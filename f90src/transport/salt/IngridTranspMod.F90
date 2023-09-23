@@ -221,7 +221,7 @@ module IngridTranspMod
   real(r8), intent(out) :: trcsa_RFLS0(idsa_beg:idsa_end)
 !     begin_execution
 !
-!     VHCPWM,VLHeatCapSnowMN=current,minimum volumetric heat capacity of snowpack
+!     VLSnowHeatCapM,VLHeatCapSnowMN=current,minimum volumetric heat capacity of snowpack
 !     VOLWSL=snowpack water content
 !     WatFlowInSnowM=snowpack water flux
 !     R*BLS=solute flux in snowpack
@@ -229,9 +229,10 @@ module IngridTranspMod
 !
   ICHKL=0
   DO L=1,JS
-    IF(VHCPWM(M,L,NY,NX).GT.VLHeatCapSnowMN(NY,NX))THEN
+  
+    IF(VLSnowHeatCapM(M,L,NY,NX).GT.VLHeatCapSnowMN(NY,NX))THEN
       L2=MIN(JS,L+1)
-      IF(L.LT.JS.AND.VHCPWM(M,L2,NY,NX).GT.VLHeatCapSnowMN(NY,NX))THEN
+      IF(L.LT.JS.AND.VLSnowHeatCapM(M,L2,NY,NX).GT.VLHeatCapSnowMN(NY,NX))THEN
         IF(VLWatSnow(L,NY,NX).GT.ZEROS2(NY,NX))THEN
           VFLWW=AZMAX1(AMIN1(1.0_r8,WatFlowInSnowM(M,L2,NY,NX)/VLWatSnow(L,NY,NX)))
         ELSE
@@ -991,7 +992,7 @@ module IngridTranspMod
 !          :*1=non-band,*B=band
 !     *S2,*B2=micropore solute content in non-band,band
 !
-  IF(FLWM(M,N,N6,N5,N4).GT.0.0)THEN
+  IF(WaterFlow2MicPM(M,N,N6,N5,N4).GT.0.0)THEN
 !
 !     IF MICROPORE WATER FLUX FROM 'WATSUB' IS FROM CURRENT TO
 !     ADJACENT GRID CELL THEN CONVECTIVE TRANSPORT IS THE PRODUCT
@@ -999,7 +1000,7 @@ module IngridTranspMod
 !     IN CURRENT GRID CELL
 !
     IF(VLWatMicPM(M,N3,N2,N1).GT.ZEROS2(N2,N1))THEN
-      VFLW=AZMAX1(AMIN1(VFLWX,FLWM(M,N,N6,N5,N4)/VLWatMicPM(M,N3,N2,N1)))
+      VFLW=AZMAX1(AMIN1(VFLWX,WaterFlow2MicPM(M,N,N6,N5,N4)/VLWatMicPM(M,N3,N2,N1)))
     ELSE
       VFLW=VFLWX
     ENDIF
@@ -1023,7 +1024,7 @@ module IngridTranspMod
 !
   ELSE
     IF(VLWatMicPM(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
-      VFLW=AZMIN1(AMAX1(-VFLWX,FLWM(M,N,N6,N5,N4)/VLWatMicPM(M,N6,N5,N4)))
+      VFLW=AZMIN1(AMAX1(-VFLWX,WaterFlow2MicPM(M,N,N6,N5,N4)/VLWatMicPM(M,N6,N5,N4)))
     ELSE
       VFLW=-VFLWX
     ENDIF
@@ -1163,7 +1164,7 @@ module IngridTranspMod
     DLYR2=AMAX1(ZERO2,DLYR(N,N6,N5,N4))
     TORTL=(TortMicPM(M,N3,N2,N1)*DLYR1+TortMicPM(M,N6,N5,N4)*DLYR2)/(DLYR1+DLYR2)
 
-    DISPN=DISP(N,N6,N5,N4)*AMIN1(VFLWX,ABS(FLWM(M,N,N6,N5,N4)/AREA(N,N6,N5,N4)))
+    DISPN=DISP(N,N6,N5,N4)*AMIN1(VFLWX,ABS(WaterFlow2MicPM(M,N,N6,N5,N4)/AREA(N,N6,N5,N4)))
     DIFPO=(POSGL2(N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
 
     DIFAL=(ALSGL2(N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
@@ -1225,9 +1226,9 @@ module IngridTranspMod
   integer :: NTSA
   real(r8) :: trcsa_RFH(idsa_beg:idsab_end)
   real(r8) :: VFLW
-!     WaterFlowMacPi=water flux through soil macropore from watsub.f
+!     WaterFlow2MacPM=water flux through soil macropore from watsub.f
 !
-  IF(WaterFlowMacPi(M,N,N6,N5,N4).GT.0.0)THEN
+  IF(WaterFlow2MacPM(M,N,N6,N5,N4).GT.0.0)THEN
 !
 !     IF MACROPORE WATER FLUX FROM 'WATSUB' IS FROM CURRENT TO
 !     ADJACENT GRID CELL THEN CONVECTIVE TRANSPORT IS THE PRODUCT
@@ -1253,7 +1254,7 @@ module IngridTranspMod
 !     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
 !
     IF(VLWatMacPM(M,N3,N2,N1).GT.ZEROS2(N2,N1))THEN
-      VFLW=AZMAX1(AMIN1(VFLWX,WaterFlowMacPi(M,N,N6,N5,N4)/VLWatMacPM(M,N3,N2,N1)))
+      VFLW=AZMAX1(AMIN1(VFLWX,WaterFlow2MacPM(M,N,N6,N5,N4)/VLWatMacPM(M,N3,N2,N1)))
     ELSE
       VFLW=VFLWX
     ENDIF
@@ -1294,7 +1295,7 @@ module IngridTranspMod
           *trcs_VLN(ids_H1PO4B,N6,N5,N4)
       ENDDO
     ENDIF
-  ELSEIF(WaterFlowMacPi(M,N,N6,N5,N4).LT.0.0)THEN
+  ELSEIF(WaterFlow2MacPM(M,N,N6,N5,N4).LT.0.0)THEN
 !
 !     IF MACROPORE WATER FLUX FROM 'WATSUB' IS FROM ADJACENT TO
 !     CURRENT GRID CELL THEN CONVECTIVE TRANSPORT IS THE PRODUCT
@@ -1302,7 +1303,7 @@ module IngridTranspMod
 !     IN ADJACENT GRID CELL
 !
     IF(VLWatMacPM(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
-      VFLW=AZMIN1(AMAX1(-VFLWX,WaterFlowMacPi(M,N,N6,N5,N4)/VLWatMacPM(M,N6,N5,N4)))
+      VFLW=AZMIN1(AMAX1(-VFLWX,WaterFlow2MacPM(M,N,N6,N5,N4)/VLWatMacPM(M,N6,N5,N4)))
     ELSE
       VFLW=-VFLWX
     ENDIF
@@ -1383,7 +1384,7 @@ module IngridTranspMod
 !     DLYR=soil layer thickness
 !     TortMacPM=macropore tortuosity from hour1.f
 !     DISP=dispersivity parameter
-!     WaterFlowMacPi=water flux through soil macropore from watsub.f
+!     WaterFlow2MacPM=water flux through soil macropore from watsub.f
 !     DIF*=aqueous diffusivity-dispersivity through macropore
 !     *SGL2=solute diffusivity from hour1.f
 !     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
@@ -1405,7 +1406,7 @@ module IngridTranspMod
     DLYR1=AMAX1(ZERO2,DLYR(N,N3,N2,N1))
     DLYR2=AMAX1(ZERO2,DLYR(N,N6,N5,N4))
     TORTL=(TortMacPM(M,N3,N2,N1)*DLYR1+TortMacPM(M,N6,N5,N4)*DLYR2)/(DLYR1+DLYR2)
-    DISPN=DISP(N,N6,N5,N4)*AMIN1(VFLWX,ABS(WaterFlowMacPi(M,N,N6,N5,N4)/AREA(N,N6,N5,N4)))
+    DISPN=DISP(N,N6,N5,N4)*AMIN1(VFLWX,ABS(WaterFlow2MacPM(M,N,N6,N5,N4)/AREA(N,N6,N5,N4)))
     DIFPO=(POSGL2(N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
 
     DIFAL=(ALSGL2(N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)

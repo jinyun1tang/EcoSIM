@@ -142,7 +142,7 @@ implicit none
   real(r8), allocatable ::  DH2GG(:,:,:,:)                     !
   real(r8), allocatable ::  RHGFXS(:,:,:)                      !
   real(r8), allocatable ::  THGFLG(:,:,:)                      !
-  real(r8), allocatable ::  FLVM(:,:,:)                        !
+  real(r8), allocatable ::  CumReductVLsoiAirPM(:,:,:)                        !
   real(r8), allocatable ::  THETH2(:,:,:)                      !
   real(r8), allocatable ::  THETHL(:,:,:)                      !
   real(r8), allocatable ::  VLsoiAirPMA(:,:,:)                      !
@@ -417,7 +417,7 @@ contains
   allocate(DH2GG(3,JZ,JY,JX));  DH2GG=0._r8
   allocate(RHGFXS(JZ,JY,JX));   RHGFXS=0._r8
   allocate(THGFLG(JZ,JY,JX));   THGFLG=0._r8
-  allocate(FLVM(JZ,JY,JX));     FLVM=0._r8
+  allocate(CumReductVLsoiAirPM(JZ,JY,JX));     CumReductVLsoiAirPM=0._r8
   allocate(THETH2(JZ,JY,JX));   THETH2=0._r8
   allocate(THETHL(JZ,JY,JX));   THETHL=0._r8
   allocate(VLsoiAirPMA(JZ,JY,JX));   VLsoiAirPMA=0._r8
@@ -691,7 +691,7 @@ contains
   call destroy(DH2GG)
   call destroy(RHGFXS)
   call destroy(THGFLG)
-  call destroy(FLVM)
+  call destroy(CumReductVLsoiAirPM)
   call destroy(THETH2)
   call destroy(THETHL)
   call destroy(VLsoiAirPMA)

@@ -21,7 +21,7 @@ implicit none
   real(r8),allocatable ::  RARG(:,:)                          !
   real(r8),allocatable ::  PARSR(:,:)                         !
   real(r8),allocatable ::  RAR(:,:)                           !
-  real(r8),allocatable ::  FLWRL(:,:)                         !
+  real(r8),allocatable ::  WatFLow2LitR(:,:)                         !
   real(r8),allocatable ::  HeatFLoByWat2LitRi(:,:)                        !  
   real(r8),allocatable ::  PARSG(:,:)                         !
   real(r8),allocatable ::  VapXAir2LitR(:,:)                  !water vapor flux from canopy air to litr
@@ -63,7 +63,7 @@ implicit none
   allocate(RARG(JY,JX));        RARG=0._r8
   allocate(PARSR(JY,JX));       PARSR=0._r8
   allocate(RAR(JY,JX));         RAR=0._r8  
-  allocate(FLWRL(JY,JX));       FLWRL=0._r8
+  allocate(WatFLow2LitR(JY,JX));       WatFLow2LitR=0._r8
   allocate(HeatFLoByWat2LitRi(JY,JX));      HeatFLoByWat2LitRi=0._r8  
   allocate(PARSG(JY,JX));       PARSG=0._r8  
   allocate(VapXAir2LitR(JY,JX));       VapXAir2LitR=0._r8  
@@ -103,7 +103,7 @@ implicit none
   call destroy(RARG)
   call destroy(PARSR)
   call destroy(RAR)  
-  call destroy(FLWRL)
+  call destroy(WatFLow2LitR)
   call destroy(HeatFLoByWat2LitRi)  
   call destroy(PARSG)  
   call destroy(VapXAir2LitR)

@@ -101,7 +101,7 @@ implicit none
   real(r8) :: CPOOLX
   real(r8) :: DMRTD
   real(r8) :: FWTRT
-  real(r8) :: RSCS2
+  real(r8) :: SoilResit4SecndRootPentration
   real(r8) :: TotSecndRootLen,TotPrimRootLen
   real(r8) :: RTLGX
   real(r8) :: RTLGT
@@ -123,14 +123,14 @@ implicit none
     ZEROP    =>   plt_biom%ZEROP      , &
     WTRVE    =>   plt_biom%WTRVE      , &
     FWODRE   =>   plt_allom%FWODRE    , &
-    DMRT     =>   plt_allom%DMRT      , &
+    BiomGrowthYieldRoot    =>   plt_allom%BiomGrowthYieldRoot     , &
     IGTYP    =>   plt_pheno%IGTYP     , &
     PSIRoot    =>   plt_ew%PSIRoot        , &
     PSIRootTurg    =>   plt_ew%PSIRootTurg        , &
     RootGasLoss_disturb    =>   plt_bgcr%RootGasLoss_disturb    , &
     trcg_rootml     =>   plt_rbgc%trcg_rootml       , &
     trcs_rootml  => plt_rbgc%trcs_rootml, &
-    RSCS     =>   plt_soilchem%RSCS   , &
+    SoilResit4RootPentration     =>   plt_soilchem%SoilResit4RootPentration   , &
     VLSoilPoreMicP     =>   plt_soilchem%VLSoilPoreMicP   , &
     NU       =>   plt_site%NU         , &
     ZERO     =>   plt_site%ZERO       , &
@@ -188,7 +188,7 @@ implicit none
 !     WATER STRESS CONSTRAINT ON SECONDARY ROOT EXTENSION IMPOSED
 !     BY ROOT TURGOR AND SOIL PENETRATION RESISTANCE
 !
-!     RSCS,RSCS2=soil resistance to secondary root penetration (MPa)
+!     SoilResit4RootPentration,SoilResit4SecndRootPentration=soil resistance to secondary root penetration (MPa)
 !     SecndRootRadius=secondary root radius
 !     WFNR=water function for root extension
 !     IGTYP=growth type:0=bryophyte,1=graminoid,2=shrub,tree
@@ -196,16 +196,16 @@ implicit none
 !     PSIRoot,PSIRootTurg=root total,turgor water potential
 !     DMRT=root growth yield
 !
-        RSCS2=RSCS(L)*SecndRootRadius(N,L,NZ)/1.0E-03_r8
-        WFNR=AMIN1(1.0_r8,AZMAX1(PSIRootTurg(N,L,NZ)-PSILM-RSCS2))
+        SoilResit4SecndRootPentration=SoilResit4RootPentration(L)*SecndRootRadius(N,L,NZ)/1.0E-03_r8
+        WFNR=AMIN1(1.0_r8,AZMAX1(PSIRootTurg(N,L,NZ)-PSILM-SoilResit4SecndRootPentration))
         IF(IGTYP(NZ).EQ.0)THEN
-          WFNGR(N,L)=EXP(0.05*PSIRoot(N,L,NZ))
+          WFNGR(N,L)=EXP(0.05_r8*PSIRoot(N,L,NZ))
           WFNRG=WFNR**0.10_r8
         ELSE
           WFNGR(N,L)=EXP(0.10_r8*PSIRoot(N,L,NZ))
           WFNRG=WFNR**0.25_r8
         ENDIF
-        DMRTD=1.0_r8-DMRT(NZ)
+        DMRTD=1.0_r8-BiomGrowthYieldRoot(NZ)
 !
 !     FOR EACH ROOT AXIS
 !
@@ -357,7 +357,7 @@ implicit none
   real(r8) :: RMNCR,RCO2RM,RCO2R
   real(r8) :: RCER(npelms)
   real(r8) :: RTN2X,RTN2Y
-  real(r8) :: RTDP1X,RSCS1
+  real(r8) :: RTDP1X,SoilResit4PrimRootPentration
   REAL(R8) :: SNCR,SNCRM
   real(r8) :: TFRCO2
   real(r8) :: RCCC,RCCN,RCCP
@@ -384,7 +384,7 @@ implicit none
     FWODRE  =>  plt_allom%FWODRE    , &
     CNRTS   =>  plt_allom%CNRTS     , &
     CPRTS   =>  plt_allom%CPRTS     , &
-    DMRT    =>  plt_allom%DMRT      , &
+    BiomGrowthYieldRoot    =>  plt_allom%BiomGrowthYieldRoot      , &
     k_woody_litr=> pltpar%k_woody_litr,&
     k_fine_litr=> pltpar%k_fine_litr, &
     icwood  =>  pltpar%icwood       , &
@@ -396,7 +396,7 @@ implicit none
     IDAY    =>  plt_pheno%IDAY      , &
     SoiBulkDensity    =>  plt_soilchem%SoiBulkDensity   , &
     CFOPE   =>  plt_soilchem%CFOPE  , &
-    RSCS    =>  plt_soilchem%RSCS   , &
+    SoilResit4RootPentration    =>  plt_soilchem%SoilResit4RootPentration   , &
     DLYR3   =>  plt_site%DLYR3      , &
     ZERO    =>  plt_site%ZERO       , &
     NJ      =>  plt_site%NJ         , &
@@ -532,14 +532,14 @@ implicit none
 !     RCO2GM,RCO2G=growth respiration limited by N,P unltd,ltd by O2
 !     DMRTD=root C respiration vs nonstructural C consumption
 !     GRTWGM,GRTWTG=root C growth unltd,ltd by O2
-!     DMRT=root growth yield
+!     BiomGrowthYieldRoot=root growth yield
 !     ZADD2M,ZADD2,PADD2=nonstructural N,P unlimited,limited by O2 used in growth
 !     CNRDM,CNRDA=respiration for N assimilation unltd,ltd by O2
 !
       CGRORM=RCO2GM/DMRTD
       CGROR=RCO2G/DMRTD
-      GRTWGM=CGRORM*DMRT(NZ)
-      GRTWTG=CGROR*DMRT(NZ)
+      GRTWGM=CGRORM*BiomGrowthYieldRoot(NZ)
+      GRTWTG=CGROR*BiomGrowthYieldRoot(NZ)
       ZADD2M=AZMAX1(GRTWGM*CNRTW)
       ZADD2=AZMAX1(AMIN1(FRTN*EPOOLR(ielmn,N,L,NZ),GRTWTG*CNRTW))
       PADD2=AZMAX1(AMIN1(FRTN*EPOOLR(ielmp,N,L,NZ),GRTWTG*CPRTW))
@@ -752,13 +752,13 @@ implicit none
 !     WATER STRESS CONSTRAINT ON SECONDARY ROOT EXTENSION IMPOSED
 !     BY ROOT TURGOR AND SOIL PENETRATION RESISTANCE
 !
-!     RSCS,RSCS1=soil resistance to primary root penetration (MPa)
+!     SoilResit4RootPentration,SoilResit4PrimRootPentration=soil resistance to primary root penetration (MPa)
 !     RRAD1=primary root radius
 !     WFNR=water function for root extension
 !     WFNRG=respiration function of root water potential
 !
-              RSCS1=RSCS(L)*PrimRootRadius(N,L,NZ)/1.0E-03_r8
-              WFNR=AMIN1(1.0_r8,AZMAX1(PSIRootTurg(N,L,NZ)-PSILM-RSCS1))
+              SoilResit4PrimRootPentration=SoilResit4RootPentration(L)*PrimRootRadius(N,L,NZ)/1.0E-03_r8
+              WFNR=AMIN1(1.0_r8,AZMAX1(PSIRootTurg(N,L,NZ)-PSILM-SoilResit4PrimRootPentration))
               IF(IGTYP(NZ).EQ.0)THEN
                 WFNRG=WFNR**0.10_r8
               ELSE
@@ -865,8 +865,8 @@ implicit none
 !
               CGRORM=RCO2GM/DMRTD
               CGROR=RCO2G/DMRTD
-              GRTWGM=CGRORM*DMRT(NZ)
-              GRTWTG=CGROR*DMRT(NZ)
+              GRTWGM=CGRORM*BiomGrowthYieldRoot(NZ)
+              GRTWTG=CGROR*BiomGrowthYieldRoot(NZ)
               ZADD1M=AZMAX1(GRTWGM*CNRTW)
               ZADD1=AZMAX1(AMIN1(FRTN*EPOOLR(ielmn,N,L,NZ),GRTWTG*CNRTW))
               PADD1=AZMAX1(AMIN1(FRTN*EPOOLR(ielmp,N,L,NZ),GRTWTG*CPRTW))
@@ -1903,7 +1903,7 @@ implicit none
     RUOH1B     =>   plt_rbgc%RUOH1B    , &
     RCO2M      =>   plt_rbgc%RCO2M     , &
     RCO2A      =>   plt_rbgc%RCO2A     , &
-    HTSTZ      =>   plt_morph%HTSTZ    , &
+    CanPHeight4WatUptake      =>   plt_morph%CanPHeight4WatUptake    , &
     MY         =>   plt_morph%MY       , &
     PrimRootRadius     =>   plt_morph%PrimRootRadius   , &
     PrimRootDepth     =>   plt_morph%PrimRootDepth   , &
@@ -1989,7 +1989,7 @@ implicit none
 !     RTDP1=primary root depth from soil surface
 !     RTDPP=primary root depth from canopy
 !     CumSoilThickness=depth from soil surface to layer bottom
-!     HTSTZ=canopy height for water uptake
+!     CanPHeight4WatUptake=canopy height for water uptake
 !     RTSK=relative primary root sink strength
 !     RTSK1=primary root sink strength
 !     XRTN1=number of primary root axes
@@ -1999,7 +1999,7 @@ implicit none
           IF(N.EQ.1)THEN
             IF(PrimRootDepth(N,NR,NZ).GT.CumSoilThickness(L-1))THEN
               IF(PrimRootDepth(N,NR,NZ).LE.CumSoilThickness(L))THEN
-                RTDPP=PrimRootDepth(N,NR,NZ)+HTSTZ(NZ)
+                RTDPP=PrimRootDepth(N,NR,NZ)+CanPHeight4WatUptake(NZ)
                 RTSK1(N,L,NR)=RTSK(IGTYP(NZ))*XRTN1*PrimRootRadius(N,L,NZ)**2._r8/RTDPP
                 RTNT(N)=RTNT(N)+RTSK1(N,L,NR)
                 RLNT(N,L)=RLNT(N,L)+RTSK1(N,L,NR)
@@ -2017,7 +2017,7 @@ implicit none
 !     DLYR=layer thickness
 !     SeedinDepth=seeding depth
 !     HypoctoylHeight=hypocotyledon height
-!     HTSTZ=canopy height for water uptake
+!     CanPHeight4WatUptake=canopy height for water uptake
 !     RTDPS=secondary root depth from canopy
 !     RTSKP,RTSKS=primary,secondary root sink strength
 !     RTN2=number of secondary root axes
@@ -2029,7 +2029,7 @@ implicit none
             RTDPL(NR,L)=AZMAX1(PrimRootDepth(ipltroot,NR,NZ)-CumSoilThickness(L-1)-RTDPX)
             RTDPL(NR,L)=AZMAX1(AMIN1(DLYR3(L),RTDPL(NR,L)) &
               -AZMAX1(SeedinDepth(NZ)-CumSoilThickness(L-1)-HypoctoylHeight(NZ)))
-            RTDPS=AMAX1(SeedinDepth(NZ),CumSoilThickness(L-1))+0.5*RTDPL(NR,L)+HTSTZ(NZ)
+            RTDPS=AMAX1(SeedinDepth(NZ),CumSoilThickness(L-1))+0.5_r8*RTDPL(NR,L)+CanPHeight4WatUptake(NZ)
             IF(RTDPS.GT.ZERO)THEN
               RTSKP=XRTN1*PrimRootRadius(N,L,NZ)**2._r8/RTDPS
               RTSKS=safe_adb(RTN2(N,L,NR,NZ)*SecndRootRadius(N,L,NZ)**2._r8,AveSecndRootLen(N,L,NZ))

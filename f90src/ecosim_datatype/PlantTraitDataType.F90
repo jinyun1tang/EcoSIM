@@ -41,13 +41,13 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  ANGBR(:,:,:)                       !branching angle, [degree from horizontal]
   real(r8),target,allocatable ::  ANGSH(:,:,:)                       !sheath angle, [degree from horizontal]
   real(r8),target,allocatable ::  RAZ(:,:,:)                         !canopy roughness height, [m]
-  real(r8),target,allocatable ::  HTSTZ(:,:,:)                       !canopy height, [m]
+  real(r8),target,allocatable ::  CanPHeight4WatUptake(:,:,:)                       !canopy height, [m]
   real(r8),target,allocatable ::  ARLF(:,:,:,:,:)                    !leaf area, [m2 d-2]
-  real(r8),target,allocatable ::  HTSHE(:,:,:,:,:)                   !sheath height, [m]
+  real(r8),target,allocatable ::  CanPSheathHeight(:,:,:,:,:)                   !sheath height, [m]
   real(r8),target,allocatable ::  HTNODE(:,:,:,:,:)                  !internode height, [m]
   real(r8),target,allocatable ::  CanPBLA(:,:,:,:)                     !branch leaf area, [m2 d-2]
   real(r8),target,allocatable ::  ARLFZ(:,:,:,:)                     !branch leaf area, [m2 d-2]
-  real(r8),target,allocatable ::  HTSHEX(:,:,:,:)                    !branch height, [m]
+  real(r8),target,allocatable ::  CanPBranchHeight(:,:,:,:)                    !branch height, [m]
   real(r8),target,allocatable ::  GRNOB(:,:,:,:)                     !branch grain number, [d-2]
   real(r8),target,allocatable ::  GRNXB(:,:,:,:)                     !branch potential grain number, [d-2]
   real(r8),target,allocatable ::  GRNO(:,:,:)                        !canopy grain number, [d-2]
@@ -198,13 +198,13 @@ contains
   allocate(ANGBR(JP,JY,JX));    ANGBR=0._r8
   allocate(ANGSH(JP,JY,JX));    ANGSH=0._r8
   allocate(RAZ(JP,JY,JX));      RAZ=0._r8
-  allocate(HTSTZ(JP,JY,JX));    HTSTZ=0._r8
+  allocate(CanPHeight4WatUptake(JP,JY,JX));    CanPHeight4WatUptake=0._r8
   allocate(ARLF(0:JNODS,JBR,JP,JY,JX));ARLF=0._r8
-  allocate(HTSHE(0:JNODS,JBR,JP,JY,JX));HTSHE=0._r8
+  allocate(CanPSheathHeight(0:JNODS,JBR,JP,JY,JX));CanPSheathHeight=0._r8
   allocate(HTNODE(0:JNODS,JBR,JP,JY,JX));HTNODE=0._r8
   allocate(CanPBLA(JBR,JP,JY,JX)); CanPBLA=0._r8
   allocate(ARLFZ(JBR,JP,JY,JX)); ARLFZ=0._r8
-  allocate(HTSHEX(JBR,JP,JY,JX));HTSHEX=0._r8
+  allocate(CanPBranchHeight(JBR,JP,JY,JX));CanPBranchHeight=0._r8
   allocate(GRNOB(JBR,JP,JY,JX)); GRNOB=0._r8
   allocate(GRNXB(JBR,JP,JY,JX)); GRNXB=0._r8
   allocate(GRNO(JP,JY,JX));     GRNO=0._r8
@@ -352,13 +352,13 @@ contains
   call destroy(ANGBR)
   call destroy(ANGSH)
   call destroy(RAZ)
-  call destroy(HTSTZ)
+  call destroy(CanPHeight4WatUptake)
   call destroy(ARLF)
-  call destroy(HTSHE)
+  call destroy(CanPSheathHeight)
   call destroy(HTNODE)
   call destroy(CanPBLA)
   call destroy(ARLFZ)
-  call destroy(HTSHEX)
+  call destroy(CanPBranchHeight)
   call destroy(GRNOB)
   call destroy(GRNXB)
   call destroy(GRNO)

@@ -772,7 +772,7 @@ implicit none
     CanPLBSA    => plt_morph%CanPLBSA     , &
     NBR      => plt_morph%NBR       , &
     ARLF1    => plt_morph%ARLF1     , &
-    HTSHE    => plt_morph%HTSHE     , &
+    CanPSheathHeight    => plt_morph%CanPSheathHeight     , &
     HTNODX   => plt_morph%HTNODX    , &
     SURF     => plt_morph%SURF      , &
     HTNODE   => plt_morph%HTNODE    , &
@@ -835,7 +835,7 @@ implicit none
     ARLF1(K,NB,NZ)=0._r8
     HTNODE(K,NB,NZ)=0._r8
     HTNODX(K,NB,NZ)=0._r8
-    HTSHE(K,NB,NZ)=0._r8
+    CanPSheathHeight(K,NB,NZ)=0._r8
     WSLF(K,NB,NZ)=0._r8
     WSSHE(K,NB,NZ)=0._r8
     WGLFE(1:npelms,K,NB,NZ)=0._r8

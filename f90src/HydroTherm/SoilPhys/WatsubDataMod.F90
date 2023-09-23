@@ -11,13 +11,15 @@ implicit none
   real(r8),allocatable ::  AreaUnderWaterTBL(:,:,:)           !
 
   real(r8),allocatable ::  VLairMacP(:,:,:)                   !
-  real(r8),allocatable ::  TLSoiPIceHeatFlxFrez1(:,:,:)        !total soil layer latent heat release from melting
+  real(r8),allocatable ::  TLPhaseChangeHeat2Soi1(:,:,:)        !total soil layer latent heat release from melting
+  real(r8),allocatable ::  TLPhaseChangeHeat2Soi1s(:,:,:)        !total soil layer latent heat release from melting
 
   real(r8),allocatable ::  FWatExMacP2MicPi(:,:,:)             !pressure-driven water flow from macpore to micpore
 
   real(r8),allocatable ::  TWatCharge2MicP(:,:,:)                       !
   real(r8),allocatable ::  TConvectWaterFlowMacP(:,:,:)                      !
   real(r8),allocatable ::  THeatFlow2Soili(:,:,:)                      !
+  real(r8),allocatable ::  THeatFlow2Soilis(:,:,:)                      !
   real(r8),allocatable ::  FIceThawMicP(:,:,:)                       !
   real(r8),allocatable ::  SoiPLIceHeatFlxFrez(:,:,:)                       !
   real(r8),allocatable ::  AVCNHL(:,:,:,:)                    !
@@ -59,13 +61,15 @@ contains
 
 
   allocate(VLairMacP(JZ,JY,JX));  VLairMacP=0._r8
-  allocate(TLSoiPIceHeatFlxFrez1(JZ,JY,JX));   TLSoiPIceHeatFlxFrez1=0._r8
+  allocate(TLPhaseChangeHeat2Soi1(JZ,JY,JX));   TLPhaseChangeHeat2Soi1=0._r8
+  allocate(TLPhaseChangeHeat2Soi1s(JZ,JY,JX));   TLPhaseChangeHeat2Soi1s=0._r8
 
   allocate(FWatExMacP2MicPi(JZ,JY,JX));    FWatExMacP2MicPi=0._r8
 
   allocate(TWatCharge2MicP(JZ,JY,JX));    TWatCharge2MicP=0._r8
   allocate(TConvectWaterFlowMacP(JZ,JY,JX));   TConvectWaterFlowMacP=0._r8
   allocate(THeatFlow2Soili(JZ,JY,JX));   THeatFlow2Soili=0._r8
+  allocate(THeatFlow2Soilis(JZ,JY,JX));   THeatFlow2Soilis=0._r8  
   allocate(FIceThawMicP(JZ,JY,JX));    FIceThawMicP=0._r8
   allocate(SoiPLIceHeatFlxFrez(JZ,JY,JX));    SoiPLIceHeatFlxFrez=0._r8
   allocate(AVCNHL(3,JD,JV,JH)); AVCNHL=0._r8
@@ -104,13 +108,15 @@ contains
   call destroy(AreaUnderWaterTBL)
 
   call destroy(VLairMacP)
-  call destroy(TLSoiPIceHeatFlxFrez1)
+  call destroy(TLPhaseChangeHeat2Soi1)
+  call destroy(TLPhaseChangeHeat2Soi1s)
 
   call destroy(FWatExMacP2MicPi)
 
   call destroy(TWatCharge2MicP)
   call destroy(TConvectWaterFlowMacP)
   call destroy(THeatFlow2Soili)
+  call destroy(THeatFlow2Soilis)  
   call destroy(FIceThawMicP)
   call destroy(SoiPLIceHeatFlxFrez)
   call destroy(AVCNHL)

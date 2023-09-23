@@ -397,7 +397,7 @@ implicit none
   call ncd_getvar(pft_nfid, 'ETMX', loc, ETMX(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'CHL', loc, CHL(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'CHL4', loc, CHL4(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'FCO2', loc, FCO2(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'FCO2', loc, CanPCi2CaRatio(NZ,NY,NX))
 
   call ncd_getvar(pft_nfid, 'ALBR', loc, ALBR(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'ALBP', loc, ALBP(NZ,NY,NX))
@@ -465,7 +465,7 @@ implicit none
   call ncd_getvar(pft_nfid, 'DMHSK', loc,DMHSK(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'DMEAR', loc,DMEAR(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'DMGR', loc,DMGR(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'DMRT', loc,DMRT(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'DMRT', loc,BiomGrowthYieldRoot(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'DMND', loc,DMND(NZ,NY,NX))
 
   call ncd_getvar(pft_nfid, 'CNLF', loc,CNLF(NZ,NY,NX))
@@ -676,7 +676,7 @@ implicit none
     write(*,*)'Fraction of leaf protein as chlorophyll in bundle sheath(C4)',CHL(NZ,NY,NX)
     write(*,*)'fraction of leaf protein in mesophyll chlorophyll(C4)',CHL4(NZ,NY,NX)
   endif
-  write(*,*)'intercellular:atmospheric CO2 concentration ratio:',FCO2(NZ,NY,NX)
+  write(*,*)'intercellular:atmospheric CO2 concentration ratio:',CanPCi2CaRatio(NZ,NY,NX)
   end subroutine photosyns_trait_disp
 
 !------------------------------------------------------------------------------------------
@@ -792,7 +792,7 @@ implicit none
   write(*,*)'grain C production vs nonstructural C'// &
     ' consumption (g g-1): DMGR',DMGR(NZ,NY,NX)
   write(*,*)'root dry matter C production vs nonstructural C'// &
-    ' consumption (g g-1): DMRT',DMRT(NZ,NY,NX)
+    ' consumption (g g-1): DMRT',BiomGrowthYieldRoot(NZ,NY,NX)
   write(*,*)'nodule bacteria in root nodule,canopy dry matter'// &
     'C production vs nonstructural C consumption (g g-1): DMND' &
     ,DMND(NZ,NY,NX)

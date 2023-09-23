@@ -783,9 +783,7 @@ module Hour1Mod
   WatXfer2SnoLay(1:JS,NY,NX)=0.0_r8
   IceXfer2SnoLay(1:JS,NY,NX)=0.0_r8
   HeatXfer2SnoLay(1:JS,NY,NX)=0.0_r8
-  XWFLXS(1:JS,NY,NX)=0.0_r8
-  XWFLXI(1:JS,NY,NX)=0.0_r8
-  XTHAWW(1:JS,NY,NX)=0.0_r8
+  XPhaseChangeHeatL(1:JS,NY,NX)=0.0_r8
 
   trcg_XBLS(idg_beg:idg_end-1,1:JS,NY,NX)=0.0_r8
 
@@ -2368,7 +2366,7 @@ module Hour1Mod
     ENDDO
     TLIceThawMicP(L,NY,NX)=0.0_r8
     TLIceThawMacP(L,NY,NX)=0.0_r8
-    TLSoiPIceHeatFlxFrez(L,NY,NX)=0.0_r8
+    TLPhaseChangeHeat2Soi(L,NY,NX)=0.0_r8
     trcg_XBLL(idg_beg:idg_end,L,NY,NX)=0.0_r8
     RTDNT(L,NY,NX)=0.0_r8
   ENDDO

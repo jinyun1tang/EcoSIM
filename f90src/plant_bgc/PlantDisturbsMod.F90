@@ -907,7 +907,7 @@ module PlantDisturbsMod
               ARLF1(K,NB,NZ)=ARLF1(K,NB,NZ)*XHVST
 
               WSLF(K,NB,NZ)=WSLF(K,NB,NZ)*XHVST
-!     HTSHE(K,NB,NZ)=HTSHE(K,NB,NZ)*XHVST
+!     CanPSheathHeight(K,NB,NZ)=CanPSheathHeight(K,NB,NZ)*XHVST
 
               WSSHE(K,NB,NZ)=WSSHE(K,NB,NZ)*XHVST
 !     HTNODE(K,NB,NZ)=HTNODE(K,NB,NZ)*XHVST
@@ -1289,7 +1289,7 @@ module PlantDisturbsMod
     HTNODE   =>  plt_morph%HTNODE  , &
     GRNXB    =>  plt_morph%GRNXB   , &
     GRNOB    =>  plt_morph%GRNOB   , &
-    HTSHE    =>  plt_morph%HTSHE   , &
+    CanPSheathHeight    =>  plt_morph%CanPSheathHeight   , &
     ARLF1    =>  plt_morph%ARLF1   , &
     ARLFV    =>  plt_morph%ARLFV   , &
     CanPLSA    =>  plt_morph%CanPLSA   , &
@@ -1753,7 +1753,7 @@ module PlantDisturbsMod
 !     WTHTX2E(ielmc),WTHTX2E(ielmn),WTHTX2E(ielmp)=harvested petiole C,N,P to litter
 !     FWODB=C woody fraction in other organs:0=woody,1=non-woody
 !     FWODLN,FWODLP=N,P woody fraction in leaf:0=woody,1=non-woody
-!     HTSHE,HTNODE=petiole,internode length
+!     CanPSheathHeight,HTNODE=petiole,internode length
 !
           IF((IHVST(NZ).NE.4.AND.IHVST(NZ).NE.6).OR.WHVSBS.GT.0.0)THEN
             IF(IHVST(NZ).EQ.4.OR.IHVST(NZ).EQ.6)THEN
@@ -1778,7 +1778,7 @@ module PlantDisturbsMod
 !
 !     WGSHE=petiole node C mass
 !     WTSHEB,WTSHBN,WTSHBP=branch petiole C,N,P mass
-!     HTSHE=node petiole height
+!     CanPSheathHeight=node petiole height
 !     WSSHE=petiole protein mass
 !
             WGSHGY=WGSHGY+WGSHE(ielmc,K,NB,NZ)
@@ -1790,12 +1790,12 @@ module PlantDisturbsMod
               WGSHE(NE,K,NB,NZ)=FHVSETK(K)*WGSHE(NE,K,NB,NZ)
             ENDDO
 !            WSSHE(K,NB,NZ)=FHVSETK(K)*WSSHE(K,NB,NZ)
-            IF(IHVST(NZ).LE.2.AND.HTSHE(K,NB,NZ).GT.0.0_r8)THEN
+            IF(IHVST(NZ).LE.2.AND.CanPSheathHeight(K,NB,NZ).GT.0.0_r8)THEN
               FHGT=AZMAX1(AMIN1(1.0_r8,(HTNODE(K,NB,NZ) &
-                +HTSHE(K,NB,NZ)-HVST(NZ))/HTSHE(K,NB,NZ)))
-              HTSHE(K,NB,NZ)=(1._r8-FHGT)*HTSHE(K,NB,NZ)
+                +CanPSheathHeight(K,NB,NZ)-HVST(NZ))/CanPSheathHeight(K,NB,NZ)))
+              CanPSheathHeight(K,NB,NZ)=(1._r8-FHGT)*CanPSheathHeight(K,NB,NZ)
             ELSE
-              HTSHE(K,NB,NZ)=FHVSETK(K)*HTSHE(K,NB,NZ)
+              CanPSheathHeight(K,NB,NZ)=FHVSETK(K)*CanPSheathHeight(K,NB,NZ)
             ENDIF
             WGSHGX=WGSHGX+WGSHE(ielmc,K,NB,NZ)
 !     IF(IHVST(NZ).NE.4.AND.IHVST(NZ).NE.6)THEN

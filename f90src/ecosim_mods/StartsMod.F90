@@ -483,9 +483,6 @@ module StartsMod
           +VLWatMacP(L,NY,NX))+cpi*(VLiceMicP(L,NY,NX)+VLiceMacP(L,NY,NX))
         THETWZ(L,NY,NX)=THETW(L,NY,NX)
         THETIZ(L,NY,NX)=THETI(L,NY,NX)
-        write(111,*)'heatcap starts',L,NY,NX,VHeatCapacitySoilM(L,NY,NX),&
-          cpw*(VLWatMicP(L,NY,NX)+VLWatMacP(L,NY,NX)), &
-          cpi*(VLiceMicP(L,NY,NX)+VLiceMacP(L,NY,NX))  
       ENDIF
     ENDIF
     TKS(L,NY,NX)=ATKS(NY,NX)
@@ -926,10 +923,11 @@ module StartsMod
     
 !------------------------------------------------------------------------------------------
   
-  subroutine set_ecosim_solver(NPXS1,NPYS1)
+  subroutine set_ecosim_solver(NPXS1,NPYS1,NCYC_LITR,NCYC_SNOW)
   
   implicit none
   integer, intent(in) :: NPXS1,NPYS1
+  integer, intent(in) :: NCYC_LITR,NCYC_SNOW
   !     begin_execution
   real(r8) :: XNPV
   
@@ -940,8 +938,8 @@ module StartsMod
   NPT=NPY
   NPG=NPH*NPT
 
-  NPR=30    !sub-cycles of litter
-  NPS=10    !sub-cycles of snow iteration
+  NPR=NCYC_LITR     !sub-cycles of litter
+  NPS=NCYC_SNOW     !sub-cycles of snow iteration
   dts_HeatWatTP=1.0_r8/NPH
   XNPT=1.0_r8/NPT
   dts_gas=1.0_r8/NPG

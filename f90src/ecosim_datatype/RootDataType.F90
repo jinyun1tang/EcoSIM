@@ -14,7 +14,7 @@ module RootDataType
   integer,target,allocatable ::  IDTHR(:,:,:)                        !flag to detect root system death , [-]
   integer,target,allocatable ::  NIXBotRootLayer(:,:,:)              !maximum soil layer number for all root axes, [-]
   integer,target,allocatable ::  NI(:,:,:)                           !maximum soil layer number for all root axes, [-]
-  real(r8),target,allocatable ::  DMRT(:,:,:)                        !root growth yield, [g g-1]
+  real(r8),target,allocatable ::  BiomGrowthYieldRoot(:,:,:)                        !root growth yield, [g g-1]
   real(r8),target,allocatable ::  PR(:,:,:)                          !threshold root nonstructural C content for initiating new root axis, [g g-1]
   real(r8),target,allocatable ::  CWSRT(:,:,:)                       !fraction of remobilizable nonstructural biomass in root, [-]
   real(r8),target,allocatable ::  DMVL(:,:,:,:)                      !root volume:mass ratio, [m3 g-1]
@@ -96,7 +96,7 @@ contains
   allocate(IDTHR(JP,JY,JX));    IDTHR=0
   allocate(NIXBotRootLayer(JP,JY,JX));      NIXBotRootLayer=0
   allocate(NI(JP,JY,JX));       NI=0
-  allocate(DMRT(JP,JY,JX));     DMRT=0._r8
+  allocate(BiomGrowthYieldRoot(JP,JY,JX));     BiomGrowthYieldRoot=0._r8
   allocate(PR(JP,JY,JX));       PR=0._r8
   allocate(CWSRT(JP,JY,JX));    CWSRT=0._r8
   allocate(DMVL(jroots,JP,JY,JX));   DMVL=0._r8
@@ -176,7 +176,7 @@ contains
   call destroy(IDTHR)
   call destroy(NIXBotRootLayer)
   call destroy(NI)
-  call destroy(DMRT)
+  call destroy(BiomGrowthYieldRoot)
   call destroy(PR)
   call destroy(CWSRT)
   call destroy(DMVL)

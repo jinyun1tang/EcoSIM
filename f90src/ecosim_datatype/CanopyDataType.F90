@@ -59,7 +59,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  ETMX(:,:,:)                        !cholorophyll activity , [umol g-1 h-1 at 25 oC]
   real(r8),target,allocatable ::  CHL(:,:,:)                         !leaf C3 chlorophyll content, [g g-1]
   real(r8),target,allocatable ::  CHL4(:,:,:)                        !leaf C4 chlorophyll content, [g g-1]
-  real(r8),target,allocatable ::  FCO2(:,:,:)                        !Ci:Ca ratio, [-]
+  real(r8),target,allocatable ::  CanPCi2CaRatio(:,:,:)                        !Ci:Ca ratio, [-]
   real(r8),target,allocatable ::  RadNet2CanP(:,:,:)                 !canopy net radiation , [MJ d-2 h-1] >0
   real(r8),target,allocatable ::  LWRadCanP(:,:,:)                   !canopy longwave radiation , [MJ d-2 h-1]
   real(r8),target,allocatable ::  SWRadByCanP(:,:,:)                 !canopy absorbed shortwave radiation , [MJ d-2 h-1]
@@ -208,7 +208,7 @@ module CanopyDataType
   allocate(ETMX(JP,JY,JX));     ETMX=0._r8
   allocate(CHL(JP,JY,JX));      CHL=0._r8
   allocate(CHL4(JP,JY,JX));     CHL4=0._r8
-  allocate(FCO2(JP,JY,JX));     FCO2=0._r8
+  allocate(CanPCi2CaRatio(JP,JY,JX));     CanPCi2CaRatio=0._r8
   allocate(RadNet2CanP(JP,JY,JX));     RadNet2CanP=0._r8
   allocate(LWRadCanP(JP,JY,JX));    LWRadCanP=0._r8
   allocate(SWRadByCanP(JP,JY,JX));     SWRadByCanP=0._r8
@@ -358,7 +358,7 @@ module CanopyDataType
   call destroy(ETMX)
   call destroy(CHL)
   call destroy(CHL4)
-  call destroy(FCO2)
+  call destroy(CanPCi2CaRatio)
   call destroy(RadNet2CanP)
   call destroy(LWRadCanP)
   call destroy(SWRadByCanP)

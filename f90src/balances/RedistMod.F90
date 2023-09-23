@@ -88,9 +88,6 @@ module RedistMod
   TFLWT=0.0_r8
   VOLPT=0.0_r8
   VOLTT=0.0_r8
-  
-  write(111,*)'xxhourd',curday,curhour
-  
 
   D9995: DO NX=NHW,NHE
     D9990: DO NY=NVN,NVS
@@ -363,10 +360,10 @@ module RedistMod
     HEATIN=HEATIN+HFLXO
     Ls=NUM(NY,NX)
     !if(curday>=175)write(*,*)'at line',__LINE__,TKS(0,NY,NX),tks(Ls,ny,nx),tkspre
-    if(abs(VHeatCapacity(0,NY,NX)/VHeatCapacityLitrX-1._r8)>0.025_r8.or. &
-      abs(TKS(0,NY,NX)/tkspre-1._r8)>0.025_r8)then
-      TKS(0,NY,NX)=TKS(NUM(NY,NX),NY,NX)
-    endif
+!    if(abs(VHeatCapacity(0,NY,NX)/VHeatCapacityLitrX-1._r8)>0.025_r8.or. &
+!      abs(TKS(0,NY,NX)/tkspre-1._r8)>0.025_r8)then
+!      TKS(0,NY,NX)=TKS(NUM(NY,NX),NY,NX)
+!    endif
   ELSE
     HEATIN=HEATIN+HFLXO+(TKS(NUM(NY,NX),NY,NX)-TKS(0,NY,NX))*VHeatCapacity(0,NY,NX)
     TKS(0,NY,NX)=TKS(NUM(NY,NX),NY,NX)
@@ -399,7 +396,7 @@ module RedistMod
   HEATIN=HEATIN+cpw*TairK(NY,NX)*PRECA(NY,NX)+cps*TairK(NY,NX)*SnoFalPrec(NY,NX)
   HEATIN=HEATIN+HeatNet2Surf(NY,NX)+THFLXC(NY,NX)
   D5150: DO L=1,JS
-    HEATIN=HEATIN+XTHAWW(L,NY,NX)
+    HEATIN=HEATIN+XPhaseChangeHeatL(L,NY,NX)
   ENDDO D5150
   HEATOU=HEATOU-cpw*TairK(NY,NX)*IrrigSubsurf(NY,NX)
 !
@@ -983,6 +980,7 @@ module RedistMod
   TVOLI=0.0_r8
   TVOLIH=0.0_r8
   TENGY=0.0_r8
+  
   DO L=NU(NY,NX),NL(NY,NX)
 
     TKSX=TKS(L,NY,NX)
@@ -999,7 +997,6 @@ module RedistMod
     VLWatMicPX(L,NY,NX)=AMIN1(VLWatMicP(L,NY,NX),VLWatMicPX(L,NY,NX)+0.01_r8*(VLWatMicP(L,NY,NX)-VLWatMicPX(L,NY,NX)))
     VLiceMicP(L,NY,NX)=VLiceMicP(L,NY,NX)-WatIceThawMicP(L,NY,NX)/DENSICE
 
-    if(L<2)write(*,*)'redist Lwat',L,NY,NX,VLWatMicP(L,NY,NX),VLiceMicP(L,NY,NX)
     !micropore
     VLWatMacP(L,NY,NX)=VLWatMacP(L,NY,NX)+TWaterFlowMacP(L,NY,NX)-FWatExMacP2MicP(L,NY,NX)+WatIceThawMacP(L,NY,NX)
     VLiceMacP(L,NY,NX)=VLiceMacP(L,NY,NX)-WatIceThawMacP(L,NY,NX)/DENSICE
@@ -1022,8 +1019,9 @@ module RedistMod
     ENGY=VHeatCapacityX*TKSX
     VHeatCapacity(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+cpw*(VLWatMicP(L,NY,NX)+VLWatMacP(L,NY,NX)) &
       +cpi*(VLiceMicP(L,NY,NX)+VLiceMacP(L,NY,NX))
+
     TVHeatCapacity=TVHeatCapacity+VHeatCapacity(L,NY,NX)
-    TVHeatCapacitySoilM=TVHeatCapacitySoilM+VHeatCapacitySoilM(L,NY,NX)
+    TVHeatCapacitySoilM=TVHeatCapacitySoilM+VHeatCapacitySoilM(L,NY,NX)    
     TVOLW=TVOLW+VLWatMicP(L,NY,NX)
     TVOLWH=TVOLWH+VLWatMacP(L,NY,NX)
     TVOLI=TVOLI+VLiceMicP(L,NY,NX)
@@ -1034,10 +1032,10 @@ module RedistMod
     !
     !     IF(NX.EQ.3.AND.NY.EQ.2.AND.L.GT.NU(NY,NX)
     !    3.AND.L.LE.17.AND.I.GE.152.AND.I.LE.304)THEN
-    !     THeatFlowSoiCell(L,NY,NX)=THeatFlowSoiCell(L,NY,NX)
+    !     THeatFlow2Soil(L,NY,NX)=THeatFlow2Soil(L,NY,NX)
     !    2+(TKSZ(I,J,L)-TKS(L,NY,NX))*VHeatCapacity(L,NY,NX)
     !     WRITE(*,3379)'TKSZ',I,J,NX,NY,L,TKSZ(I,J,L)
-    !    2,TKS(L,NY,NX),VHeatCapacity(L,NY,NX),THeatFlowSoiCell(L,NY,NX)
+    !    2,TKS(L,NY,NX),VHeatCapacity(L,NY,NX),THeatFlow2Soil(L,NY,NX)
     !3379  FORMAT(A8,6I4,12E12.4)
     !     ENDIF
     !
@@ -1045,32 +1043,16 @@ module RedistMod
     !
     IF(VHeatCapacity(L,NY,NX).GT.ZEROS(NY,NX))THEN
       TKS00=TKS(L,NY,NX)
-      TKS(L,NY,NX)=(ENGY+THeatFlowSoiCell(L,NY,NX)+THeatSoiThaw(L,NY,NX) &
+      TKS(L,NY,NX)=(ENGY+THeatFlow2Soil(L,NY,NX)+THeatSoiThaw(L,NY,NX) &
         +THeatRootUptake(L,NY,NX)+HeatIrrigation(L,NY,NX))/VHeatCapacity(L,NY,NX)
-        
-      if(TKS(L,NY,NX)>400..or.(curday>=283 .and.curhour>=9))then
-        write(111,*)'tkx L NY NX',L,NY,NX,TKSX,TKS(L,NY,NX),VHeatCapacity(L,NY,NX)
-        write(111,*)'energy THeatFlowSoiCell THeatSoiThaw THeatRootUptake ',&
-          'HeatIrrigation VHeatCapacity'  
-        write(111,*)ENGY/VHeatCapacity(L,NY,NX),THeatFlowSoiCell(L,NY,NX)/VHeatCapacity(L,NY,NX),&
-          THeatSoiThaw(L,NY,NX)/VHeatCapacity(L,NY,NX), &
-          THeatRootUptake(L,NY,NX)/VHeatCapacity(L,NY,NX),&
-          HeatIrrigation(L,NY,NX)/VHeatCapacity(L,NY,NX),VHeatCapacity(L,NY,NX)
-        write(111,*)ENGY,THeatFlowSoiCell(L,NY,NX),THeatSoiThaw(L,NY,NX), &
-          THeatRootUptake(L,NY,NX),HeatIrrigation(L,NY,NX)
-        write(111,*)'heatcap comp',VHeatCapacityX,VHeatCapacitySoilM(L,NY,NX),&
-          cpw*(VLWatMicP(L,NY,NX)+VLWatMacP(L,NY,NX)), &
-          cpi*(VLiceMicP(L,NY,NX)+VLiceMacP(L,NY,NX))  
-        write(111,*)'dwatv dicev',DVLWatMicP(L,NY,NX),DVLiceMicP(L,NY,NX)  
-      endif
-      if(L==1.and.abs(TKS(L,NY,NX)/TKS00-1._r8)>0.025_r8)then
-        TKS(L,NY,NX)=TKS00
-      endif
+
+!      if(L==1.and.abs(TKS(L,NY,NX)/TKS00-1._r8)>0.025_r8)then
+!        TKS(L,NY,NX)=TKS00
+!      endif
     ELSE
       TKS(L,NY,NX)=TKS(NUM(NY,NX),NY,NX)
     ENDIF
-    if(L==2 .and. TKS(L,NY,NX)>400.)&
-      print*,'update_physVar_Profile',NY,NX,TKSX,TKS(L,NY,NX),VHeatCapacity(L,NY,NX)
+
     TCS(L,NY,NX)=units%Kelvin2Celcius(TKS(L,NY,NX))
     WS=VLWatMicP(L,NY,NX)+VLWatMacP(L,NY,NX)+(VLiceMicP(L,NY,NX)+VLiceMacP(L,NY,NX))*DENSICE
     WaterStoreLandscape=WaterStoreLandscape+WS

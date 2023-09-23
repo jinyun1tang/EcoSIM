@@ -1,5 +1,6 @@
 set(SURFPHYS_SOURCES
   SurfPhysData.F90
+  SurfLitterPhysMod.F90
   SurfPhysMod.F90
 )
 include(add_ecosim_library)

@@ -13,12 +13,16 @@ module SoilPhysParaMod
   USE AqueChemDatatype
   USE SOMDataType
   use SoilBGCDataType
+  use MiniMathMod
+  use SoilHeatDataType
   USE GridDataType
 implicit none
   private
   character(len=*), parameter :: mod_filename=__FILE__
   PUBLIC :: CalcSoilWatPotential
   public :: SetDeepSoil
+  public :: CalcSoilThermConductivity
+
   contains
 !------------------------------------------------------------------------------------------
   subroutine CalcSoilWatPotential(NY,NX,N1,N2,N3,PSISoilMatric,THETA1S)
@@ -167,4 +171,37 @@ implicit none
   ENDDO
   END associate
   end subroutine SetDeepSoil
+
+!------------------------------------------------------------------------------------------
+  subroutine CalcSoilThermConductivity(N1,N2,N3,DTKX,TCND1)
+  implicit none
+  integer , intent(in) :: N1,N2,N3
+  real(r8), intent(in) :: DTKX     !absolute temeprature gradient
+  real(r8), intent(out):: TCND1
+
+  real(r8) :: HeatDiffusByWat1,HeatDiffusByAir1,RYLXW1,RYLXA1,RYLNW1,RYLNA1
+  REAL(R8) :: XNUSW1,XNUSA1,ThermalConducByWater,ThermalConducByAir,WTHET1
+
+  IF(SoiBulkDensity(N3,N2,N1).GT.ZERO.OR.FracSoiPAsWat(N3,N2,N1)+FracSoiPAsIce(N3,N2,N1).GT.ZERO)THEN
+    !it is a soil layer or pure water layer
+    HeatDiffusByWat1=AZMAX1(FracSoiPAsWat(N3,N2,N1)-TRBW)**3._r8
+    HeatDiffusByAir1=AZMAX1(FracSoiPAsAir(N3,N2,N1)-TRBA)**3._r8
+    RYLXW1=DTKX*HeatDiffusByWat1
+    RYLXA1=DTKX*HeatDiffusByAir1
+    RYLNW1=AMIN1(1.0E+04_r8,RYLXW*RYLXW1)
+    RYLNA1=AMIN1(1.0E+04_r8,RYLXA*RYLXA1)
+    XNUSW1=AMAX1(1.0_r8,0.68_r8+0.67_r8*RYLNW1**0.25_r8/DNUSW)
+    XNUSA1=AMAX1(1.0_r8,0.68_r8+0.67_r8*RYLNA1**0.25_r8/DNUSA)
+    ThermalConducByWater=2.067E-03_r8*XNUSW1
+    ThermalConducByAir=9.050E-05_r8*XNUSA1
+    WTHET1=1.467_r8-0.467_r8*FracSoilAsAirt(N3,N2,N1)
+    TCND1=(STC(N3,N2,N1)+FracSoiPAsWat(N3,N2,N1)*ThermalConducByWater &
+      +0.611_r8*FracSoiPAsIce(N3,N2,N1)*7.844E-03_r8 &
+      +WTHET1*FracSoiPAsAir(N3,N2,N1)*ThermalConducByAir) &
+      /(DTC(N3,N2,N1)+FracSoiPAsWat(N3,N2,N1)+0.611_r8*FracSoiPAsIce(N3,N2,N1) &
+      +WTHET1*FracSoiPAsAir(N3,N2,N1))
+  ELSE
+    TCND1=0.0_r8
+  ENDIF
+  end subroutine CalcSoilThermConductivity
 end  module SoilPhysParaMod

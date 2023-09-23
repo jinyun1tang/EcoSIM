@@ -8,8 +8,8 @@ module SnowDataType
   save
   character(len=*), private, parameter :: mod_filename = __FILE__
 
-  real(r8),target, allocatable ::  VHCPWM(:,:,:,:)                    !volumetric heat capacity of snowpack
-  real(r8),target, allocatable ::  WatFlowInSnowM(:,:,:,:)                     !snowpack water flux
+  real(r8),target, allocatable ::  VLSnowHeatCapM(:,:,:,:)            !volumetric heat capacity of snowpack
+  real(r8),target, allocatable ::  WatFlowInSnowM(:,:,:,:)            !snowpack water flux
   real(r8),target, allocatable ::  QSM(:,:,:,:)                       !runoff snow flux, [m3 d-2 t-1]
   REAL(R8),target, allocatable ::  ALBS(:,:)                          !snowpack albedo
   real(r8),target, allocatable ::  NewSnowDens(:,:)                   !new snowpack density, [Mg m-3]
@@ -26,8 +26,7 @@ module SnowDataType
   real(r8),target, allocatable ::  SnoXfer2SnoLay(:,:,:)                       !hourly snow transfer
   real(r8),target, allocatable ::  IceXfer2SnoLay(:,:,:)                       !hourly snow ice transfer
   real(r8),target, allocatable ::  HeatXfer2SnoLay(:,:,:)                      !hourly convective heat flux from water transfer
-  real(r8),target, allocatable ::  XWFLXS(:,:,:)                      !hourly convective heat flux from snow transfer
-  real(r8),target, allocatable ::  XWFLXI(:,:,:)                      !hourly convective heat flux from ice transfer
+
   real(r8),target, allocatable ::  cumSnowDepth(:,:,:)                !cumulative depth to bottom of snowpack layer
   real(r8),target, allocatable ::  VLSnowt0(:,:,:)                    !Initial snowpack volume, [m3 d-2]
   real(r8),target, allocatable ::  SnowDepth(:,:)                     !snowpack depth, [m]
@@ -68,7 +67,7 @@ contains
   subroutine InitSnowData
 
   implicit none
-  allocate(VHCPWM(60,JS,JY,JX));VHCPWM=0._r8
+  allocate(VLSnowHeatCapM(60,JS,JY,JX));VLSnowHeatCapM=0._r8
   allocate(WatFlowInSnowM(60,JS,JY,JX)); WatFlowInSnowM=0._r8
   allocate(QSM(60,2,JV,JH));    QSM=0._r8
   allocate(ALBS(JY,JX));        ALBS=0._r8
@@ -86,8 +85,7 @@ contains
   allocate(SnoXfer2SnoLay(JS,JY,JX));    SnoXfer2SnoLay=0._r8
   allocate(IceXfer2SnoLay(JS,JY,JX));    IceXfer2SnoLay=0._r8
   allocate(HeatXfer2SnoLay(JS,JY,JX));   HeatXfer2SnoLay=0._r8
-  allocate(XWFLXS(JS,JY,JX));   XWFLXS=0._r8
-  allocate(XWFLXI(JS,JY,JX));   XWFLXI=0._r8
+
   allocate(cumSnowDepth(0:JS,JY,JX)); cumSnowDepth=0._r8
   allocate(VLSnowt0(JS,JY,JX));    VLSnowt0=0._r8
   allocate(SnowDepth(JY,JX));       SnowDepth=0._r8
@@ -134,7 +132,7 @@ contains
     call destroy(trcs_solsml)
     call destroy(trcsa_XQS)
   endif
-  call destroy(VHCPWM)
+  call destroy(VLSnowHeatCapM)
   call destroy(WatFlowInSnowM)
   call destroy(QSM)
   call destroy(ALBS)
@@ -152,8 +150,6 @@ contains
   call destroy(SnoXfer2SnoLay)
   call destroy(IceXfer2SnoLay)
   call destroy(HeatXfer2SnoLay)
-  call destroy(XWFLXS)
-  call destroy(XWFLXI)
   call destroy(cumSnowDepth)
   call destroy(VLSnowt0)
   call destroy(SnowDepth)

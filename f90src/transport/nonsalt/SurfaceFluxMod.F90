@@ -37,24 +37,24 @@ contains
 !------------------------------------------------------------------------------------------
 
   subroutine SoluteFluxSurface(M,NY,NX,NHE,NHW,NVS,NVN,&
-    FLQM,trcg_RFLS0,trcn_RFLW0,RDXS_gas)
+    WaterFlow2Soil,trcg_RFLS0,trcn_RFLW0,RDXS_gas)
   implicit none
   integer, intent(in) :: NY,NX,M
   integer, intent(in) :: NHE,NHW,NVS,NVN
   real(r8),intent(in) :: trcg_RFLS0(idg_beg:idg_end-1)
   real(r8),intent(in) :: trcn_RFLW0(ids_nut_beg:ids_nuts_end)
-  real(r8),intent(inout) :: FLQM(3,JD,JV,JH)
+  real(r8),intent(inout) :: WaterFlow2Soil(3,JD,JV,JH)
   real(r8),intent(out) :: RDXS_gas(idg_beg:idg_end)
   real(r8) :: FLWRM1
   real(r8) :: trcs_cl1(ids_beg:ids_end)
   real(r8) :: trcs_cl2(ids_beg:ids_end)
   real(r8) :: RFLs_adv(ids_beg:ids_end)
   real(r8) :: SDifFlx(ids_beg:ids_end)
-!     VLWatMicPM,VLWatMacPM,VLsoiAirPM,FLPM=micropore,macropore water volume, air volume and change in air volume
-!     FLWM,WaterFlowMacPi=water flux into soil micropore,macropore from watsub.f
+!     VLWatMicPM,VLWatMacPM,VLsoiAirPM,ReductVLsoiAirPM=micropore,macropore water volume, air volume and change in air volume
+!     WaterFlow2MicPM,WaterFlow2MacPM=water flux into soil micropore,macropore from watsub.f
 !     VLNH4,VLNO3,VLPO4=non-band NH4,NO3,PO4 volume fraction
 !     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
-!     FLVM,FLM=air,water flux in gas flux calculations
+!     CumReductVLsoiAirPM,FLM=air,water flux in gas flux calculations
 !     XNPT=1/number of cycles NPH-1 for gas flux calculations
 !
   VLWatMicPMA(NU(NY,NX),NY,NX)=VLWatMicPM(M,NU(NY,NX),NY,NX)*trcs_VLN(ids_NH4,NU(NY,NX),NY,NX)
@@ -63,8 +63,8 @@ contains
   VLWatMicPXB(NU(NY,NX),NY,NX)=natomw*VLWatMicPMB(NU(NY,NX),NY,NX)
   VLsoiAirPMA(NU(NY,NX),NY,NX)=VLsoiAirPM(M,NU(NY,NX),NY,NX)*trcs_VLN(ids_NH4,NU(NY,NX),NY,NX)
   VLsoiAirPMB(NU(NY,NX),NY,NX)=VLsoiAirPM(M,NU(NY,NX),NY,NX)*trcs_VLN(ids_NH4B,NU(NY,NX),NY,NX)
-  FLVM(NU(NY,NX),NY,NX)=FLPM(M,NU(NY,NX),NY,NX)*XNPT
-  FLQM(3,NU(NY,NX),NY,NX)=(FLWM(M,3,NU(NY,NX),NY,NX)+WaterFlowMacPi(M,3,NU(NY,NX),NY,NX))*XNPT
+  CumReductVLsoiAirPM(NU(NY,NX),NY,NX)=ReductVLsoiAirPM(M,NU(NY,NX),NY,NX)*XNPT
+  WaterFlow2Soil(3,NU(NY,NX),NY,NX)=(WaterFlow2MicPM(M,3,NU(NY,NX),NY,NX)+WaterFlow2MacPM(M,3,NU(NY,NX),NY,NX))*XNPT
 !
 !     SURFACE EXCHANGE OF AQUEOUS CO2, CH4, O2, N2, NH3
 !     THROUGH VOLATILIZATION-DISSOLUTION FROM AQUEOUS
@@ -1017,14 +1017,14 @@ contains
 
 !------------------------------------------------------------------------------------------
 
-  subroutine SurfSoilFluxGasDifAdv(M,NY,NX,FLQM,RDXS_gas)
+  subroutine SurfSoilFluxGasDifAdv(M,NY,NX,WaterFlow2Soil,RDXS_gas)
 !
 ! DESCRIPTION:
 ! surface soil gaseous diffusion, advection, dissolution & volatilization
   implicit none
 
   integer, intent(in) :: M, NY, NX
-  real(r8),intent(in) :: FLQM(3,JD,JV,JH)
+  real(r8),intent(in) :: WaterFlow2Soil(3,JD,JV,JH)
   real(r8),intent(in) :: RDXS_gas(idg_beg:idg_end)
   real(r8) :: VFLW
   integer :: NTG
@@ -1041,7 +1041,7 @@ contains
 !     FROM 'WATSUB' AND GAS CONCENTRATIONS IN THE SOIL SURFACE
 !     OR THE ATMOSPHERE DEPENDING ON WATER FLUX DIRECTION
 !
-    call SurfSoillAdvFlux(M,NY,NX,FLQM)
+    call SurfSoillAdvFlux(M,NY,NX,WaterFlow2Soil)
 !
 !
 !
@@ -1319,7 +1319,7 @@ contains
   real(r8) :: VFLWNH4,VFLWPO4,VFLWPOB
   integer  :: NTG,NTS,NTN
 !
-!     VHCPWM,VLHeatCapSnowMN=current,minimum volumetric heat capacity of snowpack
+!     VLSnowHeatCapM,VLHeatCapSnowMN=current,minimum volumetric heat capacity of snowpack
 !     VOLWSL=snowpack water content
 !     WatFlowInSnowM=snowpack water flux
 !     R*BLS=solute flux in snowpack
@@ -1328,9 +1328,9 @@ contains
 !
   ICHKL=0
   DO  L=1,JS
-    IF(VHCPWM(M,L,NY,NX).GT.VLHeatCapSnowMN(NY,NX))THEN
+    IF(VLSnowHeatCapM(M,L,NY,NX).GT.VLHeatCapSnowMN(NY,NX))THEN
       L2=MIN(JS,L+1)
-      IF(L.LT.JS.AND.VHCPWM(M,L2,NY,NX).GT.VLHeatCapSnowMN(NY,NX))THEN
+      IF(L.LT.JS.AND.VLSnowHeatCapM(M,L2,NY,NX).GT.VLHeatCapSnowMN(NY,NX))THEN
         IF(VLWatSnow(L,NY,NX).GT.ZEROS2(NY,NX))THEN
           VFLWW=AZMAX1(AMIN1(1.0,WatFlowInSnowM(M,L2,NY,NX)/VLWatSnow(L,NY,NX)))
         ELSE
@@ -1428,15 +1428,15 @@ contains
   end subroutine SoluteFluxSnowpackDisch
 
 ! ----------------------------------------------------------------------
-  subroutine SurfSoillAdvFlux(M,NY,NX,FLQM)
+  subroutine SurfSoillAdvFlux(M,NY,NX,WaterFlow2Soil)
   implicit none
   integer, intent(in) :: M,NY,NX
-  real(r8),intent(in) :: FLQM(3,JD,JV,JH)
+  real(r8),intent(in) :: WaterFlow2Soil(3,JD,JV,JH)
   real(r8) :: VFLW
   real(r8) :: RFLg_ADV(idg_beg:idg_end-1)
   integer :: NTG
 
-!     FLQM=total water flux into soil micropore+macropore from watsub.f
+!     WaterFlow2Soil=total water flux into soil micropore+macropore from watsub.f
 !     VLsoiAirPM=air-filled porosity
 !     RFL*G=convective gas flux
 !     gas code:*CO2*=CO2,*OXY*=O2,*CH4*=CH4,*Z2G*=N2,*Z2O*=N2O
@@ -1445,9 +1445,9 @@ contains
 !     C*E=atmospheric gas concentration from hour1.f
 !
 
-  IF(FLQM(3,NU(NY,NX),NY,NX).GT.0.0_r8)THEN
+  IF(WaterFlow2Soil(3,NU(NY,NX),NY,NX).GT.0.0_r8)THEN
     IF(VLsoiAirPM(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
-      VFLW=-AZMAX1(AMIN1(VFLWX,FLQM(3,NU(NY,NX),NY,NX)/VLsoiAirPM(M,NU(NY,NX),NY,NX)))
+      VFLW=-AZMAX1(AMIN1(VFLWX,WaterFlow2Soil(3,NU(NY,NX),NY,NX)/VLsoiAirPM(M,NU(NY,NX),NY,NX)))
     ELSE
       VFLW=-VFLWX
     ENDIF
@@ -1457,7 +1457,7 @@ contains
     ENDDO
   ELSE
     DO NTG=idg_beg,idg_end-1
-      RFLg_ADV(NTG)=-FLQM(3,NU(NY,NX),NY,NX)*AtmGgms(NTG,NY,NX)
+      RFLg_ADV(NTG)=-WaterFlow2Soil(3,NU(NY,NX),NY,NX)*AtmGgms(NTG,NY,NX)
     ENDDO
   ENDIF
 !     TOTAL SOIL GAS FLUX + CONVECTIVE FLUX

@@ -10,7 +10,7 @@ module UptakePars
 !     MaxIterNum=max number of cycles in convergence soln for water uptake
 !     DIFFX,DIFFY=acceptance criteria in convergence soln
 !     FMN=min PFT:total population ratio
-!     RACM,RACX=min,max canopy boundary layer resistance (h m-1)
+!     MinCanPbndlResist,RACX=min,max canopy boundary layer resistance (h m-1)
 !     RZ=surface resistance to evaporation (h m-1)
 !     EMODW=wood modulus of elasticity (MPa)
 !     DSTK,VSTK=stalk density (Mg m-3),specific volume (m3 g-1)
@@ -24,7 +24,7 @@ module UptakePars
   real(r8) :: DIFFX
   real(r8) :: DIFFY
   real(r8) :: FMN
-  real(r8) :: RACM
+  real(r8) :: MinCanPbndlResist
   real(r8) :: RACX
   real(r8) :: RZ
   real(r8) :: DSTK
@@ -48,7 +48,7 @@ module UptakePars
   DIFFX=1.0E-09_r8
   DIFFY=0.5E-02_r8
   FMN=ppmc
-  RACM=0.00139_r8
+  MinCanPbndlResist=0.00139_r8
   RACX=0.0278_r8
   RZ=0.0139_r8
   DSTK=0.225_r8

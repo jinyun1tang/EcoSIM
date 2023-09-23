@@ -432,7 +432,7 @@ module StartqsMod
   associate(                             &
     CNRTS    =>  plt_allom%CNRTS   , &
     CPRTS    =>  plt_allom%CPRTS   , &
-    DMRT     =>  plt_allom%DMRT    , &
+    BiomGrowthYieldRoot     =>  plt_allom%BiomGrowthYieldRoot    , &
     CNRT     =>  plt_allom%CNRT    , &
     CPRT     =>  plt_allom%CPRT    , &
     UPMNPO   =>  plt_rbgc%UPMNPO   , &
@@ -502,8 +502,8 @@ module StartqsMod
       ENDDO D9790
     ENDIF
   ENDDO D9795
-  CNRTS(NZ)=CNRT(NZ)*DMRT(NZ)
-  CPRTS(NZ)=CPRT(NZ)*DMRT(NZ)
+  CNRTS(NZ)=CNRT(NZ)*BiomGrowthYieldRoot(NZ)
+  CPRTS(NZ)=CPRT(NZ)*BiomGrowthYieldRoot(NZ)
   MaxPrimRootRadius(2,NZ)=5.0E-06_r8
   MaxSecndRootRadius(2,NZ)=5.0E-06_r8
   RootPorosity(2,NZ)=RootPorosity(1,NZ)
@@ -602,7 +602,7 @@ module StartqsMod
     CanPLSA   =>  plt_morph%CanPLSA  , &
     SURF    =>  plt_morph%SURF   , &
     ARLF1   =>  plt_morph%ARLF1  , &
-    HTSHEX  =>  plt_morph%HTSHEX , &
+    CanPBranchHeight  =>  plt_morph%CanPBranchHeight , &
     HypoctoylHeight   =>  plt_morph%HypoctoylHeight  , &
     NBTB    =>  plt_morph%NBTB   , &
     PSTGI   =>  plt_morph%PSTGI  , &
@@ -688,7 +688,7 @@ module StartqsMod
     CanPBLA(NB,NZ)=0._r8
     plt_rbgc%RNH3B(NB,NZ)=0._r8
     ARLFZ(NB,NZ)=0._r8
-    HTSHEX(NB,NZ)=0._r8
+    CanPBranchHeight(NB,NZ)=0._r8
     D5: DO L=1,JC1
       CanPLBSA(L,NB,NZ)=0._r8
       DO N=1,JLI1
@@ -699,7 +699,7 @@ module StartqsMod
       ARLF1(K,NB,NZ)=0._r8
       HTNODE(K,NB,NZ)=0._r8
       plt_morph%HTNODX(K,NB,NZ)=0._r8
-      plt_morph%HTSHE(K,NB,NZ)=0._r8
+      plt_morph%CanPSheathHeight(K,NB,NZ)=0._r8
       plt_biom%WSLF(K,NB,NZ)=0._r8
       plt_biom%WSSHE(K,NB,NZ)=0._r8
       plt_biom%WGLFE(1:npelms,K,NB,NZ)=0._r8
@@ -762,7 +762,7 @@ module StartqsMod
     NU     => plt_site%NU        , &
     AREA3  => plt_site%AREA3     , &
     CFOPE  => plt_soilchem%CFOPE , &
-    CTRAN  => plt_ew%CTRAN       , &
+    ETCanP  => plt_ew%ETCanP       , &
     WTSTDE => plt_biom%WTSTDE    , &
     WTSTGE => plt_biom%WTSTGE    , &
     WTSTDI => plt_biom%WTSTDI    , &
@@ -806,7 +806,7 @@ module StartqsMod
     plt_distb%THVSTE(1:npelms,NZ)=0._r8
     plt_distb%HVSTE(1:npelms,NZ)=0._r8
     RSETE(1:npelms,NZ)=0._r8
-    CTRAN(NZ)=0._r8
+    ETCanP(NZ)=0._r8
     WTSTGE(1:npelms,NZ)=0._r8
     WTSTDX=WTSTDI(NZ)*AREA3(NU)
     D155: DO M=1,jsken

@@ -17,10 +17,10 @@ implicit none
   real(r8),allocatable ::  TQR(:,:)                           !
   real(r8),allocatable ::  THQR(:,:)                          !
 
-  real(r8),allocatable ::  TFLWS(:,:,:)                       !
-  real(r8),allocatable ::  TFLWW(:,:,:)                       !
-  real(r8),allocatable ::  TFLWI(:,:,:)                       !
-  real(r8),allocatable ::  THFLWW(:,:,:)                      !
+!  real(r8),allocatable ::  TFLWS(:,:,:)                       !
+!  real(r8),allocatable ::  TFLWW(:,:,:)                       !
+!  real(r8),allocatable ::  TFLWI(:,:,:)                       !
+!  real(r8),allocatable ::  THFLWW(:,:,:)                      !
 
   real(r8),allocatable ::  TCOQSS(:,:)                        !
   real(r8),allocatable ::  TCHQSS(:,:)                        !
@@ -52,7 +52,7 @@ implicit none
   real(r8),allocatable ::  TSEDER(:,:)                        !
   real(r8),allocatable ::  TWatFlowCellMicP(:,:,:)                        !
   real(r8),allocatable ::  TWatFlowCellMicPX(:,:,:)                       !
-  real(r8),allocatable ::  THeatFlowSoiCell(:,:,:)                       !
+  real(r8),allocatable ::  THeatFlow2Soil(:,:,:)                       !
   real(r8),allocatable ::  TWaterFlowMacP(:,:,:)                       !
 
   real(r8),allocatable ::  RTGasADFlx(:,:,:,:)                      !
@@ -117,10 +117,10 @@ implicit none
   allocate(TQR(JY,JX));         TQR=0._r8
   allocate(THQR(JY,JX));        THQR=0._r8
 
-  allocate(TFLWS(JS,JY,JX));    TFLWS=0._r8
-  allocate(TFLWW(JS,JY,JX));    TFLWW=0._r8
-  allocate(TFLWI(JS,JY,JX));    TFLWI=0._r8
-  allocate(THFLWW(JS,JY,JX));   THFLWW=0._r8
+!  allocate(TFLWS(JS,JY,JX));    TFLWS=0._r8
+!  allocate(TFLWW(JS,JY,JX));    TFLWW=0._r8
+!  allocate(TFLWI(JS,JY,JX));    TFLWI=0._r8
+!  allocate(THFLWW(JS,JY,JX));   THFLWW=0._r8
 
   allocate(TCOQSS(JY,JX));      TCOQSS=0._r8
   allocate(TCHQSS(JY,JX));      TCHQSS=0._r8
@@ -155,7 +155,7 @@ implicit none
   allocate(TSEDER(JY,JX));      TSEDER=0._r8
   allocate(TWatFlowCellMicP(JZ,JY,JX));     TWatFlowCellMicP=0._r8
   allocate(TWatFlowCellMicPX(JZ,JY,JX));    TWatFlowCellMicPX=0._r8
-  allocate(THeatFlowSoiCell(JZ,JY,JX));    THeatFlowSoiCell=0._r8
+  allocate(THeatFlow2Soil(JZ,JY,JX));    THeatFlow2Soil=0._r8
   allocate(TWaterFlowMacP(JZ,JY,JX));    TWaterFlowMacP=0._r8
   allocate(WatIceThawMicP(JZ,JY,JX));    WatIceThawMicP=0._r8
   allocate(THeatSoiThaw(JZ,JY,JX));   THeatSoiThaw=0._r8
@@ -241,10 +241,10 @@ implicit none
   call destroy(trcsa_TFHS)
   call destroy(TQR)
   call destroy(THQR)
-  call destroy(TFLWS)
-  call destroy(TFLWW)
-  call destroy(TFLWI)
-  call destroy(THFLWW)
+!  call destroy(TFLWS)
+!  call destroy(TFLWW)
+!  call destroy(TFLWI)
+!  call destroy(THFLWW)
 
   call destroy(trcs_TFHS)
 
@@ -273,7 +273,7 @@ implicit none
   call destroy(TSEDER)
   call destroy(TWatFlowCellMicP)
   call destroy(TWatFlowCellMicPX)
-  call destroy(THeatFlowSoiCell)
+  call destroy(THeatFlow2Soil)
   call destroy(TWaterFlowMacP)
   call destroy(WatIceThawMicP)
   call destroy(THeatSoiThaw)

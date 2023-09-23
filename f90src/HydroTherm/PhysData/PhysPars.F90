@@ -35,11 +35,11 @@ implicit none
   real(r8), parameter :: EXPNW=2.07E-04_r8   !parameter used to calculate Nusselt number for water
   real(r8), parameter :: DIFFA=2.01E-05_r8
   real(r8), parameter :: DIFFW=1.45E-07_r8
-  real(r8), parameter :: VISCW=ppmc    !water viscosity
-  real(r8), parameter :: RYLXW=GravAcceleration*EXPNW/(VISCW*DIFFW)
+  real(r8), parameter :: VISCW=ppmc          !water viscosity
+  real(r8), parameter :: RYLXW=GravAcceleration*EXPNW/(VISCW*DIFFW)   
   real(r8), parameter :: VISCA=2.0E-08_r8  
-  real(r8), parameter :: EXPNA=3.66E-03_r8
-  real(r8), parameter :: RYLXA=GravAcceleration*EXPNA/(VISCA*DIFFA)
+  real(r8), parameter :: EXPNA=3.66E-03_r8   !parameter used to calculate Nusselt number for air
+  real(r8), parameter :: RYLXA=GravAcceleration*EXPNA/(VISCA*DIFFA)   
   real(r8), parameter :: PRNTW=VISCW/DIFFW
   real(r8), parameter :: PRNTA=VISCA/DIFFA
   real(r8), parameter :: DNUSW=(1.0_r8+(0.492_r8/PRNTW)**0.5625_r8)**0.4444_r8

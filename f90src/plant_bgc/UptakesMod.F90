@@ -2,7 +2,7 @@ module UptakesMod
   use data_kind_mod , only : r8 => DAT_KIND_R8
   use data_const_mod, only : GravAcceleration=>DAT_CONST_G
   use StomatesMod   , only : stomates
-  use minimathmod   , only : safe_adb,vapsat,isclose,AZMAX1,AZMIN1
+  use minimathmod   
   use UnitMod       , only : units  
   use EcosimConst
   use EcoSIMSolverPar
@@ -637,7 +637,7 @@ module UptakesMod
   real(r8) :: cumPRootH2OUptakePre
   real(r8) :: VOLWPX,VPC,SymplasmicWat
   real(r8) :: XC,WFNC
-  real(r8) :: RI
+  real(r8) :: RichardsNO
   integer  :: IC,ICHK
 !     return variables
   integer :: NN
@@ -683,7 +683,7 @@ module UptakesMod
     LWRadGrnd  => plt_rad%LWRadGrnd     &
   )
   CCPOLT=CEPOLP(ielmc,NZ)+CEPOLP(ielmn,NZ)+CEPOLP(ielmp,NZ)
-  FTHRM=EMMC*2.04E-10*FracPARByCanP(NZ)*AREA3(NU)
+  FTHRM=EMMC*2.04E-10_r8*FracPARByCanP(NZ)*AREA3(NU)
   LWRad2CanP=(LWRadSky+LWRadGrnd)*FracPARByCanP(NZ)
 !     RAZ=canopy isothermal boundary later resistance
 
@@ -720,9 +720,9 @@ module UptakesMod
 !     RA=canopy boundary layer resistance
 !     HeatLatentConductCanP,HeatSensConductCanP=canopy latent,sensible heat conductance
 !
-    RI=AMAX1(-0.3_r8,AMIN1(0.075_r8,RIB*(TairK-TKC1)))
+    RichardsNO=RichardsonNumber(RIB,TairK,TKC1)
 
-    CanPbndlResist(NZ)=AMAX1(RACM,0.9_r8*RA1,AMIN1(1.1_r8*RA1,RAZ(NZ)/(1.0_r8-10.0_r8*RI)))
+    CanPbndlResist(NZ)=AMAX1(MinCanPbndlResist,0.9_r8*RA1,AMIN1(1.1_r8*RA1,RAZ(NZ)/(1.0_r8-10.0_r8*RichardsNO)))
 
     RA1=CanPbndlResist(NZ)
     HeatLatentConductCanP=EffGrndAreaByPFT4H2O/CanPbndlResist(NZ)  !m2/(h/m)=m/h
@@ -772,13 +772,13 @@ module UptakesMod
       EX=0.0_r8
       VFLXC=VapXAir2PCan(NZ)*cpw*TairK                !enthalpy of evaporated water, MJ/(h*m2)
     ELSEIF(EX.LE.0.0_r8.AND.WatByPCan(NZ).GT.0.0_r8)THEN
-      !evaporation, and there is water stored in canopy
-      !<0._r8, off canopy
+      !evaporation, and there is water stored in canopy 
+      !<0._r8, off canopy, cannot be more than WatByPCan(NZ)
       VapXAir2PCan(NZ)=AMAX1(EX*CanPbndlResist(NZ)/(CanPbndlResist(NZ)+RZ),-WatByPCan(NZ))
       EX=EX-VapXAir2PCan(NZ)                !extra water needs transpiration
       VFLXC=VapXAir2PCan(NZ)*cpw*TKC1       !enthalpy of evaporated water
     ENDIF
-
+    !PTrans <0 means transpiration into atmosphere
     PTrans(NZ)=EX*CanPbndlResist(NZ)/(CanPbndlResist(NZ)+CanPStomaResistH2O(NZ))
     EvapTransHeatP(NZ)=(PTrans(NZ)+VapXAir2PCan(NZ))*EvapLHTC   !latent heat flux, negative means into atmosphere
     
@@ -942,8 +942,6 @@ module UptakesMod
       ENDIF
     ENDIF
   ENDDO
-!4000  CONTINUE
-!4500  CONTINUE
   end associate
   end function CanopyEnergyH2OIteration
 !------------------------------------------------------------------------
@@ -973,7 +971,7 @@ module UptakesMod
     ZEROP  => plt_biom%ZEROP    , &
     THETW  => plt_soilchem%THETW, &
     VLMicP   => plt_soilchem%VLMicP , &
-    CNDU   => plt_soilchem%CNDU , &
+    HydroCondMicP4RootUptake   => plt_soilchem%HydroCondMicP4RootUptake , &
     VLSoilPoreMicP   => plt_soilchem%VLSoilPoreMicP , &
     SecndRootXNumL   => plt_morph%SecndRootXNumL    , &
     PrimRootXNumL  => plt_morph%PrimRootXNumL   , &
@@ -981,7 +979,7 @@ module UptakesMod
     RSRA   => plt_morph%RSRA    , &
     SecndRootRadius  => plt_morph%SecndRootRadius   , &
     RootLenDensNLP  => plt_morph%RootLenDensNLP   , &
-    HTSTZ  => plt_morph%HTSTZ   , &
+    CanPHeight4WatUptake  => plt_morph%CanPHeight4WatUptake   , &
     RootLenPerP  => plt_morph%RootLenPerP   , &
     AveSecndRootLen  => plt_morph%AveSecndRootLen   , &
     PrimRootRadius  => plt_morph%PrimRootRadius   , &
@@ -994,22 +992,22 @@ module UptakesMod
 
   !     GRAVIMETRIC WATER POTENTIAL FROM CANOPY HEIGHT
   !
-  !     HTSTZ=canopy height for water uptake
-  !     PSILH=gravimetric water potential at HTSTZ
+  !     CanPHeight4WatUptake=canopy height for water uptake
+  !     PSILH=gravimetric water potential at CanPHeight4WatUptake
   !     FRADW=conducting elements of stalk relative to those of primary root
   !     PSICanP=canopy total water potential
   !     EMODW=wood modulus of elasticity (MPa)
 !
   CNDT=0.0_r8
-  HTSTZ(NZ)=0.80*CanopyHeight(NZ)
-  PSILH=-mGravAccelerat*HTSTZ(NZ)
+  CanPHeight4WatUptake(NZ)=0.80_r8*CanopyHeight(NZ)
+  PSILH=-mGravAccelerat*CanPHeight4WatUptake(NZ)
   FRADW=1.0E+04_r8*(AMAX1(0.5_r8,1.0_r8+PSICanP(NZ)/EMODW))**4._r8
 !
   !     SOIL AND ROOT HYDRAULIC RESISTANCES TO ROOT WATER UPTAKE
   !
   !      VLSoilPoreMicP,VLWatMicPM,THETW=soil,water volume,content
   !     RootLenDensNLP,RootLenPerP=root length density,root length per plant
-  !     CNDU=soil hydraulic conductivity for root uptake
+  !     HydroCondMicP4RootUptake=soil hydraulic conductivity for root uptake
   !     PrimRootXNumL,SecndRootXNumL=number of root,myco primary,secondary axes
   !     LayrHasRoot:1=rooted,0=not rooted
   !     N:1=root,2=mycorrhizae
@@ -1019,7 +1017,7 @@ module UptakesMod
       IF(VLSoilPoreMicP(L).GT.ZEROS2 &
         .AND.VLWatMicPM(NPH,L).GT.ZEROS2 &
         .AND.RootLenDensNLP(N,L,NZ).GT.ZERO &
-        .AND.CNDU(L).GT.ZERO &
+        .AND.HydroCondMicP4RootUptake(L).GT.ZERO &
         .AND.PrimRootXNumL(ipltroot,L,NZ).GT.ZEROP(NZ) &
         .AND.SecndRootXNumL(N,L,NZ).GT.ZEROP(NZ) &
         .AND.THETW(L).GT.ZERO)THEN
@@ -1034,7 +1032,7 @@ module UptakesMod
         !     FineRootRadius,RootAreaDivRadius=root radius,surface/radius area
         !
         RSSL=(LOG(PATH(N,L)/FineRootRadius(N,L))/RootAreaDivRadius(N,L))/pftPlantPopulation(NZ)
-        SoiH2OResist(N,L)=RSSL/CNDU(L)
+        SoiH2OResist(N,L)=RSSL/HydroCondMicP4RootUptake(L)
         !
         !     RADIAL ROOT RESISTANCE FROM ROOT AREA AND RADIAL RESISTIVITY
         !     ENTERED IN 'READQ'
@@ -1062,7 +1060,7 @@ module UptakesMod
 !
         FRAD1=(PrimRootRadius(N,L,NZ)/MaxSecndRootRadius(N,NZ))**4._r8
         RootResistRadial(N,L)=RSRA(N,NZ)*DPTHZ(L)/(FRAD1*PrimRootXNumL(ipltroot,L,NZ)) &
-          +RSRA(ipltroot,NZ)*HTSTZ(NZ)/(FRADW*PrimRootXNumL(ipltroot,L,NZ))
+          +RSRA(ipltroot,NZ)*CanPHeight4WatUptake(NZ)/(FRADW*PrimRootXNumL(ipltroot,L,NZ))
         FRAD2=(SecndRootRadius(N,L,NZ)/MaxSecndRootRadius(N,NZ))**4._r8
         RootResistAxial(N,L)=RSRA(N,NZ)*AveSecndRootLen(N,L,NZ)/(FRAD2*SecndRootXNumL(N,L,NZ))
       ELSE

@@ -119,11 +119,11 @@ module InsideTranspMod
   end subroutine DestructInsTp
 !------------------------------------------------------------------------------------------
 
-  subroutine ModelTracerHydroFlux(M,MX, NHW, NHE, NVN, NVS,FLQM)
+  subroutine ModelTracerHydroFlux(M,MX, NHW, NHE, NVN, NVS,WaterFlow2Soil)
   implicit none
 
   integer, intent(in) :: M,MX, NHW, NHE, NVN, NVS
-  real(r8), intent(inout) :: FLQM(3,JD,JV,JH)
+  real(r8), intent(inout) :: WaterFlow2Soil(3,JD,JV,JH)
   integer :: NY,NX
   real(r8) :: FLWRM1
   real(r8) :: trcg_RFLS0(idg_beg:idg_end-1)
@@ -147,11 +147,11 @@ module InsideTranspMod
         call SoluteFluxSnowpackDisch(M,NY,NX,trcg_RFLS0,trcn_RFLW0)
 !
 !     SOLUTE FLUXES AT SOIL SURFACE FROM SURFACE WATER
-!     CONTENTS, WATER FLUXES 'FLQM' AND ATMOSPHERE BOUNDARY
+!     CONTENTS, WATER FLUXES 'WaterFlow2Soil' AND ATMOSPHERE BOUNDARY
 !     LAYER RESISTANCES 'PARGM' FROM 'WATSUB'
 !
         call SoluteFluxSurface(M,NY,NX,NHE,NHW,NVS,NVN,&
-          FLQM,trcg_RFLS0,trcn_RFLW0,RDXS_gas)
+          WaterFlow2Soil,trcg_RFLS0,trcn_RFLW0,RDXS_gas)
 !
       ENDIF
 !
@@ -166,14 +166,14 @@ module InsideTranspMod
 !     SOIL SURFACE LAYER AND THROUGH ATMOSPHERE BOUNDARY
 !     LAYER
 !
-      call SurfSoilFluxGasDifAdv(M,NY,NX,FLQM,RDXS_gas)
+      call SurfSoilFluxGasDifAdv(M,NY,NX,WaterFlow2Soil,RDXS_gas)
 !
 !     SOIL SURFACE WATER-AIR GAS EXCHANGE
 !
 !
 !     SOLUTE FLUXES BETWEEN ADJACENT GRID CELLS
 !
-      call TracerExchInBetweenCells(M,MX,NY,NX,NHE,NVS,FLQM)
+      call TracerExchInBetweenCells(M,MX,NY,NX,NHE,NVS,WaterFlow2Soil)
 
     ENDDO
   ENDDO
@@ -312,7 +312,7 @@ module InsideTranspMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine TracerExchInBetweenCells(M,MX,NY,NX,NHE,NVS,FLQM)
+  subroutine TracerExchInBetweenCells(M,MX,NY,NX,NHE,NVS,WaterFlow2Soil)
 !
 ! DESCRIPTION
 ! exchanges tracers within (gaseous vs aqueous phase) and between
@@ -320,7 +320,7 @@ module InsideTranspMod
   implicit none
 
   integer, intent(in) :: M,MX, NY, NX, NHE, NVS
-  real(r8), intent(inout) :: FLQM(3,JD,JV,JH)
+  real(r8), intent(inout) :: WaterFlow2Soil(3,JD,JV,JH)
   real(r8) :: VFLW
   real(r8) :: VOLH2A,VOLH2B
   real(r8) :: VLWatMacPS,VOLWT
@@ -377,14 +377,14 @@ module InsideTranspMod
       ENDDO
 !
 !     SOLUTE FLUXES BETWEEN ADJACENT GRID CELLS FROM
-!     WATER CONTENTS AND WATER FLUXES 'FLQM' FROM 'WATSUB'
+!     WATER CONTENTS AND WATER FLUXES 'WaterFlow2Soil' FROM 'WATSUB'
 !
 !     VLSoilPoreMicP,VLSoilMicP=soil volume excluding rock, macropore
 !     VLNH4,VLNO3,VLPO4=non-band NH4,NO3,PO4 volume fraction
 !     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
 !     VLWatMicPM,VLWatMacPM=micropore,macropore water-filled porosity from watsub.f
 !     THETW=volumetric water content
-!     FLPM=change in air volume
+!     ReductVLsoiAirPM=change in air volume
 !     XNPT=1/number of cycles NPH-1 for gas flux calculations
 !
       IF(VLSoilPoreMicP(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
@@ -398,7 +398,7 @@ module InsideTranspMod
 
             VLsoiAirPMA(N6,N5,N4)=VLsoiAirPM(M,N6,N5,N4)*trcs_VLN(ids_NH4,N6,N5,N4)
             VLsoiAirPMB(N6,N5,N4)=VLsoiAirPM(M,N6,N5,N4)*trcs_VLN(ids_NH4B,N6,N5,N4)
-            FLVM(N6,N5,N4)=FLPM(M,N6,N5,N4)*XNPT
+            CumReductVLsoiAirPM(N6,N5,N4)=ReductVLsoiAirPM(M,N6,N5,N4)*XNPT
 !
 !     GASEOUS SOLUBILITIES
 !
@@ -407,9 +407,9 @@ module InsideTranspMod
 !     gas code:*CO2*=CO2,*OXY*=O2,*CH4*=CH4,*Z2G*=N2,*Z2O*=N2O
 !             :*ZN3*=NH3,*H2G*=H2
 !     S*L=solubility of gas in water from hour1.f
-!     FLQM=total water flux into soil micropore+macropore from watsub.f
+!     WaterFlow2Soil=total water flux into soil micropore+macropore from watsub.f
 !
-            FLQM(N,N6,N5,N4)=(FLWM(M,N,N6,N5,N4)+WaterFlowMacPi(M,N,N6,N5,N4))*XNPT
+            WaterFlow2Soil(N,N6,N5,N4)=(WaterFlow2MicPM(M,N,N6,N5,N4)+WaterFlow2MacPM(M,N,N6,N5,N4))*XNPT
 !
             call SoluteAdvDifTransport(M,N,N1,N2,N3,N4,N5,N6)
 
@@ -426,7 +426,7 @@ module InsideTranspMod
 !     GASEOUS TRANSPORT FROM GASEOUS DIFFUSIVITY AND CONCENTRATION
 !     DIFFERENCES BETWEEN ADJACENT GRID CELLS
 !
-          call GaseousTransport(M,N,N1,N2,N3,N4,N5,N6,FLQM)
+          call GaseousTransport(M,N,N1,N2,N3,N4,N5,N6,WaterFlow2Soil)
 
         ELSEIF(N.NE.3)THEN
           call ZeroTransport1(N,N1,N2,N3,N4,N5,N6)
@@ -458,7 +458,7 @@ module InsideTranspMod
 !     OF WATER FLUX AND MICROPORE GAS OR SOLUTE CONCENTRATIONS
 !     IN CURRENT GRID CELL
 !
-!     FLWM=water flux through soil micropore from watsub.f
+!     WaterFlow2MicPM=water flux through soil micropore from watsub.f
 !     VLWatMicPM=micropore water-filled porosity from watsub.f
 !     RFL*S=solute diffusive flux through micropore
 !     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
@@ -467,9 +467,9 @@ module InsideTranspMod
 !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
 !     *S2,*B2=micropore solute content in non-band,band
 !
-  IF(FLWM(M,N,N6,N5,N4).GT.0.0_r8)THEN
+  IF(WaterFlow2MicPM(M,N,N6,N5,N4).GT.0.0_r8)THEN
     IF(VLWatMicPM(M,N3,N2,N1).GT.ZEROS2(N2,N1))THEN
-      VFLW=AZMAX1(AMIN1(VFLWX,FLWM(M,N,N6,N5,N4)/VLWatMicPM(M,N3,N2,N1)))
+      VFLW=AZMAX1(AMIN1(VFLWX,WaterFlow2MicPM(M,N,N6,N5,N4)/VLWatMicPM(M,N3,N2,N1)))
     ELSE
       VFLW=VFLWX
     ENDIF
@@ -491,7 +491,7 @@ module InsideTranspMod
 !
   ELSE
     IF(VLWatMicPM(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
-      VFLW=AZMIN1(AMAX1(-VFLWX,FLWM(M,N,N6,N5,N4)/VLWatMicPM(M,N6,N5,N4)))
+      VFLW=AZMIN1(AMAX1(-VFLWX,WaterFlow2MicPM(M,N,N6,N5,N4)/VLWatMicPM(M,N6,N5,N4)))
     ELSE
       VFLW=-VFLWX
     ENDIF
@@ -670,7 +670,7 @@ module InsideTranspMod
 !     DLYR=soil layer thickness
 !     TORT=micropore tortuosity from hour1.f
 !     DISP=dispersivity parameter
-!     FLWM=water flux through soil micropore from watsub.f
+!     WaterFlow2MicPM=water flux through soil micropore from watsub.f
 !     DIF*=aqueous diffusivity-dispersivity through micropore
 !     *SGL2=solute diffusivity from hour1.f
 !     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
@@ -686,7 +686,7 @@ module InsideTranspMod
     DLYR1=AMAX1(ZERO2,DLYR(N,N3,N2,N1))
     DLYR2=AMAX1(ZERO2,DLYR(N,N6,N5,N4))
     TORTL=(TortMicPM(M,N3,N2,N1)*DLYR1+TortMicPM(M,N6,N5,N4)*DLYR2)/(DLYR1+DLYR2)
-    DISPN=DISP(N,N6,N5,N4)*AMIN1(VFLWX,ABS(FLWM(M,N,N6,N5,N4)/AREA(N,N6,N5,N4)))
+    DISPN=DISP(N,N6,N5,N4)*AMIN1(VFLWX,ABS(WaterFlow2MicPM(M,N,N6,N5,N4)/AREA(N,N6,N5,N4)))
 
     DIFOC=(OCSGL2(N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
     DIFON=(ONSGL2(N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
@@ -739,10 +739,10 @@ module InsideTranspMod
   real(r8) :: trcs_RFH(ids_beg:ids_end)
   integer  :: K,NTG,NTS
   real(r8) :: VFLW
-!     WaterFlowMacPi=water flux through soil macropore from watsub.f
+!     WaterFlow2MacPM=water flux through soil macropore from watsub.f
 !
 
-  IF(WaterFlowMacPi(M,N,N6,N5,N4).GT.0.0_r8)THEN
+  IF(WaterFlow2MacPM(M,N,N6,N5,N4).GT.0.0_r8)THEN
 !
 !     IF MACROPORE WATER FLUX FROM 'WATSUB' IS FROM CURRENT TO
 !     ADJACENT GRID CELL THEN CONVECTIVE TRANSPORT IS THE PRODUCT
@@ -762,7 +762,7 @@ module InsideTranspMod
 !     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
 !
     IF(VLWatMacPM(M,N3,N2,N1).GT.ZEROS2(N2,N1))THEN
-      VFLW=AZMAX1(AMIN1(VFLWX,WaterFlowMacPi(M,N,N6,N5,N4)/VLWatMacPM(M,N3,N2,N1)))
+      VFLW=AZMAX1(AMIN1(VFLWX,WaterFlow2MacPM(M,N,N6,N5,N4)/VLWatMacPM(M,N3,N2,N1)))
     ELSE
       VFLW=VFLWX
     ENDIF
@@ -812,9 +812,9 @@ module InsideTranspMod
 !     OF WATER FLUX AND MACROPORE SOLUTE CONCENTRATIONS IN ADJACENT
 !     GRID CELL
 !
-  ELSEIF(WaterFlowMacPi(M,N,N6,N5,N4).LT.0.0_r8)THEN
+  ELSEIF(WaterFlow2MacPM(M,N,N6,N5,N4).LT.0.0_r8)THEN
     IF(VLWatMacPM(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
-      VFLW=AZMIN1(AMAX1(-VFLWX,WaterFlowMacPi(M,N,N6,N5,N4)/VLWatMacPM(M,N6,N5,N4)))
+      VFLW=AZMIN1(AMAX1(-VFLWX,WaterFlow2MacPM(M,N,N6,N5,N4)/VLWatMacPM(M,N6,N5,N4)))
     ELSE
       VFLW=-VFLWX
     ENDIF
@@ -1016,7 +1016,7 @@ module InsideTranspMod
 !     DLYR=soil layer thickness
 !     TortMacPM=macropore tortuosity from hour1.f
 !     DISP=dispersivity parameter
-!     WaterFlowMacPi=water flux through soil macropore from watsub.f
+!     WaterFlow2MacPM=water flux through soil macropore from watsub.f
 !     DIF*=aqueous diffusivity-dispersivity through macropore
 !     *SGL2=solute diffusivity from hour1.f
 !     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
@@ -1032,7 +1032,7 @@ module InsideTranspMod
     DLYR1=AMAX1(ZERO2,DLYR(N,N3,N2,N1))
     DLYR2=AMAX1(ZERO2,DLYR(N,N6,N5,N4))
     TORTL=(TortMacPM(M,N3,N2,N1)*DLYR1+TortMacPM(M,N6,N5,N4)*DLYR2)/(DLYR1+DLYR2)
-    DISPN=DISP(N,N6,N5,N4)*AMIN1(VFLWX,ABS(WaterFlowMacPi(M,N,N6,N5,N4)/AREA(N,N6,N5,N4)))
+    DISPN=DISP(N,N6,N5,N4)*AMIN1(VFLWX,ABS(WaterFlow2MacPM(M,N,N6,N5,N4)/AREA(N,N6,N5,N4)))
 
     DIFOC=(OCSGL2(N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
     DIFON=(ONSGL2(N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
@@ -1548,9 +1548,9 @@ module InsideTranspMod
 
 
 ! ----------------------------------------------------------------------
-  subroutine GasAdvTransport(M,N,N1,N2,N3,N4,N5,N6,FLQM)
+  subroutine GasAdvTransport(M,N,N1,N2,N3,N4,N5,N6,WaterFlow2Soil)
   implicit none
-  real(r8), intent(in) :: FLQM(3,JD,JV,JH)
+  real(r8), intent(in) :: WaterFlow2Soil(3,JD,JV,JH)
   integer, intent(in) :: M,N,N1,N2,N3,N4,N5,N6
   real(r8) :: RGasAdv
   real(r8) :: VFLW,FLQW
@@ -1561,13 +1561,13 @@ module InsideTranspMod
 !     DEPENDING ON WATER FLUX DIRECTION
 !
 !     by assuming volume conservation, gases and water flow in opposite direction
-!     FLQM=total water flux into soil micropore+macropore from watsub.f
+!     WaterFlow2Soil=total water flux into soil micropore+macropore from watsub.f
 !     VLsoiAirPM=air-filled porosity
 !     RFL*G=convective gas flux
 !     gas code:*CO*=CO2,*OX*=O2,*CH*=CH4,*NG*=N2,*N2*=N2O,*NH*=NH3,*HG*=H2
 !     *G2=gaseous content
 !
-  FLQW=FLQM(N,N6,N5,N4)
+  FLQW=WaterFlow2Soil(N,N6,N5,N4)
   IF(FLQW.GT.0.0_r8)THEN
     IF(VLsoiAirPM(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
       VFLW=-AZMAX1(AMIN1(VFLWX,FLQW/VLsoiAirPM(M,N6,N5,N4)))
@@ -1593,11 +1593,11 @@ module InsideTranspMod
   end subroutine GasAdvTransport
 
 ! ----------------------------------------------------------------------
-  subroutine GaseousTransport(M,N,N1,N2,N3,N4,N5,N6,FLQM)
+  subroutine GaseousTransport(M,N,N1,N2,N3,N4,N5,N6,WaterFlow2Soil)
 
   implicit none
   integer, intent(in) :: M,N,N1,N2,N3,N4,N5,N6
-  real(r8), intent(in) :: FLQM(3,JD,JV,JH)
+  real(r8), intent(in) :: WaterFlow2Soil(3,JD,JV,JH)
   integer :: NTG
 
 !     THETPM,VLsoiAirPM=air-filled porosity,volume from watsub.f
@@ -1610,7 +1610,7 @@ module InsideTranspMod
     call GasDifTransport(M,N,N1,N2,N3,N4,N5,N6)
 
 !     TOTAL SOIL GAS FLUX FROM CONVECTIVE FLUX
-    call GasAdvTransport(M,N,N1,N2,N3,N4,N5,N6,FLQM)
+    call GasAdvTransport(M,N,N1,N2,N3,N4,N5,N6,WaterFlow2Soil)
 !
 !     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
 !

@@ -125,9 +125,9 @@ implicit none
     IF(VHeatCapacity(NUM(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
       TKSX=TKS(NUM(NY,NX),NY,NX)
       TKS(NUM(NY,NX),NY,NX)=(ENGY+HeatFlo2Surface)/VHeatCapacity(NUM(NY,NX),NY,NX)
-      if(abs(TKS(NUM(NY,NX),NY,NX)/tksx-1._r8)>0.025_r8)then
-        TKS(NUM(NY,NX),NY,NX)=TKSX
-      endif
+!      if(abs(TKS(NUM(NY,NX),NY,NX)/tksx-1._r8)>0.025_r8)then
+!        TKS(NUM(NY,NX),NY,NX)=TKSX
+!      endif
     ELSE
       TKS(NUM(NY,NX),NY,NX)=TairK(NY,NX)
     ENDIF
@@ -151,12 +151,12 @@ implicit none
 ! ADD CHANGES IN SNOW, WATER AND ICE
 !
 ! VOLSSL,VOLWSL,VOLISL=snow water equivalent,water,ice volume in snowpack layer
-! TFLWS,TFLWW,TFLWI=net fluxes of snow,water,ice in snowpack
-! XWFLXS,XWFLXI=freeze-thaw flux from watsub.f
+! CumSno2SnowLay,CumWat2SnowLay,CumIce2SnowLay=net fluxes of snow,water,ice in snowpack
+! XSnowThawMassL,XIceThawMassL=freeze-thaw flux from watsub.f
 !
 !
-  VLDrySnoWE(L,NY,NX)=VLDrySnoWE(L,NY,NX)+TFLWS(L,NY,NX)-XWFLXS(L,NY,NX)
-  VLWatSnow(L,NY,NX)=VLWatSnow(L,NY,NX)+TFLWW(L,NY,NX)+XWFLXS(L,NY,NX)+XWFLXI(L,NY,NX)
+  VLDrySnoWE(L,NY,NX)=VLDrySnoWE(L,NY,NX)+CumSno2SnowLay(L,NY,NX)-XSnowThawMassL(L,NY,NX)
+  VLWatSnow(L,NY,NX)=VLWatSnow(L,NY,NX)+CumWat2SnowLay(L,NY,NX)+XSnowThawMassL(L,NY,NX)+XIceThawMassL(L,NY,NX)
   if(VLWatSnow(L,NY,NX)<0._r8)then
     if(L>1)then
       VLWatSnow(L-1,NY,NX)=VLWatSnow(L-1,NY,NX)+VLWatSnow(L,NY,NX)
@@ -165,7 +165,7 @@ implicit none
     endif
     VLWatSnow(L,NY,NX)=0._r8
   endif
-  VLIceSnow(L,NY,NX)=VLIceSnow(L,NY,NX)+TFLWI(L,NY,NX)-XWFLXI(L,NY,NX)/DENSICE
+  VLIceSnow(L,NY,NX)=VLIceSnow(L,NY,NX)+CumIce2SnowLay(L,NY,NX)-XIceThawMassL(L,NY,NX)/DENSICE
   if(VLWatSnow(L,NY,NX)<0._r8)then
     if(L>1)then
       VLIceSnow(L-1,NY,NX)=VLIceSnow(L-1,NY,NX)+VLIceSnow(L,NY,NX)
@@ -223,8 +223,8 @@ implicit none
 ! cumSnowDepth=cumulative depth to bottom of snowpack layer
 ! VHCPW=snowpack layer heat capacity
 ! TKW,TCSnow=snowpack layer temperature K,oC
-! THFLWW=convective heat fluxes of snow,water,ice in snowpack
-! XTHAWW=latent heat flux from freeze-thaw from watsub.f
+! CumHeat2SnowLay=convective heat fluxes of snow,water,ice in snowpack
+! XPhaseChangeHeatL=latent heat flux from freeze-thaw from watsub.f
 ! HEATIN=cumulative net surface heat transfer
 ! VOLSS,VOLWS,VOLIS=total snow water equivalent, water, ice content of snowpack
 ! VOLS,SnowDepth=total snowpack volume, depth
@@ -252,7 +252,7 @@ implicit none
     ENGYW=VLHeatCapSnow(L,NY,NX)*TKSnow(L,NY,NX)
     VLHeatCapSnow(L,NY,NX)=cps*VLDrySnoWE(L,NY,NX)+cpw*VLWatSnow(L,NY,NX)+cpi*VLIceSnow(L,NY,NX)
     IF(VHCPWZ(L,NY,NX).GT.VLHeatCapSnowMN(NY,NX).AND.VLHeatCapSnow(L,NY,NX).GT.ZEROS(NY,NX))THEN
-      TKSnow(L,NY,NX)=(ENGYW+THFLWW(L,NY,NX)+XTHAWW(L,NY,NX))/VLHeatCapSnow(L,NY,NX)
+      TKSnow(L,NY,NX)=(ENGYW+CumHeat2SnowLay(L,NY,NX)+XPhaseChangeHeatL(L,NY,NX))/VLHeatCapSnow(L,NY,NX)
     ELSE
       IF(L.EQ.1)THEN
         TKSnow(L,NY,NX)=TairK(NY,NX)
@@ -475,8 +475,8 @@ implicit none
 !     NET WATER AND HEAT FLUXES THROUGH SNOWPACK
 !
 !     VHCPW,VLHeatCapSnowMN=current, minimum snowpack heat capacities
-!     TFLWS,TFLWW,TFLWI=net fluxes of snow,water,ice in snowpack
-!     THFLWW=convective heat fluxes of snow,water,ice in snowpack
+!     CumSno2SnowLay,CumWat2SnowLay,CumIce2SnowLay=net fluxes of snow,water,ice in snowpack
+!     CumHeat2SnowLay=convective heat fluxes of snow,water,ice in snowpack
 !     XFLWS,WatXfer2SnoLay,IceXfer2SnoLay=snow,water,ice transfer from watsub.f
 !     HeatXfer2SnoLay=convective heat flux from snow,water,ice transfer from watsub.f
 !     FLSW,WatConvSno2MacP,WatConvSno2LitR=water flux from lowest snow layer to soil macropore,micropore,litter
@@ -491,11 +491,11 @@ implicit none
 !
       IF(LS.LT.JS.AND.VLHeatCapSnow(LS2,N2,N1).GT.VLHeatCapSnowMN(N2,N1))THEN
         !not surface layer, and is heat significant
-        TFLWS(LS,N2,N1)=TFLWS(LS,N2,N1)+SnoXfer2SnoLay(LS,N2,N1)-SnoXfer2SnoLay(LS2,N2,N1)
-        TFLWW(LS,N2,N1)=TFLWW(LS,N2,N1)+WatXfer2SnoLay(LS,N2,N1)-WatXfer2SnoLay(LS2,N2,N1) &
+        CumSno2SnowLay(LS,N2,N1)=CumSno2SnowLay(LS,N2,N1)+SnoXfer2SnoLay(LS,N2,N1)-SnoXfer2SnoLay(LS2,N2,N1)
+        CumWat2SnowLay(LS,N2,N1)=CumWat2SnowLay(LS,N2,N1)+WatXfer2SnoLay(LS,N2,N1)-WatXfer2SnoLay(LS2,N2,N1) &
           -WatConvSno2LitR(LS,N2,N1)-FLSW(LS,N2,N1)-WatConvSno2MacP(LS,N2,N1)
-        TFLWI(LS,N2,N1)=TFLWI(LS,N2,N1)+IceXfer2SnoLay(LS,N2,N1)-IceXfer2SnoLay(LS2,N2,N1)
-        THFLWW(LS,N2,N1)=THFLWW(LS,N2,N1)+HeatXfer2SnoLay(LS,N2,N1) &
+        CumIce2SnowLay(LS,N2,N1)=CumIce2SnowLay(LS,N2,N1)+IceXfer2SnoLay(LS,N2,N1)-IceXfer2SnoLay(LS2,N2,N1)
+        CumHeat2SnowLay(LS,N2,N1)=CumHeat2SnowLay(LS,N2,N1)+HeatXfer2SnoLay(LS,N2,N1) &
           -HeatXfer2SnoLay(LS2,N2,N1)-HeatConvSno2LitR(LS,N2,N1)-HeatConvSno2Soi(LS,N2,N1)
 
 !     NET SOLUTE FLUXES THROUGH SNOWPACK
@@ -541,11 +541,11 @@ implicit none
 !     IF LOWER LAYER IS THE LITTER AND SOIL SURFACE
 !
       ELSE
-        TFLWS(LS,N2,N1)=TFLWS(LS,N2,N1)+SnoXfer2SnoLay(LS,N2,N1)
-        TFLWW(LS,N2,N1)=TFLWW(LS,N2,N1)+WatXfer2SnoLay(LS,N2,N1) &
+        CumSno2SnowLay(LS,N2,N1)=CumSno2SnowLay(LS,N2,N1)+SnoXfer2SnoLay(LS,N2,N1)
+        CumWat2SnowLay(LS,N2,N1)=CumWat2SnowLay(LS,N2,N1)+WatXfer2SnoLay(LS,N2,N1) &
           -WatConvSno2LitR(LS,N2,N1)-FLSW(LS,N2,N1)-WatConvSno2MacP(LS,N2,N1)
-        TFLWI(LS,N2,N1)=TFLWI(LS,N2,N1)+IceXfer2SnoLay(LS,N2,N1)
-        THFLWW(LS,N2,N1)=THFLWW(LS,N2,N1)+HeatXfer2SnoLay(LS,N2,N1) &
+        CumIce2SnowLay(LS,N2,N1)=CumIce2SnowLay(LS,N2,N1)+IceXfer2SnoLay(LS,N2,N1)
+        CumHeat2SnowLay(LS,N2,N1)=CumHeat2SnowLay(LS,N2,N1)+HeatXfer2SnoLay(LS,N2,N1) &
           -HeatConvSno2LitR(LS,N2,N1)-HeatConvSno2Soi(LS,N2,N1)
 ! and NH3B
         DO NTG=idg_beg,idg_end-1
@@ -589,10 +589,10 @@ implicit none
 !
     ELSEIF(LS.EQ.1)THEN
       IF(abs(SnoXfer2SnoLay(LS,N2,N1))>0._r8)THEN
-        TFLWS(LS,N2,N1)=TFLWS(LS,N2,N1)+SnoXfer2SnoLay(LS,N2,N1)
-        TFLWW(LS,N2,N1)=TFLWW(LS,N2,N1)+WatXfer2SnoLay(LS,N2,N1)
-        TFLWI(LS,N2,N1)=TFLWI(LS,N2,N1)+IceXfer2SnoLay(LS,N2,N1)
-        THFLWW(LS,N2,N1)=THFLWW(LS,N2,N1)+HeatXfer2SnoLay(LS,N2,N1)
+        CumSno2SnowLay(LS,N2,N1)=CumSno2SnowLay(LS,N2,N1)+SnoXfer2SnoLay(LS,N2,N1)
+        CumWat2SnowLay(LS,N2,N1)=CumWat2SnowLay(LS,N2,N1)+WatXfer2SnoLay(LS,N2,N1)
+        CumIce2SnowLay(LS,N2,N1)=CumIce2SnowLay(LS,N2,N1)+IceXfer2SnoLay(LS,N2,N1)
+        CumHeat2SnowLay(LS,N2,N1)=CumHeat2SnowLay(LS,N2,N1)+HeatXfer2SnoLay(LS,N2,N1)
 
         DO NTG=idg_beg,idg_end-1
           trcg_TBLS(NTG,LS,N2,N1)=trcg_TBLS(NTG,LS,N2,N1)+trcg_XBLS(NTG,LS,N2,N1)
@@ -631,10 +631,10 @@ implicit none
   DO  L=1,JS
     trcg_TBLS(idg_beg:idg_end-1,L,NY,NX)=0.0_r8
     trcn_TBLS(ids_nut_beg:ids_nuts_end,L,NY,NX)=0.0_r8
-    TFLWS(L,NY,NX)=0.0_r8
-    TFLWW(L,NY,NX)=0.0_r8
-    TFLWI(L,NY,NX)=0.0_r8
-    THFLWW(L,NY,NX)=0.0_r8
+    CumSno2SnowLay(L,NY,NX)=0.0_r8
+    CumWat2SnowLay(L,NY,NX)=0.0_r8
+    CumIce2SnowLay(L,NY,NX)=0.0_r8
+    CumHeat2SnowLay(L,NY,NX)=0.0_r8
   ENDDO
 
   IF(salt_model)THEN

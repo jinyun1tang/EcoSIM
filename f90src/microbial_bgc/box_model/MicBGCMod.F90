@@ -3114,6 +3114,7 @@ module MicBGCMod
         VOLWOX=VLWatMicPM(M)*SOXYL
         VOLPOX=VLsoiAirPM(M)
         VOLWPM=VOLWOX+VOLPOX
+
         D425: DO MX=1,NPT
           OXYG1=OXYG1+ROXYFX
           OXYS1=OXYS1+ROXYLX
@@ -3137,6 +3138,7 @@ module MicBGCMod
           RUPOX(NGL,K)=RUPOX(NGL,K)+RMPOX
           ROXSK(M)=ROXSK(M)+RMPOX
         ENDDO D425
+        
       ENDDO D420
       !write(*,*)'420'
       !

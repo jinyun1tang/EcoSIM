@@ -22,7 +22,7 @@ module fileUtil
   integer, public, parameter :: ecosim_string_length_long=256
   integer, public, parameter :: var_flux_type =1
   integer, public, parameter :: var_state_type=2
-  integer, public, parameter :: ecosim_namelist_buffer_size = 4096
+  integer, public, parameter :: ecosim_namelist_buffer_size = 2048
   logical, public, save :: continue_run = .false.
   integer, public, parameter :: datestrlen=14
   integer(DAT_KIND_IN) :: s_loglev = 0

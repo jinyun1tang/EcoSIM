@@ -39,7 +39,7 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  XVLiceMicPM(:,:,:)                     !excess ice
   real(r8),target,allocatable ::  HydroCond3D(:,:,:,:,:)                   !hydraulic conductivity at different moisture levels
   real(r8),target,allocatable ::  HydroCondMacP(:,:,:)                       !macropore hydraulic conductivity, [m MPa-1 h-1]
-  real(r8),target,allocatable ::  CNDU(:,:,:)                       !soil micropore hydraulic conductivity for root water uptake [m MPa-1 h-1]
+  real(r8),target,allocatable ::  HydroCondMicP4RootUptake(:,:,:)                       !soil micropore hydraulic conductivity for root water uptake [m MPa-1 h-1]
   real(r8),target,allocatable ::  QRM(:,:,:)                        !runoff water flux, [m3 d-2 t-1]
   real(r8),target,allocatable ::  QRV(:,:,:)                        !runoff velocity, [m t-1]
    integer,target,allocatable ::  IFLBM(:,:,:,:,:)                   !flag for directional surface runoff
@@ -58,9 +58,9 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  RechargSouthSurf(:,:)                        !southern surface boundary water flux , [-]
   real(r8),target,allocatable ::  RechargWestSurf(:,:)                        !western surface boundary water flux , [-]
   real(r8),target,allocatable ::  RCHGD(:,:)                        !lower subsurface boundary water flux , [-]
-  real(r8),target,allocatable ::  FLWM(:,:,:,:,:)                   !micropore water flux, [m3 d-2 t-1]
-  real(r8),target,allocatable ::  WaterFlowMacPi(:,:,:,:,:)                  !macropore water flux, [m3 d-2 t-1]
-  real(r8),target,allocatable ::  FLPM(:,:,:,:)                     !soil air flux, [g d-2 t-1]
+  real(r8),target,allocatable ::  WaterFlow2MicPM(:,:,:,:,:)                   !micropore water flux, [m3 d-2 t-1]
+  real(r8),target,allocatable ::  WaterFlow2MacPM(:,:,:,:,:)                  !macropore water flux, [m3 d-2 t-1]
+  real(r8),target,allocatable ::  ReductVLsoiAirPM(:,:,:,:)                     !change in soil air volume for layer from last to current iteration, [g d-2 t-1] >0, shrink
   real(r8),target,allocatable ::  FWatExMacP2MicPM(:,:,:,:)                    !soil macropore - micropore water transfer, [g d-2 t-1]
   real(r8),target,allocatable ::  WatFlowSno2MicPM(:,:,:)                      !meltwater flux into soil micropores
   real(r8),target,allocatable ::  WatFlowSno2MacPM(:,:,:)                      !meltwater flux into soil macropores
@@ -68,7 +68,7 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  TortMicPM(:,:,:,:)                     !soil tortuosity, []
   real(r8),target,allocatable ::  TortMacPM(:,:,:,:)                    !macropore tortuosity, []
   real(r8),target,allocatable ::  DFGS(:,:,:,:)                     !coefficient for dissolution - volatilization, []
-  real(r8),target,allocatable ::  RSCS(:,:,:)                       !soil hydraulic resistance, [MPa h m-2]
+  real(r8),target,allocatable ::  SoilResit4RootPentration(:,:,:)                       !soil hydraulic resistance, [MPa h m-2]
   real(r8),target,allocatable ::  PSISE(:,:,:)                      !soil water potential at saturation, [Mpa]
   real(r8),target,allocatable ::  PSISoilAirEntry(:,:,:)                      !soil water potential at air entry, [Mpa]
   real(r8),target,allocatable ::  PSISoilOsmotic(:,:,:)                      !osmotic soil water potential , [Mpa]
@@ -133,7 +133,7 @@ module SoilWaterDataType
   allocate(XVLiceMicPM(60,JY,JX));   XVLiceMicPM=0._r8
   allocate(HydroCond3D(3,100,0:JZ,JY,JX));HydroCond3D=0._r8
   allocate(HydroCondMacP(JZ,JY,JX));     HydroCondMacP=0._r8
-  allocate(CNDU(JZ,JY,JX));     CNDU=0._r8
+  allocate(HydroCondMicP4RootUptake(JZ,JY,JX));     HydroCondMicP4RootUptake=0._r8
   allocate(QRM(60,JV,JH));      QRM=0._r8
   allocate(QRV(60,JY,JX));      QRV=0._r8
   allocate(IFLBM(60,2,2,JY,JX));IFLBM=0
@@ -152,9 +152,9 @@ module SoilWaterDataType
   allocate(RechargSouthSurf(JY,JX));       RechargSouthSurf=0._r8
   allocate(RechargWestSurf(JY,JX));       RechargWestSurf=0._r8
   allocate(RCHGD(JY,JX));       RCHGD=0._r8
-  allocate(FLWM(60,3,JD,JV,JH));FLWM=0._r8
-  allocate(WaterFlowMacPi(60,3,JD,JV,JH));WaterFlowMacPi=0._r8
-  allocate(FLPM(60,JZ,JY,JX));  FLPM=0._r8
+  allocate(WaterFlow2MicPM(60,3,JD,JV,JH));WaterFlow2MicPM=0._r8
+  allocate(WaterFlow2MacPM(60,3,JD,JV,JH));WaterFlow2MacPM=0._r8
+  allocate(ReductVLsoiAirPM(60,JZ,JY,JX));  ReductVLsoiAirPM=0._r8
   allocate(FWatExMacP2MicPM(60,JZ,JY,JX)); FWatExMacP2MicPM=0._r8
   allocate(WatFlowSno2MicPM(60,JY,JX));    WatFlowSno2MicPM=0._r8
   allocate(WatFlowSno2MacPM(60,JY,JX));    WatFlowSno2MacPM=0._r8
@@ -162,7 +162,7 @@ module SoilWaterDataType
   allocate(TortMicPM(60,0:JZ,JY,JX));TortMicPM=0._r8
   allocate(TortMacPM(60,JZ,JY,JX)); TortMacPM=0._r8
   allocate(DFGS(60,0:JZ,JY,JX));DFGS=0._r8
-  allocate(RSCS(JZ,JY,JX));     RSCS=0._r8
+  allocate(SoilResit4RootPentration(JZ,JY,JX));     SoilResit4RootPentration=0._r8
   allocate(PSISE(0:JZ,JY,JX));  PSISE=0._r8
   allocate(PSISoilAirEntry(0:JZ,JY,JX));  PSISoilAirEntry=0._r8
   allocate(PSISoilOsmotic(0:JZ,JY,JX));  PSISoilOsmotic=0._r8
@@ -219,7 +219,7 @@ module SoilWaterDataType
   call destroy(XVLiceMicPM)
   call destroy(HydroCond3D)
   call destroy(HydroCondMacP)
-  call destroy(CNDU)
+  call destroy(HydroCondMicP4RootUptake)
   call destroy(QRM)
   call destroy(QRV)
   call destroy(IFLBM)
@@ -238,9 +238,9 @@ module SoilWaterDataType
   call destroy(RechargSouthSurf)
   call destroy(RechargWestSurf)
   call destroy(RCHGD)
-  call destroy(FLWM)
-  call destroy(WaterFlowMacPi)
-  call destroy(FLPM)
+  call destroy(WaterFlow2MicPM)
+  call destroy(WaterFlow2MacPM)
+  call destroy(ReductVLsoiAirPM)
   call destroy(FWatExMacP2MicPM)
   call destroy(WatFlowSno2MicPM)
   call destroy(WatFlowSno2MacPM)
@@ -248,7 +248,7 @@ module SoilWaterDataType
   call destroy(TortMicPM)
   call destroy(TortMacPM)
   call destroy(DFGS)
-  call destroy(RSCS)
+  call destroy(SoilResit4RootPentration)
   call destroy(PSISE)
   call destroy(PSISoilAirEntry)
   call destroy(PSISoilOsmotic)

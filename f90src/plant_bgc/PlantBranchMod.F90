@@ -105,7 +105,7 @@ module PlantBranchMod
     CNWS       =>  plt_allom%CNWS     , &
     CPWS       =>  plt_allom%CPWS     , &
     CNRSV      =>  plt_allom%CNRSV    , &
-    DMRT       =>  plt_allom%DMRT     , &
+    BiomGrowthYieldRoot       =>  plt_allom%BiomGrowthYieldRoot     , &
     FNOD       =>  plt_allom%FNOD     , &
     ESNC       =>  plt_bgcr%ESNC      , &
     CFOPE      =>  plt_soilchem%CFOPE , &
@@ -160,9 +160,9 @@ module PlantBranchMod
     ARLFZ      =>   plt_morph%ARLFZ   , &
     CanPBLA      =>   plt_morph%CanPBLA   , &
     SeedinDepth      =>   plt_morph%SeedinDepth   , &
-    HTSHEX     =>   plt_morph%HTSHEX  , &
+    CanPBranchHeight     =>   plt_morph%CanPBranchHeight  , &
     ARLF1      =>   plt_morph%ARLF1   , &
-    HTSHE      =>   plt_morph%HTSHE   , &
+    CanPSheathHeight      =>   plt_morph%CanPSheathHeight   , &
     ANGBR      =>   plt_morph%ANGBR   , &
     SSL1       =>   plt_morph%SSL1    , &
     HTNODE     =>   plt_morph%HTNODE  , &
@@ -198,8 +198,8 @@ module PlantBranchMod
       CPLFB=CPLFW
       CPSHB=CPSHW
     ELSE
-      DMLFB=DMRT(NZ)
-      DMSHB=DMRT(NZ)
+      DMLFB=BiomGrowthYieldRoot(NZ)
+      DMSHB=BiomGrowthYieldRoot(NZ)
       CNLFB=CNRTW
       CNSHB=CNRTW
       CPLFB=CPRTW
@@ -433,13 +433,13 @@ module PlantBranchMod
         !   GSSL=allocation of petiole length growth to each node
         !   WFNS=turgor expansion,extension function
         !   GROS,GRO=petiole length,mass growth
-        !   HTSHE=petiole length
+        !   CanPSheathHeight=petiole length
 !
             IF(WGLFE(ielmc,K,NB,NZ).GT.0.0_r8)THEN
               SSL=ETOL*SSL1(NZ)*(AMAX1(ZEROL(NZ) &
                 ,WGSHE(ielmc,K,NB,NZ))/(pftPlantPopulation(NZ)*GSSL))**SSL2*WFNS
               GROS=GROE(ielmc)/pftPlantPopulation(NZ)*SSL
-              HTSHE(K,NB,NZ)=HTSHE(K,NB,NZ)+GROS*ANGSH(NZ)
+              CanPSheathHeight(K,NB,NZ)=CanPSheathHeight(K,NB,NZ)+GROS*ANGSH(NZ)
             ENDIF
           ENDDO D505
         ENDIF
@@ -634,14 +634,14 @@ module PlantBranchMod
     !
     !       IFLGP=flag for remobilization
     !       WGSHE,WGSHN,WGSHP=node petiole C,N,P mass
-    !       HTSHEX=petiole length
+    !       CanPBranchHeight=petiole length
     !       RCES(ielmc)X,RCES(ielmn)X,RCES(ielmp)X=remobilization of C,N,P from senescing petiole
 !
             IF(IFLGP(NB,NZ).EQ.1)THEN
               DO NE=1,npelms
                 WGSHEXE(NE,NB,NZ)=AZMAX1(WGSHE(NE,K,NB,NZ))
               ENDDO
-              HTSHEX(NB,NZ)=AZMAX1(HTSHE(K,NB,NZ))
+              CanPBranchHeight(NB,NZ)=AZMAX1(CanPSheathHeight(K,NB,NZ))
               IF(WGSHEXE(ielmc,NB,NZ).GT.ZEROP(NZ))THEN
                 RCESX(ielmc,NB,NZ)=RCCC*WGSHEXE(ielmc,NB,NZ)
                 RCESX(ielmn,NB,NZ)=WGSHEXE(ielmn,NB,NZ) &
@@ -693,7 +693,7 @@ module PlantBranchMod
     !       UPDATE STATE VARIABLES FOR REMOBILIZATION AND LITTERFALL
     !
     !       FSNCS=fraction of lowest petiole to be remobilized
-    !       HTSHE,HTSHEX=living,senescing petiole length
+    !       CanPSheathHeight,CanPBranchHeight=living,senescing petiole length
     !       WTSHB,WTSHBN,WTSHBP,WGSHEX,WGSHNX,WGSHPX=C,N,P mass in living,senescing petiole
     !       WSSHE=petiole protein mass
     !       CNWS,CPWS=protein:N,protein:P ratios from startq.f
@@ -705,7 +705,7 @@ module PlantBranchMod
               WGSHE(NE,K,NB,NZ)=WGSHE(NE,K,NB,NZ)-FSNCS*WGSHEXE(NE,NB,NZ)
               EPOOL(NE,NB,NZ)=EPOOL(NE,NB,NZ)+FSNCS*RCESX(NE,NB,NZ)
             ENDDO
-            HTSHE(K,NB,NZ)=HTSHE(K,NB,NZ)-FSNCS*HTSHEX(NB,NZ)
+            CanPSheathHeight(K,NB,NZ)=CanPSheathHeight(K,NB,NZ)-FSNCS*CanPBranchHeight(NB,NZ)
 
             WSSHE(K,NB,NZ)=AZMAX1(WSSHE(K,NB,NZ) &
               -FSNCS*AMAX1(WGSHEXE(ielmn,NB,NZ)*CNWS(NZ) &
@@ -1355,7 +1355,7 @@ module PlantBranchMod
     CanPBLA      =>   plt_morph%CanPBLA    , &
     NNOD       =>   plt_morph%NNOD     , &
     HTNODE     =>   plt_morph%HTNODE   , &
-    HTSHE      =>   plt_morph%HTSHE    , &
+    CanPSheathHeight      =>   plt_morph%CanPSheathHeight    , &
     ARLF1      =>   plt_morph%ARLF1    , &
     HTNODX     =>   plt_morph%HTNODX     &
   )
@@ -1562,14 +1562,14 @@ module PlantBranchMod
 !
       !     UPDATE STATE VARIABLES FOR REMOBILIZATION AND LITTERFALL
       !
-      !     HTSHE=petiole length
+      !     CanPSheathHeight=petiole length
       !     WTSHEB,WTLFBN,WTSHBP=branch petiole C,N,P mass
       !     WGSHE,WGSHN,WGSHP,WSSHE=node petiole C,N,P,protein mass
       !     FSNCS=fraction of current petiole to be remobilized
       !     CNWS,CPWS=protein:N,protein:P ratios from startq.f
       !
 
-        HTSHE(K,NB,NZ)=HTSHE(K,NB,NZ)-FSNAS*HTSHE(K,NB,NZ)
+        CanPSheathHeight(K,NB,NZ)=CanPSheathHeight(K,NB,NZ)-FSNAS*CanPSheathHeight(K,NB,NZ)
         WSSHE(K,NB,NZ)=AZMAX1(WSSHE(K,NB,NZ) &
           -FSNCS*AMAX1(WGSHE(ielmn,K,NB,NZ)*CNWS(NZ) &
           ,WGSHE(ielmp,K,NB,NZ)*CPWS(NZ)))
@@ -1603,7 +1603,7 @@ module PlantBranchMod
       !     foliar(1,*),non-foliar(2,*),stalk(3,*),root(4,*), coarse woody (5,*)
       !     FWODB=C woody fraction in branch:0=woody,1=non-woody
       !     FWODSN,FWODSP=N,P woody fraction in petiole:0=woody,1=non-woody
-      !     HTSHE=petiole length
+      !     CanPSheathHeight=petiole length
       !     WTSHEB,WTSHBN,WTSHBP=branch petiole C,N,P mass
       !     WGSHE,WGSHN,WGSHP,WSSHE=node petiole C,N,P,protein mass
       !
@@ -1618,7 +1618,7 @@ module PlantBranchMod
           WTSHEBE(NE,NB,NZ)=AZMAX1(WTSHEBE(NE,NB,NZ)-WGSHE(NE,K,NB,NZ))
           WGSHE(NE,K,NB,NZ)=0._r8
         ENDDO
-        HTSHE(K,NB,NZ)=0._r8
+        CanPSheathHeight(K,NB,NZ)=0._r8
         WSSHE(K,NB,NZ)=0._r8
         IF(WTSHEBE(ielmc,NB,NZ).LE.ZEROL(NZ))THEN
           WTSHEBE(ielmc,NB,NZ)=0._r8
@@ -1911,7 +1911,7 @@ module PlantBranchMod
     SeedinDepth    => plt_morph%SeedinDepth   , &
     NB1      => plt_morph%NB1     , &
     CanPLNBLA    => plt_morph%CanPLNBLA   , &
-    HTSHE    => plt_morph%HTSHE   , &
+    CanPSheathHeight    => plt_morph%CanPSheathHeight   , &
     CanPLBSA    => plt_morph%CanPLBSA   , &
     NBTB     => plt_morph%NBTB    , &
     HTNODE   => plt_morph%HTNODE  , &
@@ -1930,12 +1930,12 @@ module PlantBranchMod
 !   HypoctoylHeight=hypocotyledon height
 !   SeedinDepth=seeding depth
 !   ARLF=node leaf area
-!   HTSHE=petiole length
+!   CanPSheathHeight=petiole length
 !
   KVSTGN(NB,NZ)=0
   IF(HypoctoylHeight(NZ).LE.SeedinDepth(NZ).AND.ARLF1(0,NB1(NZ),NZ).GT.0.0)THEN
     XLGLF=SQRT(1.0E+02*ARLF1(0,NB1(NZ),NZ)/pftPlantPopulation(NZ))
-    HypoctoylHeight(NZ)=XLGLF+HTSHE(0,NB1(NZ),NZ)+HTNODE(0,NB1(NZ),NZ)
+    HypoctoylHeight(NZ)=XLGLF+CanPSheathHeight(0,NB1(NZ),NZ)+HTNODE(0,NB1(NZ),NZ)
   ENDIF
 !
 ! IF CANOPY HAS EMERGED
@@ -1996,7 +1996,7 @@ module PlantBranchMod
       !     XLGLF=leaf length
 !
       HTSTK=HTBR+HTNODE(K,NB,NZ)
-      HTLF=HTSTK+HTSHE(K,NB,NZ)
+      HTLF=HTSTK+CanPSheathHeight(K,NB,NZ)
       XLGLF=AZMAX1(SQRT(WDLF(NZ)*AMAX1(0.0 &
         ,ARLF1(K,NB,NZ))/(pftPlantPopulation(NZ)*FNOD(NZ))))
       TLGLF=0._r8
@@ -2534,7 +2534,7 @@ module PlantBranchMod
     MY       =>  plt_morph%MY        , &
     VSTG     =>  plt_morph%VSTG      , &
     XTLI     =>  plt_morph%XTLI      , &
-    HTSHE    =>  plt_morph%HTSHE     , &
+    CanPSheathHeight    =>  plt_morph%CanPSheathHeight     , &
     KLEAF    =>  plt_morph%KLEAF     , &
     HTNODX   =>  plt_morph%HTNODX    , &
     HTNODE   =>  plt_morph%HTNODE    , &
@@ -2644,7 +2644,7 @@ module PlantBranchMod
             WTSHEBE(1:npelms,NB,NZ)=0._r8
             D5335: DO K=0,JNODS1
               ARLF1(K,NB,NZ)=0._r8
-              HTSHE(K,NB,NZ)=0._r8
+              CanPSheathHeight(K,NB,NZ)=0._r8
               WSLF(K,NB,NZ)=0._r8
               WGLFE(1:npelms,K,NB,NZ)=0._r8
               WGSHE(1:npelms,K,NB,NZ)=0._r8

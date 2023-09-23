@@ -1,13 +1,25 @@
 module PlantMathFuncMod
 !
 !DESCRIPTION
-! code for small functions used by plant processes
-use data_kind_mod, only : r8 => DAT_KIND_R8
-use EcoSimConst
-use MiniMathMod
+  ! code for small functions used by plant processes
+  use data_kind_mod, only : r8 => DAT_KIND_R8
+  use EcoSimConst
+  use MiniMathMod
 implicit none
-  
-  
+  character(len=*), parameter, private :: mod_filename='PlantMathFuncMod'
+
+  type, public  :: PlantSoluteUptakeConfig_type
+    real(r8) :: SolAdvFlx  
+    real(r8) :: SolDifusFlx    
+    real(r8) :: UptakeRateMax   
+    real(r8) :: O2Stress        
+    real(r8) :: PlantPopulation 
+    real(r8) :: CAvailStress    
+    real(r8) :: SoluteMassMax   
+    real(r8) :: SoluteConc      
+    real(r8) :: SoluteKM      
+    real(r8) :: SoluteConcMin       
+  end type PlantSoluteUptakeConfig_type
 contains
 
   pure function get_FDM(PSICanP)result(FDMP)
@@ -101,4 +113,70 @@ contains
 
   end function calc_canopy_grow_tempf
 
+!--------------------------------------------------------------------------------
+
+  subroutine SoluteUptakeByPlantRoots(PlantSoluteUptakeConfig, PltUptake_Ol, PltUptake_Sl, PltUptake_OSl, PltUptake_OSCl)
+  !
+  !DESCRIPTION
+  !solve for substrate uptake rate as a function of solute concentration
+  !
+  !Q^2−(v+X-Y+DK)Q+(X−Y)v=0
+  !Q is uptake rate
+  !v is maximum uptake rate
+  !K is affinity parameter
+  !X=(q+D)C, with C as micropore solute concentration
+  !Y=D*Cm, with Cm being the minimum concentration for uptake
+
+  implicit none
+  type(PlantSoluteUptakeConfig_type), intent(in) :: PlantSoluteUptakeConfig
+  real(r8), intent(out) :: PltUptake_Ol
+  real(r8), intent(out) :: PltUptake_Sl
+  real(r8), intent(out) :: PltUptake_OSl  
+  real(r8), intent(out) :: PltUptake_OSCl
+  real(r8) :: UptakeRateMax_Ol   !oxygen limited maximum uptake rate
+  real(r8) :: X, Y, B, C, BP, CP 
+  real(r8) :: Uptake, Uptake_Ol
+
+  associate(                                                    &
+  SolAdvFlx       => PlantSoluteUptakeConfig%SolAdvFlx        , &
+  SolDifusFlx     => PlantSoluteUptakeConfig%SolDifusFlx      , &
+  UptakeRateMax   => PlantSoluteUptakeConfig%UptakeRateMax    , &
+  O2Stress        => PlantSoluteUptakeConfig%O2Stress         , &
+  PlantPopulation => PlantSoluteUptakeConfig%PlantPopulation  , &
+  CAvailStress    => PlantSoluteUptakeConfig%CAvailStress     , &
+  SoluteMassMax   => PlantSoluteUptakeConfig%SoluteMassMax    , &
+  SoluteConc      => PlantSoluteUptakeConfig%SoluteConc       , &
+  SoluteKM        => PlantSoluteUptakeConfig%SoluteKM         , &
+  SoluteConcMin   => PlantSoluteUptakeConfig%SoluteConcMin      &
+  )
+
+  UptakeRateMax_Ol=UptakeRateMax*O2Stress  
+
+  X=(SolDifusFlx+SolAdvFlx)*SoluteConc
+  Y=SolDifusFlx*SoluteConcMin
+
+  !Oxygen limited but not solute or carbon limited uptake
+  B=-UptakeRateMax_Ol-SolDifusFlx*SoluteKM-X+Y
+  C=(X-Y)*UptakeRateMax_Ol
+  Uptake_Ol=(-B-SQRT(B*B-4.0_r8*C))/2.0_r8
+
+  !Oxygen, solute and carbon unlimited solute uptake
+  BP=-UptakeRateMax-SolDifusFlx*SoluteKM-X+Y
+  CP=(X-Y)*UptakeRateMax
+  Uptake=(-BP-SQRT(BP*BP-4.0_r8*CP))/2.0_r8
+
+  !oxygen limited but solute or carbon unlimited
+  PltUptake_Ol=AZMAX1(Uptake_Ol*PlantPopulation)
+
+  !oxygen and solute limited, but not carbon limited
+  PltUptake_OSl=AMIN1(SoluteMassMax,PltUptake_Ol)
+
+  !oxygen and carbon unlimited but solute limited uptake
+  PltUptake_Sl=AMIN1(SoluteMassMax,AZMAX1(Uptake*PlantPopulation))
+
+  !oxygen, solute and carbon limited uptake
+  PltUptake_OSCl=PltUptake_OSl/CAvailStress
+
+  end associate
+  end subroutine SoluteUptakeByPlantRoots
 end module PlantMathFuncMod

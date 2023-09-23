@@ -39,7 +39,7 @@ module PlantDataRateType
   real(r8),target,allocatable ::  HESNC(:,:,:,:)                     !plant element litterfall, [g d-2 h-1]
   real(r8),target,allocatable ::  ESNC(:,:,:,:,:,:,:)                !plant litterfall element, [g d-2 h-1]
   real(r8),target,allocatable ::  ZNPP(:,:,:)                        !total net primary productivity, [g d-2]
-  real(r8),target,allocatable ::  CTRAN(:,:,:)                       !total transpiration, [m d-2]
+  real(r8),target,allocatable ::  ETCanP(:,:,:)                       !total transpiration, [m d-2], <0 into atmosphere
   real(r8),target,allocatable ::  TCO2A(:,:,:)                       !total autotrophic respiration, [g d-2 ]
   real(r8),target,allocatable ::  HVSTE(:,:,:,:)                     !plant element harvest, [g d-2 ]
   real(r8),target,allocatable ::  THVSTE(:,:,:,:)                    !total plant harvest, [g d-2 ]
@@ -192,7 +192,7 @@ module PlantDataRateType
   allocate(HESNC(npelms,JP,JY,JX));    HESNC=0._r8
   allocate(ESNC(npelms,jsken,1:n_pltlitrk,0:JZ,JP,JY,JX));ESNC=0._r8
   allocate(ZNPP(JP,JY,JX));     ZNPP=0._r8
-  allocate(CTRAN(JP,JY,JX));    CTRAN=0._r8
+  allocate(ETCanP(JP,JY,JX));    ETCanP=0._r8
   allocate(TCO2A(JP,JY,JX));    TCO2A=0._r8
   allocate(HVSTE(npelms,JP,JY,JX));    HVSTE=0._r8
   allocate(THVSTE(npelms,JP,JY,JX));   THVSTE=0._r8
@@ -333,7 +333,7 @@ module PlantDataRateType
   call destroy(HESNC)
   call destroy(ESNC)
   call destroy(ZNPP)
-  call destroy(CTRAN)
+  call destroy(ETCanP)
   call destroy(TCO2A)
   call destroy(HVSTE)
   call destroy(THVSTE)

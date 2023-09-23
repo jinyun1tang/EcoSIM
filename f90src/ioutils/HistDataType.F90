@@ -191,7 +191,7 @@ implicit none
   real(r8),pointer   :: histr_1D_NPP_ptc(:)           !ZNPP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_CAN_HT_ptc(:)        !CanopyHeight(NZ,NY,NX), canopy height, m
   real(r8),pointer   :: histr_1D_POPN_ptc(:)          !PP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), plant population
-  real(r8),pointer   :: histr_1D_tTRANSPN_ptc(:)      !-CTRAN(NZ,NY,NX)*1000.0/AREA(3,NU(NY,NX),NY,NX), total transpiration
+  real(r8),pointer   :: histr_1D_tTRANSPN_ptc(:)      !-ETCanP(NZ,NY,NX)*1000.0/AREA(3,NU(NY,NX),NY,NX), total transpiration
   real(r8),pointer   :: histr_1D_WTR_STRESS_ptc(:)    !WSTR(NZ,NY,NX)
   real(r8),pointer   :: histr_1D_OXY_STRESS_ptc(:)    !OSTR(NZ,NY,NX)
   real(r8),pointer   :: histr_1D_SHOOT_N_ptc(:)       !CanPShootElmMass(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -440,7 +440,7 @@ implicit none
   allocate(this%histr_1D_NPP_ptc(beg_ptc:end_ptc))           !ZNPP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_CAN_HT_ptc(beg_ptc:end_ptc))        !CanopyHeight(NZ,NY,NX), canopy height, m
   allocate(this%histr_1D_POPN_ptc(beg_ptc:end_ptc))          !PP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), plant population
-  allocate(this%histr_1D_tTRANSPN_ptc(beg_ptc:end_ptc))      !-CTRAN(NZ,NY,NX)*1000.0/AREA(3,NU(NY,NX),NY,NX), total transpiration
+  allocate(this%histr_1D_tTRANSPN_ptc(beg_ptc:end_ptc))      !-ETCanP(NZ,NY,NX)*1000.0/AREA(3,NU(NY,NX),NY,NX), total transpiration
   allocate(this%histr_1D_WTR_STRESS_ptc(beg_ptc:end_ptc))    !WSTR(NZ,NY,NX)
   allocate(this%histr_1D_OXY_STRESS_ptc(beg_ptc:end_ptc))    !OSTR(NZ,NY,NX)
   allocate(this%histr_1D_SHOOT_N_ptc(beg_ptc:end_ptc))       !CanPShootElmMass(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -1143,7 +1143,7 @@ implicit none
 
   data1d_ptr => this%histr_1D_tTRANSPN_ptc(beg_ptc:end_ptc)  
   call hist_addfld1d(fname='tTRANSPN',units='mmH2O/m2/hr',avgflag='A',&
-    long_name='Total evapotranspiration',ptr_patch=data1d_ptr)      
+    long_name='Total evapotranspiration (>0 into atmosphere)',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%histr_1D_WTR_STRESS_ptc(beg_ptc:end_ptc)    !WSTR(NZ,NY,NX)
   call hist_addfld1d(fname='WTR_STRESS',units='hr',avgflag='A',&
@@ -1613,7 +1613,7 @@ implicit none
         this%histr_1D_NPP_ptc(nptc)          = ZNPP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_CAN_HT_ptc(nptc)       = CanopyHeight(NZ,NY,NX)
         this%histr_1D_POPN_ptc(nptc)         = pftPlantPopulation(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%histr_1D_tTRANSPN_ptc(nptc)     =-CTRAN(NZ,NY,NX)*1000.0/AREA(3,NU(NY,NX),NY,NX)
+        this%histr_1D_tTRANSPN_ptc(nptc)     =-ETCanP(NZ,NY,NX)*1000.0/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_WTR_STRESS_ptc(nptc)   = WSTR(NZ,NY,NX)
         this%histr_1D_OXY_STRESS_ptc(nptc)   = PlantO2Stress(NZ,NY,NX)
         this%histr_1D_SHOOT_N_ptc(nptc)      = CanPShootElmMass(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)

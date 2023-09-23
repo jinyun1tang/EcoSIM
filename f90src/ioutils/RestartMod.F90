@@ -534,16 +534,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='CTRAN', dim1name='pft',&
-     long_name='total transpiration', units='m d-2', &
+    call restartvar(ncid, flag, varname='ETCanP', dim1name='pft',&
+     long_name='total transpiration (<0 into atmosphere)', units='m d-2', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)       
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,CTRAN,datrp_1d,iflgt=iflgt,iflgc=iflgc)  
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,ETCanP,datrp_1d,iflgt=iflgt,iflgc=iflgc)  
   else
-    !print*,'CTRAN'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,CTRAN,datrp_1d,iflgt=iflgt,iflgc=iflgc)    
+    !print*,'ETCanP'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,ETCanP,datrp_1d,iflgt=iflgt,iflgc=iflgc)    
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='CTRAN', dim1name='pft',&
-     long_name='total transpiration', units='m d-2', &
+    call restartvar(ncid, flag, varname='ETCanP', dim1name='pft',&
+     long_name='total transpiration  (<0 into atmosphere)', units='m d-2', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)           
   endif  
 
@@ -2103,15 +2103,15 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrp_2d(1:npfts,1:JBR)
-    call restartvar(ncid, flag, varname='HTSHEX', dim1name='pft',dim2name='nbranches',&
+    call restartvar(ncid, flag, varname='CanPBranchHeight', dim1name='pft',dim2name='nbranches',&
      long_name='branch height', units='m', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,HTSHEX,datrp_2d,iflgt=iflgt,iflgc=iflgc) 
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,CanPBranchHeight,datrp_2d,iflgt=iflgt,iflgc=iflgc) 
   else
-    !print*,'HTSHEX'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,HTSHEX,datrp_2d,iflgt=iflgt,iflgc=iflgc)   
+    !print*,'CanPBranchHeight'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,CanPBranchHeight,datrp_2d,iflgt=iflgt,iflgc=iflgc)   
     datpr2 => datrp_2d(1:npfts,1:JBR)
-    call restartvar(ncid, flag, varname='HTSHEX', dim1name='pft',dim2name='nbranches',&
+    call restartvar(ncid, flag, varname='CanPBranchHeight', dim1name='pft',dim2name='nbranches',&
      long_name='branch height', units='m', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
   endif
@@ -2313,16 +2313,16 @@ implicit none
 
   if(flag=='read')then
     datpr3 => datrp_3d(1:npfts,1:JNODS,1:JBR)
-    call restartvar(ncid, flag, varname='HTSHE', dim1name='pft',dim2name='nodes',&
-     dim3name='nbranches',long_name='sheath height', units='m', &
+    call restartvar(ncid, flag, varname='CanPSheathHeight', dim1name='pft',dim2name='nodes',&
+     dim3name='nbranches',long_name='plant sheath height', units='m', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)  
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,HTSHE,datrp_3d,iflgt=iflgt,iflgc=iflgc) 
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,CanPSheathHeight,datrp_3d,iflgt=iflgt,iflgc=iflgc) 
   else
-    !print*,'HTSHE'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,HTSHE,datrp_3d,iflgt=iflgt,iflgc=iflgc)   
+    !print*,'CanPSheathHeight'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,CanPSheathHeight,datrp_3d,iflgt=iflgt,iflgc=iflgc)   
     datpr3 => datrp_3d(1:npfts,1:JNODS,1:JBR)
-    call restartvar(ncid, flag, varname='HTSHE', dim1name='pft',dim2name='nodes',&
-     dim3name='nbranches',long_name='sheath height', units='m', &
+    call restartvar(ncid, flag, varname='CanPSheathHeight', dim1name='pft',dim2name='nodes',&
+     dim3name='nbranches',long_name='plant sheath height', units='m', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)  
   endif 
 

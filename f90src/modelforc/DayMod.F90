@@ -174,7 +174,7 @@
           TEUPTK(:,NZ,NY,NX)=0._r8
           TCO2T(NZ,NY,NX)=0._r8
           TCO2A(NZ,NY,NX)=0._r8
-          CTRAN(NZ,NY,NX)=0._r8
+          ETCanP(NZ,NY,NX)=0._r8
           TZUPFX(NZ,NY,NX)=0._r8
           TNH3C(NZ,NY,NX)=0._r8
           VCO2F(NZ,NY,NX)=0._r8

@@ -77,13 +77,13 @@ module TrnsfrMod
   integer, intent(in) :: I, J
   integer, intent(in) :: NHW,NHE,NVN,NVS
   integer :: MX,MM,M
-  real(r8) :: FLQM(3,JD,JV,JH)
+  real(r8) :: WaterFlow2Soil(3,JD,JV,JH)
 !     execution begins here
 !
 !     TIME STEPS FOR SOLUTE AND GAS FLUX CALCULATIONS
 !
 
-  FLQM(:,:,:,:)=0._r8
+  WaterFlow2Soil(:,:,:,:)=0._r8
   call InitFluxandStateVariables(I,NHW,NHE,NVN,NVS)
 
 !
@@ -96,7 +96,7 @@ module TrnsfrMod
     !compute the ordinal number of the current iteration
     M=MIN(NPH,INT((MM-1)*XNPT)+1)
 
-    call ModelTracerHydroFlux(M,MX,NHW, NHE, NVN, NVS,FLQM)
+    call ModelTracerHydroFlux(M,MX,NHW, NHE, NVN, NVS,WaterFlow2Soil)
 !
 !     BOUNDARY SOLUTE AND GAS FLUXES
 !
@@ -175,7 +175,7 @@ module TrnsfrMod
 !     ENTERED IN WEATHER AND IRRIGATION FILES
 !
 !     SnoFalPrec,RainFalPrec=snow,rain
-!     VHCPWM,VLHeatCapSnowMN=current,minimum volumetric heat capacity of snowpack
+!     VLSnowHeatCapM,VLHeatCapSnowMN=current,minimum volumetric heat capacity of snowpack
 !     X*BLS=hourly solute flux to snowpack
 !     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
 !             :OC=DOC,ON=DON,OP=DOP,OA=acetate
@@ -538,7 +538,7 @@ module TrnsfrMod
 
   integer, intent(in) :: I
   integer, intent(in) :: NY,NX
-  IF(SnoFalPrec(NY,NX).GT.0.0_r8.OR.(RainFalPrec(NY,NX).GT.0.0_r8.AND.VHCPWM(1,1,NY,NX).GT.VLHeatCapSnowMN(NY,NX)))THEN
+  IF(SnoFalPrec(NY,NX).GT.0.0_r8.OR.(RainFalPrec(NY,NX).GT.0.0_r8.AND.VLSnowHeatCapM(1,1,NY,NX).GT.VLHeatCapSnowMN(NY,NX)))THEN
     trcg_XBLS(idg_CO2,1,NY,NX)=FLQGQ(NY,NX)*CCOR(NY,NX)+FLQGI(NY,NX)*CCOQ(NY,NX)
     trcg_XBLS(idg_CH4,1,NY,NX)=FLQGQ(NY,NX)*CCHR(NY,NX)+FLQGI(NY,NX)*CCHQ(NY,NX)
     trcg_XBLS(idg_O2,1,NY,NX)=FLQGQ(NY,NX)*COXR(NY,NX)+FLQGI(NY,NX)*COXQ(NY,NX)
@@ -564,7 +564,7 @@ module TrnsfrMod
 !     ENTERED IN WEATHER AND IRRIGATION FILES
 !
   ELSEIF((PRECQ(NY,NX).GT.0.0.OR.PRECI(NY,NX).GT.0.0) &
-    .AND.VHCPWM(1,1,NY,NX).LE.VLHeatCapSnowMN(NY,NX))THEN
+    .AND.VLSnowHeatCapM(1,1,NY,NX).LE.VLHeatCapSnowMN(NY,NX))THEN
 !
 !     HOURLY SOLUTE FLUXES FROM ATMOSPHERE TO SNOWPACK
 !     IF SNOWFALL AND IRRIGATION IS ZERO AND SNOWPACK IS ABSENT

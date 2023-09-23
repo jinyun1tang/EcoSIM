@@ -1,7 +1,7 @@
   module stomatesMod
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use EcosimConst
-  use minimathmod, only : AZMAX1
+  use minimathmod
   use PlantAPIData
   implicit none
 
@@ -38,7 +38,7 @@
   integer, intent(in) :: NZ
 
   integer :: K,L,M,NB,N
-  REAL(R8):: RACL
+  REAL(R8):: CanPbndlResist4CO2
   real(r8):: RI
 !     begin_execution
   associate(                            &
@@ -54,7 +54,7 @@
     SSIN     =>  plt_rad%SSIN     , &
     FMOL     =>  plt_photo%FMOL   , &
     MinCanPStomaResistH2O     =>  plt_photo%MinCanPStomaResistH2O   , &
-    FCO2     =>  plt_photo%FCO2   , &
+    CanPCi2CaRatio     =>  plt_photo%CanPCi2CaRatio   , &
     MaxCanPStomaResistH2O     =>  plt_photo%MaxCanPStomaResistH2O   , &
     CO2I     =>  plt_photo%CO2I     &
   )
@@ -64,32 +64,36 @@
 !     CANOPY BOUNDARY LAYER RESISTANCE
 !
 !     RI=Richardson's number
-!     RIB=canopy isothermal Richardson�s number
+!     RIB=canopy isothermal Richardson's number
 !     TairK,TKCZ=air,canopy temperature
 !     RAZ=canopy isothermal boundary later resistance
-!     RACL=canopy boundary layer resistance to CO2
+!     CanPbndlResist4CO2=canopy boundary layer resistance to CO2, h/m
 !     FMOL=number of moles of air per m3
 !
-  RI=AMAX1(-0.3,AMIN1(0.075,RIB*(TairK-TKCZ(NZ))))
-  RACL=1.34*AMAX1(5.56E-03,RAZ(NZ)/(1.0-10.0*RI))
-  FMOL(NZ)=1.2194E+04/TKCZ(NZ)
+  RI=RichardsonNumber(RIB,TairK,TKCZ(NZ))
+
+  CanPbndlResist4CO2=1.34*AMAX1(5.56E-03,RAZ(NZ)/(1.0-10.0*RI))
+
+  !assuming pressure is one atmosphere
+  FMOL(NZ)=GetMolAirPerm3(TKCZ(NZ))
 !
 !     CANOPY CO2 CONCENTRATION FROM CO2 INFLUXES AND EFFLUXES
 !
 !     CO2Q,CO2E=CO2 concentrations in canopy air,atmosphere, umol mol-1 (ppmv)
 !     CNETX=net CO2 flux in canopy air from soil,plants, g d-2 h-1
-!
-  CO2Q(NZ)=CO2E-8.33E+04_r8*CNETX*RACL/FMOL(NZ)
+! assuming steady state, canopy CO2 concentration is computed with mass balance. 
+! how 8.33E+04 is determined. 
+  CO2Q(NZ)=CO2E-8.33E+04_r8*CNETX*CanPbndlResist4CO2/FMOL(NZ)
   CO2Q(NZ)=AMIN1(CO2E+200.0_r8,AZMAX1(CO2E-200.0_r8,CO2Q(NZ)))
 !
 !     MESOPHYLL CO2 CONCENTRATION FROM CI:CA RATIO ENTERED IN 'READQ'
 !
 !     CO2I=intercellular CO2 concentration
-!     FCO2=intercellular:atmospheric CO2 concn ratio from PFT file, parameter
+!     CanPCi2CaRatio=intercellular:atmospheric CO2 concn ratio from PFT file, parameter
 !     SSIN=sine of solar angle
 !     CanPLA=PFT leaf area
 !
-  CO2I(NZ)=FCO2(NZ)*CO2Q(NZ)
+  CO2I(NZ)=CanPCi2CaRatio(NZ)*CO2Q(NZ)
 
   IF(SSIN.GT.0.0.AND.CanPLA(NZ).GT.ZEROP(NZ))THEN
 !

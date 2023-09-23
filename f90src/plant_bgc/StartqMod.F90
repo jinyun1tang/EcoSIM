@@ -422,8 +422,8 @@ module StartqMod
       ENDDO D9790
     ENDIF
   ENDDO D9795  
-  CNRTS(NZ,NY,NX)=CNRT(NZ,NY,NX)*DMRT(NZ,NY,NX)
-  CPRTS(NZ,NY,NX)=CPRT(NZ,NY,NX)*DMRT(NZ,NY,NX)
+  CNRTS(NZ,NY,NX)=CNRT(NZ,NY,NX)*BiomGrowthYieldRoot(NZ,NY,NX)
+  CPRTS(NZ,NY,NX)=CPRT(NZ,NY,NX)*BiomGrowthYieldRoot(NZ,NY,NX)
   MaxPrimRootRadius(2,NZ,NY,NX)=5.0E-06
   MaxSecndRootRadius(2,NZ,NY,NX)=5.0E-06
   RootPorosity(2,NZ,NY,NX)=RootPorosity(1,NZ,NY,NX)
@@ -535,6 +535,7 @@ module StartqMod
   WGSHEXE(1:npelms,1:JBR,NZ,NY,NX)=0._r8  
   WTSTXBE(1:npelms,1:JBR,NZ,NY,NX)=0._r8
   WGLFEX(1:npelms,1:JBR,NZ,NY,NX)=0._r8
+  
   D25: DO NB=1,JBR
     CanPBStalkC(NB,NZ,NY,NX)=0._r8
     CanPBLeafShethC(NB,NZ,NY,NX)=0._r8
@@ -544,7 +545,7 @@ module StartqMod
     CanPBLA(NB,NZ,NY,NX)=0._r8
     RNH3B(NB,NZ,NY,NX)=0._r8
     ARLFZ(NB,NZ,NY,NX)=0._r8
-    HTSHEX(NB,NZ,NY,NX)=0._r8
+    CanPBranchHeight(NB,NZ,NY,NX)=0._r8
     
     D5: DO L=1,JC
       CanPLBSA(L,NB,NZ,NY,NX)=0._r8
@@ -556,7 +557,7 @@ module StartqMod
       ARLF(K,NB,NZ,NY,NX)=0._r8
       HTNODE(K,NB,NZ,NY,NX)=0._r8
       HTNODX(K,NB,NZ,NY,NX)=0._r8
-      HTSHE(K,NB,NZ,NY,NX)=0._r8
+      CanPSheathHeight(K,NB,NZ,NY,NX)=0._r8
       WGLFE(1:npelms,K,NB,NZ,NY,NX)=0._r8
       WGSHE(1:npelms,K,NB,NZ,NY,NX)=0._r8
       WGNODE(1:npelms,K,NB,NZ,NY,NX)=0._r8
@@ -639,7 +640,7 @@ module StartqMod
     THVSTE(1:npelms,NZ,NY,NX)=0._r8
     HVSTE(1:npelms,NZ,NY,NX)=0._r8
     RSETE(1:npelms,NZ,NY,NX)=0._r8
-    CTRAN(NZ,NY,NX)=0._r8
+    ETCanP(NZ,NY,NX)=0._r8
     WTSTGE(1:npelms,NZ,NY,NX)=0._r8
     WTSTDX=WTSTDI(NZ,NY,NX)*AREA(3,NU(NY,NX),NY,NX)
     D155: DO M=1,jskenc

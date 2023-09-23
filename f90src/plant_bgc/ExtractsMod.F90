@@ -365,7 +365,7 @@ module ExtractsMod
     RootGasLoss_disturb => plt_bgcr%RootGasLoss_disturb, &
     RUPNF => plt_bgcr%RUPNF  , &
     CNET  => plt_bgcr%CNET   , &
-    CTRAN => plt_ew%CTRAN    , &
+    ETCanP => plt_ew%ETCanP    , &
     TH2GZ => plt_bgcr%TH2GZ  , &
     RNH3B => plt_rbgc%RNH3B  , &
     HEUPTK=> plt_rbgc%HEUPTK , &
@@ -440,7 +440,7 @@ module ExtractsMod
   TSH=TSH+HeatXAir2PCan(NZ)
   TGH=TGH+HeatStorCanP(NZ)
   TCCAN=TCCAN+CNET(NZ)
-  CTRAN(NZ)=CTRAN(NZ)+PTrans(NZ)+VapXAir2PCan(NZ)
+  ETCanP(NZ)=ETCanP(NZ)+PTrans(NZ)+VapXAir2PCan(NZ)
   CanWatg=CanWatg+CanWatP(NZ)
   CanH2OHeldVg=CanH2OHeldVg+WatByPCan(NZ)
   TEVAPP=TEVAPP+PTrans(NZ)+VapXAir2PCan(NZ)

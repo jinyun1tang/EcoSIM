@@ -108,7 +108,7 @@ implicit none
   real(r8), pointer :: XKCO2O(:) => null()   !leaf aqueous CO2 Km ambient O2, [uM]
   real(r8), pointer :: XKCO2L(:) => null()   !leaf aqueous CO2 Km no O2, [uM]
   real(r8), pointer :: RCS(:)    => null()   !shape parameter for calculating stomatal resistance from turgor pressure, [-]
-  real(r8), pointer :: FCO2(:)   => null()   !Ci:Ca ratio, [-]
+  real(r8), pointer :: CanPCi2CaRatio(:)   => null()   !Ci:Ca ratio, [-]
   real(r8), pointer :: MaxCanPStomaResistH2O(:)   => null()   !maximum stomatal resistance to vapor, [s h-1]
   real(r8), pointer :: CHILL(:)  => null()   !chilling effect on CO2 fixation, [-]
   real(r8), pointer :: SCO2(:)   => null()   !leaf CO2 solubility, [uM /umol mol-1]
@@ -218,7 +218,7 @@ implicit none
   real(r8), pointer :: HypoctoylHeight(:)        => null() !cotyledon height, [m]
   integer,  pointer :: INTYP(:)        => null() !N2 fixation type
   integer,  pointer :: MY(:)           => null() !mycorrhizal type (no or yes)
-  real(r8), pointer :: HTSTZ(:)        => null() !canopy height, [m]
+  real(r8), pointer :: CanPHeight4WatUptake(:)        => null() !canopy height, [m]
   real(r8), pointer :: CanopyHeightz(:)  => null() !canopy layer height , [m]
   real(r8), pointer :: CanPSA(:)        => null() !plant stem area, [m2 d-2]
   real(r8), pointer :: CanPLA(:)        => null() !plant canopy leaf area, [m2 d-2]
@@ -239,7 +239,7 @@ implicit none
   integer,  pointer :: NBTB(:,:)       => null() !branch number, [-]
   real(r8), pointer :: GRNXB(:,:)      => null() !branch potential grain number, [d-2]
   real(r8), pointer :: GRNOB(:,:)      => null() !branch grain number, [d-2]
-  real(r8), pointer :: HTSHEX(:,:)     => null() !branch height, [m]
+  real(r8), pointer :: CanPBranchHeight(:,:)     => null() !branch height, [m]
   real(r8), pointer :: ARLFZ(:,:)      => null() !branch leaf area, [m2 d-2]
   real(r8), pointer :: CanPBLA(:,:)      => null() !branch leaf area, [m2 d-2]
   real(r8), pointer :: ANGSH(:)        => null() !sheath angle, [degree from horizontal]
@@ -260,7 +260,7 @@ implicit none
   real(r8), pointer :: ARLFT(:)        => null() !total leaf area, [m2 d-2]
   real(r8), pointer :: CanPA(:)        => null() !plant leaf+stem/stalk area, [m2 d-2]
   real(r8), pointer :: HTNODX(:,:,:)   => null() !internode height, [m]
-  real(r8), pointer :: HTSHE(:,:,:)    => null() !sheath height, [m]
+  real(r8), pointer :: CanPSheathHeight(:,:,:)    => null() !sheath height, [m]
   real(r8), pointer :: HTNODE(:,:,:)   => null() !internode height, [m]
   real(r8), pointer :: SURFB(:,:,:,:)  => null() !stem surface area, [m2 d-2]
   real(r8), pointer :: CanPLNBLA(:,:,:,:)  => null() !layer/node/branch leaf area, [m2 d-2]
@@ -372,14 +372,14 @@ implicit none
   real(r8), pointer :: TFND(:)     => null()  !temperature effect on diffusivity
   real(r8), pointer :: THETPM(:,:) => null()  !soil air-filled porosity, [m3 m-3]
   real(r8), pointer :: DFGS(:,:)   => null()  !coefficient for dissolution - volatilization, []
-  real(r8), pointer :: RSCS(:)     => null()  !soil hydraulic resistance, [MPa h m-2]
+  real(r8), pointer :: SoilResit4RootPentration(:)     => null()  !soil hydraulic resistance, [MPa h m-2]
   real(r8), pointer :: SoiBulkDensity(:)     => null()  !soil bulk density, [Mg m-3]
   real(r8), pointer :: trc_solcl(:,:) => null() !aqueous tracer concentration [g m-3]
   real(r8), pointer :: trc_gascl(:,:) => null() !gaseous tracer concentration [g m-3]
 
   real(r8), pointer :: CORGC(:)    => null()  !soil organic C content [gC kg soil-1]
 
-  real(r8), pointer :: CNDU(:)     => null()  !soil micropore hydraulic conductivity for root water uptake [m MPa-1 h-1]
+  real(r8), pointer :: HydroCondMicP4RootUptake(:)     => null()  !soil micropore hydraulic conductivity for root water uptake [m MPa-1 h-1]
 
   real(r8), pointer :: GasDifc(:,:)=> null()  !gaseous diffusivity [m2 h-1]
   real(r8), pointer :: SolDifc(:,:)=> null()  !aqueous diffusivity [m2 h-1]
@@ -417,7 +417,7 @@ implicit none
   real(r8), pointer :: CNWS(:)     => null()  !C:N ratio in remobilizable nonstructural biomass, [-]
   real(r8), pointer :: CPWS(:)     => null()  !C:P ratio in remobilizable nonstructural biomass, [-]
   real(r8), pointer :: DMND(:)     => null()  !nodule growth yield, [g g-1]
-  real(r8), pointer :: DMRT(:)     => null()  !root growth yield, [g g-1]
+  real(r8), pointer :: BiomGrowthYieldRoot(:)     => null()  !root growth yield, [g g-1]
   real(r8), pointer :: CPEAR(:)    => null()  !ear P:C ratio, [gP gC-1]
   real(r8), pointer :: DMSHE(:)    => null()  !sheath growth yield, [g g-1]
   real(r8), pointer :: CPHSK(:)    => null()  !husk P:C ratio, [gP gC-1]
@@ -577,7 +577,7 @@ implicit none
   real(r8), pointer :: CanWatP(:)     => null()  !canopy water content, [m3 d-2]
   real(r8), pointer :: VHeatCapCanP(:)     => null()  !canopy heat capacity, [MJ d-2 K-1]
   real(r8), pointer :: TotalSoilH2OPSIMPa(:)     => null()  !soil micropore total water potential [MPa]
-  real(r8), pointer :: CTRAN(:)     =>  null()  !total transpiration, [m H2O d-2]
+  real(r8), pointer :: ETCanP(:)     =>  null()  !total transpiration, [m H2O d-2]
   contains
     procedure, public :: Init => plt_ew_init
     procedure, public :: Destroy=> plt_ew_destroy
@@ -1191,7 +1191,7 @@ implicit none
   implicit none
   class(plant_ew_type) :: this
 
-  allocate(this%CTRAN(JP1))
+  allocate(this%ETCanP(JP1))
   allocate(this%TotalSoilH2OPSIMPa(0:JZ1))
   allocate(this%THeatRootUptake(0:JZ1))
   allocate(this%TKCZ(JP1))
@@ -1228,7 +1228,7 @@ implicit none
   implicit none
   class(plant_ew_type) :: this
 
-!  if(allocated(CTRAN))deallocate(CTRAN)
+!  if(allocated(ETCanP))deallocate(ETCanP)
 !  if(allocated(PSIST))deallocate(PSIST)
 !  if(allocated(THeatRootUptake))deallocate(THeatRootUptake)
 !  if(allocated(TKCZ))deallocate(TKCZ)
@@ -1271,7 +1271,7 @@ implicit none
   allocate(this%FNOD(JP1))
   allocate(this%GRWTB(JBR,JP1))
   allocate(this%DMND(JP1))
-  allocate(this%DMRT(JP1))
+  allocate(this%BiomGrowthYieldRoot(JP1))
   allocate(this%CPRT(JP1))
   allocate(this%CNWS(JP1))
   allocate(this%CPWS(JP1))
@@ -1319,7 +1319,7 @@ implicit none
 !  if(allocated(FNOD))deallocate(FNOD)
 !  if(allocated(GRWTB))deallocate(GRWTB)
 !  if(allocated(DMND))deallocate(DMND)
-!  if(allocated(DMRT))deallocate(DMRT)
+!  if(allocated(BiomGrowthYieldRoot))deallocate(BiomGrowthYieldRoot)
 !  if(allocated(CPRT))deallocate(CPRT)
 !  if(allocated(CNWS))deallocate(CNWS)
 !  if(allocated(CPWS))deallocate(CPWS)
@@ -1537,9 +1537,9 @@ implicit none
   allocate(this%GSolbility(idg_beg:idg_end,0:JZ1))
   allocate(this%GasDifc(idg_beg:idg_end,0:JZ1))
   allocate(this%SolDifc(ids_beg:ids_end,0:JZ1))
-  allocate(this%RSCS(JZ1))
+  allocate(this%SoilResit4RootPentration(JZ1))
   allocate(this%SoiBulkDensity(0:JZ1))
-  allocate(this%CNDU(JZ1))
+  allocate(this%HydroCondMicP4RootUptake(JZ1))
 
   end subroutine plt_soilchem_init
 !----------------------------------------------------------------------
@@ -1557,12 +1557,12 @@ implicit none
 !  if(allocated(ZVSGL))deallocate(ZVSGL)
 !  if(allocated(SOXYL))deallocate(SOXYL)
 
-!  if(allocated(CNDU))deallocate(CNDU)
+!  if(allocated(HydroCondMicP4RootUptake))deallocate(HydroCondMicP4RootUptake)
 !  if(allocated(CGSGL))deallocate(CGSGL)
 !  if(allocated(CHSGL))deallocate(CHSGL)
 !  if(allocated(HGSGL))deallocate(HGSGL)
 !  if(allocated(OGSGL))deallocate(OGSGL)
-!  if(allocated(RSCS))deallocate(RSCS)
+!  if(allocated(SoilResit4RootPentration))deallocate(SoilResit4RootPentration)
 
 !   call destroy(this%GSolbility)
 !  if(allocated(THETW))deallocate(THETW)
@@ -1799,7 +1799,7 @@ implicit none
   allocate(this%CO2I(JP1))
   allocate(this%O2I(JP1))
   allocate(this%RCS(JP1))
-  allocate(this%FCO2(JP1))
+  allocate(this%CanPCi2CaRatio(JP1))
   allocate(this%MaxCanPStomaResistH2O(JP1))
 
   end subroutine plt_photo_init
@@ -1856,7 +1856,7 @@ implicit none
 !  if(allocated(CO2I))deallocate(CO2I)
 !  if(allocated(O2I))deallocate(O2I)
 !  if(allocated(RCS))deallocate(RCS)
-!  if(allocated(FCO2))deallocate(FCO2)
+!  if(allocated(CanPCi2CaRatio))deallocate(CanPCi2CaRatio)
 !  if(allocated(MaxCanPStomaResistH2O)) deallocate(MaxCanPStomaResistH2O)
   end subroutine plt_photo_destroy
 
@@ -2050,7 +2050,7 @@ implicit none
   allocate(this%RTN2(jroots,JZ1,JC1,JP1))
   allocate(this%INTYP(JP1))
   allocate(this%MY(JP1))
-  allocate(this%HTSTZ(JP1))
+  allocate(this%CanPHeight4WatUptake(JP1))
   allocate(this%KLEAF(JBR,JP1))
   allocate(this%VSTG(JBR,JP1))
   allocate(this%NGTopRootLayer(JP1))
@@ -2074,7 +2074,7 @@ implicit none
   allocate(this%KLEAFX(JBR,JP1))
   allocate(this%NBTB(JBR,JP1))
   allocate(this%GRNXB(JBR,JP1))
-  allocate(this%HTSHEX(JBR,JP1))
+  allocate(this%CanPBranchHeight(JBR,JP1))
   allocate(this%ARLFZ(JBR,JP1))
   allocate(this%CanPBLA(JBR,JP1))
   allocate(this%ANGSH(JP1))
@@ -2095,7 +2095,7 @@ implicit none
   allocate(this%ARLFT(JC1))
   allocate(this%CanPA(JP1))
   allocate(this%HTNODX(0:JNODS1,JBR,JP1))
-  allocate(this%HTSHE(0:JNODS1,JBR,JP1))
+  allocate(this%CanPSheathHeight(0:JNODS1,JBR,JP1))
   allocate(this%HTNODE(0:JNODS1,JBR,JP1))
   allocate(this%SURFB(JLI1,JC1,JBR,JP1))
   allocate(this%CanPLNBLA(JC1,0:JNODS1,JBR,JP1))
