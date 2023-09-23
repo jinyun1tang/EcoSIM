@@ -11,8 +11,8 @@ implicit none
   real(r8),target,allocatable ::  DLYR(:,:,:,:)                      !thickness of soil layer [m]
   real(r8),target,allocatable ::  DLYRI(:,:,:,:)                     !thickness of soil layer [m]
   real(r8),target,allocatable ::  XDPTH(:,:,:,:)                     !cross-sectional area / distance between adjacent grid cells [m]
-  real(r8),target,allocatable ::  DPTH(:,:,:)                        !depth to middle of soil layer [m]
-  real(r8),target,allocatable ::  CDPTHZ(:,:,:)                      !depth to bottom of soil layer from  surface of grid cell [m]
+  real(r8),target,allocatable ::  SoiDepthMidLay(:,:,:)                        !depth to middle of soil layer [m]
+  real(r8),target,allocatable ::  CumSoilThickness(:,:,:)                      !depth to bottom of soil layer from  surface of grid cell [m]
   real(r8),target,allocatable ::  DPTHZ(:,:,:)                       !depth to middle of soil layer from  surface of grid cell [m]
   real(r8),target,allocatable ::  AREA(:,:,:,:)                      !cross-sectional area  [m2 d-2]
   real(r8),target,allocatable ::  DIST(:,:,:,:)                      !distance between adjacent layers:1=EW,2=NS,3=vertical [m]
@@ -23,11 +23,11 @@ implicit none
   integer,target,allocatable ::  NLI(:,:)                            !initial lowest soil layer number
   integer,target,allocatable ::  NL(:,:)                             !lowest soil layer number
   integer,target,allocatable ::  NUM(:,:)                            !new surface layer number
-  real(r8),target,allocatable ::  CDPTHI(:,:)                        !initial depth to bottom of soil layer [m]
+  real(r8),target,allocatable ::  CumSoilDeptht0(:,:)                !initial depth from surface to bottom of soil layer [m]
   REAL(R8),target,allocatable ::  ALAT(:,:)                          !latitude	[degrees]
   real(r8),target,allocatable ::  DH(:,:)                            !number of EW grid cells, [-]
   real(r8),target,allocatable ::  DV(:,:)                            !number of EW grid cells, [-]
-  integer,target,allocatable ::  NCN(:,:)                            !number of dimensions for grid cell connections
+  integer,target,allocatable ::  FlowDirIndicator(:,:)                            !dimension of low
   integer,target,allocatable ::  LSG(:,:,:)                          !match PFT from different scenarios
   integer,target,allocatable ::  NP(:,:)                             !number of plant species
   integer,target,allocatable ::  NP0(:,:)                            !intitial number of plant species
@@ -42,8 +42,8 @@ contains
   allocate(DLYR(3,0:JZ,JY,JX)); DLYR=0._r8
   allocate(DLYRI(3,0:JZ,JY,JX));DLYRI=0._r8
   allocate(XDPTH(3,JZ,JY,JX));  XDPTH=0._r8
-  allocate(DPTH(JZ,JY,JX));     DPTH=0._r8
-  allocate(CDPTHZ(0:JZ,JY,JX)); CDPTHZ=0._r8
+  allocate(SoiDepthMidLay(JZ,JY,JX));     SoiDepthMidLay=0._r8
+  allocate(CumSoilThickness(0:JZ,JY,JX)); CumSoilThickness=0._r8
   allocate(DPTHZ(JZ,JY,JX));    DPTHZ=0._r8
   allocate(AREA(3,0:JZ,JY,JX)); AREA=0._r8
   allocate(DIST(3,JD,JV,JH));   DIST=0._r8
@@ -54,11 +54,11 @@ contains
   allocate(NLI(JV,JH));         NLI=0
   allocate(NL(JV,JH));          NL=0
   allocate(NUM(JY,JX));         NUM=0
-  allocate(CDPTHI(JY,JX));      CDPTHI=0._r8
+  allocate(CumSoilDeptht0(JY,JX));      CumSoilDeptht0=0._r8
   allocate(ALAT(JY,JX));        ALAT=0._r8
   allocate(DH(JY,JX));          DH=0._r8
   allocate(DV(JY,JX));          DV=0._r8
-  allocate(NCN(JY,JX));         NCN=0
+  allocate(FlowDirIndicator(JY,JX));         FlowDirIndicator=0
   allocate(LSG(JZ,JY,JX));      LSG=0
   allocate(NP(JY,JX));          NP=0
   allocate(NP0(JY,JX));         NP0=0
@@ -73,8 +73,8 @@ contains
   call destroy(DLYR)
   call destroy(DLYRI)
   call destroy(XDPTH)
-  call destroy(DPTH)
-  call destroy(CDPTHZ)
+  call destroy(SoiDepthMidLay)
+  call destroy(CumSoilThickness)
   call destroy(DPTHZ)
   call destroy(AREA)
   call destroy(DIST)
@@ -85,11 +85,11 @@ contains
   call destroy(NLI)
   call destroy(NL)
   call destroy(NUM)
-  call destroy(CDPTHI)
+  call destroy(CumSoilDeptht0)
   call destroy(ALAT)
   call destroy(DH)
   call destroy(DV)
-  call destroy(NCN)
+  call destroy(FlowDirIndicator)
   call destroy(LSG)
   call destroy(NP)
   call destroy(NP0)

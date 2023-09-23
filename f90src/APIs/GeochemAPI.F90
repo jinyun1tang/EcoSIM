@@ -38,38 +38,38 @@ module GeochemAPI
   DO   NX=NHW,NHE
     DO   NY=NVN,NVS
       DO   L=NU(NY,NX),NL(NY,NX)
-        IF(VOLX(L,NY,NX).GT.ZEROS2(NY,NX).AND.VOLWM(NPH,L,NY,NX).GT.ZEROS2(NY,NX))THEN
+        IF(VLSoilPoreMicP(L,NY,NX).GT.ZEROS2(NY,NX).AND.VLWatMicPM(NPH,L,NY,NX).GT.ZEROS2(NY,NX))THEN
 !
 !     WATER VOLUME IN NON-BAND AND BAND SOIL ZONES
 !
-!     VOLWM=soil water volume
+!     VLWatMicPM=soil water volume
 !     VLNH4,VLNHB=fractions of soil volume in NH4 non-band,band
 !     VLNO3,VLNOB=fractions of soil volume in N03 non-band,band
 !     VLPO4,VLPOB=fractions of soil volume in H2PO4 non-band,band
-!     BKVL=soil mass
+!     SoilMicPMassLayer=soil mass
 !
-          chemvar%VOLWNH=VOLWM(NPH,L,NY,NX)*trcs_VLN(ids_NH4,L,NY,NX)
-          chemvar%VOLWNB=VOLWM(NPH,L,NY,NX)*trcs_VLN(ids_NH4B,L,NY,NX)
-          chemvar%VOLWNO=VOLWM(NPH,L,NY,NX)*trcs_VLN(ids_NO3,L,NY,NX)
-          chemvar%VOLWNZ=VOLWM(NPH,L,NY,NX)*trcs_VLN(ids_NO3B,L,NY,NX)
-          chemvar%VOLWPO=VOLWM(NPH,L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-          chemvar%VOLWPB=VOLWM(NPH,L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
-          IF(BKVL(L,NY,NX).GT.ZEROS(NY,NX))THEN
-            chemvar%BKVLX=BKVL(L,NY,NX)
-            chemvar%BKVLNH=BKVL(L,NY,NX)*trcs_VLN(ids_NH4,L,NY,NX)
-            chemvar%BKVLNB=BKVL(L,NY,NX)*trcs_VLN(ids_NH4B,L,NY,NX)
-            chemvar%BKVLNO=BKVL(L,NY,NX)*trcs_VLN(ids_NO3,L,NY,NX)
-            chemvar%BKVLNZ=BKVL(L,NY,NX)*trcs_VLN(ids_NO3B,L,NY,NX)
-            chemvar%BKVLPO=BKVL(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-            chemvar%BKVLPB=BKVL(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
+          chemvar%VLWatMicPNH=VLWatMicPM(NPH,L,NY,NX)*trcs_VLN(ids_NH4,L,NY,NX)
+          chemvar%VLWatMicPNB=VLWatMicPM(NPH,L,NY,NX)*trcs_VLN(ids_NH4B,L,NY,NX)
+          chemvar%VLWatMicPNO=VLWatMicPM(NPH,L,NY,NX)*trcs_VLN(ids_NO3,L,NY,NX)
+          chemvar%VLWatMicPNZ=VLWatMicPM(NPH,L,NY,NX)*trcs_VLN(ids_NO3B,L,NY,NX)
+          chemvar%VLWatMicPPO=VLWatMicPM(NPH,L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
+          chemvar%VLWatMicPPB=VLWatMicPM(NPH,L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
+          IF(SoilMicPMassLayer(L,NY,NX).GT.ZEROS(NY,NX))THEN
+            chemvar%SoilMicPMassLayerX=SoilMicPMassLayer(L,NY,NX)
+            chemvar%BKVLNH=SoilMicPMassLayer(L,NY,NX)*trcs_VLN(ids_NH4,L,NY,NX)
+            chemvar%BKVLNB=SoilMicPMassLayer(L,NY,NX)*trcs_VLN(ids_NH4B,L,NY,NX)
+            chemvar%BKVLNO=SoilMicPMassLayer(L,NY,NX)*trcs_VLN(ids_NO3,L,NY,NX)
+            chemvar%BKVLNZ=SoilMicPMassLayer(L,NY,NX)*trcs_VLN(ids_NO3B,L,NY,NX)
+            chemvar%BKVLPO=SoilMicPMassLayer(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
+            chemvar%BKVLPB=SoilMicPMassLayer(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
           ELSE
-            chemvar%BKVLX=VOLA(L,NY,NX)
-            chemvar%BKVLNH=chemvar%VOLWNH
-            chemvar%BKVLNB=chemvar%VOLWNB
-            chemvar%BKVLNO=chemvar%VOLWNO
-            chemvar%BKVLNZ=chemvar%VOLWNZ
-            chemvar%BKVLPO=chemvar%VOLWPO
-            chemvar%BKVLPB=chemvar%VOLWPB
+            chemvar%SoilMicPMassLayerX=VLMicP(L,NY,NX)
+            chemvar%BKVLNH=chemvar%VLWatMicPNH
+            chemvar%BKVLNB=chemvar%VLWatMicPNB
+            chemvar%BKVLNO=chemvar%VLWatMicPNO
+            chemvar%BKVLNZ=chemvar%VLWatMicPNZ
+            chemvar%BKVLPO=chemvar%VLWatMicPPO
+            chemvar%BKVLPB=chemvar%VLWatMicPPB
           ENDIF
 
           call UpdateSoilFertlizer(L,NY,NX,chemvar)
@@ -105,12 +105,12 @@ module GeochemAPI
   chemvar%PH=PH(L,NY,NX)
   chemvar%CAL=CAL(L,NY,NX)
   chemvar%CFE=CFE(L,NY,NX)
-  chemvar%VOLWM=VOLWM(NPH,L,NY,NX)
+  chemvar%VLWatMicPM=VLWatMicPM(NPH,L,NY,NX)
   chemvar%ZMG=trcsa_solml(idsa_Mg,L,NY,NX)
   chemvar%ZNA=trcsa_solml(idsa_Na,L,NY,NX)
   chemvar%ZKA=trcsa_solml(idsa_K,L,NY,NX)
   chemvar%CCA=CCA(L,NY,NX)
-  chemvar%BKVL=BKVL(L,NY,NX)
+  chemvar%SoilMicPMassLayer=SoilMicPMassLayer(L,NY,NX)
   chemvar%XAEC=trcx_solml(idx_AEC,L,NY,NX)
   chemvar%VLNH4=trcs_VLN(ids_NH4,L,NY,NX)
   chemvar%GKC4=GKC4(L,NY,NX)

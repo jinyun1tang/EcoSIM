@@ -9,7 +9,7 @@ module GrosubPars
 ! PART1X,PART2X=modifiers to organ partitioning coefficients
 ! VMXC=rate constant for nonstructural C oxidation in respiration (h-1)
 ! FSNR=rate constant for litterfall at end of growing season (h-1)
-! FLG4X=number of hours with no grain filling required for physl maturity
+! Hours4PhyslMature=number of hours with no grain filling required for physilogical maturity
 ! FLGZX=number of hours until full senescence after physl maturity
 ! XFRX=maximum storage C content for remobiln from stalk,root reserves
 ! XFRY=rate const for remobiln to storage from stalk,root reserves (h-1)
@@ -24,7 +24,7 @@ module GrosubPars
 !     PSILM=minimum water potential for organ expansion,extension (MPa)
 !     RCMN=minimum stomatal resistance to CO2 (s m-1)
 !     RTDPX=distance behind growing point for secondary roots (m)
-!     RTLGAX=minimum average secondary root length (m)
+!     MinAve2ndRootLen=minimum average secondary root length (m)
 !     EMODR=root modulus of elasticity (MPa)
 !
 !
@@ -70,7 +70,7 @@ module GrosubPars
   real(r8) :: PART2X
   real(r8) :: VMXC
   real(r8) :: FSNR
-  real(r8) :: FLG4X
+  real(r8) :: Hours4PhyslMature
   real(r8) :: FLGZX
   real(r8) :: XFRX
   real(r8) :: XFRY
@@ -83,7 +83,7 @@ module GrosubPars
   real(r8) :: PSILM
   real(r8) :: RCMN
   real(r8) :: RTDPX
-  real(r8) :: RTLGAX
+  real(r8) :: MinAve2ndRootLen
   real(r8) :: EMODR
   real(r8) :: QNTM
   real(r8) :: CURV
@@ -142,7 +142,7 @@ module GrosubPars
   real(r8) :: FXFB(0:3),FXFR(0:3),FXRT(0:1),FXSH(0:1),FXRN(6)
   REAL(R8) :: RCCX(0:3),RCCQ(0:3)
   REAL(R8) :: RCCZ(0:3),RCCY(0:3)
-  real(r8) :: FLG4Y(0:3)
+  real(r8) :: Hours4SenesAftMature(0:3)
   real(r8) :: ATRPX(0:1)
   real(r8) :: GVMX(0:1)
   real(r8) :: RTSK(0:3)
@@ -217,7 +217,7 @@ module GrosubPars
   PART2X=0.02_r8
   VMXC=0.015_r8
   FSNR=2.884E-03_r8
-  FLG4X=168.0_r8
+  Hours4PhyslMature=168.0_r8
   FLGZX=240.0_r8
   XFRX=2.5E-02_r8
   XFRY=2.5E-03_r8
@@ -230,7 +230,7 @@ module GrosubPars
   PSILM=0.1_r8
   RCMN=1.560E+01_r8
   RTDPX=0.00_r8
-  RTLGAX=1.0E-03_r8
+  MinAve2ndRootLen=1.0E-03_r8
   EMODR=5.0_r8
   QNTM=0.45_r8
   CURV=0.70_r8
@@ -299,8 +299,9 @@ module GrosubPars
   FXSH=real((/0.50,0.75/),r8);FXRT=real((/0.50,0.25/),r8)
   FRSV=real((/0.025,0.025,0.001,0.001/),r8)
   FXFY=real((/0.025,0.005/),r8);FXFZ=real((/0.25,0.05/),r8)
-  FLG4Y=real((/360.0,1440.0,720.0,720.0/),r8)
+  Hours4SenesAftMature=real((/360.0,1440.0,720.0,720.0/),r8)
   ATRPX=real((/68.96,276.9/),r8);GVMX=real((/0.010,0.0025/),r8)
+  
   end subroutine InitVegPars
 !------------------------------------------------------------------------------------------
 

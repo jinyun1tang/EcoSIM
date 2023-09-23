@@ -44,7 +44,7 @@ implicit none
 ! FSINK=hourly rate for sediment sinking
 !
   D9885: DO L=NL(NY,NX)-1,0,-1
-    IF(BKDS(L,NY,NX).LE.ZERO.AND.DLYR(3,L,NY,NX).GT.ZERO)THEN
+    IF(SoiBulkDensity(L,NY,NX).LE.ZERO.AND.DLYR(3,L,NY,NX).GT.ZERO)THEN
       !sinking from water to sediment layer
       D9880: DO LL=L+1,NL(NY,NX)
         IF(DLYR(3,LL,NY,NX).GT.ZEROS(NY,NX))exit

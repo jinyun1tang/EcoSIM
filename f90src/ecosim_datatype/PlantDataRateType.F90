@@ -39,7 +39,7 @@ module PlantDataRateType
   real(r8),target,allocatable ::  HESNC(:,:,:,:)                     !plant element litterfall, [g d-2 h-1]
   real(r8),target,allocatable ::  ESNC(:,:,:,:,:,:,:)                !plant litterfall element, [g d-2 h-1]
   real(r8),target,allocatable ::  ZNPP(:,:,:)                        !total net primary productivity, [g d-2]
-  real(r8),target,allocatable ::  CTRAN(:,:,:)                       !total transpiration, [m d-2]
+  real(r8),target,allocatable ::  ETCanP(:,:,:)                       !total transpiration, [m d-2], <0 into atmosphere
   real(r8),target,allocatable ::  TCO2A(:,:,:)                       !total autotrophic respiration, [g d-2 ]
   real(r8),target,allocatable ::  HVSTE(:,:,:,:)                     !plant element harvest, [g d-2 ]
   real(r8),target,allocatable ::  THVSTE(:,:,:,:)                    !total plant harvest, [g d-2 ]
@@ -97,7 +97,7 @@ module PlantDataRateType
   real(r8),target,allocatable ::  HEUPTK(:,:,:,:)                    !net root element uptake (+ve) - exudation (-ve), [g d-2 h-1]
   real(r8),target,allocatable ::  TEUPTK(:,:,:,:)                    !total net root element uptake (+ve) - exudation (-ve), [g d-2 ]
   real(r8),target,allocatable ::  GridPlantRootH2OUptake_vr(:,:,:)                      !total root water uptake, [m3 d-2]
-  real(r8),target,allocatable ::  TUPHT(:,:,:)                       !total root heat uptake, [MJ d-2]
+  real(r8),target,allocatable ::  THeatRootUptake(:,:,:)                       !total root heat uptake, [MJ d-2]
   real(r8),target,allocatable ::  trcg_TFLA(:,:,:,:)                 !total internal root gas flux , [g d-2 h-1]
   real(r8),target,allocatable ::  trcg_TLP(:,:,:,:)                  !total root internal gas flux, [g d-2 h-1]
   real(r8),target,allocatable ::  TCO2S(:,:,:)                       !total root-soil CO2 flux, [g d-2 h-1]
@@ -192,7 +192,7 @@ module PlantDataRateType
   allocate(HESNC(npelms,JP,JY,JX));    HESNC=0._r8
   allocate(ESNC(npelms,jsken,1:n_pltlitrk,0:JZ,JP,JY,JX));ESNC=0._r8
   allocate(ZNPP(JP,JY,JX));     ZNPP=0._r8
-  allocate(CTRAN(JP,JY,JX));    CTRAN=0._r8
+  allocate(ETCanP(JP,JY,JX));    ETCanP=0._r8
   allocate(TCO2A(JP,JY,JX));    TCO2A=0._r8
   allocate(HVSTE(npelms,JP,JY,JX));    HVSTE=0._r8
   allocate(THVSTE(npelms,JP,JY,JX));   THVSTE=0._r8
@@ -250,7 +250,7 @@ module PlantDataRateType
   allocate(HEUPTK(npelms,JP,JY,JX));   HEUPTK=0._r8
   allocate(TEUPTK(npelms,JP,JY,JX));   TEUPTK=0._r8
   allocate(GridPlantRootH2OUptake_vr(0:JZ,JY,JX)); GridPlantRootH2OUptake_vr=0._r8
-  allocate(TUPHT(0:JZ,JY,JX));  TUPHT=0._r8
+  allocate(THeatRootUptake(0:JZ,JY,JX));  THeatRootUptake=0._r8
   allocate(trcg_TFLA(idg_beg:idg_end-1,JZ,JY,JX));   trcg_TFLA=0._r8
   allocate(trcg_TLP(idg_beg:idg_end-1,JZ,JY,JX));   trcg_TLP=0._r8
   allocate(TCO2S(JZ,JY,JX));    TCO2S=0._r8
@@ -333,7 +333,7 @@ module PlantDataRateType
   call destroy(HESNC)
   call destroy(ESNC)
   call destroy(ZNPP)
-  call destroy(CTRAN)
+  call destroy(ETCanP)
   call destroy(TCO2A)
   call destroy(HVSTE)
   call destroy(THVSTE)
@@ -388,7 +388,7 @@ module PlantDataRateType
   call destroy(HEUPTK)
   call destroy(TEUPTK)
   call destroy(GridPlantRootH2OUptake_vr)
-  call destroy(TUPHT)
+  call destroy(THeatRootUptake)
   call destroy(TCO2S)
   call destroy(TUPOXS)
   call destroy(TUPCHS)

@@ -49,63 +49,63 @@ module CanopyCondsMod
     ZERO    => plt_site%ZERO    , &
     AREA3   => plt_site%AREA3   , &
     IETYP   => plt_site%IETYP   , &
-    ZS      => plt_site%ZS      , &
-    Z0      => plt_site%Z0      , &
+    SoiSurfRoughnesst0      => plt_site%SoiSurfRoughnesst0      , &
+    WindMesHeight      => plt_site%WindMesHeight      , &
     ZEROS   => plt_site%ZEROS   , &
     NU      => plt_site%NU      , &
-    RAB     => plt_ew%RAB       , &
-    ZD      => plt_ew%ZD        , &
-    ZR      => plt_ew%ZR        , &
+    BndlResistAboveCanG     => plt_ew%BndlResistAboveCanG       , &
+    ZeroPlanDisp      => plt_ew%ZeroPlanDisp        , &
+    RoughHeight      => plt_ew%RoughHeight        , &
     RIB     => plt_ew%RIB       , &
     TairK     => plt_ew%TairK       , &
-    VHCPWX  => plt_ew%VHCPWX    , &
+    VLHeatCapSnowMN  => plt_ew%VLHeatCapSnowMN    , &
     SnowDepth   => plt_ew%SnowDepth     , &
     VHCPW1  => plt_ew%VHCPW1    , &
     GridMaxCanopyHeight      => plt_morph%GridMaxCanopyHeight     , &
     IRTYP   => plt_morph%IRTYP  , &
-    ARSTC   => plt_morph%ARSTC  , &
-    ARLFC   => plt_morph%ARLFC    &
+    StemAreag   => plt_morph%StemAreag  , &
+    CanGLA   => plt_morph%CanGLA    &
   )
 !     CANOPY ZERO PLANE AND ROUGHNESS HEIGHTS
 !
-!     ARLFC,ARSTC=leaf,stalk area of combined canopy
+!     CanGLA,StemAreag=leaf,stalk area of combined canopy
 !     SnowDepth,DPTH0=snowpack,surface water depths
-!     ZT,ZD,ZR=canopy,zero plane displacement,roughness height
+!     ZT,ZeroPlanDisp,RoughHeight=canopy,zero plane displacement,roughness height
 !     ZZ=reference height for wind speed
 !
-  ARLSC=ARLFC+ARSTC
+  ARLSC=CanGLA+StemAreag
   IF(ARLSC.GT.ZEROS.AND.GridMaxCanopyHeight.GE.SnowDepth-ZERO.AND.GridMaxCanopyHeight.GE.DPTH0-ZERO)THEN
     ARLSG=ARLSC/AREA3(NU)
     ZX=EXP(-0.5_r8*ARLSG)
     ZY=1.0_r8-ZX
-    ZD=GridMaxCanopyHeight*AZMAX1(1.0_r8-2.0_r8/ARLSG*ZY)
+    ZeroPlanDisp=GridMaxCanopyHeight*AZMAX1(1.0_r8-2.0_r8/ARLSG*ZY)
     ZE=GridMaxCanopyHeight*AMAX1(0.05_r8,ZX*ZY)
   ELSE
-    ZD=0.0_r8
+    ZeroPlanDisp=0.0_r8
     ZE=0.0_r8
   ENDIF
   IF(IFLGW.EQ.1)THEN
-    ZZ=Z0+GridMaxCanopyHeight
+    ZZ=WindMesHeight+GridMaxCanopyHeight
   ELSE
-    ZZ=AMAX1(Z0,ZD+2.0_r8)
+    ZZ=AMAX1(WindMesHeight,ZeroPlanDisp+2.0_r8)
   ENDIF
   IF(IETYP.GE.0)THEN
-    IF(VHCPW1.GT.VHCPWX)THEN
-      ZR=AMAX1(0.001,ZE,ZW)
+    IF(VHCPW1.GT.VLHeatCapSnowMN)THEN
+      RoughHeight=AMAX1(0.001,ZE,ZW)
     ELSE
-      ZR=AMAX1(0.001,ZE,ZS)
+      RoughHeight=AMAX1(0.001,ZE,SoiSurfRoughnesst0)
     ENDIF
 !
 !     CANOPY ISOTHERMAL BOUNDARY LAYER RESISTANCE
 !
-!     RAB,RAM=biome canopy,minimum isothermal boundary layer resistance
+!     BndlResistAboveCanG,RAM=biome canopy,minimum isothermal boundary layer resistance
 !     UA=wind speed
 !     RIB=canopy isothermal Richardson number
 !
-    RAB=AMAX1(RAM,(LOG((ZZ-ZD)/ZR))**2._r8/(0.168_r8*UA))
-    RIB=1.27E+08_r8*(ZZ-ZR)/(UA**2*TairK)
+    BndlResistAboveCanG=AMAX1(RAM,(LOG((ZZ-ZeroPlanDisp)/RoughHeight))**2._r8/(0.168_r8*UA))
+    RIB=1.27E+08_r8*(ZZ-RoughHeight)/(UA**2*TairK)
   ELSE
-    RAB=RAM
+    BndlResistAboveCanG=RAM
     RIB=0.0_r8
   ENDIF
   end associate
@@ -130,15 +130,15 @@ module CanopyCondsMod
     CanopyHeight      => plt_morph%CanopyHeight     , &
     ARSTT   => plt_morph%ARSTT  , &
     ARLFT   => plt_morph%ARLFT  , &
-    ARSTC   => plt_morph%ARSTC  , &
-    ARLFC   => plt_morph%ARLFC    &
+    StemAreag   => plt_morph%StemAreag  , &
+    CanGLA   => plt_morph%CanGLA    &
   )
   !
   !     DIVISION OF CANOPY INTO JC LAYERS WITH EQUAL LAI
   !
   !     ZT,ZC=heights of combined canopy,PFT canopy
   !     ZL=height to bottom of each canopy layer
-  !     ARLFC,ARSTC=leaf,stalk area of combined canopy
+  !     CanGLA,StemAreag=leaf,stalk area of combined canopy
   !     ARLFT,ARSTT=leaf,stalk area of combined canopy layer
   !
   GridMaxCanopyHeight=0.0
@@ -148,7 +148,7 @@ module CanopyCondsMod
   CanopyHeightz(JC1)=GridMaxCanopyHeight+0.01_r8
   ZL1(JC1)=CanopyHeightz(JC1)
   ZL1(0)=0.0
-  ART=(ARLFC+ARSTC)/JC1
+  ART=(CanGLA+StemAreag)/JC1
   IF(ART.GT.ZEROS)THEN
     DO 2765 L=JC1,2,-1
       ARL=ARLFT(L)+ARSTT(L)
@@ -241,22 +241,22 @@ module CanopyCondsMod
   !     IN SW AND VISIBLE BANDS BY INCLINATION N, AZIMUTH M, LAYER L,
   !     NODE K, BRANCH NB, PFT NZ
   !
-  !     ARLFS,ARLSS=leaf+stalk area of combined,each PFT canopy
+  !     CanPA,CanGA=leaf+stalk area of combined,each PFT canopy
   !     ZL=height to bottom of canopy layer
   !     SnowDepth,DPTH0=snowpack,surface water depths
-  !     ARLFL,ARSTK=leaf,stalk areas of PFT
+  !     CanPLNBLA,CanPLBSA=leaf,stalk areas of PFT
   !     RAD,RAP=vertical direct+diffuse SW,PAR
   !     RADS,RADY,RAPS,RAPY=solar beam direct,diffuse SW,PAR
   !     SSIN,TYSIN=sine of solar,sky angles
-  !     RADC,RADP=total SW,PAR absorbed by canopy
+  !     SWRadByCanP,RADP=total SW,PAR absorbed by canopy
   !     CFX=clumping factor for self-shading
   !
   associate(                       &
     VHCPW1  => plt_ew%VHCPW1 , &
-    VOLIS   => plt_ew%VOLIS  , &
-    VOLSS   => plt_ew%VOLSS  , &
-    VOLWS   => plt_ew%VOLWS  , &
-    VHCPWX  => plt_ew%VHCPWX , &
+    VcumIceSnow   => plt_ew%VcumIceSnow  , &
+    VcumDrySnoWE   => plt_ew%VcumDrySnoWE  , &
+    VcumWatSnow   => plt_ew%VcumWatSnow  , &
+    VLHeatCapSnowMN  => plt_ew%VLHeatCapSnowMN , &
     SnowDepth   => plt_ew%SnowDepth  , &
     ALBR    => plt_rad%ALBR  , &
     ALBS    => plt_rad%ALBS  , &
@@ -268,7 +268,7 @@ module CanopyCondsMod
     GSIN    => plt_rad%GSIN  , &
     IALBY   => plt_rad%IALBY , &
     OMEGA   => plt_rad%OMEGA , &
-    FRADP   => plt_rad%FRADP , &
+    FracPARByCanP   => plt_rad%FracPARByCanP , &
     PAR     => plt_rad%PAR   , &
     PARDIF  => plt_rad%PARDIF, &
     OMEGAG  => plt_rad%OMEGAG   , &
@@ -277,11 +277,10 @@ module CanopyCondsMod
     RADG    => plt_rad%RADG     , &
     RADS    => plt_rad%RADS     , &
     RAP0    => plt_rad%RAP0     , &
-    RADC    => plt_rad%RADC     , &
+    SWRadByCanP    => plt_rad%SWRadByCanP     , &
     RAPY    => plt_rad%RAPY     , &
     RAPS    => plt_rad%RAPS     , &
     RADY    => plt_rad%RADY     , &
-    RAD1    => plt_rad%RAD1     , &
     SSIN    => plt_rad%SSIN     , &
     TYSIN   => plt_rad%TYSIN    , &
     TAU0    => plt_rad%TAU0     , &
@@ -291,7 +290,7 @@ module CanopyCondsMod
     ABSR    => plt_rad%ABSR     , &
     TAUP    => plt_rad%TAUP     , &
     TAUR    => plt_rad%TAUR     , &
-    RADP    => plt_rad%RADP     , &
+    PARByCanP    => plt_rad%PARByCanP     , &
     ZCOS    => plt_rad%ZCOS     , &
     ZEROS   => plt_site%ZEROS   , &
     NU      => plt_site%NU      , &
@@ -301,34 +300,36 @@ module CanopyCondsMod
     ZEROS2  => plt_site%ZEROS2  , &
     POROS1  => plt_site%POROS1  , &
     ZNOON   => plt_site%ZNOON   , &
-    VOLX    => plt_soilchem%VOLX, &
-    VOLY    => plt_soilchem%VOLY, &
-    VOLW    => plt_soilchem%VOLW, &
+    VLSoilPoreMicP    => plt_soilchem%VLSoilPoreMicP, &
+    VLSoilMicP    => plt_soilchem%VLSoilMicP, &
+    VLWatMicP    => plt_soilchem%VLWatMicP, &
     CFX     => plt_morph%CFX    , &
     CanopyHeightz      => plt_morph%CanopyHeightz     , &
     NBR     => plt_morph%NBR    , &
     SURF    => plt_morph%SURF   , &
     SURFB   => plt_morph%SURFB  , &
-    ARLFP   => plt_morph%ARLFP  , &
-    ARLFL   => plt_morph%ARLFL  , &
-    ARSTK   => plt_morph%ARSTK  , &
-    ARLFS   => plt_morph%ARLFS  , &
+    CanPLA   => plt_morph%CanPLA  , &
+    CanPLNBLA   => plt_morph%CanPLNBLA  , &
+    CanPLBSA   => plt_morph%CanPLBSA  , &
+    CanPA   => plt_morph%CanPA  , &
     CF      => plt_morph%CF     , &
-    ARLSS   => plt_morph%ARLSS    &
+    CanGA   => plt_morph%CanGA    &
   )
-  ARLSS=0.0
+  CanGA=0.0
   D1135: DO NZ=1,NP
-    ARLFS(NZ)=0.0
+    CanPA(NZ)=0.0
     DO  NB=1,NBR(NZ)
       DO  L=1,JC1
-        if(isnan(CanopyHeightz(L-1)))print*,L,CanopyHeightz(L),CanopyHeightz(L-1)
+        
         IF(CanopyHeightz(L-1).GE.SnowDepth-ZERO.AND.CanopyHeightz(L-1).GE.DPTH0-ZERO)THEN
+          !above snow depth and above water/ice surface
           D1130: DO K=1,JNODS1
-            ARLFS(NZ)=ARLFS(NZ)+ARLFL(L,K,NB,NZ)
-            ARLSS=ARLSS+ARLFL(L,K,NB,NZ)
+            CanPA(NZ)=CanPA(NZ)+CanPLNBLA(L,K,NB,NZ)
+            CanGA=CanGA+CanPLNBLA(L,K,NB,NZ)
           ENDDO D1130
-          ARLFS(NZ)=ARLFS(NZ)+ARSTK(L,NB,NZ)
-          ARLSS=ARLSS+ARSTK(L,NB,NZ)
+          !add stem/stalk area
+          CanPA(NZ)=CanPA(NZ)+CanPLBSA(L,NB,NZ)
+          CanGA=CanGA+CanPLBSA(L,NB,NZ)
         ENDIF
       enddo
     enddo
@@ -347,9 +348,9 @@ module CanopyCondsMod
   TRADC=0.0_r8
   TRAPC=0.0_r8
   D1025: DO NZ=1,NP
-    RADC(NZ)=0.0_r8
-    RADP(NZ)=0.0_r8
-    CFX(NZ)=CF(NZ)*(1.0_r8-0.025_r8*ARLFP(NZ)/AREA3(NU))
+    SWRadByCanP(NZ)=0.0_r8
+    PARByCanP(NZ)=0.0_r8
+    CFX(NZ)=CF(NZ)*(1.0_r8-0.025_r8*CanPLA(NZ)/AREA3(NU))
   ENDDO D1025
   !
   !     ANGLE BETWEEN SUN AND GROUND SURFACE
@@ -364,7 +365,7 @@ module CanopyCondsMod
     SCOS=SQRT(1.0_r8-SSIN**2._r8)
     DGAZI=COS(GAZI-SAZI)
     BETAG=AZMAX1(AMIN1(1.0_r8,GCOS*SSIN+GSIN*SCOS*DGAZI))
-    IF(ARLSS.GT.0.0_r8)THEN
+    IF(CanGA.GT.0.0_r8)THEN
       SAGL=ASIN(SSIN)
       !
       !     ABSORBED RADIATION FROM OPTICAL PROPERTIES ENTERED IN 'READS'
@@ -684,7 +685,7 @@ module CanopyCondsMod
           !     RA2ST,RA2WT,RA2PT,RA2QT=total fwd scattered SW,PAR absd by leaf,stalk
           !     RAFSL,RAFPL=total fwd scattered SW,PAR to next layer
           !     RABSL,RABPL=total back scattered SW,PAR to next layer
-          !     RADC,TRADC,RADP,TRADP=total atmospheric SW,PAR absbd by each,all PFT
+          !     SWRadByCanP,TRADC,RADP,TRADP=total atmospheric SW,PAR absbd by each,all PFT
           !     STOPS,STOPY=accumulated interception of direct,diffuse radiation
           !     TAUS,TAUY=transmission of direct,diffuse radiation to next lower layer
           !
@@ -705,8 +706,8 @@ module CanopyCondsMod
             RAFPL(L)=RAFPL(L)+(RADPT*TAUP(NZ)+RA2PT*ALBP(NZ)+RA2QT*ALBPW)*YAREA
             RABSL(L)=RABSL(L)+(RA1ST*ALBR(NZ)+RA1WT*ALBRW)*YAREA
             RABPL(L)=RABPL(L)+(RA1PT*ALBP(NZ)+RA1QT*ALBPW)*YAREA
-            RADC(NZ)=RADC(NZ)+RADST+RADWT
-            RADP(NZ)=RADP(NZ)+RADPT+RADQT
+            SWRadByCanP(NZ)=SWRadByCanP(NZ)+RADST+RADWT
+            PARByCanP(NZ)=PARByCanP(NZ)+RADPT+RADQT
             TRADC=TRADC+RADST+RADWT
             TRAPC=TRAPC+RADPT+RADQT
           ENDDO D1530
@@ -747,21 +748,21 @@ module CanopyCondsMod
 !
       !     RADIATION REFLECTED FROM GROUND SURFACE
       !
-      !     VHCPW,VHCPWX=current,minimum snowpack heat capacity
-      !     ALBW,VOLSS,VOLWS,VOLIS=snowpack albedo,snow,water,ice volume
+      !     VHCPW,VLHeatCapSnowMN=current,minimum snowpack heat capacity
+      !     ALBW,VcumDrySnoWE,VcumWatSnow,VcumIceSnow=snowpack albedo,snow,water,ice volume
       !     ALBG,ALBS,FSNOW=ground,soil albedo,snow cover fraction
       !     THETW1=soil surface water content
       !     RABSL,RADPL=SW,PAR backscatter from ground surface
       !     TRADG,TRAPG=SW,PAR absorbed by ground surface
 !
-      IF(VHCPW1.GT.VHCPWX)THEN
-        ALBW=(0.80_r8*VOLSS+0.30_r8*VOLIS+0.06_r8*VOLWS)/(VOLSS+VOLIS+VOLWS)
+      IF(VHCPW1.GT.VLHeatCapSnowMN)THEN
+        ALBW=(0.80_r8*VcumDrySnoWE+0.30_r8*VcumIceSnow+0.06_r8*VcumWatSnow)/(VcumDrySnoWE+VcumIceSnow+VcumWatSnow)
         !the following partition differs from that used in the surface physics module  
         FSNOW=AMIN1((SnowDepth/0.07_r8)**2._r8,1.0_r8)
         ALBG=FSNOW*ALBW+(1.0_r8-FSNOW)*ALBS
       ELSE
-        IF(VOLX(NU).GT.ZEROS2)THEN
-          THETW1=AMIN1(POROS1,VOLW(NU)/VOLY(NU))
+        IF(VLSoilPoreMicP(NU).GT.ZEROS2)THEN
+          THETW1=AMIN1(POROS1,VLWatMicP(NU)/VLSoilMicP(NU))
         ELSE
           THETW1=0.0_r8
         ENDIF
@@ -778,7 +779,7 @@ module CanopyCondsMod
       !     RAFSL,RAFPL=total fwd scattered SW,PAR to next layer
       !     RADYN,RADYW,RAPYN,RAPYW=leaf,stalk SW,PAR absbd fwd+back flux
       !     RAYSL,RAYSW,RAYPL,RAYPW=total leaf,stalk SW,PAR absbd fwd+back
-      !     RADC,TRADC,RADP,TRADP=total SW,PAR absbd by each,all PFT
+      !     SWRadByCanP,TRADC,PARByCanP,TRADP=total SW,PAR absbd by each,all PFT
 !
       RADYL=0.0_r8
       RAPYL=0.0_r8
@@ -816,8 +817,8 @@ module CanopyCondsMod
             ENDDO D2600
             RAFSL(L)=RAFSL(L)+RAYSL(NZ)*TAUR(NZ)*YAREA
             RAFPL(L)=RAFPL(L)+RAYPL(NZ)*TAUP(NZ)*YAREA
-            RADC(NZ)=RADC(NZ)+RAYSL(NZ)+RAYSW(NZ)
-            RADP(NZ)=RADP(NZ)+RAYPL(NZ)+RAYPW(NZ)
+            SWRadByCanP(NZ)=SWRadByCanP(NZ)+RAYSL(NZ)+RAYSW(NZ)
+            PARByCanP(NZ)=PARByCanP(NZ)+RAYPL(NZ)+RAYPW(NZ)
             TRADC=TRADC+RAYSL(NZ)+RAYSW(NZ)
             TRAPC=TRAPC+RAYPL(NZ)+RAYPW(NZ)
           ENDDO D2500
@@ -838,8 +839,8 @@ module CanopyCondsMod
       ENDDO D120
       RADG=RASG*AREA3(NU)
       D135: DO NZ=1,NP
-        RADC(NZ)=0.0_r8
-        RADP(NZ)=0.0_r8
+        SWRadByCanP(NZ)=0.0_r8
+        PARByCanP(NZ)=0.0_r8
       ENDDO D135
     ENDIF
 !
@@ -848,8 +849,8 @@ module CanopyCondsMod
   ELSE
     RADG=0.0_r8
     D125: DO NZ=1,NP
-      RADC(NZ)=0.0_r8
-      RADP(NZ)=0.0_r8
+      SWRadByCanP(NZ)=0.0_r8
+      PARByCanP(NZ)=0.0_r8
     ENDDO D125
   ENDIF
   !
@@ -857,19 +858,19 @@ module CanopyCondsMod
   !
   !     FRADG=fraction of radiation received by ground surface
   !     FRADP=fraction of radiation received by each PFT canopy
-  !     ARLSS,ARLFS=leaf+stalk area of all PFTs,each PFT
+  !     CanGA,CanPA=leaf+stalk area of all PFTs,each PFT
   !
   FRADG=1.0_r8
-  IF(ARLSS.GT.ZEROS)THEN
-    FRADPT=1.0_r8-EXP(-0.65_r8*ARLSS/AREA3(NU))
+  IF(CanGA.GT.ZEROS)THEN
+    FRADPT=1.0_r8-EXP(-0.65_r8*CanGA/AREA3(NU))
     D145: DO NZ=1,NP
-      FRADP(NZ)=FRADPT*ARLFS(NZ)/ARLSS
-      FRADG=FRADG-FRADP(NZ)
+      FracPARByCanP(NZ)=FRADPT*CanPA(NZ)/CanGA
+      FRADG=FRADG-FracPARByCanP(NZ)
     ENDDO D145
   ELSE
     FRADG=1.0_r8
     D146: DO NZ=1,NP
-      FRADP(NZ)=0.0_r8
+      FracPARByCanP(NZ)=0.0_r8
     ENDDO D146
   ENDIF
   end associate

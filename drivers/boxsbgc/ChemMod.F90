@@ -52,26 +52,26 @@ implicit none
   real(r8), intent(inout) :: ystatesfl(nvars)
 
   !ZNH4S=ZNH4S+TRN4S*Natomw
-  ystatesfl(cid_CN41)=ystates0l(cid_CN41)+solflx%TRN4S/chemvar%VOLWNH
+  ystatesfl(cid_CN41)=ystates0l(cid_CN41)+solflx%TRN4S/chemvar%VLWatMicPNH
   ystatesfl(fid_TRN4S)=solflx%TRN4S
 
   !ZNH3S=ZNH3S+TRN3S*Natomw
-  ystatesfl(cid_CN31)=ystates0l(cid_CN31)+solflx%TRN3S/chemvar%VOLWNH
+  ystatesfl(cid_CN31)=ystates0l(cid_CN31)+solflx%TRN3S/chemvar%VLWatMicPNH
   ystatesfl(fid_TRN3S)=solflx%TRN3S
 
   !XN4  =XN4+TRXN4
-  ystatesfl(cid_XN41)=ystates0l(cid_XN41)+solflx%TRXN4/chemvar%VOLWNH
+  ystatesfl(cid_XN41)=ystates0l(cid_XN41)+solflx%TRXN4/chemvar%VLWatMicPNH
   ystatesfl(fid_TRXN4)=solflx%TRXN4
 
-  if(chemvar%VOLWNB>0._r8)THEN
+  if(chemvar%VLWatMicPNB>0._r8)THEN
     !ZNH4B=ZNH4B+TRN4B*Natomw
-    ystatesfl(cid_CN4B)=ystates0l(cid_CN4B)+solflx%TRN3B/chemvar%VOLWNB
+    ystatesfl(cid_CN4B)=ystates0l(cid_CN4B)+solflx%TRN3B/chemvar%VLWatMicPNB
 
     !ZNH3B=ZNH3B+TRN3B*Natomw
-    ystatesfl(cid_CN3B)=ystates0l(cid_CN3B)+solflx%TRN3B/chemvar%VOLWNB
+    ystatesfl(cid_CN3B)=ystates0l(cid_CN3B)+solflx%TRN3B/chemvar%VLWatMicPNB
 
     !XNB  = XNB+TRXNB
-    ystatesfl(cid_XN4B)=ystates0l(cid_XN4B)+solflx%TRXNB/chemvar%VOLWNB
+    ystatesfl(cid_XN4B)=ystates0l(cid_XN4B)+solflx%TRXNB/chemvar%VLWatMicPNB
 
   else
     ystatesfl(cid_CN4B)=ystates0l(cid_CN4B)
@@ -83,83 +83,83 @@ implicit none
   ystatesfl(fid_TRXNB)=solflx%TRXNB
 
   !H1PO4=H1PO4+TRH1P*Patomw
-  ystatesfl(cid_CH1P1)=ystates0l(cid_CH1P1)+solflx%TRH1P/chemvar%VOLWPO
+  ystatesfl(cid_CH1P1)=ystates0l(cid_CH1P1)+solflx%TRH1P/chemvar%VLWatMicPPO
   ystatesfl(fid_TRH1P)=solflx%TRH1P
 
   !H2PO4=H2PO4+TRH2P*Patomw
-  ystatesfl(cid_CH2P1)=ystates0l(cid_CH2P1)+solflx%TRH2P/chemvar%VOLWPO
+  ystatesfl(cid_CH2P1)=ystates0l(cid_CH2P1)+solflx%TRH2P/chemvar%VLWatMicPPO
   ystatesfl(fid_TRH2P)=solflx%TRH2P
 
   !XOH1 =XOH1+TRXH1
-  ystatesfl(cid_XOH11)=ystates0l(cid_XOH11)+solflx%TRXH1/chemvar%VOLWPO
+  ystatesfl(cid_XOH11)=ystates0l(cid_XOH11)+solflx%TRXH1/chemvar%VLWatMicPPO
   ystatesfl(fid_TRXH1)=solflx%TRXH1
 
   !XOH2 =XOH2+TRXH2
-  ystatesfl(cid_XOH21)=ystates0l(cid_XOH21)+solflx%TRXH2/chemvar%VOLWPO
+  ystatesfl(cid_XOH21)=ystates0l(cid_XOH21)+solflx%TRXH2/chemvar%VLWatMicPPO
   ystatesfl(fid_TRXH2)=solflx%TRXH2
 
   !XH1P =XH1P+TRX1P
-  ystatesfl(cid_XH1P1)=ystates0l(cid_XH1P1)+solflx%TRX1P/chemvar%VOLWPO
+  ystatesfl(cid_XH1P1)=ystates0l(cid_XH1P1)+solflx%TRX1P/chemvar%VLWatMicPPO
   ystatesfl(fid_TRX1P)=solflx%TRX1P
 
   !XH2P =XH2P+TRX2P
-  ystatesfl(cid_XH2P1)=ystates0l(cid_XH2P1)+solflx%TRX2P/chemvar%VOLWPO
+  ystatesfl(cid_XH2P1)=ystates0l(cid_XH2P1)+solflx%TRX2P/chemvar%VLWatMicPPO
   ystatesfl(fid_TRX2P)=solflx%TRX2P
 
   !PALPO=PALPO+TRALPO
-  ystatesfl(cid_PALPO1)=ystates0l(cid_PALPO1)+solflx%TRALPO/chemvar%VOLWPO
+  ystatesfl(cid_PALPO1)=ystates0l(cid_PALPO1)+solflx%TRALPO/chemvar%VLWatMicPPO
   ystatesfl(fid_TRALPO)=solflx%TRALPO
 
   !PFEPO=PFEPO+TRFEPO
-  ystatesfl(cid_PFEPO1)=ystates0l(cid_PFEPO1)+solflx%TRFEPO/chemvar%VOLWPO
+  ystatesfl(cid_PFEPO1)=ystates0l(cid_PFEPO1)+solflx%TRFEPO/chemvar%VLWatMicPPO
   ystatesfl(fid_TRFEPO)=solflx%TRFEPO
 
   !PCAPD=PCAPD+TRCAPD
-  ystatesfl(cid_PCAPD1)=ystates0l(cid_PCAPD1)+solflx%TRCAPD/chemvar%VOLWPO
+  ystatesfl(cid_PCAPD1)=ystates0l(cid_PCAPD1)+solflx%TRCAPD/chemvar%VLWatMicPPO
   ystatesfl(fid_TRCAPD)=solflx%TRCAPD
 
   !PCAPH=PCAPH+TRCAPH
-  ystatesfl(cid_PCAPH1)=ystates0l(cid_PCAPH1)+solflx%TRCAPH/chemvar%VOLWPO
+  ystatesfl(cid_PCAPH1)=ystates0l(cid_PCAPH1)+solflx%TRCAPH/chemvar%VLWatMicPPO
   ystatesfl(fid_TRCAPH)=solflx%TRCAPH
 
   !PCAPM=PCAPM+TRCAPM
-  ystatesfl(cid_PCAPM1)=ystates0l(cid_PCAPM1)+solflx%TRCAPM/chemvar%VOLWPO
+  ystatesfl(cid_PCAPM1)=ystates0l(cid_PCAPM1)+solflx%TRCAPM/chemvar%VLWatMicPPO
   ystatesfl(fid_TRCAPM)=solflx%TRCAPM
 
 
-  if(chemvar%VOLWPB>0._r8)then
+  if(chemvar%VLWatMicPPB>0._r8)then
     !H1POB=H1POB+TRH1B*Patomw
-    ystatesfl(cid_CH1PB)=ystates0l(cid_CH1PB)+solflx%TRH1B/chemvar%VOLWPB
+    ystatesfl(cid_CH1PB)=ystates0l(cid_CH1PB)+solflx%TRH1B/chemvar%VLWatMicPPB
 
     !H2POB=H2POB+TRH2B*Patomw
-    ystatesfl(cid_CH2PB)=ystates0l(cid_CH2PB)+solflx%TRH2B/chemvar%VOLWPB
+    ystatesfl(cid_CH2PB)=ystates0l(cid_CH2PB)+solflx%TRH2B/chemvar%VLWatMicPPB
 
     !XOH1B=XOH1B+TRBH1
-    ystatesfl(cid_XH11B)=ystates0l(cid_XH11B)+solflx%TRBH1/chemvar%VOLWPB
+    ystatesfl(cid_XH11B)=ystates0l(cid_XH11B)+solflx%TRBH1/chemvar%VLWatMicPPB
 
     !XOH2B=XOH2B+TRBH2
-    ystatesfl(cid_XH21B)=ystates0l(cid_XH21B)+solflx%TRBH2/chemvar%VOLWPB
+    ystatesfl(cid_XH21B)=ystates0l(cid_XH21B)+solflx%TRBH2/chemvar%VLWatMicPPB
 
     !XH1PB=XH1PB+TRB1P
-    ystatesfl(cid_X1P1B)=ystates0l(cid_X1P1B)+solflx%TRB1P/chemvar%VOLWPB
+    ystatesfl(cid_X1P1B)=ystates0l(cid_X1P1B)+solflx%TRB1P/chemvar%VLWatMicPPB
 
     !XH2PB=XH2PB+TRB2P
-    ystatesfl(cid_X2P1B)=ystates0l(cid_X2P1B)+solflx%TRB2P/chemvar%VOLWPB
+    ystatesfl(cid_X2P1B)=ystates0l(cid_X2P1B)+solflx%TRB2P/chemvar%VLWatMicPPB
 
     !PALPB=PALPB+TRALPB
-    ystatesfl(cid_PALPOB)=ystates0l(cid_PALPOB)+solflx%TRALPB/chemvar%VOLWPB
+    ystatesfl(cid_PALPOB)=ystates0l(cid_PALPOB)+solflx%TRALPB/chemvar%VLWatMicPPB
 
     !PFEPB=PFEPB+TRFEPB
-    ystatesfl(cid_PFEPOB)=ystates0l(cid_PFEPOB)+solflx%TRFEPB/chemvar%VOLWPB
+    ystatesfl(cid_PFEPOB)=ystates0l(cid_PFEPOB)+solflx%TRFEPB/chemvar%VLWatMicPPB
 
     !PCPDB=PCPDB+TRCPDB
-    ystatesfl(cid_PCAPDB)=ystates0l(cid_PCAPDB)+solflx%TRCPDB/chemvar%VOLWPB
+    ystatesfl(cid_PCAPDB)=ystates0l(cid_PCAPDB)+solflx%TRCPDB/chemvar%VLWatMicPPB
 
     !PCPHB=PCPHB+TRCPHB
-    ystatesfl(cid_PCAPHB)=ystates0l(cid_PCAPHB)+solflx%TRCPHB/chemvar%VOLWPB
+    ystatesfl(cid_PCAPHB)=ystates0l(cid_PCAPHB)+solflx%TRCPHB/chemvar%VLWatMicPPB
 
     !PCPMB=PCPMB+TRCPMB
-    ystatesfl(cid_PCAPMB)=ystates0l(cid_PCAPMB)+solflx%TRCPMB/chemvar%VOLWPB
+    ystatesfl(cid_PCAPMB)=ystates0l(cid_PCAPMB)+solflx%TRCPMB/chemvar%VLWatMicPPB
 
   else
     ystatesfl(cid_CH1PB)=ystates0l(cid_CH1PB)
@@ -213,13 +213,13 @@ implicit none
   chemvar%GKCK = GKCK
   chemvar%GKCN = GKCN
 
-  chemvar%BKVLX   =forc%BKVL
-  chemvar%BKVL    =forc%BKVL
-  chemvar%VOLWM   =forc%VOLW
-  chemvar%VOLWPO  =forc%VOLW*forc%VLPO4
-  chemvar%VOLWPB  =forc%VOLW*forc%VLPOB
-  chemvar%VOLWNH  =forc%VOLW*forc%VLNH4
-  chemvar%VOLWNB  =forc%VOLW*forc%VLNHB
+  chemvar%SoilMicPMassLayerX   =forc%SoilMicPMassLayer
+  chemvar%SoilMicPMassLayer    =forc%SoilMicPMassLayer
+  chemvar%VLWatMicPM   =forc%VLWatMicP
+  chemvar%VLWatMicPPO  =forc%VLWatMicP*forc%VLPO4
+  chemvar%VLWatMicPPB  =forc%VLWatMicP*forc%VLPOB
+  chemvar%VLWatMicPNH  =forc%VLWatMicP*forc%VLNH4
+  chemvar%VLWatMicPNB  =forc%VLWatMicP*forc%VLNHB
   chemvar%XCEC    =forc%XCEC
   chemvar%PH      =forc%pH
   chemvar%VLNH4   =forc%VLNH4

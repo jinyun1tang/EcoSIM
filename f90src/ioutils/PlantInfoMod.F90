@@ -135,7 +135,7 @@ implicit none
             EHVST(2,ipld_woody,NZ,M,NY,NX)=1.0_r8
             EHVST(2,ipld_stdead,NZ,M,NY,NX)=1.0_r8
           ENDDO
-          SDPTHI(NZ,NY,NX)=ppmc
+          PlantinDepth(NZ,NY,NX)=ppmc
         ENDDO
       ENDDO
     ENDDO
@@ -201,11 +201,10 @@ implicit none
 
       DO NX=NH1,NH2
         DO NY=NV1,NV2
-          print*,'NS',NP(NY,NX),NS
           DO NZ=1,MIN(NS,NP(NY,NX))
             tstr=trim(pft_pltinfo(NZ))
             read(tstr,'(I2,I2,I4)')IDX,IMO,IYR
-            read(tstr,*)DY,PPI(NZ,NY,NX),SDPTHI(NZ,NY,NX)
+            read(tstr,*)DY,PPI(NZ,NY,NX),PlantinDepth(NZ,NY,NX)
 
             LPY=0
             if(isLeap(iyr) .and. IMO.GT.2)LPY=1
@@ -398,7 +397,7 @@ implicit none
   call ncd_getvar(pft_nfid, 'ETMX', loc, ETMX(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'CHL', loc, CHL(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'CHL4', loc, CHL4(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'FCO2', loc, FCO2(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'FCO2', loc, CanPCi2CaRatio(NZ,NY,NX))
 
   call ncd_getvar(pft_nfid, 'ALBR', loc, ALBR(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'ALBP', loc, ALBP(NZ,NY,NX))
@@ -429,14 +428,14 @@ implicit none
   call ncd_getvar(pft_nfid, 'ANGSH', loc,ANGSH(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'STMX', loc,STMX(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'SDMX', loc,SDMX(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'GRMX', loc,GRMX(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'GRDM', loc,GRDM(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'GRMX', loc,MaxSeedCMass(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'GRDM', loc,SeedCMass(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'GFILL', loc,GFILL(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'WTSTDI', loc,WTSTDI(NZ,NY,NX))
 
-  call ncd_getvar(pft_nfid, 'RRAD1M', loc,RRAD1M(1,NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'RRAD2M', loc,RRAD2M(1,NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'PORT', loc,PORT(1,NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'RRAD1M', loc,MaxPrimRootRadius(1,NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'RRAD2M', loc,MaxSecndRootRadius(1,NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'PORT', loc,RootPorosity(1,NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'PR', loc,PR(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'RSRR', loc,RSRR(1,NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'RSRA', loc,RSRA(1,NZ,NY,NX))
@@ -466,7 +465,7 @@ implicit none
   call ncd_getvar(pft_nfid, 'DMHSK', loc,DMHSK(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'DMEAR', loc,DMEAR(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'DMGR', loc,DMGR(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'DMRT', loc,DMRT(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'DMRT', loc,BiomGrowthYieldRoot(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'DMND', loc,DMND(NZ,NY,NX))
 
   call ncd_getvar(pft_nfid, 'CNLF', loc,CNLF(NZ,NY,NX))
@@ -677,7 +676,7 @@ implicit none
     write(*,*)'Fraction of leaf protein as chlorophyll in bundle sheath(C4)',CHL(NZ,NY,NX)
     write(*,*)'fraction of leaf protein in mesophyll chlorophyll(C4)',CHL4(NZ,NY,NX)
   endif
-  write(*,*)'intercellular:atmospheric CO2 concentration ratio:',FCO2(NZ,NY,NX)
+  write(*,*)'intercellular:atmospheric CO2 concentration ratio:',CanPCi2CaRatio(NZ,NY,NX)
   end subroutine photosyns_trait_disp
 
 !------------------------------------------------------------------------------------------
@@ -716,8 +715,8 @@ implicit none
   write(*,*)'maximum potential seed mumber from '// &
     'pre-anthesis stalk growth: STMX',STMX(NZ,NY,NX)
   write(*,*)'maximum seed number per STMX: SDMX',SDMX(NZ,NY,NX)
-  write(*,*)'maximum seed size per SDMX (g): GRMX',GRMX(NZ,NY,NX)
-  write(*,*)'seed size at planting (g): GRDM',GRDM(NZ,NY,NX)    !could be greater than GRMX, accouting for seedling
+  write(*,*)'maximum seed size per SDMX (g): GRMX',MaxSeedCMass(NZ,NY,NX)
+  write(*,*)'seed size at planting (g): GRDM',SeedCMass(NZ,NY,NX)    !could be greater than MaxSeedCMass, accouting for seedling
   write(*,*)'grain filling rate at 25 oC (g seed-1 h-1): GFILL',GFILL(NZ,NY,NX)
   write(*,*)'mass of dead standing biomass at planting: WTSTDI',WTSTDI(NZ,NY,NX)
   end subroutine morphology_trait_disp
@@ -728,9 +727,9 @@ implicit none
   integer, intent(in) :: NZ,NY,NX
 
   write(*,*)'ROOT CHARACTERISTICS'
-  write(*,*)'radius of primary roots: RRAD1M',RRAD1M(1,NZ,NY,NX)
-  write(*,*)'radius of secondary roots: RRAD2M',RRAD2M(1,NZ,NY,NX)
-  write(*,*)'primary/fine root porosity: PORT',PORT(1,NZ,NY,NX)
+  write(*,*)'radius of primary roots: MaxPrimRootRadius',MaxPrimRootRadius(1,NZ,NY,NX)
+  write(*,*)'radius of secondary roots: MaxSecndRootRadius',MaxSecndRootRadius(1,NZ,NY,NX)
+  write(*,*)'primary/fine root porosity: PORT',RootPorosity(1,NZ,NY,NX)
   write(*,*)'nonstructural C concentration needed for root'// &
     ' branching: PR',PR(NZ,NY,NX)
   write(*,*)'radial root resistivity for water uptake (m2 MPa-1 h-1): RSRR',RSRR(1,NZ,NY,NX)
@@ -793,7 +792,7 @@ implicit none
   write(*,*)'grain C production vs nonstructural C'// &
     ' consumption (g g-1): DMGR',DMGR(NZ,NY,NX)
   write(*,*)'root dry matter C production vs nonstructural C'// &
-    ' consumption (g g-1): DMRT',DMRT(NZ,NY,NX)
+    ' consumption (g g-1): DMRT',BiomGrowthYieldRoot(NZ,NY,NX)
   write(*,*)'nodule bacteria in root nodule,canopy dry matter'// &
     'C production vs nonstructural C consumption (g g-1): DMND' &
     ,DMND(NZ,NY,NX)

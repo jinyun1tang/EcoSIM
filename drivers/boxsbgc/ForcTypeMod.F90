@@ -45,21 +45,21 @@ implicit none
     real(r8) :: ATCS        !mean annual temperature for offset calculation
     real(r8) :: EHUM        !partitioning coefficient between humus and microbial residue, [], hour1.f
     real(r8) :: pH          !pH value
-    real(r8) :: BKVL        !mass of soil layer	Mg d-2
-    real(r8) :: VOLX        !volume of soil layer	m3 d-2
+    real(r8) :: SoilMicPMassLayer        !mass of soil layer	Mg d-2
+    real(r8) :: VLSoilPoreMicP        !volume of soil layer	m3 d-2
     real(r8) :: ZNH4S       !NH4 non-band micropore, [g d-2]
     real(r8) :: ZNO3S       !NO3 band micropore, [g d-2]
     real(r8) :: H2PO4       !PO4 non-band micropore, [g d-2]
     real(r8) :: H1PO4       !soil aqueous HPO4 content micropore non-band, [mol d-2]
     real(r8) :: ZNO2S       !NO2  non-band micropore, [g d-2]
-    real(r8) :: VOLY      !micropore volume, [m3 d-2]
+    real(r8) :: VLSoilMicP      !micropore volume, [m3 d-2]
     real(r8) :: POROS     !soil porosity, [m3 m-3]
-    real(r8) :: FC        !water contents at field capacity, [m3 m-3]
+    real(r8) :: FieldCapacity        !water contents at field capacity, [m3 m-3]
     real(r8) :: SRP
-    real(r8) :: WP
-    real(r8) :: PSIMX
-    real(r8) :: PSIMD
-    real(r8) :: PSIMS
+    real(r8) :: WiltPoint
+    real(r8) :: LOGPSIMX
+    real(r8) :: LOGPSIMND
+    real(r8) :: LOGPSIAtSat
     real(r8) :: PSISD
     real(r8) :: PSISE
     real(r8), allocatable :: CFOMC(:)  !allocation coefficient to humus fractions
@@ -108,8 +108,8 @@ implicit none
     real(r8) :: OFFSET      !offset for calculating temperature in Arrhenius curves, [oC]
 
     real(r8) :: THETY       !air-dry water content, [m3 m-3]
-    real(r8) :: VOLW        !soil micropore water content [m3 d-2]
-    real(r8) :: VOLP        !soil air content, [m3 d-2]
+    real(r8) :: VLWatMicP        !soil micropore water content [m3 d-2]
+    real(r8) :: VLsoiAirP        !soil air content, [m3 d-2]
     real(r8) :: VOLA        !total volume in micropores [m3 d-2]
 
     real(r8) :: VLNOB       !NO3 band volume fracrion, [-]
@@ -119,7 +119,7 @@ implicit none
     real(r8) :: VLPOB       !PO4 band volume fracrion, [-]
     real(r8) :: VLPO4       !PO4 non-band volume fraction,[-]:=1-VLPOB
 
-    real(r8) :: PSISM       !soil micropore matric water potential, [MPa]
+    real(r8) :: PSISoilMatricP       !soil micropore matric water potential, [MPa]
     real(r8) :: OLSGL       !aqueous O2 diffusivity, [m2 h-1], set in hour1
     real(r8) :: CLSGL       !aqueous CO2 diffusivity	[m2 h-1]
     real(r8) :: CQSGL       !aqueous CH4 diffusivity	m2 h-1
@@ -173,7 +173,7 @@ implicit none
 
 !derived variables
     real(r8) :: FILM        !soil water film thickness , [m]
-    real(r8) :: TORT        !soil tortuosity, []
+    real(r8) :: TortMicPM        !soil tortuosity, []
 
     real(r8) :: EPOC      !partitioning coefficient between POC and litter, [], hour1.f
     real(r8) :: CCO2S     !aqueous CO2 concentration micropore	[g m-3]
@@ -200,8 +200,8 @@ implicit none
     real(r8) :: TFND      !temperature effect on aqueous diffusivity
     real(r8) :: ATKA      !mean annual air temperature [K]
  !litter layer
-    real(r8) :: VOLR      !surface litter volume, [m3 d-2]
-    real(r8) :: VOLWRX    !surface litter water holding capacity, [m3 d-2]
+    real(r8) :: VLitR      !surface litter volume, [m3 d-2]
+    real(r8) :: VWatLitrX    !surface litter water holding capacity, [m3 d-2]
  !non litter layer
     real(r8) :: ROXYY       !total root + microbial O2 uptake from previous hour, [g d-2 h-1], updated in hour1
     real(r8) :: RN2OY       !total root + microbial N2O uptake from previous hour, [g d-2 h-1]
@@ -276,14 +276,14 @@ implicit none
   call ncd_getvar(ncf,'CNOSC',forc%CNOSC)
   call ncd_getvar(ncf,'CPOSC',forc%CPOSC)
   call ncd_getvar(ncf,'pH',forc%PH)
-  call ncd_getvar(ncf,'VOLX',forc%VOLX)
+  call ncd_getvar(ncf,'VLSoilPoreMicP',forc%VLSoilPoreMicP)
   call ncd_getvar(ncf,'ORGC',forc%ORGC)
   call ncd_getvar(ncf,'CFOMC',forc%CFOMC)
-  call ncd_getvar(ncf,'VOLY',forc%VOLY)
-  call ncd_getvar(ncf,'BKVL',forc%BKVL)
+  call ncd_getvar(ncf,'VLSoilMicP',forc%VLSoilMicP)
+  call ncd_getvar(ncf,'BKVL',forc%SoilMicPMassLayer)
   call ncd_getvar(ncf,'POROS',forc%POROS)
-  call ncd_getvar(ncf,'FC',forc%FC)
-  call ncd_getvar(ncf,'WP',forc%WP)
+  call ncd_getvar(ncf,'FC',forc%FieldCapacity)
+  call ncd_getvar(ncf,'WP',forc%WiltPoint)
   call ncd_getvar(ncf,'SRP',forc%SRP)
   call ncd_getvar(ncf,'EHUM',forc%EHUM)
   call ncd_getvar(ncf,'EPOC',forc%EPOC)
@@ -333,9 +333,9 @@ implicit none
   call ncd_getvar(ncf,'OQN',forc%OQN)
   call ncd_getvar(ncf,'OQP',forc%OQP)
   call ncd_getvar(ncf,'THETY',forc%THETY)
-  call ncd_getvar(ncf,'PSIMX',forc%PSIMX)
-  call ncd_getvar(ncf,'PSIMD',forc%PSIMD)
-  call ncd_getvar(ncf,'PSIMS',forc%PSIMS)
+  call ncd_getvar(ncf,'PSIMX',forc%LOGPSIMX)
+  call ncd_getvar(ncf,'PSIMD',forc%LOGPSIMND)
+  call ncd_getvar(ncf,'PSIMS',forc%LOGPSIAtSat)
   call ncd_getvar(ncf,'PSISD',forc%PSISD)
   call ncd_getvar(ncf,'PSISE',forc%PSISE)
   call ncd_getvar(ncf,'ATKA', forc%ATKA)
@@ -350,7 +350,7 @@ implicit none
   forc%VLPO4=1._r8
   forc%ZNFN0=0._r8
   forc%ZNFNI=0._r8
-  forc%VOLA=forc%POROS*forc%VOLY
+  forc%VOLA=forc%POROS*forc%VLSoilMicP
   forc%AREA3=1._r8
   forc%CNH4B=0._r8       !NH4 concentration band micropore	[g m-3], derived from ZNH4B
   forc%ZNH4B=0._r8       !NH4 band micropore, [g d-2]
@@ -376,7 +376,7 @@ implicit none
   integer, intent(in) :: forctype  ! 0: (transient), 1: T const, 2: water const, 3: T and water const
   type(forc_type), target, intent(inout) :: forc
 
-  real(r8) :: FCL, WPL,PSL,FCD,PSD
+  real(r8) :: FCL, LOGWiltPoint,PSL,FCD,PSD
   real(r8) :: scalar, Z3S, TCS
   real(r8) :: TFACG
   real(r8) :: DFLG2
@@ -403,10 +403,10 @@ implicit none
   !since the model if configured for incubation
   !the primary variable forcing is temperature, and moisture
   associate(                     &
-     PSIMX    =>  forc%PSIMX   , &
-     PSIMD    =>  forc%PSIMD   , &
+     LOGPSIMX    =>  forc%LOGPSIMX   , &
+     LOGPSIMND    =>  forc%LOGPSIMND   , &
      PSISD    =>  forc%PSISD   , &
-     PSIMS    =>  forc%PSIMS   , &
+     LOGPSIAtSat    =>  forc%LOGPSIAtSat   , &
      PSISE    =>  forc%PSISE   , &
      SRP      =>  forc%SRP     , &
     THETW => forc%THETW        , &  !relative saturation
@@ -417,23 +417,23 @@ implicit none
   THETW=0.65_r8
   if (first .or. forctype<=1)then
 !  variable moisture
-    FCL=log(forc%FC)
-    WPL=log(forc%WP)
+    FCL=log(forc%FieldCapacity)
+    LOGWiltPoint=log(forc%WiltPoint)
     PSL=log(forc%POROS)
     PSD=PSL-FCL
-    FCD=FCL-WPL
-    IF(THETW.LT.forc%FC)THEN
-      forc%PSISM=AMAX1(PSIHY,-EXP(PSIMX+((FCL-LOG(THETW))/FCD*PSIMD)))
+    FCD=FCL-LOGWiltPoint
+    IF(THETW.LT.forc%FieldCapacity)THEN
+      forc%PSISoilMatricP=AMAX1(PSIHY,-EXP(LOGPSIMX+((FCL-LOG(THETW))/FCD*LOGPSIMND)))
     ELSEIF(THETW.LT.forc%POROS-DTHETW)THEN
-      forc%PSISM=-EXP(PSIMS+(((PSL-LOG(THETW))/PSD)**SRP*PSISD))
+      forc%PSISoilMatricP=-EXP(LOGPSIAtSat+(((PSL-LOG(THETW))/PSD)**SRP*PSISD))
     ELSE
-      forc%PSISM=PSISE
+      forc%PSISoilMatricP=PSISE
     ENDIF
-    forc%FILM=FilmThickness(forc%PSISM)
-    forc%TORT=TortMicporew(THETW)
+    forc%FILM=FilmThickness(forc%PSISoilMatricP)
+    forc%TortMicPM=TortMicporew(THETW)
     forc%THETPM=1._r8-THETW
-    forc%VOLW=forc%THETPM*forc%POROS*forc%VOLY
-    forc%VOLP=forc%VOLA-forc%VOLW
+    forc%VLWatMicP=forc%THETPM*forc%POROS*forc%VLSoilMicP
+    forc%VLsoiAirP=forc%VOLA-forc%VLWatMicP
   endif
 
   if(first .or. forctype ==0 .or. forctype==2)then
@@ -469,8 +469,8 @@ implicit none
   endif
 
   if (first .or. forctype <=2)then
-    Z3S=forc%FC/forc%POROS
-    XNPD=600.0_r8*XNPG
+    Z3S=forc%FieldCapacity/forc%POROS
+    XNPD=600.0_r8*dts_gas
     scalar=forc%TFND*XNPD
     forc%DFGS=fDFGS(scalar,THETW,Z3S)
 
@@ -485,7 +485,7 @@ implicit none
     forc%ZHSGL=ZHSG*TFACG*DFLG2
     forc%HGSGL=HGSG*TFACG*DFLG2
 
-    forc%PARG=forc%AREA3*XNPH/(0.0139_r8+1.39E-03_r8)
+    forc%PARG=forc%AREA3*dts_HeatWatTP/(0.0139_r8+1.39E-03_r8)
     PARGM=forc%PARG*XNPT
     !GASEOUS BOUNDARY LAYER CONDUCTANCES
     PARGCO=PARGM*0.74_r8
@@ -496,13 +496,13 @@ implicit none
     PARGN3=PARGM*1.02_r8
     PARGH2=PARGM*2.08_r8
 
-    DCO2G=forc%CGSGL*XNPG
-    DCH4G=forc%CHSGL*XNPG
-    DOXYG=forc%OGSGL*XNPG
-    DZ2GG=forc%ZGSGL*XNPG
-    DZ2OG=forc%Z2SGL*XNPG
-    DNH3G=forc%ZHSGL*XNPG
-    DH2GG=forc%HGSGL*XNPG
+    DCO2G=forc%CGSGL*dts_gas
+    DCH4G=forc%CHSGL*dts_gas
+    DOXYG=forc%OGSGL*dts_gas
+    DZ2GG=forc%ZGSGL*dts_gas
+    DZ2OG=forc%Z2SGL*dts_gas
+    DNH3G=forc%ZHSGL*dts_gas
+    DH2GG=forc%HGSGL*dts_gas
 
 
     forc%DCO2GQ=DCO2G*PARGCO/(DCO2G+PARGCO)

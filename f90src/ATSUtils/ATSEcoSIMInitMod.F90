@@ -46,10 +46,10 @@ implicit none
     H2GE(NY,NX)=atm_H2
 
     DO L=NU(NY,NX),NL(NY,NX)
-      FC(L,NY,NX)=a_FC(L,ny)
-      WP(L,NY,NX)=a_WP(L,NY)
+      FieldCapacity(L,NY,NX)=a_FC(L,ny)
+      WiltPoint(L,NY,NX)=a_WP(L,NY)
       CumDepth2LayerBottom(L,NY,NX)=a_CumDepth2LayerBottom(L,NY)
-      BKDSI(L,NY,NX)=a_BKDSI(L,NY)
+      SoiBulkDensityt0(L,NY,NX)=a_BKDSI(L,NY)
       CORGC(L,NY,NX)=a_CORGC(L,NY)
       CORGN(L,NY,NX)=a_CORGN(L,NY)
       CORGP(L,NY,NX)=a_CORGP(L,NY)      

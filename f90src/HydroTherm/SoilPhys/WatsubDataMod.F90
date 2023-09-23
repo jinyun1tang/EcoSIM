@@ -4,40 +4,41 @@ module WatsubDataMod
 implicit none
   character(len=*), private, parameter :: mod_filename = __FILE__
 
-  real(r8),allocatable ::  TWFLXL(:,:,:)                      !
-
-  real(r8),allocatable ::  TWFLXH(:,:,:)                      !
+  real(r8),allocatable ::  TMLiceThawMicP(:,:,:)              !micropore layer integrated ice mass loss due to thaw
+  real(r8),allocatable ::  TMLiceThawMacP(:,:,:)              !macropore layer integrated ice mass loss due to thaw
 
   real(r8),allocatable ::  AREAU(:,:,:)                       !
-  real(r8),allocatable ::  AreaUnderWaterTable(:,:,:)                      !
+  real(r8),allocatable ::  AreaUnderWaterTBL(:,:,:)           !
 
-  real(r8),allocatable ::  VOLPH1Z(:,:,:)                     !
-  real(r8),allocatable ::  TTFLXL(:,:,:)                      !
+  real(r8),allocatable ::  VLairMacP(:,:,:)                   !
+  real(r8),allocatable ::  TLPhaseChangeHeat2Soi1(:,:,:)        !total soil layer latent heat release from melting
+  real(r8),allocatable ::  TLPhaseChangeHeat2Soi1s(:,:,:)        !total soil layer latent heat release from melting
 
-  real(r8),allocatable ::  FINHL(:,:,:)                       !
+  real(r8),allocatable ::  FWatExMacP2MicPi(:,:,:)             !pressure-driven water flow from macpore to micpore
 
-  real(r8),allocatable ::  TFLWL(:,:,:)                       !
-  real(r8),allocatable ::  TFLWHL(:,:,:)                      !
-  real(r8),allocatable ::  THFLWL(:,:,:)                      !
-  real(r8),allocatable ::  WFLXL(:,:,:)                       !
-  real(r8),allocatable ::  TFLXL(:,:,:)                       !
+  real(r8),allocatable ::  TWatCharge2MicP(:,:,:)                       !
+  real(r8),allocatable ::  TConvectWaterFlowMacP(:,:,:)                      !
+  real(r8),allocatable ::  THeatFlow2Soili(:,:,:)                      !
+  real(r8),allocatable ::  THeatFlow2Soilis(:,:,:)                      !
+  real(r8),allocatable ::  FIceThawMicP(:,:,:)                       !
+  real(r8),allocatable ::  SoiPLIceHeatFlxFrez(:,:,:)                       !
   real(r8),allocatable ::  AVCNHL(:,:,:,:)                    !
 
-  real(r8),allocatable ::  TFLWLX(:,:,:)                      !
-  real(r8),allocatable ::  FLU1(:,:,:)                        !
-  real(r8),allocatable ::  HWFLU1(:,:,:)                      !
+  real(r8),allocatable ::  TWatXChange2WatTableX(:,:,:)                      !
+  real(r8),allocatable ::  FWatIrrigate2MicP1(:,:,:)                        !
+  real(r8),allocatable ::  HeatIrrigation1(:,:,:)                      !
 
-  real(r8),allocatable ::  WFLXLH(:,:,:)                      !
+  real(r8),allocatable ::  FIceThawMacP(:,:,:)                      !
 
-  real(r8),allocatable ::  CNDH1(:,:,:)                       !
-  real(r8),allocatable ::  VOLA1(:,:,:)                       !
-  real(r8),allocatable ::  VOLAH1(:,:,:)                      !
+  real(r8),allocatable ::  HydroCondMacP1(:,:,:)                       !
+  real(r8),allocatable ::  VLMicP1(:,:,:)                       !
+  real(r8),allocatable ::  VLMacP1(:,:,:)                      !
 
   real(r8),allocatable ::  FLWNX(:,:)                         !
   real(r8),allocatable ::  FLWXNX(:,:)                        !
   real(r8),allocatable ::  FLWHNX(:,:)                        !
   real(r8),allocatable ::  HFLWNX(:,:)                        !
-  real(r8),allocatable ::  PSISA1(:,:,:)                      !
+  real(r8),allocatable ::  PSISoilMatricPtmp(:,:,:)                      !
 
 
   integer, allocatable ::  N6X(:,:)
@@ -51,43 +52,44 @@ contains
 
   allocate(N6X(JY,JX));         N6X=0
 
-  allocate(TWFLXL(JZ,JY,JX));   TWFLXL=0._r8
+  allocate(TMLiceThawMicP(JZ,JY,JX));   TMLiceThawMicP=0._r8
 
-  allocate(TWFLXH(JZ,JY,JX));   TWFLXH=0._r8
+  allocate(TMLiceThawMacP(JZ,JY,JX));   TMLiceThawMacP=0._r8
 
   allocate(AREAU(JZ,JY,JX));    AREAU=0._r8
-  allocate(AreaUnderWaterTable(JZ,JY,JX));   AreaUnderWaterTable=0._r8
+  allocate(AreaUnderWaterTBL(JZ,JY,JX));   AreaUnderWaterTBL=0._r8
 
 
-  allocate(VOLPH1Z(JZ,JY,JX));  VOLPH1Z=0._r8
-  allocate(TTFLXL(JZ,JY,JX));   TTFLXL=0._r8
+  allocate(VLairMacP(JZ,JY,JX));  VLairMacP=0._r8
+  allocate(TLPhaseChangeHeat2Soi1(JZ,JY,JX));   TLPhaseChangeHeat2Soi1=0._r8
+  allocate(TLPhaseChangeHeat2Soi1s(JZ,JY,JX));   TLPhaseChangeHeat2Soi1s=0._r8
 
-  allocate(FINHL(JZ,JY,JX));    FINHL=0._r8
+  allocate(FWatExMacP2MicPi(JZ,JY,JX));    FWatExMacP2MicPi=0._r8
 
-  allocate(TFLWL(JZ,JY,JX));    TFLWL=0._r8
-  allocate(TFLWHL(JZ,JY,JX));   TFLWHL=0._r8
-  allocate(THFLWL(JZ,JY,JX));   THFLWL=0._r8
-  allocate(WFLXL(JZ,JY,JX));    WFLXL=0._r8
-  allocate(TFLXL(JZ,JY,JX));    TFLXL=0._r8
+  allocate(TWatCharge2MicP(JZ,JY,JX));    TWatCharge2MicP=0._r8
+  allocate(TConvectWaterFlowMacP(JZ,JY,JX));   TConvectWaterFlowMacP=0._r8
+  allocate(THeatFlow2Soili(JZ,JY,JX));   THeatFlow2Soili=0._r8
+  allocate(THeatFlow2Soilis(JZ,JY,JX));   THeatFlow2Soilis=0._r8  
+  allocate(FIceThawMicP(JZ,JY,JX));    FIceThawMicP=0._r8
+  allocate(SoiPLIceHeatFlxFrez(JZ,JY,JX));    SoiPLIceHeatFlxFrez=0._r8
   allocate(AVCNHL(3,JD,JV,JH)); AVCNHL=0._r8
 
-  allocate(TFLWLX(JZ,JY,JX));   TFLWLX=0._r8
-  allocate(FLU1(JZ,JY,JX));     FLU1=0._r8
-  allocate(HWFLU1(JZ,JY,JX));   HWFLU1=0._r8
+  allocate(TWatXChange2WatTableX(JZ,JY,JX));   TWatXChange2WatTableX=0._r8
+  allocate(FWatIrrigate2MicP1(JZ,JY,JX));     FWatIrrigate2MicP1=0._r8
+  allocate(HeatIrrigation1(JZ,JY,JX));   HeatIrrigation1=0._r8
 
-  allocate(WFLXLH(JZ,JY,JX));   WFLXLH=0._r8
+  allocate(FIceThawMacP(JZ,JY,JX));   FIceThawMacP=0._r8
 
-  allocate(CNDH1(JZ,JY,JX));    CNDH1=0._r8
-  allocate(VOLA1(0:JZ,JY,JX));  VOLA1=0._r8
-
-  allocate(VOLAH1(JZ,JY,JX));   VOLAH1=0._r8
+  allocate(HydroCondMacP1(JZ,JY,JX));    HydroCondMacP1=0._r8
+  allocate(VLMicP1(0:JZ,JY,JX));  VLMicP1=0._r8
+  allocate(VLMacP1(JZ,JY,JX));   VLMacP1=0._r8
 
 
   allocate(FLWNX(JY,JX));       FLWNX=0._r8
   allocate(FLWXNX(JY,JX));      FLWXNX=0._r8
   allocate(FLWHNX(JY,JX));      FLWHNX=0._r8
   allocate(HFLWNX(JY,JX));      HFLWNX=0._r8
-  allocate(PSISA1(JZ,JY,JX));   PSISA1=0._r8
+  allocate(PSISoilMatricPtmp(JZ,JY,JX));   PSISoilMatricPtmp=0._r8
 
   end subroutine InitWatSubData
 
@@ -98,41 +100,43 @@ contains
 
   call destroy(N6X)
 
-  call destroy(TWFLXL)
+  call destroy(TMLiceThawMicP)
 
-  call destroy(TWFLXH)
+  call destroy(TMLiceThawMacP)
 
   call destroy(AREAU)
-  call destroy(AreaUnderWaterTable)
+  call destroy(AreaUnderWaterTBL)
 
-  call destroy(VOLPH1Z)
-  call destroy(TTFLXL)
+  call destroy(VLairMacP)
+  call destroy(TLPhaseChangeHeat2Soi1)
+  call destroy(TLPhaseChangeHeat2Soi1s)
 
-  call destroy(FINHL)
+  call destroy(FWatExMacP2MicPi)
 
-  call destroy(TFLWL)
-  call destroy(TFLWHL)
-  call destroy(THFLWL)
-  call destroy(WFLXL)
-  call destroy(TFLXL)
+  call destroy(TWatCharge2MicP)
+  call destroy(TConvectWaterFlowMacP)
+  call destroy(THeatFlow2Soili)
+  call destroy(THeatFlow2Soilis)  
+  call destroy(FIceThawMicP)
+  call destroy(SoiPLIceHeatFlxFrez)
   call destroy(AVCNHL)
 
-  call destroy(TFLWLX)
-  call destroy(FLU1)
-  call destroy(HWFLU1)
+  call destroy(TWatXChange2WatTableX)
+  call destroy(FWatIrrigate2MicP1)
+  call destroy(HeatIrrigation1)
 
-  call destroy(WFLXLH)
+  call destroy(FIceThawMacP)
 
-  call destroy(CNDH1)
-  call destroy(VOLA1)
+  call destroy(HydroCondMacP1)
+  call destroy(VLMicP1)
 
-  call destroy(VOLAH1)
+  call destroy(VLMacP1)
 
   call destroy(FLWNX)
   call destroy(FLWXNX)
   call destroy(FLWHNX)
   call destroy(HFLWNX)
-  call destroy(PSISA1)
+  call destroy(PSISoilMatricPtmp)
 
   end subroutine DestructWatSubData
 

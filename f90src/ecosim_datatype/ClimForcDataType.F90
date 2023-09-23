@@ -66,7 +66,7 @@ implicit none
   real(r8),target,allocatable ::  DYLX(:,:)                          !daylength of previous day, [h]
   real(r8),target,allocatable ::  DYLM(:,:)                          !maximum daylength, [h]
   real(r8),target,allocatable ::  OMEGAG(:,:,:)                      !sine of solar beam on leaf surface, [-]
-  real(r8),target,allocatable ::  THS(:,:)                           !sky longwave radiation , [MJ d-2 h-1]
+  real(r8),target,allocatable ::  LWRadSky(:,:)                           !sky longwave radiation , [MJ d-2 h-1]
   real(r8),target,allocatable ::  TRAD(:,:)                          !total daily solar radiation, [MJ d-1]
   real(r8),target,allocatable ::  TAMX(:,:)                          !daily maximum air temperature , [oC]
   real(r8),target,allocatable ::  TAMN(:,:)                          !daily minimum air temperature , [oC]
@@ -111,8 +111,8 @@ implicit none
   real(r8),target,allocatable ::  ATCS(:,:)                          !mean annual soil temperature, [oC]
   real(r8),target,allocatable ::  TairKClimMean(:,:)                 !mean annual air temperature, [K]
   real(r8),target,allocatable ::  ATKS(:,:)                          !mean annual soil temperature, [K]
-  real(r8),target,allocatable ::  PRECR(:,:)                         !rainfall, [m3 d-2 h-1]
-  real(r8),target,allocatable ::  PRECW(:,:)                         !snowfall, [m3 d-2 h-1]
+  real(r8),target,allocatable ::  RainFalPrec(:,:)                   !rainfall, [m3 d-2 h-1]
+  real(r8),target,allocatable ::  SnoFalPrec(:,:)                    !snowfall, [m3 d-2 h-1]
   real(r8),target,allocatable ::  PRECQ(:,:)                         !rainfall + snowfall, [m3 d-2 h-1]
   real(r8),target,allocatable ::  PRECA(:,:)                         !rainfall + irrigation, [m3 d-2 h-1]
   real(r8),target,allocatable ::  ENGYP(:,:)                         !cumulative rainfall energy impact on soil surface
@@ -196,7 +196,7 @@ implicit none
   allocate(DYLX(JY,JX));        DYLX=0._r8
   allocate(DYLM(JY,JX));        DYLM=0._r8
   allocate(OMEGAG(JSA,JY,JX));  OMEGAG=0._r8
-  allocate(THS(JY,JX));         THS=0._r8
+  allocate(LWRadSky(JY,JX));         LWRadSky=0._r8
   allocate(TRAD(JY,JX));        TRAD=0._r8
   allocate(TAMX(JY,JX));        TAMX=0._r8
   allocate(TAMN(JY,JX));        TAMN=0._r8
@@ -242,8 +242,8 @@ implicit none
   allocate(ATCS(JY,JX));        ATCS=0._r8
   allocate(TairKClimMean(JY,JX));        TairKClimMean=0._r8
   allocate(ATKS(JY,JX));        ATKS=0._r8
-  allocate(PRECR(JY,JX));       PRECR=0._r8
-  allocate(PRECW(JY,JX));       PRECW=0._r8
+  allocate(RainFalPrec(JY,JX));       RainFalPrec=0._r8
+  allocate(SnoFalPrec(JY,JX));       SnoFalPrec=0._r8
   allocate(PRECQ(JY,JX));       PRECQ=0._r8
   allocate(PRECA(JY,JX));       PRECA=0._r8
   allocate(ENGYP(JY,JX));       ENGYP=0._r8
@@ -327,7 +327,7 @@ implicit none
   call destroy(DYLX)
   call destroy(DYLM)
   call destroy(OMEGAG)
-  call destroy(THS)
+  call destroy(LWRadSky)
   call destroy(TRAD)
   call destroy(TAMX)
   call destroy(TAMN)
@@ -373,8 +373,8 @@ implicit none
   call destroy(ATCS)
   call destroy(TairKClimMean)
   call destroy(ATKS)
-  call destroy(PRECR)
-  call destroy(PRECW)
+  call destroy(RainFalPrec)
+  call destroy(SnoFalPrec)
   call destroy(PRECQ)
   call destroy(PRECA)
   call destroy(ENGYP)

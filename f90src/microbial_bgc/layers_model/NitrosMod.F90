@@ -61,7 +61,7 @@ module nitrosMod
 !     FOSCXS=mixing fraction for surface litter
 !     TOQCK=total active biomass respiration activity
 !     TFNX=temperature function
-!     VOLX=soil layer volume
+!     VLSoilPoreMicP=soil layer volume
 !     OSCXD=mixing required for equilibrating litter concentration
 !     FOSCXD=mixing fraction for equilibrating subsurface litter
 !     FOSCXS=mixing fraction for subsurface litter
@@ -77,14 +77,14 @@ module nitrosMod
         ENDIF
       ELSE
         D1100: DO LN=L+1,NL(NY,NX)
-          IF(VOLX(LN,NY,NX).GT.ZEROS2(NY,NX))THEN
+          IF(VLSoilPoreMicP(LN,NY,NX).GT.ZEROS2(NY,NX))THEN
             LL=LN
             exit
           ENDIF
         ENDDO D1100
         ORGRL=AZMAX1(ORGR(L,NY,NX))
         ORGRLL=AZMAX1(ORGR(LL,NY,NX))
-        OSCXD=(ORGRL*VOLT(LL,NY,NX)-ORGRLL*VOLT(L,NY,NX))/(VOLT(L,NY,NX)+VOLT(LL,NY,NX))
+        OSCXD=(ORGRL*VGeomLayer(LL,NY,NX)-ORGRLL*VGeomLayer(L,NY,NX))/(VGeomLayer(L,NY,NX)+VGeomLayer(LL,NY,NX))
         IF(OSCXD.GT.0.0_r8.AND.ORGR(L,NY,NX).GT.ZEROS(NY,NX))THEN
           FOSCXD=OSCXD/ORGR(L,NY,NX)
         ELSEIF(OSCXD.LT.0.0_r8.AND.ORGR(LL,NY,NX).GT.ZEROS(NY,NX))THEN
@@ -92,8 +92,8 @@ module nitrosMod
         ELSE
           FOSCXD=0.0_r8
         ENDIF
-        IF(VOLT(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-          FOSCXS=FOSCZL*FOSCXD*TOQCK(L,NY,NX)/VOLT(L,NY,NX)
+        IF(VGeomLayer(L,NY,NX).GT.ZEROS2(NY,NX))THEN
+          FOSCXS=FOSCZL*FOSCXD*TOQCK(L,NY,NX)/VGeomLayer(L,NY,NX)
         ELSE
           FOSCXS=0.0_r8
         ENDIF

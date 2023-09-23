@@ -174,7 +174,7 @@
           TEUPTK(:,NZ,NY,NX)=0._r8
           TCO2T(NZ,NY,NX)=0._r8
           TCO2A(NZ,NY,NX)=0._r8
-          CTRAN(NZ,NY,NX)=0._r8
+          ETCanP(NZ,NY,NX)=0._r8
           TZUPFX(NZ,NY,NX)=0._r8
           TNH3C(NZ,NY,NX)=0._r8
           VCO2F(NZ,NY,NX)=0._r8
@@ -344,7 +344,7 @@
 !     CIRRA= fraction of FC to which irrigation will raise SWC
 !     FW=fraction of soil layer in irrigation zone
 !     FZ=SWC at which irrigation is triggered
-!     VOLX,VOLW,VOLI=total,water,ice volume
+!     VLSoilPoreMicP,VOLW,VOLI=total,water,ice volume
 !     IFLGV=flag for irrigation criterion,0=SWC,1=canopy water potential
 !     FIRRA=depletion of SWC from CIRRA to WP(IFLGV=0),or minimum canopy
 !     water potential(IFLGV=1), to trigger irrigation
@@ -363,15 +363,15 @@
           D165: DO L=NU(NY,NX),NL(NY,NX)
             IF(CumDepth2LayerBottom(L-1,NY,NX).LT.DIRRA1)THEN
               FW=AMIN1(1.0_r8,(DIRRA1-CumDepth2LayerBottom(L-1,NY,NX))/(CumDepth2LayerBottom(L,NY,NX)-CumDepth2LayerBottom(L-1,NY,NX)))
-              FZ=AMIN1(POROS(L,NY,NX),WP(L,NY,NX)+CIRRA(NY,NX)*(FC(L,NY,NX)-WP(L,NY,NX)))
-              TFZ=TFZ+FW*FZ*VOLX(L,NY,NX)
-              TWP=TWP+FW*WP(L,NY,NX)*VOLX(L,NY,NX)
-              TVW=TVW+FW*(VOLW(L,NY,NX)+VOLI(L,NY,NX))
+              FZ=AMIN1(POROS(L,NY,NX),WiltPoint(L,NY,NX)+CIRRA(NY,NX)*(FieldCapacity(L,NY,NX)-WiltPoint(L,NY,NX)))
+              TFZ=TFZ+FW*FZ*VLSoilPoreMicP(L,NY,NX)
+              TWP=TWP+FW*WiltPoint(L,NY,NX)*VLSoilPoreMicP(L,NY,NX)
+              TVW=TVW+FW*(VLWatMicP(L,NY,NX)+VLiceMicP(L,NY,NX))
             ENDIF
           ENDDO D165
 
           IF((IFLGV(NY,NX).EQ.0 .AND. TVW.LT.TWP+FIRRA(NY,NX)*(TFZ-TWP)) &
-            .OR.(IFLGV(NY,NX).EQ.1.AND.PSILZ(1,NY,NX).LT.FIRRA(NY,NX)))THEN
+            .OR.(IFLGV(NY,NX).EQ.1.AND.PSICanPDailyMin(1,NY,NX).LT.FIRRA(NY,NX)))THEN
             RR=AZMAX1(TFZ-TVW)
             IF(RR.GT.0.0_r8)THEN
               D170: DO J=IIRRA(3,NY,NX),IIRRA(4,NY,NX)
@@ -379,7 +379,7 @@
               ENDDO D170
               WDPTH(I,NY,NX)=DIRRA(2,NY,NX)
               WRITE(*,2222)'auto',IYRC,I,IIRRA(3,NY,NX),IIRRA(4,NY,NX) &
-                ,IFLGV(NY,NX),RR,TFZ,TVW,TWP,FIRRA(NY,NX),PSILZ(1,NY,NX) &
+                ,IFLGV(NY,NX),RR,TFZ,TVW,TWP,FIRRA(NY,NX),PSICanPDailyMin(1,NY,NX) &
                 ,CIRRA(NY,NX),DIRRA1,WDPTH(I,NY,NX)
 
 2222  FORMAT(A8,5I6,40E12.4)

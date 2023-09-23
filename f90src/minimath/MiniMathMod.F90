@@ -4,6 +4,7 @@ module minimathmod
 ! Some small subroutines/function to do safe math.
 
   use data_kind_mod, only : r8 => DAT_KIND_R8
+  use EcoSimConst
   implicit none
   character(len=*),private, parameter :: mod_filename = __FILE__
   private
@@ -14,7 +15,7 @@ module minimathmod
   public :: isLeap
   public :: isnan
   public :: AZMAX1,AZMIN1,AZMAX1t
-
+  public :: GetMolAirPerm3
   interface AZMAX1
     module procedure AZMAX1_s
     module procedure AZMAX1_d
@@ -26,9 +27,9 @@ module minimathmod
   end interface AZMIN1
 
   public :: addone
+  public :: RichardsonNumber
   real(r8), parameter :: tiny_val=1.e-20_r8
   contains
-
 
    pure function isnan(a)result(ans)
    implicit none
@@ -76,7 +77,7 @@ module minimathmod
   implicit none
   real(r8), intent(in) :: tempK
 
-  real(r8) :: ans  !(10^3 kg/m3)
+  real(r8) :: ans  !ton/m3, i.e. (ans*10^3=kg/m3) in terms vapor concentration, 2.173~18/8.314
   ans=2.173E-03_r8/tempK*0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/tempK))
   end function vapsat
 
@@ -200,5 +201,34 @@ module minimathmod
   ac=a/c;bc=b/c  
   ans=abs((ac-bc)/(ac+bc))<tiny_val
   end function isclose
- 
+
+! ----------------------------------------------------------------------
+
+  pure function RichardsonNumber(RIB,TK1,TK2)result(ans)
+  implicit none
+  real(r8), intent(in) :: RIB  !isothermal RI
+  real(r8), intent(in) :: TK1, TK2
+
+  real(r8) :: ans
+
+  ans = AMAX1(-0.3_r8,AMIN1(0.075_r8,RIB*(TK1-TK2)))
+  
+  end function RichardsonNumber
+! ----------------------------------------------------------------------
+  pure function GetMolAirPerm3(TKair,Patm_Pa)result(ans)
+  implicit none
+  real(r8), intent(in) :: TKair
+  real(r8), optional, intent(in) :: Patm_Pa  !atmospheric pressure in Pascal
+
+  real(r8) :: ans
+
+  if(present(Patm_Pa))then
+    ans = Patm_Pa/(TKair*RGAS)
+  else
+    ans= 1.01325E5_r8/(TKair*RGAS)
+  endif
+
+  end function GetMolAirPerm3
+
+
 end module minimathmod

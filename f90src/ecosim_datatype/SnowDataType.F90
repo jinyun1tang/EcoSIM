@@ -8,39 +8,38 @@ module SnowDataType
   save
   character(len=*), private, parameter :: mod_filename = __FILE__
 
-  real(r8),target, allocatable ::  VHCPWM(:,:,:,:)                    !volumetric heat capacity of snowpack
-  real(r8),target, allocatable ::  FLQWM(:,:,:,:)                     !snowpack water flux
+  real(r8),target, allocatable ::  VLSnowHeatCapM(:,:,:,:)            !volumetric heat capacity of snowpack
+  real(r8),target, allocatable ::  WatFlowInSnowM(:,:,:,:)            !snowpack water flux
   real(r8),target, allocatable ::  QSM(:,:,:,:)                       !runoff snow flux, [m3 d-2 t-1]
   REAL(R8),target, allocatable ::  ALBS(:,:)                          !snowpack albedo
-  real(r8),target, allocatable ::  DENS0(:,:)                         !snowpack density, [Mg m-3]
-  real(r8),target, allocatable ::  TCW(:,:,:)                         !snow temperature, [oC]
-  real(r8),target, allocatable ::  TKW(:,:,:)                         !snow temperature, [K]
-  real(r8),target, allocatable ::  VHCPW(:,:,:)                       !snowpack heat capacity, [MJ m-3 K-1]
-  real(r8),target, allocatable ::  VOLSSL(:,:,:)                      !snow water equivalent volume in snowpack layer
-  real(r8),target, allocatable ::  VOLWSL(:,:,:)                      !snow water volume in snowpack layer
-  real(r8),target, allocatable ::  VOLISL(:,:,:)                      !snow ice volume in snowpack layer
-  real(r8),target, allocatable ::  VOLSL(:,:,:)                       !snow volume in snowpack layer
-  real(r8),target, allocatable ::  DENSS(:,:,:)                       !snowpack density, [Mg m-3]
-  real(r8),target, allocatable ::  DLYRS(:,:,:)                       !snowpack layer depth
-  real(r8),target, allocatable ::  XFLWW(:,:,:)                       !hourly snow water transfer
-  real(r8),target, allocatable ::  XFLWS(:,:,:)                       !hourly snow transfer
-  real(r8),target, allocatable ::  XFLWI(:,:,:)                       !hourly snow ice transfer
-  real(r8),target, allocatable ::  XHFLWW(:,:,:)                      !hourly convective heat flux from water transfer
-  real(r8),target, allocatable ::  XWFLXS(:,:,:)                      !hourly convective heat flux from snow transfer
-  real(r8),target, allocatable ::  XWFLXI(:,:,:)                      !hourly convective heat flux from ice transfer
-  real(r8),target, allocatable ::  cumSnowDepth(:,:,:)                      !cumulative depth to bottom of snowpack layer
-  real(r8),target, allocatable ::  VOLSI(:,:,:)                       !Initial snowpack volume, [m3 d-2]
-  real(r8),target, allocatable ::  SnowDepth(:,:)                         !snowpack depth, [m]
-  real(r8),target, allocatable ::  VOLSS(:,:)                         !snow volume in snowpack (water equivalent), [m3 d-2]
-  real(r8),target, allocatable ::  VOLWS(:,:)                         !water volume in snowpack, [m3 d-2]
-  real(r8),target, allocatable ::  VOLIS(:,:)                         !ice volume in snowpack, [m3 d-2]
-  real(r8),target, allocatable ::  VOLS(:,:)                          !snowpack volume, [m3 d-2]
-  real(r8),target, allocatable ::  VHCPWX(:,:)                        !snowpack heat capacity from previous time step, [MJ d-2 K-1]
+  real(r8),target, allocatable ::  NewSnowDens(:,:)                   !new snowpack density, [Mg m-3]
+  real(r8),target, allocatable ::  TCSnow(:,:,:)                         !snow temperature, [oC]
+  real(r8),target, allocatable ::  TKSnow(:,:,:)                         !snow temperature, [K]
+  real(r8),target, allocatable ::  VLHeatCapSnow(:,:,:)                       !snowpack heat capacity, [MJ m-3 K-1]
+  real(r8),target, allocatable ::  VLDrySnoWE(:,:,:)                  !water equivalent dry snow in snowpack layer
+  real(r8),target, allocatable ::  VLWatSnow(:,:,:)                      !snow water volume in snowpack layer
+  real(r8),target, allocatable ::  VLIceSnow(:,:,:)                      !snow ice volume in snowpack layer
+  real(r8),target, allocatable ::  VLSnoDWI(:,:,:)                       !snow volume in snowpack layer
+  real(r8),target, allocatable ::  SnoDensL(:,:,:)                       !snowpack density, [Mg m-3]
+  real(r8),target, allocatable ::  SnowLayerThick(:,:,:)                 !snowpack layer thickness
+  real(r8),target, allocatable ::  WatXfer2SnoLay(:,:,:)                       !hourly snow water transfer
+  real(r8),target, allocatable ::  SnoXfer2SnoLay(:,:,:)                       !hourly snow transfer
+  real(r8),target, allocatable ::  IceXfer2SnoLay(:,:,:)                       !hourly snow ice transfer
+  real(r8),target, allocatable ::  HeatXfer2SnoLay(:,:,:)                      !hourly convective heat flux from water transfer
+
+  real(r8),target, allocatable ::  cumSnowDepth(:,:,:)                !cumulative depth to bottom of snowpack layer
+  real(r8),target, allocatable ::  VLSnowt0(:,:,:)                    !Initial snowpack volume, [m3 d-2]
+  real(r8),target, allocatable ::  SnowDepth(:,:)                     !snowpack depth, [m]
+  real(r8),target, allocatable ::  VcumDrySnoWE(:,:)                  !snow volume in snowpack (water equivalent), [m3 d-2]
+  real(r8),target, allocatable ::  VcumWatSnow(:,:)                   !water volume in snowpack, [m3 d-2]
+  real(r8),target, allocatable ::  VcumIceSnow(:,:)                         !ice volume in snowpack, [m3 d-2]
+  real(r8),target, allocatable ::  VcumSnoDWI(:,:)                          !snowpack volume, [m3 d-2]
+  real(r8),target, allocatable ::  VLHeatCapSnowMN(:,:)               !minimum layer integrated snowpack heat capacity  [MJ d-2 K-1]
   real(r8),target, allocatable ::  FLSW(:,:,:)                        !water from snowpack to soil micropores
-  real(r8),target, allocatable ::  FLSWH(:,:,:)                       !water from snowpack to soil macropores
-  real(r8),target, allocatable ::  HFLSW(:,:,:)                       !convective heat from snowpack to soil
-  real(r8),target, allocatable ::  FLSWR(:,:,:)                       !water flux from snowpack to litter
-  real(r8),target, allocatable ::  HFLSWR(:,:,:)                      !convective heat flux from snowpack to litter
+  real(r8),target, allocatable ::  WatConvSno2MacP(:,:,:)                       !water from snowpack to soil macropores
+  real(r8),target, allocatable ::  HeatConvSno2Soi(:,:,:)                       !convective heat from snowpack to soil
+  real(r8),target, allocatable ::  WatConvSno2LitR(:,:,:)                       !water flux from snowpack to litter
+  real(r8),target, allocatable ::  HeatConvSno2LitR(:,:,:)                      !convective heat flux from snowpack to litter
   real(r8),target, allocatable ::  QS(:,:,:)                          !snowpack runoff snow, [m3 d-2 h-1]
   real(r8),target, allocatable ::  QW(:,:,:)                          !snowpack runoff water, [m3 d-2 h-1]
   real(r8),target, allocatable ::  QI(:,:,:)                          !snowpack runoff ice, [m3 d-2 h-1]
@@ -68,39 +67,38 @@ contains
   subroutine InitSnowData
 
   implicit none
-  allocate(VHCPWM(60,JS,JY,JX));VHCPWM=0._r8
-  allocate(FLQWM(60,JS,JY,JX)); FLQWM=0._r8
+  allocate(VLSnowHeatCapM(60,JS,JY,JX));VLSnowHeatCapM=0._r8
+  allocate(WatFlowInSnowM(60,JS,JY,JX)); WatFlowInSnowM=0._r8
   allocate(QSM(60,2,JV,JH));    QSM=0._r8
   allocate(ALBS(JY,JX));        ALBS=0._r8
-  allocate(DENS0(JY,JX));       DENS0=0._r8
-  allocate(TCW(JS,JY,JX));      TCW=0._r8
-  allocate(TKW(JS,JY,JX));      TKW=0._r8
-  allocate(VHCPW(JS,JY,JX));    VHCPW=0._r8
-  allocate(VOLSSL(JS,JY,JX));   VOLSSL=0._r8
-  allocate(VOLWSL(JS,JY,JX));   VOLWSL=0._r8
-  allocate(VOLISL(JS,JY,JX));   VOLISL=0._r8
-  allocate(VOLSL(JS,JY,JX));    VOLSL=0._r8
-  allocate(DENSS(JS,JY,JX));    DENSS=0._r8
-  allocate(DLYRS(JS,JY,JX));    DLYRS=0._r8
-  allocate(XFLWW(JS,JY,JX));    XFLWW=0._r8
-  allocate(XFLWS(JS,JY,JX));    XFLWS=0._r8
-  allocate(XFLWI(JS,JY,JX));    XFLWI=0._r8
-  allocate(XHFLWW(JS,JY,JX));   XHFLWW=0._r8
-  allocate(XWFLXS(JS,JY,JX));   XWFLXS=0._r8
-  allocate(XWFLXI(JS,JY,JX));   XWFLXI=0._r8
+  allocate(NewSnowDens(JY,JX));       NewSnowDens=0._r8
+  allocate(TCSnow(JS,JY,JX));      TCSnow=0._r8
+  allocate(TKSnow(JS,JY,JX));      TKSnow=0._r8
+  allocate(VLHeatCapSnow(JS,JY,JX));    VLHeatCapSnow=0._r8
+  allocate(VLDrySnoWE(JS,JY,JX));   VLDrySnoWE=0._r8
+  allocate(VLWatSnow(JS,JY,JX));   VLWatSnow=0._r8
+  allocate(VLIceSnow(JS,JY,JX));   VLIceSnow=0._r8
+  allocate(VLSnoDWI(JS,JY,JX));    VLSnoDWI=0._r8
+  allocate(SnoDensL(JS,JY,JX));    SnoDensL=0._r8
+  allocate(SnowLayerThick(JS,JY,JX));    SnowLayerThick=0._r8
+  allocate(WatXfer2SnoLay(JS,JY,JX));    WatXfer2SnoLay=0._r8
+  allocate(SnoXfer2SnoLay(JS,JY,JX));    SnoXfer2SnoLay=0._r8
+  allocate(IceXfer2SnoLay(JS,JY,JX));    IceXfer2SnoLay=0._r8
+  allocate(HeatXfer2SnoLay(JS,JY,JX));   HeatXfer2SnoLay=0._r8
+
   allocate(cumSnowDepth(0:JS,JY,JX)); cumSnowDepth=0._r8
-  allocate(VOLSI(JS,JY,JX));    VOLSI=0._r8
+  allocate(VLSnowt0(JS,JY,JX));    VLSnowt0=0._r8
   allocate(SnowDepth(JY,JX));       SnowDepth=0._r8
-  allocate(VOLSS(JY,JX));       VOLSS=0._r8
-  allocate(VOLWS(JY,JX));       VOLWS=0._r8
-  allocate(VOLIS(JY,JX));       VOLIS=0._r8
-  allocate(VOLS(JY,JX));        VOLS=0._r8
-  allocate(VHCPWX(JY,JX));      VHCPWX=0._r8
+  allocate(VcumDrySnoWE(JY,JX));       VcumDrySnoWE=0._r8
+  allocate(VcumWatSnow(JY,JX));       VcumWatSnow=0._r8
+  allocate(VcumIceSnow(JY,JX));       VcumIceSnow=0._r8
+  allocate(VcumSnoDWI(JY,JX));        VcumSnoDWI=0._r8
+  allocate(VLHeatCapSnowMN(JY,JX));      VLHeatCapSnowMN=0._r8
   allocate(FLSW(JS,JY,JX));     FLSW=0._r8
-  allocate(FLSWH(JS,JY,JX));    FLSWH=0._r8
-  allocate(HFLSW(JS,JY,JX));    HFLSW=0._r8
-  allocate(FLSWR(JS,JY,JX));    FLSWR=0._r8
-  allocate(HFLSWR(JS,JY,JX));   HFLSWR=0._r8
+  allocate(WatConvSno2MacP(JS,JY,JX));    WatConvSno2MacP=0._r8
+  allocate(HeatConvSno2Soi(JS,JY,JX));    HeatConvSno2Soi=0._r8
+  allocate(WatConvSno2LitR(JS,JY,JX));    WatConvSno2LitR=0._r8
+  allocate(HeatConvSno2LitR(JS,JY,JX));   HeatConvSno2LitR=0._r8
   allocate(QS(2,JV,JH));        QS=0._r8
   allocate(QW(2,JV,JH));        QW=0._r8
   allocate(QI(2,JV,JH));        QI=0._r8
@@ -134,39 +132,37 @@ contains
     call destroy(trcs_solsml)
     call destroy(trcsa_XQS)
   endif
-  call destroy(VHCPWM)
-  call destroy(FLQWM)
+  call destroy(VLSnowHeatCapM)
+  call destroy(WatFlowInSnowM)
   call destroy(QSM)
   call destroy(ALBS)
-  call destroy(DENS0)
-  call destroy(TCW)
-  call destroy(TKW)
-  call destroy(VHCPW)
-  call destroy(VOLSSL)
-  call destroy(VOLWSL)
-  call destroy(VOLISL)
-  call destroy(VOLSL)
-  call destroy(DENSS)
-  call destroy(DLYRS)
-  call destroy(XFLWW)
-  call destroy(XFLWS)
-  call destroy(XFLWI)
-  call destroy(XHFLWW)
-  call destroy(XWFLXS)
-  call destroy(XWFLXI)
+  call destroy(NewSnowDens)
+  call destroy(TCSnow)
+  call destroy(TKSnow)
+  call destroy(VLHeatCapSnow)
+  call destroy(VLDrySnoWE)
+  call destroy(VLWatSnow)
+  call destroy(VLIceSnow)
+  call destroy(VLSnoDWI)
+  call destroy(SnoDensL)
+  call destroy(SnowLayerThick)
+  call destroy(WatXfer2SnoLay)
+  call destroy(SnoXfer2SnoLay)
+  call destroy(IceXfer2SnoLay)
+  call destroy(HeatXfer2SnoLay)
   call destroy(cumSnowDepth)
-  call destroy(VOLSI)
+  call destroy(VLSnowt0)
   call destroy(SnowDepth)
-  call destroy(VOLSS)
-  call destroy(VOLWS)
-  call destroy(VOLIS)
-  call destroy(VOLS)
-  call destroy(VHCPWX)
+  call destroy(VcumDrySnoWE)
+  call destroy(VcumWatSnow)
+  call destroy(VcumIceSnow)
+  call destroy(VcumSnoDWI)
+  call destroy(VLHeatCapSnowMN)
   call destroy(FLSW)
-  call destroy(FLSWH)
-  call destroy(HFLSW)
-  call destroy(FLSWR)
-  call destroy(HFLSWR)
+  call destroy(WatConvSno2MacP)
+  call destroy(HeatConvSno2Soi)
+  call destroy(WatConvSno2LitR)
+  call destroy(HeatConvSno2LitR)
   call destroy(QS)
   call destroy(QW)
   call destroy(QI)

@@ -36,7 +36,7 @@ implicit none
   integer,target,allocatable ::  IBTYP(:,:,:)                        !phenologically-driven above-ground turnover (all, foliar only, none)
   integer,target,allocatable ::  IRTYP(:,:,:)                        !grain type (below or above-ground), e.g. potato and onion are below 
   integer,target,allocatable ::  MY(:,:,:)                           !mycorrhizal type (no or yes)
-  integer,target,allocatable ::  IDTBL(:,:)                          !water table flag from site file
+  integer,target,allocatable ::  IDWaterTable(:,:)                   !water table flag from site file
 !----------------------------------------------------------------------
 
 contains
@@ -67,7 +67,7 @@ contains
   allocate(IBTYP(JP,JY,JX));    IBTYP=0
   allocate(IRTYP(JP,JY,JX));    IRTYP=0
   allocate(MY(JP,JY,JX));       MY=0
-  allocate(IDTBL(JY,JX));       IDTBL=0
+  allocate(IDWaterTable(JY,JX));       IDWaterTable=0
   end subroutine InitFlagData
 
 !----------------------------------------------------------------------
@@ -98,7 +98,7 @@ contains
   call destroy(IBTYP)
   call destroy(IRTYP)
   call destroy(MY)
-  call destroy(IDTBL)
+  call destroy(IDWaterTable)
   end subroutine DestructFlagData
 
 end module FlagDataType

@@ -72,7 +72,7 @@ module TillageMixMod
   real(r8) :: TOSN(jsken,1:jcplx)
   real(r8) :: TOSP(jsken,1:jcplx)
   real(r8) :: CORP,CORP0,XCORP0,DCORPZ
-  real(r8) :: TBKDX,TFC,TWP,TSCNV,TSCNH,TSAND
+  real(r8) :: TBKDX,TFC,TWP,TSatHydroCondVert,TSCNH,TSAND
   REAL(R8) :: ZNHUX0,ZNHUXI,ZNFNX0
   real(r8) :: TSILT,TCLAY,TGKC4,TGKCA,TGKCM,TGKCN,TGKCK
   real(r8) :: TP_soil(idsp_psoi_beg:idsp_psoi_end)
@@ -114,7 +114,7 @@ module TillageMixMod
     TBKDX=0.0_r8
     TFC=0.0_r8
     TWP=0.0_r8
-    TSCNV=0.0_r8
+    TSatHydroCondVert=0.0_r8
     TSCNH=0.0_r8
     TSAND=0.0_r8
     TSILT=0.0_r8
@@ -172,7 +172,7 @@ module TillageMixMod
 !
 !     IF(ORGC(0,NY,NX).GT.ZEROS(NY,NX))THEN
 !     XCORP0=AMAX1(XCORP(NY,NX),AMIN1(1.0,
-!    2(VHCPRX(NY,NX)/cpo)/ORGC(0,NY,NX)))
+!    2(VHeatCapLitR(NY,NX)/cpo)/ORGC(0,NY,NX)))
     XCORP0=AMAX1(0.001_r8,XCORP(NY,NX))
 !     ELSE
 !     XCORP0=1.0
@@ -297,10 +297,10 @@ module TillageMixMod
     ENDDO
 
     TZNFNG=ZNFNI(0,NY,NX)*CORP0
-    TVOLWR=VOLW(0,NY,NX)*CORP0
+    TVOLWR=VLWatMicP(0,NY,NX)*CORP0
     HFLXD=cpo*ORGC(0,NY,NX)*CORP0*TKS(0,NY,NX)
     HEATIN=HEATIN-HFLXD
-    HEATSO=HEATSO-HFLXD
+    HeatStoreLandscape=HeatStoreLandscape-HFLXD
     TENGYR=cpw*TVOLWR*TKS(0,NY,NX)
     ORGC(0,NY,NX)=DC
     ORGN(0,NY,NX)=DN
@@ -330,10 +330,10 @@ module TillageMixMod
       FertN_soil(NTN,0,NY,NX)=FertN_soil(NTN,0,NY,NX)*XCORP0
     ENDDO
 
-    VOLW(0,NY,NX)=VOLW(0,NY,NX)*XCORP0
-    VHCP(0,NY,NX)=cpo*ORGC(0,NY,NX)+cpw*VOLW(0,NY,NX)+cpi*VOLI(0,NY,NX)
-    VOLR(NY,NX)=VOLR(NY,NX)*XCORP0
-    VOLT(0,NY,NX)=VOLT(0,NY,NX)*XCORP0
+    VLWatMicP(0,NY,NX)=VLWatMicP(0,NY,NX)*XCORP0
+    VHeatCapacity(0,NY,NX)=cpo*ORGC(0,NY,NX)+cpw*VLWatMicP(0,NY,NX)+cpi*VLiceMicP(0,NY,NX)
+    VLitR(NY,NX)=VLitR(NY,NX)*XCORP0
+    VGeomLayer(0,NY,NX)=VGeomLayer(0,NY,NX)*XCORP0
     ZNHUX0=AMAX1(ZNHUX0,ZNHU0(0,NY,NX))
     ZNHUXI=AMAX1(ZNHUXI,ZNHUI(0,NY,NX))
     ZNFNX0=AMAX1(ZNFNX0,ZNFN0(0,NY,NX))
@@ -341,20 +341,20 @@ module TillageMixMod
 !
 !     REDISTRIBUTE SOIL STATE VARIABLES DURING TILLAGE
 !
-    DCORPZ=AMIN1(DCORP(I,NY,NX),CDPTHZ(NL(NY,NX),NY,NX))
+    DCORPZ=AMIN1(DCORP(I,NY,NX),CumSoilThickness(NL(NY,NX),NY,NX))
 !
 !     ACCUMULATE SOIL STATE VARIABLES WITHIN TILLAGE MIXING ZONE
 !
     DO L=NU(NY,NX),NL(NY,NX)
-      IF(CDPTHZ(L,NY,NX)-DLYR(3,L,NY,NX).LT.DCORPZ.AND.DLYR(3,L,NY,NX).GT.ZERO)THEN
-        TL=AMIN1(DLYR(3,L,NY,NX),DCORPZ-(CDPTHZ(L,NY,NX)-DLYR(3,L,NY,NX)))
+      IF(CumSoilThickness(L,NY,NX)-DLYR(3,L,NY,NX).LT.DCORPZ.AND.DLYR(3,L,NY,NX).GT.ZERO)THEN
+        TL=AMIN1(DLYR(3,L,NY,NX),DCORPZ-(CumSoilThickness(L,NY,NX)-DLYR(3,L,NY,NX)))
         FI=TL/DCORPZ
         TI=TL/DLYR(3,L,NY,NX)
-        TBKDX=TBKDX+FI*BKDSI(L,NY,NX)
-        TFC=TFC+FI*FC(L,NY,NX)
-        TWP=TWP+FI*WP(L,NY,NX)
-        TSCNV=TSCNV+FI*SCNV(L,NY,NX)
-        TSCNH=TSCNH+FI*SCNH(L,NY,NX)
+        TBKDX=TBKDX+FI*SoiBulkDensityt0(L,NY,NX)
+        TFC=TFC+FI*FieldCapacity(L,NY,NX)
+        TWP=TWP+FI*WiltPoint(L,NY,NX)
+        TSatHydroCondVert=TSatHydroCondVert+FI*SatHydroCondVert(L,NY,NX)
+        TSCNH=TSCNH+FI*SatHydroCondHrzn(L,NY,NX)
         TSAND=TSAND+TI*SAND(L,NY,NX)
         TSILT=TSILT+TI*SILT(L,NY,NX)
         TCLAY=TCLAY+TI*CLAY(L,NY,NX)
@@ -363,12 +363,12 @@ module TillageMixMod
         TGKCM=TGKCM+FI*GKCM(L,NY,NX)
         TGKCN=TGKCN+FI*GKCN(L,NY,NX)
         TGKCK=TGKCK+FI*GKCK(L,NY,NX)
-        TVOLW=TVOLW+TI*VOLW(L,NY,NX)
-        TVOLI=TVOLI+TI*VOLI(L,NY,NX)
-!     TVOLP=TVOLP+TI*VOLP(L,NY,NX)
-!     TVOLA=TVOLA+TI*VOLA(L,NY,NX)
-        TENGY=TENGY+TI*(cpw*(VOLW(L,NY,NX)+VOLWH(L,NY,NX)) &
-          +cpi*(VOLI(L,NY,NX)+VOLIH(L,NY,NX)))*TKS(L,NY,NX)
+        TVOLW=TVOLW+TI*VLWatMicP(L,NY,NX)
+        TVOLI=TVOLI+TI*VLiceMicP(L,NY,NX)
+!     TVOLP=TVOLP+TI*VLsoiAirP(L,NY,NX)
+!     TVOLA=TVOLA+TI*VLMicP(L,NY,NX)
+        TENGY=TENGY+TI*(cpw*(VLWatMicP(L,NY,NX)+VLWatMacP(L,NY,NX)) &
+          +cpi*(VLiceMicP(L,NY,NX)+VLiceMacP(L,NY,NX)))*TKS(L,NY,NX)
         DO NTN=ifertn_beg,ifertn_end
           TfertN_soil(NTN)=TfertN_soil(NTN)+TI*FertN_soil(NTN,L,NY,NX)
         ENDDO
@@ -458,15 +458,16 @@ module TillageMixMod
 
     D2000: DO  L=NU(NY,NX),LL
       IF(DLYR(3,L,NY,NX).GT.ZERO)THEN
-        TL=AMIN1(DLYR(3,L,NY,NX),DCORPZ-(CDPTHZ(L,NY,NX)-DLYR(3,L,NY,NX)))
+        TL=AMIN1(DLYR(3,L,NY,NX),DCORPZ-(CumSoilThickness(L,NY,NX)-DLYR(3,L,NY,NX)))
         FI=TL/DCORPZ
         TI=TL/DLYR(3,L,NY,NX)
         TX=1.0_r8-TI
-        BKDSI(L,NY,NX)=TI*(BKDSI(L,NY,NX)+CORP*(TBKDX-BKDSI(L,NY,NX)))+TX*BKDSI(L,NY,NX)
-        FC(L,NY,NX)=TI*(FC(L,NY,NX)+CORP*(TFC-FC(L,NY,NX)))+TX*FC(L,NY,NX)
-        WP(L,NY,NX)=TI*(WP(L,NY,NX)+CORP*(TWP-WP(L,NY,NX)))+TX*WP(L,NY,NX)
-        SCNV(L,NY,NX)=TI*(SCNV(L,NY,NX)+CORP*(TSCNV-SCNV(L,NY,NX)))+TX*SCNV(L,NY,NX)
-        SCNH(L,NY,NX)=TI*(SCNH(L,NY,NX)+CORP*(TSCNH-SCNH(L,NY,NX)))+TX*SCNH(L,NY,NX)
+        SoiBulkDensityt0(L,NY,NX)=TI*(SoiBulkDensityt0(L,NY,NX)+CORP*(TBKDX-SoiBulkDensityt0(L,NY,NX))) &
+          +TX*SoiBulkDensityt0(L,NY,NX)
+        FieldCapacity(L,NY,NX)=TI*(FieldCapacity(L,NY,NX)+CORP*(TFC-FieldCapacity(L,NY,NX)))+TX*FieldCapacity(L,NY,NX)
+        WiltPoint(L,NY,NX)=TI*(WiltPoint(L,NY,NX)+CORP*(TWP-WiltPoint(L,NY,NX)))+TX*WiltPoint(L,NY,NX)
+        SatHydroCondVert(L,NY,NX)=TI*(SatHydroCondVert(L,NY,NX)+CORP*(TSatHydroCondVert-SatHydroCondVert(L,NY,NX)))+TX*SatHydroCondVert(L,NY,NX)
+        SatHydroCondHrzn(L,NY,NX)=TI*(SatHydroCondHrzn(L,NY,NX)+CORP*(TSCNH-SatHydroCondHrzn(L,NY,NX)))+TX*SatHydroCondHrzn(L,NY,NX)
         SAND(L,NY,NX)=TI*SAND(L,NY,NX)+CORP*(FI*TSAND-TI*SAND(L,NY,NX))+TX*SAND(L,NY,NX)
         SILT(L,NY,NX)=TI*SILT(L,NY,NX)+CORP*(FI*TSILT-TI*SILT(L,NY,NX))+TX*SILT(L,NY,NX)
         CLAY(L,NY,NX)=TI*CLAY(L,NY,NX)+CORP*(FI*TCLAY-TI*CLAY(L,NY,NX))+TX*CLAY(L,NY,NX)
@@ -477,22 +478,22 @@ module TillageMixMod
         GKCN(L,NY,NX)=TI*(GKCN(L,NY,NX)+CORP*(TGKCN-GKCN(L,NY,NX)))+TX*GKCN(L,NY,NX)
         GKCK(L,NY,NX)=TI*(GKCK(L,NY,NX)+CORP*(TGKCK-GKCK(L,NY,NX)))+TX*GKCK(L,NY,NX)
         
-        ENGYM=VHCM(L,NY,NX)*TKS(L,NY,NX)
-        ENGYV=(cpw*(VOLW(L,NY,NX)+VOLWH(L,NY,NX))+cpi*(VOLI(L,NY,NX)+VOLIH(L,NY,NX)))*TKS(L,NY,NX)
-        VOLW(L,NY,NX)=TI*VOLW(L,NY,NX)+CORP*(FI*TVOLW-TI*VOLW(L,NY,NX))+TX*VOLW(L,NY,NX)+FI*TVOLWR
-        VOLI(L,NY,NX)=TI*VOLI(L,NY,NX)+CORP*(FI*TVOLI-TI*VOLI(L,NY,NX))+TX*VOLI(L,NY,NX)
-      VOLWX(L,NY,NX)=VOLW(L,NY,NX)
-!     VOLW(L,NY,NX)=VOLW(L,NY,NX)+CORP*VOLWH(L,NY,NX)
-!     VOLI(L,NY,NX)=VOLI(L,NY,NX)+CORP*VOLIH(L,NY,NX)
-!     VOLA(L,NY,NX)=VOLA(L,NY,NX)+CORP*VOLAH(L,NY,NX)
-!     VOLWH(L,NY,NX)=XCORP(NY,NX)*VOLWH(L,NY,NX)
-!     VOLIH(L,NY,NX)=XCORP(NY,NX)*VOLIH(L,NY,NX)
-!     VOLAH(L,NY,NX)=XCORP(NY,NX)*VOLAH(L,NY,NX)
-!     FHOL(L,NY,NX)=XCORP(NY,NX)*FHOL(L,NY,NX)
+        ENGYM=VHeatCapacitySoilM(L,NY,NX)*TKS(L,NY,NX)
+        ENGYV=(cpw*(VLWatMicP(L,NY,NX)+VLWatMacP(L,NY,NX))+cpi*(VLiceMicP(L,NY,NX)+VLiceMacP(L,NY,NX)))*TKS(L,NY,NX)
+        VLWatMicP(L,NY,NX)=TI*VLWatMicP(L,NY,NX)+CORP*(FI*TVOLW-TI*VLWatMicP(L,NY,NX))+TX*VLWatMicP(L,NY,NX)+FI*TVOLWR
+        VLiceMicP(L,NY,NX)=TI*VLiceMicP(L,NY,NX)+CORP*(FI*TVOLI-TI*VLiceMicP(L,NY,NX))+TX*VLiceMicP(L,NY,NX)
+      VLWatMicPX(L,NY,NX)=VLWatMicP(L,NY,NX)
+!     VLWatMicP(L,NY,NX)=VLWatMicP(L,NY,NX)+CORP*VLWatMacP(L,NY,NX)
+!     VLiceMicP(L,NY,NX)=VLiceMicP(L,NY,NX)+CORP*VLiceMacP(L,NY,NX)
+!     VLMicP(L,NY,NX)=VLMicP(L,NY,NX)+CORP*VLMacP(L,NY,NX)
+!     VLWatMacP(L,NY,NX)=XCORP(NY,NX)*VLWatMacP(L,NY,NX)
+!     VLiceMacP(L,NY,NX)=XCORP(NY,NX)*VLiceMacP(L,NY,NX)
+!     VLMacP(L,NY,NX)=XCORP(NY,NX)*VLMacP(L,NY,NX)
+!     SoilFracAsMacP(L,NY,NX)=XCORP(NY,NX)*SoilFracAsMacP(L,NY,NX)
         ENGYL=TI*ENGYV+CORP*(FI*TENGY-TI*ENGYV)+TX*ENGYV+FI*TENGYR
-        VHCP(L,NY,NX)=VHCM(L,NY,NX)+cpw*(VOLW(L,NY,NX)+VOLWH(L,NY,NX)) &
-          +cpi*(VOLI(L,NY,NX)+VOLIH(L,NY,NX))
-        TKS(L,NY,NX)=(ENGYM+ENGYL)/VHCP(L,NY,NX)
+        VHeatCapacity(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+cpw*(VLWatMicP(L,NY,NX)+VLWatMacP(L,NY,NX)) &
+          +cpi*(VLiceMicP(L,NY,NX)+VLiceMacP(L,NY,NX))
+        TKS(L,NY,NX)=(ENGYM+ENGYL)/VHeatCapacity(L,NY,NX)
         TCS(L,NY,NX)=units%Kelvin2Celcius(TKS(L,NY,NX))
         DO NTN=ifertn_beg,ifertn_end
           FertN_soil(NTN,L,NY,NX)=TI*FertN_soil(NTN,L,NY,NX) &

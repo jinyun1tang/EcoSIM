@@ -38,17 +38,15 @@ module BoundaryTranspMod
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
       D9585: DO L=NU(NY,NX),NL(NY,NX)
-        N1=NX
-        N2=NY
-        N3=L
+        N1=NX;N2=NY;N3=L
 !
 !     LOCATE ALL EXTERNAL BOUNDARIES AND SET BOUNDARY CONDITIONS
 !     ENTERED IN 'READS'
 !
-        D9580: DO  N=NCN(NY,NX),3
+        D9580: DO  N=FlowDirIndicator(NY,NX),3
           D9575: DO  NN=1,2
             IF(N.EQ.1)THEN
-!direction x
+              !WEST-EAST
               N4=NX+1
               N5=NY
               N4B=NX-1
@@ -64,9 +62,9 @@ module BoundaryTranspMod
                   M5=NY
                   M6=L
                   XN=-1.0
-                  RCHQF=RCHQE(M2,M1)
-                  RCHGFU=RCHGEU(M2,M1)
-                  RCHGFT=RCHGET(M2,M1)
+                  RCHQF=RechargEastSurf(M2,M1)
+                  RCHGFU=RechargEastSubSurf(M2,M1)
+                  RCHGFT=RechargRateEastWTBL(M2,M1)
                 ELSE
                   cycle
                 ENDIF
@@ -80,15 +78,15 @@ module BoundaryTranspMod
                   M5=NY
                   M6=L
                   XN=1.0
-                  RCHQF=RCHQW(M5,M4)
-                  RCHGFU=RCHGWU(M5,M4)
-                  RCHGFT=RCHGWT(M5,M4)
+                  RCHQF=RechargWestSurf(M5,M4)
+                  RCHGFU=RechargWestSubSurf(M5,M4)
+                  RCHGFT=RechargRateWestWTBL(M5,M4)
                 ELSE
                   cycle
                 ENDIF
               ENDIF
             ELSEIF(N.EQ.2)THEN
-!direction y
+              !NORTH-SOUTH
               N4=NX
               N5=NY+1
               N4B=NX
@@ -104,9 +102,9 @@ module BoundaryTranspMod
                   M5=NY+1
                   M6=L
                   XN=-1.0_r8
-                  RCHQF=RCHQS(M2,M1)
-                  RCHGFU=RCHGSU(M2,M1)
-                  RCHGFT=RCHGST(M2,M1)
+                  RCHQF=RechargSouthSurf(M2,M1)
+                  RCHGFU=RechargSouthSubSurf(M2,M1)
+                  RCHGFT=RechargRateSouthWTBL(M2,M1)
                 ELSE
                   cycle
                 ENDIF
@@ -120,15 +118,15 @@ module BoundaryTranspMod
                   M5=NY
                   M6=L
                   XN=1.0_r8
-                  RCHQF=RCHQN(M5,M4)
-                  RCHGFU=RCHGNU(M5,M4)
-                  RCHGFT=RCHGNT(M5,M4)
+                  RCHQF=RechargNorthSurf(M5,M4)
+                  RCHGFU=RechargNorthSubSurf(M5,M4)
+                  RCHGFT=RechargRateNorthWTBL(M5,M4)
                 ELSE
                   cycle
                 ENDIF
               ENDIF
             ELSEIF(N.EQ.3)THEN
-!vertical
+              !vertical
               N1=NX
               N2=NY
               N3=L
@@ -185,7 +183,7 @@ module BoundaryTranspMod
 !             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
 !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
 !
-          IF(NCN(N2,N1).NE.3.OR.N.EQ.3)THEN
+          IF(FlowDirIndicator(N2,N1).NE.3.OR.N.EQ.3)THEN
             call NetFluxMicroandMacropores(NY,NX,N,M,MX,N1,N2,N3,N4,N5,N6)
           ENDIF
         ENDDO D9580
@@ -310,10 +308,10 @@ module BoundaryTranspMod
   integer :: K,NTG,NTN,NTS
   real(r8) :: VFLW
 
-  IF(NN.EQ.1.AND.FLWM(M,N,M6,M5,M4).GT.0.0_r8 &
-    .OR.NN.EQ.2.AND.FLWM(M,N,M6,M5,M4).LT.0.0_r8)THEN
-    IF(VOLWM(M,M3,M2,M1).GT.ZEROS2(M2,M1))THEN
-      VFLW=AMAX1(-VFLWX,AMIN1(VFLWX,FLWM(M,N,M6,M5,M4)/VOLWM(M,M3,M2,M1)))
+  IF(NN.EQ.1.AND.WaterFlow2MicPM(M,N,M6,M5,M4).GT.0.0_r8 &
+    .OR.NN.EQ.2.AND.WaterFlow2MicPM(M,N,M6,M5,M4).LT.0.0_r8)THEN
+    IF(VLWatMicPM(M,M3,M2,M1).GT.ZEROS2(M2,M1))THEN
+      VFLW=AMAX1(-VFLWX,AMIN1(VFLWX,WaterFlow2MicPM(M,N,M6,M5,M4)/VLWatMicPM(M,M3,M2,M1)))
     ELSE
       VFLW=0.0_r8
     ENDIF
@@ -345,7 +343,7 @@ module BoundaryTranspMod
 
 !add irrigation flux
     DO NTS=ids_nuts_beg,ids_nuts_end
-      R3PoreSolFlx(NTS,N,M6,M5,M4)=FLWM(M,N,M6,M5,M4) &
+      R3PoreSolFlx(NTS,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4) &
         *trcn_irrig(NTS,M3,M2,M1)*trcs_VLN(NTS,M3,M2,M1)
     ENDDO
 
@@ -353,18 +351,18 @@ module BoundaryTranspMod
 !
 !     SOLUTE LOSS WITH SUBSURFACE MACROPORE WATER LOSS
 !
-!     FLWHM=water flux through soil macropore from watsub.f
-!     VOLWHM=macropore water-filled porosity from watsub.f
+!     WaterFlow2MacPM=water flux through soil macropore from watsub.f
+!     VLWatMacPM=macropore water-filled porosity from watsub.f
 !     RFH*S=solute diffusive flux through macropore
 !     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
 !             :OC=DOC,ON=DON,OP=DOP,OA=acetate
 !             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
 !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
 !
-  IF(NN.EQ.1.AND.FLWHM(M,N,M6,M5,M4).GT.0.0 &
-    .OR.NN.EQ.2.AND.FLWHM(M,N,M6,M5,M4).LT.0.0)THEN
-    IF(VOLWHM(M,M3,M2,M1).GT.ZEROS2(M2,M1))THEN
-      VFLW=AMAX1(-VFLWX,AMIN1(VFLWX,FLWHM(M,N,M6,M5,M4)/VOLWHM(M,M3,M2,M1)))
+  IF(NN.EQ.1.AND.WaterFlow2MacPM(M,N,M6,M5,M4).GT.0.0 &
+    .OR.NN.EQ.2.AND.WaterFlow2MacPM(M,N,M6,M5,M4).LT.0.0)THEN
+    IF(VLWatMacPM(M,M3,M2,M1).GT.ZEROS2(M2,M1))THEN
+      VFLW=AMAX1(-VFLWX,AMIN1(VFLWX,WaterFlow2MacPM(M,N,M6,M5,M4)/VLWatMacPM(M,M3,M2,M1)))
     ELSE
       VFLW=0.0_r8
     ENDIF
@@ -444,8 +442,8 @@ module BoundaryTranspMod
       call BoundaryRunoffandSnowXY(M,N,NN,N1,N2,M4,M5,RCHQF)
     ENDIF
 
-!     FLWM=water flux through soil micropore from watsub.f
-!     VOLWM=micropore water-filled porosity from watsub.f
+!     WaterFlow2MicPM=water flux through soil micropore from watsub.f
+!     VLWatMicPM=micropore water-filled porosity from watsub.f
 !     R*FLS=convective solute flux through micropores
 !     R*FLW,R*FLB=convective solute flux through micropores in non-band,band
 !     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
@@ -453,8 +451,8 @@ module BoundaryTranspMod
 !             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
 !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
 !
-    IF(VOLX(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
-      IF(NCN(M2,M1).NE.3.OR.N.EQ.3)THEN
+    IF(VLSoilPoreMicP(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
+      IF(FlowDirIndicator(M2,M1).NE.3.OR.N.EQ.3)THEN
 
         call BoundaryRunoffandSnowZ(M,N,NN,M1,M2,M3,M4,M5,M6)
       ENDIF
@@ -462,18 +460,18 @@ module BoundaryTranspMod
 !
 !     GASOUS LOSS WITH SUBSURFACE MICROPORE WATER GAIN
 !
-!     FLWM,FLWHM=micropore,macropore water flux from watsub.f
+!     WaterFlow2MicPM,WaterFlow2MacPM=micropore,macropore water flux from watsub.f
 !     XNPT=1/number of cycles NPH-1 for gas flux calculations
-!     VOLPM=air-filled porosity
+!     VLsoiAirPM=air-filled porosity
 !     R*FLG=convective gas flux
 !     X*FLG=convective gas flux
 !     gas code:*CO2*=CO2,*OXY*=O2,*CH4*=CH4,*Z2G*=N2,*Z2O*=N2O
 !             :*ZN3*=NH3,*H2G*=H2
 !
-    FLGM=(FLWM(M,N,M6,M5,M4)+FLWHM(M,N,M6,M5,M4))*XNPT
+    FLGM=(WaterFlow2MicPM(M,N,M6,M5,M4)+WaterFlow2MacPM(M,N,M6,M5,M4))*XNPT
     IF(NN.EQ.1.AND.FLGM.LT.0.0.OR.NN.EQ.2.AND.FLGM.GT.0.0)THEN
-      IF(VOLPM(M,M3,M2,M1).GT.ZEROS2(M2,M1))THEN
-        VFLW=-AMAX1(-VFLWX,AMIN1(VFLWX,FLGM/VOLPM(M,M3,M2,M1)))
+      IF(VLsoiAirPM(M,M3,M2,M1).GT.ZEROS2(M2,M1))THEN
+        VFLW=-AMAX1(-VFLWX,AMIN1(VFLWX,FLGM/VLsoiAirPM(M,M3,M2,M1)))
       ELSE
         VFLW=0.0_r8
       ENDIF
@@ -596,7 +594,7 @@ module BoundaryTranspMod
 !
 !     NET SOLUTE FLUX IN SNOWPACK
 !
-!     VHCPWM,VHCPWX=current,minimum volumetric heat capacity of snowpack
+!     VLSnowHeatCapM,VLHeatCapSnowMN=current,minimum volumetric heat capacity of snowpack
 !     T*BLS=net solute flux in snowpack
 !     R*BLS=solute flux in snowpack
 !
@@ -617,12 +615,12 @@ module BoundaryTranspMod
   integer :: NTG,NTN
 
   DO  LS=1,JS
-    IF(VHCPWM(M,LS,NY,NX).GT.VHCPWX(NY,NX))THEN
+    IF(VLSnowHeatCapM(M,LS,NY,NX).GT.VLHeatCapSnowMN(NY,NX))THEN
       LS2=MIN(JS,LS+1)
 !
 !     IF LOWER LAYER IS IN THE SNOWPACK
 !
-      IF(LS.LT.JS.AND.VHCPWM(M,LS2,N2,N1).GT.VHCPWX(N2,N1))THEN
+      IF(LS.LT.JS.AND.VLSnowHeatCapM(M,LS2,N2,N1).GT.VLHeatCapSnowMN(N2,N1))THEN
         DO NTG=idg_beg,idg_end-1
           trcg_TBLS(NTG,LS,N2,N1)=trcg_TBLS(NTG,LS,N2,N1) &
             +trcg_RBLS(NTG,LS,N2,N1)-trcg_RBLS(NTG,LS2,N2,N1)
@@ -670,14 +668,14 @@ module BoundaryTranspMod
   integer :: K,LL,NTS,NTG
 
   DO LL=N6,NL(NY,NX)
-    IF(VOLX(LL,N2,N1).GT.ZEROS2(N2,N1))THEN
+    IF(VLSoilPoreMicP(LL,N2,N1).GT.ZEROS2(N2,N1))THEN
       N6=LL
       exit
     ENDIF
   ENDDO
 
   IF(M.NE.MX)THEN
-    IF(VOLX(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
+    IF(VLSoilPoreMicP(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
       DO  K=1,jcplx
         TOCFLS(K,N3,N2,N1)=TOCFLS(K,N3,N2,N1)+ROCFLS(K,N,N3,N2,N1)-ROCFLS(K,N,N6,N5,N4)
         TONFLS(K,N3,N2,N1)=TONFLS(K,N3,N2,N1)+RONFLS(K,N,N3,N2,N1)-RONFLS(K,N,N6,N5,N4)
@@ -718,7 +716,7 @@ module BoundaryTranspMod
 !     R*FLG=convective+diffusive gas flux
 !     gas code:*CO*=CO2,*OX*=O2,*CH*=CH4,*NG*=N2,*N2*=N2O,*NH*=NH3,*HG*=H2
 !
-  IF(VOLX(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
+  IF(VLSoilPoreMicP(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
     DO NTG=idg_beg,idg_end-1
       RTGasADFlx(NTG,N3,N2,N1)=RTGasADFlx(NTG,N3,N2,N1) &
         +R3GasADFlx(NTG,N,N3,N2,N1)-R3GasADFlx(NTG,N,N6,N5,N4)

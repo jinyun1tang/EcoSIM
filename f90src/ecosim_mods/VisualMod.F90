@@ -135,14 +135,14 @@ module VisualMod
         TTCH=TTCH+HCH4G(NY,NX)
         IF(J.EQ.24)THEN
           IF(NU(NY,NX).EQ.7)THEN
-            SWC(NY,NX)=(VOLW(8,NY,NX)+AMIN1(VOLAH(8,NY,NX) &
-              ,VOLWH(8,NY,NX)))/VOLT(8,NY,NX)
+            SWC(NY,NX)=(VLWatMicP(8,NY,NX)+AMIN1(VLMacP(8,NY,NX) &
+              ,VLWatMacP(8,NY,NX)))/VGeomLayer(8,NY,NX)
           ELSEIF(NU(NY,NX).EQ.4)THEN
-            SWC(NY,NX)=(VOLW(5,NY,NX)+AMIN1(VOLAH(5,NY,NX) &
-              ,VOLWH(5,NY,NX)))/VOLT(5,NY,NX)
+            SWC(NY,NX)=(VLWatMicP(5,NY,NX)+AMIN1(VLMacP(5,NY,NX) &
+              ,VLWatMacP(5,NY,NX)))/VGeomLayer(5,NY,NX)
           ELSE
-            SWC(NY,NX)=(VOLW(2,NY,NX)+AMIN1(VOLAH(2,NY,NX) &
-              ,VOLWH(2,NY,NX)))/VOLT(2,NY,NX)
+            SWC(NY,NX)=(VLWatMicP(2,NY,NX)+AMIN1(VLMacP(2,NY,NX) &
+              ,VLWatMacP(2,NY,NX)))/VGeomLayer(2,NY,NX)
           ENDIF
         ENDIF
 !     GO TO 9990
@@ -220,7 +220,7 @@ module VisualMod
           OUT(16)=-TSH(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
           L=1
           D60: DO N=17,27
-            OUT(N)=(VOLW(L,NY,NX)+AMIN1(VOLAH(L,NY,NX),VOLWH(L,NY,NX)))/VOLT(L,NY,NX)
+            OUT(N)=(VLWatMicP(L,NY,NX)+AMIN1(VLMacP(L,NY,NX),VLWatMacP(L,NY,NX)))/VGeomLayer(L,NY,NX)
             L=L+1
           ENDDO D60
 
@@ -229,16 +229,16 @@ module VisualMod
             OUT(N)=TKS(L,NY,NX)
             L=L+1
           ENDDO D61
-          OUT(39)=-1000.0*CTRAN(1,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(40)=-1000.0*CTRAN(3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(41)=-1000.0*CTRAN(2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(39)=-1000.0*ETCanP(1,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(40)=-1000.0*ETCanP(3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(41)=-1000.0*ETCanP(2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
           OUT(42)=1000.0*UEVAP(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
           OUT(43)=OUT(42)-OUT(39)-OUT(40)-OUT(41)
           OUT(44)=1000.0*URUN(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
           OUT(45)=1000.0*UVOLO(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(46)=-(DPTHT(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX))
+          OUT(46)=-(DepthInternalWTBL(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX))
           OUT(47)=SnowDepth(NY,NX)
-          OUT(48)=ARLFC(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(48)=CanGLA(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
           OUT(49)=0.001_r8*WTLFE(ielmc,1,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
           OUT(50)=0.001_r8*WTLFE(ielmc,3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
           OUT(51)=0.001_r8*WTLFE(ielmc,2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -282,7 +282,7 @@ module VisualMod
       WRITE(20,2026)'SWC',IYRC,I,J,((SnowDepth(NY,NX) &
       ,NX=NHW,NHE),NY=NVN,NVS),DEFAULT &
       ,((SWC(NY,NX),NX=NHW,NHE),NY=NVN,NVS),DEFAULT &
-      ,((-(DPTHA(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)) &
+      ,((-(ActiveLayDepth(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)) &
       ,NX=NHW,NHE),NY=NVN,NVS)
 2026  FORMAT(A8,3I6,100E12.4)
     ENDIF

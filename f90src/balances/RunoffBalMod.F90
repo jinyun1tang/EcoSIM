@@ -43,7 +43,7 @@ implicit none
 !
     N1=NX
     N2=NY
-    D9980: DO N=NCN(NY,NX),3
+    D9980: DO N=FlowDirIndicator(NY,NX),3
       D9975: DO NN=1,2
         IF(N.EQ.1)THEN
           IF(NN.EQ.1)THEN
@@ -445,20 +445,20 @@ implicit none
 !     begin_execution
 !     SUBSURFACE BOUNDARY FLUXES OF WATER AND HEAT
 !
-!     FLW,FLWH,HFLW=micropore,macropore,heat flux through lateral and lower boundaries from watsub.f
+!     FLW,WaterFlowMacP,HFLW=micropore,macropore,heat flux through lateral and lower boundaries from watsub.f
 !     VOLWOU,HEATOU=cumulative water, heat loss through lateral and lower boundaries
-!     UVOLO,HVOLO=cumulative,hourly water loss through lateral and lower boundaries
+!     UVOLO,FWatDischarge=cumulative,hourly water loss through lateral and lower boundaries
 !
-  IF(NCN(NY,NX).NE.3.OR.N.EQ.3)THEN
-    HEATOU=HEATOU-XN*HFLW(N,N6,N5,N4)
-    WO=XN*(FLW(N,N6,N5,N4)+FLWH(N,N6,N5,N4))
+  IF(FlowDirIndicator(NY,NX).NE.3.OR.N.EQ.3)THEN
+    HEATOU=HEATOU-XN*HeatFlow2Soil(N,N6,N5,N4)
+    WO=XN*(WaterFlowSoiMicP(N,N6,N5,N4)+WaterFlowMacP(N,N6,N5,N4))
     IF(abs(WO)>0._r8)THEN
       VOLWOU=VOLWOU-WO
-      HVOLO(N2,N1)=HVOLO(N2,N1)-WO
+      FWatDischarge(N2,N1)=FWatDischarge(N2,N1)-WO
       UVOLO(N2,N1)=UVOLO(N2,N1)-WO
 !     IF((I/10)*10.EQ.I.AND.J.EQ.15)THEN
 !     WRITE(*,3488)'UVOLO',I,J,N6,N5,N4,N,XN,WO
-!    2,UVOLO(NY,NX),FLW(N,N6,N5,N4),FLWH(N,N6,N5,N4)
+!    2,UVOLO(NY,NX),WaterFlowSoiMicP(N,N6,N5,N4),WaterFlowMacP(N,N6,N5,N4)
 !3488  FORMAT(A8,6I4,12E12.4)
 !     ENDIF
 !
@@ -641,14 +641,14 @@ implicit none
 !
 !     SUBSURFACE FLUX ELECTRICAL CONDUCTIVITY
 !
-!     FLW,FLWH=micropore,macropore flux through lateral and lower boundaries from watsub.f
+!     FLW,WaterFlowMacP=micropore,macropore flux through lateral and lower boundaries from watsub.f
 !     X*FLS=hourly convective + diffusive solute flux through micropores from trnsfrs.f
 !     X*FLW,X*FLB= hourly convective + diffusive solute flux through micropores in non-band,band from trnsfrs.f
 !     X*FHS=hourly convective + diffusive solute flux through macropores from trnsfrs.f
 !     X*FHW,X*FHB= hourly convective + diffusive solute flux through macropores in non-band,band from trnsfrs.f
 !     ECNDQ=electrical conductivity of water flux
 !
-        WX=FLW(N,N6,N5,N4)+FLWH(N,N6,N5,N4)
+        WX=WaterFlowSoiMicP(N,N6,N5,N4)+WaterFlowMacP(N,N6,N5,N4)
         IF(ABS(WX).GT.ZEROS(N2,N1))THEN
           ECHY=0.337*AZMAX1((trcsa_XFLS(idsa_Hp,N,N6,N5,N4)+trcsa_XFHS(idsa_Hp,N,N6,N5,N4))/WX)
           ECOH=0.192*AZMAX1((trcsa_XFLS(idsa_OH,N,N6,N5,N4)+trcsa_XFHS(idsa_OH,N,N6,N5,N4))/WX)
@@ -666,7 +666,7 @@ implicit none
           ECNDX=ECHY+ECOH+ECAL+ECFE+ECCA+ECMG+ECNA+ECKA+ECCO+ECHC+ECSO+ECCL+ECNO
 !     IF((I/10)*10.EQ.I.AND.J.EQ.15)THEN
 !     WRITE(*,9992)'ECNDX',IYRC,I,J,N4,N5,N6,N,WX,ECNDX
-!    2,FLW(N,N6,N5,N4),FLWH(N,N6,N5,N4)
+!    2,WaterFlowSoiMicP(N,N6,N5,N4),WaterFlowMacP(N,N6,N5,N4)
 !9992  FORMAT(A8,7I4,4E12.4)
 !     ENDIF
         ELSE

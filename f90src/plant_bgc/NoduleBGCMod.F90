@@ -57,7 +57,7 @@ module NoduleBGCMod
     k_fine_litr=> pltpar%k_fine_litr,&
     CFOPE    =>  plt_soilchem%CFOPE, &
     INTYP    =>  plt_morph%INTYP   , &
-    TFN3     =>  plt_pheno%TFN3    , &
+    fTgrowCanP     =>  plt_pheno%fTgrowCanP    , &
     TCO2T    =>  plt_bgcr%TCO2T    , &
     RECO     =>  plt_bgcr%RECO     , &
     TCO2A    =>  plt_bgcr%TCO2A    , &
@@ -68,7 +68,7 @@ module NoduleBGCMod
     DMND     =>  plt_allom%DMND    , &
     CNND     =>  plt_allom%CNND    , &
     CPND     =>  plt_allom%CPND    , &
-    WTLSB    =>  plt_biom%WTLSB    , &
+    CanPBLeafShethC    =>  plt_biom%CanPBLeafShethC    , &
     EPOOL    =>  plt_biom%EPOOL    , &
     EPOLNB   =>  plt_biom%EPOLNB   , &
     ZEROP    =>  plt_biom%ZEROP    , &
@@ -138,13 +138,13 @@ module NoduleBGCMod
 !     CPOLNB,ZPOLNB,PPOLNB=nonstructural C,N,P in bacteria
 !     VMXO=specific respiration rate by bacterial N2 fixers
 !     WTNDB=bacterial C mass
-!     TFN3=temperature function for canopy growth
+!     fTgrowCanP=temperature function for canopy growth
 !     FCNPF=N,P constraint to bacterial activity
 !     WFNG=growth function of canopy water potential
 !
-    RCNDL=AZMAX1(AMIN1(EPOLNB(ielmc,NB,NZ),VMXO*WTNDBE(ielmc,NB,NZ))*FCNPF*TFN3(NZ)*WFNG)
+    RCNDL=AZMAX1(AMIN1(EPOLNB(ielmc,NB,NZ),VMXO*WTNDBE(ielmc,NB,NZ))*FCNPF*fTgrowCanP(NZ)*WFNG)
 !     CPOOLNX=EPOLNB(ielmc,NB,NZ)
-!     VMXOX=VMXO*WTNDBE(ielmc,NB,NZ)*FCNPF*TFN3(NZ)*WFNG
+!     VMXOX=VMXO*WTNDBE(ielmc,NB,NZ)*FCNPF*fTgrowCanP(NZ)*WFNG
 !
 !     NODULE MAINTENANCE RESPIRATION FROM SOIL TEMPERATURE,
 !     NODULE STRUCTURAL N
@@ -193,7 +193,7 @@ module NoduleBGCMod
 !     RCCC,RCCN,RCCP=remobilization coefficient for C,N,P
 !     RCCZN,RCCYN=min,max fractions for bacteria C recycling
 !     RCCXN,RCCQN=max fractions for bacteria N,P recycling
-!     WTLSB=leaf+petiole mass
+!     CanPBLeafShethC=leaf+petiole mass
 !     CCNDLB=bacteria:leaf+petiole ratio
 !     RDNDBX=effect of CCNDLB on bacteria decomposition rate
 !     SPNDX=specific bacterial decomposition rate at current CCNDLB
@@ -206,7 +206,7 @@ module NoduleBGCMod
     RCCC=RCCZN+CCC*RCCYN
     RCCN=CNC*RCCXN
     RCCP=CPC*RCCQN
-    SPNDX=SPNDL*SQRT(TFN3(NZ)*WFNG)
+    SPNDX=SPNDL*SQRT(fTgrowCanP(NZ)*WFNG)
     DO NE=1,npelms
       RXNDLE(NE)=SPNDX*WTNDBE(NE,NB,NZ)
     ENDDO
@@ -336,7 +336,7 @@ module NoduleBGCMod
 !     FROM NON-STRUCTURAL C,N,P CONCENTRATION DIFFERENCES
 !
 !     CPOOL,ZPOOL,PPOOL=branch non-structural C,N,P mass
-!     WTLSB=leaf+petiole C mass
+!     CanPBLeafShethC=leaf+petiole C mass
 !     WTNDB=bacterial C mass
 !     WTNDI=initial bacterial mass at infection
 !     FXRN=rate constant for plant-bacteria nonstructural C,N,P exchange
@@ -345,10 +345,10 @@ module NoduleBGCMod
 !     XFRC,XFRN,XFRC=nonstructural C,N,P transfer
 !     CPOLNB,ZPOLNB,PPOLNB=nonstructural C,N,P in bacteria
 !
-    IF(EPOOL(ielmc,NB,NZ).GT.ZEROP(NZ).AND.WTLSB(NB,NZ).GT.ZEROL(NZ))THEN
-      CCNDLB=WTNDBE(ielmc,NB,NZ)/WTLSB(NB,NZ)
-      WTLSB1=WTLSB(NB,NZ)
-      WTNDB1=AMIN1(WTLSB(NB,NZ),AMAX1(WTNDI*AREA3(NU),WTNDBE(ielmc,NB,NZ)))
+    IF(EPOOL(ielmc,NB,NZ).GT.ZEROP(NZ).AND.CanPBLeafShethC(NB,NZ).GT.ZEROL(NZ))THEN
+      CCNDLB=WTNDBE(ielmc,NB,NZ)/CanPBLeafShethC(NB,NZ)
+      WTLSB1=CanPBLeafShethC(NB,NZ)
+      WTNDB1=AMIN1(CanPBLeafShethC(NB,NZ),AMAX1(WTNDI*AREA3(NU),WTNDBE(ielmc,NB,NZ)))
       WTLSBT=WTLSB1+WTNDB1
       IF(WTLSBT.GT.ZEROP(NZ))THEN
         FXRNX=FXRN(INTYP(NZ))/(1.0+CCNDLB/CCNGB)
@@ -421,7 +421,7 @@ module NoduleBGCMod
     NU       =>   plt_site%NU        , &
     AREA3    =>   plt_site%AREA3     , &
     ZERO     =>   plt_site%ZERO      , &
-    TFN4     =>   plt_pheno%TFN4     , &
+    fTgrowRootP     =>   plt_pheno%fTgrowRootP     , &
     DMND     =>   plt_allom%DMND     , &
     CNND     =>   plt_allom%CNND     , &
     CPND     =>   plt_allom%CPND     , &
@@ -434,7 +434,7 @@ module NoduleBGCMod
     ESNC     =>   plt_bgcr%ESNC      , &
     UPNF     =>   plt_rbgc%UPNF      , &
     RUPNF    =>   plt_bgcr%RUPNF     , &
-    WTRTD    =>   plt_biom%WTRTD     , &
+    RootCPZR   =>   plt_biom%RootCPZR    , &
     WTNDLE   =>   plt_biom%WTNDLE    , &
     ZEROP    =>   plt_biom%ZEROP     , &
     EPOOLN   =>   plt_biom%EPOOLN    , &
@@ -442,7 +442,7 @@ module NoduleBGCMod
     EPOOLR   =>   plt_biom%EPOOLR    , &
     CFOPE    =>   plt_soilchem%CFOPE , &
     INTYP    =>   plt_morph%INTYP    , &
-    NIX      =>   plt_morph%NIX        &
+    NIXBotRootLayer     =>   plt_morph%NIXBotRootLayer       &
   )
 !     INTYP=N2 fixation: 1,2,3=rapid to slow root symbiosis
 !     WTNDL,WTNDLN,WTNDLP=bacterial C,N,P mass
@@ -451,8 +451,8 @@ module NoduleBGCMod
 !     CNND,CPND=bacterial N:C,P:C ratio from PFT file
 !
   IF(INTYP(NZ).GE.1.AND.INTYP(NZ).LE.3)THEN
-    D5400: DO L=NU,NIX(NZ)
-      IF(WTRTD(ipltroot,L,NZ).GT.ZEROL(NZ))THEN
+    D5400: DO L=NU,NIXBotRootLayer(NZ)
+      IF(RootCPZR(ipltroot,L,NZ).GT.ZEROL(NZ))THEN
 !
 !     INITIAL INFECTION
 !
@@ -509,12 +509,12 @@ module NoduleBGCMod
 !     CPOOLN,ZPOOLN,PPOOLN=nonstructural C,N,P in bacteria
 !     VMXO=specific respiration rate by bacterial N2 fixers
 !     WTNDL=bacterial C mass
-!     TFN4=temperature function for root growth
+!     fTgrowRootP=temperature function for root growth
 !     FCNPF=N,P constraint to bacterial activity
 !     WFNGR=growth function of root water potential
 !
         RCNDLM=AZMAX1(AMIN1(EPOOLN(ielmc,L,NZ) &
-          ,VMXO*WTNDLE(ielmc,L,NZ))*FCNPF*TFN4(L,NZ)*WFNGR(1,L))
+          ,VMXO*WTNDLE(ielmc,L,NZ))*FCNPF*fTgrowRootP(L,NZ)*WFNGR(1,L))
         CPOOLNX=EPOOLN(ielmc,L,NZ)
 !
 !     O2-LIMITED NODULE RESPIRATION FROM 'WFR' IN 'UPTAKE'
@@ -587,7 +587,7 @@ module NoduleBGCMod
         RCCC=RCCZN+CCC*RCCYN
         RCCN=CNC*RCCXN
         RCCP=CPC*RCCQN
-        SPNDX=SPNDL*SQRT(TFN4(L,NZ)*WFNGR(1,L))
+        SPNDX=SPNDL*SQRT(fTgrowRootP(L,NZ)*WFNGR(1,L))
         DO NE=1,npelms
           RXNDLE(NE)=SPNDX*WTNDLE(NE,L,NZ)
         ENDDO
@@ -723,10 +723,10 @@ module NoduleBGCMod
 !     CPOOLN,ZPOOLN,PPOOLN=nonstructural C,N,P in bacteria
 !
         IF(EPOOLR(ielmc,ipltroot,L,NZ).GT.ZEROP(NZ) &
-          .AND.WTRTD(ipltroot,L,NZ).GT.ZEROL(NZ))THEN
-          CCNDLR=WTNDLE(ielmc,L,NZ)/WTRTD(ipltroot,L,NZ)
-          WTRTD1=WTRTD(ipltroot,L,NZ)
-          WTNDL1=AMIN1(WTRTD(ipltroot,L,NZ),AMAX1(WTNDI*AREA3(NU),WTNDLE(ielmc,L,NZ)))
+          .AND.RootCPZR(ipltroot,L,NZ).GT.ZEROL(NZ))THEN
+          CCNDLR=WTNDLE(ielmc,L,NZ)/RootCPZR(ipltroot,L,NZ)
+          WTRTD1=RootCPZR(ipltroot,L,NZ)
+          WTNDL1=AMIN1(RootCPZR(ipltroot,L,NZ),AMAX1(WTNDI*AREA3(NU),WTNDLE(ielmc,L,NZ)))
           WTRTDT=WTRTD1+WTNDL1
           IF(WTRTDT.GT.ZEROP(NZ))THEN
             FXRNX=FXRN(INTYP(NZ))/(1.0_r8+CCNDLR/CCNGR)

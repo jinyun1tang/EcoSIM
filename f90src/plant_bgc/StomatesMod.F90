@@ -1,7 +1,7 @@
   module stomatesMod
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use EcosimConst
-  use minimathmod, only : AZMAX1
+  use minimathmod
   use PlantAPIData
   implicit none
 
@@ -23,7 +23,7 @@
   real(r8), PARAMETER :: FBS=0.2_r8*FDML    !leaf water content in bundle sheath in C4 CO2 fixation
   real(r8), PARAMETER :: FMP=0.8_r8*FDML    !leaf water content in mesophyll in C4 CO2 fixationn
   real(r8), PARAMETER :: C4KI=5.0E+06_r8    !nonstructural C inhibition constant on PEP carboxylase (uM)
-  real(r8), parameter :: FLG4Y(0:5)=real((/336.0,672.0,672.0,672.0,672.0,672.0/),r8)  !number of hours with no grain fill to terminate annuals
+  real(r8), parameter :: Hours2KillAnuals(0:5)=real((/336.0,672.0,672.0,672.0,672.0,672.0/),r8)  !number of hours with no grain fill to terminate annuals
 
   public :: stomates
   contains
@@ -38,7 +38,7 @@
   integer, intent(in) :: NZ
 
   integer :: K,L,M,NB,N
-  REAL(R8):: RACL
+  REAL(R8):: CanPbndlResist4CO2
   real(r8):: RI
 !     begin_execution
   associate(                            &
@@ -48,14 +48,14 @@
     TKCZ     =>  plt_ew%TKCZ      , &
     CO2E     =>  plt_site%CO2E    , &
     CO2Q     =>  plt_photo%CO2Q   , &
-    ARLFP    =>  plt_morph%ARLFP  , &
+    CanPLA    =>  plt_morph%CanPLA  , &
     ZEROP    =>  plt_biom%ZEROP   , &
     CNETX    =>  plt_bgcr%CNETX   , &
     SSIN     =>  plt_rad%SSIN     , &
     FMOL     =>  plt_photo%FMOL   , &
-    RSMN     =>  plt_photo%RSMN   , &
-    FCO2     =>  plt_photo%FCO2   , &
-    RSMH     =>  plt_photo%RSMH   , &
+    MinCanPStomaResistH2O     =>  plt_photo%MinCanPStomaResistH2O   , &
+    CanPCi2CaRatio     =>  plt_photo%CanPCi2CaRatio   , &
+    MaxCanPStomaResistH2O     =>  plt_photo%MaxCanPStomaResistH2O   , &
     CO2I     =>  plt_photo%CO2I     &
   )
 !
@@ -64,39 +64,43 @@
 !     CANOPY BOUNDARY LAYER RESISTANCE
 !
 !     RI=Richardson's number
-!     RIB=canopy isothermal Richardson�s number
+!     RIB=canopy isothermal Richardson's number
 !     TairK,TKCZ=air,canopy temperature
 !     RAZ=canopy isothermal boundary later resistance
-!     RACL=canopy boundary layer resistance to CO2
+!     CanPbndlResist4CO2=canopy boundary layer resistance to CO2, h/m
 !     FMOL=number of moles of air per m3
 !
-  RI=AMAX1(-0.3,AMIN1(0.075,RIB*(TairK-TKCZ(NZ))))
-  RACL=1.34*AMAX1(5.56E-03,RAZ(NZ)/(1.0-10.0*RI))
-  FMOL(NZ)=1.2194E+04/TKCZ(NZ)
+  RI=RichardsonNumber(RIB,TairK,TKCZ(NZ))
+
+  CanPbndlResist4CO2=1.34*AMAX1(5.56E-03,RAZ(NZ)/(1.0-10.0*RI))
+
+  !assuming pressure is one atmosphere
+  FMOL(NZ)=GetMolAirPerm3(TKCZ(NZ))
 !
 !     CANOPY CO2 CONCENTRATION FROM CO2 INFLUXES AND EFFLUXES
 !
 !     CO2Q,CO2E=CO2 concentrations in canopy air,atmosphere, umol mol-1 (ppmv)
 !     CNETX=net CO2 flux in canopy air from soil,plants, g d-2 h-1
-!
-  CO2Q(NZ)=CO2E-8.33E+04_r8*CNETX*RACL/FMOL(NZ)
+! assuming steady state, canopy CO2 concentration is computed with mass balance. 
+! how 8.33E+04 is determined. 
+  CO2Q(NZ)=CO2E-8.33E+04_r8*CNETX*CanPbndlResist4CO2/FMOL(NZ)
   CO2Q(NZ)=AMIN1(CO2E+200.0_r8,AZMAX1(CO2E-200.0_r8,CO2Q(NZ)))
 !
 !     MESOPHYLL CO2 CONCENTRATION FROM CI:CA RATIO ENTERED IN 'READQ'
 !
 !     CO2I=intercellular CO2 concentration
-!     FCO2=intercellular:atmospheric CO2 concn ratio from PFT file, parameter
+!     CanPCi2CaRatio=intercellular:atmospheric CO2 concn ratio from PFT file, parameter
 !     SSIN=sine of solar angle
-!     ARLFP=PFT leaf area
+!     CanPLA=PFT leaf area
 !
-  CO2I(NZ)=FCO2(NZ)*CO2Q(NZ)
+  CO2I(NZ)=CanPCi2CaRatio(NZ)*CO2Q(NZ)
 
-  IF(SSIN.GT.0.0.AND.ARLFP(NZ).GT.ZEROP(NZ))THEN
+  IF(SSIN.GT.0.0.AND.CanPLA(NZ).GT.ZEROP(NZ))THEN
 !
     call PhotoActivePFT(NZ)
   ELSE
 !
-    RSMN(NZ)=RSMH(NZ)
+    MinCanPStomaResistH2O(NZ)=MaxCanPStomaResistH2O(NZ)
   ENDIF
 
   RETURN
@@ -246,7 +250,7 @@
   real(r8) :: VOGRO
 !     begin_execution
   associate(                          &
-    ARLFL   =>  plt_morph%ARLFL , &
+    CanPLNBLA   =>  plt_morph%CanPLNBLA , &
     ZEROP   =>  plt_biom%ZEROP  , &
     O2L     =>  plt_photo%O2L   , &
     CO2L    =>  plt_photo%CO2L  , &
@@ -312,11 +316,11 @@
 !
 !     FOR EACH CANOPY LAYER
 !
-!     ARLFL=leaf area
+!     CanPLNBLA=leaf area
 !     SURFX=unself-shaded leaf surface area
 !
   DO L=JC1,1,-1
-    IF(ARLFL(L,K,NB,NZ).GT.ZEROP(NZ))THEN
+    IF(CanPLNBLA(L,K,NB,NZ).GT.ZEROP(NZ))THEN
       call C3PhotosynsCanopyLayerL(L,K,NB,NZ,CH2O)
     ENDIF
   ENDDO
@@ -339,7 +343,7 @@
   associate(                      &
     WGLFE   =>  plt_biom%WGLFE  , &
     ZEROP   =>  plt_biom%ZEROP  , &
-    ARLFL   =>  plt_morph%ARLFL , &
+    CanPLNBLA   =>  plt_morph%CanPLNBLA , &
     FDBKX   =>  plt_photo%FDBKX , &
     CHL4    =>  plt_photo%CHL4  , &
     O2L     =>  plt_photo%O2L   , &
@@ -421,11 +425,11 @@
 !
 !     FOR EACH CANOPY LAYER
 !
-!     ARLFL=leaf area
+!     CanPLNBLA=leaf area
 !     SURFX=unself-shaded leaf surface area
 !
   DO L=JC1,1,-1
-    IF(ARLFL(L,K,NB,NZ).GT.ZEROP(NZ))THEN
+    IF(CanPLNBLA(L,K,NB,NZ).GT.ZEROP(NZ))THEN
       call C4PhotosynsCanopyLayerL(L,K,NB,NZ,CH2O)
     ENDIF
   ENDDO
@@ -707,10 +711,10 @@
 !
 !     ISTYP=growth habit:0=annual,1=perennial from PFT file
 !     FLG4=number of hours with no grain fill after start of grain fill
-!     FLG4Y=number of hours with no grain fill to terminate annuals
+!     Hours2KillAnuals=number of hours with no grain fill to terminate annuals
 !
   IF(ISTYP(NZ).EQ.iplt_annual.AND.FLG4(NB,NZ).GT.0.0_r8)THEN
-    FDBKX(NB,NZ)=AZMAX1(1.0_r8-FLG4(NB,NZ)/FLG4Y(IWTYP(NZ)))
+    FDBKX(NB,NZ)=AZMAX1(1.0_r8-FLG4(NB,NZ)/Hours2KillAnuals(IWTYP(NZ)))
   ELSE
     FDBKX(NB,NZ)=1.0_r8
   ENDIF
@@ -752,7 +756,7 @@
     SO2    =>  plt_photo%SO2    , &
     CO2I   =>  plt_photo%CO2I   , &
     O2I    =>  plt_photo%O2I    , &
-    RSMH   =>  plt_photo%RSMH   , &
+    MaxCanPStomaResistH2O   =>  plt_photo%MaxCanPStomaResistH2O   , &
     XKCO2O =>  plt_photo%XKCO2O , &
     XKCO2L =>  plt_photo%XKCO2L , &
     XKCO2  =>  plt_photo%XKCO2    &
@@ -830,10 +834,10 @@
     FDBKX  =>  plt_photo%FDBKX  , &
     XKCO2O =>  plt_photo%XKCO2O , &
     VCGR4  =>  plt_photo%VCGR4  , &
-    RSMN   =>  plt_photo%RSMN   , &
+    MinCanPStomaResistH2O   =>  plt_photo%MinCanPStomaResistH2O   , &
     DCO2   =>  plt_photo%DCO2   , &
-    RSMH   =>  plt_photo%RSMH   , &
-    FRADP  =>  plt_rad%FRADP    , &
+    MaxCanPStomaResistH2O   =>  plt_photo%MaxCanPStomaResistH2O   , &
+    FracPARByCanP  =>  plt_rad%FracPARByCanP    , &
     NBR    =>  plt_morph%NBR      &
   )
 
@@ -866,19 +870,19 @@
 !     MINIMUM CANOPY STOMATAL RESISTANCE FROM CO2 CONCENTRATION
 !     DIFFERENCE DIVIDED BY TOTAL CO2 FIXATION
 !
-!     RSX,RSMN=minimum canopy stomatal resistance to CO2,H2O (h m-1)
+!     RSX,MinCanPStomaResistH2O=minimum canopy stomatal resistance to CO2,H2O (h m-1)
 !     CH2O=total PEP(C4) or rubisco(C3) carboxylation rate
-!     FRADP=fraction of radiation received by each PFT canopy
+!     FracPARByCanP=fraction of radiation received by each PFT canopy
 !     DCO2=difference between atmosph and intercellular CO2 concn (umol m-3)
 !     AREA=area of grid cell
 !     RSMY=minimum stomatal resistance for CO2 uptake (h m-1)
 ! hourly time step
   IF(CH2O.GT.ZEROP(NZ))THEN
-    RSX=FRADP(NZ)*DCO2(NZ)*AREA3(NU)/(CH2O*secsperhour)
+    RSX=FracPARByCanP(NZ)*DCO2(NZ)*AREA3(NU)/(CH2O*secsperhour)
   ELSE
-    RSX=RSMH(NZ)*1.56_r8
+    RSX=MaxCanPStomaResistH2O(NZ)*1.56_r8
   ENDIF
-  RSMN(NZ)=AMIN1(RSMH(NZ),AMAX1(RSMY,RSX*0.641_r8))
+  MinCanPStomaResistH2O(NZ)=AMIN1(MaxCanPStomaResistH2O(NZ),AMAX1(RSMY,RSX*0.641_r8))
   end associate
   end subroutine PhotoActivePFT
 

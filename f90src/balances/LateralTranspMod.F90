@@ -41,12 +41,12 @@ implicit none
   integer :: N4B,N5B
   real(r8) :: VTATM,VTGAS
   real(r8) :: trcg_VOLG(idg_beg:idg_end)
+  
 ! begin_execution
   call ZeroFluxArrays(NY,NX)
   call ZeroFluxAccumulators(NY,NX)
 
-  LG=0
-  LX=0
+  LG=0;LX=0
 
   D8575: DO L=NU(NY,NX),NL(NY,NX)
     !
@@ -69,44 +69,48 @@ implicit none
     trcg_VOLG(idg_NH3)=trc_gasml(idg_NH3,L,NY,NX)/natomw
     trcg_VOLG(idg_H2)=trc_gasml(idg_H2,L,NY,NX)/2.0_r8
 
-    VTATM=AZMAX1(1.2194E+04_r8*VOLP(L,NY,NX)/TKS(L,NY,NX))
+    VTATM=AZMAX1(1.2194E+04_r8*VLsoiAirP(L,NY,NX)/TKS(L,NY,NX))
 !   NH3B does not have explicit gas species, so there is an inconsistency
 !   with respect to the actual ebullition calculation, which involves
 !   NH3B
 
     VTGAS=sum(trcg_VOLG(idg_beg:idg_end-1))
 
+    !air-concentration insignificant, or total gas volume > allwed air
+    !LX==1, then too less air, or gas pressure > atmosphere
     IF(THETP(L,NY,NX).LT.THETX.OR.VTGAS.GT.VTATM)LX=1
-    IF(THETP(L,NY,NX).GE.THETX.AND.LX.EQ.0)LG=L
 
-    VOLW1(L,NY,NX)=VOLW(L,NY,NX)
-    VOLI1(L,NY,NX)=VOLI(L,NY,NX)
-    VOLWH1(L,NY,NX)=VOLWH(L,NY,NX)
-    VOLIH1(L,NY,NX)=VOLIH(L,NY,NX)
+    IF(THETP(L,NY,NX).GE.THETX.AND.LX.EQ.0)LG=L
+    !make a copy of soil water/ice in micro- and macropores
+    VLWatMicP1(L,NY,NX)=VLWatMicP(L,NY,NX)
+    VLiceMicP1(L,NY,NX)=VLiceMicP(L,NY,NX)
+    VLWatMacP1(L,NY,NX)=VLWatMacP(L,NY,NX)
+    VLiceMacP1(L,NY,NX)=VLiceMacP(L,NY,NX)
 
 !
   !     NET WATER, HEAT, GAS, SOLUTE, SEDIMENT FLUX
   !
   !     N3,N2,N1=L,NY,NX of source grid cell
   !     N6,N5,N4=L,NY,NX of destination grid cell
-  !
-    N1=NX
-    N2=NY
-    N3=L
-    D8580: DO N=NCN(NY,NX),3
+  ! source
+    N1=NX;N2=NY;N3=L
+    D8580: DO N=FlowDirIndicator(NY,NX),3
       IF(N.EQ.1)THEN
-        N4=NX+1
+        !exchange in the x direction, west-east
+        N4=NX+1   !east
         N5=NY
-        N4B=NX-1
+        N4B=NX-1  !west
         N5B=NY
         N6=L
       ELSEIF(N.EQ.2)THEN
+        !exchange in the y direction, north-south
         N4=NX
-        N5=NY+1
+        N5=NY+1    !south
         N4B=NX
-        N5B=NY-1
+        N5B=NY-1   !north
         N6=L
       ELSEIF(N.EQ.3)THEN
+        !vertical
         N4=NX
         N5=NY
         N6=L+1
@@ -114,14 +118,16 @@ implicit none
 !
 !
       IF(L.EQ.NUM(N2,N1))THEN
+        !top layer
         IF(N.NE.3)THEN
+          !horizontal exchange
+          call OMH2OFluxesFromRunoff(N,N1,N2,N4,N5,N4B,N5B)
 
-          call FluxesFromRunoff(N,N1,N2,N4,N5,N4B,N5B)
-
-          call FluxFromSnowRunoff(N,N1,N2,N4,N5,N4B,N5B)
+          call MassFluxFromSnowRunoff(N,N1,N2,N4,N5,N4B,N5B)
           !
     !
         ELSEIF(N.EQ.3)THEN
+          !vertical direction
           call SaltFromRunoffSnowpack(N1,N2,NY,NX)
         ENDIF
 !
@@ -129,19 +135,19 @@ implicit none
         call TotalFluxFromSedmentTransp(N,N1,N2,N4,N5,N4B,N5B,NY,NX)
       ENDIF
 !
-      call FluxBetweenGrids(N,N1,N2,N3,N4,N5,N6,NY,NX)
+      call FluxThruGrids(N,N1,N2,N3,N4,N5,N6,NY,NX)
     ENDDO D8580
 !
 !     NET FREEZE-THAW
 !
-!     TTHAW,TTHAWH=net freeze-thaw flux in micropores,macropores
-!     THTHAW=net freeze-thaw latent heat flux
-!     THAW,THAWH=freeze-thaw flux in micropores,macropores from watsub.f
-!     HTHAW=freeze-thaw latent heat flux from watsub.f
+!     WatIceThawMicP,WatIceThawMacP=net freeze-thaw flux in micropores,macropores
+!     THeatSoiThaw=net freeze-thaw latent heat flux
+!     THAW,TLIceThawMacP=freeze-thaw flux in micropores,macropores from watsub.f
+!     TLPhaseChangeHeat2Soi=freeze-thaw latent heat flux from watsub.f
   !
-    TTHAW(N3,N2,N1)=TTHAW(N3,N2,N1)+THAW(N3,N2,N1)
-    TTHAWH(N3,N2,N1)=TTHAWH(N3,N2,N1)+THAWH(N3,N2,N1)
-    THTHAW(N3,N2,N1)=THTHAW(N3,N2,N1)+HTHAW(N3,N2,N1)
+    WatIceThawMicP(N3,N2,N1)=WatIceThawMicP(N3,N2,N1)+TLIceThawMicP(N3,N2,N1)
+    WatIceThawMacP(N3,N2,N1)=WatIceThawMacP(N3,N2,N1)+TLIceThawMacP(N3,N2,N1)
+    THeatSoiThaw(N3,N2,N1)=THeatSoiThaw(N3,N2,N1)+TLPhaseChangeHeat2Soi(N3,N2,N1)
   ENDDO D8575
   end subroutine LateralTranspt
 
@@ -200,13 +206,13 @@ implicit none
 !     INITIALIZE WATER AND HEAT NET FLUX ACCUMULATORS WITHIN SOIL
 !
   DO  L=NU(NY,NX),NL(NY,NX)
-    TFLW(L,NY,NX)=0.0_r8
-    TFLWX(L,NY,NX)=0.0_r8
-    TFLWH(L,NY,NX)=0.0_r8
-    THFLW(L,NY,NX)=0.0_r8
-    TTHAW(L,NY,NX)=0.0_r8
-    TTHAWH(L,NY,NX)=0.0_r8
-    THTHAW(L,NY,NX)=0.0_r8
+    TWatFlowCellMicP(L,NY,NX)=0.0_r8
+    TWatFlowCellMicPX(L,NY,NX)=0.0_r8
+    TWaterFlowMacP(L,NY,NX)=0.0_r8
+    THeatFlow2Soil(L,NY,NX)=0.0_r8
+    WatIceThawMicP(L,NY,NX)=0.0_r8
+    WatIceThawMacP(L,NY,NX)=0.0_r8
+    THeatSoiThaw(L,NY,NX)=0.0_r8
 !
 !     INITIALIZE GAS AND SOLUTE NET FLUX ACCUMULATORS WITHIN SOIL
 !
@@ -236,7 +242,7 @@ implicit none
 
 !------------------------------------------------------------------------------------------
 
-  subroutine FluxesFromRunoff(N,N1,N2,N4,N5,N4B,N5B)
+  subroutine OMH2OFluxesFromRunoff(N,N1,N2,N4,N5,N4B,N5B)
   implicit none
   integer, intent(in) :: N,N1,N2,N4,N5,N4B,N5B
 
@@ -296,7 +302,7 @@ implicit none
   ENDDO D1202
   
 
-  end subroutine FluxesFromRunoff
+  end subroutine OMH2OFluxesFromRunoff
 !------------------------------------------------------------------------------------------
 
   subroutine TotalFluxFromSedmentTransp(N,N1,N2,N4 &
@@ -545,55 +551,69 @@ implicit none
   end subroutine TotalFluxFromSedmentTransp
 !------------------------------------------------------------------------------------------
 
-  subroutine FluxBetweenGrids(N,N1,N2,N3,N4,N5,N6,NY,NX)
+  subroutine FluxThruGrids(N,N1,N2,N3,N4,N5,N6,NY,NX)
   implicit none
-  integer, intent(in) :: N,N1,N2,N3,N4,N5,NY,NX
+  integer, intent(in) :: N          !exchagne along direction
+  integer, intent(in) :: NY,NX      !geophysical location
+  integer, intent(in) :: N1,N2,N3   !source grid indices
+  integer, intent(in) :: N4,N5      !dest grid indices  
   integer, intent(inout) :: N6
   integer :: LL,K,NTSA,NTS,NTG
+
   !     begin_execution
   !     NET HEAT, WATER FLUXES BETWEEN ADJACENT
   !     GRID CELLS
   !
-  !     TFLW,TFLWH,TFLWH=net micropore,macropore water flux, heat flux
+  !     TFLW,TWaterFlowMacP,TWaterFlowMacP=net micropore,macropore water flux, heat flux
   !     FLW,FLWH,HFLW=micropore,macropore water flux, heat flux from watsub.f
-  !     FLWNU,FLWHNU,HFLWNU=lake surface water flux, heat flux from watsub.f if lake surface disappears
-  !
-  IF(NCN(N2,N1).NE.3.OR.N.EQ.3)THEN
+  !     LakeSurfFlowMicP,FLWHNU,LakeSurfHeatFlux=lake surface water flux, heat flux from watsub.f if lake surface disappears
+  !when FlowDirIndicator /=3, it means lateral exchange is consdiered
+  !N==3 means vertical direction
+
+  IF(FlowDirIndicator(N2,N1).NE.3.OR.N.EQ.3)THEN
+    !locate the vertical layer for the dest grid
     D1200: DO LL=N6,NL(N5,N4)
-      IF(VOLX(LL,N2,N1).GT.ZEROS2(N2,N1))THEN
+      !modify the dest grid vertical location if needed
+      !by matching the vertical layer number between source and dest, if N/=3
+      !if N==3, skip insignificant layers
+      IF(VLSoilPoreMicP(LL,N2,N1).GT.ZEROS2(N2,N1))THEN
         N6=LL
         exit
       ENDIF
     ENDDO D1200
-    IF(VOLX(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
+
+    IF(VLSoilPoreMicP(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
       IF(N3.EQ.NU(N2,N1).AND.N.EQ.3)THEN
-        TFLW(N3,N2,N1)=TFLW(N3,N2,N1)+FLW(N,N3,N2,N1)-FLWNU(N5,N4)
-        TFLWX(N3,N2,N1)=TFLWX(N3,N2,N1)+FLWX(N,N3,N2,N1)-FLWXNU(N5,N4)
-        TFLWH(N3,N2,N1)=TFLWH(N3,N2,N1)+FLWH(N,N3,N2,N1)-FLWHNU(N5,N4)
-        THFLW(N3,N2,N1)=THFLW(N3,N2,N1)+HFLW(N,N3,N2,N1)-HFLWNU(N5,N4)
-        if(THFLW(N3,N2,N1)<-1.e10)then
-          write(*,*)'THFLW(N3,N2,N1)+HFLW(N,N3,N2,N1)-HFLWNU(N5,N4)',&
-            THFLW(N3,N2,N1),HFLW(N,N3,N2,N1),HFLWNU(N5,N4)
+        !vertical direction, source is at soil surface
+        TWatFlowCellMicP(N3,N2,N1)=TWatFlowCellMicP(N3,N2,N1)+WaterFlowSoiMicP(N,N3,N2,N1)-LakeSurfFlowMicP(N5,N4)
+        TWatFlowCellMicPX(N3,N2,N1)=TWatFlowCellMicPX(N3,N2,N1)+WaterFlowSoiMicPX(N,N3,N2,N1)-LakeSurfFlowMicPX(N5,N4)
+        TWaterFlowMacP(N3,N2,N1)=TWaterFlowMacP(N3,N2,N1)+WaterFlowMacP(N,N3,N2,N1)-LakeSurfFlowMacP(N5,N4)
+        THeatFlow2Soil(N3,N2,N1)=THeatFlow2Soil(N3,N2,N1)+HeatFlow2Soil(N,N3,N2,N1)-LakeSurfHeatFlux(N5,N4)
+
+        if(THeatFlow2Soil(N3,N2,N1)<-1.e10)then
+          write(*,*)'THeatFlow2Soil(N3,N2,N1)+HeatFlow2Soil(N,N3,N2,N1)-LakeSurfHeatFlux(N5,N4)',&
+            THeatFlow2Soil(N3,N2,N1),HeatFlow2Soil(N,N3,N2,N1),LakeSurfHeatFlux(N5,N4)
           write(*,*)'Ns=',N1,n2,n3,n4,n5
           call endrun(trim(mod_filename)//' at line',__LINE__)
         endif
       ELSE
-        TFLW(N3,N2,N1)=TFLW(N3,N2,N1)+FLW(N,N3,N2,N1)-FLW(N,N6,N5,N4)
-        TFLWX(N3,N2,N1)=TFLWX(N3,N2,N1)+FLWX(N,N3,N2,N1)-FLWX(N,N6,N5,N4)
-        TFLWH(N3,N2,N1)=TFLWH(N3,N2,N1)+FLWH(N,N3,N2,N1)-FLWH(N,N6,N5,N4)
-        THFLW(N3,N2,N1)=THFLW(N3,N2,N1)+HFLW(N,N3,N2,N1)-HFLW(N,N6,N5,N4)
-        if(THFLW(N3,N2,N1)<-1.e10)then
-          write(*,*)'THFLW(N3,N2,N1)+HFLW(N,N3,N2,N1)-HFLW(N,N6,N5,N4)',&
-            THFLW(N3,N2,N1),HFLW(N,N3,N2,N1),HFLW(N,N6,N5,N4)
+        TWatFlowCellMicP(N3,N2,N1)=TWatFlowCellMicP(N3,N2,N1)+WaterFlowSoiMicP(N,N3,N2,N1)-WaterFlowSoiMicP(N,N6,N5,N4)
+        TWatFlowCellMicPX(N3,N2,N1)=TWatFlowCellMicPX(N3,N2,N1)+WaterFlowSoiMicPX(N,N3,N2,N1)-WaterFlowSoiMicPX(N,N6,N5,N4)
+        TWaterFlowMacP(N3,N2,N1)=TWaterFlowMacP(N3,N2,N1)+WaterFlowMacP(N,N3,N2,N1)-WaterFlowMacP(N,N6,N5,N4)
+        THeatFlow2Soil(N3,N2,N1)=THeatFlow2Soil(N3,N2,N1)+HeatFlow2Soil(N,N3,N2,N1)-HeatFlow2Soil(N,N6,N5,N4)
+
+        if(THeatFlow2Soil(N3,N2,N1)<-1.e10)then
+          write(*,*)'THeatFlow2Soil(N3,N2,N1)+HeatFlow2Soil(N,N3,N2,N1)-HeatFlow2Soil(N,N6,N5,N4)',&
+            THeatFlow2Soil(N3,N2,N1),HeatFlow2Soil(N,N3,N2,N1),HeatFlow2Soil(N,N6,N5,N4)
           write(*,*)'Ns=',N,N1,n2,n3,n4,n5,n6
           call endrun(trim(mod_filename)//' at line',__LINE__)
         endif
       ENDIF
       !     IF(N1.EQ.1.AND.N3.EQ.1)THEN
       !     WRITE(*,6632)'TFLW',I,J,N,N1,N2,N3,N4,N5,N6,NU(N2,N1)
-      !    2,TFLW(N3,N2,N1),FLW(N,N3,N2,N1),FLW(N,N6,N5,N4),FLWNU(N5,N4)
-      !    3,THFLW(N3,N2,N1),HFLW(N,N3,N2,N1),HFLW(N,N6,N5,N4)
-      !    2,HFLWNU(N5,N4),VOLW(N3,N2,N1)
+      !    2,TWatFlowCellMicP(N3,N2,N1),WaterFlowSoiMicP(N,N3,N2,N1),WaterFlowSoiMicP(N,N6,N5,N4),LakeSurfFlowMicP(N5,N4)
+      !    3,THeatFlow2Soil(N3,N2,N1),HeatFlow2Soil(N,N3,N2,N1),HeatFlow2Soil(N,N6,N5,N4)
+      !    2,LakeSurfHeatFlux(N5,N4),VLWatMicP(N3,N2,N1)
 !6632  FORMAT(A8,10I4,12E16.8)
       !     ENDIF
       !
@@ -658,13 +678,13 @@ implicit none
         ENDDO
       ENDIF
     ELSE
-      TFLW(N3,N2,N1)=0.0_r8
-      TFLWX(N3,N2,N1)=0.0_r8
-      TFLWH(N3,N2,N1)=0.0_r8
-      THFLW(N3,N2,N1)=0.0_r8
-      TTHAW(N3,N2,N1)=0.0_r8
-      TTHAWH(N3,N2,N1)=0.0_r8
-      THTHAW(N3,N2,N1)=0.0_r8
+      TWatFlowCellMicP(N3,N2,N1)=0.0_r8
+      TWatFlowCellMicPX(N3,N2,N1)=0.0_r8
+      TWaterFlowMacP(N3,N2,N1)=0.0_r8
+      THeatFlow2Soil(N3,N2,N1)=0.0_r8
+      WatIceThawMicP(N3,N2,N1)=0.0_r8
+      WatIceThawMacP(N3,N2,N1)=0.0_r8
+      THeatSoiThaw(N3,N2,N1)=0.0_r8
       D8596: DO K=1,jcplx
         TOCFLS(K,N3,N2,N1)=0.0_r8
         TONFLS(K,N3,N2,N1)=0.0_r8
@@ -687,6 +707,6 @@ implicit none
       ENDIF
     ENDIF
   ENDIF
-  end subroutine FluxBetweenGrids
+  end subroutine FluxThruGrids
 
 end module LateralTranspMod

@@ -85,9 +85,9 @@ module MicAutoCPLXMod
     nf_hydro_methang  => micpar%nf_hydro_methang, &
     nf_aero_methanot  => micpar%nf_aero_methanot, &
     ZEROS  => micfor%ZEROS  ,    &
-    BKVL  => micfor%BKVL    ,    &
+    SoilMicPMassLayer  => micfor%SoilMicPMassLayer    ,    &
     litrm => micfor%litrm  , &
-    VOLX  => micfor%VOLX, &
+    VLSoilPoreMicP  => micfor%VLSoilPoreMicP, &
     ORGC   => micfor%ORGC  ,     &
     ROXYSff => micflx%ROXYSff  &
   )
@@ -117,7 +117,7 @@ module MicAutoCPLXMod
   !     SPOMK=effect of microbial C concentration on microbial decay
   !     RMOMK=effect of microbial C concentration on maintenance respn
   !
-  ORGCL=AMIN1(1.0E+05_r8*BKVL,ORGC)
+  ORGCL=AMIN1(1.0E+05_r8*SoilMicPMassLayer,ORGC)
   IF(ORGCL.GT.ZEROS)THEN
     DO M=1,2
       COMC=TOMCNK(M)/ORGCL
@@ -180,7 +180,7 @@ module MicAutoCPLXMod
 ! RUPOX, ROXYP=O2-limited, O2-unlimited rates of O2 uptake
 ! RUPMX=O2-unlimited rate of O2 uptake
 ! FOXYX=fraction of O2 uptake by N,K relative to total
-! XNPG=1/(NPH*NPT)
+! dts_gas=1/(NPH*NPT)
 ! ROXYF,ROXYL=net O2 gaseous, aqueous fluxes from previous hour
 ! OLSGL=aqueous O2 diffusivity
 ! OXYG,OXYS=gaseous, aqueous O2 amounts
@@ -205,7 +205,7 @@ module MicAutoCPLXMod
 !
 !     AUTOTROPHIC DENITRIFICATION
 !
-  IF(N.EQ.nf_amonia_oxi.AND.ROXYMff(NGL).GT.0.0_r8.AND.(.not.litrm.OR.VOLX.GT.ZEROS))THEN
+  IF(N.EQ.nf_amonia_oxi.AND.ROXYMff(NGL).GT.0.0_r8.AND.(.not.litrm.OR.VLSoilPoreMicP.GT.ZEROS))THEN
     call AutotrophDenitrificCatabolism(NGL,N,XCO2,VOLWZ,micfor,micstt,&
       naqfdiag,nmicf,nmics,micflx)
   ELSE
@@ -271,7 +271,7 @@ module MicAutoCPLXMod
     RPO4YU    => micfor%RPO4YU,   &
     ROQCY     => micfor%ROQCY,    &
     ROQAY     => micfor%ROQAY,    &
-    BKVL0     => micfor%BKVL0,   &
+    SoilMicPMassLayer0     => micfor%SoilMicPMassLayer0,   &
     Lsurf     => micfor%Lsurf,   &
     litrm     => micfor%litrm,   &
     ZEROS     => micfor%ZEROS,   &
@@ -383,7 +383,7 @@ module MicAutoCPLXMod
       FP14XRff(NGL)=AMAX1(FMN,FOMKff(NGL))
     ENDIF
   ENDIF
-  IF(Lsurf.AND.BKVL0.GT.ZEROS)THEN
+  IF(Lsurf.AND.SoilMicPMassLayer0.GT.ZEROS)THEN
     naqfdiag%TFNH4X=naqfdiag%TFNH4X+FNH4XRff(NGL)
     naqfdiag%TFNO3X=naqfdiag%TFNO3X+FNO3XRff(NGL)
     naqfdiag%TFPO4X=naqfdiag%TFPO4X+FPO4XRff(NGL)
@@ -718,13 +718,13 @@ module MicAutoCPLXMod
     litrm  => micfor%litrm  , &
     OLSGL => micfor%OLSGL , &
     ROXYL => micfor%ROXYL  , &
-    VOLX  => micfor%VOLX   , &
-    VOLY  => micfor%VOLY  , &
-    VOLPM  => micfor%VOLPM , &
-    VOLWM  => micfor%VOLWM , &
+    VLSoilPoreMicP  => micfor%VLSoilPoreMicP   , &
+    VLSoilMicP  => micfor%VLSoilMicP  , &
+    VLsoiAirPM  => micfor%VLsoiAirPM , &
+    VLWatMicPM  => micfor%VLWatMicPM , &
     FILM  => micfor%FILM , &
     THETPM => micfor%THETPM ,&
-    TORT => micfor%TORT , &
+    TortMicPM => micfor%TortMicPM , &
     ZERO => micfor%ZERO , &
     ZEROS => micfor%ZEROS , &
     DFGS => micfor%DFGS , &
@@ -740,21 +740,21 @@ module MicAutoCPLXMod
   )
 
   IF(ROXYPff(NGL).GT.ZEROS.AND.FOXYX.GT.ZERO)THEN
-    IF(.not.litrm.OR.VOLX.GT.ZEROS)THEN
+    IF(.not.litrm.OR.VLSoilPoreMicP.GT.ZEROS)THEN
       !
       !write(*,*)'MAXIMUM O2 UPAKE FROM POTENTIAL RESPIRATION OF EACH AEROBIC'
       !     POPULATION
       !
-      RUPMX=ROXYPff(NGL)*XNPG
-      ROXYFX=ROXYF*XNPG*FOXYX
-      OLSGL1=OLSGL*XNPG
+      RUPMX=ROXYPff(NGL)*dts_gas
+      ROXYFX=ROXYF*dts_gas*FOXYX
+      OLSGL1=OLSGL*dts_gas
       IF(.not.litrm)THEN
         OXYG1=OXYG*FOXYX
-        ROXYLX=ROXYL*XNPG*FOXYX
+        ROXYLX=ROXYL*dts_gas*FOXYX
       ELSE
-        OXYG1=COXYG*VOLPM(1)*FOXYX
+        OXYG1=COXYG*VLsoiAirPM(1)*FOXYX
         ROXYLX=(ROXYL+FLQRQ*COXR &
-          +FLQRI*COXQ)*XNPG*FOXYX
+          +FLQRI*COXQ)*dts_gas*FOXYX
       ENDIF
       OXYS1=OXYS*FOXYX
 !
@@ -769,25 +769,25 @@ module MicAutoCPLXMod
         !     OF AQUEOUS O2 FROM DISSOLUTION RATE CONSTANT 'DFGS'
         !     CALCULATED IN 'WATSUB'
         !
-        !     VOLWM,VOLPM,VOLX=water, air and total volumes
+        !     VLWatMicPM,VLsoiAirPM,VLSoilPoreMicP=water, air and total volumes
         !     ORAD=microbial radius,FILM=water film thickness
-        !     DIFOX=aqueous O2 diffusion, TORT=tortuosity
+        !     DIFOX=aqueous O2 diffusion, TortMicPM=tortuosity
         !     BIOS=microbial number, OMA=active biomass
         !     SOXYL=O2 solubility, OXKX=Km for O2 uptake
         !     OXYS,COXYS=aqueous O2 amount, concentration
         !     OXYG,COXYG=gaseous O2 amount, concentration
         !     RMPOX,ROXSK=O2 uptake
         !
-        THETW1=AZMAX1(safe_adb(VOLWM(M),VOLY))
+        THETW1=AZMAX1(safe_adb(VLWatMicPM(M),VLSoilMicP))
         RRADO=ORAD*(FILM(M)+ORAD)/FILM(M)
-        DIFOX=TORT(M)*OLSGL1*12.57_r8*BIOS*OMAff(NGL)*RRADO
-        VOLWOX=VOLWM(M)*SOXYL
-        VOLPOX=VOLPM(M)
+        DIFOX=TortMicPM(M)*OLSGL1*12.57_r8*BIOS*OMAff(NGL)*RRADO
+        VOLWOX=VLWatMicPM(M)*SOXYL
+        VOLPOX=VLsoiAirPM(M)
         VOLWPM=VOLWOX+VOLPOX
         DO  MX=1,NPT
           OXYG1=OXYG1+ROXYFX
           OXYS1=OXYS1+ROXYLX
-          COXYS1=AMIN1(COXYE*SOXYL,AZMAX1(safe_adb(OXYS1,(VOLWM(M)*FOXYX))))
+          COXYS1=AMIN1(COXYE*SOXYL,AZMAX1(safe_adb(OXYS1,(VLWatMicPM(M)*FOXYX))))
           X=DIFOX*COXYS1
           IF(X.GT.ZEROS.AND.OXYS1.GT.ZEROS)THEN
             B=-RUPMX-DIFOX*OXKX-X
@@ -1321,8 +1321,8 @@ module MicAutoCPLXMod
     ROXYMff=> nmicf%ROXYMff, &
     ROXYPff=> nmicf%ROXYPff, &
     CCH4E  => micfor%CCH4E  , &
-    VOLPM  => micfor%VOLPM  , &
-    VOLWM  => micfor%VOLWM  , &
+    VLsoiAirPM  => micfor%VLsoiAirPM  , &
+    VLWatMicPM  => micfor%VLWatMicPM  , &
     ZEROS2  => micfor%ZEROS2 , &
     ZEROS  => micfor%ZEROS , &
     THETPM  => micfor%THETPM, &
@@ -1348,10 +1348,10 @@ module MicAutoCPLXMod
 !     RCH4L=total aqueous CH4 exchange from previous hour
 !     RCH4F=total gaseous CH4 exchange from previous hour
 !     TCH4H+TCH4A=total CH4 generated from methanogenesis
-!     XNPG=1.0/(NPH*NPT)
+!     dts_gas=1.0/(NPH*NPT)
 !     CH4G1,CH4S1=CH4 gaseous, aqueous amounts
 !     CCH4E,CCH4G=CH4 gas concentration in atmosphere, soil
-!     VOLPM,VOLWM=air,water-filled porosity
+!     VLsoiAirPM,VLWatMicPM=air,water-filled porosity
 !     SCH4L=CH4 aqueous solubility
 !     CCK4=Km for CH4 uptake
 !     ECHO=efficiency CO2 conversion to biomass
@@ -1361,16 +1361,16 @@ module MicAutoCPLXMod
 !
   ECHZ=EH4X
   VMXA=TFNGff(NGL)*FCNPff(NGL)*OMAff(NGL)*VMX4
-  RCH4L1=RCH4L*XNPG
-  RCH4F1=RCH4F*XNPG
-  RCH4S1=(naqfdiag%TCH4H+naqfdiag%TCH4A)*XNPG
+  RCH4L1=RCH4L*dts_gas
+  RCH4F1=RCH4F*dts_gas
+  RCH4S1=(naqfdiag%TCH4H+naqfdiag%TCH4A)*dts_gas
   IF(litrm)THEN
-    CH4G1=CCH4E*VOLPM(1)
+    CH4G1=CCH4E*VLsoiAirPM(1)
   ELSE
-    CH4G1=CCH4G*VOLPM(1)
+    CH4G1=CCH4G*VLsoiAirPM(1)
   ENDIF
   CH4S1=CH4S
-  VMXA1=VMXA*XNPG
+  VMXA1=VMXA*dts_gas
   RVOXP=0.0_r8
   RGOMP=0.0_r8
 !
@@ -1378,19 +1378,19 @@ module MicAutoCPLXMod
 !     TO MAINTAIN AQUEOUS CH4 CONCENTRATION DURING OXIDATION
 !
   D320: DO M=1,NPH
-    IF(VOLWM(M).GT.ZEROS2)THEN
-      VOLWCH=VOLWM(M)*SCH4L
-      VOLWPM=VOLWCH+VOLPM(M)
+    IF(VLWatMicPM(M).GT.ZEROS2)THEN
+      VOLWCH=VLWatMicPM(M)*SCH4L
+      VOLWPM=VOLWCH+VLsoiAirPM(M)
       D325: DO MM=1,NPT
         CH4G1=CH4G1+RCH4F1
         CH4S1=CH4S1+RCH4L1+RCH4S1
-        CCH4S1=AZMAX1(safe_adb(CH4S1,VOLWM(M)))
+        CCH4S1=AZMAX1(safe_adb(CH4S1,VLWatMicPM(M)))
         FSBST=CCH4S1/(CCH4S1+CCK4)
         RVOXP1=AMIN1(AZMAX1(CH4S1)/(1.0+ECHO*ECHZ),VMXA1*FSBST)
         RGOMP1=RVOXP1*ECHO*ECHZ
         CH4S1=CH4S1-RVOXP1-RGOMP1
         IF(THETPM(M).GT.THETX)THEN
-          RCHDF=DFGS(M)*(AMAX1(ZEROS,CH4G1)*VOLWCH-CH4S1*VOLPM(M))/VOLWPM
+          RCHDF=DFGS(M)*(AMAX1(ZEROS,CH4G1)*VOLWCH-CH4S1*VLsoiAirPM(M))/VOLWPM
         ELSE
           RCHDF=0.0_r8
         ENDIF
@@ -1471,7 +1471,7 @@ module MicAutoCPLXMod
    CPOMCff  => micpar%CPOMCff   , &
    VLNH4    => micfor%VLNH4     , &
    VLNHB    => micfor%VLNHB     , &
-   VOLW     => micfor%VOLW      , &
+   VLWatMicP     => micfor%VLWatMicP      , &
    VLNO3    => micfor%VLNO3     , &
    VLNOB    => micfor%VLNOB     , &
    VLPO4    => micfor%VLPO4     , &
@@ -1530,7 +1530,7 @@ module MicAutoCPLXMod
 !     TFNG=temp+water stress
 !     FNH4S,FNHBS=fractions of NH4 in non-band, band
 !     RINHO,RINHB=substrate-unlimited NH4 mineraln-immobiln
-!     VOLW=water content
+!     VLWatMicP=water content
 !     ZNH4M,ZNHBM=NH4 not available for uptake in non-band, band
 !     FNH4X,FNB4X=fractions of biological NH4 demand in non-band, band
 !     RINH4,RINB4=substrate-limited NH4 mineraln-immobiln in non-band, band
@@ -1545,8 +1545,8 @@ module MicAutoCPLXMod
     RINHX=AMIN1(RINHP,BIOA*OMAff(NGL)*TFNGff(NGL)*Z4MX)
     RINHOff(NGL)=FNH4S*RINHX*CNH4X/(CNH4X+Z4KU)
     RINHBff(NGL)=FNHBS*RINHX*CNH4Y/(CNH4Y+Z4KU)
-    ZNH4M=Z4MN*VOLW*FNH4S
-    ZNHBM=Z4MN*VOLW*FNHBS
+    ZNH4M=Z4MN*VLWatMicP*FNH4S
+    ZNHBM=Z4MN*VLWatMicP*FNHBS
     RINH4ff(NGL)=AMIN1(FNH4X*AZMAX1((ZNH4S-ZNH4M)),RINHOff(NGL))
     RINB4ff(NGL)=AMIN1(FNB4X*AZMAX1((ZNH4B-ZNHBM)),RINHBff(NGL))
   ELSE
@@ -1569,7 +1569,7 @@ module MicAutoCPLXMod
 !     TFNG=temp+water stress
 !     FNO3S,FNO3B=fractions of NO3 in non-band, band
 !     RINOO,RINOB=substrate-unlimited NO3 immobiln
-!     VOLW=water content
+!     VLWatMicP=water content
 !     ZNO3M,ZNOBM=NO3 not available for uptake in non-band, band
 !     FNO3X,FNB3X=fractions of biological NO3 demand in non-band, band
 !     RINO3,RINB3=substrate-limited NO3 immobiln in non-band, band
@@ -1584,8 +1584,8 @@ module MicAutoCPLXMod
     RINOX=AMIN1(RINOP,BIOA*OMAff(NGL)*TFNGff(NGL)*ZOMX)
     RINOOff(NGL)=FNO3S*RINOX*CNO3X/(CNO3X+ZOKU)
     RINOBff(NGL)=FNO3B*RINOX*CNO3Y/(CNO3Y+ZOKU)
-    ZNO3M=ZOMN*VOLW*FNO3S
-    ZNOBM=ZOMN*VOLW*FNO3B
+    ZNO3M=ZOMN*VLWatMicP*FNO3S
+    ZNOBM=ZOMN*VLWatMicP*FNO3B
     RINO3ff(NGL)=AMIN1(FNO3X*AZMAX1((ZNO3S-ZNO3M)) &
       ,RINOOff(NGL))
     RINB3ff(NGL)=AMIN1(FNB3X*AZMAX1((ZNO3B-ZNOBM)) &
@@ -1627,8 +1627,8 @@ module MicAutoCPLXMod
     RIPOX=AMIN1(RIPOP,BIOA*OMAff(NGL)*TFNGff(NGL)*HPMX)
     RIPOOff(NGL)=FH2PS*RIPOX*CH2PX/(CH2PX+HPKU)
     RIPBOff(NGL)=FH2PB*RIPOX*CH2PY/(CH2PY+HPKU)
-    H2POM=HPMN*VOLW*FH2PS
-    H2PBM=HPMN*VOLW*FH2PB
+    H2POM=HPMN*VLWatMicP*FH2PS
+    H2PBM=HPMN*VLWatMicP*FH2PB
     RIPO4ff(NGL)=AMIN1(FPO4X*AZMAX1((H2PO4-H2POM)),RIPOOff(NGL))
     RIPOBff(NGL)=AMIN1(FPOBX*AZMAX1((H2POB-H2PBM)),RIPBOff(NGL))
   ELSE
@@ -1666,8 +1666,8 @@ module MicAutoCPLXMod
     RIP1X=AMIN1(RIP1P,BIOA*OMAff(NGL)*TFNGff(NGL)*HPMX)
     RIPO1ff(NGL)=FH1PS*RIP1X*CH1PX/(CH1PX+HPKU)
     RIPB1ff(NGL)=FH1PB*RIP1X*CH1PY/(CH1PY+HPKU)
-    H1POM=HPMN*VOLW*FH1PS
-    H1PBM=HPMN*VOLW*FH1PB
+    H1POM=HPMN*VLWatMicP*FH1PS
+    H1PBM=HPMN*VLWatMicP*FH1PB
     RIP14ff(NGL)=AMIN1(FP14X*AZMAX1((H1PO4-H1POM)) &
       ,RIPO1ff(NGL))
     RIP1Bff(NGL)=AMIN1(FP1BX*AZMAX1((H1POB-H1PBM)) &
@@ -1706,7 +1706,7 @@ module MicAutoCPLXMod
       CNH4Y=AZMAX1(CNH4B-Z4MN)
       RINHORff(NGL)=AMIN1(RINHPR,BIOA*OMAff(NGL)*TFNGff(NGL)*Z4MX) &
         *(FNH4S*CNH4X/(CNH4X+Z4KU)+FNHBS*CNH4Y/(CNH4Y+Z4KU))
-      ZNH4M=Z4MN*VOLW
+      ZNH4M=Z4MN*VLWatMicP
       RINH4Rff(NGL)=AMIN1(FNH4XRff(NGL)*AZMAX1((ZNH4T-ZNH4M)),RINHORff(NGL))
     ELSE
       RINHORff(NGL)=0.0_r8
@@ -1728,7 +1728,7 @@ module MicAutoCPLXMod
 !     TFNG=temp+water stress
 !     FNO3S,FNO3B=fractions of NO3 in non-band, band
 !     RINO3R=substrate-unlimited NO3 immobiln
-!     VOLW=water content
+!     VLWatMicP=water content
 !     ZNO3M=NO3 not available for uptake
 !     FNO3XR=fraction of biological NO3 demand
 !     RINO3R=substrate-limited NO3 immobiln
@@ -1740,7 +1740,7 @@ module MicAutoCPLXMod
       CNO3Y=AZMAX1(CNO3B-ZOMN)
       RINOORff(NGL)=AMAX1(RINOPR,BIOA*OMAff(NGL)*TFNGff(NGL)*ZOMX) &
         *(FNO3S*CNO3X/(CNO3X+ZOKU)+FNO3B*CNO3Y/(CNO3Y+ZOKU))
-      ZNO3M=ZOMN*VOLW
+      ZNO3M=ZOMN*VLWatMicP
       RINO3Rff(NGL)=AMIN1(FNO3XRff(NGL)*AZMAX1((ZNO3T-ZNO3M)),RINOORff(NGL))
     ELSE
       RINOORff(NGL)=0.0_r8
@@ -1762,7 +1762,7 @@ module MicAutoCPLXMod
 !     TFNG=temp+water stress
 !     FH2PS,FH2PB=fractions of H2PO4 in non-band, band
 !     RIPOOR=substrate-unlimited H2PO4 mineraln-immobiln
-!     VOLW=water content
+!     VLWatMicP=water content
 !     H2P4M=H2PO4 not available for uptake
 !     FPO4XR=fractions of biological H2PO4 demand
 !     RIPO4R=substrate-limited H2PO4 mineraln-immobiln
@@ -1774,7 +1774,7 @@ module MicAutoCPLXMod
       CH2PY=AZMAX1(CH2P4B-HPMN)
       RIPOORff(NGL)=AMIN1(RIPOPR,BIOA*OMAff(NGL)*TFNGff(NGL)*HPMX) &
         *(FH2PS*CH2PX/(CH2PX+HPKU)+FH2PB*CH2PY/(CH2PY+HPKU))
-      H2P4M=HPMN*VOLW
+      H2P4M=HPMN*VLWatMicP
       RIPO4Rff(NGL)=AMIN1(FPO4XRff(NGL)*AZMAX1((H2P4T-H2P4M)),RIPOORff(NGL))
     ELSE
       RIPOORff(NGL)=0.0_r8
@@ -1796,7 +1796,7 @@ module MicAutoCPLXMod
 !     TFNG=temp+water stress
 !     FH1PS,FH1PB=fractions of HPO4 in non-band, band
 !     RIPO1R=substrate-unlimited HPO4 mineraln-immobiln
-!     VOLW=water content
+!     VLWatMicP=water content
 !     H1P4M=HPO4 not available for uptake
 !     FP14XR=fraction of biological HPO4 demand
 !     RIP14R=substrate-limited HPO4 minereraln-immobiln
@@ -1810,7 +1810,7 @@ module MicAutoCPLXMod
       CH1PY=AZMAX1(CH1P4B-HPMN)
       RIPO1Rff(NGL)=AMIN1(RIP1PR,BIOA*OMAff(NGL)*TFNGff(NGL)*HPMX) &
         *(FH1PS*CH1PX/(CH1PX+HPKU)+FH1PB*CH1PY/(CH1PY+HPKU))
-      H1P4M=HPMN*VOLW
+      H1P4M=HPMN*VLWatMicP
       RIP14Rff(NGL)=AMIN1(FP14XRff(NGL)*AZMAX1((H1P4T-H1P4M)),RIPO1Rff(NGL))
     ELSE
       RIPO1Rff(NGL)=0.0_r8

@@ -38,6 +38,8 @@ implicit none
   character(len=8)  :: sim_yyyymmdd
   integer :: forc_periods(9)
   integer :: NPXS(3),NPYS(3),JOUTS(3),IOUTS(3)
+  integer :: NCYC_LITR  !number of subcycles for litr
+  integer :: NCYC_SNOW  !number of subcycles for snow
   logical :: lverb           !logical switch for verbose output
   logical :: do_rgres        !logical switch for regression tests
 
