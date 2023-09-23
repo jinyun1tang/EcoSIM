@@ -16,7 +16,7 @@ program EcoATSTest
 
   write(*,*) "Transferring data"
   ! Transfer data from ATS to EcoSIM
-  integer :: ncol = sizes%ncells_per_col_
+  !integer :: ncol = sizes%ncells_per_col_
   !type (BGCState) :: state
   !type (BGCProperties) :: props
   !call ATS2EcoSIMData(ncol, state, props, sizes)
