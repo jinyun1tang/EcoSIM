@@ -17,7 +17,7 @@ atm_ghg_in='../../../input_data/fatm_hist_GHGs_1750-2022.nc'
 
 lverbose=.false.
 plant_model=.true.
-micb_model=.true.
+microbial_model=.true.
 soichem_model=.true.
 !set up output variable lists
 !set up the first year of simulation
@@ -30,6 +30,8 @@ forc_periods=1980,1980,1,1981,1983,10,1991,2008,0
 !set up solvers
 NPXS=30,30,30      !number of cycles per hour for water,heat,solute flux calcns
 NPYS=10,10,10      !number of cycles per NPX for gas flux calcns
+NCYC_LITR=20
+NCYC_SNOW=20
 !set up output frequency
 JOUTS=1,3,3        !frequency on hourly scale, DATA(18
 hist_mfilt=8760
