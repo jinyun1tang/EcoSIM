@@ -41,7 +41,7 @@ module InitVegBGC
     write(*,*) "L = ", L, " of ", JLA
     ZAZI(L)=(L-0.5)*PICON/real(JLA,r8)
   ENDDO D205
-  write(*,*) "Loop over sky azimuth sectors""
+  write(*,*) "Loop over sky azimuth sectors"
   !JSA: number of sky azimuth sectors
   !JLA: number of leaf azimuth sectors
   D230: DO N=1,JSA

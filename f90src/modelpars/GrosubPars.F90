@@ -194,8 +194,10 @@ module GrosubPars
   integer :: npfts
 
   if(.not. file_exists(pft_file_in))then
-    call endrun(msg='Fail to locate plant trait file specified by pft_file_in in ' &
-      //mod_filename,line=__LINE__)
+    !call endrun(msg='Fail to locate plant trait file specified by pft_file_in in ' &
+    !  //mod_filename,line=__LINE__)
+    write(*,*) "Setting PFTs to one"
+    npfts=1
   else
     npfts=get_dim_len(pft_file_in, 'npfts')
     allocate(pftss(npfts))
