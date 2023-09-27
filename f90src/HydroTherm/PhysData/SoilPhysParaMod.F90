@@ -20,7 +20,7 @@ implicit none
   private
   character(len=*), parameter :: mod_filename=&
   __FILE__
-  PUBLIC :: CalcSoilWaterPotential
+  PUBLIC :: CalcSoilWatPotential
   public :: SetDeepSoil
   public :: CalcSoilThermConductivity
 

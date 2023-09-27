@@ -44,13 +44,13 @@ contains
   srad = data(:)
 
   call c_f_pointer(props%longwave_radiation%data, data, (/num_cols/))
-  lrad = data(:)
+  sunrad = data(:)
 
   call c_f_pointer(props%air_temperature%data, data, (/num_cols/))
   tairc = data(:)
 
   call c_f_pointer(props%vapor_pressure_air%data, data, (/num_cols/))
-  vpa = data(:)
+  vpair = data(:)
 
   call c_f_pointer(props%wind_speed%data, data, (/num_cols/))
   uwind = data(:)
