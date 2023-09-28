@@ -16,6 +16,7 @@ module MicBGCMod
   use MicStateTraitTypeMod, only : micsttype
   use MicForcTypeMod, only : micforctype
   use EcoSiMParDataMod, only : micpar
+  use MicrobMathFuncMod
   implicit none
 
   private
@@ -158,9 +159,8 @@ module MicBGCMod
   type(NitroOMcplxStateType),intent(inout):: ncplxs
   integer  :: K
   integer  :: M,N,NGL
-  real(r8) :: ACTV,ACTVM
   real(r8) :: ORGCL
-  real(r8) :: RTK,STK,TKSO
+  real(r8) :: TKSO
   real(r8) :: TOSC,TOSA,TOHC
   real(r8) :: TSRH
 !     begin_execution
@@ -221,9 +221,9 @@ module MicBGCMod
     k_POM=>micpar%k_POM                     , &
     is_activef_micb=> micpar%is_activef_micb, &
     n_anero_faculb  => micpar%n_anero_faculb, &
-    nf_amonia_oxi => micpar%nf_amonia_oxi, &
+    AmmoniaOxidizeBacteria => micpar%AmmoniaOxidizeBacteria, &
     litrm    => micfor%litrm  , &
-    VWatLitrX  => micfor%VWatLitrX , &
+    VWatLitRHoldCapcity  => micfor%VWatLitRHoldCapcity , &
     VLWatMicP   => micfor%VLWatMicP, &
     VOLW0   => micfor%VOLW0, &
     THETY  => micfor%THETY, &
@@ -274,8 +274,8 @@ module MicBGCMod
 !     WITH OFFSET FOR THERMAL ADAPTATION
   IF(litrm)THEN
     ! surface litter layer
-    KL=micpar%n_litrsfk
-    IF(VWatLitrX.GT.ZEROS2)THEN
+    KL=micpar%NumOfLitrCmplxs
+    IF(VWatLitRHoldCapcity.GT.ZEROS2)THEN
       THETR=VOLW0/VLitR
       THETZ=AZMAX1(THETR-THETY)
       VOLWZ=THETZ*VLitR
@@ -299,12 +299,16 @@ module MicBGCMod
 !     TFNX,TFNY=temperature function for growth,maintenance respiration
 !
   TKSO=TKS+OFFSET
-  RTK=RGAS*TKSO
-  STK=710.0_r8*TKSO
-  ACTV=1+EXP((197500._r8-STK)/RTK)+EXP((STK-222500._r8)/RTK)
-  TFNX=EXP(25.229_r8-62500._r8/RTK)/ACTV
-  ACTVM=1+EXP((195000._r8-STK)/RTK)+EXP((STK-232500._r8)/RTK)
-  TFNY=EXP(25.214_r8-62500._r8/RTK)/ACTVM
+
+  call MicrobPhysTempFun(TKSO, TFNX, TFNY)
+
+!  RTK=RGAS*TKSO
+!  STK=710.0_r8*TKSO
+!  ACTV=1+EXP((197500._r8-STK)/RTK)+EXP((STK-222500._r8)/RTK)
+!  TFNX=EXP(25.229_r8-62500._r8/RTK)/ACTV
+!  ACTVM=1+EXP((195000._r8-STK)/RTK)+EXP((STK-232500._r8)/RTK)
+!  TFNY=EXP(25.214_r8-62500._r8/RTK)/ACTVM
+
 !
 !     OXYI=inhibition of fermenters by O2
 !     ORGCL=SOC used to calculate microbial concentration
@@ -439,7 +443,7 @@ module MicBGCMod
 !
         TOMA=TOMA+OMAff(NGL)
 
-        IF(N.EQ.nf_amonia_oxi)THEN
+        IF(N.EQ.AmmoniaOxidizeBacteria)THEN
           TOMN=TOMN+OMAff(NGL)
         ENDIF
 
@@ -632,7 +636,7 @@ module MicBGCMod
     ENDIF
   ENDDO D760
 
-  N=micpar%nf_amonia_oxi
+  N=micpar%AmmoniaOxidizeBacteria
   nmicf%RVOXAAO=SUM(nmicf%RVOXA(JGniA(N):JGnfA(N)))
   nmicf%RVOXBAO=SUM(nmicf%RVOXB(JGniA(N):JGnfA(N)))
   DO  N=1,NFGs
@@ -806,7 +810,7 @@ module MicBGCMod
 !     GOMX=acetate effect on energy yield
 !     ECHZ=growth respiration efficiency of aceto. methanogenesis
 !
-  ELSEIF(N.EQ.micpar%n_aceto_methang)THEN
+  ELSEIF(N.EQ.micpar%AcetotroMethanogenArchea)THEN
 !     write(*,*)'AcetoMethanogenCatabolism'
     call AcetoMethanogenCatabolism(NGL,N,K,TFNX,WFNG,FOQA,ECHZ,&
       FGOCP,FGOAP,RGOMP,micfor,micstt,naqfdiag,nmicf,nmics,ncplxs,micflx)
@@ -849,7 +853,7 @@ module MicBGCMod
     RCH4X(NGL,K)=0.0_r8
     ROXYO(NGL,K)=ROXYM(NGL,K)
     RH2GX(NGL,K)=0.111_r8*RGOMO(NGL,K)
-  ELSEIF(N.EQ.micpar%n_aceto_methang)THEN
+  ELSEIF(N.EQ.micpar%AcetotroMethanogenArchea)THEN
     RGOMO(NGL,K)=RGOMP
     RCO2X(NGL,K)=0.50_r8*RGOMO(NGL,K)
     RCH3X(NGL,K)=0.0_r8
@@ -1390,7 +1394,7 @@ module MicBGCMod
 !     EPOC=fraction of RDOSC allocated to POC from hour1.f
 !     RCOSC,RCOSN,RCOSP=transfer of decomposition C,N,P to DOC,DON,DOP
 !
-    IF(K.LE.micpar%n_litrsfk)THEN
+    IF(K.LE.micpar%NumOfLitrCmplxs)THEN
       RHOSC(ilignin,K)=AZMAX1(AMIN1(RDOSN(ilignin,K)/CNRH(k_POM) &
         ,RDOSP(ilignin,K)/CPRH(k_POM),EPOC*RDOSC(ilignin,K)))
       RHOSCM=0.10_r8*RHOSC(ilignin,K)
@@ -2047,9 +2051,9 @@ module MicBGCMod
     Lsurf   => micfor%Lsurf, &
     k_POM   =>micpar%k_POM, &
     k_humus => micpar%k_humus, &
-    nf_amonia_oxi => micpar%nf_amonia_oxi, &
-    nf_aero_methanot => micpar%nf_aero_methanot, &
-    nf_nitrite_oxi => micpar%nf_nitrite_oxi, &
+    AmmoniaOxidizeBacteria => micpar%AmmoniaOxidizeBacteria, &
+    AerobicMethanotrophBacteria => micpar%AerobicMethanotrophBacteria, &
+    NitriteOxidizeBacteria => micpar%NitriteOxidizeBacteria, &
     is_activef_micb => micpar%is_activef_micb, &
     RCH4O => micflx%RCH4O, &
     RCO2O => micflx%RCO2O, &
@@ -2172,7 +2176,7 @@ module MicBGCMod
   RCO2O=naqfdiag%TRGOA-naqfdiag%TRGOM-naqfdiag%TRGOD
   RCH4O=-naqfdiag%TRGOC
 
-  DO NGL=JGniA(nf_aero_methanot),JGnfA(nf_aero_methanot)
+  DO NGL=JGniA(AerobicMethanotrophBacteria),JGnfA(AerobicMethanotrophBacteria)
     RCO2O=RCO2O-RVOXA(NGL)
     RCH4O=RCH4O+RVOXA(NGL)+CGOMCff(NGL)
   ENDDO
@@ -2240,13 +2244,13 @@ module MicBGCMod
   XNH4B=-naqfdiag%TRINB
   XNO3B=-naqfdiag%TRIOB-naqfdiag%TRDNB+RCN3B
   XNO2B=naqfdiag%TRDNB-naqfdiag%TRD2B-RCNOB
-  !nf_amonia_oxi=1, nf_nitrite_oxi=2, nf_aero_methanot=3
-  DO NGL=JGniA(nf_amonia_oxi),JGnfA(nf_amonia_oxi)
+  !AmmoniaOxidizeBacteria=1, NitriteOxidizeBacteria=2, AerobicMethanotrophBacteria=3
+  DO NGL=JGniA(AmmoniaOxidizeBacteria),JGnfA(AmmoniaOxidizeBacteria)
     XNH4S=XNH4S-RVOXA(NGL)
     XNO2S=XNO2S+RVOXA(NGL)
     XNH4B=XNH4B-RVOXB(NGL)
   ENDDO
-  DO NGL=JGniA(nf_nitrite_oxi),JGnfA(nf_nitrite_oxi)
+  DO NGL=JGniA(NitriteOxidizeBacteria),JGnfA(NitriteOxidizeBacteria)
     XNO3S=XNO3S+RVOXA(NGL)
     XNO2S=XNO2S-RVOXA(NGL)
     XNO3B=XNO3B+RVOXB(NGL)
@@ -3120,15 +3124,17 @@ module MicBGCMod
           OXYG1=OXYG1+ROXYFX
           OXYS1=OXYS1+ROXYLX
           COXYS1=AMIN1(COXYE*SOXYL,AZMAX1(safe_adb(OXYS1,(VLWatMicPM(M)*FOXYX))))
-          X=DIFOX*COXYS1
-          IF(X.GT.ZEROS.AND.OXYS1.GT.ZEROS)THEN
-            B=-RUPMX-DIFOX*OXKX-X
-            C=X*RUPMX
-            RMPOX=(-B-SQRT(B*B-4.0_r8*C))/2.0_r8
-          ELSE
-            RMPOX=0.0_r8
-          ENDIF
+
+          !obtain uptake flux
+          if(OXYS1<=ZEROS)then
+            RMPOX=0.0_r8            
+          else
+            RMPOX=TranspBasedsubstrateUptake(COXYS1,DIFOX, OXKX, RUPMX, ZEROS)
+          endif  
+  
+          !apply the uptake
           OXYS1=OXYS1-RMPOX
+          !apply dissolution-volatilization
           IF(THETPM(M).GT.THETX.AND.VOLPOX.GT.ZEROS)THEN
             ROXDFQ=DFGS(M)*(AMAX1(ZEROS,OXYG1)*VOLWOX-OXYS1*VOLPOX)/VOLWPM
           ELSE
@@ -3136,6 +3142,7 @@ module MicBGCMod
           ENDIF
           OXYG1=OXYG1-ROXDFQ
           OXYS1=OXYS1+ROXDFQ
+          !accumulate upatke
           RUPOX(NGL,K)=RUPOX(NGL,K)+RMPOX
           ROXSK(M)=ROXSK(M)+RMPOX
         ENDDO D425

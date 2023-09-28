@@ -150,25 +150,25 @@ module PlantDataRateType
   contains
 
 !----------------------------------------------------------------------
-  subroutine InitPlantRates(n_pltlitrk,jroots)
+  subroutine InitPlantRates(NumOfPlantLitrCmplxs,jroots)
   implicit none
-  integer, intent(in) :: n_pltlitrk
+  integer, intent(in) :: NumOfPlantLitrCmplxs
   integer, intent(in) :: jroots
-  call InitAllocate(n_pltlitrk,jroots)
+  call InitAllocate(NumOfPlantLitrCmplxs,jroots)
 
   end subroutine InitPlantRates
 !----------------------------------------------------------------------
 
-  subroutine InitAllocate(n_pltlitrk,jroots)
+  subroutine InitAllocate(NumOfPlantLitrCmplxs,jroots)
 
   implicit none
-  integer, intent(in) :: n_pltlitrk
+  integer, intent(in) :: NumOfPlantLitrCmplxs
   integer, intent(in) :: jroots    !number of root types, root,mycos
   allocate(TCNET(JY,JX));       TCNET=0._r8
   allocate(RNH3C(JP,JY,JX));    RNH3C=0._r8
   allocate(TNH3C(JP,JY,JX));    TNH3C=0._r8
-  allocate(TESN0(npelms,JP,JY,JX));    TESN0=0._r8
-  allocate(RDFOME(npelms,2,1:jcplx,JZ,JP,JY,JX));RDFOME=0._r8
+  allocate(TESN0(NumOfPlantChemElements,JP,JY,JX));    TESN0=0._r8
+  allocate(RDFOME(NumOfPlantChemElements,2,1:jcplx,JZ,JP,JY,JX));RDFOME=0._r8
   allocate(RUPNH4(jroots,JZ,JP,JY,JX));RUPNH4=0._r8
   allocate(RUPNHB(jroots,JZ,JP,JY,JX));RUPNHB=0._r8
   allocate(RUPNO3(jroots,JZ,JP,JY,JX));RUPNO3=0._r8
@@ -183,20 +183,20 @@ module PlantDataRateType
   allocate(RUPP2B(jroots,JZ,JP,JY,JX));RUPP2B=0._r8
   allocate(RUPP1P(jroots,JZ,JP,JY,JX));RUPP1P=0._r8
   allocate(RUPP1B(jroots,JZ,JP,JY,JX));RUPP1B=0._r8
-  allocate(RCELX(npelms,JBR,JP,JY,JX)); RCELX=0._r8
-  allocate(RCESX(npelms,JBR,JP,JY,JX)); RCESX=0._r8
+  allocate(RCELX(NumOfPlantChemElements,JBR,JP,JY,JX)); RCELX=0._r8
+  allocate(RCESX(NumOfPlantChemElements,JBR,JP,JY,JX)); RCESX=0._r8
   allocate(CARBN(JP,JY,JX));    CARBN=0._r8
-  allocate(TESNC(npelms,JP,JY,JX));    TESNC=0._r8
+  allocate(TESNC(NumOfPlantChemElements,JP,JY,JX));    TESNC=0._r8
   allocate(TZUPFX(JP,JY,JX));   TZUPFX=0._r8
   allocate(TCO2T(JP,JY,JX));    TCO2T=0._r8
-  allocate(BALE(npelms,JP,JY,JX));     BALE=0._r8
-  allocate(HESNC(npelms,JP,JY,JX));    HESNC=0._r8
-  allocate(ESNC(npelms,jsken,1:n_pltlitrk,0:JZ,JP,JY,JX));ESNC=0._r8
+  allocate(BALE(NumOfPlantChemElements,JP,JY,JX));     BALE=0._r8
+  allocate(HESNC(NumOfPlantChemElements,JP,JY,JX));    HESNC=0._r8
+  allocate(ESNC(NumOfPlantChemElements,jsken,1:NumOfPlantLitrCmplxs,0:JZ,JP,JY,JX));ESNC=0._r8
   allocate(ZNPP(JP,JY,JX));     ZNPP=0._r8
   allocate(ETCanP(JP,JY,JX));    ETCanP=0._r8
   allocate(TCO2A(JP,JY,JX));    TCO2A=0._r8
-  allocate(HVSTE(npelms,JP,JY,JX));    HVSTE=0._r8
-  allocate(THVSTE(npelms,JP,JY,JX));   THVSTE=0._r8
+  allocate(HVSTE(NumOfPlantChemElements,JP,JY,JX));    HVSTE=0._r8
+  allocate(THVSTE(NumOfPlantChemElements,JP,JY,JX));   THVSTE=0._r8
   allocate(VCO2F(JP,JY,JX));    VCO2F=0._r8
   allocate(VCH4F(JP,JY,JX));    VCH4F=0._r8
   allocate(VOXYF(JP,JY,JX));    VOXYF=0._r8
@@ -216,7 +216,7 @@ module PlantDataRateType
   allocate(RUPOXP(jroots,JZ,JP,JY,JX));RUPOXP=0._r8
   allocate(RCO2M(jroots,JZ,JP,JY,JX));RCO2M=0._r8
   allocate(RCO2A(jroots,JZ,JP,JY,JX));RCO2A=0._r8
-  allocate(UPOME(1:npelms,JP,JY,JX));    UPOME=0._r8
+  allocate(UPOME(1:NumOfPlantChemElements,JP,JY,JX));    UPOME=0._r8
   allocate(UPNH4(JP,JY,JX));    UPNH4=0._r8
   allocate(UPNO3(JP,JY,JX));    UPNO3=0._r8
   allocate(UPH2P(JP,JY,JX));    UPH2P=0._r8
@@ -248,8 +248,8 @@ module PlantDataRateType
   allocate(RNH3B(JBR,JP,JY,JX)); RNH3B=0._r8
   allocate(WFR(2,JZ,JP,JY,JX)); WFR=0._r8
   allocate(RH2GZ(JP,JY,JX));    RH2GZ=0._r8
-  allocate(HEUPTK(npelms,JP,JY,JX));   HEUPTK=0._r8
-  allocate(TEUPTK(npelms,JP,JY,JX));   TEUPTK=0._r8
+  allocate(HEUPTK(NumOfPlantChemElements,JP,JY,JX));   HEUPTK=0._r8
+  allocate(TEUPTK(NumOfPlantChemElements,JP,JY,JX));   TEUPTK=0._r8
   allocate(GridPlantRootH2OUptake_vr(0:JZ,JY,JX)); GridPlantRootH2OUptake_vr=0._r8
   allocate(THeatRootUptake(0:JZ,JY,JX));  THeatRootUptake=0._r8
   allocate(trcg_TFLA(idg_beg:idg_end-1,JZ,JY,JX));   trcg_TFLA=0._r8
@@ -267,7 +267,7 @@ module PlantDataRateType
   allocate(TUPNOB(JZ,JY,JX));   TUPNOB=0._r8
   allocate(TUPH2B(JZ,JY,JX));   TUPH2B=0._r8
   allocate(TUPNF(JZ,JY,JX));    TUPNF=0._r8
-  allocate(TDFOME(npelms,1:jcplx,JZ,JY,JX));TDFOME=0._r8
+  allocate(TDFOME(NumOfPlantChemElements,1:jcplx,JZ,JY,JX));TDFOME=0._r8
   allocate(TCO2P(JZ,JY,JX));    TCO2P=0._r8
   allocate(TUPOXP(JZ,JY,JX));   TUPOXP=0._r8
   allocate(RTDNT(JZ,JY,JX));    RTDNT=0._r8

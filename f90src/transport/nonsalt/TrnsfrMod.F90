@@ -176,7 +176,7 @@ module TrnsfrMod
 !     ENTERED IN WEATHER AND IRRIGATION FILES
 !
 !     SnoFalPrec,RainFalPrec=snow,rain
-!     VLSnowHeatCapM,VLHeatCapSnowMN=current,minimum volumetric heat capacity of snowpack
+!     VLSnowHeatCapM,VLHeatCapSnowMin=current,minimum volumetric heat capacity of snowpack
 !     X*BLS=hourly solute flux to snowpack
 !     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
 !             :OC=DOC,ON=DON,OP=DOP,OA=acetate
@@ -539,7 +539,7 @@ module TrnsfrMod
 
   integer, intent(in) :: I
   integer, intent(in) :: NY,NX
-  IF(SnoFalPrec(NY,NX).GT.0.0_r8.OR.(RainFalPrec(NY,NX).GT.0.0_r8.AND.VLSnowHeatCapM(1,1,NY,NX).GT.VLHeatCapSnowMN(NY,NX)))THEN
+  IF(SnoFalPrec(NY,NX).GT.0.0_r8.OR.(RainFalPrec(NY,NX).GT.0.0_r8.AND.VLSnowHeatCapM(1,1,NY,NX).GT.VLHeatCapSnowMin(NY,NX)))THEN
     trcg_XBLS(idg_CO2,1,NY,NX)=FLQGQ(NY,NX)*CCOR(NY,NX)+FLQGI(NY,NX)*CCOQ(NY,NX)
     trcg_XBLS(idg_CH4,1,NY,NX)=FLQGQ(NY,NX)*CCHR(NY,NX)+FLQGI(NY,NX)*CCHQ(NY,NX)
     trcg_XBLS(idg_O2,1,NY,NX)=FLQGQ(NY,NX)*COXR(NY,NX)+FLQGI(NY,NX)*COXQ(NY,NX)
@@ -564,13 +564,13 @@ module TrnsfrMod
 !     IN RAINFALL AND IRRIGATION ACCORDING TO CONCENTRATIONS
 !     ENTERED IN WEATHER AND IRRIGATION FILES
 !
-  ELSEIF((PRECQ(NY,NX).GT.0.0.OR.PRECI(NY,NX).GT.0.0) &
-    .AND.VLSnowHeatCapM(1,1,NY,NX).LE.VLHeatCapSnowMN(NY,NX))THEN
+  ELSEIF((PrecAtm(NY,NX).GT.0.0_r8.OR.IrrigSurface(NY,NX).GT.0.0_r8) &
+    .AND.VLSnowHeatCapM(1,1,NY,NX).LE.VLHeatCapSnowMin(NY,NX))THEN
 !
 !     HOURLY SOLUTE FLUXES FROM ATMOSPHERE TO SNOWPACK
 !     IF SNOWFALL AND IRRIGATION IS ZERO AND SNOWPACK IS ABSENT
 !
-!     PRECQ,PRECI=snow+rain,irrigation
+!     PrecAtm,PRECI=snow+rain,irrigation
 !     X*BLS=hourly solute flux to snowpack
 !     X*FLS,X*FLB=hourly solute flux to surface litter,soil surface micropore non-band,band
 !     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
@@ -653,7 +653,7 @@ module TrnsfrMod
   integer, intent(in) :: NY, NX
   INTEGER :: K,L,NTS,NTG,NTN
 
-  DO  K=1,micpar%n_litrsfk
+  DO  K=1,micpar%NumOfLitrCmplxs
     ROCFL0(K,NY,NX)=XOCFLS(K,3,0,NY,NX)*dts_HeatWatTP
     RONFL0(K,NY,NX)=XONFLS(K,3,0,NY,NX)*dts_HeatWatTP
     ROPFL0(K,NY,NX)=XOPFLS(K,3,0,NY,NX)*dts_HeatWatTP

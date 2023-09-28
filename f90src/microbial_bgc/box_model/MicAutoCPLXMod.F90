@@ -10,6 +10,7 @@ module MicAutoCPLXMod
   use EcoSIMSolverPar
   use EcoSimConst
   use NitroPars
+  use MicrobMathFuncMod
   implicit none
 
   private
@@ -81,10 +82,10 @@ module MicAutoCPLXMod
     RCH4Xff  => nmicf%RCH4Xff,    &
     TOMK  => ncplxs%TOMK     ,    &
     jcplx  => micpar%jcplx   ,    &
-    nf_amonia_oxi => micpar%nf_amonia_oxi, &
-    nf_nitrite_oxi  => micpar%nf_nitrite_oxi, &
-    nf_hydro_methang  => micpar%nf_hydro_methang, &
-    nf_aero_methanot  => micpar%nf_aero_methanot, &
+    AmmoniaOxidizeBacteria => micpar%AmmoniaOxidizeBacteria, &
+    NitriteOxidizeBacteria  => micpar%NitriteOxidizeBacteria, &
+    HydrogenoMethanogenArchea  => micpar%HydrogenoMethanogenArchea, &
+    AerobicMethanotrophBacteria  => micpar%AerobicMethanotrophBacteria, &
     ZEROS  => micfor%ZEROS  ,    &
     SoilMicPMassLayer  => micfor%SoilMicPMassLayer    ,    &
     litrm => micfor%litrm  , &
@@ -150,22 +151,22 @@ module MicAutoCPLXMod
 !     OXIDIZERS,(3) CH4 OXIDIZERS, (5) H2TROPHIC METHANOGENS
 !
 !
-  if (N.eq.nf_amonia_oxi)then
+  if (N.eq.AmmoniaOxidizeBacteria)then
 !   NH3 OXIDIZERS
     call NH3OxidizerCatabolism(NGL,N,XCO2,VOLWZ,TFNX,ECHZ,RGOMP,RVOXP,&
       RVOXPA,RVOXPB,micfor,micstt,naqfdiag,nmicf,nmics,micflx)
 
-  elseif (N.eq.nf_nitrite_oxi)then
+  elseif (N.eq.NitriteOxidizeBacteria)then
 !     NO2 OXIDIZERS
     call NO2OxidizerCatabolism(NGL,N,XCO2,ECHZ,RGOMP,RVOXP,RVOXPA,RVOXPB,&
       micfor,micstt,naqfdiag,nmicf,nmics,micflx)
 
-  elseif (N.eq.nf_hydro_methang)then
+  elseif (N.eq.HydrogenoMethanogenArchea)then
 !     H2TROPHIC METHANOGENS
     call H2MethanogensCatabolism(NGL,N,ECHZ,RGOMP,XCO2,micfor,micstt,&
       naqfdiag,nmicf,nmics,micflx)
 
-  elseif (N.eq.nf_aero_methanot)then
+  elseif (N.eq.AerobicMethanotrophBacteria)then
 !     METHANOTROPHS
     call MethanotrophCatabolism(NGL,N,ECHZ,RGOMP,&
       RVOXP,RVOXPA,RVOXPB,micfor,micstt,naqfdiag,nmicf,nmics,micflx)
@@ -190,11 +191,11 @@ module MicAutoCPLXMod
 !
   RUPOXff(NGL)=0.0_r8
 
-  if (N.eq.nf_amonia_oxi .or. N.eq.nf_nitrite_oxi .or. N.eq.nf_aero_methanot)then
+  if (N.eq.AmmoniaOxidizeBacteria .or. N.eq.NitriteOxidizeBacteria .or. N.eq.AerobicMethanotrophBacteria)then
 !   write(*,*)'AerobsO2Uptake'
     call AerobsO2Uptakeff(NGL,N,FOXYX,OXKX,RGOMP,RVOXP,RVOXPA,RVOXPB,&
       micfor,micstt,nmicf,nmics,micflx)
-  elseif (N.eq.nf_hydro_methang)then
+  elseif (N.eq.HydrogenoMethanogenArchea)then
     RGOMOff(NGL)=RGOMP
     RCO2Xff(NGL)=0.0_r8
     RCH3Xff(NGL)=0.0_r8
@@ -206,7 +207,7 @@ module MicAutoCPLXMod
 !
 !     AUTOTROPHIC DENITRIFICATION
 !
-  IF(N.EQ.nf_amonia_oxi.AND.ROXYMff(NGL).GT.0.0_r8.AND.(.not.litrm.OR.VLSoilPoreMicP.GT.ZEROS))THEN
+  IF(N.EQ.AmmoniaOxidizeBacteria.AND.ROXYMff(NGL).GT.0.0_r8.AND.(.not.litrm.OR.VLSoilPoreMicP.GT.ZEROS))THEN
     call AutotrophDenitrificCatabolism(NGL,N,XCO2,VOLWZ,micfor,micstt,&
       naqfdiag,nmicf,nmics,micflx)
   ELSE
@@ -670,7 +671,8 @@ module MicAutoCPLXMod
   subroutine AerobsO2Uptakeff(NGL,N,FOXYX,OXKX,RGOMP,RVOXP,RVOXPA,RVOXPB,&
     micfor,micstt,nmicf,nmics,micflx)
   implicit none
-  integer, intent(in) :: NGL,N
+  integer, intent(in) :: NGL   !guild id
+  integer, intent(in) :: N     !functional group id
   real(r8), intent(in) :: OXKX,FOXYX,RGOMP,RVOXP
   real(r8), intent(in) :: RVOXPA
   real(r8), intent(in) :: RVOXPB
@@ -708,8 +710,8 @@ module MicAutoCPLXMod
     RCH4Xff  => nmicf%RCH4Xff,    &
     RVOXA  => nmicf%RVOXA,    &
     RVOXB  => nmicf%RVOXB,    &
-    nf_amonia_oxi => micpar%nf_amonia_oxi, &
-    nf_nitrite_oxi => micpar%nf_nitrite_oxi, &
+    AmmoniaOxidizeBacteria => micpar%AmmoniaOxidizeBacteria, &
+    NitriteOxidizeBacteria => micpar%NitriteOxidizeBacteria, &
     ROXYF  => micfor%ROXYF,  &
     COXYE  => micfor%COXYE  , &
     COXR   => micfor%COXR  , &
@@ -746,8 +748,8 @@ module MicAutoCPLXMod
       !write(*,*)'MAXIMUM O2 UPAKE FROM POTENTIAL RESPIRATION OF EACH AEROBIC'
       !     POPULATION
       !
-      RUPMX=ROXYPff(NGL)*dts_gas
-      ROXYFX=ROXYF*dts_gas*FOXYX
+      RUPMX=ROXYPff(NGL)*dts_gas    !
+      ROXYFX=ROXYF*dts_gas*FOXYX    !O2 demand
       OLSGL1=OLSGL*dts_gas
       IF(.not.litrm)THEN
         OXYG1=OXYG*FOXYX
@@ -785,19 +787,23 @@ module MicAutoCPLXMod
         VOLWOX=VLWatMicPM(M)*SOXYL
         VOLPOX=VLsoiAirPM(M)
         VOLWPM=VOLWOX+VOLPOX
+
+!oxygen uptake in the layer
         DO  MX=1,NPT
           OXYG1=OXYG1+ROXYFX
           OXYS1=OXYS1+ROXYLX
           COXYS1=AMIN1(COXYE*SOXYL,AZMAX1(safe_adb(OXYS1,(VLWatMicPM(M)*FOXYX))))
-          X=DIFOX*COXYS1
-          IF(X.GT.ZEROS.AND.OXYS1.GT.ZEROS)THEN
-            B=-RUPMX-DIFOX*OXKX-X
-            C=X*RUPMX
-            RMPOX=(-B-SQRT(B*B-4.0*C))/2.0_r8
-          ELSE
+
+          !solve for uptake flux
+          IF(OXYS1<=ZEROS)THEN
             RMPOX=0.0_r8
+          else
+            RMPOX=TranspBasedsubstrateUptake(COXYS1,DIFOX, OXKX, RUPMX, ZEROS)
           ENDIF
+
+          !apply the uptake flux
           OXYS1=OXYS1-RMPOX
+          !apply volatilization-dissolution
           IF(THETPM(M).GT.THETX.AND.VOLPOX.GT.ZEROS)THEN
             ROXDFQ=DFGS(M)*(AMAX1(ZEROS,OXYG1)*VOLWOX-OXYS1*VOLPOX)/VOLWPM
           ELSE
@@ -805,10 +811,11 @@ module MicAutoCPLXMod
           ENDIF
           OXYG1=OXYG1-ROXDFQ
           OXYS1=OXYS1+ROXDFQ
+          !accumulate uptake flux
           RUPOXff(NGL)=RUPOXff(NGL)+RMPOX
           ROXSK(M)=ROXSK(M)+RMPOX
-
         ENDDO
+
       ENDDO
       !write(*,*)'420'
       !
@@ -818,10 +825,10 @@ module MicAutoCPLXMod
       !     RVMX4,RVNHB,RVMX2,RVMB2=NH3,NO2 oxidation in non-band, band
       !
       WFNff(NGL)=AMIN1(1.0,AZMAX1(RUPOXff(NGL)/ROXYPff(NGL)))
-      IF(N.EQ.nf_amonia_oxi)THEN
+      IF(N.EQ.AmmoniaOxidizeBacteria)THEN
         RVMX4ff(NGL)=RVMX4ff(NGL)*WFNff(NGL)
         RVMB4ff(NGL)=RVMB4ff(NGL)*WFNff(NGL)
-      ELSEIF(N.EQ.nf_nitrite_oxi)THEN
+      ELSEIF(N.EQ.NitriteOxidizeBacteria)THEN
         RVMX2ff(NGL)=RVMX2ff(NGL)*WFNff(NGL)
         RVMB2ff(NGL)=RVMB2ff(NGL)*WFNff(NGL)
       ENDIF
@@ -1111,7 +1118,9 @@ module MicAutoCPLXMod
 !
 !     ROXYM=O2 demand from respiration by nitrifiers
 !     ROXYP,ROXYM=O2 demand from respiration + NH3 oxidation
-!
+! C+O2 -> CO2,  respiration, 2.667=32./12.
+! NH3+1.5O2-> NO2(-)+H2O+H(+), 1.5*32/14.=3.249
+
   ROXYMff(NGL)=2.667_r8*RGOMP
   ROXYPff(NGL)=ROXYMff(NGL)+3.429_r8*RVOXP
   ROXYSff(NGL)=ROXYPff(NGL)
@@ -1365,31 +1374,52 @@ module MicAutoCPLXMod
   RCH4L1=RCH4L*dts_gas
   RCH4F1=RCH4F*dts_gas
   RCH4S1=(naqfdiag%TCH4H+naqfdiag%TCH4A)*dts_gas
+
   IF(litrm)THEN
+    !surface residue layer
     CH4G1=CCH4E*VLsoiAirPM(1)
   ELSE
     CH4G1=CCH4G*VLsoiAirPM(1)
   ENDIF
   CH4S1=CH4S
+  !apparent vmax for uptake
   VMXA1=VMXA*dts_gas
   RVOXP=0.0_r8
   RGOMP=0.0_r8
 !
 !     CH4 DISSOLUTION FROM GASEOUS PHASE SOLVED IN SHORTER TIME STEP
 !     TO MAINTAIN AQUEOUS CH4 CONCENTRATION DURING OXIDATION
-!
+! for aerobic methanotrophs, CH4 is oxiized to CO2 for energy, and also 
+! to intracellular C for respiration. (Grant 1999), the C yield is approximated
+! as the energy required for turning CH4 into organic C, and the energy released
+! from turnining CH4 into CO2. 
+! the catabolic reaction is
+!  CH4 + 2O2 -> CO2 + 2H2O
+!    
+!  C+ O2 -> CO2,  32/12=2.667
   D320: DO M=1,NPH
     IF(VLWatMicPM(M).GT.ZEROS2)THEN
       VOLWCH=VLWatMicPM(M)*SCH4L
       VOLWPM=VOLWCH+VLsoiAirPM(M)
+
+      !CH4 uptake by aerobic oxidation
+      !RCH4F1: net gaseous CH4 flux from transport into the layer
+      !RCH4L1: net aqueous CH4 flux from transport into the layer
+      !RCH4S1: aquoues CH4 production from methanogenesis in the layer
       D325: DO MM=1,NPT
         CH4G1=CH4G1+RCH4F1
         CH4S1=CH4S1+RCH4L1+RCH4S1
         CCH4S1=AZMAX1(safe_adb(CH4S1,VLWatMicPM(M)))
+        
         FSBST=CCH4S1/(CCH4S1+CCK4)
+        !RVOXP1 energy from oxidizing CH4 into CO2
         RVOXP1=AMIN1(AZMAX1(CH4S1)/(1.0+ECHO*ECHZ),VMXA1*FSBST)
+        !the respiration yield
         RGOMP1=RVOXP1*ECHO*ECHZ
+        !
         CH4S1=CH4S1-RVOXP1-RGOMP1
+
+        !dissolution-vaporization
         IF(THETPM(M).GT.THETX)THEN
           RCHDF=DFGS(M)*(AMAX1(ZEROS,CH4G1)*VOLWCH-CH4S1*VLsoiAirPM(M))/VOLWPM
         ELSE

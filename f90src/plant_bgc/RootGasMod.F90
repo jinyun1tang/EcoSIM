@@ -17,13 +17,13 @@ module RootGasMod
   contains
 !------------------------------------------------------------------------
 
-  subroutine RootSoilGasExchange(N,L,NZ,FineRootRadius,FracPRoot4Uptake,FracSoiLayByPrimRoot,RTARR,&
-    UPWTRH,FOXYX,PopPlantO2Uptake_vr)
+  subroutine RootSoilGasExchange(N,L,NZ,FineRootRadius,FracPRoot4Uptake,FracSoiLayByPrimRoot,RootAreaDivRadius,&
+    CumPerPlantRootH2OUptake,FOXYX,PopPlantO2Uptake_vr)
 
   implicit none
   integer , intent(in) :: N,L,NZ
   real(r8), intent(in) :: FineRootRadius(2,JZ1),FracPRoot4Uptake(2,JZ1,JP1),FracSoiLayByPrimRoot(JZ1,JP1)
-  real(r8), intent(in) :: RTARR(2,JZ1),UPWTRH,FOXYX
+  real(r8), intent(in) :: RootAreaDivRadius(2,JZ1),CumPerPlantRootH2OUptake,FOXYX
   real(r8), intent(out):: PopPlantO2Uptake_vr
   integer :: M,MX
   real(r8) :: B,C
@@ -50,7 +50,7 @@ module RootGasMod
   real(r8) :: trcg_RDF1(idg_beg:idg_end-1),trcg_RFL1(idg_beg:idg_end-1)
   real(r8) :: THETW1,THETM
   real(r8) :: UPMXP
-  real(r8) :: VOLWG(idg_beg:idg_end-1),VLWatMicPMO,VLWatMicPMM,VLsoiAirPMM
+  real(r8) :: DissolvedGasVolume(idg_beg:idg_end-1),VLWatMicPMO,VLWatMicPMM,VLsoiAirPMM
   real(r8) :: VOLWSP,VLWatMicPMA,VLWatMicPMB,VOLWSA,VOLWSB,VOLWCO,VOLWOX
   real(r8) :: VOLWCH,VOLWN2,VLWatMicPNH,VOLWNB,VOLWHG,VOLPNH,VOLPNB
   real(r8) :: X
@@ -104,7 +104,7 @@ module RootGasMod
     trc_gascl  =>  plt_soilchem%trc_gascl, &
     GasDifc=>  plt_soilchem%GasDifc,&
     SolDifc  =>  plt_soilchem%SolDifc, &
-    GSolbility=> plt_soilchem%GSolbility,&
+    GasSolbility=> plt_soilchem%GasSolbility,&
     trc_solcl  =>  plt_soilchem%trc_solcl, &
     THETY  =>  plt_soilchem%THETY, &
     VLSoilMicP   =>  plt_soilchem%VLSoilMicP , &
@@ -112,7 +112,7 @@ module RootGasMod
     trc_gasml=> plt_soilchem%trc_gasml,&
     DFGS   =>  plt_soilchem%DFGS , &
     IDAY   =>  plt_pheno%IDAY    , &
-    PORTX  =>  plt_morph%PORTX   , &
+    RootPoreTortu4Gas  =>  plt_morph%RootPoreTortu4Gas   , &
     PrimRootRadius  =>  plt_morph%PrimRootRadius   , &
     AveSecndRootLen  =>  plt_morph%AveSecndRootLen   , &
     RTVLP  =>  plt_morph%RTVLP   , &
@@ -195,16 +195,16 @@ module RootGasMod
 !     GASEOUS AND AQUEOUS DIFFUSIVITIES IN ROOT AND SOIL
 !
 !     *SGL1=diffusivity
-!     PORTX=tortuosity effect of root porosity on diffusivity
+!     RootPoreTortu4Gas=tortuosity effect of root porosity on diffusivity
 !     CG=CO2g,OG=O2g,CH=CH4g,Z2=N2Og,ZH=NH3g,HG=H2g
 !     CL=CO2s,OL=O2s,CQ=CH4s,ZV=N2Os,ZN=NH3s,HL=H2s
 !
-    CGSGL1=GasDifc(idg_CO2,L)*dts_gas*PORTX(N,NZ)
-    OGSGL1=GasDifc(idg_O2,L)*dts_gas*PORTX(N,NZ)
-    CHSGL1=GasDifc(idg_CH4,L)*dts_gas*PORTX(N,NZ)
-    Z2SGL1=GasDifc(idg_N2O,L)*dts_gas*PORTX(N,NZ)
-    ZHSGL1=GasDifc(idg_NH3,L)*dts_gas*PORTX(N,NZ)
-    HGSGL1=GasDifc(idg_H2,L)*dts_gas*PORTX(N,NZ)
+    CGSGL1=GasDifc(idg_CO2,L)*dts_gas*RootPoreTortu4Gas(N,NZ)
+    OGSGL1=GasDifc(idg_O2,L)*dts_gas*RootPoreTortu4Gas(N,NZ)
+    CHSGL1=GasDifc(idg_CH4,L)*dts_gas*RootPoreTortu4Gas(N,NZ)
+    Z2SGL1=GasDifc(idg_N2O,L)*dts_gas*RootPoreTortu4Gas(N,NZ)
+    ZHSGL1=GasDifc(idg_NH3,L)*dts_gas*RootPoreTortu4Gas(N,NZ)
+    HGSGL1=GasDifc(idg_H2,L)*dts_gas*RootPoreTortu4Gas(N,NZ)
 
     CLSGL1=SolDifc(idg_CO2,L)*dts_gas*FOXYX
     OLSGL1=SolDifc(idg_O2,L)*dts_gas*FOXYX
@@ -263,11 +263,11 @@ module RootGasMod
 !     RCO2A=root CO2 flux from grosub.f
 !
     IF(N.EQ.1.AND.IDAY(1,NB1(NZ),NZ).GT.0.AND.RootLenPerP(N,L,NZ).GT.ZEROP(NZ))THEN
-      RTARRX=RTARR(N,L)/RRADP(N,NZ)
+      RTARRX=RootAreaDivRadius(N,L)/RRADP(N,NZ)
       DIFOP=OLSGLP*RTARRX
 
       DO NTG=idg_beg,idg_end-1
-        VOLWG(NTG)=RTVLW(N,L,NZ)*GSolbility(NTG,L)
+        DissolvedGasVolume(NTG)=RTVLW(N,L,NZ)*GasSolbility(NTG,L)
       ENDDO
 
       DFCOA=CGSGL1*RTCRA
@@ -279,7 +279,7 @@ module RootGasMod
     ELSE
       RTARRX=0.0_r8
       DIFOP=0.0_r8
-      VOLWG(idg_beg:idg_end-1)=0.0_r8
+      DissolvedGasVolume(idg_beg:idg_end-1)=0.0_r8
       DFCOA=0.0_r8
       DFOXA=0.0_r8
       DFCHA=0.0_r8
@@ -326,7 +326,7 @@ module RootGasMod
       IF(THETW1.GT.THETY(L).AND.FracPRoot4Uptake(N,L,NZ).GT.ZEROQ(NZ))THEN
         THETM=TortMicPM(M,L)*THETW1
         RRADS=LOG((FILM(M,L)+FineRootRadius(N,L))/FineRootRadius(N,L))
-        RTARRX=RTARR(N,L)/RRADS
+        RTARRX=RootAreaDivRadius(N,L)/RRADS
         DIFOL=THETM*OLSGL1*RTARRX
         DIFCL=THETM*CQSGL1*RTARRX
         DIFZL=THETM*ZVSGL1*RTARRX
@@ -339,13 +339,13 @@ module RootGasMod
         ZH3G1=trc_gascl(idg_NH3,L)*VLsoiAirPMM
         H2GG1=trc_gascl(idg_H2,L)*VLsoiAirPMM
 
-        VOLWCO=VLWatMicPMM*GSolbility(idg_CO2,L)
-        VOLWOX=VLWatMicPMM*GSolbility(idg_O2,L)
-        VOLWCH=VLWatMicPMM*GSolbility(idg_CH4,L)
-        VOLWN2=VLWatMicPMM*GSolbility(idg_N2O,L)
-        VLWatMicPNH=VLWatMicPMM*GSolbility(idg_NH3,L)*trcs_VLN(ids_NH4,L)
-        VOLWNB=VLWatMicPMM*GSolbility(idg_NH3,L)*trcs_VLN(ids_NH4B,L)
-        VOLWHG=VLWatMicPMM*GSolbility(idg_H2,L)
+        VOLWCO=VLWatMicPMM*GasSolbility(idg_CO2,L)
+        VOLWOX=VLWatMicPMM*GasSolbility(idg_O2,L)
+        VOLWCH=VLWatMicPMM*GasSolbility(idg_CH4,L)
+        VOLWN2=VLWatMicPMM*GasSolbility(idg_N2O,L)
+        VLWatMicPNH=VLWatMicPMM*GasSolbility(idg_NH3,L)*trcs_VLN(ids_NH4,L)
+        VOLWNB=VLWatMicPMM*GasSolbility(idg_NH3,L)*trcs_VLN(ids_NH4B,L)
+        VOLWHG=VLWatMicPMM*GasSolbility(idg_H2,L)
         VOLPNH=VLsoiAirPMM*trcs_VLN(ids_NH4,L)
         VOLPNB=VLsoiAirPMM*trcs_VLN(ids_NH4B,L)
 !
@@ -360,12 +360,12 @@ module RootGasMod
 !     RTVLW,RTVLP=root aqueous,gaseous volume
 !     RMF*=soil convective solute flux:COS=CO2,OXS=O2,CHS=CH4,
 !     N2S=N2O,NHS=NH3 non-band,NHB=NH3 band,HGS=H2
-!     UPWTRH=water uptake
+!     CumPerPlantRootH2OUptake=water uptake
 !
         D90: DO MX=1,NPT
           OXYS1=OXYS1+ROXYLX
           CCO2S1=AZMAX1(CO2S1/VLWatMicPMM)
-          COXYS1=AMIN1(COXYE*GSolbility(idg_O2,L),AZMAX1(OXYS1/VLWatMicPMO))
+          COXYS1=AMIN1(COXYE*GasSolbility(idg_O2,L),AZMAX1(OXYS1/VLWatMicPMO))
           CCH4S1=AZMAX1(CH4S1/VLWatMicPMM)
           CN2OS1=AZMAX1(Z2OS1/VLWatMicPMM)
           CNH3S1=AZMAX1(ZH3S1/VLWatMicPMM)
@@ -379,26 +379,26 @@ module RootGasMod
             trcg_gcon(idg_beg:idg_end-1)=0.0_r8
           ENDIF
           CCO2P1=AZMAX1(CO2P1/RTVLW(N,L,NZ))
-          COXYP1=AMIN1(COXYE*GSolbility(idg_O2,L),AZMAX1(OXYP1/RTVLW(N,L,NZ)))
+          COXYP1=AMIN1(COXYE*GasSolbility(idg_O2,L),AZMAX1(OXYP1/RTVLW(N,L,NZ)))
           CCH4P1=AZMAX1(CH4P1/RTVLW(N,L,NZ))
           CN2OP1=AZMAX1(Z2OP1/RTVLW(N,L,NZ))
           CNH3P1=AZMAX1(ZH3P1/RTVLW(N,L,NZ))
           CH2GP1=AZMAX1(H2GP1/RTVLW(N,L,NZ))
 
           DIFOX=DIFOL+DIFOP
-          RMFCOS=UPWTRH*CCO2S1
-          RMFOXS=UPWTRH*COXYS1
-          RMFCHS=UPWTRH*CCH4S1
-          RMFN2S=UPWTRH*CN2OS1
-          RMFN3S=UPWTRH*CNH3S1*trcs_VLN(ids_NH4,L)
-          RMFN3B=UPWTRH*CNH3B1*trcs_VLN(ids_NH4B,L)
-          RMFHGS=UPWTRH*CH2GS1
+          RMFCOS=CumPerPlantRootH2OUptake*CCO2S1
+          RMFOXS=CumPerPlantRootH2OUptake*COXYS1
+          RMFCHS=CumPerPlantRootH2OUptake*CCH4S1
+          RMFN2S=CumPerPlantRootH2OUptake*CN2OS1
+          RMFN3S=CumPerPlantRootH2OUptake*CNH3S1*trcs_VLN(ids_NH4,L)
+          RMFN3B=CumPerPlantRootH2OUptake*CNH3B1*trcs_VLN(ids_NH4B,L)
+          RMFHGS=CumPerPlantRootH2OUptake*CH2GS1
 !
 !     SOLUTION FOR MASS FLOW + DIFFUSION OF O2 IN AQUEOUS PHASES OF
 !     SOIL AND ROOT = ACTIVE UPTAKE OF O2 BY ROOT
 !
 !     DIFOL=O2 aqueous diffusivity from soil to root
-!     UPWTRH=water uptake
+!     CumPerPlantRootH2OUptake=water uptake
 !     DIFOP=aqueous diffusivity of O2 within root
 !     COXYS1,COXYP1=soil,root aqueous O2 concentration
 !     UPMXP=O2 demand per plant
@@ -406,7 +406,7 @@ module RootGasMod
 !     COXYR=aqueous O2 concentration at root surface
 !     RDFOXS,RDFOXP=aqueous O2 diffusion per plant:soil-root,within root
 !
-          X=(DIFOL+UPWTRH)*COXYS1+DIFOP*COXYP1
+          X=(DIFOL+CumPerPlantRootH2OUptake)*COXYS1+DIFOP*COXYP1
           IF(X.GT.ZERO.AND.OXYS1.GT.ZEROP(NZ))THEN
             B=-UPMXP-DIFOX*OXKM-X
             C=X*UPMXP
@@ -628,23 +628,23 @@ module RootGasMod
 !     DF*A=root-atmosphere gas conductance
 !
             CO2PX=CO2P1+RCO2PX
-            trcg_RDF1(idg_CO2)=AMAX1(-CO2PX,DFGP*(AMAX1(ZEROP(NZ),trcg_gmas(idg_CO2))*VOLWG(idg_CO2) &
-              -CO2PX*RTVLP(N,L,NZ))/(VOLWG(idg_CO2)+RTVLP(N,L,NZ)))
+            trcg_RDF1(idg_CO2)=AMAX1(-CO2PX,DFGP*(AMAX1(ZEROP(NZ),trcg_gmas(idg_CO2))*DissolvedGasVolume(idg_CO2) &
+              -CO2PX*RTVLP(N,L,NZ))/(DissolvedGasVolume(idg_CO2)+RTVLP(N,L,NZ)))
             OXYPX=OXYP1-RUPOPX
-            trcg_RDF1(idg_O2)=AMAX1(-OXYPX,DFGP*(AMAX1(ZEROP(NZ),trcg_gmas(idg_O2))*VOLWG(idg_O2) &
-              -OXYPX*RTVLP(N,L,NZ))/(VOLWG(idg_O2)+RTVLP(N,L,NZ)))
+            trcg_RDF1(idg_O2)=AMAX1(-OXYPX,DFGP*(AMAX1(ZEROP(NZ),trcg_gmas(idg_O2))*DissolvedGasVolume(idg_O2) &
+              -OXYPX*RTVLP(N,L,NZ))/(DissolvedGasVolume(idg_O2)+RTVLP(N,L,NZ)))
             CH4PX=CH4P1+RUPCSX
-            trcg_RDF1(idg_CH4)=AMAX1(-CH4PX,DFGP*(AMAX1(ZEROP(NZ),trcg_gmas(idg_CH4))*VOLWG(idg_CH4) &
-              -CH4PX*RTVLP(N,L,NZ))/(VOLWG(idg_CH4)+RTVLP(N,L,NZ)))
+            trcg_RDF1(idg_CH4)=AMAX1(-CH4PX,DFGP*(AMAX1(ZEROP(NZ),trcg_gmas(idg_CH4))*DissolvedGasVolume(idg_CH4) &
+              -CH4PX*RTVLP(N,L,NZ))/(DissolvedGasVolume(idg_CH4)+RTVLP(N,L,NZ)))
             Z2OPX=Z2OP1+RUPZSX
-            trcg_RDF1(idg_N2O)=AMAX1(-Z2OPX,DFGP*(AMAX1(ZEROP(NZ),trcg_gmas(idg_N2O))*VOLWG(idg_N2O) &
-              -Z2OPX*RTVLP(N,L,NZ))/(VOLWG(idg_N2O)+RTVLP(N,L,NZ)))
+            trcg_RDF1(idg_N2O)=AMAX1(-Z2OPX,DFGP*(AMAX1(ZEROP(NZ),trcg_gmas(idg_N2O))*DissolvedGasVolume(idg_N2O) &
+              -Z2OPX*RTVLP(N,L,NZ))/(DissolvedGasVolume(idg_N2O)+RTVLP(N,L,NZ)))
             ZH3PX=ZH3P1+RUPNTX
-            trcg_RDF1(idg_NH3)=AMAX1(-ZH3PX,DFGP*(AMAX1(ZEROP(NZ),trcg_gmas(idg_NH3))*VOLWG(idg_NH3) &
-              -ZH3PX*RTVLP(N,L,NZ))/(VOLWG(idg_NH3)+RTVLP(N,L,NZ)))
+            trcg_RDF1(idg_NH3)=AMAX1(-ZH3PX,DFGP*(AMAX1(ZEROP(NZ),trcg_gmas(idg_NH3))*DissolvedGasVolume(idg_NH3) &
+              -ZH3PX*RTVLP(N,L,NZ))/(DissolvedGasVolume(idg_NH3)+RTVLP(N,L,NZ)))
             H2GPX=H2GP1+RUPHGX
-            trcg_RDF1(idg_H2)=AMAX1(-H2GPX,DFGP*(AMAX1(ZEROP(NZ),trcg_gmas(idg_H2))*VOLWG(idg_H2) &
-              -H2GPX*RTVLP(N,L,NZ))/(VOLWG(idg_H2)+RTVLP(N,L,NZ)))
+            trcg_RDF1(idg_H2)=AMAX1(-H2GPX,DFGP*(AMAX1(ZEROP(NZ),trcg_gmas(idg_H2))*DissolvedGasVolume(idg_H2) &
+              -H2GPX*RTVLP(N,L,NZ))/(DissolvedGasVolume(idg_H2)+RTVLP(N,L,NZ)))
 
             trcg_RFL1(idg_CO2)=AMIN1(DFCOA,RTVLP(N,L,NZ))*(CCO2E-trcg_gcon(idg_CO2))
             trcg_RFL1(idg_O2)=AMIN1(DFOXA,RTVLP(N,L,NZ))*(COXYE-trcg_gcon(idg_O2))

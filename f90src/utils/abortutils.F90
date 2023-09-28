@@ -36,6 +36,9 @@ module abortutils
     module procedure destroy_6d_i
     module procedure destroy_7d_i
     module procedure destroy_1d_l
+    module procedure destroy_2d_l
+    module procedure destroy_3d_l
+    module procedure destroy_4d_l
     module procedure destroy_1d_char
     module procedure destroy_2d_char
     module procedure destroy_3d_char
@@ -399,6 +402,30 @@ CONTAINS
   if(allocated(arr))deallocate(arr)
 
   end subroutine destroy_1d_L
+  !-----------------------------------------------------------------------
+  subroutine destroy_2d_l(arr)
+  implicit none
+  logical, allocatable :: arr(:,:)
+
+  if(allocated(arr))deallocate(arr)
+
+  end subroutine destroy_2d_L
+  !-----------------------------------------------------------------------
+  subroutine destroy_3d_l(arr)
+  implicit none
+  logical, allocatable :: arr(:,:,:)
+
+  if(allocated(arr))deallocate(arr)
+
+  end subroutine destroy_3d_L
+  !-----------------------------------------------------------------------
+  subroutine destroy_4d_l(arr)
+  implicit none
+  logical, allocatable :: arr(:,:,:,:)
+
+  if(allocated(arr))deallocate(arr)
+
+  end subroutine destroy_4d_L
 
 
   !-----------------------------------------------------------------------
@@ -593,5 +620,7 @@ CONTAINS
   deallocate(arr)
 
   end subroutine destroy_4d_charpt
+
+
 
 end module abortutils

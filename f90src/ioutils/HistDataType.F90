@@ -89,7 +89,7 @@ implicit none
   real(r8),pointer   :: histr_1D_ATM_CO2_col(:)        !CO2E(NY,NX)
   real(r8),pointer   :: histr_1D_NBP_col(:)            !TNBP(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_ECO_HVST_C_col(:)     !XHVSTE(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: histr_1D_ECO_LAI_col(:)        !CanGLA(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: histr_1D_ECO_LAI_col(:)        !CanopyLA_grd(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_ECO_GPP_col(:)        !TGPP(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_ECO_RA_col(:)         !TRAU(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_ECO_NPP_col(:)        !TNPP(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -136,7 +136,7 @@ implicit none
   real(r8),pointer   :: histr_1D_sN2G_FLX_col(:)        !HN2GG(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_sNH3_FLX_col(:)        !HNH3G(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
 
-  real(r8),pointer   :: histr_1D_LEAF_PC_ptc(:)       !(WTLFE(ielmp,NZ,NY,NX)+EPOOLP(ielmp,NZ,NY,NX))/(WTLFE(ielmc,NZ,NY,NX)+EPOOLP(ielmc,NZ,NY,NX)),mass based CP ratio of leaf
+  real(r8),pointer   :: histr_1D_LEAF_PC_ptc(:)       !(WTLFE(ielmp,NZ,NY,NX)+CanopyNonstructElements_pft(ielmp,NZ,NY,NX))/(WTLFE(ielmc,NZ,NY,NX)+CanopyNonstructElements_pft(ielmc,NZ,NY,NX)),mass based CP ratio of leaf
   real(r8),pointer   :: histr_2D_tSOC_vr_col(:,:)        !ORGC(1:JZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total soil C
   real(r8),pointer   :: histr_1D_CAN_RN_ptc(:)        !277.8*RadNet2CanP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), W m-2
   real(r8),pointer   :: histr_1D_CAN_LE_ptc(:)        !277.8*EvapTransHeatP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -153,7 +153,7 @@ implicit none
   real(r8),pointer   :: histr_1D_STOML_RSC_CO2_ptc(:) !CanPStomaResistH2O(NZ,NY,NX)*1.56*3600.0_r8, s m-1, for CO2
   real(r8),pointer   :: histr_1D_BLYR_RSC_CO2_ptc(:)  !CanPbndlResist(NZ,NY,NX)*1.34*3600.0_r8, s m-1, for CO2
   real(r8),pointer   :: histr_1D_CAN_CO2_ptc(:)       !CO2Q(NZ,NY,NX), umol mol-1
-  real(r8),pointer   :: histr_1D_LAI_ptc(:)           !CanPA(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), plant leaf area, include stalk
+  real(r8),pointer   :: histr_1D_LAI_ptc(:)           !CanopyArea_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), plant leaf area, include stalk
   real(r8),pointer   :: histr_1D_PSI_CAN_ptc(:)       !PSICanP(NZ,NY,NX), canopy total water potential , MPa
   real(r8),pointer   :: histr_1D_TURG_CAN_ptc(:)      !PSICanPTurg(NZ,NY,NX), canopy turgor water potential, MPa
   real(r8),pointer   :: histr_1D_STOM_RSC_H2O_ptc(:)  !CanPStomaResistH2O(NZ,NY,NX)*3600.0_r8, s m-1, for H2O
@@ -176,7 +176,7 @@ implicit none
   real(r8),pointer   :: histr_1D_NODULE_C_ptc(:)         !WTNDE(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), nodule
   real(r8),pointer   :: histr_1D_STORED_C_ptc(:)      !WTRVE(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_GRAIN_NO_ptc(:)      !GRNO(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: histr_1D_LAIb_ptc(:)          !CanPLA(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total branch leaf area
+  real(r8),pointer   :: histr_1D_LAIb_ptc(:)          !CanopyLeafA_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total branch leaf area
   real(r8),pointer   :: histr_1D_EXUD_C_FLX_ptc(:)        !TEUPTK(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_LITRf_C_FLX_ptc(:)       !TESNC(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_LITRf_P_FLX_ptc(:)       !TESNC(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -231,7 +231,7 @@ implicit none
   real(r8),pointer   :: histr_1D_FIREp_P_FLX_ptc(:)        !VPO4F(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_SURF_LITRf_P_FLX_ptc(:)  !TESN0(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_BRANCH_NO_ptc(:)     !NBR(NZ,NY,NX)
-  real(r8),pointer   :: histr_1D_LEAF_NC_ptc(:)       !(WTLFE(ielmn,NZ,NY,NX)+EPOOLP(ielmn,NZ,NY,NX))/(WTLFE(ielmc,NZ,NY,NX)+EPOOLP(ielmc,NZ,NY,NX)),mass based CN ratio of leaf  
+  real(r8),pointer   :: histr_1D_LEAF_NC_ptc(:)       !(WTLFE(ielmn,NZ,NY,NX)+CanopyNonstructElements_pft(ielmn,NZ,NY,NX))/(WTLFE(ielmc,NZ,NY,NX)+CanopyNonstructElements_pft(ielmc,NZ,NY,NX)),mass based CN ratio of leaf  
   real(r8),pointer   :: histr_1D_GROWTH_STG_ptc(:)    !plant development stage, integer, 0-10, planting, emergence, floral_init, jointing, 
                                       !elongation, heading, anthesis, seed_fill, see_no_set, seed_mass_set, end_seed_fill
   real(r8),pointer   :: histr_2D_LEAF_NODE_NO_ptc(:,:)       !VSTG(NB1(NZ,NY,NX),NZ,NY,NX), leaf NO
@@ -340,7 +340,7 @@ implicit none
   allocate(this%histr_1D_ATM_CO2_col(beg_col:end_col))       !CO2E(NY,NX)
   allocate(this%histr_1D_NBP_col(beg_col:end_col))           !TNBP(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
 
-  allocate(this%histr_1D_ECO_LAI_col(beg_col:end_col))       !CanGLA(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  allocate(this%histr_1D_ECO_LAI_col(beg_col:end_col))       !CanopyLA_grd(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_ECO_GPP_col(beg_col:end_col))       !TGPP(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_ECO_RA_col(beg_col:end_col))        !TRAU(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_ECO_NPP_col(beg_col:end_col))       !TNPP(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -387,7 +387,7 @@ implicit none
   allocate(this%histr_1D_RUNOFF_FLX_col(beg_col:end_col))        !-WQRH(NY,NX)*1000.0/TAREA, 
   allocate(this%histr_1D_SEDIMENT_FLX_col(beg_col:end_col))      !USEDOU(NY,NX)*1000.0/TAREA, soil mass 
   allocate(this%histr_1D_DISCHG_FLX_col(beg_col:end_col))        !FWatDischarge(NY,NX)*1000.0/TAREA
-  allocate(this%histr_1D_LEAF_PC_ptc(beg_ptc:end_ptc))       !(WTLFE(ielmp,NZ,NY,NX)+EPOOLP(ielmp,NZ,NY,NX))/(WTLFE(ielmc,NZ,NY,NX)+EPOOLP(ielmc,NZ,NY,NX)),mass based CP ratio of leaf
+  allocate(this%histr_1D_LEAF_PC_ptc(beg_ptc:end_ptc))       !(WTLFE(ielmp,NZ,NY,NX)+CanopyNonstructElements_pft(ielmp,NZ,NY,NX))/(WTLFE(ielmc,NZ,NY,NX)+CanopyNonstructElements_pft(ielmc,NZ,NY,NX)),mass based CP ratio of leaf
   allocate(this%histr_1D_CAN_RN_ptc(beg_ptc:end_ptc))        !277.8*RadNet2CanP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), W m-2
   allocate(this%histr_1D_CAN_LE_ptc(beg_ptc:end_ptc))        !277.8*EvapTransHeatP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_CAN_H_ptc(beg_ptc:end_ptc))         !277.8*HeatXAir2PCan(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -403,7 +403,7 @@ implicit none
   allocate(this%histr_1D_STOML_RSC_CO2_ptc(beg_ptc:end_ptc))!CanPStomaResistH2O(NZ,NY,NX)*1.56*3600.0_r8, s m-1, for CO2
   allocate(this%histr_1D_BLYR_RSC_CO2_ptc(beg_ptc:end_ptc)) !CanPbndlResist(NZ,NY,NX)*1.34*3600.0_r8, s m-1, for CO2
   allocate(this%histr_1D_CAN_CO2_ptc(beg_ptc:end_ptc))      !CO2Q(NZ,NY,NX), umol mol-1
-  allocate(this%histr_1D_LAI_ptc(beg_ptc:end_ptc))          !CanPA(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), plant leaf area, include stalk
+  allocate(this%histr_1D_LAI_ptc(beg_ptc:end_ptc))          !CanopyArea_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), plant leaf area, include stalk
   allocate(this%histr_1D_PSI_CAN_ptc(beg_ptc:end_ptc))      !PSICanP(NZ,NY,NX), canopy total water potential , MPa
   allocate(this%histr_1D_TURG_CAN_ptc(beg_ptc:end_ptc))     !PSICanPTurg(NZ,NY,NX), canopy turgor water potential, MPa
   allocate(this%histr_1D_STOM_RSC_H2O_ptc(beg_ptc:end_ptc)) !CanPStomaResistH2O(NZ,NY,NX)*3600.0_r8, s m-1, for H2O
@@ -426,7 +426,7 @@ implicit none
   allocate(this%histr_1D_NODULE_C_ptc(beg_ptc:end_ptc))        !WTNDE(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), nodule
   allocate(this%histr_1D_STORED_C_ptc(beg_ptc:end_ptc))     !WTRVE(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_GRAIN_NO_ptc(beg_ptc:end_ptc))     !GRNO(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  allocate(this%histr_1D_LAIb_ptc(beg_ptc:end_ptc))         !CanPLA(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total branch leaf area
+  allocate(this%histr_1D_LAIb_ptc(beg_ptc:end_ptc))         !CanopyLeafA_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total branch leaf area
   allocate(this%histr_1D_EXUD_C_FLX_ptc(beg_ptc:end_ptc))       !TEUPTK(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_LITRf_C_FLX_ptc(beg_ptc:end_ptc));  this%histr_1D_LITRf_C_FLX_ptc=spval
   allocate(this%histr_1D_LITRf_P_FLX_ptc(beg_ptc:end_ptc));  this%histr_1D_LITRf_P_FLX_ptc=spval
@@ -482,7 +482,7 @@ implicit none
   allocate(this%histr_1D_SURF_LITRf_P_FLX_ptc(beg_ptc:end_ptc))         !TESN0(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_BRANCH_NO_ptc(beg_ptc:end_ptc))            !NBR(NZ,NY,NX)
   allocate(this%histr_1D_GROWTH_STG_ptc(beg_ptc:end_ptc));      this%histr_1D_GROWTH_STG_ptc=spval
-  allocate(this%histr_1D_LEAF_NC_ptc(beg_ptc:end_ptc))              !(WTLFE(ielmn,NZ,NY,NX)+EPOOLP(ielmn,NZ,NY,NX))/(WTLFE(ielmc,NZ,NY,NX)+EPOOLP(ielmc,NZ,NY,NX)),mass based CN ratio of leaf  
+  allocate(this%histr_1D_LEAF_NC_ptc(beg_ptc:end_ptc))              !(WTLFE(ielmn,NZ,NY,NX)+CanopyNonstructElements_pft(ielmn,NZ,NY,NX))/(WTLFE(ielmc,NZ,NY,NX)+CanopyNonstructElements_pft(ielmc,NZ,NY,NX)),mass based CN ratio of leaf  
   allocate(this%histr_2D_tSOC_vr_col(beg_col:end_col,1:JZ))         !ORGC(1:JZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total soil C                                          
   allocate(this%histr_2D_LEAF_NODE_NO_ptc(beg_ptc:end_ptc,1:JBR))        !VSTG(NB1(NZ,NY,NX),NZ,NY,NX), leaf NO
   allocate(this%histr_2D_RUB_ACTVN_ptc(beg_ptc:end_ptc,1:JBR));      this%histr_2D_RUB_ACTVN_ptc=spval
@@ -1484,7 +1484,7 @@ implicit none
       this%histr_1D_ATM_CO2_col(ncol)     = CO2E(NY,NX)
       this%histr_1D_NBP_col(ncol)         = TNBP(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_ECO_HVST_C_col(ncol)  = XHVSTE(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%histr_1D_ECO_LAI_col(ncol)     = CanGLA(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%histr_1D_ECO_LAI_col(ncol)     = CanopyLA_grd(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_ECO_GPP_col(ncol)     = TGPP(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_ECO_RA_col(ncol)      = TRAU(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_ECO_NPP_col(ncol)     = TNPP(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -1555,8 +1555,8 @@ implicit none
       DO NZ=1,NP0(NY,NX)
         nptc=get_pft(NZ,NY,NX)
         this%histr_1D_MIN_LWP_ptc(nptc)      = PSICanPDailyMin(NZ,NY,NX)
-        this%histr_1D_LEAF_PC_ptc(nptc)      = safe_adb(WTLFE(ielmp,NZ,NY,NX)+EPOOLP(ielmp,NZ,NY,NX), &
-                                                 WTLFE(ielmc,NZ,NY,NX)+EPOOLP(ielmc,NZ,NY,NX))
+        this%histr_1D_LEAF_PC_ptc(nptc)      = safe_adb(WTLFE(ielmp,NZ,NY,NX)+CanopyNonstructElements_pft(ielmp,NZ,NY,NX), &
+                                                 WTLFE(ielmc,NZ,NY,NX)+CanopyNonstructElements_pft(ielmc,NZ,NY,NX))
         this%histr_1D_CAN_RN_ptc(nptc)       = 277.8_r8*RadNet2CanP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_CAN_LE_ptc(nptc)       = 277.8_r8*EvapTransHeatP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_CAN_H_ptc(nptc)        = 277.8_r8*HeatXAir2PCan(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -1572,7 +1572,7 @@ implicit none
         this%histr_1D_STOML_RSC_CO2_ptc(nptc)= CanPStomaResistH2O(NZ,NY,NX)*1.56_r8*3600.0_r8
         this%histr_1D_BLYR_RSC_CO2_ptc(nptc) = CanPbndlResist(NZ,NY,NX)*1.34_r8*3600.0_r8
         this%histr_1D_CAN_CO2_ptc(nptc)      = CO2Q(NZ,NY,NX)
-        this%histr_1D_LAI_ptc(nptc)          = CanPA(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%histr_1D_LAI_ptc(nptc)          = CanopyArea_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_PSI_CAN_ptc(nptc)      = PSICanP(NZ,NY,NX)
         this%histr_1D_TURG_CAN_ptc(nptc)     = PSICanPTurg(NZ,NY,NX)
         this%histr_1D_STOM_RSC_H2O_ptc(nptc) = CanPStomaResistH2O(NZ,NY,NX)*3600.0_r8
@@ -1595,7 +1595,7 @@ implicit none
         this%histr_1D_NODULE_C_ptc(nptc)        = WTNDE(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_STORED_C_ptc(nptc)     = WTRVE(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_GRAIN_NO_ptc(nptc)     = GRNO(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%histr_1D_LAIb_ptc(nptc)         = CanPLA(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%histr_1D_LAIb_ptc(nptc)         = CanopyLeafA_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_EXUD_C_FLX_ptc(nptc)       = TEUPTK(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_LITRf_C_FLX_ptc(nptc)      = TESNC(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_SURF_LITRf_C_FLX_ptc(nptc) = TESN0(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -1649,8 +1649,8 @@ implicit none
         this%histr_1D_FIREp_P_FLX_ptc(nptc)       = VPO4F(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_SURF_LITRf_P_FLX_ptc(nptc) = TESN0(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_BRANCH_NO_ptc(nptc)    = NBR(NZ,NY,NX)
-        this%histr_1D_LEAF_NC_ptc(nptc)      = safe_adb(WTLFE(ielmn,NZ,NY,NX)+EPOOLP(ielmn,NZ,NY,NX),&
-                                                 WTLFE(ielmc,NZ,NY,NX)+EPOOLP(ielmc,NZ,NY,NX))
+        this%histr_1D_LEAF_NC_ptc(nptc)      = safe_adb(WTLFE(ielmn,NZ,NY,NX)+CanopyNonstructElements_pft(ielmn,NZ,NY,NX),&
+                                                 WTLFE(ielmc,NZ,NY,NX)+CanopyNonstructElements_pft(ielmc,NZ,NY,NX))
         if(NB1(NZ,NY,NX)> 0)then
           DO KN=10,0,-1
             IF(KN==0)THEN

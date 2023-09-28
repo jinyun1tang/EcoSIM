@@ -123,7 +123,7 @@ module nitrosMod
   integer :: K,M,N,NGL
 !     begin_execution
   IF(FOSCXS.GT.ZERO)THEN
-    D7971: DO K=1,micpar%n_litrsfk
+    D7971: DO K=1,micpar%NumOfLitrCmplxs
       if(.not.micpar%is_finelitter(K))cycle
       D7961: DO N=1,NFGs
         DO NGL=JGnio(N),JGnfo(N)
@@ -148,7 +148,7 @@ module nitrosMod
       ENDDO D7961
     ENDDO D7971
 
-    D7901: DO K=1,micpar%n_litrsfk
+    D7901: DO K=1,micpar%NumOfLitrCmplxs
       if(.not.micpar%is_finelitter(K))cycle
       D7941: DO M=1,micpar%ndbiomcp
         IF(FOSCXS.GT.0.0_r8)THEN

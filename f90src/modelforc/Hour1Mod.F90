@@ -41,8 +41,8 @@ module Hour1Mod
   use SedimentDataType
   use PlantDataRateType
   use GridDataType
-  use EcoSIMConfig, only : jcplx1 => jcplx1c,jcplx=>jcplxc,nlbiomcp=>nlbiomcpc
-  use EcoSIMConfig, only : ndbiomcp=>ndbiomcpc,jsken=>jskenc,NFGs=>NFGsc,do_instequil
+  use EcoSIMConfig, only : jcplx1 => jcplx1c,jcplx=>jcplxc,nlbiomcp=>NumOfLiveMicrobiomComponents
+  use EcoSIMConfig, only : ndbiomcp=>NumOfDeadMicrobiomComponents,jsken=>jskenc,NFGs=>NFGsc,do_instequil
   use EcoSiMParDataMod, only : micpar,pltpar
   implicit none
 
@@ -66,12 +66,12 @@ module Hour1Mod
 
   contains
 
-  subroutine InitHour1(n_litrsfk)
+  subroutine InitHour1(NumOfLitrCmplxs)
 
   implicit none
-  integer, intent(in) :: n_litrsfk
+  integer, intent(in) :: NumOfLitrCmplxs
 
-  allocate(THETRX(1:n_litrsfk))
+  allocate(THETRX(1:NumOfLitrCmplxs))
   SoiBulkDensityX=1.89_r8
 
   THETPW=0.01_r8
@@ -254,16 +254,16 @@ module Hour1Mod
 !     CANOPY RETENTION OF PRECIPITATION
 !
 !     XVOLWC=foliar surface water retention capacity
-!     CanPLA,CanPSA=leaf,stalk area of PFT
+!     CanopyLeafA_pft,CanPSA=leaf,stalk area of PFT
 !     FLWC,TFLWC=water retention of PFT,combined canopy
 !     PRECA=precipitation+irrigation
 !     FracPARByCanP=fraction of radiation received by each PFT canopy
 !     VOLWC=canopy surface water retention
 !
   DO  NZ=1,NP(NY,NX)
-    VOLWCX=XVOLWC(IGTYP(NZ,NY,NX))*(CanPLA(NZ,NY,NX)+CanPSA(NZ,NY,NX))
-    PrecIntcptByCanP(NZ,NY,NX)=AZMAX1(AMIN1(PRECA(NY,NX)*FracPARByCanP(NZ,NY,NX),VOLWCX-WatByPCan(NZ,NY,NX)))
-    TFLWCI(NY,NX)=TFLWCI(NY,NX)+PRECA(NY,NX)*FracPARByCanP(NZ,NY,NX)
+    VOLWCX=XVOLWC(IGTYP(NZ,NY,NX))*(CanopyLeafA_pft(NZ,NY,NX)+CanPSA(NZ,NY,NX))
+    PrecIntcptByCanP(NZ,NY,NX)=AZMAX1(AMIN1(PrecRainAndSurfirrig(NY,NX)*FracPARByCanP(NZ,NY,NX),VOLWCX-WatByPCan(NZ,NY,NX)))
+    TFLWCI(NY,NX)=TFLWCI(NY,NX)+PrecRainAndSurfirrig(NY,NX)*FracPARByCanP(NZ,NY,NX)
     PrecIntcptByCanG(NY,NX)=PrecIntcptByCanG(NY,NX)+PrecIntcptByCanP(NZ,NY,NX)
   ENDDO
 
@@ -539,7 +539,7 @@ module Hour1Mod
     !     BKVL=soil mass
     !     C*=concentration,ORGC=SOC,SAND=sand,SILT=silt,CLAY=clay
     !     ParticleDens=particle density
-    !     PTDSNU=particle density of surface layer for use in erosion.f
+    !     ParticleDensitySurfLay=particle density of surface layer for use in erosion.f
     !     POROS=porosity used in diffusivity
     !     VOLA,VOLW,VOLI,VOLP=total,water-,ice-,air-filled micropore volume
     !     VOLAH,VOLWH,VOLIH,VOLPH=total,water-,ice-,air-filled macropore volume
@@ -643,8 +643,8 @@ module Hour1Mod
 !     ExtWaterTable,ExtWaterTablet0=current,initial natural water table depth
 !     DTBLY,DTBLD=current,initial artificial water table depth
 !     SoiSurfRoughnesst0,ZW=soil,water surface roughness
-!     VOLWD=soil surface water retention capacity
-!     VOLWG=VOLWD accounting for above-ground water table
+!     MaxVLWatByLitR=soil surface water retention capacity
+!     VWatStoreCapSurf=MaxVLWatByLitR accounting for above-ground water table
 !     EHUM=fraction of microbial decompn product allocated to surface humus
 !     EPOC=fraction of SOC decomposition product allocated to surface POC
 !
@@ -663,10 +663,11 @@ module Hour1Mod
   ELSE
     SoiSurfRoughnesst0(NY,NX)=ZW
   ENDIF
-  VOLWD(NY,NX)=AMAX1(0.001_r8,0.112_r8*SoiSurfRoughnesst0(NY,NX)+3.10_r8*SoiSurfRoughnesst0(NY,NX)**2._r8 &
+  MaxVLWatByLitR(NY,NX)=AMAX1(0.001_r8,0.112_r8*SoiSurfRoughnesst0(NY,NX)+&
+    3.10_r8*SoiSurfRoughnesst0(NY,NX)**2._r8 &
     -0.012_r8*SoiSurfRoughnesst0(NY,NX)*SLOPE(0,NY,NX))*AREA(3,NU(NY,NX),NY,NX)
-  VOLWG(NY,NX)=AMAX1(VOLWD(NY,NX),-(ExtWaterTable(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)) &
-    *AREA(3,NU(NY,NX),NY,NX))
+  VWatStoreCapSurf(NY,NX)=AMAX1(MaxVLWatByLitR(NY,NX),-(ExtWaterTable(NY,NX)-&
+    CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX))*AREA(3,NU(NY,NX),NY,NX))
 
   SoiDepthMidLay(NU(NY,NX),NY,NX)=CumDepth2LayerBottom(NU(NY,NX),NY,NX)-0.5_r8*DLYR(3,NU(NY,NX),NY,NX)
   IF(SoilMicPMassLayer(NU(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
@@ -772,7 +773,7 @@ module Hour1Mod
 
   TRootGasLoss_disturb(idg_beg:idg_end-1,NY,NX)=0.0_r8
   ZESNC(:,NY,NX)=0.0_r8
-  WTSTGET(1:npelms,NY,NX)=0.0_r8
+  WTSTGET(1:NumOfPlantChemElements,NY,NX)=0.0_r8
   PPT(NY,NX)=0.0_r8
 ! zero arrays in the snow layers
   FLSW(1:JS,NY,NX)=0.0_r8
@@ -802,7 +803,8 @@ module Hour1Mod
 
 !     begin_execution
 
-  ESNT(1:npelms,1:jsken,1:pltpar%n_pltlitrk,0:NL(NY,NX),NY,NX)=0.0_r8
+  LitrfalChemElemnts_vr(1:NumOfPlantChemElements,1:jsken,1:pltpar%NumOfPlantLitrCmplxs,&
+    0:NL(NY,NX),NY,NX)=0.0_r8
 
   XOQCS(1:jcplx,0:NL(NY,NX),NY,NX)=0.0_r8
   XOQNS(1:jcplx,0:NL(NY,NX),NY,NX)=0.0_r8
@@ -828,7 +830,7 @@ module Hour1Mod
 
   GasDisFlx(idg_beg:idg_end,0:NL(NY,NX),NY,NX)=0.0_r8
 
-  TDFOME(1:npelms,1:jcplx,NU(NY,NX):NL(NY,NX),NY,NX)=0.0_r8
+  TDFOME(1:NumOfPlantChemElements,1:jcplx,NU(NY,NX):NL(NY,NX),NY,NX)=0.0_r8
   ROXSK(1:NPH,NU(NY,NX):NL(NY,NX),NY,NX)=0.0_r8
   end subroutine SetArrays4PlantSoilTransfer
 !------------------------------------------------------------------------------------------
@@ -960,9 +962,9 @@ module Hour1Mod
     COHS=2.0_r8+10.0_r8*(CCLAY(NU(NY,NX),NY,NX)+CORGM) &
       +5.0_r8*(1.0_r8-EXP(-2.0E-06_r8*RTDNT(NU(NY,NX),NY,NX)))
     DETE(NY,NX)=0.79_r8*EXP(-0.85_r8*AMAX1(1.0_r8,COHS))
-    PTDSNU(NY,NX)=1.30_r8*CORGM+2.66_r8*(1.0_r8-CORGM)
+    ParticleDensitySurfLay(NY,NX)=1.30_r8*CORGM+2.66_r8*(1.0_r8-CORGM)
     VISCWL=VISCW*EXP(0.533_r8-0.0267_r8*TCS(0,NY,NX))
-    VLS(NY,NX)=3.6E+03_r8*9.8_r8*(PTDSNU(NY,NX)-1.0_r8) &
+    VLS(NY,NX)=3.6E+03_r8*9.8_r8*(ParticleDensitySurfLay(NY,NX)-1.0_r8) &
       *(ppmc*D50)**2/(18.0_r8*VISCWL)
   ENDIF
   end subroutine SetSurfaceProperty4SedErosion
@@ -989,10 +991,10 @@ module Hour1Mod
 
   DO L=0,NL(NY,NX)
 !  add heterotrophic complexs
-    OC=OC+sum(OMC(1:nlbiomcp,1:NMICBSO,1:jcplx,L,NY,NX))
+    OC=OC+sum(OMC(1:nlbiomcp,1:NumOfMicrobs1HetertrophCmplx,1:jcplx,L,NY,NX))
 
 !  add autotrophic complex
-    OC=OC+sum(OMCff(1:nlbiomcp,1:NMICBSA,L,NY,NX))
+    OC=OC+sum(OMCff(1:nlbiomcp,1:NumOfMicrobsInAutotrophCmplx,L,NY,NX))
 !  add microbial residue
     OC=OC+SUM(ORC(1:ndbiomcp,1:jcplx,L,NY,NX))
 !  add dissolved/sorbed OM and acetate
@@ -1152,12 +1154,12 @@ module Hour1Mod
     ROQAX(K,0,NY,NX)=0.0_r8
   ENDDO D5055
 !
-!     WGSGA,WGSGR,WGSGW=vapor diffusivity in air,litter,snowpack
+!     WGSGA,VaporDiffusivityLitR,WGSGW=vapor diffusivity in air,litter,snowpack
 !
   TFACA=TEFGASDIF(TairK(NY,NX))
   WGSGA(NY,NX)=WGSG*TFACA
   TFACR=TEFGASDIF(TKS(0,NY,NX))
-  WGSGR(NY,NX)=WGSG*TFACR
+  VaporDiffusivityLitR(NY,NX)=WGSG*TFACR
   D5060: DO  L=1,JS
     TFACW=TEFGASDIF(TKSnow(L,NY,NX))
     H2OVapDifscSno(L,NY,NX)=WGSG*TFACW
@@ -1435,7 +1437,7 @@ module Hour1Mod
 ! PHYSICAL PROPERTIES, AND WATER, GAS, AND MINERAL CONTENTS
 ! OF SURFACE RESIDUE
 !
-! VWatLitrX=liter water holding capacity
+! VWatLitRHoldCapcity=liter water holding capacity
 ! THETRX,RC0=specific WHC,mass of woody(0),fine(1),manure(2) litter
 ! VLitR=dry litter volume
 ! BulkDensLitR=dry bulk density of woody(0),fine(1),manure(2) litter
@@ -1449,7 +1451,7 @@ module Hour1Mod
 ! DLYR=litter thickness
 ! PSISM,PSISE=litter matric,saturation water potential
 !
-  VxcessWatLitR=AZMAX1(VLWatMicP(0,NY,NX)+VLiceMicP(0,NY,NX)-VWatLitrX(NY,NX))
+  VxcessWatLitR=AZMAX1(VLWatMicP(0,NY,NX)+VLiceMicP(0,NY,NX)-VWatLitRHoldCapcity(NY,NX))
   VGeomLayer(0,NY,NX)=VxcessWatLitR+VLitR(NY,NX)
   IF(VGeomLayer(0,NY,NX).GT.ZEROS2(NY,NX))THEN
     VLSoilPoreMicP(0,NY,NX)=VGeomLayer(0,NY,NX)
@@ -1469,8 +1471,8 @@ module Hour1Mod
     ENDIF
     TVOLWI=VLWatMicP(0,NY,NX)+VLiceMicP(0,NY,NX)
     IF(TVOLWI.GT.ZEROS(NY,NX))THEN
-      VWatLitrZ=VLWatMicP(0,NY,NX)/TVOLWI*VWatLitrX(NY,NX)
-      VOLIRZ=VLiceMicP(0,NY,NX)/TVOLWI*VWatLitrX(NY,NX)
+      VWatLitrZ=VLWatMicP(0,NY,NX)/TVOLWI*VWatLitRHoldCapcity(NY,NX)
+      VOLIRZ=VLiceMicP(0,NY,NX)/TVOLWI*VWatLitRHoldCapcity(NY,NX)
       XVOLW0=AZMAX1(VLWatMicP(0,NY,NX)-VWatLitrZ)/AREA(3,NU(NY,NX),NY,NX)
       XVOLI0=AZMAX1(VLiceMicP(0,NY,NX)-VOLIRZ)/AREA(3,NU(NY,NX),NY,NX)
     ELSE
@@ -1481,7 +1483,7 @@ module Hour1Mod
 
     DLYR(3,0,NY,NX)=VLSoilPoreMicP(0,NY,NX)/AREA(3,0,NY,NX)
     IF(VLitR(NY,NX).GT.ZEROS(NY,NX).AND.VLWatMicP(0,NY,NX).GT.ZEROS2(NY,NX))THEN
-      THETWR=AMIN1(VWatLitrX(NY,NX),VLWatMicP(0,NY,NX))/VLitR(NY,NX)
+      THETWR=AMIN1(VWatLitRHoldCapcity(NY,NX),VLWatMicP(0,NY,NX))/VLitR(NY,NX)
       IF(THETWR.LT.FieldCapacity(0,NY,NX))THEN
         PSISoilMatricP(0,NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIFLD(NY,NX)+((LOGFldCapacity(0,NY,NX)-LOG(THETWR)) &
           /FCD(0,NY,NX)*LOGPSIMND(NY,NX))))
@@ -1518,7 +1520,7 @@ module Hour1Mod
     THETW(0,NY,NX)=0.0_r8
     THETI(0,NY,NX)=0.0_r8
     THETP(0,NY,NX)=1.0
-    VWatLitrX(NY,NX)=0.0_r8
+    VWatLitRHoldCapcity(NY,NX)=0.0_r8
     PSISoilMatricP(0,NY,NX)=PSISoilMatricP(NU(NY,NX),NY,NX)
 
     trc_solcl(ids_nut_beg:ids_nuts_end,0,NY,NX)=0.0_r8
@@ -2383,7 +2385,7 @@ module Hour1Mod
 
   L=0
   DO NTG=idg_beg,idg_end-1
-    GSolbility(NTG,L,NY,NX)=gas_solubility(NTG,TCS(L,NY,NX))
+    GasSolbility(NTG,L,NY,NX)=gas_solubility(NTG,TCS(L,NY,NX))
   ENDDO
 
   DO  L=1,NL(NY,NX)+1
@@ -2392,7 +2394,7 @@ module Hour1Mod
 ! 5.56E+04_r8 := mole H2O / m3
     FH2O=5.56E+04_r8/(5.56E+04_r8+CION(L,NY,NX))
     DO NTG=idg_beg,idg_end-1
-      GSolbility(NTG,L,NY,NX)=gas_solubility(NTG,TCS(L,NY,NX))/(EXP(ACTCG(NTG)*CSTR(L,NY,NX)))*FH2O
+      GasSolbility(NTG,L,NY,NX)=gas_solubility(NTG,TCS(L,NY,NX))/(EXP(ACTCG(NTG)*CSTR(L,NY,NX)))*FH2O
     ENDDO
   ENDDO
   end subroutine CalGasSolubility
@@ -2402,24 +2404,24 @@ module Hour1Mod
   real(r8) :: FVLitR
   integer, intent(in) :: NY,NX
 !
-!     VWatLitrX=liter water holding capacity
+!     VWatLitRHoldCapcity=liter water holding capacity
 !     VLitR=dry litter volume
 !     POROS0,FC,WP=litter porosity,field capacity,wilting point
 !
-  real(r8) :: VWatLitrX0,VLitR0
+  real(r8) :: VWatLitRHoldCapcity0,VLitR0
   integer  :: K
-  VWatLitrX0=0._r8
+  VWatLitRHoldCapcity0=0._r8
   VLitR0=0._r8
-  DO K=1,micpar%n_litrsfk
-    VWatLitrX0=VWatLitrX0+THETRX(K)*RC0(K,NY,NX)
+  DO K=1,micpar%NumOfLitrCmplxs
+    VWatLitRHoldCapcity0=VWatLitRHoldCapcity0+THETRX(K)*RC0(K,NY,NX)
     VLitR0=VLitR0+RC0(K,NY,NX)/BulkDensLitR(K)
   ENDDO
 
-  VWatLitrX(NY,NX)=AZMAX1(VWatLitrX0)
+  VWatLitRHoldCapcity(NY,NX)=AZMAX1(VWatLitRHoldCapcity0)
   VLitR(NY,NX)=AZMAX1(VLitR0*ppmc)
 
   IF(VLitR(NY,NX).GT.ZEROS(NY,NX))THEN
-    FVLitR=VWatLitrX(NY,NX)/VLitR(NY,NX)
+    FVLitR=VWatLitRHoldCapcity(NY,NX)/VLitR(NY,NX)
   ELSE
     FVLitR=THETRX(micpar%k_fine_litr)/BulkDensLitR(micpar%k_fine_litr)
   ENDIF

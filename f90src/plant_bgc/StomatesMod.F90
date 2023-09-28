@@ -49,7 +49,7 @@
     TKCZ     =>  plt_ew%TKCZ      , &
     CO2E     =>  plt_site%CO2E    , &
     CO2Q     =>  plt_photo%CO2Q   , &
-    CanPLA    =>  plt_morph%CanPLA  , &
+    CanopyLeafA_pft    =>  plt_morph%CanopyLeafA_pft  , &
     ZEROP    =>  plt_biom%ZEROP   , &
     CNETX    =>  plt_bgcr%CNETX   , &
     SSIN     =>  plt_rad%SSIN     , &
@@ -92,11 +92,11 @@
 !     CO2I=intercellular CO2 concentration
 !     CanPCi2CaRatio=intercellular:atmospheric CO2 concn ratio from PFT file, parameter
 !     SSIN=sine of solar angle
-!     CanPLA=PFT leaf area
+!     CanopyLeafA_pft=PFT leaf area
 !
   CO2I(NZ)=CanPCi2CaRatio(NZ)*CO2Q(NZ)
 
-  IF(SSIN.GT.0.0.AND.CanPLA(NZ).GT.ZEROP(NZ))THEN
+  IF(SSIN.GT.0.0.AND.CanopyLeafA_pft(NZ).GT.ZEROP(NZ))THEN
 !
     call PhotoActivePFT(NZ)
   ELSE
@@ -320,7 +320,7 @@
 !     CanPLNBLA=leaf area
 !     SURFX=unself-shaded leaf surface area
 !
-  DO L=JC1,1,-1
+  DO L=NumOfCanopyLayers1,1,-1
     IF(CanPLNBLA(L,K,NB,NZ).GT.ZEROP(NZ))THEN
       call C3PhotosynsCanopyLayerL(L,K,NB,NZ,CH2O)
     ENDIF
@@ -429,7 +429,7 @@
 !     CanPLNBLA=leaf area
 !     SURFX=unself-shaded leaf surface area
 !
-  DO L=JC1,1,-1
+  DO L=NumOfCanopyLayers1,1,-1
     IF(CanPLNBLA(L,K,NB,NZ).GT.ZEROP(NZ))THEN
       call C4PhotosynsCanopyLayerL(L,K,NB,NZ,CH2O)
     ENDIF
@@ -671,7 +671,7 @@
     IWTYP  =>  plt_pheno%IWTYP  , &
     IBTYP  =>  plt_pheno%IBTYP  , &
     FLG4   =>  plt_pheno%FLG4   , &
-    ATRP   =>  plt_pheno%ATRP   , &
+    HourCounter4LeafOut_brch   =>  plt_pheno%HourCounter4LeafOut_brch   , &
     ISTYP  =>  plt_pheno%ISTYP  , &
     IDTHB  =>  plt_pheno%IDTHB  , &
     ZERO   =>  plt_site%ZERO    , &
@@ -705,7 +705,7 @@
 ! deciduous
   IF(IWTYP(NZ).NE.0.AND.IBTYP(NZ).GE.2)THEN
     FDBK(NB,NZ)=FDBK(NB,NZ)*AZMAX1(AMIN1(1.0_r8 &
-      ,ATRP(NB,NZ)/(0.9_r8*ATRPZ)))
+      ,HourCounter4LeafOut_brch(NB,NZ)/(0.9_r8*ATRPZ)))
   ENDIF
 !
 !     TERMINATION OF ANNUALS

@@ -11,7 +11,7 @@ module ErosionBalMod
   USE AqueChemDatatype
   use FlagDataType
   use FertilizerDataType
-  use EcoSIMConfig, only : nlbiomcp=>nlbiomcpc
+  use EcoSIMConfig, only : nlbiomcp=>NumOfLiveMicrobiomComponents
   use TFlxTypeMod
 implicit none
   private
@@ -119,7 +119,7 @@ implicit none
 
 !     MICROBIAL C,N,P
 !
-      D1970: DO K=1,micpar%n_litrsfk
+      D1970: DO K=1,micpar%NumOfLitrCmplxs
 
 !         OMC,OMN,OMP=microbial C,N,P
 !         ORC,ORN,ORP=microbial residue C,N,P
@@ -167,7 +167,7 @@ implicit none
 !
 !     MICROBIAL RESIDUE C,N,P
 !
-      D1900: DO K=1,micpar%n_litrsfk
+      D1900: DO K=1,micpar%NumOfLitrCmplxs
         D1940: DO M=1,ndbiomcp
           FORC=FSINK*ORC(M,K,L,NY,NX)
           FORN=FSINK*ORN(M,K,L,NY,NX)
@@ -238,13 +238,13 @@ implicit none
     trcx_TER(idx_beg:idx_end,NY,NX)=0.0_r8
     trcp_TER(idsp_beg:idsp_end,NY,NX)=0.0_r8
 
-    TOMCER(1:nlbiomcp,1:NMICBSO,1:jcplx,NY,NX)=0.0_r8
-    TOMNER(1:nlbiomcp,1:NMICBSO,1:jcplx,NY,NX)=0.0_r8
-    TOMPER(1:nlbiomcp,1:NMICBSO,1:jcplx,NY,NX)=0.0_r8
+    TOMCER(1:nlbiomcp,1:NumOfMicrobs1HetertrophCmplx,1:jcplx,NY,NX)=0.0_r8
+    TOMNER(1:nlbiomcp,1:NumOfMicrobs1HetertrophCmplx,1:jcplx,NY,NX)=0.0_r8
+    TOMPER(1:nlbiomcp,1:NumOfMicrobs1HetertrophCmplx,1:jcplx,NY,NX)=0.0_r8
 
-    TOMCERff(1:nlbiomcp,1:NMICBSA,NY,NX)=0.0_r8
-    TOMNERff(1:nlbiomcp,1:NMICBSA,NY,NX)=0.0_r8
-    TOMPERff(1:nlbiomcp,1:NMICBSA,NY,NX)=0.0_r8
+    TOMCERff(1:nlbiomcp,1:NumOfMicrobsInAutotrophCmplx,NY,NX)=0.0_r8
+    TOMNERff(1:nlbiomcp,1:NumOfMicrobsInAutotrophCmplx,NY,NX)=0.0_r8
+    TOMPERff(1:nlbiomcp,1:NumOfMicrobsInAutotrophCmplx,NY,NX)=0.0_r8
 
     TORCER(1:ndbiomcp,1:jcplx,NY,NX)=0.0_r8
     TORNER(1:ndbiomcp,1:jcplx,NY,NX)=0.0_r8

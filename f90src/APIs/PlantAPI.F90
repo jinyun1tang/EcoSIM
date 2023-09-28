@@ -123,14 +123,14 @@ implicit none
   TLEC(NY,NX)=plt_ew%TLEC
   TSHC(NY,NX)=plt_ew%TSHC
   TRAU(NY,NX)=plt_bgcr%TRAU
-  ZESNC(1:npelms,NY,NX) =plt_bgcr%ZESNC(1:npelms)
-  XHVSTE(1:npelms,NY,NX)=plt_distb%XHVSTE(1:npelms)
+  ZESNC(1:NumOfPlantChemElements,NY,NX) =plt_bgcr%ZESNC(1:NumOfPlantChemElements)
+  XHVSTE(1:NumOfPlantChemElements,NY,NX)=plt_distb%XHVSTE(1:NumOfPlantChemElements)
   CanH2OHeldVg(NY,NX)=plt_ew%CanH2OHeldVg
   TSH(NY,NX)   =plt_ew%TSH
-  WTSTGET(1:npelms,NY,NX)=plt_biom%WTSTGET(1:npelms)
+  WTSTGET(1:NumOfPlantChemElements,NY,NX)=plt_biom%WTSTGET(1:NumOfPlantChemElements)
   UVOLO(NY,NX) =plt_ew%UVOLO
   StemAreag(NY,NX) =plt_morph%StemAreag
-  CanGLA(NY,NX) =plt_morph%CanGLA
+  CanopyLA_grd(NY,NX) =plt_morph%CanopyLA_grd
   TRN(NY,NX)   =plt_rad%TRN
   TLE(NY,NX)   =plt_ew%TLE
   TGH(NY,NX)   =plt_ew%TGH
@@ -146,15 +146,15 @@ implicit none
   FERT(17:19,I1,NY,NX)=plt_distb%FERT(17:19)
   FERT(3,I1,NY,NX) =plt_distb%FERT(3)
   IYTYP(2,I1,NY,NX)=plt_distb%IYTYP
-  FWOODE(1:npelms,1:n_pltlitrk) =plt_allom%FWOODE(1:npelms,1:n_pltlitrk)
-  FWODRE(1:npelms,1:n_pltlitrk) =plt_allom%FWODRE(1:npelms,1:n_pltlitrk)
-  FWODBE(1:npelms,1:n_pltlitrk) =plt_allom%FWODBE(1:npelms,1:n_pltlitrk)
-  FWODLE(1:npelms,1:n_pltlitrk)=plt_allom%FWODLE(1:npelms,1:n_pltlitrk)
+  FWOODE(1:NumOfPlantChemElements,1:NumOfPlantLitrCmplxs) =plt_allom%FWOODE(1:NumOfPlantChemElements,1:NumOfPlantLitrCmplxs)
+  FWODRE(1:NumOfPlantChemElements,1:NumOfPlantLitrCmplxs) =plt_allom%FWODRE(1:NumOfPlantChemElements,1:NumOfPlantLitrCmplxs)
+  FWODBE(1:NumOfPlantChemElements,1:NumOfPlantLitrCmplxs) =plt_allom%FWODBE(1:NumOfPlantChemElements,1:NumOfPlantLitrCmplxs)
+  FWODLE(1:NumOfPlantChemElements,1:NumOfPlantLitrCmplxs)=plt_allom%FWODLE(1:NumOfPlantChemElements,1:NumOfPlantLitrCmplxs)
   VOLWOU   =plt_site%VOLWOU
   DO L=1,JC
     WGLFT(L,NY,NX)=plt_biom%WGLFT(L)
-    ARSTT(L,NY,NX)=plt_morph%ARSTT(L)
-    ARLFT(L,NY,NX)=plt_morph%ARLFT(L)
+    CanopyStemA_lyr(L,NY,NX)=plt_morph%CanopyStemA_lyr(L)
+    CanopyLAgrid_lyr(L,NY,NX)=plt_morph%CanopyLAgrid_lyr(L)
   ENDDO
   DO L=NU(NY,NX),NL(NY,NX)
     DO K=1,jcplx
@@ -179,10 +179,10 @@ implicit none
     ROXYX(L,NY,NX) =plt_bgcr%ROXYX(L)
     THeatRootUptake(L,NY,NX) =plt_ew%THeatRootUptake(L)
     GridPlantRootH2OUptake_vr(L,NY,NX)=plt_ew%GridPlantRootH2OUptake_vr(L)
-    DO  K=1,micpar%n_pltlitrk
-      DO NE=1,npelms
+    DO  K=1,micpar%NumOfPlantLitrCmplxs
+      DO NE=1,NumOfPlantChemElements
         DO  M=1,jsken
-          ESNT(NE,M,K,L,NY,NX)=plt_bgcr%ESNT(NE,M,K,L)
+          LitrfalChemElemnts_vr(NE,M,K,L,NY,NX)=plt_bgcr%LitrfalChemElemnts_vr(NE,M,K,L)
         ENDDO
       ENDDO
     ENDDO
@@ -211,44 +211,44 @@ implicit none
     TUPH1P(L,NY,NX)=plt_bgcr%TUPH1P(L)
     TUPH2P(L,NY,NX)=plt_bgcr%TUPH2P(L)
     DO  K=1,jcplx
-      TDFOME(1:npelms,K,L,NY,NX)=plt_bgcr%TDFOME(1:npelms,K,L)
+      TDFOME(1:NumOfPlantChemElements,K,L,NY,NX)=plt_bgcr%TDFOME(1:NumOfPlantChemElements,K,L)
     ENDDO
   ENDDO
   DO NZ=1,NP0(NY,NX)
-    WTRTE(1:npelms,NZ,NY,NX) =plt_biom%WTRTE(1:npelms,NZ)
-    BALE(1:npelms,NZ,NY,NX)  =plt_site%BALE(1:npelms,NZ)
-    EPOOLP(1:npelms,NZ,NY,NX)=plt_biom%EPOOLP(1:npelms,NZ)
-    EPOLNP(1:npelms,NZ,NY,NX)=plt_biom%EPOLNP(1:npelms,NZ)
-    CEPOLP(1:npelms,NZ,NY,NX)=plt_biom%CEPOLP(1:npelms,NZ)
-    HESNC(1:npelms,NZ,NY,NX) =plt_bgcr%HESNC(1:npelms,NZ)
-    HVSTE(1:npelms,NZ,NY,NX) =plt_distb%HVSTE(1:npelms,NZ)
-    RSETE(1:npelms,NZ,NY,NX) =plt_pheno%RSETE(1:npelms,NZ)
-    TESN0(1:npelms,NZ,NY,NX) =plt_bgcr%TESN0(1:npelms,NZ)
-    TESNC(1:npelms,NZ,NY,NX) =plt_bgcr%TESNC(1:npelms,NZ)
-    THVSTE(1:npelms,NZ,NY,NX) =plt_distb%THVSTE(1:npelms,NZ)
-    TEUPTK(1:npelms,NZ,NY,NX) =plt_rbgc%TEUPTK(1:npelms,NZ)
-    UPOME(1:npelms,NZ,NY,NX)  =plt_rbgc%UPOME(1:npelms,NZ)
-    WTSTGE(1:npelms,NZ,NY,NX)  =plt_biom%WTSTGE(1:npelms,NZ)
-    WTRVE(1:npelms,NZ,NY,NX)  =plt_biom%WTRVE(1:npelms,NZ)
-    CanPShootElmMass(1:npelms,NZ,NY,NX)  =plt_biom%CanPShootElmMass(1:npelms,NZ)
-    WTLFE(1:npelms,NZ,NY,NX)   =plt_biom%WTLFE(1:npelms,NZ)
-    WTSHEE(1:npelms,NZ,NY,NX)  =plt_biom%WTSHEE(1:npelms,NZ)
-    WTSTKE(1:npelms,NZ,NY,NX)  =plt_biom%WTSTKE(1:npelms,NZ)
-    WTRSVE(1:npelms,NZ,NY,NX)  =plt_biom%WTRSVE(1:npelms,NZ)
-    WTHSKE(1:npelms,NZ,NY,NX)  =plt_biom%WTHSKE(1:npelms,NZ)
-    WTEARE(1:npelms,NZ,NY,NX)  =plt_biom%WTEARE(1:npelms,NZ)
-    WTGRE(1:npelms,NZ,NY,NX)   =plt_biom%WTGRE(1:npelms,NZ)
-    WTRTSE(1:npelms,NZ,NY,NX)  =plt_biom%WTRTSE(1:npelms,NZ)
-    WTNDE(1:npelms,NZ,NY,NX)   =plt_biom%WTNDE(1:npelms,NZ)
-    HEUPTK(1:npelms,NZ,NY,NX)=plt_rbgc%HEUPTK(1:npelms,NZ)
-    CanPLA(NZ,NY,NX) =plt_morph%CanPLA(NZ)
+    WTRTE(1:NumOfPlantChemElements,NZ,NY,NX) =plt_biom%WTRTE(1:NumOfPlantChemElements,NZ)
+    BALE(1:NumOfPlantChemElements,NZ,NY,NX)  =plt_site%BALE(1:NumOfPlantChemElements,NZ)
+    CanopyNonstructElements_pft(1:NumOfPlantChemElements,NZ,NY,NX)=plt_biom%CanopyNonstructElements_pft(1:NumOfPlantChemElements,NZ)
+    EPOLNP(1:NumOfPlantChemElements,NZ,NY,NX)=plt_biom%EPOLNP(1:NumOfPlantChemElements,NZ)
+    CEPOLP(1:NumOfPlantChemElements,NZ,NY,NX)=plt_biom%CEPOLP(1:NumOfPlantChemElements,NZ)
+    HESNC(1:NumOfPlantChemElements,NZ,NY,NX) =plt_bgcr%HESNC(1:NumOfPlantChemElements,NZ)
+    HVSTE(1:NumOfPlantChemElements,NZ,NY,NX) =plt_distb%HVSTE(1:NumOfPlantChemElements,NZ)
+    RSETE(1:NumOfPlantChemElements,NZ,NY,NX) =plt_pheno%RSETE(1:NumOfPlantChemElements,NZ)
+    TESN0(1:NumOfPlantChemElements,NZ,NY,NX) =plt_bgcr%TESN0(1:NumOfPlantChemElements,NZ)
+    TESNC(1:NumOfPlantChemElements,NZ,NY,NX) =plt_bgcr%TESNC(1:NumOfPlantChemElements,NZ)
+    THVSTE(1:NumOfPlantChemElements,NZ,NY,NX) =plt_distb%THVSTE(1:NumOfPlantChemElements,NZ)
+    TEUPTK(1:NumOfPlantChemElements,NZ,NY,NX) =plt_rbgc%TEUPTK(1:NumOfPlantChemElements,NZ)
+    UPOME(1:NumOfPlantChemElements,NZ,NY,NX)  =plt_rbgc%UPOME(1:NumOfPlantChemElements,NZ)
+    WTSTGE(1:NumOfPlantChemElements,NZ,NY,NX)  =plt_biom%WTSTGE(1:NumOfPlantChemElements,NZ)
+    WTRVE(1:NumOfPlantChemElements,NZ,NY,NX)  =plt_biom%WTRVE(1:NumOfPlantChemElements,NZ)
+    CanPShootElmMass(1:NumOfPlantChemElements,NZ,NY,NX)  =plt_biom%CanPShootElmMass(1:NumOfPlantChemElements,NZ)
+    WTLFE(1:NumOfPlantChemElements,NZ,NY,NX)   =plt_biom%WTLFE(1:NumOfPlantChemElements,NZ)
+    WTSHEE(1:NumOfPlantChemElements,NZ,NY,NX)  =plt_biom%WTSHEE(1:NumOfPlantChemElements,NZ)
+    WTSTKE(1:NumOfPlantChemElements,NZ,NY,NX)  =plt_biom%WTSTKE(1:NumOfPlantChemElements,NZ)
+    WTRSVE(1:NumOfPlantChemElements,NZ,NY,NX)  =plt_biom%WTRSVE(1:NumOfPlantChemElements,NZ)
+    WTHSKE(1:NumOfPlantChemElements,NZ,NY,NX)  =plt_biom%WTHSKE(1:NumOfPlantChemElements,NZ)
+    WTEARE(1:NumOfPlantChemElements,NZ,NY,NX)  =plt_biom%WTEARE(1:NumOfPlantChemElements,NZ)
+    WTGRE(1:NumOfPlantChemElements,NZ,NY,NX)   =plt_biom%WTGRE(1:NumOfPlantChemElements,NZ)
+    WTRTSE(1:NumOfPlantChemElements,NZ,NY,NX)  =plt_biom%WTRTSE(1:NumOfPlantChemElements,NZ)
+    WTNDE(1:NumOfPlantChemElements,NZ,NY,NX)   =plt_biom%WTNDE(1:NumOfPlantChemElements,NZ)
+    HEUPTK(1:NumOfPlantChemElements,NZ,NY,NX)=plt_rbgc%HEUPTK(1:NumOfPlantChemElements,NZ)
+    CanopyLeafA_pft(NZ,NY,NX) =plt_morph%CanopyLeafA_pft(NZ)
     CanPSA(NZ,NY,NX) =plt_morph%CanPSA(NZ)
     CCPLNP(NZ,NY,NX)=plt_biom%CCPLNP(NZ)
     CNET(NZ,NY,NX)  =plt_bgcr%CNET(NZ)
     CO2Q(NZ,NY,NX)  =plt_photo%CO2Q(NZ)
     CO2I(NZ,NY,NX)  =plt_photo%CO2I(NZ)
     CO2L(NZ,NY,NX)  =plt_photo%CO2L(NZ)
-    CF(NZ,NY,NX)    =plt_morph%CF(NZ)
+    ClumpFactor(NZ,NY,NX)    =plt_morph%ClumpFactor(NZ)
     CNWS(NZ,NY,NX)  =plt_allom%CNWS(NZ)
     CPWS(NZ,NY,NX)  =plt_allom%CPWS(NZ)
     CWSRT(NZ,NY,NX) =plt_allom%CWSRT(NZ)
@@ -348,7 +348,7 @@ implicit none
     WSTR(NZ,NY,NX)   =plt_pheno%WSTR(NZ)
     WTRVX(NZ,NY,NX)  =plt_biom%WTRVX(NZ)
     CanPStalkC(NZ,NY,NX)  =plt_biom%CanPStalkC(NZ)
-    CanPLeafShethC(NZ,NY,NX)   =plt_biom%CanPLeafShethC(NZ)
+    CanopyLeafShethC_pft(NZ,NY,NX)   =plt_biom%CanopyLeafShethC_pft(NZ)
     WTRTA(NZ,NY,NX)  =plt_biom%WTRTA(NZ)
     XKCO2L(NZ,NY,NX) =plt_photo%XKCO2L(NZ)
     XKCO2O(NZ,NY,NX) =plt_photo%XKCO2O(NZ)
@@ -363,28 +363,28 @@ implicit none
     JHVST(NZ,I,NY,NX)=plt_distb%JHVST(NZ)
     THIN(NZ,I,NY,NX) =plt_distb%THIN(NZ)
     DO L=1,JZ
-      WTNDLE(1:npelms,L,NZ,NY,NX) =plt_biom%WTNDLE(1:npelms,L,NZ)
-      EPOOLN(1:npelms,L,NZ,NY,NX)=plt_biom%EPOOLN(1:npelms,L,NZ)
+      WTNDLE(1:NumOfPlantChemElements,L,NZ,NY,NX) =plt_biom%WTNDLE(1:NumOfPlantChemElements,L,NZ)
+      EPOOLN(1:NumOfPlantChemElements,L,NZ,NY,NX)=plt_biom%EPOOLN(1:NumOfPlantChemElements,L,NZ)
       RUPNF(L,NZ,NY,NX) =plt_bgcr%RUPNF(L,NZ)
       fTgrowRootP(L,NZ,NY,NX)  =plt_pheno%fTgrowRootP(L,NZ)
     ENDDO
     DO L=1,JC
-      ARLFV(L,NZ,NY,NX)=plt_morph%ARLFV(L,NZ)
-      WGLFV(L,NZ,NY,NX)=plt_biom%WGLFV(L,NZ)
-      CanPLSA(L,NZ,NY,NX)=plt_morph%CanPLSA(L,NZ)
+      CanopyLeafApft_lyr(L,NZ,NY,NX)=plt_morph%CanopyLeafApft_lyr(L,NZ)
+      CanopyLeafCpft_lyr(L,NZ,NY,NX)=plt_biom%CanopyLeafCpft_lyr(L,NZ)
+      CanopyStemApft_lyr(L,NZ,NY,NX)=plt_morph%CanopyStemApft_lyr(L,NZ)
     ENDDO
 
     DO L=0,JZ
-      DO K=1,micpar%n_pltlitrk
+      DO K=1,micpar%NumOfPlantLitrCmplxs
         DO M=1,jsken
-          ESNC(1:npelms,M,K,L,NZ,NY,NX)=plt_bgcr%ESNC(1:npelms,M,K,L,NZ)
+          ESNC(1:NumOfPlantChemElements,M,K,L,NZ,NY,NX)=plt_bgcr%ESNC(1:NumOfPlantChemElements,M,K,L,NZ)
         ENDDO
       ENDDO
     ENDDO
 
 
     DO NB=1,NBR(NZ,NY,NX)
-      DO NE=1,npelms
+      DO NE=1,NumOfPlantChemElements
         EPOOL(NE,NB,NZ,NY,NX) =plt_biom%EPOOL(NE,NB,NZ)
         WTEARBE(NE,NB,NZ,NY,NX)=plt_biom%WTEARBE(NE,NB,NZ)
       ENDDO
@@ -392,7 +392,7 @@ implicit none
 
 
     DO NB=1,NBR(NZ,NY,NX)
-      DO NE=1,npelms
+      DO NE=1,NumOfPlantChemElements
         EPOLNB(NE,NB,NZ,NY,NX)=plt_biom%EPOLNB(NE,NB,NZ)
         WTSHTBE(NE,NB,NZ,NY,NX)=plt_biom%WTSHTBE(NE,NB,NZ)
         WTSHEBE(NE,NB,NZ,NY,NX)=plt_biom%WTSHEBE(NE,NB,NZ)
@@ -408,9 +408,9 @@ implicit none
     ENDDO
     DO NB=1,NBR(NZ,NY,NX)
       DO L=1,JC
-        CanPLBSA(L,NB,NZ,NY,NX)=plt_morph%CanPLBSA(L,NB,NZ)
+        CanopyBranchStemApft_lyr(L,NB,NZ,NY,NX)=plt_morph%CanopyBranchStemApft_lyr(L,NB,NZ)
       ENDDO
-      ATRP(NB,NZ,NY,NX)  =plt_pheno%ATRP(NB,NZ)
+      HourCounter4LeafOut_brch(NB,NZ,NY,NX)  =plt_pheno%HourCounter4LeafOut_brch(NB,NZ)
       CanPBLA(NB,NZ,NY,NX) =plt_morph%CanPBLA(NB,NZ)
       ARLFZ(NB,NZ,NY,NX) =plt_morph%ARLFZ(NB,NZ)
 
@@ -443,8 +443,8 @@ implicit none
       PSTG(NB,NZ,NY,NX)  =plt_morph%PSTG(NB,NZ)
       PSTGI(NB,NZ,NY,NX) =plt_morph%PSTGI(NB,NZ)
       PSTGF(NB,NZ,NY,NX) =plt_morph%PSTGF(NB,NZ)
-      RCELX(1:npelms,NB,NZ,NY,NX) =plt_pheno%RCELX(1:npelms,NB,NZ)
-      RCESX(1:npelms,NB,NZ,NY,NX) =plt_pheno%RCESX(1:npelms,NB,NZ)
+      RCELX(1:NumOfPlantChemElements,NB,NZ,NY,NX) =plt_pheno%RCELX(1:NumOfPlantChemElements,NB,NZ)
+      RCESX(1:NumOfPlantChemElements,NB,NZ,NY,NX) =plt_pheno%RCESX(1:NumOfPlantChemElements,NB,NZ)
       RNH3B(NB,NZ,NY,NX) =plt_rbgc%RNH3B(NB,NZ)
       TGSTGI(NB,NZ,NY,NX)=plt_pheno%TGSTGI(NB,NZ)
       TGSTGF(NB,NZ,NY,NX)=plt_pheno%TGSTGF(NB,NZ)
@@ -456,8 +456,8 @@ implicit none
       VSTGX(NB,NZ,NY,NX) =plt_pheno%VSTGX(NB,NZ)
       CanPBLeafShethC(NB,NZ,NY,NX) =plt_biom%CanPBLeafShethC(NB,NZ)
 
-      WGLFEX(1:npelms,NB,NZ,NY,NX) =plt_biom%WGLFEX(1:npelms,NB,NZ)
-      WTSTXBE(1:npelms,NB,NZ,NY,NX)=plt_biom%WTSTXBE(1:npelms,NB,NZ)
+      WGLFEX(1:NumOfPlantChemElements,NB,NZ,NY,NX) =plt_biom%WGLFEX(1:NumOfPlantChemElements,NB,NZ)
+      WTSTXBE(1:NumOfPlantChemElements,NB,NZ,NY,NX)=plt_biom%WTSTXBE(1:NumOfPlantChemElements,NB,NZ)
       CanPBStalkC(NB,NZ,NY,NX)=plt_biom%CanPBStalkC(NB,NZ)
 
       DO K=0,JNODS
@@ -465,10 +465,10 @@ implicit none
         HTNODX(K,NB,NZ,NY,NX)=plt_morph%HTNODX(K,NB,NZ)
         HTNODE(K,NB,NZ,NY,NX)=plt_morph%HTNODE(K,NB,NZ)
         CanPSheathHeight(K,NB,NZ,NY,NX) =plt_morph%CanPSheathHeight(K,NB,NZ)
-        WGNODE(1:npelms,K,NB,NZ,NY,NX)=plt_biom%WGNODE(1:npelms,K,NB,NZ)
-        WGLFE(1:npelms,K,NB,NZ,NY,NX)  =plt_biom%WGLFE(1:npelms,K,NB,NZ)
+        WGNODE(1:NumOfPlantChemElements,K,NB,NZ,NY,NX)=plt_biom%WGNODE(1:NumOfPlantChemElements,K,NB,NZ)
+        WGLFE(1:NumOfPlantChemElements,K,NB,NZ,NY,NX)  =plt_biom%WGLFE(1:NumOfPlantChemElements,K,NB,NZ)
         WSLF(K,NB,NZ,NY,NX)  =plt_biom%WSLF(K,NB,NZ)
-        WGSHE(1:npelms,K,NB,NZ,NY,NX) =plt_biom%WGSHE(1:npelms,K,NB,NZ)
+        WGSHE(1:NumOfPlantChemElements,K,NB,NZ,NY,NX) =plt_biom%WGSHE(1:NumOfPlantChemElements,K,NB,NZ)
         WSSHE(K,NB,NZ,NY,NX) =plt_biom%WSSHE(K,NB,NZ)
       ENDDO
       DO  L=1,JC
@@ -479,7 +479,7 @@ implicit none
       DO K=0,JNODS
         DO  L=1,JC
           CanPLNBLA(L,K,NB,NZ,NY,NX) =plt_morph%CanPLNBLA(L,K,NB,NZ)
-          WGLFLE(1:npelms,L,K,NB,NZ,NY,NX) =plt_biom%WGLFLE(1:npelms,L,K,NB,NZ)
+          WGLFLE(1:NumOfPlantChemElements,L,K,NB,NZ,NY,NX) =plt_biom%WGLFLE(1:NumOfPlantChemElements,L,K,NB,NZ)
         ENDDO
       ENDDO
       DO M=1,pltpar%jpstgs
@@ -509,13 +509,13 @@ implicit none
       ENDDO
     ENDDO
     DO M=1,jsken
-      WTSTDE(1:npelms,M,NZ,NY,NX)=plt_biom%WTSTDE(1:npelms,M,NZ)
+      WTSTDE(1:NumOfPlantChemElements,M,NZ,NY,NX)=plt_biom%WTSTDE(1:NumOfPlantChemElements,M,NZ)
     ENDDO
 
     DO  L=1,JZ
       DO N=1,pltpar%jroots
-        EPOOLR(1:npelms,N,L,NZ,NY,NX)=plt_biom%EPOOLR(1:npelms,N,L,NZ)
-        CEPOLR(1:npelms,N,L,NZ,NY,NX)=plt_biom%CEPOLR(1:npelms,N,L,NZ)
+        EPOOLR(1:NumOfPlantChemElements,N,L,NZ,NY,NX)=plt_biom%EPOOLR(1:NumOfPlantChemElements,N,L,NZ)
+        CEPOLR(1:NumOfPlantChemElements,N,L,NZ,NY,NX)=plt_biom%CEPOLR(1:NumOfPlantChemElements,N,L,NZ)
         CWSRTL(N,L,NZ,NY,NX)=plt_biom%CWSRTL(N,L,NZ)
         trcg_rootml(idg_beg:idg_end-1,N,L,NZ,NY,NX)  =plt_rbgc%trcg_rootml(idg_beg:idg_end-1,N,L,NZ)
         trcs_rootml(idg_beg:idg_end-1,N,L,NZ,NY,NX)  =plt_rbgc%trcs_rootml(idg_beg:idg_end-1,N,L,NZ)
@@ -589,9 +589,9 @@ implicit none
         RUOH1B(N,L,NZ,NY,NX)=plt_rbgc%RUOH1B(N,L,NZ)
         RUCH1B(N,L,NZ,NY,NX)=plt_rbgc%RUCH1B(N,L,NZ)
         ROXYP(N,L,NZ,NY,NX) =plt_rbgc%ROXYP(N,L,NZ)
-        PopPlantRootH2OUptake_vr(N,L,NZ,NY,NX) =plt_ew%PopPlantRootH2OUptake_vr(N,L,NZ)
+        AllPlantRootH2OUptake_vr(N,L,NZ,NY,NX) =plt_ew%AllPlantRootH2OUptake_vr(N,L,NZ)
         WTRTL(N,L,NZ,NY,NX) =plt_biom%WTRTL(N,L,NZ)
-        RootCPZR(N,L,NZ,NY,NX) =plt_biom%RootCPZR(N,L,NZ)
+        PopPlantRootC_vr(N,L,NZ,NY,NX) =plt_biom%PopPlantRootC_vr(N,L,NZ)
         WSRTL(N,L,NZ,NY,NX) =plt_biom%WSRTL(N,L,NZ)
         WFR(N,L,NZ,NY,NX)   =plt_rbgc%WFR(N,L,NZ)
       ENDDO
@@ -600,13 +600,13 @@ implicit none
     DO NR=1,JC
       NINR(NR,NZ,NY,NX)=plt_morph%NINR(NR,NZ)
       DO N=1,jroots
-        RTWT1E(1:npelms,N,NR,NZ,NY,NX) =plt_biom%RTWT1E(1:npelms,N,NR,NZ)
+        RTWT1E(1:NumOfPlantChemElements,N,NR,NZ,NY,NX) =plt_biom%RTWT1E(1:NumOfPlantChemElements,N,NR,NZ)
         PrimRootDepth(N,NR,NZ,NY,NX) =plt_morph%PrimRootDepth(N,NR,NZ)
       ENDDO
       DO L=1,JZ
         DO N=1,2
-          WTRT1E(1:npelms,N,L,NR,NZ,NY,NX) =plt_biom%WTRT1E(1:npelms,N,L,NR,NZ)
-          WTRT2E(1:npelms,N,L,NR,NZ,NY,NX) =plt_biom%WTRT2E(1:npelms,N,L,NR,NZ)
+          WTRT1E(1:NumOfPlantChemElements,N,L,NR,NZ,NY,NX) =plt_biom%WTRT1E(1:NumOfPlantChemElements,N,L,NR,NZ)
+          WTRT2E(1:NumOfPlantChemElements,N,L,NR,NZ,NY,NX) =plt_biom%WTRT2E(1:NumOfPlantChemElements,N,L,NR,NZ)
           PrimRootLen(N,L,NR,NZ,NY,NX) =plt_morph%PrimRootLen(N,L,NR,NZ)
           SecndRootLen(N,L,NR,NZ,NY,NX) =plt_morph%SecndRootLen(N,L,NR,NZ)
           RTN2(N,L,NR,NZ,NY,NX)  =plt_morph%RTN2(N,L,NR,NZ)
@@ -621,14 +621,14 @@ implicit none
 
       DO K=1,jcplx
         DO N=1,2
-          DO NE=1,npelms
+          DO NE=1,NumOfPlantChemElements
             RDFOME(NE,N,K,L,NZ,NY,NX)=plt_rbgc%RDFOME(NE,N,K,L,NZ)
           ENDDO
         ENDDO
       ENDDO
     ENDDO
 
-    DO NE=1,npelms
+    DO NE=1,NumOfPlantChemElements
       DO M=1,jsken
         DO N=0,JP
           CFOPE(NE,N,M,NZ,NY,NX)=plt_soilchem%CFOPE(NE,N,M,NZ)
@@ -650,7 +650,7 @@ implicit none
     RSRR(2,NZ,NY,NX)  =plt_morph%RSRR(2,NZ)
     RSRA(2,NZ,NY,NX)  =plt_morph%RSRA(2,NZ)
     DO N=1,2
-      PORTX(N,NZ,NY,NX)=plt_morph%PORTX(N,NZ)
+      RootPoreTortu4Gas(N,NZ,NY,NX)=plt_morph%RootPoreTortu4Gas(N,NZ)
       RRADP(N,NZ,NY,NX)=plt_morph%RRADP(N,NZ)
       DMVL(N,NZ,NY,NX) =plt_morph%DMVL(N,NZ)
       PrimRootSpecLen(N,NZ,NY,NX)=plt_morph%PrimRootSpecLen(N,NZ)
@@ -683,8 +683,8 @@ implicit none
   plt_site%ZERO2=ZERO2
   plt_site%ALAT=ALAT(NY,NX)
   plt_site%ATCA=ATCA(NY,NX)
-  plt_morph%CanGA=CanGA(NY,NX)
-  plt_morph%CanGLA=CanGLA(NY,NX)
+  plt_morph%CanopyArea_grid=CanopyArea_grid(NY,NX)
+  plt_morph%CanopyLA_grd=CanopyLA_grd(NY,NX)
   plt_site%ALT=ALT(NY,NX)
   plt_site%CCO2EI=CCO2EI(NY,NX)
   plt_site%CO2EI=CO2EI(NY,NX)
@@ -768,7 +768,7 @@ implicit none
 
     plt_soilchem%trc_solml(ids_beg:ids_end,L)  =trc_solml(ids_beg:ids_end,L,NY,NX)
 
-    plt_soilchem%GSolbility(idg_beg:idg_end-1,L) =GSolbility(idg_beg:idg_end-1,L,NY,NX)
+    plt_soilchem%GasSolbility(idg_beg:idg_end-1,L) =GasSolbility(idg_beg:idg_end-1,L,NY,NX)
 
     plt_ew%TotalSoilH2OPSIMPa(L)       =TotalSoilH2OPSIMPa(L,NY,NX)
     plt_bgcr%RPO4Y(L)     =RPO4Y(L,NY,NX)
@@ -850,7 +850,7 @@ implicit none
     DO  N=1,JLI
       plt_morph%CLASS(N,NZ)=CLASS(N,NZ,NY,NX)
     ENDDO
-    plt_morph%CFI(NZ)=CFI(NZ,NY,NX)
+    plt_morph%ClumpFactort0(NZ)=ClumpFactort0(NZ,NY,NX)
     plt_morph%ANGBR(NZ)=ANGBR(NZ,NY,NX)
     plt_morph%ANGSH(NZ)=ANGSH(NZ,NY,NX)
     plt_morph%STMX(NZ)=STMX(NZ,NY,NX)
@@ -914,7 +914,7 @@ implicit none
 
 !plant properties end
 
-    plt_morph%CanPA(NZ)=CanPA(NZ,NY,NX)
+    plt_morph%CanopyArea_pft(NZ)=CanopyArea_pft(NZ,NY,NX)
     plt_distb%IYRX(NZ)=IYRX(NZ,NY,NX)
     plt_distb%IDAYX(NZ)=IDAYX(NZ,NY,NX)
     plt_distb%IYRY(NZ)=IYRY(NZ,NY,NX)
@@ -960,8 +960,8 @@ implicit none
   plt_site%VOLWOU=VOLWOU
   plt_site%PPT=PPT(NY,NX)
   plt_bgcr%RECO=RECO(NY,NX)
-  plt_biom%WTSTGET(1:npelms)=WTSTGET(1:npelms,NY,NX)
-  plt_bgcr%ZESNC(1:npelms)=ZESNC(1:npelms,NY,NX)
+  plt_biom%WTSTGET(1:NumOfPlantChemElements)=WTSTGET(1:NumOfPlantChemElements,NY,NX)
+  plt_bgcr%ZESNC(1:NumOfPlantChemElements)=ZESNC(1:NumOfPlantChemElements,NY,NX)
   plt_morph%StemAreag=StemAreag(NY,NX)
   plt_ew%TSH=TSH(NY,NX)
   plt_ew%CanH2OHeldVg=CanH2OHeldVg(NY,NX)
@@ -971,7 +971,7 @@ implicit none
   plt_ew%TSHC=TSHC(NY,NX)
   plt_bgcr%TRAU=TRAU(NY,NX)
   plt_ew%UVOLO    =UVOLO(NY,NX)
-  plt_distb%XHVSTE(1:npelms)=XHVSTE(1:npelms,NY,NX)
+  plt_distb%XHVSTE(1:NumOfPlantChemElements)=XHVSTE(1:NumOfPlantChemElements,NY,NX)
   plt_rad%TRN     =TRN(NY,NX)
   plt_ew%VapXAir2CanG=VapXAir2CanG(NY,NX)
   plt_ew%TLE=TLE(NY,NX)
@@ -986,15 +986,15 @@ implicit none
   plt_distb%FERT(1:20)=FERT(1:20,I1,NY,NX)
 
   DO  L=1,JC
-    plt_morph%ARSTT(L)=ARSTT(L,NY,NX)
+    plt_morph%CanopyStemA_lyr(L)=CanopyStemA_lyr(L,NY,NX)
     plt_biom%WGLFT(L)=WGLFT(L,NY,NX)
-    plt_morph%ARLFT(L)=ARLFT(L,NY,NX)
+    plt_morph%CanopyLAgrid_lyr(L)=CanopyLAgrid_lyr(L,NY,NX)
   ENDDO
 
-  plt_allom%FWOODE(1:npelms,1:n_pltlitrk)=FWOODE(1:npelms,1:n_pltlitrk)
-  plt_allom%FWODRE(1:npelms,1:n_pltlitrk)=FWODRE(1:npelms,1:n_pltlitrk)
-  plt_allom%FWODBE(1:npelms,1:n_pltlitrk)=FWODBE(1:npelms,1:n_pltlitrk)
-  plt_allom%FWODLE(1:npelms,1:n_pltlitrk)=FWODLE(1:npelms,1:n_pltlitrk)
+  plt_allom%FWOODE(1:NumOfPlantChemElements,1:NumOfPlantLitrCmplxs)=FWOODE(1:NumOfPlantChemElements,1:NumOfPlantLitrCmplxs)
+  plt_allom%FWODRE(1:NumOfPlantChemElements,1:NumOfPlantLitrCmplxs)=FWODRE(1:NumOfPlantChemElements,1:NumOfPlantLitrCmplxs)
+  plt_allom%FWODBE(1:NumOfPlantChemElements,1:NumOfPlantLitrCmplxs)=FWODBE(1:NumOfPlantChemElements,1:NumOfPlantLitrCmplxs)
+  plt_allom%FWODLE(1:NumOfPlantChemElements,1:NumOfPlantLitrCmplxs)=FWODLE(1:NumOfPlantChemElements,1:NumOfPlantLitrCmplxs)
 
   DO L=0,NL(NY,NX)
     DO K=1,jcplx
@@ -1016,10 +1016,10 @@ implicit none
     plt_bgcr%ROXYX(L)=ROXYX(L,NY,NX)
     plt_ew%THeatRootUptake(L)  =THeatRootUptake(L,NY,NX)
     plt_ew%GridPlantRootH2OUptake_vr(L) =GridPlantRootH2OUptake_vr(L,NY,NX)
-    DO  K=1,micpar%n_pltlitrk
-      DO NE=1,npelms
+    DO  K=1,micpar%NumOfPlantLitrCmplxs
+      DO NE=1,NumOfPlantChemElements
         DO  M=1,jsken
-          plt_bgcr%ESNT(NE,M,K,L)=ESNT(NE,M,K,L,NY,NX)
+          plt_bgcr%LitrfalChemElemnts_vr(NE,M,K,L)=LitrfalChemElemnts_vr(NE,M,K,L,NY,NX)
         ENDDO
       ENDDO
     ENDDO
@@ -1047,37 +1047,37 @@ implicit none
     plt_bgcr%TUPH1P(L)=TUPH1P(L,NY,NX)
     plt_bgcr%TUPH2P(L)=TUPH2P(L,NY,NX)
     DO  K=1,jcplx
-      plt_bgcr%TDFOME(1:npelms,K,L)=TDFOME(1:npelms,K,L,NY,NX)
+      plt_bgcr%TDFOME(1:NumOfPlantChemElements,K,L)=TDFOME(1:NumOfPlantChemElements,K,L,NY,NX)
     ENDDO
   ENDDO
 
 
   DO NZ=1,NP0(NY,NX)
-    plt_biom%WTRTE(1:npelms,NZ)=WTRTE(1:npelms,NZ,NY,NX)
-    plt_biom%WTLFE(1:npelms,NZ)  =WTLFE(1:npelms,NZ,NY,NX)
-    plt_biom%WTEARE(1:npelms,NZ) =WTEARE(1:npelms,NZ,NY,NX)
-    plt_biom%WTRTSE(1:npelms,NZ) =WTRTSE(1:npelms,NZ,NY,NX)
-    plt_biom%WTHSKE(1:npelms,NZ) =WTHSKE(1:npelms,NZ,NY,NX)
-    plt_biom%WTRSVE(1:npelms,NZ) =WTRSVE(1:npelms,NZ,NY,NX)
-    plt_biom%WTSTKE(1:npelms,NZ) =WTSTKE(1:npelms,NZ,NY,NX)
-    plt_biom%WTSHEE(1:npelms,NZ) =WTSHEE(1:npelms,NZ,NY,NX)
-    plt_biom%WTGRE(1:npelms,NZ)=WTGRE(1:npelms,NZ,NY,NX)
-    plt_site%BALE(1:npelms,NZ)  =BALE(1:npelms,NZ,NY,NX)
-    plt_biom%CEPOLP(1:npelms,NZ)=CEPOLP(1:npelms,NZ,NY,NX)
-    plt_biom%EPOOLP(1:npelms,NZ)=EPOOLP(1:npelms,NZ,NY,NX)
-    plt_biom%EPOLNP(1:npelms,NZ)=EPOLNP(1:npelms,NZ,NY,NX)
-    plt_bgcr%HESNC(1:npelms,NZ) =HESNC(1:npelms,NZ,NY,NX)
-    plt_distb%HVSTE(1:npelms,NZ)=HVSTE(1:npelms,NZ,NY,NX)
-    plt_pheno%RSETE(1:npelms,NZ)=RSETE(1:npelms,NZ,NY,NX)
-    plt_bgcr%TESN0(1:npelms,NZ)  =TESN0(1:npelms,NZ,NY,NX)
-    plt_bgcr%TESNC(1:npelms,NZ)  =TESNC(1:npelms,NZ,NY,NX)
-    plt_rbgc%TEUPTK(1:npelms,NZ) =TEUPTK(1:npelms,NZ,NY,NX)
-    plt_distb%THVSTE(1:npelms,NZ)=THVSTE(1:npelms,NZ,NY,NX)
-    plt_rbgc%UPOME(1:npelms,NZ)=UPOME(1:npelms,NZ,NY,NX)
-    plt_biom%WTRVE(1:npelms,NZ) =WTRVE(1:npelms,NZ,NY,NX)
-    plt_biom%CanPShootElmMass(1:npelms,NZ) =CanPShootElmMass(1:npelms,NZ,NY,NX)
-    plt_biom%WTSTGE(1:npelms,NZ) =WTSTGE(1:npelms,NZ,NY,NX)
-    plt_biom%WTNDE(1:npelms,NZ)  =WTNDE(1:npelms,NZ,NY,NX)
+    plt_biom%WTRTE(1:NumOfPlantChemElements,NZ)=WTRTE(1:NumOfPlantChemElements,NZ,NY,NX)
+    plt_biom%WTLFE(1:NumOfPlantChemElements,NZ)  =WTLFE(1:NumOfPlantChemElements,NZ,NY,NX)
+    plt_biom%WTEARE(1:NumOfPlantChemElements,NZ) =WTEARE(1:NumOfPlantChemElements,NZ,NY,NX)
+    plt_biom%WTRTSE(1:NumOfPlantChemElements,NZ) =WTRTSE(1:NumOfPlantChemElements,NZ,NY,NX)
+    plt_biom%WTHSKE(1:NumOfPlantChemElements,NZ) =WTHSKE(1:NumOfPlantChemElements,NZ,NY,NX)
+    plt_biom%WTRSVE(1:NumOfPlantChemElements,NZ) =WTRSVE(1:NumOfPlantChemElements,NZ,NY,NX)
+    plt_biom%WTSTKE(1:NumOfPlantChemElements,NZ) =WTSTKE(1:NumOfPlantChemElements,NZ,NY,NX)
+    plt_biom%WTSHEE(1:NumOfPlantChemElements,NZ) =WTSHEE(1:NumOfPlantChemElements,NZ,NY,NX)
+    plt_biom%WTGRE(1:NumOfPlantChemElements,NZ)=WTGRE(1:NumOfPlantChemElements,NZ,NY,NX)
+    plt_site%BALE(1:NumOfPlantChemElements,NZ)  =BALE(1:NumOfPlantChemElements,NZ,NY,NX)
+    plt_biom%CEPOLP(1:NumOfPlantChemElements,NZ)=CEPOLP(1:NumOfPlantChemElements,NZ,NY,NX)
+    plt_biom%CanopyNonstructElements_pft(1:NumOfPlantChemElements,NZ)=CanopyNonstructElements_pft(1:NumOfPlantChemElements,NZ,NY,NX)
+    plt_biom%EPOLNP(1:NumOfPlantChemElements,NZ)=EPOLNP(1:NumOfPlantChemElements,NZ,NY,NX)
+    plt_bgcr%HESNC(1:NumOfPlantChemElements,NZ) =HESNC(1:NumOfPlantChemElements,NZ,NY,NX)
+    plt_distb%HVSTE(1:NumOfPlantChemElements,NZ)=HVSTE(1:NumOfPlantChemElements,NZ,NY,NX)
+    plt_pheno%RSETE(1:NumOfPlantChemElements,NZ)=RSETE(1:NumOfPlantChemElements,NZ,NY,NX)
+    plt_bgcr%TESN0(1:NumOfPlantChemElements,NZ)  =TESN0(1:NumOfPlantChemElements,NZ,NY,NX)
+    plt_bgcr%TESNC(1:NumOfPlantChemElements,NZ)  =TESNC(1:NumOfPlantChemElements,NZ,NY,NX)
+    plt_rbgc%TEUPTK(1:NumOfPlantChemElements,NZ) =TEUPTK(1:NumOfPlantChemElements,NZ,NY,NX)
+    plt_distb%THVSTE(1:NumOfPlantChemElements,NZ)=THVSTE(1:NumOfPlantChemElements,NZ,NY,NX)
+    plt_rbgc%UPOME(1:NumOfPlantChemElements,NZ)=UPOME(1:NumOfPlantChemElements,NZ,NY,NX)
+    plt_biom%WTRVE(1:NumOfPlantChemElements,NZ) =WTRVE(1:NumOfPlantChemElements,NZ,NY,NX)
+    plt_biom%CanPShootElmMass(1:NumOfPlantChemElements,NZ) =CanPShootElmMass(1:NumOfPlantChemElements,NZ,NY,NX)
+    plt_biom%WTSTGE(1:NumOfPlantChemElements,NZ) =WTSTGE(1:NumOfPlantChemElements,NZ,NY,NX)
+    plt_biom%WTNDE(1:NumOfPlantChemElements,NZ)  =WTNDE(1:NumOfPlantChemElements,NZ,NY,NX)
 
     plt_ew%TKCZ(NZ)=TKCZ(NZ,NY,NX)
     plt_photo%SO2(NZ)=SO2(NZ,NY,NX)
@@ -1116,7 +1116,7 @@ implicit none
     plt_allom%CWSRT(NZ)=CWSRT(NZ,NY,NX)
     plt_photo%MaxCanPStomaResistH2O(NZ)=MaxCanPStomaResistH2O(NZ,NY,NX)
     plt_biom%WTRTA(NZ)=WTRTA(NZ,NY,NX)
-    plt_morph%CF(NZ)=CF(NZ,NY,NX)
+    plt_morph%ClumpFactor(NZ)=ClumpFactor(NZ,NY,NX)
 
     plt_site%PPI(NZ)=PPI(NZ,NY,NX)
     plt_site%PPX(NZ)=PPX(NZ,NY,NX)
@@ -1144,7 +1144,7 @@ implicit none
     plt_distb%JHVST(NZ)=JHVST(NZ,I,NY,NX)
     plt_distb%THIN(NZ) =THIN(NZ,I,NY,NX)
     plt_morph%CanPSA(NZ)=CanPSA(NZ,NY,NX)
-    plt_morph%CanPLA(NZ)=CanPLA(NZ,NY,NX)
+    plt_morph%CanopyLeafA_pft(NZ)=CanopyLeafA_pft(NZ,NY,NX)
 
     plt_photo%O2I(NZ)  =O2I(NZ,NY,NX)
     plt_photo%CO2I(NZ) =CO2I(NZ,NY,NX)
@@ -1161,7 +1161,7 @@ implicit none
     plt_allom%FNOD(NZ)=FNOD(NZ,NY,NX)
 
     plt_morph%HypoctoylHeight(NZ)=HypoctoylHeight(NZ,NY,NX)
-    plt_rbgc%HEUPTK(1:npelms,NZ)=HEUPTK(1:npelms,NZ,NY,NX)
+    plt_rbgc%HEUPTK(1:NumOfPlantChemElements,NZ)=HEUPTK(1:NumOfPlantChemElements,NZ,NY,NX)
     plt_morph%CanPHeight4WatUptake(NZ)=CanPHeight4WatUptake(NZ,NY,NX)
     plt_morph%NI(NZ)   =NI(NZ,NY,NX)
     plt_photo%CanPbndlResist(NZ)   =CanPbndlResist(NZ,NY,NX)
@@ -1213,7 +1213,7 @@ implicit none
     plt_ew%CanWatP(NZ) =CanWatP(NZ,NY,NX)
     plt_pheno%WSTR(NZ) =WSTR(NZ,NY,NX)
     plt_biom%WTRVX(NZ) =WTRVX(NZ,NY,NX)
-    plt_biom%CanPLeafShethC(NZ)  =CanPLeafShethC(NZ,NY,NX)
+    plt_biom%CanopyLeafShethC_pft(NZ)  =CanopyLeafShethC_pft(NZ,NY,NX)
 
     plt_biom%ZEROL(NZ) =ZEROL(NZ,NY,NX)
     plt_biom%ZEROP(NZ) =ZEROP(NZ,NY,NX)
@@ -1224,13 +1224,13 @@ implicit none
     DO L=1,NL(NY,NX)
       DO K=1,jcplx
         DO N=1,2
-          DO NE=1,npelms
+          DO NE=1,NumOfPlantChemElements
             plt_rbgc%RDFOME(NE,N,K,L,NZ)=RDFOME(NE,N,K,L,NZ,NY,NX)
           ENDDO
         ENDDO
       ENDDO
     ENDDO
-    DO NE=1,npelms
+    DO NE=1,NumOfPlantChemElements
       DO NB=1,NBR(NZ,NY,NX)
         plt_biom%EPOOL(NE,NB,NZ)=EPOOL(NE,NB,NZ,NY,NX)
         plt_biom%EPOLNB(NE,NB,NZ)=EPOLNB(NE,NB,NZ,NY,NX)
@@ -1251,7 +1251,7 @@ implicit none
     DO NB=1,NBR(NZ,NY,NX)
       plt_photo%FDBK(NB,NZ)=FDBK(NB,NZ,NY,NX)
       plt_photo%FDBKX(NB,NZ)=FDBKX(NB,NZ,NY,NX)
-      plt_pheno%ATRP(NB,NZ)=ATRP(NB,NZ,NY,NX)
+      plt_pheno%HourCounter4LeafOut_brch(NB,NZ)=HourCounter4LeafOut_brch(NB,NZ,NY,NX)
       plt_morph%ARLFZ(NB,NZ)=ARLFZ(NB,NZ,NY,NX)
       plt_morph%CanPBLA(NB,NZ)=CanPBLA(NB,NZ,NY,NX)
 
@@ -1280,8 +1280,8 @@ implicit none
       plt_morph%PSTG(NB,NZ)=PSTG(NB,NZ,NY,NX)
       plt_morph%PSTGI(NB,NZ)=PSTGI(NB,NZ,NY,NX)
       plt_morph%PSTGF(NB,NZ)=PSTGF(NB,NZ,NY,NX)
-      plt_pheno%RCELX(1:npelms,NB,NZ)=RCELX(1:npelms,NB,NZ,NY,NX)
-      plt_pheno%RCESX(1:npelms,NB,NZ)=RCESX(1:npelms,NB,NZ,NY,NX)
+      plt_pheno%RCELX(1:NumOfPlantChemElements,NB,NZ)=RCELX(1:NumOfPlantChemElements,NB,NZ,NY,NX)
+      plt_pheno%RCESX(1:NumOfPlantChemElements,NB,NZ)=RCESX(1:NumOfPlantChemElements,NB,NZ,NY,NX)
       plt_rbgc%RNH3B(NB,NZ)=RNH3B(NB,NZ,NY,NX)
       plt_pheno%TGSTGI(NB,NZ)=TGSTGI(NB,NZ,NY,NX)
       plt_pheno%TGSTGF(NB,NZ)=TGSTGF(NB,NZ,NY,NX)
@@ -1292,8 +1292,8 @@ implicit none
       plt_pheno%VRNS(NB,NZ)=VRNS(NB,NZ,NY,NX)
       plt_pheno%VRNF(NB,NZ)=VRNF(NB,NZ,NY,NX)
       plt_biom%CanPBLeafShethC(NB,NZ)=CanPBLeafShethC(NB,NZ,NY,NX)
-      plt_biom%WGLFEX(1:npelms,NB,NZ) =WGLFEX(1:npelms,NB,NZ,NY,NX)
-      plt_biom%WTSTXBE(1:npelms,NB,NZ)=WTSTXBE(1:npelms,NB,NZ,NY,NX)
+      plt_biom%WGLFEX(1:NumOfPlantChemElements,NB,NZ) =WGLFEX(1:NumOfPlantChemElements,NB,NZ,NY,NX)
+      plt_biom%WTSTXBE(1:NumOfPlantChemElements,NB,NZ)=WTSTXBE(1:NumOfPlantChemElements,NB,NZ,NY,NX)
       plt_biom%CanPBStalkC(NB,NZ)=CanPBStalkC(NB,NZ,NY,NX)
       DO M=1,pltpar%jpstgs
         plt_pheno%IDAY(M,NB,NZ)=IDAY(M,NB,NZ,NY,NX)
@@ -1325,35 +1325,35 @@ implicit none
         plt_morph%HTNODX(K,NB,NZ)=HTNODX(K,NB,NZ,NY,NX)
         plt_morph%CanPSheathHeight(K,NB,NZ) =CanPSheathHeight(K,NB,NZ,NY,NX)
         plt_morph%HTNODE(K,NB,NZ)=HTNODE(K,NB,NZ,NY,NX)
-        plt_biom%WGNODE(1:npelms,K,NB,NZ) =WGNODE(1:npelms,K,NB,NZ,NY,NX)
-        plt_biom%WGLFE(1:npelms,K,NB,NZ)   =WGLFE(1:npelms,K,NB,NZ,NY,NX)
+        plt_biom%WGNODE(1:NumOfPlantChemElements,K,NB,NZ) =WGNODE(1:NumOfPlantChemElements,K,NB,NZ,NY,NX)
+        plt_biom%WGLFE(1:NumOfPlantChemElements,K,NB,NZ)   =WGLFE(1:NumOfPlantChemElements,K,NB,NZ,NY,NX)
         plt_biom%WSLF(K,NB,NZ)   =WSLF(K,NB,NZ,NY,NX)
-        plt_biom%WGSHE(1:npelms,K,NB,NZ)  =WGSHE(1:npelms,K,NB,NZ,NY,NX)
+        plt_biom%WGSHE(1:NumOfPlantChemElements,K,NB,NZ)  =WGSHE(1:NumOfPlantChemElements,K,NB,NZ,NY,NX)
         plt_biom%WSSHE(K,NB,NZ)  =WSSHE(K,NB,NZ,NY,NX)
       ENDDO
 
       DO K=0,JNODS
         DO  L=1,JC
           plt_morph%CanPLNBLA(L,K,NB,NZ)=CanPLNBLA(L,K,NB,NZ,NY,NX)
-          plt_biom%WGLFLE(1:npelms,L,K,NB,NZ) =WGLFLE(1:npelms,L,K,NB,NZ,NY,NX)
+          plt_biom%WGLFLE(1:NumOfPlantChemElements,L,K,NB,NZ) =WGLFLE(1:NumOfPlantChemElements,L,K,NB,NZ,NY,NX)
         ENDDO
       ENDDO
       DO  L=1,JC
-        plt_morph%CanPLBSA(L,NB,NZ)=CanPLBSA(L,NB,NZ,NY,NX)
+        plt_morph%CanopyBranchStemApft_lyr(L,NB,NZ)=CanopyBranchStemApft_lyr(L,NB,NZ,NY,NX)
       ENDDO
     enddo
-    DO NE=1,npelms
+    DO NE=1,NumOfPlantChemElements
       DO L=1,NL(NY,NX)
         plt_biom%WTNDLE(NE,L,NZ) =WTNDLE(NE,L,NZ,NY,NX)
       ENDDO
     ENDDO
     DO L=1,NL(NY,NX)
       DO N=1,MY(NZ,NY,NX)
-        plt_biom%EPOOLR(1:npelms,N,L,NZ)=EPOOLR(1:npelms,N,L,NZ,NY,NX)
+        plt_biom%EPOOLR(1:NumOfPlantChemElements,N,L,NZ)=EPOOLR(1:NumOfPlantChemElements,N,L,NZ,NY,NX)
         plt_rbgc%trcs_rootml(idg_beg:idg_end-1,N,L,NZ)=trcs_rootml(idg_beg:idg_end-1,N,L,NZ,NY,NX)
         plt_rbgc%trcg_rootml(idg_beg:idg_end-1,N,L,NZ)=trcg_rootml(idg_beg:idg_end-1,N,L,NZ,NY,NX)
 
-        plt_biom%CEPOLR(1:npelms,N,L,NZ)=CEPOLR(1:npelms,N,L,NZ,NY,NX)
+        plt_biom%CEPOLR(1:NumOfPlantChemElements,N,L,NZ)=CEPOLR(1:NumOfPlantChemElements,N,L,NZ,NY,NX)
         plt_biom%CWSRTL(N,L,NZ)=CWSRTL(N,L,NZ,NY,NX)
 
         plt_ew%PSIRoot(N,L,NZ)=PSIRoot(N,L,NZ,NY,NX)
@@ -1416,25 +1416,25 @@ implicit none
         plt_rbgc%RUPP2B(N,L,NZ)=RUPP2B(N,L,NZ,NY,NX)
         plt_rbgc%RUPP1P(N,L,NZ)=RUPP1P(N,L,NZ,NY,NX)
         plt_rbgc%RUPP1B(N,L,NZ)=RUPP1B(N,L,NZ,NY,NX)
-        plt_ew%PopPlantRootH2OUptake_vr(N,L,NZ)   =PopPlantRootH2OUptake_vr(N,L,NZ,NY,NX)
+        plt_ew%AllPlantRootH2OUptake_vr(N,L,NZ)   =AllPlantRootH2OUptake_vr(N,L,NZ,NY,NX)
         plt_rbgc%WFR(N,L,NZ)   =WFR(N,L,NZ,NY,NX)
         plt_biom%WTRTL(N,L,NZ) =WTRTL(N,L,NZ,NY,NX)
-        plt_biom%RootCPZR(N,L,NZ) =RootCPZR(N,L,NZ,NY,NX)
+        plt_biom%PopPlantRootC_vr(N,L,NZ) =PopPlantRootC_vr(N,L,NZ,NY,NX)
         plt_biom%WSRTL(N,L,NZ) =WSRTL(N,L,NZ,NY,NX)
 
       enddo
       plt_bgcr%RUPNF(L,NZ) =RUPNF(L,NZ,NY,NX)
       plt_pheno%fTgrowRootP(L,NZ) =fTgrowRootP(L,NZ,NY,NX)
-      plt_biom%EPOOLN(1:npelms,L,NZ)=EPOOLN(1:npelms,L,NZ,NY,NX)
+      plt_biom%EPOOLN(1:NumOfPlantChemElements,L,NZ)=EPOOLN(1:NumOfPlantChemElements,L,NZ,NY,NX)
     ENDDO
     DO L=1,JC
-      plt_morph%CanPLSA(L,NZ)=CanPLSA(L,NZ,NY,NX)
-      plt_morph%ARLFV(L,NZ)=ARLFV(L,NZ,NY,NX)
-      plt_biom%WGLFV(L,NZ) =WGLFV(L,NZ,NY,NX)
+      plt_morph%CanopyStemApft_lyr(L,NZ)=CanopyStemApft_lyr(L,NZ,NY,NX)
+      plt_morph%CanopyLeafApft_lyr(L,NZ)=CanopyLeafApft_lyr(L,NZ,NY,NX)
+      plt_biom%CanopyLeafCpft_lyr(L,NZ) =CanopyLeafCpft_lyr(L,NZ,NY,NX)
     ENDDO
     DO N=1,MY(NZ,NY,NX)
       plt_morph%DMVL(N,NZ)=DMVL(N,NZ,NY,NX)
-      plt_morph%PORTX(N,NZ)=PORTX(N,NZ,NY,NX)
+      plt_morph%RootPoreTortu4Gas(N,NZ)=RootPoreTortu4Gas(N,NZ,NY,NX)
       plt_morph%SecndRootXSecArea(N,NZ)=SecndRootXSecArea(N,NZ,NY,NX)
       plt_morph%PrimRootXSecArea(N,NZ)=PrimRootXSecArea(N,NZ,NY,NX)
       plt_morph%MaxPrimRootRadius1(N,NZ)=MaxPrimRootRadius1(N,NZ,NY,NX)
@@ -1450,28 +1450,28 @@ implicit none
           plt_morph%PrimRootLen(N,L,NR,NZ)=PrimRootLen(N,L,NR,NZ,NY,NX)
           plt_morph%SecndRootLen(N,L,NR,NZ)=SecndRootLen(N,L,NR,NZ,NY,NX)
           plt_morph%RTN2(N,L,NR,NZ) =RTN2(N,L,NR,NZ,NY,NX)
-          plt_biom%WTRT2E(1:npelms,N,L,NR,NZ) =WTRT2E(1:npelms,N,L,NR,NZ,NY,NX)
-          plt_biom%WTRT1E(1:npelms,N,L,NR,NZ) =WTRT1E(1:npelms,N,L,NR,NZ,NY,NX)
+          plt_biom%WTRT2E(1:NumOfPlantChemElements,N,L,NR,NZ) =WTRT2E(1:NumOfPlantChemElements,N,L,NR,NZ,NY,NX)
+          plt_biom%WTRT1E(1:NumOfPlantChemElements,N,L,NR,NZ) =WTRT1E(1:NumOfPlantChemElements,N,L,NR,NZ,NY,NX)
         enddo
       enddo
       DO N=1,MY(NZ,NY,NX)
         plt_morph%PrimRootDepth(N,NR,NZ)=PrimRootDepth(N,NR,NZ,NY,NX)
-        plt_biom%RTWT1E(1:npelms,N,NR,NZ)=RTWT1E(1:npelms,N,NR,NZ,NY,NX)
+        plt_biom%RTWT1E(1:NumOfPlantChemElements,N,NR,NZ)=RTWT1E(1:NumOfPlantChemElements,N,NR,NZ,NY,NX)
       enddo
     enddo
-    DO NE=1,npelms
+    DO NE=1,NumOfPlantChemElements
       DO M=1,jsken
         plt_biom%WTSTDE(NE,M,NZ)=WTSTDE(NE,M,NZ,NY,NX)
       ENDDO
     ENDDO
     DO L=0,NJ(NY,NX)
-      DO K=1,micpar%n_pltlitrk
+      DO K=1,micpar%NumOfPlantLitrCmplxs
         DO M=1,jsken
-          plt_bgcr%ESNC(1:npelms,M,K,L,NZ)=ESNC(1:npelms,M,K,L,NZ,NY,NX)
+          plt_bgcr%ESNC(1:NumOfPlantChemElements,M,K,L,NZ)=ESNC(1:NumOfPlantChemElements,M,K,L,NZ,NY,NX)
         enddo
       enddo
     ENDDO
-    DO NE=1,npelms
+    DO NE=1,NumOfPlantChemElements
       DO M=1,jsken
         DO N=0,JP
           plt_soilchem%CFOPE(NE,N,M,NZ)=CFOPE(NE,N,M,NZ,NY,NX)
@@ -1501,7 +1501,7 @@ implicit none
   plt_site%NP=NP(NY,NX)
   plt_site%NU=NU(NY,NX)
   plt_morph%StemAreag=StemAreag(NY,NX)
-  plt_morph%CanGLA=CanGLA(NY,NX)
+  plt_morph%CanopyLA_grd=CanopyLA_grd(NY,NX)
   plt_site%ZEROS =ZEROS(NY,NX)
   plt_site%ZERO  =ZERO
   plt_ew%SnowDepth   =SnowDepth(NY,NX)
@@ -1510,12 +1510,12 @@ implicit none
   plt_site%WindMesHeight=WindMesHeight(NY,NX)
   plt_ew%ZeroPlanDisp=ZeroPlanDisp(NY,NX)
   plt_site%UA=UA(NY,NX)
-  plt_ew%VLHeatCapSnowMN=VLHeatCapSnowMN(NY,NX)
-  plt_ew%VHCPW1=VLHeatCapSnow(1,NY,NX)
+  plt_ew%VLHeatCapSnowMin=VLHeatCapSnowMin(NY,NX)
+  plt_ew%VLHeatCapSurfSnow=VLHeatCapSnow(1,NY,NX)
   plt_morph%CanopyHeightz(0)=CanopyHeightz(0,NY,NX)
   DO L=1,JC
-    plt_morph%ARSTT(L)=ARSTT(L,NY,NX)
-    plt_morph%ARLFT(L)=ARLFT(L,NY,NX)
+    plt_morph%CanopyStemA_lyr(L)=CanopyStemA_lyr(L,NY,NX)
+    plt_morph%CanopyLAgrid_lyr(L)=CanopyLAgrid_lyr(L,NY,NX)
     plt_morph%CanopyHeightz(L)=CanopyHeightz(L,NY,NX)
     plt_rad%TAUS(L)=TAUS(L,NY,NX)
   ENDDO
@@ -1529,7 +1529,7 @@ implicit none
   ENDDO
   plt_rad%SSIN=SSIN(NY,NX)
   plt_site%ZNOON=ZNOON(NY,NX)
-  plt_morph%CanGA=CanGA(NY,NX)
+  plt_morph%CanopyArea_grid=CanopyArea_grid(NY,NX)
   plt_rad%GAZI=GAZI(NY,NX)
   plt_rad%GCOS=GCOS(NY,NX)
   plt_rad%GSIN=GSIN(NY,NX)
@@ -1542,22 +1542,22 @@ implicit none
   plt_ew%VcumIceSnow=VcumIceSnow(NY,NX)
   plt_ew%VcumDrySnoWE=VcumDrySnoWE(NY,NX)
   plt_rad%TYSIN  =TYSIN
-  plt_rad%ALBS   =ALBS(NY,NX)
+  plt_rad%SoilAlbedo   =SoilAlbedo(NY,NX)
   plt_rad%ALBX   =ALBX(NY,NX)
   plt_site%ZEROS2=ZEROS2(NY,NX)
   plt_site%POROS1=POROS(NU(NY,NX),NY,NX)
   DO NZ=1,NP(NY,NX)
-    plt_morph%CanPLA(NZ)=CanPLA(NZ,NY,NX)
+    plt_morph%CanopyLeafA_pft(NZ)=CanopyLeafA_pft(NZ,NY,NX)
     plt_morph%CanopyHeight(NZ)=CanopyHeight(NZ,NY,NX)
     plt_morph%CFX(NZ)=CFX(NZ,NY,NX)
-    plt_rad%ABSR(NZ)=ABSR(NZ,NY,NX)
-    plt_rad%ABSP(NZ)=ABSP(NZ,NY,NX)
+    plt_rad%CanopySWabsorpty_pft(NZ)=CanopySWabsorpty_pft(NZ,NY,NX)
+    plt_rad%CanopyPARabsorpty_pft(NZ)=CanopyPARabsorpty_pft(NZ,NY,NX)
     plt_rad%TAUR(NZ)=TAUR(NZ,NY,NX)
-    plt_rad%ALBR(NZ)=ALBR(NZ,NY,NX)
+    plt_rad%CanopySWAlbedo_pft(NZ)=CanopySWAlbedo_pft(NZ,NY,NX)
     plt_rad%TAUP(NZ)=TAUP(NZ,NY,NX)
-    plt_rad%ALBP(NZ)=ALBP(NZ,NY,NX)
+    plt_rad%CanopyPARalbedo_pft(NZ)=CanopyPARalbedo_pft(NZ,NY,NX)
     plt_morph%NBR(NZ)=NBR(NZ,NY,NX)
-    plt_morph%CF(NZ)=CF(NZ,NY,NX)
+    plt_morph%ClumpFactor(NZ)=ClumpFactor(NZ,NY,NX)
     DO NB=1,NBR(NZ,NY,NX)
       DO K=0,JNODS
         DO  L=1,JC
@@ -1565,7 +1565,7 @@ implicit none
         ENDDO
       ENDDO
       DO  L=1,JC
-        plt_morph%CanPLBSA(L,NB,NZ)=CanPLBSA(L,NB,NZ,NY,NX)
+        plt_morph%CanopyBranchStemApft_lyr(L,NB,NZ)=CanopyBranchStemApft_lyr(L,NB,NZ,NY,NX)
       ENDDO
       DO K=1,JNODS
         DO  L=1,JC
@@ -1618,8 +1618,8 @@ implicit none
   RADY(NY,NX)=plt_rad%RADY
   RAPS(NY,NX)=plt_rad%RAPS
   RAPY(NY,NX)=plt_rad%RAPY
-  RADG(NY,NX)=plt_rad%RADG
-  FRADG(NY,NX)=plt_rad%FRADG
+  SWRadOnGrnd(NY,NX)=plt_rad%SWRadOnGrnd
+  FracSWRad2Grnd(NY,NX)=plt_rad%FracSWRad2Grnd
   RAD(NY,NX)=plt_rad%RAD0
   RAP(NY,NX)=plt_rad%RAP0
   DO L=0,JC
@@ -1629,9 +1629,9 @@ implicit none
     TAUS(L,NY,NX)=plt_rad%TAUS(L)
     TAU0(L,NY,NX)=plt_rad%TAU0(L)
   ENDDO
-  CanGA(NY,NX)=plt_morph%CanGA
+  CanopyArea_grid(NY,NX)=plt_morph%CanopyArea_grid
   DO NZ=1,NP(NY,NX)
-    CanPA(NZ,NY,NX)=plt_morph%CanPA(NZ)
+    CanopyArea_pft(NZ,NY,NX)=plt_morph%CanopyArea_pft(NZ)
     SWRadByCanP(NZ,NY,NX) =plt_rad%SWRadByCanP(NZ)
     PARByCanP(NZ,NY,NX) =plt_rad%PARByCanP(NZ)
     CFX(NZ,NY,NX)  =plt_morph%CFX(NZ)

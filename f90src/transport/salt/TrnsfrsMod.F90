@@ -227,7 +227,7 @@ module TrnsfrsMod
 !     HOURLY SOLUTE FLUXES FROM ATMOSPHERE TO SNOWPACK
 !     IN SNOWFALL AND IRRIGATION IS ZERO IF SNOWPACK IS ABSENT
 !
-!     PRECQ,PRECI=snow+rain,irrigation
+!     PrecAtm,PRECI=snow+rain,irrigation
 !     X*BLS=hourly solute flux to snowpack
 !     X*FLS,X*FLB=hourly solute flux to surface litter,soil surface micropore non-band,band
 !     FLQRQ,FLQRI=water flux to surface litter from rain,irrigation
@@ -578,7 +578,7 @@ module TrnsfrsMod
 !     ENTERED IN WEATHER AND IRRIGATION FILES
 !
 !     SnoFalPrec,RainFalPrec=snow,rain
-!     VLSnowHeatCapM,VLHeatCapSnowMN=current,minimum volumetric heat capacity of snowpack
+!     VLSnowHeatCapM,VLHeatCapSnowMin=current,minimum volumetric heat capacity of snowpack
 !     X*BLS=hourly solute flux to snowpack
 !     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
 !          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
@@ -593,7 +593,7 @@ module TrnsfrsMod
 !     C*R,C*Q=precipitation,irrigation solute concentrations
 !
       IF(SnoFalPrec(NY,NX).GT.0.0.OR.(RainFalPrec(NY,NX).GT.0.0 &
-      .AND.VLSnowHeatCapM(1,1,NY,NX).GT.VLHeatCapSnowMN(NY,NX)))THEN
+      .AND.VLSnowHeatCapM(1,1,NY,NX).GT.VLHeatCapSnowMin(NY,NX)))THEN
 !
       call AtmosSoluteFluxToSnowpack(I,NY,NX)
 !
@@ -601,8 +601,8 @@ module TrnsfrsMod
 !     IN RAINFALL AND IRRIGATION ACCORDING TO CONCENTRATIONS
 !     ENTERED IN WEATHER AND IRRIGATION FILES
 !
-      ELSEIF((PRECQ(NY,NX).GT.0.0.OR.PRECI(NY,NX).GT.0.0) &
-        .AND.VLSnowHeatCapM(1,1,NY,NX).LE.VLHeatCapSnowMN(NY,NX))THEN
+      ELSEIF((PrecAtm(NY,NX).GT.0.0.OR.IrrigSurface(NY,NX).GT.0.0) &
+        .AND.VLSnowHeatCapM(1,1,NY,NX).LE.VLHeatCapSnowMin(NY,NX))THEN
 !
       call AtmosSoluteFluxToTopsoil(I,NY,NX)
 !
@@ -679,7 +679,7 @@ module TrnsfrsMod
   integer :: NTSA
 !     begin_execution
 
-  FQRM=QRMN(M,N,NN,M5,M4)/QRM(M,N2,N1)
+  FQRM=QRMN(M,N,NN,M5,M4)/WatFlux4ErosionM(M,N2,N1)
 
   DO NTSA=idsa_beg,idsa_end
     trcsa_RQR(NTSA,N,NN,M5,M4)=trcsa_RQR0(NTSA,N2,N1)*FQRM
@@ -922,12 +922,12 @@ module TrnsfrsMod
 !     begin_execution
 
   D1205: DO LS=1,JS
-    IF(VLSnowHeatCapM(M,LS,NY,NX).GT.VLHeatCapSnowMN(NY,NX))THEN
+    IF(VLSnowHeatCapM(M,LS,NY,NX).GT.VLHeatCapSnowMin(NY,NX))THEN
       LS2=MIN(JS,LS+1)
 !
 !     IF LOWER LAYER IS IN THE SNOWPACK
   !
-      IF(LS.LT.JS.AND.VLSnowHeatCapM(M,LS2,N2,N1).GT.VLHeatCapSnowMN(N2,N1))THEN
+      IF(LS.LT.JS.AND.VLSnowHeatCapM(M,LS2,N2,N1).GT.VLHeatCapSnowMin(N2,N1))THEN
         DO NTSA=idsa_beg,idsa_end
           trcsa_TBLS(NTSA,LS,NY,NX)=trcsa_TBLS(NTSA,LS,NY,NX) &
             +trcsa_RBLS(NTSA,LS,NY,NX)-trcsa_RBLS(NTSA,LS2,NY,NX)
@@ -1146,8 +1146,8 @@ module TrnsfrsMod
 !          :*1=non-band,*B=band
 !
             IF(L.EQ.NUM(M2,M1).AND.N.NE.3)THEN
-              IF(IRCHG(NN,N,N2,N1).EQ.0.OR.isclose(RCHQF,0.0_r8) &
-                .OR.QRM(M,N2,N1).LE.ZEROS(N2,N1))THEN
+              IF(.not.XGridRunoffFlag(NN,N,N2,N1).OR.isclose(RCHQF,0.0_r8) &
+                .OR.WatFlux4ErosionM(M,N2,N1).LE.ZEROS(N2,N1))THEN
                 call ZeroSoluteFluxFromRecharge(N,NN,M5,M4)
               ELSE
 !
@@ -1256,7 +1256,7 @@ module TrnsfrsMod
             ELSEIF(N.EQ.3)THEN
 !     NET SOLUTE FLUX IN SNOWPACK
 !
-!     VLSnowHeatCapM,VLHeatCapSnowMN=current,minimum volumetric heat capacity of snowpack
+!     VLSnowHeatCapM,VLHeatCapSnowMin=current,minimum volumetric heat capacity of snowpack
 !     T*BLS=net solute flux in snowpack
 !     R*BLS=solute flux in snowpack
               call NetFluxInSnowpack(M,NY,NX,N1,N2)

@@ -9,7 +9,7 @@ module InitSOMBGCMOD
   use EcoSIMCtrlDataType
   use SoilWaterDataType
   use EcosimConst
-  use EcoSIMConfig, only : nlbiomcp => nlbiomcpc, ndbiomcp=> ndbiomcpc
+  use EcoSIMConfig, only : nlbiomcp => NumOfLiveMicrobiomComponents, ndbiomcp=> NumOfDeadMicrobiomComponents
   use SurfLitterDataType
   use SoilPropertyDataType
   use GridDataType
@@ -41,8 +41,8 @@ module InitSOMBGCMOD
   JGnfo  => micpar%JGnfo
   JGniA  => micpar%JGniA
   JGnfA  => micpar%JGnfA
-  NMICBSA= micpar%NMICBSA
-  NMICBSO= micpar%NMICBSO
+  NumOfMicrobsInAutotrophCmplx= micpar%NumOfMicrobsInAutotrophCmplx
+  NumOfMicrobs1HetertrophCmplx= micpar%NumOfMicrobs1HetertrophCmplx
 
   allocate(CORGCX(1:jcplx))
   allocate(CORGNX(1:jcplx))
@@ -89,7 +89,7 @@ module InitSOMBGCMOD
     CNOMCa  => micpar%CNOMCa ,&
     CPOMCa  => micpar%CPOMCa ,&
     nlbiomcp=> micpar%nlbiomcp, &
-    NMICBSA => micpar%NMICBSA, &
+    NumOfMicrobsInAutotrophCmplx => micpar%NumOfMicrobsInAutotrophCmplx, &
     k_humus => micpar%k_humus, &
     OHCK    => micpar%OHCK   ,&
     OMCK    => micpar%OMCK   ,&
@@ -105,7 +105,7 @@ module InitSOMBGCMOD
     OMCA    => micpar%OMCA    &
   )
 
-  D975: DO K=1,micpar%n_litrsfk
+  D975: DO K=1,micpar%NumOfLitrCmplxs
     CNOSCT(K)=0.0_r8
     CPOSCT(K)=0.0_r8
     IF(RSC(K,L,NY,NX).GT.ZEROS(NY,NX))THEN
@@ -133,7 +133,7 @@ module InitSOMBGCMOD
     ENDIF
   ENDDO D975
 
-  D990: DO K=micpar%n_litrsfk+1,jcplx1
+  D990: DO K=micpar%NumOfLitrCmplxs+1,jcplx1
     CNOSCT(K)=0.0_r8
     CPOSCT(K)=0.0_r8
     IF(CORGCX(K).GT.ZERO)THEN
@@ -205,13 +205,13 @@ module InitSOMBGCMOD
       FOSPI=1.0
     ELSE
       IF(SoilMicPMassLayer(L,NY,NX).GT.ZEROS(NY,NX))THEN
-        IF(K.LE.micpar%n_litrsfk)THEN
+        IF(K.LE.micpar%NumOfLitrCmplxs)THEN
           OSCM(K)=DCKR*CORGCX(K)*SoilMicPMassLayer(L,NY,NX)
         ELSE
           OSCM(K)=FCX*CORGCX(K)*SoilMicPMassLayer(L,NY,NX)*DCKM/(CORGCX(k_humus)+DCKM)
         ENDIF
       ELSE
-        IF(K.LE.micpar%n_litrsfk)THEN
+        IF(K.LE.micpar%NumOfLitrCmplxs)THEN
           OSCM(K)=DCKR*CORGCX(K)*VGeomLayer(L,NY,NX)
         ELSE
           OSCM(K)=FCX*CORGCX(K)*VGeomLayer(L,NY,NX)*DCKM/(CORGCX(k_humus)+DCKM)
@@ -239,9 +239,9 @@ module InitSOMBGCMOD
 !     OSCX,OSNX,OSPX=remaining unallocated SOC,SON,SOP
 !  The reason that initialization of complex 5 microbes is repated for each
 ! complex is because complex 5 is shared by the other complexes
-    OMCff(1:nlbiomcp,1:NMICBSA,L,NY,NX)=0._r8
-    OMNff(1:nlbiomcp,1:NMICBSA,L,NY,NX)=0._r8
-    OMPff(1:nlbiomcp,1:NMICBSA,L,NY,NX)=0._r8
+    OMCff(1:nlbiomcp,1:NumOfMicrobsInAutotrophCmplx,L,NY,NX)=0._r8
+    OMNff(1:nlbiomcp,1:NumOfMicrobsInAutotrophCmplx,L,NY,NX)=0._r8
+    OMPff(1:nlbiomcp,1:NumOfMicrobsInAutotrophCmplx,L,NY,NX)=0._r8
 
     D8990: DO N=1,NFGs
       tglds=JGnfo(N)-JGnio(N)+1._r8
@@ -377,7 +377,7 @@ module InitSOMBGCMOD
           OC=OC+OMC(M,NGL,K,L,NY,NX)
           ON=ON+OMN(M,NGL,K,L,NY,NX)
           OP=OP+OMP(M,NGL,K,L,NY,NX)
-          IF(K.LE.micpar%n_litrsfk)THEN
+          IF(K.LE.micpar%NumOfLitrCmplxs)THEN
             RC=RC+OMC(M,NGL,K,L,NY,NX)
           ENDIF
           RC0(K,NY,NX)=RC0(K,NY,NX)+OMC(M,NGL,K,L,NY,NX)
@@ -421,7 +421,7 @@ module InitSOMBGCMOD
       OC=OC+ORC(M,K,L,NY,NX)
       ON=ON+ORN(M,K,L,NY,NX)
       OP=OP+ORP(M,K,L,NY,NX)
-      IF(K.LE.micpar%n_litrsfk)THEN
+      IF(K.LE.micpar%NumOfLitrCmplxs)THEN
         RC=RC+ORC(M,K,L,NY,NX)
       ENDIF
       IF(L.EQ.0)THEN
@@ -433,7 +433,7 @@ module InitSOMBGCMOD
     ON=ON+OQN(K,L,NY,NX)+OQNH(K,L,NY,NX)+OHN(K,L,NY,NX)
     OP=OP+OQP(K,L,NY,NX)+OQPH(K,L,NY,NX)+OHP(K,L,NY,NX)
     OC=OC+OQA(K,L,NY,NX)+OQAH(K,L,NY,NX)
-    IF(K.LE.micpar%n_litrsfk)THEN
+    IF(K.LE.micpar%NumOfLitrCmplxs)THEN
       RC=RC+OQC(K,L,NY,NX)+OQCH(K,L,NY,NX)+OHC(K,L,NY,NX) &
         +OQA(K,L,NY,NX)+OQAH(K,L,NY,NX)+OHA(K,L,NY,NX)
       RC=RC+OQA(K,L,NY,NX)+OQAH(K,L,NY,NX)
@@ -446,7 +446,7 @@ module InitSOMBGCMOD
       OC=OC+OSC(M,K,L,NY,NX)
       ON=ON+OSN(M,K,L,NY,NX)
       OP=OP+OSP(M,K,L,NY,NX)
-      IF(K.LE.micpar%n_litrsfk)THEN
+      IF(K.LE.micpar%NumOfLitrCmplxs)THEN
         RC=RC+OSC(M,K,L,NY,NX)
       ENDIF
       IF(L.EQ.0)THEN
@@ -726,7 +726,7 @@ module InitSOMBGCMOD
   real(r8) :: scal
 ! begin_execution
   associate(                     &
-    n_litrsfk=> micpar%n_litrsfk , &
+    NumOfLitrCmplxs=> micpar%NumOfLitrCmplxs , &
     k_POM   => micpar%k_POM    , &
     k_humus => micpar%k_humus  , &
     CNRH    => micpar%CNRH     , &
@@ -734,14 +734,14 @@ module InitSOMBGCMOD
   )
   IF(SoilMicPMassLayer(L,NY,NX).GT.ZEROS(NY,NX))THEN
     scal=AREA(3,L,NY,NX)/SoilMicPMassLayer(L,NY,NX)
-    CORGCX(1:n_litrsfk)=RSC(1:n_litrsfk,L,NY,NX)*scal
-    CORGNX(1:n_litrsfk)=RSN(1:n_litrsfk,L,NY,NX)*scal
-    CORGPX(1:n_litrsfk)=RSP(1:n_litrsfk,L,NY,NX)*scal
+    CORGCX(1:NumOfLitrCmplxs)=RSC(1:NumOfLitrCmplxs,L,NY,NX)*scal
+    CORGNX(1:NumOfLitrCmplxs)=RSN(1:NumOfLitrCmplxs,L,NY,NX)*scal
+    CORGPX(1:NumOfLitrCmplxs)=RSP(1:NumOfLitrCmplxs,L,NY,NX)*scal
   ELSE
     scal=AREA(3,L,NY,NX)/VGeomLayer(L,NY,NX)
-    CORGCX(1:n_litrsfk)=RSC(1:n_litrsfk,L,NY,NX)*scal
-    CORGNX(1:n_litrsfk)=RSN(1:n_litrsfk,L,NY,NX)*scal
-    CORGPX(1:n_litrsfk)=RSP(1:n_litrsfk,L,NY,NX)*scal
+    CORGCX(1:NumOfLitrCmplxs)=RSC(1:NumOfLitrCmplxs,L,NY,NX)*scal
+    CORGNX(1:NumOfLitrCmplxs)=RSN(1:NumOfLitrCmplxs,L,NY,NX)*scal
+    CORGPX(1:NumOfLitrCmplxs)=RSP(1:NumOfLitrCmplxs,L,NY,NX)*scal
   ENDIF
     !
     !     ALLOCATE SOC TO POC(3) AND HUMUS(4)

@@ -322,18 +322,18 @@ implicit none
 !
 !   RE-CALCULATE PLANT INPUTS IN MODEL UNITS
 !
-!   ABSR,ABSP=leaf SW,PAR absorbtivity
+!   CanopySWabsorpty_pft,CanopyPARabsorpty_pft=leaf SW,PAR absorbtivity
 !
     VCMX(NZ,NY,NX)=2.5_r8*VCMX(NZ,NY,NX)
     VOMX(NZ,NY,NX)=2.5_r8*VOMX(NZ,NY,NX)
     VCMX4(NZ,NY,NX)=2.5_r8*VCMX4(NZ,NY,NX)
     ETMX(NZ,NY,NX)=2.5_r8*ETMX(NZ,NY,NX)
-    ABSR(NZ,NY,NX)=1.0_r8-ALBR(NZ,NY,NX)-TAUR(NZ,NY,NX)
-    ABSP(NZ,NY,NX)=1.0_r8-ALBP(NZ,NY,NX)-TAUP(NZ,NY,NX)
-    ALBR(NZ,NY,NX)=ALBR(NZ,NY,NX)/ABSR(NZ,NY,NX)
-    ALBP(NZ,NY,NX)=ALBP(NZ,NY,NX)/ABSP(NZ,NY,NX)
-    TAUR(NZ,NY,NX)=TAUR(NZ,NY,NX)/ABSR(NZ,NY,NX)
-    TAUP(NZ,NY,NX)=TAUP(NZ,NY,NX)/ABSP(NZ,NY,NX)
+    CanopySWabsorpty_pft(NZ,NY,NX)=1.0_r8-CanopySWAlbedo_pft(NZ,NY,NX)-TAUR(NZ,NY,NX)
+    CanopyPARabsorpty_pft(NZ,NY,NX)=1.0_r8-CanopyPARalbedo_pft(NZ,NY,NX)-TAUP(NZ,NY,NX)
+    CanopySWAlbedo_pft(NZ,NY,NX)=CanopySWAlbedo_pft(NZ,NY,NX)/CanopySWabsorpty_pft(NZ,NY,NX)
+    CanopyPARalbedo_pft(NZ,NY,NX)=CanopyPARalbedo_pft(NZ,NY,NX)/CanopyPARabsorpty_pft(NZ,NY,NX)
+    TAUR(NZ,NY,NX)=TAUR(NZ,NY,NX)/CanopySWabsorpty_pft(NZ,NY,NX)
+    TAUP(NZ,NY,NX)=TAUP(NZ,NY,NX)/CanopyPARabsorpty_pft(NZ,NY,NX)
     ANGBR(NZ,NY,NX)=SIN(ANGBR(NZ,NY,NX)/57.29578_r8)
     ANGSH(NZ,NY,NX)=SIN(ANGSH(NZ,NY,NX)/57.29578_r8)
     GROUPI(NZ,NY,NX)=GROUPX(NZ,NY,NX)
@@ -400,8 +400,8 @@ implicit none
   call ncd_getvar(pft_nfid, 'CHL4', loc, CHL4(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'FCO2', loc, CanPCi2CaRatio(NZ,NY,NX))
 
-  call ncd_getvar(pft_nfid, 'ALBR', loc, ALBR(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'ALBP', loc, ALBP(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'ALBR', loc, CanopySWAlbedo_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'ALBP', loc, CanopyPARalbedo_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'TAUR', loc, TAUR(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'TAUP', loc, TAUP(NZ,NY,NX))
 
@@ -424,7 +424,7 @@ implicit none
 
 
   call ncd_getvar(pft_nfid, 'CLASS', loc,CLASS(1:JLI,NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'CFI', loc,CFI(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'CFI', loc,ClumpFactort0(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'ANGBR', loc,ANGBR(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'ANGSH', loc,ANGSH(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'STMX', loc,STMX(NZ,NY,NX))
@@ -710,7 +710,7 @@ implicit none
   write(*,*)'growth in internode length vs mass: SNL1',SNL1(NZ,NY,NX)
   write(*,*)'fraction of leaf area in 0-22.5,45,67.5,90o '// &
     'inclination classes: CLASS',(CLASS(N,NZ,NY,NX),N=1,JLI)
-  write(*,*)'initial clumping factor: CFI',CFI(NZ,NY,NX)
+  write(*,*)'initial clumping factor: CFI',ClumpFactort0(NZ,NY,NX)
   write(*,*)'stem angle from horizontal: ANGBR',ANGBR(NZ,NY,NX)
   write(*,*)'petiole angle from horizontal: ANGSH',ANGSH(NZ,NY,NX)
   write(*,*)'maximum potential seed mumber from '// &
@@ -832,8 +832,8 @@ implicit none
   integer, intent(in) :: NZ,NY,NX
 
   write(*,*)'OPTICAL PROPERTIES'
-  write(*,*)'leaf SW albedo: ALBR',ALBR(NZ,NY,NX)
-  write(*,*)'leaf PAR albedo: ALBP',ALBP(NZ,NY,NX)
+  write(*,*)'leaf SW albedo: ALBR',CanopySWAlbedo_pft(NZ,NY,NX)
+  write(*,*)'leaf PAR albedo: ALBP',CanopyPARalbedo_pft(NZ,NY,NX)
   write(*,*)'leaf SW transmission: TAUR',TAUR(NZ,NY,NX)
   write(*,*)'leaf PAR transmission: TAUP',TAUP(NZ,NY,NX)
   end subroutine plant_optic_trait_disp

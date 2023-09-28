@@ -1168,15 +1168,15 @@ module InsideTranspMod
 
   integer :: K,NTS
 
-  VLWatMicPCO(N6,N5,N4)=VLWatMicPM(M,N6,N5,N4)*GSolbility(idg_CO2,N6,N5,N4)
-  VLWatMicPCH(N6,N5,N4)=VLWatMicPM(M,N6,N5,N4)*GSolbility(idg_CH4,N6,N5,N4)
-  VLWatMicPOX(N6,N5,N4)=VLWatMicPM(M,N6,N5,N4)*GSolbility(idg_O2,N6,N5,N4)
-  VLWatMicPNG(N6,N5,N4)=VLWatMicPM(M,N6,N5,N4)*GSolbility(idg_N2,N6,N5,N4)
-  VLWatMicPN2(N6,N5,N4)=VLWatMicPM(M,N6,N5,N4)*GSolbility(idg_N2O,N6,N5,N4)
-  VLWatMicPN3(N6,N5,N4)=VLWatMicPMA(N6,N5,N4)*GSolbility(idg_NH3,N6,N5,N4)
-  VLWatMicPHG(N6,N5,N4)=VLWatMicPM(M,N6,N5,N4)*GSolbility(idg_H2,N6,N5,N4)
+  VLWatMicPCO(N6,N5,N4)=VLWatMicPM(M,N6,N5,N4)*GasSolbility(idg_CO2,N6,N5,N4)
+  VLWatMicPCH(N6,N5,N4)=VLWatMicPM(M,N6,N5,N4)*GasSolbility(idg_CH4,N6,N5,N4)
+  VLWatMicPOX(N6,N5,N4)=VLWatMicPM(M,N6,N5,N4)*GasSolbility(idg_O2,N6,N5,N4)
+  VLWatMicPNG(N6,N5,N4)=VLWatMicPM(M,N6,N5,N4)*GasSolbility(idg_N2,N6,N5,N4)
+  VLWatMicPN2(N6,N5,N4)=VLWatMicPM(M,N6,N5,N4)*GasSolbility(idg_N2O,N6,N5,N4)
+  VLWatMicPN3(N6,N5,N4)=VLWatMicPMA(N6,N5,N4)*GasSolbility(idg_NH3,N6,N5,N4)
+  VLWatMicPHG(N6,N5,N4)=VLWatMicPM(M,N6,N5,N4)*GasSolbility(idg_H2,N6,N5,N4)
 
-  VLWatMicPNB(N6,N5,N4)=VLWatMicPMB(N6,N5,N4)*GSolbility(idg_NH3,N6,N5,N4)
+  VLWatMicPNB(N6,N5,N4)=VLWatMicPMB(N6,N5,N4)*GasSolbility(idg_NH3,N6,N5,N4)
 !
 !     MACROPORE-MICROPORE CONVECTIVE SOLUTE EXCHANGE IN SOIL
 !     LAYER FROM WATER EXCHANGE IN 'WATSUB' AND
@@ -1411,13 +1411,13 @@ module InsideTranspMod
     THETW1=AZMAX1(safe_adb(VLWatMicPM(M,N3,N2,N1),VLSoilMicP(N3,N2,N1)))
     IF(THETW1.GT.THETY(N3,N2,N1).AND.IFLGB.EQ.0)THEN
 
-      trcg_SLX(idg_CO2) =catomw*GSolbility(idg_CO2,N3,N2,N1)  !conver into carbon g C/mol
-      trcg_SLX(idg_CH4) =catomw*GSolbility(idg_CH4,N3,N2,N1)
-      trcg_SLX(idg_O2)  =32.0_r8*GSolbility(idg_O2,N3,N2,N1)
-      trcg_SLX(idg_N2)  =28.0_r8*GSolbility(idg_N2,N3,N2,N1)
-      trcg_SLX(idg_N2O) =28.0_r8*GSolbility(idg_N2O,N3,N2,N1)
-      trcg_SLX(idg_NH3) =natomw*GSolbility(idg_NH3,N3,N2,N1)
-      trcg_SLX(idg_H2)  =2.0_r8*GSolbility(idg_H2,N3,N2,N1)
+      trcg_SLX(idg_CO2) =catomw*GasSolbility(idg_CO2,N3,N2,N1)  !conver into carbon g C/mol
+      trcg_SLX(idg_CH4) =catomw*GasSolbility(idg_CH4,N3,N2,N1)
+      trcg_SLX(idg_O2)  =32.0_r8*GasSolbility(idg_O2,N3,N2,N1)
+      trcg_SLX(idg_N2)  =28.0_r8*GasSolbility(idg_N2,N3,N2,N1)
+      trcg_SLX(idg_N2O) =28.0_r8*GasSolbility(idg_N2O,N3,N2,N1)
+      trcg_SLX(idg_NH3) =natomw*GasSolbility(idg_NH3,N3,N2,N1)
+      trcg_SLX(idg_H2)  =2.0_r8*GasSolbility(idg_H2,N3,N2,N1)
       trcg_SLX(idg_NH3B)=trcg_SLX(idg_NH3)
 !
 !     GASEOUS EQUIVALENT PARTIAL CONCENTRATIONS

@@ -16,21 +16,21 @@ module PlantDisturbsMod
 ! end_include_section
 
 ! disturbance variables
-  real(r8) :: WTHTH0E(npelms)
-  real(r8) :: WTHTH1E(npelms)
-  real(r8) :: WTHTH2E(npelms)
-  real(r8) :: WTHTH3E(npelms)
-  real(r8) :: WTHTH4E(npelms)
-  real(r8) :: WTHTR1E(npelms)
-  real(r8) :: WTHTR2E(npelms)
-  real(r8) :: WTHTR3E(npelms)
-  real(r8) :: WTHTR4E(npelms)
-  real(r8) :: WTHTX0E(npelms)
-  real(r8) :: WTHTX1E(npelms)
-  real(r8) :: WTHTX2E(npelms)
-  real(r8) :: WTHTX3E(npelms)
-  real(r8) :: WTHTX4E(npelms)
-  real(r8) :: WTHTGE(npelms)
+  real(r8) :: WTHTH0E(NumOfPlantChemElements)
+  real(r8) :: WTHTH1E(NumOfPlantChemElements)
+  real(r8) :: WTHTH2E(NumOfPlantChemElements)
+  real(r8) :: WTHTH3E(NumOfPlantChemElements)
+  real(r8) :: WTHTH4E(NumOfPlantChemElements)
+  real(r8) :: WTHTR1E(NumOfPlantChemElements)
+  real(r8) :: WTHTR2E(NumOfPlantChemElements)
+  real(r8) :: WTHTR3E(NumOfPlantChemElements)
+  real(r8) :: WTHTR4E(NumOfPlantChemElements)
+  real(r8) :: WTHTX0E(NumOfPlantChemElements)
+  real(r8) :: WTHTX1E(NumOfPlantChemElements)
+  real(r8) :: WTHTX2E(NumOfPlantChemElements)
+  real(r8) :: WTHTX3E(NumOfPlantChemElements)
+  real(r8) :: WTHTX4E(NumOfPlantChemElements)
+  real(r8) :: WTHTGE(NumOfPlantChemElements)
   real(r8) :: EFIRE(2,5:5)
 
   public :: RemoveBiomassByDisturbance
@@ -49,7 +49,7 @@ module PlantDisturbsMod
   subroutine RemoveBiomByManagement(I,J,NZ,CPOOLK)
   implicit none
   integer, intent(in) :: I,J,NZ
-  real(r8), intent(inout) :: CPOOLK(JC1,JP1)
+  real(r8), intent(inout) :: CPOOLK(NumOfCanopyLayers1,JP1)
 !     TRANSFER ABOVE-GROUND C,N,P AT HARVEST OR DISTURBANCE
 !
 
@@ -64,7 +64,7 @@ module PlantDisturbsMod
   subroutine RemoveBiomassByDisturbance(I,J,NZ,CPOOLK)
   implicit none
   integer , intent(in) :: I,J,NZ
-  real(r8), INTENT(INOUT) :: CPOOLK(JC1,JP1)
+  real(r8), INTENT(INOUT) :: CPOOLK(NumOfCanopyLayers1,JP1)
   real(r8) :: FHVSE(ielmc)
   real(r8) :: FHVSH
   real(r8) :: WHVSTD
@@ -171,21 +171,21 @@ module PlantDisturbsMod
   implicit none
   integer, intent(in) :: I,J,NZ
 
-  real(r8) :: WTHEL0(npelms)
-  real(r8) :: WTHEL1(npelms)
-  real(r8) :: WTHEL2(npelms)
-  real(r8) :: WTHEL3(npelms)
-  real(r8) :: WTHEL4(npelms)
-  real(r8) :: WTHER0(npelms)
-  real(r8) :: WTHERT(npelms)
-  real(r8) :: WTHEXT(npelms)
+  real(r8) :: WTHEL0(NumOfPlantChemElements)
+  real(r8) :: WTHEL1(NumOfPlantChemElements)
+  real(r8) :: WTHEL2(NumOfPlantChemElements)
+  real(r8) :: WTHEL3(NumOfPlantChemElements)
+  real(r8) :: WTHEL4(NumOfPlantChemElements)
+  real(r8) :: WTHER0(NumOfPlantChemElements)
+  real(r8) :: WTHERT(NumOfPlantChemElements)
+  real(r8) :: WTHEXT(NumOfPlantChemElements)
 
-  WTHEL0(1:npelms)=0._r8
-  WTHEL1(1:npelms)=0._r8
-  WTHEL2(1:npelms)=0._r8
-  WTHEL3(1:npelms)=0._r8
-  WTHEL4(1:npelms)=0._r8
-  WTHER0(1:npelms)=0._r8
+  WTHEL0(1:NumOfPlantChemElements)=0._r8
+  WTHEL1(1:NumOfPlantChemElements)=0._r8
+  WTHEL2(1:NumOfPlantChemElements)=0._r8
+  WTHEL3(1:NumOfPlantChemElements)=0._r8
+  WTHEL4(1:NumOfPlantChemElements)=0._r8
+  WTHER0(1:NumOfPlantChemElements)=0._r8
 
   call ApplyDisturbanceBiomRemoval(I,J,NZ,WTHER0,WTHEL0,WTHEL1,WTHEL2,WTHEL3,WTHEL4)
 !
@@ -203,13 +203,13 @@ module PlantDisturbsMod
 
   implicit none
   integer , intent(in) :: I,J,NZ
-  real(r8), intent(in) :: WTHEXT(npelms),WTHERT(npelms)
-  real(r8), intent(in) :: WTHER0(npelms)
-  real(r8), intent(in) :: WTHEL0(npelms)
-  real(r8), intent(in) :: WTHEL1(npelms)
-  real(r8), intent(in) :: WTHEL2(npelms)
-  real(r8), intent(in) :: WTHEL3(npelms)
-  real(r8), intent(in) :: WTHEL4(npelms)
+  real(r8), intent(in) :: WTHEXT(NumOfPlantChemElements),WTHERT(NumOfPlantChemElements)
+  real(r8), intent(in) :: WTHER0(NumOfPlantChemElements)
+  real(r8), intent(in) :: WTHEL0(NumOfPlantChemElements)
+  real(r8), intent(in) :: WTHEL1(NumOfPlantChemElements)
+  real(r8), intent(in) :: WTHEL2(NumOfPlantChemElements)
+  real(r8), intent(in) :: WTHEL3(NumOfPlantChemElements)
+  real(r8), intent(in) :: WTHEL4(NumOfPlantChemElements)
   integer :: M,NE
 !     begin_execution
   associate(                        &
@@ -251,7 +251,7 @@ module PlantDisturbsMod
   IF(IHVST(NZ).NE.4.AND.IHVST(NZ).NE.6)THEN
     IF(IHVST(NZ).NE.5)THEN
       D6375: DO M=1,jsken
-        DO NE=1,npelms
+        DO NE=1,NumOfPlantChemElements        
           ESNC(NE,M,k_fine_litr,0,NZ)=ESNC(NE,M,k_fine_litr,0,NZ) &
             +CFOPE(NE,instruct,M,NZ)*(WTHER0(NE)+WTHTX0E(NE)) &
             +CFOPE(NE,ifoliar,M,NZ)*(WTHTR1E(NE)+WTHTX1E(NE)) &
@@ -366,7 +366,7 @@ module PlantDisturbsMod
 !     TCSNC,TZSNC,TPSNC=cumulative C,N,P litterfall
 !     TCSN0,TZSN0,TPSN0=cumulative above-ground C,N,P litterfall
 !
-    DO NE=1,npelms
+    DO NE=1,NumOfPlantChemElements
       TESNC(NE,NZ)=TESNC(NE,NZ)+WTHERT(NE)+WTHEXT(NE)
       TESN0(NE,NZ)=TESN0(NE,NZ)+WTHERT(NE)+WTHEXT(NE)
     ENDDO
@@ -378,9 +378,9 @@ module PlantDisturbsMod
   subroutine TotalBiomRemovalByDisturbance(I,J,NZ,WTHER0,WTHEXT,WTHERT)
   implicit none
   integer , intent(in) :: I,J,NZ
-  real(r8), intent(in) :: WTHER0(npelms)
-  real(r8), intent(out):: WTHEXT(npelms),WTHERT(npelms)
-  real(r8) :: WTHEHT(npelms)
+  real(r8), intent(in) :: WTHER0(NumOfPlantChemElements)
+  real(r8), intent(out):: WTHEXT(NumOfPlantChemElements),WTHERT(NumOfPlantChemElements)
+  real(r8) :: WTHEHT(NumOfPlantChemElements)
   integer :: NE
 !     begin_execution
   associate(                            &
@@ -412,7 +412,7 @@ module PlantDisturbsMod
 !     XHVSTC,XHVSTN,XHVSTP=total C,N,P removed from ecosystem from all PFT
 !     WTRVC,WTRVN,WTRVP=storage C,N,P
 !
-  DO NE=1,npelms
+  DO NE=1,NumOfPlantChemElements
     WTHEHT(NE)=WTHTH0E(NE)+WTHTH1E(NE)+WTHTH2E(NE)+WTHTH3E(NE)+WTHTH4E(NE)
     WTHERT(NE)=WTHER0(NE)+WTHTR1E(NE)+WTHTR2E(NE)+WTHTR3E(NE)+WTHTR4E(NE)
     WTHEXT(NE)=WTHTX0E(NE)+WTHTX1E(NE)+WTHTX2E(NE)+WTHTX3E(NE)+WTHTX4E(NE)
@@ -420,13 +420,13 @@ module PlantDisturbsMod
   IF(IHVST(NZ).NE.4.AND.IHVST(NZ).NE.6)THEN
     IF(IHVST(NZ).NE.5)THEN
       IF(JHVST(NZ).NE.2)THEN
-        DO NE=1,npelms
+        DO NE=1,NumOfPlantChemElements
           HVSTE(NE,NZ)=HVSTE(NE,NZ)+WTHEHT(NE)-WTHERT(NE)
           XHVSTE(NE)=XHVSTE(NE)+WTHEHT(NE)-WTHERT(NE)
         ENDDO
         TNBP=TNBP+WTHERT(ielmc)-WTHEHT(ielmc)
       ELSE
-        DO NE=1,npelms
+        DO NE=1,NumOfPlantChemElements
           WTRVE(NE,NZ)=WTRVE(NE,NZ)+WTHEHT(NE)-WTHERT(NE)
         ENDDO
       ENDIF
@@ -461,7 +461,7 @@ module PlantDisturbsMod
   ELSE
     HVSTE(ielmc,NZ)=HVSTE(ielmc,NZ)+GY*(WTHEHT(ielmc)-WTHERT(ielmc))
     XHVSTE(ielmc)=XHVSTE(ielmc)+GY*(WTHEHT(ielmc)-WTHERT(ielmc))
-    DO NE=2,npelms
+    DO NE=2,NumOfPlantChemElements
       HVSTE(NE,NZ)=HVSTE(NE,NZ)+WTHEHT(NE)-WTHERT(NE)
       XHVSTE(NE)=XHVSTE(NE)+WTHEHT(NE)-WTHERT(NE)
     ENDDO
@@ -480,12 +480,12 @@ module PlantDisturbsMod
     WTHEL0,WTHEL1,WTHEL2,WTHEL3,WTHEL4)
   implicit none
   integer, intent(in) :: I,J,NZ
-  real(r8), intent(out) :: WTHER0(npelms)
-  real(r8), intent(out) :: WTHEL0(npelms)
-  real(r8), intent(out) :: WTHEL1(npelms)
-  real(r8), intent(out) :: WTHEL2(npelms)
-  real(r8), intent(out) :: WTHEL3(npelms)
-  real(r8), intent(out) :: WTHEL4(npelms)
+  real(r8), intent(out) :: WTHER0(NumOfPlantChemElements)
+  real(r8), intent(out) :: WTHEL0(NumOfPlantChemElements)
+  real(r8), intent(out) :: WTHEL1(NumOfPlantChemElements)
+  real(r8), intent(out) :: WTHEL2(NumOfPlantChemElements)
+  real(r8), intent(out) :: WTHEL3(NumOfPlantChemElements)
+  real(r8), intent(out) :: WTHEL4(NumOfPlantChemElements)
 
   real(r8) :: EHVST21,EHVST22,EHVST23,EHVST24
   real(r8) :: EHVST21h,EHVST22h,EHVST23h,EHVST24h
@@ -522,7 +522,7 @@ module PlantDisturbsMod
   EHVST24=1._r8-EHVST(2,ipld_stdead,NZ)
 
   IF(IHVST(NZ).EQ.0)THEN
-    DO NE=1,npelms
+    DO NE=1,NumOfPlantChemElements
       WTHER0(NE)=WTHTH0E(NE)*EHVST21    !non-structural
       WTHTR1E(NE)=WTHTH1E(NE)*EHVST21   !leaf
       WTHTR2E(NE)=WTHTH2E(NE)*EHVST22   !fine, non-woody
@@ -533,7 +533,7 @@ module PlantDisturbsMod
 !     IF ONLY GRAIN C,N,P REMOVED AT HARVEST
 !
   ELSEIF(IHVST(NZ).EQ.1)THEN
-    DO NE=1,npelms
+    DO NE=1,NumOfPlantChemElements
       WTHER0(NE)=WTHTH0E(NE)
       WTHTR1E(NE)=WTHTH1E(NE)
       WTHTR2E(NE)=WTHTH2E(NE)-WTHTGE(NE)*EHVST(2,ipld_nofoliar,NZ)
@@ -544,7 +544,7 @@ module PlantDisturbsMod
 !     IF ONLY WOOD C,N,P REMOVED AT HARVEST
 !
   ELSEIF(IHVST(NZ).EQ.2)THEN
-    DO NE=1,npelms
+    DO NE=1,NumOfPlantChemElements
       WTHER0(NE)=WTHTH0E(NE)*EHVST21
       WTHTR1E(NE)=WTHTH1E(NE)*EHVST21
       WTHTR2E(NE)=WTHTH2E(NE)*EHVST22
@@ -555,7 +555,7 @@ module PlantDisturbsMod
 !     IF ALL PLANT C,N,P REMOVED AT HARVEST (NO RESIDUE RETURNED)
 !
   ELSEIF(IHVST(NZ).EQ.3)THEN
-    DO NE=1,npelms
+    DO NE=1,NumOfPlantChemElements
       WTHER0(NE)=WTHTH0E(NE)*EHVST21
       WTHTR1E(NE)=WTHTH1E(NE)*EHVST21
       WTHTR2E(NE)=WTHTH2E(NE)*EHVST22
@@ -577,7 +577,7 @@ module PlantDisturbsMod
     WTHTR3E(ielmc)=WTHTH3E(ielmc)*EHVST23
     WTHTR4E(ielmc)=WTHTH4E(ielmc)*EHVST24
 
-    DO NE=2,npelms
+    DO NE=2,NumOfPlantChemElements
       WTHER0(NE)=WTHTH0E(NE)*EHVST21h
       WTHTR1E(NE)=WTHTH1E(NE)*EHVST21h
       WTHTR2E(NE)=WTHTH2E(NE)*EHVST22h
@@ -685,7 +685,7 @@ module PlantDisturbsMod
     PPX      =>  plt_site%PPX        , &
     EPOOLR   =>  plt_biom%EPOOLR     , &
     WSRTL    =>  plt_biom%WSRTL      , &
-    RootCPZR    =>  plt_biom%RootCPZR      , &
+    PopPlantRootC_vr    =>  plt_biom%PopPlantRootC_vr      , &
     WTRTL    =>  plt_biom%WTRTL      , &
     WTLFBE   =>  plt_biom%WTLFBE     , &
     WTGRBE   =>  plt_biom%WTGRBE     , &
@@ -711,7 +711,7 @@ module PlantDisturbsMod
     CanPStalkC    =>  plt_biom%CanPStalkC      , &
     RTWT1E   =>  plt_biom%RTWT1E     , &
     WTRVE    =>  plt_biom%WTRVE      , &
-    CanPLeafShethC     =>  plt_biom%CanPLeafShethC       , &
+    CanopyLeafShethC_pft     =>  plt_biom%CanopyLeafShethC_pft       , &
     WTRT2E   =>  plt_biom%WTRT2E     , &
     EPOOLN   =>  plt_biom%EPOOLN     , &
     WTNDLE   =>  plt_biom%WTNDLE     , &
@@ -794,7 +794,7 @@ module PlantDisturbsMod
         pftPlantPopulation(NZ)=pftPlantPopulation(NZ)*XHVST
         FracPARByCanP(NZ)=FracPARByCanP(NZ)*XHVST
         VHeatCapCanP(NZ)=VHeatCapCanP(NZ)*XHVST
-        CanPLeafShethC(NZ)=0._r8
+        CanopyLeafShethC_pft(NZ)=0._r8
         CanPStalkC(NZ)=0._r8
 !
 !     TERMINATE BRANCHES IF TILLAGE IMPLEMENT 10 IS SELECTED
@@ -840,7 +840,7 @@ module PlantDisturbsMod
                 +CFOPE(ielmc,infoliar,M,NZ)*(WTSHEBE(ielmc,NB,NZ)*FWODBE(ielmc,k_fine_litr) &
                 +WTHSKBE(ielmc,NB,NZ)+WTEARBE(ielmc,NB,NZ)))
 
-              DO NE=2,npelms
+              DO NE=2,NumOfPlantChemElements
                 ESNC(NE,M,k_fine_litr,0,NZ)=ESNC(NE,M,k_fine_litr,0,NZ)+XHVST1 &
                   *(CFOPE(NE,instruct,M,NZ)*(EPOOL(NE,NB,NZ)+EPOLNB(NE,NB,NZ)&
                   +WTRSVBE(NE,NB,NZ)) &
@@ -851,7 +851,7 @@ module PlantDisturbsMod
             ENDDO D6380
 
             DO M=1,jsken
-              DO NE=1,npelms
+              DO NE=1,NumOfPlantChemElements
                 ESNC(NE,M,k_woody_litr,0,NZ)=ESNC(NE,M,k_woody_litr,0,NZ)+XHVST1 &
                   *CFOPE(NE,icwood,M,NZ)*(WTLFBE(NE,NB,NZ)*FWODLE(NE,k_woody_litr) &
                   +WTSHEBE(NE,NB,NZ)*FWODBE(NE,k_woody_litr))
@@ -875,7 +875,7 @@ module PlantDisturbsMod
 
             CPOOLK(NB,NZ)=CPOOLK(NB,NZ)*XHVST
             CanPBStalkC(NB,NZ)=CanPBStalkC(NB,NZ)*XHVST
-            DO NE=1,npelms
+            DO NE=1,NumOfPlantChemElements
               EPOOL(NE,NB,NZ)=EPOOL(NE,NB,NZ)*XHVST
               EPOLNB(NE,NB,NZ)=EPOLNB(NE,NB,NZ)*XHVST
               WTSHTBE(NE,NB,NZ)=WTSHTBE(NE,NB,NZ)*XHVST
@@ -895,7 +895,7 @@ module PlantDisturbsMod
             GRWTB(NB,NZ)=GRWTB(NB,NZ)*XHVST
             CanPBLA(NB,NZ)=CanPBLA(NB,NZ)*XHVST
             CanPBLeafShethC(NB,NZ)=AZMAX1(WTLFBE(ielmc,NB,NZ)+WTSHEBE(ielmc,NB,NZ))
-            CanPLeafShethC(NZ)=CanPLeafShethC(NZ)+CanPBLeafShethC(NB,NZ)
+            CanopyLeafShethC_pft(NZ)=CanopyLeafShethC_pft(NZ)+CanPBLeafShethC(NB,NZ)
 
             CanPStalkC(NZ)=CanPStalkC(NZ)+CanPBStalkC(NB,NZ)
             D8970: DO K=0,JNODS1
@@ -913,15 +913,15 @@ module PlantDisturbsMod
               WSSHE(K,NB,NZ)=WSSHE(K,NB,NZ)*XHVST
 !     HTNODE(K,NB,NZ)=HTNODE(K,NB,NZ)*XHVST
 !     HTNODX(K,NB,NZ)=HTNODX(K,NB,NZ)*XHVST
-              DO NE=1,npelms
+              DO NE=1,NumOfPlantChemElements
                 WGNODE(NE,K,NB,NZ)=WGNODE(NE,K,NB,NZ)*XHVST
                 WGLFE(NE,K,NB,NZ)=WGLFE(NE,K,NB,NZ)*XHVST
                 WGSHE(NE,K,NB,NZ)=WGSHE(NE,K,NB,NZ)*XHVST
-                DO L=1,JC1
+                DO L=1,NumOfCanopyLayers1
                   WGLFLE(NE,L,K,NB,NZ)=WGLFLE(NE,L,K,NB,NZ)*XHVST
                 ENDDO
               ENDDO
-              D8965: DO L=1,JC1
+              D8965: DO L=1,NumOfCanopyLayers1
                 CanPLNBLA(L,K,NB,NZ)=CanPLNBLA(L,K,NB,NZ)*XHVST
               ENDDO D8965
             ENDDO D8970
@@ -933,7 +933,7 @@ module PlantDisturbsMod
 !     VOLWOU,UVOLO=accumulated water loss for water balance calculation
 !
         VOLWPX=CanWatP(NZ)
-        WVPLT=AZMAX1(CanPLeafShethC(NZ)+CanPStalkC(NZ))
+        WVPLT=AZMAX1(CanopyLeafShethC_pft(NZ)+CanPStalkC(NZ))
 
         FDM=get_FDM(PSICanP(NZ))
 !        APSILT=ABS(PSICanP(NZ))
@@ -974,13 +974,13 @@ module PlantDisturbsMod
           D8985: DO N=1,MY(NZ)
 
             D6385: DO M=1,jsken
-                DO NE=1,npelms
+                DO NE=1,NumOfPlantChemElements
                   ESNC(NE,M,k_fine_litr,L,NZ)=ESNC(NE,M,k_fine_litr,L,NZ)+XHVST1 &
                     *CFOPE(NE,instruct,M,NZ)*EPOOLR(NE,N,L,NZ)
                 ENDDO
 
               DO NR=1,NRT(NZ)
-                DO NE=1,npelms
+                DO NE=1,NumOfPlantChemElements
                   ESNC(NE,M,k_woody_litr,L,NZ)=ESNC(NE,M,k_woody_litr,L,NZ)+XHVST1 &
                     *CFOPE(NE,icwood,M,NZ)*(WTRT1E(NE,N,L,NR,NZ) &
                     +WTRT2E(NE,N,L,NR,NZ))*FWODRE(NE,k_woody_litr)
@@ -1014,7 +1014,7 @@ module PlantDisturbsMod
 !     PrimRootLen,SecndRootLen=primary,secondary root length
 !     RTN2=number of secondary root axes
 !     CPOOLR,ZPOOLR,PPOOLR=non-structural C,N,P mass in root
-!     WTRTL,RootCPZR=active,actual root C mass
+!     WTRTL,PopPlantRootC_vr=active,actual root C mass
 !     WSRTL=root protein C mass
 !     RTN1,SecndRootXNumL=number of primary,secondary root axes
 !     RootLenDensNLP,RootLenPerP=root length density,root length per plant
@@ -1023,7 +1023,7 @@ module PlantDisturbsMod
 !     RCO2M,RCO2N,RCO2A unlimited by O2,nonstructural C
 !
             D8960: DO NR=1,NRT(NZ)
-              DO NE=1,npelms
+              DO NE=1,NumOfPlantChemElements
                 WTRT1E(NE,N,L,NR,NZ)=WTRT1E(NE,N,L,NR,NZ)*XHVST
                 WTRT2E(NE,N,L,NR,NZ)=WTRT2E(NE,N,L,NR,NZ)*XHVST
                 RTWT1E(NE,N,NR,NZ)=RTWT1E(NE,N,NR,NZ)*XHVST
@@ -1032,11 +1032,11 @@ module PlantDisturbsMod
               SecndRootLen(N,L,NR,NZ)=SecndRootLen(N,L,NR,NZ)*XHVST
               RTN2(N,L,NR,NZ)=RTN2(N,L,NR,NZ)*XHVST
             ENDDO D8960
-            DO NE=1,npelms
+            DO NE=1,NumOfPlantChemElements
               EPOOLR(NE,N,L,NZ)=EPOOLR(NE,N,L,NZ)*XHVST
             ENDDO
             WTRTL(N,L,NZ)=WTRTL(N,L,NZ)*XHVST
-            RootCPZR(N,L,NZ)=RootCPZR(N,L,NZ)*XHVST
+            PopPlantRootC_vr(N,L,NZ)=PopPlantRootC_vr(N,L,NZ)*XHVST
             WSRTL(N,L,NZ)=WSRTL(N,L,NZ)*XHVST
             PrimRootXNumL(N,L,NZ)=PrimRootXNumL(N,L,NZ)*XHVST
             SecndRootXNumL(N,L,NZ)=SecndRootXNumL(N,L,NZ)*XHVST
@@ -1058,7 +1058,7 @@ module PlantDisturbsMod
 !     CPOOLN,ZPOOLN,PPOOLN=nonstructural C,N,P in bacteria
 !
             IF(INTYP(NZ).NE.0.AND.N.EQ.1)THEN
-              DO NE=1,npelms
+              DO NE=1,NumOfPlantChemElements
                 D6395: DO M=1,jsken
                   ESNC(NE,M,k_fine_litr,L,NZ)=ESNC(NE,M,k_fine_litr,L,NZ)+XHVST1 &
                     *(CFOPE(NE,iroot,M,NZ)*WTNDLE(NE,L,NZ) &
@@ -1080,7 +1080,7 @@ module PlantDisturbsMod
 !     XHVST,XHVSN,XHVSP=fraction of root C,N,P remaining after disturbance
 !     WTRVC,WTRVN,WTRVP=storage C,N,P
 !
-        DO NE=1,npelms
+        DO NE=1,NumOfPlantChemElements
           D6400: DO M=1,jsken
             ESNC(NE,M,k_woody_litr,NGTopRootLayer(NZ),NZ)=ESNC(NE,M,k_woody_litr,NGTopRootLayer(NZ),NZ) &
               +(XHVST1*CFOPE(NE,instruct,M,NZ)*WTRVE(NE,NZ))*FWOODE(NE,k_woody_litr)
@@ -1101,12 +1101,12 @@ module PlantDisturbsMod
 
   implicit none
   integer, intent(in) :: I,J,NZ
-  real(r8), intent(inout) :: CPOOLK(JC1,JP1)
+  real(r8), intent(inout) :: CPOOLK(NumOfCanopyLayers1,JP1)
   integer :: L,K,M,NR,N,NB,NBX,NE
   real(r8):: ZPOOLG,ZPOLNG,ZPOOLX
-  real(r8) :: ZPOLNX,XHVST(npelms)
-  real(r8) :: XHVST1(npelms)
-  REAL(R8) :: WGLFBL(JC1,JP1,JP1)
+  real(r8) :: ZPOLNX,XHVST(NumOfPlantChemElements)
+  real(r8) :: XHVST1(NumOfPlantChemElements)
+  REAL(R8) :: WGLFBL(NumOfCanopyLayers1,JP1,JP1)
   real(r8) :: FHVSHK(0:JNODS1),FHVSETK(0:JNODS1)
   real(r8) :: ARLFY,ARLFR,ARLFG
   real(r8) :: APSILT
@@ -1128,8 +1128,8 @@ module PlantDisturbsMod
   real(r8) :: FHVSHH
   real(r8) :: FHVSHE
   real(r8) :: FDM
-  real(r8) :: FFIRE(npelms)
-  real(r8) :: FHVSE(npelms)
+  real(r8) :: FFIRE(NumOfPlantChemElements)
+  real(r8) :: FHVSE(NumOfPlantChemElements)
   real(r8) :: HTSTKX
   real(r8) :: PPOOLG
   real(r8) :: PPOLNG,PPOOLX,PPOLNX
@@ -1145,7 +1145,7 @@ module PlantDisturbsMod
   real(r8) :: WTNDPG,WGLFGX,WGSHGX,WGLFGY,WGSHGY
   real(r8) :: WHVSBS,WHVSCX,WHVSNX,WVPLT
   real(r8) :: FHVSH1,FHVSHT
-  real(r8) :: WGLFGE(npelms)
+  real(r8) :: WGLFGE(NumOfPlantChemElements)
   integer :: NTG
 !     begin_execution
   associate(                             &
@@ -1181,11 +1181,11 @@ module PlantDisturbsMod
     VOLWOU   => plt_site%VOLWOU    , &
     EPOOLR   => plt_biom%EPOOLR    , &
     WSRTL    => plt_biom%WSRTL     , &
-    RootCPZR    => plt_biom%RootCPZR     , &
+    PopPlantRootC_vr    => plt_biom%PopPlantRootC_vr     , &
     WTRTL    => plt_biom%WTRTL     , &
     WTRVE    => plt_biom%WTRVE     , &
     CanPStalkC    => plt_biom%CanPStalkC     , &
-    CanPLeafShethC     => plt_biom%CanPLeafShethC      , &
+    CanopyLeafShethC_pft     => plt_biom%CanopyLeafShethC_pft      , &
     CanPBStalkC   => plt_biom%CanPBStalkC    , &
     WTNDBE   => plt_biom%WTNDBE    , &
     WTRSVE   => plt_biom%WTRSVE    , &
@@ -1224,7 +1224,7 @@ module PlantDisturbsMod
     EPOOLN   => plt_biom%EPOOLN    , &
     ZEROP    => plt_biom%ZEROP     , &
     ZEROL    => plt_biom%ZEROL     , &
-    WGLFV    => plt_biom%WGLFV     , &
+    CanopyLeafCpft_lyr    => plt_biom%CanopyLeafCpft_lyr     , &
     FVRN     => plt_allom%FVRN     , &
     FWODRE   => plt_allom%FWODRE   , &
     FWOODE   => plt_allom%FWOODE   , &
@@ -1278,7 +1278,7 @@ module PlantDisturbsMod
     RTVLW    =>  plt_morph%RTVLW   , &
     RootLenDensNLP    =>  plt_morph%RootLenDensNLP   , &
     INTYP    =>  plt_morph%INTYP   , &
-    ARLFT    =>  plt_morph%ARLFT   , &
+    CanopyLAgrid_lyr    =>  plt_morph%CanopyLAgrid_lyr   , &
     CanopyHeightz       =>  plt_morph%CanopyHeightz      , &
     CanPBLA    =>  plt_morph%CanPBLA   , &
     NBR      =>  plt_morph%NBR     , &
@@ -1292,17 +1292,17 @@ module PlantDisturbsMod
     GRNOB    =>  plt_morph%GRNOB   , &
     CanPSheathHeight    =>  plt_morph%CanPSheathHeight   , &
     ARLF1    =>  plt_morph%ARLF1   , &
-    ARLFV    =>  plt_morph%ARLFV   , &
-    CanPLSA    =>  plt_morph%CanPLSA   , &
+    CanopyLeafApft_lyr    =>  plt_morph%CanopyLeafApft_lyr   , &
+    CanopyStemApft_lyr    =>  plt_morph%CanopyStemApft_lyr   , &
     CanPLNBLA    =>  plt_morph%CanPLNBLA   , &
-    CanPLBSA    =>  plt_morph%CanPLBSA   , &
+    CanopyBranchStemApft_lyr    =>  plt_morph%CanopyBranchStemApft_lyr   , &
     NRT      =>  plt_morph%NRT     , &
     PSTGF    =>  plt_morph%PSTGF   , &
     NB1      =>  plt_morph%NB1     , &
     PSTGI    =>  plt_morph%PSTGI   , &
     PSTG     =>  plt_morph%PSTG    , &
-    CF       =>  plt_morph%CF      , &
-    CanGLA    =>  plt_morph%CanGLA   , &
+    ClumpFactor      =>  plt_morph%ClumpFactor     , &
+    CanopyLA_grd    =>  plt_morph%CanopyLA_grd   , &
     ICTYP    =>  plt_photo%ICTYP     &
   )
 !     IHVST=harvest type:0=none,1=grain,2=all above-ground
@@ -1324,7 +1324,7 @@ module PlantDisturbsMod
 !          IHVST=4 or 6:animal or insect biomass(g LM m-2),IHVST=5:fire
 !     THIN=IHVST=0-3,5: fraction of population removed,
 !          IHVST=4 or 6:specific herbivory rate (g DM g-1 LM d-1)
-!     CanGLA,ARLFT=leaf area of combined canopy, canopy layer
+!     CanopyLA_grd,CanopyLAgrid_lyr=leaf area of combined canopy, canopy layer
 !     ARLFR,ARLFY=leaf area harvested,remaining
 !     ZL=height to bottom of each canopy layer
 !
@@ -1339,20 +1339,20 @@ module PlantDisturbsMod
         pftPlantPopulation(NZ)=PPX(NZ)*AREA3(NU)
       ENDIF
       IF(IHVST(NZ).EQ.3)THEN
-        CF(NZ)=CF(NZ)*HVST(NZ)
+        ClumpFactor(NZ)=ClumpFactor(NZ)*HVST(NZ)
       ENDIF
       IF(IHVST(NZ).LE.2.AND.HVST(NZ).LT.0.0)THEN
-        ARLFY=(1._r8-ABS(HVST(NZ)))*CanGLA
+        ARLFY=(1._r8-ABS(HVST(NZ)))*CanopyLA_grd
         ARLFR=0._r8
-        D9875: DO L=1,JC1
-          IF(CanopyHeightz(L).GT.CanopyHeightz(L-1).AND.ARLFT(L).GT.ZEROS.AND.ARLFR.LT.ARLFY)THEN
-            IF(ARLFR+ARLFT(L).GT.ARLFY)THEN
-              HVST(NZ)=CanopyHeightz(L-1)+((ARLFY-ARLFR)/ARLFT(L))*(CanopyHeightz(L)-CanopyHeightz(L-1))
+        D9875: DO L=1,NumOfCanopyLayers1
+          IF(CanopyHeightz(L).GT.CanopyHeightz(L-1).AND.CanopyLAgrid_lyr(L).GT.ZEROS.AND.ARLFR.LT.ARLFY)THEN
+            IF(ARLFR+CanopyLAgrid_lyr(L).GT.ARLFY)THEN
+              HVST(NZ)=CanopyHeightz(L-1)+((ARLFY-ARLFR)/CanopyLAgrid_lyr(L))*(CanopyHeightz(L)-CanopyHeightz(L-1))
             ENDIF
           ELSE
             HVST(NZ)=0._r8
           ENDIF
-          ARLFR=ARLFR+ARLFT(L)
+          ARLFR=ARLFR+CanopyLAgrid_lyr(L)
         ENDDO D9875
       ENDIF
       WHVSTT=0._r8
@@ -1510,14 +1510,14 @@ module PlantDisturbsMod
 !     WGLFBL=branch leaf C mass in canopy layer
 !
       D9860: DO NB=1,NBR(NZ)
-        DO  L=1,JC1
+        DO  L=1,NumOfCanopyLayers1
           DO  K=0,JNODS1
             WGLFBL(L,NB,NZ)=0._r8
           enddo
         enddo
       ENDDO D9860
       D9870: DO NB=1,NBR(NZ)
-        DO  L=1,JC1
+        DO  L=1,NumOfCanopyLayers1
           DO  K=0,JNODS1
             WGLFBL(L,NB,NZ)=WGLFBL(L,NB,NZ)+WGLFLE(ielmc,L,K,NB,NZ)
           enddo
@@ -1537,7 +1537,7 @@ module PlantDisturbsMod
 !     EHVST(1,1,EHVST(1,2,EHVST(1,3,EHVST(1,4=fraction of
 !           leaf,non-foliar,woody, standing dead removed from PFT
 !
-    D9865: DO L=JC1,1,-1
+    D9865: DO L=NumOfCanopyLayers1,1,-1
       IF(IHVST(NZ).NE.4.AND.IHVST(NZ).NE.6)THEN
         IF(IHVST(NZ).NE.3)THEN
           IF(CanopyHeightz(L).GT.CanopyHeightz(L-1))THEN
@@ -1597,7 +1597,7 @@ module PlantDisturbsMod
 !
 !     FHVSE(ielmc)=fraction of leaf node mass not harvested
 !     WGLFL,WGLFLN,WGLFLP=leaf node C,N,P in canopy layer
-!     CanPLNBLA,CanPLBSA=leaf,stalk node area in canopy layer
+!     CanPLNBLA,CanopyBranchStemApft_lyr=leaf,stalk node area in canopy layer
 !     WTHTH1E(ielmc),WTHTH1E(ielmn),WTHTH1E(ielmp)=harvested leaf C,N,P
 !     WTHTX1E(ielmc),WTHTX1E(ielmn),WTHTX1E(ielmp)=harvested leaf C,N,P to litter
 !     WTHTH3E(ielmc),WTHTH3E(ielmn),WTHTH3E(ielmp)=harvested woody C,N,P
@@ -1609,7 +1609,7 @@ module PlantDisturbsMod
             WHVSBL=WHVSBL-(1._r8-FHVSE(ielmc))*WGLFLE(ielmc,L,K,NB,NZ)
             FHVSH1=1._r8-FHVSH
             FHVSHT=FHVSH-FHVSE(ielmc)
-            DO NE=1,npelms
+            DO NE=1,NumOfPlantChemElements
               WTHTH1E(NE)=WTHTH1E(NE)+FHVSH1*WGLFLE(NE,L,K,NB,NZ)*FWODLE(NE,k_fine_litr)
               WTHTX1E(NE)=WTHTX1E(NE)+FHVSHT*WGLFLE(NE,L,K,NB,NZ)*FWODLE(NE,k_fine_litr)
               WTHTH3E(NE)=WTHTH3E(NE)+FHVSH1*WGLFLE(NE,L,K,NB,NZ)*FWODLE(NE,k_woody_litr)
@@ -1621,15 +1621,15 @@ module PlantDisturbsMod
 !
             CanPLNBLA(L,K,NB,NZ)=FHVSE(ielmc)*CanPLNBLA(L,K,NB,NZ)
             IF(K.EQ.1)THEN
-              CanPLBSA(L,NB,NZ)=FHVSE(ielmc)*CanPLBSA(L,NB,NZ)
+              CanopyBranchStemApft_lyr(L,NB,NZ)=FHVSE(ielmc)*CanopyBranchStemApft_lyr(L,NB,NZ)
             ENDIF
           ENDIF
 
         ENDDO D9845
       ENDDO D9855
-      ARLFV(L,NZ)=0._r8
-      WGLFV(L,NZ)=0._r8
-      CanPLSA(L,NZ)=CanPLSA(L,NZ)*FHVSE(ielmc)
+      CanopyLeafApft_lyr(L,NZ)=0._r8
+      CanopyLeafCpft_lyr(L,NZ)=0._r8
+      CanopyStemApft_lyr(L,NZ)=CanopyStemApft_lyr(L,NZ)*FHVSE(ielmc)
     ENDDO D9865
 
     D9835: DO NB=1,NBR(NZ)
@@ -1648,20 +1648,20 @@ module PlantDisturbsMod
       WGSHGY=0._r8
       D9825: DO K=0,JNODS1
         ARLFG=0._r8
-        WGLFGE(1:npelms)=0._r8
+        WGLFGE(1:NumOfPlantChemElements)=0._r8
 !
 !     ACCUMULATE REMAINING LEAF AREA, C, N, P
 !
 !     WGLFL,WGLFLN,WGLFLP=leaf node C,N,P in canopy layer
-!     CanPLNBLA,ARLFV=leaf node,total area in canopy layer
+!     CanPLNBLA,CanopyLeafApft_lyr=leaf node,total area in canopy layer
 !
-        D9815: DO L=1,JC1
+        D9815: DO L=1,NumOfCanopyLayers1
           ARLFG=ARLFG+CanPLNBLA(L,K,NB,NZ)
-          DO NE=1,npelms
+          DO NE=1,NumOfPlantChemElements
             WGLFGE(NE)=WGLFGE(NE)+WGLFLE(NE,L,K,NB,NZ)
           ENDDO
-          ARLFV(L,NZ)=ARLFV(L,NZ)+CanPLNBLA(L,K,NB,NZ)
-          WGLFV(L,NZ)=WGLFV(L,NZ)+WGLFLE(ielmc,L,K,NB,NZ)
+          CanopyLeafApft_lyr(L,NZ)=CanopyLeafApft_lyr(L,NZ)+CanPLNBLA(L,K,NB,NZ)
+          CanopyLeafCpft_lyr(L,NZ)=CanopyLeafCpft_lyr(L,NZ)+WGLFLE(ielmc,L,K,NB,NZ)
         ENDDO D9815
 !
 !     CUT STALK AT HARVESTED NODES AND LAYERS
@@ -1706,7 +1706,7 @@ module PlantDisturbsMod
 !     WSLF=leaf protein mass
 !
       WGLFGY=WGLFGY+WGLFE(ielmc,K,NB,NZ)
-      DO NE=1,npelms
+      DO NE=1,NumOfPlantChemElements
         WTLFBE(NE,NB,NZ)=WTLFBE(NE,NB,NZ)-WGLFE(NE,K,NB,NZ)+WGLFGE(NE)
       ENDDO
       CanPBLA(NB,NZ)=CanPBLA(NB,NZ)-ARLF1(K,NB,NZ)+ARLFG
@@ -1716,7 +1716,7 @@ module PlantDisturbsMod
         WSLF(K,NB,NZ)=0._r8
       ENDIF
       ARLF1(K,NB,NZ)=ARLFG
-      DO NE=1,npelms
+      DO NE=1,NumOfPlantChemElements
         WGLFE(NE,K,NB,NZ)=WGLFGE(NE)
       ENDDO
       WGLFGX=WGLFGX+WGLFE(ielmc,K,NB,NZ)
@@ -1767,7 +1767,7 @@ module PlantDisturbsMod
               ENDIF
             ENDIF
             WHVSBS=WHVSBS-(1._r8-FHVSETK(K))*WGSHE(ielmc,K,NB,NZ)
-            DO NE=1,npelms
+            DO NE=1,NumOfPlantChemElements
               WTHTH2E(NE)=WTHTH2E(NE)+(1._r8-FHVSHK(K))*WGSHE(NE,K,NB,NZ)*FWODBE(NE,k_fine_litr)
               WTHTX2E(NE)=WTHTX2E(NE)+(FHVSHK(K)-FHVSETK(K))*WGSHE(NE,K,NB,NZ)*FWODBE(NE,k_fine_litr)
 
@@ -1785,7 +1785,7 @@ module PlantDisturbsMod
             WGSHGY=WGSHGY+WGSHE(ielmc,K,NB,NZ)
             WSSHE(K,NB,NZ)=FHVSETK(K)*WSSHE(K,NB,NZ)
 
-            DO NE=1,npelms
+            DO NE=1,NumOfPlantChemElements
               WTSHEBE(NE,NB,NZ)=WTSHEBE(NE,NB,NZ) &
                 -(1._r8-FHVSETK(K))*WGSHE(NE,K,NB,NZ)
               WGSHE(NE,K,NB,NZ)=FHVSETK(K)*WGSHE(NE,K,NB,NZ)
@@ -1858,10 +1858,10 @@ module PlantDisturbsMod
             WTNDPG=0._r8
           ENDIF
         ELSE
-          IF(CanPLeafShethC(NZ).GT.ZEROL(NZ))THEN
+          IF(CanopyLeafShethC_pft(NZ).GT.ZEROL(NZ))THEN
             WTLSBX=AZMAX1(CanPBLeafShethC(NB,NZ))
             IF(EPOOL(ielmc,NB,NZ).GT.ZEROP(NZ))THEN
-              WHVSCX=AZMAX1(WHVSCP)*WTLSBX/CanPLeafShethC(NZ)
+              WHVSCX=AZMAX1(WHVSCP)*WTLSBX/CanopyLeafShethC_pft(NZ)
               CPOOLG=AZMAX1(CPOOLX-WHVSCX)
               ZPOOLG=AZMAX1(ZPOOLX-WHVSCX*ZPOOLX/EPOOL(ielmc,NB,NZ))
               PPOOLG=AZMAX1(PPOOLX-WHVSCX*PPOOLX/EPOOL(ielmc,NB,NZ))
@@ -1871,7 +1871,7 @@ module PlantDisturbsMod
               PPOOLG=0._r8
             ENDIF
             IF(EPOLNB(ielmc,NB,NZ).GT.ZEROP(NZ))THEN
-              WHVSNX=AZMAX1(WHVSNP)*WTLSBX/CanPLeafShethC(NZ)
+              WHVSNX=AZMAX1(WHVSNP)*WTLSBX/CanopyLeafShethC_pft(NZ)
               CPOLNG=AZMAX1(CPOLNX-WHVSNX)
               ZPOLNG=AZMAX1(ZPOLNX-WHVSNX*ZPOLNX/EPOLNB(ielmc,NB,NZ))
               PPOLNG=AZMAX1(PPOLNX-WHVSNX*PPOLNX/EPOLNB(ielmc,NB,NZ))
@@ -2004,7 +2004,7 @@ module PlantDisturbsMod
 !     WTHTX3E(ielmc),WTHTX3E(ielmn),WTHTX3E(ielmp)=harvested stalk C,N,P to litter
 !     WTSTKB,WTSTBN,WTSTBP=C,N,P mass remaining in harvested stalk
 !
-        DO NE=1,npelms
+        DO NE=1,NumOfPlantChemElements
           WTHTH3E(NE)=WTHTH3E(NE)+(1._r8-FHVSH)*WTSTKBE(NE,NB,NZ)
           WTHTX3E(NE)=WTHTX3E(NE)+(FHVSH-FHVSE(ielmc))*WTSTKBE(NE,NB,NZ)
 !
@@ -2054,7 +2054,7 @@ module PlantDisturbsMod
               FHVSETS=1.0_r8
             ENDIF
           ENDIF
-          DO NE=1,npelms
+          DO NE=1,NumOfPlantChemElements
             WGNODE(NE,K,NB,NZ)=FHVSETS*WGNODE(NE,K,NB,NZ)
           ENDDO
           IF(IHVST(NZ).LE.2.AND.isclose(THIN(NZ),0._r8))THEN
@@ -2097,7 +2097,7 @@ module PlantDisturbsMod
 !     WTHTX3E(ielmc),WTHTX3E(ielmn),WTHTX3E(ielmp)=harvested stalk C,N,P to litter
 !     WTRSVB,WTRSBN,WTRSBP=stalk reserve C,N,P mass
 !
-        DO NE=1,npelms
+        DO NE=1,NumOfPlantChemElements
           WTHTH3E(NE)=WTHTH3E(NE)+(1._r8-FHVSH)*WTRSVBE(NE,NB,NZ)
           WTHTX3E(NE)=WTHTX3E(ielmc)+(FHVSH-FHVSE(ielmc))*WTRSVBE(NE,NB,NZ)
 !
@@ -2169,7 +2169,7 @@ module PlantDisturbsMod
 !     WTHSBP,WTEABP,WTGRBP=branch husk,ear,grain P mass
 !     WTHTGE(ielmc),WTHTGE(ielmn),WTHTGE(ielmp)=grain harvested
 !
-        DO NE=1,npelms
+        DO NE=1,NumOfPlantChemElements
           WTHTH2E(NE)=WTHTH2E(NE)+(1._r8-FHVSHH)*WTHSKBE(NE,NB,NZ)+(1._r8-FHVSHE) &
             *WTEARBE(NE,NB,NZ)+(1._r8-FHVSHG)*WTGRBE(NE,NB,NZ)
           WTHTX2E(NE)=WTHTX2E(NE)+(FHVSHH-FHVSETH)*WTHSKBE(NE,NB,NZ)+(FHVSHE-FHVSETE) &
@@ -2221,14 +2221,14 @@ module PlantDisturbsMod
           +WTSHEBE(ielmc,NB,NZ))
 
         WTSHTBE(ielmc,NB,NZ)=WTSHTBE(ielmc,NB,NZ)+CPOOLK(NB,NZ)
-        DO NE=1,npelms
+        DO NE=1,NumOfPlantChemElements
           WTSHTBE(NE,NB,NZ)=AZMAX1(WTSHTBE(ielmc,NB,NZ)+WTLFBE(NE,NB,NZ) &
             +WTSHEBE(NE,NB,NZ)+WTSTKBE(NE,NB,NZ)+WTRSVBE(NE,NB,NZ) &
             +WTHSKBE(NE,NB,NZ)+WTEARBE(NE,NB,NZ)+WTGRBE(NE,NB,NZ) &
             +EPOOL(NE,NB,NZ))
         ENDDO
         VOLWPX=CanWatP(NZ)
-        WVPLT=AZMAX1(CanPLeafShethC(NZ)+CanPStalkC(NZ))
+        WVPLT=AZMAX1(CanopyLeafShethC_pft(NZ)+CanPStalkC(NZ))
 
         FDM=get_FDM(PSICanP(NZ))
 !        APSILT=ABS(PSICanP(NZ))
@@ -2307,7 +2307,7 @@ module PlantDisturbsMod
 !     WTLS=total PFT leaf+petiole C mass
 !     WTSTK=total PFT stalk C mass
 !     WVSTK=total PFT sapwood C mass
-!     CanPLBSA=total PFT stalk surface area
+!     CanopyBranchStemApft_lyr=total PFT stalk surface area
 !
         IF(JHVST(NZ).NE.ihv_noaction)then
           IDTHB(NB,NZ)=ibrdead
@@ -2316,16 +2316,16 @@ module PlantDisturbsMod
           IDTHB(NB,NZ)=ibrdead
         endif
       ENDDO D9835
-      CanPLeafShethC(NZ)=0._r8
+      CanopyLeafShethC_pft(NZ)=0._r8
       WTSTKE(ielmc,NZ)=0._r8
       CanPStalkC(NZ)=0._r8
       CanPSA(NZ)=0._r8
       D9840: DO NB=1,NBR(NZ)
-        CanPLeafShethC(NZ)=CanPLeafShethC(NZ)+CanPBLeafShethC(NB,NZ)
+        CanopyLeafShethC_pft(NZ)=CanopyLeafShethC_pft(NZ)+CanPBLeafShethC(NB,NZ)
         WTSTKE(ielmc,NZ)=WTSTKE(ielmc,NZ)+WTSTKBE(ielmc,NB,NZ)
         CanPStalkC(NZ)=CanPStalkC(NZ)+CanPBStalkC(NB,NZ)
-        D9830: DO L=1,JC1
-          CanPSA(NZ)=CanPSA(NZ)+CanPLBSA(L,NB,NZ)
+        D9830: DO L=1,NumOfCanopyLayers1
+          CanPSA(NZ)=CanPSA(NZ)+CanopyBranchStemApft_lyr(L,NB,NZ)
         ENDDO D9830
       ENDDO D9840
 !
@@ -2359,13 +2359,13 @@ module PlantDisturbsMod
               XHVST(ielmc)=1.0_r8-THIN(NZ)
               XHVST(ielmn)=XHVST(ielmc)
               XHVST(ielmp)=XHVST(ielmc)
-              FFIRE(1:npelms)=0._r8
+              FFIRE(1:NumOfPlantChemElements)=0._r8
             ELSE
               IF(THETW(L).GT.FVLWB.OR.CORGC(L).LE.FORGC.OR.ITILL.NE.22)THEN
                 XHVST(ielmc)=1.0_r8
                 XHVST(ielmn)=XHVST(ielmc)
                 XHVST(ielmp)=XHVST(ielmc)
-                FFIRE(1:npelms)=0._r8
+                FFIRE(1:NumOfPlantChemElements)=0._r8
               ELSE
                 XHVST(ielmc)=1.0_r8-DCORP*EHVST(1,ipld_woody,NZ) &
                   *AMIN1(1.0_r8,(CORGC(L)-FORGC)/(orgcden-FORGC))
@@ -2378,7 +2378,7 @@ module PlantDisturbsMod
             ENDIF
             XHVST1=1._r8-XHVST
             D3385: DO M=1,jsken
-              DO NE=1,npelms
+              DO NE=1,NumOfPlantChemElements
                 FHVSE(NE)=XHVST1(NE)*CFOPE(NE,instruct,M,NZ)*EPOOLR(NE,N,L,NZ)
                 ESNC(NE,M,k_fine_litr,L,NZ)=ESNC(NE,M,k_fine_litr,L,NZ)+(1._r8-FFIRE(NE))*FHVSE(NE)
               ENDDO
@@ -2391,7 +2391,7 @@ module PlantDisturbsMod
               CNET(NZ)=CNET(NZ)-(1._r8-FCH4F)*FFIRE(ielmc)*FHVSE(ielmc)
               TNBP=TNBP-FCH4F*FFIRE(ielmc)*FHVSE(ielmc)
               DO NR=1,NRT(NZ)
-                DO NE=1,npelms
+                DO NE=1,NumOfPlantChemElements
                   FHVSE(NE)=XHVST1(NE)*CFOPE(NE,icwood,M,NZ)*(WTRT1E(NE,N,L,NR,NZ) &
                     +WTRT2E(NE,N,L,NR,NZ))*FWODRE(NE,k_woody_litr)
                   ESNC(NE,M,k_fine_litr,L,NZ)=ESNC(NE,M,k_fine_litr,L,NZ)+(1._r8-FFIRE(NE))*FHVSE(NE)
@@ -2405,7 +2405,7 @@ module PlantDisturbsMod
                 CNET(NZ)=CNET(NZ)-(1._r8-FCH4F)*FFIRE(ielmc)*FHVSE(ielmc)
                 TNBP=TNBP-FCH4F*FFIRE(ielmc)*FHVSE(ielmc)
 
-                DO NE=1,npelms
+                DO NE=1,NumOfPlantChemElements
                   FHVSE(NE)=XHVST1(NE)*CFOPE(NE,iroot,M,NZ)*(WTRT1E(NE,N,L,NR,NZ) &
                     +WTRT2E(NE,N,L,NR,NZ))*FWODRE(NE,k_fine_litr)
                   ESNC(NE,M,k_fine_litr,L,NZ)=ESNC(NE,M,k_fine_litr,L,NZ) &
@@ -2445,7 +2445,7 @@ module PlantDisturbsMod
 !     PrimRootLen,SecndRootLen=primary,secondary root length
 !     RTN2=number of secondary root axes
 !     CPOOLR,ZPOOLR,PPOOLR=non-structural C,N,P mass in root
-!     WTRTL,RootCPZR=active,actual root C mass
+!     WTRTL,PopPlantRootC_vr=active,actual root C mass
 !     WSRTL=root protein C mass
 !     RTN1,SecndRootXNumL=number of primary,secondary root axes
 !     RootLenDensNLP,RootLenPerP=root length density,root length per plant
@@ -2454,7 +2454,7 @@ module PlantDisturbsMod
 !     RCO2M,RCO2N,RCO2A unlimited by O2,nonstructural C
 !
             D3960: DO NR=1,NRT(NZ)
-              DO NE=1,npelms
+              DO NE=1,NumOfPlantChemElements
                 WTRT1E(NE,N,L,NR,NZ)=WTRT1E(NE,N,L,NR,NZ)*XHVST(NE)
                 WTRT2E(NE,N,L,NR,NZ)=WTRT2E(NE,N,L,NR,NZ)*XHVST(NE)
                 RTWT1E(NE,N,NR,NZ)=RTWT1E(NE,N,NR,NZ)*XHVST(NE)
@@ -2463,11 +2463,11 @@ module PlantDisturbsMod
               SecndRootLen(N,L,NR,NZ)=SecndRootLen(N,L,NR,NZ)*XHVST(ielmc)
               RTN2(N,L,NR,NZ)=RTN2(N,L,NR,NZ)*XHVST(ielmc)
             ENDDO D3960
-            DO NE=1,npelms
+            DO NE=1,NumOfPlantChemElements
               EPOOLR(NE,N,L,NZ)=EPOOLR(NE,N,L,NZ)*XHVST(NE)
             ENDDO
             WTRTL(N,L,NZ)=WTRTL(N,L,NZ)*XHVST(ielmc)
-            RootCPZR(N,L,NZ)=RootCPZR(N,L,NZ)*XHVST(ielmc)
+            PopPlantRootC_vr(N,L,NZ)=PopPlantRootC_vr(N,L,NZ)*XHVST(ielmc)
             WSRTL(N,L,NZ)=WSRTL(N,L,NZ)*XHVST(ielmc)
             PrimRootXNumL(N,L,NZ)=PrimRootXNumL(N,L,NZ)*XHVST(ielmc)
             SecndRootXNumL(N,L,NZ)=SecndRootXNumL(N,L,NZ)*XHVST(ielmc)
@@ -2489,7 +2489,7 @@ module PlantDisturbsMod
 !     CPOOLN,ZPOOLN,PPOOLN=nonstructural C,N,P in bacteria
 !
             IF(INTYP(NZ).NE.0.AND.N.EQ.1)THEN
-              DO NE=1,npelms
+              DO NE=1,NumOfPlantChemElements
                 D3395: DO M=1,jsken
                   ESNC(NE,M,k_fine_litr,L,NZ)=ESNC(NE,M,k_fine_litr,L,NZ)+XHVST1(NE) &
                     *(CFOPE(NE,iroot,M,NZ)*WTNDLE(NE,L,NZ) &
@@ -2511,7 +2511,7 @@ module PlantDisturbsMod
 !     WTRVC,WTRVN,WTRVP=storage C,N,P
 !
         IF(ISTYP(NZ).NE.iplt_annual)THEN
-          DO NE=1,npelms
+          DO NE=1,NumOfPlantChemElements
             D3400: DO M=1,jsken
               ESNC(NE,M,k_woody_litr,NGTopRootLayer(NZ),NZ)=ESNC(NE,M,k_woody_litr,NGTopRootLayer(NZ),NZ) &
                 +(XHVST1(NE)*CFOPE(NE,instruct,M,NZ)*WTRVE(NE,NZ))*FWOODE(NE,k_woody_litr)

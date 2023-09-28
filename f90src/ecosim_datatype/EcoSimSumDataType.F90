@@ -65,7 +65,7 @@ module EcoSimSumDataType
   subroutine InitAllocate
   implicit none
 
-  allocate(PlantElemntStoreLandscape(npelms)); PlantElemntStoreLandscape=0._r8
+  allocate(PlantElemntStoreLandscape(NumOfPlantChemElements)); PlantElemntStoreLandscape=0._r8
   end subroutine InitAllocate
 
 !----------------------------------------------------------------------

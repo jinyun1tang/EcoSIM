@@ -65,8 +65,8 @@ implicit none
   IF(II.LT.1)THEN
     TMPH(J-2,I)=TMPH(J,I)
     TMPH(J-1,I)=TMPH(J,I)
-    SRADH(J-2,I)=SRADH(J,I)
-    SRADH(J-1,I)=SRADH(J,I)
+    SWRad_hrly(J-2,I)=SWRad_hrly(J,I)
+    SWRad_hrly(J-1,I)=SWRad_hrly(J,I)
     WINDH(J-2,I)=WINDH(J,I)
     WINDH(J-1,I)=WINDH(J,I)
     DWPTH(J-2,I)=DWPTH(J,I)
@@ -79,8 +79,8 @@ implicit none
   ELSE
     TMPH(J-2,I)=0.667_r8*TMPH(JJ,II)+0.333_r8*TMPH(J,I)
     TMPH(J-1,I)=0.333_r8*TMPH(JJ,II)+0.667_r8*TMPH(J,I)
-    SRADH(J-2,I)=0.667_r8*SRADH(JJ,II)+0.333_r8*SRADH(J,I)
-    SRADH(J-1,I)=0.333_r8*SRADH(JJ,II)+0.667_r8*SRADH(J,I)
+    SWRad_hrly(J-2,I)=0.667_r8*SWRad_hrly(JJ,II)+0.333_r8*SWRad_hrly(J,I)
+    SWRad_hrly(J-1,I)=0.333_r8*SWRad_hrly(JJ,II)+0.667_r8*SWRad_hrly(J,I)
     WINDH(J-2,I)=0.667_r8*WINDH(JJ,II)+0.333_r8*WINDH(J,I)
     WINDH(J-1,I)=0.333_r8*WINDH(JJ,II)+0.667_r8*WINDH(J,I)
     DWPTH(J-2,I)=0.667_r8*DWPTH(JJ,II)+0.333_r8*DWPTH(J,I)
@@ -190,7 +190,7 @@ implicit none
 !     AND ENTER INTO MODEL ARRAYS
 !
 !     TMPH=temperature (oC)
-!     SRADH=solar radiation (MJ m-2 h-1)
+!     SWRad_hrly=solar radiation (MJ m-2 h-1)
 !     WINDH=windspeed (m h-1)
 !     DWPTH=vapor pressure (kPa)
 !     RAINH=precipitation (m h-1)
@@ -217,19 +217,19 @@ implicit none
 ! shortwave radiation
       IF(TYP(K).EQ.'W')THEN
 ! W m-2 to MJ m-2 per hour (3600 seconds per hour * 1.e-6)
-        SRADH(J,I)=AZMAX1((DAT(K)+DATK(K))/IH*0.0036_r8)
+        SWRad_hrly(J,I)=AZMAX1((DAT(K)+DATK(K))/IH*0.0036_r8)
       ELSEIF(TYP(K).EQ.'J')THEN
 ! 1.e4 J m-2
-        SRADH(J,I)=AZMAX1((DAT(K)+DATK(K))/IH*0.01_r8)
+        SWRad_hrly(J,I)=AZMAX1((DAT(K)+DATK(K))/IH*0.01_r8)
       ELSEIF(TYP(K).EQ.'K')THEN
 ! kJ m-2 per hour
-        SRADH(J,I)=AZMAX1((DAT(K)+DATK(K))/IH*0.001_r8)
+        SWRad_hrly(J,I)=AZMAX1((DAT(K)+DATK(K))/IH*0.001_r8)
       ELSEIF(TYP(K).EQ.'P')THEN
-        SRADH(J,I)=AZMAX1((DAT(K)+DATK(K))/IH*0.0036_r8*0.457_r8)
+        SWRad_hrly(J,I)=AZMAX1((DAT(K)+DATK(K))/IH*0.0036_r8*0.457_r8)
 !     ELSEIF(TYP(K).EQ.'M')THEN
-!     SRADH(J,I)=AZMAX1((DAT(K)+DATK(K))/IH*3.6*0.457)
+!     SWRad_hrly(J,I)=AZMAX1((DAT(K)+DATK(K))/IH*3.6*0.457)
       ELSE
-        SRADH(J,I)=AZMAX1((DAT(K)+DATK(K))/IH)
+        SWRad_hrly(J,I)=AZMAX1((DAT(K)+DATK(K))/IH)
       ENDIF
 !
 !     WIND SPEED
@@ -301,7 +301,7 @@ implicit none
 ! given in hour
         RAINH(J,I)=AZMAX1(DAT(K)+DATK(K))*3.6_r8
       ELSE
-! given in half hour
+! given in half hour, 
         RAINH(J,I)=AZMAX1(DAT(K)+DATK(K))*1.8_r8
       ENDIF
     ELSE
@@ -699,7 +699,7 @@ implicit none
   call ncd_getvar(clm_nfid,'WINDH',irec,fdatam); call reshape2(WINDH,fdatam)
   call ncd_getvar(clm_nfid,'DWPTH',irec,fdatam); call reshape2(DWPTH,fdatam)
   call ncd_getvar(clm_nfid,'RAINH',irec,fdatam); call reshape2(RAINH,fdatam)
-  call ncd_getvar(clm_nfid,'SRADH',irec,fdatam); call reshape2(SRADH,fdatam)
+  call ncd_getvar(clm_nfid,'SRADH',irec,fdatam); call reshape2(SWRad_hrly,fdatam)
 
   call ncd_getvar(clm_nfid,'Z0G',irec,fdatav); atmf%Z0G=fdatav(1)
   call ncd_getvar(clm_nfid,'ZNOONG',irec,fdatav); atmf%ZNOONG=fdatav(1)
@@ -730,7 +730,7 @@ implicit none
       WINDH(J,I+1)= WINDH(J,I)
       DWPTH(J,I+1)= DWPTH(J,I)
       RAINH(J,I+1)= RAINH(J,I)
-      SRADH(J,I+1)= SRADH(J,I)
+      SWRad_hrly(J,I+1)= SWRad_hrly(J,I)
       XRADH(J,I+1)= XRADH(J,I)
     ENDDO
   endif
@@ -738,7 +738,7 @@ implicit none
   if(isleap(yearc))LYR=1
   DO II=1,365+LYR
     DO JJ=1,24
-      SRADH(JJ,II)=SRADH(JJ,II)*3600._r8*1.e-6_r8  !convert from W/m2 to MJ/m^2/hour
+      SWRad_hrly(JJ,II)=SWRad_hrly(JJ,II)*3600._r8*1.e-6_r8  !convert from W/m2 to MJ/m^2/hour
       WINDH(JJ,II)=WINDH(JJ,II)*3600._r8       !convert from m/s to m/hour
       RAINH(JJ,II)=RAINH(JJ,II)*1.e-3_r8        !convert into m hr^-1
     enddo
@@ -747,7 +747,7 @@ implicit none
   if(lverb)then
   DO II=1,365+LYR
     DO JJ=1,24
-      print*,TMPH(JJ,II),SRADH(JJ,II),WINDH(JJ,II),RAINH(JJ,II),DWPTH(JJ,II)
+      print*,TMPH(JJ,II),SWRad_hrly(JJ,II),WINDH(JJ,II),RAINH(JJ,II),DWPTH(JJ,II)
     ENDDO
   ENDDO
   endif

@@ -23,12 +23,12 @@ module SnowPhysData
   real(r8),allocatable ::  THQS(:,:)                          !
   real(r8),allocatable ::  TQI(:,:)                           !
   real(r8),allocatable ::  TQW(:,:)                           !
-  real(r8),allocatable ::  TQR1(:,:)                          !
-  real(r8),allocatable ::  THQR1(:,:)                         !
-  real(r8),allocatable ::  TQS1(:,:)                          !
-  real(r8),allocatable ::  TQW1(:,:)                          !
-  real(r8),allocatable ::  TQI1(:,:)                          !
-  real(r8),allocatable ::  THQS1(:,:)                         !
+  real(r8),allocatable ::  cumWatFlx2LitRByRunoff(:,:)                          !
+  real(r8),allocatable ::  cumHeatFlx2LitRByRunoff(:,:)                         !
+  real(r8),allocatable ::  cumDrySnoFlxByRedistribut(:,:)                          !
+  real(r8),allocatable ::  cumWatFlxBySnowRedistribut(:,:)                          !
+  real(r8),allocatable ::  cumIceFlxBySnowRedistribut(:,:)                          !
+  real(r8),allocatable ::  cumHeatFlxBySnowRedistribut(:,:)                         !
   real(r8),allocatable ::  TKSnow1(:,:,:)                     ! temporary snow layer temperature in Kelvin
   real(r8),allocatable ::  VLHeatCapSnowM1(:,:,:)             ! temporary snow layer volumetric heat capacity 
   real(r8),allocatable ::  VLIceSnow0M(:,:,:)                 !
@@ -73,12 +73,12 @@ module SnowPhysData
   allocate(TQS(JY,JX));         TQS=0._r8
   allocate(THQS(JY,JX));        THQS=0._r8
   allocate(TKSnow1(JS,JY,JX));     TKSnow1=0._r8
-  allocate(THQR1(JY,JX));       THQR1=0._r8
-  allocate(THQS1(JY,JX));       THQS1=0._r8
-  allocate(TQR1(JY,JX));        TQR1=0._r8
-  allocate(TQS1(JY,JX));        TQS1=0._r8
-  allocate(TQW1(JY,JX));        TQW1=0._r8
-  allocate(TQI1(JY,JX));        TQI1=0._r8
+  allocate(cumHeatFlx2LitRByRunoff(JY,JX));       cumHeatFlx2LitRByRunoff=0._r8
+  allocate(cumHeatFlxBySnowRedistribut(JY,JX));       cumHeatFlxBySnowRedistribut=0._r8
+  allocate(cumWatFlx2LitRByRunoff(JY,JX));        cumWatFlx2LitRByRunoff=0._r8
+  allocate(cumDrySnoFlxByRedistribut(JY,JX));        cumDrySnoFlxByRedistribut=0._r8
+  allocate(cumWatFlxBySnowRedistribut(JY,JX));        cumWatFlxBySnowRedistribut=0._r8
+  allocate(cumIceFlxBySnowRedistribut(JY,JX));        cumIceFlxBySnowRedistribut=0._r8
   allocate(VLHeatCapSnowM1(JS,JY,JX));  VLHeatCapSnowM1=0._r8
   allocate(VLIceSnow0M(JS,JY,JX));   VLIceSnow0M=0._r8
   allocate(VLWatSnow0M(JS,JY,JX));   VLWatSnow0M=0._r8
@@ -116,13 +116,13 @@ module SnowPhysData
   call destroy(trcn_QSS)  
   call destroy(trcg_TQR)
   call destroy(TQW)  
-  call destroy(TQR1)
-  call destroy(TQS1)
-  call destroy(TQW1)
-  call destroy(TQI1)
+  call destroy(cumWatFlx2LitRByRunoff)
+  call destroy(cumDrySnoFlxByRedistribut)
+  call destroy(cumWatFlxBySnowRedistribut)
+  call destroy(cumIceFlxBySnowRedistribut)
   call destroy(TQI)  
   call destroy(THQS)  
-  call destroy(THQS1)
+  call destroy(cumHeatFlxBySnowRedistribut)
   call destroy(TKSnow1)  
   call destroy(VLHeatCapSnowM1)
   call destroy(VLIceSnow0M)
@@ -146,6 +146,7 @@ module SnowPhysData
   call destroy(SnowLayerThick0)
   call destroy(XSnowThawMassL)  
   call destroy(trcsa_TQS)
+  call destroy(cumHeatFlx2LitRByRunoff)
   call destroy(TQS)
   call destroy(XIceThawMassL)  
   end subroutine DestructSnowPhysData

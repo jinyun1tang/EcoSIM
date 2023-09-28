@@ -308,8 +308,8 @@ contains
   subroutine InitTransfrData
   use EcoSiMParDataMod, only : micpar
   implicit none
-  integer :: n_litrsfk
-  n_litrsfk=micpar%n_litrsfk
+  integer :: NumOfLitrCmplxs
+  NumOfLitrCmplxs=micpar%NumOfLitrCmplxs
   allocate(RQROC0(1:jcplx,JV,JH));       RQROC0=0._r8
   allocate(RQRON0(1:jcplx,JV,JH));       RQRON0=0._r8
   allocate(RQROA0(1:jcplx,JV,JH));       RQROA0=0._r8
@@ -337,14 +337,14 @@ contains
 
   allocate(trcg_RBLS(idg_beg:idg_end-1,JS,JY,JX));   trcg_RBLS=0._r8
   allocate(trcn_RBLS(ids_nut_beg:ids_nuts_end,JS,JY,JX));   trcn_RBLS=0._r8
-  allocate(ROCFL0(1:n_litrsfk,JY,JX));  ROCFL0=0._r8
-  allocate(RONFL0(1:n_litrsfk,JY,JX));  RONFL0=0._r8
-  allocate(ROPFL0(1:n_litrsfk,JY,JX));  ROPFL0=0._r8
-  allocate(ROAFL0(1:n_litrsfk,JY,JX));  ROAFL0=0._r8
-  allocate(ROCFL1(1:n_litrsfk,JY,JX));  ROCFL1=0._r8
-  allocate(RONFL1(1:n_litrsfk,JY,JX));  RONFL1=0._r8
-  allocate(ROPFL1(1:n_litrsfk,JY,JX));  ROPFL1=0._r8
-  allocate(ROAFL1(1:n_litrsfk,JY,JX));  ROAFL1=0._r8
+  allocate(ROCFL0(1:NumOfLitrCmplxs,JY,JX));  ROCFL0=0._r8
+  allocate(RONFL0(1:NumOfLitrCmplxs,JY,JX));  RONFL0=0._r8
+  allocate(ROPFL0(1:NumOfLitrCmplxs,JY,JX));  ROPFL0=0._r8
+  allocate(ROAFL0(1:NumOfLitrCmplxs,JY,JX));  ROAFL0=0._r8
+  allocate(ROCFL1(1:NumOfLitrCmplxs,JY,JX));  ROCFL1=0._r8
+  allocate(RONFL1(1:NumOfLitrCmplxs,JY,JX));  RONFL1=0._r8
+  allocate(ROPFL1(1:NumOfLitrCmplxs,JY,JX));  ROPFL1=0._r8
+  allocate(ROAFL1(1:NumOfLitrCmplxs,JY,JX));  ROAFL1=0._r8
   allocate(trcg_RFL0(idg_beg:idg_end-1,JY,JX));      trcg_RFL0=0._r8
   allocate(trcn_RFL0(ids_nut_beg:ids_nuts_end,JY,JX));      trcn_RFL0=0._r8
   allocate(trcs_RFL1(ids_beg:ids_end,JY,JX));      trcs_RFL1=0._r8

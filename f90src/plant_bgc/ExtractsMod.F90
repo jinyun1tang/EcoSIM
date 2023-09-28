@@ -54,13 +54,13 @@ module ExtractsMod
    WTSTGE   => plt_biom%WTSTGE     , &
    HESNC    => plt_bgcr%HESNC      , &
    ZESNC    => plt_bgcr%ZESNC      , &
-   ESNT     => plt_bgcr%ESNT       , &
+   LitrfalChemElemnts_vr     => plt_bgcr%LitrfalChemElemnts_vr       , &
    ESNC     => plt_bgcr%ESNC       , &
    NI       => plt_morph%NI        , &
-   ARSTT    => plt_morph%ARSTT     , &
-   ARLFT    =>  plt_morph%ARLFT    , &
+   CanopyStemA_lyr    => plt_morph%CanopyStemA_lyr     , &
+   CanopyLAgrid_lyr    =>  plt_morph%CanopyLAgrid_lyr    , &
    StemAreag    =>  plt_morph%StemAreag    , &
-   CanGLA    =>  plt_morph%CanGLA      &
+   CanopyLA_grd    =>  plt_morph%CanopyLA_grd      &
   )
   DO NZ=1,NP0
 !
@@ -71,29 +71,29 @@ module ExtractsMod
 !   WTSTGET=total standing dead C,N,P mass
 !   WTSTG=PFT standing dead C,N,P mass
 !   ESNC,=cumulative PFT C,N,P litterfall from grosub.f
-!   ESNT,=cumulative total C,N,P litterfall
+!   LitrfalChemElemnts_vr,=cumulative total C,N,P litterfall
 !
-    DO NE=1,npelms
+    DO NE=1,NumOfPlantChemElements
       ZESNC(NE)=ZESNC(NE)+HESNC(NE,NZ)
       WTSTGET(NE)=WTSTGET(NE)+WTSTGE(NE,NZ)
     ENDDO
 
     DO  L=0,NI(NZ)
-      DO K=1,pltpar%n_pltlitrk
-        DO NE=1,npelms
+      DO K=1,pltpar%NumOfPlantLitrCmplxs
+        DO NE=1,NumOfPlantChemElements
           DO  M=1,pltpar%jsken
-            ESNT(NE,M,K,L)=ESNT(NE,M,K,L)+ESNC(NE,M,K,L,NZ)
+            LitrfalChemElemnts_vr(NE,M,K,L)=LitrfalChemElemnts_vr(NE,M,K,L)+ESNC(NE,M,K,L,NZ)
           enddo
         ENDDO
       ENDDO
     ENDDO
   ENDDO
-  CanGLA=0._r8
+  CanopyLA_grd=0._r8
   StemAreag=0._r8
-  DO  L=1,JC1
-    ARLFT(L)=0._r8
+  DO  L=1,NumOfCanopyLayers1
+    CanopyLAgrid_lyr(L)=0._r8
     WGLFT(L)=0._r8
-    ARSTT(L)=0._r8
+    CanopyStemA_lyr(L)=0._r8
   ENDDO
   end associate
   end subroutine TotalLitterfall
@@ -103,26 +103,26 @@ module ExtractsMod
 !
 !     TOTAL LEAF AREA OF ALL PLANT SPECIES
 !
-!     ARLFT,ARSTT=total leaf,stalk area of combined canopy layer
-!     ARLFV,CanPLSA=PFT leaf,stalk area in canopy layer
+!     CanopyLAgrid_lyr,CanopyStemA_lyr=total leaf,stalk area of combined canopy layer
+!     CanopyLeafApft_lyr,CanopyStemApft_lyr=PFT leaf,stalk area in canopy layer
 !     WGLFT=total leaf C of combined canopy layer
-!     WGLFV=PFT leaf C in canopy layer
+!     CanopyLeafCpft_lyr=PFT leaf C in canopy layer
 !
   implicit none
   integer, intent(in) :: NZ
   integer :: L
   associate(                              &
-    WGLFV    => plt_biom%WGLFV      , &
+    CanopyLeafCpft_lyr    => plt_biom%CanopyLeafCpft_lyr      , &
     WGLFT    => plt_biom%WGLFT      , &
-    ARLFT    =>  plt_morph%ARLFT    , &
-    CanPLSA    =>  plt_morph%CanPLSA    , &
-    ARSTT    => plt_morph%ARSTT     , &
-    ARLFV    => plt_morph%ARLFV       &
+    CanopyLAgrid_lyr    =>  plt_morph%CanopyLAgrid_lyr    , &
+    CanopyStemApft_lyr    =>  plt_morph%CanopyStemApft_lyr    , &
+    CanopyStemA_lyr    => plt_morph%CanopyStemA_lyr     , &
+    CanopyLeafApft_lyr    => plt_morph%CanopyLeafApft_lyr       &
   )
-  DO L=1,JC1
-    ARLFT(L)=ARLFT(L)+ARLFV(L,NZ)
-    WGLFT(L)=WGLFT(L)+WGLFV(L,NZ)
-    ARSTT(L)=ARSTT(L)+CanPLSA(L,NZ)
+  DO L=1,NumOfCanopyLayers1
+    CanopyLAgrid_lyr(L)=CanopyLAgrid_lyr(L)+CanopyLeafApft_lyr(L,NZ)
+    WGLFT(L)=WGLFT(L)+CanopyLeafCpft_lyr(L,NZ)
+    CanopyStemA_lyr(L)=CanopyStemA_lyr(L)+CanopyStemApft_lyr(L,NZ)
   ENDDO
   end associate
   end subroutine TotalLeafArea
@@ -203,7 +203,7 @@ module ExtractsMod
     TKS   => plt_ew%TKS      , &
     THeatRootUptake => plt_ew%THeatRootUptake    , &
     GridPlantRootH2OUptake_vr=> plt_ew%GridPlantRootH2OUptake_vr   , &
-    PopPlantRootH2OUptake_vr => plt_ew%PopPlantRootH2OUptake_vr    , &
+    AllPlantRootH2OUptake_vr => plt_ew%AllPlantRootH2OUptake_vr    , &
     trcg_rootml  => plt_rbgc%trcg_rootml,&
     trcs_rootml => plt_rbgc%trcs_rootml, &
     RootLenDensNLP => plt_morph%RootLenDensNLP , &
@@ -219,8 +219,8 @@ module ExtractsMod
 !
 !     RTDNT=total root length density
 !     RootLenDensNLP=PFT root length density per plant
-!     PopPlantRootH2OUptake_vr=total water uptake
-!     PopPlantRootH2OUptake_vr=PFT root water uptake
+!     AllPlantRootH2OUptake_vr=total water uptake
+!     AllPlantRootH2OUptake_vr=PFT root water uptake
 !     THeatRootUptake=total convective heat in root water uptake
 !     TKS=soil temperature
 !     PP=PFT population, this is dynamic, and can goes to zero
@@ -231,8 +231,8 @@ module ExtractsMod
 !
 !     TOTAL WATER UPTAKE
 !
-      GridPlantRootH2OUptake_vr(L)=GridPlantRootH2OUptake_vr(L)+PopPlantRootH2OUptake_vr(N,L,NZ)
-      THeatRootUptake(L)=THeatRootUptake(L)+PopPlantRootH2OUptake_vr(N,L,NZ)*cpw*TKS(L)
+      GridPlantRootH2OUptake_vr(L)=GridPlantRootH2OUptake_vr(L)+AllPlantRootH2OUptake_vr(N,L,NZ)
+      THeatRootUptake(L)=THeatRootUptake(L)+AllPlantRootH2OUptake_vr(N,L,NZ)*cpw*TKS(L)
 !
 !     ROOT GAS CONTENTS FROM FLUXES IN 'UPTAKE'
 !
@@ -300,7 +300,7 @@ module ExtractsMod
 !     RDFOMC,RDFOMN,RDFOMP=PFT nonstructl C,N,P exchange
 !
       DO K=1,jcplx
-        DO NE=1,npelms
+        DO NE=1,NumOfPlantChemElements
           TDFOME(NE,K,L)=TDFOME(NE,K,L)-RDFOME(ielmc,N,K,L,NZ)
         ENDDO
       ENDDO
@@ -396,11 +396,11 @@ module ExtractsMod
     CanH2OHeldVg=> plt_ew%CanH2OHeldVg   , &
     NU    => plt_site%NU     , &
     StemAreag => plt_morph%StemAreag , &
-    CanGLA => plt_morph%CanGLA , &
+    CanopyLA_grd => plt_morph%CanopyLA_grd , &
     NI    => plt_morph%NI    , &
     NBR   => plt_morph%NBR   , &
     CanPSA => plt_morph%CanPSA , &
-    CanPLA => plt_morph%CanPLA , &
+    CanopyLeafA_pft => plt_morph%CanopyLeafA_pft , &
     RadNet2CanP  => plt_rad%RadNet2CanP    , &
     LWRadCanP => plt_rad%LWRadCanP   , &
     TRN   => plt_rad%TRN       &
@@ -427,8 +427,8 @@ module ExtractsMod
 !     VapXAir2PCan,PTrans=water flux to,from canopy surfaces, inside canopy
 !     TENGYC=total canopy water heat content
 !     ENGYC=PFT canopy water heat content
-!     CanGLA,StemAreag=total leaf,stalk area
-!     CanPLA,CanPSA=PFT leaf,stalk area
+!     CanopyLA_grd,StemAreag=total leaf,stalk area
+!     CanopyLeafA_pft,CanPSA=PFT leaf,stalk area
 !     ZCSNC,ZZSNC,ZPSNC=total net root-soil C,N,P exchange
 !     HCUPTK,HZUPTK,HPUPTK=PFT net root-soil C,N,P exchange
 !     TBALC,TBALN,TBALP=total C,N,P balance
@@ -451,9 +451,9 @@ module ExtractsMod
   THFLXC=THFLXC+ENGYC-ENGYX(NZ)-(PrecIntcptByCanP(NZ)*cpw*TairK)
   ENGYX(NZ)=ENGYC
   LWRadCanG=LWRadCanG+LWRadCanP(NZ)
-  CanGLA=CanGLA+CanPLA(NZ)
+  CanopyLA_grd=CanopyLA_grd+CanopyLeafA_pft(NZ)
   StemAreag=StemAreag+CanPSA(NZ)
-  DO NE=1,npelms
+  DO NE=1,NumOfPlantChemElements
     ZESNC(NE)=ZESNC(NE)-HEUPTK(NE,NZ)
     PlantElemntStoreLandscape(NE)=PlantElemntStoreLandscape(NE)+BALE(NE,NZ)
   ENDDO
