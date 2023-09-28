@@ -162,7 +162,7 @@
 
         D960: DO NZ=1,NP0(NY,NX)
         !RSETE: effect of canopy element status on seed set
-          DO NE=1,npelms
+          DO NE=1,NumOfPlantChemElements
             RSETE(NE,NZ,NY,NX)=RSETE(NE,NZ,NY,NX)+TEUPTK(NE,NZ,NY,NX)-TESNC(NE,NZ,NY,NX)
             THVSTE(NE,NZ,NY,NX)=THVSTE(NE,NZ,NY,NX)+HVSTE(NE,NZ,NY,NX)
           enddo

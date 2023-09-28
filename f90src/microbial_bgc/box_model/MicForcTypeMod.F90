@@ -20,7 +20,7 @@ module MicForcTypeMod
   real(r8) :: FLQRQ
   real(r8) :: offset
   real(r8) :: VLitR
-  real(r8) :: VWatLitrX
+  real(r8) :: VWatLitRHoldCapcity
   real(r8) :: ZEROS2
   real(r8) :: ZEROS
   real(r8) :: VLWatMicP
@@ -63,7 +63,7 @@ module MicForcTypeMod
   real(r8) :: RP14Y
   real(r8) :: RP1BY
   real(r8) :: SoilMicPMassLayer0
-  logical  :: LitrM
+  logical  :: LitrM                     !true if it is the litter layer
   logical  :: Lsurf
   real(r8) :: RNH4YU
   real(r8) :: RNO3YU

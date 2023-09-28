@@ -190,8 +190,8 @@ module StartsMod
 !
   GridMaxCanopyHeight(:,:)=0.0_r8
   CanopyHeightz(0:JC,:,:)=0.0_r8
-  ARLFT(1:JC,:,:)=0.0_r8
-  ARSTT(1:JC,:,:)=0.0_r8
+  CanopyLAgrid_lyr(1:JC,:,:)=0.0_r8
+  CanopyStemA_lyr(1:JC,:,:)=0.0_r8
   WGLFT(1:JC,:,:)=0.0_r8
 
 !
@@ -573,51 +573,54 @@ module StartsMod
 ! SLOPE=sine of ground surface slope in (0)aspect, (1)EW,(2)NS directions
 ! ALT=ground surface elevation
 ! ALTY=maximum surface elevation in landscape
-! IRCHG=runoff boundary flags:0=not possible,1=possible
+! XGridRunoffFlag=runoff boundary flags:0=not possible,1=possible
 ! ASP=aspect angle in degree
   ALTY=0.0_r8
+  write(*,1112)'NY','NX','east','west','south','north','altitude','Dist(m):E-W','Dist(m):N-S',&
+    'aspect(o)','slope(o)','slope0','slope-east','slope-north','GSIN','GCOS','GSINA'
+1112    FORMAT(2A4,4A6,20A12)
   D9985: DO NX=NHW,NHE
     D9980: DO NY=NVN,NVS
       ZEROS(NY,NX)=ZERO*DH(NY,NX)*DV(NY,NX)
       ZEROS2(NY,NX)=ZERO2*DH(NY,NX)*DV(NY,NX)
 !     compute slopes
-      GAZI(NY,NX)=ASP(NY,NX)/RDN   !radian
+      GAZI(NY,NX)=ASP(NY,NX)*RadianPerDegree   !radian
       GSINA(NY,NX)=ABS(SIN(GAZI(NY,NX)))
       GCOSA(NY,NX)=ABS(COS(GAZI(NY,NX)))
-      SLOPE(0,NY,NX)=AMAX1(1.745E-04_r8,SIN(SL(NY,NX)/RDN))  !small slope approximation
+      SLOPE(0,NY,NX)=AMAX1(1.745E-04_r8,SIN(SL(NY,NX)*RadianPerDegree))  !small slope approximation
 
       IF(ASP(NY,NX).GE.0.0_r8.AND.ASP(NY,NX).LT.90.0_r8)THEN
       ! along the northeast
-        SLOPE(1,NY,NX)=-SLOPE(0,NY,NX)*COS(ASP(NY,NX)/RDN)    !to east
-        SLOPE(2,NY,NX)=SLOPE(0,NY,NX)*SIN(ASP(NY,NX)/RDN)     !to north
-        IRCHG(1,1,NY,NX)=1    !east
-        IRCHG(2,1,NY,NX)=0
-        IRCHG(1,2,NY,NX)=0
-        IRCHG(2,2,NY,NX)=1    !north
+        SLOPE(1,NY,NX)=-SLOPE(0,NY,NX)*COS(ASP(NY,NX)*RadianPerDegree)    !to east
+        SLOPE(2,NY,NX)=SLOPE(0,NY,NX)*SIN(ASP(NY,NX)*RadianPerDegree)     !to north
+        XGridRunoffFlag(1,1,NY,NX)=.true.    !east
+        XGridRunoffFlag(2,1,NY,NX)=.false.
+        XGridRunoffFlag(1,2,NY,NX)=.false.
+        XGridRunoffFlag(2,2,NY,NX)=.true.    !north
       ELSEIF(ASP(NY,NX).GE.90.0_r8.AND.ASP(NY,NX).LT.180.0_r8)THEN
       ! along the northwest
-        SLOPE(1,NY,NX)=SLOPE(0,NY,NX)*SIN((ASP(NY,NX)-90.0_r8)/RDN)   !to west
-        SLOPE(2,NY,NX)=SLOPE(0,NY,NX)*COS((ASP(NY,NX)-90.0_r8)/RDN)   !to north
-        IRCHG(1,1,NY,NX)=0
-        IRCHG(2,1,NY,NX)=1   !west
-        IRCHG(1,2,NY,NX)=0
-        IRCHG(2,2,NY,NX)=1   !north
+        SLOPE(1,NY,NX)=SLOPE(0,NY,NX)*SIN((ASP(NY,NX)-90.0_r8)*RadianPerDegree)   !to west
+        SLOPE(2,NY,NX)=SLOPE(0,NY,NX)*COS((ASP(NY,NX)-90.0_r8)*RadianPerDegree)   !to north
+        XGridRunoffFlag(1,1,NY,NX)=.false.
+        XGridRunoffFlag(2,1,NY,NX)=.true.   !west
+        XGridRunoffFlag(1,2,NY,NX)=.false.
+        XGridRunoffFlag(2,2,NY,NX)=.true.   !north
       ELSEIF(ASP(NY,NX).GE.180.0_r8.AND.ASP(NY,NX).LT.270.0_r8)THEN
       !along the southwest
-        SLOPE(1,NY,NX)=SLOPE(0,NY,NX)*COS((ASP(NY,NX)-180.0_r8)/RDN)    !to west
-        SLOPE(2,NY,NX)=-SLOPE(0,NY,NX)*SIN((ASP(NY,NX)-180.0_r8)/RDN)   !to south
-        IRCHG(1,1,NY,NX)=0
-        IRCHG(2,1,NY,NX)=1  !west
-        IRCHG(1,2,NY,NX)=1  !south
-        IRCHG(2,2,NY,NX)=0
+        SLOPE(1,NY,NX)=SLOPE(0,NY,NX)*COS((ASP(NY,NX)-180.0_r8)*RadianPerDegree)    !to west
+        SLOPE(2,NY,NX)=-SLOPE(0,NY,NX)*SIN((ASP(NY,NX)-180.0_r8)*RadianPerDegree)   !to south
+        XGridRunoffFlag(1,1,NY,NX)=.false.
+        XGridRunoffFlag(2,1,NY,NX)=.true.  !west
+        XGridRunoffFlag(1,2,NY,NX)=.true.  !south
+        XGridRunoffFlag(2,2,NY,NX)=.false.
       ELSEIF(ASP(NY,NX).GE.270.0_r8.AND.ASP(NY,NX).LE.360.0_r8)THEN
       ! along the southeast
-        SLOPE(1,NY,NX)=-SLOPE(0,NY,NX)*SIN((ASP(NY,NX)-270.0_r8)/RDN)   !to east
-        SLOPE(2,NY,NX)=-SLOPE(0,NY,NX)*COS((ASP(NY,NX)-270.0_r8)/RDN)   !to south
-        IRCHG(1,1,NY,NX)=1  !east
-        IRCHG(2,1,NY,NX)=0
-        IRCHG(1,2,NY,NX)=1  !south
-        IRCHG(2,2,NY,NX)=0
+        SLOPE(1,NY,NX)=-SLOPE(0,NY,NX)*SIN((ASP(NY,NX)-270.0_r8)*RadianPerDegree)   !to east
+        SLOPE(2,NY,NX)=-SLOPE(0,NY,NX)*COS((ASP(NY,NX)-270.0_r8)*RadianPerDegree)   !to south
+        XGridRunoffFlag(1,1,NY,NX)=.true.  !east
+        XGridRunoffFlag(2,1,NY,NX)=.false.
+        XGridRunoffFlag(1,2,NY,NX)=.true.  !south
+        XGridRunoffFlag(2,2,NY,NX)=.false.
       ENDIF
       SLOPE(3,NY,NX)=-1.0_r8
 
@@ -673,11 +676,11 @@ module StartsMod
       ELSE
         ALTY=MAX(ALTY,ALT(NY,NX))
       ENDIF
-      WRITE(*,1111)'ALT',NX,NY,((IRCHG(NN,N,NY,NX),NN=1,2),N=1,2) &
+      WRITE(*,1111)NX,NY,((XGridRunoffFlag(NN,N,NY,NX),NN=1,2),N=1,2) &
         ,ALT(NY,NX),DH(NY,NX),DV(NY,NX),ASP(NY,NX),SL(NY,NX) &
         ,SLOPE(0,NY,NX),SLOPE(1,NY,NX),SLOPE(2,NY,NX) &
         ,GSIN(NY,NX),GCOSA(NY,NX),GSINA(NY,NX)
-1111  FORMAT(A8,6I4,20E12.4)
+1111  FORMAT(2I4,4L6,20E12.4)
     ENDDO D9980
   ENDDO D9985
   end subroutine InitGridElevation
@@ -805,7 +808,7 @@ module StartsMod
   DPNO3(:,:)=0.0_r8
   DPPO4(:,:)=0.0_r8
   trc_solml(idg_O2,0,:,:)=0.0_r8
-  FRADG(:,:)=1.0_r8
+  FracSWRad2Grnd(:,:)=1.0_r8
   LWRadBySurf(:,:)=0.0_r8
   LWRadCanG(:,:)=0.0_r8
   TRN(:,:)=0.0_r8
@@ -818,12 +821,12 @@ module StartsMod
   TSHX(:,:)=0.0_r8
   TCNET(:,:)=0.0_r8
   CanH2OHeldVg(:,:)=0.0_r8
-  CanGLA(:,:)=0.0_r8
+  CanopyLA_grd(:,:)=0.0_r8
   StemAreag(:,:)=0.0_r8
   PrecIntcptByCanG(:,:)=0.0_r8
   PPT(:,:)=0.0_r8
   DYLN(:,:)=12.0_r8
-  ALBX(:,:)=ALBS(:,:)
+  ALBX(:,:)=SoilAlbedo(:,:)
   XHVSTE(:,:,:)=0.0_r8
   ENGYP(:,:)=0.0_r8
   end subroutine InitAccumulators
@@ -850,7 +853,7 @@ module StartsMod
   integer :: L,K
   real(r8) :: VLitR0
   associate(                              &
-    n_litrsfk    => micpar%n_litrsfk    , &
+    NumOfLitrCmplxs    => micpar%NumOfLitrCmplxs    , &
     k_woody_litr => micpar%k_woody_litr , &
     k_fine_litr  => micpar%k_fine_litr  , &
     k_manure     => micpar%k_manure       &
@@ -872,10 +875,10 @@ module StartsMod
       ! surface litter residue layer
       TAREA=TAREA+AREA(3,L,NY,NX)
       CumSoilThickness(L,NY,NX)=0.0_r8
-      ORGC(L,NY,NX)=SUM(RSC(1:n_litrsfk,L,NY,NX))*AREA(3,L,NY,NX)
+      ORGC(L,NY,NX)=SUM(RSC(1:NumOfLitrCmplxs,L,NY,NX))*AREA(3,L,NY,NX)
       ORGCX(L,NY,NX)=ORGC(L,NY,NX)
       VLitR0=0._r8
-      DO K=1,n_litrsfk
+      DO K=1,NumOfLitrCmplxs
         VLitR0=VLitR0+RSC(K,L,NY,NX)/BulkDensLitR(K)
       ENDDO
       VLitR(NY,NX)=VLitR0*ppmc*AREA(3,L,NY,NX)
@@ -1087,8 +1090,8 @@ module StartsMod
 !
   GridMaxCanopyHeight(:,:)=0.0_r8
   CanopyHeightz(0:JC,:,:)=0.0_r8
-  ARLFT(1:JC,:,:)=0.0_r8
-  ARSTT(1:JC,:,:)=0.0_r8
+  CanopyLAgrid_lyr(1:JC,:,:)=0.0_r8
+  CanopyStemA_lyr(1:JC,:,:)=0.0_r8
   WGLFT(1:JC,:,:)=0.0_r8
 
 !

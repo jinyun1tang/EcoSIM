@@ -35,10 +35,10 @@ module ChemTranspDataType
   real(r8),target,allocatable ::  ZVSGL(:,:,:)                       !aqueous N2O diffusivity, [m2 h-1]
   real(r8),target,allocatable ::  WGSGL(:,:,:)                       !water vapor diffusivity, [m2 h-1]
   real(r8),target,allocatable ::  H2OVapDifscSno(:,:,:)                       !water vapor diffusivity, [m2 h-1]
-  real(r8),target,allocatable ::  WGSGR(:,:)                         !water vapor diffusivity, [m2 h-1]
+  real(r8),target,allocatable ::  VaporDiffusivityLitR(:,:)                         !water vapor diffusivity, [m2 h-1]
   real(r8),target,allocatable ::  WGSGA(:,:)                         !water vapor diffusivity, [m2 h-1]
 
-  real(r8),target,allocatable ::  GSolbility(:,:,:,:)                !solubility of gases
+  real(r8),target,allocatable ::  GasSolbility(:,:,:,:)                !solubility of gases
   real(r8),target,allocatable ::  HGSGL(:,:,:)                       !gaseous H2 diffusivity, [m2 h-1]
   real(r8),target,allocatable ::  HLSGL(:,:,:)                       !aqueous H2 diffusivity, [m2 h-1]
   real(r8),target,allocatable ::  XCODFG(:,:,:)                      !soil CO2 dissolution (+ve) - volatilization (-ve) , [g d-2 h-1]
@@ -115,9 +115,9 @@ module ChemTranspDataType
   allocate(ZVSGL(0:JZ,JY,JX));  ZVSGL=0._r8
   allocate(WGSGL(JZ,JY,JX));    WGSGL=0._r8
   allocate(H2OVapDifscSno(JS,JY,JX));    H2OVapDifscSno=0._r8
-  allocate(WGSGR(JY,JX));       WGSGR=0._r8
+  allocate(VaporDiffusivityLitR(JY,JX));       VaporDiffusivityLitR=0._r8
   allocate(WGSGA(JY,JX));       WGSGA=0._r8
-  allocate(GSolbility(idg_beg:idg_end,0:JZ,JY,JX)); GSolbility=0._r8
+  allocate(GasSolbility(idg_beg:idg_end,0:JZ,JY,JX)); GasSolbility=0._r8
 
   allocate(GasDisFlx(idg_beg:idg_end,0:JZ,JY,JX)); GasDisFlx=0._r8
   allocate(HGSGL(JZ,JY,JX));    HGSGL=0._r8
@@ -190,12 +190,12 @@ module ChemTranspDataType
   call destroy(ZVSGL)
   call destroy(WGSGL)
   call destroy(H2OVapDifscSno)
-  call destroy(WGSGR)
+  call destroy(VaporDiffusivityLitR)
   call destroy(WGSGA)
 
   call destroy(trcn_XRS)
   call destroy(trcg_XRS)
-  call destroy(GSolbility)
+  call destroy(GasSolbility)
 
   call destroy(HGSGL)
   call destroy(HLSGL)

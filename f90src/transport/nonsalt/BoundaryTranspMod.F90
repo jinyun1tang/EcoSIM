@@ -201,7 +201,7 @@ module BoundaryTranspMod
   real(r8) :: FQRM
   integer :: K,NTG,NTN,NTS
 
-  IF(IRCHG(NN,N,N2,N1).EQ.0.OR.isclose(RCHQF,0.0_r8).OR.QRM(M,N2,N1).LE.ZEROS(N2,N1))THEN
+  IF(.not.XGridRunoffFlag(NN,N,N2,N1).OR.isclose(RCHQF,0.0_r8).OR.WatFlux4ErosionM(M,N2,N1).LE.ZEROS(N2,N1))THEN
     DO  K=1,jcplx
       RQROC(K,N,NN,M5,M4)=0.0_r8
       RQRON(K,N,NN,M5,M4)=0.0_r8
@@ -217,7 +217,7 @@ module BoundaryTranspMod
 !
     IF((NN.EQ.1.AND.QRMN(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
       .OR.(NN.EQ.2.AND.QRMN(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
-      FQRM=QRMN(M,N,NN,M5,M4)/QRM(M,N2,N1)
+      FQRM=QRMN(M,N,NN,M5,M4)/WatFlux4ErosionM(M,N2,N1)
       DO  K=1,jcplx
         RQROC(K,N,NN,M5,M4)=RQROC0(K,N2,N1)*FQRM
         RQRON(K,N,NN,M5,M4)=RQRON0(K,N2,N1)*FQRM
@@ -595,7 +595,7 @@ module BoundaryTranspMod
 !
 !     NET SOLUTE FLUX IN SNOWPACK
 !
-!     VLSnowHeatCapM,VLHeatCapSnowMN=current,minimum volumetric heat capacity of snowpack
+!     VLSnowHeatCapM,VLHeatCapSnowMin=current,minimum volumetric heat capacity of snowpack
 !     T*BLS=net solute flux in snowpack
 !     R*BLS=solute flux in snowpack
 !
@@ -616,12 +616,12 @@ module BoundaryTranspMod
   integer :: NTG,NTN
 
   DO  LS=1,JS
-    IF(VLSnowHeatCapM(M,LS,NY,NX).GT.VLHeatCapSnowMN(NY,NX))THEN
+    IF(VLSnowHeatCapM(M,LS,NY,NX).GT.VLHeatCapSnowMin(NY,NX))THEN
       LS2=MIN(JS,LS+1)
 !
 !     IF LOWER LAYER IS IN THE SNOWPACK
 !
-      IF(LS.LT.JS.AND.VLSnowHeatCapM(M,LS2,N2,N1).GT.VLHeatCapSnowMN(N2,N1))THEN
+      IF(LS.LT.JS.AND.VLSnowHeatCapM(M,LS2,N2,N1).GT.VLHeatCapSnowMin(N2,N1))THEN
         DO NTG=idg_beg,idg_end-1
           trcg_TBLS(NTG,LS,N2,N1)=trcg_TBLS(NTG,LS,N2,N1) &
             +trcg_RBLS(NTG,LS,N2,N1)-trcg_RBLS(NTG,LS2,N2,N1)

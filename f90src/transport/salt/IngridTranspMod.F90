@@ -163,7 +163,7 @@ module IngridTranspMod
 !
       N1=NX
       N2=NY
-      IF(QRM(M,N2,N1).GT.ZEROS(N2,N1))THEN
+      IF(WatFlux4ErosionM(M,N2,N1).GT.ZEROS(N2,N1))THEN
         call SoluteFluxBySurfaceOutflow(M,N1,N2)
       ELSE
         trcsa_RQR0(idsa_beg:idsa_end,N2,N1)=0.0_r8
@@ -222,7 +222,7 @@ module IngridTranspMod
   real(r8), intent(out) :: trcsa_RFLS0(idsa_beg:idsa_end)
 !     begin_execution
 !
-!     VLSnowHeatCapM,VLHeatCapSnowMN=current,minimum volumetric heat capacity of snowpack
+!     VLSnowHeatCapM,VLHeatCapSnowMin=current,minimum volumetric heat capacity of snowpack
 !     VOLWSL=snowpack water content
 !     WatFlowInSnowM=snowpack water flux
 !     R*BLS=solute flux in snowpack
@@ -231,9 +231,9 @@ module IngridTranspMod
   ICHKL=0
   DO L=1,JS
   
-    IF(VLSnowHeatCapM(M,L,NY,NX).GT.VLHeatCapSnowMN(NY,NX))THEN
+    IF(VLSnowHeatCapM(M,L,NY,NX).GT.VLHeatCapSnowMin(NY,NX))THEN
       L2=MIN(JS,L+1)
-      IF(L.LT.JS.AND.VLSnowHeatCapM(M,L2,NY,NX).GT.VLHeatCapSnowMN(NY,NX))THEN
+      IF(L.LT.JS.AND.VLSnowHeatCapM(M,L2,NY,NX).GT.VLHeatCapSnowMin(NY,NX))THEN
         IF(VLWatSnow(L,NY,NX).GT.ZEROS2(NY,NX))THEN
           VFLWW=AZMAX1(AMIN1(1.0_r8,WatFlowInSnowM(M,L2,NY,NX)/VLWatSnow(L,NY,NX)))
         ELSE
@@ -794,7 +794,7 @@ module IngridTranspMod
 !     begin_execution
 
   IF(VLWatMicPM(M,0,N2,N1).GT.ZEROS2(N2,N1))THEN
-    VFLW=AMIN1(VFLWX,QRM(M,N2,N1)/VLWatMicPM(M,0,N2,N1))
+    VFLW=AMIN1(VFLWX,WatFlux4ErosionM(M,N2,N1)/VLWatMicPM(M,0,N2,N1))
   ELSE
     VFLW=VFLWX
   ENDIF
@@ -854,9 +854,9 @@ module IngridTranspMod
 !
 !     IF OVERLAND FLOW IS FROM CURRENT TO ADJACENT GRID CELL
 !
-      IF(QRM(M,N2,N1).GT.ZEROS(N2,N1))THEN
+      IF(WatFlux4ErosionM(M,N2,N1).GT.ZEROS(N2,N1))THEN
         IF(NN.EQ.1)THEN
-          FQRM=QRMN(M,N,2,N5,N4)/QRM(M,N2,N1)
+          FQRM=QRMN(M,N,2,N5,N4)/WatFlux4ErosionM(M,N2,N1)
 
           DO NTSA=idsa_beg,idsa_end
             trcsa_RQR(NTSA,N,2,N5,N4)=trcsa_RQR0(NTSA,N2,N1)*FQRM
@@ -878,7 +878,7 @@ module IngridTranspMod
 !
         IF(NN.EQ.2)THEN
           IF(N4B.GT.0.AND.N5B.GT.0)THEN
-            FQRM=QRMN(M,N,1,N5B,N4B)/QRM(M,N2,N1)
+            FQRM=QRMN(M,N,1,N5B,N4B)/WatFlux4ErosionM(M,N2,N1)
             DO NTSA=idsa_beg,idsa_end
               trcsa_RQR(NTSA,N,1,N5B,N4B)=trcsa_RQR0(NTSA,N2,N1)*FQRM
             ENDDO
@@ -905,7 +905,7 @@ module IngridTranspMod
 !
 !     SNOW DRIFT
 !
-!     QSM=snow transfer from watsub.f
+!     DrySnoFlxBySnowRedistributM=snow transfer from watsub.f
 !     RQS*=solute flux in snow transfer
 !     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
 !          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
@@ -924,14 +924,14 @@ module IngridTranspMod
 !
 !     IF NO SNOW DRIFT THEN NO TRANSPORT
 !
-        IF(ABS(QSM(M,N,N5,N4)).LE.ZEROS2(N2,N1))THEN
+        IF(ABS(DrySnoFlxBySnowRedistributM(M,N,N5,N4)).LE.ZEROS2(N2,N1))THEN
           trcsa_RQ(idsa_beg:idsab_end,N,N5,N4)=0.0_r8
 !
 !     IF DRIFT IS FROM CURRENT TO ADJACENT GRID CELL
 !
-        ELSEIF(QSM(M,N,N5,N4).GT.0.0)THEN
+        ELSEIF(DrySnoFlxBySnowRedistributM(M,N,N5,N4).GT.0.0)THEN
           IF(VcumSnoDWI(N2,N1).GT.ZEROS2(NY,NX))THEN
-            VFLW=AZMAX1(AMIN1(VFLWX,QSM(M,N,N5,N4)/VcumSnoDWI(N2,N1)))
+            VFLW=AZMAX1(AMIN1(VFLWX,DrySnoFlxBySnowRedistributM(M,N,N5,N4)/VcumSnoDWI(N2,N1)))
           ELSE
             VFLW=VFLWX
           ENDIF
@@ -942,9 +942,9 @@ module IngridTranspMod
 !
 !     IF DRIFT IS TO CURRENT FROM ADJACENT GRID CELL
 !
-        ELSEIF(QSM(M,N,N5,N4).LT.-ZEROS2(N2,N1))THEN
+        ELSEIF(DrySnoFlxBySnowRedistributM(M,N,N5,N4).LT.-ZEROS2(N2,N1))THEN
           IF(VcumSnoDWI(N5,N4).GT.ZEROS2(N5,N4))THEN
-            VFLW=AZMIN1(AMAX1(-VFLWX,QSM(M,N,N5,N4)/VcumSnoDWI(N5,N4)))
+            VFLW=AZMIN1(AMAX1(-VFLWX,DrySnoFlxBySnowRedistributM(M,N,N5,N4)/VcumSnoDWI(N5,N4)))
           ELSE
             VFLW=-VFLWX
           ENDIF

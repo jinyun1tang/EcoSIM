@@ -17,7 +17,7 @@ module ErosionMod
   use SoilPropertyDataType
   USE SedimentDataType
   use GridDataType
-  use EcoSIMConfig, only : nlbiomcp => nlbiomcpc, ndbiomcp=> ndbiomcpc
+  use EcoSIMConfig, only : nlbiomcp => NumOfLiveMicrobiomComponents, ndbiomcp=> NumOfDeadMicrobiomComponents
   use EcoSIMConfig, only : jcplx1=> jcplx1c, NFGs => NFGsc,jcplx=>jcplxc
   use EcoSIMConfig, only : column_mode
   implicit none
@@ -104,8 +104,8 @@ module ErosionMod
 
         TERSED(NY,NX)=0._r8
         RDTSED(NY,NX)=0._r8
-        FVOLIM(NY,NX)=AMIN1(1.0_r8,AZMAX1(XVLiceMicPM(M,NY,NX)/VOLWG(NY,NX)))
-        FVLWatMicPM(NY,NX)=AMIN1(1.0_r8,AZMAX1(XVLWatMicPM(M,NY,NX)/VOLWG(NY,NX)))
+        FVOLIM(NY,NX)=AMIN1(1.0_r8,AZMAX1(XVLiceMicPM(M,NY,NX)/VWatStoreCapSurf(NY,NX)))
+        FVLWatMicPM(NY,NX)=AMIN1(1.0_r8,AZMAX1(XVLWatMicPM(M,NY,NX)/VWatStoreCapSurf(NY,NX)))
         FERSNM(NY,NX)=(1.0_r8-FVOLIM(NY,NX))*FVLWatMicPM(NY,NX)
 !
 !     DETACHMENT BY RAINFALL WHEN SURFACE WATER IS PRESENT
@@ -128,7 +128,7 @@ module ErosionMod
 !
         SEDX=SED(NY,NX)+RDTSED(NY,NX)
         IF(SoiBulkDensity(NU(NY,NX),NY,NX).GT.ZERO.AND.SEDX.GT.ZEROS(NY,NX) &
-          .AND.XVOLTM(M,NY,NX).LE.VOLWG(NY,NX) &
+          .AND.XVOLTM(M,NY,NX).LE.VWatStoreCapSurf(NY,NX) &
           .AND.FERSNM(NY,NX).GT.ZERO)THEN
           CSEDD=AZMAX1(SEDX/XVLWatMicPM(M,NY,NX))
           DEPI=AMAX1(-SEDX,VLS(NY,NX)*(0.0-CSEDD)*AREA(3,NU(NY,NX),NY,NX) &
@@ -142,12 +142,12 @@ module ErosionMod
 !     CONCENTRATION IN SURFACE WATER, MODIFIED BY SOIL COHESION
 !     FROM 'HOUR1'
 !
-!     PTDSNU=particle density
+!     ParticleDensitySurfLay=particle density
 !
-        IF(SoiBulkDensity(NU(NY,NX),NY,NX).GT.ZERO.AND.XVOLTM(M,NY,NX).GT.VOLWG(NY,NX) &
+        IF(SoiBulkDensity(NU(NY,NX),NY,NX).GT.ZERO.AND.XVOLTM(M,NY,NX).GT.VWatStoreCapSurf(NY,NX) &
           .AND.FERSNM(NY,NX).GT.ZERO)THEN
-          STPR=1.0E+02*QRV(M,NY,NX)*ABS(SLOPE(0,NY,NX))
-          CSEDX=PTDSNU(NY,NX)*CER(NY,NX)*AZMAX1(STPR-0.4)**XER(NY,NX)
+          STPR=1.0E+02_r8*RunoffVelocity(M,NY,NX)*ABS(SLOPE(0,NY,NX))
+          CSEDX=ParticleDensitySurfLay(NY,NX)*CER(NY,NX)*AZMAX1(STPR-0.4_r8)**XER(NY,NX)
           CSEDD=AZMAX1(SEDX/XVLWatMicPM(M,NY,NX))
           IF(CSEDX.GT.CSEDD)THEN
             DETI=AMIN1(SoilMicPMassLayer(NU(NY,NX),NY,NX)*dts_wat &
@@ -184,13 +184,13 @@ module ErosionMod
   N1=NX
   N2=NY
 !     SEDX=SED(N2,N1)
-  IF(QRM(M,N2,N1).LE.0.0.OR.SoiBulkDensity(NU(N2,N1),N2,N1).LE.ZERO)THEN
+  IF(WatFlux4ErosionM(M,N2,N1).LE.0.0.OR.SoiBulkDensity(NU(N2,N1),N2,N1).LE.ZERO)THEN
     RERSED0(N2,N1)=0._r8
   ELSE
     IF(XVLWatMicPM(M,N2,N1).GT.ZEROS2(N2,N1))THEN
       SEDX=SED(N2,N1)+RDTSED(N2,N1)
       CSEDE=AZMAX1(SEDX/XVLWatMicPM(M,N2,N1))
-       RERSED0(N2,N1)=AMIN1(SEDX,CSEDE*QRM(M,N2,N1)*(1.0-FVOLIM(N2,N1)))
+       RERSED0(N2,N1)=AMIN1(SEDX,CSEDE*WatFlux4ErosionM(M,N2,N1)*(1.0-FVOLIM(N2,N1)))
     ELSE
       RERSED0(N2,N1)=0._r8
     ENDIF
@@ -222,7 +222,7 @@ module ErosionMod
         ENDIF
         IF(RERSED0(N2,N1).GT.ZEROS(N2,N1))THEN
           IF(NN.EQ.1)THEN
-            FERM=QRMN(M,N,2,N5,N4)/QRM(M,N2,N1)
+            FERM=QRMN(M,N,2,N5,N4)/WatFlux4ErosionM(M,N2,N1)
             RERSED(N,2,N5,N4)=RERSED0(N2,N1)*FERM
             XSEDER(N,2,N5,N4)=XSEDER(N,2,N5,N4)+RERSED(N,2,N5,N4)
           ELSE
@@ -230,7 +230,7 @@ module ErosionMod
           ENDIF
           IF(NN.EQ.2)THEN
             IF(N4B.GT.0.AND.N5B.GT.0)THEN
-              FERM=QRMN(M,N,1,N5B,N4B)/QRM(M,N2,N1)
+              FERM=QRMN(M,N,1,N5B,N4B)/WatFlux4ErosionM(M,N2,N1)
               RERSED(N,1,N5B,N4B)=RERSED0(N2,N1)*FERM
               XSEDER(N,1,N5B,N4B)=XSEDER(N,1,N5B,N4B)+RERSED(N,1,N5B,N4B)
 
@@ -270,13 +270,13 @@ module ErosionMod
       IF(IERSNG.EQ.1.OR.IERSNG.EQ.3)THEN
         N1=NX
         N2=NY
-        IF(QRM(M,N2,N1).LE.0.0.OR.SoiBulkDensity(NU(N2,N1),N2,N1).LE.ZERO)THEN
+        IF(WatFlux4ErosionM(M,N2,N1).LE.0.0.OR.SoiBulkDensity(NU(N2,N1),N2,N1).LE.ZERO)THEN
           RERSED0(N2,N1)=0._r8
         ELSE
           IF(XVLWatMicPM(M,N2,N1).GT.ZEROS2(N2,N1))THEN
             SEDX=SED(NY,NX)+RDTSED(NY,NX)
             CSEDE=AZMAX1(SEDX/XVLWatMicPM(M,N2,N1))
-            RERSED0(N2,N1)=AMIN1(SEDX,CSEDE*QRM(M,N2,N1))
+            RERSED0(N2,N1)=AMIN1(SEDX,CSEDE*WatFlux4ErosionM(M,N2,N1))
           ELSE
             RERSED0(N2,N1)=0._r8
           ENDIF
@@ -373,14 +373,14 @@ module ErosionMod
 !     IN 'WATSUB' TIMES BOUNDARY SEDIMENT CONCENTRATION IN
 !     SURFACE WATER
 !
-      IF(IRCHG(NN,N,N2,N1).EQ.0.OR.isclose(RCHQF,0._r8) &
+      IF(.not.XGridRunoffFlag(NN,N,N2,N1).OR.isclose(RCHQF,0._r8) &
         .OR.RERSED0(N2,N1).LE.ZEROS(N2,N1))THEN
         RERSED(N,NN,M5,M4)=0._r8
       ELSE
-        IF(QRM(M,N2,N1).GT.ZEROS(N2,N1))THEN
+        IF(WatFlux4ErosionM(M,N2,N1).GT.ZEROS(N2,N1))THEN
           IF((NN.EQ.1.AND.QRMN(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
             .OR.(NN.EQ.2.AND.QRMN(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
-            FERM=QRMN(M,N,NN,M5,M4)/QRM(M,N2,N1)
+            FERM=QRMN(M,N,NN,M5,M4)/WatFlux4ErosionM(M,N2,N1)
             RERSED(N,NN,M5,M4)=RERSED0(N2,N1)*FERM
             XSEDER(N,NN,M5,M4)=XSEDER(N,NN,M5,M4)+RERSED(N,NN,M5,M4)
           ELSEIF((NN.EQ.2.AND.QRMN(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
@@ -851,7 +851,7 @@ module ErosionMod
                 ENDIF
               ENDIF
             ENDIF
-            IF(IRCHG(NN,N,N2,N1).EQ.0.OR.isclose(RCHQF,0._r8) &
+            IF(.not.XGridRunoffFlag(NN,N,N2,N1).OR.isclose(RCHQF,0._r8) &
               .OR.ABS(XSEDER(N,NN,M5,M4)).LE.ZEROS(N2,N1))THEN
               XSANER(N,NN,M5,M4)=0._r8
               XSILER(N,NN,M5,M4)=0._r8

@@ -2,7 +2,7 @@ module SedimentDataType
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use GridConsts
   use TracerIDMod
-  use EcoSIMConfig, only : jcplx => jcplxc,ndbiomcp=>ndbiomcpc,jsken=>jskenc
+  use EcoSIMConfig, only : jcplx => jcplxc,ndbiomcp=>NumOfDeadMicrobiomComponents,jsken=>jskenc
 implicit none
 
   save
@@ -14,7 +14,7 @@ implicit none
   real(r8),target,allocatable ::  DETE(:,:)                         !soil detachability
   real(r8),target,allocatable ::  CER(:,:)                          !soil detachment/deposition, [-]
   real(r8),target,allocatable ::  XER(:,:)                          !soil detachment/deposition, [-]
-  real(r8),target,allocatable ::  PTDSNU(:,:)                       !particle density of surface layer
+  real(r8),target,allocatable ::  ParticleDensitySurfLay(:,:)       !particle density of surface layer
   real(r8),target,allocatable ::  VLS(:,:)                          !hourly sinking rate
   real(r8),target,allocatable ::  SED(:,:)                          !sediment transport, [Mg d-2 h-1]
   real(r8),target,allocatable ::  XSANER(:,:,:,:)                   !total sand erosion , [Mg d-2 h-1]
@@ -64,7 +64,7 @@ implicit none
   allocate(DETE(JY,JX));        DETE=0._r8
   allocate(CER(JY,JX));         CER=0._r8
   allocate(XER(JY,JX));         XER=0._r8
-  allocate(PTDSNU(JY,JX));      PTDSNU=0._r8
+  allocate(ParticleDensitySurfLay(JY,JX));      ParticleDensitySurfLay=0._r8
   allocate(VLS(JY,JX));         VLS=0._r8
   allocate(SED(JY,JX));         SED=0._r8
   allocate(XSANER(2,2,JV,JH));  XSANER=0._r8
@@ -107,7 +107,7 @@ implicit none
   call destroy(DETE)
   call destroy(CER)
   call destroy(XER)
-  call destroy(PTDSNU)
+  call destroy(ParticleDensitySurfLay)
   call destroy(VLS)
   call destroy(SED)
   call destroy(XSANER)

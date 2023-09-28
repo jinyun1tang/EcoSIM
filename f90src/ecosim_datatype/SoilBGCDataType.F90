@@ -4,7 +4,7 @@ module SoilBGCDataType
 ! USES:
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use GridConsts
-  use ElmIDMod    , only : npelms
+  use ElmIDMod    , only : NumOfPlantChemElements
   use TracerIDMod
   use EcoSIMConfig, only : jcplx => jcplxc,jsken => jskenc
 implicit none
@@ -99,7 +99,7 @@ implicit none
   real(r8),target,allocatable ::  TOQCK(:,:,:)                       !total respiration of DOC+DOA in soil layer
   real(r8),target,allocatable ::  VOLQ(:,:,:)                        !soil water volume occupied by microial biomass, [m3 m-3]
   real(r8),target,allocatable ::  TFNQ(:,:,:)                        !constraints of temperature and water potential on microbial activity, []
-  real(r8),target,allocatable ::  ESNT(:,:,:,:,:,:)                    !total litterfall C, [g d-2 h-1]
+  real(r8),target,allocatable ::  LitrfalChemElemnts_vr(:,:,:,:,:,:)                    !total litterfall C, [g d-2 h-1]
   real(r8),target,allocatable :: trcs_VLN(:,:,:,:)
 
   real(r8),target,allocatable ::  VLNHB(:,:,:)                       !NH4 band volume fracrion, []
@@ -141,19 +141,19 @@ implicit none
   private :: InitAllocate
   contains
 
-  subroutine InitSoilBGCData(n_pltlitrk)
+  subroutine InitSoilBGCData(NumOfPlantLitrCmplxs)
 
   implicit none
-  integer, intent(in) :: n_pltlitrk
+  integer, intent(in) :: NumOfPlantLitrCmplxs
 
-  call InitAllocate(n_pltlitrk)
+  call InitAllocate(NumOfPlantLitrCmplxs)
   end subroutine InitSoilBGCData
 
 !------------------------------------------------------------------------------------------
 
-  subroutine InitAllocate(n_pltlitrk)
+  subroutine InitAllocate(NumOfPlantLitrCmplxs)
   implicit none
-  integer, intent(in) :: n_pltlitrk
+  integer, intent(in) :: NumOfPlantLitrCmplxs
 
   allocate(CNH4(JZ,JY,JX));     CNH4=0._r8
   allocate(CNO3(JZ,JY,JX));     CNO3=0._r8
@@ -211,7 +211,7 @@ implicit none
   allocate(UDIND(JY,JX));       UDIND=0._r8
   allocate(UDIPQ(JY,JX));       UDIPQ=0._r8
   allocate(UDIPD(JY,JX));       UDIPD=0._r8
-  allocate(WTSTGET(npelms,JY,JX));      WTSTGET=0._r8
+  allocate(WTSTGET(NumOfPlantChemElements,JY,JX));      WTSTGET=0._r8
   allocate(ZDRAIN(JY,JX));      ZDRAIN=0._r8
   allocate(PDRAIN(JY,JX));      PDRAIN=0._r8
   allocate(UION(JY,JX));        UION=0._r8
@@ -240,7 +240,7 @@ implicit none
   allocate(TOQCK(0:JZ,JY,JX));  TOQCK=0._r8
   allocate(VOLQ(0:JZ,JY,JX));   VOLQ=0._r8
   allocate(TFNQ(0:JZ,JY,JX));   TFNQ=0._r8
-  allocate(ESNT(npelms,jsken,1:n_pltlitrk,0:JZ,JY,JX));ESNT=0._r8
+  allocate(LitrfalChemElemnts_vr(NumOfPlantChemElements,jsken,1:NumOfPlantLitrCmplxs,0:JZ,JY,JX));LitrfalChemElemnts_vr=0._r8
   allocate(trcs_VLN(ids_beg:ids_end,0:JZ,JY,JX));trcs_VLN=1._r8
 
   allocate(VLNHB(0:JZ,JY,JX));  VLNHB=0._r8
@@ -372,7 +372,7 @@ implicit none
   call destroy(TOQCK)
   call destroy(VOLQ)
   call destroy(TFNQ)
-  call destroy(ESNT)
+  call destroy(LitrfalChemElemnts_vr)
 
   call destroy(trcs_VLN)
   call destroy(trcg_XBLL)

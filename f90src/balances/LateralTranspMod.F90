@@ -20,7 +20,7 @@ module LateralTranspMod
   use EcoSiMParDataMod, only : micpar
   use minimathmod , only : AZMAX1
   use EcoSIMConfig, only : jcplx => jcplxc,NFGs=>NFGsc
-  use EcoSIMConfig, only : nlbiomcp=>nlbiomcpc
+  use EcoSIMConfig, only : nlbiomcp=>NumOfLiveMicrobiomComponents
   use ErosionBalMod
   use SnowBalanceMod
 implicit none
@@ -166,7 +166,7 @@ implicit none
 !
 !     INITIALIZE NET SOLUTE AND GAS FLUXES FOR RUNOFF
 !
-  D9960: DO K=1,micpar%n_litrsfk
+  D9960: DO K=1,micpar%NumOfLitrCmplxs
     TOCQRS(K,NY,NX)=0.0_r8
     TONQRS(K,NY,NX)=0.0_r8
     TOPQRS(K,NY,NX)=0.0_r8
@@ -263,7 +263,7 @@ implicit none
     TQR(N2,N1)=TQR(N2,N1)+QR(N,NN,N2,N1)
     !heat flux
     THQR(N2,N1)=THQR(N2,N1)+HQR(N,NN,N2,N1)
-    D8590: DO K=1,micpar%n_litrsfk
+    D8590: DO K=1,micpar%NumOfLitrCmplxs
       TOCQRS(K,N2,N1)=TOCQRS(K,N2,N1)+XOCQRS(K,N,NN,N2,N1)
       TONQRS(K,N2,N1)=TONQRS(K,N2,N1)+XONQRS(K,N,NN,N2,N1)
       TOPQRS(K,N2,N1)=TOPQRS(K,N2,N1)+XOPQRS(K,N,NN,N2,N1)
@@ -276,7 +276,7 @@ implicit none
       TQR(N2,N1)=TQR(N2,N1)-QR(N,NN,N5,N4)
       !heat flux
       THQR(N2,N1)=THQR(N2,N1)-HQR(N,NN,N5,N4)
-      D8591: DO K=1,micpar%n_litrsfk
+      D8591: DO K=1,micpar%NumOfLitrCmplxs
         TOCQRS(K,N2,N1)=TOCQRS(K,N2,N1)-XOCQRS(K,N,NN,N5,N4)
         TONQRS(K,N2,N1)=TONQRS(K,N2,N1)-XONQRS(K,N,NN,N5,N4)
         TOPQRS(K,N2,N1)=TOPQRS(K,N2,N1)-XOPQRS(K,N,NN,N5,N4)
@@ -288,7 +288,7 @@ implicit none
     IF(N4B.GT.0.AND.N5B.GT.0.AND.NN.EQ.1)THEN
       TQR(N2,N1)=TQR(N2,N1)-QR(N,NN,N5B,N4B)
       THQR(N2,N1)=THQR(N2,N1)-HQR(N,NN,N5B,N4B)
-      D8592: DO K=1,micpar%n_litrsfk
+      D8592: DO K=1,micpar%NumOfLitrCmplxs
         TOCQRS(K,N2,N1)=TOCQRS(K,N2,N1)-XOCQRS(K,N,NN,N5B,N4B)
         TONQRS(K,N2,N1)=TONQRS(K,N2,N1)-XONQRS(K,N,NN,N5B,N4B)
         TOPQRS(K,N2,N1)=TOPQRS(K,N2,N1)-XOPQRS(K,N,NN,N5B,N4B)

@@ -20,7 +20,7 @@ module SoilLayerDynMod
   use SurfLitterDataType
   use EcosimConst
   use UnitMod     , only : units
-  use EcoSIMConfig, only : ndbiomcp => ndbiomcpc
+  use EcoSIMConfig, only : ndbiomcp => NumOfDeadMicrobiomComponents
   USE TFlxTypeMod , ONLY : TSEDER,TDLYXF,TDYLXC,TDVOLI,TDORGC
 implicit none
 
@@ -634,17 +634,17 @@ implicit none
 !     RESET POND SURFACE LAYER NUMBER IF GAIN FROM PRECIPITATION
 !
   ELSEIF(NN.EQ.3)THEN
-    XVOLWP=AZMAX1(VLWatMicP(0,NY,NX)-VOLWD(NY,NX))
+    XVOLWP=AZMAX1(VLWatMicP(0,NY,NX)-MaxVLWatByLitR(NY,NX))
     IF(L.EQ.NU(NY,NX).AND.CumDepth2LayerBottom(0,NY,NX).GT.CumSoilDeptht0(NY,NX) &
-      .AND.XVOLWP.GT.VOLWD(NY,NX)+VHCPNX(NY,NX)/cpw)THEN
+      .AND.XVOLWP.GT.MaxVLWatByLitR(NY,NX)+VHCPNX(NY,NX)/cpw)THEN
           !     IF((SoiBulkDensity(L,NY,NX).GT.ZERO.AND.NU(NY,NX).GT.NUI(NY,NX))
           !    2.OR.(SoiBulkDensity(L,NY,NX).LE.ZERO))THEN
       IF(SoiBulkDensity(L,NY,NX).GT.ZERO.AND.NU(NY,NX).GT.NUI(NY,NX))THEN
         NU(NY,NX)=NUI(NY,NX)
         NUM(NY,NX)=NUI(NY,NX)
-        DDLYRX(NN)=(VOLWD(NY,NX)-XVOLWP)/AREA(3,0,NY,NX)
+        DDLYRX(NN)=(MaxVLWatByLitR(NY,NX)-XVOLWP)/AREA(3,0,NY,NX)
         IFLGL(L,NN)=1
-        DLYR0=(AZMAX1(VLWatMicP(0,NY,NX)+VLiceMicP(0,NY,NX)-VWatLitrX(NY,NX)) &
+        DLYR0=(AZMAX1(VLWatMicP(0,NY,NX)+VLiceMicP(0,NY,NX)-VWatLitRHoldCapcity(NY,NX)) &
           +VLitR(NY,NX))/AREA(3,0,NY,NX)
         DLYR(3,0,NY,NX)=DLYR0+DDLYRX(NN)
         DLYR(3,NU(NY,NX),NY,NX)=DLYR(3,NU(NY,NX),NY,NX)-DDLYRX(NN)
@@ -831,7 +831,7 @@ implicit none
             trcs_rootml(NTG,N,L1,NZ,NY,NX)=trcs_rootml(NTG,N,L1,NZ,NY,NX)+FX*trcs_rootml(NTG,N,L0,NZ,NY,NX)
           ENDDO
           DO  NR=1,NRT(NZ,NY,NX)
-            DO NE=1,npelms
+            DO NE=1,NumOfPlantChemElements
               WTRT1E(NE,N,L1,NR,NZ,NY,NX)=WTRT1E(NE,N,L1,NR,NZ,NY,NX)+FX*WTRT1E(NE,N,L0,NR,NZ,NY,NX)
               WTRT2E(NE,N,L1,NR,NZ,NY,NX)=WTRT2E(NE,N,L1,NR,NZ,NY,NX)+FX*WTRT2E(NE,N,L0,NR,NZ,NY,NX)
             ENDDO
@@ -839,11 +839,11 @@ implicit none
             SecndRootLen(N,L1,NR,NZ,NY,NX)=SecndRootLen(N,L1,NR,NZ,NY,NX)+FX*SecndRootLen(N,L0,NR,NZ,NY,NX)
             RTN2(N,L1,NR,NZ,NY,NX)=RTN2(N,L1,NR,NZ,NY,NX)+FX*RTN2(N,L0,NR,NZ,NY,NX)
           ENDDO
-          DO NE=1,npelms
+          DO NE=1,NumOfPlantChemElements
             EPOOLR(NE,N,L1,NZ,NY,NX)=EPOOLR(NE,N,L1,NZ,NY,NX)+FX*EPOOLR(NE,N,L0,NZ,NY,NX)
           ENDDO
           WTRTL(N,L1,NZ,NY,NX)=WTRTL(N,L1,NZ,NY,NX)+FX*WTRTL(N,L0,NZ,NY,NX)
-          RootCPZR(N,L1,NZ,NY,NX)=RootCPZR(N,L1,NZ,NY,NX)+FX*RootCPZR(N,L0,NZ,NY,NX)
+          PopPlantRootC_vr(N,L1,NZ,NY,NX)=PopPlantRootC_vr(N,L1,NZ,NY,NX)+FX*PopPlantRootC_vr(N,L0,NZ,NY,NX)
           WSRTL(N,L1,NZ,NY,NX)=WSRTL(N,L1,NZ,NY,NX)+FX*WSRTL(N,L0,NZ,NY,NX)
           PrimRootXNumL(N,L1,NZ,NY,NX)=PrimRootXNumL(N,L1,NZ,NY,NX)+FX*PrimRootXNumL(N,L0,NZ,NY,NX)
           SecndRootXNumL(N,L1,NZ,NY,NX)=SecndRootXNumL(N,L1,NZ,NY,NX)+FX*SecndRootXNumL(N,L0,NZ,NY,NX)
@@ -856,7 +856,7 @@ implicit none
           RTARP(N,L1,NZ,NY,NX)=RTARP(N,L1,NZ,NY,NX)+FX*RTARP(N,L0,NZ,NY,NX)
           AveSecndRootLen(N,L1,NZ,NY,NX)=AveSecndRootLen(N,L1,NZ,NY,NX)+FX*AveSecndRootLen(N,L0,NZ,NY,NX)
         ENDDO
-        DO NE=1,npelms
+        DO NE=1,NumOfPlantChemElements
           WTNDLE(NE,L1,NZ,NY,NX)=WTNDLE(NE,L1,NZ,NY,NX)+FX*WTNDLE(NE,L0,NZ,NY,NX)
           EPOOLN(NE,L1,NZ,NY,NX)=EPOOLN(NE,L1,NZ,NY,NX)+FX*EPOOLN(NE,L0,NZ,NY,NX)
         ENDDO
@@ -1008,7 +1008,7 @@ implicit none
             trcs_rootml(NTG,N,L0,NZ,NY,NX)=FY*trcs_rootml(NTG,N,L0,NZ,NY,NX)
           ENDDO
           DO NR=1,NRT(NZ,NY,NX)
-            DO NE=1,npelms
+            DO NE=1,NumOfPlantChemElements
               WTRT1E(NE,N,L0,NR,NZ,NY,NX)=FY*WTRT1E(NE,N,L0,NR,NZ,NY,NX)
               WTRT2E(NE,N,L0,NR,NZ,NY,NX)=FY*WTRT2E(NE,N,L0,NR,NZ,NY,NX)
             ENDDO
@@ -1016,11 +1016,11 @@ implicit none
             SecndRootLen(N,L0,NR,NZ,NY,NX)=FY*SecndRootLen(N,L0,NR,NZ,NY,NX)
             RTN2(N,L0,NR,NZ,NY,NX)=FY*RTN2(N,L0,NR,NZ,NY,NX)
           ENDDO
-          DO NE=1,npelms
+          DO NE=1,NumOfPlantChemElements
             EPOOLR(NE,N,L0,NZ,NY,NX)=FY*EPOOLR(NE,N,L0,NZ,NY,NX)
           ENDDO
           WTRTL(N,L0,NZ,NY,NX)=FY*WTRTL(N,L0,NZ,NY,NX)
-          RootCPZR(N,L0,NZ,NY,NX)=FY*RootCPZR(N,L0,NZ,NY,NX)
+          PopPlantRootC_vr(N,L0,NZ,NY,NX)=FY*PopPlantRootC_vr(N,L0,NZ,NY,NX)
           WSRTL(N,L0,NZ,NY,NX)=FY*WSRTL(N,L0,NZ,NY,NX)
           PrimRootXNumL(N,L0,NZ,NY,NX)=FY*PrimRootXNumL(N,L0,NZ,NY,NX)
           SecndRootXNumL(N,L0,NZ,NY,NX)=FY*SecndRootXNumL(N,L0,NZ,NY,NX)
@@ -1033,7 +1033,7 @@ implicit none
           RTARP(N,L0,NZ,NY,NX)=FY*RTARP(N,L0,NZ,NY,NX)
           AveSecndRootLen(N,L0,NZ,NY,NX)=FY*AveSecndRootLen(N,L0,NZ,NY,NX)
         ENDDO
-        DO NE=1,npelms
+        DO NE=1,NumOfPlantChemElements
           WTNDLE(NE,L0,NZ,NY,NX)=FY*WTNDLE(NE,L0,NZ,NY,NX)
 
           EPOOLN(NE,L0,NZ,NY,NX)=FY*EPOOLN(NE,L0,NZ,NY,NX)
@@ -1207,7 +1207,7 @@ implicit none
           ENDDO
 
           DO  NR=1,NRT(NZ,NY,NX)
-            DO NE=1,npelms
+            DO NE=1,NumOfPlantChemElements
               FXWTRT1E=FRO*WTRT1E(NE,N,L0,NR,NZ,NY,NX)
               WTRT1E(NE,N,L1,NR,NZ,NY,NX)=WTRT1E(NE,N,L1,NR,NZ,NY,NX)+FXWTRT1E
               WTRT1E(NE,N,L0,NR,NZ,NY,NX)=WTRT1E(NE,N,L0,NR,NZ,NY,NX)-FXWTRT1E
@@ -1226,7 +1226,7 @@ implicit none
             RTN2(N,L1,NR,NZ,NY,NX)=RTN2(N,L1,NR,NZ,NY,NX)+FXRTN2
             RTN2(N,L0,NR,NZ,NY,NX)=RTN2(N,L0,NR,NZ,NY,NX)-FXRTN2
           ENDDO
-          DO NE=1,npelms
+          DO NE=1,NumOfPlantChemElements
             FXEPOOLR=FRO*EPOOLR(NE,N,L0,NZ,NY,NX)
             EPOOLR(NE,N,L1,NZ,NY,NX)=EPOOLR(NE,N,L1,NZ,NY,NX)+FXEPOOLR
             EPOOLR(NE,N,L0,NZ,NY,NX)=EPOOLR(NE,N,L0,NZ,NY,NX)-FXEPOOLR
@@ -1235,9 +1235,9 @@ implicit none
           FXWTRTL=FRO*WTRTL(N,L0,NZ,NY,NX)
           WTRTL(N,L1,NZ,NY,NX)=WTRTL(N,L1,NZ,NY,NX)+FXWTRTL
           WTRTL(N,L0,NZ,NY,NX)=WTRTL(N,L0,NZ,NY,NX)-FXWTRTL
-          FXWTRTD=FRO*RootCPZR(N,L0,NZ,NY,NX)
-          RootCPZR(N,L1,NZ,NY,NX)=RootCPZR(N,L1,NZ,NY,NX)+FXWTRTD
-          RootCPZR(N,L0,NZ,NY,NX)=RootCPZR(N,L0,NZ,NY,NX)-FXWTRTD
+          FXWTRTD=FRO*PopPlantRootC_vr(N,L0,NZ,NY,NX)
+          PopPlantRootC_vr(N,L1,NZ,NY,NX)=PopPlantRootC_vr(N,L1,NZ,NY,NX)+FXWTRTD
+          PopPlantRootC_vr(N,L0,NZ,NY,NX)=PopPlantRootC_vr(N,L0,NZ,NY,NX)-FXWTRTD
           FXWSRTL=FRO*WSRTL(N,L0,NZ,NY,NX)
           WSRTL(N,L1,NZ,NY,NX)=WSRTL(N,L1,NZ,NY,NX)+FXWSRTL
           WSRTL(N,L0,NZ,NY,NX)=WSRTL(N,L0,NZ,NY,NX)-FXWSRTL
@@ -1275,7 +1275,7 @@ implicit none
 !
 !     ROOT NODULES
 !
-        DO NE=1,npelms
+        DO NE=1,NumOfPlantChemElements
           FXWTNDLE=FRO*WTNDLE(NE,L0,NZ,NY,NX)
           WTNDLE(NE,L1,NZ,NY,NX)=WTNDLE(NE,L1,NZ,NY,NX)+FXWTNDLE
           WTNDLE(NE,L0,NZ,NY,NX)=WTNDLE(NE,L0,NZ,NY,NX)-FXWTNDLE
@@ -1635,7 +1635,7 @@ implicit none
 !             SatHydroCondHrzn(L1,NY,NX)=SatHydroCondHrzn(L1,NY,NX)+FXSCNH
 !             SatHydroCondHrzn(L0,NY,NX)=SatHydroCondHrzn(L0,NY,NX)-FXSCNH
   IF(L0.EQ.0)THEN
-    FXVOLW=FX*AZMAX1(XVOLWP-VOLWD(NY,NX))
+    FXVOLW=FX*AZMAX1(XVOLWP-MaxVLWatByLitR(NY,NX))
   ELSE
     FXVOLW=FWO*VLWatMicP(L0,NY,NX)
   ENDIF

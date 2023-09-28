@@ -293,7 +293,7 @@ module HfuncsMod
         IF(ISTYP(NZ).NE.iplt_annual.OR.IDAY(2,NB1(NZ),NZ).EQ.0)THEN
           IF((NBR(NZ).EQ.0.AND.WTRVE(ielmc,NZ).GT.0.0_r8) &
             .OR.(CEPOLP(ielmc,NZ).GT.PB(NZ).AND.PB(NZ).GT.0.0_r8))THEN
-            D120: DO NB=1,JC1
+            D120: DO NB=1,NumOfCanopyLayers1
               IF(IDTHB(NB,NZ).EQ.ibrdead)THEN
                 IF(NB.EQ.NB1(NZ).OR.PSTG(NB1(NZ),NZ).GT.NBT(NZ) &
                   +NNOD(NZ)/FNOD(NZ)+XTLI(NZ))THEN
@@ -331,7 +331,7 @@ module HfuncsMod
         IF(NRT(NZ).EQ.0 .OR. PSTG(NB1(NZ),NZ).GT.NRT(NZ)/FNOD(NZ)+XTLI(NZ))THEN
           IF((NRT(NZ).EQ.0 .AND. WTRVE(ielmc,NZ).GT.0.0_r8) &
             .OR.(CEPOLP(ielmc,NZ).GT.PR(NZ) .AND. PR(NZ).GT.0.0_r8))THEN
-            NRT(NZ)=MIN(JC1,NRT(NZ)+1)
+            NRT(NZ)=MIN(NumOfCanopyLayers1,NRT(NZ)+1)
             IDTHR(NZ)=0
           ENDIF
         ENDIF
@@ -349,13 +349,13 @@ module HfuncsMod
   integer :: NB,N,L,NE
   real(r8):: ARLSP
   associate(                           &
-    CanPLeafShethC   =>  plt_biom%CanPLeafShethC     , &
+    CanopyLeafShethC_pft   =>  plt_biom%CanopyLeafShethC_pft     , &
     CanPBLeafShethC  =>  plt_biom%CanPBLeafShethC    , &
     CanPShootElmMass =>  plt_biom%CanPShootElmMass   , &
     CCPLNP =>  plt_biom%CCPLNP   , &
     CEPOLB =>  plt_biom%CEPOLB   , &
     CEPOLP =>  plt_biom%CEPOLP   , &
-    EPOOLP =>  plt_biom%EPOOLP   , &
+    CanopyNonstructElements_pft =>  plt_biom%CanopyNonstructElements_pft   , &
     EPOLNB =>  plt_biom%EPOLNB   , &
     EPOOLR =>  plt_biom%EPOOLR   , &
     EPOOL  =>  plt_biom%EPOOL    , &
@@ -372,7 +372,7 @@ module HfuncsMod
     NB1    =>  plt_morph%NB1     , &
     PrimRootDepth  =>  plt_morph%PrimRootDepth   , &
     MY     =>  plt_morph%MY      , &
-    CanPLA  =>  plt_morph%CanPLA   , &
+    CanopyLeafA_pft  =>  plt_morph%CanopyLeafA_pft   , &
     NGTopRootLayer    =>  plt_morph%NGTopRootLayer     , &
     NIXBotRootLayer   =>  plt_morph%NIXBotRootLayer     , &
     NBR    =>  plt_morph%NBR     , &
@@ -383,7 +383,7 @@ module HfuncsMod
     NI     =>  plt_morph%NI        &
   )
   plt_bgcr%RootGasLoss_disturb(idg_beg:idg_end-1,NZ)=0.0_r8
-  EPOOLP(1:npelms,NZ)=0.0_r8
+  CanopyNonstructElements_pft(1:NumOfPlantChemElements,NZ)=0.0_r8
   NI(NZ)=NIXBotRootLayer(NZ)
   NGTopRootLayer(NZ)=MIN(NI(NZ),MAX(NGTopRootLayer(NZ),NU))
   NB1(NZ)=1
@@ -395,10 +395,10 @@ module HfuncsMod
 ! CPOLN*,ZPOLN*,PPOLN*=non-structl C,N,P in branch,canopy nodules (g)
 ! NB1=main branch number
 !
-  DO NE=1,npelms
+  DO NE=1,NumOfPlantChemElements
     D140: DO NB=1,NBR(NZ)
       IF(IDTHB(NB,NZ).EQ.ibralive)THEN
-        EPOOLP(NE,NZ)=EPOOLP(NE,NZ)+EPOOL(NE,NB,NZ)
+        CanopyNonstructElements_pft(NE,NZ)=CanopyNonstructElements_pft(NE,NZ)+EPOOL(NE,NB,NZ)
         EPOLNP(NE,NZ)=EPOLNP(NE,NZ)+EPOLNB(NE,NB,NZ)
       ENDIF
     ENDDO D140
@@ -422,11 +422,11 @@ module HfuncsMod
   D180: DO N=1,MY(NZ)
     D160: DO L=NU,NI(NZ)
       IF(WTRTL(N,L,NZ).GT.ZEROL(NZ))THEN
-        DO NE=1,npelms
+        DO NE=1,NumOfPlantChemElements
           CEPOLR(NE,N,L,NZ)=AZMAX1(EPOOLR(NE,N,L,NZ)/WTRTL(N,L,NZ))
         ENDDO
       ELSE
-        DO NE=1,npelms
+        DO NE=1,NumOfPlantChemElements
           CEPOLR(NE,N,L,NZ)=1.0_r8
         ENDDO
       ENDIF
@@ -439,16 +439,16 @@ module HfuncsMod
 ! CCPLNP=nonstructural C concentration in canopy nodules
 ! CCPOLB,CZPOLB,CPPOLB=nonstructural C,N,P concn in branch(g g-1)
 !
-  IF(CanPLeafShethC(NZ).GT.ZEROL(NZ))THEN
-    DO NE=1,npelms
-      CEPOLP(NE,NZ)=AZMAX1(AMIN1(1.0_r8,EPOOLP(NE,NZ)/CanPLeafShethC(NZ)))
+  IF(CanopyLeafShethC_pft(NZ).GT.ZEROL(NZ))THEN
+    DO NE=1,NumOfPlantChemElements
+      CEPOLP(NE,NZ)=AZMAX1(AMIN1(1.0_r8,CanopyNonstructElements_pft(NE,NZ)/CanopyLeafShethC_pft(NZ)))
     ENDDO
-    CCPLNP(NZ)=AZMAX1(AMIN1(1.0_r8,EPOLNP(ielmc,NZ)/CanPLeafShethC(NZ)))
+    CCPLNP(NZ)=AZMAX1(AMIN1(1.0_r8,EPOLNP(ielmc,NZ)/CanopyLeafShethC_pft(NZ)))
   ELSE
-    CEPOLP(1:npelms,NZ)=1.0_r8
+    CEPOLP(1:NumOfPlantChemElements,NZ)=1.0_r8
     CCPLNP(NZ)=1.0_r8
   ENDIF
-  DO NE=1,npelms
+  DO NE=1,NumOfPlantChemElements
     D190: DO NB=1,NBR(NZ)
       IF(CanPBLeafShethC(NB,NZ).GT.ZEROP(NZ))THEN
         CEPOLB(NE,NB,NZ)=AZMAX1(EPOOL(NE,NB,NZ)/CanPBLeafShethC(NB,NZ))
@@ -461,14 +461,14 @@ module HfuncsMod
 ! EMERGENCE DATE FROM COTYLEDON HEIGHT, LEAF AREA, ROOT DEPTH
 !
 ! IDAY(1,=emergence date
-! CanPLA,CanPSA=leaf,stalk areas
+! CanopyLeafA_pft,CanPSA=leaf,stalk areas
 ! HypoctoylHeight=hypocotyledon height
 ! SeedinDepth=seeding depth
 ! PrimRootDepth=primary root depth
 ! VHeatCapCanP,WTSHT,WatByPCan=canopy heat capacity,mass,water content
 !
   IF(IDAY(1,NB1(NZ),NZ).EQ.0)THEN
-    ARLSP=CanPLA(NZ)+CanPSA(NZ)
+    ARLSP=CanopyLeafA_pft(NZ)+CanPSA(NZ)
     IF((HypoctoylHeight(NZ).GT.SeedinDepth(NZ)).AND.(ARLSP.GT.ZEROL(NZ)) &
       .AND.(PrimRootDepth(1,1,NZ).GT.SeedinDepth(NZ)+ppmc))THEN
       IDAY(1,NB1(NZ),NZ)=I

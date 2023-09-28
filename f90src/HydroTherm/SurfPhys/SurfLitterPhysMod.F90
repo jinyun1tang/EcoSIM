@@ -17,10 +17,14 @@ module SurfLitterPhysMod
   use EcoSIMSolverPar
   use abortutils
   use PhysPars
+  use UnitMod, only : units  
   use SoilPhysParaMod
+  USE SoilHeatDataType
+  USE ClimForcDataType
 implicit none
   character(len=*), parameter, private :: mod_filename='SurfLitterPhysMod'
   public :: SRFLitterEnergyBalance
+  public :: UpdateLitRPhys
   contains
 
 
@@ -90,7 +94,7 @@ implicit none
   ! CNVR,CNV1=litter,soil vapor conductivity
   ! THETPM=litter air concentration
   ! POROS,POROQ=litter porosity, tortuosity
-  ! WGSGR,WGSGL=litter,soil vapor diffusivity
+  ! VaporDiffusivityLitR,WGSGL=litter,soil vapor diffusivity
   ! CVRD=litter cover fraction
   ! ATCNVR=litter-soil vapor conductance
   ! DLYRR,DLYR=litter,soil depths
@@ -101,7 +105,7 @@ implicit none
   ! TCNDR,TCND1=litter,soil thermal conductivity
   ! ATCNDR=litter-soil thermal conductance
   !
-  CNVR=WGSGR(NY,NX)*THETPM(M,0,NY,NX)*POROQ*THETPM(M,0,NY,NX)/POROS(0,NY,NX)
+  CNVR=VaporDiffusivityLitR(NY,NX)*THETPM(M,0,NY,NX)*POROQ*THETPM(M,0,NY,NX)/POROS(0,NY,NX)
   CNV1=WGSGL(NUM(NY,NX),NY,NX)*THETPM(M,NUM(NY,NX),NY,NX)*POROQ &
     *THETPM(M,NUM(NY,NX),NY,NX)/POROS(NUM(NY,NX),NY,NX)
 
@@ -240,19 +244,19 @@ implicit none
 !     LWRadLitR2=longwave radiation emitted by litter
 !     Radnet2LitR2=litter net radiation,after taking out outgoing radiation from litter 
 !     THETWR=litter water content
-!     VWatLitrX=maximum water retention by litter
+!     VWatLitRHoldCapcity=maximum water retention by litter
 !     PSISM1=litter matric water potential
 !
       LWRadLitR2=THRMR(NY,NX)*TKR1**4._r8
       Radnet2LitR2=RFLX0-LWRadLitR2
-      IF(VWatLitrX(NY,NX).GT.ZEROS2(NY,NX))THEN
-        THETWR=AMIN1(VWatLitrX(NY,NX),VWatLitr2)/VLitR(NY,NX)
+      IF(VWatLitRHoldCapcity(NY,NX).GT.ZEROS2(NY,NX))THEN
+        THETWR=AMIN1(VWatLitRHoldCapcity(NY,NX),VWatLitr2)/VLitR(NY,NX)
       ELSE
         THETWR=POROS0(NY,NX)
       ENDIF
 
       IF(VLitR(NY,NX).GT.ZEROS(NY,NX).AND.VLWatMicP1(0,NY,NX).GT.ZEROS2(NY,NX))THEN
-        THETWR=AMIN1(VWatLitrX(NY,NX),VLWatMicP1(0,NY,NX))/VLitR(NY,NX)
+        THETWR=AMIN1(VWatLitRHoldCapcity(NY,NX),VLWatMicP1(0,NY,NX))/VLitR(NY,NX)
         IF(THETWR.LT.FieldCapacity(0,NY,NX))THEN
           PSISM1(0,NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIFLD(NY,NX) &
             +((LOGFldCapacity(0,NY,NX)-LOG(THETWR))/FCD(0,NY,NX)*LOGPSIMND(NY,NX))))
@@ -412,5 +416,77 @@ implicit none
 
   ENDDO D5000
   end subroutine SurfLitterIterateNN
+
+!------------------------------------------------------------------------------------------
+  subroutine UpdateLitRPhys(NY,NX,WatInByRunoff,HeatInByRunoff,HeatStoreLandscape,HEATIN)
+  !
+  !Description
+  !Update Litter physical variables
+  implicit none
+  integer,  intent(in) :: NY,NX
+  real(r8), intent(in) :: WatInByRunoff
+  real(r8), intent(in) :: HeatInByRunoff
+  real(r8), intent(inout) :: HeatStoreLandscape
+  real(r8), intent(inout) :: HEATIN
+
+  real(r8) :: VHeatCapacityLitrX  !old litr heat capacity
+  real(r8) :: VHeatCapacityLitR   !current litr heat capacity
+  real(r8) :: dVHeatCapacityLitr  !change in heat capacity
+  real(r8) :: tkspre,ENGYR
+  real(r8) :: ENGYZ,HeatByLitrMassChange
+  integer :: LS
+
+  ! CALCULATE SURFACE RESIDUE TEMPERATURE FROM ITS CHANGE
+  ! IN HEAT STORAGE
+  !
+  VHeatCapacityLitrX=VHeatCapacity(0,NY,NX)                          
+  VHeatCapacityLitR=cpw*VLWatMicP(0,NY,NX)+cpi*VLiceMicP(0,NY,NX)+cpo*ORGC(0,NY,NX) 
+
+  if(VLWatMicP(0,NY,NX)<0._r8 .or. VLiceMicP(0,NY,NX)<0._r8 .or. VHeatCapacityLitR<0._r8)then
+    write(*,*)'negative litr water',VLWatMicP(0,NY,NX),VLiceMicP(0,NY,NX)
+    call endrun(trim(mod_filename)//' at line',__LINE__)    
+  endif
+  dVHeatCapacityLitr=VHeatCapacityLitR-VHeatCapacityLitrX            
+  !TairK: air temperature in kelvin, HeatByLitrMassChange represents increase heat in litr
+  HeatByLitrMassChange=dVHeatCapacityLitr*TairK(NY,NX)
+  ENGYZ=VHeatCapacityLitrX*TKS(0,NY,NX)
+
+  !update water, ice content and heat capacity of residue
+  VLWatMicP(0,NY,NX)=AZMAX1(VLWatMicP(0,NY,NX)+WatFLo2Litr(NY,NX)+TLitrIceFlxThaw(NY,NX)+WatInByRunoff)
+  VLiceMicP(0,NY,NX)=AZMAX1(VLiceMicP(0,NY,NX)-TLitrIceFlxThaw(NY,NX)/DENSICE)
+  VHeatCapacity(0,NY,NX)=cpo*ORGC(0,NY,NX)+cpw*VLWatMicP(0,NY,NX)+cpi*VLiceMicP(0,NY,NX)
+
+  IF(VHeatCapacity(0,NY,NX).GT.VHeatCapLitR(NY,NX))THEN
+    !when there are still significant heat capacity of the residual layer
+    tkspre=TKS(0,NY,NX)
+    TKS(0,NY,NX)=(ENGYZ+HeatFLo2LitrByWat(NY,NX)+TLitrIceHeatFlxFrez(NY,NX)+HeatByLitrMassChange &
+      +HeatInByRunoff)/VHeatCapacity(0,NY,NX)
+    if(TKS(0,NY,NX)<100._r8 .or. TKS(0,NY,NX)>400._r8)then
+      write(*,*)'redist NY,NX',NY,NX,TKS(0,NY,NX),tkspre
+      write(*,*)ENGYZ,HeatFLo2LitrByWat(NY,NX),TLitrIceHeatFlxFrez(NY,NX),HeatByLitrMassChange, &
+        HeatInByRunoff,VHeatCapacity(0,NY,NX)
+      write(*,*)VHeatCapacityLitrX,VHeatCapacityLitR,dVHeatCapacityLitR,TairK(NY,NX),ORGC(0,NY,NX)   
+      call endrun(trim(mod_filename)//' at line',__LINE__)
+    endif  
+    HEATIN=HEATIN+HeatByLitrMassChange
+    Ls=NUM(NY,NX)
+    !if(curday>=175)write(*,*)'at line',__LINE__,TKS(0,NY,NX),tks(Ls,ny,nx),tkspre
+!    if(abs(VHeatCapacity(0,NY,NX)/VHeatCapacityLitrX-1._r8)>0.025_r8.or. &
+!      abs(TKS(0,NY,NX)/tkspre-1._r8)>0.025_r8)then
+!      TKS(0,NY,NX)=TKS(NUM(NY,NX),NY,NX)
+!    endif
+  ELSE
+    HEATIN=HEATIN+HeatByLitrMassChange+(TKS(NUM(NY,NX),NY,NX)-TKS(0,NY,NX))*VHeatCapacity(0,NY,NX)
+    TKS(0,NY,NX)=TKS(NUM(NY,NX),NY,NX)
+  ENDIF
+
+  TCS(0,NY,NX)=units%Kelvin2Celcius(TKS(0,NY,NX))
+    
+  ENGYR=VHeatCapacity(0,NY,NX)*TKS(0,NY,NX)
+
+  HeatStoreLandscape=HeatStoreLandscape+ENGYR
+  HEATIN=HEATIN+TLitrIceHeatFlxFrez(NY,NX)
+
+  end subroutine UpdateLitRPhys
 
 end module SurfLitterPhysMod
