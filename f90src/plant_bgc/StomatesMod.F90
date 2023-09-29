@@ -839,14 +839,14 @@
     DCO2   =>  plt_photo%DCO2   , &
     MaxCanPStomaResistH2O   =>  plt_photo%MaxCanPStomaResistH2O   , &
     FracPARByCanP  =>  plt_rad%FracPARByCanP    , &
-    NBR    =>  plt_morph%NBR      &
+    NumOfBranches_pft    =>  plt_morph%NumOfBranches_pft      &
   )
 
   call PrepPhotosynthesis(NZ,CH2O,TFN1,TFN2,TFNE,XKO2L)
 !
 !     FOR EACH BRANCH
 !
-  DO NB=1,NBR(NZ)
+  DO NB=1,NumOfBranches_pft(NZ)
 !
 !     FEEDBACK ON CO2 FIXATION
 !

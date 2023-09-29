@@ -48,7 +48,7 @@ module StartqMod
 !     MaxCanPStomaResistH2O=cuticular resistance to water (h m-1)
 !     RCMX=cuticular resistance to CO2 (s m-1)
 !     CNWS,CPWS=protein:N,protein:P ratios
-!     CWSRT=maximum root protein concentration (g g-1)
+!    RootFracRemobilizableBiom=maximum root protein concentration (g g-1)
 !     O2I=intercellular O2 concentration in C3,C4 PFT (umol mol-1)
 !
 
@@ -118,7 +118,7 @@ module StartqMod
   RCMX(NZ,NY,NX)=RSMX(NZ,NY,NX)*1.56_r8
   CNWS(NZ,NY,NX)=2.5_r8
   CPWS(NZ,NY,NX)=25.0_r8
-  CWSRT(NZ,NY,NX)=AMIN1(CNRT(NZ,NY,NX)*CNWS(NZ,NY,NX),CPRT(NZ,NY,NX)*CPWS(NZ,NY,NX))
+ RootFracRemobilizableBiom(NZ,NY,NX)=AMIN1(CNRT(NZ,NY,NX)*CNWS(NZ,NY,NX),CPRT(NZ,NY,NX)*CPWS(NZ,NY,NX))
   IF(ICTYP(NZ,NY,NX).EQ.ic3_photo)THEN
     O2I(NZ,NY,NX)=2.10E+05_r8
   ELSE
@@ -476,7 +476,7 @@ module StartqMod
   IDTHP(NZ,NY,NX)=0
   IDTHR(NZ,NY,NX)=0
   NBT(NZ,NY,NX)=0
-  NBR(NZ,NY,NX)=0
+  NumOfBranches_pft(NZ,NY,NX)=0
   HypoctoylHeight(NZ,NY,NX)=0._r8
   CanopyHeight(NZ,NY,NX)=0._r8
   D10: DO NB=1,JBR
@@ -508,7 +508,7 @@ module StartqMod
     FDBKX(NB,NZ,NY,NX)=1.0
     FLG4(NB,NZ,NY,NX)=0
     FLGZ(NB,NZ,NY,NX)=0
-    NBTB(NB,NZ,NY,NX)=0
+    BranchNumber_brchpft(NB,NZ,NY,NX)=0
     IDTHB(NB,NZ,NY,NX)=1
     D15: DO M=1,jpstgs
       IDAY(M,NB,NZ,NY,NX)=0
@@ -542,7 +542,7 @@ module StartqMod
     GRNXB(NB,NZ,NY,NX)=0._r8
     GRNOB(NB,NZ,NY,NX)=0._r8
     GRWTB(NB,NZ,NY,NX)=0._r8
-    CanPBLA(NB,NZ,NY,NX)=0._r8
+    CanopyBranchLeafA_pft(NB,NZ,NY,NX)=0._r8
     RNH3B(NB,NZ,NY,NX)=0._r8
     ARLFZ(NB,NZ,NY,NX)=0._r8
     CanPBranchHeight(NB,NZ,NY,NX)=0._r8
@@ -587,8 +587,8 @@ module StartqMod
     CanopyStemApft_lyr(L,NZ,NY,NX)=0._r8
   ENDDO D35
   CanopyNonstructElements_pft(1:NumOfPlantChemElements,NZ,NY,NX)=0._r8
-  CEPOLP(1:NumOfPlantChemElements,NZ,NY,NX)=0._r8
-  CCPLNP(NZ,NY,NX)=0._r8
+  CanopyNonstructElementConc_pft(1:NumOfPlantChemElements,NZ,NY,NX)=0._r8
+  NoduleNonstructCconc_pft(NZ,NY,NX)=0._r8
   CanPShootElmMass(1:NumOfPlantChemElements,NZ,NY,NX)=0._r8
   WTLFE(1:NumOfPlantChemElements,NZ,NY,NX)=0._r8
   WTSHEE(1:NumOfPlantChemElements,NZ,NY,NX)=0._r8
@@ -712,8 +712,8 @@ module StartqMod
       PSIRootOSMO(N,L,NZ,NY,NX)=OSMO(NZ,NY,NX)+PSIRoot(N,L,NZ,NY,NX)
       PSIRootTurg(N,L,NZ,NY,NX)=AZMAX1(PSIRoot(N,L,NZ,NY,NX)-PSIRootOSMO(N,L,NZ,NY,NX))
       EPOOLR(1:NumOfPlantChemElements,N,L,NZ,NY,NX)=0._r8
-      CEPOLR(1:NumOfPlantChemElements,N,L,NZ,NY,NX)=0._r8
-      CWSRTL(N,L,NZ,NY,NX)=CWSRT(NZ,NY,NX)
+      RootNonstructElementConcpft_vr(1:NumOfPlantChemElements,N,L,NZ,NY,NX)=0._r8
+      RootProteinConc_pftvr(N,L,NZ,NY,NX)=RootFracRemobilizableBiom(NZ,NY,NX)
       WTRTL(N,L,NZ,NY,NX)=0._r8
       PopPlantRootC_vr(N,L,NZ,NY,NX)=0._r8
       WSRTL(N,L,NZ,NY,NX)=0._r8
@@ -829,7 +829,7 @@ module StartqMod
   RTWT1E(ielmp,1,1,NZ,NY,NX)=CPGR(NZ,NY,NX)*RTWT1E(ielmc,1,1,NZ,NY,NX)
   WTRTL(ipltroot,NGTopRootLayer(NZ,NY,NX),NZ,NY,NX)=WTRT1E(ielmc,ipltroot,NGTopRootLayer(NZ,NY,NX),1,NZ,NY,NX)
   PopPlantRootC_vr(ipltroot,NGTopRootLayer(NZ,NY,NX),NZ,NY,NX)=WTRT1E(ielmc,ipltroot,NGTopRootLayer(NZ,NY,NX),1,NZ,NY,NX)
-  WSRTL(1,NGTopRootLayer(NZ,NY,NX),NZ,NY,NX)=WTRTL(ipltroot,NGTopRootLayer(NZ,NY,NX),NZ,NY,NX)*CWSRT(NZ,NY,NX)
+  WSRTL(1,NGTopRootLayer(NZ,NY,NX),NZ,NY,NX)=WTRTL(ipltroot,NGTopRootLayer(NZ,NY,NX),NZ,NY,NX)*RootFracRemobilizableBiom(NZ,NY,NX)
   EPOOLR(ielmn,1,NGTopRootLayer(NZ,NY,NX),NZ,NY,NX)=CNGR(NZ,NY,NX)*EPOOLR(ielmc,1,NGTopRootLayer(NZ,NY,NX),NZ,NY,NX)
   EPOOLR(ielmp,1,NGTopRootLayer(NZ,NY,NX),NZ,NY,NX)=CPGR(NZ,NY,NX)*EPOOLR(ielmc,1,NGTopRootLayer(NZ,NY,NX),NZ,NY,NX)
   end subroutine InitSeedMorphoBio

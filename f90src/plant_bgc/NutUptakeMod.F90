@@ -66,8 +66,8 @@ module NutUptakeMod
     CEPOLB  =>  plt_biom%CEPOLB   , &
     CanPStomaResistH2O      =>  plt_photo%CanPStomaResistH2O      , &
     CanPbndlResist     =>  plt_photo%CanPbndlResist     , &
-    CanPBLA   =>  plt_morph%CanPBLA   , &
-    NBR     =>  plt_morph%NBR     , &
+    CanopyBranchLeafA_pft   =>  plt_morph%CanopyBranchLeafA_pft   , &
+    NumOfBranches_pft     =>  plt_morph%NumOfBranches_pft     , &
     FracPARByCanP   =>  plt_rad%FracPARByCanP     , &
     CanopyLeafA_pft   =>  plt_morph%CanopyLeafA_pft     &
   )
@@ -79,7 +79,7 @@ module NutUptakeMod
   !     SNH3P,SNH3X=NH3 solubility at TCC, 25 oC
   !     TCC=canopy temperature (oC)
   !     FDMP,FNH3P=canopy dry matter content,NH3 concentration
-  !     CanPBLA,CanopyLeafA_pft=branch,canopy leaf area
+  !     CanopyBranchLeafA_pft,CanopyLeafA_pft=branch,canopy leaf area
   !     CNH3P,CNH3E=gaseous NH3 concentration in branch,atmosphere
   !     CZPOLB,ZPOOLB=nonstplt_rbgc%RUCtural N concentration,content in branch
   !     RNH3B=NH3 flux between atmosphere and branch
@@ -88,13 +88,13 @@ module NutUptakeMod
   !
   SNH3P=SNH3X*EXP(0.513_r8-0.0171_r8*TCC(NZ))
   FNH3P=1.0E-04_r8*FDMP
-  D105: DO NB=1,NBR(NZ)
-    IF(CanPBLeafShethC(NB,NZ).GT.ZEROP(NZ).AND.CanPBLA(NB,NZ).GT.ZEROP(NZ) &
+  D105: DO NB=1,NumOfBranches_pft(NZ)
+    IF(CanPBLeafShethC(NB,NZ).GT.ZEROP(NZ).AND.CanopyBranchLeafA_pft(NB,NZ).GT.ZEROP(NZ) &
       .AND.CanopyLeafA_pft(NZ).GT.ZEROP(NZ))THEN
       CNH3P=AZMAX1(FNH3P*CEPOLB(ielmn,NB,NZ)/SNH3P)
       ZPOOLB=AZMAX1(EPOOL(ielmn,NB,NZ))
       RNH3B(NB,NZ)=AMIN1(0.1_r8*ZPOOLB,AMAX1((CNH3E-CNH3P)/(CanPbndlResist(NZ)+CanPStomaResistH2O(NZ)) &
-        *FracPARByCanP(NZ)*AREA3(NU)*CanPBLA(NB,NZ)/CanopyLeafA_pft(NZ),-0.1_r8*ZPOOLB))
+        *FracPARByCanP(NZ)*AREA3(NU)*CanopyBranchLeafA_pft(NB,NZ)/CanopyLeafA_pft(NZ),-0.1_r8*ZPOOLB))
     ELSE
       RNH3B(NB,NZ)=0.0_r8
     ENDIF
@@ -1117,12 +1117,12 @@ module NutUptakeMod
     ZEROS   => plt_site%ZEROS   , &
     ZERO    => plt_site%ZERO    , &
     AllPlantRootH2OUptake_vr   => plt_ew%AllPlantRootH2OUptake_vr     , &
-    CWSRT   => plt_allom%CWSRT  , &
+    RootFracRemobilizableBiom   => plt_allom%RootFracRemobilizableBiom  , &
     ZEROP   => plt_biom%ZEROP   , &
-    CWSRTL  => plt_biom%CWSRTL  , &
+    RootProteinConc_pftvr  => plt_biom%RootProteinConc_pftvr  , &
     WSRTL   => plt_biom%WSRTL   , &
     EPOOLR  => plt_biom%EPOOLR  , &
-    CEPOLR  => plt_biom%CEPOLR  , &
+    RootNonstructElementConcpft_vr  => plt_biom%RootNonstructElementConcpft_vr  , &
     WTRTL   => plt_biom%WTRTL     &
   )
   !
@@ -1130,15 +1130,15 @@ module NutUptakeMod
   !     PROTEIN CONTENT RELATIVE TO 5% FOR WHICH ACTIVE UPTAKE
   !     PARAMETERS ARE DEFINED
   !
-  !     CWSRTL,CWSRT=current,maximum protein concentration
+  !     RootProteinConc_pftvr,RootFracRemobilizableBiom=current,maximum protein concentration
   !     WSRTL,WTRTL=protein content,mass
   !     FWSRT=protein concentration relative to 5%
   !
   IF(WTRTL(N,L,NZ).GT.ZEROP(NZ))THEN
-    CWSRTL(N,L,NZ)=AMIN1(CWSRT(NZ),WSRTL(N,L,NZ)/WTRTL(N,L,NZ))
-    FWSRT=CWSRTL(N,L,NZ)/0.05_r8
+    RootProteinConc_pftvr(N,L,NZ)=AMIN1(RootFracRemobilizableBiom(NZ),WSRTL(N,L,NZ)/WTRTL(N,L,NZ))
+    FWSRT=RootProteinConc_pftvr(N,L,NZ)/0.05_r8
   ELSE
-    CWSRTL(N,L,NZ)=CWSRT(NZ)
+    RootProteinConc_pftvr(N,L,NZ)=RootFracRemobilizableBiom(NZ)
     FWSRT=1.0_r8
   ENDIF
   !
@@ -1161,11 +1161,15 @@ module NutUptakeMod
   !     ZCKI,PCKI,ZPKI,PZKI=N,P inhibition effect on N,P uptake
   !     CumPerPlantRootH2OUptake=water uptake at time step for gas flux calculations
   !
-  IF(CEPOLR(ielmc,N,L,NZ).GT.ZERO)THEN
-    FZUP=AMIN1(safe_adb(CEPOLR(ielmc,N,L,NZ),CEPOLR(ielmc,N,L,NZ)+CEPOLR(ielmn,N,L,NZ)/ZCKI) &
-      ,safe_adb(CEPOLR(ielmp,N,L,NZ),CEPOLR(ielmp,N,L,NZ)+CEPOLR(ielmn,N,L,NZ)/ZPKI))
-    FPUP=AMIN1(safe_adb(CEPOLR(ielmc,N,L,NZ),CEPOLR(ielmc,N,L,NZ)+CEPOLR(ielmp,N,L,NZ)/PCKI) &
-      ,safe_adb(CEPOLR(ielmn,N,L,NZ),CEPOLR(ielmn,N,L,NZ)+CEPOLR(ielmp,N,L,NZ)/PZKI))
+  IF(RootNonstructElementConcpft_vr(ielmc,N,L,NZ).GT.ZERO)THEN
+    FZUP=AMIN1(safe_adb(RootNonstructElementConcpft_vr(ielmc,N,L,NZ),RootNonstructElementConcpft_vr(ielmc,N,L,NZ) &
+      +RootNonstructElementConcpft_vr(ielmn,N,L,NZ)/ZCKI) &
+      ,safe_adb(RootNonstructElementConcpft_vr(ielmp,N,L,NZ),RootNonstructElementConcpft_vr(ielmp,N,L,NZ) &
+       +RootNonstructElementConcpft_vr(ielmn,N,L,NZ)/ZPKI))
+    FPUP=AMIN1(safe_adb(RootNonstructElementConcpft_vr(ielmc,N,L,NZ),RootNonstructElementConcpft_vr(ielmc,N,L,NZ) &
+      +RootNonstructElementConcpft_vr(ielmp,N,L,NZ)/PCKI) &
+      ,safe_adb(RootNonstructElementConcpft_vr(ielmn,N,L,NZ),RootNonstructElementConcpft_vr(ielmn,N,L,NZ) &
+      +RootNonstructElementConcpft_vr(ielmp,N,L,NZ)/PZKI))
   ELSE
     FZUP=0.0_r8
     FPUP=0.0_r8

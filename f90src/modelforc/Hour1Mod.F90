@@ -379,10 +379,10 @@ module Hour1Mod
       trcg_XRS(idg_beg:idg_end-1,1:2,1:2,NY,NX)=0.0_r8
       trcn_XRS(ids_nut_beg:ids_nuts_end,1:2,1:2,NY,NX)=0.0_r8
 
-      QS(1:2,NY,NX)=0.0_r8
-      QW(1:2,NY,NX)=0.0_r8
-      QI(1:2,NY,NX)=0.0_r8
-      HQS(1:2,NY,NX)=0.0_r8
+      DrysnoBySnowRedistribution(1:2,NY,NX)=0.0_r8
+      WatBySnowRedistribution(1:2,NY,NX)=0.0_r8
+      IceBySnowRedistribution(1:2,NY,NX)=0.0_r8
+      HeatBySnowRedistribution(1:2,NY,NX)=0.0_r8
       XCOQSS(1:2,NY,NX)=0.0_r8
       XCHQSS(1:2,NY,NX)=0.0_r8
       XOXQSS(1:2,NY,NX)=0.0_r8
@@ -751,7 +751,7 @@ module Hour1Mod
   HeatFLo2LitrByWat(NY,NX)=0.0_r8
   TLitrIceFlxThaw(NY,NX)=0.0_r8
   TLitrIceHeatFlxFrez(NY,NX)=0.0_r8
-  HeatRadiation(NY,NX)=0.0_r8
+  HeatByRadiation(NY,NX)=0.0_r8
   HeatSensAir2Surf(NY,NX)=0.0_r8
   HeatEvapAir2Surf(NY,NX)=0.0_r8
   HeatSensVapAir2Surf(NY,NX)=0.0_r8

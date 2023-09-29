@@ -174,7 +174,7 @@ module WthrMod
 !
       !     UA=wind speed
 !
-      UA(NY,NX)=AMAX1(3600.0_r8,WIND(I))
+      WindSpeedAtm(NY,NX)=AMAX1(3600.0_r8,WIND(I))
 !
 !     TSNOW=temperature below which precipitation is snow (oC)
 !     PrecAsRain,PrecAsSnow=rainfall,snowfall
@@ -225,7 +225,7 @@ module WthrMod
       !elevation corrected saturated air vapor pressure
       VPS(NY,NX)=vapsat0(TairK(ny,nx))*EXP(-ALTI(NY,NX)/7272.0_r8)
       VPK(NY,NX)=AMIN1(DWPTH(J,I),VPS(NY,NX))
-      UA(NY,NX)=AMAX1(3600.0_r8,WINDH(J,I))
+      WindSpeedAtm(NY,NX)=AMAX1(3600.0_r8,WINDH(J,I))
 
       !snowfall is determined by air tempeature
       IF(TCA(NY,NX).GT.TSNOW)THEN
@@ -496,7 +496,7 @@ module WthrMod
       RADY(NY,NX)=RADY(NY,NX)*TDRAD(N,NY,NX)
       RAPS(NY,NX)=RAPS(NY,NX)*TDRAD(N,NY,NX)
       RAPY(NY,NX)=RAPY(NY,NX)*TDRAD(N,NY,NX)
-      UA(NY,NX)=UA(NY,NX)*TDWND(N,NY,NX)
+      WindSpeedAtm(NY,NX)=WindSpeedAtm(NY,NX)*TDWND(N,NY,NX)
       VPK(NY,NX)=AMIN1(VPS(NY,NX),VPK(NY,NX)*TDHUM(N,NY,NX))
       PrecAsRain(NY,NX)=PrecAsRain(NY,NX)*TDPRC(N,NY,NX)
       PrecAsSnow(NY,NX)=PrecAsSnow(NY,NX)*TDPRC(N,NY,NX)
@@ -531,7 +531,7 @@ module WthrMod
       TAMN(NY,NX)=AMIN1(TAMN(NY,NX),TCA(NY,NX))
       HUDX(NY,NX)=AMAX1(HUDX(NY,NX),VPK(NY,NX))
       HUDN(NY,NX)=AMIN1(HUDN(NY,NX),VPK(NY,NX))
-      TWIND(NY,NX)=TWIND(NY,NX)+UA(NY,NX)
+      TWIND(NY,NX)=TWIND(NY,NX)+WindSpeedAtm(NY,NX)
       VPA(NY,NX)=VPK(NY,NX)*2.173E-03_r8/TairK(NY,NX)
       TRAI(NY,NX)=TRAI(NY,NX)+(PrecAsRain(NY,NX)+PrecAsSnow(NY,NX) &
         +PRECII(NY,NX)+PRECUI(NY,NX))*1000.0_r8

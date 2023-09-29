@@ -347,15 +347,15 @@ implicit none
 
   if(flag=='read')then   
     dat1pr => datip_1d  
-    call restartvar(ncid, flag, varname='NBR', dim1name='pft',&
+    call restartvar(ncid, flag, varname='NumOfBranches_pft', dim1name='pft',&
      long_name='branch number', units='none', interpinic_flag='skip', &
      data=dat1pr, missing_value=ispval, fill_value=ispval)        
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,NBR,datip_1d,iflgt=iflgt,iflgc=iflgc)
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,NumOfBranches_pft,datip_1d,iflgt=iflgt,iflgc=iflgc)
   else 
-    !print*,'NBR'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,NBR,datip_1d,iflgt=iflgt,iflgc=iflgc)  
+    !print*,'NumOfBranches_pft'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,NumOfBranches_pft,datip_1d,iflgt=iflgt,iflgc=iflgc)  
     dat1pr => datip_1d  
-    call restartvar(ncid, flag, varname='NBR', dim1name='pft',&
+    call restartvar(ncid, flag, varname='NumOfBranches_pft', dim1name='pft',&
      long_name='branch number', units='none', interpinic_flag='skip', &
      data=dat1pr, missing_value=ispval, fill_value=ispval)            
   endif 
@@ -1409,15 +1409,15 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrp_2d(1:npfts,1:JBR)
-    call restartvar(ncid, flag, varname='NBTB', dim1name='pft',dim2name='nbranches',&
+    call restartvar(ncid, flag, varname='BranchNumber_brchpft', dim1name='pft',dim2name='nbranches',&
      long_name='branch number', units='none', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,NBTB,datip_2d,iflgt=iflgt,iflgc=iflgc)          
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,BranchNumber_brchpft,datip_2d,iflgt=iflgt,iflgc=iflgc)          
   else
-    !print*,'NBTB'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,NBTB,datip_2d,iflgt=iflgt,iflgc=iflgc)     
+    !print*,'BranchNumber_brchpft'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,BranchNumber_brchpft,datip_2d,iflgt=iflgt,iflgc=iflgc)     
     datpr2 => datrp_2d(1:npfts,1:JBR)
-    call restartvar(ncid, flag, varname='NBTB', dim1name='pft',dim2name='nbranches',&
+    call restartvar(ncid, flag, varname='BranchNumber_brchpft', dim1name='pft',dim2name='nbranches',&
      long_name='branch number', units='none', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
   endif  
@@ -2060,15 +2060,15 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrp_2d(1:npfts,1:JBR)
-    call restartvar(ncid, flag, varname='CanPBLA', dim1name='pft',dim2name='nbranches',&
+    call restartvar(ncid, flag, varname='CanopyBranchLeafA_pft', dim1name='pft',dim2name='nbranches',&
      long_name='plant branch leaf area', units='m2 d-2', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,CanPBLA,datrp_2d,iflgt=iflgt,iflgc=iflgc) 
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,CanopyBranchLeafA_pft,datrp_2d,iflgt=iflgt,iflgc=iflgc) 
   else
-    !print*,'CanPBLA'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,CanPBLA,datrp_2d,iflgt=iflgt,iflgc=iflgc)   
+    !print*,'CanopyBranchLeafA_pft'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,CanopyBranchLeafA_pft,datrp_2d,iflgt=iflgt,iflgc=iflgc)   
     datpr2 => datrp_2d(1:npfts,1:JBR)
-    call restartvar(ncid, flag, varname='CanPBLA', dim1name='pft',dim2name='nbranches',&
+    call restartvar(ncid, flag, varname='CanopyBranchLeafA_pft', dim1name='pft',dim2name='nbranches',&
      long_name='plant branch leaf area', units='m2 d-2', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
   endif  

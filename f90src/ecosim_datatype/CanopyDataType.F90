@@ -119,7 +119,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  CNET(:,:,:)                        !canopy net CO2 exchange, [g d-2 h-1]
   real(r8),target,allocatable ::  CanopyLeafCpft_lyr(:,:,:,:)                     !canopy layer leaf C, [g d-2]
   real(r8),target,allocatable ::  CanopyNonstructElements_pft(:,:,:,:)   !canopy nonstructural element, [g d-2]
-  real(r8),target,allocatable ::  CEPOLP(:,:,:,:)                    !canopy nonstructural element concentration, [g d-2]
+  real(r8),target,allocatable ::  CanopyNonstructElementConc_pft(:,:,:,:)                    !canopy nonstructural element concentration, [g d-2]
   real(r8),target,allocatable ::  CanopyStemApft_lyr(:,:,:,:)                   !plant canopy layer stem area, [m2 d-2]
   real(r8),target,allocatable ::  EPOLNP(:,:,:,:)                    !canopy nodule nonstructural element, [g d-2]
   real(r8),target,allocatable ::  CanPBStalkC(:,:,:,:)                    !branch active stalk C, [g d-2]
@@ -146,7 +146,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  CanPLNBLA(:,:,:,:,:,:)                 !layer leaf area, [m2 d-2]
   real(r8),target,allocatable ::  WSLF(:,:,:,:,:)                    !layer leaf protein C, [g d-2]
   real(r8),target,allocatable ::  WSSHE(:,:,:,:,:)                   !layer sheath protein C, [g d-2]
-  real(r8),target,allocatable ::  CCPLNP(:,:,:)                      !nodule nonstructural C, [g d-2]
+  real(r8),target,allocatable ::  NoduleNonstructCconc_pft(:,:,:)                      !nodule nonstructural C, [g d-2]
   real(r8),target,allocatable ::  GRWTB(:,:,:,:)                     !maximum grain C during grain fill, [g d-2]
   real(r8),target,allocatable ::  WTSTDE(:,:,:,:,:)                  !standing dead element fraction, [g d-2]
   real(r8),target,allocatable ::  WTSTGE(:,:,:,:)                    !standing dead element, [g d-2]
@@ -268,7 +268,7 @@ module CanopyDataType
   allocate(CNET(JP,JY,JX));     CNET=0._r8
   allocate(CanopyLeafCpft_lyr(JC,JP,JY,JX)); CanopyLeafCpft_lyr=0._r8
   allocate(CanopyNonstructElements_pft(NumOfPlantChemElements,JP,JY,JX));   CanopyNonstructElements_pft=0._r8
-  allocate(CEPOLP(NumOfPlantChemElements,JP,JY,JX));   CEPOLP=0._r8
+  allocate(CanopyNonstructElementConc_pft(NumOfPlantChemElements,JP,JY,JX));   CanopyNonstructElementConc_pft=0._r8
   allocate(CanopyStemApft_lyr(JC,JP,JY,JX)); CanopyStemApft_lyr=0._r8
   allocate(EPOLNP(NumOfPlantChemElements,JP,JY,JX));   EPOLNP=0._r8
   allocate(CanPBStalkC(JBR,JP,JY,JX));CanPBStalkC=0._r8
@@ -295,7 +295,7 @@ module CanopyDataType
   allocate(CanPLNBLA(JC,0:JNODS,JBR,JP,JY,JX));CanPLNBLA=0._r8
   allocate(WSLF(0:JNODS,JBR,JP,JY,JX));WSLF=0._r8
   allocate(WSSHE(0:JNODS,JBR,JP,JY,JX));WSSHE=0._r8
-  allocate(CCPLNP(JP,JY,JX));   CCPLNP=0._r8
+  allocate(NoduleNonstructCconc_pft(JP,JY,JX));   NoduleNonstructCconc_pft=0._r8
   allocate(GRWTB(JBR,JP,JY,JX)); GRWTB=0._r8
   allocate(WTSTDE(NumOfPlantChemElements,jsken,JP,JY,JX)); WTSTDE=0._r8
   allocate(WTSTGE(NumOfPlantChemElements,JP,JY,JX));    WTSTGE=0._r8
@@ -418,7 +418,7 @@ module CanopyDataType
   call destroy(CNET)
   call destroy(CanopyLeafCpft_lyr)
   call destroy(CanopyNonstructElements_pft)
-  call destroy(CEPOLP)
+  call destroy(CanopyNonstructElementConc_pft)
   call destroy(CanopyStemApft_lyr)
   call destroy(EPOLNP)
   call destroy(CanPBStalkC)
@@ -445,7 +445,7 @@ module CanopyDataType
   call destroy(CanPLNBLA)
   call destroy(WSLF)
   call destroy(WSSHE)
-  call destroy(CCPLNP)
+  call destroy(NoduleNonstructCconc_pft)
   call destroy(GRWTB)
   call destroy(WTSTDE)
   call destroy(WTSTGE)

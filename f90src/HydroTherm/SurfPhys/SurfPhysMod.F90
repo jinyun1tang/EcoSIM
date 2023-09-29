@@ -264,7 +264,7 @@ contains
   real(r8), dimension(:,:), intent(out):: ResistanceLitRLay
   real(r8) :: FracSoiPAsAir0,DFVR  
   real(r8) :: PAREX,PARSX,RAS
-  real(r8) :: ALFZ,UAG
+  real(r8) :: ALFZ,WindSpeedGrnd
 !
 !     BOUNDARY LAYER CONDUCTANCES FOR EXPORT TO TRNSFR.F
 !
@@ -276,7 +276,7 @@ contains
 !     FracSWRad2Grnd=fraction of shortwave radiation at ground surface
 !     BndlResistAboveCanG,RAC=isothermal blr above canopy, canopy blr
 !     ZT,SoiSurfRoughnesst0=canopy, surface roughness heights
-!     UA,UAG=windspeeds above,below canopy
+!     UA,WindSpeedGrnd=windspeeds above,below canopy
 !     VPQ,VPA=vapor pressure within,above canopy
 !     TKQ,TairK=temperature within,above canopy
 !     TLEX,TSHX=net latent,sensible heat fluxes x blrs from prev hour
@@ -291,10 +291,10 @@ contains
     BndlResistCanG(NY,NX)=AMIN1(RACX,AZMAX1(GridMaxCanopyHeight(NY,NX)*EXP(ALFZ) &
       /(ALFZ/BndlResistAboveCanG(NY,NX))*AZMAX1(EXP(-ALFZ*SoiSurfRoughnesst0(NY,NX)/GridMaxCanopyHeight(NY,NX)) &
       -EXP(-ALFZ*(ZeroPlanDisp(NY,NX)+RoughHeight(NY,NX))/GridMaxCanopyHeight(NY,NX)))))
-    UAG=UA(NY,NX)*EXP(-ALFZ)
+    WindSpeedGrnd=WindSpeedAtm(NY,NX)*EXP(-ALFZ)
   ELSE
     BndlResistCanG(NY,NX)=0.0_r8
-    UAG=UA(NY,NX)
+    WindSpeedGrnd=WindSpeedAtm(NY,NX)
   ENDIF
 !
 !     AERODYNAMIC RESISTANCE OF SNOWPACK, RESIDUE AND SOIL
@@ -990,7 +990,7 @@ contains
   WatFLo2Litr(NY,NX)=WatFLo2Litr(NY,NX)+WatFLow2LitR(NY,NX)
   HeatFLo2LitrByWat(NY,NX)=HeatFLo2LitrByWat(NY,NX)+HeatFLoByWat2LitRi(NY,NX)
 
-  HeatRadiation(NY,NX)=HeatRadiation(NY,NX)+Radnet2LitGrnd+Radnet2Snow
+  HeatByRadiation(NY,NX)=HeatByRadiation(NY,NX)+Radnet2LitGrnd+Radnet2Snow
   HeatSensAir2Surf(NY,NX)=HeatSensAir2Surf(NY,NX)+HeatSensAir2Grnd+HeatSensAir2Snow
   HeatEvapAir2Surf(NY,NX)=HeatEvapAir2Surf(NY,NX)+LatentHeatEvapAir2Grnd+LatentHeatAir2Sno
   HeatSensVapAir2Surf(NY,NX)=HeatSensVapAir2Surf(NY,NX)+HeatSensVapAir2Soi+HeatSensEvap

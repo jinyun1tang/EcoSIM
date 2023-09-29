@@ -136,7 +136,7 @@ implicit none
     EvapLitR2Soi1,HeatSensAir2LitR,HeatSensEvapAir2LitR,HeatSensLitR2Soi1,&
     HeatSensVapLitR2Soi1,LatentHeatAir2LitR,LWRadLitR,Radnet2LitR,TotHeatAir2LitR)
 
-  HeatRadiation(NY,NX)=HeatRadiation(NY,NX)+Radnet2LitR
+  HeatByRadiation(NY,NX)=HeatByRadiation(NY,NX)+Radnet2LitR
   HeatNet2Surf(NY,NX)=HeatNet2Surf(NY,NX)+Radnet2LitR+HeatSensEvapAir2LitR+HeatSensAir2LitR
   HeatEvapAir2Surf(NY,NX)=HeatEvapAir2Surf(NY,NX)+LatentHeatAir2LitR
   HeatSensVapAir2Surf(NY,NX)=HeatSensVapAir2Surf(NY,NX)+HeatSensEvapAir2LitR

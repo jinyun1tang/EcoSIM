@@ -17,7 +17,7 @@ module RootDataType
   integer,target,allocatable ::  NI(:,:,:)                           !maximum soil layer number for all root axes, [-]
   real(r8),target,allocatable ::  BiomGrowthYieldRoot(:,:,:)                        !root growth yield, [g g-1]
   real(r8),target,allocatable ::  PR(:,:,:)                          !threshold root nonstructural C content for initiating new root axis, [g g-1]
-  real(r8),target,allocatable ::  CWSRT(:,:,:)                       !fraction of remobilizable nonstructural biomass in root, [-]
+  real(r8),target,allocatable ::  RootFracRemobilizableBiom(:,:,:)                       !fraction of remobilizable nonstructural biomass in root, [-]
   real(r8),target,allocatable ::  DMVL(:,:,:,:)                      !root volume:mass ratio, [m3 g-1]
   real(r8),target,allocatable ::  MaxPrimRootRadius1(:,:,:,:)                    !root diameter primary axes, [m]
   real(r8),target,allocatable ::  MaxSecndRootRadius1(:,:,:,:)                    !root diameter secondary axes, [m]
@@ -81,9 +81,9 @@ module RootDataType
   real(r8),target,allocatable ::  WTNDE(:,:,:,:)                     !root total nodule mass, [g d-2]
   real(r8),target,allocatable ::  WTRTL(:,:,:,:,:)                   !root layer structural C, [g d-2]
   real(r8),target,allocatable ::  EPOOLR(:,:,:,:,:,:)                !root  layer nonstructural element, [g d-2]
-  real(r8),target,allocatable ::  CEPOLR(:,:,:,:,:,:)                !root  layer nonstructural element concentration, [g g-1]
+  real(r8),target,allocatable ::  RootNonstructElementConcpft_vr(:,:,:,:,:,:)                !root  layer nonstructural element concentration, [g g-1]
   real(r8),target,allocatable ::  RTWT1E(:,:,:,:,:,:)                   !root C primary axes, [g d-2]
-  real(r8),target,allocatable ::  CWSRTL(:,:,:,:,:)                  !root layer protein C concentration, [g g-1]
+  real(r8),target,allocatable ::  RootProteinConc_pftvr(:,:,:,:,:)                  !root layer protein C concentration, [g g-1]
 !----------------------------------------------------------------------
 
 contains
@@ -99,7 +99,7 @@ contains
   allocate(NI(JP,JY,JX));       NI=0
   allocate(BiomGrowthYieldRoot(JP,JY,JX));     BiomGrowthYieldRoot=0._r8
   allocate(PR(JP,JY,JX));       PR=0._r8
-  allocate(CWSRT(JP,JY,JX));    CWSRT=0._r8
+  allocate(RootFracRemobilizableBiom(JP,JY,JX));    RootFracRemobilizableBiom=0._r8
   allocate(DMVL(jroots,JP,JY,JX));   DMVL=0._r8
   allocate(MaxPrimRootRadius1(jroots,JP,JY,JX)); MaxPrimRootRadius1=0._r8
   allocate(MaxSecndRootRadius1(jroots,JP,JY,JX)); MaxSecndRootRadius1=0._r8
@@ -163,9 +163,9 @@ contains
   allocate(WTNDE(NumOfPlantChemElements,JP,JY,JX));  WTNDE=0._r8
   allocate(WTRTL(jroots,JZ,JP,JY,JX));WTRTL=0._r8
   allocate(EPOOLR(NumOfPlantChemElements,jroots,JZ,JP,JY,JX));EPOOLR=0._r8
-  allocate(CEPOLR(NumOfPlantChemElements,jroots,JZ,JP,JY,JX));CEPOLR=0._r8
+  allocate(RootNonstructElementConcpft_vr(NumOfPlantChemElements,jroots,JZ,JP,JY,JX));RootNonstructElementConcpft_vr=0._r8
   allocate(RTWT1E(NumOfPlantChemElements,jroots,JRS,JP,JY,JX));RTWT1E=0._r8
-  allocate(CWSRTL(jroots,JZ,JP,JY,JX));CWSRTL=0._r8
+  allocate(RootProteinConc_pftvr(jroots,JZ,JP,JY,JX));RootProteinConc_pftvr=0._r8
   end subroutine InitRootData
 
 !----------------------------------------------------------------------
@@ -179,7 +179,7 @@ contains
   call destroy(NI)
   call destroy(BiomGrowthYieldRoot)
   call destroy(PR)
-  call destroy(CWSRT)
+  call destroy(RootFracRemobilizableBiom)
   call destroy(DMVL)
   call destroy(MaxPrimRootRadius1)
   call destroy(MaxSecndRootRadius1)
@@ -243,9 +243,9 @@ contains
   call destroy(WTNDE)
   call destroy(WTRTL)
   call destroy(EPOOLR)
-  call destroy(CEPOLR)
+  call destroy(RootNonstructElementConcpft_vr)
   call destroy(RTWT1E)
-  call destroy(CWSRTL)
+  call destroy(RootProteinConc_pftvr)
   end subroutine DestructRootData
 
 end module RootDataType

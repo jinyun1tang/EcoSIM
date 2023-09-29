@@ -368,7 +368,7 @@ implicit none
   associate(                          &
     RTWT1E  =>  plt_biom%RTWT1E     , &
     WTRT2E  =>  plt_biom%WTRT2E     , &
-    CEPOLR  =>  plt_biom%CEPOLR     , &
+    RootNonstructElementConcpft_vr  =>  plt_biom%RootNonstructElementConcpft_vr     , &
     WTRT1E  =>  plt_biom%WTRT1E     , &
     EPOOLR  =>  plt_biom%EPOOLR     , &
     WSRTL   =>  plt_biom%WSRTL      , &
@@ -450,10 +450,10 @@ implicit none
 !     CNPG=N,P constraint on growth respiration
 !     CNKI,CPKI=nonstructural N,P inhibition constant on growth
 !
-      IF(CEPOLR(ielmc,N,L,NZ).GT.ZERO)THEN
-        CNPG=AMIN1(CEPOLR(ielmn,N,L,NZ)/(CEPOLR(ielmn,N,L,NZ) &
-          +CEPOLR(ielmc,N,L,NZ)*CNKI),CEPOLR(ielmp,N,L,NZ) &
-          /(CEPOLR(ielmp,N,L,NZ)+CEPOLR(ielmc,N,L,NZ)*CPKI))
+      IF(RootNonstructElementConcpft_vr(ielmc,N,L,NZ).GT.ZERO)THEN
+        CNPG=AMIN1(RootNonstructElementConcpft_vr(ielmn,N,L,NZ)/(RootNonstructElementConcpft_vr(ielmn,N,L,NZ) &
+          +RootNonstructElementConcpft_vr(ielmc,N,L,NZ)*CNKI),RootNonstructElementConcpft_vr(ielmp,N,L,NZ) &
+          /(RootNonstructElementConcpft_vr(ielmp,N,L,NZ)+RootNonstructElementConcpft_vr(ielmc,N,L,NZ)*CPKI))
       ELSE
         CNPG=1.0_r8
       ENDIF
@@ -558,15 +558,15 @@ implicit none
 !     RCCZR,RCCYR=min,max fractions for root C recycling
 !     RCCXR,RCCQR=max fractions for root N,P recycling
 !
-      IF(IDAY(1,NB1(NZ),NZ).NE.0.AND.CEPOLR(ielmc,N,L,NZ).GT.ZERO)THEN
-        CCC=AZMAX1(AMIN1(1.0_r8,safe_adb(CEPOLR(ielmn,N,L,NZ),CEPOLR(ielmn,N,L,NZ) &
-          +CEPOLR(ielmc,N,L,NZ)*CNKI) &
-          ,safe_adb(CEPOLR(ielmp,N,L,NZ),CEPOLR(ielmp,N,L,NZ) &
-          +CEPOLR(ielmc,N,L,NZ)*CPKI)))
+      IF(IDAY(1,NB1(NZ),NZ).NE.0.AND.RootNonstructElementConcpft_vr(ielmc,N,L,NZ).GT.ZERO)THEN
+        CCC=AZMAX1(AMIN1(1.0_r8,safe_adb(RootNonstructElementConcpft_vr(ielmn,N,L,NZ),RootNonstructElementConcpft_vr(ielmn,N,L,NZ) &
+          +RootNonstructElementConcpft_vr(ielmc,N,L,NZ)*CNKI) &
+          ,safe_adb(RootNonstructElementConcpft_vr(ielmp,N,L,NZ),RootNonstructElementConcpft_vr(ielmp,N,L,NZ) &
+          +RootNonstructElementConcpft_vr(ielmc,N,L,NZ)*CPKI)))
         CNC=AZMAX1(AMIN1(1.0_r8 &
-          ,safe_adb(CEPOLR(ielmc,N,L,NZ),CEPOLR(ielmc,N,L,NZ)+CEPOLR(ielmn,N,L,NZ)/CNKI)))
+          ,safe_adb(RootNonstructElementConcpft_vr(ielmc,N,L,NZ),RootNonstructElementConcpft_vr(ielmc,N,L,NZ)+RootNonstructElementConcpft_vr(ielmn,N,L,NZ)/CNKI)))
         CPC=AZMAX1(AMIN1(1.0_r8 &
-          ,safe_adb(CEPOLR(ielmc,N,L,NZ),CEPOLR(ielmc,N,L,NZ)+CEPOLR(ielmp,N,L,NZ)/CPKI)))
+          ,safe_adb(RootNonstructElementConcpft_vr(ielmc,N,L,NZ),RootNonstructElementConcpft_vr(ielmc,N,L,NZ)+RootNonstructElementConcpft_vr(ielmp,N,L,NZ)/CPKI)))
       ELSE
         CCC=0._r8
         CNC=0._r8
@@ -773,10 +773,10 @@ implicit none
 !     CNPG=N,P constraint on growth respiration
 !     CNKI,CPKI=nonstructural N,P inhibition constant on growth
 !
-              IF(CEPOLR(ielmc,N,L,NZ).GT.ZERO)THEN
-                CNPG=AMIN1(CEPOLR(ielmn,N,L,NZ)/(CEPOLR(ielmn,N,L,NZ) &
-                  +CEPOLR(ielmc,N,L,NZ)*CNKI),CEPOLR(ielmp,N,L,NZ) &
-                  /(CEPOLR(ielmp,N,L,NZ)+CEPOLR(ielmc,N,L,NZ)*CPKI))
+              IF(RootNonstructElementConcpft_vr(ielmc,N,L,NZ).GT.ZERO)THEN
+                CNPG=AMIN1(RootNonstructElementConcpft_vr(ielmn,N,L,NZ)/(RootNonstructElementConcpft_vr(ielmn,N,L,NZ) &
+                  +RootNonstructElementConcpft_vr(ielmc,N,L,NZ)*CNKI),RootNonstructElementConcpft_vr(ielmp,N,L,NZ) &
+                  /(RootNonstructElementConcpft_vr(ielmp,N,L,NZ)+RootNonstructElementConcpft_vr(ielmc,N,L,NZ)*CPKI))
               ELSE
                 CNPG=1.0_r8
               ENDIF
@@ -1080,7 +1080,7 @@ implicit none
 ! begin_execution
   associate(                          &
     RTWT1E  =>  plt_biom%RTWT1E     , &
-    CEPOLR  =>  plt_biom%CEPOLR     , &
+    RootNonstructElementConcpft_vr  =>  plt_biom%RootNonstructElementConcpft_vr     , &
     ZEROP   =>  plt_biom%ZEROP      , &
     ZERO    =>  plt_site%ZERO       , &
     icwood  =>  pltpar%icwood       , &
@@ -1106,11 +1106,11 @@ implicit none
 !     RCCZR,RCCYR=min,max fractions for root C recycling
 !     RCCXR,RCCQR=max fractions for root N,P recycling
 !
-  IF(IDAY(1,NB1(NZ),NZ).NE.0.AND.CEPOLR(ielmc,N,L,NZ).GT.ZERO)THEN
-    CCC=AZMAX1(AMIN1(1.0_r8,safe_adb(CEPOLR(ielmn,N,L,NZ),CEPOLR(ielmn,N,L,NZ)+CEPOLR(ielmc,N,L,NZ)*CNKI) &
-      ,safe_adb(CEPOLR(ielmp,N,L,NZ),CEPOLR(ielmp,N,L,NZ)+CEPOLR(ielmc,N,L,NZ)*CPKI)))
-    CNC=AZMAX1(AMIN1(1.0_r8,safe_adb(CEPOLR(ielmc,N,L,NZ),CEPOLR(ielmc,N,L,NZ)+CEPOLR(ielmn,N,L,NZ)/CNKI)))
-    CPC=AZMAX1(AMIN1(1.0_r8,safe_adb(CEPOLR(ielmc,N,L,NZ),CEPOLR(ielmc,N,L,NZ)+CEPOLR(ielmp,N,L,NZ)/CPKI)))
+  IF(IDAY(1,NB1(NZ),NZ).NE.0.AND.RootNonstructElementConcpft_vr(ielmc,N,L,NZ).GT.ZERO)THEN
+    CCC=AZMAX1(AMIN1(1.0_r8,safe_adb(RootNonstructElementConcpft_vr(ielmn,N,L,NZ),RootNonstructElementConcpft_vr(ielmn,N,L,NZ)+RootNonstructElementConcpft_vr(ielmc,N,L,NZ)*CNKI) &
+      ,safe_adb(RootNonstructElementConcpft_vr(ielmp,N,L,NZ),RootNonstructElementConcpft_vr(ielmp,N,L,NZ)+RootNonstructElementConcpft_vr(ielmc,N,L,NZ)*CPKI)))
+    CNC=AZMAX1(AMIN1(1.0_r8,safe_adb(RootNonstructElementConcpft_vr(ielmc,N,L,NZ),RootNonstructElementConcpft_vr(ielmc,N,L,NZ)+RootNonstructElementConcpft_vr(ielmn,N,L,NZ)/CNKI)))
+    CPC=AZMAX1(AMIN1(1.0_r8,safe_adb(RootNonstructElementConcpft_vr(ielmc,N,L,NZ),RootNonstructElementConcpft_vr(ielmc,N,L,NZ)+RootNonstructElementConcpft_vr(ielmp,N,L,NZ)/CPKI)))
   ELSE
     CCC=0._r8
     CNC=0._r8
@@ -1520,7 +1520,7 @@ implicit none
   associate(                                &
     FWODBE     =>   plt_allom%FWODBE  , &
     FWODRE     =>   plt_allom%FWODRE  , &
-    CEPOLR     =>   plt_biom%CEPOLR   , &
+    RootNonstructElementConcpft_vr     =>   plt_biom%RootNonstructElementConcpft_vr   , &
     RTWT1E     =>   plt_biom%RTWT1E   , &
     WTRT1E     =>   plt_biom%WTRT1E   , &
     WTRT2E     =>   plt_biom%WTRT2E   , &
@@ -1557,7 +1557,7 @@ implicit none
     NI         =>   plt_morph%NI      , &
     MY         =>   plt_morph%MY      , &
     NRT        =>   plt_morph%NRT     , &
-    NBR        =>   plt_morph%NBR       &
+    NumOfBranches_pft        =>   plt_morph%NumOfBranches_pft       &
   )
 !
 !     TRANSFER NON-STRUCTURAL C,N,P AMONG BRANCH LEAVES
@@ -1570,12 +1570,12 @@ implicit none
 !     CanPBLeafShethC=leaf+petiole mass
 !     CPOOL,ZPOOL,PPOOL=non-structural C,N,P mass in branch
 !
-  IF(NBR(NZ).GT.1)THEN
+  IF(NumOfBranches_pft(NZ).GT.1)THEN
     WTPLTT=0._r8
     CPOOLT=0._r8
     ZPOOLT=0._r8
     PPOOLT=0._r8
-    D300: DO NB=1,NBR(NZ)
+    D300: DO NB=1,NumOfBranches_pft(NZ)
       IF(IDTHB(NB,NZ).EQ.ibralive)THEN
         IF(HourCounter4LeafOut_brch(NB,NZ).GT.ATRPX(ISTYP(NZ)))THEN
           WTLSBZ(NB)=AZMAX1(CanPBLeafShethC(NB,NZ))
@@ -1589,7 +1589,7 @@ implicit none
         ENDIF
       ENDIF
     ENDDO D300
-    D305: DO NB=1,NBR(NZ)
+    D305: DO NB=1,NumOfBranches_pft(NZ)
       IF(IDTHB(NB,NZ).EQ.ibralive)THEN
         IF(HourCounter4LeafOut_brch(NB,NZ).GT.ATRPX(ISTYP(NZ)))THEN
           IF(WTPLTT.GT.ZEROP(NZ).AND.CPOOLT.GT.ZEROP(NZ))THEN
@@ -1616,12 +1616,12 @@ implicit none
 !     WTRSVB,WTRSBN,WTRSBP=stalk reserve C,N,P mass
 !     IDAY(7,=start of grain filling and setting max seed size
 !
-  IF(NBR(NZ).GT.1)THEN
+  IF(NumOfBranches_pft(NZ).GT.1)THEN
     WTSTKT=0._r8
     WTRSVT=0._r8
     WTRSNT=0._r8
     WTRSPT=0._r8
-    D330: DO NB=1,NBR(NZ)
+    D330: DO NB=1,NumOfBranches_pft(NZ)
       IF(IDTHB(NB,NZ).EQ.ibralive)THEN
         IF(IDAY(7,NB,NZ).NE.0)THEN
           WTSTKT=WTSTKT+CanPBStalkC(NB,NZ)
@@ -1632,7 +1632,7 @@ implicit none
       ENDIF
     ENDDO D330
     IF(WTSTKT.GT.ZEROP(NZ).AND.WTRSVT.GT.ZEROP(NZ))THEN
-      D335: DO NB=1,NBR(NZ)
+      D335: DO NB=1,NumOfBranches_pft(NZ)
         IF(IDTHB(NB,NZ).EQ.ibralive)THEN
           IF(IDAY(7,NB,NZ).NE.0)THEN
             WTRSVD=WTRSVT*CanPBStalkC(NB,NZ)-WTRSVBE(ielmc,NB,NZ)*WTSTKT
@@ -1695,9 +1695,11 @@ implicit none
   IF(IFLGZ.EQ.1.AND.ISTYP(NZ).NE.iplt_annual)THEN
     D5545: DO N=1,MY(NZ)
       D5550: DO L=NU,NI(NZ)
-        IF(CEPOLR(ielmc,N,L,NZ).GT.ZERO)THEN
-          CNL=CEPOLR(ielmc,N,L,NZ)/(CEPOLR(ielmc,N,L,NZ)+CEPOLR(ielmn,N,L,NZ)/CNKI)
-          CPL=CEPOLR(ielmc,N,L,NZ)/(CEPOLR(ielmc,N,L,NZ)+CEPOLR(ielmp,N,L,NZ)/CPKI)
+        IF(RootNonstructElementConcpft_vr(ielmc,N,L,NZ).GT.ZERO)THEN
+          CNL=RootNonstructElementConcpft_vr(ielmc,N,L,NZ)/(RootNonstructElementConcpft_vr(ielmc,N,L,NZ) &
+            +RootNonstructElementConcpft_vr(ielmn,N,L,NZ)/CNKI)
+          CPL=RootNonstructElementConcpft_vr(ielmc,N,L,NZ)/(RootNonstructElementConcpft_vr(ielmc,N,L,NZ) &
+            +RootNonstructElementConcpft_vr(ielmp,N,L,NZ)/CPKI)
         ELSE
           CNL=0._r8
           CPL=0._r8
@@ -1782,7 +1784,7 @@ implicit none
 !     WTLS,WTLSB=total,branch PFT leaf+petiole C mass
 !
   CanopyLeafShethC_pft(NZ)=0._r8
-  D309: DO NB=1,NBR(NZ)
+  D309: DO NB=1,NumOfBranches_pft(NZ)
     CanopyLeafShethC_pft(NZ)=CanopyLeafShethC_pft(NZ)+CanPBLeafShethC(NB,NZ)
   ENDDO D309
 !
@@ -1802,7 +1804,7 @@ implicit none
 !     CPOOL,ZPOOL,PPOOL=non-structural C,N,P mass in branch
 !     CPOOLR,ZPOOLR,PPOOLR=non-structural C,N,P mass in root
 !
-  D310: DO NB=1,NBR(NZ)
+  D310: DO NB=1,NumOfBranches_pft(NZ)
     IF(IDTHB(NB,NZ).EQ.ibralive)THEN
       IF(CanopyLeafShethC_pft(NZ).GT.ZEROP(NZ))THEN
         FWTB(NB)=AZMAX1(CanPBLeafShethC(NB,NZ)/CanopyLeafShethC_pft(NZ))
