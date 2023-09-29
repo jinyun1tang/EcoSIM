@@ -7,7 +7,8 @@ module NitroPars
   use EcoSimConst
   implicit none
   public
-  character(len=*), private, parameter :: mod_filename = __FILE__
+  character(len=*), private, parameter :: mod_filename = &
+  __FILE__
 
   save
 ! SUBSTRATE DECOMPOSITION BY MICROBIAL POPULATIONS

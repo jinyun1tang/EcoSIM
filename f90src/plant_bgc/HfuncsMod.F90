@@ -13,7 +13,8 @@ module HfuncsMod
   private
 
 
-  character(len=*), parameter :: mod_filename = __FILE__
+  character(len=*), parameter :: mod_filename = &
+  __FILE__
 
   real(r8) :: RLA,STK,TKCO,TFNP
   real(r8) :: WFNG
@@ -203,7 +204,7 @@ module HfuncsMod
 
           IF(DATAP(NZ).NE.'NO'.AND.IDTH(NZ).EQ.0)then
             IFLGC(NZ)=PlantIsActive
-          endif  
+          endif
         ENDIF
       ELSE
         IFLGC(NZ)=ipltdorm
@@ -223,7 +224,7 @@ module HfuncsMod
         ENDIF
         IF(DATAP(NZ).NE.'NO'.AND.IDTH(NZ).EQ.0)then
           IFLGC(NZ)=PlantIsActive
-        endif  
+        endif
       ENDIF
     ENDIF
     IFLGT=IFLGT+IFLGC(NZ)
@@ -283,7 +284,7 @@ module HfuncsMod
 ! FNOD=scales node number for perennial vegetation (e.g. trees)
 ! NNOD=number of concurrently growing nodes
 ! XTLI,GROUP=node number at planting,floral initiation
-! IBTYP: setup for phenologically-driven above-ground turnover 
+! IBTYP: setup for phenologically-driven above-ground turnover
 
 
   IF(IFLGI(NZ).EQ.0)THEN

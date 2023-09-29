@@ -7,7 +7,8 @@ module ChemTranspDataType
   implicit none
 
   save
-  character(len=*), private, parameter :: mod_filename = __FILE__
+  character(len=*), private, parameter :: mod_filename = &
+  __FILE__
   real(r8),target,allocatable ::  TFND(:,:,:)                        !temperature effect on diffusivity
   real(r8),target,allocatable ::  DISP(:,:,:,:)                      !aqueous dispersivity
 

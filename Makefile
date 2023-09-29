@@ -8,6 +8,8 @@ ifndef ATS
 	netcdfsys  = not-set
 endif
 
+TPL_INSTALL_PREFIX=/global/home/users/agraus/code/ats_dev_dir/amanzi_tpls-install-master-Debug
+
 # Options set on command line.
 debug      = not-set
 mpi        = not-set
@@ -132,19 +134,17 @@ ifeq ($(sanitize), 1)
   CONFIG_FLAGS += -DADDRESS_SANITIZER=1
 endif
 
-
 ifeq ($(ATS), 1)
   NETCDF_FFLAGS += $(TPL_INSTALL_PREFIX)/include
-  NETCDF_FLIBS += -L$(TPL_INSTALL_PREFIX)/lib -lnetcdff -lnetcdf -lnetcdf
+  NETCDF_FLIBS += -L$(TPL_INSTALL_PREFIX)/lib -lnetcdff -lnetcdf -lnetcdf -lhdf5
 else
   ifeq ($(netcdfsys), not-set)
     NETCDF_FFLAGS =""
     NETCDF_FLIBS =""
   else
-    NETCDF_FFLAGS = $(shell ./nc_config --prefix)/include/
-    NETCDF_FLIBS = $(shell ./nc_config --flibs)		
+    NETCDF_FFLAGS = $(shell ./nc_config --prefix --$(CC))/include/
+    NETCDF_FLIBS = $(shell ./nc_config --flibs --$(CC))
   endif
-
 endif
 
 CONFIG_FLAGS += -DTPL_NETCDF_INCLUDE_DIRS="$(NETCDF_FFLAGS)"

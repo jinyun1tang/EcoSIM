@@ -5,7 +5,8 @@ module GrosubPars
   implicit none
   public
   save
-  character(len=*),private, parameter :: mod_filename = __FILE__
+  character(len=*),private, parameter :: mod_filename = &
+  __FILE__
 ! PART1X,PART2X=modifiers to organ partitioning coefficients
 ! VMXC=rate constant for nonstructural C oxidation in respiration (h-1)
 ! FSNR=rate constant for litterfall at end of growing season (h-1)
@@ -193,8 +194,10 @@ module GrosubPars
   integer :: npfts
 
   if(.not. file_exists(pft_file_in))then
-    call endrun(msg='Fail to locate plant trait file specified by pft_file_in in ' &
-      //mod_filename,line=__LINE__)
+    !call endrun(msg='Fail to locate plant trait file specified by pft_file_in in ' &
+    !  //mod_filename,line=__LINE__)
+    write(*,*) "Setting PFTs to one"
+    npfts=1
   else
     npfts=get_dim_len(pft_file_in, 'npfts')
     allocate(pftss(npfts))

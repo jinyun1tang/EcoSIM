@@ -9,7 +9,8 @@ module restUtilMod
    use GridMod
   implicit none
   private
-  character(len=*), parameter :: mod_filename=__FILE__
+  character(len=*), parameter :: mod_filename=&
+  __FILE__
   public :: restartvar
   public :: cppft
   public :: cpcol
@@ -18,7 +19,7 @@ module restUtilMod
     module procedure cpcol_i_1d,cpcol_r_1d,cpcol_r_2d
     module procedure cpcol_r_3d,cpcol_r_4d,cpcol_r_5d
   end interface cpcol
-  
+
   interface cppft
     module procedure cppft_i_1d,cppft_i_2d,cppft_i_3d,cppft_r_1d
     module procedure cppft_r_2d,cppft_r_3d,cppft_r_4d,cppft_r_5d
@@ -26,15 +27,15 @@ module restUtilMod
 
   interface restartvar
     module procedure restartvar_int
-    module procedure restartvar_int_1d    
-    module procedure restartvar_int_2d    
-    module procedure restartvar_int_3d    
-    module procedure restartvar_real_sp   
+    module procedure restartvar_int_1d
+    module procedure restartvar_int_2d
+    module procedure restartvar_int_3d
+    module procedure restartvar_real_sp
     module procedure restartvar_real_sp_1d
     module procedure restartvar_real_sp_2d
     module procedure restartvar_real_sp_3d
-    module procedure restartvar_real_sp_4d    
-    module procedure restartvar_real_sp_5d        
+    module procedure restartvar_real_sp_4d
+    module procedure restartvar_real_sp_5d
   end interface restartvar
 
   integer,parameter, public :: iflag_interp = 1
@@ -63,13 +64,13 @@ module restUtilMod
     integer           , intent(in), optional :: fill_value       ! attribute for real
     integer           , intent(in), optional :: flag_values(:)   ! attribute for int
     integer           , intent(in), optional :: nvalid_range(2)  ! attribute for int
-    ! 
+    !
     ! Local variables
     character(len=*), parameter :: sub=trim(mod_filename)//'::'//'restartvar_int'
-    logical           :: readvar          ! was var read?    
+    logical           :: readvar          ! was var read?
     integer          :: ivalue
     type(var_desc_t) :: vardesc  ! local vardesc
-    integer          :: status   ! return error code 
+    integer          :: status   ! return error code
     integer          :: varid
     !----------------------------------------------------
 
@@ -136,13 +137,13 @@ module restUtilMod
     character(len=*)  , intent(in), optional :: flag_meanings(:) ! attribute
     real(r8)          , intent(in), optional :: missing_value    ! attribute for real
     real(r8)          , intent(in), optional :: fill_value       ! attribute for real
-    ! 
-    ! Local variables    
+    !
+    ! Local variables
     character(len=*), parameter :: sub=trim(mod_filename)//'::'//'restartvar_real_sp'
-    logical           :: readvar          ! was var read?    
+    logical           :: readvar          ! was var read?
     integer          :: ivalue
     type(var_desc_t) :: vardesc  ! local vardesc
-    integer          :: status   ! return error code 
+    integer          :: status   ! return error code
     integer          :: varid
     !----------------------------------------------------
 
@@ -184,7 +185,7 @@ module restUtilMod
     end if
 
     if (flag == 'read') then
-       
+
        if (.not. readvar .and. is_restart()) &
          call endrun('Reading '//trim(varname)//' from restart file failed in '//trim(sub),__LINE__)
     end if
@@ -216,11 +217,11 @@ module restUtilMod
 
     ! Local variables
     ! Local variables
-    character(len=*), parameter :: sub=trim(mod_filename)//'::'//'restartvar_int_arr'    
-    logical           :: readvar          ! was var read?    
+    character(len=*), parameter :: sub=trim(mod_filename)//'::'//'restartvar_int_arr'
+    logical           :: readvar          ! was var read?
     integer          :: ivalue
     type(var_desc_t) :: vardesc  ! local vardesc
-    integer          :: status   ! return error code 
+    integer          :: status   ! return error code
     integer          :: varid
     integer          :: lxtype   ! local external type (in case logical variable)
     !----------------------------------------------------
@@ -253,15 +254,15 @@ module restUtilMod
        if (present(units)) then
           call check_ret(ncd_putatt(ncid, varid, 'units', trim(units)),sub)
        end if
-      
+
        if (present(fill_value)) then
           call check_ret(ncd_putatt(ncid, varid, '_FillValue', fill_value),sub)
-       else 
+       else
           call check_ret(ncd_putatt(ncid, varid, '_FillValue', ispval),sub)
        end if
        if (present(missing_value)) then
           call check_ret(ncd_putatt(ncid, varid, 'missing_value', missing_value),sub)
-       else 
+       else
           call check_ret(ncd_putatt(ncid, varid, 'missing_value', ispval),sub)
        end if
 
@@ -296,7 +297,7 @@ module restUtilMod
     character(len=*)  , intent(in)           :: interpinic_flag  ! interpolate variable using interpinic
     integer           , pointer              :: data(:,:)
     character(len=*)  , intent(in)           :: dim1name         ! dimension name
-    character(len=*)  , intent(in)           :: dim2name         ! dimension name    
+    character(len=*)  , intent(in)           :: dim2name         ! dimension name
     character(len=*)  , intent(in), optional :: units            ! long name for variable
     character(len=*)  , intent(in), optional :: comment          ! attribute
     character(len=*)  , intent(in), optional :: flag_meanings(:) ! attribute
@@ -308,11 +309,11 @@ module restUtilMod
 
     ! Local variables
     ! Local variables
-    character(len=*), parameter :: sub=trim(mod_filename)//'::'//'restartvar_int_2d'    
-    logical           :: readvar          ! was var read?    
+    character(len=*), parameter :: sub=trim(mod_filename)//'::'//'restartvar_int_2d'
+    logical           :: readvar          ! was var read?
     integer          :: ivalue
     type(var_desc_t) :: vardesc  ! local vardesc
-    integer          :: status   ! return error code 
+    integer          :: status   ! return error code
     integer          :: varid
     integer          :: lxtype   ! local external type (in case logical variable)
     !----------------------------------------------------
@@ -345,15 +346,15 @@ module restUtilMod
        if (present(units)) then
           call check_ret(ncd_putatt(ncid, varid, 'units', trim(units)),sub)
        end if
-      
+
        if (present(fill_value)) then
           call check_ret(ncd_putatt(ncid, varid, '_FillValue', fill_value),sub)
-       else 
+       else
           call check_ret(ncd_putatt(ncid, varid, '_FillValue', ispval),sub)
        end if
        if (present(missing_value)) then
           call check_ret(ncd_putatt(ncid, varid, 'missing_value', missing_value),sub)
-       else 
+       else
           call check_ret(ncd_putatt(ncid, varid, 'missing_value', ispval),sub)
        end if
 
@@ -372,7 +373,7 @@ module restUtilMod
          call endrun('Reading '//trim(varname)//' from restart file failed in '//trim(sub),__LINE__)
     end if
 
-  end subroutine restartvar_int_2d  
+  end subroutine restartvar_int_2d
 !-----------------------------------------------------------------------
   subroutine restartvar_int_3d(ncid, flag, varname, dim1name, dim2name, dim3name, &
        long_name, units, interpinic_flag, data, &
@@ -389,7 +390,7 @@ module restUtilMod
     integer           , pointer              :: data(:,:,:)
     character(len=*)  , intent(in)           :: dim1name         ! dimension name
     character(len=*)  , intent(in)           :: dim2name         ! dimension name
-    character(len=*)  , intent(in)           :: dim3name         ! dimension name        
+    character(len=*)  , intent(in)           :: dim3name         ! dimension name
     character(len=*)  , intent(in), optional :: units            ! long name for variable
     character(len=*)  , intent(in), optional :: comment          ! attribute
     character(len=*)  , intent(in), optional :: flag_meanings(:) ! attribute
@@ -401,11 +402,11 @@ module restUtilMod
 
     ! Local variables
     ! Local variables
-    character(len=*), parameter :: sub=trim(mod_filename)//'::'//'restartvar_int_3d'    
-    logical           :: readvar          ! was var read?    
+    character(len=*), parameter :: sub=trim(mod_filename)//'::'//'restartvar_int_3d'
+    logical           :: readvar          ! was var read?
     integer          :: ivalue
     type(var_desc_t) :: vardesc  ! local vardesc
-    integer          :: status   ! return error code 
+    integer          :: status   ! return error code
     integer          :: varid
     integer          :: lxtype   ! local external type (in case logical variable)
     !----------------------------------------------------
@@ -438,15 +439,15 @@ module restUtilMod
        if (present(units)) then
           call check_ret(ncd_putatt(ncid, varid, 'units', trim(units)),sub)
        end if
-      
+
        if (present(fill_value)) then
           call check_ret(ncd_putatt(ncid, varid, '_FillValue', fill_value),sub)
-       else 
+       else
           call check_ret(ncd_putatt(ncid, varid, '_FillValue', ispval),sub)
        end if
        if (present(missing_value)) then
           call check_ret(ncd_putatt(ncid, varid, 'missing_value', missing_value),sub)
-       else 
+       else
           call check_ret(ncd_putatt(ncid, varid, 'missing_value', ispval),sub)
        end if
 
@@ -465,7 +466,7 @@ module restUtilMod
          call endrun('Reading '//trim(varname)//' from restart file failed in '//trim(sub),__LINE__)
     end if
 
-  end subroutine restartvar_int_3d  
+  end subroutine restartvar_int_3d
 !-----------------------------------------------------------------------
   subroutine restartvar_real_sp_1d(ncid, flag, varname,  dim1name,  &
        long_name, units, interpinic_flag, data, &
@@ -489,11 +490,11 @@ module restUtilMod
 
     ! Local variables
     ! Local variables
-    character(len=*), parameter :: sub=trim(mod_filename)//'::'//'restartvar_real_sp_1d'    
-    logical           :: readvar          ! was var read?    
+    character(len=*), parameter :: sub=trim(mod_filename)//'::'//'restartvar_real_sp_1d'
+    logical           :: readvar          ! was var read?
     integer          :: ivalue
     type(var_desc_t) :: vardesc  ! local vardesc
-    integer          :: status   ! return error code 
+    integer          :: status   ! return error code
     integer          :: varid
     integer          :: lxtype   ! local external type (in case logical variable)
     !----------------------------------------------------
@@ -526,15 +527,15 @@ module restUtilMod
        if (present(units)) then
           call check_ret(ncd_putatt(ncid, varid, 'units', trim(units)),sub)
        end if
-      
+
        if (present(fill_value)) then
           call check_ret(ncd_putatt(ncid, varid, '_FillValue', fill_value,ncd_double),sub)
-       else 
+       else
           call check_ret(ncd_putatt(ncid, varid, '_FillValue', spval,ncd_double),sub)
        end if
        if (present(missing_value)) then
           call check_ret(ncd_putatt(ncid, varid, 'missing_value', missing_value,ncd_double),sub)
-       else 
+       else
           call check_ret(ncd_putatt(ncid, varid, 'missing_value', spval,ncd_double),sub)
        end if
 
@@ -549,7 +550,7 @@ module restUtilMod
          call endrun('Reading restart file failed in '//trim(sub),__LINE__)
     end if
 
-  end subroutine restartvar_real_sp_1d  
+  end subroutine restartvar_real_sp_1d
 
 !-----------------------------------------------------------------------
   subroutine restartvar_real_sp_2d(ncid, flag, varname,  dim1name,  dim2name, &
@@ -565,7 +566,7 @@ module restUtilMod
     character(len=*)  , intent(in)           :: interpinic_flag  ! interpolate variable using interpinic
     real(r8)          , pointer              :: data(:,:)
     character(len=*)  , intent(in)           :: dim1name         ! dimension name
-    character(len=*)  , intent(in)           :: dim2name         ! dimension name    
+    character(len=*)  , intent(in)           :: dim2name         ! dimension name
     character(len=*)  , intent(in), optional :: units            ! long name for variable
     character(len=*)  , intent(in), optional :: comment          ! attribute
     character(len=*)  , intent(in), optional :: flag_meanings(:) ! attribute
@@ -575,11 +576,11 @@ module restUtilMod
 
     ! Local variables
     ! Local variables
-    character(len=*), parameter :: sub=trim(mod_filename)//'::'//'restartvar_real_sp_2d'    
-    logical           :: readvar          ! was var read?    
-    integer          :: ivalue    
+    character(len=*), parameter :: sub=trim(mod_filename)//'::'//'restartvar_real_sp_2d'
+    logical           :: readvar          ! was var read?
+    integer          :: ivalue
     type(var_desc_t) :: vardesc  ! local vardesc
-    integer          :: status   ! return error code 
+    integer          :: status   ! return error code
     integer          :: varid
     integer          :: lxtype   ! local external type (in case logical variable)
     !----------------------------------------------------
@@ -612,15 +613,15 @@ module restUtilMod
        if (present(units)) then
           call check_ret(ncd_putatt(ncid, varid, 'units', trim(units)),sub)
        end if
-      
+
        if (present(fill_value)) then
           call check_ret(ncd_putatt(ncid, varid, '_FillValue', fill_value,ncd_double),sub)
-       else 
+       else
           call check_ret(ncd_putatt(ncid, varid, '_FillValue', spval,ncd_double),sub)
        end if
        if (present(missing_value)) then
           call check_ret(ncd_putatt(ncid, varid, 'missing_value', missing_value,ncd_double),sub)
-       else 
+       else
           call check_ret(ncd_putatt(ncid, varid, 'missing_value', spval,ncd_double),sub)
        end if
 
@@ -635,7 +636,7 @@ module restUtilMod
          call endrun('Reading restart file failed in '//trim(sub),__LINE__)
     end if
 
-  end subroutine restartvar_real_sp_2d  
+  end subroutine restartvar_real_sp_2d
 
 !-----------------------------------------------------------------------
   subroutine restartvar_real_sp_3d(ncid, flag, varname,  dim1name,  dim2name, &
@@ -652,7 +653,7 @@ module restUtilMod
     real(r8)          , pointer              :: data(:,:,:)
     character(len=*)  , intent(in)           :: dim1name         ! dimension name
     character(len=*)  , intent(in)           :: dim2name         ! dimension name
-    character(len=*)  , intent(in)           :: dim3name         ! dimension name        
+    character(len=*)  , intent(in)           :: dim3name         ! dimension name
     character(len=*)  , intent(in), optional :: units            ! long name for variable
     character(len=*)  , intent(in), optional :: comment          ! attribute
     character(len=*)  , intent(in), optional :: flag_meanings(:) ! attribute
@@ -662,11 +663,11 @@ module restUtilMod
 
     ! Local variables
     ! Local variables
-    character(len=*), parameter :: sub=trim(mod_filename)//'::'//'restartvar_real_sp_3d'    
-    logical           :: readvar          ! was var read?    
+    character(len=*), parameter :: sub=trim(mod_filename)//'::'//'restartvar_real_sp_3d'
+    logical           :: readvar          ! was var read?
     integer          :: ivalue
     type(var_desc_t) :: vardesc  ! local vardesc
-    integer          :: status   ! return error code 
+    integer          :: status   ! return error code
     integer          :: varid
     integer          :: lxtype   ! local external type (in case logical variable)
     !----------------------------------------------------
@@ -699,21 +700,21 @@ module restUtilMod
        if (present(units)) then
           call check_ret(ncd_putatt(ncid, varid, 'units', trim(units)),sub)
        end if
-      
+
        if (present(fill_value)) then
           call check_ret(ncd_putatt(ncid, varid, '_FillValue', fill_value,ncd_double),sub)
-       else 
+       else
           call check_ret(ncd_putatt(ncid, varid, '_FillValue', spval,ncd_double),sub)
        end if
        if (present(missing_value)) then
           call check_ret(ncd_putatt(ncid, varid, 'missing_value', missing_value,ncd_double),sub)
-       else 
+       else
           call check_ret(ncd_putatt(ncid, varid, 'missing_value', spval,ncd_double),sub)
        end if
 
 
     else if (flag == 'read' .or. flag == 'write') then
-      
+
       call ncd_io(varname=trim(varname), data=data, &
         dim1name=trim(dim1name),  flag=flag, ncid=ncid, readvar=readvar)
     end if
@@ -723,7 +724,7 @@ module restUtilMod
          call endrun('Reading '//trim(varname)//' from restart file failed in '//trim(sub),__LINE__)
     end if
 
-  end subroutine restartvar_real_sp_3d  
+  end subroutine restartvar_real_sp_3d
 !-----------------------------------------------------------------------
   subroutine restartvar_real_sp_4d(ncid, flag, varname,  dim1name,  dim2name, &
        dim3name, dim4name, long_name, units, interpinic_flag, data,  &
@@ -739,8 +740,8 @@ module restUtilMod
     real(r8)          , pointer              :: data(:,:,:,:)
     character(len=*)  , intent(in)           :: dim1name         ! dimension name
     character(len=*)  , intent(in)           :: dim2name         ! dimension name
-    character(len=*)  , intent(in)           :: dim3name         ! dimension name        
-    character(len=*)  , intent(in)           :: dim4name         ! dimension name            
+    character(len=*)  , intent(in)           :: dim3name         ! dimension name
+    character(len=*)  , intent(in)           :: dim4name         ! dimension name
     character(len=*)  , intent(in), optional :: units            ! long name for variable
     character(len=*)  , intent(in), optional :: comment          ! attribute
     character(len=*)  , intent(in), optional :: flag_meanings(:) ! attribute
@@ -750,11 +751,11 @@ module restUtilMod
 
     ! Local variables
     ! Local variables
-    character(len=*), parameter :: sub=trim(mod_filename)//'::'//'restartvar_real_sp_4d'    
-    logical           :: readvar          ! was var read?    
+    character(len=*), parameter :: sub=trim(mod_filename)//'::'//'restartvar_real_sp_4d'
+    logical           :: readvar          ! was var read?
     integer          :: ivalue
     type(var_desc_t) :: vardesc  ! local vardesc
-    integer          :: status   ! return error code 
+    integer          :: status   ! return error code
     integer          :: varid
     integer          :: lxtype   ! local external type (in case logical variable)
     !----------------------------------------------------
@@ -787,21 +788,21 @@ module restUtilMod
        if (present(units)) then
           call check_ret(ncd_putatt(ncid, varid, 'units', trim(units)),sub)
        end if
-      
+
        if (present(fill_value)) then
           call check_ret(ncd_putatt(ncid, varid, '_FillValue', fill_value,ncd_double),sub)
-       else 
+       else
           call check_ret(ncd_putatt(ncid, varid, '_FillValue', spval,ncd_double),sub)
        end if
        if (present(missing_value)) then
           call check_ret(ncd_putatt(ncid, varid, 'missing_value', missing_value,ncd_double),sub)
-       else 
+       else
           call check_ret(ncd_putatt(ncid, varid, 'missing_value', spval,ncd_double),sub)
        end if
 
 
     else if (flag == 'read' .or. flag == 'write') then
-      
+
       call ncd_io(varname=trim(varname), data=data, &
         dim1name=trim(dim1name), ncid=ncid, flag=flag, readvar=readvar)
     end if
@@ -811,7 +812,7 @@ module restUtilMod
          call endrun('Reading restart file failed in '//trim(sub),__LINE__)
     end if
 
-  end subroutine restartvar_real_sp_4d  
+  end subroutine restartvar_real_sp_4d
 !-----------------------------------------------------------------------
   subroutine restartvar_real_sp_5d(ncid, flag, varname,  dim1name,  dim2name, &
        dim3name, dim4name, dim5name, long_name, units, interpinic_flag, data,  &
@@ -827,9 +828,9 @@ module restUtilMod
     real(r8)          , pointer              :: data(:,:,:,:,:)
     character(len=*)  , intent(in)           :: dim1name         ! dimension name
     character(len=*)  , intent(in)           :: dim2name         ! dimension name
-    character(len=*)  , intent(in)           :: dim3name         ! dimension name        
-    character(len=*)  , intent(in)           :: dim4name         ! dimension name            
-    character(len=*)  , intent(in)           :: dim5name         ! dimension name                
+    character(len=*)  , intent(in)           :: dim3name         ! dimension name
+    character(len=*)  , intent(in)           :: dim4name         ! dimension name
+    character(len=*)  , intent(in)           :: dim5name         ! dimension name
     character(len=*)  , intent(in), optional :: units            ! long name for variable
     character(len=*)  , intent(in), optional :: comment          ! attribute
     character(len=*)  , intent(in), optional :: flag_meanings(:) ! attribute
@@ -839,11 +840,11 @@ module restUtilMod
 
     ! Local variables
     ! Local variables
-    character(len=*), parameter :: sub=trim(mod_filename)//'::'//'restartvar_real_sp_5d'    
-    logical           :: readvar          ! was var read?    
+    character(len=*), parameter :: sub=trim(mod_filename)//'::'//'restartvar_real_sp_5d'
+    logical           :: readvar          ! was var read?
     integer          :: ivalue
     type(var_desc_t) :: vardesc  ! local vardesc
-    integer          :: status   ! return error code 
+    integer          :: status   ! return error code
     integer          :: varid
     integer          :: lxtype   ! local external type (in case logical variable)
     !----------------------------------------------------
@@ -876,15 +877,15 @@ module restUtilMod
        if (present(units)) then
           call check_ret(ncd_putatt(ncid, varid, 'units', trim(units)),sub)
        end if
-      
+
        if (present(fill_value)) then
           call check_ret(ncd_putatt(ncid, varid, '_FillValue', fill_value,ncd_double),sub)
-       else 
+       else
           call check_ret(ncd_putatt(ncid, varid, '_FillValue', spval,ncd_double),sub)
        end if
        if (present(missing_value)) then
           call check_ret(ncd_putatt(ncid, varid, 'missing_value', missing_value,ncd_double),sub)
-       else 
+       else
           call check_ret(ncd_putatt(ncid, varid, 'missing_value', spval,ncd_double),sub)
        end if
 
@@ -900,7 +901,7 @@ module restUtilMod
          call endrun('Reading restart file failed in '//trim(sub),__LINE__)
     end if
 
-  end subroutine restartvar_real_sp_5d  
+  end subroutine restartvar_real_sp_5d
 !------------------------------------------------------------------------------------------
   subroutine cpcol_i_1d(flag,NHW,NHE,NVN,NVS,dat_arc,datic_1d)
   implicit none
@@ -950,7 +951,7 @@ module restUtilMod
       ENDDO
     ENDDO
   endif
-  end subroutine cpcol_r_1d  
+  end subroutine cpcol_r_1d
 !------------------------------------------------------------------------------------------
   subroutine cpcol_r_2d(flag,NHW,NHE,NVN,NVS,dat_arc,datrc_2d)
   implicit none
@@ -979,7 +980,7 @@ module restUtilMod
       ENDDO
     ENDDO
   endif
-  end subroutine cpcol_r_2d  
+  end subroutine cpcol_r_2d
 !------------------------------------------------------------------------------------------
   subroutine cpcol_r_3d(flag,NHW,NHE,NVN,NVS,dat_arc,datrc_3d)
   implicit none
@@ -997,7 +998,7 @@ module restUtilMod
           DO N1=1,size(dat_arc,1)
             dat_arc(N1,N2,NY,NX)=datrc_3d(icol,N1,N2)
           enddo
-        ENDDO  
+        ENDDO
       ENDDO
     ENDDO
   else if(flag=='write')then
@@ -1008,11 +1009,11 @@ module restUtilMod
           DO n1=1,size(dat_arc,1)
             datrc_3d(icol,N1,N2)=dat_arc(N1,N2,NY,NX)
           enddo
-        enddo  
+        enddo
       ENDDO
     ENDDO
   endif
-  end subroutine cpcol_r_3d  
+  end subroutine cpcol_r_3d
 !------------------------------------------------------------------------------------------
   subroutine cpcol_r_4d(flag,NHW,NHE,NVN,NVS,dat_arc,datrc_4d)
   implicit none
@@ -1030,9 +1031,9 @@ module restUtilMod
           DO N2=1,size(dat_arc,2)
             DO N1=1,size(dat_arc,1)
               dat_arc(N1,N2,N3,NY,NX)=datrc_4d(icol,N1,N2,N3)
-            enddo  
+            enddo
           enddo
-        ENDDO  
+        ENDDO
       ENDDO
     ENDDO
   else if(flag=='write')then
@@ -1044,12 +1045,12 @@ module restUtilMod
             DO n1=1,size(dat_arc,1)
               datrc_4d(icol,N1,N2,N3)=dat_arc(N1,N2,N3,NY,NX)
             enddo
-          enddo  
+          enddo
         enddo
       ENDDO
     ENDDO
   endif
-  end subroutine cpcol_r_4d  
+  end subroutine cpcol_r_4d
 !------------------------------------------------------------------------------------------
   subroutine cpcol_r_5d(flag,NHW,NHE,NVN,NVS,dat_arc,datrc_5d)
   implicit none
@@ -1068,10 +1069,10 @@ module restUtilMod
             DO N2=1,size(dat_arc,2)
               DO N1=1,size(dat_arc,1)
                 dat_arc(N1,N2,N3,N4,NY,NX)=datrc_5d(icol,N1,N2,N3,N4)
-              enddo   
-            enddo  
+              enddo
+            enddo
           enddo
-        ENDDO  
+        ENDDO
       ENDDO
     ENDDO
   else if(flag=='write')then
@@ -1084,13 +1085,13 @@ module restUtilMod
               DO n1=1,size(dat_arc,1)
                 datrc_5d(icol,N1,N2,N3,N4)=dat_arc(N1,N2,N3,N4,NY,NX)
               enddo
-            enddo  
-          enddo  
+            enddo
+          enddo
         enddo
       ENDDO
     ENDDO
   endif
-  end subroutine cpcol_r_5d  
+  end subroutine cpcol_r_5d
 
 !------------------------------------------------------------------------------------------
   subroutine cppft_i_1d(flag,NHW,NHE,NVN,NVS,NP,dat_arp,datip_1d,iflgt,iflgc)
@@ -1107,22 +1108,22 @@ module restUtilMod
   if (flag=='read')then
     if(present(iflgt))then
       DO NX=NHW,NHE
-        DO NY=NVN,NVS    
+        DO NY=NVN,NVS
           IF(IFLGT(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
-              if(present(IFLGC))then      
+              if(present(IFLGC))then
                 IF(IFLGC(NZ,NY,NX)==PlantIsActive)THEN
                   ip=get_pft(NZ,NY,NX)
-                  dat_arp(NZ,NY,NX)=datip_1d(ip)            
+                  dat_arp(NZ,NY,NX)=datip_1d(ip)
                 endif
               else
                 ip=get_pft(NZ,NY,NX)
-                dat_arp(NZ,NY,NX)=datip_1d(ip)            
+                dat_arp(NZ,NY,NX)=datip_1d(ip)
               endif
-            ENDDO 
+            ENDDO
           endif
         enddo
-      enddo    
+      enddo
     else
       DO NX=NHW,NHE
         DO NY=NVN,NVS
@@ -1137,10 +1138,10 @@ module restUtilMod
     datip_1d=ispval
     if(present(iflgt))then
       DO NX=NHW,NHE
-        DO NY=NVN,NVS    
+        DO NY=NVN,NVS
           IF(IFLGT(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
-              if(present(IFLGC))then      
+              if(present(IFLGC))then
                 IF(IFLGC(NZ,NY,NX)==PlantIsActive)THEN
                   ip=get_pft(NZ,NY,NX)
                   datip_1d(ip)=dat_arp(NZ,NY,NX)
@@ -1149,10 +1150,10 @@ module restUtilMod
                 ip=get_pft(NZ,NY,NX)
                 datip_1d(ip)=dat_arp(NZ,NY,NX)
               endif
-            ENDDO 
+            ENDDO
           endif
         enddo
-      enddo  
+      enddo
     else
       DO NX=NHW,NHE
          DO NY=NVN,NVS
@@ -1181,26 +1182,26 @@ module restUtilMod
   if (flag=='read')then
     if(present(iflgt))then
       DO NX=NHW,NHE
-        DO NY=NVN,NVS    
+        DO NY=NVN,NVS
           IF(IFLGT(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
-              if(present(IFLGC))then      
+              if(present(IFLGC))then
                 IF(IFLGC(NZ,NY,NX)==PlantIsActive)THEN
                   ip=get_pft(NZ,NY,NX)
                   DO NN=1,SIZE(dat_arp,1)
-                    dat_arp(NN,NZ,NY,NX)=datip_2d(ip,NN)            
+                    dat_arp(NN,NZ,NY,NX)=datip_2d(ip,NN)
                   enddo
                 endif
               else
                 ip=get_pft(NZ,NY,NX)
                 DO NN=1,SIZE(dat_arp,1)
-                  dat_arp(NN,NZ,NY,NX)=datip_2d(ip,NN)            
+                  dat_arp(NN,NZ,NY,NX)=datip_2d(ip,NN)
                 ENDDO
               endif
-            ENDDO 
+            ENDDO
           endif
         enddo
-      enddo    
+      enddo
     else
       DO NX=NHW,NHE
         DO NY=NVN,NVS
@@ -1219,12 +1220,12 @@ module restUtilMod
       DO NX=NHW,NHE
         DO NY=NVN,NVS
 
-          IF(IFLGT(NY,NX)>0)THEN      
+          IF(IFLGT(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
-              if(present(IFLGC))then      
+              if(present(IFLGC))then
                 IF(IFLGC(NZ,NY,NX)==PlantIsActive)THEN
                   ip=get_pft(NZ,NY,NX)
-                  DO NN=1,SIZE(dat_arp,1)              
+                  DO NN=1,SIZE(dat_arp,1)
                     datip_2d(ip,NN)=dat_arp(NN,NZ,NY,NX)
                   enddo
                 endif
@@ -1234,10 +1235,10 @@ module restUtilMod
                   datip_2d(ip,NN)=dat_arp(NN,NZ,NY,NX)
                 enddo
               endif
-            ENDDO 
+            ENDDO
           endif
         enddo
-      enddo  
+      enddo
     else
       DO NX=NHW,NHE
          DO NY=NVN,NVS
@@ -1268,15 +1269,15 @@ module restUtilMod
   if (flag=='read')then
     if(present(iflgt))then
       DO NX=NHW,NHE
-        DO NY=NVN,NVS    
+        DO NY=NVN,NVS
           IF(IFLGT(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
-              if(present(IFLGC))then      
+              if(present(IFLGC))then
                 IF(IFLGC(NZ,NY,NX)==PlantIsActive)THEN
                   ip=get_pft(NZ,NY,NX)
                   DO N2=1,SIZE(dat_arp,2)
                     DO N1=1,SIZE(dat_arp,1)
-                      dat_arp(N1,N2,NZ,NY,NX)=datip_3d(ip,N1,N2)            
+                      dat_arp(N1,N2,NZ,NY,NX)=datip_3d(ip,N1,N2)
                     ENDDO
                   enddo
                 endif
@@ -1284,14 +1285,14 @@ module restUtilMod
                 ip=get_pft(NZ,NY,NX)
                 DO N2=1,SIZE(dat_arp,2)
                   DO N1=1,SIZE(dat_arp,1)
-                    dat_arp(N1,N2,NZ,NY,NX)=datip_3d(ip,N1,N2)            
-                  ENDDO  
+                    dat_arp(N1,N2,NZ,NY,NX)=datip_3d(ip,N1,N2)
+                  ENDDO
                 ENDDO
               endif
-            ENDDO 
+            ENDDO
           endif
         enddo
-      enddo    
+      enddo
     else
       DO NX=NHW,NHE
         DO NY=NVN,NVS
@@ -1300,7 +1301,7 @@ module restUtilMod
             DO N2=1,SIZE(dat_arp,2)
               DO N1=1,SIZE(dat_arp,1)
                 dat_arp(N1,N2,NZ,NY,NX)=datip_3d(ip,N1,N2)
-              ENDDO  
+              ENDDO
             ENDDO
           ENDDO
         ENDDO
@@ -1310,16 +1311,16 @@ module restUtilMod
     datip_3d=ispval
     if(present(iflgt))then
       DO NX=NHW,NHE
-        DO NY=NVN,NVS    
+        DO NY=NVN,NVS
           IF(IFLGT(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
-              if(present(IFLGC))then      
+              if(present(IFLGC))then
                 IF(IFLGC(NZ,NY,NX)==PlantIsActive)THEN
                   ip=get_pft(NZ,NY,NX)
                   DO N2=1,SIZE(dat_arp,2)
                     DO N1=1,SIZE(dat_arp,1)
                       datip_3d(ip,N1,N2)=dat_arp(N1,N2,NZ,NY,NX)
-                    ENDDO  
+                    ENDDO
                   enddo
                 endif
               else
@@ -1327,13 +1328,13 @@ module restUtilMod
                 DO N2=1,SIZE(dat_arp,2)
                   DO N1=1,SIZE(dat_arp,1)
                     datip_3d(ip,N1,N2)=dat_arp(N1,N2,NZ,NY,NX)
-                  ENDDO  
+                  ENDDO
                 enddo
               endif
-            ENDDO 
+            ENDDO
           endif
         enddo
-      enddo    
+      enddo
     else
       DO NX=NHW,NHE
          DO NY=NVN,NVS
@@ -1366,22 +1367,22 @@ module restUtilMod
   if (flag=='read')then
     if(present(iflgt))then
       DO NX=NHW,NHE
-        DO NY=NVN,NVS    
+        DO NY=NVN,NVS
           IF(IFLGT(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
-              if(present(IFLGC))then      
+              if(present(IFLGC))then
                 IF(IFLGC(NZ,NY,NX)==PlantIsActive)THEN
                   ip=get_pft(NZ,NY,NX)
-                  dat_arp(NZ,NY,NX)=datrp_1d(ip)            
+                  dat_arp(NZ,NY,NX)=datrp_1d(ip)
                 endif
               else
                 ip=get_pft(NZ,NY,NX)
-                dat_arp(NZ,NY,NX)=datrp_1d(ip)            
+                dat_arp(NZ,NY,NX)=datrp_1d(ip)
               endif
-            ENDDO 
+            ENDDO
           endif
         enddo
-      enddo    
+      enddo
     else
       DO NX=NHW,NHE
         DO NY=NVN,NVS
@@ -1393,13 +1394,13 @@ module restUtilMod
       ENDDO
     endif
   else if(flag=='write') then
-    datrp_1d=spval    
+    datrp_1d=spval
     if(present(iflgt))then
       DO NX=NHW,NHE
         DO NY=NVN,NVS
           IF(IFLGT(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
-              if(present(IFLGC))then      
+              if(present(IFLGC))then
                 IF(IFLGC(NZ,NY,NX)==PlantIsActive)THEN
                   ip=get_pft(NZ,NY,NX)
                   datrp_1d(ip)=dat_arp(NZ,NY,NX)
@@ -1408,10 +1409,10 @@ module restUtilMod
                 ip=get_pft(NZ,NY,NX)
                 datrp_1d(ip)=dat_arp(NZ,NY,NX)
               endif
-            ENDDO 
+            ENDDO
           endif
         enddo
-      enddo    
+      enddo
     else
       DO NX=NHW,NHE
          DO NY=NVN,NVS
@@ -1443,31 +1444,31 @@ module restUtilMod
         DO NY=NVN,NVS
           IF(IFLGT(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
-              if(present(IFLGC))then      
+              if(present(IFLGC))then
                 IF(IFLGC(NZ,NY,NX)==PlantIsActive)THEN
-                  ip=get_pft(NZ,NY,NX)              
+                  ip=get_pft(NZ,NY,NX)
                   DO NN=1,SIZE(dat_arp,1)
-                    dat_arp(NN,NZ,NY,NX)=datrp_2d(ip,NN)            
-                  enddo                
+                    dat_arp(NN,NZ,NY,NX)=datrp_2d(ip,NN)
+                  enddo
                 endif
               else
                 ip=get_pft(NZ,NY,NX)
                 DO NN=1,SIZE(dat_arp,1)
-                  dat_arp(NN,NZ,NY,NX)=datrp_2d(ip,NN)            
-                enddo                
+                  dat_arp(NN,NZ,NY,NX)=datrp_2d(ip,NN)
+                enddo
               endif
-            ENDDO 
+            ENDDO
           endif
         enddo
-      enddo    
+      enddo
     else
       DO NX=NHW,NHE
         DO NY=NVN,NVS
           DO NZ=1,NP(NY,NX)
             ip=get_pft(NZ,NY,NX)
             DO NN=1,SIZE(dat_arp,1)
-              dat_arp(NN,NZ,NY,NX)=datrp_2d(ip,NN)            
-            enddo                
+              dat_arp(NN,NZ,NY,NX)=datrp_2d(ip,NN)
+            enddo
           ENDDO
         ENDDO
       ENDDO
@@ -1479,31 +1480,31 @@ module restUtilMod
         DO NY=NVN,NVS
           IF(IFLGT(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
-              if(present(IFLGC))then      
+              if(present(IFLGC))then
                 IF(IFLGC(NZ,NY,NX)==PlantIsActive)THEN
                   ip=get_pft(NZ,NY,NX)
                   DO NN=1,SIZE(dat_arp,1)
-                    datrp_2d(ip,NN)=dat_arp(NN,NZ,NY,NX)            
-                  enddo                
+                    datrp_2d(ip,NN)=dat_arp(NN,NZ,NY,NX)
+                  enddo
                 endif
               else
                 ip=get_pft(NZ,NY,NX)
                 DO NN=1,SIZE(dat_arp,1)
-                  datrp_2d(ip,NN)=dat_arp(NN,NZ,NY,NX)            
-                enddo                
+                  datrp_2d(ip,NN)=dat_arp(NN,NZ,NY,NX)
+                enddo
               endif
-            ENDDO 
+            ENDDO
           endif
         enddo
-      enddo    
+      enddo
     else
       DO NX=NHW,NHE
          DO NY=NVN,NVS
            DO NZ=1,NP(NY,NX)
              ip=get_pft(NZ,NY,NX)
              DO NN=1,SIZE(dat_arp,1)
-               datrp_2d(ip,NN)=dat_arp(NN,NZ,NY,NX)            
-             enddo                
+               datrp_2d(ip,NN)=dat_arp(NN,NZ,NY,NX)
+             enddo
            ENDDO
          ENDDO
       ENDDO
@@ -1526,30 +1527,30 @@ module restUtilMod
   if (flag=='read')then
     if(present(iflgt))then
       DO NX=NHW,NHE
-        DO NY=NVN,NVS    
+        DO NY=NVN,NVS
           IF(IFLGT(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
-              if(present(IFLGC))then      
+              if(present(IFLGC))then
                 IF(IFLGC(NZ,NY,NX)==PlantIsActive)THEN
-                  ip=get_pft(NZ,NY,NX)              
+                  ip=get_pft(NZ,NY,NX)
                 DO N2=1,SIZE(dat_arp,2)
                   DO N1=1,SIZE(dat_arp,1)
-                    dat_arp(N1,N2,NZ,NY,NX)=datrp_3d(ip,N1,N2)            
-                  enddo  
-                enddo                
+                    dat_arp(N1,N2,NZ,NY,NX)=datrp_3d(ip,N1,N2)
+                  enddo
+                enddo
                 endif
               else
                 ip=get_pft(NZ,NY,NX)
                 DO N2=1,SIZE(dat_arp,2)
                   DO N1=1,SIZE(dat_arp,1)
-                    dat_arp(N1,N2,NZ,NY,NX)=datrp_3d(ip,N1,N2)            
-                  enddo  
-                enddo                
+                    dat_arp(N1,N2,NZ,NY,NX)=datrp_3d(ip,N1,N2)
+                  enddo
+                enddo
               endif
-            ENDDO 
+            ENDDO
           endif
         enddo
-      enddo    
+      enddo
     else
       DO NX=NHW,NHE
         DO NY=NVN,NVS
@@ -1557,9 +1558,9 @@ module restUtilMod
             ip=get_pft(NZ,NY,NX)
              DO N2=1,SIZE(dat_arp,2)
                DO N1=1,SIZE(dat_arp,1)
-                 dat_arp(N1,N2,NZ,NY,NX)=datrp_3d(ip,N1,N2)            
-               enddo  
-             enddo                
+                 dat_arp(N1,N2,NZ,NY,NX)=datrp_3d(ip,N1,N2)
+               enddo
+             enddo
           ENDDO
         ENDDO
       ENDDO
@@ -1568,30 +1569,30 @@ module restUtilMod
     datrp_3d=spval
     if(present(iflgt))then
       DO NX=NHW,NHE
-        DO NY=NVN,NVS    
+        DO NY=NVN,NVS
           IF(IFLGT(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
-              if(present(IFLGC))then      
+              if(present(IFLGC))then
                 IF(IFLGC(NZ,NY,NX)==PlantIsActive)THEN
                   ip=get_pft(NZ,NY,NX)
                   DO N2=1,SIZE(dat_arp,2)
                     DO N1=1,SIZE(dat_arp,1)
-                      datrp_3d(ip,N1,N2)=dat_arp(N1,N2,NZ,NY,NX)           
-                    enddo  
-                  enddo                
+                      datrp_3d(ip,N1,N2)=dat_arp(N1,N2,NZ,NY,NX)
+                    enddo
+                  enddo
                 endif
               else
                 ip=get_pft(NZ,NY,NX)
                 DO N2=1,SIZE(dat_arp,2)
                   DO N1=1,SIZE(dat_arp,1)
-                    datrp_3d(ip,N1,N2)=dat_arp(N1,N2,NZ,NY,NX)            
-                  enddo  
-                enddo                
+                    datrp_3d(ip,N1,N2)=dat_arp(N1,N2,NZ,NY,NX)
+                  enddo
+                enddo
               endif
-            ENDDO 
+            ENDDO
           endif
         enddo
-      enddo    
+      enddo
     else
       DO NX=NHW,NHE
          DO NY=NVN,NVS
@@ -1599,9 +1600,9 @@ module restUtilMod
              ip=get_pft(NZ,NY,NX)
              DO N2=1,SIZE(dat_arp,2)
                DO N1=1,SIZE(dat_arp,1)
-                 datrp_3d(ip,N1,N2)=dat_arp(N1,N2,NZ,NY,NX)            
-               enddo  
-             enddo                
+                 datrp_3d(ip,N1,N2)=dat_arp(N1,N2,NZ,NY,NX)
+               enddo
+             enddo
            ENDDO
          ENDDO
       ENDDO
@@ -1623,18 +1624,18 @@ module restUtilMod
   if (flag=='read')then
     if(present(iflgt))then
       DO NX=NHW,NHE
-        DO NY=NVN,NVS    
+        DO NY=NVN,NVS
           IF(IFLGT(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
-              if(present(IFLGC))then      
+              if(present(IFLGC))then
                 IF(IFLGC(NZ,NY,NX)==PlantIsActive)THEN
-                  ip=get_pft(NZ,NY,NX)              
+                  ip=get_pft(NZ,NY,NX)
                   DO N3=1,SIZE(dat_arp,3)
                     DO N2=1,SIZE(dat_arp,2)
                       DO N1=1,SIZE(dat_arp,1)
-                        dat_arp(N1,N2,N3,NZ,NY,NX)=datrp_4d(ip,N1,N2,N3)            
-                      enddo  
-                  enddo                
+                        dat_arp(N1,N2,N3,NZ,NY,NX)=datrp_4d(ip,N1,N2,N3)
+                      enddo
+                  enddo
                 enddo
                 endif
               else
@@ -1642,15 +1643,15 @@ module restUtilMod
                 DO N3=1,SIZE(dat_arp,3)
                   DO N2=1,SIZE(dat_arp,2)
                     DO N1=1,SIZE(dat_arp,1)
-                      dat_arp(N1,N2,N3,NZ,NY,NX)=datrp_4d(ip,N1,N2,N3)            
-                    enddo  
-                  enddo                
+                      dat_arp(N1,N2,N3,NZ,NY,NX)=datrp_4d(ip,N1,N2,N3)
+                    enddo
+                  enddo
                 enddo
               endif
-            ENDDO 
+            ENDDO
           endif
         enddo
-      enddo    
+      enddo
     else
       DO NX=NHW,NHE
         DO NY=NVN,NVS
@@ -1659,9 +1660,9 @@ module restUtilMod
              DO N3=1,SIZE(dat_arp,3)
                DO N2=1,SIZE(dat_arp,2)
                  DO N1=1,SIZE(dat_arp,1)
-                   dat_arp(N1,N2,N3,NZ,NY,NX)=datrp_4d(ip,N1,N2,N3)            
-                 enddo  
-               enddo                
+                   dat_arp(N1,N2,N3,NZ,NY,NX)=datrp_4d(ip,N1,N2,N3)
+                 enddo
+               enddo
              enddo
           ENDDO
         ENDDO
@@ -1671,18 +1672,18 @@ module restUtilMod
     datrp_4d=spval
     if(present(iflgt))then
       DO NX=NHW,NHE
-        DO NY=NVN,NVS    
+        DO NY=NVN,NVS
           IF(IFLGT(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
-              if(present(IFLGC))then      
+              if(present(IFLGC))then
                 IF(IFLGC(NZ,NY,NX)==PlantIsActive)THEN
                   ip=get_pft(NZ,NY,NX)
                   DO N3=1,SIZE(dat_arp,3)
                     DO N2=1,SIZE(dat_arp,2)
                       DO N1=1,SIZE(dat_arp,1)
-                        datrp_4d(ip,N1,N2,N3)=dat_arp(N1,N2,N3,NZ,NY,NX)            
-                      enddo  
-                    enddo                
+                        datrp_4d(ip,N1,N2,N3)=dat_arp(N1,N2,N3,NZ,NY,NX)
+                      enddo
+                    enddo
                   enddo
                 endif
               else
@@ -1690,15 +1691,15 @@ module restUtilMod
                 DO N3=1,SIZE(dat_arp,3)
                   DO N2=1,SIZE(dat_arp,2)
                     DO N1=1,SIZE(dat_arp,1)
-                      datrp_4d(ip,N1,N2,N3)=dat_arp(N1,N2,N3,NZ,NY,NX)            
-                    enddo  
-                  enddo 
-                enddo                
+                      datrp_4d(ip,N1,N2,N3)=dat_arp(N1,N2,N3,NZ,NY,NX)
+                    enddo
+                  enddo
+                enddo
               endif
-            ENDDO 
+            ENDDO
           endif
         enddo
-      enddo    
+      enddo
     else
       DO NX=NHW,NHE
          DO NY=NVN,NVS
@@ -1707,9 +1708,9 @@ module restUtilMod
              DO N3=1,SIZE(dat_arp,3)
                DO N2=1,SIZE(dat_arp,2)
                   DO N1=1,SIZE(dat_arp,1)
-                    datrp_4d(ip,N1,N2,N3)=dat_arp(N1,N2,N3,NZ,NY,NX)            
-                  enddo  
-               enddo                
+                    datrp_4d(ip,N1,N2,N3)=dat_arp(N1,N2,N3,NZ,NY,NX)
+                  enddo
+               enddo
              enddo
            ENDDO
          ENDDO
@@ -1732,20 +1733,20 @@ module restUtilMod
   if (flag=='read')then
     if(present(iflgt))then
       DO NX=NHW,NHE
-        DO NY=NVN,NVS    
+        DO NY=NVN,NVS
           IF(IFLGT(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
-              if(present(IFLGC))then      
+              if(present(IFLGC))then
                 IF(IFLGC(NZ,NY,NX)==PlantIsActive)THEN
-                  ip=get_pft(NZ,NY,NX)              
+                  ip=get_pft(NZ,NY,NX)
                   DO N4=1,SIZE(dat_arp,4)
                     DO N3=1,SIZE(dat_arp,3)
                       DO N2=1,SIZE(dat_arp,2)
                         DO N1=1,SIZE(dat_arp,1)
                           dat_arp(N1,N2,N3,N4,NZ,NY,NX)=datrp_5d(ip,N1,N2,N3,N4)
-                        enddo  
-                      enddo  
-                    enddo                
+                        enddo
+                      enddo
+                    enddo
                   enddo
                 endif
               else
@@ -1754,16 +1755,16 @@ module restUtilMod
                   DO N3=1,SIZE(dat_arp,3)
                       DO N2=1,SIZE(dat_arp,2)
                         DO N1=1,SIZE(dat_arp,1)
-                          dat_arp(N1,N2,N3,N4,NZ,NY,NX)=datrp_5d(ip,N1,N2,N3,N4)            
-                        enddo  
-                      enddo  
-                  enddo                
+                          dat_arp(N1,N2,N3,N4,NZ,NY,NX)=datrp_5d(ip,N1,N2,N3,N4)
+                        enddo
+                      enddo
+                  enddo
                 enddo
               endif
-            ENDDO 
+            ENDDO
           endif
         enddo
-      enddo    
+      enddo
     else
       DO NX=NHW,NHE
         DO NY=NVN,NVS
@@ -1773,10 +1774,10 @@ module restUtilMod
                DO N3=1,SIZE(dat_arp,3)
                   DO N2=1,SIZE(dat_arp,2)
                     DO N1=1,SIZE(dat_arp,1)
-                      dat_arp(N1,N2,N3,N4,NZ,NY,NX)=datrp_5d(ip,N1,N2,N3,N4)            
-                    enddo  
-                  enddo  
-               enddo                
+                      dat_arp(N1,N2,N3,N4,NZ,NY,NX)=datrp_5d(ip,N1,N2,N3,N4)
+                    enddo
+                  enddo
+               enddo
              enddo
           ENDDO
         ENDDO
@@ -1786,20 +1787,20 @@ module restUtilMod
     datrp_5d=spval
     if(present(iflgt))then
       DO NX=NHW,NHE
-        DO NY=NVN,NVS    
+        DO NY=NVN,NVS
           IF(IFLGT(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
-              if(present(IFLGC))then      
+              if(present(IFLGC))then
                 IF(IFLGC(NZ,NY,NX)==PlantIsActive)THEN
                   ip=get_pft(NZ,NY,NX)
                   DO N4=1,SIZE(dat_arp,4)
                     DO N3=1,SIZE(dat_arp,3)
                       DO N2=1,SIZE(dat_arp,2)
                         DO N1=1,SIZE(dat_arp,1)
-                          datrp_5d(ip,N1,N2,N3,N4)=dat_arp(N1,N2,N3,N4,NZ,NY,NX)            
-                        enddo  
-                      enddo  
-                    enddo                
+                          datrp_5d(ip,N1,N2,N3,N4)=dat_arp(N1,N2,N3,N4,NZ,NY,NX)
+                        enddo
+                      enddo
+                    enddo
                   enddo
                 endif
               else
@@ -1808,16 +1809,16 @@ module restUtilMod
                   DO N3=1,SIZE(dat_arp,3)
                       DO N2=1,SIZE(dat_arp,2)
                         DO N1=1,SIZE(dat_arp,1)
-                          datrp_5d(ip,N1,N2,N3,N4)=dat_arp(N1,N2,N3,N4,NZ,NY,NX)            
-                        enddo  
-                      enddo  
-                  enddo                
+                          datrp_5d(ip,N1,N2,N3,N4)=dat_arp(N1,N2,N3,N4,NZ,NY,NX)
+                        enddo
+                      enddo
+                  enddo
                 enddo
               endif
-            ENDDO 
+            ENDDO
           endif
         enddo
-      enddo    
+      enddo
     else
       DO NX=NHW,NHE
          DO NY=NVN,NVS
@@ -1828,9 +1829,9 @@ module restUtilMod
                   DO N2=1,SIZE(dat_arp,2)
                     DO N1=1,SIZE(dat_arp,1)
                       datrp_5d(ip,N1,N2,N3,N4)=dat_arp(N1,N2,N3,N4,NZ,NY,NX)
-                    enddo  
-                  enddo  
-               enddo                
+                    enddo
+                  enddo
+               enddo
              enddo
            ENDDO
          ENDDO

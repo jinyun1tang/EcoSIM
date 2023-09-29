@@ -2,7 +2,8 @@ program main
   use abortutils, only : endrun
   use fileUtil
 implicit none
-  character(len=*), parameter :: mod_filename = __FILE__
+  character(len=*), parameter :: mod_filename = &
+  __FILE__
 
   integer :: arg_count
   character(len=ecosim_filename_length)      :: namelist_filename
@@ -78,7 +79,8 @@ subroutine RunModel(namelist_buffer)
   character(len=32) :: prefix
   logical :: salton
   namelist /driver_nml/model_name,case_id,hist_freq,salton
-  character(len=*), parameter :: mod_filename=__FILE__
+  character(len=*), parameter :: mod_filename=&
+  __FILE__
   hist_freq='day'
   model_name='mock'
   case_id='exp0'

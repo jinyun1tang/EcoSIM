@@ -17,7 +17,8 @@ module RunoffBalMod
   use EcosimConst, only : patomw,natomw
 implicit none
   private
-  character(len=*), parameter :: mod_filename = __FILE__
+  character(len=*), parameter :: mod_filename = &
+  __FILE__
   public :: RunoffBal
 
   real(r8) :: SG

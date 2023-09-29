@@ -7,7 +7,8 @@ module CanopyDataType
   implicit none
   public
   save
-  character(len=*), private, parameter :: mod_filename = __FILE__
+  character(len=*), private, parameter :: mod_filename = &
+  __FILE__
 
   real(r8),target,allocatable ::  ALBP(:,:,:)                        !canopy PAR albedo , [-]
   real(r8),target,allocatable ::  TAUP(:,:,:)                        !canopy PAR transmissivity , [-]

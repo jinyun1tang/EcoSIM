@@ -1,6 +1,6 @@
 set(PHYSDATA_SOURCES
  PhysPars.F90
- HydroThermData.F90 
+ HydroThermData.F90
  SoilPhysParaMod.F90
 )
 include(add_ecosim_library)

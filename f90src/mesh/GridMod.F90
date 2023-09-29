@@ -2,8 +2,9 @@ module GridMod
 
 implicit none
   private
-  character(len=*), parameter :: mod_filename = __FILE__
-  public :: SetMesh
+  character(len=*), parameter :: mod_filename = &
+  __FILE__
+  public :: SetMesh, SetMeshATS
   public :: get_col, get_pft
 contains
 
@@ -89,7 +90,7 @@ contains
 
   allocate(bounds%icol(JY,JX))
   allocate(bounds%ipft(JP,JY,JX))
-  
+
   if(column_mode)nextra_grid=0
   JX=JX+nextra_grid
   JY=JY+nextra_grid
@@ -105,7 +106,7 @@ contains
       ENDDO
     ENDDO
   ENDDO
-  !read JZ from input data? 
+  !read JZ from input data?
   JZ=14
   JH=JX+nextra_grid
   JV=JY+nextra_grid
@@ -113,13 +114,94 @@ contains
   write(iulog,*)'grid size'
   write(iulog,*)'JX0=',JX0,'JY0=',JY0,'JZ=',JZ
   end subroutine SetMesh
+
 !------------------------------------------------------------------------
+
+  !Version of the SetMesh function that does not attempt to load a
+  !netcdf file as the mesh information is provided by ATS
+
+  subroutine SetMeshATS(NHW,NVN,NHE,NVS)
+
+  use EcoSIMConfig, only : column_mode
+  use EcoSIMCtrlMod,only : grid_file_in
+  use ncdio_pio
+  use netcdf
+  USE fileUtil, ONLY : iulog
+  use abortutils, only : endrun
+  use GridConsts, only : JX,JY,JZ,JH,JV,JD,bounds,JP,JX0,JY0
+!  set up the landscape rectangular mesh
+!  beginning(NHW,NVN)
+!  o--------------------------x
+!  |                          |
+!  |                          |
+!  |                          |
+!  |                          |
+!  x--------------------------o
+!                             end (NHE,NVS)
+
+  implicit none
+  integer, intent(out) :: NHW   !upper corner x index
+  integer, intent(out) :: NVN   !upper corner y index
+  integer, intent(out) :: NHE   !lower corner x index
+  integer, intent(out) :: NVS   !lower corner y index
+  integer :: nextra_grid
+  INTEGER :: NZ,NY,NX,ic,ip
+  type(file_desc_t) :: grid_nfid
+  type(Var_desc_t) :: vardesc
+  logical :: readvar
+
+  bounds%NHW =NHW
+  bounds%NVN =NVN
+  bounds%NHE =NHE
+  bounds%NVS =NVS
+
+  bounds%begg=1;bounds%endg=bounds%ngrid
+  bounds%begt=1;bounds%endt=bounds%ntopou
+  nextra_grid=1
+  JX=(NHE-NHW)+1;JX0=JX
+  JY=(NVS-NVN)+1;JY0=JY
+
+  bounds%ncols=JX*JY
+  bounds%npfts=bounds%ncols*JP
+  bounds%begc=1;bounds%endc=bounds%ncols
+  bounds%begp=1;bounds%endp=bounds%npfts
+
+  allocate(bounds%icol(JY,JX))
+  allocate(bounds%ipft(JP,JY,JX))
+
+  if(column_mode)nextra_grid=0
+  JX=JX+nextra_grid
+  JY=JY+nextra_grid
+
+  ic=0;ip=0
+  DO  NX=NHW,NHE
+    DO  NY=NVN,NVS
+      ic=ic+1
+      bounds%icol(NY,NX)=ic
+      DO NZ=1,JP
+        ip=ip+1
+        bounds%ipft(NZ,NY,NX)=ip
+      ENDDO
+    ENDDO
+  ENDDO
+  !read JZ from input data?
+  JZ=14
+  JH=JX+nextra_grid
+  JV=JY+nextra_grid
+  JD=JZ+1
+  write(iulog,*)'grid size'
+  write(iulog,*)'JX0=',JX0,'JY0=',JY0,'JZ=',JZ
+  end subroutine SetMeshATS
+
+!------------------------------------------------------------------------
+
+
   integer function get_col(NY,NX)
 
   use GridConsts, only : JX0,JY0
   implicit none
   integer, intent(in) :: NY,NX
-  
+
   get_col=(NX-1)*JY0+NY
   end function get_col
 !------------------------------------------------------------------------
@@ -128,7 +210,7 @@ contains
   use GridConsts, only : JX0,JY0,JP
   implicit none
   integer, intent(in) :: NZ,NY,NX
-  
+
   get_pft=(NX-1)*(JP*JY0)+(NY-1)*JP+NZ
 
   end function get_pft

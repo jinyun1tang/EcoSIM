@@ -6,25 +6,26 @@ module InitEcoSIM
   use EcoSiMParDataMod    , only : micpar,pltpar
   implicit none
   private
-  character(len=*),private, parameter :: mod_filename = __FILE__
+  character(len=*),private, parameter :: mod_filename = &
+  __FILE__
   public :: InitModules
   public :: InitModules2
   contains
 
   subroutine InitModules(NOMicrobeGuilds)
   use PlantDisturbsMod     , only : InitPlantDisturbance
-  use UptakesMod           , only : InitUptake  
-  use WatsubMod            , only : initWatsub  
+  use UptakesMod           , only : InitUptake
+  use WatsubMod            , only : initWatsub
   use NitrosMod            , only : InitNitro
   use RedistMod            , only : InitRedist
   use ErosionMod           , only : InitErosion
   use Hour1Mod             , only : InitHour1
-  use HistDataType         , only : hist_ecosim  
+  use HistDataType         , only : hist_ecosim
   use InitAllocMod         , only : InitAlloc
-  use UnitMod              , only : units  
-  use GridConsts  
+  use UnitMod              , only : units
+  use GridConsts
   implicit  none
-  
+
   integer                 , intent(in) :: NOMicrobeGuilds   !number of microbial guilds per group
 
 
@@ -47,7 +48,7 @@ module InitEcoSIM
   call InitHour1(micpar%n_litrsfk)
 
   call InitModules2
-    
+
   call hist_ecosim%Init(bounds)
 
   end subroutine InitModules

@@ -3,8 +3,8 @@ module LinearAlgebraMod
 !DESCRIPTION
 !code to do linear algebra
 
-#include "shr_assert.h"
-  use shr_assert_mod, only : shr_assert_all
+!#include "shr_assert.h"
+!  use shr_assert_mod, only : shr_assert_all
   use data_kind_mod , only : r8 => DAT_Kind_r8
   use ecosim_log_mod  , only : errMsg => shr_log_errMsg
   implicit none

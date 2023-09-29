@@ -3,7 +3,8 @@ module SoluteChemDataType
 
   implicit none
   public
-  CHARACTER(LEN=*), private, PARAMETER :: MOD_FILENAME=__FILE__
+  CHARACTER(LEN=*), private, PARAMETER :: MOD_FILENAME = &
+  __FILE__
 
   type, public :: solutedtype
     real(r8) :: CCO21

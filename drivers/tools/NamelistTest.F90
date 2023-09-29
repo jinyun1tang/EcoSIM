@@ -5,8 +5,9 @@ PROGRAM NamelistTest
   use ecosim_time_mod   , only : getdow
   use abortutils        , only : endrun
   implicit none
-  character(len=*), parameter :: mod_filename = __FILE__
-  
+  character(len=*), parameter :: mod_filename = &
+  __FILE__
+
   logical :: continue_run
   character(len=16) :: hist_config(10)
   character(len=8)  :: sim_yyyymmdd
@@ -73,14 +74,14 @@ PROGRAM NamelistTest
   endif
 
 
-  read(sim_yyyymmdd,'(I4)')year  
+  read(sim_yyyymmdd,'(I4)')year
 
   year1=0
   if(continue_run)then
     print*,'read restart file'
     ymdhs0='18820114000000'
     read(ymdhs0,'(I4)')year1
-    call etimer%Init(year0=year1)   
+    call etimer%Init(year0=year1)
   else
     ymdhs0='00000000000000'
     ymdhs0(1:8)=sim_yyyymmdd
@@ -89,12 +90,12 @@ PROGRAM NamelistTest
   call etimer%setClock(dtime=3600._r8,nelapstep=0)
 
   year0=forc_year0
-  read(sim_yyyymmdd,'(I4)')year  
+  read(sim_yyyymmdd,'(I4)')year
   print*,'year',year1,year
-  call etimer%get_ymdhs(ymdhs)  
+  call etimer%get_ymdhs(ymdhs)
   print*,ymdhs,' ',ymdhs0
-  do while(year1<=year) 
-    call etimer%get_ymdhs(ymdhs)  
+  do while(year1<=year)
+    call etimer%get_ymdhs(ymdhs)
     if(ymdhs==ymdhs0)lskip_loop=.false.
     call etimer%update_time_stamp()
     if (etimer%its_a_new_year())exit
@@ -107,8 +108,8 @@ PROGRAM NamelistTest
   DO nn=1,forc_periods(3)
     do nyr=forc_periods(1),forc_periods(2)
       year=year+1
-      
-      do while(year1<=year) 
+
+      do while(year1<=year)
         call etimer%get_ymdhs(ymdhs)
         if(ymdhs==ymdhs0)lskip_loop=.false.
         call etimer%update_time_stamp()
@@ -122,15 +123,15 @@ PROGRAM NamelistTest
 
   do nyr=forc_periods(4),forc_periods(5)
     year=year+1
-    do while(year1<=year) 
+    do while(year1<=year)
       call etimer%get_ymdhs(ymdhs)
-      if(ymdhs==ymdhs0)lskip_loop=.false.    
+      if(ymdhs==ymdhs0)lskip_loop=.false.
       call etimer%update_time_stamp()
       if (etimer%its_a_new_year())exit
     enddo
     call etimer%get_ymdhs(ymdhs)
     if(ymdhs==ymdhs0)lskip_loop=.false.
     if(.not.lskip_loop)print*,year,nyr,ymdhs
-  enddo  
+  enddo
   print*,lskip_loop
 end program NamelistTest

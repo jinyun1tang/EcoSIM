@@ -6,7 +6,8 @@ module NitroDiagTypes
   implicit none
   save
   private
-  character(len=*), parameter :: mod_filename = __FILE__
+  character(len=*), parameter :: mod_filename = &
+  __FILE__
 
 ! accumulative flux diagnostics
 type, public :: NitroAQMFluxDiagType

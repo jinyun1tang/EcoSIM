@@ -4,7 +4,8 @@ module EcoSIMCtrlDataType
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use GridConsts
   implicit none
-  character(len=*), private, parameter :: mod_filename = __FILE__
+  character(len=*), private, parameter :: mod_filename = &
+  __FILE__
   public
   real(r8) :: ZERO
   real(r8) :: ZERO2

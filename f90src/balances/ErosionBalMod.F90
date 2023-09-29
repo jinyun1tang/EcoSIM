@@ -15,7 +15,8 @@ module ErosionBalMod
   use TFlxTypeMod
 implicit none
   private
-  character(len=*), parameter :: mod_filename = __FILE__
+  character(len=*), parameter :: mod_filename = &
+  __FILE__
   public :: SinkChemicals
   public :: ZeroErosionArray
   contains
@@ -257,6 +258,6 @@ implicit none
     TOSNER(1:jsken,1:jcplx,NY,NX)=0.0_r8
     TOSPER(1:jsken,1:jcplx,NY,NX)=0.0_r8
   ENDIF
-  end subroutine ZeroErosionArray  
+  end subroutine ZeroErosionArray
 
 end module ErosionBalMod

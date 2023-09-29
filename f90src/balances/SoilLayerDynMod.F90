@@ -27,7 +27,8 @@ implicit none
 
   private
 
-  character(len=*), parameter :: mod_filename = __FILE__
+  character(len=*), parameter :: mod_filename = &
+  __FILE__
 
   real(r8) :: DDLYRX(3)
   real(r8) :: XVOLWP,WDPOBDL,WDNOBD1,WDPOBD0,WDPOBD1
@@ -63,7 +64,7 @@ implicit none
   !
   IF(IERSNG < 0)return
   !soil relayering can occur due to freeze-thaw, soc change, and erosion
-  !  
+  !
     IF(SoiBulkDensity(NU(NY,NX),NY,NX).LE.ZERO)THEN
       ICHKLX=ist_water      !surface is water layer
     ELSE
@@ -175,7 +176,7 @@ implicit none
   real(r8) :: DDLYXF
   real(r8) :: DENSJ,DPTWI,DDLYXP
   integer, parameter :: ich_watlev =1
-  integer, parameter :: ich_frzthaw=4  
+  integer, parameter :: ich_frzthaw=4
   integer, parameter :: ich_erosion=5
   integer, parameter :: ich_socloss=6
 ! begin_execution
@@ -379,7 +380,7 @@ implicit none
         !
         !     POND
         !
-        IF(SoiBulkDensity(LX,NY,NX).LE.ZERO)THEN          
+        IF(SoiBulkDensity(LX,NY,NX).LE.ZERO)THEN
           ! there are some changes
           IF(IFLGL(LX,NN).NE.0)THEN
             CumDepth2LayerBottom(LX,NY,NX)=CumDepth2LayerBottom(LX,NY,NX)+DDLYR(LX,NN)

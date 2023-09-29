@@ -3,7 +3,8 @@ module SurfPhysData
   use GridConsts
 implicit none
   save
-  character(len=*), private, parameter :: mod_filename=__FILE__
+  character(len=*), private, parameter :: mod_filename=&
+  __FILE__
 
   real(r8),allocatable ::  XVGeomLayer(:,:)                         !
   real(r8),allocatable ::  XVLWatMicP(:,:)                         !

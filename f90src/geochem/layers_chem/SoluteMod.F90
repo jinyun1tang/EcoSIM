@@ -26,7 +26,8 @@ module SoluteMod
   implicit none
 
   private
-  character(len=*),private, parameter :: mod_filename = __FILE__
+  character(len=*),private, parameter :: mod_filename = &
+  __FILE__
 
   real(r8) :: RSN4AA,RSN4BA,RSN3AA,RSN3BA,RSNUAA,RSNUBA,RSNOAA
   real(r8) :: RSNOBA,RSN4BB,RSN3BB,RSNUBB,RSNOBB

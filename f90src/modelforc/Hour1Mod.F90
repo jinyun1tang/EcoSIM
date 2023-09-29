@@ -48,7 +48,8 @@ module Hour1Mod
 
   private
 
-  CHARACTER(LEN=*), PARAMETER :: MOD_FILENAME=__FILE__
+  CHARACTER(LEN=*), PARAMETER :: MOD_FILENAME=&
+  __FILE__
 
   public :: hour1
   public :: InitHour1
@@ -58,7 +59,7 @@ module Hour1Mod
   real(r8) :: THETWP
   real(r8) :: XVOLWC(0:3)
   real(r8), pointer :: THETRX(:)
-  real(r8), parameter :: mGravAccelerat=1.e-3_r8*GravAcceleration  !gravitational constant devided by 1000.  
+  real(r8), parameter :: mGravAccelerat=1.e-3_r8*GravAcceleration  !gravitational constant devided by 1000.
 !
 !     XVOLWC=foliar water retention capacity (m3 m-2)
 !     THETRX=litter water retention capacity (m3 g C-1)
@@ -226,7 +227,7 @@ module Hour1Mod
         NGTopRootLayer(NZ,NY,NX)=MAX(NGTopRootLayer(NZ,NY,NX),NU(NY,NX))
         NIXBotRootLayer(NZ,NY,NX)=MAX(NIXBotRootLayer(NZ,NY,NX),NU(NY,NX))
         DO  NR=1,JC
-          NINR(NR,NZ,NY,NX)=MAX(NINR(NR,NZ,NY,NX),NU(NY,NX))   
+          NINR(NR,NZ,NY,NX)=MAX(NINR(NR,NZ,NY,NX),NU(NY,NX))
         ENDDO
       ENDDO
 !
@@ -596,7 +597,7 @@ module Hour1Mod
     ENDIF
     EHUM(L,NY,NX)=0.200_r8+0.333_r8*AMIN1(0.5_r8,CCLAY(L,NY,NX))
     EPOC(L,NY,NX)=1.0_r8
-    
+
     call SoilHydroProperty(L,NY,NX,I,J)
 !
 !     SOIL HEAT CAPACITY AND THERMAL CONDUCTIVITY OF SOLID PHASE
@@ -1477,7 +1478,7 @@ module Hour1Mod
       XVOLI0=0.0_r8
     ENDIF
     DPTH0(NY,NX)=XVOLW0+XVOLI0
-    
+
     DLYR(3,0,NY,NX)=VLSoilPoreMicP(0,NY,NX)/AREA(3,0,NY,NX)
     IF(VLitR(NY,NX).GT.ZEROS(NY,NX).AND.VLWatMicP(0,NY,NX).GT.ZEROS2(NY,NX))THEN
       THETWR=AMIN1(VWatLitrX(NY,NX),VLWatMicP(0,NY,NX))/VLitR(NY,NX)
@@ -2398,7 +2399,7 @@ module Hour1Mod
 !------------------------------------------------------------------------------------------
   subroutine UpdateLiterPropertz(NY,NX)
   implicit none
-  real(r8) :: FVLitR  
+  real(r8) :: FVLitR
   integer, intent(in) :: NY,NX
 !
 !     VWatLitrX=liter water holding capacity
@@ -2431,5 +2432,5 @@ module Hour1Mod
   PSD(0,NY,NX)=LOGPOROS(0,NY,NX)-LOGFldCapacity(0,NY,NX)
   FCD(0,NY,NX)=LOGFldCapacity(0,NY,NX)-LOGWiltPoint(0,NY,NX)
   SRP(0,NY,NX)=1.00_r8
-  end subroutine UpdateLiterPropertz  
+  end subroutine UpdateLiterPropertz
 end module Hour1Mod

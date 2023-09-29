@@ -3,7 +3,8 @@ module InitAllocMod
   use EcoSIMCtrlMod
 
 implicit none
-  character(len=*),private, parameter :: mod_filename = __FILE__
+  character(len=*),private, parameter :: mod_filename = &
+  __FILE__
 
   public :: InitAlloc
   contains
@@ -52,7 +53,7 @@ implicit none
   use TracerIDMod         , only : InitTracerIDs
   use SnowPhysData        , only : InitSnowPhysData
   use HydroThermData      , only : InitHydroThermData
-  use GridConsts  
+  use GridConsts
 
   implicit none
   integer                 , intent(in) :: NOMicrobeGuilds   !number of microbial guilds per group
@@ -127,7 +128,7 @@ implicit none
   call InitHydroThermData
 
   call InitSnowPhysData
-  
+
   call InitSoilPhysData
 
   end subroutine InitAlloc

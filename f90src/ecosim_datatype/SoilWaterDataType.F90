@@ -5,7 +5,8 @@ module SoilWaterDataType
   implicit none
   public
   save
-  character(len=*), private, parameter :: mod_filename = __FILE__
+  character(len=*), private, parameter :: mod_filename = &
+  __FILE__
 
   real(r8),target,allocatable ::  THETP(:,:,:)                      !air concentration [m3 m-3]
   real(r8),target,allocatable ::  VLsoiAirP(:,:,:)                       !soil air content [m3 d-2]

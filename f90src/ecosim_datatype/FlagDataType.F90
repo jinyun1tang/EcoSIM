@@ -4,7 +4,8 @@ implicit none
 
   public
   save
-  character(len=*), private, parameter :: mod_filename = __FILE__
+  character(len=*), private, parameter :: mod_filename = &
+  __FILE__
   integer  ::  ISALTG                              !salt option
   integer  ::  IERSNG                              !erosion option
   integer  ::  ICLM                                !changes to weather data (0=none,1=step,2=transient)
@@ -34,7 +35,7 @@ implicit none
   integer,target,allocatable ::  IWTYP(:,:,:)                        !climate signal for phenological progress none, temperature, water stress)
   integer,target,allocatable ::  IPTYP(:,:,:)                        !photoperiod type (neutral, long day, short day)
   integer,target,allocatable ::  IBTYP(:,:,:)                        !phenologically-driven above-ground turnover (all, foliar only, none)
-  integer,target,allocatable ::  IRTYP(:,:,:)                        !grain type (below or above-ground), e.g. potato and onion are below 
+  integer,target,allocatable ::  IRTYP(:,:,:)                        !grain type (below or above-ground), e.g. potato and onion are below
   integer,target,allocatable ::  MY(:,:,:)                           !mycorrhizal type (no or yes)
   integer,target,allocatable ::  IDWaterTable(:,:)                   !water table flag from site file
 !----------------------------------------------------------------------

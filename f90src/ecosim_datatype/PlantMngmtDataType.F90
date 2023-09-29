@@ -3,7 +3,8 @@ module PlantMngmtDataType
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use GridConsts
   implicit none
-  character(len=*), private, parameter :: mod_filename = __FILE__
+  character(len=*), private, parameter :: mod_filename = &
+  __FILE__
 
   real(r8),target,allocatable ::  THIN(:,:,:,:)                      !thinning of plant population, [-]
   real(r8),target,allocatable ::  EHVST(:,:,:,:,:,:)                 !harvest efficiency, [-]

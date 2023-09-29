@@ -13,7 +13,8 @@ module ChemEquilibriaMod
   use EcoSIMSolverPar
   implicit none
   private
-  CHARACTER(LEN=*), PARAMETER :: MOD_FILENAME=__FILE__
+  CHARACTER(LEN=*), PARAMETER :: MOD_FILENAME=&
+  __FILE__
   public ::  NoSaltChemEquilibria
   contains
 

@@ -4,7 +4,8 @@ module EcoSimSumDataType
   implicit none
   public
   save
-  character(len=*), private, parameter :: mod_filename = __FILE__
+  character(len=*), private, parameter :: mod_filename = &
+  __FILE__
   real(r8) :: TLH2G    !total soil N2	g d-2
   real(r8) :: H2GIN    !total soil H2 g d-2
   real(r8) :: H2GOU    !cumulative H2 loss through lateral and lower boundaries

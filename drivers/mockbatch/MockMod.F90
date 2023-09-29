@@ -6,7 +6,8 @@ module MockMod
  use ModelStatusType   , only : model_status_type
  use data_kind_mod     , only : r8 => DAT_KIND_R8
 implicit none
-  character(len=*), private,parameter :: mod_filename = __FILE__
+  character(len=*), private,parameter :: mod_filename = &
+  __FILE__
 
   public :: getvarllen
   public :: getvarlist

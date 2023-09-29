@@ -5,7 +5,8 @@ module FertilizerDataType
   implicit none
   public
   save
-  character(len=*), private, parameter :: mod_filename = __FILE__
+  character(len=*), private, parameter :: mod_filename = &
+  __FILE__
 
   real(r8),target,allocatable :: FertN_soil(:,:,:,:)
   real(r8),target,allocatable :: FertN_band(:,:,:,:)

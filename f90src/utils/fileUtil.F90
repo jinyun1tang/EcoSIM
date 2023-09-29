@@ -5,7 +5,8 @@ module fileUtil
   use data_kind_mod
   implicit none
   private
-  character(len=*),  parameter :: mod_filename = __FILE__
+  character(len=*),  parameter :: mod_filename = &
+  __FILE__
   public :: open_safe
   public :: check_read
   public :: remove_filename_extension

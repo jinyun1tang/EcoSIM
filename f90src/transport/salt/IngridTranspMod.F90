@@ -13,7 +13,8 @@ module IngridTranspMod
   use minimathmod, only : AZMAX1,AZMIN1
   implicit none
   private
-  CHARACTER(LEN=*), PARAMETER :: MOD_FILENAME=__FILE__
+  CHARACTER(LEN=*), PARAMETER :: MOD_FILENAME=&
+  __FILE__
 
   real(r8), PARAMETER :: XFRS=0.05_r8
   public :: SaltModelSoluteHydroFlux

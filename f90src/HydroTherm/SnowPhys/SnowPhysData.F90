@@ -5,7 +5,8 @@ module SnowPhysData
 
   implicit none
 
-  character(len=*), private, parameter :: mod_filename=__FILE__
+  character(len=*), private, parameter :: mod_filename=&
+  __FILE__
 
   real(r8),allocatable ::  trcg_TBLS(:,:,:,:)
   real(r8),allocatable ::  trcn_TBLS(:,:,:,:)

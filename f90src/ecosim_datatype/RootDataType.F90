@@ -8,7 +8,8 @@ module RootDataType
   use ElmIDMod
   use TracerIDMod
   implicit none
-  character(len=*), private, parameter :: mod_filename = __FILE__
+  character(len=*), private, parameter :: mod_filename = &
+  __FILE__
   integer,target,allocatable ::  NRT(:,:,:)                          !root primary axis number, [-]
   integer,target,allocatable ::  NINR(:,:,:,:)                       !maximum soil layer number for root axes, [-]
   integer,target,allocatable ::  IDTHR(:,:,:)                        !flag to detect root system death , [-]

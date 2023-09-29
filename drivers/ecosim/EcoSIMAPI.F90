@@ -13,7 +13,8 @@ module EcoSIMAPI
   use WatsubMod    , only : watsub
 implicit none
   private
-  character(len=*), parameter :: mod_filename = __FILE__
+  character(len=*), parameter :: mod_filename = &
+  __FILE__
   public :: soil
   public :: readnamelist
   public :: regressiontest
@@ -57,9 +58,9 @@ contains
   !
   !   CALCULATE SOLUTE EQUILIBRIA IN 'SOLUTE'
   !
-  
+
   if(soichem_model)then
-    if(lverb)WRITE(*,334)'SOL'  
+    if(lverb)WRITE(*,334)'SOL'
     call start_timer(t1)
     CALL soluteModel(I,J,NHW,NHE,NVN,NVS)
     call end_timer('SOL',t1)
@@ -81,7 +82,7 @@ contains
     CALL TRNSFRS(I,J,NHW,NHE,NVN,NVS)
     call end_timer('TRNSFRS',t1)
   endif
-  
+
   !
   !   CALCULATE SOIL SEDIMENT TRANSPORT IN 'EROSION'
   !
@@ -96,7 +97,7 @@ contains
   !
   if(TKS(2,1,1)>400.)PRINT*,'bfTKS',TKS(2,1,1)
   if(lverb)WRITE(*,334)'RED'
-    
+
   !    if(I>=170)print*,TKS(0,NVN,NHW)
   call start_timer(t1)
   CALL REDIST(I,J,NHW,NHE,NVN,NVS)
@@ -119,7 +120,8 @@ contains
   use EcoSIMCtrlMod
   use HistFileMod
   implicit none
-  character(len=*), parameter :: mod_filename = __FILE__
+  character(len=*), parameter :: mod_filename = &
+  __FILE__
   character(len=ecosim_namelist_buffer_size), intent(in) :: nml_buffer
   character(len=36)    , intent(out) :: case_name
   character(len=80)    , intent(out) :: prefix
@@ -140,7 +142,7 @@ contains
     NPXS,NPYS,JOUTS,continue_run,visual_out,restart_out,&
     finidat,restartFileFullPath,brnch_retain_casename,plant_model,microbial_model,&
     soichem_model,atm_ghg_in,aco2_ppm,ao2_ppm,an2_ppm,an2_ppm,ach4_ppm,anh3_ppm
-  
+
   namelist /ecosim/hist_nhtfrq,hist_mfilt,hist_fincl1,hist_fincl2,hist_yrclose, &
     do_budgets,ref_date,start_date
 
@@ -161,7 +163,7 @@ contains
   NCYC_LITR=20
   NCYC_SNOW=20
   visual_out =.false.
-  restart_out=.false.  
+  restart_out=.false.
   do_budgets =.false.
   plant_model=.true.
   soichem_model=.true.
@@ -173,7 +175,7 @@ contains
 
   brnch_retain_casename=.false.
   hist_yrclose=.false.
-  
+
   forc_periods=(/1980,1980,1,1981,1988,2,1989,2008,1/)
 
   num_of_simdays=-1
@@ -201,7 +203,7 @@ contains
   an2o_ppm  = 0.270_r8
   ao2_ppm   = 0.209e6_r8
   an2_ppm   = 0.78e6_r8
-  anh3_ppm  = 5.e-3_r8  
+  anh3_ppm  = 5.e-3_r8
 
   read(nml_buffer, nml=ecosim, iostat=nml_error, iomsg=ioerror_msg)
   if (nml_error /= 0) then
@@ -278,7 +280,8 @@ subroutine soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
   integer :: yearc, yeari
   integer, intent(in) :: NE,NEX,NHW,NHE,NVN,NVS
   logical, intent(out) :: nlend
-  character(len=*), parameter :: mod_filename = __FILE__
+  character(len=*), parameter :: mod_filename = &
+  __FILE__
   real(r8) :: t1
   integer :: I,J
   integer :: idaz
@@ -300,9 +303,9 @@ subroutine soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
 
   !temporary set up for setting mass balance check
   IBEGIN=1;ISTART=1;ILAST=0
-  
+
   call etimer%get_ymdhs(ymdhs)
-  
+
   IF(ymdhs(1:4)==frectyp%ymdhs0(1:4))THEN
 !   the first simulation year
     if(lverb)WRITE(*,333)'STARTS'
@@ -316,8 +319,8 @@ subroutine soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
   if(plant_model)then
     !plant information is read in every year, but the active flags
     !are set using the checkpoint file.
-    if(lverb)WRITE(*,333)'ReadPlantInfo'  
-    WRITE(*,333)'ReadPlantInfo'  
+    if(lverb)WRITE(*,333)'ReadPlantInfo'
+    WRITE(*,333)'ReadPlantInfo'
     call ReadPlantInfo(frectyp%yearcur,frectyp%yearclm,NE,NEX,NHW,NHE,NVN,NVS)
   endif
 
@@ -331,10 +334,10 @@ subroutine soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
   ENDIF
 
   if(soichem_model)then
-! INITIALIZE ALL SOIL CHEMISTRY VARIABLES IN 'STARTE' 
+! INITIALIZE ALL SOIL CHEMISTRY VARIABLES IN 'STARTE'
 ! This is done done every year, because tracer concentrations
-! in rainfall vary every year. In a more reasonable way, e.g., 
-! when coupled to atmospheric chemistry code, it should be done by 
+! in rainfall vary every year. In a more reasonable way, e.g.,
+! when coupled to atmospheric chemistry code, it should be done by
 ! hour
     if(lverb)WRITE(*,333)'STARTE'
     CALL STARTE(NHW,NHE,NVN,NVS)
@@ -342,7 +345,7 @@ subroutine soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
 
   iyear_cur=frectyp%yearcur
   LYRC=etimer%get_days_cur_year()
-  
+
   DO I=1,LYRC
     IF(do_rgres .and. I.eq.LYRG)RETURN
     !   UPDATE DAILY VARIABLES SUCH AS MANAGEMENT INPUTS
@@ -352,15 +355,15 @@ subroutine soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
 
     DO J=1,24
       call etimer%get_ymdhs(ymdhs)
-      
+
       if(ymdhs==frectyp%ymdhs0)then
-        frectyp%lskip_loop=.false. 
-        if(is_restart())then          
+        frectyp%lskip_loop=.false.
+        if(is_restart())then
           call restFile(flag='read')
         endif
-      endif        
+      endif
       if(frectyp%lskip_loop)then
-        call etimer%update_time_stamp()      
+        call etimer%update_time_stamp()
         cycle
       endif
 
@@ -371,7 +374,7 @@ subroutine soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
       call start_timer(t1)
       CALL WTHR(I,J,NHW,NHE,NVN,NVS)
       call end_timer('WTHR',t1)
-            
+
       if(lverb)WRITE(*,333)'Run_EcoSIM_one_step'
       call Run_EcoSIM_one_step(I,J,NHW,NHE,NVN,NVS)
   !
@@ -383,25 +386,25 @@ subroutine soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
           CALL VISUAL(I,J,NHW,NHE,NVN,NVS)
         ENDIF
       ENDIF
-          
+
       call end_timer_loop()
-      
+
       call hist_ecosim%hist_update(bounds)
-      
-      call hist_update_hbuf(bounds)      
-      call etimer%update_time_stamp()      
+
+      call hist_update_hbuf(bounds)
+      call etimer%update_time_stamp()
 
       nlend=etimer%its_time_to_exit()
       rstwr=etimer%its_time_to_write_restart()
       lnyr=etimer%its_a_new_year().and.hist_yrclose
-      
-      call hist_htapes_wrapup( rstwr, nlend, bounds, lnyr )      
+
+      call hist_htapes_wrapup( rstwr, nlend, bounds, lnyr )
       if(rstwr)then
         call restFile(flag='write')
       endif
-      if(nlend)exit      
+      if(nlend)exit
     END DO
-    
+
 !
 ! PERFORM MASS AND ENERGY BALANCE CHECKS IN 'EXEC'
 !
@@ -436,7 +439,8 @@ subroutine regressiontest(nmfile,case_name, NX, NY)
   use GridDataType
   implicit none
 
-  character(len=*), parameter :: mod_filename = __FILE__
+  character(len=*), parameter :: mod_filename = &
+  __FILE__
   character(len=*), intent(in) :: nmfile
   character(len=*), intent(in) :: case_name
   integer, intent(in) :: NX

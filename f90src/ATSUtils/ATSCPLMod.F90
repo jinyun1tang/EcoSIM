@@ -2,99 +2,144 @@ module ATSCPLMod
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use SharedDataMod
   use ATSEcoSIMInitMod
+  use BGCContainers_module
   implicit none
 
-  public 
-  character(len=*), private, parameter :: mod_filename=__FILE__
-
+  public
+  character(len=*), private, parameter :: mod_filename=&
+  __FILE__
 
 contains
 !------------------------------------------------------------------------------------------
 
-  subroutine ATS2EcoSIMData(filter_col,data_1d,var_1d,data_2d,var_2d,data_3d,var_3d)
+  subroutine ATS2EcoSIMData(ncol, state, props, sizes)
   !send data from ATS to ecosim
   implicit none
-  integer, intent(in) :: filter_col(:)
-  real(r8), optional, intent(in) :: data_1d(:)              !1:nvar
-  character(len=*), optional, intent(in) :: var_1d(:)       !1:nvar
-  real(r8), optional,intent(in) :: data_2d(:,:)             !1:nvar,1:ncol, column specific scalar
-  character(len=*), optional,intent(in) :: var_2d(:)        !1:nvar
-  real(r8), optional, intent(in) :: data_3d(:,:,:)          !1:jz, 1:nvar,1:ncol, 1D vector column specific
-  character(len=*), optional, intent(in) :: var_3d(:)       !
-  character(len=*), parameter :: subname=trim(mod_filename)//'::ATS2EcoSIMData'
-  integer :: ncol,nvar
+
+  ! BGC coupler variables
+  type (BGCState), intent(in) :: state
+  type (BGCProperties), intent(in) :: props
+  type (BGCSizes), intent(out) :: sizes
+
+  ! Ecosim variables
+  real(r8), pointer :: data(:)
+  real(r8), pointer :: data2D(:,:)
+  integer :: ncol, nvar, size_col, num_cols
   integer :: j1,j2,j3
 
-  ncol=size(filter_col)
-  
-  if (present(data_1d) .and. present(var_1d))then
-  !domain specific scalar
-    nvar=size(var_1d)
-    do j1=1,nvar
-      select case(var_1d(j1))
-      case ('ATM_N2')  !ppmv
-        atm_N2=data_1d(j1)
-      case ('ATM_O2')  !ppmv    
-        atm_o2=data_1d(j1)
-      case ('ATM_CO2') !ppmv    
-        atm_co2=data_1d(j1)
-      case ('ATM_CH4') !ppmv    
-        atm_ch4=data_1d(j1)
-      case ('ATM_N2O') !ppmv    
-        atm_n2o=data_1d(j1)
-      case ('ATM_H2')  !ppmv    
-        atm_h2=data_1d(j1)
-      case ('ATM_NH3') !ppmv    
-        atm_NH3=data_1d(j1)
-      end select
-    enddo
-  endif
+  write(*,*) "In the driver...."
 
-  if (present(data_2d) .and. present(var_2d))then  
-  !columun specific scalar 
-    nvar=size(var_2d)
-    do j2=1,ncol
-      do j1=1,nvar
-        select case(var_2d(j1))
-        case ('TAIRC')     !air temperature, oC
-          tairc(j2)=data_2d(j1,j2)
-        case ('PREC')      !precipitation, mm H2O/hr
-          prec(j2)=data_2d(j1,j2)
-        case ('WINDH')     !horizontal wind speed,   m/s
-          uwind(j2)=data_2d(j1,j2)
-        case ('DWPTH')     !atmospheric vapor pressure, kPa
-          vpair(j2)=data_2d(j1,j2)
-        case ('SRADH')     !Incident solar radiation, W/m2 
-          sunrad(j2)=data_2d(j1,j2) 
-        end select
-      enddo
-    enddo
-  endif
+  write(*,*) "Setting sizes"
+  call SetBGCSizes(sizes)
 
-  if (present(data_2d) .and. present(var_2d))then  
-  !1D vertical vector, 
-    nvar=size(var_2d)
-    do j3=1,ncol
-      do j2=1,nvar
-        select case (var_2d(j2))
-        case ('CSAND')  !g/kg soil
-          a_csand(1:JZSOI,j3)=data_3d(1:JZSOI,j2,j3)
-        case ('CSILT')
-          a_CSILT(1:JZSOI,j3)=data_3d(1:JZSOI,j2,j3)
-        end select
-      enddo
-    enddo
-  endif
+  !ncol=size(filter_col)
 
+  !1D vertical vector,
+  write(*,*) "computing column size"
+
+  size_col = sizes%ncells_per_col_
+  num_cols = props%shortwave_radiation%size
+
+  call c_f_pointer(props%shortwave_radiation%data, data, (/num_cols/))
+  srad = data(:)
+
+  call c_f_pointer(props%longwave_radiation%data, data, (/num_cols/))
+  sunrad = data(:)
+
+  call c_f_pointer(props%air_temperature%data, data, (/num_cols/))
+  tairc = data(:)
+
+  call c_f_pointer(props%vapor_pressure_air%data, data, (/num_cols/))
+  vpair = data(:)
+
+  call c_f_pointer(props%wind_speed%data, data, (/num_cols/))
+  uwind = data(:)
+
+  call c_f_pointer(props%precipitation%data, data, (/num_cols/))
+  prec = data(:)
+
+!!** Currently used by coupler **!!
+
+  atm_n2 = props%atm_n2
+  atm_o2 = props%atm_o2
+  atm_co2 = props%atm_co2
+  atm_ch4 = props%atm_ch4
+  atm_n2o = props%atm_n2o
+  atm_h2 = props%atm_h2
+  atm_nh3 = props%atm_nh3
+
+  call c_f_pointer(props%plant_wilting_factor%data, data2D, [(/size_col/),(/num_cols/)])
+  a_WP=data2D(:,:)
+
+  call c_f_pointer(props%rooting_depth_fraction%data, data2D, [(/size_col/),(/num_cols/)])
+  a_FC=data2D(:,:)
+
+  call c_f_pointer(state%bulk_density%data, data2D, [(/size_col/),(/num_cols/)])
+  a_BKDSI=data2D(:,:)
+
+!!***********************************!!
+
+  call c_f_pointer(state%porosity%data, data2D, [(/size_col/),(/num_cols/)])
+  a_PORO=data2D(:,:)
+
+  call c_f_pointer(state%water_content%data, data2D, [(/size_col/),(/num_cols/)])
+  a_WC=data2D(:,:)
+
+  call c_f_pointer(props%liquid_saturation%data, data2D, [(/size_col/),(/num_cols/)])
+  a_LSAT=data2D(:,:)
+
+  call c_f_pointer(props%relative_permeability%data, data2D, [(/size_col/),(/num_cols/)])
+  a_RELPERM=data2D(:,:)
+
+  call c_f_pointer(state%hydraulic_conductivity%data, data2D, [(/size_col/),(/num_cols/)])
+  a_HCOND=data2D(:,:)
+
+  call c_f_pointer(state%temperature%data, data2D, [(/size_col/),(/num_cols/)])
+  a_TEMP=data2D(:,:)
+
+  write(*,*) "Data Transfer Finished"
   end subroutine ATS2EcoSIMData
 !------------------------------------------------------------------------------------------
 
-  subroutine EcoSIM2ATSData()
+  subroutine EcoSIM2ATSData(ncol, state, sizes)
   !!grab data from ecosim and return it to ATS
   implicit none
-  character(len=*), parameter :: subname=trim(mod_filename)//'::EcoSIM2ATSData'
+  !character(len=*), parameter :: subname=trim(mod_filename)//'::EcoSIM2ATSData'
 
-  
+  type (BGCState), intent(in) :: state
+  type (BGCSizes), intent(out) :: sizes
+
+  ! Ecosim variables
+  real(r8), pointer :: data(:)
+  real(r8), pointer :: data2D(:,:)
+  integer :: ncol, nvar, size_col, size_procs
+  integer :: j1,j2,j3
+
+  write(*,*) "Copying back"
+  call SetBGCSizes(sizes)
+
+  size_col = sizes%ncells_per_col_
+  size_procs = state%porosity%cols
+
+  write(*,*) "column size: ", size_col, " columns on this process: ", size_procs
+
+  !seems like we call the pointer as normal,
+  !then just reverse the data
+
+  call c_f_pointer(state%bulk_density%data, data2D, [(/size_col/),(/size_procs/)])
+  data2D(:,:)=a_BKDSI
+
+  call c_f_pointer(state%water_content%data, data2D, [(/size_col/),(/size_procs/)])
+  data2D(:,:)=a_WC
+
+  call c_f_pointer(state%hydraulic_conductivity%data, data2D, [(/size_col/),(/size_procs/)])
+  data2D(:,:)=a_HCOND
+
+  call c_f_pointer(state%temperature%data, data2D, [(/size_col/),(/size_procs/)])
+  data2D(:,:)=a_TEMP
+
+  write(*,*) "finished copying back in driver"
+
   end subroutine EcoSIM2ATSData
 
 !------------------------------------------------------------------------------------------
@@ -102,7 +147,7 @@ contains
   subroutine Run_EcoSIM_one_step()
   !advance ecosim one time step
   implicit none
-  character(len=*), parameter :: subname=trim(mod_filename)//'::Run_EcoSIM_one_step'
+  !character(len=*), parameter :: subname=trim(mod_filename)//'::Run_EcoSIM_one_step'
 
 
   !copy data from compuler to EcoSIM
@@ -114,18 +159,19 @@ contains
   end subroutine Run_EcoSIM_one_step
 !------------------------------------------------------------------------------------------
 
-  subroutine Init_EcoSIM(jz,js,ncol)
+  subroutine Init_EcoSIM(sizes)
   !initialize ecosim
   implicit none
-  character(len=*), parameter :: subname=trim(mod_filename)//'::Init_EcoSIM'
-  integer, intent(in) :: jz   !number of soil layers
-  integer, intent(in) :: js   !number of snow layers
-  integer, intent(in) :: ncol !number of column
+  !character(len=*), parameter :: subname=trim(mod_filename)//'::Init_EcoSIM'
+  type (BGCSizes), intent(in) :: sizes
+  integer :: size_col, num_cols
 
+  size_col = sizes%ncells_per_col_
+  num_cols = sizes%num_columns
 
-  call InitSharedData(JZ,NCOL)
+  call InitSharedData(size_col,num_cols)
 
-  call Init_EcoSIM_Soil()
+  call Init_EcoSIM_Soil(size_col)
   end subroutine Init_EcoSIM
 !------------------------------------------------------------------------------------------
 
@@ -134,7 +180,20 @@ contains
   implicit none
 
   end subroutine SurfaceEBalance
-  
 
+  subroutine SetBGCSizes(sizes)
 
+    use BGCContainers_module, only : BGCSizes
+
+    implicit none
+
+    type (BGCSizes), intent(out) :: sizes
+
+    sizes%num_components = 1
+    sizes%ncells_per_col_ = 100
+    sizes%num_columns = 25
+
+  end subroutine SetBGCSizes
+
+!-----------------------------------------------------------------------------------------
 end module ATSCPLMod

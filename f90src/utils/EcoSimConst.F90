@@ -1,13 +1,14 @@
 module EcosimConst
   use data_kind_mod, only : r8 => DAT_KIND_R8
   implicit none
-  character(len=*),private, parameter :: mod_filename = __FILE__
+  character(len=*),private, parameter :: mod_filename = &
+  __FILE__
   real(r8), parameter :: secspday=86400._r8
   real(r8), parameter :: secspyear=86400._r8*365._r8   !seconds in a normal year
-  real(r8), parameter :: cpw=4.19_r8           !heat capacity for water, J/g/K
-  real(r8), parameter :: cpi=1.9274_r8         !heat capacity for ice, J/g/K
-  real(r8), parameter :: cpo=2.496E-06_r8      !heat capacity for organic matter, MJ/K
-  real(r8), parameter :: cps=2.095_r8          !heat capacity for fresh snow, J/g/K
+  real(r8), parameter :: Cpw=4.19_r8           !heat capacity for water, J/g/K
+  real(r8), parameter :: cpi=1.9274_r8         !heat capacity for ice
+  real(r8), parameter :: cpo=2.496E-06_r8      !heat capacity for organic matter
+  real(r8), parameter :: cps=2.095_r8          !heat capacity for fresh snow
   real(r8), parameter :: TFice=273.15_r8       !frozen temperature [K]
   real(r8), parameter :: TC2K=273.15_r8        !temperature for converting celcius to Kelvin
   real(r8), parameter :: Tref=273.15_r8        !reference temperature for atmospheric variables [K]

@@ -2,12 +2,13 @@ program restartTest
   use HistFileMod
   use RestartMod
   use abortutils        , only : endrun
-  use fileUtil          , only : iulog  
-  use data_kind_mod     , only : r8 => DAT_KIND_R8  
+  use fileUtil          , only : iulog
+  use data_kind_mod     , only : r8 => DAT_KIND_R8
   use EcoSIMCtrlMod     , only : etimer
   use GridConsts        , only : JZ,JS,JBR,bounds,JP
 implicit none
-  character(len=*), parameter :: prognm=__FILE__
+  character(len=*), parameter :: prognm=&
+  __FILE__
 
   character(len=36):: nmlfile
 
@@ -49,7 +50,7 @@ implicit none
     write(iulog, *) '--------------------'
     write(iulog,hist_nml)
 
-  endif  
+  endif
   print*,prognm
 
   bounds%ngrid=1

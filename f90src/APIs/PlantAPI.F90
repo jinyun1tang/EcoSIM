@@ -9,8 +9,8 @@ module PlantAPI
   use EcoSiMParDataMod, only : micpar, pltpar
   use PlantDisturbMod , only : PrepLandscapeGrazing
   use timings         , only : start_timer, end_timer
-  use SoilPhysDataType, only : ALBX  
-  use EcoSIMSolverPar  
+  use SoilPhysDataType, only : ALBX
+  use EcoSIMSolverPar
   use EcoSIMHistMod
   use SnowDataType
   use TracerIDMod
@@ -39,7 +39,8 @@ module PlantAPI
 implicit none
 
   private
-  character(len=*),private, parameter :: mod_filename = __FILE__
+  character(len=*),private, parameter :: mod_filename = &
+  __FILE__
   public :: PlantModel
   public :: PlantCanopyRadsModel
 
@@ -381,7 +382,7 @@ implicit none
       ENDDO
     ENDDO
 
-    
+
     DO NB=1,NBR(NZ,NY,NX)
       DO NE=1,npelms
         EPOOL(NE,NB,NZ,NY,NX) =plt_biom%EPOOL(NE,NB,NZ)

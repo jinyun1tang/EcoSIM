@@ -7,7 +7,8 @@ module CanopyCondsMod
   use minimathmod, only : AZMAX1,isnan
   implicit none
   private
-  CHARACTER(LEN=*), PARAMETER :: MOD_FILENAME=__FILE__
+  CHARACTER(LEN=*), PARAMETER :: MOD_FILENAME=&
+  __FILE__
 
   public :: CanopyConditionModel
 
@@ -144,7 +145,7 @@ module CanopyCondsMod
   GridMaxCanopyHeight=0.0
   D9685: DO NZ=1,NP
     GridMaxCanopyHeight=AMAX1(GridMaxCanopyHeight,CanopyHeight(NZ))
-  ENDDO D9685  
+  ENDDO D9685
   CanopyHeightz(JC1)=GridMaxCanopyHeight+0.01_r8
   ZL1(JC1)=CanopyHeightz(JC1)
   ZL1(0)=0.0
@@ -320,7 +321,7 @@ module CanopyCondsMod
     CanPA(NZ)=0.0
     DO  NB=1,NBR(NZ)
       DO  L=1,JC1
-        
+
         IF(CanopyHeightz(L-1).GE.SnowDepth-ZERO.AND.CanopyHeightz(L-1).GE.DPTH0-ZERO)THEN
           !above snow depth and above water/ice surface
           D1130: DO K=1,JNODS1
@@ -743,7 +744,7 @@ module CanopyCondsMod
       D20: DO N=1,JSA1
         RASG=RASG+ABS(OMEGAG(N))*RADYG
         RAPG=RAPG+ABS(OMEGAG(N))*RAPYG
-      ENDDO D20 
+      ENDDO D20
       RADG=RASG*AREA3(NU)
 !
       !     RADIATION REFLECTED FROM GROUND SURFACE
@@ -757,7 +758,7 @@ module CanopyCondsMod
 !
       IF(VHCPW1.GT.VLHeatCapSnowMN)THEN
         ALBW=(0.80_r8*VcumDrySnoWE+0.30_r8*VcumIceSnow+0.06_r8*VcumWatSnow)/(VcumDrySnoWE+VcumIceSnow+VcumWatSnow)
-        !the following partition differs from that used in the surface physics module  
+        !the following partition differs from that used in the surface physics module
         FSNOW=AMIN1((SnowDepth/0.07_r8)**2._r8,1.0_r8)
         ALBG=FSNOW*ALBW+(1.0_r8-FSNOW)*ALBS
       ELSE

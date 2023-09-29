@@ -11,7 +11,8 @@ module InitSoluteMod
   implicit none
 
   private
-  character(len=*),private, parameter :: mod_filename = __FILE__
+  character(len=*),private, parameter :: mod_filename = &
+  __FILE__
 
   real(r8), parameter :: COOH1=2.5E-02_r8
   real(r8), parameter :: TAD=5.0E-02_r8

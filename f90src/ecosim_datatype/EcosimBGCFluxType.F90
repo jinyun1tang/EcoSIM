@@ -8,7 +8,8 @@ module EcosimBGCFluxType
   implicit none
   public
   save
-  character(len=*), private, parameter :: mod_filename = __FILE__
+  character(len=*), private, parameter :: mod_filename = &
+  __FILE__
 
   real(r8),target,allocatable ::  TCAN(:,:)                          !total net CO2 fixation
   real(r8),target,allocatable ::  TRN(:,:)                           !ecosystem net radiation, [MJ d-2 h-1]

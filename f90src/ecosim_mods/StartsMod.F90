@@ -8,7 +8,7 @@ module StartsMod
   use minimathMod, only : isclose, AZMAX1,AZMIN1
   use EcosimConst
   use TracerIDMod
-  use SnowDataType  
+  use SnowDataType
   use MicrobialDataType
   use EcoSIMSolverPar
   use SOMDataType
@@ -45,7 +45,8 @@ module StartsMod
   implicit none
 
   private
-  character(len=*),private, parameter :: mod_filename = __FILE__
+  character(len=*),private, parameter :: mod_filename = &
+  __FILE__
   !
   !
   !     BulkDensLitR=dry bulk density of woody(0),fine(1),manure(2) litter
@@ -174,7 +175,7 @@ module StartsMod
 !     TCNDG=assumed thermal conductivity below lower soil boundary
 !     (MJ m-1 K-1 h-1)
 !     TKSD=deep source/sink temperature from geothermal flux(K)
-      
+
       SoilHeatSrcDepth(NY,NX)=AMAX1(10.0_r8,CumDepth2LayerBottom(NL(NY,NX),NY,NX)+1.0_r8)
       TCS(0,NY,NX)=ATCS(NY,NX)
       TKS(0,NY,NX)=ATKS(NY,NX)
@@ -477,7 +478,7 @@ module StartsMod
         VLiceMicP(L,NY,NX)=THETI(L,NY,NX)*VLSoilPoreMicP(L,NY,NX)
         VLiceMacP(L,NY,NX)=THETI(L,NY,NX)*VLMacP(L,NY,NX)
 !       total air-filled porosity, micropores + macropores
-        VLsoiAirP(L,NY,NX)=AZMAX1(VLMicP(L,NY,NX)-VLWatMicP(L,NY,NX)-VLiceMicP(L,NY,NX)) & 
+        VLsoiAirP(L,NY,NX)=AZMAX1(VLMicP(L,NY,NX)-VLWatMicP(L,NY,NX)-VLiceMicP(L,NY,NX)) &
           +AZMAX1(VLMacP(L,NY,NX)-VLWatMacP(L,NY,NX)-VLiceMacP(L,NY,NX))
         VHeatCapacity(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+cpw*(VLWatMicP(L,NY,NX) &
           +VLWatMacP(L,NY,NX))+cpi*(VLiceMicP(L,NY,NX)+VLiceMacP(L,NY,NX))
@@ -854,7 +855,7 @@ module StartsMod
     k_fine_litr  => micpar%k_fine_litr  , &
     k_manure     => micpar%k_manure       &
   )
-  
+
 !     begin_execution
   DO  L=0,NL(NY,NX)
 !
@@ -906,7 +907,7 @@ module StartsMod
       VLSoilPoreMicP(L,NY,NX)=VGeomLayer(L,NY,NX)*FracSoiAsMicP(L,NY,NX)
       VLSoilMicP(L,NY,NX)=VLSoilPoreMicP(L,NY,NX)
       VGeomLayert0(L,NY,NX)=VGeomLayer(L,NY,NX)
-!     bulk density is defined only for soil with micropores      
+!     bulk density is defined only for soil with micropores
 !     bulk soil mass evaluated as micropore volume
       SoilMicPMassLayer(L,NY,NX)=SoiBulkDensity(L,NY,NX)*VLSoilPoreMicP(L,NY,NX)
       RTDNT(L,NY,NX)=0.0_r8
@@ -920,20 +921,20 @@ module StartsMod
 
   end associate
   end subroutine InitLayerDepths
-    
+
 !------------------------------------------------------------------------------------------
-  
+
   subroutine set_ecosim_solver(NPXS1,NPYS1,NCYC_LITR,NCYC_SNOW)
-  
+
   implicit none
   integer, intent(in) :: NPXS1,NPYS1
   integer, intent(in) :: NCYC_LITR,NCYC_SNOW
   !     begin_execution
   real(r8) :: XNPV
-  
+
   NPX=NPXS1   !number of cycles per hour for water,heat,solute flux calcns
   NPY=NPYS1   !number of cycles per NPX for gas flux calcns
-    
+
   NPH=NPX
   NPT=NPY
   NPG=NPH*NPT
@@ -954,15 +955,15 @@ module StartsMod
   dts_sno=dts_wat*XNPS
   XNPB=dts_wat*XNPR
   dt_watvap=dts_wat*XNPV
-  
+
   end subroutine set_ecosim_solver
 
 !------------------------------------------------------------------------------------------
 
-  
+
   subroutine startsim(NHW,NHE,NVN,NVS)
   use SoilHydroParaMod, only : ComputeSoilHydroPars
-  use SoilPhysParaMod, only : SetDeepSoil  
+  use SoilPhysParaMod, only : SetDeepSoil
   implicit none
   integer,intent(in) :: NHW,NHE,NVN,NVS
   REAL(R8) :: ALTY
@@ -1071,7 +1072,7 @@ module StartsMod
 !     TCNDG=assumed thermal conductivity below lower soil boundary
 !     (MJ m-1 K-1 h-1)
 !     TKSD=deep source/sink temperature from geothermal flux(K)
-      
+
       SoilHeatSrcDepth(NY,NX)=AMAX1(10.0_r8,CumDepth2LayerBottom(NL(NY,NX),NY,NX)+1.0_r8)
       TCS(0,NY,NX)=ATCS(NY,NX)
       TKS(0,NY,NX)=ATKS(NY,NX)

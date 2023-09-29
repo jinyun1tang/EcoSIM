@@ -2,8 +2,8 @@ module UptakesMod
   use data_kind_mod , only : r8 => DAT_KIND_R8
   use data_const_mod, only : GravAcceleration=>DAT_CONST_G
   use StomatesMod   , only : stomates
-  use minimathmod   
-  use UnitMod       , only : units  
+  use minimathmod
+  use UnitMod       , only : units
   use EcosimConst
   use EcoSIMSolverPar
   use UptakePars
@@ -15,12 +15,13 @@ module UptakesMod
 
   private
 
-  character(len=*), private, parameter :: mod_filename = __FILE__
+  character(len=*), private, parameter :: mod_filename = &
+  __FILE__
 
   public :: uptakes
   public :: InitUptake
 
-  real(r8), parameter :: mGravAccelerat=1.e-3_r8*GravAcceleration  !gravitational constant devided by 1000.  
+  real(r8), parameter :: mGravAccelerat=1.e-3_r8*GravAcceleration  !gravitational constant devided by 1000.
   contains
 
   subroutine InitUptake
@@ -316,7 +317,7 @@ module UptakesMod
 !     ENDIF
       enddo
     ENDDO D9005
-  ENDDO D9000  
+  ENDDO D9000
   end associate
   end subroutine PrepH2ONutrientUptake
 !------------------------------------------------------------------------
@@ -376,8 +377,8 @@ module UptakesMod
           SURFX(N,L,K,NB,NZ)=SURF(N,L,K,NB,NZ)*CFX(NZ)
         ENDDO D650
       ENDDO D600
-    ENDDO D550 
-  ENDDO D500 
+    ENDDO D550
+  ENDDO D500
 !
 !     CANOPY HEIGHT FROM HEIGHT OF MAXIMUM LEAF LAYER
 !
@@ -585,7 +586,7 @@ module UptakesMod
       TCC(NZ)=units%Kelvin2Celcius(TKC(NZ))
       FTHRM=EMMC*2.04E-10_r8*FracPARByCanP(NZ)*AREA3(NU)
       LWRadCanP(NZ)=FTHRM*TKC(NZ)**4._r8
-      PSICanP(NZ)=ElvAdjstedtSoiPSIMPa(NGTopRootLayer(NZ))      
+      PSICanP(NZ)=ElvAdjstedtSoiPSIMPa(NGTopRootLayer(NZ))
       CCPOLT=CEPOLP(ielmc,NZ)+CEPOLP(ielmn,NZ)+CEPOLP(ielmp,NZ)
 
       CALL update_osmo_turg_pressure(PSICanP(NZ),CCPOLT,OSMO(NZ),TKC(NZ),PSICanPOsmo(NZ),PSICanPTurg(NZ),FDMP)
@@ -772,7 +773,7 @@ module UptakesMod
       EX=0.0_r8
       VFLXC=VapXAir2PCan(NZ)*cpw*TairK                !enthalpy of evaporated water, MJ/(h*m2)
     ELSEIF(EX.LE.0.0_r8.AND.WatByPCan(NZ).GT.0.0_r8)THEN
-      !evaporation, and there is water stored in canopy 
+      !evaporation, and there is water stored in canopy
       !<0._r8, off canopy, cannot be more than WatByPCan(NZ)
       VapXAir2PCan(NZ)=AMAX1(EX*CanPbndlResist(NZ)/(CanPbndlResist(NZ)+RZ),-WatByPCan(NZ))
       EX=EX-VapXAir2PCan(NZ)                !extra water needs transpiration
@@ -781,7 +782,7 @@ module UptakesMod
     !PTrans <0 means transpiration into atmosphere
     PTrans(NZ)=EX*CanPbndlResist(NZ)/(CanPbndlResist(NZ)+CanPStomaResistH2O(NZ))
     EvapTransHeatP(NZ)=(PTrans(NZ)+VapXAir2PCan(NZ))*EvapLHTC   !latent heat flux, negative means into atmosphere
-    
+
 !
 !     SENSIBLE + STORAGE HEAT FROM RN, LE AND CONVECTIVE HEAT FLUXES
 !
@@ -917,14 +918,14 @@ module UptakesMod
 !     1.0E-03=acceptance criterion for DPSI
 !
       DPSI=AMIN1(AMIN1(RSSZ,RSSU)*(DIFFU-DIFFZ),ABS(PSICanP(NZ)))
-      
+
 !     IF CONVERGENCE CRITERION IS MET THEN FINISH,
 !     OTHERWISE START NEXT ITERATION WITH CANOPY WATER POTENTIAL
 !     TRANSPIRATION, UPTAKE AND WATER CONTENT FROM CURRENT ITERATION
 !
       IF(.not.((NN.GE.30.AND.ABS(DPSI).LT.1.0E-03_r8).OR.NN.GE.MaxIterNum))then
         !make copies for next iteration
-        PSICanPPre=PSICanP(NZ)        
+        PSICanPPre=PSICanP(NZ)
         PTransPre=PTrans(NZ)
         cumPRootH2OUptakePre=cumPRootH2OUptake
         VOLWPX=SymplasmicWat
@@ -1160,7 +1161,7 @@ module UptakesMod
   FTHRM=EMMC*2.04E-10_r8*FracPARByCanP(NZ)*AREA3(NU)
   LWRadCanP(NZ)=FTHRM*TKC(NZ)**4._r8
   PSICanP(NZ)=ElvAdjstedtSoiPSIMPa(NGTopRootLayer(NZ))
-  
+
   CCPOLT=CEPOLP(ielmc,NZ)+CEPOLP(ielmn,NZ)+CEPOLP(ielmp,NZ)
 
   call update_osmo_turg_pressure(PSICanP(NZ),CCPOLT,OSMO(NZ),TKC(NZ),PSICanPOsmo(NZ),PSICanPTurg(NZ),FDMP)
@@ -1173,7 +1174,7 @@ module UptakesMod
 
   DO N=1,MY(NZ)
     DO  L=NU,NI(NZ)
-      PSIRoot(N,L,NZ)=ElvAdjstedtSoiPSIMPa(L)      
+      PSIRoot(N,L,NZ)=ElvAdjstedtSoiPSIMPa(L)
       CCPOLT=sum(CEPOLR(1:npelms,N,L,NZ))
 
       call update_osmo_turg_pressure(PSIRoot(N,L,NZ),CCPOLT,OSMO(NZ),TKS(L),&
@@ -1252,10 +1253,10 @@ module UptakesMod
     D4510: DO L=NU,NI(NZ)
       IF(LayrHasRoot(N,L).EQ.1)THEN
         PSIRoot(N,L,NZ)=AZMIN1((ElvAdjstedtSoiPSIMPa(L)*RootResist(N,L) &
-          +PSICanP(NZ)*SoiH2OResist(N,L))/SoiAddRootResist(N,L))        
-      ELSE 
+          +PSICanP(NZ)*SoiH2OResist(N,L))/SoiAddRootResist(N,L))
+      ELSE
         PSIRoot(N,L,NZ)=ElvAdjstedtSoiPSIMPa(L)
-      ENDIF           
+      ENDIF
       CCPOLT=sum(CEPOLR(1:npelms,N,L,NZ))
 
       CALL update_osmo_turg_pressure(PSIRoot(N,L,NZ),CCPOLT,OSMO(NZ),TKS(L),&

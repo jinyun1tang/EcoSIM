@@ -23,7 +23,8 @@ module ErosionMod
   implicit none
 
   private
-  character(len=*),private, parameter :: mod_filename = __FILE__
+  character(len=*),private, parameter :: mod_filename = &
+  __FILE__
 
   real(r8), PARAMETER :: FSINK=0.01_r8
 
@@ -100,7 +101,7 @@ module ErosionMod
   IF(IERSNG.EQ.1.OR.IERSNG.EQ.3)THEN
     DO  NX=NHW,NHE
       DO  NY=NVN,NVS
-      
+
         TERSED(NY,NX)=0._r8
         RDTSED(NY,NX)=0._r8
         FVOLIM(NY,NX)=AMIN1(1.0_r8,AZMAX1(XVLiceMicPM(M,NY,NX)/VOLWG(NY,NX)))

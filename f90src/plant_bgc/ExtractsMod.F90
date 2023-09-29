@@ -11,7 +11,8 @@ module ExtractsMod
   implicit none
 
   private
-  character(len=*),private, parameter :: mod_filename = __FILE__
+  character(len=*),private, parameter :: mod_filename = &
+  __FILE__
 
   public :: extracts
   contains
@@ -76,7 +77,7 @@ module ExtractsMod
       ZESNC(NE)=ZESNC(NE)+HESNC(NE,NZ)
       WTSTGET(NE)=WTSTGET(NE)+WTSTGE(NE,NZ)
     ENDDO
-    
+
     DO  L=0,NI(NZ)
       DO K=1,pltpar%n_pltlitrk
         DO NE=1,npelms

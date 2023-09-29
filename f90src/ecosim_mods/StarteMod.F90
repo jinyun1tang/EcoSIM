@@ -29,7 +29,8 @@ module StarteMod
   implicit none
 
   private
-  character(len=*),private, parameter :: mod_filename = __FILE__
+  character(len=*),private, parameter :: mod_filename = &
+  __FILE__
   integer :: I,K,L,MM,M,NX,NY,NR1,NP2,NP3
 
   public :: starte
@@ -39,7 +40,7 @@ module StarteMod
 !
 ! DESCRIPTION:
 !     THIS SUBROUTINE INITIALIZES ALL SOIL CHEMISTRY VARIABLES
-! The top layer are initialized every year to accomadate changes in 
+! The top layer are initialized every year to accomadate changes in
 ! boundary conditions (irrigation, rainfall, manure application) every year
 ! other layers are done only in the first year.
 

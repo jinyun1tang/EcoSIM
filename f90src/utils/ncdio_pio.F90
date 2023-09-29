@@ -75,8 +75,8 @@ module ncdio_pio
     module procedure ncd_putvar_int_3d
     module procedure ncd_putvar_int_all_3d
     module procedure ncd_putvar_real_sp_3d
-    module procedure ncd_putvar_real_sp_4d    
-    module procedure ncd_putvar_real_sp_5d    
+    module procedure ncd_putvar_real_sp_4d
+    module procedure ncd_putvar_real_sp_5d
 
     module procedure ncd_putvar_real_sp_all_3d
     module procedure ncd_putvar_real_sp_all_4d
@@ -94,10 +94,10 @@ module ncdio_pio
     module procedure ncd_getvar_int_all_2d
     module procedure ncd_getvar_real_sp_2d
     module procedure ncd_getvar_int_3d
-    module procedure ncd_getvar_int_all_3d  
+    module procedure ncd_getvar_int_all_3d
     module procedure ncd_getvar_real_sp_3d
     module procedure ncd_getvar_real_sp_4d
-    module procedure ncd_getvar_real_sp_5d    
+    module procedure ncd_getvar_real_sp_5d
     module procedure ncd_getvar_real_sp_scalar
     module procedure ncd_getvar_real_sp_all_1d
     module procedure ncd_getvar_real_sp_all_2d
@@ -439,7 +439,7 @@ module ncdio_pio
   character(len=*), intent(in), optional :: dim5name       ! dimension name
   character(len=*), intent(in), optional :: long_name      ! attribute
   character(len=*), intent(in), optional :: standard_name  ! attribute
-  character(len=*), intent(in), optional :: comment        ! attribute    
+  character(len=*), intent(in), optional :: comment        ! attribute
   character(len=*), intent(in), optional :: flag_meanings(:) ! attribute
   character(len=*), intent(in), optional :: units          ! attribute
   character(len=*), intent(in), optional :: cell_method    ! attribute
@@ -447,8 +447,8 @@ module ncdio_pio
   real(r8)        , intent(in), optional :: fill_value     ! attribute for real
   integer         , intent(in), optional :: imissing_value ! attribute for int
   integer         , intent(in), optional :: ifill_value    ! attribute for int
-  integer         , intent(in), optional :: flag_values(:)  ! attribute for int  
-  integer         , intent(in), optional :: nvalid_range(2)  ! attribute for int  
+  integer         , intent(in), optional :: flag_values(:)  ! attribute for int
+  integer         , intent(in), optional :: nvalid_range(2)  ! attribute for int
 !
 ! !REVISION HISTORY:
 !
@@ -530,7 +530,7 @@ module ncdio_pio
   if (present(comment)) then
     call check_ret(ncd_putatt(ncid, varid, 'comment', trim(comment)),subname)
   end if
-  
+
   if (present(standard_name)) then
       if (standard_name /= ' ') then
         call check_ret(ncd_putatt(ncid, varid, 'standard_name', trim(standard_name)),subname)
@@ -549,24 +549,32 @@ module ncdio_pio
     call check_ret(ncd_putatt(ncid,varid,'flag_values',flag_values),subname)
     if ( .not. present(flag_meanings)) then
       write(iulog,*) 'Error in defining variable = ', trim(varname)
-      call endrun(" ERROR:: flag_values set -- but not flag_meanings"//errMsg(__FILE__, __LINE__))
+      call endrun(" ERROR:: flag_values set -- but not flag_meanings"//errMsg(&
+      __FILE__,&
+      __LINE__))
     end if
   end if
 
   if (present(flag_meanings)) then
       if ( .not. present(flag_values)) then
         write(iulog,*) 'Error in defining variable = ', trim(varname)
-        call endrun(" ERROR:: flag_meanings set -- but not flag_values"//errMsg(__FILE__, __LINE__) )
+        call endrun(" ERROR:: flag_meanings set -- but not flag_values"//errMsg(&
+        __FILE__, &
+        __LINE__) )
       end if
       if ( size(flag_values) /= size(flag_meanings) ) then
         write(iulog,*) 'Error in defining variable = ', trim(varname)
-        call endrun(" ERROR:: flag_meanings and flag_values dimension different"//errMsg(__FILE__, __LINE__))
+        call endrun(" ERROR:: flag_meanings and flag_values dimension different"//errMsg(&
+        __FILE__, &
+        __LINE__))
       end if
       str = flag_meanings(1)
       do n = 1, size(flag_meanings)
         if ( index(flag_meanings(n), ' ') /= 0 )then
             write(iulog,*) 'Error in defining variable = ', trim(varname)
-            call endrun(" ERROR:: flag_meanings has an invalid space in it"//errMsg(__FILE__, __LINE__) )
+            call endrun(" ERROR:: flag_meanings has an invalid space in it"//errMsg(&
+            __FILE__, &
+            __LINE__) )
         end if
         if ( n > 1 ) str = trim(str)//" "//flag_meanings(n)
       end do
@@ -725,7 +733,7 @@ module ncdio_pio
   subroutine ncd_putvar_string(ncid,varname,data)
   !write string to file
   implicit none
-    class(file_desc_t), intent(in) :: ncid  
+    class(file_desc_t), intent(in) :: ncid
     character(len=*), intent(in) :: data
     character(len=*), intent(in) :: varname
     character(len=*), parameter :: sub=trim(mod_filename)//'::ncd_putvar_string'
@@ -742,7 +750,7 @@ module ncdio_pio
   subroutine ncd_putvar_string_1d(ncid,varname,rec,data)
   !write string to file
   implicit none
-    class(file_desc_t), intent(in) :: ncid  
+    class(file_desc_t), intent(in) :: ncid
     character(len=*), intent(in) :: data
     character(len=*), intent(in) :: varname
     integer, intent(in) :: rec
@@ -761,7 +769,7 @@ module ncdio_pio
   subroutine ncd_getvar_string_1d(ncid,varname,rec,data)
   !write string to file
   implicit none
-    class(file_desc_t), intent(in) :: ncid  
+    class(file_desc_t), intent(in) :: ncid
     character(len=*), intent(out) :: data
     character(len=*), intent(in) :: varname
     integer, intent(in) :: rec
@@ -931,7 +939,7 @@ module ncdio_pio
   integer, dimension(:,:,:), intent(in) :: data
   character(len=*), intent(in) :: varname
   integer :: varid
-  logical :: readvar  
+  logical :: readvar
   type(Var_desc_t)  :: vardesc
   character(len=*), parameter  :: subname=trim(mod_filename)//'::ncd_putvar_int_all_3d'
   call check_var(ncid, trim(varname), vardesc, readvar)
@@ -994,7 +1002,7 @@ module ncdio_pio
 
     call check_ret( nf90_put_var(ncid%fh, vardesc%varid, data), &
       trim(mod_filename)//'::ncd_putvar_real_sp_all_5d::'//trim(varname))
-  end subroutine ncd_putvar_real_sp_all_5d  
+  end subroutine ncd_putvar_real_sp_all_5d
 !----------------------------------------------------------------------
   subroutine ncd_putvar_real_sp_3d(ncid, varname, rec, data)
   !
@@ -1366,7 +1374,7 @@ module ncdio_pio
   call check_ret( nf90_get_var(ncid%fh, vardesc%varid, data),&
     trim(mod_filename)//'::ncd_getvar_int_all_1d::'//trim(varname))
 
-  end subroutine ncd_getvar_int_all_1d  
+  end subroutine ncd_getvar_int_all_1d
 !----------------------------------------------------------------------
   subroutine ncd_getvar_real_sp_1d(ncid, varname, rec, data)
   !
@@ -1699,7 +1707,7 @@ module ncdio_pio
     integer :: ierr
     !-----------------------------------------------------------------------
 
-    write(iulog,*)'open file ',trim(fname), ' to write'    
+    write(iulog,*)'open file ',trim(fname), ' to write'
     call check_ret(nf90_open(fname, NF90_WRITE, file%fh),'open file '//trim(fname))
   end subroutine ncd_pio_openfile_for_write
 
@@ -1749,8 +1757,8 @@ module ncdio_pio
   implicit none
   class(file_desc_t),intent(inout) :: ncid      ! netcdf file id
   integer           ,intent(in)    :: varid     ! netcdf var id
-  character(len=*)  ,intent(in)    :: attrib    ! netcdf attrib  
-  integer           , intent(in)   :: value(:)  ! attribute for int  
+  character(len=*)  ,intent(in)    :: attrib    ! netcdf attrib
+  integer           , intent(in)   :: value(:)  ! attribute for int
   integer :: status
 
     status = nf90_put_att(ncid%fh,varid,trim(attrib),value)
@@ -1852,7 +1860,7 @@ module ncdio_pio
     integer :: status
     character(len=*), parameter :: subname = trim(mod_filename)//'::ncd_defdim'
     !-----------------------------------------------------------------------
-    
+
     call check_ret(nf90_def_dim(ncid%fh,attrib,value,dimid), trim(subname)//' '//trim(attrib))
 
   end subroutine ncd_defdim
@@ -2166,18 +2174,18 @@ module ncdio_pio
     call check_var(ncid, trim(varname), vardesc, lreadv)
 
     if(flag=='read')then
-      if(present(readvar))readvar=lreadv      
+      if(present(readvar))readvar=lreadv
       if(present(nt))then
         call check_ret( nf90_get_var(ncid%fh, vardesc%varid, data, start = (/nt/)),subname)
       else
-        call check_ret( nf90_get_var(ncid%fh, vardesc%varid, data ),subname)  
+        call check_ret( nf90_get_var(ncid%fh, vardesc%varid, data ),subname)
       endif
     elseif(flag=='write')then
       if(present(nt))then
         call check_ret( nf90_put_var(ncid%fh, vardesc%varid, data, start = (/nt/)),subname)
       else
         call check_ret( nf90_put_var(ncid%fh, vardesc%varid, data),subname)
-      endif  
+      endif
 
     endif
   end subroutine ncd_io_0d_int_glob
@@ -2344,20 +2352,20 @@ module ncdio_pio
     real(r8) :: temp(1)
     logical :: lreadv
     character(len=*),parameter :: subname=trim(mod_filename)//'::ncd_io_0d_double_glob'
-    
+
     if (flag=='read')then
       if(present(nt))then
         call ncd_getvar_real_sp(ncid, varname, nt, data,lreadv)
       else
         call ncd_getvar_real_sp_scalar(ncid, varname, data,lreadv)
-      endif  
+      endif
       if(present(readvar))readvar=lreadv
     elseif(flag=='write')then
       if(present(nt))then
         call ncd_putvar_real_sp(ncid, varname, nt, data)
       else
         call ncd_putvar_real_sp_scalar(ncid, varname, data)
-      endif  
+      endif
     endif
   end subroutine ncd_io_0d_double_glob
 !------------------------------------------------------------------------------------------
@@ -2433,16 +2441,16 @@ module ncdio_pio
 
     if(trim(flag)=='read')then
       if(present(nt))then
-        call ncd_getvar_real_sp_2d(ncid, varname, nt, data)      
+        call ncd_getvar_real_sp_2d(ncid, varname, nt, data)
       else
         call ncd_getvar_real_sp_all_2d(ncid, varname, data)
       endif
       if(present(readvar))readvar=.true.
     else if(trim(flag)=='write')then
       if(present(nt))then
-        call ncd_putvar_real_sp_2d(ncid, varname, nt, data)        
+        call ncd_putvar_real_sp_2d(ncid, varname, nt, data)
       else
-        call ncd_putvar_real_sp_all_2d(ncid, varname, data)  
+        call ncd_putvar_real_sp_all_2d(ncid, varname, data)
       endif
     endif
   end subroutine ncd_io_2d_double_glob
@@ -2483,9 +2491,9 @@ module ncdio_pio
       if(present(readvar))readvar=.true.
     else if(trim(flag)=='write')then
       if(present(nt))then
-        call ncd_putvar_real_sp_3d(ncid, varname, nt, data)      
+        call ncd_putvar_real_sp_3d(ncid, varname, nt, data)
       else
-        call ncd_putvar_real_sp_all_3d(ncid, varname, data)  
+        call ncd_putvar_real_sp_all_3d(ncid, varname, data)
       endif
     endif
   end subroutine ncd_io_3d_double_glob
@@ -2521,7 +2529,7 @@ module ncdio_pio
       call ncd_getvar_real_sp_all_4d(ncid, varname, data)
       if(present(readvar))readvar=.true.
     else if(trim(flag)=='write')then
-      call ncd_putvar_real_sp_all_4d(ncid, varname, data)  
+      call ncd_putvar_real_sp_all_4d(ncid, varname, data)
     endif
   end subroutine ncd_io_4d_double_glob
 
@@ -2579,7 +2587,7 @@ module ncdio_pio
     logical :: lreadv
 
     call check_var(ncid, trim(varname), vardesc, lreadv)
-    
+
     if(flag=='write')then
       if(present(nt))then
         call check_ret( nf90_put_var(ncid%fh, vardesc%varid, data,start = (/nt/)),trim(subname))
@@ -2655,7 +2663,7 @@ module ncdio_pio
     type(var_desc_t)                 :: vardesc
     character(len=*),parameter       :: subname=trim(mod_filename)//'::ncd_io_1d_int' ! subroutine name
 
-    if (flag == 'read') then      
+    if (flag == 'read') then
       if(present(nt))then
         call ncd_getvar_int_1d(ncid, varname, nt, data)
       else
@@ -2776,7 +2784,7 @@ module ncdio_pio
     logical, optional, intent(in)  :: switchdim       ! true=> permute dim1 and dim2 for output
     logical, optional, intent(in)  :: cnvrtnan2fill   ! true => convert any NaN's to _FillValue (spval)
 
-    if (flag == 'read') then      
+    if (flag == 'read') then
       if(present(nt))then
         call ncd_getvar_int_2d(ncid, varname, nt, data)
       else
@@ -2814,16 +2822,16 @@ module ncdio_pio
 
     if(trim(flag)=='read')then
       if(present(nt))then
-        call ncd_getvar_real_sp_2d(ncid, varname, nt, data)      
+        call ncd_getvar_real_sp_2d(ncid, varname, nt, data)
       else
         call ncd_getvar_real_sp_all_2d(ncid, varname, data)
       endif
       if(present(readvar))readvar=.true.
     else if(trim(flag)=='write')then
       if(present(nt))then
-        call ncd_putvar_real_sp_2d(ncid, varname, nt, data)        
+        call ncd_putvar_real_sp_2d(ncid, varname, nt, data)
       else
-        call ncd_putvar_real_sp_all_2d(ncid, varname, data)  
+        call ncd_putvar_real_sp_all_2d(ncid, varname, data)
       endif
     endif
 
@@ -2863,7 +2871,7 @@ module ncdio_pio
     type(var_desc_t)                 :: vardesc
     character(len=*),parameter :: subname=trim(mod_filename)//'::ncd_io_3d_int' ! subroutine name
 
-    if (flag == 'read') then      
+    if (flag == 'read') then
       if(present(nt))then
         call ncd_getvar_int_3d(ncid, varname, nt, data)
       else
@@ -2876,7 +2884,7 @@ module ncdio_pio
       else
         call ncd_putvar_int_all_3d(ncid, varname, data)
       endif
-    endif    
+    endif
   end subroutine ncd_io_3d_int
     !-----------------------------------------------------------------------
   subroutine ncd_io_3d_double(varname, data, dim1name, flag, ncid, nt, readvar)
@@ -2914,16 +2922,16 @@ module ncdio_pio
 
     if(trim(flag)=='read')then
       if(present(nt))then
-        call ncd_getvar_real_sp_3d(ncid, varname, nt, data)      
+        call ncd_getvar_real_sp_3d(ncid, varname, nt, data)
       else
         call ncd_getvar_real_sp_all_3d(ncid, varname, data)
       endif
       if(present(readvar))readvar=.true.
     else if(trim(flag)=='write')then
       if(present(nt))then
-        call ncd_putvar_real_sp_3d(ncid, varname, nt, data)        
+        call ncd_putvar_real_sp_3d(ncid, varname, nt, data)
       else
-        call ncd_putvar_real_sp_all_3d(ncid, varname, data)  
+        call ncd_putvar_real_sp_all_3d(ncid, varname, data)
       endif
     endif
 
@@ -2964,20 +2972,20 @@ module ncdio_pio
 
     if(trim(flag)=='read')then
       if(present(nt))then
-        call ncd_getvar_real_sp_4d(ncid, varname, nt, data)      
+        call ncd_getvar_real_sp_4d(ncid, varname, nt, data)
       else
         call ncd_getvar_real_sp_all_4d(ncid, varname, data)
       endif
       if(present(readvar))readvar=.true.
     else if(trim(flag)=='write')then
       if(present(nt))then
-        call ncd_putvar_real_sp_4d(ncid, varname, nt, data)        
+        call ncd_putvar_real_sp_4d(ncid, varname, nt, data)
       else
-        call ncd_putvar_real_sp_all_4d(ncid, varname, data)  
+        call ncd_putvar_real_sp_all_4d(ncid, varname, data)
       endif
     endif
 
-  end subroutine ncd_io_4d_double  
+  end subroutine ncd_io_4d_double
     !-----------------------------------------------------------------------
   subroutine ncd_io_5d_double(varname, data, dim1name, flag, ncid, nt, readvar)
     !
@@ -3014,20 +3022,20 @@ module ncdio_pio
 
     if(trim(flag)=='read')then
       if(present(nt))then
-        call ncd_getvar_real_sp_5d(ncid, varname, nt, data)      
+        call ncd_getvar_real_sp_5d(ncid, varname, nt, data)
       else
         call ncd_getvar_real_sp_all_5d(ncid, varname, data)
       endif
       if(present(readvar))readvar=.true.
     else if(trim(flag)=='write')then
       if(present(nt))then
-        call ncd_putvar_real_sp_5d(ncid, varname, nt, data)        
+        call ncd_putvar_real_sp_5d(ncid, varname, nt, data)
       else
-        call ncd_putvar_real_sp_all_5d(ncid, varname, data)  
+        call ncd_putvar_real_sp_all_5d(ncid, varname, data)
       endif
     endif
 
-  end subroutine ncd_io_5d_double  
+  end subroutine ncd_io_5d_double
 
     !-----------------------------------------------------------------------
   integer function ncd_inq_varid(ncid, varname, vardesc)

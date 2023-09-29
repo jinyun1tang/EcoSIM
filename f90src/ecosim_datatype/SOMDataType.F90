@@ -5,7 +5,8 @@ module SOMDataType
   implicit none
   public
   save
-  character(len=*), private, parameter :: mod_filename = __FILE__
+  character(len=*), private, parameter :: mod_filename = &
+  __FILE__
 
   real(r8),target,allocatable :: RSC(:,:,:,:)                       !initial surface litter [C	g m-2]
   real(r8),target,allocatable :: RSN(:,:,:,:)                       !initial surface litter [N	g m-2]
