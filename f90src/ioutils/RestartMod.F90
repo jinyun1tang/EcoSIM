@@ -7,7 +7,7 @@ module RestartMod
   use data_const_mod    , only : spval => DAT_CONST_SPVAL, ispval => DAT_CONST_ISPVAL  
   use EcoSIMConfig      , only : jcplx=> jcplxc, NFGs=> NFGsc,nlbiomcp=>nlbiomcpc
   use EcoSIMConfig      , only : ndbiomcp=>ndbiomcpc,jsken=>jskenc, cold_run
-  use EcoSIMConfig      , only : inst_suffix,ref_date,start_date, ctitle,datestrlen
+  use EcoSIMConfig      , only : inst_suffix,ref_date,start_date, ctitle
   use EcoSIMConfig      , only : case_name,hostname,version,source,username
   use EcoSIMCtrlDataType, only : iyear_cur
   use EcoSiMParDataMod  , only : micpar,pltpar
@@ -8226,7 +8226,7 @@ implicit none
   call ncd_defdim(ncid , namet      , numt           ,  dimid)
   call ncd_defdim(ncid , namec      , numc           ,  dimid)
   call ncd_defdim(ncid , namep      , nump           ,  dimid)
-  call ncd_defdim(ncid,'datestrlen',datestrlen,dimid)
+  
   ! "level" dimensions
   call ncd_defdim(ncid,'datestrlen',datestrlen,dimid)  
   call ncd_defdim(ncid,'rootaxs',JRS,dimid)
