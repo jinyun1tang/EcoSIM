@@ -202,7 +202,7 @@ implicit none
     real(r8) :: ATKA      !mean annual air temperature [K]
  !litter layer
     real(r8) :: VLitR      !surface litter volume, [m3 d-2]
-    real(r8) :: VWatLitrX    !surface litter water holding capacity, [m3 d-2]
+    real(r8) :: VWatLitRHoldCapcity    !surface litter water holding capacity, [m3 d-2]
  !non litter layer
     real(r8) :: ROXYY       !total root + microbial O2 uptake from previous hour, [g d-2 h-1], updated in hour1
     real(r8) :: RN2OY       !total root + microbial N2O uptake from previous hour, [g d-2 h-1]
@@ -233,21 +233,21 @@ implicit none
   type(forc_type), intent(inout) :: forc
   character(len=*), intent(in) :: fname
   integer :: jcplx,ndbiomcp,nlbiomcp
-  integer :: NFGs,jsken,NMICBSO,NMICBSA
+  integer :: NFGs,jsken,NumOfMicrobs1HetertrophCmplx,NumOfMicrobsInAutotrophCmplx
   type(file_desc_t) :: ncf
 
   call ncd_pio_openfile(ncf, fname, ncd_nowrite)
 
   jcplx=get_dim_len(ncf,'jcplx')
   jsken =get_dim_len(ncf,'jsken')
-  NMICBSO=get_dim_len(ncf,'NMICBSO')
-  NMICBSA=get_dim_len(ncf,'NMICBSA')
+  NumOfMicrobs1HetertrophCmplx=get_dim_len(ncf,'NumOfMicrobs1HetertrophCmplx')
+  NumOfMicrobsInAutotrophCmplx=get_dim_len(ncf,'NumOfMicrobsInAutotrophCmplx')
   nlbiomcp=get_dim_len(ncf,'nlbiomcp')
   ndbiomcp=get_dim_len(ncf,'ndbiomcp')
   NFGs    =get_dim_len(ncf,'NFGs')
-  allocate(forc%OMC(nlbiomcp,NMICBSO,1:jcplx))
-  allocate(forc%OMN(nlbiomcp,NMICBSO,1:jcplx))
-  allocate(forc%OMP(nlbiomcp,NMICBSO,1:jcplx))
+  allocate(forc%OMC(nlbiomcp,NumOfMicrobs1HetertrophCmplx,1:jcplx))
+  allocate(forc%OMN(nlbiomcp,NumOfMicrobs1HetertrophCmplx,1:jcplx))
+  allocate(forc%OMP(nlbiomcp,NumOfMicrobs1HetertrophCmplx,1:jcplx))
   allocate(forc%OQC(1:jcplx))
   allocate(forc%OQN(1:jcplx))
   allocate(forc%OQP(1:jcplx))
@@ -259,9 +259,9 @@ implicit none
   allocate(forc%ORC(ndbiomcp,1:jcplx))
   allocate(forc%ORN(ndbiomcp,1:jcplx))
   allocate(forc%ORP(ndbiomcp,1:jcplx))
-  allocate(forc%OMCff(nlbiomcp,NMICBSA))
-  allocate(forc%OMNff(nlbiomcp,NMICBSA))
-  allocate(forc%OMPff(nlbiomcp,NMICBSA))
+  allocate(forc%OMCff(nlbiomcp,NumOfMicrobsInAutotrophCmplx))
+  allocate(forc%OMNff(nlbiomcp,NumOfMicrobsInAutotrophCmplx))
+  allocate(forc%OMPff(nlbiomcp,NumOfMicrobsInAutotrophCmplx))
   allocate(forc%OHC(1:jcplx))
   allocate(forc%OHN(1:jcplx))
   allocate(forc%OHP(1:jcplx))
