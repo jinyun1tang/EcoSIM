@@ -87,6 +87,95 @@
   END subroutine day
 !------------------------------------------------------------------------------------------
 
+  subroutine SetAnnualAccumlators(NY,NX)
+  implicit none
+  integer, intent(in) :: NY,NX
+
+  integer :: NZ,NE
+
+  UORGF(NY,NX)=0._r8
+  UXCSN(NY,NX)=0._r8
+  UCOP(NY,NX)=0._r8
+  UDOCQ(NY,NX)=0._r8
+  UDOCD(NY,NX)=0._r8
+  UDICQ(NY,NX)=0._r8
+  UDICD(NY,NX)=0._r8
+  TNBP(NY,NX)=0._r8
+  URAIN(NY,NX)=0._r8
+  UEVAP(NY,NX)=0._r8
+  URUN(NY,NX)=0._r8
+  USEDOU(NY,NX)=0._r8
+  UVOLO(NY,NX)=0._r8
+  UIONOU(NY,NX)=0._r8
+  UFERTN(NY,NX)=0._r8
+  UXZSN(NY,NX)=0._r8
+  UDONQ(NY,NX)=0._r8
+  UDOND(NY,NX)=0._r8
+  UDINQ(NY,NX)=0._r8
+  UDIND(NY,NX)=0._r8
+  UFERTP(NY,NX)=0._r8
+  UXPSN(NY,NX)=0._r8
+  UDOPQ(NY,NX)=0._r8
+  UDOPD(NY,NX)=0._r8
+  UDIPQ(NY,NX)=0._r8
+  UDIPD(NY,NX)=0._r8
+  UCO2G(NY,NX)=0._r8
+  UCH4G(NY,NX)=0._r8
+  UOXYG(NY,NX)=0._r8
+  UN2OG(NY,NX)=0._r8
+  UN2GG(NY,NX)=0._r8
+  UNH3G(NY,NX)=0._r8
+  UN2GS(NY,NX)=0._r8
+  UH2GG(NY,NX)=0._r8
+  UCO2F(NY,NX)=0._r8
+  UCH4F(NY,NX)=0._r8
+  UOXYF(NY,NX)=0._r8
+  UN2OF(NY,NX)=0._r8
+  UNH3F(NY,NX)=0._r8
+  UPO4F(NY,NX)=0._r8
+  THRE(NY,NX)=0._r8
+  TGPP(NY,NX)=0._r8
+  TNPP(NY,NX)=0._r8
+  TRAU(NY,NX)=0._r8
+  TCAN(NY,NX)=0._r8
+  XHVSTE(:,NY,NX)=0._r8
+  TRINH4(NY,NX)=0._r8
+  TRIPO4(NY,NX)=0._r8
+
+  D960: DO NZ=1,NP0(NY,NX)
+  !RSETE: effect of canopy element status on seed set
+    DO NE=1,NumOfPlantChemElements
+      RSETE(NE,NZ,NY,NX)=RSETE(NE,NZ,NY,NX)+TEUPTK(NE,NZ,NY,NX)-TESNC(NE,NZ,NY,NX)
+      THVSTE(NE,NZ,NY,NX)=THVSTE(NE,NZ,NY,NX)+HVSTE(NE,NZ,NY,NX)
+    enddo
+    RSETE(ielmc,NZ,NY,NX)=RSETE(ielmc,NZ,NY,NX)+CARBN(NZ,NY,NX)+TCO2T(NZ,NY,NX)-VCO2F(NZ,NY,NX)-VCH4F(NZ,NY,NX)
+    RSETE(ielmn,NZ,NY,NX)=RSETE(ielmn,NZ,NY,NX)+TNH3C(NZ,NY,NX)+TZUPFX(NZ,NY,NX)-VNH3F(NZ,NY,NX)-VN2OF(NZ,NY,NX)
+    RSETE(ielmp,NZ,NY,NX)=RSETE(ielmp,NZ,NY,NX)-VPO4F(NZ,NY,NX)
+
+! the following variables are accumulated daily
+    CARBN(NZ,NY,NX)=0._r8
+    TEUPTK(:,NZ,NY,NX)=0._r8
+    TCO2T(NZ,NY,NX)=0._r8
+    TCO2A(NZ,NY,NX)=0._r8
+    ETCanP(NZ,NY,NX)=0._r8
+    TZUPFX(NZ,NY,NX)=0._r8
+    TNH3C(NZ,NY,NX)=0._r8
+    VCO2F(NZ,NY,NX)=0._r8
+    VCH4F(NZ,NY,NX)=0._r8
+    VOXYF(NZ,NY,NX)=0._r8
+    VNH3F(NZ,NY,NX)=0._r8
+    VN2OF(NZ,NY,NX)=0._r8
+    VPO4F(NZ,NY,NX)=0._r8
+
+    HVSTE(:,NZ,NY,NX)=0._r8
+    TESN0(:,NZ,NY,NX)=0._r8
+    TESNC(:,NZ,NY,NX)=0._r8
+  ENDDO D960
+  IF(IERSNG.EQ.1.OR.IERSNG.EQ.3)THEN
+    TSED(NY,NX)=0._r8
+  ENDIF
+  end subroutine SetAnnualAccumlators        
+!------------------------------------------------------------------------------------------     
   subroutine WriteDailyAccumulators(I, NHW, NHE, NVN, NVS)
 !     WRITE DAILY MAX MIN ACCUMULATORS FOR WEATHER VARIABLES
 
@@ -111,87 +200,8 @@
 !     ALAT=latitude +ve=N,-ve=S
 !
       IF((ALAT(NY,NX).GE.0.0.AND.I.EQ.1).OR.(ALAT(NY,NX).LT.0.0.AND.I.EQ.1))THEN
-        UORGF(NY,NX)=0._r8
-        UXCSN(NY,NX)=0._r8
-        UCOP(NY,NX)=0._r8
-        UDOCQ(NY,NX)=0._r8
-        UDOCD(NY,NX)=0._r8
-        UDICQ(NY,NX)=0._r8
-        UDICD(NY,NX)=0._r8
-        TNBP(NY,NX)=0._r8
-        URAIN(NY,NX)=0._r8
-        UEVAP(NY,NX)=0._r8
-        URUN(NY,NX)=0._r8
-        USEDOU(NY,NX)=0._r8
-        UVOLO(NY,NX)=0._r8
-        UIONOU(NY,NX)=0._r8
-        UFERTN(NY,NX)=0._r8
-        UXZSN(NY,NX)=0._r8
-        UDONQ(NY,NX)=0._r8
-        UDOND(NY,NX)=0._r8
-        UDINQ(NY,NX)=0._r8
-        UDIND(NY,NX)=0._r8
-        UFERTP(NY,NX)=0._r8
-        UXPSN(NY,NX)=0._r8
-        UDOPQ(NY,NX)=0._r8
-        UDOPD(NY,NX)=0._r8
-        UDIPQ(NY,NX)=0._r8
-        UDIPD(NY,NX)=0._r8
-        UCO2G(NY,NX)=0._r8
-        UCH4G(NY,NX)=0._r8
-        UOXYG(NY,NX)=0._r8
-        UN2OG(NY,NX)=0._r8
-        UN2GG(NY,NX)=0._r8
-        UNH3G(NY,NX)=0._r8
-        UN2GS(NY,NX)=0._r8
-        UH2GG(NY,NX)=0._r8
-        UCO2F(NY,NX)=0._r8
-        UCH4F(NY,NX)=0._r8
-        UOXYF(NY,NX)=0._r8
-        UN2OF(NY,NX)=0._r8
-        UNH3F(NY,NX)=0._r8
-        UPO4F(NY,NX)=0._r8
-        THRE(NY,NX)=0._r8
-        TGPP(NY,NX)=0._r8
-        TNPP(NY,NX)=0._r8
-        TRAU(NY,NX)=0._r8
-        TCAN(NY,NX)=0._r8
-        XHVSTE(:,NY,NX)=0._r8
-        TRINH4(NY,NX)=0._r8
-        TRIPO4(NY,NX)=0._r8
+        call SetAnnualAccumlators(NY,NX)
 
-        D960: DO NZ=1,NP0(NY,NX)
-        !RSETE: effect of canopy element status on seed set
-          DO NE=1,NumOfPlantChemElements
-            RSETE(NE,NZ,NY,NX)=RSETE(NE,NZ,NY,NX)+TEUPTK(NE,NZ,NY,NX)-TESNC(NE,NZ,NY,NX)
-            THVSTE(NE,NZ,NY,NX)=THVSTE(NE,NZ,NY,NX)+HVSTE(NE,NZ,NY,NX)
-          enddo
-          RSETE(ielmc,NZ,NY,NX)=RSETE(ielmc,NZ,NY,NX)+CARBN(NZ,NY,NX)+TCO2T(NZ,NY,NX)-VCO2F(NZ,NY,NX)-VCH4F(NZ,NY,NX)
-          RSETE(ielmn,NZ,NY,NX)=RSETE(ielmn,NZ,NY,NX)+TNH3C(NZ,NY,NX)+TZUPFX(NZ,NY,NX)-VNH3F(NZ,NY,NX)-VN2OF(NZ,NY,NX)
-          RSETE(ielmp,NZ,NY,NX)=RSETE(ielmp,NZ,NY,NX)-VPO4F(NZ,NY,NX)
-
-! the following variables are accumulated daily
-          CARBN(NZ,NY,NX)=0._r8
-          TEUPTK(:,NZ,NY,NX)=0._r8
-          TCO2T(NZ,NY,NX)=0._r8
-          TCO2A(NZ,NY,NX)=0._r8
-          ETCanP(NZ,NY,NX)=0._r8
-          TZUPFX(NZ,NY,NX)=0._r8
-          TNH3C(NZ,NY,NX)=0._r8
-          VCO2F(NZ,NY,NX)=0._r8
-          VCH4F(NZ,NY,NX)=0._r8
-          VOXYF(NZ,NY,NX)=0._r8
-          VNH3F(NZ,NY,NX)=0._r8
-          VN2OF(NZ,NY,NX)=0._r8
-          VPO4F(NZ,NY,NX)=0._r8
-
-          HVSTE(:,NZ,NY,NX)=0._r8
-          TESN0(:,NZ,NY,NX)=0._r8
-          TESNC(:,NZ,NY,NX)=0._r8
-        ENDDO D960
-        IF(IERSNG.EQ.1.OR.IERSNG.EQ.3)THEN
-          TSED(NY,NX)=0._r8
-        ENDIF
       ENDIF
 !
 !     CALCULATE DAYLENGTH FROM SOLAR ANGLE

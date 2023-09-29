@@ -46,7 +46,7 @@ module CanopyCondsMod
   REAL(R8) :: ZZ
 !     begin_execution
   associate(                          &
-    UA      => plt_site%UA      , &
+    WindSpeedAtm      => plt_site%WindSpeedAtm      , &
     ZERO    => plt_site%ZERO    , &
     AREA3   => plt_site%AREA3   , &
     IETYP   => plt_site%IETYP   , &
@@ -100,11 +100,11 @@ module CanopyCondsMod
 !     CANOPY ISOTHERMAL BOUNDARY LAYER RESISTANCE
 !
 !     BndlResistAboveCanG,RAM=biome canopy,minimum isothermal boundary layer resistance
-!     UA=wind speed
+!     WindSpeedAtm=wind speed
 !     RIB=canopy isothermal Richardson number
 !
-    BndlResistAboveCanG=AMAX1(RAM,(LOG((ZZ-ZeroPlanDisp)/RoughHeight))**2._r8/(0.168_r8*UA))
-    RIB=1.27E+08_r8*(ZZ-RoughHeight)/(UA**2._r8*TairK)
+    BndlResistAboveCanG=AMAX1(RAM,(LOG((ZZ-ZeroPlanDisp)/RoughHeight))**2._r8/(0.168_r8*WindSpeedAtm))
+    RIB=1.27E+08_r8*(ZZ-RoughHeight)/(WindSpeedAtm**2._r8*TairK)
   ELSE
     BndlResistAboveCanG=RAM
     RIB=0.0_r8
@@ -307,7 +307,7 @@ module CanopyCondsMod
     VLWatMicP    => plt_soilchem%VLWatMicP, &
     CFX     => plt_morph%CFX    , &
     CanopyHeightz      => plt_morph%CanopyHeightz     , &
-    NBR     => plt_morph%NBR    , &
+    NumOfBranches_pft     => plt_morph%NumOfBranches_pft    , &
     SURF    => plt_morph%SURF   , &
     SURFB   => plt_morph%SURFB  , &
     CanopyLeafA_pft   => plt_morph%CanopyLeafA_pft  , &
@@ -320,7 +320,7 @@ module CanopyCondsMod
   CanopyArea_grid=0.0
   D1135: DO NZ=1,NP
     CanopyArea_pft(NZ)=0.0
-    DO  NB=1,NBR(NZ)
+    DO  NB=1,NumOfBranches_pft(NZ)
       DO  L=1,NumOfCanopyLayers1
         
         IF(CanopyHeightz(L-1).GE.SnowDepth-ZERO.AND.CanopyHeightz(L-1).GE.DPTH0-ZERO)THEN
@@ -456,7 +456,7 @@ module CanopyCondsMod
         enddo
       ENDDO D1150
       D1200: DO NZ=1,NP
-        DO  NB=1,NBR(NZ)
+        DO  NB=1,NumOfBranches_pft(NZ)
           DO  L=1,NumOfCanopyLayers1
             IF(CanopyHeightz(L-1).GT.SnowDepth-ZERO.AND.CanopyHeightz(L-1).GT.DPTH0-ZERO)THEN
               D1205: DO N=1,JLI1

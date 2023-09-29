@@ -50,7 +50,7 @@ implicit none
   real(r8) :: OXYE      !atmospheric O2 concentration, [umol mol-1]
   real(r8) :: PPT       !total plant population, [d-2]
   real(r8) :: POROS1    !top layer soil porosity
-  real(r8) :: UA        !wind speed, [m h-1]
+  real(r8) :: WindSpeedAtm        !wind speed, [m h-1]
   real(r8), pointer :: PlantElemntStoreLandscape(:)  => null() !total plant element balance	g d-2
   real(r8) :: WindMesHeight        !wind speed measurement height, [m]
   real(r8) :: ZEROS2    !threshold zero
@@ -229,7 +229,7 @@ implicit none
   integer,  pointer :: NRT(:)          => null() !root primary axis number
   integer,  pointer :: NNOD(:)         => null() !number of concurrently growing nodes
   integer,  pointer :: NBT(:)          => null() !branch number
-  integer,  pointer :: NBR(:)          => null() !branch number
+  integer,  pointer :: NumOfBranches_pft(:)          => null() !branch number
   integer,  pointer :: NINR(:,:)       => null() !maximum soil layer number for root axes, [-]
   real(r8), pointer :: PSTG(:,:)       => null() !shoot node number, [-]
   real(r8), pointer :: PSTGI(:,:)      => null() !shoot node number at floral initiation, [-]
@@ -237,12 +237,12 @@ implicit none
   real(r8), pointer :: ANGBR(:)        => null() !branching angle, [degree from horizontal]
   real(r8), pointer :: SURF(:,:,:,:,:) => null() !leaf surface area, [m2 d-2]
   integer,  pointer :: KLEAFX(:,:)     => null() !NUMBER OF MINIMUM LEAFED NODE USED IN GROWTH ALLOCATION
-  integer,  pointer :: NBTB(:,:)       => null() !branch number, [-]
+  integer,  pointer :: BranchNumber_brchpft(:,:)       => null() !branch number, [-]
   real(r8), pointer :: GRNXB(:,:)      => null() !branch potential grain number, [d-2]
   real(r8), pointer :: GRNOB(:,:)      => null() !branch grain number, [d-2]
   real(r8), pointer :: CanPBranchHeight(:,:)     => null() !branch height, [m]
   real(r8), pointer :: ARLFZ(:,:)      => null() !branch leaf area, [m2 d-2]
-  real(r8), pointer :: CanPBLA(:,:)      => null() !branch leaf area, [m2 d-2]
+  real(r8), pointer :: CanopyBranchLeafA_pft(:,:)      => null() !branch leaf area, [m2 d-2]
   real(r8), pointer :: ANGSH(:)        => null() !sheath angle, [degree from horizontal]
   real(r8), pointer :: CLASS(:,:)      => null() !fractionction of leaves in different angle classes, [-]
   real(r8), pointer :: CanopyStemApft_lyr(:,:)      => null() !plant canopy layer stem area, [m2 d-2]
@@ -447,7 +447,7 @@ implicit none
   real(r8), pointer :: CNLF(:)     => null()  !maximum leaf N:C ratio, [g g-1]
   real(r8), pointer :: GRWTB(:,:)  => null()  !maximum grain C during grain fill, [g d-2]
   real(r8), pointer :: FNOD(:)     => null()  !parameter for allocation of growth to nodes, [-]
-  real(r8), pointer :: CWSRT(:)    => null()  !fraction of remobilizable nonstructural biomass in root, [-]
+  real(r8), pointer ::RootFracRemobilizableBiom(:)    => null()  !fraction of remobilizable nonstructural biomass in root, [-]
 
   contains
     procedure, public :: Init => plt_allom_init
@@ -465,16 +465,16 @@ implicit none
   real(r8), pointer :: WTRT1E(:,:,:,:,:) => null()    !root layer element primary axes, [g d-2]
   real(r8), pointer :: RTWT1E(:,:,:,:)   => null()    !root C primary axes, [g d-2]
   real(r8), pointer :: WTSTDE(:,:,:)  => null()    !standing dead element fraction, [g d-2]
-  real(r8), pointer :: CEPOLP(:,:)    => null()    !canopy nonstructural element concentration, [g d-2]
+  real(r8), pointer :: CanopyNonstructElementConc_pft(:,:)    => null()    !canopy nonstructural element concentration, [g d-2]
   real(r8), pointer :: CanopyNonstructElements_pft(:,:)    => null()    !canopy nonstructural element concentration, [g d-2]
   real(r8), pointer :: EPOLNP(:,:)    => null()    !canopy nodule nonstructural element, [g d-2]
-  real(r8), pointer :: CCPLNP(:)      => null()    !nodule nonstructural C, [gC d-2]
+  real(r8), pointer :: NoduleNonstructCconc_pft(:)      => null()    !nodule nonstructural C, [gC d-2]
   real(r8), pointer :: WTRTL(:,:,:)   => null()    !root layer structural C, [g d-2]
   real(r8), pointer :: PopPlantRootC_vr(:,:,:)   => null()    !root layer C, [g d-2]
   real(r8), pointer :: WSRTL(:,:,:)   => null()    !root layer protein C, [g d-2]
-  real(r8), pointer :: CWSRTL(:,:,:)  => null()    !root layer protein C concentration, [g g-1]
+  real(r8), pointer :: RootProteinConc_pftvr(:,:,:)  => null()    !root layer protein C concentration, [g g-1]
   real(r8), pointer :: EPOOLR(:,:,:,:)=> null()    !root  layer nonstructural element, [g d-2]
-  real(r8), pointer :: CEPOLR(:,:,:,:)  => null()    !root  layer nonstructural C concentration, [g g-1]
+  real(r8), pointer :: RootNonstructElementConcpft_vr(:,:,:,:)  => null()    !root  layer nonstructural C concentration, [g g-1]
   real(r8), pointer :: CEPOLB(:,:,:)    => null()    !branch nonstructural C concentration, [g d-2]
   real(r8), pointer :: WGNODE(:,:,:,:)  => null()    !internode C, [g d-2]
   real(r8), pointer :: WGLFE(:,:,:,:)    => null()    !leaf element, [g d-2]
@@ -605,7 +605,7 @@ implicit none
   integer,  pointer :: JHVST(:)    => null()  !flag for stand replacing disturbance
   real(r8), pointer :: EHVST(:,:,:)=> null()  !harvest efficiency, [-]
   real(r8), pointer :: HVST(:)     => null()  !harvest cutting height (+ve) or fractional LAI removal (-ve), [m or -]
-  real(r8), pointer :: THIN(:)     => null()  !thinning of plant population, [-]
+  real(r8), pointer :: THIN_pft(:)     => null()  !thinning of plant population, [-]
   real(r8), pointer :: VCH4F(:)    => null()  !plant CH4 emission from fire, [g d-2 ]
   real(r8), pointer :: VCO2F(:)    => null()  !plant CO2 emission from fire, [g d-2 ]
   real(r8), pointer :: VN2OF(:)    => null()  !plant N2O emission from fire, [g d-2 ]
@@ -1129,7 +1129,7 @@ implicit none
   implicit none
   class(plant_disturb_type) :: this
 
-  allocate(this%THIN(JP1))
+  allocate(this%THIN_pft(JP1))
   allocate(this%XHVSTE(NumOfPlantChemElements))
   allocate(this%THVSTE(NumOfPlantChemElements,JP1))
   allocate(this%HVSTE(NumOfPlantChemElements,JP1))
@@ -1161,7 +1161,7 @@ implicit none
   class(plant_disturb_type) :: this
 
 
-!  if(allocated(THIN))deallocate(THIN)
+!  if(allocated(THIN_pft))deallocate(THIN_pft)
 !  if(allocated(HVSTE))deallocate(HVSTE)
 !  if(allocated(THVSTE))deallocate(THVSTE)
 !  if(allocated(VCH4F))deallocate(VCH4F)
@@ -1268,7 +1268,7 @@ implicit none
   class(plant_allometry_type) :: this
 
 
-  allocate(this%CWSRT(JP1))
+  allocate(this%RootFracRemobilizableBiom(JP1))
   allocate(this%FNOD(JP1))
   allocate(this%GRWTB(JBR,JP1))
   allocate(this%DMND(JP1))
@@ -1329,7 +1329,7 @@ implicit none
 !  if(allocated(CNND))deallocate(CNND)
 !  if(allocated(CPND))deallocate(CPND)
 !  if(allocated(CNRT))deallocate(CNRT)
-!  if(allocated(CWSRT))deallocate(CWSRT)
+!  if(allocated(RootFracRemobilizableBiom))deallocate(RootFracRemobilizableBiom)
 !  if(allocated(CPLF))deallocate(CPLF)
 !  if(allocated(CPSHE))deallocate(CPSHE)
 !  if(allocated(CNSHE))deallocate(CNSHE)
@@ -1372,16 +1372,16 @@ implicit none
   allocate(this%WTSTDE(NumOfPlantChemElements,jsken,JP1))
   allocate(this%WTRT2E(NumOfPlantChemElements,jroots,JZ1,NumOfCanopyLayers1,JP1))
   allocate(this%WTRT1E(NumOfPlantChemElements,jroots,JZ1,NumOfCanopyLayers1,JP1))
-  allocate(this%CEPOLP(NumOfPlantChemElements,JP1))
+  allocate(this%CanopyNonstructElementConc_pft(NumOfPlantChemElements,JP1))
   allocate(this%CanopyNonstructElements_pft(NumOfPlantChemElements,JP1))
   allocate(this%EPOLNP(NumOfPlantChemElements,JP1))
-  allocate(this%CCPLNP(JP1))
-  allocate(this%CWSRTL(jroots,JZ1,JP1))
+  allocate(this%NoduleNonstructCconc_pft(JP1))
+  allocate(this%RootProteinConc_pftvr(jroots,JZ1,JP1))
   allocate(this%WSRTL(jroots,JZ1,JP1))
   allocate(this%WTRTL(jroots,JZ1,JP1))
   allocate(this%PopPlantRootC_vr(jroots,JZ1,JP1))
   allocate(this%EPOOLR(NumOfPlantChemElements,jroots,JZ1,JP1))
-  allocate(this%CEPOLR(NumOfPlantChemElements,jroots,JZ1,JP1))
+  allocate(this%RootNonstructElementConcpft_vr(NumOfPlantChemElements,jroots,JZ1,JP1))
   allocate(this%EPOOL(NumOfPlantChemElements,JBR,JP1))
   allocate(this%CanPStalkC(JP1))
   allocate(this%WSLF(0:JNODS1,JBR,JP1))
@@ -1444,11 +1444,11 @@ implicit none
 !  if(allocated(WTRT1E))deallocate(WTRT1E)
 !  if(allocated(WTSTDE))deallocate(WTSTDE)
 !  if(allocated(WTRT2E))deallocate(WTRT2E)
-!  if(allocated(CEPOLP))deallocate(CEPOLP)
+!  if(allocated(CanopyNonstructElementConc_pft))deallocate(CanopyNonstructElementConc_pft)
 !  if(allocated(CanopyNonstructElements_pft))deallocate(CanopyNonstructElements_pft)
 !  if(allocated(EPOLNP))deallocate(EPOLNP)
-!  if(allocated(CCPLNP))deallocate(CCPLNP)
-!  if(allocated(CWSRTL))deallocate(CWSRTL)
+!  if(allocated(NoduleNonstructCconc_pft))deallocate(NoduleNonstructCconc_pft)
+!  if(allocated(RootProteinConc_pftvr))deallocate(RootProteinConc_pftvr)
 !  if(allocated(WSRTL))deallocate(WSRTL)
 !  if(allocated(WTRTL))deallocate(WTRTL)
 !  if(allocated(PopPlantRootC_vr))deallocate(PopPlantRootC_vr)
@@ -2065,7 +2065,7 @@ implicit none
   allocate(this%NRT(JP1))
   allocate(this%NNOD(JP1))
   allocate(this%NBT(JP1))
-  allocate(this%NBR(JP1))
+  allocate(this%NumOfBranches_pft(JP1))
   allocate(this%NINR(NumOfCanopyLayers1,JP1))
   allocate(this%PSTG(JBR,JP1))
   allocate(this%PSTGI(JBR,JP1))
@@ -2073,11 +2073,11 @@ implicit none
   allocate(this%ANGBR(JP1))
   allocate(this%SURF(JLI1,NumOfCanopyLayers1,JNODS1,JBR,JP1))
   allocate(this%KLEAFX(JBR,JP1))
-  allocate(this%NBTB(JBR,JP1))
+  allocate(this%BranchNumber_brchpft(JBR,JP1))
   allocate(this%GRNXB(JBR,JP1))
   allocate(this%CanPBranchHeight(JBR,JP1))
   allocate(this%ARLFZ(JBR,JP1))
-  allocate(this%CanPBLA(JBR,JP1))
+  allocate(this%CanopyBranchLeafA_pft(JBR,JP1))
   allocate(this%ANGSH(JP1))
   allocate(this%CLASS(JLI1,JP1))
   allocate(this%CanopyStemApft_lyr(NumOfCanopyLayers1,JP1))

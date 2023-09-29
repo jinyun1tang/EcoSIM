@@ -350,7 +350,7 @@ module UptakesMod
     CanopyHeight     =>  plt_morph%CanopyHeight     , &
     CFX    =>  plt_morph%CFX    , &
     CanopyArea_pft  =>  plt_morph%CanopyArea_pft  , &
-    NBR    =>  plt_morph%NBR    , &
+    NumOfBranches_pft    =>  plt_morph%NumOfBranches_pft    , &
     SURF   =>  plt_morph%SURF   , &
     GridMaxCanopyHeight     =>  plt_morph%GridMaxCanopyHeight       &
   )
@@ -359,7 +359,7 @@ module UptakesMod
 !     INCLINATION N, LAYER L, NODE K, BRANCH NB, SPECIES NZ,
 !     N-S POSITION NY, E-W POSITION NX(AZIMUTH M ASSUMED UNIFORM)
 !
-  D500: DO NB=1,NBR(NZ)
+  D500: DO NB=1,NumOfBranches_pft(NZ)
     D550: DO K=1,JNODS1
 !
 !     NUMBER OF MINIMUM LEAFED NODE USED IN GROWTH ALLOCATION
@@ -560,8 +560,8 @@ module UptakesMod
    NI      => plt_morph%NI     , &
    NGTopRootLayer     => plt_morph%NGTopRootLayer    , &
    MY      => plt_morph%MY     , &
-   CEPOLR  => plt_biom%CEPOLR  , &
-   CEPOLP  => plt_biom%CEPOLP  , &
+   RootNonstructElementConcpft_vr  => plt_biom%RootNonstructElementConcpft_vr  , &
+   CanopyNonstructElementConc_pft  => plt_biom%CanopyNonstructElementConc_pft  , &
    CanPShootElmMass  => plt_biom%CanPShootElmMass  , &
    CanPbndlResist     => plt_photo%CanPbndlResist    , &
    MinCanPStomaResistH2O    => plt_photo%MinCanPStomaResistH2O   , &
@@ -586,8 +586,8 @@ module UptakesMod
       TCC(NZ)=units%Kelvin2Celcius(TKC(NZ))
       FTHRM=EMMC*2.04E-10_r8*FracPARByCanP(NZ)*AREA3(NU)
       LWRadCanP(NZ)=FTHRM*TKC(NZ)**4._r8
-      PSICanP(NZ)=ElvAdjstedtSoiPSIMPa(NGTopRootLayer(NZ))
-      CCPOLT=CEPOLP(ielmc,NZ)+CEPOLP(ielmn,NZ)+CEPOLP(ielmp,NZ)
+      PSICanP(NZ)=ElvAdjstedtSoiPSIMPa(NGTopRootLayer(NZ))      
+      CCPOLT=CanopyNonstructElementConc_pft(ielmc,NZ)+CanopyNonstructElementConc_pft(ielmn,NZ)+CanopyNonstructElementConc_pft(ielmp,NZ)
 
       CALL update_osmo_turg_pressure(PSICanP(NZ),CCPOLT,OSMO(NZ),TKC(NZ),PSICanPOsmo(NZ),PSICanPTurg(NZ),FDMP)
 
@@ -599,7 +599,7 @@ module UptakesMod
       D4290: DO N=1,MY(NZ)
         DO  L=NU,NI(NZ)
           PSIRoot(N,L,NZ)=ElvAdjstedtSoiPSIMPa(L)
-          CCPOLT=sum(CEPOLR(1:NumOfPlantChemElements,N,L,NZ))
+          CCPOLT=sum(RootNonstructElementConcpft_vr(1:NumOfPlantChemElements,N,L,NZ))
           CALL update_osmo_turg_pressure(PSIRoot(N,L,NZ),CCPOLT,OSMO(NZ),TKS(L),&
             PSIRootOSMO(N,L,NZ),PSIRootTurg(N,L,NZ))
 
@@ -668,7 +668,7 @@ module UptakesMod
     EvapTransHeatP   => plt_ew%EvapTransHeatP     , &
     ZEROL   => plt_biom%ZEROL   , &
     ZEROP   => plt_biom%ZEROP   , &
-    CEPOLP  => plt_biom%CEPOLP  , &
+    CanopyNonstructElementConc_pft  => plt_biom%CanopyNonstructElementConc_pft  , &
     NI      => plt_morph%NI     , &
     MY      => plt_morph%MY     , &
     MinCanPStomaResistH2O    => plt_photo%MinCanPStomaResistH2O   , &
@@ -683,7 +683,7 @@ module UptakesMod
     LWRadCanP   => plt_rad%LWRadCanP    , &
     LWRadGrnd  => plt_rad%LWRadGrnd     &
   )
-  CCPOLT=CEPOLP(ielmc,NZ)+CEPOLP(ielmn,NZ)+CEPOLP(ielmp,NZ)
+  CCPOLT=CanopyNonstructElementConc_pft(ielmc,NZ)+CanopyNonstructElementConc_pft(ielmn,NZ)+CanopyNonstructElementConc_pft(ielmp,NZ)
   FTHRM=EMMC*2.04E-10_r8*FracPARByCanP(NZ)*AREA3(NU)
   LWRad2CanP=(LWRadSky+LWRadGrnd)*FracPARByCanP(NZ)
 !     RAZ=canopy isothermal boundary later resistance
@@ -1130,8 +1130,8 @@ module UptakesMod
     NU     =>  plt_site%NU      , &
     ZERO   =>  plt_site%ZERO    , &
     AREA3  =>  plt_site%AREA3   , &
-    CEPOLP =>  plt_biom%CEPOLP  , &
-    CEPOLR =>  plt_biom%CEPOLR  , &
+    CanopyNonstructElementConc_pft =>  plt_biom%CanopyNonstructElementConc_pft  , &
+    RootNonstructElementConcpft_vr =>  plt_biom%RootNonstructElementConcpft_vr  , &
     CanPShootElmMass =>  plt_biom%CanPShootElmMass  , &
     NI     =>  plt_morph%NI     , &
     CanopyHeight     =>  plt_morph%CanopyHeight     , &
@@ -1161,8 +1161,8 @@ module UptakesMod
   FTHRM=EMMC*2.04E-10_r8*FracPARByCanP(NZ)*AREA3(NU)
   LWRadCanP(NZ)=FTHRM*TKC(NZ)**4._r8
   PSICanP(NZ)=ElvAdjstedtSoiPSIMPa(NGTopRootLayer(NZ))
-
-  CCPOLT=CEPOLP(ielmc,NZ)+CEPOLP(ielmn,NZ)+CEPOLP(ielmp,NZ)
+  
+  CCPOLT=sum(CanopyNonstructElementConc_pft(1:NumOfPlantChemElements,NZ))
 
   call update_osmo_turg_pressure(PSICanP(NZ),CCPOLT,OSMO(NZ),TKC(NZ),PSICanPOsmo(NZ),PSICanPTurg(NZ),FDMP)
 
@@ -1175,7 +1175,7 @@ module UptakesMod
   DO N=1,MY(NZ)
     DO  L=NU,NI(NZ)
       PSIRoot(N,L,NZ)=ElvAdjstedtSoiPSIMPa(L)      
-      CCPOLT=sum(CEPOLR(1:NumOfPlantChemElements,N,L,NZ))
+      CCPOLT=sum(RootNonstructElementConcpft_vr(1:NumOfPlantChemElements,N,L,NZ))
 
       call update_osmo_turg_pressure(PSIRoot(N,L,NZ),CCPOLT,OSMO(NZ),TKS(L),&
         PSIRootOSMO(N,L,NZ),PSIRootTurg(N,L,NZ))
@@ -1219,7 +1219,7 @@ module UptakesMod
     PSIRootOSMO    => plt_ew%PSIRootOSMO     , &
     PSIRootTurg    => plt_ew%PSIRootTurg     , &
     PSICanP    => plt_ew%PSICanP     , &
-    CEPOLR   => plt_biom%CEPOLR  , &
+    RootNonstructElementConcpft_vr   => plt_biom%RootNonstructElementConcpft_vr  , &
     MY       => plt_morph%MY     , &
     NI       => plt_morph%NI       &
   )
@@ -1257,7 +1257,7 @@ module UptakesMod
       ELSE
         PSIRoot(N,L,NZ)=ElvAdjstedtSoiPSIMPa(L)
       ENDIF           
-      CCPOLT=sum(CEPOLR(1:NumOfPlantChemElements,N,L,NZ))
+      CCPOLT=sum(RootNonstructElementConcpft_vr(1:NumOfPlantChemElements,N,L,NZ))
 
       CALL update_osmo_turg_pressure(PSIRoot(N,L,NZ),CCPOLT,OSMO(NZ),TKS(L),&
         PSIRootOSMO(N,L,NZ),PSIRootTurg(N,L,NZ))

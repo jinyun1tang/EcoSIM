@@ -41,10 +41,10 @@ module SnowDataType
   real(r8),target, allocatable ::  HeatConvSno2Soi(:,:,:)                       !convective heat from snowpack to soil
   real(r8),target, allocatable ::  WatConvSno2LitR(:,:,:)                       !water flux from snowpack to litter
   real(r8),target, allocatable ::  HeatConvSno2LitR(:,:,:)                      !convective heat flux from snowpack to litter
-  real(r8),target, allocatable ::  QS(:,:,:)                          !snowpack runoff snow, [m3 d-2 h-1]
-  real(r8),target, allocatable ::  QW(:,:,:)                          !snowpack runoff water, [m3 d-2 h-1]
-  real(r8),target, allocatable ::  QI(:,:,:)                          !snowpack runoff ice, [m3 d-2 h-1]
-  real(r8),target, allocatable ::  HQS(:,:,:)                         !snowpack runoff heat, [MJ d-2 h-1]
+  real(r8),target, allocatable ::  DrysnoBySnowRedistribution(:,:,:)                          !snowpack runoff snow, [m3 d-2 h-1]
+  real(r8),target, allocatable ::  WatBySnowRedistribution(:,:,:)                          !snowpack runoff water, [m3 d-2 h-1]
+  real(r8),target, allocatable ::  IceBySnowRedistribution(:,:,:)                          !snowpack runoff ice, [m3 d-2 h-1]
+  real(r8),target, allocatable ::  HeatBySnowRedistribution(:,:,:)                         !snowpack runoff heat, [MJ d-2 h-1]
   real(r8),target, allocatable ::  XCOQSS(:,:,:)                      !snowpack runoff CO2 flux, [g d-2 h-1]
   real(r8),target, allocatable ::  XCHQSS(:,:,:)                      !snowpack runoff CH4 flux, [g d-2 h-1]
   real(r8),target, allocatable ::  XOXQSS(:,:,:)                      !snowpack runoff O2 flux, [g d-2 h-1]
@@ -100,10 +100,10 @@ contains
   allocate(HeatConvSno2Soi(JS,JY,JX));    HeatConvSno2Soi=0._r8
   allocate(WatConvSno2LitR(JS,JY,JX));    WatConvSno2LitR=0._r8
   allocate(HeatConvSno2LitR(JS,JY,JX));   HeatConvSno2LitR=0._r8
-  allocate(QS(2,JV,JH));        QS=0._r8
-  allocate(QW(2,JV,JH));        QW=0._r8
-  allocate(QI(2,JV,JH));        QI=0._r8
-  allocate(HQS(2,JV,JH));       HQS=0._r8
+  allocate(DrysnoBySnowRedistribution(2,JV,JH));        DrysnoBySnowRedistribution=0._r8
+  allocate(WatBySnowRedistribution(2,JV,JH));        WatBySnowRedistribution=0._r8
+  allocate(IceBySnowRedistribution(2,JV,JH));        IceBySnowRedistribution=0._r8
+  allocate(HeatBySnowRedistribution(2,JV,JH));       HeatBySnowRedistribution=0._r8
   allocate(XCOQSS(2,JV,JH));    XCOQSS=0._r8
   allocate(XCHQSS(2,JV,JH));    XCHQSS=0._r8
   allocate(XOXQSS(2,JV,JH));    XOXQSS=0._r8
@@ -164,10 +164,10 @@ contains
   call destroy(HeatConvSno2Soi)
   call destroy(WatConvSno2LitR)
   call destroy(HeatConvSno2LitR)
-  call destroy(QS)
-  call destroy(QW)
-  call destroy(QI)
-  call destroy(HQS)
+  call destroy(DrysnoBySnowRedistribution)
+  call destroy(WatBySnowRedistribution)
+  call destroy(IceBySnowRedistribution)
+  call destroy(HeatBySnowRedistribution)
   call destroy(XCOQSS)
   call destroy(XCHQSS)
   call destroy(XOXQSS)

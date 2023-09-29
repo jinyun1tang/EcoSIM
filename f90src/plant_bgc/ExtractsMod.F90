@@ -398,7 +398,7 @@ module ExtractsMod
     StemAreag => plt_morph%StemAreag , &
     CanopyLA_grd => plt_morph%CanopyLA_grd , &
     NI    => plt_morph%NI    , &
-    NBR   => plt_morph%NBR   , &
+    NumOfBranches_pft   => plt_morph%NumOfBranches_pft   , &
     CanPSA => plt_morph%CanPSA , &
     CanopyLeafA_pft => plt_morph%CanopyLeafA_pft , &
     RadNet2CanP  => plt_rad%RadNet2CanP    , &
@@ -468,7 +468,7 @@ module ExtractsMod
 !     TNH3C=total NH3 flux between atmosphere and canopy
 !
   RNH3C(NZ)=0._r8
-  DO NB=1,NBR(NZ)
+  DO NB=1,NumOfBranches_pft(NZ)
     RNH3C(NZ)=RNH3C(NZ)+RNH3B(NB,NZ)
     TNH3C(NZ)=TNH3C(NZ)+RNH3B(NB,NZ)
   ENDDO

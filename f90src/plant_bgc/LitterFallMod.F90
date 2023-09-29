@@ -38,7 +38,7 @@ implicit none
     VOLWOU     =>   plt_site%VOLWOU    , &
     ZNOON      =>   plt_site%ZNOON     , &
     HypoctoylHeight      =>   plt_morph%HypoctoylHeight    , &
-    NBR        =>   plt_morph%NBR      , &
+    NumOfBranches_pft        =>   plt_morph%NumOfBranches_pft      , &
     NB1        =>   plt_morph%NB1      , &
     NBT        =>   plt_morph%NBT        &
   )
@@ -76,14 +76,14 @@ implicit none
 !
     call LiterfallFromDeadBranches(I,J,NZ,IDTHY,CPOOLK)
 
-    IF(IDTHY.EQ.NBR(NZ))THEN
+    IF(IDTHY.EQ.NumOfBranches_pft(NZ))THEN
       IDTHP(NZ)=ibrdead
       NBT(NZ)=0
       WSTR(NZ)=0._r8
       IF(IFLGI(NZ).EQ.1)THEN
-        NBR(NZ)=1
+        NumOfBranches_pft(NZ)=1
       ELSE
-        NBR(NZ)=0
+        NumOfBranches_pft(NZ)=0
       ENDIF
       HypoctoylHeight(NZ)=0._r8
       VOLWOU=VOLWOU+CanWatP(NZ)
@@ -182,7 +182,7 @@ implicit none
     CFOPE      =>   plt_soilchem%CFOPE, &
     MY         =>   plt_morph%MY      , &
     NGTopRootLayer         =>   plt_morph%NGTopRootLayer      , &
-    NBR        =>   plt_morph%NBR     , &
+    NumOfBranches_pft        =>   plt_morph%NumOfBranches_pft     , &
     NRT        =>   plt_morph%NRT       &
   )
 !     LITTERFALL AND STATE VARIABLES FOR SEASONAL STORAGE
@@ -211,7 +211,7 @@ implicit none
   IF(IDTHP(NZ).EQ.1.AND.IDTHR(NZ).EQ.1)THEN
     IF(IFLGI(NZ).EQ.0)THEN
       D6425: DO M=1,jsken
-        D8825: DO NB=1,NBR(NZ)
+        D8825: DO NB=1,NumOfBranches_pft(NZ)
 
           ESNC(ielmc,M,k_fine_litr,0,NZ)=ESNC(ielmc,M,k_fine_litr,0,NZ) &
             +CFOPE(ielmc,instruct,M,NZ)*CPOOLK(NB,NZ)
@@ -520,10 +520,10 @@ implicit none
     IWTYP     =>  plt_pheno%IWTYP     , &
     ISTYP     =>  plt_pheno%ISTYP     , &
     ESNC      =>  plt_bgcr%ESNC       , &
-    NBR       =>  plt_morph%NBR       , &
+    NumOfBranches_pft       =>  plt_morph%NumOfBranches_pft       , &
     PSTGI     =>  plt_morph%PSTGI     , &
     PSTG      =>  plt_morph%PSTG      , &
-    NBTB      =>  plt_morph%NBTB      , &
+    BranchNumber_brchpft      =>  plt_morph%BranchNumber_brchpft      , &
     PSTGF     =>  plt_morph%PSTGF     , &
     XTLI      =>  plt_morph%XTLI      , &
     VSTG      =>  plt_morph%VSTG      , &
@@ -538,7 +538,7 @@ implicit none
     FDBK      =>  plt_photo%FDBK      , &
     FDBKX     =>  plt_photo%FDBKX       &
   )
-  D8845: DO NB=1,NBR(NZ)
+  D8845: DO NB=1,NumOfBranches_pft(NZ)
     IF(IDTHB(NB,NZ).EQ.ibrdead)THEN
       GROUP(NB,NZ)=GROUPI(NZ)
       PSTG(NB,NZ)=XTLI(NZ)
@@ -563,7 +563,7 @@ implicit none
       IFLGF(NB,NZ)=0
       IFLGR(NB,NZ)=0
       IFLGQ(NB,NZ)=0
-      NBTB(NB,NZ)=0
+      BranchNumber_brchpft(NB,NZ)=0
       D8850: DO M=1,pltpar%jpstgs
         IDAY(M,NB,NZ)=0
       ENDDO D8850
@@ -684,13 +684,13 @@ implicit none
     RTN2   => plt_morph%RTN2         , &
     PrimRootLen  => plt_morph%PrimRootLen        , &
     MY     => plt_morph%MY           , &
-    NBR    => plt_morph%NBR          , &
+    NumOfBranches_pft    => plt_morph%NumOfBranches_pft          , &
     NRT    => plt_morph%NRT            &
   )
 !     RESET BRANCH STATE VARIABLES
 !
   DO NE=1,NumOfPlantChemElements
-    DO NB=1,NBR(NZ)
+    DO NB=1,NumOfBranches_pft(NZ)
       EPOOL(NE,NB,NZ)=0._r8
       EPOLNB(NE,NB,NZ)=0._r8
       WTSHTBE(NE,NB,NZ)=0._r8
@@ -700,7 +700,7 @@ implicit none
       WTRSVBE(NE,NB,NZ)=0._r8
     ENDDO
   ENDDO
-  D8835: DO NB=1,NBR(NZ)
+  D8835: DO NB=1,NumOfBranches_pft(NZ)
     CPOOLK(NB,NZ)=0._r8
     CanPBStalkC(NB,NZ)=0._r8
     WTNDBE(1:NumOfPlantChemElements,NB,NZ)=0._r8
@@ -769,9 +769,9 @@ implicit none
     GRWTB    => plt_allom%GRWTB     , &
     GRNXB    => plt_morph%GRNXB     , &
     GRNOB    => plt_morph%GRNOB     , &
-    CanPBLA    => plt_morph%CanPBLA     , &
+    CanopyBranchLeafA_pft    => plt_morph%CanopyBranchLeafA_pft     , &
     CanopyBranchStemApft_lyr    => plt_morph%CanopyBranchStemApft_lyr     , &
-    NBR      => plt_morph%NBR       , &
+    NumOfBranches_pft      => plt_morph%NumOfBranches_pft       , &
     ARLF1    => plt_morph%ARLF1     , &
     CanPSheathHeight    => plt_morph%CanPSheathHeight     , &
     HTNODX   => plt_morph%HTNODX    , &
@@ -801,7 +801,7 @@ implicit none
 !     CPOOL3,CPOOL4=C4 nonstructural C mass in bundle sheath,mesophyll
 !     CO2B,HCOB=aqueous CO2,HCO3-C mass in bundle sheath
 !     WSLF=leaf protein mass
-!     CanPBLA=branch leaf area
+!     CanopyBranchLeafA_pft=branch leaf area
 !     WGLF,WGLFN,WGLFP,WSLF=node leaf C,N,P,protein mass
 !     WGSHE,WGSHN,WGSHP,WSSHE=node petiole C,N,P,protein mass
 !     WGNODE,WGNODN,WGNODP=node stalk C,N,P mass
@@ -823,7 +823,7 @@ implicit none
   GRNXB(NB,NZ)=0._r8
   GRNOB(NB,NZ)=0._r8
   GRWTB(NB,NZ)=0._r8
-  CanPBLA(NB,NZ)=0._r8
+  CanopyBranchLeafA_pft(NB,NZ)=0._r8
   WTSTXBE(1:NumOfPlantChemElements,NB,NZ)=0._r8
 
   D8855: DO K=0,JNODS1

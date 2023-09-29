@@ -961,6 +961,7 @@ contains
   subroutine SnowRedistribution(M,NY,NX,NHE,NHW,NVS,NVN,N1,N2)
 !
 ! SNOW redistribution
+! currently, it does consider wind effect
   implicit none
   integer, intent(in) :: M,NY,NX,NHE,NHW,NVS,NVN
   integer, intent(in) :: N1,N2
@@ -982,8 +983,8 @@ contains
 !     HeatFlxBySnowRedistribut=convective heat transfer from snow,water,ice transfer
 !     VOLS0,VOLW0,VOLI0=snow,water,ice volume
 !     MinSnowDepth=minimum snowpack depth for full cover
-!     QS,QW,QI=hourly-accumulated snow,water,ice transfer
-!     HQS=hourly-accumd convective heat from snow,water,ice transfer
+!     QS,WatBySnowRedistribution,IceBySnowRedistribution=hourly-accumulated snow,water,ice transfer
+!     HeatBySnowRedistribution=hourly-accumd convective heat from snow,water,ice transfer
 !     DrySnoFlxBySnowRedistributM=snow transfer for solute flux calculation
 
   DO  N=1,2
@@ -1012,13 +1013,15 @@ contains
         ENDIF
       ENDIF
 
-      IF(NN.EQ.1)THEN
-        !east or south
-        ALTS1=Altitude_grid(N2,N1)+SnowDepth(N2,N1)
-        ALTS2=Altitude_grid(N5,N4)+SnowDepth(N5,N4)
+      ALTS1=Altitude_grid(N2,N1)+SnowDepth(N2,N1)
 
+      IF(NN.EQ.1)THEN
+        !east or south        
+        ALTS2=Altitude_grid(N5,N4)+SnowDepth(N5,N4)
+        
         SnowDepthLateralGradient=(ALTS1-ALTS2)/DIST(N,NU(N5,N4),N5,N4)
         QSX=SnowDepthLateralGradient/AMAX1(1.0_r8,DIST(N,NU(N5,N4),N5,N4))*dts_HeatWatTP
+
         IF(SnowDepthLateralGradient.GT.0.0_r8.AND.SnowDepth(N2,N1).GT.MinSnowDepth)THEN
           DrySnoFlxBySnowRedistribut(N,N5,N4)=QSX*AZMAX1(VLDrySnoWE0(1,N2,N1))
           WatFlxBySnowRedistribut(N,N5,N4)=QSX*AZMAX1(VLWatSnow0(1,N2,N1))
@@ -1037,12 +1040,13 @@ contains
           IceFlxBySnowRedistribut(N,N5,N4)=0.0_r8
           HeatFlxBySnowRedistribut(N,N5,N4)=0.0_r8
         ENDIF
-        QS(N,N5,N4)=QS(N,N5,N4)+DrySnoFlxBySnowRedistribut(N,N5,N4)
-        QW(N,N5,N4)=QW(N,N5,N4)+WatFlxBySnowRedistribut(N,N5,N4)
-        QI(N,N5,N4)=QI(N,N5,N4)+IceFlxBySnowRedistribut(N,N5,N4)
-        HQS(N,N5,N4)=HQS(N,N5,N4)+HeatFlxBySnowRedistribut(N,N5,N4)
+        DrysnoBySnowRedistribution(N,N5,N4)=DrysnoBySnowRedistribution(N,N5,N4)+DrySnoFlxBySnowRedistribut(N,N5,N4)
+        WatBySnowRedistribution(N,N5,N4)=WatBySnowRedistribution(N,N5,N4)+WatFlxBySnowRedistribut(N,N5,N4)
+        IceBySnowRedistribution(N,N5,N4)=IceBySnowRedistribution(N,N5,N4)+IceFlxBySnowRedistribut(N,N5,N4)
+        HeatBySnowRedistribution(N,N5,N4)=HeatBySnowRedistribution(N,N5,N4)+HeatFlxBySnowRedistribut(N,N5,N4)
         DrySnoFlxBySnowRedistributM(M,N,N5,N4)=DrySnoFlxBySnowRedistribut(N,N5,N4)
       ENDIF
+
       !add west and south
       IF(NN.EQ.2)THEN
 

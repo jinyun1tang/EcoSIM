@@ -700,10 +700,10 @@ implicit none
     ENDIF
   ENDDO D1202
 
-  TQS(N2,N1)=TQS(N2,N1)+QS(N,N2,N1)-QS(N,N5,N4)
-  TQW(N2,N1)=TQW(N2,N1)+QW(N,N2,N1)-QW(N,N5,N4)
-  TQI(N2,N1)=TQI(N2,N1)+QI(N,N2,N1)-QI(N,N5,N4)
-  THQS(N2,N1)=THQS(N2,N1)+HQS(N,N2,N1)-HQS(N,N5,N4)
+  TQS(N2,N1)=TQS(N2,N1)+DrysnoBySnowRedistribution(N,N2,N1)-DrysnoBySnowRedistribution(N,N5,N4)
+  TQW(N2,N1)=TQW(N2,N1)+WatBySnowRedistribution(N,N2,N1)-WatBySnowRedistribution(N,N5,N4)
+  TQI(N2,N1)=TQI(N2,N1)+IceBySnowRedistribution(N,N2,N1)-IceBySnowRedistribution(N,N5,N4)
+  THQS(N2,N1)=THQS(N2,N1)+HeatBySnowRedistribution(N,N2,N1)-HeatBySnowRedistribution(N,N5,N4)
   !
   !     NET GAS AND SOLUTE FLUXES FROM RUNOFF AND SNOWPACK
   !

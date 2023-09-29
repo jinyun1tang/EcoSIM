@@ -161,7 +161,7 @@ module RedistMod
   real(r8), intent(in) :: TXCO2(JY,JX)
   real(r8) :: VLSoilPoreMicPX,VOLTX
   integer  :: L
-  TRN(NY,NX)=TRN(NY,NX)+HeatRadiation(NY,NX)
+  TRN(NY,NX)=TRN(NY,NX)+HeatByRadiation(NY,NX)
   TLE(NY,NX)=TLE(NY,NX)+HeatEvapAir2Surf(NY,NX)
   TSH(NY,NX)=TSH(NY,NX)+HeatSensAir2Surf(NY,NX)
   TGH(NY,NX)=TGH(NY,NX)-(HeatNet2Surf(NY,NX)-HeatSensVapAir2Surf(NY,NX))

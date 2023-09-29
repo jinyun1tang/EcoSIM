@@ -138,7 +138,7 @@ implicit none
 !     begin_execution
 !     RUNOFF BOUNDARY FLUXES OF WATER AND HEAT
 !
-!     QR,QS,QW,QI=runoff from surface water, snowpack snow,water,ice from watsub.f
+!     QR,QS,WatBySnowRedistribution,IceBySnowRedistribution=runoff from surface water, snowpack snow,water,ice from watsub.f
 !     CRUN,URUN=cumulative water and snow runoff
 !     HEATOU=cumulative heat loss through lateral and lower boundaries
 !
@@ -691,11 +691,11 @@ implicit none
   real(r8) :: WQRS,HQRS,OXS,PSS
 !     begin_execution
   IF(N.NE.3.AND.L.EQ.NU(NY,NX))THEN
-    WQRS=XN*(QS(N,N5,N4)+QW(N,N5,N4)+QI(N,N5,N4))
+    WQRS=XN*(DrysnoBySnowRedistribution(N,N5,N4)+WatBySnowRedistribution(N,N5,N4)+IceBySnowRedistribution(N,N5,N4))
     IF(ABS(WQRS).GT.ZEROS(N5,N4))THEN
       CRUN=CRUN-WQRS
       URUN(NY,NX)=URUN(NY,NX)-WQRS
-      HQRS=XN*HQS(N,N5,N4)
+      HQRS=XN*HeatBySnowRedistribution(N,N5,N4)
       HEATOU=HEATOU-HQRS
       CXS=XN*(XCOQSS(N,N5,N4)+XCHQSS(N,N5,N4))
       ZXS=XN*(XN4QSS(N,N5,N4)+XN3QSS(N,N5,N4)+XNOQSS(N,N5,N4))

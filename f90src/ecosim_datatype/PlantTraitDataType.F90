@@ -46,7 +46,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  ARLF(:,:,:,:,:)                    !leaf area, [m2 d-2]
   real(r8),target,allocatable ::  CanPSheathHeight(:,:,:,:,:)                   !sheath height, [m]
   real(r8),target,allocatable ::  HTNODE(:,:,:,:,:)                  !internode height, [m]
-  real(r8),target,allocatable ::  CanPBLA(:,:,:,:)                     !branch leaf area, [m2 d-2]
+  real(r8),target,allocatable ::  CanopyBranchLeafA_pft(:,:,:,:)                     !branch leaf area, [m2 d-2]
   real(r8),target,allocatable ::  ARLFZ(:,:,:,:)                     !branch leaf area, [m2 d-2]
   real(r8),target,allocatable ::  CanPBranchHeight(:,:,:,:)                    !branch height, [m]
   real(r8),target,allocatable ::  GRNOB(:,:,:,:)                     !branch grain number, [d-2]
@@ -114,9 +114,9 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  TCZ(:,:,:)                         !threshold temperature for spring leafout/dehardening, [oC]
   real(r8),target,allocatable ::  SSL1(:,:,:)                        !petiole length:mass during growth, [m g-1]
   real(r8),target,allocatable ::  VRNL(:,:,:,:)                      !hours above threshold temperature required for spring leafout/dehardening, [-]
-  integer,target,allocatable ::  NBR(:,:,:)                          !branch number, [-]
+  integer,target,allocatable ::  NumOfBranches_pft(:,:,:)                          !branch number, [-]
   integer,target,allocatable ::  NBT(:,:,:)                          !branch number, [-]
-  integer,target,allocatable ::  NBTB(:,:,:,:)                       !branch number, [-]
+  integer,target,allocatable ::  BranchNumber_brchpft(:,:,:,:)                       !branch number, [-]
   integer,target,allocatable ::  NB1(:,:,:)                          !number of main branch, [-]
   integer,target,allocatable ::  IFLGR(:,:,:,:)                      !branch phenology flag, [-]
   integer,target,allocatable ::  IFLGQ(:,:,:,:)                      !branch phenology flag, [h]
@@ -203,7 +203,7 @@ contains
   allocate(ARLF(0:JNODS,JBR,JP,JY,JX));ARLF=0._r8
   allocate(CanPSheathHeight(0:JNODS,JBR,JP,JY,JX));CanPSheathHeight=0._r8
   allocate(HTNODE(0:JNODS,JBR,JP,JY,JX));HTNODE=0._r8
-  allocate(CanPBLA(JBR,JP,JY,JX)); CanPBLA=0._r8
+  allocate(CanopyBranchLeafA_pft(JBR,JP,JY,JX)); CanopyBranchLeafA_pft=0._r8
   allocate(ARLFZ(JBR,JP,JY,JX)); ARLFZ=0._r8
   allocate(CanPBranchHeight(JBR,JP,JY,JX));CanPBranchHeight=0._r8
   allocate(GRNOB(JBR,JP,JY,JX)); GRNOB=0._r8
@@ -271,9 +271,9 @@ contains
   allocate(TCZ(JP,JY,JX));      TCZ=0._r8
   allocate(SSL1(JP,JY,JX));     SSL1=0._r8
   allocate(VRNL(JC,JP,JY,JX));  VRNL=0._r8
-  allocate(NBR(JP,JY,JX));      NBR=0
+  allocate(NumOfBranches_pft(JP,JY,JX));      NumOfBranches_pft=0
   allocate(NBT(JP,JY,JX));      NBT=0
-  allocate(NBTB(JBR,JP,JY,JX));  NBTB=0
+  allocate(BranchNumber_brchpft(JBR,JP,JY,JX));  BranchNumber_brchpft=0
   allocate(NB1(JP,JY,JX));      NB1=0
   allocate(IFLGR(JBR,JP,JY,JX)); IFLGR=0
   allocate(IFLGQ(JBR,JP,JY,JX)); IFLGQ=0
@@ -357,7 +357,7 @@ contains
   call destroy(ARLF)
   call destroy(CanPSheathHeight)
   call destroy(HTNODE)
-  call destroy(CanPBLA)
+  call destroy(CanopyBranchLeafA_pft)
   call destroy(ARLFZ)
   call destroy(CanPBranchHeight)
   call destroy(GRNOB)
@@ -425,9 +425,9 @@ contains
   call destroy(TCZ)
   call destroy(SSL1)
   call destroy(VRNL)
-  call destroy(NBR)
+  call destroy(NumOfBranches_pft)
   call destroy(NBT)
-  call destroy(NBTB)
+  call destroy(BranchNumber_brchpft)
   call destroy(NB1)
   call destroy(IFLGR)
   call destroy(IFLGQ)

@@ -75,7 +75,7 @@ module PlantDisturbsMod
     EHVST    =>  plt_distb%EHVST  , &
     HVST     =>  plt_distb%HVST   , &
     IHVST    =>  plt_distb%IHVST  , &
-    THIN     =>  plt_distb%THIN   , &
+    THIN_pft     =>  plt_distb%THIN_pft   , &
     pftPlantPopulation       =>  plt_site%pftPlantPopulation      , &
     NU       =>  plt_site%NU      , &
     ZERO     =>  plt_site%ZERO    , &
@@ -107,7 +107,7 @@ module PlantDisturbsMod
 
 !     IHVST=harvest type:0=none,1=grain,2=all above-ground
 !                       ,3=pruning,4=grazing,5=fire,6=herbivory
-!     THIN=thinning:fraction of population removed
+!     THIN_pft=thinning:fraction of population removed
 !     FHVSE(ielmc)=fraction of standing dead mass not harvested
 !     EHVST(1,1,EHVST(1,2,EHVST(1,3,EHVST(1,4=fraction of
 !           leaf,non-foliar,woody, standing dead removed from PFT
@@ -120,20 +120,20 @@ module PlantDisturbsMod
 !
   IF(IHVST(NZ).GE.0)THEN
     IF(J.EQ.INT(ZNOON).AND.IHVST(NZ).NE.4.AND.IHVST(NZ).NE.6)THEN
-      IF(isclose(THIN(NZ),0._r8))THEN
+      IF(isclose(THIN_pft(NZ),0._r8))THEN
         FHVSE(ielmc)=AZMAX1(1._r8-EHVST(1,4,NZ))
         FHVSH=FHVSE(ielmc)
       ELSE
-        FHVSE(ielmc)=AZMAX1(1._r8-THIN(NZ))
+        FHVSE(ielmc)=AZMAX1(1._r8-THIN_pft(NZ))
         IF(IHVST(NZ).EQ.0)THEN
-          FHVSH=AZMAX1(1._r8-EHVST(1,4,NZ)*THIN(NZ))
+          FHVSH=AZMAX1(1._r8-EHVST(1,4,NZ)*THIN_pft(NZ))
         ELSE
           FHVSH=FHVSE(ielmc)
         ENDIF
       ENDIF
     ELSEIF(IHVST(NZ).EQ.4.OR.IHVST(NZ).EQ.6)THEN
       IF(WTSTGE(ielmc,NZ).GT.ZEROP(NZ))THEN
-        WHVSTD=HVST(NZ)*THIN(NZ)*0.45_r8/24.0_r8*AREA3(NU)*EHVST(1,4,NZ)
+        WHVSTD=HVST(NZ)*THIN_pft(NZ)*0.45_r8/24.0_r8*AREA3(NU)*EHVST(1,4,NZ)
         FHVSE(ielmc)=AZMAX1(1._r8-WHVSTD/WTSTGE(ielmc,NZ))
         FHVSH=FHVSE(ielmc)
       ELSE
@@ -766,9 +766,9 @@ module PlantDisturbsMod
     NGTopRootLayer      =>  plt_morph%NGTopRootLayer       , &
     MY       =>  plt_morph%MY        , &
     NRT      =>  plt_morph%NRT       , &
-    NBR      =>  plt_morph%NBR       , &
+    NumOfBranches_pft      =>  plt_morph%NumOfBranches_pft       , &
     ARLF1    =>  plt_morph%ARLF1     , &
-    CanPBLA    =>  plt_morph%CanPBLA     , &
+    CanopyBranchLeafA_pft    =>  plt_morph%CanopyBranchLeafA_pft     , &
     GRNXB    =>  plt_morph%GRNXB     , &
     GRNOB    =>  plt_morph%GRNOB     , &
     CanPLNBLA    =>  plt_morph%CanPLNBLA       &
@@ -802,7 +802,7 @@ module PlantDisturbsMod
 !     IDTHB=branch living flag: 0=alive,1=dead
 !     PP=PFT population
 !
-        D8975: DO NB=1,NBR(NZ)
+        D8975: DO NB=1,NumOfBranches_pft(NZ)
           IF(IDTHB(NB,NZ).EQ.ibralive)THEN
             IF(pftPlantPopulation(NZ).LE.0.0)then
               IDTHB(NB,NZ)=ibrdead
@@ -893,7 +893,7 @@ module PlantDisturbsMod
             GRNXB(NB,NZ)=GRNXB(NB,NZ)*XHVST
             GRNOB(NB,NZ)=GRNOB(NB,NZ)*XHVST
             GRWTB(NB,NZ)=GRWTB(NB,NZ)*XHVST
-            CanPBLA(NB,NZ)=CanPBLA(NB,NZ)*XHVST
+            CanopyBranchLeafA_pft(NB,NZ)=CanopyBranchLeafA_pft(NB,NZ)*XHVST
             CanPBLeafShethC(NB,NZ)=AZMAX1(WTLFBE(ielmc,NB,NZ)+WTSHEBE(ielmc,NB,NZ))
             CanopyLeafShethC_pft(NZ)=CanopyLeafShethC_pft(NZ)+CanPBLeafShethC(NB,NZ)
 
@@ -1152,7 +1152,7 @@ module PlantDisturbsMod
     HVST     =>  plt_distb%HVST    , &
     EHVST    =>  plt_distb%EHVST   , &
     DCORP    =>  plt_distb%DCORP   , &
-    THIN     =>  plt_distb%THIN    , &
+    THIN_pft     =>  plt_distb%THIN_pft    , &
     ITILL    =>  plt_distb%ITILL   , &
     IHVST    =>  plt_distb%IHVST   , &
     JHVST    =>  plt_distb%JHVST   , &
@@ -1208,8 +1208,8 @@ module PlantDisturbsMod
     WTLFBE   => plt_biom%WTLFBE    , &
     WSSHE    => plt_biom%WSSHE     , &
     WTSTKE   => plt_biom%WTSTKE    , &
-    CEPOLP   => plt_biom%CEPOLP    , &
-    CCPLNP   => plt_biom%CCPLNP    , &
+    CanopyNonstructElementConc_pft   => plt_biom%CanopyNonstructElementConc_pft    , &
+    NoduleNonstructCconc_pft   => plt_biom%NoduleNonstructCconc_pft    , &
     WTLFE    => plt_biom%WTLFE     , &
     WTGRE    => plt_biom%WTGRE     , &
     CanPShootElmMass   => plt_biom%CanPShootElmMass     , &
@@ -1280,8 +1280,8 @@ module PlantDisturbsMod
     INTYP    =>  plt_morph%INTYP   , &
     CanopyLAgrid_lyr    =>  plt_morph%CanopyLAgrid_lyr   , &
     CanopyHeightz       =>  plt_morph%CanopyHeightz      , &
-    CanPBLA    =>  plt_morph%CanPBLA   , &
-    NBR      =>  plt_morph%NBR     , &
+    CanopyBranchLeafA_pft    =>  plt_morph%CanopyBranchLeafA_pft   , &
+    NumOfBranches_pft      =>  plt_morph%NumOfBranches_pft     , &
     CanPSA    =>  plt_morph%CanPSA   , &
     HTNODX   =>  plt_morph%HTNODX  , &
     PrimRootXNumL    =>  plt_morph%PrimRootXNumL   , &
@@ -1317,12 +1317,12 @@ module PlantDisturbsMod
 !
 !     JHVST=terminate PFT:0=no,1=yes,2=yes,and reseed
 !     PPX,PP=PFT population per m2,grid cell
-!     THIN=thinning:fraction of population removed
+!     THIN_pft=thinning:fraction of population removed
 !     CF=clumping factor
 !     HVST=IHVST=0-2:>0=cutting height,<0=fraction of LAI removed
 !          IHVST=3:reduction of clumping factor
 !          IHVST=4 or 6:animal or insect biomass(g LM m-2),IHVST=5:fire
-!     THIN=IHVST=0-3,5: fraction of population removed,
+!     THIN_pft=IHVST=0-3,5: fraction of population removed,
 !          IHVST=4 or 6:specific herbivory rate (g DM g-1 LM d-1)
 !     CanopyLA_grd,CanopyLAgrid_lyr=leaf area of combined canopy, canopy layer
 !     ARLFR,ARLFY=leaf area harvested,remaining
@@ -1331,8 +1331,8 @@ module PlantDisturbsMod
     IF(IHVST(NZ).NE.4.AND.IHVST(NZ).NE.6)THEN
       IF(JHVST(NZ).NE.ihv_tmareseed)THEN
         !terminate and reseed
-        PPX(NZ)=PPX(NZ)*(1._r8-THIN(NZ))
-        pftPlantPopulation(NZ)=pftPlantPopulation(NZ)*(1._r8-THIN(NZ))
+        PPX(NZ)=PPX(NZ)*(1._r8-THIN_pft(NZ))
+        pftPlantPopulation(NZ)=pftPlantPopulation(NZ)*(1._r8-THIN_pft(NZ))
       ELSE
 !     PPI(NZ)=AMAX1(1.0_r8,0.5_r8*(PPI(NZ)+GRNO(NZ)/AREA3(NU)))
         PPX(NZ)=PPI(NZ)
@@ -1371,15 +1371,15 @@ module PlantDisturbsMod
 !     HVST=IHVST=0-2:>0=cutting height,<0=fraction of LAI removed
 !          IHVST=3:reduction of clumping factor
 !          IHVST=4 or 6:animal or insect biomass(g LM m-2),IHVST=5:fire
-!     THIN=IHVST=0-3,5: fraction of population removed,
+!     THIN_pft=IHVST=0-3,5: fraction of population removed,
 !          IHVST=4 or 6:specific herbivory rate (g DM g-1 LM d-1)
 !     WHVSTT=total phytomass grazed, removed
 !     fTgrowCanP=temperature function for canopy growth
 !     CCPOLP=nonstructural C concentration in canopy
-!     CCPLNP=nonstructural C concentration in canopy nodules
+!     NoduleNonstructCconc_pft=nonstructural C concentration in canopy nodules
 !
       IF(WTSHTA(NZ).GT.ZEROP(NZ))THEN
-        WHVSTT=HVST(NZ)*THIN(NZ)*0.45_r8/24.0_r8 &
+        WHVSTT=HVST(NZ)*THIN_pft(NZ)*0.45_r8/24.0_r8 &
           *AREA3(NU)*CanPShootElmMass(ielmc,NZ)/WTSHTA(NZ)
       ELSE
         WHVSTT=0._r8
@@ -1387,8 +1387,8 @@ module PlantDisturbsMod
       IF(IHVST(NZ).EQ.6)THEN
         WHVSTT=WHVSTT*fTgrowCanP(NZ)
       ENDIF
-      CCPOLX=CEPOLP(ielmc,NZ)/(1.0_r8+CEPOLP(ielmc,NZ))
-      CCPLNX=CCPLNP(NZ)/(1.0_r8+CCPLNP(NZ))
+      CCPOLX=CanopyNonstructElementConc_pft(ielmc,NZ)/(1.0_r8+CanopyNonstructElementConc_pft(ielmc,NZ))
+      CCPLNX=NoduleNonstructCconc_pft(NZ)/(1.0_r8+NoduleNonstructCconc_pft(NZ))
 !
 !     LEAF,BACTERIA GRAZED,REMOVED
 !
@@ -1509,14 +1509,14 @@ module PlantDisturbsMod
 !
 !     WGLFBL=branch leaf C mass in canopy layer
 !
-      D9860: DO NB=1,NBR(NZ)
+      D9860: DO NB=1,NumOfBranches_pft(NZ)
         DO  L=1,NumOfCanopyLayers1
           DO  K=0,JNODS1
             WGLFBL(L,NB,NZ)=0._r8
           enddo
         enddo
       ENDDO D9860
-      D9870: DO NB=1,NBR(NZ)
+      D9870: DO NB=1,NumOfBranches_pft(NZ)
         DO  L=1,NumOfCanopyLayers1
           DO  K=0,JNODS1
             WGLFBL(L,NB,NZ)=WGLFBL(L,NB,NZ)+WGLFLE(ielmc,L,K,NB,NZ)
@@ -1532,7 +1532,7 @@ module PlantDisturbsMod
 !     ZL=height to bottom of each canopy layer
 !     FHGT=fraction of canopy layer height not harvested
 !     FHVSE(ielmc)=fraction of canopy layer mass not harvested
-!     THIN=IHVST=0-3,5: fraction of population removed,
+!     THIN_pft=IHVST=0-3,5: fraction of population removed,
 !          IHVST=4 or 6:specific herbivory rate (g DM g-1 LM d-1)
 !     EHVST(1,1,EHVST(1,2,EHVST(1,3,EHVST(1,4=fraction of
 !           leaf,non-foliar,woody, standing dead removed from PFT
@@ -1548,13 +1548,13 @@ module PlantDisturbsMod
         ELSE
           FHGT=0._r8
         ENDIF
-        IF(isclose(THIN(NZ),0._r8))THEN
+        IF(isclose(THIN_pft(NZ),0._r8))THEN
           FHVSE(ielmc)=AZMAX1(1._r8-(1._r8-FHGT)*EHVST(1,ipld_leaf,NZ))
           FHVSH=FHVSE(ielmc)
         ELSE
-          FHVSE(ielmc)=AZMAX1(1._r8-THIN(NZ))
+          FHVSE(ielmc)=AZMAX1(1._r8-THIN_pft(NZ))
           IF(IHVST(NZ).EQ.0)THEN
-            FHVSH=1.0_r8-(1._r8-FHGT)*EHVST(1,ipld_leaf,NZ)*THIN(NZ)
+            FHVSH=1.0_r8-(1._r8-FHGT)*EHVST(1,ipld_leaf,NZ)*THIN_pft(NZ)
           ELSE
             FHVSH=FHVSE(ielmc)
           ENDIF
@@ -1574,7 +1574,7 @@ module PlantDisturbsMod
 !     WGLFL=leaf node C in canopy layer
 !     FHVSE(ielmc)=fraction of leaf node mass not harvested
 !
-      D9855: DO NB=1,NBR(NZ)
+      D9855: DO NB=1,NumOfBranches_pft(NZ)
         IF((IHVST(NZ).EQ.4.OR.IHVST(NZ).EQ.6) &
           .AND.WTLFE(ielmc,NZ).GT.ZEROL(NZ))THEN
           WHVSBL=WHVSLF*AZMAX1(WGLFBL(L,NB,NZ))/WTLFE(ielmc,NZ)
@@ -1632,7 +1632,7 @@ module PlantDisturbsMod
       CanopyStemApft_lyr(L,NZ)=CanopyStemApft_lyr(L,NZ)*FHVSE(ielmc)
     ENDDO D9865
 
-    D9835: DO NB=1,NBR(NZ)
+    D9835: DO NB=1,NumOfBranches_pft(NZ)
       CPOOLG=0._r8
       ZPOOLG=0._r8
       PPOOLG=0._r8
@@ -1672,7 +1672,7 @@ module PlantDisturbsMod
 !     EHVST(1,1,EHVST(1,2,EHVST(1,3,EHVST(1,4=fraction of
 !           leaf,non-foliar,woody, standing dead removed from PFT
 !     FHVSETK=fraction of internode layer mass not harvested
-!     THIN=IHVST=0-3,5: fraction of population removed,
+!     THIN_pft=IHVST=0-3,5: fraction of population removed,
 !          IHVST=4 or 6:specific herbivory rate (g DM g-1 LM d-1)
 !
         IF(IHVST(NZ).NE.4.AND.IHVST(NZ).NE.6)THEN
@@ -1681,13 +1681,13 @@ module PlantDisturbsMod
               /WGLFE(ielmc,K,NB,NZ))*EHVST(1,ipld_nofoliar,NZ)/EHVST(1,ipld_leaf,NZ))))
             FHVSHK(K)=FHVSETK(K)
         ELSE
-          IF(isclose(THIN(NZ),0._r8))THEN
+          IF(isclose(THIN_pft(NZ),0._r8))THEN
             FHVSETK(K)=1.0_r8-EHVST(1,ipld_nofoliar,NZ)
             FHVSHK(K)=FHVSETK(K)
           ELSE
-            FHVSETK(K)=1.0_r8-THIN(NZ)
+            FHVSETK(K)=1.0_r8-THIN_pft(NZ)
             IF(IHVST(NZ).EQ.0)THEN
-              FHVSHK(K)=1.0_r8-EHVST(1,ipld_nofoliar,NZ)*THIN(NZ)
+              FHVSHK(K)=1.0_r8-EHVST(1,ipld_nofoliar,NZ)*THIN_pft(NZ)
             ELSE
               FHVSHK(K)=FHVSETK(K)
             ENDIF
@@ -1702,14 +1702,14 @@ module PlantDisturbsMod
 !
 !     WGLF=leaf node C mass
 !     WTLFB,WTLFBN,WTLFBP=branch leaf C,N,P mass
-!     CanPBLA,ARLF=branch,node leaf area
+!     CanopyBranchLeafA_pft,ARLF=branch,node leaf area
 !     WSLF=leaf protein mass
 !
       WGLFGY=WGLFGY+WGLFE(ielmc,K,NB,NZ)
       DO NE=1,NumOfPlantChemElements
         WTLFBE(NE,NB,NZ)=WTLFBE(NE,NB,NZ)-WGLFE(NE,K,NB,NZ)+WGLFGE(NE)
       ENDDO
-      CanPBLA(NB,NZ)=CanPBLA(NB,NZ)-ARLF1(K,NB,NZ)+ARLFG
+      CanopyBranchLeafA_pft(NB,NZ)=CanopyBranchLeafA_pft(NB,NZ)-ARLF1(K,NB,NZ)+ARLFG
       IF(ARLF1(K,NB,NZ).GT.ZEROP(NZ))THEN
         WSLF(K,NB,NZ)=WSLF(K,NB,NZ)*ARLFG/ARLF1(K,NB,NZ)
       ELSE
@@ -1961,7 +1961,7 @@ module PlantDisturbsMod
 !     FHVSE(ielmc)=fraction of canopy layer mass not harvested
 !     EHVST(1,1,EHVST(1,2,EHVST(1,3,EHVST(1,4=fraction of
 !           leaf,non-foliar,woody, standing dead removed from PFT
-!     THIN=IHVST=0-3,5: fraction of population removed,
+!     THIN_pft=IHVST=0-3,5: fraction of population removed,
 !          IHVST=4 or 6:specific herbivory rate (g DM g-1 LM d-1)
 !     WTSTK=stalk C mass
 !
@@ -1973,13 +1973,13 @@ module PlantDisturbsMod
             ELSE
               FHGT=0._r8
             ENDIF
-            IF(isclose(THIN(NZ),0._r8))THEN
+            IF(isclose(THIN_pft(NZ),0._r8))THEN
               FHVSE(ielmc)=AZMAX1(1._r8-(1._r8-FHGT)*EHVST(1,ipld_woody,NZ))
               FHVSH=FHVSE(ielmc)
             ELSE
-              FHVSE(ielmc)=AZMAX1(1._r8-THIN(NZ))
+              FHVSE(ielmc)=AZMAX1(1._r8-THIN_pft(NZ))
               IF(IHVST(NZ).EQ.0)THEN
-                FHVSH=1.0_r8-(1._r8-FHGT)*EHVST(1,ipld_woody,NZ)*THIN(NZ)
+                FHVSH=1.0_r8-(1._r8-FHGT)*EHVST(1,ipld_woody,NZ)*THIN_pft(NZ)
               ELSE
                 FHVSH=FHVSE(ielmc)
               ENDIF
@@ -2024,7 +2024,7 @@ module PlantDisturbsMod
 !                       ,3=pruning,4=grazing,5=fire,6=herbivory
 !     HTNODX,HTNODE=stalk height,stalk internode length
 !     FHGTK=fraction of internode length not harvested
-!     THIN=IHVST=0-3,5: fraction of population removed,
+!     THIN_pft=IHVST=0-3,5: fraction of population removed,
 !          IHVST=4 or 6:specific herbivory rate (g DM g-1 LM d-1)
 !     EHVST(1,1,EHVST(1,2,EHVST(1,3,EHVST(1,4=fraction of
 !           leaf,non-foliar,woody, standing dead removed from PFT
@@ -2039,10 +2039,10 @@ module PlantDisturbsMod
               ELSE
                 FHGTK=0._r8
               ENDIF
-              IF(isclose(THIN(NZ),0._r8))THEN
+              IF(isclose(THIN_pft(NZ),0._r8))THEN
                 FHVSETS=AZMAX1(1._r8-FHGTK*EHVST(1,ipld_woody,NZ))
               ELSE
-                FHVSETS=AZMAX1(1._r8-THIN(NZ))
+                FHVSETS=AZMAX1(1._r8-THIN_pft(NZ))
               ENDIF
             ELSE
               FHVSETS=1.0_r8
@@ -2057,7 +2057,7 @@ module PlantDisturbsMod
           DO NE=1,NumOfPlantChemElements
             WGNODE(NE,K,NB,NZ)=FHVSETS*WGNODE(NE,K,NB,NZ)
           ENDDO
-          IF(IHVST(NZ).LE.2.AND.isclose(THIN(NZ),0._r8))THEN
+          IF(IHVST(NZ).LE.2.AND.isclose(THIN_pft(NZ),0._r8))THEN
             HTNODX(K,NB,NZ)=FHVSETS*HTNODX(K,NB,NZ)
             HTNODE(K,NB,NZ)=AMIN1(HTNODE(K,NB,NZ),HVST(NZ))
           ENDIF
@@ -2113,7 +2113,7 @@ module PlantDisturbsMod
 !     HVST=IHVST=0-2:>0=cutting height,<0=fraction of LAI removed
 !          IHVST=3:reduction of clumping factor
 !          IHVST=4 or 6:animal or insect biomass(g LM m-2),IHVST=5:fire
-!     THIN=IHVST=0-3,5: fraction of population removed,
+!     THIN_pft=IHVST=0-3,5: fraction of population removed,
 !          IHVST=4 or 6:specific herbivory rate (g DM g-1 LM d-1)
 !     FHVSETG,FHVSETH,FHVSETE=fraction of grain,husk,ear mass not harvested
 !     EHVST(1,1,EHVST(1,2,EHVST(1,3,EHVST(1,4=fraction of
@@ -2122,15 +2122,15 @@ module PlantDisturbsMod
 !
         IF(IHVST(NZ).NE.4.AND.IHVST(NZ).NE.6)THEN
           IF(HVST(NZ).LT.HTSTKX.OR.IHVST(NZ).EQ.1.OR.IHVST(NZ).EQ.3)THEN
-            IF(isclose(THIN(NZ),0._r8))THEN
+            IF(isclose(THIN_pft(NZ),0._r8))THEN
               FHVSETG=1.0_r8-EHVST(1,ipld_nofoliar,NZ)
               FHVSHG=FHVSETG
             ELSE
-              FHVSETG=1.0_r8-THIN(NZ)
-              FHVSHG=1.0_r8-EHVST(1,ipld_nofoliar,NZ)*THIN(NZ)
+              FHVSETG=1.0_r8-THIN_pft(NZ)
+              FHVSHG=1.0_r8-EHVST(1,ipld_nofoliar,NZ)*THIN_pft(NZ)
             ENDIF
           ELSE
-            FHVSETG=1.0_r8-THIN(NZ)
+            FHVSETG=1.0_r8-THIN_pft(NZ)
             FHVSHG=FHVSETG
           ENDIF
           FHVSETH=FHVSETG
@@ -2279,7 +2279,7 @@ module PlantDisturbsMod
             ENDDO D3005
             IFLGA(NB,NZ)=0
             IF(NB.EQ.NB1(NZ))THEN
-              D3010: DO NBX=1,NBR(NZ)
+              D3010: DO NBX=1,NumOfBranches_pft(NZ)
                 IF(NBX.NE.NB1(NZ))THEN
                   GROUP(NBX,NZ)=GROUPI(NZ)
                   PSTGI(NBX,NZ)=PSTG(NBX,NZ)
@@ -2320,7 +2320,7 @@ module PlantDisturbsMod
       WTSTKE(ielmc,NZ)=0._r8
       CanPStalkC(NZ)=0._r8
       CanPSA(NZ)=0._r8
-      D9840: DO NB=1,NBR(NZ)
+      D9840: DO NB=1,NumOfBranches_pft(NZ)
         CanopyLeafShethC_pft(NZ)=CanopyLeafShethC_pft(NZ)+CanPBLeafShethC(NB,NZ)
         WTSTKE(ielmc,NZ)=WTSTKE(ielmc,NZ)+WTSTKBE(ielmc,NB,NZ)
         CanPStalkC(NZ)=CanPStalkC(NZ)+CanPBStalkC(NB,NZ)
@@ -2334,7 +2334,7 @@ module PlantDisturbsMod
 !     IHVST=harvest type:0=none,1=grain,2=all above-ground
 !                       ,3=pruning,4=grazing,5=fire,6=herbivory
 !     XHVST,XHVSN,XHVSP=fraction of root C,N,P remaining after disturbance
-!     THIN=IHVST=0-3,5: fraction of population removed,
+!     THIN_pft=IHVST=0-3,5: fraction of population removed,
 !          IHVST=4 or 6:specific herbivory rate (g DM g-1 LM d-1)
 !     THETW=soil water concentration
 !     CORGC=SOC concentration
@@ -2352,11 +2352,11 @@ module PlantDisturbsMod
 !     FWOOD,FWOODN,FWOODP=C,N,P woody fraction in root:0=woody,1=non-woody
 !
       IF(IHVST(NZ).NE.4.AND.IHVST(NZ).NE.6)THEN
-        XHVST(ielmc)=1.0_r8-THIN(NZ)
+        XHVST(ielmc)=1.0_r8-THIN_pft(NZ)
         D3985: DO N=1,MY(NZ)
           D3980: DO L=NU,NJ
             IF(IHVST(NZ).NE.5)THEN
-              XHVST(ielmc)=1.0_r8-THIN(NZ)
+              XHVST(ielmc)=1.0_r8-THIN_pft(NZ)
               XHVST(ielmn)=XHVST(ielmc)
               XHVST(ielmp)=XHVST(ielmc)
               FFIRE(1:NumOfPlantChemElements)=0._r8
