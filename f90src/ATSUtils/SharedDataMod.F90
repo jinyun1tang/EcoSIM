@@ -42,7 +42,7 @@ Module SharedDataMod
   integer,  allocatable :: a_NU(:)
   integer,  allocatable :: a_NL(:)
   integer,  allocatable :: a_NJ(:)
-  integer :: NYS                     !total number of columns
+  integer :: NYS, I                     !total number of columns
   contains
 
   subroutine InitSharedData(ncells_per_col_,ncol)
@@ -66,17 +66,27 @@ Module SharedDataMod
   allocate(a_CORGN(ncells_per_col_,ncol))   !organic nitrogen content
   allocate(a_CORGP(ncells_per_col_,ncol))   !organic phosphorus content
   !allocate(a_PORO(ncells_per_col_,ncol))
-  allocate(a_AREA3(ncol))
-  allocate(a_NU(ncol))
-  allocate(a_NL(ncol))
-  allocate(a_ASP(ncol))
-  allocate(a_ALT(ncol))
-  allocate(tairc(1:ncol))
-  allocate(uwind(1:ncol))
-  allocate(prec(1:ncol))
-  allocate(sunrad(1:ncol))
-  allocate(vpair(1:ncol))
-  allocate(a_ATKA(1:ncol))
+  allocate(a_AREA3(ncells_per_col_))
+  allocate(a_NU(ncells_per_col_))
+  allocate(a_NL(ncells_per_col_))
+  allocate(a_ASP(ncells_per_col_))
+  allocate(a_ALT(ncells_per_col_))
+  !allocate(tairc(1:ncells_per_col_))
+  !allocate(uwind(1:ncells_per_col_))
+  !allocate(prec(1:ncells_per_col_))
+  !allocate(sunrad(1:ncells_per_col_))
+  !allocate(vpair(1:ncells_per_col_))
+  allocate(a_ATKA(1:ncells_per_col_))
+  
+  a_NU=0
+  a_NL=0
+
+  do I=1, ncells_per_col_
+    write(*,*) "I = ", I, " of ", ncells_per_col_
+    write(*,*) "a_NU(", I ,") = ", a_NU(I)
+    write(*,*) "a_NL(", I ,") = ", a_NL(I)
+  end do
+
   end subroutine InitSharedData
 
 !------------------------------------------------------------------------------------------
