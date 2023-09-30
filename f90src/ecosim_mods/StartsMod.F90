@@ -253,7 +253,10 @@ module StartsMod
     ENDDO
   ENDDO
 
+  write(*,*) "In init soil vars"
+  write(*,*) "NHW = ", NHW, "NHE = ", NHE 
   DO  NX=NHW,NHE
+    write(*,*) "Loop: ", NX
     DO  NY=NVN,NVS
 
       DO L=1,NL(NY,NX)
@@ -289,6 +292,10 @@ module StartsMod
               N6=L+1
             ENDIF
           ENDIF
+          write(*,*) "N = ", N
+          write(*,*) "N6 = ", N6
+          write(*,*) "N5 = ", N5
+          write(*,*) "N4 = ", N4
           DIST(N,N6,N5,N4)=0.5_r8*(DLYR(N,N3,N2,N1)+DLYR(N,N6,N5,N4))
           XDPTH(N,N6,N5,N4)=AREA(N,N3,N2,N1)/DIST(N,N6,N5,N4)
           !1.07 is a scaling parameter for dispersion calculation, reference?

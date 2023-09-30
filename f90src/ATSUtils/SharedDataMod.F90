@@ -6,8 +6,8 @@ Module SharedDataMod
   character(len=*), private, parameter :: mod_filename= &
   __FILE__
 !figure out the grid for ATS
-!  integer, intent(in) :: jzsoi   !number of soil layers
-!  integer, intent(in) :: js    !number of snow layers
+!  integer, intent(in) :: jzsoi            !number of soil layers
+!  integer, intent(in) :: js               !number of snow layers
 
 ! temporary data holder in ecosim
   real(r8) :: atm_n2, atm_o2,atm_co2,atm_ch4,atm_N2o,atm_H2,atm_NH3
@@ -22,27 +22,28 @@ Module SharedDataMod
   real(r8), allocatable :: a_CORGC(:,:)   !organic carbon content
   real(r8), allocatable :: a_CORGN(:,:)   !organic nitrogen content
   real(r8), allocatable :: a_CORGP(:,:)   !organic phosphorus content
-  real(r8), allocatable :: a_PORO(:,:)
-!  real(r8), allocatable ::a_CORGR(:,:)  !organic nitrogen  content
-  real(r8), allocatable :: a_ASP(:)
-  real(r8), allocatable :: a_ALT(:)
+  real(r8), allocatable :: a_PORO(:,:)    !Porosity
+!  real(r8), allocatable ::a_CORGR(:,:)   !organic nitrogen  content
+  real(r8), allocatable :: a_ASP(:)       !Aspect
+  real(r8), allocatable :: a_ALT(:)       !Altitude 
   real(r8), allocatable :: a_ATKA(:)
-  real(r8), allocatable :: a_WC(:,:) !Soil water content
-  real(r8), allocatable :: a_LSAT(:,:) !liquid saturation
+  real(r8), allocatable :: a_WC(:,:)      !Soil water content
+  real(r8), allocatable :: a_LSAT(:,:)    !liquid saturation
   real(r8), allocatable :: a_RELPERM(:,:) !relative_permeability
-  real(r8), allocatable :: a_HCOND(:,:) !hydraulic conductivity
-  real(r8), allocatable :: a_TEMP(:,:) !temperature
+  real(r8), allocatable :: a_HCOND(:,:)   !hydraulic conductivity
+  real(r8), allocatable :: a_TEMP(:,:)    !temperature
 
-  real(r8), allocatable :: tairc(:)  !air temperature oC
-  real(r8), allocatable :: uwind(:)  !wind speed, m/s
-  real(r8), allocatable :: prec(:)   !precipitation, mm H2O/hr
-  real(r8), allocatable :: sunrad(:)   !solar radiation,
-  real(r8), allocatable :: vpair(:)    !vapor pressure deficit
+  real(r8), allocatable :: tairc(:)       !air temperature oC
+  real(r8), allocatable :: uwind(:)       !wind speed, m/s
+  real(r8), allocatable :: prec(:)        !precipitation, mm H2O/hr
+  real(r8), allocatable :: sunrad(:)      !solar radiation,
+  real(r8), allocatable :: vpair(:)       !vapor pressure deficit
   real(r8), allocatable :: a_AREA3(:)
-  integer,  allocatable :: a_NU(:)
-  integer,  allocatable :: a_NL(:)
+  integer,  allocatable :: a_NU(:)        !upper soil layer index
+  integer,  allocatable :: a_NL(:)        !lower soil layer index
+  integer,  allocatable :: a_NJ(:)
   integer,  allocatable :: a_MaxNumRootLays(:)
-  integer :: NYS, I                     !total number of columns
+  integer :: NYS, I                       !total number of columns
   contains
 
   subroutine InitSharedData(ncells_per_col_,ncol)
@@ -53,7 +54,7 @@ Module SharedDataMod
   !set # of soil layers
   !JZSOI=JZs
   !JX=1;JY=ncol;jz=jzs
-
+  JZ = ncells_per_col_
   allocate(a_csand(ncells_per_col_,ncol))
   allocate(a_CSILT(ncells_per_col_,ncol))   !silt mass fraction
   !allocate(a_BKDSI(ncells_per_col_,ncol))   !bulk density
@@ -77,15 +78,9 @@ Module SharedDataMod
   !allocate(sunrad(1:ncells_per_col_))
   !allocate(vpair(1:ncells_per_col_))
   allocate(a_ATKA(1:ncells_per_col_))
-  
-  a_NU=0
-  a_NL=0
-
-  do I=1, ncells_per_col_
-    write(*,*) "I = ", I, " of ", ncells_per_col_
-    write(*,*) "a_NU(", I ,") = ", a_NU(I)
-    write(*,*) "a_NL(", I ,") = ", a_NL(I)
-  end do
+ 
+  a_NU=1
+  a_NL=ncells_per_col_
 
   end subroutine InitSharedData
 
