@@ -103,10 +103,10 @@ implicit none
   k_manure     => micpar%k_manure       &
   )
 
-  write(*,*) "In SetDeepSoil, starting loop..."
+  write(*,*) "In SetDeepSoil, starting loop.."
+  write(*,*) "Looping from L=", NM+1, " to ", JZ
   DO L=NM+1,JZ
     write(*,*) "On loop: ", L
-    write(*,*) "Cumulative depth"
     CumDepth2LayerBottom(L,NY,NX)=2.0_r8*CumDepth2LayerBottom(L-1,NY,NX)-1.0_r8*CumDepth2LayerBottom(L-2,NY,NX)
     SoiBulkDensityt0(L,NY,NX)=SoiBulkDensityt0(L-1,NY,NX)
     FieldCapacity(L,NY,NX)=FieldCapacity(L-1,NY,NX)
@@ -135,82 +135,79 @@ implicit none
 !       CORGN(L,NY,NX)=CORGN(L-1,NY,NX)
 !       CORGP(L,NY,NX)=CORGP(L-1,NY,NX)
 !     ENDIF
-    write(*,*) "atm abundances"
     CNH4(L,NY,NX)=CNH4(L-1,NY,NX)
-    write(*,*) "1"
     CNO3(L,NY,NX)=CNO3(L-1,NY,NX)
-    write(*,*) "2"
     CPO4(L,NY,NX)=CPO4(L-1,NY,NX)
-    write(*,*) "3"
     !9/12 - error seems to be here
-    !CAL(L,NY,NX)=CAL(L-1,NY,NX)
+    CAL(L,NY,NX)=CAL(L-1,NY,NX)
     !write(*,*) "4"
-    !CFE(L,NY,NX)=CFE(L-1,NY,NX)
+    CFE(L,NY,NX)=CFE(L-1,NY,NX)
     !write(*,*) "5"
-    !CCA(L,NY,NX)=CCA(L-1,NY,NX)
+    CCA(L,NY,NX)=CCA(L-1,NY,NX)
     !write(*,*) "6"
-    !CMG(L,NY,NX)=CMG(L-1,NY,NX)
+    CMG(L,NY,NX)=CMG(L-1,NY,NX)
     !write(*,*) "7"
-    !CNA(L,NY,NX)=CNA(L-1,NY,NX)
+    CNA(L,NY,NX)=CNA(L-1,NY,NX)
     !write(*,*) "8"
-    !CKA(L,NY,NX)=CKA(L-1,NY,NX)
+    CKA(L,NY,NX)=CKA(L-1,NY,NX)
     !write(*,*) "9"
-    !CSO4(L,NY,NX)=CSO4(L-1,NY,NX)
+    CSO4(L,NY,NX)=CSO4(L-1,NY,NX)
     !write(*,*) "10"
-    !CCL(L,NY,NX)=CCL(L-1,NY,NX)
+    CCL(L,NY,NX)=CCL(L-1,NY,NX)
     !write(*,*) "11"
-    !CALOH(L,NY,NX)=CALOH(L-1,NY,NX)
+    CALOH(L,NY,NX)=CALOH(L-1,NY,NX)
     !write(*,*) "12"
-    !CFEOH(L,NY,NX)=CFEOH(L-1,NY,NX)
+    CFEOH(L,NY,NX)=CFEOH(L-1,NY,NX)
     !write(*,*) "13"
-    !CCACO(L,NY,NX)=CCACO(L-1,NY,NX)
+    CCACO(L,NY,NX)=CCACO(L-1,NY,NX)
     !write(*,*) "14"
-    !CCASO(L,NY,NX)=CCASO(L-1,NY,NX)
+    CCASO(L,NY,NX)=CCASO(L-1,NY,NX)
     !write(*,*) "15"
-    !CALPO(L,NY,NX)=CALPO(L-1,NY,NX)
+    CALPO(L,NY,NX)=CALPO(L-1,NY,NX)
     !write(*,*) "16"
-    !CFEPO(L,NY,NX)=CFEPO(L-1,NY,NX)
+    CFEPO(L,NY,NX)=CFEPO(L-1,NY,NX)
     !write(*,*) "17"
-    !CCAPD(L,NY,NX)=CCAPD(L-1,NY,NX)
+    CCAPD(L,NY,NX)=CCAPD(L-1,NY,NX)
     !write(*,*) "18"
-    !CCAPH(L,NY,NX)=CCAPH(L-1,NY,NX)
+    CCAPH(L,NY,NX)=CCAPH(L-1,NY,NX)
     !write(*,*) "19"
-    !GKC4(L,NY,NX)=GKC4(L-1,NY,NX)
+    GKC4(L,NY,NX)=GKC4(L-1,NY,NX)
     !write(*,*) "20"
-    !GKCH(L,NY,NX)=GKCH(L-1,NY,NX)
+    GKCH(L,NY,NX)=GKCH(L-1,NY,NX)
     !write(*,*) "21"
-    !GKCA(L,NY,NX)=GKCA(L-1,NY,NX)
+    GKCA(L,NY,NX)=GKCA(L-1,NY,NX)
     !write(*,*) "22"
-    !GKCM(L,NY,NX)=GKCM(L-1,NY,NX)
+    GKCM(L,NY,NX)=GKCM(L-1,NY,NX)
     !write(*,*) "23"
-    !GKCN(L,NY,NX)=GKCN(L-1,NY,NX)
+    GKCN(L,NY,NX)=GKCN(L-1,NY,NX)
     !write(*,*) "24"
-    !GKCK(L,NY,NX)=GKCK(L-1,NY,NX)
+    GKCK(L,NY,NX)=GKCK(L-1,NY,NX)
     !write(*,*) "25"
-    !THW(L,NY,NX)=THW(L-1,NY,NX)
+    THW(L,NY,NX)=THW(L-1,NY,NX)
     !write(*,*) "26"
-    !THI(L,NY,NX)=THI(L-1,NY,NX)
+    THI(L,NY,NX)=THI(L-1,NY,NX)
     !write(*,*) "27"
-    !ISOIL(1:4,L,NY,NX)=ISOIL(1:4,L-1,NY,NX)
+    ISOIL(1:4,L,NY,NX)=ISOIL(1:4,L-1,NY,NX)
     !write(*,*) "28"
-    !RSC(k_fine_litr,L,NY,NX)=0.0_r8
+    RSC(k_fine_litr,L,NY,NX)=0.0_r8
     !write(*,*) "29"
-    !RSN(k_fine_litr,L,NY,NX)=0.0_r8
+    RSN(k_fine_litr,L,NY,NX)=0.0_r8
     !write(*,*) "30"
-    !RSP(k_fine_litr,L,NY,NX)=0.0_r8
+    RSP(k_fine_litr,L,NY,NX)=0.0_r8
     !write(*,*) "31"
-    !RSC(k_woody_litr,L,NY,NX)=0.0_r8
+    RSC(k_woody_litr,L,NY,NX)=0.0_r8
     !write(*,*) "32"
-    !RSN(k_woody_litr,L,NY,NX)=0.0_r8
+    RSN(k_woody_litr,L,NY,NX)=0.0_r8
     !write(*,*) "33"
-    !RSP(k_woody_litr,L,NY,NX)=0.0_r8
+    RSP(k_woody_litr,L,NY,NX)=0.0_r8
     !write(*,*) "34"
-    !RSC(k_manure,L,NY,NX)=0.0_r8
+    RSC(k_manure,L,NY,NX)=0.0_r8
     !write(*,*) "35"
-    !RSN(k_manure,L,NY,NX)=0.0_r8
+    RSN(k_manure,L,NY,NX)=0.0_r8
     !write(*,*) "36"
-    !RSP(k_manure,L,NY,NX)=0.0_r8
+    RSP(k_manure,L,NY,NX)=0.0_r8
   ENDDO
+  write(*,*) "End SetDeepSoil"
   END associate
   end subroutine SetDeepSoil
 
