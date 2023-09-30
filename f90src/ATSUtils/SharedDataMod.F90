@@ -82,7 +82,6 @@ Module SharedDataMod
   !allocate(sunrad(1:ncells_per_col_))
   !allocate(vpair(1:ncells_per_col_))
   allocate(a_ATKA(1:ncells_per_col_))
-
   a_NU=1
   a_NL=ncells_per_col_
 

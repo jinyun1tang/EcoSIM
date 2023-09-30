@@ -169,6 +169,7 @@ implicit none
     RSN(k_manure,L,NY,NX)=0.0_r8
     RSP(k_manure,L,NY,NX)=0.0_r8
   ENDDO
+  write(*,*) "End SetDeepSoil"
   END associate
   end subroutine SetDeepSoil
 
