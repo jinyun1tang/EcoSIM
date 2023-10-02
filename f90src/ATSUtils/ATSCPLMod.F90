@@ -77,6 +77,18 @@ contains
   call c_f_pointer(state%bulk_density%data, data2D, [(/size_col/),(/num_cols/)])
   a_BKDSI=data2D(:,:)
 
+  call c_f_pointer(state%subsurface_water_source%data, data2D, [(/size_col/),(/num_cols/)])
+  a_SSWS=data2D(:,:)
+
+  call c_f_pointer(state%subsurface_energy_source%data, data2D, [(/size_col/),(/num_cols/)])
+  a_SSES=data2D(:,:)
+
+  call c_f_pointer(state%surface_water_source%data, data, (/num_cols/))
+  surf_w_source = data(:)
+
+  call c_f_pointer(state%surface_energy_source%data, data, (/num_cols/))
+  surf_e_source = data(:)
+
 !!***********************************!!
 
   call c_f_pointer(state%porosity%data, data2D, [(/size_col/),(/num_cols/)])
@@ -138,6 +150,18 @@ contains
   call c_f_pointer(state%temperature%data, data2D, [(/size_col/),(/size_procs/)])
   data2D(:,:)=a_TEMP
 
+  call c_f_pointer(state%subsurface_water_source%data, data2D, [(/size_col/),(/size_procs/)])
+  data2D(:,:)=a_SSWS
+
+  call c_f_pointer(state%subsurface_energy_source%data, data2D, [(/size_col/),(/size_procs/)])
+  data2D(:,:)=a_SSES
+
+  call c_f_pointer(state%surface_water_source%data, data, (/num_cols/))
+  data(:) = surf_w_source
+
+  call c_f_pointer(state%surface_energy_source%data, data, (/num_cols/))
+  data(:) = surf_e_source
+
   write(*,*) "finished copying back in driver"
 
   end subroutine EcoSIM2ATSData
@@ -179,7 +203,21 @@ contains
 
   implicit none
 
+  !For this we need to either specifically take energy away from the top layer
+  !or add it to the surface_energy-source variable
+  integer :: K
+
+  write(*,*) "in surface energy balance"
+  do K=1,ncol
+    write(*,*) "surface energy [", K, "] = ", surf_e_source[K]
+    write(*,*) "surface water [", K, "] = ", surf_w_source[K]
+  end do
+
+  write(*,*) "leaving surface energy balance"
+
   end subroutine SurfaceEBalance
+
+!------------------------------------------------------------------------------------------
 
   subroutine SetBGCSizes(sizes)
 

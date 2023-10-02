@@ -25,19 +25,23 @@ Module SharedDataMod
   real(r8), allocatable :: a_PORO(:,:)    !Porosity
 !  real(r8), allocatable ::a_CORGR(:,:)   !organic nitrogen  content
   real(r8), allocatable :: a_ASP(:)       !Aspect
-  real(r8), allocatable :: a_ALT(:)       !Altitude 
+  real(r8), allocatable :: a_ALT(:)       !Altitude
   real(r8), allocatable :: a_ATKA(:)
   real(r8), allocatable :: a_WC(:,:)      !Soil water content
   real(r8), allocatable :: a_LSAT(:,:)    !liquid saturation
   real(r8), allocatable :: a_RELPERM(:,:) !relative_permeability
   real(r8), allocatable :: a_HCOND(:,:)   !hydraulic conductivity
   real(r8), allocatable :: a_TEMP(:,:)    !temperature
+  real(r8), allocatable :: a_SSES(:,:)    !subsurface energy source
+  real(r8), allocatable :: a_SSWS(:,:)    !subsurface water source
 
   real(r8), allocatable :: tairc(:)       !air temperature oC
   real(r8), allocatable :: uwind(:)       !wind speed, m/s
   real(r8), allocatable :: prec(:)        !precipitation, mm H2O/hr
   real(r8), allocatable :: sunrad(:)      !solar radiation,
   real(r8), allocatable :: vpair(:)       !vapor pressure deficit
+  real(r8), allocatable :: surf_e_source(:) !surface energy source
+  real(r8), allocatable :: surf_w_source(:) !surface water source
   real(r8), allocatable :: a_AREA3(:)
   integer,  allocatable :: a_NU(:)        !upper soil layer index
   integer,  allocatable :: a_NL(:)        !lower soil layer index
@@ -77,7 +81,7 @@ Module SharedDataMod
   !allocate(sunrad(1:ncells_per_col_))
   !allocate(vpair(1:ncells_per_col_))
   allocate(a_ATKA(1:ncells_per_col_))
- 
+
   a_NU=1
   a_NL=ncells_per_col_
 
