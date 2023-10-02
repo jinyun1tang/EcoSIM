@@ -152,6 +152,10 @@ module BGCContainers_module
      type (BGCMatrixDouble) :: temperature
      type (BGCMatrixDouble) :: hydraulic_conductivity
      type (BGCMatrixDouble) :: bulk_density
+     type (BGCMatrixDouble) :: subsurface_water_source
+     type (BGCMatrixDouble) :: subsurface_energy_source
+     type (BGCVectorDouble) :: surface_energy_source
+     type (BGCVectorDouble) :: surface_water_source
      type (BGCTensorDouble) :: total_component_concentration
   end type BGCState
 
