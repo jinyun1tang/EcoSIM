@@ -29,13 +29,11 @@ contains
 
   write(*,*) "In the driver...."
 
-  write(*,*) "Setting sizes"
   call SetBGCSizes(sizes)
 
   !ncol=size(filter_col)
 
-  !1D vertical vector,
-  write(*,*) "computing column size"
+  !1D vertical vector
 
   size_col = sizes%ncells_per_col_
   num_cols = props%shortwave_radiation%size
@@ -132,8 +130,6 @@ contains
 
   size_col = sizes%ncells_per_col_
   size_procs = state%porosity%cols
-
-  write(*,*) "column size: ", size_col, " columns on this process: ", size_procs
 
   !seems like we call the pointer as normal,
   !then just reverse the data
