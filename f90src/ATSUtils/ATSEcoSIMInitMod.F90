@@ -26,11 +26,9 @@ implicit none
 
   NHW=1;NHE=1;NVN=1;NVS=NYS
 
-  write(*,*) "Setting Mesh..."
+  write(*,*) "Init Soil"
 
   call SetMeshATS(NHW,NVN,NHE,NVS)
-
-  write(*,*) "Finished mesh, Allocating ..."
 
   call InitAlloc(NOMicrobeGuilds=1)
 
@@ -40,8 +38,6 @@ implicit none
   NJ = 1 !Is the number of layers down the roots go
 
   NX=1
-
-  write(*,*) "Finished Allocate, setting vars"
 
   do NY=1,NYS
     NU(NY,NX)=a_NU(NY)
@@ -68,7 +64,6 @@ implicit none
     ENDDO
   ENDDO
 
-  write(*,*) "calling startsim..."
   call startsim(NHW,NHE,NVN,NVS)
 
   write(*,*) "Finished Subroutine Init_EcoSIM_Soil"
