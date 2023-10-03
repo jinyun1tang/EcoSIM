@@ -124,7 +124,7 @@ contains
   ! Ecosim variables
   real(r8), pointer :: data(:)
   real(r8), pointer :: data2D(:,:)
-  integer :: ncol, nvar, size_col, size_procs
+  integer :: num_cols, ncol, nvar, size_col, size_procs
   integer :: j1,j2,j3
 
   write(*,*) "Copying back"
@@ -205,12 +205,14 @@ contains
 
   !For this we need to either specifically take energy away from the top layer
   !or add it to the surface_energy-source variable
-  integer :: K
+  integer :: K, vec_size
+
+  vec_size = size(surf_e_source)
 
   write(*,*) "in surface energy balance"
-  do K=1,ncol
-    write(*,*) "surface energy [", K, "] = ", surf_e_source[K]
-    write(*,*) "surface water [", K, "] = ", surf_w_source[K]
+  do K=1,vec_size
+    write(*,*) "surface energy (", K, ") = ", surf_e_source(K)
+    write(*,*) "surface water (", K, ") = ", surf_w_source(K)
   end do
 
   write(*,*) "leaving surface energy balance"
