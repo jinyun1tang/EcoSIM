@@ -209,6 +209,10 @@ contains
   do K=1,vec_size
     write(*,*) "surface energy (", K, ") = ", surf_e_source(K)
     write(*,*) "surface water (", K, ") = ", surf_w_source(K)
+  
+    write(*,*) "changing surface vars"
+    surf_e_source(K) = 1.0
+    surf_w_source(K) = 1.0
   end do
 
   write(*,*) "leaving surface energy balance"
