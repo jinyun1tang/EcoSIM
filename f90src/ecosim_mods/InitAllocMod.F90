@@ -81,11 +81,11 @@ implicit none
 
   call InitPlantMngmtData
 
-  call InitPlantRates(micpar%n_pltlitrk,pltpar%jroots)
+  call InitPlantRates(micpar%NumOfPlantLitrCmplxs,pltpar%jroots)
 
   call InitSoilProperty
 
-  call InitSurfLitter(micpar%n_litrsfk)
+  call InitSurfLitter(micpar%NumOfLitrCmplxs)
 
   call InitSedimentData
 
@@ -99,13 +99,13 @@ implicit none
 
   call InitChemTranspData
 
-  call InitSoilBGCData(pltpar%n_pltlitrk)
+  call InitSoilBGCData(pltpar%NumOfPlantLitrCmplxs)
 
-  call InitSOMData(micpar%n_litrsfk)
+  call InitSOMData(micpar%NumOfLitrCmplxs)
 
   call InitFertilizerData
 
-  call InitPlantTraits(pltpar%n_pltlitrk)
+  call InitPlantTraits(pltpar%NumOfPlantLitrCmplxs)
 
   call InitFlagData
 
@@ -139,7 +139,7 @@ implicit none
   implicit none
 
   pltpar%JZ1    = JZ
-  pltpar%JC1    = JC
+  pltpar%NumOfCanopyLayers1    = JC
   pltpar%JP1    = JP
   pltpar%JLA1   = JLA
   pltpar%JSA1   = JSA
@@ -153,7 +153,7 @@ implicit none
   pltpar%k_fine_litr=micpar%k_fine_litr
   !the following variable should be consistent with the soil bgc model
   pltpar%jcplx= micpar%jcplx
-  pltpar%n_pltlitrk=micpar%n_pltlitrk
+  pltpar%NumOfPlantLitrCmplxs=micpar%NumOfPlantLitrCmplxs
   pltpar%jsken  = micpar%jsken
   pltpar%Jlitgrp= 5     !number of liter groups
   pltpar%JBR    = 10    !number of branches

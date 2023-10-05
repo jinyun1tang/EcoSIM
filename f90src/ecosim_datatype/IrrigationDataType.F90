@@ -20,7 +20,7 @@ module IrrigationDataType
   real(r8),target,allocatable ::  RRIG(:,:,:,:)                      !irrigation application, [mm h-1]
   real(r8),target,allocatable ::  WDPTH(:,:,:)                       !depth of irrigation application, [m]
   real(r8),target,allocatable ::  IrrigSubsurf(:,:)                  !underground irrigation, [m3 d-2 h-1]
-  real(r8),target,allocatable ::  PRECI(:,:)                        !surface irrigation, [m3 d-2 h-1]
+  real(r8),target,allocatable ::  IrrigSurface(:,:)                        !surface irrigation, [m3 d-2 h-1]
   real(r8),target,allocatable ::  FIRRA(:,:)                        !fraction of FC - WP below which automatic irrigation applied, [-]
   real(r8),target,allocatable ::  CIRRA(:,:)                        !fraction of FC - WP to which automatic irrigation applied, [-]
   real(r8),target,allocatable ::  DIRRA(:,:,:)                      !depth to which automatic irrigation applied, [m]
@@ -129,7 +129,7 @@ module IrrigationDataType
   real(r8),target,allocatable ::  FWatIrrigate2MicP(:,:,:)                        !underground irrigation, [m3 d-2 h-1]
   real(r8),target,allocatable ::  HeatIrrigation(:,:,:)                      !convective heat of underground irrigation, [MJ d-2 h-1]
   real(r8),target,allocatable ::  trcs_RFLU(:,:,:,:)                     !aqueous non-salt solutes in underground irrigation, [g d-2 h-1]
-  real(r8),target,allocatable ::  trcsa_RFLU(:,:,:,:)                     !aqueous PO4 in underground irrigation non-band, [g d-2 h-1]
+  real(r8),target,allocatable ::  trcSalt_RFLU(:,:,:,:)                     !aqueous PO4 in underground irrigation non-band, [g d-2 h-1]
   private :: InitAllocate
   contains
 
@@ -199,7 +199,7 @@ module IrrigationDataType
 
   allocate(IIRRA(4,JY,JX));     IIRRA=0
   allocate(IrrigSubsurf(JY,JX));       IrrigSubsurf=0._r8
-  allocate(PRECI(JY,JX));       PRECI=0._r8
+  allocate(IrrigSurface(JY,JX));       IrrigSurface=0._r8
   allocate(FIRRA(JY,JX));       FIRRA=0._r8
   allocate(CIRRA(JY,JX));       CIRRA=0._r8
   allocate(DIRRA(2,JY,JX));     DIRRA=0._r8
@@ -260,7 +260,7 @@ module IrrigationDataType
   allocate(FWatIrrigate2MicP(JZ,JY,JX));      FWatIrrigate2MicP=0._r8
   allocate(HeatIrrigation(JZ,JY,JX));    HeatIrrigation=0._r8
   allocate(trcs_RFLU(ids_beg:ids_end,JZ,JY,JX));   trcs_RFLU=0._r8
-  allocate(trcsa_RFLU(idsa_beg:idsab_end,JZ,JY,JX));   trcsa_RFLU=0._r8
+  allocate(trcSalt_RFLU(idsalt_beg:idsaltb_end,JZ,JY,JX));   trcSalt_RFLU=0._r8
   end subroutine InitAllocate
 
 !----------------------------------------------------------------------
@@ -322,7 +322,7 @@ module IrrigationDataType
   call destroy(WDPTH)
   call destroy(IIRRA)
   call destroy(IrrigSubsurf)
-  call destroy(PRECI)
+  call destroy(IrrigSurface)
   call destroy(FIRRA)
   call destroy(CIRRA)
   call destroy(DIRRA)

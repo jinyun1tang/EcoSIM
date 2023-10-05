@@ -15,7 +15,7 @@ implicit none
   subroutine ResetDeadBranch(I,J,NZ,CPOOLK)
   implicit none
   integer, intent(in) :: I,J,NZ
-  real(r8),intent(inout) :: CPOOLK(JC1,JP1)
+  real(r8),intent(inout) :: CPOOLK(NumOfCanopyLayers1,JP1)
   integer :: IDTHY
 
 !     begin_execution
@@ -38,7 +38,7 @@ implicit none
     VOLWOU     =>   plt_site%VOLWOU    , &
     ZNOON      =>   plt_site%ZNOON     , &
     HypoctoylHeight      =>   plt_morph%HypoctoylHeight    , &
-    NBR        =>   plt_morph%NBR      , &
+    NumOfBranches_pft        =>   plt_morph%NumOfBranches_pft      , &
     NB1        =>   plt_morph%NB1      , &
     NBT        =>   plt_morph%NBT        &
   )
@@ -61,7 +61,7 @@ implicit none
 !     IFLGA=flag for initializing leafout
 !     VRNS,VRNL=leafout hours,hours required for leafout
 !     VRNF,VRNX=leafoff hours,hours required for leafoff
-!     ATRP=hourly leafout counter
+!     HourCounter4LeafOut_brch=hourly leafout counter
 !     FDBK,FDBKX=N,P feedback inhibition on C3 CO2 fixation
 !     IFLGA,IFLGE=flag for initializing,enabling leafout
 !     IFLGF=flag for enabling leafoff:0=enable,1=disable
@@ -76,14 +76,14 @@ implicit none
 !
     call LiterfallFromDeadBranches(I,J,NZ,IDTHY,CPOOLK)
 
-    IF(IDTHY.EQ.NBR(NZ))THEN
+    IF(IDTHY.EQ.NumOfBranches_pft(NZ))THEN
       IDTHP(NZ)=ibrdead
       NBT(NZ)=0
       WSTR(NZ)=0._r8
       IF(IFLGI(NZ).EQ.1)THEN
-        NBR(NZ)=1
+        NumOfBranches_pft(NZ)=1
       ELSE
-        NBR(NZ)=0
+        NumOfBranches_pft(NZ)=0
       ENDIF
       HypoctoylHeight(NZ)=0._r8
       VOLWOU=VOLWOU+CanWatP(NZ)
@@ -133,7 +133,7 @@ implicit none
   use EcoSIMCtrlDataType, only : iyear_cur
   implicit none
   integer, intent(in) :: I,J,NZ
-  REAL(R8),INTENT(INOUT) :: CPOOLK(JC1,JP1)
+  REAL(R8),INTENT(INOUT) :: CPOOLK(NumOfCanopyLayers1,JP1)
   integer :: L,M,NR,NB,N,NE
 !     begin_execution
   associate(                            &
@@ -182,7 +182,7 @@ implicit none
     CFOPE      =>   plt_soilchem%CFOPE, &
     MY         =>   plt_morph%MY      , &
     NGTopRootLayer         =>   plt_morph%NGTopRootLayer      , &
-    NBR        =>   plt_morph%NBR     , &
+    NumOfBranches_pft        =>   plt_morph%NumOfBranches_pft     , &
     NRT        =>   plt_morph%NRT       &
   )
 !     LITTERFALL AND STATE VARIABLES FOR SEASONAL STORAGE
@@ -211,12 +211,12 @@ implicit none
   IF(IDTHP(NZ).EQ.1.AND.IDTHR(NZ).EQ.1)THEN
     IF(IFLGI(NZ).EQ.0)THEN
       D6425: DO M=1,jsken
-        D8825: DO NB=1,NBR(NZ)
+        D8825: DO NB=1,NumOfBranches_pft(NZ)
 
           ESNC(ielmc,M,k_fine_litr,0,NZ)=ESNC(ielmc,M,k_fine_litr,0,NZ) &
             +CFOPE(ielmc,instruct,M,NZ)*CPOOLK(NB,NZ)
 
-          DO NE=1,npelms
+          DO NE=1,NumOfPlantChemElements
             ESNC(NE,M,k_woody_litr,0,NZ)=ESNC(NE,M,k_woody_litr,0,NZ) &
               +CFOPE(NE,icwood,M,NZ)*(WTLFBE(NE,NB,NZ)*FWODLE(NE,k_woody_litr) &
               +WTSHEBE(NE,NB,NZ)*FWODBE(NE,k_woody_litr))
@@ -254,7 +254,7 @@ implicit none
 !     FWOOD,FWOODN,FWOODP=C,N,P woody fraction in root:0=woody,1=non-woody
 !     WTRVC,WTRVN,WTRVP=storage C,N,P
 !
-        DO NE=1,npelms
+        DO NE=1,NumOfPlantChemElements
           D6415: DO L=NU,NJ
             DO N=1,MY(NZ)
               ESNC(NE,M,k_fine_litr,L,NZ)=ESNC(NE,M,k_fine_litr,L,NZ) &
@@ -310,7 +310,7 @@ implicit none
     RTWT1E    =>   plt_biom%RTWT1E    , &
     WTRT1E    =>   plt_biom%WTRT1E    , &
     EPOOLR    =>   plt_biom%EPOOLR    , &
-    RootCPZR    =>   plt_biom%RootCPZR    , &
+    PopPlantRootC_vr    =>   plt_biom%PopPlantRootC_vr    , &
     WTRTL     =>   plt_biom%WTRTL     , &
     WSRTL     =>   plt_biom%WSRTL     , &
     EPOOLN    =>   plt_biom%EPOOLN    , &
@@ -369,7 +369,7 @@ implicit none
     D8900: DO N=1,MY(NZ)
 
       D8895: DO L=NU,NJ
-        DO NE=1,npelms
+        DO NE=1,NumOfPlantChemElements
           D6410: DO M=1,jsken
             ESNC(NE,M,k_fine_litr,L,NZ)=ESNC(NE,M,k_fine_litr,L,NZ) &
               +CFOPE(NE,instruct,M,NZ)*EPOOLR(NE,N,L,NZ)
@@ -408,16 +408,16 @@ implicit none
 !     AveSecndRootLen=average secondary root length
 !
         D8870: DO NR=1,NRT(NZ)
-          WTRT1E(1:npelms,N,L,NR,NZ)=0._r8
-          WTRT2E(1:npelms,N,L,NR,NZ)=0._r8
-          RTWT1E(1:npelms,N,NR,NZ)=0._r8
+          WTRT1E(1:NumOfPlantChemElements,N,L,NR,NZ)=0._r8
+          WTRT2E(1:NumOfPlantChemElements,N,L,NR,NZ)=0._r8
+          RTWT1E(1:NumOfPlantChemElements,N,NR,NZ)=0._r8
           PrimRootLen(N,L,NR,NZ)=0._r8
           SecndRootLen(N,L,NR,NZ)=0._r8
           RTN2(N,L,NR,NZ)=0._r8
         ENDDO D8870
         EPOOLR(:,N,L,NZ)=0._r8
         WTRTL(N,L,NZ)=0._r8
-        RootCPZR(N,L,NZ)=0._r8
+        PopPlantRootC_vr(N,L,NZ)=0._r8
         WSRTL(N,L,NZ)=0._r8
         PrimRootXNumL(N,L,NZ)=0._r8
         SecndRootXNumL(N,L,NZ)=0._r8
@@ -440,13 +440,13 @@ implicit none
 !
         IF(INTYP(NZ).NE.0.AND.N.EQ.1)THEN
           D6420: DO M=1,jsken
-            DO NE=1,npelms
+            DO NE=1,NumOfPlantChemElements            
               ESNC(NE,M,k_fine_litr,L,NZ)=ESNC(NE,M,k_fine_litr,L,NZ)+CFOPE(NE,iroot,M,NZ) &
                 *WTNDLE(NE,L,NZ)+CFOPE(NE,instruct,M,NZ)*EPOOLN(NE,L,NZ)
             ENDDO
           ENDDO D6420
-          WTNDLE(1:npelms,L,NZ)=0._r8
-          EPOOLN(1:npelms,L,NZ)=0._r8
+          WTNDLE(1:NumOfPlantChemElements,L,NZ)=0._r8
+          EPOOLN(1:NumOfPlantChemElements,L,NZ)=0._r8          
         ENDIF
       ENDDO D8895
     ENDDO D8900
@@ -461,7 +461,7 @@ implicit none
       NINR(NR,NZ)=NGTopRootLayer(NZ)
       D8790: DO N=1,MY(NZ)
         PrimRootDepth(N,NR,NZ)=SeedinDepth(NZ)
-        RTWT1E(1:npelms,N,NR,NZ)=0._r8
+        RTWT1E(1:NumOfPlantChemElements,N,NR,NZ)=0._r8
       ENDDO D8790
     ENDDO D8795
     NIXBotRootLayer(NZ)=NGTopRootLayer(NZ)
@@ -475,7 +475,7 @@ implicit none
   implicit none
   integer, intent(in) :: I,J,NZ
   integer, intent(inout) :: IDTHY
-  real(r8), intent(inout) :: CPOOLK(JC1,JP1)
+  real(r8), intent(inout) :: CPOOLK(NumOfCanopyLayers1,JP1)
   integer :: M,NE,NB
 !     begin_execution
   associate(                                &
@@ -506,7 +506,7 @@ implicit none
     VRNF      =>  plt_pheno%VRNF      , &
     VRNY      =>  plt_pheno%VRNY      , &
     VRNZ      =>  plt_pheno%VRNZ      , &
-    ATRP      =>  plt_pheno%ATRP      , &
+    HourCounter4LeafOut_brch      =>  plt_pheno%HourCounter4LeafOut_brch      , &
     FLG4      =>  plt_pheno%FLG4      , &
     IFLGA     =>  plt_pheno%IFLGA     , &
     IFLGE     =>  plt_pheno%IFLGE     , &
@@ -520,10 +520,10 @@ implicit none
     IWTYP     =>  plt_pheno%IWTYP     , &
     ISTYP     =>  plt_pheno%ISTYP     , &
     ESNC      =>  plt_bgcr%ESNC       , &
-    NBR       =>  plt_morph%NBR       , &
+    NumOfBranches_pft       =>  plt_morph%NumOfBranches_pft       , &
     PSTGI     =>  plt_morph%PSTGI     , &
     PSTG      =>  plt_morph%PSTG      , &
-    NBTB      =>  plt_morph%NBTB      , &
+    BranchNumber_brchpft      =>  plt_morph%BranchNumber_brchpft      , &
     PSTGF     =>  plt_morph%PSTGF     , &
     XTLI      =>  plt_morph%XTLI      , &
     VSTG      =>  plt_morph%VSTG      , &
@@ -538,7 +538,7 @@ implicit none
     FDBK      =>  plt_photo%FDBK      , &
     FDBKX     =>  plt_photo%FDBKX       &
   )
-  D8845: DO NB=1,NBR(NZ)
+  D8845: DO NB=1,NumOfBranches_pft(NZ)
     IF(IDTHB(NB,NZ).EQ.ibrdead)THEN
       GROUP(NB,NZ)=GROUPI(NZ)
       PSTG(NB,NZ)=XTLI(NZ)
@@ -554,7 +554,7 @@ implicit none
       VRNF(NB,NZ)=0._r8
       VRNY(NB,NZ)=0._r8
       VRNZ(NB,NZ)=0._r8
-      ATRP(NB,NZ)=0._r8
+      HourCounter4LeafOut_brch(NB,NZ)=0._r8
       FLG4(NB,NZ)=0._r8
       FDBK(NB,NZ)=1.0_r8
       FDBKX(NB,NZ)=1.0_r8
@@ -563,7 +563,7 @@ implicit none
       IFLGF(NB,NZ)=0
       IFLGR(NB,NZ)=0
       IFLGQ(NB,NZ)=0
-      NBTB(NB,NZ)=0
+      BranchNumber_brchpft(NB,NZ)=0
       D8850: DO M=1,pltpar%jpstgs
         IDAY(M,NB,NZ)=0
       ENDDO D8850
@@ -590,7 +590,7 @@ implicit none
 !     IGTYP=growth type:0=bryophyte,1=graminoid,2=shrub,tree
 !
       D6405: DO M=1,jsken
-        DO NE=1,npelms
+        DO NE=1,NumOfPlantChemElements        
           ESNC(NE,M,k_fine_litr,0,NZ)=ESNC(NE,M,k_fine_litr,0,NZ) &
             +CFOPE(NE,instruct,M,NZ)*EPOLNB(NE,NB,NZ) &
             +CFOPE(NE,ifoliar,M,NZ)*(WTLFBE(NE,NB,NZ)*FWODLE(NE,k_fine_litr) &
@@ -629,7 +629,7 @@ implicit none
 !                       ,3=pruning,4=grazing,5=fire,6=herbivory
 !
       WTRVE(ielmc,NZ)=WTRVE(ielmc,NZ)+CPOOLK(NB,NZ)
-      DO NE=1,npelms
+      DO NE=1,NumOfPlantChemElements
         WTRVE(NE,NZ)=WTRVE(NE,NZ)+EPOOL(NE,NB,NZ)
         IF(IHVST(NZ).NE.4.AND.IHVST(NZ).NE.6)THEN
           D6406: DO M=1,jsken
@@ -654,7 +654,7 @@ implicit none
   subroutine ResetBranchRootStates(NZ,CPOOLK)
   implicit none
   integer, intent(in) :: NZ
-  real(r8),INTENT(OUT) :: CPOOLK(JC1,JP1)
+  real(r8),INTENT(OUT) :: CPOOLK(NumOfCanopyLayers1,JP1)
   integer :: L,NR,N,NE,NB
 !     begin_execution
   associate(                           &
@@ -684,13 +684,13 @@ implicit none
     RTN2   => plt_morph%RTN2         , &
     PrimRootLen  => plt_morph%PrimRootLen        , &
     MY     => plt_morph%MY           , &
-    NBR    => plt_morph%NBR          , &
+    NumOfBranches_pft    => plt_morph%NumOfBranches_pft          , &
     NRT    => plt_morph%NRT            &
   )
 !     RESET BRANCH STATE VARIABLES
 !
-  DO NE=1,npelms
-    DO NB=1,NBR(NZ)
+  DO NE=1,NumOfPlantChemElements
+    DO NB=1,NumOfBranches_pft(NZ)
       EPOOL(NE,NB,NZ)=0._r8
       EPOLNB(NE,NB,NZ)=0._r8
       WTSHTBE(NE,NB,NZ)=0._r8
@@ -700,33 +700,33 @@ implicit none
       WTRSVBE(NE,NB,NZ)=0._r8
     ENDDO
   ENDDO
-  D8835: DO NB=1,NBR(NZ)
+  D8835: DO NB=1,NumOfBranches_pft(NZ)
     CPOOLK(NB,NZ)=0._r8
     CanPBStalkC(NB,NZ)=0._r8
-    WTNDBE(1:npelms,NB,NZ)=0._r8
-    WTHSKBE(1:npelms,NB,NZ)=0._r8
-    WTEARBE(1:npelms,NB,NZ)=0._r8
-    WTGRBE(1:npelms,NB,NZ)=0._r8
+    WTNDBE(1:NumOfPlantChemElements,NB,NZ)=0._r8
+    WTHSKBE(1:NumOfPlantChemElements,NB,NZ)=0._r8
+    WTEARBE(1:NumOfPlantChemElements,NB,NZ)=0._r8
+    WTGRBE(1:NumOfPlantChemElements,NB,NZ)=0._r8
     CanPBLeafShethC(NB,NZ)=0._r8
-    WTSTXBE(1:npelms,NB,NZ)=0._r8
+    WTSTXBE(1:NumOfPlantChemElements,NB,NZ)=0._r8
   ENDDO D8835
 !
 !     RESET ROOT STATE VARIABLES
 !
   D6416: DO L=NU,NJ
     DO  N=1,MY(NZ)
-      EPOOLR(1:npelms,N,L,NZ)=0._r8
+      EPOOLR(1:NumOfPlantChemElements,N,L,NZ)=0._r8
       DO  NR=1,NRT(NZ)
-        WTRT1E(1:npelms,N,L,NR,NZ)=0._r8
-        WTRT2E(1:npelms,N,L,NR,NZ)=0._r8
-        RTWT1E(1:npelms,N,NR,NZ)=0._r8
+        WTRT1E(1:NumOfPlantChemElements,N,L,NR,NZ)=0._r8
+        WTRT2E(1:NumOfPlantChemElements,N,L,NR,NZ)=0._r8
+        RTWT1E(1:NumOfPlantChemElements,N,NR,NZ)=0._r8
         PrimRootLen(N,L,NR,NZ)=0._r8
         SecndRootLen(N,L,NR,NZ)=0._r8
         RTN2(N,L,NR,NZ)=0._r8
       enddo
     enddo
   ENDDO D6416
-  WTRVE(1:npelms,NZ)=0._r8
+  WTRVE(1:NumOfPlantChemElements,NZ)=0._r8
   IDTH(NZ)=1
   end associate
   end subroutine ResetBranchRootStates
@@ -737,7 +737,7 @@ implicit none
 !     RESET STATE VARIABLES FROM DEAD BRANCHES
   implicit none
   integer, intent(in) :: NB,NZ
-  real(r8),intent(inout) :: CPOOLK(JC1,JP1)
+  real(r8),intent(inout) :: CPOOLK(NumOfCanopyLayers1,JP1)
   integer :: L,K,N
 !     begin_execution
   associate(                          &
@@ -760,7 +760,7 @@ implicit none
     WGNODE   => plt_biom%WGNODE     , &
     WGSHE    => plt_biom%WGSHE      , &
     WGLFLE   => plt_biom%WGLFLE     , &
-    WGLFV    => plt_biom%WGLFV      , &
+    CanopyLeafCpft_lyr    => plt_biom%CanopyLeafCpft_lyr      , &
     WTSHEBE  => plt_biom%WTSHEBE    , &
     CPOOL3   => plt_photo%CPOOL3    , &
     CPOOL4   => plt_photo%CPOOL4    , &
@@ -769,16 +769,16 @@ implicit none
     GRWTB    => plt_allom%GRWTB     , &
     GRNXB    => plt_morph%GRNXB     , &
     GRNOB    => plt_morph%GRNOB     , &
-    CanPBLA    => plt_morph%CanPBLA     , &
-    CanPLBSA    => plt_morph%CanPLBSA     , &
-    NBR      => plt_morph%NBR       , &
+    CanopyBranchLeafA_pft    => plt_morph%CanopyBranchLeafA_pft     , &
+    CanopyBranchStemApft_lyr    => plt_morph%CanopyBranchStemApft_lyr     , &
+    NumOfBranches_pft      => plt_morph%NumOfBranches_pft       , &
     ARLF1    => plt_morph%ARLF1     , &
     CanPSheathHeight    => plt_morph%CanPSheathHeight     , &
     HTNODX   => plt_morph%HTNODX    , &
-    SURF     => plt_morph%SURF      , &
+    LeafA_lyrnodbrchpft     => plt_morph%LeafA_lyrnodbrchpft      , &
     HTNODE   => plt_morph%HTNODE    , &
-    ARLFV    => plt_morph%ARLFV     , &
-    SURFB    => plt_morph%SURFB     , &
+    CanopyLeafApft_lyr    => plt_morph%CanopyLeafApft_lyr     , &
+    StemA_lyrnodbrchpft    => plt_morph%StemA_lyrnodbrchpft     , &
     CanPLNBLA    => plt_morph%CanPLNBLA       &
   )
 !
@@ -801,30 +801,30 @@ implicit none
 !     CPOOL3,CPOOL4=C4 nonstructural C mass in bundle sheath,mesophyll
 !     CO2B,HCOB=aqueous CO2,HCO3-C mass in bundle sheath
 !     WSLF=leaf protein mass
-!     CanPBLA=branch leaf area
+!     CanopyBranchLeafA_pft=branch leaf area
 !     WGLF,WGLFN,WGLFP,WSLF=node leaf C,N,P,protein mass
 !     WGSHE,WGSHN,WGSHP,WSSHE=node petiole C,N,P,protein mass
 !     WGNODE,WGNODN,WGNODP=node stalk C,N,P mass
 !
   CPOOLK(NB,NZ)=0._r8
-  EPOOL(1:npelms,NB,NZ)=0._r8
-  EPOLNB(1:npelms,NB,NZ)=0._r8
-  WTSHTBE(1:npelms,NB,NZ)=0._r8
-  WTLFBE(1:npelms,NB,NZ)=0._r8
-  WTNDBE(1:npelms,NB,NZ)=0._r8
-  WTSHEBE(1:npelms,NB,NZ)=0._r8
-  WTSTKBE(1:npelms,NB,NZ)=0._r8
-  WTRSVBE(1:npelms,NB,NZ)=0._r8
-  WTHSKBE(1:npelms,NB,NZ)=0._r8
-  WTEARBE(1:npelms,NB,NZ)=0._r8
-  WTGRBE(1:npelms,NB,NZ)=0._r8
+  EPOOL(1:NumOfPlantChemElements,NB,NZ)=0._r8
+  EPOLNB(1:NumOfPlantChemElements,NB,NZ)=0._r8
+  WTSHTBE(1:NumOfPlantChemElements,NB,NZ)=0._r8
+  WTLFBE(1:NumOfPlantChemElements,NB,NZ)=0._r8
+  WTNDBE(1:NumOfPlantChemElements,NB,NZ)=0._r8
+  WTSHEBE(1:NumOfPlantChemElements,NB,NZ)=0._r8
+  WTSTKBE(1:NumOfPlantChemElements,NB,NZ)=0._r8
+  WTRSVBE(1:NumOfPlantChemElements,NB,NZ)=0._r8
+  WTHSKBE(1:NumOfPlantChemElements,NB,NZ)=0._r8
+  WTEARBE(1:NumOfPlantChemElements,NB,NZ)=0._r8
+  WTGRBE(1:NumOfPlantChemElements,NB,NZ)=0._r8
   CanPBStalkC(NB,NZ)=0._r8
   CanPBLeafShethC(NB,NZ)=0._r8
   GRNXB(NB,NZ)=0._r8
   GRNOB(NB,NZ)=0._r8
   GRWTB(NB,NZ)=0._r8
-  CanPBLA(NB,NZ)=0._r8
-  WTSTXBE(1:npelms,NB,NZ)=0._r8
+  CanopyBranchLeafA_pft(NB,NZ)=0._r8
+  WTSTXBE(1:NumOfPlantChemElements,NB,NZ)=0._r8
 
   D8855: DO K=0,JNODS1
     IF(K.NE.0)THEN
@@ -839,25 +839,25 @@ implicit none
     CanPSheathHeight(K,NB,NZ)=0._r8
     WSLF(K,NB,NZ)=0._r8
     WSSHE(K,NB,NZ)=0._r8
-    WGLFE(1:npelms,K,NB,NZ)=0._r8
-    WGSHE(1:npelms,K,NB,NZ)=0._r8
-    WGNODE(1:npelms,K,NB,NZ)=0._r8
-    D8865: DO L=1,JC1
-      ARLFV(L,NZ)=ARLFV(L,NZ)-CanPLNBLA(L,K,NB,NZ)
-      WGLFV(L,NZ)=WGLFV(L,NZ)-WGLFLE(ielmc,L,K,NB,NZ)
+    WGLFE(1:NumOfPlantChemElements,K,NB,NZ)=0._r8
+    WGSHE(1:NumOfPlantChemElements,K,NB,NZ)=0._r8
+    WGNODE(1:NumOfPlantChemElements,K,NB,NZ)=0._r8
+    D8865: DO L=1,NumOfCanopyLayers1
+      CanopyLeafApft_lyr(L,NZ)=CanopyLeafApft_lyr(L,NZ)-CanPLNBLA(L,K,NB,NZ)
+      CanopyLeafCpft_lyr(L,NZ)=CanopyLeafCpft_lyr(L,NZ)-WGLFLE(ielmc,L,K,NB,NZ)
       CanPLNBLA(L,K,NB,NZ)=0._r8
-      WGLFLE(1:npelms,L,K,NB,NZ)=0._r8
+      WGLFLE(1:NumOfPlantChemElements,L,K,NB,NZ)=0._r8
       IF(K.NE.0)THEN
         D8860: DO N=1,JLI1
-          SURF(N,L,K,NB,NZ)=0._r8
+          LeafA_lyrnodbrchpft(N,L,K,NB,NZ)=0._r8
         ENDDO D8860
       ENDIF
     ENDDO D8865
   ENDDO D8855
-  D8875: DO L=1,JC1
-    CanPLBSA(L,NB,NZ)=0._r8
+  D8875: DO L=1,NumOfCanopyLayers1
+    CanopyBranchStemApft_lyr(L,NB,NZ)=0._r8
     DO  N=1,JLI1
-      SURFB(N,L,NB,NZ)=0._r8
+      StemA_lyrnodbrchpft(N,L,NB,NZ)=0._r8
     enddo
   ENDDO D8875
   end associate

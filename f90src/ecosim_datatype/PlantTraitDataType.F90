@@ -18,18 +18,18 @@ module PlantTraitDataType
   real(r8),target,allocatable :: FWODLE(:,:)             !element allocation for leaf
   real(r8),target,allocatable :: FWODRE(:,:)
   real(r8),target,allocatable :: FWOODE(:,:)             !woody C allocation
-  real(r8),target,allocatable ::  CanPLBSA(:,:,:,:,:)              !stem layer area, [m2 d-2]
-  real(r8),target,allocatable ::  CanPLA(:,:,:)                       !plant leaf area, [m2 d-2]
-  real(r8),target,allocatable ::  CanPA(:,:,:)                       !plant canopy leaf+stem/stalk area, [m2 d-2]
+  real(r8),target,allocatable ::  CanopyBranchStemApft_lyr(:,:,:,:,:)              !stem layer area, [m2 d-2]
+  real(r8),target,allocatable ::  CanopyLeafA_pft(:,:,:)                       !plant leaf area, [m2 d-2]
+  real(r8),target,allocatable ::  CanopyArea_pft(:,:,:)                       !plant canopy leaf+stem/stalk area, [m2 d-2]
   real(r8),target,allocatable ::  ARLFX(:,:)                         !total canopy leaf area, [m2 d-2]
   real(r8),target,allocatable ::  CanPSA(:,:,:)                      !plant stem area, [m2 d-2]
   real(r8),target,allocatable ::  CanopyHeight(:,:,:)                          !canopy height, [m]
   real(r8),target,allocatable ::  ARSTX(:,:)                         !total canopy stem area, [m2 d-2]
-  real(r8),target,allocatable ::  ARLFT(:,:,:)                       !total leaf area, [m2 d-2]
-  real(r8),target,allocatable ::  ARSTT(:,:,:)                       !total stem area, [m2 d-2]
-  real(r8),target,allocatable ::  CanGLA(:,:)                         !grid level plant canopy leaf area, [m2 d-2]
+  real(r8),target,allocatable ::  CanopyLAgrid_lyr(:,:,:)                       !total leaf area, [m2 d-2]
+  real(r8),target,allocatable ::  CanopyStemA_lyr(:,:,:)                       !total stem area, [m2 d-2]
+  real(r8),target,allocatable ::  CanopyLA_grd(:,:)                         !grid level plant canopy leaf area, [m2 d-2]
   real(r8),target,allocatable ::  StemAreag(:,:)                     !total canopy stem area, [m2 d-2]
-  real(r8),target,allocatable ::  CanGA(:,:)                         !canopy area of combined over the grid [m2 d-2]
+  real(r8),target,allocatable ::  CanopyArea_grid(:,:)                         !canopy area of combined over the grid [m2 d-2]
   integer ,target,allocatable ::  NGTopRootLayer(:,:,:)                           !soil layer at planting depth, [-]
   real(r8),target,allocatable ::  PlantinDepth(:,:,:)                      !planting depth, [m]
   real(r8),target,allocatable ::  SeedinDepth(:,:,:)                       !seeding depth, [m]
@@ -46,7 +46,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  ARLF(:,:,:,:,:)                    !leaf area, [m2 d-2]
   real(r8),target,allocatable ::  CanPSheathHeight(:,:,:,:,:)                   !sheath height, [m]
   real(r8),target,allocatable ::  HTNODE(:,:,:,:,:)                  !internode height, [m]
-  real(r8),target,allocatable ::  CanPBLA(:,:,:,:)                     !branch leaf area, [m2 d-2]
+  real(r8),target,allocatable ::  CanopyBranchLeafA_pft(:,:,:,:)                     !branch leaf area, [m2 d-2]
   real(r8),target,allocatable ::  ARLFZ(:,:,:,:)                     !branch leaf area, [m2 d-2]
   real(r8),target,allocatable ::  CanPBranchHeight(:,:,:,:)                    !branch height, [m]
   real(r8),target,allocatable ::  GRNOB(:,:,:,:)                     !branch grain number, [d-2]
@@ -114,9 +114,9 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  TCZ(:,:,:)                         !threshold temperature for spring leafout/dehardening, [oC]
   real(r8),target,allocatable ::  SSL1(:,:,:)                        !petiole length:mass during growth, [m g-1]
   real(r8),target,allocatable ::  VRNL(:,:,:,:)                      !hours above threshold temperature required for spring leafout/dehardening, [-]
-  integer,target,allocatable ::  NBR(:,:,:)                          !branch number, [-]
+  integer,target,allocatable ::  NumOfBranches_pft(:,:,:)                          !branch number, [-]
   integer,target,allocatable ::  NBT(:,:,:)                          !branch number, [-]
-  integer,target,allocatable ::  NBTB(:,:,:,:)                       !branch number, [-]
+  integer,target,allocatable ::  BranchNumber_brchpft(:,:,:,:)                       !branch number, [-]
   integer,target,allocatable ::  NB1(:,:,:)                          !number of main branch, [-]
   integer,target,allocatable ::  IFLGR(:,:,:,:)                      !branch phenology flag, [-]
   integer,target,allocatable ::  IFLGQ(:,:,:,:)                      !branch phenology flag, [h]
@@ -141,8 +141,8 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  FNOD(:,:,:)                        !parameter for allocation of growth to nodes, [-]
   integer,target,allocatable ::  NNOD(:,:,:)                         !number of concurrently growing nodes
   real(r8),target,allocatable ::  PSICanPDailyMin(:,:,:)                       !minimum daily canopy water potential, [MPa]
-  real(r8),target,allocatable ::  CFX(:,:,:)                         !clumping factor for self-shading in canopy layer at current LAI, [-]
-  real(r8),target,allocatable ::  CF(:,:,:)                          !clumping factor for self-shading in canopy layer, [-]
+  real(r8),target,allocatable ::  ClumpFactort(:,:,:)                         !clumping factor for self-shading in canopy layer at current LAI, [-]
+  real(r8),target,allocatable ::  ClumpFactor(:,:,:)                          !clumping factor for self-shading in canopy layer, [-]
   integer,target,allocatable ::  IDTHP(:,:,:)                        !flag to detect canopy death , [-]
   real(r8),target,allocatable ::  STMX(:,:,:)                        !maximum grain node number per branch, [-]
   real(r8),target,allocatable ::  SDMX(:,:,:)                        !maximum grain number per node , [-]
@@ -151,7 +151,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  SeedCMass(:,:,:)                        !grain size at seeding, [g]
   real(r8),target,allocatable ::  GFILL(:,:,:)                       !maximum rate of fill per grain, [g h-1]
   real(r8),target,allocatable ::  FLG4(:,:,:,:)                      !flag to detect physiological maturity from  grain fill , [-]
-  real(r8),target,allocatable ::  ATRP(:,:,:,:)                      !counter for mobilizing nonstructural C during spring leafout/dehardening, [h]
+  real(r8),target,allocatable ::  HourCounter4LeafOut_brch(:,:,:,:)                      !counter for mobilizing nonstructural C during spring leafout/dehardening, [h]
   real(r8),target,allocatable ::  FLGZ(:,:,:,:)                      !counter for mobilizing nonstructural C during autumn leafoff/hardening, [h]
   integer,target,allocatable ::  IDAY(:,:,:,:,:)                     !plant growth stage, [-]
   real(r8),target,allocatable ::  CTC(:,:,:)                         !temperature below which seed set is adversely affected, [oC]
@@ -159,34 +159,34 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  SSTX(:,:,:)                        !sensitivity to HTC (seeds oC-1 above HTC)
   real(r8),target,allocatable ::  XDL(:,:,:)                         !critical daylength for phenological progress, [h]
   real(r8),target,allocatable ::  XPPD(:,:,:)                        !difference between current and critical daylengths used to calculate  phenological progress, [h]
-  real(r8),target,allocatable ::  CFI(:,:,:)                         !initial clumping factor for self-shading in canopy layer, [-]
+  real(r8),target,allocatable ::  ClumpFactort0(:,:,:)                         !initial clumping factor for self-shading in canopy layer, [-]
   real(r8),target,allocatable ::  VRNX(:,:,:,:)                      !number of hours below set temperature required for autumn leafoff/hardening, [-]
   real(r8),target,allocatable ::  OFFST(:,:,:)                       !adjustment of Arhhenius curves for plant thermal acclimation, [oC]
 !----------------------------------------------------------------------
 
 contains
-  subroutine InitPlantTraits(n_pltlitrk)
+  subroutine InitPlantTraits(NumOfPlantLitrCmplxs)
 
   implicit none
-  integer, intent(in) :: n_pltlitrk
+  integer, intent(in) :: NumOfPlantLitrCmplxs
 
   FVRN =real((/0.75,0.5,0.5,0.5,0.5,0.5/),r8)
-  allocate(FWODLE(npelms,1:n_pltlitrk));  FWODLE=0._r8
-  allocate(FWODBE(npelms,1:n_pltlitrk));  FWODBE=0._r8
-  allocate(FWODRE(npelms,1:n_pltlitrk));  FWODRE=0._r8         !
-  allocate(FWOODE(npelms,1:n_pltlitrk));  FWOODE=0._r8         !woody element allocation
-  allocate(CanPLBSA(JC,JBR,JP,JY,JX));CanPLBSA=0._r8
-  allocate(CanPLA(JP,JY,JX));    CanPLA=0._r8
-  allocate(CanPA(JP,JY,JX));    CanPA=0._r8
+  allocate(FWODLE(NumOfPlantChemElements,1:NumOfPlantLitrCmplxs));  FWODLE=0._r8
+  allocate(FWODBE(NumOfPlantChemElements,1:NumOfPlantLitrCmplxs));  FWODBE=0._r8
+  allocate(FWODRE(NumOfPlantChemElements,1:NumOfPlantLitrCmplxs));  FWODRE=0._r8         !
+  allocate(FWOODE(NumOfPlantChemElements,1:NumOfPlantLitrCmplxs));  FWOODE=0._r8         !woody element allocation
+  allocate(CanopyBranchStemApft_lyr(JC,JBR,JP,JY,JX));CanopyBranchStemApft_lyr=0._r8
+  allocate(CanopyLeafA_pft(JP,JY,JX));    CanopyLeafA_pft=0._r8
+  allocate(CanopyArea_pft(JP,JY,JX));    CanopyArea_pft=0._r8
   allocate(ARLFX(JY,JX));       ARLFX=0._r8
   allocate(CanPSA(JP,JY,JX));    CanPSA=0._r8
   allocate(CanopyHeight(JP,JY,JX));       CanopyHeight=0._r8
   allocate(ARSTX(JY,JX));       ARSTX=0._r8
-  allocate(ARLFT(JC,JY,JX));    ARLFT=0._r8
-  allocate(ARSTT(JC,JY,JX));    ARSTT=0._r8
-  allocate(CanGLA(JY,JX));       CanGLA=0._r8
+  allocate(CanopyLAgrid_lyr(JC,JY,JX));    CanopyLAgrid_lyr=0._r8
+  allocate(CanopyStemA_lyr(JC,JY,JX));    CanopyStemA_lyr=0._r8
+  allocate(CanopyLA_grd(JY,JX));       CanopyLA_grd=0._r8
   allocate(StemAreag(JY,JX));       StemAreag=0._r8
-  allocate(CanGA(JY,JX));       CanGA=0._r8
+  allocate(CanopyArea_grid(JY,JX));       CanopyArea_grid=0._r8
   allocate(NGTopRootLayer(JP,JY,JX));       NGTopRootLayer=0
   allocate(PlantinDepth(JP,JY,JX));   PlantinDepth=0._r8
   allocate(SeedinDepth(JP,JY,JX));    SeedinDepth=0._r8
@@ -203,7 +203,7 @@ contains
   allocate(ARLF(0:JNODS,JBR,JP,JY,JX));ARLF=0._r8
   allocate(CanPSheathHeight(0:JNODS,JBR,JP,JY,JX));CanPSheathHeight=0._r8
   allocate(HTNODE(0:JNODS,JBR,JP,JY,JX));HTNODE=0._r8
-  allocate(CanPBLA(JBR,JP,JY,JX)); CanPBLA=0._r8
+  allocate(CanopyBranchLeafA_pft(JBR,JP,JY,JX)); CanopyBranchLeafA_pft=0._r8
   allocate(ARLFZ(JBR,JP,JY,JX)); ARLFZ=0._r8
   allocate(CanPBranchHeight(JBR,JP,JY,JX));CanPBranchHeight=0._r8
   allocate(GRNOB(JBR,JP,JY,JX)); GRNOB=0._r8
@@ -271,9 +271,9 @@ contains
   allocate(TCZ(JP,JY,JX));      TCZ=0._r8
   allocate(SSL1(JP,JY,JX));     SSL1=0._r8
   allocate(VRNL(JC,JP,JY,JX));  VRNL=0._r8
-  allocate(NBR(JP,JY,JX));      NBR=0
+  allocate(NumOfBranches_pft(JP,JY,JX));      NumOfBranches_pft=0
   allocate(NBT(JP,JY,JX));      NBT=0
-  allocate(NBTB(JBR,JP,JY,JX));  NBTB=0
+  allocate(BranchNumber_brchpft(JBR,JP,JY,JX));  BranchNumber_brchpft=0
   allocate(NB1(JP,JY,JX));      NB1=0
   allocate(IFLGR(JBR,JP,JY,JX)); IFLGR=0
   allocate(IFLGQ(JBR,JP,JY,JX)); IFLGQ=0
@@ -298,8 +298,8 @@ contains
   allocate(FNOD(JP,JY,JX));     FNOD=0._r8
   allocate(NNOD(JP,JY,JX));     NNOD=0
   allocate(PSICanPDailyMin(JP,JY,JX));    PSICanPDailyMin=0._r8
-  allocate(CFX(JP,JY,JX));      CFX=0._r8
-  allocate(CF(JP,JY,JX));       CF=0._r8
+  allocate(ClumpFactort(JP,JY,JX));      ClumpFactort=0._r8
+  allocate(ClumpFactor(JP,JY,JX));       ClumpFactor=0._r8
   allocate(IDTHP(JP,JY,JX));    IDTHP=0
   allocate(STMX(JP,JY,JX));     STMX=0._r8
   allocate(SDMX(JP,JY,JX));     SDMX=0._r8
@@ -308,7 +308,7 @@ contains
   allocate(SeedCMass(JP,JY,JX));     SeedCMass=0._r8
   allocate(GFILL(JP,JY,JX));    GFILL=0._r8
   allocate(FLG4(JBR,JP,JY,JX));  FLG4=0._r8
-  allocate(ATRP(JBR,JP,JY,JX));  ATRP=0._r8
+  allocate(HourCounter4LeafOut_brch(JBR,JP,JY,JX));  HourCounter4LeafOut_brch=0._r8
   allocate(FLGZ(JBR,JP,JY,JX));  FLGZ=0._r8
   allocate(IDAY(jpstgs,JBR,JP,JY,JX));IDAY=0
   allocate(CTC(JP,JY,JX));      CTC=0._r8
@@ -316,7 +316,7 @@ contains
   allocate(SSTX(JP,JY,JX));     SSTX=0._r8
   allocate(XDL(JP,JY,JX));      XDL=0._r8
   allocate(XPPD(JP,JY,JX));     XPPD=0._r8
-  allocate(CFI(JP,JY,JX));      CFI=0._r8
+  allocate(ClumpFactort0(JP,JY,JX));      ClumpFactort0=0._r8
   allocate(VRNX(JC,JP,JY,JX));  VRNX=0._r8
   allocate(OFFST(JP,JY,JX));    OFFST=0._r8
   end subroutine InitPlantTraits
@@ -329,18 +329,18 @@ contains
   call destroy(FWODBE)
   call destroy(FWODRE)
   call destroy(FWOODE)
-  call destroy(CanPLBSA)
-  call destroy(CanPLA)
-  call destroy(CanPA)
+  call destroy(CanopyBranchStemApft_lyr)
+  call destroy(CanopyLeafA_pft)
+  call destroy(CanopyArea_pft)
   call destroy(ARLFX)
   call destroy(CanPSA)
   call destroy(CanopyHeight)
   call destroy(ARSTX)
-  call destroy(ARLFT)
-  call destroy(ARSTT)
-  call destroy(CanGLA)
+  call destroy(CanopyLAgrid_lyr)
+  call destroy(CanopyStemA_lyr)
+  call destroy(CanopyLA_grd)
   call destroy(StemAreag)
-  call destroy(CanGA)
+  call destroy(CanopyArea_grid)
   call destroy(NGTopRootLayer)
   call destroy(PlantinDepth)
   call destroy(SeedinDepth)
@@ -357,7 +357,7 @@ contains
   call destroy(ARLF)
   call destroy(CanPSheathHeight)
   call destroy(HTNODE)
-  call destroy(CanPBLA)
+  call destroy(CanopyBranchLeafA_pft)
   call destroy(ARLFZ)
   call destroy(CanPBranchHeight)
   call destroy(GRNOB)
@@ -425,9 +425,9 @@ contains
   call destroy(TCZ)
   call destroy(SSL1)
   call destroy(VRNL)
-  call destroy(NBR)
+  call destroy(NumOfBranches_pft)
   call destroy(NBT)
-  call destroy(NBTB)
+  call destroy(BranchNumber_brchpft)
   call destroy(NB1)
   call destroy(IFLGR)
   call destroy(IFLGQ)
@@ -452,8 +452,8 @@ contains
   call destroy(FNOD)
   call destroy(NNOD)
   call destroy(PSICanPDailyMin)
-  call destroy(CFX)
-  call destroy(CF)
+  call destroy(ClumpFactort)
+  call destroy(ClumpFactor)
   call destroy(IDTHP)
   call destroy(STMX)
   call destroy(SDMX)
@@ -462,7 +462,7 @@ contains
   call destroy(SeedCMass)
   call destroy(GFILL)
   call destroy(FLG4)
-  call destroy(ATRP)
+  call destroy(HourCounter4LeafOut_brch)
   call destroy(FLGZ)
   call destroy(IDAY)
   call destroy(CTC)
@@ -470,7 +470,7 @@ contains
   call destroy(SSTX)
   call destroy(XDL)
   call destroy(XPPD)
-  call destroy(CFI)
+  call destroy(ClumpFactort0)
   call destroy(VRNX)
   call destroy(OFFST)
   end subroutine DestructPlantTraits

@@ -64,7 +64,7 @@ implicit none
   VLIceSnow(1,NY,NX)=VLIceSnow(1,NY,NX)+TQI(NY,NX)
   ENGYW=VLHeatCapSnow(1,NY,NX)*TKSnow(1,NY,NX)
   VLHeatCapSnow(1,NY,NX)=cps*VLDrySnoWE(1,NY,NX)+cpw*VLWatSnow(1,NY,NX)+cpi*VLIceSnow(1,NY,NX)
-  IF(VLHeatCapSnow(1,NY,NX).GT.VLHeatCapSnowMN(NY,NX))THEN
+  IF(VLHeatCapSnow(1,NY,NX).GT.VLHeatCapSnowMin(NY,NX))THEN
     TKSnow(1,NY,NX)=(ENGYW+THQS(NY,NX))/VLHeatCapSnow(1,NY,NX)
   ELSE
     TKSnow(1,NY,NX)=TairK(NY,NX)
@@ -87,7 +87,7 @@ implicit none
   real(r8) :: HeatFlo2Surface,ENGYS,ENGY1,ENGY
 !     begin_execution
 !
-  IF(VLHeatCapSnow(1,NY,NX).GT.0.0_r8.AND.VLHeatCapSnow(1,NY,NX).LE.VLHeatCapSnowMN(NY,NX) &
+  IF(VLHeatCapSnow(1,NY,NX).GT.0.0_r8.AND.VLHeatCapSnow(1,NY,NX).LE.VLHeatCapSnowMin(NY,NX) &
     .AND.TairK(NY,NX).GT.TFICE)THEN
     !air temperature above freezing, surface snow layer heat insignificant, so it is merged
     !to the surface layer, and all varaibles are reset
@@ -108,6 +108,7 @@ implicit none
     VcumIceSnow(NY,NX)=0.0_r8
     VcumSnoDWI(NY,NX)=0.0_r8
     SnowDepth(NY,NX)=0.0_r8    
+
     D9770: DO L=1,JS
       SnoDensL(L,NY,NX)=NewSnowDens(NY,NX)
     ENDDO D9770
@@ -146,6 +147,8 @@ implicit none
   real(r8) :: VOLSF,TCASF
   real(r8) :: DENSF,DDENS2,DDENS1
   real(r8) :: CVISC,DENSX
+  real(r8) :: dHPhaseChange,VLDrySnoWEtmp
+  real(r8) :: frcnew,SnowIceMass,VLwatNet
 ! begin_execution
 !
 ! ADD CHANGES IN SNOW, WATER AND ICE
@@ -157,22 +160,32 @@ implicit none
 !
   VLDrySnoWE(L,NY,NX)=VLDrySnoWE(L,NY,NX)+CumSno2SnowLay(L,NY,NX)-XSnowThawMassL(L,NY,NX)
   VLWatSnow(L,NY,NX)=VLWatSnow(L,NY,NX)+CumWat2SnowLay(L,NY,NX)+XSnowThawMassL(L,NY,NX)+XIceThawMassL(L,NY,NX)
-  if(VLWatSnow(L,NY,NX)<0._r8)then
-    if(L>1)then
-      VLWatSnow(L-1,NY,NX)=VLWatSnow(L-1,NY,NX)+VLWatSnow(L,NY,NX)
-    elseif(L==1)then
-      VLWatMicP(0,NY,NX)=VLWatMicP(0,NY,NX)+VLWatSnow(L,NY,NX)
-    endif
-    VLWatSnow(L,NY,NX)=0._r8
-  endif
   VLIceSnow(L,NY,NX)=VLIceSnow(L,NY,NX)+CumIce2SnowLay(L,NY,NX)-XIceThawMassL(L,NY,NX)/DENSICE
+
   if(VLWatSnow(L,NY,NX)<0._r8)then
-    if(L>1)then
-      VLIceSnow(L-1,NY,NX)=VLIceSnow(L-1,NY,NX)+VLIceSnow(L,NY,NX)
-    elseif(L==1)then
-      VLiceMicP(0,NY,NX)=VLiceMicP(0,NY,NX)+VLIceSnow(L,NY,NX)
+    !melt dray snow
+    VLDrySnoWEtmp=VLDrySnoWE(L,NY,NX)+VLWatSnow(L,NY,NX)
+    if(VLDrySnoWEtmp>0._r8)then
+      VLDrySnoWE(L,NY,NX)=VLDrySnoWEtmp
+      dHPhaseChange=-333.0_r8*VLWatSnow(L,NY,NX)
+      XPhaseChangeHeatL(L,NY,NX)=XPhaseChangeHeatL(L,NY,NX)+dHPhaseChange
+      VLWatSnow(L,NY,NX)=0._r8      
+    else
+      !also check for ice
+      SnowIceMass=VLDrySnoWE(L,NY,NX)+VLIceSnow(L,NY,NX)*DENSICE
+      VLwatNet=SnowIceMass+VLWatSnow(L,NY,NX)
+      if(VLwatNet>0._r8)then
+        frcnew=VLwatNet/SnowIceMass
+        VLDrySnoWE(L,NY,NX)=VLDrySnoWE(L,NY,NX)*frcnew
+        VLIceSnow(L,NY,NX)=VLIceSnow(L,NY,NX)*frcnew
+        dHPhaseChange=-333.0_r8*VLWatSnow(L,NY,NX)
+        XPhaseChangeHeatL(L,NY,NX)=XPhaseChangeHeatL(L,NY,NX)+dHPhaseChange        
+        VLWatSnow(L,NY,NX)=0._r8
+      else
+        write(*,*)'negative snowmass cannot be fixed',L,VLDrySnoWE(L,NY,NX),VLWatSnow(L,NY,NX),VLIceSnow(L,NY,NX)
+        call endrun(trim(mod_filename)//' at line',__LINE__)        
+      endif
     endif
-    VLIceSnow(L,NY,NX)=0._r8
   endif
 !
 ! ACCUMULATE SNOW MASS FOR CALCULATING COMPRESSION
@@ -251,7 +264,7 @@ implicit none
     TKWX=TKSnow(L,NY,NX)
     ENGYW=VLHeatCapSnow(L,NY,NX)*TKSnow(L,NY,NX)
     VLHeatCapSnow(L,NY,NX)=cps*VLDrySnoWE(L,NY,NX)+cpw*VLWatSnow(L,NY,NX)+cpi*VLIceSnow(L,NY,NX)
-    IF(VHCPWZ(L,NY,NX).GT.VLHeatCapSnowMN(NY,NX).AND.VLHeatCapSnow(L,NY,NX).GT.ZEROS(NY,NX))THEN
+    IF(VHCPWZ(L,NY,NX).GT.VLHeatCapSnowMin(NY,NX).AND.VLHeatCapSnow(L,NY,NX).GT.ZEROS(NY,NX))THEN
       TKSnow(L,NY,NX)=(ENGYW+CumHeat2SnowLay(L,NY,NX)+XPhaseChangeHeatL(L,NY,NX))/VLHeatCapSnow(L,NY,NX)
     ELSE
       IF(L.EQ.1)THEN
@@ -318,8 +331,8 @@ implicit none
   !          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH2PO4+,*M1P*=MgHPO4,*COO*=COOH-
   !
   IF(salt_model)THEN
-    DO NTSA=idsa_beg,idsa_end
-      trcs_solsml(NTSA,L,NY,NX)=trcs_solsml(NTSA,L,NY,NX)+trcsa_TBLS(NTSA,L,NY,NX)
+    DO NTSA=idsalt_beg,idsalt_end
+      trcs_solsml(NTSA,L,NY,NX)=trcs_solsml(NTSA,L,NY,NX)+trcSalt_TBLS(NTSA,L,NY,NX)
     ENDDO
 
   ENDIF
@@ -340,7 +353,7 @@ implicit none
 
 !     begin_execution
 ! from surface to bottom, and modify the bottom layer
-  IF(VLHeatCapSnow(1,NY,NX).GT.VLHeatCapSnowMN(NY,NX))THEN
+  IF(VLHeatCapSnow(1,NY,NX).GT.VLHeatCapSnowMin(NY,NX))THEN
     D325: DO L=1,JS-1
 !      VOLSLX=VLSnoDWI(L,NY,NX)
       IF(VLSnoDWI(L,NY,NX).GT.ZEROS2(NY,NX))THEN
@@ -421,7 +434,7 @@ implicit none
           ENDDO
           !salt
           IF(salt_model)THEN
-            DO NTSA=idsa_beg,idsa_end
+            DO NTSA=idsalt_beg,idsalt_end
               trcs_solsml(NTSA,L1,NY,NX)=trcs_solsml(NTSA,L1,NY,NX)+FX*trcs_solsml(NTSA,L0,NY,NX)
             ENDDO
           ENDIF
@@ -449,7 +462,7 @@ implicit none
           ENDDO
 
           IF(salt_model)THEN
-            DO NTSA=idsa_beg,idsa_end
+            DO NTSA=idsalt_beg,idsalt_end
               trcs_solsml(NTSA,L0,NY,NX)=FY*trcs_solsml(NTSA,L0,NY,NX)
             ENDDO
 
@@ -474,7 +487,7 @@ implicit none
 !     begin_execution
 !     NET WATER AND HEAT FLUXES THROUGH SNOWPACK
 !
-!     VHCPW,VLHeatCapSnowMN=current, minimum snowpack heat capacities
+!     VHCPW,VLHeatCapSnowMin=current, minimum snowpack heat capacities
 !     CumSno2SnowLay,CumWat2SnowLay,CumIce2SnowLay=net fluxes of snow,water,ice in snowpack
 !     CumHeat2SnowLay=convective heat fluxes of snow,water,ice in snowpack
 !     XFLWS,WatXfer2SnoLay,IceXfer2SnoLay=snow,water,ice transfer from watsub.f
@@ -483,13 +496,13 @@ implicit none
 !     HeatConvSno2Soi,HeatConvSno2LitR=heat flux from lowest snow layer to soil,litter
 
   D1205: DO LS=1,JS
-    IF(VLHeatCapSnow(LS,NY,NX).GT.VLHeatCapSnowMN(NY,NX))THEN
+    IF(VLHeatCapSnow(LS,NY,NX).GT.VLHeatCapSnowMin(NY,NX))THEN
       !id of next snow layer
       LS2=MIN(JS,LS+1)
 !
 !     IF LOWER LAYER IS IN THE SNOWPACK
 !
-      IF(LS.LT.JS.AND.VLHeatCapSnow(LS2,N2,N1).GT.VLHeatCapSnowMN(N2,N1))THEN
+      IF(LS.LT.JS.AND.VLHeatCapSnow(LS2,N2,N1).GT.VLHeatCapSnowMin(N2,N1))THEN
         !not surface layer, and is heat significant
         CumSno2SnowLay(LS,N2,N1)=CumSno2SnowLay(LS,N2,N1)+SnoXfer2SnoLay(LS,N2,N1)-SnoXfer2SnoLay(LS2,N2,N1)
         CumWat2SnowLay(LS,N2,N1)=CumWat2SnowLay(LS,N2,N1)+WatXfer2SnoLay(LS,N2,N1)-WatXfer2SnoLay(LS2,N2,N1) &
@@ -498,15 +511,15 @@ implicit none
         CumHeat2SnowLay(LS,N2,N1)=CumHeat2SnowLay(LS,N2,N1)+HeatXfer2SnoLay(LS,N2,N1) &
           -HeatXfer2SnoLay(LS2,N2,N1)-HeatConvSno2LitR(LS,N2,N1)-HeatConvSno2Soi(LS,N2,N1)
 
-!     NET SOLUTE FLUXES THROUGH SNOWPACK
-!
-!     T*BLS=net solute flux in snowpack
-!     X*BLS=solute flux in snowpack from trnsfr.f
-!     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
-!             :OC=DOC,ON=DON,OP=DOP,OA=acetate
-!             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
-!             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
-!
+        !     NET SOLUTE FLUXES THROUGH SNOWPACK
+        !
+        !     T*BLS=net solute flux in snowpack
+        !     X*BLS=solute flux in snowpack from trnsfr.f
+        !     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
+        !             :OC=DOC,ON=DON,OP=DOP,OA=acetate
+        !             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
+        !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
+        !
         DO NTG=idg_beg,idg_end-1
           trcg_TBLS(NTG,LS,N2,N1)=trcg_TBLS(NTG,LS,N2,N1)+trcg_XBLS(NTG,LS,N2,N1) &
             -trcg_XBLS(NTG,LS2,N2,N1)
@@ -516,30 +529,30 @@ implicit none
           trcn_TBLS(NTN,LS,N2,N1)=trcn_TBLS(NTN,LS,N2,N1)+trcn_XBLS(NTN,LS,N2,N1) &
             -trcn_XBLS(NTN,LS2,N2,N1)
         ENDDO
-!
-!     NET SALT FLUXES THROUGH SNOWPACK
-!
-!     T*BLS=net solute flux in snowpack
-!     X*BLS=solute flux in snowpack from trnsfrs.f
-!     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
-!          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
-!          :*CO2*=CO2,*ALO1*=AlOH2-,*ALOH2=AlOH2-,*ALOH3*=AlOH3
-!          :*ALOH4*=AlOH4+,*ALS*=AlSO4+,*FEO1*=FeOH2-,*FEOH2=F3OH2-
-!          :*FEOH3*=FeOH3,*FEOH4*=FeOH4+,*FES*=FeSO4+,*CAO*=CaOH
-!          :*CAC*=CaCO3,*CAH*=CaHCO3-,*CAS*=CaSO4,*MGO*=MgOH,*MGC*=MgCO3
-!          :*MHG*=MgHCO3-,*MGS*=MgSO4,*NAC*=NaCO3-,*NAS*=NaSO4-,*KAS*=KSO4-
-!     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
-!          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH2PO4+,*M1P*=MgHPO4,*COO*=COOH-
-!          :*1=non-band,*B=band
-!
+        !
+        !     NET SALT FLUXES THROUGH SNOWPACK
+        !
+        !     T*BLS=net solute flux in snowpack
+        !     X*BLS=solute flux in snowpack from trnsfrs.f
+        !     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
+        !          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
+        !          :*CO2*=CO2,*ALO1*=AlOH2-,*ALOH2=AlOH2-,*ALOH3*=AlOH3
+        !          :*ALOH4*=AlOH4+,*ALS*=AlSO4+,*FEO1*=FeOH2-,*FEOH2=F3OH2-
+        !          :*FEOH3*=FeOH3,*FEOH4*=FeOH4+,*FES*=FeSO4+,*CAO*=CaOH
+        !          :*CAC*=CaCO3,*CAH*=CaHCO3-,*CAS*=CaSO4,*MGO*=MgOH,*MGC*=MgCO3
+        !          :*MHG*=MgHCO3-,*MGS*=MgSO4,*NAC*=NaCO3-,*NAS*=NaSO4-,*KAS*=KSO4-
+        !     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
+        !          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH2PO4+,*M1P*=MgHPO4,*COO*=COOH-
+        !          :*1=non-band,*B=band
+        !
         IF(salt_model)THEN
-          DO NTSA=idsa_beg,idsa_end
-            trcsa_TBLS(NTSA,LS,N2,N1)=trcsa_TBLS(NTSA,LS,N2,N1)+trcsa_XBLS(NTSA,LS,N2,N1)-trcsa_XBLS(NTSA,LS2,N2,N1)
+          DO NTSA=idsalt_beg,idsalt_end
+            trcSalt_TBLS(NTSA,LS,N2,N1)=trcSalt_TBLS(NTSA,LS,N2,N1)+trcSalt_XBLS(NTSA,LS,N2,N1)-trcSalt_XBLS(NTSA,LS2,N2,N1)
           ENDDO
         ENDIF
-!
-!     IF LOWER LAYER IS THE LITTER AND SOIL SURFACE
-!
+        !
+        !     IF LOWER LAYER IS THE LITTER AND SOIL SURFACE
+        !
       ELSE
         CumSno2SnowLay(LS,N2,N1)=CumSno2SnowLay(LS,N2,N1)+SnoXfer2SnoLay(LS,N2,N1)
         CumWat2SnowLay(LS,N2,N1)=CumWat2SnowLay(LS,N2,N1)+WatXfer2SnoLay(LS,N2,N1) &
@@ -547,7 +560,8 @@ implicit none
         CumIce2SnowLay(LS,N2,N1)=CumIce2SnowLay(LS,N2,N1)+IceXfer2SnoLay(LS,N2,N1)
         CumHeat2SnowLay(LS,N2,N1)=CumHeat2SnowLay(LS,N2,N1)+HeatXfer2SnoLay(LS,N2,N1) &
           -HeatConvSno2LitR(LS,N2,N1)-HeatConvSno2Soi(LS,N2,N1)
-! and NH3B
+
+        ! and NH3B
         DO NTG=idg_beg,idg_end-1
           trcg_TBLS(NTG,LS,N2,N1)=trcg_TBLS(NTG,LS,N2,N1)+trcg_XBLS(NTG,LS,N2,N1) &
             -trcs_XFLS(NTG,3,0,N2,N1)-trcs_XFLS(NTG,3,NUM(N2,N1),N2,N1) &
@@ -560,7 +574,7 @@ implicit none
             -trcs_XFHS(NTN,3,NUM(N2,N1),N2,N1)
         ENDDO
 
-!add band flux
+        !add band flux
         trcg_TBLS(idg_NH3,LS,N2,N1)=trcg_TBLS(idg_NH3,LS,N2,N1) &
           -trcs_XFLS(idg_NH3B,3,NUM(N2,N1),N2,N1)-trcs_XFHS(idg_NH3B,3,NUM(N2,N1),N2,N1)
 
@@ -570,17 +584,17 @@ implicit none
         ENDDO
 
         IF(salt_model)THEN
-          DO NTSA=idsa_beg,idsa_end
-            trcsa_TBLS(NTSA,LS,NY,NX)=trcsa_TBLS(NTSA,LS,NY,NX)+trcsa_XBLS(NTSA,LS,NY,NX) &
-              -trcsa_XFLS(NTSA,3,0,N2,N1)-trcsa_XFLS(NTSA,3,NUM(N2,N1),N2,N1) &
-              -trcsa_XFHS(NTSA,3,NUM(N2,N1),N2,N1)
+          DO NTSA=idsalt_beg,idsalt_end
+            trcSalt_TBLS(NTSA,LS,NY,NX)=trcSalt_TBLS(NTSA,LS,NY,NX)+trcSalt_XBLS(NTSA,LS,NY,NX) &
+              -trcSalt_XFLS(NTSA,3,0,N2,N1)-trcSalt_XFLS(NTSA,3,NUM(N2,N1),N2,N1) &
+              -trcSalt_XFHS(NTSA,3,NUM(N2,N1),N2,N1)
           ENDDO
 
-!add band flux
-          DO NTSA=0,idsa_nuts
-            trcsa_TBLS(idsa_H0PO4+NTSA,LS,NY,NX)=trcsa_TBLS(idsa_H0PO4+NTSA,LS,NY,NX) &
-              -trcsa_XFLS(idsa_H0PO4B+NTSA,3,NUM(N2,N1),N2,N1) &
-              -trcsa_XFHS(idsa_H0PO4B+NTSA,3,NUM(N2,N1),N2,N1)
+          !add band flux
+          DO NTSA=0,idsalt_nuts
+            trcSalt_TBLS(idsalt_H0PO4+NTSA,LS,NY,NX)=trcSalt_TBLS(idsalt_H0PO4+NTSA,LS,NY,NX) &
+              -trcSalt_XFLS(idsalt_H0PO4B+NTSA,3,NUM(N2,N1),N2,N1) &
+              -trcSalt_XFHS(idsalt_H0PO4B+NTSA,3,NUM(N2,N1),N2,N1)
           ENDDO
         ENDIF
       ENDIF
@@ -603,8 +617,8 @@ implicit none
         ENDDO
 
         IF(salt_model)THEN
-          DO NTSA=idsa_beg,idsa_end
-            trcsa_TBLS(NTSA,LS,N2,N1)=trcsa_TBLS(NTSA,LS,N2,N1)+trcsa_XBLS(NTSA,LS,N2,N1)
+          DO NTSA=idsalt_beg,idsalt_end
+            trcSalt_TBLS(NTSA,LS,N2,N1)=trcSalt_TBLS(NTSA,LS,N2,N1)+trcSalt_XBLS(NTSA,LS,N2,N1)
           ENDDO
 
         ENDIF
@@ -640,10 +654,10 @@ implicit none
   IF(salt_model)THEN
 !     INITIALIZE NET SOLUTE AND GAS FLUXES FROM SNOWPACK DRIFT
 !
-    trcsa_TQR(idsa_beg:idsa_end,NY,NX)=0.0_r8
-    trcsa_TQS(idsa_beg:idsa_end,NY,NX)=0.0_r8
+    trcSalt_TQR(idsalt_beg:idsalt_end,NY,NX)=0.0_r8
+    trcSalt_TQS(idsalt_beg:idsalt_end,NY,NX)=0.0_r8
     DO  L=1,JS
-      trcsa_TBLS(idsa_beg:idsa_end,L,NY,NX)=0.0_r8
+      trcSalt_TBLS(idsalt_beg:idsalt_end,L,NY,NX)=0.0_r8
     ENDDO
   endif
   end subroutine ZeroSnowArrays
@@ -686,10 +700,10 @@ implicit none
     ENDIF
   ENDDO D1202
 
-  TQS(N2,N1)=TQS(N2,N1)+QS(N,N2,N1)-QS(N,N5,N4)
-  TQW(N2,N1)=TQW(N2,N1)+QW(N,N2,N1)-QW(N,N5,N4)
-  TQI(N2,N1)=TQI(N2,N1)+QI(N,N2,N1)-QI(N,N5,N4)
-  THQS(N2,N1)=THQS(N2,N1)+HQS(N,N2,N1)-HQS(N,N5,N4)
+  TQS(N2,N1)=TQS(N2,N1)+DrysnoBySnowRedistribution(N,N2,N1)-DrysnoBySnowRedistribution(N,N5,N4)
+  TQW(N2,N1)=TQW(N2,N1)+WatBySnowRedistribution(N,N2,N1)-WatBySnowRedistribution(N,N5,N4)
+  TQI(N2,N1)=TQI(N2,N1)+IceBySnowRedistribution(N,N2,N1)-IceBySnowRedistribution(N,N5,N4)
+  THQS(N2,N1)=THQS(N2,N1)+HeatBySnowRedistribution(N,N2,N1)-HeatBySnowRedistribution(N,N5,N4)
   !
   !     NET GAS AND SOLUTE FLUXES FROM RUNOFF AND SNOWPACK
   !
@@ -738,8 +752,8 @@ implicit none
       trcn_solsml(NTS,1,NY,NX)=trcn_solsml(NTS,1,NY,NX)+trcn_QSS(NTS,NY,NX)
     ENDDO
     IF(salt_model)THEN
-      DO NTA=idsa_beg,idsa_end
-        trcs_solsml(NTA,1,NY,NX)=trcs_solsml(NTA,1,NY,NX)+trcsa_TQS(NTA,NY,NX)
+      DO NTA=idsalt_beg,idsalt_end
+        trcs_solsml(NTA,1,NY,NX)=trcs_solsml(NTA,1,NY,NX)+trcSalt_TQS(NTA,NY,NX)
       ENDDO
     ENDIF
   ENDIF
@@ -771,26 +785,26 @@ implicit none
   IF(salt_model)THEN
     D1203: DO NN=1,2
 
-      DO NTSA=idsa_beg,idsa_end
-        trcsa_TQR(NTSA,N2,N1)=trcsa_TQR(NTSA,N2,N1)+trcsa_XQR(NTSA,N,NN,N2,N1)
+      DO NTSA=idsalt_beg,idsalt_end
+        trcSalt_TQR(NTSA,N2,N1)=trcSalt_TQR(NTSA,N2,N1)+trcSalt_XQR(NTSA,N,NN,N2,N1)
       ENDDO
 
       IF(IFLBH(N,NN,N5,N4).EQ.0)THEN
 ! runoff direction
-        DO NTSA=idsa_beg,idsa_end
-          trcsa_TQR(NTSA,N2,N1)=trcsa_TQR(NTSA,N2,N1)-trcsa_XQR(NTSA,N,NN,N5,N4)
+        DO NTSA=idsalt_beg,idsalt_end
+          trcSalt_TQR(NTSA,N2,N1)=trcSalt_TQR(NTSA,N2,N1)-trcSalt_XQR(NTSA,N,NN,N5,N4)
         ENDDO
       ENDIF
 
       IF(N4B.GT.0.AND.N5B.GT.0.AND.NN.EQ.1)THEN
-        DO NTSA=idsa_beg,idsa_end
-          trcsa_TQR(NTSA,N2,N1)=trcsa_TQR(NTSA,N2,N1)-trcsa_XQR(NTSA,N,NN,N5B,N4B)
+        DO NTSA=idsalt_beg,idsalt_end
+          trcSalt_TQR(NTSA,N2,N1)=trcSalt_TQR(NTSA,N2,N1)-trcSalt_XQR(NTSA,N,NN,N5B,N4B)
         ENDDO
       ENDIF
     ENDDO D1203
 
-    DO NTSA=idsa_beg,idsa_end
-      trcsa_TQS(NTSA,N2,N1)=trcsa_TQS(NTSA,N2,N1)+trcsa_XQS(NTSA,N,N2,N1)-trcsa_XQS(NTSA,N,N5,N4)
+    DO NTSA=idsalt_beg,idsalt_end
+      trcSalt_TQS(NTSA,N2,N1)=trcSalt_TQS(NTSA,N2,N1)+trcSalt_XQS(NTSA,N,N2,N1)-trcSalt_XQS(NTSA,N,N5,N4)
     ENDDO
   ENDIF
   end subroutine SaltThruFluxRunoffAndSnowpack
@@ -813,8 +827,8 @@ implicit none
   ENDDO
 
   IF(salt_model)THEN
-    DO NTSA=idsa_beg,idsa_end
-      trcsa_solml(NTSA,0,NY,NX)=trcsa_solml(NTSA,0,NY,NX)+trcsa_TQR(NTSA,NY,NX)
+    DO NTSA=idsalt_beg,idsalt_end
+      trcSalt_solml(NTSA,0,NY,NX)=trcSalt_solml(NTSA,0,NY,NX)+trcSalt_TQR(NTSA,NY,NX)
     ENDDO
   ENDIF
   end subroutine OverlandSnowFlow    

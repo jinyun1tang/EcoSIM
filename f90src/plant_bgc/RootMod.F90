@@ -345,7 +345,7 @@ implicit none
   real(r8) :: GRTWGM
   real(r8) :: GRTLGL
   real(r8) :: GRTWTG
-  real(r8) :: GRTWTLE(npelms)
+  real(r8) :: GRTWTLE(NumOfPlantChemElements)
   real(r8) :: GRTWTM
   real(r8) :: PPOOLB
   real(r8) :: PADD2,PADD1
@@ -356,7 +356,7 @@ implicit none
   real(r8) :: RCO2GM
   real(r8) :: RCO2TM
   real(r8) :: RMNCR,RCO2RM,RCO2R
-  real(r8) :: RCER(npelms)
+  real(r8) :: RCER(NumOfPlantChemElements)
   real(r8) :: RTN2X,RTN2Y
   real(r8) :: RTDP1X,SoilResit4PrimRootPentration
   REAL(R8) :: SNCR,SNCRM
@@ -368,7 +368,7 @@ implicit none
   associate(                          &
     RTWT1E  =>  plt_biom%RTWT1E     , &
     WTRT2E  =>  plt_biom%WTRT2E     , &
-    CEPOLR  =>  plt_biom%CEPOLR     , &
+    RootNonstructElementConcpft_vr  =>  plt_biom%RootNonstructElementConcpft_vr     , &
     WTRT1E  =>  plt_biom%WTRT1E     , &
     EPOOLR  =>  plt_biom%EPOOLR     , &
     WSRTL   =>  plt_biom%WSRTL      , &
@@ -450,10 +450,10 @@ implicit none
 !     CNPG=N,P constraint on growth respiration
 !     CNKI,CPKI=nonstructural N,P inhibition constant on growth
 !
-      IF(CEPOLR(ielmc,N,L,NZ).GT.ZERO)THEN
-        CNPG=AMIN1(CEPOLR(ielmn,N,L,NZ)/(CEPOLR(ielmn,N,L,NZ) &
-          +CEPOLR(ielmc,N,L,NZ)*CNKI),CEPOLR(ielmp,N,L,NZ) &
-          /(CEPOLR(ielmp,N,L,NZ)+CEPOLR(ielmc,N,L,NZ)*CPKI))
+      IF(RootNonstructElementConcpft_vr(ielmc,N,L,NZ).GT.ZERO)THEN
+        CNPG=AMIN1(RootNonstructElementConcpft_vr(ielmn,N,L,NZ)/(RootNonstructElementConcpft_vr(ielmn,N,L,NZ) &
+          +RootNonstructElementConcpft_vr(ielmc,N,L,NZ)*CNKI),RootNonstructElementConcpft_vr(ielmp,N,L,NZ) &
+          /(RootNonstructElementConcpft_vr(ielmp,N,L,NZ)+RootNonstructElementConcpft_vr(ielmc,N,L,NZ)*CPKI))
       ELSE
         CNPG=1.0_r8
       ENDIF
@@ -558,15 +558,15 @@ implicit none
 !     RCCZR,RCCYR=min,max fractions for root C recycling
 !     RCCXR,RCCQR=max fractions for root N,P recycling
 !
-      IF(IDAY(1,NB1(NZ),NZ).NE.0.AND.CEPOLR(ielmc,N,L,NZ).GT.ZERO)THEN
-        CCC=AZMAX1(AMIN1(1.0_r8,safe_adb(CEPOLR(ielmn,N,L,NZ),CEPOLR(ielmn,N,L,NZ) &
-          +CEPOLR(ielmc,N,L,NZ)*CNKI) &
-          ,safe_adb(CEPOLR(ielmp,N,L,NZ),CEPOLR(ielmp,N,L,NZ) &
-          +CEPOLR(ielmc,N,L,NZ)*CPKI)))
+      IF(IDAY(1,NB1(NZ),NZ).NE.0.AND.RootNonstructElementConcpft_vr(ielmc,N,L,NZ).GT.ZERO)THEN
+        CCC=AZMAX1(AMIN1(1.0_r8,safe_adb(RootNonstructElementConcpft_vr(ielmn,N,L,NZ),RootNonstructElementConcpft_vr(ielmn,N,L,NZ) &
+          +RootNonstructElementConcpft_vr(ielmc,N,L,NZ)*CNKI) &
+          ,safe_adb(RootNonstructElementConcpft_vr(ielmp,N,L,NZ),RootNonstructElementConcpft_vr(ielmp,N,L,NZ) &
+          +RootNonstructElementConcpft_vr(ielmc,N,L,NZ)*CPKI)))
         CNC=AZMAX1(AMIN1(1.0_r8 &
-          ,safe_adb(CEPOLR(ielmc,N,L,NZ),CEPOLR(ielmc,N,L,NZ)+CEPOLR(ielmn,N,L,NZ)/CNKI)))
+          ,safe_adb(RootNonstructElementConcpft_vr(ielmc,N,L,NZ),RootNonstructElementConcpft_vr(ielmc,N,L,NZ)+RootNonstructElementConcpft_vr(ielmn,N,L,NZ)/CNKI)))
         CPC=AZMAX1(AMIN1(1.0_r8 &
-          ,safe_adb(CEPOLR(ielmc,N,L,NZ),CEPOLR(ielmc,N,L,NZ)+CEPOLR(ielmp,N,L,NZ)/CPKI)))
+          ,safe_adb(RootNonstructElementConcpft_vr(ielmc,N,L,NZ),RootNonstructElementConcpft_vr(ielmc,N,L,NZ)+RootNonstructElementConcpft_vr(ielmp,N,L,NZ)/CPKI)))
       ELSE
         CCC=0._r8
         CNC=0._r8
@@ -615,7 +615,7 @@ implicit none
           FSNC2=1.0_r8
         ENDIF
       ELSE
-        RCER(1:npelms)=0._r8
+        RCER(1:NumOfPlantChemElements)=0._r8
         FSNC2=0._r8
       ENDIF
 !
@@ -629,7 +629,7 @@ implicit none
 !     RCER(ielmc),RCER(ielmn),RCER(ielmp)=remobilization of C,N,P from senescing root
 !     FWOOD,FWOODN,FWOODP=C,N,P woody fraction in root:0=woody,1=non-woody
 !
-      DO NE=1,npelms
+      DO NE=1,NumOfPlantChemElements
         D6350: DO M=1,jsken
           ESNC(NE,M,k_woody_litr,L,NZ)=ESNC(NE,M,k_woody_litr,L,NZ)+CFOPE(NE,icwood,M,NZ) &
             *FSNC2*(WTRT2E(NE,N,L,NR,NZ)-RCER(NE))*FWODRE(NE,k_woody_litr)
@@ -705,7 +705,7 @@ implicit none
 !     RTN2,SecndRootXNumL=number of secondary root axes
 !
       SecndRootLen(N,L,NR,NZ)=SecndRootLen(N,L,NR,NZ)+GRTLGL
-      DO NE=1,npelms
+      DO NE=1,NumOfPlantChemElements
         WTRT2E(NE,N,L,NR,NZ)=WTRT2E(NE,N,L,NR,NZ)+GRTWTLE(NE)
       ENDDO
       WSRTL(N,L,NZ)=WSRTL(N,L,NZ)+AMIN1(CNWS(NZ)*WTRT2E(ielmn,N,L,NR,NZ) &
@@ -773,10 +773,10 @@ implicit none
 !     CNPG=N,P constraint on growth respiration
 !     CNKI,CPKI=nonstructural N,P inhibition constant on growth
 !
-              IF(CEPOLR(ielmc,N,L,NZ).GT.ZERO)THEN
-                CNPG=AMIN1(CEPOLR(ielmn,N,L,NZ)/(CEPOLR(ielmn,N,L,NZ) &
-                  +CEPOLR(ielmc,N,L,NZ)*CNKI),CEPOLR(ielmp,N,L,NZ) &
-                  /(CEPOLR(ielmp,N,L,NZ)+CEPOLR(ielmc,N,L,NZ)*CPKI))
+              IF(RootNonstructElementConcpft_vr(ielmc,N,L,NZ).GT.ZERO)THEN
+                CNPG=AMIN1(RootNonstructElementConcpft_vr(ielmn,N,L,NZ)/(RootNonstructElementConcpft_vr(ielmn,N,L,NZ) &
+                  +RootNonstructElementConcpft_vr(ielmc,N,L,NZ)*CNKI),RootNonstructElementConcpft_vr(ielmp,N,L,NZ) &
+                  /(RootNonstructElementConcpft_vr(ielmp,N,L,NZ)+RootNonstructElementConcpft_vr(ielmc,N,L,NZ)*CPKI))
               ELSE
                 CNPG=1.0_r8
               ENDIF
@@ -957,7 +957,7 @@ implicit none
                 LX=MAX(1,L-1)
                 D5105: DO LL=L,LX,-1
                   GRTWTM=GRTWTLE(ielmc)
-                  DO NE=1,npelms
+                  DO NE=1,NumOfPlantChemElements
                     IF(GRTWTLE(NE).LT.0.0_r8)THEN
                       IF(GRTWTLE(NE).GT.-WTRT2E(NE,N,LL,NR,NZ))THEN
                         if(NE==ielmc)SecndRootLen(N,LL,NR,NZ)=SecndRootLen(N,LL,NR,NZ)+GRTWTLE(NE) &
@@ -999,7 +999,7 @@ implicit none
                       FSNCP=1.0_r8
                     ENDIF
 
-                    DO NE=1,npelms
+                    DO NE=1,NumOfPlantChemElements
                       D6450: DO M=1,jsken
                         ESNC(NE,M,k_woody_litr,LL,NZ)=ESNC(NE,M,k_woody_litr,LL,NZ)+CFOPE(NE,icwood,M,NZ) &
                           *FSNCM*AZMAX1(WTRT2E(NE,imycorrhz,LL,NR,NZ))*FWODRE(NE,k_woody_litr)
@@ -1074,13 +1074,13 @@ implicit none
   real(r8), intent(out) :: FSNC1
   integer :: M,NE
   real(r8) :: CCC,CNC,CPC
-  real(r8) :: RCER(npelms)
+  real(r8) :: RCER(NumOfPlantChemElements)
   real(r8) :: RCCC,RCCN,RCCP
   real(r8) :: SNCR,SNCRM
 ! begin_execution
   associate(                          &
     RTWT1E  =>  plt_biom%RTWT1E     , &
-    CEPOLR  =>  plt_biom%CEPOLR     , &
+    RootNonstructElementConcpft_vr  =>  plt_biom%RootNonstructElementConcpft_vr     , &
     ZEROP   =>  plt_biom%ZEROP      , &
     ZERO    =>  plt_site%ZERO       , &
     icwood  =>  pltpar%icwood       , &
@@ -1106,11 +1106,11 @@ implicit none
 !     RCCZR,RCCYR=min,max fractions for root C recycling
 !     RCCXR,RCCQR=max fractions for root N,P recycling
 !
-  IF(IDAY(1,NB1(NZ),NZ).NE.0.AND.CEPOLR(ielmc,N,L,NZ).GT.ZERO)THEN
-    CCC=AZMAX1(AMIN1(1.0_r8,safe_adb(CEPOLR(ielmn,N,L,NZ),CEPOLR(ielmn,N,L,NZ)+CEPOLR(ielmc,N,L,NZ)*CNKI) &
-      ,safe_adb(CEPOLR(ielmp,N,L,NZ),CEPOLR(ielmp,N,L,NZ)+CEPOLR(ielmc,N,L,NZ)*CPKI)))
-    CNC=AZMAX1(AMIN1(1.0_r8,safe_adb(CEPOLR(ielmc,N,L,NZ),CEPOLR(ielmc,N,L,NZ)+CEPOLR(ielmn,N,L,NZ)/CNKI)))
-    CPC=AZMAX1(AMIN1(1.0_r8,safe_adb(CEPOLR(ielmc,N,L,NZ),CEPOLR(ielmc,N,L,NZ)+CEPOLR(ielmp,N,L,NZ)/CPKI)))
+  IF(IDAY(1,NB1(NZ),NZ).NE.0.AND.RootNonstructElementConcpft_vr(ielmc,N,L,NZ).GT.ZERO)THEN
+    CCC=AZMAX1(AMIN1(1.0_r8,safe_adb(RootNonstructElementConcpft_vr(ielmn,N,L,NZ),RootNonstructElementConcpft_vr(ielmn,N,L,NZ)+RootNonstructElementConcpft_vr(ielmc,N,L,NZ)*CNKI) &
+      ,safe_adb(RootNonstructElementConcpft_vr(ielmp,N,L,NZ),RootNonstructElementConcpft_vr(ielmp,N,L,NZ)+RootNonstructElementConcpft_vr(ielmc,N,L,NZ)*CPKI)))
+    CNC=AZMAX1(AMIN1(1.0_r8,safe_adb(RootNonstructElementConcpft_vr(ielmc,N,L,NZ),RootNonstructElementConcpft_vr(ielmc,N,L,NZ)+RootNonstructElementConcpft_vr(ielmn,N,L,NZ)/CNKI)))
+    CPC=AZMAX1(AMIN1(1.0_r8,safe_adb(RootNonstructElementConcpft_vr(ielmc,N,L,NZ),RootNonstructElementConcpft_vr(ielmc,N,L,NZ)+RootNonstructElementConcpft_vr(ielmp,N,L,NZ)/CPKI)))
   ELSE
     CCC=0._r8
     CNC=0._r8
@@ -1159,7 +1159,7 @@ implicit none
       FSNC1=1.0_r8
     ENDIF
   ELSE
-    RCER(1:npelms)=0._r8
+    RCER(1:NumOfPlantChemElements)=0._r8
     FSNC1=0._r8
   ENDIF
 !
@@ -1174,7 +1174,7 @@ implicit none
 !     FWOOD,FWOODN,FWOODP=C,N,P woody fraction in root:0=woody,1=non-woody
 !
   D6355: DO M=1,jsken
-    DO NE=1,npelms
+    DO NE=1,NumOfPlantChemElements    
       ESNC(NE,M,k_woody_litr,L,NZ)=ESNC(NE,M,k_woody_litr,L,NZ)+CFOPE(NE,icwood,M,NZ) &
         *FSNC1*(RTWT1E(NE,N,NR,NZ)-RCER(NE))*FWODRE(NE,k_woody_litr)
 
@@ -1190,18 +1190,18 @@ implicit none
   subroutine PrimRootExtension(L,L1,N,NR,NZ,WFNR,FRTN,GRTWTG,GRTWTLE,GRTLGL,TotPrimRootLen,WTRTZ)
   implicit none
   integer, intent(in) :: L,L1,N,NR,NZ
-  real(r8), intent(in):: WFNR,FRTN,GRTWTG,GRTWTLE(npelms)
+  real(r8), intent(in):: WFNR,FRTN,GRTWTG,GRTWTLE(NumOfPlantChemElements)
   real(r8), intent(inout) :: TotPrimRootLen,WTRTZ
   real(r8), intent(out):: GRTLGL
   real(r8) :: FGROL,FGROZ
   integer :: NE
-  REAL(R8) :: XFRE(npelms)
+  REAL(R8) :: XFRE(NumOfPlantChemElements)
 ! begin_execution
   associate(                             &
     WTRT1E    =>  plt_biom%WTRT1E      , &
     RTWT1E    =>  plt_biom%RTWT1E      , &
     WSRTL     =>  plt_biom%WSRTL       , &
-    RootCPZR    =>  plt_biom%RootCPZR      , &
+    PopPlantRootC_vr    =>  plt_biom%PopPlantRootC_vr      , &
     EPOOLR    =>  plt_biom%EPOOLR      , &
     ZEROP     =>  plt_biom%ZEROP       , &
     CNWS      =>  plt_allom%CNWS       , &
@@ -1281,7 +1281,7 @@ implicit none
 !
   PrimRootDepth(N,NR,NZ)=PrimRootDepth(N,NR,NZ)+GRTLGL
 
-  DO NE=1,npelms
+  DO NE=1,NumOfPlantChemElements
     RTWT1E(NE,N,NR,NZ)=RTWT1E(NE,N,NR,NZ)+GRTWTLE(NE)
     WTRT1E(NE,N,L,NR,NZ)=WTRT1E(NE,N,L,NR,NZ)+GRTWTLE(NE)*FGROL
   ENDDO
@@ -1307,18 +1307,18 @@ implicit none
 !     NINR=deepest root layer
 !
   IF(FGROZ.GT.0.0)THEN
-    DO NE=1,npelms
+    DO NE=1,NumOfPlantChemElements
       WTRT1E(NE,N,L1,NR,NZ)=WTRT1E(NE,N,L1,NR,NZ)+GRTWTLE(NE)*FGROZ
     ENDDO
     WSRTL(N,L1,NZ)=WSRTL(N,L1,NZ)+AMIN1(CNWS(NZ)*WTRT1E(ielmn,N,L1,NR,NZ) &
       ,CPWS(NZ)*WTRT1E(ielmp,N,L1,NR,NZ))
-    RootCPZR(N,L1,NZ)=RootCPZR(N,L1,NZ)+WTRT1E(ielmc,N,L1,NR,NZ)
+    PopPlantRootC_vr(N,L1,NZ)=PopPlantRootC_vr(N,L1,NZ)+WTRT1E(ielmc,N,L1,NR,NZ)
     PrimRootLen(N,L1,NR,NZ)=PrimRootLen(N,L1,NR,NZ)+GRTLGL*FGROZ
     PrimRootRadius(N,L1,NZ)=PrimRootRadius(N,L,NZ)
     TotPrimRootLen=TotPrimRootLen+PrimRootLen(N,L1,NR,NZ)
     WTRTZ=WTRTZ+WTRT1E(ielmc,N,L1,NR,NZ)
 
-    DO NE=1,npelms
+    DO NE=1,NumOfPlantChemElements
       XFRE(NE)=FRTN*EPOOLR(NE,N,L,NZ)
       EPOOLR(NE,N,L,NZ)=EPOOLR(NE,N,L,NZ)-XFRE(NE)
       EPOOLR(NE,N,L1,NZ)=EPOOLR(NE,N,L1,NZ)+XFRE(NE)
@@ -1340,7 +1340,7 @@ implicit none
   real(r8),intent(in) :: RTSK1(2,JZ1,10),RTSK2(2,JZ1,10),XRTN1
   integer :: LL,NN,NE,NTG
   real(r8) :: XFRD,XFRW,FRTN
-  real(r8) :: XFRE(npelms)
+  real(r8) :: XFRE(NumOfPlantChemElements)
 
 ! begin_execution
   associate(                             &
@@ -1348,7 +1348,7 @@ implicit none
     WTRT2E   =>  plt_biom%WTRT2E   , &
     EPOOLR   =>  plt_biom%EPOOLR   , &
     WSRTL    =>  plt_biom%WSRTL    , &
-    RootCPZR   =>  plt_biom%RootCPZR   , &
+    PopPlantRootC_vr   =>  plt_biom%PopPlantRootC_vr   , &
     WTNDLE   =>  plt_biom%WTNDLE   , &
     ZEROP    =>  plt_biom%ZEROP    , &
     EPOOLN   =>  plt_biom%EPOOLN   , &
@@ -1398,7 +1398,7 @@ implicit none
       D5110: DO NN=1,MY(NZ)
         PrimRootLen(NN,LL-1,NR,NZ)=PrimRootLen(NN,LL-1,NR,NZ)+PrimRootLen(NN,LL,NR,NZ)
         PrimRootLen(NN,LL,NR,NZ)=0._r8
-        DO NE=1,npelms
+        DO NE=1,NumOfPlantChemElements
           WTRT1E(NE,NN,LL-1,NR,NZ)=WTRT1E(NE,NN,LL-1,NR,NZ)+WTRT1E(NE,NN,LL,NR,NZ)
 
           WTRT2E(NE,NN,LL-1,NR,NZ)=WTRT2E(NE,NN,LL-1,NR,NZ)+WTRT2E(NE,NN,LL,NR,NZ)
@@ -1414,12 +1414,12 @@ implicit none
           EPOOLR(NE,NN,LL-1,NZ)=EPOOLR(NE,NN,LL-1,NZ)+XFRE(NE)
         ENDDO
         XFRW=FRTN*WSRTL(NN,L,NZ)
-        XFRD=FRTN*RootCPZR(NN,LL,NZ)
+        XFRD=FRTN*PopPlantRootC_vr(NN,LL,NZ)
 
         WSRTL(NN,LL,NZ)=WSRTL(NN,LL,NZ)-XFRW
-        RootCPZR(NN,LL,NZ)=RootCPZR(NN,LL,NZ)-XFRD
+        PopPlantRootC_vr(NN,LL,NZ)=PopPlantRootC_vr(NN,LL,NZ)-XFRD
         WSRTL(NN,LL-1,NZ)=WSRTL(NN,LL-1,NZ)+XFRW
-        RootCPZR(NN,LL-1,NZ)=RootCPZR(NN,LL-1,NZ)+XFRD
+        PopPlantRootC_vr(NN,LL-1,NZ)=PopPlantRootC_vr(NN,LL-1,NZ)+XFRD
 !
 !     WITHDRAW GASES IN PRIMARY ROOTS
 !
@@ -1463,7 +1463,7 @@ implicit none
 !     CPOOLN,ZPOOLN,PPOOLN=nonstructural C,N,P in root bacteria
 !
       IF(INTYP(NZ).GE.1.AND.INTYP(NZ).LE.3)THEN
-        DO NE=1,npelms
+        DO NE=1,NumOfPlantChemElements
           XFRE(NE)=FRTN*WTNDLE(NE,LL,NZ)
           WTNDLE(NE,LL,NZ)=WTNDLE(NE,LL,NZ)-XFRE(NE)
           WTNDLE(NE,LL-1,NZ)=WTNDLE(NE,LL-1,NZ)+XFRE(NE)
@@ -1494,8 +1494,8 @@ implicit none
   real(r8) :: ZPOOLB
   real(r8) :: ZPOOLD,EPOOLD
   real(r8) :: XFRPX,XFRCX,XFRNX
-  real(r8) :: WTLSBZ(JC1)
-  real(r8) :: CPOOLZ(JC1),ZPOOLZ(JC1),PPOOLZ(JC1)
+  real(r8) :: WTLSBZ(NumOfCanopyLayers1)
+  real(r8) :: CPOOLZ(NumOfCanopyLayers1),ZPOOLZ(NumOfCanopyLayers1),PPOOLZ(NumOfCanopyLayers1)
   REAL(R8) :: FWTR(JZ1),FWTB(JP1)
   real(r8) :: CPOOLT
   real(r8) :: CNL,CPL,CPOOLD
@@ -1515,12 +1515,12 @@ implicit none
   real(r8) :: WTRSVD,WTRSND,WTRSPD
   real(r8) :: WTRTD2,WTLSBX,WTLSBB
   real(r8) :: WTRTLR
-  real(r8) :: XFRE(npelms)
+  real(r8) :: XFRE(NumOfPlantChemElements)
 !     begin_execution
   associate(                                &
     FWODBE     =>   plt_allom%FWODBE  , &
     FWODRE     =>   plt_allom%FWODRE  , &
-    CEPOLR     =>   plt_biom%CEPOLR   , &
+    RootNonstructElementConcpft_vr     =>   plt_biom%RootNonstructElementConcpft_vr   , &
     RTWT1E     =>   plt_biom%RTWT1E   , &
     WTRT1E     =>   plt_biom%WTRT1E   , &
     WTRT2E     =>   plt_biom%WTRT2E   , &
@@ -1528,11 +1528,11 @@ implicit none
     EPOOLR     =>   plt_biom%EPOOLR   , &
     CanPBLeafShethC    =>   plt_biom%CanPBLeafShethC   , &
     EPOOL      =>   plt_biom%EPOOL    , &
-    RootCPZR     =>   plt_biom%RootCPZR   , &
+    PopPlantRootC_vr     =>   plt_biom%PopPlantRootC_vr   , &
     CanPBStalkC     =>   plt_biom%CanPBStalkC   , &
     WTRSVBE    =>   plt_biom%WTRSVBE  , &
     WTRVE      =>   plt_biom%WTRVE    , &
-    CanPLeafShethC       =>   plt_biom%CanPLeafShethC     , &
+    CanopyLeafShethC_pft       =>   plt_biom%CanopyLeafShethC_pft     , &
     WTRTE      =>   plt_biom%WTRTE    , &
     ZEROL      =>   plt_biom%ZEROL    , &
     ZEROP      =>   plt_biom%ZEROP    , &
@@ -1542,7 +1542,7 @@ implicit none
     ISTYP      =>   plt_pheno%ISTYP   , &
     PTSHT      =>   plt_pheno%PTSHT   , &
     IDAY       =>   plt_pheno%IDAY    , &
-    ATRP       =>   plt_pheno%ATRP    , &
+    HourCounter4LeafOut_brch       =>   plt_pheno%HourCounter4LeafOut_brch    , &
     RCO2A      =>   plt_rbgc%RCO2A    , &
     TCO2T      =>   plt_bgcr%TCO2T    , &
     RECO       =>   plt_bgcr%RECO     , &
@@ -1557,7 +1557,7 @@ implicit none
     NI         =>   plt_morph%NI      , &
     MY         =>   plt_morph%MY      , &
     NRT        =>   plt_morph%NRT     , &
-    NBR        =>   plt_morph%NBR       &
+    NumOfBranches_pft        =>   plt_morph%NumOfBranches_pft       &
   )
 !
 !     TRANSFER NON-STRUCTURAL C,N,P AMONG BRANCH LEAVES
@@ -1565,19 +1565,19 @@ implicit none
 !     WHEN SEASONAL STORAGE C IS NOT BEING MOBILIZED
 !
 !     IDTHB=branch living flag: 0=alive,1=dead
-!     ATRP=hourly leafout counter
+!     HourCounter4LeafOut_brch=hourly leafout counter
 !     ATRPX=number of hours required to initiate remobilization of storage C for leafout
 !     CanPBLeafShethC=leaf+petiole mass
 !     CPOOL,ZPOOL,PPOOL=non-structural C,N,P mass in branch
 !
-  IF(NBR(NZ).GT.1)THEN
+  IF(NumOfBranches_pft(NZ).GT.1)THEN
     WTPLTT=0._r8
     CPOOLT=0._r8
     ZPOOLT=0._r8
     PPOOLT=0._r8
-    D300: DO NB=1,NBR(NZ)
+    D300: DO NB=1,NumOfBranches_pft(NZ)
       IF(IDTHB(NB,NZ).EQ.ibralive)THEN
-        IF(ATRP(NB,NZ).GT.ATRPX(ISTYP(NZ)))THEN
+        IF(HourCounter4LeafOut_brch(NB,NZ).GT.ATRPX(ISTYP(NZ)))THEN
           WTLSBZ(NB)=AZMAX1(CanPBLeafShethC(NB,NZ))
           CPOOLZ(NB)=AZMAX1(EPOOL(ielmc,NB,NZ))
           ZPOOLZ(NB)=AZMAX1(EPOOL(ielmn,NB,NZ))
@@ -1589,9 +1589,9 @@ implicit none
         ENDIF
       ENDIF
     ENDDO D300
-    D305: DO NB=1,NBR(NZ)
+    D305: DO NB=1,NumOfBranches_pft(NZ)
       IF(IDTHB(NB,NZ).EQ.ibralive)THEN
-        IF(ATRP(NB,NZ).GT.ATRPX(ISTYP(NZ)))THEN
+        IF(HourCounter4LeafOut_brch(NB,NZ).GT.ATRPX(ISTYP(NZ)))THEN
           IF(WTPLTT.GT.ZEROP(NZ).AND.CPOOLT.GT.ZEROP(NZ))THEN
             CPOOLD=CPOOLT*WTLSBZ(NB)-CPOOLZ(NB)*WTPLTT
             ZPOOLD=ZPOOLT*CPOOLZ(NB)-ZPOOLZ(NB)*CPOOLT
@@ -1599,7 +1599,7 @@ implicit none
             XFRE(ielmc)=0.01_r8*CPOOLD/WTPLTT
             XFRE(ielmn)=0.01_r8*ZPOOLD/CPOOLT
             XFRE(ielmp)=0.01_r8*PPOOLD/CPOOLT
-            DO NE=1,npelms
+            DO NE=1,NumOfPlantChemElements
               EPOOL(NE,NB,NZ)=EPOOL(NE,NB,NZ)+XFRE(NE)
             ENDDO
           ENDIF
@@ -1616,12 +1616,12 @@ implicit none
 !     WTRSVB,WTRSBN,WTRSBP=stalk reserve C,N,P mass
 !     IDAY(7,=start of grain filling and setting max seed size
 !
-  IF(NBR(NZ).GT.1)THEN
+  IF(NumOfBranches_pft(NZ).GT.1)THEN
     WTSTKT=0._r8
     WTRSVT=0._r8
     WTRSNT=0._r8
     WTRSPT=0._r8
-    D330: DO NB=1,NBR(NZ)
+    D330: DO NB=1,NumOfBranches_pft(NZ)
       IF(IDTHB(NB,NZ).EQ.ibralive)THEN
         IF(IDAY(7,NB,NZ).NE.0)THEN
           WTSTKT=WTSTKT+CanPBStalkC(NB,NZ)
@@ -1632,7 +1632,7 @@ implicit none
       ENDIF
     ENDDO D330
     IF(WTSTKT.GT.ZEROP(NZ).AND.WTRSVT.GT.ZEROP(NZ))THEN
-      D335: DO NB=1,NBR(NZ)
+      D335: DO NB=1,NumOfBranches_pft(NZ)
         IF(IDTHB(NB,NZ).EQ.ibralive)THEN
           IF(IDAY(7,NB,NZ).NE.0)THEN
             WTRSVD=WTRSVT*CanPBStalkC(NB,NZ)-WTRSVBE(ielmc,NB,NZ)*WTSTKT
@@ -1662,11 +1662,11 @@ implicit none
 !
   IF(MY(NZ).EQ.mycorarbu)THEN
     D425: DO L=NU,NIXBotRootLayer(NZ)
-      IF(EPOOLR(ielmc,ipltroot,L,NZ).GT.ZEROP(NZ).AND.RootCPZR(ipltroot,L,NZ).GT.ZEROL(NZ))THEN
+      IF(EPOOLR(ielmc,ipltroot,L,NZ).GT.ZEROP(NZ).AND.PopPlantRootC_vr(ipltroot,L,NZ).GT.ZEROL(NZ))THEN
 !root
-        WTRTD1=RootCPZR(ipltroot,L,NZ)
-        WTRTD2=AMIN1(RootCPZR(ipltroot,L,NZ),AMAX1(FSNK &
-          *RootCPZR(ipltroot,L,NZ),RootCPZR(imycorrhz,L,NZ)))
+        WTRTD1=PopPlantRootC_vr(ipltroot,L,NZ)
+        WTRTD2=AMIN1(PopPlantRootC_vr(ipltroot,L,NZ),AMAX1(FSNK &
+          *PopPlantRootC_vr(ipltroot,L,NZ),PopPlantRootC_vr(imycorrhz,L,NZ)))
         WTPLTT=WTRTD1+WTRTD2
         IF(WTPLTT.GT.ZEROP(NZ))THEN
           CPOOLD=(EPOOLR(ielmc,ipltroot,L,NZ)*WTRTD2-EPOOLR(ielmc,imycorrhz,L,NZ)*WTRTD1)/WTPLTT
@@ -1676,7 +1676,7 @@ implicit none
           CPOOLT=EPOOLR(ielmc,ipltroot,L,NZ)+EPOOLR(ielmc,imycorrhz,L,NZ)
 
           IF(CPOOLT.GT.ZEROP(NZ))THEN
-            DO NE=2,npelms
+            DO NE=2,NumOfPlantChemElements
               EPOOLD=(EPOOLR(NE,ipltroot,L,NZ)*EPOOLR(ielmc,imycorrhz,L,NZ) &
                 -EPOOLR(NE,imycorrhz,L,NZ)*EPOOLR(ielmc,ipltroot,L,NZ))/CPOOLT
               XFRE(NE)=FMYC*EPOOLD
@@ -1695,9 +1695,11 @@ implicit none
   IF(IFLGZ.EQ.1.AND.ISTYP(NZ).NE.iplt_annual)THEN
     D5545: DO N=1,MY(NZ)
       D5550: DO L=NU,NI(NZ)
-        IF(CEPOLR(ielmc,N,L,NZ).GT.ZERO)THEN
-          CNL=CEPOLR(ielmc,N,L,NZ)/(CEPOLR(ielmc,N,L,NZ)+CEPOLR(ielmn,N,L,NZ)/CNKI)
-          CPL=CEPOLR(ielmc,N,L,NZ)/(CEPOLR(ielmc,N,L,NZ)+CEPOLR(ielmp,N,L,NZ)/CPKI)
+        IF(RootNonstructElementConcpft_vr(ielmc,N,L,NZ).GT.ZERO)THEN
+          CNL=RootNonstructElementConcpft_vr(ielmc,N,L,NZ)/(RootNonstructElementConcpft_vr(ielmc,N,L,NZ) &
+            +RootNonstructElementConcpft_vr(ielmn,N,L,NZ)/CNKI)
+          CPL=RootNonstructElementConcpft_vr(ielmc,N,L,NZ)/(RootNonstructElementConcpft_vr(ielmc,N,L,NZ) &
+            +RootNonstructElementConcpft_vr(ielmp,N,L,NZ)/CPKI)
         ELSE
           CNL=0._r8
           CPL=0._r8
@@ -1708,7 +1710,7 @@ implicit none
         XFRE(ielmc)=AMIN1(XFRCX,XFRNX/CNMN,XFRPX/CPMN)
         XFRE(ielmn)=AMIN1(XFRNX,XFRE(ielmc)*CNMX,XFRPX*CNMX/CPMN*0.5_r8)
         XFRE(ielmp)=AMIN1(XFRPX,XFRE(ielmc)*CPMX,XFRNX*CPMX/CNMN*0.5_r8)
-        DO NE=1,npelms
+        DO NE=1,NumOfPlantChemElements
           EPOOLR(NE,N,L,NZ)=EPOOLR(NE,N,L,NZ)-XFRE(NE)
           WTRVE(NE,NZ)=WTRVE(NE,NZ)+XFRE(NE)
         ENDDO
@@ -1729,10 +1731,10 @@ implicit none
   D5445: DO N=1,MY(NZ)
     D5450: DO L=NU,NI(NZ)
       WTRTL(N,L,NZ)=0._r8
-      RootCPZR(N,L,NZ)=0._r8
+      PopPlantRootC_vr(N,L,NZ)=0._r8
       D5460: DO NR=1,NRT(NZ)
         WTRTL(N,L,NZ)=WTRTL(N,L,NZ)+WTRT2E(ielmc,N,L,NR,NZ)
-        RootCPZR(N,L,NZ)=RootCPZR(N,L,NZ)+WTRT2E(ielmc,N,L,NR,NZ)+WTRT1E(ielmc,N,L,NR,NZ)
+        PopPlantRootC_vr(N,L,NZ)=PopPlantRootC_vr(N,L,NZ)+WTRT2E(ielmc,N,L,NR,NZ)+WTRT1E(ielmc,N,L,NR,NZ)
       ENDDO D5460
       TCO2T(NZ)=TCO2T(NZ)+RCO2A(N,L,NZ)
       RECO=RECO+RCO2A(N,L,NZ)
@@ -1755,13 +1757,13 @@ implicit none
 !     RLNT,RTNT=root layer,root system sink strength
 !
 !     IF(ISTYP(NZ).EQ.iplt_preanu)THEN
-  IF(CanPLeafShethC(NZ).GT.ZEROP(NZ))THEN
-    FWTC=AMIN1(1.0_r8,0.667_r8*WTRTE(ielmc,NZ)/CanPLeafShethC(NZ))
+  IF(CanopyLeafShethC_pft(NZ).GT.ZEROP(NZ))THEN
+    FWTC=AMIN1(1.0_r8,0.667_r8*WTRTE(ielmc,NZ)/CanopyLeafShethC_pft(NZ))
   ELSE
     FWTC=1.0_r8
   ENDIF
   IF(WTRTE(ielmc,NZ).GT.ZEROP(NZ))THEN
-    FWTS=AMIN1(1.0_r8,CanPLeafShethC(NZ)/(0.667_r8*WTRTE(ielmc,NZ)))
+    FWTS=AMIN1(1.0_r8,CanopyLeafShethC_pft(NZ)/(0.667_r8*WTRTE(ielmc,NZ)))
   ELSE
     FWTS=1.0_r8
   ENDIF
@@ -1781,9 +1783,9 @@ implicit none
 !
 !     WTLS,WTLSB=total,branch PFT leaf+petiole C mass
 !
-  CanPLeafShethC(NZ)=0._r8
-  D309: DO NB=1,NBR(NZ)
-    CanPLeafShethC(NZ)=CanPLeafShethC(NZ)+CanPBLeafShethC(NB,NZ)
+  CanopyLeafShethC_pft(NZ)=0._r8
+  D309: DO NB=1,NumOfBranches_pft(NZ)
+    CanopyLeafShethC_pft(NZ)=CanopyLeafShethC_pft(NZ)+CanPBLeafShethC(NB,NZ)
   ENDDO D309
 !
 !     SINK STRENGTH OF BRANCHES IN EACH CANOPY AS A FRACTION
@@ -1802,10 +1804,10 @@ implicit none
 !     CPOOL,ZPOOL,PPOOL=non-structural C,N,P mass in branch
 !     CPOOLR,ZPOOLR,PPOOLR=non-structural C,N,P mass in root
 !
-  D310: DO NB=1,NBR(NZ)
+  D310: DO NB=1,NumOfBranches_pft(NZ)
     IF(IDTHB(NB,NZ).EQ.ibralive)THEN
-      IF(CanPLeafShethC(NZ).GT.ZEROP(NZ))THEN
-        FWTB(NB)=AZMAX1(CanPBLeafShethC(NB,NZ)/CanPLeafShethC(NZ))
+      IF(CanopyLeafShethC_pft(NZ).GT.ZEROP(NZ))THEN
+        FWTB(NB)=AZMAX1(CanPBLeafShethC(NB,NZ)/CanopyLeafShethC_pft(NZ))
       ELSE
         FWTB(NB)=1.0_r8
       ENDIF
@@ -1839,7 +1841,7 @@ implicit none
             XFRE(ielmn)=0._r8
             XFRE(ielmp)=0._r8
           ENDIF
-          DO NE=1,npelms
+          DO NE=1,NumOfPlantChemElements
             EPOOL(NE,NB,NZ)=EPOOL(NE,NB,NZ)-XFRE(NE)
             EPOOLR(NE,ipltroot,L,NZ)=EPOOLR(NE,ipltroot,L,NZ)+XFRE(NE)
           ENDDO
@@ -1972,7 +1974,7 @@ implicit none
 !     RUPH2P,RUPH2B,RUPH1P,RUPH1B=uptake from non-band,band of H2PO4,HPO4
 !
         D195: DO K=1,jcplx
-          DO NE=1,npelms
+          DO NE=1,NumOfPlantChemElements
             EPOOLR(NE,N,L,NZ)=EPOOLR(NE,N,L,NZ)+RDFOME(NE,N,K,L,NZ)
           ENDDO
         ENDDO D195

@@ -404,7 +404,7 @@ module readiMod
 
     call ncd_getvar(grid_nfid, 'PSIFC', ntp,PSIAtFldCapacity(NV1,NH1))
     call ncd_getvar(grid_nfid, 'PSIWP', ntp,PSIAtWiltPoint(NV1,NH1))
-    call ncd_getvar(grid_nfid, 'ALBS',  ntp,ALBS(NV1,NH1))
+    call ncd_getvar(grid_nfid, 'ALBS',  ntp,SoilAlbedo(NV1,NH1))
     call ncd_getvar(grid_nfid, 'PH0',   ntp,PH(0,NV1,NH1))
     call ncd_getvar(grid_nfid, 'RSCf',  ntp,RSC(k_fine_litr,0,NV1,NH1))
     call ncd_getvar(grid_nfid, 'RSNf',  ntp,RSN(k_fine_litr,0,NV1,NH1))
@@ -504,7 +504,7 @@ module readiMod
 !     SURFACE PROPERTIES
 !
 !     PSIAtFldCapacity,PSIAtWiltPoint=water potentials at field capacity,wilting point (MPa)
-!     ALBS=wet soil albedo
+!     SoilAlbedo=wet soil albedo
 !     PH=litter pH
 !     RSC,RSC,RSP=C,N,P in fine(1,0),woody(0,0),manure(2,0) surface litter (g m-2)
 !     IXTYP=surface litter type:1=plant,2=manure
@@ -514,7 +514,7 @@ module readiMod
 !
           PSIAtFldCapacity(NY,NX)=PSIAtFldCapacity(NV1,NH1)
           PSIAtWiltPoint(NY,NX)=PSIAtWiltPoint(NV1,NH1)
-          ALBS(NY,NX) =ALBS(NV1,NH1)
+          SoilAlbedo(NY,NX) =SoilAlbedo(NV1,NH1)
           PH(0,NY,NX) =PH(0,NV1,NH1)
           RSC(k_fine_litr,0,NY,NX) =RSC(k_fine_litr,0,NV1,NH1)
           RSN(k_fine_litr,0,NY,NX) =RSN(k_fine_litr,0,NV1,NH1)
@@ -805,7 +805,7 @@ module readiMod
   write(*,*)'NY,NX=',NY,NX
   write(*,*)'Water potential at field capacity (MPa)',PSIAtFldCapacity(NY,NX)
   write(*,*)'Water potential at wilting point (MPa)',PSIAtWiltPoint(NY,NX)
-  write(*,*)'Wet soil albedo',ALBS(NY,NX)
+  write(*,*)'Wet soil albedo',SoilAlbedo(NY,NX)
 
   write(*,*)'Litter pH',PH(0,NY,NX)
   write(*,*)'C in surface fine litter (g m-2)',RSC(k_fine_litr,0,NY,NX)

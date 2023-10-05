@@ -87,15 +87,15 @@ module WatsubMod
   integer :: K0,K1
   integer :: KL,L,L2,LL,M,MM,M1,M2,M3,M4,M5,M6,NX,NY
   integer :: N,N1,N2,N3,N4,N5,N6,NN,N4B,N5B,NUX
-  real(r8):: RAR1(JY,JX),HeatFlux2Ground(JY,JX)
-  REAL(R8):: FKSATS(JY,JX)
+  real(r8):: ResistanceLitRLay(JY,JX),HeatFlux2Ground(JY,JX)
+  REAL(R8):: KSatReductByRainKineticEnergyS(JY,JX)
 
   REAL(R8) :: TopLayWatVol(JY,JX)
 ! begin_execution
 !
   curday=i;curhour=j
 
-  call PrepWaterEnergyBalance(I,J,NHW,NHE,NVN,NVS,RAR1)
+  call PrepWaterEnergyBalance(I,J,NHW,NHE,NVN,NVS,ResistanceLitRLay)
 
   call InitSoilHydrauics(NHW,NHE,NVN,NVS)
 
@@ -107,15 +107,16 @@ module WatsubMod
 
     call FWDCopyTopLayerWatVolMit(NHW,NHE,NVN,NVS,TopLayWatVol)
 
-    ! run surface energy balance model, uses RAR1
-    call SurfacePhysModel(M,NHE,NHW,NVS,NVN,RAR1,FKSATS,HeatFlux2Ground,TopLayWatVol)
+    ! run surface energy balance model, uses ResistanceLitRLay
+    call RunSurfacePhysModel(M,NHE,NHW,NVS,NVN,ResistanceLitRLay,KSatReductByRainKineticEnergyS,&
+      HeatFlux2Ground,TopLayWatVol)
 
     call CopySoilWatVolMit(NHW,NHE,NVN,NVS,TopLayWatVol)
         
     ! do 3D water flow
-    call Subsurface3DFlowMit(M,NHW,NHE,NVN,NVS,FKSATS,HeatFlux2Ground)
+    call Subsurface3DFlowMit(M,NHW,NHE,NVN,NVS,KSatReductByRainKineticEnergyS,HeatFlux2Ground)
 
-    call LateralWatHeatExchMit(M,NHW,NHE,NVN,NVS,FKSATS)
+    call LateralWatHeatExchMit(M,NHW,NHE,NVN,NVS,KSatReductByRainKineticEnergyS)
 !
     IF(M.NE.NPH)THEN
 !     intermediate iteration
@@ -172,19 +173,19 @@ module WatsubMod
   integer, intent(in) :: I,NHW,NHE,NVN,NVS
   integer :: NY,NX
 
-  integer :: L,LWDPTH
+  integer :: L,LyrIrrig
   real(r8) :: VLTSoiPore
 
   DX995: DO NX=NHW,NHE
     DX990: DO NY=NVN,NVS
 
     ! CDPTH=depth to bottom of soil layer
-    ! WDPTH,LWDPTH=depth,layer of subsurface irrigation
+    ! WDPTH,LyrIrrig=depth,layer of subsurface irrigation
 
       !identify the layer where irrigation is applied
       D65: DO L=NUM(NY,NX),NL(NY,NX)
         IF(CumDepth2LayerBottom(L,NY,NX).GE.WDPTH(I,NY,NX))THEN
-          LWDPTH=L
+          LyrIrrig=L
           exit
         ENDIF
       ENDDO D65
@@ -285,8 +286,8 @@ module WatsubMod
           write(*,*)'TKS(L,NY,NX)',L,TKS(L,NY,NX)
           call endrun(trim(mod_filename)//' at line',__LINE__)
         endif
-        !LWDPTH=layer number where irrigation is applied
-        IF(L.EQ.LWDPTH)THEN
+        !LyrIrrig=layer number where irrigation is applied
+        IF(L.EQ.LyrIrrig)THEN
           FWatIrrigate2MicP(L,NY,NX)=IrrigSubsurf(NY,NX)
           HeatIrrigation(L,NY,NX)=cpw*TairK(NY,NX)*IrrigSubsurf(NY,NX)
           FWatIrrigate2MicP1(L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*dts_HeatWatTP
@@ -316,11 +317,11 @@ module WatsubMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine PrepWaterEnergyBalance(I,J,NHW,NHE,NVN,NVS,RAR1)
+  subroutine PrepWaterEnergyBalance(I,J,NHW,NHE,NVN,NVS,ResistanceLitRLay)
   implicit none
   integer :: I,J
   integer, intent(in) :: NHW,NHE,NVN,NVS
-  real(r8),dimension(:,:),intent(out):: RAR1
+  real(r8),dimension(:,:),intent(out):: ResistanceLitRLay
   integer :: NY,NX
 
 ! begin_execution
@@ -332,7 +333,7 @@ module WatsubMod
     ENDDO D9990
   ENDDO D9995
 
-  call StageSurfStateVars(I,J,NHW,NHE,NVN,NVS,RAR1)
+  call StageSurfacePhysModel(I,J,NHW,NHE,NVN,NVS,ResistanceLitRLay)
 
   call LocalCopySoilVars(I,NHW,NHE,NVN,NVS)
 
@@ -412,10 +413,10 @@ module WatsubMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine Subsurface3DFlowMit(M,NHW,NHE,NVN,NVS,FKSAT,HeatFlux2Ground)
+  subroutine Subsurface3DFlowMit(M,NHW,NHE,NVN,NVS,KSatReductByRainKineticEnergy,HeatFlux2Ground)
   implicit none
   integer, intent(in)  :: M,NHW,NHE,NVN,NVS
-  real(r8), dimension(:,:),intent(in) :: FKSAT(:,:)
+  real(r8), dimension(:,:),intent(in) :: KSatReductByRainKineticEnergy(:,:)
   real(r8), dimension(:,:),intent(in) :: HeatFlux2Ground(:,:)
   integer :: N,N1,N2,N3,N4,N5,N6,L,LL,K1,KL,NY,NX
   real(r8) :: WTHET1,FCDX,FCLX,FCX
@@ -526,7 +527,7 @@ module WatsubMod
               !     IN WATER FLUX CALCULATIONS
               !
               !     HydCondSrc,CNDL=hydraulic conductivities in source,destination cells
-              !     FKSAT=reduction in soil surface Ksat from rainfall energy impact
+              !     KSatReductByRainKineticEnergy=reduction in soil surface Ksat from rainfall energy impact
               !     PSISM1=soil matric potential
               !     VLWatMicPX1=VLWatMicP1 accounting for wetting front
               !
@@ -534,7 +535,7 @@ module WatsubMod
               !     (CURRENT WATER POTENTIAL > AIR ENTRY WATER POTENTIAL)
               !
               call MicporeDarcyFlow(NY,NX,N,N1,N2,N3,N4,N5,N6,THETA1,THETAL,&
-                FKSAT(NY,NX),HeatByWatFlowMicP,PSISV1,PSISVL)          
+                KSatReductByRainKineticEnergy(NY,NX),HeatByWatFlowMicP,PSISV1,PSISVL)          
 
           !
           !     MACROPORE FLOW FROM POISEUILLE FLOW IF MACROPORES PRESENT
@@ -610,13 +611,13 @@ module WatsubMod
   end subroutine Subsurface3DFlowMit
 !------------------------------------------------------------------------------------------
 
-  subroutine LateralWatHeatExchMit(M,NHW,NHE,NVN,NVS,FKSATS)
+  subroutine LateralWatHeatExchMit(M,NHW,NHE,NVN,NVS,KSatReductByRainKineticEnergyS)
   !
   !Description
   ! boundary flow involes exchange with external water table, and through tile drainage
   implicit none
   integer, intent(in) :: M,NHW,NHE,NVN,NVS
-  real(r8),intent(in) :: FKSATS(JY,JX)
+  real(r8),intent(in) :: KSatReductByRainKineticEnergyS(JY,JX)
   integer :: NY,NX
   integer :: L,LL
   integer :: N,NN,N1,N2,N3,N4,N5,N4B,N5B,N6
@@ -651,7 +652,7 @@ module WatsubMod
 !
 !     N3,N2,N1=L,NY,NX of source grid cell
 !     M6,M5,M4=L,NY,NX of destination grid cell
-!
+!       
         N1=NX;N2=NY;N3=L
 !
 !     LOCATE EXTERNAL BOUNDARIES
@@ -768,40 +769,41 @@ module WatsubMod
 !
 !     CDPTH,CumSoilDeptht0=current,initial surface elevation
 !     BKDS=bulk density
-!     IRCHG,RCHQ*=runoff boundary flags
+!     XGridRunoffFlag,RCHQ*=runoff boundary flags
 
 !           top soil layer and surface soil layer is active
             IF(L.EQ.NUM(N2,N1).AND.N.NE.ivertdir.AND. &
               (CumDepth2LayerBottom(NU(N2,N1)-1,N2,N1).LE.CumSoilDeptht0(N2,N1) &
               .OR.SoiBulkDensity(NUI(N2,N1),N2,N1).GT.ZERO))THEN
 !not in vertical direction
-              IF(IRCHG(NN,N,N2,N1).EQ.0.OR.isclose(RechargSurf,0._r8).OR.ABS(QRM(M,N2,N1)).LT.ZEROS(N2,N1))THEN
+              IF(.not.XGridRunoffFlag(NN,N,N2,N1).OR.isclose(RechargSurf,0._r8).OR. &
+                ABS(WatFlux4ErosionM(M,N2,N1)).LT.ZEROS(N2,N1))THEN
                 !no runoff
-                QR1(N,NN,M5,M4)=0.0_r8
-                HQR1(N,NN,M5,M4)=0.0_r8
+                WatFlx2LitRByRunoff(N,NN,M5,M4)=0.0_r8
+                HeatFlx2LitRByRunoff(N,NN,M5,M4)=0.0_r8
               ELSE
 
                 call SurfaceRunoff(M,N,NN,N1,N2,M4,M5,RechargSurf,XN)
 !
         !     BOUNDARY SNOW FLUX
         !
-        !     QS1,QW1,QI1=snow,water,ice transfer
-        !     HQS1=convective heat transfer from snow,water,ice transfer
+        !     DrySnoFlxBySnowRedistribut,WatFlxBySnowRedistribut,IceFlxBySnowRedistribut=snow,water,ice transfer
+        !     HeatFlxBySnowRedistribut=convective heat transfer from snow,water,ice transfer
         !     QS,QW,QI=cumulative hourly snow,water,ice transfer
         !     HQS=cumulative hourly convective heat transfer from snow,water,ice transfer
 !
                 IF(NN.EQ.1)THEN
-                  QS1(N,M5,M4)=0.0_r8
-                  QW1(N,M5,M4)=0.0_r8
-                  QI1(N,M5,M4)=0.0_r8
-                  HQS1(N,M5,M4)=0.0_r8
-                  QSM(M,N,M5,M4)=QS1(N,M5,M4)
+                  DrySnoFlxBySnowRedistribut(N,M5,M4)=0.0_r8
+                  WatFlxBySnowRedistribut(N,M5,M4)=0.0_r8
+                  IceFlxBySnowRedistribut(N,M5,M4)=0.0_r8
+                  HeatFlxBySnowRedistribut(N,M5,M4)=0.0_r8
+                  DrySnoFlxBySnowRedistributM(M,N,M5,M4)=DrySnoFlxBySnowRedistribut(N,M5,M4)
                 ENDIF
               ENDIF
             ELSE
               IF(N.NE.ivertdir)THEN
-                QR1(N,NN,M5,M4)=0.0_r8
-                HQR1(N,NN,M5,M4)=0.0_r8
+                WatFlx2LitRByRunoff(N,NN,M5,M4)=0.0_r8
+                HeatFlx2LitRByRunoff(N,NN,M5,M4)=0.0_r8
               ENDIF
             ENDIF
 !
@@ -818,7 +820,7 @@ module WatsubMod
               ! THETA1,THETAX=water content ahead,behind wetting front
               ! K1,KL=pore water class ahead,behind wetting front
               ! HydcondSrc,CNDL=hydraulic conductivity ahead,behind wetting front
-              ! FKSAT=reduction in soil surface Ksat from rainfall energy impact
+              ! KSatReductByRainKineticEnergy=reduction in soil surface Ksat from rainfall energy impact
               ! FLWL,WatXChange2WatTableX=lower boundary micropore water flux
               ! ConvectWaterFlowMacP=lower boundary macropore water flux
               ! HFLWL=convective heat from lower boundary water flux
@@ -833,7 +835,7 @@ module WatsubMod
                   K1=MAX(1,MIN(100,INT(100.0_r8*(POROS(N3,N2,N1)-THETA1)/POROS(N3,N2,N1))+1))
                   KL=MAX(1,MIN(100,INT(100.0_r8*(POROS(N3,N2,N1)-THETAX)/POROS(N3,N2,N1))+1))
                   IF(N3.EQ.NUM(NY,NX))THEN
-                   HydcondSrc=HydroCond3D(N,K1,N3,N2,N1)*FKSATS(NY,NX)
+                   HydcondSrc=HydroCond3D(N,K1,N3,N2,N1)*KSatReductByRainKineticEnergyS(NY,NX)
                   ELSE
                    HydcondSrc=HydroCond3D(N,K1,N3,N2,N1)
                   ENDIF
@@ -901,13 +903,13 @@ module WatsubMod
     !
     !     TQR1,THQR1=net runoff,convective heat from runoff
     !     TQS1,TQW1,TQI1,THQS1=net snow,water,ice, heat from snowpack runoff
-    !     QR1,HQR1=runoff, convective heat from runoff
-    !     QS1,QW1,QI1=snow,water,ice transfer
-    !     HQS1=convective heat transfer from snow,water,ice transfer
+    !     WatFlx2LitRByRunoff,HeatFlx2LitRByRunoff=runoff, convective heat from runoff
+    !     DrySnoFlxBySnowRedistribut,WatFlxBySnowRedistribut,IceFlxBySnowRedistribut=snow,water,ice transfer
+    !     HeatFlxBySnowRedistribut=convective heat transfer from snow,water,ice transfer
 !
           IF(L.EQ.NUM(N2,N1).AND.N.NE.ivertdir)THEN
-          !top layer snow redistribution
-            call SumSnowRoffDrift(M,N,N1,N2,N4,N5,N4B,N5B)
+            !top layer snow redistribution
+            call SumSnowDriftByRunoff(M,N,N1,N2,N4,N5,N4B,N5B)
           ENDIF
 !
         !     NET WATER AND HEAT FLUXES THROUGH SOIL AND SNOWPACK
@@ -1413,12 +1415,12 @@ module WatsubMod
 
 
 !------------------------------------------------------------------------------------------
-  subroutine MicporeDarcyFlow(NY,NX,N,N1,N2,N3,N4,N5,N6,THETA1,THETAL,FKSAT,HeatByWatFlowMicP,PSISV1,PSISVL)          
+  subroutine MicporeDarcyFlow(NY,NX,N,N1,N2,N3,N4,N5,N6,THETA1,THETAL,KSatReductByRainKineticEnergy,HeatByWatFlowMicP,PSISV1,PSISVL)          
   implicit none
   integer, intent(in)  :: NY,NX,N
   integer, intent(in)  :: N1,N2,N3  !source grid
   integer, intent(in)  :: N4,N5,N6  !destination grid
-  real(r8), intent(in) :: THETA1,THETAL,FKSAT
+  real(r8), intent(in) :: THETA1,THETAL,KSatReductByRainKineticEnergy
   real(r8), intent(out):: HeatByWatFlowMicP,PSISV1,PSISVL
   real(r8) :: AVE_CONDUCTANCE,HydCondSrc,HydCondDest
   real(r8) :: FLQ2,PSISTL,PSIST1,THETW1
@@ -1516,7 +1518,7 @@ module WatsubMod
   !
   IF(N3.EQ.NUM(NY,NX))THEN
     !surface soil
-    HydCondSrc=HydroCond3D(N,K1,N3,N2,N1)*FKSAT
+    HydCondSrc=HydroCond3D(N,K1,N3,N2,N1)*KSatReductByRainKineticEnergy
   ELSE
     HydCondSrc=HydroCond3D(N,K1,N3,N2,N1)
   ENDIF
@@ -1536,7 +1538,7 @@ module WatsubMod
   !     AND LOOKUP ARRAY GENERATED IN 'HOUR1'
   !
   !     HydCondSrc,HydCondDest=hydraulic conductivities in source,destination cells
-  !     FKSAT=reduction in soil surface Ksat from rainfall energy impact
+  !     KSatReductByRainKineticEnergy=reduction in soil surface Ksat from rainfall energy impact
   !     AVE_CONDUCTANCE=source-destination hydraulic conductance
   !     DLYR=layer thickness
   !
@@ -1771,7 +1773,7 @@ module WatsubMod
   !
 
   IF(VLHeatCapacity(N3,N2,N1).GT.VHCPNX(NY,NX))THEN
-    IF(N3.EQ.NUM(NY,NX).AND.VLHeatCapSnow(1,N2,N1).LE.VLHeatCapSnowMN(N2,N1))THEN
+    IF(N3.EQ.NUM(NY,NX).AND.VLHeatCapSnow(1,N2,N1).LE.VLHeatCapSnowMin(N2,N1))THEN
       !surface layer, not significant snowpack
       TK1X=TKSoi1(N3,N2,N1)-(ConvectHeatFluxMicP-HeatFlux2Ground)/VLHeatCapacity(N3,N2,N1)
       if(abs(TK1X)>1.e5_r8)then

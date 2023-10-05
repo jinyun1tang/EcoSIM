@@ -49,7 +49,7 @@
     TKCZ     =>  plt_ew%TKCZ      , &
     CO2E     =>  plt_site%CO2E    , &
     CO2Q     =>  plt_photo%CO2Q   , &
-    CanPLA    =>  plt_morph%CanPLA  , &
+    CanopyLeafA_pft    =>  plt_morph%CanopyLeafA_pft  , &
     ZEROP    =>  plt_biom%ZEROP   , &
     CNETX    =>  plt_bgcr%CNETX   , &
     SSIN     =>  plt_rad%SSIN     , &
@@ -92,11 +92,11 @@
 !     CO2I=intercellular CO2 concentration
 !     CanPCi2CaRatio=intercellular:atmospheric CO2 concn ratio from PFT file, parameter
 !     SSIN=sine of solar angle
-!     CanPLA=PFT leaf area
+!     CanopyLeafA_pft=PFT leaf area
 !
   CO2I(NZ)=CanPCi2CaRatio(NZ)*CO2Q(NZ)
 
-  IF(SSIN.GT.0.0.AND.CanPLA(NZ).GT.ZEROP(NZ))THEN
+  IF(SSIN.GT.0.0.AND.CanopyLeafA_pft(NZ).GT.ZEROP(NZ))THEN
 !
     call PhotoActivePFT(NZ)
   ELSE
@@ -120,7 +120,7 @@
     PARDIF => plt_rad%PARDIF  , &
     PAR    => plt_rad%PAR     , &
     VGRO   => plt_photo%VGRO  , &
-    SURFX  => plt_photo%SURFX , &
+    LeafAUnshaded_seclyrnodbrpft  => plt_photo%LeafAUnshaded_seclyrnodbrpft , &
     FDBK   => plt_photo%FDBK  , &
     CBXN   => plt_photo%CBXN  , &
     ETGRO  => plt_photo%ETGRO , &
@@ -148,11 +148,11 @@
 !     EGRO=light-limited rubisco carboxylation rate
 !     CH2O=total rubisco carboxylation rate
 !     FDBK=N,P feedback inhibition on C3 CO2 fixation
-!     SURFX=unself-shaded leaf surface area
+!     LeafAUnshaded_seclyrnodbrpft=unself-shaded leaf surface area
 !     TAU0=fraction of diffuse radiation transmitted from layer above
 !
   VL=AMIN1(VGRO(K,NB,NZ),EGRO)*FDBK(NB,NZ)
-  CH2O=CH2O+VL*SURFX(N,L,K,NB,NZ)*TAU0(L+1)
+  CH2O=CH2O+VL*LeafAUnshaded_seclyrnodbrpft(N,L,K,NB,NZ)*TAU0(L+1)
   end associate
   end subroutine C3ShadedLeaves
 !------------------------------------------------------------------------------------------
@@ -169,7 +169,7 @@
     VGRO    => plt_photo%VGRO     , &
     CBXN    => plt_photo%CBXN     , &
     ETGRO   => plt_photo%ETGRO    , &
-    SURFX   => plt_photo%SURFX    , &
+    LeafAUnshaded_seclyrnodbrpft   => plt_photo%LeafAUnshaded_seclyrnodbrpft    , &
     FDBK    => plt_photo%FDBK     , &
     TAUS    =>  plt_rad%TAUS        &
   )
@@ -195,11 +195,11 @@
 !     EGRO=light-limited rubisco carboxylation rate
 !     FDBK=N,P feedback inhibition on C3 CO2 fixation
 !     CH2O=total rubisco carboxylation rate
-!     SURFX=unself-shaded leaf surface area
+!     LeafAUnshaded_seclyrnodbrpft=unself-shaded leaf surface area
 !     TAUS=fraction of direct radiation transmitted from layer above
 !
   VL=AMIN1(VGRO(K,NB,NZ),EGRO)*FDBK(NB,NZ)
-  CH2O=CH2O+VL*SURFX(N,L,K,NB,NZ)*TAUS(L+1)
+  CH2O=CH2O+VL*LeafAUnshaded_seclyrnodbrpft(N,L,K,NB,NZ)*TAUS(L+1)
   end associate
   end subroutine C3SunlitLeaves
 !------------------------------------------------------------------------------------------
@@ -212,7 +212,7 @@
 !     begin_execution
   associate(                           &
     ZEROP  => plt_biom%ZEROP     , &
-    SURFX  => plt_photo%SURFX    , &
+    LeafAUnshaded_seclyrnodbrpft  => plt_photo%LeafAUnshaded_seclyrnodbrpft    , &
     PAR    => plt_rad%PAR        , &
     PARDIF => plt_rad%PARDIF       &
   )
@@ -220,7 +220,7 @@
 !
   DO N=1,JLI1
     DO M=1,JSA1
-      IF(SURFX(N,L,K,NB,NZ).GT.ZEROP(NZ))THEN
+      IF(LeafAUnshaded_seclyrnodbrpft(N,L,K,NB,NZ).GT.ZEROP(NZ))THEN
 !
 !     SUNLIT LEAVES
 !
@@ -318,9 +318,9 @@
 !     FOR EACH CANOPY LAYER
 !
 !     CanPLNBLA=leaf area
-!     SURFX=unself-shaded leaf surface area
+!     LeafAUnshaded_seclyrnodbrpft=unself-shaded leaf surface area
 !
-  DO L=JC1,1,-1
+  DO L=NumOfCanopyLayers1,1,-1
     IF(CanPLNBLA(L,K,NB,NZ).GT.ZEROP(NZ))THEN
       call C3PhotosynsCanopyLayerL(L,K,NB,NZ,CH2O)
     ENDIF
@@ -427,9 +427,9 @@
 !     FOR EACH CANOPY LAYER
 !
 !     CanPLNBLA=leaf area
-!     SURFX=unself-shaded leaf surface area
+!     LeafAUnshaded_seclyrnodbrpft=unself-shaded leaf surface area
 !
-  DO L=JC1,1,-1
+  DO L=NumOfCanopyLayers1,1,-1
     IF(CanPLNBLA(L,K,NB,NZ).GT.ZEROP(NZ))THEN
       call C4PhotosynsCanopyLayerL(L,K,NB,NZ,CH2O)
     ENDIF
@@ -490,7 +490,7 @@
   integer :: M,N
 !     begin_execution
   associate(                        &
-    SURFX  => plt_photo%SURFX , &
+    LeafAUnshaded_seclyrnodbrpft  => plt_photo%LeafAUnshaded_seclyrnodbrpft , &
     ZEROP  =>  plt_biom%ZEROP , &
     PAR    => plt_rad%PAR     , &
     PARDIF => plt_rad%PARDIF    &
@@ -500,7 +500,7 @@
 !
   DO  N=1,JLI1
     DO  M=1,JSA1
-      IF(SURFX(N,L,K,NB,NZ).GT.ZEROP(NZ))THEN
+      IF(LeafAUnshaded_seclyrnodbrpft(N,L,K,NB,NZ).GT.ZEROP(NZ))THEN
 !
 !     SUNLIT LEAVES
         IF(PAR(N,M,L,NZ).GT.0.0_r8)THEN
@@ -527,7 +527,7 @@
   real(r8) :: VL
 !     begin_execution
   associate(                          &
-    SURFX  => plt_photo%SURFX   , &
+    LeafAUnshaded_seclyrnodbrpft  => plt_photo%LeafAUnshaded_seclyrnodbrpft   , &
     FDBK4  => plt_photo%FDBK4   , &
     CBXN4  => plt_photo%CBXN4   , &
     VGRO4  => plt_photo%VGRO4   , &
@@ -558,11 +558,11 @@
 !     EGRO4=light-limited PEP carboxylation rate
 !     CH2O=total PEP carboxylation rate
 !     FDBK4=N,P feedback inhibition on C4 CO2 fixation
-!     SURFX=unself-shaded leaf surface area
+!     LeafAUnshaded_seclyrnodbrpft=unself-shaded leaf surface area
 !     TAU0=fraction of diffuse radiation transmitted from layer above
 !
   VL=AMIN1(VGRO4(K,NB,NZ),EGRO4)*FDBK4(K,NB,NZ)
-  CH2O=CH2O+VL*SURFX(N,L,K,NB,NZ)*TAU0(L+1)
+  CH2O=CH2O+VL*LeafAUnshaded_seclyrnodbrpft(N,L,K,NB,NZ)*TAU0(L+1)
   end associate
   end subroutine C4ShadedLeaves
 !------------------------------------------------------------------------------------------
@@ -575,7 +575,7 @@
   real(r8) :: VL
 !     begin_execution
   associate(                       &
-  SURFX  =>  plt_photo%SURFX , &
+  LeafAUnshaded_seclyrnodbrpft  =>  plt_photo%LeafAUnshaded_seclyrnodbrpft , &
   CBXN4  =>  plt_photo%CBXN4 , &
   ETGR4  =>  plt_photo%ETGR4 , &
   FDBK4  =>  plt_photo%FDBK4 , &
@@ -605,11 +605,11 @@
 !     EGRO4=light-limited PEP carboxylation rate
 !     FDBK4=N,P feedback inhibition on C4 CO2 fixation
 !     CH2O=total PEP carboxylation rate
-!     SURFX=unself-shaded leaf surface area
+!     LeafAUnshaded_seclyrnodbrpft=unself-shaded leaf surface area
 !     TAUS=fraction of direct radiation transmitted from layer above
 !
   VL=AMIN1(VGRO4(K,NB,NZ),EGRO4)*FDBK4(K,NB,NZ)
-  CH2O=CH2O+VL*SURFX(N,L,K,NB,NZ)*TAUS(L+1)
+  CH2O=CH2O+VL*LeafAUnshaded_seclyrnodbrpft(N,L,K,NB,NZ)*TAUS(L+1)
   end associate
   end subroutine C4SunlitLeaves
 !------------------------------------------------------------------------------------------
@@ -671,7 +671,7 @@
     IWTYP  =>  plt_pheno%IWTYP  , &
     IBTYP  =>  plt_pheno%IBTYP  , &
     FLG4   =>  plt_pheno%FLG4   , &
-    ATRP   =>  plt_pheno%ATRP   , &
+    HourCounter4LeafOut_brch   =>  plt_pheno%HourCounter4LeafOut_brch   , &
     ISTYP  =>  plt_pheno%ISTYP  , &
     IDTHB  =>  plt_pheno%IDTHB  , &
     ZERO   =>  plt_site%ZERO    , &
@@ -705,7 +705,7 @@
 ! deciduous
   IF(IWTYP(NZ).NE.0.AND.IBTYP(NZ).GE.2)THEN
     FDBK(NB,NZ)=FDBK(NB,NZ)*AZMAX1(AMIN1(1.0_r8 &
-      ,ATRP(NB,NZ)/(0.9_r8*ATRPZ)))
+      ,HourCounter4LeafOut_brch(NB,NZ)/(0.9_r8*ATRPZ)))
   ENDIF
 !
 !     TERMINATION OF ANNUALS
@@ -839,14 +839,14 @@
     DCO2   =>  plt_photo%DCO2   , &
     MaxCanPStomaResistH2O   =>  plt_photo%MaxCanPStomaResistH2O   , &
     FracPARByCanP  =>  plt_rad%FracPARByCanP    , &
-    NBR    =>  plt_morph%NBR      &
+    NumOfBranches_pft    =>  plt_morph%NumOfBranches_pft      &
   )
 
   call PrepPhotosynthesis(NZ,CH2O,TFN1,TFN2,TFNE,XKO2L)
 !
 !     FOR EACH BRANCH
 !
-  DO NB=1,NBR(NZ)
+  DO NB=1,NumOfBranches_pft(NZ)
 !
 !     FEEDBACK ON CO2 FIXATION
 !

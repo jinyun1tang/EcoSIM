@@ -328,7 +328,7 @@ contains
 !     RFL*=convective flux between surface litter and soil surface
 !     DFV*=diffusive solute flux between litter and soil surface
 !
-  DO K=1,micpar%n_litrsfk
+  DO K=1,micpar%NumOfLitrCmplxs
     ROCFLS(K,3,0,NY,NX)=ROCFL0(K,NY,NX)-RFLOC(K)-DFVOC(K)
     RONFLS(K,3,0,NY,NX)=RONFL0(K,NY,NX)-RFLON(K)-DFVON(K)
     ROPFLS(K,3,0,NY,NX)=ROPFL0(K,NY,NX)-RFLOP(K)-DFVOP(K)
@@ -377,7 +377,7 @@ contains
 !     X*FLS=hourly convective + diffusive solute flux
 !     X*FLW,X*FLB= hourly convective + diffusive solute flux in non-band,band
 !
-  DO K=1,micpar%n_litrsfk
+  DO K=1,micpar%NumOfLitrCmplxs
     XOCFLS(K,3,0,NY,NX)=XOCFLS(K,3,0,NY,NX)-RFLOC(K)-DFVOC(K)
     XONFLS(K,3,0,NY,NX)=XONFLS(K,3,0,NY,NX)-RFLON(K)-DFVON(K)
     XOPFLS(K,3,0,NY,NX)=XOPFLS(K,3,0,NY,NX)-RFLOP(K)-DFVOP(K)
@@ -674,9 +674,9 @@ contains
 !
   N1=NX
   N2=NY
-  IF(QRM(M,N2,N1).GT.ZEROS(N2,N1))THEN
+  IF(WatFlux4ErosionM(M,N2,N1).GT.ZEROS(N2,N1))THEN
     IF(VLWatMicPM(M,0,N2,N1).GT.ZEROS2(N2,N1))THEN
-      VFLW=AMIN1(VFLWX,QRM(M,N2,N1)/VLWatMicPM(M,0,N2,N1))
+      VFLW=AMIN1(VFLWX,WatFlux4ErosionM(M,N2,N1)/VLWatMicPM(M,0,N2,N1))
     ELSE
       VFLW=VFLWX
     ENDIF
@@ -740,9 +740,9 @@ contains
 !
 !     IF OVERLAND FLOW IS FROM CURRENT TO ADJACENT GRID CELL
 !
-      IF(QRM(M,N2,N1).GT.ZEROS(N2,N1))THEN
+      IF(WatFlux4ErosionM(M,N2,N1).GT.ZEROS(N2,N1))THEN
         IF(NN.EQ.1)THEN
-          FQRM=QRMN(M,N,2,N5,N4)/QRM(M,N2,N1)
+          FQRM=QflxSurfRunoffM(M,N,2,N5,N4)/WatFlux4ErosionM(M,N2,N1)
           DO  K=1,jcplx
             RQROC(K,N,2,N5,N4)=RQROC0(K,N2,N1)*FQRM
             RQRON(K,N,2,N5,N4)=RQRON0(K,N2,N1)*FQRM
@@ -792,7 +792,7 @@ contains
 !
         IF(NN.EQ.2)THEN
           IF(N4B.GT.0.AND.N5B.GT.0)THEN
-            FQRM=QRMN(M,N,1,N5B,N4B)/QRM(M,N2,N1)
+            FQRM=QflxSurfRunoffM(M,N,1,N5B,N4B)/WatFlux4ErosionM(M,N2,N1)
             DO  K=1,jcplx
               RQROC(K,N,1,N5B,N4B)=RQROC0(K,N2,N1)*FQRM
               RQRON(K,N,1,N5B,N4B)=RQRON0(K,N2,N1)*FQRM
@@ -857,7 +857,7 @@ contains
 !
 !     subroutine SnowdriftTransport(M)
 !
-!     QSM=snow transfer from watsub.f
+!     DrySnoFlxBySnowRedistributM=snow transfer from watsub.f
 !     RQS*=solute flux in snow transfer
 !     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
 !             :OC=DOC,ON=DON,OP=DOP,OA=acetate
@@ -870,7 +870,7 @@ contains
 !
 !     IF NO SNOW DRIFT THEN NO TRANSPORT
 !
-        IF(ABS(QSM(M,N,N5,N4)).LE.ZEROS2(N2,N1))THEN
+        IF(ABS(DrySnoFlxBySnowRedistributM(M,N,N5,N4)).LE.ZEROS2(N2,N1))THEN
           trcg_RQS(idg_beg:idg_end-1,N,N5,N4)=0.0_r8
 
           RQSNH4(N,N5,N4)=0.0_r8
@@ -880,9 +880,9 @@ contains
     !
 !     IF DRIFT IS FROM CURRENT TO ADJACENT GRID CELL
 !
-        ELSEIF(QSM(M,N,N5,N4).GT.ZEROS2(N2,N1))THEN
+        ELSEIF(DrySnoFlxBySnowRedistributM(M,N,N5,N4).GT.ZEROS2(N2,N1))THEN
           IF(VcumSnoDWI(N2,N1).GT.ZEROS2(N2,N1))THEN
-            VFLW=AZMAX1(AMIN1(VFLWX,QSM(M,N,N5,N4)/VcumSnoDWI(N2,N1)))
+            VFLW=AZMAX1(AMIN1(VFLWX,DrySnoFlxBySnowRedistributM(M,N,N5,N4)/VcumSnoDWI(N2,N1)))
           ELSE
             VFLW=VFLWX
           ENDIF
@@ -898,9 +898,9 @@ contains
 !
 !     IF DRIFT IS TO CURRENT FROM ADJACENT GRID CELL
 !
-        ELSEIF(QSM(M,N,N5,N4).LT.-ZEROS2(N2,N1))THEN
+        ELSEIF(DrySnoFlxBySnowRedistributM(M,N,N5,N4).LT.-ZEROS2(N2,N1))THEN
           IF(VcumSnoDWI(N5,N4).GT.ZEROS2(N5,N4))THEN
-            VFLW=AZMIN1(AMAX1(-VFLWX,QSM(M,N,N5,N4)/VcumSnoDWI(N5,N4)))
+            VFLW=AZMIN1(AMAX1(-VFLWX,DrySnoFlxBySnowRedistributM(M,N,N5,N4)/VcumSnoDWI(N5,N4)))
           ELSE
             VFLW=-VFLWX
           ENDIF
@@ -965,13 +965,13 @@ contains
     .AND.VLsoiAirPM(M,0,NY,NX).GT.ZEROS2(NY,NX) &
     .AND.VLWatMicPM(M,0,NY,NX).GT.ZEROS2(NY,NX))THEN
 
-    VLWatMicPCO(0,NY,NX)=VLWatMicPM(M,0,NY,NX)*GSolbility(idg_CO2,0,NY,NX)
-    VLWatMicPCH(0,NY,NX)=VLWatMicPM(M,0,NY,NX)*GSolbility(idg_CH4,0,NY,NX)
-    VLWatMicPOX(0,NY,NX)=VLWatMicPM(M,0,NY,NX)*GSolbility(idg_O2,0,NY,NX)
-    VLWatMicPNG(0,NY,NX)=VLWatMicPM(M,0,NY,NX)*GSolbility(idg_N2,0,NY,NX)
-    VLWatMicPN2(0,NY,NX)=VLWatMicPM(M,0,NY,NX)*GSolbility(idg_N2O,0,NY,NX)
-    VLWatMicPN3(0,NY,NX)=VLWatMicPM(M,0,NY,NX)*GSolbility(idg_NH3,0,NY,NX)
-    VLWatMicPHG(0,NY,NX)=VLWatMicPM(M,0,NY,NX)*GSolbility(idg_H2,0,NY,NX)
+    VLWatMicPCO(0,NY,NX)=VLWatMicPM(M,0,NY,NX)*GasSolbility(idg_CO2,0,NY,NX)
+    VLWatMicPCH(0,NY,NX)=VLWatMicPM(M,0,NY,NX)*GasSolbility(idg_CH4,0,NY,NX)
+    VLWatMicPOX(0,NY,NX)=VLWatMicPM(M,0,NY,NX)*GasSolbility(idg_O2,0,NY,NX)
+    VLWatMicPNG(0,NY,NX)=VLWatMicPM(M,0,NY,NX)*GasSolbility(idg_N2,0,NY,NX)
+    VLWatMicPN2(0,NY,NX)=VLWatMicPM(M,0,NY,NX)*GasSolbility(idg_N2O,0,NY,NX)
+    VLWatMicPN3(0,NY,NX)=VLWatMicPM(M,0,NY,NX)*GasSolbility(idg_NH3,0,NY,NX)
+    VLWatMicPHG(0,NY,NX)=VLWatMicPM(M,0,NY,NX)*GasSolbility(idg_H2,0,NY,NX)
 
     VLWatMicPXA(0,NY,NX)=natomw*VLWatMicPM(M,0,NY,NX)
     DO NTG=idg_beg,idg_end-1
@@ -1121,7 +1121,7 @@ contains
 !     DFGS*=effective solute diffusivity
 !
     DO NTG=idg_beg,idg_end-1
-      trc_gasq(NTG)=(PARR(NY,NX)*AtmGgms(NTG,NY,NX)*GSolbility(NTG,0,NY,NX) &
+      trc_gasq(NTG)=(PARR(NY,NX)*AtmGgms(NTG,NY,NX)*GasSolbility(NTG,0,NY,NX) &
         +DFGcc(NTG)*trcs_cl1(NTG))/(DFGcc(NTG)+PARR(NY,NX))
 
 !
@@ -1271,7 +1271,7 @@ contains
     DO NTG=idg_beg,idg_end
       DFGS=SolDifcc(NTG,NU(NY,NX),NY,NX)*TORT1
       trc_gsolc2=AZMAX1(trc_solml2(NTG,NU(NY,NX),NY,NX)/VLWatMicPM(M,NU(NY,NX),NY,NX))
-      trc_gsolc=(PARG(M,NY,NX)*AtmGgms(NTG,NY,NX)*GSolbility(NTG,NU(NY,NX),NY,NX) &
+      trc_gsolc=(PARG(M,NY,NX)*AtmGgms(NTG,NY,NX)*GasSolbility(NTG,NU(NY,NX),NY,NX) &
         +DFGS*trc_gsolc2)/(DFGS+PARG(M,NY,NX))
 !
 !     SURFACE VOLATILIZATION-DISSOLUTION FROM DIFFERENCES
@@ -1320,7 +1320,7 @@ contains
   real(r8) :: VFLWNH4,VFLWPO4,VFLWPOB
   integer  :: NTG,NTS,NTN
 !
-!     VLSnowHeatCapM,VLHeatCapSnowMN=current,minimum volumetric heat capacity of snowpack
+!     VLSnowHeatCapM,VLHeatCapSnowMin=current,minimum volumetric heat capacity of snowpack
 !     VOLWSL=snowpack water content
 !     WatFlowInSnowM=snowpack water flux
 !     R*BLS=solute flux in snowpack
@@ -1329,9 +1329,9 @@ contains
 !
   ICHKL=0
   DO  L=1,JS
-    IF(VLSnowHeatCapM(M,L,NY,NX).GT.VLHeatCapSnowMN(NY,NX))THEN
+    IF(VLSnowHeatCapM(M,L,NY,NX).GT.VLHeatCapSnowMin(NY,NX))THEN
       L2=MIN(JS,L+1)
-      IF(L.LT.JS.AND.VLSnowHeatCapM(M,L2,NY,NX).GT.VLHeatCapSnowMN(NY,NX))THEN
+      IF(L.LT.JS.AND.VLSnowHeatCapM(M,L2,NY,NX).GT.VLHeatCapSnowMin(NY,NX))THEN
         IF(VLWatSnow(L,NY,NX).GT.ZEROS2(NY,NX))THEN
           VFLWW=AZMAX1(AMIN1(1.0,WatFlowInSnowM(M,L2,NY,NX)/VLWatSnow(L,NY,NX)))
         ELSE
@@ -1561,14 +1561,14 @@ contains
 !     R*DXS=gas exchange between atmosphere and soil surface water
 !
 
-  VLWatMicPCO(NU(NY,NX),NY,NX)=VLWatMicPM(M,NU(NY,NX),NY,NX)*GSolbility(idg_CO2,NU(NY,NX),NY,NX)
-  VLWatMicPCH(NU(NY,NX),NY,NX)=VLWatMicPM(M,NU(NY,NX),NY,NX)*GSolbility(idg_CH4,NU(NY,NX),NY,NX)
-  VLWatMicPOX(NU(NY,NX),NY,NX)=VLWatMicPM(M,NU(NY,NX),NY,NX)*GSolbility(idg_O2,NU(NY,NX),NY,NX)
-  VLWatMicPNG(NU(NY,NX),NY,NX)=VLWatMicPM(M,NU(NY,NX),NY,NX)*GSolbility(idg_N2,NU(NY,NX),NY,NX)
-  VLWatMicPN2(NU(NY,NX),NY,NX)=VLWatMicPM(M,NU(NY,NX),NY,NX)*GSolbility(idg_N2O,NU(NY,NX),NY,NX)
-  VLWatMicPN3(NU(NY,NX),NY,NX)=VLWatMicPMA(NU(NY,NX),NY,NX)*GSolbility(idg_NH3,NU(NY,NX),NY,NX)
-  VLWatMicPNB(NU(NY,NX),NY,NX)=VLWatMicPMB(NU(NY,NX),NY,NX)*GSolbility(idg_NH3,NU(NY,NX),NY,NX)
-  VLWatMicPHG(NU(NY,NX),NY,NX)=VLWatMicPM(M,NU(NY,NX),NY,NX)*GSolbility(idg_H2,NU(NY,NX),NY,NX)
+  VLWatMicPCO(NU(NY,NX),NY,NX)=VLWatMicPM(M,NU(NY,NX),NY,NX)*GasSolbility(idg_CO2,NU(NY,NX),NY,NX)
+  VLWatMicPCH(NU(NY,NX),NY,NX)=VLWatMicPM(M,NU(NY,NX),NY,NX)*GasSolbility(idg_CH4,NU(NY,NX),NY,NX)
+  VLWatMicPOX(NU(NY,NX),NY,NX)=VLWatMicPM(M,NU(NY,NX),NY,NX)*GasSolbility(idg_O2,NU(NY,NX),NY,NX)
+  VLWatMicPNG(NU(NY,NX),NY,NX)=VLWatMicPM(M,NU(NY,NX),NY,NX)*GasSolbility(idg_N2,NU(NY,NX),NY,NX)
+  VLWatMicPN2(NU(NY,NX),NY,NX)=VLWatMicPM(M,NU(NY,NX),NY,NX)*GasSolbility(idg_N2O,NU(NY,NX),NY,NX)
+  VLWatMicPN3(NU(NY,NX),NY,NX)=VLWatMicPMA(NU(NY,NX),NY,NX)*GasSolbility(idg_NH3,NU(NY,NX),NY,NX)
+  VLWatMicPNB(NU(NY,NX),NY,NX)=VLWatMicPMB(NU(NY,NX),NY,NX)*GasSolbility(idg_NH3,NU(NY,NX),NY,NX)
+  VLWatMicPHG(NU(NY,NX),NY,NX)=VLWatMicPM(M,NU(NY,NX),NY,NX)*GasSolbility(idg_H2,NU(NY,NX),NY,NX)
 
   VOLCOT(NY,NX)=VLWatMicPCO(NU(NY,NX),NY,NX)+VLsoiAirPM(M,NU(NY,NX),NY,NX)
   VOLCHT(NY,NX)=VLWatMicPCH(NU(NY,NX),NY,NX)+VLsoiAirPM(M,NU(NY,NX),NY,NX)

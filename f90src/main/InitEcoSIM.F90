@@ -45,7 +45,7 @@ module InitEcoSIM
 
   call InitErosion
 
-  call InitHour1(micpar%n_litrsfk)
+  call InitHour1(micpar%NumOfLitrCmplxs)
 
   call InitModules2
 

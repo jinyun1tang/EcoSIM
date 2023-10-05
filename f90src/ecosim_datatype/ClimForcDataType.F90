@@ -31,7 +31,7 @@ implicit none
   real(r8) :: DWPT(2,366)                       !daily dewpoint temperature, [oC]
 
   real(r8) :: TMPH(24,366)                      !hourly air temperature, [oC]
-  real(r8) :: SRADH(24,366)                     !hourly solar radiation, [MJ m-2 h-1]
+  real(r8) :: SWRad_hrly(24,366)                     !hourly solar radiation, [MJ m-2 h-1]
   real(r8) :: RAINH(24,366)                     !hourly precipitation, [mm h-1]
   real(r8) :: WINDH(24,366)                     !hourly wind speed, [m h-1]
   real(r8) :: DWPTH(24,366)                     !hourly dewpoint temperature, [oC]
@@ -59,7 +59,7 @@ implicit none
   real(r8),target,allocatable ::  TDCNO(:,:,:)                       !accumulated change  for NO3 in precipitation, [-]
   real(r8),target,allocatable ::  TCA(:,:)                           !air temperature, [oC]
   real(r8),target,allocatable ::  TairK(:,:)                           !air temperature, [K]
-  real(r8),target,allocatable ::  UA(:,:)                            !wind speed, [m h-1]
+  real(r8),target,allocatable ::  WindSpeedAtm(:,:)                            !wind speed, [m h-1]
   real(r8),target,allocatable ::  VPA(:,:)                           !vapor concentration, [m3 m-3]
   real(r8),target,allocatable ::  VPK(:,:)                           !vapor pressure, [kPa]
   real(r8),target,allocatable ::  Pbot(:,:)                          !atmospheric pressure [kPa]
@@ -114,9 +114,9 @@ implicit none
   real(r8),target,allocatable ::  ATKS(:,:)                          !mean annual soil temperature, [K]
   real(r8),target,allocatable ::  RainFalPrec(:,:)                   !rainfall, [m3 d-2 h-1]
   real(r8),target,allocatable ::  SnoFalPrec(:,:)                    !snowfall, [m3 d-2 h-1]
-  real(r8),target,allocatable ::  PRECQ(:,:)                         !rainfall + snowfall, [m3 d-2 h-1]
-  real(r8),target,allocatable ::  PRECA(:,:)                         !rainfall + irrigation, [m3 d-2 h-1]
-  real(r8),target,allocatable ::  ENGYP(:,:)                         !cumulative rainfall energy impact on soil surface
+  real(r8),target,allocatable ::  PrecAtm(:,:)                         !rainfall + snowfall, [m3 d-2 h-1]
+  real(r8),target,allocatable ::  PrecRainAndSurfirrig(:,:)                         !rainfall + irrigation, [m3 d-2 h-1]
+  real(r8),target,allocatable ::  EnergyImpact4Erosion(:,:)                         !cumulative rainfall energy impact on soil surface
   real(r8),target,allocatable ::  PHR(:,:)                           !precipitation pH, [-]
   real(r8),target,allocatable ::  CN4RI(:,:)                         !precipitation initial NH4 concentration, [g m-3]
   real(r8),target,allocatable ::  CNORI(:,:)                         !precipitation initial NO3 concentration, [g m-3]
@@ -189,7 +189,7 @@ implicit none
   allocate(TDCNO(12,JY,JX));    TDCNO=0._r8
   allocate(TCA(JY,JX));         TCA=0._r8
   allocate(TairK(JY,JX));         TairK=0._r8
-  allocate(UA(JY,JX));          UA=0._r8
+  allocate(WindSpeedAtm(JY,JX));          WindSpeedAtm=0._r8
   allocate(VPA(JY,JX));         VPA=0._r8
   allocate(VPK(JY,JX));         VPK=0._r8
   allocate(Pbot(JY,JX));        PBOT=1.01325E+02_r8
@@ -245,9 +245,9 @@ implicit none
   allocate(ATKS(JY,JX));        ATKS=0._r8
   allocate(RainFalPrec(JY,JX));       RainFalPrec=0._r8
   allocate(SnoFalPrec(JY,JX));       SnoFalPrec=0._r8
-  allocate(PRECQ(JY,JX));       PRECQ=0._r8
-  allocate(PRECA(JY,JX));       PRECA=0._r8
-  allocate(ENGYP(JY,JX));       ENGYP=0._r8
+  allocate(PrecAtm(JY,JX));       PrecAtm=0._r8
+  allocate(PrecRainAndSurfirrig(JY,JX));       PrecRainAndSurfirrig=0._r8
+  allocate(EnergyImpact4Erosion(JY,JX));       EnergyImpact4Erosion=0._r8
   allocate(PHR(JY,JX));         PHR=0._r8
   allocate(CN4RI(JY,JX));       CN4RI=0._r8
   allocate(CNORI(JY,JX));       CNORI=0._r8
@@ -320,7 +320,7 @@ implicit none
   call destroy(TDCNO)
   call destroy(TCA)
   call destroy(TairK)
-  call destroy(UA)
+  call destroy(WindSpeedAtm)
   call destroy(VPA)
   call destroy(VPK)
   call destroy(PBOT)
@@ -376,9 +376,9 @@ implicit none
   call destroy(ATKS)
   call destroy(RainFalPrec)
   call destroy(SnoFalPrec)
-  call destroy(PRECQ)
-  call destroy(PRECA)
-  call destroy(ENGYP)
+  call destroy(PrecAtm)
+  call destroy(PrecRainAndSurfirrig)
+  call destroy(EnergyImpact4Erosion)
   call destroy(PHR)
   call destroy(CN4RI)
   call destroy(CNORI)

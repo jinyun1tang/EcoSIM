@@ -6,7 +6,7 @@ module PlantMngmtDataType
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
 
-  real(r8),target,allocatable ::  THIN(:,:,:,:)                      !thinning of plant population, [-]
+  real(r8),target,allocatable ::  THIN_pft(:,:,:,:)                      !thinning of plant population, [-]
   real(r8),target,allocatable ::  EHVST(:,:,:,:,:,:)                 !harvest efficiency, [-]
   real(r8),target,allocatable ::  HVST(:,:,:,:)                      !harvest cutting height (+ve) or fractional LAI removal (-ve), [m or -]
   integer ,target,allocatable ::  IHVST(:,:,:,:)                      !type of harvest, [-]
@@ -43,7 +43,7 @@ module PlantMngmtDataType
   subroutine InitAllocate
 
   implicit none
-  allocate(THIN(05,366,JY,JX)); THIN=0._r8
+  allocate(THIN_pft(05,366,JY,JX)); THIN_pft=0._r8
   allocate(EHVST(2,4,05,366,JY,JX));EHVST=0._r8
   allocate(HVST(05,366,JY,JX)); HVST=0._r8
   allocate(IHVST(05,366,JY,JX));IHVST=0
@@ -68,7 +68,7 @@ module PlantMngmtDataType
 
 !----------------------------------------------------------------------
   subroutine DestructPlantMngmtData
-  if (allocated(THIN))     deallocate(THIN)
+  if (allocated(THIN_pft))     deallocate(THIN_pft)
   if (allocated(EHVST))    deallocate(EHVST)
   if (allocated(HVST))     deallocate(HVST)
   if (allocated(IHVST))    deallocate(IHVST)

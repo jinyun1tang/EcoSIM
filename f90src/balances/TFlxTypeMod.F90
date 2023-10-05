@@ -5,7 +5,7 @@ module TFlxTypeMod
   use abortutils, only : destroy
   use TracerIDMod
   use EcoSIMConfig, only : jcplx => jcplxc,jsken=>jskenc,NFGs=>NFGsc
-  use EcoSIMConfig, only : nlbiomcp=>nlbiomcpc,ndbiomcp=>ndbiomcpc
+  use EcoSIMConfig, only : nlbiomcp=>NumOfLiveMicrobiomComponents,ndbiomcp=>NumOfDeadMicrobiomComponents
 implicit none
 
   character(len=*), private, parameter :: mod_filename = &
@@ -15,8 +15,8 @@ implicit none
 
   real(r8),allocatable ::  trcs_TFLS(:,:,:,:)                      !
   real(r8),allocatable ::  trcs_TFHS(:,:,:,:)                      !
-  real(r8),allocatable ::  TQR(:,:)                           !
-  real(r8),allocatable ::  THQR(:,:)                          !
+  real(r8),allocatable ::  TWat2GridBySurfRunoff(:,:)                           !
+  real(r8),allocatable ::  THeat2GridBySurfRunoff(:,:)                          !
 
 !  real(r8),allocatable ::  TFLWS(:,:,:)                       !
 !  real(r8),allocatable ::  TFLWW(:,:,:)                       !
@@ -34,8 +34,8 @@ implicit none
   real(r8),allocatable ::  TPOQSS(:,:)                        !
   real(r8),allocatable ::  TP1QSS(:,:)                        !
 
-  real(r8),allocatable ::  trcsa_TFLS(:,:,:,:)                      !
-  real(r8),allocatable ::  trcsa_TFHS(:,:,:,:)                      !
+  real(r8),allocatable ::  trcSalt_TFLS(:,:,:,:)                      !
+  real(r8),allocatable ::  trcSalt_TFHS(:,:,:,:)                      !
 
   real(r8),allocatable ::  TSANER(:,:)                        !
   real(r8),allocatable ::  TSILER(:,:)                        !
@@ -115,8 +115,8 @@ implicit none
   allocate(trcs_TFHS(ids_beg:ids_end,JZ,JY,JX));   trcs_TFHS=0._r8
   allocate(RTGasADFlx(idg_beg:idg_end-1,JZ,JY,JX));   RTGasADFlx=0._r8
 
-  allocate(TQR(JY,JX));         TQR=0._r8
-  allocate(THQR(JY,JX));        THQR=0._r8
+  allocate(TWat2GridBySurfRunoff(JY,JX));         TWat2GridBySurfRunoff=0._r8
+  allocate(THeat2GridBySurfRunoff(JY,JX));        THeat2GridBySurfRunoff=0._r8
 
 !  allocate(TFLWS(JS,JY,JX));    TFLWS=0._r8
 !  allocate(TFLWW(JS,JY,JX));    TFLWW=0._r8
@@ -134,8 +134,8 @@ implicit none
   allocate(TPOQSS(JY,JX));      TPOQSS=0._r8
   allocate(TP1QSS(JY,JX));      TP1QSS=0._r8
 
-  allocate(trcsa_TFLS(idsa_beg:idsab_end,JZ,JY,JX)); trcsa_TFLS=0._r8
-  allocate(trcsa_TFHS(idsa_beg:idsab_end,JZ,JY,JX)); trcsa_TFHS=0._r8
+  allocate(trcSalt_TFLS(idsalt_beg:idsaltb_end,JZ,JY,JX)); trcSalt_TFLS=0._r8
+  allocate(trcSalt_TFHS(idsalt_beg:idsaltb_end,JZ,JY,JX)); trcSalt_TFHS=0._r8
 
   allocate(TSANER(JY,JX));      TSANER=0._r8
   allocate(TSILER(JY,JX));      TSILER=0._r8
@@ -165,13 +165,13 @@ implicit none
   allocate(VLiceMicP1(JZ,JY,JX));    VLiceMicP1=0._r8
   allocate(VLWatMacP1(JZ,JY,JX));   VLWatMacP1=0._r8
   allocate(VLiceMacP1(JZ,JY,JX));   VLiceMacP1=0._r8
-  allocate(TOMCER(nlbiomcp,NMICBSO,1:jcplx,JY,JX)); TOMCER=0._r8
-  allocate(TOMNER(nlbiomcp,NMICBSO,1:jcplx,JY,JX)); TOMNER=0._r8
-  allocate(TOMPER(nlbiomcp,NMICBSO,1:jcplx,JY,JX)); TOMPER=0._r8
+  allocate(TOMCER(nlbiomcp,NumOfMicrobs1HetertrophCmplx,1:jcplx,JY,JX)); TOMCER=0._r8
+  allocate(TOMNER(nlbiomcp,NumOfMicrobs1HetertrophCmplx,1:jcplx,JY,JX)); TOMNER=0._r8
+  allocate(TOMPER(nlbiomcp,NumOfMicrobs1HetertrophCmplx,1:jcplx,JY,JX)); TOMPER=0._r8
 
-  allocate(TOMCERff(nlbiomcp,NMICBSA,JY,JX));TOMCERff=0._r8
-  allocate(TOMNERff(nlbiomcp,NMICBSA,JY,JX));TOMNERff=0._r8
-  allocate(TOMPERff(nlbiomcp,NMICBSA,JY,JX));TOMPERff=0._r8
+  allocate(TOMCERff(nlbiomcp,NumOfMicrobsInAutotrophCmplx,JY,JX));TOMCERff=0._r8
+  allocate(TOMNERff(nlbiomcp,NumOfMicrobsInAutotrophCmplx,JY,JX));TOMNERff=0._r8
+  allocate(TOMPERff(nlbiomcp,NumOfMicrobsInAutotrophCmplx,JY,JX));TOMPERff=0._r8
 
   allocate(TOCFLS(1:jcplx,JZ,JY,JX));TOCFLS=0._r8
   allocate(TONFLS(1:jcplx,JZ,JY,JX));TONFLS=0._r8
@@ -237,11 +237,11 @@ implicit none
   call destroy(TOSAER)
   call destroy(TOSNER)
   call destroy(TOSPER)
-  call destroy(trcsa_TFLS)
+  call destroy(trcSalt_TFLS)
   call destroy(trcs_TFLS)
-  call destroy(trcsa_TFHS)
-  call destroy(TQR)
-  call destroy(THQR)
+  call destroy(trcSalt_TFHS)
+  call destroy(TWat2GridBySurfRunoff)
+  call destroy(THeat2GridBySurfRunoff)
 !  call destroy(TFLWS)
 !  call destroy(TFLWW)
 !  call destroy(TFLWI)

@@ -1,7 +1,7 @@
 module SOMDataType
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use GridConsts
-  use EcoSIMConfig, only : jcplx => jcplxc,jsken=>jskenc, ndbiomcp=>ndbiomcpc
+  use EcoSIMConfig, only : jcplx => jcplxc,jsken=>jskenc, ndbiomcp=>NumOfDeadMicrobiomComponents
   implicit none
   public
   save
@@ -66,23 +66,23 @@ module SOMDataType
   private :: InitAllocate
   contains
 
-  subroutine InitSOMData(n_litrsfk)
+  subroutine InitSOMData(NumOfLitrCmplxs)
 
   implicit none
-  integer, intent(in) :: n_litrsfk
+  integer, intent(in) :: NumOfLitrCmplxs
 
-  call InitAllocate(n_litrsfk)
+  call InitAllocate(NumOfLitrCmplxs)
 
   end subroutine InitSOMData
 !------------------------------------------------------------------------------------------
 
-  subroutine InitAllocate(n_litrsfk)
+  subroutine InitAllocate(NumOfLitrCmplxs)
   implicit none
-  integer, intent(in) :: n_litrsfk
+  integer, intent(in) :: NumOfLitrCmplxs
 
-  allocate(RSC(1:n_litrsfk,0:JZ,JY,JX))
-  allocate(RSN(1:n_litrsfk,0:JZ,JY,JX))
-  allocate(RSP(1:n_litrsfk,0:JZ,JY,JX))
+  allocate(RSC(1:NumOfLitrCmplxs,0:JZ,JY,JX))
+  allocate(RSN(1:NumOfLitrCmplxs,0:JZ,JY,JX))
+  allocate(RSP(1:NumOfLitrCmplxs,0:JZ,JY,JX))
   allocate(CFOSC(jsken,1:jcplx,0:JZ,JY,JX))
   allocate(CNOSC(jsken,1:jcplx,0:JZ,JY,JX))
   allocate(CPOSC(jsken,1:jcplx,0:JZ,JY,JX))

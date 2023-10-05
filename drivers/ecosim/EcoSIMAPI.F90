@@ -141,7 +141,8 @@ contains
     clm_file_in,soil_mgmt_in,forc_periods,NCYC_LITR,NCYC_SNOW,&
     NPXS,NPYS,JOUTS,continue_run,visual_out,restart_out,&
     finidat,restartFileFullPath,brnch_retain_casename,plant_model,microbial_model,&
-    soichem_model,atm_ghg_in,aco2_ppm,ao2_ppm,an2_ppm,an2_ppm,ach4_ppm,anh3_ppm
+    soichem_model,atm_ghg_in,aco2_ppm,ao2_ppm,an2_ppm,an2_ppm,ach4_ppm,anh3_ppm,&
+    snowRedist_model
 
   namelist /ecosim/hist_nhtfrq,hist_mfilt,hist_fincl1,hist_fincl2,hist_yrclose, &
     do_budgets,ref_date,start_date
@@ -262,7 +263,7 @@ subroutine soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
   use WthrMod      , only : wthr
   use RestartMod   , only : restFile
   use PlantInfoMod , only : ReadPlantInfo
-  use readsmod     , only : reads
+  use readsmod     , only : ReadClimSoilForcing
   use timings      , only : init_timer, start_timer, end_timer,end_timer_loop
   use InitEcoSIM   , only : InitModules2
   use EcoSIMCtrlMod
@@ -299,7 +300,7 @@ subroutine soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
   call init_timer(outdir)
 
   if(lverb)WRITE(*,333)'READS: read climate forcing'
-  CALL READS(frectyp%yearcur,frectyp%yearclm,NE,NEX,NHW,NHE,NVN,NVS)
+  CALL ReadClimSoilForcing(frectyp%yearcur,frectyp%yearclm,NE,NEX,NHW,NHE,NVN,NVS)
 
   !temporary set up for setting mass balance check
   IBEGIN=1;ISTART=1;ILAST=0

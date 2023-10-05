@@ -139,13 +139,13 @@ implicit none
   DO while(.true.)
     read(4,'(A)',END=1000)clmfile
     print*,'processing file ', trim(clmfile), iyear
-    TMPH=spval;SRADH=spval;WINDH=spval;RAINH=spval;DWPTH=spval
+    TMPH=spval;SWRad_hrly=spval;WINDH=spval;RAINH=spval;DWPTH=spval
     call ReadClim(iyear,clmfile,NTX,NFX,L,I,IX,TTYPE,atmf)
     LYR=0
     if(isleap(iyear))LYR=1
     DO II=1,365+LYR
       DO JJ=1,24
-        SRADH(JJ,II)=SRADH(JJ,II)*1.e6/3600._r8  !convert from MJ/m2 into W m^-2
+        SWRad_hrly(JJ,II)=SWRad_hrly(JJ,II)*1.e6/3600._r8  !convert from MJ/m2 into W m^-2
         WINDH(JJ,II)=WINDH(JJ,II)/3600._r8       !convert from m/hour to m s^-1
         RAINH(JJ,II)=RAINH(JJ,II)*1.e3_r8        !convert from m/hr into mm hr^-1
       enddo
@@ -155,7 +155,7 @@ implicit none
     call reshape1(WINDH,data); call ncd_putvar(ncf,'WINDH',k,data)
     call reshape1(DWPTH,data); call ncd_putvar(ncf,'DWPTH',k,data)
     call reshape1(RAINH,data); call ncd_putvar(ncf,'RAINH',k,data)
-    call reshape1(SRADH,data); call ncd_putvar(ncf,'SRADH',k,data)
+    call reshape1(SWRad_hrly,data); call ncd_putvar(ncf,'SRADH',k,data)
     data1(1)=atmf%Z0G; call ncd_putvar(ncf,'Z0G',k,data1)
     data1(1)=atmf%ZNOONG; call ncd_putvar(ncf,'ZNOONG',k,data1)
     data1(1)=atmf%PHRG; call ncd_putvar(ncf,'PHRG',k,data1)

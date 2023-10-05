@@ -28,62 +28,62 @@ implicit none
   integer :: ids_nut_beg,ids_nuts_beg,ids_nuts_end
   integer :: ids_nutb_beg,ids_nutb_end
 ! salt tracers
-  integer :: idsa_beg,idsa_end
+  integer :: idsalt_beg,idsalt_end
 
-  integer :: idsa_Al      ! Al
-  integer :: idsa_Fe      ! Fe
-  integer :: idsa_Hp      ! H+
-  integer :: idsa_Ca      ! Ca
-  integer :: idsa_Mg      ! Mg
-  integer :: idsa_Na      ! Na
-  integer :: idsa_K       ! K
-  integer :: idsa_OH      ! OH
-  integer :: idsa_SO4     ! SO4
-  integer :: idsa_Cl      ! Cl
-  integer :: idsa_CO3     ! CO3,
-  integer :: idsa_HCO3    ! HCO3
-  integer :: idsa_AlOH    ! AlOH
-  integer :: idsa_AlOH2   ! AlOH2
-  integer :: idsa_AlOH3   ! AlOH3
-  integer :: idsa_AlOH4   ! AlOH4
-  integer :: idsa_AlSO4   ! AlSO4
-  integer :: idsa_FeOH    ! FeOH
-  integer :: idsa_FeOH2   ! FeOH2
-  integer :: idsa_FeOH3   ! FeOH3
-  integer :: idsa_FeOH4   ! FeOH4
-  integer :: idsa_FeSO4   ! FeSO4
-  integer :: idsa_CaOH2   ! CaOH2
-  integer :: idsa_CaCO3   ! CaCO3
-  integer :: idsa_CaHCO3  ! CaHCO3
-  integer :: idsa_CaSO4   ! CaSO4
-  integer :: idsa_MgOH2   ! MgOH2
-  integer :: idsa_MgCO3   ! MgCO3
-  integer :: idsa_MgHCO3  ! MgHCO3
-  integer :: idsa_MgSO4   ! MgSO4
-  integer :: idsa_NaCO3   ! NaCO3
-  integer :: idsa_NaSO4   ! NaSO4
-  integer :: idsa_KSO4    ! KSO4
-  integer :: idsa_H0PO4   ! PO4
-  integer :: idsa_H3PO4   ! H3PO4
-  integer :: idsa_FeHPO4  ! FeHPO4
-  integer :: idsa_FeH2PO4 ! FeH2PO4
-  integer :: idsa_CaPO4   ! CaPO4
-  integer :: idsa_CaHPO4  ! CaHPO4
-  integer :: idsa_CaH2PO4 ! CaH2PO4
-  integer :: idsa_MgHPO4 ! MgHPO4
+  integer :: idsalt_Al      ! Al
+  integer :: idsalt_Fe      ! Fe
+  integer :: idsalt_Hp      ! H+
+  integer :: idsalt_Ca      ! Ca
+  integer :: idsalt_Mg      ! Mg
+  integer :: idsalt_Na      ! Na
+  integer :: idsalt_K       ! K
+  integer :: idsalt_OH      ! OH
+  integer :: idsalt_SO4     ! SO4
+  integer :: idsalt_Cl      ! Cl
+  integer :: idsalt_CO3     ! CO3,
+  integer :: idsalt_HCO3    ! HCO3
+  integer :: idsalt_AlOH    ! AlOH
+  integer :: idsalt_AlOH2   ! AlOH2
+  integer :: idsalt_AlOH3   ! AlOH3
+  integer :: idsalt_AlOH4   ! AlOH4
+  integer :: idsalt_AlSO4   ! AlSO4
+  integer :: idsalt_FeOH    ! FeOH
+  integer :: idsalt_FeOH2   ! FeOH2
+  integer :: idsalt_FeOH3   ! FeOH3
+  integer :: idsalt_FeOH4   ! FeOH4
+  integer :: idsalt_FeSO4   ! FeSO4
+  integer :: idsalt_CaOH2   ! CaOH2
+  integer :: idsalt_CaCO3   ! CaCO3
+  integer :: idsalt_CaHCO3  ! CaHCO3
+  integer :: idsalt_CaSO4   ! CaSO4
+  integer :: idsalt_MgOH2   ! MgOH2
+  integer :: idsalt_MgCO3   ! MgCO3
+  integer :: idsalt_MgHCO3  ! MgHCO3
+  integer :: idsalt_MgSO4   ! MgSO4
+  integer :: idsalt_NaCO3   ! NaCO3
+  integer :: idsalt_NaSO4   ! NaSO4
+  integer :: idsalt_KSO4    ! KSO4
+  integer :: idsalt_H0PO4   ! PO4
+  integer :: idsalt_H3PO4   ! H3PO4
+  integer :: idsalt_FeHPO4  ! FeHPO4
+  integer :: idsalt_FeH2PO4 ! FeH2PO4
+  integer :: idsalt_CaPO4   ! CaPO4
+  integer :: idsalt_CaHPO4  ! CaHPO4
+  integer :: idsalt_CaH2PO4 ! CaH2PO4
+  integer :: idsalt_MgHPO4 ! MgHPO4
 !band salt
-  integer :: idsa_H0PO4B   ! PO4
-  integer :: idsa_H3PO4B   ! H3PO4
-  integer :: idsa_FeHPO4B  ! FeHPO4
-  integer :: idsa_FeH2PO4B ! FeH2PO4
-  integer :: idsa_CaPO4B   ! CaPO4
-  integer :: idsa_CaHPO4B  ! CaHPO4
-  integer :: idsa_CaH2PO4B ! CaH2PO4
-  integer :: idsa_MgHPO4B ! MgHPO4
-  integer :: idsab_beg    !band begin
-  integer :: idsab_end    !band end
-  integer :: idsa_psoil_beg,idsa_psoil_end
-  integer :: idsa_pband_beg,idsa_pband_end
+  integer :: idsalt_H0PO4B   ! PO4
+  integer :: idsalt_H3PO4B   ! H3PO4
+  integer :: idsalt_FeHPO4B  ! FeHPO4
+  integer :: idsalt_FeH2PO4B ! FeH2PO4
+  integer :: idsalt_CaPO4B   ! CaPO4
+  integer :: idsalt_CaHPO4B  ! CaHPO4
+  integer :: idsalt_CaH2PO4B ! CaH2PO4
+  integer :: idsalt_MgHPO4B ! MgHPO4
+  integer :: idsaltb_beg    !band begin
+  integer :: idsaltb_end    !band end
+  integer :: idsalt_psoil_beg,idsalt_psoil_end
+  integer :: idsalt_pband_beg,idsalt_pband_end
 
 ! precipitated tracers
   integer :: idsp_beg,idsp_end
@@ -104,6 +104,7 @@ implicit none
   integer :: idsp_CaH2PO4B
   integer :: idsp_psoi_beg,idsp_psoi_end
   integer :: idsp_p_beg, idsp_p_end
+  
 ! exchangeable tracers
   integer :: idx_CEC    ! XCEC,  cation exchange capacity, [mol d-2]
   integer :: idx_NH4    ! XN4, exchangeable NH4 non-band, [mol d-2]
@@ -137,16 +138,16 @@ implicit none
   integer :: ifertn_beg,ifertn_end
   integer :: ifertnb_beg,ifertnb_end
   integer :: ids_nuts
-  integer :: idsa_nuts
+  integer :: idsalt_nuts
   type, public :: trc_def_type
-   integer :: ngtracers    !number of gas tracers
-   integer :: nstracers    !number of solute tracers
-   integer :: nsatracers   !number of salt tracers
-   integer :: nptracers    !number of precipitate tracers
+   integer :: NGasTracers    !number of gas tracers
+   integer :: NSolutTracers    !number of solute tracers
+   integer :: NSaltTracers   !number of salt tracers
+   integer :: NPrecipTracers    !number of precipitate tracers
    integer :: nxtracers    !number of exchangeable tracers
-   integer :: nutracers    !number of nutrient tracers
-   integer :: nfertN
-   integer :: nfertNb
+   integer :: NnutrientTracers    !number of nutrient tracers
+   integer :: NFertNitro
+   integer :: NFertNitrob
   end type trc_def_type
 
   type(trc_def_type), public :: trc_confs
@@ -189,67 +190,67 @@ implicit none
   ids_nuts_end=ids_H2PO4;!the last non-band nutrient tracer
 
   if(lsalt_model)then
-    idsa_beg=1;idsa_end=0
-    idsa_Al=addone(idsa_end)
-    idsa_Fe=addone(idsa_end)
-    idsa_Hp=addone(idsa_end)
-    idsa_Ca=addone(idsa_end)
-    idsa_Mg=addone(idsa_end)
-    idsa_Na=addone(idsa_end)
-    idsa_K=addone(idsa_end)
-    idsa_OH=addone(idsa_end)
-    idsa_SO4=addone(idsa_end)
-    idsa_Cl=addone(idsa_end)
-    idsa_CO3=addone(idsa_end)
-    idsa_HCO3=addone(idsa_end)
-    idsa_AlOH=addone(idsa_end)
-    idsa_AlOH2=addone(idsa_end)
-    idsa_AlOH3=addone(idsa_end)
-    idsa_AlOH4=addone(idsa_end)
-    idsa_AlSO4=addone(idsa_end)
-    idsa_FeOH =addone(idsa_end)
-    idsa_FeOH2=addone(idsa_end)
-    idsa_FeOH3=addone(idsa_end)
-    idsa_FeOH4=addone(idsa_end)
-    idsa_FeSO4=addone(idsa_end)
-    idsa_CaOH2=addone(idsa_end)
-    idsa_CaCO3=addone(idsa_end)
-    idsa_CaHCO3=addone(idsa_end)
-    idsa_CaSO4 =addone(idsa_end)
-    idsa_MgOH2 =addone(idsa_end)
-    idsa_MgCO3 =addone(idsa_end)
-    idsa_MgHCO3=addone(idsa_end)
-    idsa_MgSO4 =addone(idsa_end)
-    idsa_NaCO3 =addone(idsa_end)
-    idsa_NaSO4 =addone(idsa_end)
-    idsa_KSO4  =addone(idsa_end)
+    idsalt_beg=1;idsalt_end=0
+    idsalt_Al=addone(idsalt_end)
+    idsalt_Fe=addone(idsalt_end)
+    idsalt_Hp=addone(idsalt_end)
+    idsalt_Ca=addone(idsalt_end)
+    idsalt_Mg=addone(idsalt_end)
+    idsalt_Na=addone(idsalt_end)
+    idsalt_K=addone(idsalt_end)
+    idsalt_OH=addone(idsalt_end)
+    idsalt_SO4=addone(idsalt_end)
+    idsalt_Cl=addone(idsalt_end)
+    idsalt_CO3=addone(idsalt_end)
+    idsalt_HCO3=addone(idsalt_end)
+    idsalt_AlOH=addone(idsalt_end)
+    idsalt_AlOH2=addone(idsalt_end)
+    idsalt_AlOH3=addone(idsalt_end)
+    idsalt_AlOH4=addone(idsalt_end)
+    idsalt_AlSO4=addone(idsalt_end)
+    idsalt_FeOH =addone(idsalt_end)
+    idsalt_FeOH2=addone(idsalt_end)
+    idsalt_FeOH3=addone(idsalt_end)
+    idsalt_FeOH4=addone(idsalt_end)
+    idsalt_FeSO4=addone(idsalt_end)
+    idsalt_CaOH2=addone(idsalt_end)
+    idsalt_CaCO3=addone(idsalt_end)
+    idsalt_CaHCO3=addone(idsalt_end)
+    idsalt_CaSO4 =addone(idsalt_end)
+    idsalt_MgOH2 =addone(idsalt_end)
+    idsalt_MgCO3 =addone(idsalt_end)
+    idsalt_MgHCO3=addone(idsalt_end)
+    idsalt_MgSO4 =addone(idsalt_end)
+    idsalt_NaCO3 =addone(idsalt_end)
+    idsalt_NaSO4 =addone(idsalt_end)
+    idsalt_KSO4  =addone(idsalt_end)
 
-    idsa_H0PO4 =addone(idsa_end)
-    idsa_H3PO4 =addone(idsa_end)
-    idsa_FeHPO4=addone(idsa_end)
-    idsa_FeH2PO4=addone(idsa_end)
-    idsa_CaPO4 =addone(idsa_end)
-    idsa_CaHPO4=addone(idsa_end)
-    idsa_CaH2PO4=addone(idsa_end)
-    idsa_MgHPO4=addone(idsa_end)
-    idsa_end=idsa_MgHPO4
-    idsab_beg=idsa_end+1
-    idsab_end=idsab_beg
-    idsa_psoil_beg=idsa_H0PO4;idsa_psoil_end=idsa_MgHPO4
+    idsalt_H0PO4 =addone(idsalt_end)
+    idsalt_H3PO4 =addone(idsalt_end)
+    idsalt_FeHPO4=addone(idsalt_end)
+    idsalt_FeH2PO4=addone(idsalt_end)
+    idsalt_CaPO4 =addone(idsalt_end)
+    idsalt_CaHPO4=addone(idsalt_end)
+    idsalt_CaH2PO4=addone(idsalt_end)
+    idsalt_MgHPO4=addone(idsalt_end)
+    idsalt_end=idsalt_MgHPO4
+    idsaltb_beg=idsalt_end+1
+    idsaltb_end=idsaltb_beg
+    idsalt_psoil_beg=idsalt_H0PO4;idsalt_psoil_end=idsalt_MgHPO4
 
-    idsa_nuts=idsa_MgHPO4-idsa_H0PO4
+    idsalt_nuts=idsalt_MgHPO4-idsalt_H0PO4
 
-    idsa_H0PO4B=addone(idsab_end)   ! PO4
-    idsa_H3PO4B=addone(idsab_end)  ! H3PO4
-    idsa_FeHPO4B=addone(idsab_end)  ! FeHPO4
-    idsa_FeH2PO4B=addone(idsab_end) ! FeH2PO4
-    idsa_CaPO4B=addone(idsab_end)   ! CaPO4
-    idsa_CaHPO4B=addone(idsab_end)  ! CaHPO4
-    idsa_CaH2PO4B=addone(idsab_end) ! CaH2PO4
-    idsa_MgHPO4B =addone(idsab_end)! MgHPO4
-    idsa_pband_beg=idsa_H0PO4B;idsa_pband_end=idsa_MgHPO4B
+    idsalt_H0PO4B=addone(idsaltb_end)   ! PO4
+    idsalt_H3PO4B=addone(idsaltb_end)  ! H3PO4
+    idsalt_FeHPO4B=addone(idsaltb_end)  ! FeHPO4
+    idsalt_FeH2PO4B=addone(idsaltb_end) ! FeH2PO4
+    idsalt_CaPO4B=addone(idsaltb_end)   ! CaPO4
+    idsalt_CaHPO4B=addone(idsaltb_end)  ! CaHPO4
+    idsalt_CaH2PO4B=addone(idsaltb_end) ! CaH2PO4
+    idsalt_MgHPO4B =addone(idsaltb_end)! MgHPO4
+    idsalt_pband_beg=idsalt_H0PO4B;idsalt_pband_end=idsalt_MgHPO4B
 
-    idsab_end=idsa_MgHPO4B
+    idsaltb_end=idsalt_MgHPO4B
 
 
     idsp_beg=1
@@ -339,14 +340,14 @@ implicit none
   idx_anion_soil_end=idx_H2PO4
 
 
-  trc_confs%ngtracers=idg_end-idg_beg
-  trc_confs%nstracers=ids_end-ids_beg+1
-  if(lsalt_model)trc_confs%nsatracers=idsab_end-idsa_beg+1
-  trc_confs%nptracers=idsp_end-idsp_beg+1
+  trc_confs%NGasTracers=idg_end-idg_beg
+  trc_confs%NSolutTracers=ids_end-ids_beg+1
+  if(lsalt_model)trc_confs%NSaltTracers=idsaltb_end-idsalt_beg+1
+  trc_confs%NPrecipTracers=idsp_end-idsp_beg+1
   trc_confs%nxtracers=idx_end-idx_beg+1
-  trc_confs%nutracers=ids_nuts_end-ids_nut_beg+1
-  trc_confs%nfertN    = ifertn_end-ifertn_beg+1
-  trc_confs%nfertNb   = ifertnb_end-ifertnb_beg+1
+  trc_confs%NnutrientTracers=ids_nuts_end-ids_nut_beg+1
+  trc_confs%NFertNitro    = ifertn_end-ifertn_beg+1
+  trc_confs%NFertNitrob   = ifertnb_end-ifertnb_beg+1
   end subroutine InitTracerIDs
 end module TracerIDMod
 

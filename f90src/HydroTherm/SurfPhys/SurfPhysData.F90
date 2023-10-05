@@ -6,8 +6,8 @@ implicit none
   character(len=*), private, parameter :: mod_filename=&
   __FILE__
 
-  real(r8),allocatable ::  XVGeomLayer(:,:)                         !
-  real(r8),allocatable ::  XVLWatMicP(:,:)                         !
+  real(r8),allocatable ::  XVLMobileWaterLitR(:,:)                         !
+  real(r8),allocatable ::  XVLMobileWatMicP(:,:)                         !
   real(r8),allocatable ::  XVLiceMicP(:,:)                         !
   real(r8),allocatable ::  THRMR(:,:)                         !
   real(r8),allocatable ::  VLPoreLitR(:,:)                        !
@@ -21,7 +21,7 @@ implicit none
   real(r8),allocatable ::  PARER(:,:)                         !
   real(r8),allocatable ::  RARG(:,:)                          !
   real(r8),allocatable ::  PARSR(:,:)                         !
-  real(r8),allocatable ::  RAR(:,:)                           !
+  real(r8),allocatable ::  VapDiffusResistanceLitR(:,:)                           !
   real(r8),allocatable ::  WatFLow2LitR(:,:)                         !
   real(r8),allocatable ::  HeatFLoByWat2LitRi(:,:)                        !  
   real(r8),allocatable ::  PARSG(:,:)                         !
@@ -48,8 +48,8 @@ implicit none
   subroutine InitSurfPhysData  
   implicit none
 
-  allocate(XVGeomLayer(JY,JX));       XVGeomLayer=0._r8
-  allocate(XVLWatMicP(JY,JX));       XVLWatMicP=0._r8
+  allocate(XVLMobileWaterLitR(JY,JX));       XVLMobileWaterLitR=0._r8
+  allocate(XVLMobileWatMicP(JY,JX));       XVLMobileWatMicP=0._r8
   allocate(XVLiceMicP(JY,JX));       XVLiceMicP=0._r8
   allocate(THRMR(JY,JX));       THRMR=0._r8
   allocate(VLPoreLitR(JY,JX));      VLPoreLitR=0._r8
@@ -63,7 +63,7 @@ implicit none
   allocate(PARER(JY,JX));       PARER=0._r8
   allocate(RARG(JY,JX));        RARG=0._r8
   allocate(PARSR(JY,JX));       PARSR=0._r8
-  allocate(RAR(JY,JX));         RAR=0._r8  
+  allocate(VapDiffusResistanceLitR(JY,JX));         VapDiffusResistanceLitR=0._r8  
   allocate(WatFLow2LitR(JY,JX));       WatFLow2LitR=0._r8
   allocate(HeatFLoByWat2LitRi(JY,JX));      HeatFLoByWat2LitRi=0._r8  
   allocate(PARSG(JY,JX));       PARSG=0._r8  
@@ -88,8 +88,8 @@ implicit none
   use abortutils, only : destroy
   implicit none
 
-  call destroy(XVGeomLayer)
-  call destroy(XVLWatMicP)
+  call destroy(XVLMobileWaterLitR)
+  call destroy(XVLMobileWatMicP)
   call destroy(XVLiceMicP)
   call destroy(THRMR)
   call destroy(VLPoreLitR)
@@ -103,7 +103,7 @@ implicit none
   call destroy(PARER)
   call destroy(RARG)
   call destroy(PARSR)
-  call destroy(RAR)  
+  call destroy(VapDiffusResistanceLitR)  
   call destroy(WatFLow2LitR)
   call destroy(HeatFLoByWat2LitRi)  
   call destroy(PARSG)  

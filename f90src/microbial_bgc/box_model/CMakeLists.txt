@@ -1,4 +1,5 @@
 set(BOX_MODEL_SOURCES
+  MicrobMathFuncMod.F90
   MicAutoCPLXMod.F90
   MicBGCMod.F90
   MicFluxTypeMod.F90

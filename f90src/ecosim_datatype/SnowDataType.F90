@@ -11,8 +11,8 @@ module SnowDataType
 
   real(r8),target, allocatable ::  VLSnowHeatCapM(:,:,:,:)            !volumetric heat capacity of snowpack
   real(r8),target, allocatable ::  WatFlowInSnowM(:,:,:,:)            !snowpack water flux
-  real(r8),target, allocatable ::  QSM(:,:,:,:)                       !runoff snow flux, [m3 d-2 t-1]
-  REAL(R8),target, allocatable ::  ALBS(:,:)                          !snowpack albedo
+  real(r8),target, allocatable ::  DrySnoFlxBySnowRedistributM(:,:,:,:)                       !runoff snow flux, [m3 d-2 t-1]
+  REAL(R8),target, allocatable ::  SoilAlbedo(:,:)                          !snowpack albedo
   real(r8),target, allocatable ::  NewSnowDens(:,:)                   !new snowpack density, [Mg m-3]
   real(r8),target, allocatable ::  TCSnow(:,:,:)                         !snow temperature, [oC]
   real(r8),target, allocatable ::  TKSnow(:,:,:)                         !snow temperature, [K]
@@ -35,16 +35,16 @@ module SnowDataType
   real(r8),target, allocatable ::  VcumWatSnow(:,:)                   !water volume in snowpack, [m3 d-2]
   real(r8),target, allocatable ::  VcumIceSnow(:,:)                         !ice volume in snowpack, [m3 d-2]
   real(r8),target, allocatable ::  VcumSnoDWI(:,:)                          !snowpack volume, [m3 d-2]
-  real(r8),target, allocatable ::  VLHeatCapSnowMN(:,:)               !minimum layer integrated snowpack heat capacity  [MJ d-2 K-1]
+  real(r8),target, allocatable ::  VLHeatCapSnowMin(:,:)               !minimum layer integrated snowpack heat capacity  [MJ d-2 K-1]
   real(r8),target, allocatable ::  FLSW(:,:,:)                        !water from snowpack to soil micropores
   real(r8),target, allocatable ::  WatConvSno2MacP(:,:,:)                       !water from snowpack to soil macropores
   real(r8),target, allocatable ::  HeatConvSno2Soi(:,:,:)                       !convective heat from snowpack to soil
   real(r8),target, allocatable ::  WatConvSno2LitR(:,:,:)                       !water flux from snowpack to litter
   real(r8),target, allocatable ::  HeatConvSno2LitR(:,:,:)                      !convective heat flux from snowpack to litter
-  real(r8),target, allocatable ::  QS(:,:,:)                          !snowpack runoff snow, [m3 d-2 h-1]
-  real(r8),target, allocatable ::  QW(:,:,:)                          !snowpack runoff water, [m3 d-2 h-1]
-  real(r8),target, allocatable ::  QI(:,:,:)                          !snowpack runoff ice, [m3 d-2 h-1]
-  real(r8),target, allocatable ::  HQS(:,:,:)                         !snowpack runoff heat, [MJ d-2 h-1]
+  real(r8),target, allocatable ::  DrysnoBySnowRedistribution(:,:,:)                          !snowpack runoff snow, [m3 d-2 h-1]
+  real(r8),target, allocatable ::  WatBySnowRedistribution(:,:,:)                          !snowpack runoff water, [m3 d-2 h-1]
+  real(r8),target, allocatable ::  IceBySnowRedistribution(:,:,:)                          !snowpack runoff ice, [m3 d-2 h-1]
+  real(r8),target, allocatable ::  HeatBySnowRedistribution(:,:,:)                         !snowpack runoff heat, [MJ d-2 h-1]
   real(r8),target, allocatable ::  XCOQSS(:,:,:)                      !snowpack runoff CO2 flux, [g d-2 h-1]
   real(r8),target, allocatable ::  XCHQSS(:,:,:)                      !snowpack runoff CH4 flux, [g d-2 h-1]
   real(r8),target, allocatable ::  XOXQSS(:,:,:)                      !snowpack runoff O2 flux, [g d-2 h-1]
@@ -61,7 +61,7 @@ module SnowDataType
   real(r8),target, allocatable ::  trcs_solsml(:,:,:,:)               ! snowpack salt dissolved tracers
 
 
-  real(r8),target, allocatable ::  trcsa_XQS(:,:,:,:)                       !total salt in snow drift, [mol d-2 h-1]
+  real(r8),target, allocatable ::  trcSalt_XQS(:,:,:,:)                       !total salt in snow drift, [mol d-2 h-1]
 !----------------------------------------------------------------------
 
 contains
@@ -70,8 +70,8 @@ contains
   implicit none
   allocate(VLSnowHeatCapM(60,JS,JY,JX));VLSnowHeatCapM=0._r8
   allocate(WatFlowInSnowM(60,JS,JY,JX)); WatFlowInSnowM=0._r8
-  allocate(QSM(60,2,JV,JH));    QSM=0._r8
-  allocate(ALBS(JY,JX));        ALBS=0._r8
+  allocate(DrySnoFlxBySnowRedistributM(60,2,JV,JH));    DrySnoFlxBySnowRedistributM=0._r8
+  allocate(SoilAlbedo(JY,JX));        SoilAlbedo=0._r8
   allocate(NewSnowDens(JY,JX));       NewSnowDens=0._r8
   allocate(TCSnow(JS,JY,JX));      TCSnow=0._r8
   allocate(TKSnow(JS,JY,JX));      TKSnow=0._r8
@@ -94,16 +94,16 @@ contains
   allocate(VcumWatSnow(JY,JX));       VcumWatSnow=0._r8
   allocate(VcumIceSnow(JY,JX));       VcumIceSnow=0._r8
   allocate(VcumSnoDWI(JY,JX));        VcumSnoDWI=0._r8
-  allocate(VLHeatCapSnowMN(JY,JX));      VLHeatCapSnowMN=0._r8
+  allocate(VLHeatCapSnowMin(JY,JX));      VLHeatCapSnowMin=0._r8
   allocate(FLSW(JS,JY,JX));     FLSW=0._r8
   allocate(WatConvSno2MacP(JS,JY,JX));    WatConvSno2MacP=0._r8
   allocate(HeatConvSno2Soi(JS,JY,JX));    HeatConvSno2Soi=0._r8
   allocate(WatConvSno2LitR(JS,JY,JX));    WatConvSno2LitR=0._r8
   allocate(HeatConvSno2LitR(JS,JY,JX));   HeatConvSno2LitR=0._r8
-  allocate(QS(2,JV,JH));        QS=0._r8
-  allocate(QW(2,JV,JH));        QW=0._r8
-  allocate(QI(2,JV,JH));        QI=0._r8
-  allocate(HQS(2,JV,JH));       HQS=0._r8
+  allocate(DrysnoBySnowRedistribution(2,JV,JH));        DrysnoBySnowRedistribution=0._r8
+  allocate(WatBySnowRedistribution(2,JV,JH));        WatBySnowRedistribution=0._r8
+  allocate(IceBySnowRedistribution(2,JV,JH));        IceBySnowRedistribution=0._r8
+  allocate(HeatBySnowRedistribution(2,JV,JH));       HeatBySnowRedistribution=0._r8
   allocate(XCOQSS(2,JV,JH));    XCOQSS=0._r8
   allocate(XCHQSS(2,JV,JH));    XCHQSS=0._r8
   allocate(XOXQSS(2,JV,JH));    XOXQSS=0._r8
@@ -119,10 +119,10 @@ contains
   allocate(trcg_solsml(idg_beg:idg_end-1,JS,JY,JX));trcg_solsml=0._r8
   allocate(trcn_solsml(ids_nut_beg:ids_nuts_end,JS,JY,JX));trcn_solsml=0._r8
   if(salt_model)then
-    allocate(trcs_solsml(idsa_beg:idsa_end,JS,JY,JX)); trcs_solsml=0._r8
+    allocate(trcs_solsml(idsalt_beg:idsalt_end,JS,JY,JX)); trcs_solsml=0._r8
   endif
 
-  allocate(trcsa_XQS(idsa_beg:idsa_end,2,JV,JH));     trcsa_XQS=0._r8
+  allocate(trcSalt_XQS(idsalt_beg:idsalt_end,2,JV,JH));     trcSalt_XQS=0._r8
   end subroutine InitSnowData
 
 !----------------------------------------------------------------------
@@ -131,12 +131,12 @@ contains
   implicit none
   if(salt_model)then
     call destroy(trcs_solsml)
-    call destroy(trcsa_XQS)
+    call destroy(trcSalt_XQS)
   endif
   call destroy(VLSnowHeatCapM)
   call destroy(WatFlowInSnowM)
-  call destroy(QSM)
-  call destroy(ALBS)
+  call destroy(DrySnoFlxBySnowRedistributM)
+  call destroy(SoilAlbedo)
   call destroy(NewSnowDens)
   call destroy(TCSnow)
   call destroy(TKSnow)
@@ -158,16 +158,16 @@ contains
   call destroy(VcumWatSnow)
   call destroy(VcumIceSnow)
   call destroy(VcumSnoDWI)
-  call destroy(VLHeatCapSnowMN)
+  call destroy(VLHeatCapSnowMin)
   call destroy(FLSW)
   call destroy(WatConvSno2MacP)
   call destroy(HeatConvSno2Soi)
   call destroy(WatConvSno2LitR)
   call destroy(HeatConvSno2LitR)
-  call destroy(QS)
-  call destroy(QW)
-  call destroy(QI)
-  call destroy(HQS)
+  call destroy(DrysnoBySnowRedistribution)
+  call destroy(WatBySnowRedistribution)
+  call destroy(IceBySnowRedistribution)
+  call destroy(HeatBySnowRedistribution)
   call destroy(XCOQSS)
   call destroy(XCHQSS)
   call destroy(XOXQSS)
@@ -179,7 +179,7 @@ contains
   call destroy(XP4QSS)
   call destroy(XP1QSS)
   if(salt_model)then
-    call destroy(trcsa_XQS)
+    call destroy(trcSalt_XQS)
   endif
   end subroutine DestructSnowData
 

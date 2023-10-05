@@ -17,7 +17,7 @@ module RootDataType
   integer,target,allocatable ::  NI(:,:,:)                           !maximum soil layer number for all root axes, [-]
   real(r8),target,allocatable ::  BiomGrowthYieldRoot(:,:,:)                        !root growth yield, [g g-1]
   real(r8),target,allocatable ::  PR(:,:,:)                          !threshold root nonstructural C content for initiating new root axis, [g g-1]
-  real(r8),target,allocatable ::  CWSRT(:,:,:)                       !fraction of remobilizable nonstructural biomass in root, [-]
+  real(r8),target,allocatable ::  RootFracRemobilizableBiom(:,:,:)                       !fraction of remobilizable nonstructural biomass in root, [-]
   real(r8),target,allocatable ::  DMVL(:,:,:,:)                      !root volume:mass ratio, [m3 g-1]
   real(r8),target,allocatable ::  MaxPrimRootRadius1(:,:,:,:)                    !root diameter primary axes, [m]
   real(r8),target,allocatable ::  MaxSecndRootRadius1(:,:,:,:)                    !root diameter secondary axes, [m]
@@ -45,7 +45,7 @@ module RootDataType
   real(r8),target,allocatable ::  MaxPrimRootRadius(:,:,:,:)                    !maximum radius of primary roots, [m]
   real(r8),target,allocatable ::  MaxSecndRootRadius(:,:,:,:)                    !maximum radius of secondary roots, [m]
   real(r8),target,allocatable ::  RTFQ(:,:,:)                        !root brancing frequency, [m-1]
-  real(r8),target,allocatable ::  PORTX(:,:,:,:)                     !power function of root porosity used to calculate root gaseous diffusivity, [-]
+  real(r8),target,allocatable ::  RootPoreTortu4Gas(:,:,:,:)                     !power function of root porosity used to calculate root gaseous diffusivity, [-]
   real(r8),target,allocatable ::  EPOOLN(:,:,:,:,:)                  !root  layer nonstructural element, [g d-2]
   real(r8),target,allocatable ::  RootLenPerP(:,:,:,:,:)                   !root layer length per plant, [m p-1]
   real(r8),target,allocatable ::  PrimRootLen(:,:,:,:,:,:)                 !root layer length primary axes, [m d-2]
@@ -63,7 +63,7 @@ module RootDataType
   real(r8),target,allocatable ::  SecndRootRadius(:,:,:,:,:)                   !root layer diameter secondary axes, [m ]
   real(r8),target,allocatable ::  PrimRootSpecLen(:,:,:,:)                    !specific root length primary axes, [m g-1]
   real(r8),target,allocatable ::  SecndRootSpecLen(:,:,:,:)                    !specific root length secondary axes, [m g-1]
-  real(r8),target,allocatable ::  PopPlantRootH2OUptake_vr(:,:,:,:,:)                   !root water uptake, [m2 d-2 h-1]
+  real(r8),target,allocatable ::  AllPlantRootH2OUptake_vr(:,:,:,:,:)                   !root water uptake, [m2 d-2 h-1]
   real(r8),target,allocatable ::  PSIRoot(:,:,:,:,:)                   !root total water potential , [Mpa]
   real(r8),target,allocatable ::  PSIRootOSMO(:,:,:,:,:)                   !root osmotic water potential , [Mpa]
   real(r8),target,allocatable ::  PSIRootTurg(:,:,:,:,:)                   !root turgor water potential , [Mpa]
@@ -76,14 +76,14 @@ module RootDataType
   real(r8),target,allocatable ::  WSRTL(:,:,:,:,:)                   !root layer protein C, [g d-2]
   real(r8),target,allocatable ::  WTRT1E(:,:,:,:,:,:,:)              !root layer element primary axes, [g d-2]
   real(r8),target,allocatable ::  WTRT2E(:,:,:,:,:,:,:)              !root layer element secondary axes, [g d-2]
-  real(r8),target,allocatable ::  RootCPZR(:,:,:,:,:)                   !root layer C, [g d-2]
+  real(r8),target,allocatable ::  PopPlantRootC_vr(:,:,:,:,:)                   !root layer C, [g d-2]
   real(r8),target,allocatable ::  WTNDLE(:,:,:,:,:)                  !root layer nodule element, [g d-2]
   real(r8),target,allocatable ::  WTNDE(:,:,:,:)                     !root total nodule mass, [g d-2]
   real(r8),target,allocatable ::  WTRTL(:,:,:,:,:)                   !root layer structural C, [g d-2]
   real(r8),target,allocatable ::  EPOOLR(:,:,:,:,:,:)                !root  layer nonstructural element, [g d-2]
-  real(r8),target,allocatable ::  CEPOLR(:,:,:,:,:,:)                !root  layer nonstructural element concentration, [g g-1]
+  real(r8),target,allocatable ::  RootNonstructElementConcpft_vr(:,:,:,:,:,:)                !root  layer nonstructural element concentration, [g g-1]
   real(r8),target,allocatable ::  RTWT1E(:,:,:,:,:,:)                   !root C primary axes, [g d-2]
-  real(r8),target,allocatable ::  CWSRTL(:,:,:,:,:)                  !root layer protein C concentration, [g g-1]
+  real(r8),target,allocatable ::  RootProteinConc_pftvr(:,:,:,:,:)                  !root layer protein C concentration, [g g-1]
 !----------------------------------------------------------------------
 
 contains
@@ -99,7 +99,7 @@ contains
   allocate(NI(JP,JY,JX));       NI=0
   allocate(BiomGrowthYieldRoot(JP,JY,JX));     BiomGrowthYieldRoot=0._r8
   allocate(PR(JP,JY,JX));       PR=0._r8
-  allocate(CWSRT(JP,JY,JX));    CWSRT=0._r8
+  allocate(RootFracRemobilizableBiom(JP,JY,JX));    RootFracRemobilizableBiom=0._r8
   allocate(DMVL(jroots,JP,JY,JX));   DMVL=0._r8
   allocate(MaxPrimRootRadius1(jroots,JP,JY,JX)); MaxPrimRootRadius1=0._r8
   allocate(MaxSecndRootRadius1(jroots,JP,JY,JX)); MaxSecndRootRadius1=0._r8
@@ -127,8 +127,8 @@ contains
   allocate(MaxPrimRootRadius(jroots,JP,JY,JX)); MaxPrimRootRadius=0._r8
   allocate(MaxSecndRootRadius(jroots,JP,JY,JX)); MaxSecndRootRadius=0._r8
   allocate(RTFQ(JP,JY,JX));     RTFQ=0._r8
-  allocate(PORTX(jroots,JP,JY,JX));  PORTX=0._r8
-  allocate(EPOOLN(npelms,JZ,JP,JY,JX));EPOOLN=0._r8
+  allocate(RootPoreTortu4Gas(jroots,JP,JY,JX));  RootPoreTortu4Gas=0._r8
+  allocate(EPOOLN(NumOfPlantChemElements,JZ,JP,JY,JX));EPOOLN=0._r8
   allocate(RootLenPerP(jroots,JZ,JP,JY,JX));RootLenPerP=0._r8
   allocate(PrimRootLen(jroots,JZ,JC,JP,JY,JX));PrimRootLen=0._r8
   allocate(SecndRootLen(jroots,JZ,JC,JP,JY,JX));SecndRootLen=0._r8
@@ -145,7 +145,7 @@ contains
   allocate(SecndRootRadius(jroots,JZ,JP,JY,JX));SecndRootRadius=0._r8
   allocate(PrimRootSpecLen(jroots,JP,JY,JX)); PrimRootSpecLen=0._r8
   allocate(SecndRootSpecLen(jroots,JP,JY,JX)); SecndRootSpecLen=0._r8
-  allocate(PopPlantRootH2OUptake_vr(jroots,JZ,JP,JY,JX));PopPlantRootH2OUptake_vr=0._r8
+  allocate(AllPlantRootH2OUptake_vr(jroots,JZ,JP,JY,JX));AllPlantRootH2OUptake_vr=0._r8
   allocate(PSIRoot(jroots,JZ,JP,JY,JX));PSIRoot=0._r8
   allocate(PSIRootOSMO(jroots,JZ,JP,JY,JX));PSIRootOSMO=0._r8
   allocate(PSIRootTurg(jroots,JZ,JP,JY,JX));PSIRootTurg=0._r8
@@ -153,19 +153,19 @@ contains
   allocate(trcs_rootml(idg_beg:idg_end-1,2,JZ,JP,JY,JX)); trcs_rootml =0._r8
   allocate(TRootGasLoss_disturb(idg_beg:idg_end-1,JY,JX));TRootGasLoss_disturb=0._r8
   allocate(WTRTA(JP,JY,JX));    WTRTA=0._r8
-  allocate(WTRTE(npelms,JP,JY,JX)); WTRTE=0._r8
-  allocate(WTRTSE(npelms,JP,JY,JX));   WTRTSE=0._r8
+  allocate(WTRTE(NumOfPlantChemElements,JP,JY,JX)); WTRTE=0._r8
+  allocate(WTRTSE(NumOfPlantChemElements,JP,JY,JX));   WTRTSE=0._r8
   allocate(WSRTL(jroots,JZ,JP,JY,JX));WSRTL=0._r8
-  allocate(WTRT1E(npelms,jroots,JZ,JC,JP,JY,JX));WTRT1E=0._r8
-  allocate(WTRT2E(npelms,jroots,JZ,JC,JP,JY,JX));WTRT2E=0._r8
-  allocate(RootCPZR(jroots,JZ,JP,JY,JX));RootCPZR=0._r8
-  allocate(WTNDLE(npelms,JZ,JP,JY,JX)); WTNDLE=0._r8
-  allocate(WTNDE(npelms,JP,JY,JX));  WTNDE=0._r8
+  allocate(WTRT1E(NumOfPlantChemElements,jroots,JZ,JC,JP,JY,JX));WTRT1E=0._r8
+  allocate(WTRT2E(NumOfPlantChemElements,jroots,JZ,JC,JP,JY,JX));WTRT2E=0._r8
+  allocate(PopPlantRootC_vr(jroots,JZ,JP,JY,JX));PopPlantRootC_vr=0._r8
+  allocate(WTNDLE(NumOfPlantChemElements,JZ,JP,JY,JX)); WTNDLE=0._r8
+  allocate(WTNDE(NumOfPlantChemElements,JP,JY,JX));  WTNDE=0._r8
   allocate(WTRTL(jroots,JZ,JP,JY,JX));WTRTL=0._r8
-  allocate(EPOOLR(npelms,jroots,JZ,JP,JY,JX));EPOOLR=0._r8
-  allocate(CEPOLR(npelms,jroots,JZ,JP,JY,JX));CEPOLR=0._r8
-  allocate(RTWT1E(npelms,jroots,JRS,JP,JY,JX));RTWT1E=0._r8
-  allocate(CWSRTL(jroots,JZ,JP,JY,JX));CWSRTL=0._r8
+  allocate(EPOOLR(NumOfPlantChemElements,jroots,JZ,JP,JY,JX));EPOOLR=0._r8
+  allocate(RootNonstructElementConcpft_vr(NumOfPlantChemElements,jroots,JZ,JP,JY,JX));RootNonstructElementConcpft_vr=0._r8
+  allocate(RTWT1E(NumOfPlantChemElements,jroots,JRS,JP,JY,JX));RTWT1E=0._r8
+  allocate(RootProteinConc_pftvr(jroots,JZ,JP,JY,JX));RootProteinConc_pftvr=0._r8
   end subroutine InitRootData
 
 !----------------------------------------------------------------------
@@ -179,7 +179,7 @@ contains
   call destroy(NI)
   call destroy(BiomGrowthYieldRoot)
   call destroy(PR)
-  call destroy(CWSRT)
+  call destroy(RootFracRemobilizableBiom)
   call destroy(DMVL)
   call destroy(MaxPrimRootRadius1)
   call destroy(MaxSecndRootRadius1)
@@ -207,7 +207,7 @@ contains
   call destroy(MaxPrimRootRadius)
   call destroy(MaxSecndRootRadius)
   call destroy(RTFQ)
-  call destroy(PORTX)
+  call destroy(RootPoreTortu4Gas)
   call destroy(EPOOLN)
   call destroy(RootLenPerP)
   call destroy(PrimRootLen)
@@ -225,7 +225,7 @@ contains
   call destroy(SecndRootRadius)
   call destroy(PrimRootSpecLen)
   call destroy(SecndRootSpecLen)
-  call destroy(PopPlantRootH2OUptake_vr)
+  call destroy(AllPlantRootH2OUptake_vr)
   call destroy(PSIRoot)
   call destroy(PSIRootOSMO)
   call destroy(PSIRootTurg)
@@ -238,14 +238,14 @@ contains
   call destroy(WSRTL)
   call destroy(WTRT1E)
   call destroy(WTRT2E)
-  call destroy(RootCPZR)
+  call destroy(PopPlantRootC_vr)
   call destroy(WTNDLE)
   call destroy(WTNDE)
   call destroy(WTRTL)
   call destroy(EPOOLR)
-  call destroy(CEPOLR)
+  call destroy(RootNonstructElementConcpft_vr)
   call destroy(RTWT1E)
-  call destroy(CWSRTL)
+  call destroy(RootProteinConc_pftvr)
   end subroutine DestructRootData
 
 end module RootDataType

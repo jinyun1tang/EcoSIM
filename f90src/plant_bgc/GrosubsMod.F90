@@ -67,7 +67,7 @@ module grosubsMod
   real(r8) :: ZCX(JP1)
   integer :: L,K,M
   integer :: NZ,NE
-  real(r8) :: CPOOLK(JC1,JP1)
+  real(r8) :: CPOOLK(NumOfCanopyLayers1,JP1)
 ! begin_execution
   associate(                            &
     IFLGC    => plt_pheno%IFLGC   , &
@@ -87,15 +87,15 @@ module grosubsMod
 
   D9980: DO NZ=1,NP0
     D1: DO L=0,NJ
-      DO K=1,pltpar%n_pltlitrk
+      DO K=1,pltpar%NumOfPlantLitrCmplxs
         DO M=1,jsken
-          DO NE=1,npelms
+          DO NE=1,NumOfPlantChemElements
             ESNC(NE,M,K,L,NZ)=0._r8
           ENDDO
         ENDDO
       ENDDO
     ENDDO D1
-    HESNC(1:npelms,NZ)=0._r8
+    HESNC(1:NumOfPlantChemElements,NZ)=0._r8
     CNET(NZ)=0._r8
     ZCX(NZ)=CanopyHeight(NZ)
     CanopyHeight(NZ)=0._r8
@@ -172,13 +172,13 @@ module grosubsMod
     TEUPTK  => plt_rbgc%TEUPTK   , &
     CumSoilThickness  => plt_site%CumSoilThickness   , &
     PlantinDepth  => plt_morph%PlantinDepth  , &
-    NBR     => plt_morph%NBR       &
+    NumOfBranches_pft     => plt_morph%NumOfBranches_pft       &
   )
   D9975: DO NZ=1,NP0
 !
 !     ACTIVATE DORMANT SEEDS
 !
-    D205: DO NB=1,NBR(NZ)
+    D205: DO NB=1,NumOfBranches_pft(NZ)
       IF(IFLGI(NZ).EQ.itrue)THEN
         IF(IFLGE(NB,NZ).EQ.0.AND.VRNS(NB,NZ).GE.VRNL(NB,NZ))THEN
           IDAY0(NZ)=I
@@ -196,7 +196,7 @@ module grosubsMod
 !     WTSTG,WTSTDN,WTSTDP=standing dead C,N,P mass
 !     CSNC,ZSNC,PSNC=C,N,P litterfall
 !
-    DO NE=1,npelms
+    DO NE=1,NumOfPlantChemElements
       D6235: DO M=1,jsken
         XFRE=1.5814E-05_r8*fTgrowCanP(NZ)*WTSTDE(NE,M,NZ)
         IF(IBTYP(NZ).EQ.0.OR.IGTYP(NZ).LE.1)THEN
@@ -214,8 +214,8 @@ module grosubsMod
 !     TCSNC,TZSNC,TPSNC=cumulative C,N,P litterfall
 !     HCSNC,HZSNC,HPSNC=hourly C,N,P litterfall
 !
-    DO K=1,pltpar%n_pltlitrk
-      DO NE=1,npelms
+    DO K=1,pltpar%NumOfPlantLitrCmplxs
+      DO NE=1,NumOfPlantChemElements
         D6430: DO M=1,jsken
           TESN0(NE,NZ)=TESN0(NE,NZ)+ESNC(NE,M,K,0,NZ)
           D8955: DO L=0,NJ
@@ -230,7 +230,7 @@ module grosubsMod
 !
 !     WTSTG,WTSTDN,WTSTDP=standing dead C,N,P mass
 !
-    DO NE=1,npelms
+    DO NE=1,NumOfPlantChemElements
       WTSTGE(NE,NZ)=sum(WTSTDE(NE,1:jsken,NZ))
     ENDDO
 
@@ -253,7 +253,7 @@ module grosubsMod
 
     IF(IFLGC(NZ).EQ.PlantIsActive)THEN
     !check for living plant
-      DO NE=1,npelms
+      DO NE=1,NumOfPlantChemElements
         BALE(NE,NZ)=CanPShootElmMass(NE,NZ)+WTRTE(NE,NZ)+WTNDE(NE,NZ) &
           +WTRVE(NE,NZ)+TESNC(NE,NZ)-TEUPTK(NE,NZ) &
           -RSETE(NE,NZ)+WTSTGE(NE,NZ)+HVSTE(NE,NZ)+THVSTE(NE,NZ)
@@ -300,7 +300,7 @@ module grosubsMod
   implicit none
   integer, intent(in) :: I,J,NZ
   real(r8), intent(in) :: ZCX(JP1)
-  real(r8), intent(out) :: CPOOLK(JC1,JP1)
+  real(r8), intent(out) :: CPOOLK(NumOfCanopyLayers1,JP1)
 
   real(r8)  :: UPNFC(JP1)
   integer  :: ICHK1(2,JZ1),IDTHRN,NB
@@ -325,7 +325,7 @@ module grosubsMod
     UPNO3  => plt_rbgc%UPNO3        , &
     HEUPTK => plt_rbgc%HEUPTK       , &
     UPOME  => plt_rbgc%UPOME        , &
-    NBR    => plt_morph%NBR         , &
+    NumOfBranches_pft    => plt_morph%NumOfBranches_pft         , &
     NRT    => plt_morph%NRT           &
   )
   IF(IDTHP(NZ).EQ.0.OR.IDTHR(NZ).EQ.ibralive)THEN
@@ -339,7 +339,7 @@ module grosubsMod
 !     WTLFB,WTSHEB,CanPBLeafShethC=leaf,petiole,leaf+petiole mass
 !     IDTHB=branch living flag: 0=alive,1=dead
 !
-    DO  NB=1,NBR(NZ)
+    DO  NB=1,NumOfBranches_pft(NZ)
       call GrowOneBranch(I,J,NB,NZ,TFN6,ZCX,CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW,&
         TFN5,WFNG,WFNC,WFNS,WFNSG,PTRT,UPNFC,IFLGZ)
     ENDDO
@@ -348,7 +348,7 @@ module grosubsMod
 !
     call ComputeTotalBiom(NZ,CPOOLK)
   ELSE
-    HEUPTK(1:npelms,NZ)=UPOME(1:npelms,NZ)
+    HEUPTK(1:NumOfPlantChemElements,NZ)=UPOME(1:NumOfPlantChemElements,NZ)
     HEUPTK(ielmn,NZ)=HEUPTK(ielmn,NZ)+UPNH4(NZ)+UPNO3(NZ)+UPNF(NZ)
     HEUPTK(ielmp,NZ)=HEUPTK(ielmp,NZ)+UPH2P(NZ)+UPH1P(NZ)
   ENDIF
@@ -390,7 +390,7 @@ module grosubsMod
     WTRTA  =>  plt_biom%WTRTA     , &
     WTSTKE =>  plt_biom%WTSTKE    , &
     WTRTE  =>  plt_biom%WTRTE     , &
-    WGLFV  =>  plt_biom%WGLFV     , &
+    CanopyLeafCpft_lyr  =>  plt_biom%CanopyLeafCpft_lyr     , &
     IBTYP  =>  plt_pheno%IBTYP    , &
     IGTYP  =>  plt_pheno%IGTYP    , &
     RCO2A  =>  plt_rbgc%RCO2A     , &
@@ -415,14 +415,14 @@ module grosubsMod
     PrimRootXNumL  =>  plt_morph%PrimRootXNumL    , &
     SecndRootXNumL   =>  plt_morph%SecndRootXNumL     , &
     MY     =>  plt_morph%MY       , &
-    ARLFV  =>  plt_morph%ARLFV    , &
-    CanPLSA  =>  plt_morph%CanPLSA    , &
+    CanopyLeafApft_lyr  =>  plt_morph%CanopyLeafApft_lyr    , &
+    CanopyStemApft_lyr  =>  plt_morph%CanopyStemApft_lyr    , &
     NRT    =>  plt_morph%NRT        &
   )
-  D2: DO L=1,JC1
-    ARLFV(L,NZ)=0._r8
-    WGLFV(L,NZ)=0._r8
-    CanPLSA(L,NZ)=0._r8
+  D2: DO L=1,NumOfCanopyLayers1
+    CanopyLeafApft_lyr(L,NZ)=0._r8
+    CanopyLeafCpft_lyr(L,NZ)=0._r8
+    CanopyStemApft_lyr(L,NZ)=0._r8
   ENDDO D2
   D5: DO NR=1,NRT(NZ)
     DO  N=1,MY(NZ)
@@ -474,7 +474,7 @@ module grosubsMod
   CNRTW=FWODRE(ielmc,k_woody_litr)*CNSTK(NZ)+FWODRE(ielmc,k_fine_litr)*CNRT(NZ)
   CPRTW=FWODRE(ielmc,k_woody_litr)*CPSTK(NZ)+FWODRE(ielmc,k_fine_litr)*CPRT(NZ)
 
-  FWODLE(ielmc,1:n_pltlitrk)=FWODBE(ielmc,1:n_pltlitrk)
+  FWODLE(ielmc,1:NumOfPlantLitrCmplxs)=FWODBE(ielmc,1:NumOfPlantLitrCmplxs)
 
   FWODLE(ielmn,k_woody_litr)=FWODBE(ielmc,k_woody_litr)*CNSTK(NZ)/CNLFW
   FWODLE(ielmp,k_woody_litr)=FWODBE(ielmc,k_woody_litr)*CPSTK(NZ)/CPLFW
@@ -559,14 +559,14 @@ module grosubsMod
   subroutine ComputeTotalBiom(NZ,CPOOLK)
 
   integer, intent(in) :: NZ
-  real(r8), intent(out) :: CPOOLK(JC1,JP1)
+  real(r8), intent(out) :: CPOOLK(NumOfCanopyLayers1,JP1)
   integer :: L,K,N,NE,NB
 !     begin_execution
   associate(                                 &
     WTLFBE     =>  plt_biom%WTLFBE     , &
     WTGRBE     =>  plt_biom%WTGRBE     , &
     EPOOLR     =>  plt_biom%EPOOLR     , &
-    RootCPZR     =>  plt_biom%RootCPZR     , &
+    PopPlantRootC_vr     =>  plt_biom%PopPlantRootC_vr     , &
     WTSHTBE    =>  plt_biom%WTSHTBE    , &
     WTEARBE    =>  plt_biom%WTEARBE    , &
     WTSTKBE    =>  plt_biom%WTSTKBE    , &
@@ -581,7 +581,7 @@ module grosubsMod
     CO2B       =>  plt_photo%CO2B      , &
     MY         =>  plt_morph%MY        , &
     NI         =>  plt_morph%NI        , &
-    NBR        =>  plt_morph%NBR         &
+    NumOfBranches_pft        =>  plt_morph%NumOfBranches_pft         &
   )
 !     TOTAL C,N,P IN EACH BRANCH
 !
@@ -605,8 +605,8 @@ module grosubsMod
 !     IWTYP=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
 !     WTRVC,WTRVN,WTRVP=storage C,N,P
 !
-  DO NE=1,npelms
-    DO NB=1,NBR(NZ)
+  DO NE=1,NumOfPlantChemElements
+    DO NB=1,NumOfBranches_pft(NZ)
       WTSHTBE(NE,NB,NZ)=WTLFBE(NE,NB,NZ) &
         +WTSHEBE(NE,NB,NZ)+WTSTKBE(NE,NB,NZ)+WTRSVBE(NE,NB,NZ) &
         +WTHSKBE(NE,NB,NZ)+WTEARBE(NE,NB,NZ)+WTGRBE(NE,NB,NZ) &
@@ -614,7 +614,7 @@ module grosubsMod
     ENDDO
   ENDDO
 
-  D320: DO NB=1,NBR(NZ)
+  D320: DO NB=1,NumOfBranches_pft(NZ)
     CPOOLK(NB,NZ)=0._r8
     D325: DO K=1,JNODS1
       CPOOLK(NB,NZ)=CPOOLK(NB,NZ)+CPOOL3(K,NB,NZ)+CPOOL4(K,NB,NZ) &
@@ -635,7 +635,7 @@ module grosubsMod
 !
   D345: DO N=1,MY(NZ)
     DO  L=NU,NI(NZ)
-      RootCPZR(N,L,NZ)=RootCPZR(N,L,NZ)+EPOOLR(ielmc,N,L,NZ)
+      PopPlantRootC_vr(N,L,NZ)=PopPlantRootC_vr(N,L,NZ)+EPOOLR(ielmc,N,L,NZ)
     enddo
   ENDDO D345
   end associate
@@ -675,9 +675,9 @@ module grosubsMod
     WTHSKE   =>  plt_biom%WTHSKE  , &
     WTEARE   =>  plt_biom%WTEARE  , &
     WTGRE    =>  plt_biom%WTGRE   , &
-    CanPLeafShethC     =>  plt_biom%CanPLeafShethC    , &
+    CanopyLeafShethC_pft     =>  plt_biom%CanopyLeafShethC_pft    , &
     WTNDLE   =>  plt_biom%WTNDLE  , &
-    EPOOLP   =>  plt_biom%EPOOLP  , &
+    CanopyNonstructElements_pft   =>  plt_biom%CanopyNonstructElements_pft  , &
     EPOLNP   =>  plt_biom%EPOLNP  , &
     WTRT1E   =>  plt_biom%WTRT1E  , &
     WTRT2E   =>  plt_biom%WTRT2E  , &
@@ -693,16 +693,16 @@ module grosubsMod
     UPOME    =>  plt_rbgc%UPOME   , &
     NJ       =>  plt_site%NJ      , &
     NU       =>  plt_site%NU      , &
-    NBR      =>  plt_morph%NBR    , &
+    NumOfBranches_pft      =>  plt_morph%NumOfBranches_pft    , &
     MY       =>  plt_morph%MY     , &
     NI       =>  plt_morph%NI     , &
     NRT      =>  plt_morph%NRT    , &
-    CanPBLA    =>  plt_morph%CanPBLA  , &
+    CanopyBranchLeafA_pft    =>  plt_morph%CanopyBranchLeafA_pft  , &
     CanPSA    =>  plt_morph%CanPSA  , &
-    CanPLBSA    =>  plt_morph%CanPLBSA  , &
+    CanopyBranchStemApft_lyr    =>  plt_morph%CanopyBranchStemApft_lyr  , &
     GRNOB    =>  plt_morph%GRNOB  , &
-    CanPLA    =>  plt_morph%CanPLA  , &
-    CanPLSA    =>  plt_morph%CanPLSA  , &
+    CanopyLeafA_pft    =>  plt_morph%CanopyLeafA_pft  , &
+    CanopyStemApft_lyr    =>  plt_morph%CanopyStemApft_lyr  , &
     INTYP    =>  plt_morph%INTYP  , &
     GRNO     =>  plt_morph%GRNO     &
   )
@@ -719,20 +719,20 @@ module grosubsMod
 !     WTHSBN,WTEABN,WTGRBN=branch husk,ear,grain N mass
 !     WTHSBP,WTEABP,WTGRBP=branch husk,ear,grain P mass
 !     WTRVC,WTRVN,WTRVP=storage C,N,P
-!     CanPBLA=branch leaf area
-!     CanPLBSA=total branch stalk surface area in each layer
+!     CanopyBranchLeafA_pft=branch leaf area
+!     CanopyBranchStemApft_lyr=total branch stalk surface area in each layer
 !     GRNOB=seed set number
 !
-  DO NE=1,npelms
-    EPOOLP(NE,NZ)=sum(EPOOL(NE,1:NBR(NZ),NZ))
-    CanPShootElmMass(NE,NZ)=sum(WTSHTBE(NE,1:NBR(NZ),NZ))
-    WTSHEE(NE,NZ)=sum(WTSHEBE(NE,1:NBR(NZ),NZ))
-    WTSTKE(NE,NZ)=sum(WTSTKBE(NE,1:NBR(NZ),NZ))
-    WTLFE(NE,NZ)=sum(WTLFBE(NE,1:NBR(NZ),NZ))
-    WTRSVE(NE,NZ)=sum(WTRSVBE(NE,1:NBR(NZ),NZ))
-    WTHSKE(NE,NZ)=sum(WTHSKBE(NE,1:NBR(NZ),NZ))
-    WTGRE(NE,NZ)=sum(WTGRBE(NE,1:NBR(NZ),NZ))
-    WTEARE(NE,NZ)=sum(WTEARBE(NE,1:NBR(NZ),NZ))
+  DO NE=1,NumOfPlantChemElements
+    CanopyNonstructElements_pft(NE,NZ)=sum(EPOOL(NE,1:NumOfBranches_pft(NZ),NZ))
+    CanPShootElmMass(NE,NZ)=sum(WTSHTBE(NE,1:NumOfBranches_pft(NZ),NZ))
+    WTSHEE(NE,NZ)=sum(WTSHEBE(NE,1:NumOfBranches_pft(NZ),NZ))
+    WTSTKE(NE,NZ)=sum(WTSTKBE(NE,1:NumOfBranches_pft(NZ),NZ))
+    WTLFE(NE,NZ)=sum(WTLFBE(NE,1:NumOfBranches_pft(NZ),NZ))
+    WTRSVE(NE,NZ)=sum(WTRSVBE(NE,1:NumOfBranches_pft(NZ),NZ))
+    WTHSKE(NE,NZ)=sum(WTHSKBE(NE,1:NumOfBranches_pft(NZ),NZ))
+    WTGRE(NE,NZ)=sum(WTGRBE(NE,1:NumOfBranches_pft(NZ),NZ))
+    WTEARE(NE,NZ)=sum(WTEARBE(NE,1:NumOfBranches_pft(NZ),NZ))
     !root state variables
     WTRTE(NE,NZ)=sum(EPOOLR(NE,1:MY(NZ),NU:NJ,NZ))
     WTRTSE(NE,NZ)=sum(WTRT1E(NE,1:MY(NZ),NU:NJ,1:NRT(NZ),NZ)) &
@@ -740,15 +740,15 @@ module grosubsMod
     WTRTE(NE,NZ)=WTRTE(NE,NZ)+WTRTSE(NE,NZ)
   ENDDO
 
-  CanPStalkC(NZ)=sum(CanPBStalkC(1:NBR(NZ),NZ))
-  CanPLeafShethC(NZ) =sum(CanPBLeafShethC(1:NBR(NZ),NZ))
-  GRNO(NZ) =sum(GRNOB(1:NBR(NZ),NZ))
-  CanPLA(NZ)=sum(CanPBLA(1:NBR(NZ),NZ))
-  CanPSA(NZ)=sum(CanPLBSA(1:JC1,1:NBR(NZ),NZ))
-  CanPLSA(1:JC1,1:NBR(NZ))=0._r8
-  DO NB=1,NBR(NZ)
-    DO L=1,JC1
-      CanPLSA(L,NZ)=CanPLSA(L,NZ)+CanPLBSA(L,NB,NZ)
+  CanPStalkC(NZ)=sum(CanPBStalkC(1:NumOfBranches_pft(NZ),NZ))
+  CanopyLeafShethC_pft(NZ) =sum(CanPBLeafShethC(1:NumOfBranches_pft(NZ),NZ))
+  GRNO(NZ) =sum(GRNOB(1:NumOfBranches_pft(NZ),NZ))
+  CanopyLeafA_pft(NZ)=sum(CanopyBranchLeafA_pft(1:NumOfBranches_pft(NZ),NZ))
+  CanPSA(NZ)=sum(CanopyBranchStemApft_lyr(1:NumOfCanopyLayers1,1:NumOfBranches_pft(NZ),NZ))
+  CanopyStemApft_lyr(1:NumOfCanopyLayers1,1:NumOfBranches_pft(NZ))=0._r8
+  DO NB=1,NumOfBranches_pft(NZ)
+    DO L=1,NumOfCanopyLayers1
+      CanopyStemApft_lyr(L,NZ)=CanopyStemApft_lyr(L,NZ)+CanopyBranchStemApft_lyr(L,NB,NZ)
     ENDDO
   ENDDO
 
@@ -761,14 +761,14 @@ module grosubsMod
 !
   IF(INTYP(NZ).NE.0)THEN
     IF(INTYP(NZ).GE.4)THEN
-      DO NE=1,npelms
-        D7950: DO NB=1,NBR(NZ)
+      DO NE=1,NumOfPlantChemElements
+        D7950: DO NB=1,NumOfBranches_pft(NZ)
           EPOLNP(NE,NZ)=EPOLNP(NE,NZ)+EPOLNB(NE,NB,NZ)
         ENDDO D7950
-        WTNDE(NE,NZ)=sum(WTNDBE(NE,1:NBR(NZ),NZ))+sum(EPOLNB(NE,1:NBR(NZ),NZ))
+        WTNDE(NE,NZ)=sum(WTNDBE(NE,1:NumOfBranches_pft(NZ),NZ))+sum(EPOLNB(NE,1:NumOfBranches_pft(NZ),NZ))
       ENDDO
     ELSEIF(INTYP(NZ).GE.1.AND.INTYP(NZ).LE.3)THEN
-      DO NE=1,npelms
+      DO NE=1,NumOfPlantChemElements
         WTNDE(NE,NZ)=sum(WTNDLE(NE,NU:NI(NZ),NZ))+sum(EPOOLN(NE,NU:NI(NZ),NZ))
       ENDDO
     ENDIF
@@ -783,11 +783,11 @@ module grosubsMod
 !     TCUPTK,TZUPTK,TPUPTK=cumulative PFT root-soil C,N,P exchange
 !     TZUPFX=cumulative PFT N2 fixation
 !
-  HEUPTK(1:npelms,NZ)=UPOME(1:npelms,NZ)
+  HEUPTK(1:NumOfPlantChemElements,NZ)=UPOME(1:NumOfPlantChemElements,NZ)
   HEUPTK(ielmn,NZ)=HEUPTK(ielmn,NZ)+UPNH4(NZ)+UPNO3(NZ)+UPNF(NZ)
   HEUPTK(ielmp,NZ)=HEUPTK(ielmp,NZ)+UPH2P(NZ)+UPH1P(NZ)
 
-  TEUPTK(1:npelms,NZ)=TEUPTK(1:npelms,NZ)+UPOME(1:npelms,NZ)
+  TEUPTK(1:NumOfPlantChemElements,NZ)=TEUPTK(1:NumOfPlantChemElements,NZ)+UPOME(1:NumOfPlantChemElements,NZ)
   TEUPTK(ielmn,NZ)=TEUPTK(ielmn,NZ)+UPNH4(NZ)+UPNO3(NZ)
   TEUPTK(ielmp,NZ)=TEUPTK(ielmp,NZ)+UPH2P(NZ)+UPH1P(NZ)
   TZUPFX(NZ)=TZUPFX(NZ)+UPNF(NZ)+UPNFC(NZ)

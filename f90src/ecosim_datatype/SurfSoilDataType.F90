@@ -10,14 +10,14 @@ module SurfSoilDataType
   real(r8),target,allocatable ::  FracSurfSnoFree(:,:)               !fraction of snow-free cover
   real(r8),target,allocatable ::  FracSurfAsBareSoi(:,:)             !fraction of exposed soil surface, [-]
   real(r8),target,allocatable ::  LWRadBySurf(:,:)                         !longwave radiation emitted from ground surface, [MJ d-2 t-1]
-  real(r8),target,allocatable ::  HeatRadiation(:,:)                 !total net radiation at ground surface, [MJ d-2 t-1]
+  real(r8),target,allocatable ::  HeatByRadiation(:,:)                 !total net radiation at ground surface, [MJ d-2 t-1]
   real(r8),target,allocatable ::  HeatEvapAir2Surf(:,:)              !total latent heat flux at ground surface, [MJ d-2 t-1]
   real(r8),target,allocatable ::  HeatSensAir2Surf(:,:)              !total sensible heat flux at ground surface, [MJ d-2 t-1]
   real(r8),target,allocatable ::  HeatSensVapAir2Surf(:,:)           !total convective heat flux at ground surface, [MJ d-2 t-1]
   real(r8),target,allocatable ::  HeatNet2Surf(:,:)                  !total ground heat flux at ground surface, [MJ d-2 t-1]
   real(r8),target,allocatable ::  VapXAir2GSurf(:,:)                 !negative of total evaporation at ground surface, [m3 d-2 t-1]
-  real(r8),target,allocatable ::  VOLWG(:,:)                         !surface water storage capacity, [m3 d-2]
-  real(r8),target,allocatable ::  VOLWD(:,:)                         !soil surface water retention capacity
+  real(r8),target,allocatable ::  VWatStoreCapSurf(:,:)                         !surface water storage capacity, [m3 d-2]
+  real(r8),target,allocatable ::  MaxVLWatByLitR(:,:)                         !soil surface water retention capacity
   real(r8),target,allocatable ::  VHCPNX(:,:)                        !minimum heat capacities
   real(r8),target,allocatable ::  PARG(:,:,:)                        !soil surface boundary layer conductance, [m t-1]
   real(r8),target,allocatable ::  FLQGQ(:,:)                         !precipitation flux into soil surface , [m3 d-2 h-1]
@@ -35,15 +35,15 @@ contains
   allocate(FracSurfAsSnow(JY,JX));         FracSurfAsSnow=0._r8
   allocate(FracSurfSnoFree(JY,JX));        FracSurfSnoFree=0._r8
   allocate(LWRadBySurf(JY,JX));             LWRadBySurf=0._r8
-  allocate(HeatRadiation(JY,JX));          HeatRadiation=0._r8
+  allocate(HeatByRadiation(JY,JX));          HeatByRadiation=0._r8
   allocate(HeatEvapAir2Surf(JY,JX));       HeatEvapAir2Surf=0._r8
   allocate(HeatSensAir2Surf(JY,JX));       HeatSensAir2Surf=0._r8
   allocate(HeatSensVapAir2Surf(JY,JX));    HeatSensVapAir2Surf=0._r8
   allocate(HeatNet2Surf(JY,JX));           HeatNet2Surf=0._r8
   allocate(VapXAir2GSurf(JY,JX));          VapXAir2GSurf=0._r8
   allocate(FracSurfAsBareSoi(JY,JX));      FracSurfAsBareSoi=0._r8
-  allocate(VOLWG(JY,JX));       VOLWG=0._r8
-  allocate(VOLWD(JY,JX));       VOLWD=0._r8
+  allocate(VWatStoreCapSurf(JY,JX));       VWatStoreCapSurf=0._r8
+  allocate(MaxVLWatByLitR(JY,JX));       MaxVLWatByLitR=0._r8
   allocate(VHCPNX(JY,JX));      VHCPNX=0._r8
   allocate(PARG(60,JY,JX));     PARG=0._r8
   allocate(FLQGQ(JY,JX));       FLQGQ=0._r8
@@ -61,15 +61,15 @@ contains
   call destroy(FracSurfAsSnow)
   call destroy(FracSurfSnoFree)
   call destroy(LWRadBySurf)
-  call destroy(HeatRadiation)
+  call destroy(HeatByRadiation)
   call destroy(HeatEvapAir2Surf)
   call destroy(HeatSensAir2Surf)
   call destroy(HeatSensVapAir2Surf)
   call destroy(HeatNet2Surf)
   call destroy(VapXAir2GSurf)
   call destroy(FracSurfAsBareSoi)
-  call destroy(VOLWG)
-  call destroy(VOLWD)
+  call destroy(VWatStoreCapSurf)
+  call destroy(MaxVLWatByLitR)
   call destroy(VHCPNX)
   call destroy(PARG)
   call destroy(FLQGQ)

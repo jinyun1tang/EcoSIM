@@ -37,13 +37,13 @@ module NoduleBGCMod
   real(r8) :: RGNDL,RSNDL
   real(r8) :: RGN2P,RGN2F
   real(r8) :: RUPNFB
-  real(r8) :: RXNDLE(npelms)
-  real(r8) :: RDNDLE(npelms)
-  real(r8) :: RCNDLE(npelms)
+  real(r8) :: RXNDLE(NumOfPlantChemElements)
+  real(r8) :: RDNDLE(NumOfPlantChemElements)
+  real(r8) :: RCNDLE(NumOfPlantChemElements)
   real(r8) :: RGNDG
-  real(r8) :: RXNSNE(npelms)
-  real(r8) :: RDNSNE(npelms)
-  real(r8) :: RCNSNE(npelms)
+  real(r8) :: RXNSNE(NumOfPlantChemElements)
+  real(r8) :: RDNSNE(NumOfPlantChemElements)
+  real(r8) :: RCNSNE(NumOfPlantChemElements)
   real(r8) :: SPNDLI
   real(r8) :: SPNDX
   real(r8) :: WTLSB1,WTNDB1,WTLSBT
@@ -208,7 +208,7 @@ module NoduleBGCMod
     RCCN=CNC*RCCXN
     RCCP=CPC*RCCQN
     SPNDX=SPNDL*SQRT(fTgrowCanP(NZ)*WFNG)
-    DO NE=1,npelms
+    DO NE=1,NumOfPlantChemElements
       RXNDLE(NE)=SPNDX*WTNDBE(NE,NB,NZ)
     ENDDO
 
@@ -216,7 +216,7 @@ module NoduleBGCMod
     RDNDLE(ielmn)=RXNDLE(ielmn)*(1.0_r8-RCCC)*(1.0_r8-RCCN)
     RDNDLE(ielmp)=RXNDLE(ielmp)*(1.0_r8-RCCC)*(1.0_r8-RCCP)
 
-    DO NE=1,npelms
+    DO NE=1,NumOfPlantChemElements
       RCNDLE(NE)=RXNDLE(NE)-RDNDLE(NE)
     ENDDO
 !
@@ -263,13 +263,13 @@ module NoduleBGCMod
       RDNSNE(ielmc)=RXNSNE(ielmc)*(1.0_r8-RCCC)
       RDNSNE(ielmn)=RXNSNE(ielmn)*(1.0_r8-RCCC)*(1.0_r8-RCCN)
       RDNSNE(ielmp)=RXNSNE(ielmp)*(1.0_r8-RCCC)*(1.0_r8-RCCP)
-      DO NE=1,npelms
+      DO NE=1,NumOfPlantChemElements
         RCNSNE(NE)=RXNSNE(NE)-RDNSNE(NE)
       ENDDO
     ELSE
-      RXNSNE(1:npelms)=0._r8
-      RDNSNE(1:npelms)=0._r8
-      RCNSNE(1:npelms)=0._r8
+      RXNSNE(1:NumOfPlantChemElements)=0._r8
+      RDNSNE(1:NumOfPlantChemElements)=0._r8
+      RCNSNE(1:NumOfPlantChemElements)=0._r8
     ENDIF
 !
 !     TOTAL NODULE RESPIRATION
@@ -299,7 +299,7 @@ module NoduleBGCMod
 !     RDNSNE(ielmc),RDNSNE(ielmc),RDNSNE(ielmp)=bacterial C,N,P senescence to litterfall
 !
     D6470: DO M=1,jsken
-      DO NE=1,npelms
+      DO NE=1,NumOfPlantChemElements
         ESNC(NE,M,k_fine_litr,0,NZ)=ESNC(NE,M,k_fine_litr,0,NZ) &
           +CFOPE(NE,ifoliar,M,NZ)*(RDNDLE(NE)+RDNSNE(NE))
       ENDDO
@@ -402,13 +402,13 @@ module NoduleBGCMod
   real(r8) :: RCNDL,RMNDL,RXNDL
   real(r8) :: RGNDL,RSNDL
   real(r8) :: RGN2P,RGN2F
-  real(r8) :: RXNDLE(npelms)
-  real(r8) :: RDNDLE(npelms)
-  real(r8) :: RCNDLE(npelms)
+  real(r8) :: RXNDLE(NumOfPlantChemElements)
+  real(r8) :: RDNDLE(NumOfPlantChemElements)
+  real(r8) :: RCNDLE(NumOfPlantChemElements)
   real(r8) :: RGNDG
-  real(r8) :: RXNSNE(npelms)
-  real(r8) :: RDNSNE(npelms)
-  real(r8) :: RCNSNE(npelms)
+  real(r8) :: RXNSNE(NumOfPlantChemElements)
+  real(r8) :: RDNSNE(NumOfPlantChemElements)
+  real(r8) :: RCNSNE(NumOfPlantChemElements)
   real(r8) :: RCNDLM,RXNDLM,RGNDLM
   real(r8) :: RSNDLM
   real(r8) :: SPNDLI
@@ -435,7 +435,7 @@ module NoduleBGCMod
     ESNC     =>   plt_bgcr%ESNC      , &
     UPNF     =>   plt_rbgc%UPNF      , &
     RUPNF    =>   plt_bgcr%RUPNF     , &
-    RootCPZR   =>   plt_biom%RootCPZR    , &
+    PopPlantRootC_vr   =>   plt_biom%PopPlantRootC_vr    , &
     WTNDLE   =>   plt_biom%WTNDLE    , &
     ZEROP    =>   plt_biom%ZEROP     , &
     EPOOLN   =>   plt_biom%EPOOLN    , &
@@ -453,7 +453,7 @@ module NoduleBGCMod
 !
   IF(INTYP(NZ).GE.1.AND.INTYP(NZ).LE.3)THEN
     D5400: DO L=NU,NIXBotRootLayer(NZ)
-      IF(RootCPZR(ipltroot,L,NZ).GT.ZEROL(NZ))THEN
+      IF(PopPlantRootC_vr(ipltroot,L,NZ).GT.ZEROL(NZ))THEN
 !
 !     INITIAL INFECTION
 !
@@ -589,7 +589,7 @@ module NoduleBGCMod
         RCCN=CNC*RCCXN
         RCCP=CPC*RCCQN
         SPNDX=SPNDL*SQRT(fTgrowRootP(L,NZ)*WFNGR(1,L))
-        DO NE=1,npelms
+        DO NE=1,NumOfPlantChemElements
           RXNDLE(NE)=SPNDX*WTNDLE(NE,L,NZ)
         ENDDO
 
@@ -642,13 +642,13 @@ module NoduleBGCMod
           RDNSNE(ielmc)=RXNSNE(ielmc)*(1.0_r8-RCCC)
           RDNSNE(ielmn)=RXNSNE(ielmn)*(1.0_r8-RCCC)*(1.0_r8-RCCN)
           RDNSNE(ielmp)=RXNSNE(ielmp)*(1.0_r8-RCCC)*(1.0_r8-RCCP)
-          DO NE=1,npelms
+          DO NE=1,NumOfPlantChemElements
             RCNSNE(NE)=RXNSNE(NE)-RDNSNE(NE)
           ENDDO
         ELSE
-          RXNSNE(1:npelms)=0._r8
-          RDNSNE(1:npelms)=0._r8
-          RCNSNE(1:npelms)=0._r8
+          RXNSNE(1:NumOfPlantChemElements)=0._r8
+          RDNSNE(1:NumOfPlantChemElements)=0._r8
+          RCNSNE(1:NumOfPlantChemElements)=0._r8
         ENDIF
 !
 !     TOTAL NODULE RESPIRATION
@@ -676,7 +676,7 @@ module NoduleBGCMod
 !     RDNSNE(ielmc),RDNSNE(ielmc),RDNSNE(ielmp)=bacterial C,N,P senescence to litterfall
 !
         D6370: DO M=1,jsken
-          DO NE=1,npelms
+          DO NE=1,NumOfPlantChemElements
             ESNC(NE,M,k_fine_litr,L,NZ)=ESNC(NE,M,k_fine_litr,L,NZ)&
               +CFOPE(NE,iroot,M,NZ)*(RDNDLE(NE)+RDNSNE(NE))
           ENDDO
@@ -724,10 +724,10 @@ module NoduleBGCMod
 !     CPOOLN,ZPOOLN,PPOOLN=nonstructural C,N,P in bacteria
 !
         IF(EPOOLR(ielmc,ipltroot,L,NZ).GT.ZEROP(NZ) &
-          .AND.RootCPZR(ipltroot,L,NZ).GT.ZEROL(NZ))THEN
-          CCNDLR=WTNDLE(ielmc,L,NZ)/RootCPZR(ipltroot,L,NZ)
-          WTRTD1=RootCPZR(ipltroot,L,NZ)
-          WTNDL1=AMIN1(RootCPZR(ipltroot,L,NZ),AMAX1(WTNDI*AREA3(NU),WTNDLE(ielmc,L,NZ)))
+          .AND.PopPlantRootC_vr(ipltroot,L,NZ).GT.ZEROL(NZ))THEN
+          CCNDLR=WTNDLE(ielmc,L,NZ)/PopPlantRootC_vr(ipltroot,L,NZ)
+          WTRTD1=PopPlantRootC_vr(ipltroot,L,NZ)
+          WTNDL1=AMIN1(PopPlantRootC_vr(ipltroot,L,NZ),AMAX1(WTNDI*AREA3(NU),WTNDLE(ielmc,L,NZ)))
           WTRTDT=WTRTD1+WTNDL1
           IF(WTRTDT.GT.ZEROP(NZ))THEN
             FXRNX=FXRN(INTYP(NZ))/(1.0_r8+CCNDLR/CCNGR)

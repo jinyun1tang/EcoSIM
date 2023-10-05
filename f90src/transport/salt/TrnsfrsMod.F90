@@ -35,12 +35,12 @@ module TrnsfrsMod
 
   real(r8) :: RCHQF,RCHGFU,RCHGFT
   real(r8) :: XN
-  real(r8),allocatable ::  trcsa_TQR(:,:,:)                         !
+  real(r8),allocatable ::  trcSalt_TQR(:,:,:)                         !
 
-  real(r8),allocatable ::  trcsa_TQ(:,:,:)                         !
-  real(r8),allocatable ::  trcsa_TFLS(:,:,:,:)                      !
-  real(r8),allocatable ::  trcsa_TFHS(:,:,:,:)                      !
-  real(r8),allocatable ::  trcsa_RFLZ(:,:,:,:)                      !
+  real(r8),allocatable ::  trcSalt_TQ(:,:,:)                         !
+  real(r8),allocatable ::  trcSalt_TFLS(:,:,:,:)                      !
+  real(r8),allocatable ::  trcSalt_TFHS(:,:,:,:)                      !
+  real(r8),allocatable ::  trcSalt_RFLZ(:,:,:,:)                      !
 !----------------------------------------------------------------------
 
 
@@ -54,8 +54,8 @@ module TrnsfrsMod
   use abortutils, only : destroy
   implicit none
 
-  call destroy(trcsa_TQR)
-  call destroy(trcsa_TFLS)
+  call destroy(trcSalt_TQR)
+  call destroy(trcSalt_TFLS)
 
 
   end subroutine DestructTrnsfrs
@@ -65,11 +65,11 @@ module TrnsfrsMod
   subroutine initTrnsfrs()
   implicit none
 
-  allocate(trcsa_TQR(idsa_beg:idsa_end,JY,JX));       trcsa_TQR=0._r8
+  allocate(trcSalt_TQR(idsalt_beg:idsalt_end,JY,JX));       trcSalt_TQR=0._r8
 
-  allocate(trcsa_TFLS(idsa_beg:idsab_end,JZ,JY,JX));   trcsa_TFLS=0._r8
-  allocate(trcsa_TFHS(idsa_beg:idsab_end,JZ,JY,JX));   trcsa_TFHS=0._r8
-  allocate(trcsa_RFLZ(idsa_beg:idsab_end,JZ,JY,JX));   trcsa_RFLZ=0._r8
+  allocate(trcSalt_TFLS(idsalt_beg:idsaltb_end,JZ,JY,JX));   trcSalt_TFLS=0._r8
+  allocate(trcSalt_TFHS(idsalt_beg:idsaltb_end,JZ,JY,JX));   trcSalt_TFHS=0._r8
+  allocate(trcSalt_RFLZ(idsalt_beg:idsaltb_end,JZ,JY,JX));   trcSalt_RFLZ=0._r8
   end subroutine InitTrnsfrs
 !----------------------------------------------------------------------
   SUBROUTINE trnsfrs(I,J,NHW,NHE,NVN,NVS)
@@ -137,13 +137,13 @@ module TrnsfrsMod
   integer, intent(in) :: NY,NX
   integer :: NTSA
 !     begin_execution
-  DO NTSA=idsa_beg,idsa_end
-    trcsa_XBLS(NTSA,1,NY,NX)=0.0
-    trcsa_XFLS(NTSA,3,0,NY,NX)=0.0
+  DO NTSA=idsalt_beg,idsalt_end
+    trcSalt_XBLS(NTSA,1,NY,NX)=0.0
+    trcSalt_XFLS(NTSA,3,0,NY,NX)=0.0
   ENDDO
 
-  DO NTSA=idsa_beg,idsab_end
-    trcsa_XFLS(NTSA,3,NU(NY,NX),NY,NX)=0.0
+  DO NTSA=idsalt_beg,idsaltb_end
+    trcSalt_XFLS(NTSA,3,NU(NY,NX),NY,NX)=0.0
   ENDDO
   end subroutine ZeroAtmosSoluteFlux
 !------------------------------------------------------------------------------------------
@@ -158,59 +158,59 @@ module TrnsfrsMod
 
 !     begin_execution
 
-  trcsa_XBLS(idsa_Al,1,NY,NX)=FLQGQ(NY,NX)*CALR(NY,NX)+FLQGI(NY,NX)*CALQ(I,NY,NX)
-  trcsa_XBLS(idsa_Fe,1,NY,NX)=FLQGQ(NY,NX)*CFER(NY,NX)+FLQGI(NY,NX)*CFEQ(I,NY,NX)
-  trcsa_XBLS(idsa_Hp,1,NY,NX)=FLQGQ(NY,NX)*CHYR(NY,NX)+FLQGI(NY,NX)*CHYQ(I,NY,NX)
-  trcsa_XBLS(idsa_Ca,1,NY,NX)=FLQGQ(NY,NX)*CCAR(NY,NX)+FLQGI(NY,NX)*CCAQ(I,NY,NX)
-  trcsa_XBLS(idsa_Mg,1,NY,NX)=FLQGQ(NY,NX)*CMGR(NY,NX)+FLQGI(NY,NX)*CMGQ(I,NY,NX)
-  trcsa_XBLS(idsa_Na,1,NY,NX)=FLQGQ(NY,NX)*CNAR(NY,NX)+FLQGI(NY,NX)*CNAQ(I,NY,NX)
-  trcsa_XBLS(idsa_K,1,NY,NX)=FLQGQ(NY,NX)*CKAR(NY,NX)+FLQGI(NY,NX)*CKAQ(I,NY,NX)
-  trcsa_XBLS(idsa_OH,1,NY,NX)=FLQGQ(NY,NX)*COHR(NY,NX)+FLQGI(NY,NX)*COHQ(I,NY,NX)
-  trcsa_XBLS(idsa_SO4,1,NY,NX)=FLQGQ(NY,NX)*CSOR(NY,NX)+FLQGI(NY,NX)*CSOQ(I,NY,NX)
-  trcsa_XBLS(idsa_Cl,1,NY,NX)=FLQGQ(NY,NX)*CCLR(NY,NX)+FLQGI(NY,NX)*CCLQ(I,NY,NX)
-  trcsa_XBLS(idsa_CO3,1,NY,NX)=FLQGQ(NY,NX)*CC3R(NY,NX)+FLQGI(NY,NX)*CC3Q(I,NY,NX)
-  trcsa_XBLS(idsa_HCO3,1,NY,NX)=FLQGQ(NY,NX)*CHCR(NY,NX)+FLQGI(NY,NX)*CHCQ(I,NY,NX)
-  trcsa_XBLS(idsa_AlOH,1,NY,NX)=FLQGQ(NY,NX)*CAL1R(NY,NX)+FLQGI(NY,NX)*CAL1Q(I,NY,NX)
-  trcsa_XBLS(idsa_AlOH2,1,NY,NX)=FLQGQ(NY,NX)*CAL2R(NY,NX)+FLQGI(NY,NX)*CAL2Q(I,NY,NX)
-  trcsa_XBLS(idsa_AlOH3,1,NY,NX)=FLQGQ(NY,NX)*CAL3R(NY,NX)+FLQGI(NY,NX)*CAL3Q(I,NY,NX)
-  trcsa_XBLS(idsa_AlOH4,1,NY,NX)=FLQGQ(NY,NX)*CAL4R(NY,NX)+FLQGI(NY,NX)*CAL4Q(I,NY,NX)
-  trcsa_XBLS(idsa_AlSO4,1,NY,NX)=FLQGQ(NY,NX)*CALSR(NY,NX)+FLQGI(NY,NX)*CALSQ(I,NY,NX)
-  trcsa_XBLS(idsa_FeOH,1,NY,NX)=FLQGQ(NY,NX)*CFE1R(NY,NX)+FLQGI(NY,NX)*CFE1Q(I,NY,NX)
-  trcsa_XBLS(idsa_FeOH2,1,NY,NX)=FLQGQ(NY,NX)*CFE2R(NY,NX)+FLQGI(NY,NX)*CFE2Q(I,NY,NX)
-  trcsa_XBLS(idsa_FeOH3,1,NY,NX)=FLQGQ(NY,NX)*CFE3R(NY,NX)+FLQGI(NY,NX)*CFE3Q(I,NY,NX)
-  trcsa_XBLS(idsa_FeOH4,1,NY,NX)=FLQGQ(NY,NX)*CFE4R(NY,NX)+FLQGI(NY,NX)*CFE4Q(I,NY,NX)
-  trcsa_XBLS(idsa_FeSO4,1,NY,NX)=FLQGQ(NY,NX)*CFESR(NY,NX)+FLQGI(NY,NX)*CFESQ(I,NY,NX)
-  trcsa_XBLS(idsa_CaOH2,1,NY,NX)=FLQGQ(NY,NX)*CCAOR(NY,NX)+FLQGI(NY,NX)*CCAOQ(I,NY,NX)
-  trcsa_XBLS(idsa_CaCO3,1,NY,NX)=FLQGQ(NY,NX)*CCACR(NY,NX)+FLQGI(NY,NX)*CCACQ(I,NY,NX)
-  trcsa_XBLS(idsa_CaHCO3,1,NY,NX)=FLQGQ(NY,NX)*CCAHR(NY,NX)+FLQGI(NY,NX)*CCAHQ(I,NY,NX)
-  trcsa_XBLS(idsa_CaSO4,1,NY,NX)=FLQGQ(NY,NX)*CCASR(NY,NX)+FLQGI(NY,NX)*CCASQ(I,NY,NX)
-  trcsa_XBLS(idsa_MgOH2,1,NY,NX)=FLQGQ(NY,NX)*CMGOR(NY,NX)+FLQGI(NY,NX)*CMGOQ(I,NY,NX)
-  trcsa_XBLS(idsa_MgCO3,1,NY,NX)=FLQGQ(NY,NX)*CMGCR(NY,NX)+FLQGI(NY,NX)*CMGCQ(I,NY,NX)
-  trcsa_XBLS(idsa_MgHCO3,1,NY,NX)=FLQGQ(NY,NX)*CMGHR(NY,NX)+FLQGI(NY,NX)*CMGHQ(I,NY,NX)
-  trcsa_XBLS(idsa_MgSO4,1,NY,NX)=FLQGQ(NY,NX)*CMGSR(NY,NX)+FLQGI(NY,NX)*CMGSQ(I,NY,NX)
-  trcsa_XBLS(idsa_NaCO3,1,NY,NX)=FLQGQ(NY,NX)*CNACR(NY,NX)+FLQGI(NY,NX)*CNACQ(I,NY,NX)
-  trcsa_XBLS(idsa_NaSO4,1,NY,NX)=FLQGQ(NY,NX)*CNASR(NY,NX)+FLQGI(NY,NX)*CNASQ(I,NY,NX)
-  trcsa_XBLS(idsa_KSO4,1,NY,NX)=FLQGQ(NY,NX)*CKASR(NY,NX)+FLQGI(NY,NX)*CKASQ(I,NY,NX)
-  trcsa_XBLS(idsa_H0PO4,1,NY,NX)=FLQGQ(NY,NX)*CH0PR(NY,NX)+FLQGI(NY,NX)*CH0PQ(I,NY,NX)
-  trcsa_XBLS(idsa_H3PO4,1,NY,NX)=FLQGQ(NY,NX)*CH3PR(NY,NX)+FLQGI(NY,NX)*CH3PQ(I,NY,NX)
-  trcsa_XBLS(idsa_FeHPO4,1,NY,NX)=FLQGQ(NY,NX)*CF1PR(NY,NX)+FLQGI(NY,NX)*CF1PQ(I,NY,NX)
-  trcsa_XBLS(idsa_FeH2PO4,1,NY,NX)=FLQGQ(NY,NX)*CF2PR(NY,NX)+FLQGI(NY,NX)*CF2PQ(I,NY,NX)
-  trcsa_XBLS(idsa_CaPO4,1,NY,NX)=FLQGQ(NY,NX)*CC0PR(NY,NX)+FLQGI(NY,NX)*CC0PQ(I,NY,NX)
-  trcsa_XBLS(idsa_CaHPO4,1,NY,NX)=FLQGQ(NY,NX)*CC1PR(NY,NX)+FLQGI(NY,NX)*CC1PQ(I,NY,NX)
-  trcsa_XBLS(idsa_CaH2PO4,1,NY,NX)=FLQGQ(NY,NX)*CC2PR(NY,NX)+FLQGI(NY,NX)*CC2PQ(I,NY,NX)
-  trcsa_XBLS(idsa_MgHPO4,1,NY,NX)=FLQGQ(NY,NX)*CM1PR(NY,NX)+FLQGI(NY,NX)*CM1PQ(I,NY,NX)
+  trcSalt_XBLS(idsalt_Al,1,NY,NX)=FLQGQ(NY,NX)*CALR(NY,NX)+FLQGI(NY,NX)*CALQ(I,NY,NX)
+  trcSalt_XBLS(idsalt_Fe,1,NY,NX)=FLQGQ(NY,NX)*CFER(NY,NX)+FLQGI(NY,NX)*CFEQ(I,NY,NX)
+  trcSalt_XBLS(idsalt_Hp,1,NY,NX)=FLQGQ(NY,NX)*CHYR(NY,NX)+FLQGI(NY,NX)*CHYQ(I,NY,NX)
+  trcSalt_XBLS(idsalt_Ca,1,NY,NX)=FLQGQ(NY,NX)*CCAR(NY,NX)+FLQGI(NY,NX)*CCAQ(I,NY,NX)
+  trcSalt_XBLS(idsalt_Mg,1,NY,NX)=FLQGQ(NY,NX)*CMGR(NY,NX)+FLQGI(NY,NX)*CMGQ(I,NY,NX)
+  trcSalt_XBLS(idsalt_Na,1,NY,NX)=FLQGQ(NY,NX)*CNAR(NY,NX)+FLQGI(NY,NX)*CNAQ(I,NY,NX)
+  trcSalt_XBLS(idsalt_K,1,NY,NX)=FLQGQ(NY,NX)*CKAR(NY,NX)+FLQGI(NY,NX)*CKAQ(I,NY,NX)
+  trcSalt_XBLS(idsalt_OH,1,NY,NX)=FLQGQ(NY,NX)*COHR(NY,NX)+FLQGI(NY,NX)*COHQ(I,NY,NX)
+  trcSalt_XBLS(idsalt_SO4,1,NY,NX)=FLQGQ(NY,NX)*CSOR(NY,NX)+FLQGI(NY,NX)*CSOQ(I,NY,NX)
+  trcSalt_XBLS(idsalt_Cl,1,NY,NX)=FLQGQ(NY,NX)*CCLR(NY,NX)+FLQGI(NY,NX)*CCLQ(I,NY,NX)
+  trcSalt_XBLS(idsalt_CO3,1,NY,NX)=FLQGQ(NY,NX)*CC3R(NY,NX)+FLQGI(NY,NX)*CC3Q(I,NY,NX)
+  trcSalt_XBLS(idsalt_HCO3,1,NY,NX)=FLQGQ(NY,NX)*CHCR(NY,NX)+FLQGI(NY,NX)*CHCQ(I,NY,NX)
+  trcSalt_XBLS(idsalt_AlOH,1,NY,NX)=FLQGQ(NY,NX)*CAL1R(NY,NX)+FLQGI(NY,NX)*CAL1Q(I,NY,NX)
+  trcSalt_XBLS(idsalt_AlOH2,1,NY,NX)=FLQGQ(NY,NX)*CAL2R(NY,NX)+FLQGI(NY,NX)*CAL2Q(I,NY,NX)
+  trcSalt_XBLS(idsalt_AlOH3,1,NY,NX)=FLQGQ(NY,NX)*CAL3R(NY,NX)+FLQGI(NY,NX)*CAL3Q(I,NY,NX)
+  trcSalt_XBLS(idsalt_AlOH4,1,NY,NX)=FLQGQ(NY,NX)*CAL4R(NY,NX)+FLQGI(NY,NX)*CAL4Q(I,NY,NX)
+  trcSalt_XBLS(idsalt_AlSO4,1,NY,NX)=FLQGQ(NY,NX)*CALSR(NY,NX)+FLQGI(NY,NX)*CALSQ(I,NY,NX)
+  trcSalt_XBLS(idsalt_FeOH,1,NY,NX)=FLQGQ(NY,NX)*CFE1R(NY,NX)+FLQGI(NY,NX)*CFE1Q(I,NY,NX)
+  trcSalt_XBLS(idsalt_FeOH2,1,NY,NX)=FLQGQ(NY,NX)*CFE2R(NY,NX)+FLQGI(NY,NX)*CFE2Q(I,NY,NX)
+  trcSalt_XBLS(idsalt_FeOH3,1,NY,NX)=FLQGQ(NY,NX)*CFE3R(NY,NX)+FLQGI(NY,NX)*CFE3Q(I,NY,NX)
+  trcSalt_XBLS(idsalt_FeOH4,1,NY,NX)=FLQGQ(NY,NX)*CFE4R(NY,NX)+FLQGI(NY,NX)*CFE4Q(I,NY,NX)
+  trcSalt_XBLS(idsalt_FeSO4,1,NY,NX)=FLQGQ(NY,NX)*CFESR(NY,NX)+FLQGI(NY,NX)*CFESQ(I,NY,NX)
+  trcSalt_XBLS(idsalt_CaOH2,1,NY,NX)=FLQGQ(NY,NX)*CCAOR(NY,NX)+FLQGI(NY,NX)*CCAOQ(I,NY,NX)
+  trcSalt_XBLS(idsalt_CaCO3,1,NY,NX)=FLQGQ(NY,NX)*CCACR(NY,NX)+FLQGI(NY,NX)*CCACQ(I,NY,NX)
+  trcSalt_XBLS(idsalt_CaHCO3,1,NY,NX)=FLQGQ(NY,NX)*CCAHR(NY,NX)+FLQGI(NY,NX)*CCAHQ(I,NY,NX)
+  trcSalt_XBLS(idsalt_CaSO4,1,NY,NX)=FLQGQ(NY,NX)*CCASR(NY,NX)+FLQGI(NY,NX)*CCASQ(I,NY,NX)
+  trcSalt_XBLS(idsalt_MgOH2,1,NY,NX)=FLQGQ(NY,NX)*CMGOR(NY,NX)+FLQGI(NY,NX)*CMGOQ(I,NY,NX)
+  trcSalt_XBLS(idsalt_MgCO3,1,NY,NX)=FLQGQ(NY,NX)*CMGCR(NY,NX)+FLQGI(NY,NX)*CMGCQ(I,NY,NX)
+  trcSalt_XBLS(idsalt_MgHCO3,1,NY,NX)=FLQGQ(NY,NX)*CMGHR(NY,NX)+FLQGI(NY,NX)*CMGHQ(I,NY,NX)
+  trcSalt_XBLS(idsalt_MgSO4,1,NY,NX)=FLQGQ(NY,NX)*CMGSR(NY,NX)+FLQGI(NY,NX)*CMGSQ(I,NY,NX)
+  trcSalt_XBLS(idsalt_NaCO3,1,NY,NX)=FLQGQ(NY,NX)*CNACR(NY,NX)+FLQGI(NY,NX)*CNACQ(I,NY,NX)
+  trcSalt_XBLS(idsalt_NaSO4,1,NY,NX)=FLQGQ(NY,NX)*CNASR(NY,NX)+FLQGI(NY,NX)*CNASQ(I,NY,NX)
+  trcSalt_XBLS(idsalt_KSO4,1,NY,NX)=FLQGQ(NY,NX)*CKASR(NY,NX)+FLQGI(NY,NX)*CKASQ(I,NY,NX)
+  trcSalt_XBLS(idsalt_H0PO4,1,NY,NX)=FLQGQ(NY,NX)*CH0PR(NY,NX)+FLQGI(NY,NX)*CH0PQ(I,NY,NX)
+  trcSalt_XBLS(idsalt_H3PO4,1,NY,NX)=FLQGQ(NY,NX)*CH3PR(NY,NX)+FLQGI(NY,NX)*CH3PQ(I,NY,NX)
+  trcSalt_XBLS(idsalt_FeHPO4,1,NY,NX)=FLQGQ(NY,NX)*CF1PR(NY,NX)+FLQGI(NY,NX)*CF1PQ(I,NY,NX)
+  trcSalt_XBLS(idsalt_FeH2PO4,1,NY,NX)=FLQGQ(NY,NX)*CF2PR(NY,NX)+FLQGI(NY,NX)*CF2PQ(I,NY,NX)
+  trcSalt_XBLS(idsalt_CaPO4,1,NY,NX)=FLQGQ(NY,NX)*CC0PR(NY,NX)+FLQGI(NY,NX)*CC0PQ(I,NY,NX)
+  trcSalt_XBLS(idsalt_CaHPO4,1,NY,NX)=FLQGQ(NY,NX)*CC1PR(NY,NX)+FLQGI(NY,NX)*CC1PQ(I,NY,NX)
+  trcSalt_XBLS(idsalt_CaH2PO4,1,NY,NX)=FLQGQ(NY,NX)*CC2PR(NY,NX)+FLQGI(NY,NX)*CC2PQ(I,NY,NX)
+  trcSalt_XBLS(idsalt_MgHPO4,1,NY,NX)=FLQGQ(NY,NX)*CM1PR(NY,NX)+FLQGI(NY,NX)*CM1PQ(I,NY,NX)
 !
 !     HOURLY SOLUTE FLUXES FROM ATMOSPHERE TO SOIL SURFACE
 !     IN RAINFALL AND IRRIGATION ARE ZERO IF SNOWPACK IS PRESENT
 !
 !     X*FLS,X*FLB=hourly solute flux to micropores in non-band,band
 !
-  DO NTSA=idsa_beg,idsa_end
-    trcsa_XFLS(NTSA,3,0,NY,NX)=0.0
+  DO NTSA=idsalt_beg,idsalt_end
+    trcSalt_XFLS(NTSA,3,0,NY,NX)=0.0
   ENDDO
 
-  DO NTSA=idsa_beg,idsab_end
-    trcsa_XFLS(NTSA,3,NU(NY,NX),NY,NX)=0.0
+  DO NTSA=idsalt_beg,idsaltb_end
+    trcSalt_XFLS(NTSA,3,NU(NY,NX),NY,NX)=0.0
   ENDDO
   end subroutine AtmosSoluteFluxToSnowpack
 !------------------------------------------------------------------------------------------
@@ -227,7 +227,7 @@ module TrnsfrsMod
 !     HOURLY SOLUTE FLUXES FROM ATMOSPHERE TO SNOWPACK
 !     IN SNOWFALL AND IRRIGATION IS ZERO IF SNOWPACK IS ABSENT
 !
-!     PRECQ,PRECI=snow+rain,irrigation
+!     PrecAtm,PRECI=snow+rain,irrigation
 !     X*BLS=hourly solute flux to snowpack
 !     X*FLS,X*FLB=hourly solute flux to surface litter,soil surface micropore non-band,band
 !     FLQRQ,FLQRI=water flux to surface litter from rain,irrigation
@@ -244,115 +244,115 @@ module TrnsfrsMod
 !          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH2PO4+,*M1P*=MgHPO4,*COO*=COOH-
 !          :*1=non-band,*B=band
 !
-  DO NTSA=idsa_beg,idsa_end
-    trcsa_XBLS(NTSA,1,NY,NX)=0.0_r8
+  DO NTSA=idsalt_beg,idsalt_end
+    trcSalt_XBLS(NTSA,1,NY,NX)=0.0_r8
   ENDDO
 
-  trcsa_XFLS(idsa_Al,3,0,NY,NX)=FLQRQ(NY,NX)*CALR(NY,NX)+FLQRI(NY,NX)*CALQ(I,NY,NX)
-  trcsa_XFLS(idsa_Fe,3,0,NY,NX)=FLQRQ(NY,NX)*CFER(NY,NX)+FLQRI(NY,NX)*CFEQ(I,NY,NX)
-  trcsa_XFLS(idsa_Hp,3,0,NY,NX)=FLQRQ(NY,NX)*CHYR(NY,NX)+FLQRI(NY,NX)*CHYQ(I,NY,NX)
-  trcsa_XFLS(idsa_Ca,3,0,NY,NX)=FLQRQ(NY,NX)*CCAR(NY,NX)+FLQRI(NY,NX)*CCAQ(I,NY,NX)
-  trcsa_XFLS(idsa_Mg,3,0,NY,NX)=FLQRQ(NY,NX)*CMGR(NY,NX)+FLQRI(NY,NX)*CMGQ(I,NY,NX)
-  trcsa_XFLS(idsa_Na,3,0,NY,NX)=FLQRQ(NY,NX)*CNAR(NY,NX)+FLQRI(NY,NX)*CNAQ(I,NY,NX)
-  trcsa_XFLS(idsa_K,3,0,NY,NX)=FLQRQ(NY,NX)*CKAR(NY,NX)+FLQRI(NY,NX)*CKAQ(I,NY,NX)
-  trcsa_XFLS(idsa_OH,3,0,NY,NX)=FLQRQ(NY,NX)*COHR(NY,NX)+FLQRI(NY,NX)*COHQ(I,NY,NX)
-  trcsa_XFLS(idsa_SO4,3,0,NY,NX)=FLQRQ(NY,NX)*CSOR(NY,NX)+FLQRI(NY,NX)*CSOQ(I,NY,NX)
-  trcsa_XFLS(idsa_Cl,3,0,NY,NX)=FLQRQ(NY,NX)*CCLR(NY,NX)+FLQRI(NY,NX)*CCLQ(I,NY,NX)
-  trcsa_XFLS(idsa_CO3,3,0,NY,NX)=FLQRQ(NY,NX)*CC3R(NY,NX)+FLQRI(NY,NX)*CC3Q(I,NY,NX)
-  trcsa_XFLS(idsa_HCO3,3,0,NY,NX)=FLQRQ(NY,NX)*CHCR(NY,NX)+FLQRI(NY,NX)*CHCQ(I,NY,NX)
-  trcsa_XFLS(idsa_AlOH,3,0,NY,NX)=FLQRQ(NY,NX)*CAL1R(NY,NX)+FLQRI(NY,NX)*CAL1Q(I,NY,NX)
-  trcsa_XFLS(idsa_AlOH2,3,0,NY,NX)=FLQRQ(NY,NX)*CAL2R(NY,NX)+FLQRI(NY,NX)*CAL2Q(I,NY,NX)
-  trcsa_XFLS(idsa_AlOH3,3,0,NY,NX)=FLQRQ(NY,NX)*CAL3R(NY,NX)+FLQRI(NY,NX)*CAL3Q(I,NY,NX)
-  trcsa_XFLS(idsa_AlOH4,3,0,NY,NX)=FLQRQ(NY,NX)*CAL4R(NY,NX)+FLQRI(NY,NX)*CAL4Q(I,NY,NX)
-  trcsa_XFLS(idsa_AlSO4,3,0,NY,NX)=FLQRQ(NY,NX)*CALSR(NY,NX)+FLQRI(NY,NX)*CALSQ(I,NY,NX)
-  trcsa_XFLS(idsa_FeOH,3,0,NY,NX)=FLQRQ(NY,NX)*CFE1R(NY,NX)+FLQRI(NY,NX)*CFE1Q(I,NY,NX)
-  trcsa_XFLS(idsa_FeOH2,3,0,NY,NX)=FLQRQ(NY,NX)*CFE2R(NY,NX)+FLQRI(NY,NX)*CFE2Q(I,NY,NX)
-  trcsa_XFLS(idsa_FeOH3,3,0,NY,NX)=FLQRQ(NY,NX)*CFE3R(NY,NX)+FLQRI(NY,NX)*CFE3Q(I,NY,NX)
-  trcsa_XFLS(idsa_FeOH4,3,0,NY,NX)=FLQRQ(NY,NX)*CFE4R(NY,NX)+FLQRI(NY,NX)*CFE4Q(I,NY,NX)
-  trcsa_XFLS(idsa_FeSO4,3,0,NY,NX)=FLQRQ(NY,NX)*CFESR(NY,NX)+FLQRI(NY,NX)*CFESQ(I,NY,NX)
-  trcsa_XFLS(idsa_CaOH2,3,0,NY,NX)=FLQRQ(NY,NX)*CCAOR(NY,NX)+FLQRI(NY,NX)*CCAOQ(I,NY,NX)
-  trcsa_XFLS(idsa_CaCO3,3,0,NY,NX)=FLQRQ(NY,NX)*CCACR(NY,NX)+FLQRI(NY,NX)*CCACQ(I,NY,NX)
-  trcsa_XFLS(idsa_CaHCO3,3,0,NY,NX)=FLQRQ(NY,NX)*CCAHR(NY,NX)+FLQRI(NY,NX)*CCAHQ(I,NY,NX)
-  trcsa_XFLS(idsa_CaSO4,3,0,NY,NX)=FLQRQ(NY,NX)*CCASR(NY,NX)+FLQRI(NY,NX)*CCASQ(I,NY,NX)
-  trcsa_XFLS(idsa_MgOH2,3,0,NY,NX)=FLQRQ(NY,NX)*CMGOR(NY,NX)+FLQRI(NY,NX)*CMGOQ(I,NY,NX)
-  trcsa_XFLS(idsa_MgCO3,3,0,NY,NX)=FLQRQ(NY,NX)*CMGCR(NY,NX)+FLQRI(NY,NX)*CMGCQ(I,NY,NX)
-  trcsa_XFLS(idsa_MgHCO3,3,0,NY,NX)=FLQRQ(NY,NX)*CMGHR(NY,NX)+FLQRI(NY,NX)*CMGHQ(I,NY,NX)
-  trcsa_XFLS(idsa_MgSO4,3,0,NY,NX)=FLQRQ(NY,NX)*CMGSR(NY,NX)+FLQRI(NY,NX)*CMGSQ(I,NY,NX)
-  trcsa_XFLS(idsa_NaCO3,3,0,NY,NX)=FLQRQ(NY,NX)*CNACR(NY,NX)+FLQRI(NY,NX)*CNACQ(I,NY,NX)
-  trcsa_XFLS(idsa_NaSO4,3,0,NY,NX)=FLQRQ(NY,NX)*CNASR(NY,NX)+FLQRI(NY,NX)*CNASQ(I,NY,NX)
-  trcsa_XFLS(idsa_KSO4,3,0,NY,NX)=FLQRQ(NY,NX)*CKASR(NY,NX)+FLQRI(NY,NX)*CKASQ(I,NY,NX)
-  trcsa_XFLS(idsa_H0PO4,3,0,NY,NX)=FLQRQ(NY,NX)*CH0PR(NY,NX)+FLQRI(NY,NX)*CH0PQ(I,NY,NX)
-  trcsa_XFLS(idsa_H3PO4,3,0,NY,NX)=FLQRQ(NY,NX)*CH3PR(NY,NX)+FLQRI(NY,NX)*CH3PQ(I,NY,NX)
-  trcsa_XFLS(idsa_FeHPO4,3,0,NY,NX)=FLQRQ(NY,NX)*CF1PR(NY,NX)+FLQRI(NY,NX)*CF1PQ(I,NY,NX)
-  trcsa_XFLS(idsa_FeH2PO4,3,0,NY,NX)=FLQRQ(NY,NX)*CF2PR(NY,NX)+FLQRI(NY,NX)*CF2PQ(I,NY,NX)
-  trcsa_XFLS(idsa_CaPO4,3,0,NY,NX)=FLQRQ(NY,NX)*CC0PR(NY,NX)+FLQRI(NY,NX)*CC0PQ(I,NY,NX)
-  trcsa_XFLS(idsa_CaHPO4,3,0,NY,NX)=FLQRQ(NY,NX)*CC1PR(NY,NX)+FLQRI(NY,NX)*CC1PQ(I,NY,NX)
-  trcsa_XFLS(idsa_CaH2PO4,3,0,NY,NX)=FLQRQ(NY,NX)*CC2PR(NY,NX)+FLQRI(NY,NX)*CC2PQ(I,NY,NX)
-  trcsa_XFLS(idsa_MgHPO4,3,0,NY,NX)=FLQRQ(NY,NX)*CM1PR(NY,NX)+FLQRI(NY,NX)*CM1PQ(I,NY,NX)
-  trcsa_XFLS(idsa_Al,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CALR(NY,NX)+FLQGI(NY,NX)*CALQ(I,NY,NX)
-  trcsa_XFLS(idsa_Fe,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CFER(NY,NX)+FLQGI(NY,NX)*CFEQ(I,NY,NX)
-  trcsa_XFLS(idsa_Hp,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CHYR(NY,NX)+FLQGI(NY,NX)*CHYQ(I,NY,NX)
-  trcsa_XFLS(idsa_Ca,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CCAR(NY,NX)+FLQGI(NY,NX)*CCAQ(I,NY,NX)
-  trcsa_XFLS(idsa_Mg,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CMGR(NY,NX)+FLQGI(NY,NX)*CMGQ(I,NY,NX)
-  trcsa_XFLS(idsa_Na,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CNAR(NY,NX)+FLQGI(NY,NX)*CNAQ(I,NY,NX)
-  trcsa_XFLS(idsa_K,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CKAR(NY,NX)+FLQGI(NY,NX)*CKAQ(I,NY,NX)
-  trcsa_XFLS(idsa_OH,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*COHR(NY,NX)+FLQGI(NY,NX)*COHQ(I,NY,NX)
-  trcsa_XFLS(idsa_SO4,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CSOR(NY,NX)+FLQGI(NY,NX)*CSOQ(I,NY,NX)
-  trcsa_XFLS(idsa_Cl,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CCLR(NY,NX)+FLQGI(NY,NX)*CCLQ(I,NY,NX)
-  trcsa_XFLS(idsa_CO3,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CC3R(NY,NX)+FLQGI(NY,NX)*CC3Q(I,NY,NX)
-  trcsa_XFLS(idsa_HCO3,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CHCR(NY,NX)+FLQGI(NY,NX)*CHCQ(I,NY,NX)
-  trcsa_XFLS(idsa_AlOH,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CAL1R(NY,NX)+FLQGI(NY,NX)*CAL1Q(I,NY,NX)
-  trcsa_XFLS(idsa_AlOH2,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CAL2R(NY,NX)+FLQGI(NY,NX)*CAL2Q(I,NY,NX)
-  trcsa_XFLS(idsa_AlOH3,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CAL3R(NY,NX)+FLQGI(NY,NX)*CAL3Q(I,NY,NX)
-  trcsa_XFLS(idsa_AlOH4,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CAL4R(NY,NX)+FLQGI(NY,NX)*CAL4Q(I,NY,NX)
-  trcsa_XFLS(idsa_AlSO4,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CALSR(NY,NX)+FLQGI(NY,NX)*CALSQ(I,NY,NX)
-  trcsa_XFLS(idsa_FeOH,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CFE1R(NY,NX)+FLQGI(NY,NX)*CFE1Q(I,NY,NX)
-  trcsa_XFLS(idsa_FeOH2,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CFE2R(NY,NX)+FLQGI(NY,NX)*CFE2Q(I,NY,NX)
-  trcsa_XFLS(idsa_FeOH3,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CFE3R(NY,NX)+FLQGI(NY,NX)*CFE3Q(I,NY,NX)
-  trcsa_XFLS(idsa_FeOH4,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CFE4R(NY,NX)+FLQGI(NY,NX)*CFE4Q(I,NY,NX)
-  trcsa_XFLS(idsa_FeSO4,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CFESR(NY,NX)+FLQGI(NY,NX)*CFESQ(I,NY,NX)
-  trcsa_XFLS(idsa_CaOH2,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CCAOR(NY,NX)+FLQGI(NY,NX)*CCAOQ(I,NY,NX)
-  trcsa_XFLS(idsa_CaCO3,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CCACR(NY,NX)+FLQGI(NY,NX)*CCACQ(I,NY,NX)
-  trcsa_XFLS(idsa_CaHCO3,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CCAHR(NY,NX)+FLQGI(NY,NX)*CCAHQ(I,NY,NX)
-  trcsa_XFLS(idsa_CaSO4,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CCASR(NY,NX)+FLQGI(NY,NX)*CCASQ(I,NY,NX)
-  trcsa_XFLS(idsa_MgOH2,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CMGOR(NY,NX)+FLQGI(NY,NX)*CMGOQ(I,NY,NX)
-  trcsa_XFLS(idsa_MgCO3,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CMGCR(NY,NX)+FLQGI(NY,NX)*CMGCQ(I,NY,NX)
-  trcsa_XFLS(idsa_MgHCO3,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CMGHR(NY,NX)+FLQGI(NY,NX)*CMGHQ(I,NY,NX)
-  trcsa_XFLS(idsa_MgSO4,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CMGSR(NY,NX)+FLQGI(NY,NX)*CMGSQ(I,NY,NX)
-  trcsa_XFLS(idsa_NaCO3,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CNACR(NY,NX)+FLQGI(NY,NX)*CNACQ(I,NY,NX)
-  trcsa_XFLS(idsa_NaSO4,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CNASR(NY,NX)+FLQGI(NY,NX)*CNASQ(I,NY,NX)
-  trcsa_XFLS(idsa_KSO4,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CKASR(NY,NX)+FLQGI(NY,NX)*CKASQ(I,NY,NX)
-  trcsa_XFLS(idsa_H0PO4,3,NU(NY,NX),NY,NX)=(FLQGQ(NY,NX)*CH0PR(NY,NX)+FLQGI(NY,NX)*CH0PQ(I,NY,NX)) &
+  trcSalt_XFLS(idsalt_Al,3,0,NY,NX)=FLQRQ(NY,NX)*CALR(NY,NX)+FLQRI(NY,NX)*CALQ(I,NY,NX)
+  trcSalt_XFLS(idsalt_Fe,3,0,NY,NX)=FLQRQ(NY,NX)*CFER(NY,NX)+FLQRI(NY,NX)*CFEQ(I,NY,NX)
+  trcSalt_XFLS(idsalt_Hp,3,0,NY,NX)=FLQRQ(NY,NX)*CHYR(NY,NX)+FLQRI(NY,NX)*CHYQ(I,NY,NX)
+  trcSalt_XFLS(idsalt_Ca,3,0,NY,NX)=FLQRQ(NY,NX)*CCAR(NY,NX)+FLQRI(NY,NX)*CCAQ(I,NY,NX)
+  trcSalt_XFLS(idsalt_Mg,3,0,NY,NX)=FLQRQ(NY,NX)*CMGR(NY,NX)+FLQRI(NY,NX)*CMGQ(I,NY,NX)
+  trcSalt_XFLS(idsalt_Na,3,0,NY,NX)=FLQRQ(NY,NX)*CNAR(NY,NX)+FLQRI(NY,NX)*CNAQ(I,NY,NX)
+  trcSalt_XFLS(idsalt_K,3,0,NY,NX)=FLQRQ(NY,NX)*CKAR(NY,NX)+FLQRI(NY,NX)*CKAQ(I,NY,NX)
+  trcSalt_XFLS(idsalt_OH,3,0,NY,NX)=FLQRQ(NY,NX)*COHR(NY,NX)+FLQRI(NY,NX)*COHQ(I,NY,NX)
+  trcSalt_XFLS(idsalt_SO4,3,0,NY,NX)=FLQRQ(NY,NX)*CSOR(NY,NX)+FLQRI(NY,NX)*CSOQ(I,NY,NX)
+  trcSalt_XFLS(idsalt_Cl,3,0,NY,NX)=FLQRQ(NY,NX)*CCLR(NY,NX)+FLQRI(NY,NX)*CCLQ(I,NY,NX)
+  trcSalt_XFLS(idsalt_CO3,3,0,NY,NX)=FLQRQ(NY,NX)*CC3R(NY,NX)+FLQRI(NY,NX)*CC3Q(I,NY,NX)
+  trcSalt_XFLS(idsalt_HCO3,3,0,NY,NX)=FLQRQ(NY,NX)*CHCR(NY,NX)+FLQRI(NY,NX)*CHCQ(I,NY,NX)
+  trcSalt_XFLS(idsalt_AlOH,3,0,NY,NX)=FLQRQ(NY,NX)*CAL1R(NY,NX)+FLQRI(NY,NX)*CAL1Q(I,NY,NX)
+  trcSalt_XFLS(idsalt_AlOH2,3,0,NY,NX)=FLQRQ(NY,NX)*CAL2R(NY,NX)+FLQRI(NY,NX)*CAL2Q(I,NY,NX)
+  trcSalt_XFLS(idsalt_AlOH3,3,0,NY,NX)=FLQRQ(NY,NX)*CAL3R(NY,NX)+FLQRI(NY,NX)*CAL3Q(I,NY,NX)
+  trcSalt_XFLS(idsalt_AlOH4,3,0,NY,NX)=FLQRQ(NY,NX)*CAL4R(NY,NX)+FLQRI(NY,NX)*CAL4Q(I,NY,NX)
+  trcSalt_XFLS(idsalt_AlSO4,3,0,NY,NX)=FLQRQ(NY,NX)*CALSR(NY,NX)+FLQRI(NY,NX)*CALSQ(I,NY,NX)
+  trcSalt_XFLS(idsalt_FeOH,3,0,NY,NX)=FLQRQ(NY,NX)*CFE1R(NY,NX)+FLQRI(NY,NX)*CFE1Q(I,NY,NX)
+  trcSalt_XFLS(idsalt_FeOH2,3,0,NY,NX)=FLQRQ(NY,NX)*CFE2R(NY,NX)+FLQRI(NY,NX)*CFE2Q(I,NY,NX)
+  trcSalt_XFLS(idsalt_FeOH3,3,0,NY,NX)=FLQRQ(NY,NX)*CFE3R(NY,NX)+FLQRI(NY,NX)*CFE3Q(I,NY,NX)
+  trcSalt_XFLS(idsalt_FeOH4,3,0,NY,NX)=FLQRQ(NY,NX)*CFE4R(NY,NX)+FLQRI(NY,NX)*CFE4Q(I,NY,NX)
+  trcSalt_XFLS(idsalt_FeSO4,3,0,NY,NX)=FLQRQ(NY,NX)*CFESR(NY,NX)+FLQRI(NY,NX)*CFESQ(I,NY,NX)
+  trcSalt_XFLS(idsalt_CaOH2,3,0,NY,NX)=FLQRQ(NY,NX)*CCAOR(NY,NX)+FLQRI(NY,NX)*CCAOQ(I,NY,NX)
+  trcSalt_XFLS(idsalt_CaCO3,3,0,NY,NX)=FLQRQ(NY,NX)*CCACR(NY,NX)+FLQRI(NY,NX)*CCACQ(I,NY,NX)
+  trcSalt_XFLS(idsalt_CaHCO3,3,0,NY,NX)=FLQRQ(NY,NX)*CCAHR(NY,NX)+FLQRI(NY,NX)*CCAHQ(I,NY,NX)
+  trcSalt_XFLS(idsalt_CaSO4,3,0,NY,NX)=FLQRQ(NY,NX)*CCASR(NY,NX)+FLQRI(NY,NX)*CCASQ(I,NY,NX)
+  trcSalt_XFLS(idsalt_MgOH2,3,0,NY,NX)=FLQRQ(NY,NX)*CMGOR(NY,NX)+FLQRI(NY,NX)*CMGOQ(I,NY,NX)
+  trcSalt_XFLS(idsalt_MgCO3,3,0,NY,NX)=FLQRQ(NY,NX)*CMGCR(NY,NX)+FLQRI(NY,NX)*CMGCQ(I,NY,NX)
+  trcSalt_XFLS(idsalt_MgHCO3,3,0,NY,NX)=FLQRQ(NY,NX)*CMGHR(NY,NX)+FLQRI(NY,NX)*CMGHQ(I,NY,NX)
+  trcSalt_XFLS(idsalt_MgSO4,3,0,NY,NX)=FLQRQ(NY,NX)*CMGSR(NY,NX)+FLQRI(NY,NX)*CMGSQ(I,NY,NX)
+  trcSalt_XFLS(idsalt_NaCO3,3,0,NY,NX)=FLQRQ(NY,NX)*CNACR(NY,NX)+FLQRI(NY,NX)*CNACQ(I,NY,NX)
+  trcSalt_XFLS(idsalt_NaSO4,3,0,NY,NX)=FLQRQ(NY,NX)*CNASR(NY,NX)+FLQRI(NY,NX)*CNASQ(I,NY,NX)
+  trcSalt_XFLS(idsalt_KSO4,3,0,NY,NX)=FLQRQ(NY,NX)*CKASR(NY,NX)+FLQRI(NY,NX)*CKASQ(I,NY,NX)
+  trcSalt_XFLS(idsalt_H0PO4,3,0,NY,NX)=FLQRQ(NY,NX)*CH0PR(NY,NX)+FLQRI(NY,NX)*CH0PQ(I,NY,NX)
+  trcSalt_XFLS(idsalt_H3PO4,3,0,NY,NX)=FLQRQ(NY,NX)*CH3PR(NY,NX)+FLQRI(NY,NX)*CH3PQ(I,NY,NX)
+  trcSalt_XFLS(idsalt_FeHPO4,3,0,NY,NX)=FLQRQ(NY,NX)*CF1PR(NY,NX)+FLQRI(NY,NX)*CF1PQ(I,NY,NX)
+  trcSalt_XFLS(idsalt_FeH2PO4,3,0,NY,NX)=FLQRQ(NY,NX)*CF2PR(NY,NX)+FLQRI(NY,NX)*CF2PQ(I,NY,NX)
+  trcSalt_XFLS(idsalt_CaPO4,3,0,NY,NX)=FLQRQ(NY,NX)*CC0PR(NY,NX)+FLQRI(NY,NX)*CC0PQ(I,NY,NX)
+  trcSalt_XFLS(idsalt_CaHPO4,3,0,NY,NX)=FLQRQ(NY,NX)*CC1PR(NY,NX)+FLQRI(NY,NX)*CC1PQ(I,NY,NX)
+  trcSalt_XFLS(idsalt_CaH2PO4,3,0,NY,NX)=FLQRQ(NY,NX)*CC2PR(NY,NX)+FLQRI(NY,NX)*CC2PQ(I,NY,NX)
+  trcSalt_XFLS(idsalt_MgHPO4,3,0,NY,NX)=FLQRQ(NY,NX)*CM1PR(NY,NX)+FLQRI(NY,NX)*CM1PQ(I,NY,NX)
+  trcSalt_XFLS(idsalt_Al,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CALR(NY,NX)+FLQGI(NY,NX)*CALQ(I,NY,NX)
+  trcSalt_XFLS(idsalt_Fe,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CFER(NY,NX)+FLQGI(NY,NX)*CFEQ(I,NY,NX)
+  trcSalt_XFLS(idsalt_Hp,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CHYR(NY,NX)+FLQGI(NY,NX)*CHYQ(I,NY,NX)
+  trcSalt_XFLS(idsalt_Ca,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CCAR(NY,NX)+FLQGI(NY,NX)*CCAQ(I,NY,NX)
+  trcSalt_XFLS(idsalt_Mg,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CMGR(NY,NX)+FLQGI(NY,NX)*CMGQ(I,NY,NX)
+  trcSalt_XFLS(idsalt_Na,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CNAR(NY,NX)+FLQGI(NY,NX)*CNAQ(I,NY,NX)
+  trcSalt_XFLS(idsalt_K,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CKAR(NY,NX)+FLQGI(NY,NX)*CKAQ(I,NY,NX)
+  trcSalt_XFLS(idsalt_OH,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*COHR(NY,NX)+FLQGI(NY,NX)*COHQ(I,NY,NX)
+  trcSalt_XFLS(idsalt_SO4,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CSOR(NY,NX)+FLQGI(NY,NX)*CSOQ(I,NY,NX)
+  trcSalt_XFLS(idsalt_Cl,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CCLR(NY,NX)+FLQGI(NY,NX)*CCLQ(I,NY,NX)
+  trcSalt_XFLS(idsalt_CO3,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CC3R(NY,NX)+FLQGI(NY,NX)*CC3Q(I,NY,NX)
+  trcSalt_XFLS(idsalt_HCO3,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CHCR(NY,NX)+FLQGI(NY,NX)*CHCQ(I,NY,NX)
+  trcSalt_XFLS(idsalt_AlOH,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CAL1R(NY,NX)+FLQGI(NY,NX)*CAL1Q(I,NY,NX)
+  trcSalt_XFLS(idsalt_AlOH2,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CAL2R(NY,NX)+FLQGI(NY,NX)*CAL2Q(I,NY,NX)
+  trcSalt_XFLS(idsalt_AlOH3,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CAL3R(NY,NX)+FLQGI(NY,NX)*CAL3Q(I,NY,NX)
+  trcSalt_XFLS(idsalt_AlOH4,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CAL4R(NY,NX)+FLQGI(NY,NX)*CAL4Q(I,NY,NX)
+  trcSalt_XFLS(idsalt_AlSO4,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CALSR(NY,NX)+FLQGI(NY,NX)*CALSQ(I,NY,NX)
+  trcSalt_XFLS(idsalt_FeOH,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CFE1R(NY,NX)+FLQGI(NY,NX)*CFE1Q(I,NY,NX)
+  trcSalt_XFLS(idsalt_FeOH2,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CFE2R(NY,NX)+FLQGI(NY,NX)*CFE2Q(I,NY,NX)
+  trcSalt_XFLS(idsalt_FeOH3,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CFE3R(NY,NX)+FLQGI(NY,NX)*CFE3Q(I,NY,NX)
+  trcSalt_XFLS(idsalt_FeOH4,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CFE4R(NY,NX)+FLQGI(NY,NX)*CFE4Q(I,NY,NX)
+  trcSalt_XFLS(idsalt_FeSO4,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CFESR(NY,NX)+FLQGI(NY,NX)*CFESQ(I,NY,NX)
+  trcSalt_XFLS(idsalt_CaOH2,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CCAOR(NY,NX)+FLQGI(NY,NX)*CCAOQ(I,NY,NX)
+  trcSalt_XFLS(idsalt_CaCO3,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CCACR(NY,NX)+FLQGI(NY,NX)*CCACQ(I,NY,NX)
+  trcSalt_XFLS(idsalt_CaHCO3,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CCAHR(NY,NX)+FLQGI(NY,NX)*CCAHQ(I,NY,NX)
+  trcSalt_XFLS(idsalt_CaSO4,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CCASR(NY,NX)+FLQGI(NY,NX)*CCASQ(I,NY,NX)
+  trcSalt_XFLS(idsalt_MgOH2,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CMGOR(NY,NX)+FLQGI(NY,NX)*CMGOQ(I,NY,NX)
+  trcSalt_XFLS(idsalt_MgCO3,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CMGCR(NY,NX)+FLQGI(NY,NX)*CMGCQ(I,NY,NX)
+  trcSalt_XFLS(idsalt_MgHCO3,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CMGHR(NY,NX)+FLQGI(NY,NX)*CMGHQ(I,NY,NX)
+  trcSalt_XFLS(idsalt_MgSO4,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CMGSR(NY,NX)+FLQGI(NY,NX)*CMGSQ(I,NY,NX)
+  trcSalt_XFLS(idsalt_NaCO3,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CNACR(NY,NX)+FLQGI(NY,NX)*CNACQ(I,NY,NX)
+  trcSalt_XFLS(idsalt_NaSO4,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CNASR(NY,NX)+FLQGI(NY,NX)*CNASQ(I,NY,NX)
+  trcSalt_XFLS(idsalt_KSO4,3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CKASR(NY,NX)+FLQGI(NY,NX)*CKASQ(I,NY,NX)
+  trcSalt_XFLS(idsalt_H0PO4,3,NU(NY,NX),NY,NX)=(FLQGQ(NY,NX)*CH0PR(NY,NX)+FLQGI(NY,NX)*CH0PQ(I,NY,NX)) &
     *trcs_VLN(ids_H1PO4,NU(NY,NX),NY,NX)
-  trcsa_XFLS(idsa_H3PO4,3,NU(NY,NX),NY,NX)=(FLQGQ(NY,NX)*CH3PR(NY,NX)+FLQGI(NY,NX) &
+  trcSalt_XFLS(idsalt_H3PO4,3,NU(NY,NX),NY,NX)=(FLQGQ(NY,NX)*CH3PR(NY,NX)+FLQGI(NY,NX) &
     *CH3PQ(I,NY,NX))*trcs_VLN(ids_H1PO4,NU(NY,NX),NY,NX)
-  trcsa_XFLS(idsa_FeHPO4,3,NU(NY,NX),NY,NX)=(FLQGQ(NY,NX)*CF1PR(NY,NX)+FLQGI(NY,NX) &
+  trcSalt_XFLS(idsalt_FeHPO4,3,NU(NY,NX),NY,NX)=(FLQGQ(NY,NX)*CF1PR(NY,NX)+FLQGI(NY,NX) &
     *CF1PQ(I,NY,NX))*trcs_VLN(ids_H1PO4,NU(NY,NX),NY,NX)
-  trcsa_XFLS(idsa_FeH2PO4,3,NU(NY,NX),NY,NX)=(FLQGQ(NY,NX)*CF2PR(NY,NX)+FLQGI(NY,NX) &
+  trcSalt_XFLS(idsalt_FeH2PO4,3,NU(NY,NX),NY,NX)=(FLQGQ(NY,NX)*CF2PR(NY,NX)+FLQGI(NY,NX) &
     *CF2PQ(I,NY,NX))*trcs_VLN(ids_H1PO4,NU(NY,NX),NY,NX)
-  trcsa_XFLS(idsa_CaPO4,3,NU(NY,NX),NY,NX)=(FLQGQ(NY,NX)*CC0PR(NY,NX)+FLQGI(NY,NX) &
+  trcSalt_XFLS(idsalt_CaPO4,3,NU(NY,NX),NY,NX)=(FLQGQ(NY,NX)*CC0PR(NY,NX)+FLQGI(NY,NX) &
     *CC0PQ(I,NY,NX))*trcs_VLN(ids_H1PO4,NU(NY,NX),NY,NX)
-  trcsa_XFLS(idsa_CaHPO4,3,NU(NY,NX),NY,NX)=(FLQGQ(NY,NX)*CC1PR(NY,NX)+FLQGI(NY,NX) &
+  trcSalt_XFLS(idsalt_CaHPO4,3,NU(NY,NX),NY,NX)=(FLQGQ(NY,NX)*CC1PR(NY,NX)+FLQGI(NY,NX) &
     *CC1PQ(I,NY,NX))*trcs_VLN(ids_H1PO4,NU(NY,NX),NY,NX)
-  trcsa_XFLS(idsa_CaH2PO4,3,NU(NY,NX),NY,NX)=(FLQGQ(NY,NX)*CC2PR(NY,NX)+FLQGI(NY,NX) &
+  trcSalt_XFLS(idsalt_CaH2PO4,3,NU(NY,NX),NY,NX)=(FLQGQ(NY,NX)*CC2PR(NY,NX)+FLQGI(NY,NX) &
     *CC2PQ(I,NY,NX))*trcs_VLN(ids_H1PO4,NU(NY,NX),NY,NX)
-  trcsa_XFLS(idsa_MgHPO4,3,NU(NY,NX),NY,NX)=(FLQGQ(NY,NX)*CM1PR(NY,NX)+FLQGI(NY,NX) &
+  trcSalt_XFLS(idsalt_MgHPO4,3,NU(NY,NX),NY,NX)=(FLQGQ(NY,NX)*CM1PR(NY,NX)+FLQGI(NY,NX) &
     *CM1PQ(I,NY,NX))*trcs_VLN(ids_H1PO4,NU(NY,NX),NY,NX)
-  trcsa_XFLS(idsa_H0PO4B,3,NU(NY,NX),NY,NX)=(FLQGQ(NY,NX)*CH0PR(NY,NX)+FLQGI(NY,NX) &
+  trcSalt_XFLS(idsalt_H0PO4B,3,NU(NY,NX),NY,NX)=(FLQGQ(NY,NX)*CH0PR(NY,NX)+FLQGI(NY,NX) &
     *CH0PQ(I,NY,NX))*trcs_VLN(ids_H1PO4B,NU(NY,NX),NY,NX)
-  trcsa_XFLS(idsa_H3PO4B,3,NU(NY,NX),NY,NX)=(FLQGQ(NY,NX)*CH3PR(NY,NX)+FLQGI(NY,NX) &
+  trcSalt_XFLS(idsalt_H3PO4B,3,NU(NY,NX),NY,NX)=(FLQGQ(NY,NX)*CH3PR(NY,NX)+FLQGI(NY,NX) &
     *CH3PQ(I,NY,NX))*trcs_VLN(ids_H1PO4B,NU(NY,NX),NY,NX)
-  trcsa_XFLS(idsa_FeHPO4B,3,NU(NY,NX),NY,NX)=(FLQGQ(NY,NX)*CF1PR(NY,NX)+FLQGI(NY,NX) &
+  trcSalt_XFLS(idsalt_FeHPO4B,3,NU(NY,NX),NY,NX)=(FLQGQ(NY,NX)*CF1PR(NY,NX)+FLQGI(NY,NX) &
     *CF1PQ(I,NY,NX))*trcs_VLN(ids_H1PO4B,NU(NY,NX),NY,NX)
-  trcsa_XFLS(idsa_FeH2PO4B,3,NU(NY,NX),NY,NX)=(FLQGQ(NY,NX)*CF2PR(NY,NX)+FLQGI(NY,NX) &
+  trcSalt_XFLS(idsalt_FeH2PO4B,3,NU(NY,NX),NY,NX)=(FLQGQ(NY,NX)*CF2PR(NY,NX)+FLQGI(NY,NX) &
     *CF2PQ(I,NY,NX))*trcs_VLN(ids_H1PO4B,NU(NY,NX),NY,NX)
-  trcsa_XFLS(idsa_CaPO4B,3,NU(NY,NX),NY,NX)=(FLQGQ(NY,NX)*CC0PR(NY,NX)+FLQGI(NY,NX) &
+  trcSalt_XFLS(idsalt_CaPO4B,3,NU(NY,NX),NY,NX)=(FLQGQ(NY,NX)*CC0PR(NY,NX)+FLQGI(NY,NX) &
     *CC0PQ(I,NY,NX))*trcs_VLN(ids_H1PO4B,NU(NY,NX),NY,NX)
-  trcsa_XFLS(idsa_CaHPO4B,3,NU(NY,NX),NY,NX)=(FLQGQ(NY,NX)*CC1PR(NY,NX)+FLQGI(NY,NX) &
+  trcSalt_XFLS(idsalt_CaHPO4B,3,NU(NY,NX),NY,NX)=(FLQGQ(NY,NX)*CC1PR(NY,NX)+FLQGI(NY,NX) &
     *CC1PQ(I,NY,NX))*trcs_VLN(ids_H1PO4B,NU(NY,NX),NY,NX)
-  trcsa_XFLS(idsa_CaH2PO4B,3,NU(NY,NX),NY,NX)=(FLQGQ(NY,NX)*CC2PR(NY,NX)+FLQGI(NY,NX) &
+  trcSalt_XFLS(idsalt_CaH2PO4B,3,NU(NY,NX),NY,NX)=(FLQGQ(NY,NX)*CC2PR(NY,NX)+FLQGI(NY,NX) &
     *CC2PQ(I,NY,NX))*trcs_VLN(ids_H1PO4B,NU(NY,NX),NY,NX)
-  trcsa_XFLS(idsa_MgHPO4B,3,NU(NY,NX),NY,NX)=(FLQGQ(NY,NX)*CM1PR(NY,NX)+FLQGI(NY,NX) &
+  trcSalt_XFLS(idsalt_MgHPO4B,3,NU(NY,NX),NY,NX)=(FLQGQ(NY,NX)*CM1PR(NY,NX)+FLQGI(NY,NX) &
     *CM1PQ(I,NY,NX))*trcs_VLN(ids_H1PO4B,NU(NY,NX),NY,NX)
   end subroutine AtmosSoluteFluxToTopsoil
 !------------------------------------------------------------------------------------------
@@ -378,8 +378,8 @@ module TrnsfrsMod
 !     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
 !          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH2PO4+,*M1P*=MgHPO4,*COO*=COOH-C
   D20: DO L=1,JS
-    DO NTA=idsa_beg,idsa_end
-      trcsa_sosml2(NTA,L,NY,NX)=trcs_solsml(NTA,L,NY,NX)
+    DO NTA=idsalt_beg,idsalt_end
+      trcSalt_sosml2(NTA,L,NY,NX)=trcs_solsml(NTA,L,NY,NX)
     ENDDO
   ENDDO D20
   end subroutine InitSolutesInSnowpack
@@ -409,13 +409,13 @@ module TrnsfrsMod
 !          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH2PO4+,*M1P*=MgHPO4,*COO*=COOH-
 !          :*1=non-band,*B=band
 !
-  DO NTSA=idsa_beg,idsa_end
-    trcsa_RBLS(NTSA,1,NY,NX)=trcsa_XBLS(NTSA,1,NY,NX)*dts_HeatWatTP
-    trcsa_RFL0(NTSA,NY,NX)=trcsa_XFLS(NTSA,3,0,NY,NX)*dts_HeatWatTP
+  DO NTSA=idsalt_beg,idsalt_end
+    trcSalt_RBLS(NTSA,1,NY,NX)=trcSalt_XBLS(NTSA,1,NY,NX)*dts_HeatWatTP
+    trcSalt_RFL0(NTSA,NY,NX)=trcSalt_XFLS(NTSA,3,0,NY,NX)*dts_HeatWatTP
   ENDDO
 
-  DO NTSA=idsa_beg,idsab_end
-    trcsa_RFL1(NTSA,NY,NX)=trcsa_XFLS(NTSA,3,NU(NY,NX),NY,NX)*dts_HeatWatTP
+  DO NTSA=idsalt_beg,idsaltb_end
+    trcSalt_RFL1(NTSA,NY,NX)=trcSalt_XFLS(NTSA,3,NU(NY,NX),NY,NX)*dts_HeatWatTP
   ENDDO
 
   end subroutine GetSubHourFlux
@@ -439,11 +439,11 @@ module TrnsfrsMod
 !     TR*=solute transformations from solute.f
 !
   D10: DO L=NU(NY,NX),NL(NY,NX)
-    DO NTSA=idsa_beg,idsab_end
-      trcsa_solml2R(NTSA,L,NY,NX)=-trcsa_TR(NTSA,L,NY,NX)*dts_HeatWatTP
+    DO NTSA=idsalt_beg,idsaltb_end
+      trcSalt_solml2R(NTSA,L,NY,NX)=-trcSalt_TR(NTSA,L,NY,NX)*dts_HeatWatTP
     ENDDO
 
-    trcsa_solml2R(idsa_Hp,L,NY,NX)=trcsa_solml2R(idsa_Hp,L,NY,NX)-(XZHYS(L,NY,NX))*dts_HeatWatTP
+    trcSalt_solml2R(idsalt_Hp,L,NY,NX)=trcSalt_solml2R(idsalt_Hp,L,NY,NX)-(XZHYS(L,NY,NX))*dts_HeatWatTP
 !
 !     SOLUTE FLUXES FROM SUBSURFACE IRRIGATION
 !
@@ -454,65 +454,65 @@ module TrnsfrsMod
 !     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
 !
     FLWU(L,NY,NX)=GridPlantRootH2OUptake_vr(L,NY,NX)*dts_HeatWatTP
-    trcsa_RFLU(idsa_Al,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CALQ(I,NY,NX)
-    trcsa_RFLU(idsa_Fe,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CFEQ(I,NY,NX)
-    trcsa_RFLU(idsa_Hp,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CHYQ(I,NY,NX)
-    trcsa_RFLU(idsa_Ca,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CCAQ(I,NY,NX)
-    trcsa_RFLU(idsa_Mg,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CMGQ(I,NY,NX)
-    trcsa_RFLU(idsa_Na,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CNAQ(I,NY,NX)
-    trcsa_RFLU(idsa_K,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CKAQ(I,NY,NX)
-    trcsa_RFLU(idsa_OH,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*COHQ(I,NY,NX)
-    trcsa_RFLU(idsa_SO4,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CSOQ(I,NY,NX)
-    trcsa_RFLU(idsa_Cl,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CCLQ(I,NY,NX)
-    trcsa_RFLU(idsa_CO3,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CC3Q(I,NY,NX)
-    trcsa_RFLU(idsa_HCO3,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CHCQ(I,NY,NX)
-    trcsa_RFLU(idsa_AlOH,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CAL1Q(I,NY,NX)
-    trcsa_RFLU(idsa_AlOH2,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CAL2Q(I,NY,NX)
-    trcsa_RFLU(idsa_AlOH3,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CAL3Q(I,NY,NX)
-    trcsa_RFLU(idsa_AlOH4,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CAL4Q(I,NY,NX)
-    trcsa_RFLU(idsa_AlSO4,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CALSQ(I,NY,NX)
-    trcsa_RFLU(idsa_FeOH,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CFE1Q(I,NY,NX)
-    trcsa_RFLU(idsa_FeOH2,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CFE2Q(I,NY,NX)
-    trcsa_RFLU(idsa_FeOH3,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CFE3Q(I,NY,NX)
-    trcsa_RFLU(idsa_FeOH4,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CFE4Q(I,NY,NX)
-    trcsa_RFLU(idsa_FeSO4,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CFESQ(I,NY,NX)
-    trcsa_RFLU(idsa_CaOH2,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CCAOQ(I,NY,NX)
-    trcsa_RFLU(idsa_CaCO3,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CCACQ(I,NY,NX)
-    trcsa_RFLU(idsa_CaHCO3,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CCAHQ(I,NY,NX)
-    trcsa_RFLU(idsa_CaSO4,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CCASQ(I,NY,NX)
-    trcsa_RFLU(idsa_MgOH2,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CMGOQ(I,NY,NX)
-    trcsa_RFLU(idsa_MgCO3,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CMGCQ(I,NY,NX)
-    trcsa_RFLU(idsa_MgHCO3,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CMGHQ(I,NY,NX)
-    trcsa_RFLU(idsa_MgSO4,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CMGSQ(I,NY,NX)
-    trcsa_RFLU(idsa_NaCO3,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CNACQ(I,NY,NX)
-    trcsa_RFLU(idsa_NaSO4,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CNASQ(I,NY,NX)
-    trcsa_RFLU(idsa_KSO4,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CKASQ(I,NY,NX)
+    trcSalt_RFLU(idsalt_Al,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CALQ(I,NY,NX)
+    trcSalt_RFLU(idsalt_Fe,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CFEQ(I,NY,NX)
+    trcSalt_RFLU(idsalt_Hp,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CHYQ(I,NY,NX)
+    trcSalt_RFLU(idsalt_Ca,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CCAQ(I,NY,NX)
+    trcSalt_RFLU(idsalt_Mg,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CMGQ(I,NY,NX)
+    trcSalt_RFLU(idsalt_Na,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CNAQ(I,NY,NX)
+    trcSalt_RFLU(idsalt_K,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CKAQ(I,NY,NX)
+    trcSalt_RFLU(idsalt_OH,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*COHQ(I,NY,NX)
+    trcSalt_RFLU(idsalt_SO4,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CSOQ(I,NY,NX)
+    trcSalt_RFLU(idsalt_Cl,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CCLQ(I,NY,NX)
+    trcSalt_RFLU(idsalt_CO3,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CC3Q(I,NY,NX)
+    trcSalt_RFLU(idsalt_HCO3,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CHCQ(I,NY,NX)
+    trcSalt_RFLU(idsalt_AlOH,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CAL1Q(I,NY,NX)
+    trcSalt_RFLU(idsalt_AlOH2,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CAL2Q(I,NY,NX)
+    trcSalt_RFLU(idsalt_AlOH3,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CAL3Q(I,NY,NX)
+    trcSalt_RFLU(idsalt_AlOH4,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CAL4Q(I,NY,NX)
+    trcSalt_RFLU(idsalt_AlSO4,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CALSQ(I,NY,NX)
+    trcSalt_RFLU(idsalt_FeOH,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CFE1Q(I,NY,NX)
+    trcSalt_RFLU(idsalt_FeOH2,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CFE2Q(I,NY,NX)
+    trcSalt_RFLU(idsalt_FeOH3,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CFE3Q(I,NY,NX)
+    trcSalt_RFLU(idsalt_FeOH4,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CFE4Q(I,NY,NX)
+    trcSalt_RFLU(idsalt_FeSO4,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CFESQ(I,NY,NX)
+    trcSalt_RFLU(idsalt_CaOH2,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CCAOQ(I,NY,NX)
+    trcSalt_RFLU(idsalt_CaCO3,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CCACQ(I,NY,NX)
+    trcSalt_RFLU(idsalt_CaHCO3,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CCAHQ(I,NY,NX)
+    trcSalt_RFLU(idsalt_CaSO4,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CCASQ(I,NY,NX)
+    trcSalt_RFLU(idsalt_MgOH2,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CMGOQ(I,NY,NX)
+    trcSalt_RFLU(idsalt_MgCO3,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CMGCQ(I,NY,NX)
+    trcSalt_RFLU(idsalt_MgHCO3,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CMGHQ(I,NY,NX)
+    trcSalt_RFLU(idsalt_MgSO4,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CMGSQ(I,NY,NX)
+    trcSalt_RFLU(idsalt_NaCO3,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CNACQ(I,NY,NX)
+    trcSalt_RFLU(idsalt_NaSO4,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CNASQ(I,NY,NX)
+    trcSalt_RFLU(idsalt_KSO4,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CKASQ(I,NY,NX)
 
-    trcsa_RFLU(idsa_H0PO4,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CH0PQ(I,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-    trcsa_RFLU(idsa_H3PO4,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CH3PQ(I,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-    trcsa_RFLU(idsa_FeHPO4,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CF1PQ(I,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-    trcsa_RFLU(idsa_FeH2PO4,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CF2PQ(I,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-    trcsa_RFLU(idsa_CaPO4,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CC0PQ(I,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-    trcsa_RFLU(idsa_CaHPO4,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CC1PQ(I,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-    trcsa_RFLU(idsa_CaH2PO4,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CC2PQ(I,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-    trcsa_RFLU(idsa_MgHPO4,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CM1PQ(I,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
+    trcSalt_RFLU(idsalt_H0PO4,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CH0PQ(I,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
+    trcSalt_RFLU(idsalt_H3PO4,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CH3PQ(I,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
+    trcSalt_RFLU(idsalt_FeHPO4,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CF1PQ(I,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
+    trcSalt_RFLU(idsalt_FeH2PO4,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CF2PQ(I,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
+    trcSalt_RFLU(idsalt_CaPO4,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CC0PQ(I,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
+    trcSalt_RFLU(idsalt_CaHPO4,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CC1PQ(I,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
+    trcSalt_RFLU(idsalt_CaH2PO4,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CC2PQ(I,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
+    trcSalt_RFLU(idsalt_MgHPO4,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CM1PQ(I,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
 
-    trcsa_RFLU(idsa_H0PO4B,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CH0PQ(I,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
-    trcsa_RFLU(idsa_H3PO4B,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CH3PQ(I,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
-    trcsa_RFLU(idsa_FeHPO4B,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CF1PQ(I,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
-    trcsa_RFLU(idsa_FeH2PO4B,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CF2PQ(I,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
-    trcsa_RFLU(idsa_CaPO4B,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CC0PQ(I,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
-    trcsa_RFLU(idsa_CaHPO4B,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CC1PQ(I,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
-    trcsa_RFLU(idsa_CaH2PO4B,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CC2PQ(I,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
-    trcsa_RFLU(idsa_MgHPO4B,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CM1PQ(I,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
+    trcSalt_RFLU(idsalt_H0PO4B,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CH0PQ(I,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
+    trcSalt_RFLU(idsalt_H3PO4B,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CH3PQ(I,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
+    trcSalt_RFLU(idsalt_FeHPO4B,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CF1PQ(I,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
+    trcSalt_RFLU(idsalt_FeH2PO4B,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CF2PQ(I,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
+    trcSalt_RFLU(idsalt_CaPO4B,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CC0PQ(I,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
+    trcSalt_RFLU(idsalt_CaHPO4B,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CC1PQ(I,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
+    trcSalt_RFLU(idsalt_CaH2PO4B,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CC2PQ(I,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
+    trcSalt_RFLU(idsalt_MgHPO4B,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CM1PQ(I,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
 !
 !     SUB-HOURLY SOLUTE FLUXES FROM SUBSURFACE IRRIGATION
 !
 !     R*FLZ,R*FBZ=subsurface solute flux in non-band,band
 !     dts_HeatWatTP=1/no. of cycles h-1 for water, heat and solute flux calculations
 !
-    DO NTSA=idsa_beg,idsab_end
-      trcsa_RFLZ(NTSA,L,NY,NX)=trcsa_RFLU(NTSA,L,NY,NX)*dts_HeatWatTP
+    DO NTSA=idsalt_beg,idsaltb_end
+      trcSalt_RFLZ(NTSA,L,NY,NX)=trcSalt_RFLU(NTSA,L,NY,NX)*dts_HeatWatTP
     ENDDO
 !
 !     SOLUTE DIFFUSIVITIES AT SUB-HOURLY TIME STEP
@@ -551,9 +551,9 @@ module TrnsfrsMod
 !          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH2PO4+,*M1P*=MgHPO4,*COO*=COOH-
 !          :*1=non-band,*B=band
 !
-    DO NTSA=idsa_beg,idsab_end
-      trcsa_solml2(NTSA,L,NY,NX)=trcsa_solml(NTSA,L,NY,NX)
-      trcsa_soHml2(NTSA,L,NY,NX)=trcsa_soHml(NTSA,L,NY,NX)
+    DO NTSA=idsalt_beg,idsaltb_end
+      trcSalt_solml2(NTSA,L,NY,NX)=trcSalt_solml(NTSA,L,NY,NX)
+      trcSalt_soHml2(NTSA,L,NY,NX)=trcSalt_soHml(NTSA,L,NY,NX)
     ENDDO
 
   ENDDO D10
@@ -578,7 +578,7 @@ module TrnsfrsMod
 !     ENTERED IN WEATHER AND IRRIGATION FILES
 !
 !     SnoFalPrec,RainFalPrec=snow,rain
-!     VLSnowHeatCapM,VLHeatCapSnowMN=current,minimum volumetric heat capacity of snowpack
+!     VLSnowHeatCapM,VLHeatCapSnowMin=current,minimum volumetric heat capacity of snowpack
 !     X*BLS=hourly solute flux to snowpack
 !     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
 !          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
@@ -593,7 +593,7 @@ module TrnsfrsMod
 !     C*R,C*Q=precipitation,irrigation solute concentrations
 !
       IF(SnoFalPrec(NY,NX).GT.0.0.OR.(RainFalPrec(NY,NX).GT.0.0 &
-      .AND.VLSnowHeatCapM(1,1,NY,NX).GT.VLHeatCapSnowMN(NY,NX)))THEN
+      .AND.VLSnowHeatCapM(1,1,NY,NX).GT.VLHeatCapSnowMin(NY,NX)))THEN
 !
       call AtmosSoluteFluxToSnowpack(I,NY,NX)
 !
@@ -601,8 +601,8 @@ module TrnsfrsMod
 !     IN RAINFALL AND IRRIGATION ACCORDING TO CONCENTRATIONS
 !     ENTERED IN WEATHER AND IRRIGATION FILES
 !
-      ELSEIF((PRECQ(NY,NX).GT.0.0.OR.PRECI(NY,NX).GT.0.0) &
-        .AND.VLSnowHeatCapM(1,1,NY,NX).LE.VLHeatCapSnowMN(NY,NX))THEN
+      ELSEIF((PrecAtm(NY,NX).GT.0.0.OR.IrrigSurface(NY,NX).GT.0.0) &
+        .AND.VLSnowHeatCapM(1,1,NY,NX).LE.VLHeatCapSnowMin(NY,NX))THEN
 !
       call AtmosSoluteFluxToTopsoil(I,NY,NX)
 !
@@ -636,8 +636,8 @@ module TrnsfrsMod
   integer :: L,NTSA
 
   D9855: DO L=1,JS
-    DO NTSA=idsa_beg,idsa_end
-      trcsa_TBLS(NTSA,L,NY,NX)=0.0
+    DO NTSA=idsalt_beg,idsalt_end
+      trcSalt_TBLS(NTSA,L,NY,NX)=0.0
     ENDDO
   ENDDO D9855
   end subroutine InitFluxAccumulatorsInSnowpack
@@ -651,7 +651,7 @@ module TrnsfrsMod
   implicit none
   integer, intent(in) :: N,M5,M4
 !     begin_execution
-  trcsa_RQ(idsa_beg:idsa_end,N,M5,M4)=0.0
+  trcSalt_RQ(idsalt_beg:idsalt_end,N,M5,M4)=0.0
 
   end subroutine ZeroBoundarySnowFlux
 !------------------------------------------------------------------------------------------
@@ -664,7 +664,7 @@ module TrnsfrsMod
   integer, intent(in) :: N,NN,M5,M4
 !     begin_execution
 
-  trcsa_RQR(idsa_beg:idsa_end,N,NN,M5,M4)=0.0
+  trcSalt_RQR(idsalt_beg:idsalt_end,N,NN,M5,M4)=0.0
 
   end subroutine ZeroSoluteFluxFromRecharge
 !------------------------------------------------------------------------------------------
@@ -679,10 +679,10 @@ module TrnsfrsMod
   integer :: NTSA
 !     begin_execution
 
-  FQRM=QRMN(M,N,NN,M5,M4)/QRM(M,N2,N1)
+  FQRM=QflxSurfRunoffM(M,N,NN,M5,M4)/WatFlux4ErosionM(M,N2,N1)
 
-  DO NTSA=idsa_beg,idsa_end
-    trcsa_RQR(NTSA,N,NN,M5,M4)=trcsa_RQR0(NTSA,N2,N1)*FQRM
+  DO NTSA=idsalt_beg,idsalt_end
+    trcSalt_RQR(NTSA,N,NN,M5,M4)=trcSalt_RQR0(NTSA,N2,N1)*FQRM
   ENDDO
 !
 !     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
@@ -690,8 +690,8 @@ module TrnsfrsMod
 !     X*QRS=hourly solute in runoff
 !     RQR*=solute in runoff
 !
-  DO NTSA=idsa_beg,idsa_end
-    trcsa_XQR(NTSA,N,NN,M5,M4)=trcsa_XQR(NTSA,N,NN,M5,M4)+trcsa_RQR(NTSA,N,NN,M5,M4)
+  DO NTSA=idsalt_beg,idsalt_end
+    trcSalt_XQR(NTSA,N,NN,M5,M4)=trcSalt_XQR(NTSA,N,NN,M5,M4)+trcSalt_RQR(NTSA,N,NN,M5,M4)
   ENDDO
   end subroutine SoluteExportThruBoundary
 !------------------------------------------------------------------------------------------
@@ -704,7 +704,7 @@ module TrnsfrsMod
   integer, intent(in) :: N,NN,M5,M4
 !     begin_execution
 
-  trcsa_RQR(idsa_beg:idsa_end,N,NN,M5,M4)=0.0
+  trcSalt_RQR(idsalt_beg:idsalt_end,N,NN,M5,M4)=0.0
 
   end subroutine ZeroSoluteInfluxThruBoundary
 !------------------------------------------------------------------------------------------
@@ -716,57 +716,57 @@ module TrnsfrsMod
   implicit none
   integer, intent(in) :: M3,M2,M1,M,N,M6,M5,M4
 !     begin_execution
-  trcsa_RFLS(idsa_Al,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CALU(M3,M2,M1)
-  trcsa_RFLS(idsa_Fe,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CFEU(M3,M2,M1)
-  trcsa_RFLS(idsa_Hp,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CHYU(M3,M2,M1)
-  trcsa_RFLS(idsa_Ca,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CCAU(M3,M2,M1)
-  trcsa_RFLS(idsa_Mg,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CMGU(M3,M2,M1)
-  trcsa_RFLS(idsa_Na,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CNAU(M3,M2,M1)
-  trcsa_RFLS(idsa_K,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CKAU(M3,M2,M1)
-  trcsa_RFLS(idsa_OH,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*COHU(M3,M2,M1)
-  trcsa_RFLS(idsa_SO4,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CSOU(M3,M2,M1)
-  trcsa_RFLS(idsa_Cl,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CCLU(M3,M2,M1)
-  trcsa_RFLS(idsa_CO3,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CC3U(M3,M2,M1)
-  trcsa_RFLS(idsa_HCO3,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CHCU(M3,M2,M1)
-  trcsa_RFLS(idsa_AlOH,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CAL1U(M3,M2,M1)
-  trcsa_RFLS(idsa_AlOH2,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CAL2U(M3,M2,M1)
-  trcsa_RFLS(idsa_AlOH3,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CAL3U(M3,M2,M1)
-  trcsa_RFLS(idsa_AlOH4,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CAL4U(M3,M2,M1)
-  trcsa_RFLS(idsa_AlSO4,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CALSU(M3,M2,M1)
-  trcsa_RFLS(idsa_FeOH,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CFE1U(M3,M2,M1)
-  trcsa_RFLS(idsa_FeOH2,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CFE2U(M3,M2,M1)
-  trcsa_RFLS(idsa_FeOH3,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CFE3U(M3,M2,M1)
-  trcsa_RFLS(idsa_FeOH4,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CFE4U(M3,M2,M1)
-  trcsa_RFLS(idsa_FeSO4,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CFESU(M3,M2,M1)
-  trcsa_RFLS(idsa_CaOH2,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CCAOU(M3,M2,M1)
-  trcsa_RFLS(idsa_CaCO3,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CCACU(M3,M2,M1)
-  trcsa_RFLS(idsa_CaHCO3,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CCAHU(M3,M2,M1)
-  trcsa_RFLS(idsa_CaSO4,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CCASU(M3,M2,M1)
-  trcsa_RFLS(idsa_MgOH2,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CMGOU(M3,M2,M1)
-  trcsa_RFLS(idsa_MgCO3,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CMGCU(M3,M2,M1)
-  trcsa_RFLS(idsa_MgHCO3,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CMGHU(M3,M2,M1)
-  trcsa_RFLS(idsa_MgSO4,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CMGSU(M3,M2,M1)
-  trcsa_RFLS(idsa_NaCO3,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CNACU(M3,M2,M1)
-  trcsa_RFLS(idsa_NaSO4,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CNASU(M3,M2,M1)
-  trcsa_RFLS(idsa_KSO4,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CKASU(M3,M2,M1)
+  trcSalt_RFLS(idsalt_Al,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CALU(M3,M2,M1)
+  trcSalt_RFLS(idsalt_Fe,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CFEU(M3,M2,M1)
+  trcSalt_RFLS(idsalt_Hp,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CHYU(M3,M2,M1)
+  trcSalt_RFLS(idsalt_Ca,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CCAU(M3,M2,M1)
+  trcSalt_RFLS(idsalt_Mg,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CMGU(M3,M2,M1)
+  trcSalt_RFLS(idsalt_Na,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CNAU(M3,M2,M1)
+  trcSalt_RFLS(idsalt_K,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CKAU(M3,M2,M1)
+  trcSalt_RFLS(idsalt_OH,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*COHU(M3,M2,M1)
+  trcSalt_RFLS(idsalt_SO4,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CSOU(M3,M2,M1)
+  trcSalt_RFLS(idsalt_Cl,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CCLU(M3,M2,M1)
+  trcSalt_RFLS(idsalt_CO3,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CC3U(M3,M2,M1)
+  trcSalt_RFLS(idsalt_HCO3,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CHCU(M3,M2,M1)
+  trcSalt_RFLS(idsalt_AlOH,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CAL1U(M3,M2,M1)
+  trcSalt_RFLS(idsalt_AlOH2,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CAL2U(M3,M2,M1)
+  trcSalt_RFLS(idsalt_AlOH3,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CAL3U(M3,M2,M1)
+  trcSalt_RFLS(idsalt_AlOH4,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CAL4U(M3,M2,M1)
+  trcSalt_RFLS(idsalt_AlSO4,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CALSU(M3,M2,M1)
+  trcSalt_RFLS(idsalt_FeOH,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CFE1U(M3,M2,M1)
+  trcSalt_RFLS(idsalt_FeOH2,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CFE2U(M3,M2,M1)
+  trcSalt_RFLS(idsalt_FeOH3,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CFE3U(M3,M2,M1)
+  trcSalt_RFLS(idsalt_FeOH4,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CFE4U(M3,M2,M1)
+  trcSalt_RFLS(idsalt_FeSO4,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CFESU(M3,M2,M1)
+  trcSalt_RFLS(idsalt_CaOH2,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CCAOU(M3,M2,M1)
+  trcSalt_RFLS(idsalt_CaCO3,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CCACU(M3,M2,M1)
+  trcSalt_RFLS(idsalt_CaHCO3,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CCAHU(M3,M2,M1)
+  trcSalt_RFLS(idsalt_CaSO4,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CCASU(M3,M2,M1)
+  trcSalt_RFLS(idsalt_MgOH2,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CMGOU(M3,M2,M1)
+  trcSalt_RFLS(idsalt_MgCO3,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CMGCU(M3,M2,M1)
+  trcSalt_RFLS(idsalt_MgHCO3,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CMGHU(M3,M2,M1)
+  trcSalt_RFLS(idsalt_MgSO4,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CMGSU(M3,M2,M1)
+  trcSalt_RFLS(idsalt_NaCO3,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CNACU(M3,M2,M1)
+  trcSalt_RFLS(idsalt_NaSO4,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CNASU(M3,M2,M1)
+  trcSalt_RFLS(idsalt_KSO4,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CKASU(M3,M2,M1)
 
-  trcsa_RFLS(idsa_H0PO4,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CH0PU(M3,M2,M1)*trcs_VLN(ids_H1PO4,M3,M2,M1)
-  trcsa_RFLS(idsa_H3PO4,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CH3PU(M3,M2,M1)*trcs_VLN(ids_H1PO4,M3,M2,M1)
-  trcsa_RFLS(idsa_FeHPO4,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CF1PU(M3,M2,M1)*trcs_VLN(ids_H1PO4,M3,M2,M1)
-  trcsa_RFLS(idsa_FeH2PO4,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CF2PU(M3,M2,M1)*trcs_VLN(ids_H1PO4,M3,M2,M1)
-  trcsa_RFLS(idsa_CaPO4,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CC0PU(M3,M2,M1)*trcs_VLN(ids_H1PO4,M3,M2,M1)
-  trcsa_RFLS(idsa_CaHPO4,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CC1PU(M3,M2,M1)*trcs_VLN(ids_H1PO4,M3,M2,M1)
-  trcsa_RFLS(idsa_CaH2PO4,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CC2PU(M3,M2,M1)*trcs_VLN(ids_H1PO4,M3,M2,M1)
-  trcsa_RFLS(idsa_MgHPO4,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CM1PU(M3,M2,M1)*trcs_VLN(ids_H1PO4,M3,M2,M1)
+  trcSalt_RFLS(idsalt_H0PO4,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CH0PU(M3,M2,M1)*trcs_VLN(ids_H1PO4,M3,M2,M1)
+  trcSalt_RFLS(idsalt_H3PO4,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CH3PU(M3,M2,M1)*trcs_VLN(ids_H1PO4,M3,M2,M1)
+  trcSalt_RFLS(idsalt_FeHPO4,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CF1PU(M3,M2,M1)*trcs_VLN(ids_H1PO4,M3,M2,M1)
+  trcSalt_RFLS(idsalt_FeH2PO4,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CF2PU(M3,M2,M1)*trcs_VLN(ids_H1PO4,M3,M2,M1)
+  trcSalt_RFLS(idsalt_CaPO4,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CC0PU(M3,M2,M1)*trcs_VLN(ids_H1PO4,M3,M2,M1)
+  trcSalt_RFLS(idsalt_CaHPO4,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CC1PU(M3,M2,M1)*trcs_VLN(ids_H1PO4,M3,M2,M1)
+  trcSalt_RFLS(idsalt_CaH2PO4,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CC2PU(M3,M2,M1)*trcs_VLN(ids_H1PO4,M3,M2,M1)
+  trcSalt_RFLS(idsalt_MgHPO4,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CM1PU(M3,M2,M1)*trcs_VLN(ids_H1PO4,M3,M2,M1)
 
-  trcsa_RFLS(idsa_H0PO4B,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CH0PU(M3,M2,M1)*trcs_VLN(ids_H1PO4B,M3,M2,M1)
-  trcsa_RFLS(idsa_H3PO4B,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CH3PU(M3,M2,M1)*trcs_VLN(ids_H1PO4B,M3,M2,M1)
-  trcsa_RFLS(idsa_FeHPO4B,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CF1PU(M3,M2,M1)*trcs_VLN(ids_H1PO4B,M3,M2,M1)
-  trcsa_RFLS(idsa_FeH2PO4B,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CF2PU(M3,M2,M1)*trcs_VLN(ids_H1PO4B,M3,M2,M1)
-  trcsa_RFLS(idsa_CaPO4B,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CC0PU(M3,M2,M1)*trcs_VLN(ids_H1PO4B,M3,M2,M1)
-  trcsa_RFLS(idsa_CaHPO4B,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CC1PU(M3,M2,M1)*trcs_VLN(ids_H1PO4B,M3,M2,M1)
-  trcsa_RFLS(idsa_CaH2PO4B,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CC2PU(M3,M2,M1)*trcs_VLN(ids_H1PO4B,M3,M2,M1)
-  trcsa_RFLS(idsa_MgHPO4B,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CM1PU(M3,M2,M1)*trcs_VLN(ids_H1PO4B,M3,M2,M1)
+  trcSalt_RFLS(idsalt_H0PO4B,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CH0PU(M3,M2,M1)*trcs_VLN(ids_H1PO4B,M3,M2,M1)
+  trcSalt_RFLS(idsalt_H3PO4B,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CH3PU(M3,M2,M1)*trcs_VLN(ids_H1PO4B,M3,M2,M1)
+  trcSalt_RFLS(idsalt_FeHPO4B,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CF1PU(M3,M2,M1)*trcs_VLN(ids_H1PO4B,M3,M2,M1)
+  trcSalt_RFLS(idsalt_FeH2PO4B,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CF2PU(M3,M2,M1)*trcs_VLN(ids_H1PO4B,M3,M2,M1)
+  trcSalt_RFLS(idsalt_CaPO4B,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CC0PU(M3,M2,M1)*trcs_VLN(ids_H1PO4B,M3,M2,M1)
+  trcSalt_RFLS(idsalt_CaHPO4B,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CC1PU(M3,M2,M1)*trcs_VLN(ids_H1PO4B,M3,M2,M1)
+  trcSalt_RFLS(idsalt_CaH2PO4B,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CC2PU(M3,M2,M1)*trcs_VLN(ids_H1PO4B,M3,M2,M1)
+  trcSalt_RFLS(idsalt_MgHPO4B,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4)*CM1PU(M3,M2,M1)*trcs_VLN(ids_H1PO4B,M3,M2,M1)
   end subroutine SoluteGainSubsurfMicropore
 !------------------------------------------------------------------------------------------
 
@@ -786,16 +786,16 @@ module TrnsfrsMod
   ELSE
     VFLW=0.0_r8
   ENDIF
-  DO NTSA=idsa_beg,idsa_psoil_beg-1
-    trcsa_RFLS(NTSA,N,M6,M5,M4)=VFLW*AZMAX1(trcsa_solml2(NTSA,M3,M2,M1))
+  DO NTSA=idsalt_beg,idsalt_psoil_beg-1
+    trcSalt_RFLS(NTSA,N,M6,M5,M4)=VFLW*AZMAX1(trcSalt_solml2(NTSA,M3,M2,M1))
   ENDDO
-  DO NTSA=idsa_psoil_beg,idsa_psoil_end
-    trcsa_RFLS(NTSA,N,M6,M5,M4)=VFLW*AZMAX1(trcsa_solml2(NTSA,M3,M2,M1)) &
+  DO NTSA=idsalt_psoil_beg,idsalt_psoil_end
+    trcSalt_RFLS(NTSA,N,M6,M5,M4)=VFLW*AZMAX1(trcSalt_solml2(NTSA,M3,M2,M1)) &
       *trcs_VLN(ids_H1PO4,M3,M2,M1)
   ENDDO
 
-  DO NTSA=idsa_pband_beg,idsa_pband_end
-    trcsa_RFLS(NTSA,N,M6,M5,M4)=VFLW*AZMAX1(trcsa_solml2(NTSA,M3,M2,M1)) &
+  DO NTSA=idsalt_pband_beg,idsalt_pband_end
+    trcSalt_RFLS(NTSA,N,M6,M5,M4)=VFLW*AZMAX1(trcSalt_solml2(NTSA,M3,M2,M1)) &
       *trcs_VLN(ids_H1PO4B,M3,M2,M1)
   ENDDO
   end subroutine SoluteLossSubsurfMicropore
@@ -817,17 +817,17 @@ module TrnsfrsMod
     VFLW=0.0
   ENDIF
 
-  DO NTSA=idsa_beg,idsa_psoil_beg-1
-    trcsa_RFHS(NTSA,N,M6,M5,M4)=VFLW*AZMAX1(trcsa_soHml2(NTSA,M3,M2,M1))
+  DO NTSA=idsalt_beg,idsalt_psoil_beg-1
+    trcSalt_RFHS(NTSA,N,M6,M5,M4)=VFLW*AZMAX1(trcSalt_soHml2(NTSA,M3,M2,M1))
   ENDDO
 
-  DO NTSA=idsa_psoil_beg,idsa_psoil_end
-    trcsa_RFHS(NTSA,N,M6,M5,M4)=VFLW*AZMAX1(trcsa_soHml2(NTSA,M3,M2,M1)) &
+  DO NTSA=idsalt_psoil_beg,idsalt_psoil_end
+    trcSalt_RFHS(NTSA,N,M6,M5,M4)=VFLW*AZMAX1(trcSalt_soHml2(NTSA,M3,M2,M1)) &
       *trcs_VLN(ids_H1PO4,M3,M2,M1)
   ENDDO
 
-  DO NTSA=idsa_pband_beg,idsa_pband_end
-    trcsa_RFHS(NTSA,N,M6,M5,M4)=VFLW*AZMAX1(trcsa_soHml2(NTSA,M3,M2,M1)) &
+  DO NTSA=idsalt_pband_beg,idsalt_pband_end
+    trcSalt_RFHS(NTSA,N,M6,M5,M4)=VFLW*AZMAX1(trcSalt_soHml2(NTSA,M3,M2,M1)) &
       *trcs_VLN(ids_H1PO4B,M3,M2,M1)
   ENDDO
   end subroutine SoluteLossSubsurfMacropore
@@ -848,9 +848,9 @@ module TrnsfrsMod
 !     R*FLS,R*FLW,R*FLB=solute flux in non-band,band micropores
 !     R*FHS,R*FHW,R*FHB=solute flux in non-band,band macropores
 !
-  DO NTSA=idsa_beg,idsab_end
-    trcsa_XFLS(NTSA,N,M6,M5,M4)=trcsa_XFLS(NTSA,N,M6,M5,M4)+trcsa_RFLS(NTSA,N,M6,M5,M4)
-    trcsa_XFHS(NTSA,N,M6,M5,M4)=trcsa_XFHS(NTSA,N,M6,M5,M4)+trcsa_RFHS(NTSA,N,M6,M5,M4)
+  DO NTSA=idsalt_beg,idsaltb_end
+    trcSalt_XFLS(NTSA,N,M6,M5,M4)=trcSalt_XFLS(NTSA,N,M6,M5,M4)+trcSalt_RFLS(NTSA,N,M6,M5,M4)
+    trcSalt_XFHS(NTSA,N,M6,M5,M4)=trcSalt_XFHS(NTSA,N,M6,M5,M4)+trcSalt_RFHS(NTSA,N,M6,M5,M4)
   ENDDO
   end subroutine AccumFluxMacMicPores
 !------------------------------------------------------------------------------------------
@@ -876,19 +876,19 @@ module TrnsfrsMod
 !          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH2PO4+,*M1P*=MgHPO4,*COO*=COOH-
 !          :*1=non-band,*B=band
   D1202: DO NN=1,2
-    DO NTSA=idsa_beg,idsa_end
-      trcsa_TQR(NTSA,N2,N1)=trcsa_TQR(NTSA,N2,N1)+trcsa_RQR(NTSA,N,NN,N2,N1)
+    DO NTSA=idsalt_beg,idsalt_end
+      trcSalt_TQR(NTSA,N2,N1)=trcSalt_TQR(NTSA,N2,N1)+trcSalt_RQR(NTSA,N,NN,N2,N1)
     ENDDO
 
     IF(IFLBM(M,N,NN,N5,N4).EQ.0)THEN
-      DO NTSA=idsa_beg,idsa_end
-        trcsa_TQR(NTSA,N2,N1)=trcsa_TQR(NTSA,N2,N1)-trcsa_RQR(NTSA,N,NN,N5,N4)
+      DO NTSA=idsalt_beg,idsalt_end
+        trcSalt_TQR(NTSA,N2,N1)=trcSalt_TQR(NTSA,N2,N1)-trcSalt_RQR(NTSA,N,NN,N5,N4)
       ENDDO
 
     ENDIF
     IF(N4B.GT.0.AND.N5B.GT.0.AND.NN.EQ.1)THEN
-      DO NTSA=idsa_beg,idsa_end
-        trcsa_TQR(NTSA,N2,N1)=trcsa_TQR(NTSA,N2,N1)-trcsa_RQR(NTSA,N,NN,N5B,N4B)
+      DO NTSA=idsalt_beg,idsalt_end
+        trcSalt_TQR(NTSA,N2,N1)=trcSalt_TQR(NTSA,N2,N1)-trcSalt_RQR(NTSA,N,NN,N5B,N4B)
       ENDDO
     ENDIF
   ENDDO D1202
@@ -907,8 +907,8 @@ module TrnsfrsMod
 !     TQS*=net solute flux in snow transfer
 !     RQS*=solute flux in snow transfer
 !
-  DO NTSA=idsa_beg,idsa_end
-    trcsa_TQ(NTSA,N2,N1)=trcsa_TQ(NTSA,N2,N1)+trcsa_RQ(NTSA,N,N2,N1)-trcsa_RQ(NTSA,N,N5,N4)
+  DO NTSA=idsalt_beg,idsalt_end
+    trcSalt_TQ(NTSA,N2,N1)=trcSalt_TQ(NTSA,N2,N1)+trcSalt_RQ(NTSA,N,N2,N1)-trcSalt_RQ(NTSA,N,N5,N4)
   ENDDO
   end subroutine NetOverloadFLuxInSnow
 !------------------------------------------------------------------------------------------
@@ -922,28 +922,28 @@ module TrnsfrsMod
 !     begin_execution
 
   D1205: DO LS=1,JS
-    IF(VLSnowHeatCapM(M,LS,NY,NX).GT.VLHeatCapSnowMN(NY,NX))THEN
+    IF(VLSnowHeatCapM(M,LS,NY,NX).GT.VLHeatCapSnowMin(NY,NX))THEN
       LS2=MIN(JS,LS+1)
 !
 !     IF LOWER LAYER IS IN THE SNOWPACK
   !
-      IF(LS.LT.JS.AND.VLSnowHeatCapM(M,LS2,N2,N1).GT.VLHeatCapSnowMN(N2,N1))THEN
-        DO NTSA=idsa_beg,idsa_end
-          trcsa_TBLS(NTSA,LS,NY,NX)=trcsa_TBLS(NTSA,LS,NY,NX) &
-            +trcsa_RBLS(NTSA,LS,NY,NX)-trcsa_RBLS(NTSA,LS2,NY,NX)
+      IF(LS.LT.JS.AND.VLSnowHeatCapM(M,LS2,N2,N1).GT.VLHeatCapSnowMin(N2,N1))THEN
+        DO NTSA=idsalt_beg,idsalt_end
+          trcSalt_TBLS(NTSA,LS,NY,NX)=trcSalt_TBLS(NTSA,LS,NY,NX) &
+            +trcSalt_RBLS(NTSA,LS,NY,NX)-trcSalt_RBLS(NTSA,LS2,NY,NX)
         ENDDO
       ELSE
   !
   !     IF LOWER LAYER IS THE LITTER AND SOIL SURFACE
   !
-        DO NTSA=idsa_beg,idsa_end
-          trcsa_TBLS(NTSA,LS,NY,NX)=trcsa_TBLS(NTSA,LS,NY,NX)+trcsa_RBLS(NTSA,LS,NY,NX) &
-            -trcsa_RFLS(NTSA,3,0,N2,N1)-trcsa_RFLS(NTSA,3,NUM(N2,N1),N2,N1)
+        DO NTSA=idsalt_beg,idsalt_end
+          trcSalt_TBLS(NTSA,LS,NY,NX)=trcSalt_TBLS(NTSA,LS,NY,NX)+trcSalt_RBLS(NTSA,LS,NY,NX) &
+            -trcSalt_RFLS(NTSA,3,0,N2,N1)-trcSalt_RFLS(NTSA,3,NUM(N2,N1),N2,N1)
         ENDDO
 
-        DO NTSA=0,idsa_nuts
-          trcsa_TBLS(idsa_H0PO4+NTSA,LS,NY,NX)=trcsa_TBLS(idsa_H0PO4+NTSA,LS,NY,NX) &
-            -trcsa_RFLS(idsa_H0PO4B+NTSA,3,NUM(N2,N1),N2,N1)
+        DO NTSA=0,idsalt_nuts
+          trcSalt_TBLS(idsalt_H0PO4+NTSA,LS,NY,NX)=trcSalt_TBLS(idsalt_H0PO4+NTSA,LS,NY,NX) &
+            -trcSalt_RFLS(idsalt_H0PO4B+NTSA,3,NUM(N2,N1),N2,N1)
         ENDDO
       ENDIF
     ENDIF
@@ -987,16 +987,16 @@ module TrnsfrsMod
     ENDDO D1200
 
     IF(VLSoilPoreMicP(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
-      DO NTSA=idsa_beg,idsab_end
-        trcsa_TFLS(NTSA,N3,N2,N1)=trcsa_TFLS(NTSA,N3,N2,N1) &
-          +trcsa_RFLS(NTSA,N,N3,N2,N1)-trcsa_RFLS(NTSA,N,N6,N5,N4)
-        trcsa_TFHS(NTSA,N3,N2,N1)=trcsa_TFHS(NTSA,N3,N2,N1) &
-          +trcsa_RFHS(NTSA,N,N3,N2,N1)-trcsa_RFHS(NTSA,N,N6,N5,N4)
+      DO NTSA=idsalt_beg,idsaltb_end
+        trcSalt_TFLS(NTSA,N3,N2,N1)=trcSalt_TFLS(NTSA,N3,N2,N1) &
+          +trcSalt_RFLS(NTSA,N,N3,N2,N1)-trcSalt_RFLS(NTSA,N,N6,N5,N4)
+        trcSalt_TFHS(NTSA,N3,N2,N1)=trcSalt_TFHS(NTSA,N3,N2,N1) &
+          +trcSalt_RFHS(NTSA,N,N3,N2,N1)-trcSalt_RFHS(NTSA,N,N6,N5,N4)
       ENDDO
 
     ELSE
-      trcsa_TFLS(idsa_beg:idsab_end,N3,N2,N1)=0.0
-      trcsa_TFHS(idsa_beg:idsab_end,N3,N2,N1)=0.0
+      trcSalt_TFLS(idsalt_beg:idsaltb_end,N3,N2,N1)=0.0
+      trcSalt_TFHS(idsalt_beg:idsaltb_end,N3,N2,N1)=0.0
     ENDIF
   ENDIF
   end subroutine TotFluxInMacMicPores
@@ -1018,13 +1018,13 @@ module TrnsfrsMod
   D9595: DO NX=NHW,NHE
     D9590: DO NY=NVN,NVS
       D9585: DO L=NU(NY,NX),NL(NY,NX)
-        N1=NX
-        N2=NY
-        N3=L
+        !source grid
+        N1=NX;N2=NY;N3=L
 !
 !     LOCATE ALL EXTERNAL BOUNDARIES AND SET BOUNDARY CONDITIONS
 !     ENTERED IN 'READS'
 !
+        !locate dest grid
         D9580: DO N=FlowDirIndicator(NY,NX),3
           D9575: DO NN=1,2
             IF(N.EQ.1)THEN
@@ -1146,23 +1146,24 @@ module TrnsfrsMod
 !          :*1=non-band,*B=band
 !
             IF(L.EQ.NUM(M2,M1).AND.N.NE.3)THEN
-              IF(IRCHG(NN,N,N2,N1).EQ.0.OR.isclose(RCHQF,0.0_r8) &
-                .OR.QRM(M,N2,N1).LE.ZEROS(N2,N1))THEN
+              IF(.not.XGridRunoffFlag(NN,N,N2,N1).OR.isclose(RCHQF,0.0_r8) &
+                .OR.WatFlux4ErosionM(M,N2,N1).LE.ZEROS(N2,N1))THEN
                 call ZeroSoluteFluxFromRecharge(N,NN,M5,M4)
               ELSE
 !
 !     SOLUTE LOSS FROM RUNOFF DEPENDING ON ASPECT
 !     AND BOUNDARY CONDITIONS SET IN SITE FILE
 !
-                IF((NN.EQ.1.AND.QRMN(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
-                  .OR.(NN.EQ.2.AND.QRMN(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
+                IF((NN.EQ.1.AND.QflxSurfRunoffM(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
+                  .OR.(NN.EQ.2.AND.QflxSurfRunoffM(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
+
                   call SoluteExportThruBoundary(N1,N2,M,N,NN,M5,M4)
 !
 !     SOLUTE GAIN FROM RUNON DEPENDING ON ASPECT
 !     AND BOUNDARY CONDITIONS SET IN SITE FILE
 !
-                ELSEIF((NN.EQ.2.AND.QRMN(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
-                  .OR.(NN.EQ.1.AND.QRMN(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
+                ELSEIF((NN.EQ.2.AND.QflxSurfRunoffM(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
+                  .OR.(NN.EQ.1.AND.QflxSurfRunoffM(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
                   call ZeroSoluteInfluxThruBoundary(N,NN,M5,M4)
                 ELSE
                   call ZeroSoluteInfluxThruBoundary(N,NN,M5,M4)
@@ -1232,7 +1233,7 @@ module TrnsfrsMod
 !
 !     NO SOLUTE GAIN IN SUBSURFACE MACROPORES
 !
-                  trcsa_RFHS(idsa_beg:idsab_end,N,M6,M5,M4)=0.0_r8
+                  trcSalt_RFHS(idsalt_beg:idsaltb_end,N,M6,M5,M4)=0.0_r8
                 ENDIF
 !
 !     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
@@ -1256,7 +1257,7 @@ module TrnsfrsMod
             ELSEIF(N.EQ.3)THEN
 !     NET SOLUTE FLUX IN SNOWPACK
 !
-!     VLSnowHeatCapM,VLHeatCapSnowMN=current,minimum volumetric heat capacity of snowpack
+!     VLSnowHeatCapM,VLHeatCapSnowMin=current,minimum volumetric heat capacity of snowpack
 !     T*BLS=net solute flux in snowpack
 !     R*BLS=solute flux in snowpack
               call NetFluxInSnowpack(M,NY,NX,N1,N2)
@@ -1294,12 +1295,12 @@ module TrnsfrsMod
 !          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH2PO4+,*M1P*=MgHPO4,*COO*=COOH-
 !          :*1=non-band,*B=band
 !
-  DO NTA=idsa_beg,idsa_end
-    trcsa_sosml2(NTA,1,NY,NX)=trcsa_sosml2(NTA,1,NY,NX)+trcsa_TQ(NTA,NY,NX)
+  DO NTA=idsalt_beg,idsalt_end
+    trcSalt_sosml2(NTA,1,NY,NX)=trcSalt_sosml2(NTA,1,NY,NX)+trcSalt_TQ(NTA,NY,NX)
   ENDDO
   D9670: DO L=1,JS
-    DO NTA=idsa_beg,idsa_end
-      trcsa_sosml2(NTA,L,NY,NX)=trcsa_sosml2(NTA,L,NY,NX)+trcsa_TBLS(NTA,L,NY,NX)
+    DO NTA=idsalt_beg,idsalt_end
+      trcSalt_sosml2(NTA,L,NY,NX)=trcSalt_sosml2(NTA,L,NY,NX)+trcSalt_TBLS(NTA,L,NY,NX)
     ENDDO
   ENDDO D9670
   end subroutine UpdateSoluteInSnow
@@ -1331,9 +1332,9 @@ module TrnsfrsMod
 !          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH2PO4+,*M1P*=MgHPO4,*COO*=COOH-
 !          :*1=non-band,*B=band
 !
-  DO NTSA=idsa_beg,idsa_end
-    trcsa_solml2(NTSA,0,NY,NX)=trcsa_solml2(NTSA,0,NY,NX) &
-      +trcsa_TQR(NTSA,NY,NX)+trcsa_RFLS(NTSA,3,0,NY,NX)
+  DO NTSA=idsalt_beg,idsalt_end
+    trcSalt_solml2(NTSA,0,NY,NX)=trcSalt_solml2(NTSA,0,NY,NX) &
+      +trcSalt_TQR(NTSA,NY,NX)+trcSalt_RFLS(NTSA,3,0,NY,NX)
   ENDDO
   end subroutine UpdateSoluteInResidue
 !------------------------------------------------------------------------------------------
@@ -1365,12 +1366,12 @@ module TrnsfrsMod
 !
   D9685: DO L=NU(NY,NX),NL(NY,NX)
     IF(VLSoilPoreMicP(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-      DO NTSA=idsa_beg,idsab_end
-        trcsa_solml2(NTSA,L,NY,NX)=trcsa_solml2(NTSA,L,NY,NX) &
-          +trcsa_TFLS(NTSA,L,NY,NX)+trcsa_RFXS(NTSA,L,NY,NX) &
-          +trcsa_RFLZ(NTSA,L,NY,NX)
-        trcsa_soHml2(NTSA,L,NY,NX)=trcsa_soHml2(NTSA,L,NY,NX) &
-          +trcsa_TFHS(NTSA,L,NY,NX)-trcsa_RFXS(NTSA,L,NY,NX)
+      DO NTSA=idsalt_beg,idsaltb_end
+        trcSalt_solml2(NTSA,L,NY,NX)=trcSalt_solml2(NTSA,L,NY,NX) &
+          +trcSalt_TFLS(NTSA,L,NY,NX)+trcSalt_RFXS(NTSA,L,NY,NX) &
+          +trcSalt_RFLZ(NTSA,L,NY,NX)
+        trcSalt_soHml2(NTSA,L,NY,NX)=trcSalt_soHml2(NTSA,L,NY,NX) &
+          +trcSalt_TFHS(NTSA,L,NY,NX)-trcSalt_RFXS(NTSA,L,NY,NX)
       ENDDO
 
     ENDIF
@@ -1411,9 +1412,9 @@ module TrnsfrsMod
   integer, intent(in) :: NY,NX
 !     begin_execution
 !
-  trcsa_TQR(idsa_beg:idsa_end,NY,NX)=0.0
+  trcSalt_TQR(idsalt_beg:idsalt_end,NY,NX)=0.0
 
-  trcsa_TQ(idsa_beg:idsa_end,NY,NX)=0.0
+  trcSalt_TQ(idsalt_beg:idsalt_end,NY,NX)=0.0
   end subroutine InitFluxAccumlatorsInRunoff
 !------------------------------------------------------------------------------------------
 
@@ -1426,8 +1427,8 @@ module TrnsfrsMod
   integer :: L
 
   D9885: DO L=NU(NY,NX),NL(NY,NX)
-    trcsa_TFLS(idsa_beg:idsab_end,L,NY,NX)=0.0
-    trcsa_TFHS(idsa_beg:idsab_end,L,NY,NX)=0.0
+    trcSalt_TFLS(idsalt_beg:idsaltb_end,L,NY,NX)=0.0
+    trcSalt_TFHS(idsalt_beg:idsaltb_end,L,NY,NX)=0.0
   ENDDO D9885
   end subroutine InitFluxAccumulatorsInSoil
 

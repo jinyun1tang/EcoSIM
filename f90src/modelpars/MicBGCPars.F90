@@ -20,15 +20,15 @@ implicit none
   integer :: k_manure
   integer :: k_POM
   integer :: k_humus
-  integer :: nf_amonia_oxi
-  integer :: nf_nitrite_oxi
-  integer :: nf_aero_methanot
-  integer :: nf_hydro_methang
+  integer :: AmmoniaOxidizeBacteria
+  integer :: NitriteOxidizeBacteria
+  integer :: AerobicMethanotrophBacteria
+  integer :: HydrogenoMethanogenArchea
   integer :: n_aero_hetrophb
   integer :: n_anero_faculb
   integer :: n_aero_fungi
   integer :: n_anaero_ferm
-  integer :: n_aceto_methang
+  integer :: AcetotroMethanogenArchea
   integer :: n_aero_n2fixer
   integer :: n_anero_n2fixer
   integer :: ndbiomcp   !number of necrobiomass components
@@ -67,16 +67,16 @@ implicit none
   character(len=16) :: cplxname(1:jcplxc)
   character(len=16) :: hmicname(NFGsc)
   character(len=16) :: amicname(NFGsc)
-  character(len=16) :: micresb(0:ndbiomcpc-1)      !residual biomass name
-  character(len=16) :: micbiom(1:nlbiomcpc)        !microbial biomass pool name
+  character(len=16) :: micresb(0:NumOfDeadMicrobiomComponents-1)      !residual biomass name
+  character(len=16) :: micbiom(1:NumOfLiveMicrobiomComponents)        !microbial biomass pool name
   integer, pointer :: JGnio(:)   !guid indices for organic-microbial complex
   integer, pointer :: JGnfo(:)   !guid indices for organic-microbial complex
   integer, pointer :: JGniA(:)   !guid indices for autotrophic-microbial complex
   integer, pointer :: JGnfA(:)   !guid indices for autotrophic-microbial complex
-  integer :: NMICBSA             !total number of microbial guilds in the autotrophic complex
-  integer :: NMICBSO             !total number of microbial guilds in one organic-microbial complex
-  integer :: n_litrsfk
-  integer :: n_pltlitrk
+  integer :: NumOfMicrobsInAutotrophCmplx             !total number of microbial guilds in the autotrophic complex
+  integer :: NumOfMicrobs1HetertrophCmplx             !total number of microbial guilds in one organic-microbial complex
+  integer :: NumOfLitrCmplxs
+  integer :: NumOfPlantLitrCmplxs
   integer :: iprotein
   integer :: icarbhyro
   integer :: icellulos
@@ -99,8 +99,8 @@ contains
   !organic matter is grouped into five complexes, including woody(1),
   ! non-woody(2), manure(3), litter, POC(4) and humus(5) (g Mg-1)
 
-  this%ndbiomcp=ndbiomcpc  !number of necrobiomass components
-  this%nlbiomcp=nlbiomcpc  !number of living biomass components
+  this%ndbiomcp=NumOfDeadMicrobiomComponents  !number of necrobiomass components
+  this%nlbiomcp=NumOfLiveMicrobiomComponents  !number of living biomass components
 
   this%jcplx=jcplxc         !# of microbe-substrate complexes
   this%jsken=jskenc        !# of kinetic components of the substrates
@@ -112,7 +112,7 @@ contains
 
   this%k_woody_litr=1;     this%is_litter(this%k_woody_litr)=.true.
   this%k_fine_litr=this%k_woody_litr+1; this%is_litter(this%k_fine_litr)=.true.
-  this%n_pltlitrk=this%k_fine_litr
+  this%NumOfPlantLitrCmplxs=this%k_fine_litr
   this%k_manure=this%k_fine_litr+1;   this%is_litter(this%k_manure)=.true.
   this%is_litter(this%k_fine_litr)=.true.
   this%is_litter(this%k_manure)=.true.
@@ -122,7 +122,7 @@ contains
   this%icellulos=3
   this%ilignin  =4
 
-  this%n_litrsfk=this%k_manure
+  this%NumOfLitrCmplxs=this%k_manure
   this%k_POM=this%k_manure+1
   this%k_humus=this%k_POM+1
   this%kiname(0)='protein'
@@ -161,7 +161,7 @@ contains
   this%n_anero_faculb=2
   this%n_aero_fungi=3
   this%n_anaero_ferm=4
-  this%n_aceto_methang=5
+  this%AcetotroMethanogenArchea=5
   this%n_aero_n2fixer=6
   this%n_anero_n2fixer=7
 
@@ -173,19 +173,19 @@ contains
   this%is_anerobic_hetr(this%n_anaero_ferm)=.true.
   this%is_anerobic_hetr(this%n_anero_n2fixer)=.true.
 !the abstract complex
-  this%nf_amonia_oxi=1
-  this%nf_nitrite_oxi=2
-  this%nf_aero_methanot=3
-  this%nf_hydro_methang=5
+  this%AmmoniaOxidizeBacteria=1
+  this%NitriteOxidizeBacteria=2
+  this%AerobicMethanotrophBacteria=3
+  this%HydrogenoMethanogenArchea=5
 
-  this%is_activef_micb(this%nf_amonia_oxi)=.True.
-  this%is_activef_micb(this%nf_nitrite_oxi)=.True.
-  this%is_activef_micb(this%nf_aero_methanot)=.True.
-  this%is_activef_micb(this%nf_hydro_methang)=.True.
+  this%is_activef_micb(this%AmmoniaOxidizeBacteria)=.True.
+  this%is_activef_micb(this%NitriteOxidizeBacteria)=.True.
+  this%is_activef_micb(this%AerobicMethanotrophBacteria)=.True.
+  this%is_activef_micb(this%HydrogenoMethanogenArchea)=.True.
 
-  this%is_CO2_autotroph(this%nf_amonia_oxi)=.true.
-  this%is_CO2_autotroph(this%nf_nitrite_oxi)=.true.
-  this%is_CO2_autotroph(this%nf_hydro_methang)=.true.
+  this%is_CO2_autotroph(this%AmmoniaOxidizeBacteria)=.true.
+  this%is_CO2_autotroph(this%NitriteOxidizeBacteria)=.true.
+  this%is_CO2_autotroph(this%HydrogenoMethanogenArchea)=.true.
 
 
   end subroutine Init
@@ -196,8 +196,8 @@ contains
   implicit none
   class(MicParType) :: this
 
-  real(r8) :: COMCI(nlbiomcpc,1:this%jcplx)
-  real(r8) :: OMCI1(nlbiomcpc,1:this%jcplx)  !allocation of biomass to kinetic components
+  real(r8) :: COMCI(NumOfLiveMicrobiomComponents,1:this%jcplx)
+  real(r8) :: OMCI1(NumOfLiveMicrobiomComponents,1:this%jcplx)  !allocation of biomass to kinetic components
   integer :: K,M,NGL,N
   associate(                    &
     OHCK     => this%OHCK     , &
@@ -245,15 +245,15 @@ contains
   OMCI(1:3,:)=OMCI1
 
 !  if(this%jguilds.GT.1)then
-!    COMCI=OMCI(1:nlbiomcpc,:)
+!    COMCI=OMCI(1:NumOfLiveMicrobiomComponents,:)
 !    DO K=1,jcplxc
 !      DO NGL=2,this%jguilds-1
-!        DO M=1,nlbiomcpc
-!          OMCI(M+(NGL-1)*nlbiomcpc,K)=OMCI(M,K)
+!        DO M=1,NumOfLiveMicrobiomComponents
+!          OMCI(M+(NGL-1)*NumOfLiveMicrobiomComponents,K)=OMCI(M,K)
 !          COMCI(M,K)=COMCI(M,K)+OMCI(M,K)
 !        enddo
 !      enddo
-!      DO M=1,nlbiomcpc
+!      DO M=1,NumOfLiveMicrobiomComponents
 !        OMCI(M+(JG-1)*3,K)=OMCI1(M,K)-COMCI(M,K)
 !      ENDDO
 !    enddo
@@ -351,16 +351,16 @@ contains
   allocate(this%JGnfA(NFGsc))
 
   k=1
-  this%NMICBSA=0
-  this%NMICBSO=0
+  this%NumOfMicrobsInAutotrophCmplx=0
+  this%NumOfMicrobs1HetertrophCmplx=0
   do n=1,NFGsc
     this%JGnio(n)=k
     this%JGniA(n)=k
     k=k+jguilds
     this%JGnfo(n)=k-1
     this%JGnfA(n)=k-1
-    this%NMICBSA=this%NMICBSA+this%JGnfA(n)-this%JGniA(n)+1
-    this%NMICBSO=this%NMICBSO+this%JGnfo(n)-this%JGnio(n)+1
+    this%NumOfMicrobsInAutotrophCmplx=this%NumOfMicrobsInAutotrophCmplx+this%JGnfA(n)-this%JGniA(n)+1
+    this%NumOfMicrobs1HetertrophCmplx=this%NumOfMicrobs1HetertrophCmplx+this%JGnfo(n)-this%JGnio(n)+1
   enddo
 
 
@@ -370,19 +370,19 @@ contains
   allocate(this%OMCK(1:jcplx))
   allocate(this%ORCK(1:jcplx))
   allocate(this%OQCK(1:jcplx))
-  allocate(this%ORCI(ndbiomcpc,1:jcplx))
-  allocate(this%OMCI(nlbiomcpc,1:jcplx))
-  allocate(this%CNOMC(nlbiomcpc,this%NMICBSO,1:jcplx))
-  allocate(this%CPOMC(nlbiomcpc,this%NMICBSO,1:jcplx))
-  allocate(this%CNOMCff(nlbiomcpc,this%NMICBSA))
-  allocate(this%CPOMCff(nlbiomcpc,this%NMICBSA))
-  allocate(this%CNOMCa(nlbiomcpc,NFGs,1:jcplx))
-  allocate(this%CPOMCa(nlbiomcpc,NFGs,1:jcplx))
-  allocate(this%CNOMCffa(nlbiomcpc,NFGs))
-  allocate(this%CPOMCffa(nlbiomcpc,NFGs))
+  allocate(this%ORCI(NumOfDeadMicrobiomComponents,1:jcplx))
+  allocate(this%OMCI(NumOfLiveMicrobiomComponents,1:jcplx))
+  allocate(this%CNOMC(NumOfLiveMicrobiomComponents,this%NumOfMicrobs1HetertrophCmplx,1:jcplx))
+  allocate(this%CPOMC(NumOfLiveMicrobiomComponents,this%NumOfMicrobs1HetertrophCmplx,1:jcplx))
+  allocate(this%CNOMCff(NumOfLiveMicrobiomComponents,this%NumOfMicrobsInAutotrophCmplx))
+  allocate(this%CPOMCff(NumOfLiveMicrobiomComponents,this%NumOfMicrobsInAutotrophCmplx))
+  allocate(this%CNOMCa(NumOfLiveMicrobiomComponents,NFGs,1:jcplx))
+  allocate(this%CPOMCa(NumOfLiveMicrobiomComponents,NFGs,1:jcplx))
+  allocate(this%CNOMCffa(NumOfLiveMicrobiomComponents,NFGs))
+  allocate(this%CPOMCffa(NumOfLiveMicrobiomComponents,NFGs))
 
-  allocate(this%CNOFC(jsken,1:this%n_litrsfk))
-  allocate(this%CPOFC(jsken,1:this%n_litrsfk))
+  allocate(this%CNOFC(jsken,1:this%NumOfLitrCmplxs))
+  allocate(this%CPOFC(jsken,1:this%NumOfLitrCmplxs))
   allocate(this%CNRH(1:jcplx))
   allocate(this%CPRH(1:jcplx))
   allocate(this%OMCF(NFGs))

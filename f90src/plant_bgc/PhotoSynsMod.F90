@@ -39,7 +39,7 @@ implicit none
   IGTYP      => plt_pheno%IGTYP , &
   FDBK       => plt_photo%FDBK  , &
   CO2Q       => plt_photo%CO2Q  , &
-  SURFX      => plt_photo%SURFX , &
+  LeafAUnshaded_seclyrnodbrpft      => plt_photo%LeafAUnshaded_seclyrnodbrpft , &
   XKCO2O     => plt_photo%XKCO2O, &
   SCO2       => plt_photo%SCO2  , &
   CBXN       => plt_photo%CBXN  , &
@@ -62,7 +62,7 @@ implicit none
 
 ! FOR EACH CANOPY LAYER
 !
-  D210: DO L=JC1,1,-1
+  D210: DO L=NumOfCanopyLayers1,1,-1
     IF(CanPLNBLA(L,K,NB,NZ).GT.ZEROP(NZ))THEN
 !
 !     FOR EACH LEAF AZIMUTH AND INCLINATION
@@ -72,9 +72,9 @@ implicit none
 !
 !         CO2 FIXATION BY SUNLIT LEAVES
 !
-!         SURFX=unself-shaded leaf surface area
+!         LeafAUnshaded_seclyrnodbrpft=unself-shaded leaf surface area
 !
-          IF(SURFX(N,L,K,NB,NZ).GT.ZEROP(NZ))THEN
+          IF(LeafAUnshaded_seclyrnodbrpft(N,L,K,NB,NZ).GT.ZEROP(NZ))THEN
             IF(PAR(N,M,L,NZ).GT.0.0)THEN
 !
 !             C3 CARBOXYLATION REACTIONS IN MESOPHYLL
@@ -162,13 +162,13 @@ implicit none
 !               ACCUMULATE C3 FIXATION PRODUCT IN MESOPHYLL
 !
 !               CH2O3=total C4 CO2 fixation
-!               SURFX=unself-shaded leaf surface area
+!               LeafAUnshaded_seclyrnodbrpft=unself-shaded leaf surface area
 !               TAUS=fraction of direct radiation transmitted from layer above
 !
-                CH2O3(K)=CH2O3(K)+VL*SURFX(N,L,K,NB,NZ)*TAUS(L+1)
+                CH2O3(K)=CH2O3(K)+VL*LeafAUnshaded_seclyrnodbrpft(N,L,K,NB,NZ)*TAUS(L+1)
 !               ICO2I=MAX(1,MIN(400,INT(CO2X)))
 !               VCO2(ICO2I,I,NZ)=VCO2(ICO2I,I,NZ)
-!              2+(VL*SURFX(N,L,K,NB,NZ)*TAUS(L+1))*0.0432
+!              2+(VL*LeafAUnshaded_seclyrnodbrpft(N,L,K,NB,NZ)*TAUS(L+1))*0.0432
 
               ENDIF
             ENDIF
@@ -262,13 +262,13 @@ implicit none
 !               ACCUMULATE C3 FIXATION PRODUCT IN MESOPHYLL
 !
 !               CH2O3=total C3 CO2 fixation
-!               SURFX=unself-shaded leaf surface area
+!               LeafAUnshaded_seclyrnodbrpft=unself-shaded leaf surface area
 !               TAU0=fraction of diffuse radiation transmitted from layer above
 !
-                CH2O3(K)=CH2O3(K)+VL*SURFX(N,L,K,NB,NZ)*TAU0(L+1)
+                CH2O3(K)=CH2O3(K)+VL*LeafAUnshaded_seclyrnodbrpft(N,L,K,NB,NZ)*TAU0(L+1)
 !               ICO2I=MAX(1,MIN(400,INT(CO2X)))
 !               VCO2(ICO2I,I,NZ)=VCO2(ICO2I,I,NZ)
-!              2+(VL*SURFX(N,L,K,NB,NZ)*TAU0(L+1))*0.0432
+!              2+(VL*LeafAUnshaded_seclyrnodbrpft(N,L,K,NB,NZ)*TAU0(L+1))*0.0432
               ENDIF
             ENDIF
           ENDIF
@@ -313,7 +313,7 @@ implicit none
   FDBK4      => plt_photo%FDBK4 , &
   SCO2       => plt_photo%SCO2  , &
   CBXN4      => plt_photo%CBXN4 , &
-  SURFX      => plt_photo%SURFX , &
+  LeafAUnshaded_seclyrnodbrpft      => plt_photo%LeafAUnshaded_seclyrnodbrpft , &
   VGRO4      => plt_photo%VGRO4 , &
   RCMX       => plt_photo%RCMX  , &
   DCO2       => plt_photo%DCO2  , &
@@ -335,7 +335,7 @@ implicit none
   )
 ! FOR EACH CANOPY LAYER
 !
-  D110: DO L=JC1,1,-1
+  D110: DO L=NumOfCanopyLayers1,1,-1
     IF(CanPLNBLA(L,K,NB,NZ).GT.ZEROP(NZ))THEN
 !
 !     FOR EACH LEAF AZIMUTH AND INCLINATION
@@ -345,9 +345,9 @@ implicit none
 !
 !         CO2 FIXATION IN MESOPHYLL BY SUNLIT LEAVES
 !
-!         SURFX=unself-shaded leaf surface area
+!         LeafAUnshaded_seclyrnodbrpft=unself-shaded leaf surface area
 !
-          IF(SURFX(N,L,K,NB,NZ).GT.ZEROP(NZ))THEN
+          IF(LeafAUnshaded_seclyrnodbrpft(N,L,K,NB,NZ).GT.ZEROP(NZ))THEN
             IF(PAR(N,M,L,NZ).GT.0.0)THEN
 !
 !             C4 CARBOXYLATION REACTIONS IN MESOPHYLL
@@ -437,14 +437,14 @@ implicit none
 !               ACCUMULATE C4 FIXATION PRODUCT IN MESOPHYLL
 !
 !               CH2O4=total C4 CO2 fixation
-!               SURFX=unself-shaded leaf surface area
+!               LeafAUnshaded_seclyrnodbrpft=unself-shaded leaf surface area
 !               TAUS=fraction of direct radiation transmitted from layer above
 !
-                CH2O4(K)=CH2O4(K)+VL*SURFX(N,L,K,NB,NZ) &
+                CH2O4(K)=CH2O4(K)+VL*LeafAUnshaded_seclyrnodbrpft(N,L,K,NB,NZ) &
                   *TAUS(L+1)
 !               ICO2I=MAX(1,MIN(400,INT(CO2X)))
 !               VCO2(ICO2I,I,NZ)=VCO2(ICO2I,I,NZ)
-!              2+(VL*SURFX(N,L,K,NB,NZ)*TAUS(L+1))*0.0432
+!              2+(VL*LeafAUnshaded_seclyrnodbrpft(N,L,K,NB,NZ)*TAUS(L+1))*0.0432
 !
 !               C3 CARBOXYLATION REACTIONS IN BUNDLE SHEATH OF C4 PLANTS
 !
@@ -465,10 +465,10 @@ implicit none
 !               ACCUMULATE C3 FIXATION PRODUCT IN BUNDLE SHEATH
 !
 !               CH2O3=total C3 CO2 fixation
-!               SURFX=unself-shaded leaf surface area
+!               LeafAUnshaded_seclyrnodbrpft=unself-shaded leaf surface area
 !               TAUS=fraction of direct radiation transmitted from layer above
 !
-                CH2O3(K)=CH2O3(K)+VL*SURFX(N,L,K,NB,NZ)*TAUS(L+1)
+                CH2O3(K)=CH2O3(K)+VL*LeafAUnshaded_seclyrnodbrpft(N,L,K,NB,NZ)*TAUS(L+1)
 
               ENDIF
             ENDIF
@@ -564,13 +564,13 @@ implicit none
 !               ACCUMULATE C4 FIXATION PRODUCT IN MESOPHYLL
 !
 !               CH2O4=total C4 CO2 fixation
-!               SURFX=unself-shaded leaf surface area
+!               LeafAUnshaded_seclyrnodbrpft=unself-shaded leaf surface area
 !               TAU0=fraction of diffuse radiation transmitted from layer above
 !
-                CH2O4(K)=CH2O4(K)+VL*SURFX(N,L,K,NB,NZ)*TAU0(L+1)
+                CH2O4(K)=CH2O4(K)+VL*LeafAUnshaded_seclyrnodbrpft(N,L,K,NB,NZ)*TAU0(L+1)
 !               ICO2I=MAX(1,MIN(400,INT(CO2X)))
 !               VCO2(ICO2I,I,NZ)=VCO2(ICO2I,I,NZ)
-!              2+(VL*SURFX(N,L,K,NB,NZ)*TAU0(L+1))*0.0432
+!              2+(VL*LeafAUnshaded_seclyrnodbrpft(N,L,K,NB,NZ)*TAU0(L+1))*0.0432
 !
 !               C3 CARBOXYLATION REACTIONS IN IN BUNDLE SHEATH OF C4 PLANTS
 !
@@ -591,10 +591,10 @@ implicit none
 !               ACCUMULATE C3 FIXATION PRODUCT IN BUNDLE SHEATH
 !
 !               CH2O3=total C3 CO2 fixation
-!               SURFX=unself-shaded leaf surface area
+!               LeafAUnshaded_seclyrnodbrpft=unself-shaded leaf surface area
 !               TAU0=fraction of diffuse radiation transmitted from layer above
 !
-                CH2O3(K)=CH2O3(K)+VL*SURFX(N,L,K,NB,NZ)*TAU0(L+1)
+                CH2O3(K)=CH2O3(K)+VL*LeafAUnshaded_seclyrnodbrpft(N,L,K,NB,NZ)*TAU0(L+1)
               ENDIF
             ENDIF
           ENDIF

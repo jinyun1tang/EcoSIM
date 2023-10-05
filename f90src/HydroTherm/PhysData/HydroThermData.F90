@@ -36,15 +36,15 @@ implicit none
   real(r8),allocatable ::  VLHeatCapacityB(:,:,:)                      !
   real(r8),allocatable ::  RAG(:,:)                           !
   real(r8),allocatable ::  PAREW(:,:)                         ! 
-  real(r8),allocatable ::  ALTG(:,:)                          ! 
+  real(r8),allocatable ::  Altitude_grid(:,:)                          ! 
   real(r8),allocatable ::  VLiceMacP1(:,:,:)                      !
   real(r8),allocatable ::  RADXW(:,:)                         !  
-  real(r8),allocatable ::  QR1(:,:,:,:)                       !  
-  real(r8),allocatable ::  HQR1(:,:,:,:)                      !  
-  real(r8),allocatable ::  QS1(:,:,:)                         !  
-  real(r8),allocatable ::  QW1(:,:,:)                         !
-  real(r8),allocatable ::  QI1(:,:,:)                         !  
-  real(r8),allocatable ::  HQS1(:,:,:)                        !  
+  real(r8),allocatable ::  WatFlx2LitRByRunoff(:,:,:,:)                       !  
+  real(r8),allocatable ::  HeatFlx2LitRByRunoff(:,:,:,:)                      !  
+  real(r8),allocatable ::  DrySnoFlxBySnowRedistribut(:,:,:)                         !  
+  real(r8),allocatable ::  WatFlxBySnowRedistribut(:,:,:)                         !
+  real(r8),allocatable ::  IceFlxBySnowRedistribut(:,:,:)                         !  
+  real(r8),allocatable ::  HeatFlxBySnowRedistribut(:,:,:)                        !  
   real(r8),allocatable ::  HeatFlow2Soili(:,:,:,:)                     !  
   real(r8),allocatable ::  WatXChange2WatTable(:,:,:,:)                      !  
   real(r8),allocatable ::  ConvectWaterFlowMacP(:,:,:,:)                     !  
@@ -95,15 +95,15 @@ implicit none
   allocate(VLHeatCapacityB(JZ,JY,JX));   VLHeatCapacityB=0._r8  
   allocate(RAG(JY,JX));         RAG=0._r8
   allocate(PAREW(JY,JX));       PAREW=0._r8
-  allocate(ALTG(JY,JX));        ALTG=0._r8  
+  allocate(Altitude_grid(JY,JX));        Altitude_grid=0._r8  
   allocate(VLiceMacP1(JZ,JY,JX));   VLiceMacP1=0._r8  
   allocate(RADXW(JY,JX));       RADXW=0._r8  
-  allocate(QR1(2,2,JV,JH));     QR1=0._r8  
-  allocate(HQR1(2,2,JV,JH));    HQR1=0._r8
-  allocate(QS1(2,JV,JH));       QS1=0._r8
-  allocate(QW1(2,JV,JH));       QW1=0._r8
-  allocate(QI1(2,JV,JH));       QI1=0._r8  
-  allocate(HQS1(2,JV,JH));      HQS1=0._r8
+  allocate(WatFlx2LitRByRunoff(2,2,JV,JH));     WatFlx2LitRByRunoff=0._r8  
+  allocate(HeatFlx2LitRByRunoff(2,2,JV,JH));    HeatFlx2LitRByRunoff=0._r8
+  allocate(DrySnoFlxBySnowRedistribut(2,JV,JH));       DrySnoFlxBySnowRedistribut=0._r8
+  allocate(WatFlxBySnowRedistribut(2,JV,JH));       WatFlxBySnowRedistribut=0._r8
+  allocate(IceFlxBySnowRedistribut(2,JV,JH));       IceFlxBySnowRedistribut=0._r8  
+  allocate(HeatFlxBySnowRedistribut(2,JV,JH));      HeatFlxBySnowRedistribut=0._r8
   allocate(HeatFlow2Soili(3,JD,JV,JH));  HeatFlow2Soili=0._r8
   allocate(WatXChange2WatTable(3,JD,JV,JH));   WatXChange2WatTable=0._r8  
   allocate(ConvectWaterFlowMacP(3,JD,JV,JH));  ConvectWaterFlowMacP=0._r8
@@ -119,7 +119,7 @@ implicit none
   use abortutils, only : destroy  
   implicit none
 
-  call destroy(QR1)
+  call destroy(WatFlx2LitRByRunoff)
   call destroy(FracSoiPAsWat)
   call destroy(PSISM1)  
   call destroy(TKSoi1)  
@@ -153,14 +153,14 @@ implicit none
   call destroy(VLHeatCapacityB)  
   call destroy(RAG)
   call destroy(PAREW)
-  call destroy(ALTG)
+  call destroy(Altitude_grid)
   call destroy(VLiceMacP1)
   call destroy(RADXW)
-  call destroy(HQR1)    
-  call destroy(QS1)  
-  call destroy(QW1)
-  call destroy(QI1)
-  call destroy(HQS1)    
+  call destroy(HeatFlx2LitRByRunoff)    
+  call destroy(DrySnoFlxBySnowRedistribut)  
+  call destroy(WatFlxBySnowRedistribut)
+  call destroy(IceFlxBySnowRedistribut)
+  call destroy(HeatFlxBySnowRedistribut)    
   call destroy(HeatFlow2Soili)  
   call destroy(WatXChange2WatTable)  
   call destroy(ConvectWaterFlowMacP)

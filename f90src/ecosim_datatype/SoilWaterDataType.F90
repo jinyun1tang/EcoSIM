@@ -34,18 +34,18 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  ExtWaterTablet0(:,:)              !initial external water table depth, elevation corrected [m]
   real(r8),target,allocatable ::  ExtWaterTable(:,:)                !current external water table depth, elevation corrected [m]
   real(r8),target,allocatable ::  DTBLI(:,:)                        !external water table depth, [m]
-  real(r8),target,allocatable ::  ENGYPM(:,:,:)                     !total energy impact for erosion
-  real(r8),target,allocatable ::  XVOLTM(:,:,:)                     !excess water+ice
-  real(r8),target,allocatable ::  XVLWatMicPM(:,:,:)                     !excess water
+  real(r8),target,allocatable ::  EnergyImpact4ErosionM(:,:,:)                     !total energy impact for erosion
+  real(r8),target,allocatable ::  XVLMobileWaterLitRM(:,:,:)                     !excess water+ice
+  real(r8),target,allocatable ::  XVLMobileWatMicPM(:,:,:)                     !excess water
   real(r8),target,allocatable ::  XVLiceMicPM(:,:,:)                     !excess ice
   real(r8),target,allocatable ::  HydroCond3D(:,:,:,:,:)                   !hydraulic conductivity at different moisture levels
   real(r8),target,allocatable ::  HydroCondMacP(:,:,:)                       !macropore hydraulic conductivity, [m MPa-1 h-1]
   real(r8),target,allocatable ::  HydroCondMicP4RootUptake(:,:,:)                       !soil micropore hydraulic conductivity for root water uptake [m MPa-1 h-1]
-  real(r8),target,allocatable ::  QRM(:,:,:)                        !runoff water flux, [m3 d-2 t-1]
-  real(r8),target,allocatable ::  QRV(:,:,:)                        !runoff velocity, [m t-1]
-   integer,target,allocatable ::  IFLBM(:,:,:,:,:)                   !flag for directional surface runoff
-   integer,target,allocatable ::  IRCHG(:,:,:,:)                     !enables or disables boundary water flux depending on aspect, [-]
-   integer,target,allocatable ::  IFLBH(:,:,:,:)                     !flag for directional runoff, related to IFLBM
+  real(r8),target,allocatable ::  WatFlux4ErosionM(:,:,:)                        !runoff water flux, [m3 d-2 t-1]
+  real(r8),target,allocatable ::  RunoffVelocity(:,:,:)                        !runoff velocity, [m t-1]
+  integer,target,allocatable ::  IFLBM(:,:,:,:,:)                   !flag for directional surface runoff
+  logical,target,allocatable ::  XGridRunoffFlag(:,:,:,:)           !enables or disables boundary water flux depending on aspect, [-]
+  integer,target,allocatable ::  IFLBH(:,:,:,:)                     !flag for directional runoff, related to IFLBM
   real(r8),target,allocatable ::  RechargNorthSubSurf(:,:)                       !northern subsurface boundary water flux , [-]
   real(r8),target,allocatable ::  RechargEastSubSurf(:,:)                       !eastern subsurface boundary water flux , [-]
   real(r8),target,allocatable ::  RechargSouthSubSurf(:,:)                       !southern subsurface boundary water flux , [-]
@@ -83,11 +83,11 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  UVLWatMicP(:,:)                        !total soil water content, [m3 d-2]
   real(r8),target,allocatable ::  UVOLO(:,:)                        !total subsurface water flux, [m3 d-2]
   real(r8),target,allocatable ::  UDRAIN(:,:)                       !total water drainage below root zone, [m3 d-2]
-  real(r8),target,allocatable ::  QR(:,:,:,:)                       !soil surface runoff water, [m3 d-2 h-1]
-  real(r8),target,allocatable ::  HQR(:,:,:,:)                      !soil surface runoff heat, [MJ d-2 h-1]
+  real(r8),target,allocatable ::  Wat2GridBySurfRunoff(:,:,:,:)                       !soil surface runoff water, [m3 d-2 h-1]
+  real(r8),target,allocatable ::  Heat2GridBySurfRunoff(:,:,:,:)                      !soil surface runoff heat, [MJ d-2 h-1]
   real(r8),target,allocatable ::  WQRH(:,:)                         !runoff from surface water, [m3 d-2 h-1]
-  real(r8),target,allocatable ::  FWatDischarge(:,:)                        !water discharge, [m3 d-2 h-1]
-  real(r8),target,allocatable ::  QRMN(:,:,:,:,:)                   !surface runoff,
+  real(r8),target,allocatable ::  FWatDischarge(:,:)                !water discharge, [m3 d-2 h-1]
+  real(r8),target,allocatable ::  QflxSurfRunoffM(:,:,:,:,:)        !surface runoff,
   private :: InitAllocate
   contains
 
@@ -128,17 +128,17 @@ module SoilWaterDataType
   allocate(ExtWaterTablet0(JY,JX));       ExtWaterTablet0=0._r8
   allocate(ExtWaterTable(JY,JX));       ExtWaterTable=0._r8
   allocate(DTBLI(JY,JX));       DTBLI=0._r8
-  allocate(ENGYPM(60,JY,JX));   ENGYPM=0._r8
-  allocate(XVOLTM(60,JY,JX));   XVOLTM=0._r8
-  allocate(XVLWatMicPM(60,JY,JX));   XVLWatMicPM=0._r8
+  allocate(EnergyImpact4ErosionM(60,JY,JX));   EnergyImpact4ErosionM=0._r8
+  allocate(XVLMobileWaterLitRM(60,JY,JX));   XVLMobileWaterLitRM=0._r8
+  allocate(XVLMobileWatMicPM(60,JY,JX));   XVLMobileWatMicPM=0._r8
   allocate(XVLiceMicPM(60,JY,JX));   XVLiceMicPM=0._r8
   allocate(HydroCond3D(3,100,0:JZ,JY,JX));HydroCond3D=0._r8
   allocate(HydroCondMacP(JZ,JY,JX));     HydroCondMacP=0._r8
   allocate(HydroCondMicP4RootUptake(JZ,JY,JX));     HydroCondMicP4RootUptake=0._r8
-  allocate(QRM(60,JV,JH));      QRM=0._r8
-  allocate(QRV(60,JY,JX));      QRV=0._r8
+  allocate(WatFlux4ErosionM(60,JV,JH));      WatFlux4ErosionM=0._r8
+  allocate(RunoffVelocity(60,JY,JX));      RunoffVelocity=0._r8
   allocate(IFLBM(60,2,2,JY,JX));IFLBM=0
-  allocate(IRCHG(2,2,JY,JX));   IRCHG=0
+  allocate(XGridRunoffFlag(2,2,JY,JX));   XGridRunoffFlag=.false.
   allocate(IFLBH(2,2,JY,JX));   IFLBH=0
   allocate(RechargNorthSubSurf(JY,JX));      RechargNorthSubSurf=0._r8
   allocate(RechargEastSubSurf(JY,JX));      RechargEastSubSurf=0._r8
@@ -177,11 +177,11 @@ module SoilWaterDataType
   allocate(UVLWatMicP(JY,JX));       UVLWatMicP=0._r8
   allocate(UVOLO(JY,JX));       UVOLO=0._r8
   allocate(UDRAIN(JY,JX));      UDRAIN=0._r8
-  allocate(QR(2,2,JV,JH));      QR=0._r8
-  allocate(HQR(2,2,JV,JH));     HQR=0._r8
+  allocate(Wat2GridBySurfRunoff(2,2,JV,JH));      Wat2GridBySurfRunoff=0._r8
+  allocate(Heat2GridBySurfRunoff(2,2,JV,JH));     Heat2GridBySurfRunoff=0._r8
   allocate(WQRH(JY,JX));        WQRH=0._r8
   allocate(FWatDischarge(JY,JX));       FWatDischarge=0._r8
-  allocate(QRMN(60,2,2,JV,JH)); QRMN=0._r8
+  allocate(QflxSurfRunoffM(60,2,2,JV,JH)); QflxSurfRunoffM=0._r8
   end subroutine InitAllocate
 
 !----------------------------------------------------------------------
@@ -214,17 +214,17 @@ module SoilWaterDataType
   call destroy(ExtWaterTablet0)
   call destroy(ExtWaterTable)
   call destroy(DTBLI)
-  call destroy(ENGYPM)
-  call destroy(XVOLTM)
-  call destroy(XVLWatMicPM)
+  call destroy(EnergyImpact4ErosionM)
+  call destroy(XVLMobileWaterLitRM)
+  call destroy(XVLMobileWatMicPM)
   call destroy(XVLiceMicPM)
   call destroy(HydroCond3D)
   call destroy(HydroCondMacP)
   call destroy(HydroCondMicP4RootUptake)
-  call destroy(QRM)
-  call destroy(QRV)
+  call destroy(WatFlux4ErosionM)
+  call destroy(RunoffVelocity)
   call destroy(IFLBM)
-  call destroy(IRCHG)
+  call destroy(XGridRunoffFlag)
   call destroy(IFLBH)
   call destroy(RechargNorthSubSurf)
   call destroy(RechargEastSubSurf)
@@ -263,11 +263,11 @@ module SoilWaterDataType
   call destroy(UVLWatMicP)
   call destroy(UVOLO)
   call destroy(UDRAIN)
-  call destroy(QR)
-  call destroy(HQR)
+  call destroy(Wat2GridBySurfRunoff)
+  call destroy(Heat2GridBySurfRunoff)
   call destroy(WQRH)
   call destroy(FWatDischarge)
-  call destroy(QRMN)
+  call destroy(QflxSurfRunoffM)
   end subroutine DestructSoilWater
 
 end module SoilWaterDataType

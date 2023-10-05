@@ -646,16 +646,16 @@ module SoluteMod
 !     DZ*,DX*,DP*=transfer of solute,adsorbed,precipitated HPO4,H2PO4
 !
       IF(salt_model)THEN
-        DZH0P=FVLPO4*trcsa_solml(idsa_H0PO4,L,NY,NX)
+        DZH0P=FVLPO4*trcSalt_solml(idsalt_H0PO4,L,NY,NX)
         DZH1P=FVLPO4*trc_solml(ids_H1PO4,L,NY,NX)/patomw
         DZH2P=FVLPO4*trc_solml(ids_H2PO4,L,NY,NX)/patomw
-        DZH3P=FVLPO4*trcsa_solml(idsa_H3PO4,L,NY,NX)
-        DZF1P=FVLPO4*trcsa_solml(idsa_FeHPO4,L,NY,NX)
-        DZF2P=FVLPO4*trcsa_solml(idsa_FeH2PO4,L,NY,NX)
-        DZC0P=FVLPO4*trcsa_solml(idsa_CaPO4,L,NY,NX)
-        DZC1P=FVLPO4*trcsa_solml(idsa_CaHPO4,L,NY,NX)
-        DZC2P=FVLPO4*trcsa_solml(idsa_CaH2PO4,L,NY,NX)
-        DZM1P=FVLPO4*trcsa_solml(idsa_MgHPO4,L,NY,NX)
+        DZH3P=FVLPO4*trcSalt_solml(idsalt_H3PO4,L,NY,NX)
+        DZF1P=FVLPO4*trcSalt_solml(idsalt_FeHPO4,L,NY,NX)
+        DZF2P=FVLPO4*trcSalt_solml(idsalt_FeH2PO4,L,NY,NX)
+        DZC0P=FVLPO4*trcSalt_solml(idsalt_CaPO4,L,NY,NX)
+        DZC1P=FVLPO4*trcSalt_solml(idsalt_CaHPO4,L,NY,NX)
+        DZC2P=FVLPO4*trcSalt_solml(idsalt_CaH2PO4,L,NY,NX)
+        DZM1P=FVLPO4*trcSalt_solml(idsalt_MgHPO4,L,NY,NX)
         DXOH0=FVLPO4*trcx_solml(idx_OHe,L,NY,NX)
         DXOH1=FVLPO4*trcx_solml(idx_OH,L,NY,NX)
         DXOH2=FVLPO4*trcx_solml(idx_OHp,L,NY,NX)
@@ -667,26 +667,26 @@ module SoluteMod
         DPCHP=FVLPO4*trcp_salml(idsp_HA,L,NY,NX)
         DPCMP=FVLPO4*trcp_salml(idsp_CaH2PO4,L,NY,NX)
 
-        trcsa_TR(idsa_H0PO4,L,NY,NX)=trcsa_TR(idsa_H0PO4,L,NY,NX)+DZH0P
+        trcSalt_TR(idsalt_H0PO4,L,NY,NX)=trcSalt_TR(idsalt_H0PO4,L,NY,NX)+DZH0P
         TRH1P(L,NY,NX)=TRH1P(L,NY,NX)+DZH1P
         TRH2P(L,NY,NX)=TRH2P(L,NY,NX)+DZH2P
-        trcsa_TR(idsa_H3PO4,L,NY,NX)=trcsa_TR(idsa_H3PO4,L,NY,NX)+DZH3P
-        trcsa_TR(idsa_FeHPO4,L,NY,NX)=trcsa_TR(idsa_FeHPO4,L,NY,NX)+DZF1P
-        trcsa_TR(idsa_FeH2PO4,L,NY,NX)=trcsa_TR(idsa_FeH2PO4,L,NY,NX)+DZF2P
-        trcsa_TR(idsa_CaPO4,L,NY,NX)=trcsa_TR(idsa_CaPO4,L,NY,NX)+DZC0P
-        trcsa_TR(idsa_CaHPO4,L,NY,NX)=trcsa_TR(idsa_CaHPO4,L,NY,NX)+DZC1P
-        trcsa_TR(idsa_CaH2PO4,L,NY,NX)=trcsa_TR(idsa_CaH2PO4,L,NY,NX)+DZC2P
-        trcsa_TR(idsa_MgHPO4,L,NY,NX)=trcsa_TR(idsa_MgHPO4,L,NY,NX)+DZM1P
-        trcsa_TR(idsa_H0PO4B,L,NY,NX)=trcsa_TR(idsa_H0PO4B,L,NY,NX)-DZH0P
+        trcSalt_TR(idsalt_H3PO4,L,NY,NX)=trcSalt_TR(idsalt_H3PO4,L,NY,NX)+DZH3P
+        trcSalt_TR(idsalt_FeHPO4,L,NY,NX)=trcSalt_TR(idsalt_FeHPO4,L,NY,NX)+DZF1P
+        trcSalt_TR(idsalt_FeH2PO4,L,NY,NX)=trcSalt_TR(idsalt_FeH2PO4,L,NY,NX)+DZF2P
+        trcSalt_TR(idsalt_CaPO4,L,NY,NX)=trcSalt_TR(idsalt_CaPO4,L,NY,NX)+DZC0P
+        trcSalt_TR(idsalt_CaHPO4,L,NY,NX)=trcSalt_TR(idsalt_CaHPO4,L,NY,NX)+DZC1P
+        trcSalt_TR(idsalt_CaH2PO4,L,NY,NX)=trcSalt_TR(idsalt_CaH2PO4,L,NY,NX)+DZC2P
+        trcSalt_TR(idsalt_MgHPO4,L,NY,NX)=trcSalt_TR(idsalt_MgHPO4,L,NY,NX)+DZM1P
+        trcSalt_TR(idsalt_H0PO4B,L,NY,NX)=trcSalt_TR(idsalt_H0PO4B,L,NY,NX)-DZH0P
         TRH1B(L,NY,NX)=TRH1B(L,NY,NX)-DZH1P
         TRH2B(L,NY,NX)=TRH2B(L,NY,NX)-DZH2P
-        trcsa_TR(idsa_H3PO4B,L,NY,NX)=trcsa_TR(idsa_H3PO4B,L,NY,NX)-DZH3P
-        trcsa_TR(idsa_FeHPO4B,L,NY,NX)=trcsa_TR(idsa_FeHPO4B,L,NY,NX)-DZF1P
-        trcsa_TR(idsa_FeH2PO4B,L,NY,NX)=trcsa_TR(idsa_FeH2PO4B,L,NY,NX)-DZF2P
-        trcsa_TR(idsa_CaPO4B,L,NY,NX)=trcsa_TR(idsa_CaPO4B,L,NY,NX)-DZC0P
-        trcsa_TR(idsa_CaHPO4B,L,NY,NX)=trcsa_TR(idsa_CaHPO4B,L,NY,NX)-DZC1P
-        trcsa_TR(idsa_CaH2PO4B,L,NY,NX)=trcsa_TR(idsa_CaH2PO4B,L,NY,NX)-DZC2P
-        trcsa_TR(idsa_MgHPO4B,L,NY,NX)=trcsa_TR(idsa_MgHPO4B,L,NY,NX)-DZM1P
+        trcSalt_TR(idsalt_H3PO4B,L,NY,NX)=trcSalt_TR(idsalt_H3PO4B,L,NY,NX)-DZH3P
+        trcSalt_TR(idsalt_FeHPO4B,L,NY,NX)=trcSalt_TR(idsalt_FeHPO4B,L,NY,NX)-DZF1P
+        trcSalt_TR(idsalt_FeH2PO4B,L,NY,NX)=trcSalt_TR(idsalt_FeH2PO4B,L,NY,NX)-DZF2P
+        trcSalt_TR(idsalt_CaPO4B,L,NY,NX)=trcSalt_TR(idsalt_CaPO4B,L,NY,NX)-DZC0P
+        trcSalt_TR(idsalt_CaHPO4B,L,NY,NX)=trcSalt_TR(idsalt_CaHPO4B,L,NY,NX)-DZC1P
+        trcSalt_TR(idsalt_CaH2PO4B,L,NY,NX)=trcSalt_TR(idsalt_CaH2PO4B,L,NY,NX)-DZC2P
+        trcSalt_TR(idsalt_MgHPO4B,L,NY,NX)=trcSalt_TR(idsalt_MgHPO4B,L,NY,NX)-DZM1P
         trcx_TR(idx_OHe,L,NY,NX)=trcx_TR(idx_OHe,L,NY,NX)+DXOH0
         trcx_TR(idx_OH,L,NY,NX)=trcx_TR(idx_OH,L,NY,NX)+DXOH1
         trcx_TR(idx_OHp,L,NY,NX)=trcx_TR(idx_OHp,L,NY,NX)+DXOH2
@@ -755,22 +755,22 @@ module SoluteMod
       trc_solml(ids_H1PO4B,L,NY,NX)=0._r8
       trc_solml(ids_H2PO4B,L,NY,NX)=0._r8
 
-      trcsa_solml(idsa_H0PO4,L,NY,NX)=trcsa_solml(idsa_H0PO4,L,NY,NX)+trcsa_solml(idsa_H0PO4B,L,NY,NX)
-      trcsa_solml(idsa_H3PO4,L,NY,NX)=trcsa_solml(idsa_H3PO4,L,NY,NX)+trcsa_solml(idsa_H3PO4B,L,NY,NX)
-      trcsa_solml(idsa_FeHPO4,L,NY,NX)=trcsa_solml(idsa_FeHPO4,L,NY,NX)+trcsa_solml(idsa_FeHPO4B,L,NY,NX)
-      trcsa_solml(idsa_FeH2PO4,L,NY,NX)=trcsa_solml(idsa_FeH2PO4,L,NY,NX)+trcsa_solml(idsa_FeH2PO4B,L,NY,NX)
-      trcsa_solml(idsa_CaPO4,L,NY,NX)=trcsa_solml(idsa_CaPO4,L,NY,NX)+trcsa_solml(idsa_CaPO4B,L,NY,NX)
-      trcsa_solml(idsa_CaHPO4,L,NY,NX)=trcsa_solml(idsa_CaHPO4,L,NY,NX)+trcsa_solml(idsa_CaHPO4B,L,NY,NX)
-      trcsa_solml(idsa_CaH2PO4,L,NY,NX)=trcsa_solml(idsa_CaH2PO4,L,NY,NX)+trcsa_solml(idsa_CaH2PO4B,L,NY,NX)
-      trcsa_solml(idsa_MgHPO4,L,NY,NX)=trcsa_solml(idsa_MgHPO4,L,NY,NX)+trcsa_solml(idsa_MgHPO4B,L,NY,NX)
-      trcsa_solml(idsa_H0PO4B,L,NY,NX)=0._r8
-      trcsa_solml(idsa_H3PO4B,L,NY,NX)=0._r8
-      trcsa_solml(idsa_FeHPO4B,L,NY,NX)=0._r8
-      trcsa_solml(idsa_FeH2PO4B,L,NY,NX)=0._r8
-      trcsa_solml(idsa_CaPO4B,L,NY,NX)=0._r8
-      trcsa_solml(idsa_CaHPO4B,L,NY,NX)=0._r8
-      trcsa_solml(idsa_CaH2PO4B,L,NY,NX)=0._r8
-      trcsa_solml(idsa_MgHPO4B,L,NY,NX)=0._r8
+      trcSalt_solml(idsalt_H0PO4,L,NY,NX)=trcSalt_solml(idsalt_H0PO4,L,NY,NX)+trcSalt_solml(idsalt_H0PO4B,L,NY,NX)
+      trcSalt_solml(idsalt_H3PO4,L,NY,NX)=trcSalt_solml(idsalt_H3PO4,L,NY,NX)+trcSalt_solml(idsalt_H3PO4B,L,NY,NX)
+      trcSalt_solml(idsalt_FeHPO4,L,NY,NX)=trcSalt_solml(idsalt_FeHPO4,L,NY,NX)+trcSalt_solml(idsalt_FeHPO4B,L,NY,NX)
+      trcSalt_solml(idsalt_FeH2PO4,L,NY,NX)=trcSalt_solml(idsalt_FeH2PO4,L,NY,NX)+trcSalt_solml(idsalt_FeH2PO4B,L,NY,NX)
+      trcSalt_solml(idsalt_CaPO4,L,NY,NX)=trcSalt_solml(idsalt_CaPO4,L,NY,NX)+trcSalt_solml(idsalt_CaPO4B,L,NY,NX)
+      trcSalt_solml(idsalt_CaHPO4,L,NY,NX)=trcSalt_solml(idsalt_CaHPO4,L,NY,NX)+trcSalt_solml(idsalt_CaHPO4B,L,NY,NX)
+      trcSalt_solml(idsalt_CaH2PO4,L,NY,NX)=trcSalt_solml(idsalt_CaH2PO4,L,NY,NX)+trcSalt_solml(idsalt_CaH2PO4B,L,NY,NX)
+      trcSalt_solml(idsalt_MgHPO4,L,NY,NX)=trcSalt_solml(idsalt_MgHPO4,L,NY,NX)+trcSalt_solml(idsalt_MgHPO4B,L,NY,NX)
+      trcSalt_solml(idsalt_H0PO4B,L,NY,NX)=0._r8
+      trcSalt_solml(idsalt_H3PO4B,L,NY,NX)=0._r8
+      trcSalt_solml(idsalt_FeHPO4B,L,NY,NX)=0._r8
+      trcSalt_solml(idsalt_FeH2PO4B,L,NY,NX)=0._r8
+      trcSalt_solml(idsalt_CaPO4B,L,NY,NX)=0._r8
+      trcSalt_solml(idsalt_CaHPO4B,L,NY,NX)=0._r8
+      trcSalt_solml(idsalt_CaH2PO4B,L,NY,NX)=0._r8
+      trcSalt_solml(idsalt_MgHPO4B,L,NY,NX)=0._r8
 
       trcx_solml(idx_OHe,L,NY,NX)=trcx_solml(idx_OHe,L,NY,NX)+trcx_solml(idx_OHeB,L,NY,NX)
       trcx_solml(idx_OH,L,NY,NX)=trcx_solml(idx_OH,L,NY,NX)+trcx_solml(idx_OHB,L,NY,NX)
@@ -976,8 +976,8 @@ module SoluteMod
 !     RSNUAA=rate of broadcast urea fertr dissoln
 !     RSNOAA=rate of broadcast NO3 fertilizer dissoln
 !
-    IF(VWatLitrX(NY,NX).GT.ZEROS(NY,NX))THEN
-      THETWR=AMIN1(1.0,VLWatMicP(0,NY,NX)/VWatLitrX(NY,NX))
+    IF(VWatLitRHoldCapcity(NY,NX).GT.ZEROS(NY,NX))THEN
+      THETWR=AMIN1(1.0,VLWatMicP(0,NY,NX)/VWatLitRHoldCapcity(NY,NX))
     ELSE
       THETWR=1._r8
     ENDIF

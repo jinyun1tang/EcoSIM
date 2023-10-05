@@ -36,6 +36,7 @@ module RedistMod
   USE LateralTranspMod
   use UnitMod, only : units
   use SnowBalanceMod
+  use SurfLitterPhysMod, only : UpdateLitRPhys
   implicit none
 
   private
@@ -54,7 +55,7 @@ module RedistMod
   subroutine InitRedist
   implicit none
 
-  allocate(THETCX(micpar%n_pltlitrk))
+  allocate(THETCX(micpar%NumOfPlantLitrCmplxs))
 
   THETCX=(/8.0E-06_r8,8.0E-06_r8/)
 
@@ -132,7 +133,7 @@ module RedistMod
 !     SNOWPACK LAYERING
       call SnowpackLayering(NY,NX)
 
-      call RelayerSoilProfile(NY,NX,DORGC,DVLiceMicP,UDVLiceMicP,UDLYXF)
+      call RelayerSoilProfile(NY,NX,DORGC(:,NY,NX),DVLiceMicP(:,NY,NX),UDVLiceMicP,UDLYXF)
 
       call UpdateOutputVars(I,J,NY,NX,TXCO2)
 !
@@ -160,7 +161,7 @@ module RedistMod
   real(r8), intent(in) :: TXCO2(JY,JX)
   real(r8) :: VLSoilPoreMicPX,VOLTX
   integer  :: L
-  TRN(NY,NX)=TRN(NY,NX)+HeatRadiation(NY,NX)
+  TRN(NY,NX)=TRN(NY,NX)+HeatByRadiation(NY,NX)
   TLE(NY,NX)=TLE(NY,NX)+HeatEvapAir2Surf(NY,NX)
   TSH(NY,NX)=TSH(NY,NX)+HeatSensAir2Surf(NY,NX)
   TGH(NY,NX)=TGH(NY,NX)-(HeatNet2Surf(NY,NX)-HeatSensVapAir2Surf(NY,NX))
@@ -191,8 +192,8 @@ module RedistMod
   !
   !     OUTPUT FOR SOIL WATER, ICE CONTENTS
   !
-  THETWZ(0,NY,NX)=AZMAX1((VLWatMicP(0,NY,NX)-VWatLitrX(NY,NX))/AREA(3,0,NY,NX))
-  THETIZ(0,NY,NX)=AZMAX1((VLiceMicP(0,NY,NX)-VWatLitrX(NY,NX))/AREA(3,0,NY,NX))
+  THETWZ(0,NY,NX)=AZMAX1((VLWatMicP(0,NY,NX)-VWatLitRHoldCapcity(NY,NX))/AREA(3,0,NY,NX))
+  THETIZ(0,NY,NX)=AZMAX1((VLiceMicP(0,NY,NX)-VWatLitRHoldCapcity(NY,NX))/AREA(3,0,NY,NX))
   !THETWZ(0,NY,NX)=AZMAX1(AMIN1(1.0,VLWatMicP(0,NY,NX)/VLitR(NY,NX)))
   !THETIZ(0,NY,NX)=AZMAX1(AMIN1(1.0,VLiceMicP(0,NY,NX)/VLitR(NY,NX)))
   D9945: DO L=NUI(NY,NX),NL(NY,NX)
@@ -237,20 +238,20 @@ module RedistMod
     TLPO4=TLPO4+trcn_solsml(ids_H1PO4,L,NY,NX)+trcn_solsml(ids_H2PO4,L,NY,NX)
 
     IF(salt_model)THEN
-      SSW=trcs_solsml(idsa_Al,L,NY,NX)+trcs_solsml(idsa_Fe,L,NY,NX)+trcs_solsml(idsa_Hp,L,NY,NX)+trcs_solsml(idsa_Ca,L,NY,NX) &
-        +trcs_solsml(idsa_Mg,L,NY,NX)+trcs_solsml(idsa_Na,L,NY,NX)+trcs_solsml(idsa_K,L,NY,NX)+trcs_solsml(idsa_OH,L,NY,NX) &
-        +trcs_solsml(idsa_SO4,L,NY,NX)+trcs_solsml(idsa_Cl,L,NY,NX)+trcs_solsml(idsa_CO3,L,NY,NX)+trcs_solsml(idsa_H0PO4,L,NY,NX) &
-        +2.0_r8*(trcs_solsml(idsa_HCO3,L,NY,NX)+trcs_solsml(idsa_AlOH,L,NY,NX) &
-        +trcs_solsml(idsa_AlSO4,L,NY,NX)+trcs_solsml(idsa_FeOH,L,NY,NX)+trcs_solsml(idsa_FeSO4,L,NY,NX)+trcs_solsml(idsa_CaOH2,L,NY,NX) &
-        +trcs_solsml(idsa_CaCO3,L,NY,NX)+trcs_solsml(idsa_CaSO4,L,NY,NX)+trcs_solsml(idsa_MgOH2,L,NY,NX)+trcs_solsml(idsa_MgCO3,L,NY,NX) &
-        +trcs_solsml(idsa_MgSO4,L,NY,NX)+trcs_solsml(idsa_NaCO3,L,NY,NX)+trcs_solsml(idsa_NaSO4,L,NY,NX)+trcs_solsml(idsa_KSO4,L,NY,NX) &
-        +trcs_solsml(idsa_CaPO4,L,NY,NX)) &
-        +3.0*(trcs_solsml(idsa_AlOH2,L,NY,NX)+trcs_solsml(idsa_FeOH2,L,NY,NX)+trcs_solsml(idsa_CaHCO3,L,NY,NX) &
-        +trcs_solsml(idsa_MgHCO3,L,NY,NX)+trcs_solsml(idsa_FeHPO4,L,NY,NX)+trcs_solsml(idsa_CaHPO4,L,NY,NX) &
-        +trcs_solsml(idsa_MgHPO4,L,NY,NX)) &
-        +4.0*(trcs_solsml(idsa_AlOH3,L,NY,NX)+trcs_solsml(idsa_FeOH3,L,NY,NX)+trcs_solsml(idsa_H3PO4,L,NY,NX) &
-        +trcs_solsml(idsa_FeH2PO4,L,NY,NX)+trcs_solsml(idsa_CaH2PO4,L,NY,NX)) &
-        +5.0*(trcs_solsml(idsa_AlOH4,L,NY,NX)+trcs_solsml(idsa_FeOH4,L,NY,NX))
+      SSW=trcs_solsml(idsalt_Al,L,NY,NX)+trcs_solsml(idsalt_Fe,L,NY,NX)+trcs_solsml(idsalt_Hp,L,NY,NX)+trcs_solsml(idsalt_Ca,L,NY,NX) &
+        +trcs_solsml(idsalt_Mg,L,NY,NX)+trcs_solsml(idsalt_Na,L,NY,NX)+trcs_solsml(idsalt_K,L,NY,NX)+trcs_solsml(idsalt_OH,L,NY,NX) &
+        +trcs_solsml(idsalt_SO4,L,NY,NX)+trcs_solsml(idsalt_Cl,L,NY,NX)+trcs_solsml(idsalt_CO3,L,NY,NX)+trcs_solsml(idsalt_H0PO4,L,NY,NX) &
+        +2.0_r8*(trcs_solsml(idsalt_HCO3,L,NY,NX)+trcs_solsml(idsalt_AlOH,L,NY,NX) &
+        +trcs_solsml(idsalt_AlSO4,L,NY,NX)+trcs_solsml(idsalt_FeOH,L,NY,NX)+trcs_solsml(idsalt_FeSO4,L,NY,NX)+trcs_solsml(idsalt_CaOH2,L,NY,NX) &
+        +trcs_solsml(idsalt_CaCO3,L,NY,NX)+trcs_solsml(idsalt_CaSO4,L,NY,NX)+trcs_solsml(idsalt_MgOH2,L,NY,NX)+trcs_solsml(idsalt_MgCO3,L,NY,NX) &
+        +trcs_solsml(idsalt_MgSO4,L,NY,NX)+trcs_solsml(idsalt_NaCO3,L,NY,NX)+trcs_solsml(idsalt_NaSO4,L,NY,NX)+trcs_solsml(idsalt_KSO4,L,NY,NX) &
+        +trcs_solsml(idsalt_CaPO4,L,NY,NX)) &
+        +3.0*(trcs_solsml(idsalt_AlOH2,L,NY,NX)+trcs_solsml(idsalt_FeOH2,L,NY,NX)+trcs_solsml(idsalt_CaHCO3,L,NY,NX) &
+        +trcs_solsml(idsalt_MgHCO3,L,NY,NX)+trcs_solsml(idsalt_FeHPO4,L,NY,NX)+trcs_solsml(idsalt_CaHPO4,L,NY,NX) &
+        +trcs_solsml(idsalt_MgHPO4,L,NY,NX)) &
+        +4.0*(trcs_solsml(idsalt_AlOH3,L,NY,NX)+trcs_solsml(idsalt_FeOH3,L,NY,NX)+trcs_solsml(idsalt_H3PO4,L,NY,NX) &
+        +trcs_solsml(idsalt_FeH2PO4,L,NY,NX)+trcs_solsml(idsalt_CaH2PO4,L,NY,NX)) &
+        +5.0*(trcs_solsml(idsalt_AlOH4,L,NY,NX)+trcs_solsml(idsalt_FeOH4,L,NY,NX))
       TION=TION+SSW
 
     ENDIF
@@ -321,67 +322,26 @@ module RedistMod
   integer, intent(in) :: I,NY,NX
 
   integer :: L,K,LS,NTG,NTP,NTX
-  real(r8):: tkspre,vhcp1s
+  real(r8):: vhcp1s
   real(r8) :: CI,CH,CO,CX
-  real(r8) :: ENGYZ,ENGYR,HFLXO
   real(r8) :: OI,OO
   real(r8) :: HI,HO
   real(r8) :: PI,PXB
   real(r8) :: SIN,SGN,SIP,SNB
   real(r8) :: SPB,SNM0,SPM0,SIR,SII,SBU
-  real(r8) :: VHeatCapacityLitrX  !old litr heat capacity
-  real(r8) :: VHeatCapacityLitr   !current litr heat capacity
-  real(r8) :: dVHeatCapacityLitr  !change in heat capacity
   real(r8) :: WI,WO
   real(r8) :: ZSI,ZXB,ZGI
   real(r8) :: ZNGGIN,ZN2OIN,ZNH3IN
   ! begin_execution
 
   !
-  ! CALCULATE SURFACE RESIDUE TEMPERATURE FROM ITS CHANGE
-  ! IN HEAT STORAGE
-  !
-  VHeatCapacityLitrX=VHeatCapacity(0,NY,NX)                          
-  VHeatCapacityLitr=cpw*VLWatMicP(0,NY,NX)+cpi*VLiceMicP(0,NY,NX)+cpo*ORGC(0,NY,NX) 
-  dVHeatCapacityLitr=VHeatCapacityLitr-VHeatCapacityLitrX            
-  !TairK: air temperature in kelvin, hflxo represents increase heat in litr
-  HFLXO=dVHeatCapacityLitr*TairK(NY,NX)                              
-  ENGYZ=VHeatCapacityLitrX*TKS(0,NY,NX)
-
-  !update water, ice content and heat capacity of residue
-  VLWatMicP(0,NY,NX)=AZMAX1(VLWatMicP(0,NY,NX)+WatFLo2Litr(NY,NX)+TLitrIceFlxThaw(NY,NX)+TQR(NY,NX))
-  VLiceMicP(0,NY,NX)=AZMAX1(VLiceMicP(0,NY,NX)-TLitrIceFlxThaw(NY,NX)/DENSICE)
-  VHeatCapacity(0,NY,NX)=cpo*ORGC(0,NY,NX)+cpw*VLWatMicP(0,NY,NX)+cpi*VLiceMicP(0,NY,NX)
-
-  IF(VHeatCapacity(0,NY,NX).GT.VHeatCapLitR(NY,NX))THEN
-    !when there are still significant heat capacity of the residual layer
-    tkspre=TKS(0,NY,NX)
-    TKS(0,NY,NX)=(ENGYZ+HeatFLo2LitrByWat(NY,NX)+TLitrIceHeatFlxFrez(NY,NX)+HFLXO &
-      +THQR(NY,NX))/VHeatCapacity(0,NY,NX)
-    HEATIN=HEATIN+HFLXO
-    Ls=NUM(NY,NX)
-    !if(curday>=175)write(*,*)'at line',__LINE__,TKS(0,NY,NX),tks(Ls,ny,nx),tkspre
-!    if(abs(VHeatCapacity(0,NY,NX)/VHeatCapacityLitrX-1._r8)>0.025_r8.or. &
-!      abs(TKS(0,NY,NX)/tkspre-1._r8)>0.025_r8)then
-!      TKS(0,NY,NX)=TKS(NUM(NY,NX),NY,NX)
-!    endif
-  ELSE
-    HEATIN=HEATIN+HFLXO+(TKS(NUM(NY,NX),NY,NX)-TKS(0,NY,NX))*VHeatCapacity(0,NY,NX)
-    TKS(0,NY,NX)=TKS(NUM(NY,NX),NY,NX)
-  ENDIF
-  TCS(0,NY,NX)=units%Kelvin2Celcius(TKS(0,NY,NX))
-    
-  ENGYR=VHeatCapacity(0,NY,NX)*TKS(0,NY,NX)
-
-
-  HeatStoreLandscape=HeatStoreLandscape+ENGYR
-  HEATIN=HEATIN+TLitrIceHeatFlxFrez(NY,NX)
+  call UpdateLitRPhys(NY,NX,TWat2GridBySurfRunoff(NY,NX),THeat2GridBySurfRunoff(NY,NX),HeatStoreLandscape,HEATIN)
 
   !     UVLWatMicP(NY,NX)=UVLWatMicP(NY,NX)-VLWatMicP(0,NY,NX)-VLiceMicP(0,NY,NX)*DENSICE
   !
   !     SURFACE BOUNDARY WATER FLUXES
   !
-  WI=PRECQ(NY,NX)+PRECI(NY,NX)   !total incoming water flux=rain/snowfall + irrigation
+  WI=PrecAtm(NY,NX)+IrrigSurface(NY,NX)   !total incoming water flux=rain/snowfall + irrigation
   CRAIN=CRAIN+WI
   URAIN(NY,NX)=URAIN(NY,NX)+WI
   WO=VapXAir2GSurf(NY,NX)+TEVAPP(NY,NX) !total outgoing water flux
@@ -394,7 +354,7 @@ module RedistMod
   !
   !     SURFACE BOUNDARY HEAT FLUXES
   !
-  HEATIN=HEATIN+cpw*TairK(NY,NX)*PRECA(NY,NX)+cps*TairK(NY,NX)*SnoFalPrec(NY,NX)
+  HEATIN=HEATIN+cpw*TairK(NY,NX)*PrecRainAndSurfirrig(NY,NX)+cps*TairK(NY,NX)*SnoFalPrec(NY,NX)
   HEATIN=HEATIN+HeatNet2Surf(NY,NX)+THFLXC(NY,NX)
   D5150: DO L=1,JS
     HEATIN=HEATIN+XPhaseChangeHeatL(L,NY,NX)
@@ -413,14 +373,16 @@ module RedistMod
 ! XCODFR: soil surface CO2 dissolution (+ve) - volatilization
 ! UCO2G: total soil CO2 flux, [g d-2]
 ! HCO2G: hourly soil CO2 flux, [g d-2 h-1]
-  CI=GasSfAtmFlx(idg_CO2,NY,NX)+R3GasADTFlx(idg_CO2,3,NU(NY,NX),NY,NX)+TRootGasLoss_disturb(idg_CO2,NY,NX) &
-      +(FLQGQ(NY,NX)+FLQRQ(NY,NX))*CCOR(NY,NX) &
-      +(FLQGI(NY,NX)+FLQRI(NY,NX))*CCOQ(NY,NX) &
-      +GasDisFlx(idg_CO2,0,NY,NX)+trcg_XDFR(idg_CO2,NY,NX)
-  CH=GasSfAtmFlx(idg_CH4,NY,NX)+R3GasADTFlx(idg_CH4,3,NU(NY,NX),NY,NX)+TRootGasLoss_disturb(idg_CH4,NY,NX) &
-      +(FLQGQ(NY,NX)+FLQRQ(NY,NX))*CCHR(NY,NX) &
-      +(FLQGI(NY,NX)+FLQRI(NY,NX))*CCHQ(NY,NX) &
-      +GasDisFlx(idg_CH4,0,NY,NX)+trcg_XDFR(idg_CH4,NY,NX)
+  CI=GasSfAtmFlx(idg_CO2,NY,NX)+R3GasADTFlx(idg_CO2,3,NU(NY,NX),NY,NX) &
+    +TRootGasLoss_disturb(idg_CO2,NY,NX) &
+    +(FLQGQ(NY,NX)+FLQRQ(NY,NX))*CCOR(NY,NX) &
+    +(FLQGI(NY,NX)+FLQRI(NY,NX))*CCOQ(NY,NX) &
+    +GasDisFlx(idg_CO2,0,NY,NX)+trcg_XDFR(idg_CO2,NY,NX)
+  CH=GasSfAtmFlx(idg_CH4,NY,NX)+R3GasADTFlx(idg_CH4,3,NU(NY,NX),NY,NX) &
+    +TRootGasLoss_disturb(idg_CH4,NY,NX) &
+    +(FLQGQ(NY,NX)+FLQRQ(NY,NX))*CCHR(NY,NX) &
+    +(FLQGI(NY,NX)+FLQRI(NY,NX))*CCHQ(NY,NX) &
+    +GasDisFlx(idg_CH4,0,NY,NX)+trcg_XDFR(idg_CH4,NY,NX)
   CO=-IrrigSubsurf(NY,NX)*CCOQ(NY,NX)
   CX=-IrrigSubsurf(NY,NX)*CCHQ(NY,NX)
   UCO2G(NY,NX)=UCO2G(NY,NX)+CI
@@ -432,17 +394,19 @@ module RedistMod
   !
   !     SURFACE BOUNDARY O2 FLUXES
   !
-  OI=GasSfAtmFlx(idg_O2,NY,NX)+R3GasADTFlx(idg_O2,3,NU(NY,NX),NY,NX)+TRootGasLoss_disturb(idg_O2,NY,NX) &
-      +(FLQGQ(NY,NX)+FLQRQ(NY,NX))*COXR(NY,NX) &
-      +(FLQGI(NY,NX)+FLQRI(NY,NX))*COXQ(NY,NX) &
-      +GasDisFlx(idg_O2,0,NY,NX)+trcg_XDFR(idg_O2,NY,NX)
+  OI=GasSfAtmFlx(idg_O2,NY,NX)+R3GasADTFlx(idg_O2,3,NU(NY,NX),NY,NX) &
+    +TRootGasLoss_disturb(idg_O2,NY,NX) &
+    +(FLQGQ(NY,NX)+FLQRQ(NY,NX))*COXR(NY,NX) &
+    +(FLQGI(NY,NX)+FLQRI(NY,NX))*COXQ(NY,NX) &
+    +GasDisFlx(idg_O2,0,NY,NX)+trcg_XDFR(idg_O2,NY,NX)
   OXYGIN=OXYGIN+OI
   OO=RUPOXO(0,NY,NX)-IrrigSubsurf(NY,NX)*COXQ(NY,NX)
   OXYGOU=OXYGOU+OO
   UOXYG(NY,NX)=UOXYG(NY,NX)+OI
   HOXYG(NY,NX)=HOXYG(NY,NX)+OI
-  HI=GasSfAtmFlx(idg_H2,NY,NX)+R3GasADTFlx(idg_H2,3,NU(NY,NX),NY,NX)+TRootGasLoss_disturb(idg_H2,NY,NX) &
-      +GasDisFlx(idg_H2,0,NY,NX)+trcg_XDFR(idg_H2,NY,NX)
+  HI=GasSfAtmFlx(idg_H2,NY,NX)+R3GasADTFlx(idg_H2,3,NU(NY,NX),NY,NX) &
+    +TRootGasLoss_disturb(idg_H2,NY,NX) &
+    +GasDisFlx(idg_H2,0,NY,NX)+trcg_XDFR(idg_H2,NY,NX)
   H2GIN=H2GIN+HI
   HO=RH2GO(0,NY,NX)
   H2GOU=H2GOU+HO
@@ -474,7 +438,8 @@ module RedistMod
 
   ZNGGIN=GasSfAtmFlx(idg_N2,NY,NX)+R3GasADTFlx(idg_N2,3,NU(NY,NX),NY,NX)+GasDisFlx(idg_N2,0,NY,NX)
   ZN2OIN=GasSfAtmFlx(idg_N2O,NY,NX)+R3GasADTFlx(idg_N2O,3,NU(NY,NX),NY,NX)+GasDisFlx(idg_N2O,0,NY,NX)
-  ZNH3IN=GasSfAtmFlx(idg_NH3,NY,NX)+GasSfAtmFlx(idg_NH3B,NY,NX)+R3GasADTFlx(idg_NH3,3,NU(NY,NX),NY,NX)+GasDisFlx(idg_NH3,0,NY,NX)
+  ZNH3IN=GasSfAtmFlx(idg_NH3,NY,NX)+GasSfAtmFlx(idg_NH3B,NY,NX)+R3GasADTFlx(idg_NH3,3,NU(NY,NX),NY,NX) &
+    +GasDisFlx(idg_NH3,0,NY,NX)
   ! UN2GG(NY,NX)=UN2GG(NY,NX)+ZNGGIN
   !     HN2GG(NY,NX)=HN2GG(NY,NX)+ZNGGIN
   UN2OG(NY,NX)=UN2OG(NY,NX)+ZN2OIN
@@ -532,7 +497,7 @@ module RedistMod
   !     SURFACE BOUNDARY SALT FLUXES FROM RAINFALL AND SURFACE IRRIGATION
   !
   IF(salt_model)THEN
-    SIR=PRECQ(NY,NX)*(CALR(NY,NX)+CFER(NY,NX)+CHYR(NY,NX)+CCAR(NY,NX) &
+    SIR=PrecAtm(NY,NX)*(CALR(NY,NX)+CFER(NY,NX)+CHYR(NY,NX)+CCAR(NY,NX) &
       +CMGR(NY,NX)+CNAR(NY,NX)+CKAR(NY,NX)+COHR(NY,NX)+CSOR(NY,NX) &
       +CCLR(NY,NX)+CC3R(NY,NX)+CH0PR(NY,NX) &
       +2.0_r8*(CHCR(NY,NX)+CAL1R(NY,NX)+CALSR(NY,NX)+CFE1R(NY,NX) &
@@ -544,7 +509,7 @@ module RedistMod
       +4.0_r8*(CAL3R(NY,NX)+CFE3R(NY,NX)+CH3PR(NY,NX)+CF2PR(NY,NX) &
       +CC2PR(NY,NX)) &
       +5.0_r8*(CAL4R(NY,NX)+CFE4R(NY,NX)))
-    SII=PRECI(NY,NX)*(CALQ(I,NY,NX)+CFEQ(I,NY,NX)+CHYQ(I,NY,NX) &
+    SII=IrrigSurface(NY,NX)*(CALQ(I,NY,NX)+CFEQ(I,NY,NX)+CHYQ(I,NY,NX) &
       +CCAQ(I,NY,NX)+CMGQ(I,NY,NX)+CNAQ(I,NY,NX)+CKAQ(I,NY,NX) &
       +COHQ(I,NY,NX)+CSOQ(I,NY,NX)+CCLQ(I,NY,NX)+CC3Q(I,NY,NX) &
       +CH0PQ(I,NY,NX) &
@@ -579,7 +544,7 @@ module RedistMod
   !
   ! GAS EXCHANGE FROM SURFACE VOLATILIZATION-DISSOLUTION
   !
-  D9680: DO K=1,micpar%n_litrsfk
+  D9680: DO K=1,micpar%NumOfLitrCmplxs
     OQC(K,0,NY,NX)=OQC(K,0,NY,NX)+XOCFLS(K,3,0,NY,NX)
     OQN(K,0,NY,NX)=OQN(K,0,NY,NX)+XONFLS(K,3,0,NY,NX)
     OQP(K,0,NY,NX)=OQP(K,0,NY,NX)+XOPFLS(K,3,0,NY,NX)
@@ -621,6 +586,7 @@ module RedistMod
   THRE(NY,NX)=THRE(NY,NX)+RCO2O(0,NY,NX)+RCH4O(0,NY,NX)
   UN2GG(NY,NX)=UN2GG(NY,NX)+RN2G(0,NY,NX)
   HN2GG(NY,NX)=HN2GG(NY,NX)+RN2G(0,NY,NX)
+
   ROXYF(0,NY,NX)=GasDisFlx(idg_O2,0,NY,NX)
   RCO2F(0,NY,NX)=GasDisFlx(idg_CO2,0,NY,NX)
   RCH4F(0,NY,NX)=GasDisFlx(idg_CH4,0,NY,NX)
@@ -656,11 +622,11 @@ module RedistMod
   integer :: K,NTG
   !     begin_execution
   !
-  IF(ABS(TQR(NY,NX)).GT.ZEROS(NY,NX))THEN
+  IF(ABS(TWat2GridBySurfRunoff(NY,NX)).GT.ZEROS(NY,NX))THEN
     !
     !     DOC, DON, DOP
     !
-    D8570: DO K=1,micpar%n_litrsfk
+    D8570: DO K=1,micpar%NumOfLitrCmplxs
       OQC(K,0,NY,NX)=OQC(K,0,NY,NX)+TOCQRS(K,NY,NX)
       OQN(K,0,NY,NX)=OQN(K,0,NY,NX)+TONQRS(K,NY,NX)
       OQP(K,0,NY,NX)=OQP(K,0,NY,NX)+TOPQRS(K,NY,NX)
@@ -785,12 +751,12 @@ module RedistMod
   real(r8) :: SSS,ZG,Z4S,WS,Z4X
   real(r8) :: Z4F,ZOS,ZOF
   real(r8) :: tDC,tDN,tDP
-  integer :: n_litrsfk
+  integer :: NumOfLitrCmplxs
 !     begin_execution
 !     TOTAL C,N,P, SALTS IN SURFACE RESIDUE
 !
 
-  n_litrsfk   = micpar%n_litrsfk
+  NumOfLitrCmplxs   = micpar%NumOfLitrCmplxs
 
   DC=0.0_r8
   DN=0.0_r8
@@ -803,13 +769,13 @@ module RedistMod
   OMCL(0,NY,NX)=0.0_r8
   OMNL(0,NY,NX)=0.0_r8
 
-  DO K=1,n_litrsfk
+  DO K=1,NumOfLitrCmplxs
     !
     ! TOTAL heterotrophic MICROBIAL C,N,P
     !
-    tDC=SUM(OMC(1:nlbiomcp,1:NMICBSO,K,0,NY,NX))
-    tDN=SUM(OMN(1:nlbiomcp,1:NMICBSO,K,0,NY,NX))
-    tDP=SUM(OMP(1:nlbiomcp,1:NMICBSO,K,0,NY,NX))
+    tDC=SUM(OMC(1:nlbiomcp,1:NumOfMicrobs1HetertrophCmplx,K,0,NY,NX))
+    tDN=SUM(OMN(1:nlbiomcp,1:NumOfMicrobs1HetertrophCmplx,K,0,NY,NX))
+    tDP=SUM(OMP(1:nlbiomcp,1:NumOfMicrobs1HetertrophCmplx,K,0,NY,NX))
     DC=DC+tDC
     DN=DN+tDN
     DP=DP+tDP
@@ -824,9 +790,9 @@ module RedistMod
   !
   ! TOTAL autotrophic MICROBIAL C,N,P
   !
-  tDC=SUM(OMCff(1:nlbiomcp,1:NMICBSA,0,NY,NX))
-  tDN=SUM(OMNff(1:nlbiomcp,1:NMICBSA,0,NY,NX))
-  tDP=SUM(OMPff(1:nlbiomcp,1:NMICBSA,0,NY,NX))
+  tDC=SUM(OMCff(1:nlbiomcp,1:NumOfMicrobsInAutotrophCmplx,0,NY,NX))
+  tDN=SUM(OMNff(1:nlbiomcp,1:NumOfMicrobsInAutotrophCmplx,0,NY,NX))
+  tDP=SUM(OMPff(1:nlbiomcp,1:NumOfMicrobsInAutotrophCmplx,0,NY,NX))
   DC=DC+tDC
   DN=DN+tDN
   DP=DP+tDP
@@ -841,10 +807,10 @@ module RedistMod
   !
   !     TOTAL MICROBIAL RESIDUE C,N,P
   !
-  DC=DC+SUM(ORC(1:ndbiomcp,1:n_litrsfk,0,NY,NX))
-  DN=DN+SUM(ORN(1:ndbiomcp,1:n_litrsfk,0,NY,NX))
-  DP=DP+SUM(ORP(1:ndbiomcp,1:n_litrsfk,0,NY,NX))
-  DO K=1,n_litrsfk
+  DC=DC+SUM(ORC(1:ndbiomcp,1:NumOfLitrCmplxs,0,NY,NX))
+  DN=DN+SUM(ORN(1:ndbiomcp,1:NumOfLitrCmplxs,0,NY,NX))
+  DP=DP+SUM(ORP(1:ndbiomcp,1:NumOfLitrCmplxs,0,NY,NX))
+  DO K=1,NumOfLitrCmplxs
     RC0(K,NY,NX)=RC0(K,NY,NX)+SUM(ORC(1:ndbiomcp,K,0,NY,NX))
     RC0(K,NY,NX)=RC0(K,NY,NX)+OQC(K,0,NY,NX)+OQCH(K,0,NY,NX) &
       +OHC(K,0,NY,NX)+OQA(K,0,NY,NX)+OQAH(K,0,NY,NX)+OHA(K,0,NY,NX)
@@ -854,20 +820,20 @@ module RedistMod
 !
 !     TOTAL DOC, DON, DOP
 !
-  DC=DC+SUM(OQC(1:n_litrsfk,0,NY,NX))+SUM(OQCH(1:n_litrsfk,0,NY,NX)) &
-       +SUM(OHC(1:n_litrsfk,0,NY,NX))+SUM(OQA(1:n_litrsfk,0,NY,NX)) &
-       +SUM(OQAH(1:n_litrsfk,0,NY,NX))+SUM(OHA(1:n_litrsfk,0,NY,NX))
+  DC=DC+SUM(OQC(1:NumOfLitrCmplxs,0,NY,NX))+SUM(OQCH(1:NumOfLitrCmplxs,0,NY,NX)) &
+       +SUM(OHC(1:NumOfLitrCmplxs,0,NY,NX))+SUM(OQA(1:NumOfLitrCmplxs,0,NY,NX)) &
+       +SUM(OQAH(1:NumOfLitrCmplxs,0,NY,NX))+SUM(OHA(1:NumOfLitrCmplxs,0,NY,NX))
 
-  DN=DN+SUM(OQN(1:n_litrsfk,0,NY,NX))+SUM(OQNH(1:n_litrsfk,0,NY,NX)) &
-       +SUM(OHN(1:n_litrsfk,0,NY,NX))
-  DP=DP+SUM(OQP(1:n_litrsfk,0,NY,NX))+SUM(OQPH(1:n_litrsfk,0,NY,NX)) &
-       +SUM(OHP(1:n_litrsfk,0,NY,NX))
+  DN=DN+SUM(OQN(1:NumOfLitrCmplxs,0,NY,NX))+SUM(OQNH(1:NumOfLitrCmplxs,0,NY,NX)) &
+       +SUM(OHN(1:NumOfLitrCmplxs,0,NY,NX))
+  DP=DP+SUM(OQP(1:NumOfLitrCmplxs,0,NY,NX))+SUM(OQPH(1:NumOfLitrCmplxs,0,NY,NX)) &
+       +SUM(OHP(1:NumOfLitrCmplxs,0,NY,NX))
 !
     !     TOTAL PLANT RESIDUE C,N,P
 !
-  DC=DC+SUM(OSC(1:jsken,1:n_litrsfk,0,NY,NX))
-  DN=DN+SUM(OSN(1:jsken,1:n_litrsfk,0,NY,NX))
-  DP=DP+SUM(OSP(1:jsken,1:n_litrsfk,0,NY,NX))
+  DC=DC+SUM(OSC(1:jsken,1:NumOfLitrCmplxs,0,NY,NX))
+  DN=DN+SUM(OSN(1:jsken,1:NumOfLitrCmplxs,0,NY,NX))
+  DP=DP+SUM(OSP(1:jsken,1:NumOfLitrCmplxs,0,NY,NX))
 
   ORGC(0,NY,NX)=DC
   ORGN(0,NY,NX)=DN
@@ -923,38 +889,38 @@ module RedistMod
   real(r8) :: SSS,PSS
   INTEGER :: NTSA
 
-  DO NTSA=idsa_beg,idsa_end
-    trcsa_solml(NTSA,0,NY,NX)=trcsa_solml(NTSA,0,NY,NX)+trcsa_XFLS(NTSA,3,0,NY,NX)
+  DO NTSA=idsalt_beg,idsalt_end
+    trcSalt_solml(NTSA,0,NY,NX)=trcSalt_solml(NTSA,0,NY,NX)+trcSalt_XFLS(NTSA,3,0,NY,NX)
   ENDDO
 
-  PSS=patomw*(trcsa_solml(idsa_H0PO4,0,NY,NX)+trcsa_solml(idsa_H3PO4,0,NY,NX)&
-    +trcsa_solml(idsa_FeHPO4,0,NY,NX) &
-    +trcsa_solml(idsa_FeH2PO4,0,NY,NX)+trcsa_solml(idsa_CaPO4,0,NY,NX)&
-    +trcsa_solml(idsa_CaHPO4,0,NY,NX) &
-    +trcsa_solml(idsa_CaH2PO4,0,NY,NX)+trcsa_solml(idsa_MgHPO4,0,NY,NX))
+  PSS=patomw*(trcSalt_solml(idsalt_H0PO4,0,NY,NX)+trcSalt_solml(idsalt_H3PO4,0,NY,NX)&
+    +trcSalt_solml(idsalt_FeHPO4,0,NY,NX) &
+    +trcSalt_solml(idsalt_FeH2PO4,0,NY,NX)+trcSalt_solml(idsalt_CaPO4,0,NY,NX)&
+    +trcSalt_solml(idsalt_CaHPO4,0,NY,NX) &
+    +trcSalt_solml(idsalt_CaH2PO4,0,NY,NX)+trcSalt_solml(idsalt_MgHPO4,0,NY,NX))
   TLPO4=TLPO4+PSS
-  SSS=trcsa_solml(idsa_Al,0,NY,NX)+trcsa_solml(idsa_Fe,0,NY,NX) &
-    +trcsa_solml(idsa_Hp,0,NY,NX)+trcsa_solml(idsa_Ca,0,NY,NX) &
-    +trcsa_solml(idsa_Mg,0,NY,NX)+trcsa_solml(idsa_Na,0,NY,NX) &
-    +trcsa_solml(idsa_K,0,NY,NX)+trcsa_solml(idsa_OH,0,NY,NX) &
-    +trcsa_solml(idsa_SO4,0,NY,NX)+trcsa_solml(idsa_Cl,0,NY,NX) &
-    +trcsa_solml(idsa_CO3,0,NY,NX)+trcsa_solml(idsa_H0PO4,0,NY,NX) &
-    +2.0*(trcsa_solml(idsa_HCO3,0,NY,NX)+trcsa_solml(idsa_AlOH,0,NY,NX) &
-    +trcsa_solml(idsa_AlSO4,0,NY,NX) &
-    +trcsa_solml(idsa_FeOH,0,NY,NX)+trcsa_solml(idsa_FeSO4,0,NY,NX) &
-    +trcsa_solml(idsa_CaOH2,0,NY,NX)+trcsa_solml(idsa_CaCO3,0,NY,NX) &
-    +trcsa_solml(idsa_CaSO4,0,NY,NX)+trcsa_solml(idsa_MgOH2,0,NY,NX) &
-    +trcsa_solml(idsa_MgCO3,0,NY,NX)+trcsa_solml(idsa_MgSO4,0,NY,NX) &
-    +trcsa_solml(idsa_NaCO3,0,NY,NX)+trcsa_solml(idsa_NaSO4,0,NY,NX) &
-    +trcsa_solml(idsa_KSO4,0,NY,NX)+trcsa_solml(idsa_CaPO4,0,NY,NX)) &
-    +3.0*(trcsa_solml(idsa_AlOH2,0,NY,NX)+trcsa_solml(idsa_FeOH2,0,NY,NX) &
-    +trcsa_solml(idsa_CaHCO3,0,NY,NX) &
-    +trcsa_solml(idsa_MgHCO3,0,NY,NX)+trcsa_solml(idsa_FeHPO4,0,NY,NX) &
-    +trcsa_solml(idsa_CaHPO4,0,NY,NX)+trcsa_solml(idsa_MgHPO4,0,NY,NX)) &
-    +4.0*(trcsa_solml(idsa_AlOH3,0,NY,NX)+trcsa_solml(idsa_FeOH3,0,NY,NX) &
-    +trcsa_solml(idsa_H3PO4,0,NY,NX) &
-    +trcsa_solml(idsa_FeH2PO4,0,NY,NX)+trcsa_solml(idsa_CaH2PO4,0,NY,NX)) &
-    +5.0*(trcsa_solml(idsa_AlOH4,0,NY,NX)+trcsa_solml(idsa_FeOH4,0,NY,NX))
+  SSS=trcSalt_solml(idsalt_Al,0,NY,NX)+trcSalt_solml(idsalt_Fe,0,NY,NX) &
+    +trcSalt_solml(idsalt_Hp,0,NY,NX)+trcSalt_solml(idsalt_Ca,0,NY,NX) &
+    +trcSalt_solml(idsalt_Mg,0,NY,NX)+trcSalt_solml(idsalt_Na,0,NY,NX) &
+    +trcSalt_solml(idsalt_K,0,NY,NX)+trcSalt_solml(idsalt_OH,0,NY,NX) &
+    +trcSalt_solml(idsalt_SO4,0,NY,NX)+trcSalt_solml(idsalt_Cl,0,NY,NX) &
+    +trcSalt_solml(idsalt_CO3,0,NY,NX)+trcSalt_solml(idsalt_H0PO4,0,NY,NX) &
+    +2.0*(trcSalt_solml(idsalt_HCO3,0,NY,NX)+trcSalt_solml(idsalt_AlOH,0,NY,NX) &
+    +trcSalt_solml(idsalt_AlSO4,0,NY,NX) &
+    +trcSalt_solml(idsalt_FeOH,0,NY,NX)+trcSalt_solml(idsalt_FeSO4,0,NY,NX) &
+    +trcSalt_solml(idsalt_CaOH2,0,NY,NX)+trcSalt_solml(idsalt_CaCO3,0,NY,NX) &
+    +trcSalt_solml(idsalt_CaSO4,0,NY,NX)+trcSalt_solml(idsalt_MgOH2,0,NY,NX) &
+    +trcSalt_solml(idsalt_MgCO3,0,NY,NX)+trcSalt_solml(idsalt_MgSO4,0,NY,NX) &
+    +trcSalt_solml(idsalt_NaCO3,0,NY,NX)+trcSalt_solml(idsalt_NaSO4,0,NY,NX) &
+    +trcSalt_solml(idsalt_KSO4,0,NY,NX)+trcSalt_solml(idsalt_CaPO4,0,NY,NX)) &
+    +3.0*(trcSalt_solml(idsalt_AlOH2,0,NY,NX)+trcSalt_solml(idsalt_FeOH2,0,NY,NX) &
+    +trcSalt_solml(idsalt_CaHCO3,0,NY,NX) &
+    +trcSalt_solml(idsalt_MgHCO3,0,NY,NX)+trcSalt_solml(idsalt_FeHPO4,0,NY,NX) &
+    +trcSalt_solml(idsalt_CaHPO4,0,NY,NX)+trcSalt_solml(idsalt_MgHPO4,0,NY,NX)) &
+    +4.0*(trcSalt_solml(idsalt_AlOH3,0,NY,NX)+trcSalt_solml(idsalt_FeOH3,0,NY,NX) &
+    +trcSalt_solml(idsalt_H3PO4,0,NY,NX) &
+    +trcSalt_solml(idsalt_FeH2PO4,0,NY,NX)+trcSalt_solml(idsalt_CaH2PO4,0,NY,NX)) &
+    +5.0*(trcSalt_solml(idsalt_AlOH4,0,NY,NX)+trcSalt_solml(idsalt_FeOH4,0,NY,NX))
   TION=TION+SSS
   UION(NY,NX)=UION(NY,NX)+SSS
   end subroutine UpdateSurfaceLayerSalt
@@ -1094,12 +1060,12 @@ module RedistMod
     !
     !     RESIDUE FROM PLANT LITTERFALL
 !
-    D8565: DO K=1,micpar%n_pltlitrk
+    D8565: DO K=1,micpar%NumOfPlantLitrCmplxs
       DO  M=1,jsken
-        OSC(M,K,L,NY,NX)=OSC(M,K,L,NY,NX)+ESNT(ielmc,M,K,L,NY,NX)
-        OSA(M,K,L,NY,NX)=OSA(M,K,L,NY,NX)+ESNT(ielmc,M,K,L,NY,NX)*micpar%OMCI(1,K)
-        OSN(M,K,L,NY,NX)=OSN(M,K,L,NY,NX)+ESNT(ielmn,M,K,L,NY,NX)
-        OSP(M,K,L,NY,NX)=OSP(M,K,L,NY,NX)+ESNT(ielmp,M,K,L,NY,NX)
+        OSC(M,K,L,NY,NX)=OSC(M,K,L,NY,NX)+LitrfalChemElemnts_vr(ielmc,M,K,L,NY,NX)
+        OSA(M,K,L,NY,NX)=OSA(M,K,L,NY,NX)+LitrfalChemElemnts_vr(ielmc,M,K,L,NY,NX)*micpar%OMCI(1,K)
+        OSN(M,K,L,NY,NX)=OSN(M,K,L,NY,NX)+LitrfalChemElemnts_vr(ielmn,M,K,L,NY,NX)
+        OSP(M,K,L,NY,NX)=OSP(M,K,L,NY,NX)+LitrfalChemElemnts_vr(ielmp,M,K,L,NY,NX)
       enddo
     ENDDO D8565
 !
@@ -1414,15 +1380,15 @@ module RedistMod
   real(r8) :: ECNO,ECSO,ECCL
   real(r8) :: PSS,SSS,SSH,SSF,SSX,SST,SSP
 
-  DO NTSA=idsa_beg,idsab_end
-    trcsa_solml(NTSA,L,NY,NX)=trcsa_solml(NTSA,L,NY,NX)+trcsa_TR(NTSA,L,NY,NX) &
-      +trcsa_TFLS(NTSA,L,NY,NX)+trcsa_RFLU(NTSA,L,NY,NX)+trcsa_XFXS(NTSA,L,NY,NX)
+  DO NTSA=idsalt_beg,idsaltb_end
+    trcSalt_solml(NTSA,L,NY,NX)=trcSalt_solml(NTSA,L,NY,NX)+trcSalt_TR(NTSA,L,NY,NX) &
+      +trcSalt_TFLS(NTSA,L,NY,NX)+trcSalt_RFLU(NTSA,L,NY,NX)+trcSalt_XFXS(NTSA,L,NY,NX)
 
-    trcsa_soHml(NTSA,L,NY,NX)=trcsa_soHml(NTSA,L,NY,NX)+trcsa_TFHS(NTSA,L,NY,NX) &
-      -trcsa_XFXS(NTSA,L,NY,NX)
+    trcSalt_soHml(NTSA,L,NY,NX)=trcSalt_soHml(NTSA,L,NY,NX)+trcSalt_TFHS(NTSA,L,NY,NX) &
+      -trcSalt_XFXS(NTSA,L,NY,NX)
   ENDDO
-  trcsa_solml(idsa_AlOH2,L,NY,NX)=trcsa_solml(idsa_AlOH2,L,NY,NX)-TRXAL2(L,NY,NX)
-  trcsa_solml(idsa_FeOH2,L,NY,NX)=trcsa_solml(idsa_FeOH2,L,NY,NX)-TRXFE2(L,NY,NX)
+  trcSalt_solml(idsalt_AlOH2,L,NY,NX)=trcSalt_solml(idsalt_AlOH2,L,NY,NX)-TRXAL2(L,NY,NX)
+  trcSalt_solml(idsalt_FeOH2,L,NY,NX)=trcSalt_solml(idsalt_FeOH2,L,NY,NX)-TRXFE2(L,NY,NX)
 
   trcx_solml(idx_Hp,L,NY,NX)=trcx_solml(idx_Hp,L,NY,NX)+TRXHY(L,NY,NX)
   trcx_solml(idx_Al,L,NY,NX)=trcx_solml(idx_Al,L,NY,NX)+TRXAL(L,NY,NX)
@@ -1440,82 +1406,82 @@ module RedistMod
     trcp_salml(NTP,L,NY,NX)=trcp_salml(NTP,L,NY,NX)+trcp_TR(NTP,L,NY,NX)
   ENDDO
 
-  PSS=patomw*(trcsa_solml(idsa_H0PO4,L,NY,NX)+trcsa_solml(idsa_H3PO4,L,NY,NX) &
-    +trcsa_solml(idsa_FeHPO4,L,NY,NX) &
-    +trcsa_solml(idsa_FeH2PO4,L,NY,NX)+trcsa_solml(idsa_CaPO4,L,NY,NX) &
-    +trcsa_solml(idsa_CaHPO4,L,NY,NX) &
-    +trcsa_solml(idsa_CaH2PO4,L,NY,NX)+trcsa_solml(idsa_MgHPO4,L,NY,NX) &
-    +trcsa_solml(idsa_H0PO4B,L,NY,NX) &
-    +trcsa_solml(idsa_H3PO4B,L,NY,NX)+trcsa_solml(idsa_FeHPO4B,L,NY,NX) &
-    +trcsa_solml(idsa_FeH2PO4B,L,NY,NX) &
-    +trcsa_solml(idsa_CaPO4B,L,NY,NX)+trcsa_solml(idsa_CaHPO4B,L,NY,NX) &
-    +trcsa_solml(idsa_CaH2PO4B,L,NY,NX) &
-    +trcsa_solml(idsa_MgHPO4B,L,NY,NX)+trcsa_soHml(idsa_H0PO4,L,NY,NX)&
-    +trcsa_soHml(idsa_H3PO4,L,NY,NX)+trcsa_soHml(idsa_FeHPO4,L,NY,NX) &
-    +trcsa_soHml(idsa_FeH2PO4,L,NY,NX)+trcsa_soHml(idsa_CaPO4,L,NY,NX) &
-    +trcsa_soHml(idsa_CaHPO4,L,NY,NX)+trcsa_soHml(idsa_CaH2PO4,L,NY,NX) &
-    +trcsa_soHml(idsa_MgHPO4,L,NY,NX)+trcsa_soHml(idsa_H0PO4B,L,NY,NX) &
-    +trcsa_soHml(idsa_H3PO4B,L,NY,NX)+trcsa_soHml(idsa_FeHPO4B,L,NY,NX) &
-    +trcsa_soHml(idsa_FeH2PO4B,L,NY,NX)+trcsa_soHml(idsa_CaPO4B,L,NY,NX)&
-    +trcsa_soHml(idsa_CaHPO4B,L,NY,NX)+trcsa_soHml(idsa_CaH2PO4B,L,NY,NX) &
-    +trcsa_soHml(idsa_MgHPO4B,L,NY,NX))
+  PSS=patomw*(trcSalt_solml(idsalt_H0PO4,L,NY,NX)+trcSalt_solml(idsalt_H3PO4,L,NY,NX) &
+    +trcSalt_solml(idsalt_FeHPO4,L,NY,NX) &
+    +trcSalt_solml(idsalt_FeH2PO4,L,NY,NX)+trcSalt_solml(idsalt_CaPO4,L,NY,NX) &
+    +trcSalt_solml(idsalt_CaHPO4,L,NY,NX) &
+    +trcSalt_solml(idsalt_CaH2PO4,L,NY,NX)+trcSalt_solml(idsalt_MgHPO4,L,NY,NX) &
+    +trcSalt_solml(idsalt_H0PO4B,L,NY,NX) &
+    +trcSalt_solml(idsalt_H3PO4B,L,NY,NX)+trcSalt_solml(idsalt_FeHPO4B,L,NY,NX) &
+    +trcSalt_solml(idsalt_FeH2PO4B,L,NY,NX) &
+    +trcSalt_solml(idsalt_CaPO4B,L,NY,NX)+trcSalt_solml(idsalt_CaHPO4B,L,NY,NX) &
+    +trcSalt_solml(idsalt_CaH2PO4B,L,NY,NX) &
+    +trcSalt_solml(idsalt_MgHPO4B,L,NY,NX)+trcSalt_soHml(idsalt_H0PO4,L,NY,NX)&
+    +trcSalt_soHml(idsalt_H3PO4,L,NY,NX)+trcSalt_soHml(idsalt_FeHPO4,L,NY,NX) &
+    +trcSalt_soHml(idsalt_FeH2PO4,L,NY,NX)+trcSalt_soHml(idsalt_CaPO4,L,NY,NX) &
+    +trcSalt_soHml(idsalt_CaHPO4,L,NY,NX)+trcSalt_soHml(idsalt_CaH2PO4,L,NY,NX) &
+    +trcSalt_soHml(idsalt_MgHPO4,L,NY,NX)+trcSalt_soHml(idsalt_H0PO4B,L,NY,NX) &
+    +trcSalt_soHml(idsalt_H3PO4B,L,NY,NX)+trcSalt_soHml(idsalt_FeHPO4B,L,NY,NX) &
+    +trcSalt_soHml(idsalt_FeH2PO4B,L,NY,NX)+trcSalt_soHml(idsalt_CaPO4B,L,NY,NX)&
+    +trcSalt_soHml(idsalt_CaHPO4B,L,NY,NX)+trcSalt_soHml(idsalt_CaH2PO4B,L,NY,NX) &
+    +trcSalt_soHml(idsalt_MgHPO4B,L,NY,NX))
   TLPO4=TLPO4+PSS
 
-  SSS=trcsa_solml(idsa_Al,L,NY,NX)+trcsa_solml(idsa_Fe,L,NY,NX) &
-    +trcsa_solml(idsa_Hp,L,NY,NX)+trcsa_solml(idsa_Ca,L,NY,NX) &
-    +trcsa_solml(idsa_Mg,L,NY,NX)+trcsa_solml(idsa_Na,L,NY,NX) &
-    +trcsa_solml(idsa_K,L,NY,NX)+trcsa_solml(idsa_OH,L,NY,NX) &
-    +trcsa_solml(idsa_SO4,L,NY,NX)+trcsa_solml(idsa_Cl,L,NY,NX) &
-    +trcsa_solml(idsa_CO3,L,NY,NX)+trcsa_solml(idsa_H0PO4,L,NY,NX) &
-    +trcsa_solml(idsa_H0PO4B,L,NY,NX) &
-    +2.0_r8*(trcsa_solml(idsa_HCO3,L,NY,NX)+trcsa_solml(idsa_AlOH,L,NY,NX) &
-    +trcsa_solml(idsa_AlSO4,L,NY,NX)+trcsa_solml(idsa_FeOH,L,NY,NX)&
-    +trcsa_solml(idsa_FeSO4,L,NY,NX)+trcsa_solml(idsa_CaOH2,L,NY,NX) &
-    +trcsa_solml(idsa_CaCO3,L,NY,NX)+trcsa_solml(idsa_CaSO4,L,NY,NX)&
-    +trcsa_solml(idsa_MgOH2,L,NY,NX)+trcsa_solml(idsa_MgCO3,L,NY,NX) &
-    +trcsa_solml(idsa_MgSO4,L,NY,NX)+trcsa_solml(idsa_NaCO3,L,NY,NX)&
-    +trcsa_solml(idsa_NaSO4,L,NY,NX)+trcsa_solml(idsa_KSO4,L,NY,NX) &
-    +trcsa_solml(idsa_CaPO4,L,NY,NX)+trcsa_solml(idsa_CaPO4B,L,NY,NX)) &
-    +3.0_r8*(trcsa_solml(idsa_AlOH2,L,NY,NX)+trcsa_solml(idsa_FeOH2,L,NY,NX)&
-    +trcsa_solml(idsa_CaHCO3,L,NY,NX) &
-    +trcsa_solml(idsa_MgHCO3,L,NY,NX)+trcsa_solml(idsa_FeHPO4,L,NY,NX)&
-    +trcsa_solml(idsa_CaHPO4,L,NY,NX)+trcsa_solml(idsa_MgHPO4,L,NY,NX) &
-    +trcsa_solml(idsa_FeHPO4B,L,NY,NX)+trcsa_solml(idsa_CaHPO4B,L,NY,NX)&
-    +trcsa_solml(idsa_MgHPO4B,L,NY,NX)) &
-    +4.0_r8*(trcsa_solml(idsa_AlOH3,L,NY,NX)+trcsa_solml(idsa_FeOH3,L,NY,NX) &
-    +trcsa_solml(idsa_H3PO4,L,NY,NX) &
-    +trcsa_solml(idsa_FeH2PO4,L,NY,NX)+trcsa_solml(idsa_CaH2PO4,L,NY,NX) &
-    +trcsa_solml(idsa_H3PO4B,L,NY,NX)+trcsa_solml(idsa_FeH2PO4B,L,NY,NX) &
-    +trcsa_solml(idsa_CaH2PO4B,L,NY,NX)) &
-    +5.0_r8*(trcsa_solml(idsa_AlOH4,L,NY,NX)+trcsa_solml(idsa_FeOH4,L,NY,NX))
+  SSS=trcSalt_solml(idsalt_Al,L,NY,NX)+trcSalt_solml(idsalt_Fe,L,NY,NX) &
+    +trcSalt_solml(idsalt_Hp,L,NY,NX)+trcSalt_solml(idsalt_Ca,L,NY,NX) &
+    +trcSalt_solml(idsalt_Mg,L,NY,NX)+trcSalt_solml(idsalt_Na,L,NY,NX) &
+    +trcSalt_solml(idsalt_K,L,NY,NX)+trcSalt_solml(idsalt_OH,L,NY,NX) &
+    +trcSalt_solml(idsalt_SO4,L,NY,NX)+trcSalt_solml(idsalt_Cl,L,NY,NX) &
+    +trcSalt_solml(idsalt_CO3,L,NY,NX)+trcSalt_solml(idsalt_H0PO4,L,NY,NX) &
+    +trcSalt_solml(idsalt_H0PO4B,L,NY,NX) &
+    +2.0_r8*(trcSalt_solml(idsalt_HCO3,L,NY,NX)+trcSalt_solml(idsalt_AlOH,L,NY,NX) &
+    +trcSalt_solml(idsalt_AlSO4,L,NY,NX)+trcSalt_solml(idsalt_FeOH,L,NY,NX)&
+    +trcSalt_solml(idsalt_FeSO4,L,NY,NX)+trcSalt_solml(idsalt_CaOH2,L,NY,NX) &
+    +trcSalt_solml(idsalt_CaCO3,L,NY,NX)+trcSalt_solml(idsalt_CaSO4,L,NY,NX)&
+    +trcSalt_solml(idsalt_MgOH2,L,NY,NX)+trcSalt_solml(idsalt_MgCO3,L,NY,NX) &
+    +trcSalt_solml(idsalt_MgSO4,L,NY,NX)+trcSalt_solml(idsalt_NaCO3,L,NY,NX)&
+    +trcSalt_solml(idsalt_NaSO4,L,NY,NX)+trcSalt_solml(idsalt_KSO4,L,NY,NX) &
+    +trcSalt_solml(idsalt_CaPO4,L,NY,NX)+trcSalt_solml(idsalt_CaPO4B,L,NY,NX)) &
+    +3.0_r8*(trcSalt_solml(idsalt_AlOH2,L,NY,NX)+trcSalt_solml(idsalt_FeOH2,L,NY,NX)&
+    +trcSalt_solml(idsalt_CaHCO3,L,NY,NX) &
+    +trcSalt_solml(idsalt_MgHCO3,L,NY,NX)+trcSalt_solml(idsalt_FeHPO4,L,NY,NX)&
+    +trcSalt_solml(idsalt_CaHPO4,L,NY,NX)+trcSalt_solml(idsalt_MgHPO4,L,NY,NX) &
+    +trcSalt_solml(idsalt_FeHPO4B,L,NY,NX)+trcSalt_solml(idsalt_CaHPO4B,L,NY,NX)&
+    +trcSalt_solml(idsalt_MgHPO4B,L,NY,NX)) &
+    +4.0_r8*(trcSalt_solml(idsalt_AlOH3,L,NY,NX)+trcSalt_solml(idsalt_FeOH3,L,NY,NX) &
+    +trcSalt_solml(idsalt_H3PO4,L,NY,NX) &
+    +trcSalt_solml(idsalt_FeH2PO4,L,NY,NX)+trcSalt_solml(idsalt_CaH2PO4,L,NY,NX) &
+    +trcSalt_solml(idsalt_H3PO4B,L,NY,NX)+trcSalt_solml(idsalt_FeH2PO4B,L,NY,NX) &
+    +trcSalt_solml(idsalt_CaH2PO4B,L,NY,NX)) &
+    +5.0_r8*(trcSalt_solml(idsalt_AlOH4,L,NY,NX)+trcSalt_solml(idsalt_FeOH4,L,NY,NX))
 
-  SSH=trcsa_soHml(idsa_Al,L,NY,NX)+trcsa_soHml(idsa_Fe,L,NY,NX)&
-    +trcsa_soHml(idsa_Hp,L,NY,NX)+trcsa_soHml(idsa_Ca,L,NY,NX) &
-    +trcsa_soHml(idsa_Mg,L,NY,NX)+trcsa_soHml(idsa_Na,L,NY,NX) &
-    +trcsa_soHml(idsa_K,L,NY,NX)+trcsa_soHml(idsa_OH,L,NY,NX)  &
-    +trcsa_soHml(idsa_SO4,L,NY,NX)+trcsa_soHml(idsa_Cl,L,NY,NX) &
-    +trcsa_soHml(idsa_CO3,L,NY,NX) +trcsa_soHml(idsa_H0PO4,L,NY,NX) &
-    +trcsa_soHml(idsa_H0PO4B,L,NY,NX) &
-    +2.0_r8*(trcsa_soHml(idsa_HCO3,L,NY,NX)+trcsa_soHml(idsa_AlOH,L,NY,NX) &
-    +trcsa_soHml(idsa_AlSO4,L,NY,NX)+trcsa_soHml(idsa_FeOH,L,NY,NX) &
-    +trcsa_soHml(idsa_FeSO4,L,NY,NX)+trcsa_soHml(idsa_CaOH2,L,NY,NX) &
-    +trcsa_soHml(idsa_CaCO3,L,NY,NX)+trcsa_soHml(idsa_CaSO4,L,NY,NX) &
-    +trcsa_soHml(idsa_MgOH2,L,NY,NX)+trcsa_soHml(idsa_MgCO3,L,NY,NX) &
-    +trcsa_soHml(idsa_MgSO4,L,NY,NX)+trcsa_soHml(idsa_NaCO3,L,NY,NX) &
-    +trcsa_soHml(idsa_NaSO4,L,NY,NX)+trcsa_soHml(idsa_KSO4,L,NY,NX) &
-    +trcsa_soHml(idsa_CaPO4,L,NY,NX)+trcsa_soHml(idsa_CaPO4B,L,NY,NX)) &
-    +3.0_r8*(trcsa_soHml(idsa_AlOH2,L,NY,NX)+trcsa_soHml(idsa_FeOH2,L,NY,NX) &
-    +trcsa_soHml(idsa_CaHCO3,L,NY,NX) &
-    +trcsa_soHml(idsa_MgHCO3,L,NY,NX)+trcsa_soHml(idsa_FeHPO4,L,NY,NX) &
-    +trcsa_soHml(idsa_CaHPO4,L,NY,NX)+trcsa_soHml(idsa_MgHPO4,L,NY,NX) &
-    +trcsa_soHml(idsa_FeHPO4B,L,NY,NX)+trcsa_soHml(idsa_CaHPO4B,L,NY,NX) &
-    +trcsa_soHml(idsa_MgHPO4B,L,NY,NX)) &
-    +4.0_r8*(trcsa_soHml(idsa_AlOH3,L,NY,NX)+trcsa_soHml(idsa_FeOH3,L,NY,NX) &
-    +trcsa_soHml(idsa_H3PO4,L,NY,NX) &
-    +trcsa_soHml(idsa_FeH2PO4,L,NY,NX)+trcsa_soHml(idsa_CaH2PO4,L,NY,NX) &
-    +trcsa_soHml(idsa_H3PO4B,L,NY,NX) &
-    +trcsa_soHml(idsa_FeH2PO4B,L,NY,NX)+trcsa_soHml(idsa_CaH2PO4B,L,NY,NX)) &
-    +5.0_r8*(trcsa_soHml(idsa_AlOH4,L,NY,NX)+trcsa_soHml(idsa_FeOH4,L,NY,NX))
+  SSH=trcSalt_soHml(idsalt_Al,L,NY,NX)+trcSalt_soHml(idsalt_Fe,L,NY,NX)&
+    +trcSalt_soHml(idsalt_Hp,L,NY,NX)+trcSalt_soHml(idsalt_Ca,L,NY,NX) &
+    +trcSalt_soHml(idsalt_Mg,L,NY,NX)+trcSalt_soHml(idsalt_Na,L,NY,NX) &
+    +trcSalt_soHml(idsalt_K,L,NY,NX)+trcSalt_soHml(idsalt_OH,L,NY,NX)  &
+    +trcSalt_soHml(idsalt_SO4,L,NY,NX)+trcSalt_soHml(idsalt_Cl,L,NY,NX) &
+    +trcSalt_soHml(idsalt_CO3,L,NY,NX) +trcSalt_soHml(idsalt_H0PO4,L,NY,NX) &
+    +trcSalt_soHml(idsalt_H0PO4B,L,NY,NX) &
+    +2.0_r8*(trcSalt_soHml(idsalt_HCO3,L,NY,NX)+trcSalt_soHml(idsalt_AlOH,L,NY,NX) &
+    +trcSalt_soHml(idsalt_AlSO4,L,NY,NX)+trcSalt_soHml(idsalt_FeOH,L,NY,NX) &
+    +trcSalt_soHml(idsalt_FeSO4,L,NY,NX)+trcSalt_soHml(idsalt_CaOH2,L,NY,NX) &
+    +trcSalt_soHml(idsalt_CaCO3,L,NY,NX)+trcSalt_soHml(idsalt_CaSO4,L,NY,NX) &
+    +trcSalt_soHml(idsalt_MgOH2,L,NY,NX)+trcSalt_soHml(idsalt_MgCO3,L,NY,NX) &
+    +trcSalt_soHml(idsalt_MgSO4,L,NY,NX)+trcSalt_soHml(idsalt_NaCO3,L,NY,NX) &
+    +trcSalt_soHml(idsalt_NaSO4,L,NY,NX)+trcSalt_soHml(idsalt_KSO4,L,NY,NX) &
+    +trcSalt_soHml(idsalt_CaPO4,L,NY,NX)+trcSalt_soHml(idsalt_CaPO4B,L,NY,NX)) &
+    +3.0_r8*(trcSalt_soHml(idsalt_AlOH2,L,NY,NX)+trcSalt_soHml(idsalt_FeOH2,L,NY,NX) &
+    +trcSalt_soHml(idsalt_CaHCO3,L,NY,NX) &
+    +trcSalt_soHml(idsalt_MgHCO3,L,NY,NX)+trcSalt_soHml(idsalt_FeHPO4,L,NY,NX) &
+    +trcSalt_soHml(idsalt_CaHPO4,L,NY,NX)+trcSalt_soHml(idsalt_MgHPO4,L,NY,NX) &
+    +trcSalt_soHml(idsalt_FeHPO4B,L,NY,NX)+trcSalt_soHml(idsalt_CaHPO4B,L,NY,NX) &
+    +trcSalt_soHml(idsalt_MgHPO4B,L,NY,NX)) &
+    +4.0_r8*(trcSalt_soHml(idsalt_AlOH3,L,NY,NX)+trcSalt_soHml(idsalt_FeOH3,L,NY,NX) &
+    +trcSalt_soHml(idsalt_H3PO4,L,NY,NX) &
+    +trcSalt_soHml(idsalt_FeH2PO4,L,NY,NX)+trcSalt_soHml(idsalt_CaH2PO4,L,NY,NX) &
+    +trcSalt_soHml(idsalt_H3PO4B,L,NY,NX) &
+    +trcSalt_soHml(idsalt_FeH2PO4B,L,NY,NX)+trcSalt_soHml(idsalt_CaH2PO4B,L,NY,NX)) &
+    +5.0_r8*(trcSalt_soHml(idsalt_AlOH4,L,NY,NX)+trcSalt_soHml(idsalt_FeOH4,L,NY,NX))
 !
 !     TOTAL FERILIZER,EXCHANGEABLE CATIONS AND ANIONS, PRECIPITATES
 !
@@ -1549,18 +1515,18 @@ module RedistMod
 !     SOIL ELECTRICAL CONDUCTIVITY
 !
   IF(VLWatMicP(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-    ECHY=0.337_r8*AZMAX1(trcsa_solml(idsa_Hp,L,NY,NX)/VLWatMicP(L,NY,NX))
-    ECOH=0.192_r8*AZMAX1(trcsa_solml(idsa_OH,L,NY,NX)/VLWatMicP(L,NY,NX))
-    ECAL=0.056_r8*AZMAX1(trcsa_solml(idsa_Al,L,NY,NX)*3.0_r8/VLWatMicP(L,NY,NX))
-    ECFE=0.051_r8*AZMAX1(trcsa_solml(idsa_Fe,L,NY,NX)*3.0_r8/VLWatMicP(L,NY,NX))
-    ECCA=0.060_r8*AZMAX1(trcsa_solml(idsa_Ca,L,NY,NX)*2.0_r8/VLWatMicP(L,NY,NX))
-    ECMG=0.053_r8*AZMAX1(trcsa_solml(idsa_Mg,L,NY,NX)*2.0_r8/VLWatMicP(L,NY,NX))
-    ECNA=0.050_r8*AZMAX1(trcsa_solml(idsa_Na,L,NY,NX)/VLWatMicP(L,NY,NX))
-    ECKA=0.070_r8*AZMAX1(trcsa_solml(idsa_K,L,NY,NX)/VLWatMicP(L,NY,NX))
-    ECCO=0.072_r8*AZMAX1(trcsa_solml(idsa_CO3,L,NY,NX)*2.0_r8/VLWatMicP(L,NY,NX))
-    ECHC=0.044_r8*AZMAX1(trcsa_solml(idsa_HCO3,L,NY,NX)/VLWatMicP(L,NY,NX))
-    ECSO=0.080_r8*AZMAX1(trcsa_solml(idsa_SO4,L,NY,NX)*2.0_r8/VLWatMicP(L,NY,NX))
-    ECCL=0.076_r8*AZMAX1(trcsa_solml(idsa_Cl,L,NY,NX)/VLWatMicP(L,NY,NX))
+    ECHY=0.337_r8*AZMAX1(trcSalt_solml(idsalt_Hp,L,NY,NX)/VLWatMicP(L,NY,NX))
+    ECOH=0.192_r8*AZMAX1(trcSalt_solml(idsalt_OH,L,NY,NX)/VLWatMicP(L,NY,NX))
+    ECAL=0.056_r8*AZMAX1(trcSalt_solml(idsalt_Al,L,NY,NX)*3.0_r8/VLWatMicP(L,NY,NX))
+    ECFE=0.051_r8*AZMAX1(trcSalt_solml(idsalt_Fe,L,NY,NX)*3.0_r8/VLWatMicP(L,NY,NX))
+    ECCA=0.060_r8*AZMAX1(trcSalt_solml(idsalt_Ca,L,NY,NX)*2.0_r8/VLWatMicP(L,NY,NX))
+    ECMG=0.053_r8*AZMAX1(trcSalt_solml(idsalt_Mg,L,NY,NX)*2.0_r8/VLWatMicP(L,NY,NX))
+    ECNA=0.050_r8*AZMAX1(trcSalt_solml(idsalt_Na,L,NY,NX)/VLWatMicP(L,NY,NX))
+    ECKA=0.070_r8*AZMAX1(trcSalt_solml(idsalt_K,L,NY,NX)/VLWatMicP(L,NY,NX))
+    ECCO=0.072_r8*AZMAX1(trcSalt_solml(idsalt_CO3,L,NY,NX)*2.0_r8/VLWatMicP(L,NY,NX))
+    ECHC=0.044_r8*AZMAX1(trcSalt_solml(idsalt_HCO3,L,NY,NX)/VLWatMicP(L,NY,NX))
+    ECSO=0.080_r8*AZMAX1(trcSalt_solml(idsalt_SO4,L,NY,NX)*2.0_r8/VLWatMicP(L,NY,NX))
+    ECCL=0.076_r8*AZMAX1(trcSalt_solml(idsalt_Cl,L,NY,NX)/VLWatMicP(L,NY,NX))
     ECNO=0.071_r8*AZMAX1(trc_solml(ids_NO3,L,NY,NX)/(VLWatMicP(L,NY,NX)*natomw))
     ECND(L,NY,NX)=ECHY+ECOH+ECAL+ECFE+ECCA+ECMG+ECNA+ECKA &
       +ECCO+ECHC+ECSO+ECCL+ECNO
@@ -1579,7 +1545,7 @@ module RedistMod
   real(r8) :: DC,DN,DP,OC,ON,OP
 
   integer :: K,N,M,NGL
-  integer :: n_litrsfk
+  integer :: NumOfLitrCmplxs
   real(r8) :: tDC,tDN,tDP
     !     TOTAL SOC,SON,SOP
     !
@@ -1590,7 +1556,7 @@ module RedistMod
     !     OSC=SOC(K=0:woody litter, K=1:non-woody litter,
     !     K=2:manure, K=3:POC, K=4:humus)
 !
-  n_litrsfk  = micpar%n_litrsfk
+  NumOfLitrCmplxs  = micpar%NumOfLitrCmplxs
 
   DC=0.0_r8
   DN=0.0_r8
@@ -1603,9 +1569,9 @@ module RedistMod
 
 ! add living microbes
   DO K=1,jcplx
-    tDC=SUM(OMC(1:nlbiomcp,1:NMICBSO,K,L,NY,NX))
-    tDN=SUM(OMN(1:nlbiomcp,1:NMICBSO,K,L,NY,NX))
-    tDP=SUM(OMP(1:nlbiomcp,1:NMICBSO,K,L,NY,NX))
+    tDC=SUM(OMC(1:nlbiomcp,1:NumOfMicrobs1HetertrophCmplx,K,L,NY,NX))
+    tDN=SUM(OMN(1:nlbiomcp,1:NumOfMicrobs1HetertrophCmplx,K,L,NY,NX))
+    tDP=SUM(OMP(1:nlbiomcp,1:NumOfMicrobs1HetertrophCmplx,K,L,NY,NX))
     IF(micpar%is_litter(K))THEN  
       !K=0,1,2: woody litr, nonwoody litr, and manure
       DC=DC+tDC
@@ -1631,9 +1597,9 @@ module RedistMod
   ENDDO
 
 ! add autotrophs
-  tDC=SUM(OMCff(1:nlbiomcp,1:NMICBSA,L,NY,NX))
-  tDN=SUM(OMNff(1:nlbiomcp,1:NMICBSA,L,NY,NX))
-  tDP=SUM(OMPff(1:nlbiomcp,1:NMICBSA,L,NY,NX))
+  tDC=SUM(OMCff(1:nlbiomcp,1:NumOfMicrobsInAutotrophCmplx,L,NY,NX))
+  tDN=SUM(OMNff(1:nlbiomcp,1:NumOfMicrobsInAutotrophCmplx,L,NY,NX))
+  tDP=SUM(OMPff(1:nlbiomcp,1:NumOfMicrobsInAutotrophCmplx,L,NY,NX))
   OC=OC+tDC
   ON=ON+tDN
   OP=OP+tDP
@@ -1722,14 +1688,14 @@ module RedistMod
 !     FLWR,HFLWR=water,heat flux into litter
 !     HEATIN=cumulative net surface heat transfer
 !
-  DO   K=1,micpar%n_pltlitrk
+  DO   K=1,micpar%NumOfPlantLitrCmplxs
     DO  M=1,jsken
-      OSC(M,K,0,NY,NX)=OSC(M,K,0,NY,NX)+ESNT(ielmc,M,K,0,NY,NX)
-      OSA(M,K,0,NY,NX)=OSA(M,K,0,NY,NX)+ESNT(ielmc,M,K,0,NY,NX)*micpar%OMCI(1,K)
-      OSN(M,K,0,NY,NX)=OSN(M,K,0,NY,NX)+ESNT(ielmn,M,K,0,NY,NX)
-      OSP(M,K,0,NY,NX)=OSP(M,K,0,NY,NX)+ESNT(ielmp,M,K,0,NY,NX)
-      ORGC(0,NY,NX)=ORGC(0,NY,NX)+ESNT(ielmc,M,K,0,NY,NX)
-      RAINR=ESNT(ielmc,M,K,0,NY,NX)*THETCX(K)
+      OSC(M,K,0,NY,NX)=OSC(M,K,0,NY,NX)+LitrfalChemElemnts_vr(ielmc,M,K,0,NY,NX)
+      OSA(M,K,0,NY,NX)=OSA(M,K,0,NY,NX)+LitrfalChemElemnts_vr(ielmc,M,K,0,NY,NX)*micpar%OMCI(1,K)
+      OSN(M,K,0,NY,NX)=OSN(M,K,0,NY,NX)+LitrfalChemElemnts_vr(ielmn,M,K,0,NY,NX)
+      OSP(M,K,0,NY,NX)=OSP(M,K,0,NY,NX)+LitrfalChemElemnts_vr(ielmp,M,K,0,NY,NX)
+      ORGC(0,NY,NX)=ORGC(0,NY,NX)+LitrfalChemElemnts_vr(ielmc,M,K,0,NY,NX)
+      RAINR=LitrfalChemElemnts_vr(ielmc,M,K,0,NY,NX)*THETCX(K)
       HRAINR=RAINR*cpw*TairK(NY,NX)
       WatFLo2Litr(NY,NX)=WatFLo2Litr(NY,NX)+RAINR
       HeatFLo2LitrByWat(NY,NX)=HeatFLo2LitrByWat(NY,NX)+HRAINR
@@ -1833,42 +1799,42 @@ module RedistMod
 
   integer :: K,N,NGL
 
-  ROXYX(L,NY,NX)=ROXYX(L,NY,NX)+SUM(ROXYS(1:NMICBSO,1:jcplx,L,NY,NX))
-  RNH4X(L,NY,NX)=RNH4X(L,NY,NX)+SUM(RVMX4(1:NMICBSO,1:jcplx,L,NY,NX)) &
-    +SUM(RINHO(1:NMICBSO,1:jcplx,L,NY,NX))
-  RNO3X(L,NY,NX)=RNO3X(L,NY,NX)+SUM(RVMX3(1:NMICBSO,1:jcplx,L,NY,NX)) &
-    +SUM(RINOO(1:NMICBSO,1:jcplx,L,NY,NX))
-  RNO2X(L,NY,NX)=RNO2X(L,NY,NX)+SUM(RVMX2(1:NMICBSO,1:jcplx,L,NY,NX))
-  RN2OX(L,NY,NX)=RN2OX(L,NY,NX)+SUM(RVMX1(1:NMICBSO,1:jcplx,L,NY,NX))
-  RPO4X(L,NY,NX)=RPO4X(L,NY,NX)+SUM(RIPOO(1:NMICBSO,1:jcplx,L,NY,NX))
-  RP14X(L,NY,NX)=RP14X(L,NY,NX)+SUM(RIPO1(1:NMICBSO,1:jcplx,L,NY,NX))
-  RNHBX(L,NY,NX)=RNHBX(L,NY,NX)+SUM(RVMB4(1:NMICBSO,1:jcplx,L,NY,NX)) &
-    +SUM(RINHB(1:NMICBSO,1:jcplx,L,NY,NX))
-  RN3BX(L,NY,NX)=RN3BX(L,NY,NX)+SUM(RVMB3(1:NMICBSO,1:jcplx,L,NY,NX)) &
-    +SUM(RINOB(1:NMICBSO,1:jcplx,L,NY,NX))
-  RN2BX(L,NY,NX)=RN2BX(L,NY,NX)+SUM(RVMB2(1:NMICBSO,1:jcplx,L,NY,NX))
-  RPOBX(L,NY,NX)=RPOBX(L,NY,NX)+SUM(RIPBO(1:NMICBSO,1:jcplx,L,NY,NX))
-  RP1BX(L,NY,NX)=RP1BX(L,NY,NX)+SUM(RIPB1(1:NMICBSO,1:jcplx,L,NY,NX))
+  ROXYX(L,NY,NX)=ROXYX(L,NY,NX)+SUM(ROXYS(1:NumOfMicrobs1HetertrophCmplx,1:jcplx,L,NY,NX))
+  RNH4X(L,NY,NX)=RNH4X(L,NY,NX)+SUM(RVMX4(1:NumOfMicrobs1HetertrophCmplx,1:jcplx,L,NY,NX)) &
+    +SUM(RINHO(1:NumOfMicrobs1HetertrophCmplx,1:jcplx,L,NY,NX))
+  RNO3X(L,NY,NX)=RNO3X(L,NY,NX)+SUM(RVMX3(1:NumOfMicrobs1HetertrophCmplx,1:jcplx,L,NY,NX)) &
+    +SUM(RINOO(1:NumOfMicrobs1HetertrophCmplx,1:jcplx,L,NY,NX))
+  RNO2X(L,NY,NX)=RNO2X(L,NY,NX)+SUM(RVMX2(1:NumOfMicrobs1HetertrophCmplx,1:jcplx,L,NY,NX))
+  RN2OX(L,NY,NX)=RN2OX(L,NY,NX)+SUM(RVMX1(1:NumOfMicrobs1HetertrophCmplx,1:jcplx,L,NY,NX))
+  RPO4X(L,NY,NX)=RPO4X(L,NY,NX)+SUM(RIPOO(1:NumOfMicrobs1HetertrophCmplx,1:jcplx,L,NY,NX))
+  RP14X(L,NY,NX)=RP14X(L,NY,NX)+SUM(RIPO1(1:NumOfMicrobs1HetertrophCmplx,1:jcplx,L,NY,NX))
+  RNHBX(L,NY,NX)=RNHBX(L,NY,NX)+SUM(RVMB4(1:NumOfMicrobs1HetertrophCmplx,1:jcplx,L,NY,NX)) &
+    +SUM(RINHB(1:NumOfMicrobs1HetertrophCmplx,1:jcplx,L,NY,NX))
+  RN3BX(L,NY,NX)=RN3BX(L,NY,NX)+SUM(RVMB3(1:NumOfMicrobs1HetertrophCmplx,1:jcplx,L,NY,NX)) &
+    +SUM(RINOB(1:NumOfMicrobs1HetertrophCmplx,1:jcplx,L,NY,NX))
+  RN2BX(L,NY,NX)=RN2BX(L,NY,NX)+SUM(RVMB2(1:NumOfMicrobs1HetertrophCmplx,1:jcplx,L,NY,NX))
+  RPOBX(L,NY,NX)=RPOBX(L,NY,NX)+SUM(RIPBO(1:NumOfMicrobs1HetertrophCmplx,1:jcplx,L,NY,NX))
+  RP1BX(L,NY,NX)=RP1BX(L,NY,NX)+SUM(RIPB1(1:NumOfMicrobs1HetertrophCmplx,1:jcplx,L,NY,NX))
   DO K=1,jcplx
-    ROQCX(K,L,NY,NX)=ROQCX(K,L,NY,NX)+SUM(ROQCS(1:NMICBSO,1:jcplx,L,NY,NX))
-    ROQAX(K,L,NY,NX)=ROQAX(K,L,NY,NX)+SUM(ROQAS(1:NMICBSO,1:jcplx,L,NY,NX))
+    ROQCX(K,L,NY,NX)=ROQCX(K,L,NY,NX)+SUM(ROQCS(1:NumOfMicrobs1HetertrophCmplx,1:jcplx,L,NY,NX))
+    ROQAX(K,L,NY,NX)=ROQAX(K,L,NY,NX)+SUM(ROQAS(1:NumOfMicrobs1HetertrophCmplx,1:jcplx,L,NY,NX))
   ENDDO
-  ROXYX(L,NY,NX)=ROXYX(L,NY,NX)+SUM(ROXYSff(1:NMICBSO,L,NY,NX))
-  RNH4X(L,NY,NX)=RNH4X(L,NY,NX)+SUM(RVMX4ff(1:NMICBSO,L,NY,NX)) &
-    +SUM(RINHOff(1:NMICBSO,L,NY,NX))
-  RNO3X(L,NY,NX)=RNO3X(L,NY,NX)+SUM(RVMX3ff(1:NMICBSO,L,NY,NX)) &
-    +SUM(RINOOff(1:NMICBSO,L,NY,NX))
-  RNO2X(L,NY,NX)=RNO2X(L,NY,NX)+SUM(RVMX2ff(1:NMICBSO,L,NY,NX))
-  RN2OX(L,NY,NX)=RN2OX(L,NY,NX)+SUM(RVMX1ff(1:NMICBSO,L,NY,NX))
-  RPO4X(L,NY,NX)=RPO4X(L,NY,NX)+SUM(RIPOOff(1:NMICBSO,L,NY,NX))
-  RP14X(L,NY,NX)=RP14X(L,NY,NX)+SUM(RIPO1ff(1:NMICBSO,L,NY,NX))
-  RNHBX(L,NY,NX)=RNHBX(L,NY,NX)+SUM(RVMB4ff(1:NMICBSO,L,NY,NX)) &
-    +SUM(RINHBff(1:NMICBSO,L,NY,NX))
-  RN3BX(L,NY,NX)=RN3BX(L,NY,NX)+SUM(RVMB3ff(1:NMICBSO,L,NY,NX)) &
-    +SUM(RINOBff(1:NMICBSO,L,NY,NX))
-  RN2BX(L,NY,NX)=RN2BX(L,NY,NX)+SUM(RVMB2ff(1:NMICBSO,L,NY,NX))
-  RPOBX(L,NY,NX)=RPOBX(L,NY,NX)+SUM(RIPBOff(1:NMICBSO,L,NY,NX))
-  RP1BX(L,NY,NX)=RP1BX(L,NY,NX)+SUM(RIPB1ff(1:NMICBSO,L,NY,NX))
+  ROXYX(L,NY,NX)=ROXYX(L,NY,NX)+SUM(ROXYSff(1:NumOfMicrobs1HetertrophCmplx,L,NY,NX))
+  RNH4X(L,NY,NX)=RNH4X(L,NY,NX)+SUM(RVMX4ff(1:NumOfMicrobs1HetertrophCmplx,L,NY,NX)) &
+    +SUM(RINHOff(1:NumOfMicrobs1HetertrophCmplx,L,NY,NX))
+  RNO3X(L,NY,NX)=RNO3X(L,NY,NX)+SUM(RVMX3ff(1:NumOfMicrobs1HetertrophCmplx,L,NY,NX)) &
+    +SUM(RINOOff(1:NumOfMicrobs1HetertrophCmplx,L,NY,NX))
+  RNO2X(L,NY,NX)=RNO2X(L,NY,NX)+SUM(RVMX2ff(1:NumOfMicrobs1HetertrophCmplx,L,NY,NX))
+  RN2OX(L,NY,NX)=RN2OX(L,NY,NX)+SUM(RVMX1ff(1:NumOfMicrobs1HetertrophCmplx,L,NY,NX))
+  RPO4X(L,NY,NX)=RPO4X(L,NY,NX)+SUM(RIPOOff(1:NumOfMicrobs1HetertrophCmplx,L,NY,NX))
+  RP14X(L,NY,NX)=RP14X(L,NY,NX)+SUM(RIPO1ff(1:NumOfMicrobs1HetertrophCmplx,L,NY,NX))
+  RNHBX(L,NY,NX)=RNHBX(L,NY,NX)+SUM(RVMB4ff(1:NumOfMicrobs1HetertrophCmplx,L,NY,NX)) &
+    +SUM(RINHBff(1:NumOfMicrobs1HetertrophCmplx,L,NY,NX))
+  RN3BX(L,NY,NX)=RN3BX(L,NY,NX)+SUM(RVMB3ff(1:NumOfMicrobs1HetertrophCmplx,L,NY,NX)) &
+    +SUM(RINOBff(1:NumOfMicrobs1HetertrophCmplx,L,NY,NX))
+  RN2BX(L,NY,NX)=RN2BX(L,NY,NX)+SUM(RVMB2ff(1:NumOfMicrobs1HetertrophCmplx,L,NY,NX))
+  RPOBX(L,NY,NX)=RPOBX(L,NY,NX)+SUM(RIPBOff(1:NumOfMicrobs1HetertrophCmplx,L,NY,NX))
+  RP1BX(L,NY,NX)=RP1BX(L,NY,NX)+SUM(RIPB1ff(1:NumOfMicrobs1HetertrophCmplx,L,NY,NX))
 
   RNO2X(L,NY,NX)=RNO2X(L,NY,NX)+RVMXC(L,NY,NX)
   RN2BX(L,NY,NX)=RN2BX(L,NY,NX)+RVMBC(L,NY,NX)

@@ -35,12 +35,12 @@ module readsmod
 
   integer :: IDATE,IDY,IFLG3,I,ICHECK
 
-  public :: reads
+  public :: ReadClimSoilForcing
   contains
 
-  SUBROUTINE reads(yearc,yeari,NE,NEX,NHW,NHE,NVN,NVS)
+  SUBROUTINE ReadClimSoilForcing(yearc,yeari,NE,NEX,NHW,NHE,NVN,NVS)
 !
-! THIS SUBROUTINE READS ALL SOIL AND PLANT MANAGEMENT INPUT FILES
+! THIS SUBROUTINE ReadClimSoilForcing ALL SOIL AND PLANT MANAGEMENT INPUT FILES
 !
   use ReadManagementMod, only : ReadManagementFiles
   use EcoSIMCtrlMod, only : soil_mgmt_in
@@ -283,7 +283,7 @@ module readsmod
   call getGHGts(yearc,NHW,NHE,NVN,NVS)
 
   RETURN
-  END subroutine reads
+  END subroutine ReadClimSoilForcing
 !------------------------------------------------------------------------------------------
   subroutine ReadClimateCorrections(yeari)
   !

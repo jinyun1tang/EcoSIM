@@ -14,9 +14,9 @@ module CanopyRadDataType
   real(r8),target,allocatable :: PARDIF(:,:,:,:,:,:)           !diffuse incoming PAR, [umol m-2 s-1]
   real(r8),target,allocatable :: PAR(:,:,:,:,:,:)              !direct incoming PAR, [umol m-2 s-1]
   real(r8),target,allocatable :: CLASS(:,:,:,:)                !fractionction of leaves in different angle classes, [-]
-  real(r8),target,allocatable :: SURF(:,:,:,:,:,:,:)           !leaf surface area, [m2 d-2]
-  real(r8),target,allocatable :: SURFX(:,:,:,:,:,:,:)          !leaf irradiated surface area, [m2 d-2]
-  real(r8),target,allocatable :: SURFB(:,:,:,:,:,:)            !stem surface area, [m2 d-2]
+  real(r8),target,allocatable :: LeafA_lyrnodbrchpft(:,:,:,:,:,:,:)           !leaf surface area, [m2 d-2]
+  real(r8),target,allocatable :: LeafAUnshaded_seclyrnodbrpft(:,:,:,:,:,:,:)          !leaf irradiated surface area, [m2 d-2]
+  real(r8),target,allocatable :: StemA_lyrnodbrchpft(:,:,:,:,:,:)            !stem surface area, [m2 d-2]
 
   real(r8) :: TYSIN
   real(r8) :: dangle
@@ -60,28 +60,29 @@ module CanopyRadDataType
   allocate(OMEGX(JSA,JLI,JLA))
   allocate(IALBY(JSA,JLI,JLA))
   allocate(CLASS(JLI,JP,JY,JX))
-  allocate(SURF(JLI,JC,JNODS,JBR,JP,JY,JX))
-  allocate(SURFX(JLI,JC,JNODS,JBR,JP,JY,JX))
+  allocate(LeafA_lyrnodbrchpft(JLI,JC,JNODS,JBR,JP,JY,JX))
+  allocate(LeafAUnshaded_seclyrnodbrpft(JLI,JC,JNODS,JBR,JP,JY,JX))
   allocate(PAR(JLI,JSA,JC,JP,JY,JX))
   allocate(PARDIF(JLI,JSA,JC,JP,JY,JX))
-  allocate(SURFB(JLI,JC,JBR,JP,JY,JX))
+  allocate(StemA_lyrnodbrchpft(JLI,JC,JBR,JP,JY,JX))
 
   end subroutine InitAllocate
 !------------------------------------------------------------------------------------------
 
 
   subroutine DestructCanopyRad
+  use abortutils, only : destroy
   implicit none
-  if(allocated(ZSIN))  deallocate(ZSIN)
-  if(allocated(ZCOS))  deallocate(ZCOS)
-  if(allocated(OMEGA)) deallocate(OMEGA)
-  if(allocated(OMEGX)) deallocate(OMEGX)
-  if(allocated(IALBY)) deallocate(IALBY)
-  if(allocated(CLASS)) deallocate(CLASS)
-  if(allocated(SURF))  deallocate(SURF)
-  if(allocated(SURFX)) deallocate(SURFX)
-  if(allocated(PAR))   deallocate(PAR)
-  if(allocated(PARDIF))deallocate(PARDIF)
-  if(allocated(SURFB)) deallocate(SURFB)
+  call destroy(ZSIN)
+  call destroy(ZCOS)
+  call destroy(OMEGA)
+  call destroy(OMEGX)
+  call destroy(IALBY)
+  call destroy(CLASS)
+  call destroy(LeafA_lyrnodbrchpft)
+  call destroy(LeafAUnshaded_seclyrnodbrpft)
+  call destroy(PAR)
+  call destroy(PARDIF)
+  call destroy(StemA_lyrnodbrchpft)
   end subroutine DestructCanopyRad
 end module CanopyRadDataType

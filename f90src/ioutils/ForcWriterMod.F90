@@ -52,8 +52,8 @@ implicit none
     call ncd_defdim(ncf,'jsken',jsken,recordDimID)
     call ncd_defdim(ncf,'ndbiomcp',2,recordDimID)
     call ncd_defdim(ncf,'nlbiomcp',3,recordDimID)
-    call ncd_defdim(ncf,'NMICBSO',NMICBSO,recordDimID)
-    call ncd_defdim(ncf,'NMICBSA',NMICBSA,recordDimID)
+    call ncd_defdim(ncf,'NumOfMicrobs1HetertrophCmplx',NumOfMicrobs1HetertrophCmplx,recordDimID)
+    call ncd_defdim(ncf,'NumOfMicrobsInAutotrophCmplx',NumOfMicrobsInAutotrophCmplx,recordDimID)
 
     call ncd_defvar(ncf, 'pH', ncd_float, long_name='soil pH',  &
             units='none', missing_value=spval, fill_value=spval)
@@ -188,27 +188,27 @@ implicit none
             dim2name='jcplx',long_name='microbial residue P in each complex',  &
             units='gP d-2', missing_value=spval, fill_value=spval)
     call ncd_defvar(ncf, 'OMC', ncd_float, dim1name='nlbiomcp',&
-            dim2name='NMICBSO',dim3name='jcplx',&
+            dim2name='NumOfMicrobs1HetertrophCmplx',dim3name='jcplx',&
             long_name='microbial biomass C in each complex',  &
             units='gC d-2', missing_value=spval, fill_value=spval)
     call ncd_defvar(ncf, 'OMN', ncd_float, dim1name='nlbiomcp',&
-            dim2name='NMICBSO',dim3name='jcplx',&
+            dim2name='NumOfMicrobs1HetertrophCmplx',dim3name='jcplx',&
             long_name='microbial biomass N in each complex',  &
             units='gN d-2', missing_value=spval, fill_value=spval)
     call ncd_defvar(ncf, 'OMP', ncd_float, dim1name='nlbiomcp',&
-            dim2name='NMICBSO',dim3name='jcplx',&
+            dim2name='NumOfMicrobs1HetertrophCmplx',dim3name='jcplx',&
             long_name='microbial biomass P in each complex',  &
             units='gP d-2', missing_value=spval, fill_value=spval)
 
-    call ncd_defvar(ncf, 'OMCff', ncd_float, dim1name='nlbiomcp',dim2name='NMICBSA',&
+    call ncd_defvar(ncf, 'OMCff', ncd_float, dim1name='nlbiomcp',dim2name='NumOfMicrobsInAutotrophCmplx',&
             long_name='microbial biomass C in autotrophic complex',  &
             units='gC d-2', missing_value=spval, fill_value=spval)
 
-    call ncd_defvar(ncf, 'OMNff', ncd_float, dim1name='nlbiomcp',dim2name='NMICBSA',&
+    call ncd_defvar(ncf, 'OMNff', ncd_float, dim1name='nlbiomcp',dim2name='NumOfMicrobsInAutotrophCmplx',&
             long_name='microbial biomass N in autotrophic complex',  &
             units='gN d-2', missing_value=spval, fill_value=spval)
 
-    call ncd_defvar(ncf, 'OMPff', ncd_float, dim1name='nlbiomcp',dim2name='NMICBSA',&
+    call ncd_defvar(ncf, 'OMPff', ncd_float, dim1name='nlbiomcp',dim2name='NumOfMicrobsInAutotrophCmplx',&
             long_name='microbial biomass P in autotrophic complex',  &
             units='gP d-2', missing_value=spval, fill_value=spval)
 
@@ -281,9 +281,9 @@ implicit none
     call ncd_putvar(ncf,'CSO4',CSO4(L,NY,NX))
     call ncd_putvar(ncf,'CCL',CCL(L,NY,NX))
     call ncd_putvar(ncf,'CAL',CAL(L,NY,NX))
-    call ncd_putvar(ncf,'ZMG',trcsa_solml(idsa_Mg,L,NY,NX))
-    call ncd_putvar(ncf,'ZNA',trcsa_solml(idsa_Na,L,NY,NX))
-    call ncd_putvar(ncf,'ZKA',trcsa_solml(idsa_K,L,NY,NX))
+    call ncd_putvar(ncf,'ZMG',trcSalt_solml(idsalt_Mg,L,NY,NX))
+    call ncd_putvar(ncf,'ZNA',trcSalt_solml(idsalt_Na,L,NY,NX))
+    call ncd_putvar(ncf,'ZKA',trcSalt_solml(idsalt_K,L,NY,NX))
     call ncd_putvar(ncf,'CALPO',CALPO(L,NY,NX))
     call ncd_putvar(ncf,'CFEPO',CFEPO(L,NY,NX))
     call ncd_putvar(ncf,'CCAPD',CCAPD(L,NY,NX))

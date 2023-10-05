@@ -18,7 +18,7 @@ module TillageMixMod
   USE FlagDataType
   use EcoSIMCtrlDataType
   USE EcoSimSumDataType
-  use EcoSIMConfig , only : ndbiomcp => ndbiomcpc
+  use EcoSIMConfig , only : ndbiomcp => NumOfDeadMicrobiomComponents
   use UnitMod, only : units
   implicit none
   character(len=*),private, parameter :: mod_filename = __FILE__
@@ -33,29 +33,29 @@ module TillageMixMod
 
   integer :: K,N,M,L,LL,NGL,NTS
 
-  REAL(R8) :: TOSGC(jsken,0:micpar%n_litrsfk),TOSGA(jsken,0:micpar%n_litrsfk)
-  real(r8) :: TOSGN(jsken,0:micpar%n_litrsfk),TOSGP(jsken,0:micpar%n_litrsfk)
-  real(r8) :: TORXC(ndbiomcp,0:micpar%n_litrsfk)
-  real(r8) :: TORXN(ndbiomcp,0:micpar%n_litrsfk),TORXP(ndbiomcp,0:micpar%n_litrsfk)
-  real(r8) :: TOQGC(0:micpar%n_litrsfk),TOQGN(0:micpar%n_litrsfk)
-  real(r8) :: TOQGP(0:micpar%n_litrsfk),TOQHC(0:micpar%n_litrsfk)
-  real(r8) :: TOQHN(0:micpar%n_litrsfk),TOQHP(0:micpar%n_litrsfk)
-  real(r8) :: TOHGC(0:micpar%n_litrsfk),TOHGN(0:micpar%n_litrsfk)
-  real(r8) :: TOHGP(0:micpar%n_litrsfk),TOHGA(0:micpar%n_litrsfk)
-  real(r8) :: TOQGA(0:micpar%n_litrsfk),TOQHA(0:micpar%n_litrsfk)
+  REAL(R8) :: TOSGC(jsken,0:micpar%NumOfLitrCmplxs),TOSGA(jsken,0:micpar%NumOfLitrCmplxs)
+  real(r8) :: TOSGN(jsken,0:micpar%NumOfLitrCmplxs),TOSGP(jsken,0:micpar%NumOfLitrCmplxs)
+  real(r8) :: TORXC(ndbiomcp,0:micpar%NumOfLitrCmplxs)
+  real(r8) :: TORXN(ndbiomcp,0:micpar%NumOfLitrCmplxs),TORXP(ndbiomcp,0:micpar%NumOfLitrCmplxs)
+  real(r8) :: TOQGC(0:micpar%NumOfLitrCmplxs),TOQGN(0:micpar%NumOfLitrCmplxs)
+  real(r8) :: TOQGP(0:micpar%NumOfLitrCmplxs),TOQHC(0:micpar%NumOfLitrCmplxs)
+  real(r8) :: TOQHN(0:micpar%NumOfLitrCmplxs),TOQHP(0:micpar%NumOfLitrCmplxs)
+  real(r8) :: TOHGC(0:micpar%NumOfLitrCmplxs),TOHGN(0:micpar%NumOfLitrCmplxs)
+  real(r8) :: TOHGP(0:micpar%NumOfLitrCmplxs),TOHGA(0:micpar%NumOfLitrCmplxs)
+  real(r8) :: TOQGA(0:micpar%NumOfLitrCmplxs),TOQHA(0:micpar%NumOfLitrCmplxs)
 
-  real(r8) :: TOMGCff(nlbiomcp,NMICBSA)
-  real(r8) :: TOMGNff(nlbiomcp,NMICBSA)
-  real(r8) :: TOMGPff(nlbiomcp,NMICBSA)
-  real(r8) :: TOMGC(nlbiomcp,NMICBSO,1:jcplx)
-  real(r8) :: TOMGN(nlbiomcp,NMICBSO,1:jcplx)
-  real(r8) :: TOMGP(nlbiomcp,NMICBSO,1:jcplx)
-  REAL(R8) :: TOMC(nlbiomcp,NMICBSO,1:jcplx)
-  REAL(R8) :: TOMN(nlbiomcp,NMICBSO,1:jcplx)
-  REAL(R8) :: TOMP(nlbiomcp,NMICBSO,1:jcplx)
-  REAL(R8) :: TOMCff(nlbiomcp,NMICBSA)
-  REAL(R8) :: TOMNff(nlbiomcp,NMICBSA)
-  REAL(R8) :: TOMPff(nlbiomcp,NMICBSA)
+  real(r8) :: TOMGCff(nlbiomcp,NumOfMicrobsInAutotrophCmplx)
+  real(r8) :: TOMGNff(nlbiomcp,NumOfMicrobsInAutotrophCmplx)
+  real(r8) :: TOMGPff(nlbiomcp,NumOfMicrobsInAutotrophCmplx)
+  real(r8) :: TOMGC(nlbiomcp,NumOfMicrobs1HetertrophCmplx,1:jcplx)
+  real(r8) :: TOMGN(nlbiomcp,NumOfMicrobs1HetertrophCmplx,1:jcplx)
+  real(r8) :: TOMGP(nlbiomcp,NumOfMicrobs1HetertrophCmplx,1:jcplx)
+  REAL(R8) :: TOMC(nlbiomcp,NumOfMicrobs1HetertrophCmplx,1:jcplx)
+  REAL(R8) :: TOMN(nlbiomcp,NumOfMicrobs1HetertrophCmplx,1:jcplx)
+  REAL(R8) :: TOMP(nlbiomcp,NumOfMicrobs1HetertrophCmplx,1:jcplx)
+  REAL(R8) :: TOMCff(nlbiomcp,NumOfMicrobsInAutotrophCmplx)
+  REAL(R8) :: TOMNff(nlbiomcp,NumOfMicrobsInAutotrophCmplx)
+  REAL(R8) :: TOMPff(nlbiomcp,NumOfMicrobsInAutotrophCmplx)
   real(r8) :: TORC(ndbiomcp,1:jcplx)
   real(r8) :: TORN(ndbiomcp,1:jcplx)
   real(r8) :: TORP(ndbiomcp,1:jcplx)
@@ -84,7 +84,7 @@ module TillageMixMod
   real(r8) :: TX_solml(idx_beg:idx_end)
   real(r8) :: TP_salml(idsp_beg:idsp_end)
   real(r8) :: TG_gasml(idg_beg:idg_end-1)
-  real(r8) :: TSA_solml(idsa_beg:idsa_end)
+  real(r8) :: TSA_solml(idsalt_beg:idsalt_end)
   real(r8) :: TS_solml(ids_beg:ids_end)
   real(r8) :: TS0_solml(ids_beg:ids_end)   !surface mass for incoporation
   real(r8) :: TfertN_band(ifertn_beg:ifertnb_end)
@@ -107,7 +107,7 @@ module TillageMixMod
 !
     IFLGS(NY,NX)=1
     CORP=1.0_r8-XCORP(NY,NX)
-    ENGYP(NY,NX)=0.0_r8
+    EnergyImpact4Erosion(NY,NX)=0.0_r8
 !
 !     TEMPORARY ACCUMULATORS
 !
@@ -183,7 +183,7 @@ module TillageMixMod
     DN=0.0_r8
     DP=0.0_r8
 
-    DO  K=1,micpar%n_litrsfk
+    DO  K=1,micpar%NumOfLitrCmplxs
       DO  N=1,NFGs
         DO NGL=JGnio(N),JGnfo(N)
           DO  M=1,nlbiomcp
@@ -217,7 +217,7 @@ module TillageMixMod
       enddo
     ENDDO
 
-    DO K=1,micpar%n_litrsfk
+    DO K=1,micpar%NumOfLitrCmplxs
       DO M=1,ndbiomcp
         TORXC(M,K)=ORC(M,K,0,NY,NX)*CORP0
         TORXN(M,K)=ORN(M,K,0,NY,NX)*CORP0
@@ -381,8 +381,8 @@ module TillageMixMod
           TS_solml(NTS)=TS_solml(NTS)+TI*trc_solml(NTS,L,NY,NX)
         ENDDO
 
-        DO NTSA=idsa_beg,idsa_end
-          TSA_solml(NTSA)=TSA_solml(NTSA)+TI*trcsa_solml(NTSA,L,NY,NX)
+        DO NTSA=idsalt_beg,idsalt_end
+          TSA_solml(NTSA)=TSA_solml(NTSA)+TI*trcSalt_solml(NTSA,L,NY,NX)
         ENDDO
 !cation
         DO NTX=idx_CEC,idx_cation_end
@@ -508,10 +508,10 @@ module TillageMixMod
         ENDDO
 
         !SALT
-        DO NTSA=idsa_beg,idsa_end
-          trcsa_solml(NTSA,L,NY,NX)=TI*trcsa_solml(NTSA,L,NY,NX)  &
-            +CORP*(FI*TSA_solml(NTSA)-TI*trcsa_solml(NTSA,L,NY,NX)) &
-            +TX*trcsa_solml(NTSA,L,NY,NX)+CORP*trcsa_soHml(NTSA,L,NY,NX)
+        DO NTSA=idsalt_beg,idsalt_end
+          trcSalt_solml(NTSA,L,NY,NX)=TI*trcSalt_solml(NTSA,L,NY,NX)  &
+            +CORP*(FI*TSA_solml(NTSA)-TI*trcSalt_solml(NTSA,L,NY,NX)) &
+            +TX*trcSalt_solml(NTSA,L,NY,NX)+CORP*trcSalt_soHml(NTSA,L,NY,NX)
         ENDDO
 
         ! solute
@@ -616,7 +616,7 @@ module TillageMixMod
 !     ADD STATE VARIABLES IN SURFACE RESIDUE INCORPORATED
 !     WITHIN TILLAGE MIXING ZONE
 !
-        DO  K=1,micpar%n_litrsfk
+        DO  K=1,micpar%NumOfLitrCmplxs
           DO  N=1,NFGs
             DO NGL=JGnio(N),JGnfo(N)
               DO M=1,nlbiomcp
@@ -638,7 +638,7 @@ module TillageMixMod
           enddo
         ENDDO
 
-        DO K=1,micpar%n_litrsfk
+        DO K=1,micpar%NumOfLitrCmplxs
           DO  M=1,ndbiomcp
             ORC(M,K,L,NY,NX)=ORC(M,K,L,NY,NX)+FI*TORXC(M,K)
             ORN(M,K,L,NY,NX)=ORN(M,K,L,NY,NX)+FI*TORXN(M,K)
@@ -682,7 +682,7 @@ module TillageMixMod
           enddo
         ENDDO
 
-        DO  K=1,micpar%n_litrsfk
+        DO  K=1,micpar%NumOfLitrCmplxs
           DO  N=1,NFGs
             DO NGL=JGnio(N),JGnfo(N)
               DO  M=1,nlbiomcp
@@ -798,8 +798,8 @@ module TillageMixMod
     trc_soHml(NTS,L,NY,NX)=XCORP(NY,NX)*trc_soHml(NTS,L,NY,NX)
   ENDDO
 
-  DO NTSA=idsa_beg,idsa_end
-    trcsa_soHml(ntsa,L,NY,NX)=XCORP(NY,NX)*trcsa_soHml(ntsa,L,NY,NX)
+  DO NTSA=idsalt_beg,idsalt_end
+    trcSalt_soHml(ntsa,L,NY,NX)=XCORP(NY,NX)*trcSalt_soHml(ntsa,L,NY,NX)
   ENDDO
   end subroutine MixSoluteH
 

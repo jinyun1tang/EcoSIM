@@ -44,11 +44,11 @@ module StartqMod
 !     IFLGC=PFT flag:0=not active,1=active
 !     IYR0,IDAY0,IYRH,IDAYH=year,day of planting,arvesting
 !     PPI,PPX=initial,current population (m-2)
-!     CF,CFI=current,initial clumping factor
+!     CF,ClumpFactort0=current,initial clumping factor
 !     MaxCanPStomaResistH2O=cuticular resistance to water (h m-1)
 !     RCMX=cuticular resistance to CO2 (s m-1)
 !     CNWS,CPWS=protein:N,protein:P ratios
-!     CWSRT=maximum root protein concentration (g g-1)
+!    RootFracRemobilizableBiom=maximum root protein concentration (g g-1)
 !     O2I=intercellular O2 concentration in C3,C4 PFT (umol mol-1)
 !
 
@@ -84,13 +84,13 @@ module StartqMod
 !     FILL OUT UNUSED ARRAYS
 !
       D9986: DO NZ=NP(NY,NX)+1,JP
-        TESN0(1:npelms,NZ,NY,NX)=0._r8
-        TESNC(1:npelms,NZ,NY,NX)=0._r8
-        WTSTGE(1:npelms,NZ,NY,NX)=0._r8
+        TESN0(1:NumOfPlantChemElements,NZ,NY,NX)=0._r8
+        TESNC(1:NumOfPlantChemElements,NZ,NY,NX)=0._r8
+        WTSTGE(1:NumOfPlantChemElements,NZ,NY,NX)=0._r8
         D6401: DO L=1,NL(NY,NX)
-          DO  K=1,pltpar%n_pltlitrk
+          DO  K=1,pltpar%NumOfPlantLitrCmplxs
             DO  M=1,jskenc
-              ESNC(1:npelms,M,K,L,NZ,NY,NX)=0._r8
+              ESNC(1:NumOfPlantChemElements,M,K,L,NZ,NY,NX)=0._r8
             enddo
           enddo
         ENDDO D6401
@@ -112,13 +112,13 @@ module StartqMod
   IDAYH(NZ,NY,NX)=IDAYY(NZ,NY,NX)
   PPI(NZ,NY,NX)=PPZ(NZ,NY,NX)
   PPX(NZ,NY,NX)=PPI(NZ,NY,NX)
-  CF(NZ,NY,NX)=CFI(NZ,NY,NX)       !clumping factor
+  ClumpFactor(NZ,NY,NX)=ClumpFactort0(NZ,NY,NX)       !clumping factor
   
   MaxCanPStomaResistH2O(NZ,NY,NX)=RSMX(NZ,NY,NX)/3600.0_r8
   RCMX(NZ,NY,NX)=RSMX(NZ,NY,NX)*1.56_r8
   CNWS(NZ,NY,NX)=2.5_r8
   CPWS(NZ,NY,NX)=25.0_r8
-  CWSRT(NZ,NY,NX)=AMIN1(CNRT(NZ,NY,NX)*CNWS(NZ,NY,NX),CPRT(NZ,NY,NX)*CPWS(NZ,NY,NX))
+ RootFracRemobilizableBiom(NZ,NY,NX)=AMIN1(CNRT(NZ,NY,NX)*CNWS(NZ,NY,NX),CPRT(NZ,NY,NX)*CPWS(NZ,NY,NX))
   IF(ICTYP(NZ,NY,NX).EQ.ic3_photo)THEN
     O2I(NZ,NY,NX)=2.10E+05_r8
   ELSE
@@ -439,14 +439,14 @@ module StartqMod
   RSRR(2,NZ,NY,NX)=1.0E+04
   RSRA(2,NZ,NY,NX)=1.0E+12
 !
-!     PORTX=tortuosity for gas transport
+!     RootPoreTortu4Gas=tortuosity for gas transport
 !     RRADP=path length for radial diffusion within root (m)
 !     DMVL=volume:C ratio (m3 g-1)
 !     PrimRootSpecLen,SecndRootSpecLen=specific primary,secondary root length (m g-1)
 !     PrimRootXSecArea,SecndRootXSecArea=specific primary,secondary root area (m2 g-1)
 !
-  DO 500 N=1,2
-    PORTX(N,NZ,NY,NX)=RootPorosity(N,NZ,NY,NX)**1.33_r8
+  D500: DO N=1,2
+    RootPoreTortu4Gas(N,NZ,NY,NX)=RootPorosity(N,NZ,NY,NX)**1.33_r8
     RRADP(N,NZ,NY,NX)=LOG(1.0_r8/SQRT(AMAX1(0.01_r8,RootPorosity(N,NZ,NY,NX))))
     DMVL(N,NZ,NY,NX)=ppmc/(0.05_r8*(1.0-RootPorosity(N,NZ,NY,NX)))
     PrimRootSpecLen(N,NZ,NY,NX)=DMVL(N,NZ,NY,NX)/(PICON*MaxPrimRootRadius(N,NZ,NY,NX)**2)
@@ -457,7 +457,7 @@ module StartqMod
 !    2*SQRT(0.25*(1.0-RootPorosity(N,NZ,NY,NX)))
     PrimRootXSecArea(N,NZ,NY,NX)=PICON*MaxPrimRootRadius1(N,NZ,NY,NX)**2._r8
     SecndRootXSecArea(N,NZ,NY,NX)=PICON*MaxSecndRootRadius1(N,NZ,NY,NX)**2._r8
-500 CONTINUE
+  ENDDO D500 
   end subroutine InitDimensionsandUptake
 !------------------------------------------------------------------------------------------
 
@@ -476,7 +476,7 @@ module StartqMod
   IDTHP(NZ,NY,NX)=0
   IDTHR(NZ,NY,NX)=0
   NBT(NZ,NY,NX)=0
-  NBR(NZ,NY,NX)=0
+  NumOfBranches_pft(NZ,NY,NX)=0
   HypoctoylHeight(NZ,NY,NX)=0._r8
   CanopyHeight(NZ,NY,NX)=0._r8
   D10: DO NB=1,JBR
@@ -503,12 +503,12 @@ module StartqMod
     VRNZ(NB,NZ,NY,NX)=0._r8
     VRNS(NB,NZ,NY,NX)=VRNY(NB,NZ,NY,NX)
     VRNF(NB,NZ,NY,NX)=VRNZ(NB,NZ,NY,NX)
-    ATRP(NB,NZ,NY,NX)=0._r8
+    HourCounter4LeafOut_brch(NB,NZ,NY,NX)=0._r8
     FDBK(NB,NZ,NY,NX)=1.0
     FDBKX(NB,NZ,NY,NX)=1.0
     FLG4(NB,NZ,NY,NX)=0
     FLGZ(NB,NZ,NY,NX)=0
-    NBTB(NB,NZ,NY,NX)=0
+    BranchNumber_brchpft(NB,NZ,NY,NX)=0
     IDTHB(NB,NZ,NY,NX)=1
     D15: DO M=1,jpstgs
       IDAY(M,NB,NZ,NY,NX)=0
@@ -519,22 +519,22 @@ module StartqMod
 !
   WSTR(NZ,NY,NX)=0._r8
   CHILL(NZ,NY,NX)=0._r8
-  EPOOL(1:npelms,1:JBR,NZ,NY,NX)=0._r8
-  EPOLNB(1:npelms,1:JBR,NZ,NY,NX)=0._r8
-  WTSHTBE(1:npelms,1:JBR,NZ,NY,NX)=0._r8
-  WTSHEBE(1:npelms,1:JBR,NZ,NY,NX)=0._r8
-  WTSTKBE(1:npelms,1:JBR,NZ,NY,NX)=0._r8
-  WTLFBE(1:npelms,1:JBR,NZ,NY,NX)=0._r8
-  WTRSVBE(1:npelms,1:JBR,NZ,NY,NX)=0._r8
-  WTHSKBE(1:npelms,1:JBR,NZ,NY,NX)=0._r8
-  WTGRBE(1:npelms,1:JBR,NZ,NY,NX)=0._r8
-  WTEARBE(1:npelms,1:JBR,NZ,NY,NX)=0._r8
-  WTNDBE(1:npelms,1:JBR,NZ,NY,NX)=0._r8
-  RCELX(1:npelms,1:JBR,NZ,NY,NX)=0._r8
-  RCESX(1:npelms,1:JBR,NZ,NY,NX)=0._r8
-  WGSHEXE(1:npelms,1:JBR,NZ,NY,NX)=0._r8  
-  WTSTXBE(1:npelms,1:JBR,NZ,NY,NX)=0._r8
-  WGLFEX(1:npelms,1:JBR,NZ,NY,NX)=0._r8
+  EPOOL(1:NumOfPlantChemElements,1:JBR,NZ,NY,NX)=0._r8
+  EPOLNB(1:NumOfPlantChemElements,1:JBR,NZ,NY,NX)=0._r8
+  WTSHTBE(1:NumOfPlantChemElements,1:JBR,NZ,NY,NX)=0._r8
+  WTSHEBE(1:NumOfPlantChemElements,1:JBR,NZ,NY,NX)=0._r8
+  WTSTKBE(1:NumOfPlantChemElements,1:JBR,NZ,NY,NX)=0._r8
+  WTLFBE(1:NumOfPlantChemElements,1:JBR,NZ,NY,NX)=0._r8
+  WTRSVBE(1:NumOfPlantChemElements,1:JBR,NZ,NY,NX)=0._r8
+  WTHSKBE(1:NumOfPlantChemElements,1:JBR,NZ,NY,NX)=0._r8
+  WTGRBE(1:NumOfPlantChemElements,1:JBR,NZ,NY,NX)=0._r8
+  WTEARBE(1:NumOfPlantChemElements,1:JBR,NZ,NY,NX)=0._r8
+  WTNDBE(1:NumOfPlantChemElements,1:JBR,NZ,NY,NX)=0._r8
+  RCELX(1:NumOfPlantChemElements,1:JBR,NZ,NY,NX)=0._r8
+  RCESX(1:NumOfPlantChemElements,1:JBR,NZ,NY,NX)=0._r8
+  WGSHEXE(1:NumOfPlantChemElements,1:JBR,NZ,NY,NX)=0._r8  
+  WTSTXBE(1:NumOfPlantChemElements,1:JBR,NZ,NY,NX)=0._r8
+  WGLFEX(1:NumOfPlantChemElements,1:JBR,NZ,NY,NX)=0._r8
   
   D25: DO NB=1,JBR
     CanPBStalkC(NB,NZ,NY,NX)=0._r8
@@ -542,15 +542,15 @@ module StartqMod
     GRNXB(NB,NZ,NY,NX)=0._r8
     GRNOB(NB,NZ,NY,NX)=0._r8
     GRWTB(NB,NZ,NY,NX)=0._r8
-    CanPBLA(NB,NZ,NY,NX)=0._r8
+    CanopyBranchLeafA_pft(NB,NZ,NY,NX)=0._r8
     RNH3B(NB,NZ,NY,NX)=0._r8
     ARLFZ(NB,NZ,NY,NX)=0._r8
     CanPBranchHeight(NB,NZ,NY,NX)=0._r8
     
     D5: DO L=1,JC
-      CanPLBSA(L,NB,NZ,NY,NX)=0._r8
+      CanopyBranchStemApft_lyr(L,NB,NZ,NY,NX)=0._r8
       DO N=1,JLI
-        SURFB(N,L,NB,NZ,NY,NX)=0._r8
+        StemA_lyrnodbrchpft(N,L,NB,NZ,NY,NX)=0._r8
       enddo
     ENDDO D5
     DO K=0,JNODS
@@ -558,15 +558,15 @@ module StartqMod
       HTNODE(K,NB,NZ,NY,NX)=0._r8
       HTNODX(K,NB,NZ,NY,NX)=0._r8
       CanPSheathHeight(K,NB,NZ,NY,NX)=0._r8
-      WGLFE(1:npelms,K,NB,NZ,NY,NX)=0._r8
-      WGSHE(1:npelms,K,NB,NZ,NY,NX)=0._r8
-      WGNODE(1:npelms,K,NB,NZ,NY,NX)=0._r8
+      WGLFE(1:NumOfPlantChemElements,K,NB,NZ,NY,NX)=0._r8
+      WGSHE(1:NumOfPlantChemElements,K,NB,NZ,NY,NX)=0._r8
+      WGNODE(1:NumOfPlantChemElements,K,NB,NZ,NY,NX)=0._r8
       WSLF(K,NB,NZ,NY,NX)=0._r8
       WSSHE(K,NB,NZ,NY,NX)=0._r8
 
       D55: DO L=1,JC
         CanPLNBLA(L,K,NB,NZ,NY,NX)=0._r8
-        WGLFLE(1:npelms,L,K,NB,NZ,NY,NX)=0._r8
+        WGLFLE(1:NumOfPlantChemElements,L,K,NB,NZ,NY,NX)=0._r8
       ENDDO D55
       IF(K.NE.0)THEN
         CPOOL3(K,NB,NZ,NY,NX)=0._r8
@@ -575,35 +575,35 @@ module StartqMod
         CPOOL4(K,NB,NZ,NY,NX)=0._r8
         D45: DO L=1,JC
           DO N=1,JLI
-            SURF(N,L,K,NB,NZ,NY,NX)=0._r8
+            LeafA_lyrnodbrchpft(N,L,K,NB,NZ,NY,NX)=0._r8
           enddo
         ENDDO D45
       ENDIF
     enddo
   ENDDO D25
   D35: DO L=1,JC
-    ARLFV(L,NZ,NY,NX)=0._r8
-    WGLFV(L,NZ,NY,NX)=0._r8
-    CanPLSA(L,NZ,NY,NX)=0._r8
+    CanopyLeafApft_lyr(L,NZ,NY,NX)=0._r8
+    CanopyLeafCpft_lyr(L,NZ,NY,NX)=0._r8
+    CanopyStemApft_lyr(L,NZ,NY,NX)=0._r8
   ENDDO D35
-  EPOOLP(1:npelms,NZ,NY,NX)=0._r8
-  CEPOLP(1:npelms,NZ,NY,NX)=0._r8
-  CCPLNP(NZ,NY,NX)=0._r8
-  CanPShootElmMass(1:npelms,NZ,NY,NX)=0._r8
-  WTLFE(1:npelms,NZ,NY,NX)=0._r8
-  WTSHEE(1:npelms,NZ,NY,NX)=0._r8
-  WTSTKE(1:npelms,NZ,NY,NX)=0._r8
+  CanopyNonstructElements_pft(1:NumOfPlantChemElements,NZ,NY,NX)=0._r8
+  CanopyNonstructElementConc_pft(1:NumOfPlantChemElements,NZ,NY,NX)=0._r8
+  NoduleNonstructCconc_pft(NZ,NY,NX)=0._r8
+  CanPShootElmMass(1:NumOfPlantChemElements,NZ,NY,NX)=0._r8
+  WTLFE(1:NumOfPlantChemElements,NZ,NY,NX)=0._r8
+  WTSHEE(1:NumOfPlantChemElements,NZ,NY,NX)=0._r8
+  WTSTKE(1:NumOfPlantChemElements,NZ,NY,NX)=0._r8
   CanPStalkC(NZ,NY,NX)=0._r8
-  WTRSVE(1:npelms,NZ,NY,NX)=0._r8
-  WTHSKE(1:npelms,NZ,NY,NX)=0._r8
-  WTEARE(1:npelms,NZ,NY,NX)=0._r8
-  WTGRE(1:npelms,NZ,NY,NX)=0._r8
-  WTRTE(1:npelms,NZ,NY,NX)=0._r8
-  WTRTSE(1:npelms,NZ,NY,NX)=0._r8
-  WTNDE(1:npelms,NZ,NY,NX)=0._r8
-  CanPLeafShethC(NZ,NY,NX)=0._r8
+  WTRSVE(1:NumOfPlantChemElements,NZ,NY,NX)=0._r8
+  WTHSKE(1:NumOfPlantChemElements,NZ,NY,NX)=0._r8
+  WTEARE(1:NumOfPlantChemElements,NZ,NY,NX)=0._r8
+  WTGRE(1:NumOfPlantChemElements,NZ,NY,NX)=0._r8
+  WTRTE(1:NumOfPlantChemElements,NZ,NY,NX)=0._r8
+  WTRTSE(1:NumOfPlantChemElements,NZ,NY,NX)=0._r8
+  WTNDE(1:NumOfPlantChemElements,NZ,NY,NX)=0._r8
+  CanopyLeafShethC_pft(NZ,NY,NX)=0._r8
 
-  CanPLA(NZ,NY,NX)=0._r8
+  CanopyLeafA_pft(NZ,NY,NX)=0._r8
   WTRTA(NZ,NY,NX)=0._r8
   CanPSA(NZ,NY,NX)=0._r8
   end subroutine InitPlantPhenoMorphoBio
@@ -623,11 +623,11 @@ module StartqMod
 !
   IF(.not.is_restart().AND.is_first_year)THEN
     CARBN(NZ,NY,NX)=0._r8
-    TESN0(1:npelms,NZ,NY,NX)=0._r8
+    TESN0(1:NumOfPlantChemElements,NZ,NY,NX)=0._r8
     TCO2T(NZ,NY,NX)=0._r8
     TCO2A(NZ,NY,NX)=0._r8
-    TEUPTK(1:npelms,NZ,NY,NX)=0._r8
-    TESNC(1:npelms,NZ,NY,NX)=0._r8
+    TEUPTK(1:NumOfPlantChemElements,NZ,NY,NX)=0._r8
+    TESNC(1:NumOfPlantChemElements,NZ,NY,NX)=0._r8
     TZUPFX(NZ,NY,NX)=0._r8
     RNH3C(NZ,NY,NX)=0._r8
     TNH3C(NZ,NY,NX)=0._r8
@@ -637,11 +637,11 @@ module StartqMod
     VNH3F(NZ,NY,NX)=0._r8
     VN2OF(NZ,NY,NX)=0._r8
     VPO4F(NZ,NY,NX)=0._r8
-    THVSTE(1:npelms,NZ,NY,NX)=0._r8
-    HVSTE(1:npelms,NZ,NY,NX)=0._r8
-    RSETE(1:npelms,NZ,NY,NX)=0._r8
+    THVSTE(1:NumOfPlantChemElements,NZ,NY,NX)=0._r8
+    HVSTE(1:NumOfPlantChemElements,NZ,NY,NX)=0._r8
+    RSETE(1:NumOfPlantChemElements,NZ,NY,NX)=0._r8
     ETCanP(NZ,NY,NX)=0._r8
-    WTSTGE(1:npelms,NZ,NY,NX)=0._r8
+    WTSTGE(1:NumOfPlantChemElements,NZ,NY,NX)=0._r8
     WTSTDX=WTSTDI(NZ,NY,NX)*AREA(3,NU(NY,NX),NY,NX)
     D155: DO M=1,jskenc
       WTSTDE(ielmc,M,NZ,NY,NX)=WTSTDX*CFOPE(ielmc,icwood,M,NZ,NY,NX)
@@ -707,15 +707,15 @@ module StartqMod
   UPNF(NZ,NY,NX)=0._r8
   D40: DO N=1,pltpar%jroots
     D20: DO L=1,NL(NY,NX)
-      PopPlantRootH2OUptake_vr(N,L,NZ,NY,NX)=0._r8
+      AllPlantRootH2OUptake_vr(N,L,NZ,NY,NX)=0._r8
       PSIRoot(N,L,NZ,NY,NX)=-0.01
       PSIRootOSMO(N,L,NZ,NY,NX)=OSMO(NZ,NY,NX)+PSIRoot(N,L,NZ,NY,NX)
       PSIRootTurg(N,L,NZ,NY,NX)=AZMAX1(PSIRoot(N,L,NZ,NY,NX)-PSIRootOSMO(N,L,NZ,NY,NX))
-      EPOOLR(1:npelms,N,L,NZ,NY,NX)=0._r8
-      CEPOLR(1:npelms,N,L,NZ,NY,NX)=0._r8
-      CWSRTL(N,L,NZ,NY,NX)=CWSRT(NZ,NY,NX)
+      EPOOLR(1:NumOfPlantChemElements,N,L,NZ,NY,NX)=0._r8
+      RootNonstructElementConcpft_vr(1:NumOfPlantChemElements,N,L,NZ,NY,NX)=0._r8
+      RootProteinConc_pftvr(N,L,NZ,NY,NX)=RootFracRemobilizableBiom(NZ,NY,NX)
       WTRTL(N,L,NZ,NY,NX)=0._r8
-      RootCPZR(N,L,NZ,NY,NX)=0._r8
+      PopPlantRootC_vr(N,L,NZ,NY,NX)=0._r8
       WSRTL(N,L,NZ,NY,NX)=0._r8
       PrimRootXNumL(N,L,NZ,NY,NX)=0._r8
       SecndRootXNumL(N,L,NZ,NY,NX)=0._r8
@@ -763,20 +763,20 @@ module StartqMod
       D30: DO NR=1,JRS
         RTN2(N,L,NR,NZ,NY,NX)=0._r8
         PrimRootLen(N,L,NR,NZ,NY,NX)=0._r8
-        WTRT1E(1:npelms,N,L,NR,NZ,NY,NX)=0._r8
+        WTRT1E(1:NumOfPlantChemElements,N,L,NR,NZ,NY,NX)=0._r8
         SecndRootLen(N,L,NR,NZ,NY,NX)=0._r8
-        WTRT2E(1:npelms,N,L,NR,NZ,NY,NX)=0._r8
+        WTRT2E(1:NumOfPlantChemElements,N,L,NR,NZ,NY,NX)=0._r8
         PrimRootDepth(N,NR,NZ,NY,NX)=SeedinDepth(NZ,NY,NX)
-        RTWT1E(1:npelms,N,NR,NZ,NY,NX)=0._r8
+        RTWT1E(1:NumOfPlantChemElements,N,NR,NZ,NY,NX)=0._r8
       ENDDO D30
       IF(N.EQ.1)THEN
-        D6400: DO K=1,pltpar%n_pltlitrk
+        D6400: DO K=1,pltpar%NumOfPlantLitrCmplxs
           DO  M=1,jskenc
-            ESNC(1:npelms,M,K,L,NZ,NY,NX)=0._r8
+            ESNC(1:NumOfPlantChemElements,M,K,L,NZ,NY,NX)=0._r8
           enddo
         ENDDO D6400
-        EPOOLN(1:npelms,L,NZ,NY,NX)=0._r8
-        WTNDLE(1:npelms,L,NZ,NY,NX)=0._r8
+        EPOOLN(1:NumOfPlantChemElements,L,NZ,NY,NX)=0._r8
+        WTNDLE(1:NumOfPlantChemElements,L,NZ,NY,NX)=0._r8
         RUPNF(L,NZ,NY,NX)=0._r8
       ENDIF
     ENDDO D20
@@ -817,9 +817,9 @@ module StartqMod
   WTLFBE(ielmn,1,NZ,NY,NX)=CNGR(NZ,NY,NX)*WTLFBE(ielmc,1,NZ,NY,NX)
   WTLFBE(ielmp,1,NZ,NY,NX)=CPGR(NZ,NY,NX)*WTLFBE(ielmc,1,NZ,NY,NX)
   CanPBLeafShethC(1,NZ,NY,NX)=WTLFBE(ielmc,1,NZ,NY,NX)+WTSHEBE(ielmc,1,NZ,NY,NX)
-  CanPLeafShethC(NZ,NY,NX)=CanPLeafShethC(NZ,NY,NX)+CanPBLeafShethC(1,NZ,NY,NX)  
+  CanopyLeafShethC_pft(NZ,NY,NX)=CanopyLeafShethC_pft(NZ,NY,NX)+CanPBLeafShethC(1,NZ,NY,NX)  
   FDM=AMIN1(1.0_r8,0.16_r8-0.045_r8*PSICanP(NZ,NY,NX))
-  CanWatP(NZ,NY,NX)=ppmc*CanPLeafShethC(NZ,NY,NX)/FDM
+  CanWatP(NZ,NY,NX)=ppmc*CanopyLeafShethC_pft(NZ,NY,NX)/FDM
   WatByPCan(NZ,NY,NX)=0._r8
   EPOOL(ielmn,1,NZ,NY,NX)=CNGR(NZ,NY,NX)*EPOOL(ielmc,1,NZ,NY,NX)
   EPOOL(ielmp,1,NZ,NY,NX)=CPGR(NZ,NY,NX)*EPOOL(ielmc,1,NZ,NY,NX)
@@ -828,8 +828,8 @@ module StartqMod
   RTWT1E(ielmn,1,1,NZ,NY,NX)=CNGR(NZ,NY,NX)*RTWT1E(ielmc,1,1,NZ,NY,NX)
   RTWT1E(ielmp,1,1,NZ,NY,NX)=CPGR(NZ,NY,NX)*RTWT1E(ielmc,1,1,NZ,NY,NX)
   WTRTL(ipltroot,NGTopRootLayer(NZ,NY,NX),NZ,NY,NX)=WTRT1E(ielmc,ipltroot,NGTopRootLayer(NZ,NY,NX),1,NZ,NY,NX)
-  RootCPZR(ipltroot,NGTopRootLayer(NZ,NY,NX),NZ,NY,NX)=WTRT1E(ielmc,ipltroot,NGTopRootLayer(NZ,NY,NX),1,NZ,NY,NX)
-  WSRTL(1,NGTopRootLayer(NZ,NY,NX),NZ,NY,NX)=WTRTL(ipltroot,NGTopRootLayer(NZ,NY,NX),NZ,NY,NX)*CWSRT(NZ,NY,NX)
+  PopPlantRootC_vr(ipltroot,NGTopRootLayer(NZ,NY,NX),NZ,NY,NX)=WTRT1E(ielmc,ipltroot,NGTopRootLayer(NZ,NY,NX),1,NZ,NY,NX)
+  WSRTL(1,NGTopRootLayer(NZ,NY,NX),NZ,NY,NX)=WTRTL(ipltroot,NGTopRootLayer(NZ,NY,NX),NZ,NY,NX)*RootFracRemobilizableBiom(NZ,NY,NX)
   EPOOLR(ielmn,1,NGTopRootLayer(NZ,NY,NX),NZ,NY,NX)=CNGR(NZ,NY,NX)*EPOOLR(ielmc,1,NGTopRootLayer(NZ,NY,NX),NZ,NY,NX)
   EPOOLR(ielmp,1,NGTopRootLayer(NZ,NY,NX),NZ,NY,NX)=CPGR(NZ,NY,NX)*EPOOLR(ielmc,1,NGTopRootLayer(NZ,NY,NX),NZ,NY,NX)
   end subroutine InitSeedMorphoBio

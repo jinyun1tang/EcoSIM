@@ -90,57 +90,57 @@ implicit none
   implicit none
   class(micfluxtype) :: this
   integer :: jcplx,JG,NFGs
-  integer :: NMICBSO, NMICBSA
+  integer :: NumOfMicrobs1HetertrophCmplx, NumOfMicrobsInAutotrophCmplx
 
   jcplx=micpar%jcplx
   JG=micpar%jguilds
   NFGs=micpar%NFGs
-  NMICBSO=micpar%NMICBSO
-  NMICBSA=micpar%NMICBSA
+  NumOfMicrobs1HetertrophCmplx=micpar%NumOfMicrobs1HetertrophCmplx
+  NumOfMicrobsInAutotrophCmplx=micpar%NumOfMicrobsInAutotrophCmplx
   allocate(this%ROXSK(NPH));this%ROXSK = 0._r8
   allocate(this%XOQCS(1:jcplx));this%XOQCS=0._r8
   allocate(this%XOQNS(1:jcplx));this%XOQNS=0._r8
   allocate(this%XOQPS(1:jcplx));this%XOQPS=0._r8
   allocate(this%XOQAS(1:jcplx));this%XOQAS=0._r8
-  allocate(this%ROXYS(NMICBSO,1:jcplx));this%ROXYS=0._r8
-  allocate(this%ROQCS(NMICBSO,1:jcplx));this%ROQCS=0._r8
-  allocate(this%ROQAS(NMICBSO,1:jcplx));this%ROQAS=0._r8
-  allocate(this%RVMX3(NMICBSO,1:jcplx));this%RVMX3=0._r8
-  allocate(this%RVMB3(NMICBSO,1:jcplx));this%RVMB3=0._r8
-  allocate(this%RVMX2(NMICBSO,1:jcplx));this%RVMX2=0._r8
-  allocate(this%RVMB2(NMICBSO,1:jcplx));this%RVMB2=0._r8
-  allocate(this%RVMX1(NMICBSO,1:jcplx));this%RVMX1=0._r8
-  allocate(this%RVMX4(NMICBSO,1:jcplx));this%RVMX4=0._r8
-  allocate(this%RVMB4(NMICBSO,1:jcplx));this%RVMB4=0._r8
-  allocate(this%RINHO(NMICBSO,1:jcplx));this%RINHO=0._r8
-  allocate(this%RINHB(NMICBSO,1:jcplx));this%RINHB=0._r8
-  allocate(this%RINOO(NMICBSO,1:jcplx));this%RINOO=0._r8
-  allocate(this%RINOB(NMICBSO,1:jcplx));this%RINOB=0._r8
-  allocate(this%RIPOO(NMICBSO,1:jcplx));this%RIPOO=0._r8
-  allocate(this%RIPBO(NMICBSO,1:jcplx));this%RIPBO=0._r8
-  allocate(this%RIPO1(NMICBSO,1:jcplx));this%RIPO1=0._r8
-  allocate(this%RIPB1(NMICBSO,1:jcplx));this%RIPB1=0._r8
-  allocate(this%RINHOR(NMICBSO,1:jcplx));this%RINHOR=0._r8
-  allocate(this%RINOOR(NMICBSO,1:jcplx));this%RINOOR=0._r8
-  allocate(this%RIPOOR(NMICBSO,1:jcplx));this%RIPOOR=0._r8
-  allocate(this%RIPO1R(NMICBSO,1:jcplx));this%RIPO1R=0._r8
-  allocate(this%ROXYSff(NMICBSA));this%ROXYSff=0._r8
-  allocate(this%RINHOff(NMICBSA));this%RINHOff=0._r8
-  allocate(this%RINHBff(NMICBSA));this%RINHBff=0._r8
-  allocate(this%RINOOff(NMICBSA));this%RINOOff=0._r8
-  allocate(this%RINOBff(NMICBSA));this%RINOBff=0._r8
-  allocate(this%RIPOOff(NMICBSA));this%RIPOOff=0._r8
-  allocate(this%RIPBOff(NMICBSA));this%RIPBOff=0._r8
-  allocate(this%RIPO1ff(NMICBSA));this%RIPO1ff=0._r8
-  allocate(this%RIPB1ff(NMICBSA));this%RIPB1ff=0._r8
-  allocate(this%RINHORff(NMICBSA));this%RINHORff=0._r8
-  allocate(this%RINOORff(NMICBSA));this%RINOORff=0._r8
-  allocate(this%RIPOORff(NMICBSA));this%RIPOORff=0._r8
-  allocate(this%RIPO1Rff(NMICBSA));this%RIPO1Rff=0._r8
-  allocate(this%RVMX4ff(NMICBSA));this%RVMX4ff=0._r8
-  allocate(this%RVMB4ff(NMICBSA));this%RVMB4ff=0._r8
-  allocate(this%RVMX2ff(NMICBSA));this%RVMX2ff=0._r8
-  allocate(this%RVMB2ff(NMICBSA));this%RVMB2ff=0._r8
+  allocate(this%ROXYS(NumOfMicrobs1HetertrophCmplx,1:jcplx));this%ROXYS=0._r8
+  allocate(this%ROQCS(NumOfMicrobs1HetertrophCmplx,1:jcplx));this%ROQCS=0._r8
+  allocate(this%ROQAS(NumOfMicrobs1HetertrophCmplx,1:jcplx));this%ROQAS=0._r8
+  allocate(this%RVMX3(NumOfMicrobs1HetertrophCmplx,1:jcplx));this%RVMX3=0._r8
+  allocate(this%RVMB3(NumOfMicrobs1HetertrophCmplx,1:jcplx));this%RVMB3=0._r8
+  allocate(this%RVMX2(NumOfMicrobs1HetertrophCmplx,1:jcplx));this%RVMX2=0._r8
+  allocate(this%RVMB2(NumOfMicrobs1HetertrophCmplx,1:jcplx));this%RVMB2=0._r8
+  allocate(this%RVMX1(NumOfMicrobs1HetertrophCmplx,1:jcplx));this%RVMX1=0._r8
+  allocate(this%RVMX4(NumOfMicrobs1HetertrophCmplx,1:jcplx));this%RVMX4=0._r8
+  allocate(this%RVMB4(NumOfMicrobs1HetertrophCmplx,1:jcplx));this%RVMB4=0._r8
+  allocate(this%RINHO(NumOfMicrobs1HetertrophCmplx,1:jcplx));this%RINHO=0._r8
+  allocate(this%RINHB(NumOfMicrobs1HetertrophCmplx,1:jcplx));this%RINHB=0._r8
+  allocate(this%RINOO(NumOfMicrobs1HetertrophCmplx,1:jcplx));this%RINOO=0._r8
+  allocate(this%RINOB(NumOfMicrobs1HetertrophCmplx,1:jcplx));this%RINOB=0._r8
+  allocate(this%RIPOO(NumOfMicrobs1HetertrophCmplx,1:jcplx));this%RIPOO=0._r8
+  allocate(this%RIPBO(NumOfMicrobs1HetertrophCmplx,1:jcplx));this%RIPBO=0._r8
+  allocate(this%RIPO1(NumOfMicrobs1HetertrophCmplx,1:jcplx));this%RIPO1=0._r8
+  allocate(this%RIPB1(NumOfMicrobs1HetertrophCmplx,1:jcplx));this%RIPB1=0._r8
+  allocate(this%RINHOR(NumOfMicrobs1HetertrophCmplx,1:jcplx));this%RINHOR=0._r8
+  allocate(this%RINOOR(NumOfMicrobs1HetertrophCmplx,1:jcplx));this%RINOOR=0._r8
+  allocate(this%RIPOOR(NumOfMicrobs1HetertrophCmplx,1:jcplx));this%RIPOOR=0._r8
+  allocate(this%RIPO1R(NumOfMicrobs1HetertrophCmplx,1:jcplx));this%RIPO1R=0._r8
+  allocate(this%ROXYSff(NumOfMicrobsInAutotrophCmplx));this%ROXYSff=0._r8
+  allocate(this%RINHOff(NumOfMicrobsInAutotrophCmplx));this%RINHOff=0._r8
+  allocate(this%RINHBff(NumOfMicrobsInAutotrophCmplx));this%RINHBff=0._r8
+  allocate(this%RINOOff(NumOfMicrobsInAutotrophCmplx));this%RINOOff=0._r8
+  allocate(this%RINOBff(NumOfMicrobsInAutotrophCmplx));this%RINOBff=0._r8
+  allocate(this%RIPOOff(NumOfMicrobsInAutotrophCmplx));this%RIPOOff=0._r8
+  allocate(this%RIPBOff(NumOfMicrobsInAutotrophCmplx));this%RIPBOff=0._r8
+  allocate(this%RIPO1ff(NumOfMicrobsInAutotrophCmplx));this%RIPO1ff=0._r8
+  allocate(this%RIPB1ff(NumOfMicrobsInAutotrophCmplx));this%RIPB1ff=0._r8
+  allocate(this%RINHORff(NumOfMicrobsInAutotrophCmplx));this%RINHORff=0._r8
+  allocate(this%RINOORff(NumOfMicrobsInAutotrophCmplx));this%RINOORff=0._r8
+  allocate(this%RIPOORff(NumOfMicrobsInAutotrophCmplx));this%RIPOORff=0._r8
+  allocate(this%RIPO1Rff(NumOfMicrobsInAutotrophCmplx));this%RIPO1Rff=0._r8
+  allocate(this%RVMX4ff(NumOfMicrobsInAutotrophCmplx));this%RVMX4ff=0._r8
+  allocate(this%RVMB4ff(NumOfMicrobsInAutotrophCmplx));this%RVMB4ff=0._r8
+  allocate(this%RVMX2ff(NumOfMicrobsInAutotrophCmplx));this%RVMX2ff=0._r8
+  allocate(this%RVMB2ff(NumOfMicrobsInAutotrophCmplx));this%RVMB2ff=0._r8
 
   end subroutine Init
 !------------------------------------------------------------------------------------------
