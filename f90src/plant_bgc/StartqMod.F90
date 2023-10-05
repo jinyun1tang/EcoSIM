@@ -550,7 +550,7 @@ module StartqMod
     D5: DO L=1,JC
       CanopyBranchStemApft_lyr(L,NB,NZ,NY,NX)=0._r8
       DO N=1,JLI
-        SURFB(N,L,NB,NZ,NY,NX)=0._r8
+        StemA_lyrnodbrchpft(N,L,NB,NZ,NY,NX)=0._r8
       enddo
     ENDDO D5
     DO K=0,JNODS
@@ -575,7 +575,7 @@ module StartqMod
         CPOOL4(K,NB,NZ,NY,NX)=0._r8
         D45: DO L=1,JC
           DO N=1,JLI
-            SURF(N,L,K,NB,NZ,NY,NX)=0._r8
+            LeafA_lyrnodbrchpft(N,L,K,NB,NZ,NY,NX)=0._r8
           enddo
         ENDDO D45
       ENDIF

@@ -10,11 +10,11 @@ module SnowPhysData
 
   real(r8),allocatable ::  trcg_TBLS(:,:,:,:)
   real(r8),allocatable ::  trcn_TBLS(:,:,:,:)
-  real(r8),allocatable ::  trcsa_TBLS(:,:,:,:)                      !
+  real(r8),allocatable ::  trcSalt_TBLS(:,:,:,:)                      !
   real(r8),allocatable ::  TQS(:,:)                           !
-  real(r8),allocatable ::  trcsa_TQS(:,:,:)  
+  real(r8),allocatable ::  trcSalt_TQS(:,:,:)  
   real(r8),allocatable ::  trcn_TQR(:,:,:)                        !
-  real(r8),allocatable ::  trcsa_TQR(:,:,:)                         !
+  real(r8),allocatable ::  trcSalt_TQR(:,:,:)                         !
   real(r8),allocatable ::  trcg_QSS(:,:,:)
   real(r8),allocatable ::  trcn_QSS(:,:,:)
   real(r8),allocatable ::  trcg_TQR(:,:,:)                        !
@@ -60,10 +60,10 @@ module SnowPhysData
 
   allocate(trcg_TBLS(idg_beg:idg_end-1,JS,JY,JX));        trcg_TBLS=0._r8
   allocate(trcn_TBLS(ids_nut_beg:ids_nuts_end,JS,JY,JX)); trcn_TBLS=0._r8
-  allocate(trcsa_TBLS(idsa_beg:idsa_end,JS,JY,JX));       trcsa_TBLS=0._r8  
-  allocate(trcsa_TQS(idsa_beg:idsa_end,JY,JX));           trcsa_TQS=0._r8  
+  allocate(trcSalt_TBLS(idsalt_beg:idsalt_end,JS,JY,JX));       trcSalt_TBLS=0._r8  
+  allocate(trcSalt_TQS(idsalt_beg:idsalt_end,JY,JX));           trcSalt_TQS=0._r8  
   allocate(trcn_TQR(ids_nut_beg:ids_nuts_end,JY,JX));     trcn_TQR=0._r8  
-  allocate(trcsa_TQR(idsa_beg:idsa_end,JY,JX));           trcsa_TQR=0._r8  
+  allocate(trcSalt_TQR(idsalt_beg:idsalt_end,JY,JX));           trcSalt_TQR=0._r8  
   allocate(trcg_QSS(idg_beg:idg_end-1,JY,JX));            trcg_QSS=0._r8
   allocate(trcn_QSS(ids_nut_beg:ids_nuts_end,JY,JX));trcn_QSS=0._r8
   allocate(trcg_TQR(idg_beg:idg_end-1,JY,JX));      trcg_TQR=0._r8
@@ -109,9 +109,9 @@ module SnowPhysData
 
   call destroy(trcg_TBLS)
   call destroy(trcn_TBLS)
-  call destroy(trcsa_TBLS)
+  call destroy(trcSalt_TBLS)
   call destroy(trcn_TQR)  
-  call destroy(trcsa_TQR)
+  call destroy(trcSalt_TQR)
   call destroy(trcg_QSS)
   call destroy(trcn_QSS)  
   call destroy(trcg_TQR)
@@ -145,7 +145,7 @@ module SnowPhysData
   call destroy(VLSnoDWI1)
   call destroy(SnowLayerThick0)
   call destroy(XSnowThawMassL)  
-  call destroy(trcsa_TQS)
+  call destroy(trcSalt_TQS)
   call destroy(cumHeatFlx2LitRByRunoff)
   call destroy(TQS)
   call destroy(XIceThawMassL)  

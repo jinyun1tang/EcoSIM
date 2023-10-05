@@ -141,7 +141,8 @@ contains
     clm_file_in,soil_mgmt_in,forc_periods,NCYC_LITR,NCYC_SNOW,&
     NPXS,NPYS,JOUTS,continue_run,visual_out,restart_out,&
     finidat,restartFileFullPath,brnch_retain_casename,plant_model,microbial_model,&
-    soichem_model,atm_ghg_in,aco2_ppm,ao2_ppm,an2_ppm,an2_ppm,ach4_ppm,anh3_ppm
+    soichem_model,atm_ghg_in,aco2_ppm,ao2_ppm,an2_ppm,an2_ppm,ach4_ppm,anh3_ppm,&
+    snowRedist_model
 
   namelist /ecosim/hist_nhtfrq,hist_mfilt,hist_fincl1,hist_fincl2,hist_yrclose, &
     do_budgets,ref_date,start_date

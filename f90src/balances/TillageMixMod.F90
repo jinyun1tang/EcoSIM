@@ -84,7 +84,7 @@ module TillageMixMod
   real(r8) :: TX_solml(idx_beg:idx_end)
   real(r8) :: TP_salml(idsp_beg:idsp_end)
   real(r8) :: TG_gasml(idg_beg:idg_end-1)
-  real(r8) :: TSA_solml(idsa_beg:idsa_end)
+  real(r8) :: TSA_solml(idsalt_beg:idsalt_end)
   real(r8) :: TS_solml(ids_beg:ids_end)
   real(r8) :: TS0_solml(ids_beg:ids_end)   !surface mass for incoporation
   real(r8) :: TfertN_band(ifertn_beg:ifertnb_end)
@@ -107,7 +107,7 @@ module TillageMixMod
 !
     IFLGS(NY,NX)=1
     CORP=1.0_r8-XCORP(NY,NX)
-    ENGYP(NY,NX)=0.0_r8
+    EnergyImpact4Erosion(NY,NX)=0.0_r8
 !
 !     TEMPORARY ACCUMULATORS
 !
@@ -381,8 +381,8 @@ module TillageMixMod
           TS_solml(NTS)=TS_solml(NTS)+TI*trc_solml(NTS,L,NY,NX)
         ENDDO
 
-        DO NTSA=idsa_beg,idsa_end
-          TSA_solml(NTSA)=TSA_solml(NTSA)+TI*trcsa_solml(NTSA,L,NY,NX)
+        DO NTSA=idsalt_beg,idsalt_end
+          TSA_solml(NTSA)=TSA_solml(NTSA)+TI*trcSalt_solml(NTSA,L,NY,NX)
         ENDDO
 !cation
         DO NTX=idx_CEC,idx_cation_end
@@ -508,10 +508,10 @@ module TillageMixMod
         ENDDO
 
         !SALT
-        DO NTSA=idsa_beg,idsa_end
-          trcsa_solml(NTSA,L,NY,NX)=TI*trcsa_solml(NTSA,L,NY,NX)  &
-            +CORP*(FI*TSA_solml(NTSA)-TI*trcsa_solml(NTSA,L,NY,NX)) &
-            +TX*trcsa_solml(NTSA,L,NY,NX)+CORP*trcsa_soHml(NTSA,L,NY,NX)
+        DO NTSA=idsalt_beg,idsalt_end
+          trcSalt_solml(NTSA,L,NY,NX)=TI*trcSalt_solml(NTSA,L,NY,NX)  &
+            +CORP*(FI*TSA_solml(NTSA)-TI*trcSalt_solml(NTSA,L,NY,NX)) &
+            +TX*trcSalt_solml(NTSA,L,NY,NX)+CORP*trcSalt_soHml(NTSA,L,NY,NX)
         ENDDO
 
         ! solute
@@ -798,8 +798,8 @@ module TillageMixMod
     trc_soHml(NTS,L,NY,NX)=XCORP(NY,NX)*trc_soHml(NTS,L,NY,NX)
   ENDDO
 
-  DO NTSA=idsa_beg,idsa_end
-    trcsa_soHml(ntsa,L,NY,NX)=XCORP(NY,NX)*trcsa_soHml(ntsa,L,NY,NX)
+  DO NTSA=idsalt_beg,idsalt_end
+    trcSalt_soHml(ntsa,L,NY,NX)=XCORP(NY,NX)*trcSalt_soHml(ntsa,L,NY,NX)
   ENDDO
   end subroutine MixSoluteH
 

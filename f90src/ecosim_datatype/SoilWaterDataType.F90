@@ -34,9 +34,9 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  ExtWaterTablet0(:,:)              !initial external water table depth, elevation corrected [m]
   real(r8),target,allocatable ::  ExtWaterTable(:,:)                !current external water table depth, elevation corrected [m]
   real(r8),target,allocatable ::  DTBLI(:,:)                        !external water table depth, [m]
-  real(r8),target,allocatable ::  ENGYPM(:,:,:)                     !total energy impact for erosion
-  real(r8),target,allocatable ::  XVOLTM(:,:,:)                     !excess water+ice
-  real(r8),target,allocatable ::  XVLWatMicPM(:,:,:)                     !excess water
+  real(r8),target,allocatable ::  EnergyImpact4ErosionM(:,:,:)                     !total energy impact for erosion
+  real(r8),target,allocatable ::  XVLMobileWaterLitRM(:,:,:)                     !excess water+ice
+  real(r8),target,allocatable ::  XVLMobileWatMicPM(:,:,:)                     !excess water
   real(r8),target,allocatable ::  XVLiceMicPM(:,:,:)                     !excess ice
   real(r8),target,allocatable ::  HydroCond3D(:,:,:,:,:)                   !hydraulic conductivity at different moisture levels
   real(r8),target,allocatable ::  HydroCondMacP(:,:,:)                       !macropore hydraulic conductivity, [m MPa-1 h-1]
@@ -83,11 +83,11 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  UVLWatMicP(:,:)                        !total soil water content, [m3 d-2]
   real(r8),target,allocatable ::  UVOLO(:,:)                        !total subsurface water flux, [m3 d-2]
   real(r8),target,allocatable ::  UDRAIN(:,:)                       !total water drainage below root zone, [m3 d-2]
-  real(r8),target,allocatable ::  QR(:,:,:,:)                       !soil surface runoff water, [m3 d-2 h-1]
-  real(r8),target,allocatable ::  HQR(:,:,:,:)                      !soil surface runoff heat, [MJ d-2 h-1]
+  real(r8),target,allocatable ::  Wat2GridBySurfRunoff(:,:,:,:)                       !soil surface runoff water, [m3 d-2 h-1]
+  real(r8),target,allocatable ::  Heat2GridBySurfRunoff(:,:,:,:)                      !soil surface runoff heat, [MJ d-2 h-1]
   real(r8),target,allocatable ::  WQRH(:,:)                         !runoff from surface water, [m3 d-2 h-1]
-  real(r8),target,allocatable ::  FWatDischarge(:,:)                        !water discharge, [m3 d-2 h-1]
-  real(r8),target,allocatable ::  QRMN(:,:,:,:,:)                   !surface runoff,
+  real(r8),target,allocatable ::  FWatDischarge(:,:)                !water discharge, [m3 d-2 h-1]
+  real(r8),target,allocatable ::  QflxSurfRunoffM(:,:,:,:,:)        !surface runoff,
   private :: InitAllocate
   contains
 
@@ -128,9 +128,9 @@ module SoilWaterDataType
   allocate(ExtWaterTablet0(JY,JX));       ExtWaterTablet0=0._r8
   allocate(ExtWaterTable(JY,JX));       ExtWaterTable=0._r8
   allocate(DTBLI(JY,JX));       DTBLI=0._r8
-  allocate(ENGYPM(60,JY,JX));   ENGYPM=0._r8
-  allocate(XVOLTM(60,JY,JX));   XVOLTM=0._r8
-  allocate(XVLWatMicPM(60,JY,JX));   XVLWatMicPM=0._r8
+  allocate(EnergyImpact4ErosionM(60,JY,JX));   EnergyImpact4ErosionM=0._r8
+  allocate(XVLMobileWaterLitRM(60,JY,JX));   XVLMobileWaterLitRM=0._r8
+  allocate(XVLMobileWatMicPM(60,JY,JX));   XVLMobileWatMicPM=0._r8
   allocate(XVLiceMicPM(60,JY,JX));   XVLiceMicPM=0._r8
   allocate(HydroCond3D(3,100,0:JZ,JY,JX));HydroCond3D=0._r8
   allocate(HydroCondMacP(JZ,JY,JX));     HydroCondMacP=0._r8
@@ -177,11 +177,11 @@ module SoilWaterDataType
   allocate(UVLWatMicP(JY,JX));       UVLWatMicP=0._r8
   allocate(UVOLO(JY,JX));       UVOLO=0._r8
   allocate(UDRAIN(JY,JX));      UDRAIN=0._r8
-  allocate(QR(2,2,JV,JH));      QR=0._r8
-  allocate(HQR(2,2,JV,JH));     HQR=0._r8
+  allocate(Wat2GridBySurfRunoff(2,2,JV,JH));      Wat2GridBySurfRunoff=0._r8
+  allocate(Heat2GridBySurfRunoff(2,2,JV,JH));     Heat2GridBySurfRunoff=0._r8
   allocate(WQRH(JY,JX));        WQRH=0._r8
   allocate(FWatDischarge(JY,JX));       FWatDischarge=0._r8
-  allocate(QRMN(60,2,2,JV,JH)); QRMN=0._r8
+  allocate(QflxSurfRunoffM(60,2,2,JV,JH)); QflxSurfRunoffM=0._r8
   end subroutine InitAllocate
 
 !----------------------------------------------------------------------
@@ -214,9 +214,9 @@ module SoilWaterDataType
   call destroy(ExtWaterTablet0)
   call destroy(ExtWaterTable)
   call destroy(DTBLI)
-  call destroy(ENGYPM)
-  call destroy(XVOLTM)
-  call destroy(XVLWatMicPM)
+  call destroy(EnergyImpact4ErosionM)
+  call destroy(XVLMobileWaterLitRM)
+  call destroy(XVLMobileWatMicPM)
   call destroy(XVLiceMicPM)
   call destroy(HydroCond3D)
   call destroy(HydroCondMacP)
@@ -263,11 +263,11 @@ module SoilWaterDataType
   call destroy(UVLWatMicP)
   call destroy(UVOLO)
   call destroy(UDRAIN)
-  call destroy(QR)
-  call destroy(HQR)
+  call destroy(Wat2GridBySurfRunoff)
+  call destroy(Heat2GridBySurfRunoff)
   call destroy(WQRH)
   call destroy(FWatDischarge)
-  call destroy(QRMN)
+  call destroy(QflxSurfRunoffM)
   end subroutine DestructSoilWater
 
 end module SoilWaterDataType

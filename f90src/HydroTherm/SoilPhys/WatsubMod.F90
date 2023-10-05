@@ -173,19 +173,19 @@ module WatsubMod
   integer, intent(in) :: I,NHW,NHE,NVN,NVS
   integer :: NY,NX
 
-  integer :: L,LWDPTH
+  integer :: L,LyrIrrig
   real(r8) :: VLTSoiPore
 
   DX995: DO NX=NHW,NHE
     DX990: DO NY=NVN,NVS
 
     ! CDPTH=depth to bottom of soil layer
-    ! WDPTH,LWDPTH=depth,layer of subsurface irrigation
+    ! WDPTH,LyrIrrig=depth,layer of subsurface irrigation
 
       !identify the layer where irrigation is applied
       D65: DO L=NUM(NY,NX),NL(NY,NX)
         IF(CumDepth2LayerBottom(L,NY,NX).GE.WDPTH(I,NY,NX))THEN
-          LWDPTH=L
+          LyrIrrig=L
           exit
         ENDIF
       ENDDO D65
@@ -286,8 +286,8 @@ module WatsubMod
           write(*,*)'TKS(L,NY,NX)',L,TKS(L,NY,NX)
           call endrun(trim(mod_filename)//' at line',__LINE__)
         endif
-        !LWDPTH=layer number where irrigation is applied
-        IF(L.EQ.LWDPTH)THEN
+        !LyrIrrig=layer number where irrigation is applied
+        IF(L.EQ.LyrIrrig)THEN
           FWatIrrigate2MicP(L,NY,NX)=IrrigSubsurf(NY,NX)
           HeatIrrigation(L,NY,NX)=cpw*TairK(NY,NX)*IrrigSubsurf(NY,NX)
           FWatIrrigate2MicP1(L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*dts_HeatWatTP

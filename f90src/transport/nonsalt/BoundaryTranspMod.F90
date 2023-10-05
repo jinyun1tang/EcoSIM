@@ -215,9 +215,9 @@ module BoundaryTranspMod
 !     SOLUTE LOSS FROM RUNOFF DEPENDING ON ASPECT
 !     AND BOUNDARY CONDITIONS SET IN SITE FILE
 !
-    IF((NN.EQ.1.AND.QRMN(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
-      .OR.(NN.EQ.2.AND.QRMN(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
-      FQRM=QRMN(M,N,NN,M5,M4)/WatFlux4ErosionM(M,N2,N1)
+    IF((NN.EQ.1.AND.QflxSurfRunoffM(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
+      .OR.(NN.EQ.2.AND.QflxSurfRunoffM(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
+      FQRM=QflxSurfRunoffM(M,N,NN,M5,M4)/WatFlux4ErosionM(M,N2,N1)
       DO  K=1,jcplx
         RQROC(K,N,NN,M5,M4)=RQROC0(K,N2,N1)*FQRM
         RQRON(K,N,NN,M5,M4)=RQRON0(K,N2,N1)*FQRM
@@ -255,8 +255,8 @@ module BoundaryTranspMod
 !     SOLUTE GAIN FROM RUNON DEPENDING ON ASPECT
 !     AND BOUNDARY CONDITIONS SET IN SITE FILE
 !
-    ELSEIF((NN.EQ.2.AND.QRMN(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
-      .OR.(NN.EQ.1.AND.QRMN(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
+    ELSEIF((NN.EQ.2.AND.QflxSurfRunoffM(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
+      .OR.(NN.EQ.1.AND.QflxSurfRunoffM(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
       DO  K=1,jcplx
         RQROC(K,N,NN,M5,M4)=0.0_r8
         RQRON(K,N,NN,M5,M4)=0.0_r8
@@ -264,11 +264,11 @@ module BoundaryTranspMod
         RQROA(K,N,NN,M5,M4)=0.0_r8
       enddo
 
-      trcg_RQR(idg_CO2,N,NN,M5,M4)=QRMN(M,N,NN,M5,M4)*CCOU
-      trcg_RQR(idg_CH4,N,NN,M5,M4)=QRMN(M,N,NN,M5,M4)*CCHU
-      trcg_RQR(idg_O2,N,NN,M5,M4)=QRMN(M,N,NN,M5,M4)*COXU
-      trcg_RQR(idg_N2,N,NN,M5,M4)=QRMN(M,N,NN,M5,M4)*CNNU
-      trcg_RQR(idg_N2O,N,NN,M5,M4)=QRMN(M,N,NN,M5,M4)*CN2U
+      trcg_RQR(idg_CO2,N,NN,M5,M4)=QflxSurfRunoffM(M,N,NN,M5,M4)*CCOU
+      trcg_RQR(idg_CH4,N,NN,M5,M4)=QflxSurfRunoffM(M,N,NN,M5,M4)*CCHU
+      trcg_RQR(idg_O2,N,NN,M5,M4)=QflxSurfRunoffM(M,N,NN,M5,M4)*COXU
+      trcg_RQR(idg_N2,N,NN,M5,M4)=QflxSurfRunoffM(M,N,NN,M5,M4)*CNNU
+      trcg_RQR(idg_N2O,N,NN,M5,M4)=QflxSurfRunoffM(M,N,NN,M5,M4)*CN2U
       trcg_RQR(idg_H2,N,NN,M5,M4)=0.0_r8
       trcg_RQR(idg_NH3,N,NN,M5,M4)=0.0_r8
 

@@ -61,7 +61,7 @@ module SnowDataType
   real(r8),target, allocatable ::  trcs_solsml(:,:,:,:)               ! snowpack salt dissolved tracers
 
 
-  real(r8),target, allocatable ::  trcsa_XQS(:,:,:,:)                       !total salt in snow drift, [mol d-2 h-1]
+  real(r8),target, allocatable ::  trcSalt_XQS(:,:,:,:)                       !total salt in snow drift, [mol d-2 h-1]
 !----------------------------------------------------------------------
 
 contains
@@ -119,10 +119,10 @@ contains
   allocate(trcg_solsml(idg_beg:idg_end-1,JS,JY,JX));trcg_solsml=0._r8
   allocate(trcn_solsml(ids_nut_beg:ids_nuts_end,JS,JY,JX));trcn_solsml=0._r8
   if(salt_model)then
-    allocate(trcs_solsml(idsa_beg:idsa_end,JS,JY,JX)); trcs_solsml=0._r8
+    allocate(trcs_solsml(idsalt_beg:idsalt_end,JS,JY,JX)); trcs_solsml=0._r8
   endif
 
-  allocate(trcsa_XQS(idsa_beg:idsa_end,2,JV,JH));     trcsa_XQS=0._r8
+  allocate(trcSalt_XQS(idsalt_beg:idsalt_end,2,JV,JH));     trcSalt_XQS=0._r8
   end subroutine InitSnowData
 
 !----------------------------------------------------------------------
@@ -131,7 +131,7 @@ contains
   implicit none
   if(salt_model)then
     call destroy(trcs_solsml)
-    call destroy(trcsa_XQS)
+    call destroy(trcSalt_XQS)
   endif
   call destroy(VLSnowHeatCapM)
   call destroy(WatFlowInSnowM)
@@ -179,7 +179,7 @@ contains
   call destroy(XP4QSS)
   call destroy(XP1QSS)
   if(salt_model)then
-    call destroy(trcsa_XQS)
+    call destroy(trcSalt_XQS)
   endif
   end subroutine DestructSnowData
 

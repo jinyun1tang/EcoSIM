@@ -33,7 +33,7 @@ module AqueChemDatatype
   real(r8),target,allocatable ::  GKCN(:,:,:)                        !Ca-Na Gapon selectivity coefficient, [-]
   real(r8),target,allocatable ::  GKCK(:,:,:)                        !Ca-K Gapon selectivity coefficient, [-]
 
-  real(r8),target,allocatable :: trcsa_solml(:,:,:,:)                !soil aqueous salt content micropre, [mol d-2]
+  real(r8),target,allocatable :: trcSalt_solml(:,:,:,:)                !soil aqueous salt content micropre, [mol d-2]
   real(r8),target,allocatable :: trcx_solml(:,:,:,:)                 !exchangeable tracers
   real(r8),target,allocatable :: trcp_salml(:,:,:,:)                !salt precipitate in micropore
 
@@ -41,23 +41,23 @@ module AqueChemDatatype
   real(r8),target,allocatable ::  CSTR(:,:,:)                        !solution ion strength, [mol m-3]
   real(r8),target,allocatable ::  CION(:,:,:)                        !solution ion concentratiom, [mol m-3]
 
-  real(r8),target,allocatable :: trcsa_soHml(:,:,:,:)
-  real(r8),target,allocatable :: trcsa_XFHS(:,:,:,:,:)
-  real(r8),target,allocatable :: trcsa_XFLS(:,:,:,:,:)
+  real(r8),target,allocatable :: trcSalt_soHml(:,:,:,:)
+  real(r8),target,allocatable :: trcSalt_XFHS(:,:,:,:,:)
+  real(r8),target,allocatable :: trcSalt_XFLS(:,:,:,:,:)
 
   real(r8),target,allocatable ::  XOCFXS(:,:,:,:)                    !total DOC micropore-macropore transfer, [g d-2 h-1]
   real(r8),target,allocatable ::  XONFXS(:,:,:,:)                    !total DON micropore-macropore transfer, [g d-2 h-1]
   real(r8),target,allocatable ::  XOPFXS(:,:,:,:)                    !total DOP micropore-macropore transfer, [g d-2 h-1]
   real(r8),target,allocatable ::  XOAFXS(:,:,:,:)                    !total acetate micropore-macropore transfer, [g d-2 h-1]
   real(r8),target,allocatable ::  trcs_XFXS(:,:,:,:)                 !total non-salt solute micropore-macropore transfer, [g d-2 h-1]
-  real(r8),target,allocatable ::  trcsa_XFXS(:,:,:,:)                !total salt micropore-macropore transfer non-band, [g d-2 h-1]
+  real(r8),target,allocatable ::  trcSalt_XFXS(:,:,:,:)                !total salt micropore-macropore transfer non-band, [g d-2 h-1]
   real(r8),target,allocatable ::  TRN4S(:,:,:)                       !total solute NH4 transformation non-band, [mol d-2 h-1]
   real(r8),target,allocatable ::  TRN3S(:,:,:)                       !total solute NH3 transformation non-band, [mol d-2 h-1]
   real(r8),target,allocatable ::  TRN4B(:,:,:)                       !total solute NH4 transformation band, [mol d-2 h-1]
   real(r8),target,allocatable ::  TRNO3(:,:,:)                       !total solute NO3 transformation non-band, [mol d-2 h-1]
   real(r8),target,allocatable ::  TRN3B(:,:,:)                       !total solute NH3 transformation band, [mol d-2 h-1]
   real(r8),target,allocatable ::  TRNOB(:,:,:)                       !total solute NO3 transformation band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  trcsa_TR(:,:,:,:)                  !total salt solute transformation non-band, [mol d-2 h-1]
+  real(r8),target,allocatable ::  trcSalt_TR(:,:,:,:)                  !total salt solute transformation non-band, [mol d-2 h-1]
   real(r8),target,allocatable ::  TRH1P(:,:,:)                       !total solute HPO4 transformation non-band, [mol d-2 h-1]
   real(r8),target,allocatable ::  TRH2P(:,:,:)                       !total solute H2PO4 transformation non-band, [mol d-2 h-1]
   real(r8),target,allocatable ::  TRH1B(:,:,:)                       !total solute HPO4 transformation band, [mol d-2 h-1]
@@ -86,7 +86,7 @@ module AqueChemDatatype
   real(r8),target,allocatable ::  trcp_TR(:,:,:,:)                   !total precipitated P containing transformation non-band, [mol d-2 h-1]
   real(r8),target,allocatable ::  trcg_XBLS(:,:,:,:)
   real(r8),target,allocatable ::  trcn_XBLS(:,:,:,:)
-  real(r8),target,allocatable ::  trcsa_XBLS(:,:,:,:)
+  real(r8),target,allocatable ::  trcSalt_XBLS(:,:,:,:)
   real(r8),target,allocatable ::  XCOBLS(:,:,:)                      !wet deposition of CO2, [g d-2 h-1]
   real(r8),target,allocatable ::  XCHBLS(:,:,:)                      !wet deposition of CH4, [g d-2 h-1]
   real(r8),target,allocatable ::  XOXBLS(:,:,:)                      !wet deposition of O2, [g d-2 h-1]
@@ -177,7 +177,7 @@ module AqueChemDatatype
   allocate(GKCN(JZ,JY,JX));     GKCN=0._r8
   allocate(GKCK(JZ,JY,JX));     GKCK=0._r8
 
-  allocate(trcsa_solml(idsa_beg:idsab_end,0:JZ,JY,JX));trcsa_solml=0._r8
+  allocate(trcSalt_solml(idsalt_beg:idsaltb_end,0:JZ,JY,JX));trcSalt_solml=0._r8
   allocate(trcx_solml(idx_beg:idx_end,0:JZ,JY,JX));trcx_solml=0._r8
   allocate(trcp_salml(idsp_beg:idsp_end,0:JZ,JY,JX)); trcp_salml=0._r8
 
@@ -185,20 +185,20 @@ module AqueChemDatatype
   allocate(CSTR(JZ,JY,JX));     CSTR=0._r8
   allocate(CION(JZ,JY,JX));     CION=0._r8
 
-  allocate(trcsa_soHml(idsa_beg:idsab_end,JZ,JY,JX)); trcsa_soHml=0._r8
+  allocate(trcSalt_soHml(idsalt_beg:idsaltb_end,JZ,JY,JX)); trcSalt_soHml=0._r8
   allocate(XOCFXS(1:jcplx,JZ,JY,JX));XOCFXS=0._r8
   allocate(XONFXS(1:jcplx,JZ,JY,JX));XONFXS=0._r8
   allocate(XOPFXS(1:jcplx,JZ,JY,JX));XOPFXS=0._r8
   allocate(XOAFXS(1:jcplx,JZ,JY,JX));XOAFXS=0._r8
   allocate(trcs_XFXS(ids_beg:ids_end,JZ,JY,JX));   trcs_XFXS=0._r8
-  allocate(trcsa_XFXS(idsa_beg:idsab_end,JZ,JY,JX));   trcsa_XFXS=0._r8
+  allocate(trcSalt_XFXS(idsalt_beg:idsaltb_end,JZ,JY,JX));   trcSalt_XFXS=0._r8
   allocate(TRN4S(0:JZ,JY,JX));  TRN4S=0._r8
   allocate(TRN3S(0:JZ,JY,JX));  TRN3S=0._r8
   allocate(TRN4B(JZ,JY,JX));    TRN4B=0._r8
   allocate(TRNO3(0:JZ,JY,JX));  TRNO3=0._r8
   allocate(TRN3B(JZ,JY,JX));    TRN3B=0._r8
   allocate(TRNOB(JZ,JY,JX));    TRNOB=0._r8
-  allocate(trcsa_TR(idsa_beg:idsab_end,JZ,JY,JX));    trcsa_TR=0._r8
+  allocate(trcSalt_TR(idsalt_beg:idsaltb_end,JZ,JY,JX));    trcSalt_TR=0._r8
   allocate(trcx_TR(idx_beg:idx_end,0:JZ,JY,JX));  trcx_TR=0._r8
 
   allocate(TRH1P(0:JZ,JY,JX));  TRH1P=0._r8
@@ -229,9 +229,9 @@ module AqueChemDatatype
   allocate(trcg_XBLS(idg_beg:idg_end-1,JS,JY,JX)); trcg_XBLS=0._r8
   allocate(trcn_XBLS(ids_nut_beg:ids_nuts_end,JS,JY,JX)); trcn_XBLS=0._r8
   if(salt_model)then
-    allocate(trcsa_XBLS(idsa_beg:idsa_end,JS,JY,JX)); trcsa_XBLS=0._r8
-    allocate(trcsa_XFLS(idsa_beg:idsab_end,3,0:JD,JV,JH));trcsa_XFLS=0._r8
-    allocate(trcsa_XFHS(idsa_beg:idsab_end,3,JD,JV,JH));trcsa_XFHS=0._r8
+    allocate(trcSalt_XBLS(idsalt_beg:idsalt_end,JS,JY,JX)); trcSalt_XBLS=0._r8
+    allocate(trcSalt_XFLS(idsalt_beg:idsaltb_end,3,0:JD,JV,JH));trcSalt_XFLS=0._r8
+    allocate(trcSalt_XFHS(idsalt_beg:idsaltb_end,3,JD,JV,JH));trcSalt_XFHS=0._r8
   endif
   allocate(XCOBLS(JS,JY,JX));   XCOBLS=0._r8
   allocate(XCHBLS(JS,JY,JX));   XCHBLS=0._r8
@@ -315,17 +315,17 @@ module AqueChemDatatype
   call destroy(GKCN)
   call destroy(GKCK)
 
-  call destroy(trcsa_TR)
+  call destroy(trcSalt_TR)
   call destroy(trcx_solml)
-  call destroy(trcsa_solml)
-  call destroy(trcsa_soHml)
+  call destroy(trcSalt_solml)
+  call destroy(trcSalt_soHml)
   call destroy(trcp_salml)
   call destroy(ECND)
   call destroy(CSTR)
   call destroy(CION)
-  call destroy(trcsa_XFXS)
-  call destroy(trcsa_XFLS)
-  call destroy(trcsa_XFHS)
+  call destroy(trcSalt_XFXS)
+  call destroy(trcSalt_XFLS)
+  call destroy(trcSalt_XFHS)
   call destroy(XOCFXS)
   call destroy(XONFXS)
   call destroy(XOPFXS)

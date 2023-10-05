@@ -775,10 +775,10 @@ implicit none
     ARLF1    => plt_morph%ARLF1     , &
     CanPSheathHeight    => plt_morph%CanPSheathHeight     , &
     HTNODX   => plt_morph%HTNODX    , &
-    SURF     => plt_morph%SURF      , &
+    LeafA_lyrnodbrchpft     => plt_morph%LeafA_lyrnodbrchpft      , &
     HTNODE   => plt_morph%HTNODE    , &
     CanopyLeafApft_lyr    => plt_morph%CanopyLeafApft_lyr     , &
-    SURFB    => plt_morph%SURFB     , &
+    StemA_lyrnodbrchpft    => plt_morph%StemA_lyrnodbrchpft     , &
     CanPLNBLA    => plt_morph%CanPLNBLA       &
   )
 !
@@ -849,7 +849,7 @@ implicit none
       WGLFLE(1:NumOfPlantChemElements,L,K,NB,NZ)=0._r8
       IF(K.NE.0)THEN
         D8860: DO N=1,JLI1
-          SURF(N,L,K,NB,NZ)=0._r8
+          LeafA_lyrnodbrchpft(N,L,K,NB,NZ)=0._r8
         ENDDO D8860
       ENDIF
     ENDDO D8865
@@ -857,7 +857,7 @@ implicit none
   D8875: DO L=1,NumOfCanopyLayers1
     CanopyBranchStemApft_lyr(L,NB,NZ)=0._r8
     DO  N=1,JLI1
-      SURFB(N,L,NB,NZ)=0._r8
+      StemA_lyrnodbrchpft(N,L,NB,NZ)=0._r8
     enddo
   ENDDO D8875
   end associate

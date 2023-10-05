@@ -828,7 +828,7 @@ module StartsMod
   DYLN(:,:)=12.0_r8
   ALBX(:,:)=SoilAlbedo(:,:)
   XHVSTE(:,:,:)=0.0_r8
-  ENGYP(:,:)=0.0_r8
+  EnergyImpact4Erosion(:,:)=0.0_r8
   end subroutine InitAccumulators
 
 !------------------------------------------------------------------------------------------

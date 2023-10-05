@@ -10,6 +10,7 @@ implicit none
   logical :: plant_model  =.true.
   logical :: microbial_model   =.true.
   logical :: soichem_model=.true.
+  logical :: snowRedist_model=.true.
   real(r8) :: aco2_ppm  = 280._r8
   real(r8) :: ach4_ppm  = 1.144_r8
   real(r8) :: an2o_ppm  = 0.270_r8

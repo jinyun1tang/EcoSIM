@@ -473,7 +473,7 @@ implicit none
       ENDDO
       DO  L=1,JC
         DO N=1,JLI
-          SURFB(N,L,NB,NZ,NY,NX)=plt_morph%SURFB(N,L,NB,NZ)
+          StemA_lyrnodbrchpft(N,L,NB,NZ,NY,NX)=plt_morph%StemA_lyrnodbrchpft(N,L,NB,NZ)
         ENDDO
       ENDDO
       DO K=0,JNODS
@@ -488,8 +488,8 @@ implicit none
       DO K=1,JNODS
         DO  L=1,JC
           DO N=1,JLI
-            SURF(N,L,K,NB,NZ,NY,NX) =plt_morph%SURF(N,L,K,NB,NZ)
-            SURFX(N,L,K,NB,NZ,NY,NX)=plt_photo%SURFX(N,L,K,NB,NZ)
+            LeafA_lyrnodbrchpft(N,L,K,NB,NZ,NY,NX) =plt_morph%LeafA_lyrnodbrchpft(N,L,K,NB,NZ)
+            LeafAUnshaded_seclyrnodbrpft(N,L,K,NB,NZ,NY,NX)=plt_photo%LeafAUnshaded_seclyrnodbrpft(N,L,K,NB,NZ)
           ENDDO
         ENDDO
         CPOOL3(K,NB,NZ,NY,NX)=plt_photo%CPOOL3(K,NB,NZ)
@@ -924,7 +924,7 @@ implicit none
 
     plt_site%PPZ(NZ)=PPZ(NZ,NY,NX)
     plt_distb%IDAYY(NZ)=IDAYY(NZ,NY,NX)
-    plt_morph%CFX(NZ)=CFX(NZ,NY,NX)
+    plt_morph%ClumpFactort(NZ)=ClumpFactort(NZ,NY,NX)
     plt_site%DATAP(NZ)=DATAP(NZ,NY,NX)
     plt_pheno%GROUPI(NZ)=GROUPI(NZ,NY,NX)
     plt_biom%WTSHTA(NZ)=WTSHTA(NZ,NY,NX)
@@ -1301,8 +1301,8 @@ implicit none
       DO K=1,JNODS
         DO  L=1,JC
           DO N=1,JLI
-            plt_morph%SURF(N,L,K,NB,NZ) =SURF(N,L,K,NB,NZ,NY,NX)
-            plt_photo%SURFX(N,L,K,NB,NZ)=SURFX(N,L,K,NB,NZ,NY,NX)
+            plt_morph%LeafA_lyrnodbrchpft(N,L,K,NB,NZ) =LeafA_lyrnodbrchpft(N,L,K,NB,NZ,NY,NX)
+            plt_photo%LeafAUnshaded_seclyrnodbrpft(N,L,K,NB,NZ)=LeafAUnshaded_seclyrnodbrpft(N,L,K,NB,NZ,NY,NX)
           ENDDO
         ENDDO
         plt_photo%CPOOL3(K,NB,NZ)=CPOOL3(K,NB,NZ,NY,NX)
@@ -1549,7 +1549,7 @@ implicit none
   DO NZ=1,NP(NY,NX)
     plt_morph%CanopyLeafA_pft(NZ)=CanopyLeafA_pft(NZ,NY,NX)
     plt_morph%CanopyHeight(NZ)=CanopyHeight(NZ,NY,NX)
-    plt_morph%CFX(NZ)=CFX(NZ,NY,NX)
+    plt_morph%ClumpFactort(NZ)=ClumpFactort(NZ,NY,NX)
     plt_rad%CanopySWabsorpty_pft(NZ)=CanopySWabsorpty_pft(NZ,NY,NX)
     plt_rad%CanopyPARabsorpty_pft(NZ)=CanopyPARabsorpty_pft(NZ,NY,NX)
     plt_rad%TAUR(NZ)=TAUR(NZ,NY,NX)
@@ -1570,13 +1570,13 @@ implicit none
       DO K=1,JNODS
         DO  L=1,JC
           DO N=1,JLI
-            plt_morph%SURF(N,L,K,NB,NZ)=SURF(N,L,K,NB,NZ,NY,NX)
+            plt_morph%LeafA_lyrnodbrchpft(N,L,K,NB,NZ)=LeafA_lyrnodbrchpft(N,L,K,NB,NZ,NY,NX)
           ENDDO
         ENDDO
       ENDDO
       DO  L=1,JC
         DO N=1,JLI
-          plt_morph%SURFB(N,L,NB,NZ)=SURFB(N,L,NB,NZ,NY,NX)
+          plt_morph%StemA_lyrnodbrchpft(N,L,NB,NZ)=StemA_lyrnodbrchpft(N,L,NB,NZ,NY,NX)
         ENDDO
       ENDDO
     ENDDO
@@ -1634,7 +1634,7 @@ implicit none
     CanopyArea_pft(NZ,NY,NX)=plt_morph%CanopyArea_pft(NZ)
     SWRadByCanP(NZ,NY,NX) =plt_rad%SWRadByCanP(NZ)
     PARByCanP(NZ,NY,NX) =plt_rad%PARByCanP(NZ)
-    CFX(NZ,NY,NX)  =plt_morph%CFX(NZ)
+    ClumpFactort(NZ,NY,NX)  =plt_morph%ClumpFactort(NZ)
     FracPARByCanP(NZ,NY,NX)=plt_rad%FracPARByCanP(NZ)
 
     DO L=1,JC

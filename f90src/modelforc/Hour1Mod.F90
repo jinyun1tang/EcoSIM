@@ -368,8 +368,8 @@ module Hour1Mod
 !     WATER,SNOW,SOLUTE RUNOFF
 !
 
-      QR(1:2,1:2,NY,NX)=0.0_r8
-      HQR(1:2,1:2,NY,NX)=0.0_r8
+      Wat2GridBySurfRunoff(1:2,1:2,NY,NX)=0.0_r8
+      Heat2GridBySurfRunoff(1:2,1:2,NY,NX)=0.0_r8
 
       XOCQRS(1:jcplx,1:2,1:2,NY,NX)=0.0_r8
       XONQRS(1:jcplx,1:2,1:2,NY,NX)=0.0_r8
@@ -434,7 +434,7 @@ module Hour1Mod
   IF(IERSNG.EQ.1.OR.IERSNG.EQ.3)THEN
     DO NX=NHW,NHE+extragrid
       DO NY=NVN,NVS+extragrid
-        XSEDER(1:2,1:2,NY,NX)=0.0_r8
+        cumSedErosion(1:2,1:2,NY,NX)=0.0_r8
         XSANER(1:2,1:2,NY,NX)=0.0_r8
         XSILER(1:2,1:2,NY,NX)=0.0_r8
         XCLAER(1:2,1:2,NY,NX)=0.0_r8
@@ -490,13 +490,13 @@ module Hour1Mod
   DO  NX=NHW,NHE+extragrid
     DO  NY=NVN,NVS+extragrid
 
-      trcsa_XQR(idsa_beg:idsa_end,1:2,1:2,NY,NX)=0.0_r8
-      trcsa_XQS(idsa_beg:idsa_end,1:2,NY,NX)=0.0_r8
+      trcSalt_XQR(idsalt_beg:idsalt_end,1:2,1:2,NY,NX)=0.0_r8
+      trcSalt_XQS(idsalt_beg:idsalt_end,1:2,NY,NX)=0.0_r8
 
       DO  L=1,NL(NY,NX)+1
-        DO NSA=idsa_beg,idsab_end
-          trcsa_XFLS(NSA,1:3,L,NY,NX)=0.0_r8
-          trcsa_XFHS(NSA,1:3,L,NY,NX)=0.0_r8
+        DO NSA=idsalt_beg,idsaltb_end
+          trcSalt_XFLS(NSA,1:3,L,NY,NX)=0.0_r8
+          trcSalt_XFHS(NSA,1:3,L,NY,NX)=0.0_r8
         ENDDO
       ENDDO
     ENDDO
@@ -792,7 +792,7 @@ module Hour1Mod
   trcn_XBLS(ids_nut_beg:ids_nuts_end,1:JS,NY,NX)=0.0_r8
 
   IF(salt_model)THEN
-    trcsa_XBLS(idsa_beg:idsa_end,1:JS,NY,NX)=0.0_r8
+    trcSalt_XBLS(idsalt_beg:idsalt_end,1:JS,NY,NX)=0.0_r8
   ENDIF
   end subroutine SetHourlyAccumulators
 !------------------------------------------------------------------------------------------
@@ -926,13 +926,13 @@ module Hour1Mod
   REAL(R8) :: ZD50
   !     begin_execution
   !
-  !     DETS=soil detachability from rainfall impact
+  !     SoilDetachability4Erosion1=soil detachability from rainfall impact
   !     D50=average particle size
   !     CER,XER=parameters for runoff transport capacity
   !     ZD50=particle size effect on surface roughness
   !     VLS=hourly sinking rate
   !     COHS=soil cohesion
-  !     DETE=soil detachability
+  !     SoilDetachability4Erosion2=soil detachability
   !     ZM=surface roughness used in runoff velocity calculation in watsub.f
   !
   SoilMicPMassLayerMX(NY,NX)=AZMAX1(SoilMicPMassLayerMn(NY,NX)+MWC2Soil*ORGC(NU(NY,NX),NY,NX))
@@ -951,6 +951,7 @@ module Hour1Mod
     CSILT(NU(NY,NX),NY,NX)=1.0
     CCLAY(NU(NY,NX),NY,NX)=0.0_r8
   ENDIF
+  
   IF(IERSNG.EQ.2.OR.IERSNG.EQ.3)THEN
     D50=1.0_r8*CCLAY(NU(NY,NX),NY,NX)+10.0_r8*CSILT(NU(NY,NX),NY,NX) &
       +100.0_r8*CSAND(NU(NY,NX),NY,NX)+100.0_r8*CORGM
@@ -958,10 +959,12 @@ module Hour1Mod
     SoiSurfRoughness(NY,NX)=SoiSurfRoughnesst0(NY,NX)+ZD50+1.0_r8*VLitR(NY,NX)/AREA(3,0,NY,NX)
     CER(NY,NX)=((D50+5.0_r8)/0.32_r8)**(-0.6_r8)
     XER(NY,NX)=((D50+5.0_r8)/300.0_r8)**0.25_r8
-    DETS(NY,NX)=ppmc*(1.0_r8+2.0_r8*(1.0_r8-CSILT(NU(NY,NX),NY,NX)-CORGM))
+
+    SoilDetachability4Erosion1(NY,NX)=ppmc*(1.0_r8+2.0_r8*(1.0_r8-CSILT(NU(NY,NX),NY,NX)-CORGM))
     COHS=2.0_r8+10.0_r8*(CCLAY(NU(NY,NX),NY,NX)+CORGM) &
       +5.0_r8*(1.0_r8-EXP(-2.0E-06_r8*RTDNT(NU(NY,NX),NY,NX)))
-    DETE(NY,NX)=0.79_r8*EXP(-0.85_r8*AMAX1(1.0_r8,COHS))
+    SoilDetachability4Erosion2(NY,NX)=0.79_r8*EXP(-0.85_r8*AMAX1(1.0_r8,COHS))
+
     ParticleDensitySurfLay(NY,NX)=1.30_r8*CORGM+2.66_r8*(1.0_r8-CORGM)
     VISCWL=VISCW*EXP(0.533_r8-0.0267_r8*TCS(0,NY,NX))
     VLS(NY,NX)=3.6E+03_r8*9.8_r8*(ParticleDensitySurfLay(NY,NX)-1.0_r8) &
@@ -1203,9 +1206,9 @@ module Hour1Mod
         trc_solcl(ids_H1PO4,L,NY,NX)=AZMAX1(trc_solml(ids_H1PO4,L,NY,NX)/(VLWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)))
         trc_solcl(ids_H2PO4,L,NY,NX)=AZMAX1(trc_solml(ids_H2PO4,L,NY,NX)/(VLWatMicP(L,NY,NX)*trcs_VLN(ids_H2PO4,L,NY,NX)))
 
-        CPO4S(L,NY,NX)=AZMAX1(((trcsa_solml(idsa_H0PO4,L,NY,NX)+trcsa_solml(idsa_H3PO4,L,NY,NX) &
-          +trcsa_solml(idsa_FeHPO4,L,NY,NX)+trcsa_solml(idsa_FeH2PO4,L,NY,NX)+trcsa_solml(idsa_CaPO4,L,NY,NX) &
-          +trcsa_solml(idsa_CaHPO4,L,NY,NX)+trcsa_solml(idsa_CaH2PO4,L,NY,NX)+trcsa_solml(idsa_MgHPO4,L,NY,NX))*patomw &
+        CPO4S(L,NY,NX)=AZMAX1(((trcSalt_solml(idsalt_H0PO4,L,NY,NX)+trcSalt_solml(idsalt_H3PO4,L,NY,NX) &
+          +trcSalt_solml(idsalt_FeHPO4,L,NY,NX)+trcSalt_solml(idsalt_FeH2PO4,L,NY,NX)+trcSalt_solml(idsalt_CaPO4,L,NY,NX) &
+          +trcSalt_solml(idsalt_CaHPO4,L,NY,NX)+trcSalt_solml(idsalt_CaH2PO4,L,NY,NX)+trcSalt_solml(idsalt_MgHPO4,L,NY,NX))*patomw &
           +trc_solml(ids_H1PO4,L,NY,NX)+trc_solml(ids_H2PO4,L,NY,NX))/(VLWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)))
       ELSE
         trc_solcl(ids_H1PO4,L,NY,NX)=0.0_r8
@@ -1238,9 +1241,9 @@ module Hour1Mod
         trc_solcl(ids_H1PO4B,L,NY,NX)=AZMAX1(trc_solml(ids_H1PO4B,L,NY,NX)/(VLWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)))
         trc_solcl(ids_H2PO4B,L,NY,NX)=AZMAX1(trc_solml(ids_H2PO4B,L,NY,NX)/(VLWatMicP(L,NY,NX)*trcs_VLN(ids_H2PO4B,L,NY,NX)))
 
-        CPO4B(L,NY,NX)=AZMAX1(((trcsa_solml(idsa_H0PO4B,L,NY,NX)+trcsa_solml(idsa_H3PO4B,L,NY,NX) &
-          +trcsa_solml(idsa_FeHPO4B,L,NY,NX)+trcsa_solml(idsa_FeH2PO4B,L,NY,NX)+trcsa_solml(idsa_CaPO4B,L,NY,NX) &
-          +trcsa_solml(idsa_CaHPO4B,L,NY,NX)+trcsa_solml(idsa_CaH2PO4B,L,NY,NX)+trcsa_solml(idsa_MgHPO4B,L,NY,NX))*patomw &
+        CPO4B(L,NY,NX)=AZMAX1(((trcSalt_solml(idsalt_H0PO4B,L,NY,NX)+trcSalt_solml(idsalt_H3PO4B,L,NY,NX) &
+          +trcSalt_solml(idsalt_FeHPO4B,L,NY,NX)+trcSalt_solml(idsalt_FeH2PO4B,L,NY,NX)+trcSalt_solml(idsalt_CaPO4B,L,NY,NX) &
+          +trcSalt_solml(idsalt_CaHPO4B,L,NY,NX)+trcSalt_solml(idsalt_CaH2PO4B,L,NY,NX)+trcSalt_solml(idsalt_MgHPO4B,L,NY,NX))*patomw &
           +trc_solml(ids_H1PO4B,L,NY,NX)+trc_solml(ids_H2PO4B,L,NY,NX))/(VLWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)))
       ELSE
         trc_solcl(ids_H1PO4B,L,NY,NX)=0.0_r8
@@ -1373,35 +1376,35 @@ module Hour1Mod
 !   ZC3,ZA3,ZC2,ZA2,ZC1,ZA1=total tri-,di-,univalent cations C,anions A
 !   CSTR,CION=ion strength, total ion concentration
 !
-      ZC3=trcsa_solml(idsa_Al,L,NY,NX)+trcsa_solml(idsa_Fe,L,NY,NX)
-      ZA3=trcsa_solml(idsa_H0PO4,L,NY,NX)+trcsa_solml(idsa_H0PO4B,L,NY,NX)
-      ZC2=trcsa_solml(idsa_Ca,L,NY,NX)+trcsa_solml(idsa_Mg,L,NY,NX) &
-        +trcsa_solml(idsa_AlOH,L,NY,NX)+trcsa_solml(idsa_FeOH,L,NY,NX) &
-        +trcsa_solml(idsa_FeH2PO4,L,NY,NX)+trcsa_solml(idsa_FeH2PO4B,L,NY,NX)
-      ZA2=trcsa_solml(idsa_SO4,L,NY,NX)+trcsa_solml(idsa_CO3,L,NY,NX)+trc_solml(ids_H1PO4,L,NY,NX)+trc_solml(ids_H1PO4B,L,NY,NX)
+      ZC3=trcSalt_solml(idsalt_Al,L,NY,NX)+trcSalt_solml(idsalt_Fe,L,NY,NX)
+      ZA3=trcSalt_solml(idsalt_H0PO4,L,NY,NX)+trcSalt_solml(idsalt_H0PO4B,L,NY,NX)
+      ZC2=trcSalt_solml(idsalt_Ca,L,NY,NX)+trcSalt_solml(idsalt_Mg,L,NY,NX) &
+        +trcSalt_solml(idsalt_AlOH,L,NY,NX)+trcSalt_solml(idsalt_FeOH,L,NY,NX) &
+        +trcSalt_solml(idsalt_FeH2PO4,L,NY,NX)+trcSalt_solml(idsalt_FeH2PO4B,L,NY,NX)
+      ZA2=trcSalt_solml(idsalt_SO4,L,NY,NX)+trcSalt_solml(idsalt_CO3,L,NY,NX)+trc_solml(ids_H1PO4,L,NY,NX)+trc_solml(ids_H1PO4B,L,NY,NX)
 
-      ZC1=(trc_solml(ids_NH4,L,NY,NX)+trc_solml(ids_NH4B,L,NY,NX))/natomw+trcsa_solml(idsa_Hp,L,NY,NX) &
-        +trcsa_solml(idsa_Na,L,NY,NX)+trcsa_solml(idsa_K,L,NY,NX) &
-        +trcsa_solml(idsa_AlOH2,L,NY,NX)+trcsa_solml(idsa_FeOH2,L,NY,NX) &
-        +trcsa_solml(idsa_AlSO4,L,NY,NX)+trcsa_solml(idsa_FeSO4,L,NY,NX) &
-        +trcsa_solml(idsa_CaOH2,L,NY,NX)+trcsa_solml(idsa_CaHCO3,L,NY,NX) &
-        +trcsa_solml(idsa_MgOH2,L,NY,NX)+trcsa_solml(idsa_MgHCO3,L,NY,NX)&
-        +trcsa_solml(idsa_FeHPO4,L,NY,NX)+trcsa_solml(idsa_FeHPO4B,L,NY,NX) &
-        +trcsa_solml(idsa_CaH2PO4,L,NY,NX)+trcsa_solml(idsa_CaH2PO4B,L,NY,NX)
+      ZC1=(trc_solml(ids_NH4,L,NY,NX)+trc_solml(ids_NH4B,L,NY,NX))/natomw+trcSalt_solml(idsalt_Hp,L,NY,NX) &
+        +trcSalt_solml(idsalt_Na,L,NY,NX)+trcSalt_solml(idsalt_K,L,NY,NX) &
+        +trcSalt_solml(idsalt_AlOH2,L,NY,NX)+trcSalt_solml(idsalt_FeOH2,L,NY,NX) &
+        +trcSalt_solml(idsalt_AlSO4,L,NY,NX)+trcSalt_solml(idsalt_FeSO4,L,NY,NX) &
+        +trcSalt_solml(idsalt_CaOH2,L,NY,NX)+trcSalt_solml(idsalt_CaHCO3,L,NY,NX) &
+        +trcSalt_solml(idsalt_MgOH2,L,NY,NX)+trcSalt_solml(idsalt_MgHCO3,L,NY,NX)&
+        +trcSalt_solml(idsalt_FeHPO4,L,NY,NX)+trcSalt_solml(idsalt_FeHPO4B,L,NY,NX) &
+        +trcSalt_solml(idsalt_CaH2PO4,L,NY,NX)+trcSalt_solml(idsalt_CaH2PO4B,L,NY,NX)
 
-      ZA1=(trc_solml(ids_NO3,L,NY,NX)+trc_solml(ids_NO3B,L,NY,NX))/natomw+trcsa_solml(idsa_OH,L,NY,NX) &
-        +trcsa_solml(idsa_HCO3,L,NY,NX)+trcsa_solml(idsa_Cl,L,NY,NX) &
-        +trcsa_solml(idsa_AlOH4,L,NY,NX)+trcsa_solml(idsa_FeOH4,L,NY,NX) &
-        +trcsa_solml(idsa_NaCO3,L,NY,NX)+trcsa_solml(idsa_NaSO4,L,NY,NX) &
-        +trcsa_solml(idsa_KSO4,L,NY,NX)+(trc_solml(ids_H2PO4,L,NY,NX) &
-        +trc_solml(ids_H2PO4B,L,NY,NX))/patomw+trcsa_solml(idsa_CaPO4,L,NY,NX) &
-        +trcsa_solml(idsa_CaPO4B,L,NY,NX)
+      ZA1=(trc_solml(ids_NO3,L,NY,NX)+trc_solml(ids_NO3B,L,NY,NX))/natomw+trcSalt_solml(idsalt_OH,L,NY,NX) &
+        +trcSalt_solml(idsalt_HCO3,L,NY,NX)+trcSalt_solml(idsalt_Cl,L,NY,NX) &
+        +trcSalt_solml(idsalt_AlOH4,L,NY,NX)+trcSalt_solml(idsalt_FeOH4,L,NY,NX) &
+        +trcSalt_solml(idsalt_NaCO3,L,NY,NX)+trcSalt_solml(idsalt_NaSO4,L,NY,NX) &
+        +trcSalt_solml(idsalt_KSO4,L,NY,NX)+(trc_solml(ids_H2PO4,L,NY,NX) &
+        +trc_solml(ids_H2PO4B,L,NY,NX))/patomw+trcSalt_solml(idsalt_CaPO4,L,NY,NX) &
+        +trcSalt_solml(idsalt_CaPO4B,L,NY,NX)
 
       ZN=trc_solml(idg_CO2,L,NY,NX)/catomw+trc_solml(idg_CH4,L,NY,NX)/catomw+trc_solml(idg_O2,L,NY,NX)/32.0 &
         +(trc_solml(idg_N2,L,NY,NX)+trc_solml(idg_N2O,L,NY,NX)+trc_solml(idg_NH3,L,NY,NX)+trc_solml(idg_NH3B,L,NY,NX))/natomw &
-        +trcsa_solml(idsa_AlOH3,L,NY,NX)+trcsa_solml(idsa_FeOH3,L,NY,NX)+trcsa_solml(idsa_CaCO3,L,NY,NX)+trcsa_solml(idsa_CaSO4,L,NY,NX) &
-        +trcsa_solml(idsa_MgCO3,L,NY,NX)+trcsa_solml(idsa_MgSO4,L,NY,NX)+trcsa_solml(idsa_H3PO4,L,NY,NX)+trcsa_solml(idsa_CaHPO4,L,NY,NX) &
-        +trcsa_solml(idsa_MgHPO4,L,NY,NX)+trcsa_solml(idsa_H3PO4B,L,NY,NX)+trcsa_solml(idsa_CaHPO4B,L,NY,NX)+trcsa_solml(idsa_MgHPO4B,L,NY,NX)
+        +trcSalt_solml(idsalt_AlOH3,L,NY,NX)+trcSalt_solml(idsalt_FeOH3,L,NY,NX)+trcSalt_solml(idsalt_CaCO3,L,NY,NX)+trcSalt_solml(idsalt_CaSO4,L,NY,NX) &
+        +trcSalt_solml(idsalt_MgCO3,L,NY,NX)+trcSalt_solml(idsalt_MgSO4,L,NY,NX)+trcSalt_solml(idsalt_H3PO4,L,NY,NX)+trcSalt_solml(idsalt_CaHPO4,L,NY,NX) &
+        +trcSalt_solml(idsalt_MgHPO4,L,NY,NX)+trcSalt_solml(idsalt_H3PO4B,L,NY,NX)+trcSalt_solml(idsalt_CaHPO4B,L,NY,NX)+trcSalt_solml(idsalt_MgHPO4B,L,NY,NX)
 
       ZION1=ABS(3.0_r8*(ZC3-ZA3)+2.0_r8*(ZC2-ZA2)+ZC1-ZA1)
       IF(VLWatMicP(L,NY,NX).GT.ZEROS2(NY,NX))THEN
@@ -2107,16 +2110,16 @@ module Hour1Mod
         trcs_VLN(ids_H2PO4B,L,NY,NX)=trcs_VLN(ids_H1PO4B,L,NY,NX)
         trcs_VLN(ids_H2PO4,L,NY,NX)=trcs_VLN(ids_H1PO4,L,NY,NX)
 
-        H0PO4T=trcsa_solml(idsa_H0PO4,L,NY,NX)+trcsa_solml(idsa_H0PO4B,L,NY,NX)
+        H0PO4T=trcSalt_solml(idsalt_H0PO4,L,NY,NX)+trcSalt_solml(idsalt_H0PO4B,L,NY,NX)
         H1PO4T=trc_solml(ids_H1PO4,L,NY,NX)+trc_solml(ids_H1PO4B,L,NY,NX)
         H2PO4T=trc_solml(ids_H2PO4,L,NY,NX)+trc_solml(ids_H2PO4B,L,NY,NX)
-        H3PO4T=trcsa_solml(idsa_H3PO4,L,NY,NX)+trcsa_solml(idsa_H3PO4B,L,NY,NX)
-        ZFE1PT=trcsa_solml(idsa_FeHPO4,L,NY,NX)+trcsa_solml(idsa_FeHPO4B,L,NY,NX)
-        ZFE2PT=trcsa_solml(idsa_FeH2PO4,L,NY,NX)+trcsa_solml(idsa_FeH2PO4B,L,NY,NX)
-        ZCA0PT=trcsa_solml(idsa_CaPO4,L,NY,NX)+trcsa_solml(idsa_CaPO4B,L,NY,NX)
-        ZCA1PT=trcsa_solml(idsa_CaHPO4,L,NY,NX)+trcsa_solml(idsa_CaHPO4B,L,NY,NX)
-        ZCA2PT=trcsa_solml(idsa_CaH2PO4,L,NY,NX)+trcsa_solml(idsa_CaH2PO4B,L,NY,NX)
-        ZMG1PT=trcsa_solml(idsa_MgHPO4,L,NY,NX)+trcsa_solml(idsa_MgHPO4B,L,NY,NX)
+        H3PO4T=trcSalt_solml(idsalt_H3PO4,L,NY,NX)+trcSalt_solml(idsalt_H3PO4B,L,NY,NX)
+        ZFE1PT=trcSalt_solml(idsalt_FeHPO4,L,NY,NX)+trcSalt_solml(idsalt_FeHPO4B,L,NY,NX)
+        ZFE2PT=trcSalt_solml(idsalt_FeH2PO4,L,NY,NX)+trcSalt_solml(idsalt_FeH2PO4B,L,NY,NX)
+        ZCA0PT=trcSalt_solml(idsalt_CaPO4,L,NY,NX)+trcSalt_solml(idsalt_CaPO4B,L,NY,NX)
+        ZCA1PT=trcSalt_solml(idsalt_CaHPO4,L,NY,NX)+trcSalt_solml(idsalt_CaHPO4B,L,NY,NX)
+        ZCA2PT=trcSalt_solml(idsalt_CaH2PO4,L,NY,NX)+trcSalt_solml(idsalt_CaH2PO4B,L,NY,NX)
+        ZMG1PT=trcSalt_solml(idsalt_MgHPO4,L,NY,NX)+trcSalt_solml(idsalt_MgHPO4B,L,NY,NX)
 
         XOH0T=trcx_solml(idx_OHe,L,NY,NX)+trcx_solml(idx_OHeB,L,NY,NX)
         XOH1T=trcx_solml(idx_OH,L,NY,NX)+trcx_solml(idx_OHB,L,NY,NX)
@@ -2129,26 +2132,26 @@ module Hour1Mod
         PCAPHT=trcp_salml(idsp_HA,L,NY,NX)+trcp_salml(idsp_HAB,L,NY,NX)
         PCAPMT=trcp_salml(idsp_CaH2PO4,L,NY,NX)+trcp_salml(idsp_CaH2PO4B,L,NY,NX)
 
-        trcsa_solml(idsa_H0PO4,L,NY,NX)=H0PO4T*trcs_VLN(ids_H1PO4,L,NY,NX)
+        trcSalt_solml(idsalt_H0PO4,L,NY,NX)=H0PO4T*trcs_VLN(ids_H1PO4,L,NY,NX)
         trc_solml(ids_H1PO4,L,NY,NX)=H1PO4T*trcs_VLN(ids_H1PO4,L,NY,NX)
         trc_solml(ids_H2PO4,L,NY,NX)=H2PO4T*trcs_VLN(ids_H1PO4,L,NY,NX)
-        trcsa_solml(idsa_H3PO4,L,NY,NX)=H3PO4T*trcs_VLN(ids_H1PO4,L,NY,NX)
-        trcsa_solml(idsa_FeHPO4,L,NY,NX)=ZFE1PT*trcs_VLN(ids_H1PO4,L,NY,NX)
-        trcsa_solml(idsa_FeH2PO4,L,NY,NX)=ZFE2PT*trcs_VLN(ids_H1PO4,L,NY,NX)
-        trcsa_solml(idsa_CaPO4,L,NY,NX)=ZCA0PT*trcs_VLN(ids_H1PO4,L,NY,NX)
-        trcsa_solml(idsa_CaHPO4,L,NY,NX)=ZCA1PT*trcs_VLN(ids_H1PO4,L,NY,NX)
-        trcsa_solml(idsa_CaH2PO4,L,NY,NX)=ZCA2PT*trcs_VLN(ids_H1PO4,L,NY,NX)
-        trcsa_solml(idsa_MgHPO4,L,NY,NX)=ZMG1PT*trcs_VLN(ids_H1PO4,L,NY,NX)
-        trcsa_solml(idsa_H0PO4B,L,NY,NX)=H0PO4T*trcs_VLN(ids_H1PO4B,L,NY,NX)
+        trcSalt_solml(idsalt_H3PO4,L,NY,NX)=H3PO4T*trcs_VLN(ids_H1PO4,L,NY,NX)
+        trcSalt_solml(idsalt_FeHPO4,L,NY,NX)=ZFE1PT*trcs_VLN(ids_H1PO4,L,NY,NX)
+        trcSalt_solml(idsalt_FeH2PO4,L,NY,NX)=ZFE2PT*trcs_VLN(ids_H1PO4,L,NY,NX)
+        trcSalt_solml(idsalt_CaPO4,L,NY,NX)=ZCA0PT*trcs_VLN(ids_H1PO4,L,NY,NX)
+        trcSalt_solml(idsalt_CaHPO4,L,NY,NX)=ZCA1PT*trcs_VLN(ids_H1PO4,L,NY,NX)
+        trcSalt_solml(idsalt_CaH2PO4,L,NY,NX)=ZCA2PT*trcs_VLN(ids_H1PO4,L,NY,NX)
+        trcSalt_solml(idsalt_MgHPO4,L,NY,NX)=ZMG1PT*trcs_VLN(ids_H1PO4,L,NY,NX)
+        trcSalt_solml(idsalt_H0PO4B,L,NY,NX)=H0PO4T*trcs_VLN(ids_H1PO4B,L,NY,NX)
         trc_solml(ids_H1PO4B,L,NY,NX)=H1PO4T*trcs_VLN(ids_H1PO4B,L,NY,NX)
         trc_solml(ids_H2PO4B,L,NY,NX)=H2PO4T*trcs_VLN(ids_H1PO4B,L,NY,NX)
-        trcsa_solml(idsa_H3PO4B,L,NY,NX)=H3PO4T*trcs_VLN(ids_H1PO4B,L,NY,NX)
-        trcsa_solml(idsa_FeHPO4B,L,NY,NX)=ZFE1PT*trcs_VLN(ids_H1PO4B,L,NY,NX)
-        trcsa_solml(idsa_FeH2PO4B,L,NY,NX)=ZFE2PT*trcs_VLN(ids_H1PO4B,L,NY,NX)
-        trcsa_solml(idsa_CaPO4B,L,NY,NX)=ZCA0PT*trcs_VLN(ids_H1PO4B,L,NY,NX)
-        trcsa_solml(idsa_CaHPO4B,L,NY,NX)=ZCA1PT*trcs_VLN(ids_H1PO4B,L,NY,NX)
-        trcsa_solml(idsa_CaH2PO4B,L,NY,NX)=ZCA2PT*trcs_VLN(ids_H1PO4B,L,NY,NX)
-        trcsa_solml(idsa_MgHPO4B,L,NY,NX)=ZMG1PT*trcs_VLN(ids_H1PO4B,L,NY,NX)
+        trcSalt_solml(idsalt_H3PO4B,L,NY,NX)=H3PO4T*trcs_VLN(ids_H1PO4B,L,NY,NX)
+        trcSalt_solml(idsalt_FeHPO4B,L,NY,NX)=ZFE1PT*trcs_VLN(ids_H1PO4B,L,NY,NX)
+        trcSalt_solml(idsalt_FeH2PO4B,L,NY,NX)=ZFE2PT*trcs_VLN(ids_H1PO4B,L,NY,NX)
+        trcSalt_solml(idsalt_CaPO4B,L,NY,NX)=ZCA0PT*trcs_VLN(ids_H1PO4B,L,NY,NX)
+        trcSalt_solml(idsalt_CaHPO4B,L,NY,NX)=ZCA1PT*trcs_VLN(ids_H1PO4B,L,NY,NX)
+        trcSalt_solml(idsalt_CaH2PO4B,L,NY,NX)=ZCA2PT*trcs_VLN(ids_H1PO4B,L,NY,NX)
+        trcSalt_solml(idsalt_MgHPO4B,L,NY,NX)=ZMG1PT*trcs_VLN(ids_H1PO4B,L,NY,NX)
 
         trcx_solml(idx_OHe,L,NY,NX)=XOH0T*trcs_VLN(ids_H1PO4,L,NY,NX)
         trcx_solml(idx_OH,L,NY,NX)=XOH1T*trcs_VLN(ids_H1PO4,L,NY,NX)
@@ -2356,9 +2359,9 @@ module Hour1Mod
 
     trcs_XFXS(ids_beg:ids_end,L,NY,NX)=0.0_r8
 
-    DO NTSA=idsa_beg,idsab_end
-      trcsa_TR(NTSA,L,NY,NX)=0.0_r8
-      trcsa_XFXS(NTSA,L,NY,NX)=0.0_r8
+    DO NTSA=idsalt_beg,idsaltb_end
+      trcSalt_TR(NTSA,L,NY,NX)=0.0_r8
+      trcSalt_XFXS(NTSA,L,NY,NX)=0.0_r8
     ENDDO
 
     DO  K=1,jcplx

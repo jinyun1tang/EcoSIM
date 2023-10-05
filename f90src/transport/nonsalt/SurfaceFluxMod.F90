@@ -742,7 +742,7 @@ contains
 !
       IF(WatFlux4ErosionM(M,N2,N1).GT.ZEROS(N2,N1))THEN
         IF(NN.EQ.1)THEN
-          FQRM=QRMN(M,N,2,N5,N4)/WatFlux4ErosionM(M,N2,N1)
+          FQRM=QflxSurfRunoffM(M,N,2,N5,N4)/WatFlux4ErosionM(M,N2,N1)
           DO  K=1,jcplx
             RQROC(K,N,2,N5,N4)=RQROC0(K,N2,N1)*FQRM
             RQRON(K,N,2,N5,N4)=RQRON0(K,N2,N1)*FQRM
@@ -792,7 +792,7 @@ contains
 !
         IF(NN.EQ.2)THEN
           IF(N4B.GT.0.AND.N5B.GT.0)THEN
-            FQRM=QRMN(M,N,1,N5B,N4B)/WatFlux4ErosionM(M,N2,N1)
+            FQRM=QflxSurfRunoffM(M,N,1,N5B,N4B)/WatFlux4ErosionM(M,N2,N1)
             DO  K=1,jcplx
               RQROC(K,N,1,N5B,N4B)=RQROC0(K,N2,N1)*FQRM
               RQRON(K,N,1,N5B,N4B)=RQRON0(K,N2,N1)*FQRM
