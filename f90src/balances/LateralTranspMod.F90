@@ -161,8 +161,8 @@ implicit none
 !
 !     INITIALIZE NET WATER AND HEAT FLUXES FOR RUNOFF
 !
-  TQR(NY,NX)=0.0_r8
-  THQR(NY,NX)=0.0_r8
+  TWat2GridBySurfRunoff(NY,NX)=0.0_r8
+  THeat2GridBySurfRunoff(NY,NX)=0.0_r8
 !
 !     INITIALIZE NET SOLUTE AND GAS FLUXES FOR RUNOFF
 !
@@ -235,8 +235,8 @@ implicit none
     RTGasADFlx(idg_beg:idg_end-1,L,NY,NX)=0.0_r8
 
     IF(salt_model)THEN
-      trcsa_TFLS(idsa_beg:idsab_end,L,NY,NX)=0.0_r8
-      trcsa_TFHS(idsa_beg:idsab_end,L,NY,NX)=0.0_r8
+      trcSalt_TFLS(idsalt_beg:idsaltb_end,L,NY,NX)=0.0_r8
+      trcSalt_TFHS(idsalt_beg:idsaltb_end,L,NY,NX)=0.0_r8
     ENDIF
   ENDDO
   end subroutine ZeroFluxAccumulators
@@ -251,8 +251,8 @@ implicit none
   !     begin_execution
   !     NET WATER, SNOW AND HEAT FLUXES FROM RUNOFF
   !
-  !     TQR,TQS,TQW,TQI=net water and snowpack snow,water,ice runoff
-  !     THQR,THQS=net convective heat from surface water and snow runoff
+  !     TWat2GridBySurfRunoff,TQS,TQW,TQI=net water and snowpack snow,water,ice runoff
+  !     THeat2GridBySurfRunoff,THQS=net convective heat from surface water and snow runoff
   !     QR,HQR=runoff, convective heat from runoff from watsub.f
   !     QS,QW,QI=snow,water,ice transfer from watsub.f
   !     HQS=convective heat transfer from snow,water,ice transfer from watsub.f
@@ -260,9 +260,9 @@ implicit none
 
   D1202: DO NN=1,2
     !water flux
-    TQR(N2,N1)=TQR(N2,N1)+QR(N,NN,N2,N1)
+    TWat2GridBySurfRunoff(N2,N1)=TWat2GridBySurfRunoff(N2,N1)+Wat2GridBySurfRunoff(N,NN,N2,N1)
     !heat flux
-    THQR(N2,N1)=THQR(N2,N1)+HQR(N,NN,N2,N1)
+    THeat2GridBySurfRunoff(N2,N1)=THeat2GridBySurfRunoff(N2,N1)+Heat2GridBySurfRunoff(N,NN,N2,N1)
     D8590: DO K=1,micpar%NumOfLitrCmplxs
       TOCQRS(K,N2,N1)=TOCQRS(K,N2,N1)+XOCQRS(K,N,NN,N2,N1)
       TONQRS(K,N2,N1)=TONQRS(K,N2,N1)+XONQRS(K,N,NN,N2,N1)
@@ -273,9 +273,9 @@ implicit none
     IF(IFLBH(N,NN,N5,N4).EQ.0)THEN
       !there is lateral runoff
       !water flux
-      TQR(N2,N1)=TQR(N2,N1)-QR(N,NN,N5,N4)
+      TWat2GridBySurfRunoff(N2,N1)=TWat2GridBySurfRunoff(N2,N1)-Wat2GridBySurfRunoff(N,NN,N5,N4)
       !heat flux
-      THQR(N2,N1)=THQR(N2,N1)-HQR(N,NN,N5,N4)
+      THeat2GridBySurfRunoff(N2,N1)=THeat2GridBySurfRunoff(N2,N1)-Heat2GridBySurfRunoff(N,NN,N5,N4)
       D8591: DO K=1,micpar%NumOfLitrCmplxs
         TOCQRS(K,N2,N1)=TOCQRS(K,N2,N1)-XOCQRS(K,N,NN,N5,N4)
         TONQRS(K,N2,N1)=TONQRS(K,N2,N1)-XONQRS(K,N,NN,N5,N4)
@@ -286,8 +286,8 @@ implicit none
     ENDIF
 
     IF(N4B.GT.0.AND.N5B.GT.0.AND.NN.EQ.1)THEN
-      TQR(N2,N1)=TQR(N2,N1)-QR(N,NN,N5B,N4B)
-      THQR(N2,N1)=THQR(N2,N1)-HQR(N,NN,N5B,N4B)
+      TWat2GridBySurfRunoff(N2,N1)=TWat2GridBySurfRunoff(N2,N1)-Wat2GridBySurfRunoff(N,NN,N5B,N4B)
+      THeat2GridBySurfRunoff(N2,N1)=THeat2GridBySurfRunoff(N2,N1)-Heat2GridBySurfRunoff(N,NN,N5B,N4B)
       D8592: DO K=1,micpar%NumOfLitrCmplxs
         TOCQRS(K,N2,N1)=TOCQRS(K,N2,N1)-XOCQRS(K,N,NN,N5B,N4B)
         TONQRS(K,N2,N1)=TONQRS(K,N2,N1)-XONQRS(K,N,NN,N5B,N4B)
@@ -297,7 +297,7 @@ implicit none
 
       !     WRITE(*,6631)'TQRB',I,J,N1,N2,N4B,N5B,N,NN
       !    2,IFLBH(N,NN,N5B,N4B)
-      !    2,TQR(N2,N1),QR(N,NN,N5B,N4B)
+      !    2,TWat2GridBySurfRunoff(N2,N1),Wat2GridBySurfRunoff(N,NN,N5B,N4B)
 !6631  FORMAT(A8,9I4,12E12.4)
     ENDIF
   ENDDO D1202
@@ -306,10 +306,10 @@ implicit none
   end subroutine OMH2OFluxesFromRunoff
 !------------------------------------------------------------------------------------------
 
-  subroutine TotalFluxFromSedmentTransp(N,N1,N2,N4 &
-    ,N5,N4B,N5B,NY,NX)
+  subroutine TotalFluxFromSedmentTransp(N,N1,N2,N4,N5,N4B,N5B,NY,NX)
     implicit none
-    integer, intent(in) :: N,N1,N2,N4,N5,N4B,N5B,NY,NX
+    integer, intent(in) :: N   !direction of calculation
+    integer, intent(in) :: N1,N2,N4,N5,N4B,N5B,NY,NX
 
     integer :: M,K,NO,NN,NGL,NTX,NTP
 !     begin_execution
@@ -336,10 +336,12 @@ implicit none
 !       :PCPMB,PCPDB,PCPHB=precip CaH2PO4,CaHPO4,apatite in band
 !
   IF(N.NE.3.AND.(IERSNG.EQ.1.OR.IERSNG.EQ.3))THEN
+    !horizontal direction
     D9350: DO NN=1,2
-      IF(ABS(XSEDER(N,NN,N2,N1)).GT.ZEROS(N2,N1) &
-        .OR.ABS(XSEDER(N,NN,N5,N4)).GT.ZEROS(N5,N4))THEN
-        TSEDER(N2,N1)=TSEDER(N2,N1)+XSEDER(N,NN,N2,N1)
+      IF(ABS(cumSedErosion(N,NN,N2,N1)).GT.ZEROS(N2,N1) &
+        .OR.ABS(cumSedErosion(N,NN,N5,N4)).GT.ZEROS(N5,N4))THEN
+        !incoming from south or east grid 
+        TSEDER(N2,N1)=TSEDER(N2,N1)+cumSedErosion(N,NN,N2,N1)
         TSANER(N2,N1)=TSANER(N2,N1)+XSANER(N,NN,N2,N1)
         TSILER(N2,N1)=TSILER(N2,N1)+XSILER(N,NN,N2,N1)
         TCLAER(N2,N1)=TCLAER(N2,N1)+XCLAER(N,NN,N2,N1)
@@ -408,7 +410,8 @@ implicit none
         ENDDO D9375
 
 !     IF(NN.EQ.2)THEN
-        TSEDER(N2,N1)=TSEDER(N2,N1)-XSEDER(N,NN,N5,N4)
+!       outgoing
+        TSEDER(N2,N1)=TSEDER(N2,N1)-cumSedErosion(N,NN,N5,N4)
         TSANER(N2,N1)=TSANER(N2,N1)-XSANER(N,NN,N5,N4)
         TSILER(N2,N1)=TSILER(N2,N1)-XSILER(N,NN,N5,N4)
         TCLAER(N2,N1)=TCLAER(N2,N1)-XCLAER(N,NN,N5,N4)
@@ -478,8 +481,8 @@ implicit none
 !     ENDIF
       ENDIF
       IF(N4B.GT.0.AND.N5B.GT.0.AND.NN.EQ.1)THEN
-        IF(ABS(XSEDER(N,NN,N5B,N4B)).GT.ZEROS(N5,N4))THEN
-          TSEDER(N2,N1)=TSEDER(N2,N1)-XSEDER(N,NN,N5B,N4B)
+        IF(ABS(cumSedErosion(N,NN,N5B,N4B)).GT.ZEROS(N5,N4))THEN
+          TSEDER(N2,N1)=TSEDER(N2,N1)-cumSedErosion(N,NN,N5B,N4B)
           TSANER(N2,N1)=TSANER(N2,N1)-XSANER(N,NN,N5B,N4B)
           TSILER(N2,N1)=TSILER(N2,N1)-XSILER(N,NN,N5B,N4B)
           TCLAER(N2,N1)=TCLAER(N2,N1)-XCLAER(N,NN,N5B,N4B)
@@ -671,11 +674,11 @@ implicit none
       !          :*1=non-band,*B=band
 !
       IF(salt_model)THEN
-        DO NTSA=idsa_beg,idsab_end
-          trcsa_TFLS(NTSA,N3,N2,N1)=trcsa_TFLS(NTSA,N3,N2,N1) &
-            +trcsa_XFLS(NTSA,N,N3,N2,N1)-trcsa_XFLS(NTSA,N,N6,N5,N4)
-          trcsa_TFHS(NTSA,N3,N2,N1)=trcsa_TFHS(NTSA,N3,N2,N1) &
-            +trcsa_XFHS(NTSA,N,N3,N2,N1)-trcsa_XFHS(NTSA,N,N6,N5,N4)
+        DO NTSA=idsalt_beg,idsaltb_end
+          trcSalt_TFLS(NTSA,N3,N2,N1)=trcSalt_TFLS(NTSA,N3,N2,N1) &
+            +trcSalt_XFLS(NTSA,N,N3,N2,N1)-trcSalt_XFLS(NTSA,N,N6,N5,N4)
+          trcSalt_TFHS(NTSA,N3,N2,N1)=trcSalt_TFHS(NTSA,N3,N2,N1) &
+            +trcSalt_XFHS(NTSA,N,N3,N2,N1)-trcSalt_XFHS(NTSA,N,N6,N5,N4)
         ENDDO
       ENDIF
     ELSE
@@ -703,8 +706,8 @@ implicit none
       RTGasADFlx(idg_beg:idg_end-1,N3,N2,N1)=0.0_r8
 
       IF(salt_model)THEN
-        trcsa_TFLS(idsa_beg:idsab_end,N3,N2,N1)=0.0_r8
-        trcsa_TFHS(idsa_beg:idsab_end,N3,N2,N1)=0.0_r8
+        trcSalt_TFLS(idsalt_beg:idsaltb_end,N3,N2,N1)=0.0_r8
+        trcSalt_TFHS(idsalt_beg:idsaltb_end,N3,N2,N1)=0.0_r8
       ENDIF
     ENDIF
   ENDIF

@@ -10,8 +10,8 @@ implicit none
   __FILE__
 
   real(r8),target,allocatable ::  TSED(:,:)                         !erosion rate [Mg d-2 t-1]
-  real(r8),target,allocatable ::  DETS(:,:)                         !soil detachment, [-]
-  real(r8),target,allocatable ::  DETE(:,:)                         !soil detachability
+  real(r8),target,allocatable ::  SoilDetachability4Erosion1(:,:)                         !soil detachment, [-]
+  real(r8),target,allocatable ::  SoilDetachability4Erosion2(:,:)                         !soil detachability
   real(r8),target,allocatable ::  CER(:,:)                          !soil detachment/deposition, [-]
   real(r8),target,allocatable ::  XER(:,:)                          !soil detachment/deposition, [-]
   real(r8),target,allocatable ::  ParticleDensitySurfLay(:,:)       !particle density of surface layer
@@ -29,8 +29,8 @@ implicit none
   real(r8),target,allocatable ::  XNHUEB(:,:,:,:)                   !total urea fertilizer erosion band , [g d-2 h-1]
   real(r8),target,allocatable ::  XNO3EB(:,:,:,:)                   !total NO3 fertilizer erosion band , [g d-2 h-1]
   real(r8),target,allocatable ::  trcx_XER(:,:,:,:,:)               !total adsorbed sediment erosion non-band , [g d-2 h-1]
-  real(r8),target,allocatable ::  trcp_ER(:,:,:,:,:)                   !total adsorbed ALOH3  erosion , [g d-2 h-1]
-  real(r8),target,allocatable ::  XSEDER(:,:,:,:)                   !sediment erosion, [Mg d-2 h-1]
+  real(r8),target,allocatable ::  trcp_ER(:,:,:,:,:)                !total adsorbed ALOH3  erosion , [g d-2 h-1]
+  real(r8),target,allocatable ::  cumSedErosion(:,:,:,:)            !sediment erosion, [Mg d-2 h-1]
   real(r8),target,allocatable ::  ORCER(:,:,:,:,:,:)                !microbial residue C  erosion , [g d-2 h-1]
   real(r8),target,allocatable ::  ORNER(:,:,:,:,:,:)                !microbial residue N  erosion , [g d-2 h-1]
   real(r8),target,allocatable ::  ORPER(:,:,:,:,:,:)                !microbial residue P  erosion , [g d-2 h-1]
@@ -60,8 +60,8 @@ implicit none
 
   implicit none
   allocate(TSED(JY,JX));        TSED=0._r8
-  allocate(DETS(JY,JX));        DETS=0._r8
-  allocate(DETE(JY,JX));        DETE=0._r8
+  allocate(SoilDetachability4Erosion1(JY,JX));        SoilDetachability4Erosion1=0._r8
+  allocate(SoilDetachability4Erosion2(JY,JX));        SoilDetachability4Erosion2=0._r8
   allocate(CER(JY,JX));         CER=0._r8
   allocate(XER(JY,JX));         XER=0._r8
   allocate(ParticleDensitySurfLay(JY,JX));      ParticleDensitySurfLay=0._r8
@@ -80,7 +80,7 @@ implicit none
   allocate(XNO3EB(2,2,JV,JH));  XNO3EB=0._r8
   allocate(trcx_XER(idx_beg:idx_end,2,2,JV,JH));   trcx_XER=0._r8
   allocate(trcp_ER(idsp_beg:idsp_end,2,2,JV,JH));  trcp_ER=0._r8
-  allocate(XSEDER(2,2,JV,JH));  XSEDER=0._r8
+  allocate(cumSedErosion(2,2,JV,JH));  cumSedErosion=0._r8
   allocate(ORCER(ndbiomcp,1:jcplx,2,2,JV,JH));ORCER=0._r8
   allocate(ORNER(ndbiomcp,1:jcplx,2,2,JV,JH));ORNER=0._r8
   allocate(ORPER(ndbiomcp,1:jcplx,2,2,JV,JH));ORPER=0._r8
@@ -103,8 +103,8 @@ implicit none
   call destroy(trcp_ER)
   call destroy(trcx_XER)
   call destroy(TSED)
-  call destroy(DETS)
-  call destroy(DETE)
+  call destroy(SoilDetachability4Erosion1)
+  call destroy(SoilDetachability4Erosion2)
   call destroy(CER)
   call destroy(XER)
   call destroy(ParticleDensitySurfLay)
@@ -121,7 +121,7 @@ implicit none
   call destroy(XNH3EB)
   call destroy(XNHUEB)
   call destroy(XNO3EB)
-  call destroy(XSEDER)
+  call destroy(cumSedErosion)
   call destroy(ORCER)
   call destroy(ORNER)
   call destroy(ORPER)

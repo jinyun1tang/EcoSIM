@@ -124,7 +124,7 @@ implicit none
   real(r8), pointer :: SO2(:)    => null()   !leaf O2 solubility, [uM /umol mol-1]
   real(r8), pointer :: RCMX(:)   => null()   !maximum stomatal resistance to CO2, [s h-1]
   real(r8), pointer :: DCO2(:)   => null()   !gaesous CO2 concentration difference across stomates, [umol m-3]
-  real(r8), pointer :: SURFX(:,:,:,:,:)  => null()   !leaf irradiated surface area, [m2 d-2]
+  real(r8), pointer :: LeafAUnshaded_seclyrnodbrpft(:,:,:,:,:)  => null()   !leaf irradiated surface area, [m2 d-2]
   real(r8), pointer :: CPOOL3(:,:,:)     => null()   !minimum sink strength for nonstructural C transfer, [g d-2]
   real(r8), pointer :: CPOOL4(:,:,:)     => null()   !leaf nonstructural C4 content in C4 photosynthesis, [g d-2]
   real(r8), pointer :: CO2B(:,:,:)       => null()   !bundle sheath nonstructural C3 content in C4 photosynthesis, [g d-2]
@@ -214,7 +214,7 @@ implicit none
   real(r8), pointer :: RTN2(:,:,:,:)   => null() !root layer number secondary axes, [d-2]
   real(r8), pointer :: PrimRootDepth(:,:,:)    => null() !root layer depth, [m]
   real(r8), pointer :: ClumpFactort0(:)          => null() !initial clumping factor for self-shading in canopy layer, [-]
-  real(r8), pointer :: CFX(:)          => null() !clumping factor for self-shading in canopy layer at current LAI, [-]
+  real(r8), pointer :: ClumpFactort(:)          => null() !clumping factor for self-shading in canopy layer at current LAI, [-]
   real(r8), pointer :: RTFQ(:)         => null() !root brancing frequency, [m-1]
   real(r8), pointer :: HypoctoylHeight(:)        => null() !cotyledon height, [m]
   integer,  pointer :: INTYP(:)        => null() !N2 fixation type
@@ -235,7 +235,7 @@ implicit none
   real(r8), pointer :: PSTGI(:,:)      => null() !shoot node number at floral initiation, [-]
   real(r8), pointer :: PSTGF(:,:)      => null() !shoot node number at anthesis, [-]
   real(r8), pointer :: ANGBR(:)        => null() !branching angle, [degree from horizontal]
-  real(r8), pointer :: SURF(:,:,:,:,:) => null() !leaf surface area, [m2 d-2]
+  real(r8), pointer :: LeafA_lyrnodbrchpft(:,:,:,:,:) => null() !leaf surface area, [m2 d-2]
   integer,  pointer :: KLEAFX(:,:)     => null() !NUMBER OF MINIMUM LEAFED NODE USED IN GROWTH ALLOCATION
   integer,  pointer :: BranchNumber_brchpft(:,:)       => null() !branch number, [-]
   real(r8), pointer :: GRNXB(:,:)      => null() !branch potential grain number, [d-2]
@@ -263,7 +263,7 @@ implicit none
   real(r8), pointer :: HTNODX(:,:,:)   => null() !internode height, [m]
   real(r8), pointer :: CanPSheathHeight(:,:,:)    => null() !sheath height, [m]
   real(r8), pointer :: HTNODE(:,:,:)   => null() !internode height, [m]
-  real(r8), pointer :: SURFB(:,:,:,:)  => null() !stem surface area, [m2 d-2]
+  real(r8), pointer :: StemA_lyrnodbrchpft(:,:,:,:)  => null() !stem surface area, [m2 d-2]
   real(r8), pointer :: CanPLNBLA(:,:,:,:)  => null() !layer/node/branch leaf area, [m2 d-2]
   real(r8), pointer :: CanopyBranchStemApft_lyr(:,:,:)    => null() !plant canopy layer branch stem area, [m2 d-2]
   real(r8), pointer :: ClumpFactor(:)           => null() !clumping factor for self-shading in canopy layer, [-]
@@ -1760,7 +1760,7 @@ implicit none
   allocate(this%DCO2(JP1))
   allocate(this%FMOL(JP1))
   allocate(this%RCMX(JP1))
-  allocate(this%SURFX(JLI1,NumOfCanopyLayers1,JNODS1,JBR,JP1))
+  allocate(this%LeafAUnshaded_seclyrnodbrpft(JLI1,NumOfCanopyLayers1,JNODS1,JBR,JP1))
   allocate(this%CPOOL3(JNODS1,JBR,JP1))
   allocate(this%CPOOL4(JNODS1,JBR,JP1))
   allocate(this%CO2B(JNODS1,JBR,JP1))
@@ -1817,7 +1817,7 @@ implicit none
 !  if(allocated(DCO2))deallocate(DCO2)
 !  if(allocated(FMOL))deallocate(FMOL)
 !  if(allocated(RCMX))deallocate(RCMX)
-!  if(allocated(SURFX))deallocate(SURFX)
+!  if(allocated(LeafAUnshaded_seclyrnodbrpft))deallocate(LeafAUnshaded_seclyrnodbrpft)
 !  if(allocated(CPOOL3))deallocate(CPOOL3)
 !  if(allocated(CPOOL4))deallocate(CPOOL4)
 !  if(allocated(CO2B))deallocate(CO2B)
@@ -2026,7 +2026,7 @@ implicit none
   allocate(this%RTDNT(JZ1))
   allocate(this%RTFQ(JP1))
   allocate(this%ClumpFactort0(JP1))
-  allocate(this%CFX(JP1))
+  allocate(this%ClumpFactort(JP1))
   allocate(this%HypoctoylHeight(JP1))
   allocate(this%RootPoreTortu4Gas(jroots,JP1))
   allocate(this%WDLF(JP1))
@@ -2071,7 +2071,7 @@ implicit none
   allocate(this%PSTGI(JBR,JP1))
   allocate(this%PSTGF(JBR,JP1))
   allocate(this%ANGBR(JP1))
-  allocate(this%SURF(JLI1,NumOfCanopyLayers1,JNODS1,JBR,JP1))
+  allocate(this%LeafA_lyrnodbrchpft(JLI1,NumOfCanopyLayers1,JNODS1,JBR,JP1))
   allocate(this%KLEAFX(JBR,JP1))
   allocate(this%BranchNumber_brchpft(JBR,JP1))
   allocate(this%GRNXB(JBR,JP1))
@@ -2098,7 +2098,7 @@ implicit none
   allocate(this%HTNODX(0:JNODS1,JBR,JP1))
   allocate(this%CanPSheathHeight(0:JNODS1,JBR,JP1))
   allocate(this%HTNODE(0:JNODS1,JBR,JP1))
-  allocate(this%SURFB(JLI1,NumOfCanopyLayers1,JBR,JP1))
+  allocate(this%StemA_lyrnodbrchpft(JLI1,NumOfCanopyLayers1,JBR,JP1))
   allocate(this%CanPLNBLA(NumOfCanopyLayers1,0:JNODS1,JBR,JP1))
   allocate(this%CanopyBranchStemApft_lyr(NumOfCanopyLayers1,JBR,JP1))
   allocate(this%NI(JP1))

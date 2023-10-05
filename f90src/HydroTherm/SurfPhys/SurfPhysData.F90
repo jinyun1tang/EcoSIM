@@ -7,7 +7,7 @@ implicit none
   __FILE__
 
   real(r8),allocatable ::  XVLMobileWaterLitR(:,:)                         !
-  real(r8),allocatable ::  XVLWatMicP(:,:)                         !
+  real(r8),allocatable ::  XVLMobileWatMicP(:,:)                         !
   real(r8),allocatable ::  XVLiceMicP(:,:)                         !
   real(r8),allocatable ::  THRMR(:,:)                         !
   real(r8),allocatable ::  VLPoreLitR(:,:)                        !
@@ -49,7 +49,7 @@ implicit none
   implicit none
 
   allocate(XVLMobileWaterLitR(JY,JX));       XVLMobileWaterLitR=0._r8
-  allocate(XVLWatMicP(JY,JX));       XVLWatMicP=0._r8
+  allocate(XVLMobileWatMicP(JY,JX));       XVLMobileWatMicP=0._r8
   allocate(XVLiceMicP(JY,JX));       XVLiceMicP=0._r8
   allocate(THRMR(JY,JX));       THRMR=0._r8
   allocate(VLPoreLitR(JY,JX));      VLPoreLitR=0._r8
@@ -89,7 +89,7 @@ implicit none
   implicit none
 
   call destroy(XVLMobileWaterLitR)
-  call destroy(XVLWatMicP)
+  call destroy(XVLMobileWatMicP)
   call destroy(XVLiceMicP)
   call destroy(THRMR)
   call destroy(VLPoreLitR)

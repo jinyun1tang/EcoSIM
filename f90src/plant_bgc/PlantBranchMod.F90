@@ -869,7 +869,7 @@ module PlantBranchMod
     !     DISTRIBUTION ENTERED IN 'READQ' ASSUMING AZIMUTH IS UNIFORM
     !
     !     SSIN=sine of solar angle
-    !     SURF=leaf node surface area in canopy layer
+    !     LeafA_lyrnodbrchpft=leaf node surface area in canopy layer
     !     ARLF,CanPLNBLA=leaf node surface area in canopy layer
     !     ZC,DPTHS=canopy,snowpack height
     !     CLASS=leaf inclination class
@@ -2162,14 +2162,14 @@ module PlantBranchMod
     CanopyBranchStemApft_lyr   =>  plt_morph%CanopyBranchStemApft_lyr    , &
     CLASS   =>  plt_morph%CLASS    , &
     CanPLNBLA   =>  plt_morph%CanPLNBLA    , &
-    SURFB   =>  plt_morph%SURFB    , &
+    StemA_lyrnodbrchpft   =>  plt_morph%StemA_lyrnodbrchpft    , &
     NB1     =>  plt_morph%NB1      , &
-    SURF    =>  plt_morph%SURF       &
+    LeafA_lyrnodbrchpft    =>  plt_morph%LeafA_lyrnodbrchpft       &
   )
   D900: DO K=1,JNODS1
     DO  L=1,NumOfCanopyLayers1
       DO  N=1,JLI1
-        SURF(N,L,K,NB,NZ)=0._r8
+        LeafA_lyrnodbrchpft(N,L,K,NB,NZ)=0._r8
       enddo
     enddo
   ENDDO D900
@@ -2182,8 +2182,8 @@ module PlantBranchMod
       D700: DO L=NumOfCanopyLayers1,1,-1
 !       ARLFXL=ARLFXL+CanPLNBLA(L,K,NB,NZ)
         D800: DO N=1,JLI1
-          SURF(N,L,K,NB,NZ)=AZMAX1(CLASS(N,NZ)*0.25_r8*CanPLNBLA(L,K,NB,NZ))
-  !       SURFXX=SURFXX+SURF(N,L,K,NB,NZ)
+          LeafA_lyrnodbrchpft(N,L,K,NB,NZ)=AZMAX1(CLASS(N,NZ)*0.25_r8*CanPLNBLA(L,K,NB,NZ))
+  !       SURFXX=SURFXX+LeafA_lyrnodbrchpft(N,L,K,NB,NZ)
         ENDDO D800
       ENDDO D700
     ENDIF
@@ -2192,13 +2192,13 @@ module PlantBranchMod
 ! ALLOCATE STALK AREA TO INCLINATION CLASSES ACCORDING TO
 ! BRANCH ANGLE ENTERED IN 'READQ' ASSUMING AZIMUTH IS UNIFORM
 !
-! SURFB=stalk surface area in canopy layer
+! StemA_lyrnodbrchpft=stalk surface area in canopy layer
 ! ANGBR=stem angle from horizontal
 ! CanopyBranchStemApft_lyr=total branch stalk surface area in each layer
 !
   D910: DO L=1,NumOfCanopyLayers1
     DO  N=1,JLI1
-      SURFB(N,L,NB,NZ)=0._r8
+      StemA_lyrnodbrchpft(N,L,NB,NZ)=0._r8
     enddo
   ENDDO D910
 
@@ -2209,7 +2209,7 @@ module PlantBranchMod
     N=MIN(JLI1,INT(ASIN(ANGBR(NZ))/dangle)+1)
   ENDIF
   D710: DO L=NumOfCanopyLayers1,1,-1
-    SURFB(N,L,NB,NZ)=CanopyBranchStemApft_lyr(L,NB,NZ)/real(JLI1,r8)
+    StemA_lyrnodbrchpft(N,L,NB,NZ)=CanopyBranchStemApft_lyr(L,NB,NZ)/real(JLI1,r8)
   ENDDO D710
   end associate
   end subroutine LeafClassAllocation

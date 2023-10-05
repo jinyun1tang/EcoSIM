@@ -59,7 +59,7 @@ contains
   allocate(ALAT(JY,JX));        ALAT=0._r8
   allocate(DH(JY,JX));          DH=0._r8
   allocate(DV(JY,JX));          DV=0._r8
-  allocate(FlowDirIndicator(JY,JX));         FlowDirIndicator=0
+  allocate(FlowDirIndicator(JY,JX));         FlowDirIndicator=3   !vertical by default
   allocate(LSG(JZ,JY,JX));      LSG=0
   allocate(NP(JY,JX));          NP=0
   allocate(NP0(JY,JX));         NP0=0

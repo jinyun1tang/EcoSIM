@@ -141,7 +141,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  FNOD(:,:,:)                        !parameter for allocation of growth to nodes, [-]
   integer,target,allocatable ::  NNOD(:,:,:)                         !number of concurrently growing nodes
   real(r8),target,allocatable ::  PSICanPDailyMin(:,:,:)                       !minimum daily canopy water potential, [MPa]
-  real(r8),target,allocatable ::  CFX(:,:,:)                         !clumping factor for self-shading in canopy layer at current LAI, [-]
+  real(r8),target,allocatable ::  ClumpFactort(:,:,:)                         !clumping factor for self-shading in canopy layer at current LAI, [-]
   real(r8),target,allocatable ::  ClumpFactor(:,:,:)                          !clumping factor for self-shading in canopy layer, [-]
   integer,target,allocatable ::  IDTHP(:,:,:)                        !flag to detect canopy death , [-]
   real(r8),target,allocatable ::  STMX(:,:,:)                        !maximum grain node number per branch, [-]
@@ -298,7 +298,7 @@ contains
   allocate(FNOD(JP,JY,JX));     FNOD=0._r8
   allocate(NNOD(JP,JY,JX));     NNOD=0
   allocate(PSICanPDailyMin(JP,JY,JX));    PSICanPDailyMin=0._r8
-  allocate(CFX(JP,JY,JX));      CFX=0._r8
+  allocate(ClumpFactort(JP,JY,JX));      ClumpFactort=0._r8
   allocate(ClumpFactor(JP,JY,JX));       ClumpFactor=0._r8
   allocate(IDTHP(JP,JY,JX));    IDTHP=0
   allocate(STMX(JP,JY,JX));     STMX=0._r8
@@ -452,7 +452,7 @@ contains
   call destroy(FNOD)
   call destroy(NNOD)
   call destroy(PSICanPDailyMin)
-  call destroy(CFX)
+  call destroy(ClumpFactort)
   call destroy(ClumpFactor)
   call destroy(IDTHP)
   call destroy(STMX)

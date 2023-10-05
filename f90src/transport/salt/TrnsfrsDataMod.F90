@@ -22,26 +22,26 @@ implicit none
   real(r8),allocatable ::  HCSGL2(:,:,:)                      !
   real(r8),allocatable ::  SOSGL2(:,:,:)                      !
   real(r8),allocatable ::  CLSXL2(:,:,:)                      !
-  real(r8),allocatable ::  trcsa_RQR(:,:,:,:,:)                     !
-  real(r8),allocatable ::  trcsa_RQ(:,:,:,:)                       !
-  real(r8),allocatable ::  trcsa_RQR0(:,:,:)                        !
+  real(r8),allocatable ::  trcSalt_RQR(:,:,:,:,:)                     !
+  real(r8),allocatable ::  trcSalt_RQ(:,:,:,:)                       !
+  real(r8),allocatable ::  trcSalt_RQR0(:,:,:)                        !
 
-  real(r8),allocatable ::  trcsa_solml2(:,:,:,:)              !
+  real(r8),allocatable ::  trcSalt_solml2(:,:,:,:)              !
   real(r8),allocatable ::  ZFE2(:,:,:)                        !
   real(r8),allocatable ::  ZHCO32(:,:,:)                      !
-  real(r8),allocatable ::  trcsa_solml2R(:,:,:,:)                       !
-  real(r8),allocatable ::  trcsa_RBLS(:,:,:,:)                      !
+  real(r8),allocatable ::  trcSalt_solml2R(:,:,:,:)                       !
+  real(r8),allocatable ::  trcSalt_RBLS(:,:,:,:)                      !
 
-  real(r8),allocatable ::  trcsa_TBLS(:,:,:,:)
+  real(r8),allocatable ::  trcSalt_TBLS(:,:,:,:)
 
   real(r8),allocatable ::  POSGL2(:,:,:)                      !
-  real(r8),allocatable ::  trcsa_RFLS(:,:,:,:,:)                    !
-  real(r8),allocatable ::  trcsa_RFHS(:,:,:,:,:)                    !
-  real(r8),allocatable ::  trcsa_soHml2(:,:,:,:)                       !
-  real(r8),allocatable ::  trcsa_RFXS(:,:,:,:)                      !
-  real(r8), allocatable ::  trcsa_sosml2(:,:,:,:)               ! snowpack salt dissolved tracers
-  real(r8),allocatable ::  trcsa_RFL0(:,:,:)                        !
-  real(r8),allocatable ::  trcsa_RFL1(:,:,:)                        !
+  real(r8),allocatable ::  trcSalt_RFLS(:,:,:,:,:)                    !
+  real(r8),allocatable ::  trcSalt_RFHS(:,:,:,:,:)                    !
+  real(r8),allocatable ::  trcSalt_soHml2(:,:,:,:)                       !
+  real(r8),allocatable ::  trcSalt_RFXS(:,:,:,:)                      !
+  real(r8), allocatable ::  trcSalt_sosml2(:,:,:,:)               ! snowpack salt dissolved tracers
+  real(r8),allocatable ::  trcSalt_RFL0(:,:,:)                        !
+  real(r8),allocatable ::  trcSalt_RFL1(:,:,:)                        !
 !----------------------------------------------------------------------
 
 contains
@@ -61,22 +61,22 @@ contains
   allocate(SOSGL2(JZ,JY,JX));   SOSGL2=0._r8
   allocate(CLSXL2(JZ,JY,JX));   CLSXL2=0._r8
 
-  allocate(trcsa_RQR(idsa_beg:idsa_end,2,2,JV,JH));   trcsa_RQR=0._r8
-  allocate(trcsa_RQ(idsa_beg:idsab_end,2,JV,JH));     trcsa_RQ=0._r8
-  allocate(trcsa_RQR0(idsa_beg:idsa_end,JY,JX));     trcsa_RQR0=0._r8
-  allocate(trcsa_RBLS(idsa_beg:idsa_end,JS,JY,JX));   trcsa_RBLS=0._r8
-  allocate(trcsa_TBLS(idsa_beg:idsa_end,JS,JY,JX)); trcsa_TBLS=0._r8
+  allocate(trcSalt_RQR(idsalt_beg:idsalt_end,2,2,JV,JH));   trcSalt_RQR=0._r8
+  allocate(trcSalt_RQ(idsalt_beg:idsaltb_end,2,JV,JH));     trcSalt_RQ=0._r8
+  allocate(trcSalt_RQR0(idsalt_beg:idsalt_end,JY,JX));     trcSalt_RQR0=0._r8
+  allocate(trcSalt_RBLS(idsalt_beg:idsalt_end,JS,JY,JX));   trcSalt_RBLS=0._r8
+  allocate(trcSalt_TBLS(idsalt_beg:idsalt_end,JS,JY,JX)); trcSalt_TBLS=0._r8
 
   allocate(POSGL2(JZ,JY,JX));   POSGL2=0._r8
-  allocate(trcsa_RFLS(idsa_beg:idsab_end,3,0:JD,JV,JH));trcsa_RFLS=0._r8
-  allocate(trcsa_RFHS(idsa_beg:idsab_end,3,JD,JV,JH)); trcsa_RFHS=0._r8
-  allocate(trcsa_soHml2(idsa_beg:idsab_end,JZ,JY,JX));    trcsa_soHml2=0._r8
-  allocate(trcsa_RFXS(idsa_beg:idsab_end,JZ,JY,JX));   trcsa_RFXS=0._r8
+  allocate(trcSalt_RFLS(idsalt_beg:idsaltb_end,3,0:JD,JV,JH));trcSalt_RFLS=0._r8
+  allocate(trcSalt_RFHS(idsalt_beg:idsaltb_end,3,JD,JV,JH)); trcSalt_RFHS=0._r8
+  allocate(trcSalt_soHml2(idsalt_beg:idsaltb_end,JZ,JY,JX));    trcSalt_soHml2=0._r8
+  allocate(trcSalt_RFXS(idsalt_beg:idsaltb_end,JZ,JY,JX));   trcSalt_RFXS=0._r8
 
-  allocate(trcsa_sosml2(idsa_beg:idsa_end,JS,JY,JX)); trcsa_sosml2=0._r8
+  allocate(trcSalt_sosml2(idsalt_beg:idsalt_end,JS,JY,JX)); trcSalt_sosml2=0._r8
 
-  allocate(trcsa_RFL0(idsa_beg:idsa_end,JY,JX));      trcsa_RFL0=0._r8
-  allocate(trcsa_RFL1(idsa_beg:idsab_end,JY,JX));     trcsa_RFL1=0._r8
+  allocate(trcSalt_RFL0(idsalt_beg:idsalt_end,JY,JX));      trcSalt_RFL0=0._r8
+  allocate(trcSalt_RFL1(idsalt_beg:idsaltb_end,JY,JX));     trcSalt_RFL1=0._r8
   end subroutine InitTrnsfrsData
 
 !----------------------------------------------------------------------
@@ -84,9 +84,9 @@ contains
   use abortutils, only : destroy
   implicit none
 
-  call destroy(trcsa_RFLS)
-  call destroy(trcsa_solml2)
-  call destroy(trcsa_solml2R)
+  call destroy(trcSalt_RFLS)
+  call destroy(trcSalt_solml2)
+  call destroy(trcSalt_solml2R)
 
   call destroy(ALSGL2)
   call destroy(FESGL2)
@@ -100,13 +100,13 @@ contains
   call destroy(HCSGL2)
   call destroy(SOSGL2)
   call destroy(CLSXL2)
-  call destroy(trcsa_RQ)
+  call destroy(trcSalt_RQ)
 
   call destroy(POSGL2)
 
 
-  call destroy(trcsa_RQR)
-  call destroy(trcsa_RFXS)
+  call destroy(trcSalt_RQR)
+  call destroy(trcSalt_RFXS)
   end subroutine DestructTrnsfrsData
 
 end module TrnsfrsDataMod

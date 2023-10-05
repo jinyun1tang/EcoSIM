@@ -344,14 +344,14 @@ module UptakesMod
     WSLF   =>  plt_biom%WSLF    , &
     ZEROP  =>  plt_biom%ZEROP   , &
     FracPARByCanP  =>  plt_rad%FracPARByCanP    , &
-    SURFX  =>  plt_photo%SURFX  , &
+    LeafAUnshaded_seclyrnodbrpft  =>  plt_photo%LeafAUnshaded_seclyrnodbrpft  , &
     ARLF1  =>  plt_morph%ARLF1  , &
     KLEAFX =>  plt_morph%KLEAFX , &
     CanopyHeight     =>  plt_morph%CanopyHeight     , &
-    CFX    =>  plt_morph%CFX    , &
+    ClumpFactort    =>  plt_morph%ClumpFactort    , &
     CanopyArea_pft  =>  plt_morph%CanopyArea_pft  , &
     NumOfBranches_pft    =>  plt_morph%NumOfBranches_pft    , &
-    SURF   =>  plt_morph%SURF   , &
+    LeafA_lyrnodbrchpft   =>  plt_morph%LeafA_lyrnodbrchpft   , &
     GridMaxCanopyHeight     =>  plt_morph%GridMaxCanopyHeight       &
   )
 !
@@ -366,15 +366,15 @@ module UptakesMod
 !
 !     ARLF=leaf area
 !     WSLF=leaf protein content
-!     SURFX,SURF=unself-shaded,total leaf surface area
-!     CFX=clumping factor from PFT file
+!     LeafAUnshaded_seclyrnodbrpft,LeafA_lyrnodbrchpft=unself-shaded,total leaf surface area
+!     ClumpFactort=clumping factor from PFT file
 !
       IF(ARLF1(K,NB,NZ).GT.ZEROP(NZ).AND.WSLF(K,NB,NZ).GT.ZEROP(NZ))THEN
         KLEAFX(NB,NZ)=K
       ENDIF
       D600: DO L=NumOfCanopyLayers1,1,-1
         D650: DO N=1,JLI1
-          SURFX(N,L,K,NB,NZ)=SURF(N,L,K,NB,NZ)*CFX(NZ)
+          LeafAUnshaded_seclyrnodbrpft(N,L,K,NB,NZ)=LeafA_lyrnodbrchpft(N,L,K,NB,NZ)*ClumpFactort(NZ)
         ENDDO D650
       ENDDO D600
     ENDDO D550

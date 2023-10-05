@@ -215,7 +215,7 @@ module CanopyCondsMod
   real(r8) :: BETA(JLI1,JSA1)                         !sine of direct solar radiation on leaf surface, [-]
   real(r8) :: BETX(JLI1,JSA1)                         !sine of direct solar radiation on leaf surface/sine of direct solar radiation, [-]
   REAL(R8) :: RDNDIR(JLI1,JSA1,JP1),RDNDIW(JLI1,JSA1,JP1)
-  real(r8) :: TSURF(JLI1,JZ1,JP1),TSURFB(JLI1,JZ1,JP1)
+  real(r8) :: CanopyLeafA_lyrpft(JLI1,NumOfCanopyLayers1,JP1),CanopyStemA_lyrpft(JLI1,NumOfCanopyLayers1,JP1)
   real(r8) :: TRADC,TRAPC,TRADG,TRAPG
   real(r8) :: SnowpackAlbedo,GrndAlbedo
   real(r8) :: GrndIncidSolarAngle,BETY,BETZ
@@ -251,7 +251,7 @@ module CanopyCondsMod
   !     RADS,RADY,RAPS,RAPY=solar beam direct,diffuse SW,PAR
   !     SSIN,TYSIN=sine of solar,sky angles
   !     SWRadByCanP,RADP=total SW,PAR absorbed by canopy
-  !     CFX=clumping factor for self-shading
+  !     ClumpFactort=clumping factor for self-shading
   !
   associate(                       &
     VLHeatCapSurfSnow  => plt_ew%VLHeatCapSurfSnow , &
@@ -305,11 +305,11 @@ module CanopyCondsMod
     VLSoilPoreMicP    => plt_soilchem%VLSoilPoreMicP, &
     VLSoilMicP    => plt_soilchem%VLSoilMicP, &
     VLWatMicP    => plt_soilchem%VLWatMicP, &
-    CFX     => plt_morph%CFX    , &
+    ClumpFactort     => plt_morph%ClumpFactort    , &
     CanopyHeightz      => plt_morph%CanopyHeightz     , &
     NumOfBranches_pft     => plt_morph%NumOfBranches_pft    , &
-    SURF    => plt_morph%SURF   , &
-    SURFB   => plt_morph%SURFB  , &
+    LeafA_lyrnodbrchpft   => plt_morph%LeafA_lyrnodbrchpft  , &
+    StemA_lyrnodbrchpft   => plt_morph%StemA_lyrnodbrchpft  , &
     CanopyLeafA_pft   => plt_morph%CanopyLeafA_pft  , &
     CanPLNBLA   => plt_morph%CanPLNBLA  , &
     CanopyBranchStemApft_lyr   => plt_morph%CanopyBranchStemApft_lyr  , &
@@ -352,7 +352,7 @@ module CanopyCondsMod
   D1025: DO NZ=1,NP
     SWRadByCanP(NZ)=0.0_r8
     PARByCanP(NZ)=0.0_r8
-    CFX(NZ)=ClumpFactor(NZ)*(1.0_r8-0.025_r8*CanopyLeafA_pft(NZ)/AREA3(NU))
+    ClumpFactort(NZ)=ClumpFactor(NZ)*(1.0_r8-0.025_r8*CanopyLeafA_pft(NZ)/AREA3(NU))
   ENDDO D1025
   !
   !     ANGLE BETWEEN SUN AND GROUND SURFACE
@@ -445,13 +445,13 @@ module CanopyCondsMod
       !     RESET ARRAYS OF SUNLIT AND SHADED LEAF AREAS IN DIFFERENT
       !     LAYERS AND ANGLE CLASSES
       !
-      !     TSURF,TSURFB,SURF,SURFB=leaf,stalk total,PFT surface area
+      !     TSURF,CanopyStemA_lyrpft,SURF,StemA_lyrnodbrchpft=leaf,stalk total,PFT surface area
 !
       D1150: DO NZ=1,NP
         DO  L=1,NumOfCanopyLayers1
           DO  N=1,JLI1
-            TSURF(N,L,NZ)=0.0_r8
-            TSURFB(N,L,NZ)=0.0_r8
+            CanopyLeafA_lyrpft(N,L,NZ)=0.0_r8
+            CanopyStemA_lyrpft(N,L,NZ)=0.0_r8
           enddo
         enddo
       ENDDO D1150
@@ -461,9 +461,9 @@ module CanopyCondsMod
             IF(CanopyHeightz(L-1).GT.SnowDepth-ZERO.AND.CanopyHeightz(L-1).GT.DPTH0-ZERO)THEN
               D1205: DO N=1,JLI1
                 D1210: DO K=1,JNODS1
-                  TSURF(N,L,NZ)=TSURF(N,L,NZ)+SURF(N,L,K,NB,NZ)
+                  CanopyLeafA_lyrpft(N,L,NZ)=CanopyLeafA_lyrpft(N,L,NZ)+LeafA_lyrnodbrchpft(N,L,K,NB,NZ)
                 ENDDO D1210
-                TSURFB(N,L,NZ)=TSURFB(N,L,NZ)+SURFB(N,L,NB,NZ)
+                CanopyStemA_lyrpft(N,L,NZ)=CanopyStemA_lyrpft(N,L,NZ)+StemA_lyrnodbrchpft(N,L,NB,NZ)
               ENDDO D1205
             ENDIF
           enddo
@@ -539,11 +539,11 @@ module CanopyCondsMod
       !     TSURWX=TSURWS m-2
       !
             D1600: DO N=1,JLI1
-              TSURFY=TSURF(N,L,NZ)*CFX(NZ)
+              TSURFY=CanopyLeafA_lyrpft(N,L,NZ)*ClumpFactort(NZ)
               TSURFZ=TSURFY*YAREA
               TSURFS=TSURFY*TAUS(L+1)
               TSURFX=TSURFS*XAREA
-              TSURWY=TSURFB(N,L,NZ)*CFW
+              TSURWY=CanopyStemA_lyrpft(N,L,NZ)*CFW
               TSURWZ=TSURWY*YAREA
               TSURWS=TSURWY*TAUS(L+1)
               TSURWX=TSURWS*XAREA
@@ -800,8 +800,8 @@ module CanopyCondsMod
             RAYPL(NZ)=0.0_r8
             RAYPW(NZ)=0.0_r8
             D2600: DO N=1,JLI1
-              TSURFY=TSURF(N,L,NZ)*CFX(NZ)
-              TSURWY=TSURFB(N,L,NZ)*CFW
+              TSURFY=CanopyLeafA_lyrpft(N,L,NZ)*ClumpFactort(NZ)
+              TSURWY=CanopyStemA_lyrpft(N,L,NZ)*CFW
               D2700: DO M=1,JSA1
                 D2750: DO NN=1,JLA1
                   RADYN=RADYL*OMEGA(M,N,NN)*CanopySWabsorpty_pft(NZ)

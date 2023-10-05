@@ -590,7 +590,7 @@ module StartqsMod
     PSTG    =>  plt_morph%PSTG   , &
     CanopyLeafA_pft   =>  plt_morph%CanopyLeafA_pft  , &
     CanopyBranchStemApft_lyr   =>  plt_morph%CanopyBranchStemApft_lyr  , &
-    SURFB   =>  plt_morph%SURFB  , &
+    StemA_lyrnodbrchpft   =>  plt_morph%StemA_lyrnodbrchpft  , &
     CanPSA   =>  plt_morph%CanPSA  , &
     PSTGF   =>  plt_morph%PSTGF  , &
     GRNXB   =>  plt_morph%GRNXB  , &
@@ -601,7 +601,7 @@ module StartqsMod
     CanPLNBLA   =>  plt_morph%CanPLNBLA  , &
     CanopyLeafApft_lyr   =>  plt_morph%CanopyLeafApft_lyr  , &
     CanopyStemApft_lyr   =>  plt_morph%CanopyStemApft_lyr  , &
-    SURF    =>  plt_morph%SURF   , &
+    LeafA_lyrnodbrchpft    =>  plt_morph%LeafA_lyrnodbrchpft   , &
     ARLF1   =>  plt_morph%ARLF1  , &
     CanPBranchHeight  =>  plt_morph%CanPBranchHeight , &
     HypoctoylHeight   =>  plt_morph%HypoctoylHeight  , &
@@ -693,7 +693,7 @@ module StartqsMod
     D5: DO L=1,NumOfCanopyLayers1
       CanopyBranchStemApft_lyr(L,NB,NZ)=0._r8
       DO N=1,JLI1
-        SURFB(N,L,NB,NZ)=0._r8
+        StemA_lyrnodbrchpft(N,L,NB,NZ)=0._r8
       enddo
     ENDDO D5
     DO K=0,JNODS1
@@ -719,7 +719,7 @@ module StartqsMod
         CPOOL4(K,NB,NZ)=0._r8
         D45: DO L=1,NumOfCanopyLayers1
           DO N=1,JLI1
-            SURF(N,L,K,NB,NZ)=0._r8
+            LeafA_lyrnodbrchpft(N,L,K,NB,NZ)=0._r8
           enddo
         ENDDO D45
       ENDIF
