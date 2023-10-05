@@ -89,6 +89,7 @@ module ecosim_Time_Mod
      procedure, public :: config_restart
      procedure, public :: config_diag
      procedure, public :: print_model_time_stamp
+     procedure, public :: update_sim_len
      procedure, private:: proc_nextstep
      procedure, private:: ReadNamelist
   end type ecosim_time_type
@@ -1058,4 +1059,13 @@ contains
 
 !  endif
   end subroutine getdatetime
+!-----------------------------------------------------------------------
+  subroutine update_sim_len(this, nstopyr)
+  implicit none
+  class(ecosim_time_type)  :: this
+  integer, intent(in) :: nstopyr
+
+  if(this%stop_opt==4)this%stop_count=min0(nstopyr,this%stop_count)
+
+  end subroutine update_sim_len
 end module ecosim_Time_Mod
