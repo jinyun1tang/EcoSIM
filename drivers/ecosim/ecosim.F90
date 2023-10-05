@@ -94,6 +94,8 @@ PROGRAM main
 
   nstopyr=get_sim_len(forc_periods)
 
+  call etimer%update_sim_len(nstopyr)
+  
   call frectyp%Init()
 
   if(is_restart())then
