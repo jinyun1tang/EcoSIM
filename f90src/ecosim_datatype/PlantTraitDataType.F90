@@ -310,7 +310,7 @@ contains
   allocate(FLG4(JBR,JP,JY,JX));  FLG4=0._r8
   allocate(HourCounter4LeafOut_brch(JBR,JP,JY,JX));  HourCounter4LeafOut_brch=0._r8
   allocate(FLGZ(JBR,JP,JY,JX));  FLGZ=0._r8
-  allocate(IDAY(jpstgs,JBR,JP,JY,JX));IDAY=0
+  allocate(IDAY(NumGrothStages,JBR,JP,JY,JX));IDAY=0
   allocate(CTC(JP,JY,JX));      CTC=0._r8
   allocate(HTC(JP,JY,JX));      HTC=0._r8
   allocate(SSTX(JP,JY,JX));     SSTX=0._r8

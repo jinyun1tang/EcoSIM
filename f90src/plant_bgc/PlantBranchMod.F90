@@ -2585,7 +2585,7 @@ module PlantBranchMod
         TGSTGI(NB,NZ)=0._r8
         TGSTGF(NB,NZ)=0._r8
         IDAY(1,NB,NZ)=I
-        D2005: DO M=2,jpstgs
+        D2005: DO M=2,NumGrothStages
           IDAY(M,NB,NZ)=0
         ENDDO D2005
         IF(NB.EQ.NB1(NZ))THEN

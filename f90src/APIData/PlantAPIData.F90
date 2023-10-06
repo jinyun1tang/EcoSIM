@@ -10,7 +10,7 @@ implicit none
   __FILE__
   public
 
-  integer, pointer :: jpstgs       !number of growth stages
+  integer, pointer :: NumGrothStages       !number of growth stages
   integer, pointer :: JRS          !maximum number of root layers
   integer, pointer :: JBR         !maximum number of plant branches
   integer, pointer :: JP1         !number of plants
@@ -1622,7 +1622,7 @@ implicit none
   JRS    => pltpar%JRS
   JPRT   => pltpar%JPRT
   NumOfPlantLitrCmplxs => pltpar%NumOfPlantLitrCmplxs
-  jpstgs => pltpar%jpstgs
+  NumGrothStages => pltpar%NumGrothStages
   jroots => pltpar%jroots
 
   call plt_site%Init()
@@ -1911,7 +1911,7 @@ implicit none
   allocate(this%IGTYP(JP1))
   allocate(this%KVSTG(JBR,JP1))
   allocate(this%KVSTGN(JBR,JP1))
-  allocate(this%IDAY(jpstgs,JBR,JP1))
+  allocate(this%IDAY(NumGrothStages,JBR,JP1))
   allocate(this%TGSTGI(JBR,JP1))
   allocate(this%TGSTGF(JBR,JP1))
   allocate(this%VSTGX(JBR,JP1))

@@ -183,7 +183,7 @@ implicit none
   !create history file for output
 
   use EcoSIMConfig      , only : case_name
-  use GridConsts        , only : JZ,JS,JBR,JC,JP,jpstgs
+  use GridConsts        , only : JZ,JS,JBR,JC,JP,NumGrothStages
   use EcoSIMConfig      , only : jcplx=>jcplxc,jsken=>jskenc
   use ElmIDMod          , only : NumOfPlantChemElements
   implicit none
@@ -249,7 +249,7 @@ implicit none
   call ncd_defdim(lnfid, 'levcan',JC,dimid)
   call ncd_defdim(lnfid, 'npfts',  JP,dimid)
   call ncd_defdim(lnfid, 'nbranches',JBR,dimid)
-  call ncd_defdim(lnfid, 'ngrstages',jpstgs,dimid)
+  call ncd_defdim(lnfid, 'ngrstages',NumGrothStages,dimid)
   call ncd_defdim(lnfid, 'elements',NumOfPlantChemElements,dimid)
   call ncd_defdim(lnfid, 'nkinecomp',jsken,dimid)
   call ncd_defdim(lnfid, 'nomcomplx',jcplx,dimid)

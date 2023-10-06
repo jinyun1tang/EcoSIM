@@ -1468,7 +1468,7 @@ implicit none
   endif  
 
   if(flag=='read')then
-    dat3pr => datip_3d(1:npfts,1:jpstgs,1:JBR)
+    dat3pr => datip_3d(1:npfts,1:NumGrothStages,1:JBR)
     call restartvar(ncid, flag, varname='IDAY', dim1name='pft',dim2name='ngrstages', &
      dim3name='nbranches',long_name='plant growth stage', units='none', &
      interpinic_flag='skip', data=dat3pr, missing_value=ispval, fill_value=ispval)
@@ -1476,7 +1476,7 @@ implicit none
   else
     !print*,'IDAY'
     if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,IDAY,datip_3d,iflgt=iflgt,iflgc=iflgc)   
-    dat3pr => datip_3d(1:npfts,1:jpstgs,1:JBR)
+    dat3pr => datip_3d(1:npfts,1:NumGrothStages,1:JBR)
     call restartvar(ncid, flag, varname='IDAY', dim1name='pft',dim2name='ngrstages', &
      dim3name='nbranches',long_name='plant growth stage', units='none', &
      interpinic_flag='skip', data=dat3pr, missing_value=ispval, fill_value=ispval)
@@ -7965,7 +7965,7 @@ implicit none
   call check_dim(ncid, 'levcan1',JC+1)
   call check_dim(ncid, 'npfts',  JP)
   call check_dim(ncid, 'nbranches',JBR)
-  call check_dim(ncid, 'ngrstages',jpstgs)
+  call check_dim(ncid, 'ngrstages',NumGrothStages)
   call check_dim(ncid, 'elmnts',NumOfPlantChemElements)
   call check_dim(ncid, 'nkinecmp',jsken)
   call check_dim(ncid, 'nomcomplx',jcplx)
@@ -8245,7 +8245,7 @@ implicit none
   call ncd_defdim(ncid, 'levcan1',JC+1,dimid)
   call ncd_defdim(ncid, 'npfts',  JP,dimid)
   call ncd_defdim(ncid, 'nbranches',JBR,dimid)
-  call ncd_defdim(ncid, 'ngrstages',jpstgs,dimid)
+  call ncd_defdim(ncid, 'ngrstages',NumGrothStages,dimid)
   call ncd_defdim(ncid, 'elmnts',NumOfPlantChemElements,dimid)
   call ncd_defdim(ncid, 'nkinecmp',jsken,dimid)
   call ncd_defdim(ncid, 'nomcomplx',jcplx,dimid)

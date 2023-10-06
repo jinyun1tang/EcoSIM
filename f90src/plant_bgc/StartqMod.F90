@@ -510,7 +510,7 @@ module StartqMod
     FLGZ(NB,NZ,NY,NX)=0
     BranchNumber_brchpft(NB,NZ,NY,NX)=0
     IDTHB(NB,NZ,NY,NX)=1
-    D15: DO M=1,jpstgs
+    D15: DO M=1,NumGrothStages
       IDAY(M,NB,NZ,NY,NX)=0
     ENDDO D15
   ENDDO D10

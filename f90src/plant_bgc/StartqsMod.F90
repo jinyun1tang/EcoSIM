@@ -654,7 +654,7 @@ module StartqsMod
     FLGZ(NB,NZ)=0
     BranchNumber_brchpft(NB,NZ)=0
     plt_pheno%IDTHB(NB,NZ)=ibrdead
-    D15: DO M=1,pltpar%jpstgs
+    D15: DO M=1,pltpar%NumGrothStages
       IDAY(M,NB,NZ)=0
     ENDDO D15
   ENDDO D10

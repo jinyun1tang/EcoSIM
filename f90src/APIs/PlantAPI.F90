@@ -482,7 +482,7 @@ implicit none
           WGLFLE(1:NumOfPlantChemElements,L,K,NB,NZ,NY,NX) =plt_biom%WGLFLE(1:NumOfPlantChemElements,L,K,NB,NZ)
         ENDDO
       ENDDO
-      DO M=1,pltpar%jpstgs
+      DO M=1,pltpar%NumGrothStages
         IDAY(M,NB,NZ,NY,NX)=plt_pheno%IDAY(M,NB,NZ)
       ENDDO
       DO K=1,JNODS
@@ -1295,7 +1295,7 @@ implicit none
       plt_biom%WGLFEX(1:NumOfPlantChemElements,NB,NZ) =WGLFEX(1:NumOfPlantChemElements,NB,NZ,NY,NX)
       plt_biom%WTSTXBE(1:NumOfPlantChemElements,NB,NZ)=WTSTXBE(1:NumOfPlantChemElements,NB,NZ,NY,NX)
       plt_biom%CanPBStalkC(NB,NZ)=CanPBStalkC(NB,NZ,NY,NX)
-      DO M=1,pltpar%jpstgs
+      DO M=1,pltpar%NumGrothStages
         plt_pheno%IDAY(M,NB,NZ)=IDAY(M,NB,NZ,NY,NX)
       ENDDO
       DO K=1,JNODS

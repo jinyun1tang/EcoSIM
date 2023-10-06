@@ -192,9 +192,11 @@ contains
 
     IF(VLHeatCapSnowM1(L,NY,NX).GT.VLHeatCapSnowMin(NY,NX))THEN
       ! active snow layer
-      VLSnoDWI1(L,NY,NX)=VLDrySnoWE0M(L,NY,NX)/SnoDensL(L,NY,NX)+VLWatSnow0M(L,NY,NX)+VLIceSnow0M(L,NY,NX)
+      VLSnoDWI1(L,NY,NX)=VLDrySnoWE0M(L,NY,NX)/SnoDensL(L,NY,NX)+VLWatSnow0M(L,NY,NX) &
+        +VLIceSnow0M(L,NY,NX)
       SnowLayerThick0(L,NY,NX)=VLSnoDWI1(L,NY,NX)/AREA(3,NUM(NY,NX),NY,NX)
-      VLairSno1=AZMAX1(VLSnoDWI1(L,NY,NX)-VLDrySnoWE0M(L,NY,NX)-VLIceSnow0M(L,NY,NX)-VLWatSnow0M(L,NY,NX))
+      VLairSno1=AZMAX1(VLSnoDWI1(L,NY,NX)-VLDrySnoWE0M(L,NY,NX)-VLIceSnow0M(L,NY,NX) &
+        -VLWatSnow0M(L,NY,NX))
       FracAsAirSno1=AMAX1(THETPI,VLairSno1/VLSnoDWI1(L,NY,NX))
       VapCond1=FracAsAirSno1**2.0_r8*H2OVapDifscSno(L,NY,NX)
       VapSnoSrc=vapsat(TKSnow1(L,NY,NX))  
@@ -237,7 +239,8 @@ contains
       IF(L.LT.JS.AND.VLHeatCapSnowM1(L2,NY,NX).GT.VLHeatCapSnowMin(NY,NX))THEN
         !if L==JS-1, L2==JS, so top layer is treated here.
 
-        VLSnoDWI1(L2,NY,NX)=VLDrySnoWE0M(L2,NY,NX)/SnoDensL(L2,NY,NX)+VLWatSnow0M(L2,NY,NX)+VLIceSnow0M(L2,NY,NX)
+        VLSnoDWI1(L2,NY,NX)=VLDrySnoWE0M(L2,NY,NX)/SnoDensL(L2,NY,NX)+VLWatSnow0M(L2,NY,NX) &
+          +VLIceSnow0M(L2,NY,NX)
         SnowLayerThick0(L2,NY,NX)=VLSnoDWI1(L2,NY,NX)/AREA(3,NUM(NY,NX),NY,NX)
         VLairSno2=VLSnoDWI1(L2,NY,NX)-VLDrySnoWE0M(L2,NY,NX)-VLIceSnow0M(L2,NY,NX)-VLWatSnow0M(L2,NY,NX)        
         FracAsAirInSno=AMAX1(THETPI,VLairSno2/VLSnoDWI1(L2,NY,NX))
@@ -261,7 +264,8 @@ contains
           !both layer has air-filled pores
           VapCond2=FracAsAirInSno**2.0_r8*H2OVapDifscSno(L2,NY,NX)
           VapSnoDest=vapsat(TKSnow1(L2,NY,NX))
-          VapCondSnoWeited=2.0_r8*VapCond1*VapCond2/(VapCond1*SnowLayerThick0(L2,NY,NX)+VapCond2*SnowLayerThick0(L,NY,NX))
+          VapCondSnoWeited=2.0_r8*VapCond1*VapCond2/(VapCond1*SnowLayerThick0(L2,NY,NX) &
+            +VapCond2*SnowLayerThick0(L,NY,NX))
           H2OVapFlx=VapCondSnoWeited*(VapSnoSrc-VapSnoDest)*AREA(3,NUM(NY,NX),NY,NX)*FracSurfAsSnow(NY,NX)*dts_snohttp
           VPY=(VapSnoSrc*VLairSno1+VapSnoDest*VLairSno2)/(VLairSno1+VLairSno2)
           !H2OVapFlxMax>0, moves out from layer L
@@ -305,7 +309,8 @@ contains
         TKY=(TKSnow1(L,NY,NX)*VLHeatCapSnowM1(L,NY,NX)+TKSnow1(L2,NY,NX) &
           *VLHeatCapSnowM1(L2,NY,NX))/(VLHeatCapSnowM1(L,NY,NX)+VLHeatCapSnowM1(L2,NY,NX))
         HeatCnductMax=(TKSnow1(L,NY,NX)-TKY)*VLHeatCapSnowM1(L,NY,NX)*dts_sno
-        HeatCnduct=ATCNDW*(TKSnow1(L,NY,NX)-TKSnow1(L2,NY,NX))*AREA(3,NUM(NY,NX),NY,NX)*FracSurfAsSnow(NY,NX)*dts_snohttp
+        HeatCnduct=ATCNDW*(TKSnow1(L,NY,NX)-TKSnow1(L2,NY,NX))*AREA(3,NUM(NY,NX),NY,NX) &
+          *FracSurfAsSnow(NY,NX)*dts_snohttp
 
         IF(HeatCnduct.GE.0.0_r8)THEN
           HeatCndFlxInSno=AZMAX1(AMIN1(HeatCnductMax,HeatCnduct))
@@ -835,7 +840,8 @@ contains
 !     CumHeat2SnowLay=total snowpack conductive+convective heat flux
 !     PhaseChangeHeatL=snowpack latent heat flux from freeze-thaw
 !
-!  if(M>=28 .and. NY==3)write(*,*)'UpdateSnowAtM0000 NY,NX ',NY,NX,M,VLDrySnoWE0(1,NY,NX),VLWatSnow0(1,NY,NX),VLIceSnow0(1,NY,NX)
+!  if(M>=28 .and. NY==3)write(*,*)'UpdateSnowAtM0000 NY,NX ',NY,NX,M,VLDrySnoWE0(1,NY,NX),&
+!    VLWatSnow0(1,NY,NX),VLIceSnow0(1,NY,NX)
   D9780: DO L=1,JS
     VLDrySnoWE0(L,NY,NX)=VLDrySnoWE0(L,NY,NX)+CumSno2SnowLay(L,NY,NX)-SnowThawMassL(L,NY,NX)
     VLWatSnow0(L,NY,NX)=VLWatSnow0(L,NY,NX)+CumWat2SnowLay(L,NY,NX)+SnowThawMassL(L,NY,NX)+IceThawMassL(L,NY,NX)
@@ -1415,9 +1421,11 @@ contains
   IF(VLitR(NY,NX).GT.ZEROS(NY,NX).AND.VLWatMicP1(0,NY,NX).GT.ZEROS2(NY,NX))THEN
     THETWR=AMIN1(VWatLitRHoldCapcity(NY,NX),VLWatMicP1(0,NY,NX))/VLitR(NY,NX)
     IF(THETWR.LT.FieldCapacity(0,NY,NX))THEN
-      PSISM1(0,NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIFLD(NY,NX)+((LOGFldCapacity(0,NY,NX)-LOG(THETWR))/FCD(0,NY,NX)*LOGPSIMND(NY,NX))))
+      PSISM1(0,NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIFLD(NY,NX)+((LOGFldCapacity(0,NY,NX)-LOG(THETWR))/FCD(0,NY,NX) &
+        *LOGPSIMND(NY,NX))))
     ELSEIF(THETWR.LT.POROS0(NY,NX))THEN
-      PSISM1(0,NY,NX)=-EXP(LOGPSIAtSat(NY,NX)+(((LOGPOROS(0,NY,NX)-LOG(THETWR))/PSD(0,NY,NX))**SRP(0,NY,NX)*LOGPSIMXD(NY,NX)))
+      PSISM1(0,NY,NX)=-EXP(LOGPSIAtSat(NY,NX)+(((LOGPOROS(0,NY,NX)-LOG(THETWR))/PSD(0,NY,NX))**SRP(0,NY,NX) &
+        *LOGPSIMXD(NY,NX)))
     ELSE
       THETWR=POROS0(NY,NX)
       PSISM1(0,NY,NX)=PSISE(0,NY,NX)

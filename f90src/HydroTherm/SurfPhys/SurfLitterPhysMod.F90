@@ -21,10 +21,12 @@ module SurfLitterPhysMod
   use SoilPhysParaMod
   USE SoilHeatDataType
   USE ClimForcDataType
+  use SnowPhysData
 implicit none
   character(len=*), parameter, private :: mod_filename='SurfLitterPhysMod'
   public :: SRFLitterEnergyBalance
   public :: UpdateLitRPhys
+  public :: UpdateLitRAtM
   contains
 
 
@@ -489,4 +491,79 @@ implicit none
 
   end subroutine UpdateLitRPhys
 
+!------------------------------------------------------------------------------------------
+  subroutine UpdateLitRAtM(M,NY,NX)
+  implicit none
+  integer, intent(in) :: M,NY,NX
+  real(r8) :: VOLIRZ,ENGYR,VLHeatCapLitRPre
+  real(r8) :: TK0Prev,TVWatIceLitR,VWatLitrZ
+
+  ! SURFACE RESIDUE WATER AND TEMPERATURE
+  !
+  ! XVOLT,XVOLW=free water+ice,water in litter layer
+  ! VOLWM,VsoiPM=surface water,air content for use in trnsfr.f
+  ! VWatLitRHoldCapcity=maximum water retention by litter
+  ! VLHeatCapacity=volumetric heat capacity of litter
+  ! VOLA1,VLWatMicP1,VLiceMicP1,VOLP1=pore,water,ice,air volumes of litter
+  ! VWatLitRHoldCapcity=maximum water retention by litter
+  ! LitrIceHeatFlxFrez,LitrIceFlxThaw=litter water,latent heat flux from freeze-thaw
+  ! VLitR=dry litter volume
+  ! THETWX,FracSoiPAsIce,FracSoiPAsAir=water,ice,air concentrations
+  ! VLHeatCapacity=volumetric heat capacity of litter
+  ! TK1=litter temperature
+  ! HFLWRL,LitrIceHeatFlxFrez,cumHeatFlx2LitRByRunoff=litter total cond+conv,latent,runoff heat flux
+
+  VLWatMicP1(0,NY,NX)=AZMAX1(VLWatMicP1(0,NY,NX)+WatFLow2LitR(NY,NX)+LitrIceFlxThaw(NY,NX)+&
+    cumWatFlx2LitRByRunoff(NY,NX))
+  VLiceMicP1(0,NY,NX)=AZMAX1(VLiceMicP1(0,NY,NX)-LitrIceFlxThaw(NY,NX)/DENSICE)
+  VLairMicP1(0,NY,NX)=AZMAX1(VLPoreLitR(NY,NX)-VLWatMicP1(0,NY,NX)-VLiceMicP1(0,NY,NX))
+  VLWatMicPM(M+1,0,NY,NX)=VLWatMicP1(0,NY,NX)
+  VLsoiAirPM(M+1,0,NY,NX)=VLairMicP1(0,NY,NX)
+  TVWatIceLitR=VLWatMicP1(0,NY,NX)+VLiceMicP1(0,NY,NX)
+  XVLMobileWaterLitR(NY,NX)=AZMAX1(TVWatIceLitR-VWatLitRHoldCapcity(NY,NX))
+  IF(TVWatIceLitR.GT.ZEROS(NY,NX))THEN
+    VWatLitrZ=VLWatMicP1(0,NY,NX)/TVWatIceLitR*VWatLitRHoldCapcity(NY,NX)
+    VOLIRZ=VLiceMicP1(0,NY,NX)/TVWatIceLitR*VWatLitRHoldCapcity(NY,NX)
+    XVLMobileWatMicP(NY,NX)=AZMAX1(VLWatMicP1(0,NY,NX)-VWatLitrZ)
+    XVLiceMicP(NY,NX)=AZMAX1(VLiceMicP1(0,NY,NX)-VOLIRZ)
+  ELSE
+    XVLMobileWatMicP(NY,NX)=0.0_r8
+    XVLiceMicP(NY,NX)=0.0_r8
+  ENDIF
+  XVLMobileWaterLitRM(M+1,NY,NX)=XVLMobileWaterLitR(NY,NX)
+  XVLMobileWatMicPM(M+1,NY,NX)=XVLMobileWatMicP(NY,NX)
+  XVLiceMicPM(M+1,NY,NX)=XVLiceMicP(NY,NX)
+  IF(VLitR(NY,NX).GT.ZEROS2(NY,NX))THEN
+    FracSoiPAsWat(0,NY,NX)=AZMAX1t(VLWatMicP1(0,NY,NX)/VLitR(NY,NX))
+    FracSoiPAsIce(0,NY,NX)=AZMAX1t(VLiceMicP1(0,NY,NX)/VLitR(NY,NX))
+    FracSoiPAsAir(0,NY,NX)=AZMAX1t(VLairMicP1(0,NY,NX)/VLitR(NY,NX)) &
+      *AZMAX1t((1.0_r8-XVLMobileWaterLitR(NY,NX)/MaxVLWatByLitR(NY,NX)))
+  ELSE
+    FracSoiPAsWat(0,NY,NX)=0.0_r8
+    FracSoiPAsIce(0,NY,NX)=0.0_r8
+    FracSoiPAsAir(0,NY,NX)=1.0_r8
+  ENDIF
+  THETPM(M+1,0,NY,NX)=FracSoiPAsAir(0,NY,NX)
+  VLHeatCapLitRPre=VLHeatCapacity(0,NY,NX)                !heat capacity
+  TK0Prev=TKSoi1(0,NY,NX)                                 !residual temperature
+  ENGYR=VLHeatCapacity(0,NY,NX)*TKSoi1(0,NY,NX)  !initial energy content
+  VLHeatCapacity(0,NY,NX)=cpo*ORGC(0,NY,NX)+cpw*VLWatMicP1(0,NY,NX)+cpi*VLiceMicP1(0,NY,NX)  !update heat capacity
+
+  IF(VLHeatCapacity(0,NY,NX).GT.VHeatCapLitR(NY,NX))THEN
+    TKSoi1(0,NY,NX)=(ENGYR+HeatFLoByWat2LitRi(NY,NX)+LitrIceHeatFlxFrez(NY,NX) &
+      +cumHeatFlx2LitRByRunoff(NY,NX))/VLHeatCapacity(0,NY,NX)
+    if(TKSoi1(0,NY,NX)<100._r8 .or. TKSoi1(0,NY,NX)>400._r8)then
+      write(*,*)'weird litter temp UpdateSurfaceAtM=',M,NY,NX,TKSoi1(0,NY,NX),TK0Prev,HeatFLoByWat2LitRi(NY,NX)
+      write(*,*)ENGYR/VLHeatCapacity(0,NY,NX),HeatFLoByWat2LitRi(NY,NX)/VLHeatCapacity(0,NY,NX),&
+        LitrIceHeatFlxFrez(NY,NX)/VLHeatCapacity(0,NY,NX),cumHeatFlx2LitRByRunoff(NY,NX)/VLHeatCapacity(0,NY,NX)
+      call endrun(trim(mod_filename)//'at line',__LINE__)
+    endif
+!    IF(ABS(VLHeatCapacity(0,NY,NX)/VLHeatCapLitRPre-1._r8)>0.025_r8.or. &
+!      abs(TKSoi1(0,NY,NX)/TK0Prev-1._r8)>0.025_r8)THEN
+!      TKSoi1(0,NY,NX)=TKSoi1(NUM(NY,NX),NY,NX)
+!    ENDIF
+  ELSE
+    TKSoi1(0,NY,NX)=TKSoi1(NUM(NY,NX),NY,NX)
+  ENDIF
+  end subroutine UpdateLitRAtM
 end module SurfLitterPhysMod

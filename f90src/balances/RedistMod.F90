@@ -97,7 +97,7 @@ module RedistMod
       DORGE(NY,NX)=0.0_r8
       WQRH(NY,NX)=0.0_r8
 !
-      call AddFluxToSurfaceResidue(NY,NX)
+      call AddFlux2SurfaceResidue(NY,NX)
 !
       call SinkChemicals(NY,NX)
 !
@@ -139,11 +139,11 @@ module RedistMod
 !
 !     CHECK MATERIAL BALANCES
 !
-      IF(I.EQ.365.AND.J.EQ.24)THEN
-        WRITE(19,2221)'ORGC',I,J,IYRC,NX,NY,(ORGC(L,NY,NX)/AREA(3,L,NY,NX),L=0,NL(NY,NX))
-        WRITE(20,2221)'ORGN',I,J,IYRC,NX,NY,(ORGN(L,NY,NX)/AREA(3,L,NY,NX),L=0,NL(NY,NX))
+!      IF(I.EQ.365.AND.J.EQ.24)THEN
+!        WRITE(19,2221)'ORGC',I,J,IYRC,NX,NY,(ORGC(L,NY,NX)/AREA(3,L,NY,NX),L=0,NL(NY,NX))
+!        WRITE(20,2221)'ORGN',I,J,IYRC,NX,NY,(ORGN(L,NY,NX)/AREA(3,L,NY,NX),L=0,NL(NY,NX))
 2221    FORMAT(A8,5I6,21E14.6)
-      ENDIF
+!      ENDIF
 
     ENDDO D9990
   ENDDO D9995
@@ -1671,7 +1671,7 @@ module RedistMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine AddFluxToSurfaceResidue(NY,NX)
+  subroutine AddFlux2SurfaceResidue(NY,NX)
   implicit none
   integer, intent(in) :: NY,NX
 
@@ -1707,7 +1707,7 @@ module RedistMod
 
   call SumSurfMicBGCFluxes(NY,NX)
 
-  end subroutine AddFluxToSurfaceResidue
+  end subroutine AddFlux2SurfaceResidue
 
 !------------------------------------------------------------------------------------------
 

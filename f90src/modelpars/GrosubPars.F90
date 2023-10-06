@@ -157,7 +157,7 @@ module GrosubPars
   integer :: istalk
   integer :: iroot
   integer :: icwood
-  integer :: jpstgs       !number of growth stages
+  integer :: NumGrothStages       !number of growth stages
   integer :: JRS          !maximum number of root axes
   integer  :: JP1         !number of plants
   integer  :: JBR         !maximum number of branches
@@ -211,7 +211,7 @@ module GrosubPars
   pltpar%istalk=3
   pltpar%iroot=4
   pltpar%icwood=5
-  pltpar%jpstgs=10
+  pltpar%NumGrothStages=10
   pltpar%JRS=10
   pltpar%JPRT=7
   pltpar%jroots=2

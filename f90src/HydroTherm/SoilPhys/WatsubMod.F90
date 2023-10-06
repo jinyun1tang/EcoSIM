@@ -109,7 +109,7 @@ module WatsubMod
 
     ! run surface energy balance model, uses ResistanceLitRLay
     call RunSurfacePhysModel(M,NHE,NHW,NVS,NVN,ResistanceLitRLay,KSatReductByRainKineticEnergyS,&
-      HeatFlux2Ground,TopLayWatVol)
+      TopLayWatVol,HeatFlux2Ground)
 
     call CopySoilWatVolMit(NHW,NHE,NVN,NVS,TopLayWatVol)
         
@@ -117,9 +117,12 @@ module WatsubMod
     call Subsurface3DFlowMit(M,NHW,NHE,NVN,NVS,KSatReductByRainKineticEnergyS,HeatFlux2Ground)
 
     call LateralWatHeatExchMit(M,NHW,NHE,NVN,NVS,KSatReductByRainKineticEnergyS)
-!
+
+!   update states and fluxes
     IF(M.NE.NPH)THEN
 !     intermediate iteration
+      call UpdateSurfaceAtM(M,NHW,NHE,NVN,NVS)
+
       call UpdateStateFluxAtM(M,NHW,NHE,NVN,NVS)
     ELSE
 !     last iteration
@@ -1012,8 +1015,6 @@ module WatsubMod
   D9795: DO NX=NHW,NHE
     D9790: DO NY=NVN,NVS
 
-      call UpdateSurfaceAtM(M,NY,NX)
-
       !
       ! SOIL LAYER WATER, ICE AND TEMPERATURE
       !
@@ -1083,6 +1084,7 @@ module WatsubMod
           VLWatMacPM(M+1,L,NY,NX)=VLWatMacP1(L,NY,NX)
           VLsoiAirPM(M+1,L,NY,NX)=VLairMicP1(L,NY,NX)+VLairMacP1(L,NY,NX) &
             +THETPI*(VLiceMicP1(L,NY,NX)+VLiceMacP1(L,NY,NX))
+
           !change in soil air volume
           ReductVLsoiAirPM(M,L,NY,NX)=VLsoiAirPM(M,L,NY,NX)-VLsoiAirPM(M+1,L,NY,NX)
           VLTSoiPore=VLSoilMicP(L,NY,NX)+VLMacP1(L,NY,NX)

@@ -63,7 +63,7 @@ implicit none
 
   call InitPlantMorphSize()
 
-  call InitGrosub(jpstgs,JRS)
+  call InitGrosub(NumGrothStages,JRS)
 
   call InitGridData
 

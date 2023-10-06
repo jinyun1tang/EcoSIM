@@ -43,13 +43,13 @@ module grosubsMod
   public :: InitGrosub
   contains
 
-  subroutine InitGrosub(jpstgs,JRS)
+  subroutine InitGrosub(NumGrothStages,JRS)
 
   implicit none
-  integer, intent(out) :: jpstgs,JRS
+  integer, intent(out) :: NumGrothStages,JRS
 
   call InitVegPars(pltpar)
-  jpstgs = pltpar%jpstgs
+  NumGrothStages = pltpar%NumGrothStages
   jrs = pltpar%JRS
 
 
