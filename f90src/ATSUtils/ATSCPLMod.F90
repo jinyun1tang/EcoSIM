@@ -155,7 +155,7 @@ contains
 
   write(*,*) "AT copy back:"
   write(*,*) "water: ", surf_w_source
-  write(*,*) "energy: ", surf_e_source  
+  write(*,*) "energy: ", surf_e_source
 
   call c_f_pointer(state%surface_water_source%data, data, (/num_cols/))
   data(:) = surf_w_source
