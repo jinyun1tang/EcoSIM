@@ -3,6 +3,7 @@ set(ATSUTILS_MOD_SOURCES
   ATSUtilsMod.F90
   ATSCPLMod.F90
   ATSEcoSIMInitMod.F90
+  ATSEcoSIMAdvanceMod.F90
   BGC_containers.F90
   c_f_interface_module.F90
 )

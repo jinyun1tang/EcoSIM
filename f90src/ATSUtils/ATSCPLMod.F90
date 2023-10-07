@@ -2,6 +2,7 @@ module ATSCPLMod
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use SharedDataMod
   use ATSEcoSIMInitMod
+  use ATSEcoSIMAdvanceMod
   use BGCContainers_module
   implicit none
 
@@ -154,7 +155,7 @@ contains
 
   write(*,*) "AT copy back:"
   write(*,*) "water: ", surf_w_source
-  write(*,*) "energy: ", surf_e_source  
+  write(*,*) "energy: ", surf_e_source
 
   call c_f_pointer(state%surface_water_source%data, data, (/num_cols/))
   data(:) = surf_w_source
@@ -206,18 +207,28 @@ contains
   !For this we need to either specifically take energy away from the top layer
   !or add it to the surface_energy-source variable
   integer :: K, vec_size
+  type (BGCSizes), intent(in) :: sizes
+  integer :: size_col, num_cols
+
+  size_col = sizes%ncells_per_col_
+  num_cols = sizes%num_columns
 
   vec_size = size(surf_e_source)
-
   write(*,*) "in surface energy balance"
-  do K=1,vec_size
-    write(*,*) "surface energy (", K, ") = ", surf_e_source(K)
-    write(*,*) "surface water (", K, ") = ", surf_w_source(K)
-  
-    write(*,*) "changing surface vars"
-    surf_e_source(K) = 8.08
-    surf_w_source(K) = 8.08
-  end do
+
+  call RunEcoSIMSurfaceBalance(size_col)
+
+  !call StageSurfacePhysModel(I,J,NHW,NHE,NVN,NVS,ResistanceLitRLay)
+  !call RunSurfacePhysModel(M,NHE,NHW,NVS,NVN,ResistanceLitRLay,&
+  !    KSatReductByRainKineticEnergyS,TopLayWatVol,HeatFlux2Ground,Qinfl2MicP)
+  !do K=1,vec_size
+  !  write(*,*) "surface energy (", K, ") = ", surf_e_source(K)
+  !  write(*,*) "surface water (", K, ") = ", surf_w_source(K)
+  !
+  !  write(*,*) "changing surface vars"
+  !  surf_e_source(K) = 8.08
+  !  surf_w_source(K) = 8.08
+  !end do
 
   write(*,*) "leaving surface energy balance"
 
