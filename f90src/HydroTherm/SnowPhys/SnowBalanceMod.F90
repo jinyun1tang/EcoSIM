@@ -59,13 +59,14 @@ implicit none
 !
 !     SNOW RUNOFF
 !
-  VLDrySnoWE(1,NY,NX)=VLDrySnoWE(1,NY,NX)+TQS(NY,NX)
-  VLWatSnow(1,NY,NX)=VLWatSnow(1,NY,NX)+TQW(NY,NX)
-  VLIceSnow(1,NY,NX)=VLIceSnow(1,NY,NX)+TQI(NY,NX)
+  VLDrySnoWE(1,NY,NX)=VLDrySnoWE(1,NY,NX)+TDrysnoBySnowRedist(NY,NX)
+  VLWatSnow(1,NY,NX)=VLWatSnow(1,NY,NX)+TWatBySnowRedist(NY,NX)
+  VLIceSnow(1,NY,NX)=VLIceSnow(1,NY,NX)+TIceBySnowRedist(NY,NX)
   ENGYW=VLHeatCapSnow(1,NY,NX)*TKSnow(1,NY,NX)
   VLHeatCapSnow(1,NY,NX)=cps*VLDrySnoWE(1,NY,NX)+cpw*VLWatSnow(1,NY,NX)+cpi*VLIceSnow(1,NY,NX)
+
   IF(VLHeatCapSnow(1,NY,NX).GT.VLHeatCapSnowMin(NY,NX))THEN
-    TKSnow(1,NY,NX)=(ENGYW+THQS(NY,NX))/VLHeatCapSnow(1,NY,NX)
+    TKSnow(1,NY,NX)=(ENGYW+THeatBySnowRedist(NY,NX))/VLHeatCapSnow(1,NY,NX)
   ELSE
     TKSnow(1,NY,NX)=TairK(NY,NX)
   ENDIF
@@ -632,10 +633,10 @@ implicit none
   integer, intent(in) :: NY,NX
   integer :: L
 
-  TQS(NY,NX)=0.0_r8
-  TQW(NY,NX)=0.0_r8
-  TQI(NY,NX)=0.0_r8
-  THQS(NY,NX)=0.0_r8
+  TDrysnoBySnowRedist(NY,NX)=0.0_r8
+  TWatBySnowRedist(NY,NX)=0.0_r8
+  TIceBySnowRedist(NY,NX)=0.0_r8
+  THeatBySnowRedist(NY,NX)=0.0_r8
 
   trcn_TQR(ids_nut_beg:ids_nuts_end,NY,NX)=0.0_r8
   trcg_QSS(idg_beg:idg_end-1,NY,NX)=0.0_r8  
@@ -700,10 +701,10 @@ implicit none
     ENDIF
   ENDDO D1202
 
-  TQS(N2,N1)=TQS(N2,N1)+DrysnoBySnowRedistribution(N,N2,N1)-DrysnoBySnowRedistribution(N,N5,N4)
-  TQW(N2,N1)=TQW(N2,N1)+WatBySnowRedistribution(N,N2,N1)-WatBySnowRedistribution(N,N5,N4)
-  TQI(N2,N1)=TQI(N2,N1)+IceBySnowRedistribution(N,N2,N1)-IceBySnowRedistribution(N,N5,N4)
-  THQS(N2,N1)=THQS(N2,N1)+HeatBySnowRedistribution(N,N2,N1)-HeatBySnowRedistribution(N,N5,N4)
+  TDrysnoBySnowRedist(N2,N1)=TDrysnoBySnowRedist(N2,N1)+DrysnoBySnowRedistribution(N,N2,N1)-DrysnoBySnowRedistribution(N,N5,N4)
+  TWatBySnowRedist(N2,N1)=TWatBySnowRedist(N2,N1)+WatBySnowRedistribution(N,N2,N1)-WatBySnowRedistribution(N,N5,N4)
+  TIceBySnowRedist(N2,N1)=TIceBySnowRedist(N2,N1)+IceBySnowRedistribution(N,N2,N1)-IceBySnowRedistribution(N,N5,N4)
+  THeatBySnowRedist(N2,N1)=THeatBySnowRedist(N2,N1)+HeatBySnowRedistribution(N,N2,N1)-HeatBySnowRedistribution(N,N5,N4)
   !
   !     NET GAS AND SOLUTE FLUXES FROM RUNOFF AND SNOWPACK
   !
@@ -743,7 +744,7 @@ implicit none
 !     begin_execution
 !     OVERLAND SNOW REDISTRIBUTION
 !
-  IF(abs(TQS(NY,NX))>0._r8)THEN
+  IF(abs(TDrysnoBySnowRedist(NY,NX))>0._r8)THEN
     DO NTG=idg_beg,idg_end-1
       trcg_solsml(NTG,1,NY,NX)=trcg_solsml(NTG,1,NY,NX)+trcg_QSS(NTG,NY,NX)
     ENDDO

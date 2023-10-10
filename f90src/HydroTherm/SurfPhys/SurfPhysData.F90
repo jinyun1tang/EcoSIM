@@ -40,6 +40,9 @@ implicit none
   real(r8),allocatable ::  BAREW(:,:)                         !
   real(r8),allocatable ::  HCNDR(:,:)                         !
 
+  real(r8),allocatable :: watflw(:,:)
+  real(r8),allocatable :: waticefl(:,:)
+
   public :: InitSurfPhysData,DestructSurfPhysData
 
   contains
@@ -47,6 +50,9 @@ implicit none
 
   subroutine InitSurfPhysData  
   implicit none
+
+  allocate(watflw(JY, JX))
+  allocate(waticefl(JY,JX))
 
   allocate(XVLMobileWaterLitR(JY,JX));       XVLMobileWaterLitR=0._r8
   allocate(XVLMobileWatMicP(JY,JX));       XVLMobileWatMicP=0._r8

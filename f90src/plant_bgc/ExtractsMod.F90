@@ -365,7 +365,7 @@ module ExtractsMod
     ZESNC => plt_bgcr%ZESNC  , &
     RootGasLoss_disturb => plt_bgcr%RootGasLoss_disturb, &
     RUPNF => plt_bgcr%RUPNF  , &
-    CNET  => plt_bgcr%CNET   , &
+    CO2NetFix_pft  => plt_bgcr%CO2NetFix_pft   , &
     ETCanP => plt_ew%ETCanP    , &
     TH2GZ => plt_bgcr%TH2GZ  , &
     RNH3B => plt_rbgc%RNH3B  , &
@@ -420,7 +420,7 @@ module ExtractsMod
 !     TGH=total canopy storage heat flux
 !     HeatStorCanP=PFT canopy storage heat flux
 !     TCCAN=total net CO2 fixation
-!     CNET=PFT net CO2 fixation
+!     CO2NetFix_pft=PFT net CO2 fixation
 !     CanWatg,CanH2OHeldVg=total water volume in canopy,on canopy surfaces
 !     CanWatP,WatByPCan=PFT water volume in canopy,on canopy surfaces
 !     TEVAPP,VapXAir2CanG=total water flux to,from canopy,canopy surfaces
@@ -440,7 +440,7 @@ module ExtractsMod
   TLE=TLE+EvapTransHeatP(NZ)
   TSH=TSH+HeatXAir2PCan(NZ)
   TGH=TGH+HeatStorCanP(NZ)
-  TCCAN=TCCAN+CNET(NZ)
+  TCCAN=TCCAN+CO2NetFix_pft(NZ)
   ETCanP(NZ)=ETCanP(NZ)+PTrans(NZ)+VapXAir2PCan(NZ)
   CanWatg=CanWatg+CanWatP(NZ)
   CanH2OHeldVg=CanH2OHeldVg+WatByPCan(NZ)

@@ -144,7 +144,7 @@ implicit none
   real(r8),pointer   :: histr_1D_CAN_G_ptc(:)         !277.8*HeatStorCanP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_CAN_TEMP_ptc(:)      !TCC(NZ,NY,NX)
   real(r8),pointer   :: histr_1D_TEMP_FN_ptc(:)       !fTgrowCanP(NZ,NY,NX), canopy temperature growth function/stress
-  real(r8),pointer   :: histr_1D_CAN_CO2_FLX_ptc(:)   !CNET(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.148, umol m-2 s-1
+  real(r8),pointer   :: histr_1D_CAN_CO2_FLX_ptc(:)   !CO2NetFix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.148, umol m-2 s-1
   real(r8),pointer   :: histr_1D_CAN_GPP_ptc(:)       !CARBN(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total gross CO2 fixation, gC m-2
   real(r8),pointer   :: histr_1D_CAN_RA_ptc(:)        !TCO2A(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total autotrophic respiration
   real(r8),pointer   :: histr_1D_cTNC_ptc(:)          !CanopyNonstructElementConc_pft(ielmc,NZ,NY,NX), canopy nonstructural C concentration, 
@@ -369,7 +369,7 @@ implicit none
   allocate(this%histr_1D_O2_LITR_col(beg_col:end_col))       !trc_solcl(idg_O2,0,NY,NX)
   allocate(this%histr_1D_MIN_LWP_ptc(beg_ptc:end_ptc))       !PSICanPDailyMin(NZ,NY,NX), minimum daily canopy water potential, [MPa]
   allocate(this%histr_1D_SOIL_CO2_FLX_col(beg_col:end_col))  !HCO2G(NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.14815, umol m-2 s-1, 1.e6/(12*3600)=23.14815
-  allocate(this%histr_1D_ECO_CO2_FLX_col(beg_col:end_col))   !TCNET(NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.14815
+  allocate(this%histr_1D_ECO_CO2_FLX_col(beg_col:end_col))   !TCO2NetFix_pft(NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.14815
   allocate(this%histr_1D_CH4_FLX_col(beg_col:end_col))       !HCH4G(NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.14815
   allocate(this%histr_1D_O2_FLX_col(beg_col:end_col))        !HOXYG(NY,NX)/AREA(3,NU(NY,NX),NY,NX)*8.68056,  umol m-2 s-1, 1.e6/(32*3600)=8.68056
   allocate(this%histr_1D_CO2_LITR_col(beg_col:end_col))      !trc_solcl(idg_CO2,0,NY,NX)
@@ -394,7 +394,7 @@ implicit none
   allocate(this%histr_1D_CAN_G_ptc(beg_ptc:end_ptc))         !277.8*HeatStorCanP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_CAN_TEMP_ptc(beg_ptc:end_ptc))     !TCC(NZ,NY,NX)
   allocate(this%histr_1D_TEMP_FN_ptc(beg_ptc:end_ptc))      !fTgrowCanP(NZ,NY,NX), canopy temperature growth function/stress
-  allocate(this%histr_1D_CAN_CO2_FLX_ptc(beg_ptc:end_ptc))  !CNET(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.148, umol m-2 s-1
+  allocate(this%histr_1D_CAN_CO2_FLX_ptc(beg_ptc:end_ptc))  !CO2NetFix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.148, umol m-2 s-1
   allocate(this%histr_1D_CAN_GPP_ptc(beg_ptc:end_ptc))      !CARBN(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total gross CO2 fixation, gC m-2
   allocate(this%histr_1D_CAN_RA_ptc(beg_ptc:end_ptc))       !TCO2A(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total autotrophic respiration
   allocate(this%histr_1D_cTNC_ptc(beg_ptc:end_ptc))         !CanopyNonstructElementConc_pft(ielmc,NZ,NY,NX), canopy nonstructural C concentration, 
@@ -962,8 +962,8 @@ implicit none
     long_name='canopy net CO2 exchange',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%histr_1D_CAN_GPP_ptc(beg_ptc:end_ptc)    
-  call hist_addfld1d(fname='CAN_GPP',units='gC/m2/hr',avgflag='A',&
-    long_name='total gross CO2 fixation',ptr_patch=data1d_ptr)      
+  call hist_addfld1d(fname='CAN_GPP',units='gC/m2',avgflag='A',&
+    long_name='cumulative total gross CO2 fixation',ptr_patch=data1d_ptr)      
   
   data1d_ptr => this%histr_1D_CAN_RA_ptc(beg_ptc:end_ptc)    
   call hist_addfld1d(fname='CAN_RA',units='gC/m2/hr',avgflag='A',&
@@ -1102,8 +1102,8 @@ implicit none
     long_name='plant litterfall C to the soil surface',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%histr_1D_AUTO_RESP_FLX_ptc(beg_ptc:end_ptc)    
-  call hist_addfld1d(fname='AUTO_RESP',units='gC/m2/hr',avgflag='A',&
-    long_name='total plant autotrophic respiration',ptr_patch=data1d_ptr)      
+  call hist_addfld1d(fname='AUTO_RESP',units='gC/m2',avgflag='A',&
+    long_name='cumulative plant autotrophic respiration',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%histr_1D_ABV_GRD_RESP_FLX_ptc(beg_ptc:end_ptc)  
   call hist_addfld1d(fname='ABV_GRD_RESP',units='gC/m2/hr',&
@@ -1130,8 +1130,8 @@ implicit none
     long_name='plant CH4 emission from fire',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%histr_1D_NPP_ptc(beg_ptc:end_ptc)  
-  call hist_addfld1d(fname='NPP',units='gC/m2/hr',avgflag='A',&
-    long_name='Total net primary productivity',ptr_patch=data1d_ptr)      
+  call hist_addfld1d(fname='NPP',units='gC/m2',avgflag='A',&
+    long_name='Cumulative net primary productivity',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%histr_1D_CAN_HT_ptc(beg_ptc:end_ptc)    
   call hist_addfld1d(fname='CAN_HT',units='m',avgflag='A',&
@@ -1563,7 +1563,7 @@ implicit none
         this%histr_1D_CAN_G_ptc(nptc)        = 277.8_r8*HeatStorCanP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_CAN_TEMP_ptc(nptc)     = TCC(NZ,NY,NX)
         this%histr_1D_TEMP_FN_ptc(nptc)      = fTgrowCanP(NZ,NY,NX)
-        this%histr_1D_CAN_CO2_FLX_ptc(nptc)  = CNET(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.148_r8
+        this%histr_1D_CAN_CO2_FLX_ptc(nptc)  = CO2NetFix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.148_r8
         this%histr_1D_CAN_GPP_ptc(nptc)      = CARBN(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_CAN_RA_ptc(nptc)       = TCO2A(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_cTNC_ptc(nptc)         = CanopyNonstructElementConc_pft(ielmc,NZ,NY,NX)

@@ -63,7 +63,7 @@ module NoduleBGCMod
     RECO     =>  plt_bgcr%RECO     , &
     TCO2A    =>  plt_bgcr%TCO2A    , &
     TRAU     =>  plt_bgcr%TRAU     , &
-    CNET     =>  plt_bgcr%CNET     , &
+    CO2NetFix_pft     =>  plt_bgcr%CO2NetFix_pft     , &
     ESNC     =>  plt_bgcr%ESNC     , &
     ifoliar  =>  pltpar%ifoliar    , &
     DMND     =>  plt_allom%DMND    , &
@@ -280,14 +280,14 @@ module NoduleBGCMod
 !     RGNDG=bacterial respiration for growth and N2 fixation
 !     RCNSNE(ielmc)=bacterial C senescence to recycling
 !     TCO2T,TCO2A=total,above-ground PFT respiration
-!     CNET=PFT net CO2 fixation
+!     CO2NetFix_pft=PFT net CO2 fixation
 !     RECO=ecosystem respiration
 !     TRAU=total autotrophic respiration
 !
     RCO2T=AMIN1(RMNDL,RCNDL)+RGNDG+RCNSNE(ielmc)
     TCO2T(NZ)=TCO2T(NZ)-RCO2T
     TCO2A(NZ)=TCO2A(NZ)-RCO2T
-    CNET(NZ)=CNET(NZ)-RCO2T
+    CO2NetFix_pft(NZ)=CO2NetFix_pft(NZ)-RCO2T
     RECO=RECO-RCO2T
     TRAU=TRAU-RCO2T
 !

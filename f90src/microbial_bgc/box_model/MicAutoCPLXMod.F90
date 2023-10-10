@@ -1442,7 +1442,7 @@ module MicAutoCPLXMod
 !     ROXYP=O2 demand from respiration + CH4 oxidation
 !
   ROXYMff(NGL)=2.667_r8*RGOMP
-  ROXYPff(NGL)=ROXYMff(NGL)+4.00_r8*RVOXP
+  ROXYPff(NGL)=ROXYMff(NGL)+5.333_r8*RVOXP
   ROXYSff(NGL)=ROXYPff(NGL)
   end associate
   end subroutine MethanotrophCatabolism

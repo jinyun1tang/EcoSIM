@@ -564,7 +564,7 @@ implicit none
       IFLGR(NB,NZ)=0
       IFLGQ(NB,NZ)=0
       BranchNumber_brchpft(NB,NZ)=0
-      D8850: DO M=1,pltpar%jpstgs
+      D8850: DO M=1,pltpar%NumGrothStages
         IDAY(M,NB,NZ)=0
       ENDDO D8850
 !

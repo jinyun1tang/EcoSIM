@@ -54,7 +54,7 @@ implicit none
               N4=NX+1
               N5=NY
               N6=L
-              XN=-1.0_r8
+              XN=-1.0_r8   !going out
             ELSE
               cycle
             ENDIF
@@ -64,7 +64,7 @@ implicit none
               N4=NX
               N5=NY
               N6=L
-              XN=1.0_r8
+              XN=1.0_r8    !coming in
             ELSE
               cycle
             ENDIF
@@ -77,7 +77,7 @@ implicit none
               N4=NX
               N5=NY+1
               N6=L
-              XN=-1.0_r8
+              XN=-1.0_r8   !going out
             ELSE
               cycle
             ENDIF
@@ -87,7 +87,7 @@ implicit none
               N4=NX
               N5=NY
               N6=L
-              XN=1.0_r8
+              XN=1.0_r8       !coming in
             ELSE
               cycle
             ENDIF
@@ -99,7 +99,7 @@ implicit none
               N4=NX
               N5=NY
               N6=L+1
-              XN=-1.0_r8
+              XN=-1.0_r8       !going out
             ELSE
               cycle
             ENDIF
@@ -150,6 +150,7 @@ implicit none
 !     HEATOU=cumulative heat loss through lateral and lower boundaries
 !
   IF(N.NE.3.AND.L.EQ.NU(NY,NX))THEN
+    !horizontal direction and surface layer
     WQRN=XN*Wat2GridBySurfRunoff(N,NN,N5,N4)
     WQRH(N2,N1)=WQRH(N2,N1)+WQRN
     IF(ABS(WQRN).GT.ZEROS(N5,N4))THEN
@@ -461,7 +462,8 @@ implicit none
 !
   IF(FlowDirIndicator(NY,NX).NE.3.OR.N.EQ.3)THEN
     HEATOU=HEATOU-XN*HeatFlow2Soil(N,N6,N5,N4)
-    WO=XN*(WaterFlowSoiMicP(N,N6,N5,N4)+WaterFlowMacP(N,N6,N5,N4))
+    WO=XN*(WaterFlowSoiMicP(N,N6,N5,N4)+WaterFlowMacP(N,N6,N5,N4))   !<0, going out grid
+
     IF(abs(WO)>0._r8)THEN
       VOLWOU=VOLWOU-WO
       FWatDischarge(N2,N1)=FWatDischarge(N2,N1)-WO

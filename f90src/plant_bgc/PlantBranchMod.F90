@@ -931,7 +931,7 @@ module PlantBranchMod
     IWTYP   =>  plt_pheno%IWTYP     , &
     CTC     =>  plt_pheno%CTC       , &
     RNH3B   =>  plt_rbgc%RNH3B      , &
-    CNET    =>  plt_bgcr%CNET       , &
+    CO2NetFix_pft    =>  plt_bgcr%CO2NetFix_pft       , &
     SNL1    =>  plt_morph%SNL1      , &
     CanopyLeafA_pft   =>  plt_morph%CanopyLeafA_pft     , &
     NB1     =>  plt_morph%NB1         &
@@ -1176,7 +1176,7 @@ module PlantBranchMod
 !   SHOOT AUTOTROPHIC RESPIRATION BEFORE EMERGENCE
 !
   ELSE
-    call ComputeRAutoBfEmergence(NB,NZ,TFN6,DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX,WTSHXN,&
+    call ComputeRAutoB4Emergence(NB,NZ,TFN6,DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX,WTSHXN,&
       WFNG,WFNSG,ZADDB,CNPG,PADDB,RCO2C,RMNCS,SNCR,CGROS,CNRDM,CNRDA,CH2O)
   ENDIF
 
@@ -1205,11 +1205,11 @@ module PlantBranchMod
   integer, intent(in) :: I,J,NZ,NB
   real(r8), intent(in) :: CH2O3(25),CH2O4(25)
   integer :: K
-  real(r8) :: CPL4M,CCBS,CPL3K,CO2LK
+  real(r8) :: CPL4M,CCBS,CPL3K,CO2LeakFromBundsheth
 
 !     begin_execution
   associate(                              &
-    CNET    =>  plt_bgcr%CNET       , &
+    CO2NetFix_pft    =>  plt_bgcr%CO2NetFix_pft       , &
     TCO2T   =>  plt_bgcr%TCO2T      , &
     TCO2A   =>  plt_bgcr%TCO2A      , &
     TRAU    =>  plt_bgcr%TRAU       , &
@@ -1260,7 +1260,7 @@ module PlantBranchMod
 !
 !     BUNDLE SHEATH LEAKAGE
 !
-!     CO2LK=bundle sheath CO2 leakage
+!     CO2LeakFromBundsheth=bundle sheath CO2 leakage
 !     CCBS=CO2 concn in bundle sheath (uM)
 !     CO2L=intercellular CO2 concentration (uM)
 !     WGLF=node leaf C mass
@@ -1268,24 +1268,24 @@ module PlantBranchMod
 !     FCO2B,FHCOB=partition decarboxylation to CO2,HCO3
 !     CO2B,HCOB=aqueous CO2,HCO3-C mass in bundle sheath
 !
-      CO2LK=5.0E-07*(CCBS-CO2L(NZ))*WGLFE(ielmc,K,NB,NZ)*FBS
-      CO2B(K,NB,NZ)=CO2B(K,NB,NZ)-FCO2B*CO2LK
-      HCOB(K,NB,NZ)=HCOB(K,NB,NZ)-FHCOB*CO2LK
+      CO2LeakFromBundsheth=5.0E-07_r8*(CCBS-CO2L(NZ))*WGLFE(ielmc,K,NB,NZ)*FBS
+      CO2B(K,NB,NZ)=CO2B(K,NB,NZ)-FCO2B*CO2LeakFromBundsheth
+      HCOB(K,NB,NZ)=HCOB(K,NB,NZ)-FHCOB*CO2LeakFromBundsheth
 
 !
 !     TOTAL C EXCHANGE
 !
 !     TCO2T,TCO2A=total,above-ground PFT respiration
-!     CNET=PFT net CO2 fixation
+!     CO2NetFix_pft=PFT net CO2 fixation
 !     RECO=ecosystem respiration
 !     TRAU=total autotrophic respiration
-!     CO2LK=bundle sheath CO2 leakage
+!     CO2LeakFromBundsheth=bundle sheath CO2 leakage
 !
-      TCO2T(NZ)=TCO2T(NZ)-CO2LK
-      TCO2A(NZ)=TCO2A(NZ)-CO2LK
-      CNET(NZ)=CNET(NZ)-CO2LK
-      RECO=RECO-CO2LK
-      TRAU=TRAU-CO2LK
+      TCO2T(NZ)=TCO2T(NZ)-CO2LeakFromBundsheth
+      TCO2A(NZ)=TCO2A(NZ)-CO2LeakFromBundsheth
+      CO2NetFix_pft(NZ)=CO2NetFix_pft(NZ)-CO2LeakFromBundsheth
+      RECO=RECO-CO2LeakFromBundsheth
+      TRAU=TRAU-CO2LeakFromBundsheth
     ENDIF
   ENDDO D170
   end associate
@@ -2585,7 +2585,7 @@ module PlantBranchMod
         TGSTGI(NB,NZ)=0._r8
         TGSTGF(NB,NZ)=0._r8
         IDAY(1,NB,NZ)=I
-        D2005: DO M=2,jpstgs
+        D2005: DO M=2,NumGrothStages
           IDAY(M,NB,NZ)=0
         ENDDO D2005
         IF(NB.EQ.NB1(NZ))THEN
@@ -3249,10 +3249,10 @@ module PlantBranchMod
   real(r8) :: ZPOOLB
   real(r8) :: PPOOLB
   real(r8) :: RCO2X,RCO2Y,RCO2G
-  real(r8) :: RCO2T,RCO2CM
+  real(r8) :: Rauto_pft,RCO2CM
 ! begin_execution
   associate(                             &
-    CNET      =>  plt_bgcr%CNET    , &
+    CO2NetFix_pft      =>  plt_bgcr%CO2NetFix_pft    , &
     TCO2T     =>  plt_bgcr%TCO2T   , &
     TRAU      =>  plt_bgcr%TRAU    , &
     RECO      =>  plt_bgcr%RECO    , &
@@ -3367,7 +3367,7 @@ module PlantBranchMod
 ! TOTAL ABOVE-GROUND AUTOTROPHIC RESPIRATION BY BRANCH
 ! ACCUMULATE GPP, SHOOT AUTOTROPHIC RESPIRATION, NET C EXCHANGE
 !
-! RCO2T=total C respiration
+! Rauto_pft=total C respiration
 ! RMNCS=maintenance respiration
 ! RCO2C=respiration from non-structural C
 ! RCO2G=growth respiration limited by N,P
@@ -3376,26 +3376,26 @@ module PlantBranchMod
 ! CARBN=total PFT CO2 fixation
 ! CO2F=total CO2 fixation
 ! TCO2T,TCO2A=total,above-ground PFT respiration
-! CNET=PFT net CO2 fixation
+! CO2NetFix_pft=PFT net CO2 fixation
 ! TGPP=ecosystem GPP
 ! RECO=ecosystem respiration
 ! TRAU=total autotrophic respiration
 !
-  RCO2T=AMIN1(RMNCS,RCO2C)+RCO2G+SNCR+CNRDA
+  Rauto_pft=AMIN1(RMNCS,RCO2C)+RCO2G+SNCR+CNRDA
   CARBN(NZ)=CARBN(NZ)+CO2F
-  TCO2T(NZ)=TCO2T(NZ)-RCO2T
-  TCO2A(NZ)=TCO2A(NZ)-RCO2T
-  CNET(NZ)=CNET(NZ)+CO2F-RCO2T
+  TCO2T(NZ)=TCO2T(NZ)-Rauto_pft
+  TCO2A(NZ)=TCO2A(NZ)-Rauto_pft
+  CO2NetFix_pft(NZ)=CO2NetFix_pft(NZ)+CO2F-Rauto_pft
   TGPP=TGPP+CO2F
-  RECO=RECO-RCO2T
-  TRAU=TRAU-RCO2T
+  RECO=RECO-Rauto_pft
+  TRAU=TRAU-Rauto_pft
 
   end associate
   end subroutine ComputeRAutoAfEmergence
 
 !------------------------------------------------------------------------------------------
 
-  subroutine ComputeRAutoBfEmergence(NB,NZ,TFN6,DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,&
+  subroutine ComputeRAutoB4Emergence(NB,NZ,TFN6,DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,&
     CNLFX,CPLFX,WTSHXN,WFNG,WFNSG,ZADDB,CNPG,PADDB,RCO2C,RMNCS,SNCR,CGROS,CNRDM,CNRDA,CH2O)
   implicit none
   integer, intent(in) :: NB,NZ
@@ -3408,7 +3408,7 @@ module PlantBranchMod
   real(r8) :: FNP
   real(r8) :: PPOOLB
   real(r8) :: RCO2X,RCO2Y,RCO2G
-  real(r8) :: RCO2T,RCO2CM
+  real(r8) :: Rauto_pft,RCO2CM
   real(r8) :: RCO2XM,RCO2YM
   real(r8) :: RCO2GM
   real(r8) :: RCO2TM
@@ -3421,7 +3421,7 @@ module PlantBranchMod
     fTgrowRootP      =>  plt_pheno%fTgrowRootP    , &
     WFR       =>  plt_rbgc%WFR      , &
     IWTYP     =>  plt_pheno%IWTYP   , &
-    CNET      =>  plt_bgcr%CNET     , &
+    CO2NetFix_pft      =>  plt_bgcr%CO2NetFix_pft     , &
     RCO2M     =>  plt_rbgc%RCO2M    , &
     RCO2N     =>  plt_rbgc%RCO2N    , &
     RCO2A     =>  plt_rbgc%RCO2A    , &
@@ -3506,13 +3506,14 @@ module PlantBranchMod
   IF(CNSHX.GT.0.0_r8.OR.CNLFX.GT.0.0_r8)THEN
     ZPOOLB=AZMAX1(EPOOL(ielmn,NB,NZ))
     PPOOLB=AZMAX1(EPOOL(ielmp,NB,NZ))
-    FNP=AMIN1(ZPOOLB*DMSHD/(CNSHX+CNLFM+CNLFX*CNPG) &
-      ,PPOOLB*DMSHD/(CPSHX+CPLFM+CPLFX*CNPG))
+    FNP=AMIN1(ZPOOLB*DMSHD/(CNSHX+CNLFM+CNLFX*CNPG),PPOOLB*DMSHD/(CPSHX+CPLFM+CPLFX*CNPG))
+
     IF(RCO2YM.GT.0.0_r8)THEN
       RCO2GM=AMIN1(RCO2YM,FNP)
     ELSE
       RCO2GM=0._r8
     ENDIF
+
     IF(RCO2Y.GT.0.0_r8)THEN
       RCO2G=AMIN1(RCO2Y,FNP*WFR(1,NGTopRootLayer(NZ),NZ))
     ELSE
@@ -3549,7 +3550,7 @@ module PlantBranchMod
 ! TOTAL ABOVE-GROUND AUTOTROPHIC RESPIRATION BY BRANCH
 ! ACCUMULATE GPP, SHOOT AUTOTROPHIC RESPIRATION, NET C EXCHANGE
 !
-! RCO2TM,RCO2T=total C respiration unltd,ltd by O2
+! RCO2TM,Rauto_pft=total C respiration unltd,ltd by O2
 ! RMNCS=maintenance respiration
 ! RCO2GM,RCO2G=growth respiration limited by N,P unltd,ltd by O2
 ! SNCRM,SNCR=excess maintenance respiration unltd,ltd by O2
@@ -3558,12 +3559,12 @@ module PlantBranchMod
 ! RCO2M,RCO2N=RCO2A unltd by O2,nonstructural C
 !
   RCO2TM=RMNCS+RCO2GM+SNCRM+CNRDM
-  RCO2T=RMNCS+RCO2G+SNCR+CNRDA
+  Rauto_pft=RMNCS+RCO2G+SNCR+CNRDA
   RCO2M(1,NGTopRootLayer(NZ),NZ)=RCO2M(1,NGTopRootLayer(NZ),NZ)+RCO2TM
-  RCO2N(1,NGTopRootLayer(NZ),NZ)=RCO2N(1,NGTopRootLayer(NZ),NZ)+RCO2T
-  RCO2A(1,NGTopRootLayer(NZ),NZ)=RCO2A(1,NGTopRootLayer(NZ),NZ)-RCO2T
+  RCO2N(1,NGTopRootLayer(NZ),NZ)=RCO2N(1,NGTopRootLayer(NZ),NZ)+Rauto_pft
+  RCO2A(1,NGTopRootLayer(NZ),NZ)=RCO2A(1,NGTopRootLayer(NZ),NZ)-Rauto_pft
   CH2O=0._r8
   end associate
-  end subroutine ComputeRAutoBfEmergence
+  end subroutine ComputeRAutoB4Emergence
 
 end module PlantBranchMod

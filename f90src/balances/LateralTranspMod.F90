@@ -286,6 +286,7 @@ implicit none
     ENDIF
 
     IF(N4B.GT.0.AND.N5B.GT.0.AND.NN.EQ.1)THEN
+      IF(IFLBH(N,NN,N5B,N4B).EQ.1)then
       TWat2GridBySurfRunoff(N2,N1)=TWat2GridBySurfRunoff(N2,N1)-Wat2GridBySurfRunoff(N,NN,N5B,N4B)
       THeat2GridBySurfRunoff(N2,N1)=THeat2GridBySurfRunoff(N2,N1)-Heat2GridBySurfRunoff(N,NN,N5B,N4B)
       D8592: DO K=1,micpar%NumOfLitrCmplxs
@@ -294,6 +295,7 @@ implicit none
         TOPQRS(K,N2,N1)=TOPQRS(K,N2,N1)-XOPQRS(K,N,NN,N5B,N4B)
         TOAQRS(K,N2,N1)=TOAQRS(K,N2,N1)-XOAQRS(K,N,NN,N5B,N4B)
       ENDDO D8592
+      ENDIF
 
       !     WRITE(*,6631)'TQRB',I,J,N1,N2,N4B,N5B,N,NN
       !    2,IFLBH(N,NN,N5B,N4B)

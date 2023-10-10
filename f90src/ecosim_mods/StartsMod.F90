@@ -881,13 +881,15 @@ module StartsMod
       DO K=1,NumOfLitrCmplxs
         VLitR0=VLitR0+RSC(K,L,NY,NX)/BulkDensLitR(K)
       ENDDO
+      !volume of litter layer
       VLitR(NY,NX)=VLitR0*ppmc*AREA(3,L,NY,NX)
       VGeomLayer(L,NY,NX)=VLitR(NY,NX)
       VLSoilPoreMicP(L,NY,NX)=VGeomLayer(L,NY,NX)
       VLSoilMicP(L,NY,NX)=VLSoilPoreMicP(L,NY,NX)
       VGeomLayert0(L,NY,NX)=VGeomLayer(L,NY,NX)
       SoilMicPMassLayer(L,NY,NX)=MWC2Soil*ORGC(L,NY,NX)  !mass of soil layer, Mg/d2
-      DLYRI(3,L,NY,NX)=VLSoilPoreMicP(L,NY,NX)/AREA(3,L,NY,NX)
+      !thickness of litter layer 
+      DLYRI(3,L,NY,NX)=VLSoilPoreMicP(L,NY,NX)/AREA(3,L,NY,NX)  
       DLYR(3,L,NY,NX)=DLYRI(3,L,NY,NX)
     ELSE
 !     if it is a standing water, no macropore fraction
@@ -954,7 +956,7 @@ module StartsMod
   dts_litrvapht=dts_litrhtwtp*XNPS
   XNPV=XNPR*XNPS
   XNPD=600.0_r8*dts_gas
-  dts_wat=AMIN1(1.0_r8,20.0_r8*dts_HeatWatTP)  !adjust/recompute the time step for water/heat update
+  dts_wat=AMIN1(1.0_r8,20.0_r8*dts_HeatWatTP)  !adjust/recompute the time step for water/heat update, no greater than 1 hour
   dts_sno=dts_wat*XNPS
   XNPB=dts_wat*XNPR
   dt_watvap=dts_wat*XNPV

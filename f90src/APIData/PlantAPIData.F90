@@ -10,7 +10,7 @@ implicit none
   __FILE__
   public
 
-  integer, pointer :: jpstgs       !number of growth stages
+  integer, pointer :: NumGrothStages       !number of growth stages
   integer, pointer :: JRS          !maximum number of root layers
   integer, pointer :: JBR         !maximum number of plant branches
   integer, pointer :: JP1         !number of plants
@@ -676,7 +676,7 @@ implicit none
   real(r8), pointer :: XOQCS(:,:)    => null()  !net microbial DOC flux, [gC d-2 h-1]
   real(r8), pointer :: XOQNS(:,:)    => null()  !net microbial DON flux, [gN d-2 h-1]
   real(r8), pointer :: XOQPS(:,:)    => null()  !net microbial DOP flux, [gP d-2 h-1]
-  real(r8), pointer :: CNET(:)       => null()  !canopy net CO2 exchange, [gC d-2 h-1]
+  real(r8), pointer :: CO2NetFix_pft(:)       => null()  !canopy net CO2 exchange, [gC d-2 h-1]
   real(r8), pointer :: CARBN(:)      => null()  !total gross CO2 fixation, [gC d-2 ]
   real(r8), pointer :: HESNC(:,:)    => null()  !plant element litterfall, [g d-2 h-1]
   real(r8), pointer :: RootGasLoss_disturb(:,:)=> null() !gaseous flux fron root disturbance, [g d-2 h-1]
@@ -1087,7 +1087,7 @@ implicit none
   allocate(this%XOQCS(1:jcplx,0:JZ1))
   allocate(this%XOQNS(1:jcplx,0:JZ1))
   allocate(this%XOQPS(1:jcplx,0:JZ1))
-  allocate(this%CNET(JP1))
+  allocate(this%CO2NetFix_pft(JP1))
   allocate(this%RootGasLoss_disturb(idg_beg:idg_end-1,JP1))
   allocate(this%TCO2T(JP1))
   allocate(this%TZUPFX(JP1))
@@ -1622,7 +1622,7 @@ implicit none
   JRS    => pltpar%JRS
   JPRT   => pltpar%JPRT
   NumOfPlantLitrCmplxs => pltpar%NumOfPlantLitrCmplxs
-  jpstgs => pltpar%jpstgs
+  NumGrothStages => pltpar%NumGrothStages
   jroots => pltpar%jroots
 
   call plt_site%Init()
@@ -1911,7 +1911,7 @@ implicit none
   allocate(this%IGTYP(JP1))
   allocate(this%KVSTG(JBR,JP1))
   allocate(this%KVSTGN(JBR,JP1))
-  allocate(this%IDAY(jpstgs,JBR,JP1))
+  allocate(this%IDAY(NumGrothStages,JBR,JP1))
   allocate(this%TGSTGI(JBR,JP1))
   allocate(this%TGSTGF(JBR,JP1))
   allocate(this%VSTGX(JBR,JP1))
