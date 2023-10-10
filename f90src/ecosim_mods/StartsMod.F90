@@ -956,7 +956,7 @@ module StartsMod
   dts_litrvapht=dts_litrhtwtp*XNPS
   XNPV=XNPR*XNPS
   XNPD=600.0_r8*dts_gas
-  dts_wat=AMIN1(1.0_r8,20.0_r8*dts_HeatWatTP)  !adjust/recompute the time step for water/heat update
+  dts_wat=AMIN1(1.0_r8,20.0_r8*dts_HeatWatTP)  !adjust/recompute the time step for water/heat update, no greater than 1 hour
   dts_sno=dts_wat*XNPS
   XNPB=dts_wat*XNPR
   dt_watvap=dts_wat*XNPV

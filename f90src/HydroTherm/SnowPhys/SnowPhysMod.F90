@@ -1153,7 +1153,8 @@ contains
     cumHeatCndFlxLitr2Soi)
   implicit none
   integer, intent(in) :: L,M,NY,NX
-  real(r8), intent(in) :: AvgThermCondctSnoLitR,AvgThermCondctSoilLitR,AvgVaporCondctSnowLitR,AvgVaporCondctSoilLitR,PSISV1,VLairSno1
+  real(r8), intent(in) :: AvgThermCondctSnoLitR,AvgThermCondctSoilLitR,AvgVaporCondctSnowLitR
+  real(r8), intent(in) :: AvgVaporCondctSoilLitR,PSISV1,VLairSno1
   real(r8), intent(inout) :: TK0X,TKXR,TK1X
   real(r8), intent(inout) :: CumVapFlxSno2Litr,CumVapFlxLitr2Soi
   real(r8), intent(inout) :: cumHeatConvFlxLitr2Soi1,CumHeatConvFlxSno2Litr

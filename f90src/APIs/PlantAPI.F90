@@ -244,7 +244,7 @@ implicit none
     CanopyLeafA_pft(NZ,NY,NX) =plt_morph%CanopyLeafA_pft(NZ)
     CanPSA(NZ,NY,NX) =plt_morph%CanPSA(NZ)
     NoduleNonstructCconc_pft(NZ,NY,NX)=plt_biom%NoduleNonstructCconc_pft(NZ)
-    CNET(NZ,NY,NX)  =plt_bgcr%CNET(NZ)
+    CO2NetFix_pft(NZ,NY,NX)  =plt_bgcr%CO2NetFix_pft(NZ)
     CO2Q(NZ,NY,NX)  =plt_photo%CO2Q(NZ)
     CO2I(NZ,NY,NX)  =plt_photo%CO2I(NZ)
     CO2L(NZ,NY,NX)  =plt_photo%CO2L(NZ)
@@ -1150,7 +1150,7 @@ implicit none
     plt_photo%CO2I(NZ) =CO2I(NZ,NY,NX)
 
     plt_biom%NoduleNonstructCconc_pft(NZ)=NoduleNonstructCconc_pft(NZ,NY,NX)
-    plt_bgcr%CNET(NZ)=CNET(NZ,NY,NX)
+    plt_bgcr%CO2NetFix_pft(NZ)=CO2NetFix_pft(NZ,NY,NX)
     plt_bgcr%CARBN(NZ)=CARBN(NZ,NY,NX)
 
     plt_allom%CNWS(NZ)=CNWS(NZ,NY,NX)

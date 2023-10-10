@@ -78,6 +78,8 @@ contains
   character(len=*), parameter :: subn=trim(mod_filename)//'::StageSurfacePhysModel'
   integer :: NY,NX
 
+  watflw =0._r8;waticefl=0._r8
+
   D9995: DO NX=NHW,NHE
     D9990: DO NY=NVN,NVS
     !make a local copy of the upper boundary index
@@ -579,7 +581,7 @@ contains
   WatFLow2LitR(NY,NX)=CumWatFlow2LitR+NetWatFlx2LitR
   HeatFLoByWat2LitRi(NY,NX)=CumHeatFlow2LitR+CumHeatSensAir2LitR
 
-!  write(*,*)'AtmLandSurfExchange  init',M,NY,NX,HeatFLoByWat2LitRi(NY,NX),CumHeatFlow2LitR,CumHeatSensAir2LitR
+!  if(M==11)write(*,*)'AtmLandSurfExchange  init',M,NY,NX,HeatFLoByWat2LitRi(NY,NX),CumHeatFlow2LitR,CumHeatSensAir2LitR
   end subroutine AtmLandSurfExchange  
 !------------------------------------------------------------------------------------------
 
@@ -661,9 +663,11 @@ contains
 
     IF(DarcyFlxLitR2Soil.GE.0.0_r8)THEN
       !flow from liter to soil
-      IF(THETWR.GT.THETS(0,NY,NX))THEN
-        FLQZ=DarcyFlxLitR2Soil+AMIN1((THETWR-THETS(0,NY,NX))*VLitR(NY,NX),&
-          AZMAX1((THETS(NUM(NY,NX),NY,NX)-THETW1)*VLSoilMicP(NUM(NY,NX),NY,NX)))*dts_wat
+      !more water than saturation
+      !note dts_wat:=AMIN1(1.0_r8,20.0_r8*dts_HeatWatTP)
+      IF(THETWR.GT.Theta_sat(0,NY,NX))THEN
+        FLQZ=DarcyFlxLitR2Soil+AMIN1((THETWR-Theta_sat(0,NY,NX))*VLitR(NY,NX),&
+          AZMAX1((Theta_sat(NUM(NY,NX),NY,NX)-THETW1)*VLSoilMicP(NUM(NY,NX),NY,NX)))*dts_wat
       ELSE
         FLQZ=DarcyFlxLitR2Soil
       ENDIF
@@ -671,9 +675,9 @@ contains
       FLQ2=AZMAX1(AMIN1(DarcyFlxLitR2Soil,VLWatMicP1(0,NY,NX)*dts_wat,VLairMicP1(NUM(NY,NX),NY,NX)))
     ELSE
       !from soil to liter
-      IF(THETW1.GT.THETS(NUM(NY,NX),NY,NX))THEN
-        FLQZ=DarcyFlxLitR2Soil+AMAX1((THETS(NUM(NY,NX),NY,NX)-THETW1)*VLSoilMicP(NUM(NY,NX),NY,NX),&
-          AZMIN1((THETWR-THETS(0,NY,NX))*VLitR(NY,NX)))*dts_wat
+      IF(THETW1.GT.Theta_sat(NUM(NY,NX),NY,NX))THEN
+        FLQZ=DarcyFlxLitR2Soil+AMAX1((Theta_sat(NUM(NY,NX),NY,NX)-THETW1)*VLSoilMicP(NUM(NY,NX),NY,NX),&
+          AZMIN1((THETWR-Theta_sat(0,NY,NX))*VLitR(NY,NX)))*dts_wat
       ELSE
         FLQZ=DarcyFlxLitR2Soil
       ENDIF
@@ -688,8 +692,10 @@ contains
     ENDIF
 
     IF(WatDarcyFloLitR2SoiMicP.GT.0.0_r8)THEN
+      !litter layer to soil
       HeatFlxLitR2Soi=cpw*TKSoi1(0,NY,NX)*WatDarcyFloLitR2SoiMicP
     ELSE
+      !soil to litter layer
       HeatFlxLitR2Soi=cpw*TKSoi1(NUM(NY,NX),NY,NX)*WatDarcyFloLitR2SoiMicP
     ENDIF
 
@@ -739,7 +745,7 @@ contains
     WatFLow2LitR(NY,NX)=WatFLow2LitR(NY,NX)-WatFlowLitR2MacP
     HeatFLoByWat2LitRi(NY,NX)=HeatFLoByWat2LitRi(NY,NX)-HeatFlowLitR2MacP
   ENDIF
-!  write(*,*)'SurfLitrSoilWaterExchange macP',M,NY,NX,HeatFLoByWat2LitRi(NY,NX)
+!  if(M==11)write(*,*)'SurfLitrSoilWaterExchange macP',M,NY,NX,HeatFLoByWat2LitRi(NY,NX)
   end subroutine SurfLitrSoilWaterExchange
 !------------------------------------------------------------------------------------------
 
@@ -1369,7 +1375,7 @@ contains
       !update snow
       call UpdateSnowAtM(M,NY,NX)
 
-      call UpdateLitRAtM(M,NY,NX)
+      call UpdateLitRAftRunoff(M,NY,NX)
       
     ENDDO D9790
   ENDDO D9795
@@ -1477,6 +1483,8 @@ contains
         Radnet2Snow,VapXAir2TopLay)
 !      write(*,*)'end RunSurfacePhysModel'
        if(present(Qinfl2MicP))Qinfl2MicP(NY,NX)=TopLayWatVol(NY,NX)-Qinfl2MicP(NY,NX)
+
+       call UpdateLitRB4RunoffM(M,NY,NX)
     ENDDO D9890
   ENDDO D9895
 

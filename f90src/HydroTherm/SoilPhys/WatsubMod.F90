@@ -1041,6 +1041,7 @@ module WatsubMod
 
       D9785: DO L=NUM(NY,NX),NL(NY,NX)
         IF(VGeomLayer(L,NY,NX).GT.ZEROS2(NY,NX))THEN
+
           VLWatMicP1(L,NY,NX)=VLWatMicP1(L,NY,NX)+TWatCharge2MicP(L,NY,NX)+FWatExMacP2MicPi(L,NY,NX) &
             +TMLiceThawMicP(L,NY,NX)+FWatIrrigate2MicP1(L,NY,NX)
           
@@ -1109,10 +1110,15 @@ module WatsubMod
           VHXX=VLHeatCapacity(L,NY,NX)
           ENGY1=VLHeatCapacity(L,NY,NX)*TKSoi1(L,NY,NX)
           if(TKSoi1(L,NY,NX)>1.e3_r8.or.TKSoi1(L,NY,NX)<0._r8)then
-            write(*,*)'L=',L,NY,NX,NUM(NY,NX)
-            write(*,*)'SoiBulkDensity(L,NY,NX)=',SoiBulkDensity(L,NY,NX)
+            write(*,*)'======'
+            write(*,*)'VLWatMicP1(L,NY,NX)=',VLWatMicP1(L,NY,NX),L,VLairMicP(L,NY,NX),VLiceMicP1(L,NY,NX)
+            write(*,*)TWatCharge2MicP(L,NY,NX),FWatExMacP2MicPi(L,NY,NX), &
+              TMLiceThawMicP(L,NY,NX),FWatIrrigate2MicP1(L,NY,NX)
+            write(*,*)'M, L=',M,L,NY,NX,NUM(NY,NX),VGeomLayer(L,NY,NX),ZEROS2(NY,NX),VLWatMicPX1(L,NY,NX)
+            write(*,*)'SoiBulkDensity(L,NY,NX)=',SoiBulkDensity(L,NY,NX),TKS(L,NY,NX),ZEROS(NY,NX)
             write(*,*)'VLHeatCapacity(L,NY,NX),TKSoi1(L,NY,NX)',L,VLHeatCapacity(L,NY,NX),TKSoi1(L,NY,NX)
-            call endrun(trim(mod_filename)//' at line',__LINE__)
+            write(*,*)VLMicP1(L,NY,NX),VLMacP1(L,NY,NX)
+            if(TKSoi1(L,NY,NX)>1.e3_r8.or.TKSoi1(L,NY,NX)<0._r8)call endrun(trim(mod_filename)//' at line',__LINE__)
           endif
           VLHeatCapacityA(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+cpw*VLWatMicP1(L,NY,NX)+cpi*VLiceMicP1(L,NY,NX)
           VLHeatCapacityB(L,NY,NX)=cpw*VLWatMacP1(L,NY,NX)+cpi*VLiceMacP1(L,NY,NX)
@@ -1134,7 +1140,7 @@ module WatsubMod
           !
           !           END ARTIFICIAL SOIL WARMING
 !
-          IF(VLHeatCapacity(L,NY,NX).GT.ZEROS(NY,NX))THEN
+          IF(VLHeatCapacity(L,NY,NX).GT.ZEROS2(NY,NX))THEN
             tk1l=TKSoi1(L,NY,NX)
             TKSoi1(L,NY,NX)=(ENGY1+THeatFlow2Soili(L,NY,NX)+TLPhaseChangeHeat2Soi1(L,NY,NX)+&
               HeatIrrigation1(L,NY,NX))/VLHeatCapacity(L,NY,NX)
@@ -1447,13 +1453,13 @@ module WatsubMod
     !     (CURRENT WATER POTENTIAL < AIR ENTRY WATER POENTIAL)
     !
     !     GREEN-AMPT FLOW IF SOURCE CELL SATURATED
-    !THETS=micropore soil water content
+    !Theta_sat=micropore soil water content
   ELSEIF(PSISoilMatricPtmp(N3,N2,N1).GT.PSISoilAirEntry(N3,N2,N1))THEN
     !source grid is saturated
     THETW1=THETA1
     THETWL=AMAX1(THETY(N6,N5,N4),AMIN1(POROS(N6,N5,N4),safe_adb(VLWatMicPX1(N6,N5,N4),VLSoilMicP(N6,N5,N4))))
     K1=MAX(1,MIN(100,INT(100.0_r8*(POROS(N3,N2,N1)-THETW1)/POROS(N3,N2,N1))+1))
-    KL=MAX(1,MIN(100,INT(100.0_r8*(POROS(N6,N5,N4)-AMIN1(THETS(N6,N5,N4),THETWL))/POROS(N6,N5,N4))+1))
+    KL=MAX(1,MIN(100,INT(100.0_r8*(POROS(N6,N5,N4)-AMIN1(Theta_sat(N6,N5,N4),THETWL))/POROS(N6,N5,N4))+1))
     PSISM1(N3,N2,N1)=PSISoilMatricPtmp(N3,N2,N1)
     
     IF(SoilMicPMassLayer(N6,N5,N4).GT.ZEROS(NY,NX))THEN
@@ -1481,7 +1487,7 @@ module WatsubMod
     !source grid is saturated, dest grid is not
     THETW1=AMAX1(THETY(N3,N2,N1),AMIN1(POROS(N3,N2,N1),safe_adb(VLWatMicPX1(N3,N2,N1),VLSoilMicP(N3,N2,N1))))
     THETWL=THETAL
-    K1=MAX(1,MIN(100,INT(100.0*(POROS(N3,N2,N1)-AMIN1(THETS(N3,N2,N1),THETW1))/POROS(N3,N2,N1))+1))
+    K1=MAX(1,MIN(100,INT(100.0*(POROS(N3,N2,N1)-AMIN1(Theta_sat(N3,N2,N1),THETW1))/POROS(N3,N2,N1))+1))
     KL=MAX(1,MIN(100,INT(100.0*(POROS(N6,N5,N4)-THETWL)/POROS(N6,N5,N4))+1))
 
     IF(SoilMicPMassLayer(N3,N2,N1).GT.ZEROS(NY,NX))THEN
@@ -1564,9 +1570,9 @@ module WatsubMod
 
   IF(PtWatDarcyFlux.GE.0.0_r8)THEN
     !flow from src to dest
-    IF(THETW1.GT.THETS(N3,N2,N1))THEN
+    IF(THETW1.GT.Theta_sat(N3,N2,N1))THEN
       !water more than air-entry saturation
-      FLQZ=PtWatDarcyFlux+AMIN1((THETW1-THETS(N3,N2,N1))*VLSoilMicP(N3,N2,N1),AZMAX1((THETS(N6,N5,N4)-THETWL) &
+      FLQZ=PtWatDarcyFlux+AMIN1((THETW1-Theta_sat(N3,N2,N1))*VLSoilMicP(N3,N2,N1),AZMAX1((Theta_sat(N6,N5,N4)-THETWL) &
         *VLSoilMicP(N6,N5,N4)))*dts_wat
     ELSE
       FLQZ=PtWatDarcyFlux
@@ -1574,23 +1580,23 @@ module WatsubMod
 
     WatDarcyFlowMicP=AZMAX1(AMIN1(FLQZ,VLWatMicP2(N3,N2,N1)*dts_wat,VLairMicP1(N6,N5,N4)*dts_wat))
     FLQ2=AZMAX1(AMIN1(PtWatDarcyFlux,VLWatMicP2(N3,N2,N1)*dts_wat,VLairMicP1(N6,N5,N4)*dts_wat))
-    !     FLQL1=(THETW1-THETS(N3,N2,N1))*VLSoilMicP(N3,N2,N1)
-    !     FLQL2=(THETS(N6,N5,N4)-THETWL)*VLSoilMicP(N6,N5,N4)
+    !     FLQL1=(THETW1-Theta_sat(N3,N2,N1))*VLSoilMicP(N3,N2,N1)
+    !     FLQL2=(Theta_sat(N6,N5,N4)-THETWL)*VLSoilMicP(N6,N5,N4)
     !     FLQL3=PtWatDarcyFlux+AMIN1(FLQL1,AZMAX1(FLQL2))*dts_wat
     !     FLQL4=AZMAX1(AMIN1(FLQL3,VLairMicP1(N6,N5,N4)*dts_wat))
   ELSE
     !flow from dest to src
-    IF(THETWL.GT.THETS(N6,N5,N4))THEN
-      FLQZ=PtWatDarcyFlux+AMAX1((THETS(N6,N5,N4)-THETWL)*VLSoilMicP(N6,N5,N4), &
-        AZMIN1((THETW1-THETS(N3,N2,N1))*VLSoilMicP(N3,N2,N1)))*dts_wat
+    IF(THETWL.GT.Theta_sat(N6,N5,N4))THEN
+      FLQZ=PtWatDarcyFlux+AMAX1((Theta_sat(N6,N5,N4)-THETWL)*VLSoilMicP(N6,N5,N4), &
+        AZMIN1((THETW1-Theta_sat(N3,N2,N1))*VLSoilMicP(N3,N2,N1)))*dts_wat
     ELSE
       FLQZ=PtWatDarcyFlux
     ENDIF
 
     WatDarcyFlowMicP=AZMIN1(AMAX1(FLQZ,-VLWatMicP2(N6,N5,N4)*dts_wat,-VLairMicP1(N3,N2,N1)*dts_wat))
     FLQ2=AZMIN1(AMAX1(PtWatDarcyFlux,-VLWatMicP2(N6,N5,N4)*dts_wat,-VLairMicP1(N3,N2,N1)*dts_wat))
-    !     FLQL1=(THETS(N6,N5,N4)-THETWL)*VLSoilMicP(N6,N5,N4)
-    !     FLQL2=(THETW1-THETS(N3,N2,N1))*VLSoilMicP(N3,N2,N1)
+    !     FLQL1=(Theta_sat(N6,N5,N4)-THETWL)*VLSoilMicP(N6,N5,N4)
+    !     FLQL2=(THETW1-Theta_sat(N3,N2,N1))*VLSoilMicP(N3,N2,N1)
     !     FLQL3=PtWatDarcyFlux+AMAX1(FLQL1,AZMIN1(FLQL2))*dts_wat
     !     FLQL4=AZMIN1(AMAX1(FLQL3,-VLairMicP1(N3,N2,N1)*dts_wat))
   ENDIF

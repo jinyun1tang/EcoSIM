@@ -75,7 +75,7 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  PSISoilOsmotic(:,:,:)                      !osmotic soil water potential , [Mpa]
   real(r8),target,allocatable ::  PSIGrav(:,:,:)                      !gravimetric soil water potential , [Mpa]
   real(r8),target,allocatable ::  THETY(:,:,:)                      !air-dry water content, [m3 m-3]
-  real(r8),target,allocatable ::  THETS(:,:,:)                      !micropore class water content
+  real(r8),target,allocatable ::  Theta_sat(:,:,:)                      !micropore class water content
   real(r8),target,allocatable ::  WaterFlowSoiMicPX(:,:,:,:)                     !unsaturated water flux , [m3 d-2 h-1]
   real(r8),target,allocatable ::  UEVAP(:,:)                        !total evaporation, [m3 d-2]
   real(r8),target,allocatable ::  URAIN(:,:)                        !total precipitation, [m3 d-2]
@@ -169,7 +169,7 @@ module SoilWaterDataType
   allocate(PSISoilOsmotic(0:JZ,JY,JX));  PSISoilOsmotic=0._r8
   allocate(PSIGrav(0:JZ,JY,JX));  PSIGrav=0._r8
   allocate(THETY(0:JZ,JY,JX));  THETY=0._r8
-  allocate(THETS(0:JZ,JY,JX));  THETS=0._r8
+  allocate(Theta_sat(0:JZ,JY,JX));  Theta_sat=0._r8
   allocate(WaterFlowSoiMicPX(3,JD,JV,JH));   WaterFlowSoiMicPX=0._r8
   allocate(UEVAP(JY,JX));       UEVAP=0._r8
   allocate(URAIN(JY,JX));       URAIN=0._r8
@@ -255,7 +255,7 @@ module SoilWaterDataType
   call destroy(PSISoilOsmotic)
   call destroy(PSIGrav)
   call destroy(THETY)
-  call destroy(THETS)
+  call destroy(Theta_sat)
   call destroy(WaterFlowSoiMicPX)
   call destroy(UEVAP)
   call destroy(URAIN)

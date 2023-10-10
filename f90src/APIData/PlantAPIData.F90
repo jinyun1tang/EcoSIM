@@ -676,7 +676,7 @@ implicit none
   real(r8), pointer :: XOQCS(:,:)    => null()  !net microbial DOC flux, [gC d-2 h-1]
   real(r8), pointer :: XOQNS(:,:)    => null()  !net microbial DON flux, [gN d-2 h-1]
   real(r8), pointer :: XOQPS(:,:)    => null()  !net microbial DOP flux, [gP d-2 h-1]
-  real(r8), pointer :: CNET(:)       => null()  !canopy net CO2 exchange, [gC d-2 h-1]
+  real(r8), pointer :: CO2NetFix_pft(:)       => null()  !canopy net CO2 exchange, [gC d-2 h-1]
   real(r8), pointer :: CARBN(:)      => null()  !total gross CO2 fixation, [gC d-2 ]
   real(r8), pointer :: HESNC(:,:)    => null()  !plant element litterfall, [g d-2 h-1]
   real(r8), pointer :: RootGasLoss_disturb(:,:)=> null() !gaseous flux fron root disturbance, [g d-2 h-1]
@@ -1087,7 +1087,7 @@ implicit none
   allocate(this%XOQCS(1:jcplx,0:JZ1))
   allocate(this%XOQNS(1:jcplx,0:JZ1))
   allocate(this%XOQPS(1:jcplx,0:JZ1))
-  allocate(this%CNET(JP1))
+  allocate(this%CO2NetFix_pft(JP1))
   allocate(this%RootGasLoss_disturb(idg_beg:idg_end-1,JP1))
   allocate(this%TCO2T(JP1))
   allocate(this%TZUPFX(JP1))

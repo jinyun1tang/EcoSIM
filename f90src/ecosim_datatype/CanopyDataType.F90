@@ -116,7 +116,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  WTGRE(:,:,:,:)                     !canopy grain element, [g d-2]
   real(r8),target,allocatable ::  CanopyLeafShethC_pft(:,:,:)              !plant canopy leaf + sheath C, [gC d-2]
   real(r8),target,allocatable ::  CanopyLeafApft_lyr(:,:,:,:)                     !canopy layer leaf area, [m2 d-2]
-  real(r8),target,allocatable ::  CNET(:,:,:)                        !canopy net CO2 exchange, [g d-2 h-1]
+  real(r8),target,allocatable ::  CO2NetFix_pft(:,:,:)                        !canopy net CO2 exchange, [g d-2 h-1]
   real(r8),target,allocatable ::  CanopyLeafCpft_lyr(:,:,:,:)                     !canopy layer leaf C, [g d-2]
   real(r8),target,allocatable ::  CanopyNonstructElements_pft(:,:,:,:)   !canopy nonstructural element, [g d-2]
   real(r8),target,allocatable ::  CanopyNonstructElementConc_pft(:,:,:,:)                    !canopy nonstructural element concentration, [g d-2]
@@ -265,7 +265,7 @@ module CanopyDataType
   allocate(WTGRE(NumOfPlantChemElements,JP,JY,JX));     WTGRE=0._r8
   allocate(CanopyLeafShethC_pft(JP,JY,JX));     CanopyLeafShethC_pft=0._r8
   allocate(CanopyLeafApft_lyr(JC,JP,JY,JX)); CanopyLeafApft_lyr=0._r8
-  allocate(CNET(JP,JY,JX));     CNET=0._r8
+  allocate(CO2NetFix_pft(JP,JY,JX));     CO2NetFix_pft=0._r8
   allocate(CanopyLeafCpft_lyr(JC,JP,JY,JX)); CanopyLeafCpft_lyr=0._r8
   allocate(CanopyNonstructElements_pft(NumOfPlantChemElements,JP,JY,JX));   CanopyNonstructElements_pft=0._r8
   allocate(CanopyNonstructElementConc_pft(NumOfPlantChemElements,JP,JY,JX));   CanopyNonstructElementConc_pft=0._r8
@@ -415,7 +415,7 @@ module CanopyDataType
   call destroy(WTGRE)
   call destroy(CanopyLeafShethC_pft)
   call destroy(CanopyLeafApft_lyr)
-  call destroy(CNET)
+  call destroy(CO2NetFix_pft)
   call destroy(CanopyLeafCpft_lyr)
   call destroy(CanopyNonstructElements_pft)
   call destroy(CanopyNonstructElementConc_pft)

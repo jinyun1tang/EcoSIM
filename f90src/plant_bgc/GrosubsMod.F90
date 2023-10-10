@@ -74,7 +74,7 @@ module grosubsMod
     NP       => plt_site%NP       , &
     NP0      => plt_site%NP0      , &
     NJ       => plt_site%NJ       , &
-    CNET     => plt_bgcr%CNET     , &
+    CO2NetFix_pft     => plt_bgcr%CO2NetFix_pft     , &
     HESNC    => plt_bgcr%HESNC    , &
     ESNC     => plt_bgcr%ESNC     , &
     CanopyHeight       => plt_morph%CanopyHeight        &
@@ -96,7 +96,7 @@ module grosubsMod
       ENDDO
     ENDDO D1
     HESNC(1:NumOfPlantChemElements,NZ)=0._r8
-    CNET(NZ)=0._r8
+    CO2NetFix_pft(NZ)=0._r8
     ZCX(NZ)=CanopyHeight(NZ)
     CanopyHeight(NZ)=0._r8
   ENDDO D9980
