@@ -19,9 +19,16 @@ implicit none
   use GridMod           , only : SetMeshATS
   use SurfPhysMod       , only : RunSurfacePhysModel, StageSurfacePhysModel
   implicit none
-  integer :: NY,NX,L,NHW,NHE,NVN,NVS
+  integer :: NY,NX,L,NHW,NHE,NVN,NVS, I, J, M
   integer, intent(in) :: NYS
   real(r8) :: YSIN(JSA),YCOS(JSA),YAZI(JSA)
+  real(r8), dimension(:,:), allocatable :: ResistanceLitRLay
+  real(r8), dimension(:,:), allocatable :: KSatReductByRainKineticEnergyS
+  real(r8), dimension(:,:), allocatable :: HeatFlux2Ground
+  real(r8), dimension(:,:), allocatable :: Qinfl2MicP
+  real(r8), dimension(:,:), allocatable :: TopLayWatVol
+  !real(r8), dimension(:), allocatable :: HeatFlux2Ground
+
 
   NHW=1;NHE=1;NVN=1;NVS=NYS
 
@@ -30,6 +37,11 @@ implicit none
   call SetMeshATS(NHW,NVN,NHE,NVS)
 
   NX=1
+  HeatFlux2Ground=0
+  KSatReductByRainKineticEnergyS=0
+  Qinfl2MicP=0
+  ResistanceLitRLay=0 
+  TopLayWatVol=0
 
   !What are I and J are these a loop?
   write(*,*) "Running StageSurfacePhysModel"
@@ -38,7 +50,7 @@ implicit none
   write(*,*) "Done; Running RunSurfacePhysModel"
 
   call RunSurfacePhysModel(M,NHE,NHW,NVS,NVN,ResistanceLitRLay,&
-      KSatReductByRainKineticEnergyS,TopLayWatVol,HeatFlux2Ground,Qinfl2MicP)
+      KSatReductByRainKineticEnergyS,HeatFlux2Ground,TopLayWatVol)
 
   write(*,*) "Finished Subroutine RunEcoSIMSurfaceBalance"
   end subroutine RunEcoSIMSurfaceBalance
