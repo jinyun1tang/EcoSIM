@@ -169,16 +169,16 @@ contains
 
 !------------------------------------------------------------------------------------------
 
-  subroutine Run_EcoSIM_one_step()
+  subroutine Run_EcoSIM_one_step(sizes)
   !advance ecosim one time step
   implicit none
   !character(len=*), parameter :: subname=trim(mod_filename)//'::Run_EcoSIM_one_step'
-
+  type (BGCSizes), intent(in) :: sizes
 
   !copy data from compuler to EcoSIM
 
   !run surface energy balance
-  call SurfaceEBalance()
+  call SurfaceEBalance(sizes)
 
   !copy data back to coupler
   end subroutine Run_EcoSIM_one_step
@@ -200,8 +200,7 @@ contains
   end subroutine Init_EcoSIM
 !------------------------------------------------------------------------------------------
 
-  subroutine SurfaceEBalance()
-
+  subroutine SurfaceEBalance(sizes)
   implicit none
 
   !For this we need to either specifically take energy away from the top layer
