@@ -214,7 +214,7 @@ module GeochemAPI
 !  solflx%TRC0P=trcSalt_TR(idsalt_CaPO4,L,NY,NX)
 !  solflx%TRH0P=trcSalt_TR(idsalt_H0PO4,L,NY,NX)
 !  solflx%TRFEPO=trcp_TR(idsp_FePO4,L,NY,NX)
-!  solflx%TRALPO=trcp_TR(idsp_AlPO4,L,NY,NX)
+!  solflx%TR_AlPO4=trcp_TR(idsp_AlPO4,L,NY,NX)
 !  solflx%TRFEPB=trcp_TR(idsp_FePO4B,L,NY,NX)
 !  solflx%TRALPB=trcp_TR(idsp_AlPO4B,L,NY,NX)
 !  solflx%TRCAPM=trcp_TR(idsp_CaH2PO4,L,NY,NX)
@@ -317,7 +317,7 @@ module GeochemAPI
   trcx_TR(idx_OHpB,L,NY,NX)=solflx%TRBH2
   trcx_TR(idx_HPO4B,L,NY,NX)=solflx%TRB1P
   trcx_TR(idx_H2PO4B,L,NY,NX)=solflx%TRB2P
-  trcp_TR(idsp_AlPO4,L,NY,NX)=solflx%TRALPO
+  trcp_TR(idsp_AlPO4,L,NY,NX)=solflx%TR_AlPO4
   trcp_TR(idsp_FePO4,L,NY,NX)=solflx%TRFEPO
   trcp_TR(idsp_CaHPO4,L,NY,NX)=solflx%TRCAPD
   trcp_TR(idsp_HA,L,NY,NX)=solflx%TRCAPH

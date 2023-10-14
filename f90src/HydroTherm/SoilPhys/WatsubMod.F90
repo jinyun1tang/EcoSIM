@@ -671,14 +671,14 @@ module WatsubMod
               N6=L
               IF(NN.EQ.1)THEN
                 !eastern boundary
-                IF(NX.EQ.NHE)THEN
+                IF(NX.EQ.NHE)THEN                
                   M1=NX
                   M2=NY
                   M3=L
                   M4=NX+1
                   M5=NY
                   M6=L
-                  XN=-1.0_r8
+                  XN=-1.0_r8   !going out
                   RechargSurf=RechargEastSurf(M2,M1)
                   RechargSubSurf=RechargEastSubSurf(M2,M1)
                   RechargRateWTBL=RechargRateEastWTBL(M2,M1)
@@ -694,7 +694,7 @@ module WatsubMod
                   M4=NX
                   M5=NY
                   M6=L
-                  XN=1.0_r8
+                  XN=1.0_r8    !coming in
                   RechargSurf=RechargWestSurf(M5,M4)
                   RechargSubSurf=RechargWestSubSurf(M5,M4)
                   RechargRateWTBL=RechargRateWestWTBL(M5,M4)
@@ -703,7 +703,7 @@ module WatsubMod
                 ENDIF
               ENDIF
             ELSEIF(N.EQ.insthdir)THEN
-! along the N-S direction
+              ! along the N-S direction
               N4=NX
               N5=NY+1
               N4B=NX
@@ -718,7 +718,7 @@ module WatsubMod
                   M4=NX
                   M5=NY+1
                   M6=L
-                  XN=-1.0_r8
+                  XN=-1.0_r8    !going out
                   RechargSurf=RechargSouthSurf(M2,M1)
                   RechargSubSurf=RechargSouthSubSurf(M2,M1)
                   RechargRateWTBL=RechargRateSouthWTBL(M2,M1)
@@ -734,7 +734,7 @@ module WatsubMod
                   M4=NX
                   M5=NY
                   M6=L
-                  XN=1.0_r8
+                  XN=1.0_r8   !coming in
                   RechargSurf=RechargNorthSurf(M5,M4)
                   RechargSubSurf=RechargNorthSubSurf(M5,M4)
                   RechargRateWTBL=RechargRateNorthWTBL(M5,M4)
@@ -756,7 +756,7 @@ module WatsubMod
                   M4=NX
                   M5=NY
                   M6=L+1
-                  XN=-1.0_r8
+                  XN=-1.0_r8    !going out
                   RechargSubSurf=RCHGD(M2,M1)
                   RechargRateWTBL=1.0_r8
                 ELSE
@@ -774,7 +774,8 @@ module WatsubMod
 !     BKDS=bulk density
 !     XGridRunoffFlag,RCHQ*=runoff boundary flags
 
-!           top soil layer and surface soil layer is active
+!           top soil layer and surface soil layer is active, litter layer is lower than its initial thickness 
+!           or the grid is a soil
             IF(L.EQ.NUM(N2,N1).AND.N.NE.ivertdir.AND. &
               (CumDepth2LayerBottom(NU(N2,N1)-1,N2,N1).LE.CumSoilDeptht0(N2,N1) &
               .OR.SoiBulkDensity(NUI(N2,N1),N2,N1).GT.ZERO))THEN
@@ -856,8 +857,8 @@ module WatsubMod
                   endif
 
                   WatXChange2WatTableX(N,M6,M5,M4)=WatXChange2WatTable(N,M6,M5,M4)
-                  ConvectWaterFlowMacP(N,M6,M5,M4)=AMIN1(VLWatMacP1(L,NY,NX)*dts_wat &
-                    ,XN*mGravAccelerat*(-ABS(SLOPE(N,N2,N1)))*HydroCondMacP1(L,NY,NX)*AREA(3,N3,N2,N1)) &
+                  ConvectWaterFlowMacP(N,M6,M5,M4)=AMIN1(VLWatMacP1(N3,N2,N1)*dts_wat &
+                    ,XN*mGravAccelerat*(-ABS(SLOPE(N,N2,N1)))*HydroCondMacP1(N3,N2,N1)*AREA(3,N3,N2,N1)) &
                     *RechargSubSurf*RechargRateWTBL*dts_HeatWatTP
                   HeatFlow2Soili(N,M6,M5,M4)=cpw*TKSoi1(N3,N2,N1)*(WatXChange2WatTable(N,M6,M5,M4) &
                     +ConvectWaterFlowMacP(N,M6,M5,M4))

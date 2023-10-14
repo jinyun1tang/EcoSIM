@@ -671,6 +671,6 @@ implicit none
   ELSE
     TKSoi1(0,NY,NX)=TKSoi1(NUM(NY,NX),NY,NX)
   ENDIF
-!  if(NY==1 .AND. NX==1)write(192,*)'UpdateLitRAftRunoff',M,VLWatMicP(0,NY,NX),VLWatMicP1(0,NY,NX),cumWatFlx2LitRByRunoff(NY,NX)
+!  if(NY==1 .AND. NX==1 .and. M>=26)write(192,*)'UpdateLitRAftRunoff',M,VLWatMicP(0,NY,NX),VLWatMicP1(0,NY,NX),cumWatFlx2LitRByRunoff(NY,NX)
   end subroutine UpdateLitRAftRunoff  
 end module SurfLitterPhysMod

@@ -904,7 +904,7 @@ module MicBGCMod
   type(NitroMicDiagType), intent(inout) :: nmicdiag
   type(NitroAQMFluxDiagType), INTENT(INOUT):: naqfdiag
   type(micfluxtype), intent(inout) :: micflx
-  real(r8) :: chy1,CHNO2,CHNOB
+  real(r8) :: H_1p_conc,CHNO2,CHNOB
   real(r8) :: FNO3S,FNO3B
   REAL(R8) :: FNO2,FNB2
   real(r8) :: VMXC4S,VMXC4B
@@ -946,9 +946,9 @@ module MicBGCMod
 !     RCOQN=DON production from nitrous acid reduction
 !     RVMXC,RVMBC=demand for NO2 reduction in non-band,band
 !     nitrous acid concn CHNO2
-  CHY1=AMAX1(ZERO,10.0**(-(PH-3.0)))
-  CHNO2=CNO2S*CHY1/0.5
-  CHNOB=CNO2B*CHY1/0.5
+  H_1p_conc=AMAX1(ZERO,10.0**(-(PH-3.0_r8)))
+  CHNO2=CNO2S*H_1p_conc/0.5_r8
+  CHNOB=CNO2B*H_1p_conc/0.5_r8
 
   IF(RNO2Y.GT.ZEROS)THEN
     FNO2=AMAX1(FMN,RVMXC/RNO2Y)

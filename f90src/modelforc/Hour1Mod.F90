@@ -367,7 +367,7 @@ module Hour1Mod
 !
 !     WATER,SNOW,SOLUTE RUNOFF
 !
-
+      WatFlux4ErosionM(:,NY,NX)=0._r8
       Wat2GridBySurfRunoff(1:2,1:2,NY,NX)=0.0_r8
       Heat2GridBySurfRunoff(1:2,1:2,NY,NX)=0.0_r8
 

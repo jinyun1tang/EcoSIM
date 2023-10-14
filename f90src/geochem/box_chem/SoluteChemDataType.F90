@@ -7,56 +7,56 @@ module SoluteChemDataType
   __FILE__
 
   type, public :: solutedtype
-    real(r8) :: CCO21
-    real(r8) :: CCH41
-    real(r8) :: COXY1
-    real(r8) :: CZ2G1
-    real(r8) :: CZ2O1
-    real(r8) :: CN41
-    real(r8) :: CN31
-    real(r8) :: CAL1
-    real(r8) :: CFE1
-    real(r8) :: CHY1
-    real(r8) :: CCA1
-    real(r8) :: CMG1
-    real(r8) :: CNA1
-    real(r8) :: CKA1
-    real(r8) :: COH1
-    real(r8) :: CSO41
-    real(r8) :: CCL1
-    real(r8) :: CCO31
-    real(r8) :: CHCO31
-    real(r8) :: CALO1
-    real(r8) :: CALO2
-    real(r8) :: CALO3
-    real(r8) :: CALO4
-    real(r8) :: CALS1
-    real(r8) :: CFEO1
-    real(r8) :: CFEO2
-    real(r8) :: CFEO3
-    real(r8) :: CFEO4
-    real(r8) :: CFES1
-    real(r8) :: CCAO1
-    real(r8) :: CCAC1
-    real(r8) :: CCAH1
-    real(r8) :: CCAS1
-    real(r8) :: CMGO1
-    real(r8) :: CMGC1
-    real(r8) :: CMGH1
-    real(r8) :: CMGS1
-    real(r8) :: CNAC1
-    real(r8) :: CNAS1
-    real(r8) :: CKAS1
-    real(r8) :: CH0P1
-    real(r8) :: CH1P1
-    real(r8) :: CH2P1
-    real(r8) :: CH3P1
-    real(r8) :: CF1P1
-    real(r8) :: CF2P1
-    real(r8) :: CC0P1
-    real(r8) :: CC1P1
-    real(r8) :: CC2P1
-    real(r8) :: CM1P1
+    real(r8) :: H2CO3_aqu_conc
+    real(r8) :: CH4_aqu_conc
+    real(r8) :: O2_aqu_conc
+    real(r8) :: N2_aqu_conc
+    real(r8) :: N2O_aqu_conc
+    real(r8) :: NH4_1p_conc
+    real(r8) :: NH3_aqu_conc
+    real(r8) :: Al_3p_conc
+    real(r8) :: Fe_3p_conc
+    real(r8) :: H_1p_conc
+    real(r8) :: Ca_2p_conc
+    real(r8) :: Mg_2p_conc
+    real(r8) :: Na_1p_conc
+    real(r8) :: K_1p_conc
+    real(r8) :: OH_1e_conc
+    real(r8) :: SO4_2e_conc
+    real(r8) :: Cl_e_conc
+    real(r8) :: CO3_2e_conc
+    real(r8) :: HCO3_e_conc
+    real(r8) :: AlOH_2p_conc
+    real(r8) :: AlOH2_p_conc
+    real(r8) :: AlOH3_conc
+    real(r8) :: AlOH4_1e_conc
+    real(r8) :: AlSO4_1p_conc
+    real(r8) :: FeOH_2p_conc
+    real(r8) :: FeO2H2_p_conc
+    real(r8) :: FeO3H3_conc
+    real(r8) :: FeO4H4_1e_conc
+    real(r8) :: FeSO4_1p_conc
+    real(r8) :: CaO2H2_conc
+    real(r8) :: CaCO3_conc
+    real(r8) :: CaHCO3_1p_conc
+    real(r8) :: CaSO4_conc
+    real(r8) :: MgOH_1p_conc
+    real(r8) :: MgCO3_conc
+    real(r8) :: MgHCO3_1p_conc
+    real(r8) :: MgSO4_conc
+    real(r8) :: NaCO3_1e_conc
+    real(r8) :: NaSO4_1e_conc
+    real(r8) :: KSO4_1e_conc
+    real(r8) :: H0PO4_conc
+    real(r8) :: H1PO4_2e_conc
+    real(r8) :: H2PO4_1e_conc
+    real(r8) :: H3PO4_conc
+    real(r8) :: FeHPO4_conc
+    real(r8) :: FeH2PO4_conc
+    real(r8) :: CaPO4_1e_con
+    real(r8) :: CaHPO4_conc
+    real(r8) :: CaH2PO4_1p_conc
+    real(r8) :: MgHPO4_conc
     real(r8) :: CSTR1
     real(r8) :: CCO2M
     real(r8) :: CCH4M
@@ -79,8 +79,8 @@ module SoluteChemDataType
     real(r8) :: CMGZ
     real(r8) :: CALX
     real(r8) :: CFEX
-    real(r8) :: CCAX
-    real(r8) :: CMGX
+    real(r8) :: CaX_conc
+    real(r8) :: MgX_conc
     real(r8) :: CNAX
     real(r8) :: CKAX
     real(r8) :: CSOX
@@ -92,30 +92,30 @@ module SoluteChemDataType
     real(r8) :: CALOHX
     real(r8) :: CFEOHX
     real(r8) :: CCACOX
-    real(r8) :: XN41
+    real(r8) :: XNH4_conc
     real(r8) :: XHY1
-    real(r8) :: XAL1
-    real(r8) :: XFE1
-    real(r8) :: XCA1
-    real(r8) :: PCAPH1
-    real(r8) :: XMG1
-    real(r8) :: XNA1
-    real(r8) :: XKA1
+    real(r8) :: XAl_conc
+    real(r8) :: XFe_conc
+    real(r8) :: XCa_conc
+    real(r8) :: Precp_Ca5P3O12O3H3_conc
+    real(r8) :: XMg_conc
+    real(r8) :: XNa_conc
+    real(r8) :: XK_conc
     real(r8) :: XHC1
-    real(r8) :: XALO21
-    real(r8) :: XFEO21
-    real(r8) :: XOH01
-    real(r8) :: XOH11
-    real(r8) :: XOH21
-    real(r8) :: XH1P1
-    real(r8) :: XH2P1
-    real(r8) :: PALOH1
-    real(r8) :: PFEOH1
-    real(r8) :: PCACO1
-    real(r8) :: PCASO1
-    real(r8) :: PALPO1
-    real(r8) :: PFEPO1
-    real(r8) :: PCAPD1
+    real(r8) :: XAlO2H2_conc
+    real(r8) :: XFeO2H2_conc
+    real(r8) :: XOH_conc
+    real(r8) :: XROH1_conc
+    real(r8) :: XROH2_conc
+    real(r8) :: XHPO4_conc
+    real(r8) :: XH2PO4_conc
+    real(r8) :: Precp_AlO3H3_conc
+    real(r8) :: Precp_FeO3H3_conc
+    real(r8) :: Precp_CaCO3_conc
+    real(r8) :: Precp_CaSO4_conc
+    real(r8) :: Precp_AlPO4_conc
+    real(r8) :: Precp_FePO4_conc
+    real(r8) :: Precp_CaHPO4_conc
     real(r8) :: FH2O
     real(r8) :: ATCA
     real(r8) :: XAEC
@@ -152,7 +152,7 @@ module SoluteChemDataType
     real(r8) :: TRBH2
     real(r8) :: TRB1P
     real(r8) :: TRB2P
-    real(r8) :: TRALPO
+    real(r8) :: TR_AlPO4
     real(r8) :: TRFEPO
     real(r8) :: TRCAPD
     real(r8) :: TRCAPH
@@ -235,24 +235,24 @@ module SoluteChemDataType
   end type solute_flx_type
 
   type, public :: chem_var_type
-  real(r8) :: CH1P1
-  real(r8) :: CH1PB
-  real(r8) :: CH2P1
-  real(r8) :: CH2PB
-  real(r8) :: CN31
-  real(r8) :: CN3B
-  real(r8) :: CN41
-  real(r8) :: CN4B
-  real(r8) :: PALPO1
-  real(r8) :: PALPOB
-  real(r8) :: PCAPD1
-  real(r8) :: PCAPDB
-  real(r8) :: PCAPH1
-  real(r8) :: PCAPHB
-  real(r8) :: PCAPM1
-  real(r8) :: PCAPMB
-  real(r8) :: PFEPO1
-  real(r8) :: PFEPOB
+  real(r8) :: H1PO4_2e_conc
+  real(r8) :: H1PO4_2e_Bconc
+  real(r8) :: H2PO4_1e_conc
+  real(r8) :: H2PO4_1e_Bconc
+  real(r8) :: NH3_aqu_conc
+  real(r8) :: NH3_aqu_Bconc
+  real(r8) :: NH4_1p_conc
+  real(r8) :: NH4_1p_Bconc
+  real(r8) :: Precp_AlPO4_conc
+  real(r8) :: PrecpB_AlPO4_conc
+  real(r8) :: Precp_CaHPO4_conc
+  real(r8) :: PrecpB_CaHPO4_conc
+  real(r8) :: Precp_Ca5P3O12O3H3_conc
+  real(r8) :: PrecpB_Ca5P3O12O3H3_conc
+  real(r8) :: Precp_CaH4P2O8_conc
+  real(r8) :: PrecpB_CaH2PO4_con
+  real(r8) :: Precp_FePO4_conc
+  real(r8) :: PrecpB_FePO4_con
   real(r8) :: SoilMicPMassLayerX
   real(r8) :: VLWatMicPNB
   real(r8) :: VLWatMicPNH
@@ -347,18 +347,18 @@ module SoluteChemDataType
   real(r8) :: VLNO3
   real(r8) :: VLNH4
   real(r8) :: VLNHB
-  real(r8) :: X1P1B
-  real(r8) :: X2P1B
-  real(r8) :: XH11B
-  real(r8) :: XH1P1
-  real(r8) :: XH21B
-  real(r8) :: XH2P1
-  real(r8) :: XN41
-  real(r8) :: XN4B
-  real(r8) :: XOH11
-  real(r8) :: XOH21
+  real(r8) :: XHPO4_Bconc
+  real(r8) :: XH2PO4_Bconc
+  real(r8) :: XROH_Bconc
+  real(r8) :: XHPO4_conc
+  real(r8) :: XROH2_Bconc
+  real(r8) :: XH2PO4_conc
+  real(r8) :: XNH4_conc
+  real(r8) :: XNH4_Bconc
+  real(r8) :: XROH1_conc
+  real(r8) :: XROH2_conc
   real(r8) :: XH01B
-  real(r8) :: XOH01
+  real(r8) :: XOH_conc
   real(r8) :: VLWatMicPNZ
   real(r8) :: VLWatMicPNO
   real(r8) :: BKVLNH
@@ -392,7 +392,7 @@ contains
   solflx%TRBH2 = 0._r8
   solflx%TRB1P = 0._r8
   solflx%TRB2P = 0._r8
-  solflx%TRALPO= 0._r8
+  solflx%TR_AlPO4= 0._r8
   solflx%TRFEPO= 0._r8
   solflx%TRCAPD= 0._r8
   solflx%TRCAPH= 0._r8

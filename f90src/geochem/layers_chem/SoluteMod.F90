@@ -234,68 +234,68 @@ module SoluteMod
   real(r8), pointer :: BKVLPB
   real(r8), pointer :: VLWatMicPNB
   real(r8), pointer :: VLWatMicPPO
-  real(r8), pointer :: CH1P1
-  real(r8), pointer :: CH1PB
-  real(r8), pointer :: CH2P1
-  real(r8), pointer :: CH2PB
-  real(r8), pointer :: CN31
-  real(r8), pointer :: CN3B
-  real(r8), pointer :: CN41
-  real(r8), pointer :: CN4B
-  real(r8), pointer :: PALPO1
-  real(r8), pointer :: PALPOB
-  real(r8), pointer :: PCAPD1
-  real(r8), pointer :: PCAPDB
-  real(r8), pointer :: PCAPH1
-  real(r8), pointer :: PCAPHB
-  real(r8), pointer :: PCAPM1
-  real(r8), pointer :: PCAPMB
-  real(r8), pointer :: PFEPO1
-  real(r8), pointer :: PFEPOB
-  real(r8), pointer :: X1P1B
-  real(r8), pointer :: X2P1B
-  real(r8), pointer :: XH11B
-  real(r8), pointer :: XH1P1
-  real(r8), pointer :: XH21B
-  real(r8), pointer :: XH2P1
-  real(r8), pointer :: XN41
-  real(r8), pointer :: XN4B
-  real(r8), pointer :: XOH11
-  real(r8), pointer :: XOH21
+  real(r8), pointer :: H1PO4_2e_conc
+  real(r8), pointer :: H1PO4_2e_Bconc
+  real(r8), pointer :: H2PO4_1e_conc
+  real(r8), pointer :: H2PO4_1e_Bconc
+  real(r8), pointer :: NH3_aqu_conc
+  real(r8), pointer :: NH3_aqu_Bconc
+  real(r8), pointer :: NH4_1p_conc
+  real(r8), pointer :: NH4_1p_Bconc
+  real(r8), pointer :: Precp_AlPO4_conc
+  real(r8), pointer :: PrecpB_AlPO4_conc
+  real(r8), pointer :: Precp_CaHPO4_conc
+  real(r8), pointer :: PrecpB_CaHPO4_conc
+  real(r8), pointer :: Precp_Ca5P3O12O3H3_conc
+  real(r8), pointer :: PrecpB_Ca5P3O12O3H3_conc
+  real(r8), pointer :: Precp_CaH4P2O8_conc
+  real(r8), pointer :: PrecpB_CaH2PO4_con
+  real(r8), pointer :: Precp_FePO4_conc
+  real(r8), pointer :: PrecpB_FePO4_con
+  real(r8), pointer :: XHPO4_Bconc
+  real(r8), pointer :: XH2PO4_Bconc
+  real(r8), pointer :: XROH_Bconc
+  real(r8), pointer :: XHPO4_conc
+  real(r8), pointer :: XROH2_Bconc
+  real(r8), pointer :: XH2PO4_conc
+  real(r8), pointer :: XNH4_conc
+  real(r8), pointer :: XNH4_Bconc
+  real(r8), pointer :: XROH1_conc
+  real(r8), pointer :: XROH2_conc
   real(r8), pointer :: XH01B
-  real(r8), pointer :: XOH01
+  real(r8), pointer :: XOH_conc
   real(r8), pointer :: VLWatMicPPB
 
-  XOH01  =>  chemvar%XOH01
+  XOH_conc  =>  chemvar%XOH_conc
   XH01B  =>  chemvar%XH01B
-  XOH21  =>  chemvar%XOH21
-  XOH11  =>  chemvar%XOH11
-  XH21B  =>  chemvar%XH21B
-  XH1P1  =>  chemvar%XH1P1
-  XH11B  =>  chemvar%XH11B
-  X1P1B  =>  chemvar%X1P1B
-  X2P1B  =>  chemvar%X2P1B
-  CH2PB  =>  chemvar%CH2PB
-  XN41   =>  chemvar%XN41
-  XN4B   =>  chemvar%XN4B
-  CN31   =>  chemvar%CN31
-  CN3B   =>  chemvar%CN3B
-  CN41   =>  chemvar%CN41
-  CN4B   =>  chemvar%CN4B
-  PALPO1 =>  chemvar%PALPO1
-  PALPOB =>  chemvar%PALPOB
-  PCAPD1 =>  chemvar%PCAPD1
-  PCAPDB =>  chemvar%PCAPDB
-  PCAPH1 =>  chemvar%PCAPH1
-  PCAPHB =>  chemvar%PCAPHB
-  PCAPM1 =>  chemvar%PCAPM1
-  PCAPMB =>  chemvar%PCAPMB
-  PFEPO1 =>  chemvar%PFEPO1
-  PFEPOB =>  chemvar%PFEPOB
-  CH2P1  =>  chemvar%CH2P1
-  CH1PB  =>  chemvar%CH1PB
-  CH1P1  =>  chemvar%CH1P1
-  XH2P1  =>  chemvar%XH2P1
+  XROH2_conc  =>  chemvar%XROH2_conc
+  XROH1_conc  =>  chemvar%XROH1_conc
+  XROH2_Bconc  =>  chemvar%XROH2_Bconc
+  XHPO4_conc  =>  chemvar%XHPO4_conc
+  XROH_Bconc  =>  chemvar%XROH_Bconc
+  XHPO4_Bconc  =>  chemvar%XHPO4_Bconc
+  XH2PO4_Bconc  =>  chemvar%XH2PO4_Bconc
+  H2PO4_1e_Bconc  =>  chemvar%H2PO4_1e_Bconc
+  XNH4_conc   =>  chemvar%XNH4_conc
+  XNH4_Bconc   =>  chemvar%XNH4_Bconc
+  NH3_aqu_conc   =>  chemvar%NH3_aqu_conc
+  NH3_aqu_Bconc   =>  chemvar%NH3_aqu_Bconc
+  NH4_1p_conc   =>  chemvar%NH4_1p_conc
+  NH4_1p_Bconc   =>  chemvar%NH4_1p_Bconc
+  Precp_AlPO4_conc =>  chemvar%Precp_AlPO4_conc
+  PrecpB_AlPO4_conc =>  chemvar%PrecpB_AlPO4_conc
+  Precp_CaHPO4_conc =>  chemvar%Precp_CaHPO4_conc
+  PrecpB_CaHPO4_conc =>  chemvar%PrecpB_CaHPO4_conc
+  Precp_Ca5P3O12O3H3_conc =>  chemvar%Precp_Ca5P3O12O3H3_conc
+  PrecpB_Ca5P3O12O3H3_conc =>  chemvar%PrecpB_Ca5P3O12O3H3_conc
+  Precp_CaH4P2O8_conc =>  chemvar%Precp_CaH4P2O8_conc
+  PrecpB_CaH2PO4_con =>  chemvar%PrecpB_CaH2PO4_con
+  Precp_FePO4_conc =>  chemvar%Precp_FePO4_conc
+  PrecpB_FePO4_con =>  chemvar%PrecpB_FePO4_con
+  H2PO4_1e_conc  =>  chemvar%H2PO4_1e_conc
+  H1PO4_2e_Bconc  =>  chemvar%H1PO4_2e_Bconc
+  H1PO4_2e_conc  =>  chemvar%H1PO4_2e_conc
+  XH2PO4_conc  =>  chemvar%XH2PO4_conc
   VLWatMicPNH =>  chemvar%VLWatMicPNH
   BKVLNH =>  chemvar%BKVLNH
   BKVLNB =>  chemvar%BKVLNB
@@ -351,36 +351,36 @@ module SoluteMod
 !     TUPNH4,TUPNH3=soil-root exchange of NH4,NH3 in non-band from uptake.f
 !     TUPNHB,TUPN3B=soil-root exchange of NH4,NH3 in band from uptake.f
 !     XNH4S,XNH4B=net change in NH4 in band,non-band from nitro.f
-!     CN41,CN31,CN4B,CN3B=total NH4,NH3 concentration in non-band,band
-!     XN41,XN4B=adsorbed NH4 concentration in non-band,band
+!     NH4_1p_conc,NH3_aqu_conc,NH4_1p_Bconc,NH3_aqu_Bconc=total NH4,NH3 concentration in non-band,band
+!     XNH4_conc,XNH4_Bconc=adsorbed NH4 concentration in non-band,band
 !
   IF(VLWatMicPNH.GT.ZEROS2(NY,NX))THEN
     VLWatMicPNX=natomw*VLWatMicPNH
     RN4X=(-TUPNH4(L,NY,NX)+XNH4S(L,NY,NX)+natomw*RSN4AA)/VLWatMicPNX
     RN3X=(-TUPN3S(L,NY,NX)+natomw*RSNUAA)/VLWatMicPNX
-    CN41=AZMAX1(trc_solml(ids_NH4,L,NY,NX)/VLWatMicPNX+RN4X)
-    CN31=AZMAX1(trc_solml(idg_NH3,L,NY,NX)/VLWatMicPNX+RN3X)
-    XN41=AZMAX1(trcx_solml(idx_NH4,L,NY,NX)/BKVLNH)
+    NH4_1p_conc=AZMAX1(trc_solml(ids_NH4,L,NY,NX)/VLWatMicPNX+RN4X)
+    NH3_aqu_conc=AZMAX1(trc_solml(idg_NH3,L,NY,NX)/VLWatMicPNX+RN3X)
+    XNH4_conc=AZMAX1(trcx_solml(idx_NH4,L,NY,NX)/BKVLNH)
   ELSE
     RN4X=0._r8
     RN3X=0._r8
-    CN41=0._r8
-    CN31=0._r8
-    XN41=0._r8
+    NH4_1p_conc=0._r8
+    NH3_aqu_conc=0._r8
+    XNH4_conc=0._r8
   ENDIF
   IF(VLWatMicPNB.GT.ZEROS2(NY,NX))THEN
     VLWatMicPNX=natomw*VLWatMicPNB
     RNBX=(-TUPNHB(L,NY,NX)+XNH4B(L,NY,NX)+natomw*(RSN4BA+RSN4BB))/VLWatMicPNX
     R3BX=(-TUPN3B(L,NY,NX)+natomw*(RSNUBA+RSNUBB))/VLWatMicPNX
-    CN4B=AZMAX1(trc_solml(ids_NH4B,L,NY,NX)/VLWatMicPNX+RNBX)
-    CN3B=AZMAX1(trc_solml(idg_NH3B,L,NY,NX)/VLWatMicPNX+R3BX)
-    XN4B=AZMAX1(trcx_solml(idx_NH4B,L,NY,NX)/BKVLNB)
+    NH4_1p_Bconc=AZMAX1(trc_solml(ids_NH4B,L,NY,NX)/VLWatMicPNX+RNBX)
+    NH3_aqu_Bconc=AZMAX1(trc_solml(idg_NH3B,L,NY,NX)/VLWatMicPNX+R3BX)
+    XNH4_Bconc=AZMAX1(trcx_solml(idx_NH4B,L,NY,NX)/BKVLNB)
   ELSE
     RNBX=0._r8
     R3BX=0._r8
-    CN4B=0._r8
-    CN3B=0._r8
-    XN4B=0._r8
+    NH4_1p_Bconc=0._r8
+    NH3_aqu_Bconc=0._r8
+    XNH4_Bconc=0._r8
   ENDIF
 !
 !     SOLUBLE, EXCHANGEABLE AND PRECIPITATED PO4 CONCENTRATIONS IN
@@ -392,80 +392,80 @@ module SoluteMod
 !     XH1PS,XH1BS=net change in HPO4 in band,non-band from nitro.f
 !     TUPH1P,TUPH2P=soil-root exch of HPO4,H2PO4 in non-band from uptake.f
 !     TUPH1B,TUPH2B=soil-root exch of HPO4,H2PO4 in band from uptake.f
-!     CH1P1,CH2P1=HPO4,H2PO4 concentrations in non-band
-!     CH1PB,CH2PB=HPO4,H2PO4 concentrations in band
-!     XOH11,XOH11,XOH21=concn of adsorption sites R-,R-OH,R-OH2 in non-band
-!     XOH1B,XH11B,XH21B=concn of adsorption sites R-,R-OH,R-OH2 in band
-!     XH1P1,XH2P1=concentration of adsorbed HPO4,H2PO4 in non-band
-!     XH11B,X2P1B=concentration of adsorbed HPO4,H2PO4 in band
-!     PALPO1,PFEPO1=concn of precip AlPO4,FEPO4 in non-band
-!     PALPOB,PFEPOB=concn of precip AlPO4,FEPO4 in band
-!     PCAPM1,PCAPD1,PCAPH1=concn of precip CaH2PO4,CaHPO4,apatite in non-band
-!     PCAPMB,PCAPDB,PCAPHB=concn of precip CaH2PO4,CaHPO4,apatite in band
+!     H1PO4_2e_conc,H2PO4_1e_conc=HPO4,H2PO4 concentrations in non-band
+!     H1PO4_2e_Bconc,H2PO4_1e_Bconc=HPO4,H2PO4 concentrations in band
+!     XROH1_conc,XROH1_conc,XROH2_conc=concn of adsorption sites R-,R-OH,R-OH2 in non-band
+!     XOH1B,XROH_Bconc,XROH2_Bconc=concn of adsorption sites R-,R-OH,R-OH2 in band
+!     XHPO4_conc,XH2PO4_conc=concentration of adsorbed HPO4,H2PO4 in non-band
+!     XROH_Bconc,XH2PO4_Bconc=concentration of adsorbed HPO4,H2PO4 in band
+!     Precp_AlPO4_conc,Precp_FePO4_conc=concn of precip AlPO4,FEPO4 in non-band
+!     PrecpB_AlPO4_conc,PrecpB_FePO4_con=concn of precip AlPO4,FEPO4 in band
+!     Precp_CaH4P2O8_conc,Precp_CaHPO4_conc,Precp_Ca5P3O12O3H3_conc=concn of precip CaH2PO4,CaHPO4,apatite in non-band
+!     PrecpB_CaH2PO4_con,PrecpB_CaHPO4_conc,PrecpB_Ca5P3O12O3H3_conc=concn of precip CaH2PO4,CaHPO4,apatite in band
 !
   IF(VLWatMicPPO.GT.ZEROS2(NY,NX))THEN
     VLWatMicPPX=patomw*VLWatMicPPO
     RH1PX=(XH1PS(L,NY,NX)-TUPH1P(L,NY,NX))/VLWatMicPPX
     RH2PX=(XH2PS(L,NY,NX)-TUPH2P(L,NY,NX))/VLWatMicPPX
-    CH1P1=AZMAX1(trc_solml(ids_H1PO4,L,NY,NX)/VLWatMicPPX+RH1PX)
-    CH2P1=AZMAX1(trc_solml(ids_H2PO4,L,NY,NX)/VLWatMicPPX+RH2PX)
-    XOH01=AZMAX1(trcx_solml(idx_OHe,L,NY,NX))/BKVLPO
-    XOH11=AZMAX1(trcx_solml(idx_OH,L,NY,NX))/BKVLPO
-    XOH21=AZMAX1(trcx_solml(idx_OHp,L,NY,NX))/BKVLPO
-    XH1P1=AZMAX1(trcx_solml(idx_HPO4,L,NY,NX))/BKVLPO
-    XH2P1=AZMAX1(trcx_solml(idx_H2PO4,L,NY,NX))/BKVLPO
-    PALPO1=AZMAX1(trcp_salml(idsp_AlPO4,L,NY,NX))/BKVLPO
-    PFEPO1=AZMAX1(trcp_salml(idsp_FePO4,L,NY,NX))/BKVLPO
-    PCAPM1=AZMAX1(trcp_salml(idsp_CaH2PO4,L,NY,NX))/BKVLPO
-    PCAPD1=AZMAX1(trcp_salml(idsp_CaHPO4,L,NY,NX))/BKVLPO
-    PCAPH1=AZMAX1(trcp_salml(idsp_HA,L,NY,NX))/BKVLPO
+    H1PO4_2e_conc=AZMAX1(trc_solml(ids_H1PO4,L,NY,NX)/VLWatMicPPX+RH1PX)
+    H2PO4_1e_conc=AZMAX1(trc_solml(ids_H2PO4,L,NY,NX)/VLWatMicPPX+RH2PX)
+    XOH_conc=AZMAX1(trcx_solml(idx_OHe,L,NY,NX))/BKVLPO
+    XROH1_conc=AZMAX1(trcx_solml(idx_OH,L,NY,NX))/BKVLPO
+    XROH2_conc=AZMAX1(trcx_solml(idx_OHp,L,NY,NX))/BKVLPO
+    XHPO4_conc=AZMAX1(trcx_solml(idx_HPO4,L,NY,NX))/BKVLPO
+    XH2PO4_conc=AZMAX1(trcx_solml(idx_H2PO4,L,NY,NX))/BKVLPO
+    Precp_AlPO4_conc=AZMAX1(trcp_salml(idsp_AlPO4,L,NY,NX))/BKVLPO
+    Precp_FePO4_conc=AZMAX1(trcp_salml(idsp_FePO4,L,NY,NX))/BKVLPO
+    Precp_CaH4P2O8_conc=AZMAX1(trcp_salml(idsp_CaH2PO4,L,NY,NX))/BKVLPO
+    Precp_CaHPO4_conc=AZMAX1(trcp_salml(idsp_CaHPO4,L,NY,NX))/BKVLPO
+    Precp_Ca5P3O12O3H3_conc=AZMAX1(trcp_salml(idsp_HA,L,NY,NX))/BKVLPO
   ELSE
     RH1PX=0._r8
     RH2PX=0._r8
-    CH1P1=0._r8
-    CH2P1=0._r8
-    XOH01=0._r8
-    XOH11=0._r8
-    XOH21=0._r8
-    XH1P1=0._r8
-    XH2P1=0._r8
-    PALPO1=0._r8
-    PFEPO1=0._r8
-    PCAPM1=0._r8
-    PCAPD1=0._r8
-    PCAPH1=0._r8
+    H1PO4_2e_conc=0._r8
+    H2PO4_1e_conc=0._r8
+    XOH_conc=0._r8
+    XROH1_conc=0._r8
+    XROH2_conc=0._r8
+    XHPO4_conc=0._r8
+    XH2PO4_conc=0._r8
+    Precp_AlPO4_conc=0._r8
+    Precp_FePO4_conc=0._r8
+    Precp_CaH4P2O8_conc=0._r8
+    Precp_CaHPO4_conc=0._r8
+    Precp_Ca5P3O12O3H3_conc=0._r8
   ENDIF
   IF(VLWatMicPPB.GT.ZEROS2(NY,NX))THEN
     VLWatMicPPX=patomw*VLWatMicPPB
     RH1BX=(XH1BS(L,NY,NX)-TUPH1B(L,NY,NX))/VLWatMicPPX
     RH2BX=(XH2BS(L,NY,NX)-TUPH2B(L,NY,NX))/VLWatMicPPX
-    CH1PB=AZMAX1(trc_solml(ids_H1PO4B,L,NY,NX)/VLWatMicPPX+RH1BX)
-    CH2PB=AZMAX1(trc_solml(ids_H2PO4B,L,NY,NX)/VLWatMicPPX+RH2BX)
+    H1PO4_2e_Bconc=AZMAX1(trc_solml(ids_H1PO4B,L,NY,NX)/VLWatMicPPX+RH1BX)
+    H2PO4_1e_Bconc=AZMAX1(trc_solml(ids_H2PO4B,L,NY,NX)/VLWatMicPPX+RH2BX)
     XH01B=AZMAX1(trcx_solml(idx_OHeB,L,NY,NX))/BKVLPB
-    XH11B=AZMAX1(trcx_solml(idx_OHB,L,NY,NX))/BKVLPB
-    XH21B=AZMAX1(trcx_solml(idx_OHpB,L,NY,NX))/BKVLPB
-    X1P1B=AZMAX1(trcx_solml(idx_HPO4B,L,NY,NX))/BKVLPB
-    X2P1B=AZMAX1(trcx_solml(idx_H2PO4B,L,NY,NX))/BKVLPB
-    PALPOB=AZMAX1(trcp_salml(idsp_AlPO4B,L,NY,NX))/BKVLPB
-    PFEPOB=AZMAX1(trcp_salml(idsp_FePO4B,L,NY,NX))/BKVLPB
-    PCAPMB=AZMAX1(trcp_salml(idsp_CaH2PO4B,L,NY,NX))/BKVLPB
-    PCAPDB=AZMAX1(trcp_salml(idsp_CaHPO4B,L,NY,NX))/BKVLPB
-    PCAPHB=AZMAX1(trcp_salml(idsp_HAB,L,NY,NX))/BKVLPB
+    XROH_Bconc=AZMAX1(trcx_solml(idx_OHB,L,NY,NX))/BKVLPB
+    XROH2_Bconc=AZMAX1(trcx_solml(idx_OHpB,L,NY,NX))/BKVLPB
+    XHPO4_Bconc=AZMAX1(trcx_solml(idx_HPO4B,L,NY,NX))/BKVLPB
+    XH2PO4_Bconc=AZMAX1(trcx_solml(idx_H2PO4B,L,NY,NX))/BKVLPB
+    PrecpB_AlPO4_conc=AZMAX1(trcp_salml(idsp_AlPO4B,L,NY,NX))/BKVLPB
+    PrecpB_FePO4_con=AZMAX1(trcp_salml(idsp_FePO4B,L,NY,NX))/BKVLPB
+    PrecpB_CaH2PO4_con=AZMAX1(trcp_salml(idsp_CaH2PO4B,L,NY,NX))/BKVLPB
+    PrecpB_CaHPO4_conc=AZMAX1(trcp_salml(idsp_CaHPO4B,L,NY,NX))/BKVLPB
+    PrecpB_Ca5P3O12O3H3_conc=AZMAX1(trcp_salml(idsp_HAB,L,NY,NX))/BKVLPB
   ELSE
     RH1BX=0._r8
     RH2BX=0._r8
-    CH1PB=0._r8
-    CH2PB=0._r8
+    H1PO4_2e_Bconc=0._r8
+    H2PO4_1e_Bconc=0._r8
     XH01B=0._r8
-    XH11B=0._r8
-    XH21B=0._r8
-    X1P1B=0._r8
-    X2P1B=0._r8
-    PALPOB=0._r8
-    PFEPOB=0._r8
-    PCAPMB=0._r8
-    PCAPDB=0._r8
-    PCAPHB=0._r8
+    XROH_Bconc=0._r8
+    XROH2_Bconc=0._r8
+    XHPO4_Bconc=0._r8
+    XH2PO4_Bconc=0._r8
+    PrecpB_AlPO4_conc=0._r8
+    PrecpB_FePO4_con=0._r8
+    PrecpB_CaH2PO4_con=0._r8
+    PrecpB_CaHPO4_conc=0._r8
+    PrecpB_Ca5P3O12O3H3_conc=0._r8
   ENDIF
   end subroutine UpdateSoilFertlizer
 
@@ -898,27 +898,29 @@ module SoluteMod
   subroutine UpdateSoluteinSurfaceResidue(NX,NY)
   implicit none
   integer, intent(in) :: NY,NX
-  real(r8) :: CAL1,CALX,CCA1,CCAX
-  real(r8) :: CCEC,CCEC0,CCO31
-  real(r8) :: CFE1,CFEX
-  real(r8) :: CH2PA,CH2PD,CH2PF,CH2PH,CH2PM
-  real(r8) :: CHY1,COH1,DP
+  real(r8) :: Al_3p_conc,CALX,Ca_2p_conc,CaX_conc
+  real(r8) :: CCEC0,CO3_2e_conc
+  real(r8) :: Fe_3p_conc,CFEX
+  real(r8) :: H2PO4_1e_AlPO4_eqv,H2PO4_1e_CaHPO4_eqv,H2PO4_1e_FePO4_eqv,H2PO4_1e_apatite_eqv,H2PO4_1e_CaH4P2O8_eqv
+  real(r8) :: H2PO4_e_to_HPO4_2e_flx
+  real(r8) :: H_1p_conc,OH_1e_conc,DP
   real(r8) :: FX,S0,S1,XALQ,XCAQ,XCAX
   real(r8) :: XFEQ,XHYQ,XN4Q,XTLQ
-  real(r8) :: VLWatMicPMX,VLWatMicPMP,BKVLX
+  real(r8) :: VLWatMicPMX,VLWatMicPMP,BulkSoilMass
   real(r8) :: THETWR,COMA
   real(r8) :: CNHUA
   real(r8) :: CCO20
   real(r8) :: RH1PX,RH2PX,DUKD,DFNSA,RN3X,RN4X
-  real(r8) :: CH1P1,CH2P1,CN31,CN41,PALPO1,PCAPD1
-  real(r8) :: PCAPH1,PCAPM1,PFEPO1,RH2P,RNH4,RPALPX
-  real(r8) :: RPCADX,RPCAHX,RPCAMX,RPFEPX,RXN4,XN41
+  real(r8) :: H1PO4_2e_conc,H2PO4_1e_conc,NH3_aqu_conc,NH4_1p_conc,Precp_AlPO4_conc,Precp_CaHPO4_conc
+  real(r8) :: Precp_Ca5P3O12O3H3_conc,Precp_CaH4P2O8_conc,Precp_FePO4_conc,RNH4,H2PO4_1e_AlPO4_dissol_flx
+  real(r8) :: H2PO4_1e_CaHPO4_dissol_flx,H2PO4_1e_apatite_dissol_flx,H2PO4_1e_CaH4P2O8_dissol_flx
+  real(r8) :: H2PO4_1e_FePO4_dissol_flx,RXN4,XNH4_conc
   real(r8) :: RHP1,RHP2,RN3S,RN4S
 !     begin_execution
 !     BKVL=litter mass
 !
   IF(VLWatMicPM(NPH,0,NY,NX).GT.ZEROS2(NY,NX))THEN
-    BKVLX=SoilMicPMassLayer(0,NY,NX)
+    BulkSoilMass=SoilMicPMassLayer(0,NY,NX)
 !
 !     UREA HYDROLYSIS IN SURFACE RESIDUE
 !
@@ -960,7 +962,7 @@ module SoluteMod
       .AND.SoilMicPMassLayer(0,NY,NX).GT.ZEROS(NY,NX))THEN
       CNHUA=FertN_soil(ifert_urea,0,NY,NX)/SoilMicPMassLayer(0,NY,NX)
       DFNSA=CNHUA/(CNHUA+DUKD)
-      RSNUA=AMIN1(FertN_soil(ifert_urea,0,NY,NX),SPNHU*TOQCK(0,NY,NX)*DFNSA*TFNQ(0,NY,NX))*(1.0-ZNHUI(0,NY,NX))
+      RSNUA=AMIN1(FertN_soil(ifert_urea,0,NY,NX),SPNHU*TOQCK(0,NY,NX)*DFNSA*TFNQ(0,NY,NX))*(1.0_r8-ZNHUI(0,NY,NX))
     ELSE
       RSNUA=0._r8
     ENDIF
@@ -991,19 +993,19 @@ module SoluteMod
 !     VLWatMicPNH=water volume
 !     RN4X,RN3X=NH4,NH3 input from uptake, mineraln, dissoln
 !     XNH4S=net change in NH4 from nitro.f
-!     CN41,CN31=total NH4,NH3 concentration
-!     XN41=adsorbed NH4 concentration
+!     NH4_1p_conc,NH3_aqu_conc=total NH4,NH3 concentration
+!     XNH4_conc=adsorbed NH4 concentration
 !
     IF(VLWatMicPM(NPH,0,NY,NX).GT.ZEROS2(NY,NX))THEN
       VLWatMicPMX=natomw*VLWatMicPM(NPH,0,NY,NX)
       RN4X=(XNH4S(0,NY,NX)+natomw*RSN4AA)/VLWatMicPMX
       RN3X=natomw*RSNUAA/VLWatMicPMX
-      CN41=AMAX1(ZERO,trc_solml(ids_NH4,0,NY,NX)/VLWatMicPMX+RN4X)
-      CN31=AMAX1(ZERO,trc_solml(idg_NH3,0,NY,NX)/VLWatMicPMX+RN3X)
-      IF(BKVLX.GT.ZEROS(NY,NX))THEN
-        XN41=AMAX1(ZERO,trcx_solml(idx_NH4,0,NY,NX)/BKVLX)
+      NH4_1p_conc=AMAX1(ZERO,trc_solml(ids_NH4,0,NY,NX)/VLWatMicPMX+RN4X)
+      NH3_aqu_conc=AMAX1(ZERO,trc_solml(idg_NH3,0,NY,NX)/VLWatMicPMX+RN3X)
+      IF(BulkSoilMass.GT.ZEROS(NY,NX))THEN
+        XNH4_conc=AMAX1(ZERO,trcx_solml(idx_NH4,0,NY,NX)/BulkSoilMass)
       ELSE
-        XN41=0._r8
+        XNH4_conc=0._r8
       ENDIF
 !
 !     SOLUBLE, EXCHANGEABLE AND PRECIPITATED PO4 CONCENTRATIONS
@@ -1011,98 +1013,103 @@ module SoluteMod
 !     VLWatMicPMP=water volume
 !     RH1PX,RH2PX=HPO4,H2PO4 inputs from mineraln, uptake
 !     XH1PS=net change in HPO4 from nitro.f
-!     CH1P1,CH2P1=HPO4,H2PO4 concentrations
+!     H1PO4_2e_conc,H2PO4_1e_conc=HPO4,H2PO4 concentrations
 !
       VLWatMicPMP=patomw*VLWatMicPM(NPH,0,NY,NX)
       RH1PX=XH1PS(0,NY,NX)/VLWatMicPMP
       RH2PX=XH2PS(0,NY,NX)/VLWatMicPMP
-      CH1P1=AZMAX1(trc_solml(ids_H1PO4,0,NY,NX)/VLWatMicPMP+RH1PX)
-      CH2P1=AZMAX1(trc_solml(ids_H2PO4,0,NY,NX)/VLWatMicPMP+RH2PX)
+      H1PO4_2e_conc=AZMAX1(trc_solml(ids_H1PO4,0,NY,NX)/VLWatMicPMP+RH1PX)
+      H2PO4_1e_conc=AZMAX1(trc_solml(ids_H2PO4,0,NY,NX)/VLWatMicPMP+RH2PX)
     ELSE
       RN4X=0._r8
       RN3X=0._r8
-      CN41=0._r8
-      CN31=0._r8
-      XN41=0._r8
+      NH4_1p_conc=0._r8
+      NH3_aqu_conc=0._r8
+      XNH4_conc=0._r8
       RH1PX=0._r8
       RH2PX=0._r8
-      CH1P1=0._r8
-      CH2P1=0._r8
+      H1PO4_2e_conc=0._r8
+      H2PO4_1e_conc=0._r8
     ENDIF
 !
 !     PHOSPHORUS TRANSFORMATIONS IN SURFACE RESIDUE
 !
-!     PALPO1,PFEPO1=concn of precip AlPO4,FEPO4
-!     PCAPM1,PCAPD1,PCAPH1=concn of precip CaH2PO4,CaHPO4,apatite
+!     Precp_AlPO4_conc,Precp_FePO4_conc=concn of precip AlPO4,FEPO4
+!     Precp_CaH4P2O8_conc,Precp_CaHPO4_conc,Precp_Ca5P3O12O3H3_conc=concn of precip CaH2PO4,CaHPO4,apatite
 !
-    IF(BKVLX.GT.ZEROS(NY,NX))THEN
-      PALPO1=AZMAX1(trcp_salml(idsp_AlPO4,0,NY,NX)/BKVLX)
-      PFEPO1=AZMAX1(trcp_salml(idsp_FePO4,0,NY,NX)/BKVLX)
-      PCAPM1=AZMAX1(trcp_salml(idsp_CaH2PO4,0,NY,NX)/BKVLX)
-      PCAPD1=AZMAX1(trcp_salml(idsp_CaHPO4,0,NY,NX)/BKVLX)
-      PCAPH1=AZMAX1(trcp_salml(idsp_HA,0,NY,NX)/BKVLX)
+    IF(BulkSoilMass.GT.ZEROS(NY,NX))THEN
+      Precp_AlPO4_conc=AZMAX1(trcp_salml(idsp_AlPO4,0,NY,NX)/BulkSoilMass)
+      Precp_FePO4_conc=AZMAX1(trcp_salml(idsp_FePO4,0,NY,NX)/BulkSoilMass)
+      Precp_CaH4P2O8_conc=AZMAX1(trcp_salml(idsp_CaH2PO4,0,NY,NX)/BulkSoilMass)
+      Precp_CaHPO4_conc=AZMAX1(trcp_salml(idsp_CaHPO4,0,NY,NX)/BulkSoilMass)
+      Precp_Ca5P3O12O3H3_conc=AZMAX1(trcp_salml(idsp_HA,0,NY,NX)/BulkSoilMass)
     ELSE
-      PALPO1=0._r8
-      PFEPO1=0._r8
-      PCAPM1=0._r8
-      PCAPD1=0._r8
-      PCAPH1=0._r8
+      Precp_AlPO4_conc=0._r8
+      Precp_FePO4_conc=0._r8
+      Precp_CaH4P2O8_conc=0._r8
+      Precp_CaHPO4_conc=0._r8
+      Precp_Ca5P3O12O3H3_conc=0._r8
     ENDIF
 !
 !     CALCULATE H2PO4 COPRECIPITATES FRPM LITTER PH
 !
-    CHY1=AMAX1(ZERO,10.0_r8**(-(PH(0,NY,NX)-3.0_r8)))
-    COH1=AMAX1(ZERO,DPH2O/CHY1)
-    CAL1=AMAX1(ZERO,SPALO/COH1**3._r8)
-    CFE1=AMAX1(ZERO,SPFEO/COH1**3_r8)
+    H_1p_conc=AMAX1(ZERO,10.0_r8**(-(PH(0,NY,NX)-3.0_r8)))
+    OH_1e_conc=AMAX1(ZERO,DPH2O/H_1p_conc)
+    Al_3p_conc=AMAX1(ZERO,SPALO/OH_1e_conc**3._r8)
+    Fe_3p_conc=AMAX1(ZERO,SPFEO/OH_1e_conc**3_r8)
     CCO20=AMAX1(ZERO,trc_solcl(idg_CO2,0,NY,NX)/catomw)
-    CCO31=AMAX1(ZERO,CCO20*DPCO3/CHY1**2._r8)
-    CCA1=AMAX1(ZERO,AMIN1(CCAMX,SPCAC/CCO31))
+    CO3_2e_conc=AMAX1(ZERO,CCO20*DPCO3/H_1p_conc**2._r8)
+    Ca_2p_conc=AMAX1(ZERO,AMIN1(CCAMX,SPCAC/CO3_2e_conc))
 !
 !     ALUMINUM PHOSPHATE (VARISCITE)
 !
-!     CH2PA,CH2P1=equilibrium,current H2PO4 concentration in litter
+!     H2PO4_1e_AlPO4_eqv,H2PO4_1e_conc=equilibrium,current H2PO4 concentration in litter
 !     SYA0P2=solubility product derived from SPALO
-!     RPALPX=H2PO4 dissolution from AlPO4 in litter
+!     H2PO4_1e_AlPO4_dissol_flx=H2PO4 dissolution from AlPO4 in litter
 !
-    CH2PA=SYA0P2/(CAL1*COH1**2)
-    RPALPX=AMIN1(AZMAX1(4.0E-08*ORGC(0,NY,NX)-PALPO1),AMAX1(-PALPO1,TPD*(CH2P1-CH2PA)))
+    H2PO4_1e_AlPO4_eqv=SYA0P2/(Al_3p_conc*OH_1e_conc**2)
+    H2PO4_1e_AlPO4_dissol_flx=AMIN1(AZMAX1(4.0E-08*ORGC(0,NY,NX)-Precp_AlPO4_conc),&
+      AMAX1(-Precp_AlPO4_conc,TPD*(H2PO4_1e_conc-H2PO4_1e_AlPO4_eqv)))
 !
 !     IRON PHOSPHATE (STRENGITE)
 !
-!     CH2PF,CH2P1=equilibrium,current H2PO4 concentration in litter
+!     H2PO4_1e_FePO4_eqv,H2PO4_1e_conc=equilibrium,current H2PO4 concentration in litter
 !     SYF0P2=solubility product derived from SPALO
-!     RPFEPX=H2PO4 dissolution from FePO4 in litter
+!     H2PO4_1e_FePO4_dissol_flx=H2PO4 dissolution from FePO4 in litter
 !
-    CH2PF=SYF0P2/(CFE1*COH1**2)
-    RPFEPX=AMIN1(AZMAX1(2.0E-06*ORGC(0,NY,NX)-PFEPO1),AMAX1(-PFEPO1,TPD*(CH2P1-CH2PF)))
+    H2PO4_1e_FePO4_eqv=SYF0P2/(Fe_3p_conc*OH_1e_conc**2)
+    H2PO4_1e_FePO4_dissol_flx=AMIN1(AZMAX1(2.0E-06*ORGC(0,NY,NX)-Precp_FePO4_conc),&
+      AMAX1(-Precp_FePO4_conc,TPD*(H2PO4_1e_conc-H2PO4_1e_FePO4_eqv)))
 !
 !     DICALCIUM PHOSPHATE
 !
-!     CH2PD,CH2P1=equilibrium,current H2PO4 concentration in litter
+!     H2PO4_1e_CaHPO4_eqv,H2PO4_1e_conc=equilibrium,current H2PO4 concentration in litter
 !     SYCAD2=solubility product derived from SPALO
-!     RPCADX=H2PO4 dissolution from CaHPO4 in litter
-!
-    CH2PD=SYCAD2/(CCA1*COH1)
-    RPCADX=AMIN1(AMAX1(0-.0,5.0E-05*ORGC(0,NY,NX)-PCAPD1),AMAX1(-PCAPD1,TPD*(CH2P1-CH2PD)))
+!     H2PO4_1e_CaHPO4_dissol_flx=H2PO4 dissolution from CaHPO4 in litter
+!   CaHPO4.H2O <->HPO4(-)+Ca(2+)+OH(-) 
+    H2PO4_1e_CaHPO4_eqv=SYCAD2/(Ca_2p_conc*OH_1e_conc)
+    H2PO4_1e_CaHPO4_dissol_flx=AMIN1(AMAX1(0-.0,5.0E-05*ORGC(0,NY,NX)-Precp_CaHPO4_conc),&
+      AMAX1(-Precp_CaHPO4_conc,TPD*(H2PO4_1e_conc-H2PO4_1e_CaHPO4_eqv)))
 !
 !     HYDROXYAPATITE
 !
-!     CH2PH,CH2P1=equilibrium,current H2PO4 concentration in litter
+!     H2PO4_1e_apatite_eqv,H2PO4_1e_conc=equilibrium,current H2PO4 concentration in litter
 !     SYCAH2=solubility product derived from SPALO
-!     RPCAHX=H2PO4 dissolution from apatite in litter
+!     H2PO4_1e_apatite_dissol_flx=H2PO4 dissolution from apatite in litter
 !
-    CH2PH=(SYCAH2/(CCA1**5*COH1**7))**0.333
-    RPCAHX=AMIN1(AZMAX1(5.0E-05*ORGC(0,NY,NX)-PCAPH1),AMAX1(-PCAPH1,TPD*(CH2P1-CH2PH)))
+    H2PO4_1e_apatite_eqv=(SYCAH2/(Ca_2p_conc**5_r8*OH_1e_conc**7))**0.333_r8
+    H2PO4_1e_apatite_dissol_flx=AMIN1(AZMAX1(5.0E-05_r8*ORGC(0,NY,NX)-Precp_Ca5P3O12O3H3_conc),&
+      AMAX1(-Precp_Ca5P3O12O3H3_conc,TPD*(H2PO4_1e_conc-H2PO4_1e_apatite_eqv)))
 !
 !     MONOCALCIUM PHOSPHATE
 !
-!     CH2PM,CH2P1=equilibrium,current H2PO4 concentration in litter
+!     H2PO4_1e_CaH4P2O8_eqv,H2PO4_1e_conc=equilibrium,current H2PO4 concentration in litter
 !     SPCAM=solubility product for Ca(H2PO4)2
-!     RPCAMX=H2PO4 dissolution from Ca(H2PO4)2 in litter
+!     H2PO4_1e_CaH4P2O8_dissol_flx=H2PO4 dissolution from Ca(H2PO4)2 in litter
 !
-    CH2PM=SQRT(SPCAM/CCA1)
-    RPCAMX=AMIN1(AZMAX1(5.0E-05_r8*ORGC(0,NY,NX)-PCAPM1),AMAX1(-PCAPM1*SPPO4,TPD*(CH2P1-CH2PM)))
+    H2PO4_1e_CaH4P2O8_eqv=SQRT(SPCAM/Ca_2p_conc)
+    H2PO4_1e_CaH4P2O8_dissol_flx=AMIN1(AZMAX1(5.0E-05_r8*ORGC(0,NY,NX)-Precp_CaH4P2O8_conc),&
+      AMAX1(-Precp_CaH4P2O8_conc*SPPO4,TPD*(H2PO4_1e_conc-H2PO4_1e_CaH4P2O8_eqv)))
 
 !
 !     PHOSPHORUS ANION EXCHANGE IN SURFACE REDISUE
@@ -1114,44 +1121,46 @@ module SoluteMod
 !
 !     DPH2P=dissociation constant
 !     S1=equilibrium concentration in litter
-!     RH2P=H2PO4-H+HPO4 dissociation in litter
+!     H2PO4_e_to_HPO4_2e_flx=H2PO4-H+HPO4 dissociation in litter
 !
     DP=DPH2P
-    S0=CH1P1+CHY1+DP
-    S1=AZMAX1(S0**2-4.0*(CH1P1*CHY1-DP*CH2P1))
-    RH2P=TSL*(S0-SQRT(S1))
+    S0=H1PO4_2e_conc+H_1p_conc+DP
+    S1=AZMAX1(S0**2-4.0*(H1PO4_2e_conc*H_1p_conc-DP*H2PO4_1e_conc))
+    H2PO4_e_to_HPO4_2e_flx=TSL*(S0-SQRT(S1))
 !
 !     EQUILIBRIUM X-CA CONCENTRATION FROM CEC, GAPON COEFFICIENTS
 !     AND CATION CONCENTRATIONS
 !
-!     CCEC,XCEC=cation exchange concentration,capacity
+!     XCEC=cation exchange concentration,capacity
 !     XCAX=equilibrium R-Ca concentration
 !     GKC4,GKCH,GKCA,GKCM,GKCN,GKCK=Gapon selectivity coefficients for
 !     CA-NH4,CA-H,CA-AL,CA-MG,CA-NA,CA-K
 !     X*Q=equilibrium exchangeable concentrations
 !     XTLQ=total equilibrium exchangeable concentration
-!
-    IF(BKVLX.GT.ZEROS(NY,NX))THEN
-      CCEC0=AMAX1(ZERO,COOH*ORGC(0,NY,NX)/BKVLX)
+!     BulkSoilMass=Mg/d2
+!     ORGC=gC/d-2
+!     COOH=mol/gC, CEC of organic matter
+    IF(BulkSoilMass.GT.ZEROS(NY,NX))THEN
+      CCEC0=AMAX1(ZERO,COOH*ORGC(0,NY,NX)/BulkSoilMass)
     ELSE
       CCEC0=ZERO
     ENDIF
-    CALX=AMAX1(ZERO,CAL1)**0.333
-    CFEX=AMAX1(ZERO,CFE1)**0.333
-    CCAX=AMAX1(ZERO,CCA1)**0.500
+    CALX=AMAX1(ZERO,Al_3p_conc)**0.333_r8
+    CFEX=AMAX1(ZERO,Fe_3p_conc)**0.333_r8
+    CaX_conc=AMAX1(ZERO,Ca_2p_conc)**0.500_r8
 !
 !     EQUILIBRIUM X-CA CONCENTRATION FROM CEC AND CATION
 !     CONCENTRATIONS
 !
-    XCAX=CCEC0/(1.0+GKC4(NU(NY,NX),NY,NX)*CN41/CCAX &
-      +GKCH(NU(NY,NX),NY,NX)*CHY1/CCAX &
-      +GKCA(NU(NY,NX),NY,NX)*CALX/CCAX &
-      +GKCA(NU(NY,NX),NY,NX)*CFEX/CCAX)
-    XN4Q=XCAX*CN41*GKC4(NU(NY,NX),NY,NX)
-    XHYQ=XCAX*CHY1*GKCH(NU(NY,NX),NY,NX)
+    XCAX=CCEC0/(1.0_r8+GKC4(NU(NY,NX),NY,NX)*NH4_1p_conc/CaX_conc &
+      +GKCH(NU(NY,NX),NY,NX)*H_1p_conc/CaX_conc &
+      +GKCA(NU(NY,NX),NY,NX)*CALX/CaX_conc &
+      +GKCA(NU(NY,NX),NY,NX)*CFEX/CaX_conc)
+    XN4Q=XCAX*NH4_1p_conc*GKC4(NU(NY,NX),NY,NX)
+    XHYQ=XCAX*H_1p_conc*GKCH(NU(NY,NX),NY,NX)
     XALQ=XCAX*CALX*GKCA(NU(NY,NX),NY,NX)
     XFEQ=XCAX*CFEX*GKCA(NU(NY,NX),NY,NX)
-    XCAQ=XCAX*CCAX
+    XCAQ=XCAX*CaX_conc
     XTLQ=XN4Q+XHYQ+XALQ+XFEQ+XCAQ
     IF(XTLQ.GT.ZERO)THEN
       FX=CCEC0/XTLQ
@@ -1167,27 +1176,22 @@ module SoluteMod
 !     RNH4=NH4-NH3+H dissociation in litter
 !     DPN4=NH4 dissociation constant
 !
-    RXN4=TADC0*(XN4Q-XN41)
-    RNH4=(CHY1*CN31-DPN4*CN41)/(DPN4+CHY1)
+    RXN4=TADC0*(XN4Q-XNH4_conc)
+    RNH4=(H_1p_conc*NH3_aqu_conc-DPN4*NH4_1p_conc)/(DPN4+H_1p_conc)
 
   ELSE
     RSN4AA=0._r8
     RSN3AA=0._r8
     RSNUAA=0._r8
     RSNOAA=0._r8
-    RPALPX=0._r8
-    RPFEPX=0._r8
-    RPCADX=0._r8
-    RPCAHX=0._r8
-    RPCAMX=0._r8
+    H2PO4_1e_AlPO4_dissol_flx=0._r8
+    H2PO4_1e_FePO4_dissol_flx=0._r8
+    H2PO4_1e_CaHPO4_dissol_flx=0._r8
+    H2PO4_1e_apatite_dissol_flx=0._r8
+    H2PO4_1e_CaH4P2O8_dissol_flx=0._r8
     RXN4=0._r8
     RNH4=0._r8
-    RH2P=0._r8
-    RPALPX=0._r8
-    RPFEPX=0._r8
-    RPCADX=0._r8
-    RPCAMX=0._r8
-    RPCAHX=0._r8
+    H2PO4_e_to_HPO4_2e_flx=0._r8
   ENDIF
 !     TOTAL ION FLUXES FOR ALL REACTIONS ABOVE
 !
@@ -1197,8 +1201,9 @@ module SoluteMod
 !
       RN4S=RNH4-RXN4
       RN3S=-RNH4
-      RHP1=-RH2P
-      RHP2=RH2P-RPALPX-RPFEPX-RPCADX-2.0*RPCAMX-3.0*RPCAHX
+      RHP1=-H2PO4_e_to_HPO4_2e_flx
+      RHP2=H2PO4_e_to_HPO4_2e_flx-H2PO4_1e_AlPO4_dissol_flx-H2PO4_1e_FePO4_dissol_flx &
+        -H2PO4_1e_CaHPO4_dissol_flx-2.0*H2PO4_1e_CaH4P2O8_dissol_flx-3.0_r8*H2PO4_1e_apatite_dissol_flx
 !
 !     CONVERT TOTAL ION FLUXES FROM CHANGES IN CONCENTRATION
 !     TO CHANGES IN MASS PER UNIT AREA FOR USE IN 'REDIST'
@@ -1207,7 +1212,7 @@ module SoluteMod
 !     TRN3S=total NH3 flux
 !     TRH1P,TRH2P=net HPO4,H2PO4 flux
 !     TRNX4=total NH4 adsorption
-!     TRALPO,TRFEPO,TRCAPD,TRCAPH,TRCAPM
+!     TR_AlPO4,TRFEPO,TRCAPD,TRCAPH,TRCAPM
 !     =total AlPO4,FePO4,CaHPO4,apatite,Ca(H2PO4)2 precipitation
 !
       TRN4S(0,NY,NX)=TRN4S(0,NY,NX)+RN4S*VLWatMicPM(NPH,0,NY,NX)
@@ -1215,11 +1220,11 @@ module SoluteMod
       TRH1P(0,NY,NX)=TRH1P(0,NY,NX)+RHP1*VLWatMicPM(NPH,0,NY,NX)
       TRH2P(0,NY,NX)=TRH2P(0,NY,NX)+RHP2*VLWatMicPM(NPH,0,NY,NX)
       trcx_TR(idx_NH4,0,NY,NX)=trcx_TR(idx_NH4,0,NY,NX)+RXN4*VLWatMicPM(NPH,0,NY,NX)
-      trcp_TR(idsp_AlPO4,0,NY,NX)=trcp_TR(idsp_AlPO4,0,NY,NX)+RPALPX*VLWatMicPM(NPH,0,NY,NX)
-      trcp_TR(idsp_FePO4,0,NY,NX)=trcp_TR(idsp_FePO4,0,NY,NX)+RPFEPX*VLWatMicPM(NPH,0,NY,NX)
-      trcp_TR(idsp_CaHPO4,0,NY,NX)=trcp_TR(idsp_CaHPO4,0,NY,NX)+RPCADX*VLWatMicPM(NPH,0,NY,NX)
-      trcp_TR(idsp_HA,0,NY,NX)=trcp_TR(idsp_HA,0,NY,NX)+RPCAHX*VLWatMicPM(NPH,0,NY,NX)
-      trcp_TR(idsp_CaH2PO4,0,NY,NX)=trcp_TR(idsp_CaH2PO4,0,NY,NX)+RPCAMX*VLWatMicPM(NPH,0,NY,NX)
+      trcp_TR(idsp_AlPO4,0,NY,NX)=trcp_TR(idsp_AlPO4,0,NY,NX)+H2PO4_1e_AlPO4_dissol_flx*VLWatMicPM(NPH,0,NY,NX)
+      trcp_TR(idsp_FePO4,0,NY,NX)=trcp_TR(idsp_FePO4,0,NY,NX)+H2PO4_1e_FePO4_dissol_flx*VLWatMicPM(NPH,0,NY,NX)
+      trcp_TR(idsp_CaHPO4,0,NY,NX)=trcp_TR(idsp_CaHPO4,0,NY,NX)+H2PO4_1e_CaHPO4_dissol_flx*VLWatMicPM(NPH,0,NY,NX)
+      trcp_TR(idsp_HA,0,NY,NX)=trcp_TR(idsp_HA,0,NY,NX)+H2PO4_1e_apatite_dissol_flx*VLWatMicPM(NPH,0,NY,NX)
+      trcp_TR(idsp_CaH2PO4,0,NY,NX)=trcp_TR(idsp_CaH2PO4,0,NY,NX)+H2PO4_1e_CaH4P2O8_dissol_flx*VLWatMicPM(NPH,0,NY,NX)
       FertN_soil(ifert_nh4,0,NY,NX)=FertN_soil(ifert_nh4,0,NY,NX)-RSN4AA
       FertN_soil(ifert_nh3,0,NY,NX)=FertN_soil(ifert_nh3,0,NY,NX)-RSN3AA
       FertN_soil(ifert_urea,0,NY,NX)=FertN_soil(ifert_urea,0,NY,NX)-RSNUAA

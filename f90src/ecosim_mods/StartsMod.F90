@@ -591,32 +591,32 @@ module StartsMod
 
       IF(ASP(NY,NX).GE.0.0_r8.AND.ASP(NY,NX).LT.90.0_r8)THEN
       ! along the northeast
-        SLOPE(1,NY,NX)=-SLOPE(0,NY,NX)*COS(ASP(NY,NX)*RadianPerDegree)    !to east
-        SLOPE(2,NY,NX)=SLOPE(0,NY,NX)*SIN(ASP(NY,NX)*RadianPerDegree)     !to north
+        SLOPE(1,NY,NX)=-SLOPE(0,NY,NX)*COS(ASP(NY,NX)*RadianPerDegree)    !to south (thus -)
+        SLOPE(2,NY,NX)=SLOPE(0,NY,NX)*SIN(ASP(NY,NX)*RadianPerDegree)     !to east
         XGridRunoffFlag(1,1,NY,NX)=.true.    !east
         XGridRunoffFlag(2,1,NY,NX)=.false.
         XGridRunoffFlag(1,2,NY,NX)=.false.
         XGridRunoffFlag(2,2,NY,NX)=.true.    !north
       ELSEIF(ASP(NY,NX).GE.90.0_r8.AND.ASP(NY,NX).LT.180.0_r8)THEN
-      ! along the northwest
-        SLOPE(1,NY,NX)=SLOPE(0,NY,NX)*SIN((ASP(NY,NX)-90.0_r8)*RadianPerDegree)   !to west
-        SLOPE(2,NY,NX)=SLOPE(0,NY,NX)*COS((ASP(NY,NX)-90.0_r8)*RadianPerDegree)   !to north
+      ! along the southeast
+        SLOPE(1,NY,NX)=SLOPE(0,NY,NX)*SIN((ASP(NY,NX)-90.0_r8)*RadianPerDegree)   !to south
+        SLOPE(2,NY,NX)=SLOPE(0,NY,NX)*COS((ASP(NY,NX)-90.0_r8)*RadianPerDegree)   !to east
         XGridRunoffFlag(1,1,NY,NX)=.false.
-        XGridRunoffFlag(2,1,NY,NX)=.true.   !west
+        XGridRunoffFlag(2,1,NY,NX)=.true.   !west to east
         XGridRunoffFlag(1,2,NY,NX)=.false.
-        XGridRunoffFlag(2,2,NY,NX)=.true.   !north
+        XGridRunoffFlag(2,2,NY,NX)=.true.   !north to south
       ELSEIF(ASP(NY,NX).GE.180.0_r8.AND.ASP(NY,NX).LT.270.0_r8)THEN
       !along the southwest
-        SLOPE(1,NY,NX)=SLOPE(0,NY,NX)*COS((ASP(NY,NX)-180.0_r8)*RadianPerDegree)    !to west
-        SLOPE(2,NY,NX)=-SLOPE(0,NY,NX)*SIN((ASP(NY,NX)-180.0_r8)*RadianPerDegree)   !to south
+        SLOPE(1,NY,NX)=SLOPE(0,NY,NX)*COS((ASP(NY,NX)-180.0_r8)*RadianPerDegree)    !to south
+        SLOPE(2,NY,NX)=-SLOPE(0,NY,NX)*SIN((ASP(NY,NX)-180.0_r8)*RadianPerDegree)   !to east (thus -)
         XGridRunoffFlag(1,1,NY,NX)=.false.
         XGridRunoffFlag(2,1,NY,NX)=.true.  !west
         XGridRunoffFlag(1,2,NY,NX)=.true.  !south
         XGridRunoffFlag(2,2,NY,NX)=.false.
       ELSEIF(ASP(NY,NX).GE.270.0_r8.AND.ASP(NY,NX).LE.360.0_r8)THEN
-      ! along the southeast
-        SLOPE(1,NY,NX)=-SLOPE(0,NY,NX)*SIN((ASP(NY,NX)-270.0_r8)*RadianPerDegree)   !to east
-        SLOPE(2,NY,NX)=-SLOPE(0,NY,NX)*COS((ASP(NY,NX)-270.0_r8)*RadianPerDegree)   !to south
+      ! along the northwest
+        SLOPE(1,NY,NX)=-SLOPE(0,NY,NX)*SIN((ASP(NY,NX)-270.0_r8)*RadianPerDegree)   !to north (thus -)
+        SLOPE(2,NY,NX)=-SLOPE(0,NY,NX)*COS((ASP(NY,NX)-270.0_r8)*RadianPerDegree)   !to west (thus -)
         XGridRunoffFlag(1,1,NY,NX)=.true.  !east
         XGridRunoffFlag(2,1,NY,NX)=.false.
         XGridRunoffFlag(1,2,NY,NX)=.true.  !south
@@ -956,7 +956,7 @@ module StartsMod
   dts_litrvapht=dts_litrhtwtp*XNPS
   XNPV=XNPR*XNPS
   XNPD=600.0_r8*dts_gas
-  dts_wat=AMIN1(1.0_r8,20.0_r8*dts_HeatWatTP)  !adjust/recompute the time step for water/heat update, no greater than 1 hour
+  dts_wat=AMIN1(1.0_r8,5.0_r8*dts_HeatWatTP)  !adjust/recompute the time step for water/heat update, no greater than 1 hour
   dts_sno=dts_wat*XNPS
   XNPB=dts_wat*XNPR
   dt_watvap=dts_wat*XNPV

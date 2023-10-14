@@ -849,7 +849,7 @@ contains
   subroutine LateralHydroExchange(M,NY,NX,NHE,NHW,NVS,NVN,N1,N2)
   implicit none
   integer, intent(in) :: M,NY,NX,NHE,NHW,NVS,NVN
-  integer, intent(in) :: N1,N2
+  integer, intent(in) :: N1,N2   !source grid, with which the lateral exchange is computed 
   integer :: N,NN,N4,N5,N4B,N5B
   real(r8) :: ALT1,ALT2,ALTB,QRQ1
   integer, parameter :: idirew=1
@@ -913,6 +913,7 @@ contains
             Heat2GridBySurfRunoff(N,2,N5,N4)=Heat2GridBySurfRunoff(N,2,N5,N4)+HeatFlx2LitRByRunoff(N,2,N5,N4)
             QflxSurfRunoffM(M,N,2,N5,N4)=WatFlx2LitRByRunoff(N,2,N5,N4)
             IFLBM(M,N,2,N5,N4)=0
+!            if(N2==1 .AND. N1==1 .and. M>=26)write(192,*)'LateralHydroExchange',M,N,2,N5,N4,WatFlx2LitRByRunoff(N,2,N5,N4),QRQ1
           ELSE
             WatFlx2LitRByRunoff(N,2,N5,N4)=0.0_r8
             HeatFlx2LitRByRunoff(N,2,N5,N4)=0.0_r8
@@ -1034,7 +1035,7 @@ contains
 ! begin_execution
 ! INITIALIZE NET SURFACE FLUX ACCUMULATORS
 !
-! cumWatFlx2LitRByRunoff,TQS1,TQW1,TQI1=net water and snowpack snow,water,ice runoff
+! TQS1,TQW1,TQI1=net water and snowpack snow,water,ice runoff
 ! cumHeatFlx2LitRByRunoff,THQS1=net convective heat from surface water and snow runoff
 ! BAREW,CVRDW=fractions of soil,litter cover including free water+ice
 ! RAGS= boundary layer resistance at soil surface
@@ -1189,8 +1190,11 @@ contains
 
   subroutine SurfaceRunoff(M,N,NN,N1,N2,M4,M5,RCHQF,XN)
   implicit none
-  integer, intent(in) :: M,N,NN,N1,N2,M4,M5
-  real(r8), intent(in):: RCHQF,XN
+  integer, intent(in) :: M,N,NN
+  integer, intent(in) :: N1,N2  !source grid
+  integer, intent(in) :: M4,M5  !dest grid
+  real(r8),intent(in) :: RCHQF  !water flux scalar
+  real(r8),intent(in) :: XN     !flow direction
   real(r8) :: ALT1,ALT2,DPTHW1,DPTHW2
   real(r8) :: VX
   !
@@ -1210,19 +1214,22 @@ contains
   !
   DPTHW1=XVLMobileWaterLitR(N2,N1)/AREA(3,NUM(N2,N1),N2,N1)
   DPTHW2=VWatStoreCapSurf(N2,N1)/AREA(3,NUM(N2,N1),N2,N1)
-  ALT1=Altitude_grid(N2,N1)+DPTHW1
-  ALT2=Altitude_grid(N2,N1)+DPTHW2-XN*SLOPE(N,N2,N1)*DLYR(N,NUM(N2,N1),N2,N1)
-
+  !elevation at the source center
+  ALT1=Altitude_grid(N2,N1)+DPTHW1      
+  !elevation in the dest center
+  ALT2=Altitude_grid(N2,N1)+DPTHW2-XN*SLOPE(N,N2,N1)*DLYR(N,NUM(N2,N1),N2,N1)  
+  !grid elevation is higher than outside the grid, and in grid water layer higher than external water table
   IF(ALT1.GT.ALT2.AND.CumDepth2LayerBottom(NU(N2,N1)-1,N2,N1)-DPTHW1.LT.ExtWaterTable(N2,N1))THEN
-    !out of grid (N2,N1)
+    !out of grid (N2,N1), WatFlux4ErosionM is computed from surface physics model
     WatFlx2LitRByRunoff(N,NN,M5,M4)=-XN*WatFlux4ErosionM(M,N2,N1)*FSLOPE(N,N2,N1)*RCHQF
     HeatFlx2LitRByRunoff(N,NN,M5,M4)=cpw*TKSoi1(0,N2,N1)*WatFlx2LitRByRunoff(N,NN,M5,M4)
     Wat2GridBySurfRunoff(N,NN,M5,M4)=Wat2GridBySurfRunoff(N,NN,M5,M4)+WatFlx2LitRByRunoff(N,NN,M5,M4)
     Heat2GridBySurfRunoff(N,NN,M5,M4)=Heat2GridBySurfRunoff(N,NN,M5,M4)+HeatFlx2LitRByRunoff(N,NN,M5,M4)
-!
+!    if(N2==1 .AND. N1==1 .and. M>=26)write(192,*)'SurfaceRunoff',M,N,NN,M5,M4,WatFlx2LitRByRunoff(N,NN,M5,M4),DPTHW2
 ! RUNON
-!
+! water table in higher than grid surface (accouting for minimum water )
   ELSEIF(CumDepth2LayerBottom(NU(N2,N1)-1,N2,N1)-DPTHW1.GT.ExtWaterTable(N2,N1))THEN
+    !elevation difference
     VX=AZMIN1((ExtWaterTable(N2,N1)-CumDepth2LayerBottom(NU(N2,N1)-1,N2,N1)+DPTHW1)*AREA(3,NUM(N2,N1),N2,N1))
     WatFlux4ErosionM(M,N2,N1)=VX*dts_wat
     RunoffVelocity(M,N2,N1)=0.0_r8

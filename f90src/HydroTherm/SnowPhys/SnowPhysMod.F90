@@ -1068,9 +1068,10 @@ contains
   integer, intent(in) :: M,N
   integer, intent(in) :: N1,N2
   integer, intent(in) :: N4,N5    !forward dest grid
-  integer, intent(in) :: N4B,N5B  !backward dest grid
+  integer, intent(in) :: N4B,N5B  !backward dest grid  
   integer :: NN
-
+  real(r8) :: cumwat0
+  cumwat0=cumWatFlx2LitRByRunoff(N2,N1)
   D1202: DO NN=1,2
     cumWatFlx2LitRByRunoff(N2,N1)=cumWatFlx2LitRByRunoff(N2,N1)+WatFlx2LitRByRunoff(N,NN,N2,N1)
     cumHeatFlx2LitRByRunoff(N2,N1)=cumHeatFlx2LitRByRunoff(N2,N1)+HeatFlx2LitRByRunoff(N,NN,N2,N1)
@@ -1084,6 +1085,15 @@ contains
       cumWatFlx2LitRByRunoff(N2,N1)=cumWatFlx2LitRByRunoff(N2,N1)-WatFlx2LitRByRunoff(N,NN,N5B,N4B)
       cumHeatFlx2LitRByRunoff(N2,N1)=cumHeatFlx2LitRByRunoff(N2,N1)-HeatFlx2LitRByRunoff(N,NN,N5B,N4B)
     ENDIF
+!    if(N2==1 .AND. N1==1 .and. M>=26)then
+!      write(192,*)'snowdrift1',M,N,NN,N2,N1,WatFlx2LitRByRunoff(N,NN,N2,N1),cumWatFlx2LitRByRunoff(N2,N1),cumwat0
+!      IF(IFLBM(M,N,NN,N5,N4).EQ.0)THEN
+!        write(192,*)'snowdrift2',M,N,NN,N5,N4,WatFlx2LitRByRunoff(N,NN,N5,N4),cumWatFlx2LitRByRunoff(N2,N1)
+!      endif
+!      IF(N4B.GT.0.AND.N5B.GT.0.AND.NN.EQ.1)THEN
+!        write(192,*)'snowdrift3',M,N,NN,N5B,N4B,WatFlx2LitRByRunoff(N,NN,N5B,N4B),cumWatFlx2LitRByRunoff(N2,N1)
+!      endif
+!    endif  
 
     IF(M.EQ.NPH)THEN
       IFLBH(N,NN,N5,N4)=IFLBM(M,N,NN,N5,N4)
