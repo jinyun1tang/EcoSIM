@@ -34,6 +34,7 @@ implicit none
   use FertilizerDataType  , only : InitFertilizerData
   use CanopyRadDataType   , only : InitCanopyRad
   use GrosubsMod          , only : InitGrosub
+  
 
   use AqueChemDatatype    , only : initaquachem
   use PlantDataRateType   , only : InitPlantRates
@@ -41,6 +42,7 @@ implicit none
   use PlantTraitDataType   , only : InitPlantTraits
   use SoilPropertyDataType, only : InitSoilProperty
   use SurfLitterDataType  , only : InitSurfLitter
+  use SurfPhysData        , only : InitSurfPhysData
   use IrrigationDataType  , only : InitIrrigation
   use SoilBGCDataType     , only : InitSoilBGCData
   use SedimentDataType    , only : InitSedimentData
@@ -84,6 +86,8 @@ implicit none
   call InitPlantRates(micpar%NumOfPlantLitrCmplxs,pltpar%jroots)
 
   call InitSoilProperty
+
+  call InitSurfPhysData
 
   call InitSurfLitter(micpar%NumOfLitrCmplxs)
 

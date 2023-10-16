@@ -14,7 +14,7 @@ module SurfPhysMod
   use MiniFuncMod
   use minimathmod
   use SurfPhysData
-  use EcoSIMCtrlDataType
+  use EcoSIMCtrlDataType 
   use SnowDataType
   use SOMDataType
   USE ChemTranspDataType
@@ -77,6 +77,16 @@ contains
   character(len=*), parameter :: subn=trim(mod_filename)//'::StageSurfacePhysModel'
   integer :: NY,NX
 
+  write(*,*) "Stage surface phys model"
+  DO NX=NHW,NHE
+    DO NY=NVN,NVS
+    NUM(NY,NX)=2 
+    write(*,*) "NUM(", NY, ",", NX, ") = ", NUM(NY,NX) 
+    write(*,*) "CumDepth2LayerBottom = ", CumDepth2LayerBottom(NUM(NY,NX),NY,NX) 
+ 
+    ENDDO
+  ENDDO
+
   D9995: DO NX=NHW,NHE
     D9990: DO NY=NVN,NVS
     !make a local copy of the upper boundary index
@@ -92,7 +102,7 @@ contains
       EnergyImpact4Erosion(NY,NX)=EnergyImpact4Erosion(NY,NX)*(1.0_r8-FEnergyImpact4Erosion)
 
       call CopySnowStates(NY,NX)
-
+      write(*,*) "Copy Surface Vars"
       call CopySurfaceVars(NY,NX)
 !
       call PartionSurfaceFraction(NY,NX)
