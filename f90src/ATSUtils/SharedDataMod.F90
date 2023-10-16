@@ -62,7 +62,7 @@ Module SharedDataMod
   allocate(a_csand(ncells_per_col_,ncol))
   allocate(a_CSILT(ncells_per_col_,ncol))   !silt mass fraction
   !allocate(a_BKDSI(ncells_per_col_,ncol))   !bulk density
-  allocate(a_CumDepth2LayerBottom(ncells_per_col_,ncol))   !dpeth (from surfce to bottom)
+  !allocate(a_CumDepth2LayerBottom(ncells_per_col_,ncol))   !dpeth (from surfce to bottom)
   !allocate(a_FC(ncells_per_col_,ncol))      !field capacity
   !allocate(a_WP(ncells_per_col_,ncol))      !wilting point
   allocate(a_FHOL(ncells_per_col_,ncol))    !macropore fraction
