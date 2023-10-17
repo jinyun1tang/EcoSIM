@@ -9,6 +9,7 @@ module ATSEcoSIMAdvanceMod
   use LandSurfDataType
   use ClimForcDataType
   use SoilPropertyDataType
+  use EcoSIMSolverPar, only : NPH
 implicit none
   character(len=*), private, parameter :: mod_filename=&
   __FILE__
@@ -34,8 +35,9 @@ implicit none
   !real(r8), dimension(:,:),intent(out) :: HeatFlux2Ground 
   !real(r8),dimension(:,:),intent(inout) :: TopLayWatVol     
   real(r8) :: ResistanceLitRLay(JY,JX)
- 
-  !real(r8), dimension(:), allocatable :: HeatFlux2Ground
+  real(r8) :: KSatReductByRainKineticEnergyS(JY,JX)
+  real(r8) :: HeatFlux2Ground(JY,JX)
+  real(r8) :: TopLayWatVol(JY,JX)
 
   NHW=1;NHE=1;NVN=1;NVS=NYS
 
@@ -63,8 +65,10 @@ implicit none
 
   write(*,*) "Done; Running RunSurfacePhysModel"
 
-  !call RunSurfacePhysModel(M,NHE,NHW,NVS,NVN,ResistanceLitRLay,&
-  !    KSatReductByRainKineticEnergyS,HeatFlux2Ground,TopLayWatVol)
+  DO M=1,NPH
+    call RunSurfacePhysModel(M,NHE,NHW,NVS,NVN,ResistanceLitRLay,&
+      KSatReductByRainKineticEnergyS,HeatFlux2Ground,TopLayWatVol)
+  ENDDO
 
   write(*,*) "Finished Subroutine RunEcoSIMSurfaceBalance"
   end subroutine RunEcoSIMSurfaceBalance

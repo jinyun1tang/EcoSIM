@@ -220,9 +220,6 @@ contains
 
   call RunEcoSIMSurfaceBalance(size_col)
 
-  !call StageSurfacePhysModel(I,J,NHW,NHE,NVN,NVS,ResistanceLitRLay)
-  !call RunSurfacePhysModel(M,NHE,NHW,NVS,NVN,ResistanceLitRLay,&
-  !    KSatReductByRainKineticEnergyS,TopLayWatVol,HeatFlux2Ground,Qinfl2MicP)
   !do K=1,vec_size
   !  write(*,*) "surface energy (", K, ") = ", surf_e_source(K)
   !  write(*,*) "surface water (", K, ") = ", surf_w_source(K)
