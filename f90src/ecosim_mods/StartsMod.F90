@@ -899,12 +899,9 @@ module StartsMod
       IF(SoiBulkDensityt0(L,NY,NX).LE.ZERO)SoilFracAsMacP(L,NY,NX)=0.0_r8
 !     thickness:=bottom depth-upper depth
       DLYRI(3,L,NY,NX)=(CumDepth2LayerBottom(L,NY,NX)-CumDepth2LayerBottom(L-1,NY,NX))
-      write(*,*) "Checking Soil layer nums: "
-      write(*,*) "upper: ", CumDepth2LayerBottom(L,NY,NX)
-      write(*,*) "lower: ", CumDepth2LayerBottom(L-1,NY,NX)
-      write(*,*) "Removing the assertion to keep it moving ... "
-      !call check_bool(DLYRI(3,L,NY,NX)<0._r8,'negative soil layer thickness',&
-      !  __LINE__,mod_filename)
+!     write(*,*) "Removing the assertion to keep it moving ... "
+      call check_bool(DLYRI(3,L,NY,NX)<0._r8,'negative soil layer thickness',&
+        __LINE__,mod_filename)
       DLYR(3,L,NY,NX)=DLYRI(3,L,NY,NX)
       SoiDepthMidLay(L,NY,NX)=0.5_r8*(CumDepth2LayerBottom(L,NY,NX)+CumDepth2LayerBottom(L-1,NY,NX))
       CumSoilThickness(L,NY,NX)=CumDepth2LayerBottom(L,NY,NX)-CumDepth2LayerBottom(NU(NY,NX),NY,NX)+DLYR(3,NU(NY,NX),NY,NX)

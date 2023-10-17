@@ -81,9 +81,6 @@ contains
   DO NX=NHW,NHE
     DO NY=NVN,NVS
     NUM(NY,NX)=2 
-    write(*,*) "NUM(", NY, ",", NX, ") = ", NUM(NY,NX) 
-    write(*,*) "CumDepth2LayerBottom = ", CumDepth2LayerBottom(NUM(NY,NX),NY,NX) 
- 
     ENDDO
   ENDDO
 
@@ -102,7 +99,7 @@ contains
       EnergyImpact4Erosion(NY,NX)=EnergyImpact4Erosion(NY,NX)*(1.0_r8-FEnergyImpact4Erosion)
 
       call CopySnowStates(NY,NX)
-      write(*,*) "Copy Surface Vars"
+
       call CopySurfaceVars(NY,NX)
 !
       call PartionSurfaceFraction(NY,NX)
@@ -1510,13 +1507,13 @@ contains
   D9895: DO  NX=NHW,NHE
     D9890: DO  NY=NVN,NVS
 
-!      write(*,*)'RunSurfacePhysModel',NY,NX,'M=',M,TKS(0,NY,NX)
+      write(*,*)'RunSurfacePhysModel',NY,NX,'M=',M,TKS(0,NY,NX)
 
       call SurfaceEnergyModel(M,NX,NY,ResistanceLitRLay,KSatReductByRainKineticEnergy(NY,NX),&
         HeatFlux2Ground(NY,NX),LatentHeatAir2Sno,HeatSensEvap,HeatSensAir2Snow,Radnet2Snow,&
         TopLayWatVol,VapXAir2TopLay)
 
-!      write(*,*)'TXKR SurfaceEnergyModel MM=',M,TKSoi1(0,NY,NX)
+      write(*,*)'TXKR SurfaceEnergyModel MM=',M,TKSoi1(0,NY,NX)
 
     ! CAPILLARY EXCHANGE OF WATER BETWEEN SOIL SURFACE AND RESIDUE
       call SurfLitrSoilWaterExchange(M,NY,NX,KSatReductByRainKineticEnergy(NY,NX))
