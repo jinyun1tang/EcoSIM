@@ -504,7 +504,7 @@ module StartqMod
     VRNS(NB,NZ,NY,NX)=VRNY(NB,NZ,NY,NX)
     VRNF(NB,NZ,NY,NX)=VRNZ(NB,NZ,NY,NX)
     HourCounter4LeafOut_brch(NB,NZ,NY,NX)=0._r8
-    FDBK(NB,NZ,NY,NX)=1.0
+    RubiscoActivity_brpft(NB,NZ,NY,NX)=1.0
     FDBKX(NB,NZ,NY,NX)=1.0
     FLG4(NB,NZ,NY,NX)=0
     FLGZ(NB,NZ,NY,NX)=0

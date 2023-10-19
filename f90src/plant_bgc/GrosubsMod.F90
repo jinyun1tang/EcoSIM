@@ -311,7 +311,7 @@ module grosubsMod
   real(r8) :: XRTN1
   real(r8) :: TFN5
   real(r8) :: WFNG
-  real(r8) :: WFNC
+  real(r8) :: Stomata_Activity
   real(r8) :: WFNS,WFNSG
 ! begin_execution
   associate(                              &
@@ -332,7 +332,7 @@ module grosubsMod
     UPNFC(NZ)=0._r8
     IFLGZ = 0
     call StagePlantForGrowth(I,J,NZ,ICHK1,NRX,TFN6,CNLFW,CPLFW,&
-      CNSHW,CPSHW,CNRTW,CPRTW,XRTN1,TFN5,WFNG,WFNC,WFNS,WFNSG)
+      CNSHW,CPSHW,CNRTW,CPRTW,XRTN1,TFN5,WFNG,Stomata_Activity,WFNS,WFNSG)
 !
 !     CALCULATE GROWTH OF EACH BRANCH
 !
@@ -341,7 +341,7 @@ module grosubsMod
 !
     DO  NB=1,NumOfBranches_pft(NZ)
       call GrowOneBranch(I,J,NB,NZ,TFN6,ZCX,CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW,&
-        TFN5,WFNG,WFNC,WFNS,WFNSG,PTRT,UPNFC,IFLGZ)
+        TFN5,WFNG,Stomata_Activity,WFNS,WFNSG,PTRT,UPNFC,IFLGZ)
     ENDDO
 !
     call RootBGCModel(I,J,NZ,IFLGZ,ICHK1,IDTHRN,NRX,PTRT,TFN6,CNRTW,CPRTW,XRTN1)
@@ -364,12 +364,12 @@ module grosubsMod
 
 !------------------------------------------------------------------------------------------
   subroutine StagePlantForGrowth(I,J,NZ,ICHK1,NRX,TFN6,CNLFW,CPLFW,CNSHW,&
-    CPSHW,CNRTW,CPRTW,XRTN1,TFN5,WFNG,WFNC,WFNS,WFNSG)
+    CPSHW,CNRTW,CPRTW,XRTN1,TFN5,WFNG,Stomata_Activity,WFNS,WFNSG)
   integer, intent(in) :: I,J,NZ
   integer, intent(out):: ICHK1(2,JZ1)
   integer, intent(out):: NRX(2,JZ1)
   REAL(R8), INTENT(OUT):: TFN6(JZ1)
-  REAL(R8), INTENT(OUT) :: CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW,XRTN1,TFN5,WFNG,WFNC
+  REAL(R8), INTENT(OUT) :: CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW,XRTN1,TFN5,WFNG,Stomata_Activity
   real(r8), intent(out) :: WFNS,WFNSG
   integer :: L,NR,N
   real(r8) :: ACTVM,RTK,STK,TKCM,TKSM
@@ -534,7 +534,7 @@ module grosubsMod
 !
 !     WFNS=turgor expansion,extension function
 !     PSICanPTurg,PSILM=current,minimum canopy turgor potl for expansion,extension
-!     WFNC=stomatal resistance function of canopy turgor
+!     Stomata_Activity=stomatal resistance function of canopy turgor
 !     PSICanP=canopy water potential
 !     WFNG=growth function of canopy water potential
 !     WFNSG=expansion,extension function of canopy water potential
@@ -543,12 +543,12 @@ module grosubsMod
 
   IF(IGTYP(NZ).EQ.0)THEN
     !bryophyte, no turgor
-    WFNC=1.0_r8
+    Stomata_Activity=1.0_r8
     WFNG=EXP(0.05_r8*PSICanP(NZ))
     WFNSG=WFNS**0.10_r8
   ELSE
     !others
-    WFNC=EXP(RCS(NZ)*PSICanPTurg(NZ))
+    Stomata_Activity=EXP(RCS(NZ)*PSICanPTurg(NZ))
     WFNG=EXP(0.10_r8*PSICanP(NZ))
     WFNSG=WFNS**0.25_r8
   ENDIF

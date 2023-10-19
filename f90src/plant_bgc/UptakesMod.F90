@@ -534,7 +534,7 @@ module UptakesMod
   real(r8) :: APSILT
   real(r8) :: CCPOLT
   real(r8) :: FTHRM,FDMR
-  real(r8) :: OSWT,WFNC
+  real(r8) :: OSWT,Stomata_Activity
 
   integer :: N,L
 ! begin_execution
@@ -591,8 +591,8 @@ module UptakesMod
 
       CALL update_osmo_turg_pressure(PSICanP(NZ),CCPOLT,OSMO(NZ),TKC(NZ),PSICanPOsmo(NZ),PSICanPTurg(NZ),FDMP)
 
-      WFNC=EXP(RCS(NZ)*PSICanPTurg(NZ))
-      CanPStomaResistH2O(NZ)=MinCanPStomaResistH2O(NZ)+(MaxCanPStomaResistH2O(NZ)-MinCanPStomaResistH2O(NZ))*WFNC
+      Stomata_Activity=EXP(RCS(NZ)*PSICanPTurg(NZ))
+      CanPStomaResistH2O(NZ)=MinCanPStomaResistH2O(NZ)+(MaxCanPStomaResistH2O(NZ)-MinCanPStomaResistH2O(NZ))*Stomata_Activity
       CanPbndlResist(NZ)=RAZ(NZ)
       VHeatCapCanP(NZ)=cpw*(CanPShootElmMass(ielmc,NZ)*10.0E-06_r8)
       DTKC(NZ)=0.0_r8
@@ -637,7 +637,7 @@ module UptakesMod
   real(r8) :: TKC1,TKCY
   real(r8) :: cumPRootH2OUptakePre
   real(r8) :: VOLWPX,VPC,SymplasmicWat
-  real(r8) :: XC,WFNC
+  real(r8) :: XC,Stomata_Activity
   real(r8) :: RichardsNO
   integer  :: IC,ICHK
 !     return variables
@@ -744,9 +744,9 @@ module UptakesMod
 !     MinCanPStomaResistH2O=minimum CanPStomaResistH2Oat PSICanP=0 from stomate.f
 !     RSMX=cuticular resistance from PFT file
 !
-    WFNC=EXP(RCS(NZ)*PSICanPTurg(NZ))
+    Stomata_Activity=EXP(RCS(NZ)*PSICanPTurg(NZ))
 
-    CanPStomaResistH2O(NZ)=MinCanPStomaResistH2O(NZ)+WFNC &
+    CanPStomaResistH2O(NZ)=MinCanPStomaResistH2O(NZ)+Stomata_Activity &
       *(MaxCanPStomaResistH2O(NZ)-MinCanPStomaResistH2O(NZ))
 !
 !     CANOPY VAPOR PRESSURE AND EVAPORATION OF INTERCEPTED WATER
@@ -1101,7 +1101,7 @@ module UptakesMod
   real(r8) :: APSILT
   real(r8) :: CCPOLT
   real(r8) :: FTHRM,FDMR
-  real(r8) :: OSWT,WFNC
+  real(r8) :: OSWT,Stomata_Activity
 
 ! begin_execution
   associate(                         &
@@ -1166,8 +1166,8 @@ module UptakesMod
 
   call update_osmo_turg_pressure(PSICanP(NZ),CCPOLT,OSMO(NZ),TKC(NZ),PSICanPOsmo(NZ),PSICanPTurg(NZ),FDMP)
 
-  WFNC=EXP(RCS(NZ)*PSICanPTurg(NZ))
-  CanPStomaResistH2O(NZ)=MinCanPStomaResistH2O(NZ)+(MaxCanPStomaResistH2O(NZ)-MinCanPStomaResistH2O(NZ))*WFNC
+  Stomata_Activity=EXP(RCS(NZ)*PSICanPTurg(NZ))
+  CanPStomaResistH2O(NZ)=MinCanPStomaResistH2O(NZ)+(MaxCanPStomaResistH2O(NZ)-MinCanPStomaResistH2O(NZ))*Stomata_Activity
   CanPbndlResist(NZ)=RAZ(NZ)
   VHeatCapCanP(NZ)=cpw*(CanPShootElmMass(ielmc,NZ)*10.0E-06_r8)
   DTKC(NZ)=0.0_r8

@@ -62,7 +62,7 @@ implicit none
 !     VRNS,VRNL=leafout hours,hours required for leafout
 !     VRNF,VRNX=leafoff hours,hours required for leafoff
 !     HourCounter4LeafOut_brch=hourly leafout counter
-!     FDBK,FDBKX=N,P feedback inhibition on C3 CO2 fixation
+!     RubiscoActivity_brpft,FDBKX=N,P feedback inhibition on C3 CO2 fixation
 !     IFLGA,IFLGE=flag for initializing,enabling leafout
 !     IFLGF=flag for enabling leafoff:0=enable,1=disable
 !     IFLGQ=current hours after physl maturity until start of litterfall
@@ -535,7 +535,7 @@ implicit none
     icwood     =>   pltpar%icwood     , &
     infoliar   =>  pltpar%infoliar    , &
     ifoliar    => pltpar%ifoliar      , &
-    FDBK      =>  plt_photo%FDBK      , &
+    RubiscoActivity_brpft      =>  plt_photo%RubiscoActivity_brpft      , &
     FDBKX     =>  plt_photo%FDBKX       &
   )
   D8845: DO NB=1,NumOfBranches_pft(NZ)
@@ -556,7 +556,7 @@ implicit none
       VRNZ(NB,NZ)=0._r8
       HourCounter4LeafOut_brch(NB,NZ)=0._r8
       FLG4(NB,NZ)=0._r8
-      FDBK(NB,NZ)=1.0_r8
+      RubiscoActivity_brpft(NB,NZ)=1.0_r8
       FDBKX(NB,NZ)=1.0_r8
       IFLGA(NB,NZ)=0
       IFLGE(NB,NZ)=1

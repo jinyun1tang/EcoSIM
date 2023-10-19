@@ -19,12 +19,13 @@ module PlantBranchMod
   contains
 !------------------------------------------------------------------------------------------
 
-  subroutine GrowOneBranch(I,J,NB,NZ,TFN6,ZCX,CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW,TFN5,WFNG,WFNC,WFNS,WFNSG,PTRT,UPNFC,IFLGZ)
+  subroutine GrowOneBranch(I,J,NB,NZ,TFN6,ZCX,CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW,TFN5,WFNG,&
+    Stomata_Activity,WFNS,WFNSG,PTRT,UPNFC,IFLGZ)
   implicit none
   integer, intent(in)  :: I,J,NB,NZ
   REAL(R8), INTENT(IN) :: TFN6(JZ1)
   real(r8), intent(in) :: ZCX(JP1)
-  real(r8), intent(in) :: CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW,TFN5,WFNG,WFNC,WFNS,WFNSG
+  real(r8), intent(in) :: CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW,TFN5,WFNG,Stomata_Activity,WFNS,WFNSG
   real(r8), intent(inout) :: UPNFC(JP1)
   real(r8), intent(out) :: PTRT
   integer, intent(out) :: IFLGZ
@@ -245,7 +246,7 @@ module PlantBranchMod
 !   GROSS PRIMARY PRODUCTIVITY
 !
     call UpdatePhotosynthates(I,J,NB,NZ,TFN6,DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,&
-      CNLFX,CPLFX,WTSHXN,TFN5,WFNG,WFNC,WFNSG,CH2O3,CH2O4,CNPG,rco2c,RMNCS,&
+      CNLFX,CPLFX,WTSHXN,TFN5,WFNG,Stomata_Activity,WFNSG,CH2O3,CH2O4,CNPG,rco2c,RMNCS,&
       SNCR,CGROS,CNRDM,CNRDA)
 !
 !
@@ -1138,13 +1139,13 @@ module PlantBranchMod
 !------------------------------------------------------------------------------------------
 
   subroutine UpdatePhotosynthates(I,J,NB,NZ,TFN6,DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX,&
-    WTSHXN,TFN5,WFNG,WFNC,WFNSG,CH2O3,CH2O4,CNPG,rco2c,RMNCS,SNCR,CGROS,CNRDM,CNRDA)
+    WTSHXN,TFN5,WFNG,Stomata_Activity,WFNSG,CH2O3,CH2O4,CNPG,rco2c,RMNCS,SNCR,CGROS,CNRDM,CNRDA)
   implicit none
   integer, intent(in) :: I,J,NB,NZ
   real(r8), intent(in) :: TFN6(JZ1)
   real(r8), intent(in) :: DMSHD
   real(r8), intent(in) :: CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX,WTSHXN,TFN5,WFNG
-  real(r8), intent(in) :: WFNC,WFNSG
+  real(r8), intent(in) :: Stomata_Activity,WFNSG
   real(r8), intent(out) :: rco2c,RMNCS
   real(r8), intent(out) :: CH2O3(25),CH2O4(25)
   REAL(R8), INTENT(OUT) :: CNPG
@@ -1166,7 +1167,7 @@ module PlantBranchMod
 !
   IF(IDAY(1,NB,NZ).NE.0)THEN
 
-    call ComputeGPP(NB,NZ,WFNG,WFNC,CH2O3,CH2O4,CH2O,CO2F)
+    call ComputeGPP(NB,NZ,WFNG,Stomata_Activity,CH2O3,CH2O4,CH2O,CO2F)
 !
 !   SHOOT AUTOTROPHIC RESPIRATION AFTER EMERGENCE
 !

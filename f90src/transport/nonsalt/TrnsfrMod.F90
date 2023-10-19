@@ -142,15 +142,15 @@ module TrnsfrMod
 !     RH2GO=net H2 uptake from nitro.f
 !     XOQCS,XOQNZ,XOQPS,XOQAS=net change in DOC,DON,DOP,acetate from nitro.f
 !     XNH4S=net change in NH4 from nitro.f
-!     TRN4S,TRN3S=NH4,NH3 dissolution from solute.f
+!     TR_NH4_soil,TR_NH3_soil=NH4,NH3 dissolution from solute.f
 !     XNO3S=net change in NO3 from nitro.f
 !     TRNO3=NO3 dissolution from solute.f
 !     XNO2S=net change in NO2 from nitro.f
 !     TRNO2=NO2 dissolution from solute.f
 !     XH2PS=net change in H2PO4 from nitro.f
-!     TRH2P=H2PO4 dissolution from solute.f
+!     TR_H2PO4_soil=H2PO4 dissolution from solute.f
 !     XH1PS=net change in HPO4 from nitro.f
-!     TRH1P=HPO4 dissolution from solute.f
+!     TR_H1PO4_soil=HPO4 dissolution from solute.f
 !
       call SurfaceSinksandSources(NY,NX)
 !
@@ -215,15 +215,15 @@ module TrnsfrMod
 !     RH2GO=net H2 uptake from nitro.f
 !     XOQCS,XOQNZ,XOQPS,XOQAS=net change in DOC,DON,DOP,acetate from nitro.f
 !     XNH4S=net change in NH4 from nitro.f
-!     TRN4S,TRN3S=NH4,NH3 dissolution from solute.f
+!     TR_NH4_soil,TR_NH3_soil=NH4,NH3 dissolution from solute.f
 !     XNO3S=net change in NO3 from nitro.f
 !     TRNO3=NO3 dissolution from solute.f
 !     XNO2S=net change in NO2 from nitro.f
 !     TRNO2=NO2 dissolution from solute.f
 !     XH2PS=net change in H2PO4 from nitro.f
-!     TRH2P=H2PO4 dissolution from solute.f
+!     TR_H2PO4_soil=H2PO4 dissolution from solute.f
 !     XH1PS=net change in HPO4 from nitro.f
-!     TRH1P=HPO4 dissolution from solute.f
+!     TR_H1PO4_soil=HPO4 dissolution from solute.f
 !     TUPNH4,TUPNHB=root NH4 uptake in non-band,band from extract.f
 !     TUPNO3,TUPNOB=root NO3 uptake in non-band,band from extract.f
 !     TUPH2P,TUPH2B=root H2PO4 uptake in non-band,band from extract.f
@@ -466,12 +466,12 @@ module TrnsfrMod
     ROPSK2(K,0,NY,NX)=-XOQPS(K,0,NY,NX)*dts_HeatWatTP
     ROASK2(K,0,NY,NX)=-XOQAS(K,0,NY,NX)*dts_HeatWatTP
   ENDDO
-  RBGCSinkS(ids_NH4,0,NY,NX)=(-XNH4S(0,NY,NX)-TRN4S(0,NY,NX))*dts_HeatWatTP
-  RBGCSinkS(idg_NH3,0,NY,NX)=-TRN3S(0,NY,NX)*dts_HeatWatTP
+  RBGCSinkS(ids_NH4,0,NY,NX)=(-XNH4S(0,NY,NX)-TR_NH4_soil(0,NY,NX))*dts_HeatWatTP
+  RBGCSinkS(idg_NH3,0,NY,NX)=-TR_NH3_soil(0,NY,NX)*dts_HeatWatTP
   RBGCSinkS(ids_NO3,0,NY,NX)=(-XNO3S(0,NY,NX)-TRNO3(0,NY,NX))*dts_HeatWatTP
   RBGCSinkS(ids_NO2,0,NY,NX)=(-XNO2S(0,NY,NX)-TRNO2(0,NY,NX))*dts_HeatWatTP
-  RBGCSinkS(ids_H2PO4,0,NY,NX)=(-XH2PS(0,NY,NX)-TRH2P(0,NY,NX))*dts_HeatWatTP
-  RBGCSinkS(ids_H1PO4,0,NY,NX)=(-XH1PS(0,NY,NX)-TRH1P(0,NY,NX))*dts_HeatWatTP
+  RBGCSinkS(ids_H2PO4,0,NY,NX)=(-XH2PS(0,NY,NX)-TR_H2PO4_soil(0,NY,NX))*dts_HeatWatTP
+  RBGCSinkS(ids_H1PO4,0,NY,NX)=(-XH1PS(0,NY,NX)-TR_H1PO4_soil(0,NY,NX))*dts_HeatWatTP
 
   end subroutine SurfaceSinksandSources
 !------------------------------------------------------------------------------------------
@@ -732,7 +732,7 @@ module TrnsfrMod
   DO L=NU(NY,NX),NL(NY,NX)
     CHY0(L,NY,NX)=10.0_r8**(-(PH(L,NY,NX)-3.0_r8))
     FLWU(L,NY,NX)=GridPlantRootH2OUptake_vr(L,NY,NX)*dts_HeatWatTP
-    RBGCSinkG(idg_CO2,L,NY,NX)=(RCO2O(L,NY,NX)+TCO2S(L,NY,NX)-TRCO2(L,NY,NX))*dts_gas
+    RBGCSinkG(idg_CO2,L,NY,NX)=(RCO2O(L,NY,NX)+TCO2S(L,NY,NX)-TR_CO2_aqu_soil(L,NY,NX))*dts_gas
     RBGCSinkG(idg_CH4,L,NY,NX)=(RCH4O(L,NY,NX)+TUPCHS(L,NY,NX))*dts_gas
     RBGCSinkG(idg_N2,L,NY,NX)=(RN2G(L,NY,NX)+XN2GS(L,NY,NX)+TUPNF(L,NY,NX))*dts_gas
     RBGCSinkG(idg_N2O,L,NY,NX)=(RN2O(L,NY,NX)+TUPN2S(L,NY,NX))*dts_gas
@@ -744,18 +744,18 @@ module TrnsfrMod
       ROPSK2(K,L,NY,NX)=-XOQPS(K,L,NY,NX)*dts_HeatWatTP
       ROASK2(K,L,NY,NX)=-XOQAS(K,L,NY,NX)*dts_HeatWatTP
     ENDDO
-    RBGCSinkS(ids_NH4,L,NY,NX)=(-XNH4S(L,NY,NX)-TRN4S(L,NY,NX)+TUPNH4(L,NY,NX))*dts_HeatWatTP
-    RBGCSinkS(idg_NH3,L,NY,NX)=(-TRN3S(L,NY,NX)+TUPN3S(L,NY,NX))*dts_HeatWatTP
+    RBGCSinkS(ids_NH4,L,NY,NX)=(-XNH4S(L,NY,NX)-TR_NH4_soil(L,NY,NX)+TUPNH4(L,NY,NX))*dts_HeatWatTP
+    RBGCSinkS(idg_NH3,L,NY,NX)=(-TR_NH3_soil(L,NY,NX)+TUPN3S(L,NY,NX))*dts_HeatWatTP
     RBGCSinkS(ids_NO3,L,NY,NX)=(-XNO3S(L,NY,NX)-TRNO3(L,NY,NX)+TUPNO3(L,NY,NX))*dts_HeatWatTP
     RBGCSinkS(ids_NO2,L,NY,NX)=(-XNO2S(L,NY,NX)-TRNO2(L,NY,NX))*dts_HeatWatTP
-    RBGCSinkS(ids_H2PO4,L,NY,NX)=(-XH2PS(L,NY,NX)-TRH2P(L,NY,NX)+TUPH2P(L,NY,NX))*dts_HeatWatTP
-    RBGCSinkS(ids_H1PO4,L,NY,NX)=(-XH1PS(L,NY,NX)-TRH1P(L,NY,NX)+TUPH1P(L,NY,NX))*dts_HeatWatTP
-    RBGCSinkS(ids_NH4B,L,NY,NX)=(-XNH4B(L,NY,NX)-TRN4B(L,NY,NX)+TUPNHB(L,NY,NX))*dts_HeatWatTP
-    RBGCSinkS(idg_NH3B,L,NY,NX)=(-TRN3B(L,NY,NX)+TUPN3B(L,NY,NX))*dts_HeatWatTP
+    RBGCSinkS(ids_H2PO4,L,NY,NX)=(-XH2PS(L,NY,NX)-TR_H2PO4_soil(L,NY,NX)+TUPH2P(L,NY,NX))*dts_HeatWatTP
+    RBGCSinkS(ids_H1PO4,L,NY,NX)=(-XH1PS(L,NY,NX)-TR_H1PO4_soil(L,NY,NX)+TUPH1P(L,NY,NX))*dts_HeatWatTP
+    RBGCSinkS(ids_NH4B,L,NY,NX)=(-XNH4B(L,NY,NX)-TR_NH4_band_soil(L,NY,NX)+TUPNHB(L,NY,NX))*dts_HeatWatTP
+    RBGCSinkS(idg_NH3B,L,NY,NX)=(-TR_NH3_band_soil(L,NY,NX)+TUPN3B(L,NY,NX))*dts_HeatWatTP
     RBGCSinkS(ids_NO3B,L,NY,NX)=(-XNO3B(L,NY,NX)-TRNOB(L,NY,NX)+TUPNOB(L,NY,NX))*dts_HeatWatTP
     RBGCSinkS(ids_NO2B,L,NY,NX)=(-XNO2B(L,NY,NX)-TRN2B(L,NY,NX))*dts_HeatWatTP
-    RBGCSinkS(ids_H2PO4B,L,NY,NX)=(-XH2BS(L,NY,NX)-TRH2B(L,NY,NX)+TUPH2B(L,NY,NX))*dts_HeatWatTP
-    RBGCSinkS(ids_H1PO4B,L,NY,NX)=(-XH1BS(L,NY,NX)-TRH1B(L,NY,NX)+TUPH1B(L,NY,NX))*dts_HeatWatTP
+    RBGCSinkS(ids_H2PO4B,L,NY,NX)=(-XH2BS(L,NY,NX)-TR_H2PO4_band_soil(L,NY,NX)+TUPH2B(L,NY,NX))*dts_HeatWatTP
+    RBGCSinkS(ids_H1PO4B,L,NY,NX)=(-XH1BS(L,NY,NX)-TR_H1PO4_band_soil(L,NY,NX)+TUPH1B(L,NY,NX))*dts_HeatWatTP
 !
 !     SOLUTE FLUXES FROM SUBSURFACE IRRIGATION
 !

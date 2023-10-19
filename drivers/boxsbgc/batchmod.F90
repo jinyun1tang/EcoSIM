@@ -344,20 +344,20 @@ contains
   cid_ZKA    =addone(itemp)
   cid_CO2S   =addone(itemp)
   cid_H1PO4_2e_conc  =addone(itemp)
-  cid_H1PO4_2e_Bconc  =addone(itemp)
+  cid_H1PO4_2e_band_conc  =addone(itemp)
   cid_H2PO4_1e_conc  =addone(itemp)
-  cid_H2PO4_1e_Bconc  =addone(itemp)
+  cid_H2PO4_1e_band_conc  =addone(itemp)
   cid_NH3_aqu_conc   =addone(itemp)
-  cid_NH3_aqu_Bconc   =addone(itemp)
+  cid_NH3_aqu_band_conc   =addone(itemp)
   cid_NH4_1p_conc   =addone(itemp)
-  cid_NH4_1p_Bconc   =addone(itemp)
+  cid_NH4_1p_band_conc   =addone(itemp)
   cid_XNH4_conc   =addone(itemp)
-  cid_XNH4_Bconc   =addone(itemp)
-  cid_XHPO4_Bconc  =addone(itemp)
-  cid_XH2PO4_Bconc  =addone(itemp)
-  cid_XROH_Bconc  =addone(itemp)
+  cid_XNH4_band_conc   =addone(itemp)
+  cid_XHPO4_band_conc  =addone(itemp)
+  cid_XH2PO4_band_conc  =addone(itemp)
+  cid_XROH_band_conc  =addone(itemp)
   cid_XHPO4_conc  =addone(itemp)
-  cid_XROH2_Bconc  =addone(itemp)
+  cid_XROH2_band_conc  =addone(itemp)
   cid_XH2PO4_conc  =addone(itemp)
   cid_XROH1_conc  =addone(itemp)
   cid_XROH2_conc  =addone(itemp)
@@ -372,35 +372,35 @@ contains
   cid_Precp_FePO4_conc =addone(itemp)
   cid_PrecpB_FePO4_con =addone(itemp)
 
-  fid_TRN4S = addone(itemp)
-  fid_TRN4B = addone(itemp)
-  fid_TRN3S = addone(itemp)
-  fid_TRN3B = addone(itemp)
-  fid_TRH1P = addone(itemp)
-  fid_TRH2P = addone(itemp)
-  fid_TRH1B = addone(itemp)
-  fid_TRH2B = addone(itemp)
-  fid_TRXN4 = addone(itemp)
-  fid_TRXNB = addone(itemp)
-  fid_TRXH1 = addone(itemp)
-  fid_TRXH2 = addone(itemp)
-  fid_TRX1P = addone(itemp)
-  fid_TRX2P = addone(itemp)
-  fid_TRBH1 = addone(itemp)
-  fid_TRBH2 = addone(itemp)
-  fid_TRB1P = addone(itemp)
-  fid_TRB2P = addone(itemp)
-  fid_TR_AlPO4= addone(itemp)
-  fid_TRFEPO= addone(itemp)
-  fid_TRCAPD= addone(itemp)
-  fid_TRCAPH= addone(itemp)
-  fid_TRCAPM= addone(itemp)
-  fid_TRALPB= addone(itemp)
-  fid_TRFEPB= addone(itemp)
-  fid_TRCPDB= addone(itemp)
-  fid_TRCPHB= addone(itemp)
-  fid_TRCPMB= addone(itemp)
-  fid_TRAL  = addone(itemp)
+  fid_TR_NH4_soil = addone(itemp)
+  fid_TR_NH4_band_soil = addone(itemp)
+  fid_TR_NH3_soil = addone(itemp)
+  fid_TR_NH3_band_soil = addone(itemp)
+  fid_TR_H1PO4_soil = addone(itemp)
+  fid_TR_H2PO4_soil = addone(itemp)
+  fid_TR_H1PO4_band_soil = addone(itemp)
+  fid_TR_H2PO4_band_soil = addone(itemp)
+  fid_TR_NH4_sorbed_soil = addone(itemp)
+  fid_TR_NH4_sorbed_band_soil = addone(itemp)
+  fid_TR_ROH_sorbed_soil = addone(itemp)
+  fid_TR_ROH2_sorbed_soil = addone(itemp)
+  fid_TR_RHPO4_sorbed_soil = addone(itemp)
+  fid_TR_RH2PO4_sorbed_soil = addone(itemp)
+  fid_TR_ROH_sorbed_band_soil = addone(itemp)
+  fid_TR_ROH2_sorbed_band_soil = addone(itemp)
+  fid_TR_RHPO4_sorbed_band_soil = addone(itemp)
+  fid_TR_RH2PO4_sorbed_band_soil = addone(itemp)
+  fid_TR_AlPO4_precip_soil= addone(itemp)
+  fid_TR_FePO4_precip_soil= addone(itemp)
+  fid_TR_CaHPO4_precip_soil= addone(itemp)
+  fid_TR_apatite_precip_soil= addone(itemp)
+  fid_TR_CaH4P2O8_precip_soil= addone(itemp)
+  fid_TR_AlPO4_precip_band_soil= addone(itemp)
+  fid_TR_FePO4_precip_band_soil= addone(itemp)
+  fid_TR_CaHPO4_precip_band_soil= addone(itemp)
+  fid_TR_apatite_precip_band_soil= addone(itemp)
+  fid_TR_CaH4P2O8_precip_band_soil= addone(itemp)
+  fid_TR_Al_3p_soil  = addone(itemp)
 
   cid_oqc_b=addone(itemp);cid_oqc_e=cid_oqc_b+jcplx;itemp=cid_oqc_e
   cid_oqn_b=addone(itemp);cid_oqn_e=cid_oqn_b+jcplx;itemp=cid_oqn_e
@@ -544,14 +544,14 @@ contains
   )
 !atmospheric gaseous CO2,CH4,O2,NH3,N2,N2O,H2
 !
-  ystatesfl(cid_ZNH3B)=ystates0l(cid_ZNH3B)+ystatesfl(fid_TRN3B)+micflx%XNH4B
-  ystatesfl(cid_ZNH3S)=ystates0l(cid_ZNH3S)+ystatesfl(fid_TRN3S)+micflx%XNH4S
-  ystatesfl(cid_ZNH4B)=ystates0l(cid_ZNH4B)+ystatesfl(fid_TRN3B)+micflx%XNH4B
-  ystatesfl(cid_ZNH4S)=ystates0l(cid_ZNH4S)+ystatesfl(fid_TRN4S)+micflx%XNH4S
-  ystatesfl(cid_H1POB)=ystates0l(cid_H1POB)+ystatesfl(fid_TRH1B)+micflx%XH1BS
-  ystatesfl(cid_H1PO4)=ystates0l(cid_H1PO4)+ystatesfl(fid_TRH1P)+micflx%XH1PS
-  ystatesfl(cid_H2POB)=ystates0l(cid_H2POB)+ystatesfl(fid_TRH2B)+micflx%XH2BS
-  ystatesfl(cid_H2PO4)=ystates0l(cid_H2PO4)+ystatesfl(fid_TRH2P)+micflx%XH2PS
+  ystatesfl(cid_ZNH3B)=ystates0l(cid_ZNH3B)+ystatesfl(fid_TR_NH3_band_soil)+micflx%XNH4B
+  ystatesfl(cid_ZNH3S)=ystates0l(cid_ZNH3S)+ystatesfl(fid_TR_NH3_soil)+micflx%XNH4S
+  ystatesfl(cid_ZNH4B)=ystates0l(cid_ZNH4B)+ystatesfl(fid_TR_NH3_band_soil)+micflx%XNH4B
+  ystatesfl(cid_ZNH4S)=ystates0l(cid_ZNH4S)+ystatesfl(fid_TR_NH4_soil)+micflx%XNH4S
+  ystatesfl(cid_H1POB)=ystates0l(cid_H1POB)+ystatesfl(fid_TR_H1PO4_band_soil)+micflx%XH1BS
+  ystatesfl(cid_H1PO4)=ystates0l(cid_H1PO4)+ystatesfl(fid_TR_H1PO4_soil)+micflx%XH1PS
+  ystatesfl(cid_H2POB)=ystates0l(cid_H2POB)+ystatesfl(fid_TR_H2PO4_band_soil)+micflx%XH2BS
+  ystatesfl(cid_H2PO4)=ystates0l(cid_H2PO4)+ystatesfl(fid_TR_H2PO4_soil)+micflx%XH2PS
   ystatesfl(cid_ZNO3B)=ystates0l(cid_ZNO3B)+micflx%XNO3B
   ystatesfl(cid_ZNO3S)=ystates0l(cid_ZNO3S)+micflx%XNO3S
   ystatesfl(cid_ZNO2B)=ystates0l(cid_ZNO2B)+micflx%XNO2B
@@ -1668,7 +1668,7 @@ contains
 !    Z2GS(L,NY,NX)=Z2GS(L,NY,NX)+XNGDFG(L,NY,NX)-RN2G(L,NY,NX)-XN2GS(L,NY,NX)
 !    Z2OS(L,NY,NX)=Z2OS(L,NY,NX)+XN2DFG(L,NY,NX)-RN2O(L,NY,NX)
 !    H2GS(L,NY,NX)=H2GS(L,NY,NX)+XHGDFG(L,NY,NX)-RH2GO(L,NY,NX)
-!    ZNH3S(L,NY,NX)=ZNH3S(L,NY,NX)+XN3DFG(L,NY,NX)+TRN3S(L,NY,NX)
+!    ZNH3S(L,NY,NX)=ZNH3S(L,NY,NX)+XN3DFG(L,NY,NX)+TR_NH3_soil(L,NY,NX)
 
 !    CO2G(L,NY,NX)=CO2G(L,NY,NX)-XCODFG(L,NY,NX)+XCOFLG
 !    CH4G(L,NY,NX)=CH4G(L,NY,NX)-XCHDFG(L,NY,NX)+XCHFLG

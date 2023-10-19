@@ -417,7 +417,7 @@ implicit none
       DGSTGI(NB,NZ,NY,NX)=plt_pheno%DGSTGI(NB,NZ)
       DGSTGF(NB,NZ,NY,NX)=plt_pheno%DGSTGF(NB,NZ)
       FLG4(NB,NZ,NY,NX)  =plt_pheno%FLG4(NB,NZ)
-      FDBK(NB,NZ,NY,NX)  =plt_photo%FDBK(NB,NZ)
+      RubiscoActivity_brpft(NB,NZ,NY,NX)  =plt_photo%RubiscoActivity_brpft(NB,NZ)
       FDBKX(NB,NZ,NY,NX) =plt_photo%FDBKX(NB,NZ)
       FLGZ(NB,NZ,NY,NX)  =plt_pheno%FLGZ(NB,NZ)
       GROUP(NB,NZ,NY,NX) =plt_pheno%GROUP(NB,NZ)
@@ -1249,7 +1249,7 @@ implicit none
     ENDDO
 
     DO NB=1,NumOfBranches_pft(NZ,NY,NX)
-      plt_photo%FDBK(NB,NZ)=FDBK(NB,NZ,NY,NX)
+      plt_photo%RubiscoActivity_brpft(NB,NZ)=RubiscoActivity_brpft(NB,NZ,NY,NX)
       plt_photo%FDBKX(NB,NZ)=FDBKX(NB,NZ,NY,NX)
       plt_pheno%HourCounter4LeafOut_brch(NB,NZ)=HourCounter4LeafOut_brch(NB,NZ,NY,NX)
       plt_morph%ARLFZ(NB,NZ)=ARLFZ(NB,NZ,NY,NX)

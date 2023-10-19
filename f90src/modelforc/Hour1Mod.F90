@@ -812,13 +812,13 @@ module Hour1Mod
   XOQAS(1:jcplx,0:NL(NY,NX),NY,NX)=0.0_r8
 
   XZHYS(0:NL(NY,NX),NY,NX)=0.0_r8
-  TRN4S(0:NL(NY,NX),NY,NX)=0.0_r8
-  TRN3S(0:NL(NY,NX),NY,NX)=0.0_r8
+  TR_NH4_soil(0:NL(NY,NX),NY,NX)=0.0_r8
+  TR_NH3_soil(0:NL(NY,NX),NY,NX)=0.0_r8
   TRN3G(0:NL(NY,NX),NY,NX)=0.0_r8
   TRNO3(0:NL(NY,NX),NY,NX)=0.0_r8
   TRNO2(0:NL(NY,NX),NY,NX)=0.0_r8
-  TRH1P(0:NL(NY,NX),NY,NX)=0.0_r8
-  TRH2P(0:NL(NY,NX),NY,NX)=0.0_r8
+  TR_H1PO4_soil(0:NL(NY,NX),NY,NX)=0.0_r8
+  TR_H2PO4_soil(0:NL(NY,NX),NY,NX)=0.0_r8
 
   trcx_TR(idx_NH4,0:NL(NY,NX),NY,NX)=0.0_r8
   trcx_TR(idx_AEC+1:idx_anion_soil_end,0:NL(NY,NX),NY,NX)=0.0_r8
@@ -2329,29 +2329,29 @@ module Hour1Mod
     TUPH2B(L,NY,NX)=0.0_r8
     TUPH1B(L,NY,NX)=0.0_r8
     TUPNF(L,NY,NX)=0.0_r8
-    TRN4B(L,NY,NX)=0.0_r8
-    TRN3B(L,NY,NX)=0.0_r8
+    TR_NH4_band_soil(L,NY,NX)=0.0_r8
+    TR_NH3_band_soil(L,NY,NX)=0.0_r8
     TRNOB(L,NY,NX)=0.0_r8
     TRN2B(L,NY,NX)=0.0_r8
-    TRH1B(L,NY,NX)=0.0_r8
-    TRH2B(L,NY,NX)=0.0_r8
-    TRCO2(L,NY,NX)=0.0_r8
+    TR_H1PO4_band_soil(L,NY,NX)=0.0_r8
+    TR_H2PO4_band_soil(L,NY,NX)=0.0_r8
+    TR_CO2_aqu_soil(L,NY,NX)=0.0_r8
     TBCO2(L,NY,NX)=0.0_r8
 
 
     trcx_TR(idx_NH4B,L,NY,NX)=0.0_r8
     trcx_TR(idx_OHeB:idx_end,L,NY,NX)=0.0_r8
 
-    TRXHY(L,NY,NX)=0.0_r8
-    TRXAL(L,NY,NX)=0.0_r8
-    TRXFE(L,NY,NX)=0.0_r8
-    TRXCA(L,NY,NX)=0.0_r8
-    TRXMG(L,NY,NX)=0.0_r8
-    TRXNA(L,NY,NX)=0.0_r8
-    TRXKA(L,NY,NX)=0.0_r8
-    TRXHC(L,NY,NX)=0.0_r8
-    TRXAL2(L,NY,NX)=0.0_r8
-    TRXFE2(L,NY,NX)=0.0_r8
+    TR_H_p_sorbed_soil(L,NY,NX)=0.0_r8
+    TR_Al_sorbed_soil(L,NY,NX)=0.0_r8
+    TR_Fe_sorbed_soil(L,NY,NX)=0.0_r8
+    TR_Ca_sorbed_soil(L,NY,NX)=0.0_r8
+    TR_Mg_sorbed_soil(L,NY,NX)=0.0_r8
+    TR_Na_sorbed_soil(L,NY,NX)=0.0_r8
+    TR_K_sorbed_soil(L,NY,NX)=0.0_r8
+    TR_HCO3_sorbed_soil(L,NY,NX)=0.0_r8
+    TR_AlO2H2_sorbed_soil(L,NY,NX)=0.0_r8
+    TR_FeO2H2_sorbed_soil(L,NY,NX)=0.0_r8
 
     trcp_TR(idsp_beg:idsp_psoi_beg-1,L,NY,NX)=0.0_r8
 

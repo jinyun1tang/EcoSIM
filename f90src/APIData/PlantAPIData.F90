@@ -101,7 +101,7 @@ implicit none
   real(r8), pointer :: VCMX(:)   => null()  !rubisco carboxylase activity, [umol g-1 h-1 at 25 oC]
   real(r8), pointer :: XKCO2(:)  => null()  !Km for rubisco carboxylase activity, [uM]
   real(r8), pointer :: XKO2(:)   => null()  !Km for rubisco oxygenase activity, [uM]
-  real(r8), pointer :: FDBK(:,:) => null()   !branch down-regulation of CO2 fixation, [-]
+  real(r8), pointer :: RubiscoActivity_brpft(:,:) => null()   !branch down-regulation of CO2 fixation, [-]
   real(r8), pointer :: FDBKX(:,:)=> null()   !down-regulation of C4 photosynthesis, [-]
   real(r8), pointer :: CO2L(:)   => null()   !leaf aqueous CO2 concentration, [uM]
   real(r8), pointer :: O2I(:)    => null()   !leaf gaseous O2 concentration, [umol m-3]
@@ -1792,7 +1792,7 @@ implicit none
   allocate(this%VCMX(JP1))
   allocate(this%XKCO2(JP1))
   allocate(this%XKO2(JP1))
-  allocate(this%FDBK(JBR,JP1))
+  allocate(this%RubiscoActivity_brpft(JBR,JP1))
   allocate(this%FDBKX(JBR,JP1))
   allocate(this%CO2L(JP1))
   allocate(this%XKCO2L(JP1))
@@ -1849,7 +1849,7 @@ implicit none
 !  if(allocated(VCMX))deallocate(VCMX)
 !  if(allocated(XKCO2))deallocate(XKCO2)
 !  if(allocated(XKO2))deallocate(XKO2)
-!  if(allocated(FDBK))deallocate(FDBK)
+!  if(allocated(RubiscoActivity_brpft))deallocate(RubiscoActivity_brpft)
 !  if(allocated(FDBKX))deallocate(FDBKX)
 !  if(allocated(CO2L))deallocate(CO2L)
 !  if(allocated(XKCO2L))deallocate(XKCO2L)

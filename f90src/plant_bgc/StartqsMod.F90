@@ -579,7 +579,7 @@ module StartqsMod
     CPOOL3  =>  plt_photo%CPOOL3 , &
     CPOOL4  =>  plt_photo%CPOOL4 , &
     CHILL   =>  plt_photo%CHILL  , &
-    FDBK    =>  plt_photo%FDBK   , &
+    RubiscoActivity_brpft    =>  plt_photo%RubiscoActivity_brpft   , &
     HCOB    =>  plt_photo%HCOB   , &
     CO2B    =>  plt_photo%CO2B   , &
     VSTG    =>  plt_morph%VSTG   , &
@@ -648,7 +648,7 @@ module StartqsMod
     VRNS(NB,NZ)=VRNY(NB,NZ)
     VRNF(NB,NZ)=VRNZ(NB,NZ)
     HourCounter4LeafOut_brch(NB,NZ)=0._r8
-    FDBK(NB,NZ)=1.0
+    RubiscoActivity_brpft(NB,NZ)=1.0
     FDBKX(NB,NZ)=1.0
     FLG4(NB,NZ)=0
     FLGZ(NB,NZ)=0

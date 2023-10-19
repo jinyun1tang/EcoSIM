@@ -45,7 +45,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  CBXN4(:,:,:,:,:)                   !C4 carboxylation efficiency, [umol umol-1]
   real(r8),target,allocatable ::  CPOOL4(:,:,:,:,:)                  !leaf nonstructural C4 content in C4 photosynthesis, [g d-2]
   real(r8),target,allocatable ::  HCOB(:,:,:,:,:)                    !bundle sheath nonstructural C3 content in C4 photosynthesis, [g d-2]
-  real(r8),target,allocatable ::  FDBK(:,:,:,:)                      !branch down-regulation of CO2 fixation, [-]
+  real(r8),target,allocatable ::  RubiscoActivity_brpft(:,:,:,:)                      !branch down-regulation of CO2 fixation, [-]
   real(r8),target,allocatable ::  FDBK4(:,:,:,:,:)                   !down-regulation of C4 photosynthesis, [-]
   real(r8),target,allocatable ::  FDBKX(:,:,:,:)                     !down-regulation of C4 photosynthesis, [-]
   real(r8),target,allocatable ::  CNETX(:,:)                         !total net canopy CO2 exchange, [g d-2 h-1]
@@ -194,7 +194,7 @@ module CanopyDataType
   allocate(CBXN4(JNODS,JBR,JP,JY,JX));CBXN4=0._r8
   allocate(CPOOL4(JNODS,JBR,JP,JY,JX));CPOOL4=0._r8
   allocate(HCOB(JNODS,JBR,JP,JY,JX));HCOB=0._r8
-  allocate(FDBK(JBR,JP,JY,JX));  FDBK=0._r8
+  allocate(RubiscoActivity_brpft(JBR,JP,JY,JX));  RubiscoActivity_brpft=0._r8
   allocate(FDBK4(JNODS,JBR,JP,JY,JX));FDBK4=0._r8
   allocate(FDBKX(JBR,JP,JY,JX)); FDBKX=0._r8
   allocate(CNETX(JY,JX));       CNETX=0._r8
@@ -344,7 +344,7 @@ module CanopyDataType
   call destroy(CBXN4)
   call destroy(CPOOL4)
   call destroy(HCOB)
-  call destroy(FDBK)
+  call destroy(RubiscoActivity_brpft)
   call destroy(FDBK4)
   call destroy(FDBKX)
   call destroy(CNETX)

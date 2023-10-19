@@ -20,7 +20,7 @@ module InitSoluteMod
   real(r8), parameter :: CFEMX=10.0_r8
   real(r8), parameter :: ZERO=1.0E-15_r8
 
-  real(r8) :: A1,A2,CEC_conc,XCOOH,SPOH2,SPOH1,NO3_1e_conc
+  real(r8) :: A1,A2,CEC_conc,XCOOH_conc,SPOH2,SPOH1,NO3_1e_conc
   real(r8), pointer :: H2CO3_aqu_conc
   real(r8), pointer :: CH4_aqu_conc
   real(r8), pointer :: O2_aqu_conc
@@ -41,9 +41,9 @@ module InitSoluteMod
   real(r8), pointer :: CO3_2e_conc
   real(r8), pointer :: HCO3_e_conc
   real(r8), pointer :: AlOH_2p_conc
-  real(r8), pointer :: AlOH2_p_conc
-  real(r8), pointer :: AlOH3_conc
-  real(r8), pointer :: AlOH4_1e_conc
+  real(r8), pointer :: AlO2H2_1p_conc
+  real(r8), pointer :: AlO3H3_conc
+  real(r8), pointer :: AlO4H4_1e_conc
   real(r8), pointer :: AlSO4_1p_conc
   real(r8), pointer :: FeOH_2p_conc
   real(r8), pointer :: FeO2H2_p_conc
@@ -61,12 +61,12 @@ module InitSoluteMod
   real(r8), pointer :: NaCO3_1e_conc
   real(r8), pointer :: NaSO4_1e_conc
   real(r8), pointer :: KSO4_1e_conc
-  real(r8), pointer :: H0PO4_conc
+  real(r8), pointer :: H0PO4_3e_conc
   real(r8), pointer :: H1PO4_2e_conc
   real(r8), pointer :: H2PO4_1e_conc
   real(r8), pointer :: H3PO4_conc
-  real(r8), pointer :: FeHPO4_conc
-  real(r8), pointer :: FeH2PO4_conc
+  real(r8), pointer :: FeHPO4_p_conc
+  real(r8), pointer :: FeH2PO4_2p_conc
   real(r8), pointer :: CaPO4_1e_con
   real(r8), pointer :: CaHPO4_conc
   real(r8), pointer :: CaH2PO4_1p_conc
@@ -182,9 +182,9 @@ module InitSoluteMod
   CO3_2e_conc     => solutevar%CO3_2e_conc
   HCO3_e_conc    => solutevar%HCO3_e_conc
   AlOH_2p_conc     => solutevar%AlOH_2p_conc
-  AlOH2_p_conc     => solutevar%AlOH2_p_conc
-  AlOH3_conc     => solutevar%AlOH3_conc
-  AlOH4_1e_conc     => solutevar%AlOH4_1e_conc
+  AlO2H2_1p_conc     => solutevar%AlO2H2_1p_conc
+  AlO3H3_conc     => solutevar%AlO3H3_conc
+  AlO4H4_1e_conc     => solutevar%AlO4H4_1e_conc
   AlSO4_1p_conc     => solutevar%AlSO4_1p_conc
   FeOH_2p_conc     => solutevar%FeOH_2p_conc
   FeO2H2_p_conc     => solutevar%FeO2H2_p_conc
@@ -202,12 +202,12 @@ module InitSoluteMod
   NaCO3_1e_conc     => solutevar%NaCO3_1e_conc
   NaSO4_1e_conc     => solutevar%NaSO4_1e_conc
   KSO4_1e_conc     => solutevar%KSO4_1e_conc
-  H0PO4_conc     => solutevar%H0PO4_conc
+  H0PO4_3e_conc     => solutevar%H0PO4_3e_conc
   H1PO4_2e_conc     => solutevar%H1PO4_2e_conc
   H2PO4_1e_conc     => solutevar%H2PO4_1e_conc
   H3PO4_conc     => solutevar%H3PO4_conc
-  FeHPO4_conc     => solutevar%FeHPO4_conc
-  FeH2PO4_conc     => solutevar%FeH2PO4_conc
+  FeHPO4_p_conc     => solutevar%FeHPO4_p_conc
+  FeH2PO4_2p_conc     => solutevar%FeH2PO4_2p_conc
   CaPO4_1e_con     => solutevar%CaPO4_1e_con
   CaHPO4_conc     => solutevar%CaHPO4_conc
   CaH2PO4_1p_conc     => solutevar%CaH2PO4_1p_conc
@@ -319,26 +319,26 @@ module InitSoluteMod
   real(r8) :: XCAQ,XOH,SPH1P,FX,FXH2,FXP1,FSTR2
   real(r8) :: FHPA,FXH1,FXP2,FHP1,FHP3,FHCO
   real(r8) :: FCO3,CX1,CX2,CSTRZ,FHP2,CCO2Y
-  real(r8) :: CION2,A3,CA1,CA2,CA3,CC1,CC2,CC3
+  real(r8) :: CION2,A3,anion_1e_conc,anion_2e_conc,anion_3e_conc,cation_1p_conc,cation_2p_conc,cation_3p_conc
   real(r8) :: CCO2X,CCO2Z,CN,CSTR2,FHP0,FXH0,R,Z
 !
 !     INITIALIZE SOLUTE EQUILIBRIA
 !
-  CC3=AZMAX1(CALZ)+AZMAX1(CFEZ)
-  CA3=0._r8
-  CC2=AZMAX1(CCAZ)+CMGZ
-  CA2=CSOZ
-  CC1=CN4Z+CNAZ+CKAZ
-  CA1=CNOZ+CCLZ+CPOZ
+  cation_3p_conc=AZMAX1(CALZ)+AZMAX1(CFEZ)
+  anion_3e_conc=0._r8
+  cation_2p_conc=AZMAX1(CCAZ)+CMGZ
+  anion_2e_conc=CSOZ
+  cation_1p_conc=CN4Z+CNAZ+CKAZ
+  anion_1e_conc=CNOZ+CCLZ+CPOZ
   CX2=0._r8
   CX1=0._r8
   CN=0._r8
 !
 !     INITIALIZE ION STRENGTH AND ACTIVITIES
 !
-  CION2=AZMAX1(CC3+CA3+CC2+CA2+CC1+CA1+CN)
-  CSTR1=0.5E-03*(9.0*(CC3+CA3)+4.0*(CC2+CA2)+CC1+CA1)
-  CSTRZ=0.5E-03*(9.0*(CC3+CA3)+4.0*(CC2+CX2)+CC1+CX1)
+  CION2=AZMAX1(cation_3p_conc+anion_3e_conc+cation_2p_conc+anion_2e_conc+cation_1p_conc+anion_1e_conc+CN)
+  CSTR1=0.5E-03*(9.0*(cation_3p_conc+anion_3e_conc)+4.0*(cation_2p_conc+anion_2e_conc)+cation_1p_conc+anion_1e_conc)
+  CSTRZ=0.5E-03*(9.0*(cation_3p_conc+anion_3e_conc)+4.0*(cation_2p_conc+CX2)+cation_1p_conc+CX1)
   CSTR2=SQRT(CSTR1)
   FSTR2=CSTR2/(1.0_r8+CSTR2)
   FH2O=5.56E+04/(5.56E+04+CION2)
@@ -407,9 +407,9 @@ module InitSoluteMod
   SO4_2e_conc=CSOZ
   Cl_e_conc=CCLZ
   AlOH_2p_conc=Al_3p_conc*OH_1e_conc*A3/(DPAL1*A2)
-  AlOH2_p_conc=Al_3p_conc*OH_1e_conc**2*A3/(DPAL1*DPAL2*A1)
-  AlOH3_conc=Al_3p_conc*OH_1e_conc**3*A3/(DPAL1*DPAL2*DPAL3*A0)
-  AlOH4_1e_conc=Al_3p_conc*OH_1e_conc**4*A3/(DPAL1*DPAL2*DPAL3*DPAL4*A1)
+  AlO2H2_1p_conc=Al_3p_conc*OH_1e_conc**2*A3/(DPAL1*DPAL2*A1)
+  AlO3H3_conc=Al_3p_conc*OH_1e_conc**3*A3/(DPAL1*DPAL2*DPAL3*A0)
+  AlO4H4_1e_conc=Al_3p_conc*OH_1e_conc**4*A3/(DPAL1*DPAL2*DPAL3*DPAL4*A1)
   AlSO4_1p_conc=0._r8
   FeOH_2p_conc=Fe_3p_conc*OH_1e_conc*A3/(DPFE1*A2)
   FeO2H2_p_conc=Fe_3p_conc*OH_1e_conc**2*A3/(DPFE1*DPFE2*A1)
@@ -427,8 +427,8 @@ module InitSoluteMod
   NaCO3_1e_conc=Na_1p_conc*CO3_2e_conc*A2/DPNAC
   NaSO4_1e_conc=0._r8
   KSO4_1e_conc=0._r8
-  FeHPO4_conc=0._r8
-  FeH2PO4_conc=0._r8
+  FeHPO4_p_conc=0._r8
+  FeH2PO4_2p_conc=0._r8
   CaPO4_1e_con=0._r8
   CaHPO4_conc=0._r8
   CaH2PO4_1p_conc=0._r8
@@ -442,7 +442,7 @@ module InitSoluteMod
       /(H_1p_conc**2*A2)+DPH3P*DPH2P*DPH1P*A0/(H_1p_conc**3*A3))
     H2PO4_1e_conc=H3PO4_conc*DPH3P*A0/(H_1p_conc*A1)
     H1PO4_2e_conc=H3PO4_conc*DPH3P*DPH2P*A0/(H_1p_conc**2*A2)
-    H0PO4_conc=H3PO4_conc*DPH3P*DPH2P*DPH1P*A0/(H_1p_conc**3*A3)
+    H0PO4_3e_conc=H3PO4_conc*DPH3P*DPH2P*DPH1P*A0/(H_1p_conc**3*A3)
 ! POM complex
   ELSE
     XHP=CPOZ
@@ -474,7 +474,7 @@ module InitSoluteMod
     H3PO4_conc=(XHP-XPT)*FHP3
     H2PO4_1e_conc=(XHP-XPT)*FHP2
     H1PO4_2e_conc=(XHP-XPT)*FHP1
-    H0PO4_conc=(XHP-XPT)*FHP0
+    H0PO4_3e_conc=(XHP-XPT)*FHP0
 !
 !     INITIALIZE CATION EQILIBRIA BETWEEN SOLUBLE
 !     AND EXCHANGEABLE FORMS
@@ -491,20 +491,20 @@ module InitSoluteMod
     XHC1=0._r8
     XAlO2H2_conc=0._r8
     XFeO2H2_conc=0._r8
-    XCOOH=AZMAX1(COOH1*ORGC)
+    XCOOH_conc=AZMAX1(COOH1*ORGC)
   ENDIF
-  CC3=Al_3p_conc+Fe_3p_conc
-  CA3=H0PO4_conc
-  CC2=Ca_2p_conc+Mg_2p_conc+AlOH_2p_conc+FeOH_2p_conc+FeH2PO4_conc
-  CA2=SO4_2e_conc+CO3_2e_conc+H1PO4_2e_conc
-  CC1=NH4_1p_conc+H_1p_conc+Na_1p_conc+K_1p_conc+AlOH2_p_conc+FeO2H2_p_conc+AlSO4_1p_conc &
-    +FeSO4_1p_conc+CaO2H2_conc+CaHCO3_1p_conc+MgOH_1p_conc+MgHCO3_1p_conc+FeHPO4_conc+CaH2PO4_1p_conc
-  CA1=NO3_1e_conc+OH_1e_conc+HCO3_e_conc+Cl_e_conc+AlOH4_1e_conc+FeO4H4_1e_conc+NaCO3_1e_conc &
+  cation_3p_conc=Al_3p_conc+Fe_3p_conc
+  anion_3e_conc=H0PO4_3e_conc
+  cation_2p_conc=Ca_2p_conc+Mg_2p_conc+AlOH_2p_conc+FeOH_2p_conc+FeH2PO4_2p_conc
+  anion_2e_conc=SO4_2e_conc+CO3_2e_conc+H1PO4_2e_conc
+  cation_1p_conc=NH4_1p_conc+H_1p_conc+Na_1p_conc+K_1p_conc+AlO2H2_1p_conc+FeO2H2_p_conc+AlSO4_1p_conc &
+    +FeSO4_1p_conc+CaO2H2_conc+CaHCO3_1p_conc+MgOH_1p_conc+MgHCO3_1p_conc+FeHPO4_p_conc+CaH2PO4_1p_conc
+  anion_1e_conc=NO3_1e_conc+OH_1e_conc+HCO3_e_conc+Cl_e_conc+AlO4H4_1e_conc+FeO4H4_1e_conc+NaCO3_1e_conc &
     +NaSO4_1e_conc+KSO4_1e_conc+H2PO4_1e_conc+CaPO4_1e_con
-  CN=H2CO3_aqu_conc+CH4_aqu_conc+O2_aqu_conc+N2_aqu_conc+N2O_aqu_conc+NH3_aqu_conc+AlOH3_conc+FeO3H3_conc+CaCO3_conc+CaSO4_conc &
+  CN=H2CO3_aqu_conc+CH4_aqu_conc+O2_aqu_conc+N2_aqu_conc+N2O_aqu_conc+NH3_aqu_conc+AlO3H3_conc+FeO3H3_conc+CaCO3_conc+CaSO4_conc &
     +MgCO3_conc+MgSO4_conc+H3PO4_conc+CaHPO4_conc+MgHPO4_conc
-  CX2=CA2-CO3_2e_conc
-  CX1=CA1-HCO3_e_conc
+  CX2=anion_2e_conc-CO3_2e_conc
+  CX1=anion_1e_conc-HCO3_e_conc
 !
 !     INITIALIZE EQUILIBRIA BETWEEN SOLUBLE AND PRECIPITATED FORMS
 ! POM complex
@@ -561,7 +561,8 @@ module InitSoluteMod
   real(r8) :: XALQ,XCAX,SPH2P,XCAQ,SPH1P,FX
   real(r8) :: RN4S,RN3S,RNA,RNAC,RNH4
   real(r8) :: RPALOX,H2PO4_1e_AlPO4_dissol_flx,RPCACX,H2PO4_1e_CaHPO4_dissol_flx
-  real(r8) :: H2PO4_e_to_HPO4_2e_flx,RHP1,RHP2,H2PO4_1e_apatite_dissol_flx,H2PO4_1e_FePO4_dissol_flx,H1PO4_to_XHPO4_ROH_flx
+  real(r8) :: H2PO4_e_to_HPO4_2e_flx,RHP1,RHP2,H2PO4_1e_apatite_dissol_flx
+  real(r8) :: H2PO4_1e_FePO4_dissol_flx,H1PO4_to_XHPO4_ROH_flx
   real(r8) :: FSTR2,RCAO,FHCO,FHP2
   real(r8) :: H2PO4_1e_to_XH2PO4_ROH2_flx,RXN4,RF1P,FCO3,SP
   real(r8) :: XCOO,XNAQ,RHP0,RHP3,RKAS,RM1P
@@ -581,15 +582,15 @@ module InitSoluteMod
   real(r8) :: RMGC,RMGH,RMGO,RMGS,RNAS,RPCAD1,RPCASO
   real(r8) :: RPFEOX,RSO4,RXCA,RXFE,RXHY,RXKA,RXMG
   real(r8) :: RXAL,RXNA,RXOH1,RXOH2,SPX,R,Z
-  real(r8) :: A3,AAL1,AALO1,AALO2,AALO3,AALO4
-  real(r8) :: AALS1,AALX,AC0P1,AC1P1,AC2P1,ACA1,ACAC1
-  real(r8) :: ACAH1,ACAS1,ACAO1,ACAX,ACO21,ACO31
-  real(r8) :: AF1P1,AF2P1,AFE1,AFEO1,AFEO2,AFEO3,AFEO4
-  real(r8) :: AFES1,AFEX,AH0P1,AH1P1,AH2P1,AH3P1,AHCO31
-  real(r8) :: AHY1,AKA1,AKAS1,AM1P1,AMG1,AMGC1,AMGO1
-  real(r8) :: AMGX,AMGH1,AMGS1,AN31,AN41,ANA1,ANAC1
-  real(r8) :: AOH1,ASO41,ANAS1,CA1,CA2,CA3,CC1,CC2
-  real(r8) :: CC3,CCO2X,CCO2Z,CN,CSTR2,DP,P1,P2,P3,PX
+  real(r8) :: A3,Al_3p_activity,AlOH_2p_activity,AlO2H2_1p_activity,AlO3H3_activity,AlO4H4_1e_activity
+  real(r8) :: AlSO4_1p_activity,AALX,CaPO4_1e_activity,CaHPO4_activity,CaH2PO4_1p_activity,Ca_2p_activity,CaCO3_activity
+  real(r8) :: CaHCO3_1p_activity,CaSO4_activity,CaO2H2_activity,ACAX,H2CO3_activity,CO3_2e_activity
+  real(r8) :: FeHPO4_p_activity,FeH2PO4_2p_activity,Fe_3p_activity,FeOH_2p_activity,FeO2H2_p_activity,FeO3H3_activity,FeO4H4_1e_activity
+  real(r8) :: FeSO4_1p_activity,AFEX,H0PO4_3e_activity,H1PO4_2e_activity,H2PO4_1e_activity,H3PO4_activity,HCO3_e_activity
+  real(r8) :: H_1p_activity,K_1p_activity,KSO4_1e_activity,MgHPO4_activity,Mg_2p_activity,MgCO3_activity,MgOH_1p_activity
+  real(r8) :: AMGX,MgHCO3_1p_activity,MgSO4_activity,NH3_activity,NH4_1p_activity,Na_1p_activity,NaCO3_1e_activity
+  real(r8) :: OH_1e_activity,SO4_2e_activity,NaSO4_1e_activity,anion_1e_conc,anion_2e_conc,anion_3e_conc,cation_1p_conc,cation_2p_conc
+  real(r8) :: cation_3p_conc,CCO2X,CCO2Z,CN,CSTR2,DP,P1,P2,P3,PX
   real(r8) :: PY,R1,RAL,RAL1,RAL2,RAL3,RAL4,RALO1
   real(r8) :: RALO2,RALO3,RALO4,RALS,RC0P,RC1P,RC2P
   integer :: NR1,NP2,NP3
@@ -610,9 +611,9 @@ module InitSoluteMod
   K_1p_conc=AMAX1(ZERO,K_1p_conc)
   SO4_2e_conc=AMAX1(ZERO,SO4_2e_conc)
   AlOH_2p_conc=AMAX1(ZERO,AlOH_2p_conc)
-  AlOH2_p_conc=AMAX1(ZERO,AlOH2_p_conc)
-  AlOH3_conc=AMAX1(ZERO,AlOH3_conc)
-  AlOH4_1e_conc=AMAX1(ZERO,AlOH4_1e_conc)
+  AlO2H2_1p_conc=AMAX1(ZERO,AlO2H2_1p_conc)
+  AlO3H3_conc=AMAX1(ZERO,AlO3H3_conc)
+  AlO4H4_1e_conc=AMAX1(ZERO,AlO4H4_1e_conc)
   AlSO4_1p_conc=AMAX1(ZERO,AlSO4_1p_conc)
   FeOH_2p_conc=AMAX1(ZERO,FeOH_2p_conc)
   FeO2H2_p_conc=AMAX1(ZERO,FeO2H2_p_conc)
@@ -630,12 +631,12 @@ module InitSoluteMod
   NaCO3_1e_conc=AMAX1(ZERO,NaCO3_1e_conc)
   NaSO4_1e_conc=AMAX1(ZERO,NaSO4_1e_conc)
   KSO4_1e_conc=AMAX1(ZERO,KSO4_1e_conc)
-  H0PO4_conc=AMAX1(ZERO,H0PO4_conc)
+  H0PO4_3e_conc=AMAX1(ZERO,H0PO4_3e_conc)
   H1PO4_2e_conc=AMAX1(ZERO,H1PO4_2e_conc)
   H2PO4_1e_conc=AMAX1(ZERO,H2PO4_1e_conc)
   H3PO4_conc=AMAX1(ZERO,H3PO4_conc)
-  FeHPO4_conc=AMAX1(ZERO,FeHPO4_conc)
-  FeH2PO4_conc=AMAX1(ZERO,FeH2PO4_conc)
+  FeHPO4_p_conc=AMAX1(ZERO,FeHPO4_p_conc)
+  FeH2PO4_2p_conc=AMAX1(ZERO,FeH2PO4_2p_conc)
   CaPO4_1e_con=AMAX1(ZERO,CaPO4_1e_con)
   CaHPO4_conc=AMAX1(ZERO,CaHPO4_conc)
   CaH2PO4_1p_conc=AMAX1(ZERO,CaH2PO4_1p_conc)
@@ -643,116 +644,116 @@ module InitSoluteMod
 !
 !     ION ACTIVITY COEFFICIENTS
 !
-  CC3=Al_3p_conc+Fe_3p_conc
-  CA3=H0PO4_conc
-  CC2=Ca_2p_conc+Mg_2p_conc+AlOH_2p_conc+FeOH_2p_conc+FeH2PO4_conc
-  CA2=SO4_2e_conc+CO3_2e_conc+H1PO4_2e_conc
-  CC1=NH4_1p_conc+H_1p_conc+Na_1p_conc+K_1p_conc+AlOH2_p_conc+FeO2H2_p_conc+AlSO4_1p_conc+FeSO4_1p_conc+CaO2H2_conc &
-    +CaHCO3_1p_conc+MgOH_1p_conc+MgHCO3_1p_conc+FeHPO4_conc+CaH2PO4_1p_conc
-  CA1=NO3_1e_conc+OH_1e_conc+HCO3_e_conc+Cl_e_conc+AlOH4_1e_conc+FeO4H4_1e_conc+NaCO3_1e_conc+NaSO4_1e_conc+KSO4_1e_conc &
+  cation_3p_conc=Al_3p_conc+Fe_3p_conc
+  anion_3e_conc=H0PO4_3e_conc
+  cation_2p_conc=Ca_2p_conc+Mg_2p_conc+AlOH_2p_conc+FeOH_2p_conc+FeH2PO4_2p_conc
+  anion_2e_conc=SO4_2e_conc+CO3_2e_conc+H1PO4_2e_conc
+  cation_1p_conc=NH4_1p_conc+H_1p_conc+Na_1p_conc+K_1p_conc+AlO2H2_1p_conc+FeO2H2_p_conc+AlSO4_1p_conc+FeSO4_1p_conc+CaO2H2_conc &
+    +CaHCO3_1p_conc+MgOH_1p_conc+MgHCO3_1p_conc+FeHPO4_p_conc+CaH2PO4_1p_conc
+  anion_1e_conc=NO3_1e_conc+OH_1e_conc+HCO3_e_conc+Cl_e_conc+AlO4H4_1e_conc+FeO4H4_1e_conc+NaCO3_1e_conc+NaSO4_1e_conc+KSO4_1e_conc &
     +H2PO4_1e_conc+CaPO4_1e_con
-  CN=H2CO3_aqu_conc+CH4_aqu_conc+O2_aqu_conc+N2_aqu_conc+N2O_aqu_conc+NH3_aqu_conc+AlOH3_conc+FeO3H3_conc+CaCO3_conc+CaSO4_conc &
+  CN=H2CO3_aqu_conc+CH4_aqu_conc+O2_aqu_conc+N2_aqu_conc+N2O_aqu_conc+NH3_aqu_conc+AlO3H3_conc+FeO3H3_conc+CaCO3_conc+CaSO4_conc &
     +MgCO3_conc+MgSO4_conc+H3PO4_conc+CaHPO4_conc+MgHPO4_conc
-  CX2=CA2-CO3_2e_conc
-  CX1=CA1-HCO3_e_conc
-  CION2=AZMAX1(CC3+CA3+CC2+CA2+CC1+CA1+CN)
-  CSTR1=0.5E-03*(9.0*(CC3+CA3)+4.0*(CC2+CA2)+CC1+CA1)
-  CSTRZ=0.5E-03*(9.0*(CC3+CA3)+4.0*(CC2+CX2)+CC1+CX1)
+  CX2=anion_2e_conc-CO3_2e_conc
+  CX1=anion_1e_conc-HCO3_e_conc
+  CION2=AZMAX1(cation_3p_conc+anion_3e_conc+cation_2p_conc+anion_2e_conc+cation_1p_conc+anion_1e_conc+CN)
+  CSTR1=0.5E-03_r8*(9.0_r8*(cation_3p_conc+anion_3e_conc)+4.0*(cation_2p_conc+anion_2e_conc)+cation_1p_conc+anion_1e_conc)
+  CSTRZ=0.5E-03_r8*(9.0_r8*(cation_3p_conc+anion_3e_conc)+4.0*(cation_2p_conc+CX2)+cation_1p_conc+CX1)
   CSTR2=SQRT(CSTR1)
   FSTR2=CSTR2/(1.0_r8+CSTR2)
-  FH2O=5.56E+04/(5.56E+04+CION2)
-  A1=AMIN1(1.0,10.0**(-0.509*1.0*FSTR2+0.20*CSTR2))
-  A2=AMIN1(1.0,10.0**(-0.509*4.0*FSTR2+0.20*CSTR2))
-  A3=AMIN1(1.0,10.0**(-0.509*9.0*FSTR2+0.20*CSTR2))
+  FH2O=5.56E+04_r8/(5.56E+04_r8+CION2)
+  A1=AMIN1(1.0_r8,10.0_r8**(-0.509_r8*1.0_r8*FSTR2+0.20_r8*CSTR2))
+  A2=AMIN1(1.0_r8,10.0_r8**(-0.509_r8*4.0_r8*FSTR2+0.20_r8*CSTR2))
+  A3=AMIN1(1.0_r8,10.0_r8**(-0.509_r8*9.0_r8*FSTR2+0.20_r8*CSTR2))
 !
 !     PRECIPITATION-DISSOLUTION EQUILIBRIA
 !
-  AHY1=H_1p_conc*A1
-  AOH1=OH_1e_conc*A1
-  AAL1=Al_3p_conc*A3
-  AALO1=AlOH_2p_conc*A2
-  AALO2=AlOH2_p_conc*A1
-  AALO3=AlOH3_conc
-  AALO4=AlOH4_1e_conc*A1
-  AFE1=Fe_3p_conc*A3
-  AFEO1=FeOH_2p_conc*A2
-  AFEO2=FeO2H2_p_conc*A1
-  AFEO3=FeO3H3_conc
-  AFEO4=FeO4H4_1e_conc*A1
-  ACA1=Ca_2p_conc*A2
-  ACO31=CO3_2e_conc*A2
-  AHCO31=HCO3_e_conc*A1
-  ACO21=H2CO3_aqu_conc*A0
-  ASO41=SO4_2e_conc*A2
-  AH0P1=H0PO4_conc*A3
-  AH1P1=H1PO4_2e_conc*A2
-  AH2P1=H2PO4_1e_conc*A1
-  AH3P1=H3PO4_conc*A0
-  AF1P1=FeHPO4_conc*A2
-  AF2P1=FeH2PO4_conc*A1
-  AC0P1=CaPO4_1e_con*A1
-  AC1P1=CaHPO4_conc*A0
-  AC2P1=CaH2PO4_1p_conc*A1
-  AM1P1=MgHPO4_conc*A0
-  AN41=NH4_1p_conc*A1
-  AN31=NH3_aqu_conc*A0
-  AMG1=Mg_2p_conc*A2
-  ANA1=Na_1p_conc*A1
-  AKA1=K_1p_conc*A1
-  AALX=AAL1**0.333
-  AFEX=AFE1**0.333
-  ACAX=ACA1**0.500
-  AMGX=AMG1**0.500
-  AALS1=AlSO4_1p_conc*A1
-  AFES1=FeSO4_1p_conc*A1
-  ACAO1=CaO2H2_conc*A1
-  ACAC1=CaCO3_conc*A0
-  ACAS1=CaSO4_conc*A0
-  ACAH1=CaHCO3_1p_conc*A1
-  AMGO1=MgOH_1p_conc*A1
-  AMGC1=MgCO3_conc*A0
-  AMGH1=MgHCO3_1p_conc*A1
-  AMGS1=MgSO4_conc*A0
-  ANAC1=NaCO3_1e_conc*A1
-  ANAS1=NaSO4_1e_conc*A1
-  AKAS1=KSO4_1e_conc*A1
+  H_1p_activity=H_1p_conc*A1
+  OH_1e_activity=OH_1e_conc*A1
+  Al_3p_activity=Al_3p_conc*A3
+  AlOH_2p_activity=AlOH_2p_conc*A2
+  AlO2H2_1p_activity=AlO2H2_1p_conc*A1
+  AlO3H3_activity=AlO3H3_conc*A0
+  AlO4H4_1e_activity=AlO4H4_1e_conc*A1
+  Fe_3p_activity=Fe_3p_conc*A3
+  FeOH_2p_activity=FeOH_2p_conc*A2
+  FeO2H2_p_activity=FeO2H2_p_conc*A1
+  FeO3H3_activity=FeO3H3_conc*A0
+  FeO4H4_1e_activity=FeO4H4_1e_conc*A1
+  Ca_2p_activity=Ca_2p_conc*A2
+  CO3_2e_activity=CO3_2e_conc*A2
+  HCO3_e_activity=HCO3_e_conc*A1
+  H2CO3_activity=H2CO3_aqu_conc*A0
+  SO4_2e_activity=SO4_2e_conc*A2
+  H0PO4_3e_activity=H0PO4_3e_conc*A3
+  H1PO4_2e_activity=H1PO4_2e_conc*A2
+  H2PO4_1e_activity=H2PO4_1e_conc*A1
+  H3PO4_activity=H3PO4_conc*A0
+  FeHPO4_p_activity=FeHPO4_p_conc*A2
+  FeH2PO4_2p_activity=FeH2PO4_2p_conc*A2
+  CaPO4_1e_activity=CaPO4_1e_con*A1
+  CaHPO4_activity=CaHPO4_conc*A0
+  CaH2PO4_1p_activity=CaH2PO4_1p_conc*A1
+  MgHPO4_activity=MgHPO4_conc*A0
+  NH4_1p_activity=NH4_1p_conc*A1
+  NH3_activity=NH3_aqu_conc*A0
+  Mg_2p_activity=Mg_2p_conc*A2
+  Na_1p_activity=Na_1p_conc*A1
+  K_1p_activity=K_1p_conc*A1
+  AALX=Al_3p_activity**0.333_r8
+  AFEX=Fe_3p_activity**0.333_r8
+  ACAX=Ca_2p_activity**0.500_r8
+  AMGX=Mg_2p_activity**0.500_r8
+  AlSO4_1p_activity=AlSO4_1p_conc*A1
+  FeSO4_1p_activity=FeSO4_1p_conc*A1
+  CaO2H2_activity=CaO2H2_conc*A0
+  CaCO3_activity=CaCO3_conc*A0
+  CaSO4_activity=CaSO4_conc*A0
+  CaHCO3_1p_activity=CaHCO3_1p_conc*A1
+  MgOH_1p_activity=MgOH_1p_conc*A1
+  MgCO3_activity=MgCO3_conc*A0
+  MgHCO3_1p_activity=MgHCO3_1p_conc*A1
+  MgSO4_activity=MgSO4_conc*A0
+  NaCO3_1e_activity=NaCO3_1e_conc*A1
+  NaSO4_1e_activity=NaSO4_1e_conc*A1
+  KSO4_1e_activity=KSO4_1e_conc*A1
 !
 !     ALUMINUM HYDROXIDE (GIBBSITE)
 !
   IF(K.EQ.micpar%k_POM)THEN
-    PX=AMAX1(AAL1,AALO1,AALO2,AALO3,AALO4)
-    IF(isclose(PX,AAL1))THEN
-      R1=AHY1
-      P1=AAL1
-      P2=AOH1
+    PX=AMAX1(Al_3p_activity,AlOH_2p_activity,AlO2H2_1p_activity,AlO3H3_activity,AlO4H4_1e_activity)
+    IF(isclose(PX,Al_3p_activity))THEN
+      R1=H_1p_activity
+      P1=Al_3p_activity
+      P2=OH_1e_activity
       NR1=3
       NP2=0
       SP=SHALO
-    ELSEIF(isclose(PX,AALO1))THEN
-      R1=AHY1
-      P1=AALO1
-      P2=AOH1
+    ELSEIF(isclose(PX,AlOH_2p_activity))THEN
+      R1=H_1p_activity
+      P1=AlOH_2p_activity
+      P2=OH_1e_activity
       NR1=2
       NP2=0
       SP=SHAL1
-    ELSEIF(isclose(PX,AALO2))THEN
-      R1=AHY1
-      P1=AALO2
-      P2=AOH1
+    ELSEIF(isclose(PX,AlO2H2_1p_activity))THEN
+      R1=H_1p_activity
+      P1=AlO2H2_1p_activity
+      P2=OH_1e_activity
       NR1=1
       NP2=0
       SP=SHAL2
-    ELSEIF(isclose(PX,AALO3))THEN
-      R1=AHY1
-      P1=AALO3
-      P2=AOH1
+    ELSEIF(isclose(PX,AlO3H3_activity))THEN
+      R1=H_1p_activity
+      P1=AlO3H3_activity
+      P2=OH_1e_activity
       NR1=0
       NP2=0
       SP=SPAL3
-    ELSEIF(isclose(PX,AALO4))THEN
-      R1=AOH1
-      P1=AALO4
-      P2=AHY1
+    ELSEIF(isclose(PX,AlO4H4_1e_activity))THEN
+      R1=OH_1e_activity
+      P1=AlO4H4_1e_activity
+      P2=H_1p_activity
       NR1=0
       NP2=1
       SP=SHAL4
@@ -767,53 +768,53 @@ module InitSoluteMod
     P2=AMAX1(ZERO,P2)
     SPX=SP*R1**NR1/P2**NP2
     RPALOX=AMAX1(-Precp_AlO3H3_conc,TPD*(P1-SPX))
-    IF(isclose(PX,AAL1))THEN
+    IF(isclose(PX,Al_3p_activity))THEN
       RHAL1=RPALOX
-    ELSEIF(isclose(PX,AALO1))THEN
+    ELSEIF(isclose(PX,AlOH_2p_activity))THEN
       RHALO1=RPALOX
-    ELSEIF(isclose(PX,AALO2))THEN
+    ELSEIF(isclose(PX,AlO2H2_1p_activity))THEN
       RHALO2=RPALOX
-    ELSEIF(isclose(PX,AALO3))THEN
+    ELSEIF(isclose(PX,AlO3H3_activity))THEN
       RHALO3=RPALOX
-    ELSEIF(isclose(PX,AALO4))THEN
+    ELSEIF(isclose(PX,AlO4H4_1e_activity))THEN
       RHALO4=RPALOX
     ENDIF
 !
 !     IRON HYDROXIDE
 !
-    PX=AMAX1(AFE1,AFEO1,AFEO2,AFEO3,AFEO4)
-    IF(isclose(PX,AFE1))THEN
-      R1=AHY1
-      P1=AFE1
-      P2=AOH1
+    PX=AMAX1(Fe_3p_activity,FeOH_2p_activity,FeO2H2_p_activity,FeO3H3_activity,FeO4H4_1e_activity)
+    IF(isclose(PX,Fe_3p_activity))THEN
+      R1=H_1p_activity
+      P1=Fe_3p_activity
+      P2=OH_1e_activity
       NR1=3
       NP2=0
       SP=SHFEO
-    ELSEIF(isclose(PX,AFEO1))THEN
-      R1=AHY1
-      P1=AFEO1
-      P2=AOH1
+    ELSEIF(isclose(PX,FeOH_2p_activity))THEN
+      R1=H_1p_activity
+      P1=FeOH_2p_activity
+      P2=OH_1e_activity
       NR1=2
       NP2=0
       SP=SHFE1
-    ELSEIF(isclose(PX,AFEO2))THEN
-      R1=AHY1
-      P1=AFEO2
-      P2=AOH1
+    ELSEIF(isclose(PX,FeO2H2_p_activity))THEN
+      R1=H_1p_activity
+      P1=FeO2H2_p_activity
+      P2=OH_1e_activity
       NR1=1
       NP2=0
       SP=SHFE2
-    ELSEIF(isclose(PX,AFEO3))THEN
-      R1=AHY1
-      P1=AFEO3
-      P2=AOH1
+    ELSEIF(isclose(PX,FeO3H3_activity))THEN
+      R1=H_1p_activity
+      P1=FeO3H3_activity
+      P2=OH_1e_activity
       NR1=0
       NP2=0
       SP=SPFE3
-    ELSEIF(isclose(PX,AFEO4))THEN
-      R1=AOH1
-      P1=AFEO4
-      P2=AHY1
+    ELSEIF(isclose(PX,FeO4H4_1e_activity))THEN
+      R1=OH_1e_activity
+      P1=FeO4H4_1e_activity
+      P2=H_1p_activity
       NR1=0
       NP2=1
       SP=SHFE4
@@ -828,33 +829,33 @@ module InitSoluteMod
     P2=AMAX1(ZERO,P2)
     SPX=SP*R1**NR1/P2**NP2
     RPFEOX=AMAX1(-Precp_FeO3H3_conc,TPD*(P1-SPX))
-    IF(isclose(PX,AFE1))THEN
+    IF(isclose(PX,Fe_3p_activity))THEN
       RHFE1=RPFEOX
-    ELSEIF(isclose(PX,AFEO1))THEN
+    ELSEIF(isclose(PX,FeOH_2p_activity))THEN
       RHFEO1=RPFEOX
-    ELSEIF(isclose(PX,AFEO2))THEN
+    ELSEIF(isclose(PX,FeO2H2_p_activity))THEN
       RHFEO2=RPFEOX
-    ELSEIF(isclose(PX,AFEO3))THEN
+    ELSEIF(isclose(PX,FeO3H3_activity))THEN
       RHFEO3=RPFEOX
-    ELSEIF(isclose(PX,AFEO4))THEN
+    ELSEIF(isclose(PX,FeO4H4_1e_activity))THEN
       RHFEO4=RPFEOX
     ENDIF
 !
 !     CALCITE
 !
-    PX=AMAX1(ACO31,AHCO31,ACO21)
-    R1=AHY1
-    P1=ACA1
-    IF(isclose(PX,ACO31))THEN
-      P2=ACO31
+    PX=AMAX1(CO3_2e_activity,HCO3_e_activity,H2CO3_activity)
+    R1=H_1p_activity
+    P1=Ca_2p_activity
+    IF(isclose(PX,CO3_2e_activity))THEN
+      P2=CO3_2e_activity
       NR1=0
       SP=SPCAC
-    ELSEIF(isclose(PX,AHCO31))THEN
-      P2=AHCO31
+    ELSEIF(isclose(PX,HCO3_e_activity))THEN
+      P2=HCO3_e_activity
       NR1=1
       SP=SHCAC1
-    ELSEIF(isclose(PX,ACO21))THEN
-      P2=ACO21
+    ELSEIF(isclose(PX,H2CO3_activity))THEN
+      P2=H2CO3_activity
       NR1=2
       SP=SHCAC2
     ENDIF
@@ -868,18 +869,18 @@ module InitSoluteMod
     S0=P1+P2
     S1=AZMAX1(S0**2_r8-4.0_r8*(P1*P2-SPX))
     RPCACX=AMAX1(-Precp_CaCO3_conc,TPD*(S0-SQRT(S1)))
-    IF(isclose(PX,ACO31))THEN
+    IF(isclose(PX,CO3_2e_activity))THEN
       RHCAC3=RPCACX
-    ELSEIF(isclose(PX,AHCO31))THEN
+    ELSEIF(isclose(PX,HCO3_e_activity))THEN
       RHCACH=RPCACX
-    ELSEIF(isclose(PX,ACO21))THEN
+    ELSEIF(isclose(PX,H2CO3_activity))THEN
       RHCACO=RPCACX
     ENDIF
 !
 !     GYPSUM
 !
-    P1=ACA1
-    P2=ASO41
+    P1=Ca_2p_activity
+    P2=SO4_2e_activity
     P1=AMAX1(ZERO,P1)
     P2=AMAX1(ZERO,P2)
     SPX=SPCAS
@@ -892,62 +893,62 @@ module InitSoluteMod
 !
 !     ALUMINUM PHOSPHATE (VARISCITE)
 !
-    PX=AMAX1(AAL1,AALO1,AALO2,AALO3,AALO4)
-    PY=AMAX1(AH1P1,AH2P1)
-    R1=AHY1
-    P3=AHY1
-    IF(isclose(PY,AH1P1))THEN
-      P2=AH1P1
-      IF(isclose(PX,AAL1))THEN
-        P1=AAL1
+    PX=AMAX1(Al_3p_activity,AlOH_2p_activity,AlO2H2_1p_activity,AlO3H3_activity,AlO4H4_1e_activity)
+    PY=AMAX1(H1PO4_2e_activity,H2PO4_1e_activity)
+    R1=H_1p_activity
+    P3=H_1p_activity
+    IF(isclose(PY,H1PO4_2e_activity))THEN
+      P2=H1PO4_2e_activity
+      IF(isclose(PX,Al_3p_activity))THEN
+        P1=Al_3p_activity
         NR1=1
         NP3=0
         SP=SHA0P1
-      ELSEIF(isclose(PX,AALO1))THEN
-        P1=AALO1
+      ELSEIF(isclose(PX,AlOH_2p_activity))THEN
+        P1=AlOH_2p_activity
         NR1=0
         NP3=0
         SP=SPA1P1
-      ELSEIF(isclose(PX,AALO2))THEN
-        P1=AALO2
+      ELSEIF(isclose(PX,AlO2H2_1p_activity))THEN
+        P1=AlO2H2_1p_activity
         NR1=0
         NP3=1
         SP=SHA2P1
-      ELSEIF(isclose(PX,AALO3))THEN
-        P1=AALO3
+      ELSEIF(isclose(PX,AlO3H3_activity))THEN
+        P1=AlO3H3_activity
         NR1=0
         NP3=2
         SP=SHA3P1
-      ELSEIF(isclose(PX,AALO4))THEN
-        P1=AALO4
+      ELSEIF(isclose(PX,AlO4H4_1e_activity))THEN
+        P1=AlO4H4_1e_activity
         NR1=0
         NP3=3
         SP=SHA4P1
       ENDIF
     ELSE
-      P2=AH2P1
-      IF(isclose(PX,AAL1))THEN
-        P1=AAL1
+      P2=H2PO4_1e_activity
+      IF(isclose(PX,Al_3p_activity))THEN
+        P1=Al_3p_activity
         NR1=2
         NP3=0
         SP=SHA0P2
-      ELSEIF(isclose(PX,AALO1))THEN
-        P1=AALO1
+      ELSEIF(isclose(PX,AlOH_2p_activity))THEN
+        P1=AlOH_2p_activity
         NR1=1
         NP3=0
         SP=SHA1P2
-      ELSEIF(isclose(PX,AALO2))THEN
-        P1=AALO2
+      ELSEIF(isclose(PX,AlO2H2_1p_activity))THEN
+        P1=AlO2H2_1p_activity
         NR1=0
         NP3=0
         SP=SPA2P2
-      ELSEIF(isclose(PX,AALO3))THEN
-        P1=AALO3
+      ELSEIF(isclose(PX,AlO3H3_activity))THEN
+        P1=AlO3H3_activity
         NR1=0
         NP3=1
         SP=SHA3P2
-      ELSEIF(isclose(PX,AALO4))THEN
-        P1=AALO4
+      ELSEIF(isclose(PX,AlO4H4_1e_activity))THEN
+        P1=AlO4H4_1e_activity
         NR1=0
         NP3=2
         SP=SHA4P2
@@ -971,90 +972,90 @@ module InitSoluteMod
     S0=P1+P2
     S1=AZMAX1(S0**2-4.0*(P1*P2-SPX))
     H2PO4_1e_AlPO4_dissol_flx=AMAX1(-Precp_AlPO4_conc,TPD*(S0-SQRT(S1)))
-    IF(isclose(PY,AH1P1))THEN
-      IF(isclose(PX,AAL1))THEN
+    IF(isclose(PY,H1PO4_2e_activity))THEN
+      IF(isclose(PX,Al_3p_activity))THEN
         RHA0P1=H2PO4_1e_AlPO4_dissol_flx
-      ELSEIF(isclose(PX,AALO1))THEN
+      ELSEIF(isclose(PX,AlOH_2p_activity))THEN
         RHA1P1=H2PO4_1e_AlPO4_dissol_flx
-      ELSEIF(isclose(PX,AALO2))THEN
+      ELSEIF(isclose(PX,AlO2H2_1p_activity))THEN
         RHA2P1=H2PO4_1e_AlPO4_dissol_flx
-      ELSEIF(isclose(PX,AALO3))THEN
+      ELSEIF(isclose(PX,AlO3H3_activity))THEN
         RHA3P1=H2PO4_1e_AlPO4_dissol_flx
-      ELSEIF(isclose(PX,AALO4))THEN
+      ELSEIF(isclose(PX,AlO4H4_1e_activity))THEN
         RHA4P1=H2PO4_1e_AlPO4_dissol_flx
       ENDIF
     ELSE
-      IF(isclose(PX,AAL1))THEN
+      IF(isclose(PX,Al_3p_activity))THEN
         RHA0P2=H2PO4_1e_AlPO4_dissol_flx
-      ELSEIF(isclose(PX,AALO1))THEN
+      ELSEIF(isclose(PX,AlOH_2p_activity))THEN
         RHA1P2=H2PO4_1e_AlPO4_dissol_flx
-      ELSEIF(isclose(PX,AALO2))THEN
+      ELSEIF(isclose(PX,AlO2H2_1p_activity))THEN
         RHA2P2=H2PO4_1e_AlPO4_dissol_flx
-      ELSEIF(isclose(PX,AALO3))THEN
+      ELSEIF(isclose(PX,AlO3H3_activity))THEN
         RHA3P2=H2PO4_1e_AlPO4_dissol_flx
-      ELSEIF(isclose(PX,AALO4))THEN
+      ELSEIF(isclose(PX,AlO4H4_1e_activity))THEN
         RHA4P2=H2PO4_1e_AlPO4_dissol_flx
       ENDIF
     ENDIF
 !
 !     IRON PHOSPHATE (STRENGITE)
 !
-    PX=AMAX1(AFE1,AFEO1,AFEO2,AFEO3,AFEO4)
-    PY=AMAX1(AH1P1,AH2P1)
-    R1=AHY1
-    P3=AHY1
-    IF(isclose(PY,AH1P1))THEN
-      P2=AH1P1
-      IF(isclose(PX,AFE1))THEN
-        P1=AFE1
+    PX=AMAX1(Fe_3p_activity,FeOH_2p_activity,FeO2H2_p_activity,FeO3H3_activity,FeO4H4_1e_activity)
+    PY=AMAX1(H1PO4_2e_activity,H2PO4_1e_activity)
+    R1=H_1p_activity
+    P3=H_1p_activity
+    IF(isclose(PY,H1PO4_2e_activity))THEN
+      P2=H1PO4_2e_activity
+      IF(isclose(PX,Fe_3p_activity))THEN
+        P1=Fe_3p_activity
         NR1=1
         NP3=0
         SP=SHF0P1
-      ELSEIF(isclose(PX,AFEO1))THEN
-        P1=AFEO1
+      ELSEIF(isclose(PX,FeOH_2p_activity))THEN
+        P1=FeOH_2p_activity
         NR1=0
         NP3=0
         SP=SPF1P1
-      ELSEIF(isclose(PX,AFEO2))THEN
-        P1=AFEO2
+      ELSEIF(isclose(PX,FeO2H2_p_activity))THEN
+        P1=FeO2H2_p_activity
         NR1=0
         NP3=1
         SP=SHF2P1
-      ELSEIF(isclose(PX,AFEO3))THEN
-        P1=AFEO3
+      ELSEIF(isclose(PX,FeO3H3_activity))THEN
+        P1=FeO3H3_activity
         NR1=0
         NP3=2
         SP=SHF3P1
-      ELSEIF(isclose(PX,AFEO4))THEN
-        P1=AFEO4
+      ELSEIF(isclose(PX,FeO4H4_1e_activity))THEN
+        P1=FeO4H4_1e_activity
         NR1=0
         NP3=3
         SP=SHF4P1
       ENDIF
     ELSE
-      P2=AH2P1
-      IF(isclose(PX,AFE1))THEN
-        P1=AFE1
+      P2=H2PO4_1e_activity
+      IF(isclose(PX,Fe_3p_activity))THEN
+        P1=Fe_3p_activity
         NR1=2
         NP3=0
         SP=SHF0P2
-      ELSEIF(isclose(PX,AFEO1))THEN
-        P1=AFEO1
+      ELSEIF(isclose(PX,FeOH_2p_activity))THEN
+        P1=FeOH_2p_activity
         NR1=1
         NP3=0
         SP=SHF1P2
-      ELSEIF(isclose(PX,AFEO2))THEN
-        P1=AFEO2
+      ELSEIF(isclose(PX,FeO2H2_p_activity))THEN
+        P1=FeO2H2_p_activity
         NR1=0
         NP3=0
         SP=SPF2P2
-      ELSEIF(isclose(PX,AFEO3))THEN
-        P1=AFEO3
+      ELSEIF(isclose(PX,FeO3H3_activity))THEN
+        P1=FeO3H3_activity
         NR1=0
         NP3=1
         SP=SHF3P2
-      ELSEIF(isclose(PX,AFEO4))THEN
-        P1=AFEO4
+      ELSEIF(isclose(PX,FeO4H4_1e_activity))THEN
+        P1=FeO4H4_1e_activity
         NR1=0
         NP3=2
         SP=SHF4P2
@@ -1078,43 +1079,43 @@ module InitSoluteMod
     S0=P1+P2
     S1=AZMAX1(S0**2_r8-4.0_r8*(P1*P2-SPX))
     H2PO4_1e_FePO4_dissol_flx=AMAX1(-Precp_FePO4_conc,TPD*(S0-SQRT(S1)))
-    IF(isclose(PY,AH1P1))THEN
-      IF(isclose(PX,AFE1))THEN
+    IF(isclose(PY,H1PO4_2e_activity))THEN
+      IF(isclose(PX,Fe_3p_activity))THEN
         RHF0P1=H2PO4_1e_FePO4_dissol_flx
-      ELSEIF(isclose(PX,AFEO1))THEN
+      ELSEIF(isclose(PX,FeOH_2p_activity))THEN
         RHF1P1=H2PO4_1e_FePO4_dissol_flx
-      ELSEIF(isclose(PX,AFEO2))THEN
+      ELSEIF(isclose(PX,FeO2H2_p_activity))THEN
         RHF2P1=H2PO4_1e_FePO4_dissol_flx
-      ELSEIF(isclose(PX,AFEO3))THEN
+      ELSEIF(isclose(PX,FeO3H3_activity))THEN
         RHF3P1=H2PO4_1e_FePO4_dissol_flx
-      ELSEIF(isclose(PX,AFEO4))THEN
+      ELSEIF(isclose(PX,FeO4H4_1e_activity))THEN
         RHF4P1=H2PO4_1e_FePO4_dissol_flx
       ENDIF
     ELSE
-      IF(isclose(PX,AFE1))THEN
+      IF(isclose(PX,Fe_3p_activity))THEN
         RHF0P2=H2PO4_1e_FePO4_dissol_flx
-      ELSEIF(isclose(PX,AFEO1))THEN
+      ELSEIF(isclose(PX,FeOH_2p_activity))THEN
         RHF1P2=H2PO4_1e_FePO4_dissol_flx
-      ELSEIF(isclose(PX,AFEO2))THEN
+      ELSEIF(isclose(PX,FeO2H2_p_activity))THEN
         RHF2P2=H2PO4_1e_FePO4_dissol_flx
-      ELSEIF(isclose(PX,AFEO3))THEN
+      ELSEIF(isclose(PX,FeO3H3_activity))THEN
         RHF3P2=H2PO4_1e_FePO4_dissol_flx
-      ELSEIF(isclose(PX,AFEO4))THEN
+      ELSEIF(isclose(PX,FeO4H4_1e_activity))THEN
         RHF4P2=H2PO4_1e_FePO4_dissol_flx
       ENDIF
     ENDIF
 !
 !     DICALCIUM PHOSPHATE
 !
-    PX=AMAX1(AH1P1,AH2P1)
-    R1=AHY1
-    P1=ACA1
-    IF(isclose(PX,AH1P1))THEN
-      P2=AH1P1
+    PX=AMAX1(H1PO4_2e_activity,H2PO4_1e_activity)
+    R1=H_1p_activity
+    P1=Ca_2p_activity
+    IF(isclose(PX,H1PO4_2e_activity))THEN
+      P2=H1PO4_2e_activity
       NR1=0
       SP=SPCAD
-    ELSEIF(isclose(PX,AH2P1))THEN
-      P2=AH2P1
+    ELSEIF(isclose(PX,H2PO4_1e_activity))THEN
+      P2=H2PO4_1e_activity
       NR1=1
       SP=SHCAD2
     ENDIF
@@ -1127,23 +1128,23 @@ module InitSoluteMod
     S0=P1+P2
     S1=AZMAX1(S0**2_r8-4.0_r8*(P1*P2-SPX))
     H2PO4_1e_CaHPO4_dissol_flx=AMAX1(-Precp_CaHPO4_conc,TPD*(S0-SQRT(S1)))
-    IF(isclose(PX,AH1P1))THEN
+    IF(isclose(PX,H1PO4_2e_activity))THEN
       RPCAD1=H2PO4_1e_CaHPO4_dissol_flx
-    ELSEIF(isclose(PX,AH2P1))THEN
+    ELSEIF(isclose(PX,H2PO4_1e_activity))THEN
       RHCAD2=H2PO4_1e_CaHPO4_dissol_flx
     ENDIF
 !
 !     HYDROXYAPATITE
 !
-    PX=AMAX1(AH1P1,AH2P1)
-    R1=AHY1
-    P1=ACA1
-    IF(isclose(PX,AH1P1))THEN
-      P2=AH1P1
+    PX=AMAX1(H1PO4_2e_activity,H2PO4_1e_activity)
+    R1=H_1p_activity
+    P1=Ca_2p_activity
+    IF(isclose(PX,H1PO4_2e_activity))THEN
+      P2=H1PO4_2e_activity
       NR1=4
       SP=SHCAH1
-    ELSEIF(isclose(PX,AH2P1))THEN
-      P2=AH2P1
+    ELSEIF(isclose(PX,H2PO4_1e_activity))THEN
+      P2=H2PO4_1e_activity
       NR1=7
       SP=SHCAH2
     ENDIF
@@ -1154,9 +1155,9 @@ module InitSoluteMod
     P2=AMAX1(ZERO,P2)
     SPX=(SP*R1**NR1/P1**5_r8)**0.333_r8
     H2PO4_1e_apatite_dissol_flx=AMAX1(-Precp_Ca5P3O12O3H3_conc,TPD*(P2-SPX))
-    IF(isclose(PX,AH1P1))THEN
+    IF(isclose(PX,H1PO4_2e_activity))THEN
       RHCAH1=H2PO4_1e_apatite_dissol_flx
-    ELSEIF(isclose(PX,AH2P1))THEN
+    ELSEIF(isclose(PX,H2PO4_1e_activity))THEN
       RHCAH2=H2PO4_1e_apatite_dissol_flx
     ENDIF
     Precp_AlO3H3_conc=Precp_AlO3H3_conc+RPALOX
@@ -1176,16 +1177,16 @@ module InitSoluteMod
       VLWatMicPBK=1.0_r8
     ENDIF
     IF(XAEC.GT.ZEROS)THEN
-      RXOH2=TAD*(XROH1_conc*AHY1-SXOH2*XROH2_conc)/(XROH1_conc+SPOH2)*VLWatMicPBK
-      RXOH1=TAD*(XOH_conc*AHY1-SXOH1*XROH1_conc)/(XOH_conc+SPOH1)*VLWatMicPBK
+      RXOH2=TAD*(XROH1_conc*H_1p_activity-SXOH2*XROH2_conc)/(XROH1_conc+SPOH2)*VLWatMicPBK
+      RXOH1=TAD*(XOH_conc*H_1p_activity-SXOH1*XROH1_conc)/(XOH_conc+SPOH1)*VLWatMicPBK
       SPH2P=SXH2P*DPH2O
-      H2PO4_1e_to_XH2PO4_ROH2_flx=TAD*(XROH2_conc*AH2P1-SPH2P*XH2PO4_conc)/(XROH2_conc+SPH2P)*VLWatMicPBK
-      H2PO4_to_XH2PO4_ROH_flx=TAD*(XROH1_conc*AH2P1-SXH2P*XH2PO4_conc*AOH1)/(XROH1_conc+SXH2P*AOH1)*VLWatMicPBK
+      H2PO4_1e_to_XH2PO4_ROH2_flx=TAD*(XROH2_conc*H2PO4_1e_activity-SPH2P*XH2PO4_conc)/(XROH2_conc+SPH2P)*VLWatMicPBK
+      H2PO4_to_XH2PO4_ROH_flx=TAD*(XROH1_conc*H2PO4_1e_activity-SXH2P*XH2PO4_conc*OH_1e_activity)/(XROH1_conc+SXH2P*OH_1e_activity)*VLWatMicPBK
 !
 !     HPO4 EXCHANGE
 !
       SPH1P=SXH1P*DPH2O/DPH2P
-      H1PO4_to_XHPO4_ROH_flx=TAD*(XROH1_conc*AH2P1-SPH1P*XHPO4_conc)/(XROH1_conc+SPH1P)*VLWatMicPBK
+      H1PO4_to_XHPO4_ROH_flx=TAD*(XROH1_conc*H2PO4_1e_activity-SPH1P*XHPO4_conc)/(XROH1_conc+SPH1P)*VLWatMicPBK
       XOH_conc=XOH_conc-RXOH1
       XROH1_conc=XROH1_conc+RXOH1-RXOH2-H2PO4_to_XH2PO4_ROH_flx-H1PO4_to_XHPO4_ROH_flx
       XROH2_conc=XROH2_conc+RXOH2-H2PO4_1e_to_XH2PO4_ROH2_flx
@@ -1202,22 +1203,22 @@ module InitSoluteMod
 !     CATION EXCHANGE
 !
     IF(XCEC.GT.ZEROS)THEN
-      AALX=AAL1**0.333_r8
-      AFEX=AFE1**0.333_r8
-      ACAX=ACA1**0.500_r8
-      AMGX=AMG1**0.500_r8
-      XCAX=CEC_conc/(1.0_r8+GKC4*AN41/ACAX &
-       +GKCH*AHY1/ACAX+GKCA*AALX/ACAX &
+      AALX=Al_3p_activity**0.333_r8
+      AFEX=Fe_3p_activity**0.333_r8
+      ACAX=Ca_2p_activity**0.500_r8
+      AMGX=Mg_2p_activity**0.500_r8
+      XCAX=CEC_conc/(1.0_r8+GKC4*NH4_1p_activity/ACAX &
+       +GKCH*H_1p_activity/ACAX+GKCA*AALX/ACAX &
        +GKCA*AFEX/ACAX+GKCM*AMGX/ACAX &
-       +GKCN*ANA1/ACAX+GKCK*AKA1/ACAX)
-      XN4Q=XCAX*AN41*GKC4
-      XHYQ=XCAX*AHY1*GKCH
+       +GKCN*Na_1p_activity/ACAX+GKCK*K_1p_activity/ACAX)
+      XN4Q=XCAX*NH4_1p_activity*GKC4
+      XHYQ=XCAX*H_1p_activity*GKCH
       XALQ=XCAX*AALX*GKCA
       XFEQ=XCAX*AFEX*GKCA
       XCAQ=XCAX*ACAX
       XMGQ=XCAX*AMGX*GKCM
-      XNAQ=XCAX*ANA1*GKCN
-      XKAQ=XCAX*AKA1*GKCK
+      XNAQ=XCAX*Na_1p_activity*GKCN
+      XKAQ=XCAX*K_1p_activity*GKCK
       XTLQ=XN4Q+XHYQ+XALQ+XFEQ+XCAQ+XMGQ+XNAQ+XKAQ
       IF(XTLQ.GT.ZERO)THEN
         FX=CEC_conc/XTLQ
@@ -1232,14 +1233,14 @@ module InitSoluteMod
       XMGQ=FX*XMGQ/2.0_r8
       XNAQ=FX*XNAQ
       XKAQ=FX*XKAQ
-      RXN4=TAD*AMIN1((XN4Q-XNH4_conc)*AN41/XN4Q,NH4_1p_conc)
-      RXHY=TAD*AMIN1((XHYQ-XHY1)*AHY1/XHYQ,H_1p_conc)
+      RXN4=TAD*AMIN1((XN4Q-XNH4_conc)*NH4_1p_activity/XN4Q,NH4_1p_conc)
+      RXHY=TAD*AMIN1((XHYQ-XHY1)*H_1p_activity/XHYQ,H_1p_conc)
       RXAL=TAD*AMIN1((XALQ-XAl_conc)*AALX/XALQ,Al_3p_conc)
       RXFE=TAD*AMIN1((XFEQ-XFe_conc)*AFEX/XFEQ,Fe_3p_conc)
       RXCA=TAD*AMIN1((XCAQ-XCa_conc)*ACAX/XCAQ,Ca_2p_conc)
       RXMG=TAD*AMIN1((XMGQ-XMg_conc)*AMGX/XMGQ,Mg_2p_conc)
-      RXNA=TAD*AMIN1((XNAQ-XNa_conc)*ANA1/XNAQ,Na_1p_conc)
-      RXKA=TAD*AMIN1((XKAQ-XK_conc)*AKA1/XKAQ,K_1p_conc)
+      RXNA=TAD*AMIN1((XNAQ-XNa_conc)*Na_1p_activity/XNAQ,Na_1p_conc)
+      RXKA=TAD*AMIN1((XKAQ-XK_conc)*K_1p_activity/XKAQ,K_1p_conc)
       XNH4_conc=XNH4_conc+RXN4
       XHY1=XHY1+RXHY
       XAl_conc=XAl_conc+RXAL
@@ -1262,10 +1263,10 @@ module InitSoluteMod
 !     ORGANIC MATTER
 !
     DP=DPCOH*DPALO
-    XHC1=AHY1*(XCOOH-XAlO2H2_conc-XFeO2H2_conc)/(AHY1+DPCOH)
-    XAlO2H2_conc=AALO2*(XCOOH-XHC1)/(AALO2+DPALO)
-    XFeO2H2_conc=AFEO2*(XCOOH-XHC1)/(AFEO2+DPFEO)
-    XCOO=AZMAX1(XCOOH-XHC1-XAlO2H2_conc-XFeO2H2_conc)
+    XHC1=H_1p_activity*(XCOOH_conc-XAlO2H2_conc-XFeO2H2_conc)/(H_1p_activity+DPCOH)
+    XAlO2H2_conc=AlO2H2_1p_activity*(XCOOH_conc-XHC1)/(AlO2H2_1p_activity+DPALO)
+    XFeO2H2_conc=FeO2H2_p_activity*(XCOOH_conc-XHC1)/(FeO2H2_p_activity+DPFEO)
+    XCOO=AZMAX1(XCOOH_conc-XHC1-XAlO2H2_conc-XFeO2H2_conc)
   ELSE
     RHAL1=0._r8
     RHALO1=0._r8
@@ -1325,98 +1326,98 @@ module InitSoluteMod
 !
 !     ION SPECIATION
 !
-  S0=AHY1+AN31+DPN4
-  S1=S0**2_r8-4.0_r8*(AHY1*AN31-DPN4*AN41)
+  S0=H_1p_activity+NH3_activity+DPN4
+  S1=S0**2_r8-4.0_r8*(H_1p_activity*NH3_activity-DPN4*NH4_1p_activity)
   RNH4=TSL*(S0-SQRT(S1))
-  S0=AAL1+AOH1+DPAL1
-  S1=S0**2_r8-4.0_r8*(AAL1*AOH1-DPAL1*AALO1)
+  S0=Al_3p_activity+OH_1e_activity+DPAL1
+  S1=S0**2_r8-4.0_r8*(Al_3p_activity*OH_1e_activity-DPAL1*AlOH_2p_activity)
   RALO1=TSL*(S0-SQRT(S1))
-  S0=AALO1+AOH1+DPAL2
-  S1=S0**2_r8-4.0_r8*(AALO1*AOH1-DPAL2*AALO2)
+  S0=AlOH_2p_activity+OH_1e_activity+DPAL2
+  S1=S0**2_r8-4.0_r8*(AlOH_2p_activity*OH_1e_activity-DPAL2*AlO2H2_1p_activity)
   RALO2=TSL*(S0-SQRT(S1))
-  S0=AlOH2_p_conc+OH_1e_conc+DPAL3
-  S1=S0**2-4.0*(AALO2*AOH1-DPAL3*AALO3)
+  S0=AlO2H2_1p_conc+OH_1e_conc+DPAL3
+  S1=S0**2-4.0*(AlO2H2_1p_activity*OH_1e_activity-DPAL3*AlO3H3_activity)
   RALO3=TSL*(S0-SQRT(S1))
-  S0=AALO3+AOH1+DPAL4
-  S1=S0**2-4.0*(AALO3*AOH1-DPAL4*AALO4)
+  S0=AlO3H3_activity+OH_1e_activity+DPAL4
+  S1=S0**2-4.0*(AlO3H3_activity*OH_1e_activity-DPAL4*AlO4H4_1e_activity)
   RALO4=TSL*(S0-SQRT(S1))
-  S0=AAL1+ASO41+DPALS
-  S1=S0**2-4.0*(AAL1*ASO41-DPALS*AALS1)
+  S0=Al_3p_activity+SO4_2e_activity+DPALS
+  S1=S0**2-4.0*(Al_3p_activity*SO4_2e_activity-DPALS*AlSO4_1p_activity)
   RALS=TSL*(S0-SQRT(S1))
-  S0=AFE1+AOH1+DPFE1
-  S1=S0**2-4.0*(AFE1*AOH1-DPFE1*AFEO1)
+  S0=Fe_3p_activity+OH_1e_activity+DPFE1
+  S1=S0**2-4.0*(Fe_3p_activity*OH_1e_activity-DPFE1*FeOH_2p_activity)
   RFEO1=TSL*(S0-SQRT(S1))
-  S0=AFEO1+AOH1+DPFE2
-  S1=S0**2-4.0*(AFEO1*AOH1-DPFE2*AFEO2)
+  S0=FeOH_2p_activity+OH_1e_activity+DPFE2
+  S1=S0**2-4.0*(FeOH_2p_activity*OH_1e_activity-DPFE2*FeO2H2_p_activity)
   RFEO2=TSL*(S0-SQRT(S1))
-  S0=AFEO2+AOH1+DPFE3
-  S1=S0**2-4.0*(AFEO2*AOH1-DPFE3*AFEO3)
+  S0=FeO2H2_p_activity+OH_1e_activity+DPFE3
+  S1=S0**2-4.0*(FeO2H2_p_activity*OH_1e_activity-DPFE3*FeO3H3_activity)
   RFEO3=TSL*(S0-SQRT(S1))
-  S0=AFEO3+AOH1+DPFE4
-  S1=S0**2-4.0*(AFEO3*AOH1-DPFE4*AFEO4)
+  S0=FeO3H3_activity+OH_1e_activity+DPFE4
+  S1=S0**2-4.0*(FeO3H3_activity*OH_1e_activity-DPFE4*FeO4H4_1e_activity)
   RFEO4=TSL*(S0-SQRT(S1))
-  S0=AFE1+ASO41+DPFES
-  S1=S0**2-4.0*(AFE1*ASO41-DPFES*AFES1)
+  S0=Fe_3p_activity+SO4_2e_activity+DPFES
+  S1=S0**2-4.0*(Fe_3p_activity*SO4_2e_activity-DPFES*FeSO4_1p_activity)
   RFES=TSL*(S0-SQRT(S1))
-  S0=ACA1+AOH1+DPCAO
-  S1=S0**2-4.0*(ACA1*AOH1-DPCAO*ACAO1)
+  S0=Ca_2p_activity+OH_1e_activity+DPCAO
+  S1=S0**2-4.0*(Ca_2p_activity*OH_1e_activity-DPCAO*CaO2H2_activity)
   RCAO=TSL*(S0-SQRT(S1))
-  S0=ACA1+ACO31+DPCAC
-  S1=S0**2-4.0*(ACA1*ACO31-DPCAC*ACAC1)
+  S0=Ca_2p_activity+CO3_2e_activity+DPCAC
+  S1=S0**2-4.0*(Ca_2p_activity*CO3_2e_activity-DPCAC*CaCO3_activity)
   RCAC=TSL*(S0-SQRT(S1))
-  S0=ACA1+AHCO31+DPCAH
-  S1=S0**2-4.0*(ACA1*AHCO31-DPCAH*ACAH1)
+  S0=Ca_2p_activity+HCO3_e_activity+DPCAH
+  S1=S0**2-4.0*(Ca_2p_activity*HCO3_e_activity-DPCAH*CaHCO3_1p_activity)
   RCAH=TSL*(S0-SQRT(S1))
-  S0=ACA1+ASO41+DPCAS
-  S1=S0**2-4.0*(ACA1*ASO41-DPCAS*ACAS1)
+  S0=Ca_2p_activity+SO4_2e_activity+DPCAS
+  S1=S0**2-4.0*(Ca_2p_activity*SO4_2e_activity-DPCAS*CaSO4_activity)
   RCAS=TSL*(S0-SQRT(S1))
-  S0=AMG1+AOH1+DPMGO
-  S1=S0**2-4.0*(AMG1*AOH1-DPMGO*AMGO1)
+  S0=Mg_2p_activity+OH_1e_activity+DPMGO
+  S1=S0**2-4.0*(Mg_2p_activity*OH_1e_activity-DPMGO*MgOH_1p_activity)
   RMGO=TSL*(S0-SQRT(S1))
-  S0=AMG1+ACO31+DPMGC
-  S1=S0**2-4.0*(AMG1*ACO31-DPMGC*AMGC1)
+  S0=Mg_2p_activity+CO3_2e_activity+DPMGC
+  S1=S0**2-4.0*(Mg_2p_activity*CO3_2e_activity-DPMGC*MgCO3_activity)
   RMGC=TSL*(S0-SQRT(S1))
-  S0=AMG1+AHCO31+DPMGH
-  S1=S0**2-4.0*(AMG1*AHCO31-DPMGH*AMGH1)
+  S0=Mg_2p_activity+HCO3_e_activity+DPMGH
+  S1=S0**2-4.0*(Mg_2p_activity*HCO3_e_activity-DPMGH*MgHCO3_1p_activity)
   RMGH=TSL*(S0-SQRT(S1))
-  S0=AMG1+ASO41+DPMGS
-  S1=S0**2-4.0*(AMG1*ASO41-DPMGS*AMGS1)
+  S0=Mg_2p_activity+SO4_2e_activity+DPMGS
+  S1=S0**2-4.0*(Mg_2p_activity*SO4_2e_activity-DPMGS*MgSO4_activity)
   RMGS=TSL*(S0-SQRT(S1))
-  S0=ANA1+ACO31+DPNAC
-  S1=S0**2-4.0*(ANA1*ACO31-DPNAC*ANAC1)
+  S0=Na_1p_activity+CO3_2e_activity+DPNAC
+  S1=S0**2-4.0*(Na_1p_activity*CO3_2e_activity-DPNAC*NaCO3_1e_activity)
   RNAC=TSL*(S0-SQRT(S1))
-  S0=ANA1+ASO41+DPNAS
-  S1=S0**2-4.0*(ANA1*ASO41-DPNAS*ANAS1)
+  S0=Na_1p_activity+SO4_2e_activity+DPNAS
+  S1=S0**2-4.0*(Na_1p_activity*SO4_2e_activity-DPNAS*NaSO4_1e_activity)
   RNAS=TSL*(S0-SQRT(S1))
-  S0=AKA1+ASO41+DPKAS
-  S1=S0**2-4.0*(AKA1*ASO41-DPKAS*AKAS1)
+  S0=K_1p_activity+SO4_2e_activity+DPKAS
+  S1=S0**2-4.0*(K_1p_activity*SO4_2e_activity-DPKAS*KSO4_1e_activity)
   RKAS=TSL*(S0-SQRT(S1))
-  S0=AH0P1+AHY1+DPH1P
-  S1=S0**2-4.0*(AH0P1*AHY1-DPH1P*AH1P1)
+  S0=H0PO4_3e_activity+H_1p_activity+DPH1P
+  S1=S0**2-4.0*(H0PO4_3e_activity*H_1p_activity-DPH1P*H1PO4_2e_activity)
   RH1P=TSL*(S0-SQRT(S1))
-  S0=AH1P1+AHY1+DPH2P
-  S1=S0**2-4.0*(AH1P1*AHY1-DPH2P*AH2P1)
+  S0=H1PO4_2e_activity+H_1p_activity+DPH2P
+  S1=S0**2-4.0*(H1PO4_2e_activity*H_1p_activity-DPH2P*H2PO4_1e_activity)
   H2PO4_e_to_HPO4_2e_flx=TSL*(S0-SQRT(S1))
-  S0=AH2P1+AHY1+DPH3P
-  S1=S0**2-4.0*(AH2P1*AHY1-DPH3P*AH3P1)
+  S0=H2PO4_1e_activity+H_1p_activity+DPH3P
+  S1=S0**2-4.0*(H2PO4_1e_activity*H_1p_activity-DPH3P*H3PO4_activity)
   RH3P=TSL*(S0-SQRT(S1))
-  S0=AFE1+AH1P1+DPF1P
-  S1=S0**2-4.0*(AFE1*AH1P1-DPF1P*AF1P1)
+  S0=Fe_3p_activity+H1PO4_2e_activity+DPF1P
+  S1=S0**2-4.0*(Fe_3p_activity*H1PO4_2e_activity-DPF1P*FeHPO4_p_activity)
   RF1P=TSL*(S0-SQRT(S1))
-  S0=AFE1+AH2P1+DPF2P
-  S1=S0**2-4.0*(AFE1*AH2P1-DPF2P*AF2P1)
+  S0=Fe_3p_activity+H2PO4_1e_activity+DPF2P
+  S1=S0**2-4.0*(Fe_3p_activity*H2PO4_1e_activity-DPF2P*FeH2PO4_2p_activity)
   RF2P=TSL*(S0-SQRT(S1))
-  S0=ACA1+AH0P1+DPC0P
-  S1=S0**2-4.0*(ACA1*AH0P1-DPC0P*AC0P1)
+  S0=Ca_2p_activity+H0PO4_3e_activity+DPC0P
+  S1=S0**2-4.0*(Ca_2p_activity*H0PO4_3e_activity-DPC0P*CaPO4_1e_activity)
   RC0P=TSL*(S0-SQRT(S1))
-  S0=ACA1+AH1P1+DPC1P
-  S1=S0**2-4.0*(ACA1*AH1P1-DPC1P*AC1P1)
+  S0=Ca_2p_activity+H1PO4_2e_activity+DPC1P
+  S1=S0**2-4.0*(Ca_2p_activity*H1PO4_2e_activity-DPC1P*CaHPO4_activity)
   RC1P=TSL*(S0-SQRT(S1))
-  S0=ACA1+AH2P1+DPC2P
-  S1=S0**2-4.0*(ACA1*AH2P1-DPC2P*AC2P1)
+  S0=Ca_2p_activity+H2PO4_1e_activity+DPC2P
+  S1=S0**2-4.0*(Ca_2p_activity*H2PO4_1e_activity-DPC2P*CaH2PO4_1p_activity)
   RC2P=TSL*(S0-SQRT(S1))
-  S0=AMG1+AH1P1+DPM1P
-  S1=S0**2-4.0*(AMG1*AH1P1-DPM1P*AM1P1)
+  S0=Mg_2p_activity+H1PO4_2e_activity+DPM1P
+  S1=S0**2-4.0*(Mg_2p_activity*H1PO4_2e_activity-DPM1P*MgHPO4_activity)
   RM1P=TSL*(S0-SQRT(S1))
 !
 !     TOTAL ION FLUX FOR EACH ION SPECIES
@@ -1455,8 +1456,8 @@ module InitSoluteMod
   CCO2Y=LOG(CCO2X)
   CCO2Z=ABS(CCO2Y)
   H2CO3_aqu_conc=CCO2X
-  FCO3=DPCO3*A0/(AHY1**2*A2)
-  FHCO=DPCO2*A0/(AHY1*A1)
+  FCO3=DPCO3*A0/(H_1p_activity**2*A2)
+  FHCO=DPCO2*A0/(H_1p_activity*A1)
   Z=ACTCG(idg_CO2)*(2.0E-03*FCO3+0.5E-03*FHCO)
   DO  MM=1,25
     R=(LOG(H2CO3_aqu_conc)+Z*H2CO3_aqu_conc-CCO2Y)/CCO2Z
@@ -1476,12 +1477,12 @@ module InitSoluteMod
   Na_1p_conc=Na_1p_conc+RNA
   K_1p_conc=K_1p_conc+RKA
   SO4_2e_conc=SO4_2e_conc+RSO4
-  CO3_2e_conc=H2CO3_aqu_conc*DPCO3*A0/(AHY1**2*A2)
-  HCO3_e_conc=H2CO3_aqu_conc*DPCO2*A0/(AHY1*A1)
+  CO3_2e_conc=H2CO3_aqu_conc*DPCO3*A0/(H_1p_activity**2*A2)
+  HCO3_e_conc=H2CO3_aqu_conc*DPCO2*A0/(H_1p_activity*A1)
   AlOH_2p_conc=AlOH_2p_conc+RAL1
-  AlOH2_p_conc=AlOH2_p_conc+RAL2
-  AlOH3_conc=AlOH3_conc+RAL3
-  AlOH4_1e_conc=AlOH4_1e_conc+RAL4
+  AlO2H2_1p_conc=AlO2H2_1p_conc+RAL2
+  AlO3H3_conc=AlO3H3_conc+RAL3
+  AlO4H4_1e_conc=AlO4H4_1e_conc+RAL4
   AlSO4_1p_conc=AlSO4_1p_conc+RALS
   FeOH_2p_conc=FeOH_2p_conc+RFE1
   FeO2H2_p_conc=FeO2H2_p_conc+RFE2
@@ -1499,34 +1500,34 @@ module InitSoluteMod
   NaCO3_1e_conc=NaCO3_1e_conc+RNAC
   NaSO4_1e_conc=NaSO4_1e_conc+RNAS
   KSO4_1e_conc=KSO4_1e_conc+RKAS
-  H0PO4_conc=H0PO4_conc+RHP0
+  H0PO4_3e_conc=H0PO4_3e_conc+RHP0
   H1PO4_2e_conc=H1PO4_2e_conc+RHP1
   H2PO4_1e_conc=H2PO4_1e_conc+RHP2
   H3PO4_conc=H3PO4_conc+RHP3
-  FeHPO4_conc=FeHPO4_conc+RF1P
-  FeH2PO4_conc=FeH2PO4_conc+RF2P
+  FeHPO4_p_conc=FeHPO4_p_conc+RF1P
+  FeH2PO4_2p_conc=FeH2PO4_2p_conc+RF2P
   CaPO4_1e_con=CaPO4_1e_con+RC0P
   CaHPO4_conc=CaHPO4_conc+RC1P
   CaH2PO4_1p_conc=CaH2PO4_1p_conc+RC2P
   MgHPO4_conc=MgHPO4_conc+RM1P
 !  IF(K.EQ.micpar%k_POM.AND.(M/1)*1.EQ.M)THEN
 !     WRITE(*,1112)'A1I',I,NX,NY,L,K,M,A1,A2,A3,FSTR2,CSTR1
-!    2,CSTR2,CC3,CA3,CC2,CA2,CC1,CA1,VLWatMicP
-!     WRITE(*,1112)'ALPO4I',I,NX,NY,L,K,M,Precp_AlPO4_conc,AAL1
-!    2,AALO1,AALO2,AALO3,AALO4
-!    2,AH0P1,AH1P1,AH2P1,AHY1,AOH1,H2PO4_1e_AlPO4_dissol_flx,RHA0P1,RHA1P1,RHA2P1,RHA3P1
-!    3,RHA4P1,RHA0P2,RHA1P2,RHA2P2,RHA3P2,RHA4P2,SP,SPX,AAL1*AH0P1
-!    4,SPALP,H0PO4_conc,H1PO4_2e_conc,H2PO4_1e_conc,H3PO4_conc,RHP0,RHP1,RHP2,RHP3
+!    2,CSTR2,cation_3p_conc,anion_3e_conc,cation_2p_conc,anion_2e_conc,cation_1p_conc,CA1,VLWatMicP
+!     WRITE(*,1112)'ALPO4I',I,NX,NY,L,K,M,Precp_AlPO4_conc,Al_3p_activity
+!    2,AlOH_2p_activity,AlO2H2_1p_activity,AlO3H3_activity,AlO4H4_1e_activity
+!    2,H0PO4_3e_activity,H1PO4_2e_activity,H2PO4_1e_activity,H_1p_activity,OH_1e_activity,H2PO4_1e_AlPO4_dissol_flx,RHA0P1,RHA1P1,RHA2P1,RHA3P1
+!    3,RHA4P1,RHA0P2,RHA1P2,RHA2P2,RHA3P2,RHA4P2,SP,SPX,Al_3p_activity*H0PO4_3e_activity
+!    4,SPALP,H0PO4_3e_conc,H1PO4_2e_conc,H2PO4_1e_conc,H3PO4_conc,RHP0,RHP1,RHP2,RHP3
 !    5,RAL,RHAL1,RHA0P1,RHA0P2,RALO1,RALS,RXAL
-!     WRITE(*,1112)'FEPO4I',I,NX,NY,L,K,M,Precp_FePO4_conc,AFE1
-!    2,AFEO1,AFEO2,AFEO3,AFEO4
-!    2,AH0P1,AH1P1,AH2P1,AHY1,AOH1,H2PO4_1e_FePO4_dissol_flx,RHF0P1,RHF1P1,RHF2P1,RHF3P1
-!    3,RHF4P1,RHF0P2,RHF1P2,RHF2P2,RHF3P2,RHF4P2,SP,SPX,AFE1*AH0P1
+!     WRITE(*,1112)'FEPO4I',I,NX,NY,L,K,M,Precp_FePO4_conc,Fe_3p_activity
+!    2,FeOH_2p_activity,FeO2H2_p_activity,FeO3H3_activity,FeO4H4_1e_activity
+!    2,H0PO4_3e_activity,H1PO4_2e_activity,H2PO4_1e_activity,H_1p_activity,OH_1e_activity,H2PO4_1e_FePO4_dissol_flx,RHF0P1,RHF1P1,RHF2P1,RHF3P1
+!    3,RHF4P1,RHF0P2,RHF1P2,RHF2P2,RHF3P2,RHF4P2,SP,SPX,Fe_3p_activity*H0PO4_3e_activity
 !    4,SPFEP
-!     WRITE(*,1112)'APATITEI',I,NX,NY,L,K,M,Precp_Ca5P3O12O3H3_conc,ACA1,XCa_conc
-!    2,AH0P1,AH1P1,AH2P1,AHY1,AOH1,H2PO4_1e_apatite_dissol_flx,RHCAH1,RHCAH2
-!    3,SP,SPX,ACA1**5*AH0P1**3*AOH1,SPCAH,SHCAH1,SHCAH2
-!    3,H0PO4_conc,H1PO4_2e_conc,H2PO4_1e_conc,XOH_conc,XROH1_conc,XROH2_conc,XHPO4_conc,XH2PO4_conc
+!     WRITE(*,1112)'APATITEI',I,NX,NY,L,K,M,Precp_Ca5P3O12O3H3_conc,Ca_2p_activity,XCa_conc
+!    2,H0PO4_3e_activity,H1PO4_2e_activity,H2PO4_1e_activity,H_1p_activity,OH_1e_activity,H2PO4_1e_apatite_dissol_flx,RHCAH1,RHCAH2
+!    3,SP,SPX,Ca_2p_activity**5*H0PO4_3e_activity**3*OH_1e_activity,SPCAH,SHCAH1,SHCAH2
+!    3,H0PO4_3e_conc,H1PO4_2e_conc,H2PO4_1e_conc,XOH_conc,XROH1_conc,XROH2_conc,XHPO4_conc,XH2PO4_conc
 !    4,RHA0P1,RHA1P1,RHA2P1,RHA3P1
 !    2,RHA4P1,RHF0P1,RHF1P1,RHF2P1
 !    3,RHF3P1,RHF4P1,RPCAD1,3.0*RHCAH1
@@ -1668,6 +1669,7 @@ module InitSoluteMod
   RHP1=-H1PO4_to_XHPO4_ROH_flx-H2PO4_e_to_HPO4_2e_flx
   RHP2=-H2PO4_1e_to_XH2PO4_ROH2_flx-H2PO4_to_XH2PO4_ROH_flx+H2PO4_e_to_HPO4_2e_flx &
     -H2PO4_1e_AlPO4_dissol_flx-H2PO4_1e_FePO4_dissol_flx-H2PO4_1e_CaHPO4_dissol_flx-3.0_r8*H2PO4_1e_apatite_dissol_flx
+
   NH4_1p_conc=NH4_1p_conc+RN4S
   NH3_aqu_conc=NH3_aqu_conc+RN3S
   H1PO4_2e_conc=H1PO4_2e_conc+RHP1

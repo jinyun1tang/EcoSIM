@@ -121,7 +121,7 @@
     PAR    => plt_rad%PAR     , &
     VGRO   => plt_photo%VGRO  , &
     LeafAUnshaded_seclyrnodbrpft  => plt_photo%LeafAUnshaded_seclyrnodbrpft , &
-    FDBK   => plt_photo%FDBK  , &
+    RubiscoActivity_brpft   => plt_photo%RubiscoActivity_brpft  , &
     CBXN   => plt_photo%CBXN  , &
     ETGRO  => plt_photo%ETGRO , &
     TAU0   => plt_rad%TAU0      &
@@ -147,11 +147,11 @@
 !     VGRO=rubisco carboxylation rate limited by CO2
 !     EGRO=light-limited rubisco carboxylation rate
 !     CH2O=total rubisco carboxylation rate
-!     FDBK=N,P feedback inhibition on C3 CO2 fixation
+!     RubiscoActivity_brpft=N,P feedback inhibition on C3 CO2 fixation
 !     LeafAUnshaded_seclyrnodbrpft=unself-shaded leaf surface area
 !     TAU0=fraction of diffuse radiation transmitted from layer above
 !
-  VL=AMIN1(VGRO(K,NB,NZ),EGRO)*FDBK(NB,NZ)
+  VL=AMIN1(VGRO(K,NB,NZ),EGRO)*RubiscoActivity_brpft(NB,NZ)
   CH2O=CH2O+VL*LeafAUnshaded_seclyrnodbrpft(N,L,K,NB,NZ)*TAU0(L+1)
   end associate
   end subroutine C3ShadedLeaves
@@ -170,7 +170,7 @@
     CBXN    => plt_photo%CBXN     , &
     ETGRO   => plt_photo%ETGRO    , &
     LeafAUnshaded_seclyrnodbrpft   => plt_photo%LeafAUnshaded_seclyrnodbrpft    , &
-    FDBK    => plt_photo%FDBK     , &
+    RubiscoActivity_brpft    => plt_photo%RubiscoActivity_brpft     , &
     TAUS    =>  plt_rad%TAUS        &
   )
 !
@@ -193,12 +193,12 @@
 !     VL=rubisco carboxylation rate limited by light,CO2,N,P
 !     VGRO=rubisco carboxylation rate limited by CO2
 !     EGRO=light-limited rubisco carboxylation rate
-!     FDBK=N,P feedback inhibition on C3 CO2 fixation
+!     RubiscoActivity_brpft=N,P feedback inhibition on C3 CO2 fixation
 !     CH2O=total rubisco carboxylation rate
 !     LeafAUnshaded_seclyrnodbrpft=unself-shaded leaf surface area
 !     TAUS=fraction of direct radiation transmitted from layer above
 !
-  VL=AMIN1(VGRO(K,NB,NZ),EGRO)*FDBK(NB,NZ)
+  VL=AMIN1(VGRO(K,NB,NZ),EGRO)*RubiscoActivity_brpft(NB,NZ)
   CH2O=CH2O+VL*LeafAUnshaded_seclyrnodbrpft(N,L,K,NB,NZ)*TAUS(L+1)
   end associate
   end subroutine C3SunlitLeaves
@@ -676,27 +676,27 @@
     IDTHB  =>  plt_pheno%IDTHB  , &
     ZERO   =>  plt_site%ZERO    , &
     FDBKX  => plt_photo%FDBKX   , &
-    FDBK   => plt_photo%FDBK      &
+    RubiscoActivity_brpft   => plt_photo%RubiscoActivity_brpft      &
   )
 !
 !     FEEDBACK ON C3 CARBOXYLATION FROM NON-STRUCTURAL C:N:P
 !
 !     CCPOLB,CZPOLB,CPPOLB=nonstructural C,N,P concn in branch
-!     FDBK=N,P feedback inhibition on C3 CO2 fixation
+!     RubiscoActivity_brpft=N,P feedback inhibition on C3 CO2 fixation
 !     CNKI,CPKI=nonstructural N,P inhibition constant on rubisco
 !
   IF(CEPOLB(ielmc,NB,NZ).GT.ZERO)THEN
-    FDBK(NB,NZ)=AMIN1(CEPOLB(ielmn,NB,NZ)/(CEPOLB(ielmn,NB,NZ)+CEPOLB(ielmc,NB,NZ)/CNKI) &
+    RubiscoActivity_brpft(NB,NZ)=AMIN1(CEPOLB(ielmn,NB,NZ)/(CEPOLB(ielmn,NB,NZ)+CEPOLB(ielmc,NB,NZ)/CNKI) &
       ,CEPOLB(ielmp,NB,NZ)/(CEPOLB(ielmp,NB,NZ)+CEPOLB(ielmc,NB,NZ)/CPKI))
   ELSE
-    FDBK(NB,NZ)=1.0_r8
+    RubiscoActivity_brpft(NB,NZ)=1.0_r8
   ENDIF
 !
 !     CHILLING
 !
 !     CHILL=accumulated chilling hours used to limit CO2 fixn
 !
-!     FDBK(NB,NZ)=FDBK(NB,NZ)/(1.0_r8+0.25_r8*CHILL(NZ))
+!     RubiscoActivity_brpft(NB,NZ)=RubiscoActivity_brpft(NB,NZ)/(1.0_r8+0.25_r8*CHILL(NZ))
 !
 !     DEHARDENING OF EVERGREENS IN SPRING
 !
@@ -704,7 +704,7 @@
 !     ATRPZ=hours to full dehardening of conifers in spring
 ! deciduous
   IF(IWTYP(NZ).NE.0.AND.IBTYP(NZ).GE.2)THEN
-    FDBK(NB,NZ)=FDBK(NB,NZ)*AZMAX1(AMIN1(1.0_r8 &
+    RubiscoActivity_brpft(NB,NZ)=RubiscoActivity_brpft(NB,NZ)*AZMAX1(AMIN1(1.0_r8 &
       ,HourCounter4LeafOut_brch(NB,NZ)/(0.9_r8*ATRPZ)))
   ENDIF
 !
@@ -719,7 +719,7 @@
   ELSE
     FDBKX(NB,NZ)=1.0_r8
   ENDIF
-  FDBK(NB,NZ)=FDBK(NB,NZ)*FDBKX(NB,NZ)
+  RubiscoActivity_brpft(NB,NZ)=RubiscoActivity_brpft(NB,NZ)*FDBKX(NB,NZ)
 !
 !     FOR EACH NODE
 !
@@ -831,7 +831,7 @@
     NU     =>  plt_site%NU      , &
     AREA3  =>  plt_site%AREA3   , &
     VCGRO  =>  plt_photo%VCGRO  , &
-    FDBK   =>  plt_photo%FDBK   , &
+    RubiscoActivity_brpft   =>  plt_photo%RubiscoActivity_brpft   , &
     FDBKX  =>  plt_photo%FDBKX  , &
     XKCO2O =>  plt_photo%XKCO2O , &
     VCGR4  =>  plt_photo%VCGR4  , &
@@ -854,12 +854,11 @@
 !     VRNS,VRNL=leafout hours,hours required for leafout
 !     VRNF,VRNX=leafoff hours,hours required for leafoff
 !
-    IF(IWTYP(NZ).EQ.0.OR.VRNS(NB,NZ).GE.VRNL(NB,NZ) &
-      .OR.VRNF(NB,NZ).LT.VRNX(NB,NZ))THEN
+    IF(IWTYP(NZ).EQ.0.OR.VRNS(NB,NZ).GE.VRNL(NB,NZ).OR.VRNF(NB,NZ).LT.VRNX(NB,NZ))THEN
 
       call PhenoActiveBranch(NB,NZ,CH2O,TFN1,TFN2,TFNE,XKO2L)
     ELSE
-      FDBK(NB,NZ)=0.0_r8
+      RubiscoActivity_brpft(NB,NZ)=0.0_r8
       FDBKX(NB,NZ)=1.0_r8
       DO K=1,JNODS1
         VCGR4(K,NB,NZ)=0.0_r8

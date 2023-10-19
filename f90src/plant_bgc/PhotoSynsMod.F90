@@ -14,11 +14,11 @@ implicit none
 
 !------------------------------------------------------------------------------------------
 
-  subroutine ComputeGPP_C3(K,NB,NZ,WFNG,WFNC,CH2O3,CO2F,CH2O)
+  subroutine ComputeGPP_C3(K,NB,NZ,WFNG,Stomata_Activity,CH2O3,CO2F,CH2O)
 
   implicit none
   integer, intent(in) :: K,NB,NZ
-  real(r8), intent(in) :: WFNG,WFNC
+  real(r8), intent(in) :: WFNG,Stomata_Activity
   real(r8), intent(inout) :: CH2O3(25),CO2F,CH2O
   integer :: L,NN,M,N
   real(r8) :: WFNB
@@ -37,7 +37,7 @@ implicit none
   associate(                          &
   ZERO       => plt_site%ZERO   , &
   IGTYP      => plt_pheno%IGTYP , &
-  FDBK       => plt_photo%FDBK  , &
+  RubiscoActivity_brpft       => plt_photo%RubiscoActivity_brpft  , &
   CO2Q       => plt_photo%CO2Q  , &
   LeafAUnshaded_seclyrnodbrpft      => plt_photo%LeafAUnshaded_seclyrnodbrpft , &
   XKCO2O     => plt_photo%XKCO2O, &
@@ -88,13 +88,13 @@ implicit none
 !             CBXN=rubisco caboxylation efficiency
 !             VL=rubisco carboxylation rate limited by light,CO2,N,P
 !             VGRO=rubisco carboxylation rate limited by CO2 from stomate.f
-!             FDBK=N,P feedback inhibition on C4 CO2 fixation
+!             RubiscoActivity_brpft=N,P feedback inhibition on C4 CO2 fixation
 !
               PARX=QNTM*PAR(N,M,L,NZ)
               PARJ=PARX+ETGRO(K,NB,NZ)
               ETLF=(PARJ-SQRT(PARJ**2-CURV4*PARX*ETGRO(K,NB,NZ)))/CURV2
               EGRO=ETLF*CBXN(K,NB,NZ)
-              VL=AMIN1(VGRO(K,NB,NZ),EGRO)*FDBK(NB,NZ)
+              VL=AMIN1(VGRO(K,NB,NZ),EGRO)*RubiscoActivity_brpft(NB,NZ)
 !
 !             STOMATAL EFFECT OF WATER DEFICIT IN MESOPHYLL
 !
@@ -103,12 +103,12 @@ implicit none
 !             RCMX=cuticular resistance to CO2 from startq.f (s m-1)
 !             DCO2=difference between atmosph and intercellular CO2 concn (umol m-3)
 !             GSL=leaf stomatal conductance (mol m-2 s-1)
-!             WFNC=stomatal resistance function of canopy turgor
+!             Stomata_Activity=stomatal resistance function of canopy turgor
 !             FMOL=number of moles of air per m3
 !
               IF(VL.GT.ZERO)THEN
                 RS=AMIN1(RCMX(NZ),AMAX1(RCMN,DCO2(NZ)/VL))
-                RSL=RS+(RCMX(NZ)-RS)*WFNC
+                RSL=RS+(RCMX(NZ)-RS)*Stomata_Activity
                 GSL=1.0_r8/RSL*FMOL(NZ)
 !
 !               EFFECT OF WATER DEFICIT IN MESOPHYLL
@@ -146,7 +146,7 @@ implicit none
                   CBXNX=CO2Y/(ELEC3*CO2C+10.5_r8*COMPL(K,NB,NZ))
                   VGROX=VCGRO(K,NB,NZ)*CO2Y/(CO2C+XKCO2O(NZ))
                   EGROX=ETLF*CBXNX
-                  VL=AMIN1(VGROX,EGROX)*WFNB*FDBK(NB,NZ)
+                  VL=AMIN1(VGROX,EGROX)*WFNB*RubiscoActivity_brpft(NB,NZ)
                   VG=(CO2Q(NZ)-CO2X)*GSL
                   IF(VL+VG.GT.ZERO)THEN
                     DIFF=(VL-VG)/(VL+VG)
@@ -188,13 +188,13 @@ implicit none
 !             CBXN=rubisco caboxylation efficiency
 !             VL=rubisco carboxylation rate limited by light,CO2,N,P
 !             VGRO=rubisco carboxylation rate limited by CO2 from stomate.f
-!             FDBK=N,P feedback inhibition on C3 CO2 fixation
+!             RubiscoActivity_brpft=N,P feedback inhibition on C3 CO2 fixation
 !
               PARX=QNTM*PARDIF(N,M,L,NZ)
               PARJ=PARX+ETGRO(K,NB,NZ)
               ETLF=(PARJ-SQRT(PARJ**2-CURV4*PARX*ETGRO(K,NB,NZ)))/CURV2
               EGRO=ETLF*CBXN(K,NB,NZ)
-              VL=AMIN1(VGRO(K,NB,NZ),EGRO)*FDBK(NB,NZ)
+              VL=AMIN1(VGRO(K,NB,NZ),EGRO)*RubiscoActivity_brpft(NB,NZ)
 !
 !             STOMATAL EFFECT OF WATER DEFICIT IN MESOPHYLL
 !
@@ -203,12 +203,12 @@ implicit none
 !             RCMX=cuticular resistance to CO2 from startq.f (s m-1)
 !             DCO2=difference between atmosph and intercellular CO2 concn (umol m-3)
 !             GSL=leaf stomatal conductance (mol m-2 s-1)
-!             WFNC=stomatal resistance function of canopy turgor
+!             Stomata_Activity=stomatal resistance function of canopy turgor
 !             FMOL=number of moles of air per m3
 !
               IF(VL.GT.ZERO)THEN
                 RS=AMIN1(RCMX(NZ),AMAX1(RCMN,DCO2(NZ)/VL))
-                RSL=RS+(RCMX(NZ)-RS)*WFNC
+                RSL=RS+(RCMX(NZ)-RS)*Stomata_Activity
                 GSL=1.0_r8/RSL*FMOL(NZ)
 !
 !               EFFECT OF WATER DEFICIT IN MESOPHYLL
@@ -246,7 +246,7 @@ implicit none
                   CBXNX=CO2Y/(ELEC3*CO2C+10.5*COMPL(K,NB,NZ))
                   VGROX=VCGRO(K,NB,NZ)*CO2Y/(CO2C+XKCO2O(NZ))
                   EGROX=ETLF*CBXNX
-                  VL=AMIN1(VGROX,EGROX)*WFNB*FDBK(NB,NZ)
+                  VL=AMIN1(VGROX,EGROX)*WFNB*RubiscoActivity_brpft(NB,NZ)
                   VG=(CO2Q(NZ)-CO2X)*GSL
                   IF(VL+VG.GT.ZERO)THEN
                     DIFF=(VL-VG)/(VL+VG)
@@ -278,16 +278,17 @@ implicit none
   ENDDO D210
   CO2F=CO2F+CH2O3(K)
   CH2O=CH2O+CH2O3(K)
+  write(191,*)'ComputeGPP_C3',CH2O,CO2F
   end associate
   end subroutine ComputeGPP_C3
 
 
 !------------------------------------------------------------------------------------------
 
-  subroutine ComputeGPP_C4(K,NB,NZ,WFNG,WFNC,CH2O3,CH2O4,CO2F,CH2O)
+  subroutine ComputeGPP_C4(K,NB,NZ,WFNG,Stomata_Activity,CH2O3,CH2O4,CO2F,CH2O)
   implicit none
   integer, intent(in) :: K,NB,NZ
-  real(r8), intent(in):: WFNG,WFNC
+  real(r8), intent(in):: WFNG,Stomata_Activity
   real(r8), intent(inout) :: CH2O3(25),CH2O4(25),CO2F,CH2O
   integer :: L,NN,M,N
   real(r8) :: WFN4
@@ -322,7 +323,7 @@ implicit none
   VGRO       => plt_photo%VGRO  , &
   ETGR4      => plt_photo%ETGR4 , &
   CO2Q       => plt_photo%CO2Q  , &
-  FDBK       => plt_photo%FDBK  , &
+  RubiscoActivity_brpft       => plt_photo%RubiscoActivity_brpft  , &
   CO2I       => plt_photo%CO2I  , &
   CBXN       => plt_photo%CBXN  , &
   VCGR4      => plt_photo%VCGR4 , &
@@ -376,12 +377,12 @@ implicit none
 !             RCMX=cuticular resistance to CO2 from startq.f (s m-1)
 !             DCO2=difference between atmosph and intercellular CO2 concn (umol m-3)
 !             GSL=leaf stomatal conductance (mol m-2 s-1)
-!             WFNC=stomatal resistance function of canopy turgor
+!             Stomata_Activity=stomatal resistance function of canopy turgor
 !             FMOL=number of moles of air per m3
 !
               IF(VL.GT.ZERO)THEN
                 RS=AMIN1(RCMX(NZ),AMAX1(RCMN,DCO2(NZ)/VL))
-                RSL=RS+(RCMX(NZ)-RS)*WFNC
+                RSL=RS+(RCMX(NZ)-RS)*Stomata_Activity
                 GSL=1.0_r8/RSL*FMOL(NZ)
 !
 !               EFFECT OF WATER DEFICIT IN MESOPHYLL
@@ -455,12 +456,12 @@ implicit none
 !               CBXN=rubisco caboxylation efficiency
 !               VL=rubisco carboxylation rate limited by light,CO2,N,P
 !               VGRO=rubisco carboxylation rate limited by CO2 from stomate.f
-!               FDBK=N,P feedback inhibition on C3 CO2 fixation
+!               RubiscoActivity_brpft=N,P feedback inhibition on C3 CO2 fixation
 !
                 PARJ=PARX+ETGRO(K,NB,NZ)
                 ETLF=(PARJ-SQRT(PARJ**2-CURV4*PARX*ETGRO(K,NB,NZ)))/CURV2
                 EGRO=ETLF*CBXN(K,NB,NZ)
-                VL=AMIN1(VGRO(K,NB,NZ),EGRO)*WFNB*FDBK(NB,NZ)
+                VL=AMIN1(VGRO(K,NB,NZ),EGRO)*WFNB*RubiscoActivity_brpft(NB,NZ)
 !
 !               ACCUMULATE C3 FIXATION PRODUCT IN BUNDLE SHEATH
 !
@@ -503,12 +504,12 @@ implicit none
 !             RCMX=cuticular resistance to CO2 from startq.f (s m-1)
 !             DCO2=difference between atmosph and intercellular CO2 concn (umol m-3)
 !             GSL=leaf stomatal conductance (mol m-2 s-1)
-!             WFNC=stomatal resistance function of canopy turgor
+!             Stomata_Activity=stomatal resistance function of canopy turgor
 !             FMOL=number of moles of air per m3
 !
               IF(VL.GT.ZERO)THEN
                 RS=AMIN1(RCMX(NZ),AMAX1(RCMN,DCO2(NZ)/VL))
-                RSL=RS+(RCMX(NZ)-RS)*WFNC
+                RSL=RS+(RCMX(NZ)-RS)*Stomata_Activity
                 GSL=1.0_r8/RSL*FMOL(NZ)
 !
 !               EFFECT OF WATER DEFICIT IN MESOPHYLL
@@ -581,12 +582,12 @@ implicit none
 !               CBXN=rubisco caboxylation efficiency
 !               VL=rubisco carboxylation rate limited by light,CO2,N,P
 !               VGRO=rubisco carboxylation rate limited by CO2 from stomate.f
-!               FDBK=N,P feedback inhibition on C3 CO2 fixation
+!               RubiscoActivity_brpft=N,P feedback inhibition on C3 CO2 fixation
 !
                 PARJ=PARX+ETGRO(K,NB,NZ)
                 ETLF=(PARJ-SQRT(PARJ**2-CURV4*PARX*ETGRO(K,NB,NZ)))/CURV2
                 EGRO=ETLF*CBXN(K,NB,NZ)
-                VL=AMIN1(VGRO(K,NB,NZ),EGRO)*WFNB*FDBK(NB,NZ)
+                VL=AMIN1(VGRO(K,NB,NZ),EGRO)*WFNB*RubiscoActivity_brpft(NB,NZ)
 !
 !               ACCUMULATE C3 FIXATION PRODUCT IN BUNDLE SHEATH
 !
@@ -610,11 +611,11 @@ implicit none
 
 !------------------------------------------------------------------------------------------
 
-  subroutine ComputeGPP(NB,NZ,WFNG,WFNC,CH2O3,CH2O4,CH2O,CO2F)
+  subroutine ComputeGPP(NB,NZ,WFNG,Stomata_Activity,CH2O3,CH2O4,CH2O,CO2F)
   implicit none
   integer, intent(in) :: NB,NZ
   real(r8), intent(in) :: WFNG
-  real(r8), intent(in) :: WFNC
+  real(r8), intent(in) :: Stomata_Activity    !between 0. and 1., a function of canopy turgor
   real(r8), intent(out) :: CH2O3(JNODS1),CH2O4(JNODS1)
   real(r8), intent(out) :: CO2F,CH2O
   real(r8) :: ZADDB,PADDB
@@ -632,14 +633,14 @@ implicit none
     PARByCanP    =>  plt_rad%PARByCanP     , &
     ZEROP   =>  plt_biom%ZEROP   , &
     ARLF1   =>  plt_morph%ARLF1  , &
-    FDBK    =>  plt_photo%FDBK     &
+    RubiscoActivity_brpft    =>  plt_photo%RubiscoActivity_brpft     &
   )
 
-  IF(abs(FDBK(NB,NZ)).GT.0._r8)THEN
+  IF(abs(RubiscoActivity_brpft(NB,NZ)).GT.0._r8)THEN
     IF(SSIN.GT.0.0_r8.AND.PARByCanP(NZ).GT.0.0_r8.AND.CO2Q(NZ).GT.0.0_r8)THEN
       CO2F=0._r8
       CH2O=0._r8
-      IF(IGTYP(NZ).NE.0.OR.WFNC.GT.0.0_r8)THEN
+      IF(IGTYP(NZ).NE.0.OR.Stomata_Activity.GT.0.0_r8)THEN
 !
 !         FOR EACH NODE
 !
@@ -656,12 +657,12 @@ implicit none
 !
             IF(ICTYP(NZ).EQ.ic4_photo.AND.VCGR4(K,NB,NZ).GT.0.0_r8)THEN
 !
-              CALL ComputeGPP_C4(K,NB,NZ,WFNG,WFNC,CH2O3,CH2O4,CO2F,CH2O)
+              CALL ComputeGPP_C4(K,NB,NZ,WFNG,Stomata_Activity,CH2O3,CH2O4,CO2F,CH2O)
 !
 !               C3 PHOTOSYNTHESIS
 !
             ELSEIF(ICTYP(NZ).NE.ic4_photo.AND.VCGRO(K,NB,NZ).GT.0.0_r8)THEN
-              call ComputeGPP_C3(K,NB,NZ,WFNG,WFNC,CH2O3,CO2F,CH2O)
+              call ComputeGPP_C3(K,NB,NZ,WFNG,Stomata_Activity,CH2O3,CO2F,CH2O)
 
             ENDIF
           ENDIF
