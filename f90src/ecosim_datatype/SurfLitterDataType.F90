@@ -22,8 +22,8 @@ module SurfLitterDataType
   real(r8) ,target,allocatable ::   WatFLo2Litr(:,:)                        !net water transfer to surface litter, [MJ d-2 t-1]
   real(r8) ,target,allocatable ::   TLitrIceFlxThaw(:,:)             !water from ice thaw in surface litter, [m3 d-2 h-1]
   real(r8) ,target,allocatable ::   TLitrIceHeatFlxFrez(:,:)         !latent heat released from water freeze in surface litter, [MJ d-2 h-1]
-  real(r8) ,target,allocatable ::   FLQRQ(:,:)                       !precipitation flux into surface litter, [m3 d-2 h-1]
-  real(r8) ,target,allocatable ::   FLQRI(:,:)                       !irrigation flux into surface litter, [m3 d-2 h-1]
+  real(r8) ,target,allocatable ::   Rain2LitRSurf(:,:)                       !precipitation flux into surface litter, [m3 d-2 h-1]
+  real(r8) ,target,allocatable ::   Irrig2LitRSurf(:,:)                       !irrigation flux into surface litter, [m3 d-2 h-1]
   real(r8) ,target,allocatable ::   POROS0(:,:)                      !litter porosity
   real(r8) ,target,allocatable ::   RC0(:,:,:)                       !surface litter in each complex	g d-2
   real(r8),target,allocatable ::  RC0ff(:,:)
@@ -60,8 +60,8 @@ module SurfLitterDataType
   allocate(WatFLo2Litr(JY,JX));         WatFLo2Litr=0._r8
   allocate(TLitrIceFlxThaw(JY,JX));        TLitrIceFlxThaw=0._r8
   allocate(TLitrIceHeatFlxFrez(JY,JX));       TLitrIceHeatFlxFrez=0._r8
-  allocate(FLQRQ(JY,JX));        FLQRQ=0._r8
-  allocate(FLQRI(JY,JX));        FLQRI=0._r8
+  allocate(Rain2LitRSurf(JY,JX));        Rain2LitRSurf=0._r8
+  allocate(Irrig2LitRSurf(JY,JX));        Irrig2LitRSurf=0._r8
   allocate(POROS0(JY,JX));       POROS0=0._r8
   allocate(RC0(1:jcplx,JY,JX));      Rc0=0._r8
   allocate(RC0ff(JY,JX)); RC0ff=0._r8
@@ -86,8 +86,8 @@ module SurfLitterDataType
   call destroy(WatFLo2Litr)
   call destroy(TLitrIceFlxThaw)
   call destroy(TLitrIceHeatFlxFrez)
-  call destroy(FLQRQ)
-  call destroy(FLQRI)
+  call destroy(Rain2LitRSurf)
+  call destroy(Irrig2LitRSurf)
   call destroy(POROS0)
   call destroy(RC0)
   call destroy(RC0ff)

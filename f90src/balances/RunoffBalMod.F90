@@ -216,37 +216,37 @@ implicit none
 !     TPOU,TIONOU=total P,salt loss through lateral and lower boundaries
 !
       IF(salt_model)THEN
-        PSS=XN*patomw*(trcSalt_XQR(idsalt_H0PO4,N,NN,N5,N4) &
-          +trcSalt_XQR(idsalt_CaPO4,N,NN,N5,N4)+trcSalt_XQR(idsalt_FeHPO4,N,NN,N5,N4) &
-          +trcSalt_XQR(idsalt_CaHPO4,N,NN,N5,N4) &
-          +trcSalt_XQR(idsalt_MgHPO4,N,NN,N5,N4)+trcSalt_XQR(idsalt_H3PO4,N,NN,N5,N4) &
-          +trcSalt_XQR(idsalt_FeH2PO4,N,NN,N5,N4) &
-          +trcSalt_XQR(idsalt_CaH2PO4,N,NN,N5,N4))
-        SS1=XN*(trcSalt_XQR(idsalt_Al,N,NN,N5,N4)+trcSalt_XQR(idsalt_Fe,N,NN,N5,N4) &
-          +trcSalt_XQR(idsalt_Hp,N,NN,N5,N4) &
-          +trcSalt_XQR(idsalt_Ca,N,NN,N5,N4)+trcSalt_XQR(idsalt_Mg,N,NN,N5,N4) &
-          +trcSalt_XQR(idsalt_Na,N,NN,N5,N4) &
-          +trcSalt_XQR(idsalt_K,N,NN,N5,N4)+trcSalt_XQR(idsalt_OH,N,NN,N5,N4) &
-          +trcSalt_XQR(idsalt_SO4,N,NN,N5,N4) &
-          +trcSalt_XQR(idsalt_Cl,N,NN,N5,N4)+trcSalt_XQR(idsalt_CO3,N,NN,N5,N4) &
-          +trcSalt_XQR(idsalt_H0PO4,N,NN,N5,N4))
-        SS2=XN*2.0_r8*(trcSalt_XQR(idsalt_HCO3,N,NN,N5,N4)+trcSalt_XQR(idsalt_AlOH,N,NN,N5,N4) &
-          +trcSalt_XQR(idsalt_AlSO4,N,NN,N5,N4)+trcSalt_XQR(idsalt_FeOH,N,NN,N5,N4) &
-          +trcSalt_XQR(idsalt_FeSO4,N,NN,N5,N4) &
-          +trcSalt_XQR(idsalt_CaOH2,N,NN,N5,N4)+trcSalt_XQR(idsalt_CaCO3,N,NN,N5,N4) &
-          +trcSalt_XQR(idsalt_CaSO4,N,NN,N5,N4) &
-          +trcSalt_XQR(idsalt_MgOH2,N,NN,N5,N4)+trcSalt_XQR(idsalt_MgCO3,N,NN,N5,N4) &
-          +trcSalt_XQR(idsalt_MgSO4,N,NN,N5,N4) &
-          +trcSalt_XQR(idsalt_NaCO3,N,NN,N5,N4)+trcSalt_XQR(idsalt_NaSO4,N,NN,N5,N4) &
-          +trcSalt_XQR(idsalt_KSO4,N,NN,N5,N4)+trcSalt_XQR(idsalt_CaPO4,N,NN,N5,N4))
-        SS3=XN*3.0_r8*(trcSalt_XQR(idsalt_AlOH2,N,NN,N5,N4)+trcSalt_XQR(idsalt_FeOH2,N,NN,N5,N4) &
-          +trcSalt_XQR(idsalt_CaHCO3,N,NN,N5,N4)+trcSalt_XQR(idsalt_MgHCO3,N,NN,N5,N4) &
-          +trcSalt_XQR(idsalt_FeHPO4,N,NN,N5,N4) &
-          +trcSalt_XQR(idsalt_CaHPO4,N,NN,N5,N4)+trcSalt_XQR(idsalt_MgHPO4,N,NN,N5,N4))
-        SS4=XN*4.0_r8*(trcSalt_XQR(idsalt_AlOH3,N,NN,N5,N4)+trcSalt_XQR(idsalt_FeOH3,N,NN,N5,N4) &
-          +trcSalt_XQR(idsalt_H3PO4,N,NN,N5,N4)+trcSalt_XQR(idsalt_FeH2PO4,N,NN,N5,N4) &
-          +trcSalt_XQR(idsalt_CaH2PO4,N,NN,N5,N4)) &
-          +XN*5.0_r8*(trcSalt_XQR(idsalt_AlOH4,N,NN,N5,N4)+trcSalt_XQR(idsalt_FeOH4,N,NN,N5,N4))
+        PSS=XN*patomw*(trcSaltRunoffBoundary(idsalt_H0PO4,N,NN,N5,N4) &
+          +trcSaltRunoffBoundary(idsalt_CaPO4,N,NN,N5,N4)+trcSaltRunoffBoundary(idsalt_FeHPO4,N,NN,N5,N4) &
+          +trcSaltRunoffBoundary(idsalt_CaHPO4,N,NN,N5,N4) &
+          +trcSaltRunoffBoundary(idsalt_MgHPO4,N,NN,N5,N4)+trcSaltRunoffBoundary(idsalt_H3PO4,N,NN,N5,N4) &
+          +trcSaltRunoffBoundary(idsalt_FeH2PO4,N,NN,N5,N4) &
+          +trcSaltRunoffBoundary(idsalt_CaH2PO4,N,NN,N5,N4))
+        SS1=XN*(trcSaltRunoffBoundary(idsalt_Al,N,NN,N5,N4)+trcSaltRunoffBoundary(idsalt_Fe,N,NN,N5,N4) &
+          +trcSaltRunoffBoundary(idsalt_Hp,N,NN,N5,N4) &
+          +trcSaltRunoffBoundary(idsalt_Ca,N,NN,N5,N4)+trcSaltRunoffBoundary(idsalt_Mg,N,NN,N5,N4) &
+          +trcSaltRunoffBoundary(idsalt_Na,N,NN,N5,N4) &
+          +trcSaltRunoffBoundary(idsalt_K,N,NN,N5,N4)+trcSaltRunoffBoundary(idsalt_OH,N,NN,N5,N4) &
+          +trcSaltRunoffBoundary(idsalt_SO4,N,NN,N5,N4) &
+          +trcSaltRunoffBoundary(idsalt_Cl,N,NN,N5,N4)+trcSaltRunoffBoundary(idsalt_CO3,N,NN,N5,N4) &
+          +trcSaltRunoffBoundary(idsalt_H0PO4,N,NN,N5,N4))
+        SS2=XN*2.0_r8*(trcSaltRunoffBoundary(idsalt_HCO3,N,NN,N5,N4)+trcSaltRunoffBoundary(idsalt_AlOH,N,NN,N5,N4) &
+          +trcSaltRunoffBoundary(idsalt_AlSO4,N,NN,N5,N4)+trcSaltRunoffBoundary(idsalt_FeOH,N,NN,N5,N4) &
+          +trcSaltRunoffBoundary(idsalt_FeSO4,N,NN,N5,N4) &
+          +trcSaltRunoffBoundary(idsalt_CaOH2,N,NN,N5,N4)+trcSaltRunoffBoundary(idsalt_CaCO3,N,NN,N5,N4) &
+          +trcSaltRunoffBoundary(idsalt_CaSO4,N,NN,N5,N4) &
+          +trcSaltRunoffBoundary(idsalt_MgOH2,N,NN,N5,N4)+trcSaltRunoffBoundary(idsalt_MgCO3,N,NN,N5,N4) &
+          +trcSaltRunoffBoundary(idsalt_MgSO4,N,NN,N5,N4) &
+          +trcSaltRunoffBoundary(idsalt_NaCO3,N,NN,N5,N4)+trcSaltRunoffBoundary(idsalt_NaSO4,N,NN,N5,N4) &
+          +trcSaltRunoffBoundary(idsalt_KSO4,N,NN,N5,N4)+trcSaltRunoffBoundary(idsalt_CaPO4,N,NN,N5,N4))
+        SS3=XN*3.0_r8*(trcSaltRunoffBoundary(idsalt_AlOH2,N,NN,N5,N4)+trcSaltRunoffBoundary(idsalt_FeOH2,N,NN,N5,N4) &
+          +trcSaltRunoffBoundary(idsalt_CaHCO3,N,NN,N5,N4)+trcSaltRunoffBoundary(idsalt_MgHCO3,N,NN,N5,N4) &
+          +trcSaltRunoffBoundary(idsalt_FeHPO4,N,NN,N5,N4) &
+          +trcSaltRunoffBoundary(idsalt_CaHPO4,N,NN,N5,N4)+trcSaltRunoffBoundary(idsalt_MgHPO4,N,NN,N5,N4))
+        SS4=XN*4.0_r8*(trcSaltRunoffBoundary(idsalt_AlOH3,N,NN,N5,N4)+trcSaltRunoffBoundary(idsalt_FeOH3,N,NN,N5,N4) &
+          +trcSaltRunoffBoundary(idsalt_H3PO4,N,NN,N5,N4)+trcSaltRunoffBoundary(idsalt_FeH2PO4,N,NN,N5,N4) &
+          +trcSaltRunoffBoundary(idsalt_CaH2PO4,N,NN,N5,N4)) &
+          +XN*5.0_r8*(trcSaltRunoffBoundary(idsalt_AlOH4,N,NN,N5,N4)+trcSaltRunoffBoundary(idsalt_FeOH4,N,NN,N5,N4))
         PSS=PSS+XN*patomw*trcSalt_XQS(idsalt_H0PO4,N,N5,N4)
         TPOU=TPOU-PSS
         SSR=SS1+SS2+SS3+SS4
@@ -263,18 +263,18 @@ implicit none
 !       where are those coefficients from?
         WX=Wat2GridBySurfRunoff(N,NN,N5,N4)
         IF(ABS(WX).GT.ZEROS(N5,N4))THEN
-          ECHY=0.337_r8*AZMAX1(trcSalt_XQR(idsalt_Hp,N,NN,N5,N4)/WX)
-          ECOH=0.192_r8*AZMAX1(trcSalt_XQR(idsalt_OH,N,NN,N5,N4)/WX)
-          ECAL=0.056_r8*AZMAX1(trcSalt_XQR(idsalt_Al,N,NN,N5,N4)*3.0_r8/WX)
-          ECFE=0.051_r8*AZMAX1(trcSalt_XQR(idsalt_Fe,N,NN,N5,N4)*3.0_r8/WX)
-          ECCA=0.060_r8*AZMAX1(trcSalt_XQR(idsalt_Ca,N,NN,N5,N4)*2.0_r8/WX)
-          ECMG=0.053_r8*AZMAX1(trcSalt_XQR(idsalt_Mg,N,NN,N5,N4)*2.0_r8/WX)
-          ECNA=0.050_r8*AZMAX1(trcSalt_XQR(idsalt_Na,N,NN,N5,N4)/WX)
-          ECKA=0.070_r8*AZMAX1(trcSalt_XQR(idsalt_K,N,NN,N5,N4)/WX)
-          ECCO=0.072_r8*AZMAX1(trcSalt_XQR(idsalt_CO3,N,NN,N5,N4)*2.0_r8/WX)
-          ECHC=0.044_r8*AZMAX1(trcSalt_XQR(idsalt_HCO3,N,NN,N5,N4)/WX)
-          ECSO=0.080_r8*AZMAX1(trcSalt_XQR(idsalt_SO4,N,NN,N5,N4)*2.0_r8/WX)
-          ECCL=0.076_r8*AZMAX1(trcSalt_XQR(idsalt_Cl,N,NN,N5,N4)/WX)
+          ECHY=0.337_r8*AZMAX1(trcSaltRunoffBoundary(idsalt_Hp,N,NN,N5,N4)/WX)
+          ECOH=0.192_r8*AZMAX1(trcSaltRunoffBoundary(idsalt_OH,N,NN,N5,N4)/WX)
+          ECAL=0.056_r8*AZMAX1(trcSaltRunoffBoundary(idsalt_Al,N,NN,N5,N4)*3.0_r8/WX)
+          ECFE=0.051_r8*AZMAX1(trcSaltRunoffBoundary(idsalt_Fe,N,NN,N5,N4)*3.0_r8/WX)
+          ECCA=0.060_r8*AZMAX1(trcSaltRunoffBoundary(idsalt_Ca,N,NN,N5,N4)*2.0_r8/WX)
+          ECMG=0.053_r8*AZMAX1(trcSaltRunoffBoundary(idsalt_Mg,N,NN,N5,N4)*2.0_r8/WX)
+          ECNA=0.050_r8*AZMAX1(trcSaltRunoffBoundary(idsalt_Na,N,NN,N5,N4)/WX)
+          ECKA=0.070_r8*AZMAX1(trcSaltRunoffBoundary(idsalt_K,N,NN,N5,N4)/WX)
+          ECCO=0.072_r8*AZMAX1(trcSaltRunoffBoundary(idsalt_CO3,N,NN,N5,N4)*2.0_r8/WX)
+          ECHC=0.044_r8*AZMAX1(trcSaltRunoffBoundary(idsalt_HCO3,N,NN,N5,N4)/WX)
+          ECSO=0.080_r8*AZMAX1(trcSaltRunoffBoundary(idsalt_SO4,N,NN,N5,N4)*2.0_r8/WX)
+          ECCL=0.076_r8*AZMAX1(trcSaltRunoffBoundary(idsalt_Cl,N,NN,N5,N4)/WX)
           ECNO=0.071_r8*AZMAX1(trcn_XRS(ids_NO3,N,NN,N5,N4)/(WX*natomw))
           ECNDQ=ECHY+ECOH+ECAL+ECFE+ECCA+ECMG+ECNA+ECKA+ECCO+ECHC+ECSO+ECCL+ECNO
 !     WRITE(*,9991)'ECNDQ',IYRC,I,J,N4,N5,N,NN,WX,ECNDQ
@@ -557,16 +557,16 @@ implicit none
 !     TIONOU,UIONOU=total salt loss through lateral and lower boundaries
 !
       IF(salt_model)THEN
-        PQD=XN*patomw*(trcSalt_XFLS(idsalt_H0PO4,N,N6,N5,N4)+trcSalt_XFLS(idsalt_H0PO4B,N,N6,N5,N4) &
-          +trcSalt_XFLS(idsalt_CaPO4,N,N6,N5,N4)+trcSalt_XFLS(idsalt_CaPO4B,N,N6,N5,N4) &
-          +trcSalt_XFLS(idsalt_FeHPO4,N,N6,N5,N4) &
-          +trcSalt_XFLS(idsalt_CaHPO4,N,N6,N5,N4)+trcSalt_XFLS(idsalt_MgHPO4,N,N6,N5,N4) &
-          +trcSalt_XFLS(idsalt_FeHPO4B,N,N6,N5,N4) &
-          +trcSalt_XFLS(idsalt_CaHPO4B,N,N6,N5,N4)+trcSalt_XFLS(idsalt_MgHPO4B,N,N6,N5,N4) &
-          +trcSalt_XFLS(idsalt_H3PO4,N,N6,N5,N4) &
-          +trcSalt_XFLS(idsalt_FeH2PO4,N,N6,N5,N4)+trcSalt_XFLS(idsalt_CaH2PO4,N,N6,N5,N4) &
-          +trcSalt_XFLS(idsalt_H3PO4B,N,N6,N5,N4) &
-          +trcSalt_XFLS(idsalt_FeH2PO4B,N,N6,N5,N4)+trcSalt_XFLS(idsalt_CaH2PO4B,N,N6,N5,N4))
+        PQD=XN*patomw*(trcSalt3DFlo2Cell(idsalt_H0PO4,N,N6,N5,N4)+trcSalt3DFlo2Cell(idsalt_H0PO4B,N,N6,N5,N4) &
+          +trcSalt3DFlo2Cell(idsalt_CaPO4,N,N6,N5,N4)+trcSalt3DFlo2Cell(idsalt_CaPO4B,N,N6,N5,N4) &
+          +trcSalt3DFlo2Cell(idsalt_FeHPO4,N,N6,N5,N4) &
+          +trcSalt3DFlo2Cell(idsalt_CaHPO4,N,N6,N5,N4)+trcSalt3DFlo2Cell(idsalt_MgHPO4,N,N6,N5,N4) &
+          +trcSalt3DFlo2Cell(idsalt_FeHPO4B,N,N6,N5,N4) &
+          +trcSalt3DFlo2Cell(idsalt_CaHPO4B,N,N6,N5,N4)+trcSalt3DFlo2Cell(idsalt_MgHPO4B,N,N6,N5,N4) &
+          +trcSalt3DFlo2Cell(idsalt_H3PO4,N,N6,N5,N4) &
+          +trcSalt3DFlo2Cell(idsalt_FeH2PO4,N,N6,N5,N4)+trcSalt3DFlo2Cell(idsalt_CaH2PO4,N,N6,N5,N4) &
+          +trcSalt3DFlo2Cell(idsalt_H3PO4B,N,N6,N5,N4) &
+          +trcSalt3DFlo2Cell(idsalt_FeH2PO4B,N,N6,N5,N4)+trcSalt3DFlo2Cell(idsalt_CaH2PO4B,N,N6,N5,N4))
 
         PHD=XN*patomw*(trcSalt_XFHS(idsalt_H0PO4,N,N6,N5,N4)+trcSalt_XFHS(idsalt_H0PO4B,N,N6,N5,N4) &
           +trcSalt_XFHS(idsalt_CaPO4,N,N6,N5,N4)+trcSalt_XFHS(idsalt_CaPO4B,N,N6,N5,N4) &
@@ -580,38 +580,38 @@ implicit none
           +trcSalt_XFHS(idsalt_FeH2PO4B,N,N6,N5,N4)+trcSalt_XFHS(idsalt_CaH2PO4B,N,N6,N5,N4))
 
         TPOU=TPOU-PQD-PHD
-        SSD=XN*(trcSalt_XFLS(idsalt_Al,N,N6,N5,N4)+trcSalt_XFLS(idsalt_Fe,N,N6,N5,N4) &
-          +trcSalt_XFLS(idsalt_Hp,N,N6,N5,N4) &
-          +trcSalt_XFLS(idsalt_Ca,N,N6,N5,N4)+trcSalt_XFLS(idsalt_Mg,N,N6,N5,N4) &
-          +trcSalt_XFLS(idsalt_Na,N,N6,N5,N4) &
-          +trcSalt_XFLS(idsalt_K,N,N6,N5,N4)+trcSalt_XFLS(idsalt_OH,N,N6,N5,N4) &
-          +trcSalt_XFLS(idsalt_SO4,N,N6,N5,N4) &
-          +trcSalt_XFLS(idsalt_Cl,N,N6,N5,N4)+trcSalt_XFLS(idsalt_CO3,N,N6,N5,N4) &
-          +trcSalt_XFLS(idsalt_H0PO4,N,N6,N5,N4) &
-          +trcSalt_XFLS(idsalt_H0PO4B,N,N6,N5,N4)+2.0*(trcSalt_XFLS(idsalt_HCO3,N,N6,N5,N4) &
-          +trcSalt_XFLS(idsalt_AlOH,N,N6,N5,N4) &
-          +trcSalt_XFLS(idsalt_AlSO4,N,N6,N5,N4)+trcSalt_XFLS(idsalt_FeOH,N,N6,N5,N4) &
-          +trcSalt_XFLS(idsalt_FeSO4,N,N6,N5,N4) &
-          +trcSalt_XFLS(idsalt_CaOH2,N,N6,N5,N4)+trcSalt_XFLS(idsalt_CaCO3,N,N6,N5,N4) &
-          +trcSalt_XFLS(idsalt_CaSO4,N,N6,N5,N4)+trcSalt_XFLS(idsalt_MgOH2,N,N6,N5,N4) &
-          +trcSalt_XFLS(idsalt_MgCO3,N,N6,N5,N4) &
-          +trcSalt_XFLS(idsalt_MgSO4,N,N6,N5,N4)+trcSalt_XFLS(idsalt_NaCO3,N,N6,N5,N4) &
-          +trcSalt_XFLS(idsalt_NaSO4,N,N6,N5,N4) &
-          +trcSalt_XFLS(idsalt_KSO4,N,N6,N5,N4)+trcSalt_XFLS(idsalt_CaPO4,N,N6,N5,N4) &
-          +trcSalt_XFLS(idsalt_CaPO4B,N,N6,N5,N4)) &
-          +3.0*(trcSalt_XFLS(idsalt_AlOH2,N,N6,N5,N4) &
-          +trcSalt_XFLS(idsalt_FeOH2,N,N6,N5,N4)+trcSalt_XFLS(idsalt_CaHCO3,N,N6,N5,N4) &
-          +trcSalt_XFLS(idsalt_MgHCO3,N,N6,N5,N4) &
-          +trcSalt_XFLS(idsalt_FeHPO4,N,N6,N5,N4)+trcSalt_XFLS(idsalt_CaHPO4,N,N6,N5,N4) &
-          +trcSalt_XFLS(idsalt_MgHPO4,N,N6,N5,N4) &
-          +trcSalt_XFLS(idsalt_FeHPO4B,N,N6,N5,N4)+trcSalt_XFLS(idsalt_CaHPO4B,N,N6,N5,N4) &
-          +trcSalt_XFLS(idsalt_MgHPO4B,N,N6,N5,N4)) &
-          +4.0*(trcSalt_XFLS(idsalt_AlOH3,N,N6,N5,N4)+trcSalt_XFLS(idsalt_FeOH3,N,N6,N5,N4) &
-          +trcSalt_XFLS(idsalt_H3PO4,N,N6,N5,N4) &
-          +trcSalt_XFLS(idsalt_FeH2PO4,N,N6,N5,N4)+trcSalt_XFLS(idsalt_CaH2PO4,N,N6,N5,N4) &
-          +trcSalt_XFLS(idsalt_H3PO4B,N,N6,N5,N4) &
-          +trcSalt_XFLS(idsalt_FeH2PO4B,N,N6,N5,N4)+trcSalt_XFLS(idsalt_CaH2PO4B,N,N6,N5,N4)) &
-          +5.0*(trcSalt_XFLS(idsalt_AlOH4,N,N6,N5,N4)+trcSalt_XFLS(idsalt_FeOH4,N,N6,N5,N4)))
+        SSD=XN*(trcSalt3DFlo2Cell(idsalt_Al,N,N6,N5,N4)+trcSalt3DFlo2Cell(idsalt_Fe,N,N6,N5,N4) &
+          +trcSalt3DFlo2Cell(idsalt_Hp,N,N6,N5,N4) &
+          +trcSalt3DFlo2Cell(idsalt_Ca,N,N6,N5,N4)+trcSalt3DFlo2Cell(idsalt_Mg,N,N6,N5,N4) &
+          +trcSalt3DFlo2Cell(idsalt_Na,N,N6,N5,N4) &
+          +trcSalt3DFlo2Cell(idsalt_K,N,N6,N5,N4)+trcSalt3DFlo2Cell(idsalt_OH,N,N6,N5,N4) &
+          +trcSalt3DFlo2Cell(idsalt_SO4,N,N6,N5,N4) &
+          +trcSalt3DFlo2Cell(idsalt_Cl,N,N6,N5,N4)+trcSalt3DFlo2Cell(idsalt_CO3,N,N6,N5,N4) &
+          +trcSalt3DFlo2Cell(idsalt_H0PO4,N,N6,N5,N4) &
+          +trcSalt3DFlo2Cell(idsalt_H0PO4B,N,N6,N5,N4)+2.0*(trcSalt3DFlo2Cell(idsalt_HCO3,N,N6,N5,N4) &
+          +trcSalt3DFlo2Cell(idsalt_AlOH,N,N6,N5,N4) &
+          +trcSalt3DFlo2Cell(idsalt_AlSO4,N,N6,N5,N4)+trcSalt3DFlo2Cell(idsalt_FeOH,N,N6,N5,N4) &
+          +trcSalt3DFlo2Cell(idsalt_FeSO4,N,N6,N5,N4) &
+          +trcSalt3DFlo2Cell(idsalt_CaOH2,N,N6,N5,N4)+trcSalt3DFlo2Cell(idsalt_CaCO3,N,N6,N5,N4) &
+          +trcSalt3DFlo2Cell(idsalt_CaSO4,N,N6,N5,N4)+trcSalt3DFlo2Cell(idsalt_MgOH2,N,N6,N5,N4) &
+          +trcSalt3DFlo2Cell(idsalt_MgCO3,N,N6,N5,N4) &
+          +trcSalt3DFlo2Cell(idsalt_MgSO4,N,N6,N5,N4)+trcSalt3DFlo2Cell(idsalt_NaCO3,N,N6,N5,N4) &
+          +trcSalt3DFlo2Cell(idsalt_NaSO4,N,N6,N5,N4) &
+          +trcSalt3DFlo2Cell(idsalt_KSO4,N,N6,N5,N4)+trcSalt3DFlo2Cell(idsalt_CaPO4,N,N6,N5,N4) &
+          +trcSalt3DFlo2Cell(idsalt_CaPO4B,N,N6,N5,N4)) &
+          +3.0*(trcSalt3DFlo2Cell(idsalt_AlOH2,N,N6,N5,N4) &
+          +trcSalt3DFlo2Cell(idsalt_FeOH2,N,N6,N5,N4)+trcSalt3DFlo2Cell(idsalt_CaHCO3,N,N6,N5,N4) &
+          +trcSalt3DFlo2Cell(idsalt_MgHCO3,N,N6,N5,N4) &
+          +trcSalt3DFlo2Cell(idsalt_FeHPO4,N,N6,N5,N4)+trcSalt3DFlo2Cell(idsalt_CaHPO4,N,N6,N5,N4) &
+          +trcSalt3DFlo2Cell(idsalt_MgHPO4,N,N6,N5,N4) &
+          +trcSalt3DFlo2Cell(idsalt_FeHPO4B,N,N6,N5,N4)+trcSalt3DFlo2Cell(idsalt_CaHPO4B,N,N6,N5,N4) &
+          +trcSalt3DFlo2Cell(idsalt_MgHPO4B,N,N6,N5,N4)) &
+          +4.0*(trcSalt3DFlo2Cell(idsalt_AlOH3,N,N6,N5,N4)+trcSalt3DFlo2Cell(idsalt_FeOH3,N,N6,N5,N4) &
+          +trcSalt3DFlo2Cell(idsalt_H3PO4,N,N6,N5,N4) &
+          +trcSalt3DFlo2Cell(idsalt_FeH2PO4,N,N6,N5,N4)+trcSalt3DFlo2Cell(idsalt_CaH2PO4,N,N6,N5,N4) &
+          +trcSalt3DFlo2Cell(idsalt_H3PO4B,N,N6,N5,N4) &
+          +trcSalt3DFlo2Cell(idsalt_FeH2PO4B,N,N6,N5,N4)+trcSalt3DFlo2Cell(idsalt_CaH2PO4B,N,N6,N5,N4)) &
+          +5.0*(trcSalt3DFlo2Cell(idsalt_AlOH4,N,N6,N5,N4)+trcSalt3DFlo2Cell(idsalt_FeOH4,N,N6,N5,N4)))
 
         SHD=XN*(trcSalt_XFHS(idsalt_Al,N,N6,N5,N4)+trcSalt_XFHS(idsalt_Fe,N,N6,N5,N4) &
           +trcSalt_XFHS(idsalt_Hp,N,N6,N5,N4) &
@@ -662,18 +662,18 @@ implicit none
 !
         WX=WaterFlowSoiMicP(N,N6,N5,N4)+WaterFlowMacP(N,N6,N5,N4)
         IF(ABS(WX).GT.ZEROS(N2,N1))THEN
-          ECHY=0.337*AZMAX1((trcSalt_XFLS(idsalt_Hp,N,N6,N5,N4)+trcSalt_XFHS(idsalt_Hp,N,N6,N5,N4))/WX)
-          ECOH=0.192*AZMAX1((trcSalt_XFLS(idsalt_OH,N,N6,N5,N4)+trcSalt_XFHS(idsalt_OH,N,N6,N5,N4))/WX)
-          ECAL=0.056*AZMAX1((trcSalt_XFLS(idsalt_Al,N,N6,N5,N4)+trcSalt_XFHS(idsalt_Ca,N,N6,N5,N4))*3.0/WX)
-          ECFE=0.051*AZMAX1((trcSalt_XFLS(idsalt_Fe,N,N6,N5,N4)+trcSalt_XFHS(idsalt_Fe,N,N6,N5,N4))*3.0/WX)
-          ECCA=0.060*AZMAX1((trcSalt_XFLS(idsalt_Ca,N,N6,N5,N4)+trcSalt_XFHS(idsalt_Ca,N,N6,N5,N4))*2.0/WX)
-          ECMG=0.053*AZMAX1((trcSalt_XFLS(idsalt_Mg,N,N6,N5,N4)+trcSalt_XFHS(idsalt_Mg,N,N6,N5,N4))*2.0/WX)
-          ECNA=0.050*AZMAX1((trcSalt_XFLS(idsalt_Na,N,N6,N5,N4)+trcSalt_XFHS(idsalt_Na,N,N6,N5,N4))/WX)
-          ECKA=0.070*AZMAX1((trcSalt_XFLS(idsalt_K,N,N6,N5,N4)+trcSalt_XFHS(idsalt_K,N,N6,N5,N4))/WX)
-          ECCO=0.072*AZMAX1((trcSalt_XFLS(idsalt_CO3,N,N6,N5,N4)+trcSalt_XFHS(idsalt_CO3,N,N6,N5,N4))*2.0/WX)
-          ECHC=0.044*AZMAX1((trcSalt_XFLS(idsalt_HCO3,N,N6,N5,N4)+trcSalt_XFHS(idsalt_HCO3,N,N6,N5,N4))/WX)
-          ECSO=0.080*AZMAX1((trcSalt_XFLS(idsalt_SO4,N,N6,N5,N4)+trcSalt_XFHS(idsalt_SO4,N,N6,N5,N4))*2.0/WX)
-          ECCL=0.076*AZMAX1((trcSalt_XFLS(idsalt_Cl,N,N6,N5,N4)+trcSalt_XFHS(idsalt_Cl,N,N6,N5,N4))/WX)
+          ECHY=0.337*AZMAX1((trcSalt3DFlo2Cell(idsalt_Hp,N,N6,N5,N4)+trcSalt_XFHS(idsalt_Hp,N,N6,N5,N4))/WX)
+          ECOH=0.192*AZMAX1((trcSalt3DFlo2Cell(idsalt_OH,N,N6,N5,N4)+trcSalt_XFHS(idsalt_OH,N,N6,N5,N4))/WX)
+          ECAL=0.056*AZMAX1((trcSalt3DFlo2Cell(idsalt_Al,N,N6,N5,N4)+trcSalt_XFHS(idsalt_Ca,N,N6,N5,N4))*3.0/WX)
+          ECFE=0.051*AZMAX1((trcSalt3DFlo2Cell(idsalt_Fe,N,N6,N5,N4)+trcSalt_XFHS(idsalt_Fe,N,N6,N5,N4))*3.0/WX)
+          ECCA=0.060*AZMAX1((trcSalt3DFlo2Cell(idsalt_Ca,N,N6,N5,N4)+trcSalt_XFHS(idsalt_Ca,N,N6,N5,N4))*2.0/WX)
+          ECMG=0.053*AZMAX1((trcSalt3DFlo2Cell(idsalt_Mg,N,N6,N5,N4)+trcSalt_XFHS(idsalt_Mg,N,N6,N5,N4))*2.0/WX)
+          ECNA=0.050*AZMAX1((trcSalt3DFlo2Cell(idsalt_Na,N,N6,N5,N4)+trcSalt_XFHS(idsalt_Na,N,N6,N5,N4))/WX)
+          ECKA=0.070*AZMAX1((trcSalt3DFlo2Cell(idsalt_K,N,N6,N5,N4)+trcSalt_XFHS(idsalt_K,N,N6,N5,N4))/WX)
+          ECCO=0.072*AZMAX1((trcSalt3DFlo2Cell(idsalt_CO3,N,N6,N5,N4)+trcSalt_XFHS(idsalt_CO3,N,N6,N5,N4))*2.0/WX)
+          ECHC=0.044*AZMAX1((trcSalt3DFlo2Cell(idsalt_HCO3,N,N6,N5,N4)+trcSalt_XFHS(idsalt_HCO3,N,N6,N5,N4))/WX)
+          ECSO=0.080*AZMAX1((trcSalt3DFlo2Cell(idsalt_SO4,N,N6,N5,N4)+trcSalt_XFHS(idsalt_SO4,N,N6,N5,N4))*2.0/WX)
+          ECCL=0.076*AZMAX1((trcSalt3DFlo2Cell(idsalt_Cl,N,N6,N5,N4)+trcSalt_XFHS(idsalt_Cl,N,N6,N5,N4))/WX)
           ECNO=0.071*AZMAX1((trcs_XFLS(ids_NO3,N,N6,N5,N4)+trcs_XFHS(ids_NO3,N,N6,N5,N4))/(WX*natomw))
           ECNDX=ECHY+ECOH+ECAL+ECFE+ECCA+ECMG+ECNA+ECKA+ECCO+ECHC+ECSO+ECCL+ECNO
 !     IF((I/10)*10.EQ.I.AND.J.EQ.15)THEN

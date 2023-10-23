@@ -14,10 +14,10 @@ module MicForcTypeMod
 
   real(r8) :: CCH4E
   real(r8) :: COXYE
-  real(r8) :: COXQ
-  real(r8) :: COXR
-  real(r8) :: FLQRI
-  real(r8) :: FLQRQ
+  real(r8) :: O2_irrig_conc
+  real(r8) :: O2_rain_conc
+  real(r8) :: Irrig2LitRSurf
+  real(r8) :: Rain2LitRSurf
   real(r8) :: offset
   real(r8) :: VLitR
   real(r8) :: VWatLitRHoldCapcity

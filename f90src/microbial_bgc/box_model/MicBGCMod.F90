@@ -834,8 +834,8 @@ module MicBGCMod
 ! ROXYF,ROXYL=net O2 gaseous, aqueous fluxes from previous hour
 ! OLSGL=aqueous O2 diffusivity
 ! OXYG,OXYS=gaseous, aqueous O2 amounts
-! FLQRQ,FLQRI=surface water flux from precipitation, irrigation
-! COXR,COXQ=O2 concentration in FLQRQ,FLQRI
+! Rain2LitRSurf,Irrig2LitRSurf=surface water flux from precipitation, irrigation
+! O2_rain_conc,O2_irrig_conc=O2 concentration in Rain2LitRSurf,Irrig2LitRSurf
 !
   RUPOX(NGL,K)=0.0_r8
   !aerobic heterotrophs
@@ -3043,13 +3043,13 @@ module MicBGCMod
     RCH4X  => nmicf%RCH4X,    &
     RVOXA  => nmicf%RVOXA,    &
     RVOXB  => nmicf%RVOXB,    &
-    COXQ   => micfor%COXQ, &
-    COXR   => micfor%COXR, &
+    O2_irrig_conc   => micfor%O2_irrig_conc, &
+    O2_rain_conc   => micfor%O2_rain_conc, &
     COXYE => micfor%COXYE, &
     ROXYF  => micfor%ROXYF,   &
     ROXYL => micfor%ROXYL, &
-    FLQRI  => micfor%FLQRI, &
-    FLQRQ => micfor%FLQRQ , &
+    Irrig2LitRSurf  => micfor%Irrig2LitRSurf, &
+    Rain2LitRSurf => micfor%Rain2LitRSurf , &
     litrm => micfor%litrm , &
     OLSGL  => micfor%OLSGL, &
     VLSoilPoreMicP => micfor%VLSoilPoreMicP, &
@@ -3088,7 +3088,7 @@ module MicBGCMod
         ROXYLX=ROXYL*dts_gas*FOXYX
       ELSE
         OXYG1=COXYG*VLsoiAirPM(1)*FOXYX
-        ROXYLX=(ROXYL+FLQRQ*COXR+FLQRI*COXQ)*dts_gas*FOXYX
+        ROXYLX=(ROXYL+Rain2LitRSurf*O2_rain_conc+Irrig2LitRSurf*O2_irrig_conc)*dts_gas*FOXYX
       ENDIF
       OXYS1=OXYS*FOXYX
 !

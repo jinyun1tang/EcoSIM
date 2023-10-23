@@ -323,26 +323,26 @@ module Hour1Mod
       AtmGgms(idg_H2 ,NY,NX)=H2GE(NY,NX)*8.92E-05_r8*TREF/TairK(NY,NX)  !gH/m3
       AtmGgms(idg_NH3B,NY,NX)=ZNH3E(NY,NX)*6.25E-04_r8*TREF/TairK(NY,NX) !gN/m3
 
-      CCOR(NY,NX)=AtmGgms(idg_CO2,NY,NX)*gas_solubility(idg_CO2,TCA(NY,NX)) &
+      CO2_rain_conc(NY,NX)=AtmGgms(idg_CO2,NY,NX)*gas_solubility(idg_CO2,TCA(NY,NX)) &
          /(EXP(ACTCG(idg_CO2)*CSTRR(NY,NX)))
-      CCHR(NY,NX)=AtmGgms(idg_CH4,NY,NX)*gas_solubility(idg_CH4,TCA(NY,NX)) &
+      CH4_rain_conc(NY,NX)=AtmGgms(idg_CH4,NY,NX)*gas_solubility(idg_CH4,TCA(NY,NX)) &
         /(EXP(ACTCG(idg_CH4)*CSTRR(NY,NX)))
-      COXR(NY,NX)=AtmGgms(idg_O2,NY,NX)*gas_solubility(idg_O2, TCA(NY,NX)) &
+      O2_rain_conc(NY,NX)=AtmGgms(idg_O2,NY,NX)*gas_solubility(idg_O2, TCA(NY,NX)) &
         /(EXP(ACTCG(idg_O2)*CSTRR(NY,NX)))
-      CNNR(NY,NX)=AtmGgms(idg_N2,NY,NX)*gas_solubility(idg_N2, TCA(NY,NX)) &
+      N2_rain_conc(NY,NX)=AtmGgms(idg_N2,NY,NX)*gas_solubility(idg_N2, TCA(NY,NX)) &
         /(EXP(ACTCG(idg_N2)*CSTRR(NY,NX)))
-      CN2R(NY,NX)=AtmGgms(idg_N2O,NY,NX)*gas_solubility(idg_N2O, TCA(NY,NX)) &
+      N2O_rain_conc(NY,NX)=AtmGgms(idg_N2O,NY,NX)*gas_solubility(idg_N2O, TCA(NY,NX)) &
         /(EXP(ACTCG(idg_N2O)*CSTRR(NY,NX)))
 
-      CCOQ(NY,NX)=AtmGgms(idg_CO2,NY,NX)*gas_solubility(idg_CO2, TCA(NY,NX)) &
+      CO2_irrig_conc(NY,NX)=AtmGgms(idg_CO2,NY,NX)*gas_solubility(idg_CO2, TCA(NY,NX)) &
         /(EXP(ACTCG(idg_CO2)*CSTRQ(I,NY,NX)))
-      CCHQ(NY,NX)=AtmGgms(idg_CH4,NY,NX)*gas_solubility(idg_CH4, TCA(NY,NX)) &
+      CH4_irrig_conc(NY,NX)=AtmGgms(idg_CH4,NY,NX)*gas_solubility(idg_CH4, TCA(NY,NX)) &
         /(EXP(ACTCG(idg_CH4)*CSTRQ(I,NY,NX)))
-      COXQ(NY,NX)=AtmGgms(idg_O2,NY,NX)*gas_solubility(idg_O2, TCA(NY,NX)) &
+      O2_irrig_conc(NY,NX)=AtmGgms(idg_O2,NY,NX)*gas_solubility(idg_O2, TCA(NY,NX)) &
         /(EXP(ACTCG(idg_O2)*CSTRQ(I,NY,NX)))
-      CNNQ(NY,NX)=AtmGgms(idg_N2,NY,NX)*gas_solubility(idg_N2, TCA(NY,NX)) &
+      N2_irrig_conc(NY,NX)=AtmGgms(idg_N2,NY,NX)*gas_solubility(idg_N2, TCA(NY,NX)) &
         /(EXP(ACTCG(idg_N2)*CSTRQ(I,NY,NX)))
-      CN2Q(NY,NX)=AtmGgms(idg_N2O,NY,NX)*gas_solubility(idg_N2O, TCA(NY,NX)) &
+      N2O_irrig_conc(NY,NX)=AtmGgms(idg_N2O,NY,NX)*gas_solubility(idg_N2O, TCA(NY,NX)) &
         /(EXP(ACTCG(idg_N2O)*CSTRQ(I,NY,NX)))
 
     ENDDO
@@ -490,12 +490,12 @@ module Hour1Mod
   DO  NX=NHW,NHE+extragrid
     DO  NY=NVN,NVS+extragrid
 
-      trcSalt_XQR(idsalt_beg:idsalt_end,1:2,1:2,NY,NX)=0.0_r8
+      trcSaltRunoffBoundary(idsalt_beg:idsalt_end,1:2,1:2,NY,NX)=0.0_r8
       trcSalt_XQS(idsalt_beg:idsalt_end,1:2,NY,NX)=0.0_r8
 
       DO  L=1,NL(NY,NX)+1
         DO NSA=idsalt_beg,idsaltb_end
-          trcSalt_XFLS(NSA,1:3,L,NY,NX)=0.0_r8
+          trcSalt3DFlo2Cell(NSA,1:3,L,NY,NX)=0.0_r8
           trcSalt_XFHS(NSA,1:3,L,NY,NX)=0.0_r8
         ENDDO
       ENDDO
@@ -627,7 +627,7 @@ module Hour1Mod
   implicit none
   integer, intent(in) :: NY,NX
   real(r8) :: VxcessWatLitR,TVOLWI
-  real(r8) :: THETWR
+  real(r8) :: ThetaWLitR
   real(r8) :: VOLIRZ,VWatLitrZ
   real(r8) :: XVOLW0,XVOLI0
 !     begin_execution
@@ -792,7 +792,7 @@ module Hour1Mod
   trcn_XBLS(ids_nut_beg:ids_nuts_end,1:JS,NY,NX)=0.0_r8
 
   IF(salt_model)THEN
-    trcSalt_XBLS(idsalt_beg:idsalt_end,1:JS,NY,NX)=0.0_r8
+    trcSaltFlo2SnowLay(idsalt_beg:idsalt_end,1:JS,NY,NX)=0.0_r8
   ENDIF
   end subroutine SetHourlyAccumulators
 !------------------------------------------------------------------------------------------
@@ -1430,7 +1430,7 @@ module Hour1Mod
   implicit none
   integer, intent(in) :: NY,NX
   real(r8),intent(out) :: DPTH0(JY,JX)
-  real(r8) :: VxcessWatLitR,TVOLWI,THETWR
+  real(r8) :: VxcessWatLitR,TVOLWI,ThetaWLitR
   real(r8) :: VWatLitrZ
   real(r8) :: VOLIRZ
   real(r8) :: XVOLW0
@@ -1486,12 +1486,12 @@ module Hour1Mod
 
     DLYR(3,0,NY,NX)=VLSoilPoreMicP(0,NY,NX)/AREA(3,0,NY,NX)
     IF(VLitR(NY,NX).GT.ZEROS(NY,NX).AND.VLWatMicP(0,NY,NX).GT.ZEROS2(NY,NX))THEN
-      THETWR=AMIN1(VWatLitRHoldCapcity(NY,NX),VLWatMicP(0,NY,NX))/VLitR(NY,NX)
-      IF(THETWR.LT.FieldCapacity(0,NY,NX))THEN
-        PSISoilMatricP(0,NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIFLD(NY,NX)+((LOGFldCapacity(0,NY,NX)-LOG(THETWR)) &
+      ThetaWLitR=AMIN1(VWatLitRHoldCapcity(NY,NX),VLWatMicP(0,NY,NX))/VLitR(NY,NX)
+      IF(ThetaWLitR.LT.FieldCapacity(0,NY,NX))THEN
+        PSISoilMatricP(0,NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIFLD(NY,NX)+((LOGFldCapacity(0,NY,NX)-LOG(ThetaWLitR)) &
           /FCD(0,NY,NX)*LOGPSIMND(NY,NX))))
-      ELSEIF(THETWR.LT.POROS(0,NY,NX))THEN
-        PSISoilMatricP(0,NY,NX)=-EXP(LOGPSIAtSat(NY,NX)+(((LOGPOROS(0,NY,NX)-LOG(THETWR)) &
+      ELSEIF(ThetaWLitR.LT.POROS(0,NY,NX))THEN
+        PSISoilMatricP(0,NY,NX)=-EXP(LOGPSIAtSat(NY,NX)+(((LOGPOROS(0,NY,NX)-LOG(ThetaWLitR)) &
           /PSD(0,NY,NX))**SRP(0,NY,NX)*LOGPSIMXD(NY,NX)))
       ELSE
         PSISoilMatricP(0,NY,NX)=PSISE(0,NY,NX)

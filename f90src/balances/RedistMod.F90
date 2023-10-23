@@ -122,7 +122,7 @@ module RedistMod
 !
       call ChemicalBySnowRedistribution(NY,NX)
 !
-      call UpdateSnowChemFlux(NY,NX)
+      call DiagSnowChemMass(NY,NX)
 !
       call CalcLitterLayerChemicalMass(NY,NX)
 !
@@ -208,11 +208,11 @@ module RedistMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine UpdateSnowChemFlux(NY,NX)
+  subroutine DiagSnowChemMass(NY,NX)
   implicit none
   integer, intent(in) :: NY,NX
   real(r8) :: SSW,ENGYW,WS
-  integer :: L
+  integer :: L,nsalts
   !
   !     UPDATE STATE VARIABLES WITH TOTAL FLUXES CALCULATED ABOVE
   !
@@ -238,25 +238,14 @@ module RedistMod
     TLPO4=TLPO4+trcn_solsml(ids_H1PO4,L,NY,NX)+trcn_solsml(ids_H2PO4,L,NY,NX)
 
     IF(salt_model)THEN
-      SSW=trcs_solsml(idsalt_Al,L,NY,NX)+trcs_solsml(idsalt_Fe,L,NY,NX)+trcs_solsml(idsalt_Hp,L,NY,NX)+trcs_solsml(idsalt_Ca,L,NY,NX) &
-        +trcs_solsml(idsalt_Mg,L,NY,NX)+trcs_solsml(idsalt_Na,L,NY,NX)+trcs_solsml(idsalt_K,L,NY,NX)+trcs_solsml(idsalt_OH,L,NY,NX) &
-        +trcs_solsml(idsalt_SO4,L,NY,NX)+trcs_solsml(idsalt_Cl,L,NY,NX)+trcs_solsml(idsalt_CO3,L,NY,NX)+trcs_solsml(idsalt_H0PO4,L,NY,NX) &
-        +2.0_r8*(trcs_solsml(idsalt_HCO3,L,NY,NX)+trcs_solsml(idsalt_AlOH,L,NY,NX) &
-        +trcs_solsml(idsalt_AlSO4,L,NY,NX)+trcs_solsml(idsalt_FeOH,L,NY,NX)+trcs_solsml(idsalt_FeSO4,L,NY,NX)+trcs_solsml(idsalt_CaOH2,L,NY,NX) &
-        +trcs_solsml(idsalt_CaCO3,L,NY,NX)+trcs_solsml(idsalt_CaSO4,L,NY,NX)+trcs_solsml(idsalt_MgOH2,L,NY,NX)+trcs_solsml(idsalt_MgCO3,L,NY,NX) &
-        +trcs_solsml(idsalt_MgSO4,L,NY,NX)+trcs_solsml(idsalt_NaCO3,L,NY,NX)+trcs_solsml(idsalt_NaSO4,L,NY,NX)+trcs_solsml(idsalt_KSO4,L,NY,NX) &
-        +trcs_solsml(idsalt_CaPO4,L,NY,NX)) &
-        +3.0*(trcs_solsml(idsalt_AlOH2,L,NY,NX)+trcs_solsml(idsalt_FeOH2,L,NY,NX)+trcs_solsml(idsalt_CaHCO3,L,NY,NX) &
-        +trcs_solsml(idsalt_MgHCO3,L,NY,NX)+trcs_solsml(idsalt_FeHPO4,L,NY,NX)+trcs_solsml(idsalt_CaHPO4,L,NY,NX) &
-        +trcs_solsml(idsalt_MgHPO4,L,NY,NX)) &
-        +4.0*(trcs_solsml(idsalt_AlOH3,L,NY,NX)+trcs_solsml(idsalt_FeOH3,L,NY,NX)+trcs_solsml(idsalt_H3PO4,L,NY,NX) &
-        +trcs_solsml(idsalt_FeH2PO4,L,NY,NX)+trcs_solsml(idsalt_CaH2PO4,L,NY,NX)) &
-        +5.0*(trcs_solsml(idsalt_AlOH4,L,NY,NX)+trcs_solsml(idsalt_FeOH4,L,NY,NX))
+      SSW=0._r8
+      do nsalts=idsalt_beg,idsalt_end
+        SSW=SSW+trcs_solsml(nsalts,L,NY,NX)*trcSaltIonNumber(nsalts)
+      ENDDO  
       TION=TION+SSW
-
     ENDIF
   ENDDO
-  end subroutine UpdateSnowChemFlux
+  end subroutine DiagSnowChemMass
 !------------------------------------------------------------------------------------------
 
   subroutine ModifyExWTBLByDisturbance(I,J,NY,NX)
@@ -321,7 +310,7 @@ module RedistMod
   implicit none
   integer, intent(in) :: I,NY,NX
 
-  integer :: L,K,LS,NTG,NTP,NTX
+  integer :: L,K,LS,NTG,NTP,NTX,nsalts
   real(r8):: vhcp1s
   real(r8) :: CI,CH,CO,CX
   real(r8) :: OI,OO
@@ -366,25 +355,25 @@ module RedistMod
 ! XCOFLG: gaseous CO2 flux, [g d-2 h-1]
 ! TCO2Z: total root CO2 content
 ! FLQGQ: precipitation flux into soil surface
-! FLQRQ: precipitation flux into surface litter
+! Rain2LitRSurf: precipitation flux into surface litter
 ! FLQGI: irrifation flux into soil surface
-! FLQRI: irrigation flux into surface litter
+! Irrig2LitRSurf: irrigation flux into surface litter
 ! XCODFG: soil CO2 dissolution (+ve) - volatilization (-ve)
 ! XCODFR: soil surface CO2 dissolution (+ve) - volatilization
 ! UCO2G: total soil CO2 flux, [g d-2]
 ! HCO2G: hourly soil CO2 flux, [g d-2 h-1]
   CI=GasSfAtmFlx(idg_CO2,NY,NX)+R3GasADTFlx(idg_CO2,3,NU(NY,NX),NY,NX) &
     +TRootGasLoss_disturb(idg_CO2,NY,NX) &
-    +(FLQGQ(NY,NX)+FLQRQ(NY,NX))*CCOR(NY,NX) &
-    +(FLQGI(NY,NX)+FLQRI(NY,NX))*CCOQ(NY,NX) &
+    +(Rain2SoilSurf(NY,NX)+Rain2LitRSurf(NY,NX))*CO2_rain_conc(NY,NX) &
+    +(Irrig2SoilSurf(NY,NX)+Irrig2LitRSurf(NY,NX))*CO2_irrig_conc(NY,NX) &
     +GasDisFlx(idg_CO2,0,NY,NX)+trcg_XDFR(idg_CO2,NY,NX)
   CH=GasSfAtmFlx(idg_CH4,NY,NX)+R3GasADTFlx(idg_CH4,3,NU(NY,NX),NY,NX) &
     +TRootGasLoss_disturb(idg_CH4,NY,NX) &
-    +(FLQGQ(NY,NX)+FLQRQ(NY,NX))*CCHR(NY,NX) &
-    +(FLQGI(NY,NX)+FLQRI(NY,NX))*CCHQ(NY,NX) &
+    +(Rain2SoilSurf(NY,NX)+Rain2LitRSurf(NY,NX))*CH4_rain_conc(NY,NX) &
+    +(Irrig2SoilSurf(NY,NX)+Irrig2LitRSurf(NY,NX))*CH4_irrig_conc(NY,NX) &
     +GasDisFlx(idg_CH4,0,NY,NX)+trcg_XDFR(idg_CH4,NY,NX)
-  CO=-IrrigSubsurf(NY,NX)*CCOQ(NY,NX)
-  CX=-IrrigSubsurf(NY,NX)*CCHQ(NY,NX)
+  CO=-IrrigSubsurf(NY,NX)*CO2_irrig_conc(NY,NX)
+  CX=-IrrigSubsurf(NY,NX)*CH4_irrig_conc(NY,NX)
   UCO2G(NY,NX)=UCO2G(NY,NX)+CI
   HCO2G(NY,NX)=HCO2G(NY,NX)+CI
   UCH4G(NY,NX)=UCH4G(NY,NX)+CH
@@ -396,11 +385,11 @@ module RedistMod
   !
   OI=GasSfAtmFlx(idg_O2,NY,NX)+R3GasADTFlx(idg_O2,3,NU(NY,NX),NY,NX) &
     +TRootGasLoss_disturb(idg_O2,NY,NX) &
-    +(FLQGQ(NY,NX)+FLQRQ(NY,NX))*COXR(NY,NX) &
-    +(FLQGI(NY,NX)+FLQRI(NY,NX))*COXQ(NY,NX) &
+    +(Rain2SoilSurf(NY,NX)+Rain2LitRSurf(NY,NX))*O2_rain_conc(NY,NX) &
+    +(Irrig2SoilSurf(NY,NX)+Irrig2LitRSurf(NY,NX))*O2_irrig_conc(NY,NX) &
     +GasDisFlx(idg_O2,0,NY,NX)+trcg_XDFR(idg_O2,NY,NX)
   OXYGIN=OXYGIN+OI
-  OO=RUPOXO(0,NY,NX)-IrrigSubsurf(NY,NX)*COXQ(NY,NX)
+  OO=RUPOXO(0,NY,NX)-IrrigSubsurf(NY,NX)*O2_irrig_conc(NY,NX)
   OXYGOU=OXYGOU+OO
   UOXYG(NY,NX)=UOXYG(NY,NX)+OI
   HOXYG(NY,NX)=HOXYG(NY,NX)+OI
@@ -413,16 +402,16 @@ module RedistMod
   !
   !     SURFACE BOUNDARY N2, N2O, NH3, NH4, NO3, AND DON FLUXES
   !
-  ZSI=((FLQGQ(NY,NX)+FLQRQ(NY,NX)) &
-      *(CN4R(NY,NX)+CN3R(NY,NX)+CNOR(NY,NX)) &
-      +(FLQGI(NY,NX)+FLQRI(NY,NX)) &
-      *(CN4Q(I,NY,NX)+CN3Q(I,NY,NX)+CNOQ(I,NY,NX)))*14.0
-  ZXB=-IrrigSubsurf(NY,NX)*(CNNQ(NY,NX)+CN2Q(NY,NX))-IrrigSubsurf(NY,NX) &
-      *(CN4Q(I,NY,NX)+CN3Q(I,NY,NX)+CNOQ(I,NY,NX))*14.0
+  ZSI=((Rain2SoilSurf(NY,NX)+Rain2LitRSurf(NY,NX)) &
+      *(NH4_rain_conc(NY,NX)+NH3_rain_conc(NY,NX)+NO3_rain_conc(NY,NX)) &
+      +(Irrig2SoilSurf(NY,NX)+Irrig2LitRSurf(NY,NX)) &
+      *(NH4_irrig_conc(I,NY,NX)+NH3_irrig_conc(I,NY,NX)+NO3_irrig_conc(I,NY,NX)))*14.0
+  ZXB=-IrrigSubsurf(NY,NX)*(N2_irrig_conc(NY,NX)+N2O_irrig_conc(NY,NX))-IrrigSubsurf(NY,NX) &
+      *(NH4_irrig_conc(I,NY,NX)+NH3_irrig_conc(I,NY,NX)+NO3_irrig_conc(I,NY,NX))*14.0
   TZIN=TZIN+ZSI
   TZOU=TZOU+ZXB
-  ZGI=(FLQGQ(NY,NX)+FLQRQ(NY,NX))*(CNNR(NY,NX)+CN2R(NY,NX)) &
-      +(FLQGI(NY,NX)+FLQRI(NY,NX))*(CNNQ(NY,NX)+CN2Q(NY,NX)) &
+  ZGI=(Rain2SoilSurf(NY,NX)+Rain2LitRSurf(NY,NX))*(N2_rain_conc(NY,NX)+N2O_rain_conc(NY,NX)) &
+      +(Irrig2SoilSurf(NY,NX)+Irrig2LitRSurf(NY,NX))*(N2_irrig_conc(NY,NX)+N2O_irrig_conc(NY,NX)) &
       +GasSfAtmFlx(idg_N2,NY,NX)+GasSfAtmFlx(idg_N2O,NY,NX)+GasSfAtmFlx(idg_NH3,NY,NX) &
       +GasSfAtmFlx(idg_NH3B,NY,NX)+R3GasADTFlx(idg_N2,3,NU(NY,NX),NY,NX) &
       +R3GasADTFlx(idg_N2O,3,NU(NY,NX),NY,NX)+R3GasADTFlx(idg_NH3,3,NU(NY,NX),NY,NX) &
@@ -451,11 +440,11 @@ module RedistMod
   !
   !     SURFACE BOUNDARY PO4 AND DOP FLUXES
   !
-  PI=patomw*((FLQGQ(NY,NX)+FLQRQ(NY,NX)) &
-      *(CPOR(NY,NX)+CH1PR(NY,NX)) &
-      +(FLQGI(NY,NX)+FLQRI(NY,NX)) &
-      *(CPOQ(I,NY,NX)+CH1PQ(I,NY,NX)))
-  PXB=-patomw*IrrigSubsurf(NY,NX)*(CPOQ(I,NY,NX)+CH1PQ(I,NY,NX))
+  PI=patomw*((Rain2SoilSurf(NY,NX)+Rain2LitRSurf(NY,NX)) &
+      *(H2PO4_rain_conc(NY,NX)+HPO4_rain_conc(NY,NX)) &
+      +(Irrig2SoilSurf(NY,NX)+Irrig2LitRSurf(NY,NX)) &
+      *(H2PO4_irrig_conc(I,NY,NX)+HPO4_irrig_conc(I,NY,NX)))
+  PXB=-patomw*IrrigSubsurf(NY,NX)*(H2PO4_irrig_conc(I,NY,NX)+HPO4_irrig_conc(I,NY,NX))
   TPIN=TPIN+PI
   TPOU=TPOU+PXB
   PDRAIN(NY,NX)=PDRAIN(NY,NX)+trcs_XFLS(ids_H2PO4,3,NK(NY,NX),NY,NX) &
@@ -464,23 +453,23 @@ module RedistMod
   !
   !     SURFACE BOUNDARY ION FLUXES
   !
-  SIN=((FLQGQ(NY,NX)+FLQRQ(NY,NX)) &
-      *(2.0_r8*CN4R(NY,NX)+CN3R(NY,NX)+CNOR(NY,NX)) &
-      +(FLQGI(NY,NX)+FLQRI(NY,NX)) &
-      *(2.0*CN4Q(I,NY,NX)+CN3Q(I,NY,NX)+CNOQ(I,NY,NX)))
-  SGN=(2.0_r8*(FLQGQ(NY,NX)+FLQRQ(NY,NX))*(CNNR(NY,NX)+CN2R(NY,NX)) &
-      +2.0_r8*(FLQGI(NY,NX)+FLQRI(NY,NX))*(CNNQ(NY,NX)+CN2Q(NY,NX)) &
+  SIN=((Rain2SoilSurf(NY,NX)+Rain2LitRSurf(NY,NX)) &
+      *(2.0_r8*NH4_rain_conc(NY,NX)+NH3_rain_conc(NY,NX)+NO3_rain_conc(NY,NX)) &
+      +(Irrig2SoilSurf(NY,NX)+Irrig2LitRSurf(NY,NX)) &
+      *(2.0*NH4_irrig_conc(I,NY,NX)+NH3_irrig_conc(I,NY,NX)+NO3_irrig_conc(I,NY,NX)))
+  SGN=(2.0_r8*(Rain2SoilSurf(NY,NX)+Rain2LitRSurf(NY,NX))*(N2_rain_conc(NY,NX)+N2O_rain_conc(NY,NX)) &
+      +2.0_r8*(Irrig2SoilSurf(NY,NX)+Irrig2LitRSurf(NY,NX))*(N2_irrig_conc(NY,NX)+N2O_irrig_conc(NY,NX)) &
       +2.0_r8*(GasSfAtmFlx(idg_N2,NY,NX)+GasSfAtmFlx(idg_N2O,NY,NX))+GasSfAtmFlx(idg_NH3,NY,NX) &
       +GasSfAtmFlx(idg_NH3B,NY,NX)+2.0_r8*(R3GasADTFlx(idg_N2,3,NU(NY,NX),NY,NX) &
       +R3GasADTFlx(idg_N2O,3,NU(NY,NX),NY,NX))+R3GasADTFlx(idg_NH3,3,NU(NY,NX),NY,NX) &
       +2.0_r8*TRootGasLoss_disturb(idg_N2O,NY,NX)+TRootGasLoss_disturb(idg_NH3,NY,NX) &
       +2.0_r8*(GasDisFlx(idg_N2O,0,NY,NX)+GasDisFlx(idg_N2,0,NY,NX))+GasDisFlx(idg_NH3,0,NY,NX) &
       +2.0_r8*(trcg_XDFR(idg_N2,NY,NX)+trcg_XDFR(idg_N2O,NY,NX))+trcg_XDFR(idg_NH3,NY,NX))/natomw
-  SIP=((FLQGQ(NY,NX)+FLQRQ(NY,NX))*(3.0_r8*CPOR(NY,NX)+2.0_r8*CH1PR(NY,NX)) &
-      +(FLQGI(NY,NX)+FLQRI(NY,NX))*(3.0_r8*CPOQ(I,NY,NX)+2.0_r8*CH1PQ(I,NY,NX)))
-  SNB=-IrrigSubsurf(NY,NX)*(CNNQ(NY,NX)+CN2Q(NY,NX))-IrrigSubsurf(NY,NX) &
-      *(2.0_r8*CN4Q(I,NY,NX)+CN3Q(I,NY,NX)+CNOQ(I,NY,NX))
-      SPB=-IrrigSubsurf(NY,NX)*(3.0*CPOQ(I,NY,NX)+2.0*CH1PQ(I,NY,NX))
+  SIP=((Rain2SoilSurf(NY,NX)+Rain2LitRSurf(NY,NX))*(3.0_r8*H2PO4_rain_conc(NY,NX)+2.0_r8*HPO4_rain_conc(NY,NX)) &
+      +(Irrig2SoilSurf(NY,NX)+Irrig2LitRSurf(NY,NX))*(3.0_r8*H2PO4_irrig_conc(I,NY,NX)+2.0_r8*HPO4_irrig_conc(I,NY,NX)))
+  SNB=-IrrigSubsurf(NY,NX)*(N2_irrig_conc(NY,NX)+N2O_irrig_conc(NY,NX))-IrrigSubsurf(NY,NX) &
+      *(2.0_r8*NH4_irrig_conc(I,NY,NX)+NH3_irrig_conc(I,NY,NX)+NO3_irrig_conc(I,NY,NX))
+      SPB=-IrrigSubsurf(NY,NX)*(3.0*H2PO4_irrig_conc(I,NY,NX)+2.0*HPO4_irrig_conc(I,NY,NX))
   SNM0=(2.0_r8*XNH4S(0,NY,NX)+XNO3S(0,NY,NX)+XNO2S(0,NY,NX) &
       -2.0_r8*XN2GS(0,NY,NX))/natomw
   SPM0=(2.0_r8*XH1PS(0,NY,NX)+3.0_r8*XH2PS(0,NY,NX))/patomw
@@ -497,48 +486,19 @@ module RedistMod
   !     SURFACE BOUNDARY SALT FLUXES FROM RAINFALL AND SURFACE IRRIGATION
   !
   IF(salt_model)THEN
-    SIR=PrecAtm(NY,NX)*(CALR(NY,NX)+CFER(NY,NX)+CHYR(NY,NX)+CCAR(NY,NX) &
-      +CMGR(NY,NX)+CNAR(NY,NX)+CKAR(NY,NX)+COHR(NY,NX)+CSOR(NY,NX) &
-      +CCLR(NY,NX)+CC3R(NY,NX)+CH0PR(NY,NX) &
-      +2.0_r8*(CHCR(NY,NX)+CAL1R(NY,NX)+CALSR(NY,NX)+CFE1R(NY,NX) &
-      +CFESR(NY,NX)+CCAOR(NY,NX)+CCACR(NY,NX)+CCASR(NY,NX)+CMGOR(NY,NX) &
-      +CMGCR(NY,NX)+CMGSR(NY,NX)+CNACR(NY,NX)+CNASR(NY,NX) &
-      +CKASR(NY,NX)+CC0PR(NY,NX)) &
-      +3.0_r8*(CAL2R(NY,NX)+CFE2R(NY,NX)+CCAHR(NY,NX)+CMGHR(NY,NX) &
-      +CF1PR(NY,NX)+CC1PR(NY,NX)+CM1PR(NY,NX)) &
-      +4.0_r8*(CAL3R(NY,NX)+CFE3R(NY,NX)+CH3PR(NY,NX)+CF2PR(NY,NX) &
-      +CC2PR(NY,NX)) &
-      +5.0_r8*(CAL4R(NY,NX)+CFE4R(NY,NX)))
-    SII=IrrigSurface(NY,NX)*(CALQ(I,NY,NX)+CFEQ(I,NY,NX)+CHYQ(I,NY,NX) &
-      +CCAQ(I,NY,NX)+CMGQ(I,NY,NX)+CNAQ(I,NY,NX)+CKAQ(I,NY,NX) &
-      +COHQ(I,NY,NX)+CSOQ(I,NY,NX)+CCLQ(I,NY,NX)+CC3Q(I,NY,NX) &
-      +CH0PQ(I,NY,NX) &
-      +2.0_r8*(CHCQ(I,NY,NX)+CAL1Q(I,NY,NX)+CALSQ(I,NY,NX) &
-      +CFE1Q(I,NY,NX)+CFESQ(I,NY,NX)+CCAOQ(I,NY,NX)+CCACQ(I,NY,NX) &
-      +CCASQ(I,NY,NX)+CMGOQ(I,NY,NX)+CMGCQ(I,NY,NX)+CMGSQ(I,NY,NX) &
-      +CNACQ(I,NY,NX)+CNASQ(I,NY,NX)+CKASQ(I,NY,NX)+CC0PQ(I,NY,NX)) &
-      +3.0_r8*(CAL2Q(I,NY,NX)+CFE2Q(I,NY,NX)+CCAHQ(I,NY,NX) &
-      +CMGHQ(I,NY,NX)+CF1PQ(I,NY,NX)+CC1PQ(I,NY,NX)+CM1PQ(I,NY,NX)) &
-      +4.0_r8*(CAL3Q(I,NY,NX)+CFE3Q(I,NY,NX) &
-      +CH3PQ(I,NY,NX)+CF2PQ(I,NY,NX)+CC2PQ(I,NY,NX)) &
-      +5.0_r8*(CAL4Q(I,NY,NX)+CFE4Q(I,NY,NX)))
+    SIR=0._r8
+    SII=0._r8
+    do nsalts=idsalt_beg,idsalt_end
+      SIR=SIR+trcsalt_rain_conc(nsalts,NY,NX)*trcSaltIonNumber(nsalts)
+      SII=SII+trcsalt_irrig_conc(idsalt_Al,I,NY,NX)*trcSaltIonNumber(nsalts)
+    ENDDO  
+    SIR=SIR*PrecAtm(NY,NX)
+    SBU=-IrrigSubsurf(NY,NX)*SII
+    SII=SII*IrrigSurface(NY,NX)
     TIONIN=TIONIN+SIR+SII
     !
     !     SUBSURFACE BOUNDARY SALT FLUXES FROM SUBSURFACE IRRIGATION
     !
-    SBU=-IrrigSubsurf(NY,NX)*(CALQ(I,NY,NX)+CFEQ(I,NY,NX)+CHYQ(I,NY,NX) &
-      +CCAQ(I,NY,NX)+CMGQ(I,NY,NX)+CNAQ(I,NY,NX)+CKAQ(I,NY,NX) &
-      +COHQ(I,NY,NX)+CSOQ(I,NY,NX)+CCLQ(I,NY,NX)+CC3Q(I,NY,NX) &
-      +CH0PQ(I,NY,NX) &
-      +2.0_r8*(CHCQ(I,NY,NX)+CAL1Q(I,NY,NX)+CALSQ(I,NY,NX) &
-      +CFE1Q(I,NY,NX)+CFESQ(I,NY,NX)+CCAOQ(I,NY,NX)+CCACQ(I,NY,NX) &
-      +CCASQ(I,NY,NX)+CMGOQ(I,NY,NX)+CMGCQ(I,NY,NX)+CMGSQ(I,NY,NX) &
-      +CNACQ(I,NY,NX)+CNASQ(I,NY,NX)+CKASQ(I,NY,NX)+CC0PQ(I,NY,NX)) &
-      +3.0_r8*(CAL2Q(I,NY,NX)+CFE2Q(I,NY,NX)+CCAHQ(I,NY,NX)+CMGHQ(I,NY,NX) &
-      +CF1PQ(I,NY,NX)+CC1PQ(I,NY,NX)+CM1PQ(I,NY,NX)) &
-      +4.0_r8*(CAL3Q(I,NY,NX)+CFE3Q(I,NY,NX) &
-      +CH3PQ(I,NY,NX)+CF2PQ(I,NY,NX)+CC2PQ(I,NY,NX)) &
-      +5.0_r8*(CAL4Q(I,NY,NX)+CFE4Q(I,NY,NX)))
     TIONOU=TIONOU+SBU
   ENDIF
   !
@@ -593,9 +553,9 @@ module RedistMod
 
   !ROXYL:=soil surface O2 dissolution + aqueous O2 flux micropore
   ROXYL(0,NY,NX)=trcg_XDFR(idg_O2,NY,NX)+trcs_XFLS(idg_O2,3,0,NY,NX) &
-    -(FLQRQ(NY,NX)*COXR(NY,NX)+FLQRI(NY,NX)*COXQ(NY,NX))
+    -(Rain2LitRSurf(NY,NX)*O2_rain_conc(NY,NX)+Irrig2LitRSurf(NY,NX)*O2_irrig_conc(NY,NX))
   RCH4L(0,NY,NX)=trcg_XDFR(idg_CH4,NY,NX)+trcs_XFLS(idg_CH4,3,0,NY,NX) &
-    -(FLQRQ(NY,NX)*CCHR(NY,NX)+FLQRI(NY,NX)*CCHQ(NY,NX))
+    -(Rain2LitRSurf(NY,NX)*CH4_rain_conc(NY,NX)+Irrig2LitRSurf(NY,NX)*CH4_irrig_conc(NY,NX))
   ROXYL(NU(NY,NX),NY,NX)=ROXYL(NU(NY,NX),NY,NX)+GasSfAtmFlx(idg_O2,NY,NX)
   RCH4L(NU(NY,NX),NY,NX)=RCH4L(NU(NY,NX),NY,NX)+GasSfAtmFlx(idg_CH4,NY,NX)
   !
@@ -877,20 +837,20 @@ module RedistMod
   UPO4(NY,NX)=UPO4(NY,NX)+POX
   UPP4(NY,NX)=UPP4(NY,NX)+POP
 
-  IF(salt_model)call UpdateSurfaceLayerSalt(NY,NX,TLPO4)
+  IF(salt_model)call DiagSurfLitRLayerSalt(NY,NX,TLPO4)
 
   end subroutine CalcLitterLayerChemicalMass
 !------------------------------------------------------------------------------------------
 
-  subroutine UpdateSurfaceLayerSalt(NY,NX,TLPO4)
+  subroutine DiagSurfLitRLayerSalt(NY,NX,TLPO4)
   implicit none
   integer, intent(in) :: NY,NX
   real(r8), intent(inout) :: TLPO4
   real(r8) :: SSS,PSS
-  INTEGER :: NTSA
+  INTEGER :: nsalts
 
-  DO NTSA=idsalt_beg,idsalt_end
-    trcSalt_solml(NTSA,0,NY,NX)=trcSalt_solml(NTSA,0,NY,NX)+trcSalt_XFLS(NTSA,3,0,NY,NX)
+  DO nsalts=idsalt_beg,idsalt_end
+    trcSalt_solml(nsalts,0,NY,NX)=trcSalt_solml(nsalts,0,NY,NX)+trcSalt3DFlo2Cell(nsalts,3,0,NY,NX)
   ENDDO
 
   PSS=patomw*(trcSalt_solml(idsalt_H0PO4,0,NY,NX)+trcSalt_solml(idsalt_H3PO4,0,NY,NX)&
@@ -899,31 +859,14 @@ module RedistMod
     +trcSalt_solml(idsalt_CaHPO4,0,NY,NX) &
     +trcSalt_solml(idsalt_CaH2PO4,0,NY,NX)+trcSalt_solml(idsalt_MgHPO4,0,NY,NX))
   TLPO4=TLPO4+PSS
-  SSS=trcSalt_solml(idsalt_Al,0,NY,NX)+trcSalt_solml(idsalt_Fe,0,NY,NX) &
-    +trcSalt_solml(idsalt_Hp,0,NY,NX)+trcSalt_solml(idsalt_Ca,0,NY,NX) &
-    +trcSalt_solml(idsalt_Mg,0,NY,NX)+trcSalt_solml(idsalt_Na,0,NY,NX) &
-    +trcSalt_solml(idsalt_K,0,NY,NX)+trcSalt_solml(idsalt_OH,0,NY,NX) &
-    +trcSalt_solml(idsalt_SO4,0,NY,NX)+trcSalt_solml(idsalt_Cl,0,NY,NX) &
-    +trcSalt_solml(idsalt_CO3,0,NY,NX)+trcSalt_solml(idsalt_H0PO4,0,NY,NX) &
-    +2.0*(trcSalt_solml(idsalt_HCO3,0,NY,NX)+trcSalt_solml(idsalt_AlOH,0,NY,NX) &
-    +trcSalt_solml(idsalt_AlSO4,0,NY,NX) &
-    +trcSalt_solml(idsalt_FeOH,0,NY,NX)+trcSalt_solml(idsalt_FeSO4,0,NY,NX) &
-    +trcSalt_solml(idsalt_CaOH2,0,NY,NX)+trcSalt_solml(idsalt_CaCO3,0,NY,NX) &
-    +trcSalt_solml(idsalt_CaSO4,0,NY,NX)+trcSalt_solml(idsalt_MgOH2,0,NY,NX) &
-    +trcSalt_solml(idsalt_MgCO3,0,NY,NX)+trcSalt_solml(idsalt_MgSO4,0,NY,NX) &
-    +trcSalt_solml(idsalt_NaCO3,0,NY,NX)+trcSalt_solml(idsalt_NaSO4,0,NY,NX) &
-    +trcSalt_solml(idsalt_KSO4,0,NY,NX)+trcSalt_solml(idsalt_CaPO4,0,NY,NX)) &
-    +3.0*(trcSalt_solml(idsalt_AlOH2,0,NY,NX)+trcSalt_solml(idsalt_FeOH2,0,NY,NX) &
-    +trcSalt_solml(idsalt_CaHCO3,0,NY,NX) &
-    +trcSalt_solml(idsalt_MgHCO3,0,NY,NX)+trcSalt_solml(idsalt_FeHPO4,0,NY,NX) &
-    +trcSalt_solml(idsalt_CaHPO4,0,NY,NX)+trcSalt_solml(idsalt_MgHPO4,0,NY,NX)) &
-    +4.0*(trcSalt_solml(idsalt_AlOH3,0,NY,NX)+trcSalt_solml(idsalt_FeOH3,0,NY,NX) &
-    +trcSalt_solml(idsalt_H3PO4,0,NY,NX) &
-    +trcSalt_solml(idsalt_FeH2PO4,0,NY,NX)+trcSalt_solml(idsalt_CaH2PO4,0,NY,NX)) &
-    +5.0*(trcSalt_solml(idsalt_AlOH4,0,NY,NX)+trcSalt_solml(idsalt_FeOH4,0,NY,NX))
+  SSS=0._r8
+  do nsalts=idsalt_beg,idsalt_end
+    SSS=SSS+trcSalt_solml(nsalts,0,NY,NX)*trcSaltIonNumber(nsalts)
+  enddo
+
   TION=TION+SSS
   UION(NY,NX)=UION(NY,NX)+SSS
-  end subroutine UpdateSurfaceLayerSalt
+  end subroutine DiagSurfLitRLayerSalt
 !------------------------------------------------------------------------------------------
   subroutine update_physVar_Profile(NY,NX,VOLISO,DVLiceMicP)    
   !     WATER, ICE, HEAT, TEMPERATUR
@@ -1345,12 +1288,16 @@ module RedistMod
     ZOF=natomw*(FertN_soil(ifert_no3,L,NY,NX)+FertN_soil(ifert_no3,L,NY,NX))
     TLNO3=TLNO3+ZOS+ZOF
     UNO3(NY,NX)=UNO3(NY,NX)+ZOS
+
     POS=trc_solml(ids_H2PO4,L,NY,NX)+trc_soHml(ids_H2PO4,L,NY,NX)+trc_solml(ids_H2PO4B,L,NY,NX) &
       +trc_soHml(ids_H2PO4B,L,NY,NX)+trc_solml(ids_H1PO4,L,NY,NX)+trc_soHml(ids_H1PO4,L,NY,NX) &
       +trc_solml(ids_H1PO4B,L,NY,NX)+trc_soHml(ids_H1PO4B,L,NY,NX)
 
+    !exchangeable P
     POX=patomw*(trcx_solml(idx_HPO4,L,NY,NX)+trcx_solml(idx_H2PO4,L,NY,NX) &
       +trcx_solml(idx_HPO4B,L,NY,NX)+trcx_solml(idx_H2PO4B,L,NY,NX))
+
+    !precipitated P
     POP=patomw*(trcp_salml(idsp_AlPO4,L,NY,NX)+trcp_salml(idsp_FePO4,L,NY,NX)&
       +trcp_salml(idsp_CaHPO4,L,NY,NX)+trcp_salml(idsp_AlPO4B,L,NY,NX)&
       +trcp_salml(idsp_FePO4B,L,NY,NX)+trcp_salml(idsp_CaHPO4B,L,NY,NX)) &
@@ -1375,17 +1322,17 @@ module RedistMod
   implicit none
   integer, intent(in) :: L, NY,NX
   real(r8), intent(inout) :: TLPO4
-  integer  :: NTP,NTSA
+  integer  :: NTP,nsalts
   real(r8) :: ECHY,ECOH,ECAL,ECFE,ECCA,ECMG,ECNA,ECKA,ECCO,ECHC
   real(r8) :: ECNO,ECSO,ECCL
   real(r8) :: PSS,SSS,SSH,SSF,SSX,SST,SSP
 
-  DO NTSA=idsalt_beg,idsaltb_end
-    trcSalt_solml(NTSA,L,NY,NX)=trcSalt_solml(NTSA,L,NY,NX)+trcSalt_TR(NTSA,L,NY,NX) &
-      +trcSalt_TFLS(NTSA,L,NY,NX)+trcSalt_RFLU(NTSA,L,NY,NX)+trcSalt_XFXS(NTSA,L,NY,NX)
+  DO nsalts=idsalt_beg,idsaltb_end
+    trcSalt_solml(nsalts,L,NY,NX)=trcSalt_solml(nsalts,L,NY,NX)+trcSalt_TR(nsalts,L,NY,NX) &
+      +trcSalt_TFLS(nsalts,L,NY,NX)+trcSalt_RFLU(nsalts,L,NY,NX)+trcSalt_XFXS(nsalts,L,NY,NX)
 
-    trcSalt_soHml(NTSA,L,NY,NX)=trcSalt_soHml(NTSA,L,NY,NX)+trcSalt_TFHS(NTSA,L,NY,NX) &
-      -trcSalt_XFXS(NTSA,L,NY,NX)
+    trcSalt_soHml(nsalts,L,NY,NX)=trcSalt_soHml(nsalts,L,NY,NX)+trcSalt_TFHS(nsalts,L,NY,NX) &
+      -trcSalt_XFXS(nsalts,L,NY,NX)
   ENDDO
   trcSalt_solml(idsalt_AlOH2,L,NY,NX)=trcSalt_solml(idsalt_AlOH2,L,NY,NX)-TR_AlO2H2_sorbed_soil(L,NY,NX)
   trcSalt_solml(idsalt_FeOH2,L,NY,NX)=trcSalt_solml(idsalt_FeOH2,L,NY,NX)-TR_FeO2H2_sorbed_soil(L,NY,NX)
@@ -1406,83 +1353,22 @@ module RedistMod
     trcp_salml(NTP,L,NY,NX)=trcp_salml(NTP,L,NY,NX)+trcp_TR(NTP,L,NY,NX)
   ENDDO
 
-  PSS=patomw*(trcSalt_solml(idsalt_H0PO4,L,NY,NX)+trcSalt_solml(idsalt_H3PO4,L,NY,NX) &
-    +trcSalt_solml(idsalt_FeHPO4,L,NY,NX) &
-    +trcSalt_solml(idsalt_FeH2PO4,L,NY,NX)+trcSalt_solml(idsalt_CaPO4,L,NY,NX) &
-    +trcSalt_solml(idsalt_CaHPO4,L,NY,NX) &
-    +trcSalt_solml(idsalt_CaH2PO4,L,NY,NX)+trcSalt_solml(idsalt_MgHPO4,L,NY,NX) &
-    +trcSalt_solml(idsalt_H0PO4B,L,NY,NX) &
-    +trcSalt_solml(idsalt_H3PO4B,L,NY,NX)+trcSalt_solml(idsalt_FeHPO4B,L,NY,NX) &
-    +trcSalt_solml(idsalt_FeH2PO4B,L,NY,NX) &
-    +trcSalt_solml(idsalt_CaPO4B,L,NY,NX)+trcSalt_solml(idsalt_CaHPO4B,L,NY,NX) &
-    +trcSalt_solml(idsalt_CaH2PO4B,L,NY,NX) &
-    +trcSalt_solml(idsalt_MgHPO4B,L,NY,NX)+trcSalt_soHml(idsalt_H0PO4,L,NY,NX)&
-    +trcSalt_soHml(idsalt_H3PO4,L,NY,NX)+trcSalt_soHml(idsalt_FeHPO4,L,NY,NX) &
-    +trcSalt_soHml(idsalt_FeH2PO4,L,NY,NX)+trcSalt_soHml(idsalt_CaPO4,L,NY,NX) &
-    +trcSalt_soHml(idsalt_CaHPO4,L,NY,NX)+trcSalt_soHml(idsalt_CaH2PO4,L,NY,NX) &
-    +trcSalt_soHml(idsalt_MgHPO4,L,NY,NX)+trcSalt_soHml(idsalt_H0PO4B,L,NY,NX) &
-    +trcSalt_soHml(idsalt_H3PO4B,L,NY,NX)+trcSalt_soHml(idsalt_FeHPO4B,L,NY,NX) &
-    +trcSalt_soHml(idsalt_FeH2PO4B,L,NY,NX)+trcSalt_soHml(idsalt_CaPO4B,L,NY,NX)&
-    +trcSalt_soHml(idsalt_CaHPO4B,L,NY,NX)+trcSalt_soHml(idsalt_CaH2PO4B,L,NY,NX) &
-    +trcSalt_soHml(idsalt_MgHPO4B,L,NY,NX))
+  PSS=0._r8
+  DO nsalts=idsalt_psoil_beg,idsalt_pband_end
+    PSS=PSS+trcSalt_solml(nsalts,L,NY,NX)+trcSalt_soHml(nsalts,L,NY,NX)
+  ENDDO
+  PSS=PSS*patomw  
+
   TLPO4=TLPO4+PSS
 
-  SSS=trcSalt_solml(idsalt_Al,L,NY,NX)+trcSalt_solml(idsalt_Fe,L,NY,NX) &
-    +trcSalt_solml(idsalt_Hp,L,NY,NX)+trcSalt_solml(idsalt_Ca,L,NY,NX) &
-    +trcSalt_solml(idsalt_Mg,L,NY,NX)+trcSalt_solml(idsalt_Na,L,NY,NX) &
-    +trcSalt_solml(idsalt_K,L,NY,NX)+trcSalt_solml(idsalt_OH,L,NY,NX) &
-    +trcSalt_solml(idsalt_SO4,L,NY,NX)+trcSalt_solml(idsalt_Cl,L,NY,NX) &
-    +trcSalt_solml(idsalt_CO3,L,NY,NX)+trcSalt_solml(idsalt_H0PO4,L,NY,NX) &
-    +trcSalt_solml(idsalt_H0PO4B,L,NY,NX) &
-    +2.0_r8*(trcSalt_solml(idsalt_HCO3,L,NY,NX)+trcSalt_solml(idsalt_AlOH,L,NY,NX) &
-    +trcSalt_solml(idsalt_AlSO4,L,NY,NX)+trcSalt_solml(idsalt_FeOH,L,NY,NX)&
-    +trcSalt_solml(idsalt_FeSO4,L,NY,NX)+trcSalt_solml(idsalt_CaOH2,L,NY,NX) &
-    +trcSalt_solml(idsalt_CaCO3,L,NY,NX)+trcSalt_solml(idsalt_CaSO4,L,NY,NX)&
-    +trcSalt_solml(idsalt_MgOH2,L,NY,NX)+trcSalt_solml(idsalt_MgCO3,L,NY,NX) &
-    +trcSalt_solml(idsalt_MgSO4,L,NY,NX)+trcSalt_solml(idsalt_NaCO3,L,NY,NX)&
-    +trcSalt_solml(idsalt_NaSO4,L,NY,NX)+trcSalt_solml(idsalt_KSO4,L,NY,NX) &
-    +trcSalt_solml(idsalt_CaPO4,L,NY,NX)+trcSalt_solml(idsalt_CaPO4B,L,NY,NX)) &
-    +3.0_r8*(trcSalt_solml(idsalt_AlOH2,L,NY,NX)+trcSalt_solml(idsalt_FeOH2,L,NY,NX)&
-    +trcSalt_solml(idsalt_CaHCO3,L,NY,NX) &
-    +trcSalt_solml(idsalt_MgHCO3,L,NY,NX)+trcSalt_solml(idsalt_FeHPO4,L,NY,NX)&
-    +trcSalt_solml(idsalt_CaHPO4,L,NY,NX)+trcSalt_solml(idsalt_MgHPO4,L,NY,NX) &
-    +trcSalt_solml(idsalt_FeHPO4B,L,NY,NX)+trcSalt_solml(idsalt_CaHPO4B,L,NY,NX)&
-    +trcSalt_solml(idsalt_MgHPO4B,L,NY,NX)) &
-    +4.0_r8*(trcSalt_solml(idsalt_AlOH3,L,NY,NX)+trcSalt_solml(idsalt_FeOH3,L,NY,NX) &
-    +trcSalt_solml(idsalt_H3PO4,L,NY,NX) &
-    +trcSalt_solml(idsalt_FeH2PO4,L,NY,NX)+trcSalt_solml(idsalt_CaH2PO4,L,NY,NX) &
-    +trcSalt_solml(idsalt_H3PO4B,L,NY,NX)+trcSalt_solml(idsalt_FeH2PO4B,L,NY,NX) &
-    +trcSalt_solml(idsalt_CaH2PO4B,L,NY,NX)) &
-    +5.0_r8*(trcSalt_solml(idsalt_AlOH4,L,NY,NX)+trcSalt_solml(idsalt_FeOH4,L,NY,NX))
+  SSS=0._r8
+  SSH=0._r8
+  DO nsalts=idsalt_beg,idsaltb_end
+    SSS=SSS+trcSalt_solml(nsalts,L,NY,NX)*trcSaltIonNumber(nsalts)
+    SSH=SSH+trcSalt_soHml(idsalt_Al,L,NY,NX)*trcSaltIonNumber(nsalts)
+  ENDDO
 
-  SSH=trcSalt_soHml(idsalt_Al,L,NY,NX)+trcSalt_soHml(idsalt_Fe,L,NY,NX)&
-    +trcSalt_soHml(idsalt_Hp,L,NY,NX)+trcSalt_soHml(idsalt_Ca,L,NY,NX) &
-    +trcSalt_soHml(idsalt_Mg,L,NY,NX)+trcSalt_soHml(idsalt_Na,L,NY,NX) &
-    +trcSalt_soHml(idsalt_K,L,NY,NX)+trcSalt_soHml(idsalt_OH,L,NY,NX)  &
-    +trcSalt_soHml(idsalt_SO4,L,NY,NX)+trcSalt_soHml(idsalt_Cl,L,NY,NX) &
-    +trcSalt_soHml(idsalt_CO3,L,NY,NX) +trcSalt_soHml(idsalt_H0PO4,L,NY,NX) &
-    +trcSalt_soHml(idsalt_H0PO4B,L,NY,NX) &
-    +2.0_r8*(trcSalt_soHml(idsalt_HCO3,L,NY,NX)+trcSalt_soHml(idsalt_AlOH,L,NY,NX) &
-    +trcSalt_soHml(idsalt_AlSO4,L,NY,NX)+trcSalt_soHml(idsalt_FeOH,L,NY,NX) &
-    +trcSalt_soHml(idsalt_FeSO4,L,NY,NX)+trcSalt_soHml(idsalt_CaOH2,L,NY,NX) &
-    +trcSalt_soHml(idsalt_CaCO3,L,NY,NX)+trcSalt_soHml(idsalt_CaSO4,L,NY,NX) &
-    +trcSalt_soHml(idsalt_MgOH2,L,NY,NX)+trcSalt_soHml(idsalt_MgCO3,L,NY,NX) &
-    +trcSalt_soHml(idsalt_MgSO4,L,NY,NX)+trcSalt_soHml(idsalt_NaCO3,L,NY,NX) &
-    +trcSalt_soHml(idsalt_NaSO4,L,NY,NX)+trcSalt_soHml(idsalt_KSO4,L,NY,NX) &
-    +trcSalt_soHml(idsalt_CaPO4,L,NY,NX)+trcSalt_soHml(idsalt_CaPO4B,L,NY,NX)) &
-    +3.0_r8*(trcSalt_soHml(idsalt_AlOH2,L,NY,NX)+trcSalt_soHml(idsalt_FeOH2,L,NY,NX) &
-    +trcSalt_soHml(idsalt_CaHCO3,L,NY,NX) &
-    +trcSalt_soHml(idsalt_MgHCO3,L,NY,NX)+trcSalt_soHml(idsalt_FeHPO4,L,NY,NX) &
-    +trcSalt_soHml(idsalt_CaHPO4,L,NY,NX)+trcSalt_soHml(idsalt_MgHPO4,L,NY,NX) &
-    +trcSalt_soHml(idsalt_FeHPO4B,L,NY,NX)+trcSalt_soHml(idsalt_CaHPO4B,L,NY,NX) &
-    +trcSalt_soHml(idsalt_MgHPO4B,L,NY,NX)) &
-    +4.0_r8*(trcSalt_soHml(idsalt_AlOH3,L,NY,NX)+trcSalt_soHml(idsalt_FeOH3,L,NY,NX) &
-    +trcSalt_soHml(idsalt_H3PO4,L,NY,NX) &
-    +trcSalt_soHml(idsalt_FeH2PO4,L,NY,NX)+trcSalt_soHml(idsalt_CaH2PO4,L,NY,NX) &
-    +trcSalt_soHml(idsalt_H3PO4B,L,NY,NX) &
-    +trcSalt_soHml(idsalt_FeH2PO4B,L,NY,NX)+trcSalt_soHml(idsalt_CaH2PO4B,L,NY,NX)) &
-    +5.0_r8*(trcSalt_soHml(idsalt_AlOH4,L,NY,NX)+trcSalt_soHml(idsalt_FeOH4,L,NY,NX))
-!
+ 
 !     TOTAL FERILIZER,EXCHANGEABLE CATIONS AND ANIONS, PRECIPITATES
 !
   SSF=FertN_soil(ifert_nh3,L,NY,NX)+FertN_soil(ifert_urea,L,NY,NX) &
@@ -1490,6 +1376,7 @@ module RedistMod
     +FertN_band(ifert_nh3_band,L,NY,NX)+FertN_band(ifert_urea_band,L,NY,NX) &
     +FertN_band(ifert_no3_band,L,NY,NX) &
     +2.0_r8*(FertN_soil(ifert_nh4,L,NY,NX)+FertN_band(ifert_nh4_band,L,NY,NX))
+
   SSX=trcx_solml(idx_Hp,L,NY,NX)+trcx_solml(idx_Al,L,NY,NX) &
     +trcx_solml(idx_Fe,L,NY,NX)+trcx_solml(idx_Ca,L,NY,NX)+trcx_solml(idx_Mg,L,NY,NX) &
     +trcx_solml(idx_Na,L,NY,NX)+trcx_solml(idx_K,L,NY,NX)+trcx_solml(idx_COOH,L,NY,NX) &
@@ -1500,6 +1387,7 @@ module RedistMod
     +trcx_solml(idx_OHp,L,NY,NX)+trcx_solml(idx_OHpB,L,NY,NX) &
     +trcx_solml(idx_HPO4,L,NY,NX)+trcx_solml(idx_HPO4B,L,NY,NX)) &
     +4.0_r8*(trcx_solml(idx_H2PO4,L,NY,NX)+trcx_solml(idx_H2PO4B,L,NY,NX))
+
   SSP=2.0_r8*(trcp_salml(idsp_CaCO3,L,NY,NX)+trcp_salml(idsp_CaSO4,L,NY,NX) &
     +trcp_salml(idsp_AlPO4,L,NY,NX)+trcp_salml(idsp_FePO4,L,NY,NX) &
     +trcp_salml(idsp_AlPO4B,L,NY,NX)+trcp_salml(idsp_FePO4B,L,NY,NX)) &
@@ -1507,6 +1395,7 @@ module RedistMod
     +4.0_r8*(trcp_salml(idsp_AlOH3,L,NY,NX)+trcp_salml(idsp_FeOH3,L,NY,NX)) &
     +7.0_r8*(trcp_salml(idsp_CaH2PO4,L,NY,NX)+trcp_salml(idsp_CaH2PO4B,L,NY,NX)) &
     +9.0_r8*(trcp_salml(idsp_HA,L,NY,NX)+trcp_salml(idsp_HAB,L,NY,NX))
+
   SST=SSS+SSH+SSF+SSX+SSP
   TION=TION+SST
   UION(NY,NX)=UION(NY,NX)+SST

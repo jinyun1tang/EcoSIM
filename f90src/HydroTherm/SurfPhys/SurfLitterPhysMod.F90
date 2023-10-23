@@ -205,7 +205,7 @@ implicit none
   real(r8) :: TKXR,TK1X,TKY
   real(r8) :: FLVC,FLVX,ENGYR
   real(r8) :: HFLWC,HFLWX,EVAPR2,LatentHeatAir2LitR2,HeatSensEvapAir2LitR2
-  real(r8) :: NetHeatAir2LitR2,LWRadLitR2,THETWR,HeatSensAir2LitR2,EvapLitR2Soi2,HeatSensVapLitR2Soi2
+  real(r8) :: NetHeatAir2LitR2,LWRadLitR2,ThetaWLitR,HeatSensAir2LitR2,EvapLitR2Soi2,HeatSensVapLitR2Soi2
   real(r8) :: PARE,PARS,RAGX,RI,Radnet2LitR2,TotHeatAir2LitR2,HeatSensLitR2Soi2
   real(r8) :: VLHeatCapcityLitR2,VLHeatCapacity2
   real(r8) :: VLWatMicP12,VWatLitr2
@@ -246,32 +246,32 @@ implicit none
 !
 !     LWRadLitR2=longwave radiation emitted by litter
 !     Radnet2LitR2=litter net radiation,after taking out outgoing radiation from litter 
-!     THETWR=litter water content
+!     ThetaWLitR=litter water content
 !     VWatLitRHoldCapcity=maximum water retention by litter
 !     PSISM1=litter matric water potential
 !
       LWRadLitR2=THRMR(NY,NX)*TKR1**4._r8
       Radnet2LitR2=RFLX0-LWRadLitR2
       IF(VWatLitRHoldCapcity(NY,NX).GT.ZEROS2(NY,NX))THEN
-        THETWR=AMIN1(VWatLitRHoldCapcity(NY,NX),VWatLitr2)/VLitR(NY,NX)
+        ThetaWLitR=AMIN1(VWatLitRHoldCapcity(NY,NX),VWatLitr2)/VLitR(NY,NX)
       ELSE
-        THETWR=POROS0(NY,NX)
+        ThetaWLitR=POROS0(NY,NX)
       ENDIF
 
       IF(VLitR(NY,NX).GT.ZEROS(NY,NX).AND.VLWatMicP1(0,NY,NX).GT.ZEROS2(NY,NX))THEN
-        THETWR=AMIN1(VWatLitRHoldCapcity(NY,NX),VLWatMicP1(0,NY,NX))/VLitR(NY,NX)
-        IF(THETWR.LT.FieldCapacity(0,NY,NX))THEN
+        ThetaWLitR=AMIN1(VWatLitRHoldCapcity(NY,NX),VLWatMicP1(0,NY,NX))/VLitR(NY,NX)
+        IF(ThetaWLitR.LT.FieldCapacity(0,NY,NX))THEN
           PSISM1(0,NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIFLD(NY,NX) &
-            +((LOGFldCapacity(0,NY,NX)-LOG(THETWR))/FCD(0,NY,NX)*LOGPSIMND(NY,NX))))
-        ELSEIF(THETWR.LT.POROS0(NY,NX))THEN
-          PSISM1(0,NY,NX)=-EXP(LOGPSIAtSat(NY,NX)+(((LOGPOROS(0,NY,NX)-LOG(THETWR)) &
+            +((LOGFldCapacity(0,NY,NX)-LOG(ThetaWLitR))/FCD(0,NY,NX)*LOGPSIMND(NY,NX))))
+        ELSEIF(ThetaWLitR.LT.POROS0(NY,NX))THEN
+          PSISM1(0,NY,NX)=-EXP(LOGPSIAtSat(NY,NX)+(((LOGPOROS(0,NY,NX)-LOG(ThetaWLitR)) &
             /PSD(0,NY,NX))**SRP(0,NY,NX)*LOGPSIMXD(NY,NX)))
         ELSE
-          THETWR=POROS0(NY,NX)
+          ThetaWLitR=POROS0(NY,NX)
           PSISM1(0,NY,NX)=PSISE(0,NY,NX)
         ENDIF
       ELSE
-        THETWR=POROS0(NY,NX)
+        ThetaWLitR=POROS0(NY,NX)
         PSISM1(0,NY,NX)=PSISE(0,NY,NX)
       ENDIF
 !

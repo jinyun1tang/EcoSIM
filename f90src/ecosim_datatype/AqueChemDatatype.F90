@@ -33,6 +33,7 @@ module AqueChemDatatype
   real(r8),target,allocatable ::  GKCN(:,:,:)                        !Ca-Na Gapon selectivity coefficient, [-]
   real(r8),target,allocatable ::  GKCK(:,:,:)                        !Ca-K Gapon selectivity coefficient, [-]
 
+  real(r8),target,allocatable :: trcsalt_rain_conc(:,:,:)            !salt tracer concentration in rain [g m-3]
   real(r8),target,allocatable :: trcSalt_solml(:,:,:,:)                !soil aqueous salt content micropre, [mol d-2]
   real(r8),target,allocatable :: trcx_solml(:,:,:,:)                 !exchangeable tracers
   real(r8),target,allocatable :: trcp_salml(:,:,:,:)                !salt precipitate in micropore
@@ -43,8 +44,8 @@ module AqueChemDatatype
 
   real(r8),target,allocatable :: trcSalt_soHml(:,:,:,:)
   real(r8),target,allocatable :: trcSalt_XFHS(:,:,:,:,:)
-  real(r8),target,allocatable :: trcSalt_XFLS(:,:,:,:,:)
-
+  real(r8),target,allocatable :: trcSalt3DFlo2Cell(:,:,:,:,:)
+  real(r8),target,allocatable :: trcSaltIonNumber(:)                 !number of ions when the salt is fully dissociated
   real(r8),target,allocatable ::  XOCFXS(:,:,:,:)                    !total DOC micropore-macropore transfer, [g d-2 h-1]
   real(r8),target,allocatable ::  XONFXS(:,:,:,:)                    !total DON micropore-macropore transfer, [g d-2 h-1]
   real(r8),target,allocatable ::  XOPFXS(:,:,:,:)                    !total DOP micropore-macropore transfer, [g d-2 h-1]
@@ -86,7 +87,7 @@ module AqueChemDatatype
   real(r8),target,allocatable ::  trcp_TR(:,:,:,:)                   !total precipitated P containing transformation non-band, [mol d-2 h-1]
   real(r8),target,allocatable ::  trcg_XBLS(:,:,:,:)
   real(r8),target,allocatable ::  trcn_XBLS(:,:,:,:)
-  real(r8),target,allocatable ::  trcSalt_XBLS(:,:,:,:)
+  real(r8),target,allocatable ::  trcSaltFlo2SnowLay(:,:,:,:)
   real(r8),target,allocatable ::  XCOBLS(:,:,:)                      !wet deposition of CO2, [g d-2 h-1]
   real(r8),target,allocatable ::  XCHBLS(:,:,:)                      !wet deposition of CH4, [g d-2 h-1]
   real(r8),target,allocatable ::  XOXBLS(:,:,:)                      !wet deposition of O2, [g d-2 h-1]
@@ -178,9 +179,10 @@ module AqueChemDatatype
   allocate(GKCK(JZ,JY,JX));     GKCK=0._r8
 
   allocate(trcSalt_solml(idsalt_beg:idsaltb_end,0:JZ,JY,JX));trcSalt_solml=0._r8
+  allocate(trcsalt_rain_conc(idsalt_beg:idsalt_end,JY,JX));trcsalt_rain_conc=0._r8
   allocate(trcx_solml(idx_beg:idx_end,0:JZ,JY,JX));trcx_solml=0._r8
   allocate(trcp_salml(idsp_beg:idsp_end,0:JZ,JY,JX)); trcp_salml=0._r8
-
+  allocate(trcSaltIonNumber(idsalt_beg:idsaltb_end))
   allocate(ECND(JZ,JY,JX));     ECND=0._r8
   allocate(CSTR(JZ,JY,JX));     CSTR=0._r8
   allocate(CION(JZ,JY,JX));     CION=0._r8
@@ -229,8 +231,8 @@ module AqueChemDatatype
   allocate(trcg_XBLS(idg_beg:idg_end-1,JS,JY,JX)); trcg_XBLS=0._r8
   allocate(trcn_XBLS(ids_nut_beg:ids_nuts_end,JS,JY,JX)); trcn_XBLS=0._r8
   if(salt_model)then
-    allocate(trcSalt_XBLS(idsalt_beg:idsalt_end,JS,JY,JX)); trcSalt_XBLS=0._r8
-    allocate(trcSalt_XFLS(idsalt_beg:idsaltb_end,3,0:JD,JV,JH));trcSalt_XFLS=0._r8
+    allocate(trcSaltFlo2SnowLay(idsalt_beg:idsalt_end,JS,JY,JX)); trcSaltFlo2SnowLay=0._r8
+    allocate(trcSalt3DFlo2Cell(idsalt_beg:idsaltb_end,3,0:JD,JV,JH));trcSalt3DFlo2Cell=0._r8
     allocate(trcSalt_XFHS(idsalt_beg:idsaltb_end,3,JD,JV,JH));trcSalt_XFHS=0._r8
   endif
   allocate(XCOBLS(JS,JY,JX));   XCOBLS=0._r8
@@ -318,13 +320,14 @@ module AqueChemDatatype
   call destroy(trcSalt_TR)
   call destroy(trcx_solml)
   call destroy(trcSalt_solml)
+  call destroy(trcsalt_rain_conc)
   call destroy(trcSalt_soHml)
   call destroy(trcp_salml)
   call destroy(ECND)
   call destroy(CSTR)
   call destroy(CION)
   call destroy(trcSalt_XFXS)
-  call destroy(trcSalt_XFLS)
+  call destroy(trcSalt3DFlo2Cell)
   call destroy(trcSalt_XFHS)
   call destroy(XOCFXS)
   call destroy(XONFXS)
@@ -411,7 +414,7 @@ module AqueChemDatatype
   call destroy(XC1PBS)
   call destroy(XC2PBS)
   call destroy(XM1PBS)
-
+  call destroy(trcSaltIonNumber)
   call destroy(trcs_XFXS)
   end subroutine DestructAquaChem
 

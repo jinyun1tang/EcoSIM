@@ -34,7 +34,7 @@ implicit none
   use FertilizerDataType  , only : InitFertilizerData
   use CanopyRadDataType   , only : InitCanopyRad
   use GrosubsMod          , only : InitGrosub
-
+  use InitSoluteMod       , only : InitSoluteProperty
   use AqueChemDatatype    , only : initaquachem
   use PlantDataRateType   , only : InitPlantRates
 
@@ -131,6 +131,7 @@ implicit none
 
   call InitSoilPhysData
 
+  call InitSoluteProperty
   end subroutine InitAlloc
 !------------------------------------------------------------------------------------------
   subroutine InitPlantMorphSize()

@@ -503,8 +503,8 @@ module WthrMod
       PRECII(NY,NX)=PRECII(NY,NX)*TDIRI(N,NY,NX)
       PRECUI(NY,NX)=PRECUI(NY,NX)*TDIRI(N,NY,NX)
       CO2E(NY,NX)=CO2EI(NY,NX)   !used in photosynthesis, soil CO2 transport
-      CN4R(NY,NX)=CN4RI(NY,NX)*TDCN4(N,NY,NX)
-      CNOR(NY,NX)=CNORI(NY,NX)*TDCNO(N,NY,NX)
+      NH4_rain_conc(NY,NX)=CN4RI(NY,NX)*TDCN4(N,NY,NX)
+      NO3_rain_conc(NY,NX)=CNORI(NY,NX)*TDCNO(N,NY,NX)
     ENDDO D9920
   ENDDO D9925
   end subroutine CorrectClimate

@@ -189,17 +189,17 @@ implicit none
         DIRRA(2,NY,NX)=WDPTHI
         D220: DO I=1,366
           PHQ(IDY,NY,NX)=PHQX
-          CN4Q(IDY,NY,NX)=CN4QX/14.0_r8
-          CNOQ(IDY,NY,NX)=CNOQX/14.0_r8
-          CPOQ(IDY,NY,NX)=CPOQX/31.0_r8
-          CALQ(IDY,NY,NX)=CALQX/27.0_r8
-          CFEQ(IDY,NY,NX)=CFEQX/55.8_r8
-          CCAQ(IDY,NY,NX)=CCAQX/40.0_r8
-          CMGQ(IDY,NY,NX)=CMGQX/24.3_r8
-          CNAQ(IDY,NY,NX)=CNAQX/23.0_r8
-          CKAQ(IDY,NY,NX)=CKAQX/39.1_r8
-          CSOQ(IDY,NY,NX)=CSOQX/32.0_r8
-          CCLQ(IDY,NY,NX)=CCLQX/35.5_r8
+          NH4_irrig_conc(IDY,NY,NX)=CN4QX/14.0_r8
+          NO3_irrig_conc(IDY,NY,NX)=CNOQX/14.0_r8
+          H2PO4_irrig_conc(IDY,NY,NX)=CPOQX/31.0_r8
+          trcsalt_irrig_conc(idsalt_Al,IDY,NY,NX)=CALQX/27.0_r8
+          trcsalt_irrig_conc(idsalt_Fe,IDY,NY,NX)=CFEQX/55.8_r8
+          trcsalt_irrig_conc(idsalt_Ca,IDY,NY,NX)=CCAQX/40.0_r8
+          trcsalt_irrig_conc(idsalt_Mg,IDY,NY,NX)=CMGQX/24.3_r8
+          trcsalt_irrig_conc(idsalt_Na,IDY,NY,NX)=CNAQX/23.0_r8
+          trcsalt_irrig_conc(idsalt_K,IDY,NY,NX)=CKAQX/39.1_r8
+          trcsalt_irrig_conc(idsalt_SO4,IDY,NY,NX)=CSOQX/32.0_r8
+          trcsalt_irrig_conc(idsalt_Cl,IDY,NY,NX)=CCLQX/35.5_r8
         ENDDO D220
       ENDDO D7960
     ENDDO D7965
@@ -244,17 +244,17 @@ implicit none
 !           TRANSFER INPUTS TO MODEL ARRAYS
 !
           PHQ(IDY,NY,NX)=PHQX
-          CN4Q(IDY,NY,NX)=CN4QX/14.0_r8
-          CNOQ(IDY,NY,NX)=CNOQX/14.0_r8
-          CPOQ(IDY,NY,NX)=CPOQX/31.0_r8
-          CALQ(IDY,NY,NX)=CALQX/27.0_r8
-          CFEQ(IDY,NY,NX)=CFEQX/55.8_r8
-          CCAQ(IDY,NY,NX)=CCAQX/40.0_r8
-          CMGQ(IDY,NY,NX)=CMGQX/24.3_r8
-          CNAQ(IDY,NY,NX)=CNAQX/23.0_r8
-          CKAQ(IDY,NY,NX)=CKAQX/39.1_r8
-          CSOQ(IDY,NY,NX)=CSOQX/32.0_r8
-          CCLQ(IDY,NY,NX)=CCLQX/35.5_r8
+          NH4_irrig_conc(IDY,NY,NX)=CN4QX/14.0_r8
+          NO3_irrig_conc(IDY,NY,NX)=CNOQX/14.0_r8
+          H2PO4_irrig_conc(IDY,NY,NX)=CPOQX/31.0_r8
+          trcsalt_irrig_conc(idsalt_Al,IDY,NY,NX)=CALQX/27.0_r8
+          trcsalt_irrig_conc(idsalt_Fe,IDY,NY,NX)=CFEQX/55.8_r8
+          trcsalt_irrig_conc(idsalt_Ca,IDY,NY,NX)=CCAQX/40.0_r8
+          trcsalt_irrig_conc(idsalt_Mg,IDY,NY,NX)=CMGQX/24.3_r8
+          trcsalt_irrig_conc(idsalt_Na,IDY,NY,NX)=CNAQX/23.0_r8
+          trcsalt_irrig_conc(idsalt_K,IDY,NY,NX)=CKAQX/39.1_r8
+          trcsalt_irrig_conc(idsalt_SO4,IDY,NY,NX)=CSOQX/32.0_r8
+          trcsalt_irrig_conc(idsalt_Cl,IDY,NY,NX)=CCLQX/35.5_r8
           WDPTH(IDY,NY,NX)=WDPTHI
         ENDDO D8960
       ENDDO D8965

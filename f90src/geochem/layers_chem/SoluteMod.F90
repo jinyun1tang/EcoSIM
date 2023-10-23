@@ -907,7 +907,7 @@ module SoluteMod
   real(r8) :: FX,S0,S1,XALQ,XCAQ,XCAX
   real(r8) :: XFEQ,XHYQ,XN4Q,XTLQ
   real(r8) :: VLWatMicPMX,VLWatMicPMP,BulkSoilMass
-  real(r8) :: THETWR,COMA
+  real(r8) :: ThetaWLitR,COMA
   real(r8) :: CNHUA
   real(r8) :: CCO20
   real(r8) :: RH1PX,RH2PX,DUKD,DFNSA,RN3X,RN4X
@@ -979,14 +979,14 @@ module SoluteMod
 !     RSNOAA=rate of broadcast NO3 fertilizer dissoln
 !
     IF(VWatLitRHoldCapcity(NY,NX).GT.ZEROS(NY,NX))THEN
-      THETWR=AMIN1(1.0,VLWatMicP(0,NY,NX)/VWatLitRHoldCapcity(NY,NX))
+      ThetaWLitR=AMIN1(1.0,VLWatMicP(0,NY,NX)/VWatLitRHoldCapcity(NY,NX))
     ELSE
-      THETWR=1._r8
+      ThetaWLitR=1._r8
     ENDIF
-    RSN4AA=SPNH4*FertN_soil(ifert_nh4,0,NY,NX)*THETWR
+    RSN4AA=SPNH4*FertN_soil(ifert_nh4,0,NY,NX)*ThetaWLitR
     RSN3AA=SPNH3*FertN_soil(ifert_nh3,0,NY,NX)
-    RSNUAA=RSNUA*THETWR
-    RSNOAA=SPNO3*FertN_soil(ifert_no3,0,NY,NX)*THETWR
+    RSNUAA=RSNUA*ThetaWLitR
+    RSNOAA=SPNO3*FertN_soil(ifert_no3,0,NY,NX)*ThetaWLitR
 !
 !     SOLUBLE AND EXCHANGEABLE NH4 CONCENTRATIONS
 !
@@ -1239,7 +1239,7 @@ module SoluteMod
       TR_H2PO4_soil(0,NY,NX)=TR_H2PO4_soil(0,NY,NX)*patomw
 !     WRITE(*,9989)'TR_NH4_soil',I,J,TR_NH4_soil(0,NY,NX)
 !    2,RN4S,RNH4,RXN4,RSN4AA,VLWatMicPM(NPH,0,NY,NX)
-!    3,SPNH4,FertN_soil(ifert_nh4,0,NY,NX),THETWR
+!    3,SPNH4,FertN_soil(ifert_nh4,0,NY,NX),ThetaWLitR
 !9989  FORMAT(A8,2I4,12E12.4)
   end subroutine UpdateSoluteinSurfaceResidue
 

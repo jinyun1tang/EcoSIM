@@ -548,7 +548,7 @@ implicit none
         !
         IF(salt_model)THEN
           DO NTSA=idsalt_beg,idsalt_end
-            trcSalt_TBLS(NTSA,LS,N2,N1)=trcSalt_TBLS(NTSA,LS,N2,N1)+trcSalt_XBLS(NTSA,LS,N2,N1)-trcSalt_XBLS(NTSA,LS2,N2,N1)
+            trcSalt_TBLS(NTSA,LS,N2,N1)=trcSalt_TBLS(NTSA,LS,N2,N1)+trcSaltFlo2SnowLay(NTSA,LS,N2,N1)-trcSaltFlo2SnowLay(NTSA,LS2,N2,N1)
           ENDDO
         ENDIF
         !
@@ -586,15 +586,15 @@ implicit none
 
         IF(salt_model)THEN
           DO NTSA=idsalt_beg,idsalt_end
-            trcSalt_TBLS(NTSA,LS,NY,NX)=trcSalt_TBLS(NTSA,LS,NY,NX)+trcSalt_XBLS(NTSA,LS,NY,NX) &
-              -trcSalt_XFLS(NTSA,3,0,N2,N1)-trcSalt_XFLS(NTSA,3,NUM(N2,N1),N2,N1) &
+            trcSalt_TBLS(NTSA,LS,NY,NX)=trcSalt_TBLS(NTSA,LS,NY,NX)+trcSaltFlo2SnowLay(NTSA,LS,NY,NX) &
+              -trcSalt3DFlo2Cell(NTSA,3,0,N2,N1)-trcSalt3DFlo2Cell(NTSA,3,NUM(N2,N1),N2,N1) &
               -trcSalt_XFHS(NTSA,3,NUM(N2,N1),N2,N1)
           ENDDO
 
           !add band flux
           DO NTSA=0,idsalt_nuts
             trcSalt_TBLS(idsalt_H0PO4+NTSA,LS,NY,NX)=trcSalt_TBLS(idsalt_H0PO4+NTSA,LS,NY,NX) &
-              -trcSalt_XFLS(idsalt_H0PO4B+NTSA,3,NUM(N2,N1),N2,N1) &
+              -trcSalt3DFlo2Cell(idsalt_H0PO4B+NTSA,3,NUM(N2,N1),N2,N1) &
               -trcSalt_XFHS(idsalt_H0PO4B+NTSA,3,NUM(N2,N1),N2,N1)
           ENDDO
         ENDIF
@@ -619,7 +619,7 @@ implicit none
 
         IF(salt_model)THEN
           DO NTSA=idsalt_beg,idsalt_end
-            trcSalt_TBLS(NTSA,LS,N2,N1)=trcSalt_TBLS(NTSA,LS,N2,N1)+trcSalt_XBLS(NTSA,LS,N2,N1)
+            trcSalt_TBLS(NTSA,LS,N2,N1)=trcSalt_TBLS(NTSA,LS,N2,N1)+trcSaltFlo2SnowLay(NTSA,LS,N2,N1)
           ENDDO
 
         ENDIF
@@ -787,19 +787,19 @@ implicit none
     D1203: DO NN=1,2
 
       DO NTSA=idsalt_beg,idsalt_end
-        trcSalt_TQR(NTSA,N2,N1)=trcSalt_TQR(NTSA,N2,N1)+trcSalt_XQR(NTSA,N,NN,N2,N1)
+        trcSalt_TQR(NTSA,N2,N1)=trcSalt_TQR(NTSA,N2,N1)+trcSaltRunoffBoundary(NTSA,N,NN,N2,N1)
       ENDDO
 
       IF(IFLBH(N,NN,N5,N4).EQ.0)THEN
 ! runoff direction
         DO NTSA=idsalt_beg,idsalt_end
-          trcSalt_TQR(NTSA,N2,N1)=trcSalt_TQR(NTSA,N2,N1)-trcSalt_XQR(NTSA,N,NN,N5,N4)
+          trcSalt_TQR(NTSA,N2,N1)=trcSalt_TQR(NTSA,N2,N1)-trcSaltRunoffBoundary(NTSA,N,NN,N5,N4)
         ENDDO
       ENDIF
 
       IF(N4B.GT.0.AND.N5B.GT.0.AND.NN.EQ.1)THEN
         DO NTSA=idsalt_beg,idsalt_end
-          trcSalt_TQR(NTSA,N2,N1)=trcSalt_TQR(NTSA,N2,N1)-trcSalt_XQR(NTSA,N,NN,N5B,N4B)
+          trcSalt_TQR(NTSA,N2,N1)=trcSalt_TQR(NTSA,N2,N1)-trcSaltRunoffBoundary(NTSA,N,NN,N5B,N4B)
         ENDDO
       ENDIF
     ENDDO D1203

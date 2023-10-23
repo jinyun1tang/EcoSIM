@@ -66,7 +66,7 @@ module ChemTranspDataType
   real(r8),target,allocatable ::  HCSGL(:,:,:)                       !aqueous HCO3 diffusivity, [m2 h-1]
   real(r8),target,allocatable ::  SOSGL(:,:,:)                       !aqueous SO4 diffusivity, [m2 h-1]
   real(r8),target,allocatable ::  CLSXL(:,:,:)                       !aqueous Cl diffusivity, [m2 h-1]
-  real(r8),target,allocatable ::  trcSalt_XQR(:,:,:,:,:)                     !total Al in runoff, [mol d-2 h-1]
+  real(r8),target,allocatable ::  trcSaltRunoffBoundary(:,:,:,:,:)                     !total Al in runoff, [mol d-2 h-1]
   real(r8),target,allocatable ::  trcg_XRS(:,:,:,:,:)                    !surface runoff gas flux, [g d-2 h-1]
   real(r8),target,allocatable ::  trcn_XRS(:,:,:,:,:)                    !surface runoff nutrient flux, [g d-2 h-1]
   real(r8),target,allocatable ::  XOCQRS(:,:,:,:,:)                  !surface runoff DOC flux, [g d-2 h-1]
@@ -148,7 +148,7 @@ module ChemTranspDataType
   allocate(HCSGL(JZ,JY,JX));    HCSGL=0._r8
   allocate(SOSGL(JZ,JY,JX));    SOSGL=0._r8
   allocate(CLSXL(JZ,JY,JX));    CLSXL=0._r8
-  allocate(trcSalt_XQR(idsalt_beg:idsalt_end,2,2,JV,JH));   trcSalt_XQR=0._r8
+  allocate(trcSaltRunoffBoundary(idsalt_beg:idsalt_end,2,2,JV,JH));   trcSaltRunoffBoundary=0._r8
   allocate(trcg_XRS(idg_beg:idg_end-1,2,2,JV,JH));  trcg_XRS=0._r8
   allocate(trcn_XRS(ids_nut_beg:ids_nuts_end,2,2,JV,JH));  trcn_XRS=0._r8
   allocate(XOCQRS(1:jcplx,2,2,JV,JH));XOCQRS=0._r8
@@ -165,7 +165,7 @@ module ChemTranspDataType
 
   implicit none
 
-  call destroy(trcSalt_XQR)
+  call destroy(trcSaltRunoffBoundary)
   call destroy(GasDifc)
   call destroy(SolDifc)
   call destroy(TFND)

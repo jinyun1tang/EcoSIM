@@ -611,7 +611,7 @@ contains
   integer, intent(in) :: M,NY,NX
   real(r8),intent(in) :: KSatReductByRainKineticEnergy
 
-  real(r8) :: THETW1,THETWR,PSIST1
+  real(r8) :: THETW1,ThetaWLitR,PSIST1
   real(r8) :: PSIST0,HeatFlxLitR2Soi,FLQZ,DarcyFlxLitR2Soil
   real(r8) :: WatDarcyFloLitR2SoiMicP,FLQ2,CNDR,AVCNDR
   real(r8) :: HeatFlowLitR2MacP,WatFlowLitR2MacP    
@@ -643,14 +643,14 @@ contains
   IF(SoiBulkDensity(NUM(NY,NX),NY,NX).GT.ZERO)THEN
     IF(VWatLitRHoldCapcity(NY,NX).GT.ZEROS2(NY,NX))THEN
       !surface litter holds water
-      THETWR=AMIN1(VWatLitRHoldCapcity(NY,NX),VLWatMicP1(0,NY,NX))/VLitR(NY,NX)
+      ThetaWLitR=AMIN1(VWatLitRHoldCapcity(NY,NX),VLWatMicP1(0,NY,NX))/VLitR(NY,NX)
     ELSE
-      THETWR=POROS0(NY,NX)
+      ThetaWLitR=POROS0(NY,NX)
     ENDIF
     THETW1=AMAX1(THETY(NUM(NY,NX),NY,NX),AMIN1(POROS(NUM(NY,NX),NY,NX) &
       ,safe_adb(VLWatMicP1(NUM(NY,NX),NY,NX),VLSoilMicP(NUM(NY,NX),NY,NX))))
     !litter layer  
-    K0=MAX(1,MIN(100,INT(100.0*(AZMAX1(POROS0(NY,NX)-THETWR))/POROS0(NY,NX))+1))
+    K0=MAX(1,MIN(100,INT(100.0*(AZMAX1(POROS0(NY,NX)-ThetaWLitR))/POROS0(NY,NX))+1))
     !topsoil layer
     K1=MAX(1,MIN(100,INT(100.0*(AZMAX1(POROS(NUM(NY,NX),NY,NX)-THETW1))/POROS(NUM(NY,NX),NY,NX))+1))
     CNDR=HydroCond3D(3,K0,0,NY,NX)
@@ -665,8 +665,8 @@ contains
       !flow from liter to soil
       !more water than saturation
       !note dts_wat:=AMIN1(1.0_r8,20.0_r8*dts_HeatWatTP)
-      IF(THETWR.GT.Theta_sat(0,NY,NX))THEN
-        FLQZ=DarcyFlxLitR2Soil+AMIN1((THETWR-Theta_sat(0,NY,NX))*VLitR(NY,NX),&
+      IF(ThetaWLitR.GT.Theta_sat(0,NY,NX))THEN
+        FLQZ=DarcyFlxLitR2Soil+AMIN1((ThetaWLitR-Theta_sat(0,NY,NX))*VLitR(NY,NX),&
           AZMAX1((Theta_sat(NUM(NY,NX),NY,NX)-THETW1)*VLSoilMicP(NUM(NY,NX),NY,NX)))*dts_wat
       ELSE
         FLQZ=DarcyFlxLitR2Soil
@@ -677,7 +677,7 @@ contains
       !from soil to liter
       IF(THETW1.GT.Theta_sat(NUM(NY,NX),NY,NX))THEN
         FLQZ=DarcyFlxLitR2Soil+AMAX1((Theta_sat(NUM(NY,NX),NY,NX)-THETW1)*VLSoilMicP(NUM(NY,NX),NY,NX),&
-          AZMIN1((THETWR-Theta_sat(0,NY,NX))*VLitR(NY,NX)))*dts_wat
+          AZMIN1((ThetaWLitR-Theta_sat(0,NY,NX))*VLitR(NY,NX)))*dts_wat
       ELSE
         FLQZ=DarcyFlxLitR2Soil
       ENDIF
@@ -1317,29 +1317,29 @@ contains
 !
 !     SnoFalPrec,RainFalPrec,PrecAtm,PRECI=snow,rain,snow+rain,irrigation
 !     VHCPW,VLHeatCapSnowMin=current, minimum snowpack heat capacities
-!     FLQRQ,FLQRI=water flux to surface litter from rain,irrigation
+!     Rain2LitRSurf,Irrig2LitRSurf=water flux to surface litter from rain,irrigation
 !     FLQGQ,FLQGI=water flux to snowpack from rain,irrigation
 !
   IF(SnoFalPrec(NY,NX).GT.0.0_r8.OR.(RainFalPrec(NY,NX).GT.0.0_r8 &
     .AND.VLHeatCapSnow(1,NY,NX).GT.VLHeatCapSnowMin(NY,NX)))THEN
     !there is precipitation, there is significant snow layer
-    FLQRQ(NY,NX)=0.0_r8
-    FLQRI(NY,NX)=0.0_r8
-    FLQGQ(NY,NX)=PrecAtm(NY,NX)
-    FLQGI(NY,NX)=IrrigSurface(NY,NX)
+    Rain2LitRSurf(NY,NX)=0.0_r8
+    Irrig2LitRSurf(NY,NX)=0.0_r8
+    Rain2SoilSurf(NY,NX)=PrecAtm(NY,NX)
+    Irrig2SoilSurf(NY,NX)=IrrigSurface(NY,NX)
   ELSEIF((PrecAtm(NY,NX).GT.0.0.OR.IrrigSurface(NY,NX).GT.0.0_r8) &
     .AND.VLHeatCapSnow(1,NY,NX).LE.VLHeatCapSnowMin(NY,NX))THEN
     !there is insignificant snow layer
-    FLQRQ(NY,NX)=PrecThrufall2LitR*PrecAtm(NY,NX)/(PrecAtm(NY,NX)+IrrigSurface(NY,NX))
-    FLQRI(NY,NX)=PrecThrufall2LitR*IrrigSurface(NY,NX)/(PrecAtm(NY,NX)+IrrigSurface(NY,NX))
-    FLQGQ(NY,NX)=PrecAtm(NY,NX)-FLQRQ(NY,NX)
-    FLQGI(NY,NX)=IrrigSurface(NY,NX)-FLQRI(NY,NX)
+    Rain2LitRSurf(NY,NX)=PrecThrufall2LitR*PrecAtm(NY,NX)/(PrecAtm(NY,NX)+IrrigSurface(NY,NX))
+    Irrig2LitRSurf(NY,NX)=PrecThrufall2LitR*IrrigSurface(NY,NX)/(PrecAtm(NY,NX)+IrrigSurface(NY,NX))
+    Rain2SoilSurf(NY,NX)=PrecAtm(NY,NX)-Rain2LitRSurf(NY,NX)
+    Irrig2SoilSurf(NY,NX)=IrrigSurface(NY,NX)-Irrig2LitRSurf(NY,NX)
   ELSE
     !no precipitation
-    FLQRQ(NY,NX)=0.0_r8
-    FLQRI(NY,NX)=0.0_r8
-    FLQGQ(NY,NX)=0.0_r8
-    FLQGI(NY,NX)=0.0_r8
+    Rain2LitRSurf(NY,NX)=0.0_r8
+    Irrig2LitRSurf(NY,NX)=0.0_r8
+    Rain2SoilSurf(NY,NX)=0.0_r8
+    Irrig2SoilSurf(NY,NX)=0.0_r8
   ENDIF
 !
 !     GATHER PRECIPITATION AND MELTWATER FLUXES AND THEIR HEATS

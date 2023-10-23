@@ -120,10 +120,10 @@ implicit none
   real(r8),target,allocatable ::  PHR(:,:)                           !precipitation pH, [-]
   real(r8),target,allocatable ::  CN4RI(:,:)                         !precipitation initial NH4 concentration, [g m-3]
   real(r8),target,allocatable ::  CNORI(:,:)                         !precipitation initial NO3 concentration, [g m-3]
-  real(r8),target,allocatable ::  CN4R(:,:)                          !precipitation  NH4 concentration, [g m-3]
-  real(r8),target,allocatable ::  CN3R(:,:)                          !precipitation  NH3 concentration, [g m-3]
-  real(r8),target,allocatable ::  CNOR(:,:)                          !precipitation  NO3 concentration, [g m-3]
-  real(r8),target,allocatable ::  CPOR(:,:)                          !precipitation  H2PO4 concentration, [g m-3]
+  real(r8),target,allocatable ::  NH4_rain_conc(:,:)                          !precipitation  NH4 concentration, [g m-3]
+  real(r8),target,allocatable ::  NH3_rain_conc(:,:)                          !precipitation  NH3 concentration, [g m-3]
+  real(r8),target,allocatable ::  NO3_rain_conc(:,:)                          !precipitation  NO3 concentration, [g m-3]
+  real(r8),target,allocatable ::  H2PO4_rain_conc(:,:)                          !precipitation  H2PO4 concentration, [g m-3]
   real(r8),target,allocatable ::  CALR(:,:)                          !precipitation  Al concentration, [g m-3]
   real(r8),target,allocatable ::  CFER(:,:)                          !precipitation  Fe concentration, [g m-3]
   real(r8),target,allocatable ::  CHYR(:,:)                          !precipitation  H concentration, [g m-3]
@@ -136,7 +136,7 @@ implicit none
   real(r8),target,allocatable ::  CCLR(:,:)                          !precipitation  Cl concentration, [g m-3]
   real(r8),target,allocatable ::  CC3R(:,:)                          !precipitation  CO3 concentration, [g m-3]
   real(r8),target,allocatable ::  CHCR(:,:)                          !precipitation  HCO3 concentration, [g m-3]
-  real(r8),target,allocatable ::  CCHR(:,:)                          !precipitation  CH4 concentration, [g m-3]
+  real(r8),target,allocatable ::  CH4_rain_conc(:,:)                          !precipitation  CH4 concentration, [g m-3]
   real(r8),target,allocatable ::  CAL1R(:,:)                         !precipitation  AlOH concentration, [g m-3]
   real(r8),target,allocatable ::  CAL2R(:,:)                         !precipitation  AlOH2 concentration, [g m-3]
   real(r8),target,allocatable ::  CAL3R(:,:)                         !precipitation  AlOH3 concentration, [g m-3]
@@ -159,7 +159,7 @@ implicit none
   real(r8),target,allocatable ::  CNASR(:,:)                         !precipitation  NaSO4 concentration, [g m-3]
   real(r8),target,allocatable ::  CKASR(:,:)                         !precipitation  K concentration, [g m-3]
   real(r8),target,allocatable ::  CH0PR(:,:)                         !precipitation  PO4 concentration, [g m-3]
-  real(r8),target,allocatable ::  CH1PR(:,:)                         !precipitation  HPO4 concentration, [g m-3]
+  real(r8),target,allocatable ::  HPO4_rain_conc(:,:)                         !precipitation  HPO4 concentration, [g m-3]
   real(r8),target,allocatable ::  CH3PR(:,:)                         !precipitation  H3PO4 concentration, [g m-3]
   real(r8),target,allocatable ::  CF1PR(:,:)                         !precipitation  FeHPO4 concentration, [g m-3]
   real(r8),target,allocatable ::  CF2PR(:,:)                         !precipitation  FeH2PO4 concentration, [g m-3]
@@ -167,10 +167,10 @@ implicit none
   real(r8),target,allocatable ::  CC1PR(:,:)                         !precipitation  CaHPO4 concentration, [g m-3]
   real(r8),target,allocatable ::  CC2PR(:,:)                         !precipitation  CaH2PO4 concentration, [g m-3]
   real(r8),target,allocatable ::  CM1PR(:,:)                         !precipitation  MgHPO4 concentration, [g m-3]
-  real(r8),target,allocatable ::  CCOR(:,:)                          !precipitation  CO2 concentration, [g m-3]
-  real(r8),target,allocatable ::  COXR(:,:)                          !precipitation  O2 concentration, [g m-3]
-  real(r8),target,allocatable ::  CNNR(:,:)                          !precipitation  N2 concentration, [g m-3]
-  real(r8),target,allocatable ::  CN2R(:,:)                          !precipitation  N2O concentration, [g m-3]
+  real(r8),target,allocatable ::  CO2_rain_conc(:,:)                          !precipitation  CO2 concentration, [g m-3]
+  real(r8),target,allocatable ::  O2_rain_conc(:,:)                          !precipitation  O2 concentration, [g m-3]
+  real(r8),target,allocatable ::  N2_rain_conc(:,:)                          !precipitation  N2 concentration, [g m-3]
+  real(r8),target,allocatable ::  N2O_rain_conc(:,:)                          !precipitation  N2O concentration, [g m-3]
   contains
 !----------------------------------------------------------------------
 
@@ -251,10 +251,10 @@ implicit none
   allocate(PHR(JY,JX));         PHR=0._r8
   allocate(CN4RI(JY,JX));       CN4RI=0._r8
   allocate(CNORI(JY,JX));       CNORI=0._r8
-  allocate(CN4R(JY,JX));        CN4R=0._r8
-  allocate(CN3R(JY,JX));        CN3R=0._r8
-  allocate(CNOR(JY,JX));        CNOR=0._r8
-  allocate(CPOR(JY,JX));        CPOR=0._r8
+  allocate(NH4_rain_conc(JY,JX));        NH4_rain_conc=0._r8
+  allocate(NH3_rain_conc(JY,JX));        NH3_rain_conc=0._r8
+  allocate(NO3_rain_conc(JY,JX));        NO3_rain_conc=0._r8
+  allocate(H2PO4_rain_conc(JY,JX));        H2PO4_rain_conc=0._r8
   allocate(CALR(JY,JX));        CALR=0._r8
   allocate(CFER(JY,JX));        CFER=0._r8
   allocate(CHYR(JY,JX));        CHYR=0._r8
@@ -267,7 +267,7 @@ implicit none
   allocate(CCLR(JY,JX));        CCLR=0._r8
   allocate(CC3R(JY,JX));        CC3R=0._r8
   allocate(CHCR(JY,JX));        CHCR=0._r8
-  allocate(CCHR(JY,JX));        CCHR=0._r8
+  allocate(CH4_rain_conc(JY,JX));        CH4_rain_conc=0._r8
   allocate(CAL1R(JY,JX));       CAL1R=0._r8
   allocate(CAL2R(JY,JX));       CAL2R=0._r8
   allocate(CAL3R(JY,JX));       CAL3R=0._r8
@@ -290,7 +290,7 @@ implicit none
   allocate(CNASR(JY,JX));       CNASR=0._r8
   allocate(CKASR(JY,JX));       CKASR=0._r8
   allocate(CH0PR(JY,JX));       CH0PR=0._r8
-  allocate(CH1PR(JY,JX));       CH1PR=0._r8
+  allocate(HPO4_rain_conc(JY,JX));       HPO4_rain_conc=0._r8
   allocate(CH3PR(JY,JX));       CH3PR=0._r8
   allocate(CF1PR(JY,JX));       CF1PR=0._r8
   allocate(CF2PR(JY,JX));       CF2PR=0._r8
@@ -298,10 +298,10 @@ implicit none
   allocate(CC1PR(JY,JX));       CC1PR=0._r8
   allocate(CC2PR(JY,JX));       CC2PR=0._r8
   allocate(CM1PR(JY,JX));       CM1PR=0._r8
-  allocate(CCOR(JY,JX));        CCOR=0._r8
-  allocate(COXR(JY,JX));        COXR=0._r8
-  allocate(CNNR(JY,JX));        CNNR=0._r8
-  allocate(CN2R(JY,JX));        CN2R=0._r8
+  allocate(CO2_rain_conc(JY,JX));        CO2_rain_conc=0._r8
+  allocate(O2_rain_conc(JY,JX));        O2_rain_conc=0._r8
+  allocate(N2_rain_conc(JY,JX));        N2_rain_conc=0._r8
+  allocate(N2O_rain_conc(JY,JX));        N2O_rain_conc=0._r8
   end subroutine InitClimForcData
 
 !----------------------------------------------------------------------
@@ -382,10 +382,10 @@ implicit none
   call destroy(PHR)
   call destroy(CN4RI)
   call destroy(CNORI)
-  call destroy(CN4R)
-  call destroy(CN3R)
-  call destroy(CNOR)
-  call destroy(CPOR)
+  call destroy(NH4_rain_conc)
+  call destroy(NH3_rain_conc)
+  call destroy(NO3_rain_conc)
+  call destroy(H2PO4_rain_conc)
   call destroy(CALR)
   call destroy(CFER)
   call destroy(CHYR)
@@ -398,7 +398,7 @@ implicit none
   call destroy(CCLR)
   call destroy(CC3R)
   call destroy(CHCR)
-  call destroy(CCHR)
+  call destroy(CH4_rain_conc)
   call destroy(CAL1R)
   call destroy(CAL2R)
   call destroy(CAL3R)
@@ -421,7 +421,7 @@ implicit none
   call destroy(CNASR)
   call destroy(CKASR)
   call destroy(CH0PR)
-  call destroy(CH1PR)
+  call destroy(HPO4_rain_conc)
   call destroy(CH3PR)
   call destroy(CF1PR)
   call destroy(CF2PR)
@@ -429,9 +429,9 @@ implicit none
   call destroy(CC1PR)
   call destroy(CC2PR)
   call destroy(CM1PR)
-  call destroy(CCOR)
-  call destroy(COXR)
-  call destroy(CNNR)
-  call destroy(CN2R)
+  call destroy(CO2_rain_conc)
+  call destroy(O2_rain_conc)
+  call destroy(N2_rain_conc)
+  call destroy(N2O_rain_conc)
   end subroutine DestructClimForcData
 end module ClimForcDataType

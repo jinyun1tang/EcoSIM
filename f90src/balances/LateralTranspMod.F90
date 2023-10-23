@@ -678,7 +678,7 @@ implicit none
       IF(salt_model)THEN
         DO NTSA=idsalt_beg,idsaltb_end
           trcSalt_TFLS(NTSA,N3,N2,N1)=trcSalt_TFLS(NTSA,N3,N2,N1) &
-            +trcSalt_XFLS(NTSA,N,N3,N2,N1)-trcSalt_XFLS(NTSA,N,N6,N5,N4)
+            +trcSalt3DFlo2Cell(NTSA,N,N3,N2,N1)-trcSalt3DFlo2Cell(NTSA,N,N6,N5,N4)
           trcSalt_TFHS(NTSA,N3,N2,N1)=trcSalt_TFHS(NTSA,N3,N2,N1) &
             +trcSalt_XFHS(NTSA,N,N3,N2,N1)-trcSalt_XFHS(NTSA,N,N6,N5,N4)
         ENDDO

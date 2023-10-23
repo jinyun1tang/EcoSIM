@@ -1423,26 +1423,26 @@ contains
   real(r8) :: TK0X,TKXR,TK1X
   real(r8) :: CNVR,AvgVaporCondctSnowLitR,AvgVaporCondctSoilLitR
   real(r8) :: THETRR,TCNDR,AvgThermCondctSnoLitR,AvgThermCondctSoilLitR
-  real(r8) :: THETWR
+  real(r8) :: ThetaWLitR
 
-  ! THETWR,THETW1=litter, soil water concentration
+  ! ThetaWLitR,THETW1=litter, soil water concentration
   ! VWatLitRHoldCapcity=litter water retention capacity
   ! PSISM1(0,PSISM1(NUM=litter,soil water potentials
 
   IF(VLitR(NY,NX).GT.ZEROS(NY,NX).AND.VLWatMicP1(0,NY,NX).GT.ZEROS2(NY,NX))THEN
-    THETWR=AMIN1(VWatLitRHoldCapcity(NY,NX),VLWatMicP1(0,NY,NX))/VLitR(NY,NX)
-    IF(THETWR.LT.FieldCapacity(0,NY,NX))THEN
-      PSISM1(0,NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIFLD(NY,NX)+((LOGFldCapacity(0,NY,NX)-LOG(THETWR))/FCD(0,NY,NX) &
+    ThetaWLitR=AMIN1(VWatLitRHoldCapcity(NY,NX),VLWatMicP1(0,NY,NX))/VLitR(NY,NX)
+    IF(ThetaWLitR.LT.FieldCapacity(0,NY,NX))THEN
+      PSISM1(0,NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIFLD(NY,NX)+((LOGFldCapacity(0,NY,NX)-LOG(ThetaWLitR))/FCD(0,NY,NX) &
         *LOGPSIMND(NY,NX))))
-    ELSEIF(THETWR.LT.POROS0(NY,NX))THEN
-      PSISM1(0,NY,NX)=-EXP(LOGPSIAtSat(NY,NX)+(((LOGPOROS(0,NY,NX)-LOG(THETWR))/PSD(0,NY,NX))**SRP(0,NY,NX) &
+    ELSEIF(ThetaWLitR.LT.POROS0(NY,NX))THEN
+      PSISM1(0,NY,NX)=-EXP(LOGPSIAtSat(NY,NX)+(((LOGPOROS(0,NY,NX)-LOG(ThetaWLitR))/PSD(0,NY,NX))**SRP(0,NY,NX) &
         *LOGPSIMXD(NY,NX)))
     ELSE
-      THETWR=POROS0(NY,NX)
+      ThetaWLitR=POROS0(NY,NX)
       PSISM1(0,NY,NX)=PSISE(0,NY,NX)
     ENDIF
   ELSE
-    THETWR=POROS0(NY,NX)
+    ThetaWLitR=POROS0(NY,NX)
     PSISM1(0,NY,NX)=PSISE(0,NY,NX)
   ENDIF
 
