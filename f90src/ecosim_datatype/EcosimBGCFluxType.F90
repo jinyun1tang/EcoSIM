@@ -16,10 +16,10 @@ module EcosimBGCFluxType
   real(r8),target,allocatable ::  TLE(:,:)                           !ecosystem latent heat flux, [MJ d-2 h-1]
   real(r8),target,allocatable ::  TSH(:,:)                           !ecosystem sensible heat flux, [MJ d-2 h-1]
   real(r8),target,allocatable ::  TGH(:,:)                           !ecosystem storage heat flux, [MJ d-2 h-1]
-  real(r8),target,allocatable ::  TGPP(:,:)                          !ecosystem GPP, [g d-2 h-1]
-  real(r8),target,allocatable ::  TRAU(:,:)                          !ecosystem autotrophic respiration, [g d-2 h-1]
-  real(r8),target,allocatable ::  TNPP(:,:)                          !ecosystem NPP, [g d-2 h-1]
-  real(r8),target,allocatable ::  THRE(:,:)                          !ecosystem heterotrophic respiration, [g d-2 h-1]
+  real(r8),target,allocatable ::  Eco_GPP_col(:,:)                          !ecosystem GPP, [g d-2 h-1]
+  real(r8),target,allocatable ::  Eco_AutoR_col(:,:)                          !ecosystem autotrophic respiration, [g d-2 h-1]
+  real(r8),target,allocatable ::  Eco_NPP_col(:,:)                          !ecosystem NPP, [g d-2 h-1]
+  real(r8),target,allocatable ::  Eco_HR_col(:,:)                          !ecosystem heterotrophic respiration, [g d-2 h-1]
   real(r8),target,allocatable ::  XHVSTE(:,:,:)                      !ecosystem harvest , [g d-2]
   real(r8),target,allocatable ::  TRINH4(:,:)                        !total NH4 net mineraln (-ve) or immobiln (+ve)
   real(r8),target,allocatable ::  TRIPO4(:,:)                        !total H2PO4 net mineraln (-ve) or immobiln (+ve)
@@ -27,7 +27,7 @@ module EcosimBGCFluxType
   real(r8),target,allocatable ::  TCCAN(:,:)                         !total net CO2 fixation
   real(r8),target,allocatable ::  ZESNC(:,:,:)                       !total litterfall element, [g d-2 h-1]
   real(r8),target,allocatable ::  RECO(:,:)                          !ecosystem respiration, [g d-2 h-1]
-  real(r8),target,allocatable ::  TNBP(:,:)                          !total NBP, [g d-2]
+  real(r8),target,allocatable ::  Eco_NBP_col(:,:)                          !total NBP, [g d-2]
   real(r8),target,allocatable ::  RP14X(:,:,:)                       !HPO4 demand in non-band by all microbial,root,myco populations
   real(r8),target,allocatable ::  RP14Y(:,:,:)                       !HPO4 demand in non-band by all microbial,root,myco populations
   real(r8),target,allocatable ::  RP1BX(:,:,:)                       !HPO4 demand in band by all microbial,root,myco populations
@@ -43,10 +43,10 @@ contains
   allocate(TLE(JY,JX));         TLE=0._r8
   allocate(TSH(JY,JX));         TSH=0._r8
   allocate(TGH(JY,JX));         TGH=0._r8
-  allocate(TGPP(JY,JX));        TGPP=0._r8
-  allocate(TRAU(JY,JX));        TRAU=0._r8
-  allocate(TNPP(JY,JX));        TNPP=0._r8
-  allocate(THRE(JY,JX));        THRE=0._r8
+  allocate(Eco_GPP_col(JY,JX));        Eco_GPP_col=0._r8
+  allocate(Eco_AutoR_col(JY,JX));        Eco_AutoR_col=0._r8
+  allocate(Eco_NPP_col(JY,JX));        Eco_NPP_col=0._r8
+  allocate(Eco_HR_col(JY,JX));        Eco_HR_col=0._r8
   allocate(XHVSTE(NumOfPlantChemElements,JY,JX));      XHVSTE=0._r8
   allocate(TRINH4(JY,JX));      TRINH4=0._r8
   allocate(TRIPO4(JY,JX));      TRIPO4=0._r8
@@ -54,7 +54,7 @@ contains
   allocate(TCCAN(JY,JX));       TCCAN=0._r8
   allocate(ZESNC(NumOfPlantChemElements,JY,JX));       ZESNC=0._r8
   allocate(RECO(JY,JX));        RECO=0._r8
-  allocate(TNBP(JY,JX));        TNBP=0._r8
+  allocate(Eco_NBP_col(JY,JX));        Eco_NBP_col=0._r8
   allocate(RP14X(0:JZ,JY,JX));  RP14X=0._r8
   allocate(RP14Y(0:JZ,JY,JX));  RP14Y=0._r8
   allocate(RP1BX(0:JZ,JY,JX));  RP1BX=0._r8
@@ -69,10 +69,10 @@ contains
   call destroy(TLE)
   call destroy(TSH)
   call destroy(TGH)
-  call destroy(TGPP)
-  call destroy(TRAU)
-  call destroy(TNPP)
-  call destroy(THRE)
+  call destroy(Eco_GPP_col)
+  call destroy(Eco_AutoR_col)
+  call destroy(Eco_NPP_col)
+  call destroy(Eco_HR_col)
   call destroy(XHVSTE)
   call destroy(TRINH4)
   call destroy(TRIPO4)
@@ -80,7 +80,7 @@ contains
   call destroy(TCCAN)
   call destroy(ZESNC)
   call destroy(RECO)
-  call destroy(TNBP)
+  call destroy(Eco_NBP_col)
   call destroy(RP14X)
   call destroy(RP14Y)
   call destroy(RP1BX)

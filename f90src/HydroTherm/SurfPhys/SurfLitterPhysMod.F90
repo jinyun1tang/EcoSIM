@@ -510,7 +510,7 @@ implicit none
   ! SURFACE RESIDUE WATER AND TEMPERATURE
   !
   ! XVOLT,XVOLW=free water+ice,water in litter layer
-  ! VOLWM,VsoiPM=surface water,air content for use in trnsfr.f
+  ! VOLWM,VsoiPM=surface water,air content for use in TranspNoSalt.f
   ! VWatLitRHoldCapcity=maximum water retention by litter
   ! VLHeatCapacity=volumetric heat capacity of litter
   ! VOLA1,VLWatMicP1,VLiceMicP1,VOLP1=pore,water,ice,air volumes of litter
@@ -598,7 +598,7 @@ implicit none
   ! SURFACE RESIDUE WATER AND TEMPERATURE
   !
   ! XVOLT,XVOLW=free water+ice,water in litter layer
-  ! VOLWM,VsoiPM=surface water,air content for use in trnsfr.f
+  ! VOLWM,VsoiPM=surface water,air content for use in TranspNoSalt.f
   ! VWatLitRHoldCapcity=maximum water retention by litter
   ! VLHeatCapacity=volumetric heat capacity of litter
   ! VOLA1,VLWatMicP1,VLiceMicP1,VOLP1=pore,water,ice,air volumes of litter

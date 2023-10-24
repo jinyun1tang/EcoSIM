@@ -4476,16 +4476,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d            
-    call restartvar(ncid, flag, varname='TNBP', dim1name='column',&
+    call restartvar(ncid, flag, varname='Eco_NBP_col', dim1name='column',&
        long_name='total NBP', units='g d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,TNBP,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,Eco_NBP_col,datrc_1d) 
   else
-    !print*,'TNBP'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,TNBP,datrc_1d)   
+    !print*,'Eco_NBP_col'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,Eco_NBP_col,datrc_1d)   
     datpr1 => datrc_1d              
-    call restartvar(ncid, flag, varname='TNBP', dim1name='column',&
+    call restartvar(ncid, flag, varname='Eco_NBP_col', dim1name='column',&
        long_name='total NBP', units='g d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
@@ -4527,16 +4527,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d            
-    call restartvar(ncid, flag, varname='TGPP', dim1name='column',&
+    call restartvar(ncid, flag, varname='Eco_GPP_col', dim1name='column',&
        long_name='ecosystem GPP', units='g d-2 h-1', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,TGPP,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,Eco_GPP_col,datrc_1d) 
   else
-    !print*,'TGPP'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,TGPP,datrc_1d)   
+    !print*,'Eco_GPP_col'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,Eco_GPP_col,datrc_1d)   
     datpr1 => datrc_1d              
-    call restartvar(ncid, flag, varname='TGPP', dim1name='column',&
+    call restartvar(ncid, flag, varname='Eco_GPP_col', dim1name='column',&
        long_name='ecosystem GPP', units='g d-2 h-1', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
@@ -4544,16 +4544,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d            
-    call restartvar(ncid, flag, varname='TRAU', dim1name='column',&
+    call restartvar(ncid, flag, varname='Eco_AutoR_col', dim1name='column',&
        long_name='ecosystem autotrophic respiration', units='g d-2 h-1', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,TRAU,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,Eco_AutoR_col,datrc_1d) 
   else
-    !print*,'TRAU'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,TRAU,datrc_1d)   
+    !print*,'Eco_AutoR_col'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,Eco_AutoR_col,datrc_1d)   
     datpr1 => datrc_1d              
-    call restartvar(ncid, flag, varname='TRAU', dim1name='column',&
+    call restartvar(ncid, flag, varname='Eco_AutoR_col', dim1name='column',&
        long_name='ecosystem autotrophic respiration', units='g d-2 h-1', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
@@ -4561,16 +4561,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d            
-    call restartvar(ncid, flag, varname='TNPP', dim1name='column',&
+    call restartvar(ncid, flag, varname='Eco_NPP_col', dim1name='column',&
        long_name='ecosystem NPP', units='g d-2 h-1', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,TNPP,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,Eco_NPP_col,datrc_1d) 
   else
-    !print*,'TNPP'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,TNPP,datrc_1d)   
+    !print*,'Eco_NPP_col'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,Eco_NPP_col,datrc_1d)   
     datpr1 => datrc_1d              
-    call restartvar(ncid, flag, varname='TNPP', dim1name='column',&
+    call restartvar(ncid, flag, varname='Eco_NPP_col', dim1name='column',&
        long_name='ecosystem NPP', units='g d-2 h-1', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
@@ -4578,16 +4578,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d            
-    call restartvar(ncid, flag, varname='THRE', dim1name='column',&
+    call restartvar(ncid, flag, varname='Eco_HR_col', dim1name='column',&
        long_name='ecosystem heterotrophic respiration', units='g d-2 h-1', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,THRE,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,Eco_HR_col,datrc_1d) 
   else
-    !print*,'THRE'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,THRE,datrc_1d)   
+    !print*,'Eco_HR_col'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,Eco_HR_col,datrc_1d)   
     datpr1 => datrc_1d              
-    call restartvar(ncid, flag, varname='THRE', dim1name='column',&
+    call restartvar(ncid, flag, varname='Eco_HR_col', dim1name='column',&
        long_name='ecosystem heterotrophic respiration', units='g d-2 h-1', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    

@@ -269,7 +269,7 @@ contains
   real(r8) :: PAREX,PARSX,RAS
   real(r8) :: ALFZ,WindSpeedGrnd
 !
-!     BOUNDARY LAYER CONDUCTANCES FOR EXPORT TO TRNSFR.F
+!     BOUNDARY LAYER CONDUCTANCES FOR EXPORT TO TranspNoSalt.F
 !
 
 !     AERODYNAMIC RESISTANCE OF CANOPY TO SNOW/RESIDUE/SOIL
@@ -636,7 +636,7 @@ contains
 ! HFLQL=convective heat from litter-soil water flux
 ! FLWL,HFLWL=micropore water,heat flux
 ! WatFLow2LitR,HFLWRL=total litter water,heat flux
-! FLWRM=litter-soil water flux for solute transfer in trnsfr.f
+! FLWRM=litter-soil water flux for solute transfer in TranspNoSalt.f
 ! CND1,CNDL=hydraulic conductivity of source,destination layer
 ! HydroCond3D=lateral(1,2),vertical(3) micropore hydraulic conductivity
 !
@@ -803,7 +803,7 @@ contains
   ENDIF
 !
 !     THICKNESS OF WATER FILMS IN LITTER AND SOIL SURFACE
-!     FROM WATER POTENTIALS FOR GAS EXCHANGE IN TRNSFR.F
+!     FROM WATER POTENTIALS FOR GAS EXCHANGE IN TranspNoSalt.F
 !
   IF(VLHeatCapacity(0,NY,NX).GT.VHeatCapLitR(NY,NX))THEN
     FILM(M,0,NY,NX)=FilmThickness(PSISM1(0,NY,NX), is_top_layer=.true.)
@@ -987,7 +987,7 @@ contains
 ! HeatConvSno2LitR=convective heat flux from snowpack to litter
 ! HEATI,HeatEvapAir2Surf,HeatSensAir2Surf,HEATG=net radiation,latent,sensible,storage heat
 ! VapXAir2GSurf=total evaporation
-! FLWM,WaterFlow2MacPM=water flux into soil micropore,macropore for use in trnsfr.f
+! FLWM,WaterFlow2MacPM=water flux into soil micropore,macropore for use in TranspNoSalt.f
 ! VLWatMicPX1=VLWatMicP1 accounting for wetting front
 !
   TLitrIceFlxThaw(NY,NX)=TLitrIceFlxThaw(NY,NX)+LitrIceFlxThaw(NY,NX)
@@ -1175,7 +1175,7 @@ contains
 ! cumHeatFlowSno2Soi=conv heat from snowpack to soil micropores,macropores
 !
 ! EVAPS,EVAPW=evaporation from soil,snowpack surfaces
-! WatFlowSno2LitRM,WatFlowSno2MicPM,WatFlowSno2MacPM=water into litter,soil micropores,micropores for use in trnsfr.f
+! WatFlowSno2LitRM,WatFlowSno2MicPM,WatFlowSno2MacPM=water into litter,soil micropores,micropores for use in TranspNoSalt.f
 !
   VapXAir2Sno(NY,NX)=0._r8;EVAPS(NY,NX)=0.0_r8;EVAPW(NY,NX)=0.0_r8
 
@@ -1312,7 +1312,7 @@ contains
     PrecThrufall2SoiMacP=PrecThrufall2Soil*SoilFracAsMacP1(NUM(NY,NX),NY,NX)
   ENDIF
 !
-!     PRECIP ON SNOW ARRAYS EXPORTED TO TRNSFR.F, TRNSFRS.F
+!     PRECIP ON SNOW ARRAYS EXPORTED TO TranspNoSalt.F, TranspSalt.F
 !     FOR SOLUTE FLUX CALCULATIONS
 !
 !     SnoFalPrec,RainFalPrec,PrecAtm,PRECI=snow,rain,snow+rain,irrigation

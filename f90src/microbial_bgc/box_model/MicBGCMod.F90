@@ -2062,16 +2062,16 @@ module MicBGCMod
     RN2O => micflx%RN2O, &
     RUPOXO => micflx%RUPOXO, &
     XH1BS => micflx%XH1BS, &
-    XH1PS => micflx%XH1PS, &
+    RH1PO4MicbTransf_vr => micflx%RH1PO4MicbTransf_vr, &
     XH2BS => micflx%XH2BS, &
-    XH2PS => micflx%XH2PS, &
+    RH2PO4MicbTransf_vr => micflx%RH2PO4MicbTransf_vr, &
     XN2GS => micflx%XN2GS, &
     XNH4B => micflx%XNH4B, &
-    XNH4S => micflx%XNH4S, &
+    RNH4MicbTransf_vr => micflx%RNH4MicbTransf_vr, &
     XNO2B => micflx%XNO2B, &
-    XNO2S => micflx%XNO2S, &
+    RNO2MicbTransf_vr => micflx%RNO2MicbTransf_vr, &
     XNO3B => micflx%XNO3B, &
-    XNO3S => micflx%XNO3S, &
+    RNO3MicbTransf_vr => micflx%RNO3MicbTransf_vr, &
     XOQCS =>micflx%XOQCS     , &
     XOQNS =>micflx%XOQNS     , &
     XOQPS =>micflx%XOQPS     , &
@@ -2217,42 +2217,42 @@ module MicBGCMod
     XOQAS(K)=XOQAS(K)-CSORPA(K)
   ENDDO D655
 !
-!     XNH4S,XNH4B=net change in NH4 in band,non-band
+!     RNH4MicbTransf_vr,XNH4B=net change in NH4 in band,non-band
 !     TRINH,TRINB=total NH4 mineraln-immobn in non-band,band
 !     RVOXA(1),RVOXB(1)=total NH4 oxidation in non-band,band
-!     XNO3S,XNO3B=net change in NO3 in band,non-band
+!     RNO3MicbTransf_vr,XNO3B=net change in NO3 in band,non-band
 !     TRINO,TRIOB=total NO3 immobn in non-band,band
 !     RVOXA(2),RVOXB(2)=total NO2 oxidation in non-band,band
 !     TRDN3,TRDNB=total NO3 reduction in non-band,band
 !     RCNO3,RCN3B=NO3 production from nitrous acid reduction in non-band,band
-!     XNO2S,XNO2B=net change in NO3 in band,non-band
+!     RNO2MicbTransf_vr,XNO2B=net change in NO3 in band,non-band
 !     TRDN2,TRD2B=total NO2 reduction in non-band,band
 !     RCNO2,RCNOB=substrate-limited nitrous acid reduction in non-band,band
-!     XH2PS,XH2BS=net change in H2PO4 in band,non-band
+!     RH2PO4MicbTransf_vr,XH2BS=net change in H2PO4 in band,non-band
 !     TRIPO,TRIPB=total H2PO4 mineraln-immobn in non-band,band
-!     XH1PS,XH1BS=net change in HPO4 in band,non-band
+!     RH1PO4MicbTransf_vr,XH1BS=net change in HPO4 in band,non-band
 !     TRIP1,TRIB1=total HPO4 mineraln-immobn in non-band,band
 !     XN2GS=total N2 fixation
 !     XZHYS=total H+ production
 !     TRN2F=total N2 fixation
 !
-  XNH4S=-naqfdiag%TRINH
-  XNO3S=-naqfdiag%TRINO-naqfdiag%TRDN3+RCNO3
-  XNO2S=+naqfdiag%TRDN3-naqfdiag%TRDN2-RCNO2
-  XH2PS=-naqfdiag%TRIPO
-  XH1PS=-naqfdiag%TRIP1
+  RNH4MicbTransf_vr=-naqfdiag%TRINH
+  RNO3MicbTransf_vr=-naqfdiag%TRINO-naqfdiag%TRDN3+RCNO3
+  RNO2MicbTransf_vr=+naqfdiag%TRDN3-naqfdiag%TRDN2-RCNO2
+  RH2PO4MicbTransf_vr=-naqfdiag%TRIPO
+  RH1PO4MicbTransf_vr=-naqfdiag%TRIP1
   XNH4B=-naqfdiag%TRINB
   XNO3B=-naqfdiag%TRIOB-naqfdiag%TRDNB+RCN3B
   XNO2B=naqfdiag%TRDNB-naqfdiag%TRD2B-RCNOB
   !AmmoniaOxidizeBacteria=1, NitriteOxidizeBacteria=2, AerobicMethanotrophBacteria=3
   DO NGL=JGniA(AmmoniaOxidizeBacteria),JGnfA(AmmoniaOxidizeBacteria)
-    XNH4S=XNH4S-RVOXA(NGL)
-    XNO2S=XNO2S+RVOXA(NGL)
+    RNH4MicbTransf_vr=RNH4MicbTransf_vr-RVOXA(NGL)
+    RNO2MicbTransf_vr=RNO2MicbTransf_vr+RVOXA(NGL)
     XNH4B=XNH4B-RVOXB(NGL)
   ENDDO
   DO NGL=JGniA(NitriteOxidizeBacteria),JGnfA(NitriteOxidizeBacteria)
-    XNO3S=XNO3S+RVOXA(NGL)
-    XNO2S=XNO2S-RVOXA(NGL)
+    RNO3MicbTransf_vr=RNO3MicbTransf_vr+RVOXA(NGL)
+    RNO2MicbTransf_vr=RNO2MicbTransf_vr-RVOXA(NGL)
     XNO3B=XNO3B+RVOXB(NGL)
     XNO2B=XNO2B-RVOXB(NGL)
   ENDDO

@@ -165,7 +165,7 @@ implicit none
   real(r8),target,allocatable ::  CF2PR(:,:)                         !precipitation  FeH2PO4 concentration, [g m-3]
   real(r8),target,allocatable ::  CC0PR(:,:)                         !precipitation  CaPO4 concentration, [g m-3]
   real(r8),target,allocatable ::  CC1PR(:,:)                         !precipitation  CaHPO4 concentration, [g m-3]
-  real(r8),target,allocatable ::  CC2PR(:,:)                         !precipitation  CaH2PO4 concentration, [g m-3]
+  real(r8),target,allocatable ::  CC2PR(:,:)                         !precipitation  CaH4P2O8 concentration, [g m-3]
   real(r8),target,allocatable ::  CM1PR(:,:)                         !precipitation  MgHPO4 concentration, [g m-3]
   real(r8),target,allocatable ::  CO2_rain_conc(:,:)                          !precipitation  CO2 concentration, [g m-3]
   real(r8),target,allocatable ::  O2_rain_conc(:,:)                          !precipitation  O2 concentration, [g m-3]

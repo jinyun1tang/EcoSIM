@@ -498,8 +498,8 @@ module ErosionMod
 !       :PCAC,PCAS=precip CaCO3,CaSO4
 !       :PALP,PFEP=precip AlPO4,FEPO4 in non-band
 !       :PALPB,PFEPB=precip AlPO4,FEPO4 in band
-!       :PCPM,PCPD,PCPH=precip CaH2PO4,CaHPO4,apatite in non-band
-!       :PCPMB,PCPDB,PCPHB=precip CaH2PO4,CaHPO4,apatite in band
+!       :PCPM,PCPD,PCPH=precip CaH4P2O8,CaHPO4,apatite in non-band
+!       :PCPMB,PCPDB,PCPHB=precip CaH4P2O8,CaHPO4,apatite in band
 !
               DO NTP=idsp_beg,idsp_end
                 trcp_ER(NTP,N,2,N5,N4)   =FSEDER*trcp_salml(NTP,NU(N2,N1),N2,N1)
@@ -656,8 +656,8 @@ module ErosionMod
 !       :PCAC,PCAS=precip CaCO3,CaSO4
 !       :PALP,PFEP=precip AlPO4,FEPO4 in non-band
 !       :PALPB,PFEPB=precip AlPO4,FEPO4 in band
-!       :PCPM,PCPD,PCPH=precip CaH2PO4,CaHPO4,apatite in non-band
-!       :PCPMB,PCPDB,PCPHB=precip CaH2PO4,CaHPO4,apatite in band
+!       :PCPM,PCPD,PCPH=precip CaH4P2O8,CaHPO4,apatite in non-band
+!       :PCPMB,PCPDB,PCPHB=precip CaH4P2O8,CaHPO4,apatite in band
 !
                 DO NTP=idsp_beg,idsp_end
                   trcp_ER(NTP,N,1,N5B,N4B)=FSEDER*trcp_salml(NTP,NU(N2,N1),N2,N1)

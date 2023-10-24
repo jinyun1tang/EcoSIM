@@ -18,11 +18,11 @@ implicit none
   real(r8) :: RUPOXO
   real(r8) :: RN2G
   real(r8) :: RN2O
-  real(r8) :: XNH4S
-  real(r8) :: XNO3S
-  real(r8) :: XNO2S
-  real(r8) :: XH2PS
-  real(r8) :: XH1PS
+  real(r8) :: RNH4MicbTransf_vr
+  real(r8) :: RNO3MicbTransf_vr
+  real(r8) :: RNO2MicbTransf_vr
+  real(r8) :: RH2PO4MicbTransf_vr
+  real(r8) :: RH1PO4MicbTransf_vr
   real(r8) :: XNH4B
   real(r8) :: XNO3B
   real(r8) :: XNO2B

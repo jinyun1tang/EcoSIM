@@ -3,7 +3,7 @@ module BoundaryTranspMod
   use minimathmod, only : isclose,AZMAX1
   use GridConsts
   USE SoilPropertyDataType
-  use TransfrDataMod
+  use TranspNoSaltDataMod
   use GridDataType
   use SoilWaterDataType
   use EcoSIMCtrlDataType
@@ -413,8 +413,8 @@ module BoundaryTranspMod
   enddo
 
   DO NTS=ids_beg,ids_end
-    trcs_XFLS(NTS,N,M6,M5,M4)=trcs_XFLS(NTS,N,M6,M5,M4)+R3PoreSolFlx(NTS,N,M6,M5,M4)
-    trcs_XFHS(NTS,N,M6,M5,M4)=trcs_XFHS(NTS,N,M6,M5,M4)+R3PoreSoHFlx(NTS,N,M6,M5,M4)
+    trcs_3DTransp2MicP(NTS,N,M6,M5,M4)=trcs_3DTransp2MicP(NTS,N,M6,M5,M4)+R3PoreSolFlx(NTS,N,M6,M5,M4)
+    trcs_3DTransp2MacP(NTS,N,M6,M5,M4)=trcs_3DTransp2MacP(NTS,N,M6,M5,M4)+R3PoreSoHFlx(NTS,N,M6,M5,M4)
   ENDDO
 
 

@@ -44,7 +44,7 @@ module EcoSIMDesctruct
   use PlantAPIData        , only : DestructPlantAPIData
   use PlantMngmtDataType  , only : DestructPlantMngmtData
   use InitSOMBGCMOD       , only : DestructSOMBGC
-  use TrnsfrMod           , only : DestructTrnsfr
+  use TranspNoSaltMod           , only : DestructTranspNoSalt
   use SnowPhysData        , only : DestructSnowPhysData
   use HydroThermData      , only : DestructHydroThermData
   implicit none
@@ -82,7 +82,7 @@ module EcoSIMDesctruct
   if(salt_model)then
     call DestructTranspSalt
   else
-    call DestructTrnsfr
+    call DestructTranspNoSalt
   endif
   call DestructEcoSIMCtrlData
 

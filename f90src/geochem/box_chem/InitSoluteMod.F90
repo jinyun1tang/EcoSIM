@@ -70,7 +70,7 @@ module InitSoluteMod
   real(r8), pointer :: FeH2PO4_2p_conc
   real(r8), pointer :: CaPO4_1e_con
   real(r8), pointer :: CaHPO4_conc
-  real(r8), pointer :: CaH2PO4_1p_conc
+  real(r8), pointer :: CaH4P2O8_1p_conc
   real(r8), pointer :: MgHPO4_conc
   real(r8), pointer :: CSTR1
   real(r8), pointer :: CCO2M
@@ -172,7 +172,7 @@ module InitSoluteMod
   trcSaltIonNumber(idsalt_AlSO4)=2._r8
   trcSaltIonNumber(idsalt_FeOH) =2._r8
   trcSaltIonNumber(idsalt_FeSO4)=2._r8
-  trcSaltIonNumber(idsalt_CaOH2)=3._r8
+  trcSaltIonNumber(idsalt_CaOH)=2._r8
   trcSaltIonNumber(idsalt_CaCO3)=2._r8
   trcSaltIonNumber(idsalt_CaSO4)=2._r8
   trcSaltIonNumber(idsalt_MgOH2)=3._r8
@@ -197,14 +197,15 @@ module InitSoluteMod
   trcSaltIonNumber(idsalt_FeOH3)=4._r8
   trcSaltIonNumber(idsalt_H3PO4)=4._r8
   trcSaltIonNumber(idsalt_FeH2PO4)=4._r8
-  trcSaltIonNumber(idsalt_CaH2PO4)=4._r8
+  trcSaltIonNumber(idsalt_CaH4P2O8)=4._r8
   trcSaltIonNumber(idsalt_H3PO4B)=4._r8
   trcSaltIonNumber(idsalt_FeH2PO4B)=4._r8
-  trcSaltIonNumber(idsalt_CaH2PO4B)=4._r8
+  trcSaltIonNumber(idsalt_CaH4P2O8B)=4._r8
   trcSaltIonNumber(idsalt_AlOH4)=5._r8
   trcSaltIonNumber(idsalt_FeOH4)=5._r8
 
   end subroutine InitSoluteProperty
+!------------------------------------------------------------------------------------------
 
   SUBROUTINE InitSoluteModel(K,BulkSoilMass,ISALTG,solutevar)
 !
@@ -267,7 +268,7 @@ module InitSoluteMod
   FeH2PO4_2p_conc     => solutevar%FeH2PO4_2p_conc
   CaPO4_1e_con     => solutevar%CaPO4_1e_con
   CaHPO4_conc     => solutevar%CaHPO4_conc
-  CaH2PO4_1p_conc     => solutevar%CaH2PO4_1p_conc
+  CaH4P2O8_1p_conc     => solutevar%CaH4P2O8_1p_conc
   MgHPO4_conc     => solutevar%MgHPO4_conc
   CSTR1     => solutevar%CSTR1
   CCO2M     => solutevar%CCO2M
@@ -488,7 +489,7 @@ module InitSoluteMod
   FeH2PO4_2p_conc=0._r8
   CaPO4_1e_con=0._r8
   CaHPO4_conc=0._r8
-  CaH2PO4_1p_conc=0._r8
+  CaH4P2O8_1p_conc=0._r8
   MgHPO4_conc=0._r8
 !
 !     INITIALIZE PHOSPHORUS EQUILIBRIA AMONG SOLUBLE, ADSORBED
@@ -555,7 +556,7 @@ module InitSoluteMod
   cation_2p_conc=Ca_2p_conc+Mg_2p_conc+AlOH_2p_conc+FeOH_2p_conc+FeH2PO4_2p_conc
   anion_2e_conc=SO4_2e_conc+CO3_2e_conc+H1PO4_2e_conc
   cation_1p_conc=NH4_1p_conc+H_1p_conc+Na_1p_conc+K_1p_conc+AlO2H2_1p_conc+FeO2H2_p_conc+AlSO4_1p_conc &
-    +FeSO4_1p_conc+CaO2H2_conc+CaHCO3_1p_conc+MgOH_1p_conc+MgHCO3_1p_conc+FeHPO4_p_conc+CaH2PO4_1p_conc
+    +FeSO4_1p_conc+CaO2H2_conc+CaHCO3_1p_conc+MgOH_1p_conc+MgHCO3_1p_conc+FeHPO4_p_conc+CaH4P2O8_1p_conc
   anion_1e_conc=NO3_1e_conc+OH_1e_conc+HCO3_e_conc+Cl_e_conc+AlO4H4_1e_conc+FeO4H4_1e_conc+NaCO3_1e_conc &
     +NaSO4_1e_conc+KSO4_1e_conc+H2PO4_1e_conc+CaPO4_1e_con
   CN=H2CO3_aqu_conc+CH4_aqu_conc+O2_aqu_conc+N2_aqu_conc+N2O_aqu_conc+NH3_aqu_conc+AlO3H3_conc+FeO3H3_conc+CaCO3_conc+CaSO4_conc &
@@ -640,7 +641,7 @@ module InitSoluteMod
   real(r8) :: RPFEOX,RSO4,RXCA,RXFE,RXHY,RXKA,RXMG
   real(r8) :: RXAL,RXNA,RXOH1,RXOH2,SPX,R,Z
   real(r8) :: A3,Al_3p_activity,AlOH_2p_activity,AlO2H2_1p_activity,AlO3H3_activity,AlO4H4_1e_activity
-  real(r8) :: AlSO4_1p_activity,AALX,CaPO4_1e_activity,CaHPO4_activity,CaH2PO4_1p_activity,Ca_2p_activity,CaCO3_activity
+  real(r8) :: AlSO4_1p_activity,AALX,CaPO4_1e_activity,CaHPO4_activity,CaH4P2O8_1p_activity,Ca_2p_activity,CaCO3_activity
   real(r8) :: CaHCO3_1p_activity,CaSO4_activity,CaO2H2_activity,ACAX,H2CO3_activity,CO3_2e_activity
   real(r8) :: FeHPO4_p_activity,FeH2PO4_2p_activity,Fe_3p_activity,FeOH_2p_activity
   real(r8) :: FeO2H2_p_activity,FeO3H3_activity,FeO4H4_1e_activity
@@ -698,7 +699,7 @@ module InitSoluteMod
   FeH2PO4_2p_conc=AMAX1(ZERO,FeH2PO4_2p_conc)
   CaPO4_1e_con=AMAX1(ZERO,CaPO4_1e_con)
   CaHPO4_conc=AMAX1(ZERO,CaHPO4_conc)
-  CaH2PO4_1p_conc=AMAX1(ZERO,CaH2PO4_1p_conc)
+  CaH4P2O8_1p_conc=AMAX1(ZERO,CaH4P2O8_1p_conc)
   MgHPO4_conc=AMAX1(ZERO,MgHPO4_conc)
 !
 !     ION ACTIVITY COEFFICIENTS
@@ -709,7 +710,7 @@ module InitSoluteMod
   anion_2e_conc=SO4_2e_conc+CO3_2e_conc+H1PO4_2e_conc
   cation_1p_conc=NH4_1p_conc+H_1p_conc+Na_1p_conc+K_1p_conc+AlO2H2_1p_conc &
     +FeO2H2_p_conc+AlSO4_1p_conc+FeSO4_1p_conc+CaO2H2_conc &
-    +CaHCO3_1p_conc+MgOH_1p_conc+MgHCO3_1p_conc+FeHPO4_p_conc+CaH2PO4_1p_conc
+    +CaHCO3_1p_conc+MgOH_1p_conc+MgHCO3_1p_conc+FeHPO4_p_conc+CaH4P2O8_1p_conc
   anion_1e_conc=NO3_1e_conc+OH_1e_conc+HCO3_e_conc+Cl_e_conc+AlO4H4_1e_conc &
     +FeO4H4_1e_conc+NaCO3_1e_conc+NaSO4_1e_conc+KSO4_1e_conc &
     +H2PO4_1e_conc+CaPO4_1e_con
@@ -755,7 +756,7 @@ module InitSoluteMod
   FeH2PO4_2p_activity=FeH2PO4_2p_conc*A2
   CaPO4_1e_activity=CaPO4_1e_con*A1
   CaHPO4_activity=CaHPO4_conc*A0
-  CaH2PO4_1p_activity=CaH2PO4_1p_conc*A1
+  CaH4P2O8_1p_activity=CaH4P2O8_1p_conc*A1
   MgHPO4_activity=MgHPO4_conc*A0
   NH4_1p_activity=NH4_1p_conc*A1
   NH3_activity=NH3_aqu_conc*A0
@@ -1477,7 +1478,7 @@ module InitSoluteMod
   S1=S0**2-4.0*(Ca_2p_activity*H1PO4_2e_activity-DPC1P*CaHPO4_activity)
   RC1P=TSL*(S0-SQRT(S1))
   S0=Ca_2p_activity+H2PO4_1e_activity+DPC2P
-  S1=S0**2-4.0*(Ca_2p_activity*H2PO4_1e_activity-DPC2P*CaH2PO4_1p_activity)
+  S1=S0**2-4.0*(Ca_2p_activity*H2PO4_1e_activity-DPC2P*CaH4P2O8_1p_activity)
   RC2P=TSL*(S0-SQRT(S1))
   S0=Mg_2p_activity+H1PO4_2e_activity+DPM1P
   S1=S0**2-4.0*(Mg_2p_activity*H1PO4_2e_activity-DPM1P*MgHPO4_activity)
@@ -1571,7 +1572,7 @@ module InitSoluteMod
   FeH2PO4_2p_conc=FeH2PO4_2p_conc+RF2P
   CaPO4_1e_con=CaPO4_1e_con+RC0P
   CaHPO4_conc=CaHPO4_conc+RC1P
-  CaH2PO4_1p_conc=CaH2PO4_1p_conc+RC2P
+  CaH4P2O8_1p_conc=CaH4P2O8_1p_conc+RC2P
   MgHPO4_conc=MgHPO4_conc+RM1P
 !  IF(K.EQ.micpar%k_POM.AND.(M/1)*1.EQ.M)THEN
 !     WRITE(*,1112)'A1I',I,NX,NY,L,K,M,A1,A2,A3,FSTR2,CSTR1

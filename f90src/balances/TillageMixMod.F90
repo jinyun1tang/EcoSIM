@@ -324,7 +324,7 @@ module TillageMixMod
     trcp_salml(idsp_FePO4,0,NY,NX)=trcp_salml(idsp_FePO4,0,NY,NX)*XCORP0
     trcp_salml(idsp_CaHPO4,0,NY,NX)=trcp_salml(idsp_CaHPO4,0,NY,NX)*XCORP0
     trcp_salml(idsp_HA,0,NY,NX)=trcp_salml(idsp_HA,0,NY,NX)*XCORP0
-    trcp_salml(idsp_CaH2PO4,0,NY,NX)=trcp_salml(idsp_CaH2PO4,0,NY,NX)*XCORP0
+    trcp_salml(idsp_CaH4P2O8,0,NY,NX)=trcp_salml(idsp_CaH4P2O8,0,NY,NX)*XCORP0
 
     DO NTN=ifertn_beg,ifertn_end
       FertN_soil(NTN,0,NY,NX)=FertN_soil(NTN,0,NY,NX)*XCORP0

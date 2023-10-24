@@ -7,8 +7,8 @@ module EcoSIMAPI
   use GeochemAPI   , only : soluteModel
   use PlantAPI     , only : PlantModel
   use MicBGCAPI    , only : MicrobeModel, MicAPI_Init, MicAPI_cleanup
-  use TrnsfrMod    , only : trnsfr
-  use TrnsfrsMod   , only : trnsfrs
+  use TranspNoSaltMod    , only : TranspNoSalt
+  use TranspSaltMod   , only : TranspSalt
   use EcoSIMCtrlMod, only : lverb,plant_model,soichem_model,  microbial_model,salt_model
   use WatsubMod    , only : watsub
 implicit none
@@ -66,21 +66,21 @@ contains
     call end_timer('SOL',t1)
   endif
   !
-  !   CALCULATE GAS AND SOLUTE FLUXES IN 'TRNSFR'
+  !   CALCULATE GAS AND SOLUTE FLUXES IN 'TranspNoSalt'
   !
   if(lverb)WRITE(*,334)'TRN'
   call start_timer(t1)
-  CALL TRNSFR(I,J,NHW,NHE,NVN,NVS)
+  CALL TranspNoSalt(I,J,NHW,NHE,NVN,NVS)
   call end_timer('TRN',t1)
   !
-  !   CALCULATE ADDITIONAL SOLUTE FLUXES IN 'TRNSFRS' IF SALT OPTION SELECTED
+  !   CALCULATE ADDITIONAL SOLUTE FLUXES IN 'TranspSalt' IF SALT OPTION SELECTED
   !
   if(lverb)WRITE(*,334)'TRNS'
   !    if(I>=170)print*,TKS(0,NVN,NHW)'
   if(salt_model)then
     call start_timer(t1)
-    CALL TRNSFRS(I,J,NHW,NHE,NVN,NVS)
-    call end_timer('TRNSFRS',t1)
+    CALL TranspSalt(I,J,NHW,NHE,NVN,NVS)
+    call end_timer('TranspSalt',t1)
   endif
 
   !

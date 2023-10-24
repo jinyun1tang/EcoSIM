@@ -278,7 +278,7 @@ implicit none
   ENDDO D210
   CO2F=CO2F+CH2O3(K)
   CH2O=CH2O+CH2O3(K)
-  write(191,*)'ComputeGPP_C3',CH2O,CO2F
+!  write(191,*)'ComputeGPP_C3',CH2O,CO2F
   end associate
   end subroutine ComputeGPP_C3
 

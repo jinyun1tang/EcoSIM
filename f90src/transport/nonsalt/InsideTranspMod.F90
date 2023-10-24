@@ -4,7 +4,7 @@ module InsideTranspMod
   use minimathmod, only : safe_adb,AZMAX1,AZMIN1
   use GridConsts
   use EcoSIMSolverPar
-  use TransfrDataMod
+  use TranspNoSaltDataMod
   use AqueChemDatatype
   use GridDataType
   use SoilBGCDataType
@@ -1155,8 +1155,8 @@ module InsideTranspMod
   ENDDO D9755
 
   DO NTS=ids_beg,ids_end
-    trcs_XFLS(NTS,N,N6,N5,N4)=trcs_XFLS(NTS,N,N6,N5,N4)+R3PoreSolFlx(NTS,N,N6,N5,N4)
-    trcs_XFHS(NTS,N,N6,N5,N4)=trcs_XFHS(NTS,N,N6,N5,N4)+R3PoreSoHFlx(NTS,N,N6,N5,N4)
+    trcs_3DTransp2MicP(NTS,N,N6,N5,N4)=trcs_3DTransp2MicP(NTS,N,N6,N5,N4)+R3PoreSolFlx(NTS,N,N6,N5,N4)
+    trcs_3DTransp2MacP(NTS,N,N6,N5,N4)=trcs_3DTransp2MacP(NTS,N,N6,N5,N4)+R3PoreSoHFlx(NTS,N,N6,N5,N4)
   ENDDO
 
   end subroutine SoluteAdvDifTransport

@@ -160,7 +160,7 @@ implicit none
     ystatesfl(cid_PrecpB_Ca5P3O12O3H3_conc)=ystates0l(cid_PrecpB_Ca5P3O12O3H3_conc)+solflx%TR_apatite_precip_band_soil/chemvar%VLWatMicPPB
 
     !PCPMB=PCPMB+TR_CaH4P2O8_precip_band_soil
-    ystatesfl(cid_PrecpB_CaH2PO4_con)=ystates0l(cid_PrecpB_CaH2PO4_con)+solflx%TR_CaH4P2O8_precip_band_soil/chemvar%VLWatMicPPB
+    ystatesfl(cid_PrecpB_CaH4P2O8_con)=ystates0l(cid_PrecpB_CaH4P2O8_con)+solflx%TR_CaH4P2O8_precip_band_soil/chemvar%VLWatMicPPB
 
   else
     ystatesfl(cid_H1PO4_2e_band_conc)=ystates0l(cid_H1PO4_2e_band_conc)
@@ -173,7 +173,7 @@ implicit none
     ystatesfl(cid_PrecpB_FePO4_con)=ystates0l(cid_PrecpB_FePO4_con)
     ystatesfl(cid_PrecpB_CaHPO4_conc)=ystates0l(cid_PrecpB_CaHPO4_conc)
     ystatesfl(cid_PrecpB_Ca5P3O12O3H3_conc)=ystates0l(cid_PrecpB_Ca5P3O12O3H3_conc)
-    ystatesfl(cid_PrecpB_CaH2PO4_con)=ystates0l(cid_PrecpB_CaH2PO4_con)
+    ystatesfl(cid_PrecpB_CaH4P2O8_con)=ystates0l(cid_PrecpB_CaH4P2O8_con)
   endif
   ystatesfl(fid_TR_H1PO4_band_soil)=solflx%TR_H1PO4_band_soil
   ystatesfl(fid_TR_H2PO4_band_soil)=solflx%TR_H2PO4_band_soil
@@ -263,7 +263,7 @@ implicit none
   chemvar%Precp_Ca5P3O12O3H3_conc  =ystates0l(cid_Precp_Ca5P3O12O3H3_conc)
   chemvar%PrecpB_Ca5P3O12O3H3_conc  =ystates0l(cid_PrecpB_Ca5P3O12O3H3_conc)
   chemvar%Precp_CaH4P2O8_conc  =ystates0l(cid_Precp_CaH4P2O8_conc)
-  chemvar%PrecpB_CaH2PO4_con  =ystates0l(cid_PrecpB_CaH2PO4_con)
+  chemvar%PrecpB_CaH4P2O8_con  =ystates0l(cid_PrecpB_CaH4P2O8_con)
   chemvar%Precp_FePO4_conc  =ystates0l(cid_Precp_FePO4_conc)
   chemvar%PrecpB_FePO4_con  =ystates0l(cid_PrecpB_FePO4_con)
 

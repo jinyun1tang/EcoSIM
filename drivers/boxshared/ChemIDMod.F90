@@ -51,7 +51,7 @@ implicit none
   integer :: cid_ZFE2P    !soil aqueous FeH2PO4 content micropore non-band, [mol d-2]
   integer :: cid_ZCA0P    !soil aqueous CaPO4 content micropore non-band, [mol d-2]
   integer :: cid_ZCA1P    !soil aqueous CaHPO4 content micropore non-band, [mol d-2]
-  integer :: cid_ZCA2P    !soil aqueous CaH2PO4 content micropore non-band, [mol d-2]
+  integer :: cid_ZCA2P    !soil aqueous CaH4P2O8 content micropore non-band, [mol d-2]
   integer :: cid_ZMG1P    !soil aqueous MgHPO4 content micropore non-band, [mol d-2]
   integer :: cid_Precp_AlPO4_conc   !precipitated AlPO4 non-band, [mol m-3]
   integer :: cid_Precp_CaHPO4_conc   !precipitated CaHPO4 non-band soil, [mol m-3]
@@ -90,12 +90,12 @@ implicit none
   integer :: cid_ZFE2PB   !soil aqueous FeH2PO4 content micropore band, [mol d-2
   integer :: cid_ZCA0PB   !soil aqueous CaPO4 content micropore band, [mol d-2]
   integer :: cid_ZCA1PB   !soil aqueous CaHPO4 content micropore band, [mol d-2]
-  integer :: cid_ZCA2PB   !soil aqueous CaH2PO4 content micropore band, [mol d-2]
+  integer :: cid_ZCA2PB   !soil aqueous CaH4P2O8 content micropore band, [mol d-2]
   integer :: cid_ZMG1PB   !soil aqueous MgHPO4 content micropore band, [mol d-2]
   integer :: cid_PrecpB_AlPO4_conc   !precipitated AlPO4 band soil, [mol m-3]
   integer :: cid_PrecpB_CaHPO4_conc   !precipitated CaHPO4 band soil, [mol m-3]
   integer :: cid_PrecpB_Ca5P3O12O3H3_conc   !precipitated Ca5(PO4)3OH hydroxyapatite band soil, [mol m-3]
-  integer :: cid_PrecpB_CaH2PO4_con   !precipitated CaH2PO4 band soil, [mol m-3]
+  integer :: cid_PrecpB_CaH4P2O8_con   !precipitated CaH4P2O8 band soil, [mol m-3]
   integer :: cid_PrecpB_FePO4_con   !precipitated FePO4 band soil, [mol m-3]
   integer :: cid_XNH4_band_conc     !exchangeable NH4 band soil, [mol d-2]
   integer :: cid_XROH1_band_conc    !exchangeable OH- band, [mol d-2]
@@ -120,7 +120,7 @@ implicit none
   integer :: fid_TR_AlPO4_precip_soil   !total precipitated AlPO4 transformation non-band, [mol d-2 h-1]
   integer :: fid_TR_FePO4_precip_soil   !total precipitated FePO4 transformation non-band, [mol d-2 h-1]
   integer :: fid_TR_CaHPO4_precip_soil   !total precipitated CaHPO4 transformation non-band, [mol d-2 h-1]
-  integer :: fid_TR_apatite_precip_soil   !total precipitated CaH2PO4 transformation non-band, [mol d-2 h-1]
+  integer :: fid_TR_apatite_precip_soil   !total precipitated CaH4P2O8 transformation non-band, [mol d-2 h-1]
   integer :: fid_TR_CaH4P2O8_precip_soil   !total precipitated apatite transformation non-band, [mol d-2 h-1]
   integer :: fid_TR_Al_3p_soil     !total solute Al transformation, [mol d-2 h-1]
   integer :: fid_TR_Fe_3p_soil     !total solute Fe transformation, [mol d-2 h-1]
@@ -161,7 +161,7 @@ implicit none
   integer :: fid_TR_FeH2PO4_soil    !total solute FeH2PO4(++) transformation non-band, [mol d-2 h-1]
   integer :: fid_TR_CaPO4_soil    !total solute CaPO4(-) transformation non-band, [mol d-2 h-1]
   integer :: fid_TR_CaHPO4_soil    !total solute CaHPO4 transformation non-band, [mol d-2 h-1]
-  integer :: fid_TR_CaH2PO4_soil    !total solute CaH2PO4 transformation non-band, [mol d-2 h-1]
+  integer :: fid_TR_CaH4P2O8_soil    !total solute CaH4P2O8 transformation non-band, [mol d-2 h-1]
   integer :: fid_TR_MgHPO4_soil    !total solute MgHPO4 transformation non-band, [mol d-2 h-1]
   integer :: fid_TR_H_p_sorbed_soil    !total adsorbed H transformation, [mol d-2 h-1]
   integer :: fid_TR_Al_sorbed_soil    !total adsorbed Al transformation, [mol d-2 h-1]
@@ -193,13 +193,13 @@ implicit none
   integer :: fid_TR_FeH2PO4_band_soil    !total solute FeH2PO4 transformation band, [mol d-2 h-1]
   integer :: fid_TR_CaPO4_band_soil    !total solute CaPO4 transformation band, [mol d-2 h-1]
   integer :: fid_TR_CaHPO4_band_soil    !total solute CaHPO4 transformation band, [mol d-2 h-1]
-  integer :: fid_TR_CaH2PO4_band_soil    !total solute CaH2PO4 transformation band, [mol d-2 h-1]
+  integer :: fid_TR_CaH4P2O8_band_soil    !total solute CaH4P2O8 transformation band, [mol d-2 h-1]
   integer :: fid_TR_MgHPO4_band_soil    !total solute MgHPO4 transformation band, [mol d-2 h-1]
   integer :: fid_TR_NH4_sorbed_band_soil    !total adsorbed NH4 transformation band, [mol d-2 h-1]
   integer :: fid_TR_AlPO4_precip_band_soil   !total precipitated AlPO4 transformation band, [mol d-2 h-1]
   integer :: fid_TR_FePO4_precip_band_soil   !total precipitated FePO4 transformation band, [mol d-2 h-1]
   integer :: fid_TR_CaHPO4_precip_band_soil   !total precipitated CaHPO4 transformation band, [mol d-2 h-1]
-  integer :: fid_TR_apatite_precip_band_soil   !total precipitated CaH2PO4 transformation band, [mol d-2 h-1]
+  integer :: fid_TR_apatite_precip_band_soil   !total precipitated CaH4P2O8 transformation band, [mol d-2 h-1]
   integer :: fid_TR_CaH4P2O8_precip_band_soil   !total precipitated apatite transformation band, [mol d-2 h-1]
   public :: getvarlist_nosalt
   contains
@@ -291,8 +291,8 @@ implicit none
   varl(cid_Precp_CaH4P2O8_conc) ='Precp_CaH4P2O8_conc';varlnml(cid_Precp_CaH4P2O8_conc)='non-band soil precipitated Ca(H2PO4)2'
   unitl(cid_Precp_CaH4P2O8_conc)='mol m-3';vartypes(cid_Precp_CaH4P2O8_conc)=var_state_type
 
-  varl(cid_PrecpB_CaH2PO4_con) ='PrecpB_CaH2PO4_con';varlnml(cid_PrecpB_CaH2PO4_con)='band soil precipitated CaH2PO4'
-  unitl(cid_PrecpB_CaH2PO4_con)='mol m-3';vartypes(cid_PrecpB_CaH2PO4_con)=var_state_type
+  varl(cid_PrecpB_CaH4P2O8_con) ='PrecpB_CaH4P2O8_con';varlnml(cid_PrecpB_CaH4P2O8_con)='band soil precipitated CaH4P2O8'
+  unitl(cid_PrecpB_CaH4P2O8_con)='mol m-3';vartypes(cid_PrecpB_CaH4P2O8_con)=var_state_type
 
   varl(cid_Precp_FePO4_conc) ='Precp_FePO4_conc';varlnml(cid_Precp_FePO4_conc)='non-band soil precipitated FePO4'
   unitl(cid_Precp_FePO4_conc)='mol m-3';vartypes(cid_Precp_FePO4_conc)=var_state_type
@@ -363,7 +363,7 @@ implicit none
   varl(fid_TR_CaHPO4_precip_soil)= 'TR_CaHPO4_precip_soil';varlnml(fid_TR_CaHPO4_precip_soil)='non-band soil total precipitated CaHPO4 transformation'
   unitl(fid_TR_CaHPO4_precip_soil)= 'mol d-2 h-1';vartypes(fid_TR_CaHPO4_precip_soil)=var_flux_type
 
-  varl(fid_TR_apatite_precip_soil)= 'TR_apatite_precip_soil';varlnml(fid_TR_apatite_precip_soil)='non-band soil total precipitated CaH2PO4 transformation'
+  varl(fid_TR_apatite_precip_soil)= 'TR_apatite_precip_soil';varlnml(fid_TR_apatite_precip_soil)='non-band soil total precipitated CaH4P2O8 transformation'
   unitl(fid_TR_apatite_precip_soil)= 'mol d-2 h-1';vartypes(fid_TR_apatite_precip_soil)=var_flux_type
 
   varl(fid_TR_CaH4P2O8_precip_soil)= 'TR_CaH4P2O8_precip_soil';varlnml(fid_TR_CaH4P2O8_precip_soil)='non-band soil total precipitated apatite transformation'
@@ -378,7 +378,7 @@ implicit none
   varl(fid_TR_CaHPO4_precip_band_soil)= 'TR_CaHPO4_precip_band_soil';varlnml(fid_TR_CaHPO4_precip_band_soil)='band soil total precipitated CaHPO4 transformation'
   unitl(fid_TR_CaHPO4_precip_band_soil)= 'mol d-2 h-1';vartypes(fid_TR_CaHPO4_precip_band_soil)=var_flux_type
 
-  varl(fid_TR_apatite_precip_band_soil)= 'TR_apatite_precip_band_soil';varlnml(fid_TR_apatite_precip_band_soil)='band soil total precipitated CaH2PO4 transformation'
+  varl(fid_TR_apatite_precip_band_soil)= 'TR_apatite_precip_band_soil';varlnml(fid_TR_apatite_precip_band_soil)='band soil total precipitated CaH4P2O8 transformation'
   unitl(fid_TR_apatite_precip_band_soil)= 'mol d-2 h-1';vartypes(fid_TR_apatite_precip_band_soil)=var_flux_type
 
   varl(fid_TR_CaH4P2O8_precip_band_soil)= 'TR_CaH4P2O8_precip_band_soil';varlnml(fid_TR_CaH4P2O8_precip_band_soil)='band soil total precipitated apatite transformation'

@@ -184,7 +184,7 @@ module HfuncsMod
     IDATA   =>  plt_site%IDATA    , &
     IYRC    =>  plt_site%IYRC     , &
     IFLGT   =>  plt_site%IFLGT    , &
-    TNBP    =>  plt_bgcr%TNBP     , &
+    Eco_NBP_col    =>  plt_bgcr%Eco_NBP_col     , &
     WTRVX   =>  plt_biom%WTRVX    , &
     IDTH    =>  plt_pheno%IDTH    , &
     IFLGC   =>  plt_pheno%IFLGC     &
@@ -199,7 +199,7 @@ module HfuncsMod
             IFLGC(NZ)=ipltdorm
             IDTH(NZ)=0
             CALL STARTQs(NZ,NZ)
-            TNBP=TNBP+WTRVX(NZ)
+            Eco_NBP_col=Eco_NBP_col+WTRVX(NZ)
           ENDIF
 
           IF(DATAP(NZ).NE.'NO'.AND.IDTH(NZ).EQ.0)then
@@ -220,7 +220,7 @@ module HfuncsMod
           IFLGC(NZ)=ipltdorm
           IDTH(NZ)=0
           CALL STARTQs(NZ,NZ)
-          TNBP=TNBP+WTRVX(NZ)
+          Eco_NBP_col=Eco_NBP_col+WTRVX(NZ)
         ENDIF
         IF(DATAP(NZ).NE.'NO'.AND.IDTH(NZ).EQ.0)then
           IFLGC(NZ)=PlantIsActive

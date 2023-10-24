@@ -55,7 +55,7 @@ module SoluteChemDataType
     real(r8) :: FeH2PO4_2p_conc
     real(r8) :: CaPO4_1e_con
     real(r8) :: CaHPO4_conc
-    real(r8) :: CaH2PO4_1p_conc
+    real(r8) :: CaH4P2O8_1p_conc
     real(r8) :: MgHPO4_conc
     real(r8) :: CSTR1
     real(r8) :: CCO2M
@@ -201,7 +201,7 @@ module SoluteChemDataType
     real(r8) :: TR_FeH2PO4_soil
     real(r8) :: TR_CaPO4_soil
     real(r8) :: TR_CaHPO4_soil
-    real(r8) :: TR_CaH2PO4_soil
+    real(r8) :: TR_CaH4P2O8_soil
     real(r8) :: TR_MgHPO4_soil
     real(r8) :: TR_PO4_band_soil
     real(r8) :: TR_H3PO4_band_soil
@@ -209,7 +209,7 @@ module SoluteChemDataType
     real(r8) :: TR_FeH2PO4_band_soil
     real(r8) :: TR_CaPO4_band_soil
     real(r8) :: TR_CaHPO4_band_soil
-    real(r8) :: TR_CaH2PO4_band_soil
+    real(r8) :: TR_CaH4P2O8_band_soil
     real(r8) :: TR_MgHPO4_band_soil
     real(r8) :: TR_H_p_sorbed_soil
     real(r8) :: TR_Al_sorbed_soil
@@ -250,7 +250,7 @@ module SoluteChemDataType
   real(r8) :: Precp_Ca5P3O12O3H3_conc
   real(r8) :: PrecpB_Ca5P3O12O3H3_conc
   real(r8) :: Precp_CaH4P2O8_conc
-  real(r8) :: PrecpB_CaH2PO4_con
+  real(r8) :: PrecpB_CaH4P2O8_con
   real(r8) :: Precp_FePO4_conc
   real(r8) :: PrecpB_FePO4_con
   real(r8) :: SoilMicPMassLayerX
@@ -441,7 +441,7 @@ contains
   solflx%TR_FeH2PO4_soil = 0._r8
   solflx%TR_CaPO4_soil = 0._r8
   solflx%TR_CaHPO4_soil = 0._r8
-  solflx%TR_CaH2PO4_soil = 0._r8
+  solflx%TR_CaH4P2O8_soil = 0._r8
   solflx%TR_MgHPO4_soil = 0._r8
   solflx%TR_PO4_band_soil = 0._r8
   solflx%TR_H3PO4_band_soil = 0._r8
@@ -449,7 +449,7 @@ contains
   solflx%TR_FeH2PO4_band_soil = 0._r8
   solflx%TR_CaPO4_band_soil = 0._r8
   solflx%TR_CaHPO4_band_soil = 0._r8
-  solflx%TR_CaH2PO4_band_soil = 0._r8
+  solflx%TR_CaH4P2O8_band_soil = 0._r8
   solflx%TR_MgHPO4_band_soil = 0._r8
   solflx%TR_H_p_sorbed_soil = 0._r8
   solflx%TR_Al_sorbed_soil = 0._r8

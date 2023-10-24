@@ -138,7 +138,7 @@ module AqueChemDatatype
   real(r8),target,allocatable ::  XF2PBS(:,:,:)                      !wet deposition of FeH2PO4, [g d-2 h-1]
   real(r8),target,allocatable ::  XC0PBS(:,:,:)                      !wet deposition of CaPO4, [g d-2 h-1]
   real(r8),target,allocatable ::  XC1PBS(:,:,:)                      !wet deposition of CHPO4, [g d-2 h-1]
-  real(r8),target,allocatable ::  XC2PBS(:,:,:)                      !wet deposition of CaH2PO4, [g d-2 h-1]
+  real(r8),target,allocatable ::  XC2PBS(:,:,:)                      !wet deposition of CaH4P2O8, [g d-2 h-1]
   real(r8),target,allocatable ::  XM1PBS(:,:,:)                      !wet deposition of MgHPO4, [g d-2 h-1]
   private :: InitAllocate
   contains

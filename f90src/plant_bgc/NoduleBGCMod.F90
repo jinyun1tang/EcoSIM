@@ -62,7 +62,7 @@ module NoduleBGCMod
     TCO2T    =>  plt_bgcr%TCO2T    , &
     RECO     =>  plt_bgcr%RECO     , &
     TCO2A    =>  plt_bgcr%TCO2A    , &
-    TRAU     =>  plt_bgcr%TRAU     , &
+    Eco_AutoR_col     =>  plt_bgcr%Eco_AutoR_col     , &
     CO2NetFix_pft     =>  plt_bgcr%CO2NetFix_pft     , &
     ESNC     =>  plt_bgcr%ESNC     , &
     ifoliar  =>  pltpar%ifoliar    , &
@@ -282,14 +282,14 @@ module NoduleBGCMod
 !     TCO2T,TCO2A=total,above-ground PFT respiration
 !     CO2NetFix_pft=PFT net CO2 fixation
 !     RECO=ecosystem respiration
-!     TRAU=total autotrophic respiration
+!     Eco_AutoR_col=total autotrophic respiration
 !
     RCO2T=AMIN1(RMNDL,RCNDL)+RGNDG+RCNSNE(ielmc)
     TCO2T(NZ)=TCO2T(NZ)-RCO2T
     TCO2A(NZ)=TCO2A(NZ)-RCO2T
     CO2NetFix_pft(NZ)=CO2NetFix_pft(NZ)-RCO2T
     RECO=RECO-RCO2T
-    TRAU=TRAU-RCO2T
+    Eco_AutoR_col=Eco_AutoR_col-RCO2T
 !
 !     NODULE LITTERFALL CAUSED BY REMOBILIZATION
 !

@@ -1,9 +1,9 @@
 set(NONSALT_MOD_SOURCES
-  TransfrDataMod.F90
+  TranspNoSaltDataMod.F90
   SurfaceFluxMod.F90
   InsideTranspMod.F90
   BoundaryTranspMod.F90
-	TrnsfrMod.F90
+	TranspNoSaltMod.F90
 )
 include(add_ecosim_library)
 add_ecosim_library(nonsalt ${NONSALT_MOD_SOURCES})

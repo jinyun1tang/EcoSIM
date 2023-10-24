@@ -87,13 +87,13 @@ implicit none
   real(r8),pointer   :: histr_1D_SUR_DIC_FLX_col(:)    !UDICQ(NY,NX)/TAREA
   real(r8),pointer   :: histr_1D_SUB_DIC_FLX_col(:)    !UDICD(NY,NX)/TAREA
   real(r8),pointer   :: histr_1D_ATM_CO2_col(:)        !CO2E(NY,NX)
-  real(r8),pointer   :: histr_1D_NBP_col(:)            !TNBP(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: histr_1D_NBP_col(:)            !Eco_NBP_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_ECO_HVST_C_col(:)     !XHVSTE(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_ECO_LAI_col(:)        !CanopyLA_grd(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: histr_1D_ECO_GPP_col(:)        !TGPP(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: histr_1D_ECO_RA_col(:)         !TRAU(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: histr_1D_ECO_NPP_col(:)        !TNPP(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: histr_1D_ECO_RH_col(:)         !THRE(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: histr_1D_ECO_GPP_col(:)        !Eco_GPP_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: histr_1D_ECO_RA_col(:)         !Eco_AutoR_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: histr_1D_ECO_NPP_col(:)        !Eco_NPP_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: histr_1D_ECO_RH_col(:)         !Eco_HR_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_tDIC_col(:)        !UCO2S(NY,NX)/AREA(3,NU(NY,NX),NY,NX), total soil DIC
   real(r8),pointer   :: histr_1D_tSTG_DEAD_C_col(:)       !WTSTGET(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_tSTG_DEAD_N_col(:)       !WTSTGET(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -338,13 +338,13 @@ implicit none
   allocate(this%histr_1D_tMICRO_C_col(beg_col:end_col))       !TOMT(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_OMC_LITR_col(beg_col:end_col))      !ORGC(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total residual C
   allocate(this%histr_1D_ATM_CO2_col(beg_col:end_col))       !CO2E(NY,NX)
-  allocate(this%histr_1D_NBP_col(beg_col:end_col))           !TNBP(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  allocate(this%histr_1D_NBP_col(beg_col:end_col))           !Eco_NBP_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
 
   allocate(this%histr_1D_ECO_LAI_col(beg_col:end_col))       !CanopyLA_grd(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  allocate(this%histr_1D_ECO_GPP_col(beg_col:end_col))       !TGPP(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  allocate(this%histr_1D_ECO_RA_col(beg_col:end_col))        !TRAU(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  allocate(this%histr_1D_ECO_NPP_col(beg_col:end_col))       !TNPP(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  allocate(this%histr_1D_ECO_RH_col(beg_col:end_col))        !THRE(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  allocate(this%histr_1D_ECO_GPP_col(beg_col:end_col))       !Eco_GPP_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  allocate(this%histr_1D_ECO_RA_col(beg_col:end_col))        !Eco_AutoR_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  allocate(this%histr_1D_ECO_NPP_col(beg_col:end_col))       !Eco_NPP_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  allocate(this%histr_1D_ECO_RH_col(beg_col:end_col))        !Eco_HR_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_tDIC_col(beg_col:end_col))       ;  this%histr_1D_tDIC_col=spval
   allocate(this%histr_1D_tSTG_DEAD_C_col(beg_col:end_col));  this%histr_1D_tSTG_DEAD_C_col=spval 
   allocate(this%histr_1D_tSTG_DEAD_N_col(beg_col:end_col));  this%histr_1D_tSTG_DEAD_N_col=spval  
@@ -1482,13 +1482,13 @@ implicit none
       this%histr_1D_tMICRO_C_col(ncol)     = TOMT(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_OMC_LITR_col(ncol)    = ORGC(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_ATM_CO2_col(ncol)     = CO2E(NY,NX)
-      this%histr_1D_NBP_col(ncol)         = TNBP(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%histr_1D_NBP_col(ncol)         = Eco_NBP_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_ECO_HVST_C_col(ncol)  = XHVSTE(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_ECO_LAI_col(ncol)     = CanopyLA_grd(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%histr_1D_ECO_GPP_col(ncol)     = TGPP(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%histr_1D_ECO_RA_col(ncol)      = TRAU(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%histr_1D_ECO_NPP_col(ncol)     = TNPP(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%histr_1D_ECO_RH_col(ncol)      = THRE(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%histr_1D_ECO_GPP_col(ncol)     = Eco_GPP_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%histr_1D_ECO_RA_col(ncol)      = Eco_AutoR_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%histr_1D_ECO_NPP_col(ncol)     = Eco_NPP_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%histr_1D_ECO_RH_col(ncol)      = Eco_HR_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_tDIC_col(ncol)     = UCO2S(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_tSTG_DEAD_C_col(ncol)    = WTSTGET(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_tSTG_DEAD_N_col(ncol)    = WTSTGET(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)

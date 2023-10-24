@@ -1,7 +1,7 @@
 module SurfaceFluxMod
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use GridDataType
-  use TransfrDataMod
+  use TranspNoSaltDataMod
   use SoilBGCDataType
   use SoilWaterDataType
   use EcoSIMCtrlDataType
@@ -387,36 +387,36 @@ contains
     XOPFLS(K,3,NU(NY,NX),NY,NX)=XOPFLS(K,3,NU(NY,NX),NY,NX)+RFLOP(K)+DFVOP(K)
     XOAFLS(K,3,NU(NY,NX),NY,NX)=XOAFLS(K,3,NU(NY,NX),NY,NX)+RFLOA(K)+DFVOA(K)
   ENDDO
-  trcs_XFLS(idg_CO2,3,0,NY,NX)=trcs_XFLS(idg_CO2,3,0,NY,NX)+trcg_RFLS0(idg_CO2)-RFLs_adv(idg_CO2)-SDifFlx(idg_CO2)
-  trcs_XFLS(idg_CH4,3,0,NY,NX)=trcs_XFLS(idg_CH4,3,0,NY,NX)+trcg_RFLS0(idg_CH4)-RFLs_adv(idg_CH4)-SDifFlx(idg_CH4)
-  trcs_XFLS(idg_O2,3,0,NY,NX)=trcs_XFLS(idg_O2,3,0,NY,NX)+trcg_RFLS0(idg_O2)-RFLs_adv(idg_O2)-SDifFlx(idg_O2)
-  trcs_XFLS(idg_N2,3,0,NY,NX)=trcs_XFLS(idg_N2,3,0,NY,NX)+trcg_RFLS0(idg_N2)-RFLs_adv(idg_N2)-SDifFlx(idg_N2)
-  trcs_XFLS(idg_N2O,3,0,NY,NX)=trcs_XFLS(idg_N2O,3,0,NY,NX)+trcg_RFLS0(idg_N2O)-RFLs_adv(idg_N2O)-SDifFlx(idg_N2O)
-  trcs_XFLS(idg_H2,3,0,NY,NX)=trcs_XFLS(idg_H2,3,0,NY,NX)-RFLs_adv(idg_H2)-SDifFlx(idg_H2)
-  trcs_XFLS(ids_NH4,3,0,NY,NX)=trcs_XFLS(ids_NH4,3,0,NY,NX)+trcn_RFLW0(ids_NH4)-RFLs_adv(ids_NH4)-SDifFlx(ids_NH4)-RFLs_adv(ids_NH4B)-SDifFlx(ids_NH4B)
-  trcs_XFLS(idg_NH3,3,0,NY,NX)=trcs_XFLS(idg_NH3,3,0,NY,NX)+trcg_RFLS0(idg_NH3)-RFLs_adv(idg_NH3)-SDifFlx(idg_NH3)-RFLs_adv(idg_NH3B)-SDifFlx(idg_NH3B)
-  trcs_XFLS(ids_NO3,3,0,NY,NX)=trcs_XFLS(ids_NO3,3,0,NY,NX)+trcn_RFLW0(ids_NO3)-RFLs_adv(ids_NO3)-SDifFlx(ids_NO3)-RFLs_adv(ids_NO3B)-SDifFlx(ids_NO3B)
-  trcs_XFLS(ids_NO2,3,0,NY,NX)=trcs_XFLS(ids_NO2,3,0,NY,NX)-RFLs_adv(ids_NO2)-SDifFlx(ids_NO2)-RFLs_adv(ids_NO2B)-SDifFlx(ids_NO2B)
-  trcs_XFLS(ids_H1PO4,3,0,NY,NX)=trcs_XFLS(ids_H1PO4,3,0,NY,NX)+trcn_RFLW0(ids_H1PO4)-RFLs_adv(ids_H1PO4)-SDifFlx(ids_H1PO4)-RFLs_adv(ids_H1PO4B)-SDifFlx(ids_H1PO4B)
-  trcs_XFLS(ids_H2PO4,3,0,NY,NX)=trcs_XFLS(ids_H2PO4,3,0,NY,NX)+trcn_RFLW0(ids_H2PO4)-RFLs_adv(ids_H2PO4)-SDifFlx(ids_H2PO4)-RFLs_adv(ids_H2PO4B)-SDifFlx(ids_H2PO4B)
-  trcs_XFLS(idg_CO2,3,NU(NY,NX),NY,NX)=trcs_XFLS(idg_CO2,3,NU(NY,NX),NY,NX)+RCOFLS1+RFLs_adv(idg_CO2)+SDifFlx(idg_CO2)
-  trcs_XFLS(idg_CH4,3,NU(NY,NX),NY,NX)=trcs_XFLS(idg_CH4,3,NU(NY,NX),NY,NX)+RCHFLS1+RFLs_adv(idg_CH4)+SDifFlx(idg_CH4)
-  trcs_XFLS(idg_O2,3,NU(NY,NX),NY,NX)=trcs_XFLS(idg_O2,3,NU(NY,NX),NY,NX)+ROXFLS1+RFLs_adv(idg_O2)+SDifFlx(idg_O2)
-  trcs_XFLS(idg_N2,3,NU(NY,NX),NY,NX)=trcs_XFLS(idg_N2,3,NU(NY,NX),NY,NX)+RNGFLS1+RFLs_adv(idg_N2)+SDifFlx(idg_N2)
-  trcs_XFLS(idg_N2O,3,NU(NY,NX),NY,NX)=trcs_XFLS(idg_N2O,3,NU(NY,NX),NY,NX)+RN2FLS1+RFLs_adv(idg_N2O)+SDifFlx(idg_N2O)
-  trcs_XFLS(idg_H2,3,NU(NY,NX),NY,NX)=trcs_XFLS(idg_H2,3,NU(NY,NX),NY,NX)+RFLs_adv(idg_H2)+SDifFlx(idg_H2)
-  trcs_XFLS(ids_NH4,3,NU(NY,NX),NY,NX)=trcs_XFLS(ids_NH4,3,NU(NY,NX),NY,NX)+RN4FLW1+RFLs_adv(ids_NH4)+SDifFlx(ids_NH4)
-  trcs_XFLS(idg_NH3,3,NU(NY,NX),NY,NX)=trcs_XFLS(idg_NH3,3,NU(NY,NX),NY,NX)+RN3FLW1+RFLs_adv(idg_NH3)+SDifFlx(idg_NH3)
-  trcs_XFLS(ids_NO3,3,NU(NY,NX),NY,NX)=trcs_XFLS(ids_NO3,3,NU(NY,NX),NY,NX)+RNOFLW1+RFLs_adv(ids_NO3)+SDifFlx(ids_NO3)
-  trcs_XFLS(ids_NO2,3,NU(NY,NX),NY,NX)=trcs_XFLS(ids_NO2,3,NU(NY,NX),NY,NX)+RFLs_adv(ids_NO2)+SDifFlx(ids_NO2)
-  trcs_XFLS(ids_H1PO4,3,NU(NY,NX),NY,NX)=trcs_XFLS(ids_H1PO4,3,NU(NY,NX),NY,NX)+RH1PFS1+RFLs_adv(ids_H1PO4)+SDifFlx(ids_H1PO4)
-  trcs_XFLS(ids_H2PO4,3,NU(NY,NX),NY,NX)=trcs_XFLS(ids_H2PO4,3,NU(NY,NX),NY,NX)+RH2PFS1+RFLs_adv(ids_H2PO4)+SDifFlx(ids_H2PO4)
-  trcs_XFLS(ids_NH4B,3,NU(NY,NX),NY,NX)=trcs_XFLS(ids_NH4B,3,NU(NY,NX),NY,NX)+RN4FLB1+RFLs_adv(ids_NH4B)+SDifFlx(ids_NH4B)
-  trcs_XFLS(idg_NH3B,3,NU(NY,NX),NY,NX)=trcs_XFLS(idg_NH3B,3,NU(NY,NX),NY,NX)+RN3FLB1+RFLs_adv(idg_NH3B)+SDifFlx(idg_NH3B)
-  trcs_XFLS(ids_NO3B,3,NU(NY,NX),NY,NX)=trcs_XFLS(ids_NO3B,3,NU(NY,NX),NY,NX)+RNOFLB1+RFLs_adv(ids_NO3B)+SDifFlx(ids_NO3B)
-  trcs_XFLS(ids_NO2B,3,NU(NY,NX),NY,NX)=trcs_XFLS(ids_NO2B,3,NU(NY,NX),NY,NX)+RFLs_adv(ids_NO2B)+SDifFlx(ids_NO2B)
-  trcs_XFLS(ids_H1PO4B,3,NU(NY,NX),NY,NX)=trcs_XFLS(ids_H1PO4B,3,NU(NY,NX),NY,NX)+RH1BFB1+RFLs_adv(ids_H1PO4B)+SDifFlx(ids_H1PO4B)
-  trcs_XFLS(ids_H2PO4B,3,NU(NY,NX),NY,NX)=trcs_XFLS(ids_H2PO4B,3,NU(NY,NX),NY,NX)+RH2BFB1+RFLs_adv(ids_H2PO4B)+SDifFlx(ids_H2PO4B)
+  trcs_3DTransp2MicP(idg_CO2,3,0,NY,NX)=trcs_3DTransp2MicP(idg_CO2,3,0,NY,NX)+trcg_RFLS0(idg_CO2)-RFLs_adv(idg_CO2)-SDifFlx(idg_CO2)
+  trcs_3DTransp2MicP(idg_CH4,3,0,NY,NX)=trcs_3DTransp2MicP(idg_CH4,3,0,NY,NX)+trcg_RFLS0(idg_CH4)-RFLs_adv(idg_CH4)-SDifFlx(idg_CH4)
+  trcs_3DTransp2MicP(idg_O2,3,0,NY,NX)=trcs_3DTransp2MicP(idg_O2,3,0,NY,NX)+trcg_RFLS0(idg_O2)-RFLs_adv(idg_O2)-SDifFlx(idg_O2)
+  trcs_3DTransp2MicP(idg_N2,3,0,NY,NX)=trcs_3DTransp2MicP(idg_N2,3,0,NY,NX)+trcg_RFLS0(idg_N2)-RFLs_adv(idg_N2)-SDifFlx(idg_N2)
+  trcs_3DTransp2MicP(idg_N2O,3,0,NY,NX)=trcs_3DTransp2MicP(idg_N2O,3,0,NY,NX)+trcg_RFLS0(idg_N2O)-RFLs_adv(idg_N2O)-SDifFlx(idg_N2O)
+  trcs_3DTransp2MicP(idg_H2,3,0,NY,NX)=trcs_3DTransp2MicP(idg_H2,3,0,NY,NX)-RFLs_adv(idg_H2)-SDifFlx(idg_H2)
+  trcs_3DTransp2MicP(ids_NH4,3,0,NY,NX)=trcs_3DTransp2MicP(ids_NH4,3,0,NY,NX)+trcn_RFLW0(ids_NH4)-RFLs_adv(ids_NH4)-SDifFlx(ids_NH4)-RFLs_adv(ids_NH4B)-SDifFlx(ids_NH4B)
+  trcs_3DTransp2MicP(idg_NH3,3,0,NY,NX)=trcs_3DTransp2MicP(idg_NH3,3,0,NY,NX)+trcg_RFLS0(idg_NH3)-RFLs_adv(idg_NH3)-SDifFlx(idg_NH3)-RFLs_adv(idg_NH3B)-SDifFlx(idg_NH3B)
+  trcs_3DTransp2MicP(ids_NO3,3,0,NY,NX)=trcs_3DTransp2MicP(ids_NO3,3,0,NY,NX)+trcn_RFLW0(ids_NO3)-RFLs_adv(ids_NO3)-SDifFlx(ids_NO3)-RFLs_adv(ids_NO3B)-SDifFlx(ids_NO3B)
+  trcs_3DTransp2MicP(ids_NO2,3,0,NY,NX)=trcs_3DTransp2MicP(ids_NO2,3,0,NY,NX)-RFLs_adv(ids_NO2)-SDifFlx(ids_NO2)-RFLs_adv(ids_NO2B)-SDifFlx(ids_NO2B)
+  trcs_3DTransp2MicP(ids_H1PO4,3,0,NY,NX)=trcs_3DTransp2MicP(ids_H1PO4,3,0,NY,NX)+trcn_RFLW0(ids_H1PO4)-RFLs_adv(ids_H1PO4)-SDifFlx(ids_H1PO4)-RFLs_adv(ids_H1PO4B)-SDifFlx(ids_H1PO4B)
+  trcs_3DTransp2MicP(ids_H2PO4,3,0,NY,NX)=trcs_3DTransp2MicP(ids_H2PO4,3,0,NY,NX)+trcn_RFLW0(ids_H2PO4)-RFLs_adv(ids_H2PO4)-SDifFlx(ids_H2PO4)-RFLs_adv(ids_H2PO4B)-SDifFlx(ids_H2PO4B)
+  trcs_3DTransp2MicP(idg_CO2,3,NU(NY,NX),NY,NX)=trcs_3DTransp2MicP(idg_CO2,3,NU(NY,NX),NY,NX)+RCOFLS1+RFLs_adv(idg_CO2)+SDifFlx(idg_CO2)
+  trcs_3DTransp2MicP(idg_CH4,3,NU(NY,NX),NY,NX)=trcs_3DTransp2MicP(idg_CH4,3,NU(NY,NX),NY,NX)+RCHFLS1+RFLs_adv(idg_CH4)+SDifFlx(idg_CH4)
+  trcs_3DTransp2MicP(idg_O2,3,NU(NY,NX),NY,NX)=trcs_3DTransp2MicP(idg_O2,3,NU(NY,NX),NY,NX)+ROXFLS1+RFLs_adv(idg_O2)+SDifFlx(idg_O2)
+  trcs_3DTransp2MicP(idg_N2,3,NU(NY,NX),NY,NX)=trcs_3DTransp2MicP(idg_N2,3,NU(NY,NX),NY,NX)+RNGFLS1+RFLs_adv(idg_N2)+SDifFlx(idg_N2)
+  trcs_3DTransp2MicP(idg_N2O,3,NU(NY,NX),NY,NX)=trcs_3DTransp2MicP(idg_N2O,3,NU(NY,NX),NY,NX)+RN2FLS1+RFLs_adv(idg_N2O)+SDifFlx(idg_N2O)
+  trcs_3DTransp2MicP(idg_H2,3,NU(NY,NX),NY,NX)=trcs_3DTransp2MicP(idg_H2,3,NU(NY,NX),NY,NX)+RFLs_adv(idg_H2)+SDifFlx(idg_H2)
+  trcs_3DTransp2MicP(ids_NH4,3,NU(NY,NX),NY,NX)=trcs_3DTransp2MicP(ids_NH4,3,NU(NY,NX),NY,NX)+RN4FLW1+RFLs_adv(ids_NH4)+SDifFlx(ids_NH4)
+  trcs_3DTransp2MicP(idg_NH3,3,NU(NY,NX),NY,NX)=trcs_3DTransp2MicP(idg_NH3,3,NU(NY,NX),NY,NX)+RN3FLW1+RFLs_adv(idg_NH3)+SDifFlx(idg_NH3)
+  trcs_3DTransp2MicP(ids_NO3,3,NU(NY,NX),NY,NX)=trcs_3DTransp2MicP(ids_NO3,3,NU(NY,NX),NY,NX)+RNOFLW1+RFLs_adv(ids_NO3)+SDifFlx(ids_NO3)
+  trcs_3DTransp2MicP(ids_NO2,3,NU(NY,NX),NY,NX)=trcs_3DTransp2MicP(ids_NO2,3,NU(NY,NX),NY,NX)+RFLs_adv(ids_NO2)+SDifFlx(ids_NO2)
+  trcs_3DTransp2MicP(ids_H1PO4,3,NU(NY,NX),NY,NX)=trcs_3DTransp2MicP(ids_H1PO4,3,NU(NY,NX),NY,NX)+RH1PFS1+RFLs_adv(ids_H1PO4)+SDifFlx(ids_H1PO4)
+  trcs_3DTransp2MicP(ids_H2PO4,3,NU(NY,NX),NY,NX)=trcs_3DTransp2MicP(ids_H2PO4,3,NU(NY,NX),NY,NX)+RH2PFS1+RFLs_adv(ids_H2PO4)+SDifFlx(ids_H2PO4)
+  trcs_3DTransp2MicP(ids_NH4B,3,NU(NY,NX),NY,NX)=trcs_3DTransp2MicP(ids_NH4B,3,NU(NY,NX),NY,NX)+RN4FLB1+RFLs_adv(ids_NH4B)+SDifFlx(ids_NH4B)
+  trcs_3DTransp2MicP(idg_NH3B,3,NU(NY,NX),NY,NX)=trcs_3DTransp2MicP(idg_NH3B,3,NU(NY,NX),NY,NX)+RN3FLB1+RFLs_adv(idg_NH3B)+SDifFlx(idg_NH3B)
+  trcs_3DTransp2MicP(ids_NO3B,3,NU(NY,NX),NY,NX)=trcs_3DTransp2MicP(ids_NO3B,3,NU(NY,NX),NY,NX)+RNOFLB1+RFLs_adv(ids_NO3B)+SDifFlx(ids_NO3B)
+  trcs_3DTransp2MicP(ids_NO2B,3,NU(NY,NX),NY,NX)=trcs_3DTransp2MicP(ids_NO2B,3,NU(NY,NX),NY,NX)+RFLs_adv(ids_NO2B)+SDifFlx(ids_NO2B)
+  trcs_3DTransp2MicP(ids_H1PO4B,3,NU(NY,NX),NY,NX)=trcs_3DTransp2MicP(ids_H1PO4B,3,NU(NY,NX),NY,NX)+RH1BFB1+RFLs_adv(ids_H1PO4B)+SDifFlx(ids_H1PO4B)
+  trcs_3DTransp2MicP(ids_H2PO4B,3,NU(NY,NX),NY,NX)=trcs_3DTransp2MicP(ids_H2PO4B,3,NU(NY,NX),NY,NX)+RH2BFB1+RFLs_adv(ids_H2PO4B)+SDifFlx(ids_H2PO4B)
   end subroutine TotalPoreFluxAdjacentCell
 !------------------------------------------------------------------------------------------
 
@@ -1144,7 +1144,7 @@ contains
 !     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
 !
     DO NTG=idg_beg,idg_end-1
-      trcg_XDFR(NTG,NY,NX)=trcg_XDFR(NTG,NY,NX)+RDFR_gas(NTG,NY,NX)
+      trcg_surf_disevap_flx(NTG,NY,NX)=trcg_surf_disevap_flx(NTG,NY,NX)+RDFR_gas(NTG,NY,NX)
     ENDDO
 
   ELSE

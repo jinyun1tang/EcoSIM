@@ -223,7 +223,7 @@ module StarteMod
     trcsalt_rain_conc(idsalt_FeOH3,NY,NX)=solutevar%FeO3H3_conc
     trcsalt_rain_conc(idsalt_FeOH4,NY,NX)=solutevar%FeO4H4_1e_conc
     trcsalt_rain_conc(idsalt_FeSO4,NY,NX)=solutevar%FeSO4_1p_conc
-    trcsalt_rain_conc(idsalt_CaOH2,NY,NX)=solutevar%CaO2H2_conc
+    trcsalt_rain_conc(idsalt_CaOH,NY,NX)=solutevar%CaO2H2_conc
     trcsalt_rain_conc(idsalt_CaCO3,NY,NX)=solutevar%CaCO3_conc
     trcsalt_rain_conc(idsalt_CaHCO3,NY,NX)=solutevar%CaHCO3_1p_conc
     trcsalt_rain_conc(idsalt_CaSO4,NY,NX)=solutevar%CaSO4_conc
@@ -242,7 +242,7 @@ module StarteMod
     trcsalt_rain_conc(idsalt_FeH2PO4,NY,NX)=solutevar%FeH2PO4_2p_conc
     trcsalt_rain_conc(idsalt_CaPO4,NY,NX)=solutevar%CaPO4_1e_con
     trcsalt_rain_conc(idsalt_CaHPO4,NY,NX)=solutevar%CaHPO4_conc
-    trcsalt_rain_conc(idsalt_CaH2PO4,NY,NX)=solutevar%CaH2PO4_1p_conc
+    trcsalt_rain_conc(idsalt_CaH4P2O8,NY,NX)=solutevar%CaH4P2O8_1p_conc
     trcsalt_rain_conc(idsalt_MgHPO4,NY,NX)=solutevar%MgHPO4_conc
     CSTRR(NY,NX)=solutevar%CSTR1
 !
@@ -279,7 +279,7 @@ module StarteMod
     trcsalt_irrig_conc(idsalt_FeOH3,I,NY,NX)=solutevar%FeO3H3_conc
     trcsalt_irrig_conc(idsalt_FeOH4,I,NY,NX)=solutevar%FeO4H4_1e_conc
     trcsalt_irrig_conc(idsalt_FeSO4,I,NY,NX)=solutevar%FeSO4_1p_conc
-    trcsalt_irrig_conc(idsalt_CaOH2,I,NY,NX)=solutevar%CaO2H2_conc
+    trcsalt_irrig_conc(idsalt_CaOH,I,NY,NX)=solutevar%CaO2H2_conc
     trcsalt_irrig_conc(idsalt_CaCO3,I,NY,NX)=solutevar%CaCO3_conc
     trcsalt_irrig_conc(idsalt_CaHCO3,I,NY,NX)=solutevar%CaHCO3_1p_conc
     trcsalt_irrig_conc(idsalt_CaSO4,I,NY,NX)=solutevar%CaSO4_conc
@@ -298,7 +298,7 @@ module StarteMod
     trcsalt_irrig_conc(idsalt_FeH2PO4,I,NY,NX)=solutevar%FeH2PO4_2p_conc
     trcsalt_irrig_conc(idsalt_CaPO4,I,NY,NX)=solutevar%CaPO4_1e_con
     trcsalt_irrig_conc(idsalt_CaHPO4,I,NY,NX)=solutevar%CaHPO4_conc
-    trcsalt_irrig_conc(idsalt_CaH2PO4,I,NY,NX)=solutevar%CaH2PO4_1p_conc
+    trcsalt_irrig_conc(idsalt_CaH4P2O8,I,NY,NX)=solutevar%CaH4P2O8_1p_conc
     trcsalt_irrig_conc(idsalt_MgHPO4,I,NY,NX)=solutevar%MgHPO4_conc
     CSTRQ(I,NY,NX)=solutevar%CSTR1
 !
@@ -340,7 +340,7 @@ module StarteMod
     trcsalt_subirrig_conc(idsalt_FeOH3,L,NY,NX)=solutevar%FeO3H3_conc
     trcsalt_subirrig_conc(idsalt_FeOH4,L,NY,NX)=solutevar%FeO4H4_1e_conc
     trcsalt_subirrig_conc(idsalt_FeSO4,L,NY,NX)=solutevar%FeSO4_1p_conc
-    trcsalt_subirrig_conc(idsalt_CaOH2,L,NY,NX)=solutevar%CaO2H2_conc
+    trcsalt_subirrig_conc(idsalt_CaOH,L,NY,NX)=solutevar%CaO2H2_conc
     trcsalt_subirrig_conc(idsalt_CaCO3,L,NY,NX)=solutevar%CaCO3_conc
     trcsalt_subirrig_conc(idsalt_CaHCO3,L,NY,NX)=solutevar%CaHCO3_1p_conc
     trcsalt_subirrig_conc(idsalt_CaSO4,L,NY,NX)=solutevar%CaSO4_conc
@@ -361,7 +361,7 @@ module StarteMod
     trcsalt_subirrig_conc(idsalt_FeH2PO4,L,NY,NX)=solutevar%FeH2PO4_2p_conc
     trcsalt_subirrig_conc(idsalt_CaPO4,L,NY,NX)=solutevar%CaPO4_1e_con
     trcsalt_subirrig_conc(idsalt_CaHPO4,L,NY,NX)=solutevar%CaHPO4_conc
-    trcsalt_subirrig_conc(idsalt_CaH2PO4,L,NY,NX)=solutevar%CaH2PO4_1p_conc
+    trcsalt_subirrig_conc(idsalt_CaH4P2O8,L,NY,NX)=solutevar%CaH4P2O8_1p_conc
     trcsalt_subirrig_conc(idsalt_MgHPO4,L,NY,NX)=solutevar%MgHPO4_conc
 !
 !   INITIAL STATE VARIABLES FOR GAS IN SOIL
@@ -471,12 +471,12 @@ module StarteMod
     trcp_salml(idsp_FePO4,L,NY,NX)=solutevar%Precp_FePO4_conc*SoilMicPMassLayer(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
     trcp_salml(idsp_CaHPO4,L,NY,NX)=solutevar%Precp_CaHPO4_conc*SoilMicPMassLayer(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
     trcp_salml(idsp_HA,L,NY,NX)=solutevar%Precp_Ca5P3O12O3H3_conc*SoilMicPMassLayer(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-    trcp_salml(idsp_CaH2PO4,L,NY,NX)=0._r8
+    trcp_salml(idsp_CaH4P2O8,L,NY,NX)=0._r8
     trcp_salml(idsp_AlPO4B,L,NY,NX)=solutevar%Precp_AlPO4_conc*SoilMicPMassLayer(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
     trcp_salml(idsp_FePO4B,L,NY,NX)=solutevar%Precp_FePO4_conc*SoilMicPMassLayer(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
     trcp_salml(idsp_CaHPO4B,L,NY,NX)=solutevar%Precp_CaHPO4_conc*SoilMicPMassLayer(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
     trcp_salml(idsp_HAB,L,NY,NX)=solutevar%Precp_Ca5P3O12O3H3_conc*SoilMicPMassLayer(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
-    trcp_salml(idsp_CaH2PO4B,L,NY,NX)=0._r8
+    trcp_salml(idsp_CaH4P2O8B,L,NY,NX)=0._r8
     ECND(L,NY,NX)=0._r8
     CSTR(L,NY,NX)=0._r8
     CION(L,NY,NX)=0._r8
@@ -518,12 +518,12 @@ module StarteMod
     trcp_salml(idsp_FePO4,0,NY,NX)=0._r8
     trcp_salml(idsp_CaHPO4,0,NY,NX)=0._r8
     trcp_salml(idsp_HA,0,NY,NX)=0._r8
-    trcp_salml(idsp_CaH2PO4,0,NY,NX)=0._r8
+    trcp_salml(idsp_CaH4P2O8,0,NY,NX)=0._r8
     trcp_salml(idsp_AlPO4B,0,NY,NX)=0._r8
     trcp_salml(idsp_FePO4B,0,NY,NX)=0._r8
     trcp_salml(idsp_CaHPO4B,0,NY,NX)=0._r8
     trcp_salml(idsp_HAB,0,NY,NX)=0._r8
-    trcp_salml(idsp_CaH2PO4B,0,NY,NX)=0._r8
+    trcp_salml(idsp_CaH4P2O8B,0,NY,NX)=0._r8
 !
 !     INITIAL STATE VARIABLES FOR MINERAL N AND P IN SNOWPACK
 !

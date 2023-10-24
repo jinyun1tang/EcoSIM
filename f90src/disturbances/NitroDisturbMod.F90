@@ -315,7 +315,7 @@ module NitroDisturbMod
           trcp_salml(idsp_FePO4,L,NY,NX)=DCORPC1*trcp_salml(idsp_FePO4,L,NY,NX)
           trcp_salml(idsp_CaHPO4,L,NY,NX)=DCORPC1*trcp_salml(idsp_CaHPO4,L,NY,NX)
           trcp_salml(idsp_HA,L,NY,NX)=DCORPC1*trcp_salml(idsp_HA,L,NY,NX)
-          trcp_salml(idsp_CaH2PO4,L,NY,NX)=DCORPC1*trcp_salml(idsp_CaH2PO4,L,NY,NX)
+          trcp_salml(idsp_CaH4P2O8,L,NY,NX)=DCORPC1*trcp_salml(idsp_CaH4P2O8,L,NY,NX)
 
           DO NTF=ifertn_beg,ifertn_end
             FertN_soil(NTF,L,NY,NX)=DCORPC1*FertN_soil(NTF,L,NY,NX)
@@ -341,7 +341,7 @@ module NitroDisturbMod
           UDOCQ(NY,NX)=UDOCQ(NY,NX)+OC
           UDONQ(NY,NX)=UDONQ(NY,NX)+ON
           UDOPQ(NY,NX)=UDOPQ(NY,NX)+OP
-          TNBP(NY,NX)=TNBP(NY,NX)-OC
+          Eco_NBP_col(NY,NX)=Eco_NBP_col(NY,NX)-OC
         ELSEIF(ITILL(I,NY,NX).EQ.22)THEN
           CO2GIN=CO2GIN-OC
           OXYGIN=OXYGIN+2.667_r8*OC
@@ -354,7 +354,7 @@ module NitroDisturbMod
           UNH3F(NY,NX)=UNH3F(NY,NX)-ON
           UN2OF(NY,NX)=UN2OF(NY,NX)-0.0_r8
           UPO4F(NY,NX)=UPO4F(NY,NX)-OP
-          TNBP(NY,NX)=TNBP(NY,NX)-OC
+          Eco_NBP_col(NY,NX)=Eco_NBP_col(NY,NX)-OC
         ENDIF
       ENDIF
     ENDDO D2950

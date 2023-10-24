@@ -1213,7 +1213,7 @@ module PlantBranchMod
     CO2NetFix_pft    =>  plt_bgcr%CO2NetFix_pft       , &
     TCO2T   =>  plt_bgcr%TCO2T      , &
     TCO2A   =>  plt_bgcr%TCO2A      , &
-    TRAU    =>  plt_bgcr%TRAU       , &
+    Eco_AutoR_col    =>  plt_bgcr%Eco_AutoR_col       , &
     RECO    =>  plt_bgcr%RECO       , &
     WGLFE   =>  plt_biom%WGLFE      , &
     ZEROP   =>  plt_biom%ZEROP      , &
@@ -1279,14 +1279,14 @@ module PlantBranchMod
 !     TCO2T,TCO2A=total,above-ground PFT respiration
 !     CO2NetFix_pft=PFT net CO2 fixation
 !     RECO=ecosystem respiration
-!     TRAU=total autotrophic respiration
+!     Eco_AutoR_col=total autotrophic respiration
 !     CO2LeakFromBundsheth=bundle sheath CO2 leakage
 !
       TCO2T(NZ)=TCO2T(NZ)-CO2LeakFromBundsheth
       TCO2A(NZ)=TCO2A(NZ)-CO2LeakFromBundsheth
       CO2NetFix_pft(NZ)=CO2NetFix_pft(NZ)-CO2LeakFromBundsheth
       RECO=RECO-CO2LeakFromBundsheth
-      TRAU=TRAU-CO2LeakFromBundsheth
+      Eco_AutoR_col=Eco_AutoR_col-CO2LeakFromBundsheth
     ENDIF
   ENDDO D170
   end associate
@@ -3255,9 +3255,9 @@ module PlantBranchMod
   associate(                             &
     CO2NetFix_pft      =>  plt_bgcr%CO2NetFix_pft    , &
     TCO2T     =>  plt_bgcr%TCO2T   , &
-    TRAU      =>  plt_bgcr%TRAU    , &
+    Eco_AutoR_col      =>  plt_bgcr%Eco_AutoR_col    , &
     RECO      =>  plt_bgcr%RECO    , &
-    TGPP      =>  plt_bgcr%TGPP    , &
+    Eco_GPP_col      =>  plt_bgcr%Eco_GPP_col    , &
     CARBN     =>  plt_bgcr%CARBN   , &
     TCO2A     =>  plt_bgcr%TCO2A   , &
     EPOOL     =>  plt_biom%EPOOL   , &
@@ -3378,18 +3378,18 @@ module PlantBranchMod
 ! CO2F=total CO2 fixation
 ! TCO2T,TCO2A=total,above-ground PFT respiration
 ! CO2NetFix_pft=PFT net CO2 fixation
-! TGPP=ecosystem GPP
+! Eco_GPP_col=ecosystem GPP
 ! RECO=ecosystem respiration
-! TRAU=total autotrophic respiration
+! Eco_AutoR_col=total autotrophic respiration
 !
   Rauto_pft=AMIN1(RMNCS,RCO2C)+RCO2G+SNCR+CNRDA
   CARBN(NZ)=CARBN(NZ)+CO2F
   TCO2T(NZ)=TCO2T(NZ)-Rauto_pft
   TCO2A(NZ)=TCO2A(NZ)-Rauto_pft
   CO2NetFix_pft(NZ)=CO2NetFix_pft(NZ)+CO2F-Rauto_pft
-  TGPP=TGPP+CO2F
+  Eco_GPP_col=Eco_GPP_col+CO2F
   RECO=RECO-Rauto_pft
-  TRAU=TRAU-Rauto_pft
+  Eco_AutoR_col=Eco_AutoR_col-Rauto_pft
 
   end associate
   end subroutine ComputeRAutoAfEmergence

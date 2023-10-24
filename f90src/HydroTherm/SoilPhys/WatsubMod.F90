@@ -567,7 +567,7 @@ module WatsubMod
           !
           !     FLW,FLWX,FLWH=total water flux through micropores,macropores
           !     HFLW=total heat flux
-          !     WaterFlow2MicPM=water flux used for solute flux calculations in trnsfr.f
+          !     WaterFlow2MicPM=water flux used for solute flux calculations in TranspNoSalt.f
           !
               WaterFlowSoiMicP(N,N6,N5,N4)=WaterFlowSoiMicP(N,N6,N5,N4)+WatXChange2WatTable(N,N6,N5,N4)
               WaterFlowSoiMicPX(N,N6,N5,N4)=WaterFlowSoiMicPX(N,N6,N5,N4)+WatXChange2WatTableX(N,N6,N5,N4)
@@ -577,7 +577,7 @@ module WatsubMod
 
               IF(N.EQ.ivertdir)THEN
             !
-            !     WATER FILM THICKNESS FOR CALCULATING GAS EXCHANGE IN TRNSFR.F
+            !     WATER FILM THICKNESS FOR CALCULATING GAS EXCHANGE IN TranspNoSalt.F
             !
                 FILM(M,N6,N5,N4)=FilmThickness(PSISoilMatricPtmp(N6,N5,N4))
               ENDIF
@@ -953,7 +953,7 @@ module WatsubMod
 !
 !     VLWatMacP1=macropore volume
 !     FINHX,FINHL=macro-micropore transfer unltd,ltd by water,air volume
-!     FWatExMacP2MicPM=macro-micropore transfer for use in trnsfr.f
+!     FWatExMacP2MicPM=macro-micropore transfer for use in TranspNoSalt.f
 !     HydroCond3D=hydraulic conductivity
 !     PSISE,PSISoilAirEntry=air entry,matric water potentials
 !     PHOL,MacPRadius=path length between,radius of macropores from hour1.f
@@ -1030,9 +1030,9 @@ module WatsubMod
       ! VOLA1,VLMacP1=micropore,macropore volume
       ! VOLP1,VOLPH1=micropore,macropore air volume
       ! VOLWM,VLWatMacPM,VLsoiAirPM,ReductVLsoiAirPM=micropore,macropore water volume, air volume
-      ! and change in air volume for use in trnsfr.f
+      ! and change in air volume for use in TranspNoSalt.f
       ! THETWX,FracSoiPAsIce,FracSoiPAsAir,FracSoilAsAirt=bulk water,ice,air concn,air-filled porosity
-      ! THETPM=air concentration for use in trnsfr.f
+      ! THETPM=air concentration for use in TranspNoSalt.f
       ! FMAC,SoilFracAsMicP=macropore,micropore fraction
       ! HydroCondMacP1=maropore hydraulic conductivity
       ! VLHeatCapacity,VHCM=volumetric heat capacities of total volume, solid

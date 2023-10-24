@@ -100,7 +100,7 @@
   UDOCD(NY,NX)=0._r8
   UDICQ(NY,NX)=0._r8
   UDICD(NY,NX)=0._r8
-  TNBP(NY,NX)=0._r8
+  Eco_NBP_col(NY,NX)=0._r8
   URAIN(NY,NX)=0._r8
   UEVAP(NY,NX)=0._r8
   URUN(NY,NX)=0._r8
@@ -133,10 +133,10 @@
   UN2OF(NY,NX)=0._r8
   UNH3F(NY,NX)=0._r8
   UPO4F(NY,NX)=0._r8
-  THRE(NY,NX)=0._r8
-  TGPP(NY,NX)=0._r8
-  TNPP(NY,NX)=0._r8
-  TRAU(NY,NX)=0._r8
+  Eco_HR_col(NY,NX)=0._r8
+  Eco_GPP_col(NY,NX)=0._r8
+  Eco_NPP_col(NY,NX)=0._r8
+  Eco_AutoR_col(NY,NX)=0._r8
   TCAN(NY,NX)=0._r8
   XHVSTE(:,NY,NX)=0._r8
   TRINH4(NY,NX)=0._r8

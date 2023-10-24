@@ -144,7 +144,7 @@ module GeochemAPI
   chemvar%ZFEOH3=trcSalt_solml(idsalt_FeOH3,L,NY,NX)
   chemvar%ZFEOH4=trcSalt_solml(idsalt_FeOH4,L,NY,NX)
   chemvar%ZFES=trcSalt_solml(idsalt_FeSO4,L,NY,NX)
-  chemvar%ZCAO=trcSalt_solml(idsalt_CaOH2,L,NY,NX)
+  chemvar%ZCAO=trcSalt_solml(idsalt_CaOH,L,NY,NX)
   chemvar%ZCAC=trcSalt_solml(idsalt_CaCO3,L,NY,NX)
   chemvar%ZCAH=trcSalt_solml(idsalt_CaHCO3,L,NY,NX)
   chemvar%ZCAS=trcSalt_solml(idsalt_CaSO4,L,NY,NX)
@@ -161,7 +161,7 @@ module GeochemAPI
   chemvar%ZFE2P=trcSalt_solml(idsalt_FeH2PO4,L,NY,NX)
   chemvar%ZCA0P=trcSalt_solml(idsalt_CaPO4,L,NY,NX)
   chemvar%ZCA1P=trcSalt_solml(idsalt_CaHPO4,L,NY,NX)
-  chemvar%ZCA2P=trcSalt_solml(idsalt_CaH2PO4,L,NY,NX)
+  chemvar%ZCA2P=trcSalt_solml(idsalt_CaH4P2O8,L,NY,NX)
   chemvar%ZMG1P=trcSalt_solml(idsalt_MgHPO4,L,NY,NX)
   chemvar%H0POB=trcSalt_solml(idsalt_H0PO4B,L,NY,NX)
   chemvar%H3POB=trcSalt_solml(idsalt_H3PO4B,L,NY,NX)
@@ -169,7 +169,7 @@ module GeochemAPI
   chemvar%ZFE2PB=trcSalt_solml(idsalt_FeH2PO4B,L,NY,NX)
   chemvar%ZCA0PB=trcSalt_solml(idsalt_CaPO4B,L,NY,NX)
   chemvar%ZCA1PB=trcSalt_solml(idsalt_CaHPO4B,L,NY,NX)
-  chemvar%ZCA2PB=trcSalt_solml(idsalt_CaH2PO4B,L,NY,NX)
+  chemvar%ZCA2PB=trcSalt_solml(idsalt_CaH4P2O8B,L,NY,NX)
   chemvar%ZMG1PB=trcSalt_solml(idsalt_MgHPO4B,L,NY,NX)
   chemvar%XHY=trcx_solml(idx_Hp,L,NY,NX)
   chemvar%XAL=trcx_solml(idx_Al,L,NY,NX)
@@ -199,9 +199,9 @@ module GeochemAPI
 !  solflx%TR_CaHCO3_soil=trcSalt_TR(idsalt_CaHCO3,L,NY,NX)
 !  solflx%TRHCO=trcSalt_TR(idsalt_HCO3,L,NY,NX)
 !  solflx%TR_HCO3_sorbed_soil=TR_HCO3_sorbed_soil(L,NY,NX)
-!  solflx%TR_CaH2PO4_soil=trcSalt_TR(idsalt_CaH2PO4,L,NY,NX)
+!  solflx%TR_CaH4P2O8_soil=trcSalt_TR(idsalt_CaH4P2O8,L,NY,NX)
 !  solflx%TR_FeH2PO4_soil=trcSalt_TR(idsalt_FeH2PO4,L,NY,NX)
-!  solflx%TR_CaH2PO4_band_soil=trcSalt_TR(idsalt_CaH2PO4B,L,NY,NX)
+!  solflx%TR_CaH4P2O8_band_soil=trcSalt_TR(idsalt_CaH4P2O8B,L,NY,NX)
 !  solflx%TR_FeH2PO4_band_soil=trcSalt_TR(idsalt_FeH2PO4B,L,NY,NX)
 !  solflx%TR_MgHPO4_soil=trcSalt_TR(idsalt_MgHPO4,L,NY,NX)
 !  solflx%TR_CaHPO4_soil=trcSalt_TR(idsalt_CaHPO4,L,NY,NX)
@@ -217,9 +217,9 @@ module GeochemAPI
 !  solflx%TR_AlPO4_precip_soil=trcp_TR(idsp_AlPO4,L,NY,NX)
 !  solflx%TR_FePO4_precip_band_soil=trcp_TR(idsp_FePO4B,L,NY,NX)
 !  solflx%TR_AlPO4_precip_band_soil=trcp_TR(idsp_AlPO4B,L,NY,NX)
-!  solflx%TR_CaH4P2O8_precip_soil=trcp_TR(idsp_CaH2PO4,L,NY,NX)
+!  solflx%TR_CaH4P2O8_precip_soil=trcp_TR(idsp_CaH4P2O8,L,NY,NX)
 !  solflx%TR_CaHPO4_precip_soil=trcp_TR(idsp_CaHPO4,L,NY,NX)
-!  solflx%TR_CaH4P2O8_precip_band_soil=trcp_TR(idsp_CaH2PO4B,L,NY,NX)
+!  solflx%TR_CaH4P2O8_precip_band_soil=trcp_TR(idsp_CaH4P2O8B,L,NY,NX)
 !  solflx%TR_CaHPO4_precip_band_soil=trcp_TR(idsp_CaHPO4B,L,NY,NX)
 !  solflx%TR_apatite_precip_band_soil=trcp_TR(idsp_HAB,L,NY,NX)
 !  solflx%TR_apatite_precip_soil=trcp_TR(idsp_HA,L,NY,NX)
@@ -233,7 +233,7 @@ module GeochemAPI
 !  solflx%TR_FeO4H4_soil=trcSalt_TR(idsalt_FeOH4,L,NY,NX)
 !  solflx%TR_AlO4H4_soil=trcSalt_TR(idsalt_AlOH4,L,NY,NX)
 !  solflx%TR_MgOH_soil=trcSalt_TR(idsalt_MgOH2,L,NY,NX)
-!  solflx%TR_CaOH_soil=trcSalt_TR(idsalt_CaOH2,L,NY,NX)
+!  solflx%TR_CaOH_soil=trcSalt_TR(idsalt_CaOH,L,NY,NX)
 !  solflx%TR_FeOH3_precip_soil=trcp_TR(idsp_FeOH3,L,NY,NX)
 !  solflx%TR_AlOH3_precip_soil=trcp_TR(idsp_AlOH3,L,NY,NX)
 !  solflx%TR_FeO2H2_sorbed_soil=TR_FeO2H2_sorbed_soil(L,NY,NX)
@@ -321,12 +321,12 @@ module GeochemAPI
   trcp_TR(idsp_FePO4,L,NY,NX)=solflx%TR_FePO4_precip_soil
   trcp_TR(idsp_CaHPO4,L,NY,NX)=solflx%TR_CaHPO4_precip_soil
   trcp_TR(idsp_HA,L,NY,NX)=solflx%TR_apatite_precip_soil
-  trcp_TR(idsp_CaH2PO4,L,NY,NX)=solflx%TR_CaH4P2O8_precip_soil
+  trcp_TR(idsp_CaH4P2O8,L,NY,NX)=solflx%TR_CaH4P2O8_precip_soil
   trcp_TR(idsp_AlPO4B,L,NY,NX)=solflx%TR_AlPO4_precip_band_soil
   trcp_TR(idsp_FePO4B,L,NY,NX)=solflx%TR_FePO4_precip_band_soil
   trcp_TR(idsp_CaHPO4B,L,NY,NX)=solflx%TR_CaHPO4_precip_band_soil
   trcp_TR(idsp_HAB,L,NY,NX)=solflx%TR_apatite_precip_band_soil
-  trcp_TR(idsp_CaH2PO4B,L,NY,NX)=solflx%TR_CaH4P2O8_precip_band_soil
+  trcp_TR(idsp_CaH4P2O8B,L,NY,NX)=solflx%TR_CaH4P2O8_precip_band_soil
   trcSalt_TR(idsalt_Al,L,NY,NX)=solflx%TR_Al_3p_soil
   trcSalt_TR(idsalt_Fe,L,NY,NX)=solflx%TR_Fe_3p_soil
   trcSalt_TR(idsalt_Hp,L,NY,NX)=solflx%TR_H_p_soil
@@ -349,7 +349,7 @@ module GeochemAPI
   trcSalt_TR(idsalt_FeOH3,L,NY,NX)=solflx%TR_FeO3H3_soil
   trcSalt_TR(idsalt_FeOH4,L,NY,NX)=solflx%TR_FeO4H4_soil
   trcSalt_TR(idsalt_FeSO4,L,NY,NX)=solflx%TR_FeSO4_soil
-  trcSalt_TR(idsalt_CaOH2,L,NY,NX)=solflx%TR_CaOH_soil
+  trcSalt_TR(idsalt_CaOH,L,NY,NX)=solflx%TR_CaOH_soil
   trcSalt_TR(idsalt_CaCO3,L,NY,NX)=solflx%TR_CaCO3_soil
   trcSalt_TR(idsalt_CaHCO3,L,NY,NX)=solflx%TR_CaHCO3_soil
   trcSalt_TR(idsalt_CaSO4,L,NY,NX)=solflx%TR_CaSO4_soil
@@ -366,7 +366,7 @@ module GeochemAPI
   trcSalt_TR(idsalt_FeH2PO4,L,NY,NX)=solflx%TR_FeH2PO4_soil
   trcSalt_TR(idsalt_CaPO4,L,NY,NX)=solflx%TR_CaPO4_soil
   trcSalt_TR(idsalt_CaHPO4,L,NY,NX)=solflx%TR_CaHPO4_soil
-  trcSalt_TR(idsalt_CaH2PO4,L,NY,NX)=solflx%TR_CaH2PO4_soil
+  trcSalt_TR(idsalt_CaH4P2O8,L,NY,NX)=solflx%TR_CaH4P2O8_soil
   trcSalt_TR(idsalt_MgHPO4,L,NY,NX)=solflx%TR_MgHPO4_soil
   trcSalt_TR(idsalt_H0PO4B,L,NY,NX)=solflx%TR_PO4_band_soil
   trcSalt_TR(idsalt_H3PO4B,L,NY,NX)=solflx%TR_H3PO4_band_soil
@@ -374,7 +374,7 @@ module GeochemAPI
   trcSalt_TR(idsalt_FeH2PO4B,L,NY,NX)=solflx%TR_FeH2PO4_band_soil
   trcSalt_TR(idsalt_CaPO4B,L,NY,NX)=solflx%TR_CaPO4_band_soil
   trcSalt_TR(idsalt_CaHPO4B,L,NY,NX)=solflx%TR_CaHPO4_band_soil
-  trcSalt_TR(idsalt_CaH2PO4B,L,NY,NX)=solflx%TR_CaH2PO4_band_soil
+  trcSalt_TR(idsalt_CaH4P2O8B,L,NY,NX)=solflx%TR_CaH4P2O8_band_soil
   trcSalt_TR(idsalt_MgHPO4B,L,NY,NX)=solflx%TR_MgHPO4_band_soil
   TR_H_p_sorbed_soil(L,NY,NX)=solflx%TR_H_p_sorbed_soil
   TR_Al_sorbed_soil(L,NY,NX)=solflx%TR_Al_sorbed_soil

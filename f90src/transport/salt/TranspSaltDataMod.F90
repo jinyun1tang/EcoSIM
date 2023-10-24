@@ -45,7 +45,7 @@ implicit none
 !----------------------------------------------------------------------
 
 contains
-  subroutine InitTrnsfrsData
+  subroutine InitTranspSaltData
 
   implicit none
   allocate(ALSGL2(JZ,JY,JX));   ALSGL2=0._r8
@@ -77,10 +77,10 @@ contains
 
   allocate(trcSalt_RFL0(idsalt_beg:idsalt_end,JY,JX));      trcSalt_RFL0=0._r8
   allocate(trcSalt_RFL1(idsalt_beg:idsaltb_end,JY,JX));     trcSalt_RFL1=0._r8
-  end subroutine InitTrnsfrsData
+  end subroutine InitTranspSaltData
 
 !----------------------------------------------------------------------
-  subroutine DestructTrnsfrsData
+  subroutine DestructTranspSaltData
   use abortutils, only : destroy
   implicit none
 
@@ -107,6 +107,6 @@ contains
 
   call destroy(trcSalt_RQR)
   call destroy(trcSalt_RFXS)
-  end subroutine DestructTrnsfrsData
+  end subroutine DestructTranspSaltData
 
 end module TranspSaltDataMod

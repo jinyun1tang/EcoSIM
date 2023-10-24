@@ -161,7 +161,7 @@ implicit none
 !
 !     RUNOFF BOUNDARY FLUXES OF C, N AND P
 !
-!     X*QRS,X*QSS=solute in runoff, snow drift from trnsfr.f
+!     X*QRS,X*QSS=solute in runoff, snow drift from TranspNoSalt.f
 !     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
 !             :OC=DOC,OA=acetate,ON=DON,OP=DOP
 !             :N4=NH4,N3=NH3,NO=NO3,NX=NO2,PI=HPO4,P4=H2PO4 in non-band
@@ -201,7 +201,7 @@ implicit none
 !     RUNOFF BOUNDARY FLUXES OF SOLUTES
 !
 !     ISALTG=salt flag
-!     XQR*,XQS*=solute loss in runoff,snow drift from trnsfrs.f
+!     XQR*,XQS*=solute loss in runoff,snow drift from TranspSalt.f
 !     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
 !          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
 !          :*CO2*=CO2,*ALO1*=AlOH2-,*ALOH2=AlOH2-,*ALOH3*=AlOH3
@@ -210,7 +210,7 @@ implicit none
 !          :*CAC*=CaCO3,*CAH*=CaHCO3-,*CAS*=CaSO4,*MGO*=MgOH,*MGC*=MgCO3
 !          :*MHG*=MgHCO3-,*MGS*=MgSO4,*NAC*=NaCO3-,*NAS*=NaSO4-,*KAS*=KSO4-
 !     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
-!          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH2PO4+,*M1P*=MgHPO4,*COO*=COOH-
+!          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH4P2O8+,*M1P*=MgHPO4,*COO*=COOH-
 !          :*1=non-band,*B=band
 !     XN=direction indicator
 !     TPOU,TIONOU=total P,salt loss through lateral and lower boundaries
@@ -221,7 +221,7 @@ implicit none
           +trcSaltRunoffBoundary(idsalt_CaHPO4,N,NN,N5,N4) &
           +trcSaltRunoffBoundary(idsalt_MgHPO4,N,NN,N5,N4)+trcSaltRunoffBoundary(idsalt_H3PO4,N,NN,N5,N4) &
           +trcSaltRunoffBoundary(idsalt_FeH2PO4,N,NN,N5,N4) &
-          +trcSaltRunoffBoundary(idsalt_CaH2PO4,N,NN,N5,N4))
+          +trcSaltRunoffBoundary(idsalt_CaH4P2O8,N,NN,N5,N4))
         SS1=XN*(trcSaltRunoffBoundary(idsalt_Al,N,NN,N5,N4)+trcSaltRunoffBoundary(idsalt_Fe,N,NN,N5,N4) &
           +trcSaltRunoffBoundary(idsalt_Hp,N,NN,N5,N4) &
           +trcSaltRunoffBoundary(idsalt_Ca,N,NN,N5,N4)+trcSaltRunoffBoundary(idsalt_Mg,N,NN,N5,N4) &
@@ -233,7 +233,7 @@ implicit none
         SS2=XN*2.0_r8*(trcSaltRunoffBoundary(idsalt_HCO3,N,NN,N5,N4)+trcSaltRunoffBoundary(idsalt_AlOH,N,NN,N5,N4) &
           +trcSaltRunoffBoundary(idsalt_AlSO4,N,NN,N5,N4)+trcSaltRunoffBoundary(idsalt_FeOH,N,NN,N5,N4) &
           +trcSaltRunoffBoundary(idsalt_FeSO4,N,NN,N5,N4) &
-          +trcSaltRunoffBoundary(idsalt_CaOH2,N,NN,N5,N4)+trcSaltRunoffBoundary(idsalt_CaCO3,N,NN,N5,N4) &
+          +trcSaltRunoffBoundary(idsalt_CaOH,N,NN,N5,N4)+trcSaltRunoffBoundary(idsalt_CaCO3,N,NN,N5,N4) &
           +trcSaltRunoffBoundary(idsalt_CaSO4,N,NN,N5,N4) &
           +trcSaltRunoffBoundary(idsalt_MgOH2,N,NN,N5,N4)+trcSaltRunoffBoundary(idsalt_MgCO3,N,NN,N5,N4) &
           +trcSaltRunoffBoundary(idsalt_MgSO4,N,NN,N5,N4) &
@@ -245,7 +245,7 @@ implicit none
           +trcSaltRunoffBoundary(idsalt_CaHPO4,N,NN,N5,N4)+trcSaltRunoffBoundary(idsalt_MgHPO4,N,NN,N5,N4))
         SS4=XN*4.0_r8*(trcSaltRunoffBoundary(idsalt_AlOH3,N,NN,N5,N4)+trcSaltRunoffBoundary(idsalt_FeOH3,N,NN,N5,N4) &
           +trcSaltRunoffBoundary(idsalt_H3PO4,N,NN,N5,N4)+trcSaltRunoffBoundary(idsalt_FeH2PO4,N,NN,N5,N4) &
-          +trcSaltRunoffBoundary(idsalt_CaH2PO4,N,NN,N5,N4)) &
+          +trcSaltRunoffBoundary(idsalt_CaH4P2O8,N,NN,N5,N4)) &
           +XN*5.0_r8*(trcSaltRunoffBoundary(idsalt_AlOH4,N,NN,N5,N4)+trcSaltRunoffBoundary(idsalt_FeOH4,N,NN,N5,N4))
         PSS=PSS+XN*patomw*trcSalt_XQS(idsalt_H0PO4,N,N5,N4)
         TPOU=TPOU-PSS
@@ -258,7 +258,7 @@ implicit none
 !       SURFACE RUNOFF ELECTRICAL CONDUCTIVITY
 !
 !       QR=surface runoff from watsub.f
-!       XQR*=solute in runoff from trnsfrs.f
+!       XQR*=solute in runoff from TranspSalt.f
 !       ECNDQ=electrical conductivity of runoff
 !       where are those coefficients from?
         WX=Wat2GridBySurfRunoff(N,NN,N5,N4)
@@ -321,7 +321,7 @@ implicit none
           PPE=XN*patomw*(1._r8*(trcp_ER(idsp_AlPO4,N,NN,N5,N4)+trcp_ER(idsp_FePO4,N,NN,N5,N4) &
             +trcp_ER(idsp_CaHPO4,N,NN,N5,N4)+trcp_ER(idsp_AlPO4B,N,NN,N5,N4) &
             +trcp_ER(idsp_FePO4B,N,NN,N5,N4)+trcp_ER(idsp_CaHPO4B,N,NN,N5,N4)) &
-            +2.0_r8*(trcp_ER(idsp_CaH2PO4,N,NN,N5,N4)+trcp_ER(idsp_CaH2PO4B,N,NN,N5,N4)) &
+            +2.0_r8*(trcp_ER(idsp_CaH4P2O8,N,NN,N5,N4)+trcp_ER(idsp_CaH4P2O8B,N,NN,N5,N4)) &
             +3.0_r8*(trcp_ER(idsp_HA,N,NN,N5,N4)+trcp_ER(idsp_HAB,N,NN,N5,N4)))
           COE=0.0_r8
           ZOE=0.0_r8
@@ -401,8 +401,8 @@ implicit none
 !           :PCAC,PCAS=precip CaCO3,CaSO4
 !           :PALP,PFEP=precip AlPO4,FEPO4 in non-band
 !           :PALPB,PFEPB=precip AlPO4,FEPO4 in band
-!           :PCPM,PCPD,PCPH=precip CaH2PO4,CaHPO4,apatite in non-band
-!           :PCPMB,PCPDB,PCPHB=precip CaH2PO4,CaHPO4,apatite in band
+!           :PCPM,PCPD,PCPH=precip CaH4P2O8,CaHPO4,apatite in non-band
+!           :PCPMB,PCPDB,PCPHB=precip CaH4P2O8,CaHPO4,apatite in band
 !         TIONOU,UIONOU=total salt loss through lateral and lower boundaries
 !
           IF(salt_model)THEN
@@ -424,7 +424,7 @@ implicit none
               +trcp_ER(idsp_AlPO4B,N,NN,N5,N4)+trcp_ER(idsp_FePO4B,N,NN,N5,N4)) &
               +XN*3.0*(trcp_ER(idsp_CaHPO4,N,NN,N5,N4)+trcp_ER(idsp_CaHPO4B,N,NN,N5,N4)) &
               +XN*4.0*(trcp_ER(idsp_AlOH3,N,NN,N5,N4)+trcp_ER(idsp_FeOH3,N,NN,N5,N4)) &
-              +XN*7.0*(trcp_ER(idsp_CaH2PO4,N,NN,N5,N4)+trcp_ER(idsp_CaH2PO4B,N,NN,N5,N4)) &
+              +XN*7.0*(trcp_ER(idsp_CaH4P2O8,N,NN,N5,N4)+trcp_ER(idsp_CaH4P2O8B,N,NN,N5,N4)) &
               +XN*9.0*(trcp_ER(idsp_HA,N,NN,N5,N4)+trcp_ER(idsp_HAB,N,NN,N5,N4))
             SET=SEF+SEX+SEP
             TIONOU=TIONOU-SET
@@ -476,21 +476,21 @@ implicit none
 !
 !     SUBSURFACE BOUNDARY FLUXES OF CO2 AND DOC
 !
-!     X*FLS,X*FHS=solute flux in macropores,micropores from trnsfr.f
-!     X*FLG=convective+diffusive gas flux from trnsfr.f
+!     X*FLS,X*FHS=solute flux in macropores,micropores from TranspNoSalt.f
+!     X*FLG=convective+diffusive gas flux from TranspNoSalt.f
 !     TCOU=cumulative C loss through lateral and lower boundaries
 !     UDOCD,UDICD=dissolved organic,inorganic C loss through subsurface boundaries
 !
 !     SUBSURFACE BOUNDARY FLUXES OF N2O, N2, NH4, NH3, NO3, NO2 AND DON
 !
-!     X*FLS,X*FHS,X*FLB,X*FHB=solute flux in macropores,micropores in non-band,band from trnsfr.f
-!     X*FLG=convective+diffusive gas flux from trnsfr.f
+!     X*FLS,X*FHS,X*FLB,X*FHB=solute flux in macropores,micropores in non-band,band from TranspNoSalt.f
+!     X*FLG=convective+diffusive gas flux from TranspNoSalt.f
 !     TZOU=cumulative N loss through lateral and lower boundaries
 !     UDOND,UDIND=dissolved organic,inorganic N loss through subsurface boundaries
 !
 !     SUBSURFACE BOUNDARY FLUXES OF PO4 AND DOP
 !
-!     X*FLS,X*FHS,X*FLB,X*FHB=solute flux in macropores,micropores in non-band,band from trnsfr.f
+!     X*FLS,X*FHS,X*FLB,X*FHB=solute flux in macropores,micropores in non-band,band from TranspNoSalt.f
 !     TPOU=cumulative P loss through lateral and lower boundaries
 !     UDOPD,UDIPD=dissolved organic,inorganic P loss through subsurface boundaries
 !
@@ -503,29 +503,29 @@ implicit none
         ZOD=ZOD+XN*(XONFLS(K,N,N6,N5,N4)+XONFHS(K,N,N6,N5,N4))
         POD=POD+XN*(XOPFLS(K,N,N6,N5,N4)+XOPFHS(K,N,N6,N5,N4))
       ENDDO D450
-      CXD=XN*(trcs_XFLS(idg_CO2,N,N6,N5,N4)+trcs_XFHS(idg_CO2,N,N6,N5,N4) &
-        +R3GasADTFlx(idg_CO2,N,N6,N5,N4)+trcs_XFLS(idg_CH4,N,N6,N5,N4) &
-        +trcs_XFHS(idg_CH4,N,N6,N5,N4)+R3GasADTFlx(idg_CH4,N,N6,N5,N4))
-      ZXD=XN*(trcs_XFLS(ids_NH4,N,N6,N5,N4)+trcs_XFLS(idg_NH3,N,N6,N5,N4) &
-        +trcs_XFLS(ids_NO3,N,N6,N5,N4) &
-        +trcs_XFLS(ids_NH4B,N,N6,N5,N4)+trcs_XFLS(idg_NH3B,N,N6,N5,N4)&
-        +trcs_XFLS(ids_NO3B,N,N6,N5,N4) &
-        +trcs_XFLS(ids_NO2,N,N6,N5,N4)+trcs_XFLS(ids_NO2B,N,N6,N5,N4) &
-        +trcs_XFHS(ids_NH4,N,N6,N5,N4)+trcs_XFHS(idg_NH3,N,N6,N5,N4) &
-        +trcs_XFHS(ids_NO3,N,N6,N5,N4) &
-        +trcs_XFHS(ids_NH4B,N,N6,N5,N4)+trcs_XFHS(idg_NH3B,N,N6,N5,N4) &
-        +trcs_XFHS(ids_NO3B,N,N6,N5,N4) &
-        +trcs_XFHS(ids_NO2,N,N6,N5,N4)+trcs_XFHS(ids_NO2B,N,N6,N5,N4))
-      ZGD=XN*(trcs_XFLS(idg_N2,N,N6,N5,N4)+R3GasADTFlx(idg_N2,N,N6,N5,N4) &
-        +trcs_XFHS(idg_N2,N,N6,N5,N4) &
-        +trcs_XFLS(idg_N2O,N,N6,N5,N4)+R3GasADTFlx(idg_N2O,N,N6,N5,N4) &
-        +trcs_XFHS(idg_N2O,N,N6,N5,N4) &
+      CXD=XN*(trcs_3DTransp2MicP(idg_CO2,N,N6,N5,N4)+trcs_3DTransp2MacP(idg_CO2,N,N6,N5,N4) &
+        +R3GasADTFlx(idg_CO2,N,N6,N5,N4)+trcs_3DTransp2MicP(idg_CH4,N,N6,N5,N4) &
+        +trcs_3DTransp2MacP(idg_CH4,N,N6,N5,N4)+R3GasADTFlx(idg_CH4,N,N6,N5,N4))
+      ZXD=XN*(trcs_3DTransp2MicP(ids_NH4,N,N6,N5,N4)+trcs_3DTransp2MicP(idg_NH3,N,N6,N5,N4) &
+        +trcs_3DTransp2MicP(ids_NO3,N,N6,N5,N4) &
+        +trcs_3DTransp2MicP(ids_NH4B,N,N6,N5,N4)+trcs_3DTransp2MicP(idg_NH3B,N,N6,N5,N4)&
+        +trcs_3DTransp2MicP(ids_NO3B,N,N6,N5,N4) &
+        +trcs_3DTransp2MicP(ids_NO2,N,N6,N5,N4)+trcs_3DTransp2MicP(ids_NO2B,N,N6,N5,N4) &
+        +trcs_3DTransp2MacP(ids_NH4,N,N6,N5,N4)+trcs_3DTransp2MacP(idg_NH3,N,N6,N5,N4) &
+        +trcs_3DTransp2MacP(ids_NO3,N,N6,N5,N4) &
+        +trcs_3DTransp2MacP(ids_NH4B,N,N6,N5,N4)+trcs_3DTransp2MacP(idg_NH3B,N,N6,N5,N4) &
+        +trcs_3DTransp2MacP(ids_NO3B,N,N6,N5,N4) &
+        +trcs_3DTransp2MacP(ids_NO2,N,N6,N5,N4)+trcs_3DTransp2MacP(ids_NO2B,N,N6,N5,N4))
+      ZGD=XN*(trcs_3DTransp2MicP(idg_N2,N,N6,N5,N4)+R3GasADTFlx(idg_N2,N,N6,N5,N4) &
+        +trcs_3DTransp2MacP(idg_N2,N,N6,N5,N4) &
+        +trcs_3DTransp2MicP(idg_N2O,N,N6,N5,N4)+R3GasADTFlx(idg_N2O,N,N6,N5,N4) &
+        +trcs_3DTransp2MacP(idg_N2O,N,N6,N5,N4) &
         +R3GasADTFlx(idg_NH3,N,N6,N5,N4))
-      PXD=XN*(trcs_XFLS(ids_H2PO4,N,N6,N5,N4)+trcs_XFLS(ids_H2PO4B,N,N6,N5,N4) &
-        +trcs_XFHS(ids_H2PO4,N,N6,N5,N4)+trcs_XFHS(ids_H2PO4B,N,N6,N5,N4)&
-        +trcs_XFLS(ids_H1PO4,N,N6,N5,N4) &
-        +trcs_XFLS(ids_H1PO4B,N,N6,N5,N4)+trcs_XFHS(ids_H1PO4,N,N6,N5,N4) &
-        +trcs_XFHS(ids_H1PO4B,N,N6,N5,N4))
+      PXD=XN*(trcs_3DTransp2MicP(ids_H2PO4,N,N6,N5,N4)+trcs_3DTransp2MicP(ids_H2PO4B,N,N6,N5,N4) &
+        +trcs_3DTransp2MacP(ids_H2PO4,N,N6,N5,N4)+trcs_3DTransp2MacP(ids_H2PO4B,N,N6,N5,N4)&
+        +trcs_3DTransp2MicP(ids_H1PO4,N,N6,N5,N4) &
+        +trcs_3DTransp2MicP(ids_H1PO4B,N,N6,N5,N4)+trcs_3DTransp2MacP(ids_H1PO4,N,N6,N5,N4) &
+        +trcs_3DTransp2MacP(ids_H1PO4B,N,N6,N5,N4))
 
       TCOU=TCOU-COD-CXD
       TZOU=TZOU-ZOD-ZXD-ZGD
@@ -539,21 +539,21 @@ implicit none
 !
 !     SUBSURFACE BOUNDARY FLUXES OF O2
 !
-!     X*FLS,X*FHS=solute flux in macropores,micropores from trnsfr.f
-!     X*FLG=convective+diffusive gas flux from trnsfr.f
+!     X*FLS,X*FHS=solute flux in macropores,micropores from TranspNoSalt.f
+!     X*FLG=convective+diffusive gas flux from TranspNoSalt.f
 !     OXYGOU,H2GOU=cumulative O2,H2 loss through lateral and lower boundaries
 !
-      OOD=XN*(trcs_XFLS(idg_O2,N,N6,N5,N4)+trcs_XFHS(idg_O2,N,N6,N5,N4)+R3GasADTFlx(idg_O2,N,N6,N5,N4))
+      OOD=XN*(trcs_3DTransp2MicP(idg_O2,N,N6,N5,N4)+trcs_3DTransp2MacP(idg_O2,N,N6,N5,N4)+R3GasADTFlx(idg_O2,N,N6,N5,N4))
       OXYGOU=OXYGOU-OOD
-      HOD=XN*(trcs_XFLS(idg_H2,N,N6,N5,N4)+trcs_XFHS(idg_H2,N,N6,N5,N4)+R3GasADTFlx(idg_H2,N,N6,N5,N4))
+      HOD=XN*(trcs_3DTransp2MicP(idg_H2,N,N6,N5,N4)+trcs_3DTransp2MacP(idg_H2,N,N6,N5,N4)+R3GasADTFlx(idg_H2,N,N6,N5,N4))
       H2GOU=H2GOU-HOD
 !
 !     SUBSURFACE BOUNDARY FLUXES OF SOLUTES
 !
-!     X*FLS=hourly convective + diffusive solute flux through micropores from trnsfrs.f
-!     X*FLW,X*FLB= hourly convective + diffusive solute flux through micropores in non-band,band from trnsfrs.f
-!     X*FHS=hourly convective + diffusive solute flux through macropores from trnsfrs.f
-!     X*FHW,X*FHB= hourly convective + diffusive solute flux through macropores in non-band,band from trnsfrs.f
+!     X*FLS=hourly convective + diffusive solute flux through micropores from TranspSalt.f
+!     X*FLW,X*FLB= hourly convective + diffusive solute flux through micropores in non-band,band from TranspSalt.f
+!     X*FHS=hourly convective + diffusive solute flux through macropores from TranspSalt.f
+!     X*FHW,X*FHB= hourly convective + diffusive solute flux through macropores in non-band,band from TranspSalt.f
 !     TIONOU,UIONOU=total salt loss through lateral and lower boundaries
 !
       IF(salt_model)THEN
@@ -564,9 +564,9 @@ implicit none
           +trcSalt3DFlo2Cell(idsalt_FeHPO4B,N,N6,N5,N4) &
           +trcSalt3DFlo2Cell(idsalt_CaHPO4B,N,N6,N5,N4)+trcSalt3DFlo2Cell(idsalt_MgHPO4B,N,N6,N5,N4) &
           +trcSalt3DFlo2Cell(idsalt_H3PO4,N,N6,N5,N4) &
-          +trcSalt3DFlo2Cell(idsalt_FeH2PO4,N,N6,N5,N4)+trcSalt3DFlo2Cell(idsalt_CaH2PO4,N,N6,N5,N4) &
+          +trcSalt3DFlo2Cell(idsalt_FeH2PO4,N,N6,N5,N4)+trcSalt3DFlo2Cell(idsalt_CaH4P2O8,N,N6,N5,N4) &
           +trcSalt3DFlo2Cell(idsalt_H3PO4B,N,N6,N5,N4) &
-          +trcSalt3DFlo2Cell(idsalt_FeH2PO4B,N,N6,N5,N4)+trcSalt3DFlo2Cell(idsalt_CaH2PO4B,N,N6,N5,N4))
+          +trcSalt3DFlo2Cell(idsalt_FeH2PO4B,N,N6,N5,N4)+trcSalt3DFlo2Cell(idsalt_CaH4P2O8B,N,N6,N5,N4))
 
         PHD=XN*patomw*(trcSalt_XFHS(idsalt_H0PO4,N,N6,N5,N4)+trcSalt_XFHS(idsalt_H0PO4B,N,N6,N5,N4) &
           +trcSalt_XFHS(idsalt_CaPO4,N,N6,N5,N4)+trcSalt_XFHS(idsalt_CaPO4B,N,N6,N5,N4) &
@@ -575,9 +575,9 @@ implicit none
           +trcSalt_XFHS(idsalt_FeHPO4B,N,N6,N5,N4) &
           +trcSalt_XFHS(idsalt_CaHPO4B,N,N6,N5,N4)+trcSalt_XFHS(idsalt_MgHPO4B,N,N6,N5,N4) &
           +trcSalt_XFHS(idsalt_H3PO4,N,N6,N5,N4) &
-          +trcSalt_XFHS(idsalt_FeH2PO4,N,N6,N5,N4)+trcSalt_XFHS(idsalt_CaH2PO4,N,N6,N5,N4) &
+          +trcSalt_XFHS(idsalt_FeH2PO4,N,N6,N5,N4)+trcSalt_XFHS(idsalt_CaH4P2O8,N,N6,N5,N4) &
           +trcSalt_XFHS(idsalt_H3PO4B,N,N6,N5,N4) &
-          +trcSalt_XFHS(idsalt_FeH2PO4B,N,N6,N5,N4)+trcSalt_XFHS(idsalt_CaH2PO4B,N,N6,N5,N4))
+          +trcSalt_XFHS(idsalt_FeH2PO4B,N,N6,N5,N4)+trcSalt_XFHS(idsalt_CaH4P2O8B,N,N6,N5,N4))
 
         TPOU=TPOU-PQD-PHD
         SSD=XN*(trcSalt3DFlo2Cell(idsalt_Al,N,N6,N5,N4)+trcSalt3DFlo2Cell(idsalt_Fe,N,N6,N5,N4) &
@@ -592,7 +592,7 @@ implicit none
           +trcSalt3DFlo2Cell(idsalt_AlOH,N,N6,N5,N4) &
           +trcSalt3DFlo2Cell(idsalt_AlSO4,N,N6,N5,N4)+trcSalt3DFlo2Cell(idsalt_FeOH,N,N6,N5,N4) &
           +trcSalt3DFlo2Cell(idsalt_FeSO4,N,N6,N5,N4) &
-          +trcSalt3DFlo2Cell(idsalt_CaOH2,N,N6,N5,N4)+trcSalt3DFlo2Cell(idsalt_CaCO3,N,N6,N5,N4) &
+          +trcSalt3DFlo2Cell(idsalt_CaOH,N,N6,N5,N4)+trcSalt3DFlo2Cell(idsalt_CaCO3,N,N6,N5,N4) &
           +trcSalt3DFlo2Cell(idsalt_CaSO4,N,N6,N5,N4)+trcSalt3DFlo2Cell(idsalt_MgOH2,N,N6,N5,N4) &
           +trcSalt3DFlo2Cell(idsalt_MgCO3,N,N6,N5,N4) &
           +trcSalt3DFlo2Cell(idsalt_MgSO4,N,N6,N5,N4)+trcSalt3DFlo2Cell(idsalt_NaCO3,N,N6,N5,N4) &
@@ -608,9 +608,9 @@ implicit none
           +trcSalt3DFlo2Cell(idsalt_MgHPO4B,N,N6,N5,N4)) &
           +4.0*(trcSalt3DFlo2Cell(idsalt_AlOH3,N,N6,N5,N4)+trcSalt3DFlo2Cell(idsalt_FeOH3,N,N6,N5,N4) &
           +trcSalt3DFlo2Cell(idsalt_H3PO4,N,N6,N5,N4) &
-          +trcSalt3DFlo2Cell(idsalt_FeH2PO4,N,N6,N5,N4)+trcSalt3DFlo2Cell(idsalt_CaH2PO4,N,N6,N5,N4) &
+          +trcSalt3DFlo2Cell(idsalt_FeH2PO4,N,N6,N5,N4)+trcSalt3DFlo2Cell(idsalt_CaH4P2O8,N,N6,N5,N4) &
           +trcSalt3DFlo2Cell(idsalt_H3PO4B,N,N6,N5,N4) &
-          +trcSalt3DFlo2Cell(idsalt_FeH2PO4B,N,N6,N5,N4)+trcSalt3DFlo2Cell(idsalt_CaH2PO4B,N,N6,N5,N4)) &
+          +trcSalt3DFlo2Cell(idsalt_FeH2PO4B,N,N6,N5,N4)+trcSalt3DFlo2Cell(idsalt_CaH4P2O8B,N,N6,N5,N4)) &
           +5.0*(trcSalt3DFlo2Cell(idsalt_AlOH4,N,N6,N5,N4)+trcSalt3DFlo2Cell(idsalt_FeOH4,N,N6,N5,N4)))
 
         SHD=XN*(trcSalt_XFHS(idsalt_Al,N,N6,N5,N4)+trcSalt_XFHS(idsalt_Fe,N,N6,N5,N4) &
@@ -625,7 +625,7 @@ implicit none
           +2.0*(trcSalt_XFHS(idsalt_HCO3,N,N6,N5,N4)+trcSalt_XFHS(idsalt_AlOH,N,N6,N5,N4) &
           +trcSalt_XFHS(idsalt_AlSO4,N,N6,N5,N4)+trcSalt_XFHS(idsalt_FeOH,N,N6,N5,N4) &
           +trcSalt_XFHS(idsalt_FeSO4,N,N6,N5,N4) &
-          +trcSalt_XFHS(idsalt_CaOH2,N,N6,N5,N4)+trcSalt_XFHS(idsalt_CaCO3,N,N6,N5,N4) &
+          +trcSalt_XFHS(idsalt_CaOH,N,N6,N5,N4)+trcSalt_XFHS(idsalt_CaCO3,N,N6,N5,N4) &
           +trcSalt_XFHS(idsalt_CaSO4,N,N6,N5,N4)+trcSalt_XFHS(idsalt_MgOH2,N,N6,N5,N4) &
           +trcSalt_XFHS(idsalt_MgCO3,N,N6,N5,N4) &
           +trcSalt_XFHS(idsalt_MgSO4,N,N6,N5,N4)+trcSalt_XFHS(idsalt_NaCO3,N,N6,N5,N4) &
@@ -641,9 +641,9 @@ implicit none
           +trcSalt_XFHS(idsalt_MgHPO4B,N,N6,N5,N4)) &
           +4.0*(trcSalt_XFHS(idsalt_AlOH3,N,N6,N5,N4)+trcSalt_XFHS(idsalt_FeOH3,N,N6,N5,N4) &
           +trcSalt_XFHS(idsalt_H3PO4,N,N6,N5,N4) &
-          +trcSalt_XFHS(idsalt_FeH2PO4,N,N6,N5,N4)+trcSalt_XFHS(idsalt_CaH2PO4,N,N6,N5,N4) &
+          +trcSalt_XFHS(idsalt_FeH2PO4,N,N6,N5,N4)+trcSalt_XFHS(idsalt_CaH4P2O8,N,N6,N5,N4) &
           +trcSalt_XFHS(idsalt_H3PO4B,N,N6,N5,N4) &
-          +trcSalt_XFHS(idsalt_FeH2PO4B,N,N6,N5,N4)+trcSalt_XFHS(idsalt_CaH2PO4B,N,N6,N5,N4)) &
+          +trcSalt_XFHS(idsalt_FeH2PO4B,N,N6,N5,N4)+trcSalt_XFHS(idsalt_CaH4P2O8B,N,N6,N5,N4)) &
           +5.0*(trcSalt_XFHS(idsalt_AlOH4,N,N6,N5,N4)+trcSalt_XFHS(idsalt_AlOH4,N,N6,N5,N4)))
 
         SO=SSD+SHD
@@ -654,10 +654,10 @@ implicit none
 !     SUBSURFACE FLUX ELECTRICAL CONDUCTIVITY
 !
 !     FLW,WaterFlowMacP=micropore,macropore flux through lateral and lower boundaries from watsub.f
-!     X*FLS=hourly convective + diffusive solute flux through micropores from trnsfrs.f
-!     X*FLW,X*FLB= hourly convective + diffusive solute flux through micropores in non-band,band from trnsfrs.f
-!     X*FHS=hourly convective + diffusive solute flux through macropores from trnsfrs.f
-!     X*FHW,X*FHB= hourly convective + diffusive solute flux through macropores in non-band,band from trnsfrs.f
+!     X*FLS=hourly convective + diffusive solute flux through micropores from TranspSalt.f
+!     X*FLW,X*FLB= hourly convective + diffusive solute flux through micropores in non-band,band from TranspSalt.f
+!     X*FHS=hourly convective + diffusive solute flux through macropores from TranspSalt.f
+!     X*FHW,X*FHB= hourly convective + diffusive solute flux through macropores in non-band,band from TranspSalt.f
 !     ECNDQ=electrical conductivity of water flux
 !
         WX=WaterFlowSoiMicP(N,N6,N5,N4)+WaterFlowMacP(N,N6,N5,N4)
@@ -674,7 +674,7 @@ implicit none
           ECHC=0.044*AZMAX1((trcSalt3DFlo2Cell(idsalt_HCO3,N,N6,N5,N4)+trcSalt_XFHS(idsalt_HCO3,N,N6,N5,N4))/WX)
           ECSO=0.080*AZMAX1((trcSalt3DFlo2Cell(idsalt_SO4,N,N6,N5,N4)+trcSalt_XFHS(idsalt_SO4,N,N6,N5,N4))*2.0/WX)
           ECCL=0.076*AZMAX1((trcSalt3DFlo2Cell(idsalt_Cl,N,N6,N5,N4)+trcSalt_XFHS(idsalt_Cl,N,N6,N5,N4))/WX)
-          ECNO=0.071*AZMAX1((trcs_XFLS(ids_NO3,N,N6,N5,N4)+trcs_XFHS(ids_NO3,N,N6,N5,N4))/(WX*natomw))
+          ECNO=0.071*AZMAX1((trcs_3DTransp2MicP(ids_NO3,N,N6,N5,N4)+trcs_3DTransp2MacP(ids_NO3,N,N6,N5,N4))/(WX*natomw))
           ECNDX=ECHY+ECOH+ECAL+ECFE+ECCA+ECMG+ECNA+ECKA+ECCO+ECHC+ECSO+ECCL+ECNO
 !     IF((I/10)*10.EQ.I.AND.J.EQ.15)THEN
 !     WRITE(*,9992)'ECNDX',IYRC,I,J,N4,N5,N6,N,WX,ECNDX
@@ -685,7 +685,7 @@ implicit none
           ECNDX=0.0_r8
         ENDIF
       ENDIF
-      SG=SG+trcs_XFLS(idg_H2,N,N6,N5,N4)+R3GasADTFlx(idg_H2,N,N6,N5,N4)
+      SG=SG+trcs_3DTransp2MicP(idg_H2,N,N6,N5,N4)+R3GasADTFlx(idg_H2,N,N6,N5,N4)
     ENDIF
   ENDIF
   end subroutine SubsurfaceBoundaryFluxes
@@ -724,7 +724,7 @@ implicit none
         PSS=XN*patomw*(trcSalt_XQS(idsalt_CaPO4,N,N5,N4) &
           +trcSalt_XQS(idsalt_FeHPO4,N,N5,N4)+trcSalt_XQS(idsalt_CaHPO4,N,N5,N4) &
           +trcSalt_XQS(idsalt_MgHPO4,N,N5,N4)+trcSalt_XQS(idsalt_H3PO4,N,N5,N4) &
-          +trcSalt_XQS(idsalt_FeH2PO4,N,N5,N4)+trcSalt_XQS(idsalt_CaH2PO4,N,N5,N4))
+          +trcSalt_XQS(idsalt_FeH2PO4,N,N5,N4)+trcSalt_XQS(idsalt_CaH4P2O8,N,N5,N4))
         TPOU=TPOU-PSS
         SS1=XN*(trcSalt_XQS(idsalt_Al,N,N5,N4)+trcSalt_XQS(idsalt_Fe,N,N5,N4) &
           +trcSalt_XQS(idsalt_Hp,N,N5,N4)+trcSalt_XQS(idsalt_Ca,N,N5,N4) &
@@ -735,7 +735,7 @@ implicit none
         SS2=XN*2.0*(trcSalt_XQS(idsalt_HCO3,N,N5,N4)+trcSalt_XQS(idsalt_AlOH,N,N5,N4) &
           +trcSalt_XQS(idsalt_AlSO4,N,N5,N4) &
           +trcSalt_XQS(idsalt_FeOH,N,N5,N4)+trcSalt_XQS(idsalt_FeSO4,N,N5,N4) &
-          +trcSalt_XQS(idsalt_CaOH2,N,N5,N4)+trcSalt_XQS(idsalt_CaCO3,N,N5,N4) &
+          +trcSalt_XQS(idsalt_CaOH,N,N5,N4)+trcSalt_XQS(idsalt_CaCO3,N,N5,N4) &
           +trcSalt_XQS(idsalt_CaSO4,N,N5,N4)+trcSalt_XQS(idsalt_MgOH2,N,N5,N4)&
           +trcSalt_XQS(idsalt_MgCO3,N,N5,N4)+trcSalt_XQS(idsalt_MgSO4,N,N5,N4) &
           +trcSalt_XQS(idsalt_NaCO3,N,N5,N4)+trcSalt_XQS(idsalt_NaSO4,N,N5,N4) &
@@ -746,7 +746,7 @@ implicit none
           +trcSalt_XQS(idsalt_CaHPO4,N,N5,N4)+trcSalt_XQS(idsalt_MgHPO4,N,N5,N4))
         SS4=XN*4.0*(trcSalt_XQS(idsalt_AlOH3,N,N5,N4)+trcSalt_XQS(idsalt_FeOH3,N,N5,N4) &
           +trcSalt_XQS(idsalt_H3PO4,N,N5,N4)+trcSalt_XQS(idsalt_FeH2PO4,N,N5,N4)&
-          +trcSalt_XQS(idsalt_CaH2PO4,N,N5,N4)) &
+          +trcSalt_XQS(idsalt_CaH4P2O8,N,N5,N4)) &
           +XN*5.0*(trcSalt_XQS(idsalt_AlOH4,N,N5,N4)+trcSalt_XQS(idsalt_FeOH4,N,N5,N4))
         SSR=SS1+SS2+SS3+SS4
         TIONOU=TIONOU-SSR

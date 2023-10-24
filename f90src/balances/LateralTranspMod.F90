@@ -334,8 +334,8 @@ implicit none
 !       :PCAC,PCAS=precip CaCO3,CaSO4
 !       :PALP,PFEP=precip AlPO4,FEPO4 in non-band
 !       :PALPB,PFEPB=precip AlPO4,FEPO4 in band
-!       :PCPM,PCPD,PCPH=precip CaH2PO4,CaHPO4,apatite in non-band
-!       :PCPMB,PCPDB,PCPHB=precip CaH2PO4,CaHPO4,apatite in band
+!       :PCPM,PCPD,PCPH=precip CaH4P2O8,CaHPO4,apatite in non-band
+!       :PCPMB,PCPDB,PCPHB=precip CaH4P2O8,CaHPO4,apatite in band
 !
   IF(N.NE.3.AND.(IERSNG.EQ.1.OR.IERSNG.EQ.3))THEN
     !horizontal direction
@@ -626,7 +626,7 @@ implicit none
       !     NET SOLUTE FLUXES BETWEEN ADJACENT GRID CELLS
       !
       !     T*FLS,T*FHS=net convective+diffusive solute flux through micropores,macropores
-      !     X*FLS,X*FHS=convective+diffusive solute flux through micropores, macropores from trnsfr.f
+      !     X*FLS,X*FHS=convective+diffusive solute flux through micropores, macropores from TranspNoSalt.f
       !     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
       !             :OC=DOC,ON=DON,OP=DOP,OA=acetate
       !             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
@@ -645,15 +645,15 @@ implicit none
 
       DO NTS=ids_beg,ids_end
         trcs_TFLS(NTS,N3,N2,N1)=trcs_TFLS(NTS,N3,N2,N1) &
-          +trcs_XFLS(NTS,N,N3,N2,N1)-trcs_XFLS(NTS,N,N6,N5,N4)
+          +trcs_3DTransp2MicP(NTS,N,N3,N2,N1)-trcs_3DTransp2MicP(NTS,N,N6,N5,N4)
         trcs_TFHS(NTS,N3,N2,N1)=trcs_TFHS(NTS,N3,N2,N1) &
-          +trcs_XFHS(NTS,N,N3,N2,N1)-trcs_XFHS(NTS,N,N6,N5,N4)
+          +trcs_3DTransp2MacP(NTS,N,N3,N2,N1)-trcs_3DTransp2MacP(NTS,N,N6,N5,N4)
       ENDDO
 !
       !     NET GAS FLUXES BETWEEN ADJACENT GRID CELLS
       !
       !     T*FLG=net convective+diffusive gas flux
-      !     X*FLG=convective+diffusive gas flux from trnsfr.f
+      !     X*FLG=convective+diffusive gas flux from TranspNoSalt.f
       !     gas code:*CO*=CO2,*OX*=O2,*CH*=CH4,*NG*=N2,*N2*=N2O,*NH*=NH3,*HG*=H2
 !exclude NH3B
       DO NTG=idg_beg,idg_end-1
@@ -663,7 +663,7 @@ implicit none
       !     NET SALT FLUXES BETWEEN ADJACENT GRID CELLS
       !
       !     T*FLS,T*FHS=net convective+diffusive solute flux through micropores,macropores
-      !     X*FLS,X*FHS=convective+diffusive solute flux through micropores, macropores from trnsfrs.f
+      !     X*FLS,X*FHS=convective+diffusive solute flux through micropores, macropores from TranspSalt.f
       !     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
       !          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
       !          :*CO2*=CO2,*ALO1*=AlOH2-,*ALOH2=AlOH2-,*ALOH3*=AlOH3
@@ -672,7 +672,7 @@ implicit none
       !          :*CAC*=CaCO3,*CAH*=CaHCO3-,*CAS*=CaSO4,*MGO*=MgOH,*MGC*=MgCO3
       !          :*MHG*=MgHCO3-,*MGS*=MgSO4,*NAC*=NaCO3-,*NAS*=NaSO4-,*KAS*=KSO4-
       !     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
-      !          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH2PO4+,*M1P*=MgHPO4,*COO*=COOH-
+      !          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH4P2O8+,*M1P*=MgHPO4,*COO*=COOH-
       !          :*1=non-band,*B=band
 !
       IF(salt_model)THEN

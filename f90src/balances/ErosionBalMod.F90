@@ -108,7 +108,7 @@ implicit none
 !     :PALO,PFEO=precip AlOH,FeOH
 !     :PCAC,PCAS=precip CaCO3,CaSO4
 !     :PALP,PFEP=precip AlPO4,FEPO4
-!     :PCPM,PCPD,PCPH=precip CaH2PO4,CaHPO4,apatite
+!     :PCPM,PCPD,PCPH=precip CaH4P2O8,CaHPO4,apatite
 !
 ! only for non-banded precipitates
       DO NTP=idsp_beg,idsp_beg_band-1

@@ -70,7 +70,7 @@ module IrrigationDataType
   real(r8),target,allocatable ::  CF2PQ(:,:,:)                      !surface irrigation  FeH2PO4 concentration, [g m-3]
   real(r8),target,allocatable ::  CC0PQ(:,:,:)                      !surface irrigation  CaPO4 concentration, [g m-3]
   real(r8),target,allocatable ::  CC1PQ(:,:,:)                      !surface irrigation  CaHPO4 concentration, [g m-3]
-  real(r8),target,allocatable ::  CC2PQ(:,:,:)                      !surface irrigation  CaH2PO4 concentration, [g m-3]
+  real(r8),target,allocatable ::  CC2PQ(:,:,:)                      !surface irrigation  CaH4P2O8 concentration, [g m-3]
   real(r8),target,allocatable ::  CM1PQ(:,:,:)                      !surface irrigation  MgHPO4 concentration, [g m-3]
   real(r8),target,allocatable ::  CSTRQ(:,:,:)                      !surface irrigation ion strength, [g m-3]
   real(r8),target,allocatable ::  CSTRR(:,:)                        !surface irrigation ion strength, [g m-3]

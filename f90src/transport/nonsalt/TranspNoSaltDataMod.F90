@@ -1,4 +1,4 @@
-module TransfrDataMod
+module TranspNoSaltDataMod
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use GridConsts
   use TracerIDMod
@@ -843,4 +843,4 @@ contains
   call destroy(RporeSoXFlx)
   end subroutine DestructTransfrData
 
-end module TransfrDataMod
+end module TranspNoSaltDataMod

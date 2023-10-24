@@ -329,7 +329,7 @@ implicit none
   !          :*CAC*=CaCO3,*CAH*=CaHCO3-,*CAS*=CaSO4,*MGO*=MgOH,*MGC*=MgCO3
   !          :*MHG*=MgHCO3-,*MGS*=MgSO4,*NAC*=NaCO3-,*NAS*=NaSO4-,*KAS*=KSO4-
   !     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
-  !          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH2PO4+,*M1P*=MgHPO4,*COO*=COOH-
+  !          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH4P2O8+,*M1P*=MgHPO4,*COO*=COOH-
   !
   IF(salt_model)THEN
     DO NTSA=idsalt_beg,idsalt_end
@@ -515,7 +515,7 @@ implicit none
         !     NET SOLUTE FLUXES THROUGH SNOWPACK
         !
         !     T*BLS=net solute flux in snowpack
-        !     X*BLS=solute flux in snowpack from trnsfr.f
+        !     X*BLS=solute flux in snowpack from TranspNoSalt.f
         !     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
         !             :OC=DOC,ON=DON,OP=DOP,OA=acetate
         !             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
@@ -534,7 +534,7 @@ implicit none
         !     NET SALT FLUXES THROUGH SNOWPACK
         !
         !     T*BLS=net solute flux in snowpack
-        !     X*BLS=solute flux in snowpack from trnsfrs.f
+        !     X*BLS=solute flux in snowpack from TranspSalt.f
         !     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
         !          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
         !          :*CO2*=CO2,*ALO1*=AlOH2-,*ALOH2=AlOH2-,*ALOH3*=AlOH3
@@ -543,7 +543,7 @@ implicit none
         !          :*CAC*=CaCO3,*CAH*=CaHCO3-,*CAS*=CaSO4,*MGO*=MgOH,*MGC*=MgCO3
         !          :*MHG*=MgHCO3-,*MGS*=MgSO4,*NAC*=NaCO3-,*NAS*=NaSO4-,*KAS*=KSO4-
         !     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
-        !          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH2PO4+,*M1P*=MgHPO4,*COO*=COOH-
+        !          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH4P2O8+,*M1P*=MgHPO4,*COO*=COOH-
         !          :*1=non-band,*B=band
         !
         IF(salt_model)THEN
@@ -565,23 +565,23 @@ implicit none
         ! and NH3B
         DO NTG=idg_beg,idg_end-1
           trcg_TBLS(NTG,LS,N2,N1)=trcg_TBLS(NTG,LS,N2,N1)+trcg_XBLS(NTG,LS,N2,N1) &
-            -trcs_XFLS(NTG,3,0,N2,N1)-trcs_XFLS(NTG,3,NUM(N2,N1),N2,N1) &
-            -trcs_XFHS(NTG,3,NUM(N2,N1),N2,N1)
+            -trcs_3DTransp2MicP(NTG,3,0,N2,N1)-trcs_3DTransp2MicP(NTG,3,NUM(N2,N1),N2,N1) &
+            -trcs_3DTransp2MacP(NTG,3,NUM(N2,N1),N2,N1)
         ENDDO
 
         DO NTN=ids_nut_beg,ids_nuts_end
           trcn_TBLS(NTN,LS,N2,N1)=trcn_TBLS(NTN,LS,N2,N1)+trcn_XBLS(NTN,LS,N2,N1) &
-            -trcs_XFLS(NTN,3,0,N2,N1)-trcs_XFLS(NTN,3,NUM(N2,N1),N2,N1) &
-            -trcs_XFHS(NTN,3,NUM(N2,N1),N2,N1)
+            -trcs_3DTransp2MicP(NTN,3,0,N2,N1)-trcs_3DTransp2MicP(NTN,3,NUM(N2,N1),N2,N1) &
+            -trcs_3DTransp2MacP(NTN,3,NUM(N2,N1),N2,N1)
         ENDDO
 
         !add band flux
         trcg_TBLS(idg_NH3,LS,N2,N1)=trcg_TBLS(idg_NH3,LS,N2,N1) &
-          -trcs_XFLS(idg_NH3B,3,NUM(N2,N1),N2,N1)-trcs_XFHS(idg_NH3B,3,NUM(N2,N1),N2,N1)
+          -trcs_3DTransp2MicP(idg_NH3B,3,NUM(N2,N1),N2,N1)-trcs_3DTransp2MacP(idg_NH3B,3,NUM(N2,N1),N2,N1)
 
         DO NTS=0,ids_nuts
           trcn_TBLS(ids_NH4+NTS,LS,N2,N1)=trcn_TBLS(ids_NH4+NTS,LS,N2,N1) &
-            -trcs_XFLS(ids_NH4B+NTS,3,NUM(N2,N1),N2,N1)-trcs_XFHS(ids_NH4B+NTS,3,NUM(N2,N1),N2,N1)
+            -trcs_3DTransp2MicP(ids_NH4B+NTS,3,NUM(N2,N1),N2,N1)-trcs_3DTransp2MacP(ids_NH4B+NTS,3,NUM(N2,N1),N2,N1)
         ENDDO
 
         IF(salt_model)THEN
@@ -709,9 +709,9 @@ implicit none
   !     NET GAS AND SOLUTE FLUXES FROM RUNOFF AND SNOWPACK
   !
   !     T*QRS=net overland solute flux from runoff
-  !     X*QRS=solute in runoff from trnsfr.f
+  !     X*QRS=solute in runoff from TranspNoSalt.f
   !     T*QSS=net overland solute flux from snowpack
-  !     X*QSS=solute in snowpack flux from trnsfr.f
+  !     X*QSS=solute in snowpack flux from TranspNoSalt.f
   !     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
   !             :OC=DOC,ON=DON,OP=DOP,OA=acetate
   !             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
@@ -769,9 +769,9 @@ implicit none
 !     begin_execution
 !
 !     TQR*=net overland solute flux in runoff
-!     XQR*=solute in runoff from trnsfrs.f
+!     XQR*=solute in runoff from TranspSalt.f
 !     TQS*=net overland solute flux in snow drift
-!     XQS*=solute in snow drift from trnsfrs.f
+!     XQS*=solute in snow drift from TranspSalt.f
 !     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
 !          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
 !          :*CO2*=CO2,*ALO1*=AlOH2-,*ALOH2=AlOH2-,*ALOH3*=AlOH3
@@ -780,7 +780,7 @@ implicit none
 !          :*CAC*=CaCO3,*CAH*=CaHCO3-,*CAS*=CaSO4,*MGO*=MgOH,*MGC*=MgCO3
 !          :*MHG*=MgHCO3-,*MGS*=MgSO4,*NAC*=NaCO3-,*NAS*=NaSO4-,*KAS*=KSO4-
 !     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
-!          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH2PO4+,*M1P*=MgHPO4,*COO*=COOH-
+!          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH4P2O8+,*M1P*=MgHPO4,*COO*=COOH-
 !          :*1=non-band,*B=band
 !
   IF(salt_model)THEN

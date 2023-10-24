@@ -1546,7 +1546,7 @@ implicit none
     RCO2A      =>   plt_rbgc%RCO2A    , &
     TCO2T      =>   plt_bgcr%TCO2T    , &
     RECO       =>   plt_bgcr%RECO     , &
-    TRAU       =>   plt_bgcr%TRAU     , &
+    Eco_AutoR_col       =>   plt_bgcr%Eco_AutoR_col     , &
     NU         =>   plt_site%NU       , &
     ZERO       =>   plt_site%ZERO     , &
     k_woody_litr=> pltpar%k_woody_litr,&
@@ -1726,7 +1726,7 @@ implicit none
 !     TCO2T=total PFT respiration
 !     RCO2A=total root respiration
 !     RECO=ecosystem respiration
-!     TRAU=total autotrophic respiration
+!     Eco_AutoR_col=total autotrophic respiration
 !
   D5445: DO N=1,MY(NZ)
     D5450: DO L=NU,NI(NZ)
@@ -1738,7 +1738,7 @@ implicit none
       ENDDO D5460
       TCO2T(NZ)=TCO2T(NZ)+RCO2A(N,L,NZ)
       RECO=RECO+RCO2A(N,L,NZ)
-      TRAU=TRAU+RCO2A(N,L,NZ)
+      Eco_AutoR_col=Eco_AutoR_col+RCO2A(N,L,NZ)
     ENDDO D5450
 
     DO  NR=1,NRT(NZ)

@@ -395,8 +395,8 @@ module PlantDisturbsMod
     VN2OF    =>  plt_distb%VN2OF  , &
     VCO2F    =>  plt_distb%VCO2F  , &
     CO2NetFix_pft     =>  plt_bgcr%CO2NetFix_pft    , &
-    TNBP     =>  plt_bgcr%TNBP    , &
-    TRAU     =>  plt_bgcr%TRAU    , &
+    Eco_NBP_col     =>  plt_bgcr%Eco_NBP_col    , &
+    Eco_AutoR_col     =>  plt_bgcr%Eco_AutoR_col    , &
     RECO     =>  plt_bgcr%RECO    , &
     TCO2A    =>  plt_bgcr%TCO2A   , &
     TCO2T    =>  plt_bgcr%TCO2T   , &
@@ -424,7 +424,7 @@ module PlantDisturbsMod
           HVSTE(NE,NZ)=HVSTE(NE,NZ)+WTHEHT(NE)-WTHERT(NE)
           XHVSTE(NE)=XHVSTE(NE)+WTHEHT(NE)-WTHERT(NE)
         ENDDO
-        TNBP=TNBP+WTHERT(ielmc)-WTHEHT(ielmc)
+        Eco_NBP_col=Eco_NBP_col+WTHERT(ielmc)-WTHEHT(ielmc)
       ELSE
         DO NE=1,NumOfPlantChemElements
           WTRVE(NE,NZ)=WTRVE(NE,NZ)+WTHEHT(NE)-WTHERT(NE)
@@ -435,7 +435,7 @@ module PlantDisturbsMod
 !
 !     VCO2F,VCH4F,VOXYF,VNH3F,VN2OF,VPO4F=CO2,CH4,O2,NH3,N2O,PO4 emission from disturbance
 !     CO2NetFix_pft=PFT net CO2 fixation
-!     TNBP=total net biome productivity
+!     Eco_NBP_col=total net biome productivity
 !
     ELSE
       VCO2F(NZ)=VCO2F(NZ)-(1._r8-FCH4F)*(WTHEHT(ielmc)-WTHERT(ielmc))
@@ -445,7 +445,7 @@ module PlantDisturbsMod
       VN2OF(NZ)=VN2OF(NZ)-0.0_r8
       VPO4F(NZ)=VPO4F(NZ)-WTHEHT(ielmp)+WTHERT(ielmp)
       CO2NetFix_pft(NZ)=CO2NetFix_pft(NZ)-(1._r8-FCH4F)*(WTHEHT(ielmc)-WTHERT(ielmc))
-      TNBP=TNBP-FCH4F*(WTHEHT(ielmc)-WTHERT(ielmc))
+      Eco_NBP_col=Eco_NBP_col-FCH4F*(WTHEHT(ielmc)-WTHERT(ielmc))
     ENDIF
 !
 !     C,N,P REMOVED FROM GRAZING
@@ -456,7 +456,7 @@ module PlantDisturbsMod
 !     WTHEHT(ielmc),WTHEHT(ielmn),WTHEHT(ielmp)=total C,N,P removed
 !     WTHERT(ielmc),WTHERT(ielmn),WTHERT(ielmp)=total C,N,P to litter
 !     RECO=ecosystem respiration
-!     TRAU=total autotrophic respiration
+!     Eco_AutoR_col=total autotrophic respiration
 !
   ELSE
     HVSTE(ielmc,NZ)=HVSTE(ielmc,NZ)+GY*(WTHEHT(ielmc)-WTHERT(ielmc))
@@ -467,10 +467,10 @@ module PlantDisturbsMod
     ENDDO
     TCO2T(NZ)=TCO2T(NZ)-GZ*(WTHEHT(ielmc)-WTHERT(ielmc))
     TCO2A(NZ)=TCO2A(NZ)-GZ*(WTHEHT(ielmc)-WTHERT(ielmc))
-!     TNBP=TNBP+GY*(WTHERT(ielmc)-WTHEHT(ielmc))
+!     Eco_NBP_col=Eco_NBP_col+GY*(WTHERT(ielmc)-WTHEHT(ielmc))
 !     CO2NetFix_pft(NZ)=CO2NetFix_pft(NZ)+GZ*(WTHERT(ielmc)-WTHEHT(ielmc))
     RECO=RECO-GZ*(WTHEHT(ielmc)-WTHERT(ielmc))
-    TRAU=TRAU-GZ*(WTHEHT(ielmc)-WTHERT(ielmc))
+    Eco_AutoR_col=Eco_AutoR_col-GZ*(WTHEHT(ielmc)-WTHERT(ielmc))
   ENDIF
   end associate
   end subroutine TotalBiomRemovalByDisturbance
@@ -1262,7 +1262,7 @@ module PlantDisturbsMod
     trcs_rootml     =>  plt_rbgc%trcs_rootml , &
     RootGasLoss_disturb    =>   plt_bgcr%RootGasLoss_disturb    , &
     ESNC     =>  plt_bgcr%ESNC     , &
-    TNBP     =>  plt_bgcr%TNBP     , &
+    Eco_NBP_col     =>  plt_bgcr%Eco_NBP_col     , &
     CO2NetFix_pft     =>  plt_bgcr%CO2NetFix_pft     , &
     RCO2A    =>  plt_rbgc%RCO2A    , &
     RCO2M    =>  plt_rbgc%RCO2M    , &
@@ -2346,7 +2346,7 @@ module PlantDisturbsMod
 !     CSNC,ZSNC,PSNC=C,N,P litterfall from disturbance
 !     VCO2F,VCH4F,VOXYF,VNH3F,VN2OF,VPO4F=CO2,CH4,O2,NH3,N2O,PO4 emission from disturbance
 !     CO2NetFix_pft=PFT net CO2 fixation
-!     TNBP=total net biome productivity
+!     Eco_NBP_col=total net biome productivity
 !     WTRT1,WTRT1N,WTRT1P=primary root C,N,P mass in soil layer
 !     WTRT2,WTRT2N,WTRT2P=secondary root C,N,P mass in soil layer
 !     FWOOD,FWOODN,FWOODP=C,N,P woody fraction in root:0=woody,1=non-woody
@@ -2389,7 +2389,7 @@ module PlantDisturbsMod
               VN2OF(NZ)=VN2OF(NZ)-0.0_r8
               VPO4F(NZ)=VPO4F(NZ)-FFIRE(ielmp)*FHVSE(ielmp)
               CO2NetFix_pft(NZ)=CO2NetFix_pft(NZ)-(1._r8-FCH4F)*FFIRE(ielmc)*FHVSE(ielmc)
-              TNBP=TNBP-FCH4F*FFIRE(ielmc)*FHVSE(ielmc)
+              Eco_NBP_col=Eco_NBP_col-FCH4F*FFIRE(ielmc)*FHVSE(ielmc)
               DO NR=1,NRT(NZ)
                 DO NE=1,NumOfPlantChemElements
                   FHVSE(NE)=XHVST1(NE)*CFOPE(NE,icwood,M,NZ)*(WTRT1E(NE,N,L,NR,NZ) &
@@ -2403,7 +2403,7 @@ module PlantDisturbsMod
                 VN2OF(NZ)=VN2OF(NZ)-0.0
                 VPO4F(NZ)=VPO4F(NZ)-FFIRE(ielmp)*FHVSE(ielmp)
                 CO2NetFix_pft(NZ)=CO2NetFix_pft(NZ)-(1._r8-FCH4F)*FFIRE(ielmc)*FHVSE(ielmc)
-                TNBP=TNBP-FCH4F*FFIRE(ielmc)*FHVSE(ielmc)
+                Eco_NBP_col=Eco_NBP_col-FCH4F*FFIRE(ielmc)*FHVSE(ielmc)
 
                 DO NE=1,NumOfPlantChemElements
                   FHVSE(NE)=XHVST1(NE)*CFOPE(NE,iroot,M,NZ)*(WTRT1E(NE,N,L,NR,NZ) &
@@ -2418,7 +2418,7 @@ module PlantDisturbsMod
                 VN2OF(NZ)=VN2OF(NZ)-0.0_r8
                 VPO4F(NZ)=VPO4F(NZ)-FFIRE(ielmp)*FHVSE(ielmp)
                 CO2NetFix_pft(NZ)=CO2NetFix_pft(NZ)-(1._r8-FCH4F)*FFIRE(ielmc)*FHVSE(ielmc)
-                TNBP=TNBP-FCH4F*FFIRE(ielmc)*FHVSE(ielmc)
+                Eco_NBP_col=Eco_NBP_col-FCH4F*FFIRE(ielmc)*FHVSE(ielmc)
               enddo
             ENDDO D3385
 !

@@ -59,7 +59,7 @@ module InitEcoSIM
 
   use FlagDataType , only : ISALTG
   use TranspSaltMod   , only : InitTranspSalt
-  use TrnsfrMod    , only : InitTrnsfr
+  use TranspNoSaltMod    , only : InitTranspNoSalt
 
   implicit none
 
@@ -67,7 +67,7 @@ module InitEcoSIM
   if(salt_model)then
     call InitTranspSalt
   else
-    call InitTrnsfr
+    call InitTranspNoSalt
   endif
 
 

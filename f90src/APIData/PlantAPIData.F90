@@ -619,12 +619,12 @@ implicit none
   end type plant_disturb_type
 
   type, public :: plant_bgcrate_type
-  real(r8) :: TNBP      !total NBP, [g d-2]
-  real(r8) :: TGPP      !ecosystem GPP, [g d-2 h-1]
+  real(r8) :: Eco_NBP_col      !total NBP, [g d-2]
+  real(r8) :: Eco_GPP_col      !ecosystem GPP, [g d-2 h-1]
 
   real(r8) :: CNETX     !total net canopy CO2 exchange, [g d-2 h-1]
   real(r8) :: RECO      !ecosystem respiration, [g d-2 h-1]
-  real(r8) :: TRAU      !ecosystem autotrophic respiration, [g d-2 h-1]
+  real(r8) :: Eco_AutoR_col      !ecosystem autotrophic respiration, [g d-2 h-1]
   real(r8) :: TH2GZ     !total root H2 flux, [g d-2]
   real(r8) :: TCCAN     !total net CO2 fixation, [gC d-2]
   real(r8), pointer :: ZESNC(:) => null() !total litterfall element, [g d-2 h-1]
