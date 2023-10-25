@@ -29,11 +29,11 @@ implicit none
   !real(r8), dimension(:,:), allocatable :: HeatFlux2Ground
   !real(r8), dimension(:,:), allocatable :: Qinfl2MicP
   !real(r8), dimension(:,:), allocatable :: TopLayWatVol
-  
+
   !real(r8), dimension(:,:),intent(inout) :: ResistanceLitRLay
   !REAL(R8), dimension(:,:),INTENT(OUT) :: KSatReductByRainKineticEnergy
-  !real(r8), dimension(:,:),intent(out) :: HeatFlux2Ground 
-  !real(r8),dimension(:,:),intent(inout) :: TopLayWatVol     
+  !real(r8), dimension(:,:),intent(out) :: HeatFlux2Ground
+  !real(r8),dimension(:,:),intent(inout) :: TopLayWatVol
   real(r8) :: ResistanceLitRLay(JY,JX)
   real(r8) :: KSatReductByRainKineticEnergyS(JY,JX)
   real(r8) :: HeatFlux2Ground(JY,JX)
@@ -44,20 +44,44 @@ implicit none
   write(*,*) "In Run Surface Balance"
 
   call SetMeshATS(NHW,NVN,NHE,NVS)
-  
+
   write(*,*) "finish set mesh"
 
   NX=1
-  !write(*,*) "HeatFlux2Ground"
-  !HeatFlux2Ground=a_PORO
-  !write(*,*) "KSatREduct"
-  !KSatReductByRainKineticEnergyS=a_PORO
-  !write(*,*) "Qinfl2MicP"
-  !Qinfl2MicP=a_PORO
-  !write(*,*) "ResistanceLitRLay"
-  !ResistanceLitRLay=a_PORO
-  !write(*,*) "TopLayWatVol" 
-  !TopLayWatVol=a_PORO
+
+  do NY=1,NYS
+    NU(NY,NX)=a_NU(NY)
+    NL(NY,NX)=a_NL(NY)
+    AREA(3,0,NY,NX)=a_AREA3(NY)
+    AREA(3,NU(NY,NX),NY,NX)=a_AREA3(NY)
+    ASP(NY,NX)=a_ASP(NY)
+    TairKClimMean(NY,NX)=a_ATKA(NY)
+    CO2E(NY,NX)=atm_co2
+    CH4E(NY,NX)=atm_ch4
+    OXYE(NY,NX)=atm_o2
+    Z2GE(NY,NX)=atm_n2
+    Z2OE(NY,NX)=atm_n2o
+    ZNH3E(NY,NX)=atm_nh3
+    H2GE(NY,NX)=atm_H2
+    DO L=NU(NY,NX),NL(NY,NX)
+      FieldCapacity(L,NY,NX)=a_FC(L,ny)
+      WiltPoint(L,NY,NX)=a_WP(L,NY)
+      CumDepth2LayerBottom(L,NY,NX)=a_CumDepth2LayerBottom(L,NY)
+      SoiBulkDensityt0(L,NY,NX)=a_BKDSI(L,NY)
+      CORGC(L,NY,NX)=a_CORGC(L,NY)
+      CORGN(L,NY,NX)=a_CORGN(L,NY)
+      CORGP(L,NY,NX)=a_CORGP(L,NY)
+      VLWatMicP1(L,NY,NX)=a_WC(L,NY)
+      VLiceMicP1(L,NY,NX)=0.0
+      TKSoi1(L,NY,NX) = a_TEMP(L,NY)
+      VLHeatCapacity(L,NY,NX) = 20.0
+      SoilFracAsMicP(L,NY,NX) = 1.0
+    ENDDO
+  ENDDO
+
+  PSIAtFldCapacity = 0.5
+  PSIAtWiltPoint = 0.25
+  PSISM1 = 0.1
 
   !What are I and J are these a loop?
   write(*,*) "Running StageSurfacePhysModel"

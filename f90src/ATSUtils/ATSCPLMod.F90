@@ -39,6 +39,41 @@ contains
   size_col = sizes%ncells_per_col_
   num_cols = props%shortwave_radiation%size
 
+  !Pass the data over:
+  !Variables that need to be passed still:
+  !PSISM1, soil matric pressure, MPa
+  !X - VLWatMicP1, top layer volumetric liquid water content, m3/d2, d2 means grid area,
+  !VLiceMicP1,  top layer volumetric ice content, (better pass in ice mass and then convert)
+  !SoilMicPMassLayer, total topsoil layer mass, 10^6 g (or Mg),
+  !X - TKSoi1, topsoil temperature, K
+  !X - SoiBulkDensity, topsoil layer bulk density, Mg m-3
+  !VLHeatCapacity, topsoil layer heat capacity, MJ m-3 K-1
+  !X - SoilFracAsMicP, Fraction of soil as micropore, this will be set to 1
+
+  call c_f_pointer(state%water_content%data, data2D, [(/size_col/),(/num_cols/)])
+  a_WC=data2D(:,:)
+
+  call c_f_pointer(state%temperature%data, data2D, [(/size_col/),(/num_cols/)])
+  a_TEMP=data2D(:,:)
+
+  call c_f_pointer(state%bulk_density%data, data2D, [(/size_col/),(/num_cols/)])
+  a_BKDSI=data2D(:,:)
+
+  call c_f_pointer(state%porosity%data, data2D, [(/size_col/),(/num_cols/)])
+  a_PORO=data2D(:,:)
+
+  call c_f_pointer(props%liquid_saturation%data, data2D, [(/size_col/),(/num_cols/)])
+  a_LSAT=data2D(:,:)
+
+  call c_f_pointer(props%relative_permeability%data, data2D, [(/size_col/),(/num_cols/)])
+  a_RELPERM=data2D(:,:)
+
+  call c_f_pointer(state%hydraulic_conductivity%data, data2D, [(/size_col/),(/num_cols/)])
+  a_HCOND=data2D(:,:)
+
+  call c_f_pointer(props%dz%data, data2D, [(/size_col/),(/num_cols/)])
+  a_CumDepth2LayerBottom=data2D(:,:)
+
   call c_f_pointer(props%shortwave_radiation%data, data, (/num_cols/))
   srad = data(:)
 
@@ -56,8 +91,6 @@ contains
 
   call c_f_pointer(props%precipitation%data, data, (/num_cols/))
   prec = data(:)
-
-!!** Currently used by coupler **!!
 
   atm_n2 = props%atm_n2
   atm_o2 = props%atm_o2
@@ -88,28 +121,7 @@ contains
   call c_f_pointer(state%surface_energy_source%data, data, (/num_cols/))
   surf_e_source = data(:)
 
-!!***********************************!!
 
-  call c_f_pointer(state%porosity%data, data2D, [(/size_col/),(/num_cols/)])
-  a_PORO=data2D(:,:)
-
-  call c_f_pointer(state%water_content%data, data2D, [(/size_col/),(/num_cols/)])
-  a_WC=data2D(:,:)
-
-  call c_f_pointer(props%liquid_saturation%data, data2D, [(/size_col/),(/num_cols/)])
-  a_LSAT=data2D(:,:)
-
-  call c_f_pointer(props%relative_permeability%data, data2D, [(/size_col/),(/num_cols/)])
-  a_RELPERM=data2D(:,:)
-
-  call c_f_pointer(state%hydraulic_conductivity%data, data2D, [(/size_col/),(/num_cols/)])
-  a_HCOND=data2D(:,:)
-
-  call c_f_pointer(state%temperature%data, data2D, [(/size_col/),(/num_cols/)])
-  a_TEMP=data2D(:,:)
-
-  call c_f_pointer(props%dz%data, data2D, [(/size_col/),(/num_cols/)])
-  a_CumDepth2LayerBottom=data2D(:,:)
 
   write(*,*) "Data Transfer Finished"
   end subroutine ATS2EcoSIMData
@@ -135,8 +147,17 @@ contains
   size_col = sizes%ncells_per_col_
   size_procs = state%porosity%cols
 
-  !seems like we call the pointer as normal,
-  !then just reverse the data
+  !Pass the data over:
+  !Variables that need to be passed still:
+  !PSISM1, soil matric pressure, MPa
+  !VLWatMicP1, top layer volumetric liquid water content, m3/d2, d2 means grid area,
+  !VLiceMicP1,  top layer volumetric ice content, (better pass in ice mass and then convert)
+  !SoilMicPMassLayer, total topsoil layer mass, 10^6 g (or Mg),
+  !TKSoi1, topsoil temperature, K
+  !SoiBulkDensity, topsoil layer bulk density, Mg m-3
+  !VLHeatCapacity, topsoil layer heat capacity, MJ m-3 K-1
+  !SoilFracAsMicP, Fraction of soil as micropore, this will be set to 1
+
 
   call c_f_pointer(state%bulk_density%data, data2D, [(/size_col/),(/size_procs/)])
   data2D(:,:)=a_BKDSI
