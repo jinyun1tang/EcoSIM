@@ -67,12 +67,9 @@ module ChemTranspDataType
   real(r8),target,allocatable ::  SOSGL(:,:,:)                       !aqueous SO4 diffusivity, [m2 h-1]
   real(r8),target,allocatable ::  CLSXL(:,:,:)                       !aqueous Cl diffusivity, [m2 h-1]
   real(r8),target,allocatable ::  trcSaltRunoffBoundary(:,:,:,:,:)                     !total Al in runoff, [mol d-2 h-1]
-  real(r8),target,allocatable ::  trcg_XRS(:,:,:,:,:)                    !surface runoff gas flux, [g d-2 h-1]
-  real(r8),target,allocatable ::  trcn_XRS(:,:,:,:,:)                    !surface runoff nutrient flux, [g d-2 h-1]
-  real(r8),target,allocatable ::  XOCQRS(:,:,:,:,:)                  !surface runoff DOC flux, [g d-2 h-1]
-  real(r8),target,allocatable ::  XONQRS(:,:,:,:,:)                  !surface runoff DON flux, [g d-2 h-1]
-  real(r8),target,allocatable ::  XOPQRS(:,:,:,:,:)                  !surface runoff DOP flux, [g d-2 h-1]
-  real(r8),target,allocatable ::  XOAQRS(:,:,:,:,:)                  !surface runoff acetate flux, [g d-2 h-1]
+  real(r8),target,allocatable ::  trcg_2DFloXSurRunoff(:,:,:,:,:)                    !surface runoff gas flux, [g d-2 h-1]
+  real(r8),target,allocatable ::  trcn_2DFloXSurRunoff(:,:,:,:,:)                    !surface runoff nutrient flux, [g d-2 h-1]
+  real(r8),target,allocatable ::  dom_2DFloXSurRunoff(:,:,:,:,:,:)                  !surface runoff DOC flux, [g d-2 h-1]
 
   private :: InitAllocate
 
@@ -149,12 +146,9 @@ module ChemTranspDataType
   allocate(SOSGL(JZ,JY,JX));    SOSGL=0._r8
   allocate(CLSXL(JZ,JY,JX));    CLSXL=0._r8
   allocate(trcSaltRunoffBoundary(idsalt_beg:idsalt_end,2,2,JV,JH));   trcSaltRunoffBoundary=0._r8
-  allocate(trcg_XRS(idg_beg:idg_end-1,2,2,JV,JH));  trcg_XRS=0._r8
-  allocate(trcn_XRS(ids_nut_beg:ids_nuts_end,2,2,JV,JH));  trcn_XRS=0._r8
-  allocate(XOCQRS(1:jcplx,2,2,JV,JH));XOCQRS=0._r8
-  allocate(XONQRS(1:jcplx,2,2,JV,JH));XONQRS=0._r8
-  allocate(XOPQRS(1:jcplx,2,2,JV,JH));XOPQRS=0._r8
-  allocate(XOAQRS(1:jcplx,2,2,JV,JH));XOAQRS=0._r8
+  allocate(trcg_2DFloXSurRunoff(idg_beg:idg_end-1,2,2,JV,JH));  trcg_2DFloXSurRunoff=0._r8
+  allocate(trcn_2DFloXSurRunoff(ids_nut_beg:ids_nuts_end,2,2,JV,JH));  trcn_2DFloXSurRunoff=0._r8
+  allocate(dom_2DFloXSurRunoff(idom_beg:idom_end,1:jcplx,2,2,JV,JH));dom_2DFloXSurRunoff=0._r8
 
   end subroutine InitAllocate
 !------------------------------------------------------------------------------------------
@@ -193,8 +187,8 @@ module ChemTranspDataType
   call destroy(VaporDiffusivityLitR)
   call destroy(WGSGA)
 
-  call destroy(trcn_XRS)
-  call destroy(trcg_XRS)
+  call destroy(trcn_2DFloXSurRunoff)
+  call destroy(trcg_2DFloXSurRunoff)
   call destroy(GasSolbility)
 
   call destroy(HGSGL)
@@ -224,10 +218,6 @@ module ChemTranspDataType
   call destroy(HCSGL)
   call destroy(SOSGL)
   call destroy(CLSXL)
-  call destroy(XOCQRS)
-  call destroy(XONQRS)
-  call destroy(XOPQRS)
-  call destroy(XOAQRS)
-
+  call destroy(dom_2DFloXSurRunoff)
   end subroutine DestructChemTranspData
 end module ChemTranspDataType

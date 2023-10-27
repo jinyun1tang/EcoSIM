@@ -159,7 +159,7 @@ contains
 
   continue_run=.false.
   NPXS=30   !number of cycles per hour for water,heat,solute flux calcns
-  NPYS=20   !number of cycles per NPX for gas flux calcns
+  NPYS=20   !number of cycles per NPX for gas flux calculations
   JOUTS=1   !frequency on hourly scale
   NCYC_LITR=20
   NCYC_SNOW=20

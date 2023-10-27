@@ -372,7 +372,7 @@ implicit none
   real(r8), pointer :: CFOPE(:,:,:,:)=> null() !litter kinetic fraction, [-]
   real(r8), pointer :: TFND(:)     => null()  !temperature effect on diffusivity
   real(r8), pointer :: THETPM(:,:) => null()  !soil air-filled porosity, [m3 m-3]
-  real(r8), pointer :: DFGS(:,:)   => null()  !coefficient for dissolution - volatilization, []
+  real(r8), pointer :: DiffusivitySolutEff(:,:)   => null()  !coefficient for dissolution - volatilization, []
   real(r8), pointer :: SoilResit4RootPentration(:)     => null()  !soil hydraulic resistance, [MPa h m-2]
   real(r8), pointer :: SoiBulkDensity(:)     => null()  !soil bulk density, [Mg m-3]
   real(r8), pointer :: trc_solcl(:,:) => null() !aqueous tracer concentration [g m-3]
@@ -399,9 +399,7 @@ implicit none
   real(r8), pointer :: VLWatMicP(:)     => null()  !soil micropore water content [m3 d-2]
   real(r8), pointer :: VLMicP(:)     => null()  !total volume in micropores [m3 d-2]
 
-  real(r8), pointer :: OQC(:,:)    => null()  !dissolved organic C micropore	[gC d-2]
-  real(r8), pointer :: OQN(:,:)    => null()  !dissolved organic N micropore	[gN d-2]
-  real(r8), pointer :: OQP(:,:)    => null()  !dissolved organic P micropore	[gP d-2]
+  real(r8), pointer :: DOM(:,:,:)    => null()  !dissolved organic C micropore	[gC d-2]
   real(r8), pointer :: trc_solml(:,:)=> null() !aqueous tracer [g d-2]
   contains
     procedure, public :: Init => plt_soilchem_init
@@ -673,9 +671,7 @@ implicit none
   real(r8), pointer :: TUPNHB(:)     => null()   !total root-soil NH4 flux band, [gN d-2 h-1]
   real(r8), pointer :: TUPNOB(:)     => null()   !total root-soil NO3 flux band, [gN d-2 h-1]
   real(r8), pointer :: LitrfalChemElemnts_vr(:,:,:,:)   => null() !total litterfall element, [g d-2 h-1]
-  real(r8), pointer :: XOQCS(:,:)    => null()  !net microbial DOC flux, [gC d-2 h-1]
-  real(r8), pointer :: XOQNS(:,:)    => null()  !net microbial DON flux, [gN d-2 h-1]
-  real(r8), pointer :: XOQPS(:,:)    => null()  !net microbial DOP flux, [gP d-2 h-1]
+  real(r8), pointer :: RDOM_micb_flx(:,:,:)    => null()  !net microbial DOC flux, [gC d-2 h-1]
   real(r8), pointer :: CO2NetFix_pft(:)       => null()  !canopy net CO2 exchange, [gC d-2 h-1]
   real(r8), pointer :: CARBN(:)      => null()  !total gross CO2 fixation, [gC d-2 ]
   real(r8), pointer :: HESNC(:,:)    => null()  !plant element litterfall, [g d-2 h-1]
@@ -1084,9 +1080,7 @@ implicit none
   allocate(this%ROXYY(0:JZ1))
   allocate(this%LitrfalChemElemnts_vr(NumOfPlantChemElements,jsken,NumOfPlantLitrCmplxs,0:JZ1))
   allocate(this%CARBN(JP1))
-  allocate(this%XOQCS(1:jcplx,0:JZ1))
-  allocate(this%XOQNS(1:jcplx,0:JZ1))
-  allocate(this%XOQPS(1:jcplx,0:JZ1))
+  allocate(this%RDOM_micb_flx(idom_beg:idom_end,1:jcplx,0:JZ1))
   allocate(this%CO2NetFix_pft(JP1))
   allocate(this%RootGasLoss_disturb(idg_beg:idg_end-1,JP1))
   allocate(this%TCO2T(JP1))
@@ -1512,16 +1506,14 @@ implicit none
   allocate(this%CFOPE(NumOfPlantChemElements,0:Jlitgrp,jsken,JP1))
   allocate(this%TFND(0:JZ1))
   allocate(this%THETPM(60,0:JZ1))
-  allocate(this%DFGS(60,0:JZ1))
+  allocate(this%DiffusivitySolutEff(60,0:JZ1))
   allocate(this%VLSoilMicP(0:JZ1))
   allocate(this%VLiceMicP(0:JZ1))
   allocate(this%VLWatMicP(0:JZ1))
   allocate(this%VLMicP(0:JZ1))
 
   allocate(this%trcs_VLN(ids_nuts_beg:ids_nuts_end,0:JZ1))
-  allocate(this%OQC(1:jcplx,0:JZ1))
-  allocate(this%OQN(1:jcplx,0:JZ1))
-  allocate(this%OQP(1:jcplx,0:JZ1))
+  allocate(this%DOM(idom_beg:idom_end,1:jcplx,0:JZ1))
 
   allocate(this%trc_solml(ids_beg:ids_end,0:JZ1))
 
@@ -1554,7 +1546,7 @@ implicit none
 !  if(allocated(CFOPE))deallocate(CFOPE)
 !  if(allocated(TFND))deallocate(TFND)
 !  if(allocated(THETPM))deallocate(THETPM)
-!  if(allocated(DFGS))deallocate(DFGS)
+!  if(allocated(DiffusivitySolutEff))deallocate(DiffusivitySolutEff)
 !  if(allocated(ZVSGL))deallocate(ZVSGL)
 !  if(allocated(SOXYL))deallocate(SOXYL)
 

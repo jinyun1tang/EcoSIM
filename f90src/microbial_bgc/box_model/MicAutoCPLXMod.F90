@@ -730,7 +730,7 @@ module MicAutoCPLXMod
     TortMicPM => micfor%TortMicPM , &
     ZERO => micfor%ZERO , &
     ZEROS => micfor%ZEROS , &
-    DFGS => micfor%DFGS , &
+    DiffusivitySolutEff => micfor%DiffusivitySolutEff , &
     SOXYL => micstt%SOXYL  , &
     OXYG => micstt%OXYG , &
     OXYS => micstt%OXYS , &
@@ -769,7 +769,7 @@ module MicAutoCPLXMod
         !     ACTUAL REDUCTION OF AQUEOUS BY AEROBES CALCULATED
         !     FROM MASS FLOW PLUS DIFFUSION = ACTIVE UPTAKE
         !     COUPLED WITH DISSOLUTION OF GASEOUS O2 DURING REDUCTION
-        !     OF AQUEOUS O2 FROM DISSOLUTION RATE CONSTANT 'DFGS'
+        !     OF AQUEOUS O2 FROM DISSOLUTION RATE CONSTANT 'DiffusivitySolutEff'
         !     CALCULATED IN 'WATSUB'
         !
         !     VLWatMicPM,VLsoiAirPM,VLSoilPoreMicP=water, air and total volumes
@@ -805,7 +805,7 @@ module MicAutoCPLXMod
           OXYS1=OXYS1-RMPOX
           !apply volatilization-dissolution
           IF(THETPM(M).GT.THETX.AND.VOLPOX.GT.ZEROS)THEN
-            ROXDFQ=DFGS(M)*(AMAX1(ZEROS,OXYG1)*VOLWOX-OXYS1*VOLPOX)/VOLWPM
+            ROXDFQ=DiffusivitySolutEff(M)*(AMAX1(ZEROS,OXYG1)*VOLWOX-OXYS1*VOLPOX)/VOLWPM
           ELSE
             ROXDFQ=0.0_r8
           ENDIF
@@ -1336,7 +1336,7 @@ module MicAutoCPLXMod
     ZEROS2  => micfor%ZEROS2 , &
     ZEROS  => micfor%ZEROS , &
     THETPM  => micfor%THETPM, &
-    DFGS   => micfor%DFGS   , &
+    DiffusivitySolutEff   => micfor%DiffusivitySolutEff   , &
     litrm  => micfor%litrm  , &
     CCH4G  => micstt%CCH4G  , &
     CH4S   => micstt%CH4S   , &
@@ -1367,7 +1367,7 @@ module MicAutoCPLXMod
 !     ECHO=efficiency CO2 conversion to biomass
 !     RGOMP1=substrate-limited CH4 oxidation
 !     RCHDF=gaseous-aqueous CH4 exchange
-!     DFGS=rate constant for gaseous-aqueous exchange
+!     DiffusivitySolutEff=rate constant for gaseous-aqueous exchange
 !
   ECHZ=EH4X
   VMXA=TFNGff(NGL)*FCNPff(NGL)*OMAff(NGL)*VMX4
@@ -1421,7 +1421,7 @@ module MicAutoCPLXMod
 
         !dissolution-vaporization
         IF(THETPM(M).GT.THETX)THEN
-          RCHDF=DFGS(M)*(AMAX1(ZEROS,CH4G1)*VOLWCH-CH4S1*VLsoiAirPM(M))/VOLWPM
+          RCHDF=DiffusivitySolutEff(M)*(AMAX1(ZEROS,CH4G1)*VOLWCH-CH4S1*VLsoiAirPM(M))/VOLWPM
         ELSE
           RCHDF=0.0_r8
         ENDIF

@@ -371,28 +371,28 @@ module Hour1Mod
       Wat2GridBySurfRunoff(1:2,1:2,NY,NX)=0.0_r8
       Heat2GridBySurfRunoff(1:2,1:2,NY,NX)=0.0_r8
 
-      XOCQRS(1:jcplx,1:2,1:2,NY,NX)=0.0_r8
-      XONQRS(1:jcplx,1:2,1:2,NY,NX)=0.0_r8
-      XOPQRS(1:jcplx,1:2,1:2,NY,NX)=0.0_r8
-      XOAQRS(1:jcplx,1:2,1:2,NY,NX)=0.0_r8
+      dom_2DFloXSurRunoff(idom_doc,1:jcplx,1:2,1:2,NY,NX)=0.0_r8
+      dom_2DFloXSurRunoff(idom_don,1:jcplx,1:2,1:2,NY,NX)=0.0_r8
+      dom_2DFloXSurRunoff(idom_dop,1:jcplx,1:2,1:2,NY,NX)=0.0_r8
+      dom_2DFloXSurRunoff(idom_acetate,1:jcplx,1:2,1:2,NY,NX)=0.0_r8
 
-      trcg_XRS(idg_beg:idg_end-1,1:2,1:2,NY,NX)=0.0_r8
-      trcn_XRS(ids_nut_beg:ids_nuts_end,1:2,1:2,NY,NX)=0.0_r8
+      trcg_2DFloXSurRunoff(idg_beg:idg_end-1,1:2,1:2,NY,NX)=0.0_r8
+      trcn_2DFloXSurRunoff(ids_nut_beg:ids_nuts_end,1:2,1:2,NY,NX)=0.0_r8
 
       DrysnoBySnowRedistribution(1:2,NY,NX)=0.0_r8
       WatBySnowRedistribution(1:2,NY,NX)=0.0_r8
       IceBySnowRedistribution(1:2,NY,NX)=0.0_r8
       HeatBySnowRedistribution(1:2,NY,NX)=0.0_r8
-      XCOQSS(1:2,NY,NX)=0.0_r8
-      XCHQSS(1:2,NY,NX)=0.0_r8
-      XOXQSS(1:2,NY,NX)=0.0_r8
-      XNGQSS(1:2,NY,NX)=0.0_r8
-      XN2QSS(1:2,NY,NX)=0.0_r8
-      XN4QSS(1:2,NY,NX)=0.0_r8
-      XN3QSS(1:2,NY,NX)=0.0_r8
-      XNOQSS(1:2,NY,NX)=0.0_r8
-      XP1QSS(1:2,NY,NX)=0.0_r8
-      XP4QSS(1:2,NY,NX)=0.0_r8
+      trcg_FloXSnow(idg_CO2,1:2,NY,NX)=0.0_r8
+      trcg_FloXSnow(idg_CH4,1:2,NY,NX)=0.0_r8
+      trcg_FloXSnow(idg_O2,1:2,NY,NX)=0.0_r8
+      trcg_FloXSnow(idg_N2,1:2,NY,NX)=0.0_r8
+      trcg_FloXSnow(idg_N2O,1:2,NY,NX)=0.0_r8
+      trcn_FloXSnow(ids_NH4,1:2,NY,NX)=0.0_r8
+      trcg_FloXSnow(idg_NH3,1:2,NY,NX)=0.0_r8
+      trcn_FloXSnow(ids_NO3,1:2,NY,NX)=0.0_r8
+      trcn_FloXSnow(ids_H1PO4,1:2,NY,NX)=0.0_r8
+      trcn_FloXSnow(ids_H2PO4,1:2,NY,NX)=0.0_r8
 !
 !
 !     GAS AND SOLUTE FLUXES
@@ -403,10 +403,7 @@ module Hour1Mod
 
         trcs_3DTransp2MicP(ids_nut_beg:ids_nuts_end,1:3,L,NY,NX)=0.0_r8
 
-        XOCFLS(1:jcplx,1:3,L,NY,NX)=0.0_r8
-        XONFLS(1:jcplx,1:3,L,NY,NX)=0.0_r8
-        XOPFLS(1:jcplx,1:3,L,NY,NX)=0.0_r8
-        XOAFLS(1:jcplx,1:3,L,NY,NX)=0.0_r8
+        DOM_3DMicp_Transp_flx(idom_beg:idom_end,1:jcplx,1:3,L,NY,NX)=0.0_r8
       ENDDO
 !
 !     BAND AND MACROPORE FLUXES
@@ -420,10 +417,7 @@ module Hour1Mod
         trcs_3DTransp2MicP(ids_beg:ids_end,1:3,L,NY,NX)=0.0_r8
         R3GasADTFlx(idg_beg:idg_end,1:3,L,NY,NX)=0._r8
 
-        XOCFHS(1:jcplx,1:3,L,NY,NX)=0.0_r8
-        XONFHS(1:jcplx,1:3,L,NY,NX)=0.0_r8
-        XOPFHS(1:jcplx,1:3,L,NY,NX)=0.0_r8
-        XOAFHS(1:jcplx,1:3,L,NY,NX)=0.0_r8
+        DOM_3DMacp_Transp_flx(idom_beg:idom_end,1:jcplx,1:3,L,NY,NX)=0.0_r8
 
       ENDDO
     ENDDO
@@ -806,24 +800,24 @@ module Hour1Mod
   LitrfalChemElemnts_vr(1:NumOfPlantChemElements,1:jsken,1:pltpar%NumOfPlantLitrCmplxs,&
     0:NL(NY,NX),NY,NX)=0.0_r8
 
-  XOQCS(1:jcplx,0:NL(NY,NX),NY,NX)=0.0_r8
-  XOQNS(1:jcplx,0:NL(NY,NX),NY,NX)=0.0_r8
-  XOQPS(1:jcplx,0:NL(NY,NX),NY,NX)=0.0_r8
-  XOQAS(1:jcplx,0:NL(NY,NX),NY,NX)=0.0_r8
+  RDOM_micb_flx(idom_doc,1:jcplx,0:NL(NY,NX),NY,NX)=0.0_r8
+  RDOM_micb_flx(idom_don,1:jcplx,0:NL(NY,NX),NY,NX)=0.0_r8
+  RDOM_micb_flx(idom_dop,1:jcplx,0:NL(NY,NX),NY,NX)=0.0_r8
+  RDOM_micb_flx(idom_acetate,1:jcplx,0:NL(NY,NX),NY,NX)=0.0_r8
 
   XZHYS(0:NL(NY,NX),NY,NX)=0.0_r8
-  TR_NH4_soil(0:NL(NY,NX),NY,NX)=0.0_r8
+  trcn_RChem_soil(ids_NH4,0:NL(NY,NX),NY,NX)=0.0_r8
   TR_NH3_soil(0:NL(NY,NX),NY,NX)=0.0_r8
   TRN3G(0:NL(NY,NX),NY,NX)=0.0_r8
-  TRNO3(0:NL(NY,NX),NY,NX)=0.0_r8
-  TRNO2(0:NL(NY,NX),NY,NX)=0.0_r8
-  TR_H1PO4_soil(0:NL(NY,NX),NY,NX)=0.0_r8
-  TR_H2PO4_soil(0:NL(NY,NX),NY,NX)=0.0_r8
+  trcn_RChem_soil(ids_NO3,0:NL(NY,NX),NY,NX)=0.0_r8
+  trcn_RChem_soil(ids_NO2,0:NL(NY,NX),NY,NX)=0.0_r8
+  trcn_RChem_soil(ids_H1PO4,0:NL(NY,NX),NY,NX)=0.0_r8
+  trcn_RChem_soil(ids_H2PO4,0:NL(NY,NX),NY,NX)=0.0_r8
 
   trcx_TR(idx_NH4,0:NL(NY,NX),NY,NX)=0.0_r8
   trcx_TR(idx_AEC+1:idx_anion_soil_end,0:NL(NY,NX),NY,NX)=0.0_r8
 
-  trcp_TR(idsp_psoi_beg:idsp_psoi_end,0:NL(NY,NX),NY,NX)=0.0_r8
+  trcp_RChem_soil(idsp_psoi_beg:idsp_psoi_end,0:NL(NY,NX),NY,NX)=0.0_r8
 
   GridPlantRootH2OUptake_vr(0:NL(NY,NX),NY,NX)=0.0_r8
   THeatRootUptake(0:NL(NY,NX),NY,NX)=0.0_r8
@@ -1001,9 +995,9 @@ module Hour1Mod
 !  add microbial residue
     OC=OC+SUM(ORC(1:ndbiomcp,1:jcplx,L,NY,NX))
 !  add dissolved/sorbed OM and acetate
-    OC=OC+SUM(OQC(1:jcplx,L,NY,NX))+SUM(OQCH(1:jcplx,L,NY,NX)) &
-         +SUM(OHC(1:jcplx,L,NY,NX))+SUM(OQA(1:jcplx,L,NY,NX)) &
-         +SUM(OQAH(1:jcplx,L,NY,NX))+SUM(OHA(1:jcplx,L,NY,NX))
+    OC=OC+SUM(DOM(idom_doc,1:jcplx,L,NY,NX))+SUM(DOM_Macp(idom_doc,1:jcplx,L,NY,NX)) &
+         +SUM(OHC(1:jcplx,L,NY,NX))+SUM(DOM(idom_acetate,1:jcplx,L,NY,NX)) &
+         +SUM(DOM_Macp(idom_acetate,1:jcplx,L,NY,NX))+SUM(OHA(1:jcplx,L,NY,NX))
 !  add OM complexes
     OC=OC+SUM(OSC(1:jsken,1:jcplx,L,NY,NX))
 !
@@ -1831,9 +1825,9 @@ module Hour1Mod
       OQC1=AMIN1(0.1_r8*OSCX,OSCI-OSCX)
       OQN1=AMIN1(0.1_r8*OSNX,OSNI-OSNX)
       OQP1=AMIN1(0.1_r8*OSPX,OSPI-OSPX)
-      OQC(K,LFDPTH,NY,NX)=OQC(K,LFDPTH,NY,NX)+OQC1
-      OQN(K,LFDPTH,NY,NX)=OQN(K,LFDPTH,NY,NX)+OQN1
-      OQP(K,LFDPTH,NY,NX)=OQP(K,LFDPTH,NY,NX)+OQP1
+      DOM(idom_doc,K,LFDPTH,NY,NX)=DOM(idom_doc,K,LFDPTH,NY,NX)+OQC1
+      DOM(idom_don,K,LFDPTH,NY,NX)=DOM(idom_don,K,LFDPTH,NY,NX)+OQN1
+      DOM(idom_dop,K,LFDPTH,NY,NX)=DOM(idom_dop,K,LFDPTH,NY,NX)+OQP1
 !
 !     REMAINDER DISTRIBUTED TO RESIDUE FRACTIONS
 !
@@ -2329,12 +2323,12 @@ module Hour1Mod
     TUPH2B(L,NY,NX)=0.0_r8
     TUPH1B(L,NY,NX)=0.0_r8
     TUPNF(L,NY,NX)=0.0_r8
-    TR_NH4_band_soil(L,NY,NX)=0.0_r8
+    trcn_RChem_band_soil(ids_NH4B,L,NY,NX)=0.0_r8
     TR_NH3_band_soil(L,NY,NX)=0.0_r8
-    TRNOB(L,NY,NX)=0.0_r8
-    TRN2B(L,NY,NX)=0.0_r8
-    TR_H1PO4_band_soil(L,NY,NX)=0.0_r8
-    TR_H2PO4_band_soil(L,NY,NX)=0.0_r8
+    trcn_RChem_band_soil(ids_NO3B,L,NY,NX)=0.0_r8
+    trcn_RChem_band_soil(ids_NO2B,L,NY,NX)=0.0_r8
+    trcn_RChem_band_soil(ids_H1PO4B,L,NY,NX)=0.0_r8
+    trcn_RChem_band_soil(ids_H2PO4B,L,NY,NX)=0.0_r8
     TR_CO2_aqu_soil(L,NY,NX)=0.0_r8
     TBCO2(L,NY,NX)=0.0_r8
 
@@ -2353,11 +2347,11 @@ module Hour1Mod
     TR_AlO2H2_sorbed_soil(L,NY,NX)=0.0_r8
     TR_FeO2H2_sorbed_soil(L,NY,NX)=0.0_r8
 
-    trcp_TR(idsp_beg:idsp_psoi_beg-1,L,NY,NX)=0.0_r8
+    trcp_RChem_soil(idsp_beg:idsp_psoi_beg-1,L,NY,NX)=0.0_r8
 
-    trcp_TR(idsp_beg_band:idsp_end,L,NY,NX)=0.0_r8
+    trcp_RChem_soil(idsp_beg_band:idsp_end,L,NY,NX)=0.0_r8
 
-    trcs_XFXS(ids_beg:ids_end,L,NY,NX)=0.0_r8
+    trcs_PoreTranspFlx(ids_beg:ids_end,L,NY,NX)=0.0_r8
 
     DO NTSA=idsalt_beg,idsaltb_end
       trcSalt_TR(NTSA,L,NY,NX)=0.0_r8
@@ -2365,10 +2359,10 @@ module Hour1Mod
     ENDDO
 
     DO  K=1,jcplx
-      XOCFXS(K,L,NY,NX)=0.0_r8
-      XONFXS(K,L,NY,NX)=0.0_r8
-      XOPFXS(K,L,NY,NX)=0.0_r8
-      XOAFXS(K,L,NY,NX)=0.0_r8
+      DOM_PoreTranspFlx(idom_doc,K,L,NY,NX)=0.0_r8
+      DOM_PoreTranspFlx(idom_don,K,L,NY,NX)=0.0_r8
+      DOM_PoreTranspFlx(idom_dop,K,L,NY,NX)=0.0_r8
+      DOM_PoreTranspFlx(idom_acetate,K,L,NY,NX)=0.0_r8
     ENDDO
     TLIceThawMicP(L,NY,NX)=0.0_r8
     TLIceThawMacP(L,NY,NX)=0.0_r8

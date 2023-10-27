@@ -2,6 +2,7 @@ module MicStateTraitTypeMod
 
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use EcoSiMParDataMod, only : micpar
+  use TracerIDMod
   use abortutils, only : destroy
 implicit none
   private
@@ -63,10 +64,7 @@ implicit none
   real(r8) :: TFNQ
   real(r8) :: VOLQ
   real(r8),allocatable :: FOSRH(:)
-  real(r8),allocatable :: OQC(:)
-  real(r8),allocatable :: OQN(:)
-  real(r8),allocatable :: OQP(:)
-  real(r8),allocatable :: OQA(:)
+  real(r8),allocatable :: DOM(:,:)
   real(r8),allocatable :: OHC(:)
   real(r8),allocatable :: OHN(:)
   real(r8),allocatable :: OHP(:)
@@ -112,10 +110,7 @@ implicit none
   NumOfMicrobs1HetertrophCmplx=micpar%NumOfMicrobs1HetertrophCmplx
 
   allocate(this%FOSRH(1:jcplx))
-  allocate(this%OQC(1:jcplx))
-  allocate(this%OQN(1:jcplx))
-  allocate(this%OQP(1:jcplx))
-  allocate(this%OQA(1:jcplx))
+  allocate(this%DOM(idom_beg:idom_end,1:jcplx))
   allocate(this%OHC(1:jcplx))
   allocate(this%OHN(1:jcplx))
   allocate(this%OHP(1:jcplx))
@@ -147,10 +142,7 @@ implicit none
   class(micsttype) :: this
 
   call destroy(this%FOSRH)
-  call destroy(this%OQC)
-  call destroy(this%OQN)
-  call destroy(this%OQP)
-  call destroy(this%OQA)
+  call destroy(this%DOM)
   call destroy(this%OHC)
   call destroy(this%OHN)
   call destroy(this%OHP)

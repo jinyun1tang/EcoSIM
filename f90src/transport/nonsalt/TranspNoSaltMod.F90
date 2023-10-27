@@ -89,13 +89,15 @@ module TranspNoSaltMod
 
 !
 ! TIME STEP USED IN GAS AND SOLUTE FLUX CALCULATIONS
+! NPH=NPX,NPT=NPY
 ! NPH=no. of cycles per hour for water, heat and solute flux calculations
 ! NPG=number of cycles per hour for gas flux calculations, NPG=NPH*NPT
-! XNPT=1/number of cycles NPH-1 for gas flux calculations, =1.0_r8/NPT
+! dt_GasCyc=1/number of cycles NPH-1 for gas flux calculations, =1.0_r8/NPT
   MX=0
   DO  MM=1,NPG
-    !compute the ordinal number of the current iteration
-    M=MIN(NPH,INT((MM-1)*XNPT)+1)
+    !compute the ordinal number of the intermediate forcing used for 
+    !current iteration
+    M=MIN(NPH,INT((MM-1)*dt_GasCyc)+1)
 
     call ModelTracerHydroFlux(M,MX,NHW, NHE, NVN, NVS,WaterFlow2Soil)
 !
@@ -106,6 +108,7 @@ module TranspNoSaltMod
 !     UPDATE STATE VARIABLES FROM TOTAL FLUXES CALCULATED ABOVE
 !
     call UpdateStateVar(M,MM,MX,NPG,NHW,NHE,NVN,NVS)
+    !MX records the M location of the last NPT iterations
     MX=M
   ENDDO
   RETURN
@@ -140,7 +143,6 @@ module TranspNoSaltMod
 !     XN2GS=total N2 fixation from nitro.f
 !     RN2O=net soil N2O uptake from nitro.f
 !     RH2GO=net H2 uptake from nitro.f
-!     XOQCS,XOQNZ,XOQPS,XOQAS=net change in DOC,DON,DOP,acetate from nitro.f
 !     RNH4MicbTransf_vr=net change in NH4 from nitro.f
 !     TR_NH4_soil,TR_NH3_soil=NH4,NH3 dissolution from solute.f
 !     RNO3MicbTransf_vr=net change in NO3 from nitro.f
@@ -157,8 +159,7 @@ module TranspNoSaltMod
 !     INITIALIZE STATE VARIABLES FOR USE IN GAS, SOLUTE FLUX CALCULATIONS
 !
 !     CO2S,CH4S,OXYS,Z2GS,Z2OS,H2GS=aqueous CO2,CH4,O2,N2,N2O,H2 content
-!     OQC,OQN,OQP,OQA=DOC,DON,DOP,acetate
-!     XOQCS,XOQNZ,XOQPS,XOQAS=net change in DOC,DON,DOP,acetate from nitro.f
+
 !     ZNH4S,ZNH3S,ZNO3S,ZNO2S,H1PO4,H2PO4=aqueous NH4,NH3,NO3,NO2,HPO4,H2PO4
 !     CHY0=H concentration
 !     PH=pH
@@ -213,7 +214,6 @@ module TranspNoSaltMod
 !     XN2GS=total N2 fixation from nitro.f
 !     RN2O=net soil N2O uptake from nitro.f
 !     RH2GO=net H2 uptake from nitro.f
-!     XOQCS,XOQNZ,XOQPS,XOQAS=net change in DOC,DON,DOP,acetate from nitro.f
 !     RNH4MicbTransf_vr=net change in NH4 from nitro.f
 !     TR_NH4_soil,TR_NH3_soil=NH4,NH3 dissolution from solute.f
 !     RNO3MicbTransf_vr=net change in NO3 from nitro.f
@@ -283,11 +283,11 @@ module TranspNoSaltMod
 !             :N4=NH4,N3=NH3,NO=NO3,1P=HPO4,HP=H2PO4
 !
   DO NTG=idg_beg,idg_end-1
-    trcg_solsml2(NTG,1,NY,NX)=trcg_solsml2(NTG,1,NY,NX)+trcg_TQ(NTG,NY,NX)
+    trcg_solsml2(NTG,1,NY,NX)=trcg_solsml2(NTG,1,NY,NX)+trcg_SnowDrift(NTG,NY,NX)
   ENDDO
 
   DO NTN=ids_nut_beg,ids_nuts_end
-    trcn_solsml2(NTN,1,NY,NX)=trcn_solsml2(NTN,1,NY,NX)+trcn_TQ(NTN,NY,NX)
+    trcn_solsml2(NTN,1,NY,NX)=trcn_solsml2(NTN,1,NY,NX)+trcn_SnowDrift(NTN,NY,NX)
   ENDDO
 
   DO  L=1,JS
@@ -324,10 +324,10 @@ module TranspNoSaltMod
 !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
 !
   DO  K=1,jcplx
-    OQC2(K,0,NY,NX)=OQC2(K,0,NY,NX)+ROCFLS(K,3,0,NY,NX)
-    OQN2(K,0,NY,NX)=OQN2(K,0,NY,NX)+RONFLS(K,3,0,NY,NX)
-    OQP2(K,0,NY,NX)=OQP2(K,0,NY,NX)+ROPFLS(K,3,0,NY,NX)
-    OQA2(K,0,NY,NX)=OQA2(K,0,NY,NX)+ROAFLS(K,3,0,NY,NX)
+    DOM_MicP2(idom_doc,K,0,NY,NX)=DOM_MicP2(idom_doc,K,0,NY,NX)+DOM_3DMicp_Transp_flxM(idom_doc,K,3,0,NY,NX)
+    DOM_MicP2(idom_don,K,0,NY,NX)=DOM_MicP2(idom_don,K,0,NY,NX)+DOM_3DMicp_Transp_flxM(idom_don,K,3,0,NY,NX)
+    DOM_MicP2(idom_dop,K,0,NY,NX)=DOM_MicP2(idom_dop,K,0,NY,NX)+DOM_3DMicp_Transp_flxM(idom_dop,K,3,0,NY,NX)
+    DOM_MicP2(idom_acetate,K,0,NY,NX)=DOM_MicP2(idom_acetate,K,0,NY,NX)+DOM_3DMicp_Transp_flxM(idom_acetate,K,3,0,NY,NX)
   ENDDO
 !exclude NH3B
   DO NTG=idg_beg,idg_end-1
@@ -344,18 +344,18 @@ module TranspNoSaltMod
   ENDDO
 
   D9680: DO K=1,jcplx
-    OQC2(K,0,NY,NX)=OQC2(K,0,NY,NX)+TQROC(K,NY,NX)
-    OQN2(K,0,NY,NX)=OQN2(K,0,NY,NX)+TQRON(K,NY,NX)
-    OQP2(K,0,NY,NX)=OQP2(K,0,NY,NX)+TQROP(K,NY,NX)
-    OQA2(K,0,NY,NX)=OQA2(K,0,NY,NX)+TQROA(K,NY,NX)
+    DOM_MicP2(idom_doc,K,0,NY,NX)=DOM_MicP2(idom_doc,K,0,NY,NX)+dom_TFloXSurRunoff(idom_doc,K,NY,NX)
+    DOM_MicP2(idom_don,K,0,NY,NX)=DOM_MicP2(idom_don,K,0,NY,NX)+dom_TFloXSurRunoff(idom_don,K,NY,NX)
+    DOM_MicP2(idom_dop,K,0,NY,NX)=DOM_MicP2(idom_dop,K,0,NY,NX)+dom_TFloXSurRunoff(idom_dop,K,NY,NX)
+    DOM_MicP2(idom_acetate,K,0,NY,NX)=DOM_MicP2(idom_acetate,K,0,NY,NX)+dom_TFloXSurRunoff(idom_acetate,K,NY,NX)
   ENDDO D9680
 !exclude NH3B
   DO NTG=idg_beg,idg_end-1
-    trc_solml2(NTG,0,NY,NX)=trc_solml2(NTG,0,NY,NX)+trcg_TQR(NTG,NY,NX)
+    trc_solml2(NTG,0,NY,NX)=trc_solml2(NTG,0,NY,NX)+trcg_TFloXSurRunoff(NTG,NY,NX)
   ENDDO
 
   DO NTS=ids_nut_beg,ids_nuts_end
-    trc_solml2(NTS,0,NY,NX)=trc_solml2(NTS,0,NY,NX)+trcn_TQR(NTS,NY,NX)
+    trc_solml2(NTS,0,NY,NX)=trc_solml2(NTS,0,NY,NX)+trcn_TFloXSurRunoff(NTS,NY,NX)
   ENDDO
 
   end subroutine UpdateStateVarInResidue
@@ -402,14 +402,14 @@ module TranspNoSaltMod
         trc_solml2(idg_H2,L,NY,NX)=trc_solml2(idg_H2,L,NY,NX)+trcg_BBL(idg_H2,L,NY,NX)
 
         DO  K=1,jcplx
-          OQC2(K,L,NY,NX)=OQC2(K,L,NY,NX)+TOCFLS(K,L,NY,NX)+ROCFXS(K,L,NY,NX)
-          OQN2(K,L,NY,NX)=OQN2(K,L,NY,NX)+TONFLS(K,L,NY,NX)+RONFXS(K,L,NY,NX)
-          OQP2(K,L,NY,NX)=OQP2(K,L,NY,NX)+TOPFLS(K,L,NY,NX)+ROPFXS(K,L,NY,NX)
-          OQA2(K,L,NY,NX)=OQA2(K,L,NY,NX)+TOAFLS(K,L,NY,NX)+ROAFXS(K,L,NY,NX)
-          OQCH2(K,L,NY,NX)=OQCH2(K,L,NY,NX)+TOCFHS(K,L,NY,NX)-ROCFXS(K,L,NY,NX)
-          OQNH2(K,L,NY,NX)=OQNH2(K,L,NY,NX)+TONFHS(K,L,NY,NX)-RONFXS(K,L,NY,NX)
-          OQPH2(K,L,NY,NX)=OQPH2(K,L,NY,NX)+TOPFHS(K,L,NY,NX)-ROPFXS(K,L,NY,NX)
-          OQAH2(K,L,NY,NX)=OQAH2(K,L,NY,NX)+TOAFHS(K,L,NY,NX)-ROAFXS(K,L,NY,NX)
+          DOM_MicP2(idom_doc,K,L,NY,NX)=DOM_MicP2(idom_doc,K,L,NY,NX)+DOM_Transp2Micp_flx(idom_doc,K,L,NY,NX)+DOM_XPoreTransp_flx(idom_doc,K,L,NY,NX)
+          DOM_MicP2(idom_don,K,L,NY,NX)=DOM_MicP2(idom_don,K,L,NY,NX)+DOM_Transp2Micp_flx(idom_don,K,L,NY,NX)+DOM_XPoreTransp_flx(idom_don,K,L,NY,NX)
+          DOM_MicP2(idom_dop,K,L,NY,NX)=DOM_MicP2(idom_dop,K,L,NY,NX)+DOM_Transp2Micp_flx(idom_dop,K,L,NY,NX)+DOM_XPoreTransp_flx(idom_dop,K,L,NY,NX)
+          DOM_MicP2(idom_acetate,K,L,NY,NX)=DOM_MicP2(idom_acetate,K,L,NY,NX)+DOM_Transp2Micp_flx(idom_acetate,K,L,NY,NX)+DOM_XPoreTransp_flx(idom_acetate,K,L,NY,NX)
+          DOM_MacP2(idom_doc,K,L,NY,NX)=DOM_MacP2(idom_doc,K,L,NY,NX)+DOM_Transp2Macp_flx(idom_doc,K,L,NY,NX)-DOM_XPoreTransp_flx(idom_doc,K,L,NY,NX)
+          DOM_MacP2(idom_don,K,L,NY,NX)=DOM_MacP2(idom_don,K,L,NY,NX)+DOM_Transp2Macp_flx(idom_don,K,L,NY,NX)-DOM_XPoreTransp_flx(idom_don,K,L,NY,NX)
+          DOM_MacP2(idom_dop,K,L,NY,NX)=DOM_MacP2(idom_dop,K,L,NY,NX)+DOM_Transp2Macp_flx(idom_dop,K,L,NY,NX)-DOM_XPoreTransp_flx(idom_dop,K,L,NY,NX)
+          DOM_MacP2(idom_acetate,K,L,NY,NX)=DOM_MacP2(idom_acetate,K,L,NY,NX)+DOM_Transp2Macp_flx(idom_acetate,K,L,NY,NX)-DOM_XPoreTransp_flx(idom_acetate,K,L,NY,NX)
         ENDDO
         DO NTS=ids_beg,ids_end
           trc_solml2(NTS,L,NY,NX)=trc_solml2(NTS,L,NY,NX) &
@@ -461,17 +461,17 @@ module TranspNoSaltMod
   RBGCSinkG(idg_NH3,0,NY,NX)=0.0_r8
   RBGCSinkG(idg_H2,0,NY,NX)=RH2GO(0,NY,NX)*dts_gas
   DO  K=1,jcplx
-    ROCSK2(K,0,NY,NX)=-XOQCS(K,0,NY,NX)*dts_HeatWatTP
-    RONSK2(K,0,NY,NX)=-XOQNS(K,0,NY,NX)*dts_HeatWatTP
-    ROPSK2(K,0,NY,NX)=-XOQPS(K,0,NY,NX)*dts_HeatWatTP
-    ROASK2(K,0,NY,NX)=-XOQAS(K,0,NY,NX)*dts_HeatWatTP
+    RDOM_micb_cumflx(idom_doc,K,0,NY,NX)=-RDOM_micb_flx(idom_doc,K,0,NY,NX)*dts_HeatWatTP
+    RDOM_micb_cumflx(idom_don,K,0,NY,NX)=-RDOM_micb_flx(idom_don,K,0,NY,NX)*dts_HeatWatTP
+    RDOM_micb_cumflx(idom_dop,K,0,NY,NX)=-RDOM_micb_flx(idom_dop,K,0,NY,NX)*dts_HeatWatTP
+    RDOM_micb_cumflx(idom_acetate,K,0,NY,NX)=-RDOM_micb_flx(idom_acetate,K,0,NY,NX)*dts_HeatWatTP
   ENDDO
-  RBGCSinkS(ids_NH4,0,NY,NX)=(-RNH4MicbTransf_vr(0,NY,NX)-TR_NH4_soil(0,NY,NX))*dts_HeatWatTP
+  RBGCSinkS(ids_NH4,0,NY,NX)=(-RNH4MicbTransf_vr(0,NY,NX)-trcn_RChem_soil(ids_NH4,0,NY,NX))*dts_HeatWatTP
   RBGCSinkS(idg_NH3,0,NY,NX)=-TR_NH3_soil(0,NY,NX)*dts_HeatWatTP
-  RBGCSinkS(ids_NO3,0,NY,NX)=(-RNO3MicbTransf_vr(0,NY,NX)-TRNO3(0,NY,NX))*dts_HeatWatTP
-  RBGCSinkS(ids_NO2,0,NY,NX)=(-RNO2MicbTransf_vr(0,NY,NX)-TRNO2(0,NY,NX))*dts_HeatWatTP
-  RBGCSinkS(ids_H2PO4,0,NY,NX)=(-RH2PO4MicbTransf_vr(0,NY,NX)-TR_H2PO4_soil(0,NY,NX))*dts_HeatWatTP
-  RBGCSinkS(ids_H1PO4,0,NY,NX)=(-RH1PO4MicbTransf_vr(0,NY,NX)-TR_H1PO4_soil(0,NY,NX))*dts_HeatWatTP
+  RBGCSinkS(ids_NO3,0,NY,NX)=(-RNO3MicbTransf_vr(0,NY,NX)-trcn_RChem_soil(ids_NO3,0,NY,NX))*dts_HeatWatTP
+  RBGCSinkS(ids_NO2,0,NY,NX)=(-RNO2MicbTransf_vr(0,NY,NX)-trcn_RChem_soil(ids_NO2,0,NY,NX))*dts_HeatWatTP
+  RBGCSinkS(ids_H2PO4,0,NY,NX)=(-RH2PO4MicbTransf_vr(0,NY,NX)-trcn_RChem_soil(ids_H2PO4,0,NY,NX))*dts_HeatWatTP
+  RBGCSinkS(ids_H1PO4,0,NY,NX)=(-RH1PO4MicbTransf_vr(0,NY,NX)-trcn_RChem_soil(ids_H1PO4,0,NY,NX))*dts_HeatWatTP
 
   end subroutine SurfaceSinksandSources
 !------------------------------------------------------------------------------------------
@@ -489,10 +489,10 @@ module TranspNoSaltMod
   ENDDO
 
   D9979: DO K=1,jcplx
-    OQC2(K,0,NY,NX)=OQC(K,0,NY,NX)-XOQCS(K,0,NY,NX)
-    OQN2(K,0,NY,NX)=OQN(K,0,NY,NX)-XOQNS(K,0,NY,NX)
-    OQP2(K,0,NY,NX)=OQP(K,0,NY,NX)-XOQPS(K,0,NY,NX)
-    OQA2(K,0,NY,NX)=OQA(K,0,NY,NX)-XOQAS(K,0,NY,NX)
+    DOM_MicP2(idom_doc,K,0,NY,NX)=DOM(idom_doc,K,0,NY,NX)-RDOM_micb_flx(idom_doc,K,0,NY,NX)
+    DOM_MicP2(idom_don,K,0,NY,NX)=DOM(idom_don,K,0,NY,NX)-RDOM_micb_flx(idom_don,K,0,NY,NX)
+    DOM_MicP2(idom_dop,K,0,NY,NX)=DOM(idom_dop,K,0,NY,NX)-RDOM_micb_flx(idom_dop,K,0,NY,NX)
+    DOM_MicP2(idom_acetate,K,0,NY,NX)=DOM(idom_acetate,K,0,NY,NX)-RDOM_micb_flx(idom_acetate,K,0,NY,NX)
   ENDDO D9979
 
 ! exclude banded nutrient
@@ -517,19 +517,10 @@ module TranspNoSaltMod
 
   D8855: DO K=1,jcplx
     IF(K.LE.2)THEN
-      XOCFLS(K,3,0,NY,NX)=0.0
-      XONFLS(K,3,0,NY,NX)=0.0
-      XOPFLS(K,3,0,NY,NX)=0.0
-      XOAFLS(K,3,0,NY,NX)=0.0
+      DOM_3DMicp_Transp_flx(idom_beg:idom_end,K,3,0,NY,NX)=0.0
     ENDIF
-    XOCFLS(K,3,NU(NY,NX),NY,NX)=0.0
-    XONFLS(K,3,NU(NY,NX),NY,NX)=0.0
-    XOPFLS(K,3,NU(NY,NX),NY,NX)=0.0
-    XOAFLS(K,3,NU(NY,NX),NY,NX)=0.0
-    XOCFHS(K,3,NU(NY,NX),NY,NX)=0.0
-    XONFHS(K,3,NU(NY,NX),NY,NX)=0.0
-    XOPFHS(K,3,NU(NY,NX),NY,NX)=0.0
-    XOAFHS(K,3,NU(NY,NX),NY,NX)=0.0
+    DOM_3DMicp_Transp_flx(idom_beg:idom_end,K,3,NU(NY,NX),NY,NX)=0.0
+    DOM_3DMacp_Transp_flx(idom_beg:idom_end,K,3,NU(NY,NX),NY,NX)=0.0
   ENDDO D8855
   end subroutine SurfaceSolutefromAtms
 !------------------------------------------------------------------------------------------
@@ -654,14 +645,14 @@ module TranspNoSaltMod
   INTEGER :: K,L,NTS,NTG,NTN
 
   DO  K=1,micpar%NumOfLitrCmplxs
-    ROCFL0(K,NY,NX)=XOCFLS(K,3,0,NY,NX)*dts_HeatWatTP
-    RONFL0(K,NY,NX)=XONFLS(K,3,0,NY,NX)*dts_HeatWatTP
-    ROPFL0(K,NY,NX)=XOPFLS(K,3,0,NY,NX)*dts_HeatWatTP
-    ROAFL0(K,NY,NX)=XOAFLS(K,3,0,NY,NX)*dts_HeatWatTP
-    ROCFL1(K,NY,NX)=XOCFLS(K,3,NU(NY,NX),NY,NX)*dts_HeatWatTP
-    RONFL1(K,NY,NX)=XONFLS(K,3,NU(NY,NX),NY,NX)*dts_HeatWatTP
-    ROPFL1(K,NY,NX)=XOPFLS(K,3,NU(NY,NX),NY,NX)*dts_HeatWatTP
-    ROAFL1(K,NY,NX)=XOAFLS(K,3,NU(NY,NX),NY,NX)*dts_HeatWatTP
+    ROCFL0(K,NY,NX)=DOM_3DMicp_Transp_flx(idom_doc,K,3,0,NY,NX)*dts_HeatWatTP
+    RONFL0(K,NY,NX)=DOM_3DMicp_Transp_flx(idom_don,K,3,0,NY,NX)*dts_HeatWatTP
+    ROPFL0(K,NY,NX)=DOM_3DMicp_Transp_flx(idom_dop,K,3,0,NY,NX)*dts_HeatWatTP
+    ROAFL0(K,NY,NX)=DOM_3DMicp_Transp_flx(idom_acetate,K,3,0,NY,NX)*dts_HeatWatTP
+    ROCFL1(K,NY,NX)=DOM_3DMicp_Transp_flx(idom_doc,K,3,NU(NY,NX),NY,NX)*dts_HeatWatTP
+    RONFL1(K,NY,NX)=DOM_3DMicp_Transp_flx(idom_don,K,3,NU(NY,NX),NY,NX)*dts_HeatWatTP
+    ROPFL1(K,NY,NX)=DOM_3DMicp_Transp_flx(idom_dop,K,3,NU(NY,NX),NY,NX)*dts_HeatWatTP
+    ROAFL1(K,NY,NX)=DOM_3DMicp_Transp_flx(idom_acetate,K,3,NU(NY,NX),NY,NX)*dts_HeatWatTP
   enddo
 
   DO NTG=idg_beg,idg_end-1
@@ -697,7 +688,7 @@ module TranspNoSaltMod
 !             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
 !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
 !     PARR=boundary layer conductance above litter from watsub.f
-!     XNPT=1/number of cycles NPH-1 for gas flux calculations
+!     dt_GasCyc=1/number of cycles NPH-1 for gas flux calculations
 !
   DO NTS=ids_beg,ids_end
     SolDifcc(NTS,0,NY,NX)=SolDifc(NTS,0,NY,NX)*dts_HeatWatTP
@@ -739,23 +730,23 @@ module TranspNoSaltMod
     RBGCSinkG(idg_NH3,L,NY,NX)=-TRN3G(L,NY,NX)*dts_gas
     RBGCSinkG(idg_H2,L,NY,NX)=(RH2GO(L,NY,NX)+TUPHGS(L,NY,NX))*dts_gas
     DO  K=1,jcplx
-      ROCSK2(K,L,NY,NX)=-XOQCS(K,L,NY,NX)*dts_HeatWatTP
-      RONSK2(K,L,NY,NX)=-XOQNS(K,L,NY,NX)*dts_HeatWatTP
-      ROPSK2(K,L,NY,NX)=-XOQPS(K,L,NY,NX)*dts_HeatWatTP
-      ROASK2(K,L,NY,NX)=-XOQAS(K,L,NY,NX)*dts_HeatWatTP
+      RDOM_micb_cumflx(idom_doc,K,L,NY,NX)=-RDOM_micb_flx(idom_doc,K,L,NY,NX)*dts_HeatWatTP
+      RDOM_micb_cumflx(idom_don,K,L,NY,NX)=-RDOM_micb_flx(idom_don,K,L,NY,NX)*dts_HeatWatTP
+      RDOM_micb_cumflx(idom_dop,K,L,NY,NX)=-RDOM_micb_flx(idom_dop,K,L,NY,NX)*dts_HeatWatTP
+      RDOM_micb_cumflx(idom_acetate,K,L,NY,NX)=-RDOM_micb_flx(idom_acetate,K,L,NY,NX)*dts_HeatWatTP
     ENDDO
-    RBGCSinkS(ids_NH4,L,NY,NX)=(-RNH4MicbTransf_vr(L,NY,NX)-TR_NH4_soil(L,NY,NX)+TUPNH4(L,NY,NX))*dts_HeatWatTP
+    RBGCSinkS(ids_NH4,L,NY,NX)=(-RNH4MicbTransf_vr(L,NY,NX)-trcn_RChem_soil(ids_NH4,L,NY,NX)+TUPNH4(L,NY,NX))*dts_HeatWatTP
     RBGCSinkS(idg_NH3,L,NY,NX)=(-TR_NH3_soil(L,NY,NX)+TUPN3S(L,NY,NX))*dts_HeatWatTP
-    RBGCSinkS(ids_NO3,L,NY,NX)=(-RNO3MicbTransf_vr(L,NY,NX)-TRNO3(L,NY,NX)+TUPNO3(L,NY,NX))*dts_HeatWatTP
-    RBGCSinkS(ids_NO2,L,NY,NX)=(-RNO2MicbTransf_vr(L,NY,NX)-TRNO2(L,NY,NX))*dts_HeatWatTP
-    RBGCSinkS(ids_H2PO4,L,NY,NX)=(-RH2PO4MicbTransf_vr(L,NY,NX)-TR_H2PO4_soil(L,NY,NX)+TUPH2P(L,NY,NX))*dts_HeatWatTP
-    RBGCSinkS(ids_H1PO4,L,NY,NX)=(-RH1PO4MicbTransf_vr(L,NY,NX)-TR_H1PO4_soil(L,NY,NX)+TUPH1P(L,NY,NX))*dts_HeatWatTP
-    RBGCSinkS(ids_NH4B,L,NY,NX)=(-XNH4B(L,NY,NX)-TR_NH4_band_soil(L,NY,NX)+TUPNHB(L,NY,NX))*dts_HeatWatTP
+    RBGCSinkS(ids_NO3,L,NY,NX)=(-RNO3MicbTransf_vr(L,NY,NX)-trcn_RChem_soil(ids_NO3,L,NY,NX)+TUPNO3(L,NY,NX))*dts_HeatWatTP
+    RBGCSinkS(ids_NO2,L,NY,NX)=(-RNO2MicbTransf_vr(L,NY,NX)-trcn_RChem_soil(ids_NO2,L,NY,NX))*dts_HeatWatTP
+    RBGCSinkS(ids_H2PO4,L,NY,NX)=(-RH2PO4MicbTransf_vr(L,NY,NX)-trcn_RChem_soil(ids_H2PO4,L,NY,NX)+TUPH2P(L,NY,NX))*dts_HeatWatTP
+    RBGCSinkS(ids_H1PO4,L,NY,NX)=(-RH1PO4MicbTransf_vr(L,NY,NX)-trcn_RChem_soil(ids_H1PO4,L,NY,NX)+TUPH1P(L,NY,NX))*dts_HeatWatTP
+    RBGCSinkS(ids_NH4B,L,NY,NX)=(-XNH4B(L,NY,NX)-trcn_RChem_band_soil(ids_NH4B,L,NY,NX)+TUPNHB(L,NY,NX))*dts_HeatWatTP
     RBGCSinkS(idg_NH3B,L,NY,NX)=(-TR_NH3_band_soil(L,NY,NX)+TUPN3B(L,NY,NX))*dts_HeatWatTP
-    RBGCSinkS(ids_NO3B,L,NY,NX)=(-XNO3B(L,NY,NX)-TRNOB(L,NY,NX)+TUPNOB(L,NY,NX))*dts_HeatWatTP
-    RBGCSinkS(ids_NO2B,L,NY,NX)=(-XNO2B(L,NY,NX)-TRN2B(L,NY,NX))*dts_HeatWatTP
-    RBGCSinkS(ids_H2PO4B,L,NY,NX)=(-XH2BS(L,NY,NX)-TR_H2PO4_band_soil(L,NY,NX)+TUPH2B(L,NY,NX))*dts_HeatWatTP
-    RBGCSinkS(ids_H1PO4B,L,NY,NX)=(-XH1BS(L,NY,NX)-TR_H1PO4_band_soil(L,NY,NX)+TUPH1B(L,NY,NX))*dts_HeatWatTP
+    RBGCSinkS(ids_NO3B,L,NY,NX)=(-XNO3B(L,NY,NX)-trcn_RChem_band_soil(ids_NO3B,L,NY,NX)+TUPNOB(L,NY,NX))*dts_HeatWatTP
+    RBGCSinkS(ids_NO2B,L,NY,NX)=(-XNO2B(L,NY,NX)-trcn_RChem_band_soil(ids_NO2B,L,NY,NX))*dts_HeatWatTP
+    RBGCSinkS(ids_H2PO4B,L,NY,NX)=(-XH2BS(L,NY,NX)-trcn_RChem_band_soil(ids_H2PO4B,L,NY,NX)+TUPH2B(L,NY,NX))*dts_HeatWatTP
+    RBGCSinkS(ids_H1PO4B,L,NY,NX)=(-XH1BS(L,NY,NX)-trcn_RChem_band_soil(ids_H1PO4B,L,NY,NX)+TUPH1B(L,NY,NX))*dts_HeatWatTP
 !
 !     SOLUTE FLUXES FROM SUBSURFACE IRRIGATION
 !
@@ -825,8 +816,7 @@ module TranspNoSaltMod
 !
 !     CO2G,CH4G,OXYG,ZN3G,Z2GG,Z2OG,H2GG=gaseous CO2,CH4,O2,NH3,N2,N2O,H2
 !     CO2S,CH4S,OXYS,Z2GS,Z2OS,H2GS=aqueous CO2,CH4,O2,N2,N2O,H2 in micropores
-!     OQC,OQN,OQP,OQA=DOC,DON,DOP,acetate in micropores
-!     XOQCS,XOQNZ,XOQPS,XOQAS=net change in DOC,DON,DOP,acetate from nitro.f
+
 !     OQCH,OQNH,OQPH,OQAH=DOC,DON,DOP,acetate in macropores
 !     ZNH4S,ZNH3S,ZNO3S,ZNO2S,H1PO4,H2PO4=aqueous NH4,NH3,NO3,NO2,HPO4,H2PO4 in non-band micropores
 !     ZNH4B,ZNH3B,ZNO3B,ZNO2B,H1POB,H2POB=aqueous NH4,NH3,NO3,NO2,HPO4,H2PO4 in band micropores
@@ -839,14 +829,15 @@ module TranspNoSaltMod
     ENDDO
 
     DO  K=1,jcplx
-      OQC2(K,L,NY,NX)=OQC(K,L,NY,NX)-XOQCS(K,L,NY,NX)
-      OQN2(K,L,NY,NX)=OQN(K,L,NY,NX)-XOQNS(K,L,NY,NX)
-      OQP2(K,L,NY,NX)=OQP(K,L,NY,NX)-XOQPS(K,L,NY,NX)
-      OQA2(K,L,NY,NX)=OQA(K,L,NY,NX)-XOQAS(K,L,NY,NX)
-      OQCH2(K,L,NY,NX)=OQCH(K,L,NY,NX)
-      OQNH2(K,L,NY,NX)=OQNH(K,L,NY,NX)
-      OQPH2(K,L,NY,NX)=OQPH(K,L,NY,NX)
-      OQAH2(K,L,NY,NX)=OQAH(K,L,NY,NX)
+      DOM_MicP2(idom_doc,K,L,NY,NX)=DOM(idom_doc,K,L,NY,NX)-RDOM_micb_flx(idom_doc,K,L,NY,NX)
+      DOM_MicP2(idom_don,K,L,NY,NX)=DOM(idom_don,K,L,NY,NX)-RDOM_micb_flx(idom_don,K,L,NY,NX)
+      DOM_MicP2(idom_dop,K,L,NY,NX)=DOM(idom_dop,K,L,NY,NX)-RDOM_micb_flx(idom_dop,K,L,NY,NX)
+      DOM_MicP2(idom_acetate,K,L,NY,NX)=DOM(idom_acetate,K,L,NY,NX)-RDOM_micb_flx(idom_acetate,K,L,NY,NX)
+
+      DOM_MacP2(idom_doc,K,L,NY,NX)=DOM_Macp(idom_doc,K,L,NY,NX)
+      DOM_MacP2(idom_don,K,L,NY,NX)=DOM_Macp(idom_don,K,L,NY,NX)
+      DOM_MacP2(idom_dop,K,L,NY,NX)=DOM_Macp(idom_dop,K,L,NY,NX)
+      DOM_MacP2(idom_acetate,K,L,NY,NX)=DOM_Macp(idom_acetate,K,L,NY,NX)
     enddo
     DO NTS=ids_beg,ids_end
       trc_solml2(NTS,L,NY,NX)=trc_solml(NTS,L,NY,NX)

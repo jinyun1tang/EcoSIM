@@ -269,7 +269,7 @@ implicit none
   if(micfor%Lsurf)then
     micfor%SoilMicPMassLayer0=SoilMicPMassLayer(0,NY,NX)
   endif
-  micfor%DFGS(1:NPH)=DFGS(1:NPH,L,NY,NX)
+  micfor%DiffusivitySolutEff(1:NPH)=DiffusivitySolutEff(1:NPH,L,NY,NX)
   micfor%FILM(1:NPH)=FILM(1:NPH,L,NY,NX)
   micfor%THETPM(1:NPH)=THETPM(1:NPH,L,NY,NX)
   micfor%VLWatMicPM(1:NPH)=VLWatMicPM(1:NPH,L,NY,NX)
@@ -306,10 +306,10 @@ implicit none
   micstt%ZNFN0=ZNFN0(L,NY,NX)
   micstt%ZNFNI=ZNFNI(L,NY,NX)
   micstt%FOSRH(1:jcplx)=FOSRH(1:jcplx,L,NY,NX)
-  micstt%OQC(1:jcplx)=OQC(1:jcplx,L,NY,NX)
-  micstt%OQN(1:jcplx)=OQN(1:jcplx,L,NY,NX)
-  micstt%OQP(1:jcplx)=OQP(1:jcplx,L,NY,NX)
-  micstt%OQA(1:jcplx)=OQA(1:jcplx,L,NY,NX)
+  micstt%DOM(idom_doc,1:jcplx)=DOM(idom_doc,1:jcplx,L,NY,NX)
+  micstt%DOM(idom_don,1:jcplx)=DOM(idom_don,1:jcplx,L,NY,NX)
+  micstt%DOM(idom_dop,1:jcplx)=DOM(idom_dop,1:jcplx,L,NY,NX)
+  micstt%DOM(idom_acetate,1:jcplx)=DOM(idom_acetate,1:jcplx,L,NY,NX)
   micstt%OHC(1:jcplx)=OHC(1:jcplx,L,NY,NX)
   micstt%OHN(1:jcplx)=OHN(1:jcplx,L,NY,NX)
   micstt%OHP(1:jcplx)=OHP(1:jcplx,L,NY,NX)
@@ -393,10 +393,10 @@ implicit none
   RVMBC(L,NY,NX)=micflx%RVMBC
   TRINH4(NY,NX)=TRINH4(NY,NX)+micflx%TRINH4
   TRIPO4(NY,NX)=TRIPO4(NY,NX)+micflx%TRIPO4
-  XOQCS(1:jcplx,L,NY,NX)=micflx%XOQCS(1:jcplx)
-  XOQNS(1:jcplx,L,NY,NX)=micflx%XOQNS(1:jcplx)
-  XOQPS(1:jcplx,L,NY,NX)=micflx%XOQPS(1:jcplx)
-  XOQAS(1:jcplx,L,NY,NX)=micflx%XOQAS(1:jcplx)
+  RDOM_micb_flx(idom_doc,1:jcplx,L,NY,NX)=micflx%RDOM_micb_flx(idom_doc,1:jcplx)
+  RDOM_micb_flx(idom_don,1:jcplx,L,NY,NX)=micflx%RDOM_micb_flx(idom_don,1:jcplx)
+  RDOM_micb_flx(idom_dop,1:jcplx,L,NY,NX)=micflx%RDOM_micb_flx(idom_dop,1:jcplx)
+  RDOM_micb_flx(idom_acetate,1:jcplx,L,NY,NX)=micflx%RDOM_micb_flx(idom_acetate,1:jcplx)
 
   ROXYSff(1:NumOfMicrobsInAutotrophCmplx,L,NY,NX)=micflx%ROXYSff(1:NumOfMicrobsInAutotrophCmplx)
   RVMX4ff(1:NumOfMicrobsInAutotrophCmplx,L,NY,NX)=micflx%RVMX4ff(1:NumOfMicrobsInAutotrophCmplx)
@@ -464,10 +464,10 @@ implicit none
   TOQCK(L,NY,NX)=micstt%TOQCK
   ZNFNI(L,NY,NX)=micstt%ZNFNI
   FOSRH(1:jcplx,L,NY,NX)=micstt%FOSRH(1:jcplx)
-  OQC(1:jcplx,L,NY,NX)=micstt%OQC(1:jcplx)
-  OQN(1:jcplx,L,NY,NX)=micstt%OQN(1:jcplx)
-  OQP(1:jcplx,L,NY,NX)=micstt%OQP(1:jcplx)
-  OQA(1:jcplx,L,NY,NX)=micstt%OQA(1:jcplx)
+  DOM(idom_doc,1:jcplx,L,NY,NX)=micstt%DOM(idom_doc,1:jcplx)
+  DOM(idom_don,1:jcplx,L,NY,NX)=micstt%DOM(idom_don,1:jcplx)
+  DOM(idom_dop,1:jcplx,L,NY,NX)=micstt%DOM(idom_dop,1:jcplx)
+  DOM(idom_acetate,1:jcplx,L,NY,NX)=micstt%DOM(idom_acetate,1:jcplx)
   OHC(1:jcplx,L,NY,NX)=micstt%OHC(1:jcplx)
   OHN(1:jcplx,L,NY,NX)=micstt%OHN(1:jcplx)
   OHP(1:jcplx,L,NY,NX)=micstt%OHP(1:jcplx)

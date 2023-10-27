@@ -1757,7 +1757,7 @@ module IngridTranspMod
 !     VLWatMicPM,VLWatMacPM=micropore,macropore water-filled porosity from watsub.f
 !     THETW=volumetric water content
 !     FLPM=change in air volume
-!     XNPT=1/number of cycles NPH-1 for gas flux calculations
+!     dt_GasCyc=1/number of cycles NPH-1 for gas flux calculations
 !
       IF(VLSoilPoreMicP(N3,N2,N1).GT.ZEROS2(NY,NX))THEN
         IF(N3.GE.NUM(N2,N1).AND.N6.GE.NUM(N5,N4).AND.N3.LE.NL(N2,N1).AND.N6.LE.NL(N5,N4))THEN

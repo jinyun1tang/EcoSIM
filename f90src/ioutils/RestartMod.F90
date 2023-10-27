@@ -6867,139 +6867,36 @@ implicit none
   endif  
 
   if(flag=='read')then
-    datpr3 => datrc_3d(1:ncols,1:jcplx,1:JZ+1)               
-    call restartvar(ncid, flag, varname='OQC', dim1name='column',&
-      dim2name='nomcomplx',dim3name='levsoi1',long_name='dissolved organic C micropore', &
-      units='g d-2', interpinic_flag='skip', data=datpr3, missing_value=spval, &
+    datpr4 => datrc_4d(1:ncols,1:trc_confs%NDOMS,1:jcplx,1:JZ+1)               
+    call restartvar(ncid, flag, varname='DOM', dim1name='column',dim2name='ndoms',&
+      dim3name='nomcomplx',dim4name='levsoi1',long_name='dissolved organic C micropore', &
+      units='g d-2', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)      
-    call cpcol(flag,NHW,NHE,NVN,NVS,OQC,datrc_3d)     
+    call cpcol(flag,NHW,NHE,NVN,NVS,DOM,datrc_4d)     
   else
-    !print*,'OQC'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,OQC,datrc_3d)       
-    datpr3 => datrc_3d(1:ncols,1:jcplx,1:JZ+1)                   
-    call restartvar(ncid, flag, varname='OQC', dim1name='column',&
-      dim2name='nomcomplx',dim3name='levsoi1',long_name='dissolved organic C micropore', &
-      units='g d-2', interpinic_flag='skip', data=datpr3, missing_value=spval, &
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,DOM,datrc_4d)       
+    datpr4 => datrc_4d(1:ncols,1:trc_confs%NDOMS,1:jcplx,1:JZ+1)                   
+    call restartvar(ncid, flag, varname='DOM', dim1name='column',dim2name='ndoms',&
+      dim3name='nomcomplx',dim4name='levsoi1',long_name='dissolved organic matter micropore', &
+      units='g d-2', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)      
 
   endif  
 
   if(flag=='read')then
-    datpr3 => datrc_3d(1:ncols,1:jcplx,1:JZ+1)                   
-    call restartvar(ncid, flag, varname='OQN', dim1name='column',&
-      dim2name='nomcomplx',dim3name='levsoi1',long_name='dissolved organic N micropore', &
-      units='g d-2', interpinic_flag='skip', data=datpr3, missing_value=spval, &
+    datpr4 => datrc_4d(1:ncols,1:trc_confs%NDOMS,1:jcplx,1:JZ+1)                   
+    call restartvar(ncid, flag, varname='DOM_MacP', dim1name='column',dim2name='ndoms',&
+      dim3name='nomcomplx',dim4name='levsoi1',long_name='dissolved organic matter macropore', &
+      units='g d-2', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)      
-    call cpcol(flag,NHW,NHE,NVN,NVS,OQN,datrc_3d)     
-  else
-    !print*,'OQN'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,OQN,datrc_3d)       
-    datpr3 => datrc_3d(1:ncols,1:jcplx,1:JZ+1)                   
-    call restartvar(ncid, flag, varname='OQN', dim1name='column',&
-      dim2name='nomcomplx',dim3name='levsoi1',long_name='dissolved organic N micropore', &
-      units='g d-2', interpinic_flag='skip', data=datpr3, missing_value=spval, &
-      fill_value=spval)      
-  endif  
-
-  if(flag=='read')then
-    datpr3 => datrc_3d(1:ncols,1:jcplx,1:JZ+1)                   
-    call restartvar(ncid, flag, varname='OQP', dim1name='column',&
-      dim2name='nomcomplx',dim3name='levsoi1',long_name='dissolved organic P micropore', &
-      units='g d-2', interpinic_flag='skip', data=datpr3, missing_value=spval, &
-      fill_value=spval)      
-    call cpcol(flag,NHW,NHE,NVN,NVS,OQP,datrc_3d)       
-  else
-    !print*,'OQP'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,OQP,datrc_3d)         
-    datpr3 => datrc_3d(1:ncols,1:jcplx,1:JZ+1)                   
-    call restartvar(ncid, flag, varname='OQP', dim1name='column',&
-      dim2name='nomcomplx',dim3name='levsoi1',long_name='dissolved organic P micropore', &
-      units='g d-2', interpinic_flag='skip', data=datpr3, missing_value=spval, &
-      fill_value=spval)      
-  endif  
-
-  if(flag=='read')then
-    datpr3 => datrc_3d(1:ncols,1:jcplx,1:JZ+1)                   
-    call restartvar(ncid, flag, varname='OQA', dim1name='column',&
-      dim2name='nomcomplx',dim3name='levsoi1',long_name='dissolved acetate micropore', &
-      units='g d-2', interpinic_flag='skip', data=datpr3, missing_value=spval, &
-      fill_value=spval)      
-    call cpcol(flag,NHW,NHE,NVN,NVS,OQA,datrc_3d)
-  else
-    !print*,'OQA'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,OQA,datrc_3d)  
-    datpr3 => datrc_3d(1:ncols,1:jcplx,1:JZ+1)                   
-    call restartvar(ncid, flag, varname='OQA', dim1name='column',&
-      dim2name='nomcomplx',dim3name='levsoi1',long_name='dissolved acetate micropore', &
-      units='g d-2', interpinic_flag='skip', data=datpr3, missing_value=spval, &
-      fill_value=spval)      
-  endif  
-
-  if(flag=='read')then
-    datpr3 => datrc_3d(1:ncols,1:jcplx,1:JZ+1)                   
-    call restartvar(ncid, flag, varname='OQCH', dim1name='column',&
-      dim2name='nomcomplx',dim3name='levsoi1',long_name='dissolved organic C macropore', &
-      units='g d-2', interpinic_flag='skip', data=datpr3, missing_value=spval, &
-      fill_value=spval)      
-    call cpcol(flag,NHW,NHE,NVN,NVS,OQCH,datrc_3d)
+    call cpcol(flag,NHW,NHE,NVN,NVS,DOM_MacP,datrc_4d)
   else
     !print*,'OQCH'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,OQCH,datrc_3d)  
-    datpr3 => datrc_3d(1:ncols,1:jcplx,1:JZ+1)                   
-    call restartvar(ncid, flag, varname='OQCH', dim1name='column',&
-      dim2name='nomcomplx',dim3name='levsoi1',long_name='dissolved organic C macropore', &
-      units='g d-2', interpinic_flag='skip', data=datpr3, missing_value=spval, &
-      fill_value=spval)      
-  endif  
-
-  if(flag=='read')then
-    datpr3 => datrc_3d(1:ncols,1:jcplx,1:JZ+1)                   
-    call restartvar(ncid, flag, varname='OQNH', dim1name='column',&
-      dim2name='nomcomplx',dim3name='levsoi1',long_name='dissolved organic N macropore', &
-      units='g d-2', interpinic_flag='skip', data=datpr3, missing_value=spval, &
-      fill_value=spval)      
-    call cpcol(flag,NHW,NHE,NVN,NVS,OQNH,datrc_3d)
-  else
-    !print*,'OQNH'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,OQNH,datrc_3d)  
-    datpr3 => datrc_3d(1:ncols,1:jcplx,1:JZ+1)                   
-    call restartvar(ncid, flag, varname='OQNH', dim1name='column',&
-      dim2name='nomcomplx',dim3name='levsoi1',long_name='dissolved organic N macropore', &
-      units='g d-2', interpinic_flag='skip', data=datpr3, missing_value=spval, &
-      fill_value=spval)      
-  endif  
-
-  if(flag=='read')then
-    datpr3 => datrc_3d(1:ncols,1:jcplx,1:JZ+1)                   
-    call restartvar(ncid, flag, varname='OQPH', dim1name='column',&
-      dim2name='nomcomplx',dim3name='levsoi1',long_name='dissolved organic P macropore', &
-      units='g d-2', interpinic_flag='skip', data=datpr3, missing_value=spval, &
-      fill_value=spval)      
-    call cpcol(flag,NHW,NHE,NVN,NVS,OQPH,datrc_3d)
-  else
-    !print*,'OQPH'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,OQPH,datrc_3d)  
-    datpr3 => datrc_3d(1:ncols,1:jcplx,1:JZ+1)                   
-    call restartvar(ncid, flag, varname='OQPH', dim1name='column',&
-      dim2name='nomcomplx',dim3name='levsoi1',long_name='dissolved organic P macropore', &
-      units='g d-2', interpinic_flag='skip', data=datpr3, missing_value=spval, &
-      fill_value=spval)      
-  endif  
-
-  if(flag=='read')then
-    datpr3 => datrc_3d(1:ncols,1:jcplx,1:JZ+1)                   
-    call restartvar(ncid, flag, varname='OQAH', dim1name='column',&
-      dim2name='nomcomplx',dim3name='levsoi1',long_name='dissolved acetate macropore', &
-      units='g d-2', interpinic_flag='skip', data=datpr3, missing_value=spval, &
-      fill_value=spval)      
-    call cpcol(flag,NHW,NHE,NVN,NVS,OQAH,datrc_3d)
-  else
-    !print*,'OQAH'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,OQAH,datrc_3d)  
-    datpr3 => datrc_3d(1:ncols,1:jcplx,1:JZ+1)                   
-    call restartvar(ncid, flag, varname='OQAH', dim1name='column',&
-      dim2name='nomcomplx',dim3name='levsoi1',long_name='dissolved acetate macropore', &
-      units='g d-2', interpinic_flag='skip', data=datpr3, missing_value=spval, &
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,DOM_MacP,datrc_4d)  
+    datpr4 => datrc_4d(1:ncols,1:trc_confs%NDOMS,1:jcplx,1:JZ+1)                   
+    call restartvar(ncid, flag, varname='DOM_MacP', dim1name='column',dim2name='ndoms',&
+      dim3name='nomcomplx',dim4name='levsoi1',long_name='dissolved organic matter macropore', &
+      units='g d-2', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)      
   endif  
 
@@ -8253,7 +8150,7 @@ implicit none
   call ncd_defdim(ncid,'hetrmicb',NumOfMicrobs1HetertrophCmplx,dimid)
   call ncd_defdim(ncid,'rootyps'  , pltpar%jroots, dimid)
   call ncd_defdim(ncid,'xtracers' , trc_confs%nxtracers, dimid)
-
+  call ncd_defdim(ncid,'ndoms',trc_confs%NDOMS,dimid)
   if(salt_model)call ncd_defdim(ncid,'satracers', trc_confs%NSaltTracers, dimid)
   call ncd_defdim(ncid,'ptracers' , trc_confs%NPrecipTracers, dimid)
   call ncd_defdim(ncid,'NnutrientTracers', trc_confs%NnutrientTracers, dimid)

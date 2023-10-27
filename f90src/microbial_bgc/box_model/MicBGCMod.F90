@@ -6,6 +6,7 @@ module MicBGCMod
 ! USES:
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use abortutils  , only : endrun,destroy
+  use TracerIDMod
   use MicAutoCPLXMod
   use minimathmod, only : safe_adb,AZMAX1
   use EcosimConst
@@ -182,8 +183,7 @@ module MicBGCMod
     FOAA  => ncplxs%FOAA,      &
     CNQ  => ncplxs%CNQ,        &
     CPQ  => ncplxs%CPQ,        &
-    COQC    => ncplxs%COQC, &
-    COQA    => ncplxs%COQA,  &
+    CDOM    => ncplxs%CDOM, &
     ORCT  => ncplxs%ORCT,      &
     OSCT  => ncplxs%OSCT,      &
     OSAT  => ncplxs%OSAT,      &
@@ -247,10 +247,7 @@ module MicBGCMod
     OMC     => micstt%OMC   , &
     OMN     => micstt%OMN   , &
     OMP     => micstt%OMP   , &
-    OQC     => micstt%OQC   , &
-    OQN     => micstt%OQN   , &
-    OQP     => micstt%OQP   , &
-    OQA     => micstt%OQA   , &
+    DOM     => micstt%DOM   , &
     H1PO4 => micstt%H1PO4, &
     H1POB => micstt%H1POB, &
     H2PO4 => micstt%H2PO4, &
@@ -505,30 +502,30 @@ module MicBGCMod
     !
     IF(VLWatMicPM(NPH).GT.ZEROS2)THEN
       IF(FOSRH(K).GT.ZERO)THEN
-        COQC(K)=AZMAX1(OQC(K)/(VLWatMicPM(NPH)*FOSRH(K)))
-        COQA(K)=AZMAX1(OQA(K)/(VLWatMicPM(NPH)*FOSRH(K)))
+        CDOM(idom_doc,K)=AZMAX1(DOM(idom_doc,K)/(VLWatMicPM(NPH)*FOSRH(K)))
+        CDOM(idom_acetate,K)=AZMAX1(DOM(idom_acetate,K)/(VLWatMicPM(NPH)*FOSRH(K)))
       ELSE
-        COQC(K)=AZMAX1(OQC(K)/VLWatMicPM(NPH))
-        COQA(K)=AZMAX1(OQA(K)/VLWatMicPM(NPH))
+        CDOM(idom_doc,K)=AZMAX1(DOM(idom_doc,K)/VLWatMicPM(NPH))
+        CDOM(idom_acetate,K)=AZMAX1(DOM(idom_acetate,K)/VLWatMicPM(NPH))
       ENDIF
     ELSE
-      COQC(K)=0.0_r8
-      COQA(K)=0.0_r8
+      CDOM(idom_doc,K)=0.0_r8
+      CDOM(idom_acetate,K)=0.0_r8
     ENDIF
 !
 !     CNQ,CPQ=DON:DOC,DOP:DOC,FOCA,FOAA=DOC,DOA:(DOC+DOA)
 !
-    IF(OQC(K).GT.ZEROS)THEN
-      CNQ(K)=AZMAX1(OQN(K)/OQC(K))
-      CPQ(K)=AZMAX1(OQP(K)/OQC(K))
+    IF(DOM(idom_doc,K).GT.ZEROS)THEN
+      CNQ(K)=AZMAX1(DOM(idom_don,K)/DOM(idom_doc,K))
+      CPQ(K)=AZMAX1(DOM(idom_dop,K)/DOM(idom_doc,K))
     ELSE
       CNQ(K)=0.0_r8
       CPQ(K)=0.0_r8
     ENDIF
-    IF(OQC(K).GT.ZEROS.AND.OQA(K).GT.ZEROS)THEN
-      FOCA(K)=OQC(K)/(OQC(K)+OQA(K))
+    IF(DOM(idom_doc,K).GT.ZEROS.AND.DOM(idom_acetate,K).GT.ZEROS)THEN
+      FOCA(K)=DOM(idom_doc,K)/(DOM(idom_doc,K)+DOM(idom_acetate,K))
       FOAA(K)=1.0_r8-FOCA(K)
-    ELSEIF(OQC(K).GT.ZEROS)THEN
+    ELSEIF(DOM(idom_doc,K).GT.ZEROS)THEN
       FOCA(K)=1.0_r8
       FOAA(K)=0.0_r8
     ELSE
@@ -1009,10 +1006,7 @@ module MicBGCMod
     XOQAZ  => ncplxf%XOQAZ,  &
     OSRH  => ncplxs%OSRH  ,  &
     TOQCK => micstt%TOQCK, &
-    OQC => micstt%OQC, &
-    OQN => micstt%OQN, &
-    OQP => micstt%OQP, &
-    OQA => micstt%OQA, &
+    DOM => micstt%DOM, &
     OMC => micstt%OMC, &
     OMN => micstt%OMN, &
     OMP => micstt%OMP, &
@@ -1033,28 +1027,28 @@ module MicBGCMod
         OSRT=OSRH(K)+OSRH(KK)
         IF(OSRH(K).GT.ZEROS.AND.OSRH(KK).GT.ZEROS)THEN
           XFRK=FPRIM*TFND*(ROQCK(K)*OSRH(KK)-ROQCK(KK)*OSRH(K))/OSRT
-          XFRC=FPRIM*TFND*(OQC(K)*OSRH(KK)-OQC(KK)*OSRH(K))/OSRT
-          XFRN=FPRIM*TFND*(OQN(K)*OSRH(KK)-OQN(KK)*OSRH(K))/OSRT
-          XFRP=FPRIM*TFND*(OQP(K)*OSRH(KK)-OQP(KK)*OSRH(K))/OSRT
-          XFRA=FPRIM*TFND*(OQA(K)*OSRH(KK)-OQA(KK)*OSRH(K))/OSRT
+          XFRC=FPRIM*TFND*(DOM(idom_doc,K)*OSRH(KK)-DOM(idom_doc,KK)*OSRH(K))/OSRT
+          XFRN=FPRIM*TFND*(DOM(idom_don,K)*OSRH(KK)-DOM(idom_don,KK)*OSRH(K))/OSRT
+          XFRP=FPRIM*TFND*(DOM(idom_dop,K)*OSRH(KK)-DOM(idom_dop,KK)*OSRH(K))/OSRT
+          XFRA=FPRIM*TFND*(DOM(idom_acetate,K)*OSRH(KK)-DOM(idom_acetate,KK)*OSRH(K))/OSRT
           IF(ROQCK(K)+XOQCK(K)-XFRK.GT.0.0_r8.AND.ROQCK(KK)+XOQCK(KK)+XFRK.GT.0.0_r8)THEN
             XOQCK(K)=XOQCK(K)-XFRK
             XOQCK(KK)=XOQCK(KK)+XFRK
           ENDIF
-          IF(OQC(K)+XOQCZ(K)-XFRC.GT.0.0_r8.AND.OQC(KK)+XOQCZ(KK)+XFRC.GT.0.0_r8)THEN
+          IF(DOM(idom_doc,K)+XOQCZ(K)-XFRC.GT.0.0_r8.AND.DOM(idom_doc,KK)+XOQCZ(KK)+XFRC.GT.0.0_r8)THEN
             XOQCZ(K)=XOQCZ(K)-XFRC
             XOQCZ(KK)=XOQCZ(KK)+XFRC
 
           ENDIF
-          IF(OQN(K)+XOQNZ(K)-XFRN.GT.0.0_r8.AND.OQN(KK)+XOQNZ(KK)+XFRN.GT.0.0_r8)THEN
+          IF(DOM(idom_don,K)+XOQNZ(K)-XFRN.GT.0.0_r8.AND.DOM(idom_don,KK)+XOQNZ(KK)+XFRN.GT.0.0_r8)THEN
             XOQNZ(K)=XOQNZ(K)-XFRN
             XOQNZ(KK)=XOQNZ(KK)+XFRN
           ENDIF
-          IF(OQP(K)+XOQPZ(K)-XFRP.GT.0.0_r8.AND.OQP(KK)+XOQPZ(KK)+XFRP.GT.0.0_r8)THEN
+          IF(DOM(idom_dop,K)+XOQPZ(K)-XFRP.GT.0.0_r8.AND.DOM(idom_dop,KK)+XOQPZ(KK)+XFRP.GT.0.0_r8)THEN
             XOQPZ(K)=XOQPZ(K)-XFRP
             XOQPZ(KK)=XOQPZ(KK)+XFRP
           ENDIF
-          IF(OQA(K)+XOQAZ(K)-XFRA.GT.0.0_r8.AND.OQA(KK)+XOQAZ(KK)+XFRA.GT.0.0_r8)THEN
+          IF(DOM(idom_acetate,K)+XOQAZ(K)-XFRA.GT.0.0_r8.AND.DOM(idom_acetate,KK)+XOQAZ(KK)+XFRA.GT.0.0_r8)THEN
             XOQAZ(K)=XOQAZ(K)-XFRA
             XOQAZ(KK)=XOQAZ(KK)+XFRA
           ENDIF
@@ -1111,10 +1105,10 @@ module MicBGCMod
   D840: DO K=1,KL
     ROQCK(K)=ROQCK(K)+XOQCK(K)
     TOQCK=TOQCK+ROQCK(K)
-    OQC(K)=OQC(K)+XOQCZ(K)
-    OQN(K)=OQN(K)+XOQNZ(K)
-    OQP(K)=OQP(K)+XOQPZ(K)
-    OQA(K)=OQA(K)+XOQAZ(K)
+    DOM(idom_doc,K)=DOM(idom_doc,K)+XOQCZ(K)
+    DOM(idom_don,K)=DOM(idom_don,K)+XOQNZ(K)
+    DOM(idom_dop,K)=DOM(idom_dop,K)+XOQPZ(K)
+    DOM(idom_acetate,K)=DOM(idom_acetate,K)+XOQAZ(K)
     DO  N=1,NFGs
       DO  M=1,nlbiomcp
         do NGL=JGnio(N),JGnfo(N)
@@ -1167,10 +1161,7 @@ module MicBGCMod
     litrm => micfor%litrm, &
     VLWatMicPM => micfor%VLWatMicPM, &
     FOSRH => micstt%FOSRH, &
-    OQC => micstt%OQC, &
-    OQN => micstt%OQN, &
-    OQP => micstt%OQP, &
-    OQA => micstt%OQA, &
+    DOM => micstt%DOM, &
     OHC => micstt%OHC, &
     OHN => micstt%OHN, &
     OHP => micstt%OHP, &
@@ -1192,10 +1183,10 @@ module MicBGCMod
     ELSE
       AECX=AEC
     ENDIF
-    OQCX=AMAX1(ZEROS,OQC(K)-TCGOQC(K))
-    OQNX=AMAX1(ZEROS,OQN(K)-TCGOMN(K))
-    OQPX=AMAX1(ZEROS,OQP(K)-TCGOMP(K))
-    OQAX=AMAX1(ZEROS,OQA(K)-TCGOAC(K))
+    OQCX=AMAX1(ZEROS,DOM(idom_doc,K)-TCGOQC(K))
+    OQNX=AMAX1(ZEROS,DOM(idom_don,K)-TCGOMN(K))
+    OQPX=AMAX1(ZEROS,DOM(idom_dop,K)-TCGOMP(K))
+    OQAX=AMAX1(ZEROS,DOM(idom_acetate,K)-TCGOAC(K))
     OHCX=AMAX1(ZEROS,OHC(K))
     OHNX=AMAX1(ZEROS,OHN(K))
     OHPX=AMAX1(ZEROS,OHP(K))
@@ -1286,7 +1277,7 @@ module MicBGCMod
     k_POM => micpar%k_POM   , &
     CNRH  => micpar%CNRH    ,&
     CPRH  => micpar%CPRH    ,&
-    COQC  => ncplxs%COQC  ,&
+    CDOM  => ncplxs%CDOM  ,&
     EPOC => micstt%EPOC, &
     CNOSC => micstt%CNOSC, &
     CPOSC => micstt%CPOSC, &
@@ -1350,7 +1341,7 @@ module MicBGCMod
       COSC=OSRH(K)/VLSoilMicP
     ENDIF
     DFNS=COSC/(COSC+DCKD)
-    OQCI=1.0_r8/(1.0_r8+COQC(K)/OQKI)
+    OQCI=1.0_r8/(1.0_r8+CDOM(idom_doc,K)/OQKI)
 !
 !     C, N, P DECOMPOSITION RATE OF SOLID SUBSTRATES 'RDOS*' FROM
 !     RATE CONSTANT, TOTAL ACTIVE BIOMASS, DENSITY FACTOR,
@@ -1590,10 +1581,7 @@ module MicBGCMod
     OSC13U      => micstt%OSC13U   , &
     OSN13U      => micstt%OSN13U   , &
     OSP13U      => micstt%OSP13U   , &
-    OQC  => micstt%OQC, &
-    OQN  => micstt%OQN, &
-    OQP  => micstt%OQP, &
-    OQA  => micstt%OQA, &
+    DOM  => micstt%DOM, &
     ORC  => micstt%ORC, &
     ORN  => micstt%ORN, &
     ORP  => micstt%ORP, &
@@ -1653,9 +1641,9 @@ module MicBGCMod
 !     OSA(M,K)=OSA(M,K)-RDOSC(M,K)
       OSN(M,K)=OSN(M,K)-RDOSN(M,K)
       OSP(M,K)=OSP(M,K)-RDOSP(M,K)
-      OQC(K)=OQC(K)+RCOSC(M,K)
-      OQN(K)=OQN(K)+RCOSN(M,K)
-      OQP(K)=OQP(K)+RCOSP(M,K)
+      DOM(idom_doc,K)=DOM(idom_doc,K)+RCOSC(M,K)
+      DOM(idom_don,K)=DOM(idom_don,K)+RCOSN(M,K)
+      DOM(idom_dop,K)=DOM(idom_dop,K)+RCOSP(M,K)
 !
 !     LIGNIFICATION PRODUCTS
 !
@@ -1687,14 +1675,14 @@ module MicBGCMod
       ORC(M,K)=ORC(M,K)-RDORC(M,K)
       ORN(M,K)=ORN(M,K)-RDORN(M,K)
       ORP(M,K)=ORP(M,K)-RDORP(M,K)
-      OQC(K)=OQC(K)+RDORC(M,K)
-      OQN(K)=OQN(K)+RDORN(M,K)
-      OQP(K)=OQP(K)+RDORP(M,K)
+      DOM(idom_doc,K)=DOM(idom_doc,K)+RDORC(M,K)
+      DOM(idom_don,K)=DOM(idom_don,K)+RDORN(M,K)
+      DOM(idom_dop,K)=DOM(idom_dop,K)+RDORP(M,K)
     ENDDO D575
-    OQC(K)=OQC(K)+RDOHC(K)
-    OQN(K)=OQN(K)+RDOHN(K)+RCOQN*FORC(K)
-    OQP(K)=OQP(K)+RDOHP(K)
-    OQA(K)=OQA(K)+RDOHA(K)
+    DOM(idom_doc,K)=DOM(idom_doc,K)+RDOHC(K)
+    DOM(idom_don,K)=DOM(idom_don,K)+RDOHN(K)+RCOQN*FORC(K)
+    DOM(idom_dop,K)=DOM(idom_dop,K)+RDOHP(K)
+    DOM(idom_acetate,K)=DOM(idom_acetate,K)+RDOHA(K)
     OHC(K)=OHC(K)-RDOHC(K)
     OHN(K)=OHN(K)-RDOHN(K)
     OHP(K)=OHP(K)-RDOHP(K)
@@ -1707,10 +1695,10 @@ module MicBGCMod
 !
     D570: DO N=1,NFGs
       DO NGL=JGnio(N),JGnfo(N)
-        OQC(K)=OQC(K)-CGOQC(NGL,K)
-        OQN(K)=OQN(K)-CGOMN(NGL,K)
-        OQP(K)=OQP(K)-CGOMP(NGL,K)
-        OQA(K)=OQA(K)-CGOAC(NGL,K)+RCH3X(NGL,K)
+        DOM(idom_doc,K)=DOM(idom_doc,K)-CGOQC(NGL,K)
+        DOM(idom_don,K)=DOM(idom_don,K)-CGOMN(NGL,K)
+        DOM(idom_dop,K)=DOM(idom_dop,K)-CGOMP(NGL,K)
+        DOM(idom_acetate,K)=DOM(idom_acetate,K)-CGOAC(NGL,K)+RCH3X(NGL,K)
 !
 !     MICROBIAL DECOMPOSITION PRODUCTS
 !
@@ -1731,10 +1719,10 @@ module MicBGCMod
 !
 !     CSORP,CSORPA,ZSORP,PSORP=sorption(ad=+ve,de=-ve) of OQC,acetate,DON,DOP
 !
-    OQC(K)=OQC(K)-CSORP(K)
-    OQN(K)=OQN(K)-ZSORP(K)
-    OQP(K)=OQP(K)-PSORP(K)
-    OQA(K)=OQA(K)-CSORPA(K)
+    DOM(idom_doc,K)=DOM(idom_doc,K)-CSORP(K)
+    DOM(idom_don,K)=DOM(idom_don,K)-ZSORP(K)
+    DOM(idom_dop,K)=DOM(idom_dop,K)-PSORP(K)
+    DOM(idom_acetate,K)=DOM(idom_acetate,K)-CSORPA(K)
     OHC(K)=OHC(K)+CSORP(K)
     OHN(K)=OHN(K)+ZSORP(K)
     OHP(K)=OHP(K)+PSORP(K)
@@ -2072,10 +2060,7 @@ module MicBGCMod
     RNO2MicbTransf_vr => micflx%RNO2MicbTransf_vr, &
     XNO3B => micflx%XNO3B, &
     RNO3MicbTransf_vr => micflx%RNO3MicbTransf_vr, &
-    XOQCS =>micflx%XOQCS     , &
-    XOQNS =>micflx%XOQNS     , &
-    XOQPS =>micflx%XOQPS     , &
-    XOQAS =>micflx%XOQAS       &
+    RDOM_micb_flx =>micflx%RDOM_micb_flx      &
   )
   D650: DO K=1,jcplx
     IF(.not.litrm.OR.(K.NE.k_POM.AND.K.NE.k_humus))THEN
@@ -2185,36 +2170,34 @@ module MicBGCMod
   RN2G  =-naqfdiag%TRDNO
   RN2O  =-naqfdiag%TRDN2-naqfdiag%TRD2B-RCN2O-RCN2B+naqfdiag%TRDNO
 !
-!     XOQCS,XOQNZ,XOQPS,XOQAS=net change in DOC,DON,DOP,acetate
-!
   D655: DO K=1,jcplx
     D660: DO M=1,jsken
-      XOQCS(K)=XOQCS(K)+RCOSC(M,K)
-      XOQNS(K)=XOQNS(K)+RCOSN(M,K)
-      XOQPS(K)=XOQPS(K)+RCOSP(M,K)
+      RDOM_micb_flx(idom_doc,K)=RDOM_micb_flx(idom_doc,K)+RCOSC(M,K)
+      RDOM_micb_flx(idom_don,K)=RDOM_micb_flx(idom_don,K)+RCOSN(M,K)
+      RDOM_micb_flx(idom_dop,K)=RDOM_micb_flx(idom_dop,K)+RCOSP(M,K)
     ENDDO D660
 
     D665: DO M=1,ndbiomcp
-      XOQCS(K)=XOQCS(K)+RDORC(M,K)
-      XOQNS(K)=XOQNS(K)+RDORN(M,K)
-      XOQPS(K)=XOQPS(K)+RDORP(M,K)
+      RDOM_micb_flx(idom_doc,K)=RDOM_micb_flx(idom_doc,K)+RDORC(M,K)
+      RDOM_micb_flx(idom_don,K)=RDOM_micb_flx(idom_don,K)+RDORN(M,K)
+      RDOM_micb_flx(idom_dop,K)=RDOM_micb_flx(idom_dop,K)+RDORP(M,K)
     ENDDO D665
-    XOQCS(K)=XOQCS(K)+RDOHC(K)
-    XOQNS(K)=XOQNS(K)+RDOHN(K)
-    XOQPS(K)=XOQPS(K)+RDOHP(K)
-    XOQAS(K)=XOQAS(K)+RDOHA(K)
+    RDOM_micb_flx(idom_doc,K)=RDOM_micb_flx(idom_doc,K)+RDOHC(K)
+    RDOM_micb_flx(idom_don,K)=RDOM_micb_flx(idom_don,K)+RDOHN(K)
+    RDOM_micb_flx(idom_dop,K)=RDOM_micb_flx(idom_dop,K)+RDOHP(K)
+    RDOM_micb_flx(idom_acetate,K)=RDOM_micb_flx(idom_acetate,K)+RDOHA(K)
     D670: DO N=1,NFGs
       DO NGL=JGnio(N),JGnfo(N)
-        XOQCS(K)=XOQCS(K)-CGOQC(NGL,K)
-        XOQNS(K)=XOQNS(K)-CGOMN(NGL,K)
-        XOQPS(K)=XOQPS(K)-CGOMP(NGL,K)
-        XOQAS(K)=XOQAS(K)-CGOAC(NGL,K)+RCH3X(NGL,K)
+        RDOM_micb_flx(idom_doc,K)=RDOM_micb_flx(idom_doc,K)-CGOQC(NGL,K)
+        RDOM_micb_flx(idom_don,K)=RDOM_micb_flx(idom_don,K)-CGOMN(NGL,K)
+        RDOM_micb_flx(idom_dop,K)=RDOM_micb_flx(idom_dop,K)-CGOMP(NGL,K)
+        RDOM_micb_flx(idom_acetate,K)=RDOM_micb_flx(idom_acetate,K)-CGOAC(NGL,K)+RCH3X(NGL,K)
       ENDDO
     ENDDO D670
-    XOQCS(K)=XOQCS(K)-CSORP(K)
-    XOQNS(K)=XOQNS(K)-ZSORP(K)
-    XOQPS(K)=XOQPS(K)-PSORP(K)
-    XOQAS(K)=XOQAS(K)-CSORPA(K)
+    RDOM_micb_flx(idom_doc,K)=RDOM_micb_flx(idom_doc,K)-CSORP(K)
+    RDOM_micb_flx(idom_don,K)=RDOM_micb_flx(idom_don,K)-ZSORP(K)
+    RDOM_micb_flx(idom_dop,K)=RDOM_micb_flx(idom_dop,K)-PSORP(K)
+    RDOM_micb_flx(idom_acetate,K)=RDOM_micb_flx(idom_acetate,K)-CSORPA(K)
   ENDDO D655
 !
 !     RNH4MicbTransf_vr,XNH4B=net change in NH4 in band,non-band
@@ -2466,15 +2449,15 @@ module MicBGCMod
     ROXYP => nmicf%ROXYP,     &
     ROXYM => nmicf%ROXYM,     &
     ROQCD => nmicf%ROQCD,     &
-    COQA  => ncplxs%COQA,   &
-    OQA => micstt%OQA, &
+    CDOM  => ncplxs%CDOM,   &
+    DOM => micstt%DOM, &
     ROXYS => micflx%ROXYS, &
     ROQCS => micflx%ROQCS, &
     ROQAS => micflx%ROQAS, &
     ZERO  => micfor%ZERO, &
     TKS  => micfor%TKS &
   )
-  GOMX=RGAS*1.E-3_r8*TKS*LOG((AMAX1(ZERO,COQA(K))/OAKI))
+  GOMX=RGAS*1.E-3_r8*TKS*LOG((AMAX1(ZERO,CDOM(idom_acetate,K))/OAKI))
   GOMM=GOMX/24.0_r8
   ECHZ=AMAX1(EO2X,AMIN1(1.0_r8,1.0_r8/(1.0_r8+AZMAX1((GC4X+GOMM))/EOMH)))
 !
@@ -2496,10 +2479,10 @@ module MicBGCMod
 !     ROXY*=O2 demand, ROQCS,ROQCA=DOC, acetate demand
 !     ROQCD=microbial respiration used to represent microbial activity
 !
-  FSBST=COQA(K)/(COQA(K)+OQKAM)
+  FSBST=CDOM(idom_acetate,K)/(CDOM(idom_acetate,K)+OQKAM)
   RGOGY=AZMAX1(FCNP(NGL,K)*VMXM*WFNG*OMA(NGL,K))
   RGOGZ=RGOGY*FSBST*TFNX
-  RGOGX=AZMAX1(OQA(K)*FOQA*ECHZ)
+  RGOGX=AZMAX1(DOM(idom_acetate,K)*FOQA*ECHZ)
   RGOMP=AMIN1(RGOGX,RGOGZ)
   FGOCP=0.0_r8
   FGOAP=1.0_r8
@@ -2545,8 +2528,7 @@ module MicBGCMod
     ROXYP=> nmicf%ROXYP ,     &
     ROQCD => nmicf%ROQCD,     &
     ZEROS => micfor%ZEROS, &
-    OQC  => micstt%OQC, &
-    OQA => micstt%OQA, &
+    DOM  => micstt%DOM, &
     n_aero_hetrophb => micpar%n_aero_hetrophb, &
     n_anero_faculb => micpar%n_anero_faculb, &
     n_aero_fungi => micpar%n_aero_fungi, &
@@ -2556,8 +2538,7 @@ module MicBGCMod
     ROQAS => micflx%ROQAS, &
     FOCA  => ncplxs%FOCA,     &
     FOAA  => ncplxs%FOAA,     &
-    COQC  => ncplxs%COQC,   &
-    COQA  => ncplxs%COQA    &
+    CDOM  => ncplxs%CDOM     &
   )
 !     ENERGY YIELDS OF O2 REDOX REACTIONS
 !     E* = growth respiration efficiency calculated in PARAMETERS
@@ -2585,14 +2566,14 @@ module MicBGCMod
 ! RGOMP=O2-unlimited respiration of DOC+DOA
 ! RGOCP,RGOAP,RGOMP=O2-unlimited respiration of DOC, DOA, DOC+DOA
 !
-  FSBSTC=COQC(K)/(COQC(K)+OQKM)
-  FSBSTA=COQA(K)/(COQA(K)+OQKA)
+  FSBSTC=CDOM(idom_doc,K)/(CDOM(idom_doc,K)+OQKM)
+  FSBSTA=CDOM(idom_acetate,K)/(CDOM(idom_acetate,K)+OQKA)
   FSBST=FOCA(K)*FSBSTC+FOAA(K)*FSBSTA
   RGOCY=AZMAX1(FCNP(NGL,K)*VMXO*WFNG*OMA(NGL,K))
   RGOCZ=RGOCY*FSBSTC*FOCA(K)*TFNX
   RGOAZ=RGOCY*FSBSTA*FOAA(K)*TFNX
-  RGOCX=AZMAX1(OQC(K)*FOQC*EO2Q)
-  RGOAX=AZMAX1(OQA(K)*FOQA*EO2A)
+  RGOCX=AZMAX1(DOM(idom_doc,K)*FOQC*EO2Q)
+  RGOAX=AZMAX1(DOM(idom_acetate,K)*FOQA*EO2A)
   RGOCP=AMIN1(RGOCX,RGOCZ)
   RGOAP=AMIN1(RGOAX,RGOAZ)
   RGOMP=RGOCP+RGOAP
@@ -2656,19 +2637,18 @@ module MicBGCMod
     ROQCD  => nmicf%ROQCD  ,    &
     TKS => micfor%TKS, &
     ZERO => micfor%ZERO, &
-    OQC  => micstt%OQC, &
+    DOM  => micstt%DOM, &
     CH2GS => micstt%CH2GS , &
     COXYS => micstt%COXYS, &
     ROXYS  => micflx%ROXYS, &
     ROQCS => micflx%ROQCS , &
     ROQAS => micflx%ROQAS, &
     n_anaero_ferm => micpar%n_anaero_ferm, &
-    COQA    => ncplxs%COQA,  &
-    COQC   => ncplxs%COQC     &
+    CDOM    => ncplxs%CDOM   &
   )
   GH2X=RGAS*1.E-3_r8*TKS*LOG((AMAX1(1.0E-03,CH2GS)/H2KI)**4)
   GH2F=GH2X/72.0
-  GOAX=RGAS*1.E-3_r8*TKS*LOG((AMAX1(ZERO,COQA(K))/OAKI)**2)
+  GOAX=RGAS*1.E-3_r8*TKS*LOG((AMAX1(ZERO,CDOM(idom_acetate,K))/OAKI)**2)
   GOAF=GOAX/72.0
   GHAX=GH2F+GOAF
   IF(N.EQ.n_anaero_ferm)THEN
@@ -2693,10 +2673,10 @@ module MicBGCMod
 !     ROQCD=microbial respiration used to represent microbial activity
 !
   OXYI=1.0_r8-1.0_r8/(1.0_r8+EXP(1.0_r8*(-COXYS+2.5_r8)))
-  FSBST=COQC(K)/(COQC(K)+OQKM)*OXYI
+  FSBST=CDOM(idom_doc,K)/(CDOM(idom_doc,K)+OQKM)*OXYI
   RGOFY=AZMAX1(FCNP(NGL,K)*VMXF*WFNG*OMA(NGL,K))
   RGOFZ=RGOFY*FSBST*TFNX
-  RGOFX=AZMAX1(OQC(K)*FOQC*ECHZ)
+  RGOFX=AZMAX1(DOM(idom_doc,K)*FOQC*ECHZ)
   RGOMP=AMIN1(RGOFX,RGOFZ)
   FGOCP=1.0_r8
   FGOAP=0.0_r8
@@ -2793,7 +2773,7 @@ module MicBGCMod
     CNO2S => micstt%CNO2S, &
     FOSRH => micstt%FOSRH, &
     CH2GS => micstt%CH2GS, &
-    OQC => micstt%OQC, &
+    DOM => micstt%DOM, &
     RVMX3 => micflx%RVMX3,  &
     RVMX2 => micflx%RVMX2, &
     RVMX1 => micflx%RVMX1, &
@@ -2861,7 +2841,7 @@ module MicBGCMod
   ENDIF
   VMXD3S=VMXDXS*FVMXDX
   VMXD3B=VMXDXB*FVMXDX
-  OQCZ3=AZMAX1(OQC(K)*FOQC-RGOCP*WFN(NGL,K))
+  OQCZ3=AZMAX1(DOM(idom_doc,K)*FOQC-RGOCP*WFN(NGL,K))
   OQCD3=OQCZ3/ECN3
   OQCD3S=OQCD3*FNO3S
   OQCD3B=OQCD3*FNO3B
@@ -3060,7 +3040,7 @@ module MicBGCMod
     VLWatMicP  => micfor%VLWatMicP , &
     VLWatMicPM => micfor%VLWatMicPM, &
     THETPM => micfor%THETPM, &
-    DFGS => micfor%DFGS, &
+    DiffusivitySolutEff => micfor%DiffusivitySolutEff, &
     FILM => micfor%FILM, &
     TortMicPM  => micfor%TortMicPM, &
     OXYG => micstt%OXYG, &
@@ -3100,7 +3080,7 @@ module MicBGCMod
         !     ACTUAL REDUCTION OF AQUEOUS BY AEROBES CALCULATED
         !     FROM MASS FLOW PLUS DIFFUSION = ACTIVE UPTAKE
         !     COUPLED WITH DISSOLUTION OF GASEOUS O2 DURING REDUCTION
-        !     OF AQUEOUS O2 FROM DISSOLUTION RATE CONSTANT 'DFGS'
+        !     OF AQUEOUS O2 FROM DISSOLUTION RATE CONSTANT 'DiffusivitySolutEff'
         !     CALCULATED IN 'WATSUB'
         !
         !     VLWatMicPM,VLsoiAirPM,VLSoilPoreMicP=water, air and total volumes
@@ -3136,7 +3116,7 @@ module MicBGCMod
           OXYS1=OXYS1-RMPOX
           !apply dissolution-volatilization
           IF(THETPM(M).GT.THETX.AND.VOLPOX.GT.ZEROS)THEN
-            ROXDFQ=DFGS(M)*(AMAX1(ZEROS,OXYG1)*VOLWOX-OXYS1*VOLPOX)/VOLWPM
+            ROXDFQ=DiffusivitySolutEff(M)*(AMAX1(ZEROS,OXYG1)*VOLWOX-OXYS1*VOLPOX)/VOLWPM
           ELSE
             ROXDFQ=0.0_r8
           ENDIF
@@ -3772,8 +3752,7 @@ module MicBGCMod
     OMC     => micstt%OMC   , &
     OMN     => micstt%OMN   , &
     OMP     => micstt%OMP   , &
-    OQN     => micstt%OQN   , &
-    OQP     => micstt%OQP   , &
+    DOM     => micstt%DOM   , &
     ZEROS   => micfor%ZEROS , &
     ZERO    => micfor%ZERO    &
   )
@@ -3805,8 +3784,8 @@ module MicBGCMod
   CGOQC(NGL,K)=CGOMX*FGOCP+CGOMD
   CGOAC(NGL,K)=CGOMX*FGOAP
   CGOXC=CGOQC(NGL,K)+CGOAC(NGL,K)
-  CGOMN(NGL,K)=AZMAX1(AMIN1(OQN(K)*FOMK(NGL,K),CGOXC*CNQ(K)/FCN(NGL,K)))
-  CGOMP(NGL,K)=AZMAX1(AMIN1(OQP(K)*FOMK(NGL,K),CGOXC*CPQ(K)/FCP(NGL,K)))
+  CGOMN(NGL,K)=AZMAX1(AMIN1(DOM(idom_don,K)*FOMK(NGL,K),CGOXC*CNQ(K)/FCN(NGL,K)))
+  CGOMP(NGL,K)=AZMAX1(AMIN1(DOM(idom_dop,K)*FOMK(NGL,K),CGOXC*CPQ(K)/FCP(NGL,K)))
   TCGOQC(K)=TCGOQC(K)+CGOQC(NGL,K)
   TCGOAC(K)=TCGOAC(K)+CGOAC(NGL,K)
   TCGOMN(K)=TCGOMN(K)+CGOMN(NGL,K)

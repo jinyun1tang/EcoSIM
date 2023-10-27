@@ -290,17 +290,17 @@ module InitSOMBGCMOD
 !     OQC,OQN,OQP,OQA=DOC,DON,DOP,acetate in micropores (g)
 !     OQCH,OQNH,OQPH,OQAH=DOC,DON,DOP,acetate in macropores (g)
 !
-    OQC(K,L,NY,NX)=X*AZMAX1(OSCM(K)*OQCK(K)*FOSCI)
-    OQN(K,L,NY,NX)=AZMAX1(OQC(K,L,NY,NX)*CNOSCT(KK)*FOSNI)
-    OQP(K,L,NY,NX)=AZMAX1(OQC(K,L,NY,NX)*CPOSCT(KK)*FOSPI)
-    OQA(K,L,NY,NX)=0.0_r8
-    OQCH(K,L,NY,NX)=0.0_r8
-    OQNH(K,L,NY,NX)=0.0_r8
-    OQPH(K,L,NY,NX)=0.0_r8
-    OQAH(K,L,NY,NX)=0.0_r8
-    OSCX(KK)=OSCX(KK)+OQC(K,L,NY,NX)
-    OSNX(KK)=OSNX(KK)+OQN(K,L,NY,NX)
-    OSPX(KK)=OSPX(KK)+OQP(K,L,NY,NX)
+    DOM(idom_doc,K,L,NY,NX)=X*AZMAX1(OSCM(K)*OQCK(K)*FOSCI)
+    DOM(idom_don,K,L,NY,NX)=AZMAX1(DOM(idom_doc,K,L,NY,NX)*CNOSCT(KK)*FOSNI)
+    DOM(idom_dop,K,L,NY,NX)=AZMAX1(DOM(idom_doc,K,L,NY,NX)*CPOSCT(KK)*FOSPI)
+    DOM(idom_acetate,K,L,NY,NX)=0.0_r8
+    DOM_Macp(idom_doc,K,L,NY,NX)=0.0_r8
+    DOM_Macp(idom_don,K,L,NY,NX)=0.0_r8
+    DOM_Macp(idom_dop,K,L,NY,NX)=0.0_r8
+    DOM_Macp(idom_acetate,K,L,NY,NX)=0.0_r8
+    OSCX(KK)=OSCX(KK)+DOM(idom_doc,K,L,NY,NX)
+    OSNX(KK)=OSNX(KK)+DOM(idom_don,K,L,NY,NX)
+    OSPX(KK)=OSPX(KK)+DOM(idom_dop,K,L,NY,NX)
 !
 !     ADSORBED C, N AND P
 !
@@ -428,19 +428,19 @@ module InitSOMBGCMOD
         RC0(K,NY,NX)=RC0(K,NY,NX)+ORC(M,K,L,NY,NX)
       ENDIF
     ENDDO D6985
-    OC=OC+OQC(K,L,NY,NX)+OQCH(K,L,NY,NX)+OHC(K,L,NY,NX) &
-      +OQA(K,L,NY,NX)+OQAH(K,L,NY,NX)+OHA(K,L,NY,NX)
-    ON=ON+OQN(K,L,NY,NX)+OQNH(K,L,NY,NX)+OHN(K,L,NY,NX)
-    OP=OP+OQP(K,L,NY,NX)+OQPH(K,L,NY,NX)+OHP(K,L,NY,NX)
-    OC=OC+OQA(K,L,NY,NX)+OQAH(K,L,NY,NX)
+    OC=OC+DOM(idom_doc,K,L,NY,NX)+DOM_Macp(idom_doc,K,L,NY,NX)+OHC(K,L,NY,NX) &
+      +DOM(idom_acetate,K,L,NY,NX)+DOM_Macp(idom_acetate,K,L,NY,NX)+OHA(K,L,NY,NX)
+    ON=ON+DOM(idom_don,K,L,NY,NX)+DOM_Macp(idom_don,K,L,NY,NX)+OHN(K,L,NY,NX)
+    OP=OP+DOM(idom_dop,K,L,NY,NX)+DOM_Macp(idom_dop,K,L,NY,NX)+OHP(K,L,NY,NX)
+    OC=OC+DOM(idom_acetate,K,L,NY,NX)+DOM_Macp(idom_acetate,K,L,NY,NX)
     IF(K.LE.micpar%NumOfLitrCmplxs)THEN
-      RC=RC+OQC(K,L,NY,NX)+OQCH(K,L,NY,NX)+OHC(K,L,NY,NX) &
-        +OQA(K,L,NY,NX)+OQAH(K,L,NY,NX)+OHA(K,L,NY,NX)
-      RC=RC+OQA(K,L,NY,NX)+OQAH(K,L,NY,NX)
+      RC=RC+DOM(idom_doc,K,L,NY,NX)+DOM_Macp(idom_doc,K,L,NY,NX)+OHC(K,L,NY,NX) &
+        +DOM(idom_acetate,K,L,NY,NX)+DOM_Macp(idom_acetate,K,L,NY,NX)+OHA(K,L,NY,NX)
+      RC=RC+DOM(idom_acetate,K,L,NY,NX)+DOM_Macp(idom_acetate,K,L,NY,NX)
     ENDIF
     IF(L.EQ.0)THEN
-      RC0(K,NY,NX)=RC0(K,NY,NX)+OQC(K,L,NY,NX)+OQCH(K,L,NY,NX) &
-        +OHC(K,L,NY,NX)+OQA(K,L,NY,NX)+OQAH(K,L,NY,NX)+OHA(K,L,NY,NX)
+      RC0(K,NY,NX)=RC0(K,NY,NX)+DOM(idom_doc,K,L,NY,NX)+DOM_Macp(idom_doc,K,L,NY,NX) &
+        +OHC(K,L,NY,NX)+DOM(idom_acetate,K,L,NY,NX)+DOM_Macp(idom_acetate,K,L,NY,NX)+OHA(K,L,NY,NX)
     ENDIF
     D6980: DO M=1,jsken
       OC=OC+OSC(M,K,L,NY,NX)

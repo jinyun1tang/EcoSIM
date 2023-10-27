@@ -199,17 +199,17 @@ module BoundaryTranspMod
   integer, intent(in) :: M,N,NN,N1,N2,M4,M5
   real(r8), intent(in) :: RCHQF
   real(r8) :: FQRM
-  integer :: K,NTG,NTN,NTS
+  integer :: K,idg,NTN,ids
 
   IF(.not.XGridRunoffFlag(NN,N,N2,N1).OR.isclose(RCHQF,0.0_r8).OR.WatFlux4ErosionM(M,N2,N1).LE.ZEROS(N2,N1))THEN
     DO  K=1,jcplx
-      RQROC(K,N,NN,M5,M4)=0.0_r8
-      RQRON(K,N,NN,M5,M4)=0.0_r8
-      RQROP(K,N,NN,M5,M4)=0.0_r8
-      RQROA(K,N,NN,M5,M4)=0.0_r8
+      dom_2DFloXSurRunoffM(idom_DOC,K,N,NN,M5,M4)=0.0_r8
+      dom_2DFloXSurRunoffM(idom_DON,K,N,NN,M5,M4)=0.0_r8
+      dom_2DFloXSurRunoffM(idom_DOP,K,N,NN,M5,M4)=0.0_r8
+      dom_2DFloXSurRunoffM(idom_acetate,K,N,NN,M5,M4)=0.0_r8
     ENDDO
-    trcg_RQR(idg_beg:idg_end-1,N,NN,M5,M4)=0.0_r8
-    trcn_RQR(ids_nut_beg:ids_nuts_end,N,NN,M5,M4)=0.0_r8
+    trcg_2DFloXSurRunoffM(idg_beg:idg_NH3,N,NN,M5,M4)=0.0_r8
+    trcn_2DFloXSurRunoffM(ids_nut_beg:ids_nuts_end,N,NN,M5,M4)=0.0_r8
   ELSE
 !
 !     SOLUTE LOSS FROM RUNOFF DEPENDING ON ASPECT
@@ -219,18 +219,18 @@ module BoundaryTranspMod
       .OR.(NN.EQ.2.AND.QflxSurfRunoffM(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
       FQRM=QflxSurfRunoffM(M,N,NN,M5,M4)/WatFlux4ErosionM(M,N2,N1)
       DO  K=1,jcplx
-        RQROC(K,N,NN,M5,M4)=RQROC0(K,N2,N1)*FQRM
-        RQRON(K,N,NN,M5,M4)=RQRON0(K,N2,N1)*FQRM
-        RQROP(K,N,NN,M5,M4)=RQROP0(K,N2,N1)*FQRM
-        RQROA(K,N,NN,M5,M4)=RQROA0(K,N2,N1)*FQRM
+        dom_2DFloXSurRunoffM(idom_DOC,K,N,NN,M5,M4)=dom_FloXSurRunoff(idom_DOC,K,N2,N1)*FQRM
+        dom_2DFloXSurRunoffM(idom_DON,K,N,NN,M5,M4)=dom_FloXSurRunoff(idom_DON,K,N2,N1)*FQRM
+        dom_2DFloXSurRunoffM(idom_DOP,K,N,NN,M5,M4)=dom_FloXSurRunoff(idom_DOP,K,N2,N1)*FQRM
+        dom_2DFloXSurRunoffM(idom_acetate,K,N,NN,M5,M4)=dom_FloXSurRunoff(idom_acetate,K,N2,N1)*FQRM
       enddo
 
-      DO NTG=idg_beg,idg_end-1
-        trcg_RQR(NTG,N,NN,M5,M4)=trcg_RQR0(NTG,N2,N1)*FQRM
+      DO idg=idg_beg,idg_NH3
+        trcg_2DFloXSurRunoffM(idg,N,NN,M5,M4)=trcg_FloXSurRunoff(idg,N2,N1)*FQRM
       ENDDO
 
-      DO NTS=ids_nut_beg,ids_nuts_end
-        trcn_RQR(NTS,N,NN,M5,M4)=trcn_RQR0(NTS,N2,N1)*FQRM
+      DO ids=ids_nut_beg,ids_nuts_end
+        trcn_2DFloXSurRunoffM(ids,N,NN,M5,M4)=trcn_FloXSurRunoff(ids,N2,N1)*FQRM
       ENDDO
 !
 !     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
@@ -239,17 +239,17 @@ module BoundaryTranspMod
 !     RQR*=solute in runoff
 !
       DO  K=1,jcplx
-        XOCQRS(K,N,NN,M5,M4)=XOCQRS(K,N,NN,M5,M4)+RQROC(K,N,NN,M5,M4)
-        XONQRS(K,N,NN,M5,M4)=XONQRS(K,N,NN,M5,M4)+RQRON(K,N,NN,M5,M4)
-        XOPQRS(K,N,NN,M5,M4)=XOPQRS(K,N,NN,M5,M4)+RQROP(K,N,NN,M5,M4)
-        XOAQRS(K,N,NN,M5,M4)=XOAQRS(K,N,NN,M5,M4)+RQROA(K,N,NN,M5,M4)
+        dom_2DFloXSurRunoff(idom_doc,K,N,NN,M5,M4)=dom_2DFloXSurRunoff(idom_doc,K,N,NN,M5,M4)+dom_2DFloXSurRunoffM(idom_DOC,K,N,NN,M5,M4)
+        dom_2DFloXSurRunoff(idom_don,K,N,NN,M5,M4)=dom_2DFloXSurRunoff(idom_don,K,N,NN,M5,M4)+dom_2DFloXSurRunoffM(idom_DON,K,N,NN,M5,M4)
+        dom_2DFloXSurRunoff(idom_dop,K,N,NN,M5,M4)=dom_2DFloXSurRunoff(idom_dop,K,N,NN,M5,M4)+dom_2DFloXSurRunoffM(idom_DOP,K,N,NN,M5,M4)
+        dom_2DFloXSurRunoff(idom_acetate,K,N,NN,M5,M4)=dom_2DFloXSurRunoff(idom_acetate,K,N,NN,M5,M4)+dom_2DFloXSurRunoffM(idom_acetate,K,N,NN,M5,M4)
       enddo
-      DO NTG=idg_beg,idg_end-1
-        trcg_XRS(NTG,N,NN,M5,M4)=trcg_XRS(NTG,N,NN,M5,M4)+trcg_RQR(NTG,N,NN,M5,M4)
+      DO idg=idg_beg,idg_NH3
+        trcg_2DFloXSurRunoff(idg,N,NN,M5,M4)=trcg_2DFloXSurRunoff(idg,N,NN,M5,M4)+trcg_2DFloXSurRunoffM(idg,N,NN,M5,M4)
       ENDDO
 
       DO NTN=ids_nut_beg,ids_nuts_end
-        trcn_XRS(NTN,N,NN,M5,M4)=trcn_XRS(NTN,N,NN,M5,M4)+trcn_RQR(NTN,N,NN,M5,M4)
+        trcn_2DFloXSurRunoff(NTN,N,NN,M5,M4)=trcn_2DFloXSurRunoff(NTN,N,NN,M5,M4)+trcn_2DFloXSurRunoffM(NTN,N,NN,M5,M4)
       ENDDO
 !
 !     SOLUTE GAIN FROM RUNON DEPENDING ON ASPECT
@@ -258,34 +258,34 @@ module BoundaryTranspMod
     ELSEIF((NN.EQ.2.AND.QflxSurfRunoffM(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
       .OR.(NN.EQ.1.AND.QflxSurfRunoffM(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
       DO  K=1,jcplx
-        RQROC(K,N,NN,M5,M4)=0.0_r8
-        RQRON(K,N,NN,M5,M4)=0.0_r8
-        RQROP(K,N,NN,M5,M4)=0.0_r8
-        RQROA(K,N,NN,M5,M4)=0.0_r8
+        dom_2DFloXSurRunoffM(idom_DOC,K,N,NN,M5,M4)=0.0_r8
+        dom_2DFloXSurRunoffM(idom_DON,K,N,NN,M5,M4)=0.0_r8
+        dom_2DFloXSurRunoffM(idom_DOP,K,N,NN,M5,M4)=0.0_r8
+        dom_2DFloXSurRunoffM(idom_acetate,K,N,NN,M5,M4)=0.0_r8
       enddo
 
-      trcg_RQR(idg_CO2,N,NN,M5,M4)=QflxSurfRunoffM(M,N,NN,M5,M4)*CCOU
-      trcg_RQR(idg_CH4,N,NN,M5,M4)=QflxSurfRunoffM(M,N,NN,M5,M4)*CCHU
-      trcg_RQR(idg_O2,N,NN,M5,M4)=QflxSurfRunoffM(M,N,NN,M5,M4)*COXU
-      trcg_RQR(idg_N2,N,NN,M5,M4)=QflxSurfRunoffM(M,N,NN,M5,M4)*CNNU
-      trcg_RQR(idg_N2O,N,NN,M5,M4)=QflxSurfRunoffM(M,N,NN,M5,M4)*CN2U
-      trcg_RQR(idg_H2,N,NN,M5,M4)=0.0_r8
-      trcg_RQR(idg_NH3,N,NN,M5,M4)=0.0_r8
+      trcg_2DFloXSurRunoffM(idg_CO2,N,NN,M5,M4)=QflxSurfRunoffM(M,N,NN,M5,M4)*CCOU
+      trcg_2DFloXSurRunoffM(idg_CH4,N,NN,M5,M4)=QflxSurfRunoffM(M,N,NN,M5,M4)*CCHU
+      trcg_2DFloXSurRunoffM(idg_O2,N,NN,M5,M4)=QflxSurfRunoffM(M,N,NN,M5,M4)*COXU
+      trcg_2DFloXSurRunoffM(idg_N2,N,NN,M5,M4)=QflxSurfRunoffM(M,N,NN,M5,M4)*CNNU
+      trcg_2DFloXSurRunoffM(idg_N2O,N,NN,M5,M4)=QflxSurfRunoffM(M,N,NN,M5,M4)*CN2U
+      trcg_2DFloXSurRunoffM(idg_H2,N,NN,M5,M4)=0.0_r8
+      trcg_2DFloXSurRunoffM(idg_NH3,N,NN,M5,M4)=0.0_r8
 
-      trcn_RQR(ids_nut_beg:ids_nuts_end,N,NN,M5,M4)=0.0_r8
+      trcn_2DFloXSurRunoffM(ids_nut_beg:ids_nuts_end,N,NN,M5,M4)=0.0_r8
 
-      DO NTG=idg_beg,idg_end-1
-        trcg_XRS(NTG,N,NN,M5,M4)=trcg_XRS(NTG,N,NN,M5,M4)+trcg_RQR(NTG,N,NN,M5,M4)
+      DO idg=idg_beg,idg_NH3
+        trcg_2DFloXSurRunoff(idg,N,NN,M5,M4)=trcg_2DFloXSurRunoff(idg,N,NN,M5,M4)+trcg_2DFloXSurRunoffM(idg,N,NN,M5,M4)
       ENDDO
     ELSE
       DO  K=1,jcplx
-        RQROC(K,N,NN,M5,M4)=0.0_r8
-        RQRON(K,N,NN,M5,M4)=0.0_r8
-        RQROP(K,N,NN,M5,M4)=0.0_r8
-        RQROA(K,N,NN,M5,M4)=0.0_r8
+        dom_2DFloXSurRunoffM(idom_DOC,K,N,NN,M5,M4)=0.0_r8
+        dom_2DFloXSurRunoffM(idom_DON,K,N,NN,M5,M4)=0.0_r8
+        dom_2DFloXSurRunoffM(idom_DOP,K,N,NN,M5,M4)=0.0_r8
+        dom_2DFloXSurRunoffM(idom_acetate,K,N,NN,M5,M4)=0.0_r8
       enddo
-      trcg_RQR(idg_beg:idg_end-1,N,NN,M5,M4)=0.0_r8
-      trcn_RQR(ids_nut_beg:ids_nuts_end,N,NN,M5,M4)=0.0_r8
+      trcg_2DFloXSurRunoffM(idg_beg:idg_NH3,N,NN,M5,M4)=0.0_r8
+      trcn_2DFloXSurRunoffM(ids_nut_beg:ids_nuts_end,N,NN,M5,M4)=0.0_r8
     ENDIF
 
   ENDIF
@@ -293,11 +293,11 @@ module BoundaryTranspMod
 !     BOUNDARY SNOW FLUX
 !
   IF(NN.EQ.1)THEN
-    trcg_RQS(idg_beg:idg_end-1,N,M5,M4)=0.0_r8
-    RQSNH4(N,M5,M4)=0.0_r8
-    RQSNO3(N,M5,M4)=0.0_r8
-    RQSH1P(N,M5,M4)=0.0_r8
-    RQSH2P(N,M5,M4)=0.0_r8
+    trcg_2DSnowDrift(idg_beg:idg_NH3,N,M5,M4)=0.0_r8
+    trcn_2DSnowDrift(ids_NH4,N,M5,M4)=0.0_r8
+    trcn_2DSnowDrift(ids_NO3,N,M5,M4)=0.0_r8
+    trcn_2DSnowDrift(ids_H1PO4,N,M5,M4)=0.0_r8
+    trcn_2DSnowDrift(ids_H2PO4,N,M5,M4)=0.0_r8
   ENDIF
   end subroutine BoundaryRunoffandSnowXY
 ! ----------------------------------------------------------------------
@@ -305,8 +305,7 @@ module BoundaryTranspMod
   subroutine BoundaryRunoffandSnowZ(M,N,NN,M1,M2,M3,M4,M5,M6)
   implicit none
   integer, intent(in) :: M,N,NN,M1,M2,M3,M4,M5,M6
-
-  integer :: K,NTG,NTN,NTS
+  integer :: K,idg,NTN,ids,idom
   real(r8) :: VFLW
 
   IF(NN.EQ.1.AND.WaterFlow2MicPM(M,N,M6,M5,M4).GT.0.0_r8 &
@@ -317,14 +316,13 @@ module BoundaryTranspMod
       VFLW=0.0_r8
     ENDIF
     DO  K=1,jcplx
-      ROCFLS(K,N,M6,M5,M4)=VFLW*AZMAX1(OQC2(K,M3,M2,M1))
-      RONFLS(K,N,M6,M5,M4)=VFLW*AZMAX1(OQN2(K,M3,M2,M1))
-      ROPFLS(K,N,M6,M5,M4)=VFLW*AZMAX1(OQP2(K,M3,M2,M1))
-      ROAFLS(K,N,M6,M5,M4)=VFLW*AZMAX1(OQA2(K,M3,M2,M1))
+      do idom=idom_beg,idom_end
+        DOM_3DMicp_Transp_flxM(idom,K,N,M6,M5,M4)=VFLW*AZMAX1(DOM_MicP2(idom,K,M3,M2,M1))
+      enddo
     enddo
     !does not include NH3 and NH3B
-    DO NTG=idg_beg,idg_end-2
-      R3PoreSolFlx(NTG,N,M6,M5,M4)=VFLW*AZMAX1(trc_solml2(NTG,M3,M2,M1))
+    DO idg=idg_beg,idg_end-2
+      R3PoreSolFlx(idg,N,M6,M5,M4)=VFLW*AZMAX1(trc_solml2(idg,M3,M2,M1))
     ENDDo
 
     DO NTN=ids_nuts_beg,ids_nuts_end
@@ -335,17 +333,14 @@ module BoundaryTranspMod
 !
   ELSE
     DO  K=1,jcplx
-      ROCFLS(K,N,M6,M5,M4)=0.0_r8
-      RONFLS(K,N,M6,M5,M4)=0.0_r8
-      ROPFLS(K,N,M6,M5,M4)=0.0_r8
-      ROAFLS(K,N,M6,M5,M4)=0.0_r8
+      DOM_3DMicp_Transp_flxM(idom_beg:idom_end,K,N,M6,M5,M4)=0.0_r8
     enddo
     R3PoreSolFlx(idg_beg:idg_end-2,N,M6,M5,M4)=0.0_r8
 
 !add irrigation flux
-    DO NTS=ids_nuts_beg,ids_nuts_end
-      R3PoreSolFlx(NTS,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4) &
-        *trcn_irrig(NTS,M3,M2,M1)*trcs_VLN(NTS,M3,M2,M1)
+    DO ids=ids_nuts_beg,ids_nuts_end
+      R3PoreSolFlx(ids,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4) &
+        *trcn_irrig(ids,M3,M2,M1)*trcs_VLN(ids,M3,M2,M1)
     ENDDO
 
   ENDIF
@@ -368,14 +363,13 @@ module BoundaryTranspMod
       VFLW=0.0_r8
     ENDIF
     DO  K=1,jcplx
-      ROCFHS(K,N,M6,M5,M4)=VFLW*AZMAX1(OQCH2(K,M3,M2,M1))
-      RONFHS(K,N,M6,M5,M4)=VFLW*AZMAX1(OQNH2(K,M3,M2,M1))
-      ROPFHS(K,N,M6,M5,M4)=VFLW*AZMAX1(OQPH2(K,M3,M2,M1))
-      ROAFHS(K,N,M6,M5,M4)=VFLW*AZMAX1(OQAH2(K,M3,M2,M1))
+      do idom=idom_beg,idom_end
+        DOM_3DMacp_Transp_flxM(idom,K,N,M6,M5,M4)=VFLW*AZMAX1(DOM_MacP2(idom,K,M3,M2,M1))
+      enddo
     enddo
 
-    DO NTG=idg_beg,idg_end-2
-      R3PoreSoHFlx(NTG,N,M6,M5,M4)=VFLW*AZMAX1(trc_soHml2(NTG,M3,M2,M1))
+    DO idg=idg_beg,idg_end-2
+      R3PoreSoHFlx(idg,N,M6,M5,M4)=VFLW*AZMAX1(trc_soHml2(idg,M3,M2,M1))
     ENDDO
 
     DO NTN=ids_nuts_beg,ids_nuts_end
@@ -386,10 +380,7 @@ module BoundaryTranspMod
 !
   ELSE
     DO  K=1,jcplx
-      ROCFHS(K,N,M6,M5,M4)=0.0_r8
-      RONFHS(K,N,M6,M5,M4)=0.0_r8
-      ROPFHS(K,N,M6,M5,M4)=0.0_r8
-      ROAFHS(K,N,M6,M5,M4)=0.0_r8
+      DOM_3DMacp_Transp_flxM(idom_beg:idom_end,K,N,M6,M5,M4)=0.0_r8
     enddo
     R3PoreSoHFlx(ids_beg:ids_end,N,M6,M5,M4)=0.0_r8
   ENDIF
@@ -402,19 +393,17 @@ module BoundaryTranspMod
 !     R*FHS,R*FHW,R*FHB=solute flux in non-band,band macropores
 !
   DO  K=1,jcplx
-    XOCFLS(K,N,M6,M5,M4)=XOCFLS(K,N,M6,M5,M4)+ROCFLS(K,N,M6,M5,M4)
-    XONFLS(K,N,M6,M5,M4)=XONFLS(K,N,M6,M5,M4)+RONFLS(K,N,M6,M5,M4)
-    XOPFLS(K,N,M6,M5,M4)=XOPFLS(K,N,M6,M5,M4)+ROPFLS(K,N,M6,M5,M4)
-    XOAFLS(K,N,M6,M5,M4)=XOAFLS(K,N,M6,M5,M4)+ROAFLS(K,N,M6,M5,M4)
-    XOCFHS(K,N,M6,M5,M4)=XOCFHS(K,N,M6,M5,M4)+ROCFHS(K,N,M6,M5,M4)
-    XONFHS(K,N,M6,M5,M4)=XONFHS(K,N,M6,M5,M4)+RONFHS(K,N,M6,M5,M4)
-    XOPFHS(K,N,M6,M5,M4)=XOPFHS(K,N,M6,M5,M4)+ROPFHS(K,N,M6,M5,M4)
-    XOAFHS(K,N,M6,M5,M4)=XOAFHS(K,N,M6,M5,M4)+ROAFHS(K,N,M6,M5,M4)
+    do idom=idom_beg,idom_end
+      DOM_3DMicp_Transp_flx(idom,K,N,M6,M5,M4)=DOM_3DMicp_Transp_flx(idom,K,N,M6,M5,M4) &
+        +DOM_3DMicp_Transp_flxM(idom,K,N,M6,M5,M4)
+      DOM_3DMacp_Transp_flx(idom,K,N,M6,M5,M4)=DOM_3DMacp_Transp_flx(idom,K,N,M6,M5,M4) &
+        +DOM_3DMacp_Transp_flxM(idom,K,N,M6,M5,M4)
+    enddo
   enddo
 
-  DO NTS=ids_beg,ids_end
-    trcs_3DTransp2MicP(NTS,N,M6,M5,M4)=trcs_3DTransp2MicP(NTS,N,M6,M5,M4)+R3PoreSolFlx(NTS,N,M6,M5,M4)
-    trcs_3DTransp2MacP(NTS,N,M6,M5,M4)=trcs_3DTransp2MacP(NTS,N,M6,M5,M4)+R3PoreSoHFlx(NTS,N,M6,M5,M4)
+  DO ids=ids_beg,ids_end
+    trcs_3DTransp2MicP(ids,N,M6,M5,M4)=trcs_3DTransp2MicP(ids,N,M6,M5,M4)+R3PoreSolFlx(ids,N,M6,M5,M4)
+    trcs_3DTransp2MacP(ids,N,M6,M5,M4)=trcs_3DTransp2MacP(ids,N,M6,M5,M4)+R3PoreSoHFlx(ids,N,M6,M5,M4)
   ENDDO
 
 
@@ -427,7 +416,7 @@ module BoundaryTranspMod
   integer, intent(in) :: L,N, NN, M,MX, N1, N2,N3, M1, M2,M3,M4, M5,M6
   real(r8), intent(in):: RCHQF
   real(r8) :: FLGM,FQRM,VFLW
-  integer :: K,NTG
+  integer :: K,idg
 
 ! begin_execution
 !
@@ -462,14 +451,14 @@ module BoundaryTranspMod
 !     GASOUS LOSS WITH SUBSURFACE MICROPORE WATER GAIN
 !
 !     WaterFlow2MicPM,WaterFlow2MacPM=micropore,macropore water flux from watsub.f
-!     XNPT=1/number of cycles NPH-1 for gas flux calculations
+!     dt_GasCyc=1/number of cycles NPH-1 for gas flux calculations
 !     VLsoiAirPM=air-filled porosity
 !     R*FLG=convective gas flux
 !     X*FLG=convective gas flux
 !     gas code:*CO2*=CO2,*OXY*=O2,*CH4*=CH4,*Z2G*=N2,*Z2O*=N2O
 !             :*ZN3*=NH3,*H2G*=H2
 !
-    FLGM=(WaterFlow2MicPM(M,N,M6,M5,M4)+WaterFlow2MacPM(M,N,M6,M5,M4))*XNPT
+    FLGM=(WaterFlow2MicPM(M,N,M6,M5,M4)+WaterFlow2MacPM(M,N,M6,M5,M4))*dt_GasCyc
     IF(NN.EQ.1.AND.FLGM.LT.0.0.OR.NN.EQ.2.AND.FLGM.GT.0.0)THEN
       IF(VLsoiAirPM(M,M3,M2,M1).GT.ZEROS2(M2,M1))THEN
         VFLW=-AMAX1(-VFLWX,AMIN1(VFLWX,FLGM/VLsoiAirPM(M,M3,M2,M1)))
@@ -481,78 +470,75 @@ module BoundaryTranspMod
 !
 !     X*FLG=hourly convective gas flux
 !
-      DO NTG=idg_beg,idg_end-1
-        R3GasADFlx(NTG,N,M6,M5,M4)=VFLW*AZMAX1(trc_gasml2(NTG,M3,M2,M1))
-        R3GasADTFlx(NTG,N,M6,M5,M4)=R3GasADTFlx(NTG,N,M6,M5,M4)+R3GasADFlx(NTG,N,M6,M5,M4)
+      DO idg=idg_beg,idg_NH3
+        R3GasADFlx(idg,N,M6,M5,M4)=VFLW*AZMAX1(trc_gasml2(idg,M3,M2,M1))
+        R3GasADTFlx(idg,N,M6,M5,M4)=R3GasADTFlx(idg,N,M6,M5,M4)+R3GasADFlx(idg,N,M6,M5,M4)
       ENDDO
 
     ELSE
-      R3GasADFlx(idg_beg:idg_end-1,N,M6,M5,M4)=0.0_r8
+      R3GasADFlx(idg_beg:idg_NH3,N,M6,M5,M4)=0.0_r8
     ENDIF
   ELSE
       DO  K=1,jcplx
-        ROCFHS(K,N,M6,M5,M4)=0.0_r8
-        RONFHS(K,N,M6,M5,M4)=0.0_r8
-        ROPFHS(K,N,M6,M5,M4)=0.0_r8
-        ROAFHS(K,N,M6,M5,M4)=0.0_r8
+        DOM_3DMacp_Transp_flxM(idom_beg:idom_end,K,N,M6,M5,M4)=0.0_r8
       enddo
       R3PoreSoHFlx(ids_beg:ids_end,N,M6,M5,M4)=0.0_r8
-      R3GasADFlx(idg_beg:idg_end-1,N,M6,M5,M4)=0.0_r8
+      R3GasADFlx(idg_beg:idg_NH3,N,M6,M5,M4)=0.0_r8
   ENDIF
   end subroutine BoundaryRunoffandSnow
 !------------------------------------------------------------------------------------------
 
   subroutine NetOverlandFluxXY(M,N,N1,N2,N4,N5,N4B,N5B)
   implicit none
-  integer, intent(in) :: M,N,N1,N2,N4,N5,N4B,N5B
+  integer, intent(in) :: M,N
+  integer, intent(in) :: N1,N2,N4,N5,N4B,N5B
 
-  integer :: NN,K,NTG,NTS
+  integer :: NN,K,idg,ids,idom
 
   DO NN=1,2
     DO  K=1,jcplx
-      TQROC(K,N2,N1)=TQROC(K,N2,N1)+RQROC(K,N,NN,N2,N1)
-      TQRON(K,N2,N1)=TQRON(K,N2,N1)+RQRON(K,N,NN,N2,N1)
-      TQROP(K,N2,N1)=TQROP(K,N2,N1)+RQROP(K,N,NN,N2,N1)
-      TQROA(K,N2,N1)=TQROA(K,N2,N1)+RQROA(K,N,NN,N2,N1)
+      do idom=idom_beg,idom_end
+        dom_TFloXSurRunoff(idom,K,N2,N1)=dom_TFloXSurRunoff(idom,K,N2,N1) &
+          +dom_2DFloXSurRunoffM(idom,K,N,NN,N2,N1)
+      enddo
     enddo
 
-    DO NTG=idg_beg,idg_end-1
-      trcg_TQR(NTG,N2,N1)=trcg_TQR(NTG,N2,N1)+trcg_RQR(NTG,N,NN,N2,N1)
+    DO idg=idg_beg,idg_NH3
+      trcg_TFloXSurRunoff(idg,N2,N1)=trcg_TFloXSurRunoff(idg,N2,N1)+trcg_2DFloXSurRunoffM(idg,N,NN,N2,N1)
     ENDDO
 
-    DO NTS=ids_nut_beg,ids_nuts_end
-      trcn_TQR(NTS,N2,N1)=trcn_TQR(NTS,N2,N1)+trcn_RQR(NTS,N,NN,N2,N1)
+    DO ids=ids_nut_beg,ids_nuts_end
+      trcn_TFloXSurRunoff(ids,N2,N1)=trcn_TFloXSurRunoff(ids,N2,N1)+trcn_2DFloXSurRunoffM(ids,N,NN,N2,N1)
     ENDDO
 
     IF(IFLBM(M,N,NN,N5,N4).EQ.0)THEN
       DO  K=1,jcplx
-        TQROC(K,N2,N1)=TQROC(K,N2,N1)-RQROC(K,N,NN,N5,N4)
-        TQRON(K,N2,N1)=TQRON(K,N2,N1)-RQRON(K,N,NN,N5,N4)
-        TQROP(K,N2,N1)=TQROP(K,N2,N1)-RQROP(K,N,NN,N5,N4)
-        TQROA(K,N2,N1)=TQROA(K,N2,N1)-RQROA(K,N,NN,N5,N4)
+        do idom=idom_beg,idom_end
+          dom_TFloXSurRunoff(idom,K,N2,N1)=dom_TFloXSurRunoff(idom,K,N2,N1) &
+            -dom_2DFloXSurRunoffM(idom,K,N,NN,N5,N4)
+        enddo
       enddo
 
-      DO NTG=idg_beg,idg_end-1
-        trcg_TQR(NTG,N2,N1)=trcg_TQR(NTG,N2,N1)-trcg_RQR(NTG,N,NN,N5,N4)
+      DO idg=idg_beg,idg_NH3
+        trcg_TFloXSurRunoff(idg,N2,N1)=trcg_TFloXSurRunoff(idg,N2,N1)-trcg_2DFloXSurRunoffM(idg,N,NN,N5,N4)
       ENDDO
 
-      DO NTS=ids_nut_beg,ids_nuts_end
-        trcn_TQR(NTS,N2,N1)=trcn_TQR(NTS,N2,N1)-trcn_RQR(NTS,N,NN,N5,N4)
+      DO ids=ids_nut_beg,ids_nuts_end
+        trcn_TFloXSurRunoff(ids,N2,N1)=trcn_TFloXSurRunoff(ids,N2,N1)-trcn_2DFloXSurRunoffM(ids,N,NN,N5,N4)
       ENDDO
     ENDIF
     IF(N4B.GT.0.AND.N5B.GT.0.AND.NN.EQ.1)THEN
       DO  K=1,jcplx
-        TQROC(K,N2,N1)=TQROC(K,N2,N1)-RQROC(K,N,NN,N5B,N4B)
-        TQRON(K,N2,N1)=TQRON(K,N2,N1)-RQRON(K,N,NN,N5B,N4B)
-        TQROP(K,N2,N1)=TQROP(K,N2,N1)-RQROP(K,N,NN,N5B,N4B)
-        TQROA(K,N2,N1)=TQROA(K,N2,N1)-RQROA(K,N,NN,N5B,N4B)
+        do idom=idom_beg,idom_end
+          dom_TFloXSurRunoff(idom,K,N2,N1)=dom_TFloXSurRunoff(idom,K,N2,N1)-dom_2DFloXSurRunoffM(idom,K,N,NN,N5B,N4B)
+        enddo
       enddo
-      DO NTG=idg_beg,idg_end-1
-        trcg_TQR(NTG,N2,N1)=trcg_TQR(NTG,N2,N1)-trcg_RQR(NTG,N,NN,N5B,N4B)
+      DO idg=idg_beg,idg_NH3
+        trcg_TFloXSurRunoff(idg,N2,N1)=trcg_TFloXSurRunoff(idg,N2,N1)-trcg_2DFloXSurRunoffM(idg,N,NN,N5B,N4B)
       ENDDO
 
-      DO NTS=ids_nut_beg,ids_nuts_end
-        trcn_TQR(NTS,N2,N1)=trcn_TQR(NTS,N2,N1)-trcn_RQR(NTS,N,NN,N5B,N4B)
+      DO ids=ids_nut_beg,ids_nuts_end
+        trcn_TFloXSurRunoff(ids,N2,N1)=trcn_TFloXSurRunoff(ids,N2,N1)-trcn_2DFloXSurRunoffM(ids,N,NN,N5B,N4B)
       ENDDO
     ENDIF
   enddo
@@ -562,14 +548,13 @@ module BoundaryTranspMod
 !     TQS*=net solute flux in snow transfer
 !     RQS*=solute flux in snow transfer
 !
-  DO NTG=idg_beg,idg_end-1
-    trcg_TQ(NTG,N2,N1)=trcg_TQ(NTG,N2,N1)+trcg_RQS(NTG,N,N2,N1)-trcg_RQS(NTG,N,N5,N4)
+  DO idg=idg_beg,idg_NH3
+    trcg_SnowDrift(idg,N2,N1)=trcg_SnowDrift(idg,N2,N1)+trcg_2DSnowDrift(idg,N,N2,N1)-trcg_2DSnowDrift(idg,N,N5,N4)
   ENDDO
 
-  trcn_TQ(ids_NH4,N2,N1)=trcn_TQ(ids_NH4,N2,N1)+RQSNH4(N,N2,N1)-RQSNH4(N,N5,N4)
-  trcn_TQ(ids_NO3,N2,N1)=trcn_TQ(ids_NO3,N2,N1)+RQSNO3(N,N2,N1)-RQSNO3(N,N5,N4)
-  trcn_TQ(ids_H1PO4,N2,N1)=trcn_TQ(ids_H1PO4,N2,N1)+RQSH1P(N,N2,N1)-RQSH1P(N,N5,N4)
-  trcn_TQ(ids_H2PO4,N2,N1)=trcn_TQ(ids_H2PO4,N2,N1)+RQSH2P(N,N2,N1)-RQSH2P(N,N5,N4)
+  do ids=ids_nut_beg,ids_nuts_end
+    trcn_SnowDrift(ids,N2,N1)=trcn_SnowDrift(ids,N2,N1)+trcn_2DSnowDrift(ids,N,N2,N1)-trcn_2DSnowDrift(ids,N,N5,N4)
+  enddo
   end subroutine NetOverlandFluxXY
 
 !------------------------------------------------------------------------------------------
@@ -601,19 +586,19 @@ module BoundaryTranspMod
 !
       ELSEIF(N.EQ.3)THEN
 ! vertical direction
-        call NetOverlandFluxZ(M,N1,N2,NY,NX)
+        call NetOverlandVerticalFlux(M,N1,N2,NY,NX)
       ENDIF
     ENDIF
   ENDIF
   end subroutine NetOverlandFlux
 !------------------------------------------------------------------------------------------
 
-  subroutine NetOverlandFluxZ(M,N1,N2,NY,NX)
+  subroutine NetOverlandVerticalFlux(M,N1,N2,NY,NX)
   implicit none
   integer, intent(in) :: M,N1,N2,NY,NX
 
   integer :: LS,LS2
-  integer :: NTG,NTN
+  integer :: idg,NTN
 
   DO  LS=1,JS
     IF(VLSnowHeatCapM(M,LS,NY,NX).GT.VLHeatCapSnowMin(NY,NX))THEN
@@ -622,9 +607,9 @@ module BoundaryTranspMod
 !     IF LOWER LAYER IS IN THE SNOWPACK
 !
       IF(LS.LT.JS.AND.VLSnowHeatCapM(M,LS2,N2,N1).GT.VLHeatCapSnowMin(N2,N1))THEN
-        DO NTG=idg_beg,idg_end-1
-          trcg_TBLS(NTG,LS,N2,N1)=trcg_TBLS(NTG,LS,N2,N1) &
-            +trcg_RBLS(NTG,LS,N2,N1)-trcg_RBLS(NTG,LS2,N2,N1)
+        DO idg=idg_beg,idg_NH3
+          trcg_TBLS(idg,LS,N2,N1)=trcg_TBLS(idg,LS,N2,N1) &
+            +trcg_RBLS(idg,LS,N2,N1)-trcg_RBLS(idg,LS2,N2,N1)
         ENDDO
 
         DO NTN=ids_nut_beg,ids_nuts_end
@@ -636,17 +621,18 @@ module BoundaryTranspMod
 !     IF LOWER LAYER IS THE LITTER AND SOIL SURFACE
 !
     ! exclude NH3 and NH3B
-        DO NTG=idg_beg,idg_end-1
-          trcg_TBLS(NTG,LS,N2,N1)=trcg_TBLS(NTG,LS,N2,N1) &
-            +trcg_RBLS(NTG,LS,N2,N1)-R3PoreSolFlx(NTG,3,0,N2,N1) &
-            -R3PoreSolFlx(NTG,3,NUM(N2,N1),N2,N1)
-  !    3-R3PoreSoHFlx(NTG,3,NUM(N2,N1),N2,N1)
+        DO idg=idg_beg,idg_NH3
+          trcg_TBLS(idg,LS,N2,N1)=trcg_TBLS(idg,LS,N2,N1) &
+            +trcg_RBLS(idg,LS,N2,N1)-R3PoreSolFlx(idg,3,0,N2,N1) &
+            -R3PoreSolFlx(idg,3,NUM(N2,N1),N2,N1)
+  !    3-R3PoreSoHFlx(idg,3,NUM(N2,N1),N2,N1)
         ENDDO
 
         trcg_TBLS(idg_NH3,LS,N2,N1)=trcg_TBLS(idg_NH3,LS,N2,N1) &
           -R3PoreSolFlx(idg_NH3B,3,NUM(N2,N1),N2,N1)
 !    3-R3PoreSoHFlx(idg_NH3B,3,NUM(N2,N1),N2,N1)
 
+! check trnsfr.f, loop 1205
         DO NTN=0,ids_nuts
           trcn_TBLS(ids_NH4+NTN,LS,N2,N1)=trcn_TBLS(ids_NH4+NTN,LS,N2,N1) &
             +trcn_RBLS(ids_NH4+NTN,LS,N2,N1)-R3PoreSolFlx(ids_NH4+NTN,3,0,N2,N1) &
@@ -658,7 +644,7 @@ module BoundaryTranspMod
       ENDIF
     ENDIF
   enddo
-  end subroutine NetOverlandFluxZ
+  end subroutine NetOverlandVerticalFlux
 !------------------------------------------------------------------------------------------
 
   subroutine NetFluxMicroandMacropores(NY,NX,N,M,MX,N1,N2,N3,N4,N5,N6)
@@ -666,7 +652,7 @@ module BoundaryTranspMod
 
   integer, intent(in) :: NY,NX,N,M,N1,N2,N3,N4,N5,MX
   integer, intent(inout) :: N6
-  integer :: K,LL,NTS,NTG
+  integer :: K,LL,ids,idg,idom
 
   DO LL=N6,NL(NY,NX)
     IF(VLSoilPoreMicP(LL,N2,N1).GT.ZEROS2(N2,N1))THEN
@@ -678,32 +664,24 @@ module BoundaryTranspMod
   IF(M.NE.MX)THEN
     IF(VLSoilPoreMicP(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
       DO  K=1,jcplx
-        TOCFLS(K,N3,N2,N1)=TOCFLS(K,N3,N2,N1)+ROCFLS(K,N,N3,N2,N1)-ROCFLS(K,N,N6,N5,N4)
-        TONFLS(K,N3,N2,N1)=TONFLS(K,N3,N2,N1)+RONFLS(K,N,N3,N2,N1)-RONFLS(K,N,N6,N5,N4)
-        TOPFLS(K,N3,N2,N1)=TOPFLS(K,N3,N2,N1)+ROPFLS(K,N,N3,N2,N1)-ROPFLS(K,N,N6,N5,N4)
-        TOAFLS(K,N3,N2,N1)=TOAFLS(K,N3,N2,N1)+ROAFLS(K,N,N3,N2,N1)-ROAFLS(K,N,N6,N5,N4)
-        TOCFHS(K,N3,N2,N1)=TOCFHS(K,N3,N2,N1)+ROCFHS(K,N,N3,N2,N1)-ROCFHS(K,N,N6,N5,N4)
-        TONFHS(K,N3,N2,N1)=TONFHS(K,N3,N2,N1)+RONFHS(K,N,N3,N2,N1)-RONFHS(K,N,N6,N5,N4)
-        TOPFHS(K,N3,N2,N1)=TOPFHS(K,N3,N2,N1)+ROPFHS(K,N,N3,N2,N1)-ROPFHS(K,N,N6,N5,N4)
-        TOAFHS(K,N3,N2,N1)=TOAFHS(K,N3,N2,N1)+ROAFHS(K,N,N3,N2,N1)-ROAFHS(K,N,N6,N5,N4)
+        do idom=idom_beg,idom_end
+          DOM_Transp2Micp_flx(idom,K,N3,N2,N1)=DOM_Transp2Micp_flx(idom,K,N3,N2,N1) &
+            +DOM_3DMicp_Transp_flxM(idom,K,N,N3,N2,N1)-DOM_3DMicp_Transp_flxM(idom,K,N,N6,N5,N4)
+          DOM_Transp2Macp_flx(idom,K,N3,N2,N1)=DOM_Transp2Macp_flx(idom,K,N3,N2,N1) &
+            +DOM_3DMacp_Transp_flxM(idom,K,N,N3,N2,N1)-DOM_3DMacp_Transp_flxM(idom,K,N,N6,N5,N4)
+        enddo
       enddo
-      DO NTS=ids_beg,ids_end
-        R3PorTSolFlx(NTS,N3,N2,N1)=R3PorTSolFlx(NTS,N3,N2,N1) &
-          +R3PoreSolFlx(NTS,N,N3,N2,N1)-R3PoreSolFlx(NTS,N,N6,N5,N4)
-        R3PorTSoHFlx(NTS,N3,N2,N1)=R3PorTSoHFlx(NTS,N3,N2,N1) &
-          +R3PoreSoHFlx(NTS,N,N3,N2,N1)-R3PoreSoHFlx(NTS,N,N6,N5,N4)
+      DO ids=ids_beg,ids_end
+        R3PorTSolFlx(ids,N3,N2,N1)=R3PorTSolFlx(ids,N3,N2,N1) &
+          +R3PoreSolFlx(ids,N,N3,N2,N1)-R3PoreSolFlx(ids,N,N6,N5,N4)
+        R3PorTSoHFlx(ids,N3,N2,N1)=R3PorTSoHFlx(ids,N3,N2,N1) &
+          +R3PoreSoHFlx(ids,N,N3,N2,N1)-R3PoreSoHFlx(ids,N,N6,N5,N4)
       ENDDO
 
     ELSE
       DO  K=1,jcplx
-        TOCFLS(K,N3,N2,N1)=0.0_r8
-        TONFLS(K,N3,N2,N1)=0.0_r8
-        TOPFLS(K,N3,N2,N1)=0.0_r8
-        TOAFLS(K,N3,N2,N1)=0.0_r8
-        TOCFHS(K,N3,N2,N1)=0.0_r8
-        TONFHS(K,N3,N2,N1)=0.0_r8
-        TOPFHS(K,N3,N2,N1)=0.0_r8
-        TOAFHS(K,N3,N2,N1)=0.0_r8
+        DOM_Transp2Micp_flx(idom_beg:idom_end,K,N3,N2,N1)=0.0_r8
+        DOM_Transp2Macp_flx(idom_beg:idom_end,K,N3,N2,N1)=0.0_r8
       enddo
       R3PorTSolFlx(ids_beg:ids_end,N3,N2,N1)=0.0_r8
       R3PorTSoHFlx(ids_beg:ids_end,N3,N2,N1)=0._r8
@@ -718,12 +696,12 @@ module BoundaryTranspMod
 !     gas code:*CO*=CO2,*OX*=O2,*CH*=CH4,*NG*=N2,*N2*=N2O,*NH*=NH3,*HG*=H2
 !
   IF(VLSoilPoreMicP(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
-    DO NTG=idg_beg,idg_end-1
-      RTGasADFlx(NTG,N3,N2,N1)=RTGasADFlx(NTG,N3,N2,N1) &
-        +R3GasADFlx(NTG,N,N3,N2,N1)-R3GasADFlx(NTG,N,N6,N5,N4)
+    DO idg=idg_beg,idg_NH3
+      RTGasADFlx(idg,N3,N2,N1)=RTGasADFlx(idg,N3,N2,N1) &
+        +R3GasADFlx(idg,N,N3,N2,N1)-R3GasADFlx(idg,N,N6,N5,N4)
     ENDDO
   ELSE
-    RTGasADFlx(idg_beg:idg_end-1,N3,N2,N1)=0._r8
+    RTGasADFlx(idg_beg:idg_NH3,N3,N2,N1)=0._r8
   ENDIF
   end subroutine NetFluxMicroandMacropores
 

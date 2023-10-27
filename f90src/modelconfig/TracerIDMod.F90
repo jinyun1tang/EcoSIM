@@ -22,7 +22,8 @@ implicit none
   integer :: ids_H1PO4,ids_H1PO4B
   integer :: ids_H2PO4,ids_H2PO4B
 
-  integer :: ids_DOC,ids_DON,ids_DOP,ids_ODA
+  integer :: idom_DOC,idom_DON,idom_DOP,idom_acetate
+  integer :: idom_beg,idom_end
   integer :: idg_beg,idg_end
   integer :: ids_beg,ids_end
   integer :: ids_nut_beg,ids_nuts_beg,ids_nuts_end
@@ -139,6 +140,7 @@ implicit none
   integer :: ifertnb_beg,ifertnb_end
   integer :: ids_nuts
   integer :: idsalt_nuts
+
   type, public :: trc_def_type
    integer :: NGasTracers    !number of gas tracers
    integer :: NSolutTracers    !number of solute tracers
@@ -148,6 +150,7 @@ implicit none
    integer :: NnutrientTracers    !number of nutrient tracers
    integer :: NFertNitro
    integer :: NFertNitrob
+   integer :: NDOMS
   end type trc_def_type
 
   type(trc_def_type), public :: trc_confs
@@ -189,6 +192,12 @@ implicit none
   ids_nut_beg=ids_NH4;  !the first non-band non-gaseous nutrient tracer
   ids_nuts_end=ids_H2PO4;!the last non-band nutrient tracer
 
+  idom_beg=1;idom_end=0
+  idom_doc=addone(idom_end)
+  idom_don=addone(idom_end)
+  idom_dop=addone(idom_end)
+  idom_acetate=addone(idom_end)
+  
   if(lsalt_model)then
     idsalt_beg=1;idsalt_end=0
     idsalt_Al=addone(idsalt_end)
@@ -252,59 +261,31 @@ implicit none
 
     idsaltb_end=idsalt_MgHPO4B
 
-
-    idsp_beg=1
-    idsp_end=0;
-
-
-    idsp_AlOH3=addone(idsp_end)  !
-    idsp_FeOH3=addone(idsp_end) !
-    idsp_CaCO3=addone(idsp_end) !
-    idsp_CaSO4=addone(idsp_end)
-
-    idsp_HA   =addone(idsp_end)     !hydroxyapatite
-    idsp_AlPO4=addone(idsp_end)
-    idsp_FePO4=addone(idsp_end)
-    idsp_CaHPO4=addone(idsp_end) !
-    idsp_CaH4P2O8=addone(idsp_end)
-
-    idsp_HAB  =addone(idsp_end)
-    idsp_AlPO4B=addone(idsp_end)
-    idsp_FePO4B=addone(idsp_end)
-    idsp_CaHPO4B=addone(idsp_end)
-    idsp_CaH4P2O8B=addone(idsp_end)
-
-    idsp_end=idsp_CaH4P2O8B
-    idsp_beg_band=idsp_HAB
-    idsp_p_beg=idsp_HA;idsp_p_end=idsp_CaH4P2O8B
-
-  else
-!  double check
-    idsp_beg=1
-    idsp_end=0;
-
-    idsp_AlOH3=addone(idsp_end)     !Al(3+)+3OH(-)
-    idsp_FeOH3=addone(idsp_end)     !Fe(3+)+3OH(-)
-    idsp_CaCO3=addone(idsp_end)     !Ca(2+)+CO3(2-)
-    idsp_CaSO4=addone(idsp_end)     !Ca(2+)+SO4(2-)
-
-    idsp_HA   =addone(idsp_end)     !hydroxyapatite
-    idsp_AlPO4=addone(idsp_end)     !Al(3+)+PO4(3-)
-    idsp_FePO4=addone(idsp_end)     !Fe(3+)+PO4(3-)
-    idsp_CaHPO4=addone(idsp_end)    !Ca(2+)+H(+)+PO4(3-)
-    idsp_CaH4P2O8=addone(idsp_end)  !Ca(2+)+4H(+)+2PO4(3-)
-    idsp_psoi_beg=idsp_HA;idsp_psoi_end=idsp_CaH4P2O8
-
-    idsp_HAB  =addone(idsp_end)
-    idsp_AlPO4B=addone(idsp_end)
-    idsp_FePO4B=addone(idsp_end)
-    idsp_CaHPO4B=addone(idsp_end)
-    idsp_CaH4P2O8B=addone(idsp_end)
-    idsp_end=idsp_CaH4P2O8B
-    idsp_beg_band=idsp_HAB
-
-    idsp_p_beg=idsp_HA;idsp_p_end=idsp_CaH4P2O8B
   endif
+!  double check
+  idsp_beg=1
+  idsp_end=0;
+
+  idsp_AlOH3=addone(idsp_end)     !Al(3+)+3OH(-)
+  idsp_FeOH3=addone(idsp_end)     !Fe(3+)+3OH(-)
+  idsp_CaCO3=addone(idsp_end)     !Ca(2+)+CO3(2-)
+  idsp_CaSO4=addone(idsp_end)     !Ca(2+)+SO4(2-)
+
+  idsp_HA   =addone(idsp_end)     !hydroxyapatite
+  idsp_AlPO4=addone(idsp_end)     !Al(3+)+PO4(3-)
+  idsp_FePO4=addone(idsp_end)     !Fe(3+)+PO4(3-)
+  idsp_CaHPO4=addone(idsp_end)    !Ca(2+)+H(+)+PO4(3-)
+  idsp_CaH4P2O8=addone(idsp_end)  !Ca(2+)+4H(+)+2PO4(3-)
+  idsp_psoi_beg=idsp_HA;idsp_psoi_end=idsp_CaH4P2O8
+
+  idsp_HAB  =addone(idsp_end)
+  idsp_AlPO4B=addone(idsp_end)
+  idsp_FePO4B=addone(idsp_end)
+  idsp_CaHPO4B=addone(idsp_end)
+  idsp_CaH4P2O8B=addone(idsp_end)
+  idsp_end=idsp_CaH4P2O8B
+  idsp_beg_band=idsp_HAB
+  idsp_p_beg=idsp_HA;idsp_p_end=idsp_CaH4P2O8B
 
   idx_beg=1
   idx_end=0
@@ -348,6 +329,7 @@ implicit none
   trc_confs%NnutrientTracers=ids_nuts_end-ids_nut_beg+1
   trc_confs%NFertNitro    = ifertn_end-ifertn_beg+1
   trc_confs%NFertNitrob   = ifertnb_end-ifertnb_beg+1
+  trc_confs%NDOMS         = idom_end-idom_beg+1
   end subroutine InitTracerIDs
 end module TracerIDMod
 

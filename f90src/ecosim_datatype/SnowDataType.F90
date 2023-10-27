@@ -45,16 +45,8 @@ module SnowDataType
   real(r8),target, allocatable ::  WatBySnowRedistribution(:,:,:)                          !snowpack runoff water, [m3 d-2 h-1]
   real(r8),target, allocatable ::  IceBySnowRedistribution(:,:,:)                          !snowpack runoff ice, [m3 d-2 h-1]
   real(r8),target, allocatable ::  HeatBySnowRedistribution(:,:,:)                         !snowpack runoff heat, [MJ d-2 h-1]
-  real(r8),target, allocatable ::  XCOQSS(:,:,:)                      !snowpack runoff CO2 flux, [g d-2 h-1]
-  real(r8),target, allocatable ::  XCHQSS(:,:,:)                      !snowpack runoff CH4 flux, [g d-2 h-1]
-  real(r8),target, allocatable ::  XOXQSS(:,:,:)                      !snowpack runoff O2 flux, [g d-2 h-1]
-  real(r8),target, allocatable ::  XNGQSS(:,:,:)                      !snowpack runoff N2 flux, [g d-2 h-1]
-  real(r8),target, allocatable ::  XN2QSS(:,:,:)                      !snowpack runoff N2O flux, [g d-2 h-1]
-  real(r8),target, allocatable ::  XN4QSS(:,:,:)                      !snowpack runoff NH4 flux, [g d-2 h-1]
-  real(r8),target, allocatable ::  XN3QSS(:,:,:)                      !snowpack runoff NH3 flux, [g d-2 h-1]
-  real(r8),target, allocatable ::  XNOQSS(:,:,:)                      !snowpack runoff NO3 flux, [g d-2 h-1]
-  real(r8),target, allocatable ::  XP4QSS(:,:,:)                      !snowpack runoff PO4 flux, [g d-2 h-1]
-  real(r8),target, allocatable ::  XP1QSS(:,:,:)                      !snowpack runoff HPO4 flux, [g d-2 h-1]
+  real(r8),target, allocatable ::  trcg_FloXSnow(:,:,:,:)                      !snowpack runoff CO2 flux, [g d-2 h-1]
+  real(r8),target, allocatable ::  trcn_FloXSnow(:,:,:,:)                      !snowpack runoff NH4 flux, [g d-2 h-1]
 
   real(r8),target, allocatable ::  trcg_solsml(:,:,:,:)               ! snowpack dual phase disolved tracers
   real(r8),target, allocatable ::  trcn_solsml(:,:,:,:)               ! snowpack nutrient dissolved tracers
@@ -104,19 +96,12 @@ contains
   allocate(WatBySnowRedistribution(2,JV,JH));        WatBySnowRedistribution=0._r8
   allocate(IceBySnowRedistribution(2,JV,JH));        IceBySnowRedistribution=0._r8
   allocate(HeatBySnowRedistribution(2,JV,JH));       HeatBySnowRedistribution=0._r8
-  allocate(XCOQSS(2,JV,JH));    XCOQSS=0._r8
-  allocate(XCHQSS(2,JV,JH));    XCHQSS=0._r8
-  allocate(XOXQSS(2,JV,JH));    XOXQSS=0._r8
-  allocate(XNGQSS(2,JV,JH));    XNGQSS=0._r8
-  allocate(XN2QSS(2,JV,JH));    XN2QSS=0._r8
-  allocate(XN4QSS(2,JV,JH));    XN4QSS=0._r8
-  allocate(XN3QSS(2,JV,JH));    XN3QSS=0._r8
-  allocate(XNOQSS(2,JV,JH));    XNOQSS=0._r8
-  allocate(XP4QSS(2,JV,JH));    XP4QSS=0._r8
-  allocate(XP1QSS(2,JV,JH));    XP1QSS=0._r8
+  allocate(trcg_FloXSnow(idg_beg:idg_NH3,2,JV,JH));    trcg_FloXSnow=0._r8
+
+  allocate(trcn_FloXSnow(ids_nut_beg:ids_nuts_end,2,JV,JH));    trcn_FloXSnow=0._r8
 
 ! exclude NH3B
-  allocate(trcg_solsml(idg_beg:idg_end-1,JS,JY,JX));trcg_solsml=0._r8
+  allocate(trcg_solsml(idg_beg:idg_NH3,JS,JY,JX));trcg_solsml=0._r8
   allocate(trcn_solsml(ids_nut_beg:ids_nuts_end,JS,JY,JX));trcn_solsml=0._r8
   if(salt_model)then
     allocate(trcs_solsml(idsalt_beg:idsalt_end,JS,JY,JX)); trcs_solsml=0._r8
@@ -168,16 +153,8 @@ contains
   call destroy(WatBySnowRedistribution)
   call destroy(IceBySnowRedistribution)
   call destroy(HeatBySnowRedistribution)
-  call destroy(XCOQSS)
-  call destroy(XCHQSS)
-  call destroy(XOXQSS)
-  call destroy(XNGQSS)
-  call destroy(XN2QSS)
-  call destroy(XN4QSS)
-  call destroy(XN3QSS)
-  call destroy(XNOQSS)
-  call destroy(XP4QSS)
-  call destroy(XP1QSS)
+  call destroy(trcg_FloXSnow)
+  call destroy(trcn_FloXSnow)
   if(salt_model)then
     call destroy(trcSalt_XQS)
   endif

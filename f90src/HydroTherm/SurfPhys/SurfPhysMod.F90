@@ -1091,7 +1091,7 @@ contains
 !
 ! VOLA1,VLiceMicP1,VLWatMicP1,VsoiPM=total,ice-,water-,air-filled porosity
 ! TFND1=temperature effect on gas diffusivity
-! DFGS=rate constant for air-water gas exchange
+! DiffusivitySolutEff=rate constant for air-water gas exchange
 ! Z1R,Z2RW,Z2RD,Z3RX=parameters for litter air-water gas transfers
 ! XNPD=time step for gas transfer calculations, it is tunable parameter
 ! TORT=tortuosity for aqueous diffusivity
@@ -1103,10 +1103,10 @@ contains
     THETWA=AZMAX1(AMIN1(1.0_r8,VLWatMicP1(0,NY,NX)/VOLAT0))
     TFND1=TEFAQUDIF(TKSoi1(0,NY,NX))
     scalar=TFND1*XNPD
-    DFGS(M,0,NY,NX)=fDFGS(scalar,THETWA,0.0_r8,is_litter=.true.)
+    DiffusivitySolutEff(M,0,NY,NX)=fDiffusivitySolutEff(scalar,THETWA,0.0_r8,is_litter=.true.)
   ELSE
     !litter layer saturated
-    DFGS(M,0,NY,NX)=0.0_r8
+    DiffusivitySolutEff(M,0,NY,NX)=0.0_r8
   ENDIF
 ! VWatLitRHoldCapcity=surface litter water holding capacity, [m3 d-2]
   IF(VWatLitRHoldCapcity(NY,NX).GT.ZEROS(NY,NX))THEN

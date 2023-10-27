@@ -119,26 +119,26 @@ module SoluteMod
 !     TRNO3,TRNOB=NO3 dissolution in non-band,band
 !
   TRN3G(L,NY,NX)=TRN3G(L,NY,NX)+RSN3AA+RSN3BA+RSN3BB
-  TR_NH4_soil(L,NY,NX)=TR_NH4_soil(L,NY,NX)+RSN4AA
-  TR_NH4_band_soil(L,NY,NX)=TR_NH4_band_soil(L,NY,NX)+RSN4BA+RSN4BB
+  trcn_RChem_soil(ids_NH4,L,NY,NX)=trcn_RChem_soil(ids_NH4,L,NY,NX)+RSN4AA
+  trcn_RChem_band_soil(ids_NH4B,L,NY,NX)=trcn_RChem_band_soil(ids_NH4B,L,NY,NX)+RSN4BA+RSN4BB
   TR_NH3_soil(L,NY,NX)=TR_NH3_soil(L,NY,NX)+RSNUAA
   TR_NH3_band_soil(L,NY,NX)=TR_NH3_band_soil(L,NY,NX)+RSNUBA+RSNUBB
-  TRNO3(L,NY,NX)=TRNO3(L,NY,NX)+RSNOAA
-  TRNOB(L,NY,NX)=TRNOB(L,NY,NX)+RSNOBA+RSNOBB
+  trcn_RChem_soil(ids_NO3,L,NY,NX)=trcn_RChem_soil(ids_NO3,L,NY,NX)+RSNOAA
+  trcn_RChem_band_soil(ids_NO3B,L,NY,NX)=trcn_RChem_band_soil(ids_NO3B,L,NY,NX)+RSNOBA+RSNOBB
   TR_CO2_aqu_soil(L,NY,NX)=TR_CO2_aqu_soil(L,NY,NX)*catomw
   TRN3G(L,NY,NX)=TRN3G(L,NY,NX)*natomw
-  TR_NH4_soil(L,NY,NX)=TR_NH4_soil(L,NY,NX)*natomw
-  TR_NH4_band_soil(L,NY,NX)=TR_NH4_band_soil(L,NY,NX)*natomw
+  trcn_RChem_soil(ids_NH4,L,NY,NX)=trcn_RChem_soil(ids_NH4,L,NY,NX)*natomw
+  trcn_RChem_band_soil(ids_NH4B,L,NY,NX)=trcn_RChem_band_soil(ids_NH4B,L,NY,NX)*natomw
   TR_NH3_soil(L,NY,NX)=TR_NH3_soil(L,NY,NX)*natomw
   TR_NH3_band_soil(L,NY,NX)=TR_NH3_band_soil(L,NY,NX)*natomw
-  TRNO3(L,NY,NX)=TRNO3(L,NY,NX)*natomw
-  TRNOB(L,NY,NX)=TRNOB(L,NY,NX)*natomw
-  TRNO2(L,NY,NX)=TRNO2(L,NY,NX)*natomw
-  TRN2B(L,NY,NX)=TRN2B(L,NY,NX)*natomw
-  TR_H1PO4_soil(L,NY,NX)=TR_H1PO4_soil(L,NY,NX)*patomw
-  TR_H2PO4_soil(L,NY,NX)=TR_H2PO4_soil(L,NY,NX)*patomw
-  TR_H1PO4_band_soil(L,NY,NX)=TR_H1PO4_band_soil(L,NY,NX)*patomw
-  TR_H2PO4_band_soil(L,NY,NX)=TR_H2PO4_band_soil(L,NY,NX)*patomw
+  trcn_RChem_soil(ids_NO3,L,NY,NX)=trcn_RChem_soil(ids_NO3,L,NY,NX)*natomw
+  trcn_RChem_band_soil(ids_NO3B,L,NY,NX)=trcn_RChem_band_soil(ids_NO3B,L,NY,NX)*natomw
+  trcn_RChem_soil(ids_NO2,L,NY,NX)=trcn_RChem_soil(ids_NO2,L,NY,NX)*natomw
+  trcn_RChem_band_soil(ids_NO2B,L,NY,NX)=trcn_RChem_band_soil(ids_NO2B,L,NY,NX)*natomw
+  trcn_RChem_soil(ids_H1PO4,L,NY,NX)=trcn_RChem_soil(ids_H1PO4,L,NY,NX)*patomw
+  trcn_RChem_soil(ids_H2PO4,L,NY,NX)=trcn_RChem_soil(ids_H2PO4,L,NY,NX)*patomw
+  trcn_RChem_band_soil(ids_H1PO4B,L,NY,NX)=trcn_RChem_band_soil(ids_H1PO4B,L,NY,NX)*patomw
+  trcn_RChem_band_soil(ids_H2PO4B,L,NY,NX)=trcn_RChem_band_soil(ids_H2PO4B,L,NY,NX)*patomw
   end subroutine UpdateFertilizerBand
 
 !------------------------------------------------------------------------
@@ -544,8 +544,8 @@ module SoluteMod
       DNH4S=FVLNH4*trc_solml(ids_NH4,L,NY,NX)/natomw
       DNH3S=FVLNH4*trc_solml(idg_NH3,L,NY,NX)/natomw
       DXNH4=FVLNH4*trcx_solml(idx_NH4,L,NY,NX)
-      TR_NH4_soil(L,NY,NX)=TR_NH4_soil(L,NY,NX)+DNH4S
-      TR_NH4_band_soil(L,NY,NX)=TR_NH4_band_soil(L,NY,NX)-DNH4S
+      trcn_RChem_soil(ids_NH4,L,NY,NX)=trcn_RChem_soil(ids_NH4,L,NY,NX)+DNH4S
+      trcn_RChem_band_soil(ids_NH4B,L,NY,NX)=trcn_RChem_band_soil(ids_NH4B,L,NY,NX)-DNH4S
       TR_NH3_soil(L,NY,NX)=TR_NH3_soil(L,NY,NX)+DNH3S
       TR_NH3_band_soil(L,NY,NX)=TR_NH3_band_soil(L,NY,NX)-DNH3S
       trcx_TR(idx_NH4,L,NY,NX)=trcx_TR(idx_NH4,L,NY,NX)+DXNH4
@@ -668,8 +668,8 @@ module SoluteMod
         DPCMP=FVLPO4*trcp_salml(idsp_CaH4P2O8,L,NY,NX)
 
         trcSalt_TR(idsalt_H0PO4,L,NY,NX)=trcSalt_TR(idsalt_H0PO4,L,NY,NX)+DZH0P
-        TR_H1PO4_soil(L,NY,NX)=TR_H1PO4_soil(L,NY,NX)+DZH1P
-        TR_H2PO4_soil(L,NY,NX)=TR_H2PO4_soil(L,NY,NX)+DZH2P
+        trcn_RChem_soil(ids_H1PO4,L,NY,NX)=trcn_RChem_soil(ids_H1PO4,L,NY,NX)+DZH1P
+        trcn_RChem_soil(ids_H2PO4,L,NY,NX)=trcn_RChem_soil(ids_H2PO4,L,NY,NX)+DZH2P
         trcSalt_TR(idsalt_H3PO4,L,NY,NX)=trcSalt_TR(idsalt_H3PO4,L,NY,NX)+DZH3P
         trcSalt_TR(idsalt_FeHPO4,L,NY,NX)=trcSalt_TR(idsalt_FeHPO4,L,NY,NX)+DZF1P
         trcSalt_TR(idsalt_FeH2PO4,L,NY,NX)=trcSalt_TR(idsalt_FeH2PO4,L,NY,NX)+DZF2P
@@ -678,8 +678,8 @@ module SoluteMod
         trcSalt_TR(idsalt_CaH4P2O8,L,NY,NX)=trcSalt_TR(idsalt_CaH4P2O8,L,NY,NX)+DZC2P
         trcSalt_TR(idsalt_MgHPO4,L,NY,NX)=trcSalt_TR(idsalt_MgHPO4,L,NY,NX)+DZM1P
         trcSalt_TR(idsalt_H0PO4B,L,NY,NX)=trcSalt_TR(idsalt_H0PO4B,L,NY,NX)-DZH0P
-        TR_H1PO4_band_soil(L,NY,NX)=TR_H1PO4_band_soil(L,NY,NX)-DZH1P
-        TR_H2PO4_band_soil(L,NY,NX)=TR_H2PO4_band_soil(L,NY,NX)-DZH2P
+        trcn_RChem_band_soil(ids_H1PO4B,L,NY,NX)=trcn_RChem_band_soil(ids_H1PO4B,L,NY,NX)-DZH1P
+        trcn_RChem_band_soil(ids_H2PO4B,L,NY,NX)=trcn_RChem_band_soil(ids_H2PO4B,L,NY,NX)-DZH2P
         trcSalt_TR(idsalt_H3PO4B,L,NY,NX)=trcSalt_TR(idsalt_H3PO4B,L,NY,NX)-DZH3P
         trcSalt_TR(idsalt_FeHPO4B,L,NY,NX)=trcSalt_TR(idsalt_FeHPO4B,L,NY,NX)-DZF1P
         trcSalt_TR(idsalt_FeH2PO4B,L,NY,NX)=trcSalt_TR(idsalt_FeH2PO4B,L,NY,NX)-DZF2P
@@ -697,16 +697,16 @@ module SoluteMod
         trcx_TR(idx_OHpB,L,NY,NX)=trcx_TR(idx_OHpB,L,NY,NX)-DXOH2
         trcx_TR(idx_HPO4B,L,NY,NX)=trcx_TR(idx_HPO4B,L,NY,NX)-DXH1P
         trcx_TR(idx_H2PO4B,L,NY,NX)=trcx_TR(idx_H2PO4B,L,NY,NX)-DXH2P
-        trcp_TR(idsp_AlPO4,L,NY,NX)=trcp_TR(idsp_AlPO4,L,NY,NX)+DPALP
-        trcp_TR(idsp_FePO4,L,NY,NX)=trcp_TR(idsp_FePO4,L,NY,NX)+DPFEP
-        trcp_TR(idsp_CaHPO4,L,NY,NX)=trcp_TR(idsp_CaHPO4,L,NY,NX)+DPCDP
-        trcp_TR(idsp_HA,L,NY,NX)=trcp_TR(idsp_HA,L,NY,NX)+DPCHP
-        trcp_TR(idsp_CaH4P2O8,L,NY,NX)=trcp_TR(idsp_CaH4P2O8,L,NY,NX)+DPCMP
-        trcp_TR(idsp_AlPO4B,L,NY,NX)=trcp_TR(idsp_AlPO4B,L,NY,NX)-DPALP
-        trcp_TR(idsp_FePO4B,L,NY,NX)=trcp_TR(idsp_FePO4B,L,NY,NX)-DPFEP
-        trcp_TR(idsp_CaHPO4B,L,NY,NX)=trcp_TR(idsp_CaHPO4B,L,NY,NX)-DPCDP
-        trcp_TR(idsp_HAB,L,NY,NX)=trcp_TR(idsp_HAB,L,NY,NX)-DPCHP
-        trcp_TR(idsp_CaH4P2O8B,L,NY,NX)=trcp_TR(idsp_CaH4P2O8B,L,NY,NX)-DPCMP
+        trcp_RChem_soil(idsp_AlPO4,L,NY,NX)=trcp_RChem_soil(idsp_AlPO4,L,NY,NX)+DPALP
+        trcp_RChem_soil(idsp_FePO4,L,NY,NX)=trcp_RChem_soil(idsp_FePO4,L,NY,NX)+DPFEP
+        trcp_RChem_soil(idsp_CaHPO4,L,NY,NX)=trcp_RChem_soil(idsp_CaHPO4,L,NY,NX)+DPCDP
+        trcp_RChem_soil(idsp_HA,L,NY,NX)=trcp_RChem_soil(idsp_HA,L,NY,NX)+DPCHP
+        trcp_RChem_soil(idsp_CaH4P2O8,L,NY,NX)=trcp_RChem_soil(idsp_CaH4P2O8,L,NY,NX)+DPCMP
+        trcp_RChem_soil(idsp_AlPO4B,L,NY,NX)=trcp_RChem_soil(idsp_AlPO4B,L,NY,NX)-DPALP
+        trcp_RChem_soil(idsp_FePO4B,L,NY,NX)=trcp_RChem_soil(idsp_FePO4B,L,NY,NX)-DPFEP
+        trcp_RChem_soil(idsp_CaHPO4B,L,NY,NX)=trcp_RChem_soil(idsp_CaHPO4B,L,NY,NX)-DPCDP
+        trcp_RChem_soil(idsp_HAB,L,NY,NX)=trcp_RChem_soil(idsp_HAB,L,NY,NX)-DPCHP
+        trcp_RChem_soil(idsp_CaH4P2O8B,L,NY,NX)=trcp_RChem_soil(idsp_CaH4P2O8B,L,NY,NX)-DPCMP
       ELSE
         DZH1P=FVLPO4*trc_solml(ids_H1PO4,L,NY,NX)/patomw
         DZH2P=FVLPO4*trc_solml(ids_H2PO4,L,NY,NX)/patomw
@@ -718,26 +718,26 @@ module SoluteMod
         DPCDP=FVLPO4*trcp_salml(idsp_CaHPO4,L,NY,NX)
         DPCHP=FVLPO4*trcp_salml(idsp_HA,L,NY,NX)
         DPCMP=FVLPO4*trcp_salml(idsp_CaH4P2O8,L,NY,NX)
-        TR_H1PO4_soil(L,NY,NX)=TR_H1PO4_soil(L,NY,NX)+DZH1P
-        TR_H2PO4_soil(L,NY,NX)=TR_H2PO4_soil(L,NY,NX)+DZH2P
+        trcn_RChem_soil(ids_H1PO4,L,NY,NX)=trcn_RChem_soil(ids_H1PO4,L,NY,NX)+DZH1P
+        trcn_RChem_soil(ids_H2PO4,L,NY,NX)=trcn_RChem_soil(ids_H2PO4,L,NY,NX)+DZH2P
         trcx_TR(idx_OH,L,NY,NX)=trcx_TR(idx_OH,L,NY,NX)+DXOH1
         trcx_TR(idx_OHp,L,NY,NX)=trcx_TR(idx_OHp,L,NY,NX)+DXOH2
         trcx_TR(idx_H2PO4,L,NY,NX)=trcx_TR(idx_H2PO4,L,NY,NX)+DXH2P
-        TR_H1PO4_band_soil(L,NY,NX)=TR_H1PO4_band_soil(L,NY,NX)-DZH1P
-        TR_H2PO4_band_soil(L,NY,NX)=TR_H2PO4_band_soil(L,NY,NX)-DZH2P
+        trcn_RChem_band_soil(ids_H1PO4B,L,NY,NX)=trcn_RChem_band_soil(ids_H1PO4B,L,NY,NX)-DZH1P
+        trcn_RChem_band_soil(ids_H2PO4B,L,NY,NX)=trcn_RChem_band_soil(ids_H2PO4B,L,NY,NX)-DZH2P
         trcx_TR(idx_OHB,L,NY,NX)=trcx_TR(idx_OHB,L,NY,NX)-DXOH1
         trcx_TR(idx_OHpB,L,NY,NX)=trcx_TR(idx_OHpB,L,NY,NX)-DXOH2
         trcx_TR(idx_H2PO4B,L,NY,NX)=trcx_TR(idx_H2PO4B,L,NY,NX)-DXH2P
-        trcp_TR(idsp_AlPO4,L,NY,NX)=trcp_TR(idsp_AlPO4,L,NY,NX)+DPALP
-        trcp_TR(idsp_FePO4,L,NY,NX)=trcp_TR(idsp_FePO4,L,NY,NX)+DPFEP
-        trcp_TR(idsp_CaHPO4,L,NY,NX)=trcp_TR(idsp_CaHPO4,L,NY,NX)+DPCDP
-        trcp_TR(idsp_HA,L,NY,NX)=trcp_TR(idsp_HA,L,NY,NX)+DPCHP
-        trcp_TR(idsp_CaH4P2O8,L,NY,NX)=trcp_TR(idsp_CaH4P2O8,L,NY,NX)+DPCMP
-        trcp_TR(idsp_AlPO4B,L,NY,NX)=trcp_TR(idsp_AlPO4B,L,NY,NX)-DPALP
-        trcp_TR(idsp_FePO4B,L,NY,NX)=trcp_TR(idsp_FePO4B,L,NY,NX)-DPFEP
-        trcp_TR(idsp_CaHPO4B,L,NY,NX)=trcp_TR(idsp_CaHPO4B,L,NY,NX)-DPCDP
-        trcp_TR(idsp_HAB,L,NY,NX)=trcp_TR(idsp_HAB,L,NY,NX)-DPCHP
-        trcp_TR(idsp_CaH4P2O8B,L,NY,NX)=trcp_TR(idsp_CaH4P2O8B,L,NY,NX)-DPCMP
+        trcp_RChem_soil(idsp_AlPO4,L,NY,NX)=trcp_RChem_soil(idsp_AlPO4,L,NY,NX)+DPALP
+        trcp_RChem_soil(idsp_FePO4,L,NY,NX)=trcp_RChem_soil(idsp_FePO4,L,NY,NX)+DPFEP
+        trcp_RChem_soil(idsp_CaHPO4,L,NY,NX)=trcp_RChem_soil(idsp_CaHPO4,L,NY,NX)+DPCDP
+        trcp_RChem_soil(idsp_HA,L,NY,NX)=trcp_RChem_soil(idsp_HA,L,NY,NX)+DPCHP
+        trcp_RChem_soil(idsp_CaH4P2O8,L,NY,NX)=trcp_RChem_soil(idsp_CaH4P2O8,L,NY,NX)+DPCMP
+        trcp_RChem_soil(idsp_AlPO4B,L,NY,NX)=trcp_RChem_soil(idsp_AlPO4B,L,NY,NX)-DPALP
+        trcp_RChem_soil(idsp_FePO4B,L,NY,NX)=trcp_RChem_soil(idsp_FePO4B,L,NY,NX)-DPFEP
+        trcp_RChem_soil(idsp_CaHPO4B,L,NY,NX)=trcp_RChem_soil(idsp_CaHPO4B,L,NY,NX)-DPCDP
+        trcp_RChem_soil(idsp_HAB,L,NY,NX)=trcp_RChem_soil(idsp_HAB,L,NY,NX)-DPCHP
+        trcp_RChem_soil(idsp_CaH4P2O8B,L,NY,NX)=trcp_RChem_soil(idsp_CaH4P2O8B,L,NY,NX)-DPCMP
       ENDIF
     ELSE
 !
@@ -871,10 +871,10 @@ module SoluteMod
 !
       DNO3S=FVLNO3*trc_solml(ids_NO3,L,NY,NX)/natomw
       DNO2S=FVLNO3*trc_solml(ids_NO2,L,NY,NX)/natomw
-      TRNO3(L,NY,NX)=TRNO3(L,NY,NX)+DNO3S
-      TRNO2(L,NY,NX)=TRNO2(L,NY,NX)+DNO2S
-      TRNOB(L,NY,NX)=TRNOB(L,NY,NX)-DNO3S
-      TRN2B(L,NY,NX)=TRN2B(L,NY,NX)-DNO2S
+      trcn_RChem_soil(ids_NO3,L,NY,NX)=trcn_RChem_soil(ids_NO3,L,NY,NX)+DNO3S
+      trcn_RChem_soil(ids_NO2,L,NY,NX)=trcn_RChem_soil(ids_NO2,L,NY,NX)+DNO2S
+      trcn_RChem_band_soil(ids_NO3B,L,NY,NX)=trcn_RChem_band_soil(ids_NO3B,L,NY,NX)-DNO3S
+      trcn_RChem_band_soil(ids_NO2B,L,NY,NX)=trcn_RChem_band_soil(ids_NO2B,L,NY,NX)-DNO2S
     ELSE
 !
 !     AMALGAMATE NO3 BAND WITH NON-BAND IF BAND NO LONGER EXISTS
@@ -1215,29 +1215,29 @@ module SoluteMod
 !     TR_AlPO4_precip_soil,TR_FePO4_precip_soil,TR_CaHPO4_precip_soil,TR_apatite_precip_soil,TR_CaH4P2O8_precip_soil
 !     =total AlPO4,FePO4,CaHPO4,apatite,Ca(H2PO4)2 precipitation
 !
-      TR_NH4_soil(0,NY,NX)=TR_NH4_soil(0,NY,NX)+RN4S*VLWatMicPM(NPH,0,NY,NX)
+      trcn_RChem_soil(ids_NH4,0,NY,NX)=trcn_RChem_soil(ids_NH4,0,NY,NX)+RN4S*VLWatMicPM(NPH,0,NY,NX)
       TR_NH3_soil(0,NY,NX)=TR_NH3_soil(0,NY,NX)+RN3S*VLWatMicPM(NPH,0,NY,NX)
-      TR_H1PO4_soil(0,NY,NX)=TR_H1PO4_soil(0,NY,NX)+RHP1*VLWatMicPM(NPH,0,NY,NX)
-      TR_H2PO4_soil(0,NY,NX)=TR_H2PO4_soil(0,NY,NX)+RHP2*VLWatMicPM(NPH,0,NY,NX)
+      trcn_RChem_soil(ids_H1PO4,0,NY,NX)=trcn_RChem_soil(ids_H1PO4,0,NY,NX)+RHP1*VLWatMicPM(NPH,0,NY,NX)
+      trcn_RChem_soil(ids_H2PO4,0,NY,NX)=trcn_RChem_soil(ids_H2PO4,0,NY,NX)+RHP2*VLWatMicPM(NPH,0,NY,NX)
       trcx_TR(idx_NH4,0,NY,NX)=trcx_TR(idx_NH4,0,NY,NX)+RXN4*VLWatMicPM(NPH,0,NY,NX)
-      trcp_TR(idsp_AlPO4,0,NY,NX)=trcp_TR(idsp_AlPO4,0,NY,NX)+H2PO4_1e_AlPO4_dissol_flx*VLWatMicPM(NPH,0,NY,NX)
-      trcp_TR(idsp_FePO4,0,NY,NX)=trcp_TR(idsp_FePO4,0,NY,NX)+H2PO4_1e_FePO4_dissol_flx*VLWatMicPM(NPH,0,NY,NX)
-      trcp_TR(idsp_CaHPO4,0,NY,NX)=trcp_TR(idsp_CaHPO4,0,NY,NX)+H2PO4_1e_CaHPO4_dissol_flx*VLWatMicPM(NPH,0,NY,NX)
-      trcp_TR(idsp_HA,0,NY,NX)=trcp_TR(idsp_HA,0,NY,NX)+H2PO4_1e_apatite_dissol_flx*VLWatMicPM(NPH,0,NY,NX)
-      trcp_TR(idsp_CaH4P2O8,0,NY,NX)=trcp_TR(idsp_CaH4P2O8,0,NY,NX)+H2PO4_1e_CaH4P2O8_dissol_flx*VLWatMicPM(NPH,0,NY,NX)
+      trcp_RChem_soil(idsp_AlPO4,0,NY,NX)=trcp_RChem_soil(idsp_AlPO4,0,NY,NX)+H2PO4_1e_AlPO4_dissol_flx*VLWatMicPM(NPH,0,NY,NX)
+      trcp_RChem_soil(idsp_FePO4,0,NY,NX)=trcp_RChem_soil(idsp_FePO4,0,NY,NX)+H2PO4_1e_FePO4_dissol_flx*VLWatMicPM(NPH,0,NY,NX)
+      trcp_RChem_soil(idsp_CaHPO4,0,NY,NX)=trcp_RChem_soil(idsp_CaHPO4,0,NY,NX)+H2PO4_1e_CaHPO4_dissol_flx*VLWatMicPM(NPH,0,NY,NX)
+      trcp_RChem_soil(idsp_HA,0,NY,NX)=trcp_RChem_soil(idsp_HA,0,NY,NX)+H2PO4_1e_apatite_dissol_flx*VLWatMicPM(NPH,0,NY,NX)
+      trcp_RChem_soil(idsp_CaH4P2O8,0,NY,NX)=trcp_RChem_soil(idsp_CaH4P2O8,0,NY,NX)+H2PO4_1e_CaH4P2O8_dissol_flx*VLWatMicPM(NPH,0,NY,NX)
       FertN_soil(ifert_nh4,0,NY,NX)=FertN_soil(ifert_nh4,0,NY,NX)-RSN4AA
       FertN_soil(ifert_nh3,0,NY,NX)=FertN_soil(ifert_nh3,0,NY,NX)-RSN3AA
       FertN_soil(ifert_urea,0,NY,NX)=FertN_soil(ifert_urea,0,NY,NX)-RSNUAA
       FertN_soil(ifert_no3,0,NY,NX)=FertN_soil(ifert_no3,0,NY,NX)-RSNOAA
-      TR_NH4_soil(0,NY,NX)=TR_NH4_soil(0,NY,NX)+RSN4AA
+      trcn_RChem_soil(ids_NH4,0,NY,NX)=trcn_RChem_soil(ids_NH4,0,NY,NX)+RSN4AA
       TR_NH3_soil(0,NY,NX)=TR_NH3_soil(0,NY,NX)+RSN3AA+RSNUAA
-      TRNO3(0,NY,NX)=TRNO3(0,NY,NX)+RSNOAA
-      TR_NH4_soil(0,NY,NX)=TR_NH4_soil(0,NY,NX)*natomw
+      trcn_RChem_soil(ids_NO3,0,NY,NX)=trcn_RChem_soil(ids_NO3,0,NY,NX)+RSNOAA
+      trcn_RChem_soil(ids_NH4,0,NY,NX)=trcn_RChem_soil(ids_NH4,0,NY,NX)*natomw
       TR_NH3_soil(0,NY,NX)=TR_NH3_soil(0,NY,NX)*natomw
-      TRNO3(0,NY,NX)=TRNO3(0,NY,NX)*natomw
-      TR_H1PO4_soil(0,NY,NX)=TR_H1PO4_soil(0,NY,NX)*patomw
-      TR_H2PO4_soil(0,NY,NX)=TR_H2PO4_soil(0,NY,NX)*patomw
-!     WRITE(*,9989)'TR_NH4_soil',I,J,TR_NH4_soil(0,NY,NX)
+      trcn_RChem_soil(ids_NO3,0,NY,NX)=trcn_RChem_soil(ids_NO3,0,NY,NX)*natomw
+      trcn_RChem_soil(ids_H1PO4,0,NY,NX)=trcn_RChem_soil(ids_H1PO4,0,NY,NX)*patomw
+      trcn_RChem_soil(ids_H2PO4,0,NY,NX)=trcn_RChem_soil(ids_H2PO4,0,NY,NX)*patomw
+!     WRITE(*,9989)'TR_NH4_soil',I,J,trcn_RChem_soil(ids_NH4,0,NY,NX)
 !    2,RN4S,RNH4,RXN4,RSN4AA,VLWatMicPM(NPH,0,NY,NX)
 !    3,SPNH4,FertN_soil(ifert_nh4,0,NY,NX),ThetaWLitR
 !9989  FORMAT(A8,2I4,12E12.4)

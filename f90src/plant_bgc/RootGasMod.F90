@@ -34,7 +34,7 @@ module RootGasMod
   real(r8) :: CGSGL1,CHSGL1,CLSGL1
   real(r8) :: CQSGL1,CH4G1,CCO2S1,COXYS1,trcg_gcon(idg_beg:idg_end-1)
   real(r8) :: CCO2P1,COXYP1,COXYR,CO2PX,CH4PX
-  real(r8) :: DIFOP,DIFCL,DIFZL,DIFNL,DIFNB,DIFHL,DIFOX,DFGSP
+  real(r8) :: DIFOP,DIFCL,DIFZL,DIFNL,DIFNB,DIFHL,DIFOX,DiffusivitySolutEffP
   real(r8) :: DFCOA,DFOXA,DFCHA,DFN2A,DFNHA,DFHGA,DFGP,DIFOL
   real(r8) :: H2GP1,H2GS1,HGSGL1,HLSGL1,H2GG1,H2GPX
   real(r8) :: OXYP1,OXYG1,OXYS1,OGSGL1
@@ -110,7 +110,7 @@ module RootGasMod
     VLSoilMicP   =>  plt_soilchem%VLSoilMicP , &
     THETPM =>  plt_soilchem%THETPM,&
     trc_gasml=> plt_soilchem%trc_gasml,&
-    DFGS   =>  plt_soilchem%DFGS , &
+    DiffusivitySolutEff   =>  plt_soilchem%DiffusivitySolutEff , &
     IDAY   =>  plt_pheno%IDAY    , &
     RootPoreTortu4Gas  =>  plt_morph%RootPoreTortu4Gas   , &
     PrimRootRadius  =>  plt_morph%PrimRootRadius   , &
@@ -526,7 +526,7 @@ module RootGasMod
 !
 !     THETPM,THETX=air-filled porosity,minimum THETPM
 !     R*DFQ=soil gas exchange between gaseous-aqueous phases
-!     DFGS=rate constant for soil gas exchange from watsub.f
+!     DiffusivitySolutEff=rate constant for soil gas exchange from watsub.f
 !     CO2G1,CO2S1=gaseous,aqueous CO2 in soil
 !     OXYG1,OXYS1=gaseous,aqueous O2 in soil
 !     CH4G1,CH4S1=gaseous,aqueous CH4 in soil
@@ -545,21 +545,21 @@ module RootGasMod
 !     VOLW*=VLWatMicPMM*gas solubility
 !
           IF(THETPM(M,L).GT.THETX)THEN
-            DFGSP=FracPRoot4Uptake(N,L,NZ)*DFGS(M,L)
-            RCODFQ=DFGSP*(AMAX1(ZEROP(NZ),CO2G1)*VOLWCO &
+            DiffusivitySolutEffP=FracPRoot4Uptake(N,L,NZ)*DiffusivitySolutEff(M,L)
+            RCODFQ=DiffusivitySolutEffP*(AMAX1(ZEROP(NZ),CO2G1)*VOLWCO &
               -(AMAX1(ZEROS,CO2S1)-RCO2SX)*VLsoiAirPMM)/(VOLWCO+VLsoiAirPMM)
             RUPOST=RUPOSX-ROXYLX
-            ROXDFQ=DFGSP*(AMAX1(ZEROP(NZ),OXYG1)*VOLWOX &
+            ROXDFQ=DiffusivitySolutEffP*(AMAX1(ZEROP(NZ),OXYG1)*VOLWOX &
               -(AMAX1(ZEROS,OXYS1)-RUPOST)*VLsoiAirPMM)/(VOLWOX+VLsoiAirPMM)
             IF(N.EQ.1)THEN
-              RCHDFQ=DFGSP*(AMAX1(ZEROP(NZ),CH4G1)*VOLWCH &
+              RCHDFQ=DiffusivitySolutEffP*(AMAX1(ZEROP(NZ),CH4G1)*VOLWCH &
                 -(AMAX1(ZEROS,CH4S1)-RUPCSX)*VLsoiAirPMM)/(VOLWCH+VLsoiAirPMM)
-              RN2DFQ=DFGSP*(AMAX1(ZEROP(NZ),Z2OG1)*VOLWN2 &
+              RN2DFQ=DiffusivitySolutEffP*(AMAX1(ZEROP(NZ),Z2OG1)*VOLWN2 &
                 -(AMAX1(ZEROS,Z2OS1)-RUPZSX)*VLsoiAirPMM)/(VOLWN2+VLsoiAirPMM)
               IF(VLWatMicPNH+VOLPNH.GT.ZEROP(NZ))THEN
                 ZH3GA=ZH3G1*trcs_VLN(ids_NH4,L)
                 RNHDFQ=AMIN1(RUPNSX,AMAX1(-RUPNSX &
-                  ,DFGSP*(AMAX1(ZEROP(NZ),ZH3GA)*VLWatMicPNH &
+                  ,DiffusivitySolutEffP*(AMAX1(ZEROP(NZ),ZH3GA)*VLWatMicPNH &
                   -(AMAX1(ZEROS,ZH3S1)-RUPNSX)*VOLPNH)/(VLWatMicPNH+VOLPNH)))
               ELSE
                 RNHDFQ=0.0_r8
@@ -567,12 +567,12 @@ module RootGasMod
               IF(VOLWNB+VOLPNB.GT.ZEROP(NZ))THEN
                 ZH3GB=ZH3G1*trcs_VLN(ids_NH4B,L)
                 RNBDFQ=AMIN1(RUPNSX,AMAX1(-RUPNSX &
-                  ,DFGSP*(AMAX1(ZEROP(NZ),ZH3GB)*VOLWNB &
+                  ,DiffusivitySolutEffP*(AMAX1(ZEROP(NZ),ZH3GB)*VOLWNB &
                   -(AMAX1(ZEROS,ZH3B1)-RUPNBX)*VOLPNB)/(VOLWNB+VOLPNB)))
               ELSE
                 RNBDFQ=0.0_r8
               ENDIF
-              RHGDFQ=DFGSP*(AMAX1(ZEROP(NZ),H2GG1)*VOLWHG &
+              RHGDFQ=DiffusivitySolutEffP*(AMAX1(ZEROP(NZ),H2GG1)*VOLWHG &
                 -(AMAX1(ZEROS,H2GS1)-RUPHGX)*VLsoiAirPMM)/(VOLWHG+VLsoiAirPMM)
             ELSE
               RCHDFQ=0.0_r8

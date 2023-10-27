@@ -92,10 +92,7 @@ implicit none
   real(r8),target,allocatable ::  RH2PO4MicbTransf_vr(:,:,:)                       !net microbial PO4 exchange nonband, [g d-2 h-1]
   real(r8),target,allocatable ::  RNH4MicbTransf_vr(:,:,:)                       !net microbial NH4 exchange non-band, [g d-2 h-1]
   real(r8),target,allocatable ::  RNO3MicbTransf_vr(:,:,:)                       !net microbial NO3 exchange non-band, [g d-2 h-1]
-  real(r8),target,allocatable ::  XOQCS(:,:,:,:)                     !net microbial DOC flux, [g d-2 h-1]
-  real(r8),target,allocatable ::  XOQNS(:,:,:,:)                     !net microbial DON flux, [g d-2 h-1]
-  real(r8),target,allocatable ::  XOQPS(:,:,:,:)                     !net microbial DOP flux, [g d-2 h-1]
-  real(r8),target,allocatable ::  XOQAS(:,:,:,:)                     !net microbial acetate flux, [g d-2 h-1]
+  real(r8),target,allocatable ::  RDOM_micb_flx(:,:,:,:,:)                     !net microbial DOC flux, [g d-2 h-1]
   real(r8),target,allocatable ::  TOQCK(:,:,:)                       !total respiration of DOC+DOA in soil layer
   real(r8),target,allocatable ::  VOLQ(:,:,:)                        !soil water volume occupied by microial biomass, [m3 m-3]
   real(r8),target,allocatable ::  TFNQ(:,:,:)                        !constraints of temperature and water potential on microbial activity, []
@@ -125,18 +122,11 @@ implicit none
   real(r8),target,allocatable ::  HeatFlow2Soil(:,:,:,:)                      !convective heat flux micropore, [MJ d-2 h-1]
 
   real(r8),target,allocatable ::  trcs_3DTransp2MicP(:,:,:,:,:)
-  real(r8),target,allocatable ::  XOCFLS(:,:,:,:,:)                  !DOC flux micropore, [g d-2 h-1]
-  real(r8),target,allocatable ::  XONFLS(:,:,:,:,:)                  !DON flux micropore, [g d-2 h-1]
-
-  real(r8),target,allocatable ::  XOAFLS(:,:,:,:,:)                  !aqueous acetate flux, [g d-2 h-1]
+  real(r8),target,allocatable ::  DOM_3DMicp_Transp_flx(:,:,:,:,:,:)                  !DOC flux micropore, [g d-2 h-1]
 
   real(r8),target,allocatable ::  trcs_3DTransp2MacP(:,:,:,:,:)
   real(r8),target,allocatable ::  R3GasADTFlx(:,:,:,:,:)             !3D gaseous fluxes, [g d-2 h-1]
-  real(r8),target,allocatable ::  XOPFLS(:,:,:,:,:)                  !DOP flux micropore, [g d-2 h-1]
-  real(r8),target,allocatable ::  XOCFHS(:,:,:,:,:)                  !DOC flux macropore, [g d-2 h-1]
-  real(r8),target,allocatable ::  XONFHS(:,:,:,:,:)                  !DON flux macropore, [g d-2 h-1]
-  real(r8),target,allocatable ::  XOPFHS(:,:,:,:,:)                  !DOP flux macropore, [g d-2 h-1]
-  real(r8),target,allocatable ::  XOAFHS(:,:,:,:,:)                  !acetate flux macropore, [g d-2 h-1]
+  real(r8),target,allocatable ::  DOM_3DMacp_Transp_flx(:,:,:,:,:,:)                  !DOC flux macropore, [g d-2 h-1]
 
   private :: InitAllocate
   contains
@@ -233,10 +223,7 @@ implicit none
   allocate(RH2PO4MicbTransf_vr(0:JZ,JY,JX));  RH2PO4MicbTransf_vr=0._r8
   allocate(RNH4MicbTransf_vr(0:JZ,JY,JX));  RNH4MicbTransf_vr=0._r8
   allocate(RNO3MicbTransf_vr(0:JZ,JY,JX));  RNO3MicbTransf_vr=0._r8
-  allocate(XOQCS(1:jcplx,0:JZ,JY,JX));XOQCS=0._r8
-  allocate(XOQNS(1:jcplx,0:JZ,JY,JX));XOQNS=0._r8
-  allocate(XOQPS(1:jcplx,0:JZ,JY,JX));XOQPS=0._r8
-  allocate(XOQAS(1:jcplx,0:JZ,JY,JX));XOQAS=0._r8
+  allocate(RDOM_micb_flx(idom_beg:idom_end,1:jcplx,0:JZ,JY,JX));RDOM_micb_flx=0._r8
   allocate(TOQCK(0:JZ,JY,JX));  TOQCK=0._r8
   allocate(VOLQ(0:JZ,JY,JX));   VOLQ=0._r8
   allocate(TFNQ(0:JZ,JY,JX));   TFNQ=0._r8
@@ -267,17 +254,11 @@ implicit none
   allocate(HeatFlow2Soil(3,JD,JV,JH));   HeatFlow2Soil=0._r8
 
   allocate(trcs_3DTransp2MicP(ids_beg:ids_end,3,0:JD,JV,JH));trcs_3DTransp2MicP=0._r8
-  allocate(XOCFLS(1:jcplx,3,0:JD,JV,JH));XOCFLS=0._r8
-  allocate(XONFLS(1:jcplx,3,0:JD,JV,JH));XONFLS=0._r8
-  allocate(XOAFLS(1:jcplx,3,0:JD,JV,JH));XOAFLS=0._r8
+  allocate(DOM_3DMicp_Transp_flx(idom_beg:idom_end,1:jcplx,3,0:JD,JV,JH));DOM_3DMicp_Transp_flx=0._r8
   allocate(R3GasADTFlx(idg_beg:idg_end,3,JD,JV,JH));R3GasADTFlx=0._r8
   allocate(trcs_3DTransp2MacP(ids_beg:ids_end,3,0:JD,JV,JH));trcs_3DTransp2MacP=0._r8
-  allocate(XOPFLS(1:jcplx,3,0:JD,JV,JH));XOPFLS=0._r8
   allocate(CPO4S(JZ,JY,JX));CPO4S(JZ,JY,JX)=0._r8
-  allocate(XOCFHS(1:jcplx,3,JD,JV,JH));XOCFHS=0._r8
-  allocate(XONFHS(1:jcplx,3,JD,JV,JH));XONFHS=0._r8
-  allocate(XOPFHS(1:jcplx,3,JD,JV,JH));XOPFHS=0._r8
-  allocate(XOAFHS(1:jcplx,3,JD,JV,JH));XOAFHS=0._r8
+  allocate(DOM_3DMacp_Transp_flx(idom_beg:idom_end,1:jcplx,3,JD,JV,JH));DOM_3DMacp_Transp_flx=0._r8
 
   end subroutine InitAllocate
 !------------------------------------------------------------------------------------------
@@ -365,10 +346,7 @@ implicit none
   call destroy(RH2PO4MicbTransf_vr)
   call destroy(RNH4MicbTransf_vr)
   call destroy(RNO3MicbTransf_vr)
-  call destroy(XOQCS)
-  call destroy(XOQNS)
-  call destroy(XOQPS)
-  call destroy(XOQAS)
+  call destroy(RDOM_micb_flx)
   call destroy(TOQCK)
   call destroy(VOLQ)
   call destroy(TFNQ)
@@ -397,15 +375,8 @@ implicit none
   call destroy(WaterFlowSoiMicP)
   call destroy(WaterFlowMacP)
   call destroy(HeatFlow2Soil)
-  call destroy(XOCFLS)
-  call destroy(XONFLS)
-
-  call destroy(XOAFLS)
-  call destroy(XOPFLS)
-  call destroy(XOCFHS)
-  call destroy(XONFHS)
-  call destroy(XOPFHS)
-  call destroy(XOAFHS)
+  call destroy(DOM_3DMicp_Transp_flx)
+  call destroy(DOM_3DMacp_Transp_flx)
   end subroutine DestructSoilBGCData
 
 end module SoilBGCDataType

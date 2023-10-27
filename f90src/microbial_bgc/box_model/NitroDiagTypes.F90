@@ -2,6 +2,7 @@ module NitroDiagTypes
   ! !PUBLIC TYPES:
   use data_kind_mod, only : r8 => DAT_KIND_R8
   USE abortutils, only : destroy
+  use TracerIDMod
   use EcoSiMParDataMod, only : micpar
   implicit none
   save
@@ -313,8 +314,7 @@ type, public :: NitroAQMFluxDiagType
     real(r8),allocatable :: OSAT(:)
     real(r8),allocatable :: TONX(:)
     real(r8),allocatable :: TOPX(:)
-    real(r8),allocatable :: COQC(:)
-    real(r8),allocatable :: COQA(:)
+    real(r8),allocatable :: CDOM(:,:)
   contains
     procedure, public :: Init => nit_omcplxs_init
     procedure, public :: ZeroOut => nit_omcplxs_zero
@@ -1123,8 +1123,7 @@ type, public :: NitroAQMFluxDiagType
   allocate(this%OSAT(1:ncplx))
   allocate(this%TONX(1:ncplx+1))
   allocate(this%TOPX(1:ncplx+1))
-  allocate(this%COQC(1:ncplx))
-  allocate(this%COQA(1:ncplx))
+  allocate(this%CDOM(idom_beg:idom_end,1:ncplx))
   call this%ZeroOut()
   end subroutine nit_omcplxs_init
 !------------------------------------------------------------------------------------------
@@ -1173,8 +1172,7 @@ type, public :: NitroAQMFluxDiagType
   call destroy(this%OSAT)
   call destroy(this%TONX)
   call destroy(this%TOPX)
-  call destroy(this%COQC)
-  call destroy(this%COQA)
+  call destroy(this%CDOM)
 
   end subroutine nit_omcplxs_destroy
 end module NitroDiagTypes

@@ -947,7 +947,7 @@ module StartsMod
   NPR=NCYC_LITR     !sub-cycles of litter
   NPS=NCYC_SNOW     !sub-cycles of snow iteration
   dts_HeatWatTP=1.0_r8/NPH
-  XNPT=1.0_r8/NPT
+  dt_GasCyc=1.0_r8/NPT
   dts_gas=1.0_r8/NPG
   XNPR=1.0_r8/NPR
   XNPS=1.0_r8/NPS

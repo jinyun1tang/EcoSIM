@@ -83,7 +83,7 @@ implicit none
   end function TortMacporeW
 
 !------------------------------------------------------------------------------------------
-  pure function fDFGS(scalar,THETWA,Z3SR,is_litter)result(ans)
+  pure function fDiffusivitySolutEff(scalar,THETWA,Z3SR,is_litter)result(ans)
 !
 ! compute coefficient for air-water gas transfer
   implicit none
@@ -120,7 +120,7 @@ implicit none
       ans=AMIN1(1.0_r8,scalar/((Z1S**(-1._r8))*EXP(Z2SD*(THETWA-Z3S))))
     ENDIF
   endif
-  end function fDFGS
+  end function fDiffusivitySolutEff
 !------------------------------------------------------------------------------------------
   pure function fOFFSET(atcs)result(ans)
   implicit none

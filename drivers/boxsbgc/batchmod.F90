@@ -9,6 +9,7 @@ module batchmod
   use MicFLuxTypeMod    , only : micfluxtype
   use MicStateTraitTypeMod, only : micsttype
   use fileUtil
+  use TracerIDMod
   use minimathmod    , only : AZMAX1,AZMIN1
   use EcoSIMSolverPar
   use MicIDMod
@@ -65,10 +66,10 @@ contains
     JG       => micpar%jguilds    &
   )
 
-  ystates0l(cid_oqc_b:cid_oqc_e)=forc%OQC(1:jcplx)
-  ystates0l(cid_oqn_b:cid_oqn_e)=forc%OQN(1:jcplx)
-  ystates0l(cid_oqp_b:cid_oqp_e)=forc%OQP(1:jcplx)
-  ystates0l(cid_oqa_b:cid_oqa_e)=forc%OQA(1:jcplx)
+  ystates0l(cid_oqc_b:cid_oqc_e)=forc%DOM(idom_doc,1:jcplx)
+  ystates0l(cid_oqn_b:cid_oqn_e)=forc%DOM(idom_don,1:jcplx)
+  ystates0l(cid_oqp_b:cid_oqp_e)=forc%DOM(idom_dop,1:jcplx)
+  ystates0l(cid_oqa_b:cid_oqa_e)=forc%DOM(idom_acetate,1:jcplx)
   ystates0l(cid_ohc_b:cid_ohc_e)=forc%OHC(1:jcplx)
   ystates0l(cid_ohn_b:cid_ohn_e)=forc%OHN(1:jcplx)
   ystates0l(cid_ohp_b:cid_ohp_e)=forc%OHP(1:jcplx)
@@ -235,7 +236,7 @@ contains
   if(micfor%Lsurf)then
     micfor%SoilMicPMassLayer0=forc%SoilMicPMassLayer
   endif
-  micfor%DFGS(1:NPH)  =forc%DFGS
+  micfor%DiffusivitySolutEff(1:NPH)  =forc%DiffusivitySolutEff
   micfor%FILM(1:NPH)  =forc%FILM
   micfor%THETPM(1:NPH)=forc%THETPM
   micfor%VLWatMicPM(1:NPH) =forc%VLWatMicP
@@ -272,10 +273,10 @@ contains
   micstt%ZNFN0=forc%ZNFN0
   micstt%ZNFNI=forc%ZNFNI
 
-  micstt%OQC(1:jcplx)=ystates0l(cid_oqc_b:cid_oqc_e)
-  micstt%OQN(1:jcplx)=ystates0l(cid_oqn_b:cid_oqn_e)
-  micstt%OQP(1:jcplx)=ystates0l(cid_oqp_b:cid_oqp_e)
-  micstt%OQA(1:jcplx)=ystates0l(cid_oqa_b:cid_oqa_e)
+  micstt%DOM(idom_doc,1:jcplx)=ystates0l(cid_oqc_b:cid_oqc_e)
+  micstt%DOM(idom_don,1:jcplx)=ystates0l(cid_oqn_b:cid_oqn_e)
+  micstt%DOM(idom_dop,1:jcplx)=ystates0l(cid_oqp_b:cid_oqp_e)
+  micstt%DOM(idom_acetate,1:jcplx)=ystates0l(cid_oqa_b:cid_oqa_e)
   micstt%OHC(1:jcplx)=ystates0l(cid_ohc_b:cid_ohc_e)
   micstt%OHN(1:jcplx)=ystates0l(cid_ohn_b:cid_ohn_e)
   micstt%OHP(1:jcplx)=ystates0l(cid_ohp_b:cid_ohp_e)
@@ -597,10 +598,10 @@ contains
   ystatesfl(cid_CCH4G)=ystatesfl(cidg_CH4)/micfor%VLsoiAirP
 
 ! the following variables are updated in the microbial model
-  ystatesfl(cid_oqc_b:cid_oqc_e)=micstt%OQC(1:jcplx)
-  ystatesfl(cid_oqn_b:cid_oqn_e)=micstt%OQN(1:jcplx)
-  ystatesfl(cid_oqp_b:cid_oqp_e)=micstt%OQP(1:jcplx)
-  ystatesfl(cid_oqa_b:cid_oqa_e)=micstt%OQA(1:jcplx)
+  ystatesfl(cid_oqc_b:cid_oqc_e)=micstt%DOM(idom_doc,1:jcplx)
+  ystatesfl(cid_oqn_b:cid_oqn_e)=micstt%DOM(idom_don,1:jcplx)
+  ystatesfl(cid_oqp_b:cid_oqp_e)=micstt%DOM(idom_dop,1:jcplx)
+  ystatesfl(cid_oqa_b:cid_oqa_e)=micstt%DOM(idom_acetate,1:jcplx)
   ystatesfl(cid_ohc_b:cid_ohc_e)=micstt%OHC(1:jcplx)
   ystatesfl(cid_ohn_b:cid_ohn_e)=micstt%OHN(1:jcplx)
   ystatesfl(cid_ohp_b:cid_ohp_e)=micstt%OHP(1:jcplx)
@@ -1322,10 +1323,10 @@ contains
   real(r8) :: CH2GG2
   real(r8) :: VLWatMicPMA,VLWatMicPMB
   real(r8) :: DLYR1,TortMicPM1
-  real(r8) :: DFGSCO,DFGSCH
-  real(r8) :: DFGSOX,DFGSNG
-  real(r8) :: DFGSN2,DFGSN3
-  real(r8) :: DFGSHL
+  real(r8) :: DiffusivitySolutEffCO,DiffusivitySolutEffCH
+  real(r8) :: DiffusivitySolutEffOX,DiffusivitySolutEffNG
+  real(r8) :: DiffusivitySolutEffN2,DiffusivitySolutEffN3
+  real(r8) :: DiffusivitySolutEffHL
   real(r8) :: RCODXS,RCODFS
   real(r8) :: RCHDXS,RCHDFS
   real(r8) :: ROXDXS,ROXDFS
@@ -1439,7 +1440,7 @@ contains
   DFVHGG=0._r8
 
   DO MM=1,NPG
-    M=MIN(NPH,INT((MM-1)*XNPT)+1)
+    M=MIN(NPH,INT((MM-1)*dt_GasCyc)+1)
 
     if(VLsoiAirP>ZEROS2)then
       !gaseous flux between atmosphere and soil
@@ -1499,31 +1500,31 @@ contains
 !   between atmosphere and topsoil
       DLYR1=forc%DLYR3
       TortMicPM1=forc%TortMicPM*forc%AREA3/(0.5_r8*DLYR1)
-      DFGSCO=forc%CLSGL*TortMicPM1*dts_HeatWatTP
-      DFGSCH=forc%CQSGL*TortMicPM1*dts_HeatWatTP
-      DFGSOX=forc%OLSGL*TortMicPM1*dts_HeatWatTP
-      DFGSNG=forc%ZLSGL*TortMicPM1*dts_HeatWatTP
-      DFGSN2=forc%ZNSGL*TortMicPM1*dts_HeatWatTP
-      DFGSN3=forc%ZVSGL*TortMicPM1*dts_HeatWatTP
-      DFGSHL=forc%HLSGL*TortMicPM1*dts_HeatWatTP
+      DiffusivitySolutEffCO=forc%CLSGL*TortMicPM1*dts_HeatWatTP
+      DiffusivitySolutEffCH=forc%CQSGL*TortMicPM1*dts_HeatWatTP
+      DiffusivitySolutEffOX=forc%OLSGL*TortMicPM1*dts_HeatWatTP
+      DiffusivitySolutEffNG=forc%ZLSGL*TortMicPM1*dts_HeatWatTP
+      DiffusivitySolutEffN2=forc%ZNSGL*TortMicPM1*dts_HeatWatTP
+      DiffusivitySolutEffN3=forc%ZVSGL*TortMicPM1*dts_HeatWatTP
+      DiffusivitySolutEffHL=forc%HLSGL*TortMicPM1*dts_HeatWatTP
 
-      CCO2GQ=(PARG*forc%CCO2E*forc%SCO2L+DFGSCO*CCO2S2)/(DFGSCO+PARG)
-      CCH4GQ=(PARG*forc%CCH4E*forc%SCH4L+DFGSCH*CCH4S2)/(DFGSCH+PARG)
-      COXYGQ=(PARG*forc%COXYE*forc%SOXYL+DFGSOX*COXYS2)/(DFGSOX+PARG)
-      CZ2GGQ=(PARG*forc%CZ2GE*forc%SN2GL+DFGSNG*CZ2GS2)/(DFGSNG+PARG)
-      CZ2OGQ=(PARG*forc%CZ2OE*forc%SN2OL+DFGSN2*CZ2OS2)/(DFGSN2+PARG)
-      CZN3GQ=(PARG*forc%CNH3E*forc%SNH3L+DFGSN3*CNH3S2)/(DFGSN3+PARG)
-      CZN3BQ=(PARG*forc%CNH3E*forc%SNH3L+DFGSN3*CNH3B2)/(DFGSN3+PARG)
-      CH2GGQ=(PARG*forc%CH2GE*forc%SH2GL+DFGSHL*CH2GS2)/(DFGSHL+PARG)
+      CCO2GQ=(PARG*forc%CCO2E*forc%SCO2L+DiffusivitySolutEffCO*CCO2S2)/(DiffusivitySolutEffCO+PARG)
+      CCH4GQ=(PARG*forc%CCH4E*forc%SCH4L+DiffusivitySolutEffCH*CCH4S2)/(DiffusivitySolutEffCH+PARG)
+      COXYGQ=(PARG*forc%COXYE*forc%SOXYL+DiffusivitySolutEffOX*COXYS2)/(DiffusivitySolutEffOX+PARG)
+      CZ2GGQ=(PARG*forc%CZ2GE*forc%SN2GL+DiffusivitySolutEffNG*CZ2GS2)/(DiffusivitySolutEffNG+PARG)
+      CZ2OGQ=(PARG*forc%CZ2OE*forc%SN2OL+DiffusivitySolutEffN2*CZ2OS2)/(DiffusivitySolutEffN2+PARG)
+      CZN3GQ=(PARG*forc%CNH3E*forc%SNH3L+DiffusivitySolutEffN3*CNH3S2)/(DiffusivitySolutEffN3+PARG)
+      CZN3BQ=(PARG*forc%CNH3E*forc%SNH3L+DiffusivitySolutEffN3*CNH3B2)/(DiffusivitySolutEffN3+PARG)
+      CH2GGQ=(PARG*forc%CH2GE*forc%SH2GL+DiffusivitySolutEffHL*CH2GS2)/(DiffusivitySolutEffHL+PARG)
 
-      RCODFS=(CCO2GQ-CCO2S2)*AMIN1(VLWatMicP,DFGSCO)
-      RCHDFS=(CCH4GQ-CCH4S2)*AMIN1(VLWatMicP,DFGSCH)
-      ROXDFS=(COXYGQ-COXYS2)*AMIN1(VLWatMicP,DFGSOX)
-      RNGDFS=(CZ2GGQ-CZ2GS2)*AMIN1(VLWatMicP,DFGSNG)
-      RN2DFS=(CZ2OGQ-CZ2OS2)*AMIN1(VLWatMicP,DFGSN2)
-      RN3DFS=(CZN3GQ-CNH3S2)*AMIN1(VLWatMicP*forc%VLNH4,DFGSN3)
-      RNBDFS=(CZN3BQ-CNH3B2)*AMIN1(VLWatMicP*forc%VLNHB,DFGSN3)
-      RHGDFS=(CH2GGQ-CH2GS2)*AMIN1(VLWatMicP,DFGSHL)
+      RCODFS=(CCO2GQ-CCO2S2)*AMIN1(VLWatMicP,DiffusivitySolutEffCO)
+      RCHDFS=(CCH4GQ-CCH4S2)*AMIN1(VLWatMicP,DiffusivitySolutEffCH)
+      ROXDFS=(COXYGQ-COXYS2)*AMIN1(VLWatMicP,DiffusivitySolutEffOX)
+      RNGDFS=(CZ2GGQ-CZ2GS2)*AMIN1(VLWatMicP,DiffusivitySolutEffNG)
+      RN2DFS=(CZ2OGQ-CZ2OS2)*AMIN1(VLWatMicP,DiffusivitySolutEffN2)
+      RN3DFS=(CZN3GQ-CNH3S2)*AMIN1(VLWatMicP*forc%VLNH4,DiffusivitySolutEffN3)
+      RNBDFS=(CZN3BQ-CNH3B2)*AMIN1(VLWatMicP*forc%VLNHB,DiffusivitySolutEffN3)
+      RHGDFS=(CH2GGQ-CH2GS2)*AMIN1(VLWatMicP,DiffusivitySolutEffHL)
 
 !     accumulate atmospheric dissolution/volatilization
       XCODFS=XCODFS+RCODFS
@@ -1535,14 +1536,14 @@ contains
       XNBDFS=XNBDFS+RNBDFS
       XHGDFS=XHGDFS+RHGDFS
 
-      RCODXS=RCODFS*XNPT
-      RCHDXS=RCHDFS*XNPT
-      ROXDXS=ROXDFS*XNPT
-      RNGDXS=RNGDFS*XNPT
-      RN2DXS=RN2DFS*XNPT
-      RN3DXS=RN3DFS*XNPT
-      RNBDXS=RNBDFS*XNPT
-      RHGDXS=RHGDFS*XNPT
+      RCODXS=RCODFS*dt_GasCyc
+      RCHDXS=RCHDFS*dt_GasCyc
+      ROXDXS=ROXDFS*dt_GasCyc
+      RNGDXS=RNGDFS*dt_GasCyc
+      RN2DXS=RN2DFS*dt_GasCyc
+      RN3DXS=RN3DFS*dt_GasCyc
+      RNBDXS=RNBDFS*dt_GasCyc
+      RHGDXS=RHGDFS*dt_GasCyc
 
   ! dissolution between gaseous and aqueous phases in soil
       VLWatMicPMXA=natomw*VLWatMicPMA
@@ -1566,12 +1567,12 @@ contains
       VOLNBT=VLWatMicPMNB+VLsoiAirPMB
       VOLHGT=VLWatMicPMHG+VLsoiAirP
 
-      RCODFG=forc%DFGS*(AMAX1(ZEROS,CO2G2)*VLWatMicPMCO-AMAX1(ZEROS,CO2S2+RCODXS)*VLsoiAirP)/VOLCOT
-      RCHDFG=forc%DFGS*(AMAX1(ZEROS,CH4G2)*VLWatMicPMCH-AMAX1(ZEROS,CH4S2+RCHDXS)*VLsoiAirP)/VOLCHT
-      ROXDFG=forc%DFGS*(AMAX1(ZEROS,OXYG2)*VLWatMicPMOX-AMAX1(ZEROS,OXYS2+ROXDXS)*VLsoiAirP)/VOLOXT
-      RNGDFG=forc%DFGS*(AMAX1(ZEROS,Z2GG2)*VLWatMicPMNG-AMAX1(ZEROS,Z2GS2+RNGDXS)*VLsoiAirP)/VOLNGT
-      RN2DFG=forc%DFGS*(AMAX1(ZEROS,Z2OG2)*VLWatMicPMN2-AMAX1(ZEROS,Z2OS2+RN2DXS)*VLsoiAirP)/VOLN2T
-      RHGDFG=forc%DFGS*(AMAX1(ZEROS,H2GG2)*VLWatMicPMHG-AMAX1(ZEROS,H2GS2+RHGDXS)*VLsoiAirP)/VOLHGT
+      RCODFG=forc%DiffusivitySolutEff*(AMAX1(ZEROS,CO2G2)*VLWatMicPMCO-AMAX1(ZEROS,CO2S2+RCODXS)*VLsoiAirP)/VOLCOT
+      RCHDFG=forc%DiffusivitySolutEff*(AMAX1(ZEROS,CH4G2)*VLWatMicPMCH-AMAX1(ZEROS,CH4S2+RCHDXS)*VLsoiAirP)/VOLCHT
+      ROXDFG=forc%DiffusivitySolutEff*(AMAX1(ZEROS,OXYG2)*VLWatMicPMOX-AMAX1(ZEROS,OXYS2+ROXDXS)*VLsoiAirP)/VOLOXT
+      RNGDFG=forc%DiffusivitySolutEff*(AMAX1(ZEROS,Z2GG2)*VLWatMicPMNG-AMAX1(ZEROS,Z2GS2+RNGDXS)*VLsoiAirP)/VOLNGT
+      RN2DFG=forc%DiffusivitySolutEff*(AMAX1(ZEROS,Z2OG2)*VLWatMicPMN2-AMAX1(ZEROS,Z2OS2+RN2DXS)*VLsoiAirP)/VOLN2T
+      RHGDFG=forc%DiffusivitySolutEff*(AMAX1(ZEROS,H2GG2)*VLWatMicPMHG-AMAX1(ZEROS,H2GS2+RHGDXS)*VLsoiAirP)/VOLHGT
       XCODFG=XCODFG+RCODFG
       XCHDFG=XCHDFG+RCHDFG
       XOXDFG=XOXDFG+ROXDFG
@@ -1582,14 +1583,14 @@ contains
       XHGDFG=XHGDFG+RHGDFG
 
       IF(VOLN3T.GT.ZEROS2.AND.VLWatMicPMXA.GT.ZEROS2)THEN
-        RN3DFG=forc%DFGS*(AMAX1(ZEROS,ZN3G2)*VLWatMicPMN3-AMAX1(ZEROS,ZNH3S2+RN3DXS)*VLsoiAirPMA)/VOLN3T
+        RN3DFG=forc%DiffusivitySolutEff*(AMAX1(ZEROS,ZN3G2)*VLWatMicPMN3-AMAX1(ZEROS,ZNH3S2+RN3DXS)*VLsoiAirPMA)/VOLN3T
         CNH3S0=AZMAX1((ZNH3S2+RN3DFG)/VLWatMicPMXA)
         CNH4S0=AZMAX1(ZNH4S2)/VLWatMicPMXA
       ELSE
         RN3DFG=0.0_r8
       ENDIF
       IF(VOLNBT.GT.ZEROS2.AND.VLWatMicPMXB.GT.ZEROS2)THEN
-        RNBDFG=forc%DFGS*(AMAX1(ZEROS,ZN3G2)*VLWatMicPMNB-AMAX1(ZEROS,ZNH3B2+RNBDXS)*VLsoiAirPMB)/VOLNBT
+        RNBDFG=forc%DiffusivitySolutEff*(AMAX1(ZEROS,ZN3G2)*VLWatMicPMNB-AMAX1(ZEROS,ZNH3B2+RNBDXS)*VLsoiAirPMB)/VOLNBT
         CNH3B0=AZMAX1((ZNH3B2+RNBDFG)/VLWatMicPMXB)
         CNH4B0=AZMAX1(ZNH4B2)/VLWatMicPMXB
       ELSE
@@ -1742,9 +1743,9 @@ contains
         DP=DP+micstt%ORP(M,K)
       ENDDO
 !solutes in macropores are not subject to microbial attack
-      DC=DC+micstt%OQC(K)+micstt%OHC(K)+micstt%OQA(K)+micstt%OHA(K)  !+micstt%OQCH(K)+micstt%OQAH(K)
-      DN=DN+micstt%OQN(K)+micstt%OHN(K) !+micstt%OQNH(K)
-      DP=DP+micstt%OQP(K)+micstt%OHP(K) !+micstt%OQPH(K)
+      DC=DC+micstt%DOM(idom_doc,K)+micstt%OHC(K)+micstt%DOM(idom_acetate,K)+micstt%OHA(K)  !+micstt%DOM_Macp(idom_doc,K)+micstt%DOM_Macp(idom_acetate,K)
+      DN=DN+micstt%DOM(idom_don,K)+micstt%OHN(K) !+micstt%DOM_Macp(idom_don,K)
+      DP=DP+micstt%DOM(idom_dop,K)+micstt%OHP(K) !+micstt%DOM_Macp(idom_dop,K)
       DO M=1,micpar%jsken
         DC=DC+micstt%OSC(M,K)
         DN=DN+micstt%OSN(M,K)
@@ -1756,9 +1757,9 @@ contains
         ON=ON+micstt%ORN(M,K)
         OP=OP+micstt%ORP(M,K)
       ENDDO
-      OC=OC+micstt%OQC(K)+micstt%OHC(K)+micstt%OQA(K)+micstt%OHA(K)  !micstt%OQAH(K)++micstt%OQCH(K)
-      ON=ON+micstt%OQN(K)+micstt%OHN(K)  !+micstt%OQNH(K)
-      OP=OP+micstt%OQP(K)+micstt%OHP(K)  !+micstt%OQPH(K)
+      OC=OC+micstt%DOM(idom_doc,K)+micstt%OHC(K)+micstt%DOM(idom_acetate,K)+micstt%OHA(K)  !micstt%DOM_Macp(idom_acetate,K)++micstt%DOM_Macp(idom_doc,K)
+      ON=ON+micstt%DOM(idom_don,K)+micstt%OHN(K)  !+micstt%DOM_Macp(idom_don,K)
+      OP=OP+micstt%DOM(idom_dop,K)+micstt%OHP(K)  !+micstt%DOM_Macp(idom_dop,K)
       DO M=1,micpar%jsken
         OC=OC+micstt%OSC(M,K)
         ON=ON+micstt%OSN(M,K)

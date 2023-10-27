@@ -158,9 +158,9 @@ implicit none
   ENDDO
   DO L=NU(NY,NX),NL(NY,NX)
     DO K=1,jcplx
-      XOQCS(K,L,NY,NX)=plt_bgcr%XOQCS(K,L)
-      XOQNS(K,L,NY,NX)=plt_bgcr%XOQNS(K,L)
-      XOQPS(K,L,NY,NX)=plt_bgcr%XOQPS(K,L)
+      RDOM_micb_flx(idom_doc,K,L,NY,NX)=plt_bgcr%RDOM_micb_flx(idom_doc,K,L)
+      RDOM_micb_flx(idom_don,K,L,NY,NX)=plt_bgcr%RDOM_micb_flx(idom_don,K,L)
+      RDOM_micb_flx(idom_dop,K,L,NY,NX)=plt_bgcr%RDOM_micb_flx(idom_dop,K,L)
     ENDDO
     DO M=1,NPH
       ROXSK(M,L,NY,NX)=plt_rbgc%ROXSK(M,L)
@@ -804,9 +804,9 @@ implicit none
     plt_site%DLYR3(L)     =DLYR(3,L,NY,NX)
     DO K=1,jcplx
       plt_soilchem%FOSRH(K,L)=FOSRH(K,L,NY,NX)
-      plt_soilchem%OQC(K,L)=OQC(K,L,NY,NX)
-      plt_soilchem%OQN(K,L)=OQN(K,L,NY,NX)
-      plt_soilchem%OQP(K,L)=OQP(K,L,NY,NX)
+      plt_soilchem%DOM(idom_doc,K,L)=DOM(idom_doc,K,L,NY,NX)
+      plt_soilchem%DOM(idom_don,K,L)=DOM(idom_don,K,L,NY,NX)
+      plt_soilchem%DOM(idom_dop,K,L)=DOM(idom_dop,K,L,NY,NX)
     ENDDO
   ENDDO
 
@@ -951,7 +951,7 @@ implicit none
       plt_site%VLsoiAirPM(M,L)=VLsoiAirPM(M,L,NY,NX)
       plt_site%TortMicPM(M,L)=TortMicPM(M,L,NY,NX)
       plt_site%FILM(M,L)=FILM(M,L,NY,NX)
-      plt_soilchem%DFGS(M,L)=DFGS(M,L,NY,NX)
+      plt_soilchem%DiffusivitySolutEff(M,L)=DiffusivitySolutEff(M,L,NY,NX)
     ENDDO
   ENDDO
 
@@ -998,9 +998,9 @@ implicit none
 
   DO L=0,NL(NY,NX)
     DO K=1,jcplx
-      plt_bgcr%XOQCS(K,L)=XOQCS(K,L,NY,NX)
-      plt_bgcr%XOQNS(K,L)=XOQNS(K,L,NY,NX)
-      plt_bgcr%XOQPS(K,L)=XOQPS(K,L,NY,NX)
+      plt_bgcr%RDOM_micb_flx(idom_doc,K,L)=RDOM_micb_flx(idom_doc,K,L,NY,NX)
+      plt_bgcr%RDOM_micb_flx(idom_don,K,L)=RDOM_micb_flx(idom_don,K,L,NY,NX)
+      plt_bgcr%RDOM_micb_flx(idom_dop,K,L)=RDOM_micb_flx(idom_dop,K,L,NY,NX)
     ENDDO
   ENDDO
 

@@ -75,14 +75,8 @@ implicit none
   real(r8),allocatable :: TOMNERff(:,:,:,:)
   real(r8),allocatable :: TOMPERff(:,:,:,:)
 
-  real(r8),allocatable ::  TOCFLS(:,:,:,:)
-  real(r8),allocatable ::  TONFLS(:,:,:,:)
-  real(r8),allocatable ::  TOPFLS(:,:,:,:)
-  real(r8),allocatable ::  TOAFLS(:,:,:,:)
-  real(r8),allocatable ::  TOCFHS(:,:,:,:)
-  real(r8),allocatable ::  TONFHS(:,:,:,:)
-  real(r8),allocatable ::  TOPFHS(:,:,:,:)
-  real(r8),allocatable ::  TOAFHS(:,:,:,:)
+  real(r8),allocatable ::  DOM_Transp2Micp_flx(:,:,:,:,:)
+  real(r8),allocatable ::  DOM_Transp2Macp_flx(:,:,:,:,:)
   real(r8),allocatable ::  TOCQRS(:,:,:)
   real(r8),allocatable ::  TONQRS(:,:,:)
   real(r8),allocatable ::  TOPQRS(:,:,:)
@@ -173,14 +167,8 @@ implicit none
   allocate(TOMNERff(nlbiomcp,NumOfMicrobsInAutotrophCmplx,JY,JX));TOMNERff=0._r8
   allocate(TOMPERff(nlbiomcp,NumOfMicrobsInAutotrophCmplx,JY,JX));TOMPERff=0._r8
 
-  allocate(TOCFLS(1:jcplx,JZ,JY,JX));TOCFLS=0._r8
-  allocate(TONFLS(1:jcplx,JZ,JY,JX));TONFLS=0._r8
-  allocate(TOPFLS(1:jcplx,JZ,JY,JX));TOPFLS=0._r8
-  allocate(TOAFLS(1:jcplx,JZ,JY,JX));TOAFLS=0._r8
-  allocate(TOCFHS(1:jcplx,JZ,JY,JX));TOCFHS=0._r8
-  allocate(TONFHS(1:jcplx,JZ,JY,JX));TONFHS=0._r8
-  allocate(TOPFHS(1:jcplx,JZ,JY,JX));TOPFHS=0._r8
-  allocate(TOAFHS(1:jcplx,JZ,JY,JX));TOAFHS=0._r8
+  allocate(DOM_Transp2Micp_flx(idom_beg:idom_end,1:jcplx,JZ,JY,JX));DOM_Transp2Micp_flx=0._r8
+  allocate(DOM_Transp2Macp_flx(idom_beg:idom_end,1:jcplx,JZ,JY,JX));DOM_Transp2Macp_flx=0._r8
   allocate(TOCQRS(1:jcplx,JY,JX));TOCQRS=0._r8
   allocate(TONQRS(1:jcplx,JY,JX));TONQRS=0._r8
   allocate(TOPQRS(1:jcplx,JY,JX));TOPQRS=0._r8
@@ -214,14 +202,6 @@ implicit none
   call destroy(TOMCERff)
   call destroy(TOMNERff)
   call destroy(TOMPERff)
-  call destroy(TOCFLS)
-  call destroy(TONFLS)
-  call destroy(TOPFLS)
-  call destroy(TOAFLS)
-  call destroy(TOCFHS)
-  call destroy(TONFHS)
-  call destroy(TOPFHS)
-  call destroy(TOAFHS)
   call destroy(TOCQRS)
   call destroy(TONQRS)
   call destroy(TOPQRS)
@@ -283,7 +263,8 @@ implicit none
   call destroy(VLiceMicP1)
   call destroy(VLWatMacP1)
   call destroy(VLiceMacP1)
-
+  call destroy(DOM_Transp2Micp_flx)
+  call destroy(DOM_Transp2Macp_flx)
   call destroy(trcp_TER)
   call destroy(RTGasADFlx)
 

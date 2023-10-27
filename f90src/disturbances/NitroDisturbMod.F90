@@ -193,10 +193,10 @@ module NitroDisturbMod
 !
 !     REMOVE DOC, DON, DOP
 !
-            OCH=DCORPC*OQC(K,L,NY,NX)
-            OCA=DCORPC*OQA(K,L,NY,NX)
-            ONH=DCORPC*OQN(K,L,NY,NX)
-            OPH=DCORPC*OQP(K,L,NY,NX)
+            OCH=DCORPC*DOM(idom_doc,K,L,NY,NX)
+            OCA=DCORPC*DOM(idom_acetate,K,L,NY,NX)
+            ONH=DCORPC*DOM(idom_don,K,L,NY,NX)
+            OPH=DCORPC*DOM(idom_dop,K,L,NY,NX)
             ONX=EFIRE(1,ITILL(I,NY,NX))*ONH
             OPX=EFIRE(2,ITILL(I,NY,NX))*OPH
             IF(micpar%is_litter(K))THEN
@@ -206,17 +206,17 @@ module NitroDisturbMod
               ONL(1,K)=ONL(1,K)+ONH-ONX
               OPL(1,K)=OPL(1,K)+OPH-OPX
             ENDIF
-            OQC(K,L,NY,NX)=OQC(K,L,NY,NX)-OCH
-            OQA(K,L,NY,NX)=OQA(K,L,NY,NX)-OCA
-            OQN(K,L,NY,NX)=OQN(K,L,NY,NX)-ONH
-            OQP(K,L,NY,NX)=OQP(K,L,NY,NX)-OPH
+            DOM(idom_doc,K,L,NY,NX)=DOM(idom_doc,K,L,NY,NX)-OCH
+            DOM(idom_acetate,K,L,NY,NX)=DOM(idom_acetate,K,L,NY,NX)-OCA
+            DOM(idom_don,K,L,NY,NX)=DOM(idom_don,K,L,NY,NX)-ONH
+            DOM(idom_dop,K,L,NY,NX)=DOM(idom_dop,K,L,NY,NX)-OPH
             OC=OC+OCH+OCA
             ON=ON+ONX
             OP=OP+OPX
-            OCH=DCORPC*OQCH(K,L,NY,NX)
-            ONH=DCORPC*OQNH(K,L,NY,NX)
-            OPH=DCORPC*OQPH(K,L,NY,NX)
-            OAH=DCORPC*OQAH(K,L,NY,NX)
+            OCH=DCORPC*DOM_Macp(idom_doc,K,L,NY,NX)
+            ONH=DCORPC*DOM_Macp(idom_don,K,L,NY,NX)
+            OPH=DCORPC*DOM_Macp(idom_dop,K,L,NY,NX)
+            OAH=DCORPC*DOM_Macp(idom_acetate,K,L,NY,NX)
             ONX=EFIRE(1,ITILL(I,NY,NX))*ONH
             OPX=EFIRE(2,ITILL(I,NY,NX))*OPH
             IF(micpar%is_litter(K))THEN
@@ -226,10 +226,10 @@ module NitroDisturbMod
               ONL(1,K)=ONL(1,K)+ONH-ONX
               OPL(1,K)=OPL(1,K)+OPH-OPX
             ENDIF
-            OQCH(K,L,NY,NX)=OQCH(K,L,NY,NX)-OCH
-            OQNH(K,L,NY,NX)=OQNH(K,L,NY,NX)-ONH
-            OQPH(K,L,NY,NX)=OQPH(K,L,NY,NX)-OPH
-            OQAH(K,L,NY,NX)=OQAH(K,L,NY,NX)-OAH
+            DOM_Macp(idom_doc,K,L,NY,NX)=DOM_Macp(idom_doc,K,L,NY,NX)-OCH
+            DOM_Macp(idom_don,K,L,NY,NX)=DOM_Macp(idom_don,K,L,NY,NX)-ONH
+            DOM_Macp(idom_dop,K,L,NY,NX)=DOM_Macp(idom_dop,K,L,NY,NX)-OPH
+            DOM_Macp(idom_acetate,K,L,NY,NX)=DOM_Macp(idom_acetate,K,L,NY,NX)-OAH
             OC=OC+OCH+OAH
             ON=ON+ONX
             OP=OP+OPX
@@ -253,10 +253,10 @@ module NitroDisturbMod
             OHN(K,L,NY,NX)=OHN(K,L,NY,NX)-ONH
             OHP(K,L,NY,NX)=OHP(K,L,NY,NX)-OPH
             OHA(K,L,NY,NX)=OHA(K,L,NY,NX)-OAH
-            DC=DC+OQC(K,L,NY,NX)+OQCH(K,L,NY,NX)+OHC(K,L,NY,NX) &
-              +OQA(K,L,NY,NX)+OQAH(K,L,NY,NX)+OHA(K,L,NY,NX)
-            DN=DN+OQN(K,L,NY,NX)+OQNH(K,L,NY,NX)+OHN(K,L,NY,NX)
-            DP=DP+OQP(K,L,NY,NX)+OQPH(K,L,NY,NX)+OHP(K,L,NY,NX)
+            DC=DC+DOM(idom_doc,K,L,NY,NX)+DOM_Macp(idom_doc,K,L,NY,NX)+OHC(K,L,NY,NX) &
+              +DOM(idom_acetate,K,L,NY,NX)+DOM_Macp(idom_acetate,K,L,NY,NX)+OHA(K,L,NY,NX)
+            DN=DN+DOM(idom_don,K,L,NY,NX)+DOM_Macp(idom_don,K,L,NY,NX)+OHN(K,L,NY,NX)
+            DP=DP+DOM(idom_dop,K,L,NY,NX)+DOM_Macp(idom_dop,K,L,NY,NX)+OHP(K,L,NY,NX)
             OC=OC+OCH
             ON=ON+ONX
             OP=OP+OPX

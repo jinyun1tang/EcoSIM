@@ -1243,9 +1243,7 @@ module NutUptakeMod
     RTVLW =>  plt_morph%RTVLW    , &
     RDFOME=>  plt_rbgc%RDFOME    , &
     FOSRH =>  plt_soilchem%FOSRH , &
-    OQN   =>  plt_soilchem%OQN   , &
-    OQP   =>  plt_soilchem%OQP   , &
-    OQC   =>  plt_soilchem%OQC     &
+    DOM   =>  plt_soilchem%DOM     &
   )
   !
   !     ROOT EXUDATION OF C, N AND P DEPENDS ON CONCN DIFFERENCES
@@ -1270,14 +1268,14 @@ module NutUptakeMod
     IF(VLWatMicPK.GT.ZEROS2.AND.RTVLW(N,L,NZ).GT.ZEROP(NZ))THEN
       VLWatMicPT=VLWatMicPK+RTVLW(N,L,NZ)
       CPOOLX=AMIN1(1.25E+03_r8*RTVLW(N,L,NZ),EPOOLR(ielmc,N,L,NZ))
-      XFRC=(OQC(K,L)*RTVLW(N,L,NZ)-CPOOLX*VLWatMicPK)/VLWatMicPT
+      XFRC=(DOM(idom_doc,K,L)*RTVLW(N,L,NZ)-CPOOLX*VLWatMicPK)/VLWatMicPT
       RDFOME(ielmc,N,K,L,NZ)=FEXUC*XFRC
-      IF(OQC(K,L).GT.ZEROS.AND.EPOOLR(ielmc,N,L,NZ).GT.ZEROP(NZ))THEN
-        CPOOLT=OQC(K,L)+EPOOLR(ielmc,N,L,NZ)
+      IF(DOM(idom_doc,K,L).GT.ZEROS.AND.EPOOLR(ielmc,N,L,NZ).GT.ZEROP(NZ))THEN
+        CPOOLT=DOM(idom_doc,K,L)+EPOOLR(ielmc,N,L,NZ)
         ZPOOLX=0.1_r8*EPOOLR(ielmn,N,L,NZ)
         PPOOLX=0.1_r8*EPOOLR(ielmp,N,L,NZ)
-        XFRN=(OQN(K,L)*EPOOLR(ielmc,N,L,NZ)-ZPOOLX*OQC(K,L))/CPOOLT
-        XFRP=(OQP(K,L)*EPOOLR(ielmc,N,L,NZ)-PPOOLX*OQC(K,L))/CPOOLT
+        XFRN=(DOM(idom_don,K,L)*EPOOLR(ielmc,N,L,NZ)-ZPOOLX*DOM(idom_doc,K,L))/CPOOLT
+        XFRP=(DOM(idom_dop,K,L)*EPOOLR(ielmc,N,L,NZ)-PPOOLX*DOM(idom_doc,K,L))/CPOOLT
         RDFOME(ielmn,N,K,L,NZ)=FEXUN*XFRN
         RDFOME(ielmp,N,K,L,NZ)=FEXUP*XFRP
       ELSE
@@ -1302,9 +1300,7 @@ module NutUptakeMod
   integer :: K
   !     begin_execution
   associate(                              &
-    XOQCS    =>  plt_bgcr%XOQCS     , &
-    XOQNS    =>  plt_bgcr%XOQNS     , &
-    XOQPS    =>  plt_bgcr%XOQPS     , &
+    RDOM_micb_flx    =>  plt_bgcr%RDOM_micb_flx     , &
     RDFOME   =>  plt_rbgc%RDFOME    , &
     UPOME    =>  plt_rbgc%UPOME     , &
     UPH1P    =>  plt_rbgc%UPH1P     , &
@@ -1325,7 +1321,6 @@ module NutUptakeMod
   !
   !     RDFOMC,RDFOMN,RDFOMP=nonstructl C,N,P exchange:-ve=exudn,+ve=uptake
   !     UPOMC,UPOMN,UPOMP=net PFT root-soil nonstructl C,N,P exchange
-  !     XOQCS,XOQNZ,XOQPS=accumulated change in DOC,DON,DOP from nitro.f
   !     RUPNH4,RUPNHB,RUPN03,RUPNOB=uptake from non-band,band of NH4,NO3
   !     RUPH2P,RUPH2B,RUPH1P,RUPH1B=uptake from non-band,band of H2PO4,HPO4
   !     UPNH4,UPNO3,UPH2P,UPH1P=PFT uptake of NH4,NO3,H2PO4,HPO4
@@ -1334,9 +1329,9 @@ module NutUptakeMod
     UPOME(ielmc,NZ)=UPOME(ielmc,NZ)+RDFOME(ielmc,N,K,L,NZ)
     UPOME(ielmn,NZ)=UPOME(ielmn,NZ)+RDFOME(ielmn,N,K,L,NZ)
     UPOME(ielmp,NZ)=UPOME(ielmp,NZ)+RDFOME(ielmp,N,K,L,NZ)
-    XOQCS(K,L)=XOQCS(K,L)-RDFOME(ielmc,N,K,L,NZ)
-    XOQNS(K,L)=XOQNS(K,L)-RDFOME(ielmn,N,K,L,NZ)
-    XOQPS(K,L)=XOQPS(K,L)-RDFOME(ielmp,N,K,L,NZ)
+    RDOM_micb_flx(idom_doc,K,L)=RDOM_micb_flx(idom_doc,K,L)-RDFOME(ielmc,N,K,L,NZ)
+    RDOM_micb_flx(idom_don,K,L)=RDOM_micb_flx(idom_don,K,L)-RDFOME(ielmn,N,K,L,NZ)
+    RDOM_micb_flx(idom_dop,K,L)=RDOM_micb_flx(idom_dop,K,L)-RDFOME(ielmp,N,K,L,NZ)
   ENDDO D295
   UPNH4(NZ)=UPNH4(NZ)+RUPNH4(N,L,NZ)+RUPNHB(N,L,NZ)
   UPNO3(NZ)=UPNO3(NZ)+RUPNO3(N,L,NZ)+RUPNOB(N,L,NZ)

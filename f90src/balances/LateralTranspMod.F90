@@ -75,7 +75,7 @@ implicit none
 !   with respect to the actual ebullition calculation, which involves
 !   NH3B
 
-    VTGAS=sum(trcg_VOLG(idg_beg:idg_end-1))
+    VTGAS=sum(trcg_VOLG(idg_beg:idg_NH3))
 
     !air-concentration insignificant, or total gas volume > allwed air
     !LX==1, then too less air, or gas pressure > atmosphere
@@ -218,21 +218,15 @@ implicit none
 !     INITIALIZE GAS AND SOLUTE NET FLUX ACCUMULATORS WITHIN SOIL
 !
     D8595: DO K=1,jcplx
-      TOCFLS(K,L,NY,NX)=0.0_r8
-      TONFLS(K,L,NY,NX)=0.0_r8
-      TOPFLS(K,L,NY,NX)=0.0_r8
-      TOAFLS(K,L,NY,NX)=0.0_r8
-      TOCFHS(K,L,NY,NX)=0.0_r8
-      TONFHS(K,L,NY,NX)=0.0_r8
-      TOPFHS(K,L,NY,NX)=0.0_r8
-      TOAFHS(K,L,NY,NX)=0.0_r8
+      DOM_Transp2Micp_flx(idom_beg:idom_end,K,L,NY,NX)=0.0_r8      
+      DOM_Transp2Macp_flx(idom_beg:idom_end,K,L,NY,NX)=0.0_r8
     ENDDO D8595
 
     trcs_TFLS(ids_beg:ids_end,L,NY,NX)=0.0_r8
 
     trcs_TFHS(ids_beg:ids_end,L,NY,NX)=0.0_r8
 
-    RTGasADFlx(idg_beg:idg_end-1,L,NY,NX)=0.0_r8
+    RTGasADFlx(idg_beg:idg_NH3,L,NY,NX)=0.0_r8
 
     IF(salt_model)THEN
       trcSalt_TFLS(idsalt_beg:idsaltb_end,L,NY,NX)=0.0_r8
@@ -264,10 +258,10 @@ implicit none
     !heat flux
     THeat2GridBySurfRunoff(N2,N1)=THeat2GridBySurfRunoff(N2,N1)+Heat2GridBySurfRunoff(N,NN,N2,N1)
     D8590: DO K=1,micpar%NumOfLitrCmplxs
-      TOCQRS(K,N2,N1)=TOCQRS(K,N2,N1)+XOCQRS(K,N,NN,N2,N1)
-      TONQRS(K,N2,N1)=TONQRS(K,N2,N1)+XONQRS(K,N,NN,N2,N1)
-      TOPQRS(K,N2,N1)=TOPQRS(K,N2,N1)+XOPQRS(K,N,NN,N2,N1)
-      TOAQRS(K,N2,N1)=TOAQRS(K,N2,N1)+XOAQRS(K,N,NN,N2,N1)
+      TOCQRS(K,N2,N1)=TOCQRS(K,N2,N1)+dom_2DFloXSurRunoff(idom_doc,K,N,NN,N2,N1)
+      TONQRS(K,N2,N1)=TONQRS(K,N2,N1)+dom_2DFloXSurRunoff(idom_don,K,N,NN,N2,N1)
+      TOPQRS(K,N2,N1)=TOPQRS(K,N2,N1)+dom_2DFloXSurRunoff(idom_dop,K,N,NN,N2,N1)
+      TOAQRS(K,N2,N1)=TOAQRS(K,N2,N1)+dom_2DFloXSurRunoff(idom_acetate,K,N,NN,N2,N1)
     ENDDO D8590
 
     IF(IFLBH(N,NN,N5,N4).EQ.0)THEN
@@ -277,10 +271,10 @@ implicit none
       !heat flux
       THeat2GridBySurfRunoff(N2,N1)=THeat2GridBySurfRunoff(N2,N1)-Heat2GridBySurfRunoff(N,NN,N5,N4)
       D8591: DO K=1,micpar%NumOfLitrCmplxs
-        TOCQRS(K,N2,N1)=TOCQRS(K,N2,N1)-XOCQRS(K,N,NN,N5,N4)
-        TONQRS(K,N2,N1)=TONQRS(K,N2,N1)-XONQRS(K,N,NN,N5,N4)
-        TOPQRS(K,N2,N1)=TOPQRS(K,N2,N1)-XOPQRS(K,N,NN,N5,N4)
-        TOAQRS(K,N2,N1)=TOAQRS(K,N2,N1)-XOAQRS(K,N,NN,N5,N4)
+        TOCQRS(K,N2,N1)=TOCQRS(K,N2,N1)-dom_2DFloXSurRunoff(idom_doc,K,N,NN,N5,N4)
+        TONQRS(K,N2,N1)=TONQRS(K,N2,N1)-dom_2DFloXSurRunoff(idom_don,K,N,NN,N5,N4)
+        TOPQRS(K,N2,N1)=TOPQRS(K,N2,N1)-dom_2DFloXSurRunoff(idom_dop,K,N,NN,N5,N4)
+        TOAQRS(K,N2,N1)=TOAQRS(K,N2,N1)-dom_2DFloXSurRunoff(idom_acetate,K,N,NN,N5,N4)
       ENDDO D8591
 
     ENDIF
@@ -290,10 +284,10 @@ implicit none
       TWat2GridBySurfRunoff(N2,N1)=TWat2GridBySurfRunoff(N2,N1)-Wat2GridBySurfRunoff(N,NN,N5B,N4B)
       THeat2GridBySurfRunoff(N2,N1)=THeat2GridBySurfRunoff(N2,N1)-Heat2GridBySurfRunoff(N,NN,N5B,N4B)
       D8592: DO K=1,micpar%NumOfLitrCmplxs
-        TOCQRS(K,N2,N1)=TOCQRS(K,N2,N1)-XOCQRS(K,N,NN,N5B,N4B)
-        TONQRS(K,N2,N1)=TONQRS(K,N2,N1)-XONQRS(K,N,NN,N5B,N4B)
-        TOPQRS(K,N2,N1)=TOPQRS(K,N2,N1)-XOPQRS(K,N,NN,N5B,N4B)
-        TOAQRS(K,N2,N1)=TOAQRS(K,N2,N1)-XOAQRS(K,N,NN,N5B,N4B)
+        TOCQRS(K,N2,N1)=TOCQRS(K,N2,N1)-dom_2DFloXSurRunoff(idom_doc,K,N,NN,N5B,N4B)
+        TONQRS(K,N2,N1)=TONQRS(K,N2,N1)-dom_2DFloXSurRunoff(idom_don,K,N,NN,N5B,N4B)
+        TOPQRS(K,N2,N1)=TOPQRS(K,N2,N1)-dom_2DFloXSurRunoff(idom_dop,K,N,NN,N5B,N4B)
+        TOAQRS(K,N2,N1)=TOAQRS(K,N2,N1)-dom_2DFloXSurRunoff(idom_acetate,K,N,NN,N5B,N4B)
       ENDDO D8592
       ENDIF
 
@@ -633,14 +627,14 @@ implicit none
       !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
       !
       D8585: DO K=1,jcplx
-        TOCFLS(K,N3,N2,N1)=TOCFLS(K,N3,N2,N1)+XOCFLS(K,N,N3,N2,N1)-XOCFLS(K,N,N6,N5,N4)
-        TONFLS(K,N3,N2,N1)=TONFLS(K,N3,N2,N1)+XONFLS(K,N,N3,N2,N1)-XONFLS(K,N,N6,N5,N4)
-        TOPFLS(K,N3,N2,N1)=TOPFLS(K,N3,N2,N1)+XOPFLS(K,N,N3,N2,N1)-XOPFLS(K,N,N6,N5,N4)
-        TOAFLS(K,N3,N2,N1)=TOAFLS(K,N3,N2,N1)+XOAFLS(K,N,N3,N2,N1)-XOAFLS(K,N,N6,N5,N4)
-        TOCFHS(K,N3,N2,N1)=TOCFHS(K,N3,N2,N1)+XOCFHS(K,N,N3,N2,N1)-XOCFHS(K,N,N6,N5,N4)
-        TONFHS(K,N3,N2,N1)=TONFHS(K,N3,N2,N1)+XONFHS(K,N,N3,N2,N1)-XONFHS(K,N,N6,N5,N4)
-        TOPFHS(K,N3,N2,N1)=TOPFHS(K,N3,N2,N1)+XOPFHS(K,N,N3,N2,N1)-XOPFHS(K,N,N6,N5,N4)
-        TOAFHS(K,N3,N2,N1)=TOAFHS(K,N3,N2,N1)+XOAFHS(K,N,N3,N2,N1)-XOAFHS(K,N,N6,N5,N4)
+        DOM_Transp2Micp_flx(idom_doc,K,N3,N2,N1)=DOM_Transp2Micp_flx(idom_doc,K,N3,N2,N1)+DOM_3DMicp_Transp_flx(idom_doc,K,N,N3,N2,N1)-DOM_3DMicp_Transp_flx(idom_doc,K,N,N6,N5,N4)
+        DOM_Transp2Micp_flx(idom_don,K,N3,N2,N1)=DOM_Transp2Micp_flx(idom_don,K,N3,N2,N1)+DOM_3DMicp_Transp_flx(idom_don,K,N,N3,N2,N1)-DOM_3DMicp_Transp_flx(idom_don,K,N,N6,N5,N4)
+        DOM_Transp2Micp_flx(idom_dop,K,N3,N2,N1)=DOM_Transp2Micp_flx(idom_dop,K,N3,N2,N1)+DOM_3DMicp_Transp_flx(idom_dop,K,N,N3,N2,N1)-DOM_3DMicp_Transp_flx(idom_dop,K,N,N6,N5,N4)
+        DOM_Transp2Micp_flx(idom_acetate,K,N3,N2,N1)=DOM_Transp2Micp_flx(idom_acetate,K,N3,N2,N1)+DOM_3DMicp_Transp_flx(idom_acetate,K,N,N3,N2,N1)-DOM_3DMicp_Transp_flx(idom_acetate,K,N,N6,N5,N4)
+        DOM_Transp2Macp_flx(idom_doc,K,N3,N2,N1)=DOM_Transp2Macp_flx(idom_doc,K,N3,N2,N1)+DOM_3DMacp_Transp_flx(idom_doc,K,N,N3,N2,N1)-DOM_3DMacp_Transp_flx(idom_doc,K,N,N6,N5,N4)
+        DOM_Transp2Macp_flx(idom_don,K,N3,N2,N1)=DOM_Transp2Macp_flx(idom_don,K,N3,N2,N1)+DOM_3DMacp_Transp_flx(idom_don,K,N,N3,N2,N1)-DOM_3DMacp_Transp_flx(idom_don,K,N,N6,N5,N4)
+        DOM_Transp2Macp_flx(idom_dop,K,N3,N2,N1)=DOM_Transp2Macp_flx(idom_dop,K,N3,N2,N1)+DOM_3DMacp_Transp_flx(idom_dop,K,N,N3,N2,N1)-DOM_3DMacp_Transp_flx(idom_dop,K,N,N6,N5,N4)
+        DOM_Transp2Macp_flx(idom_acetate,K,N3,N2,N1)=DOM_Transp2Macp_flx(idom_acetate,K,N3,N2,N1)+DOM_3DMacp_Transp_flx(idom_acetate,K,N,N3,N2,N1)-DOM_3DMacp_Transp_flx(idom_acetate,K,N,N6,N5,N4)
       ENDDO D8585
 
       DO NTS=ids_beg,ids_end
@@ -656,7 +650,7 @@ implicit none
       !     X*FLG=convective+diffusive gas flux from TranspNoSalt.f
       !     gas code:*CO*=CO2,*OX*=O2,*CH*=CH4,*NG*=N2,*N2*=N2O,*NH*=NH3,*HG*=H2
 !exclude NH3B
-      DO NTG=idg_beg,idg_end-1
+      DO NTG=idg_beg,idg_NH3
         RTGasADFlx(NTG,N3,N2,N1)=RTGasADFlx(NTG,N3,N2,N1)+R3GasADTFlx(NTG,N,N3,N2,N1)-R3GasADTFlx(NTG,N,N6,N5,N4)
       ENDDO
 !
@@ -692,20 +686,20 @@ implicit none
       WatIceThawMacP(N3,N2,N1)=0.0_r8
       THeatSoiThaw(N3,N2,N1)=0.0_r8
       D8596: DO K=1,jcplx
-        TOCFLS(K,N3,N2,N1)=0.0_r8
-        TONFLS(K,N3,N2,N1)=0.0_r8
-        TOPFLS(K,N3,N2,N1)=0.0_r8
-        TOAFLS(K,N3,N2,N1)=0.0_r8
-        TOCFHS(K,N3,N2,N1)=0.0_r8
-        TONFHS(K,N3,N2,N1)=0.0_r8
-        TOPFHS(K,N3,N2,N1)=0.0_r8
-        TOAFHS(K,N3,N2,N1)=0.0_r8
+        DOM_Transp2Micp_flx(idom_doc,K,N3,N2,N1)=0.0_r8
+        DOM_Transp2Micp_flx(idom_don,K,N3,N2,N1)=0.0_r8
+        DOM_Transp2Micp_flx(idom_dop,K,N3,N2,N1)=0.0_r8
+        DOM_Transp2Micp_flx(idom_acetate,K,N3,N2,N1)=0.0_r8
+        DOM_Transp2Macp_flx(idom_doc,K,N3,N2,N1)=0.0_r8
+        DOM_Transp2Macp_flx(idom_don,K,N3,N2,N1)=0.0_r8
+        DOM_Transp2Macp_flx(idom_dop,K,N3,N2,N1)=0.0_r8
+        DOM_Transp2Macp_flx(idom_acetate,K,N3,N2,N1)=0.0_r8
       ENDDO D8596
       trcs_TFLS(ids_beg:ids_end,N3,N2,N1)=0.0_r8
 
       trcs_TFHS(ids_beg:ids_end,N3,N2,N1)=0.0_r8
 
-      RTGasADFlx(idg_beg:idg_end-1,N3,N2,N1)=0.0_r8
+      RTGasADFlx(idg_beg:idg_NH3,N3,N2,N1)=0.0_r8
 
       IF(salt_model)THEN
         trcSalt_TFLS(idsalt_beg:idsaltb_end,N3,N2,N1)=0.0_r8

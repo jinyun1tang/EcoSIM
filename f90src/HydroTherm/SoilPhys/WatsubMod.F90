@@ -1389,7 +1389,7 @@ module WatsubMod
 !   VLMacP1,VLiceMacP1,VLWatMacP1=total,ice-,water-filled macroporosity
 !   VLsoiAirPM=air-filled porosity
 !   TFND1=temperature effect on gas diffusivity
-!   DFGS=rate constant for air-water gas exchange
+!   DiffusivitySolutEff=rate constant for air-water gas exchange
 !   Z1S,Z2SW,Z2SD,Z3SX=parameters for soil air-water gas transfers
 !   XNPD=time step for gas transfer calculations
 !   TORT,TortMacPM=tortuosity for aqueous diffn in micropores,macropres
@@ -1401,9 +1401,9 @@ module WatsubMod
       TFND1=TEFAQUDIF(TKSoi1(0,NY,NX))
       Z3S=FieldCapacity(L,NY,NX)/POROS(L,NY,NX)
       scalar=TFND1*XNPD
-      DFGS(M,L,NY,NX)=fDFGS(scalar,THETWA,Z3S)
+      DiffusivitySolutEff(M,L,NY,NX)=fDiffusivitySolutEff(scalar,THETWA,Z3S)
     ELSE
-      DFGS(M,L,NY,NX)=0.0_r8
+      DiffusivitySolutEff(M,L,NY,NX)=0.0_r8
     ENDIF
 
     IF(SoiBulkDensity(L,NY,NX).GT.ZERO)THEN

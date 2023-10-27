@@ -171,18 +171,18 @@ implicit none
 !     UDONQ,UDINQ=dissolved organic,inorganic N loss through runoff
 !     UDOPQ,UDIPQ=dissolved organic,inorganic P loss through runoff
 !
-      CXR=XN*(trcg_XRS(idg_CO2,N,NN,N5,N4)+trcg_XRS(idg_CH4,N,NN,N5,N4))
-      ZXR=XN*(trcn_XRS(ids_NH4,N,NN,N5,N4)+trcg_XRS(idg_NH3,N,NN,N5,N4) &
-        +trcn_XRS(ids_NO3,N,NN,N5,N4)+trcn_XRS(ids_NO2,N,NN,N5,N4))
-      ZGR=XN*(trcg_XRS(idg_N2O,N,NN,N5,N4)+trcg_XRS(idg_N2,N,NN,N5,N4))
-      PXR=XN*(trcn_XRS(ids_H2PO4,N,NN,N5,N4)+trcn_XRS(ids_H1PO4,N,NN,N5,N4))
+      CXR=XN*(trcg_2DFloXSurRunoff(idg_CO2,N,NN,N5,N4)+trcg_2DFloXSurRunoff(idg_CH4,N,NN,N5,N4))
+      ZXR=XN*(trcn_2DFloXSurRunoff(ids_NH4,N,NN,N5,N4)+trcg_2DFloXSurRunoff(idg_NH3,N,NN,N5,N4) &
+        +trcn_2DFloXSurRunoff(ids_NO3,N,NN,N5,N4)+trcn_2DFloXSurRunoff(ids_NO2,N,NN,N5,N4))
+      ZGR=XN*(trcg_2DFloXSurRunoff(idg_N2O,N,NN,N5,N4)+trcg_2DFloXSurRunoff(idg_N2,N,NN,N5,N4))
+      PXR=XN*(trcn_2DFloXSurRunoff(ids_H2PO4,N,NN,N5,N4)+trcn_2DFloXSurRunoff(ids_H1PO4,N,NN,N5,N4))
       COR=0.0_r8
       ZOR=0.0_r8
       POR=0.0_r8
       D2575: DO K=1,jcplx
-        COR=COR+XN*(XOCQRS(K,N,NN,N5,N4)+XOAQRS(K,N,NN,N5,N4))
-        ZOR=ZOR+XN*XONQRS(K,N,NN,N5,N4)
-        POR=POR+XN*XOPQRS(K,N,NN,N5,N4)
+        COR=COR+XN*(dom_2DFloXSurRunoff(idom_doc,K,N,NN,N5,N4)+dom_2DFloXSurRunoff(idom_acetate,K,N,NN,N5,N4))
+        ZOR=ZOR+XN*dom_2DFloXSurRunoff(idom_don,K,N,NN,N5,N4)
+        POR=POR+XN*dom_2DFloXSurRunoff(idom_dop,K,N,NN,N5,N4)
       ENDDO D2575
       TCOU=TCOU-CXR-COR
       TZOU=TZOU-ZXR-ZOR-ZGR
@@ -193,9 +193,9 @@ implicit none
       UDINQ(NY,NX)=UDINQ(NY,NX)-ZXR-ZGR
       UDOPQ(NY,NX)=UDOPQ(NY,NX)-POR
       UDIPQ(NY,NX)=UDIPQ(NY,NX)-PXR
-      OXR=XN*trcg_XRS(idg_O2,N,NN,N5,N4)
+      OXR=XN*trcg_2DFloXSurRunoff(idg_O2,N,NN,N5,N4)
       OXYGOU=OXYGOU-OXR
-      HGR=XN*trcg_XRS(idg_H2,N,NN,N5,N4)
+      HGR=XN*trcg_2DFloXSurRunoff(idg_H2,N,NN,N5,N4)
       H2GOU=H2GOU+HGR
 !
 !     RUNOFF BOUNDARY FLUXES OF SOLUTES
@@ -275,7 +275,7 @@ implicit none
           ECHC=0.044_r8*AZMAX1(trcSaltRunoffBoundary(idsalt_HCO3,N,NN,N5,N4)/WX)
           ECSO=0.080_r8*AZMAX1(trcSaltRunoffBoundary(idsalt_SO4,N,NN,N5,N4)*2.0_r8/WX)
           ECCL=0.076_r8*AZMAX1(trcSaltRunoffBoundary(idsalt_Cl,N,NN,N5,N4)/WX)
-          ECNO=0.071_r8*AZMAX1(trcn_XRS(ids_NO3,N,NN,N5,N4)/(WX*natomw))
+          ECNO=0.071_r8*AZMAX1(trcn_2DFloXSurRunoff(ids_NO3,N,NN,N5,N4)/(WX*natomw))
           ECNDQ=ECHY+ECOH+ECAL+ECFE+ECCA+ECMG+ECNA+ECKA+ECCO+ECHC+ECSO+ECCL+ECNO
 !     WRITE(*,9991)'ECNDQ',IYRC,I,J,N4,N5,N,NN,WX,ECNDQ
 !9991  FORMAT(A8,7I4,2E12.4)
@@ -498,10 +498,10 @@ implicit none
       ZOD=0.0_r8
       POD=0.0_r8
       D450: DO K=1,jcplx
-        COD=COD+XN*(XOCFLS(K,N,N6,N5,N4)+XOAFLS(K,N,N6,N5,N4) &
-          +XOCFHS(K,N,N6,N5,N4)+XOAFHS(K,N,N6,N5,N4))
-        ZOD=ZOD+XN*(XONFLS(K,N,N6,N5,N4)+XONFHS(K,N,N6,N5,N4))
-        POD=POD+XN*(XOPFLS(K,N,N6,N5,N4)+XOPFHS(K,N,N6,N5,N4))
+        COD=COD+XN*(DOM_3DMicp_Transp_flx(idom_doc,K,N,N6,N5,N4)+DOM_3DMicp_Transp_flx(idom_acetate,K,N,N6,N5,N4) &
+          +DOM_3DMacp_Transp_flx(idom_doc,K,N,N6,N5,N4)+DOM_3DMacp_Transp_flx(idom_acetate,K,N,N6,N5,N4))
+        ZOD=ZOD+XN*(DOM_3DMicp_Transp_flx(idom_don,K,N,N6,N5,N4)+DOM_3DMacp_Transp_flx(idom_don,K,N,N6,N5,N4))
+        POD=POD+XN*(DOM_3DMicp_Transp_flx(idom_dop,K,N,N6,N5,N4)+DOM_3DMacp_Transp_flx(idom_dop,K,N,N6,N5,N4))
       ENDDO D450
       CXD=XN*(trcs_3DTransp2MicP(idg_CO2,N,N6,N5,N4)+trcs_3DTransp2MacP(idg_CO2,N,N6,N5,N4) &
         +R3GasADTFlx(idg_CO2,N,N6,N5,N4)+trcs_3DTransp2MicP(idg_CH4,N,N6,N5,N4) &
@@ -708,17 +708,17 @@ implicit none
       URUN(NY,NX)=URUN(NY,NX)-WQRS
       HQRS=XN*HeatBySnowRedistribution(N,N5,N4)
       HEATOU=HEATOU-HQRS
-      CXS=XN*(XCOQSS(N,N5,N4)+XCHQSS(N,N5,N4))
-      ZXS=XN*(XN4QSS(N,N5,N4)+XN3QSS(N,N5,N4)+XNOQSS(N,N5,N4))
-      ZGS=XN*(XN2QSS(N,N5,N4)+XNGQSS(N,N5,N4))
-      PXS=XN*(XP4QSS(N,N5,N4)+XP1QSS(N,N5,N4))
+      CXS=XN*(trcg_FloXSnow(idg_CO2,N,N5,N4)+trcg_FloXSnow(idg_CH4,N,N5,N4))
+      ZXS=XN*(trcn_FloXSnow(ids_NH4,N,N5,N4)+trcg_FloXSnow(idg_NH3,N,N5,N4)+trcn_FloXSnow(ids_NO3,N,N5,N4))
+      ZGS=XN*(trcg_FloXSnow(idg_N2O,N,N5,N4)+trcg_FloXSnow(idg_N2,N,N5,N4))
+      PXS=XN*(trcn_FloXSnow(ids_H2PO4,N,N5,N4)+trcn_FloXSnow(ids_H1PO4,N,N5,N4))
       TCOU=TCOU-CXS
       TZOU=TZOU-ZXS-ZGS
       TPOU=TPOU-PXS
       UDICQ(NY,NX)=UDICQ(NY,NX)-CXR
       UDINQ(NY,NX)=UDINQ(NY,NX)-ZXR-ZGR
       UDIPQ(NY,NX)=UDIPQ(NY,NX)-PXR
-      OXS=XN*XOXQSS(N,N5,N4)
+      OXS=XN*trcg_FloXSnow(idg_O2,N,N5,N4)
       OXYGOU=OXYGOU-OXS
       IF(salt_model)THEN
         PSS=XN*patomw*(trcSalt_XQS(idsalt_CaPO4,N,N5,N4) &

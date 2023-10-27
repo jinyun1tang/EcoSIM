@@ -638,10 +638,10 @@ implicit none
   TIceBySnowRedist(NY,NX)=0.0_r8
   THeatBySnowRedist(NY,NX)=0.0_r8
 
-  trcn_TQR(ids_nut_beg:ids_nuts_end,NY,NX)=0.0_r8
+  trcn_TFloXSurRunoff(ids_nut_beg:ids_nuts_end,NY,NX)=0.0_r8
   trcg_QSS(idg_beg:idg_end-1,NY,NX)=0.0_r8  
   trcn_QSS(ids_nut_beg:ids_nuts_end,NY,NX)=0.0_r8
-  trcg_TQR(idg_beg:idg_end-1,NY,NX)=0.0_r8
+  trcg_TFloXSurRunoff(idg_beg:idg_end-1,NY,NX)=0.0_r8
 
   DO  L=1,JS
     trcg_TBLS(idg_beg:idg_end-1,L,NY,NX)=0.0_r8
@@ -672,30 +672,30 @@ implicit none
   D1202: DO NN=1,2
     !gaseous tracers
     DO NTG=idg_beg,idg_end-1
-      trcg_TQR(NTG,N2,N1)=trcg_TQR(NTG,N2,N1)+trcg_XRS(NTG,N,NN,N2,N1)
+      trcg_TFloXSurRunoff(NTG,N2,N1)=trcg_TFloXSurRunoff(NTG,N2,N1)+trcg_2DFloXSurRunoff(NTG,N,NN,N2,N1)
     ENDDO
 
     !nutrient tracres
     DO NTN=ids_nut_beg,ids_nuts_end
-      trcn_TQR(NTN,N2,N1)=trcn_TQR(NTN,N2,N1)+trcn_XRS(NTN,N,NN,N2,N1)
+      trcn_TFloXSurRunoff(NTN,N2,N1)=trcn_TFloXSurRunoff(NTN,N2,N1)+trcn_2DFloXSurRunoff(NTN,N,NN,N2,N1)
     ENDDO
 
     IF(IFLBH(N,NN,N5,N4).EQ.0)THEN    
 
       DO NTG=idg_beg,idg_end-1
-        trcg_TQR(NTG,N2,N1)=trcg_TQR(NTG,N2,N1)-trcg_XRS(NTG,N,NN,N5,N4)
+        trcg_TFloXSurRunoff(NTG,N2,N1)=trcg_TFloXSurRunoff(NTG,N2,N1)-trcg_2DFloXSurRunoff(NTG,N,NN,N5,N4)
       ENDDO
       DO NTN=ids_nut_beg,ids_nuts_end
-        trcn_TQR(NTN,N2,N1)=trcn_TQR(NTN,N2,N1)-trcn_XRS(NTN,N,NN,N5,N4)
+        trcn_TFloXSurRunoff(NTN,N2,N1)=trcn_TFloXSurRunoff(NTN,N2,N1)-trcn_2DFloXSurRunoff(NTN,N,NN,N5,N4)
       ENDDO
 
     ENDIF 
     IF(N4B.GT.0.AND.N5B.GT.0.AND.NN.EQ.1)THEN
       DO NTG=idg_beg,idg_end-1
-        trcg_TQR(NTG,N2,N1)=trcg_TQR(NTG,N2,N1)-trcg_XRS(NTG,N,NN,N5B,N4B)
+        trcg_TFloXSurRunoff(NTG,N2,N1)=trcg_TFloXSurRunoff(NTG,N2,N1)-trcg_2DFloXSurRunoff(NTG,N,NN,N5B,N4B)
       ENDDO
       DO NTN=ids_nut_beg,ids_nuts_end
-        trcn_TQR(NTN,N2,N1)=trcn_TQR(NTN,N2,N1)-trcn_XRS(NTN,N,NN,N5B,N4B)
+        trcn_TFloXSurRunoff(NTN,N2,N1)=trcn_TFloXSurRunoff(NTN,N2,N1)-trcn_2DFloXSurRunoff(NTN,N,NN,N5B,N4B)
       ENDDO
 
     ENDIF
@@ -717,17 +717,17 @@ implicit none
   !             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
   !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
   !
-  trcg_QSS(idg_CO2,N2,N1)=trcg_QSS(idg_CO2,N2,N1)+XCOQSS(N,N2,N1)-XCOQSS(N,N5,N4)
-  trcg_QSS(idg_CH4,N2,N1)=trcg_QSS(idg_CH4,N2,N1)+XCHQSS(N,N2,N1)-XCHQSS(N,N5,N4)
-  trcg_QSS(idg_O2,N2,N1)=trcg_QSS(idg_O2,N2,N1)+XOXQSS(N,N2,N1)-XOXQSS(N,N5,N4)
-  trcg_QSS(idg_N2,N2,N1)=trcg_QSS(idg_N2,N2,N1)+XNGQSS(N,N2,N1)-XNGQSS(N,N5,N4)
-  trcg_QSS(idg_N2O,N2,N1)=trcg_QSS(idg_N2O,N2,N1)+XN2QSS(N,N2,N1)-XN2QSS(N,N5,N4)
-  trcg_QSS(idg_NH3,N2,N1)=trcg_QSS(idg_NH3,N2,N1)+XN3QSS(N,N2,N1)-XN3QSS(N,N5,N4)
+  trcg_QSS(idg_CO2,N2,N1)=trcg_QSS(idg_CO2,N2,N1)+trcg_FloXSnow(idg_CO2,N,N2,N1)-trcg_FloXSnow(idg_CO2,N,N5,N4)
+  trcg_QSS(idg_CH4,N2,N1)=trcg_QSS(idg_CH4,N2,N1)+trcg_FloXSnow(idg_CH4,N,N2,N1)-trcg_FloXSnow(idg_CH4,N,N5,N4)
+  trcg_QSS(idg_O2,N2,N1)=trcg_QSS(idg_O2,N2,N1)+trcg_FloXSnow(idg_O2,N,N2,N1)-trcg_FloXSnow(idg_O2,N,N5,N4)
+  trcg_QSS(idg_N2,N2,N1)=trcg_QSS(idg_N2,N2,N1)+trcg_FloXSnow(idg_N2,N,N2,N1)-trcg_FloXSnow(idg_N2,N,N5,N4)
+  trcg_QSS(idg_N2O,N2,N1)=trcg_QSS(idg_N2O,N2,N1)+trcg_FloXSnow(idg_N2O,N,N2,N1)-trcg_FloXSnow(idg_N2O,N,N5,N4)
+  trcg_QSS(idg_NH3,N2,N1)=trcg_QSS(idg_NH3,N2,N1)+trcg_FloXSnow(idg_NH3,N,N2,N1)-trcg_FloXSnow(idg_NH3,N,N5,N4)
 
-  trcn_QSS(ids_NH4,N2,N1)=trcn_QSS(ids_NH4,N2,N1)+XN4QSS(N,N2,N1)-XN4QSS(N,N5,N4)
-  trcn_QSS(ids_NO3,N2,N1)=trcn_QSS(ids_NO3,N2,N1)+XNOQSS(N,N2,N1)-XNOQSS(N,N5,N4)
-  trcn_QSS(ids_H1PO4,N2,N1)=trcn_QSS(ids_H1PO4,N2,N1)+XP1QSS(N,N2,N1)-XP1QSS(N,N5,N4)
-  trcn_QSS(ids_H2PO4,N2,N1)=trcn_QSS(ids_H2PO4,N2,N1)+XP4QSS(N,N2,N1)-XP4QSS(N,N5,N4)
+  trcn_QSS(ids_NH4,N2,N1)=trcn_QSS(ids_NH4,N2,N1)+trcn_FloXSnow(ids_NH4,N,N2,N1)-trcn_FloXSnow(ids_NH4,N,N5,N4)
+  trcn_QSS(ids_NO3,N2,N1)=trcn_QSS(ids_NO3,N2,N1)+trcn_FloXSnow(ids_NO3,N,N2,N1)-trcn_FloXSnow(ids_NO3,N,N5,N4)
+  trcn_QSS(ids_H1PO4,N2,N1)=trcn_QSS(ids_H1PO4,N2,N1)+trcn_FloXSnow(ids_H1PO4,N,N2,N1)-trcn_FloXSnow(ids_H1PO4,N,N5,N4)
+  trcn_QSS(ids_H2PO4,N2,N1)=trcn_QSS(ids_H2PO4,N2,N1)+trcn_FloXSnow(ids_H2PO4,N,N2,N1)-trcn_FloXSnow(ids_H2PO4,N,N5,N4)
 
   !     NET SALT FLUXES FROM RUNOFF AND SNOWPACK
   call SaltThruFluxRunoffAndSnowpack(N,N1,N2,N4,N5,N4B,N5B)
@@ -820,11 +820,11 @@ implicit none
     !    SOLUTES
 !  exclude NH3B
     DO NTG=idg_beg,idg_end-1
-      trc_solml(NTG,0,NY,NX)=trc_solml(NTG,0,NY,NX)+trcg_TQR(NTG,NY,NX)
+      trc_solml(NTG,0,NY,NX)=trc_solml(NTG,0,NY,NX)+trcg_TFloXSurRunoff(NTG,NY,NX)
     ENDDO
 
   DO NTU=ids_nut_beg,ids_nuts_end
-    trc_solml(NTU,0,NY,NX)=trc_solml(NTU,0,NY,NX)+trcn_TQR(NTU,NY,NX)
+    trc_solml(NTU,0,NY,NX)=trc_solml(NTU,0,NY,NX)+trcn_TFloXSurRunoff(NTU,NY,NX)
   ENDDO
 
   IF(salt_model)THEN
