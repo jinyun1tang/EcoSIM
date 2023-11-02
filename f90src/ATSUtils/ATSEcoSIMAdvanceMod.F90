@@ -9,6 +9,8 @@ module ATSEcoSIMAdvanceMod
   use LandSurfDataType
   use ClimForcDataType
   use SoilPropertyDataType
+  use HydroThermData, only : PSISM1, TKSoi1, VLHeatCapacity, &
+      SoilFracAsMicP, VLWatMicP1, VLiceMicP1 !need the only as some vars are double defined
   use EcoSIMSolverPar, only : NPH
 implicit none
   character(len=*), private, parameter :: mod_filename=&
@@ -24,16 +26,6 @@ implicit none
   integer :: NY,NX,L,NHW,NHE,NVN,NVS, I, J, M
   integer, intent(in) :: NYS
   real(r8) :: YSIN(JSA),YCOS(JSA),YAZI(JSA)
-  !real(r8), dimension(:,:), allocatable :: ResistanceLitRLay
-  !real(r8), dimension(:,:), allocatable :: KSatReductByRainKineticEnergyS
-  !real(r8), dimension(:,:), allocatable :: HeatFlux2Ground
-  !real(r8), dimension(:,:), allocatable :: Qinfl2MicP
-  !real(r8), dimension(:,:), allocatable :: TopLayWatVol
-
-  !real(r8), dimension(:,:),intent(inout) :: ResistanceLitRLay
-  !REAL(R8), dimension(:,:),INTENT(OUT) :: KSatReductByRainKineticEnergy
-  !real(r8), dimension(:,:),intent(out) :: HeatFlux2Ground
-  !real(r8),dimension(:,:),intent(inout) :: TopLayWatVol
   real(r8) :: ResistanceLitRLay(JY,JX)
   real(r8) :: KSatReductByRainKineticEnergyS(JY,JX)
   real(r8) :: HeatFlux2Ground(JY,JX)
@@ -45,9 +37,9 @@ implicit none
 
   call SetMeshATS(NHW,NVN,NHE,NVS)
 
-  write(*,*) "finish set mesh"
-
   NX=1
+
+  write(*,*) "Starting loop: "
 
   do NY=1,NYS
     NU(NY,NX)=a_NU(NY)

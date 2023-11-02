@@ -25,8 +25,6 @@ module InitVegBGC
 
   integer :: L,M,N
 
-  write(*,*) "In InitIrradianceGeometry"
-
   !     begin_execution
   !     ZSIN,ZCOS=sine,cosine of leaf inclination class
   !     ZAZI=leaf azimuth class, it is pi because only on one side of the leaf
@@ -35,30 +33,20 @@ module InitVegBGC
   !     IALBY:1=backscattering,2=forward scattering of sky radiation
   !
 
-  write(*,*) "First do loop over leaf azimuth sectors"
   D205: DO L=1,JLA
-    write(*,*) "Setting ZAZI"
-    write(*,*) "L = ", L, " of ", JLA
     ZAZI(L)=(L-0.5)*PICON/real(JLA,r8)
   ENDDO D205
-  write(*,*) "Loop over sky azimuth sectors"
   !JSA: number of sky azimuth sectors
   !JLA: number of leaf azimuth sectors
   D230: DO N=1,JSA
-    write(*,*) "Setting Yvars"
-    write(*,*) "N = ", N, " of ", JSA
     YAZI(N)=PICON*(2*N-1)/real(JSA,r8)
     YAGL=PICON/real(JSA,r8)
     YSIN(N)=SIN(YAGL)
     YCOS(N)=COS(YAGL)
     TYSIN=TYSIN+YSIN(N)
     D225: DO L=1,JLA
-      write(*,*) "Setting DAZI"
-      write(*,*) "L = ", L, " of ", JLA
       DAZI=COS(ZAZI(L)-YAZI(N))
       DO  M=1,JLI
-        write(*,*) "Setting Omega vars"
-        write(*,*) "M = ", M, " of ", JLI
         OMEGY=ZCOS(M)*YSIN(N)+ZSIN(M)*YCOS(N)*DAZI
         OMEGA(N,M,L)=ABS(OMEGY)
         OMEGX(N,M,L)=OMEGA(N,M,L)/YSIN(N)

@@ -115,8 +115,8 @@ contains
   call c_f_pointer(state%subsurface_energy_source%data, data2D, [(/size_col/),(/num_cols/)])
   a_SSES=data2D(:,:)
 
-  call c_f_pointer(state%surface_water_source%data, data, (/num_cols/))
-  surf_w_source = data(:)
+  !call c_f_pointer(state%surface_water_source%data, data, (/num_cols/))
+  !surf_w_source = data(:)
 
   call c_f_pointer(state%surface_energy_source%data, data, (/num_cols/))
   surf_e_source = data(:)
@@ -177,12 +177,12 @@ contains
   call c_f_pointer(state%subsurface_energy_source%data, data2D, [(/size_col/),(/size_procs/)])
   data2D(:,:)=a_SSES
 
-  write(*,*) "AT copy back:"
-  write(*,*) "water: ", surf_w_source
-  write(*,*) "energy: ", surf_e_source
+  !write(*,*) "AT copy back:"
+  !write(*,*) "water: ", surf_w_source
+  !write(*,*) "energy: ", surf_e_source
 
-  call c_f_pointer(state%surface_water_source%data, data, (/num_cols/))
-  data(:) = surf_w_source
+  !call c_f_pointer(state%surface_water_source%data, data, (/num_cols/))
+  !data(:) = surf_w_source
 
   call c_f_pointer(state%surface_energy_source%data, data, (/num_cols/))
   data(:) = surf_e_source
@@ -246,8 +246,8 @@ contains
   !  write(*,*) "surface water (", K, ") = ", surf_w_source(K)
   !
   !  write(*,*) "changing surface vars"
-  !  surf_e_source(K) = 8.08
-  !  surf_w_source(K) = 8.08
+  !  surf_e_source(K) = 0.0
+  !  surf_w_source(K) = 0.0
   !end do
 
   write(*,*) "leaving surface energy balance"
