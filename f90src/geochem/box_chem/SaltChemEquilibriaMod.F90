@@ -250,7 +250,7 @@ module SaltChemEquilibriaMod
   real(r8), pointer :: TR_Ca_2p_soil
   real(r8), pointer :: TR_CaSO4_soil
   real(r8), pointer :: TR_CaSO4_precip_soil
-  real(r8), pointer :: TR_CO2_aqu_soil
+  real(r8), pointer :: TR_CO2_aqu_soil_vr
   real(r8), pointer :: TR_CO3_2e_soil
   real(r8), pointer :: TR_Fe_3p_soil
   real(r8), pointer :: TR_FeSO4_soil
@@ -266,7 +266,7 @@ module SaltChemEquilibriaMod
   real(r8), pointer :: TR_Mg_2p_soil
   real(r8), pointer :: TR_MgSO4_soil
   real(r8), pointer :: TR_NH3_band_soil
-  real(r8), pointer :: TR_NH3_soil
+  real(r8), pointer :: TR_NH3_soil_vr
   real(r8), pointer :: TR_NH4_band_soil
   real(r8), pointer :: TR_NH4_soil
   real(r8), pointer :: TR_Na_p_soil
@@ -481,7 +481,7 @@ module SaltChemEquilibriaMod
   TR_Ca_2p_soil   => solflx%TR_Ca_2p_soil
   TR_CaSO4_soil  => solflx%TR_CaSO4_soil
   TR_CaSO4_precip_soil => solflx%TR_CaSO4_precip_soil
-  TR_CO2_aqu_soil  => solflx%TR_CO2_aqu_soil
+  TR_CO2_aqu_soil_vr  => solflx%TR_CO2_aqu_soil_vr
   TR_CO3_2e_soil  => solflx%TR_CO3_2e_soil
   TR_Fe_3p_soil   => solflx%TR_Fe_3p_soil
   TR_FeSO4_soil  => solflx%TR_FeSO4_soil
@@ -497,7 +497,7 @@ module SaltChemEquilibriaMod
   TR_Mg_2p_soil   => solflx%TR_Mg_2p_soil
   TR_MgSO4_soil  => solflx%TR_MgSO4_soil
   TR_NH3_band_soil  => solflx%TR_NH3_band_soil
-  TR_NH3_soil  => solflx%TR_NH3_soil
+  TR_NH3_soil_vr  => solflx%TR_NH3_soil_vr
   TR_NH4_band_soil  => solflx%TR_NH4_band_soil
   TR_NH4_soil  => solflx%TR_NH4_soil
   TR_Na_p_soil   => solflx%TR_Na_p_soil
@@ -1358,7 +1358,7 @@ module SaltChemEquilibriaMod
 !
   TR_NH4_soil=TR_NH4_soil*VLWatMicPNH
   TR_NH4_band_soil=TR_NH4_band_soil*VLWatMicPNB
-  TR_NH3_soil=TR_NH3_soil*VLWatMicPNH
+  TR_NH3_soil_vr=TR_NH3_soil_vr*VLWatMicPNH
   TR_NH3_band_soil=TR_NH3_band_soil*VLWatMicPNB
   TR_Al_3p_soil=TR_Al_3p_soil*VLWatMicPM
   TR_Fe_3p_soil=TR_Fe_3p_soil*VLWatMicPM
@@ -1371,7 +1371,7 @@ module SaltChemEquilibriaMod
   TR_SO4_2e_soil=TR_SO4_2e_soil*VLWatMicPM
   TR_CO3_2e_soil=TR_CO3_2e_soil*VLWatMicPM
   TRHCO=TRHCO*VLWatMicPM
-  TR_CO2_aqu_soil=TR_CO2_aqu_soil*VLWatMicPM
+  TR_CO2_aqu_soil_vr=TR_CO2_aqu_soil_vr*VLWatMicPM
   TR_AlOH_soil=TR_AlOH_soil*VLWatMicPM
   TR_AlO2H2_soil=TR_AlO2H2_soil*VLWatMicPM
   TR_AlO3H3_soil=TR_AlO3H3_soil*VLWatMicPM
@@ -1478,7 +1478,7 @@ module SaltChemEquilibriaMod
     +TR_CaOH_soil+TR_MgOH_soil &
     +3.0*(TR_AlOH3_precip_soil+TR_FeOH3_precip_soil)
 !     IF(L.EQ.11)THEN
-!     WRITE(*,1111)'TR_CO2_aqu_soil',I,J,L,M,TR_CO2_aqu_soil,TR_CO3_2e_soil
+!     WRITE(*,1111)'TR_CO2_aqu_soil_vr',I,J,L,M,TR_CO2_aqu_soil_vr,TR_CO3_2e_soil
 !    2,TRHCO,TR_CaCO3_soil,TR_MgCO3_soil
 !    2,TR_NaCO3_soil,TR_CaHCO3_soil
 !    2,TR_MgHCO3_soil,TR_CaCO3_precip_soil,VLWatMicPM,RCO2
@@ -2682,9 +2682,9 @@ module SaltChemEquilibriaMod
 !     ACCUMULATE TOTAL ION FLUXES FOR ALL ITERATIONS
 !
 !     TR_NH4_soil,TR_NH4_band_soil=total NH4 flux in non-band,band
-!     TR_NH3_soil,TR_NH3_band_soil=total NH3 flux in non-band,band
+!     TR_NH3_soil_vr,TR_NH3_band_soil=total NH3 flux in non-band,band
 !     TR_Al_3p_soil,TR_Fe_3p_soil,TR_H_p_soil,TR_Ca_2p_soil,TR_Mg_2p_soil,TR_Na_p_soil,TR_K_1p_soil,TR_OH_1e_soil=totalAl,Fe,H,Ca,Mg,Na,K,OH flux
-!     TR_SO4_2e_soil,TR_CO3_2e_soil,TRHCO,TR_CO2_aqu_soil=total SO4,CO3,HCO3,CO2 flux
+!     TR_SO4_2e_soil,TR_CO3_2e_soil,TRHCO,TR_CO2_aqu_soil_vr=total SO4,CO3,HCO3,CO2 flux
 !     TR_AlOH_soil,TR_AlO2H2_soil,TR_AlO3H3_soil,TR_AlO4H4_soil,TR_AlSO4_soil=total AlOH,AlOH2,AlOH3,AlOH4,AlSO4
 !     TR_FeOH_soil,TR_FeO2H2_soil,TR_FeO3H3_soil,TR_FeO4H4_soil,TR_FeSO4_soil=total FeOH,FeOH2,FeOH3,FeOH4,FeSO4
 !     TR_CaOH_soil,TR_CaCO3_soil,TR_CaHCO3_soil,TR_CaSO4_soil=total CaOH,CaCO3,CaHCO3,CaSO4 flux
@@ -2711,7 +2711,7 @@ module SaltChemEquilibriaMod
 !
   TR_NH4_soil=TR_NH4_soil+RN4S    !net NH4 flux in non-band
   TR_NH4_band_soil=TR_NH4_band_soil+RN4B    !net NH4 flux in band
-  TR_NH3_soil=TR_NH3_soil+RN3S    !net NH3 flux in non-band
+  TR_NH3_soil_vr=TR_NH3_soil_vr+RN3S    !net NH3 flux in non-band
   TR_NH3_band_soil=TR_NH3_band_soil+RN3B    !net NH3 flux in band
   TR_Al_3p_soil=TR_Al_3p_soil+RAL       !total Al flux
   TR_Fe_3p_soil=TR_Fe_3p_soil+RFE       !total Fe(3+) flux
@@ -2724,7 +2724,7 @@ module SaltChemEquilibriaMod
   TR_SO4_2e_soil=TR_SO4_2e_soil+RSO4    !total SO4(2-) flux
   TR_CO3_2e_soil=TR_CO3_2e_soil+RCO3    !total CO3(2-) flux
   TRHCO=TRHCO+RHCO    !total HCO3(2-) flux
-  TR_CO2_aqu_soil=TR_CO2_aqu_soil+RCO2    !total CO2 flux due to dissociation
+  TR_CO2_aqu_soil_vr=TR_CO2_aqu_soil_vr+RCO2    !total CO2 flux due to dissociation
   TR_AlOH_soil=TR_AlOH_soil+RAL1    !total Al(OH)(2+) flux
   TR_AlO2H2_soil=TR_AlO2H2_soil+RAL2    !total Al(OH)2(+) flux
   TR_AlO3H3_soil=TR_AlO3H3_soil+RAL3    !total Al(OH)3 flux

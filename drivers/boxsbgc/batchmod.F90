@@ -375,7 +375,7 @@ contains
 
   fid_TR_NH4_soil = addone(itemp)
   fid_TR_NH4_band_soil = addone(itemp)
-  fid_TR_NH3_soil = addone(itemp)
+  fid_TR_NH3_soil_vr = addone(itemp)
   fid_TR_NH3_band_soil = addone(itemp)
   fid_TR_H1PO4_soil = addone(itemp)
   fid_TR_H2PO4_soil = addone(itemp)
@@ -546,7 +546,7 @@ contains
 !atmospheric gaseous CO2,CH4,O2,NH3,N2,N2O,H2
 !
   ystatesfl(cid_ZNH3B)=ystates0l(cid_ZNH3B)+ystatesfl(fid_TR_NH3_band_soil)+micflx%XNH4B
-  ystatesfl(cid_ZNH3S)=ystates0l(cid_ZNH3S)+ystatesfl(fid_TR_NH3_soil)+micflx%RNH4MicbTransf_vr
+  ystatesfl(cid_ZNH3S)=ystates0l(cid_ZNH3S)+ystatesfl(fid_TR_NH3_soil_vr)+micflx%RNH4MicbTransf_vr
   ystatesfl(cid_ZNH4B)=ystates0l(cid_ZNH4B)+ystatesfl(fid_TR_NH3_band_soil)+micflx%XNH4B
   ystatesfl(cid_ZNH4S)=ystates0l(cid_ZNH4S)+ystatesfl(fid_TR_NH4_soil)+micflx%RNH4MicbTransf_vr
   ystatesfl(cid_H1POB)=ystates0l(cid_H1POB)+ystatesfl(fid_TR_H1PO4_band_soil)+micflx%XH1BS
@@ -1663,13 +1663,13 @@ contains
 !  H2GS(NU(NY,NX),NY,NX)=H2GS(NU(NY,NX),NY,NX)+XHGDFS(NY,NX)
 
 
-!    CO2S(L,NY,NX)=CO2S(L,NY,NX)+XCODFG(L,NY,NX)-RCO2O(L,NY,NX)
-!    CH4S(L,NY,NX)=CH4S(L,NY,NX)+XCHDFG(L,NY,NX)-RCH4O(L,NY,NX)
-!    OXYS(L,NY,NX)=OXYS(L,NY,NX)+XOXDFG(L,NY,NX)-RUPOXO(L,NY,NX
-!    Z2GS(L,NY,NX)=Z2GS(L,NY,NX)+XNGDFG(L,NY,NX)-RN2G(L,NY,NX)-XN2GS(L,NY,NX)
-!    Z2OS(L,NY,NX)=Z2OS(L,NY,NX)+XN2DFG(L,NY,NX)-RN2O(L,NY,NX)
-!    H2GS(L,NY,NX)=H2GS(L,NY,NX)+XHGDFG(L,NY,NX)-RH2GO(L,NY,NX)
-!    ZNH3S(L,NY,NX)=ZNH3S(L,NY,NX)+XN3DFG(L,NY,NX)+TR_NH3_soil(L,NY,NX)
+!    CO2S(L,NY,NX)=CO2S(L,NY,NX)+XCODFG(L,NY,NX)-trcg_RMicbTransf_vr(idg_CO2,L,NY,NX)
+!    CH4S(L,NY,NX)=CH4S(L,NY,NX)+XCHDFG(L,NY,NX)-trcg_RMicbTransf_vr(idg_CH4,L,NY,NX)
+!    OXYS(L,NY,NX)=OXYS(L,NY,NX)+XOXDFG(L,NY,NX)-trcg_RMicbTransf_vr(idg_O2,L,NY,NX
+!    Z2GS(L,NY,NX)=Z2GS(L,NY,NX)+XNGDFG(L,NY,NX)-trcg_RMicbTransf_vr(idg_N2,L,NY,NX)-Micb_N2Fixation_vr(L,NY,NX)
+!    Z2OS(L,NY,NX)=Z2OS(L,NY,NX)+XN2DFG(L,NY,NX)-trcg_RMicbTransf_vr(idg_N2O,L,NY,NX)
+!    H2GS(L,NY,NX)=H2GS(L,NY,NX)+XHGDFG(L,NY,NX)-trcg_RMicbTransf_vr(idg_H2,L,NY,NX)
+!    ZNH3S(L,NY,NX)=ZNH3S(L,NY,NX)+XN3DFG(L,NY,NX)+TR_NH3_soil_vr(L,NY,NX)
 
 !    CO2G(L,NY,NX)=CO2G(L,NY,NX)-XCODFG(L,NY,NX)+XCOFLG
 !    CH4G(L,NY,NX)=CH4G(L,NY,NX)-XCHDFG(L,NY,NX)+XCHFLG

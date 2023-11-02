@@ -12,7 +12,7 @@ module ChemTranspDataType
   real(r8),target,allocatable ::  TFND(:,:,:)                        !temperature effect on diffusivity
   real(r8),target,allocatable ::  DISP(:,:,:,:)                      !aqueous dispersivity
 
-  real(r8),target,allocatable ::  GasDisFlx(:,:,:,:)                 !Gas dissolution flux
+  real(r8),target,allocatable ::  Gas_Disol_Flx_vr(:,:,:,:)                 !Gas dissolution flux
   real(r8),target,allocatable ::  GasDifc(:,:,:,:)                   !gaseous diffusivity [m2 h-1]
   real(r8),target,allocatable ::  SolDifc(:,:,:,:)
   real(r8),target,allocatable ::  CGSGL(:,:,:)                       !gaseous CO2 diffusivity	[m2 h-1]
@@ -116,7 +116,7 @@ module ChemTranspDataType
   allocate(WGSGA(JY,JX));       WGSGA=0._r8
   allocate(GasSolbility(idg_beg:idg_end,0:JZ,JY,JX)); GasSolbility=0._r8
 
-  allocate(GasDisFlx(idg_beg:idg_end,0:JZ,JY,JX)); GasDisFlx=0._r8
+  allocate(Gas_Disol_Flx_vr(idg_beg:idg_end,0:JZ,JY,JX)); Gas_Disol_Flx_vr=0._r8
   allocate(HGSGL(JZ,JY,JX));    HGSGL=0._r8
   allocate(HLSGL(0:JZ,JY,JX));  HLSGL=0._r8
 

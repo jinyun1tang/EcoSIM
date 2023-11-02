@@ -200,7 +200,7 @@ implicit none
   fid_TR_Ca_2p_soil    =addone(itemp)
   fid_TR_CaSO4_soil   =addone(itemp)
   fid_TR_CaSO4_precip_soil  =addone(itemp)
-  fid_TR_CO2_aqu_soil   =addone(itemp)
+  fid_TR_CO2_aqu_soil_vr   =addone(itemp)
   fid_TR_CO3_2e_soil   =addone(itemp)
   fid_TR_Fe_3p_soil    =addone(itemp)
   fid_TR_FeSO4_soil   =addone(itemp)
@@ -213,7 +213,7 @@ implicit none
   fid_TR_KSO4_soil   =addone(itemp)
   fid_TR_Mg_2p_soil    =addone(itemp)
   fid_TR_MgSO4_soil   =addone(itemp)
-  fid_TR_NH3_soil   =addone(itemp)
+  fid_TR_NH3_soil_vr   =addone(itemp)
   fid_TR_NH4_soil   =addone(itemp)
   fid_TR_Na_p_soil    =addone(itemp)
   fid_TR_NaSO4_soil   =addone(itemp)
@@ -690,8 +690,8 @@ implicit none
   varl(fid_TR_CaSO4_precip_soil)='TR_CaSO4_precip_soil';varlnml(fid_TR_CaSO4_precip_soil)='total precipitated CaSO4 transformation'
   unitl(fid_TR_CaSO4_precip_soil)='mol d-2 h-1';vartypes(fid_TR_CaSO4_precip_soil)=var_flux_type
 
-  varl(fid_TR_CO2_aqu_soil)='TR_CO2_aqu_soil';varlnml(fid_TR_CO2_aqu_soil)='total solute CO2 transformation'
-  unitl(fid_TR_CO2_aqu_soil)='mol d-2 h-1';vartypes(fid_TR_CO2_aqu_soil)=var_flux_type
+  varl(fid_TR_CO2_aqu_soil_vr)='TR_CO2_aqu_soil_vr';varlnml(fid_TR_CO2_aqu_soil_vr)='total solute CO2 transformation'
+  unitl(fid_TR_CO2_aqu_soil_vr)='mol d-2 h-1';vartypes(fid_TR_CO2_aqu_soil_vr)=var_flux_type
 
   varl(fid_TR_CO3_2e_soil)='TR_CO3_2e_soil';varlnml(fid_TR_CO3_2e_soil)='total solute CO3 transformation'
   unitl(fid_TR_CO3_2e_soil)='mol d-2 h-1';vartypes(fid_TR_CO3_2e_soil)=var_flux_type
@@ -726,8 +726,8 @@ implicit none
   varl(fid_TR_MgSO4_soil)='TR_MgSO4_soil';varlnml(fid_TR_MgSO4_soil)='total solute MgSO4 transformation'
   unitl(fid_TR_MgSO4_soil)='mol d-2 h-1';vartypes(fid_TR_MgSO4_soil)=var_flux_type
 
-  varl(fid_TR_NH3_soil) = 'TR_NH3_soil';varlnml(fid_TR_NH3_soil)='non-band total solute NH3 transformation'
-  unitl(fid_TR_NH3_soil)= 'mol d-2 h-1';vartypes(fid_TR_NH3_soil)=var_flux_type
+  varl(fid_TR_NH3_soil_vr) = 'TR_NH3_soil_vr';varlnml(fid_TR_NH3_soil_vr)='non-band total solute NH3 transformation'
+  unitl(fid_TR_NH3_soil_vr)= 'mol d-2 h-1';vartypes(fid_TR_NH3_soil_vr)=var_flux_type
 
   varl(fid_TR_NH4_soil) = 'TR_NH4_soil';varlnml(fid_TR_NH4_soil)='non-band soil total solute NH4 transformation'
   unitl(fid_TR_NH4_soil)= 'mol d-2 h-1';vartypes(fid_TR_NH4_soil)=var_flux_type
@@ -891,9 +891,9 @@ implicit none
   ystatesfl(cid_NH4_1p_conc)=ystates0l(cid_NH4_1p_conc)+solflx%TR_NH4_soil/chemvar%VLWatMicPNH
   ystatesfl(fid_TR_NH4_soil)=solflx%TR_NH4_soil
 
-  !ZNH3S=ZNH3S+TR_NH3_soil*Natomw
-  ystatesfl(cid_NH3_aqu_conc)=ystates0l(cid_NH3_aqu_conc)+solflx%TR_NH3_soil/chemvar%VLWatMicPNH
-  ystatesfl(fid_TR_NH3_soil)=solflx%TR_NH3_soil
+  !ZNH3S=ZNH3S+TR_NH3_soil_vr*Natomw
+  ystatesfl(cid_NH3_aqu_conc)=ystates0l(cid_NH3_aqu_conc)+solflx%TR_NH3_soil_vr/chemvar%VLWatMicPNH
+  ystatesfl(fid_TR_NH3_soil_vr)=solflx%TR_NH3_soil_vr
 
   !XN4  =XN4+TR_NH4_sorbed_soil
   ystatesfl(cid_XNH4_conc)=ystates0l(cid_XNH4_conc)+solflx%TR_NH4_sorbed_soil/chemvar%VLWatMicPNH

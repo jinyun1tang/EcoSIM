@@ -56,9 +56,9 @@ implicit none
   ystatesfl(cid_NH4_1p_conc)=ystates0l(cid_NH4_1p_conc)+solflx%TR_NH4_soil/chemvar%VLWatMicPNH
   ystatesfl(fid_TR_NH4_soil)=solflx%TR_NH4_soil
 
-  !ZNH3S=ZNH3S+TR_NH3_soil*Natomw
-  ystatesfl(cid_NH3_aqu_conc)=ystates0l(cid_NH3_aqu_conc)+solflx%TR_NH3_soil/chemvar%VLWatMicPNH
-  ystatesfl(fid_TR_NH3_soil)=solflx%TR_NH3_soil
+  !ZNH3S=ZNH3S+TR_NH3_soil_vr*Natomw
+  ystatesfl(cid_NH3_aqu_conc)=ystates0l(cid_NH3_aqu_conc)+solflx%TR_NH3_soil_vr/chemvar%VLWatMicPNH
+  ystatesfl(fid_TR_NH3_soil_vr)=solflx%TR_NH3_soil_vr
 
   !XN4  =XN4+TR_NH4_sorbed_soil
   ystatesfl(cid_XNH4_conc)=ystates0l(cid_XNH4_conc)+solflx%TR_NH4_sorbed_soil/chemvar%VLWatMicPNH

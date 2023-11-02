@@ -288,7 +288,7 @@ module UptakesMod
         plt_rbgc%RUPN3B(N,L,NZ)=0.0_r8
         plt_rbgc%RUPHGS(N,L,NZ)=0.0_r8
         plt_rbgc%trcg_RFLA(idg_beg:idg_end-1,N,L,NZ)=0.0_r8
-        plt_rbgc%trcg_RDFA(idg_beg:idg_end-1,N,L,NZ)=0.0_r8
+        plt_rbgc%trcg_Root_DisEvap_flx_vr(idg_beg:idg_end-1,N,L,NZ)=0.0_r8
       enddo
     enddo
   ENDDO D9984

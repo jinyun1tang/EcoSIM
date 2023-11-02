@@ -215,7 +215,7 @@ module InsideTranspMod
 !     CO2S,CH4S,OXYS,Z2GS,Z2OS,H2GS=aqueous CO2,CH4,O2,N2,N2O,H2 in micropores
 !     ZN3G=gaseous NH3
 !
-    RTGasADFlx(idg_beg:idg_NH3,L,NY,NX)=0._r8
+    Gas_AdvDif_Flx_vr(idg_beg:idg_NH3,L,NY,NX)=0._r8
     DO ngases=idg_beg,idg_NH3
       if(ngases/=idg_NH3)then
         trc_solml2(ngases,L,NY,NX)=trc_solml2(ngases,L,NY,NX)-RBGCSinkG(ngases,L,NY,NX)
@@ -1090,7 +1090,7 @@ module InsideTranspMod
   ENDDO D9945
 
   DO nsolutes=ids_beg,ids_end
-    trcs_PoreTranspFlx(nsolutes,N6,N5,N4)=trcs_PoreTranspFlx(nsolutes,N6,N5,N4) &
+    trcs_PoreTranspFlx_vr(nsolutes,N6,N5,N4)=trcs_PoreTranspFlx_vr(nsolutes,N6,N5,N4) &
       +RporeSoXFlx(nsolutes,N6,N5,N4)
   ENDDO
 
@@ -1336,7 +1336,7 @@ module InsideTranspMod
 !     X*BBL=hourly bubble flux
 !
         DO ngases=idg_beg,idg_end
-          trcg_XBLL(ngases,N3,N2,N1)=trcg_XBLL(ngases,N3,N2,N1)+trcg_BBL(ngases,N3,N2,N1)
+          trcg_ebu_flx_vr(ngases,N3,N2,N1)=trcg_ebu_flx_vr(ngases,N3,N2,N1)+trcg_BBL(ngases,N3,N2,N1)
         ENDDO
       ELSE
         trcg_BBL(idg_beg:idg_end,N3,N2,N1)=0.0_r8
@@ -1491,7 +1491,7 @@ module InsideTranspMod
 !     X*FLG=hourly total convective+diffusive gas flux
 !
     DO ngases=idg_beg,idg_NH3
-      R3GasADTFlx(ngases,N,N6,N5,N4)=R3GasADTFlx(ngases,N,N6,N5,N4) &
+      Gas_3DAdvDif_Flx_vr(ngases,N,N6,N5,N4)=Gas_3DAdvDif_Flx_vr(ngases,N,N6,N5,N4) &
         +R3GasADFlx(ngases,N,N6,N5,N4)
     ENDDO
 
@@ -1556,7 +1556,7 @@ module InsideTranspMod
 !     X*DFG=hourly water-air gas flux
 !
       DO ngases=idg_beg,idg_end
-        GasDisFlx(ngases,N6,N5,N4)=GasDisFlx(ngases,N6,N5,N4)+RGasDSFlx(ngases,N6,N5,N4)
+        Gas_Disol_Flx_vr(ngases,N6,N5,N4)=Gas_Disol_Flx_vr(ngases,N6,N5,N4)+RGasDSFlx(ngases,N6,N5,N4)
       ENDDO
     ELSE
       RGasDSFlx(idg_beg:idg_end,N6,N5,N4)=0.0_r8

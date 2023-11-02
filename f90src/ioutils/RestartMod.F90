@@ -3606,122 +3606,20 @@ implicit none
   endif  
 
   if(flag=='read')then
-    datpr1 => datrc_1d    
-    call restartvar(ncid, flag, varname='UCO2G', dim1name='column',&
-       long_name='total soil CO2 flux', units='g d-2', &
-       interpinic_flag='skip', data=datpr1, missing_value=spval, &
+    datpr2 => datrc_2d(1:ncols,1:trc_confs%NGasTracers)    
+    call restartvar(ncid, flag, varname='SurfGasFlx', dim1name='column',&
+       dim2name='gastrcs',long_name='total soil gas flux', units='g d-2', &
+       interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,UCO2G,datrc_1d) 
-  else
-    !print*,'UCO2G'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,UCO2G,datrc_1d)   
-    datpr1 => datrc_1d      
-    call restartvar(ncid, flag, varname='UCO2G', dim1name='column',&
-       long_name='total soil CO2 flux', units='g d-2', &
-       interpinic_flag='skip', data=datpr1, missing_value=spval, &
-       fill_value=spval)    
-  endif  
-
-  if(flag=='read')then
-    datpr1 => datrc_1d    
-    call restartvar(ncid, flag, varname='UCH4G', dim1name='column',&
-       long_name='total soil CH4 flux', units='g d-2', &
-       interpinic_flag='skip', data=datpr1, missing_value=spval, &
-       fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,UCH4G,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,SurfGasFlx,datrc_2d) 
   else
     !print*,'UCH4G'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,UCH4G,datrc_1d)   
-    datpr1 => datrc_1d      
-    call restartvar(ncid, flag, varname='UCH4G', dim1name='column',&
-       long_name='total soil CH4 flux', units='g d-2', &
-       interpinic_flag='skip', data=datpr1, missing_value=spval, &
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SurfGasFlx,datrc_2d)   
+    datpr2 => datrc_2d(1:ncols,1:trc_confs%NGasTracers)          
+    call restartvar(ncid, flag, varname='SurfGasFlx', dim1name='column',&
+       dim2name='gastrcs',long_name='total soil gas flux', units='g d-2', &
+       interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
-  endif  
-
-  if(flag=='read')then
-    datpr1 => datrc_1d    
-    call restartvar(ncid, flag, varname='UOXYG', dim1name='column',&
-       long_name='total soil O2 flux', units='g d-2', &
-       interpinic_flag='skip', data=datpr1, missing_value=spval, &
-       fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,UOXYG,datrc_1d) 
-  else
-    !print*,'UOXYG'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,UOXYG,datrc_1d)  
-    datpr1 => datrc_1d       
-    call restartvar(ncid, flag, varname='UOXYG', dim1name='column',&
-       long_name='total soil O2 flux', units='g d-2', &
-       interpinic_flag='skip', data=datpr1, missing_value=spval, &
-       fill_value=spval)    
-  endif  
-
-  if(flag=='read')then
-    datpr1 => datrc_1d    
-    call restartvar(ncid, flag, varname='UN2GG', dim1name='column',&
-       long_name='total soil N2 flux', units='g d-2', &
-       interpinic_flag='skip', data=datpr1, missing_value=spval, &
-       fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,UN2GG,datrc_1d) 
-  else
-    !print*,'UN2GG'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,UN2GG,datrc_1d)   
-    datpr1 => datrc_1d      
-    call restartvar(ncid, flag, varname='UN2GG', dim1name='column',&
-       long_name='total soil N2 flux', units='g d-2', &
-       interpinic_flag='skip', data=datpr1, missing_value=spval, &
-       fill_value=spval)    
-  endif  
-
-  if(flag=='read')then
-    datpr1 => datrc_1d    
-    call restartvar(ncid, flag, varname='UN2OG', dim1name='column',&
-       long_name='total soil N2O flux', units='g d-2', &
-       interpinic_flag='skip', data=datpr1, missing_value=spval, &
-       fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,UN2OG,datrc_1d) 
-  else
-    !print*,'UN2OG'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,UN2OG,datrc_1d)   
-    datpr1 => datrc_1d      
-    call restartvar(ncid, flag, varname='UN2OG', dim1name='column',&
-       long_name='total soil N2O flux', units='g d-2', &
-       interpinic_flag='skip', data=datpr1, missing_value=spval, &
-       fill_value=spval)    
-  endif  
-
-  if(flag=='read')then
-    datpr1 => datrc_1d    
-    call restartvar(ncid, flag, varname='UNH3G', dim1name='column',&
-       long_name='total soil NH3 flux', units='g d-2', &
-       interpinic_flag='skip', data=datpr1, missing_value=spval, &
-       fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,UNH3G,datrc_1d) 
-  else
-    !print*,'UNH3G'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,UNH3G,datrc_1d)   
-    datpr1 => datrc_1d      
-    call restartvar(ncid, flag, varname='UNH3G', dim1name='column',&
-       long_name='total soil NH3 flux', units='g d-2', &
-       interpinic_flag='skip', data=datpr1, missing_value=spval, &
-       fill_value=spval)    
-  endif  
-
-  if(flag=='read')then
-    datpr1 => datrc_1d    
-    call restartvar(ncid, flag, varname='UN2GS', dim1name='column',&
-       long_name='total soil N2 flux', units='g d-2', &
-       interpinic_flag='skip', data=datpr1, missing_value=spval, &
-       fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,UN2GS,datrc_1d) 
-  else
-    !print*,'UN2GS'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,UN2GS,datrc_1d)   
-    datpr1 => datrc_1d      
-    call restartvar(ncid, flag, varname='UN2GS', dim1name='column',&
-       long_name='total soil N2 flux', units='g d-2', &
-       interpinic_flag='skip', data=datpr1, missing_value=spval, &
-       fill_value=spval)   
   endif  
 
   if(flag=='read')then
@@ -3931,16 +3829,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d        
-    call restartvar(ncid, flag, varname='UDOCQ', dim1name='column',&
+    call restartvar(ncid, flag, varname='HDOCQ', dim1name='column',&
        long_name='total surface DOC flux', units='g d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,UDOCQ,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,HDOCQ,datrc_1d) 
   else
-    !print*,'UDOCQ'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,UDOCQ,datrc_1d)   
+    !print*,'HDOCQ'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,HDOCQ,datrc_1d)   
     datpr1 => datrc_1d          
-    call restartvar(ncid, flag, varname='UDOCQ', dim1name='column',&
+    call restartvar(ncid, flag, varname='HDOCQ', dim1name='column',&
        long_name='total surface DOC flux', units='g d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
@@ -3948,16 +3846,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d        
-    call restartvar(ncid, flag, varname='UDOCD', dim1name='column',&
+    call restartvar(ncid, flag, varname='HDOCD', dim1name='column',&
        long_name='total subsurface DOC flux', units='g d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,UDOCD,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,HDOCD,datrc_1d) 
   else
-    !print*,'UDOCD'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,UDOCD,datrc_1d)   
+    !print*,'HDOCD'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,HDOCD,datrc_1d)   
     datpr1 => datrc_1d          
-    call restartvar(ncid, flag, varname='UDOCD', dim1name='column',&
+    call restartvar(ncid, flag, varname='HDOCD', dim1name='column',&
        long_name='total subsurface DOC flux', units='g d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
@@ -3983,16 +3881,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d        
-    call restartvar(ncid, flag, varname='UDOND', dim1name='column',&
+    call restartvar(ncid, flag, varname='HDOND', dim1name='column',&
        long_name='total subsurface DON flux', units='g d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,UDOND,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,HDOND,datrc_1d) 
   else
-    !print*,'UDOND'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,UDOND,datrc_1d)   
+    !print*,'HDOND'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,HDOND,datrc_1d)   
     datpr1 => datrc_1d          
-    call restartvar(ncid, flag, varname='UDOND', dim1name='column',&
+    call restartvar(ncid, flag, varname='HDOND', dim1name='column',&
        long_name='total subsurface DON flux', units='g d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
@@ -4017,16 +3915,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d        
-    call restartvar(ncid, flag, varname='UDOPD', dim1name='column',&
+    call restartvar(ncid, flag, varname='HDOPD', dim1name='column',&
        long_name='total subsurface DOP flux', units='g d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,UDOPD,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,HDOPD,datrc_1d) 
   else
-    !print*,'UDOPD'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,UDOPD,datrc_1d)   
+    !print*,'HDOPD'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,HDOPD,datrc_1d)   
     datpr1 => datrc_1d          
-    call restartvar(ncid, flag, varname='UDOPD', dim1name='column',&
+    call restartvar(ncid, flag, varname='HDOPD', dim1name='column',&
        long_name='total subsurface DOP flux', units='g d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
@@ -4034,16 +3932,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d        
-    call restartvar(ncid, flag, varname='UDICQ', dim1name='column',&
+    call restartvar(ncid, flag, varname='HDICQ', dim1name='column',&
        long_name='total surface DIC flux', units='g d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,UDICQ,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,HDICQ,datrc_1d) 
   else
-    !print*,'UDICQ'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,UDICQ,datrc_1d)   
+    !print*,'HDICQ'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,HDICQ,datrc_1d)   
     datpr1 => datrc_1d          
-    call restartvar(ncid, flag, varname='UDICQ', dim1name='column',&
+    call restartvar(ncid, flag, varname='HDICQ', dim1name='column',&
        long_name='total surface DIC flux', units='g d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
@@ -4051,16 +3949,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d            
-    call restartvar(ncid, flag, varname='UDICD', dim1name='column',&
+    call restartvar(ncid, flag, varname='HDICD', dim1name='column',&
        long_name='total subsurface DIC flux', units='g d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,UDICD,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,HDICD,datrc_1d) 
   else
-    !print*,'UDICD'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,UDICD,datrc_1d)   
+    !print*,'HDICD'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,HDICD,datrc_1d)   
     datpr1 => datrc_1d              
-    call restartvar(ncid, flag, varname='UDICD', dim1name='column',&
+    call restartvar(ncid, flag, varname='HDICD', dim1name='column',&
        long_name='total subsurface DIC flux', units='g d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
@@ -4085,16 +3983,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d            
-    call restartvar(ncid, flag, varname='UDIND', dim1name='column',&
+    call restartvar(ncid, flag, varname='HDIND', dim1name='column',&
        long_name='total subsurface DIN flux', units='g d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,UDIND,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,HDIND,datrc_1d) 
   else
-    !print*,'UDIND'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,UDIND,datrc_1d)   
+    !print*,'HDIND'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,HDIND,datrc_1d)   
     datpr1 => datrc_1d              
-    call restartvar(ncid, flag, varname='UDIND', dim1name='column',&
+    call restartvar(ncid, flag, varname='HDIND', dim1name='column',&
        long_name='total subsurface DIN flux', units='g d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
@@ -4119,16 +4017,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d            
-    call restartvar(ncid, flag, varname='UDIPD', dim1name='column',&
+    call restartvar(ncid, flag, varname='HDIPD', dim1name='column',&
        long_name='total subsurface DIP flux', units='g d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,UDIPD,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,HDIPD,datrc_1d) 
   else
-    !print*,'UDIPD'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,UDIPD,datrc_1d)   
+    !print*,'HDIPD'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,HDIPD,datrc_1d)   
     datpr1 => datrc_1d              
-    call restartvar(ncid, flag, varname='UDIPD', dim1name='column',&
+    call restartvar(ncid, flag, varname='HDIPD', dim1name='column',&
        long_name='total subsurface DIP flux', units='g d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    

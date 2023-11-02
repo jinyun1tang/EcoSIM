@@ -207,7 +207,7 @@ module NutUptakeMod
   L1=plt_site%NU;L2=plt_morph%NI(NZ);NN=plt_morph%MY(NZ)
 
   plt_rbgc%trcg_RFLA(idg_beg:idg_end-1,1:NN,L1:L2,NZ)=0.0_r8
-  plt_rbgc%trcg_RDFA(idg_beg:idg_end-1,1:NN,L1:L2,NZ)=0.0_r8
+  plt_rbgc%trcg_Root_DisEvap_flx_vr(idg_beg:idg_end-1,1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%RCO2S(1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%RUPOXS(1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%RUPCHS(1:NN,L1:L2,NZ)=0.0_r8

@@ -653,23 +653,8 @@ implicit none
   real(r8), pointer :: RCO2F(:)      => null()   !net gaseous CO2 flux, [g d-2 h-1]
   real(r8), pointer :: ROXYL(:)      => null()   !net aqueous O2 flux, [g d-2 h-1]
   real(r8), pointer :: ROXYY(:)      => null()   !total root + microbial O2 uptake, [g d-2 h-1]
-  real(r8), pointer :: TUPNO3(:)     => null()   !total root-soil NO3 flux non-band, [gN d-2 h-1]
-  real(r8), pointer :: TUPH2B(:)     => null()   !total root-soil PO4 flux band, [gP d-2 h-1]
-  real(r8), pointer :: TUPH1B(:)     => null()   !soil-root exch of HPO4 in band [gP d-2 h-1]
-  real(r8), pointer :: TUPN2S(:)     => null()   !total root-soil N2O flux, [gN d-2 h-1]
-  real(r8), pointer :: TCO2S(:)      => null()   !total root-soil CO2 flux, [gC d-2 h-1]
   real(r8), pointer :: TCO2P(:)      => null()   !total root CO2 flux, [gC d-2 h-1]
   real(r8), pointer :: TUPOXP(:)     => null()   !total root internal O2 flux, [g d-2 h-1]
-  real(r8), pointer :: TUPOXS(:)     => null()   !total root-soil O2 flux, [g d-2 h-1]
-  real(r8), pointer :: TUPHGS(:)     => null()   !total root-soil H2 flux, [g d-2 h-1]
-  real(r8), pointer :: TUPCHS(:)     => null()   !total root-soil CH4 flux, [gC d-2 h-1]
-  real(r8), pointer :: TUPN3B(:)     => null()   !total root-soil NH3 flux band, [gN d-2 h-1]
-  real(r8), pointer :: TUPN3S(:)     => null()   !total root-soil NH3 flux non-band, [gN d-2 h-1]
-  real(r8), pointer :: TUPH2P(:)     => null()   !total root-soil PO4 flux non-band, [gP d-2 h-1]
-  real(r8), pointer :: TUPH1P(:)     => null()   !soil-root exch of HPO4 in non-band, [gP d-2 h-1]
-  real(r8), pointer :: TUPNH4(:)     => null()   !total root-soil NH4 flux non-band, [gN d-2 h-1]
-  real(r8), pointer :: TUPNHB(:)     => null()   !total root-soil NH4 flux band, [gN d-2 h-1]
-  real(r8), pointer :: TUPNOB(:)     => null()   !total root-soil NO3 flux band, [gN d-2 h-1]
   real(r8), pointer :: LitrfalChemElemnts_vr(:,:,:,:)   => null() !total litterfall element, [g d-2 h-1]
   real(r8), pointer :: RDOM_micb_flx(:,:,:)    => null()  !net microbial DOC flux, [gC d-2 h-1]
   real(r8), pointer :: CO2NetFix_pft(:)       => null()  !canopy net CO2 exchange, [gC d-2 h-1]
@@ -690,6 +675,7 @@ implicit none
 
   type, public :: plant_rootbgc_type
   real(r8), pointer :: TRootGasLoss_disturb(:)   => null()  !total root gas content [g d-2]
+  real(r8), pointer :: trcs_plant_uptake_vr(:,:)     => null()   !total root-soil solute flux non-band, [g d-2 h-1]  
   real(r8), pointer :: UPOME(:,:)       => null()  !total root uptake (+ve) - exudation (-ve) of dissolved element, [g d-2 h-1]
   real(r8), pointer :: UPNF(:)          => null()  !total root N2 fixation, [g d-2 h-1]
   real(r8), pointer :: UPNO3(:)         => null()  !total root uptake of NO3, [g d-2 h-1]
@@ -719,7 +705,7 @@ implicit none
   real(r8), pointer :: RUPN3B(:,:,:)    => null()  !aqueous NH3 flux from roots to soil water band, [g d-2 h-1]
   real(r8), pointer :: RUPHGS(:,:,:)    => null()  !aqueous H2 flux from roots to soil water, [g d-2 h-1]
   real(r8), pointer :: trcg_RFLA(:,:,:,:)    => null()  !gaseous tracer flux through roots, [g d-2 h-1]
-  real(r8), pointer :: trcg_RDFA(:,:,:,:)    => null()  !dissolution (+ve) - volatilization (-ve) gas flux in roots, [g d-2 h-1]
+  real(r8), pointer :: trcg_Root_DisEvap_flx_vr(:,:,:,:)    => null()  !dissolution (+ve) - volatilization (-ve) gas flux in roots, [g d-2 h-1]
   real(r8), pointer :: ROXYP(:,:,:)     => null()  !root  O2 demand from respiration, [g d-2 h-1]
   real(r8), pointer :: RUNNHP(:,:,:)    => null()  !root uptake of NH4 non-band unconstrained by NH4, [g d-2 h-1]
   real(r8), pointer :: RUNNBP(:,:,:)    => null()  !root uptake of NO3 band unconstrained by NO3, [g d-2 h-1]
@@ -763,7 +749,6 @@ implicit none
   real(r8), pointer :: TEUPTK(:,:)      => null()  !total net root element uptake (+ve) - exudation (-ve), [gC d-2 ]
   real(r8), pointer :: trcg_TLP(:,:)    => null()   !total root internal gas flux, [g d-2 h-1]
   real(r8), pointer :: trcg_TFLA(:,:)   => null()   !total internal root gas flux , [gC d-2 h-1]
-  real(r8), pointer :: TUPNF(:)         => null()   !total root N2 fixation, [g d-2 h-1]
 
   contains
     procedure, public :: Init => plt_rootbgc_init
@@ -789,11 +774,10 @@ implicit none
 
   implicit none
   class(plant_rootbgc_type) :: this
-
+  allocate(this%trcs_plant_uptake_vr(ids_beg:ids_end,JZ1))
   allocate(this%trcg_rootml(idg_beg:idg_end-1,2,JZ1,JP1));this%trcg_rootml=0._r8
   allocate(this%trcs_rootml(idg_beg:idg_end-1,2,JZ1,JP1));this%trcs_rootml=0._r8
   allocate(this%TRootGasLoss_disturb(idg_beg:idg_end-1));this%TRootGasLoss_disturb=0._r8
-  allocate(this%TUPNF(JZ1))
   allocate(this%ROXSK(60,0:JZ1))
   allocate(this%RDFOME(NumOfPlantChemElements,2,1:jcplx,0:JZ1,JP1))
   allocate(this%HEUPTK(NumOfPlantChemElements,JP1))
@@ -840,7 +824,7 @@ implicit none
   allocate(this%trcg_TLP(idg_beg:idg_end-1,JZ1))
 
   allocate(this%trcg_RFLA(idg_beg:idg_end-1,2,JZ1,JP1))
-  allocate(this%trcg_RDFA(idg_beg:idg_end-1,2,JZ1,JP1))
+  allocate(this%trcg_Root_DisEvap_flx_vr(idg_beg:idg_end-1,2,JZ1,JP1))
   allocate(this%ROXYP(2,JZ1,JP1))
   allocate(this%RUNNHP(2,JZ1,JP1))
   allocate(this%RUNNBP(2,JZ1,JP1))
@@ -1046,26 +1030,8 @@ implicit none
   implicit none
   class(plant_bgcrate_type) :: this
 
-
-  allocate(this%TCO2S(JZ1))
   allocate(this%TCO2P(JZ1))
-  allocate(this%TUPN3B(JZ1))
-  allocate(this%TUPH1B(JZ1))
-  allocate(this%TUPN3S(JZ1))
-  allocate(this%TUPHGS(JZ1))
   allocate(this%TUPOXP(JZ1))
-  allocate(this%TUPOXS(JZ1))
-  allocate(this%TUPN2S(JZ1))
-  allocate(this%TUPCHS(JZ1))
-  allocate(this%TUPNH4(JZ1))
-  allocate(this%TUPNO3(JZ1))
-  allocate(this%TUPH2P(JZ1))
-  allocate(this%TUPH2B(JZ1))
-  allocate(this%TUPH1P(JZ1))
-
-  allocate(this%TUPNHB(JZ1))
-  allocate(this%TUPNOB(JZ1))
-
   allocate(this%RPO4Y(0:JZ1))
   allocate(this%RPOBY(0:JZ1))
   allocate(this%RP14Y(0:JZ1))

@@ -35,63 +35,36 @@ implicit none
   real(r8),target,allocatable :: AEC(:,:,:)            !soil anion exchange capacity	[cmol kg-1]
 
   real(r8),target,allocatable ::  ROXSK(:,:,:,:)                     !total O2 sink, [g d-2 t-1]
-  real(r8),target,allocatable ::  HCO2G(:,:)                         !soil CO2 flux, [g d-2 h-1]
-  real(r8),target,allocatable ::  HCH4G(:,:)                         !soil CH4 flux, [g d-2 h-1]
-  real(r8),target,allocatable ::  HOXYG(:,:)                         !soil O2 flux, [g d-2 h-1]
-  real(r8),target,allocatable ::  HN2OG(:,:)                         !soil N2O flux, [g d-2 h-1]
-  real(r8),target,allocatable ::  HNH3G(:,:)                         !soil NH3 flux, [g d-2 h-1]
+  real(r8),target,allocatable ::  SurfGasFlx(:,:,:)                  !soil gas flux, [g d-2 h-1]
   real(r8),target,allocatable ::  UORGF(:,:)                         !total C amendment, [g d-2]
   real(r8),target,allocatable ::  UFERTN(:,:)                        !total fertilizer N amendment, [g d-2]
   real(r8),target,allocatable ::  UFERTP(:,:)                        !total fertilizer P amendment, [g d-2]
-  real(r8),target,allocatable ::  UDOCQ(:,:)                         !total surface DOC flux, [g d-2]
-  real(r8),target,allocatable ::  UDOCD(:,:)                         !total subsurface DOC flux, [g d-2]
+  real(r8),target,allocatable ::  HDOCQ(:,:)                         !total surface DOC flux, [g d-2]
+  real(r8),target,allocatable ::  HDOCD(:,:)                         !total subsurface DOC flux, [g d-2]
   real(r8),target,allocatable ::  UXCSN(:,:)                         !total litterfall C, [g d-2]
   real(r8),target,allocatable ::  UXZSN(:,:)                         !total litterfall N, [g d-2]
   real(r8),target,allocatable ::  UXPSN(:,:)                         !total litterfall P, [g d-2]
   real(r8),target,allocatable ::  UDONQ(:,:)                         !total surface DON flux, [g d-2]
-  real(r8),target,allocatable ::  UDOND(:,:)                         !total subsurface DON flux, [g d-2]
+  real(r8),target,allocatable ::  HDOND(:,:)                         !total subsurface DON flux, [g d-2]
   real(r8),target,allocatable ::  UDOPQ(:,:)                         !total surface DOP flux, [g d-2]
-  real(r8),target,allocatable ::  UDOPD(:,:)                         !total subsurface DOP flux, [g d-2]
+  real(r8),target,allocatable ::  HDOPD(:,:)                         !total subsurface DOP flux, [g d-2]
   real(r8),target,allocatable ::  UPP4(:,:)                          !total soil precipited P, [g d-2]
-  real(r8),target,allocatable ::  UN2GS(:,:)                         !total N2 fixation, [g d-2]
-  real(r8),target,allocatable ::  UH2GG(:,:)                         !total H2 flux, []
-  real(r8),target,allocatable ::  HN2GG(:,:)                         !soil N2 flux, [g d-2 h-1]
-  real(r8),target,allocatable ::  UN2GG(:,:)                         !total soil N2 flux, [g d-2]
-  real(r8),target,allocatable ::  UCO2G(:,:)                         !total soil CO2 flux, [g d-2]
-  real(r8),target,allocatable ::  UCH4G(:,:)                         !total soil CH4 flux, [g d-2]
-  real(r8),target,allocatable ::  UOXYG(:,:)                         !total soil O2 flux, [g d-2]
-  real(r8),target,allocatable ::  UNH3G(:,:)                         !total soil NH3 flux, [g d-2]
-  real(r8),target,allocatable ::  UN2OG(:,:)                         !total soil N2O flux, [g d-2]
   real(r8),target,allocatable ::  UCOP(:,:)                          !total soil autotrophic respiration, [g d-2]
   real(r8),target,allocatable ::  USEDOU(:,:)                        !total sediment subsurface flux, [Mg d-2]
-  real(r8),target,allocatable ::  UDICQ(:,:)                         !total surface DIC flux, [g d-2]
-  real(r8),target,allocatable ::  UDICD(:,:)                         !total subsurface DIC flux, [g d-2]
+  real(r8),target,allocatable ::  HDICQ(:,:)                         !total surface DIC flux, [g d-2]
+  real(r8),target,allocatable ::  HDICD(:,:)                         !total subsurface DIC flux, [g d-2]
   real(r8),target,allocatable ::  UDINQ(:,:)                         !total surface DIN flux, [g d-2]
-  real(r8),target,allocatable ::  UDIND(:,:)                         !total subsurface DIN flux, [g d-2]
+  real(r8),target,allocatable ::  HDIND(:,:)                         !total subsurface DIN flux, [g d-2]
   real(r8),target,allocatable ::  UDIPQ(:,:)                         !total surface DIP flux, [g d-2]
-  real(r8),target,allocatable ::  UDIPD(:,:)                         !total subsurface DIP flux, [g d-2]
+  real(r8),target,allocatable ::  HDIPD(:,:)                         !total subsurface DIP flux, [g d-2]
   real(r8),target,allocatable ::  WTSTGET(:,:,:)                        !total standing dead C, [g d-2]
   real(r8),target,allocatable ::  ZDRAIN(:,:)                        !total N drainage below root zone, [g d-2]
   real(r8),target,allocatable ::  PDRAIN(:,:)                        !total P drainage below root zone, [g d-2]
   real(r8),target,allocatable ::  UION(:,:)                          !total soil ion content, [mol d-2]
   real(r8),target,allocatable ::  UIONOU(:,:)                        !total subsurface ion flux, [mol d-2]
-  real(r8),target,allocatable ::  RNO2MicbTransf_vr(:,:,:)                       !total NO2 exchange, [g d-2 h-1]
-  real(r8),target,allocatable ::  RUPOXO(:,:,:)                      !microbial O2 uptake, [g d-2 h-1]
-  real(r8),target,allocatable ::  RCO2O(:,:,:)                       !microbial net CO2 exchange, [g d-2 h-1]
-  real(r8),target,allocatable ::  RCH4O(:,:,:)                       !microbial net CH4 exchange, [g d-2 h-1]
-  real(r8),target,allocatable ::  RH2GO(:,:,:)                       !microbial net H2 exchange, [g d-2 h-1]
-  real(r8),target,allocatable ::  RN2G(:,:,:)                        !microbial net N2 exchange, [g d-2 h-1]
-  real(r8),target,allocatable ::  RN2O(:,:,:)                        !microbial net N2O exchange, [g d-2 h-1]
-  real(r8),target,allocatable ::  XNO2B(:,:,:)                       !net microbial NO2 exchange band, [g d-2 h-1]
-  real(r8),target,allocatable ::  XNH4B(:,:,:)                       !net microbial NH4 exchange band, [g d-2 h-1]
-  real(r8),target,allocatable ::  XNO3B(:,:,:)                       !net microbial NO3 exchange band, [g d-2 h-1]
-  real(r8),target,allocatable ::  XH2BS(:,:,:)                       !net microbial PO4 exchange band, [g d-2 h-1]
-  real(r8),target,allocatable ::  XH1BS(:,:,:)                       !net microbial HPO4 exchange band, [g d-2 h-1]
-  real(r8),target,allocatable ::  XN2GS(:,:,:)                       !net microbial N2 exchange, [g d-2 h-1]
-  real(r8),target,allocatable ::  RH1PO4MicbTransf_vr(:,:,:)                       !net microibal HPO4 exchange non-band, [g d-2 h-1]
-  real(r8),target,allocatable ::  RH2PO4MicbTransf_vr(:,:,:)                       !net microbial PO4 exchange nonband, [g d-2 h-1]
-  real(r8),target,allocatable ::  RNH4MicbTransf_vr(:,:,:)                       !net microbial NH4 exchange non-band, [g d-2 h-1]
-  real(r8),target,allocatable ::  RNO3MicbTransf_vr(:,:,:)                       !net microbial NO3 exchange non-band, [g d-2 h-1]
+  real(r8),target,allocatable ::  RNutMicbTransf_vr(:,:,:,:)         !total nutrient exchange, [g d-2 h-1]
+  real(r8),target,allocatable ::  trcg_RMicbTransf_vr(:,:,:,:)       !microbial gases transformation, [g d-2 h-1]
+  real(r8),target,allocatable ::  Micb_N2Fixation_vr(:,:,:)                       !net microbial N2 exchange, [g d-2 h-1]
   real(r8),target,allocatable ::  RDOM_micb_flx(:,:,:,:,:)                     !net microbial DOC flux, [g d-2 h-1]
   real(r8),target,allocatable ::  TOQCK(:,:,:)                       !total respiration of DOC+DOA in soil layer
   real(r8),target,allocatable ::  VOLQ(:,:,:)                        !soil water volume occupied by microial biomass, [m3 m-3]
@@ -115,7 +88,7 @@ implicit none
   real(r8),target,allocatable ::  RVMXC(:,:,:)                       !total chemodenitrification N2O uptake non-band unconstrained by N2O, [g d-2 h-1]
   real(r8),target,allocatable ::  RVMBC(:,:,:)                       !total chemodenitrification N2O uptake band unconstrained by N2O, [g d-2 h-1]
   real(r8),target,allocatable ::  trcg_surf_disevap_flx(:,:,:)                   !soil surface gas dissolution (+ve) - volatilization (-ve), [g d-2 h-1]
-  real(r8),target,allocatable ::  trcg_XBLL(:,:,:,:)                      !CO2 bubbling, [g d-2 h-1]
+  real(r8),target,allocatable ::  trcg_ebu_flx_vr(:,:,:,:)                      !CO2 bubbling, [g d-2 h-1]
   real(r8),target,allocatable ::  XZHYS(:,:,:)                       !total H+ production
   real(r8),target,allocatable ::  WaterFlowSoiMicP(:,:,:,:)                       !water flux micropore, [m3 d-2 h-1]
   real(r8),target,allocatable ::  WaterFlowMacP(:,:,:,:)                      !water flux macropore, [m3 d-2 h-1]
@@ -125,7 +98,7 @@ implicit none
   real(r8),target,allocatable ::  DOM_3DMicp_Transp_flx(:,:,:,:,:,:)                  !DOC flux micropore, [g d-2 h-1]
 
   real(r8),target,allocatable ::  trcs_3DTransp2MacP(:,:,:,:,:)
-  real(r8),target,allocatable ::  R3GasADTFlx(:,:,:,:,:)             !3D gaseous fluxes, [g d-2 h-1]
+  real(r8),target,allocatable ::  Gas_3DAdvDif_Flx_vr(:,:,:,:,:)             !3D gaseous fluxes, [g d-2 h-1]
   real(r8),target,allocatable ::  DOM_3DMacp_Transp_flx(:,:,:,:,:,:)                  !DOC flux macropore, [g d-2 h-1]
 
   private :: InitAllocate
@@ -166,63 +139,38 @@ implicit none
   allocate(AEC(JZ,JY,JX));AEC(JZ,JY,JX)=0._r8
 
   allocate(ROXSK(60,0:JZ,JY,JX));ROXSK=0._r8
-  allocate(HCO2G(JY,JX));       HCO2G=0._r8
-  allocate(HCH4G(JY,JX));       HCH4G=0._r8
-  allocate(HOXYG(JY,JX));       HOXYG=0._r8
-  allocate(HN2OG(JY,JX));       HN2OG=0._r8
-  allocate(HNH3G(JY,JX));       HNH3G=0._r8
+  allocate(SurfGasFlx(idg_beg:idg_NH3,JY,JX));  SurfGasFlx=0._r8
   allocate(UORGF(JY,JX));       UORGF=0._r8
   allocate(UFERTN(JY,JX));      UFERTN=0._r8
   allocate(UFERTP(JY,JX));      UFERTP=0._r8
-  allocate(UDOCQ(JY,JX));       UDOCQ=0._r8
-  allocate(UDOCD(JY,JX));       UDOCD=0._r8
+  allocate(HDOCQ(JY,JX));       HDOCQ=0._r8
+  allocate(HDOCD(JY,JX));       HDOCD=0._r8
   allocate(UXCSN(JY,JX));       UXCSN=0._r8
   allocate(UXZSN(JY,JX));       UXZSN=0._r8
   allocate(UXPSN(JY,JX));       UXPSN=0._r8
   allocate(UDONQ(JY,JX));       UDONQ=0._r8
-  allocate(UDOND(JY,JX));       UDOND=0._r8
+  allocate(HDOND(JY,JX));       HDOND=0._r8
   allocate(UDOPQ(JY,JX));       UDOPQ=0._r8
-  allocate(UDOPD(JY,JX));       UDOPD=0._r8
+  allocate(HDOPD(JY,JX));       HDOPD=0._r8
   allocate(UPP4(JY,JX));        UPP4=0._r8
-  allocate(UN2GS(JY,JX));       UN2GS=0._r8
-  allocate(UH2GG(JY,JX));       UH2GG=0._r8
-  allocate(HN2GG(JY,JX));       HN2GG=0._r8
-  allocate(UN2GG(JY,JX));       UN2GG=0._r8
-  allocate(UCO2G(JY,JX));       UCO2G=0._r8
-  allocate(UCH4G(JY,JX));       UCH4G=0._r8
-  allocate(UOXYG(JY,JX));       UOXYG=0._r8
-  allocate(UNH3G(JY,JX));       UNH3G=0._r8
-  allocate(UN2OG(JY,JX));       UN2OG=0._r8
+
   allocate(UCOP(JY,JX));        UCOP=0._r8
   allocate(USEDOU(JY,JX));      USEDOU=0._r8
-  allocate(UDICQ(JY,JX));       UDICQ=0._r8
-  allocate(UDICD(JY,JX));       UDICD=0._r8
+  allocate(HDICQ(JY,JX));       HDICQ=0._r8
+  allocate(HDICD(JY,JX));       HDICD=0._r8
   allocate(UDINQ(JY,JX));       UDINQ=0._r8
-  allocate(UDIND(JY,JX));       UDIND=0._r8
+  allocate(HDIND(JY,JX));       HDIND=0._r8
   allocate(UDIPQ(JY,JX));       UDIPQ=0._r8
-  allocate(UDIPD(JY,JX));       UDIPD=0._r8
+  allocate(HDIPD(JY,JX));       HDIPD=0._r8
   allocate(WTSTGET(NumOfPlantChemElements,JY,JX));      WTSTGET=0._r8
   allocate(ZDRAIN(JY,JX));      ZDRAIN=0._r8
   allocate(PDRAIN(JY,JX));      PDRAIN=0._r8
   allocate(UION(JY,JX));        UION=0._r8
   allocate(UIONOU(JY,JX));      UIONOU=0._r8
-  allocate(RNO2MicbTransf_vr(0:JZ,JY,JX));  RNO2MicbTransf_vr=0._r8
-  allocate(RUPOXO(0:JZ,JY,JX)); RUPOXO=0._r8
-  allocate(RCO2O(0:JZ,JY,JX));  RCO2O=0._r8
-  allocate(RCH4O(0:JZ,JY,JX));  RCH4O=0._r8
-  allocate(RH2GO(0:JZ,JY,JX));  RH2GO=0._r8
-  allocate(RN2G(0:JZ,JY,JX));   RN2G=0._r8
-  allocate(RN2O(0:JZ,JY,JX));   RN2O=0._r8
-  allocate(XNO2B(0:JZ,JY,JX));  XNO2B=0._r8
-  allocate(XNH4B(0:JZ,JY,JX));  XNH4B=0._r8
-  allocate(XNO3B(0:JZ,JY,JX));  XNO3B=0._r8
-  allocate(XH2BS(0:JZ,JY,JX));  XH2BS=0._r8
-  allocate(XH1BS(0:JZ,JY,JX));  XH1BS=0._r8
-  allocate(XN2GS(0:JZ,JY,JX));  XN2GS=0._r8
-  allocate(RH1PO4MicbTransf_vr(0:JZ,JY,JX));  RH1PO4MicbTransf_vr=0._r8
-  allocate(RH2PO4MicbTransf_vr(0:JZ,JY,JX));  RH2PO4MicbTransf_vr=0._r8
-  allocate(RNH4MicbTransf_vr(0:JZ,JY,JX));  RNH4MicbTransf_vr=0._r8
-  allocate(RNO3MicbTransf_vr(0:JZ,JY,JX));  RNO3MicbTransf_vr=0._r8
+  allocate(RNutMicbTransf_vr(ids_NH4B:ids_nuts_end,0:JZ,JY,JX)); RNutMicbTransf_vr=0._r8
+  allocate(trcg_RMicbTransf_vr(idg_beg:idg_NH3-1,0:JZ,JY,JX)); trcg_RMicbTransf_vr=0._r8
+  allocate(Micb_N2Fixation_vr(0:JZ,JY,JX));  Micb_N2Fixation_vr=0._r8
+
   allocate(RDOM_micb_flx(idom_beg:idom_end,1:jcplx,0:JZ,JY,JX));RDOM_micb_flx=0._r8
   allocate(TOQCK(0:JZ,JY,JX));  TOQCK=0._r8
   allocate(VOLQ(0:JZ,JY,JX));   VOLQ=0._r8
@@ -247,7 +195,7 @@ implicit none
   allocate(RVMXC(0:JZ,JY,JX));  RVMXC=0._r8
   allocate(RVMBC(0:JZ,JY,JX));  RVMBC=0._r8
   allocate(trcg_surf_disevap_flx(idg_beg:idg_end-1,JY,JX));      trcg_surf_disevap_flx=0._r8
-  allocate(trcg_XBLL(idg_beg:idg_end,JZ,JY,JX));  trcg_XBLL=0._r8
+  allocate(trcg_ebu_flx_vr(idg_beg:idg_end,JZ,JY,JX));  trcg_ebu_flx_vr=0._r8
   allocate(XZHYS(0:JZ,JY,JX));  XZHYS=0._r8
   allocate(WaterFlowSoiMicP(3,JD,JV,JH));    WaterFlowSoiMicP=0._r8
   allocate(WaterFlowMacP(3,JD,JV,JH));   WaterFlowMacP=0._r8
@@ -255,7 +203,7 @@ implicit none
 
   allocate(trcs_3DTransp2MicP(ids_beg:ids_end,3,0:JD,JV,JH));trcs_3DTransp2MicP=0._r8
   allocate(DOM_3DMicp_Transp_flx(idom_beg:idom_end,1:jcplx,3,0:JD,JV,JH));DOM_3DMicp_Transp_flx=0._r8
-  allocate(R3GasADTFlx(idg_beg:idg_end,3,JD,JV,JH));R3GasADTFlx=0._r8
+  allocate(Gas_3DAdvDif_Flx_vr(idg_beg:idg_end,3,JD,JV,JH));Gas_3DAdvDif_Flx_vr=0._r8
   allocate(trcs_3DTransp2MacP(ids_beg:ids_end,3,0:JD,JV,JH));trcs_3DTransp2MacP=0._r8
   allocate(CPO4S(JZ,JY,JX));CPO4S(JZ,JY,JX)=0._r8
   allocate(DOM_3DMacp_Transp_flx(idom_beg:idom_end,1:jcplx,3,JD,JV,JH));DOM_3DMacp_Transp_flx=0._r8
@@ -287,65 +235,35 @@ implicit none
   call destroy(CEC)
   call destroy(AEC)
   call destroy(CPO4S)
-
   call destroy(ROXSK)
-  call destroy(HCO2G)
-  call destroy(HCH4G)
-  call destroy(HOXYG)
-  call destroy(HN2OG)
-  call destroy(HNH3G)
   call destroy(UORGF)
   call destroy(UFERTN)
   call destroy(UFERTP)
-  call destroy(UDOCQ)
-  call destroy(UDOCD)
+  call destroy(HDOCQ)
+  call destroy(HDOCD)
   call destroy(UXCSN)
   call destroy(UXZSN)
   call destroy(UXPSN)
   call destroy(UDONQ)
-  call destroy(UDOND)
+  call destroy(HDOND)
   call destroy(UDOPQ)
-  call destroy(UDOPD)
+  call destroy(HDOPD)
   call destroy(UPP4)
-  call destroy(UN2GS)
-  call destroy(UH2GG)
-  call destroy(HN2GG)
-  call destroy(UN2GG)
-  call destroy(UCO2G)
-  call destroy(UCH4G)
-  call destroy(UOXYG)
-  call destroy(UNH3G)
-  call destroy(UN2OG)
   call destroy(UCOP)
   call destroy(USEDOU)
-  call destroy(UDICQ)
-  call destroy(UDICD)
+  call destroy(HDICQ)
+  call destroy(HDICD)
   call destroy(UDINQ)
-  call destroy(UDIND)
+  call destroy(HDIND)
   call destroy(UDIPQ)
-  call destroy(UDIPD)
+  call destroy(HDIPD)
   call destroy(WTSTGET)
   call destroy(ZDRAIN)
   call destroy(PDRAIN)
   call destroy(UION)
   call destroy(UIONOU)
-  call destroy(RNO2MicbTransf_vr)
-  call destroy(RUPOXO)
-  call destroy(RCO2O)
-  call destroy(RCH4O)
-  call destroy(RH2GO)
-  call destroy(RN2G)
-  call destroy(RN2O)
-  call destroy(XNO2B)
-  call destroy(XNH4B)
-  call destroy(XNO3B)
-  call destroy(XH2BS)
-  call destroy(XH1BS)
-  call destroy(XN2GS)
-  call destroy(RH1PO4MicbTransf_vr)
-  call destroy(RH2PO4MicbTransf_vr)
-  call destroy(RNH4MicbTransf_vr)
-  call destroy(RNO3MicbTransf_vr)
+  call destroy(Micb_N2Fixation_vr)
+  call destroy(RNutMicbTransf_vr)
   call destroy(RDOM_micb_flx)
   call destroy(TOQCK)
   call destroy(VOLQ)
@@ -353,7 +271,7 @@ implicit none
   call destroy(LitrfalChemElemnts_vr)
 
   call destroy(trcs_VLN)
-  call destroy(trcg_XBLL)
+  call destroy(trcg_ebu_flx_vr)
   call destroy(VLNHB)
   call destroy(trcg_surf_disevap_flx)
 
@@ -377,6 +295,7 @@ implicit none
   call destroy(HeatFlow2Soil)
   call destroy(DOM_3DMicp_Transp_flx)
   call destroy(DOM_3DMacp_Transp_flx)
+  call destroy(trcg_RMicbTransf_vr)
   end subroutine DestructSoilBGCData
 
 end module SoilBGCDataType

@@ -144,7 +144,7 @@ module TranspNoSaltMod
 !     RN2O=net soil N2O uptake from nitro.f
 !     RH2GO=net H2 uptake from nitro.f
 !     RNH4MicbTransf_vr=net change in NH4 from nitro.f
-!     TR_NH4_soil,TR_NH3_soil=NH4,NH3 dissolution from solute.f
+!     TR_NH4_soil,TR_NH3_soil_vr=NH4,NH3 dissolution from solute.f
 !     RNO3MicbTransf_vr=net change in NO3 from nitro.f
 !     TRNO3=NO3 dissolution from solute.f
 !     RNO2MicbTransf_vr=net change in NO2 from nitro.f
@@ -215,7 +215,7 @@ module TranspNoSaltMod
 !     RN2O=net soil N2O uptake from nitro.f
 !     RH2GO=net H2 uptake from nitro.f
 !     RNH4MicbTransf_vr=net change in NH4 from nitro.f
-!     TR_NH4_soil,TR_NH3_soil=NH4,NH3 dissolution from solute.f
+!     TR_NH4_soil,TR_NH3_soil_vr=NH4,NH3 dissolution from solute.f
 !     RNO3MicbTransf_vr=net change in NO3 from nitro.f
 !     TRNO3=NO3 dissolution from solute.f
 !     RNO2MicbTransf_vr=net change in NO2 from nitro.f
@@ -437,7 +437,7 @@ module TranspNoSaltMod
 
       DO NTG=idg_beg,idg_end-1
         trc_gasml2(NTG,L,NY,NX)=trc_gasml2(NTG,L,NY,NX) &
-          +RTGasADFlx(NTG,L,NY,NX)-RGasDSFlx(NTG,L,NY,NX)
+          +Gas_AdvDif_Flx_vr(NTG,L,NY,NX)-RGasDSFlx(NTG,L,NY,NX)
       ENDDO
       trc_gasml2(idg_NH3,L,NY,NX)=trc_gasml2(idg_NH3,L,NY,NX)-RGasDSFlx(idg_NH3B,L,NY,NX)
     ENDIF
@@ -454,24 +454,24 @@ module TranspNoSaltMod
 
   integer :: K
 
-  RBGCSinkG(idg_CO2,0,NY,NX)=RCO2O(0,NY,NX)*dts_gas
-  RBGCSinkG(idg_CH4,0,NY,NX)=RCH4O(0,NY,NX)*dts_gas
-  RBGCSinkG(idg_N2,0,NY,NX)=(RN2G(0,NY,NX)+XN2GS(0,NY,NX))*dts_gas
-  RBGCSinkG(idg_N2O,0,NY,NX)=RN2O(0,NY,NX)*dts_gas
+  RBGCSinkG(idg_CO2,0,NY,NX)=trcg_RMicbTransf_vr(idg_CO2,0,NY,NX)*dts_gas
+  RBGCSinkG(idg_CH4,0,NY,NX)=trcg_RMicbTransf_vr(idg_CH4,0,NY,NX)*dts_gas
+  RBGCSinkG(idg_N2,0,NY,NX)=(trcg_RMicbTransf_vr(idg_N2,0,NY,NX)+Micb_N2Fixation_vr(0,NY,NX))*dts_gas
+  RBGCSinkG(idg_N2O,0,NY,NX)=trcg_RMicbTransf_vr(idg_N2O,0,NY,NX)*dts_gas
   RBGCSinkG(idg_NH3,0,NY,NX)=0.0_r8
-  RBGCSinkG(idg_H2,0,NY,NX)=RH2GO(0,NY,NX)*dts_gas
+  RBGCSinkG(idg_H2,0,NY,NX)=trcg_RMicbTransf_vr(idg_H2,0,NY,NX)*dts_gas
   DO  K=1,jcplx
     RDOM_micb_cumflx(idom_doc,K,0,NY,NX)=-RDOM_micb_flx(idom_doc,K,0,NY,NX)*dts_HeatWatTP
     RDOM_micb_cumflx(idom_don,K,0,NY,NX)=-RDOM_micb_flx(idom_don,K,0,NY,NX)*dts_HeatWatTP
     RDOM_micb_cumflx(idom_dop,K,0,NY,NX)=-RDOM_micb_flx(idom_dop,K,0,NY,NX)*dts_HeatWatTP
     RDOM_micb_cumflx(idom_acetate,K,0,NY,NX)=-RDOM_micb_flx(idom_acetate,K,0,NY,NX)*dts_HeatWatTP
   ENDDO
-  RBGCSinkS(ids_NH4,0,NY,NX)=(-RNH4MicbTransf_vr(0,NY,NX)-trcn_RChem_soil(ids_NH4,0,NY,NX))*dts_HeatWatTP
-  RBGCSinkS(idg_NH3,0,NY,NX)=-TR_NH3_soil(0,NY,NX)*dts_HeatWatTP
-  RBGCSinkS(ids_NO3,0,NY,NX)=(-RNO3MicbTransf_vr(0,NY,NX)-trcn_RChem_soil(ids_NO3,0,NY,NX))*dts_HeatWatTP
-  RBGCSinkS(ids_NO2,0,NY,NX)=(-RNO2MicbTransf_vr(0,NY,NX)-trcn_RChem_soil(ids_NO2,0,NY,NX))*dts_HeatWatTP
-  RBGCSinkS(ids_H2PO4,0,NY,NX)=(-RH2PO4MicbTransf_vr(0,NY,NX)-trcn_RChem_soil(ids_H2PO4,0,NY,NX))*dts_HeatWatTP
-  RBGCSinkS(ids_H1PO4,0,NY,NX)=(-RH1PO4MicbTransf_vr(0,NY,NX)-trcn_RChem_soil(ids_H1PO4,0,NY,NX))*dts_HeatWatTP
+  RBGCSinkS(ids_NH4,0,NY,NX)=(-RNutMicbTransf_vr(ids_NH4,0,NY,NX)-trcn_RChem_soil_vr(ids_NH4,0,NY,NX))*dts_HeatWatTP
+  RBGCSinkS(idg_NH3,0,NY,NX)=-TR_NH3_soil_vr(0,NY,NX)*dts_HeatWatTP
+  RBGCSinkS(ids_NO3,0,NY,NX)=(-RNutMicbTransf_vr(ids_NO3,0,NY,NX)-trcn_RChem_soil_vr(ids_NO3,0,NY,NX))*dts_HeatWatTP
+  RBGCSinkS(ids_NO2,0,NY,NX)=(-RNutMicbTransf_vr(ids_NO2,0,NY,NX)-trcn_RChem_soil_vr(ids_NO2,0,NY,NX))*dts_HeatWatTP
+  RBGCSinkS(ids_H2PO4,0,NY,NX)=(-RNutMicbTransf_vr(ids_H2PO4,0,NY,NX)-trcn_RChem_soil_vr(ids_H2PO4,0,NY,NX))*dts_HeatWatTP
+  RBGCSinkS(ids_H1PO4,0,NY,NX)=(-RNutMicbTransf_vr(ids_H1PO4,0,NY,NX)-trcn_RChem_soil_vr(ids_H1PO4,0,NY,NX))*dts_HeatWatTP
 
   end subroutine SurfaceSinksandSources
 !------------------------------------------------------------------------------------------
@@ -723,30 +723,30 @@ module TranspNoSaltMod
   DO L=NU(NY,NX),NL(NY,NX)
     CHY0(L,NY,NX)=10.0_r8**(-(PH(L,NY,NX)-3.0_r8))
     FLWU(L,NY,NX)=GridPlantRootH2OUptake_vr(L,NY,NX)*dts_HeatWatTP
-    RBGCSinkG(idg_CO2,L,NY,NX)=(RCO2O(L,NY,NX)+TCO2S(L,NY,NX)-TR_CO2_aqu_soil(L,NY,NX))*dts_gas
-    RBGCSinkG(idg_CH4,L,NY,NX)=(RCH4O(L,NY,NX)+TUPCHS(L,NY,NX))*dts_gas
-    RBGCSinkG(idg_N2,L,NY,NX)=(RN2G(L,NY,NX)+XN2GS(L,NY,NX)+TUPNF(L,NY,NX))*dts_gas
-    RBGCSinkG(idg_N2O,L,NY,NX)=(RN2O(L,NY,NX)+TUPN2S(L,NY,NX))*dts_gas
+    RBGCSinkG(idg_CO2,L,NY,NX)=(trcg_RMicbTransf_vr(idg_CO2,L,NY,NX)+trcs_plant_uptake_vr(idg_CO2,L,NY,NX)-TR_CO2_aqu_soil_vr(L,NY,NX))*dts_gas
+    RBGCSinkG(idg_CH4,L,NY,NX)=(trcg_RMicbTransf_vr(idg_CH4,L,NY,NX)+trcs_plant_uptake_vr(idg_CH4,L,NY,NX))*dts_gas
+    RBGCSinkG(idg_N2,L,NY,NX)=(trcg_RMicbTransf_vr(idg_N2,L,NY,NX)+Micb_N2Fixation_vr(L,NY,NX)+trcs_plant_uptake_vr(idg_N2,L,NY,NX))*dts_gas
+    RBGCSinkG(idg_N2O,L,NY,NX)=(trcg_RMicbTransf_vr(idg_N2O,L,NY,NX)+trcs_plant_uptake_vr(idg_N2O,L,NY,NX))*dts_gas
     RBGCSinkG(idg_NH3,L,NY,NX)=-TRN3G(L,NY,NX)*dts_gas
-    RBGCSinkG(idg_H2,L,NY,NX)=(RH2GO(L,NY,NX)+TUPHGS(L,NY,NX))*dts_gas
+    RBGCSinkG(idg_H2,L,NY,NX)=(trcg_RMicbTransf_vr(idg_H2,L,NY,NX)+trcs_plant_uptake_vr(idg_H2,L,NY,NX))*dts_gas
     DO  K=1,jcplx
       RDOM_micb_cumflx(idom_doc,K,L,NY,NX)=-RDOM_micb_flx(idom_doc,K,L,NY,NX)*dts_HeatWatTP
       RDOM_micb_cumflx(idom_don,K,L,NY,NX)=-RDOM_micb_flx(idom_don,K,L,NY,NX)*dts_HeatWatTP
       RDOM_micb_cumflx(idom_dop,K,L,NY,NX)=-RDOM_micb_flx(idom_dop,K,L,NY,NX)*dts_HeatWatTP
       RDOM_micb_cumflx(idom_acetate,K,L,NY,NX)=-RDOM_micb_flx(idom_acetate,K,L,NY,NX)*dts_HeatWatTP
     ENDDO
-    RBGCSinkS(ids_NH4,L,NY,NX)=(-RNH4MicbTransf_vr(L,NY,NX)-trcn_RChem_soil(ids_NH4,L,NY,NX)+TUPNH4(L,NY,NX))*dts_HeatWatTP
-    RBGCSinkS(idg_NH3,L,NY,NX)=(-TR_NH3_soil(L,NY,NX)+TUPN3S(L,NY,NX))*dts_HeatWatTP
-    RBGCSinkS(ids_NO3,L,NY,NX)=(-RNO3MicbTransf_vr(L,NY,NX)-trcn_RChem_soil(ids_NO3,L,NY,NX)+TUPNO3(L,NY,NX))*dts_HeatWatTP
-    RBGCSinkS(ids_NO2,L,NY,NX)=(-RNO2MicbTransf_vr(L,NY,NX)-trcn_RChem_soil(ids_NO2,L,NY,NX))*dts_HeatWatTP
-    RBGCSinkS(ids_H2PO4,L,NY,NX)=(-RH2PO4MicbTransf_vr(L,NY,NX)-trcn_RChem_soil(ids_H2PO4,L,NY,NX)+TUPH2P(L,NY,NX))*dts_HeatWatTP
-    RBGCSinkS(ids_H1PO4,L,NY,NX)=(-RH1PO4MicbTransf_vr(L,NY,NX)-trcn_RChem_soil(ids_H1PO4,L,NY,NX)+TUPH1P(L,NY,NX))*dts_HeatWatTP
-    RBGCSinkS(ids_NH4B,L,NY,NX)=(-XNH4B(L,NY,NX)-trcn_RChem_band_soil(ids_NH4B,L,NY,NX)+TUPNHB(L,NY,NX))*dts_HeatWatTP
-    RBGCSinkS(idg_NH3B,L,NY,NX)=(-TR_NH3_band_soil(L,NY,NX)+TUPN3B(L,NY,NX))*dts_HeatWatTP
-    RBGCSinkS(ids_NO3B,L,NY,NX)=(-XNO3B(L,NY,NX)-trcn_RChem_band_soil(ids_NO3B,L,NY,NX)+TUPNOB(L,NY,NX))*dts_HeatWatTP
-    RBGCSinkS(ids_NO2B,L,NY,NX)=(-XNO2B(L,NY,NX)-trcn_RChem_band_soil(ids_NO2B,L,NY,NX))*dts_HeatWatTP
-    RBGCSinkS(ids_H2PO4B,L,NY,NX)=(-XH2BS(L,NY,NX)-trcn_RChem_band_soil(ids_H2PO4B,L,NY,NX)+TUPH2B(L,NY,NX))*dts_HeatWatTP
-    RBGCSinkS(ids_H1PO4B,L,NY,NX)=(-XH1BS(L,NY,NX)-trcn_RChem_band_soil(ids_H1PO4B,L,NY,NX)+TUPH1B(L,NY,NX))*dts_HeatWatTP
+    RBGCSinkS(ids_NH4,L,NY,NX)=(-RNutMicbTransf_vr(ids_NH4,L,NY,NX)-trcn_RChem_soil_vr(ids_NH4,L,NY,NX)+trcs_plant_uptake_vr(ids_NH4,L,NY,NX))*dts_HeatWatTP
+    RBGCSinkS(idg_NH3,L,NY,NX)=(-TR_NH3_soil_vr(L,NY,NX)+trcs_plant_uptake_vr(idg_NH3,L,NY,NX))*dts_HeatWatTP
+    RBGCSinkS(ids_NO3,L,NY,NX)=(-RNutMicbTransf_vr(ids_NO3,L,NY,NX)-trcn_RChem_soil_vr(ids_NO3,L,NY,NX)+trcs_plant_uptake_vr(ids_NO3,L,NY,NX))*dts_HeatWatTP
+    RBGCSinkS(ids_NO2,L,NY,NX)=(-RNutMicbTransf_vr(ids_NO2,L,NY,NX)-trcn_RChem_soil_vr(ids_NO2,L,NY,NX))*dts_HeatWatTP
+    RBGCSinkS(ids_H2PO4,L,NY,NX)=(-RNutMicbTransf_vr(ids_H2PO4,L,NY,NX)-trcn_RChem_soil_vr(ids_H2PO4,L,NY,NX)+trcs_plant_uptake_vr(ids_H2PO4,L,NY,NX))*dts_HeatWatTP
+    RBGCSinkS(ids_H1PO4,L,NY,NX)=(-RNutMicbTransf_vr(ids_H1PO4,L,NY,NX)-trcn_RChem_soil_vr(ids_H1PO4,L,NY,NX)+trcs_plant_uptake_vr(ids_H1PO4,L,NY,NX))*dts_HeatWatTP
+    RBGCSinkS(ids_NH4B,L,NY,NX)=(-RNutMicbTransf_vr(ids_NH4B,L,NY,NX)-trcn_RChem_band_soil_vr(ids_NH4B,L,NY,NX)+trcs_plant_uptake_vr(ids_NH4B,L,NY,NX))*dts_HeatWatTP
+    RBGCSinkS(idg_NH3B,L,NY,NX)=(-trcn_RChem_band_soil_vr(idg_NH3B,L,NY,NX)+trcs_plant_uptake_vr(idg_NH3B,L,NY,NX))*dts_HeatWatTP
+    RBGCSinkS(ids_NO3B,L,NY,NX)=(-RNutMicbTransf_vr(ids_NO3B,L,NY,NX)-trcn_RChem_band_soil_vr(ids_NO3B,L,NY,NX)+trcs_plant_uptake_vr(ids_NO3B,L,NY,NX))*dts_HeatWatTP
+    RBGCSinkS(ids_NO2B,L,NY,NX)=(-RNutMicbTransf_vr(ids_NO2B,L,NY,NX)-trcn_RChem_band_soil_vr(ids_NO2B,L,NY,NX))*dts_HeatWatTP
+    RBGCSinkS(ids_H2PO4B,L,NY,NX)=(-RNutMicbTransf_vr(ids_H2PO4B,L,NY,NX)-trcn_RChem_band_soil_vr(ids_H2PO4B,L,NY,NX)+trcs_plant_uptake_vr(ids_H2PO4B,L,NY,NX))*dts_HeatWatTP
+    RBGCSinkS(ids_H1PO4B,L,NY,NX)=(-RNutMicbTransf_vr(ids_H1PO4B,L,NY,NX)-trcn_RChem_band_soil_vr(ids_H1PO4B,L,NY,NX)+trcs_plant_uptake_vr(ids_H1PO4B,L,NY,NX))*dts_HeatWatTP
 !
 !     SOLUTE FLUXES FROM SUBSURFACE IRRIGATION
 !
@@ -760,23 +760,23 @@ module TranspNoSaltMod
 !     VLNH4,VLNO3,VLPO4=non-band NH4,NO3,PO4 volume fraction
 !     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
 !
-    trcs_RFLU(idg_CO2,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CO2_irrig_conc(NY,NX)
-    trcs_RFLU(idg_CH4,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CH4_irrig_conc(NY,NX)
-    trcs_RFLU(idg_O2,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*O2_irrig_conc(NY,NX)
-    trcs_RFLU(idg_N2,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*N2_irrig_conc(NY,NX)
-    trcs_RFLU(idg_N2O,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*N2O_irrig_conc(NY,NX)
-    trcs_RFLU(idg_H2,L,NY,NX)=0.0_r8
+    trcs_Irrig_vr(idg_CO2,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CO2_irrig_conc(NY,NX)
+    trcs_Irrig_vr(idg_CH4,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CH4_irrig_conc(NY,NX)
+    trcs_Irrig_vr(idg_O2,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*O2_irrig_conc(NY,NX)
+    trcs_Irrig_vr(idg_N2,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*N2_irrig_conc(NY,NX)
+    trcs_Irrig_vr(idg_N2O,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*N2O_irrig_conc(NY,NX)
+    trcs_Irrig_vr(idg_H2,L,NY,NX)=0.0_r8
 
-    trcs_RFLU(ids_NH4,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*NH4_irrig_conc(I,NY,NX)*trcs_VLN(ids_NH4,L,NY,NX)*natomw
-    trcs_RFLU(idg_NH3,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*NH3_irrig_conc(I,NY,NX)*trcs_VLN(ids_NH4,L,NY,NX)*natomw
-    trcs_RFLU(ids_NO3,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*NO3_irrig_conc(I,NY,NX)*trcs_VLN(ids_NO3,L,NY,NX)*natomw
-    trcs_RFLU(ids_H1PO4,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*HPO4_irrig_conc(I,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)*patomw
-    trcs_RFLU(ids_H2PO4,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*H2PO4_irrig_conc(I,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)*patomw
-    trcs_RFLU(ids_NH4B,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*NH4_irrig_conc(I,NY,NX)*trcs_VLN(ids_NH4B,L,NY,NX)*natomw
-    trcs_RFLU(idg_NH3B,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*NH3_irrig_conc(I,NY,NX)*trcs_VLN(ids_NH4B,L,NY,NX)*natomw
-    trcs_RFLU(ids_NO3B,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*NO3_irrig_conc(I,NY,NX)*trcs_VLN(ids_NO3B,L,NY,NX)*natomw
-    trcs_RFLU(ids_H1PO4B,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*HPO4_irrig_conc(I,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)*patomw
-    trcs_RFLU(ids_H2PO4B,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*H2PO4_irrig_conc(I,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)*patomw
+    trcs_Irrig_vr(ids_NH4,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*NH4_irrig_conc(I,NY,NX)*trcs_VLN(ids_NH4,L,NY,NX)*natomw
+    trcs_Irrig_vr(idg_NH3,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*NH3_irrig_conc(I,NY,NX)*trcs_VLN(ids_NH4,L,NY,NX)*natomw
+    trcs_Irrig_vr(ids_NO3,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*NO3_irrig_conc(I,NY,NX)*trcs_VLN(ids_NO3,L,NY,NX)*natomw
+    trcs_Irrig_vr(ids_H1PO4,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*HPO4_irrig_conc(I,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)*patomw
+    trcs_Irrig_vr(ids_H2PO4,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*H2PO4_irrig_conc(I,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)*patomw
+    trcs_Irrig_vr(ids_NH4B,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*NH4_irrig_conc(I,NY,NX)*trcs_VLN(ids_NH4B,L,NY,NX)*natomw
+    trcs_Irrig_vr(idg_NH3B,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*NH3_irrig_conc(I,NY,NX)*trcs_VLN(ids_NH4B,L,NY,NX)*natomw
+    trcs_Irrig_vr(ids_NO3B,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*NO3_irrig_conc(I,NY,NX)*trcs_VLN(ids_NO3B,L,NY,NX)*natomw
+    trcs_Irrig_vr(ids_H1PO4B,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*HPO4_irrig_conc(I,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)*patomw
+    trcs_Irrig_vr(ids_H2PO4B,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*H2PO4_irrig_conc(I,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)*patomw
 !
 !     SUB-HOURLY SOLUTE FLUXES FROM SUBSURFACE IRRIGATION
 !
@@ -784,7 +784,7 @@ module TranspNoSaltMod
 !     dts_HeatWatTP=1/no. of cycles h-1 for water, heat and solute flux calculations
 !
     DO NTS=ids_beg,ids_end
-      RFLZ_sol(NTS,L,NY,NX)=trcs_RFLU(NTS,L,NY,NX)*dts_HeatWatTP
+      RFLZ_sol(NTS,L,NY,NX)=trcs_Irrig_vr(NTS,L,NY,NX)*dts_HeatWatTP
     ENDDO
 !
 !     GAS AND SOLUTE DIFFUSIVITIES AT SUB-HOURLY TIME STEP

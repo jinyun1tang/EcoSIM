@@ -13,15 +13,10 @@ implicit none
 
   public
 
-  real(r8),allocatable ::  trcs_TFLS(:,:,:,:)                      !
-  real(r8),allocatable ::  trcs_TFHS(:,:,:,:)                      !
+  real(r8),allocatable ::  trcs_Transp2MicP_vr(:,:,:,:)                      !
+  real(r8),allocatable ::  trcs_Transp2MacP_vr(:,:,:,:)                      !
   real(r8),allocatable ::  TWat2GridBySurfRunoff(:,:)                           !
   real(r8),allocatable ::  THeat2GridBySurfRunoff(:,:)                          !
-
-!  real(r8),allocatable ::  TFLWS(:,:,:)                       !
-!  real(r8),allocatable ::  TFLWW(:,:,:)                       !
-!  real(r8),allocatable ::  TFLWI(:,:,:)                       !
-!  real(r8),allocatable ::  THFLWW(:,:,:)                      !
 
   real(r8),allocatable ::  TCOQSS(:,:)                        !
   real(r8),allocatable ::  TCHQSS(:,:)                        !
@@ -34,8 +29,8 @@ implicit none
   real(r8),allocatable ::  TPOQSS(:,:)                        !
   real(r8),allocatable ::  TP1QSS(:,:)                        !
 
-  real(r8),allocatable ::  trcSalt_TFLS(:,:,:,:)                      !
-  real(r8),allocatable ::  trcSalt_TFHS(:,:,:,:)                      !
+  real(r8),allocatable ::  trcSalt_Flo2MicP_vr(:,:,:,:)                      !
+  real(r8),allocatable ::  trcSalt_Flo2MacP_vr(:,:,:,:)                      !
 
   real(r8),allocatable ::  TSANER(:,:)                        !
   real(r8),allocatable ::  TSILER(:,:)                        !
@@ -56,7 +51,7 @@ implicit none
   real(r8),allocatable ::  THeatFlow2Soil(:,:,:)                       !
   real(r8),allocatable ::  TWaterFlowMacP(:,:,:)                       !
 
-  real(r8),allocatable ::  RTGasADFlx(:,:,:,:)                      !
+  real(r8),allocatable ::  Gas_AdvDif_Flx_vr(:,:,:,:)                      !
 
   real(r8),allocatable ::  WatIceThawMicP(:,:,:)                       !
   real(r8),allocatable ::  THeatSoiThaw(:,:,:)                      !
@@ -106,8 +101,8 @@ implicit none
 
   implicit none
 
-  allocate(trcs_TFHS(ids_beg:ids_end,JZ,JY,JX));   trcs_TFHS=0._r8
-  allocate(RTGasADFlx(idg_beg:idg_end-1,JZ,JY,JX));   RTGasADFlx=0._r8
+  allocate(trcs_Transp2MacP_vr(ids_beg:ids_end,JZ,JY,JX));   trcs_Transp2MacP_vr=0._r8
+  allocate(Gas_AdvDif_Flx_vr(idg_beg:idg_NH3,JZ,JY,JX));   Gas_AdvDif_Flx_vr=0._r8
 
   allocate(TWat2GridBySurfRunoff(JY,JX));         TWat2GridBySurfRunoff=0._r8
   allocate(THeat2GridBySurfRunoff(JY,JX));        THeat2GridBySurfRunoff=0._r8
@@ -128,8 +123,8 @@ implicit none
   allocate(TPOQSS(JY,JX));      TPOQSS=0._r8
   allocate(TP1QSS(JY,JX));      TP1QSS=0._r8
 
-  allocate(trcSalt_TFLS(idsalt_beg:idsaltb_end,JZ,JY,JX)); trcSalt_TFLS=0._r8
-  allocate(trcSalt_TFHS(idsalt_beg:idsaltb_end,JZ,JY,JX)); trcSalt_TFHS=0._r8
+  allocate(trcSalt_Flo2MicP_vr(idsalt_beg:idsaltb_end,JZ,JY,JX)); trcSalt_Flo2MicP_vr=0._r8
+  allocate(trcSalt_Flo2MacP_vr(idsalt_beg:idsaltb_end,JZ,JY,JX)); trcSalt_Flo2MacP_vr=0._r8
 
   allocate(TSANER(JY,JX));      TSANER=0._r8
   allocate(TSILER(JY,JX));      TSILER=0._r8
@@ -145,7 +140,7 @@ implicit none
 
   allocate(trcx_TER(idx_beg:idx_end,JY,JX));    trcx_TER=0._r8
   allocate(trcp_TER(idsp_beg:idsp_end,JY,JX));      trcp_TER=0._r8
-  allocate(trcs_TFLS(ids_beg:ids_end,JZ,JY,JX));   trcs_TFLS=0._r8
+  allocate(trcs_Transp2MicP_vr(ids_beg:ids_end,JZ,JY,JX));   trcs_Transp2MicP_vr=0._r8
 
   allocate(TSEDER(JY,JX));      TSEDER=0._r8
   allocate(TWatFlowCellMicP(JZ,JY,JX));     TWatFlowCellMicP=0._r8
@@ -217,9 +212,9 @@ implicit none
   call destroy(TOSAER)
   call destroy(TOSNER)
   call destroy(TOSPER)
-  call destroy(trcSalt_TFLS)
-  call destroy(trcs_TFLS)
-  call destroy(trcSalt_TFHS)
+  call destroy(trcSalt_Flo2MicP_vr)
+  call destroy(trcs_Transp2MicP_vr)
+  call destroy(trcSalt_Flo2MacP_vr)
   call destroy(TWat2GridBySurfRunoff)
   call destroy(THeat2GridBySurfRunoff)
 !  call destroy(TFLWS)
@@ -227,7 +222,7 @@ implicit none
 !  call destroy(TFLWI)
 !  call destroy(THFLWW)
 
-  call destroy(trcs_TFHS)
+  call destroy(trcs_Transp2MacP_vr)
 
   call destroy(TCOQSS)
   call destroy(TCHQSS)
@@ -266,7 +261,7 @@ implicit none
   call destroy(DOM_Transp2Micp_flx)
   call destroy(DOM_Transp2Macp_flx)
   call destroy(trcp_TER)
-  call destroy(RTGasADFlx)
+  call destroy(Gas_AdvDif_Flx_vr)
 
   end subroutine DestructTflxType
 end module TFlxTypeMod

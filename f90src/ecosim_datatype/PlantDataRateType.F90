@@ -52,7 +52,7 @@ module PlantDataRateType
   real(r8),target,allocatable ::  VPO4F(:,:,:)                       !plant PO4 emission from fire, [g d-2 ]
   real(r8),target,allocatable ::  ROXYP(:,:,:,:,:)                   !root  O2 demand from respiration, [g d-2 h-1]
   real(r8),target,allocatable ::  trcg_RFLA(:,:,:,:,:,:)                  !gaseous tracer flux through roots, [g d-2 h-1]
-  real(r8),target,allocatable ::  trcg_RDFA(:,:,:,:,:,:)                  !dissolution (+ve) - volatilization (-ve) gas flux in roots, [g d-2 h-1]
+  real(r8),target,allocatable ::  trcg_Root_DisEvap_flx_vr(:,:,:,:,:,:)                  !dissolution (+ve) - volatilization (-ve) gas flux in roots, [g d-2 h-1]
   real(r8),target,allocatable ::  RCO2S(:,:,:,:,:)                   !aqueous CO2 flux from roots to soil water, [g d-2 h-1]
   real(r8),target,allocatable ::  RUPOXS(:,:,:,:,:)                  !aqueous O2 flux from roots to soil water, [g d-2 h-1]
   real(r8),target,allocatable ::  RUPCHS(:,:,:,:,:)                  !aqueous CH4 flux from roots to soil water, [g d-2 h-1]
@@ -101,25 +101,11 @@ module PlantDataRateType
   real(r8),target,allocatable ::  THeatRootUptake(:,:,:)                       !total root heat uptake, [MJ d-2]
   real(r8),target,allocatable ::  trcg_TFLA(:,:,:,:)                 !total internal root gas flux , [g d-2 h-1]
   real(r8),target,allocatable ::  trcg_TLP(:,:,:,:)                  !total root internal gas flux, [g d-2 h-1]
-  real(r8),target,allocatable ::  TCO2S(:,:,:)                       !total root-soil CO2 flux, [g d-2 h-1]
-  real(r8),target,allocatable ::  TUPOXS(:,:,:)                      !total root-soil O2 flux, [g d-2 h-1]
-  real(r8),target,allocatable ::  TUPCHS(:,:,:)                      !total root-soil CH4 flux, [g d-2 h-1]
-  real(r8),target,allocatable ::  TUPN2S(:,:,:)                      !total root-soil N2O flux, [g d-2 h-1]
-  real(r8),target,allocatable ::  TUPN3S(:,:,:)                      !total root-soil NH3 flux non-band, [g d-2 h-1]
-  real(r8),target,allocatable ::  TUPNH4(:,:,:)                      !total root-soil NH4 flux non-band, [g d-2 h-1]
-  real(r8),target,allocatable ::  TUPNO3(:,:,:)                      !total root-soil NO3 flux non-band, [g d-2 h-1]
-  real(r8),target,allocatable ::  TUPH2P(:,:,:)                      !total root-soil PO4 flux non-band, [g d-2 h-1]
-  real(r8),target,allocatable ::  TUPN3B(:,:,:)                      !total root-soil NH3 flux band, [g d-2 h-1]
-  real(r8),target,allocatable ::  TUPNHB(:,:,:)                      !total root-soil NH4 flux band, [g d-2 h-1]
-  real(r8),target,allocatable ::  TUPNOB(:,:,:)                      !total root-soil NO3 flux band, [g d-2 h-1]
-  real(r8),target,allocatable ::  TUPH2B(:,:,:)                      !total root-soil PO4 flux band, [g d-2 h-1]
-  real(r8),target,allocatable ::  TUPNF(:,:,:)                       !total root N2 fixation, [g d-2 h-1]
+  real(r8),target,allocatable ::  trcs_plant_uptake_vr(:,:,:,:)      !total root-soil solute flux, [g d-2 h-1]
   real(r8),target,allocatable ::  TDFOME(:,:,:,:,:)                  !total root element exchange, [g d-2 h-1]
   real(r8),target,allocatable ::  TCO2P(:,:,:)                       !total root CO2 flux, [g d-2 h-1]
   real(r8),target,allocatable ::  TUPOXP(:,:,:)                      !total root internal O2 flux, [g d-2 h-1]
   real(r8),target,allocatable ::  RTDNT(:,:,:)                       !total root length density, [m m-3]
-  real(r8),target,allocatable ::  TUPH1P(:,:,:)                      !soil-root exch of HPO4 in non-band
-  real(r8),target,allocatable ::  TUPH1B(:,:,:)                      !soil-root exch of HPO4 in band
   real(r8),target,allocatable ::  ROXYX(:,:,:)                       !total root + microbial O2 uptake, [g d-2 h-1]
   real(r8),target,allocatable ::  ROXYY(:,:,:)                       !total root + microbial O2 uptake, [g d-2 h-1]
   real(r8),target,allocatable ::  RNH4X(:,:,:)                       !total root + microbial NH4 uptake non-band, [g d-2 h-1]
@@ -145,7 +131,6 @@ module PlantDataRateType
   real(r8),target,allocatable ::  ROQAX(:,:,:,:)                     !total root + microbial acetate uptake, [g d-2 h-1]
   real(r8),target,allocatable ::  ROQAY(:,:,:,:)                     !total root + microbial acetate uptake, [g d-2 h-1]
   real(r8),target,allocatable ::  TH2GZ(:,:)                         !total root H2 flux, [g d-2]
-  real(r8),target,allocatable ::  TUPHGS(:,:,:)                      !total root-soil H2 flux, [g d-2 h-1]
   private :: InitAllocate
   contains
 
@@ -205,7 +190,7 @@ module PlantDataRateType
   allocate(VPO4F(JP,JY,JX));    VPO4F=0._r8
   allocate(ROXYP(jroots,JZ,JP,JY,JX));ROXYP=0._r8
   allocate(trcg_RFLA(idg_beg:idg_end-1,2,JZ,JP,JY,JX));trcg_RFLA=0._r8
-  allocate(trcg_RDFA(idg_beg:idg_end-1,2,JZ,JP,JY,JX));trcg_RDFA=0._r8
+  allocate(trcg_Root_DisEvap_flx_vr(idg_beg:idg_end-1,2,JZ,JP,JY,JX));trcg_Root_DisEvap_flx_vr=0._r8
   allocate(RCO2S(jroots,JZ,JP,JY,JX));RCO2S=0._r8
   allocate(RUPOXS(jroots,JZ,JP,JY,JX));RUPOXS=0._r8
   allocate(RUPCHS(jroots,JZ,JP,JY,JX));RUPCHS=0._r8
@@ -254,25 +239,11 @@ module PlantDataRateType
   allocate(THeatRootUptake(0:JZ,JY,JX));  THeatRootUptake=0._r8
   allocate(trcg_TFLA(idg_beg:idg_end-1,JZ,JY,JX));   trcg_TFLA=0._r8
   allocate(trcg_TLP(idg_beg:idg_end-1,JZ,JY,JX));   trcg_TLP=0._r8
-  allocate(TCO2S(JZ,JY,JX));    TCO2S=0._r8
-  allocate(TUPOXS(JZ,JY,JX));   TUPOXS=0._r8
-  allocate(TUPCHS(JZ,JY,JX));   TUPCHS=0._r8
-  allocate(TUPN2S(JZ,JY,JX));   TUPN2S=0._r8
-  allocate(TUPN3S(JZ,JY,JX));   TUPN3S=0._r8
-  allocate(TUPNH4(JZ,JY,JX));   TUPNH4=0._r8
-  allocate(TUPNO3(JZ,JY,JX));   TUPNO3=0._r8
-  allocate(TUPH2P(JZ,JY,JX));   TUPH2P=0._r8
-  allocate(TUPN3B(JZ,JY,JX));   TUPN3B=0._r8
-  allocate(TUPNHB(JZ,JY,JX));   TUPNHB=0._r8
-  allocate(TUPNOB(JZ,JY,JX));   TUPNOB=0._r8
-  allocate(TUPH2B(JZ,JY,JX));   TUPH2B=0._r8
-  allocate(TUPNF(JZ,JY,JX));    TUPNF=0._r8
+  allocate(trcs_plant_uptake_vr(ids_beg:ids_end,JZ,JY,JX));    trcs_plant_uptake_vr=0._r8
   allocate(TDFOME(NumOfPlantChemElements,1:jcplx,JZ,JY,JX));TDFOME=0._r8
   allocate(TCO2P(JZ,JY,JX));    TCO2P=0._r8
   allocate(TUPOXP(JZ,JY,JX));   TUPOXP=0._r8
   allocate(RTDNT(JZ,JY,JX));    RTDNT=0._r8
-  allocate(TUPH1P(JZ,JY,JX));   TUPH1P=0._r8
-  allocate(TUPH1B(JZ,JY,JX));   TUPH1B=0._r8
   allocate(ROXYX(0:JZ,JY,JX));  ROXYX=0._r8
   allocate(ROXYY(0:JZ,JY,JX));  ROXYY=0._r8
   allocate(RNH4X(0:JZ,JY,JX));  RNH4X=0._r8
@@ -298,7 +269,6 @@ module PlantDataRateType
   allocate(ROQAX(1:jcplx,0:JZ,JY,JX));ROQAX=0._r8
   allocate(ROQAY(1:jcplx,0:JZ,JY,JX));ROQAY=0._r8
   allocate(TH2GZ(JY,JX));       TH2GZ=0._r8
-  allocate(TUPHGS(JZ,JY,JX));   TUPHGS=0._r8
   end subroutine InitAllocate
 
 !----------------------------------------------------------------------
@@ -390,25 +360,10 @@ module PlantDataRateType
   call destroy(TEUPTK)
   call destroy(GridPlantRootH2OUptake_vr)
   call destroy(THeatRootUptake)
-  call destroy(TCO2S)
-  call destroy(TUPOXS)
-  call destroy(TUPCHS)
-  call destroy(TUPN2S)
-  call destroy(TUPN3S)
-  call destroy(TUPNH4)
-  call destroy(TUPNO3)
-  call destroy(TUPH2P)
-  call destroy(TUPN3B)
-  call destroy(TUPNHB)
-  call destroy(TUPNOB)
-  call destroy(TUPH2B)
-  call destroy(TUPNF)
   call destroy(TDFOME)
   call destroy(TCO2P)
   call destroy(TUPOXP)
   call destroy(RTDNT)
-  call destroy(TUPH1P)
-  call destroy(TUPH1B)
   call destroy(ROXYX)
   call destroy(ROXYY)
   call destroy(RNH4X)
@@ -434,7 +389,7 @@ module PlantDataRateType
   call destroy(ROQAX)
   call destroy(ROQAY)
   call destroy(TH2GZ)
-  call destroy(TUPHGS)
+  call destroy(trcs_plant_uptake_vr)
   end subroutine DestructPlantRates
 
 end module PlantDataRateType

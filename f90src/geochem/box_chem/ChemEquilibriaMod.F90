@@ -115,7 +115,7 @@ module ChemEquilibriaMod
 
   real(r8), pointer :: TR_NH4_soil
   real(r8), pointer :: TR_NH4_band_soil
-  real(r8), pointer :: TR_NH3_soil
+  real(r8), pointer :: TR_NH3_soil_vr
   real(r8), pointer :: TR_NH3_band_soil
   real(r8), pointer :: TR_H1PO4_soil
   real(r8), pointer :: TR_H2PO4_soil
@@ -200,7 +200,7 @@ module ChemEquilibriaMod
   GKCN  =>  chemvar%GKCN
   TR_NH4_soil  => solflx%TR_NH4_soil
   TR_NH4_band_soil  => solflx%TR_NH4_band_soil
-  TR_NH3_soil  => solflx%TR_NH3_soil
+  TR_NH3_soil_vr  => solflx%TR_NH3_soil_vr
   TR_NH3_band_soil  => solflx%TR_NH3_band_soil
   TR_H1PO4_soil  => solflx%TR_H1PO4_soil
   TR_H2PO4_soil  => solflx%TR_H2PO4_soil
@@ -698,7 +698,7 @@ module ChemEquilibriaMod
 !     TO CHANGES IN MASS PER UNIT AREA FOR USE IN 'REDIST'
 !
 !     TR_NH4_soil,TR_NH4_band_soil=total NH4 flux in non-band,band
-!     TR_NH3_soil,TR_NH3_band_soil=total NH3 flux in non-band,band
+!     TR_NH3_soil_vr,TR_NH3_band_soil=total NH3 flux in non-band,band
 !     TR_H1PO4_soil,TR_H2PO4_soil=net HPO4,H2PO4 flux in non-band
 !     TR_H1PO4_band_soil,TR_H2PO4_band_soil=net HPO4,H2PO4 flux in band
 !     TRNX4,TRNXB=total NH4 adsorption in non-band,band
@@ -712,7 +712,7 @@ module ChemEquilibriaMod
 !     =total AlPO4,FePO4,CaHPO4,apatite,Ca(H2PO4)2 precipitation in band
 !
   TR_NH4_soil=TR_NH4_soil+RN4S*VLWatMicPNH
-  TR_NH3_soil=TR_NH3_soil+RN3S*VLWatMicPNH
+  TR_NH3_soil_vr=TR_NH3_soil_vr+RN3S*VLWatMicPNH
   TR_NH4_sorbed_soil=TR_NH4_sorbed_soil+RXN4*VLWatMicPNH
   TR_NH4_band_soil=TR_NH4_band_soil+RN4B*VLWatMicPNB
   TR_NH3_band_soil=TR_NH3_band_soil+RN3B*VLWatMicPNB

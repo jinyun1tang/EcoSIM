@@ -338,7 +338,7 @@ module NitroDisturbMod
           TCOU=TCOU+OC
           TZOU=TZOU+ON
           TPOU=TPOU+OP
-          UDOCQ(NY,NX)=UDOCQ(NY,NX)+OC
+          HDOCQ(NY,NX)=HDOCQ(NY,NX)+OC
           UDONQ(NY,NX)=UDONQ(NY,NX)+ON
           UDOPQ(NY,NX)=UDOPQ(NY,NX)+OP
           Eco_NBP_col(NY,NX)=Eco_NBP_col(NY,NX)-OC

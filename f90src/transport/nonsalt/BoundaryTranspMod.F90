@@ -472,7 +472,7 @@ module BoundaryTranspMod
 !
       DO idg=idg_beg,idg_NH3
         R3GasADFlx(idg,N,M6,M5,M4)=VFLW*AZMAX1(trc_gasml2(idg,M3,M2,M1))
-        R3GasADTFlx(idg,N,M6,M5,M4)=R3GasADTFlx(idg,N,M6,M5,M4)+R3GasADFlx(idg,N,M6,M5,M4)
+        Gas_3DAdvDif_Flx_vr(idg,N,M6,M5,M4)=Gas_3DAdvDif_Flx_vr(idg,N,M6,M5,M4)+R3GasADFlx(idg,N,M6,M5,M4)
       ENDDO
 
     ELSE
@@ -697,11 +697,11 @@ module BoundaryTranspMod
 !
   IF(VLSoilPoreMicP(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
     DO idg=idg_beg,idg_NH3
-      RTGasADFlx(idg,N3,N2,N1)=RTGasADFlx(idg,N3,N2,N1) &
+      Gas_AdvDif_Flx_vr(idg,N3,N2,N1)=Gas_AdvDif_Flx_vr(idg,N3,N2,N1) &
         +R3GasADFlx(idg,N,N3,N2,N1)-R3GasADFlx(idg,N,N6,N5,N4)
     ENDDO
   ELSE
-    RTGasADFlx(idg_beg:idg_NH3,N3,N2,N1)=0._r8
+    Gas_AdvDif_Flx_vr(idg_beg:idg_NH3,N3,N2,N1)=0._r8
   ENDIF
   end subroutine NetFluxMicroandMacropores
 

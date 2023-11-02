@@ -87,7 +87,7 @@ module RootGasMod
     ROXSK  =>  plt_rbgc%ROXSK    , &
     RCO2P  =>  plt_rbgc%RCO2P    , &
     trcg_RFLA =>  plt_rbgc%trcg_RFLA   , &
-    trcg_RDFA =>  plt_rbgc%trcg_RDFA   , &
+    trcg_Root_DisEvap_flx_vr =>  plt_rbgc%trcg_Root_DisEvap_flx_vr   , &
     RUPN3B =>  plt_rbgc%RUPN3B   , &
     RUPHGS =>  plt_rbgc%RUPHGS   , &
     RCO2S  =>  plt_rbgc%RCO2S    , &
@@ -696,7 +696,7 @@ module RootGasMod
 !     gas code:CO=CO2,OX=O2,CH=CH4,N2=N2O,NH=NH3,H2=H2
 !
           DO NTG=idg_beg,idg_end-1
-            trcg_RDFA(NTG,N,L,NZ)=trcg_RDFA(NTG,N,L,NZ)+trcg_RDF1(NTG)
+            trcg_Root_DisEvap_flx_vr(NTG,N,L,NZ)=trcg_Root_DisEvap_flx_vr(NTG,N,L,NZ)+trcg_RDF1(NTG)
             trcg_RFLA(NTG,N,L,NZ)=trcg_RFLA(NTG,N,L,NZ)+trcg_RFL1(NTG)
           ENDDO
 !

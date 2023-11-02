@@ -167,7 +167,7 @@ implicit none
 !             :N4=NH4,N3=NH3,NO=NO3,NX=NO2,PI=HPO4,P4=H2PO4 in non-band
 !     XN=direction indicator
 !     TCOU,OXYGOU,H2GOU,TZOU,TPOU=cumulative C,O2,H2,N,P loss through lateral and lower boundaries
-!     UDOCQ,UDICQ=dissolved organic,inorganic C loss through runoff
+!     HDOCQ,HDICQ=dissolved organic,inorganic C loss through runoff
 !     UDONQ,UDINQ=dissolved organic,inorganic N loss through runoff
 !     UDOPQ,UDIPQ=dissolved organic,inorganic P loss through runoff
 !
@@ -187,8 +187,8 @@ implicit none
       TCOU=TCOU-CXR-COR
       TZOU=TZOU-ZXR-ZOR-ZGR
       TPOU=TPOU-PXR-POR
-      UDOCQ(NY,NX)=UDOCQ(NY,NX)-COR
-      UDICQ(NY,NX)=UDICQ(NY,NX)-CXR
+      HDOCQ(NY,NX)=-COR
+      HDICQ(NY,NX)=-CXR
       UDONQ(NY,NX)=UDONQ(NY,NX)-ZOR
       UDINQ(NY,NX)=UDINQ(NY,NX)-ZXR-ZGR
       UDOPQ(NY,NX)=UDOPQ(NY,NX)-POR
@@ -304,7 +304,7 @@ implicit none
 !         sediment code:OMC,OMN,OMP=microbial C,N,P; ORC=microbial residue C,N,P
 !                      :OHC,OHN,OHP=adsorbed C,N,P; OSC,OSN,OSP=humus C,N,P
 !         TSEDOU,USEDOU=cumulative sediment loss through lateral and lower boundaries
-!         UDOCQ,UDICQ=dissolved organic,inorganic C loss through lateral and lower boundaries
+!         HDOCQ,HDICQ=dissolved organic,inorganic C loss through lateral and lower boundaries
 !         UDONQ,UDINQ=dissolved organic,inorganic N loss through lateral and lower boundaries
 !         UDOPQ,UDIPQ=dissolved organic,inorganic P loss through lateral and lower boundaries
 !         TCOU,TZOU,TPOU=total C,N,P loss through lateral and lower boundaries
@@ -371,8 +371,8 @@ implicit none
           TCOU=TCOU-COE-CXE
           TZOU=TZOU-ZOE-ZXE-ZPE
           TPOU=TPOU-POE-PXE-PPE
-          UDOCQ(NY,NX)=UDOCQ(NY,NX)-COE
-          UDICQ(NY,NX)=UDICQ(NY,NX)-CXE
+          HDOCQ(NY,NX)=HDOCQ(NY,NX)-COE
+          HDICQ(NY,NX)=HDICQ(NY,NX)-CXE
           UDONQ(NY,NX)=UDONQ(NY,NX)-ZOE
           UDINQ(NY,NX)=UDINQ(NY,NX)-ZXE-ZPE
           UDOPQ(NY,NX)=UDOPQ(NY,NX)-POE
@@ -479,20 +479,20 @@ implicit none
 !     X*FLS,X*FHS=solute flux in macropores,micropores from TranspNoSalt.f
 !     X*FLG=convective+diffusive gas flux from TranspNoSalt.f
 !     TCOU=cumulative C loss through lateral and lower boundaries
-!     UDOCD,UDICD=dissolved organic,inorganic C loss through subsurface boundaries
+!     HDOCD,HDICD=dissolved organic,inorganic C loss through subsurface boundaries
 !
 !     SUBSURFACE BOUNDARY FLUXES OF N2O, N2, NH4, NH3, NO3, NO2 AND DON
 !
 !     X*FLS,X*FHS,X*FLB,X*FHB=solute flux in macropores,micropores in non-band,band from TranspNoSalt.f
 !     X*FLG=convective+diffusive gas flux from TranspNoSalt.f
 !     TZOU=cumulative N loss through lateral and lower boundaries
-!     UDOND,UDIND=dissolved organic,inorganic N loss through subsurface boundaries
+!     HDOND,HDIND=dissolved organic,inorganic N loss through subsurface boundaries
 !
 !     SUBSURFACE BOUNDARY FLUXES OF PO4 AND DOP
 !
 !     X*FLS,X*FHS,X*FLB,X*FHB=solute flux in macropores,micropores in non-band,band from TranspNoSalt.f
 !     TPOU=cumulative P loss through lateral and lower boundaries
-!     UDOPD,UDIPD=dissolved organic,inorganic P loss through subsurface boundaries
+!     HDOPD,HDIPD=dissolved organic,inorganic P loss through subsurface boundaries
 !
       COD=0.0_r8
       ZOD=0.0_r8
@@ -504,8 +504,8 @@ implicit none
         POD=POD+XN*(DOM_3DMicp_Transp_flx(idom_dop,K,N,N6,N5,N4)+DOM_3DMacp_Transp_flx(idom_dop,K,N,N6,N5,N4))
       ENDDO D450
       CXD=XN*(trcs_3DTransp2MicP(idg_CO2,N,N6,N5,N4)+trcs_3DTransp2MacP(idg_CO2,N,N6,N5,N4) &
-        +R3GasADTFlx(idg_CO2,N,N6,N5,N4)+trcs_3DTransp2MicP(idg_CH4,N,N6,N5,N4) &
-        +trcs_3DTransp2MacP(idg_CH4,N,N6,N5,N4)+R3GasADTFlx(idg_CH4,N,N6,N5,N4))
+        +Gas_3DAdvDif_Flx_vr(idg_CO2,N,N6,N5,N4)+trcs_3DTransp2MicP(idg_CH4,N,N6,N5,N4) &
+        +trcs_3DTransp2MacP(idg_CH4,N,N6,N5,N4)+Gas_3DAdvDif_Flx_vr(idg_CH4,N,N6,N5,N4))
       ZXD=XN*(trcs_3DTransp2MicP(ids_NH4,N,N6,N5,N4)+trcs_3DTransp2MicP(idg_NH3,N,N6,N5,N4) &
         +trcs_3DTransp2MicP(ids_NO3,N,N6,N5,N4) &
         +trcs_3DTransp2MicP(ids_NH4B,N,N6,N5,N4)+trcs_3DTransp2MicP(idg_NH3B,N,N6,N5,N4)&
@@ -516,11 +516,11 @@ implicit none
         +trcs_3DTransp2MacP(ids_NH4B,N,N6,N5,N4)+trcs_3DTransp2MacP(idg_NH3B,N,N6,N5,N4) &
         +trcs_3DTransp2MacP(ids_NO3B,N,N6,N5,N4) &
         +trcs_3DTransp2MacP(ids_NO2,N,N6,N5,N4)+trcs_3DTransp2MacP(ids_NO2B,N,N6,N5,N4))
-      ZGD=XN*(trcs_3DTransp2MicP(idg_N2,N,N6,N5,N4)+R3GasADTFlx(idg_N2,N,N6,N5,N4) &
+      ZGD=XN*(trcs_3DTransp2MicP(idg_N2,N,N6,N5,N4)+Gas_3DAdvDif_Flx_vr(idg_N2,N,N6,N5,N4) &
         +trcs_3DTransp2MacP(idg_N2,N,N6,N5,N4) &
-        +trcs_3DTransp2MicP(idg_N2O,N,N6,N5,N4)+R3GasADTFlx(idg_N2O,N,N6,N5,N4) &
+        +trcs_3DTransp2MicP(idg_N2O,N,N6,N5,N4)+Gas_3DAdvDif_Flx_vr(idg_N2O,N,N6,N5,N4) &
         +trcs_3DTransp2MacP(idg_N2O,N,N6,N5,N4) &
-        +R3GasADTFlx(idg_NH3,N,N6,N5,N4))
+        +Gas_3DAdvDif_Flx_vr(idg_NH3,N,N6,N5,N4))
       PXD=XN*(trcs_3DTransp2MicP(ids_H2PO4,N,N6,N5,N4)+trcs_3DTransp2MicP(ids_H2PO4B,N,N6,N5,N4) &
         +trcs_3DTransp2MacP(ids_H2PO4,N,N6,N5,N4)+trcs_3DTransp2MacP(ids_H2PO4B,N,N6,N5,N4)&
         +trcs_3DTransp2MicP(ids_H1PO4,N,N6,N5,N4) &
@@ -530,12 +530,12 @@ implicit none
       TCOU=TCOU-COD-CXD
       TZOU=TZOU-ZOD-ZXD-ZGD
       TPOU=TPOU-POD-PXD
-      UDOCD(N2,N1)=UDOCD(N2,N1)-COD
-      UDICD(N2,N1)=UDICD(N2,N1)-CXD
-      UDOND(N2,N1)=UDOND(N2,N1)-ZOD
-      UDIND(N2,N1)=UDIND(N2,N1)-ZXD
-      UDOPD(N2,N1)=UDOPD(N2,N1)-POD
-      UDIPD(N2,N1)=UDIPD(N2,N1)-PXD
+      HDOCD(N2,N1)=-COD
+      HDOND(N2,N1)=-ZOD
+      HDOPD(N2,N1)=-POD
+      HDICD(N2,N1)=-CXD
+      HDIND(N2,N1)=-ZXD
+      HDIPD(N2,N1)=-PXD
 !
 !     SUBSURFACE BOUNDARY FLUXES OF O2
 !
@@ -543,9 +543,9 @@ implicit none
 !     X*FLG=convective+diffusive gas flux from TranspNoSalt.f
 !     OXYGOU,H2GOU=cumulative O2,H2 loss through lateral and lower boundaries
 !
-      OOD=XN*(trcs_3DTransp2MicP(idg_O2,N,N6,N5,N4)+trcs_3DTransp2MacP(idg_O2,N,N6,N5,N4)+R3GasADTFlx(idg_O2,N,N6,N5,N4))
+      OOD=XN*(trcs_3DTransp2MicP(idg_O2,N,N6,N5,N4)+trcs_3DTransp2MacP(idg_O2,N,N6,N5,N4)+Gas_3DAdvDif_Flx_vr(idg_O2,N,N6,N5,N4))
       OXYGOU=OXYGOU-OOD
-      HOD=XN*(trcs_3DTransp2MicP(idg_H2,N,N6,N5,N4)+trcs_3DTransp2MacP(idg_H2,N,N6,N5,N4)+R3GasADTFlx(idg_H2,N,N6,N5,N4))
+      HOD=XN*(trcs_3DTransp2MicP(idg_H2,N,N6,N5,N4)+trcs_3DTransp2MacP(idg_H2,N,N6,N5,N4)+Gas_3DAdvDif_Flx_vr(idg_H2,N,N6,N5,N4))
       H2GOU=H2GOU-HOD
 !
 !     SUBSURFACE BOUNDARY FLUXES OF SOLUTES
@@ -685,7 +685,7 @@ implicit none
           ECNDX=0.0_r8
         ENDIF
       ENDIF
-      SG=SG+trcs_3DTransp2MicP(idg_H2,N,N6,N5,N4)+R3GasADTFlx(idg_H2,N,N6,N5,N4)
+      SG=SG+trcs_3DTransp2MicP(idg_H2,N,N6,N5,N4)+Gas_3DAdvDif_Flx_vr(idg_H2,N,N6,N5,N4)
     ENDIF
   ENDIF
   end subroutine SubsurfaceBoundaryFluxes
@@ -715,7 +715,7 @@ implicit none
       TCOU=TCOU-CXS
       TZOU=TZOU-ZXS-ZGS
       TPOU=TPOU-PXS
-      UDICQ(NY,NX)=UDICQ(NY,NX)-CXR
+      HDICQ(NY,NX)=HDICQ(NY,NX)-CXR
       UDINQ(NY,NX)=UDINQ(NY,NX)-ZXR-ZGR
       UDIPQ(NY,NX)=UDIPQ(NY,NX)-PXR
       OXS=XN*trcg_FloXSnow(idg_O2,N,N5,N4)

@@ -593,7 +593,7 @@ contains
   ENDDO
 
   DO nnut=ids_beg,ids_end
-    trcs_PoreTranspFlx(nnut,NU(NY,NX),NY,NX)=trcs_PoreTranspFlx(nnut,NU(NY,NX),NY,NX)&
+    trcs_PoreTranspFlx_vr(nnut,NU(NY,NX),NY,NX)=trcs_PoreTranspFlx_vr(nnut,NU(NY,NX),NY,NX)&
       +RporeSoXFlx(nnut,NU(NY,NX),NY,NX)
   ENDDO
 
@@ -904,7 +904,7 @@ contains
 !     R*DFG=surface gas volatilization
 !   does not include band
     DO ngases=idg_beg,idg_NH3
-      GasDisFlx(ngases,0,NY,NX)=GasDisFlx(ngases,0,NY,NX)+RGasDSFlx(ngases,0,NY,NX)
+      Gas_Disol_Flx_vr(ngases,0,NY,NX)=Gas_Disol_Flx_vr(ngases,0,NY,NX)+RGasDSFlx(ngases,0,NY,NX)
     ENDDO
 
   ELSE
@@ -947,7 +947,7 @@ contains
 !     X*FLG=hourly convective+diffusive gas flux
 !
     DO ngases=idg_beg,idg_NH3
-      R3GasADTFlx(ngases,3,NU(NY,NX),NY,NX)=R3GasADTFlx(ngases,3,NU(NY,NX),NY,NX) &
+      Gas_3DAdvDif_Flx_vr(ngases,3,NU(NY,NX),NY,NX)=Gas_3DAdvDif_Flx_vr(ngases,3,NU(NY,NX),NY,NX) &
         +R3GasADFlx(ngases,3,NU(NY,NX),NY,NX)
     ENDDO
 
@@ -959,7 +959,7 @@ contains
 !     X*DFG=hourly water-air gas flux
 !
       DO ngases=idg_beg,idg_end
-        GasDisFlx(ngases,NU(NY,NX),NY,NX)=GasDisFlx(ngases,NU(NY,NX),NY,NX) &
+        Gas_Disol_Flx_vr(ngases,NU(NY,NX),NY,NX)=Gas_Disol_Flx_vr(ngases,NU(NY,NX),NY,NX) &
           +RGasDSFlx(ngases,NU(NY,NX),NY,NX)
       ENDDO
     ELSE

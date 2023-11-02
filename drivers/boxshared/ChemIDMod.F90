@@ -105,7 +105,7 @@ implicit none
   integer :: cid_XROH2_band_conc    !exchangeable OH2 band-soil, [mol m-3]
 
   integer :: fid_TR_NH4_soil    !total solute NH4 transformation non-band, [mol d-2 h-1]
-  integer :: fid_TR_NH3_soil    !total solute NH3 transformation non-band, [mol d-2 h-1]
+  integer :: fid_TR_NH3_soil_vr    !total solute NH3 transformation non-band, [mol d-2 h-1]
   integer :: fid_TR_H1PO4_soil    !total solute HPO4 transformation non-band, [mol d-2 h-1]
   integer :: fid_TR_H2PO4_soil    !total solute H2PO4 transformation non-band, [mol d-2 h-1]
   integer :: fid_TR_NH4_sorbed_soil    !total adsorbed NH4 transformation non-band, [mol d-2 h-1]
@@ -133,7 +133,7 @@ implicit none
   integer :: fid_TR_SO4_2e_soil    !total solute SO4 transformation, [mol d-2 h-1]
   integer :: fid_TR_CO3_2e_soil    !total solute CO3 transformation, [mol d-2 h-1]
   integer :: fid_TRHCO    !total solute HCO3 transformation, [mol d-2 h-1]
-  integer :: fid_TR_CO2_aqu_soil    !total solute CO2 transformation, [mol d-2 h-1]
+  integer :: fid_TR_CO2_aqu_soil_vr    !total solute CO2 transformation, [mol d-2 h-1]
   integer :: fid_TR_AlOH_soil    !total solute AlOH transformation, [mol d-2 h-1]
   integer :: fid_TR_AlO2H2_soil    !total solute AlOH2 transformation, [mol d-2 h-1]
   integer :: fid_TR_AlO3H3_soil    !total solute AlOH3 transformation, [mol d-2 h-1]
@@ -306,8 +306,8 @@ implicit none
   varl(fid_TR_NH4_band_soil) = 'TR_NH4_band_soil';varlnml(fid_TR_NH4_band_soil)='band soil total solute NH4 transformation'
   unitl(fid_TR_NH4_band_soil)= 'mol d-2 h-1';vartypes(fid_TR_NH4_band_soil)=var_flux_type
 
-  varl(fid_TR_NH3_soil) = 'TR_NH3_soil';varlnml(fid_TR_NH3_soil)='non-band total solute NH3 transformation'
-  unitl(fid_TR_NH3_soil)= 'mol d-2 h-1';vartypes(fid_TR_NH3_soil)=var_flux_type
+  varl(fid_TR_NH3_soil_vr) = 'TR_NH3_soil_vr';varlnml(fid_TR_NH3_soil_vr)='non-band total solute NH3 transformation'
+  unitl(fid_TR_NH3_soil_vr)= 'mol d-2 h-1';vartypes(fid_TR_NH3_soil_vr)=var_flux_type
 
   varl(fid_TR_NH3_band_soil) = 'TR_NH3_band_soil';varlnml(fid_TR_NH3_band_soil)='band soil total solute NH3 transformation'
   unitl(fid_TR_NH3_band_soil)= 'mol d-2 h-1';vartypes(fid_TR_NH3_band_soil)=var_flux_type

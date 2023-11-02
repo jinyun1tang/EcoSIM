@@ -136,7 +136,7 @@ module SoluteChemDataType
   type, public :: solute_flx_type
     real(r8) :: TR_NH4_soil
     real(r8) :: TR_NH4_band_soil
-    real(r8) :: TR_NH3_soil
+    real(r8) :: TR_NH3_soil_vr
     real(r8) :: TR_NH3_band_soil
     real(r8) :: TR_H1PO4_soil
     real(r8) :: TR_H2PO4_soil
@@ -173,7 +173,7 @@ module SoluteChemDataType
     real(r8) :: TR_SO4_2e_soil
     real(r8) :: TR_CO3_2e_soil
     real(r8) :: TRHCO
-    real(r8) :: TR_CO2_aqu_soil
+    real(r8) :: TR_CO2_aqu_soil_vr
     real(r8) :: TR_AlOH_soil
     real(r8) :: TR_AlO2H2_soil
     real(r8) :: TR_AlO3H3_soil
@@ -376,7 +376,7 @@ contains
 
   solflx%TR_NH4_soil = 0._r8
   solflx%TR_NH4_band_soil = 0._r8
-  solflx%TR_NH3_soil = 0._r8
+  solflx%TR_NH3_soil_vr = 0._r8
   solflx%TR_NH3_band_soil = 0._r8
   solflx%TR_H1PO4_soil = 0._r8
   solflx%TR_H2PO4_soil = 0._r8
@@ -413,7 +413,7 @@ contains
   solflx%TR_SO4_2e_soil = 0._r8
   solflx%TR_CO3_2e_soil = 0._r8
   solflx%TRHCO = 0._r8
-  solflx%TR_CO2_aqu_soil = 0._r8
+  solflx%TR_CO2_aqu_soil_vr = 0._r8
   solflx%TR_AlOH_soil = 0._r8
   solflx%TR_AlO2H2_soil = 0._r8
   solflx%TR_AlO3H3_soil = 0._r8

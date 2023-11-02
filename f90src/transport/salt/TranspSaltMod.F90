@@ -38,8 +38,8 @@ module TranspSaltMod
   real(r8),allocatable ::  trcSalt_TQR(:,:,:)                         !
 
   real(r8),allocatable ::  trcSalt_TQ(:,:,:)                         !
-  real(r8),allocatable ::  trcSalt_TFLS(:,:,:,:)                      !
-  real(r8),allocatable ::  trcSalt_TFHS(:,:,:,:)                      !
+  real(r8),allocatable ::  trcSalt_Flo2MicP_vr(:,:,:,:)                      !
+  real(r8),allocatable ::  trcSalt_Flo2MacP_vr(:,:,:,:)                      !
   real(r8),allocatable ::  trcSalt_RFLZ(:,:,:,:)                      !
 !----------------------------------------------------------------------
 
@@ -55,7 +55,7 @@ module TranspSaltMod
   implicit none
 
   call destroy(trcSalt_TQR)
-  call destroy(trcSalt_TFLS)
+  call destroy(trcSalt_Flo2MicP_vr)
 
 
   end subroutine DestructTranspSalt
@@ -67,8 +67,8 @@ module TranspSaltMod
 
   allocate(trcSalt_TQR(idsalt_beg:idsalt_end,JY,JX));       trcSalt_TQR=0._r8
 
-  allocate(trcSalt_TFLS(idsalt_beg:idsaltb_end,JZ,JY,JX));   trcSalt_TFLS=0._r8
-  allocate(trcSalt_TFHS(idsalt_beg:idsaltb_end,JZ,JY,JX));   trcSalt_TFHS=0._r8
+  allocate(trcSalt_Flo2MicP_vr(idsalt_beg:idsaltb_end,JZ,JY,JX));   trcSalt_Flo2MicP_vr=0._r8
+  allocate(trcSalt_Flo2MacP_vr(idsalt_beg:idsaltb_end,JZ,JY,JX));   trcSalt_Flo2MacP_vr=0._r8
   allocate(trcSalt_RFLZ(idsalt_beg:idsaltb_end,JZ,JY,JX));   trcSalt_RFLZ=0._r8
   end subroutine InitTranspSalt
 !----------------------------------------------------------------------
@@ -767,15 +767,15 @@ module TranspSaltMod
 
     IF(VLSoilPoreMicP(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
       DO nsalts=idsalt_beg,idsaltb_end
-        trcSalt_TFLS(nsalts,N3,N2,N1)=trcSalt_TFLS(nsalts,N3,N2,N1) &
+        trcSalt_Flo2MicP_vr(nsalts,N3,N2,N1)=trcSalt_Flo2MicP_vr(nsalts,N3,N2,N1) &
           +trcSalt3DFlo2CellM(nsalts,N,N3,N2,N1)-trcSalt3DFlo2CellM(nsalts,N,N6,N5,N4)
-        trcSalt_TFHS(nsalts,N3,N2,N1)=trcSalt_TFHS(nsalts,N3,N2,N1) &
+        trcSalt_Flo2MacP_vr(nsalts,N3,N2,N1)=trcSalt_Flo2MacP_vr(nsalts,N3,N2,N1) &
           +trcSalt_RFHS(nsalts,N,N3,N2,N1)-trcSalt_RFHS(nsalts,N,N6,N5,N4)
       ENDDO
 
     ELSE
-      trcSalt_TFLS(idsalt_beg:idsaltb_end,N3,N2,N1)=0.0
-      trcSalt_TFHS(idsalt_beg:idsaltb_end,N3,N2,N1)=0.0
+      trcSalt_Flo2MicP_vr(idsalt_beg:idsaltb_end,N3,N2,N1)=0.0
+      trcSalt_Flo2MacP_vr(idsalt_beg:idsaltb_end,N3,N2,N1)=0.0
     ENDIF
   ENDIF
   end subroutine TotFluxInMacMicPores
@@ -1147,10 +1147,10 @@ module TranspSaltMod
     IF(VLSoilPoreMicP(L,NY,NX).GT.ZEROS2(NY,NX))THEN
       DO nsalts=idsalt_beg,idsaltb_end
         trcSalt_solml2(nsalts,L,NY,NX)=trcSalt_solml2(nsalts,L,NY,NX) &
-          +trcSalt_TFLS(nsalts,L,NY,NX)+trcSalt_RFXS(nsalts,L,NY,NX) &
+          +trcSalt_Flo2MicP_vr(nsalts,L,NY,NX)+trcSalt_RFXS(nsalts,L,NY,NX) &
           +trcSalt_RFLZ(nsalts,L,NY,NX)
         trcSalt_soHml2(nsalts,L,NY,NX)=trcSalt_soHml2(nsalts,L,NY,NX) &
-          +trcSalt_TFHS(nsalts,L,NY,NX)-trcSalt_RFXS(nsalts,L,NY,NX)
+          +trcSalt_Flo2MacP_vr(nsalts,L,NY,NX)-trcSalt_RFXS(nsalts,L,NY,NX)
       ENDDO
 
     ENDIF
@@ -1206,8 +1206,8 @@ module TranspSaltMod
   integer :: L
 
   D9885: DO L=NU(NY,NX),NL(NY,NX)
-    trcSalt_TFLS(idsalt_beg:idsaltb_end,L,NY,NX)=0.0_r8
-    trcSalt_TFHS(idsalt_beg:idsaltb_end,L,NY,NX)=0.0_r8
+    trcSalt_Flo2MicP_vr(idsalt_beg:idsaltb_end,L,NY,NX)=0.0_r8
+    trcSalt_Flo2MacP_vr(idsalt_beg:idsaltb_end,L,NY,NX)=0.0_r8
   ENDDO D9885
   end subroutine InitFluxAccumulatorsInSoil
 

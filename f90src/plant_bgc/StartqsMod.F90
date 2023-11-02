@@ -962,7 +962,7 @@ module StartqsMod
       trcg_rootml(idg_CO2,N,L,NZ)=CCO2A*RTVLP(N,L,NZ)
       trcs_rootml(idg_CO2,N,L,NZ)=CCO2P*RTVLW(N,L,NZ)
       plt_rbgc%trcg_RFLA(idg_CO2,N,L,NZ)=0._r8
-      plt_rbgc%trcg_RDFA(idg_CO2,N,L,NZ)=0._r8
+      plt_rbgc%trcg_Root_DisEvap_flx_vr(idg_CO2,N,L,NZ)=0._r8
       plt_rbgc%RCO2S(N,L,NZ)=0._r8
       plt_rbgc%RCO2P(N,L,NZ)=0._r8
       COXYA=COXYE

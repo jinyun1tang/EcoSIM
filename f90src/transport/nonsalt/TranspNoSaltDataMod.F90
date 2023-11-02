@@ -223,7 +223,7 @@ implicit none
   real(r8), allocatable ::  RGasSSVol(:,:,:)     !soil surface gas volatization
   real(r8), allocatable ::  RGasDSFlx(:,:,:,:)   !gas dissolution-volatilization
   real(r8), allocatable ::  R3GasADFlx(:,:,:,:,:) !3D gas flux advection + diffusion
-  real(r8), allocatable ::  RTGasADFlx(:,:,:,:)  !total 3D gas flux advection + diffusion
+  real(r8), allocatable ::  Gas_AdvDif_Flx_vr(:,:,:,:)  !total 3D gas flux advection + diffusion
 
   real(r8), allocatable ::  RHGFHS(:,:,:,:)                    !
   real(r8), allocatable ::  RCHFHS(:,:,:,:)                    !
@@ -444,7 +444,7 @@ contains
   allocate(trcg_2DSnowDrift(idg_beg:idg_NH3,2,JV,JH));    trcg_2DSnowDrift=0._r8
   allocate(trcn_2DFloXSurRunoffM(ids_nut_beg:ids_nuts_end,2,2,JV,JH));  trcn_2DFloXSurRunoffM=0._r8
   allocate(R3GasADFlx(idg_beg:idg_NH3,3,JD,JV,JH));R3GasADFlx=0._r8
-  allocate(RTGasADFlx(idg_beg:idg_NH3,JZ,JY,JH));RTGasADFlx=0._r8
+  allocate(Gas_AdvDif_Flx_vr(idg_beg:idg_NH3,JZ,JY,JH));Gas_AdvDif_Flx_vr=0._r8
 
   allocate(RNXFHS(3,JD,JV,JH)); RNXFHS=0._r8
   allocate(RNXFHB(3,JD,JV,JH)); RNXFHB=0._r8

@@ -222,15 +222,15 @@ implicit none
       DOM_Transp2Macp_flx(idom_beg:idom_end,K,L,NY,NX)=0.0_r8
     ENDDO D8595
 
-    trcs_TFLS(ids_beg:ids_end,L,NY,NX)=0.0_r8
+    trcs_Transp2MicP_vr(ids_beg:ids_end,L,NY,NX)=0.0_r8
 
-    trcs_TFHS(ids_beg:ids_end,L,NY,NX)=0.0_r8
+    trcs_Transp2MacP_vr(ids_beg:ids_end,L,NY,NX)=0.0_r8
 
-    RTGasADFlx(idg_beg:idg_NH3,L,NY,NX)=0.0_r8
+    Gas_AdvDif_Flx_vr(idg_beg:idg_NH3,L,NY,NX)=0.0_r8
 
     IF(salt_model)THEN
-      trcSalt_TFLS(idsalt_beg:idsaltb_end,L,NY,NX)=0.0_r8
-      trcSalt_TFHS(idsalt_beg:idsaltb_end,L,NY,NX)=0.0_r8
+      trcSalt_Flo2MicP_vr(idsalt_beg:idsaltb_end,L,NY,NX)=0.0_r8
+      trcSalt_Flo2MacP_vr(idsalt_beg:idsaltb_end,L,NY,NX)=0.0_r8
     ENDIF
   ENDDO
   end subroutine ZeroFluxAccumulators
@@ -558,7 +558,7 @@ implicit none
   integer, intent(in) :: N1,N2,N3   !source grid indices
   integer, intent(in) :: N4,N5      !dest grid indices  
   integer, intent(inout) :: N6
-  integer :: LL,K,NTSA,NTS,NTG
+  integer :: LL,K,NTSA,NTS,NTG,idom
 
   !     begin_execution
   !     NET HEAT, WATER FLUXES BETWEEN ADJACENT
@@ -627,20 +627,18 @@ implicit none
       !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
       !
       D8585: DO K=1,jcplx
-        DOM_Transp2Micp_flx(idom_doc,K,N3,N2,N1)=DOM_Transp2Micp_flx(idom_doc,K,N3,N2,N1)+DOM_3DMicp_Transp_flx(idom_doc,K,N,N3,N2,N1)-DOM_3DMicp_Transp_flx(idom_doc,K,N,N6,N5,N4)
-        DOM_Transp2Micp_flx(idom_don,K,N3,N2,N1)=DOM_Transp2Micp_flx(idom_don,K,N3,N2,N1)+DOM_3DMicp_Transp_flx(idom_don,K,N,N3,N2,N1)-DOM_3DMicp_Transp_flx(idom_don,K,N,N6,N5,N4)
-        DOM_Transp2Micp_flx(idom_dop,K,N3,N2,N1)=DOM_Transp2Micp_flx(idom_dop,K,N3,N2,N1)+DOM_3DMicp_Transp_flx(idom_dop,K,N,N3,N2,N1)-DOM_3DMicp_Transp_flx(idom_dop,K,N,N6,N5,N4)
-        DOM_Transp2Micp_flx(idom_acetate,K,N3,N2,N1)=DOM_Transp2Micp_flx(idom_acetate,K,N3,N2,N1)+DOM_3DMicp_Transp_flx(idom_acetate,K,N,N3,N2,N1)-DOM_3DMicp_Transp_flx(idom_acetate,K,N,N6,N5,N4)
-        DOM_Transp2Macp_flx(idom_doc,K,N3,N2,N1)=DOM_Transp2Macp_flx(idom_doc,K,N3,N2,N1)+DOM_3DMacp_Transp_flx(idom_doc,K,N,N3,N2,N1)-DOM_3DMacp_Transp_flx(idom_doc,K,N,N6,N5,N4)
-        DOM_Transp2Macp_flx(idom_don,K,N3,N2,N1)=DOM_Transp2Macp_flx(idom_don,K,N3,N2,N1)+DOM_3DMacp_Transp_flx(idom_don,K,N,N3,N2,N1)-DOM_3DMacp_Transp_flx(idom_don,K,N,N6,N5,N4)
-        DOM_Transp2Macp_flx(idom_dop,K,N3,N2,N1)=DOM_Transp2Macp_flx(idom_dop,K,N3,N2,N1)+DOM_3DMacp_Transp_flx(idom_dop,K,N,N3,N2,N1)-DOM_3DMacp_Transp_flx(idom_dop,K,N,N6,N5,N4)
-        DOM_Transp2Macp_flx(idom_acetate,K,N3,N2,N1)=DOM_Transp2Macp_flx(idom_acetate,K,N3,N2,N1)+DOM_3DMacp_Transp_flx(idom_acetate,K,N,N3,N2,N1)-DOM_3DMacp_Transp_flx(idom_acetate,K,N,N6,N5,N4)
+        do idom=idom_beg,idom_end
+          DOM_Transp2Micp_flx(idom,K,N3,N2,N1)=DOM_Transp2Micp_flx(idom,K,N3,N2,N1) &
+            +DOM_3DMicp_Transp_flx(idom,K,N,N3,N2,N1)-DOM_3DMicp_Transp_flx(idom,K,N,N6,N5,N4)
+          DOM_Transp2Macp_flx(idom,K,N3,N2,N1)=DOM_Transp2Macp_flx(idom,K,N3,N2,N1) &
+            +DOM_3DMacp_Transp_flx(idom,K,N,N3,N2,N1)-DOM_3DMacp_Transp_flx(idom,K,N,N6,N5,N4)
+        enddo
       ENDDO D8585
 
       DO NTS=ids_beg,ids_end
-        trcs_TFLS(NTS,N3,N2,N1)=trcs_TFLS(NTS,N3,N2,N1) &
+        trcs_Transp2MicP_vr(NTS,N3,N2,N1)=trcs_Transp2MicP_vr(NTS,N3,N2,N1) &
           +trcs_3DTransp2MicP(NTS,N,N3,N2,N1)-trcs_3DTransp2MicP(NTS,N,N6,N5,N4)
-        trcs_TFHS(NTS,N3,N2,N1)=trcs_TFHS(NTS,N3,N2,N1) &
+        trcs_Transp2MacP_vr(NTS,N3,N2,N1)=trcs_Transp2MacP_vr(NTS,N3,N2,N1) &
           +trcs_3DTransp2MacP(NTS,N,N3,N2,N1)-trcs_3DTransp2MacP(NTS,N,N6,N5,N4)
       ENDDO
 !
@@ -651,7 +649,8 @@ implicit none
       !     gas code:*CO*=CO2,*OX*=O2,*CH*=CH4,*NG*=N2,*N2*=N2O,*NH*=NH3,*HG*=H2
 !exclude NH3B
       DO NTG=idg_beg,idg_NH3
-        RTGasADFlx(NTG,N3,N2,N1)=RTGasADFlx(NTG,N3,N2,N1)+R3GasADTFlx(NTG,N,N3,N2,N1)-R3GasADTFlx(NTG,N,N6,N5,N4)
+        Gas_AdvDif_Flx_vr(NTG,N3,N2,N1)=Gas_AdvDif_Flx_vr(NTG,N3,N2,N1) &
+          +Gas_3DAdvDif_Flx_vr(NTG,N,N3,N2,N1)-Gas_3DAdvDif_Flx_vr(NTG,N,N6,N5,N4)
       ENDDO
 !
       !     NET SALT FLUXES BETWEEN ADJACENT GRID CELLS
@@ -671,9 +670,9 @@ implicit none
 !
       IF(salt_model)THEN
         DO NTSA=idsalt_beg,idsaltb_end
-          trcSalt_TFLS(NTSA,N3,N2,N1)=trcSalt_TFLS(NTSA,N3,N2,N1) &
+          trcSalt_Flo2MicP_vr(NTSA,N3,N2,N1)=trcSalt_Flo2MicP_vr(NTSA,N3,N2,N1) &
             +trcSalt3DFlo2Cell(NTSA,N,N3,N2,N1)-trcSalt3DFlo2Cell(NTSA,N,N6,N5,N4)
-          trcSalt_TFHS(NTSA,N3,N2,N1)=trcSalt_TFHS(NTSA,N3,N2,N1) &
+          trcSalt_Flo2MacP_vr(NTSA,N3,N2,N1)=trcSalt_Flo2MacP_vr(NTSA,N3,N2,N1) &
             +trcSalt_XFHS(NTSA,N,N3,N2,N1)-trcSalt_XFHS(NTSA,N,N6,N5,N4)
         ENDDO
       ENDIF
@@ -685,25 +684,20 @@ implicit none
       WatIceThawMicP(N3,N2,N1)=0.0_r8
       WatIceThawMacP(N3,N2,N1)=0.0_r8
       THeatSoiThaw(N3,N2,N1)=0.0_r8
+
       D8596: DO K=1,jcplx
-        DOM_Transp2Micp_flx(idom_doc,K,N3,N2,N1)=0.0_r8
-        DOM_Transp2Micp_flx(idom_don,K,N3,N2,N1)=0.0_r8
-        DOM_Transp2Micp_flx(idom_dop,K,N3,N2,N1)=0.0_r8
-        DOM_Transp2Micp_flx(idom_acetate,K,N3,N2,N1)=0.0_r8
-        DOM_Transp2Macp_flx(idom_doc,K,N3,N2,N1)=0.0_r8
-        DOM_Transp2Macp_flx(idom_don,K,N3,N2,N1)=0.0_r8
-        DOM_Transp2Macp_flx(idom_dop,K,N3,N2,N1)=0.0_r8
-        DOM_Transp2Macp_flx(idom_acetate,K,N3,N2,N1)=0.0_r8
+        DOM_Transp2Micp_flx(idom_beg:idom_end,K,N3,N2,N1)=0.0_r8
+        DOM_Transp2Macp_flx(idom_beg:idom_end,K,N3,N2,N1)=0.0_r8
       ENDDO D8596
-      trcs_TFLS(ids_beg:ids_end,N3,N2,N1)=0.0_r8
 
-      trcs_TFHS(ids_beg:ids_end,N3,N2,N1)=0.0_r8
+      trcs_Transp2MicP_vr(ids_beg:ids_end,N3,N2,N1)=0.0_r8
+      trcs_Transp2MacP_vr(ids_beg:ids_end,N3,N2,N1)=0.0_r8
 
-      RTGasADFlx(idg_beg:idg_NH3,N3,N2,N1)=0.0_r8
+      Gas_AdvDif_Flx_vr(idg_beg:idg_NH3,N3,N2,N1)=0.0_r8
 
       IF(salt_model)THEN
-        trcSalt_TFLS(idsalt_beg:idsaltb_end,N3,N2,N1)=0.0_r8
-        trcSalt_TFHS(idsalt_beg:idsaltb_end,N3,N2,N1)=0.0_r8
+        trcSalt_Flo2MicP_vr(idsalt_beg:idsaltb_end,N3,N2,N1)=0.0_r8
+        trcSalt_Flo2MacP_vr(idsalt_beg:idsaltb_end,N3,N2,N1)=0.0_r8
       ENDIF
     ENDIF
   ENDIF
