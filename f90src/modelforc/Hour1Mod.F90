@@ -200,20 +200,20 @@ module Hour1Mod
 !
       LWRadCanGPrev(NY,NX)=LWRadCanG(NY,NX)
       LWRadGrnd(NY,NX)=LWRadBySurf(NY,NX)
-      CNETX(NY,NX)=TCNET(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      CNETX(NY,NX)=Eco_NEE_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       LWRadCanG(NY,NX)=0.0_r8
       LWRadBySurf(NY,NX)=0.0_r8
-      TLEX(NY,NX)=TLEC(NY,NX)
-      TSHX(NY,NX)=TSHC(NY,NX)
-      TLEC(NY,NX)=0.0_r8
-      TSHC(NY,NX)=0.0_r8
-      TRN(NY,NX)=0.0_r8
-      TLE(NY,NX)=0.0_r8
-      TSH(NY,NX)=0.0_r8
-      TGH(NY,NX)=0.0_r8
-      TCCAN(NY,NX)=0.0_r8
-      TCNET(NY,NX)=0.0_r8
-      RECO(NY,NX)=0.0_r8
+      TLEX(NY,NX)=Canopy_Heat_Latent_col(NY,NX)
+      TSHX(NY,NX)=Canopy_Heat_Sens_col(NY,NX)
+      Canopy_Heat_Latent_col(NY,NX)=0.0_r8
+      Canopy_Heat_Sens_col(NY,NX)=0.0_r8
+      Eco_NetRad_col(NY,NX)=0.0_r8
+      Eco_Heat_Latent_col(NY,NX)=0.0_r8
+      Eco_Heat_Sens_col(NY,NX)=0.0_r8
+      Eco_Heat_Grnd_col(NY,NX)=0.0_r8
+      Canopy_NEE_col(NY,NX)=0.0_r8
+      Eco_NEE_col(NY,NX)=0.0_r8
+      ECO_ER_col(NY,NX)=0.0_r8
 
       CALL CanopyInterceptPrecp(NY,NX)
 
@@ -254,14 +254,14 @@ module Hour1Mod
 !     CANOPY RETENTION OF PRECIPITATION
 !
 !     XVOLWC=foliar surface water retention capacity
-!     CanopyLeafA_pft,CanPSA=leaf,stalk area of PFT
+!     CanopyLeafA_pft,CanopyStemA_pft=leaf,stalk area of PFT
 !     FLWC,TFLWC=water retention of PFT,combined canopy
 !     PRECA=precipitation+irrigation
 !     FracPARByCanP=fraction of radiation received by each PFT canopy
 !     VOLWC=canopy surface water retention
 !
   DO  NZ=1,NP(NY,NX)
-    VOLWCX=XVOLWC(IGTYP(NZ,NY,NX))*(CanopyLeafA_pft(NZ,NY,NX)+CanPSA(NZ,NY,NX))
+    VOLWCX=XVOLWC(IGTYP(NZ,NY,NX))*(CanopyLeafA_pft(NZ,NY,NX)+CanopyStemA_pft(NZ,NY,NX))
     PrecIntcptByCanP(NZ,NY,NX)=AZMAX1(AMIN1(PrecRainAndSurfirrig(NY,NX)*FracPARByCanP(NZ,NY,NX),VOLWCX-WatByPCan(NZ,NY,NX)))
     TFLWCI(NY,NX)=TFLWCI(NY,NX)+PrecRainAndSurfirrig(NY,NX)*FracPARByCanP(NZ,NY,NX)
     PrecIntcptByCanG(NY,NX)=PrecIntcptByCanG(NY,NX)+PrecIntcptByCanP(NZ,NY,NX)
@@ -2321,7 +2321,7 @@ module Hour1Mod
     trcs_plant_uptake_vr(idg_NH3,L,NY,NX)=0.0_r8
     trcs_plant_uptake_vr(idg_NH3B,L,NY,NX)=0.0_r8
     trcs_plant_uptake_vr(idg_H2,L,NY,NX)=0.0_r8
-    trcg_TFLA(idg_beg:idg_end-1,L,NY,NX)=0.0_r8
+    trcg_air2root_flx_vr(idg_beg:idg_end-1,L,NY,NX)=0.0_r8
     trcs_plant_uptake_vr(ids_NH4,L,NY,NX)=0.0_r8
     trcs_plant_uptake_vr(ids_NO3,L,NY,NX)=0.0_r8
     trcs_plant_uptake_vr(ids_H2PO4,L,NY,NX)=0.0_r8

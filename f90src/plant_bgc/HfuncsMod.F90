@@ -379,7 +379,7 @@ module HfuncsMod
     BranchNumber_brchpft   =>  plt_morph%BranchNumber_brchpft    , &
     HypoctoylHeight  =>  plt_morph%HypoctoylHeight   , &
     SeedinDepth  =>  plt_morph%SeedinDepth   , &
-    CanPSA  =>  plt_morph%CanPSA   , &
+    CanopyStemA_pft  =>  plt_morph%CanopyStemA_pft   , &
     NI     =>  plt_morph%NI        &
   )
   plt_bgcr%RootGasLoss_disturb(idg_beg:idg_end-1,NZ)=0.0_r8
@@ -461,14 +461,14 @@ module HfuncsMod
 ! EMERGENCE DATE FROM COTYLEDON HEIGHT, LEAF AREA, ROOT DEPTH
 !
 ! IDAY(1,=emergence date
-! CanopyLeafA_pft,CanPSA=leaf,stalk areas
+! CanopyLeafA_pft,CanopyStemA_pft=leaf,stalk areas
 ! HypoctoylHeight=hypocotyledon height
 ! SeedinDepth=seeding depth
 ! PrimRootDepth=primary root depth
 ! VHeatCapCanP,WTSHT,WatByPCan=canopy heat capacity,mass,water content
 !
   IF(IDAY(1,NB1(NZ),NZ).EQ.0)THEN
-    ARLSP=CanopyLeafA_pft(NZ)+CanPSA(NZ)
+    ARLSP=CanopyLeafA_pft(NZ)+CanopyStemA_pft(NZ)
     IF((HypoctoylHeight(NZ).GT.SeedinDepth(NZ)).AND.(ARLSP.GT.ZEROL(NZ)) &
       .AND.(PrimRootDepth(1,1,NZ).GT.SeedinDepth(NZ)+ppmc))THEN
       IDAY(1,NB1(NZ),NZ)=I

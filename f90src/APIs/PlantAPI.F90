@@ -117,23 +117,23 @@ implicit none
   I1=I+1;if(I1>LYRC)I1=1
   IFLGT(NY,NX)=plt_site%IFLGT
   PPT(NY,NX) =plt_site%PPT
-  RECO(NY,NX)=plt_bgcr%RECO
+  ECO_ER_col(NY,NX)=plt_bgcr%ECO_ER_col
   Eco_NBP_col(NY,NX)=plt_bgcr%Eco_NBP_col
   Eco_GPP_col(NY,NX)=plt_bgcr%Eco_GPP_col
-  TLEC(NY,NX)=plt_ew%TLEC
-  TSHC(NY,NX)=plt_ew%TSHC
+  Canopy_Heat_Latent_col(NY,NX)=plt_ew%Canopy_Heat_Latent_col
+  Canopy_Heat_Sens_col(NY,NX)=plt_ew%Canopy_Heat_Sens_col
   Eco_AutoR_col(NY,NX)=plt_bgcr%Eco_AutoR_col
   ZESNC(1:NumOfPlantChemElements,NY,NX) =plt_bgcr%ZESNC(1:NumOfPlantChemElements)
   XHVSTE(1:NumOfPlantChemElements,NY,NX)=plt_distb%XHVSTE(1:NumOfPlantChemElements)
   CanH2OHeldVg(NY,NX)=plt_ew%CanH2OHeldVg
-  TSH(NY,NX)   =plt_ew%TSH
+  Eco_Heat_Sens_col(NY,NX)   =plt_ew%Eco_Heat_Sens_col
   WTSTGET(1:NumOfPlantChemElements,NY,NX)=plt_biom%WTSTGET(1:NumOfPlantChemElements)
   UVOLO(NY,NX) =plt_ew%UVOLO
   StemAreag(NY,NX) =plt_morph%StemAreag
   CanopyLA_grd(NY,NX) =plt_morph%CanopyLA_grd
-  TRN(NY,NX)   =plt_rad%TRN
-  TLE(NY,NX)   =plt_ew%TLE
-  TGH(NY,NX)   =plt_ew%TGH
+  Eco_NetRad_col(NY,NX)   =plt_rad%Eco_NetRad_col
+  Eco_Heat_Latent_col(NY,NX)   =plt_ew%Eco_Heat_Latent_col
+  Eco_Heat_Grnd_col(NY,NX)   =plt_ew%Eco_Heat_Grnd_col
   TEVAPP(NY,NX)=plt_ew%TEVAPP
   LWRadCanG(NY,NX) =plt_ew%LWRadCanG
   VapXAir2CanG(NY,NX)=plt_ew%VapXAir2CanG
@@ -141,7 +141,7 @@ implicit none
   CanWatg(NY,NX)=plt_ew%CanWatg
   TENGYC(NY,NX)=plt_ew%TENGYC
   TRootGasLoss_disturb(idg_beg:idg_end-1,NY,NX) =plt_rbgc%TRootGasLoss_disturb(idg_beg:idg_end-1)
-  TCCAN(NY,NX)=plt_bgcr%TCCAN
+  Canopy_NEE_col(NY,NX)=plt_bgcr%Canopy_NEE_col
 
   FERT(17:19,I1,NY,NX)=plt_distb%FERT(17:19)
   FERT(3,I1,NY,NX) =plt_distb%FERT(3)
@@ -192,7 +192,7 @@ implicit none
     trcs_plant_uptake_vr(idg_N2,L,NY,NX) =plt_rbgc%trcs_plant_uptake_vr(idg_N2,L)
     RTDNT(L,NY,NX) =plt_morph%RTDNT(L)
     trcg_TLP(idg_beg:idg_end-1,L,NY,NX)=plt_rbgc%trcg_TLP(idg_beg:idg_end-1,L)
-    trcg_TFLA(idg_beg:idg_end-1,L,NY,NX)=plt_rbgc%trcg_TFLA(idg_beg:idg_end-1,L)
+    trcg_air2root_flx_vr(idg_beg:idg_end-1,L,NY,NX)=plt_rbgc%trcg_air2root_flx_vr(idg_beg:idg_end-1,L)
     TCO2P(L,NY,NX) =plt_bgcr%TCO2P(L)
     TUPOXP(L,NY,NX)=plt_bgcr%TUPOXP(L)
     
@@ -229,7 +229,7 @@ implicit none
     WTNDE(1:NumOfPlantChemElements,NZ,NY,NX)   =plt_biom%WTNDE(1:NumOfPlantChemElements,NZ)
     HEUPTK(1:NumOfPlantChemElements,NZ,NY,NX)=plt_rbgc%HEUPTK(1:NumOfPlantChemElements,NZ)
     CanopyLeafA_pft(NZ,NY,NX) =plt_morph%CanopyLeafA_pft(NZ)
-    CanPSA(NZ,NY,NX) =plt_morph%CanPSA(NZ)
+    CanopyStemA_pft(NZ,NY,NX) =plt_morph%CanopyStemA_pft(NZ)
     NoduleNonstructCconc_pft(NZ,NY,NX)=plt_biom%NoduleNonstructCconc_pft(NZ)
     CO2NetFix_pft(NZ,NY,NX)  =plt_bgcr%CO2NetFix_pft(NZ)
     CO2Q(NZ,NY,NX)  =plt_photo%CO2Q(NZ)
@@ -531,12 +531,12 @@ implicit none
         RUPN3S(N,L,NZ,NY,NX)=plt_rbgc%RUPN3S(N,L,NZ)
         RUPN3B(N,L,NZ,NY,NX)=plt_rbgc%RUPN3B(N,L,NZ)
         RUPHGS(N,L,NZ,NY,NX)=plt_rbgc%RUPHGS(N,L,NZ)
-        trcg_RFLA(idg_CO2,N,L,NZ,NY,NX)=plt_rbgc%trcg_RFLA(idg_CO2,N,L,NZ)
-        trcg_RFLA(idg_O2,N,L,NZ,NY,NX)=plt_rbgc%trcg_RFLA(idg_O2,N,L,NZ)
-        trcg_RFLA(idg_CH4,N,L,NZ,NY,NX)=plt_rbgc%trcg_RFLA(idg_CH4,N,L,NZ)
-        trcg_RFLA(idg_N2O,N,L,NZ,NY,NX)=plt_rbgc%trcg_RFLA(idg_N2O,N,L,NZ)
-        trcg_RFLA(idg_NH3,N,L,NZ,NY,NX)=plt_rbgc%trcg_RFLA(idg_NH3,N,L,NZ)
-        trcg_RFLA(idg_H2,N,L,NZ,NY,NX)=plt_rbgc%trcg_RFLA(idg_H2,N,L,NZ)
+        trcg_air2root_flx_pft_vr(idg_CO2,N,L,NZ,NY,NX)=plt_rbgc%trcg_air2root_flx_pft_vr(idg_CO2,N,L,NZ)
+        trcg_air2root_flx_pft_vr(idg_O2,N,L,NZ,NY,NX)=plt_rbgc%trcg_air2root_flx_pft_vr(idg_O2,N,L,NZ)
+        trcg_air2root_flx_pft_vr(idg_CH4,N,L,NZ,NY,NX)=plt_rbgc%trcg_air2root_flx_pft_vr(idg_CH4,N,L,NZ)
+        trcg_air2root_flx_pft_vr(idg_N2O,N,L,NZ,NY,NX)=plt_rbgc%trcg_air2root_flx_pft_vr(idg_N2O,N,L,NZ)
+        trcg_air2root_flx_pft_vr(idg_NH3,N,L,NZ,NY,NX)=plt_rbgc%trcg_air2root_flx_pft_vr(idg_NH3,N,L,NZ)
+        trcg_air2root_flx_pft_vr(idg_H2,N,L,NZ,NY,NX)=plt_rbgc%trcg_air2root_flx_pft_vr(idg_H2,N,L,NZ)
         trcg_Root_DisEvap_flx_vr(idg_CO2,N,L,NZ,NY,NX)=plt_rbgc%trcg_Root_DisEvap_flx_vr(idg_CO2,N,L,NZ)
         trcg_Root_DisEvap_flx_vr(idg_O2,N,L,NZ,NY,NX)=plt_rbgc%trcg_Root_DisEvap_flx_vr(idg_O2,N,L,NZ)
         trcg_Root_DisEvap_flx_vr(idg_CH4,N,L,NZ,NY,NX)=plt_rbgc%trcg_Root_DisEvap_flx_vr(idg_CH4,N,L,NZ)
@@ -946,30 +946,30 @@ implicit none
   plt_site%IFLGT=IFLGT(NY,NX)
   plt_site%VOLWOU=VOLWOU
   plt_site%PPT=PPT(NY,NX)
-  plt_bgcr%RECO=RECO(NY,NX)
+  plt_bgcr%ECO_ER_col=ECO_ER_col(NY,NX)
   plt_biom%WTSTGET(1:NumOfPlantChemElements)=WTSTGET(1:NumOfPlantChemElements,NY,NX)
   plt_bgcr%ZESNC(1:NumOfPlantChemElements)=ZESNC(1:NumOfPlantChemElements,NY,NX)
   plt_morph%StemAreag=StemAreag(NY,NX)
-  plt_ew%TSH=TSH(NY,NX)
+  plt_ew%Eco_Heat_Sens_col=Eco_Heat_Sens_col(NY,NX)
   plt_ew%CanH2OHeldVg=CanH2OHeldVg(NY,NX)
   plt_bgcr%Eco_NBP_col=Eco_NBP_col(NY,NX)
   plt_bgcr%Eco_GPP_col=Eco_GPP_col(NY,NX)
-  plt_ew%TLEC=TLEC(NY,NX)
-  plt_ew%TSHC=TSHC(NY,NX)
+  plt_ew%Canopy_Heat_Latent_col=Canopy_Heat_Latent_col(NY,NX)
+  plt_ew%Canopy_Heat_Sens_col=Canopy_Heat_Sens_col(NY,NX)
   plt_bgcr%Eco_AutoR_col=Eco_AutoR_col(NY,NX)
   plt_ew%UVOLO    =UVOLO(NY,NX)
   plt_distb%XHVSTE(1:NumOfPlantChemElements)=XHVSTE(1:NumOfPlantChemElements,NY,NX)
-  plt_rad%TRN     =TRN(NY,NX)
+  plt_rad%Eco_NetRad_col     =Eco_NetRad_col(NY,NX)
   plt_ew%VapXAir2CanG=VapXAir2CanG(NY,NX)
-  plt_ew%TLE=TLE(NY,NX)
+  plt_ew%Eco_Heat_Latent_col=Eco_Heat_Latent_col(NY,NX)
   plt_rbgc%TRootGasLoss_disturb(idg_beg:idg_end-1)=TRootGasLoss_disturb(idg_beg:idg_end-1,NY,NX)
-  plt_ew%TGH    =TGH(NY,NX)
+  plt_ew%Eco_Heat_Grnd_col    =Eco_Heat_Grnd_col(NY,NX)
   plt_ew%TEVAPP =TEVAPP(NY,NX)
   plt_ew%THFLXC =THFLXC(NY,NX)
   plt_ew%LWRadCanG  =LWRadCanG(NY,NX)
   plt_ew%CanWatg =CanWatg(NY,NX)
   plt_ew%TENGYC =TENGYC(NY,NX)
-  plt_bgcr%TCCAN=TCCAN(NY,NX)
+  plt_bgcr%Canopy_NEE_col=Canopy_NEE_col(NY,NX)
   plt_distb%FERT(1:20)=FERT(1:20,I1,NY,NX)
 
   DO  L=1,JC
@@ -1015,7 +1015,7 @@ implicit none
     plt_rbgc%trcs_plant_uptake_vr(idg_N2,L)=trcs_plant_uptake_vr(idg_N2,L,NY,NX)
     plt_morph%RTDNT(L)=RTDNT(L,NY,NX)
     plt_rbgc%trcg_TLP(idg_beg:idg_end-1,L)=trcg_TLP(idg_beg:idg_end-1,L,NY,NX)
-    plt_rbgc%trcg_TFLA(idg_beg:idg_end-1,L)=trcg_TFLA(idg_beg:idg_end-1,L,NY,NX)
+    plt_rbgc%trcg_air2root_flx_vr(idg_beg:idg_end-1,L)=trcg_air2root_flx_vr(idg_beg:idg_end-1,L,NY,NX)
     plt_bgcr%TCO2P(L) =TCO2P(L,NY,NX)
     plt_bgcr%TUPOXP(L)=TUPOXP(L,NY,NX)
     plt_rbgc%trcs_plant_uptake_vr(idg_CO2,L) =trcs_plant_uptake_vr(idg_CO2,L,NY,NX)
@@ -1130,7 +1130,7 @@ implicit none
     plt_distb%IHVST(NZ)=IHVST(NZ,I,NY,NX)
     plt_distb%JHVST(NZ)=JHVST(NZ,I,NY,NX)
     plt_distb%THIN_pft(NZ) =THIN_pft(NZ,I,NY,NX)
-    plt_morph%CanPSA(NZ)=CanPSA(NZ,NY,NX)
+    plt_morph%CanopyStemA_pft(NZ)=CanopyStemA_pft(NZ,NY,NX)
     plt_morph%CanopyLeafA_pft(NZ)=CanopyLeafA_pft(NZ,NY,NX)
 
     plt_photo%O2I(NZ)  =O2I(NZ,NY,NX)
@@ -1392,7 +1392,7 @@ implicit none
         plt_rbgc%RUPN3S(N,L,NZ)=RUPN3S(N,L,NZ,NY,NX)
         plt_rbgc%RUPN3B(N,L,NZ)=RUPN3B(N,L,NZ,NY,NX)
         plt_rbgc%RUPHGS(N,L,NZ)=RUPHGS(N,L,NZ,NY,NX)
-        plt_rbgc%trcg_RFLA(idg_beg:idg_end-1,N,L,NZ)=trcg_RFLA(idg_beg:idg_end-1,N,L,NZ,NY,NX)
+        plt_rbgc%trcg_air2root_flx_pft_vr(idg_beg:idg_end-1,N,L,NZ)=trcg_air2root_flx_pft_vr(idg_beg:idg_end-1,N,L,NZ,NY,NX)
         plt_rbgc%trcg_Root_DisEvap_flx_vr(idg_beg:idg_end-1,N,L,NZ)=trcg_Root_DisEvap_flx_vr(idg_beg:idg_end-1,N,L,NZ,NY,NX)
         plt_rbgc%ROXYP(N,L,NZ) =ROXYP(N,L,NZ,NY,NX)
         plt_rbgc%RUNNHP(N,L,NZ)=RUNNHP(N,L,NZ,NY,NX)

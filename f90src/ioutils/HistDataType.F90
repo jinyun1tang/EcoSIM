@@ -111,14 +111,14 @@ implicit none
   real(r8),pointer   :: histr_1D_SOIL_LE_col(:)        !HeatEvapAir2Surf(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_SOIL_H_col(:)         !HeatSensAir2Surf(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_SOIL_G_col(:)         !-(HeatNet2Surf(NY,NX)-HeatSensVapAir2Surf(NY,NX))*277.8/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: histr_1D_ECO_RN_col(:)         !TRN(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: histr_1D_ECO_LE_col(:)         !TLE(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: histr_1D_ECO_H_col(:)          !TSH(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: histr_1D_ECO_G_col(:)          !TGH(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: histr_1D_ECO_RN_col(:)         !Eco_NetRad_col(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: histr_1D_ECO_LE_col(:)         !Eco_Heat_Latent_col(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: histr_1D_Eco_Heat_col(:)          !Eco_Heat_Sens_col(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: histr_1D_ECO_G_col(:)          !Eco_Heat_Grnd_col(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_O2_LITR_col(:)       !trc_solcl(idg_O2,0,NY,NX)
   real(r8),pointer   :: histr_1D_MIN_LWP_ptc(:)       !PSICanPDailyMin(NZ,NY,NX), minimum daily canopy water potential, [MPa]
   real(r8),pointer   :: histr_1D_SOIL_CO2_FLX_col(:)  !SurfGasFlx(idg_CO2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.14815, umol m-2 s-1, 1.e6/(12*3600)=23.14815
-  real(r8),pointer   :: histr_1D_ECO_CO2_FLX_col(:)   !TCNET(NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.14815
+  real(r8),pointer   :: histr_1D_ECO_CO2_FLX_col(:)   !Eco_NEE_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.14815
   real(r8),pointer   :: histr_1D_CH4_FLX_col(:)       !SurfGasFlx(idg_CH4,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.14815
   real(r8),pointer   :: histr_1D_O2_FLX_col(:)        !SurfGasFlx(idg_O2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*8.68056,  umol m-2 s-1, 1.e6/(32*3600)=8.68056
   real(r8),pointer   :: histr_1D_CO2_LITR_col(:)      !trc_solcl(idg_CO2,0,NY,NX)
@@ -362,10 +362,10 @@ implicit none
   allocate(this%histr_1D_SOIL_LE_col(beg_col:end_col))       !HeatEvapAir2Surf(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_SOIL_H_col(beg_col:end_col))        !HeatSensAir2Surf(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_SOIL_G_col(beg_col:end_col))        !-(HeatNet2Surf(NY,NX)-HeatSensVapAir2Surf(NY,NX))*277.8/AREA(3,NU(NY,NX),NY,NX)
-  allocate(this%histr_1D_ECO_RN_col(beg_col:end_col))        !TRN(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX), W m-2
-  allocate(this%histr_1D_ECO_LE_col(beg_col:end_col))        !TLE(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
-  allocate(this%histr_1D_ECO_H_col(beg_col:end_col))         !TSH(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
-  allocate(this%histr_1D_ECO_G_col(beg_col:end_col))         !TGH(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
+  allocate(this%histr_1D_ECO_RN_col(beg_col:end_col))        !Eco_NetRad_col(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX), W m-2
+  allocate(this%histr_1D_ECO_LE_col(beg_col:end_col))        !Eco_Heat_Latent_col(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
+  allocate(this%histr_1D_Eco_Heat_col(beg_col:end_col))         !Eco_Heat_Sens_col(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
+  allocate(this%histr_1D_ECO_G_col(beg_col:end_col))         !Eco_Heat_Grnd_col(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_O2_LITR_col(beg_col:end_col))       !trc_solcl(idg_O2,0,NY,NX)
   allocate(this%histr_1D_MIN_LWP_ptc(beg_ptc:end_ptc))       !PSICanPDailyMin(NZ,NY,NX), minimum daily canopy water potential, [MPa]
   allocate(this%histr_1D_SOIL_CO2_FLX_col(beg_col:end_col))  !SurfGasFlx(idg_CO2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.14815, umol m-2 s-1, 1.e6/(12*3600)=23.14815
@@ -841,7 +841,7 @@ implicit none
   call hist_addfld1d(fname='ECO_LE',units='W/m2',avgflag='A',&
     long_name='ecosystem latent heat flux',ptr_col=data1d_ptr)      
 
-  data1d_ptr => this%histr_1D_ECO_H_col(beg_col:end_col)  
+  data1d_ptr => this%histr_1D_Eco_Heat_col(beg_col:end_col)  
   call hist_addfld1d(fname='ECO_H',units='W/m2',avgflag='A',&
     long_name='ecosystem sensible heat flux',ptr_col=data1d_ptr)      
 
@@ -862,8 +862,8 @@ implicit none
     long_name='soil CO2 flux',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%histr_1D_ECO_CO2_FLX_col(beg_col:end_col)  
-  call hist_addfld1d(fname='ECO_CO2_FLX',units='umol/m2/s',avgflag='A',&
-    long_name='total canopy net CO2 exchange',ptr_col=data1d_ptr)      
+  call hist_addfld1d(fname='ECO_NEE_CO2',units='umol/m2/s',avgflag='A',&
+    long_name='ecosystem net CO2 exchange',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%histr_1D_CH4_FLX_col(beg_col:end_col)     
   call hist_addfld1d(fname='CH4_FLX',units='umol/m2/s',avgflag='A',&
@@ -1506,13 +1506,13 @@ implicit none
       this%histr_1D_SOIL_LE_col(ncol)     = HeatEvapAir2Surf(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_SOIL_H_col(ncol)      = HeatSensAir2Surf(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_SOIL_G_col(ncol)      =-(HeatNet2Surf(NY,NX)-HeatSensVapAir2Surf(NY,NX))*277.8/AREA(3,NU(NY,NX),NY,NX)
-      this%histr_1D_ECO_RN_col(ncol)      = TRN(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
-      this%histr_1D_ECO_LE_col(ncol)      = TLE(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
-      this%histr_1D_ECO_H_col(ncol)       = TSH(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
-      this%histr_1D_ECO_G_col(ncol)       = TGH(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
+      this%histr_1D_ECO_RN_col(ncol)      = Eco_NetRad_col(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
+      this%histr_1D_ECO_LE_col(ncol)      = Eco_Heat_Latent_col(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
+      this%histr_1D_Eco_Heat_col(ncol)       = Eco_Heat_Sens_col(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
+      this%histr_1D_ECO_G_col(ncol)       = Eco_Heat_Grnd_col(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_O2_LITR_col(ncol)     = trc_solcl(idg_O2,0,NY,NX)
       this%histr_1D_SOIL_CO2_FLX_col(ncol)= SurfGasFlx(idg_CO2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.14815_r8
-      this%histr_1D_ECO_CO2_FLX_col(ncol) = TCNET(NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.14815_r8
+      this%histr_1D_ECO_CO2_FLX_col(ncol) = Eco_NEE_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.14815_r8
       this%histr_1D_CH4_FLX_col(ncol)     = SurfGasFlx(idg_CH4,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.14815_r8
       this%histr_1D_O2_FLX_col(ncol)      = SurfGasFlx(idg_O2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*8.68056_r8
       this%histr_1D_CO2_LITR_col(ncol)    = trc_solcl(idg_CO2,0,NY,NX)

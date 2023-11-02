@@ -146,7 +146,7 @@ module ExtractsMod
     RUPP2B=> plt_rbgc%RUPP2B , &
     RUNNXP=> plt_rbgc%RUNNXP , &
     trcg_Root_DisEvap_flx_vr=> plt_rbgc%trcg_Root_DisEvap_flx_vr , &
-    trcg_RFLA=> plt_rbgc%trcg_RFLA , &
+    trcg_air2root_flx_pft_vr=> plt_rbgc%trcg_air2root_flx_pft_vr , &
     RCO2P => plt_rbgc%RCO2P  , &
     RUPCHS=> plt_rbgc%RUPCHS , &
     RUPOXP=> plt_rbgc%RUPOXP , &
@@ -164,7 +164,7 @@ module ExtractsMod
     RUPNHB=> plt_rbgc%RUPNHB , &
     RUPH2B=> plt_rbgc%RUPH2B , &
     RUPH1B=> plt_rbgc%RUPH1B , &
-    trcg_TFLA=> plt_rbgc%trcg_TFLA , &
+    trcg_air2root_flx_vr=> plt_rbgc%trcg_air2root_flx_vr , &
     trcg_TLP=> plt_rbgc%trcg_TLP , &
     ROXYP => plt_rbgc%ROXYP  , &
     RDFOME=> plt_rbgc%RDFOME , &
@@ -228,7 +228,7 @@ module ExtractsMod
 !     R*DFA=root aqueous-gaseous CO2 exchange
 !
       DO NTG=idg_beg,idg_NH3
-        trcg_rootml(NTG,N,L,NZ)=trcg_rootml(NTG,N,L,NZ)+trcg_RFLA(NTG,N,L,NZ)-trcg_Root_DisEvap_flx_vr(NTG,N,L,NZ)
+        trcg_rootml(NTG,N,L,NZ)=trcg_rootml(NTG,N,L,NZ)+trcg_air2root_flx_pft_vr(NTG,N,L,NZ)-trcg_Root_DisEvap_flx_vr(NTG,N,L,NZ)
       ENDDO
 
       trcs_rootml(idg_CO2,N,L,NZ)=trcs_rootml(idg_CO2,N,L,NZ)+trcg_Root_DisEvap_flx_vr(idg_CO2,N,L,NZ)+RCO2P(N,L,NZ)
@@ -259,7 +259,7 @@ module ExtractsMod
 !                :NHB=NH4,NOB=NO3,H2B=H2PO4,H1B=H1PO4 in band
 !
       DO NTG=idg_beg,idg_end-1
-        trcg_TFLA(NTG,L)=trcg_TFLA(NTG,L)+trcg_RFLA(NTG,N,L,NZ)
+        trcg_air2root_flx_vr(NTG,L)=trcg_air2root_flx_vr(NTG,L)+trcg_air2root_flx_pft_vr(NTG,N,L,NZ)
       ENDDO
 
       TCO2P(L)=TCO2P(L)-RCO2P(N,L,NZ)
@@ -348,7 +348,7 @@ module ExtractsMod
     BALE  => plt_site%BALE   , &
     TNH3C => plt_bgcr%TNH3C  , &
     RNH3C => plt_bgcr%RNH3C  , &
-    TCCAN => plt_bgcr%TCCAN  , &
+    Canopy_NEE_col => plt_bgcr%Canopy_NEE_col  , &
     ZESNC => plt_bgcr%ZESNC  , &
     RootGasLoss_disturb => plt_bgcr%RootGasLoss_disturb, &
     RUPNF => plt_bgcr%RUPNF  , &
@@ -364,14 +364,14 @@ module ExtractsMod
     VapXAir2PCan => plt_ew%VapXAir2PCan    , &
     WatByPCan => plt_ew%WatByPCan    , &
     CanWatP => plt_ew%CanWatP    , &
-    TGH   => plt_ew%TGH      , &
+    Eco_Heat_Grnd_col   => plt_ew%Eco_Heat_Grnd_col      , &
     HeatXAir2PCan => plt_ew%HeatXAir2PCan    , &
     EvapTransHeatP => plt_ew%EvapTransHeatP    , &
     CanWatg=> plt_ew%CanWatg   , &
     TKC   => plt_ew%TKC      , &
     TKS   => plt_ew%TKS      , &
     ENGYX => plt_ew%ENGYX    , &
-    TSH   => plt_ew%TSH      , &
+    Eco_Heat_Sens_col   => plt_ew%Eco_Heat_Sens_col      , &
     VapXAir2CanG=> plt_ew%VapXAir2CanG   , &
     TENGYC=> plt_ew%TENGYC   , &
     TEVAPP=> plt_ew%TEVAPP   , &
@@ -379,18 +379,18 @@ module ExtractsMod
     LWRadCanG => plt_ew%LWRadCanG    , &
     TairK   => plt_ew%TairK      , &
     HeatStorCanP => plt_ew%HeatStorCanP    , &
-    TLE   => plt_ew%TLE      , &
+    Eco_Heat_Latent_col   => plt_ew%Eco_Heat_Latent_col      , &
     CanH2OHeldVg=> plt_ew%CanH2OHeldVg   , &
     NU    => plt_site%NU     , &
     StemAreag => plt_morph%StemAreag , &
     CanopyLA_grd => plt_morph%CanopyLA_grd , &
     NI    => plt_morph%NI    , &
     NumOfBranches_pft   => plt_morph%NumOfBranches_pft   , &
-    CanPSA => plt_morph%CanPSA , &
+    CanopyStemA_pft => plt_morph%CanopyStemA_pft , &
     CanopyLeafA_pft => plt_morph%CanopyLeafA_pft , &
     RadNet2CanP  => plt_rad%RadNet2CanP    , &
     LWRadCanP => plt_rad%LWRadCanP   , &
-    TRN   => plt_rad%TRN       &
+    Eco_NetRad_col   => plt_rad%Eco_NetRad_col       &
   )
   DO L=NU,NI(NZ)
     trcs_plant_uptake_vr(idg_N2,L)=trcs_plant_uptake_vr(idg_N2,L)+RUPNF(L,NZ)
@@ -398,15 +398,15 @@ module ExtractsMod
 !
 !     TOTAL ENERGY, WATER, CO2 FLUXES
 !
-!     TRN=total net SW+LW absorbed by canopy
+!     Eco_NetRad_col=total net SW+LW absorbed by canopy
 !     RadNet2CanP=PFT net SW+LW absorbed by canopy
-!     TLE=total canopy latent heat flux
+!     Eco_Heat_Latent_col=total canopy latent heat flux
 !     EvapTransHeatP=PFT canopy latent heat flux
-!     TSH=total canopy sensible heat flux
+!     Eco_Heat_Sens_col=total canopy sensible heat flux
 !     HeatXAir2PCan=PFT canopy sensible heat flux
-!     TGH=total canopy storage heat flux
+!     Eco_Heat_Grnd_col=total canopy storage heat flux
 !     HeatStorCanP=PFT canopy storage heat flux
-!     TCCAN=total net CO2 fixation
+!     Canopy_NEE_col=total net CO2 fixation
 !     CO2NetFix_pft=PFT net CO2 fixation
 !     CanWatg,CanH2OHeldVg=total water volume in canopy,on canopy surfaces
 !     CanWatP,WatByPCan=PFT water volume in canopy,on canopy surfaces
@@ -415,7 +415,7 @@ module ExtractsMod
 !     TENGYC=total canopy water heat content
 !     ENGYC=PFT canopy water heat content
 !     CanopyLA_grd,StemAreag=total leaf,stalk area
-!     CanopyLeafA_pft,CanPSA=PFT leaf,stalk area
+!     CanopyLeafA_pft,CanopyStemA_pft=PFT leaf,stalk area
 !     ZCSNC,ZZSNC,ZPSNC=total net root-soil C,N,P exchange
 !     HCUPTK,HZUPTK,HPUPTK=PFT net root-soil C,N,P exchange
 !     TBALC,TBALN,TBALP=total C,N,P balance
@@ -423,11 +423,11 @@ module ExtractsMod
 !     TRootGasLoss_disturb=total loss of root CO2, O2, CH4, N2O, NH3, H2
 !     RootGasLoss_disturb=PFT loss of root CO2, O2, CH4, N2O, NH3, H2
 !
-  TRN=TRN+RadNet2CanP(NZ)
-  TLE=TLE+EvapTransHeatP(NZ)
-  TSH=TSH+HeatXAir2PCan(NZ)
-  TGH=TGH+HeatStorCanP(NZ)
-  TCCAN=TCCAN+CO2NetFix_pft(NZ)
+  Eco_NetRad_col=Eco_NetRad_col+RadNet2CanP(NZ)
+  Eco_Heat_Latent_col=Eco_Heat_Latent_col+EvapTransHeatP(NZ)
+  Eco_Heat_Sens_col=Eco_Heat_Sens_col+HeatXAir2PCan(NZ)
+  Eco_Heat_Grnd_col=Eco_Heat_Grnd_col+HeatStorCanP(NZ)
+  Canopy_NEE_col=Canopy_NEE_col+CO2NetFix_pft(NZ)
   ETCanP(NZ)=ETCanP(NZ)+PTrans(NZ)+VapXAir2PCan(NZ)
   CanWatg=CanWatg+CanWatP(NZ)
   CanH2OHeldVg=CanH2OHeldVg+WatByPCan(NZ)
@@ -439,7 +439,7 @@ module ExtractsMod
   ENGYX(NZ)=ENGYC
   LWRadCanG=LWRadCanG+LWRadCanP(NZ)
   CanopyLA_grd=CanopyLA_grd+CanopyLeafA_pft(NZ)
-  StemAreag=StemAreag+CanPSA(NZ)
+  StemAreag=StemAreag+CanopyStemA_pft(NZ)
   DO NE=1,NumOfPlantChemElements
     ZESNC(NE)=ZESNC(NE)-HEUPTK(NE,NZ)
     PlantElemntStoreLandscape(NE)=PlantElemntStoreLandscape(NE)+BALE(NE,NZ)

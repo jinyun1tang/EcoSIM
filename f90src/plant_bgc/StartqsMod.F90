@@ -591,7 +591,7 @@ module StartqsMod
     CanopyLeafA_pft   =>  plt_morph%CanopyLeafA_pft  , &
     CanopyBranchStemApft_lyr   =>  plt_morph%CanopyBranchStemApft_lyr  , &
     StemA_lyrnodbrchpft   =>  plt_morph%StemA_lyrnodbrchpft  , &
-    CanPSA   =>  plt_morph%CanPSA  , &
+    CanopyStemA_pft   =>  plt_morph%CanopyStemA_pft  , &
     PSTGF   =>  plt_morph%PSTGF  , &
     GRNXB   =>  plt_morph%GRNXB  , &
     HTNODE  =>  plt_morph%HTNODE , &
@@ -747,7 +747,7 @@ module StartqsMod
   plt_biom%CanopyLeafShethC_pft(NZ)=0._r8
   CanopyLeafA_pft(NZ)=0._r8
   plt_biom%WTRTA(NZ)=0._r8
-  CanPSA(NZ)=0._r8
+  CanopyStemA_pft(NZ)=0._r8
   end associate
   end subroutine InitPlantPhenoMorphoBio
 !------------------------------------------------------------------------------------------
@@ -779,7 +779,7 @@ module StartqsMod
     TCO2T  => plt_bgcr%TCO2T     , &
     TZUPFX => plt_bgcr%TZUPFX    , &
     TESNC  => plt_bgcr%TESNC     , &
-    CanPSA  => plt_morph%CanPSA    , &
+    CanopyStemA_pft  => plt_morph%CanopyStemA_pft    , &
     icwood => pltpar%icwood      , &
     RSETE  => plt_pheno%RSETE      &
 
@@ -961,7 +961,7 @@ module StartqsMod
       CCO2P=0.030*EXP(-2.621_r8-0.0317_r8*ATCA)*CO2EI
       trcg_rootml(idg_CO2,N,L,NZ)=CCO2A*RTVLP(N,L,NZ)
       trcs_rootml(idg_CO2,N,L,NZ)=CCO2P*RTVLW(N,L,NZ)
-      plt_rbgc%trcg_RFLA(idg_CO2,N,L,NZ)=0._r8
+      plt_rbgc%trcg_air2root_flx_pft_vr(idg_CO2,N,L,NZ)=0._r8
       plt_rbgc%trcg_Root_DisEvap_flx_vr(idg_CO2,N,L,NZ)=0._r8
       plt_rbgc%RCO2S(N,L,NZ)=0._r8
       plt_rbgc%RCO2P(N,L,NZ)=0._r8

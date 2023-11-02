@@ -47,7 +47,7 @@ module RootGasMod
   real(r8) :: RDXCHS,RUPCSX,RDFN2S,RDXN2S,RUPZSX,RDFN3S,RDXNHS
   real(r8) :: RUPNSX,RDFN3B,RDXNHB,RUPNBX,RDFHGS,RDXHGS,RUPHGX
   real(r8) :: RCODFQ,RUPOST,RNBDFQ,RUPNTX
-  real(r8) :: trcg_RDF1(idg_beg:idg_end-1),trcg_RFL1(idg_beg:idg_end-1)
+  real(r8) :: trcg_Root2Soil_flx(idg_beg:idg_end-1),trcg_air2root_flx1(idg_beg:idg_end-1)
   real(r8) :: THETW1,THETM
   real(r8) :: UPMXP
   real(r8) :: DissolvedGasVolume(idg_beg:idg_end-1),VLWatMicPMO,VLWatMicPMM,VLsoiAirPMM
@@ -86,7 +86,7 @@ module RootGasMod
     RUPOXS =>  plt_rbgc%RUPOXS   , &
     ROXSK  =>  plt_rbgc%ROXSK    , &
     RCO2P  =>  plt_rbgc%RCO2P    , &
-    trcg_RFLA =>  plt_rbgc%trcg_RFLA   , &
+    trcg_air2root_flx_pft_vr =>  plt_rbgc%trcg_air2root_flx_pft_vr   , &
     trcg_Root_DisEvap_flx_vr =>  plt_rbgc%trcg_Root_DisEvap_flx_vr   , &
     RUPN3B =>  plt_rbgc%RUPN3B   , &
     RUPHGS =>  plt_rbgc%RUPHGS   , &
@@ -219,7 +219,7 @@ module RootGasMod
     RN2DFQ=0.0_r8
     RNHDFQ=0.0_r8
     RHGDFQ=0.0_r8
-    trcg_RDF1(idg_beg:idg_end-1)=0.0_r8
+    trcg_Root2Soil_flx(idg_beg:idg_end-1)=0.0_r8
 !
 !     ROOT CONDUCTANCE TO GAS TRANSFER
 !
@@ -628,48 +628,48 @@ module RootGasMod
 !     DF*A=root-atmosphere gas conductance
 !
             CO2PX=CO2P1+RCO2PX
-            trcg_RDF1(idg_CO2)=AMAX1(-CO2PX,DFGP*(AMAX1(ZEROP(NZ),trcg_gmas(idg_CO2))*DissolvedGasVolume(idg_CO2) &
+            trcg_Root2Soil_flx(idg_CO2)=AMAX1(-CO2PX,DFGP*(AMAX1(ZEROP(NZ),trcg_gmas(idg_CO2))*DissolvedGasVolume(idg_CO2) &
               -CO2PX*RTVLP(N,L,NZ))/(DissolvedGasVolume(idg_CO2)+RTVLP(N,L,NZ)))
             OXYPX=OXYP1-RUPOPX
-            trcg_RDF1(idg_O2)=AMAX1(-OXYPX,DFGP*(AMAX1(ZEROP(NZ),trcg_gmas(idg_O2))*DissolvedGasVolume(idg_O2) &
+            trcg_Root2Soil_flx(idg_O2)=AMAX1(-OXYPX,DFGP*(AMAX1(ZEROP(NZ),trcg_gmas(idg_O2))*DissolvedGasVolume(idg_O2) &
               -OXYPX*RTVLP(N,L,NZ))/(DissolvedGasVolume(idg_O2)+RTVLP(N,L,NZ)))
             CH4PX=CH4P1+RUPCSX
-            trcg_RDF1(idg_CH4)=AMAX1(-CH4PX,DFGP*(AMAX1(ZEROP(NZ),trcg_gmas(idg_CH4))*DissolvedGasVolume(idg_CH4) &
+            trcg_Root2Soil_flx(idg_CH4)=AMAX1(-CH4PX,DFGP*(AMAX1(ZEROP(NZ),trcg_gmas(idg_CH4))*DissolvedGasVolume(idg_CH4) &
               -CH4PX*RTVLP(N,L,NZ))/(DissolvedGasVolume(idg_CH4)+RTVLP(N,L,NZ)))
             Z2OPX=Z2OP1+RUPZSX
-            trcg_RDF1(idg_N2O)=AMAX1(-Z2OPX,DFGP*(AMAX1(ZEROP(NZ),trcg_gmas(idg_N2O))*DissolvedGasVolume(idg_N2O) &
+            trcg_Root2Soil_flx(idg_N2O)=AMAX1(-Z2OPX,DFGP*(AMAX1(ZEROP(NZ),trcg_gmas(idg_N2O))*DissolvedGasVolume(idg_N2O) &
               -Z2OPX*RTVLP(N,L,NZ))/(DissolvedGasVolume(idg_N2O)+RTVLP(N,L,NZ)))
             ZH3PX=ZH3P1+RUPNTX
-            trcg_RDF1(idg_NH3)=AMAX1(-ZH3PX,DFGP*(AMAX1(ZEROP(NZ),trcg_gmas(idg_NH3))*DissolvedGasVolume(idg_NH3) &
+            trcg_Root2Soil_flx(idg_NH3)=AMAX1(-ZH3PX,DFGP*(AMAX1(ZEROP(NZ),trcg_gmas(idg_NH3))*DissolvedGasVolume(idg_NH3) &
               -ZH3PX*RTVLP(N,L,NZ))/(DissolvedGasVolume(idg_NH3)+RTVLP(N,L,NZ)))
             H2GPX=H2GP1+RUPHGX
-            trcg_RDF1(idg_H2)=AMAX1(-H2GPX,DFGP*(AMAX1(ZEROP(NZ),trcg_gmas(idg_H2))*DissolvedGasVolume(idg_H2) &
+            trcg_Root2Soil_flx(idg_H2)=AMAX1(-H2GPX,DFGP*(AMAX1(ZEROP(NZ),trcg_gmas(idg_H2))*DissolvedGasVolume(idg_H2) &
               -H2GPX*RTVLP(N,L,NZ))/(DissolvedGasVolume(idg_H2)+RTVLP(N,L,NZ)))
 
-            trcg_RFL1(idg_CO2)=AMIN1(DFCOA,RTVLP(N,L,NZ))*(CCO2E-trcg_gcon(idg_CO2))
-            trcg_RFL1(idg_O2)=AMIN1(DFOXA,RTVLP(N,L,NZ))*(COXYE-trcg_gcon(idg_O2))
-            trcg_RFL1(idg_CH4)=AMIN1(DFCHA,RTVLP(N,L,NZ))*(CCH4E-trcg_gcon(idg_CH4))
-            trcg_RFL1(idg_N2O)=AMIN1(DFN2A,RTVLP(N,L,NZ))*(CZ2OE-trcg_gcon(idg_N2O))
-            trcg_RFL1(idg_NH3)=AMIN1(DFNHA,RTVLP(N,L,NZ))*(CNH3E-trcg_gcon(idg_NH3))
-            trcg_RFL1(idg_H2)=AMIN1(DFHGA,RTVLP(N,L,NZ))*(CH2GE-trcg_gcon(idg_H2))
+            trcg_air2root_flx1(idg_CO2)=AMIN1(DFCOA,RTVLP(N,L,NZ))*(CCO2E-trcg_gcon(idg_CO2))
+            trcg_air2root_flx1(idg_O2)=AMIN1(DFOXA,RTVLP(N,L,NZ))*(COXYE-trcg_gcon(idg_O2))
+            trcg_air2root_flx1(idg_CH4)=AMIN1(DFCHA,RTVLP(N,L,NZ))*(CCH4E-trcg_gcon(idg_CH4))
+            trcg_air2root_flx1(idg_N2O)=AMIN1(DFN2A,RTVLP(N,L,NZ))*(CZ2OE-trcg_gcon(idg_N2O))
+            trcg_air2root_flx1(idg_NH3)=AMIN1(DFNHA,RTVLP(N,L,NZ))*(CNH3E-trcg_gcon(idg_NH3))
+            trcg_air2root_flx1(idg_H2)=AMIN1(DFHGA,RTVLP(N,L,NZ))*(CH2GE-trcg_gcon(idg_H2))
           ELSE
-            trcg_RDF1(idg_beg:idg_end-1)=0.0_r8
-            trcg_RFL1(idg_beg:idg_end-1)=0.0_r8
+            trcg_Root2Soil_flx(idg_beg:idg_end-1)=0.0_r8
+            trcg_air2root_flx1(idg_beg:idg_end-1)=0.0_r8
           ENDIF
 !
 !     UPDATE ROOT AQUEOUS, GASEOUS GAS CONTENTS AND CONCENTRATIONS
 !     FOR ROOT AQUEOUS-GASEOUS, GASEOUS-ATMOSPHERE EXCHANGES
 !
           DO NTG=idg_beg,idg_end-1
-            trcg_gmas(NTG)=trcg_gmas(NTG)-trcg_RDF1(NTG)+trcg_RFL1(NTG)
+            trcg_gmas(NTG)=trcg_gmas(NTG)-trcg_Root2Soil_flx(NTG)+trcg_air2root_flx1(NTG)
           ENDDO
 
-          CO2P1=CO2P1+trcg_RDF1(idg_CO2)+RCO2SX+RCO2PX
-          OXYP1=OXYP1+trcg_RDF1(idg_O2)-RUPOPX
-          CH4P1=CH4P1+trcg_RDF1(idg_CH4)+RUPCSX
-          Z2OP1=Z2OP1+trcg_RDF1(idg_N2O)+RUPZSX
-          ZH3P1=ZH3P1+trcg_RDF1(idg_NH3)+RUPNSX+RUPNBX
-          H2GP1=H2GP1+trcg_RDF1(idg_H2)+RUPHGX
+          CO2P1=CO2P1+trcg_Root2Soil_flx(idg_CO2)+RCO2SX+RCO2PX
+          OXYP1=OXYP1+trcg_Root2Soil_flx(idg_O2)-RUPOPX
+          CH4P1=CH4P1+trcg_Root2Soil_flx(idg_CH4)+RUPCSX
+          Z2OP1=Z2OP1+trcg_Root2Soil_flx(idg_N2O)+RUPZSX
+          ZH3P1=ZH3P1+trcg_Root2Soil_flx(idg_NH3)+RUPNSX+RUPNBX
+          H2GP1=H2GP1+trcg_Root2Soil_flx(idg_H2)+RUPHGX
 !
 !     ACCUMULATE SOIL-ROOT GAS EXCHANGE TO HOURLY TIME SCALE
 !
@@ -696,8 +696,8 @@ module RootGasMod
 !     gas code:CO=CO2,OX=O2,CH=CH4,N2=N2O,NH=NH3,H2=H2
 !
           DO NTG=idg_beg,idg_end-1
-            trcg_Root_DisEvap_flx_vr(NTG,N,L,NZ)=trcg_Root_DisEvap_flx_vr(NTG,N,L,NZ)+trcg_RDF1(NTG)
-            trcg_RFLA(NTG,N,L,NZ)=trcg_RFLA(NTG,N,L,NZ)+trcg_RFL1(NTG)
+            trcg_Root_DisEvap_flx_vr(NTG,N,L,NZ)=trcg_Root_DisEvap_flx_vr(NTG,N,L,NZ)+trcg_Root2Soil_flx(NTG)
+            trcg_air2root_flx_pft_vr(NTG,N,L,NZ)=trcg_air2root_flx_pft_vr(NTG,N,L,NZ)+trcg_air2root_flx1(NTG)
           ENDDO
 !
 !     ACCUMULATE SOIL-ROOT GAS EXCHANGE TO HOURLY TIME SCALE

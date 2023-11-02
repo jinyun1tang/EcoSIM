@@ -1214,7 +1214,7 @@ module PlantBranchMod
     TCO2T   =>  plt_bgcr%TCO2T      , &
     TCO2A   =>  plt_bgcr%TCO2A      , &
     Eco_AutoR_col    =>  plt_bgcr%Eco_AutoR_col       , &
-    RECO    =>  plt_bgcr%RECO       , &
+    ECO_ER_col    =>  plt_bgcr%ECO_ER_col       , &
     WGLFE   =>  plt_biom%WGLFE      , &
     ZEROP   =>  plt_biom%ZEROP      , &
     HCOB    =>  plt_photo%HCOB      , &
@@ -1278,14 +1278,14 @@ module PlantBranchMod
 !
 !     TCO2T,TCO2A=total,above-ground PFT respiration
 !     CO2NetFix_pft=PFT net CO2 fixation
-!     RECO=ecosystem respiration
+!     ECO_ER_col=ecosystem respiration
 !     Eco_AutoR_col=total autotrophic respiration
 !     CO2LeakFromBundsheth=bundle sheath CO2 leakage
 !
       TCO2T(NZ)=TCO2T(NZ)-CO2LeakFromBundsheth
       TCO2A(NZ)=TCO2A(NZ)-CO2LeakFromBundsheth
       CO2NetFix_pft(NZ)=CO2NetFix_pft(NZ)-CO2LeakFromBundsheth
-      RECO=RECO-CO2LeakFromBundsheth
+      ECO_ER_col=ECO_ER_col-CO2LeakFromBundsheth
       Eco_AutoR_col=Eco_AutoR_col-CO2LeakFromBundsheth
     ENDIF
   ENDDO D170
@@ -3256,7 +3256,7 @@ module PlantBranchMod
     CO2NetFix_pft      =>  plt_bgcr%CO2NetFix_pft    , &
     TCO2T     =>  plt_bgcr%TCO2T   , &
     Eco_AutoR_col      =>  plt_bgcr%Eco_AutoR_col    , &
-    RECO      =>  plt_bgcr%RECO    , &
+    ECO_ER_col      =>  plt_bgcr%ECO_ER_col    , &
     Eco_GPP_col      =>  plt_bgcr%Eco_GPP_col    , &
     CARBN     =>  plt_bgcr%CARBN   , &
     TCO2A     =>  plt_bgcr%TCO2A   , &
@@ -3379,7 +3379,7 @@ module PlantBranchMod
 ! TCO2T,TCO2A=total,above-ground PFT respiration
 ! CO2NetFix_pft=PFT net CO2 fixation
 ! Eco_GPP_col=ecosystem GPP
-! RECO=ecosystem respiration
+! ECO_ER_col=ecosystem respiration
 ! Eco_AutoR_col=total autotrophic respiration
 !
   Rauto_pft=AMIN1(RMNCS,RCO2C)+RCO2G+SNCR+CNRDA
@@ -3388,7 +3388,7 @@ module PlantBranchMod
   TCO2A(NZ)=TCO2A(NZ)-Rauto_pft
   CO2NetFix_pft(NZ)=CO2NetFix_pft(NZ)+CO2F-Rauto_pft
   Eco_GPP_col=Eco_GPP_col+CO2F
-  RECO=RECO-Rauto_pft
+  ECO_ER_col=ECO_ER_col-Rauto_pft
   Eco_AutoR_col=Eco_AutoR_col-Rauto_pft
 
   end associate

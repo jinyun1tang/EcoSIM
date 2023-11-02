@@ -22,7 +22,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  CanopyLeafA_pft(:,:,:)                       !plant leaf area, [m2 d-2]
   real(r8),target,allocatable ::  CanopyArea_pft(:,:,:)                       !plant canopy leaf+stem/stalk area, [m2 d-2]
   real(r8),target,allocatable ::  ARLFX(:,:)                         !total canopy leaf area, [m2 d-2]
-  real(r8),target,allocatable ::  CanPSA(:,:,:)                      !plant stem area, [m2 d-2]
+  real(r8),target,allocatable ::  CanopyStemA_pft(:,:,:)                      !plant stem area, [m2 d-2]
   real(r8),target,allocatable ::  CanopyHeight(:,:,:)                          !canopy height, [m]
   real(r8),target,allocatable ::  ARSTX(:,:)                         !total canopy stem area, [m2 d-2]
   real(r8),target,allocatable ::  CanopyLAgrid_lyr(:,:,:)                       !total leaf area, [m2 d-2]
@@ -179,7 +179,7 @@ contains
   allocate(CanopyLeafA_pft(JP,JY,JX));    CanopyLeafA_pft=0._r8
   allocate(CanopyArea_pft(JP,JY,JX));    CanopyArea_pft=0._r8
   allocate(ARLFX(JY,JX));       ARLFX=0._r8
-  allocate(CanPSA(JP,JY,JX));    CanPSA=0._r8
+  allocate(CanopyStemA_pft(JP,JY,JX));    CanopyStemA_pft=0._r8
   allocate(CanopyHeight(JP,JY,JX));       CanopyHeight=0._r8
   allocate(ARSTX(JY,JX));       ARSTX=0._r8
   allocate(CanopyLAgrid_lyr(JC,JY,JX));    CanopyLAgrid_lyr=0._r8
@@ -333,7 +333,7 @@ contains
   call destroy(CanopyLeafA_pft)
   call destroy(CanopyArea_pft)
   call destroy(ARLFX)
-  call destroy(CanPSA)
+  call destroy(CanopyStemA_pft)
   call destroy(CanopyHeight)
   call destroy(ARSTX)
   call destroy(CanopyLAgrid_lyr)

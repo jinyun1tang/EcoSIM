@@ -281,7 +281,7 @@ module readsmod
   ENDIF
   IMNG=1
 
-  call getGHGts(yearc,NHW,NHE,NVN,NVS)
+  call geEco_Heat_Grnd_colGts(yearc,NHW,NHE,NVN,NVS)
 
   RETURN
   END subroutine ReadClimSoilForcing

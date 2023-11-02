@@ -101,8 +101,8 @@ implicit none
   real(r8),target,allocatable ::  SSINN(:,:)                         !sine of solar angle next hour, [-]
   real(r8),target,allocatable ::  TLEX(:,:)                          !total latent heat flux x boundary layer resistance, [MJ m-1]
   real(r8),target,allocatable ::  TSHX(:,:)                          !total sensible heat flux x boundary layer resistance, [MJ m-1]
-  real(r8),target,allocatable ::  TLEC(:,:)                          !total latent heat flux x boundary layer resistance, [MJ m-1]
-  real(r8),target,allocatable ::  TSHC(:,:)                          !total sensible heat flux x boundary layer resistance, [MJ m-1]
+  real(r8),target,allocatable ::  Canopy_Heat_Latent_col(:,:)                          !total latent heat flux x boundary layer resistance, [MJ m-1]
+  real(r8),target,allocatable ::  Canopy_Heat_Sens_col(:,:)                          !total sensible heat flux x boundary layer resistance, [MJ m-1]
   real(r8),target,allocatable ::  SoilHeatSrcDepth(:,:)                        !depth of soil heat sink/source, [m]
   real(r8),target,allocatable ::  TKSD(:,:)                          !temperature of soil heat sink/source, [oC]
   real(r8),target,allocatable ::  ATCAI(:,:)                         !initial mean annual air temperature, [oC]
@@ -232,8 +232,8 @@ implicit none
   allocate(SSINN(JY,JX));       SSINN=0._r8
   allocate(TLEX(JY,JX));        TLEX=0._r8
   allocate(TSHX(JY,JX));        TSHX=0._r8
-  allocate(TLEC(JY,JX));        TLEC=0._r8
-  allocate(TSHC(JY,JX));        TSHC=0._r8
+  allocate(Canopy_Heat_Latent_col(JY,JX));        Canopy_Heat_Latent_col=0._r8
+  allocate(Canopy_Heat_Sens_col(JY,JX));        Canopy_Heat_Sens_col=0._r8
   allocate(SoilHeatSrcDepth(JY,JX));      SoilHeatSrcDepth=0._r8
   allocate(TKSD(JY,JX));        TKSD=0._r8
   allocate(ATCAI(JY,JX));       ATCAI=0._r8
@@ -363,8 +363,8 @@ implicit none
   call destroy(SSINN)
   call destroy(TLEX)
   call destroy(TSHX)
-  call destroy(TLEC)
-  call destroy(TSHC)
+  call destroy(Canopy_Heat_Latent_col)
+  call destroy(Canopy_Heat_Sens_col)
   call destroy(SoilHeatSrcDepth)
   call destroy(TKSD)
   call destroy(ATCAI)

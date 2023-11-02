@@ -698,7 +698,7 @@ module grosubsMod
     NI       =>  plt_morph%NI     , &
     NRT      =>  plt_morph%NRT    , &
     CanopyBranchLeafA_pft    =>  plt_morph%CanopyBranchLeafA_pft  , &
-    CanPSA    =>  plt_morph%CanPSA  , &
+    CanopyStemA_pft    =>  plt_morph%CanopyStemA_pft  , &
     CanopyBranchStemApft_lyr    =>  plt_morph%CanopyBranchStemApft_lyr  , &
     GRNOB    =>  plt_morph%GRNOB  , &
     CanopyLeafA_pft    =>  plt_morph%CanopyLeafA_pft  , &
@@ -744,7 +744,7 @@ module grosubsMod
   CanopyLeafShethC_pft(NZ) =sum(CanPBLeafShethC(1:NumOfBranches_pft(NZ),NZ))
   GRNO(NZ) =sum(GRNOB(1:NumOfBranches_pft(NZ),NZ))
   CanopyLeafA_pft(NZ)=sum(CanopyBranchLeafA_pft(1:NumOfBranches_pft(NZ),NZ))
-  CanPSA(NZ)=sum(CanopyBranchStemApft_lyr(1:NumOfCanopyLayers1,1:NumOfBranches_pft(NZ),NZ))
+  CanopyStemA_pft(NZ)=sum(CanopyBranchStemApft_lyr(1:NumOfCanopyLayers1,1:NumOfBranches_pft(NZ),NZ))
   CanopyStemApft_lyr(1:NumOfCanopyLayers1,1:NumOfBranches_pft(NZ))=0._r8
   DO NB=1,NumOfBranches_pft(NZ)
     DO L=1,NumOfCanopyLayers1

@@ -43,7 +43,7 @@ implicit none
   end type atm_forc_type
   public :: ReadClim
   public :: ReadClimNC
-  public :: getGHGts
+  public :: geEco_Heat_Grnd_colGts
   contains
 
 !------------------------------------------------------------------------------------------
@@ -774,7 +774,7 @@ implicit none
 
 !----------------------------------------------------------------------
 
-  subroutine getGHGts(yeari,NHW,NHE,NVN,NVS)
+  subroutine geEco_Heat_Grnd_colGts(yeari,NHW,NHE,NVN,NVS)
   !
   !DESCRIPTION
   !read in atmospheric concentrations for CO2, CH4, and N2O
@@ -812,7 +812,7 @@ implicit none
       Z2OE(NY,NX) =atm_n2o*1.e-3_r8  !ppb to ppm
     ENDDO
   ENDDO
-  end subroutine getGHGts
+  end subroutine geEco_Heat_Grnd_colGts
 
 
 

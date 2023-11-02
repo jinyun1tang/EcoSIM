@@ -60,7 +60,7 @@ module NoduleBGCMod
     INTYP    =>  plt_morph%INTYP   , &
     fTgrowCanP     =>  plt_pheno%fTgrowCanP    , &
     TCO2T    =>  plt_bgcr%TCO2T    , &
-    RECO     =>  plt_bgcr%RECO     , &
+    ECO_ER_col     =>  plt_bgcr%ECO_ER_col     , &
     TCO2A    =>  plt_bgcr%TCO2A    , &
     Eco_AutoR_col     =>  plt_bgcr%Eco_AutoR_col     , &
     CO2NetFix_pft     =>  plt_bgcr%CO2NetFix_pft     , &
@@ -281,14 +281,14 @@ module NoduleBGCMod
 !     RCNSNE(ielmc)=bacterial C senescence to recycling
 !     TCO2T,TCO2A=total,above-ground PFT respiration
 !     CO2NetFix_pft=PFT net CO2 fixation
-!     RECO=ecosystem respiration
+!     ECO_ER_col=ecosystem respiration
 !     Eco_AutoR_col=total autotrophic respiration
 !
     RCO2T=AMIN1(RMNDL,RCNDL)+RGNDG+RCNSNE(ielmc)
     TCO2T(NZ)=TCO2T(NZ)-RCO2T
     TCO2A(NZ)=TCO2A(NZ)-RCO2T
     CO2NetFix_pft(NZ)=CO2NetFix_pft(NZ)-RCO2T
-    RECO=RECO-RCO2T
+    ECO_ER_col=ECO_ER_col-RCO2T
     Eco_AutoR_col=Eco_AutoR_col-RCO2T
 !
 !     NODULE LITTERFALL CAUSED BY REMOBILIZATION

@@ -161,17 +161,16 @@ module RedistMod
   real(r8), intent(in) :: TXCO2(JY,JX)   !what does TXCO2 mean, be careful?
   real(r8) :: VLSoilPoreMicPX,VOLTX
   integer  :: L
-  TRN(NY,NX)=TRN(NY,NX)+HeatByRadiation(NY,NX)
-  TLE(NY,NX)=TLE(NY,NX)+HeatEvapAir2Surf(NY,NX)
-  TSH(NY,NX)=TSH(NY,NX)+HeatSensAir2Surf(NY,NX)
-  TGH(NY,NX)=TGH(NY,NX)-(HeatNet2Surf(NY,NX)-HeatSensVapAir2Surf(NY,NX))
-  TLEC(NY,NX)=TLEC(NY,NX)+HeatEvapAir2Surf(NY,NX)*BndlResistCanG(NY,NX)
-  TSHC(NY,NX)=TSHC(NY,NX)+HeatSensAir2Surf(NY,NX)*BndlResistCanG(NY,NX)
-  TCNET(NY,NX)=TCCAN(NY,NX)+SurfGasFlx(idg_CO2,NY,NX)
-  RECO(NY,NX)=RECO(NY,NX)+SurfGasFlx(idg_CO2,NY,NX)
-  TCAN(NY,NX)=TCAN(NY,NX)+TCCAN(NY,NX)
+  Eco_NetRad_col(NY,NX)=Eco_NetRad_col(NY,NX)+HeatByRadiation(NY,NX)
+  Eco_Heat_Latent_col(NY,NX)=Eco_Heat_Latent_col(NY,NX)+HeatEvapAir2Surf(NY,NX)
+  Eco_Heat_Sens_col(NY,NX)=Eco_Heat_Sens_col(NY,NX)+HeatSensAir2Surf(NY,NX)
+  Eco_Heat_Grnd_col(NY,NX)=Eco_Heat_Grnd_col(NY,NX)-(HeatNet2Surf(NY,NX)-HeatSensVapAir2Surf(NY,NX))
+  Canopy_Heat_Latent_col(NY,NX)=Canopy_Heat_Latent_col(NY,NX)+HeatEvapAir2Surf(NY,NX)*BndlResistCanG(NY,NX)
+  Canopy_Heat_Sens_col(NY,NX)=Canopy_Heat_Sens_col(NY,NX)+HeatSensAir2Surf(NY,NX)*BndlResistCanG(NY,NX)
+  Eco_NEE_col(NY,NX)=Canopy_NEE_col(NY,NX)+SurfGasFlx(idg_CO2,NY,NX)
+  ECO_ER_col(NY,NX)=ECO_ER_col(NY,NX)+SurfGasFlx(idg_CO2,NY,NX)
   Eco_NPP_col(NY,NX)=Eco_GPP_col(NY,NX)+Eco_AutoR_col(NY,NX)
-  Eco_NBP_col(NY,NX)=Eco_NBP_col(NY,NX)+TCCAN(NY,NX) &
+  Eco_NBP_col(NY,NX)=Eco_NBP_col(NY,NX)+Canopy_NEE_col(NY,NX) &
     +SurfGasFlx(idg_CO2,NY,NX)+SurfGasFlx(idg_CH4,NY,NX) &
     +TXCO2(NY,NX)-HDOCQ(NY,NX)-HDICQ(NY,NX)-HDOCD(NY,NX)-HDICD(NY,NX)
     
@@ -1114,14 +1113,13 @@ module RedistMod
     !     GRID CELL BOUNDARY FLUXES FROM ROOT GAS TRANSFER
 !   watch out the following code for changes
     HEATIN=HEATIN+THeatSoiThaw(L,NY,NX)+THeatRootUptake(L,NY,NX)
-    CIB=trcg_TFLA(idg_CO2,L,NY,NX)
-    CHB=trcg_TFLA(idg_CH4,L,NY,NX)
-    OIB=trcg_TFLA(idg_O2,L,NY,NX)
-!    HGB=trcg_TFLA(idg_H2,L,NY,NX)
-    HGB=0.0_r8
-    ZGB=0.0_r8
-    Z2B=trcg_TFLA(idg_N2O,L,NY,NX)
-    ZHB=trcg_TFLA(idg_NH3,L,NY,NX)
+    CIB=trcg_air2root_flx_vr(idg_CO2,L,NY,NX)
+    CHB=trcg_air2root_flx_vr(idg_CH4,L,NY,NX)
+    OIB=trcg_air2root_flx_vr(idg_O2,L,NY,NX)
+    HGB=trcg_air2root_flx_vr(idg_H2,L,NY,NX)
+    ZGB=trcg_air2root_flx_vr(idg_N2,L,NY,NX)
+    Z2B=trcg_air2root_flx_vr(idg_N2O,L,NY,NX)
+    ZHB=trcg_air2root_flx_vr(idg_NH3,L,NY,NX)
 !
 !     GRID CELL BOUNDARY FLUXES BUBBLING
 !

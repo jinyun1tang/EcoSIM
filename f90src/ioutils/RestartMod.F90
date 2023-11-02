@@ -752,15 +752,15 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='CanPSA', dim1name='pft',&
+    call restartvar(ncid, flag, varname='CanopyStemA_pft', dim1name='pft',&
      long_name='plant stem area', units='m2 d-2', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)      
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,CanPSA,datrp_1d,iflgt=iflgt,iflgc=iflgc)  
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,CanopyStemA_pft,datrp_1d,iflgt=iflgt,iflgc=iflgc)  
   else
-    !print*,'CanPSA'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,CanPSA,datrp_1d,iflgt=iflgt,iflgc=iflgc)    
+    !print*,'CanopyStemA_pft'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,CanopyStemA_pft,datrp_1d,iflgt=iflgt,iflgc=iflgc)    
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='CanPSA', dim1name='pft',&
+    call restartvar(ncid, flag, varname='CanopyStemA_pft', dim1name='pft',&
      long_name='plant stem area', units='m2 d-2', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)      
 
@@ -3455,16 +3455,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d  
-    call restartvar(ncid, flag, varname='TCNET', dim1name='column',&
+    call restartvar(ncid, flag, varname='Eco_NEE_col', dim1name='column',&
        long_name='total canopy net CO2 exchange', units='g d-2 h-1', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)  
-    call cpcol(flag,NHW,NHE,NVN,NVS,TCNET,datrc_1d)
+    call cpcol(flag,NHW,NHE,NVN,NVS,Eco_NEE_col,datrc_1d)
   else
-    !print*,'TCNET'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,TCNET,datrc_1d)  
+    !print*,'Eco_NEE_col'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,Eco_NEE_col,datrc_1d)  
     datpr1 => datrc_1d    
-    call restartvar(ncid, flag, varname='TCNET', dim1name='column',&
+    call restartvar(ncid, flag, varname='Eco_NEE_col', dim1name='column',&
        long_name='total canopy net CO2 exchange', units='g d-2 h-1', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)  
@@ -4493,33 +4493,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d            
-    call restartvar(ncid, flag, varname='TCAN', dim1name='column',&
-       long_name='total net CO2 fixation', units='g d-2', &
-       interpinic_flag='skip', data=datpr1, missing_value=spval, &
-       fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,TCAN,datrc_1d) 
-  else
-    !print*,'TCAN'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,TCAN,datrc_1d)   
-    datpr1 => datrc_1d              
-    call restartvar(ncid, flag, varname='TCAN', dim1name='column',&
-       long_name='total net CO2 fixation', units='g d-2', &
-       interpinic_flag='skip', data=datpr1, missing_value=spval, &
-       fill_value=spval)    
-  endif  
-
-  if(flag=='read')then
-    datpr1 => datrc_1d            
-    call restartvar(ncid, flag, varname='TLEC', dim1name='column',&
+    call restartvar(ncid, flag, varname='Canopy_Heat_Latent_col', dim1name='column',&
        long_name='total latent heat flux x boundary layer resistance', units='MJ m-1', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,TLEC,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,Canopy_Heat_Latent_col,datrc_1d) 
   else
-    !print*,'TLEC'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,TLEC,datrc_1d)   
+    !print*,'Canopy_Heat_Latent_col'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,Canopy_Heat_Latent_col,datrc_1d)   
     datpr1 => datrc_1d              
-    call restartvar(ncid, flag, varname='TLEC', dim1name='column',&
+    call restartvar(ncid, flag, varname='Canopy_Heat_Latent_col', dim1name='column',&
        long_name='total latent heat flux x boundary layer resistance', units='MJ m-1', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
@@ -4527,16 +4510,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d            
-    call restartvar(ncid, flag, varname='TSHC', dim1name='column',&
+    call restartvar(ncid, flag, varname='Canopy_Heat_Sens_col', dim1name='column',&
        long_name='total sensible heat flux x boundary layer resistance', units='MJ m-1', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,TSHC,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,Canopy_Heat_Sens_col,datrc_1d) 
   else
-    !print*,'TSHC'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,TSHC,datrc_1d)   
+    !print*,'Canopy_Heat_Sens_col'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,Canopy_Heat_Sens_col,datrc_1d)   
     datpr1 => datrc_1d              
-    call restartvar(ncid, flag, varname='TSHC', dim1name='column',&
+    call restartvar(ncid, flag, varname='Canopy_Heat_Sens_col', dim1name='column',&
        long_name='total sensible heat flux x boundary layer resistance', units='MJ m-1', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)      

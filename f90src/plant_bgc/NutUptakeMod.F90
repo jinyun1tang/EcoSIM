@@ -206,7 +206,7 @@ module NutUptakeMod
 
   L1=plt_site%NU;L2=plt_morph%NI(NZ);NN=plt_morph%MY(NZ)
 
-  plt_rbgc%trcg_RFLA(idg_beg:idg_end-1,1:NN,L1:L2,NZ)=0.0_r8
+  plt_rbgc%trcg_air2root_flx_pft_vr(idg_beg:idg_end-1,1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%trcg_Root_DisEvap_flx_vr(idg_beg:idg_end-1,1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%RCO2S(1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%RUPOXS(1:NN,L1:L2,NZ)=0.0_r8
@@ -1257,7 +1257,7 @@ module NutUptakeMod
   !     OQC=soil DOC
   !     RDFOMC,RDFOMN,RDFOMP=nonstructl C,N,P exchange:-ve=exudn,+ve=uptake
   !     FEXUC,FEXUN,FEXUP=rate constant for root C,N,P exudation
-  !     TLEC,TSHC=total fluxes x blr for calculating canopy air temperature,
+  !     Canopy_Heat_Latent_col,Canopy_Heat_Sens_col=total fluxes x blr for calculating canopy air temperature,
   !     vapor pressure in watsub.f
   !      EvapTransHeatP,SFLXC=canopylatent,sensible heat fluxes
   !      RA=canopy boundary layer resistance

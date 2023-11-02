@@ -1545,7 +1545,7 @@ implicit none
     HourCounter4LeafOut_brch       =>   plt_pheno%HourCounter4LeafOut_brch    , &
     RCO2A      =>   plt_rbgc%RCO2A    , &
     TCO2T      =>   plt_bgcr%TCO2T    , &
-    RECO       =>   plt_bgcr%RECO     , &
+    ECO_ER_col       =>   plt_bgcr%ECO_ER_col     , &
     Eco_AutoR_col       =>   plt_bgcr%Eco_AutoR_col     , &
     NU         =>   plt_site%NU       , &
     ZERO       =>   plt_site%ZERO     , &
@@ -1725,7 +1725,7 @@ implicit none
 !     WTRT1,WTRT2=primary,secondary root C mass in soil layer
 !     TCO2T=total PFT respiration
 !     RCO2A=total root respiration
-!     RECO=ecosystem respiration
+!     ECO_ER_col=ecosystem respiration
 !     Eco_AutoR_col=total autotrophic respiration
 !
   D5445: DO N=1,MY(NZ)
@@ -1737,7 +1737,7 @@ implicit none
         PopPlantRootC_vr(N,L,NZ)=PopPlantRootC_vr(N,L,NZ)+WTRT2E(ielmc,N,L,NR,NZ)+WTRT1E(ielmc,N,L,NR,NZ)
       ENDDO D5460
       TCO2T(NZ)=TCO2T(NZ)+RCO2A(N,L,NZ)
-      RECO=RECO+RCO2A(N,L,NZ)
+      ECO_ER_col=ECO_ER_col+RCO2A(N,L,NZ)
       Eco_AutoR_col=Eco_AutoR_col+RCO2A(N,L,NZ)
     ENDDO D5450
 

@@ -121,7 +121,6 @@
   Eco_GPP_col(NY,NX)=0._r8
   Eco_NPP_col(NY,NX)=0._r8
   Eco_AutoR_col(NY,NX)=0._r8
-  TCAN(NY,NX)=0._r8
   XHVSTE(:,NY,NX)=0._r8
   TRINH4(NY,NX)=0._r8
   TRIPO4(NY,NX)=0._r8

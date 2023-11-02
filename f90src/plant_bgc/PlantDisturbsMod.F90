@@ -397,7 +397,7 @@ module PlantDisturbsMod
     CO2NetFix_pft     =>  plt_bgcr%CO2NetFix_pft    , &
     Eco_NBP_col     =>  plt_bgcr%Eco_NBP_col    , &
     Eco_AutoR_col     =>  plt_bgcr%Eco_AutoR_col    , &
-    RECO     =>  plt_bgcr%RECO    , &
+    ECO_ER_col     =>  plt_bgcr%ECO_ER_col    , &
     TCO2A    =>  plt_bgcr%TCO2A   , &
     TCO2T    =>  plt_bgcr%TCO2T   , &
     WTRVE    =>  plt_biom%WTRVE     &
@@ -455,7 +455,7 @@ module PlantDisturbsMod
 !     GY=growth yield of grazers
 !     WTHEHT(ielmc),WTHEHT(ielmn),WTHEHT(ielmp)=total C,N,P removed
 !     WTHERT(ielmc),WTHERT(ielmn),WTHERT(ielmp)=total C,N,P to litter
-!     RECO=ecosystem respiration
+!     ECO_ER_col=ecosystem respiration
 !     Eco_AutoR_col=total autotrophic respiration
 !
   ELSE
@@ -469,7 +469,7 @@ module PlantDisturbsMod
     TCO2A(NZ)=TCO2A(NZ)-GZ*(WTHEHT(ielmc)-WTHERT(ielmc))
 !     Eco_NBP_col=Eco_NBP_col+GY*(WTHERT(ielmc)-WTHEHT(ielmc))
 !     CO2NetFix_pft(NZ)=CO2NetFix_pft(NZ)+GZ*(WTHERT(ielmc)-WTHEHT(ielmc))
-    RECO=RECO-GZ*(WTHEHT(ielmc)-WTHERT(ielmc))
+    ECO_ER_col=ECO_ER_col-GZ*(WTHEHT(ielmc)-WTHERT(ielmc))
     Eco_AutoR_col=Eco_AutoR_col-GZ*(WTHEHT(ielmc)-WTHERT(ielmc))
   ENDIF
   end associate
@@ -1282,7 +1282,7 @@ module PlantDisturbsMod
     CanopyHeightz       =>  plt_morph%CanopyHeightz      , &
     CanopyBranchLeafA_pft    =>  plt_morph%CanopyBranchLeafA_pft   , &
     NumOfBranches_pft      =>  plt_morph%NumOfBranches_pft     , &
-    CanPSA    =>  plt_morph%CanPSA   , &
+    CanopyStemA_pft    =>  plt_morph%CanopyStemA_pft   , &
     HTNODX   =>  plt_morph%HTNODX  , &
     PrimRootXNumL    =>  plt_morph%PrimRootXNumL   , &
     SecndRootLen    =>  plt_morph%SecndRootLen   , &
@@ -2319,13 +2319,13 @@ module PlantDisturbsMod
       CanopyLeafShethC_pft(NZ)=0._r8
       WTSTKE(ielmc,NZ)=0._r8
       CanPStalkC(NZ)=0._r8
-      CanPSA(NZ)=0._r8
+      CanopyStemA_pft(NZ)=0._r8
       D9840: DO NB=1,NumOfBranches_pft(NZ)
         CanopyLeafShethC_pft(NZ)=CanopyLeafShethC_pft(NZ)+CanPBLeafShethC(NB,NZ)
         WTSTKE(ielmc,NZ)=WTSTKE(ielmc,NZ)+WTSTKBE(ielmc,NB,NZ)
         CanPStalkC(NZ)=CanPStalkC(NZ)+CanPBStalkC(NB,NZ)
         D9830: DO L=1,NumOfCanopyLayers1
-          CanPSA(NZ)=CanPSA(NZ)+CanopyBranchStemApft_lyr(L,NB,NZ)
+          CanopyStemA_pft(NZ)=CanopyStemA_pft(NZ)+CanopyBranchStemApft_lyr(L,NB,NZ)
         ENDDO D9830
       ENDDO D9840
 !

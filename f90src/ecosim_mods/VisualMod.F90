@@ -26,7 +26,7 @@ module VisualMod
 
   character(len=*), parameter :: mod_filename = &
   __FILE__
-  real(r8) :: TCSNX,TTRN,TTLE,TTSH,TTGH,TTCO,TTCH
+  real(r8) :: TCSNX,TTRN,TTLE,TTSH,TEco_Heat_Grnd_col,TTCO,TTCH
 
   integer :: L,NX,NY,N
 
@@ -123,16 +123,16 @@ module VisualMod
     TTRN=0.0_r8
     TTLE=0.0_r8
     TTSH=0.0_r8
-    TTGH=0.0_r8
+    TEco_Heat_Grnd_col=0.0_r8
     TTCO=0.0_r8
     TTCH=0.0_r8
     D9995: DO NX=NHW,NHE
       D9990: DO NY=NVN,NVS
-        TTRN=TTRN+TRN(NY,NX)
-        TTLE=TTLE+TLE(NY,NX)
-        TTSH=TTSH+TSH(NY,NX)
-        TTGH=TTGH+TGH(NY,NX)
-        TTCO=TTCO+TCNET(NY,NX)
+        TTRN=TTRN+Eco_NetRad_col(NY,NX)
+        TTLE=TTLE+Eco_Heat_Latent_col(NY,NX)
+        TTSH=TTSH+Eco_Heat_Sens_col(NY,NX)
+        TEco_Heat_Grnd_col=TEco_Heat_Grnd_col+Eco_Heat_Grnd_col(NY,NX)
+        TTCO=TTCO+Eco_NEE_col(NY,NX)
         TTCH=TTCH+SurfGasFlx(idg_CH4,NY,NX)
         IF(J.EQ.24)THEN
           IF(NU(NY,NX).EQ.7)THEN
@@ -216,9 +216,9 @@ module VisualMod
           OUT(11)=0.001_r8*Eco_NBP_col(NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
           OUT(12)=-0.001_r8*SurfGasFlx(idg_CO2,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
           OUT(13)=-0.001_r8*SurfGasFlx(idg_CH4,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
-          OUT(14)=TRN(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
-          OUT(15)=-TLE(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
-          OUT(16)=-TSH(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
+          OUT(14)=Eco_NetRad_col(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
+          OUT(15)=-Eco_Heat_Latent_col(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
+          OUT(16)=-Eco_Heat_Sens_col(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
           L=1
           D60: DO N=17,27
             OUT(N)=(VLWatMicP(L,NY,NX)+AMIN1(VLMacP(L,NY,NX),VLWatMacP(L,NY,NX)))/VGeomLayer(L,NY,NX)
@@ -272,9 +272,9 @@ module VisualMod
 !     WRITE LANDSCAPE OUTPUT
 !
     WRITE(19,2025)'FLUXES',IYRC,I,J,TTRN*277.8/TAREA &
-      ,TTLE*277.8/TAREA,TTSH*277.8/TAREA,TTGH*277.8/TAREA &
+      ,TTLE*277.8/TAREA,TTSH*277.8/TAREA,TEco_Heat_Grnd_col*277.8/TAREA &
       ,TTCO*23.14815/TAREA,TTCH*23.14815/TAREA &
-      ,((TCNET(NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.14815 &
+      ,((Eco_NEE_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.14815 &
       ,NX=NHW,NHE),NY=NVN,NVS),DEFAULT &
       ,((SurfGasFlx(idg_CH4,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.14815 &
       ,NX=NHW,NHE),NY=NVN,NVS)

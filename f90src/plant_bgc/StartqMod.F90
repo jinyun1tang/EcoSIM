@@ -605,7 +605,7 @@ module StartqMod
 
   CanopyLeafA_pft(NZ,NY,NX)=0._r8
   WTRTA(NZ,NY,NX)=0._r8
-  CanPSA(NZ,NY,NX)=0._r8
+  CanopyStemA_pft(NZ,NY,NX)=0._r8
   end subroutine InitPlantPhenoMorphoBio
 !------------------------------------------------------------------------------------------
 
@@ -748,7 +748,7 @@ module StartqMod
       CCO2P=0.030_r8*EXP(-2.621_r8-0.0317_r8*ATCA(NY,NX))*CO2EI(NY,NX)
       trcg_rootml(idg_CO2,N,L,NZ,NY,NX)=CCO2A*RTVLP(N,L,NZ,NY,NX)
       trcs_rootml(idg_CO2,N,L,NZ,NY,NX)=CCO2P*RTVLW(N,L,NZ,NY,NX)
-      trcg_RFLA(idg_CO2,N,L,NZ,NY,NX)=0._r8
+      trcg_air2root_flx_pft_vr(idg_CO2,N,L,NZ,NY,NX)=0._r8
       trcg_Root_DisEvap_flx_vr(idg_CO2,N,L,NZ,NY,NX)=0._r8
       RCO2S(N,L,NZ,NY,NX)=0._r8
       RCO2P(N,L,NZ,NY,NX)=0._r8

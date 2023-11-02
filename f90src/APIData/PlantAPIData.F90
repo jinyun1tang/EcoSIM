@@ -155,7 +155,7 @@ implicit none
   real(r8) :: RADS      !direct shortwave radiation, [W m-2]
   real(r8) :: RAPY      !diffuse PAR, [umol m-2 s-1]
   real(r8) :: RAPS      !direct PAR, [umol m-2 s-1]
-  real(r8) :: TRN       !ecosystem net radiation, [MJ d-2 h-1]
+  real(r8) :: Eco_NetRad_col       !ecosystem net radiation, [MJ d-2 h-1]
   real(r8) :: RAD0      !shortwave radiation in solar beam, [MJ m-2 h-1]
   real(r8) :: FracSWRad2Grnd     !fraction of radiation intercepted by ground surface, [-]
   real(r8) :: SWRadOnGrnd      !radiation intercepted by ground surface, [MJ m-2 h-1]
@@ -221,7 +221,7 @@ implicit none
   integer,  pointer :: MY(:)           => null() !mycorrhizal type (no or yes)
   real(r8), pointer :: CanPHeight4WatUptake(:)        => null() !canopy height, [m]
   real(r8), pointer :: CanopyHeightz(:)  => null() !canopy layer height , [m]
-  real(r8), pointer :: CanPSA(:)        => null() !plant stem area, [m2 d-2]
+  real(r8), pointer :: CanopyStemA_pft(:)        => null() !plant stem area, [m2 d-2]
   real(r8), pointer :: CanopyLeafA_pft(:)        => null() !plant canopy leaf area, [m2 d-2]
   integer,  pointer :: NB1(:)          => null() !number of main branch
   integer,  pointer :: NI(:)           => null() !maximum soil layer number for all root axes
@@ -525,7 +525,7 @@ implicit none
   real(r8) :: SnowDepth          !snowpack depth, [m]
   real(r8) :: VcumWatSnow        !water volume in snowpack, [m3 d-2]
   real(r8) :: VcumDrySnoWE       !snow volume in snowpack (water equivalent), [m3 d-2]
-  real(r8) :: TSHC               !total sensible heat flux x boundary layer resistance, [MJ m-1]
+  real(r8) :: Canopy_Heat_Sens_col               !total sensible heat flux x boundary layer resistance, [MJ m-1]
   real(r8) :: VLHeatCapSnowMin    !minimum snowpack heat capacity [MJ d-2 K-1]
   real(r8) :: VLHeatCapSurfSnow    !snowpack heat capacity, [MJ m-3 K-1]
   real(r8) :: TENGYC    !total canopy heat content, [MJ  d-2]
@@ -537,17 +537,17 @@ implicit none
   real(r8) :: VPA       !vapor concentration, [m3 m-3]
   real(r8) :: TairK       !air temperature, [K]
   real(r8) :: CanWatg    !total canopy water content stored with dry matter, [m3 d-2]
-  real(r8) :: TLE       !ecosystem latent heat flux, [MJ d-2 h-1]
-  real(r8) :: TLEC      !total latent heat flux x boundary layer resistance, [MJ m-1]
+  real(r8) :: Eco_Heat_Latent_col       !ecosystem latent heat flux, [MJ d-2 h-1]
+  real(r8) :: Canopy_Heat_Latent_col      !total latent heat flux x boundary layer resistance, [MJ m-1]
   real(r8) :: VcumIceSnow     !ice volume in snowpack, [m3 d-2]
   real(r8) :: TKSnow       !snow temperature, [K]
   real(r8) :: CanH2OHeldVg    !canopy surface water content, [m3 d-2]
-  real(r8) :: TSH       !ecosystem sensible heat flux, [MJ d-2 h-1]
+  real(r8) :: Eco_Heat_Sens_col       !ecosystem sensible heat flux, [MJ d-2 h-1]
   real(r8) :: RoughHeight        !canopy surface roughness height, [m]
   real(r8) :: ZeroPlanDisp        !zero plane displacement height, [m]
   real(r8) :: BndlResistAboveCanG       !isothermal boundary layer resistance, [h m-1]
   real(r8) :: RIB       !Richardson number for calculating boundary layer resistance, [-]
-  real(r8) :: TGH       !ecosystem storage heat flux, [MJ d-2 h-1]
+  real(r8) :: Eco_Heat_Grnd_col       !ecosystem storage heat flux, [MJ d-2 h-1]
   real(r8), pointer :: PTrans(:)     => null()    !canopy transpiration, [m2 d-2 h-1]
   real(r8), pointer :: PSICanPTurg(:)  => null()    !plant canopy turgor water potential, [MPa]
   real(r8), pointer :: PrecIntcptByCanP(:)   => null()    !water flux into canopy, [m3 d-2 h-1]
@@ -621,10 +621,10 @@ implicit none
   real(r8) :: Eco_GPP_col      !ecosystem GPP, [g d-2 h-1]
 
   real(r8) :: CNETX     !total net canopy CO2 exchange, [g d-2 h-1]
-  real(r8) :: RECO      !ecosystem respiration, [g d-2 h-1]
+  real(r8) :: ECO_ER_col      !ecosystem respiration, [g d-2 h-1]
   real(r8) :: Eco_AutoR_col      !ecosystem autotrophic respiration, [g d-2 h-1]
   real(r8) :: TH2GZ     !total root H2 flux, [g d-2]
-  real(r8) :: TCCAN     !total net CO2 fixation, [gC d-2]
+  real(r8) :: Canopy_NEE_col     !total net CO2 fixation, [gC d-2]
   real(r8), pointer :: ZESNC(:) => null() !total litterfall element, [g d-2 h-1]
   real(r8), pointer :: ZNPP(:)       => null()   !total net primary productivity, [gC d-2]
   real(r8), pointer :: RNH3C(:)      => null()   !canopy NH3 flux, [g d-2 h-1]
@@ -704,7 +704,7 @@ implicit none
   real(r8), pointer :: RUPN3S(:,:,:)    => null()  !aqueous NH3 flux from roots to soil water non-band, [g d-2 h-1]
   real(r8), pointer :: RUPN3B(:,:,:)    => null()  !aqueous NH3 flux from roots to soil water band, [g d-2 h-1]
   real(r8), pointer :: RUPHGS(:,:,:)    => null()  !aqueous H2 flux from roots to soil water, [g d-2 h-1]
-  real(r8), pointer :: trcg_RFLA(:,:,:,:)    => null()  !gaseous tracer flux through roots, [g d-2 h-1]
+  real(r8), pointer :: trcg_air2root_flx_pft_vr(:,:,:,:)    => null()  !gaseous tracer flux through roots, [g d-2 h-1]
   real(r8), pointer :: trcg_Root_DisEvap_flx_vr(:,:,:,:)    => null()  !dissolution (+ve) - volatilization (-ve) gas flux in roots, [g d-2 h-1]
   real(r8), pointer :: ROXYP(:,:,:)     => null()  !root  O2 demand from respiration, [g d-2 h-1]
   real(r8), pointer :: RUNNHP(:,:,:)    => null()  !root uptake of NH4 non-band unconstrained by NH4, [g d-2 h-1]
@@ -748,7 +748,7 @@ implicit none
   real(r8), pointer :: RCO2A(:,:,:)     => null()  !root respiration constrained by O2, [g d-2 h-1]
   real(r8), pointer :: TEUPTK(:,:)      => null()  !total net root element uptake (+ve) - exudation (-ve), [gC d-2 ]
   real(r8), pointer :: trcg_TLP(:,:)    => null()   !total root internal gas flux, [g d-2 h-1]
-  real(r8), pointer :: trcg_TFLA(:,:)   => null()   !total internal root gas flux , [gC d-2 h-1]
+  real(r8), pointer :: trcg_air2root_flx_vr(:,:)   => null()   !total internal root gas flux , [gC d-2 h-1]
 
   contains
     procedure, public :: Init => plt_rootbgc_init
@@ -820,10 +820,10 @@ implicit none
   allocate(this%RNH3B(JBR,JP1))
 
 
-  allocate(this%trcg_TFLA(idg_beg:idg_end-1,JZ1))
+  allocate(this%trcg_air2root_flx_vr(idg_beg:idg_end-1,JZ1))
   allocate(this%trcg_TLP(idg_beg:idg_end-1,JZ1))
 
-  allocate(this%trcg_RFLA(idg_beg:idg_end-1,2,JZ1,JP1))
+  allocate(this%trcg_air2root_flx_pft_vr(idg_beg:idg_end-1,2,JZ1,JP1))
   allocate(this%trcg_Root_DisEvap_flx_vr(idg_beg:idg_end-1,2,JZ1,JP1))
   allocate(this%ROXYP(2,JZ1,JP1))
   allocate(this%RUNNHP(2,JZ1,JP1))
@@ -2016,7 +2016,7 @@ implicit none
   allocate(this%CanopyHeight(JP1))
   allocate(this%XTLI(JP1))
   allocate(this%CanopyHeightz(0:NumOfCanopyLayers1))
-  allocate(this%CanPSA(JP1))
+  allocate(this%CanopyStemA_pft(JP1))
   allocate(this%CanopyLeafA_pft(JP1))
   allocate(this%NB1(JP1))
   allocate(this%NIXBotRootLayer(JP1))

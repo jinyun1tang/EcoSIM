@@ -69,11 +69,11 @@ module UptakesMod
     TKC    => plt_ew%TKC       , &
     PSICanP  => plt_ew%PSICanP     , &
     HeatXAir2PCan  => plt_ew%HeatXAir2PCan     , &
-    TSHC   => plt_ew%TSHC      , &
+    Canopy_Heat_Sens_col   => plt_ew%Canopy_Heat_Sens_col      , &
     DTKC   => plt_ew%DTKC      , &
     VapXAir2PCan  => plt_ew%VapXAir2PCan     , &
     TairK    => plt_ew%TairK       , &
-    TLEC   => plt_ew%TLEC      , &
+    Canopy_Heat_Latent_col   => plt_ew%Canopy_Heat_Latent_col      , &
     PTrans    => plt_ew%PTrans       , &
     WatByPCan  => plt_ew%WatByPCan     , &
     CumSoilThickness => plt_site%CumSoilThickness  , &
@@ -203,8 +203,8 @@ module UptakesMod
       call PopPlantNutientO2Uptake(NZ,FDMP,PopPlantO2Uptake,PopPlantO2Demand,&
         PATH,FineRootRadius,FracPRoot4Uptake,MinFracPRoot4Uptake,FracSoiLayByPrimRoot,RootAreaDivRadius)
 
-      TLEC=TLEC+EvapTransHeatP(NZ)*CanPbndlResist(NZ)
-      TSHC=TSHC+HeatXAir2PCan(NZ)*CanPbndlResist(NZ)
+      Canopy_Heat_Latent_col=Canopy_Heat_Latent_col+EvapTransHeatP(NZ)*CanPbndlResist(NZ)
+      Canopy_Heat_Sens_col=Canopy_Heat_Sens_col+HeatXAir2PCan(NZ)*CanPbndlResist(NZ)
       IF(PopPlantO2Demand.GT.ZEROP(NZ))THEN
         PlantO2Stress(NZ)=PopPlantO2Uptake/PopPlantO2Demand
       ELSE
@@ -242,7 +242,7 @@ module UptakesMod
     SoiBulkDensity   => plt_soilchem%SoiBulkDensity , &
     VLWatMicP   => plt_soilchem%VLWatMicP , &
     VLSoilMicP   => plt_soilchem%VLSoilMicP , &
-    CanPSA  => plt_morph%CanPSA   , &
+    CanopyStemA_pft  => plt_morph%CanopyStemA_pft   , &
     MY     => plt_morph%MY      , &
     CanopyLeafA_pft  => plt_morph%CanopyLeafA_pft   , &
     RadNet2CanP   => plt_rad%RadNet2CanP      , &
@@ -251,14 +251,14 @@ module UptakesMod
 !
 !     RESET TOTAL UPTAKE ARRAYS
 !
-!     CanopyLeafA_pft,CanPSA=leaf,stalk areas
+!     CanopyLeafA_pft,CanopyStemA_pft=leaf,stalk areas
 !
 
   ARLSC=0.0_r8
   D9984: DO NZ=1,NP0
 !     TKC(NZ)=TairK+DTKC(NZ)
 !     TCC(NZ)=TKC(NZ)-TC2K
-    ARLSC=ARLSC+CanopyLeafA_pft(NZ)+CanPSA(NZ)
+    ARLSC=ARLSC+CanopyLeafA_pft(NZ)+CanopyStemA_pft(NZ)
     RadNet2CanP(NZ)=0.0_r8
     plt_ew%EvapTransHeatP(NZ)=0.0_r8
     plt_ew%HeatXAir2PCan(NZ)=0.0_r8
@@ -287,7 +287,7 @@ module UptakesMod
         plt_rbgc%RUPN3S(N,L,NZ)=0.0_r8
         plt_rbgc%RUPN3B(N,L,NZ)=0.0_r8
         plt_rbgc%RUPHGS(N,L,NZ)=0.0_r8
-        plt_rbgc%trcg_RFLA(idg_beg:idg_end-1,N,L,NZ)=0.0_r8
+        plt_rbgc%trcg_air2root_flx_pft_vr(idg_beg:idg_end-1,N,L,NZ)=0.0_r8
         plt_rbgc%trcg_Root_DisEvap_flx_vr(idg_beg:idg_end-1,N,L,NZ)=0.0_r8
       enddo
     enddo
