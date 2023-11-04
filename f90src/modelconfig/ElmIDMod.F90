@@ -57,11 +57,14 @@ implicit none
   integer, parameter :: itrue=1
   integer, parameter :: ifalse=0
 
-  integer, parameter :: ibralive=0  !branch alive
-  integer, parameter :: ibrdead =1  !branch dead
+  integer, parameter :: iEnable=0
+  integer, parameter :: iDisable=1
 
-  integer, parameter :: PlantIsActive=1  !plant active
-  integer, parameter :: ipltdorm =0  !plant dormant/dead
+  integer, parameter :: iLive=0  !plant organ alive
+  integer, parameter :: iDead=1  !plant organ dead
+
+  integer, parameter :: iPlantIsActive=1  !plant active
+  integer, parameter :: iPlantIsDormant =0  !plant dormant/dead
 
   integer, parameter :: ihv_noaction=0
   integer, parameter :: ihv_terminate=1
@@ -74,5 +77,15 @@ implicit none
   integer, parameter :: iplt_grasslike=1
   integer, parameter :: iplt_treelike=2
 
-
+  integer, parameter :: ipltcal_Planting     =0
+  integer, parameter :: ipltcal_Emerge       =1
+  integer, parameter :: ipltcal_InitFloral   =2
+  integer, parameter :: ipltcal_Jointing     =3
+  integer, parameter :: ipltcal_Elongation   =4
+  integer, parameter :: ipltcal_Heading      =5
+  integer, parameter :: ipltcal_Anthesis     =6
+  integer, parameter :: ipltcal_BeginSeedFill=7
+  integer, parameter :: ipltcal_SetSeedNumber=8
+  integer, parameter :: ipltcal_SetSeedMass  =9
+  integer, parameter :: ipltcal_EndSeedFill  =10
 end module ElmIDMod

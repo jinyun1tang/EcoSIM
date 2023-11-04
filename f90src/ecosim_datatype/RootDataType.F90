@@ -12,7 +12,7 @@ module RootDataType
   __FILE__
   integer,target,allocatable ::  NRT(:,:,:)                          !root primary axis number, [-]
   integer,target,allocatable ::  NINR(:,:,:,:)                       !maximum soil layer number for root axes, [-]
-  integer,target,allocatable ::  IDTHR(:,:,:)                        !flag to detect root system death , [-]
+  integer,target,allocatable ::  iPlantRootState(:,:,:)                        !flag to detect root system death , [-]
   integer,target,allocatable ::  NIXBotRootLayer(:,:,:)              !maximum soil layer number for all root axes, [-]
   integer,target,allocatable ::  NI(:,:,:)                           !maximum soil layer number for all root axes, [-]
   real(r8),target,allocatable ::  BiomGrowthYieldRoot(:,:,:)                        !root growth yield, [g g-1]
@@ -94,7 +94,7 @@ contains
 
   allocate(NRT(JP,JY,JX));      NRT=0
   allocate(NINR(JRS,JP,JY,JX));  NINR=1  !set to one to avoid numerical failure
-  allocate(IDTHR(JP,JY,JX));    IDTHR=0
+  allocate(iPlantRootState(JP,JY,JX));    iPlantRootState=iDead
   allocate(NIXBotRootLayer(JP,JY,JX));      NIXBotRootLayer=0
   allocate(NI(JP,JY,JX));       NI=0
   allocate(BiomGrowthYieldRoot(JP,JY,JX));     BiomGrowthYieldRoot=0._r8
@@ -174,7 +174,7 @@ contains
   implicit none
   call destroy(NRT)
   call destroy(NINR)
-  call destroy(IDTHR)
+  call destroy(iPlantRootState)
   call destroy(NIXBotRootLayer)
   call destroy(NI)
   call destroy(BiomGrowthYieldRoot)

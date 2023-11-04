@@ -21,7 +21,7 @@ module SoilLayerDynMod
   use EcosimConst
   use UnitMod     , only : units
   use EcoSIMConfig, only : ndbiomcp => NumOfDeadMicrobiomComponents
-  USE TFlxTypeMod , ONLY : TSEDER,TDLYXF,TDYLXC,TDVOLI,TDORGC
+  USE TFlxTypeMod , ONLY : TSEDER,TDLYXF,TDayLenthPrevC,TDVOLI,TDORGC
 implicit none
 
 
@@ -341,7 +341,7 @@ implicit none
         ! obtain diagnostics only for NX==1
 !        IF(NX.EQ.1)THEN
 !          TDORGC=TDORGC+DORGC(LX)
-!          TDYLXC=TDYLXC+DDLEqv_OrgC
+!          TDayLenthPrevC=TDayLenthPrevC+DDLEqv_OrgC
 !        ENDIF
 
         ! bottom layer, or next layer is water

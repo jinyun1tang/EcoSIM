@@ -63,7 +63,7 @@ implicit none
 
   call InitPlantMorphSize()
 
-  call InitGrosub(NumGrothStages,JRS)
+  call InitGrosub(NumGrowthStages,JRS)
 
   call InitGridData
 
@@ -145,7 +145,7 @@ implicit none
   pltpar%JLA1   = JLA
   pltpar%JSA1   = JSA
   pltpar%JLI1   = JLI
-  pltpar%JNODS1 = JNODS
+  pltpar%MaxCanopyNodes1 = MaxCanopyNodes
   pltpar%iprotein =micpar%iprotein
   pltpar%icarbhyro=micpar%icarbhyro
   pltpar%icellulos=micpar%icellulos

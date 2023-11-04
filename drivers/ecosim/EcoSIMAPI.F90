@@ -344,7 +344,7 @@ subroutine soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
     CALL STARTE(NHW,NHE,NVN,NVS)
   endif
 
-  iyear_cur=frectyp%yearcur
+  iYearCurrent=frectyp%yearcur
   LYRC=etimer%get_days_cur_year()
 
   DO I=1,LYRC
@@ -459,7 +459,7 @@ subroutine regressiontest(nmfile,case_name, NX, NY)
     call regression%OpenOutput()
 
     do NZ=1,NP(NY,NX)
-      IF(IFLGC(NZ,NY,NX).EQ.PlantIsActive)THEN
+      IF(IsPlantActive(NZ,NY,NX).EQ.iPlantIsActive)THEN
 
         category = 'flux'
         name = 'NH4_UPTK (g m^-3 h^-1)'

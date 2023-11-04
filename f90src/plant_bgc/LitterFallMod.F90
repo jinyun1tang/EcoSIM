@@ -20,21 +20,21 @@ implicit none
 
 !     begin_execution
   associate(                                 &
-    IYRH       =>   plt_distb%IYRH     , &
+    iYearPlantHarvest       =>   plt_distb%iYearPlantHarvest     , &
     JHVST      =>   plt_distb%JHVST    , &
-    IDAYH      =>   plt_distb%IDAYH    , &
+    iDayPlantHarvest      =>   plt_distb%iDayPlantHarvest    , &
     UVOLO      =>   plt_ew%UVOLO       , &
     CanWatP      =>   plt_ew%CanWatP       , &
     WTRTE      =>   plt_biom%WTRTE     , &
     WTRVE      =>   plt_biom%WTRVE     , &
     ISTYP      =>   plt_pheno%ISTYP    , &
-    IDTHR      =>   plt_pheno%IDTHR    , &
-    IDTHP      =>   plt_pheno%IDTHP    , &
-    IFLGI      =>   plt_pheno%IFLGI    , &
+    iPlantRootState     =>   plt_pheno%iPlantRootState   , &
+    iPlantShootState      =>   plt_pheno%iPlantShootState    , &
+    doInitPlant      =>   plt_pheno%doInitPlant    , &
     WSTR       =>   plt_pheno%WSTR     , &
-    IDAY       =>   plt_pheno%IDAY     , &
+    iPlantCalendar      =>   plt_pheno%iPlantCalendar    , &
     pftPlantPopulation         =>   plt_site%pftPlantPopulation        , &
-    IYRC       =>   plt_site%IYRC      , &
+    iYearCurrent       =>   plt_site%iYearCurrent      , &
     VOLWOU     =>   plt_site%VOLWOU    , &
     ZNOON      =>   plt_site%ZNOON     , &
     HypoctoylHeight      =>   plt_morph%HypoctoylHeight    , &
@@ -44,11 +44,11 @@ implicit none
   )
 !
 !     ZNOON=hour of solar noon
-!     IDAY(1,=emergence date
+!     iPlantCalendar(ipltcal_Emerge,=emergence date
 !     ISTYP=growth habit:0=annual,1=perennial from PFT file
-!     IDAYH,IYRH=day,year of harvesting
-!     IYRC=current year
-!     IDTHB=branch living flag: 0=alive,1=dead
+!     iDayPlantHarvest,iYearPlantHarvest=day,year of harvesting
+!     iYearCurrent=current year
+!     iPlantBranchState=branch living flag: 0=alive,1=dead
 !     GROUP=node number required for floral initiation
 !     PSTGI=node number at floral initiation
 !     PSTGF=node number at flowering
@@ -58,18 +58,18 @@ implicit none
 !     TGSTGI=total change in vegve node number normalized for maturity group
 !     TGSTGF=total change in reprve node number normalized for maturity group
 !     FLG4=number of hours with no grain fill
-!     IFLGA=flag for initializing leafout
+!     doInitLeafOut=flag for initializing leafout
 !     VRNS,VRNL=leafout hours,hours required for leafout
-!     VRNF,VRNX=leafoff hours,hours required for leafoff
+!     Hours4LeafOff,VRNX=leafoff hours,hours required for leafoff
 !     HourCounter4LeafOut_brch=hourly leafout counter
 !     RubiscoActivity_brpft,FDBKX=N,P feedback inhibition on C3 CO2 fixation
-!     IFLGA,IFLGE=flag for initializing,enabling leafout
-!     IFLGF=flag for enabling leafoff:0=enable,1=disable
+!     doInitLeafOut,doPlantLeafOut=flag for initializing,enabling leafout
+!     doPlantLeaveOff=flag for enabling leafoff:0=enable,1=disable
 !     IFLGQ=current hours after physl maturity until start of litterfall
 !
-  IF(J.EQ.INT(ZNOON).AND.IDAY(1,NB1(NZ),NZ).NE.0 &
-    .AND.(ISTYP(NZ).NE.iplt_annual.OR.(I.GE.IDAYH(NZ) &
-    .AND.IYRC.GE.IYRH(NZ))))THEN
+  IF(J.EQ.INT(ZNOON).AND.iPlantCalendar(ipltcal_Emerge,NB1(NZ),NZ).NE.0 &
+    .AND.(ISTYP(NZ).NE.iplt_annual.OR.(I.GE.iDayPlantHarvest(NZ) &
+    .AND.iYearCurrent.GE.iYearPlantHarvest(NZ))))THEN
     IDTHY=0
 !
 !     RESET PHENOLOGY AND GROWTH STAGE OF DEAD BRANCHES
@@ -77,10 +77,10 @@ implicit none
     call LiterfallFromDeadBranches(I,J,NZ,IDTHY,CPOOLK)
 
     IF(IDTHY.EQ.NumOfBranches_pft(NZ))THEN
-      IDTHP(NZ)=ibrdead
+      iPlantShootState(NZ)=iDead
       NBT(NZ)=0
       WSTR(NZ)=0._r8
-      IF(IFLGI(NZ).EQ.1)THEN
+      IF(doInitPlant(NZ).EQ.itrue)THEN
         NumOfBranches_pft(NZ)=1
       ELSE
         NumOfBranches_pft(NZ)=0
@@ -96,22 +96,22 @@ implicit none
 !     ISTYP=growth habit:0=annual,1=perennial
 !     JHVST=terminate PFT:0=no,1=yes,2=yes,but reseed
 !     PP=PFT population
-!     IDTHP,IDTHR=PFT shoot,root living flag: 0=alive,1=dead
+!     iPlantShootState,IDTHR=PFT shoot,root living flag: 0=alive,1=dead
 !
       IF(WTRVE(ielmc,NZ).LT.1.0E-04_r8*WTRTE(ielmc,NZ).AND.ISTYP(NZ).NE.iplt_annual)then
-        IDTHR(NZ)=ibrdead
+        iPlantRootState(NZ)=iDead
       endif
       IF(ISTYP(NZ).EQ.iplt_annual)then
-        IDTHR(NZ)=ibrdead
+        iPlantRootState(NZ)=iDead
       endif
       IF(JHVST(NZ).NE.ihv_noaction)then
-        IDTHR(NZ)=ibrdead
+        iPlantRootState(NZ)=iDead
       endif
-      IF(pftPlantPopulation(NZ).LE.0.0)then
-        IDTHR(NZ)=ibrdead
+      IF(pftPlantPopulation(NZ).LE.0.0_r8)then
+        iPlantRootState(NZ)=iDead
       endif
-      IF(IDTHR(NZ).EQ.ibrdead)then
-        IDTHP(NZ)=ibrdead
+      IF(iPlantRootState(NZ).EQ.iDead)then
+        iPlantShootState(NZ)=iDead
       endif
     ENDIF
 !
@@ -130,7 +130,7 @@ implicit none
 
   subroutine LiterfallFromRootShootStorage(I,J,NZ,CPOOLK)
 
-  use EcoSIMCtrlDataType, only : iyear_cur
+  use EcoSIMCtrlDataType, only : iYearCurrent
   implicit none
   integer, intent(in) :: I,J,NZ
   REAL(R8),INTENT(INOUT) :: CPOOLK(NumOfCanopyLayers1,JP1)
@@ -138,8 +138,8 @@ implicit none
 !     begin_execution
   associate(                            &
     JHVST      =>   plt_distb%JHVST   , &
-    IYR0       =>   plt_distb%IYR0    , &
-    IDAY0      =>   plt_distb%IDAY0   , &
+    iYearPlanting       =>   plt_distb%iYearPlanting    , &
+    iDayPlanting      =>   plt_distb%iDayPlanting   , &
     WTEARBE    =>   plt_biom%WTEARBE  , &
     EPOOL      =>   plt_biom%EPOOL    , &
     WTSTKBE    =>   plt_biom%WTSTKBE  , &
@@ -159,13 +159,13 @@ implicit none
     FWODBE     =>   plt_allom%FWODBE  , &
     FWOODE     =>   plt_allom%FWOODE  , &
     FWODRE     =>   plt_allom%FWODRE  , &
-    IFLGI      =>   plt_pheno%IFLGI   , &
+    doInitPlant      =>   plt_pheno%doInitPlant   , &
     ISTYP      =>   plt_pheno%ISTYP   , &
     IWTYP      =>   plt_pheno%IWTYP   , &
-    IDTHR      =>   plt_pheno%IDTHR   , &
+    iPlantRootState     =>   plt_pheno%iPlantRootState  , &
     IGTYP      =>   plt_pheno%IGTYP   , &
     IBTYP      =>   plt_pheno%IBTYP   , &
-    IDTHP      =>   plt_pheno%IDTHP   , &
+    iPlantShootState      =>   plt_pheno%iPlantShootState   , &
     icwood     =>   pltpar%icwood     , &
     ifoliar    =>   pltpar%ifoliar    , &
     k_fine_litr=>   pltpar%k_fine_litr, &
@@ -188,8 +188,8 @@ implicit none
 !     LITTERFALL AND STATE VARIABLES FOR SEASONAL STORAGE
 !     RESERVES FROM SHOOT AT DEATH
 !
-!     IDTHP,IDTHR=PFT shoot,root living flag: 0=alive,1=dead
-!     IFLGI=PFT initialization flag:0=no,1=yes
+!     iPlantShootState,IDTHR=PFT shoot,root living flag: 0=alive,1=dead
+!     doInitPlant=PFT initialization flag:0=no,1=yes
 !     CSNC,ZSNC,PSNC=C,N,P litterfall from senescence
 !     CFOPC,CFOPN,CFOPC=fraction of litterfall C,N,P allocated to litter components
 !     CPOOL,ZPOOL,PPOOL=non-structural C,N,P in branch
@@ -208,8 +208,9 @@ implicit none
 !     WTRVC,WTRVN,WTRVP=storage C,N,P
 !     WTSTG,WTSTDN,WTSTDP=standing dead C,N,P mass
 !
-  IF(IDTHP(NZ).EQ.1.AND.IDTHR(NZ).EQ.1)THEN
-    IF(IFLGI(NZ).EQ.0)THEN
+  IF(iPlantShootState(NZ).EQ.iDead.AND.iPlantRootState(NZ).EQ.iDead)THEN
+    !both plant shoots and roots are dead
+    IF(doInitPlant(NZ).EQ.ifalse)THEN
       D6425: DO M=1,jsken
         D8825: DO NB=1,NumOfBranches_pft(NZ)
 
@@ -235,7 +236,7 @@ implicit none
               ESNC(NE,M,k_fine_litr,0,NZ)=ESNC(NE,M,k_fine_litr,0,NZ)+CFOPE(NE,infoliar,M,NZ)*WTGRBE(NE,NB,NZ)
             ENDIF
             IF(IBTYP(NZ).EQ.0.OR.IGTYP(NZ).LE.1)THEN
-!all above ground
+              !all above ground
               ESNC(NE,M,k_fine_litr,0,NZ)=ESNC(NE,M,k_fine_litr,0,NZ)+CFOPE(NE,istalk,M,NZ)*WTSTKBE(NE,NB,NZ)
             ELSE
               WTSTDE(NE,M,NZ)=WTSTDE(NE,M,NZ)+CFOPE(NE,icwood,M,NZ)*WTSTKBE(NE,NB,NZ)
@@ -284,15 +285,15 @@ implicit none
 !     ISTYP=growth habit:0=annual,1=perennial from PFT file
 !     JHVST=terminate PFT:0=no,1=yes,2=yes,but reseed
 !     LYRC=number of days in current year
-!     IDAY0,IYR0=day,year of planting
+!     iDayPlanting,iYearPlanting=day,year of planting
 !
     IF(ISTYP(NZ).NE.iplt_annual.AND.JHVST(NZ).EQ.ihv_noaction)THEN
       IF(I.LT.LYRC)THEN
-        IDAY0(NZ)=I+1
-        IYR0(NZ)=iyear_cur
+        iDayPlanting(NZ)=I+1
+        iYearPlanting(NZ)=iYearCurrent
       ELSE
-        IDAY0(NZ)=1
-        IYR0(NZ)=iyear_cur+1
+        iDayPlanting(NZ)=1
+        iYearPlanting(NZ)=iYearCurrent+1
       ENDIF
     ENDIF
   ENDIF
@@ -316,7 +317,7 @@ implicit none
     EPOOLN    =>   plt_biom%EPOOLN    , &
     WTNDLE    =>   plt_biom%WTNDLE    , &
     FWODRE    =>   plt_allom%FWODRE   , &
-    IDTHR     =>   plt_pheno%IDTHR    , &
+    iPlantRootState    =>   plt_pheno%iPlantRootState   , &
     CFOPE     =>   plt_soilchem%CFOPE , &
     trcg_rootml      =>   plt_rbgc%trcg_rootml  , &
     trcs_rootml => plt_rbgc%trcs_rootml, &
@@ -365,9 +366,9 @@ implicit none
 !     RCO2Z,ROXYZ,RCH4Z,RN2OZ,RNH3Z,RH2GZ=root gaseous CO2,O2,CH4,N2O,NH3,H2 loss from disturbance
 !
 
-  IF(IDTHR(NZ).EQ.1)THEN
+  IF(iPlantRootState(NZ).EQ.iDead)THEN
+    !add root to litterfall
     D8900: DO N=1,MY(NZ)
-
       D8895: DO L=NU,NJ
         DO NE=1,NumOfPlantChemElements
           D6410: DO M=1,jsken
@@ -496,25 +497,25 @@ implicit none
     WTSTDE    =>  plt_biom%WTSTDE     , &
     WTRVE     =>  plt_biom%WTRVE      , &
     CFOPE     =>  plt_soilchem%CFOPE  , &
-    IDTHB     =>  plt_pheno%IDTHB     , &
+    iPlantBranchState     =>  plt_pheno%iPlantBranchState     , &
     GROUP     =>  plt_pheno%GROUP     , &
     VSTGX     =>  plt_pheno%VSTGX     , &
     KVSTG     =>  plt_pheno%KVSTG     , &
     TGSTGI    =>  plt_pheno%TGSTGI    , &
     TGSTGF    =>  plt_pheno%TGSTGF    , &
     VRNS      =>  plt_pheno%VRNS      , &
-    VRNF      =>  plt_pheno%VRNF      , &
+    Hours4LeafOff      =>  plt_pheno%Hours4LeafOff      , &
     VRNY      =>  plt_pheno%VRNY      , &
     VRNZ      =>  plt_pheno%VRNZ      , &
     HourCounter4LeafOut_brch      =>  plt_pheno%HourCounter4LeafOut_brch      , &
     FLG4      =>  plt_pheno%FLG4      , &
-    IFLGA     =>  plt_pheno%IFLGA     , &
-    IFLGE     =>  plt_pheno%IFLGE     , &
+    doInitLeafOut     =>  plt_pheno%doInitLeafOut     , &
+    doPlantLeafOut     =>  plt_pheno%doPlantLeafOut     , &
     IFLGR     =>  plt_pheno%IFLGR     , &
     IFLGQ     =>  plt_pheno%IFLGQ     , &
     GROUPI    =>  plt_pheno%GROUPI    , &
-    IFLGF     =>  plt_pheno%IFLGF     , &
-    IDAY      =>  plt_pheno%IDAY      , &
+    doPlantLeaveOff     =>  plt_pheno%doPlantLeaveOff     , &
+    iPlantCalendar     =>  plt_pheno%iPlantCalendar     , &
     IBTYP     =>  plt_pheno%IBTYP     , &
     IGTYP     =>  plt_pheno%IGTYP     , &
     IWTYP     =>  plt_pheno%IWTYP     , &
@@ -539,7 +540,7 @@ implicit none
     FDBKX     =>  plt_photo%FDBKX       &
   )
   D8845: DO NB=1,NumOfBranches_pft(NZ)
-    IF(IDTHB(NB,NZ).EQ.ibrdead)THEN
+    IF(iPlantBranchState(NB,NZ).EQ.iDead)THEN
       GROUP(NB,NZ)=GROUPI(NZ)
       PSTG(NB,NZ)=XTLI(NZ)
       PSTGI(NB,NZ)=PSTG(NB,NZ)
@@ -551,21 +552,21 @@ implicit none
       TGSTGI(NB,NZ)=0._r8
       TGSTGF(NB,NZ)=0._r8
       VRNS(NB,NZ)=0._r8
-      VRNF(NB,NZ)=0._r8
+      Hours4LeafOff(NB,NZ)=0._r8
       VRNY(NB,NZ)=0._r8
       VRNZ(NB,NZ)=0._r8
       HourCounter4LeafOut_brch(NB,NZ)=0._r8
       FLG4(NB,NZ)=0._r8
       RubiscoActivity_brpft(NB,NZ)=1.0_r8
       FDBKX(NB,NZ)=1.0_r8
-      IFLGA(NB,NZ)=0
-      IFLGE(NB,NZ)=1
-      IFLGF(NB,NZ)=0
+      doInitLeafOut(NB,NZ)=0
+      doPlantLeafOut(NB,NZ)=iDisable
+      doPlantLeaveOff(NB,NZ)=iEnable
       IFLGR(NB,NZ)=0
       IFLGQ(NB,NZ)=0
       BranchNumber_brchpft(NB,NZ)=0
-      D8850: DO M=1,pltpar%NumGrothStages
-        IDAY(M,NB,NZ)=0
+      D8850: DO M=1,pltpar%NumGrowthStages
+        iPlantCalendar(M,NB,NZ)=0
       ENDDO D8850
 !
 !     LITTERFALL FROM DEAD BRANCHES
@@ -679,7 +680,7 @@ implicit none
     RTWT1E => plt_biom%RTWT1E        , &
     NJ     => plt_site%NJ            , &
     NU     => plt_site%NU            , &
-    IDTH   => plt_pheno%IDTH         , &
+    iPlantState  => plt_pheno%iPlantState        , &
     SecndRootLen  => plt_morph%SecndRootLen        , &
     RTN2   => plt_morph%RTN2         , &
     PrimRootLen  => plt_morph%PrimRootLen        , &
@@ -727,7 +728,7 @@ implicit none
     enddo
   ENDDO D6416
   WTRVE(1:NumOfPlantChemElements,NZ)=0._r8
-  IDTH(NZ)=1
+  iPlantState(NZ)=1
   end associate
   end subroutine ResetBranchRootStates
 
@@ -826,7 +827,7 @@ implicit none
   CanopyBranchLeafA_pft(NB,NZ)=0._r8
   WTSTXBE(1:NumOfPlantChemElements,NB,NZ)=0._r8
 
-  D8855: DO K=0,JNODS1
+  D8855: DO K=0,MaxCanopyNodes1
     IF(K.NE.0)THEN
       CPOOL3(K,NB,NZ)=0._r8
       CPOOL4(K,NB,NZ)=0._r8

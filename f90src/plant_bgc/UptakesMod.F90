@@ -88,9 +88,9 @@ module UptakesMod
     ZEROP  => plt_biom%ZEROP   , &
     CanopyLeafShethC_pft   => plt_biom%CanopyLeafShethC_pft    , &
     CanPStalkC  => plt_biom%CanPStalkC   , &
-    IDAY   => plt_pheno%IDAY   , &
+    iPlantCalendar  => plt_pheno%iPlantCalendar  , &
     PlantO2Stress   => plt_pheno%PlantO2Stress   , &
-    IFLGC  => plt_pheno%IFLGC  , &
+    IsPlantActive  => plt_pheno%IsPlantActive  , &
     CanopyLA_grd  => plt_morph%CanopyLA_grd  , &
     PrimRootDepth  => plt_morph%PrimRootDepth  , &
     CanopyArea_grid  => plt_morph%CanopyArea_grid  , &
@@ -109,7 +109,7 @@ module UptakesMod
     PopPlantO2Uptake=0.0_r8
     PopPlantO2Demand=0.0_r8
 
-    IF(IFLGC(NZ).EQ.PlantIsActive.AND.pftPlantPopulation(NZ).GT.0.0_r8)THEN
+    IF(IsPlantActive(NZ).EQ.iPlantIsActive.AND.pftPlantPopulation(NZ).GT.0.0_r8)THEN
 
       call UpdateCanopyProperty(NZ)
 
@@ -123,7 +123,7 @@ module UptakesMod
 !     TRANSPIRATION - ROOT WATER UPTAKE = CHANGE IN CANOPY WATER CONTENT
 !
 !     (AG: - originally this line had a N0B1 here )
-      IF((IDAY(1,NB1(NZ),NZ).NE.0).AND.(CanopyArea_pft(NZ).GT.ZEROL(NZ) &
+      IF((iPlantCalendar(ipltcal_Emerge,NB1(NZ),NZ).NE.0).AND.(CanopyArea_pft(NZ).GT.ZEROL(NZ) &
         .AND.FracPARByCanP(NZ).GT.0.0_r8).AND.(PrimRootDepth(1,1,NZ).GT.SeedinDepth(NZ)+CumSoilThickness(0)))THEN
         !leaf area > 0, absorped par>0, and rooting depth > seeding depth
 !
@@ -312,7 +312,7 @@ module UptakesMod
     AllRootC_vr(L)=0.0_r8
     D9005: DO NZ=1,NP
       DO  N=1,MY(NZ)
-!     IF(IFLGC(NZ).EQ.PlantIsActive.AND.pftPlantPopulation(NZ).GT.0.0)THEN
+!     IF(IsPlantActive(NZ).EQ.iPlantIsActive.AND.pftPlantPopulation(NZ).GT.0.0)THEN
       AllRootC_vr(L)=AllRootC_vr(L)+AZMAX1(PopPlantRootC_vr(N,L,NZ))
 !     ENDIF
       enddo
@@ -360,7 +360,7 @@ module UptakesMod
 !     N-S POSITION NY, E-W POSITION NX(AZIMUTH M ASSUMED UNIFORM)
 !
   D500: DO NB=1,NumOfBranches_pft(NZ)
-    D550: DO K=1,JNODS1
+    D550: DO K=1,MaxCanopyNodes1
 !
 !     NUMBER OF MINIMUM LEAFED NODE USED IN GROWTH ALLOCATION
 !
@@ -556,7 +556,7 @@ module UptakesMod
    PSICanP   => plt_ew%PSICanP     , &
    NU      => plt_site%NU      , &
    AREA3   => plt_site%AREA3   , &
-   IYRC    => plt_site%IYRC    , &
+   iYearCurrent    => plt_site%iYearCurrent    , &
    NI      => plt_morph%NI     , &
    NGTopRootLayer     => plt_morph%NGTopRootLayer    , &
    MY      => plt_morph%MY     , &
@@ -572,7 +572,7 @@ module UptakesMod
    LWRadCanP   => plt_rad%LWRadCanP      &
   )
   IF(NN.GE.MaxIterNum)THEN
-    WRITE(*,9999)IYRC,I,J,NZ
+    WRITE(*,9999)iYearCurrent,I,J,NZ
 9999  FORMAT('CONVERGENCE FOR WATER UPTAKE NOT ACHIEVED ON   ',6I4)
 
     IF(DIFF.GT.0.5_r8)THEN
@@ -1287,7 +1287,7 @@ module UptakesMod
     fTgrowRootP   =>  plt_pheno%fTgrowRootP   , &
     TCG    =>  plt_pheno%TCG    , &
     TKG    =>  plt_pheno%TKG    , &
-    IDAY   =>  plt_pheno%IDAY   , &
+    iPlantCalendar  =>  plt_pheno%iPlantCalendar  , &
     fTgrowCanP   =>  plt_pheno%fTgrowCanP   , &
     NI     =>  plt_morph%NI     , &
     NB1    =>  plt_morph%NB1      &
@@ -1296,10 +1296,10 @@ module UptakesMod
   !     SET CANOPY GROWTH TEMPERATURE FROM SOIL SURFACE
   !     OR CANOPY TEMPERATURE DEPENDING ON GROWTH STAGE
   !
-  IF(IDAY(1,NB1(NZ),NZ).EQ.0)THEN
+  IF(iPlantCalendar(ipltcal_Emerge,NB1(NZ),NZ).EQ.0)THEN
     TKG(NZ)=TKS(NU)
     !     ELSEIF((IBTYP(NZ).EQ.0.OR.IGTYP(NZ).LE.1)
-    !    2.AND.IDAY(2,NB1(NZ),NZ).EQ.0)THEN
+    !    2.AND.iPlantCalendar(ipltcal_InitFloral,NB1(NZ),NZ).EQ.0)THEN
     !     TKG(NZ)=TKS(NU)
   ELSE
     TKG(NZ)=TKC(NZ)

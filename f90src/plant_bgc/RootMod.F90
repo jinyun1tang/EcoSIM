@@ -36,8 +36,8 @@ implicit none
     pftPlantPopulation       =>   plt_site%pftPlantPopulation         , &
     ZERO     =>   plt_site%ZERO       , &
     ISTYP    =>   plt_pheno%ISTYP     , &
-    IDTHR    =>   plt_pheno%IDTHR     , &
-    IDTHP    =>   plt_pheno%IDTHP     , &
+    iPlantRootState    =>   plt_pheno%iPlantRootState     , &
+    iPlantShootState    =>   plt_pheno%iPlantShootState     , &
     SeedLength     =>   plt_morph%SeedLength      , &
     RTVLW    =>   plt_morph%RTVLW     , &
     RTARP    =>   plt_morph%RTARP     , &
@@ -70,8 +70,8 @@ implicit none
   RTARP(ipltroot,NGTopRootLayer(NZ),NZ)=RTARP(ipltroot,NGTopRootLayer(NZ),NZ)+SeedArea(NZ)
 
   IF(IDTHRN.EQ.NRT(NZ).OR.(WTRVE(ielmc,NZ).LE.ZEROL(NZ).AND.ISTYP(NZ).NE.iplt_annual))THEN
-    IDTHR(NZ)=ibrdead
-    IDTHP(NZ)=ibrdead
+    iPlantRootState(NZ)=iDead
+    iPlantShootState(NZ)=iDead
   ENDIF
 !
 !     ROOT N2 FIXATION (RHIZOBIA)
@@ -394,7 +394,7 @@ implicit none
     IGTYP   =>  plt_pheno%IGTYP     , &
     IWTYP   =>  plt_pheno%IWTYP     , &
     fTgrowRootP    =>  plt_pheno%fTgrowRootP      , &
-    IDAY    =>  plt_pheno%IDAY      , &
+    iPlantCalendar   =>  plt_pheno%iPlantCalendar     , &
     SoiBulkDensity    =>  plt_soilchem%SoiBulkDensity   , &
     CFOPE   =>  plt_soilchem%CFOPE  , &
     SoilResit4RootPentration    =>  plt_soilchem%SoilResit4RootPentration   , &
@@ -551,14 +551,14 @@ implicit none
 !     IF > 0 DRIVES GROWTH, IF < 0 DRIVES REMOBILIZATION, ALSO
 !     SECONDARY ROOT C LOSS FROM REMOBILIZATION AND CONSEQUENT LITTERFALL
 !
-!     IDAY(1,=emergence date
+!     iPlantCalendar(ipltcal_Emerge,=emergence date
 !     CCPOLR,CZPOLR,CPPOLR=root non-structural C,N,P concentration
 !     CNKI,CPKI=nonstructural N,P inhibition constant on growth
 !     RCCC,RCCN,RCCP=remobilization coefficient for C,N,P
 !     RCCZR,RCCYR=min,max fractions for root C recycling
 !     RCCXR,RCCQR=max fractions for root N,P recycling
 !
-      IF(IDAY(1,NB1(NZ),NZ).NE.0.AND.RootNonstructElementConcpft_vr(ielmc,N,L,NZ).GT.ZERO)THEN
+      IF(iPlantCalendar(ipltcal_Emerge,NB1(NZ),NZ).NE.0.AND.RootNonstructElementConcpft_vr(ielmc,N,L,NZ).GT.ZERO)THEN
         CCC=AZMAX1(AMIN1(1.0_r8,safe_adb(RootNonstructElementConcpft_vr(ielmn,N,L,NZ),RootNonstructElementConcpft_vr(ielmn,N,L,NZ) &
           +RootNonstructElementConcpft_vr(ielmc,N,L,NZ)*CNKI) &
           ,safe_adb(RootNonstructElementConcpft_vr(ielmp,N,L,NZ),RootNonstructElementConcpft_vr(ielmp,N,L,NZ) &
@@ -1091,7 +1091,7 @@ implicit none
     CFOPE   =>  plt_soilchem%CFOPE  , &
     WFR     =>  plt_rbgc%WFR        , &
     ESNC    =>  plt_bgcr%ESNC       , &
-    IDAY    =>  plt_pheno%IDAY      , &
+    iPlantCalendar   =>  plt_pheno%iPlantCalendar     , &
     NB1     =>  plt_morph%NB1         &
   )
 !
@@ -1099,14 +1099,14 @@ implicit none
 !     IF > 0 DRIVES GROWTH, IF < 0 DRIVES REMOBILIZATION, ALSO
 !     PRIMARY ROOT C LOSS FROM REMOBILIZATION AND CONSEQUENT LITTERFALL
 !
-!     IDAY(1,=emergence date
+!     iPlantCalendar(ipltcal_Emerge,=emergence date
 !     CCPOLR,CZPOLR,CPPOLR=root non-structural C,N,P concentration
 !     CNKI,CPKI=nonstructural N,P inhibition constant on growth
 !     RCCC,RCCN,RCCP=remobilization coefficient for C,N,P
 !     RCCZR,RCCYR=min,max fractions for root C recycling
 !     RCCXR,RCCQR=max fractions for root N,P recycling
 !
-  IF(IDAY(1,NB1(NZ),NZ).NE.0.AND.RootNonstructElementConcpft_vr(ielmc,N,L,NZ).GT.ZERO)THEN
+  IF(iPlantCalendar(ipltcal_Emerge,NB1(NZ),NZ).NE.0.AND.RootNonstructElementConcpft_vr(ielmc,N,L,NZ).GT.ZERO)THEN
     CCC=AZMAX1(AMIN1(1.0_r8,safe_adb(RootNonstructElementConcpft_vr(ielmn,N,L,NZ),RootNonstructElementConcpft_vr(ielmn,N,L,NZ)+RootNonstructElementConcpft_vr(ielmc,N,L,NZ)*CNKI) &
       ,safe_adb(RootNonstructElementConcpft_vr(ielmp,N,L,NZ),RootNonstructElementConcpft_vr(ielmp,N,L,NZ)+RootNonstructElementConcpft_vr(ielmc,N,L,NZ)*CPKI)))
     CNC=AZMAX1(AMIN1(1.0_r8,safe_adb(RootNonstructElementConcpft_vr(ielmc,N,L,NZ),RootNonstructElementConcpft_vr(ielmc,N,L,NZ)+RootNonstructElementConcpft_vr(ielmn,N,L,NZ)/CNKI)))
@@ -1538,10 +1538,10 @@ implicit none
     ZEROP      =>   plt_biom%ZEROP    , &
     IBTYP      =>   plt_pheno%IBTYP   , &
     IGTYP      =>   plt_pheno%IGTYP   , &
-    IDTHB      =>   plt_pheno%IDTHB   , &
+    iPlantBranchState      =>   plt_pheno%iPlantBranchState   , &
     ISTYP      =>   plt_pheno%ISTYP   , &
     PTSHT      =>   plt_pheno%PTSHT   , &
-    IDAY       =>   plt_pheno%IDAY    , &
+    iPlantCalendar      =>   plt_pheno%iPlantCalendar   , &
     HourCounter4LeafOut_brch       =>   plt_pheno%HourCounter4LeafOut_brch    , &
     RCO2A      =>   plt_rbgc%RCO2A    , &
     TCO2T      =>   plt_bgcr%TCO2T    , &
@@ -1564,7 +1564,7 @@ implicit none
 !     FROM NON-STRUCTURAL C,N,P CONCENTRATION DIFFERENCES
 !     WHEN SEASONAL STORAGE C IS NOT BEING MOBILIZED
 !
-!     IDTHB=branch living flag: 0=alive,1=dead
+!     iPlantBranchState=branch living flag: 0=alive,1=dead
 !     HourCounter4LeafOut_brch=hourly leafout counter
 !     ATRPX=number of hours required to initiate remobilization of storage C for leafout
 !     CanPBLeafShethC=leaf+petiole mass
@@ -1576,7 +1576,7 @@ implicit none
     ZPOOLT=0._r8
     PPOOLT=0._r8
     D300: DO NB=1,NumOfBranches_pft(NZ)
-      IF(IDTHB(NB,NZ).EQ.ibralive)THEN
+      IF(iPlantBranchState(NB,NZ).EQ.iLive)THEN
         IF(HourCounter4LeafOut_brch(NB,NZ).GT.ATRPX(ISTYP(NZ)))THEN
           WTLSBZ(NB)=AZMAX1(CanPBLeafShethC(NB,NZ))
           CPOOLZ(NB)=AZMAX1(EPOOL(ielmc,NB,NZ))
@@ -1590,7 +1590,7 @@ implicit none
       ENDIF
     ENDDO D300
     D305: DO NB=1,NumOfBranches_pft(NZ)
-      IF(IDTHB(NB,NZ).EQ.ibralive)THEN
+      IF(iPlantBranchState(NB,NZ).EQ.iLive)THEN
         IF(HourCounter4LeafOut_brch(NB,NZ).GT.ATRPX(ISTYP(NZ)))THEN
           IF(WTPLTT.GT.ZEROP(NZ).AND.CPOOLT.GT.ZEROP(NZ))THEN
             CPOOLD=CPOOLT*WTLSBZ(NB)-CPOOLZ(NB)*WTPLTT
@@ -1611,10 +1611,10 @@ implicit none
 !     TRANSFER NON-STRUCTURAL C,N,P AMONG BRANCH STALK RESERVES
 !     FROM NON-STRUCTURAL C,N,P CONCENTRATION DIFFERENCES
 !
-!     IDTHB=branch living flag: 0=alive,1=dead
+!     iPlantBranchState=branch living flag: 0=alive,1=dead
 !     CanPBStalkC=stalk sapwood mass
 !     WTRSVB,WTRSBN,WTRSBP=stalk reserve C,N,P mass
-!     IDAY(7,=start of grain filling and setting max seed size
+!     iPlantCalendar(ipltcal_BeginSeedFill,=start of grain filling and setting max seed size
 !
   IF(NumOfBranches_pft(NZ).GT.1)THEN
     WTSTKT=0._r8
@@ -1622,8 +1622,8 @@ implicit none
     WTRSNT=0._r8
     WTRSPT=0._r8
     D330: DO NB=1,NumOfBranches_pft(NZ)
-      IF(IDTHB(NB,NZ).EQ.ibralive)THEN
-        IF(IDAY(7,NB,NZ).NE.0)THEN
+      IF(iPlantBranchState(NB,NZ).EQ.iLive)THEN
+        IF(iPlantCalendar(ipltcal_BeginSeedFill,NB,NZ).NE.0)THEN
           WTSTKT=WTSTKT+CanPBStalkC(NB,NZ)
           WTRSVT=WTRSVT+WTRSVBE(ielmc,NB,NZ)
           WTRSNT=WTRSNT+WTRSVBE(ielmn,NB,NZ)
@@ -1633,8 +1633,8 @@ implicit none
     ENDDO D330
     IF(WTSTKT.GT.ZEROP(NZ).AND.WTRSVT.GT.ZEROP(NZ))THEN
       D335: DO NB=1,NumOfBranches_pft(NZ)
-        IF(IDTHB(NB,NZ).EQ.ibralive)THEN
-          IF(IDAY(7,NB,NZ).NE.0)THEN
+        IF(iPlantBranchState(NB,NZ).EQ.iLive)THEN
+          IF(iPlantCalendar(ipltcal_BeginSeedFill,NB,NZ).NE.0)THEN
             WTRSVD=WTRSVT*CanPBStalkC(NB,NZ)-WTRSVBE(ielmc,NB,NZ)*WTSTKT
             XFRE(ielmc)=0.1_r8*WTRSVD/WTSTKT
             WTRSVBE(ielmc,NB,NZ)=WTRSVBE(ielmc,NB,NZ)+XFRE(ielmc)
@@ -1791,9 +1791,9 @@ implicit none
 !     SINK STRENGTH OF BRANCHES IN EACH CANOPY AS A FRACTION
 !     OF TOTAL SINK STRENGTH OF THE CANOPY
 !
-!     IDTHB=branch living flag: 0=alive,1=dead
+!     iPlantBranchState=branch living flag: 0=alive,1=dead
 !     ISTYP=growth habit:0=annual,1=perennial from PFT file
-!     IDAY(8,=end date for setting final seed number
+!     iPlantCalendar(ipltcal_SetSeedNumber,=end date for setting final seed number
 !     FWTB=branch sink weighting factor
 !     PTSHT=rate constant for equilibrating shoot-root nonstructural C concn from PFT file
 !     PTRT=allocation to leaf+petiole used to modify PTSHT in annuals
@@ -1805,7 +1805,7 @@ implicit none
 !     CPOOLR,ZPOOLR,PPOOLR=non-structural C,N,P mass in root
 !
   D310: DO NB=1,NumOfBranches_pft(NZ)
-    IF(IDTHB(NB,NZ).EQ.ibralive)THEN
+    IF(iPlantBranchState(NB,NZ).EQ.iLive)THEN
       IF(CanopyLeafShethC_pft(NZ).GT.ZEROP(NZ))THEN
         FWTB(NB)=AZMAX1(CanPBLeafShethC(NB,NZ)/CanopyLeafShethC_pft(NZ))
       ELSE

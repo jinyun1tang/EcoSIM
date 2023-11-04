@@ -124,7 +124,7 @@ module RedistMod
 !
       call DiagSnowChemMass(NY,NX)
 !
-      call CalcLitterLayerChemicalMass(NY,NX)
+      call SumLitterLayerChemMass(NY,NX)
 !
       call update_physVar_Profile(NY,NX,VOLISO,DVLiceMicP)    
 
@@ -140,8 +140,8 @@ module RedistMod
 !     CHECK MATERIAL BALANCES
 !
 !      IF(I.EQ.365.AND.J.EQ.24)THEN
-!        WRITE(19,2221)'ORGC',I,J,IYRC,NX,NY,(ORGC(L,NY,NX)/AREA(3,L,NY,NX),L=0,NL(NY,NX))
-!        WRITE(20,2221)'ORGN',I,J,IYRC,NX,NY,(ORGN(L,NY,NX)/AREA(3,L,NY,NX),L=0,NL(NY,NX))
+!        WRITE(19,2221)'ORGC',I,J,iYearCurrent,NX,NY,(ORGC(L,NY,NX)/AREA(3,L,NY,NX),L=0,NL(NY,NX))
+!        WRITE(20,2221)'ORGN',I,J,iYearCurrent,NX,NY,(ORGN(L,NY,NX)/AREA(3,L,NY,NX),L=0,NL(NY,NX))
 2221    FORMAT(A8,5I6,21E14.6)
 !      ENDIF
 
@@ -161,6 +161,7 @@ module RedistMod
   real(r8), intent(in) :: TXCO2(JY,JX)   !what does TXCO2 mean, be careful?
   real(r8) :: VLSoilPoreMicPX,VOLTX
   integer  :: L
+
   Eco_NetRad_col(NY,NX)=Eco_NetRad_col(NY,NX)+HeatByRadiation(NY,NX)
   Eco_Heat_Latent_col(NY,NX)=Eco_Heat_Latent_col(NY,NX)+HeatEvapAir2Surf(NY,NX)
   Eco_Heat_Sens_col(NY,NX)=Eco_Heat_Sens_col(NY,NX)+HeatSensAir2Surf(NY,NX)
@@ -196,6 +197,7 @@ module RedistMod
   THETIZ(0,NY,NX)=AZMAX1((VLiceMicP(0,NY,NX)-VWatLitRHoldCapcity(NY,NX))/AREA(3,0,NY,NX))
   !THETWZ(0,NY,NX)=AZMAX1(AMIN1(1.0,VLWatMicP(0,NY,NX)/VLitR(NY,NX)))
   !THETIZ(0,NY,NX)=AZMAX1(AMIN1(1.0,VLiceMicP(0,NY,NX)/VLitR(NY,NX)))
+  
   D9945: DO L=NUI(NY,NX),NL(NY,NX)
     VLSoilPoreMicPX=AREA(3,L,NY,NX)*DLYR(3,L,NY,NX)*FracSoiAsMicP(L,NY,NX)
     VOLTX=VLSoilPoreMicPX+VLMacP(L,NY,NX)
@@ -230,7 +232,7 @@ module RedistMod
     ENGYW=VLHeatCapSnow(L,NY,NX)*TKSnow(L,NY,NX)
     HeatStoreLandscape=HeatStoreLandscape+ENGYW
     TLCO2G=TLCO2G+trcg_solsml(idg_CO2,L,NY,NX)+trcg_solsml(idg_CH4,L,NY,NX)
-    UCO2S(NY,NX)=UCO2S(NY,NX)+trcg_solsml(idg_CO2,L,NY,NX)+trcg_solsml(idg_CH4,L,NY,NX)
+    DIC_mass_col(NY,NX)=DIC_mass_col(NY,NX)+trcg_solsml(idg_CO2,L,NY,NX)+trcg_solsml(idg_CH4,L,NY,NX)
     OXYGSO=OXYGSO+trcg_solsml(idg_O2,L,NY,NX)
     TLN2G=TLN2G+trcg_solsml(idg_N2,L,NY,NX)+trcg_solsml(idg_N2O,L,NY,NX)
     TLNH4=TLNH4+trcn_solsml(ids_NH4,L,NY,NX)+trcg_solsml(idg_NH3,L,NY,NX)
@@ -687,7 +689,7 @@ module RedistMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine CalcLitterLayerChemicalMass(NY,NX)
+  subroutine SumLitterLayerChemMass(NY,NX)
   implicit none
   integer, intent(in) :: NY,NX
   integer :: K,N,M,NGL
@@ -784,6 +786,7 @@ module RedistMod
   ORGC(0,NY,NX)=DC
   ORGN(0,NY,NX)=DN
   ORGR(0,NY,NX)=DC
+
   LitRCStoreLandscape=LitRCStoreLandscape+DC
   URSDC(NY,NX)=URSDC(NY,NX)+DC
   LitRNStoreLandscape=LitRNStoreLandscape+DN
@@ -796,7 +799,7 @@ module RedistMod
   HeatStoreLandscape=HeatStoreLandscape+TENGYC(NY,NX)
   CS=trc_solml(idg_CO2,0,NY,NX)+trc_solml(idg_CH4,0,NY,NX)
   TLCO2G=TLCO2G+CS
-  UCO2S(NY,NX)=UCO2S(NY,NX)+CS
+  DIC_mass_col(NY,NX)=DIC_mass_col(NY,NX)+CS
   HS=trc_solml(idg_H2,0,NY,NX)
   TLH2G=TLH2G+HS
   OS=trc_solml(idg_O2,0,NY,NX)
@@ -825,7 +828,7 @@ module RedistMod
 
   IF(salt_model)call DiagSurfLitRLayerSalt(NY,NX,TLPO4)
 
-  end subroutine CalcLitterLayerChemicalMass
+  end subroutine SumLitterLayerChemMass
 !------------------------------------------------------------------------------------------
 
   subroutine DiagSurfLitRLayerSalt(NY,NX,TLPO4)
@@ -1141,7 +1144,7 @@ module RedistMod
 
       IF(LG.LT.L)THEN
         TLCO2G=TLCO2G-trcg_ebu_flx_vr(idg_CO2,L,NY,NX)-trcg_ebu_flx_vr(idg_CH4,L,NY,NX)
-        UCO2S(NY,NX)=UCO2S(NY,NX)-trcg_ebu_flx_vr(idg_CO2,L,NY,NX)-trcg_ebu_flx_vr(idg_CH4,L,NY,NX)
+        DIC_mass_col(NY,NX)=DIC_mass_col(NY,NX)-trcg_ebu_flx_vr(idg_CO2,L,NY,NX)-trcg_ebu_flx_vr(idg_CH4,L,NY,NX)
         OXYGSO=OXYGSO-trcg_ebu_flx_vr(idg_O2,L,NY,NX)
         TLN2G=TLN2G-trcg_ebu_flx_vr(idg_N2,L,NY,NX)-trcg_ebu_flx_vr(idg_N2O,L,NY,NX) &
           -trcg_ebu_flx_vr(idg_NH3,L,NY,NX)-trcg_ebu_flx_vr(idg_NH3B,L,NY,NX)
@@ -1208,7 +1211,7 @@ module RedistMod
       +trc_gasml(idg_CH4,L,NY,NX)+trc_solml(idg_CH4,L,NY,NX) &
       +trc_soHml(idg_CH4,L,NY,NX)+trcg_TLP(idg_CH4,L,NY,NX)
     TLCO2G=TLCO2G+CS
-    UCO2S(NY,NX)=UCO2S(NY,NX)+CS
+    DIC_mass_col(NY,NX)=DIC_mass_col(NY,NX)+CS
     HS=trc_gasml(idg_H2,L,NY,NX)+trc_solml(idg_H2,L,NY,NX) &
       +trc_soHml(idg_H2,L,NY,NX)+trcg_TLP(idg_H2,L,NY,NX)
     TLH2G=TLH2G+HS

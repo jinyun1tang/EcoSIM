@@ -12,11 +12,11 @@ module PlantMngmtDataType
   integer ,target,allocatable ::  IHVST(:,:,:,:)                      !type of harvest, [-]
   integer ,target,allocatable ::  JHVST(:,:,:,:)                      !flag for stand replacing disturbance, [-]
 
-  integer ,target,allocatable ::  IYR0(:,:,:)                         !year of planting, [-]
-  integer ,target,allocatable ::  IYRH(:,:,:)                         !year of harvest, [-]
-  integer ,target,allocatable ::  IDAY0(:,:,:)                        !day of planting, [-]
-  integer ,target,allocatable ::  IDAYH(:,:,:)                        !day of harvest, [-]
-  integer ,target,allocatable ::  IDTH(:,:,:)                         !flag for species death, [-]
+  integer ,target,allocatable ::  iYearPlanting(:,:,:)                         !year of planting, [-]
+  integer ,target,allocatable ::  iYearPlantHarvest(:,:,:)                         !year of harvest, [-]
+  integer ,target,allocatable ::  iDayPlanting(:,:,:)                        !day of planting, [-]
+  integer ,target,allocatable ::  iDayPlantHarvest(:,:,:)                        !day of harvest, [-]
+  integer ,target,allocatable ::  iPlantState(:,:,:)                         !flag for species death, [-]
   integer ,target,allocatable ::  IYRX(:,:,:)                         !alternate year of planting, [-]
   integer ,target,allocatable ::  IDAYX(:,:,:)                        !alternate day of planting, [-]
   integer ,target,allocatable ::  IYRY(:,:,:)                         !alternate year of harvest, [-]
@@ -49,11 +49,11 @@ module PlantMngmtDataType
   allocate(IHVST(05,366,JY,JX));IHVST=0
   allocate(JHVST(05,366,JY,JX));JHVST=0
 
-  allocate(IYR0(JP,JY,JX));     IYR0=0
-  allocate(IYRH(JP,JY,JX));     IYRH=0
-  allocate(IDAY0(JP,JY,JX));    IDAY0=0
-  allocate(IDAYH(JP,JY,JX));    IDAYH=0
-  allocate(IDTH(JP,JY,JX));     IDTH=0
+  allocate(iYearPlanting(JP,JY,JX));     iYearPlanting=0
+  allocate(iYearPlantHarvest(JP,JY,JX));     iYearPlantHarvest=0
+  allocate(iDayPlanting(JP,JY,JX));    iDayPlanting=0
+  allocate(iDayPlantHarvest(JP,JY,JX));    iDayPlantHarvest=0
+  allocate(iPlantState(JP,JY,JX));     iPlantState=0
   allocate(IYRX(JP,JY,JX));     IYRX=0
   allocate(IDAYX(JP,JY,JX));    IDAYX=0
   allocate(IYRY(JP,JY,JX));     IYRY=0
@@ -68,27 +68,30 @@ module PlantMngmtDataType
 
 !----------------------------------------------------------------------
   subroutine DestructPlantMngmtData
-  if (allocated(THIN_pft))     deallocate(THIN_pft)
-  if (allocated(EHVST))    deallocate(EHVST)
-  if (allocated(HVST))     deallocate(HVST)
-  if (allocated(IHVST))    deallocate(IHVST)
-  if (allocated(JHVST))    deallocate(JHVST)
+  use abortutils, only : destroy
+  implicit none
 
-  if (allocated(IYR0))     deallocate(IYR0)
-  if (allocated(IYRH))     deallocate(IYRH)
-  if (allocated(IDAY0))    deallocate(IDAY0)
-  if (allocated(IDAYH))    deallocate(IDAYH)
-  if (allocated(IDTH))     deallocate(IDTH)
-  if (allocated(IYRX))     deallocate(IYRX)
-  if (allocated(IDAYX))    deallocate(IDAYX)
-  if (allocated(IYRY))     deallocate(IYRY)
-  if (allocated(IDAYY))    deallocate(IDAYY)
-  if (allocated(UCO2F))    deallocate(UCO2F)
-  if (allocated(UCH4F))    deallocate(UCH4F)
-  if (allocated(UOXYF))    deallocate(UOXYF)
-  if (allocated(UNH3F))    deallocate(UNH3F)
-  if (allocated(UN2OF))    deallocate(UN2OF)
-  if (allocated(UPO4F))    deallocate(UPO4F)
+  call destroy(THIN_pft)
+  call destroy(EHVST)
+  call destroy(HVST)
+  call destroy(IHVST)
+  call destroy(JHVST)
+
+  call destroy(iYearPlanting)
+  call destroy(iYearPlantHarvest)
+  call destroy(iDayPlanting)
+  call destroy(iDayPlantHarvest)
+  call destroy(iPlantState)
+  call destroy(IYRX)
+  call destroy(IDAYX)
+  call destroy(IYRY)
+  call destroy(IDAYY)
+  call destroy(UCO2F)
+  call destroy(UCH4F)
+  call destroy(UOXYF)
+  call destroy(UNH3F)
+  call destroy(UN2OF)
+  call destroy(UPO4F)
   end subroutine DestructPlantMngmtData
 
 end module PlantMngmtDataType

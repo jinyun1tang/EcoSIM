@@ -41,8 +41,8 @@ module StartqMod
 !
 !     INITIALIZE SHOOT GROWTH VARIABLES
 !
-!     IFLGC=PFT flag:0=not active,1=active
-!     IYR0,IDAY0,IYRH,IDAYH=year,day of planting,arvesting
+!     IsPlantActive=PFT flag:0=not active,1=active
+!     iYearPlanting,iDayPlanting,iYearPlantHarvest,iDayPlantHarvest=year,day of planting,arvesting
 !     PPI,PPX=initial,current population (m-2)
 !     CF,ClumpFactort0=current,initial clumping factor
 !     MaxCanPStomaResistH2O=cuticular resistance to water (h m-1)
@@ -56,7 +56,7 @@ module StartqMod
     D9990: DO NY=NVNQ,NVSQ
       NZ2X=MIN(NZ2Q,NP(NY,NX))
       D9985: DO NZ=NZ1Q,NZ2X
-        IF(IFLGC(NZ,NY,NX).EQ.0)THEN
+        IF(IsPlantActive(NZ,NY,NX).EQ.iPlantIsDormant)THEN
 
           call InitShootGrowth(NZ,NY,NX)
 
@@ -106,10 +106,10 @@ module StartqMod
   implicit none
   integer, intent(in) :: NZ, NY, NX
 
-  IYR0(NZ,NY,NX)=IYRX(NZ,NY,NX)   !planting year
-  IDAY0(NZ,NY,NX)=IDAYX(NZ,NY,NX) !planting day
-  IYRH(NZ,NY,NX)=IYRY(NZ,NY,NX)
-  IDAYH(NZ,NY,NX)=IDAYY(NZ,NY,NX)
+  iYearPlanting(NZ,NY,NX)=IYRX(NZ,NY,NX)   !planting year
+  iDayPlanting(NZ,NY,NX)=IDAYX(NZ,NY,NX) !planting day
+  iYearPlantHarvest(NZ,NY,NX)=IYRY(NZ,NY,NX)
+  iDayPlantHarvest(NZ,NY,NX)=IDAYY(NZ,NY,NX)
   PPI(NZ,NY,NX)=PPZ(NZ,NY,NX)
   PPX(NZ,NY,NX)=PPI(NZ,NY,NX)
   ClumpFactor(NZ,NY,NX)=ClumpFactort0(NZ,NY,NX)       !clumping factor
@@ -472,17 +472,17 @@ module StartqMod
 !     PP=population (grid cell-1)
 !
   pftPlantPopulation(NZ,NY,NX)=PPX(NZ,NY,NX)*AREA(3,NU(NY,NX),NY,NX)
-  IFLGI(NZ,NY,NX)=0
-  IDTHP(NZ,NY,NX)=0
-  IDTHR(NZ,NY,NX)=0
+  doInitPlant(NZ,NY,NX)=ifalse
+  iPlantShootState(NZ,NY,NX)=iDead
+  iPlantRootState(NZ,NY,NX)=iDead
   NBT(NZ,NY,NX)=0
   NumOfBranches_pft(NZ,NY,NX)=0
   HypoctoylHeight(NZ,NY,NX)=0._r8
   CanopyHeight(NZ,NY,NX)=0._r8
   D10: DO NB=1,JBR
-    IFLGA(NB,NZ,NY,NX)=0
-    IFLGE(NB,NZ,NY,NX)=0
-    IFLGF(NB,NZ,NY,NX)=0
+    doInitLeafOut(NB,NZ,NY,NX)=0
+    doPlantLeafOut(NB,NZ,NY,NX)=iDisable
+    doPlantLeaveOff(NB,NZ,NY,NX)=iDisable
     IFLGR(NB,NZ,NY,NX)=0
     IFLGQ(NB,NZ,NY,NX)=0
     GROUP(NB,NZ,NY,NX)=GROUPI(NZ,NY,NX)
@@ -502,16 +502,16 @@ module StartqMod
     VRNY(NB,NZ,NY,NX)=0._r8
     VRNZ(NB,NZ,NY,NX)=0._r8
     VRNS(NB,NZ,NY,NX)=VRNY(NB,NZ,NY,NX)
-    VRNF(NB,NZ,NY,NX)=VRNZ(NB,NZ,NY,NX)
+    Hours4LeafOff(NB,NZ,NY,NX)=VRNZ(NB,NZ,NY,NX)
     HourCounter4LeafOut_brch(NB,NZ,NY,NX)=0._r8
     RubiscoActivity_brpft(NB,NZ,NY,NX)=1.0
     FDBKX(NB,NZ,NY,NX)=1.0
     FLG4(NB,NZ,NY,NX)=0
     FLGZ(NB,NZ,NY,NX)=0
     BranchNumber_brchpft(NB,NZ,NY,NX)=0
-    IDTHB(NB,NZ,NY,NX)=1
-    D15: DO M=1,NumGrothStages
-      IDAY(M,NB,NZ,NY,NX)=0
+    iPlantBranchState(NB,NZ,NY,NX)=1
+    D15: DO M=1,NumGrowthStages
+      iPlantCalendar(M,NB,NZ,NY,NX)=0
     ENDDO D15
   ENDDO D10
 !
@@ -553,7 +553,7 @@ module StartqMod
         StemA_lyrnodbrchpft(N,L,NB,NZ,NY,NX)=0._r8
       enddo
     ENDDO D5
-    DO K=0,JNODS
+    DO K=0,MaxCanopyNodes
       ARLF(K,NB,NZ,NY,NX)=0._r8
       HTNODE(K,NB,NZ,NY,NX)=0._r8
       HTNODX(K,NB,NZ,NY,NX)=0._r8
@@ -810,8 +810,8 @@ module StartqMod
 !     WSRTL=total root protein C mass (g)
 !     CPOOLR,ZPOOLR,PPOOLR=C,N,P in root,myco nonstructural pools (g)
 !
-  WTRVX(NZ,NY,NX)=SeedCMass(NZ,NY,NX)*pftPlantPopulation(NZ,NY,NX)
-  WTRVE(ielmc,NZ,NY,NX)=WTRVX(NZ,NY,NX)
+  SeedCPlanted_pft(NZ,NY,NX)=SeedCMass(NZ,NY,NX)*pftPlantPopulation(NZ,NY,NX)
+  WTRVE(ielmc,NZ,NY,NX)=SeedCPlanted_pft(NZ,NY,NX)
   WTRVE(ielmn,NZ,NY,NX)=CNGR(NZ,NY,NX)*WTRVE(ielmc,NZ,NY,NX)
   WTRVE(ielmp,NZ,NY,NX)=CPGR(NZ,NY,NX)*WTRVE(ielmc,NZ,NY,NX)
   WTLFBE(ielmn,1,NZ,NY,NX)=CNGR(NZ,NY,NX)*WTLFBE(ielmc,1,NZ,NY,NX)

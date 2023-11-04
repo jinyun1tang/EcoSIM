@@ -616,7 +616,7 @@ implicit none
   integer, intent(in) :: NB,NZ
   real(r8), intent(in) :: WFNG
   real(r8), intent(in) :: Stomata_Activity    !between 0. and 1., a function of canopy turgor
-  real(r8), intent(out) :: CH2O3(JNODS1),CH2O4(JNODS1)
+  real(r8), intent(out) :: CH2O3(MaxCanopyNodes1),CH2O4(MaxCanopyNodes1)
   real(r8), intent(out) :: CO2F,CH2O
   real(r8) :: ZADDB,PADDB
 
@@ -644,7 +644,7 @@ implicit none
 !
 !         FOR EACH NODE
 !
-        D100: DO K=1,JNODS1
+        D100: DO K=1,MaxCanopyNodes1
           CH2O3(K)=0._r8
           CH2O4(K)=0._r8
           IF(ARLF1(K,NB,NZ).GT.ZEROP(NZ))THEN
@@ -675,7 +675,7 @@ implicit none
 !
 !         CONVERT UMOL M-2 S-1 TO G C M-2 H-1
 !
-        D150: DO K=1,JNODS1
+        D150: DO K=1,MaxCanopyNodes1
           CH2O3(K)=CH2O3(K)*0.0432_r8
           CH2O4(K)=CH2O4(K)*0.0432_r8
         ENDDO D150
@@ -683,7 +683,7 @@ implicit none
         CO2F=0._r8
         CH2O=0._r8
         IF(ICTYP(NZ).EQ.ic4_photo)THEN
-          D155: DO K=1,JNODS1
+          D155: DO K=1,MaxCanopyNodes1
             CH2O3(K)=0._r8
             CH2O4(K)=0._r8
           ENDDO D155
@@ -694,7 +694,7 @@ implicit none
       CH2O=0._r8
       !C4
       IF(ICTYP(NZ).EQ.ic4_photo)THEN
-        D160: DO K=1,JNODS1
+        D160: DO K=1,MaxCanopyNodes1
           CH2O3(K)=0._r8
           CH2O4(K)=0._r8
         ENDDO D160
@@ -704,7 +704,7 @@ implicit none
     CO2F=0._r8
     CH2O=0._r8
     IF(ICTYP(NZ).EQ.ic4_photo)THEN
-      D165: DO K=1,JNODS1
+      D165: DO K=1,MaxCanopyNodes1
         CH2O3(K)=0._r8
         CH2O4(K)=0._r8
       ENDDO D165

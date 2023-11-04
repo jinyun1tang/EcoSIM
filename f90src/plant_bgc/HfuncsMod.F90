@@ -7,7 +7,7 @@ module HfuncsMod
   use EcosimConst
   use PlantAPIData
   use minimathmod, only : AZMAX1
-  use StartqsMod, only : startqs
+  use StartqsMod, only : StartPlants
   implicit none
 
   private
@@ -52,20 +52,20 @@ module HfuncsMod
   associate(                           &
     PSICanP   =>  plt_ew%PSICanP     , &
     VRNZ    =>  plt_pheno%VRNZ   , &
-    IFLGI   =>  plt_pheno%IFLGI  , &
-    IFLGP   =>  plt_pheno%IFLGP  , &
+    doInitPlant   =>  plt_pheno%doInitPlant  , &
+    doPlantRemobilization   =>  plt_pheno%doPlantRemobilization  , &
     VSTGX   =>  plt_pheno%VSTGX  , &
     VRNY    =>  plt_pheno%VRNY   , &
-    IFLGC   =>  plt_pheno%IFLGC  , &
-    IDTHB   =>  plt_pheno%IDTHB  , &
-    IDAY    =>  plt_pheno%IDAY   , &
+    IsPlantActive   =>  plt_pheno%IsPlantActive  , &
+    iPlantBranchState   =>  plt_pheno%iPlantBranchState  , &
+    iPlantCalendar   =>  plt_pheno%iPlantCalendar  , &
     WSTR    =>  plt_pheno%WSTR   , &
     KVSTG   =>  plt_pheno%KVSTG  , &
     IGTYP   =>  plt_pheno%IGTYP  , &
-    DYLN    =>  plt_site%DYLN    , &
+    DayLenthCurrent    =>  plt_site%DayLenthCurrent    , &
     DATAP   =>  plt_site%DATAP   , &
     PPT     =>  plt_site%PPT     , &
-    DYLX    =>  plt_site%DYLX    , &
+    DayLenthPrev    =>  plt_site%DayLenthPrev    , &
     NP      =>  plt_site%NP      , &
     pftPlantPopulation      =>  plt_site%pftPlantPopulation      , &
     KLEAF   =>  plt_morph%KLEAF  , &
@@ -77,26 +77,19 @@ module HfuncsMod
 
     IF(DATAP(NZ).NE.'NO')THEN
 !
-!         PPT=total biome population
+!     PPT=total biome population
 !
       PPT=PPT+pftPlantPopulation(NZ)
 !
 !         SET CROP FLAG ACCORDINGTopRootLayerTO PLANTING, HARVEST DATES, DEATH,
 !         1 = ALIVE, 0 = NOT ALIVE
-!
-!         IDAY0,IYR0,IDAYH,IYRH=day,year of planting,harvesting
-!         IYRC=current year
-!         IDATA(3)=start year of current scenario
-!         IDTH=PFT flag:0=alive,1=dead
-!         IFLGC=PFT flag:0=not active,1=active
-!         IFLGT=number of active PFT
 !         DATAP=PFT file name
 !
       call set_flags(I,J,NZ)
 !
 !         INITIALIZE VARIABLES IN ACTIVE PFT
 !
-      IF(IFLGC(NZ).EQ.PlantIsActive)THEN
+      IF(IsPlantActive(NZ).EQ.iPlantIsActive)THEN
 
         call stage_phenology_vars(I,J,NZ)
 
@@ -104,17 +97,16 @@ module HfuncsMod
 !
 !           THE REST OF THE subroutine MODELS THE PHENOLOGY OF EACH BRANCH
 !
-!           IFLGA,IFLGE=flags for initializing leafout,leafoff
+!           doInitLeafOut,doPlantLeafOut=flags for initializing leafout,leafoff
 !           VRNS=leafout hours
 !
-        IF(IDAY(1,NB1(NZ),NZ).NE.0.OR.IFLGI(NZ).EQ.itrue)THEN
+        IF(iPlantCalendar(ipltcal_Emerge,NB1(NZ),NZ).NE.0.OR.doInitPlant(NZ).EQ.itrue)THEN
           D2010: DO NB=1,NumOfBranches_pft(NZ)
-            IF(IDTHB(NB,NZ).EQ.iliving_branch)THEN
+            IF(iPlantBranchState(NB,NZ).EQ.iliving_branch)THEN
               call living_branch_phenology(I,J,NB,nz)
             ENDIF
 !
 !               KVSTG=integer of most recent leaf number currently growing
-!               IFLGP=flag for remobilization
 !
             KVSTGX=KVSTG(NB,NZ)
             IF(VSTGX(NB,NZ).LE.ppmc)THEN
@@ -122,20 +114,20 @@ module HfuncsMod
             ELSE
               KVSTG(NB,NZ)=INT(AMIN1(VSTG(NB,NZ),VSTGX(NB,NZ)))+1
             ENDIF
-            KLEAF(NB,NZ)=MIN(24,KVSTG(NB,NZ))
+            KLEAF(NB,NZ)=MIN(MaxCanopyNodes1-1,KVSTG(NB,NZ))
             IF(KVSTG(NB,NZ).GT.KVSTGX)THEN
-              IFLGP(NB,NZ)=1
+              doPlantRemobilization(NB,NZ)=itrue
             ELSE
-              IFLGP(NB,NZ)=0
+              doPlantRemobilization(NB,NZ)=ifalse
             ENDIF
 !
 !               PHENOLOGY
 !
-!               DYLX,DLYN=daylength of previous,current day
+!               DayLenthPrev,DLYN=daylength of previous,current day
 !               VRNY,VRNZ=hourly counter for lengthening,shortening photoperiods
 !
-            IF(IDTHB(NB,NZ).EQ.iliving_branch.OR.IFLGI(NZ).EQ.itrue)THEN
-              IF(DYLN.GE.DYLX)THEN
+            IF(iPlantBranchState(NB,NZ).EQ.iliving_branch.OR.doInitPlant(NZ).EQ.itrue)THEN
+              IF(DayLenthCurrent.GE.DayLenthPrev)THEN
                 VRNY(NB,NZ)=VRNY(NB,NZ)+1.0_r8
                 VRNZ(NB,NZ)=0.0_r8
               ELSE
@@ -167,7 +159,7 @@ module HfuncsMod
 !------------------------------------------------------------------------------------------
 
   subroutine set_flags(I,J,NZ)
-  use EcoSIMCtrlDataType, only : iyear_cur
+  use EcoSIMCtrlDataType, only : iYearCurrent
 
   implicit none
   integer, intent(in) :: I,J,NZ
@@ -176,58 +168,68 @@ module HfuncsMod
 
 ! begin_execution
   associate(                        &
-    IYR0    =>  plt_distb%IYR0    , &
-    IYRH    =>  plt_distb%IYRH    , &  !year of harvest
-    IDAY0   =>  plt_distb%IDAY0   , &  !day of planting
-    IDAYH   =>  plt_distb%IDAYH   , &  !day of harvest
+    iYearPlanting    =>  plt_distb%iYearPlanting    , &
+    iYearPlantHarvest    =>  plt_distb%iYearPlantHarvest    , &  !year of harvest
+    iDayPlanting   =>  plt_distb%iDayPlanting   , &  !day of planting
+    iDayPlantHarvest   =>  plt_distb%iDayPlantHarvest   , &  !day of harvest
     DATAP   =>  plt_site%DATAP    , &
     IDATA   =>  plt_site%IDATA    , &
-    IYRC    =>  plt_site%IYRC     , &
-    IFLGT   =>  plt_site%IFLGT    , &
+    iYearCurrent    =>  plt_site%iYearCurrent     , &
+    NumActivePlants   =>  plt_site%NumActivePlants    , &
     Eco_NBP_col    =>  plt_bgcr%Eco_NBP_col     , &
-    WTRVX   =>  plt_biom%WTRVX    , &
-    IDTH    =>  plt_pheno%IDTH    , &
-    IFLGC   =>  plt_pheno%IFLGC     &
+    SeedCPlanted_pft   =>  plt_biom%SeedCPlanted_pft    , &
+    iPlantState   =>  plt_pheno%iPlantState   , &
+    IsPlantActive   =>  plt_pheno%IsPlantActive     &
   )
+  !first hour of day
   IF(J.EQ.1)THEN
-    IF(IDAY0(NZ).LE.IDAYH(NZ).OR.IYR0(NZ).LT.IYRH(NZ))THEN
-      IF(I.GE.IDAY0(NZ).OR.iyear_cur.GT.IYR0(NZ))THEN
-        IF(I.GT.IDAYH(NZ).AND.IYRC.GE.IYRH(NZ).AND.IDTH(NZ).EQ.1)THEN
-          IFLGC(NZ)=ipltdorm
+    IF(iDayPlanting(NZ).LE.iDayPlantHarvest(NZ) &
+      .OR.iYearPlanting(NZ).LT.iYearPlantHarvest(NZ))THEN
+      !planting is feasible
+      IF(I.GE.iDayPlanting(NZ).OR.iYearCurrent.GT.iYearPlanting(NZ))THEN
+        !planted 
+        IF(I.GT.iDayPlantHarvest(NZ).AND.iYearCurrent.GE.iYearPlantHarvest(NZ) &
+          .AND.iPlantState(NZ).EQ.iDead)THEN
+          !post harvest
+          IsPlantActive(NZ)=iPlantIsDormant
         ELSE
-          IF(I.EQ.IDAY0(NZ).AND.iyear_cur.EQ.IYR0(NZ))THEN
-            IFLGC(NZ)=ipltdorm
-            IDTH(NZ)=0
-            CALL STARTQs(NZ,NZ)
-            Eco_NBP_col=Eco_NBP_col+WTRVX(NZ)
+          IF(I.EQ.iDayPlanting(NZ).AND.iYearCurrent.EQ.iYearPlanting(NZ))THEN
+            !planting day
+            IsPlantActive(NZ)=iPlantIsDormant
+            iPlantState(NZ)=iLive
+            CALL StartPlants(NZ,NZ)
+            Eco_NBP_col=Eco_NBP_col+SeedCPlanted_pft(NZ)
           ENDIF
-
-          IF(DATAP(NZ).NE.'NO'.AND.IDTH(NZ).EQ.0)then
-            IFLGC(NZ)=PlantIsActive
+          !the living plant has actual properties set
+          IF(DATAP(NZ).NE.'NO'.AND.iPlantState(NZ).EQ.iLive)then
+            IsPlantActive(NZ)=iPlantIsActive
+            print*,'plant is activated',NZ
           endif
         ENDIF
       ELSE
-        IFLGC(NZ)=ipltdorm
+        IsPlantActive(NZ)=iPlantIsDormant
+        print*,'plant is dormant',NZ
       ENDIF
     ELSE
-      IF((I.LT.IDAY0(NZ).AND.I.GT.IDAYH(NZ) &
-        .AND.IYRC.GE.IYRH(NZ).AND.IDTH(NZ).EQ.1) &
-        .OR.(I.LT.IDAY0(NZ).AND.IYR0(NZ) &
-        .GT.IYRH(NZ)))THEN
-        IFLGC(NZ)=ipltdorm
+      IF((I.LT.iDayPlanting(NZ).AND.I.GT.iDayPlantHarvest(NZ) &
+        .AND.iYearCurrent.GE.iYearPlantHarvest(NZ).AND.iPlantState(NZ).EQ.iDead) &
+        .OR.(I.LT.iDayPlanting(NZ).AND.iYearPlanting(NZ) &
+        .GT.iYearPlantHarvest(NZ)))THEN
+        IsPlantActive(NZ)=iPlantIsDormant
       ELSE
-        IF(I.EQ.IDAY0(NZ).AND.iyear_cur.EQ.IYR0(NZ))THEN
-          IFLGC(NZ)=ipltdorm
-          IDTH(NZ)=0
-          CALL STARTQs(NZ,NZ)
-          Eco_NBP_col=Eco_NBP_col+WTRVX(NZ)
+        IF(I.EQ.iDayPlanting(NZ).AND.iYearCurrent.EQ.iYearPlanting(NZ))THEN
+          IsPlantActive(NZ)=iPlantIsDormant
+          iPlantState(NZ)=iLive
+          CALL StartPlants(NZ,NZ)
+          Eco_NBP_col=Eco_NBP_col+SeedCPlanted_pft(NZ)
         ENDIF
-        IF(DATAP(NZ).NE.'NO'.AND.IDTH(NZ).EQ.0)then
-          IFLGC(NZ)=PlantIsActive
+        IF(DATAP(NZ).NE.'NO'.AND.iPlantState(NZ).EQ.iLive)then
+          IsPlantActive(NZ)=iPlantIsActive
+          print*,'plant is activated',NZ
         endif
       ENDIF
     ENDIF
-    IFLGT=IFLGT+IFLGC(NZ)
+    NumActivePlants=NumActivePlants+IsPlantActive(NZ)
   ENDIF
   end associate
   end subroutine set_flags
@@ -243,12 +245,12 @@ module HfuncsMod
     CanopyNonstructElementConc_pft  =>   plt_biom%CanopyNonstructElementConc_pft  , &
     WTRVE   =>   plt_biom%WTRVE   , &
     GROUP   =>   plt_pheno%GROUP  , &
-    IDAY    =>   plt_pheno%IDAY   , &
-    IFLGI   =>   plt_pheno%IFLGI  , &
-    IDTHR   =>   plt_pheno%IDTHR  , &
+    iPlantCalendar   =>   plt_pheno%iPlantCalendar  , &
+    doInitPlant   =>   plt_pheno%doInitPlant  , &
+    iPlantRootState   =>   plt_pheno%iPlantRootState  , &
     ISTYP   =>   plt_pheno%ISTYP  , &
-    IDTHB   =>   plt_pheno%IDTHB  , &
-    IDTHP   =>   plt_pheno%IDTHP  , &
+    iPlantBranchState   =>   plt_pheno%iPlantBranchState  , &
+    iPlantShootState   =>   plt_pheno%iPlantShootState  , &
     IBTYP   =>   plt_pheno%IBTYP  , &
     PR      =>   plt_pheno%PR     , &
     GROUPI  =>   plt_pheno%GROUPI , &
@@ -272,14 +274,14 @@ module HfuncsMod
 ! ADD BRANCH TO SHOOT IF PLANT GROWTH STAGE, SHOOT NON-STRUCTURAL
 ! CONCENTRATION PERMIT
 !
-! IFLGI=PFT initialization flag:0=no,1=yes
+! doInitPlant=PFT initialization flag:0=no,1=yes
 ! PSIRootTurg=root turgor potential
 ! ISTYP=growth habit from PFT file
-! IDAY(2,=floral initiation date
+! iPlantCalendar(ipltcal_InitFloral,=floral initiation date
 ! NumOfBranches_pft=primary root axis number
 ! WTRVC=nonstructural C storage
 ! PB=nonstructural C concentration needed for branching
-! IDTHB=branch life flag:0=living,1=dead
+! iPlantBranchState=branch life flag:0=living,1=dead
 ! PSTG=node number
 ! FNOD=scales node number for perennial vegetation (e.g. trees)
 ! NNOD=number of concurrently growing nodes
@@ -287,21 +289,21 @@ module HfuncsMod
 ! IBTYP: setup for phenologically-driven above-ground turnover
 
 
-  IF(IFLGI(NZ).EQ.0)THEN
+  IF(doInitPlant(NZ).EQ.ifalse)THEN
+    !plant initialized
     IF(J.EQ.1.AND.pftPlantPopulation(NZ).GT.0.0_r8)THEN
       IF(PSIRootTurg(ipltroot,NGTopRootLayer(NZ),NZ).GT.PSILM)THEN
-        IF(ISTYP(NZ).NE.iplt_annual.OR.IDAY(2,NB1(NZ),NZ).EQ.0)THEN
+        IF(ISTYP(NZ).NE.iplt_annual.OR.iPlantCalendar(ipltcal_InitFloral,NB1(NZ),NZ).EQ.0)THEN
           IF((NumOfBranches_pft(NZ).EQ.0.AND.WTRVE(ielmc,NZ).GT.0.0_r8) &
             .OR.(CanopyNonstructElementConc_pft(ielmc,NZ).GT.PB(NZ).AND.PB(NZ).GT.0.0_r8))THEN
             D120: DO NB=1,NumOfCanopyLayers1
-              IF(IDTHB(NB,NZ).EQ.ibrdead)THEN
-                IF(NB.EQ.NB1(NZ).OR.PSTG(NB1(NZ),NZ).GT.NBT(NZ) &
-                  +NNOD(NZ)/FNOD(NZ)+XTLI(NZ))THEN
+              IF(iPlantBranchState(NB,NZ).EQ.iDead)THEN
+                IF(NB.EQ.NB1(NZ).OR.PSTG(NB1(NZ),NZ).GT.NBT(NZ)+NNOD(NZ)/FNOD(NZ)+XTLI(NZ))THEN
                   NBT(NZ)=NBT(NZ)+1
                   NumOfBranches_pft(NZ)=MIN(NBX(IBTYP(NZ)),MAX(NB,NumOfBranches_pft(NZ)))
                   BranchNumber_brchpft(NB,NZ)=NBT(NZ)-1
-                  IDTHP(NZ)=ibralive
-                  IDTHB(NB,NZ)=ibralive
+                  iPlantShootState(NZ)=iLive
+                  iPlantBranchState(NB,NZ)=iLive
                   VRNS(NB,NZ)=0.0_r8
                   IF(ISTYP(NZ).EQ.iplt_annual)THEN
                     GROUP(NB,NZ)=AZMAX1(GROUPI(NZ)-BranchNumber_brchpft(NB,NZ))
@@ -327,12 +329,14 @@ module HfuncsMod
 !     CanopyNonstructElementConc_pft: canopy nonstructural element concentration
 !     PSIRootTurg: root turgor pressure
 !     WTRVE: non-structural carbon
+
       IF(PSIRootTurg(ipltroot,NGTopRootLayer(NZ),NZ).GT.PSILM)THEN
         IF(NRT(NZ).EQ.0 .OR. PSTG(NB1(NZ),NZ).GT.NRT(NZ)/FNOD(NZ)+XTLI(NZ))THEN
           IF((NRT(NZ).EQ.0 .AND. WTRVE(ielmc,NZ).GT.0.0_r8) &
-            .OR.(CanopyNonstructElementConc_pft(ielmc,NZ).GT.PR(NZ) .AND. PR(NZ).GT.0.0_r8))THEN
+            .OR.(CanopyNonstructElementConc_pft(ielmc,NZ).GT.PR(NZ) & 
+            .AND.PR(NZ).GT.0.0_r8))THEN
             NRT(NZ)=MIN(NumOfCanopyLayers1,NRT(NZ)+1)
-            IDTHR(NZ)=0
+            iPlantRootState(NZ)=iLive
           ENDIF
         ENDIF
       ENDIF
@@ -367,8 +371,8 @@ module HfuncsMod
     WatByPCan  =>  plt_ew%WatByPCan      , &
     VHeatCapCanP  =>  plt_ew%VHeatCapCanP      , &
     NU     =>  plt_site%NU       , &
-    IDTHB  =>  plt_pheno%IDTHB   , &
-    IDAY   =>  plt_pheno%IDAY    , &
+    iPlantBranchState  =>  plt_pheno%iPlantBranchState   , &
+    iPlantCalendar  =>  plt_pheno%iPlantCalendar   , &
     NB1    =>  plt_morph%NB1     , &
     PrimRootDepth  =>  plt_morph%PrimRootDepth   , &
     MY     =>  plt_morph%MY      , &
@@ -397,7 +401,7 @@ module HfuncsMod
 !
   DO NE=1,NumOfPlantChemElements
     D140: DO NB=1,NumOfBranches_pft(NZ)
-      IF(IDTHB(NB,NZ).EQ.ibralive)THEN
+      IF(iPlantBranchState(NB,NZ).EQ.iLive)THEN
         CanopyNonstructElements_pft(NE,NZ)=CanopyNonstructElements_pft(NE,NZ)+EPOOL(NE,NB,NZ)
         EPOLNP(NE,NZ)=EPOLNP(NE,NZ)+EPOLNB(NE,NB,NZ)
       ENDIF
@@ -405,7 +409,7 @@ module HfuncsMod
   ENDDO
 
   DO NB=1,NumOfBranches_pft(NZ)
-    IF(IDTHB(NB,NZ).EQ.ibralive)THEN
+    IF(iPlantBranchState(NB,NZ).EQ.iLive)THEN
       IF(BranchNumber_brchpft(NB,NZ).LT.NBTX)THEN
         NB1(NZ)=NB
         NBTX=BranchNumber_brchpft(NB,NZ)
@@ -460,18 +464,18 @@ module HfuncsMod
 !
 ! EMERGENCE DATE FROM COTYLEDON HEIGHT, LEAF AREA, ROOT DEPTH
 !
-! IDAY(1,=emergence date
+! iPlantCalendar(ipltcal_Emerge,=emergence date
 ! CanopyLeafA_pft,CanopyStemA_pft=leaf,stalk areas
 ! HypoctoylHeight=hypocotyledon height
 ! SeedinDepth=seeding depth
 ! PrimRootDepth=primary root depth
 ! VHeatCapCanP,WTSHT,WatByPCan=canopy heat capacity,mass,water content
 !
-  IF(IDAY(1,NB1(NZ),NZ).EQ.0)THEN
+  IF(iPlantCalendar(ipltcal_Emerge,NB1(NZ),NZ).EQ.0)THEN
     ARLSP=CanopyLeafA_pft(NZ)+CanopyStemA_pft(NZ)
     IF((HypoctoylHeight(NZ).GT.SeedinDepth(NZ)).AND.(ARLSP.GT.ZEROL(NZ)) &
       .AND.(PrimRootDepth(1,1,NZ).GT.SeedinDepth(NZ)+ppmc))THEN
-      IDAY(1,NB1(NZ),NZ)=I
+      iPlantCalendar(ipltcal_Emerge,NB1(NZ),NZ)=I
       VHeatCapCanP(NZ)=cpw*(CanPShootElmMass(ielmc,NZ)*10.0E-06_r8+WatByPCan(NZ))
     ENDIF
   ENDIF
@@ -486,61 +490,61 @@ module HfuncsMod
   associate(                           &
     PSICanP   =>  plt_ew%PSICanP     , &
     PSICanPTurg   =>  plt_ew%PSICanPTurg     , &
-    DYLN    =>  plt_site%DYLN    , &
-    DYLX    =>  plt_site%DYLX    , &
-    DYLM    =>  plt_site%DYLM    , &
+    DayLenthCurrent    =>  plt_site%DayLenthCurrent    , &
+    DayLenthPrev    =>  plt_site%DayLenthPrev    , &
+    DayLenthMax    =>  plt_site%DayLenthMax    , &
     ALAT    =>  plt_site%ALAT    , &
-    IFLGE   =>  plt_pheno%IFLGE  , &
-    IDAY    =>  plt_pheno%IDAY   , &
+    doPlantLeafOut   =>  plt_pheno%doPlantLeafOut  , &
+    iPlantCalendar   =>  plt_pheno%iPlantCalendar  , &
     IGTYP   =>  plt_pheno%IGTYP  , &
     VRNZ    =>  plt_pheno%VRNZ   , &
     VRNS    =>  plt_pheno%VRNS   , &
-    VRNL    =>  plt_pheno%VRNL   , &
+    HourThreshold4LeafOut   =>  plt_pheno%HourThreshold4LeafOut  , &
     IWTYP   =>  plt_pheno%IWTYP  , &
     TCZ     =>  plt_pheno%TCZ    , &
     VRNY    =>  plt_pheno%VRNY   , &
     TCG     =>  plt_pheno%TCG    , &
     CTC     =>  plt_pheno%CTC    , &
     TCX     =>  plt_pheno%TCX    , &
-    VRNF    =>  plt_pheno%VRNF   , &
-    VRNX    =>  plt_pheno%VRNX   , &
-    IFLGF   =>  plt_pheno%IFLGF    &
+    Hours4LeafOff    =>  plt_pheno%Hours4LeafOff   , &
+    HourThreshold4LeafOff   =>  plt_pheno%HourThreshold4LeafOff  , &
+    doPlantLeaveOff   =>  plt_pheno%doPlantLeaveOff    &
   )
 !
 ! CALCULATE EVERGREEN PHENOLOGY DURINGTopRootLayerLENGTHENINGTopRootLayerPHOTOPERIODS
 !
 ! IWTYP=phenology type from PFT file
-! DYLX,DLYN=daylength of previous,current day
-! VRNS,VRNF=leafout,leafoff hours
+! DayLenthPrev,DLYN=daylength of previous,current day
+! VRNS,Hours4LeafOff=leafout,leafoff hours
 ! VRNY=hourly counter for lengthening photoperiods
-! IFLGF=flag for enabling leafoff:0=enable,1=disable
+! doPlantLeaveOff=flag for enabling leafoff:0=enable,1=disable
 ! ALAT=latitude
 !
   IF(IWTYP(NZ).EQ.0)THEN
-    IF(DYLN.GE.DYLX)THEN
+    IF(DayLenthCurrent.GE.DayLenthPrev)THEN
       VRNS(NB,NZ)=VRNY(NB,NZ)
-      IF(VRNS(NB,NZ).GE.VRNL(NB,NZ) &
+      IF(VRNS(NB,NZ).GE.HourThreshold4LeafOut(NB,NZ) &
         .OR.(ALAT.GT.0.0_r8.AND.I.EQ.173) &
         .OR.(ALAT.LT.0.0_r8.AND.I.EQ.355))THEN
-        VRNF(NB,NZ)=0.0
-        IFLGF(NB,NZ)=0
+        Hours4LeafOff(NB,NZ)=0.0
+        doPlantLeaveOff(NB,NZ)=iEnable
       ENDIF
     ENDIF
 !
 !   CALCULATE EVERGREEN PHENOLOGY DURINGTopRootLayerSHORTENINGTopRootLayerPHOTOPERIODS
 !
-!   VRNS,VRNF=leafout,leafoff hours
+!   VRNS,Hours4LeafOff=leafout,leafoff hours
 !   VRNZ=hourly counter for shortening photoperiods
-!   IFLGE=flag for enabling leafout:0=enable,1=disable
+!   doPlantLeafOut=flag for enabling leafout:0=enable,1=disable
 !   ALAT=latitude
 !
-    IF(DYLN.LT.DYLX)THEN
-      VRNF(NB,NZ)=VRNZ(NB,NZ)
-      IF(VRNF(NB,NZ).GE.VRNX(NB,NZ) &
+    IF(DayLenthCurrent.LT.DayLenthPrev)THEN
+      Hours4LeafOff(NB,NZ)=VRNZ(NB,NZ)
+      IF(Hours4LeafOff(NB,NZ).GE.HourThreshold4LeafOff(NB,NZ) &
         .OR.(ALAT.GT.0.0_r8.AND.I.EQ.355) &
         .OR.(ALAT.LT.0.0_r8.AND.I.EQ.173))THEN
         VRNS(NB,NZ)=0.0
-        IFLGE(NB,NZ)=0
+        doPlantLeafOut(NB,NZ)=iEnable
       ENDIF
     ENDIF
 !
@@ -548,56 +552,58 @@ module HfuncsMod
 !   SPECIFIED TEMPERATURE DURINGTopRootLayerLENGTHENINGTopRootLayerPHOTOPERIODS
 !
 !   IWTYP=phenology type from PFT file
-!   DYLX,DLYN=daylength of previous,current day
+!   DayLenthPrev,DLYN=daylength of previous,current day
 !   VRNS,VRNL=leafout hours,hours required for leafout
-!   VRNF,VRNX=leafoff hours,hours required for leafoff
-!   IFLGE,IFLGF=flag for enabling leafout,leafoff:0=enable,1=disable
+!   Hours4LeafOff,VRNX=leafoff hours,hours required for leafoff
+!   doPlantLeafOut,doPlantLeaveOff=flag for enabling leafout,leafoff:0=enable,1=disable
 !   TCG,TCZ,CTC=canopy temp,leafout threshold temp,chilling temp
 !   ALAT=latitude
-!   IDAY(2,=date of floral initiation
+!   iPlantCalendar(ipltcal_InitFloral,=date of floral initiation
 !
   ELSEIF(IWTYP(NZ).EQ.1)THEN
-    IF((DYLN.GE.DYLX.OR.(DYLN.LT.DYLX.AND.VRNF(NB,NZ).LT.VRNX(NB,NZ))) &
-      .AND.IFLGE(NB,NZ).EQ.0)THEN
-        IF(TCG(NZ).GE.TCZ(NZ))THEN
-          VRNS(NB,NZ)=VRNS(NB,NZ)+1.0
-        ENDIF
-        IF(VRNS(NB,NZ).LT.VRNL(NB,NZ))THEN
-          IF(TCG(NZ).LT.CTC(NZ))THEN
-            VRNS(NB,NZ)=AZMAX1(VRNS(NB,NZ)-1.0)
-          ENDIF
-        ENDIF
-        IF(VRNS(NB,NZ).GE.VRNL(NB,NZ) &
-          .OR.(ALAT.GT.0.0.AND.I.EQ.173) &
-          .OR.(ALAT.LT.0.0.AND.I.EQ.355))THEN
-          VRNF(NB,NZ)=0.0
+    IF((DayLenthCurrent.GE.DayLenthPrev.OR.(DayLenthCurrent.LT.DayLenthPrev.AND.Hours4LeafOff(NB,NZ).LT.HourThreshold4LeafOff(NB,NZ))) &
+      .AND.doPlantLeafOut(NB,NZ).EQ.iEnable)THEN
+      IF(TCG(NZ).GE.TCZ(NZ))THEN
+        VRNS(NB,NZ)=VRNS(NB,NZ)+1.0
+      ENDIF
+      IF(VRNS(NB,NZ).LT.HourThreshold4LeafOut(NB,NZ))THEN
+        IF(TCG(NZ).LT.CTC(NZ))THEN
+          VRNS(NB,NZ)=AZMAX1(VRNS(NB,NZ)-1.0)
         ENDIF
       ENDIF
-      IF(IDAY(2,NB,NZ).NE.0.OR.(DYLN.LT.DYLX.AND.DYLN.LT.12.0))THEN
-        IFLGF(NB,NZ)=0
+      IF(VRNS(NB,NZ).GE.HourThreshold4LeafOut(NB,NZ) &
+        .OR.(ALAT.GT.0.0.AND.I.EQ.173) &
+        .OR.(ALAT.LT.0.0.AND.I.EQ.355))THEN
+        Hours4LeafOff(NB,NZ)=0.0
       ENDIF
+    ENDIF
+
+    IF(iPlantCalendar(ipltcal_InitFloral,NB,NZ).NE.0.OR. &
+      (DayLenthCurrent.LT.DayLenthPrev.AND.DayLenthCurrent.LT.12.0_r8))THEN
+      doPlantLeaveOff(NB,NZ)=iEnable
+    ENDIF
 !
 !     CALCULATE WINTER DECIDUOUS PHENOLOGY BY ACCUMULATINGTopRootLayerHOURS BELOW
 !     SPECIFIED TEMPERATURE DURINGTopRootLayerSHORTENINGTopRootLayerPHOTOPERIODS
 !
-!     DYLX,DLYN=daylength of previous,current day
+!     DayLenthPrev,DLYN=daylength of previous,current day
 !     VRNS,VRNL=leafout hours,hours required for leafout
-!     VRNF,VRNX=leafoff hours,hours required for leafoff
-!     IFLGE,IFLGF=flag for enabling leafout,leafoff:0=enable,1=disable
+!     Hours4LeafOff,VRNX=leafoff hours,hours required for leafoff
+!     doPlantLeafOut,doPlantLeaveOff=flag for enabling leafout,leafoff:0=enable,1=disable
 !     TCG,TCZ,CTC=canopy temp,leafout threshold temp,chilling temp
 !     ALAT=latitude
-!     IDAY(2,=date of floral initiation
+!     iPlantCalendar(ipltcal_InitFloral,=date of floral initiation
 !
-      IF(DYLN.LT.DYLX.AND.IFLGF(NB,NZ).EQ.0 &
-        .AND.IDAY(2,NB,NZ).NE.0)THEN
-        IF(TCG(NZ).LE.TCX(NZ))THEN
-          VRNF(NB,NZ)=VRNF(NB,NZ)+1.0
-        ENDIF
-        IF(VRNF(NB,NZ).GE.VRNX(NB,NZ).AND.IFLGE(NB,NZ).EQ.1)THEN
-          VRNS(NB,NZ)=0.0
-          IFLGE(NB,NZ)=0
-        ENDIF
+    IF(DayLenthCurrent.LT.DayLenthPrev.AND.doPlantLeaveOff(NB,NZ).EQ.iEnable &
+      .AND.iPlantCalendar(ipltcal_InitFloral,NB,NZ).NE.0)THEN
+      IF(TCG(NZ).LE.TCX(NZ))THEN
+        Hours4LeafOff(NB,NZ)=Hours4LeafOff(NB,NZ)+1.0_r8
       ENDIF
+      IF(Hours4LeafOff(NB,NZ).GE.HourThreshold4LeafOff(NB,NZ).AND.doPlantLeafOut(NB,NZ).EQ.iDisable)THEN
+        VRNS(NB,NZ)=0.0
+        doPlantLeafOut(NB,NZ)=iEnable
+      ENDIF
+    ENDIF
 
 !
 !     CALCULATE DROUGHT DECIDUOUS PHENOLOGY BY ACCUMULATINGTopRootLayerHOURS
@@ -605,61 +611,59 @@ module HfuncsMod
 !
 !     IWTYP=phenology type from PFT file
 !     VRNS,VRNL=leafout hours,hours required for leafout
-!     VRNF=leafoff hours
-!     IFLGE,IFLGF=flag for enabling leafout,leafoff:0=enable,1=disable
+!     Hours4LeafOff=leafoff hours
+!     doPlantLeafOut,doPlantLeaveOff=flag for enabling leafout,leafoff:0=enable,1=disable
 !     PSICanP=canopy total water potential
 !     PSILX,PSILY=minimum canopy water potential for leafout,leafoff
 !     ALAT=latitude
-!     IDAY(2,=date of floral initiation
+!     iPlantCalendar(ipltcal_InitFloral,=date of floral initiation
 !
-    ELSEIF(IWTYP(NZ).EQ.2.OR.IWTYP(NZ).EQ.4 &
-      .OR.IWTYP(NZ).EQ.5)THEN
-      IF(IFLGE(NB,NZ).EQ.0)THEN
-        IF(PSICanP(NZ).GE.PSILX)THEN
-          VRNS(NB,NZ)=VRNS(NB,NZ)+1.0
-        ENDIF
-        IF(VRNS(NB,NZ).LT.VRNL(NB,NZ))THEN
-          IF(PSICanP(NZ).LT.PSILY(IGTYP(NZ)))THEN
-            VRNS(NB,NZ)=AZMAX1(VRNS(NB,NZ)-12.0)
-          ENDIF
-        ENDIF
-        IF(VRNS(NB,NZ).GE.VRNL(NB,NZ))THEN
-          VRNF(NB,NZ)=0.0
-          IF(IDAY(2,NB,NZ).NE.0)IFLGF(NB,NZ)=0
+  ELSEIF(IWTYP(NZ).EQ.2.OR.IWTYP(NZ).EQ.4.OR.IWTYP(NZ).EQ.5)THEN
+    IF(doPlantLeafOut(NB,NZ).EQ.iEnable)THEN
+      IF(PSICanP(NZ).GE.PSILX)THEN
+        VRNS(NB,NZ)=VRNS(NB,NZ)+1.0_r8
+      ENDIF
+      IF(VRNS(NB,NZ).LT.HourThreshold4LeafOut(NB,NZ))THEN
+        IF(PSICanP(NZ).LT.PSILY(IGTYP(NZ)))THEN
+          VRNS(NB,NZ)=AZMAX1(VRNS(NB,NZ)-12.0)
         ENDIF
       ENDIF
-      IF(IDAY(2,NB,NZ).NE.0)IFLGF(NB,NZ)=0
+      IF(VRNS(NB,NZ).GE.HourThreshold4LeafOut(NB,NZ))THEN
+        Hours4LeafOff(NB,NZ)=0.0_r8
+        IF(iPlantCalendar(ipltcal_InitFloral,NB,NZ).NE.0)doPlantLeaveOff(NB,NZ)=iEnable
+      ENDIF
+    ENDIF
+    IF(iPlantCalendar(ipltcal_InitFloral,NB,NZ).NE.0)doPlantLeaveOff(NB,NZ)=iEnable
 !
 !     CALCULATE DROUGHT DECIDUOUS PHENOLOGY BY ACCUMULATINGTopRootLayerHOURS
 !     BELOW SPECIFIED WATER POTENTIAL DURINGTopRootLayerGROWINGTopRootLayerSEASON
 !
 !     VRNS=leafout hours,hours required for leafout
-!     VRNF,VRNX=leafoff hours,hours required for leafoff
-!     IFLGE,IFLGF=flag for enabling leafout,leafoff:0=enable,1=disable
+!     Hours4LeafOff,VRNX=leafoff hours,hours required for leafoff
+!     doPlantLeafOut,doPlantLeaveOff=flag for enabling leafout,leafoff:0=enable,1=disable
 !     PSICanP=canopy total water potential
 !     PSILX,PSILY=minimum canopy water potential for leafout,leafoff
 !     ALAT=latitude
-!     IDAY(2,=date of floral initiation
+!     iPlantCalendar(ipltcal_InitFloral,=date of floral initiation
 !     VRNY,VRNZ=hourly counter for lengthening,shortening photoperiods
 !     VRNE=maximum hours for leafout,leafoff
 !
-      IF(IFLGE(NB,NZ).EQ.1.AND.IFLGF(NB,NZ).EQ.0)THEN
+      IF(doPlantLeafOut(NB,NZ).EQ.iDisable.AND.doPlantLeaveOff(NB,NZ).EQ.iEnable)THEN
         IF(PSICanP(NZ).LT.PSILY(IGTYP(NZ)))THEN
-          VRNF(NB,NZ)=VRNF(NB,NZ)+1.0
+          Hours4LeafOff(NB,NZ)=Hours4LeafOff(NB,NZ)+1.0_r8
         ENDIF
         IF(IWTYP(NZ).EQ.4)THEN
           IF(VRNZ(NB,NZ).GT.VRNE)THEN
-            VRNF(NB,NZ)=VRNZ(NB,NZ)
+            Hours4LeafOff(NB,NZ)=VRNZ(NB,NZ)
           ENDIF
         ELSEIF(IWTYP(NZ).EQ.5)THEN
           IF(VRNY(NB,NZ).GT.VRNE)THEN
-            VRNF(NB,NZ)=VRNY(NB,NZ)
+            Hours4LeafOff(NB,NZ)=VRNY(NB,NZ)
           ENDIF
         ENDIF
-        IF(VRNF(NB,NZ).GE.VRNX(NB,NZ) &
-          .AND.IFLGE(NB,NZ).EQ.1)THEN
-          VRNS(NB,NZ)=0.0
-          IFLGE(NB,NZ)=0
+        IF(Hours4LeafOff(NB,NZ).GE.HourThreshold4LeafOff(NB,NZ).AND.doPlantLeafOut(NB,NZ).EQ.iDisable)THEN
+          VRNS(NB,NZ)=0.0_r8
+          doPlantLeafOut(NB,NZ)=iEnable
         ENDIF
       ENDIF
 !
@@ -668,57 +672,56 @@ module HfuncsMod
 !     LENGTHENINGTopRootLayerPHOTOPERIODS
 !
 !     IWTYP=phenology type from PFT file
-!     DYLX,DLYN=daylength of previous,current day
+!     DayLenthPrev,DLYN=daylength of previous,current day
 !     VRNS,VRNL=leafout hours,hours required for leafout
-!     VRNF,VRNX=leafoff hours,hours required for leafoff
+!     Hours4LeafOff,VRNX=leafoff hours,hours required for leafoff
 !     PSICanP=canopy total water potential
 !     PSILX,PSILY=minimum canopy water potential for leafout,leafoff
-!     IFLGE,IFLGF=flag for enabling leafout,leafoff:0=enable,1=disable
+!     doPlantLeafOut,doPlantLeaveOff=flag for enabling leafout,leafoff:0=enable,1=disable
 !     TCG,TCZ,CTC=canopy temp,leafout threshold temp,chilling temp
 !     ALAT=latitude
-!     IDAY(2,=date of floral initiation
+!     iPlantCalendar(ipltcal_InitFloral,=date of floral initiation
 !
     ELSEIF(IWTYP(NZ).EQ.3)THEN
-      IF((DYLN.GE.DYLX.OR.DYLN.GE.DYLM-2.0_r8).AND.IFLGE(NB,NZ).EQ.0)THEN
+      IF((DayLenthCurrent.GE.DayLenthPrev.OR.DayLenthCurrent.GE.DayLenthMax-2.0_r8).AND.doPlantLeafOut(NB,NZ).EQ.iEnable)THEN
         IF(TCG(NZ).GE.TCZ(NZ).AND.PSICanPTurg(NZ).GT.PSILM)THEN
-          VRNS(NB,NZ)=VRNS(NB,NZ)+1.0
+          VRNS(NB,NZ)=VRNS(NB,NZ)+1.0_r8
         ENDIF
-        IF(VRNS(NB,NZ).LT.VRNL(NB,NZ))THEN
-          IF(TCG(NZ).LT.CTC(NZ) &
-            .OR.PSICanPTurg(NZ).LT.PSILM)THEN
-            VRNS(NB,NZ)=AZMAX1(VRNS(NB,NZ)-1.5)
+        IF(VRNS(NB,NZ).LT.HourThreshold4LeafOut(NB,NZ))THEN
+          IF(TCG(NZ).LT.CTC(NZ).OR.PSICanPTurg(NZ).LT.PSILM)THEN
+            VRNS(NB,NZ)=AZMAX1(VRNS(NB,NZ)-1.5_r8)
           ENDIF
         ENDIF
-        IF(VRNS(NB,NZ).GE.VRNL(NB,NZ))THEN
-          VRNF(NB,NZ)=0.0
-          IF(IDAY(2,NB,NZ).NE.0)IFLGF(NB,NZ)=0
+        IF(VRNS(NB,NZ).GE.HourThreshold4LeafOut(NB,NZ))THEN
+          Hours4LeafOff(NB,NZ)=0.0_r8
+          IF(iPlantCalendar(ipltcal_InitFloral,NB,NZ).NE.0)doPlantLeaveOff(NB,NZ)=iEnable
         ENDIF
       ENDIF
-      IF(IDAY(2,NB,NZ).NE.0)IFLGF(NB,NZ)=0
+      IF(iPlantCalendar(ipltcal_InitFloral,NB,NZ).NE.0)doPlantLeaveOff(NB,NZ)=iEnable
 !
 !     CALCULATE WINTER AND DROUGHT DECIDUOUS PHENOLOGY BY ACCUMULATING
 !     HOURS BELOW SPECIFIED TEMPERATURE OR WATER POTENTIAL DURING
 !     SHORTENINGTopRootLayerPHOTOPERIODS
 !
-!     DYLX,DLYN=daylength of previous,current day
+!     DayLenthPrev,DLYN=daylength of previous,current day
 !     VRNS,VRNL=leafout hours,hours required for leafout
-!     VRNF,VRNX=leafoff hours,hours required for leafoff
-!     IFLGE,IFLGF=flag for enabling leafout,leafoff:0=enable,1=disable
+!     Hours4LeafOff,VRNX=leafoff hours,hours required for leafoff
+!     doPlantLeafOut,doPlantLeaveOff=flag for enabling leafout,leafoff:0=enable,1=disable
 !     TCG,TCZ,CTC=canopy temp,leafout threshold temp,chilling temp
 !     PSICanP=canopy total water potential
 !     PSILX,PSILY=minimum canopy water potential for leafout,leafoff
 !     ALAT=latitude
-!     IDAY(2,=date of floral initiation
+!     iPlantCalendar(ipltcal_InitFloral,=date of floral initiation
 !
-      IF((DYLN.LT.DYLX.OR.DYLN.LT.24.0-DYLM+2.0_r8).AND.IFLGF(NB,NZ).EQ.0)THEN
+      IF((DayLenthCurrent.LT.DayLenthPrev.OR.DayLenthCurrent.LT.24.0_r8-DayLenthMax+2.0_r8) &
+        .AND.doPlantLeaveOff(NB,NZ).EQ.iEnable)THEN
         IF(TCG(NZ).LE.TCX(NZ).OR.PSICanP(NZ).LT.PSILY(IGTYP(NZ)))THEN
-          VRNF(NB,NZ)=VRNF(NB,NZ)+1.0
+          Hours4LeafOff(NB,NZ)=Hours4LeafOff(NB,NZ)+1.0_r8
         ENDIF
-        IF(VRNF(NB,NZ).GE.VRNX(NB,NZ) &
-          .AND.IFLGE(NB,NZ).EQ.1)THEN
-        VRNS(NB,NZ)=0.0
-        IFLGE(NB,NZ)=0
-      ENDIF
+        IF(Hours4LeafOff(NB,NZ).GE.HourThreshold4LeafOff(NB,NZ).AND.doPlantLeafOut(NB,NZ).EQ.iDisable)THEN
+          VRNS(NB,NZ)=0.0
+          doPlantLeafOut(NB,NZ)=iEnable
+        ENDIF
     ENDIF
   ENDIF
   end associate
@@ -727,7 +730,9 @@ module HfuncsMod
 
   subroutine living_branch_phenology(I,J,NB,NZ)
   implicit none
-  integer, intent(in) :: I,J,NB,NZ
+  integer, intent(in) :: I,J
+  integer, intent(in) :: NB  !plant branch id
+  integer, intent(in) :: NZ  !plant species id
 
   real(r8) :: ACTV,OFNG
   real(r8) :: PPD
@@ -736,25 +741,25 @@ module HfuncsMod
 
 ! begin_execution
   associate(                        &
-    IYR0    =>  plt_distb%IYR0    , &
-    IDAY0   =>  plt_distb%IDAY0   , &
+    iYearPlanting    =>  plt_distb%iYearPlanting    , &
+    iDayPlanting   =>  plt_distb%iDayPlanting   , &
     SnowDepth   =>  plt_ew%SnowDepth      , &
     PSICanP   =>  plt_ew%PSICanP      , &
     ZERO    =>  plt_site%ZERO     , &
-    DYLN    =>  plt_site%DYLN     , &
-    IYRC    =>  plt_site%IYRC     , &
-    DYLX    =>  plt_site%DYLX     , &
+    DayLenthCurrent    =>  plt_site%DayLenthCurrent     , &
+    iYearCurrent    =>  plt_site%iYearCurrent     , &
+    DayLenthPrev    =>  plt_site%DayLenthPrev     , &
     TKG     =>  plt_pheno%TKG     , &
-    IDAY    =>  plt_pheno%IDAY    , &
+    iPlantCalendar   =>  plt_pheno%iPlantCalendar   , &
     XRLA    =>  plt_pheno%XRLA    , &
     GSTGF   =>  plt_pheno%GSTGF   , &
     OFFST   =>  plt_pheno%OFFST   , &
     ISTYP   =>  plt_pheno%ISTYP   , &
-    IFLGE   =>  plt_pheno%IFLGE   , &
+    doPlantLeafOut   =>  plt_pheno%doPlantLeafOut   , &
     VSTG    =>  plt_morph%VSTG    , &
     GSTGI   =>  plt_pheno%GSTGI   , &
     DGSTGF  =>  plt_pheno%DGSTGF  , &
-    IFLGG   =>  plt_pheno%IFLGG   , &
+    doPlantSenescence   =>  plt_pheno%doPlantSenescence   , &
     VSTGX   =>  plt_pheno%VSTGX   , &
     IDTYP   =>  plt_pheno%IDTYP   , &
     TGSTGF  =>  plt_pheno%TGSTGF  , &
@@ -764,14 +769,14 @@ module HfuncsMod
     TGSTGI  =>  plt_pheno%TGSTGI  , &
     GROUP   =>  plt_pheno%GROUP   , &
     IWTYP   =>  plt_pheno%IWTYP   , &
-    VRNL    =>  plt_pheno%VRNL    , &
+    HourThreshold4LeafOut   =>  plt_pheno%HourThreshold4LeafOut   , &
     IPTYP   =>  plt_pheno%IPTYP   , &
-    IFLGA   =>  plt_pheno%IFLGA   , &
+    doInitLeafOut   =>  plt_pheno%doInitLeafOut   , &
     GROUPI  =>  plt_pheno%GROUPI  , &
     PlantO2Stress    =>  plt_pheno%PlantO2Stress    , &
     VRNS    =>  plt_pheno%VRNS    , &
-    VRNF    =>  plt_pheno%VRNF    , &
-    VRNX    =>  plt_pheno%VRNX    , &
+    Hours4LeafOff    =>  plt_pheno%Hours4LeafOff    , &
+    HourThreshold4LeafOff   =>  plt_pheno%HourThreshold4LeafOff   , &
     XRNI    =>  plt_pheno%XRNI    , &
     CanopyHeight      =>  plt_morph%CanopyHeight      , &
     PSTG    =>   plt_morph%PSTG   , &
@@ -779,10 +784,11 @@ module HfuncsMod
     PSTGF   =>   plt_morph%PSTGF  , &
     NB1     =>   plt_morph%NB1      &
   )
-  IF(IDAY(1,NB,NZ).EQ.0)THEN
-    IDAY(1,NB,NZ)=I
-    IFLGA(NB,NZ)=1
-    IFLGE(NB,NZ)=0
+  IF(iPlantCalendar(ipltcal_Emerge,NB,NZ).EQ.0)THEN
+    !plant emergence
+    iPlantCalendar(ipltcal_Emerge,NB,NZ)=I
+    doInitLeafOut(NB,NZ)=iDisable
+    doPlantLeafOut(NB,NZ)=iEnable
     VRNS(NB,NZ)=0.5_r8*VRNS(NB1(NZ),NZ)
   ENDIF
 !
@@ -790,8 +796,8 @@ module HfuncsMod
 ! FROM TEMPERATURE FUNCTION CALCULATED IN 'UPTAKE' AND
 ! RATES AT 25C ENTERED IN 'READQ' EXCEPT WHEN DORMANT
 !
-! IWTYP=phenology type from PFT file
-! VRNF,VRNX=leafoff hours,hours required for leafoff
+! IWTYP=phenology type from PFT file, 0=evergreen,1=cold deciduous, 2=drought deciduous,3=1+2
+! Hours4LeafOff,VRNX=leafoff hours,hours required for leafoff
 ! TKG,TKCO=canopy temperature,canopy temp used in Arrhenius eqn
 ! OFFST=shift in Arrhenius curve for thermal adaptation
 ! TFNP=temperature function for phenology (25 oC =1 )
@@ -800,12 +806,13 @@ module HfuncsMod
 ! RNI,RLA=rates of node initiation,leaf appearance
 ! XRNI,XRLA=rate of node initiation,leaf appearance at 25 oC (h-1)
 !
-  IF(IWTYP(NZ).EQ.0.OR.VRNF(NB,NZ).LT.VRNX(NB,NZ))THEN
+  IF(IWTYP(NZ).EQ.0.OR.Hours4LeafOff(NB,NZ).LT.HourThreshold4LeafOff(NB,NZ))THEN
     TKCO=TKG(NZ)+OFFST(NZ)
     RTK=RGAS*TKCO
     STK=710.0_r8*TKCO
     ACTV=1+EXP((197500_r8-STK)/RTK)+EXP((STK-218500._r8)/RTK)
     TFNP=EXP(24.269_r8-60000._r8/RTK)/ACTV
+    
     RNI=AZMAX1(XRNI(NZ)*TFNP)
     RLA=AZMAX1(XRLA(NZ)*TFNP)
 !
@@ -815,12 +822,12 @@ module HfuncsMod
 !   WFNG=water stress effect on phenology
 !
     IF(ISTYP(NZ).EQ.iplt_annual)THEN
-      IF(IDAY(6,NB,NZ).EQ.0)THEN
+      IF(iPlantCalendar(ipltcal_Anthesis,NB,NZ).EQ.0)THEN
         WFNG=EXP(0.025_r8*PSICanP(NZ))
         RNI=RNI*WFNG
         RLA=RLA*WFNG
       ENDIF
-      IF(IDAY(2,NB,NZ).EQ.0)THEN
+      IF(iPlantCalendar(ipltcal_InitFloral,NB,NZ).EQ.0)THEN
         OFNG=SQRT(PlantO2Stress(NZ))
         RNI=RNI*OFNG
         RLA=RLA*OFNG
@@ -846,21 +853,21 @@ module HfuncsMod
 !   GSTGF=reproductive node number normalized for maturity group
 !   PSTGF=node number at flowering
 !   DGSTGF,TGSTGF=hourly,total change in GSTGF
-!   IFLGG=PFT senescence flag
+!   doPlantSenescence=PFT senescence flag
 !
-    IF(IDAY(2,NB,NZ).NE.0)THEN
+    IF(iPlantCalendar(ipltcal_InitFloral,NB,NZ).NE.0)THEN
       GSTGI(NB,NZ)=(PSTG(NB,NZ)-PSTGI(NB,NZ))/GROUPI(NZ)
       DGSTGI(NB,NZ)=RNI/(GROUPI(NZ)*GSTGG)
       TGSTGI(NB,NZ)=TGSTGI(NB,NZ)+DGSTGI(NB,NZ)
     ENDIF
-    IF(IDAY(6,NB,NZ).NE.0)THEN
+    IF(iPlantCalendar(ipltcal_Anthesis,NB,NZ).NE.0)THEN
       GSTGF(NB,NZ)=(PSTG(NB,NZ)-PSTGF(NB,NZ))/GROUPI(NZ)
       DGSTGF(NB,NZ)=RNI/(GROUPI(NZ)*GSTGR)
       TGSTGF(NB,NZ)=TGSTGF(NB,NZ)+DGSTGF(NB,NZ)
     ENDIF
-    IFLGG(NB,NZ)=1
+    doPlantSenescence(NB,NZ)=itrue
   ELSE
-    IFLGG(NB,NZ)=0
+    doPlantSenescence(NB,NZ)=ifalse
   ENDIF
 !
 ! REPRODUCTIVE GROWTH STAGES ADVANCE WHEN THRESHOLD NUMBER
@@ -872,21 +879,21 @@ module HfuncsMod
 ! PSTGI=node number at floral initiation
 ! GROUP=node number required for floral initiation
 ! VRNS,VRNL=leafout hours,hours required for leafout
-! DYLX,DLYN=daylength of previous,current day
+! DayLenthPrev,DLYN=daylength of previous,current day
 ! ISTYP=growth habit from PFT file
 ! IWTYP=phenology type from PFT file
 ! ZC,SnowDepth=canopy height,snowpack depth
 !
-  IF(IDAY(2,NB,NZ).EQ.0)THEN
+  IF(iPlantCalendar(ipltcal_InitFloral,NB,NZ).EQ.0)THEN
     IF(PSTG(NB,NZ).GT.GROUP(NB,NZ)+PSTGI(NB,NZ) &
-      .AND.((VRNS(NB,NZ).GE.VRNL(NB,NZ)) &
-      .OR.(I.GE.IDAY0(NZ).AND.IYRC.EQ.IYR0(NZ) &
-      .AND.DYLN.GT.DYLX)) &
+      .AND.((VRNS(NB,NZ).GE.HourThreshold4LeafOut(NB,NZ)) &
+      .OR.(I.GE.iDayPlanting(NZ).AND.iYearCurrent.EQ.iYearPlanting(NZ) &
+      .AND.DayLenthCurrent.GT.DayLenthPrev)) &
       .OR.(((ISTYP(NZ).EQ.iplt_preanu.AND.(IWTYP(NZ).EQ.1 &
       .OR.IWTYP(NZ).EQ.3)) &
       .OR.(ISTYP(NZ).EQ.iplt_annual.AND.IWTYP(NZ).EQ.0)) &
       .AND.CanopyHeight(NZ).GE.SnowDepth-ZERO &
-      .AND.DYLN.LT.DYLX))THEN
+      .AND.DayLenthCurrent.LT.DayLenthPrev))THEN
 !
 !     FINAL VEGETATIVE NODE NUMBER DEPENDS ON PHOTOPERIOD FROM 'DAY'
 !     AND ON MATURITY GROUP, CRITICAL PHOTOPERIOD AND PHOTOPERIOD
@@ -895,14 +902,14 @@ module HfuncsMod
 !     IPTYP=photoperiod type from PFT file
 !     PPD=photoperiod sensitivity
 !     XDL=critical photoperiod from PFT file
-!     IDAY(2,=date of floral initiation
+!     iPlantCalendar(ipltcal_InitFloral,=date of floral initiation
 !     VSTGX=node number on date of floral initiation
 !
       IF(IPTYP(NZ).EQ.0)THEN
         PPD=0.0_r8
       ELSE
-        PPD=AZMAX1(XDL(NZ)-DYLN)
-        IF(IPTYP(NZ).EQ.1.AND.DYLN.GE.DYLX)PPD=0.0_r8
+        PPD=AZMAX1(XDL(NZ)-DayLenthCurrent)
+        IF(IPTYP(NZ).EQ.1.AND.DayLenthCurrent.GE.DayLenthPrev)PPD=0.0_r8
       ENDIF
 
       IF(IPTYP(NZ).EQ.0 &
@@ -912,8 +919,8 @@ module HfuncsMod
         .OR.IWTYP(NZ).EQ.3)) &
         .OR.(ISTYP(NZ).EQ.iplt_annual.AND.IWTYP(NZ).EQ.0)) &
         .AND.CanopyHeight(NZ).GE.SnowDepth-ZERO &
-        .AND.DYLN.LT.DYLX))THEN
-        IDAY(2,NB,NZ)=I
+        .AND.DayLenthCurrent.LT.DayLenthPrev))THEN
+        iPlantCalendar(ipltcal_InitFloral,NB,NZ)=I
         PSTGI(NB,NZ)=PSTG(NB,NZ)
         IF(ISTYP(NZ).EQ.iplt_annual.AND.IDTYP(NZ).EQ.0)THEN
           VSTGX(NB,NZ)=PSTG(NB,NZ)
@@ -925,115 +932,115 @@ module HfuncsMod
 !
 !   GSTGI=vegetative node number normalized for maturity group
 !   GSTGG=normalized growth stage durations for vegetative phenology
-!   IDAY(3,=start of stem elongation and setting max seed number
+!   iPlantCalendar(ipltcal_Jointing,=start of stem elongation and setting max seed number
 !
-  ELSEIF(IDAY(3,NB,NZ).EQ.0)THEN
+  ELSEIF(iPlantCalendar(ipltcal_Jointing,NB,NZ).EQ.0)THEN
     IF(GSTGI(NB,NZ).GT.0.25_r8*GSTGG &
       .OR.((IWTYP(NZ).EQ.1.OR.IWTYP(NZ).EQ.3) &
       .AND.ISTYP(NZ).NE.iplt_annual.AND.IPTYP(NZ).NE.1 &
-      .AND.DYLN.LT.DYLX.AND.IFLGE(NB,NZ).EQ.1 &
-      .AND.VRNF(NB,NZ).GT.VRNX(NB,NZ)) &
+      .AND.DayLenthCurrent.LT.DayLenthPrev.AND.doPlantLeafOut(NB,NZ).EQ.iDisable &
+      .AND.Hours4LeafOff(NB,NZ).GT.HourThreshold4LeafOff(NB,NZ)) &
       .OR.(IWTYP(NZ).EQ.2.AND.ISTYP(NZ).EQ.iplt_annual) &
-      .AND.IFLGE(NB,NZ).EQ.1 &
-      .AND.VRNF(NB,NZ).GT.VRNX(NB,NZ))THEN
-      IDAY(3,NB,NZ)=I
+      .AND.doPlantLeafOut(NB,NZ).EQ.iDisable &
+      .AND.Hours4LeafOff(NB,NZ).GT.HourThreshold4LeafOff(NB,NZ))THEN
+      iPlantCalendar(ipltcal_Jointing,NB,NZ)=I
     ENDIF
 !
-!   IDAY(4,=mid stem elongation
+!   iPlantCalendar(ipltcal_Elongation,=mid stem elongation
 !
-  ELSEIF(IDAY(4,NB,NZ).EQ.0)THEN
+  ELSEIF(iPlantCalendar(ipltcal_Elongation,NB,NZ).EQ.0)THEN
     IF(GSTGI(NB,NZ).GT.0.50*GSTGG &
       .OR.((IWTYP(NZ).EQ.1.OR.IWTYP(NZ).EQ.3) &
       .AND.ISTYP(NZ).NE.iplt_annual.AND.IPTYP(NZ).NE.1 &
-      .AND.DYLN.LT.DYLX.AND.IFLGE(NB,NZ).EQ.1 &
-      .AND.VRNF(NB,NZ).GT.VRNX(NB,NZ)) &
+      .AND.DayLenthCurrent.LT.DayLenthPrev.AND.doPlantLeafOut(NB,NZ).EQ.iDisable &
+      .AND.Hours4LeafOff(NB,NZ).GT.HourThreshold4LeafOff(NB,NZ)) &
       .OR.(IWTYP(NZ).EQ.2.AND.ISTYP(NZ).EQ.iplt_annual) &
-      .AND.IFLGE(NB,NZ).EQ.1 &
-      .AND.VRNF(NB,NZ).GT.VRNX(NB,NZ))THEN
-      IDAY(4,NB,NZ)=I
+      .AND.doPlantLeafOut(NB,NZ).EQ.iDisable &
+      .AND.Hours4LeafOff(NB,NZ).GT.HourThreshold4LeafOff(NB,NZ))THEN
+      iPlantCalendar(ipltcal_Elongation,NB,NZ)=I
       IF(ISTYP(NZ).EQ.iplt_annual.AND.IDTYP(NZ).NE.0)THEN
         VSTGX(NB,NZ)=PSTG(NB,NZ)
       ENDIF
     ENDIF
 !
-!   IDAY(5,=end of stem elongation and setting max seed number
+!   iPlantCalendar(ipltcal_Heading,=end of stem elongation and setting max seed number
 !
-  ELSEIF(IDAY(5,NB,NZ).EQ.0)THEN
+  ELSEIF(iPlantCalendar(ipltcal_Heading,NB,NZ).EQ.0)THEN
     IF(GSTGI(NB,NZ).GT.1.00*GSTGG &
       .OR.((IWTYP(NZ).EQ.1.OR.IWTYP(NZ).EQ.3) &
       .AND.ISTYP(NZ).NE.iplt_annual.AND.IPTYP(NZ).NE.1 &
-      .AND.DYLN.LT.DYLX.AND.IFLGE(NB,NZ).EQ.1 &
-      .AND.VRNF(NB,NZ).GT.VRNX(NB,NZ)) &
+      .AND.DayLenthCurrent.LT.DayLenthPrev.AND.doPlantLeafOut(NB,NZ).EQ.iDisable &
+      .AND.Hours4LeafOff(NB,NZ).GT.HourThreshold4LeafOff(NB,NZ)) &
       .OR.(IWTYP(NZ).EQ.2.AND.ISTYP(NZ).EQ.iplt_annual) &
-      .AND.IFLGE(NB,NZ).EQ.1 &
-      .AND.VRNF(NB,NZ).GT.VRNX(NB,NZ))THEN
-      IDAY(5,NB,NZ)=I
+      .AND.doPlantLeafOut(NB,NZ).EQ.iDisable &
+      .AND.Hours4LeafOff(NB,NZ).GT.HourThreshold4LeafOff(NB,NZ))THEN
+      iPlantCalendar(ipltcal_Heading,NB,NZ)=I
     ENDIF
 !
 !   ANTHESIS OCCURS WHEN THE NUMBER OF LEAVES THAT HAVE APPEARED
 !   EQUALS THE NUMBER OF NODES INITIATED WHEN THE FINAL VEGETATIVE
 !   NODE NUMBER WAS SET ABOVE
 !
-!   IDAY(6,=start of anthesis and setting final seed number
+!   iPlantCalendar(ipltcal_Anthesis,=start of anthesis and setting final seed number
 !   VSTG=number of leaves appeared
 !   PSTGI=node number at floral initiation
 !   ISTYP,IWTYP,IPTYP=growth habit,phenology,photoperiod type from PFT file
-!   IFLGE=flag for enabling leafout:0=enable,1=disable
-!   VRNF,VRNX=leafoff hours,hours required for leafoff
-!   DYLX,DLYN=daylength of previous,current day
+!   doPlantLeafOut=flag for enabling leafout:0=enable,1=disable
+!   Hours4LeafOff,VRNX=leafoff hours,hours required for leafoff
+!   DayLenthPrev,DLYN=daylength of previous,current day
 !   PSTGF=number of nodes at anthesis
 !
-  ELSEIF(IDAY(6,NB,NZ).EQ.0)THEN
+  ELSEIF(iPlantCalendar(ipltcal_Anthesis,NB,NZ).EQ.0)THEN
     IF((VSTG(NB,NZ).GT.PSTGI(NB,NZ)) &
-      .OR.(ISTYP(NZ).NE.iplt_annual.AND.IDAY(5,NB,NZ).NE.0) &
+      .OR.(ISTYP(NZ).NE.iplt_annual.AND.iPlantCalendar(ipltcal_Heading,NB,NZ).NE.0) &
       .OR.((IWTYP(NZ).EQ.1.OR.IWTYP(NZ).EQ.3) &
       .AND.ISTYP(NZ).NE.iplt_annual.AND.IPTYP(NZ).NE.1 &
-      .AND.DYLN.LT.DYLX.AND.IFLGE(NB,NZ).EQ.1 &
-      .AND.VRNF(NB,NZ).GT.VRNX(NB,NZ)) &
+      .AND.DayLenthCurrent.LT.DayLenthPrev.AND.doPlantLeafOut(NB,NZ).EQ.iDisable &
+      .AND.Hours4LeafOff(NB,NZ).GT.HourThreshold4LeafOff(NB,NZ)) &
       .OR.(IWTYP(NZ).EQ.2.AND.ISTYP(NZ).EQ.iplt_annual) &
-      .AND.IFLGE(NB,NZ).EQ.1 &
-      .AND.VRNF(NB,NZ).GT.VRNX(NB,NZ))THEN
-      IF(NB.EQ.NB1(NZ).OR.IDAY(6,NB1(NZ),NZ).NE.0)THEN
-        IDAY(6,NB,NZ)=I
+      .AND.doPlantLeafOut(NB,NZ).EQ.iDisable &
+      .AND.Hours4LeafOff(NB,NZ).GT.HourThreshold4LeafOff(NB,NZ))THEN
+      IF(NB.EQ.NB1(NZ).OR.iPlantCalendar(ipltcal_Anthesis,NB1(NZ),NZ).NE.0)THEN
+        iPlantCalendar(ipltcal_Anthesis,NB,NZ)=I
         PSTGF(NB,NZ)=PSTG(NB,NZ)
       ENDIF
     ENDIF
 !
 !   START GRAIN FILL PERIOD
 !
-!   IDAY(7,=start of grain filling and setting max seed size
+!   iPlantCalendar(ipltcal_BeginSeedFill,=start of grain filling and setting max seed size
 !   GSTGF=reproductive node number normalized for maturity group
 !   GSTGR=normalized growth stage durations for reproductive phenology
 !
 !
-  ELSEIF(IDAY(7,NB,NZ).EQ.0)THEN
+  ELSEIF(iPlantCalendar(ipltcal_BeginSeedFill,NB,NZ).EQ.0)THEN
     IF(GSTGF(NB,NZ).GT.0.50*GSTGR &
       .OR.((IWTYP(NZ).EQ.1.OR.IWTYP(NZ).EQ.3) &
       .AND.ISTYP(NZ).NE.iplt_annual.AND.IPTYP(NZ).NE.1 &
-      .AND.DYLN.LT.DYLX.AND.IFLGE(NB,NZ).EQ.1 &
-      .AND.VRNF(NB,NZ).GT.VRNX(NB,NZ)) &
+      .AND.DayLenthCurrent.LT.DayLenthPrev.AND.doPlantLeafOut(NB,NZ).EQ.iDisable &
+      .AND.Hours4LeafOff(NB,NZ).GT.HourThreshold4LeafOff(NB,NZ)) &
       .OR.(IWTYP(NZ).EQ.2.AND.ISTYP(NZ).EQ.iplt_annual) &
-      .AND.IFLGE(NB,NZ).EQ.1 &
-      .AND.VRNF(NB,NZ).GT.VRNX(NB,NZ))THEN
-        IDAY(7,NB,NZ)=I
+      .AND.doPlantLeafOut(NB,NZ).EQ.iDisable &
+      .AND.Hours4LeafOff(NB,NZ).GT.HourThreshold4LeafOff(NB,NZ))THEN
+        iPlantCalendar(ipltcal_BeginSeedFill,NB,NZ)=I
     ENDIF
 !
 !   END SEED NUMBER SET PERIOD
 !
-!   IDAY(8,=end date setting for final seed number
+!   iPlantCalendar(ipltcal_SetSeedNumber,=end date setting for final seed number
 !
-  ELSEIF(IDAY(8,NB,NZ).EQ.0)THEN
+  ELSEIF(iPlantCalendar(ipltcal_SetSeedNumber,NB,NZ).EQ.0)THEN
     IF(GSTGF(NB,NZ).GT.1.00*GSTGR)THEN
-      IDAY(8,NB,NZ)=I
+      iPlantCalendar(ipltcal_SetSeedNumber,NB,NZ)=I
     ENDIF
 !
 !   END SEED SIZE SET PERIOD
 !
-!   IDAY(9,=end of setting max seed size
+!   iPlantCalendar(ipltcal_SetSeedMass,=end of setting max seed size
 !
-  ELSEIF(IDAY(9,NB,NZ).EQ.0)THEN
+  ELSEIF(iPlantCalendar(ipltcal_SetSeedMass,NB,NZ).EQ.0)THEN
     IF(GSTGF(NB,NZ).GT.1.50*GSTGR)THEN
-      IDAY(9,NB,NZ)=I
+      iPlantCalendar(ipltcal_SetSeedMass,NB,NZ)=I
     ENDIF
   ENDIF
   end associate

@@ -28,7 +28,7 @@ module ExtractsMod
   call TotalLitterfall()
 
   DO NZ=1,plt_site%NP
-    IF(plt_pheno%IFLGC(NZ).EQ.PlantIsActive)THEN
+    IF(plt_pheno%IsPlantActive(NZ).EQ.iPlantIsActive)THEN
 
       call TotalLeafArea(NZ)
 

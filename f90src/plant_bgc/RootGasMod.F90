@@ -111,7 +111,7 @@ module RootGasMod
     THETPM =>  plt_soilchem%THETPM,&
     trc_gasml=> plt_soilchem%trc_gasml,&
     DiffusivitySolutEff   =>  plt_soilchem%DiffusivitySolutEff , &
-    IDAY   =>  plt_pheno%IDAY    , &
+    iPlantCalendar  =>  plt_pheno%iPlantCalendar   , &
     RootPoreTortu4Gas  =>  plt_morph%RootPoreTortu4Gas   , &
     PrimRootRadius  =>  plt_morph%PrimRootRadius   , &
     AveSecndRootLen  =>  plt_morph%AveSecndRootLen   , &
@@ -250,7 +250,7 @@ module RootGasMod
 !     BETWEEN AQUEOUS AND GASEOUS PHASES
 !
 !     RootLenPerP=root,myco length per plant
-!     IDAY(1,=emergence date
+!     iPlantCalendar(ipltcal_Emerge,=emergence date
 !     RTARR=root surface area/radius for uptake
 !     RRADP=path length for radial diffusion within root
 !     DIFOP=aqueous diffusivity of O2 within root
@@ -262,7 +262,7 @@ module RootGasMod
 !     RCO2PX=root CO2 gas flux at time step for gas flux calculations
 !     RCO2A=root CO2 flux from grosub.f
 !
-    IF(N.EQ.1.AND.IDAY(1,NB1(NZ),NZ).GT.0.AND.RootLenPerP(N,L,NZ).GT.ZEROP(NZ))THEN
+    IF(N.EQ.1.AND.iPlantCalendar(ipltcal_Emerge,NB1(NZ),NZ).GT.0.AND.RootLenPerP(N,L,NZ).GT.ZEROP(NZ))THEN
       RTARRX=RootAreaDivRadius(N,L)/RRADP(N,NZ)
       DIFOP=OLSGLP*RTARRX
 

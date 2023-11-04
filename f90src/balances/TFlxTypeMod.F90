@@ -88,8 +88,8 @@ implicit none
   real(r8),allocatable ::  TOSNER(:,:,:,:)
   real(r8),allocatable ::  TOSPER(:,:,:,:)
 
-  real(r8) :: TDLYXF,TDYLXC,TDVOLI,TDORGC
-  DATA TDORGC,TDYLXC/0.0,0.0/
+  real(r8) :: TDLYXF,TDayLenthPrevC,TDVOLI,TDORGC
+  DATA TDORGC,TDayLenthPrevC/0.0,0.0/
   DATA TDVOLI,TDLYXF/0.0,0.0/
 
 

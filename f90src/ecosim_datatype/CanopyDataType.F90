@@ -151,7 +151,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  WTSTDE(:,:,:,:,:)                  !standing dead element fraction, [g d-2]
   real(r8),target,allocatable ::  WTSTGE(:,:,:,:)                    !standing dead element, [g d-2]
   real(r8),target,allocatable ::  WTRVE(:,:,:,:)                     !plant stored nonstructural element, [g d-2]
-  real(r8),target,allocatable ::  WTRVX(:,:,:)                       !plant stored nonstructural C at planting, [g d-2]
+  real(r8),target,allocatable ::  SeedCPlanted_pft(:,:,:)                       !plant stored nonstructural C at planting, [g d-2]
   REAL(R8),target,allocatable ::  WTSHTA(:,:,:)                      !landscape average canopy shoot C, [g d-2]
   contains
 !----------------------------------------------------------------------
@@ -182,20 +182,20 @@ module CanopyDataType
   allocate(XKCO2L(JP,JY,JX));   XKCO2L=0._r8
   allocate(XKCO2O(JP,JY,JX));   XKCO2O=0._r8
   allocate(CHILL(JP,JY,JX));    CHILL=0._r8
-  allocate(VCGRO(JNODS,JBR,JP,JY,JX));VCGRO=0._r8
-  allocate(VGRO(JNODS,JBR,JP,JY,JX));VGRO=0._r8
-  allocate(COMPL(JNODS,JBR,JP,JY,JX));COMPL=0._r8
-  allocate(ETGRO(JNODS,JBR,JP,JY,JX));ETGRO=0._r8
-  allocate(CBXN(JNODS,JBR,JP,JY,JX));CBXN=0._r8
-  allocate(CO2B(JNODS,JBR,JP,JY,JX));CO2B=0._r8
-  allocate(VCGR4(JNODS,JBR,JP,JY,JX));VCGR4=0._r8
-  allocate(VGRO4(JNODS,JBR,JP,JY,JX));VGRO4=0._r8
-  allocate(ETGR4(JNODS,JBR,JP,JY,JX));ETGR4=0._r8
-  allocate(CBXN4(JNODS,JBR,JP,JY,JX));CBXN4=0._r8
-  allocate(CPOOL4(JNODS,JBR,JP,JY,JX));CPOOL4=0._r8
-  allocate(HCOB(JNODS,JBR,JP,JY,JX));HCOB=0._r8
+  allocate(VCGRO(MaxCanopyNodes,JBR,JP,JY,JX));VCGRO=0._r8
+  allocate(VGRO(MaxCanopyNodes,JBR,JP,JY,JX));VGRO=0._r8
+  allocate(COMPL(MaxCanopyNodes,JBR,JP,JY,JX));COMPL=0._r8
+  allocate(ETGRO(MaxCanopyNodes,JBR,JP,JY,JX));ETGRO=0._r8
+  allocate(CBXN(MaxCanopyNodes,JBR,JP,JY,JX));CBXN=0._r8
+  allocate(CO2B(MaxCanopyNodes,JBR,JP,JY,JX));CO2B=0._r8
+  allocate(VCGR4(MaxCanopyNodes,JBR,JP,JY,JX));VCGR4=0._r8
+  allocate(VGRO4(MaxCanopyNodes,JBR,JP,JY,JX));VGRO4=0._r8
+  allocate(ETGR4(MaxCanopyNodes,JBR,JP,JY,JX));ETGR4=0._r8
+  allocate(CBXN4(MaxCanopyNodes,JBR,JP,JY,JX));CBXN4=0._r8
+  allocate(CPOOL4(MaxCanopyNodes,JBR,JP,JY,JX));CPOOL4=0._r8
+  allocate(HCOB(MaxCanopyNodes,JBR,JP,JY,JX));HCOB=0._r8
   allocate(RubiscoActivity_brpft(JBR,JP,JY,JX));  RubiscoActivity_brpft=0._r8
-  allocate(FDBK4(JNODS,JBR,JP,JY,JX));FDBK4=0._r8
+  allocate(FDBK4(MaxCanopyNodes,JBR,JP,JY,JX));FDBK4=0._r8
   allocate(FDBKX(JBR,JP,JY,JX)); FDBKX=0._r8
   allocate(CNETX(JY,JX));       CNETX=0._r8
   allocate(VCMX(JP,JY,JX));     VCMX=0._r8
@@ -250,7 +250,7 @@ module CanopyDataType
   allocate(TCC(JP,JY,JX));      TCC=0._r8
   allocate(DTKC(JP,JY,JX));     DTKC=0._r8
   allocate(TKCZ(JP,JY,JX));     TKCZ=0._r8
-  allocate(CPOOL3(JNODS,JBR,JP,JY,JX));CPOOL3=0._r8
+  allocate(CPOOL3(MaxCanopyNodes,JBR,JP,JY,JX));CPOOL3=0._r8
   allocate(RSETE(NumOfPlantChemElements,JP,JY,JX));    RSETE=0._r8
   allocate(WGLFT(JC,JY,JX));    WGLFT=0._r8
   allocate(CFOPE(NumOfPlantChemElements,0:Jlitgrp,jsken,JP,JY,JX));CFOPE=0._r8
@@ -288,19 +288,19 @@ module CanopyDataType
   allocate(WGSHEXE(NumOfPlantChemElements,JBR,JP,JY,JX));WGSHEXE=0._r8
   allocate(WTSTXBE(NumOfPlantChemElements,JBR,JP,JY,JX));WTSTXBE=0._r8
   allocate(WGLFEX(NumOfPlantChemElements,JBR,JP,JY,JX)); WGLFEX=0._r8
-  allocate(WGLFE(NumOfPlantChemElements,0:JNODS,JBR,JP,JY,JX));WGLFE=0._r8
-  allocate(WGSHE(NumOfPlantChemElements,0:JNODS,JBR,JP,JY,JX));WGSHE=0._r8
-  allocate(WGNODE(NumOfPlantChemElements,0:JNODS,JBR,JP,JY,JX));WGNODE=0._r8
-  allocate(WGLFLE(NumOfPlantChemElements,JC,0:JNODS,JBR,JP,JY,JX));WGLFLE=0._r8
-  allocate(CanPLNBLA(JC,0:JNODS,JBR,JP,JY,JX));CanPLNBLA=0._r8
-  allocate(WSLF(0:JNODS,JBR,JP,JY,JX));WSLF=0._r8
-  allocate(WSSHE(0:JNODS,JBR,JP,JY,JX));WSSHE=0._r8
+  allocate(WGLFE(NumOfPlantChemElements,0:MaxCanopyNodes,JBR,JP,JY,JX));WGLFE=0._r8
+  allocate(WGSHE(NumOfPlantChemElements,0:MaxCanopyNodes,JBR,JP,JY,JX));WGSHE=0._r8
+  allocate(WGNODE(NumOfPlantChemElements,0:MaxCanopyNodes,JBR,JP,JY,JX));WGNODE=0._r8
+  allocate(WGLFLE(NumOfPlantChemElements,JC,0:MaxCanopyNodes,JBR,JP,JY,JX));WGLFLE=0._r8
+  allocate(CanPLNBLA(JC,0:MaxCanopyNodes,JBR,JP,JY,JX));CanPLNBLA=0._r8
+  allocate(WSLF(0:MaxCanopyNodes,JBR,JP,JY,JX));WSLF=0._r8
+  allocate(WSSHE(0:MaxCanopyNodes,JBR,JP,JY,JX));WSSHE=0._r8
   allocate(NoduleNonstructCconc_pft(JP,JY,JX));   NoduleNonstructCconc_pft=0._r8
   allocate(GRWTB(JBR,JP,JY,JX)); GRWTB=0._r8
   allocate(WTSTDE(NumOfPlantChemElements,jsken,JP,JY,JX)); WTSTDE=0._r8
   allocate(WTSTGE(NumOfPlantChemElements,JP,JY,JX));    WTSTGE=0._r8
   allocate(WTRVE(NumOfPlantChemElements,JP,JY,JX));  WTRVE=0._r8
-  allocate(WTRVX(JP,JY,JX));    WTRVX=0._r8
+  allocate(SeedCPlanted_pft(JP,JY,JX));    SeedCPlanted_pft=0._r8
   allocate(WTSHTA(JP,JY,JX));   WTSHTA=0._r8
   end subroutine InitCanopyData
 
@@ -450,7 +450,7 @@ module CanopyDataType
   call destroy(WTSTDE)
   call destroy(WTSTGE)
   call destroy(WTRVE)
-  call destroy(WTRVX)
+  call destroy(SeedCPlanted_pft)
   call destroy(WTSHTA)
   end subroutine DestructCanopyData
 

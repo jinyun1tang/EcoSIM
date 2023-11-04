@@ -63,9 +63,9 @@ implicit none
   real(r8),target,allocatable ::  VPA(:,:)                           !vapor concentration, [m3 m-3]
   real(r8),target,allocatable ::  VPK(:,:)                           !vapor pressure, [kPa]
   real(r8),target,allocatable ::  Pbot(:,:)                          !atmospheric pressure [kPa]
-  real(r8),target,allocatable ::  DYLN(:,:)                          !daylength, [h]
-  real(r8),target,allocatable ::  DYLX(:,:)                          !daylength of previous day, [h]
-  real(r8),target,allocatable ::  DYLM(:,:)                          !maximum daylength, [h]
+  real(r8),target,allocatable ::  DayLenthCurrent(:,:)                          !daylength, [h]
+  real(r8),target,allocatable ::  DayLenthPrev(:,:)                          !daylength of previous day, [h]
+  real(r8),target,allocatable ::  DayLenthMax(:,:)                          !maximum daylength, [h]
   real(r8),target,allocatable ::  OMEGAG(:,:,:)                      !sine of solar beam on leaf surface, [-]
   real(r8),target,allocatable ::  LWRadSky(:,:)                           !sky longwave radiation , [MJ d-2 h-1]
   real(r8),target,allocatable ::  TRAD(:,:)                          !total daily solar radiation, [MJ d-1]
@@ -193,9 +193,9 @@ implicit none
   allocate(VPA(JY,JX));         VPA=0._r8
   allocate(VPK(JY,JX));         VPK=0._r8
   allocate(Pbot(JY,JX));        PBOT=1.01325E+02_r8
-  allocate(DYLN(JY,JX));        DYLN=0._r8
-  allocate(DYLX(JY,JX));        DYLX=0._r8
-  allocate(DYLM(JY,JX));        DYLM=0._r8
+  allocate(DayLenthCurrent(JY,JX));        DayLenthCurrent=0._r8
+  allocate(DayLenthPrev(JY,JX));        DayLenthPrev=0._r8
+  allocate(DayLenthMax(JY,JX));        DayLenthMax=0._r8
   allocate(OMEGAG(JSA,JY,JX));  OMEGAG=0._r8
   allocate(LWRadSky(JY,JX));         LWRadSky=0._r8
   allocate(TRAD(JY,JX));        TRAD=0._r8
@@ -324,9 +324,9 @@ implicit none
   call destroy(VPA)
   call destroy(VPK)
   call destroy(PBOT)
-  call destroy(DYLN)
-  call destroy(DYLX)
-  call destroy(DYLM)
+  call destroy(DayLenthCurrent)
+  call destroy(DayLenthPrev)
+  call destroy(DayLenthMax)
   call destroy(OMEGAG)
   call destroy(LWRadSky)
   call destroy(TRAD)

@@ -82,7 +82,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  PPI(:,:,:)                         !initial plant population, [m-2]
   real(r8),target,allocatable ::  WTSTDI(:,:,:)                      !initial standing dead C, [g C m-2]
   real(r8),target,allocatable ::  PPX(:,:,:)                         !plant population, [m-2]
-  integer,target,allocatable ::  IFLGT(:,:)                          !number of active PFT
+  integer,target,allocatable ::  NumActivePlants(:,:)                          !number of active PFT
   real(r8),target,allocatable ::  PPT(:,:)                           !total plant population, [d-2]
   real(r8),target,allocatable ::  PPZ(:,:,:)                         !plant population at seeding, [m-2]
   real(r8),target,allocatable ::  WSTR(:,:,:)                        !canopy plant water stress indicator, number of hours PSILT < PSILY, []
@@ -103,7 +103,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  VSTG(:,:,:,:)                      !leaf number, [-]
   real(r8),target,allocatable ::  VSTGX(:,:,:,:)                     !leaf number at floral initiation, [-]
   real(r8),target,allocatable ::  VRNS(:,:,:,:)                      !heat requirement for spring leafout/dehardening, [h]
-  real(r8),target,allocatable ::  VRNF(:,:,:,:)                      !cold requirement for autumn leafoff/hardening, [h]
+  real(r8),target,allocatable ::  Hours4LeafOff(:,:,:,:)                      !cold requirement for autumn leafoff/hardening, [h]
   integer,target,allocatable ::  KLEAF(:,:,:,:)                      !leaf number, [-]
   integer,target,allocatable ::  KVSTGN(:,:,:,:)                     !leaf growth stage counter, [-]
   integer,target,allocatable ::  KLEAFX(:,:,:,:)                     !NUMBER OF MINIMUM LEAFED NODE USED IN GROWTH ALLOCATION
@@ -113,19 +113,19 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  SLA1(:,:,:)                        !leaf area:mass during growth, [m2 g-1]
   real(r8),target,allocatable ::  TCZ(:,:,:)                         !threshold temperature for spring leafout/dehardening, [oC]
   real(r8),target,allocatable ::  SSL1(:,:,:)                        !petiole length:mass during growth, [m g-1]
-  real(r8),target,allocatable ::  VRNL(:,:,:,:)                      !hours above threshold temperature required for spring leafout/dehardening, [-]
+  real(r8),target,allocatable ::  HourThreshold4LeafOut(:,:,:,:)                      !hours above threshold temperature required for spring leafout/dehardening, [-]
   integer,target,allocatable ::  NumOfBranches_pft(:,:,:)                          !branch number, [-]
   integer,target,allocatable ::  NBT(:,:,:)                          !branch number, [-]
   integer,target,allocatable ::  BranchNumber_brchpft(:,:,:,:)                       !branch number, [-]
   integer,target,allocatable ::  NB1(:,:,:)                          !number of main branch, [-]
   integer,target,allocatable ::  IFLGR(:,:,:,:)                      !branch phenology flag, [-]
   integer,target,allocatable ::  IFLGQ(:,:,:,:)                      !branch phenology flag, [h]
-  integer,target,allocatable ::  IFLGG(:,:,:,:)                      !branch phenology flag, [-]
-  integer,target,allocatable ::  IFLGP(:,:,:,:)                      !branch phenology flag, [-]
-  integer,target,allocatable ::  IFLGA(:,:,:,:)                      !branch phenology flag, [-]
-  integer,target,allocatable ::  IFLGE(:,:,:,:)                      !branch phenology flag, [-]
-  integer,target,allocatable ::  IFLGF(:,:,:,:)                      !branch phenology flag, [-]
-  integer,target,allocatable ::  IDTHB(:,:,:,:)                      !flag to detect branch death , [-]
+  integer,target,allocatable ::  doPlantSenescence(:,:,:,:)                      !branch phenology flag, [-]
+  integer,target,allocatable ::  doPlantRemobilization(:,:,:,:)                      !branch phenology flag, [-]
+  integer,target,allocatable ::  doInitLeafOut(:,:,:,:)                      !branch phenology flag, [-]
+  integer,target,allocatable ::  doPlantLeafOut(:,:,:,:)                      !branch phenology flag, [-]
+  integer,target,allocatable ::  doPlantLeaveOff(:,:,:,:)                      !branch phenology flag, [-]
+  integer,target,allocatable ::  iPlantBranchState(:,:,:,:)                      !flag to detect branch death , [-]
   real(r8),target,allocatable ::  PB(:,:,:)                          !branch nonstructural C content required for new branch, [g g-1]
   real(r8),target,allocatable ::  GSTGI(:,:,:,:)                     !normalized node number during vegetative growth stages , [-]
   real(r8),target,allocatable ::  DGSTGI(:,:,:,:)                    !gain in normalized node number during vegetative growth stages , [h-1]
@@ -143,7 +143,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  PSICanPDailyMin(:,:,:)                       !minimum daily canopy water potential, [MPa]
   real(r8),target,allocatable ::  ClumpFactort(:,:,:)                         !clumping factor for self-shading in canopy layer at current LAI, [-]
   real(r8),target,allocatable ::  ClumpFactor(:,:,:)                          !clumping factor for self-shading in canopy layer, [-]
-  integer,target,allocatable ::  IDTHP(:,:,:)                        !flag to detect canopy death , [-]
+  integer,target,allocatable ::  iPlantShootState(:,:,:)                        !flag to detect canopy death , [-]
   real(r8),target,allocatable ::  STMX(:,:,:)                        !maximum grain node number per branch, [-]
   real(r8),target,allocatable ::  SDMX(:,:,:)                        !maximum grain number per node , [-]
   real(r8),target,allocatable ::  MaxSeedCMass(:,:,:)                        !maximum grain size   , [g]
@@ -153,14 +153,14 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  FLG4(:,:,:,:)                      !flag to detect physiological maturity from  grain fill , [-]
   real(r8),target,allocatable ::  HourCounter4LeafOut_brch(:,:,:,:)                      !counter for mobilizing nonstructural C during spring leafout/dehardening, [h]
   real(r8),target,allocatable ::  FLGZ(:,:,:,:)                      !counter for mobilizing nonstructural C during autumn leafoff/hardening, [h]
-  integer,target,allocatable ::  IDAY(:,:,:,:,:)                     !plant growth stage, [-]
+  integer,target,allocatable ::  iPlantCalendar(:,:,:,:,:)                     !plant growth stage, [-]
   real(r8),target,allocatable ::  CTC(:,:,:)                         !temperature below which seed set is adversely affected, [oC]
   real(r8),target,allocatable ::  HTC(:,:,:)                         !temperature above which seed set is adversely affected, [oC]
   real(r8),target,allocatable ::  SSTX(:,:,:)                        !sensitivity to HTC (seeds oC-1 above HTC)
   real(r8),target,allocatable ::  XDL(:,:,:)                         !critical daylength for phenological progress, [h]
   real(r8),target,allocatable ::  XPPD(:,:,:)                        !difference between current and critical daylengths used to calculate  phenological progress, [h]
   real(r8),target,allocatable ::  ClumpFactort0(:,:,:)                         !initial clumping factor for self-shading in canopy layer, [-]
-  real(r8),target,allocatable ::  VRNX(:,:,:,:)                      !number of hours below set temperature required for autumn leafoff/hardening, [-]
+  real(r8),target,allocatable ::  HourThreshold4LeafOff(:,:,:,:)                      !number of hours below set temperature required for autumn leafoff/hardening, [-]
   real(r8),target,allocatable ::  OFFST(:,:,:)                       !adjustment of Arhhenius curves for plant thermal acclimation, [oC]
 !----------------------------------------------------------------------
 
@@ -200,9 +200,9 @@ contains
   allocate(ANGSH(JP,JY,JX));    ANGSH=0._r8
   allocate(RAZ(JP,JY,JX));      RAZ=0._r8
   allocate(CanPHeight4WatUptake(JP,JY,JX));    CanPHeight4WatUptake=0._r8
-  allocate(ARLF(0:JNODS,JBR,JP,JY,JX));ARLF=0._r8
-  allocate(CanPSheathHeight(0:JNODS,JBR,JP,JY,JX));CanPSheathHeight=0._r8
-  allocate(HTNODE(0:JNODS,JBR,JP,JY,JX));HTNODE=0._r8
+  allocate(ARLF(0:MaxCanopyNodes,JBR,JP,JY,JX));ARLF=0._r8
+  allocate(CanPSheathHeight(0:MaxCanopyNodes,JBR,JP,JY,JX));CanPSheathHeight=0._r8
+  allocate(HTNODE(0:MaxCanopyNodes,JBR,JP,JY,JX));HTNODE=0._r8
   allocate(CanopyBranchLeafA_pft(JBR,JP,JY,JX)); CanopyBranchLeafA_pft=0._r8
   allocate(ARLFZ(JBR,JP,JY,JX)); ARLFZ=0._r8
   allocate(CanPBranchHeight(JBR,JP,JY,JX));CanPBranchHeight=0._r8
@@ -210,7 +210,7 @@ contains
   allocate(GRNXB(JBR,JP,JY,JX)); GRNXB=0._r8
   allocate(GRNO(JP,JY,JX));     GRNO=0._r8
   allocate(pftPlantPopulation(JP,JY,JX));       pftPlantPopulation=0._r8
-  allocate(HTNODX(0:JNODS,JBR,JP,JY,JX));HTNODX=0._r8
+  allocate(HTNODX(0:MaxCanopyNodes,JBR,JP,JY,JX));HTNODX=0._r8
   allocate(CNLF(JP,JY,JX));     CNLF=0._r8
   allocate(CPLF(JP,JY,JX));     CPLF=0._r8
   allocate(CNSHE(JP,JY,JX));    CNSHE=0._r8
@@ -239,7 +239,7 @@ contains
   allocate(PPI(JP,JY,JX));      PPI=0._r8
   allocate(WTSTDI(JP,JY,JX));   WTSTDI=0._r8
   allocate(PPX(JP,JY,JX));      PPX=0._r8
-  allocate(IFLGT(JY,JX));       IFLGT=0
+  allocate(NumActivePlants(JY,JX));       NumActivePlants=0
   allocate(PPT(JY,JX));         PPT=0._r8
   allocate(PPZ(JP,JY,JX));      PPZ=0._r8
   allocate(WSTR(JP,JY,JX));     WSTR=0._r8
@@ -260,7 +260,7 @@ contains
   allocate(VSTG(JBR,JP,JY,JX));  VSTG=0._r8
   allocate(VSTGX(JBR,JP,JY,JX)); VSTGX=0._r8
   allocate(VRNS(JBR,JP,JY,JX));  VRNS=0._r8
-  allocate(VRNF(JBR,JP,JY,JX));  VRNF=0._r8
+  allocate(Hours4LeafOff(JBR,JP,JY,JX));  Hours4LeafOff=0._r8
   allocate(KLEAF(JBR,JP,JY,JX)); KLEAF=0
   allocate(KVSTGN(JBR,JP,JY,JX));KVSTGN=0
   allocate(KLEAFX(JBR,JP,JY,JX));KLEAFX=0
@@ -270,19 +270,19 @@ contains
   allocate(SLA1(JP,JY,JX));     SLA1=0._r8
   allocate(TCZ(JP,JY,JX));      TCZ=0._r8
   allocate(SSL1(JP,JY,JX));     SSL1=0._r8
-  allocate(VRNL(JC,JP,JY,JX));  VRNL=0._r8
+  allocate(HourThreshold4LeafOut(JC,JP,JY,JX));  HourThreshold4LeafOut=0._r8
   allocate(NumOfBranches_pft(JP,JY,JX));      NumOfBranches_pft=0
   allocate(NBT(JP,JY,JX));      NBT=0
   allocate(BranchNumber_brchpft(JBR,JP,JY,JX));  BranchNumber_brchpft=0
   allocate(NB1(JP,JY,JX));      NB1=0
   allocate(IFLGR(JBR,JP,JY,JX)); IFLGR=0
   allocate(IFLGQ(JBR,JP,JY,JX)); IFLGQ=0
-  allocate(IFLGG(JBR,JP,JY,JX)); IFLGG=0
-  allocate(IFLGP(JBR,JP,JY,JX)); IFLGP=0
-  allocate(IFLGA(JBR,JP,JY,JX)); IFLGA=0
-  allocate(IFLGE(JBR,JP,JY,JX)); IFLGE=0
-  allocate(IFLGF(JBR,JP,JY,JX)); IFLGF=0
-  allocate(IDTHB(JBR,JP,JY,JX)); IDTHB=0
+  allocate(doPlantSenescence(JBR,JP,JY,JX)); doPlantSenescence=0
+  allocate(doPlantRemobilization(JBR,JP,JY,JX)); doPlantRemobilization=0
+  allocate(doInitLeafOut(JBR,JP,JY,JX)); doInitLeafOut=0
+  allocate(doPlantLeafOut(JBR,JP,JY,JX)); doPlantLeafOut=0
+  allocate(doPlantLeaveOff(JBR,JP,JY,JX)); doPlantLeaveOff=0
+  allocate(iPlantBranchState(JBR,JP,JY,JX)); iPlantBranchState=0
   allocate(PB(JP,JY,JX));       PB=0._r8
   allocate(GSTGI(JBR,JP,JY,JX)); GSTGI=0._r8
   allocate(DGSTGI(JBR,JP,JY,JX));DGSTGI=0._r8
@@ -300,7 +300,7 @@ contains
   allocate(PSICanPDailyMin(JP,JY,JX));    PSICanPDailyMin=0._r8
   allocate(ClumpFactort(JP,JY,JX));      ClumpFactort=0._r8
   allocate(ClumpFactor(JP,JY,JX));       ClumpFactor=0._r8
-  allocate(IDTHP(JP,JY,JX));    IDTHP=0
+  allocate(iPlantShootState(JP,JY,JX));    iPlantShootState=0
   allocate(STMX(JP,JY,JX));     STMX=0._r8
   allocate(SDMX(JP,JY,JX));     SDMX=0._r8
   allocate(MaxSeedCMass(JP,JY,JX));     MaxSeedCMass=0._r8
@@ -310,14 +310,14 @@ contains
   allocate(FLG4(JBR,JP,JY,JX));  FLG4=0._r8
   allocate(HourCounter4LeafOut_brch(JBR,JP,JY,JX));  HourCounter4LeafOut_brch=0._r8
   allocate(FLGZ(JBR,JP,JY,JX));  FLGZ=0._r8
-  allocate(IDAY(NumGrothStages,JBR,JP,JY,JX));IDAY=0
+  allocate(iPlantCalendar(NumGrowthStages,JBR,JP,JY,JX));iPlantCalendar=0
   allocate(CTC(JP,JY,JX));      CTC=0._r8
   allocate(HTC(JP,JY,JX));      HTC=0._r8
   allocate(SSTX(JP,JY,JX));     SSTX=0._r8
   allocate(XDL(JP,JY,JX));      XDL=0._r8
   allocate(XPPD(JP,JY,JX));     XPPD=0._r8
   allocate(ClumpFactort0(JP,JY,JX));      ClumpFactort0=0._r8
-  allocate(VRNX(JC,JP,JY,JX));  VRNX=0._r8
+  allocate(HourThreshold4LeafOff(JC,JP,JY,JX));  HourThreshold4LeafOff=0._r8
   allocate(OFFST(JP,JY,JX));    OFFST=0._r8
   end subroutine InitPlantTraits
 
@@ -393,7 +393,7 @@ contains
   call destroy(PPI)
   call destroy(WTSTDI)
   call destroy(PPX)
-  call destroy(IFLGT)
+  call destroy(NumActivePlants)
   call destroy(PPT)
   call destroy(PPZ)
   call destroy(WSTR)
@@ -414,7 +414,7 @@ contains
   call destroy(VSTG)
   call destroy(VSTGX)
   call destroy(VRNS)
-  call destroy(VRNF)
+  call destroy(Hours4LeafOff)
   call destroy(KLEAF)
   call destroy(KVSTGN)
   call destroy(KLEAFX)
@@ -424,19 +424,19 @@ contains
   call destroy(SLA1)
   call destroy(TCZ)
   call destroy(SSL1)
-  call destroy(VRNL)
+  call destroy(HourThreshold4LeafOut)
   call destroy(NumOfBranches_pft)
   call destroy(NBT)
   call destroy(BranchNumber_brchpft)
   call destroy(NB1)
   call destroy(IFLGR)
   call destroy(IFLGQ)
-  call destroy(IFLGG)
-  call destroy(IFLGP)
-  call destroy(IFLGA)
-  call destroy(IFLGE)
-  call destroy(IFLGF)
-  call destroy(IDTHB)
+  call destroy(doPlantSenescence)
+  call destroy(doPlantRemobilization)
+  call destroy(doInitLeafOut)
+  call destroy(doPlantLeafOut)
+  call destroy(doPlantLeaveOff)
+  call destroy(iPlantBranchState)
   call destroy(PB)
   call destroy(GSTGI)
   call destroy(DGSTGI)
@@ -454,7 +454,7 @@ contains
   call destroy(PSICanPDailyMin)
   call destroy(ClumpFactort)
   call destroy(ClumpFactor)
-  call destroy(IDTHP)
+  call destroy(iPlantShootState)
   call destroy(STMX)
   call destroy(SDMX)
   call destroy(MaxSeedCMass)
@@ -464,14 +464,14 @@ contains
   call destroy(FLG4)
   call destroy(HourCounter4LeafOut_brch)
   call destroy(FLGZ)
-  call destroy(IDAY)
+  call destroy(iPlantCalendar)
   call destroy(CTC)
   call destroy(HTC)
   call destroy(SSTX)
   call destroy(XDL)
   call destroy(XPPD)
   call destroy(ClumpFactort0)
-  call destroy(VRNX)
+  call destroy(HourThreshold4LeafOff)
   call destroy(OFFST)
   end subroutine DestructPlantTraits
 

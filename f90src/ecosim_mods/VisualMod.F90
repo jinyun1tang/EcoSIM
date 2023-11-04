@@ -119,7 +119,7 @@ module VisualMod
 !
 ! SELECT YEARS
 !
-  IF(IYRC.GE.IYR1.AND.IYRC.LE.IYR2)THEN
+  IF(iYearCurrent.GE.IYR1.AND.iYearCurrent.LE.IYR2)THEN
     TTRN=0.0_r8
     TTLE=0.0_r8
     TTSH=0.0_r8
@@ -151,8 +151,8 @@ module VisualMod
 !
 !     HOURLY AGGREGATION
 !
-!     IF(IFLGC(NZ,NY,NX).EQ.PlantIsActive)THEN
-!     IF(I.EQ.IDAY0(NZ,NY,NX))THEN
+!     IF(IsPlantActive(NZ,NY,NX).EQ.iPlantIsActive)THEN
+!     IF(I.EQ.iDayPlanting(NZ,NY,NX))THEN
 !     ND=0
 !     TCCTX=0.0
 !     TCCMX=0.0
@@ -169,7 +169,7 @@ module VisualMod
 !     TCCMX=TCCMX+TCCMD
 !     ND=ND+1
 !     ENDIF
-!     IF(I.EQ.IDAYH(NZ,NY,NX)-1)THEN
+!     IF(I.EQ.iDayPlantHarvest(NZ,NY,NX)-1)THEN
 !     TCCAS=TCCTX/ND
 !     TCCMS=TCCMX/ND
 !     ENDIF
@@ -183,11 +183,11 @@ module VisualMod
 !     DAILY AND SEASONAL OUTPUT
 !
 !     IF(J.EQ.24)THEN
-!     IYRZ=IYRC
+!     IYRZ=iYearCurrent
 !     XI=REAL(I)
-!     XP=REAL(IDAY0(NZ,NY,NX))
-!     XH=REAL(IDAYH(NZ,NY,NX))
-!     IF(I.EQ.IDAY0(NZ,NY,NX))THEN
+!     XP=REAL(iDayPlanting(NZ,NY,NX))
+!     XH=REAL(iDayPlantHarvest(NZ,NY,NX))
+!     IF(I.EQ.iDayPlanting(NZ,NY,NX))THEN
          D9980: DO N=1,100
            OUT(N)=0.0_r8
          ENDDO D9980
@@ -198,7 +198,7 @@ module VisualMod
 !     DTCSN=TESN0(ielmc,NZ,NY,NX)-TCSNY
 !     TCSNX=TCSNX+DTCSN
 !     TCSNY=TESN0(ielmc,NZ,NY,NX)
-!     IF(I.EQ.IDAY0(NZ,NY,NX).OR.I.EQ.IDAYH(NZ,NY,NX))THEN
+!     IF(I.EQ.iDayPlanting(NZ,NY,NX).OR.I.EQ.iDayPlantHarvest(NZ,NY,NX))THEN
 !     ICHKA=0
 !     ICHKM=0
 !     TCSNX=0.0
@@ -257,9 +257,9 @@ module VisualMod
 !
 !     WRITE OUTPUT
 !
-!     WRITE(19,91)'ECOSYS_HUMMOCK',IYRC,I,J,(OUT(N),N=1,38)
+!     WRITE(19,91)'ECOSYS_HUMMOCK',iYearCurrent,I,J,(OUT(N),N=1,38)
 !     IF(J.EQ.24)THEN
-!     WRITE(20,96)'ECOSYS_HUMMOCK',IYRC,I,(OUT(N),N=39,68)
+!     WRITE(20,96)'ECOSYS_HUMMOCK',iYearCurrent,I,(OUT(N),N=39,68)
 !     ENDIF
 !     ENDIF
 90        FORMAT(50A16)
@@ -271,7 +271,7 @@ module VisualMod
 !
 !     WRITE LANDSCAPE OUTPUT
 !
-    WRITE(19,2025)'FLUXES',IYRC,I,J,TTRN*277.8/TAREA &
+    WRITE(19,2025)'FLUXES',iYearCurrent,I,J,TTRN*277.8/TAREA &
       ,TTLE*277.8/TAREA,TTSH*277.8/TAREA,TEco_Heat_Grnd_col*277.8/TAREA &
       ,TTCO*23.14815/TAREA,TTCH*23.14815/TAREA &
       ,((Eco_NEE_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.14815 &
@@ -280,7 +280,7 @@ module VisualMod
       ,NX=NHW,NHE),NY=NVN,NVS)
 2025  FORMAT(A16,3I6,100E12.4)
     IF(J.EQ.24)THEN
-      WRITE(20,2026)'SWC',IYRC,I,J,((SnowDepth(NY,NX) &
+      WRITE(20,2026)'SWC',iYearCurrent,I,J,((SnowDepth(NY,NX) &
       ,NX=NHW,NHE),NY=NVN,NVS),DEFAULT &
       ,((SWC(NY,NX),NX=NHW,NHE),NY=NVN,NVS),DEFAULT &
       ,((-(ActiveLayDepth(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)) &

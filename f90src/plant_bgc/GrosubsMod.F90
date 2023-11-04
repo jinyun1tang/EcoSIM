@@ -43,13 +43,13 @@ module grosubsMod
   public :: InitGrosub
   contains
 
-  subroutine InitGrosub(NumGrothStages,JRS)
+  subroutine InitGrosub(NumGrowthStages,JRS)
 
   implicit none
-  integer, intent(out) :: NumGrothStages,JRS
+  integer, intent(out) :: NumGrowthStages,JRS
 
   call InitVegPars(pltpar)
-  NumGrothStages = pltpar%NumGrothStages
+  NumGrowthStages = pltpar%NumGrowthStages
   jrs = pltpar%JRS
 
 
@@ -70,7 +70,7 @@ module grosubsMod
   real(r8) :: CPOOLK(NumOfCanopyLayers1,JP1)
 ! begin_execution
   associate(                            &
-    IFLGC    => plt_pheno%IFLGC   , &
+    IsPlantActive    => plt_pheno%IsPlantActive   , &
     NP       => plt_site%NP       , &
     NP0      => plt_site%NP0      , &
     NJ       => plt_site%NJ       , &
@@ -105,8 +105,8 @@ module grosubsMod
 !
   D9985: DO NZ=1,NP
 
-! IFLGC= flag for living pft
-    IF(IFLGC(NZ).EQ.PlantIsActive)THEN
+! IsPlantActive= flag for living pft
+    IF(IsPlantActive(NZ).EQ.iPlantIsActive)THEN
       call GrowPlant(I,J,NZ,ZCX,CPOOLK)
     ENDIF
 
@@ -132,8 +132,8 @@ module grosubsMod
   associate(                       &
     k_fine_litr=> pltpar%k_fine_litr ,&
     k_woody_litr=> pltpar%k_woody_litr,&
-    IDAY0   => plt_distb%IDAY0   , &
-    IYR0    => plt_distb%IYR0    , &
+    iDayPlanting   => plt_distb%iDayPlanting   , &
+    iYearPlanting    => plt_distb%iYearPlanting    , &
     THVSTE  => plt_distb%THVSTE  , &
     HVSTE   => plt_distb%HVSTE   , &
     VPO4F   => plt_distb%VPO4F   , &
@@ -149,17 +149,17 @@ module grosubsMod
     WTSTGE  => plt_biom%WTSTGE   , &
     fTgrowCanP    => plt_pheno%fTgrowCanP    , &
     RSETE   => plt_pheno%RSETE   , &
-    IFLGC   => plt_pheno%IFLGC   , &
+    IsPlantActive   => plt_pheno%IsPlantActive   , &
     IGTYP   => plt_pheno%IGTYP   , &
-    IFLGI   => plt_pheno%IFLGI   , &
-    IFLGE   => plt_pheno%IFLGE   , &
+    doInitPlant   => plt_pheno%doInitPlant   , &
+    doPlantLeafOut   => plt_pheno%doPlantLeafOut   , &
     IBTYP   => plt_pheno%IBTYP   , &
-    VRNL    => plt_pheno%VRNL    , &
+    HourThreshold4LeafOut   => plt_pheno%HourThreshold4LeafOut   , &
     VRNS    => plt_pheno%VRNS    , &
     BALE    => plt_site%BALE     , &
     NP0     => plt_site%NP0      , &
     NJ      => plt_site%NJ       , &
-    IYRC    => plt_site%IYRC     , &
+    iYearCurrent    => plt_site%iYearCurrent     , &
     ESNC    => plt_bgcr%ESNC     , &
     ZNPP    => plt_bgcr%ZNPP     , &
     TZUPFX  => plt_bgcr%TZUPFX   , &
@@ -179,12 +179,13 @@ module grosubsMod
 !     ACTIVATE DORMANT SEEDS
 !
     D205: DO NB=1,NumOfBranches_pft(NZ)
-      IF(IFLGI(NZ).EQ.itrue)THEN
-        IF(IFLGE(NB,NZ).EQ.0.AND.VRNS(NB,NZ).GE.VRNL(NB,NZ))THEN
-          IDAY0(NZ)=I
-          IYR0(NZ)=IYRC
+      IF(doInitPlant(NZ).EQ.itrue)THEN
+        IF(doPlantLeafOut(NB,NZ).EQ.iEnable.AND.VRNS(NB,NZ).GE.HourThreshold4LeafOut(NB,NZ))THEN
+          iDayPlanting(NZ)=I
+          iYearPlanting(NZ)=iYearCurrent
           PlantinDepth(NZ)=0.005_r8+CumSoilThickness(0)
-          IFLGI(NZ)=ifalse
+          !mark plant as initialized
+          doInitPlant(NZ)=ifalse
         ENDIF
       ENDIF
     ENDDO D205
@@ -251,7 +252,7 @@ module grosubsMod
 !
     ZNPP(NZ)=CARBN(NZ)+TCO2T(NZ)
 
-    IF(IFLGC(NZ).EQ.PlantIsActive)THEN
+    IF(IsPlantActive(NZ).EQ.iPlantIsActive)THEN
     !check for living plant
       DO NE=1,NumOfPlantChemElements
         BALE(NE,NZ)=CanPShootElmMass(NE,NZ)+WTRTE(NE,NZ)+WTNDE(NE,NZ) &
@@ -316,8 +317,8 @@ module grosubsMod
 ! begin_execution
   associate(                              &
     IGTYP  => plt_pheno%IGTYP       , &
-    IDTHR  => plt_pheno%IDTHR       , &
-    IDTHP  => plt_pheno%IDTHP       , &
+    iPlantRootState => plt_pheno%iPlantRootState      , &
+    iPlantShootState  => plt_pheno%iPlantShootState       , &
     UPNF   => plt_rbgc%UPNF         , &
     UPH2P  => plt_rbgc%UPH2P        , &
     UPNH4  => plt_rbgc%UPNH4        , &
@@ -328,7 +329,7 @@ module grosubsMod
     NumOfBranches_pft    => plt_morph%NumOfBranches_pft         , &
     NRT    => plt_morph%NRT           &
   )
-  IF(IDTHP(NZ).EQ.0.OR.IDTHR(NZ).EQ.ibralive)THEN
+  IF(iPlantShootState(NZ).EQ.0.OR.iPlantRootState(NZ).EQ.iLive)THEN
     UPNFC(NZ)=0._r8
     IFLGZ = 0
     call StagePlantForGrowth(I,J,NZ,ICHK1,NRX,TFN6,CNLFW,CPLFW,&
@@ -337,7 +338,7 @@ module grosubsMod
 !     CALCULATE GROWTH OF EACH BRANCH
 !
 !     WTLFB,WTSHEB,CanPBLeafShethC=leaf,petiole,leaf+petiole mass
-!     IDTHB=branch living flag: 0=alive,1=dead
+!     iPlantBranchState=branch living flag: 0=alive,1=dead
 !
     DO  NB=1,NumOfBranches_pft(NZ)
       call GrowOneBranch(I,J,NB,NZ,TFN6,ZCX,CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW,&
@@ -616,7 +617,7 @@ module grosubsMod
 
   D320: DO NB=1,NumOfBranches_pft(NZ)
     CPOOLK(NB,NZ)=0._r8
-    D325: DO K=1,JNODS1
+    D325: DO K=1,MaxCanopyNodes1
       CPOOLK(NB,NZ)=CPOOLK(NB,NZ)+CPOOL3(K,NB,NZ)+CPOOL4(K,NB,NZ) &
         +CO2B(K,NB,NZ)+HCOB(K,NB,NZ)
     ENDDO D325

@@ -758,7 +758,7 @@ module StartsMod
   IFNOB(:,:)=0
   IFPOB(:,:)=0
   IFLGS(:,:)=1
-  IFLGT(:,:)=0
+  NumActivePlants(:,:)=0
   ATCA(:,:)=ATCAI(:,:)
   ATCS(:,:)=ATCAI(:,:)
   TairKClimMean(:,:)=units%Celcius2Kelvin(ATCA)
@@ -819,7 +819,7 @@ module StartsMod
   StemAreag(:,:)=0.0_r8
   PrecIntcptByCanG(:,:)=0.0_r8
   PPT(:,:)=0.0_r8
-  DYLN(:,:)=12.0_r8
+  DayLenthCurrent(:,:)=12.0_r8
   ALBX(:,:)=SoilAlbedo(:,:)
   XHVSTE(:,:,:)=0.0_r8
   EnergyImpact4Erosion(:,:)=0.0_r8

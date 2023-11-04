@@ -133,7 +133,7 @@ module Hour1Mod
       AtmGgms(idg_H2,NY,NX)=H2GE(NY,NX)*8.92E-05_r8*Tref/TairKClimMean(NY,NX)*tPBOT
 
       IF(J.EQ.1)THEN
-        IFLGT(NY,NX)=0
+        NumActivePlants(NY,NX)=0
         DO  NZ=1,NP(NY,NX)
           PSICanPDailyMin(NZ,NY,NX)=0.0_r8
         ENDDO
@@ -726,7 +726,7 @@ module Hour1Mod
   integer :: L
 !     begin_execution
 
-  UCO2S(NY,NX)=0.0_r8
+  DIC_mass_col(NY,NX)=0.0_r8
   TOMT(NY,NX)=0.0_r8
   TONT(NY,NX)=0.0_r8
   TOPT(NY,NX)=0.0_r8

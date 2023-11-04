@@ -157,7 +157,7 @@ module GrosubPars
   integer :: istalk
   integer :: iroot
   integer :: icwood
-  integer :: NumGrothStages       !number of growth stages
+  integer :: NumGrowthStages       !number of growth stages
   integer :: JRS          !maximum number of root axes
   integer  :: JP1         !number of plants
   integer  :: JBR         !maximum number of branches
@@ -167,7 +167,7 @@ module GrosubPars
   integer  :: NumOfCanopyLayers1         !number of canopy layers
   integer  :: JZ1         !number of soil layers
   integer  :: JLI1        !number of sectors for the leaf zenith [0,pi/2]
-  integer  :: JNODS1      !number of canopy nodes
+  integer  :: MaxCanopyNodes1      !number of canopy nodes
   integer  :: jsken       !number of kinetic components in litter,  PROTEIN(*,1),CH2O(*,2),CELLULOSE(*,3),LIGNIN(*,4) IN SOIL LITTER
   integer  :: Jlitgrp     !number of litter groups nonstructural(0,*),
                           !     foliar(1,*),non-foliar(2,*),stalk(3,*),root(4,*), coarse woody (5,*)
@@ -211,7 +211,7 @@ module GrosubPars
   pltpar%istalk=3
   pltpar%iroot=4
   pltpar%icwood=5
-  pltpar%NumGrothStages=10
+  pltpar%NumGrowthStages=10
   pltpar%JRS=10
   pltpar%JPRT=7
   pltpar%jroots=2

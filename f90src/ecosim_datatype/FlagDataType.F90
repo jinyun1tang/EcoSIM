@@ -1,5 +1,6 @@
 module FlagDataType
   use GridConsts
+  use ElmIDMod  
 implicit none
 
   public
@@ -25,8 +26,8 @@ implicit none
 
   integer,target,allocatable ::  IUTYP(:,:)                          !urea hydrolysis inhibitor type (1=no,2=yes)
   integer,target,allocatable ::  ITILL1(:,:)                         !soil disturbance type, [-]
-  integer,target,allocatable ::  IFLGC(:,:,:)                        ! flag for living pft
-  integer,target,allocatable ::  IFLGI(:,:,:)                        !PFT initialization flag:0=no,1=yes
+  integer,target,allocatable ::  IsPlantActive(:,:,:)                        ! flag for living pft
+  integer,target,allocatable ::  doInitPlant(:,:,:)                        !PFT initialization flag:0=no,1=yes
   integer,target,allocatable ::  ICTYP(:,:,:)                        !plant photosynthetic type (C3 or C4)
   integer,target,allocatable ::  IGTYP(:,:,:)                        !plant growth type (vascular, non-vascular)
   integer,target,allocatable ::  ISTYP(:,:,:)                        !plant growth habit (annual or perennial)
@@ -56,8 +57,8 @@ contains
   allocate(ISOILR(JY,JX));      ISOILR=0
   allocate(IUTYP(JY,JX));       IUTYP=0
   allocate(ITILL1(JY,JX));      ITILL1=0
-  allocate(IFLGC(JP,JY,JX));    IFLGC=0
-  allocate(IFLGI(JP,JY,JX));    IFLGI=0
+  allocate(IsPlantActive(JP,JY,JX));    IsPlantActive=0
+  allocate(doInitPlant(JP,JY,JX));    doInitPlant=ifalse
   allocate(ICTYP(JP,JY,JX));    ICTYP=0
   allocate(IGTYP(JP,JY,JX));    IGTYP=0
   allocate(ISTYP(JP,JY,JX));    ISTYP=0
@@ -87,8 +88,8 @@ contains
   call destroy(ISOILR)
   call destroy(IUTYP)
   call destroy(ITILL1)
-  call destroy(IFLGC)
-  call destroy(IFLGI)
+  call destroy(IsPlantActive)
+  call destroy(doInitPlant)
   call destroy(ICTYP)
   call destroy(IGTYP)
   call destroy(ISTYP)

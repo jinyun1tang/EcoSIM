@@ -328,14 +328,14 @@ module readiMod
 !
 !     CALCULATE MAXIMUM DAYLENTH FOR PLANT PHENOLOGY
 !
-!     DYLM=maximum daylength (h)
+!     DayLenthMax=maximum daylength (h)
 !
       IF(ALAT(NY,NX).GT.0.0_r8)THEN
         XI=173._r8
       ELSE
         XI=356._r8
       ENDIF
-      DYLM(NY,NX)=GetDayLength(ALAT(NY,NX),XI)
+      DayLenthMax(NY,NX)=GetDayLength(ALAT(NY,NX),XI)
 
     ENDDO D9890
   ENDDO D9895

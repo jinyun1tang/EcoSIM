@@ -216,11 +216,11 @@ implicit none
               IDY=30*(IMO-1)+ICOR(IMO-1)+IDX+LPY
             endif
             IF(IDY.GT.0.AND.IYR.GT.0)THEN
-              IDAY0(NZ,NY,NX)=IDY
+              iDayPlanting(NZ,NY,NX)=IDY
               IYR=yearc
-              IYR0(NZ,NY,NX)=MIN(IYR,IYRC)
-              IDAYX(NZ,NY,NX)=IDAY0(NZ,NY,NX) !planting day
-              IYRX(NZ,NY,NX)=IYR0(NZ,NY,NX)   !planting year
+              iYearPlanting(NZ,NY,NX)=MIN(IYR,iYearCurrent)
+              IDAYX(NZ,NY,NX)=iDayPlanting(NZ,NY,NX) !planting day
+              IYRX(NZ,NY,NX)=iYearPlanting(NZ,NY,NX)   !planting year
               PPZ(NZ,NY,NX)=PPI(NZ,NY,NX)     !population density
             ENDIF
 
@@ -241,9 +241,9 @@ implicit none
                 endif
 
                 IF(IDY.GT.0.AND.JCUT.EQ.1)THEN
-                  IDAYH(NZ,NY,NX)=IDY
+                  iDayPlantHarvest(NZ,NY,NX)=IDY
                   IYR=yearc
-                  IYRH(NZ,NY,NX)=MIN(IYR,IYRC)
+                  iYearPlantHarvest(NZ,NY,NX)=MIN(IYR,iYearCurrent)
                 ENDIF
 
                 IHVST(NZ,IDY,NY,NX)=ICUT
@@ -295,8 +295,8 @@ implicit none
   DO NX=NHW,NHE
     DO NY=NVN,NVS
       DO NZ=1,NP(NY,NX)
-        IDAYY(NZ,NY,NX)=IDAYH(NZ,NY,NX)
-        IYRY(NZ,NY,NX)=IYRH(NZ,NY,NX)
+        IDAYY(NZ,NY,NX)=iDayPlantHarvest(NZ,NY,NX)
+        IYRY(NZ,NY,NX)=iYearPlantHarvest(NZ,NY,NX)
       ENDDO
     ENDDO
   ENDDO
@@ -347,15 +347,15 @@ implicit none
     ENDIF
     GROUPI(NZ,NY,NX)=GROUPI(NZ,NY,NX)-XTLI(NZ,NY,NX)
     IF(XDL(NZ,NY,NX).LT.0.0_r8)THEN
-      XDL(NZ,NY,NX)=DYLM(NY,NX)
+      XDL(NZ,NY,NX)=DayLenthMax(NY,NX)
     ENDIF
     D5: DO NB=1,JC
       IF(IWTYP(NZ,NY,NX).EQ.0.AND.ISTYP(NZ,NY,NX).NE.iplt_annual)THEN
-        VRNL(NB,NZ,NY,NX)=AMIN1(4380.0_r8,VRNLI+144.0_r8*ZTYPI(NZ,NY,NX)*(NB-1))
-        VRNX(NB,NZ,NY,NX)=AMIN1(4380.0_r8,VRNXI+144.0_r8*ZTYPI(NZ,NY,NX)*(NB-1))
+        HourThreshold4LeafOut(NB,NZ,NY,NX)=AMIN1(4380.0_r8,VRNLI+144.0_r8*ZTYPI(NZ,NY,NX)*(NB-1))
+        HourThreshold4LeafOff(NB,NZ,NY,NX)=AMIN1(4380.0_r8,VRNXI+144.0_r8*ZTYPI(NZ,NY,NX)*(NB-1))
       ELSE
-        VRNL(NB,NZ,NY,NX)=VRNLI
-        VRNX(NB,NZ,NY,NX)=VRNXI
+        HourThreshold4LeafOut(NB,NZ,NY,NX)=VRNLI
+        HourThreshold4LeafOff(NB,NZ,NY,NX)=VRNXI
       ENDIF
     ENDDO D5
   ENDIF
@@ -861,10 +861,10 @@ implicit none
     D9999: DO NX=NHW,NHE
       DO  NY=NVN,NVS
         DO NZ=1,JP
-          IDAY0(NZ,NY,NX)=-1E+06
-          IYR0(NZ,NY,NX)=-1E+06
-          IDAYH(NZ,NY,NX)=1E+06
-          IYRH(NZ,NY,NX)=1E+06
+          iDayPlanting(NZ,NY,NX)=-1E+06
+          iYearPlanting(NZ,NY,NX)=-1E+06
+          iDayPlantHarvest(NZ,NY,NX)=1E+06
+          iYearPlantHarvest(NZ,NY,NX)=1E+06
         enddo
       enddo
     ENDDO D9999
@@ -1039,7 +1039,7 @@ implicit none
     D9990: DO NY=NVN,NVS
 ! read one line
       READ(30,90,END=1002)IDATE,IYR,NPP(NY,NX) &
-        ,(DATAZ(NZ,NY,NX),IFLGC(NZ,NY,NX),NZ=1,NPP(NY,NX))
+        ,(DATAZ(NZ,NY,NX),IsPlantActive(NZ,NY,NX),NZ=1,NPP(NY,NX))
 90        FORMAT(2I4,1I3,5(A16,I4))
     ENDDO D9990
   ENDDO D9995
@@ -1072,7 +1072,7 @@ implicit none
 ! the check point file has non-zero pft
           D200: DO NN=1,NPP(NY,NX)
             D205: DO NZ=1,NS
-              IF(DATAZ(NN,NY,NX).EQ.DATAX(NZ).AND.IFLGC(NN,NY,NX).EQ.PlantIsActive)THEN
+              IF(DATAZ(NN,NY,NX).EQ.DATAX(NZ).AND.IsPlantActive(NN,NY,NX).EQ.iPlantIsActive)THEN
                 DATAP(NN,NY,NX)=DATAX(NZ)
                 DATAM(NN,NY,NX)=DATAY(NZ)
                 DATAA(NZ,NY,NX)='NO'

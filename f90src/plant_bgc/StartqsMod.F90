@@ -13,10 +13,10 @@ module StartqsMod
   private
   character(len=*),private, parameter :: mod_filename = &
   __FILE__
-  public :: startqs
+  public :: StartPlants
   contains
 
-  SUBROUTINE startqs(NZ1Q,NZ2Q)
+  SUBROUTINE StartPlants(NZ1Q,NZ2Q)
 !
 !     THIS SUBROUTINE INITIALIZES ALL PLANT VARIABLES
 !
@@ -36,13 +36,13 @@ module StartqsMod
     ZEROQ   => plt_rbgc%ZEROQ     , &
     ZEROP   => plt_biom%ZEROP     , &
     ZEROL   => plt_biom%ZEROL     , &
-    IFLGC   => plt_pheno%IFLGC      &
+    IsPlantActive   => plt_pheno%IsPlantActive      &
   )
 !
 !     INITIALIZE SHOOT GROWTH VARIABLES
 !
-!     IFLGC=PFT flag:0=not active,1=active
-!     IYR0,IDAY0,IYRH,IDAYH=year,day of planting,arvesting
+!     IsPlantActive=PFT flag:0=not active,1=active
+!     iYearPlanting,iDayPlanting,iYearPlantHarvest,iDayPlantHarvest=year,day of planting,arvesting
 !     PPI,PPX=initial,current population (m-2)
 !     CF,ClumpFactort0=current,initial clumping factor
 !     MaxCanPStomaResistH2O=cuticular resistance to water (h m-1)
@@ -55,7 +55,7 @@ module StartqsMod
       NZ2X=MIN(NZ2Q,NP)
       D9985: DO NZ=NZ1Q,NZ2X
 
-        IF(IFLGC(NZ).EQ.0)THEN
+        IF(IsPlantActive(NZ).EQ.iPlantIsDormant)THEN
 
           call InitShootGrowth(NZ)
 
@@ -75,10 +75,13 @@ module StartqsMod
 
           call InitSeedMorphoBio(NZ)
         ENDIF
+      ENDDO D9985
+
+      DO NZ=NZ1Q,NZ2X
         ZEROP(NZ)=ZERO*pftPlantPopulation(NZ)
         ZEROQ(NZ)=ZERO*pftPlantPopulation(NZ)/AREA3(NU)
         ZEROL(NZ)=ZERO*pftPlantPopulation(NZ)*1.0E+06_r8
-      ENDDO D9985
+      ENDDO  
 !
 !     FILL OUT UNUSED ARRAYS
 !
@@ -94,7 +97,7 @@ module StartqsMod
       ENDDO D9986
   RETURN
   end associate
-  END subroutine startqs
+  END subroutine StartPlants
 !------------------------------------------------------------------------------------------
 
   subroutine InitShootGrowth(NZ)
@@ -105,10 +108,10 @@ module StartqsMod
     IDAYX  =>  plt_distb%IDAYX , &
     IYRY   =>  plt_distb%IYRY  , &
     IYRX   =>  plt_distb%IYRX  , &
-    IYR0   =>  plt_distb%IYR0  , &
-    IYRH   =>  plt_distb%IYRH  , &
-    IDAYH  =>  plt_distb%IDAYH , &
-    IDAY0  =>  plt_distb%IDAY0 , &
+    iYearPlanting   =>  plt_distb%iYearPlanting  , &
+    iYearPlantHarvest   =>  plt_distb%iYearPlantHarvest  , &
+    iDayPlantHarvest  =>  plt_distb%iDayPlantHarvest , &
+    iDayPlanting  =>  plt_distb%iDayPlanting , &
     IDAYY  =>  plt_distb%IDAYY , &
     RSMX   =>  plt_photo%RSMX  , &
     PPI    =>  plt_site%PPI    , &
@@ -127,10 +130,10 @@ module StartqsMod
     ClumpFactor    =>  plt_morph%ClumpFactor   , &
     NRT    =>  plt_morph%NRT     &
   )
-  IYR0(NZ)=IYRX(NZ)
-  IDAY0(NZ)=IDAYX(NZ)
-  IYRH(NZ)=IYRY(NZ)
-  IDAYH(NZ)=IDAYY(NZ)
+  iYearPlanting(NZ)=IYRX(NZ)
+  iDayPlanting(NZ)=IDAYX(NZ)
+  iYearPlantHarvest(NZ)=IYRY(NZ)
+  iDayPlantHarvest(NZ)=IDAYY(NZ)
   PPI(NZ)=PPZ(NZ)
   PPX(NZ)=PPI(NZ)
   ClumpFactor(NZ)=ClumpFactort0(NZ)
@@ -564,10 +567,10 @@ module StartqsMod
     FLG4    =>  plt_pheno%FLG4   , &
     FLGZ    =>  plt_pheno%FLGZ   , &
     VRNY    =>  plt_pheno%VRNY   , &
-    VRNF    =>  plt_pheno%VRNF   , &
-    IDTHB   =>  plt_pheno%IDTHB  , &
+    Hours4LeafOff    =>  plt_pheno%Hours4LeafOff   , &
+    iPlantBranchState   =>  plt_pheno%iPlantBranchState  , &
     VRNZ    =>  plt_pheno%VRNZ   , &
-    IDAY    =>  plt_pheno%IDAY   , &
+    iPlantCalendar   =>  plt_pheno%iPlantCalendar  , &
     VRNS    =>  plt_pheno%VRNS   , &
     HourCounter4LeafOut_brch    =>  plt_pheno%HourCounter4LeafOut_brch   , &
     WSTR    =>  plt_pheno%WSTR   , &
@@ -616,17 +619,17 @@ module StartqsMod
 !     PP=population (grid cell-1)
 !
   pftPlantPopulation(NZ)=PPX(NZ)*AREA3(NU)
-  plt_pheno%IFLGI(NZ)=0
-  plt_pheno%IDTHP(NZ)=0
-  plt_pheno%IDTHR(NZ)=0
+  plt_pheno%doInitPlant(NZ)=ifalse
+  plt_pheno%iPlantShootState(NZ)=iDead
+  plt_pheno%iPlantRootState(NZ)=iDead
   NBT(NZ)=0
   NumOfBranches_pft(NZ)=0
   HypoctoylHeight(NZ)=0._r8
   CanopyHeight(NZ)=0._r8
   D10: DO NB=1,JBR
-    plt_pheno%IFLGA(NB,NZ)=0
-    plt_pheno%IFLGE(NB,NZ)=0
-    plt_pheno%IFLGF(NB,NZ)=0
+    plt_pheno%doInitLeafOut(NB,NZ)=0
+    plt_pheno%doPlantLeafOut(NB,NZ)=iDisable
+    plt_pheno%doPlantLeaveOff(NB,NZ)=iDisable
     plt_pheno%IFLGR(NB,NZ)=0
     plt_pheno%IFLGQ(NB,NZ)=0
     GROUP(NB,NZ)=GROUPI(NZ)
@@ -646,16 +649,16 @@ module StartqsMod
     VRNY(NB,NZ)=0._r8
     VRNZ(NB,NZ)=0._r8
     VRNS(NB,NZ)=VRNY(NB,NZ)
-    VRNF(NB,NZ)=VRNZ(NB,NZ)
+    Hours4LeafOff(NB,NZ)=VRNZ(NB,NZ)
     HourCounter4LeafOut_brch(NB,NZ)=0._r8
     RubiscoActivity_brpft(NB,NZ)=1.0
     FDBKX(NB,NZ)=1.0
     FLG4(NB,NZ)=0
     FLGZ(NB,NZ)=0
     BranchNumber_brchpft(NB,NZ)=0
-    plt_pheno%IDTHB(NB,NZ)=ibrdead
-    D15: DO M=1,pltpar%NumGrothStages
-      IDAY(M,NB,NZ)=0
+    plt_pheno%iPlantBranchState(NB,NZ)=iDead
+    D15: DO M=1,pltpar%NumGrowthStages
+      iPlantCalendar(M,NB,NZ)=0
     ENDDO D15
   ENDDO D10
 !
@@ -696,7 +699,7 @@ module StartqsMod
         StemA_lyrnodbrchpft(N,L,NB,NZ)=0._r8
       enddo
     ENDDO D5
-    DO K=0,JNODS1
+    DO K=0,MaxCanopyNodes1
       ARLF1(K,NB,NZ)=0._r8
       HTNODE(K,NB,NZ)=0._r8
       plt_morph%HTNODX(K,NB,NZ)=0._r8
@@ -1016,7 +1019,7 @@ module StartqsMod
     CNGR     =>   plt_allom%CNGR   , &
     CPGR     =>   plt_allom%CPGR   , &
     RTWT1E   =>   plt_biom%RTWT1E  , &
-    WTRVX    =>   plt_biom%WTRVX   , &
+    SeedCPlanted_pft    =>   plt_biom%SeedCPlanted_pft   , &
     WTRT1E   =>   plt_biom%WTRT1E  , &
     CanPBLeafShethC    =>   plt_biom%CanPBLeafShethC   , &
     CanopyLeafShethC_pft     =>   plt_biom%CanopyLeafShethC_pft    , &
@@ -1047,8 +1050,8 @@ module StartqsMod
 !     WSRTL=total root protein C mass (g)
 !     CPOOLR,ZPOOLR,PPOOLR=C,N,P in root,myco nonstructural pools (g)
 !
-  WTRVX(NZ)=SeedCMass(NZ)*pftPlantPopulation(NZ)
-  WTRVE(ielmc,NZ)=WTRVX(NZ)
+  SeedCPlanted_pft(NZ)=SeedCMass(NZ)*pftPlantPopulation(NZ)
+  WTRVE(ielmc,NZ)=SeedCPlanted_pft(NZ)
   WTRVE(ielmn,NZ)=CNGR(NZ)*WTRVE(ielmc,NZ)
   WTRVE(ielmp,NZ)=CPGR(NZ)*WTRVE(ielmc,NZ)
   WTLFBE(ielmn,1,NZ)=CNGR(NZ)*WTLFBE(ielmc,1,NZ)

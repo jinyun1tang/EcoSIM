@@ -121,13 +121,13 @@ module WthrMod
       !     RADN=hourky SW radiation
       !     RMAX=maximum hourly radiation
       !     ZNOON=time of solar noon
-      !     DYLN=daylength
+      !     DayLenthCurrent=daylength
 !
       IF(IETYP(NY,NX).NE.-2)THEN
 !       not phytotron
-        IF(DYLN(NY,NX).GT.ZERO)THEN
+        IF(DayLenthCurrent(NY,NX).GT.ZERO)THEN
           RADN(NY,NX)=AZMAX1(RMAX*SIN((J-(ZNOON(NY,NX) &
-            -DYLN(NY,NX)/2.0_r8))*PICON/DYLN(NY,NX)))
+            -DayLenthCurrent(NY,NX)/2.0_r8))*PICON/DayLenthCurrent(NY,NX)))
         ELSE
           RADN(NY,NX)=0.0_r8
         ENDIF
@@ -139,15 +139,15 @@ module WthrMod
       !     TCA,TairK=air temperature (oC,K)
       !     TAVG*,AMP*=daily averages, amplitudes from day.f
       !
-      IF(J.LT.(ZNOON(NY,NX)-DYLN(NY,NX)/2))THEN
+      IF(J.LT.(ZNOON(NY,NX)-DayLenthCurrent(NY,NX)/2))THEN
         TCA(NY,NX)=TAVG1+AMP1*SIN(((J+ZNOON(NY,NX)-3.0)*PICON &
-          /(ZNOON(NY,NX)+9.0-DYLN(NY,NX)/2.0))+PICON2h)
+          /(ZNOON(NY,NX)+9.0-DayLenthCurrent(NY,NX)/2.0))+PICON2h)
       ELSEIF(J.GT.ZNOON(NY,NX)+3)THEN
         TCA(NY,NX)=TAVG3+AMP3*SIN(((J-ZNOON(NY,NX)-3.0)*PICON &
-          /(ZNOON(NY,NX)+9.0-DYLN(NY,NX)/2.0))+PICON2h)
+          /(ZNOON(NY,NX)+9.0-DayLenthCurrent(NY,NX)/2.0))+PICON2h)
       ELSE
         TCA(NY,NX)=TAVG2+AMP2*SIN(((J-(ZNOON(NY,NX) &
-          -DYLN(NY,NX)/2.0_r8))*PICON/(3.0_r8+DYLN(NY,NX)/2.0_r8))-PICON2h)
+          -DayLenthCurrent(NY,NX)/2.0_r8))*PICON/(3.0_r8+DayLenthCurrent(NY,NX)/2.0_r8))-PICON2h)
       ENDIF
       TairK(NY,NX)=units%Celcius2Kelvin(TCA(NY,NX))
       if(abs(TairK(NY,NX))>400._r8)then
@@ -158,15 +158,15 @@ module WthrMod
       !     VAVG*,VAMP*=daily averages, amplitudes from day.f
       !      ALTI=altitude
       !
-      IF(J.LT.(ZNOON(NY,NX)-DYLN(NY,NX)/2))THEN
+      IF(J.LT.(ZNOON(NY,NX)-DayLenthCurrent(NY,NX)/2))THEN
         VPK(NY,NX)=VAVG1+VMP1*SIN(((J+ZNOON(NY,NX)-3.0_r8)*PICON &
-          /(ZNOON(NY,NX)+9.0_r8-DYLN(NY,NX)/2.0_r8))+PICON2h)
+          /(ZNOON(NY,NX)+9.0_r8-DayLenthCurrent(NY,NX)/2.0_r8))+PICON2h)
       ELSEIF(J.GT.ZNOON(NY,NX)+3)THEN
         VPK(NY,NX)=VAVG3+VMP3*SIN(((J-ZNOON(NY,NX)-3.0_r8)*PICON &
-          /(ZNOON(NY,NX)+9.0_r8-DYLN(NY,NX)/2.0_r8))+PICON2h)
+          /(ZNOON(NY,NX)+9.0_r8-DayLenthCurrent(NY,NX)/2.0_r8))+PICON2h)
       ELSE
         VPK(NY,NX)=VAVG2+VMP2*SIN(((J-(ZNOON(NY,NX) &
-          -DYLN(NY,NX)/2.0_r8))*PICON /(3.0_r8+DYLN(NY,NX)/2.0_r8))-PICON2h)
+          -DayLenthCurrent(NY,NX)/2.0_r8))*PICON /(3.0_r8+DayLenthCurrent(NY,NX)/2.0_r8))-PICON2h)
       ENDIF
       !VPS(NY,NX)=0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/TairK(NY,NX))) &
       VPS(NY,NX)=vapsat0(TairK(ny,nx))*EXP(-ALTI(NY,NX)/7272.0_r8)

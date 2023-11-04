@@ -135,7 +135,7 @@ implicit none
     ENDIF
   ENDDO D190
 
-  IF(IFLGY.EQ.1.AND.IYRX.LT.IYRC)then
+  IF(IFLGY.EQ.1.AND.IYRX.LT.iYearCurrent)then
     GO60=.true.
     return
   endif
@@ -365,7 +365,7 @@ implicit none
     ENDIF
   ENDDO D160
 
-  IF(IFLGY.EQ.1.AND.IYRX.LT.IYRC)THEN
+  IF(IFLGY.EQ.1.AND.IYRX.LT.iYearCurrent)THEN
 ! if the year read in is not equal to year required
     GO60=.TRUE.
     RETURN

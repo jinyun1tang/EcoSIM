@@ -94,7 +94,7 @@ implicit none
   real(r8),pointer   :: histr_1D_ECO_RA_col(:)         !Eco_AutoR_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_ECO_NPP_col(:)        !Eco_NPP_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_ECO_RH_col(:)         !Eco_HR_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: histr_1D_tDIC_col(:)        !UCO2S(NY,NX)/AREA(3,NU(NY,NX),NY,NX), total soil DIC
+  real(r8),pointer   :: histr_1D_tDIC_col(:)        !DIC_mass_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX), total soil DIC
   real(r8),pointer   :: histr_1D_tSTG_DEAD_C_col(:)       !WTSTGET(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_tSTG_DEAD_N_col(:)       !WTSTGET(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_tSTG_DEAD_P_col(:)       !WTSTGET(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)    
@@ -232,7 +232,7 @@ implicit none
   real(r8),pointer   :: histr_1D_SURF_LITRf_P_FLX_ptc(:)  !TESN0(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_BRANCH_NO_ptc(:)     !NumOfBranches_pft(NZ,NY,NX)
   real(r8),pointer   :: histr_1D_LEAF_NC_ptc(:)       !(WTLFE(ielmn,NZ,NY,NX)+CanopyNonstructElements_pft(ielmn,NZ,NY,NX))/(WTLFE(ielmc,NZ,NY,NX)+CanopyNonstructElements_pft(ielmc,NZ,NY,NX)),mass based CN ratio of leaf  
-  real(r8),pointer   :: histr_1D_GROWTH_STG_ptc(:)    !plant development stage, integer, 0-10, planting, emergence, floral_init, jointing, 
+  real(r8),pointer   :: histr_1D_Growth_Stage_ptc(:)    !plant development stage, integer, 0-10, planting, emergence, floral_init, jointing, 
                                       !elongation, heading, anthesis, seed_fill, see_no_set, seed_mass_set, end_seed_fill
   real(r8),pointer   :: histr_2D_LEAF_NODE_NO_ptc(:,:)       !VSTG(NB1(NZ,NY,NX),NZ,NY,NX), leaf NO
   real(r8),pointer   :: histr_2D_RUB_ACTVN_ptc(:,:)     !RubiscoActivity_brpft(NB1(NZ,NY,NX),NZ,NY,NX), branch down-regulation of CO2 fixation
@@ -481,7 +481,7 @@ implicit none
   allocate(this%histr_1D_FIREp_P_FLX_ptc(beg_ptc:end_ptc))               !VPO4F(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_SURF_LITRf_P_FLX_ptc(beg_ptc:end_ptc))         !TESN0(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_BRANCH_NO_ptc(beg_ptc:end_ptc))            !NumOfBranches_pft(NZ,NY,NX)
-  allocate(this%histr_1D_GROWTH_STG_ptc(beg_ptc:end_ptc));      this%histr_1D_GROWTH_STG_ptc=spval
+  allocate(this%histr_1D_Growth_Stage_ptc(beg_ptc:end_ptc));      this%histr_1D_Growth_Stage_ptc=spval
   allocate(this%histr_1D_LEAF_NC_ptc(beg_ptc:end_ptc))              !(WTLFE(ielmn,NZ,NY,NX)+CanopyNonstructElements_pft(ielmn,NZ,NY,NX))/(WTLFE(ielmc,NZ,NY,NX)+CanopyNonstructElements_pft(ielmc,NZ,NY,NX)),mass based CN ratio of leaf  
   allocate(this%histr_2D_tSOC_vr_col(beg_col:end_col,1:JZ))         !ORGC(1:JZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total soil C                                          
   allocate(this%histr_2D_LEAF_NODE_NO_ptc(beg_ptc:end_ptc,1:JBR))        !VSTG(NB1(NZ,NY,NX),NZ,NY,NX), leaf NO
@@ -1301,9 +1301,9 @@ implicit none
   call hist_addfld1d(fname='BRANCH_NO',units='none',avgflag='I',&
     long_name='Plant branch number',ptr_patch=data1d_ptr)      
 
-  data1d_ptr => this%histr_1D_GROWTH_STG_ptc(beg_ptc:end_ptc)  !plant development stage, integer, 0-10, planting, emergence, floral_init, jointing, 
+  data1d_ptr => this%histr_1D_Growth_Stage_ptc(beg_ptc:end_ptc)  !plant development stage, integer, 0-10, planting, emergence, floral_init, jointing, 
                                                                !elongation, heading, anthesis, seed_fill, see_no_set, seed_mass_set, end_seed_fill
-  call hist_addfld1d(fname='GROWTH_STG',units='none',avgflag='I',&
+  call hist_addfld1d(fname='Growth_Stage',units='none',avgflag='I',&
     long_name='plant development stage, integer, 0-planting, 1-emergence, 2-floral_init, 3-jointing,'// &
     '4-elongation, 5-heading, 6-anthesis, 7-seed_fill, 8-see_no_set, 9-seed_mass_set, 10-end_seed_fill',&
     ptr_patch=data1d_ptr)      
@@ -1489,7 +1489,7 @@ implicit none
       this%histr_1D_ECO_RA_col(ncol)      = Eco_AutoR_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_ECO_NPP_col(ncol)     = Eco_NPP_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_ECO_RH_col(ncol)      = Eco_HR_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%histr_1D_tDIC_col(ncol)     = UCO2S(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%histr_1D_tDIC_col(ncol)     = DIC_mass_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_tSTG_DEAD_C_col(ncol)    = WTSTGET(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_tSTG_DEAD_N_col(ncol)    = WTSTGET(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_tSTG_DEAD_P_col(ncol)    = WTSTGET(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)            
@@ -1654,9 +1654,9 @@ implicit none
         if(NB1(NZ,NY,NX)> 0)then
           DO KN=10,0,-1
             IF(KN==0)THEN
-              this%histr_1D_GROWTH_STG_ptc(nptc)   =KN
+              this%histr_1D_Growth_Stage_ptc(nptc)   =KN
             ELSE
-              if(IDAY(KN,NB1(NZ,NY,NX),NZ,NY,NX)>0)this%histr_1D_GROWTH_STG_ptc(nptc) =KN
+              if(iPlantCalendar(KN,NB1(NZ,NY,NX),NZ,NY,NX)>0)this%histr_1D_Growth_Stage_ptc(nptc) =KN
               exit    
             ENDIF  
           ENDDO

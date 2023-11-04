@@ -66,11 +66,11 @@
     N=30*M+ICOR(M)
 
 !  leap year February.
-    IF(isLeap(iyear_cur) .and. M.GE.2)N=N+1
+    IF(isLeap(iYearCurrent) .and. M.GE.2)N=N+1
       IF(I.LE.N)THEN
         N1=I-NN
         N2=M
-        N3=iyear_cur
+        N3=iYearCurrent
         WRITE(CHARN1,'(I3)')N1+100
         WRITE(CHARN2,'(I3)')N2+100
         WRITE(CHARN3,'(I4)')N3
@@ -189,15 +189,15 @@
 !
 !     CALCULATE DAYLENGTH FROM SOLAR ANGLE
 !
-!     DYLX,DLYN=daylength of previous,current day
+!     DayLenthPrev,DLYN=daylength of previous,current day
 !     ALAT=latitude
 !
-      DYLX(NY,NX)=DYLN(NY,NX)
+      DayLenthPrev(NY,NX)=DayLenthCurrent(NY,NX)
       XI=I
       IF(I.EQ.366)XI=365.5_r8
       DECDAY=XI+100
 
-      DYLN(NY,NX)=GetDayLength(ALAT(NY,NX),XI,DECLIN)
+      DayLenthCurrent(NY,NX)=GetDayLength(ALAT(NY,NX),XI,DECLIN)
 !
 !     TIME STEP OF WEARHER DATA
 !     ITYPE 1=daily,2=hourly
@@ -225,8 +225,8 @@
 
       IF(ITYPE.EQ.1)THEN
         IF(IETYP(NY,NX).GE.-1)THEN
-          IF(DYLN(NY,NX).GT.ZERO)THEN
-            RMAX=SRAD(I)/(DYLN(NY,NX)*0.658_r8)
+          IF(DayLenthCurrent(NY,NX).GT.ZERO)THEN
+            RMAX=SRAD(I)/(DayLenthCurrent(NY,NX)*0.658_r8)
           ELSE
             RMAX=0._r8
           ENDIF
@@ -372,7 +372,7 @@
                 RRIG(J,I,NY,NX)=RR/(IIRRA(4,NY,NX)-IIRRA(3,NY,NX)+1)
               ENDDO D170
               WDPTH(I,NY,NX)=DIRRA(2,NY,NX)
-              WRITE(*,2222)'auto',IYRC,I,IIRRA(3,NY,NX),IIRRA(4,NY,NX) &
+              WRITE(*,2222)'auto',iYearCurrent,I,IIRRA(3,NY,NX),IIRRA(4,NY,NX) &
                 ,IFLGV(NY,NX),RR,TFZ,TVW,TWP,FIRRA(NY,NX),PSICanPDailyMin(1,NY,NX) &
                 ,CIRRA(NY,NX),DIRRA1,WDPTH(I,NY,NX)
 

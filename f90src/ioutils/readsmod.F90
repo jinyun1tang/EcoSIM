@@ -129,7 +129,7 @@ module readsmod
 !
 ! IDATA(3),IDATA(6)=start,end year of current scene
 !
-  IYRC=yearc
+  iYearCurrent=yearc
 
 !
 ! OPEN CHECKPOINT FILES FOR SOIL VARIABLES

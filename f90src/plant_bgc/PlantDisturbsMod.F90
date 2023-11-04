@@ -669,11 +669,11 @@ module PlantDisturbsMod
 !     begin_execution
   associate(                               &
     JHVST    =>  plt_distb%JHVST     , &
-    IDAYH    =>  plt_distb%IDAYH     , &
-    IDAY0    =>  plt_distb%IDAY0     , &
+    iDayPlantHarvest    =>  plt_distb%iDayPlantHarvest     , &
+    iDayPlanting    =>  plt_distb%iDayPlanting     , &
     ITILL    =>  plt_distb%ITILL     , &
-    IYR0     =>  plt_distb%IYR0      , &
-    IYRH     =>  plt_distb%IYRH      , &
+    iYearPlanting     =>  plt_distb%iYearPlanting      , &
+    iYearPlantHarvest     =>  plt_distb%iYearPlantHarvest      , &
     XCORP    =>  plt_distb%XCORP     , &
     CFOPE    =>  plt_soilchem%CFOPE  , &
     trcg_rootml     =>  plt_rbgc%trcg_rootml       , &
@@ -720,21 +720,21 @@ module PlantDisturbsMod
     FWODBE   =>  plt_allom%FWODBE    , &
     FWODLE   =>  plt_allom%FWODLE    , &
     FWODRE   =>  plt_allom%FWODRE    , &
-    IDTHB    =>  plt_pheno%IDTHB     , &
+    iPlantBranchState    =>  plt_pheno%iPlantBranchState     , &
     ISTYP    =>  plt_pheno%ISTYP     , &
-    IDTH     =>  plt_pheno%IDTH      , &
+    iPlantState    =>  plt_pheno%iPlantState     , &
     IGTYP    =>  plt_pheno%IGTYP     , &
     IBTYP    =>  plt_pheno%IBTYP     , &
     IWTYP    =>  plt_pheno%IWTYP     , &
-    IDTHR    =>  plt_pheno%IDTHR     , &
-    IDTHP    =>  plt_pheno%IDTHP     , &
+    iPlantRootState   =>  plt_pheno%iPlantRootState    , &
+    iPlantShootState    =>  plt_pheno%iPlantShootState     , &
     HCOB     =>  plt_photo%HCOB      , &
     CO2B     =>  plt_photo%CO2B      , &
     CPOOL3   =>  plt_photo%CPOOL3    , &
     CPOOL4   =>  plt_photo%CPOOL4    , &
     NJ       =>  plt_site%NJ         , &
     pftPlantPopulation       =>  plt_site%pftPlantPopulation         , &
-    IYRC     =>  plt_site%IYRC       , &
+    iYearCurrent     =>  plt_site%iYearCurrent       , &
     ZNOON    =>  plt_site%ZNOON      , &
     VOLWOU   =>  plt_site%VOLWOU     , &
     NU       =>  plt_site%NU         , &
@@ -776,8 +776,8 @@ module PlantDisturbsMod
 !     ZNOON=hour of solar noon
 !     IBTYP=turnover:0=all abve-grd,1=all leaf+petiole,2=none,3=between 1,2
 !     IGTYP=growth type:0=bryophyte,1=graminoid,2=shrub,tree
-!     IDAY0,IYR0=day,year of planting
-!     IYRC=current year
+!     iDayPlanting,iYearPlanting=day,year of planting
+!     iYearCurrent=current year
 !     ITILL=soil disturbance type 1-20:tillage,21=litter removal,22=fire,23-24=drainage
 !     XHVST=fraction of PFT remaining after disturbance
 !     PPX,PP=PFT population per m2,grid cell
@@ -785,10 +785,10 @@ module PlantDisturbsMod
 !     VHeatCapCanP=canopy heat capacity
 !
   IF(J.EQ.INT(ZNOON).AND.(IBTYP(NZ).EQ.0 &
-    .OR.IGTYP(NZ).LE.1).AND.(I.NE.IDAY0(NZ) &
-    .OR.IYRC.NE.IYR0(NZ)))THEN
+    .OR.IGTYP(NZ).LE.1).AND.(I.NE.iDayPlanting(NZ) &
+    .OR.iYearCurrent.NE.iYearPlanting(NZ)))THEN
     IF(ITILL.LE.10.OR.NZ.NE.1)THEN
-      IF(I.GT.IDAY0(NZ).OR.IYRC.GT.IYR0(NZ))THEN
+      IF(I.GT.iDayPlanting(NZ).OR.iYearCurrent.GT.iYearPlanting(NZ))THEN
         XHVST=XCORP
         PPX(NZ)=PPX(NZ)*XHVST
         pftPlantPopulation(NZ)=pftPlantPopulation(NZ)*XHVST
@@ -799,13 +799,13 @@ module PlantDisturbsMod
 !
 !     TERMINATE BRANCHES IF TILLAGE IMPLEMENT 10 IS SELECTED
 !
-!     IDTHB=branch living flag: 0=alive,1=dead
+!     iPlantBranchState=branch living flag: 0=alive,1=dead
 !     PP=PFT population
 !
         D8975: DO NB=1,NumOfBranches_pft(NZ)
-          IF(IDTHB(NB,NZ).EQ.ibralive)THEN
+          IF(iPlantBranchState(NB,NZ).EQ.iLive)THEN
             IF(pftPlantPopulation(NZ).LE.0.0)then
-              IDTHB(NB,NZ)=ibrdead
+              iPlantBranchState(NB,NZ)=iDead
             endif
 !
 !     LITTERFALL FROM BRANCHES DURING TILLAGE
@@ -898,7 +898,7 @@ module PlantDisturbsMod
             CanopyLeafShethC_pft(NZ)=CanopyLeafShethC_pft(NZ)+CanPBLeafShethC(NB,NZ)
 
             CanPStalkC(NZ)=CanPStalkC(NZ)+CanPBStalkC(NB,NZ)
-            D8970: DO K=0,JNODS1
+            D8970: DO K=0,MaxCanopyNodes1
               IF(K.NE.0)THEN
                 CPOOL3(K,NB,NZ)=CPOOL3(K,NB,NZ)*XHVST
                 CPOOL4(K,NB,NZ)=CPOOL4(K,NB,NZ)*XHVST
@@ -946,19 +946,19 @@ module PlantDisturbsMod
 !     TERMINATE ROOTS IF TILLAGE IMPLEMENT 10 IS SELECTED
 !
 !     PP=PFT population
-!     IDTHR,IDTHP=PFT root,shoot living flag: 0=alive,1=dead
+!     IDTHR,iPlantShootState=PFT root,shoot living flag: 0=alive,1=dead
 !     IDTH=PFT living flag: 0=alive,1=dead
 !     JHVST=terminate PFT:0=no,1=yes,2=yes,and reseed
-!     IDAYH,IYRH=day,year of harvesting
-!     IYRC=current year
+!     iDayPlantHarvest,iYearPlantHarvest=day,year of harvesting
+!     iYearCurrent=current year
 !
-        IF(pftPlantPopulation(NZ).LE.0.0)THEN
-          IDTHR(NZ)=ibrdead
-          IDTHP(NZ)=ibrdead
-          IDTH(NZ)=ibrdead
+        IF(pftPlantPopulation(NZ).LE.0.0_r8)THEN
+          iPlantRootState(NZ)=iDead
+          iPlantShootState(NZ)=iDead
+          iPlantState(NZ)=iDead
           JHVST(NZ)=ihv_terminate
-          IDAYH(NZ)=I
-          IYRH(NZ)=IYRC
+          iDayPlantHarvest(NZ)=I
+          iYearPlantHarvest(NZ)=iYearCurrent
         ENDIF
 !
 !     LITTERFALL FROM ROOTS DURING TILLAGE
@@ -1107,7 +1107,7 @@ module PlantDisturbsMod
   real(r8) :: ZPOLNX,XHVST(NumOfPlantChemElements)
   real(r8) :: XHVST1(NumOfPlantChemElements)
   REAL(R8) :: WGLFBL(NumOfCanopyLayers1,JP1,JP1)
-  real(r8) :: FHVSHK(0:JNODS1),FHVSETK(0:JNODS1)
+  real(r8) :: FHVSHK(0:MaxCanopyNodes1),FHVSETK(0:MaxCanopyNodes1)
   real(r8) :: ARLFY,ARLFR,ARLFG
   real(r8) :: APSILT
   real(r8) :: CPOOLX
@@ -1231,17 +1231,17 @@ module PlantDisturbsMod
     FWODBE   => plt_allom%FWODBE   , &
     FWODLE   => plt_allom%FWODLE   , &
     GRWTB    => plt_allom%GRWTB    , &
-    IDTHB    =>  plt_pheno%IDTHB   , &
+    iPlantBranchState    =>  plt_pheno%iPlantBranchState   , &
     fTgrowCanP     =>  plt_pheno%fTgrowCanP    , &
-    IDAY     =>  plt_pheno%IDAY    , &
+    iPlantCalendar    =>  plt_pheno%iPlantCalendar   , &
     GROUP    =>  plt_pheno%GROUP   , &
     VSTGX    =>  plt_pheno%VSTGX   , &
     IGTYP    =>  plt_pheno%IGTYP   , &
     IBTYP    =>  plt_pheno%IBTYP   , &
-    IFLGA    =>  plt_pheno%IFLGA   , &
+    doInitLeafOut    =>  plt_pheno%doInitLeafOut   , &
     ISTYP    =>  plt_pheno%ISTYP   , &
-    VRNX     =>  plt_pheno%VRNX    , &
-    VRNF     =>  plt_pheno%VRNF    , &
+    HourThreshold4LeafOff    =>  plt_pheno%HourThreshold4LeafOff   , &
+    Hours4LeafOff     =>  plt_pheno%Hours4LeafOff    , &
     IWTYP    =>  plt_pheno%IWTYP   , &
     TGSTGI   =>  plt_pheno%TGSTGI  , &
     TGSTGF   =>  plt_pheno%TGSTGF  , &
@@ -1511,14 +1511,14 @@ module PlantDisturbsMod
 !
       D9860: DO NB=1,NumOfBranches_pft(NZ)
         DO  L=1,NumOfCanopyLayers1
-          DO  K=0,JNODS1
+          DO  K=0,MaxCanopyNodes1
             WGLFBL(L,NB,NZ)=0._r8
           enddo
         enddo
       ENDDO D9860
       D9870: DO NB=1,NumOfBranches_pft(NZ)
         DO  L=1,NumOfCanopyLayers1
-          DO  K=0,JNODS1
+          DO  K=0,MaxCanopyNodes1
             WGLFBL(L,NB,NZ)=WGLFBL(L,NB,NZ)+WGLFLE(ielmc,L,K,NB,NZ)
           enddo
         enddo
@@ -1581,7 +1581,7 @@ module PlantDisturbsMod
         ELSE
           WHVSBL=0._r8
         ENDIF
-        D9845: DO K=JNODS1,0,-1
+        D9845: DO K=MaxCanopyNodes1,0,-1
           IF((IHVST(NZ).NE.4.AND.IHVST(NZ).NE.6).OR.WHVSBL.GT.0.0)THEN
             IF(IHVST(NZ).EQ.4.OR.IHVST(NZ).EQ.6)THEN
               IF(WGLFLE(ielmc,L,K,NB,NZ).GT.WHVSBL)THEN
@@ -1646,7 +1646,7 @@ module PlantDisturbsMod
       WGSHGX=0._r8
       WGLFGY=0._r8
       WGSHGY=0._r8
-      D9825: DO K=0,JNODS1
+      D9825: DO K=0,MaxCanopyNodes1
         ARLFG=0._r8
         WGLFGE(1:NumOfPlantChemElements)=0._r8
 !
@@ -1738,7 +1738,7 @@ module PlantDisturbsMod
       ELSE
         WHVSBS=0._r8
       ENDIF
-      D9805: DO K=JNODS1,0,-1
+      D9805: DO K=MaxCanopyNodes1,0,-1
 !112   FORMAT(A8,8I4,12E12.4)
         IF(HTNODE(K,NB,NZ).GT.0.0) &
           HTSTKX=AMAX1(HTSTKX,HTNODE(K,NB,NZ))
@@ -1937,7 +1937,7 @@ module PlantDisturbsMod
 !
         IF(ICTYP(NZ).EQ.ic4_photo.AND.CPOOLX.GT.ZEROP(NZ))THEN
           FHVST4=CPOOLG/CPOOLX
-          D9810: DO K=1,JNODS1
+          D9810: DO K=1,MaxCanopyNodes1
             WTHTH0E(ielmc)=WTHTH0E(ielmc)+(1._r8-FHVST4)*CPOOL3(K,NB,NZ)
             WTHTH0E(ielmc)=WTHTH0E(ielmc)+(1._r8-FHVST4)*CPOOL4(K,NB,NZ)
             WTHTH0E(ielmc)=WTHTH0E(ielmc)+(1._r8-FHVST4)*CO2B(K,NB,NZ)
@@ -2031,7 +2031,7 @@ module PlantDisturbsMod
 !     WTSTK=stalk C mass
 !     WGNODE,WGNODN,WGNODP=node stalk C,N,P mass
 !
-        D9820: DO K=JNODS1,0,-1
+        D9820: DO K=MaxCanopyNodes1,0,-1
           IF(IHVST(NZ).NE.4.AND.IHVST(NZ).NE.6)THEN
             IF(HTNODX(K,NB,NZ).GT.ZERO)THEN
               IF(IHVST(NZ).NE.3)THEN
@@ -2211,7 +2211,7 @@ module PlantDisturbsMod
 !     VOLWOU,UVOLO=accumulated water loss for water balance calculation
 !
         CPOOLK(NB,NZ)=0._r8
-        D1325: DO K=1,JNODS1
+        D1325: DO K=1,MaxCanopyNodes1
           CPOOLK(NB,NZ)=CPOOLK(NB,NZ) &
             +CPOOL3(K,NB,NZ)+CPOOL4(K,NB,NZ) &
             +CO2B(K,NB,NZ)+HCOB(K,NB,NZ)
@@ -2249,8 +2249,8 @@ module PlantDisturbsMod
 !          IHVST=4 or 6:animal or insect biomass(g LM m-2),IHVST=5:fire
 !     ZC=canopy height
 !     IWTYP=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
-!     VRNF,VRNX=leafoff hours,hours required for leafoff
-!     IDAY(1,=emergence date
+!     Hours4LeafOff,VRNX=leafoff hours,hours required for leafoff
+!     iPlantCalendar(ipltcal_Emerge,=emergence date
 !     GROUP=node number required for floral initiation
 !     PSTGI=node number at floral initiation
 !     PSTGF=node number at flowering
@@ -2258,14 +2258,14 @@ module PlantDisturbsMod
 !     TGSTGI=total change in vegve node number normalized for maturity group
 !     TGSTGF=total change in reprve node number normalized for maturity group
 !     FLG4=number of hours with no grain fill
-!     IFLGA=flag for initializing leafout
+!     doInitLeafOut=flag for initializing leafout
 !
         IF((IBTYP(NZ).EQ.0.OR.IGTYP(NZ).LE.1) &
           .AND.(IHVST(NZ).NE.4.AND.IHVST(NZ).NE.6) &
           .AND.CanopyHeight(NZ).GT.HVST(NZ))THEN
-          IF((IWTYP(NZ).NE.0.AND.VRNF(NB,NZ) &
-            .LE.FVRN(IWTYP(NZ))*VRNX(NB,NZ)) &
-            .OR.(IWTYP(NZ).EQ.0.AND.IDAY(1,NB,NZ).NE.0))THEN
+          IF((IWTYP(NZ).NE.0.AND.Hours4LeafOff(NB,NZ) &
+            .LE.FVRN(IWTYP(NZ))*HourThreshold4LeafOff(NB,NZ)) &
+            .OR.(IWTYP(NZ).EQ.0.AND.iPlantCalendar(ipltcal_Emerge,NB,NZ).NE.0))THEN
             GROUP(NB,NZ)=GROUPI(NZ)
             PSTGI(NB,NZ)=PSTG(NB,NZ)
             PSTGF(NB,NZ)=0._r8
@@ -2273,11 +2273,11 @@ module PlantDisturbsMod
             TGSTGI(NB,NZ)=0._r8
             TGSTGF(NB,NZ)=0._r8
             FLG4(NB,NZ)=0._r8
-            IDAY(1,NB,NZ)=I
+            iPlantCalendar(ipltcal_Emerge,NB,NZ)=I
             D3005: DO M=2,10
-              IDAY(M,NB,NZ)=0
+              iPlantCalendar(M,NB,NZ)=0
             ENDDO D3005
-            IFLGA(NB,NZ)=0
+            doInitLeafOut(NB,NZ)=0
             IF(NB.EQ.NB1(NZ))THEN
               D3010: DO NBX=1,NumOfBranches_pft(NZ)
                 IF(NBX.NE.NB1(NZ))THEN
@@ -2288,11 +2288,11 @@ module PlantDisturbsMod
                   TGSTGI(NBX,NZ)=0._r8
                   TGSTGF(NBX,NZ)=0._r8
                   FLG4(NBX,NZ)=0._r8
-                  IDAY(1,NBX,NZ)=I
+                  iPlantCalendar(ipltcal_Emerge,NBX,NZ)=I
                   D3015: DO M=2,10
-                    IDAY(M,NBX,NZ)=0
+                    iPlantCalendar(M,NBX,NZ)=0
                   ENDDO D3015
-                  IFLGA(NBX,NZ)=0
+                  doInitLeafOut(NBX,NZ)=0
                 ENDIF
               ENDDO D3010
             ENDIF
@@ -2302,7 +2302,7 @@ module PlantDisturbsMod
 !     DEATH OF BRANCH IF KILLING HARVEST ENTERED IN 'READQ'
 !
 !     JHVST=terminate PFT:0=no,1=yes,2=yes,and reseed
-!     IDTHB=branch living flag: 0=alive,1=dead
+!     iPlantBranchState=branch living flag: 0=alive,1=dead
 !     PP=PFT population
 !     WTLS=total PFT leaf+petiole C mass
 !     WTSTK=total PFT stalk C mass
@@ -2310,10 +2310,10 @@ module PlantDisturbsMod
 !     CanopyBranchStemApft_lyr=total PFT stalk surface area
 !
         IF(JHVST(NZ).NE.ihv_noaction)then
-          IDTHB(NB,NZ)=ibrdead
+          iPlantBranchState(NB,NZ)=iDead
         endif
         IF(pftPlantPopulation(NZ).LE.0.0)then
-          IDTHB(NB,NZ)=ibrdead
+          iPlantBranchState(NB,NZ)=iDead
         endif
       ENDDO D9835
       CanopyLeafShethC_pft(NZ)=0._r8

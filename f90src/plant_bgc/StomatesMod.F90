@@ -632,7 +632,7 @@
     WSLF     => plt_biom%WSLF     , &
     ARLF1    => plt_morph%ARLF1     &
   )
-  DO K=1,JNODS1
+  DO K=1,MaxCanopyNodes1
     IF(ARLF1(K,NB,NZ).GT.ZEROP(NZ).AND.WGLFE(ielmc,K,NB,NZ).GT.ZEROP(NZ))THEN
       WSDN=WSLF(K,NB,NZ)/ARLF1(K,NB,NZ)
     ELSE
@@ -673,7 +673,7 @@
     FLG4   =>  plt_pheno%FLG4   , &
     HourCounter4LeafOut_brch   =>  plt_pheno%HourCounter4LeafOut_brch   , &
     ISTYP  =>  plt_pheno%ISTYP  , &
-    IDTHB  =>  plt_pheno%IDTHB  , &
+    iPlantBranchState  =>  plt_pheno%iPlantBranchState  , &
     ZERO   =>  plt_site%ZERO    , &
     FDBKX  => plt_photo%FDBKX   , &
     RubiscoActivity_brpft   => plt_photo%RubiscoActivity_brpft      &
@@ -723,11 +723,11 @@
 !
 !     FOR EACH NODE
 !
-!     IDTHB=branch life flag:0=living,1=dead
+!     iPlantBranchState=branch life flag:0=living,1=dead
 !     ARLF,WGLF,WSLF=leaf area,C mass,protein mass
 !     WSDN=leaf protein surficial density
 !
-  IF(IDTHB(NB,NZ).EQ.ibralive)THEN
+  IF(iPlantBranchState(NB,NZ).EQ.iLive)THEN
     call LivingBranch(NB,NZ,CH2O,TFN1,TFN2,TFNE,XKO2L)
   ENDIF
   end associate
@@ -822,9 +822,9 @@
 
 !     begin_execution
   associate(                          &
-    VRNX   =>  plt_pheno%VRNX   , &
-    VRNF   =>  plt_pheno%VRNF   , &
-    VRNL   =>  plt_pheno%VRNL   , &
+    HourThreshold4LeafOff  =>  plt_pheno%HourThreshold4LeafOff  , &
+    Hours4LeafOff   =>  plt_pheno%Hours4LeafOff   , &
+    HourThreshold4LeafOut  =>  plt_pheno%HourThreshold4LeafOut  , &
     VRNS   =>  plt_pheno%VRNS   , &
     IWTYP  =>  plt_pheno%IWTYP  , &
     ZEROP  =>  plt_biom%ZEROP   , &
@@ -852,15 +852,15 @@
 !
 !     IWTYP=phenology type from PFT file
 !     VRNS,VRNL=leafout hours,hours required for leafout
-!     VRNF,VRNX=leafoff hours,hours required for leafoff
+!     Hours4LeafOff,VRNX=leafoff hours,hours required for leafoff
 !
-    IF(IWTYP(NZ).EQ.0.OR.VRNS(NB,NZ).GE.VRNL(NB,NZ).OR.VRNF(NB,NZ).LT.VRNX(NB,NZ))THEN
+    IF(IWTYP(NZ).EQ.0.OR.VRNS(NB,NZ).GE.HourThreshold4LeafOut(NB,NZ).OR.Hours4LeafOff(NB,NZ).LT.HourThreshold4LeafOff(NB,NZ))THEN
 
       call PhenoActiveBranch(NB,NZ,CH2O,TFN1,TFN2,TFNE,XKO2L)
     ELSE
       RubiscoActivity_brpft(NB,NZ)=0.0_r8
       FDBKX(NB,NZ)=1.0_r8
-      DO K=1,JNODS1
+      DO K=1,MaxCanopyNodes1
         VCGR4(K,NB,NZ)=0.0_r8
         VCGRO(K,NB,NZ)=0.0_r8
       ENDDO
