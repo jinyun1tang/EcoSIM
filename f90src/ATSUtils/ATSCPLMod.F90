@@ -162,30 +162,62 @@ contains
   call c_f_pointer(state%bulk_density%data, data2D, [(/size_col/),(/size_procs/)])
   data2D(:,:)=a_BKDSI
 
+  ! Uncomment and modify the following lines to print the data structures
+   print *, "Bulk Density Data:"
+   do i = 1, size_col
+      print *, data2D(i, :)
+   end do
+
   call c_f_pointer(state%water_content%data, data2D, [(/size_col/),(/size_procs/)])
   data2D(:,:)=a_WC
+
+  print *, "Water content:"
+  do i = 1, size_col
+     print *, data2D(i, :)
+  end do
 
   call c_f_pointer(state%hydraulic_conductivity%data, data2D, [(/size_col/),(/size_procs/)])
   data2D(:,:)=a_HCOND
 
+  print *, "H cond:"
+  do i = 1, size_col
+     print *, data2D(i, :)
+  end do
+
   call c_f_pointer(state%temperature%data, data2D, [(/size_col/),(/size_procs/)])
   data2D(:,:)=a_TEMP
+
+  print *, "temperature:"
+  do i = 1, size_col
+     print *, data2D(i, :)
+  end do
 
   call c_f_pointer(state%subsurface_water_source%data, data2D, [(/size_col/),(/size_procs/)])
   data2D(:,:)=a_SSWS
 
+  print *, "water source:"
+  do i = 1, size_col
+     print *, data2D(i, :)
+  end do
+
   call c_f_pointer(state%subsurface_energy_source%data, data2D, [(/size_col/),(/size_procs/)])
   data2D(:,:)=a_SSES
 
-  !write(*,*) "AT copy back:"
-  !write(*,*) "water: ", surf_w_source
-  !write(*,*) "energy: ", surf_e_source
+  print *, "energy source:"
+  do i = 1, size_col
+     print *, data2D(i, :)
+  end do
 
   !call c_f_pointer(state%surface_water_source%data, data, (/num_cols/))
   !data(:) = surf_w_source
 
   call c_f_pointer(state%surface_energy_source%data, data, (/num_cols/))
   data(:) = surf_e_source
+
+  print *, "surf energy source:"
+  do i = 1, size_col
+     print *, data2D(i, :)
+  end do
 
   write(*,*) "finished copying back in driver"
 
