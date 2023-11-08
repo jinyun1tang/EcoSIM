@@ -66,7 +66,7 @@ implicit none
       VLWatMicP1(L,NY,NX)=a_WC(L,NY)
       VLiceMicP1(L,NY,NX)=0.0
       TKSoi1(L,NY,NX) = a_TEMP(L,NY)
-      VLHeatCapacity(L,NY,NX) = 20.0
+      VLHeatCapacity(L,NY,NX) = heat_capacity
       SoilFracAsMicP(L,NY,NX) = 1.0
     ENDDO
   ENDDO

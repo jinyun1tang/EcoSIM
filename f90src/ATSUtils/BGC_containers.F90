@@ -186,6 +186,7 @@ module BGCContainers_module
      real (c_double) :: atm_n2o
      real (c_double) :: atm_h2
      real (c_double) :: atm_nh3
+     real (c_double) :: heat_capacity
   end type BGCProperties
 
   type, public, bind(c) :: BGCAuxiliaryData
