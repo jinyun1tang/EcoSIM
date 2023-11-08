@@ -139,7 +139,7 @@ contains
   real(r8), pointer :: data(:)
   real(r8), pointer :: data2D(:,:)
   integer :: num_cols, ncol, nvar, size_col, size_procs
-  integer :: j1,j2,j3
+  integer :: j1,j2,j3, i
 
   write(*,*) "Copying back"
   call SetBGCSizes(sizes)
