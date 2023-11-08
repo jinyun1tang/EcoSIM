@@ -99,6 +99,7 @@ contains
   atm_n2o = props%atm_n2o
   atm_h2 = props%atm_h2
   atm_nh3 = props%atm_nh3
+  heat_capacity = props%heat_capacity
 
   call c_f_pointer(props%plant_wilting_factor%data, data2D, [(/size_col/),(/num_cols/)])
   a_WP=data2D(:,:)
