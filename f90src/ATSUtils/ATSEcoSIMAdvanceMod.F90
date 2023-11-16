@@ -68,12 +68,12 @@ implicit none
       TKSoi1(L,NY,NX) = a_TEMP(L,NY)
       VLHeatCapacity(L,NY,NX) = heat_capacity
       SoilFracAsMicP(L,NY,NX) = 1.0
+      PSISM1(L,NY,NX) = a_MATP(L,NY)
     ENDDO
   ENDDO
 
   PSIAtFldCapacity = 0.5
   PSIAtWiltPoint = 0.25
-  PSISM1 = 0.1
 
   !What are I and J are these a loop?
   write(*,*) "Running StageSurfacePhysModel"

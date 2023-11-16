@@ -11,7 +11,7 @@ Module SharedDataMod
 
 ! temporary data holder in ecosim
   real(r8) :: atm_n2, atm_o2,atm_co2,atm_ch4,atm_N2o,atm_H2,atm_NH3
-  real(r8) :: heat_capacity
+  real(r8) :: heat_capacity, pressure_at_field_capacity, pressure_at_wilting_point
   real(r8), allocatable :: a_csand(:,:)   !sand mass fraction
   real(r8), allocatable :: a_CSILT(:,:)   !silt mass fraction
   real(r8), allocatable :: a_BKDSI(:,:)   !bulk density
@@ -24,6 +24,7 @@ Module SharedDataMod
   real(r8), allocatable :: a_CORGN(:,:)   !organic nitrogen content
   real(r8), allocatable :: a_CORGP(:,:)   !organic phosphorus content
   real(r8), allocatable :: a_PORO(:,:)    !Porosity
+  real(r8), allocatable :: a_MATP(:,:)    !Matric Pressure
 !  real(r8), allocatable ::a_CORGR(:,:)   !organic nitrogen  content
   real(r8), allocatable :: a_ASP(:)       !Aspect
   real(r8), allocatable :: a_ALT(:)       !Altitude
@@ -95,6 +96,7 @@ Module SharedDataMod
   call destroy(a_csand)
   call destroy(a_CSILT)
   call destroy(a_BKDSI)
+  call destroy(a_MATP)
   call destroy(a_CumDepth2LayerBottom)
   call destroy(a_FC)
   call destroy(a_WP)

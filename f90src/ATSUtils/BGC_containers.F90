@@ -148,7 +148,7 @@ module BGCContainers_module
      type (BGCMatrixDouble) :: ice_density
      type (BGCMatrixDouble) :: porosity
      type (BGCMatrixDouble) :: water_content
-     type (BGCMatrixDouble) :: suction_head
+     type (BGCMatrixDouble) :: matric_pressure
      type (BGCMatrixDouble) :: temperature
      type (BGCMatrixDouble) :: hydraulic_conductivity
      type (BGCMatrixDouble) :: bulk_density
@@ -187,6 +187,8 @@ module BGCContainers_module
      real (c_double) :: atm_h2
      real (c_double) :: atm_nh3
      real (c_double) :: heat_capacity
+     real (c_double) :: field_capacity
+     real (c_double) :: wilting_point
   end type BGCProperties
 
   type, public, bind(c) :: BGCAuxiliaryData
