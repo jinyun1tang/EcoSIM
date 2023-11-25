@@ -5,6 +5,7 @@ module PlantMathFuncMod
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use EcoSimConst
   use MiniMathMod
+  use ElmIDMod
 implicit none
   character(len=*), parameter, private :: mod_filename='PlantMathFuncMod'
 
@@ -114,8 +115,23 @@ contains
   end function calc_canopy_grow_tempf
 
 !--------------------------------------------------------------------------------
+  pure function calc_leave_grow_tempf(TKCO)result(TFNP)
+  !DESCRIPTION
+  !compute the temperature dependence for leave growth
+  implicit none
+  real(r8), intent(in) :: TKCO   !apparent temperature felt by the leave
+  real(r8) :: TFNP
+  real(r8) :: RTK,STK,ACTV
+  
+  RTK=RGAS*TKCO
+  STK=710.0_r8*TKCO
+  ACTV=1+EXP((197500_r8-STK)/RTK)+EXP((STK-218500._r8)/RTK)
+  TFNP=EXP(24.269_r8-60000._r8/RTK)/ACTV
+  end function calc_leave_grow_tempf
+!--------------------------------------------------------------------------------
 
-  subroutine SoluteUptakeByPlantRoots(PlantSoluteUptakeConfig, PltUptake_Ol, PltUptake_Sl, PltUptake_OSl, PltUptake_OSCl)
+  subroutine SoluteUptakeByPlantRoots(PlantSoluteUptakeConfig, PltUptake_Ol, &
+    PltUptake_Sl, PltUptake_OSl, PltUptake_OSCl)
   !
   !DESCRIPTION
   !solve for substrate uptake rate as a function of solute concentration
@@ -179,4 +195,36 @@ contains
 
   end associate
   end subroutine SoluteUptakeByPlantRoots
+!--------------------------------------------------------------------------------
+
+  function is_plant_treelike(iPlantMorphologyType)result(ans)
+!
+! currently, there are three plant growth types defined as
+! iplt_bryophyte=0
+! iplt_grasslike=1
+!  iplt_treelike=2
+
+  implicit none
+  integer, intent(in) :: iPlantMorphologyType
+  logical :: ans
+
+  ans=iPlantMorphologyType > 1
+  end function is_plant_treelike
+
+!--------------------------------------------------------------------------------
+
+  function is_plant_bryophyte(iPlantMorphologyType)result(ans)
+!
+! currently, there are three plant growth types defined as
+! iplt_bryophyte=0
+! iplt_grasslike=1
+!  iplt_treelike=2
+
+  implicit none
+  integer, intent(in) :: iPlantMorphologyType
+  logical :: ans
+
+  ans=(iPlantMorphologyType == iplt_bryophyte)
+  end function is_plant_bryophyte
+
 end module PlantMathFuncMod

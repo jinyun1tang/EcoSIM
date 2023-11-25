@@ -28,15 +28,15 @@ implicit none
   integer,target,allocatable ::  ITILL1(:,:)                         !soil disturbance type, [-]
   integer,target,allocatable ::  IsPlantActive(:,:,:)                        ! flag for living pft
   integer,target,allocatable ::  doInitPlant(:,:,:)                        !PFT initialization flag:0=no,1=yes
-  integer,target,allocatable ::  ICTYP(:,:,:)                        !plant photosynthetic type (C3 or C4)
-  integer,target,allocatable ::  IGTYP(:,:,:)                        !plant growth type (vascular, non-vascular)
-  integer,target,allocatable ::  ISTYP(:,:,:)                        !plant growth habit (annual or perennial)
-  integer,target,allocatable ::  IDTYP(:,:,:)                        !plant growth habit (determinate or indeterminate)
-  integer,target,allocatable ::  INTYP(:,:,:)                        !N2 fixation type
-  integer,target,allocatable ::  IWTYP(:,:,:)                        !climate signal for phenological progress none, temperature, water stress)
-  integer,target,allocatable ::  IPTYP(:,:,:)                        !photoperiod type (neutral, long day, short day)
-  integer,target,allocatable ::  IBTYP(:,:,:)                        !phenologically-driven above-ground turnover (all, foliar only, none)
-  integer,target,allocatable ::  IRTYP(:,:,:)                        !grain type (below or above-ground), e.g. potato and onion are below
+  integer,target,allocatable ::  iPlantPhotosynthesisType(:,:,:)                        !plant photosynthetic type (C3 or C4)
+  integer,target,allocatable ::  iPlantMorphologyType(:,:,:)                        !plant growth type (vascular, non-vascular)
+  integer,target,allocatable ::  iPlantPhenologyPattern(:,:,:)                        !plant growth habit (annual or perennial)
+  integer,target,allocatable ::  iPlantDevelopPattern(:,:,:)                        !plant growth habit (determinate or indeterminate)
+  integer,target,allocatable ::  iPlantNfixType(:,:,:)                        !N2 fixation type
+  integer,target,allocatable ::  iPlantPhenologyType(:,:,:)                        !climate signal for phenological progress none, temperature, water stress)
+  integer,target,allocatable ::  iPlantPhotoperiodType(:,:,:)                        !photoperiod type (neutral, long day, short day)
+  integer,target,allocatable ::  iPlantTurnoverPattern(:,:,:)                        !phenologically-driven above-ground turnover (all, foliar only, none)
+  integer,target,allocatable ::  iPlantGrainType(:,:,:)                        !grain type (below or above-ground), e.g. potato and onion are below
   integer,target,allocatable ::  MY(:,:,:)                           !mycorrhizal type (no or yes)
   integer,target,allocatable ::  IDWaterTable(:,:)                   !water table flag from site file
 !----------------------------------------------------------------------
@@ -59,15 +59,15 @@ contains
   allocate(ITILL1(JY,JX));      ITILL1=0
   allocate(IsPlantActive(JP,JY,JX));    IsPlantActive=0
   allocate(doInitPlant(JP,JY,JX));    doInitPlant=ifalse
-  allocate(ICTYP(JP,JY,JX));    ICTYP=0
-  allocate(IGTYP(JP,JY,JX));    IGTYP=0
-  allocate(ISTYP(JP,JY,JX));    ISTYP=0
-  allocate(IDTYP(JP,JY,JX));    IDTYP=0
-  allocate(INTYP(JP,JY,JX));    INTYP=0
-  allocate(IWTYP(JP,JY,JX));    IWTYP=0
-  allocate(IPTYP(JP,JY,JX));    IPTYP=0
-  allocate(IBTYP(JP,JY,JX));    IBTYP=0
-  allocate(IRTYP(JP,JY,JX));    IRTYP=0
+  allocate(iPlantPhotosynthesisType(JP,JY,JX));    iPlantPhotosynthesisType=0
+  allocate(iPlantMorphologyType(JP,JY,JX));    iPlantMorphologyType=0
+  allocate(iPlantPhenologyPattern(JP,JY,JX));    iPlantPhenologyPattern=0
+  allocate(iPlantDevelopPattern(JP,JY,JX));    iPlantDevelopPattern=0
+  allocate(iPlantNfixType(JP,JY,JX));    iPlantNfixType=0
+  allocate(iPlantPhenologyType(JP,JY,JX));    iPlantPhenologyType=0
+  allocate(iPlantPhotoperiodType(JP,JY,JX));    iPlantPhotoperiodType=0
+  allocate(iPlantTurnoverPattern(JP,JY,JX));    iPlantTurnoverPattern=0
+  allocate(iPlantGrainType(JP,JY,JX));    iPlantGrainType=0
   allocate(MY(JP,JY,JX));       MY=0
   allocate(IDWaterTable(JY,JX));       IDWaterTable=0
   end subroutine InitFlagData
@@ -90,15 +90,15 @@ contains
   call destroy(ITILL1)
   call destroy(IsPlantActive)
   call destroy(doInitPlant)
-  call destroy(ICTYP)
-  call destroy(IGTYP)
-  call destroy(ISTYP)
-  call destroy(IDTYP)
-  call destroy(INTYP)
-  call destroy(IWTYP)
-  call destroy(IPTYP)
-  call destroy(IBTYP)
-  call destroy(IRTYP)
+  call destroy(iPlantPhotosynthesisType)
+  call destroy(iPlantMorphologyType)
+  call destroy(iPlantPhenologyPattern)
+  call destroy(iPlantDevelopPattern)
+  call destroy(iPlantNfixType)
+  call destroy(iPlantPhenologyType)
+  call destroy(iPlantPhotoperiodType)
+  call destroy(iPlantTurnoverPattern)
+  call destroy(iPlantGrainType)
   call destroy(MY)
   call destroy(IDWaterTable)
   end subroutine DestructFlagData

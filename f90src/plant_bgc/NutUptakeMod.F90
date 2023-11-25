@@ -55,13 +55,13 @@ module NutUptakeMod
   integer :: NB
 
   associate(                        &
-    TCC     =>  plt_ew%TCC        , &
+    TCelciusCanopy    =>  plt_ew%TCelciusCanopy       , &
     NU      =>  plt_site%NU       , &
     AREA3   =>  plt_site%AREA3    , &
     CNH3E   =>  plt_site%CNH3E    , &
     RNH3B   =>  plt_rbgc%RNH3B    , &
     ZEROP   =>  plt_biom%ZEROP    , &
-    CanPBLeafShethC   =>  plt_biom%CanPBLeafShethC    , &
+    LeafPetioleBiomassC_brch   =>  plt_biom%LeafPetioleBiomassC_brch    , &
     EPOOL   =>  plt_biom%EPOOL    , &
     CEPOLB  =>  plt_biom%CEPOLB   , &
     CanPStomaResistH2O      =>  plt_photo%CanPStomaResistH2O      , &
@@ -76,8 +76,8 @@ module NutUptakeMod
   !     CONCENTRATION DIFFERENCES 'CNH3E' (ATMOSPHERE FROM 'READS') AND
   !     'CNH3P' (CANOPY), AND FROM STOMATAL + BOUNDARY LAYER RESISTANCE
   !
-  !     SNH3P,SNH3X=NH3 solubility at TCC, 25 oC
-  !     TCC=canopy temperature (oC)
+  !     SNH3P,SNH3X=NH3 solubility at TCelciusCanopy, 25 oC
+  !     TCelciusCanopy=canopy temperature (oC)
   !     FDMP,FNH3P=canopy dry matter content,NH3 concentration
   !     CanopyBranchLeafA_pft,CanopyLeafA_pft=branch,canopy leaf area
   !     CNH3P,CNH3E=gaseous NH3 concentration in branch,atmosphere
@@ -86,10 +86,10 @@ module NutUptakeMod
   !     RA,CanPStomaResistH2O=canopy boundary layer,stomatal resistance
   !     FracPARByCanP=fraction of radiation received by each PFT canopy
   !
-  SNH3P=SNH3X*EXP(0.513_r8-0.0171_r8*TCC(NZ))
+  SNH3P=SNH3X*EXP(0.513_r8-0.0171_r8*TCelciusCanopy(NZ))
   FNH3P=1.0E-04_r8*FDMP
   D105: DO NB=1,NumOfBranches_pft(NZ)
-    IF(CanPBLeafShethC(NB,NZ).GT.ZEROP(NZ).AND.CanopyBranchLeafA_pft(NB,NZ).GT.ZEROP(NZ) &
+    IF(LeafPetioleBiomassC_brch(NB,NZ).GT.ZEROP(NZ).AND.CanopyBranchLeafA_pft(NB,NZ).GT.ZEROP(NZ) &
       .AND.CanopyLeafA_pft(NZ).GT.ZEROP(NZ))THEN
       CNH3P=AZMAX1(FNH3P*CEPOLB(ielmn,NB,NZ)/SNH3P)
       ZPOOLB=AZMAX1(EPOOL(ielmn,NB,NZ))

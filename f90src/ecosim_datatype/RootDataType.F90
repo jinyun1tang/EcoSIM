@@ -15,7 +15,7 @@ module RootDataType
   integer,target,allocatable ::  iPlantRootState(:,:,:)                        !flag to detect root system death , [-]
   integer,target,allocatable ::  NIXBotRootLayer(:,:,:)              !maximum soil layer number for all root axes, [-]
   integer,target,allocatable ::  NI(:,:,:)                           !maximum soil layer number for all root axes, [-]
-  real(r8),target,allocatable ::  BiomGrowthYieldRoot(:,:,:)                        !root growth yield, [g g-1]
+  real(r8),target,allocatable ::  RootBiomGrowthYield(:,:,:)                        !root growth yield, [g g-1]
   real(r8),target,allocatable ::  PR(:,:,:)                          !threshold root nonstructural C content for initiating new root axis, [g g-1]
   real(r8),target,allocatable ::  RootFracRemobilizableBiom(:,:,:)                       !fraction of remobilizable nonstructural biomass in root, [-]
   real(r8),target,allocatable ::  DMVL(:,:,:,:)                      !root volume:mass ratio, [m3 g-1]
@@ -71,14 +71,14 @@ module RootDataType
   real(r8),target,allocatable ::  trcs_rootml(:,:,:,:,:,:)           !root dissolved gaseous tracer content [g d-2]
   real(r8),target,allocatable ::  TRootGasLoss_disturb(:,:,:)                 !total root gas content, [g d-2]
   real(r8),target,allocatable ::  WTRTA(:,:,:)                       !root C per plant, [g p-1]
-  real(r8),target,allocatable ::  WTRTE(:,:,:,:)                     !plant root element, [g d-2]
+  real(r8),target,allocatable ::  RootChemElmnts_pft(:,:,:,:)                     !plant root element, [g d-2]
   real(r8),target,allocatable ::  WTRTSE(:,:,:,:)                    !plant root structural element, [g d-2]
   real(r8),target,allocatable ::  WSRTL(:,:,:,:,:)                   !root layer protein C, [g d-2]
   real(r8),target,allocatable ::  WTRT1E(:,:,:,:,:,:,:)              !root layer element primary axes, [g d-2]
   real(r8),target,allocatable ::  WTRT2E(:,:,:,:,:,:,:)              !root layer element secondary axes, [g d-2]
   real(r8),target,allocatable ::  PopPlantRootC_vr(:,:,:,:,:)                   !root layer C, [g d-2]
   real(r8),target,allocatable ::  WTNDLE(:,:,:,:,:)                  !root layer nodule element, [g d-2]
-  real(r8),target,allocatable ::  WTNDE(:,:,:,:)                     !root total nodule mass, [g d-2]
+  real(r8),target,allocatable ::  NoduleChemElmnts_pft(:,:,:,:)                     !root total nodule mass, [g d-2]
   real(r8),target,allocatable ::  WTRTL(:,:,:,:,:)                   !root layer structural C, [g d-2]
   real(r8),target,allocatable ::  EPOOLR(:,:,:,:,:,:)                !root  layer nonstructural element, [g d-2]
   real(r8),target,allocatable ::  RootNonstructElementConcpft_vr(:,:,:,:,:,:)                !root  layer nonstructural element concentration, [g g-1]
@@ -97,7 +97,7 @@ contains
   allocate(iPlantRootState(JP,JY,JX));    iPlantRootState=iDead
   allocate(NIXBotRootLayer(JP,JY,JX));      NIXBotRootLayer=0
   allocate(NI(JP,JY,JX));       NI=0
-  allocate(BiomGrowthYieldRoot(JP,JY,JX));     BiomGrowthYieldRoot=0._r8
+  allocate(RootBiomGrowthYield(JP,JY,JX));     RootBiomGrowthYield=0._r8
   allocate(PR(JP,JY,JX));       PR=0._r8
   allocate(RootFracRemobilizableBiom(JP,JY,JX));    RootFracRemobilizableBiom=0._r8
   allocate(DMVL(jroots,JP,JY,JX));   DMVL=0._r8
@@ -153,14 +153,14 @@ contains
   allocate(trcs_rootml(idg_beg:idg_end-1,2,JZ,JP,JY,JX)); trcs_rootml =0._r8
   allocate(TRootGasLoss_disturb(idg_beg:idg_end-1,JY,JX));TRootGasLoss_disturb=0._r8
   allocate(WTRTA(JP,JY,JX));    WTRTA=0._r8
-  allocate(WTRTE(NumOfPlantChemElements,JP,JY,JX)); WTRTE=0._r8
+  allocate(RootChemElmnts_pft(NumOfPlantChemElements,JP,JY,JX)); RootChemElmnts_pft=0._r8
   allocate(WTRTSE(NumOfPlantChemElements,JP,JY,JX));   WTRTSE=0._r8
   allocate(WSRTL(jroots,JZ,JP,JY,JX));WSRTL=0._r8
   allocate(WTRT1E(NumOfPlantChemElements,jroots,JZ,JC,JP,JY,JX));WTRT1E=0._r8
   allocate(WTRT2E(NumOfPlantChemElements,jroots,JZ,JC,JP,JY,JX));WTRT2E=0._r8
   allocate(PopPlantRootC_vr(jroots,JZ,JP,JY,JX));PopPlantRootC_vr=0._r8
   allocate(WTNDLE(NumOfPlantChemElements,JZ,JP,JY,JX)); WTNDLE=0._r8
-  allocate(WTNDE(NumOfPlantChemElements,JP,JY,JX));  WTNDE=0._r8
+  allocate(NoduleChemElmnts_pft(NumOfPlantChemElements,JP,JY,JX));  NoduleChemElmnts_pft=0._r8
   allocate(WTRTL(jroots,JZ,JP,JY,JX));WTRTL=0._r8
   allocate(EPOOLR(NumOfPlantChemElements,jroots,JZ,JP,JY,JX));EPOOLR=0._r8
   allocate(RootNonstructElementConcpft_vr(NumOfPlantChemElements,jroots,JZ,JP,JY,JX));RootNonstructElementConcpft_vr=0._r8
@@ -177,7 +177,7 @@ contains
   call destroy(iPlantRootState)
   call destroy(NIXBotRootLayer)
   call destroy(NI)
-  call destroy(BiomGrowthYieldRoot)
+  call destroy(RootBiomGrowthYield)
   call destroy(PR)
   call destroy(RootFracRemobilizableBiom)
   call destroy(DMVL)
@@ -233,14 +233,14 @@ contains
   call destroy(trcs_rootml)
   call destroy(TRootGasLoss_disturb)
   call destroy(WTRTA)
-  call destroy(WTRTE)
+  call destroy(RootChemElmnts_pft)
   call destroy(WTRTSE)
   call destroy(WSRTL)
   call destroy(WTRT1E)
   call destroy(WTRT2E)
   call destroy(PopPlantRootC_vr)
   call destroy(WTNDLE)
-  call destroy(WTNDE)
+  call destroy(NoduleChemElmnts_pft)
   call destroy(WTRTL)
   call destroy(EPOOLR)
   call destroy(RootNonstructElementConcpft_vr)

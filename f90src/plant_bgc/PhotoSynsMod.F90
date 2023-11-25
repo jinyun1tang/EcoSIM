@@ -3,6 +3,7 @@ module PhotoSynsMod
   use EcosimConst
   use GrosubPars
   use minimathmod, only : AZMAX1
+  use PlantMathFuncMod
   use PlantAPIData
 implicit none
   private
@@ -36,7 +37,7 @@ implicit none
 !begin_execution
   associate(                          &
   ZERO       => plt_site%ZERO   , &
-  IGTYP      => plt_pheno%IGTYP , &
+  iPlantMorphologyType     => plt_pheno%iPlantMorphologyType, &
   RubiscoActivity_brpft       => plt_photo%RubiscoActivity_brpft  , &
   CO2Q       => plt_photo%CO2Q  , &
   LeafAUnshaded_seclyrnodbrpft      => plt_photo%LeafAUnshaded_seclyrnodbrpft , &
@@ -113,10 +114,10 @@ implicit none
 !
 !               EFFECT OF WATER DEFICIT IN MESOPHYLL
 !
-!               IGTYP=growth type:0=bryophyte,1=graminoid,2=shrub,tree
+!               iPlantMorphologyType=growth type:0=bryophyte,1=graminoid,2=shrub,tree
 !               WFNB=non-stomatal effects of water stress on CO2 fixation
 !
-                IF(IGTYP(NZ).NE.0)THEN
+                IF(.not.is_plant_bryophyte(iPlantMorphologyType(NZ)))THEN
                   WFNB=SQRT(RS/RSL)
                 ELSE
                   WFNB=WFNG
@@ -213,10 +214,10 @@ implicit none
 !
 !               EFFECT OF WATER DEFICIT IN MESOPHYLL
 !
-!               IGTYP=growth type:0=bryophyte,1=graminoid,2=shrub,tree
+!               iPlantMorphologyType=growth type:0=bryophyte,1=graminoid,2=shrub,tree
 !               WFNB=non-stomatal effects of water stress on C3 CO2 fixation
 !
-                IF(IGTYP(NZ).NE.0)THEN
+                IF(.not.is_plant_bryophyte(iPlantMorphologyType(NZ)))THEN
                   WFNB=SQRT(RS/RSL)
                 ELSE
                   WFNB=WFNG
@@ -308,7 +309,7 @@ implicit none
   real(r8) :: VA,VG
 ! begin_execution
   associate(                          &
-  IGTYP      => plt_pheno%IGTYP , &
+  iPlantMorphologyType     => plt_pheno%iPlantMorphologyType, &
   ZEROP      => plt_biom%ZEROP  , &
   XKCO24     => plt_photo%XKCO24, &
   FDBK4      => plt_photo%FDBK4 , &
@@ -387,10 +388,10 @@ implicit none
 !
 !               EFFECT OF WATER DEFICIT IN MESOPHYLL
 !
-!               IGTYP=growth type:0=bryophyte,1=graminoid,2=shrub,tree
+!               iPlantMorphologyType=growth type:0=bryophyte,1=graminoid,2=shrub,tree
 !               WFNB=non-stomatal effects of water stress on C4,C3 CO2 fixation
 !
-                IF(IGTYP(NZ).NE.0)THEN
+                IF(.not.is_plant_bryophyte(iPlantMorphologyType(NZ)))THEN
                   WFN4=RS/RSL
                   WFNB=SQRT(RS/RSL)
                 ELSE
@@ -514,10 +515,10 @@ implicit none
 !
 !               EFFECT OF WATER DEFICIT IN MESOPHYLL
 !
-!               IGTYP=growth type:0=bryophyte,1=graminoid,2=shrub,tree
+!               iPlantMorphologyType=growth type:0=bryophyte,1=graminoid,2=shrub,tree
 !               WFN4,WFNB=non-stomatal effects of water stress on C4,C3 CO2 fixation
 !
-                IF(IGTYP(NZ).NE.0)THEN
+                IF(.not.is_plant_bryophyte(iPlantMorphologyType(NZ)))THEN
                   WFN4=(RS/RSL)**1.00_r8
                   WFNB=SQRT(RS/RSL)
                 ELSE
@@ -616,7 +617,7 @@ implicit none
   integer, intent(in) :: NB,NZ
   real(r8), intent(in) :: WFNG
   real(r8), intent(in) :: Stomata_Activity    !between 0. and 1., a function of canopy turgor
-  real(r8), intent(out) :: CH2O3(MaxCanopyNodes1),CH2O4(MaxCanopyNodes1)
+  real(r8), intent(out) :: CH2O3(MaxNodesPerBranch1),CH2O4(MaxNodesPerBranch1)
   real(r8), intent(out) :: CO2F,CH2O
   real(r8) :: ZADDB,PADDB
 
@@ -625,10 +626,10 @@ implicit none
 ! begin_execution
   associate(                           &
     CO2Q    =>  plt_photo%CO2Q   , &
-    ICTYP   =>  plt_photo%ICTYP  , &
+    iPlantPhotosynthesisType  =>  plt_photo%iPlantPhotosynthesisType , &
     VCGR4   =>  plt_photo%VCGR4  , &
     VCGRO   =>  plt_photo%VCGRO  , &
-    IGTYP   =>  plt_pheno%IGTYP  , &
+    iPlantMorphologyType  =>  plt_pheno%iPlantMorphologyType , &
     SSIN    =>  plt_rad%SSIN     , &
     PARByCanP    =>  plt_rad%PARByCanP     , &
     ZEROP   =>  plt_biom%ZEROP   , &
@@ -640,11 +641,11 @@ implicit none
     IF(SSIN.GT.0.0_r8.AND.PARByCanP(NZ).GT.0.0_r8.AND.CO2Q(NZ).GT.0.0_r8)THEN
       CO2F=0._r8
       CH2O=0._r8
-      IF(IGTYP(NZ).NE.0.OR.Stomata_Activity.GT.0.0_r8)THEN
+      IF(.not.is_plant_bryophyte(iPlantMorphologyType(NZ)).OR.Stomata_Activity.GT.0.0_r8)THEN
 !
 !         FOR EACH NODE
 !
-        D100: DO K=1,MaxCanopyNodes1
+        D100: DO K=1,MaxNodesPerBranch1
           CH2O3(K)=0._r8
           CH2O4(K)=0._r8
           IF(ARLF1(K,NB,NZ).GT.ZEROP(NZ))THEN
@@ -652,16 +653,16 @@ implicit none
 !             C4 PHOTOSYNTHESIS
 !
 !             ARLF,CanPLNBLA=leaf area
-!             ICTYP=photosynthesis type:3=C3,4=C4 from PFT file
+!             iPlantPhotosynthesisType=photosynthesis type:3=C3,4=C4 from PFT file
 !             VCGR4=PEP carboxylation rate unlimited by CO2
 !
-            IF(ICTYP(NZ).EQ.ic4_photo.AND.VCGR4(K,NB,NZ).GT.0.0_r8)THEN
+            IF(iPlantPhotosynthesisType(NZ).EQ.ic4_photo.AND.VCGR4(K,NB,NZ).GT.0.0_r8)THEN
 !
               CALL ComputeGPP_C4(K,NB,NZ,WFNG,Stomata_Activity,CH2O3,CH2O4,CO2F,CH2O)
 !
 !               C3 PHOTOSYNTHESIS
 !
-            ELSEIF(ICTYP(NZ).NE.ic4_photo.AND.VCGRO(K,NB,NZ).GT.0.0_r8)THEN
+            ELSEIF(iPlantPhotosynthesisType(NZ).NE.ic4_photo.AND.VCGRO(K,NB,NZ).GT.0.0_r8)THEN
               call ComputeGPP_C3(K,NB,NZ,WFNG,Stomata_Activity,CH2O3,CO2F,CH2O)
 
             ENDIF
@@ -675,15 +676,15 @@ implicit none
 !
 !         CONVERT UMOL M-2 S-1 TO G C M-2 H-1
 !
-        D150: DO K=1,MaxCanopyNodes1
+        D150: DO K=1,MaxNodesPerBranch1
           CH2O3(K)=CH2O3(K)*0.0432_r8
           CH2O4(K)=CH2O4(K)*0.0432_r8
         ENDDO D150
       ELSE
         CO2F=0._r8
         CH2O=0._r8
-        IF(ICTYP(NZ).EQ.ic4_photo)THEN
-          D155: DO K=1,MaxCanopyNodes1
+        IF(iPlantPhotosynthesisType(NZ).EQ.ic4_photo)THEN
+          D155: DO K=1,MaxNodesPerBranch1
             CH2O3(K)=0._r8
             CH2O4(K)=0._r8
           ENDDO D155
@@ -693,8 +694,8 @@ implicit none
       CO2F=0._r8
       CH2O=0._r8
       !C4
-      IF(ICTYP(NZ).EQ.ic4_photo)THEN
-        D160: DO K=1,MaxCanopyNodes1
+      IF(iPlantPhotosynthesisType(NZ).EQ.ic4_photo)THEN
+        D160: DO K=1,MaxNodesPerBranch1
           CH2O3(K)=0._r8
           CH2O4(K)=0._r8
         ENDDO D160
@@ -703,8 +704,8 @@ implicit none
   ELSE
     CO2F=0._r8
     CH2O=0._r8
-    IF(ICTYP(NZ).EQ.ic4_photo)THEN
-      D165: DO K=1,MaxCanopyNodes1
+    IF(iPlantPhotosynthesisType(NZ).EQ.ic4_photo)THEN
+      D165: DO K=1,MaxNodesPerBranch1
         CH2O3(K)=0._r8
         CH2O4(K)=0._r8
       ENDDO D165

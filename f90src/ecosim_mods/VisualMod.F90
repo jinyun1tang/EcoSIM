@@ -161,8 +161,8 @@ module VisualMod
 !     TCCTD=0.0
 !     TCCMD=-50.0
 !     ENDIF
-!     TCCTD=TCCTD+TCC(NZ,NY,NX)
-!     TCCMD=AMAX1(TCCMD,TCC(NZ,NY,NX))
+!     TCCTD=TCCTD+TCelciusCanopy(NZ,NY,NX)
+!     TCCMD=AMAX1(TCCMD,TCelciusCanopy(NZ,NY,NX))
 !     IF(J.EQ.24)THEN
 !     TCCAD=TCCTD/24
 !     TCCTX=TCCTX+TCCAD
@@ -195,20 +195,20 @@ module VisualMod
 !     IF(I.EQ.1)THEN
 !     TCSNY=0.0
 !     ENDIF
-!     DTCSN=TESN0(ielmc,NZ,NY,NX)-TCSNY
+!     DTCSN=SurfLitrfallChemElmnts_pft(ielmc,NZ,NY,NX)-TCSNY
 !     TCSNX=TCSNX+DTCSN
-!     TCSNY=TESN0(ielmc,NZ,NY,NX)
+!     TCSNY=SurfLitrfallChemElmnts_pft(ielmc,NZ,NY,NX)
 !     IF(I.EQ.iDayPlanting(NZ,NY,NX).OR.I.EQ.iDayPlantHarvest(NZ,NY,NX))THEN
 !     ICHKA=0
 !     ICHKM=0
 !     TCSNX=0.0
 !     ENDIF
-          OUT(1)=0.001_r8*CARBN(1,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
-          OUT(2)=0.001_r8*CARBN(3,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
-          OUT(3)=0.001_r8*CARBN(2,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
-          OUT(4)=-0.001_r8*TCO2T(1,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
-          OUT(5)=-0.001_r8*TCO2T(3,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
-          OUT(6)=-0.001_r8*TCO2T(2,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
+          OUT(1)=0.001_r8*GrossCO2Fix_pft(1,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
+          OUT(2)=0.001_r8*GrossCO2Fix_pft(3,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
+          OUT(3)=0.001_r8*GrossCO2Fix_pft(2,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
+          OUT(4)=-0.001_r8*GrossResp_pft(1,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
+          OUT(5)=-0.001_r8*GrossResp_pft(3,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
+          OUT(6)=-0.001_r8*GrossResp_pft(2,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
           OUT(7)=0.001_r8*Eco_GPP_col(NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
           OUT(8)=0.001_r8*Eco_NPP_col(NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
           OUT(9)=-0.001_r8*Eco_AutoR_col(NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
@@ -240,15 +240,15 @@ module VisualMod
           OUT(46)=-(DepthInternalWTBL(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX))
           OUT(47)=SnowDepth(NY,NX)
           OUT(48)=CanopyLA_grd(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(49)=0.001_r8*WTLFE(ielmc,1,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(50)=0.001_r8*WTLFE(ielmc,3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(51)=0.001_r8*WTLFE(ielmc,2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(52)=0.001_r8*WTSTKE(ielmc,1,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(53)=0.001_r8*WTSTKE(ielmc,3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(54)=0.001_r8*WTSTKE(ielmc,2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(55)=0.001_r8*WTRTE(ielmc,1,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(56)=0.001_r8*WTRTE(ielmc,3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(57)=0.001_r8*WTRTE(ielmc,2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(49)=0.001_r8*LeafChemElmnts(ielmc,1,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(50)=0.001_r8*LeafChemElmnts(ielmc,3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(51)=0.001_r8*LeafChemElmnts(ielmc,2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(52)=0.001_r8*StalkChemElmnts(ielmc,1,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(53)=0.001_r8*StalkChemElmnts(ielmc,3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(54)=0.001_r8*StalkChemElmnts(ielmc,2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(55)=0.001_r8*RootChemElmnts_pft(ielmc,1,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(56)=0.001_r8*RootChemElmnts_pft(ielmc,3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(57)=0.001_r8*RootChemElmnts_pft(ielmc,2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
           L=0
           D62: DO N=58,68
             OUT(N)=0.001_r8*ORGC(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)

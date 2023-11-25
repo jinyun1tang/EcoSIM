@@ -57,9 +57,9 @@ module NoduleBGCMod
     AREA3    =>  plt_site%AREA3    , &
     k_fine_litr=> pltpar%k_fine_litr,&
     CFOPE    =>  plt_soilchem%CFOPE, &
-    INTYP    =>  plt_morph%INTYP   , &
+    iPlantNfixType   =>  plt_morph%iPlantNfixType  , &
     fTgrowCanP     =>  plt_pheno%fTgrowCanP    , &
-    TCO2T    =>  plt_bgcr%TCO2T    , &
+    GrossResp_pft    =>  plt_bgcr%GrossResp_pft    , &
     ECO_ER_col     =>  plt_bgcr%ECO_ER_col     , &
     TCO2A    =>  plt_bgcr%TCO2A    , &
     Eco_AutoR_col     =>  plt_bgcr%Eco_AutoR_col     , &
@@ -69,16 +69,16 @@ module NoduleBGCMod
     DMND     =>  plt_allom%DMND    , &
     CNND     =>  plt_allom%CNND    , &
     CPND     =>  plt_allom%CPND    , &
-    CanPBLeafShethC    =>  plt_biom%CanPBLeafShethC    , &
+    LeafPetioleBiomassC_brch    =>  plt_biom%LeafPetioleBiomassC_brch    , &
     EPOOL    =>  plt_biom%EPOOL    , &
     EPOLNB   =>  plt_biom%EPOLNB   , &
     ZEROP    =>  plt_biom%ZEROP    , &
     ZEROL    =>  plt_biom%ZEROL    , &
     WTNDBE   =>  plt_biom%WTNDBE     &
   )
-!     INTYP=N2 fixation: 4,5,6=rapid to slow canopy symbiosis
+!     iPlantNfixType=N2 fixation: 4,5,6=rapid to slow canopy symbiosis
 !
-  IF(INTYP(NZ).GE.4)THEN
+  IF(iPlantNfixType(NZ).GE.4)THEN
 !
 !     INITIAL INFECTION
 !
@@ -194,7 +194,7 @@ module NoduleBGCMod
 !     RCCC,RCCN,RCCP=remobilization coefficient for C,N,P
 !     RCCZN,RCCYN=min,max fractions for bacteria C recycling
 !     RCCXN,RCCQN=max fractions for bacteria N,P recycling
-!     CanPBLeafShethC=leaf+petiole mass
+!     LeafPetioleBiomassC_brch=leaf+petiole mass
 !     CCNDLB=bacteria:leaf+petiole ratio
 !     RDNDBX=effect of CCNDLB on bacteria decomposition rate
 !     SPNDX=specific bacterial decomposition rate at current CCNDLB
@@ -279,13 +279,13 @@ module NoduleBGCMod
 !     RCNDL=respiration from non-structural C
 !     RGNDG=bacterial respiration for growth and N2 fixation
 !     RCNSNE(ielmc)=bacterial C senescence to recycling
-!     TCO2T,TCO2A=total,above-ground PFT respiration
+!     GrossResp_pft,TCO2A=total,above-ground PFT respiration
 !     CO2NetFix_pft=PFT net CO2 fixation
 !     ECO_ER_col=ecosystem respiration
 !     Eco_AutoR_col=total autotrophic respiration
 !
     RCO2T=AMIN1(RMNDL,RCNDL)+RGNDG+RCNSNE(ielmc)
-    TCO2T(NZ)=TCO2T(NZ)-RCO2T
+    GrossResp_pft(NZ)=GrossResp_pft(NZ)-RCO2T
     TCO2A(NZ)=TCO2A(NZ)-RCO2T
     CO2NetFix_pft(NZ)=CO2NetFix_pft(NZ)-RCO2T
     ECO_ER_col=ECO_ER_col-RCO2T
@@ -337,7 +337,7 @@ module NoduleBGCMod
 !     FROM NON-STRUCTURAL C,N,P CONCENTRATION DIFFERENCES
 !
 !     CPOOL,ZPOOL,PPOOL=branch non-structural C,N,P mass
-!     CanPBLeafShethC=leaf+petiole C mass
+!     LeafPetioleBiomassC_brch=leaf+petiole C mass
 !     WTNDB=bacterial C mass
 !     WTNDI=initial bacterial mass at infection
 !     FXRN=rate constant for plant-bacteria nonstructural C,N,P exchange
@@ -346,14 +346,14 @@ module NoduleBGCMod
 !     XFRC,XFRN,XFRC=nonstructural C,N,P transfer
 !     CPOLNB,ZPOLNB,PPOLNB=nonstructural C,N,P in bacteria
 !
-    IF(EPOOL(ielmc,NB,NZ).GT.ZEROP(NZ).AND.CanPBLeafShethC(NB,NZ).GT.ZEROL(NZ))THEN
-      CCNDLB=WTNDBE(ielmc,NB,NZ)/CanPBLeafShethC(NB,NZ)
-      WTLSB1=CanPBLeafShethC(NB,NZ)
-      WTNDB1=AMIN1(CanPBLeafShethC(NB,NZ),AMAX1(WTNDI*AREA3(NU),WTNDBE(ielmc,NB,NZ)))
+    IF(EPOOL(ielmc,NB,NZ).GT.ZEROP(NZ).AND.LeafPetioleBiomassC_brch(NB,NZ).GT.ZEROL(NZ))THEN
+      CCNDLB=WTNDBE(ielmc,NB,NZ)/LeafPetioleBiomassC_brch(NB,NZ)
+      WTLSB1=LeafPetioleBiomassC_brch(NB,NZ)
+      WTNDB1=AMIN1(LeafPetioleBiomassC_brch(NB,NZ),AMAX1(WTNDI*AREA3(NU),WTNDBE(ielmc,NB,NZ)))
       WTLSBT=WTLSB1+WTNDB1
       IF(WTLSBT.GT.ZEROP(NZ))THEN
-        FXRNX=FXRN(INTYP(NZ))/(1.0+CCNDLB/CCNGB)
-!    2/(1.0+CCNDLB/(CCNGB*FXRN(INTYP(NZ))))
+        FXRNX=FXRN(iPlantNfixType(NZ))/(1.0+CCNDLB/CCNGB)
+!    2/(1.0+CCNDLB/(CCNGB*FXRN(iPlantNfixType(NZ))))
         CPOOLD=(EPOOL(ielmc,NB,NZ)*WTNDB1-EPOLNB(ielmc,NB,NZ)*WTLSB1)/WTLSBT
         XFRC=FXRNX*CPOOLD
         EPOOL(ielmc,NB,NZ)=EPOOL(ielmc,NB,NZ)-XFRC
@@ -442,16 +442,16 @@ module NoduleBGCMod
     ZEROL    =>   plt_biom%ZEROL     , &
     EPOOLR   =>   plt_biom%EPOOLR    , &
     CFOPE    =>   plt_soilchem%CFOPE , &
-    INTYP    =>   plt_morph%INTYP    , &
+    iPlantNfixType   =>   plt_morph%iPlantNfixType   , &
     NIXBotRootLayer     =>   plt_morph%NIXBotRootLayer       &
   )
-!     INTYP=N2 fixation: 1,2,3=rapid to slow root symbiosis
+!     iPlantNfixType=N2 fixation: 1,2,3=rapid to slow root symbiosis
 !     WTNDL,WTNDLN,WTNDLP=bacterial C,N,P mass
 !     WTNDI=initial bacterial mass at infection
 !     AREA=grid cell area
 !     CNND,CPND=bacterial N:C,P:C ratio from PFT file
 !
-  IF(INTYP(NZ).GE.1.AND.INTYP(NZ).LE.3)THEN
+  IF(iPlantNfixType(NZ).GE.1.AND.iPlantNfixType(NZ).LE.3)THEN
     D5400: DO L=NU,NIXBotRootLayer(NZ)
       IF(PopPlantRootC_vr(ipltroot,L,NZ).GT.ZEROL(NZ))THEN
 !
@@ -654,7 +654,7 @@ module NoduleBGCMod
 !     TOTAL NODULE RESPIRATION
 !
 !     RCO2TM,RCO2T=total C respiration unlimited,limited by O2
-!     TCO2T,TCO2A=total,above-ground PFT respiration
+!     GrossResp_pft,TCO2A=total,above-ground PFT respiration
 !     RMNDL=bacterial maintenance respiration
 !     RCNDL=respiration from non-structural C
 !     RGNDG=bacterial respiration for growth and N2 fixation
@@ -730,8 +730,8 @@ module NoduleBGCMod
           WTNDL1=AMIN1(PopPlantRootC_vr(ipltroot,L,NZ),AMAX1(WTNDI*AREA3(NU),WTNDLE(ielmc,L,NZ)))
           WTRTDT=WTRTD1+WTNDL1
           IF(WTRTDT.GT.ZEROP(NZ))THEN
-            FXRNX=FXRN(INTYP(NZ))/(1.0_r8+CCNDLR/CCNGR)
-!    2/(1.0+CCNDLR/(CCNGR*FXRN(INTYP(NZ))))
+            FXRNX=FXRN(iPlantNfixType(NZ))/(1.0_r8+CCNDLR/CCNGR)
+!    2/(1.0+CCNDLR/(CCNGR*FXRN(iPlantNfixType(NZ))))
             CPOOLD=(EPOOLR(ielmc,ipltroot,L,NZ)*WTNDL1-EPOOLN(ielmc,L,NZ)*WTRTD1)/WTRTDT
             XFRC=FXRNX*CPOOLD
             EPOOLR(ielmc,ipltroot,L,NZ)=EPOOLR(ielmc,ipltroot,L,NZ)-XFRC

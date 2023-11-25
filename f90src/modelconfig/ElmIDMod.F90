@@ -71,12 +71,14 @@ implicit none
   integer, parameter :: ihv_tmareseed=2
 
   integer, parameter :: iplt_annual=0
-  integer, parameter :: iplt_preanu=1
+  integer, parameter :: iplt_perennial=1
 
   integer, parameter :: iplt_bryophyte=0
   integer, parameter :: iplt_grasslike=1
   integer, parameter :: iplt_treelike=2
 
+  integer, parameter :: ideterminate=0
+  integer, parameter :: inondeterminate=1
   integer, parameter :: ipltcal_Planting     =0
   integer, parameter :: ipltcal_Emerge       =1
   integer, parameter :: ipltcal_InitFloral   =2
@@ -88,4 +90,5 @@ implicit none
   integer, parameter :: ipltcal_SetSeedNumber=8
   integer, parameter :: ipltcal_SetSeedMass  =9
   integer, parameter :: ipltcal_EndSeedFill  =10
+
 end module ElmIDMod

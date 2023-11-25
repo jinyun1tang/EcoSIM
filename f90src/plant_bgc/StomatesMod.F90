@@ -623,7 +623,7 @@
   real(r8) :: WSDN
 !     begin_execution
   associate(                            &
-    ICTYP    => plt_photo%ICTYP   , &
+    iPlantPhotosynthesisType   => plt_photo%iPlantPhotosynthesisType  , &
     VCGR4    => plt_photo%VCGR4   , &
     VCGRO    => plt_photo%VCGRO   , &
     ZERO     => plt_site%ZERO     , &
@@ -632,7 +632,7 @@
     WSLF     => plt_biom%WSLF     , &
     ARLF1    => plt_morph%ARLF1     &
   )
-  DO K=1,MaxCanopyNodes1
+  DO K=1,MaxNodesPerBranch1
     IF(ARLF1(K,NB,NZ).GT.ZEROP(NZ).AND.WGLFE(ielmc,K,NB,NZ).GT.ZEROP(NZ))THEN
       WSDN=WSLF(K,NB,NZ)/ARLF1(K,NB,NZ)
     ELSE
@@ -641,9 +641,9 @@
 
     IF(WSDN.GT.ZERO)THEN
 !
-!     ICTYP=photosynthesis type:3=C3,4=C4 from PFT file
+!     iPlantPhotosynthesisType=photosynthesis type:3=C3,4=C4 from PFT file
 !
-      IF(ICTYP(NZ).EQ.ic4_photo)THEN
+      IF(iPlantPhotosynthesisType(NZ).EQ.ic4_photo)THEN
 !     C4 PHOTOSYNTHESIS
         call C4Photosynthesis(K,NB,NZ,CH2O,TFN1,TFN2,TFNE,XKO2L,WSDN)
       ELSE
@@ -668,11 +668,11 @@
 !     begin_execution
   associate(                          &
     CEPOLB =>  plt_biom%CEPOLB  , &
-    IWTYP  =>  plt_pheno%IWTYP  , &
-    IBTYP  =>  plt_pheno%IBTYP  , &
+    iPlantPhenologyType =>  plt_pheno%iPlantPhenologyType , &
+    iPlantTurnoverPattern =>  plt_pheno%iPlantTurnoverPattern , &
     FLG4   =>  plt_pheno%FLG4   , &
     HourCounter4LeafOut_brch   =>  plt_pheno%HourCounter4LeafOut_brch   , &
-    ISTYP  =>  plt_pheno%ISTYP  , &
+    iPlantPhenologyPattern =>  plt_pheno%iPlantPhenologyPattern , &
     iPlantBranchState  =>  plt_pheno%iPlantBranchState  , &
     ZERO   =>  plt_site%ZERO    , &
     FDBKX  => plt_photo%FDBKX   , &
@@ -703,19 +703,19 @@
 !     ATRP=hours above threshold temperature for dehardening since leafout
 !     ATRPZ=hours to full dehardening of conifers in spring
 ! deciduous
-  IF(IWTYP(NZ).NE.0.AND.IBTYP(NZ).GE.2)THEN
+  IF(iPlantPhenologyType(NZ).NE.0.AND.iPlantTurnoverPattern(NZ).GE.2)THEN
     RubiscoActivity_brpft(NB,NZ)=RubiscoActivity_brpft(NB,NZ)*AZMAX1(AMIN1(1.0_r8 &
       ,HourCounter4LeafOut_brch(NB,NZ)/(0.9_r8*ATRPZ)))
   ENDIF
 !
 !     TERMINATION OF ANNUALS
 !
-!     ISTYP=growth habit:0=annual,1=perennial from PFT file
+!     iPlantPhenologyPattern=growth habit:0=annual,1=perennial from PFT file
 !     FLG4=number of hours with no grain fill after start of grain fill
 !     Hours2KillAnuals=number of hours with no grain fill to terminate annuals
 !
-  IF(ISTYP(NZ).EQ.iplt_annual.AND.FLG4(NB,NZ).GT.0.0_r8)THEN
-    FDBKX(NB,NZ)=AZMAX1(1.0_r8-FLG4(NB,NZ)/Hours2KillAnuals(IWTYP(NZ)))
+  IF(iPlantPhenologyPattern(NZ).EQ.iplt_annual.AND.FLG4(NB,NZ).GT.0.0_r8)THEN
+    FDBKX(NB,NZ)=AZMAX1(1.0_r8-FLG4(NB,NZ)/Hours2KillAnuals(iPlantPhenologyType(NZ)))
   ELSE
     FDBKX(NB,NZ)=1.0_r8
   ENDIF
@@ -825,8 +825,8 @@
     HourThreshold4LeafOff  =>  plt_pheno%HourThreshold4LeafOff  , &
     Hours4LeafOff   =>  plt_pheno%Hours4LeafOff   , &
     HourThreshold4LeafOut  =>  plt_pheno%HourThreshold4LeafOut  , &
-    VRNS   =>  plt_pheno%VRNS   , &
-    IWTYP  =>  plt_pheno%IWTYP  , &
+    Hours4Leafout   =>  plt_pheno%Hours4Leafout   , &
+    iPlantPhenologyType =>  plt_pheno%iPlantPhenologyType , &
     ZEROP  =>  plt_biom%ZEROP   , &
     NU     =>  plt_site%NU      , &
     AREA3  =>  plt_site%AREA3   , &
@@ -850,17 +850,17 @@
 !
 !     FEEDBACK ON CO2 FIXATION
 !
-!     IWTYP=phenology type from PFT file
-!     VRNS,VRNL=leafout hours,hours required for leafout
+!     iPlantPhenologyType=phenology type from PFT file
+!     Hours4Leafout,VRNL=leafout hours,hours required for leafout
 !     Hours4LeafOff,VRNX=leafoff hours,hours required for leafoff
 !
-    IF(IWTYP(NZ).EQ.0.OR.VRNS(NB,NZ).GE.HourThreshold4LeafOut(NB,NZ).OR.Hours4LeafOff(NB,NZ).LT.HourThreshold4LeafOff(NB,NZ))THEN
+    IF(iPlantPhenologyType(NZ).EQ.0.OR.Hours4Leafout(NB,NZ).GE.HourThreshold4LeafOut(NB,NZ).OR.Hours4LeafOff(NB,NZ).LT.HourThreshold4LeafOff(NB,NZ))THEN
 
       call PhenoActiveBranch(NB,NZ,CH2O,TFN1,TFN2,TFNE,XKO2L)
     ELSE
       RubiscoActivity_brpft(NB,NZ)=0.0_r8
       FDBKX(NB,NZ)=1.0_r8
-      DO K=1,MaxCanopyNodes1
+      DO K=1,MaxNodesPerBranch1
         VCGR4(K,NB,NZ)=0.0_r8
         VCGRO(K,NB,NZ)=0.0_r8
       ENDDO

@@ -57,7 +57,7 @@ implicit none
   real(r8),target,allocatable ::  HDIND(:,:)                         !total subsurface DIN flux, [g d-2]
   real(r8),target,allocatable ::  UDIPQ(:,:)                         !total surface DIP flux, [g d-2]
   real(r8),target,allocatable ::  HDIPD(:,:)                         !total subsurface DIP flux, [g d-2]
-  real(r8),target,allocatable ::  WTSTGET(:,:,:)                        !total standing dead C, [g d-2]
+  real(r8),target,allocatable ::  StandingDeadChemElmnt_col(:,:,:)                        !total standing dead C, [g d-2]
   real(r8),target,allocatable ::  ZDRAIN(:,:)                        !total N drainage below root zone, [g d-2]
   real(r8),target,allocatable ::  PDRAIN(:,:)                        !total P drainage below root zone, [g d-2]
   real(r8),target,allocatable ::  UION(:,:)                          !total soil ion content, [mol d-2]
@@ -162,7 +162,7 @@ implicit none
   allocate(HDIND(JY,JX));       HDIND=0._r8
   allocate(UDIPQ(JY,JX));       UDIPQ=0._r8
   allocate(HDIPD(JY,JX));       HDIPD=0._r8
-  allocate(WTSTGET(NumOfPlantChemElements,JY,JX));      WTSTGET=0._r8
+  allocate(StandingDeadChemElmnt_col(NumOfPlantChemElements,JY,JX));      StandingDeadChemElmnt_col=0._r8
   allocate(ZDRAIN(JY,JX));      ZDRAIN=0._r8
   allocate(PDRAIN(JY,JX));      PDRAIN=0._r8
   allocate(UION(JY,JX));        UION=0._r8
@@ -257,7 +257,7 @@ implicit none
   call destroy(HDIND)
   call destroy(UDIPQ)
   call destroy(HDIPD)
-  call destroy(WTSTGET)
+  call destroy(StandingDeadChemElmnt_col)
   call destroy(ZDRAIN)
   call destroy(PDRAIN)
   call destroy(UION)

@@ -145,7 +145,7 @@ implicit none
   pltpar%JLA1   = JLA
   pltpar%JSA1   = JSA
   pltpar%JLI1   = JLI
-  pltpar%MaxCanopyNodes1 = MaxCanopyNodes
+  pltpar%MaxNodesPerBranch1 = MaxNodesPerBranch
   pltpar%iprotein =micpar%iprotein
   pltpar%icarbhyro=micpar%icarbhyro
   pltpar%icellulos=micpar%icellulos
@@ -156,10 +156,10 @@ implicit none
   pltpar%jcplx= micpar%jcplx
   pltpar%NumOfPlantLitrCmplxs=micpar%NumOfPlantLitrCmplxs
   pltpar%jsken  = micpar%jsken
-  pltpar%Jlitgrp= 5     !number of liter groups
-  pltpar%JBR    = 10    !number of branches
-  JBR=pltpar%JBR
-  Jlitgrp=pltpar%Jlitgrp
+  pltpar%NumLitterGroups= 5     !number of liter groups
+  pltpar%MaxNumBranches    = 10    !number of branches
+  MaxNumBranches=pltpar%MaxNumBranches
+  NumLitterGroups=pltpar%NumLitterGroups
   JRS=pltpar%JRS
 
 

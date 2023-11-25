@@ -13,17 +13,17 @@ implicit none
   integer :: JH
   integer :: JV
   integer :: JD
-  integer :: JBR=10     !number of plant branches
+  integer :: MaxNumBranches=10     !number of plant branches
   integer :: NumGrowthStages=10  !number of plant growth states
   integer :: JRS     !maximum number of root layers
-  integer :: Jlitgrp !number of liter groups
+  integer :: NumLitterGroups !number of liter groups
   integer, PARAMETER :: JP=5    !maximum pft in a given topgraphic column
   integer, PARAMETER :: JC=10   !# of canopy layers
   integer, PARAMETER :: JS=5
   integer, PARAMETER :: JLI=4   !# of sectors for the leaf zenith [0,pi/2]
   integer, PARAMETER :: JLA=4   !# of sectors for the leaf azimuth, [0,pi]
   integer, PARAMETER :: JSA=4   !# of sectors for the sky azimuth  [0,2*pi]
-  integer, parameter :: MaxCanopyNodes=25!# of nodes for plant canopy
+  integer, parameter :: MaxNodesPerBranch=25!# of nodes for plant canopy
   integer, pointer :: JGnio(:)   !guid indices for organic-microbial complex
   integer, pointer :: JGnfo(:)   !guid indices for organic-microbial complex
   integer, pointer :: JGniA(:)   !guid indices for autotrophic-microbial complex

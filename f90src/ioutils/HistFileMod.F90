@@ -6,7 +6,7 @@ module HistFileMod
   use fileUtil          , only : iulog,strip_null
   use abortutils        , only : endrun
   use TestMod           , only : errMsg
-  use GridConsts        , only : JZ,JS,JBR,bounds,bounds_type
+  use GridConsts        , only : JZ,JS,MaxNumBranches,bounds,bounds_type
   use data_const_mod    , only : spval => DAT_CONST_SPVAL
   use EcosimConst       , only : secspday
   use EcoSIMCtrlMod     , only : etimer
@@ -183,7 +183,7 @@ implicit none
   !create history file for output
 
   use EcoSIMConfig      , only : case_name
-  use GridConsts        , only : JZ,JS,JBR,JC,JP,NumGrowthStages
+  use GridConsts        , only : JZ,JS,MaxNumBranches,JC,JP,NumGrowthStages
   use EcoSIMConfig      , only : jcplx=>jcplxc,jsken=>jskenc
   use ElmIDMod          , only : NumOfPlantChemElements
   implicit none
@@ -248,7 +248,7 @@ implicit none
   call ncd_defdim(lnfid, 'levsno',  JS,dimid)
   call ncd_defdim(lnfid, 'levcan',JC,dimid)
   call ncd_defdim(lnfid, 'npfts',  JP,dimid)
-  call ncd_defdim(lnfid, 'nbranches',JBR,dimid)
+  call ncd_defdim(lnfid, 'nbranches',MaxNumBranches,dimid)
   call ncd_defdim(lnfid, 'ngrstages',NumGrowthStages,dimid)
   call ncd_defdim(lnfid, 'elements',NumOfPlantChemElements,dimid)
   call ncd_defdim(lnfid, 'nkinecomp',jsken,dimid)
@@ -558,7 +558,7 @@ implicit none
   case ('levsoi')
       num2d = JZ
   case ('nbranches')
-      num2d = JBR
+      num2d = MaxNumBranches
   case default
       write(iulog,*) trim(subname),' ERROR: unsupported 2d type ',type2d, &
         ' currently supported types for multi level fields are: ', &

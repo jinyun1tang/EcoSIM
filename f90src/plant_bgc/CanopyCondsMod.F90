@@ -63,7 +63,7 @@ module CanopyCondsMod
     SnowDepth   => plt_ew%SnowDepth     , &
     VLHeatCapSurfSnow  => plt_ew%VLHeatCapSurfSnow    , &
     GridMaxCanopyHeight      => plt_morph%GridMaxCanopyHeight     , &
-    IRTYP   => plt_morph%IRTYP  , &
+    iPlantGrainType  => plt_morph%iPlantGrainType , &
     StemAreag   => plt_morph%StemAreag  , &
     CanopyLA_grd   => plt_morph%CanopyLA_grd    &
   )
@@ -325,7 +325,7 @@ module CanopyCondsMod
         
         IF(CanopyHeightz(L-1).GE.SnowDepth-ZERO.AND.CanopyHeightz(L-1).GE.DPTH0-ZERO)THEN
           !above snow depth and above water/ice surface
-          D1130: DO K=1,MaxCanopyNodes1
+          D1130: DO K=1,MaxNodesPerBranch1
             CanopyArea_pft(NZ)=CanopyArea_pft(NZ)+CanPLNBLA(L,K,NB,NZ)
             CanopyArea_grid=CanopyArea_grid+CanPLNBLA(L,K,NB,NZ)
           ENDDO D1130
@@ -460,7 +460,7 @@ module CanopyCondsMod
           DO  L=1,NumOfCanopyLayers1
             IF(CanopyHeightz(L-1).GT.SnowDepth-ZERO.AND.CanopyHeightz(L-1).GT.DPTH0-ZERO)THEN
               D1205: DO N=1,JLI1
-                D1210: DO K=1,MaxCanopyNodes1
+                D1210: DO K=1,MaxNodesPerBranch1
                   CanopyLeafA_lyrpft(N,L,NZ)=CanopyLeafA_lyrpft(N,L,NZ)+LeafA_lyrnodbrchpft(N,L,K,NB,NZ)
                 ENDDO D1210
                 CanopyStemA_lyrpft(N,L,NZ)=CanopyStemA_lyrpft(N,L,NZ)+StemA_lyrnodbrchpft(N,L,NB,NZ)

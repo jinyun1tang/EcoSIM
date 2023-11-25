@@ -50,8 +50,8 @@ module ExtractsMod
   associate(                             &
    NP0      => plt_site%NP0        , &
    WGLFT    => plt_biom%WGLFT      , &
-   WTSTGET  => plt_biom%WTSTGET   , &
-   WTSTGE   => plt_biom%WTSTGE     , &
+   StandingDeadChemElmnt_col  => plt_biom%StandingDeadChemElmnt_col   , &
+   StandingDeadChemElmnts_pft   => plt_biom%StandingDeadChemElmnts_pft     , &
    HESNC    => plt_bgcr%HESNC      , &
    ZESNC    => plt_bgcr%ZESNC      , &
    LitrfalChemElemnts_vr     => plt_bgcr%LitrfalChemElemnts_vr       , &
@@ -68,14 +68,14 @@ module ExtractsMod
 !
 !   ZCSNC,ZZSNC,ZPSNC=total C,N,P litterfall
 !   HCSNC,HZSNC,HPSNC=hourly PFT C,N,P litterfall from grosub.f
-!   WTSTGET=total standing dead C,N,P mass
+!   StandingDeadChemElmnt_col=total standing dead C,N,P mass
 !   WTSTG=PFT standing dead C,N,P mass
 !   ESNC,=cumulative PFT C,N,P litterfall from grosub.f
 !   LitrfalChemElemnts_vr,=cumulative total C,N,P litterfall
 !
     DO NE=1,NumOfPlantChemElements
       ZESNC(NE)=ZESNC(NE)+HESNC(NE,NZ)
-      WTSTGET(NE)=WTSTGET(NE)+WTSTGE(NE,NZ)
+      StandingDeadChemElmnt_col(NE)=StandingDeadChemElmnt_col(NE)+StandingDeadChemElmnts_pft(NE,NZ)
     ENDDO
 
     DO  L=0,NI(NZ)

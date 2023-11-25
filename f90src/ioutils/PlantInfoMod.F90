@@ -317,7 +317,7 @@ implicit none
 ! READ INPUTS FOR EACH PLANT SPECIES
 !
   IF(DATAP(NZ,NY,NX).NE.'NO')THEN
-
+    write(101,*)'NZ=',NZ,DATAP(NZ,NY,NX)
     call ReadPlantTraitsNC(NZ,NY,NX,VRNLI,VRNXI)
 !
 !   RE-CALCULATE PLANT INPUTS IN MODEL UNITS
@@ -338,10 +338,10 @@ implicit none
     ANGSH(NZ,NY,NX)=SIN(ANGSH(NZ,NY,NX)/57.29578_r8)
     GROUPI(NZ,NY,NX)=GROUPX(NZ,NY,NX)
 
-    IF(IBTYP(NZ,NY,NX).NE.0)THEN
+    IF(iPlantTurnoverPattern(NZ,NY,NX).NE.0)THEN
 !
-      XRNI(NZ,NY,NX)=XRNI(NZ,NY,NX)/25.0_r8
-      XRLA(NZ,NY,NX)=XRLA(NZ,NY,NX)/25.0_r8
+      RefNodeInitRate(NZ,NY,NX)=RefNodeInitRate(NZ,NY,NX)/25.0_r8
+      RefLeafAppearRate(NZ,NY,NX)=RefLeafAppearRate(NZ,NY,NX)/25.0_r8
       GROUPI(NZ,NY,NX)=GROUPI(NZ,NY,NX)/25.0_r8
       XTLI(NZ,NY,NX)=XTLI(NZ,NY,NX)/25.0_r8
     ENDIF
@@ -350,9 +350,9 @@ implicit none
       XDL(NZ,NY,NX)=DayLenthMax(NY,NX)
     ENDIF
     D5: DO NB=1,JC
-      IF(IWTYP(NZ,NY,NX).EQ.0.AND.ISTYP(NZ,NY,NX).NE.iplt_annual)THEN
-        HourThreshold4LeafOut(NB,NZ,NY,NX)=AMIN1(4380.0_r8,VRNLI+144.0_r8*ZTYPI(NZ,NY,NX)*(NB-1))
-        HourThreshold4LeafOff(NB,NZ,NY,NX)=AMIN1(4380.0_r8,VRNXI+144.0_r8*ZTYPI(NZ,NY,NX)*(NB-1))
+      IF(iPlantPhenologyType(NZ,NY,NX).EQ.0.AND.iPlantPhenologyPattern(NZ,NY,NX).NE.iplt_annual)THEN
+        HourThreshold4LeafOut(NB,NZ,NY,NX)=AMIN1(4380.0_r8,VRNLI+144.0_r8*iPlantInitThermoAdaptZone(NZ,NY,NX)*(NB-1))
+        HourThreshold4LeafOff(NB,NZ,NY,NX)=AMIN1(4380.0_r8,VRNXI+144.0_r8*iPlantInitThermoAdaptZone(NZ,NY,NX)*(NB-1))
       ELSE
         HourThreshold4LeafOut(NB,NZ,NY,NX)=VRNLI
         HourThreshold4LeafOff(NB,NZ,NY,NX)=VRNXI
@@ -375,17 +375,17 @@ implicit none
 
   loc=get_pft_loc(DATAP(NZ,NY,NX)(1:6))
   DATAPI(NZ,NY,NX)=loc
-  call ncd_getvar(pft_nfid, 'ICTYP', loc, ICTYP(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'IGTYP', loc, IGTYP(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'ISTYP', loc, ISTYP(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'IDTYP', loc, IDTYP(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'INTYP', loc, INTYP(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'IWTYP', loc, IWTYP(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'IPTYP', loc, IPTYP(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'IBTYP', loc, IBTYP(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'IRTYP', loc, IRTYP(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'ICTYP', loc, iPlantPhotosynthesisType(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'IGTYP', loc, iPlantMorphologyType(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'ISTYP', loc, iPlantPhenologyPattern(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'IDTYP', loc, iPlantDevelopPattern(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'INTYP', loc, iPlantNfixType(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'IWTYP', loc, iPlantPhenologyType(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'IPTYP', loc, iPlantPhotoperiodType(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'IBTYP', loc, iPlantTurnoverPattern(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'IRTYP', loc, iPlantGrainType(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'MY', loc, MY(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'ZTYPI', loc, ZTYPI(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'ZTYPI', loc, iPlantInitThermoAdaptZone(NZ,NY,NX))
 
   call ncd_getvar(pft_nfid, 'VCMX', loc, VCMX(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'VOMX', loc, VOMX(NZ,NY,NX))
@@ -405,13 +405,13 @@ implicit none
   call ncd_getvar(pft_nfid, 'TAUR', loc, TAUR(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'TAUP', loc, TAUP(NZ,NY,NX))
 
-  call ncd_getvar(pft_nfid, 'XRNI', loc, XRNI(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'XRLA', loc, XRLA(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'CTC', loc, CTC(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'XRNI', loc, RefNodeInitRate(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'XRLA', loc, RefLeafAppearRate(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'CTC', loc, TCelciusChill4Seed(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'VRNLI', loc,VRNLI)
   call ncd_getvar(pft_nfid, 'VRNXI', loc,VRNXI)
   call ncd_getvar(pft_nfid, 'WDLF', loc,WDLF(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'PB', loc,PB(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'PB', loc,MinNonstructalC4InitBranch(NZ,NY,NX))
 
   call ncd_getvar(pft_nfid, 'GROUPX', loc,GROUPX(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'XTLI', loc,XTLI(NZ,NY,NX))
@@ -432,7 +432,7 @@ implicit none
   call ncd_getvar(pft_nfid, 'GRMX', loc,MaxSeedCMass(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'GRDM', loc,SeedCMass(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'GFILL', loc,GFILL(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'WTSTDI', loc,WTSTDI(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'WTSTDI', loc,StandingDeadInitC_pft(NZ,NY,NX))
 
   call ncd_getvar(pft_nfid, 'RRAD1M', loc,MaxPrimRootRadius(1,NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'RRAD2M', loc,MaxSecndRootRadius(1,NZ,NY,NX))
@@ -459,19 +459,19 @@ implicit none
   call ncd_getvar(pft_nfid, 'RCS', loc,RCS(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'RSMX', loc,RSMX(NZ,NY,NX))
 
-  call ncd_getvar(pft_nfid, 'DMLF', loc,DMLF(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'DMSHE', loc,DMSHE(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'DMSTK', loc,DMSTK(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'DMRSV', loc,DMRSV(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'DMHSK', loc,DMHSK(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'DMEAR', loc,DMEAR(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'DMGR', loc,DMGR(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'DMRT', loc,BiomGrowthYieldRoot(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'DMLF', loc,LeafBiomGrowthYield(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'DMSHE', loc,PetioleBiomGrowthYield(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'DMSTK', loc,StalkBiomGrowthYield(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'DMRSV', loc,ReserveBiomGrowthYield(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'DMHSK', loc,HuskBiomGrowthYield(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'DMEAR', loc,EarBiomGrowthYield(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'DMGR', loc,GrainBiomGrowthYield(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'DMRT', loc,RootBiomGrowthYield(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'DMND', loc,DMND(NZ,NY,NX))
 
   call ncd_getvar(pft_nfid, 'CNLF', loc,CNLF(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'CNSHE', loc,CNSHE(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'CNSTK', loc,CNSTK(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'CNSTK', loc,rNCStalk_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'CNRSV', loc,CNRSV(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'CNHSK', loc,CNHSK(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'CNEAR', loc,CNEAR(NZ,NY,NX))
@@ -508,23 +508,23 @@ implicit none
   use abortutils , only : endrun
   implicit none
   integer, intent(in) :: NZ,NY,NX
-!   ICTYP=photosynthesis type:3=C3,4=C4
-!   IGTYP=root profile:0=shallow (eg bryophytes),1=intermediate(eg herbs),2=deep (eg trees)
-!   ISTYP=growth habit:0=annual,1=perennial
-!   IDTYP=growth habit:0=determinate,1=indetermimate
-!   INTYP=N2 fixation:1,2,3=rapid to slow root symbiosis (e.g.legumes),
+!   iPlantPhotosynthesisType=photosynthesis type:3=C3,4=C4
+!   iPlantMorphologyType=root profile:0=shallow (eg bryophytes),1=intermediate(eg herbs),2=deep (eg trees)
+!   iPlantPhenologyPattern=growth habit:0=annual,1=perennial
+!   iPlantDevelopPattern=growth habit:0=determinate,1=indetermimate
+!   iPlantNfixType=N2 fixation:1,2,3=rapid to slow root symbiosis (e.g.legumes),
 !   4,5,6=rapid to slow canopy symbiosis (e.g. cyanobacteria)
-!   IWTYP=phenology type:0=evergreen,1=cold deciduous,2=drought deciduous,3=1+2
-!   IPTYP=photoperiod type:0=day neutral,1=short day,2=long day
-!   IBTYP=turnover:if IGTYP=0 or 1:all above-ground:0,1=rapid(deciduous),2=very slow(evergreen),3=slow(semi-deciduous)
-!                   :if IGTYP=2:trees:1=rapid(deciduous),2=very slow(coniferous),3=slow(semi-deciduous)
-!   IRTYP=storage organ:0=above ground,1=below ground
+!   iPlantPhenologyType=phenology type:0=evergreen,1=cold deciduous,2=drought deciduous,3=1+2
+!   iPlantPhotoperiodType=photoperiod type:0=day neutral,1=short day,2=long day
+!   iPlantTurnoverPattern=turnover:if iPlantMorphologyType=0 or 1:all above-ground:0,1=rapid(deciduous),2=very slow(evergreen),3=slow(semi-deciduous)
+!                   :if iPlantMorphologyType=2:trees:1=rapid(deciduous),2=very slow(coniferous),3=slow(semi-deciduous)
+!   iPlantGrainType=storage organ:0=above ground,1=below ground
 !   MY=mycorrhizal:1=no,2=yes
-!   ZTYPI=thermal adaptation zone:1=arctic,boreal,2=cool temperate,
+!   iPlantInitThermoAdaptZone=thermal adaptation zone:1=arctic,boreal,2=cool temperate,
 !   3=warm temperate,4=subtropical,5=tropical
 
   write(*,*)'PLANT FUNCTIONAL TYPE for (NZ,NY,NX)=',NZ,NY,NX
-  select CASE (ICTYP(NZ,NY,NX))
+  select CASE (iPlantPhotosynthesisType(NZ,NY,NX))
   case (3)
     write(*,*)'C3 photosynthesis'
   case (4)
@@ -533,7 +533,7 @@ implicit none
     write(*,*)'photosynthesis type not defined'
   end select
 
-  select case(IGTYP(NZ,NY,NX))
+  select case(iPlantMorphologyType(NZ,NY,NX))
   case (0)
     write(*,*)'shallow root profile, like bryophytes'
   case (1)
@@ -544,7 +544,7 @@ implicit none
     write(*,*)'root profile not defined'
   end select
 
-  select case (ISTYP(NZ,NY,NX))
+  select case (iPlantPhenologyPattern(NZ,NY,NX))
   case (0)
     write(*,*)'Annual plant'
   case (1)
@@ -553,7 +553,7 @@ implicit none
     write(*,*)'growth habit not defined'
   end select
 
-  select case (IDTYP(NZ,NY,NX))
+  select case (iPlantDevelopPattern(NZ,NY,NX))
   case (0)
     write(*,*)'determinate growth habit'
   case (1)
@@ -562,7 +562,7 @@ implicit none
     write(*,*)'growth habit not defined'
   end select
 
-  select case (INTYP(NZ,NY,NX))
+  select case (iPlantNfixType(NZ,NY,NX))
 ! 1,2, 3, e.g. legumes
   case (1)
     write(*,*)'Rapid root N2 fixation symbiosis'
@@ -581,7 +581,7 @@ implicit none
     write(*,*)'No N2 fixation symbiosis defined'
   end select
 
-  select case(IWTYP(NZ,NY,NX))
+  select case(iPlantPhenologyType(NZ,NY,NX))
   case (0)
     write(*,*)'phenology type: evergreen'
   case (1)
@@ -594,7 +594,7 @@ implicit none
     write(*,*)'phenology type not defined'
   end select
 
-  select case(IPTYP(NZ,NY,NX))
+  select case(iPlantPhotoperiodType(NZ,NY,NX))
   case (0)
     write(*,*)'day neutral photoperiod'
   case (1)
@@ -605,7 +605,7 @@ implicit none
     write(*,*)'photoperiod not defined'
   end select
 
-  select case(IBTYP(NZ,NY,NX))
+  select case(iPlantTurnoverPattern(NZ,NY,NX))
   case (0, 1)
     write(*,*)'plant biome turnover rapid (deciduous)'
   case (2)
@@ -620,7 +620,7 @@ implicit none
     write(*,*)'Plant biome turnover not defined'
   end select
 
-  select case(IRTYP(NZ,NY,NX))
+  select case(iPlantGrainType(NZ,NY,NX))
   case (0)
     write(*,*)'Above ground storage organ'
   case (1)
@@ -638,7 +638,7 @@ implicit none
     write(*,*)'Wrong option for mycorrhizae'
   end select
 
-  select case(INT(ZTYPI(NZ,NY,NX)))
+  select case(INT(iPlantInitThermoAdaptZone(NZ,NY,NX)))
   case (1)
     write(*,*)'thermal adaptation zone: arctic, boreal'
   case (2)
@@ -671,9 +671,9 @@ implicit none
   write(*,*)'Fraction of leaf protein in rubisco: ',RUBP(NZ,NY,NX)
   write(*,*)'Fraction of leaf protein in PEP carboxylase: ',PEPC(NZ,NY,NX)
   write(*,*)'Specific chlorophyll activity (umol e- g-1 s-1): ',ETMX(NZ,NY,NX)
-  if(ICTYP(NZ,NY,NX).eq.ic3_photo)then
+  if(iPlantPhotosynthesisType(NZ,NY,NX).eq.ic3_photo)then
     write(*,*)'Fraction of leaf protein as chlorophyll in mesophyll (C3) ',CHL(NZ,NY,NX)
-  elseif(ICTYP(NZ,NY,NX).eq.ic4_photo)then
+  elseif(iPlantPhotosynthesisType(NZ,NY,NX).eq.ic4_photo)then
     write(*,*)'Fraction of leaf protein as chlorophyll in bundle sheath(C4)',CHL(NZ,NY,NX)
     write(*,*)'fraction of leaf protein in mesophyll chlorophyll(C4)',CHL4(NZ,NY,NX)
   endif
@@ -688,15 +688,15 @@ implicit none
   integer, intent(in) :: NZ,NY,NX
   real(r8), intent(in) :: VRNLI,VRNXI
   write(*,*)'PHENOLOGICAL PROPERTIES'
-  write(*,*)'rate of node initiation at 25oC (h-1): XRNI',XRNI(NZ,NY,NX)
-  write(*,*)'rate of leaf appearance at 25oC (h-1): XRLA',XRLA(NZ,NY,NX)
+  write(*,*)'rate of node initiation at 25oC (h-1): XRNI',RefNodeInitRate(NZ,NY,NX)
+  write(*,*)'rate of leaf appearance at 25oC (h-1): XRLA',RefLeafAppearRate(NZ,NY,NX)
   write(*,*)'chilling temperature for CO2 fixation, '// &
-    'seed loss (oC): CTC',CTC(NZ,NY,NX)
+    'seed loss (oC): CTC',TCelciusChill4Seed(NZ,NY,NX)
   write(*,*)'hour requirement for spring leafout: VRNLI',VRNLI
   write(*,*)'hour requirement for autumn leafoff: VRNXI',VRNXI
   write(*,*)'leaf length:width ratio: WDLF',WDLF(NZ,NY,NX)
   write(*,*)'nonstructural C concentration needed for branching'// &
-    ':PB',PB(NZ,NY,NX)
+    ':PB',MinNonstructalC4InitBranch(NZ,NY,NX)
   end subroutine Phenology_trait_disp
 !------------------------------------------------------------------------------------------
   subroutine morphology_trait_disp(NZ,NY,NX)
@@ -719,7 +719,7 @@ implicit none
   write(*,*)'maximum seed size per SDMX (g): GRMX',MaxSeedCMass(NZ,NY,NX)
   write(*,*)'seed size at planting (g): GRDM',SeedCMass(NZ,NY,NX)    !could be greater than MaxSeedCMass, accouting for seedling
   write(*,*)'grain filling rate at 25 oC (g seed-1 h-1): GFILL',GFILL(NZ,NY,NX)
-  write(*,*)'mass of dead standing biomass at planting: WTSTDI',WTSTDI(NZ,NY,NX)
+  write(*,*)'mass of dead standing biomass at planting: WTSTDI',StandingDeadInitC_pft(NZ,NY,NX)
   end subroutine morphology_trait_disp
 
 !------------------------------------------------------------------------------------------
@@ -779,21 +779,21 @@ implicit none
 
   write(*,*)'ORGAN GROWTH YIELDS'
   write(*,*)'leaf dry matter C production vs '// &
-    'nonstructural C consumption (g g-1): DMLF',DMLF(NZ,NY,NX)
+    'nonstructural C consumption (g g-1): DMLF',LeafBiomGrowthYield(NZ,NY,NX)
   write(*,*)'petiole dry matter C production vs '// &
-    'nonstructural C consumption (g g-1): DMSHE',DMSHE(NZ,NY,NX)
+    'nonstructural C consumption (g g-1): DMSHE',PetioleBiomGrowthYield(NZ,NY,NX)
   write(*,*)'stalk dry matter C production vs '// &
-    'nonstructural C consumption (g g-1): DMSTK',DMSTK(NZ,NY,NX)
+    'nonstructural C consumption (g g-1): DMSTK',StalkBiomGrowthYield(NZ,NY,NX)
   write(*,*)'stalk reserve C production vs '// &
-    'nonstructural C consumption (g g-1): DMRSV',DMRSV(NZ,NY,NX)
+    'nonstructural C consumption (g g-1): DMRSV',ReserveBiomGrowthYield(NZ,NY,NX)
   write(*,*)'husk dry matter C production vs '// &
-    'nonstructural Cconsumption (g g-1): DMHSK',DMHSK(NZ,NY,NX)
+    'nonstructural Cconsumption (g g-1): DMHSK',HuskBiomGrowthYield(NZ,NY,NX)
   write(*,*)'ear dry matter C production vs '// &
-    'nonstructural Cconsumption (g g-1): DMEAR',DMEAR(NZ,NY,NX)
+    'nonstructural Cconsumption (g g-1): DMEAR',EarBiomGrowthYield(NZ,NY,NX)
   write(*,*)'grain C production vs nonstructural C'// &
-    ' consumption (g g-1): DMGR',DMGR(NZ,NY,NX)
+    ' consumption (g g-1): DMGR',GrainBiomGrowthYield(NZ,NY,NX)
   write(*,*)'root dry matter C production vs nonstructural C'// &
-    ' consumption (g g-1): DMRT',BiomGrowthYieldRoot(NZ,NY,NX)
+    ' consumption (g g-1): DMRT',RootBiomGrowthYield(NZ,NY,NX)
   write(*,*)'nodule bacteria in root nodule,canopy dry matter'// &
     'C production vs nonstructural C consumption (g g-1): DMND' &
     ,DMND(NZ,NY,NX)
@@ -807,7 +807,7 @@ implicit none
   write(*,*)'ORGAN N AND P CONCENTRATIONS'
   write(*,*)'NC ratio in plant leaves: CNLF',CNLF(NZ,NY,NX)
   write(*,*)'NC ratio in plant petiole: CNSHE',CNSHE(NZ,NY,NX)
-  write(*,*)'NC ratio in plant stalk: CNSTK',CNSTK(NZ,NY,NX)
+  write(*,*)'NC ratio in plant stalk: CNSTK',rNCStalk_pft(NZ,NY,NX)
   write(*,*)'NC ratio in plant stalk reserve: CNRSV',CNRSV(NZ,NY,NX)
   write(*,*)'NC ratio in plant husk: CNHSK',CNHSK(NZ,NY,NX)
   write(*,*)'NC ratio in plant ear: CNEAR',CNEAR(NZ,NY,NX)

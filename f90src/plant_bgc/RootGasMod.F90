@@ -124,7 +124,7 @@ module RootGasMod
     RootPorosity  =>  plt_morph%RootPorosity   , &
     PrimRootXNumL   =>  plt_morph%PrimRootXNumL    , &
     NGTopRootLayer     =>  plt_morph%NGTopRootLayer      , &
-    NB1    =>  plt_morph%NB1       &
+    NumOfMainBranch_pft    =>  plt_morph%NumOfMainBranch_pft       &
   )
   IF(RCO2M(N,L,NZ).GT.ZEROP(NZ).AND.RTVLW(N,L,NZ).GT.ZEROP(NZ) &
     .AND.FOXYX.GT.ZEROQ(NZ))THEN
@@ -262,7 +262,7 @@ module RootGasMod
 !     RCO2PX=root CO2 gas flux at time step for gas flux calculations
 !     RCO2A=root CO2 flux from grosub.f
 !
-    IF(N.EQ.1.AND.iPlantCalendar(ipltcal_Emerge,NB1(NZ),NZ).GT.0.AND.RootLenPerP(N,L,NZ).GT.ZEROP(NZ))THEN
+    IF(N.EQ.1.AND.iPlantCalendar(ipltcal_Emerge,NumOfMainBranch_pft(NZ),NZ).GT.0.AND.RootLenPerP(N,L,NZ).GT.ZEROP(NZ))THEN
       RTARRX=RootAreaDivRadius(N,L)/RRADP(N,NZ)
       DIFOP=OLSGLP*RTARRX
 

@@ -75,7 +75,7 @@
         WRITE(CHARN2,'(I3)')N2+100
         WRITE(CHARN3,'(I4)')N3
         WRITE(CDATE,'(2A2,A4)')CHARN1(2:3),CHARN2(2:3),CHARN3(1:4)
-        call WriteDailyAccumulators(I, NHW, NHE, NVN, NVS)
+        call UpdateDailyAccumulators(I, NHW, NHE, NVN, NVS)
         exit
       ENDIF
       NN=N
@@ -88,6 +88,8 @@
 !------------------------------------------------------------------------------------------
 
   subroutine SetAnnualAccumlators(NY,NX)
+  
+  !set accumulators at the beginning of year
   implicit none
   integer, intent(in) :: NY,NX
 
@@ -128,38 +130,40 @@
   D960: DO NZ=1,NP0(NY,NX)
   !RSETE: effect of canopy element status on seed set
     DO NE=1,NumOfPlantChemElements
-      RSETE(NE,NZ,NY,NX)=RSETE(NE,NZ,NY,NX)+TEUPTK(NE,NZ,NY,NX)-TESNC(NE,NZ,NY,NX)
+      RSETE(NE,NZ,NY,NX)=RSETE(NE,NZ,NY,NX)+PlantExudChemElmnts_pft(NE,NZ,NY,NX)-LitrfallChemElmnts_pft(NE,NZ,NY,NX)
       THVSTE(NE,NZ,NY,NX)=THVSTE(NE,NZ,NY,NX)+HVSTE(NE,NZ,NY,NX)
     enddo
-    RSETE(ielmc,NZ,NY,NX)=RSETE(ielmc,NZ,NY,NX)+CARBN(NZ,NY,NX)+TCO2T(NZ,NY,NX)-VCO2F(NZ,NY,NX)-VCH4F(NZ,NY,NX)
-    RSETE(ielmn,NZ,NY,NX)=RSETE(ielmn,NZ,NY,NX)+TNH3C(NZ,NY,NX)+TZUPFX(NZ,NY,NX)-VNH3F(NZ,NY,NX)-VN2OF(NZ,NY,NX)
+    RSETE(ielmc,NZ,NY,NX)=RSETE(ielmc,NZ,NY,NX)+GrossCO2Fix_pft(NZ,NY,NX)+GrossResp_pft(NZ,NY,NX) &
+      -CO2ByFire_pft(NZ,NY,NX)-CH4ByFire_pft(NZ,NY,NX)
+    RSETE(ielmn,NZ,NY,NX)=RSETE(ielmn,NZ,NY,NX)+TNH3C(NZ,NY,NX)+TZUPFX(NZ,NY,NX) &
+      -VNH3F(NZ,NY,NX)-VN2OF(NZ,NY,NX)
     RSETE(ielmp,NZ,NY,NX)=RSETE(ielmp,NZ,NY,NX)-VPO4F(NZ,NY,NX)
 
 ! the following variables are accumulated daily
-    CARBN(NZ,NY,NX)=0._r8
-    TEUPTK(:,NZ,NY,NX)=0._r8
-    TCO2T(NZ,NY,NX)=0._r8
+    GrossCO2Fix_pft(NZ,NY,NX)=0._r8
+    PlantExudChemElmnts_pft(:,NZ,NY,NX)=0._r8
+    GrossResp_pft(NZ,NY,NX)=0._r8
     TCO2A(NZ,NY,NX)=0._r8
     ETCanP(NZ,NY,NX)=0._r8
     TZUPFX(NZ,NY,NX)=0._r8
     TNH3C(NZ,NY,NX)=0._r8
-    VCO2F(NZ,NY,NX)=0._r8
-    VCH4F(NZ,NY,NX)=0._r8
+    CO2ByFire_pft(NZ,NY,NX)=0._r8
+    CH4ByFire_pft(NZ,NY,NX)=0._r8
     VOXYF(NZ,NY,NX)=0._r8
     VNH3F(NZ,NY,NX)=0._r8
     VN2OF(NZ,NY,NX)=0._r8
     VPO4F(NZ,NY,NX)=0._r8
 
     HVSTE(:,NZ,NY,NX)=0._r8
-    TESN0(:,NZ,NY,NX)=0._r8
-    TESNC(:,NZ,NY,NX)=0._r8
+    SurfLitrfallChemElmnts_pft(:,NZ,NY,NX)=0._r8
+    LitrfallChemElmnts_pft(:,NZ,NY,NX)=0._r8
   ENDDO D960
   IF(IERSNG.EQ.1.OR.IERSNG.EQ.3)THEN
     TSED(NY,NX)=0._r8
   ENDIF
   end subroutine SetAnnualAccumlators        
 !------------------------------------------------------------------------------------------     
-  subroutine WriteDailyAccumulators(I, NHW, NHE, NVN, NVS)
+  subroutine UpdateDailyAccumulators(I, NHW, NHE, NVN, NVS)
 !     WRITE DAILY MAX MIN ACCUMULATORS FOR WEATHER VARIABLES
 
   implicit none
@@ -182,9 +186,8 @@
 !     RESET ANNUAL FLUX ACCUMULATORS AT START OF ANNUAL CYCLE
 !     ALAT=latitude +ve=N,-ve=S
 !
-      IF((ALAT(NY,NX).GE.0.0.AND.I.EQ.1).OR.(ALAT(NY,NX).LT.0.0.AND.I.EQ.1))THEN
+      IF((ALAT(NY,NX).GE.0.0.AND.I.EQ.1).OR.(ALAT(NY,NX).LT.0.0.AND.I.EQ.1))THEN        
         call SetAnnualAccumlators(NY,NX)
-
       ENDIF
 !
 !     CALCULATE DAYLENGTH FROM SOLAR ANGLE
@@ -297,7 +300,7 @@
     ENDDO D950
   ENDDO D955
 
-  END subroutine WriteDailyAccumulators
+  END subroutine UpdateDailyAccumulators
 !-----------------------------------------------------------------------------------------
 
   subroutine TillageandIrrigationEvents(I, NHW, NHE, NVN, NVS)

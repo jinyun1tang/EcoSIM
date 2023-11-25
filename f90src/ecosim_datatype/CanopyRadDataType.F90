@@ -60,11 +60,11 @@ module CanopyRadDataType
   allocate(OMEGX(JSA,JLI,JLA))
   allocate(IALBY(JSA,JLI,JLA))
   allocate(CLASS(JLI,JP,JY,JX))
-  allocate(LeafA_lyrnodbrchpft(JLI,JC,MaxCanopyNodes,JBR,JP,JY,JX))
-  allocate(LeafAUnshaded_seclyrnodbrpft(JLI,JC,MaxCanopyNodes,JBR,JP,JY,JX))
+  allocate(LeafA_lyrnodbrchpft(JLI,JC,MaxNodesPerBranch,MaxNumBranches,JP,JY,JX))
+  allocate(LeafAUnshaded_seclyrnodbrpft(JLI,JC,MaxNodesPerBranch,MaxNumBranches,JP,JY,JX))
   allocate(PAR(JLI,JSA,JC,JP,JY,JX))
   allocate(PARDIF(JLI,JSA,JC,JP,JY,JX))
-  allocate(StemA_lyrnodbrchpft(JLI,JC,JBR,JP,JY,JX))
+  allocate(StemA_lyrnodbrchpft(JLI,JC,MaxNumBranches,JP,JY,JX))
 
   end subroutine InitAllocate
 !------------------------------------------------------------------------------------------

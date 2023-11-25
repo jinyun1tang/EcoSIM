@@ -261,7 +261,7 @@ module Hour1Mod
 !     VOLWC=canopy surface water retention
 !
   DO  NZ=1,NP(NY,NX)
-    VOLWCX=XVOLWC(IGTYP(NZ,NY,NX))*(CanopyLeafA_pft(NZ,NY,NX)+CanopyStemA_pft(NZ,NY,NX))
+    VOLWCX=XVOLWC(iPlantMorphologyType(NZ,NY,NX))*(CanopyLeafA_pft(NZ,NY,NX)+CanopyStemA_pft(NZ,NY,NX))
     PrecIntcptByCanP(NZ,NY,NX)=AZMAX1(AMIN1(PrecRainAndSurfirrig(NY,NX)*FracPARByCanP(NZ,NY,NX),VOLWCX-WatByPCan(NZ,NY,NX)))
     TFLWCI(NY,NX)=TFLWCI(NY,NX)+PrecRainAndSurfirrig(NY,NX)*FracPARByCanP(NZ,NY,NX)
     PrecIntcptByCanG(NY,NX)=PrecIntcptByCanG(NY,NX)+PrecIntcptByCanP(NZ,NY,NX)
@@ -775,7 +775,7 @@ module Hour1Mod
 
   TRootGasLoss_disturb(idg_beg:idg_end-1,NY,NX)=0.0_r8
   ZESNC(:,NY,NX)=0.0_r8
-  WTSTGET(1:NumOfPlantChemElements,NY,NX)=0.0_r8
+  StandingDeadChemElmnt_col(1:NumOfPlantChemElements,NY,NX)=0.0_r8
   PPT(NY,NX)=0.0_r8
 ! zero arrays in the snow layers
   FLSW(1:JS,NY,NX)=0.0_r8

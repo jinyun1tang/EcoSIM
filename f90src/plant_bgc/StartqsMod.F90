@@ -6,6 +6,7 @@ module StartqsMod
   use PlantAPIData
   use TracerIDMod
   use EcoSiMParDataMod, only : pltpar
+  use PlantMathFuncMod
   use UnitMod, only : units
   use PlantMathFuncMod
   implicit none
@@ -86,9 +87,9 @@ module StartqsMod
 !     FILL OUT UNUSED ARRAYS
 !
       D9986: DO NZ=NP+1,JP1
-        plt_bgcr%TESN0(1:NumOfPlantChemElements,NZ)=0._r8
-        plt_bgcr%TESNC(1:NumOfPlantChemElements,NZ)=0._r8
-        plt_biom%WTSTGE(1:NumOfPlantChemElements,NZ)=0._r8
+        plt_bgcr%SurfLitrfallChemElmnts_pft(1:NumOfPlantChemElements,NZ)=0._r8
+        plt_bgcr%LitrfallChemElmnts_pft(1:NumOfPlantChemElements,NZ)=0._r8
+        plt_biom%StandingDeadChemElmnts_pft(1:NumOfPlantChemElements,NZ)=0._r8
         D6401: DO L=1,NL
           DO  K=1,pltpar%NumOfPlantLitrCmplxs
             plt_bgcr%ESNC(1:NumOfPlantChemElements,1:jsken,K,L,NZ)=0._r8
@@ -124,7 +125,7 @@ module StartqsMod
     CPRT   =>  plt_allom%CPRT  , &
     O2I    =>  plt_photo%O2I   , &
     RCMX   =>  plt_photo%RCMX  , &
-    ICTYP  =>  plt_photo%ICTYP , &
+    iPlantPhotosynthesisType =>  plt_photo%iPlantPhotosynthesisType, &
     MaxCanPStomaResistH2O   =>  plt_photo%MaxCanPStomaResistH2O  , &
     ClumpFactort0    =>  plt_morph%ClumpFactort0   , &
     ClumpFactor    =>  plt_morph%ClumpFactor   , &
@@ -143,7 +144,7 @@ module StartqsMod
   CNWS(NZ)=2.5_r8
   CPWS(NZ)=25.0_r8
   RootFracRemobilizableBiom(NZ)=AMIN1(CNRT(NZ)*CNWS(NZ),CPRT(NZ)*CPWS(NZ))
-  IF(ICTYP(NZ).EQ.ic3_photo)THEN
+  IF(iPlantPhotosynthesisType(NZ).EQ.ic3_photo)THEN
     O2I(NZ)=2.10E+05_r8
   ELSE
     O2I(NZ)=3.96E+05_r8
@@ -170,14 +171,14 @@ module StartqsMod
     icarbhyro => pltpar%icarbhyro ,&
     icellulos => pltpar%icellulos ,&
     ilignin  =>  pltpar%ilignin   , &
-    Jlitgrp  => pltpar%Jlitgrp , &
-    XRLA   =>  plt_pheno%XRLA      , &
-    IBTYP  =>  plt_pheno%IBTYP     , &
-    IGTYP  =>  plt_pheno%IGTYP     , &
+    NumLitterGroups  => pltpar%NumLitterGroups , &
+    RefLeafAppearRate   =>  plt_pheno%RefLeafAppearRate      , &
+    iPlantTurnoverPattern =>  plt_pheno%iPlantTurnoverPattern    , &
+    iPlantMorphologyType =>  plt_pheno%iPlantMorphologyType    , &
     GROUPI =>  plt_pheno%GROUPI    , &
     CFOPE  =>  plt_soilchem%CFOPE  , &
     FNOD   =>  plt_allom%FNOD      , &
-    INTYP  =>  plt_morph%INTYP     , &
+    iPlantNfixType =>  plt_morph%iPlantNfixType    , &
     NNOD   =>  plt_morph%NNOD        &
   )
 !
@@ -196,7 +197,7 @@ module StartqsMod
 !
 !     NON-VASCULAR (E.G. MOSSES)
 !
-  IF(IGTYP(NZ).EQ.0)THEN
+  IF(is_plant_bryophyte(iPlantMorphologyType(NZ)))THEN
     CFOPE(ielmc,ifoliar,iprotein,NZ)=0.07_r8
     CFOPE(ielmc,ifoliar,icarbhyro,NZ)=0.25_r8
     CFOPE(ielmc,ifoliar,icellulos,NZ)=0.30_r8
@@ -209,7 +210,7 @@ module StartqsMod
 !
 !     LEGUMES
 !
-  ELSEIF(INTYP(NZ).NE.0)THEN
+  ELSEIF(iPlantNfixType(NZ).NE.0)THEN
     CFOPE(ielmc,ifoliar,iprotein,NZ)=0.16_r8
     CFOPE(ielmc,ifoliar,icarbhyro,NZ)=0.38_r8
     CFOPE(ielmc,ifoliar,icellulos,NZ)=0.34_r8
@@ -222,7 +223,7 @@ module StartqsMod
 !
 !     ANNUALS, GRASSES, SHRUBS
 !
-  ELSEIF(IBTYP(NZ).EQ.0.OR.IGTYP(NZ).LE.1)THEN
+  ELSEIF(iPlantTurnoverPattern(NZ).EQ.0.OR.(.not.is_plant_treelike(iPlantMorphologyType(NZ))))THEN
     CFOPE(ielmc,ifoliar,iprotein,NZ)=0.08_r8
     CFOPE(ielmc,ifoliar,icarbhyro,NZ)=0.41_r8
     CFOPE(ielmc,ifoliar,icellulos,NZ)=0.36_r8
@@ -235,7 +236,7 @@ module StartqsMod
 !
 !     DECIDUOUS TREES
 !
-  ELSEIF(IBTYP(NZ).EQ.1.OR.IBTYP(NZ).GE.3)THEN
+  ELSEIF(iPlantTurnoverPattern(NZ).EQ.1.OR.iPlantTurnoverPattern(NZ).GE.3)THEN
     CFOPE(ielmc,ifoliar,iprotein,NZ)=0.07_r8
     CFOPE(ielmc,ifoliar,icarbhyro,NZ)=0.34_r8
     CFOPE(ielmc,ifoliar,icellulos,NZ)=0.36_r8
@@ -265,7 +266,7 @@ module StartqsMod
 !
 !     NON-VASCULAR
 !
-  IF(IGTYP(NZ).EQ.0)THEN
+  IF(is_plant_bryophyte(iPlantMorphologyType(NZ)))THEN
     CFOPE(ielmc,istalk,iprotein,NZ)=0.07_r8
     CFOPE(ielmc,istalk,icarbhyro,NZ)=0.25_r8
     CFOPE(ielmc,istalk,icellulos,NZ)=0.30_r8
@@ -273,7 +274,7 @@ module StartqsMod
 !
 !     ANNUALS, GRASSES, SHRUBS
 !
-  ELSEIF(IBTYP(NZ).EQ.0.OR.IGTYP(NZ).LE.1)THEN
+  ELSEIF(iPlantTurnoverPattern(NZ).EQ.0.OR.(.not.is_plant_treelike(iPlantMorphologyType(NZ))))THEN
     CFOPE(ielmc,istalk,iprotein,NZ)=0.03_r8
     CFOPE(ielmc,istalk,icarbhyro,NZ)=0.25_r8
     CFOPE(ielmc,istalk,icellulos,NZ)=0.57_r8
@@ -293,7 +294,7 @@ module StartqsMod
 !
 !     NON-VASCULAR
 !
-  IF(IGTYP(NZ).EQ.0)THEN
+  IF(is_plant_bryophyte(iPlantMorphologyType(NZ)))THEN
     CFOPE(ielmc,iroot,iprotein,NZ)=0.07_r8
     CFOPE(ielmc,iroot,icarbhyro,NZ)=0.25_r8
     CFOPE(ielmc,iroot,icellulos,NZ)=0.30_r8
@@ -301,7 +302,7 @@ module StartqsMod
 !
 !     ANNUALS, GRASSES, SHRUBS
 !
-  ELSEIF(IBTYP(NZ).EQ.0.OR.IGTYP(NZ).LE.1)THEN
+  ELSEIF(iPlantTurnoverPattern(NZ).EQ.0.OR.(.not.is_plant_treelike(iPlantMorphologyType(NZ))))THEN
     CFOPE(ielmc,iroot,iprotein,NZ)=0.057_r8
     CFOPE(ielmc,iroot,icarbhyro,NZ)=0.263_r8
     CFOPE(ielmc,iroot,icellulos,NZ)=0.542_r8
@@ -309,7 +310,7 @@ module StartqsMod
 !
 !     DECIDUOUS TREES
 !
-  ELSEIF(IBTYP(NZ).EQ.1.OR.IBTYP(NZ).GE.3)THEN
+  ELSEIF(iPlantTurnoverPattern(NZ).EQ.1.OR.iPlantTurnoverPattern(NZ).GE.3)THEN
     CFOPE(ielmc,iroot,iprotein,NZ)=0.059_r8
     CFOPE(ielmc,iroot,icarbhyro,NZ)=0.308_r8
     CFOPE(ielmc,iroot,icellulos,NZ)=0.464_r8
@@ -346,7 +347,7 @@ module StartqsMod
   CPOPC(icellulos)=0.0010_r8
   CPOPC(ilignin)=0.0020_r8
 
-  D110: DO N=0,Jlitgrp
+  D110: DO N=0,NumLitterGroups
     CNOPCT=0.0_r8
     CPOPCT=0.0_r8
     D100: DO M=1,jsken
@@ -364,7 +365,7 @@ module StartqsMod
 !     FNOD=scales node number for perennial vegetation (e.g. trees)
 !     NNOD=number of concurrently growing nodes
 !
-  IF(IBTYP(NZ).EQ.0.OR.IGTYP(NZ).LE.1)THEN
+  IF(iPlantTurnoverPattern(NZ).EQ.0.OR.(.not.is_plant_treelike(iPlantMorphologyType(NZ))))THEN
     FNOD(NZ)=1.0_r8
     IF(GROUPI(NZ).LE.10)THEN
       NNOD(NZ)=3
@@ -374,7 +375,7 @@ module StartqsMod
       NNOD(NZ)=5
     ENDIF
   ELSE
-    FNOD(NZ)=AMAX1(1.0_r8,0.04_r8/XRLA(NZ))
+    FNOD(NZ)=AMAX1(1.0_r8,0.04_r8/RefLeafAppearRate(NZ))
     NNOD(NZ)=24
   ENDIF
   end associate
@@ -390,38 +391,38 @@ module StartqsMod
 
   associate(                            &
     DATAP    =>  plt_site%DATAP   , &
-    ICTYP    =>  plt_photo%ICTYP  , &
+    iPlantPhotosynthesisType   =>  plt_photo%iPlantPhotosynthesisType , &
     HTC      =>  plt_pheno%HTC    , &
     TCX      =>  plt_pheno%TCX    , &
-    TCZ      =>  plt_pheno%TCZ    , &
+    TCelciusChill4Leaf     =>  plt_pheno%TCelciusChill4Leaf   , &
     OFFST    =>  plt_pheno%OFFST  , &
-    ZTYPI    =>  plt_pheno%ZTYPI  , &
-    ZTYP     =>  plt_pheno%ZTYP   , &
+    iPlantInitThermoAdaptZone   =>  plt_pheno%iPlantInitThermoAdaptZone , &
+    iPlantThermoAdaptZone    =>  plt_pheno%iPlantThermoAdaptZone  , &
     SSTX     =>  plt_pheno%SSTX     &
   )
 !
 !     PFT THERMAL ACCLIMATION
 !
-!     ZTYP,ZTYPI=dynamic,initial thermal adaptation zone from PFT file
+!     ZTYP,iPlantInitThermoAdaptZone=dynamic,initial thermal adaptation zone from PFT file
 !     OFFST=shift in Arrhenius curve for thermal adaptation (oC)
 !     TCZ,TCX=threshold temperature for leafout,leafoff
 !     HTC=high temperature threshold for grain number loss (oC)
 !     SSTX=sensitivity to HTC (seeds oC-1 above HTC)
 !
-  ZTYP(NZ)=ZTYPI(NZ)
-  OFFST(NZ)=2.667_r8*(2.5_r8-ZTYP(NZ))
-  TCZ(NZ)=TCZD-OFFST(NZ)
+  iPlantThermoAdaptZone(NZ)=iPlantInitThermoAdaptZone(NZ)
+  OFFST(NZ)=2.667_r8*(2.5_r8-iPlantThermoAdaptZone(NZ))
+  TCelciusChill4Leaf(NZ)=TCZD-OFFST(NZ)
   TCX(NZ)=AMIN1(15.0_r8,TCXD-OFFST(NZ))
-  IF(ICTYP(NZ).EQ.ic3_photo)THEN
+  IF(iPlantPhotosynthesisType(NZ).EQ.ic3_photo)THEN
     IF(DATAP(NZ)(1:4).EQ.'soyb')THEN
-      HTC(NZ)=30.0_r8+3.0_r8*ZTYP(NZ)
+      HTC(NZ)=30.0_r8+3.0_r8*iPlantThermoAdaptZone(NZ)
       SSTX(NZ)=0.002_r8
     ELSE
-      HTC(NZ)=27.0_r8+3.0_r8*ZTYP(NZ)
+      HTC(NZ)=27.0_r8+3.0_r8*iPlantThermoAdaptZone(NZ)
       SSTX(NZ)=0.002_r8
     ENDIF
   ELSE
-    HTC(NZ)=27.0_r8+3.0_r8*ZTYP(NZ)
+    HTC(NZ)=27.0_r8+3.0_r8*iPlantThermoAdaptZone(NZ)
     SSTX(NZ)=0.005_r8
   ENDIF
   end associate
@@ -436,7 +437,7 @@ module StartqsMod
   associate(                             &
     CNRTS    =>  plt_allom%CNRTS   , &
     CPRTS    =>  plt_allom%CPRTS   , &
-    BiomGrowthYieldRoot     =>  plt_allom%BiomGrowthYieldRoot    , &
+    RootBiomGrowthYield     =>  plt_allom%RootBiomGrowthYield    , &
     CNRT     =>  plt_allom%CNRT    , &
     CPRT     =>  plt_allom%CPRT    , &
     UPMNPO   =>  plt_rbgc%UPMNPO   , &
@@ -506,8 +507,8 @@ module StartqsMod
       ENDDO D9790
     ENDIF
   ENDDO D9795
-  CNRTS(NZ)=CNRT(NZ)*BiomGrowthYieldRoot(NZ)
-  CPRTS(NZ)=CPRT(NZ)*BiomGrowthYieldRoot(NZ)
+  CNRTS(NZ)=CNRT(NZ)*RootBiomGrowthYield(NZ)
+  CPRTS(NZ)=CPRT(NZ)*RootBiomGrowthYield(NZ)
   MaxPrimRootRadius(2,NZ)=5.0E-06_r8
   MaxSecndRootRadius(2,NZ)=5.0E-06_r8
   RootPorosity(2,NZ)=RootPorosity(1,NZ)
@@ -557,10 +558,10 @@ module StartqsMod
     pftPlantPopulation      =>  plt_site%pftPlantPopulation      , &
     ALAT    =>  plt_site%ALAT    , &
     AREA3   =>  plt_site%AREA3   , &
-    IGTYP   =>  plt_pheno%IGTYP  , &
+    iPlantMorphologyType  =>  plt_pheno%iPlantMorphologyType , &
     VSTGX   =>  plt_pheno%VSTGX  , &
     GROUP   =>  plt_pheno%GROUP  , &
-    KVSTG   =>  plt_pheno%KVSTG  , &
+    KLeafNodeNumber  =>  plt_pheno%KLeafNodeNumber , &
     KVSTGN  =>  plt_pheno%KVSTGN , &
     GSTGI   =>  plt_pheno%GSTGI  , &
     GSTGF   =>  plt_pheno%GSTGF  , &
@@ -571,7 +572,7 @@ module StartqsMod
     iPlantBranchState   =>  plt_pheno%iPlantBranchState  , &
     VRNZ    =>  plt_pheno%VRNZ   , &
     iPlantCalendar   =>  plt_pheno%iPlantCalendar  , &
-    VRNS    =>  plt_pheno%VRNS   , &
+    Hours4Leafout    =>  plt_pheno%Hours4Leafout   , &
     HourCounter4LeafOut_brch    =>  plt_pheno%HourCounter4LeafOut_brch   , &
     WSTR    =>  plt_pheno%WSTR   , &
     GROUPI  =>  plt_pheno%GROUPI , &
@@ -585,17 +586,17 @@ module StartqsMod
     RubiscoActivity_brpft    =>  plt_photo%RubiscoActivity_brpft   , &
     HCOB    =>  plt_photo%HCOB   , &
     CO2B    =>  plt_photo%CO2B   , &
-    VSTG    =>  plt_morph%VSTG   , &
+    NumOfLeaves_brch   =>  plt_morph%NumOfLeaves_brch  , &
     CanopyHeight      =>  plt_morph%CanopyHeight     , &
     KLEAF   =>  plt_morph%KLEAF  , &
     XTLI    =>  plt_morph%XTLI   , &
     NBT     =>  plt_morph%NBT    , &
-    PSTG    =>  plt_morph%PSTG   , &
+    ShootNodeNumber   =>  plt_morph%ShootNodeNumber  , &
     CanopyLeafA_pft   =>  plt_morph%CanopyLeafA_pft  , &
     CanopyBranchStemApft_lyr   =>  plt_morph%CanopyBranchStemApft_lyr  , &
     StemA_lyrnodbrchpft   =>  plt_morph%StemA_lyrnodbrchpft  , &
     CanopyStemA_pft   =>  plt_morph%CanopyStemA_pft  , &
-    PSTGF   =>  plt_morph%PSTGF  , &
+    NodeNumberAtAnthesis   =>  plt_morph%NodeNumberAtAnthesis  , &
     GRNXB   =>  plt_morph%GRNXB  , &
     HTNODE  =>  plt_morph%HTNODE , &
     GRNOB   =>  plt_morph%GRNOB  , &
@@ -609,7 +610,7 @@ module StartqsMod
     CanPBranchHeight  =>  plt_morph%CanPBranchHeight , &
     HypoctoylHeight   =>  plt_morph%HypoctoylHeight  , &
     BranchNumber_brchpft    =>  plt_morph%BranchNumber_brchpft   , &
-    PSTGI   =>  plt_morph%PSTGI  , &
+    NodeNumberToInitFloral   =>  plt_morph%NodeNumberToInitFloral  , &
     KLEAFX  =>  plt_morph%KLEAFX , &
     NumOfBranches_pft     =>  plt_morph%NumOfBranches_pft      &
   )
@@ -626,21 +627,21 @@ module StartqsMod
   NumOfBranches_pft(NZ)=0
   HypoctoylHeight(NZ)=0._r8
   CanopyHeight(NZ)=0._r8
-  D10: DO NB=1,JBR
+  D10: DO NB=1,MaxNumBranches
     plt_pheno%doInitLeafOut(NB,NZ)=0
     plt_pheno%doPlantLeafOut(NB,NZ)=iDisable
     plt_pheno%doPlantLeaveOff(NB,NZ)=iDisable
     plt_pheno%IFLGR(NB,NZ)=0
     plt_pheno%IFLGQ(NB,NZ)=0
     GROUP(NB,NZ)=GROUPI(NZ)
-    PSTG(NB,NZ)=XTLI(NZ)
-    PSTGI(NB,NZ)=PSTG(NB,NZ)
-    PSTGF(NB,NZ)=0._r8
-    VSTG(NB,NZ)=0._r8
+    ShootNodeNumber(NB,NZ)=XTLI(NZ)
+    NodeNumberToInitFloral(NB,NZ)=ShootNodeNumber(NB,NZ)
+    NodeNumberAtAnthesis(NB,NZ)=0._r8
+    NumOfLeaves_brch(NB,NZ)=0._r8
     VSTGX(NB,NZ)=0._r8
     KLEAF(NB,NZ)=1
     KLEAFX(NB,NZ)=1
-    KVSTG(NB,NZ)=1
+    KLeafNodeNumber(NB,NZ)=1
     KVSTGN(NB,NZ)=0
     GSTGI(NB,NZ)=0._r8
     GSTGF(NB,NZ)=0._r8
@@ -648,7 +649,7 @@ module StartqsMod
     TGSTGF(NB,NZ)=0._r8
     VRNY(NB,NZ)=0._r8
     VRNZ(NB,NZ)=0._r8
-    VRNS(NB,NZ)=VRNY(NB,NZ)
+    Hours4Leafout(NB,NZ)=VRNY(NB,NZ)
     Hours4LeafOff(NB,NZ)=VRNZ(NB,NZ)
     HourCounter4LeafOut_brch(NB,NZ)=0._r8
     RubiscoActivity_brpft(NB,NZ)=1.0
@@ -666,26 +667,26 @@ module StartqsMod
 !
   WSTR(NZ)=0._r8
   CHILL(NZ)=0._r8
-  plt_biom%EPOOL(1:NumOfPlantChemElements,1:JBR,NZ)=0._r8
-  plt_biom%EPOLNB(1:NumOfPlantChemElements,1:JBR,NZ)=0._r8
-  plt_biom%WTSHEBE(1:NumOfPlantChemElements,1:JBR,NZ)=0._r8
-  plt_biom%WTSHTBE(1:NumOfPlantChemElements,1:JBR,NZ)=0._r8
-  plt_biom%WTSTKBE(1:NumOfPlantChemElements,1:JBR,NZ)=0._r8
-  plt_biom%WTLFBE(1:NumOfPlantChemElements,1:JBR,NZ)=0._r8
-  plt_biom%WTRSVBE(1:NumOfPlantChemElements,1:JBR,NZ)=0._r8
-  plt_biom%WTHSKBE(1:NumOfPlantChemElements,1:JBR,NZ)=0._r8
-  plt_biom%WTGRBE(1:NumOfPlantChemElements,1:JBR,NZ)=0._r8
-  plt_biom%WTEARBE(1:NumOfPlantChemElements,1:JBR,NZ)=0._r8
-  plt_biom%WTNDBE(1:NumOfPlantChemElements,1:JBR,NZ)=0._r8
-  plt_pheno%RCELX(1:NumOfPlantChemElements,1:JBR,NZ)=0._r8
-  plt_biom%WGLFEX(1:NumOfPlantChemElements,1:JBR,NZ)=0._r8
-  plt_pheno%RCESX(1:NumOfPlantChemElements,1:JBR,NZ)=0._r8
-  plt_biom%WGSHEXE(1:NumOfPlantChemElements,1:JBR,NZ)=0._r8
-  plt_biom%WTSTXBE(1:NumOfPlantChemElements,1:JBR,NZ)=0._r8
+  plt_biom%EPOOL(1:NumOfPlantChemElements,1:MaxNumBranches,NZ)=0._r8
+  plt_biom%EPOLNB(1:NumOfPlantChemElements,1:MaxNumBranches,NZ)=0._r8
+  plt_biom%PetioleChemElmnts_brch(1:NumOfPlantChemElements,1:MaxNumBranches,NZ)=0._r8
+  plt_biom%WTSHTBE(1:NumOfPlantChemElements,1:MaxNumBranches,NZ)=0._r8
+  plt_biom%StalkChemElmnts_brch(1:NumOfPlantChemElements,1:MaxNumBranches,NZ)=0._r8
+  plt_biom%LeafChemElmnts_brch(1:NumOfPlantChemElements,1:MaxNumBranches,NZ)=0._r8
+  plt_biom%ReserveChemElmnts_brch(1:NumOfPlantChemElements,1:MaxNumBranches,NZ)=0._r8
+  plt_biom%HuskChemElmnts_brch(1:NumOfPlantChemElements,1:MaxNumBranches,NZ)=0._r8
+  plt_biom%GrainChemElmnts_brch(1:NumOfPlantChemElements,1:MaxNumBranches,NZ)=0._r8
+  plt_biom%EarChemElmnts_brch(1:NumOfPlantChemElements,1:MaxNumBranches,NZ)=0._r8
+  plt_biom%WTNDBE(1:NumOfPlantChemElements,1:MaxNumBranches,NZ)=0._r8
+  plt_pheno%RCELX(1:NumOfPlantChemElements,1:MaxNumBranches,NZ)=0._r8
+  plt_biom%WGLFEX(1:NumOfPlantChemElements,1:MaxNumBranches,NZ)=0._r8
+  plt_pheno%RCESX(1:NumOfPlantChemElements,1:MaxNumBranches,NZ)=0._r8
+  plt_biom%WGSHEXE(1:NumOfPlantChemElements,1:MaxNumBranches,NZ)=0._r8
+  plt_biom%WTSTXBE(1:NumOfPlantChemElements,1:MaxNumBranches,NZ)=0._r8
 
-  D25: DO NB=1,JBR
-    plt_biom%CanPBStalkC(NB,NZ)=0._r8
-    plt_biom%CanPBLeafShethC(NB,NZ)=0._r8
+  D25: DO NB=1,MaxNumBranches
+    plt_biom%StalkBiomassC_brch(NB,NZ)=0._r8
+    plt_biom%LeafPetioleBiomassC_brch(NB,NZ)=0._r8
     GRNXB(NB,NZ)=0._r8
     GRNOB(NB,NZ)=0._r8
     plt_allom%GRWTB(NB,NZ)=0._r8
@@ -699,7 +700,7 @@ module StartqsMod
         StemA_lyrnodbrchpft(N,L,NB,NZ)=0._r8
       enddo
     ENDDO D5
-    DO K=0,MaxCanopyNodes1
+    DO K=0,MaxNodesPerBranch1
       ARLF1(K,NB,NZ)=0._r8
       HTNODE(K,NB,NZ)=0._r8
       plt_morph%HTNODX(K,NB,NZ)=0._r8
@@ -736,17 +737,17 @@ module StartqsMod
   plt_biom%CanopyNonstructElements_pft(1:NumOfPlantChemElements,NZ)=0._r8
   plt_biom%CanopyNonstructElementConc_pft(1:NumOfPlantChemElements,NZ)=0._r8
   plt_biom%NoduleNonstructCconc_pft(NZ)=0._r8
-  plt_biom%CanPShootElmMass(1:NumOfPlantChemElements,NZ)=0._r8
-  plt_biom%WTLFE(1:NumOfPlantChemElements,NZ)=0._r8
-  plt_biom%WTSHEE(1:NumOfPlantChemElements,NZ)=0._r8
-  plt_biom%WTSTKE(1:NumOfPlantChemElements,NZ)=0._r8
+  plt_biom%ShootChemElmnts_pft(1:NumOfPlantChemElements,NZ)=0._r8
+  plt_biom%LeafChemElmnts(1:NumOfPlantChemElements,NZ)=0._r8
+  plt_biom%SheathChemElmnts(1:NumOfPlantChemElements,NZ)=0._r8
+  plt_biom%StalkChemElmnts(1:NumOfPlantChemElements,NZ)=0._r8
   plt_biom%CanPStalkC(NZ)=0._r8
-  plt_biom%WTRSVE(1:NumOfPlantChemElements,NZ)=0._r8
-  plt_biom%WTHSKE(1:NumOfPlantChemElements,NZ)=0._r8
-  plt_biom%WTEARE(1:NumOfPlantChemElements,NZ)=0._r8
-  plt_biom%WTGRE(1:NumOfPlantChemElements,NZ)=0._r8
+  plt_biom%CanopyReserveChemElmnts(1:NumOfPlantChemElements,NZ)=0._r8
+  plt_biom%HuskChemElmnts(1:NumOfPlantChemElements,NZ)=0._r8
+  plt_biom%EarChemElmnts(1:NumOfPlantChemElements,NZ)=0._r8
+  plt_biom%GrainChemElmnts(1:NumOfPlantChemElements,NZ)=0._r8
   plt_biom%WTRTSE(1:NumOfPlantChemElements,NZ)=0._r8
-  plt_biom%WTNDE(1:NumOfPlantChemElements,NZ)=0._r8
+  plt_biom%NoduleChemElmnts_pft(1:NumOfPlantChemElements,NZ)=0._r8
   plt_biom%CanopyLeafShethC_pft(NZ)=0._r8
   CanopyLeafA_pft(NZ)=0._r8
   plt_biom%WTRTA(NZ)=0._r8
@@ -767,21 +768,21 @@ module StartqsMod
     AREA3  => plt_site%AREA3     , &
     CFOPE  => plt_soilchem%CFOPE , &
     ETCanP  => plt_ew%ETCanP       , &
-    WTSTDE => plt_biom%WTSTDE    , &
-    WTSTGE => plt_biom%WTSTGE    , &
-    WTSTDI => plt_biom%WTSTDI    , &
+    StandingDeadKCompChemElmnts_pft => plt_biom%StandingDeadKCompChemElmnts_pft    , &
+    StandingDeadChemElmnts_pft => plt_biom%StandingDeadChemElmnts_pft    , &
+    StandingDeadInitC_pft => plt_biom%StandingDeadInitC_pft    , &
     WTRTA  => plt_biom%WTRTA     , &
-    CNSTK  => plt_allom%CNSTK    , &
+    rNCStalk_pft => plt_allom%rNCStalk_pft   , &
     CPSTK  => plt_allom%CPSTK    , &
-    TEUPTK => plt_rbgc%TEUPTK    , &
+    PlantExudChemElmnts_pft => plt_rbgc%PlantExudChemElmnts_pft    , &
     TNH3C  => plt_bgcr%TNH3C     , &
     RNH3C  => plt_bgcr%RNH3C     , &
-    TESN0  => plt_bgcr%TESN0     , &
-    CARBN  => plt_bgcr%CARBN     , &
+    SurfLitrfallChemElmnts_pft  => plt_bgcr%SurfLitrfallChemElmnts_pft     , &
+    GrossCO2Fix_pft  => plt_bgcr%GrossCO2Fix_pft     , &
     TCO2A  => plt_bgcr%TCO2A     , &
-    TCO2T  => plt_bgcr%TCO2T     , &
+    GrossResp_pft  => plt_bgcr%GrossResp_pft     , &
     TZUPFX => plt_bgcr%TZUPFX    , &
-    TESNC  => plt_bgcr%TESNC     , &
+    LitrfallChemElmnts_pft  => plt_bgcr%LitrfallChemElmnts_pft     , &
     CanopyStemA_pft  => plt_morph%CanopyStemA_pft    , &
     icwood => pltpar%icwood      , &
     RSETE  => plt_pheno%RSETE      &
@@ -791,18 +792,18 @@ module StartqsMod
 !     INITIALIZE MASS BALANCE CHECKS
 !
   IF(.not.is_restart().AND.is_first_year)THEN
-    CARBN(NZ)=0._r8
-    TESN0(1:NumOfPlantChemElements,NZ)=0._r8
-    TCO2T(NZ)=0._r8
+    GrossCO2Fix_pft(NZ)=0._r8
+    SurfLitrfallChemElmnts_pft(1:NumOfPlantChemElements,NZ)=0._r8
+    GrossResp_pft(NZ)=0._r8
     TCO2A(NZ)=0._r8
-    TEUPTK(1:NumOfPlantChemElements,NZ)=0._r8
-    TESNC(1:NumOfPlantChemElements,NZ)=0._r8
+    PlantExudChemElmnts_pft(1:NumOfPlantChemElements,NZ)=0._r8
+    LitrfallChemElmnts_pft(1:NumOfPlantChemElements,NZ)=0._r8
 
     TZUPFX(NZ)=0._r8
     RNH3C(NZ)=0._r8
     TNH3C(NZ)=0._r8
-    plt_distb%VCO2F(NZ)=0._r8
-    plt_distb%VCH4F(NZ)=0._r8
+    plt_distb%CO2ByFire_pft(NZ)=0._r8
+    plt_distb%CH4ByFire_pft(NZ)=0._r8
     plt_distb%VOXYF(NZ)=0._r8
     plt_distb%VNH3F(NZ)=0._r8
     plt_distb%VN2OF(NZ)=0._r8
@@ -811,15 +812,15 @@ module StartqsMod
     plt_distb%HVSTE(1:NumOfPlantChemElements,NZ)=0._r8
     RSETE(1:NumOfPlantChemElements,NZ)=0._r8
     ETCanP(NZ)=0._r8
-    WTSTGE(1:NumOfPlantChemElements,NZ)=0._r8
-    WTSTDX=WTSTDI(NZ)*AREA3(NU)
+    StandingDeadChemElmnts_pft(1:NumOfPlantChemElements,NZ)=0._r8
+    WTSTDX=StandingDeadInitC_pft(NZ)*AREA3(NU)
     D155: DO M=1,jsken
-      WTSTDE(ielmc,M,NZ)=WTSTDX*CFOPE(ielmc,icwood,M,NZ)
-      WTSTDE(ielmn,M,NZ)=WTSTDX*CNSTK(NZ)*CFOPE(ielmn,icwood,M,NZ)
-      WTSTDE(ielmp,M,NZ)=WTSTDX*CPSTK(NZ)*CFOPE(ielmp,icwood,M,NZ)
+      StandingDeadKCompChemElmnts_pft(ielmc,M,NZ)=WTSTDX*CFOPE(ielmc,icwood,M,NZ)
+      StandingDeadKCompChemElmnts_pft(ielmn,M,NZ)=WTSTDX*rNCStalk_pft(NZ)*CFOPE(ielmn,icwood,M,NZ)
+      StandingDeadKCompChemElmnts_pft(ielmp,M,NZ)=WTSTDX*CPSTK(NZ)*CFOPE(ielmp,icwood,M,NZ)
     ENDDO D155
     DO NE=1,NumOfPlantChemElements
-      WTSTGE(NE,NZ)=WTSTGE(NE,NZ)+sum(WTSTDE(NE,1:jsken,NZ))
+      StandingDeadChemElmnts_pft(NE,NZ)=StandingDeadChemElmnts_pft(NE,NZ)+sum(StandingDeadKCompChemElmnts_pft(NE,1:jsken,NZ))
     ENDDO
   ENDIF
   end associate
@@ -841,27 +842,27 @@ module StartqsMod
     PSICanPOsmo    =>  plt_ew%PSICanPOsmo   , &
     ENGYX    =>  plt_ew%ENGYX   , &
     DTKC     =>  plt_ew%DTKC    , &
-    TCC      =>  plt_ew%TCC     , &
+    TCelciusCanopy     =>  plt_ew%TCelciusCanopy    , &
     TKG      =>  plt_pheno%TKG  , &
     TCG      =>  plt_pheno%TCG  , &
     fTgrowCanP     =>  plt_pheno%fTgrowCanP , &
-    CanPShootElmMass   =>  plt_biom%CanPShootElmMass , &
+    ShootChemElmnts_pft   =>  plt_biom%ShootChemElmnts_pft , &
     FracPARByCanP    =>  plt_rad%FracPARByCanP    &
   )
 !
 !     INITIALIZE PLANT HEAT AND WATER STATUS
 !
 !     VHeatCapCanP=canopy heat capacity (MJ m-3 K-1)
-!     TCC,TKC=canopy temperature for growth (oC,K)
+!     TCelciusCanopy,TKC=canopy temperature for growth (oC,K)
 !     TCG,TKG=canopy temperature for phenology (oC,K)
 !     PSICanP,PSICanPOsmo,PSICanPTurg=canopy total,osmotic,turgor water potl(MPa)
 !
-  VHeatCapCanP(NZ)=cpw*CanPShootElmMass(ielmc,NZ)*10.0E-06
+  VHeatCapCanP(NZ)=cpw*ShootChemElmnts_pft(ielmc,NZ)*10.0E-06
   ENGYX(NZ)=0._r8
   DTKC(NZ)=0._r8
-  TCC(NZ)=ATCA
-  TKC(NZ)=units%Celcius2Kelvin(TCC(NZ))
-  TCG(NZ)=TCC(NZ)
+  TCelciusCanopy(NZ)=ATCA
+  TKC(NZ)=units%Celcius2Kelvin(TCelciusCanopy(NZ))
+  TCG(NZ)=TCelciusCanopy(NZ)
   TKG(NZ)=units%Celcius2Kelvin(TCG(NZ))
   fTgrowCanP(NZ)=1.0
   PSICanP(NZ)=-1.0E-03
@@ -1021,16 +1022,16 @@ module StartqsMod
     RTWT1E   =>   plt_biom%RTWT1E  , &
     SeedCPlanted_pft    =>   plt_biom%SeedCPlanted_pft   , &
     WTRT1E   =>   plt_biom%WTRT1E  , &
-    CanPBLeafShethC    =>   plt_biom%CanPBLeafShethC   , &
+    LeafPetioleBiomassC_brch    =>   plt_biom%LeafPetioleBiomassC_brch   , &
     CanopyLeafShethC_pft     =>   plt_biom%CanopyLeafShethC_pft    , &
     PopPlantRootC_vr    =>   plt_biom%PopPlantRootC_vr   , &
-    WTSHEBE  =>   plt_biom%WTSHEBE , &
+    PetioleChemElmnts_brch =>   plt_biom%PetioleChemElmnts_brch, &
     WTRTL    =>   plt_biom%WTRTL   , &
     WSRTL    =>   plt_biom%WSRTL   , &
     EPOOLR   =>   plt_biom%EPOOLR  , &
     EPOOL    =>   plt_biom%EPOOL   , &
-    WTLFBE   =>   plt_biom%WTLFBE  , &
-    WTRVE    =>   plt_biom%WTRVE   , &
+    LeafChemElmnts_brch  =>   plt_biom%LeafChemElmnts_brch , &
+    NonstructalChemElmnts_pft    =>   plt_biom%NonstructalChemElmnts_pft   , &
     SeedCMass     =>   plt_morph%SeedCMass   , &
     PrimRootDepth    =>   plt_morph%PrimRootDepth  , &
     NGTopRootLayer      =>   plt_morph%NGTopRootLayer      &
@@ -1040,7 +1041,7 @@ module StartqsMod
 !
 !     WTRVC,WTRVN,WTRVP=C,N,P in storage reserves (g)
 !     WTLFB,WTLFBN,WTLFBP=C,N,P in leaves (g)
-!     CanPBLeafShethC=C in leaves+petioles (g)
+!     LeafPetioleBiomassC_brch=C in leaves+petioles (g)
 !     FDM-dry matter fraction (g DM C g FM C-1)
 !     CanWatP,WatByPCan=water volume in,on canopy (m3)
 !     CPOOL,ZPOOL,PPOOL=C,N,P in canopy nonstructural pools (g)
@@ -1051,13 +1052,13 @@ module StartqsMod
 !     CPOOLR,ZPOOLR,PPOOLR=C,N,P in root,myco nonstructural pools (g)
 !
   SeedCPlanted_pft(NZ)=SeedCMass(NZ)*pftPlantPopulation(NZ)
-  WTRVE(ielmc,NZ)=SeedCPlanted_pft(NZ)
-  WTRVE(ielmn,NZ)=CNGR(NZ)*WTRVE(ielmc,NZ)
-  WTRVE(ielmp,NZ)=CPGR(NZ)*WTRVE(ielmc,NZ)
-  WTLFBE(ielmn,1,NZ)=CNGR(NZ)*WTLFBE(ielmc,1,NZ)
-  WTLFBE(ielmp,1,NZ)=CPGR(NZ)*WTLFBE(ielmc,1,NZ)
-  CanPBLeafShethC(1,NZ)=WTLFBE(ielmc,1,NZ)+WTSHEBE(ielmc,1,NZ)
-  CanopyLeafShethC_pft(NZ)=CanopyLeafShethC_pft(NZ)+CanPBLeafShethC(1,NZ)
+  NonstructalChemElmnts_pft(ielmc,NZ)=SeedCPlanted_pft(NZ)
+  NonstructalChemElmnts_pft(ielmn,NZ)=CNGR(NZ)*NonstructalChemElmnts_pft(ielmc,NZ)
+  NonstructalChemElmnts_pft(ielmp,NZ)=CPGR(NZ)*NonstructalChemElmnts_pft(ielmc,NZ)
+  LeafChemElmnts_brch(ielmn,1,NZ)=CNGR(NZ)*LeafChemElmnts_brch(ielmc,1,NZ)
+  LeafChemElmnts_brch(ielmp,1,NZ)=CPGR(NZ)*LeafChemElmnts_brch(ielmc,1,NZ)
+  LeafPetioleBiomassC_brch(1,NZ)=LeafChemElmnts_brch(ielmc,1,NZ)+PetioleChemElmnts_brch(ielmc,1,NZ)
+  CanopyLeafShethC_pft(NZ)=CanopyLeafShethC_pft(NZ)+LeafPetioleBiomassC_brch(1,NZ)
   FDM=AMIN1(1.0_r8,0.16_r8-0.045_r8*PSICanP(NZ))
   CanWatP(NZ)=ppmc*CanopyLeafShethC_pft(NZ)/FDM
   WatByPCan(NZ)=0._r8
