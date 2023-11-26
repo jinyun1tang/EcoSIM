@@ -73,14 +73,14 @@ module ExtractsMod
 !   ESNC,=cumulative PFT C,N,P litterfall from grosub.f
 !   LitrfalChemElemnts_vr,=cumulative total C,N,P litterfall
 !
-    DO NE=1,NumOfPlantChemElements
+    DO NE=1,NumOfPlantChemElmnts
       ZESNC(NE)=ZESNC(NE)+HESNC(NE,NZ)
       StandingDeadChemElmnt_col(NE)=StandingDeadChemElmnt_col(NE)+StandingDeadChemElmnts_pft(NE,NZ)
     ENDDO
 
     DO  L=0,NI(NZ)
       DO K=1,pltpar%NumOfPlantLitrCmplxs
-        DO NE=1,NumOfPlantChemElements
+        DO NE=1,NumOfPlantChemElmnts
           DO  M=1,pltpar%jsken
             LitrfalChemElemnts_vr(NE,M,K,L)=LitrfalChemElemnts_vr(NE,M,K,L)+ESNC(NE,M,K,L,NZ)
           enddo
@@ -287,7 +287,7 @@ module ExtractsMod
 !     RDFOMC,RDFOMN,RDFOMP=PFT nonstructl C,N,P exchange
 !
       DO K=1,jcplx
-        DO NE=1,NumOfPlantChemElements
+        DO NE=1,NumOfPlantChemElmnts
           TDFOME(NE,K,L)=TDFOME(NE,K,L)-RDFOME(ielmc,N,K,L,NZ)
         ENDDO
       ENDDO
@@ -440,7 +440,7 @@ module ExtractsMod
   LWRadCanG=LWRadCanG+LWRadCanP(NZ)
   CanopyLA_grd=CanopyLA_grd+CanopyLeafA_pft(NZ)
   StemAreag=StemAreag+CanopyStemA_pft(NZ)
-  DO NE=1,NumOfPlantChemElements
+  DO NE=1,NumOfPlantChemElmnts
     ZESNC(NE)=ZESNC(NE)-HEUPTK(NE,NZ)
     PlantElemntStoreLandscape(NE)=PlantElemntStoreLandscape(NE)+BALE(NE,NZ)
   ENDDO

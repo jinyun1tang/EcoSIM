@@ -336,16 +336,16 @@ implicit none
     TAUP(NZ,NY,NX)=TAUP(NZ,NY,NX)/CanopyPARabsorpty_pft(NZ,NY,NX)
     ANGBR(NZ,NY,NX)=SIN(ANGBR(NZ,NY,NX)/57.29578_r8)
     ANGSH(NZ,NY,NX)=SIN(ANGSH(NZ,NY,NX)/57.29578_r8)
-    GROUPI(NZ,NY,NX)=GROUPX(NZ,NY,NX)
+    MatureGroup_pft(NZ,NY,NX)=GROUPX(NZ,NY,NX)
 
     IF(iPlantTurnoverPattern(NZ,NY,NX).NE.0)THEN
 !
-      RefNodeInitRate(NZ,NY,NX)=RefNodeInitRate(NZ,NY,NX)/25.0_r8
-      RefLeafAppearRate(NZ,NY,NX)=RefLeafAppearRate(NZ,NY,NX)/25.0_r8
-      GROUPI(NZ,NY,NX)=GROUPI(NZ,NY,NX)/25.0_r8
-      XTLI(NZ,NY,NX)=XTLI(NZ,NY,NX)/25.0_r8
+      RefNodeInitRate(NZ,NY,NX)=RefNodeInitRate(NZ,NY,NX)/MaxNodesPerBranch
+      RefLeafAppearRate(NZ,NY,NX)=RefLeafAppearRate(NZ,NY,NX)/MaxNodesPerBranch
+      MatureGroup_pft(NZ,NY,NX)=MatureGroup_pft(NZ,NY,NX)/MaxNodesPerBranch
+      XTLI(NZ,NY,NX)=XTLI(NZ,NY,NX)/MaxNodesPerBranch
     ENDIF
-    GROUPI(NZ,NY,NX)=GROUPI(NZ,NY,NX)-XTLI(NZ,NY,NX)
+    MatureGroup_pft(NZ,NY,NX)=MatureGroup_pft(NZ,NY,NX)-XTLI(NZ,NY,NX)
     IF(XDL(NZ,NY,NX).LT.0.0_r8)THEN
       XDL(NZ,NY,NX)=DayLenthMax(NY,NX)
     ENDIF
@@ -437,10 +437,10 @@ implicit none
   call ncd_getvar(pft_nfid, 'RRAD1M', loc,MaxPrimRootRadius(1,NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'RRAD2M', loc,MaxSecndRootRadius(1,NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'PORT', loc,RootPorosity(1,NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'PR', loc,PR(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'PR', loc,MinNonstructuralC4InitRoot(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'RSRR', loc,RSRR(1,NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'RSRA', loc,RSRA(1,NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'PTSHT', loc,PTSHT(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'PTSHT', loc,ShutRutNonstructElmntConducts(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'RTFQ', loc,RTFQ(NZ,NY,NX))
 
   call ncd_getvar(pft_nfid, 'UPMXZH', loc,UPMXZH(1,NZ,NY,NX))
@@ -476,7 +476,7 @@ implicit none
   call ncd_getvar(pft_nfid, 'CNHSK', loc,CNHSK(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'CNEAR', loc,CNEAR(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'CNGR', loc,CNGR(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'CNRT', loc,CNRT(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'CNumRootAxes_pft', loc,RootrNC_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'CNND', loc,CNND(NZ,NY,NX))
 
   call ncd_getvar(pft_nfid, 'CPLF', loc,CPLF(NZ,NY,NX))
@@ -732,11 +732,11 @@ implicit none
   write(*,*)'radius of secondary roots: MaxSecndRootRadius',MaxSecndRootRadius(1,NZ,NY,NX)
   write(*,*)'primary/fine root porosity: PORT',RootPorosity(1,NZ,NY,NX)
   write(*,*)'nonstructural C concentration needed for root'// &
-    ' branching: PR',PR(NZ,NY,NX)
+    ' branching: PR',MinNonstructuralC4InitRoot(NZ,NY,NX)
   write(*,*)'radial root resistivity for water uptake (m2 MPa-1 h-1): RSRR',RSRR(1,NZ,NY,NX)
   write(*,*)'axial root resistivity for water uptake (m2 MPa-1 h-1): RSRA',RSRA(1,NZ,NY,NX)
   write(*,*)'rate constant for equilibrating shoot-root '// &
-    'nonstructural C concn: PTSHT',PTSHT(NZ,NY,NX)
+    'nonstructural C concn: PTSHT',ShutRutNonstructElmntConducts(NZ,NY,NX)
   write(*,*)'root branching frequency (m-1): RTFQ',RTFQ(NZ,NY,NX)
   end subroutine Root_trait_disp
 
@@ -812,7 +812,7 @@ implicit none
   write(*,*)'NC ratio in plant husk: CNHSK',CNHSK(NZ,NY,NX)
   write(*,*)'NC ratio in plant ear: CNEAR',CNEAR(NZ,NY,NX)
   write(*,*)'NC ratio in plant grain: CNGR',CNGR(NZ,NY,NX)
-  write(*,*)'NC ratio in plant root: CNRT',CNRT(NZ,NY,NX)
+  write(*,*)'NC ratio in plant root: CNumRootAxes_pft',RootrNC_pft(NZ,NY,NX)
   write(*,*)'NC ratio in plant nodule: CNND',CNND(NZ,NY,NX)
   write(*,*)'PC ratio in plant leaves: CPLF',CPLF(NZ,NY,NX)
   write(*,*)'PC ratio in plant petiole: CPSHE',CPSHE(NZ,NY,NX)

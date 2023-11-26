@@ -51,15 +51,15 @@ module HfuncsMod
 ! begin_execution
   associate(                           &
     PSICanP   =>  plt_ew%PSICanP     , &
-    VRNZ    =>  plt_pheno%VRNZ   , &
+    Hours4ShortenPhotoPeriod    =>  plt_pheno%Hours4ShortenPhotoPeriod   , &
     doInitPlant   =>  plt_pheno%doInitPlant  , &
     doRemobilization_brch   =>  plt_pheno%doRemobilization_brch  , &
     VSTGX   =>  plt_pheno%VSTGX  , &
-    VRNY    =>  plt_pheno%VRNY   , &
+    Hours4LenthenPhotoPeriod    =>  plt_pheno%Hours4LenthenPhotoPeriod   , &
     IsPlantActive   =>  plt_pheno%IsPlantActive  , &
     iPlantBranchState   =>  plt_pheno%iPlantBranchState  , &
     iPlantCalendar   =>  plt_pheno%iPlantCalendar  , &
-    WSTR    =>  plt_pheno%WSTR   , &
+    HoursCanopyPSITooLow    =>  plt_pheno%HoursCanopyPSITooLow   , &
     KLeafNodeNumber  =>  plt_pheno%KLeafNodeNumber , &
     iPlantMorphologyType  =>  plt_pheno%iPlantMorphologyType , &
     DayLenthCurrent    =>  plt_site%DayLenthCurrent    , &
@@ -125,15 +125,15 @@ module HfuncsMod
 !               PHENOLOGY
 !
 !               DayLenthPrev,DLYN=daylength of previous,current day
-!               VRNY,VRNZ=hourly counter for lengthening,shortening photoperiods
+!               Hours4LenthenPhotoPeriod,Hours4ShortenPhotoPeriod=hourly counter for lengthening,shortening photoperiods
 !
             IF(iPlantBranchState(NB,NZ).EQ.iLive.OR.doInitPlant(NZ).EQ.itrue)THEN
               IF(DayLenthCurrent.GE.DayLenthPrev)THEN
-                VRNY(NB,NZ)=VRNY(NB,NZ)+1.0_r8
-                VRNZ(NB,NZ)=0.0_r8
+                Hours4LenthenPhotoPeriod(NB,NZ)=Hours4LenthenPhotoPeriod(NB,NZ)+1.0_r8
+                Hours4ShortenPhotoPeriod(NB,NZ)=0.0_r8
               ELSE
-                VRNY(NB,NZ)=0.0_r8
-                VRNZ(NB,NZ)=VRNZ(NB,NZ)+1.0_r8
+                Hours4LenthenPhotoPeriod(NB,NZ)=0.0_r8
+                Hours4ShortenPhotoPeriod(NB,NZ)=Hours4ShortenPhotoPeriod(NB,NZ)+1.0_r8
               ENDIF
 
               call branch_specific_phenology(I,J,NB,NZ)
@@ -145,10 +145,10 @@ module HfuncsMod
 !
 !             PSICanP=canopy total water potential
 !             PSILY=minimum canopy water potential for leafoff
-!             WSTR=number of hours PSICanP < PSILY (for output only)
+!             HoursCanopyPSITooLow=number of hours PSICanP < PSILY (for output only)
 !
           IF(PSICanP(NZ).LT.PSILY(iPlantMorphologyType(NZ)))THEN
-            WSTR(NZ)=WSTR(NZ)+1.0_r8
+            HoursCanopyPSITooLow(NZ)=HoursCanopyPSITooLow(NZ)+1.0_r8
           ENDIF
         ENDIF
       ENDIF
@@ -247,7 +247,7 @@ module HfuncsMod
   associate(                            &
     CanopyNonstructElementConc_pft  =>   plt_biom%CanopyNonstructElementConc_pft  , &
     NonstructalChemElmnts_pft   =>   plt_biom%NonstructalChemElmnts_pft   , &
-    GROUP   =>   plt_pheno%GROUP  , &
+    MatureGroup_brch  =>   plt_pheno%MatureGroup_brch , &
     iPlantCalendar   =>   plt_pheno%iPlantCalendar  , &
     doInitPlant   =>   plt_pheno%doInitPlant  , &
     iPlantRootState   =>   plt_pheno%iPlantRootState  , &
@@ -255,19 +255,19 @@ module HfuncsMod
     iPlantBranchState   =>   plt_pheno%iPlantBranchState  , &
     iPlantShootState   =>   plt_pheno%iPlantShootState  , &
     iPlantTurnoverPattern  =>   plt_pheno%iPlantTurnoverPattern , &
-    PR      =>   plt_pheno%PR     , &
-    GROUPI  =>   plt_pheno%GROUPI , &
+    MinNonstructuralC4InitRoot     =>   plt_pheno%MinNonstructuralC4InitRoot    , &
+    MatureGroup_pft =>   plt_pheno%MatureGroup_pft, &
     MinNonstructalC4InitBranch     =>   plt_pheno%MinNonstructalC4InitBranch    , &
     pftPlantPopulation      =>   plt_site%pftPlantPopulation      , &
     Hours4Leafout    =>   plt_pheno%Hours4Leafout   , &
     PSIRootTurg   =>   plt_ew%PSIRootTurg     , &
     FNOD    =>   plt_allom%FNOD   , &
-    NRT     =>   plt_morph%NRT    , &
+    NumRootAxes_pft    =>   plt_morph%NumRootAxes_pft   , &
     NumOfMainBranch_pft     =>   plt_morph%NumOfMainBranch_pft    , &
     NumOfBranches_pft     =>   plt_morph%NumOfBranches_pft    , &
-    NNOD    =>   plt_morph%NNOD   , &
-    NBT     =>   plt_morph%NBT    , &
-    BranchNumber_brchpft    =>   plt_morph%BranchNumber_brchpft   , &
+    NumConCurrentGrowinNode   =>   plt_morph%NumConCurrentGrowinNode  , &
+    BranchNumber_pft     =>   plt_morph%BranchNumber_pft    , &
+    BranchNumber_brch    =>   plt_morph%BranchNumber_brch   , &
     NGTopRootLayer     =>   plt_morph%NGTopRootLayer    , &
     XTLI    =>   plt_morph%XTLI   , &
     ShootNodeNumber   =>   plt_morph%ShootNodeNumber    &
@@ -287,7 +287,7 @@ module HfuncsMod
 ! iPlantBranchState=branch life flag:0=living,1=dead
 ! PSTG=node number
 ! FNOD=scales node number for perennial vegetation (e.g. trees)
-! NNOD=number of concurrently growing nodes
+! NumConCurrentGrowinNode=number of concurrently growing nodes
 ! XTLI,GROUP=node number at planting,floral initiation
 ! IBTYP: setup for phenologically-driven above-ground turnover
 
@@ -298,23 +298,28 @@ module HfuncsMod
       !first hour of the day, population > 0
       IF(PSIRootTurg(ipltroot,NGTopRootLayer(NZ),NZ).GT.PSIMin4LeafExpansion)THEN
         !root is hydraulically active
-        IF(iPlantPhenologyPattern(NZ).NE.iplt_annual.OR.iPlantCalendar(ipltcal_InitFloral,NumOfMainBranch_pft(NZ),NZ).EQ.0)THEN
+        IF(iPlantPhenologyPattern(NZ).NE.iplt_annual.OR. &
+          iPlantCalendar(ipltcal_InitFloral,NumOfMainBranch_pft(NZ),NZ).EQ.0)THEN
           !perennial plant or flower not initiated for annual plant 
           IF((NumOfBranches_pft(NZ).EQ.0.AND.NonstructalChemElmnts_pft(ielmc,NZ).GT.0.0_r8) &
-            .OR.(CanopyNonstructElementConc_pft(ielmc,NZ).GT.MinNonstructalC4InitBranch(NZ).AND.MinNonstructalC4InitBranch(NZ).GT.0.0_r8))THEN
+            .OR.(CanopyNonstructElementConc_pft(ielmc,NZ).GT.MinNonstructalC4InitBranch(NZ) &
+            .AND.MinNonstructalC4InitBranch(NZ).GT.0.0_r8))THEN
+
             D120: DO NB=1,NumOfCanopyLayers1
               IF(iPlantBranchState(NB,NZ).EQ.iDead)THEN
-                IF(NB.EQ.NumOfMainBranch_pft(NZ).OR.ShootNodeNumber(NumOfMainBranch_pft(NZ),NZ).GT.NBT(NZ)+NNOD(NZ)/FNOD(NZ)+XTLI(NZ))THEN
-                  NBT(NZ)=NBT(NZ)+1
+                IF(NB.EQ.NumOfMainBranch_pft(NZ).OR.ShootNodeNumber(NumOfMainBranch_pft(NZ),NZ) &
+                  .GT.BranchNumber_pft(NZ)+NumConCurrentGrowinNode(NZ)/FNOD(NZ)+XTLI(NZ))THEN
+                  !initiate a new branch
+                  BranchNumber_pft(NZ)=BranchNumber_pft(NZ)+1
                   NumOfBranches_pft(NZ)=MIN(NBX(iPlantTurnoverPattern(NZ)),MAX(NB,NumOfBranches_pft(NZ)))
-                  BranchNumber_brchpft(NB,NZ)=NBT(NZ)-1
+                  BranchNumber_brch(NB,NZ)=BranchNumber_pft(NZ)-1
                   iPlantShootState(NZ)=iLive
                   iPlantBranchState(NB,NZ)=iLive
                   Hours4Leafout(NB,NZ)=0.0_r8
                   IF(iPlantPhenologyPattern(NZ).EQ.iplt_annual)THEN
-                    GROUP(NB,NZ)=AZMAX1(GROUPI(NZ)-BranchNumber_brchpft(NB,NZ))
+                    MatureGroup_brch(NB,NZ)=AZMAX1(MatureGroup_pft(NZ)-BranchNumber_brch(NB,NZ))
                   ELSE
-                    GROUP(NB,NZ)=GROUPI(NZ)
+                    MatureGroup_brch(NB,NZ)=MatureGroup_pft(NZ)
                   ENDIF
                   exit
                 ENDIF
@@ -337,11 +342,11 @@ module HfuncsMod
 !     NonstructalChemElmnts_pft: non-structural carbon
 
       IF(PSIRootTurg(ipltroot,NGTopRootLayer(NZ),NZ).GT.PSIMin4LeafExpansion)THEN
-        IF(NRT(NZ).EQ.0 .OR. ShootNodeNumber(NumOfMainBranch_pft(NZ),NZ).GT.NRT(NZ)/FNOD(NZ)+XTLI(NZ))THEN
-          IF((NRT(NZ).EQ.0 .AND. NonstructalChemElmnts_pft(ielmc,NZ).GT.0.0_r8) &
-            .OR.(CanopyNonstructElementConc_pft(ielmc,NZ).GT.PR(NZ) & 
-            .AND.PR(NZ).GT.0.0_r8))THEN
-            NRT(NZ)=MIN(NumOfCanopyLayers1,NRT(NZ)+1)
+        IF(NumRootAxes_pft(NZ).EQ.0 .OR.ShootNodeNumber(NumOfMainBranch_pft(NZ),NZ).GT.NumRootAxes_pft(NZ)/FNOD(NZ)+XTLI(NZ))THEN
+          IF((NumRootAxes_pft(NZ).EQ.0 .AND. NonstructalChemElmnts_pft(ielmc,NZ).GT.0.0_r8) &
+            .OR.(CanopyNonstructElementConc_pft(ielmc,NZ).GT.MinNonstructuralC4InitRoot(NZ) & 
+            .AND.MinNonstructuralC4InitRoot(NZ).GT.0.0_r8))THEN
+            NumRootAxes_pft(NZ)=MIN(NumOfCanopyLayers1,NumRootAxes_pft(NZ)+1)
             iPlantRootState(NZ)=iLive
           ENDIF
         ENDIF
@@ -356,24 +361,24 @@ module HfuncsMod
   implicit none
   integer, intent(in) :: I,J,NZ
 
-  integer :: NB,N,L,NE,NBTX
+  integer :: NB,N,L,NE,BranchNumber_pftX
   real(r8):: ARLSP
   associate(                           &
     CanopyLeafShethC_pft   =>  plt_biom%CanopyLeafShethC_pft     , &
     LeafPetioleBiomassC_brch  =>  plt_biom%LeafPetioleBiomassC_brch    , &
     ShootChemElmnts_pft =>  plt_biom%ShootChemElmnts_pft   , &
     NoduleNonstructCconc_pft =>  plt_biom%NoduleNonstructCconc_pft   , &
-    CEPOLB =>  plt_biom%CEPOLB   , &
+    LeafPetioNonstructElmntConc_brch =>  plt_biom%LeafPetioNonstructElmntConc_brch   , &
     CanopyNonstructElementConc_pft =>  plt_biom%CanopyNonstructElementConc_pft   , &
     CanopyNonstructElements_pft =>  plt_biom%CanopyNonstructElements_pft   , &
-    EPOLNB =>  plt_biom%EPOLNB   , &
-    EPOOLR =>  plt_biom%EPOOLR   , &
-    EPOOL  =>  plt_biom%EPOOL    , &
+    NoduleNonstructElmnt_brch =>  plt_biom%NoduleNonstructElmnt_brch   , &
+     RootMycoNonstructElmnt_vr =>  plt_biom% RootMycoNonstructElmnt_vr   , &
+    NonstructElmnt_brch =>  plt_biom%NonstructElmnt_brch   , &
     RootNonstructElementConcpft_vr =>  plt_biom%RootNonstructElementConcpft_vr   , &
     ZEROL  =>  plt_biom%ZEROL    , &
     ZEROP  =>  plt_biom%ZEROP    , &
-    WTRTL  =>  plt_biom%WTRTL    , &
-    EPOLNP =>  plt_biom%EPOLNP   , &
+    RootStructBiomC_vr =>  plt_biom%RootStructBiomC_vr   , &
+    NoduleNonstructElmnt_pft =>  plt_biom%NoduleNonstructElmnt_pft   , &
     WatByPCan  =>  plt_ew%WatByPCan      , &
     VHeatCapCanP  =>  plt_ew%VHeatCapCanP      , &
     NU     =>  plt_site%NU       , &
@@ -386,18 +391,18 @@ module HfuncsMod
     NGTopRootLayer    =>  plt_morph%NGTopRootLayer     , &
     NIXBotRootLayer   =>  plt_morph%NIXBotRootLayer     , &
     NumOfBranches_pft    =>  plt_morph%NumOfBranches_pft     , &
-    BranchNumber_brchpft   =>  plt_morph%BranchNumber_brchpft    , &
+    BranchNumber_brch   =>  plt_morph%BranchNumber_brch    , &
     HypoctoylHeight  =>  plt_morph%HypoctoylHeight   , &
     SeedinDepth  =>  plt_morph%SeedinDepth   , &
     CanopyStemA_pft  =>  plt_morph%CanopyStemA_pft   , &
     NI     =>  plt_morph%NI        &
   )
   plt_bgcr%RootGasLoss_disturb(idg_beg:idg_end-1,NZ)=0.0_r8
-  CanopyNonstructElements_pft(1:NumOfPlantChemElements,NZ)=0.0_r8
+  CanopyNonstructElements_pft(1:NumOfPlantChemElmnts,NZ)=0.0_r8
   NI(NZ)=NIXBotRootLayer(NZ)
   NGTopRootLayer(NZ)=MIN(NI(NZ),MAX(NGTopRootLayer(NZ),NU))
   NumOfMainBranch_pft(NZ)=1
-  NBTX=1.0E+06_r8
+  BranchNumber_pftX=1.0E+06_r8
 !
 ! TOTAL PLANT NON-STRUCTURAL C, N, P
 !
@@ -405,21 +410,22 @@ module HfuncsMod
 ! CPOLN*,ZPOLN*,PPOLN*=non-structl C,N,P in branch,canopy nodules (g)
 ! NumOfMainBranch_pft=main branch number
 !
-  DO NE=1,NumOfPlantChemElements
+  DO NE=1,NumOfPlantChemElmnts
     D140: DO NB=1,NumOfBranches_pft(NZ)
       IF(iPlantBranchState(NB,NZ).EQ.iLive)THEN
-        CanopyNonstructElements_pft(NE,NZ)=CanopyNonstructElements_pft(NE,NZ)+EPOOL(NE,NB,NZ)
-        EPOLNP(NE,NZ)=EPOLNP(NE,NZ)+EPOLNB(NE,NB,NZ)
+        CanopyNonstructElements_pft(NE,NZ)=CanopyNonstructElements_pft(NE,NZ)+NonstructElmnt_brch(NE,NB,NZ)
+        NoduleNonstructElmnt_pft(NE,NZ)=NoduleNonstructElmnt_pft(NE,NZ)+NoduleNonstructElmnt_brch(NE,NB,NZ)
       ENDIF
     ENDDO D140
   ENDDO
 
+  !find main branch number, which is the most recent live branch
   DO NB=1,NumOfBranches_pft(NZ)
     IF(iPlantBranchState(NB,NZ).EQ.iLive)THEN
-      print*,'BranchNumber_brchpft(NB,NZ).LT.NBTX',BranchNumber_brchpft(NB,NZ),NBTX
-      IF(BranchNumber_brchpft(NB,NZ).LT.NBTX)THEN
+      print*,'BranchNumber_brch(NB,NZ).LT.BranchNumber_pftX',BranchNumber_brch(NB,NZ),BranchNumber_pftX
+      IF(BranchNumber_brch(NB,NZ).LT.BranchNumber_pftX)THEN
         NumOfMainBranch_pft(NZ)=NB
-        NBTX=BranchNumber_brchpft(NB,NZ)
+        BranchNumber_pftX=BranchNumber_brch(NB,NZ)
       ENDIF
     ENDIF
   ENDDO
@@ -432,12 +438,12 @@ module HfuncsMod
 !
   D180: DO N=1,MY(NZ)
     D160: DO L=NU,NI(NZ)
-      IF(WTRTL(N,L,NZ).GT.ZEROL(NZ))THEN
-        DO NE=1,NumOfPlantChemElements
-          RootNonstructElementConcpft_vr(NE,N,L,NZ)=AZMAX1(EPOOLR(NE,N,L,NZ)/WTRTL(N,L,NZ))
+      IF(RootStructBiomC_vr(N,L,NZ).GT.ZEROL(NZ))THEN
+        DO NE=1,NumOfPlantChemElmnts
+          RootNonstructElementConcpft_vr(NE,N,L,NZ)=AZMAX1(RootMycoNonstructElmnt_vr(NE,N,L,NZ)/RootStructBiomC_vr(N,L,NZ))
         ENDDO
       ELSE
-        DO NE=1,NumOfPlantChemElements
+        DO NE=1,NumOfPlantChemElmnts
           RootNonstructElementConcpft_vr(NE,N,L,NZ)=1.0_r8
         ENDDO
       ENDIF
@@ -451,20 +457,20 @@ module HfuncsMod
 ! CCPOLB,CZPOLB,CPPOLB=nonstructural C,N,P concn in branch(g g-1)
 !
   IF(CanopyLeafShethC_pft(NZ).GT.ZEROL(NZ))THEN
-    DO NE=1,NumOfPlantChemElements
+    DO NE=1,NumOfPlantChemElmnts
       CanopyNonstructElementConc_pft(NE,NZ)=AZMAX1(AMIN1(1.0_r8,CanopyNonstructElements_pft(NE,NZ)/CanopyLeafShethC_pft(NZ)))
     ENDDO
-    NoduleNonstructCconc_pft(NZ)=AZMAX1(AMIN1(1.0_r8,EPOLNP(ielmc,NZ)/CanopyLeafShethC_pft(NZ)))
+    NoduleNonstructCconc_pft(NZ)=AZMAX1(AMIN1(1.0_r8,NoduleNonstructElmnt_pft(ielmc,NZ)/CanopyLeafShethC_pft(NZ)))
   ELSE
-    CanopyNonstructElementConc_pft(1:NumOfPlantChemElements,NZ)=1.0_r8
+    CanopyNonstructElementConc_pft(1:NumOfPlantChemElmnts,NZ)=1.0_r8
     NoduleNonstructCconc_pft(NZ)=1.0_r8
   ENDIF
-  DO NE=1,NumOfPlantChemElements
+  DO NE=1,NumOfPlantChemElmnts
     D190: DO NB=1,NumOfBranches_pft(NZ)
       IF(LeafPetioleBiomassC_brch(NB,NZ).GT.ZEROP(NZ))THEN
-        CEPOLB(NE,NB,NZ)=AZMAX1(EPOOL(NE,NB,NZ)/LeafPetioleBiomassC_brch(NB,NZ))
+        LeafPetioNonstructElmntConc_brch(NE,NB,NZ)=AZMAX1(NonstructElmnt_brch(NE,NB,NZ)/LeafPetioleBiomassC_brch(NB,NZ))
       ELSE
-        CEPOLB(NE,NB,NZ)=1.0_r8
+        LeafPetioNonstructElmntConc_brch(NE,NB,NZ)=1.0_r8
       ENDIF
     ENDDO D190
   ENDDO
@@ -505,12 +511,12 @@ module HfuncsMod
     doPlantLeafOut   =>  plt_pheno%doPlantLeafOut  , &
     iPlantCalendar   =>  plt_pheno%iPlantCalendar  , &
     iPlantMorphologyType  =>  plt_pheno%iPlantMorphologyType , &
-    VRNZ    =>  plt_pheno%VRNZ   , &
+    Hours4ShortenPhotoPeriod    =>  plt_pheno%Hours4ShortenPhotoPeriod   , &
     Hours4Leafout    =>  plt_pheno%Hours4Leafout   , &
     HourThreshold4LeafOut   =>  plt_pheno%HourThreshold4LeafOut  , &
     iPlantPhenologyType  =>  plt_pheno%iPlantPhenologyType , &
     TCelciusChill4Leaf    =>  plt_pheno%TCelciusChill4Leaf   , &
-    VRNY    =>  plt_pheno%VRNY   , &
+    Hours4LenthenPhotoPeriod    =>  plt_pheno%Hours4LenthenPhotoPeriod   , &
     TCG     =>  plt_pheno%TCG    , &
     TCelciusChill4Seed    =>  plt_pheno%TCelciusChill4Seed   , &
     TCX     =>  plt_pheno%TCX    , &
@@ -524,13 +530,13 @@ module HfuncsMod
 ! iPlantPhenologyType=phenology type from PFT file
 ! DayLenthPrev,DLYN=daylength of previous,current day
 ! Hours4Leafout,Hours4LeafOff=leafout,leafoff hours
-! VRNY=hourly counter for lengthening photoperiods
+! Hours4LenthenPhotoPeriod=hourly counter for lengthening photoperiods
 ! doPlantLeaveOff=flag for enabling leafoff:0=enable,1=disable
 ! ALAT=latitude
 !
   IF(iPlantPhenologyType(NZ).EQ.0)THEN
     IF(DayLenthCurrent.GE.DayLenthPrev)THEN
-      Hours4Leafout(NB,NZ)=VRNY(NB,NZ)
+      Hours4Leafout(NB,NZ)=Hours4LenthenPhotoPeriod(NB,NZ)
       IF(Hours4Leafout(NB,NZ).GE.HourThreshold4LeafOut(NB,NZ) &
         .OR.(ALAT.GT.0.0_r8.AND.I.EQ.173) &
         .OR.(ALAT.LT.0.0_r8.AND.I.EQ.355))THEN
@@ -542,12 +548,12 @@ module HfuncsMod
 !   CALCULATE EVERGREEN PHENOLOGY DURINGTopRootLayerSHORTENINGTopRootLayerPHOTOPERIODS
 !
 !   Hours4Leafout,Hours4LeafOff=leafout,leafoff hours
-!   VRNZ=hourly counter for shortening photoperiods
+!   Hours4ShortenPhotoPeriod=hourly counter for shortening photoperiods
 !   doPlantLeafOut=flag for enabling leafout:0=enable,1=disable
 !   ALAT=latitude
 !
     IF(DayLenthCurrent.LT.DayLenthPrev)THEN
-      Hours4LeafOff(NB,NZ)=VRNZ(NB,NZ)
+      Hours4LeafOff(NB,NZ)=Hours4ShortenPhotoPeriod(NB,NZ)
       IF(Hours4LeafOff(NB,NZ).GE.HourThreshold4LeafOff(NB,NZ) &
         .OR.(ALAT.GT.0.0_r8.AND.I.EQ.355) &
         .OR.(ALAT.LT.0.0_r8.AND.I.EQ.173))THEN
@@ -653,7 +659,7 @@ module HfuncsMod
 !     PSILX,PSILY=minimum canopy water potential for leafout,leafoff
 !     ALAT=latitude
 !     iPlantCalendar(ipltcal_InitFloral,=date of floral initiation
-!     VRNY,VRNZ=hourly counter for lengthening,shortening photoperiods
+!     Hours4LenthenPhotoPeriod,Hours4ShortenPhotoPeriod=hourly counter for lengthening,shortening photoperiods
 !     VRNE=maximum hours for leafout,leafoff
 !
       IF(doPlantLeafOut(NB,NZ).EQ.iDisable.AND.doPlantLeaveOff(NB,NZ).EQ.iEnable)THEN
@@ -661,12 +667,12 @@ module HfuncsMod
           Hours4LeafOff(NB,NZ)=Hours4LeafOff(NB,NZ)+1.0_r8
         ENDIF
         IF(iPlantPhenologyType(NZ).EQ.4)THEN
-          IF(VRNZ(NB,NZ).GT.VRNE)THEN
-            Hours4LeafOff(NB,NZ)=VRNZ(NB,NZ)
+          IF(Hours4ShortenPhotoPeriod(NB,NZ).GT.VRNE)THEN
+            Hours4LeafOff(NB,NZ)=Hours4ShortenPhotoPeriod(NB,NZ)
           ENDIF
         ELSEIF(iPlantPhenologyType(NZ).EQ.5)THEN
-          IF(VRNY(NB,NZ).GT.VRNE)THEN
-            Hours4LeafOff(NB,NZ)=VRNY(NB,NZ)
+          IF(Hours4LenthenPhotoPeriod(NB,NZ).GT.VRNE)THEN
+            Hours4LeafOff(NB,NZ)=Hours4LenthenPhotoPeriod(NB,NZ)
           ENDIF
         ENDIF
         IF(Hours4LeafOff(NB,NZ).GE.HourThreshold4LeafOff(NB,NZ).AND.doPlantLeafOut(NB,NZ).EQ.iDisable)THEN
@@ -776,12 +782,12 @@ module HfuncsMod
     DGSTGI  =>  plt_pheno%DGSTGI  , &
     XPPD    =>  plt_pheno%XPPD    , &
     TGSTGI  =>  plt_pheno%TGSTGI  , &
-    GROUP   =>  plt_pheno%GROUP   , &
+    MatureGroup_brch  =>  plt_pheno%MatureGroup_brch  , &
     iPlantPhenologyType  =>  plt_pheno%iPlantPhenologyType  , &
     HourThreshold4LeafOut   =>  plt_pheno%HourThreshold4LeafOut   , &
     iPlantPhotoperiodType  =>  plt_pheno%iPlantPhotoperiodType  , &
     doInitLeafOut   =>  plt_pheno%doInitLeafOut   , &
-    GROUPI  =>  plt_pheno%GROUPI  , &
+    MatureGroup_pft =>  plt_pheno%MatureGroup_pft , &
     PlantO2Stress    =>  plt_pheno%PlantO2Stress    , &
     Hours4Leafout    =>  plt_pheno%Hours4Leafout    , &
     Hours4LeafOff    =>  plt_pheno%Hours4LeafOff    , &
@@ -852,7 +858,7 @@ module HfuncsMod
 !   IS USED TO SET START AND END DATES FOR GROWTH STAGES BELOW
 !
 !   GSTGI=vegetative node number normalized for maturity group
-!   GROUPI=node number required for floral initiation
+!   MatureGroup_pft=node number required for floral initiation
 !   DGSTGI,TGSTGI=hourly,total change in GSTGI
 !   GSTGF=reproductive node number normalized for maturity group
 !   NodeNumberAtAnthesis=node number at flowering
@@ -860,13 +866,13 @@ module HfuncsMod
 !   doPlantSenescence=PFT senescence flag
 !
     IF(iPlantCalendar(ipltcal_InitFloral,NB,NZ).NE.0)THEN
-      GSTGI(NB,NZ)=(ShootNodeNumber(NB,NZ)-NodeNumberToInitFloral(NB,NZ))/GROUPI(NZ)
-      DGSTGI(NB,NZ)=NodeInitRate/(GROUPI(NZ)*GSTGG)
+      GSTGI(NB,NZ)=(ShootNodeNumber(NB,NZ)-NodeNumberToInitFloral(NB,NZ))/MatureGroup_pft(NZ)
+      DGSTGI(NB,NZ)=NodeInitRate/(MatureGroup_pft(NZ)*GSTGG)
       TGSTGI(NB,NZ)=TGSTGI(NB,NZ)+DGSTGI(NB,NZ)
     ENDIF
     IF(iPlantCalendar(ipltcal_Anthesis,NB,NZ).NE.0)THEN
-      GSTGF(NB,NZ)=(ShootNodeNumber(NB,NZ)-NodeNumberAtAnthesis(NB,NZ))/GROUPI(NZ)
-      DGSTGF(NB,NZ)=NodeInitRate/(GROUPI(NZ)*GSTGR)
+      GSTGF(NB,NZ)=(ShootNodeNumber(NB,NZ)-NodeNumberAtAnthesis(NB,NZ))/MatureGroup_pft(NZ)
+      DGSTGF(NB,NZ)=NodeInitRate/(MatureGroup_pft(NZ)*GSTGR)
       TGSTGF(NB,NZ)=TGSTGF(NB,NZ)+DGSTGF(NB,NZ)
     ENDIF
     doPlantSenescence(NB,NZ)=itrue
@@ -889,7 +895,7 @@ module HfuncsMod
 ! ZC,SnowDepth=canopy height,snowpack depth
 !
   IF(iPlantCalendar(ipltcal_InitFloral,NB,NZ).EQ.0)THEN
-    IF(ShootNodeNumber(NB,NZ).GT.GROUP(NB,NZ)+NodeNumberToInitFloral(NB,NZ) &
+    IF(ShootNodeNumber(NB,NZ).GT.MatureGroup_brch(NB,NZ)+NodeNumberToInitFloral(NB,NZ) &
       .AND.((Hours4Leafout(NB,NZ).GE.HourThreshold4LeafOut(NB,NZ)) &
       .OR.(I.GE.iDayPlanting(NZ).AND.iYearCurrent.EQ.iYearPlanting(NZ) &
       .AND.DayLenthCurrent.GT.DayLenthPrev)) &

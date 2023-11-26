@@ -466,11 +466,11 @@ module WthrMod
             ELSE
               HTC(NZ,NY,NX)=30.0+3.0*iPlantThermoAdaptZone(NZ,NY,NX)
             ENDIF
-            GROUPI(NZ,NY,NX)=GROUPX(NZ,NY,NX)+0.30*DTA
+            MatureGroup_pft(NZ,NY,NX)=GROUPX(NZ,NY,NX)+0.30*DTA
             IF(iPlantTurnoverPattern(NZ,NY,NX).NE.0)THEN
-              GROUPI(NZ,NY,NX)=GROUPI(NZ,NY,NX)/25.0
+              MatureGroup_pft(NZ,NY,NX)=MatureGroup_pft(NZ,NY,NX)/25.0
             ENDIF
-            GROUPI(NZ,NY,NX)=GROUPI(NZ,NY,NX)-XTLI(NZ,NY,NX)
+            MatureGroup_pft(NZ,NY,NX)=MatureGroup_pft(NZ,NY,NX)-XTLI(NZ,NY,NX)
 
           ENDDO
         ENDIF

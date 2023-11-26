@@ -192,7 +192,7 @@ implicit none
   real(r8),pointer   :: histr_1D_CAN_HT_ptc(:)        !CanopyHeight(NZ,NY,NX), canopy height, m
   real(r8),pointer   :: histr_1D_POPN_ptc(:)          !PP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), plant population
   real(r8),pointer   :: histr_1D_tTRANSPN_ptc(:)      !-ETCanP(NZ,NY,NX)*1000.0/AREA(3,NU(NY,NX),NY,NX), total transpiration
-  real(r8),pointer   :: histr_1D_WTR_STRESS_ptc(:)    !WSTR(NZ,NY,NX)
+  real(r8),pointer   :: histr_1D_WTR_STRESS_ptc(:)    !HoursCanopyPSITooLow(NZ,NY,NX)
   real(r8),pointer   :: histr_1D_OXY_STRESS_ptc(:)    !OSTR(NZ,NY,NX)
   real(r8),pointer   :: histr_1D_SHOOT_N_ptc(:)       !ShootChemElmnts_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_LEAF_N_ptc(:)        !LeafChemElmnts(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -441,7 +441,7 @@ implicit none
   allocate(this%histr_1D_CAN_HT_ptc(beg_ptc:end_ptc))        !CanopyHeight(NZ,NY,NX), canopy height, m
   allocate(this%histr_1D_POPN_ptc(beg_ptc:end_ptc))          !PP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), plant population
   allocate(this%histr_1D_tTRANSPN_ptc(beg_ptc:end_ptc))      !-ETCanP(NZ,NY,NX)*1000.0/AREA(3,NU(NY,NX),NY,NX), total transpiration
-  allocate(this%histr_1D_WTR_STRESS_ptc(beg_ptc:end_ptc))    !WSTR(NZ,NY,NX)
+  allocate(this%histr_1D_WTR_STRESS_ptc(beg_ptc:end_ptc))    !HoursCanopyPSITooLow(NZ,NY,NX)
   allocate(this%histr_1D_OXY_STRESS_ptc(beg_ptc:end_ptc))    !OSTR(NZ,NY,NX)
   allocate(this%histr_1D_SHOOT_N_ptc(beg_ptc:end_ptc))       !ShootChemElmnts_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_LEAF_N_ptc(beg_ptc:end_ptc))        !LeafChemElmnts(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -1145,7 +1145,7 @@ implicit none
   call hist_addfld1d(fname='tTRANSPN',units='mmH2O/m2/hr',avgflag='A',&
     long_name='Total evapotranspiration (>0 into atmosphere)',ptr_patch=data1d_ptr)      
 
-  data1d_ptr => this%histr_1D_WTR_STRESS_ptc(beg_ptc:end_ptc)    !WSTR(NZ,NY,NX)
+  data1d_ptr => this%histr_1D_WTR_STRESS_ptc(beg_ptc:end_ptc)    !HoursCanopyPSITooLow(NZ,NY,NX)
   call hist_addfld1d(fname='WTR_STRESS',units='hr',avgflag='A',&
     long_name='canopy plant water stress indicator: number of hours PSICanP < PSILY',ptr_patch=data1d_ptr)      
 
@@ -1614,7 +1614,7 @@ implicit none
         this%histr_1D_CAN_HT_ptc(nptc)       = CanopyHeight(NZ,NY,NX)
         this%histr_1D_POPN_ptc(nptc)         = pftPlantPopulation(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_tTRANSPN_ptc(nptc)     =-ETCanP(NZ,NY,NX)*1000.0/AREA(3,NU(NY,NX),NY,NX)
-        this%histr_1D_WTR_STRESS_ptc(nptc)   = WSTR(NZ,NY,NX)
+        this%histr_1D_WTR_STRESS_ptc(nptc)   = HoursCanopyPSITooLow(NZ,NY,NX)
         this%histr_1D_OXY_STRESS_ptc(nptc)   = PlantO2Stress(NZ,NY,NX)
         this%histr_1D_SHOOT_N_ptc(nptc)      = ShootChemElmnts_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_LEAF_N_ptc(nptc)       = LeafChemElmnts(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)

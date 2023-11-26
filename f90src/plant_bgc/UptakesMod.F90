@@ -83,7 +83,7 @@ module UptakesMod
     NU     => plt_site%NU      , &
     AREA3  => plt_site%AREA3   , &
     ZEROS  => plt_site%ZEROS   , &
-    PopPlantRootC_vr  => plt_biom%PopPlantRootC_vr   , &
+     PopuPlantRootC_vr  => plt_biom% PopuPlantRootC_vr   , &
     ZEROL  => plt_biom%ZEROL   , &
     ZEROP  => plt_biom%ZEROP   , &
     CanopyLeafShethC_pft   => plt_biom%CanopyLeafShethC_pft    , &
@@ -235,7 +235,7 @@ module UptakesMod
     NU     => plt_site%NU       , &
     NP0    => plt_site%NP0      , &
     TotalSoilH2OPSIMPa  => plt_ew%TotalSoilH2OPSIMPa      , &
-    PopPlantRootC_vr  => plt_biom%PopPlantRootC_vr    , &
+     PopuPlantRootC_vr  => plt_biom% PopuPlantRootC_vr    , &
     VLMicP   => plt_soilchem%VLMicP   , &
     VLiceMicP   => plt_soilchem%VLiceMicP , &
     THETY  => plt_soilchem%THETY, &
@@ -266,7 +266,7 @@ module UptakesMod
     LWRadCanP(NZ)=0.0_r8
     plt_ew%PTrans(NZ)=0.0_r8
     plt_ew%VapXAir2PCan(NZ)=0.0_r8
-    plt_rbgc%UPOME(1:NumOfPlantChemElements,NZ)=0.0_r8
+    plt_rbgc%UPOME(1:NumOfPlantChemElmnts,NZ)=0.0_r8
     plt_rbgc%UPNH4(NZ)=0.0_r8
     plt_rbgc%UPNO3(NZ)=0.0_r8
     plt_rbgc%UPH2P(NZ)=0.0_r8
@@ -313,7 +313,7 @@ module UptakesMod
     D9005: DO NZ=1,NP
       DO  N=1,MY(NZ)
 !     IF(IsPlantActive(NZ).EQ.iPlantIsActive.AND.pftPlantPopulation(NZ).GT.0.0)THEN
-      AllRootC_vr(L)=AllRootC_vr(L)+AZMAX1(PopPlantRootC_vr(N,L,NZ))
+      AllRootC_vr(L)=AllRootC_vr(L)+AZMAX1( PopuPlantRootC_vr(N,L,NZ))
 !     ENDIF
       enddo
     ENDDO D9005
@@ -445,7 +445,7 @@ module UptakesMod
   integer :: N,L,NR
 
   associate(                           &
-    PopPlantRootC_vr  =>  plt_biom%PopPlantRootC_vr    , &
+     PopuPlantRootC_vr  =>  plt_biom% PopuPlantRootC_vr    , &
     FracSoiAsMicP   =>  plt_site%FracSoiAsMicP     , &
     CumSoilThickness =>  plt_site%CumSoilThickness   , &
     DLYR3  =>  plt_site%DLYR3    , &
@@ -453,7 +453,7 @@ module UptakesMod
     ZERO   =>  plt_site%ZERO     , &
     pftPlantPopulation     =>  plt_site%pftPlantPopulation       , &
     NU     =>  plt_site%NU       , &
-    NRT    =>  plt_morph%NRT     , &
+    NumRootAxes_pft   =>  plt_morph%NumRootAxes_pft    , &
     MY     =>  plt_morph%MY      , &
     RootLenDensNLP  =>  plt_morph%RootLenDensNLP   , &
     MaxSecndRootRadius1 =>  plt_morph%MaxSecndRootRadius1  , &
@@ -486,7 +486,7 @@ module UptakesMod
     DO  L=NU,NI(NZ)
       IF(N.EQ.ipltroot)THEN
         RootDepZ=0.0_r8
-        D2005: DO NR=1,NRT(NZ)
+        D2005: DO NR=1,NumRootAxes_pft(NZ)
           RootDepZ=AMAX1(RootDepZ,PrimRootDepth(ipltroot,NR,NZ))
         ENDDO D2005
         IF(L.EQ.NU)THEN
@@ -503,7 +503,7 @@ module UptakesMod
 
       ENDIF
       IF(AllRootC_vr(L).GT.ZEROS)THEN
-        FracPRoot4Uptake(N,L,NZ)=AZMAX1(PopPlantRootC_vr(N,L,NZ))/AllRootC_vr(L)
+        FracPRoot4Uptake(N,L,NZ)=AZMAX1( PopuPlantRootC_vr(N,L,NZ))/AllRootC_vr(L)
       ELSE
         FracPRoot4Uptake(N,L,NZ)=1.0_r8
       ENDIF
@@ -599,7 +599,7 @@ module UptakesMod
       D4290: DO N=1,MY(NZ)
         DO  L=NU,NI(NZ)
           PSIRoot(N,L,NZ)=ElvAdjstedtSoiPSIMPa(L)
-          CCPOLT=sum(RootNonstructElementConcpft_vr(1:NumOfPlantChemElements,N,L,NZ))
+          CCPOLT=sum(RootNonstructElementConcpft_vr(1:NumOfPlantChemElmnts,N,L,NZ))
           CALL update_osmo_turg_pressure(PSIRoot(N,L,NZ),CCPOLT,OSMO(NZ),TKS(L),&
             PSIRootOSMO(N,L,NZ),PSIRootTurg(N,L,NZ))
 
@@ -1162,7 +1162,7 @@ module UptakesMod
   LWRadCanP(NZ)=FTHRM*TKC(NZ)**4._r8
   PSICanP(NZ)=ElvAdjstedtSoiPSIMPa(NGTopRootLayer(NZ))
   
-  CCPOLT=sum(CanopyNonstructElementConc_pft(1:NumOfPlantChemElements,NZ))
+  CCPOLT=sum(CanopyNonstructElementConc_pft(1:NumOfPlantChemElmnts,NZ))
 
   call update_osmo_turg_pressure(PSICanP(NZ),CCPOLT,OSMO(NZ),TKC(NZ),PSICanPOsmo(NZ),PSICanPTurg(NZ),FDMP)
 
@@ -1175,7 +1175,7 @@ module UptakesMod
   DO N=1,MY(NZ)
     DO  L=NU,NI(NZ)
       PSIRoot(N,L,NZ)=ElvAdjstedtSoiPSIMPa(L)      
-      CCPOLT=sum(RootNonstructElementConcpft_vr(1:NumOfPlantChemElements,N,L,NZ))
+      CCPOLT=sum(RootNonstructElementConcpft_vr(1:NumOfPlantChemElmnts,N,L,NZ))
 
       call update_osmo_turg_pressure(PSIRoot(N,L,NZ),CCPOLT,OSMO(NZ),TKS(L),&
         PSIRootOSMO(N,L,NZ),PSIRootTurg(N,L,NZ))
@@ -1257,7 +1257,7 @@ module UptakesMod
       ELSE
         PSIRoot(N,L,NZ)=ElvAdjstedtSoiPSIMPa(L)
       ENDIF           
-      CCPOLT=sum(RootNonstructElementConcpft_vr(1:NumOfPlantChemElements,N,L,NZ))
+      CCPOLT=sum(RootNonstructElementConcpft_vr(1:NumOfPlantChemElmnts,N,L,NZ))
 
       CALL update_osmo_turg_pressure(PSIRoot(N,L,NZ),CCPOLT,OSMO(NZ),TKS(L),&
         PSIRootOSMO(N,L,NZ),PSIRootTurg(N,L,NZ))

@@ -76,8 +76,8 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  TCX(:,:,:)                         !threshold temperature for autumn leafoff/hardening, [oC]
   real(r8),target,allocatable ::  iPlantInitThermoAdaptZone(:,:,:)                       !initial plant thermal adaptation zone, [-]
   real(r8),target,allocatable ::  iPlantThermoAdaptZone(:,:,:)                        !plant thermal adaptation zone, [-]
-  real(r8),target,allocatable ::  GROUP(:,:,:,:)                     !plant maturity group, [-]
-  real(r8),target,allocatable ::  GROUPI(:,:,:)                      !acclimated plant maturity group, [-]
+  real(r8),target,allocatable ::  MatureGroup_brch(:,:,:,:)                     !plant maturity group, [-]
+  real(r8),target,allocatable ::  MatureGroup_pft(:,:,:)                      !acclimated plant maturity group, [-]
   real(r8),target,allocatable ::  GROUPX(:,:,:)                      !initial plant maturity group, [-]
   real(r8),target,allocatable ::  PPI(:,:,:)                         !initial plant population, [m-2]
   real(r8),target,allocatable ::  StandingDeadInitC_pft(:,:,:)                      !initial standing dead C, [g C m-2]
@@ -85,7 +85,7 @@ module PlantTraitDataType
   integer,target,allocatable ::  NumActivePlants(:,:)                          !number of active PFT
   real(r8),target,allocatable ::  PPT(:,:)                           !total plant population, [d-2]
   real(r8),target,allocatable ::  PPZ(:,:,:)                         !plant population at seeding, [m-2]
-  real(r8),target,allocatable ::  WSTR(:,:,:)                        !canopy plant water stress indicator, number of hours PSILT < PSILY, []
+  real(r8),target,allocatable ::  HoursCanopyPSITooLow(:,:,:)                        !canopy plant water stress indicator, number of hours PSILT < PSILY, []
   real(r8),target,allocatable ::  PlantO2Stress(:,:,:)                        !plant O2 stress indicator, []
   real(r8),target,allocatable ::  fTgrowCanP(:,:,:)                  !canopy temperature growth function, [-]
   real(r8),target,allocatable ::  TCG(:,:,:)                         !canopy growth temperature, [oC]
@@ -98,8 +98,8 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  GrainBiomGrowthYield(:,:,:)                        !grain growth yield, [g g-1]
   real(r8),target,allocatable ::  DMND(:,:,:)                        !nodule growth yield, [g g-1]
   real(r8),target,allocatable ::  LeafBiomGrowthYield(:,:,:)                        !leaf growth yield, [g g-1]
-  real(r8),target,allocatable ::  VRNY(:,:,:,:)                      !initial heat requirement for spring leafout/dehardening, [h]
-  real(r8),target,allocatable ::  VRNZ(:,:,:,:)                      !initial cold requirement for autumn leafoff/hardening, [h]
+  real(r8),target,allocatable ::  Hours4LenthenPhotoPeriod(:,:,:,:)                      !initial heat requirement for spring leafout/dehardening, [h]
+  real(r8),target,allocatable ::  Hours4ShortenPhotoPeriod(:,:,:,:)                      !initial cold requirement for autumn leafoff/hardening, [h]
   real(r8),target,allocatable ::  NumOfLeaves_brch(:,:,:,:)                      !leaf number, [-]
   real(r8),target,allocatable ::  VSTGX(:,:,:,:)                     !leaf number at floral initiation, [-]
   real(r8),target,allocatable ::  Hours4Leafout(:,:,:,:)                      !heat requirement for spring leafout/dehardening, [h]
@@ -115,8 +115,8 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  SSL1(:,:,:)                        !petiole length:mass during growth, [m g-1]
   real(r8),target,allocatable ::  HourThreshold4LeafOut(:,:,:,:)                      !hours above threshold temperature required for spring leafout/dehardening, [-]
   integer,target,allocatable ::  NumOfBranches_pft(:,:,:)                          !branch number, [-]
-  integer,target,allocatable ::  NBT(:,:,:)                          !branch number, [-]
-  integer,target,allocatable ::  BranchNumber_brchpft(:,:,:,:)                       !branch number, [-]
+  integer,target,allocatable ::  BranchNumber_pft(:,:,:)                          !branch number, [-]
+  integer,target,allocatable ::  BranchNumber_brch(:,:,:,:)                       !branch number, [-]
   integer,target,allocatable ::  NumOfMainBranch_pft(:,:,:)                          !number of main branch, [-]
   integer,target,allocatable ::  IFLGR(:,:,:,:)                      !branch phenology flag, [-]
   integer,target,allocatable ::  IFLGQ(:,:,:,:)                      !branch phenology flag, [h]
@@ -139,7 +139,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  RefNodeInitRate(:,:,:)                        !rate of node initiation, [h-1 at 25 oC]
   real(r8),target,allocatable ::  SNL1(:,:,:)                        !internode length:mass during growth, [m g-1]
   real(r8),target,allocatable ::  FNOD(:,:,:)                        !parameter for allocation of growth to nodes, [-]
-  integer,target,allocatable ::  NNOD(:,:,:)                         !number of concurrently growing nodes
+  integer,target,allocatable ::  NumConCurrentGrowinNode(:,:,:)                         !number of concurrently growing nodes
   real(r8),target,allocatable ::  PSICanPDailyMin(:,:,:)                       !minimum daily canopy water potential, [MPa]
   real(r8),target,allocatable ::  ClumpFactort(:,:,:)                         !clumping factor for self-shading in canopy layer at current LAI, [-]
   real(r8),target,allocatable ::  ClumpFactor(:,:,:)                          !clumping factor for self-shading in canopy layer, [-]
@@ -171,10 +171,10 @@ contains
   integer, intent(in) :: NumOfPlantLitrCmplxs
 
   FVRN =real((/0.75,0.5,0.5,0.5,0.5,0.5/),r8)
-  allocate(FWODLE(NumOfPlantChemElements,1:NumOfPlantLitrCmplxs));  FWODLE=0._r8
-  allocate(FWODBE(NumOfPlantChemElements,1:NumOfPlantLitrCmplxs));  FWODBE=0._r8
-  allocate(FWODRE(NumOfPlantChemElements,1:NumOfPlantLitrCmplxs));  FWODRE=0._r8         !
-  allocate(FWOODE(NumOfPlantChemElements,1:NumOfPlantLitrCmplxs));  FWOODE=0._r8         !woody element allocation
+  allocate(FWODLE(NumOfPlantChemElmnts,1:NumOfPlantLitrCmplxs));  FWODLE=0._r8
+  allocate(FWODBE(NumOfPlantChemElmnts,1:NumOfPlantLitrCmplxs));  FWODBE=0._r8
+  allocate(FWODRE(NumOfPlantChemElmnts,1:NumOfPlantLitrCmplxs));  FWODRE=0._r8         !
+  allocate(FWOODE(NumOfPlantChemElmnts,1:NumOfPlantLitrCmplxs));  FWOODE=0._r8         !woody element allocation
   allocate(CanopyBranchStemApft_lyr(JC,MaxNumBranches,JP,JY,JX));CanopyBranchStemApft_lyr=0._r8
   allocate(CanopyLeafA_pft(JP,JY,JX));    CanopyLeafA_pft=0._r8
   allocate(CanopyArea_pft(JP,JY,JX));    CanopyArea_pft=0._r8
@@ -233,8 +233,8 @@ contains
   allocate(TCX(JP,JY,JX));      TCX=0._r8
   allocate(iPlantInitThermoAdaptZone(JP,JY,JX));    iPlantInitThermoAdaptZone=0._r8
   allocate(iPlantThermoAdaptZone(JP,JY,JX));     iPlantThermoAdaptZone=0._r8
-  allocate(GROUP(MaxNumBranches,JP,JY,JX)); GROUP=0._r8
-  allocate(GROUPI(JP,JY,JX));   GROUPI=0._r8
+  allocate(MatureGroup_brch(MaxNumBranches,JP,JY,JX)); MatureGroup_brch=0._r8
+  allocate(MatureGroup_pft(JP,JY,JX));   MatureGroup_pft=0._r8
   allocate(GROUPX(JP,JY,JX));   GROUPX=0._r8
   allocate(PPI(JP,JY,JX));      PPI=0._r8
   allocate(StandingDeadInitC_pft(JP,JY,JX));   StandingDeadInitC_pft=0._r8
@@ -242,7 +242,7 @@ contains
   allocate(NumActivePlants(JY,JX));       NumActivePlants=0
   allocate(PPT(JY,JX));         PPT=0._r8
   allocate(PPZ(JP,JY,JX));      PPZ=0._r8
-  allocate(WSTR(JP,JY,JX));     WSTR=0._r8
+  allocate(HoursCanopyPSITooLow(JP,JY,JX));     HoursCanopyPSITooLow=0._r8
   allocate(PlantO2Stress(JP,JY,JX));     PlantO2Stress=0._r8
   allocate(fTgrowCanP(JP,JY,JX));     fTgrowCanP=0._r8
   allocate(TCG(JP,JY,JX));      TCG=0._r8
@@ -255,8 +255,8 @@ contains
   allocate(GrainBiomGrowthYield(JP,JY,JX));     GrainBiomGrowthYield=0._r8
   allocate(DMND(JP,JY,JX));     DMND=0._r8
   allocate(LeafBiomGrowthYield(JP,JY,JX));     LeafBiomGrowthYield=0._r8
-  allocate(VRNY(MaxNumBranches,JP,JY,JX));  VRNY=0._r8
-  allocate(VRNZ(MaxNumBranches,JP,JY,JX));  VRNZ=0._r8
+  allocate(Hours4LenthenPhotoPeriod(MaxNumBranches,JP,JY,JX));  Hours4LenthenPhotoPeriod=0._r8
+  allocate(Hours4ShortenPhotoPeriod(MaxNumBranches,JP,JY,JX));  Hours4ShortenPhotoPeriod=0._r8
   allocate(NumOfLeaves_brch(MaxNumBranches,JP,JY,JX));  NumOfLeaves_brch=0._r8
   allocate(VSTGX(MaxNumBranches,JP,JY,JX)); VSTGX=0._r8
   allocate(Hours4Leafout(MaxNumBranches,JP,JY,JX));  Hours4Leafout=0._r8
@@ -272,8 +272,8 @@ contains
   allocate(SSL1(JP,JY,JX));     SSL1=0._r8
   allocate(HourThreshold4LeafOut(JC,JP,JY,JX));  HourThreshold4LeafOut=0._r8
   allocate(NumOfBranches_pft(JP,JY,JX));      NumOfBranches_pft=0
-  allocate(NBT(JP,JY,JX));      NBT=0
-  allocate(BranchNumber_brchpft(MaxNumBranches,JP,JY,JX));  BranchNumber_brchpft=0
+  allocate(BranchNumber_pft(JP,JY,JX));      BranchNumber_pft=0
+  allocate(BranchNumber_brch(MaxNumBranches,JP,JY,JX));  BranchNumber_brch=0
   allocate(NumOfMainBranch_pft(JP,JY,JX));      NumOfMainBranch_pft=0
   allocate(IFLGR(MaxNumBranches,JP,JY,JX)); IFLGR=0
   allocate(IFLGQ(MaxNumBranches,JP,JY,JX)); IFLGQ=0
@@ -296,7 +296,7 @@ contains
   allocate(RefNodeInitRate(JP,JY,JX));     RefNodeInitRate=0._r8
   allocate(SNL1(JP,JY,JX));     SNL1=0._r8
   allocate(FNOD(JP,JY,JX));     FNOD=0._r8
-  allocate(NNOD(JP,JY,JX));     NNOD=0
+  allocate(NumConCurrentGrowinNode(JP,JY,JX));     NumConCurrentGrowinNode=0
   allocate(PSICanPDailyMin(JP,JY,JX));    PSICanPDailyMin=0._r8
   allocate(ClumpFactort(JP,JY,JX));      ClumpFactort=0._r8
   allocate(ClumpFactor(JP,JY,JX));       ClumpFactor=0._r8
@@ -387,8 +387,8 @@ contains
   call destroy(TCX)
   call destroy(iPlantInitThermoAdaptZone)
   call destroy(iPlantThermoAdaptZone)
-  call destroy(GROUP)
-  call destroy(GROUPI)
+  call destroy(MatureGroup_brch)
+  call destroy(MatureGroup_pft)
   call destroy(GROUPX)
   call destroy(PPI)
   call destroy(StandingDeadInitC_pft)
@@ -396,7 +396,7 @@ contains
   call destroy(NumActivePlants)
   call destroy(PPT)
   call destroy(PPZ)
-  call destroy(WSTR)
+  call destroy(HoursCanopyPSITooLow)
   call destroy(PlantO2Stress)
   call destroy(fTgrowCanP)
   call destroy(TCG)
@@ -409,8 +409,8 @@ contains
   call destroy(GrainBiomGrowthYield)
   call destroy(DMND)
   call destroy(LeafBiomGrowthYield)
-  call destroy(VRNY)
-  call destroy(VRNZ)
+  call destroy(Hours4LenthenPhotoPeriod)
+  call destroy(Hours4ShortenPhotoPeriod)
   call destroy(NumOfLeaves_brch)
   call destroy(VSTGX)
   call destroy(Hours4Leafout)
@@ -426,8 +426,8 @@ contains
   call destroy(SSL1)
   call destroy(HourThreshold4LeafOut)
   call destroy(NumOfBranches_pft)
-  call destroy(NBT)
-  call destroy(BranchNumber_brchpft)
+  call destroy(BranchNumber_pft)
+  call destroy(BranchNumber_brch)
   call destroy(NumOfMainBranch_pft)
   call destroy(IFLGR)
   call destroy(IFLGQ)
@@ -450,7 +450,7 @@ contains
   call destroy(RefNodeInitRate)
   call destroy(SNL1)
   call destroy(FNOD)
-  call destroy(NNOD)
+  call destroy(NumConCurrentGrowinNode)
   call destroy(PSICanPDailyMin)
   call destroy(ClumpFactort)
   call destroy(ClumpFactor)

@@ -834,15 +834,15 @@ implicit none
 !
   IF(L0.NE.0)THEN
     DO  NZ=1,NP(NY,NX)
-      IF(WTRTL(ipltroot,L0,NZ,NY,NX).GT.ZEROP(NZ,NY,NX) &
-        .AND.WTRTL(ipltroot,L1,NZ,NY,NX).GT.ZEROP(NZ,NY,NX))THEN
+      IF(RootStructBiomC_vr(ipltroot,L0,NZ,NY,NX).GT.ZEROP(NZ,NY,NX) &
+        .AND.RootStructBiomC_vr(ipltroot,L1,NZ,NY,NX).GT.ZEROP(NZ,NY,NX))THEN
         DO N=1,MY(NZ,NY,NX)
           DO NTG=idg_beg,idg_end-1
             trcg_rootml(NTG,N,L1,NZ,NY,NX)=trcg_rootml(NTG,N,L1,NZ,NY,NX)+FX*trcg_rootml(NTG,N,L0,NZ,NY,NX)
             trcs_rootml(NTG,N,L1,NZ,NY,NX)=trcs_rootml(NTG,N,L1,NZ,NY,NX)+FX*trcs_rootml(NTG,N,L0,NZ,NY,NX)
           ENDDO
-          DO  NR=1,NRT(NZ,NY,NX)
-            DO NE=1,NumOfPlantChemElements
+          DO  NR=1,NumRootAxes_pft(NZ,NY,NX)
+            DO NE=1,NumOfPlantChemElmnts
               WTRT1E(NE,N,L1,NR,NZ,NY,NX)=WTRT1E(NE,N,L1,NR,NZ,NY,NX)+FX*WTRT1E(NE,N,L0,NR,NZ,NY,NX)
               WTRT2E(NE,N,L1,NR,NZ,NY,NX)=WTRT2E(NE,N,L1,NR,NZ,NY,NX)+FX*WTRT2E(NE,N,L0,NR,NZ,NY,NX)
             ENDDO
@@ -850,11 +850,11 @@ implicit none
             SecndRootLen(N,L1,NR,NZ,NY,NX)=SecndRootLen(N,L1,NR,NZ,NY,NX)+FX*SecndRootLen(N,L0,NR,NZ,NY,NX)
             RTN2(N,L1,NR,NZ,NY,NX)=RTN2(N,L1,NR,NZ,NY,NX)+FX*RTN2(N,L0,NR,NZ,NY,NX)
           ENDDO
-          DO NE=1,NumOfPlantChemElements
-            EPOOLR(NE,N,L1,NZ,NY,NX)=EPOOLR(NE,N,L1,NZ,NY,NX)+FX*EPOOLR(NE,N,L0,NZ,NY,NX)
+          DO NE=1,NumOfPlantChemElmnts
+             RootMycoNonstructElmnt_vr(NE,N,L1,NZ,NY,NX)= RootMycoNonstructElmnt_vr(NE,N,L1,NZ,NY,NX)+FX* RootMycoNonstructElmnt_vr(NE,N,L0,NZ,NY,NX)
           ENDDO
-          WTRTL(N,L1,NZ,NY,NX)=WTRTL(N,L1,NZ,NY,NX)+FX*WTRTL(N,L0,NZ,NY,NX)
-          PopPlantRootC_vr(N,L1,NZ,NY,NX)=PopPlantRootC_vr(N,L1,NZ,NY,NX)+FX*PopPlantRootC_vr(N,L0,NZ,NY,NX)
+          RootStructBiomC_vr(N,L1,NZ,NY,NX)=RootStructBiomC_vr(N,L1,NZ,NY,NX)+FX*RootStructBiomC_vr(N,L0,NZ,NY,NX)
+           PopuPlantRootC_vr(N,L1,NZ,NY,NX)= PopuPlantRootC_vr(N,L1,NZ,NY,NX)+FX* PopuPlantRootC_vr(N,L0,NZ,NY,NX)
           WSRTL(N,L1,NZ,NY,NX)=WSRTL(N,L1,NZ,NY,NX)+FX*WSRTL(N,L0,NZ,NY,NX)
           PrimRootXNumL(N,L1,NZ,NY,NX)=PrimRootXNumL(N,L1,NZ,NY,NX)+FX*PrimRootXNumL(N,L0,NZ,NY,NX)
           SecndRootXNumL(N,L1,NZ,NY,NX)=SecndRootXNumL(N,L1,NZ,NY,NX)+FX*SecndRootXNumL(N,L0,NZ,NY,NX)
@@ -867,9 +867,9 @@ implicit none
           RTARP(N,L1,NZ,NY,NX)=RTARP(N,L1,NZ,NY,NX)+FX*RTARP(N,L0,NZ,NY,NX)
           AveSecndRootLen(N,L1,NZ,NY,NX)=AveSecndRootLen(N,L1,NZ,NY,NX)+FX*AveSecndRootLen(N,L0,NZ,NY,NX)
         ENDDO
-        DO NE=1,NumOfPlantChemElements
+        DO NE=1,NumOfPlantChemElmnts
           WTNDLE(NE,L1,NZ,NY,NX)=WTNDLE(NE,L1,NZ,NY,NX)+FX*WTNDLE(NE,L0,NZ,NY,NX)
-          EPOOLN(NE,L1,NZ,NY,NX)=EPOOLN(NE,L1,NZ,NY,NX)+FX*EPOOLN(NE,L0,NZ,NY,NX)
+          RootNoduleNonstructElmnt_vr(NE,L1,NZ,NY,NX)=RootNoduleNonstructElmnt_vr(NE,L1,NZ,NY,NX)+FX*RootNoduleNonstructElmnt_vr(NE,L0,NZ,NY,NX)
         ENDDO
       ENDIF
     ENDDO
@@ -1011,15 +1011,15 @@ implicit none
           !
   IF(L0.NE.0)THEN
     DO  NZ=1,NP(NY,NX)
-      IF(WTRTL(ipltroot,L0,NZ,NY,NX).GT.ZEROP(NZ,NY,NX) &
-        .AND.WTRTL(ipltroot,L1,NZ,NY,NX).GT.ZEROP(NZ,NY,NX))THEN
+      IF(RootStructBiomC_vr(ipltroot,L0,NZ,NY,NX).GT.ZEROP(NZ,NY,NX) &
+        .AND.RootStructBiomC_vr(ipltroot,L1,NZ,NY,NX).GT.ZEROP(NZ,NY,NX))THEN
         DO  N=1,MY(NZ,NY,NX)
           DO NTG=idg_beg,idg_end-1
             trcg_rootml(NTG,N,L0,NZ,NY,NX)=FY*trcg_rootml(NTG,N,L0,NZ,NY,NX)
             trcs_rootml(NTG,N,L0,NZ,NY,NX)=FY*trcs_rootml(NTG,N,L0,NZ,NY,NX)
           ENDDO
-          DO NR=1,NRT(NZ,NY,NX)
-            DO NE=1,NumOfPlantChemElements
+          DO NR=1,NumRootAxes_pft(NZ,NY,NX)
+            DO NE=1,NumOfPlantChemElmnts
               WTRT1E(NE,N,L0,NR,NZ,NY,NX)=FY*WTRT1E(NE,N,L0,NR,NZ,NY,NX)
               WTRT2E(NE,N,L0,NR,NZ,NY,NX)=FY*WTRT2E(NE,N,L0,NR,NZ,NY,NX)
             ENDDO
@@ -1027,11 +1027,11 @@ implicit none
             SecndRootLen(N,L0,NR,NZ,NY,NX)=FY*SecndRootLen(N,L0,NR,NZ,NY,NX)
             RTN2(N,L0,NR,NZ,NY,NX)=FY*RTN2(N,L0,NR,NZ,NY,NX)
           ENDDO
-          DO NE=1,NumOfPlantChemElements
-            EPOOLR(NE,N,L0,NZ,NY,NX)=FY*EPOOLR(NE,N,L0,NZ,NY,NX)
+          DO NE=1,NumOfPlantChemElmnts
+             RootMycoNonstructElmnt_vr(NE,N,L0,NZ,NY,NX)=FY* RootMycoNonstructElmnt_vr(NE,N,L0,NZ,NY,NX)
           ENDDO
-          WTRTL(N,L0,NZ,NY,NX)=FY*WTRTL(N,L0,NZ,NY,NX)
-          PopPlantRootC_vr(N,L0,NZ,NY,NX)=FY*PopPlantRootC_vr(N,L0,NZ,NY,NX)
+          RootStructBiomC_vr(N,L0,NZ,NY,NX)=FY*RootStructBiomC_vr(N,L0,NZ,NY,NX)
+           PopuPlantRootC_vr(N,L0,NZ,NY,NX)=FY* PopuPlantRootC_vr(N,L0,NZ,NY,NX)
           WSRTL(N,L0,NZ,NY,NX)=FY*WSRTL(N,L0,NZ,NY,NX)
           PrimRootXNumL(N,L0,NZ,NY,NX)=FY*PrimRootXNumL(N,L0,NZ,NY,NX)
           SecndRootXNumL(N,L0,NZ,NY,NX)=FY*SecndRootXNumL(N,L0,NZ,NY,NX)
@@ -1044,10 +1044,10 @@ implicit none
           RTARP(N,L0,NZ,NY,NX)=FY*RTARP(N,L0,NZ,NY,NX)
           AveSecndRootLen(N,L0,NZ,NY,NX)=FY*AveSecndRootLen(N,L0,NZ,NY,NX)
         ENDDO
-        DO NE=1,NumOfPlantChemElements
+        DO NE=1,NumOfPlantChemElmnts
           WTNDLE(NE,L0,NZ,NY,NX)=FY*WTNDLE(NE,L0,NZ,NY,NX)
 
-          EPOOLN(NE,L0,NZ,NY,NX)=FY*EPOOLN(NE,L0,NZ,NY,NX)
+          RootNoduleNonstructElmnt_vr(NE,L0,NZ,NY,NX)=FY*RootNoduleNonstructElmnt_vr(NE,L0,NZ,NY,NX)
         ENDDO
       ENDIF
     ENDDO
@@ -1198,8 +1198,8 @@ implicit none
 !
     return
     DO NZ=1,NP(NY,NX)
-      IF(WTRTL(ipltroot,L0,NZ,NY,NX).GT.ZEROP(NZ,NY,NX) &
-        .AND.WTRTL(ipltroot,L1,NZ,NY,NX).GT.ZEROP(NZ,NY,NX))THEN
+      IF(RootStructBiomC_vr(ipltroot,L0,NZ,NY,NX).GT.ZEROP(NZ,NY,NX) &
+        .AND.RootStructBiomC_vr(ipltroot,L1,NZ,NY,NX).GT.ZEROP(NZ,NY,NX))THEN
         IF(L0.EQ.L.OR.DPTHZ(L1,NY,NX).LE.ZERO)THEN
           FRO=FO
         ELSE
@@ -1217,8 +1217,8 @@ implicit none
             trcs_rootml(NTG,N,L0,NZ,NY,NX)=trcs_rootml(NTG,N,L0,NZ,NY,NX)-FXGP
           ENDDO
 
-          DO  NR=1,NRT(NZ,NY,NX)
-            DO NE=1,NumOfPlantChemElements
+          DO  NR=1,NumRootAxes_pft(NZ,NY,NX)
+            DO NE=1,NumOfPlantChemElmnts
               FXWTRT1E=FRO*WTRT1E(NE,N,L0,NR,NZ,NY,NX)
               WTRT1E(NE,N,L1,NR,NZ,NY,NX)=WTRT1E(NE,N,L1,NR,NZ,NY,NX)+FXWTRT1E
               WTRT1E(NE,N,L0,NR,NZ,NY,NX)=WTRT1E(NE,N,L0,NR,NZ,NY,NX)-FXWTRT1E
@@ -1237,18 +1237,18 @@ implicit none
             RTN2(N,L1,NR,NZ,NY,NX)=RTN2(N,L1,NR,NZ,NY,NX)+FXRTN2
             RTN2(N,L0,NR,NZ,NY,NX)=RTN2(N,L0,NR,NZ,NY,NX)-FXRTN2
           ENDDO
-          DO NE=1,NumOfPlantChemElements
-            FXEPOOLR=FRO*EPOOLR(NE,N,L0,NZ,NY,NX)
-            EPOOLR(NE,N,L1,NZ,NY,NX)=EPOOLR(NE,N,L1,NZ,NY,NX)+FXEPOOLR
-            EPOOLR(NE,N,L0,NZ,NY,NX)=EPOOLR(NE,N,L0,NZ,NY,NX)-FXEPOOLR
+          DO NE=1,NumOfPlantChemElmnts
+             FXEPOOLR=FRO*RootMycoNonstructElmnt_vr(NE,N,L0,NZ,NY,NX)
+             RootMycoNonstructElmnt_vr(NE,N,L1,NZ,NY,NX)= RootMycoNonstructElmnt_vr(NE,N,L1,NZ,NY,NX)+FXEPOOLR
+             RootMycoNonstructElmnt_vr(NE,N,L0,NZ,NY,NX)= RootMycoNonstructElmnt_vr(NE,N,L0,NZ,NY,NX)-FXEPOOLR
           ENDDO
 
-          FXWTRTL=FRO*WTRTL(N,L0,NZ,NY,NX)
-          WTRTL(N,L1,NZ,NY,NX)=WTRTL(N,L1,NZ,NY,NX)+FXWTRTL
-          WTRTL(N,L0,NZ,NY,NX)=WTRTL(N,L0,NZ,NY,NX)-FXWTRTL
-          FXWTRTD=FRO*PopPlantRootC_vr(N,L0,NZ,NY,NX)
-          PopPlantRootC_vr(N,L1,NZ,NY,NX)=PopPlantRootC_vr(N,L1,NZ,NY,NX)+FXWTRTD
-          PopPlantRootC_vr(N,L0,NZ,NY,NX)=PopPlantRootC_vr(N,L0,NZ,NY,NX)-FXWTRTD
+          FXWTRTL=FRO*RootStructBiomC_vr(N,L0,NZ,NY,NX)
+          RootStructBiomC_vr(N,L1,NZ,NY,NX)=RootStructBiomC_vr(N,L1,NZ,NY,NX)+FXWTRTL
+          RootStructBiomC_vr(N,L0,NZ,NY,NX)=RootStructBiomC_vr(N,L0,NZ,NY,NX)-FXWTRTL
+          FXWTRTD=FRO* PopuPlantRootC_vr(N,L0,NZ,NY,NX)
+           PopuPlantRootC_vr(N,L1,NZ,NY,NX)= PopuPlantRootC_vr(N,L1,NZ,NY,NX)+FXWTRTD
+           PopuPlantRootC_vr(N,L0,NZ,NY,NX)= PopuPlantRootC_vr(N,L0,NZ,NY,NX)-FXWTRTD
           FXWSRTL=FRO*WSRTL(N,L0,NZ,NY,NX)
           WSRTL(N,L1,NZ,NY,NX)=WSRTL(N,L1,NZ,NY,NX)+FXWSRTL
           WSRTL(N,L0,NZ,NY,NX)=WSRTL(N,L0,NZ,NY,NX)-FXWSRTL
@@ -1286,14 +1286,14 @@ implicit none
 !
 !     ROOT NODULES
 !
-        DO NE=1,NumOfPlantChemElements
+        DO NE=1,NumOfPlantChemElmnts
           FXWTNDLE=FRO*WTNDLE(NE,L0,NZ,NY,NX)
           WTNDLE(NE,L1,NZ,NY,NX)=WTNDLE(NE,L1,NZ,NY,NX)+FXWTNDLE
           WTNDLE(NE,L0,NZ,NY,NX)=WTNDLE(NE,L0,NZ,NY,NX)-FXWTNDLE
 
-          FXEPOOLN=FRO*EPOOLN(NE,L0,NZ,NY,NX)
-          EPOOLN(NE,L1,NZ,NY,NX)=EPOOLN(NE,L1,NZ,NY,NX)+FXEPOOLN
-          EPOOLN(NE,L0,NZ,NY,NX)=EPOOLN(NE,L0,NZ,NY,NX)-FXEPOOLN
+          FXEPOOLN=FRO*RootNoduleNonstructElmnt_vr(NE,L0,NZ,NY,NX)
+          RootNoduleNonstructElmnt_vr(NE,L1,NZ,NY,NX)=RootNoduleNonstructElmnt_vr(NE,L1,NZ,NY,NX)+FXEPOOLN
+          RootNoduleNonstructElmnt_vr(NE,L0,NZ,NY,NX)=RootNoduleNonstructElmnt_vr(NE,L0,NZ,NY,NX)-FXEPOOLN
 
         ENDDO
       ENDIF

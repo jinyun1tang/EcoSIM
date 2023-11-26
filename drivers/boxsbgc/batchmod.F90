@@ -1315,7 +1315,7 @@ contains
   real(r8) :: VLWatMicPMNG,VLWatMicPMN2,VLWatMicPMN3
   real(r8) :: VLWatMicPMNB,VLWatMicPMHG,VOLCOT
   real(r8) :: VOLCHT,VOLOXT,VOLNGT
-  real(r8) :: VOLN2T,VOLN3T,VOLNBT
+  real(r8) :: VOLN2T,VOLN3T,VOLBranchNumber_pft
   real(r8) :: VOLHGT
   real(r8) :: VLsoiAirPMA,VLsoiAirPMB
   real(r8) :: CCO2G2,CCH4G2,COXYG2
@@ -1564,7 +1564,7 @@ contains
       VOLNGT=VLWatMicPMNG+VLsoiAirP
       VOLN2T=VLWatMicPMN2+VLsoiAirP
       VOLN3T=VLWatMicPMN3+VLsoiAirPMA
-      VOLNBT=VLWatMicPMNB+VLsoiAirPMB
+      VOLBranchNumber_pft=VLWatMicPMNB+VLsoiAirPMB
       VOLHGT=VLWatMicPMHG+VLsoiAirP
 
       RCODFG=forc%DiffusivitySolutEff*(AMAX1(ZEROS,CO2G2)*VLWatMicPMCO-AMAX1(ZEROS,CO2S2+RCODXS)*VLsoiAirP)/VOLCOT
@@ -1589,8 +1589,8 @@ contains
       ELSE
         RN3DFG=0.0_r8
       ENDIF
-      IF(VOLNBT.GT.ZEROS2.AND.VLWatMicPMXB.GT.ZEROS2)THEN
-        RNBDFG=forc%DiffusivitySolutEff*(AMAX1(ZEROS,ZN3G2)*VLWatMicPMNB-AMAX1(ZEROS,ZNH3B2+RNBDXS)*VLsoiAirPMB)/VOLNBT
+      IF(VOLBranchNumber_pft.GT.ZEROS2.AND.VLWatMicPMXB.GT.ZEROS2)THEN
+        RNBDFG=forc%DiffusivitySolutEff*(AMAX1(ZEROS,ZN3G2)*VLWatMicPMNB-AMAX1(ZEROS,ZNH3B2+RNBDXS)*VLsoiAirPMB)/VOLBranchNumber_pft
         CNH3B0=AZMAX1((ZNH3B2+RNBDFG)/VLWatMicPMXB)
         CNH4B0=AZMAX1(ZNH4B2)/VLWatMicPMXB
       ELSE

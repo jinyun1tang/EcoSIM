@@ -775,7 +775,7 @@ module Hour1Mod
 
   TRootGasLoss_disturb(idg_beg:idg_end-1,NY,NX)=0.0_r8
   ZESNC(:,NY,NX)=0.0_r8
-  StandingDeadChemElmnt_col(1:NumOfPlantChemElements,NY,NX)=0.0_r8
+  StandingDeadChemElmnt_col(1:NumOfPlantChemElmnts,NY,NX)=0.0_r8
   PPT(NY,NX)=0.0_r8
 ! zero arrays in the snow layers
   FLSW(1:JS,NY,NX)=0.0_r8
@@ -805,7 +805,7 @@ module Hour1Mod
 
 !     begin_execution
 
-  LitrfalChemElemnts_vr(1:NumOfPlantChemElements,1:jsken,1:pltpar%NumOfPlantLitrCmplxs,&
+  LitrfalChemElemnts_vr(1:NumOfPlantChemElmnts,1:jsken,1:pltpar%NumOfPlantLitrCmplxs,&
     0:NL(NY,NX),NY,NX)=0.0_r8
 
   RDOM_micb_flx(idom_doc,1:jcplx,0:NL(NY,NX),NY,NX)=0.0_r8
@@ -832,7 +832,7 @@ module Hour1Mod
 
   Gas_Disol_Flx_vr(idg_beg:idg_end,0:NL(NY,NX),NY,NX)=0.0_r8
 
-  TDFOME(1:NumOfPlantChemElements,1:jcplx,NU(NY,NX):NL(NY,NX),NY,NX)=0.0_r8
+  TDFOME(1:NumOfPlantChemElmnts,1:jcplx,NU(NY,NX):NL(NY,NX),NY,NX)=0.0_r8
   ROXSK(1:NPH,NU(NY,NX):NL(NY,NX),NY,NX)=0.0_r8
   end subroutine SetArrays4PlantSoilTransfer
 !------------------------------------------------------------------------------------------

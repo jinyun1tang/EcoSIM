@@ -37,13 +37,13 @@ module NoduleBGCMod
   real(r8) :: RGNDL,RSNDL
   real(r8) :: RGN2P,RGN2F
   real(r8) :: RUPNFB
-  real(r8) :: RXNDLE(NumOfPlantChemElements)
-  real(r8) :: RDNDLE(NumOfPlantChemElements)
-  real(r8) :: RCNDLE(NumOfPlantChemElements)
+  real(r8) :: RXNDLE(NumOfPlantChemElmnts)
+  real(r8) :: RDNDLE(NumOfPlantChemElmnts)
+  real(r8) :: RCNDLE(NumOfPlantChemElmnts)
   real(r8) :: RGNDG
-  real(r8) :: RXNSNE(NumOfPlantChemElements)
-  real(r8) :: RDNSNE(NumOfPlantChemElements)
-  real(r8) :: RCNSNE(NumOfPlantChemElements)
+  real(r8) :: RXNSNE(NumOfPlantChemElmnts)
+  real(r8) :: RDNSNE(NumOfPlantChemElmnts)
+  real(r8) :: RCNSNE(NumOfPlantChemElmnts)
   real(r8) :: SPNDLI
   real(r8) :: SPNDX
   real(r8) :: WTLSB1,WTNDB1,WTLSBT
@@ -70,8 +70,8 @@ module NoduleBGCMod
     CNND     =>  plt_allom%CNND    , &
     CPND     =>  plt_allom%CPND    , &
     LeafPetioleBiomassC_brch    =>  plt_biom%LeafPetioleBiomassC_brch    , &
-    EPOOL    =>  plt_biom%EPOOL    , &
-    EPOLNB   =>  plt_biom%EPOLNB   , &
+    NonstructElmnt_brch   =>  plt_biom%NonstructElmnt_brch   , &
+    NoduleNonstructElmnt_brch   =>  plt_biom%NoduleNonstructElmnt_brch   , &
     ZEROP    =>  plt_biom%ZEROP    , &
     ZEROL    =>  plt_biom%ZEROL    , &
     WTNDBE   =>  plt_biom%WTNDBE     &
@@ -105,9 +105,9 @@ module NoduleBGCMod
 !     FCNPF=N,P constraint to bacterial activity
 !
     IF(WTNDBE(ielmc,NB,NZ).GT.ZEROP(NZ))THEN
-      CCPOLN=AZMAX1(EPOLNB(ielmc,NB,NZ)/WTNDBE(ielmc,NB,NZ))
-      CZPOLN=AZMAX1(EPOLNB(ielmn,NB,NZ)/WTNDBE(ielmc,NB,NZ))
-      CPPOLN=AZMAX1(EPOLNB(ielmp,NB,NZ)/WTNDBE(ielmc,NB,NZ))
+      CCPOLN=AZMAX1(NoduleNonstructElmnt_brch(ielmc,NB,NZ)/WTNDBE(ielmc,NB,NZ))
+      CZPOLN=AZMAX1(NoduleNonstructElmnt_brch(ielmn,NB,NZ)/WTNDBE(ielmc,NB,NZ))
+      CPPOLN=AZMAX1(NoduleNonstructElmnt_brch(ielmp,NB,NZ)/WTNDBE(ielmc,NB,NZ))
     ELSE
       CCPOLN=1.0_r8
       CZPOLN=1.0_r8
@@ -143,8 +143,8 @@ module NoduleBGCMod
 !     FCNPF=N,P constraint to bacterial activity
 !     WFNG=growth function of canopy water potential
 !
-    RCNDL=AZMAX1(AMIN1(EPOLNB(ielmc,NB,NZ),VMXO*WTNDBE(ielmc,NB,NZ))*FCNPF*fTgrowCanP(NZ)*WFNG)
-!     CPOOLNX=EPOLNB(ielmc,NB,NZ)
+    RCNDL=AZMAX1(AMIN1(NoduleNonstructElmnt_brch(ielmc,NB,NZ),VMXO*WTNDBE(ielmc,NB,NZ))*FCNPF*fTgrowCanP(NZ)*WFNG)
+!     CPOOLNX=NoduleNonstructElmnt_brch(ielmc,NB,NZ)
 !     VMXOX=VMXO*WTNDBE(ielmc,NB,NZ)*FCNPF*fTgrowCanP(NZ)*WFNG
 !
 !     NODULE MAINTENANCE RESPIRATION FROM SOIL TEMPERATURE,
@@ -208,7 +208,7 @@ module NoduleBGCMod
     RCCN=CNC*RCCXN
     RCCP=CPC*RCCQN
     SPNDX=SPNDL*SQRT(fTgrowCanP(NZ)*WFNG)
-    DO NE=1,NumOfPlantChemElements
+    DO NE=1,NumOfPlantChemElmnts
       RXNDLE(NE)=SPNDX*WTNDBE(NE,NB,NZ)
     ENDDO
 
@@ -216,7 +216,7 @@ module NoduleBGCMod
     RDNDLE(ielmn)=RXNDLE(ielmn)*(1.0_r8-RCCC)*(1.0_r8-RCCN)
     RDNDLE(ielmp)=RXNDLE(ielmp)*(1.0_r8-RCCC)*(1.0_r8-RCCP)
 
-    DO NE=1,NumOfPlantChemElements
+    DO NE=1,NumOfPlantChemElmnts
       RCNDLE(NE)=RXNDLE(NE)-RDNDLE(NE)
     ENDDO
 !
@@ -239,12 +239,12 @@ module NoduleBGCMod
 !     CCPOLN,CZPOLN,CPPOLN=nonstructural C,N,P concn in bacteria
 !     CZKM,CPKM=Km for nonstructural N,P uptake by bacteria
 !
-    CGNDL=AMIN1(EPOLNB(ielmc,NB,NZ)-AMIN1(RMNDL,RCNDL) &
+    CGNDL=AMIN1(NoduleNonstructElmnt_brch(ielmc,NB,NZ)-AMIN1(RMNDL,RCNDL) &
       -RGN2F+RCNDLE(ielmc),(RGNDL-RGN2F)/(1.0_r8-DMND(NZ)))
     GRNDG=CGNDL*DMND(NZ)
     RGNDG=RGN2F+CGNDL*(1.0_r8-DMND(NZ))
-    ZADDN=AZMAX1(AMIN1(EPOLNB(ielmn,NB,NZ),GRNDG*CNND(NZ)))*CZPOLN/(CZPOLN+CZKM)
-    PADDN=AZMAX1(AMIN1(EPOLNB(ielmp,NB,NZ),GRNDG*CPND(NZ)))*CPPOLN/(CPPOLN+CPKM)
+    ZADDN=AZMAX1(AMIN1(NoduleNonstructElmnt_brch(ielmn,NB,NZ),GRNDG*CNND(NZ)))*CZPOLN/(CZPOLN+CZKM)
+    PADDN=AZMAX1(AMIN1(NoduleNonstructElmnt_brch(ielmp,NB,NZ),GRNDG*CPND(NZ)))*CPPOLN/(CPPOLN+CPKM)
 !
 !     NODULE SENESCENCE
 !
@@ -263,13 +263,13 @@ module NoduleBGCMod
       RDNSNE(ielmc)=RXNSNE(ielmc)*(1.0_r8-RCCC)
       RDNSNE(ielmn)=RXNSNE(ielmn)*(1.0_r8-RCCC)*(1.0_r8-RCCN)
       RDNSNE(ielmp)=RXNSNE(ielmp)*(1.0_r8-RCCC)*(1.0_r8-RCCP)
-      DO NE=1,NumOfPlantChemElements
+      DO NE=1,NumOfPlantChemElmnts
         RCNSNE(NE)=RXNSNE(NE)-RDNSNE(NE)
       ENDDO
     ELSE
-      RXNSNE(1:NumOfPlantChemElements)=0._r8
-      RDNSNE(1:NumOfPlantChemElements)=0._r8
-      RCNSNE(1:NumOfPlantChemElements)=0._r8
+      RXNSNE(1:NumOfPlantChemElmnts)=0._r8
+      RDNSNE(1:NumOfPlantChemElmnts)=0._r8
+      RCNSNE(1:NumOfPlantChemElmnts)=0._r8
     ENDIF
 !
 !     TOTAL NODULE RESPIRATION
@@ -299,7 +299,7 @@ module NoduleBGCMod
 !     RDNSNE(ielmc),RDNSNE(ielmc),RDNSNE(ielmp)=bacterial C,N,P senescence to litterfall
 !
     D6470: DO M=1,jsken
-      DO NE=1,NumOfPlantChemElements
+      DO NE=1,NumOfPlantChemElmnts
         ESNC(NE,M,k_fine_litr,0,NZ)=ESNC(NE,M,k_fine_litr,0,NZ) &
           +CFOPE(NE,ifoliar,M,NZ)*(RDNDLE(NE)+RDNSNE(NE))
       ENDDO
@@ -317,9 +317,9 @@ module NoduleBGCMod
 !     ZADDN,PADDN=nonstructural N,P used in growth
 !     RUPNFB=branch N2 fixation
 !
-    EPOLNB(ielmc,NB,NZ)=EPOLNB(ielmc,NB,NZ)-AMIN1(RMNDL,RCNDL)-RGN2F-CGNDL+RCNDLE(ielmc)
-    EPOLNB(ielmn,NB,NZ)=EPOLNB(ielmn,NB,NZ)-ZADDN+RCNDLE(ielmn)+RCNSNE(ielmn)+RUPNFB
-    EPOLNB(ielmp,NB,NZ)=EPOLNB(ielmp,NB,NZ)-PADDN+RCNDLE(ielmp)+RCNSNE(ielmp)
+    NoduleNonstructElmnt_brch(ielmc,NB,NZ)=NoduleNonstructElmnt_brch(ielmc,NB,NZ)-AMIN1(RMNDL,RCNDL)-RGN2F-CGNDL+RCNDLE(ielmc)
+    NoduleNonstructElmnt_brch(ielmn,NB,NZ)=NoduleNonstructElmnt_brch(ielmn,NB,NZ)-ZADDN+RCNDLE(ielmn)+RCNSNE(ielmn)+RUPNFB
+    NoduleNonstructElmnt_brch(ielmp,NB,NZ)=NoduleNonstructElmnt_brch(ielmp,NB,NZ)-PADDN+RCNDLE(ielmp)+RCNSNE(ielmp)
 !
 !     UPDATE STATE VARIABLES FOR NODULE C, N, P
 !
@@ -346,7 +346,7 @@ module NoduleBGCMod
 !     XFRC,XFRN,XFRC=nonstructural C,N,P transfer
 !     CPOLNB,ZPOLNB,PPOLNB=nonstructural C,N,P in bacteria
 !
-    IF(EPOOL(ielmc,NB,NZ).GT.ZEROP(NZ).AND.LeafPetioleBiomassC_brch(NB,NZ).GT.ZEROL(NZ))THEN
+    IF(NonstructElmnt_brch(ielmc,NB,NZ).GT.ZEROP(NZ).AND.LeafPetioleBiomassC_brch(NB,NZ).GT.ZEROL(NZ))THEN
       CCNDLB=WTNDBE(ielmc,NB,NZ)/LeafPetioleBiomassC_brch(NB,NZ)
       WTLSB1=LeafPetioleBiomassC_brch(NB,NZ)
       WTNDB1=AMIN1(LeafPetioleBiomassC_brch(NB,NZ),AMAX1(WTNDI*AREA3(NU),WTNDBE(ielmc,NB,NZ)))
@@ -354,20 +354,20 @@ module NoduleBGCMod
       IF(WTLSBT.GT.ZEROP(NZ))THEN
         FXRNX=FXRN(iPlantNfixType(NZ))/(1.0+CCNDLB/CCNGB)
 !    2/(1.0+CCNDLB/(CCNGB*FXRN(iPlantNfixType(NZ))))
-        CPOOLD=(EPOOL(ielmc,NB,NZ)*WTNDB1-EPOLNB(ielmc,NB,NZ)*WTLSB1)/WTLSBT
+        CPOOLD=(NonstructElmnt_brch(ielmc,NB,NZ)*WTNDB1-NoduleNonstructElmnt_brch(ielmc,NB,NZ)*WTLSB1)/WTLSBT
         XFRC=FXRNX*CPOOLD
-        EPOOL(ielmc,NB,NZ)=EPOOL(ielmc,NB,NZ)-XFRC
-        EPOLNB(ielmc,NB,NZ)=EPOLNB(ielmc,NB,NZ)+XFRC
-        CPOOLT=EPOOL(ielmc,NB,NZ)+EPOLNB(ielmc,NB,NZ)
+        NonstructElmnt_brch(ielmc,NB,NZ)=NonstructElmnt_brch(ielmc,NB,NZ)-XFRC
+        NoduleNonstructElmnt_brch(ielmc,NB,NZ)=NoduleNonstructElmnt_brch(ielmc,NB,NZ)+XFRC
+        CPOOLT=NonstructElmnt_brch(ielmc,NB,NZ)+NoduleNonstructElmnt_brch(ielmc,NB,NZ)
         IF(CPOOLT.GT.ZEROP(NZ))THEN
-          ZPOOLD=(EPOOL(ielmn,NB,NZ)*EPOLNB(ielmc,NB,NZ)-EPOLNB(ielmn,NB,NZ)*EPOOL(ielmc,NB,NZ))/CPOOLT
+          ZPOOLD=(NonstructElmnt_brch(ielmn,NB,NZ)*NoduleNonstructElmnt_brch(ielmc,NB,NZ)-NoduleNonstructElmnt_brch(ielmn,NB,NZ)*NonstructElmnt_brch(ielmc,NB,NZ))/CPOOLT
           XFRN=FXRNX*ZPOOLD
-          PPOOLD=(EPOOL(ielmp,NB,NZ)*EPOLNB(ielmc,NB,NZ)-EPOLNB(ielmp,NB,NZ)*EPOOL(ielmc,NB,NZ))/CPOOLT
+          PPOOLD=(NonstructElmnt_brch(ielmp,NB,NZ)*NoduleNonstructElmnt_brch(ielmc,NB,NZ)-NoduleNonstructElmnt_brch(ielmp,NB,NZ)*NonstructElmnt_brch(ielmc,NB,NZ))/CPOOLT
           XFRP=FXRNX*PPOOLD
-          EPOOL(ielmn,NB,NZ)=EPOOL(ielmn,NB,NZ)-XFRN
-          EPOOL(ielmp,NB,NZ)=EPOOL(ielmp,NB,NZ)-XFRP
-          EPOLNB(ielmn,NB,NZ)=EPOLNB(ielmn,NB,NZ)+XFRN
-          EPOLNB(ielmp,NB,NZ)=EPOLNB(ielmp,NB,NZ)+XFRP
+          NonstructElmnt_brch(ielmn,NB,NZ)=NonstructElmnt_brch(ielmn,NB,NZ)-XFRN
+          NonstructElmnt_brch(ielmp,NB,NZ)=NonstructElmnt_brch(ielmp,NB,NZ)-XFRP
+          NoduleNonstructElmnt_brch(ielmn,NB,NZ)=NoduleNonstructElmnt_brch(ielmn,NB,NZ)+XFRN
+          NoduleNonstructElmnt_brch(ielmp,NB,NZ)=NoduleNonstructElmnt_brch(ielmp,NB,NZ)+XFRP
         ENDIF
       ENDIF
     ENDIF
@@ -402,13 +402,13 @@ module NoduleBGCMod
   real(r8) :: RCNDL,RMNDL,RXNDL
   real(r8) :: RGNDL,RSNDL
   real(r8) :: RGN2P,RGN2F
-  real(r8) :: RXNDLE(NumOfPlantChemElements)
-  real(r8) :: RDNDLE(NumOfPlantChemElements)
-  real(r8) :: RCNDLE(NumOfPlantChemElements)
+  real(r8) :: RXNDLE(NumOfPlantChemElmnts)
+  real(r8) :: RDNDLE(NumOfPlantChemElmnts)
+  real(r8) :: RCNDLE(NumOfPlantChemElmnts)
   real(r8) :: RGNDG
-  real(r8) :: RXNSNE(NumOfPlantChemElements)
-  real(r8) :: RDNSNE(NumOfPlantChemElements)
-  real(r8) :: RCNSNE(NumOfPlantChemElements)
+  real(r8) :: RXNSNE(NumOfPlantChemElmnts)
+  real(r8) :: RDNSNE(NumOfPlantChemElmnts)
+  real(r8) :: RCNSNE(NumOfPlantChemElmnts)
   real(r8) :: RCNDLM,RXNDLM,RGNDLM
   real(r8) :: RSNDLM
   real(r8) :: SPNDLI
@@ -435,12 +435,12 @@ module NoduleBGCMod
     ESNC     =>   plt_bgcr%ESNC      , &
     UPNF     =>   plt_rbgc%UPNF      , &
     RUPNF    =>   plt_bgcr%RUPNF     , &
-    PopPlantRootC_vr   =>   plt_biom%PopPlantRootC_vr    , &
+     PopuPlantRootC_vr   =>   plt_biom% PopuPlantRootC_vr    , &
     WTNDLE   =>   plt_biom%WTNDLE    , &
     ZEROP    =>   plt_biom%ZEROP     , &
-    EPOOLN   =>   plt_biom%EPOOLN    , &
+    RootNoduleNonstructElmnt_vr  =>   plt_biom%RootNoduleNonstructElmnt_vr   , &
     ZEROL    =>   plt_biom%ZEROL     , &
-    EPOOLR   =>   plt_biom%EPOOLR    , &
+     RootMycoNonstructElmnt_vr   =>   plt_biom% RootMycoNonstructElmnt_vr    , &
     CFOPE    =>   plt_soilchem%CFOPE , &
     iPlantNfixType   =>   plt_morph%iPlantNfixType   , &
     NIXBotRootLayer     =>   plt_morph%NIXBotRootLayer       &
@@ -453,7 +453,7 @@ module NoduleBGCMod
 !
   IF(iPlantNfixType(NZ).GE.1.AND.iPlantNfixType(NZ).LE.3)THEN
     D5400: DO L=NU,NIXBotRootLayer(NZ)
-      IF(PopPlantRootC_vr(ipltroot,L,NZ).GT.ZEROL(NZ))THEN
+      IF( PopuPlantRootC_vr(ipltroot,L,NZ).GT.ZEROL(NZ))THEN
 !
 !     INITIAL INFECTION
 !
@@ -475,9 +475,9 @@ module NoduleBGCMod
 !     FCNPF=N,P constraint to bacterial activity
 !
         IF(WTNDLE(ielmc,L,NZ).GT.ZEROP(NZ))THEN
-          CCPOLN=AZMAX1(EPOOLN(ielmc,L,NZ)/WTNDLE(ielmc,L,NZ))
-          CZPOLN=AZMAX1(EPOOLN(ielmn,L,NZ)/WTNDLE(ielmc,L,NZ))
-          CPPOLN=AZMAX1(EPOOLN(ielmp,L,NZ)/WTNDLE(ielmc,L,NZ))
+          CCPOLN=AZMAX1(RootNoduleNonstructElmnt_vr(ielmc,L,NZ)/WTNDLE(ielmc,L,NZ))
+          CZPOLN=AZMAX1(RootNoduleNonstructElmnt_vr(ielmn,L,NZ)/WTNDLE(ielmc,L,NZ))
+          CPPOLN=AZMAX1(RootNoduleNonstructElmnt_vr(ielmp,L,NZ)/WTNDLE(ielmc,L,NZ))
         ELSE
           CCPOLN=1.0_r8
           CZPOLN=1.0_r8
@@ -514,9 +514,9 @@ module NoduleBGCMod
 !     FCNPF=N,P constraint to bacterial activity
 !     WFNGR=growth function of root water potential
 !
-        RCNDLM=AZMAX1(AMIN1(EPOOLN(ielmc,L,NZ) &
+        RCNDLM=AZMAX1(AMIN1(RootNoduleNonstructElmnt_vr(ielmc,L,NZ) &
           ,VMXO*WTNDLE(ielmc,L,NZ))*FCNPF*fTgrowRootP(L,NZ)*WFNGR(1,L))
-        CPOOLNX=EPOOLN(ielmc,L,NZ)
+        CPOOLNX=RootNoduleNonstructElmnt_vr(ielmc,L,NZ)
 !
 !     O2-LIMITED NODULE RESPIRATION FROM 'WFR' IN 'UPTAKE'
 !
@@ -589,7 +589,7 @@ module NoduleBGCMod
         RCCN=CNC*RCCXN
         RCCP=CPC*RCCQN
         SPNDX=SPNDL*SQRT(fTgrowRootP(L,NZ)*WFNGR(1,L))
-        DO NE=1,NumOfPlantChemElements
+        DO NE=1,NumOfPlantChemElmnts
           RXNDLE(NE)=SPNDX*WTNDLE(NE,L,NZ)
         ENDDO
 
@@ -619,12 +619,12 @@ module NoduleBGCMod
 !     CCPOLN,CZPOLN,CPPOLN=nonstructural C,N,P concn in bacteria
 !     CZKM,CPKM=Km for nonstructural N,P uptake by bacteria
 !
-        CGNDL=AMIN1(EPOOLN(ielmc,L,NZ)-AMIN1(RMNDL,RCNDL) &
+        CGNDL=AMIN1(RootNoduleNonstructElmnt_vr(ielmc,L,NZ)-AMIN1(RMNDL,RCNDL) &
           -RGN2F+RCNDLE(ielmc),(RGNDL-RGN2F)/(1.0_r8-DMND(NZ)))
         GRNDG=CGNDL*DMND(NZ)
         RGNDG=RGN2F+CGNDL*(1.0_r8-DMND(NZ))
-        ZADDN=AZMAX1(AMIN1(EPOOLN(ielmn,L,NZ),GRNDG*CNND(NZ)))*CZPOLN/(CZPOLN+CZKM)
-        PADDN=AZMAX1(AMIN1(EPOOLN(ielmp,L,NZ),GRNDG*CPND(NZ)))*CPPOLN/(CPPOLN+CPKM)
+        ZADDN=AZMAX1(AMIN1(RootNoduleNonstructElmnt_vr(ielmn,L,NZ),GRNDG*CNND(NZ)))*CZPOLN/(CZPOLN+CZKM)
+        PADDN=AZMAX1(AMIN1(RootNoduleNonstructElmnt_vr(ielmp,L,NZ),GRNDG*CPND(NZ)))*CPPOLN/(CPPOLN+CPKM)
 !
 !     NODULE SENESCENCE
 !
@@ -642,13 +642,13 @@ module NoduleBGCMod
           RDNSNE(ielmc)=RXNSNE(ielmc)*(1.0_r8-RCCC)
           RDNSNE(ielmn)=RXNSNE(ielmn)*(1.0_r8-RCCC)*(1.0_r8-RCCN)
           RDNSNE(ielmp)=RXNSNE(ielmp)*(1.0_r8-RCCC)*(1.0_r8-RCCP)
-          DO NE=1,NumOfPlantChemElements
+          DO NE=1,NumOfPlantChemElmnts
             RCNSNE(NE)=RXNSNE(NE)-RDNSNE(NE)
           ENDDO
         ELSE
-          RXNSNE(1:NumOfPlantChemElements)=0._r8
-          RDNSNE(1:NumOfPlantChemElements)=0._r8
-          RCNSNE(1:NumOfPlantChemElements)=0._r8
+          RXNSNE(1:NumOfPlantChemElmnts)=0._r8
+          RDNSNE(1:NumOfPlantChemElmnts)=0._r8
+          RCNSNE(1:NumOfPlantChemElmnts)=0._r8
         ENDIF
 !
 !     TOTAL NODULE RESPIRATION
@@ -676,7 +676,7 @@ module NoduleBGCMod
 !     RDNSNE(ielmc),RDNSNE(ielmc),RDNSNE(ielmp)=bacterial C,N,P senescence to litterfall
 !
         D6370: DO M=1,jsken
-          DO NE=1,NumOfPlantChemElements
+          DO NE=1,NumOfPlantChemElmnts
             ESNC(NE,M,k_fine_litr,L,NZ)=ESNC(NE,M,k_fine_litr,L,NZ)&
               +CFOPE(NE,iroot,M,NZ)*(RDNDLE(NE)+RDNSNE(NE))
           ENDDO
@@ -694,9 +694,9 @@ module NoduleBGCMod
 !     ZADDN,PADDN=nonstructural N,P used in growth
 !     RUPNF=root N2 fixation
 !
-        EPOOLN(ielmc,L,NZ)=EPOOLN(ielmc,L,NZ)-AMIN1(RMNDL,RCNDL)-RGN2F-CGNDL+RCNDLE(ielmc)
-        EPOOLN(ielmn,L,NZ)=EPOOLN(ielmn,L,NZ)-ZADDN+RCNDLE(ielmn)+RCNSNE(ielmn)+RUPNF(L,NZ)
-        EPOOLN(ielmp,L,NZ)=EPOOLN(ielmp,L,NZ)-PADDN+RCNDLE(ielmp)+RCNSNE(ielmp)
+        RootNoduleNonstructElmnt_vr(ielmc,L,NZ)=RootNoduleNonstructElmnt_vr(ielmc,L,NZ)-AMIN1(RMNDL,RCNDL)-RGN2F-CGNDL+RCNDLE(ielmc)
+        RootNoduleNonstructElmnt_vr(ielmn,L,NZ)=RootNoduleNonstructElmnt_vr(ielmn,L,NZ)-ZADDN+RCNDLE(ielmn)+RCNSNE(ielmn)+RUPNF(L,NZ)
+        RootNoduleNonstructElmnt_vr(ielmp,L,NZ)=RootNoduleNonstructElmnt_vr(ielmp,L,NZ)-PADDN+RCNDLE(ielmp)+RCNSNE(ielmp)
 !
 !     UPDATE STATE VARIABLES FOR NODULE C, N, P
 !
@@ -723,31 +723,31 @@ module NoduleBGCMod
 !     XFRC,XFRN,XFRC=nonstructural C,N,P transfer
 !     CPOOLN,ZPOOLN,PPOOLN=nonstructural C,N,P in bacteria
 !
-        IF(EPOOLR(ielmc,ipltroot,L,NZ).GT.ZEROP(NZ) &
-          .AND.PopPlantRootC_vr(ipltroot,L,NZ).GT.ZEROL(NZ))THEN
-          CCNDLR=WTNDLE(ielmc,L,NZ)/PopPlantRootC_vr(ipltroot,L,NZ)
-          WTRTD1=PopPlantRootC_vr(ipltroot,L,NZ)
-          WTNDL1=AMIN1(PopPlantRootC_vr(ipltroot,L,NZ),AMAX1(WTNDI*AREA3(NU),WTNDLE(ielmc,L,NZ)))
+        IF( RootMycoNonstructElmnt_vr(ielmc,ipltroot,L,NZ).GT.ZEROP(NZ) &
+          .AND. PopuPlantRootC_vr(ipltroot,L,NZ).GT.ZEROL(NZ))THEN
+          CCNDLR=WTNDLE(ielmc,L,NZ)/ PopuPlantRootC_vr(ipltroot,L,NZ)
+          WTRTD1= PopuPlantRootC_vr(ipltroot,L,NZ)
+          WTNDL1=AMIN1( PopuPlantRootC_vr(ipltroot,L,NZ),AMAX1(WTNDI*AREA3(NU),WTNDLE(ielmc,L,NZ)))
           WTRTDT=WTRTD1+WTNDL1
           IF(WTRTDT.GT.ZEROP(NZ))THEN
             FXRNX=FXRN(iPlantNfixType(NZ))/(1.0_r8+CCNDLR/CCNGR)
 !    2/(1.0+CCNDLR/(CCNGR*FXRN(iPlantNfixType(NZ))))
-            CPOOLD=(EPOOLR(ielmc,ipltroot,L,NZ)*WTNDL1-EPOOLN(ielmc,L,NZ)*WTRTD1)/WTRTDT
+            CPOOLD=( RootMycoNonstructElmnt_vr(ielmc,ipltroot,L,NZ)*WTNDL1-RootNoduleNonstructElmnt_vr(ielmc,L,NZ)*WTRTD1)/WTRTDT
             XFRC=FXRNX*CPOOLD
-            EPOOLR(ielmc,ipltroot,L,NZ)=EPOOLR(ielmc,ipltroot,L,NZ)-XFRC
-            EPOOLN(ielmc,L,NZ)=EPOOLN(ielmc,L,NZ)+XFRC
-            CPOOLT=EPOOLR(ielmc,ipltroot,L,NZ)+EPOOLN(ielmc,L,NZ)
+             RootMycoNonstructElmnt_vr(ielmc,ipltroot,L,NZ)= RootMycoNonstructElmnt_vr(ielmc,ipltroot,L,NZ)-XFRC
+            RootNoduleNonstructElmnt_vr(ielmc,L,NZ)=RootNoduleNonstructElmnt_vr(ielmc,L,NZ)+XFRC
+            CPOOLT= RootMycoNonstructElmnt_vr(ielmc,ipltroot,L,NZ)+RootNoduleNonstructElmnt_vr(ielmc,L,NZ)
             IF(CPOOLT.GT.ZEROP(NZ))THEN
-              ZPOOLD=(EPOOLR(ielmn,ipltroot,L,NZ)*EPOOLN(ielmc,L,NZ) &
-                -EPOOLN(ielmn,L,NZ)*EPOOLR(ielmc,ipltroot,L,NZ))/CPOOLT
+              ZPOOLD=( RootMycoNonstructElmnt_vr(ielmn,ipltroot,L,NZ)*RootNoduleNonstructElmnt_vr(ielmc,L,NZ) &
+                -RootNoduleNonstructElmnt_vr(ielmn,L,NZ)* RootMycoNonstructElmnt_vr(ielmc,ipltroot,L,NZ))/CPOOLT
               XFRN=FXRNX*ZPOOLD
-              PPOOLD=(EPOOLR(ielmp,ipltroot,L,NZ)*EPOOLN(ielmc,L,NZ) &
-                -EPOOLN(ielmp,L,NZ)*EPOOLR(ielmc,ipltroot,L,NZ))/CPOOLT
+              PPOOLD=( RootMycoNonstructElmnt_vr(ielmp,ipltroot,L,NZ)*RootNoduleNonstructElmnt_vr(ielmc,L,NZ) &
+                -RootNoduleNonstructElmnt_vr(ielmp,L,NZ)* RootMycoNonstructElmnt_vr(ielmc,ipltroot,L,NZ))/CPOOLT
               XFRP=FXRNX*PPOOLD
-              EPOOLR(ielmn,ipltroot,L,NZ)=EPOOLR(ielmn,ipltroot,L,NZ)-XFRN
-              EPOOLR(ielmp,ipltroot,L,NZ)=EPOOLR(ielmp,ipltroot,L,NZ)-XFRP
-              EPOOLN(ielmn,L,NZ)=EPOOLN(ielmn,L,NZ)+XFRN
-              EPOOLN(ielmp,L,NZ)=EPOOLN(ielmp,L,NZ)+XFRP
+               RootMycoNonstructElmnt_vr(ielmn,ipltroot,L,NZ)= RootMycoNonstructElmnt_vr(ielmn,ipltroot,L,NZ)-XFRN
+               RootMycoNonstructElmnt_vr(ielmp,ipltroot,L,NZ)= RootMycoNonstructElmnt_vr(ielmp,ipltroot,L,NZ)-XFRP
+              RootNoduleNonstructElmnt_vr(ielmn,L,NZ)=RootNoduleNonstructElmnt_vr(ielmn,L,NZ)+XFRN
+              RootNoduleNonstructElmnt_vr(ielmp,L,NZ)=RootNoduleNonstructElmnt_vr(ielmp,L,NZ)+XFRP
             ENDIF
           ENDIF
         ENDIF

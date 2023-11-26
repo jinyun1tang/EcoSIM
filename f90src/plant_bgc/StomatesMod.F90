@@ -667,7 +667,7 @@
   real(r8), intent(in) :: TFN1,TFN2,TFNE,XKO2L
 !     begin_execution
   associate(                          &
-    CEPOLB =>  plt_biom%CEPOLB  , &
+    LeafPetioNonstructElmntConc_brch =>  plt_biom%LeafPetioNonstructElmntConc_brch  , &
     iPlantPhenologyType =>  plt_pheno%iPlantPhenologyType , &
     iPlantTurnoverPattern =>  plt_pheno%iPlantTurnoverPattern , &
     FLG4   =>  plt_pheno%FLG4   , &
@@ -685,9 +685,9 @@
 !     RubiscoActivity_brpft=N,P feedback inhibition on C3 CO2 fixation
 !     CNKI,CPKI=nonstructural N,P inhibition constant on rubisco
 !
-  IF(CEPOLB(ielmc,NB,NZ).GT.ZERO)THEN
-    RubiscoActivity_brpft(NB,NZ)=AMIN1(CEPOLB(ielmn,NB,NZ)/(CEPOLB(ielmn,NB,NZ)+CEPOLB(ielmc,NB,NZ)/CNKI) &
-      ,CEPOLB(ielmp,NB,NZ)/(CEPOLB(ielmp,NB,NZ)+CEPOLB(ielmc,NB,NZ)/CPKI))
+  IF(LeafPetioNonstructElmntConc_brch(ielmc,NB,NZ).GT.ZERO)THEN
+    RubiscoActivity_brpft(NB,NZ)=AMIN1(LeafPetioNonstructElmntConc_brch(ielmn,NB,NZ)/(LeafPetioNonstructElmntConc_brch(ielmn,NB,NZ)+LeafPetioNonstructElmntConc_brch(ielmc,NB,NZ)/CNKI) &
+      ,LeafPetioNonstructElmntConc_brch(ielmp,NB,NZ)/(LeafPetioNonstructElmntConc_brch(ielmp,NB,NZ)+LeafPetioNonstructElmntConc_brch(ielmc,NB,NZ)/CPKI))
   ELSE
     RubiscoActivity_brpft(NB,NZ)=1.0_r8
   ENDIF
@@ -744,7 +744,7 @@
   real(r8) :: TKCO
 !     begin_execution
   associate(                          &
-    CEPOLB =>  plt_biom%CEPOLB  , &
+    LeafPetioNonstructElmntConc_brch =>  plt_biom%LeafPetioNonstructElmntConc_brch  , &
     TKCZ   =>  plt_ew%TKCZ      , &
     OFFST  =>  plt_pheno%OFFST  , &
     XKO2   =>  plt_photo%XKO2   , &
