@@ -66,7 +66,7 @@ module NutUptakeMod
     LeafPetioNonstructElmntConc_brch  =>  plt_biom%LeafPetioNonstructElmntConc_brch   , &
     CanPStomaResistH2O      =>  plt_photo%CanPStomaResistH2O      , &
     CanPbndlResist     =>  plt_photo%CanPbndlResist     , &
-    CanopyBranchLeafA_pft   =>  plt_morph%CanopyBranchLeafA_pft   , &
+    LeafAreaLive_brch   =>  plt_morph%LeafAreaLive_brch   , &
     NumOfBranches_pft     =>  plt_morph%NumOfBranches_pft     , &
     FracPARByCanP   =>  plt_rad%FracPARByCanP     , &
     CanopyLeafA_pft   =>  plt_morph%CanopyLeafA_pft     &
@@ -79,7 +79,7 @@ module NutUptakeMod
   !     SNH3P,SNH3X=NH3 solubility at TCelciusCanopy, 25 oC
   !     TCelciusCanopy=canopy temperature (oC)
   !     FDMP,FNH3P=canopy dry matter content,NH3 concentration
-  !     CanopyBranchLeafA_pft,CanopyLeafA_pft=branch,canopy leaf area
+  !     LeafAreaLive_brch,CanopyLeafA_pft=branch,canopy leaf area
   !     CNH3P,CNH3E=gaseous NH3 concentration in branch,atmosphere
   !     CZPOLB,ZPOOLB=nonstplt_rbgc%RUCtural N concentration,content in branch
   !     RNH3B=NH3 flux between atmosphere and branch
@@ -89,12 +89,12 @@ module NutUptakeMod
   SNH3P=SNH3X*EXP(0.513_r8-0.0171_r8*TCelciusCanopy(NZ))
   FNH3P=1.0E-04_r8*FDMP
   D105: DO NB=1,NumOfBranches_pft(NZ)
-    IF(LeafPetioleBiomassC_brch(NB,NZ).GT.ZEROP(NZ).AND.CanopyBranchLeafA_pft(NB,NZ).GT.ZEROP(NZ) &
+    IF(LeafPetioleBiomassC_brch(NB,NZ).GT.ZEROP(NZ).AND.LeafAreaLive_brch(NB,NZ).GT.ZEROP(NZ) &
       .AND.CanopyLeafA_pft(NZ).GT.ZEROP(NZ))THEN
       CNH3P=AZMAX1(FNH3P*LeafPetioNonstructElmntConc_brch(ielmn,NB,NZ)/SNH3P)
       ZPOOLB=AZMAX1(NonstructElmnt_brch(ielmn,NB,NZ))
       RNH3B(NB,NZ)=AMIN1(0.1_r8*ZPOOLB,AMAX1((CNH3E-CNH3P)/(CanPbndlResist(NZ)+CanPStomaResistH2O(NZ)) &
-        *FracPARByCanP(NZ)*AREA3(NU)*CanopyBranchLeafA_pft(NB,NZ)/CanopyLeafA_pft(NZ),-0.1_r8*ZPOOLB))
+        *FracPARByCanP(NZ)*AREA3(NU)*LeafAreaLive_brch(NB,NZ)/CanopyLeafA_pft(NZ),-0.1_r8*ZPOOLB))
     ELSE
       RNH3B(NB,NZ)=0.0_r8
     ENDIF

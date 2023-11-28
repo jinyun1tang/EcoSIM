@@ -90,7 +90,7 @@ module StartqMod
         D6401: DO L=1,NL(NY,NX)
           DO  K=1,pltpar%NumOfPlantLitrCmplxs
             DO  M=1,jskenc
-              ESNC(1:NumOfPlantChemElmnts,M,K,L,NZ,NY,NX)=0._r8
+              LitterFallChemElmnt_pftvr(1:NumOfPlantChemElmnts,M,K,L,NZ,NY,NX)=0._r8
             enddo
           enddo
         ENDDO D6401
@@ -534,11 +534,11 @@ module StartqMod
   GrainChemElmnts_brch(1:NumOfPlantChemElmnts,1:MaxNumBranches,NZ,NY,NX)=0._r8
   EarChemElmnts_brch(1:NumOfPlantChemElmnts,1:MaxNumBranches,NZ,NY,NX)=0._r8
   WTNDBE(1:NumOfPlantChemElmnts,1:MaxNumBranches,NZ,NY,NX)=0._r8
-  RCELX(1:NumOfPlantChemElmnts,1:MaxNumBranches,NZ,NY,NX)=0._r8
-  RCESX(1:NumOfPlantChemElmnts,1:MaxNumBranches,NZ,NY,NX)=0._r8
-  WGSHEXE(1:NumOfPlantChemElmnts,1:MaxNumBranches,NZ,NY,NX)=0._r8  
+  LeafElmntRemobFlx_brch(1:NumOfPlantChemElmnts,1:MaxNumBranches,NZ,NY,NX)=0._r8
+  PetioleChemElmntRemobFlx_brch(1:NumOfPlantChemElmnts,1:MaxNumBranches,NZ,NY,NX)=0._r8
+  PetioleChemElmntRemob_brch(1:NumOfPlantChemElmnts,1:MaxNumBranches,NZ,NY,NX)=0._r8  
   WTSTXBE(1:NumOfPlantChemElmnts,1:MaxNumBranches,NZ,NY,NX)=0._r8
-  WGLFEX(1:NumOfPlantChemElmnts,1:MaxNumBranches,NZ,NY,NX)=0._r8
+  LeafChemElmntRemob_brch(1:NumOfPlantChemElmnts,1:MaxNumBranches,NZ,NY,NX)=0._r8
   
   D25: DO NB=1,MaxNumBranches
     StalkBiomassC_brch(NB,NZ,NY,NX)=0._r8
@@ -546,9 +546,9 @@ module StartqMod
     GRNXB(NB,NZ,NY,NX)=0._r8
     GRNOB(NB,NZ,NY,NX)=0._r8
     GRWTB(NB,NZ,NY,NX)=0._r8
-    CanopyBranchLeafA_pft(NB,NZ,NY,NX)=0._r8
+    LeafAreaLive_brch(NB,NZ,NY,NX)=0._r8
     RNH3B(NB,NZ,NY,NX)=0._r8
-    ARLFZ(NB,NZ,NY,NX)=0._r8
+    LeafAreaDying_brch(NB,NZ,NY,NX)=0._r8
     CanPBranchHeight(NB,NZ,NY,NX)=0._r8
     
     D5: DO L=1,JC
@@ -558,15 +558,15 @@ module StartqMod
       enddo
     ENDDO D5
     DO K=0,MaxNodesPerBranch
-      ARLF(K,NB,NZ,NY,NX)=0._r8
-      HTNODE(K,NB,NZ,NY,NX)=0._r8
-      HTNODX(K,NB,NZ,NY,NX)=0._r8
-      CanPSheathHeight(K,NB,NZ,NY,NX)=0._r8
-      WGLFE(1:NumOfPlantChemElmnts,K,NB,NZ,NY,NX)=0._r8
-      WGSHE(1:NumOfPlantChemElmnts,K,NB,NZ,NY,NX)=0._r8
-      WGNODE(1:NumOfPlantChemElmnts,K,NB,NZ,NY,NX)=0._r8
-      WSLF(K,NB,NZ,NY,NX)=0._r8
-      WSSHE(K,NB,NZ,NY,NX)=0._r8
+      LeafAreaNode_brch(K,NB,NZ,NY,NX)=0._r8
+      InternodeHeightLive_brch(K,NB,NZ,NY,NX)=0._r8
+      InternodeHeightDying_brch(K,NB,NZ,NY,NX)=0._r8
+      PetioleLengthNode_brch(K,NB,NZ,NY,NX)=0._r8
+      LeafChemElmntNode_brch(1:NumOfPlantChemElmnts,K,NB,NZ,NY,NX)=0._r8
+      PetioleElmntNode_brch(1:NumOfPlantChemElmnts,K,NB,NZ,NY,NX)=0._r8
+      InternodeChemElmnt_brch(1:NumOfPlantChemElmnts,K,NB,NZ,NY,NX)=0._r8
+      LeafProteinCNode_brch(K,NB,NZ,NY,NX)=0._r8
+      PetioleProteinCNode_brch(K,NB,NZ,NY,NX)=0._r8
 
       D55: DO L=1,JC
         CanPLNBLA(L,K,NB,NZ,NY,NX)=0._r8
@@ -779,7 +779,7 @@ module StartqMod
       IF(N.EQ.1)THEN
         D6400: DO K=1,pltpar%NumOfPlantLitrCmplxs
           DO  M=1,jskenc
-            ESNC(1:NumOfPlantChemElmnts,M,K,L,NZ,NY,NX)=0._r8
+            LitterFallChemElmnt_pftvr(1:NumOfPlantChemElmnts,M,K,L,NZ,NY,NX)=0._r8
           enddo
         ENDDO D6400
         RootNoduleNonstructElmnt_vr(1:NumOfPlantChemElmnts,L,NZ,NY,NX)=0._r8

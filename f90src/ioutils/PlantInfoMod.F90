@@ -334,8 +334,8 @@ implicit none
     CanopyPARalbedo_pft(NZ,NY,NX)=CanopyPARalbedo_pft(NZ,NY,NX)/CanopyPARabsorpty_pft(NZ,NY,NX)
     TAUR(NZ,NY,NX)=TAUR(NZ,NY,NX)/CanopySWabsorpty_pft(NZ,NY,NX)
     TAUP(NZ,NY,NX)=TAUP(NZ,NY,NX)/CanopyPARabsorpty_pft(NZ,NY,NX)
-    ANGBR(NZ,NY,NX)=SIN(ANGBR(NZ,NY,NX)/57.29578_r8)
-    ANGSH(NZ,NY,NX)=SIN(ANGSH(NZ,NY,NX)/57.29578_r8)
+    SineBranchAngle_pft(NZ,NY,NX)=SIN(BranchAngle_pft(NZ,NY,NX)*RadianPerDegree)
+    SinePetioleAngle_pft(NZ,NY,NX)=SIN(PetioleAngle_pft(NZ,NY,NX)*RadianPerDegree)
     MatureGroup_pft(NZ,NY,NX)=GROUPX(NZ,NY,NX)
 
     IF(iPlantTurnoverPattern(NZ,NY,NX).NE.0)THEN
@@ -425,8 +425,8 @@ implicit none
 
   call ncd_getvar(pft_nfid, 'CLASS', loc,CLASS(1:JLI,NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'CFI', loc,ClumpFactort0(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'ANGBR', loc,ANGBR(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'ANGSH', loc,ANGSH(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'ANGBR', loc,BranchAngle_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'ANGSH', loc,PetioleAngle_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'STMX', loc,STMX(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'SDMX', loc,SDMX(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'GRMX', loc,MaxSeedCMass(NZ,NY,NX))
@@ -476,7 +476,7 @@ implicit none
   call ncd_getvar(pft_nfid, 'CNHSK', loc,CNHSK(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'CNEAR', loc,CNEAR(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'CNGR', loc,CNGR(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'CNumRootAxes_pft', loc,RootrNC_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'CNRT', loc,RootrNC_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'CNND', loc,CNND(NZ,NY,NX))
 
   call ncd_getvar(pft_nfid, 'CPLF', loc,CPLF(NZ,NY,NX))
@@ -711,8 +711,8 @@ implicit none
   write(*,*)'fraction of leaf area in 0-22.5,45,67.5,90o '// &
     'inclination classes: CLASS',(CLASS(N,NZ,NY,NX),N=1,JLI)
   write(*,*)'initial clumping factor: CFI',ClumpFactort0(NZ,NY,NX)
-  write(*,*)'stem angle from horizontal: ANGBR',ANGBR(NZ,NY,NX)
-  write(*,*)'petiole angle from horizontal: ANGSH',ANGSH(NZ,NY,NX)
+  write(*,*)'stem angle from horizontal: BranchAngle_pft',BranchAngle_pft(NZ,NY,NX)
+  write(*,*)'petiole angle from horizontal: PetioleAngle_pft',PetioleAngle_pft(NZ,NY,NX)
   write(*,*)'maximum potential seed mumber from '// &
     'pre-anthesis stalk growth: STMX',STMX(NZ,NY,NX)
   write(*,*)'maximum seed number per STMX: SDMX',SDMX(NZ,NY,NX)

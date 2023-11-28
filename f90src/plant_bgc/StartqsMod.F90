@@ -92,7 +92,7 @@ module StartqsMod
         plt_biom%StandingDeadChemElmnts_pft(1:NumOfPlantChemElmnts,NZ)=0._r8
         D6401: DO L=1,NL
           DO  K=1,pltpar%NumOfPlantLitrCmplxs
-            plt_bgcr%ESNC(1:NumOfPlantChemElmnts,1:jsken,K,L,NZ)=0._r8
+            plt_bgcr%LitterFallChemElmnt_pftvr(1:NumOfPlantChemElmnts,1:jsken,K,L,NZ)=0._r8
           enddo
         ENDDO D6401
       ENDDO D9986
@@ -576,7 +576,7 @@ module StartqsMod
     HourCounter4LeafOut_brch    =>  plt_pheno%HourCounter4LeafOut_brch   , &
     HoursCanopyPSITooLow    =>  plt_pheno%HoursCanopyPSITooLow   , &
     MatureGroup_pft =>  plt_pheno%MatureGroup_pft, &
-    RCESX   =>  plt_pheno%RCESX  , &
+    PetioleChemElmntRemobFlx_brch   =>  plt_pheno%PetioleChemElmntRemobFlx_brch  , &
     TGSTGF  =>  plt_pheno%TGSTGF , &
     TGSTGI  =>  plt_pheno%TGSTGI , &
     FDBKX   =>  plt_photo%FDBKX  , &
@@ -598,15 +598,15 @@ module StartqsMod
     CanopyStemA_pft   =>  plt_morph%CanopyStemA_pft  , &
     NodeNumberAtAnthesis   =>  plt_morph%NodeNumberAtAnthesis  , &
     GRNXB   =>  plt_morph%GRNXB  , &
-    HTNODE  =>  plt_morph%HTNODE , &
+    InternodeHeightLive_brch  =>  plt_morph%InternodeHeightLive_brch , &
     GRNOB   =>  plt_morph%GRNOB  , &
-    CanopyBranchLeafA_pft   =>  plt_morph%CanopyBranchLeafA_pft  , &
-    ARLFZ   =>  plt_morph%ARLFZ  , &
+    LeafAreaLive_brch   =>  plt_morph%LeafAreaLive_brch  , &
+    LeafAreaDying_brch   =>  plt_morph%LeafAreaDying_brch  , &
     CanPLNBLA   =>  plt_morph%CanPLNBLA  , &
     CanopyLeafApft_lyr   =>  plt_morph%CanopyLeafApft_lyr  , &
     CanopyStemApft_lyr   =>  plt_morph%CanopyStemApft_lyr  , &
     LeafA_lyrnodbrchpft    =>  plt_morph%LeafA_lyrnodbrchpft   , &
-    ARLF1   =>  plt_morph%ARLF1  , &
+    LeafAreaNode_brch   =>  plt_morph%LeafAreaNode_brch  , &
     CanPBranchHeight  =>  plt_morph%CanPBranchHeight , &
     HypoctoylHeight   =>  plt_morph%HypoctoylHeight  , &
     BranchNumber_brch    =>  plt_morph%BranchNumber_brch   , &
@@ -678,10 +678,10 @@ module StartqsMod
   plt_biom%GrainChemElmnts_brch(1:NumOfPlantChemElmnts,1:MaxNumBranches,NZ)=0._r8
   plt_biom%EarChemElmnts_brch(1:NumOfPlantChemElmnts,1:MaxNumBranches,NZ)=0._r8
   plt_biom%WTNDBE(1:NumOfPlantChemElmnts,1:MaxNumBranches,NZ)=0._r8
-  plt_pheno%RCELX(1:NumOfPlantChemElmnts,1:MaxNumBranches,NZ)=0._r8
-  plt_biom%WGLFEX(1:NumOfPlantChemElmnts,1:MaxNumBranches,NZ)=0._r8
-  plt_pheno%RCESX(1:NumOfPlantChemElmnts,1:MaxNumBranches,NZ)=0._r8
-  plt_biom%WGSHEXE(1:NumOfPlantChemElmnts,1:MaxNumBranches,NZ)=0._r8
+  plt_pheno%LeafElmntRemobFlx_brch(1:NumOfPlantChemElmnts,1:MaxNumBranches,NZ)=0._r8
+  plt_biom%LeafChemElmntRemob_brch(1:NumOfPlantChemElmnts,1:MaxNumBranches,NZ)=0._r8
+  plt_pheno%PetioleChemElmntRemobFlx_brch(1:NumOfPlantChemElmnts,1:MaxNumBranches,NZ)=0._r8
+  plt_biom%PetioleChemElmntRemob_brch(1:NumOfPlantChemElmnts,1:MaxNumBranches,NZ)=0._r8
   plt_biom%WTSTXBE(1:NumOfPlantChemElmnts,1:MaxNumBranches,NZ)=0._r8
 
   D25: DO NB=1,MaxNumBranches
@@ -690,9 +690,9 @@ module StartqsMod
     GRNXB(NB,NZ)=0._r8
     GRNOB(NB,NZ)=0._r8
     plt_allom%GRWTB(NB,NZ)=0._r8
-    CanopyBranchLeafA_pft(NB,NZ)=0._r8
+    LeafAreaLive_brch(NB,NZ)=0._r8
     plt_rbgc%RNH3B(NB,NZ)=0._r8
-    ARLFZ(NB,NZ)=0._r8
+    LeafAreaDying_brch(NB,NZ)=0._r8
     CanPBranchHeight(NB,NZ)=0._r8
     D5: DO L=1,NumOfCanopyLayers1
       CanopyBranchStemApft_lyr(L,NB,NZ)=0._r8
@@ -701,15 +701,15 @@ module StartqsMod
       enddo
     ENDDO D5
     DO K=0,MaxNodesPerBranch1
-      ARLF1(K,NB,NZ)=0._r8
-      HTNODE(K,NB,NZ)=0._r8
-      plt_morph%HTNODX(K,NB,NZ)=0._r8
-      plt_morph%CanPSheathHeight(K,NB,NZ)=0._r8
-      plt_biom%WSLF(K,NB,NZ)=0._r8
-      plt_biom%WSSHE(K,NB,NZ)=0._r8
-      plt_biom%WGLFE(1:NumOfPlantChemElmnts,K,NB,NZ)=0._r8
-      plt_biom%WGNODE(1:NumOfPlantChemElmnts,K,NB,NZ)=0._r8
-      plt_biom%WGSHE(1:NumOfPlantChemElmnts,K,NB,NZ)=0._r8
+      LeafAreaNode_brch(K,NB,NZ)=0._r8
+      InternodeHeightLive_brch(K,NB,NZ)=0._r8
+      plt_morph%InternodeHeightDying_brch(K,NB,NZ)=0._r8
+      plt_morph%PetioleLengthNode_brch(K,NB,NZ)=0._r8
+      plt_biom%LeafProteinCNode_brch(K,NB,NZ)=0._r8
+      plt_biom%PetioleProteinCNode_brch(K,NB,NZ)=0._r8
+      plt_biom%LeafChemElmntNode_brch(1:NumOfPlantChemElmnts,K,NB,NZ)=0._r8
+      plt_biom%InternodeChemElmnt_brch(1:NumOfPlantChemElmnts,K,NB,NZ)=0._r8
+      plt_biom%PetioleElmntNode_brch(1:NumOfPlantChemElmnts,K,NB,NZ)=0._r8
 
 
       D55: DO L=1,NumOfCanopyLayers1
@@ -987,7 +987,7 @@ module StartqsMod
       ENDDO D30
       IF(N.EQ.1)THEN
         D6400: DO K=1,pltpar%NumOfPlantLitrCmplxs
-          plt_bgcr%ESNC(1:NumOfPlantChemElmnts,1:jsken,K,L,NZ)=0._r8
+          plt_bgcr%LitterFallChemElmnt_pftvr(1:NumOfPlantChemElmnts,1:jsken,K,L,NZ)=0._r8
         ENDDO D6400
         plt_biom%RootNoduleNonstructElmnt_vr(1:NumOfPlantChemElmnts,L,NZ)=0._r8
         plt_biom%WTNDLE(1:NumOfPlantChemElmnts,L,NZ)=0._r8

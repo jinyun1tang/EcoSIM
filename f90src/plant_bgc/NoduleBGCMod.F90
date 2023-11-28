@@ -64,7 +64,7 @@ module NoduleBGCMod
     TCO2A    =>  plt_bgcr%TCO2A    , &
     Eco_AutoR_col     =>  plt_bgcr%Eco_AutoR_col     , &
     CO2NetFix_pft     =>  plt_bgcr%CO2NetFix_pft     , &
-    ESNC     =>  plt_bgcr%ESNC     , &
+    LitterFallChemElmnt_pftvr     =>  plt_bgcr%LitterFallChemElmnt_pftvr     , &
     ifoliar  =>  pltpar%ifoliar    , &
     DMND     =>  plt_allom%DMND    , &
     CNND     =>  plt_allom%CNND    , &
@@ -300,7 +300,7 @@ module NoduleBGCMod
 !
     D6470: DO M=1,jsken
       DO NE=1,NumOfPlantChemElmnts
-        ESNC(NE,M,k_fine_litr,0,NZ)=ESNC(NE,M,k_fine_litr,0,NZ) &
+        LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,0,NZ)=LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,0,NZ) &
           +CFOPE(NE,ifoliar,M,NZ)*(RDNDLE(NE)+RDNSNE(NE))
       ENDDO
     ENDDO D6470
@@ -432,7 +432,7 @@ module NoduleBGCMod
     RCO2N    =>   plt_rbgc%RCO2N     , &
     WFR      =>   plt_rbgc%WFR       , &
     RCO2A    =>   plt_rbgc%RCO2A     , &
-    ESNC     =>   plt_bgcr%ESNC      , &
+    LitterFallChemElmnt_pftvr     =>   plt_bgcr%LitterFallChemElmnt_pftvr      , &
     UPNF     =>   plt_rbgc%UPNF      , &
     RUPNF    =>   plt_bgcr%RUPNF     , &
      PopuPlantRootC_vr   =>   plt_biom% PopuPlantRootC_vr    , &
@@ -677,7 +677,7 @@ module NoduleBGCMod
 !
         D6370: DO M=1,jsken
           DO NE=1,NumOfPlantChemElmnts
-            ESNC(NE,M,k_fine_litr,L,NZ)=ESNC(NE,M,k_fine_litr,L,NZ)&
+            LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,L,NZ)=LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,L,NZ)&
               +CFOPE(NE,iroot,M,NZ)*(RDNDLE(NE)+RDNSNE(NE))
           ENDDO
         ENDDO D6370

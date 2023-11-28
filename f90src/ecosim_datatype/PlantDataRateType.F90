@@ -28,17 +28,17 @@ module PlantDataRateType
   real(r8),target,allocatable ::  RUPP2B(:,:,:,:,:)                  !root uptake of H2PO4 band
   real(r8),target,allocatable ::  RUPP1P(:,:,:,:,:)                  !HPO4 demand in non-band by each root population
   real(r8),target,allocatable ::  RUPP1B(:,:,:,:,:)                  !HPO4 demand in band by each root population
-  real(r8),target,allocatable ::  RCELX(:,:,:,:,:)                   !element translocated from leaf during senescence, [g d-2 h-1]
+  real(r8),target,allocatable ::  LeafElmntRemobFlx_brch(:,:,:,:,:)                   !element translocated from leaf during senescence, [g d-2 h-1]
   real(r8),target,allocatable ::  RCZSX(:,:,:,:)                     !N translocated from sheath during senescence, [g d-2 h-1]
   real(r8),target,allocatable ::  RCPSX(:,:,:,:)                     !P translocated from sheath during senescence, [g d-2 h-1]
-  real(r8),target,allocatable ::  RCESX(:,:,:,:,:)                   !element translocated from sheath during senescence, [g d-2 h-1]
+  real(r8),target,allocatable ::  PetioleChemElmntRemobFlx_brch(:,:,:,:,:)                   !element translocated from sheath during senescence, [g d-2 h-1]
   real(r8),target,allocatable ::  GrossCO2Fix_pft(:,:,:)                       !total gross CO2 fixation, [g d-2 ]
   real(r8),target,allocatable ::  LitrfallChemElmnts_pft(:,:,:,:)                     !total plant element litterfall , [g d-2 ]
   real(r8),target,allocatable ::  TZUPFX(:,:,:)                      !total plant N2 fixation, [g d-2 ]
   real(r8),target,allocatable ::  GrossResp_pft(:,:,:)                       !total plant respiration, [g d-2 ]
   real(r8),target,allocatable ::  BALE(:,:,:,:)                      !plant element balance, [g d-2]
-  real(r8),target,allocatable ::  HESNC(:,:,:,:)                     !plant element litterfall, [g d-2 h-1]
-  real(r8),target,allocatable ::  ESNC(:,:,:,:,:,:,:)                !plant litterfall element, [g d-2 h-1]
+  real(r8),target,allocatable ::  LitterFallChemElmnt_pft(:,:,:,:)                     !plant element litterfall, [g d-2 h-1]
+  real(r8),target,allocatable ::  LitterFallChemElmnt_pftvr(:,:,:,:,:,:,:)                !plant litterfall element, [g d-2 h-1]
   real(r8),target,allocatable ::  NetPrimaryProductvity_pft(:,:,:)                        !total net primary productivity, [g d-2]
   real(r8),target,allocatable ::  ETCanP(:,:,:)                       !total transpiration, [m d-2], <0 into atmosphere
   real(r8),target,allocatable ::  TCO2A(:,:,:)                       !total autotrophic respiration, [g d-2 ]
@@ -168,15 +168,15 @@ module PlantDataRateType
   allocate(RUPP2B(jroots,JZ,JP,JY,JX));RUPP2B=0._r8
   allocate(RUPP1P(jroots,JZ,JP,JY,JX));RUPP1P=0._r8
   allocate(RUPP1B(jroots,JZ,JP,JY,JX));RUPP1B=0._r8
-  allocate(RCELX(NumOfPlantChemElmnts,MaxNumBranches,JP,JY,JX)); RCELX=0._r8
-  allocate(RCESX(NumOfPlantChemElmnts,MaxNumBranches,JP,JY,JX)); RCESX=0._r8
+  allocate(LeafElmntRemobFlx_brch(NumOfPlantChemElmnts,MaxNumBranches,JP,JY,JX)); LeafElmntRemobFlx_brch=0._r8
+  allocate(PetioleChemElmntRemobFlx_brch(NumOfPlantChemElmnts,MaxNumBranches,JP,JY,JX)); PetioleChemElmntRemobFlx_brch=0._r8
   allocate(GrossCO2Fix_pft(JP,JY,JX));    GrossCO2Fix_pft=0._r8
   allocate(LitrfallChemElmnts_pft(NumOfPlantChemElmnts,JP,JY,JX));    LitrfallChemElmnts_pft=0._r8
   allocate(TZUPFX(JP,JY,JX));   TZUPFX=0._r8
   allocate(GrossResp_pft(JP,JY,JX));    GrossResp_pft=0._r8
   allocate(BALE(NumOfPlantChemElmnts,JP,JY,JX));     BALE=0._r8
-  allocate(HESNC(NumOfPlantChemElmnts,JP,JY,JX));    HESNC=0._r8
-  allocate(ESNC(NumOfPlantChemElmnts,jsken,1:NumOfPlantLitrCmplxs,0:JZ,JP,JY,JX));ESNC=0._r8
+  allocate(LitterFallChemElmnt_pft(NumOfPlantChemElmnts,JP,JY,JX));    LitterFallChemElmnt_pft=0._r8
+  allocate(LitterFallChemElmnt_pftvr(NumOfPlantChemElmnts,jsken,1:NumOfPlantLitrCmplxs,0:JZ,JP,JY,JX));LitterFallChemElmnt_pftvr=0._r8
   allocate(NetPrimaryProductvity_pft(JP,JY,JX));     NetPrimaryProductvity_pft=0._r8
   allocate(ETCanP(JP,JY,JX));    ETCanP=0._r8
   allocate(TCO2A(JP,JY,JX));    TCO2A=0._r8
@@ -294,15 +294,15 @@ module PlantDataRateType
   call destroy(RUPP2B)
   call destroy(RUPP1P)
   call destroy(RUPP1B)
-  call destroy(RCELX)
-  call destroy(RCESX)
+  call destroy(LeafElmntRemobFlx_brch)
+  call destroy(PetioleChemElmntRemobFlx_brch)
   call destroy(GrossCO2Fix_pft)
   call destroy(LitrfallChemElmnts_pft)
   call destroy(TZUPFX)
   call destroy(GrossResp_pft)
   call destroy(BALE)
-  call destroy(HESNC)
-  call destroy(ESNC)
+  call destroy(LitterFallChemElmnt_pft)
+  call destroy(LitterFallChemElmnt_pftvr)
   call destroy(NetPrimaryProductvity_pft)
   call destroy(ETCanP)
   call destroy(TCO2A)

@@ -774,7 +774,7 @@ module Hour1Mod
   TENGYC(NY,NX)=0.0_r8
 
   TRootGasLoss_disturb(idg_beg:idg_end-1,NY,NX)=0.0_r8
-  ZESNC(:,NY,NX)=0.0_r8
+  LitterFallChemElmnt_col(:,NY,NX)=0.0_r8
   StandingDeadChemElmnt_col(1:NumOfPlantChemElmnts,NY,NX)=0.0_r8
   PPT(NY,NX)=0.0_r8
 ! zero arrays in the snow layers

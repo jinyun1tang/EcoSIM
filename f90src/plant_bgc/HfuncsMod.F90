@@ -774,7 +774,7 @@ module HfuncsMod
     NumOfLeaves_brch   =>  plt_morph%NumOfLeaves_brch   , &
     GSTGI   =>  plt_pheno%GSTGI   , &
     DGSTGF  =>  plt_pheno%DGSTGF  , &
-    doPlantSenescence   =>  plt_pheno%doPlantSenescence   , &
+    doSenescence_brch   =>  plt_pheno%doSenescence_brch   , &
     VSTGX   =>  plt_pheno%VSTGX   , &
     iPlantDevelopPattern  =>  plt_pheno%iPlantDevelopPattern  , &
     TGSTGF  =>  plt_pheno%TGSTGF  , &
@@ -863,7 +863,7 @@ module HfuncsMod
 !   GSTGF=reproductive node number normalized for maturity group
 !   NodeNumberAtAnthesis=node number at flowering
 !   DGSTGF,TGSTGF=hourly,total change in GSTGF
-!   doPlantSenescence=PFT senescence flag
+!   doSenescence_brch=PFT senescence flag
 !
     IF(iPlantCalendar(ipltcal_InitFloral,NB,NZ).NE.0)THEN
       GSTGI(NB,NZ)=(ShootNodeNumber(NB,NZ)-NodeNumberToInitFloral(NB,NZ))/MatureGroup_pft(NZ)
@@ -875,9 +875,9 @@ module HfuncsMod
       DGSTGF(NB,NZ)=NodeInitRate/(MatureGroup_pft(NZ)*GSTGR)
       TGSTGF(NB,NZ)=TGSTGF(NB,NZ)+DGSTGF(NB,NZ)
     ENDIF
-    doPlantSenescence(NB,NZ)=itrue
+    doSenescence_brch(NB,NZ)=itrue
   ELSE
-    doPlantSenescence(NB,NZ)=ifalse
+    doSenescence_brch(NB,NZ)=ifalse
   ENDIF
 !
 ! REPRODUCTIVE GROWTH STAGES ADVANCE WHEN THRESHOLD NUMBER

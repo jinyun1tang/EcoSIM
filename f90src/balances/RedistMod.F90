@@ -476,12 +476,12 @@ module RedistMod
   !
   !     ACCUMULATE PLANT LITTERFALL FLUXES
   !
-  XCSN=XCSN+ZESNC(ielmc,NY,NX)
-  XZSN=XZSN+ZESNC(ielmn,NY,NX)
-  XPSN=XPSN+ZESNC(ielmp,NY,NX)
-  UXCSN(NY,NX)=UXCSN(NY,NX)+ZESNC(ielmc,NY,NX)
-  UXZSN(NY,NX)=UXZSN(NY,NX)+ZESNC(ielmn,NY,NX)
-  UXPSN(NY,NX)=UXPSN(NY,NX)+ZESNC(ielmp,NY,NX)
+  XCSN=XCSN+LitterFallChemElmnt_col(ielmc,NY,NX)
+  XZSN=XZSN+LitterFallChemElmnt_col(ielmn,NY,NX)
+  XPSN=XPSN+LitterFallChemElmnt_col(ielmp,NY,NX)
+  UXCSN(NY,NX)=UXCSN(NY,NX)+LitterFallChemElmnt_col(ielmc,NY,NX)
+  UXZSN(NY,NX)=UXZSN(NY,NX)+LitterFallChemElmnt_col(ielmn,NY,NX)
+  UXPSN(NY,NX)=UXPSN(NY,NX)+LitterFallChemElmnt_col(ielmp,NY,NX)
   !
   !     SURFACE BOUNDARY SALT FLUXES FROM RAINFALL AND SURFACE IRRIGATION
   !

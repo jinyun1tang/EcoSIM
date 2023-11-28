@@ -633,7 +633,7 @@ implicit none
     SSIN    =>  plt_rad%SSIN     , &
     PARByCanP    =>  plt_rad%PARByCanP     , &
     ZEROP   =>  plt_biom%ZEROP   , &
-    ARLF1   =>  plt_morph%ARLF1  , &
+    LeafAreaNode_brch   =>  plt_morph%LeafAreaNode_brch  , &
     RubiscoActivity_brpft    =>  plt_photo%RubiscoActivity_brpft     &
   )
 
@@ -648,11 +648,11 @@ implicit none
         D100: DO K=1,MaxNodesPerBranch1
           CH2O3(K)=0._r8
           CH2O4(K)=0._r8
-          IF(ARLF1(K,NB,NZ).GT.ZEROP(NZ))THEN
+          IF(LeafAreaNode_brch(K,NB,NZ).GT.ZEROP(NZ))THEN
 !
 !             C4 PHOTOSYNTHESIS
 !
-!             ARLF,CanPLNBLA=leaf area
+!             LeafAreaNode_brch,CanPLNBLA=leaf area
 !             iPlantPhotosynthesisType=photosynthesis type:3=C3,4=C4 from PFT file
 !             VCGR4=PEP carboxylation rate unlimited by CO2
 !

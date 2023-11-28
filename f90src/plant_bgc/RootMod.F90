@@ -380,7 +380,7 @@ implicit none
     RCO2N   =>  plt_rbgc%RCO2N      , &
     RCO2M   =>  plt_rbgc%RCO2M      , &
     WFR     =>  plt_rbgc%WFR        , &
-    ESNC    =>  plt_bgcr%ESNC       , &
+    LitterFallChemElmnt_pftvr    =>  plt_bgcr%LitterFallChemElmnt_pftvr       , &
     CNWS    =>  plt_allom%CNWS      , &
     CPWS    =>  plt_allom%CPWS      , &
     FWODRE  =>  plt_allom%FWODRE    , &
@@ -632,10 +632,10 @@ implicit none
 !
       DO NE=1,NumOfPlantChemElmnts
         D6350: DO M=1,jsken
-          ESNC(NE,M,k_woody_litr,L,NZ)=ESNC(NE,M,k_woody_litr,L,NZ)+CFOPE(NE,icwood,M,NZ) &
+          LitterFallChemElmnt_pftvr(NE,M,k_woody_litr,L,NZ)=LitterFallChemElmnt_pftvr(NE,M,k_woody_litr,L,NZ)+CFOPE(NE,icwood,M,NZ) &
             *FSNC2*(WTRT2E(NE,N,L,NR,NZ)-RCER(NE))*FWODRE(NE,k_woody_litr)
 
-          ESNC(NE,M,k_fine_litr,L,NZ)=ESNC(NE,M,k_fine_litr,L,NZ)+CFOPE(NE,iroot,M,NZ) &
+          LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,L,NZ)=LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,L,NZ)+CFOPE(NE,iroot,M,NZ) &
             *FSNC2*(WTRT2E(NE,N,L,NR,NZ)-RCER(NE))*FWODRE(NE,k_fine_litr)
         ENDDO D6350
       ENDDO
@@ -1002,13 +1002,13 @@ implicit none
 
                     DO NE=1,NumOfPlantChemElmnts
                       D6450: DO M=1,jsken
-                        ESNC(NE,M,k_woody_litr,LL,NZ)=ESNC(NE,M,k_woody_litr,LL,NZ)+CFOPE(NE,icwood,M,NZ) &
+                        LitterFallChemElmnt_pftvr(NE,M,k_woody_litr,LL,NZ)=LitterFallChemElmnt_pftvr(NE,M,k_woody_litr,LL,NZ)+CFOPE(NE,icwood,M,NZ) &
                           *FSNCM*AZMAX1(WTRT2E(NE,imycorrhz,LL,NR,NZ))*FWODRE(NE,k_woody_litr)
 
-                        ESNC(NE,M,k_fine_litr,LL,NZ)=ESNC(NE,M,k_fine_litr,LL,NZ)+CFOPE(NE,iroot,M,NZ) &
+                        LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,LL,NZ)=LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,LL,NZ)+CFOPE(NE,iroot,M,NZ) &
                           *FSNCM*AZMAX1(WTRT2E(NE,imycorrhz,LL,NR,NZ))*FWODRE(NE,k_fine_litr)
 
-                        ESNC(NE,M,k_fine_litr,LL,NZ)=ESNC(NE,M,k_fine_litr,LL,NZ)+CFOPE(NE,instruct,M,NZ) &
+                        LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,LL,NZ)=LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,LL,NZ)+CFOPE(NE,instruct,M,NZ) &
                           *FSNCP*AZMAX1( RootMycoNonstructElmnt_vr(NE,imycorrhz,LL,NZ))
                       ENDDO D6450
                       WTRT2E(NE,imycorrhz,LL,NR,NZ)=AZMAX1(WTRT2E(NE,imycorrhz,LL,NR,NZ))*(1.0_r8-FSNCM)
@@ -1091,7 +1091,7 @@ implicit none
     FWODRE  =>  plt_allom%FWODRE    , &
     CFOPE   =>  plt_soilchem%CFOPE  , &
     WFR     =>  plt_rbgc%WFR        , &
-    ESNC    =>  plt_bgcr%ESNC       , &
+    LitterFallChemElmnt_pftvr    =>  plt_bgcr%LitterFallChemElmnt_pftvr       , &
     iPlantCalendar   =>  plt_pheno%iPlantCalendar     , &
     NumOfMainBranch_pft     =>  plt_morph%NumOfMainBranch_pft         &
   )
@@ -1176,10 +1176,10 @@ implicit none
 !
   D6355: DO M=1,jsken
     DO NE=1,NumOfPlantChemElmnts    
-      ESNC(NE,M,k_woody_litr,L,NZ)=ESNC(NE,M,k_woody_litr,L,NZ)+CFOPE(NE,icwood,M,NZ) &
+      LitterFallChemElmnt_pftvr(NE,M,k_woody_litr,L,NZ)=LitterFallChemElmnt_pftvr(NE,M,k_woody_litr,L,NZ)+CFOPE(NE,icwood,M,NZ) &
         *FSNC1*(RTWT1E(NE,N,NR,NZ)-RCER(NE))*FWODRE(NE,k_woody_litr)
 
-      ESNC(NE,M,k_fine_litr,L,NZ)=ESNC(NE,M,k_fine_litr,L,NZ)+CFOPE(NE,iroot,M,NZ) &
+      LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,L,NZ)=LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,L,NZ)+CFOPE(NE,iroot,M,NZ) &
         *FSNC1*(RTWT1E(NE,N,NR,NZ)-RCER(NE))*FWODRE(NE,k_fine_litr)
     ENDDO
   ENDDO D6355

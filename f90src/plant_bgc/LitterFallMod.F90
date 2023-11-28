@@ -170,7 +170,7 @@ implicit none
     ifoliar    =>   pltpar%ifoliar    , &
     k_fine_litr=>   pltpar%k_fine_litr, &
     k_woody_litr=>  pltpar%k_woody_litr, &
-    ESNC       =>   plt_bgcr%ESNC     , &
+    LitterFallChemElmnt_pftvr       =>   plt_bgcr%LitterFallChemElmnt_pftvr     , &
     infoliar   =>   pltpar%infoliar   , &
     istalk     =>   pltpar%istalk     , &
     iroot      =>   pltpar%iroot      , &
@@ -214,15 +214,15 @@ implicit none
       D6425: DO M=1,jsken
         D8825: DO NB=1,NumOfBranches_pft(NZ)
 
-          ESNC(ielmc,M,k_fine_litr,0,NZ)=ESNC(ielmc,M,k_fine_litr,0,NZ) &
+          LitterFallChemElmnt_pftvr(ielmc,M,k_fine_litr,0,NZ)=LitterFallChemElmnt_pftvr(ielmc,M,k_fine_litr,0,NZ) &
             +CFOPE(ielmc,instruct,M,NZ)*CPOOLK(NB,NZ)
 
           DO NE=1,NumOfPlantChemElmnts
-            ESNC(NE,M,k_woody_litr,0,NZ)=ESNC(NE,M,k_woody_litr,0,NZ) &
+            LitterFallChemElmnt_pftvr(NE,M,k_woody_litr,0,NZ)=LitterFallChemElmnt_pftvr(NE,M,k_woody_litr,0,NZ) &
               +CFOPE(NE,icwood,M,NZ)*(LeafChemElmnts_brch(NE,NB,NZ)*FWODLE(NE,k_woody_litr) &
               +PetioleChemElmnts_brch(NE,NB,NZ)*FWODBE(NE,k_woody_litr))
 
-            ESNC(NE,M,k_fine_litr,0,NZ)=ESNC(NE,M,k_fine_litr,0,NZ) &
+            LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,0,NZ)=LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,0,NZ) &
               +CFOPE(NE,instruct,M,NZ)*(NonstructElmnt_brch(NE,NB,NZ)+NoduleNonstructElmnt_brch(NE,NB,NZ) &
               +ReserveChemElmnts_brch(NE,NB,NZ)) &
               +CFOPE(NE,ifoliar,M,NZ)*(LeafChemElmnts_brch(NE,NB,NZ)*FWODLE(NE,k_fine_litr) &
@@ -233,11 +233,11 @@ implicit none
             IF(iPlantPhenologyPattern(NZ).EQ.iplt_annual.AND.iPlantPhenologyType(NZ).NE.0)THEN
               NonstructalChemElmnts_pft(NE,NZ)=NonstructalChemElmnts_pft(NE,NZ)+CFOPE(NE,infoliar,M,NZ)*GrainChemElmnts_brch(NE,NB,NZ)
             ELSE
-              ESNC(NE,M,k_fine_litr,0,NZ)=ESNC(NE,M,k_fine_litr,0,NZ)+CFOPE(NE,infoliar,M,NZ)*GrainChemElmnts_brch(NE,NB,NZ)
+              LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,0,NZ)=LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,0,NZ)+CFOPE(NE,infoliar,M,NZ)*GrainChemElmnts_brch(NE,NB,NZ)
             ENDIF
             IF(iPlantTurnoverPattern(NZ).EQ.0.OR.iPlantMorphologyType(NZ).LE.1)THEN
               !all above ground
-              ESNC(NE,M,k_fine_litr,0,NZ)=ESNC(NE,M,k_fine_litr,0,NZ)+CFOPE(NE,istalk,M,NZ)*StalkChemElmnts_brch(NE,NB,NZ)
+              LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,0,NZ)=LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,0,NZ)+CFOPE(NE,istalk,M,NZ)*StalkChemElmnts_brch(NE,NB,NZ)
             ELSE
               StandingDeadKCompChemElmnts_pft(NE,M,NZ)=StandingDeadKCompChemElmnts_pft(NE,M,NZ)+CFOPE(NE,icwood,M,NZ)*StalkChemElmnts_brch(NE,NB,NZ)
             ENDIF
@@ -258,21 +258,21 @@ implicit none
         DO NE=1,NumOfPlantChemElmnts
           D6415: DO L=NU,NJ
             DO N=1,MY(NZ)
-              ESNC(NE,M,k_fine_litr,L,NZ)=ESNC(NE,M,k_fine_litr,L,NZ) &
+              LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,L,NZ)=LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,L,NZ) &
                 +CFOPE(NE,instruct,M,NZ)* RootMycoNonstructElmnt_vr(NE,N,L,NZ)
               DO NR=1,NumRootAxes_pft(NZ)
-                ESNC(NE,M,k_woody_litr,L,NZ)=ESNC(NE,M,k_woody_litr,L,NZ)+CFOPE(NE,icwood,M,NZ) &
+                LitterFallChemElmnt_pftvr(NE,M,k_woody_litr,L,NZ)=LitterFallChemElmnt_pftvr(NE,M,k_woody_litr,L,NZ)+CFOPE(NE,icwood,M,NZ) &
                   *(WTRT1E(NE,N,L,NR,NZ)+WTRT2E(NE,N,L,NR,NZ))*FWODRE(NE,k_woody_litr)
 
-                ESNC(NE,M,k_fine_litr,L,NZ)=ESNC(NE,M,k_fine_litr,L,NZ)+CFOPE(NE,iroot,M,NZ) &
+                LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,L,NZ)=LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,L,NZ)+CFOPE(NE,iroot,M,NZ) &
                   *(WTRT1E(NE,N,L,NR,NZ)+WTRT2E(NE,N,L,NR,NZ))*FWODRE(NE,k_fine_litr)
               ENDDO
             ENDDO
           ENDDO D6415
-          ESNC(NE,M,k_woody_litr,NGTopRootLayer(NZ),NZ)=ESNC(NE,M,k_woody_litr,NGTopRootLayer(NZ),NZ) &
+          LitterFallChemElmnt_pftvr(NE,M,k_woody_litr,NGTopRootLayer(NZ),NZ)=LitterFallChemElmnt_pftvr(NE,M,k_woody_litr,NGTopRootLayer(NZ),NZ) &
             +CFOPE(NE,instruct,M,NZ)*NonstructalChemElmnts_pft(NE,NZ)*FWOODE(NE,k_woody_litr)
 
-          ESNC(NE,M,k_fine_litr,NGTopRootLayer(NZ),NZ)=ESNC(NE,M,k_fine_litr,NGTopRootLayer(NZ),NZ) &
+          LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,NGTopRootLayer(NZ),NZ)=LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,NGTopRootLayer(NZ),NZ) &
             +CFOPE(NE,instruct,M,NZ)*NonstructalChemElmnts_pft(NE,NZ)*FWOODE(NE,k_fine_litr)
         ENDDO
       ENDDO D6425
@@ -324,7 +324,7 @@ implicit none
     NJ        =>   plt_site%NJ        , &
     NU        =>   plt_site%NU        , &
     RootGasLoss_disturb     =>   plt_bgcr%RootGasLoss_disturb     , &
-    ESNC      =>   plt_bgcr%ESNC      , &
+    LitterFallChemElmnt_pftvr      =>   plt_bgcr%LitterFallChemElmnt_pftvr      , &
     icwood    =>   pltpar%icwood      , &
     iroot     =>   pltpar%iroot       , &
     instruct   =>   pltpar%instruct   , &
@@ -372,13 +372,13 @@ implicit none
       D8895: DO L=NU,NJ
         DO NE=1,NumOfPlantChemElmnts
           D6410: DO M=1,jsken
-            ESNC(NE,M,k_fine_litr,L,NZ)=ESNC(NE,M,k_fine_litr,L,NZ) &
+            LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,L,NZ)=LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,L,NZ) &
               +CFOPE(NE,instruct,M,NZ)* RootMycoNonstructElmnt_vr(NE,N,L,NZ)
             DO  NR=1,NumRootAxes_pft(NZ)
-              ESNC(NE,M,k_woody_litr,L,NZ)=ESNC(NE,M,k_woody_litr,L,NZ)+CFOPE(NE,icwood,M,NZ) &
+              LitterFallChemElmnt_pftvr(NE,M,k_woody_litr,L,NZ)=LitterFallChemElmnt_pftvr(NE,M,k_woody_litr,L,NZ)+CFOPE(NE,icwood,M,NZ) &
                 *(WTRT1E(NE,N,L,NR,NZ)+WTRT2E(NE,N,L,NR,NZ))*FWODRE(NE,k_woody_litr)
 
-              ESNC(NE,M,k_fine_litr,L,NZ)=ESNC(NE,M,k_fine_litr,L,NZ)+CFOPE(NE,iroot,M,NZ) &
+              LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,L,NZ)=LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,L,NZ)+CFOPE(NE,iroot,M,NZ) &
                 *(WTRT1E(NE,N,L,NR,NZ)+WTRT2E(NE,N,L,NR,NZ))*FWODRE(NE,k_fine_litr)
             enddo
           ENDDO D6410
@@ -442,7 +442,7 @@ implicit none
         IF(iPlantNfixType(NZ).NE.0.AND.N.EQ.1)THEN
           D6420: DO M=1,jsken
             DO NE=1,NumOfPlantChemElmnts            
-              ESNC(NE,M,k_fine_litr,L,NZ)=ESNC(NE,M,k_fine_litr,L,NZ)+CFOPE(NE,iroot,M,NZ) &
+              LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,L,NZ)=LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,L,NZ)+CFOPE(NE,iroot,M,NZ) &
                 *WTNDLE(NE,L,NZ)+CFOPE(NE,instruct,M,NZ)*RootNoduleNonstructElmnt_vr(NE,L,NZ)
             ENDDO
           ENDDO D6420
@@ -520,7 +520,7 @@ implicit none
     iPlantMorphologyType    =>  plt_pheno%iPlantMorphologyType    , &
     iPlantPhenologyType    =>  plt_pheno%iPlantPhenologyType    , &
     iPlantPhenologyPattern    =>  plt_pheno%iPlantPhenologyPattern    , &
-    ESNC      =>  plt_bgcr%ESNC       , &
+    LitterFallChemElmnt_pftvr      =>  plt_bgcr%LitterFallChemElmnt_pftvr       , &
     NumOfBranches_pft       =>  plt_morph%NumOfBranches_pft       , &
     NodeNumberToInitFloral     =>  plt_morph%NodeNumberToInitFloral     , &
     ShootNodeNumber     =>  plt_morph%ShootNodeNumber     , &
@@ -592,25 +592,25 @@ implicit none
 !
       D6405: DO M=1,jsken
         DO NE=1,NumOfPlantChemElmnts        
-          ESNC(NE,M,k_fine_litr,0,NZ)=ESNC(NE,M,k_fine_litr,0,NZ) &
+          LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,0,NZ)=LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,0,NZ) &
             +CFOPE(NE,instruct,M,NZ)*NoduleNonstructElmnt_brch(NE,NB,NZ) &
             +CFOPE(NE,ifoliar,M,NZ)*(LeafChemElmnts_brch(NE,NB,NZ)*FWODLE(NE,k_fine_litr) &
             +WTNDBE(NE,NB,NZ)) &
             +CFOPE(NE,infoliar,M,NZ)*(PetioleChemElmnts_brch(NE,NB,NZ)*FWODBE(NE,k_fine_litr) &
             +HuskChemElmnts_brch(NE,NB,NZ)+EarChemElmnts_brch(NE,NB,NZ))
 
-          ESNC(NE,M,k_woody_litr,0,NZ)=ESNC(NE,M,k_woody_litr,0,NZ) &
+          LitterFallChemElmnt_pftvr(NE,M,k_woody_litr,0,NZ)=LitterFallChemElmnt_pftvr(NE,M,k_woody_litr,0,NZ) &
             +CFOPE(NE,icwood,M,NZ)*(LeafChemElmnts_brch(NE,NB,NZ)*FWODBE(NE,k_woody_litr) &
             +PetioleChemElmnts_brch(NE,NB,NZ)*FWODBE(NE,k_woody_litr))
 
           IF(iPlantPhenologyPattern(NZ).EQ.iplt_annual.AND.iPlantPhenologyType(NZ).NE.0)THEN
             NonstructalChemElmnts_pft(NE,NZ)=NonstructalChemElmnts_pft(NE,NZ)+CFOPE(NE,infoliar,M,NZ)*GrainChemElmnts_brch(NE,NB,NZ)
           ELSE
-            ESNC(NE,M,k_fine_litr,0,NZ)=ESNC(NE,M,k_fine_litr,0,NZ) &
+            LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,0,NZ)=LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,0,NZ) &
               +CFOPE(NE,infoliar,M,NZ)*GrainChemElmnts_brch(NE,NB,NZ)
           ENDIF
           IF(iPlantTurnoverPattern(NZ).EQ.0.OR.iPlantMorphologyType(NZ).LE.1)THEN
-            ESNC(NE,M,k_fine_litr,0,NZ)=ESNC(NE,M,k_fine_litr,0,NZ) &
+            LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,0,NZ)=LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,0,NZ) &
               +CFOPE(NE,istalk,M,NZ)*StalkChemElmnts_brch(NE,NB,NZ)
           ELSE
             StandingDeadKCompChemElmnts_pft(NE,M,NZ)=StandingDeadKCompChemElmnts_pft(NE,M,NZ)+CFOPE(NE,icwood,M,NZ)*StalkChemElmnts_brch(NE,NB,NZ)
@@ -634,7 +634,7 @@ implicit none
         NonstructalChemElmnts_pft(NE,NZ)=NonstructalChemElmnts_pft(NE,NZ)+NonstructElmnt_brch(NE,NB,NZ)
         IF(IHVST(NZ).NE.4.AND.IHVST(NZ).NE.6)THEN
           D6406: DO M=1,jsken
-            ESNC(NE,M,k_fine_litr,0,NZ)=ESNC(NE,M,k_fine_litr,0,NZ) &
+            LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,0,NZ)=LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,0,NZ) &
               +CFOPE(NE,instruct,M,NZ)*ReserveChemElmnts_brch(NE,NB,NZ)
           ENDDO D6406
         ELSE
@@ -748,7 +748,7 @@ implicit none
     LeafChemElmnts_brch  => plt_biom%LeafChemElmnts_brch    , &
     WTNDBE   => plt_biom%WTNDBE     , &
     StalkChemElmnts_brch  => plt_biom%StalkChemElmnts_brch    , &
-    WGLFE    => plt_biom%WGLFE      , &
+    LeafChemElmntNode_brch    => plt_biom%LeafChemElmntNode_brch      , &
     ReserveChemElmnts_brch  => plt_biom%ReserveChemElmnts_brch    , &
     WTSTXBE  => plt_biom%WTSTXBE    , &
     StalkBiomassC_brch   => plt_biom%StalkBiomassC_brch     , &
@@ -756,10 +756,10 @@ implicit none
     LeafPetioleBiomassC_brch    => plt_biom%LeafPetioleBiomassC_brch      , &
     HuskChemElmnts_brch  => plt_biom%HuskChemElmnts_brch    , &
     EarChemElmnts_brch  => plt_biom%EarChemElmnts_brch    , &
-    WSSHE    => plt_biom%WSSHE      , &
-    WSLF     => plt_biom%WSLF       , &
-    WGNODE   => plt_biom%WGNODE     , &
-    WGSHE    => plt_biom%WGSHE      , &
+    PetioleProteinCNode_brch   => plt_biom%PetioleProteinCNode_brch     , &
+    LeafProteinCNode_brch     => plt_biom%LeafProteinCNode_brch       , &
+    InternodeChemElmnt_brch   => plt_biom%InternodeChemElmnt_brch     , &
+    PetioleElmntNode_brch   => plt_biom%PetioleElmntNode_brch     , &
     WGLFLE   => plt_biom%WGLFLE     , &
     CanopyLeafCpft_lyr    => plt_biom%CanopyLeafCpft_lyr      , &
     PetioleChemElmnts_brch => plt_biom%PetioleChemElmnts_brch   , &
@@ -770,14 +770,14 @@ implicit none
     GRWTB    => plt_allom%GRWTB     , &
     GRNXB    => plt_morph%GRNXB     , &
     GRNOB    => plt_morph%GRNOB     , &
-    CanopyBranchLeafA_pft    => plt_morph%CanopyBranchLeafA_pft     , &
+    LeafAreaLive_brch    => plt_morph%LeafAreaLive_brch     , &
     CanopyBranchStemApft_lyr    => plt_morph%CanopyBranchStemApft_lyr     , &
     NumOfBranches_pft      => plt_morph%NumOfBranches_pft       , &
-    ARLF1    => plt_morph%ARLF1     , &
-    CanPSheathHeight    => plt_morph%CanPSheathHeight     , &
-    HTNODX   => plt_morph%HTNODX    , &
+    LeafAreaNode_brch    => plt_morph%LeafAreaNode_brch     , &
+    PetioleLengthNode_brch    => plt_morph%PetioleLengthNode_brch     , &
+    InternodeHeightDying_brch   => plt_morph%InternodeHeightDying_brch    , &
     LeafA_lyrnodbrchpft     => plt_morph%LeafA_lyrnodbrchpft      , &
-    HTNODE   => plt_morph%HTNODE    , &
+    InternodeHeightLive_brch   => plt_morph%InternodeHeightLive_brch    , &
     CanopyLeafApft_lyr    => plt_morph%CanopyLeafApft_lyr     , &
     StemA_lyrnodbrchpft    => plt_morph%StemA_lyrnodbrchpft     , &
     CanPLNBLA    => plt_morph%CanPLNBLA       &
@@ -801,11 +801,11 @@ implicit none
 !     GRWTB=individual seed size
 !     CPOOL3,CPOOL4=C4 nonstructural C mass in bundle sheath,mesophyll
 !     CO2B,HCOB=aqueous CO2,HCO3-C mass in bundle sheath
-!     WSLF=leaf protein mass
-!     CanopyBranchLeafA_pft=branch leaf area
-!     WGLF,WGLFN,WGLFP,WSLF=node leaf C,N,P,protein mass
-!     WGSHE,WGSHN,WGSHP,WSSHE=node petiole C,N,P,protein mass
-!     WGNODE,WGNODN,WGNODP=node stalk C,N,P mass
+!     LeafProteinCNode_brch=leaf protein mass
+!     LeafAreaLive_brch=branch leaf area
+!     WGLF,WGLFN,WGLFP,LeafProteinCNode_brch=node leaf C,N,P,protein mass
+!     PetioleElmntNode_brch,WGSHN,WGSHP,PetioleProteinCNode_brch=node petiole C,N,P,protein mass
+!     InternodeChemElmnt_brch,WGNODN,WGNODP=node stalk C,N,P mass
 !
   CPOOLK(NB,NZ)=0._r8
   NonstructElmnt_brch(1:NumOfPlantChemElmnts,NB,NZ)=0._r8
@@ -824,7 +824,7 @@ implicit none
   GRNXB(NB,NZ)=0._r8
   GRNOB(NB,NZ)=0._r8
   GRWTB(NB,NZ)=0._r8
-  CanopyBranchLeafA_pft(NB,NZ)=0._r8
+  LeafAreaLive_brch(NB,NZ)=0._r8
   WTSTXBE(1:NumOfPlantChemElmnts,NB,NZ)=0._r8
 
   D8855: DO K=0,MaxNodesPerBranch1
@@ -834,15 +834,15 @@ implicit none
       CO2B(K,NB,NZ)=0._r8
       HCOB(K,NB,NZ)=0._r8
     ENDIF
-    ARLF1(K,NB,NZ)=0._r8
-    HTNODE(K,NB,NZ)=0._r8
-    HTNODX(K,NB,NZ)=0._r8
-    CanPSheathHeight(K,NB,NZ)=0._r8
-    WSLF(K,NB,NZ)=0._r8
-    WSSHE(K,NB,NZ)=0._r8
-    WGLFE(1:NumOfPlantChemElmnts,K,NB,NZ)=0._r8
-    WGSHE(1:NumOfPlantChemElmnts,K,NB,NZ)=0._r8
-    WGNODE(1:NumOfPlantChemElmnts,K,NB,NZ)=0._r8
+    LeafAreaNode_brch(K,NB,NZ)=0._r8
+    InternodeHeightLive_brch(K,NB,NZ)=0._r8
+    InternodeHeightDying_brch(K,NB,NZ)=0._r8
+    PetioleLengthNode_brch(K,NB,NZ)=0._r8
+    LeafProteinCNode_brch(K,NB,NZ)=0._r8
+    PetioleProteinCNode_brch(K,NB,NZ)=0._r8
+    LeafChemElmntNode_brch(1:NumOfPlantChemElmnts,K,NB,NZ)=0._r8
+    PetioleElmntNode_brch(1:NumOfPlantChemElmnts,K,NB,NZ)=0._r8
+    InternodeChemElmnt_brch(1:NumOfPlantChemElmnts,K,NB,NZ)=0._r8
     D8865: DO L=1,NumOfCanopyLayers1
       CanopyLeafApft_lyr(L,NZ)=CanopyLeafApft_lyr(L,NZ)-CanPLNBLA(L,K,NB,NZ)
       CanopyLeafCpft_lyr(L,NZ)=CanopyLeafCpft_lyr(L,NZ)-WGLFLE(ielmc,L,K,NB,NZ)

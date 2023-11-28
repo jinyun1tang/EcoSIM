@@ -341,11 +341,11 @@ module UptakesMod
     RoughHeight     =>  plt_ew%RoughHeight        , &
     RAZ    =>  plt_ew%RAZ       , &
     TKCZ   =>  plt_ew%TKCZ      , &
-    WSLF   =>  plt_biom%WSLF    , &
+    LeafProteinCNode_brch   =>  plt_biom%LeafProteinCNode_brch    , &
     ZEROP  =>  plt_biom%ZEROP   , &
     FracPARByCanP  =>  plt_rad%FracPARByCanP    , &
     LeafAUnshaded_seclyrnodbrpft  =>  plt_photo%LeafAUnshaded_seclyrnodbrpft  , &
-    ARLF1  =>  plt_morph%ARLF1  , &
+    LeafAreaNode_brch  =>  plt_morph%LeafAreaNode_brch  , &
     KLEAFX =>  plt_morph%KLEAFX , &
     CanopyHeight     =>  plt_morph%CanopyHeight     , &
     ClumpFactort    =>  plt_morph%ClumpFactort    , &
@@ -364,12 +364,12 @@ module UptakesMod
 !
 !     NUMBER OF MINIMUM LEAFED NODE USED IN GROWTH ALLOCATION
 !
-!     ARLF=leaf area
-!     WSLF=leaf protein content
+!     LeafAreaNode_brch=leaf area
+!     LeafProteinCNode_brch=leaf protein content
 !     LeafAUnshaded_seclyrnodbrpft,LeafA_lyrnodbrchpft=unself-shaded,total leaf surface area
 !     ClumpFactort=clumping factor from PFT file
 !
-      IF(ARLF1(K,NB,NZ).GT.ZEROP(NZ).AND.WSLF(K,NB,NZ).GT.ZEROP(NZ))THEN
+      IF(LeafAreaNode_brch(K,NB,NZ).GT.ZEROP(NZ).AND.LeafProteinCNode_brch(K,NB,NZ).GT.ZEROP(NZ))THEN
         KLEAFX(NB,NZ)=K
       ENDIF
       D600: DO L=NumOfCanopyLayers1,1,-1

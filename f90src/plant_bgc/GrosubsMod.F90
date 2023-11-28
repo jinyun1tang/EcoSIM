@@ -76,8 +76,8 @@ module grosubsMod
     NP0      => plt_site%NP0      , &
     NJ       => plt_site%NJ       , &
     CO2NetFix_pft     => plt_bgcr%CO2NetFix_pft     , &
-    HESNC    => plt_bgcr%HESNC    , &
-    ESNC     => plt_bgcr%ESNC     , &
+    LitterFallChemElmnt_pft    => plt_bgcr%LitterFallChemElmnt_pft    , &
+    LitterFallChemElmnt_pftvr     => plt_bgcr%LitterFallChemElmnt_pftvr     , &
     CanopyHeight       => plt_morph%CanopyHeight        &
   )
 !     TOTAL AGB FOR GRAZING IN LANDSCAPE SECTION
@@ -91,12 +91,12 @@ module grosubsMod
       DO K=1,pltpar%NumOfPlantLitrCmplxs
         DO M=1,jsken
           DO NE=1,NumOfPlantChemElmnts
-            ESNC(NE,M,K,L,NZ)=0._r8
+            LitterFallChemElmnt_pftvr(NE,M,K,L,NZ)=0._r8
           ENDDO
         ENDDO
       ENDDO
     ENDDO D1
-    HESNC(1:NumOfPlantChemElmnts,NZ)=0._r8
+    LitterFallChemElmnt_pft(1:NumOfPlantChemElmnts,NZ)=0._r8
     CO2NetFix_pft(NZ)=0._r8
     ZCX(NZ)=CanopyHeight(NZ)
     CanopyHeight(NZ)=0._r8
@@ -161,10 +161,10 @@ module grosubsMod
     NP0     => plt_site%NP0      , &
     NJ      => plt_site%NJ       , &
     iYearCurrent    => plt_site%iYearCurrent     , &
-    ESNC    => plt_bgcr%ESNC     , &
+    LitterFallChemElmnt_pftvr    => plt_bgcr%LitterFallChemElmnt_pftvr     , &
     NetPrimaryProductvity_pft    => plt_bgcr%NetPrimaryProductvity_pft     , &
     TZUPFX  => plt_bgcr%TZUPFX   , &
-    HESNC   => plt_bgcr%HESNC    , &
+    LitterFallChemElmnt_pft   => plt_bgcr%LitterFallChemElmnt_pft    , &
     TNH3C   => plt_bgcr%TNH3C    , &
     LitrfallChemElmnts_pft   => plt_bgcr%LitrfallChemElmnts_pft    , &
     SurfLitrfallChemElmnts_pft   => plt_bgcr%SurfLitrfallChemElmnts_pft    , &
@@ -202,9 +202,9 @@ module grosubsMod
       D6235: DO M=1,jsken
         XFRE=1.5814E-05_r8*fTgrowCanP(NZ)*StandingDeadKCompChemElmnts_pft(NE,M,NZ)
         IF(iPlantTurnoverPattern(NZ).EQ.0.OR.iPlantMorphologyType(NZ).LE.1)THEN
-          ESNC(NE,M,k_fine_litr,0,NZ)=ESNC(NE,M,k_fine_litr,0,NZ)+XFRE
+          LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,0,NZ)=LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,0,NZ)+XFRE
         ELSE
-          ESNC(NE,M,k_woody_litr,0,NZ)=ESNC(NE,M,k_woody_litr,0,NZ)+XFRE
+          LitterFallChemElmnt_pftvr(NE,M,k_woody_litr,0,NZ)=LitterFallChemElmnt_pftvr(NE,M,k_woody_litr,0,NZ)+XFRE
         ENDIF
         StandingDeadKCompChemElmnts_pft(NE,M,NZ)=StandingDeadKCompChemElmnts_pft(NE,M,NZ)-XFRE
       ENDDO D6235
@@ -219,10 +219,10 @@ module grosubsMod
     DO K=1,pltpar%NumOfPlantLitrCmplxs
       DO NE=1,NumOfPlantChemElmnts
         D6430: DO M=1,jsken
-          SurfLitrfallChemElmnts_pft(NE,NZ)=SurfLitrfallChemElmnts_pft(NE,NZ)+ESNC(NE,M,K,0,NZ)
+          SurfLitrfallChemElmnts_pft(NE,NZ)=SurfLitrfallChemElmnts_pft(NE,NZ)+LitterFallChemElmnt_pftvr(NE,M,K,0,NZ)
           D8955: DO L=0,NJ
-            HESNC(NE,NZ)=HESNC(NE,NZ)+ESNC(NE,M,K,L,NZ)
-            LitrfallChemElmnts_pft(NE,NZ)=LitrfallChemElmnts_pft(NE,NZ)+ESNC(NE,M,K,L,NZ)
+            LitterFallChemElmnt_pft(NE,NZ)=LitterFallChemElmnt_pft(NE,NZ)+LitterFallChemElmnt_pftvr(NE,M,K,L,NZ)
+            LitrfallChemElmnts_pft(NE,NZ)=LitrfallChemElmnts_pft(NE,NZ)+LitterFallChemElmnt_pftvr(NE,M,K,L,NZ)
           ENDDO D8955
         ENDDO D6430
       enddo
@@ -700,7 +700,7 @@ module grosubsMod
     MY       =>  plt_morph%MY     , &
     NI       =>  plt_morph%NI     , &
     NumRootAxes_pft     =>  plt_morph%NumRootAxes_pft   , &
-    CanopyBranchLeafA_pft    =>  plt_morph%CanopyBranchLeafA_pft  , &
+    LeafAreaLive_brch    =>  plt_morph%LeafAreaLive_brch  , &
     CanopyStemA_pft    =>  plt_morph%CanopyStemA_pft  , &
     CanopyBranchStemApft_lyr    =>  plt_morph%CanopyBranchStemApft_lyr  , &
     GRNOB    =>  plt_morph%GRNOB  , &
@@ -722,7 +722,7 @@ module grosubsMod
 !     WTHSBN,WTEABN,WTGRBN=branch husk,ear,grain N mass
 !     WTHSBP,WTEABP,WTGRBP=branch husk,ear,grain P mass
 !     WTRVC,WTRVN,WTRVP=storage C,N,P
-!     CanopyBranchLeafA_pft=branch leaf area
+!     LeafAreaLive_brch=branch leaf area
 !     CanopyBranchStemApft_lyr=total branch stalk surface area in each layer
 !     GRNOB=seed set number
 !
@@ -746,7 +746,7 @@ module grosubsMod
   CanPStalkC(NZ)=sum(StalkBiomassC_brch(1:NumOfBranches_pft(NZ),NZ))
   CanopyLeafShethC_pft(NZ) =sum(LeafPetioleBiomassC_brch(1:NumOfBranches_pft(NZ),NZ))
   GRNO(NZ) =sum(GRNOB(1:NumOfBranches_pft(NZ),NZ))
-  CanopyLeafA_pft(NZ)=sum(CanopyBranchLeafA_pft(1:NumOfBranches_pft(NZ),NZ))
+  CanopyLeafA_pft(NZ)=sum(LeafAreaLive_brch(1:NumOfBranches_pft(NZ),NZ))
   CanopyStemA_pft(NZ)=sum(CanopyBranchStemApft_lyr(1:NumOfCanopyLayers1,1:NumOfBranches_pft(NZ),NZ))
   CanopyStemApft_lyr(1:NumOfCanopyLayers1,1:NumOfBranches_pft(NZ))=0._r8
   DO NB=1,NumOfBranches_pft(NZ)

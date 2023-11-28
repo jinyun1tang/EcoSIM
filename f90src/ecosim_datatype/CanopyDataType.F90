@@ -136,16 +136,16 @@ module CanopyDataType
   real(r8),target,allocatable ::  LeafPetioNonstructElmntConc_brch(:,:,:,:,:)                    !branch nonstructural C concentration, [g d-2]
   real(r8),target,allocatable ::  NoduleNonstructElmnt_brch(:,:,:,:,:)                  !branch nodule nonstructural C, [g d-2]
   real(r8),target,allocatable ::  WTNDBE(:,:,:,:,:)                  !branch nodule element, [g d-2]
-  real(r8),target,allocatable ::  WGSHEXE(:,:,:,:,:)                  !branch sheath structural element, [g d-2]
+  real(r8),target,allocatable ::  PetioleChemElmntRemob_brch(:,:,:,:,:)                  !branch sheath structural element, [g d-2]
   real(r8),target,allocatable ::  WTSTXBE(:,:,:,:,:)                    !branch stalk structural C, [g d-2]
-  real(r8),target,allocatable ::  WGLFEX(:,:,:,:,:)                     !branch leaf structural element, [g d-2]
-  real(r8),target,allocatable ::  WGLFE(:,:,:,:,:,:)                    !leaf element, [g d-2]
-  real(r8),target,allocatable ::  WGSHE(:,:,:,:,:,:)                 !sheath element , [g d-2]
-  real(r8),target,allocatable ::  WGNODE(:,:,:,:,:,:)                  !internode element, [g d-2]
+  real(r8),target,allocatable ::  LeafChemElmntRemob_brch(:,:,:,:,:)                     !branch leaf structural element, [g d-2]
+  real(r8),target,allocatable ::  LeafChemElmntNode_brch(:,:,:,:,:,:)                    !leaf element, [g d-2]
+  real(r8),target,allocatable ::  PetioleElmntNode_brch(:,:,:,:,:,:)                 !sheath element , [g d-2]
+  real(r8),target,allocatable ::  InternodeChemElmnt_brch(:,:,:,:,:,:)                  !internode element, [g d-2]
   real(r8),target,allocatable ::  WGLFLE(:,:,:,:,:,:,:)                 !layer leaf element, [g d-2]
   real(r8),target,allocatable ::  CanPLNBLA(:,:,:,:,:,:)                 !layer leaf area, [m2 d-2]
-  real(r8),target,allocatable ::  WSLF(:,:,:,:,:)                    !layer leaf protein C, [g d-2]
-  real(r8),target,allocatable ::  WSSHE(:,:,:,:,:)                   !layer sheath protein C, [g d-2]
+  real(r8),target,allocatable ::  LeafProteinCNode_brch(:,:,:,:,:)                    !layer leaf protein C, [g d-2]
+  real(r8),target,allocatable ::  PetioleProteinCNode_brch(:,:,:,:,:)                   !layer sheath protein C, [g d-2]
   real(r8),target,allocatable ::  NoduleNonstructCconc_pft(:,:,:)                      !nodule nonstructural C, [g d-2]
   real(r8),target,allocatable ::  GRWTB(:,:,:,:)                     !maximum grain C during grain fill, [g d-2]
   real(r8),target,allocatable ::  StandingDeadKCompChemElmnts_pft(:,:,:,:,:)                  !standing dead element fraction, [g d-2]
@@ -285,16 +285,16 @@ module CanopyDataType
   allocate(LeafPetioNonstructElmntConc_brch(NumOfPlantChemElmnts,MaxNumBranches,JP,JY,JX));LeafPetioNonstructElmntConc_brch=0._r8
   allocate(NoduleNonstructElmnt_brch(NumOfPlantChemElmnts,MaxNumBranches,JP,JY,JX));NoduleNonstructElmnt_brch=0._r8
   allocate(WTNDBE(NumOfPlantChemElmnts,MaxNumBranches,JP,JY,JX)); WTNDBE=0._r8
-  allocate(WGSHEXE(NumOfPlantChemElmnts,MaxNumBranches,JP,JY,JX));WGSHEXE=0._r8
+  allocate(PetioleChemElmntRemob_brch(NumOfPlantChemElmnts,MaxNumBranches,JP,JY,JX));PetioleChemElmntRemob_brch=0._r8
   allocate(WTSTXBE(NumOfPlantChemElmnts,MaxNumBranches,JP,JY,JX));WTSTXBE=0._r8
-  allocate(WGLFEX(NumOfPlantChemElmnts,MaxNumBranches,JP,JY,JX)); WGLFEX=0._r8
-  allocate(WGLFE(NumOfPlantChemElmnts,0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));WGLFE=0._r8
-  allocate(WGSHE(NumOfPlantChemElmnts,0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));WGSHE=0._r8
-  allocate(WGNODE(NumOfPlantChemElmnts,0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));WGNODE=0._r8
+  allocate(LeafChemElmntRemob_brch(NumOfPlantChemElmnts,MaxNumBranches,JP,JY,JX)); LeafChemElmntRemob_brch=0._r8
+  allocate(LeafChemElmntNode_brch(NumOfPlantChemElmnts,0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));LeafChemElmntNode_brch=0._r8
+  allocate(PetioleElmntNode_brch(NumOfPlantChemElmnts,0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));PetioleElmntNode_brch=0._r8
+  allocate(InternodeChemElmnt_brch(NumOfPlantChemElmnts,0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));InternodeChemElmnt_brch=0._r8
   allocate(WGLFLE(NumOfPlantChemElmnts,JC,0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));WGLFLE=0._r8
   allocate(CanPLNBLA(JC,0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));CanPLNBLA=0._r8
-  allocate(WSLF(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));WSLF=0._r8
-  allocate(WSSHE(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));WSSHE=0._r8
+  allocate(LeafProteinCNode_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));LeafProteinCNode_brch=0._r8
+  allocate(PetioleProteinCNode_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));PetioleProteinCNode_brch=0._r8
   allocate(NoduleNonstructCconc_pft(JP,JY,JX));   NoduleNonstructCconc_pft=0._r8
   allocate(GRWTB(MaxNumBranches,JP,JY,JX)); GRWTB=0._r8
   allocate(StandingDeadKCompChemElmnts_pft(NumOfPlantChemElmnts,jsken,JP,JY,JX)); StandingDeadKCompChemElmnts_pft=0._r8
@@ -435,16 +435,16 @@ module CanopyDataType
   call destroy(LeafPetioNonstructElmntConc_brch)
   call destroy(NoduleNonstructElmnt_brch)
   call destroy(WTNDBE)
-  call destroy(WGSHEXE)
+  call destroy(PetioleChemElmntRemob_brch)
   call destroy(WTSTXBE)
-  call destroy(WGLFEX)
-  call destroy(WGLFE)
-  call destroy(WGSHE)
-  call destroy(WGNODE)
+  call destroy(LeafChemElmntRemob_brch)
+  call destroy(LeafChemElmntNode_brch)
+  call destroy(PetioleElmntNode_brch)
+  call destroy(InternodeChemElmnt_brch)
   call destroy(WGLFLE)
   call destroy(CanPLNBLA)
-  call destroy(WSLF)
-  call destroy(WSSHE)
+  call destroy(LeafProteinCNode_brch)
+  call destroy(PetioleProteinCNode_brch)
   call destroy(NoduleNonstructCconc_pft)
   call destroy(GRWTB)
   call destroy(StandingDeadKCompChemElmnts_pft)

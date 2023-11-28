@@ -197,7 +197,7 @@ contains
   end subroutine SoluteUptakeByPlantRoots
 !--------------------------------------------------------------------------------
 
-  function is_plant_treelike(iPlantMorphologyType)result(ans)
+  pure function is_plant_treelike(iPlantMorphologyType)result(ans)
 !
 ! currently, there are three plant growth types defined as
 ! iplt_bryophyte=0
@@ -213,7 +213,7 @@ contains
 
 !--------------------------------------------------------------------------------
 
-  function is_plant_bryophyte(iPlantMorphologyType)result(ans)
+  pure function is_plant_bryophyte(iPlantMorphologyType)result(ans)
 !
 ! currently, there are three plant growth types defined as
 ! iplt_bryophyte=0
@@ -226,5 +226,16 @@ contains
 
   ans=(iPlantMorphologyType == iplt_bryophyte)
   end function is_plant_bryophyte
-
+!--------------------------------------------------------------------------------
+  pure function pMOD(a,b)result(c)
+  !
+  ! compute c=MOD(A,B)
+  ! if C==0 and A/=0 then C=B
+  implicit none
+  integer, intent(in) :: a,B
+  integer :: C
+  
+  c=mod(a,b)
+  if(c==0 .and. a/=0)c=b
+  end function pMOD
 end module PlantMathFuncMod

@@ -39,21 +39,23 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  HypoctoylHeight(:,:,:)                       !cotyledon height, [m]
   real(r8),target,allocatable ::  GridMaxCanopyHeight(:,:)                            !canopy height , [m]
   real(r8),target,allocatable ::  CanopyHeightz(:,:,:)                          !canopy layer height , [m]
-  real(r8),target,allocatable ::  ANGBR(:,:,:)                       !branching angle, [degree from horizontal]
-  real(r8),target,allocatable ::  ANGSH(:,:,:)                       !sheath angle, [degree from horizontal]
+  real(r8),target,allocatable ::  BranchAngle_pft(:,:,:)                       !branching angle, [degree from horizontal]
+  real(r8),target,allocatable ::  PetioleAngle_pft(:,:,:)                       !sheath angle, [degree from horizontal]
+  real(r8),target,allocatable ::  SineBranchAngle_pft(:,:,:)                       !branching angle, [degree from horizontal]
+  real(r8),target,allocatable ::  SinePetioleAngle_pft(:,:,:)                       !sheath angle, [degree from horizontal]
   real(r8),target,allocatable ::  RAZ(:,:,:)                         !canopy roughness height, [m]
   real(r8),target,allocatable ::  CanPHeight4WatUptake(:,:,:)                       !canopy height, [m]
-  real(r8),target,allocatable ::  ARLF(:,:,:,:,:)                    !leaf area, [m2 d-2]
-  real(r8),target,allocatable ::  CanPSheathHeight(:,:,:,:,:)                   !sheath height, [m]
-  real(r8),target,allocatable ::  HTNODE(:,:,:,:,:)                  !internode height, [m]
-  real(r8),target,allocatable ::  CanopyBranchLeafA_pft(:,:,:,:)                     !branch leaf area, [m2 d-2]
-  real(r8),target,allocatable ::  ARLFZ(:,:,:,:)                     !branch leaf area, [m2 d-2]
+  real(r8),target,allocatable ::  LeafAreaNode_brch(:,:,:,:,:)                    !leaf area, [m2 d-2]
+  real(r8),target,allocatable ::  PetioleLengthNode_brch(:,:,:,:,:)                   !sheath height, [m]
+  real(r8),target,allocatable ::  InternodeHeightLive_brch(:,:,:,:,:)                  !internode height, [m]
+  real(r8),target,allocatable ::  LeafAreaLive_brch(:,:,:,:)                     !branch leaf area, [m2 d-2]
+  real(r8),target,allocatable ::  LeafAreaDying_brch(:,:,:,:)                     !branch leaf area, [m2 d-2]
   real(r8),target,allocatable ::  CanPBranchHeight(:,:,:,:)                    !branch height, [m]
   real(r8),target,allocatable ::  GRNOB(:,:,:,:)                     !branch grain number, [d-2]
   real(r8),target,allocatable ::  GRNXB(:,:,:,:)                     !branch potential grain number, [d-2]
   real(r8),target,allocatable ::  GRNO(:,:,:)                        !canopy grain number, [d-2]
   real(r8),target,allocatable ::  pftPlantPopulation(:,:,:)             !plant population, [d-2]
-  real(r8),target,allocatable ::  HTNODX(:,:,:,:,:)                  !internode height, [m]
+  real(r8),target,allocatable ::  InternodeHeightDying_brch(:,:,:,:,:)                  !internode height, [m]
   real(r8),target,allocatable ::  CNLF(:,:,:)                        !maximum leaf N:C ratio, [g g-1]
   real(r8),target,allocatable ::  CPLF(:,:,:)                        !maximum leaf P:C ratio, [g g-1]
   real(r8),target,allocatable ::  CNSHE(:,:,:)                       !sheath N:C ratio, [g g-1]
@@ -120,7 +122,7 @@ module PlantTraitDataType
   integer,target,allocatable ::  NumOfMainBranch_pft(:,:,:)                          !number of main branch, [-]
   integer,target,allocatable ::  IFLGR(:,:,:,:)                      !branch phenology flag, [-]
   integer,target,allocatable ::  IFLGQ(:,:,:,:)                      !branch phenology flag, [h]
-  integer,target,allocatable ::  doPlantSenescence(:,:,:,:)                      !branch phenology flag, [-]
+  integer,target,allocatable ::  doSenescence_brch(:,:,:,:)                      !branch phenology flag, [-]
   integer,target,allocatable ::  doRemobilization_brch(:,:,:,:)                      !branch phenology flag, [-]
   integer,target,allocatable ::  doInitLeafOut(:,:,:,:)                      !branch phenology flag, [-]
   integer,target,allocatable ::  doPlantLeafOut(:,:,:,:)                      !branch phenology flag, [-]
@@ -196,21 +198,23 @@ contains
   allocate(HypoctoylHeight(JP,JY,JX));    HypoctoylHeight=0._r8
   allocate(GridMaxCanopyHeight(JY,JX));          GridMaxCanopyHeight=0._r8
   allocate(CanopyHeightz(0:JC,JY,JX));     CanopyHeightz=0._r8
-  allocate(ANGBR(JP,JY,JX));    ANGBR=0._r8
-  allocate(ANGSH(JP,JY,JX));    ANGSH=0._r8
+  allocate(BranchAngle_pft(JP,JY,JX));    BranchAngle_pft=0._r8
+  allocate(PetioleAngle_pft(JP,JY,JX));    PetioleAngle_pft=0._r8
+  allocate(SineBranchAngle_pft(JP,JY,JX));    SineBranchAngle_pft=0._r8
+  allocate(SinePetioleAngle_pft(JP,JY,JX));    SinePetioleAngle_pft=0._r8
   allocate(RAZ(JP,JY,JX));      RAZ=0._r8
   allocate(CanPHeight4WatUptake(JP,JY,JX));    CanPHeight4WatUptake=0._r8
-  allocate(ARLF(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));ARLF=0._r8
-  allocate(CanPSheathHeight(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));CanPSheathHeight=0._r8
-  allocate(HTNODE(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));HTNODE=0._r8
-  allocate(CanopyBranchLeafA_pft(MaxNumBranches,JP,JY,JX)); CanopyBranchLeafA_pft=0._r8
-  allocate(ARLFZ(MaxNumBranches,JP,JY,JX)); ARLFZ=0._r8
+  allocate(LeafAreaNode_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));LeafAreaNode_brch=0._r8
+  allocate(PetioleLengthNode_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));PetioleLengthNode_brch=0._r8
+  allocate(InternodeHeightLive_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));InternodeHeightLive_brch=0._r8
+  allocate(LeafAreaLive_brch(MaxNumBranches,JP,JY,JX)); LeafAreaLive_brch=0._r8
+  allocate(LeafAreaDying_brch(MaxNumBranches,JP,JY,JX)); LeafAreaDying_brch=0._r8
   allocate(CanPBranchHeight(MaxNumBranches,JP,JY,JX));CanPBranchHeight=0._r8
   allocate(GRNOB(MaxNumBranches,JP,JY,JX)); GRNOB=0._r8
   allocate(GRNXB(MaxNumBranches,JP,JY,JX)); GRNXB=0._r8
   allocate(GRNO(JP,JY,JX));     GRNO=0._r8
   allocate(pftPlantPopulation(JP,JY,JX));       pftPlantPopulation=0._r8
-  allocate(HTNODX(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));HTNODX=0._r8
+  allocate(InternodeHeightDying_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));InternodeHeightDying_brch=0._r8
   allocate(CNLF(JP,JY,JX));     CNLF=0._r8
   allocate(CPLF(JP,JY,JX));     CPLF=0._r8
   allocate(CNSHE(JP,JY,JX));    CNSHE=0._r8
@@ -277,7 +281,7 @@ contains
   allocate(NumOfMainBranch_pft(JP,JY,JX));      NumOfMainBranch_pft=0
   allocate(IFLGR(MaxNumBranches,JP,JY,JX)); IFLGR=0
   allocate(IFLGQ(MaxNumBranches,JP,JY,JX)); IFLGQ=0
-  allocate(doPlantSenescence(MaxNumBranches,JP,JY,JX)); doPlantSenescence=0
+  allocate(doSenescence_brch(MaxNumBranches,JP,JY,JX)); doSenescence_brch=0
   allocate(doRemobilization_brch(MaxNumBranches,JP,JY,JX)); doRemobilization_brch=0
   allocate(doInitLeafOut(MaxNumBranches,JP,JY,JX)); doInitLeafOut=0
   allocate(doPlantLeafOut(MaxNumBranches,JP,JY,JX)); doPlantLeafOut=0
@@ -350,21 +354,23 @@ contains
   call destroy(HypoctoylHeight)
   call destroy(GridMaxCanopyHeight)
   call destroy(CanopyHeightz)
-  call destroy(ANGBR)
-  call destroy(ANGSH)
+  call destroy(BranchAngle_pft)
+  call destroy(PetioleAngle_pft)
+  call destroy(SineBranchAngle_pft)
+  call destroy(SinePetioleAngle_pft)
   call destroy(RAZ)
   call destroy(CanPHeight4WatUptake)
-  call destroy(ARLF)
-  call destroy(CanPSheathHeight)
-  call destroy(HTNODE)
-  call destroy(CanopyBranchLeafA_pft)
-  call destroy(ARLFZ)
+  call destroy(LeafAreaNode_brch)
+  call destroy(PetioleLengthNode_brch)
+  call destroy(InternodeHeightLive_brch)
+  call destroy(LeafAreaLive_brch)
+  call destroy(LeafAreaDying_brch)
   call destroy(CanPBranchHeight)
   call destroy(GRNOB)
   call destroy(GRNXB)
   call destroy(GRNO)
   call destroy(pftPlantPopulation)
-  call destroy(HTNODX)
+  call destroy(InternodeHeightDying_brch)
   call destroy(CNLF)
   call destroy(CPLF)
   call destroy(CNSHE)
@@ -431,7 +437,7 @@ contains
   call destroy(NumOfMainBranch_pft)
   call destroy(IFLGR)
   call destroy(IFLGQ)
-  call destroy(doPlantSenescence)
+  call destroy(doSenescence_brch)
   call destroy(doRemobilization_brch)
   call destroy(doInitLeafOut)
   call destroy(doPlantLeafOut)
