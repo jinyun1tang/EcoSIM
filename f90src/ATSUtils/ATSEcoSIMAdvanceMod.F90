@@ -75,9 +75,6 @@ implicit none
   PSIAtFldCapacity = pressure_at_field_capacity
   PSIAtWiltPoint = pressure_at_wilting_point
 
-  !PSIAtFldCapacity = 0.5
-  !PSIAtWiltPoint = 0.25
-
   !What are I and J are these a loop?
   write(*,*) "Running StageSurfacePhysModel"
   call StageSurfacePhysModel(I,J,NHW,NHE,NVN,NVS,ResistanceLitRLay)
@@ -88,6 +85,17 @@ implicit none
     call RunSurfacePhysModel(M,NHE,NHW,NVS,NVN,ResistanceLitRLay,&
       KSatReductByRainKineticEnergyS,HeatFlux2Ground,TopLayWatVol)
   ENDDO
+
+  write(*,*) "Printing Heat Flux"
+
+  do NY=1,NYS
+    write(*,*) "Col: ", NY , "Heat Flux: " HeatFlux2Ground(NY,1)
+  ENDDO
+
+  DO NY=1,NYS
+    !for every column send the top layer to the transfer var
+    surf_e_source(NY) = HeatFlux2Ground(NY,1) 
+  ENDO
 
   write(*,*) "Finished Subroutine RunEcoSIMSurfaceBalance"
   end subroutine RunEcoSIMSurfaceBalance
