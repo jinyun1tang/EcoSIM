@@ -54,8 +54,8 @@ implicit none
     ZNH3E(NY,NX)=atm_nh3
     H2GE(NY,NX)=atm_H2
     DO L=NU(NY,NX),NL(NY,NX)
-      FieldCapacity(L,NY,NX)=a_FC(L,ny)
-      WiltPoint(L,NY,NX)=a_WP(L,NY)
+      !FieldCapacity(L,NY,NX)=a_FC(L,ny)
+      !WiltPoint(L,NY,NX)=a_WP(L,NY)
       CumDepth2LayerBottom(L,NY,NX)=a_CumDepth2LayerBottom(L,NY)
       SoiBulkDensityt0(L,NY,NX)=a_BKDSI(L,NY)
       CORGC(L,NY,NX)=a_CORGC(L,NY)
@@ -63,6 +63,9 @@ implicit none
       CORGP(L,NY,NX)=a_CORGP(L,NY)
     ENDDO
   ENDDO
+
+  PSIAtFldCapacity = pressure_at_field_capacity
+  PSIAtWiltPoint = pressure_at_wilting_point
 
   call startsim(NHW,NHE,NVN,NVS)
 
