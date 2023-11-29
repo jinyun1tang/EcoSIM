@@ -239,18 +239,22 @@ contains
   num_cols = sizes%num_columns
 
   vec_size = size(surf_e_source)
-  write(*,*) "in surface energy balance"
+  write(*,*) "Surface energy before running RunEcoSIMSurfaceBalance"
+
+  do K=1,vec_size
+    write(*,*) "surface energy (", K, ") = ", surf_e_source(K)
+  !  write(*,*) "surface water (", K, ") = ", surf_w_source(K)
+  end do
+
 
   call RunEcoSIMSurfaceBalance(size_col)
 
-  !do K=1,vec_size
-  !  write(*,*) "surface energy (", K, ") = ", surf_e_source(K)
+  write(*,*) "Surface energy After running RunEcoSIMSurfaceBalance"
+
+  do K=1,vec_size
+    write(*,*) "surface energy (", K, ") = ", surf_e_source(K)
   !  write(*,*) "surface water (", K, ") = ", surf_w_source(K)
-  !
-  !  write(*,*) "changing surface vars"
-  !  surf_e_source(K) = 0.0
-  !  surf_w_source(K) = 0.0
-  !end do
+  end do
 
   write(*,*) "leaving surface energy balance"
 

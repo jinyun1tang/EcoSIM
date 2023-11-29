@@ -23,7 +23,7 @@ implicit none
   use GridMod           , only : SetMeshATS
   use SurfPhysMod       , only : RunSurfacePhysModel, StageSurfacePhysModel
   implicit none
-  integer :: NY,NX,L,NHW,NHE,NVN,NVS, I, J, M
+  integer :: NY,NX,L,NHW,NHE,NVN,NVS, I, J, M, heat_vec_size
   integer, intent(in) :: NYS
   real(r8) :: YSIN(JSA),YCOS(JSA),YAZI(JSA)
   real(r8) :: ResistanceLitRLay(JY,JX)
@@ -79,7 +79,8 @@ implicit none
   write(*,*) "Running StageSurfacePhysModel"
   call StageSurfacePhysModel(I,J,NHW,NHE,NVN,NVS,ResistanceLitRLay)
 
-  write(*,*) "Done; Running RunSurfacePhysModel"
+  heat_vec_size = size(HeatFlux2Ground)
+  write(*,*) "Size of heat flux before: ", heat_vec_size 
 
   DO M=1,NPH
     call RunSurfacePhysModel(M,NHE,NHW,NVS,NVN,ResistanceLitRLay,&
@@ -87,6 +88,9 @@ implicit none
   ENDDO
 
   write(*,*) "Printing Heat Flux"
+
+  heat_vec_size = size(HeatFlux2Ground)
+  write(*,*) "Size of heat flux after: ", heat_vec_size 
 
   do NY=1,NYS
     write(*,*) "Col: ", NY , "Heat Flux: ", HeatFlux2Ground(NY,1)
