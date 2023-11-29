@@ -81,7 +81,7 @@ contains
   bounds%begt=1;bounds%endt=bounds%ntopou
   nextra_grid=1
   JX=(NHE-NHW)+1;JX0=JX
-  JY=(NVS-NVN)+1;JY0=JY
+  JY=(NVS-NVN)+1;JY0=JY     
 
   bounds%ncols=JX*JY
   bounds%npfts=bounds%ncols*JP
@@ -94,7 +94,7 @@ contains
   if(column_mode)nextra_grid=0
   JX=JX+nextra_grid
   JY=JY+nextra_grid
-
+  
   ic=0;ip=0
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
@@ -155,11 +155,24 @@ contains
   bounds%NHE =NHE
   bounds%NVS =NVS
 
+  write(*,*) "Bounds in GridMod"
+  write(*,*) "NHW = ", NHW
+  write(*,*) "NVN = ", NVN
+  write(*,*) "NHE = ", NHE
+  write(*,*) "NVS = ", NVS
+
   bounds%begg=1;bounds%endg=bounds%ngrid
   bounds%begt=1;bounds%endt=bounds%ntopou
   nextra_grid=1
   JX=(NHE-NHW)+1;JX0=JX
   JY=(NVS-NVN)+1;JY0=JY
+
+  write(*,*) "Calculating J parameters:"
+  write(*,*) "JX = ", JX
+  write(*,*) "JY = ", JY
+  write(*,*) "JX0 = ", JX0
+  write(*,*) "JY0 = ", JY0  
+  write(*,*) "ncols = ", JX*JY  
 
   bounds%ncols=JX*JY
   bounds%npfts=bounds%ncols*JP
