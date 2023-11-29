@@ -89,13 +89,13 @@ implicit none
   write(*,*) "Printing Heat Flux"
 
   do NY=1,NYS
-    write(*,*) "Col: ", NY , "Heat Flux: " HeatFlux2Ground(NY,1)
+    write(*,*) "Col: ", NY , "Heat Flux: ", HeatFlux2Ground(NY,1)
   ENDDO
 
   DO NY=1,NYS
     !for every column send the top layer to the transfer var
     surf_e_source(NY) = HeatFlux2Ground(NY,1) 
-  ENDO
+  ENDDO
 
   write(*,*) "Finished Subroutine RunEcoSIMSurfaceBalance"
   end subroutine RunEcoSIMSurfaceBalance

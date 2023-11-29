@@ -183,8 +183,8 @@ contains
   call c_f_pointer(state%subsurface_energy_source%data, data2D, [(/size_col/),(/size_procs/)])
   data2D(:,:)=a_SSES
 
-  call c_f_pointer(state%surface_water_source%data, data, (/num_cols/))
-  data(:) = surf_w_source
+  !call c_f_pointer(state%surface_water_source%data, data, (/num_cols/))
+  !data(:) = surf_w_source
 
   call c_f_pointer(state%surface_energy_source%data, data, (/num_cols/))
   data(:) = surf_e_source
