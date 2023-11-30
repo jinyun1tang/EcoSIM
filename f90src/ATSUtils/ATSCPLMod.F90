@@ -246,8 +246,8 @@ contains
   !  write(*,*) "surface water (", K, ") = ", surf_w_source(K)
   end do
 
-
-  call RunEcoSIMSurfaceBalance(size_col)
+  !needs number of columns
+  call RunEcoSIMSurfaceBalance(num_cols)
 
   write(*,*) "Surface energy After running RunEcoSIMSurfaceBalance"
 
@@ -272,7 +272,7 @@ contains
 
     sizes%num_components = 1
     sizes%ncells_per_col_ = 100
-    sizes%num_columns = 25
+    sizes%num_columns = 1
 
   end subroutine SetBGCSizes
 
