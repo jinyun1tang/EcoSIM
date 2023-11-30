@@ -74,7 +74,7 @@ contains
   call c_f_pointer(state%hydraulic_conductivity%data, data2D, [(/size_col/),(/num_cols/)])
   a_HCOND=data2D(:,:)
 
-  call c_f_pointer(props%dz%data, data2D, [(/size_col/),(/num_cols/)])
+  call c_f_pointer(props%depth_c%data, data2D, [(/size_col/),(/num_cols/)])
   a_CumDepth2LayerBottom=data2D(:,:)
 
   call c_f_pointer(props%shortwave_radiation%data, data, (/num_cols/))
