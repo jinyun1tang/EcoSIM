@@ -75,7 +75,7 @@ implicit none
 
   integer, parameter :: iplt_bryophyte=0
   integer, parameter :: iplt_grasslike=1
-  integer, parameter :: iplt_treelike=2
+  integer, parameter :: iplt_treelike =2
 
   integer, parameter :: ideterminate=0
   integer, parameter :: inondeterminate=1
@@ -91,4 +91,22 @@ implicit none
   integer, parameter :: ipltcal_SetSeedMass  =9
   integer, parameter :: ipltcal_EndSeedFill  =10
 
+  integer, parameter :: iphotop_neutral=0
+  integer, parameter :: iphotop_short  =1
+  integer, parameter :: iphotop_long   =2
+
+  integer, parameter :: iphenotyp_evgreen=0
+  integer, parameter :: iphenotyp_coldecidu=1
+  integer, parameter :: iphenotyp_drouhtdecidu=2
+  integer, parameter :: iphenotyp_coldroutdecidu=3
+
+  integer, parameter :: in2fixtyp_none=0
+  integer, parameter :: in2fixtyp_root_fast=1
+  integer, parameter :: in2fixtyp_root_medium=2
+  integer, parameter :: in2fixtyp_root_slow=3
+  integer, parameter :: in2fixtyp_canopy_fast=4
+  integer, parameter :: in2fixtyp_canopy_medium=5
+  integer, parameter :: in2fixtyp_canopy_slow=6
+
+  
 end module ElmIDMod

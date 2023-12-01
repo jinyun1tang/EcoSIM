@@ -19,9 +19,9 @@ module InitSOMBGCMOD
 
   private
 
-  real(r8), allocatable :: CORGCX(:)  !C concentations from OM complexes
-  real(r8), allocatable :: CORGNX(:)  !N concentations from OM complexes
-  real(r8), allocatable :: CORGPX(:)  !P concentations from OM complexes
+  real(r8), allocatable :: CORGCX(:)  !C concentations from OM CO2CompenPoint_nodeexes
+  real(r8), allocatable :: CORGNX(:)  !N concentations from OM CO2CompenPoint_nodeexes
+  real(r8), allocatable :: CORGPX(:)  !P concentations from OM CO2CompenPoint_nodeexes
 
   public :: InitSOMVars
   public :: InitSOMProfile
@@ -155,9 +155,9 @@ module InitSOMBGCMOD
 !
 !     MICROBIAL BIOMASS,RESIDUE, DOC, ADSORBED
 !
-!     OSCI,OSNI,OSPI=initial SOC,SON,SOP mass in each complex (g)
+!     OSCI,OSNI,OSPI=initial SOC,SON,SOP mass in each CO2CompenPoint_nodeex (g)
 !     OMCK,ORCK,OQCK,OHCK=fractions of SOC in biomass,litter,DOC adsorbed C
-!     OSCM=total biomass in each complex (g)
+!     OSCM=total biomass in each CO2CompenPoint_nodeex (g)
 !     DCKR,DCKM=parameters to initialize microbial biomass from SOC
 !
   TOSCI=0.0_r8
@@ -167,7 +167,7 @@ module InitSOMBGCMOD
     IF(L.EQ.0)THEN
       KK=K
     ELSE
-      !humus complex
+      !humus CO2CompenPoint_nodeex
       KK=micpar%k_humus
     ENDIF
     IF(SoilMicPMassLayer(L,NY,NX).GT.ZEROS(NY,NX))THEN
@@ -237,8 +237,8 @@ module InitSOMBGCMOD
 !     OMCF,OMCA=hetero,autotrophic biomass composition in litter
 !     CNOMC,CPOMC=maximum N:C and P:C ratios in microbial biomass
 !     OSCX,OSNX,OSPX=remaining unallocated SOC,SON,SOP
-!  The reason that initialization of complex 5 microbes is repated for each
-! complex is because complex 5 is shared by the other complexes
+!  The reason that initialization of CO2CompenPoint_nodeex 5 microbes is repated for each
+! CO2CompenPoint_nodeex is because CO2CompenPoint_nodeex 5 is shared by the other CO2CompenPoint_nodeexes
     OMCff(1:nlbiomcp,1:NumOfMicrobsInAutotrophCmplx,L,NY,NX)=0._r8
     OMNff(1:nlbiomcp,1:NumOfMicrobsInAutotrophCmplx,L,NY,NX)=0._r8
     OMPff(1:nlbiomcp,1:NumOfMicrobsInAutotrophCmplx,L,NY,NX)=0._r8

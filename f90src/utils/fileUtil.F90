@@ -156,7 +156,7 @@ module fileUtil
      write(stdout, '(a, a, i7, a)') subname, ": Read buffer of ", &
           len_trim(namelist_buffer), " characters."
      write(stdout, '(a)') "------------------------------"
-     write(stdout, '(a)') "  If it looks like part of the namelist is missing, "
+     write(stdout, '(a)') "  If it looks like part of the namelist is miSineSolarAngleg, "
      write(stdout, '(a)') "  compare the number of characters read to the actual "
      write(stdout, '(a,a,a)') "  size of your file ($ wc -c ", trim(namelist_filename), ") and increase "
      write(stdout, '(a)') "  the buffer size if necessary."

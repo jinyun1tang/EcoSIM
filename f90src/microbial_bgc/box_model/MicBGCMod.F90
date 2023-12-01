@@ -112,7 +112,7 @@ module MicBGCMod
         !     TRANSFER ALL PRIMING AMONG ALL K
         !
         !     TOQCK=total respiration of DOC+DOA in soil layer
-        !     ROQCK=total respiration of DOC+DOA in substrate complex
+        !     ROQCK=total respiration of DOC+DOA in substrate CO2CompenPoint_nodeex
         !     OQC,OQN,OQP,OQA=DOC,DON,DOP,acetate in micropores
         !     OMC,OMN,OMP=microbial C,N,P
         !
@@ -264,7 +264,7 @@ module MicBGCMod
     FOSRH   => micstt%FOSRH   &
   )
 
-! get KL, the number of mic-om complexes
+! get KL, the number of mic-om CO2CompenPoint_nodeexes
 
 !
 !     TEMPERATURE FUNCTIONS FOR GROWTH AND MAINTENANCE
@@ -383,7 +383,7 @@ module MicBGCMod
   TOMN=0.0_r8
   D890: DO K=1,jcplx
     IF(.not.litrm.OR.(K.NE.k_POM.AND.K.NE.k_humus))THEN
-! the omb complexes
+! the omb CO2CompenPoint_nodeexes
       D895: DO N=1,NFGs
         DO NGL=JGnio(n),JGnfo(n)
           IF(OMC(1,NGL,K).GT.ZEROS)THEN
@@ -419,7 +419,7 @@ module MicBGCMod
     ENDIF
   ENDDO D890
 
-! the abstract complex
+! the abstract CO2CompenPoint_nodeex
   DO N=1,NFGs
     IF(is_activef_micb(N))THEN
       DO NGL=JGniA(N),JGnfA(N)
@@ -485,7 +485,7 @@ module MicBGCMod
   ENDDO
 
 !
-!     FOSRH=fraction of total SOC in each substrate complex K
+!     FOSRH=fraction of total SOC in each substrate CO2CompenPoint_nodeex K
 !
   D790: DO K=1,KL
     IF(TSRH.GT.ZEROS)THEN
@@ -498,7 +498,7 @@ module MicBGCMod
     !
     !     COQC,COQA=aqueous DOC,acetate concentrations
     !     VLWatMicPM=soil water content, FOSRH=fraction of total SOC
-    !     occupied by each substrate complex K
+    !     occupied by each substrate CO2CompenPoint_nodeex K
     !
     IF(VLWatMicPM(NPH).GT.ZEROS2)THEN
       IF(FOSRH(K).GT.ZERO)THEN
@@ -1097,7 +1097,7 @@ module MicBGCMod
 !     TRANSFER ALL PRIMING AMONG ALL K
 !
 !     TOQCK=total respiration of DOC+DOA in soil layer
-!     ROQCK=total respiration of DOC+DOA in substrate complex
+!     ROQCK=total respiration of DOC+DOA in substrate CO2CompenPoint_nodeex
 !     OQC,OQN,OQP,OQA=DOC,DON,DOP,acetate in micropores
 !     OMC,OMN,OMP=microbial C,N,P
 !
@@ -1200,6 +1200,7 @@ module MicBGCMod
     ELSE
       CSORP(K)=TSORP*(OQCX*VLSoilPoreMicPX-OHCX*VLSoilPoreMicPW)/(VLSoilPoreMicPX+VLSoilPoreMicPW)
     ENDIF
+
     IF(FOAA(K).GT.ZERO)THEN
       VOLAX=FOAA(K)*VLSoilPoreMicPX
       VOLAW=FOAA(K)*VLSoilPoreMicPW
@@ -1594,7 +1595,7 @@ module MicBGCMod
   )
 !
 !     REDISTRIBUTE AUTOTROPHIC DECOMPOSITION PRODUCTS AMONG
-!     HETEROTROPHIC SUBSTRATE-MICROBE COMPLEXES
+!     HETEROTROPHIC SUBSTRATE-MICROBE CO2CompenPoint_nodeEXES
 !
 !     FORC=fraction of total microbial residue
 !     ORCT=microbial residue
@@ -1624,7 +1625,7 @@ module MicBGCMod
   ENDDO D1690
 !
 !   REDISTRIBUTE C,N AND P TRANSFORMATIONS AMONG STATE
-!   VARIABLES IN SUBSTRATE-MICROBE COMPLEXES
+!   VARIABLES IN SUBSTRATE-MICROBE CO2CompenPoint_nodeEXES
 !
 
   D590: DO K=1,KL

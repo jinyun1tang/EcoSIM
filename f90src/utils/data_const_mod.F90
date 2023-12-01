@@ -59,7 +59,7 @@ MODULE data_const_mod
    real(R8),parameter :: DAT_CONST_OCN_REF_SAL = 34.7_R8     ! ocn ref salinity (psu)
    real(R8),parameter :: DAT_CONST_ICE_REF_SAL =  4.0_R8     ! ice ref salinity (psu)
 
-   real(R8),parameter :: DAT_CONST_SPVAL   = 1.0e30_R8       ! special missing value
-   integer ,parameter :: DAT_CONST_ISPVAL  = -999            ! special missing value
+   real(R8),parameter :: DAT_CONST_SPVAL   = 1.0e30_R8       ! special miSineSolarAngleg value
+   integer ,parameter :: DAT_CONST_ISPVAL  = -999            ! special miSineSolarAngleg value
 
 END MODULE data_const_mod

@@ -44,7 +44,7 @@ module RedistMod
   character(len=*), parameter :: mod_filename = &
   __FILE__
 
-  real(r8), pointer :: THETCX(:)
+  real(r8), pointer :: ThetaCX(:)
 
 
 
@@ -55,9 +55,9 @@ module RedistMod
   subroutine InitRedist
   implicit none
 
-  allocate(THETCX(micpar%NumOfPlantLitrCmplxs))
+  allocate(ThetaCX(micpar%NumOfPlantLitrCmplxs))
 
-  THETCX=(/8.0E-06_r8,8.0E-06_r8/)
+  ThetaCX=(/8.0E-06_r8,8.0E-06_r8/)
 
   call InitTflxType()
 
@@ -1540,7 +1540,7 @@ module RedistMod
       OSN(M,K,0,NY,NX)=OSN(M,K,0,NY,NX)+LitrfalChemElemnts_vr(ielmn,M,K,0,NY,NX)
       OSP(M,K,0,NY,NX)=OSP(M,K,0,NY,NX)+LitrfalChemElemnts_vr(ielmp,M,K,0,NY,NX)
       ORGC(0,NY,NX)=ORGC(0,NY,NX)+LitrfalChemElemnts_vr(ielmc,M,K,0,NY,NX)
-      RAINR=LitrfalChemElemnts_vr(ielmc,M,K,0,NY,NX)*THETCX(K)
+      RAINR=LitrfalChemElemnts_vr(ielmc,M,K,0,NY,NX)*ThetaCX(K)
       HRAINR=RAINR*cpw*TairK(NY,NX)
       WatFLo2Litr(NY,NX)=WatFLo2Litr(NY,NX)+RAINR
       HeatFLo2LitrByWat(NY,NX)=HeatFLo2LitrByWat(NY,NX)+HRAINR

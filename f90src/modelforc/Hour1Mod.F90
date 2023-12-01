@@ -222,12 +222,12 @@ module Hour1Mod
 !     NUMBERS OF TOP AND BOTTOM ROOTED SOIL LAYERS
 !
 !     NG=number of uppermost rooted layer
-!     NINR=number of lowest rooted layer
+!     NIXBotRootLayer_rpft=number of lowest rooted layer
 !
-        NGTopRootLayer(NZ,NY,NX)=MAX(NGTopRootLayer(NZ,NY,NX),NU(NY,NX))
-        NIXBotRootLayer(NZ,NY,NX)=MAX(NIXBotRootLayer(NZ,NY,NX),NU(NY,NX))
+        NGTopRootLayer_pft(NZ,NY,NX)=MAX(NGTopRootLayer_pft(NZ,NY,NX),NU(NY,NX))
+        NIXBotRootLayer_pft(NZ,NY,NX)=MAX(NIXBotRootLayer_pft(NZ,NY,NX),NU(NY,NX))
         DO  NR=1,JC
-          NINR(NR,NZ,NY,NX)=MAX(NINR(NR,NZ,NY,NX),NU(NY,NX))
+          NIXBotRootLayer_rpft(NR,NZ,NY,NX)=MAX(NIXBotRootLayer_rpft(NR,NZ,NY,NX),NU(NY,NX))
         ENDDO
       ENDDO
 !
@@ -257,13 +257,13 @@ module Hour1Mod
 !     CanopyLeafA_pft,CanopyStemA_pft=leaf,stalk area of PFT
 !     FLWC,TFLWC=water retention of PFT,combined canopy
 !     PRECA=precipitation+irrigation
-!     FracPARByCanP=fraction of radiation received by each PFT canopy
+!     FracPARbyCanopy_pft=fraction of radiation received by each PFT canopy
 !     VOLWC=canopy surface water retention
 !
   DO  NZ=1,NP(NY,NX)
     VOLWCX=XVOLWC(iPlantMorphologyType(NZ,NY,NX))*(CanopyLeafA_pft(NZ,NY,NX)+CanopyStemA_pft(NZ,NY,NX))
-    PrecIntcptByCanP(NZ,NY,NX)=AZMAX1(AMIN1(PrecRainAndSurfirrig(NY,NX)*FracPARByCanP(NZ,NY,NX),VOLWCX-WatByPCan(NZ,NY,NX)))
-    TFLWCI(NY,NX)=TFLWCI(NY,NX)+PrecRainAndSurfirrig(NY,NX)*FracPARByCanP(NZ,NY,NX)
+    PrecIntcptByCanP(NZ,NY,NX)=AZMAX1(AMIN1(PrecRainAndSurfirrig(NY,NX)*FracPARbyCanopy_pft(NZ,NY,NX),VOLWCX-WatByPCanopy(NZ,NY,NX)))
+    TFLWCI(NY,NX)=TFLWCI(NY,NX)+PrecRainAndSurfirrig(NY,NX)*FracPARbyCanopy_pft(NZ,NY,NX)
     PrecIntcptByCanG(NY,NX)=PrecIntcptByCanG(NY,NX)+PrecIntcptByCanP(NZ,NY,NX)
   ENDDO
 
@@ -995,10 +995,10 @@ module Hour1Mod
   OC=0.0_r8
 
   DO L=0,NL(NY,NX)
-!  add heterotrophic complexs
+!  add heterotrophic CO2CompenPoint_nodeexs
     OC=OC+sum(OMC(1:nlbiomcp,1:NumOfMicrobs1HetertrophCmplx,1:jcplx,L,NY,NX))
 
-!  add autotrophic complex
+!  add autotrophic CO2CompenPoint_nodeex
     OC=OC+sum(OMCff(1:nlbiomcp,1:NumOfMicrobsInAutotrophCmplx,L,NY,NX))
 !  add microbial residue
     OC=OC+SUM(ORC(1:ndbiomcp,1:jcplx,L,NY,NX))
@@ -1006,7 +1006,7 @@ module Hour1Mod
     OC=OC+SUM(DOM(idom_doc,1:jcplx,L,NY,NX))+SUM(DOM_Macp(idom_doc,1:jcplx,L,NY,NX)) &
          +SUM(OHC(1:jcplx,L,NY,NX))+SUM(DOM(idom_acetate,1:jcplx,L,NY,NX)) &
          +SUM(DOM_Macp(idom_acetate,1:jcplx,L,NY,NX))+SUM(OHA(1:jcplx,L,NY,NX))
-!  add OM complexes
+!  add OM CO2CompenPoint_nodeexes
     OC=OC+SUM(OSC(1:jsken,1:jcplx,L,NY,NX))
 !
     ORGCX(L,NY,NX)=OC
@@ -1768,7 +1768,7 @@ module Hour1Mod
       CFOSC(ilignin,k_manure,LFDPTH,NY,NX)=0.145_r8
     ENDIF
 !
-!     DISTRIBUTE RESIDUE APPLICATION AMONG COMPONENTS OF RESIDUE COMPLEX
+!     DISTRIBUTE RESIDUE APPLICATION AMONG COMPONENTS OF RESIDUE CO2CompenPoint_nodeEX
 !
 !     OFC,OFN,OFP=litter C,N,P application from fertilizer file
 !

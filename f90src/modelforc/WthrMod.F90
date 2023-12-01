@@ -261,7 +261,7 @@ module WthrMod
 !
 !     IF OUTDOORS
 !
-!     SSIN,SSINN=sine solar angle of current,next hour
+!     SineSolarAngle,SineSolarAngleNextHour=sine solar angle of current,next hour
 !     RADX=solar constant at horizontal surface
 !     RADN=SW radiation at horizontal surface
 !     radian per degree 1.7453E-02_r8
@@ -270,13 +270,13 @@ module WthrMod
         AZI=SIN(ALAT(NY,NX)*1.7453E-02_r8)*SIN(DECLIN*1.7453E-02_r8)
         DEC=COS(ALAT(NY,NX)*1.7453E-02_r8)*COS(DECLIN*1.7453E-02_r8)
 
-        SSIN(NY,NX)=AZMAX1(AZI+DEC*COS(.2618_r8*(ZNOON(NY,NX)-(J-0.5_r8))))
-        SSINN(NY,NX)=AZMAX1(AZI+DEC*COS(.2618_r8*(ZNOON(NY,NX)-(J+0.5_r8))))
+        SineSolarAngle(NY,NX)=AZMAX1(AZI+DEC*COS(.2618_r8*(ZNOON(NY,NX)-(J-0.5_r8))))
+        SineSolarAngleNextHour(NY,NX)=AZMAX1(AZI+DEC*COS(.2618_r8*(ZNOON(NY,NX)-(J+0.5_r8))))
 
-        !     IF(SSIN(NY,NX).GT.0.0.AND.SSIN(NY,NX).LT.TWILGT)SSIN(NY,NX)=TWILGT
-        IF(RADN(NY,NX).LE.0.0)SSIN(NY,NX)=0.0_r8
-        IF(SSIN(NY,NX).LE.-TWILGT)RADN(NY,NX)=0.0_r8
-        RADX=4.896_r8*AZMAX1(SSIN(NY,NX))
+        !     IF(SineSolarAngle(NY,NX).GT.0.0.AND.SineSolarAngle(NY,NX).LT.TWILGT)SineSolarAngle(NY,NX)=TWILGT
+        IF(RADN(NY,NX).LE.0.0)SineSolarAngle(NY,NX)=0.0_r8
+        IF(SineSolarAngle(NY,NX).LE.-TWILGT)RADN(NY,NX)=0.0_r8
+        RADX=4.896_r8*AZMAX1(SineSolarAngle(NY,NX))
         RADN(NY,NX)=AMIN1(RADX,RADN(NY,NX))
 !
         !     DIRECT VS DIFFUSE RADIATION IN SOLAR OR SKY BEAMS
@@ -286,7 +286,7 @@ module WthrMod
 !
 
         RADZ=AMIN1(RADN(NY,NX),0.5_r8*(RADX-RADN(NY,NX)))
-        RADS(NY,NX)=safe_adb(RADN(NY,NX)-RADZ,SSIN(NY,NX))
+        RADS(NY,NX)=safe_adb(RADN(NY,NX)-RADZ,SineSolarAngle(NY,NX))
         RADS(NY,NX)=AMIN1(4.167_r8,RADS(NY,NX))
         RADY(NY,NX)=RADZ/TYSIN
         RAPS(NY,NX)=RADS(NY,NX)*CDIR*PDIR
@@ -310,11 +310,11 @@ module WthrMod
         !
       ELSE
         IF(RADN(NY,NX).LE.0.0_r8)THEN
-          SSIN(NY,NX)=0.0_r8
+          SineSolarAngle(NY,NX)=0.0_r8
         ELSE
-          SSIN(NY,NX)=1.0_r8
+          SineSolarAngle(NY,NX)=1.0_r8
         ENDIF
-        SSINN(NY,NX)=1.0_r8
+        SineSolarAngleNextHour(NY,NX)=1.0_r8
         CLD=0.0_r8
         EMM=0.96
       ENDIF
@@ -347,8 +347,8 @@ module WthrMod
       !     UA=WINDSPEED (M H-1)
       !     PrecAsRain(NY,NX)=RAIN (M H-1)
       !     PrecAsSnow(NY,NX)=SNOW (M H-1)
-      !     SSIN=SOLAR ANGLE CURRENT HOUR (SINE)
-      !     SSINN=SOLAR ANGLE NEXT HOUR (SINE)
+      !     SineSolarAngle=SOLAR ANGLE CURRENT HOUR (SINE)
+      !     SineSolarAngleNextHour=SOLAR ANGLE NEXT HOUR (SINE)
       !     ENDIF
       !
       !     ADD IRRIGATION
@@ -460,7 +460,7 @@ module WthrMod
             iPlantThermoAdaptZone(NZ,NY,NX)=iPlantInitThermoAdaptZone(NZ,NY,NX)+0.30/2.667*DTA
             OFFST(NZ,NY,NX)=2.667*(2.5-iPlantThermoAdaptZone(NZ,NY,NX))
             !     TCelciusChill4Leaf(NZ,NY,NX)=TCZD-OFFST(NZ,NY,NX)
-            !     TCX(NZ,NY,NX)=AMIN1(15.0,TCelciusChill4Leaf(NZ,NY,NX)+TCXD)
+            !     TCelcius4LeafOffHarden(NZ,NY,NX)=AMIN1(15.0,TCelciusChill4Leaf(NZ,NY,NX)+TCXD)
             IF(iPlantPhotosynthesisType(NZ,NY,NX).EQ.3)THEN
               HTC(NZ,NY,NX)=27.0+3.0*iPlantThermoAdaptZone(NZ,NY,NX)
             ELSE
@@ -525,8 +525,8 @@ module WthrMod
 
   DO NX=NHW,NHE
     DO  NY=NVN,NVS
-      IF(SSIN(NY,NX).GT.0.0_r8)TRAD(NY,NX)=TRAD(NY,NX)+RADS(NY,NX) &
-        *SSIN(NY,NX)+RADY(NY,NX)*TYSIN
+      IF(SineSolarAngle(NY,NX).GT.0.0_r8)TRAD(NY,NX)=TRAD(NY,NX)+RADS(NY,NX) &
+        *SineSolarAngle(NY,NX)+RADY(NY,NX)*TYSIN
       TAMX(NY,NX)=AMAX1(TAMX(NY,NX),TCA(NY,NX))
       TAMN(NY,NX)=AMIN1(TAMN(NY,NX),TCA(NY,NX))
       HUDX(NY,NX)=AMAX1(HUDX(NY,NX),VPK(NY,NX))

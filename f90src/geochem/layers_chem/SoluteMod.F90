@@ -348,7 +348,7 @@ module SoluteMod
 !     VLWatMicPNH,VLWatMicPNB=water volume in NH4 non-band,band
 !     RN4X,RN3X=NH4,NH3 input from uptake, mineraln, dissoln in non-band
 !     RNBX,R3BX=NH4,NH3 input from uptake, mineraln, dissoln in band
-!     TUPNH4,TUPNH3=soil-root exchange of NH4,NH3 in non-band from uptake.f
+!     TRootNH4Uptake_pft,TUPNH3=soil-root exchange of NH4,NH3 in non-band from uptake.f
 !     TUPNHB,TUPN3B=soil-root exchange of NH4,NH3 in band from uptake.f
 !     RNH4MicbTransf_vr,XNH4B=net change in NH4 in band,non-band from nitro.f
 !     NH4_1p_conc,NH3_aqu_conc,NH4_1p_band_conc,NH3_aqu_band_conc=total NH4,NH3 concentration in non-band,band
@@ -390,7 +390,7 @@ module SoluteMod
 !     RH1PX,RH2PX=HPO4,H2PO4 inputs from mineraln, uptake in non-band
 !     RH1BX,RH2BX=HPO4,H2PO4 inputs from mineraln, uptake in band
 !     RH1PO4MicbTransf_vr,XH1BS=net change in HPO4 in band,non-band from nitro.f
-!     TUPH1P,TUPH2P=soil-root exch of HPO4,H2PO4 in non-band from uptake.f
+!     TRootHPO4Uptake_pft,TRootH2PO4Uptake_pft=soil-root exch of HPO4,H2PO4 in non-band from uptake.f
 !     TUPH1B,TUPH2B=soil-root exch of HPO4,H2PO4 in band from uptake.f
 !     H1PO4_2e_conc,H2PO4_1e_conc=HPO4,H2PO4 concentrations in non-band
 !     H1PO4_2e_band_conc,H2PO4_1e_band_conc=HPO4,H2PO4 concentrations in band

@@ -130,23 +130,23 @@
   D960: DO NZ=1,NP0(NY,NX)
   !RSETE: effect of canopy element status on seed set
     DO NE=1,NumOfPlantChemElmnts
-      RSETE(NE,NZ,NY,NX)=RSETE(NE,NZ,NY,NX)+PlantExudChemElmnts_pft(NE,NZ,NY,NX)-LitrfallChemElmnts_pft(NE,NZ,NY,NX)
+      RSETE(NE,NZ,NY,NX)=RSETE(NE,NZ,NY,NX)+PlantExudChemElmntCum_pft(NE,NZ,NY,NX)-LitrfallChemElmnts_pft(NE,NZ,NY,NX)
       THVSTE(NE,NZ,NY,NX)=THVSTE(NE,NZ,NY,NX)+HVSTE(NE,NZ,NY,NX)
     enddo
     RSETE(ielmc,NZ,NY,NX)=RSETE(ielmc,NZ,NY,NX)+GrossCO2Fix_pft(NZ,NY,NX)+GrossResp_pft(NZ,NY,NX) &
       -CO2ByFire_pft(NZ,NY,NX)-CH4ByFire_pft(NZ,NY,NX)
-    RSETE(ielmn,NZ,NY,NX)=RSETE(ielmn,NZ,NY,NX)+TNH3C(NZ,NY,NX)+TZUPFX(NZ,NY,NX) &
+    RSETE(ielmn,NZ,NY,NX)=RSETE(ielmn,NZ,NY,NX)+NH3EmiCum_pft(NZ,NY,NX)+PlantN2FixCum_pft(NZ,NY,NX) &
       -VNH3F(NZ,NY,NX)-VN2OF(NZ,NY,NX)
     RSETE(ielmp,NZ,NY,NX)=RSETE(ielmp,NZ,NY,NX)-VPO4F(NZ,NY,NX)
 
 ! the following variables are accumulated daily
     GrossCO2Fix_pft(NZ,NY,NX)=0._r8
-    PlantExudChemElmnts_pft(:,NZ,NY,NX)=0._r8
+    PlantExudChemElmntCum_pft(:,NZ,NY,NX)=0._r8
     GrossResp_pft(NZ,NY,NX)=0._r8
-    TCO2A(NZ,NY,NX)=0._r8
+    CanopyPlusNoduRespC_pft(NZ,NY,NX)=0._r8
     ETCanP(NZ,NY,NX)=0._r8
-    TZUPFX(NZ,NY,NX)=0._r8
-    TNH3C(NZ,NY,NX)=0._r8
+    PlantN2FixCum_pft(NZ,NY,NX)=0._r8
+    NH3EmiCum_pft(NZ,NY,NX)=0._r8
     CO2ByFire_pft(NZ,NY,NX)=0._r8
     CH4ByFire_pft(NZ,NY,NX)=0._r8
     VOXYF(NZ,NY,NX)=0._r8

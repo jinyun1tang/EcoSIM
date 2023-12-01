@@ -843,32 +843,32 @@ implicit none
           ENDDO
           DO  NR=1,NumRootAxes_pft(NZ,NY,NX)
             DO NE=1,NumOfPlantChemElmnts
-              WTRT1E(NE,N,L1,NR,NZ,NY,NX)=WTRT1E(NE,N,L1,NR,NZ,NY,NX)+FX*WTRT1E(NE,N,L0,NR,NZ,NY,NX)
-              WTRT2E(NE,N,L1,NR,NZ,NY,NX)=WTRT2E(NE,N,L1,NR,NZ,NY,NX)+FX*WTRT2E(NE,N,L0,NR,NZ,NY,NX)
+              Root1stStructChemElmnt_pvr(NE,N,L1,NR,NZ,NY,NX)=Root1stStructChemElmnt_pvr(NE,N,L1,NR,NZ,NY,NX)+FX*Root1stStructChemElmnt_pvr(NE,N,L0,NR,NZ,NY,NX)
+              Root2ndStructChemElmnt_pvr(NE,N,L1,NR,NZ,NY,NX)=Root2ndStructChemElmnt_pvr(NE,N,L1,NR,NZ,NY,NX)+FX*Root2ndStructChemElmnt_pvr(NE,N,L0,NR,NZ,NY,NX)
             ENDDO
             PrimRootLen(N,L1,NR,NZ,NY,NX)=PrimRootLen(N,L1,NR,NZ,NY,NX)+FX*PrimRootLen(N,L0,NR,NZ,NY,NX)
             SecndRootLen(N,L1,NR,NZ,NY,NX)=SecndRootLen(N,L1,NR,NZ,NY,NX)+FX*SecndRootLen(N,L0,NR,NZ,NY,NX)
-            RTN2(N,L1,NR,NZ,NY,NX)=RTN2(N,L1,NR,NZ,NY,NX)+FX*RTN2(N,L0,NR,NZ,NY,NX)
+            SecndRootXNum_rpvr(N,L1,NR,NZ,NY,NX)=SecndRootXNum_rpvr(N,L1,NR,NZ,NY,NX)+FX*SecndRootXNum_rpvr(N,L0,NR,NZ,NY,NX)
           ENDDO
           DO NE=1,NumOfPlantChemElmnts
              RootMycoNonstructElmnt_vr(NE,N,L1,NZ,NY,NX)= RootMycoNonstructElmnt_vr(NE,N,L1,NZ,NY,NX)+FX* RootMycoNonstructElmnt_vr(NE,N,L0,NZ,NY,NX)
           ENDDO
           RootStructBiomC_vr(N,L1,NZ,NY,NX)=RootStructBiomC_vr(N,L1,NZ,NY,NX)+FX*RootStructBiomC_vr(N,L0,NZ,NY,NX)
            PopuPlantRootC_vr(N,L1,NZ,NY,NX)= PopuPlantRootC_vr(N,L1,NZ,NY,NX)+FX* PopuPlantRootC_vr(N,L0,NZ,NY,NX)
-          WSRTL(N,L1,NZ,NY,NX)=WSRTL(N,L1,NZ,NY,NX)+FX*WSRTL(N,L0,NZ,NY,NX)
+          RootProteinC_pvr(N,L1,NZ,NY,NX)=RootProteinC_pvr(N,L1,NZ,NY,NX)+FX*RootProteinC_pvr(N,L0,NZ,NY,NX)
           PrimRootXNumL(N,L1,NZ,NY,NX)=PrimRootXNumL(N,L1,NZ,NY,NX)+FX*PrimRootXNumL(N,L0,NZ,NY,NX)
-          SecndRootXNumL(N,L1,NZ,NY,NX)=SecndRootXNumL(N,L1,NZ,NY,NX)+FX*SecndRootXNumL(N,L0,NZ,NY,NX)
-          RootLenPerP(N,L1,NZ,NY,NX)=RootLenPerP(N,L1,NZ,NY,NX)+FX*RootLenPerP(N,L0,NZ,NY,NX)
-          RootLenDensNLP(N,L1,NZ,NY,NX)=RootLenDensNLP(N,L1,NZ,NY,NX)+FX*RootLenDensNLP(N,L0,NZ,NY,NX)
-          RTVLP(N,L1,NZ,NY,NX)=RTVLP(N,L1,NZ,NY,NX)+FX*RTVLP(N,L0,NZ,NY,NX)
-          RTVLW(N,L1,NZ,NY,NX)=RTVLW(N,L1,NZ,NY,NX)+FX*RTVLW(N,L0,NZ,NY,NX)
+          SecndRootXNum_pvr(N,L1,NZ,NY,NX)=SecndRootXNum_pvr(N,L1,NZ,NY,NX)+FX*SecndRootXNum_pvr(N,L0,NZ,NY,NX)
+          RootLenPerPopu_pvr(N,L1,NZ,NY,NX)=RootLenPerPopu_pvr(N,L1,NZ,NY,NX)+FX*RootLenPerPopu_pvr(N,L0,NZ,NY,NX)
+          RootLenthDensPerPopu_pvr(N,L1,NZ,NY,NX)=RootLenthDensPerPopu_pvr(N,L1,NZ,NY,NX)+FX*RootLenthDensPerPopu_pvr(N,L0,NZ,NY,NX)
+          RootVolume_vr(N,L1,NZ,NY,NX)=RootVolume_vr(N,L1,NZ,NY,NX)+FX*RootVolume_vr(N,L0,NZ,NY,NX)
+          RootVH2O_vr(N,L1,NZ,NY,NX)=RootVH2O_vr(N,L1,NZ,NY,NX)+FX*RootVH2O_vr(N,L0,NZ,NY,NX)
           PrimRootRadius(N,L1,NZ,NY,NX)=PrimRootRadius(N,L1,NZ,NY,NX)+FX*PrimRootRadius(N,L0,NZ,NY,NX)
           SecndRootRadius(N,L1,NZ,NY,NX)=SecndRootRadius(N,L1,NZ,NY,NX)+FX*SecndRootRadius(N,L0,NZ,NY,NX)
-          RTARP(N,L1,NZ,NY,NX)=RTARP(N,L1,NZ,NY,NX)+FX*RTARP(N,L0,NZ,NY,NX)
+          RootAreaPerPlant_vr(N,L1,NZ,NY,NX)=RootAreaPerPlant_vr(N,L1,NZ,NY,NX)+FX*RootAreaPerPlant_vr(N,L0,NZ,NY,NX)
           AveSecndRootLen(N,L1,NZ,NY,NX)=AveSecndRootLen(N,L1,NZ,NY,NX)+FX*AveSecndRootLen(N,L0,NZ,NY,NX)
         ENDDO
         DO NE=1,NumOfPlantChemElmnts
-          WTNDLE(NE,L1,NZ,NY,NX)=WTNDLE(NE,L1,NZ,NY,NX)+FX*WTNDLE(NE,L0,NZ,NY,NX)
+          RootNodueChemElmnt_pvr(NE,L1,NZ,NY,NX)=RootNodueChemElmnt_pvr(NE,L1,NZ,NY,NX)+FX*RootNodueChemElmnt_pvr(NE,L0,NZ,NY,NX)
           RootNoduleNonstructElmnt_vr(NE,L1,NZ,NY,NX)=RootNoduleNonstructElmnt_vr(NE,L1,NZ,NY,NX)+FX*RootNoduleNonstructElmnt_vr(NE,L0,NZ,NY,NX)
         ENDDO
       ENDIF
@@ -1020,32 +1020,32 @@ implicit none
           ENDDO
           DO NR=1,NumRootAxes_pft(NZ,NY,NX)
             DO NE=1,NumOfPlantChemElmnts
-              WTRT1E(NE,N,L0,NR,NZ,NY,NX)=FY*WTRT1E(NE,N,L0,NR,NZ,NY,NX)
-              WTRT2E(NE,N,L0,NR,NZ,NY,NX)=FY*WTRT2E(NE,N,L0,NR,NZ,NY,NX)
+              Root1stStructChemElmnt_pvr(NE,N,L0,NR,NZ,NY,NX)=FY*Root1stStructChemElmnt_pvr(NE,N,L0,NR,NZ,NY,NX)
+              Root2ndStructChemElmnt_pvr(NE,N,L0,NR,NZ,NY,NX)=FY*Root2ndStructChemElmnt_pvr(NE,N,L0,NR,NZ,NY,NX)
             ENDDO
             PrimRootLen(N,L0,NR,NZ,NY,NX)=FY*PrimRootLen(N,L0,NR,NZ,NY,NX)
             SecndRootLen(N,L0,NR,NZ,NY,NX)=FY*SecndRootLen(N,L0,NR,NZ,NY,NX)
-            RTN2(N,L0,NR,NZ,NY,NX)=FY*RTN2(N,L0,NR,NZ,NY,NX)
+            SecndRootXNum_rpvr(N,L0,NR,NZ,NY,NX)=FY*SecndRootXNum_rpvr(N,L0,NR,NZ,NY,NX)
           ENDDO
           DO NE=1,NumOfPlantChemElmnts
              RootMycoNonstructElmnt_vr(NE,N,L0,NZ,NY,NX)=FY* RootMycoNonstructElmnt_vr(NE,N,L0,NZ,NY,NX)
           ENDDO
           RootStructBiomC_vr(N,L0,NZ,NY,NX)=FY*RootStructBiomC_vr(N,L0,NZ,NY,NX)
            PopuPlantRootC_vr(N,L0,NZ,NY,NX)=FY* PopuPlantRootC_vr(N,L0,NZ,NY,NX)
-          WSRTL(N,L0,NZ,NY,NX)=FY*WSRTL(N,L0,NZ,NY,NX)
+          RootProteinC_pvr(N,L0,NZ,NY,NX)=FY*RootProteinC_pvr(N,L0,NZ,NY,NX)
           PrimRootXNumL(N,L0,NZ,NY,NX)=FY*PrimRootXNumL(N,L0,NZ,NY,NX)
-          SecndRootXNumL(N,L0,NZ,NY,NX)=FY*SecndRootXNumL(N,L0,NZ,NY,NX)
-          RootLenPerP(N,L0,NZ,NY,NX)=FY*RootLenPerP(N,L0,NZ,NY,NX)
-          RootLenDensNLP(N,L0,NZ,NY,NX)=FY*RootLenDensNLP(N,L0,NZ,NY,NX)
-          RTVLP(N,L0,NZ,NY,NX)=FY*RTVLP(N,L0,NZ,NY,NX)
-          RTVLW(N,L0,NZ,NY,NX)=FY*RTVLW(N,L0,NZ,NY,NX)
+          SecndRootXNum_pvr(N,L0,NZ,NY,NX)=FY*SecndRootXNum_pvr(N,L0,NZ,NY,NX)
+          RootLenPerPopu_pvr(N,L0,NZ,NY,NX)=FY*RootLenPerPopu_pvr(N,L0,NZ,NY,NX)
+          RootLenthDensPerPopu_pvr(N,L0,NZ,NY,NX)=FY*RootLenthDensPerPopu_pvr(N,L0,NZ,NY,NX)
+          RootVolume_vr(N,L0,NZ,NY,NX)=FY*RootVolume_vr(N,L0,NZ,NY,NX)
+          RootVH2O_vr(N,L0,NZ,NY,NX)=FY*RootVH2O_vr(N,L0,NZ,NY,NX)
           PrimRootRadius(N,L0,NZ,NY,NX)=FY*PrimRootRadius(N,L0,NZ,NY,NX)
           SecndRootRadius(N,L0,NZ,NY,NX)=FY*SecndRootRadius(N,L0,NZ,NY,NX)
-          RTARP(N,L0,NZ,NY,NX)=FY*RTARP(N,L0,NZ,NY,NX)
+          RootAreaPerPlant_vr(N,L0,NZ,NY,NX)=FY*RootAreaPerPlant_vr(N,L0,NZ,NY,NX)
           AveSecndRootLen(N,L0,NZ,NY,NX)=FY*AveSecndRootLen(N,L0,NZ,NY,NX)
         ENDDO
         DO NE=1,NumOfPlantChemElmnts
-          WTNDLE(NE,L0,NZ,NY,NX)=FY*WTNDLE(NE,L0,NZ,NY,NX)
+          RootNodueChemElmnt_pvr(NE,L0,NZ,NY,NX)=FY*RootNodueChemElmnt_pvr(NE,L0,NZ,NY,NX)
 
           RootNoduleNonstructElmnt_vr(NE,L0,NZ,NY,NX)=FY*RootNoduleNonstructElmnt_vr(NE,L0,NZ,NY,NX)
         ENDDO
@@ -1074,11 +1074,11 @@ implicit none
   integer :: K,N,M,NGL,NR,NZ,NE,NTG
   real(r8) :: FXO,FRO
   real(r8) :: FXRTLG2,FXRTN2,FXEPOOLR,FXWTRTL
-  real(r8) :: FXWTNDLE,FXEPOOLN
+  real(r8) :: WTNDLE,FXEPOOLN
   real(r8) :: FXWTRT1E
   real(r8) :: FXWTRT2E,FXRTLG1
-  real(r8) :: FXWTRTD,FXWSRTL,FXRTN1,FXRTNL,FXRTLGP,FXRTDNP
-  real(r8) :: FXRTVLP,FXRTVLW,FXRRAD1,FXRRAD2,FXRTARP,FXRTLGA
+  real(r8) :: FXWTRTD,FXWSRTL,FRootAreaPopu,FXRTNL,FXRTLGP,FXRTDNP
+  real(r8) :: FXRTVLP,FXRTVLW,FXRRAD1,FXRRAD2,FXRootAreaPerPlant_vr,FXRTLGA
   real(r8) :: FXOQN,FXOQP,FXOQA,FXOQCH,FXOQNH,FXOQPH,FXOQAH
   real(r8) :: FXOHC,FXOHN,FXOHP,FXOHA,FXOSC,FXOSA,FXOSN,FXOSP
   real(r8) :: FXOMC,FXOMN,FXOMP,FXORC,FXORN,FXORP,FXOQC
@@ -1219,13 +1219,13 @@ implicit none
 
           DO  NR=1,NumRootAxes_pft(NZ,NY,NX)
             DO NE=1,NumOfPlantChemElmnts
-              FXWTRT1E=FRO*WTRT1E(NE,N,L0,NR,NZ,NY,NX)
-              WTRT1E(NE,N,L1,NR,NZ,NY,NX)=WTRT1E(NE,N,L1,NR,NZ,NY,NX)+FXWTRT1E
-              WTRT1E(NE,N,L0,NR,NZ,NY,NX)=WTRT1E(NE,N,L0,NR,NZ,NY,NX)-FXWTRT1E
+              FXWTRT1E=FRO*Root1stStructChemElmnt_pvr(NE,N,L0,NR,NZ,NY,NX)
+              Root1stStructChemElmnt_pvr(NE,N,L1,NR,NZ,NY,NX)=Root1stStructChemElmnt_pvr(NE,N,L1,NR,NZ,NY,NX)+FXWTRT1E
+              Root1stStructChemElmnt_pvr(NE,N,L0,NR,NZ,NY,NX)=Root1stStructChemElmnt_pvr(NE,N,L0,NR,NZ,NY,NX)-FXWTRT1E
 
-              FXWTRT2E=FRO*WTRT2E(NE,N,L0,NR,NZ,NY,NX)
-              WTRT2E(NE,N,L1,NR,NZ,NY,NX)=WTRT2E(NE,N,L1,NR,NZ,NY,NX)+FXWTRT2E
-              WTRT2E(NE,N,L0,NR,NZ,NY,NX)=WTRT2E(NE,N,L0,NR,NZ,NY,NX)-FXWTRT2E
+              FXWTRT2E=FRO*Root2ndStructChemElmnt_pvr(NE,N,L0,NR,NZ,NY,NX)
+              Root2ndStructChemElmnt_pvr(NE,N,L1,NR,NZ,NY,NX)=Root2ndStructChemElmnt_pvr(NE,N,L1,NR,NZ,NY,NX)+FXWTRT2E
+              Root2ndStructChemElmnt_pvr(NE,N,L0,NR,NZ,NY,NX)=Root2ndStructChemElmnt_pvr(NE,N,L0,NR,NZ,NY,NX)-FXWTRT2E
             ENDDO
             FXRTLG1=FRO*PrimRootLen(N,L0,NR,NZ,NY,NX)
             PrimRootLen(N,L1,NR,NZ,NY,NX)=PrimRootLen(N,L1,NR,NZ,NY,NX)+FXRTLG1
@@ -1233,9 +1233,9 @@ implicit none
             FXRTLG2=FRO*SecndRootLen(N,L0,NR,NZ,NY,NX)
             SecndRootLen(N,L1,NR,NZ,NY,NX)=SecndRootLen(N,L1,NR,NZ,NY,NX)+FXRTLG2
             SecndRootLen(N,L0,NR,NZ,NY,NX)=SecndRootLen(N,L0,NR,NZ,NY,NX)-FXRTLG2
-            FXRTN2=FRO*RTN2(N,L0,NR,NZ,NY,NX)
-            RTN2(N,L1,NR,NZ,NY,NX)=RTN2(N,L1,NR,NZ,NY,NX)+FXRTN2
-            RTN2(N,L0,NR,NZ,NY,NX)=RTN2(N,L0,NR,NZ,NY,NX)-FXRTN2
+            FXRTN2=FRO*SecndRootXNum_rpvr(N,L0,NR,NZ,NY,NX)
+            SecndRootXNum_rpvr(N,L1,NR,NZ,NY,NX)=SecndRootXNum_rpvr(N,L1,NR,NZ,NY,NX)+FXRTN2
+            SecndRootXNum_rpvr(N,L0,NR,NZ,NY,NX)=SecndRootXNum_rpvr(N,L0,NR,NZ,NY,NX)-FXRTN2
           ENDDO
           DO NE=1,NumOfPlantChemElmnts
              FXEPOOLR=FRO*RootMycoNonstructElmnt_vr(NE,N,L0,NZ,NY,NX)
@@ -1249,36 +1249,36 @@ implicit none
           FXWTRTD=FRO* PopuPlantRootC_vr(N,L0,NZ,NY,NX)
            PopuPlantRootC_vr(N,L1,NZ,NY,NX)= PopuPlantRootC_vr(N,L1,NZ,NY,NX)+FXWTRTD
            PopuPlantRootC_vr(N,L0,NZ,NY,NX)= PopuPlantRootC_vr(N,L0,NZ,NY,NX)-FXWTRTD
-          FXWSRTL=FRO*WSRTL(N,L0,NZ,NY,NX)
-          WSRTL(N,L1,NZ,NY,NX)=WSRTL(N,L1,NZ,NY,NX)+FXWSRTL
-          WSRTL(N,L0,NZ,NY,NX)=WSRTL(N,L0,NZ,NY,NX)-FXWSRTL
-          FXRTN1=FRO*PrimRootXNumL(N,L0,NZ,NY,NX)
-          PrimRootXNumL(N,L1,NZ,NY,NX)=PrimRootXNumL(N,L1,NZ,NY,NX)+FXRTN1
-          PrimRootXNumL(N,L0,NZ,NY,NX)=PrimRootXNumL(N,L0,NZ,NY,NX)-FXRTN1
-          FXRTNL=FRO*SecndRootXNumL(N,L0,NZ,NY,NX)
-          SecndRootXNumL(N,L1,NZ,NY,NX)=SecndRootXNumL(N,L1,NZ,NY,NX)+FXRTNL
-          SecndRootXNumL(N,L0,NZ,NY,NX)=SecndRootXNumL(N,L0,NZ,NY,NX)-FXRTNL
-          FXRTLGP=FRO*RootLenPerP(N,L0,NZ,NY,NX)
-          RootLenPerP(N,L1,NZ,NY,NX)=RootLenPerP(N,L1,NZ,NY,NX)+FXRTLGP
-          RootLenPerP(N,L0,NZ,NY,NX)=RootLenPerP(N,L0,NZ,NY,NX)-FXRTLGP
-          FXRTDNP=FRO*RootLenDensNLP(N,L0,NZ,NY,NX)
-          RootLenDensNLP(N,L1,NZ,NY,NX)=RootLenDensNLP(N,L1,NZ,NY,NX)+FXRTDNP
-          RootLenDensNLP(N,L0,NZ,NY,NX)=RootLenDensNLP(N,L0,NZ,NY,NX)-FXRTDNP
-          FXRTVLP=FRO*RTVLP(N,L0,NZ,NY,NX)
-          RTVLP(N,L1,NZ,NY,NX)=RTVLP(N,L1,NZ,NY,NX)+FXRTVLP
-          RTVLP(N,L0,NZ,NY,NX)=RTVLP(N,L0,NZ,NY,NX)-FXRTVLP
-          FXRTVLW=FRO*RTVLW(N,L0,NZ,NY,NX)
-          RTVLW(N,L1,NZ,NY,NX)=RTVLW(N,L1,NZ,NY,NX)+FXRTVLW
-          RTVLW(N,L0,NZ,NY,NX)=RTVLW(N,L0,NZ,NY,NX)-FXRTVLW
+          FXWSRTL=FRO*RootProteinC_pvr(N,L0,NZ,NY,NX)
+          RootProteinC_pvr(N,L1,NZ,NY,NX)=RootProteinC_pvr(N,L1,NZ,NY,NX)+FXWSRTL
+          RootProteinC_pvr(N,L0,NZ,NY,NX)=RootProteinC_pvr(N,L0,NZ,NY,NX)-FXWSRTL
+          FRootAreaPopu=FRO*PrimRootXNumL(N,L0,NZ,NY,NX)
+          PrimRootXNumL(N,L1,NZ,NY,NX)=PrimRootXNumL(N,L1,NZ,NY,NX)+FRootAreaPopu
+          PrimRootXNumL(N,L0,NZ,NY,NX)=PrimRootXNumL(N,L0,NZ,NY,NX)-FRootAreaPopu
+          FXRTNL=FRO*SecndRootXNum_pvr(N,L0,NZ,NY,NX)
+          SecndRootXNum_pvr(N,L1,NZ,NY,NX)=SecndRootXNum_pvr(N,L1,NZ,NY,NX)+FXRTNL
+          SecndRootXNum_pvr(N,L0,NZ,NY,NX)=SecndRootXNum_pvr(N,L0,NZ,NY,NX)-FXRTNL
+          FXRTLGP=FRO*RootLenPerPopu_pvr(N,L0,NZ,NY,NX)
+          RootLenPerPopu_pvr(N,L1,NZ,NY,NX)=RootLenPerPopu_pvr(N,L1,NZ,NY,NX)+FXRTLGP
+          RootLenPerPopu_pvr(N,L0,NZ,NY,NX)=RootLenPerPopu_pvr(N,L0,NZ,NY,NX)-FXRTLGP
+          FXRTDNP=FRO*RootLenthDensPerPopu_pvr(N,L0,NZ,NY,NX)
+          RootLenthDensPerPopu_pvr(N,L1,NZ,NY,NX)=RootLenthDensPerPopu_pvr(N,L1,NZ,NY,NX)+FXRTDNP
+          RootLenthDensPerPopu_pvr(N,L0,NZ,NY,NX)=RootLenthDensPerPopu_pvr(N,L0,NZ,NY,NX)-FXRTDNP
+          FXRTVLP=FRO*RootVolume_vr(N,L0,NZ,NY,NX)
+          RootVolume_vr(N,L1,NZ,NY,NX)=RootVolume_vr(N,L1,NZ,NY,NX)+FXRTVLP
+          RootVolume_vr(N,L0,NZ,NY,NX)=RootVolume_vr(N,L0,NZ,NY,NX)-FXRTVLP
+          FXRTVLW=FRO*RootVH2O_vr(N,L0,NZ,NY,NX)
+          RootVH2O_vr(N,L1,NZ,NY,NX)=RootVH2O_vr(N,L1,NZ,NY,NX)+FXRTVLW
+          RootVH2O_vr(N,L0,NZ,NY,NX)=RootVH2O_vr(N,L0,NZ,NY,NX)-FXRTVLW
           FXRRAD1=FRO*PrimRootRadius(N,L0,NZ,NY,NX)
           PrimRootRadius(N,L1,NZ,NY,NX)=PrimRootRadius(N,L1,NZ,NY,NX)+FXRRAD1
           PrimRootRadius(N,L0,NZ,NY,NX)=PrimRootRadius(N,L0,NZ,NY,NX)-FXRRAD1
           FXRRAD2=FRO*SecndRootRadius(N,L0,NZ,NY,NX)
           SecndRootRadius(N,L1,NZ,NY,NX)=SecndRootRadius(N,L1,NZ,NY,NX)+FXRRAD2
           SecndRootRadius(N,L0,NZ,NY,NX)=SecndRootRadius(N,L0,NZ,NY,NX)-FXRRAD2
-          FXRTARP=FRO*RTARP(N,L0,NZ,NY,NX)
-          RTARP(N,L1,NZ,NY,NX)=RTARP(N,L1,NZ,NY,NX)+FXRTARP
-          RTARP(N,L0,NZ,NY,NX)=RTARP(N,L0,NZ,NY,NX)-FXRTARP
+          FXRootAreaPerPlant_vr=FRO*RootAreaPerPlant_vr(N,L0,NZ,NY,NX)
+          RootAreaPerPlant_vr(N,L1,NZ,NY,NX)=RootAreaPerPlant_vr(N,L1,NZ,NY,NX)+FXRootAreaPerPlant_vr
+          RootAreaPerPlant_vr(N,L0,NZ,NY,NX)=RootAreaPerPlant_vr(N,L0,NZ,NY,NX)-FXRootAreaPerPlant_vr
           FXRTLGA=FRO*AveSecndRootLen(N,L0,NZ,NY,NX)
           AveSecndRootLen(N,L1,NZ,NY,NX)=AveSecndRootLen(N,L1,NZ,NY,NX)+FXRTLGA
           AveSecndRootLen(N,L0,NZ,NY,NX)=AveSecndRootLen(N,L0,NZ,NY,NX)-FXRTLGA
@@ -1287,9 +1287,9 @@ implicit none
 !     ROOT NODULES
 !
         DO NE=1,NumOfPlantChemElmnts
-          FXWTNDLE=FRO*WTNDLE(NE,L0,NZ,NY,NX)
-          WTNDLE(NE,L1,NZ,NY,NX)=WTNDLE(NE,L1,NZ,NY,NX)+FXWTNDLE
-          WTNDLE(NE,L0,NZ,NY,NX)=WTNDLE(NE,L0,NZ,NY,NX)-FXWTNDLE
+          WTNDLE=FRO*RootNodueChemElmnt_pvr(NE,L0,NZ,NY,NX)
+          RootNodueChemElmnt_pvr(NE,L1,NZ,NY,NX)=RootNodueChemElmnt_pvr(NE,L1,NZ,NY,NX)+WTNDLE
+          RootNodueChemElmnt_pvr(NE,L0,NZ,NY,NX)=RootNodueChemElmnt_pvr(NE,L0,NZ,NY,NX)-WTNDLE
 
           FXEPOOLN=FRO*RootNoduleNonstructElmnt_vr(NE,L0,NZ,NY,NX)
           RootNoduleNonstructElmnt_vr(NE,L1,NZ,NY,NX)=RootNoduleNonstructElmnt_vr(NE,L1,NZ,NY,NX)+FXEPOOLN

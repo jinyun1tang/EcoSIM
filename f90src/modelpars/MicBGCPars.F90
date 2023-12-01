@@ -11,7 +11,7 @@ implicit none
   __FILE__
 
   type, public :: MicParType
-  integer :: jcplx   !# of microbe-substrate complexes
+  integer :: jcplx   !# of microbe-substrate CO2CompenPoint_nodeexes
   integer :: jsken   !# of kinetic components of the substrates
   integer :: jguilds !# of guilds
   integer :: NFGs    !# of functional groups
@@ -53,8 +53,8 @@ implicit none
   real(r8), pointer :: SPOSC(:,:)
   real(r8), pointer :: CNOFC(:,:)                         !fractions to allocate N to kinetic components
   real(r8), pointer :: CPOFC(:,:)                         !fractions to allocate P to kinetic components
-  real(r8), pointer :: CNRH(:)                            !default N:C ratios in SOC complexes
-  real(r8), pointer :: CPRH(:)                            !default P:C ratios in SOC complexes
+  real(r8), pointer :: CNRH(:)                            !default N:C ratios in SOC CO2CompenPoint_nodeexes
+  real(r8), pointer :: CPRH(:)                            !default P:C ratios in SOC CO2CompenPoint_nodeexes
   real(r8), pointer :: OMCF(:)                            !hetero microbial biomass composition in SOC
   real(r8), pointer :: OMCA(:)                            !autotrophic microbial biomass composition in SOC
   logical,  pointer :: is_activef_micb(:)
@@ -69,12 +69,12 @@ implicit none
   character(len=16) :: amicname(NFGsc)
   character(len=16) :: micresb(0:NumOfDeadMicrobiomComponents-1)      !residual biomass name
   character(len=16) :: micbiom(1:NumOfLiveMicrobiomComponents)        !microbial biomass pool name
-  integer, pointer :: JGnio(:)   !guid indices for organic-microbial complex
-  integer, pointer :: JGnfo(:)   !guid indices for organic-microbial complex
-  integer, pointer :: JGniA(:)   !guid indices for autotrophic-microbial complex
-  integer, pointer :: JGnfA(:)   !guid indices for autotrophic-microbial complex
-  integer :: NumOfMicrobsInAutotrophCmplx             !total number of microbial guilds in the autotrophic complex
-  integer :: NumOfMicrobs1HetertrophCmplx             !total number of microbial guilds in one organic-microbial complex
+  integer, pointer :: JGnio(:)   !guid indices for organic-microbial CO2CompenPoint_nodeex
+  integer, pointer :: JGnfo(:)   !guid indices for organic-microbial CO2CompenPoint_nodeex
+  integer, pointer :: JGniA(:)   !guid indices for autotrophic-microbial CO2CompenPoint_nodeex
+  integer, pointer :: JGnfA(:)   !guid indices for autotrophic-microbial CO2CompenPoint_nodeex
+  integer :: NumOfMicrobsInAutotrophCmplx             !total number of microbial guilds in the autotrophic CO2CompenPoint_nodeex
+  integer :: NumOfMicrobs1HetertrophCmplx             !total number of microbial guilds in one organic-microbial CO2CompenPoint_nodeex
   integer :: NumOfLitrCmplxs
   integer :: NumOfPlantLitrCmplxs
   integer :: iprotein
@@ -96,13 +96,13 @@ contains
   class(MicParType) :: this
   integer, intent(in) :: nmicbguilds
 
-  !organic matter is grouped into five complexes, including woody(1),
+  !organic matter is grouped into five CO2CompenPoint_nodeexes, including woody(1),
   ! non-woody(2), manure(3), litter, POC(4) and humus(5) (g Mg-1)
 
   this%ndbiomcp=NumOfDeadMicrobiomComponents  !number of necrobiomass components
   this%nlbiomcp=NumOfLiveMicrobiomComponents  !number of living biomass components
 
-  this%jcplx=jcplxc         !# of microbe-substrate complexes
+  this%jcplx=jcplxc         !# of microbe-substrate CO2CompenPoint_nodeexes
   this%jsken=jskenc        !# of kinetic components of the substrates
   this%jguilds=nmicbguilds
   this%NFGs=NFGsc
@@ -156,7 +156,7 @@ contains
   call this%Initallocate()
 
 !set up functional group ids
-!five om-complexes
+!five om-CO2CompenPoint_nodeexes
   this%n_aero_hetrophb=1
   this%n_anero_faculb=2
   this%n_aero_fungi=3
@@ -172,7 +172,7 @@ contains
 
   this%is_anerobic_hetr(this%n_anaero_ferm)=.true.
   this%is_anerobic_hetr(this%n_anero_n2fixer)=.true.
-!the abstract complex
+!the abstract CO2CompenPoint_nodeex
   this%AmmoniaOxidizeBacteria=1
   this%NitriteOxidizeBacteria=2
   this%AerobicMethanotrophBacteria=3

@@ -97,8 +97,8 @@ implicit none
   real(r8),target,allocatable ::  RADY(:,:)                          !diffuse shortwave radiation, [W m-2]
   real(r8),target,allocatable ::  RAPS(:,:)                          !direct PAR, [umol m-2 s-1]
   real(r8),target,allocatable ::  RAPY(:,:)                          !diffuse PAR, [umol m-2 s-1]
-  real(r8),target,allocatable ::  SSIN(:,:)                          !sine of solar angle, [-]
-  real(r8),target,allocatable ::  SSINN(:,:)                         !sine of solar angle next hour, [-]
+  real(r8),target,allocatable ::  SineSolarAngle(:,:)                          !sine of solar angle, [-]
+  real(r8),target,allocatable ::  SineSolarAngleNextHour(:,:)                         !sine of solar angle next hour, [-]
   real(r8),target,allocatable ::  TLEX(:,:)                          !total latent heat flux x boundary layer resistance, [MJ m-1]
   real(r8),target,allocatable ::  TSHX(:,:)                          !total sensible heat flux x boundary layer resistance, [MJ m-1]
   real(r8),target,allocatable ::  Canopy_Heat_Latent_col(:,:)                          !total latent heat flux x boundary layer resistance, [MJ m-1]
@@ -228,8 +228,8 @@ implicit none
   allocate(RADY(JY,JX));        RADY=0._r8
   allocate(RAPS(JY,JX));        RAPS=0._r8
   allocate(RAPY(JY,JX));        RAPY=0._r8
-  allocate(SSIN(JY,JX));        SSIN=0._r8
-  allocate(SSINN(JY,JX));       SSINN=0._r8
+  allocate(SineSolarAngle(JY,JX));        SineSolarAngle=0._r8
+  allocate(SineSolarAngleNextHour(JY,JX));       SineSolarAngleNextHour=0._r8
   allocate(TLEX(JY,JX));        TLEX=0._r8
   allocate(TSHX(JY,JX));        TSHX=0._r8
   allocate(Canopy_Heat_Latent_col(JY,JX));        Canopy_Heat_Latent_col=0._r8
@@ -359,8 +359,8 @@ implicit none
   call destroy(RADY)
   call destroy(RAPS)
   call destroy(RAPY)
-  call destroy(SSIN)
-  call destroy(SSINN)
+  call destroy(SineSolarAngle)
+  call destroy(SineSolarAngleNextHour)
   call destroy(TLEX)
   call destroy(TSHX)
   call destroy(Canopy_Heat_Latent_col)

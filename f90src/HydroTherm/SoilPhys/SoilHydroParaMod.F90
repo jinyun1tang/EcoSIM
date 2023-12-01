@@ -218,7 +218,7 @@ contains
         !at wilting point
         THETW(L,NY,NX)=WiltPoint(L,NY,NX)
       ELSEIF(THW(L,NY,NX).LT.0.0_r8)THEN
-        !completely dry
+        !CO2CompenPoint_nodeetely dry
         THETW(L,NY,NX)=0.0_r8
       ENDIF
 

@@ -2087,19 +2087,19 @@ module ncdio_pio
     if (ier == nf90_noerr) ier = nf90_inquire_dimension(ncid%fh, dimid, len=ni)
 
     ier = nf90_inq_dimid (ncid%fh, 'lat', dimid)
-    if (ier == nf90_noerr) ier = nf90_inquire_dimension(ncid%fh, dimid, len=nj)
+    if (ier == nf90_noerr) ier = nf90_inquire_dimension(ncid%fh, dimid, len=NJ)
 
     ier = nf90_inq_dimid (ncid%fh, 'lsmlon', dimid)
     if (ier == nf90_noerr) ier = nf90_inquire_dimension(ncid%fh, dimid, len=ni)
 
     ier = nf90_inq_dimid (ncid%fh, 'lsmlat', dimid)
-    if (ier == nf90_noerr) ier = nf90_inquire_dimension(ncid%fh, dimid, len=nj)
+    if (ier == nf90_noerr) ier = nf90_inquire_dimension(ncid%fh, dimid, len=NJ)
 
     ier = nf90_inq_dimid (ncid%fh, 'ni', dimid)
     if (ier == nf90_noerr) ier = nf90_inquire_dimension(ncid%fh, dimid, len=ni)
 
     ier = nf90_inq_dimid (ncid%fh, 'nj', dimid)
-    if (ier == nf90_noerr) ier = nf90_inquire_dimension(ncid%fh, dimid, len=nj)
+    if (ier == nf90_noerr) ier = nf90_inquire_dimension(ncid%fh, dimid, len=NJ)
 
     ier = nf90_inq_dimid (ncid%fh, 'gridcell', dimid)
     if (ier == nf90_noerr) then

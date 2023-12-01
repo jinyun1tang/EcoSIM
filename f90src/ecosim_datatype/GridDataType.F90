@@ -19,7 +19,7 @@ implicit none
   real(r8),target,allocatable ::  DIST(:,:,:,:)                      !distance between adjacent layers:1=EW,2=NS,3=vertical [m]
   integer,target,allocatable ::  NU(:,:)                             !soil surface layer number
   integer,target,allocatable ::  NUI(:,:)                            !initial soil surface layer number
-  integer,target,allocatable ::  NJ(:,:)                             !maximum root layer number
+  integer,target,allocatable ::  MaxRootLayNum(:,:)                             !maximum root layer number
   integer,target,allocatable ::  NK(:,:)                             !additional soil lower boundary layers
   integer,target,allocatable ::  NLI(:,:)                            !initial lowest soil layer number
   integer,target,allocatable ::  NL(:,:)                             !lowest soil layer number
@@ -50,7 +50,7 @@ contains
   allocate(DIST(3,JD,JV,JH));   DIST=0._r8
   allocate(NU(JY,JX));          NU=0
   allocate(NUI(JY,JX));         NUI=0
-  allocate(NJ(JY,JX));          NJ=0
+  allocate(MaxRootLayNum(JY,JX));          MaxRootLayNum=0
   allocate(NK(JY,JX));          NK=0
   allocate(NLI(JV,JH));         NLI=0
   allocate(NL(JV,JH));          NL=0
@@ -81,7 +81,7 @@ contains
   call destroy(DIST)
   call destroy(NU)
   call destroy(NUI)
-  call destroy(NJ)
+  call destroy(MaxRootLayNum)
   call destroy(NK)
   call destroy(NLI)
   call destroy(NL)

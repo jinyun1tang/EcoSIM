@@ -302,15 +302,15 @@ implicit none
 
   if(flag=='read')then  
     dat1pr => datip_1d  
-    call restartvar(ncid, flag, varname='NGTopRootLayer', dim1name='pft',&
+    call restartvar(ncid, flag, varname='NGTopRootLayer_pft', dim1name='pft',&
      long_name='top soil layer that has root', units='none', interpinic_flag='skip', &
      data=dat1pr, missing_value=ispval, fill_value=ispval)    
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,NGTopRootLayer,datip_1d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,NGTopRootLayer_pft,datip_1d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)
   else
-    !print*,'NGTopRootLayer'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,NGTopRootLayer,datip_1d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)  
+    !print*,'NGTopRootLayer_pft'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,NGTopRootLayer_pft,datip_1d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)  
     dat1pr => datip_1d  
-    call restartvar(ncid, flag, varname='NGTopRootLayer', dim1name='pft',&
+    call restartvar(ncid, flag, varname='NGTopRootLayer_pft', dim1name='pft',&
      long_name='top soil layer that has root', units='none', interpinic_flag='skip', &
      data=dat1pr, missing_value=ispval, fill_value=ispval)        
   endif  
@@ -433,16 +433,16 @@ implicit none
 
   if(flag=='read')then
     dat1pr => datip_1d  
-    call restartvar(ncid, flag, varname='NIXBotRootLayer', dim1name='pft',&
+    call restartvar(ncid, flag, varname='NIXBotRootLayer_pft', dim1name='pft',&
      long_name='Bottom soil layer number that has root', units='none', &
      interpinic_flag='skip', data=dat1pr, missing_value=ispval, fill_value=ispval)     
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,NIXBotRootLayer,datip_1d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)  
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,NIXBotRootLayer_pft,datip_1d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)  
   else 
-    !print*,'NIXBotRootLayer'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,NIXBotRootLayer,datip_1d,NumActivePlants=NumActivePlants,&
+    !print*,'NIXBotRootLayer_pft'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,NIXBotRootLayer_pft,datip_1d,NumActivePlants=NumActivePlants,&
       IsPlantActive=IsPlantActive)    
     dat1pr => datip_1d  
-    call restartvar(ncid, flag, varname='NIXBotRootLayer', dim1name='pft',&
+    call restartvar(ncid, flag, varname='NIXBotRootLayer_pft', dim1name='pft',&
      long_name='Bottom soil layer number that has root', units='none', &
      interpinic_flag='skip', data=dat1pr, missing_value=ispval, fill_value=ispval)     
 
@@ -469,33 +469,33 @@ implicit none
 
   if(flag=='read')then
     dat2pr => datip_2d(1:npfts,1:JRS)    
-    call restartvar(ncid, flag, varname='NINR', dim1name='pft',dim2name='rootaxs',&
+    call restartvar(ncid, flag, varname='NIXBotRootLayer_rpft', dim1name='pft',dim2name='rootaxs',&
      long_name='maximum soil layer number for root axes', units='none', &
      interpinic_flag='skip', data=dat2pr, missing_value=ispval, &
      fill_value=ispval)       
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,NINR,datip_2d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)  
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,NIXBotRootLayer_rpft,datip_2d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)  
   else
-    !print*,'NINR'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,NINR,datip_2d,NumActivePlants=NumActivePlants,&
+    !print*,'NIXBotRootLayer_rpft'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,NIXBotRootLayer_rpft,datip_2d,NumActivePlants=NumActivePlants,&
       IsPlantActive=IsPlantActive)  
     dat2pr => datip_2d(1:npfts,1:JRS)  
-    call restartvar(ncid, flag, varname='NINR', dim1name='pft',dim2name='rootaxs',&
+    call restartvar(ncid, flag, varname='NIXBotRootLayer_rpft', dim1name='pft',dim2name='rootaxs',&
      long_name='maximum soil layer number for root axes', units='none', &
      interpinic_flag='skip', data=dat2pr, missing_value=ispval, fill_value=ispval)     
   endif
 
   if(flag=='read')then
     datpr2 => datrp_2d(1:npfts,1:NumOfPlantChemElmnts)  
-    call restartvar(ncid, flag, varname='PlantExudChemElmnts_pft', dim1name='pft',dim2name='elmnts',&
+    call restartvar(ncid, flag, varname='PlantExudChemElmntCum_pft', dim1name='pft',dim2name='elmnts',&
      long_name='total net root element uptake (+ve) - exudation (-ve)', units='g d-2', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)     
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,PlantExudChemElmnts_pft,datrp_2d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)  
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,PlantExudChemElmntCum_pft,datrp_2d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)  
   else
-    !print*,'PlantExudChemElmnts_pft'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,PlantExudChemElmnts_pft,datrp_2d,NumActivePlants=NumActivePlants,&
+    !print*,'PlantExudChemElmntCum_pft'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,PlantExudChemElmntCum_pft,datrp_2d,NumActivePlants=NumActivePlants,&
       IsPlantActive=IsPlantActive)    
     datpr2 => datrp_2d(1:npfts,1:NumOfPlantChemElmnts)  
-    call restartvar(ncid, flag, varname='PlantExudChemElmnts_pft', dim1name='pft',dim2name='elmnts',&
+    call restartvar(ncid, flag, varname='PlantExudChemElmntCum_pft', dim1name='pft',dim2name='elmnts',&
      long_name='total net root element uptake (+ve) - exudation (-ve)', units='g d-2', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)     
 
@@ -520,16 +520,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='TZUPFX', dim1name='pft',&
+    call restartvar(ncid, flag, varname='PlantN2FixCum_pft', dim1name='pft',&
      long_name='total plant N2 fixation', units='g d-2', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)     
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,TZUPFX,datrp_1d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)  
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,PlantN2FixCum_pft,datrp_1d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)  
   else
-    !print*,'TZUPFX'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,TZUPFX,datrp_1d,NumActivePlants=NumActivePlants,&
+    !print*,'PlantN2FixCum_pft'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,PlantN2FixCum_pft,datrp_1d,NumActivePlants=NumActivePlants,&
       IsPlantActive=IsPlantActive)    
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='TZUPFX', dim1name='pft',&
+    call restartvar(ncid, flag, varname='PlantN2FixCum_pft', dim1name='pft',&
      long_name='total plant N2 fixation', units='g d-2', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)         
   endif  
@@ -667,16 +667,16 @@ implicit none
 
   if(flag=='read')then  
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='CanPStalkC', dim1name='pft',&
+    call restartvar(ncid, flag, varname='CanopyStalkC_pft', dim1name='pft',&
      long_name='canopy active stalk C', units='g d-2', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)               
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,CanPStalkC,datrp_1d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)  
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,CanopyStalkC_pft,datrp_1d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)  
   else
-    !print*,'CanPStalkC'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,CanPStalkC,datrp_1d,NumActivePlants=NumActivePlants,&
+    !print*,'CanopyStalkC_pft'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,CanopyStalkC_pft,datrp_1d,NumActivePlants=NumActivePlants,&
       IsPlantActive=IsPlantActive)  
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='CanPStalkC', dim1name='pft',&
+    call restartvar(ncid, flag, varname='CanopyStalkC_pft', dim1name='pft',&
      long_name='canopy active stalk C', units='g d-2', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)               
 
@@ -750,17 +750,17 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='WTRTA', dim1name='pft',&
+    call restartvar(ncid, flag, varname='RootBiomCPerPlant_pft', dim1name='pft',&
      long_name='root C per plant', units='g g-1', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)  
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,WTRTA,datrp_1d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)  
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,RootBiomCPerPlant_pft,datrp_1d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)  
 
   else
-    !print*,'WTRTA'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,WTRTA,datrp_1d,NumActivePlants=NumActivePlants,&
+    !print*,'RootBiomCPerPlant_pft'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,RootBiomCPerPlant_pft,datrp_1d,NumActivePlants=NumActivePlants,&
       IsPlantActive=IsPlantActive)  
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='WTRTA', dim1name='pft',&
+    call restartvar(ncid, flag, varname='RootBiomCPerPlant_pft', dim1name='pft',&
      long_name='root C per plant', units='g g-1', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)      
   endif
@@ -850,16 +850,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='TCO2A', dim1name='pft',&
+    call restartvar(ncid, flag, varname='CanopyPlusNoduRespC_pft', dim1name='pft',&
      long_name='total autotrophic respiration', units='g d-2', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)  
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,TCO2A,datrp_1d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)  
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,CanopyPlusNoduRespC_pft,datrp_1d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)  
   else
-    !print*,'TCO2A'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,TCO2A,datrp_1d,NumActivePlants=NumActivePlants,&
+    !print*,'CanopyPlusNoduRespC_pft'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,CanopyPlusNoduRespC_pft,datrp_1d,NumActivePlants=NumActivePlants,&
       IsPlantActive=IsPlantActive)  
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='TCO2A', dim1name='pft',&
+    call restartvar(ncid, flag, varname='CanopyPlusNoduRespC_pft', dim1name='pft',&
      long_name='total autotrophic respiration', units='g d-2', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)      
   endif  
@@ -883,16 +883,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='TNH3C', dim1name='pft',&
+    call restartvar(ncid, flag, varname='NH3EmiCum_pft', dim1name='pft',&
      long_name='total canopy NH3 flux', units='g d-2', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)  
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,TNH3C,datrp_1d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)  
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,NH3EmiCum_pft,datrp_1d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)  
   else
-    !print*,'TNH3C'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,TNH3C,datrp_1d,NumActivePlants=NumActivePlants,&
+    !print*,'NH3EmiCum_pft'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,NH3EmiCum_pft,datrp_1d,NumActivePlants=NumActivePlants,&
       IsPlantActive=IsPlantActive)  
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='TNH3C', dim1name='pft',&
+    call restartvar(ncid, flag, varname='NH3EmiCum_pft', dim1name='pft',&
      long_name='total canopy NH3 flux', units='g d-2', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)  
 
@@ -982,16 +982,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='WatByPCan', dim1name='pft',&
+    call restartvar(ncid, flag, varname='WatByPCanopy', dim1name='pft',&
      long_name='plant canopy held water content', units='m3 d-2', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)            
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,WatByPCan,datrp_1d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)  
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,WatByPCanopy,datrp_1d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)  
   else
-    !print*,'WatByPCan'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,WatByPCan,datrp_1d,NumActivePlants=NumActivePlants,&
+    !print*,'WatByPCanopy'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,WatByPCanopy,datrp_1d,NumActivePlants=NumActivePlants,&
       IsPlantActive=IsPlantActive)  
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='WatByPCan', dim1name='pft',&
+    call restartvar(ncid, flag, varname='WatByPCanopy', dim1name='pft',&
      long_name='plant canopy held water content', units='m3 d-2', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)     
   endif  
@@ -1193,48 +1193,48 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrp_2d(1:npfts,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='VSTGX', dim1name='pft',dim2name='nbranches',&
+    call restartvar(ncid, flag, varname='LeafNumberAtFloralInit_brch', dim1name='pft',dim2name='nbranches',&
      long_name='leaf number at floral initiation', units='none', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,VSTGX,datrp_2d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)        
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,LeafNumberAtFloralInit_brch,datrp_2d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)        
   else
     !print*,'VSTGX'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,VSTGX,datrp_2d,NumActivePlants=NumActivePlants,&
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,LeafNumberAtFloralInit_brch,datrp_2d,NumActivePlants=NumActivePlants,&
       IsPlantActive=IsPlantActive)    
     datpr2 => datrp_2d(1:npfts,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='VSTGX', dim1name='pft',dim2name='nbranches',&
+    call restartvar(ncid, flag, varname='LeafNumberAtFloralInit_brch', dim1name='pft',dim2name='nbranches',&
      long_name='leaf number at floral initiation', units='none', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
   endif  
 
   if(flag=='read')then
     datpr2 => datrp_2d(1:npfts,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='GSTGI', dim1name='pft',dim2name='nbranches',&
+    call restartvar(ncid, flag, varname='NodeNumNormByMatgrp_brch', dim1name='pft',dim2name='nbranches',&
      long_name='normalized node number during vegetative growth stages', units='none', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,GSTGI,datrp_2d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)        
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,NodeNumNormByMatgrp_brch,datrp_2d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)        
   else
-    !print*,'GSTGI'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,GSTGI,datrp_2d,NumActivePlants=NumActivePlants,&
+    !print*,'NodeNumNormByMatgrp_brch'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,NodeNumNormByMatgrp_brch,datrp_2d,NumActivePlants=NumActivePlants,&
       IsPlantActive=IsPlantActive)    
     datpr2 => datrp_2d(1:npfts,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='GSTGI', dim1name='pft',dim2name='nbranches',&
+    call restartvar(ncid, flag, varname='NodeNumNormByMatgrp_brch', dim1name='pft',dim2name='nbranches',&
      long_name='normalized node number during vegetative growth stages', units='none', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
   endif  
 
   if(flag=='read')then
     datpr2 => datrp_2d(1:npfts,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='GSTGF', dim1name='pft',dim2name='nbranches',&
+    call restartvar(ncid, flag, varname='ReprodNodeNumNormByMatrgrp_brch', dim1name='pft',dim2name='nbranches',&
      long_name='normalized node number during reproductive growth stages', units='none', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,GSTGF,datrp_2d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)          
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,ReprodNodeNumNormByMatrgrp_brch,datrp_2d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)          
   else
-    !print*,'GSTGF'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,GSTGF,datrp_2d,NumActivePlants=NumActivePlants,&
+    !print*,'ReprodNodeNumNormByMatrgrp_brch'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,ReprodNodeNumNormByMatrgrp_brch,datrp_2d,NumActivePlants=NumActivePlants,&
       IsPlantActive=IsPlantActive)            
     datpr2 => datrp_2d(1:npfts,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='GSTGF', dim1name='pft',dim2name='nbranches',&
+    call restartvar(ncid, flag, varname='ReprodNodeNumNormByMatrgrp_brch', dim1name='pft',dim2name='nbranches',&
      long_name='normalized node number during reproductive growth stages', units='none', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
 
@@ -1242,32 +1242,32 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrp_2d(1:npfts,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='TGSTGI', dim1name='pft',dim2name='nbranches',&
+    call restartvar(ncid, flag, varname='TotalNodeNumNormByMatgrp_brch', dim1name='pft',dim2name='nbranches',&
      long_name='normalized node number during vegetative growth stages', units='none', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,TGSTGI,datrp_2d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)          
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,TotalNodeNumNormByMatgrp_brch,datrp_2d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)          
   else
-    !print*,'TGSTGI'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,TGSTGI,datrp_2d,NumActivePlants=NumActivePlants,&
+    !print*,'TotalNodeNumNormByMatgrp_brch'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,TotalNodeNumNormByMatgrp_brch,datrp_2d,NumActivePlants=NumActivePlants,&
       IsPlantActive=IsPlantActive)            
     datpr2 => datrp_2d(1:npfts,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='TGSTGI', dim1name='pft',dim2name='nbranches',&
+    call restartvar(ncid, flag, varname='TotalNodeNumNormByMatgrp_brch', dim1name='pft',dim2name='nbranches',&
      long_name='normalized node number during vegetative growth stages', units='none', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
   endif  
 
   if(flag=='read')then
     datpr2 => datrp_2d(1:npfts,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='TGSTGF', dim1name='pft',dim2name='nbranches',&
+    call restartvar(ncid, flag, varname='TotalReprodNodeNumNormByMatrgrp_brch', dim1name='pft',dim2name='nbranches',&
      long_name='normalized node number during reproductive growth stages', units='none', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,TGSTGF,datrp_2d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)          
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,TotalReprodNodeNumNormByMatrgrp_brch,datrp_2d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)          
   else
-    !print*,'TGSTGF'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,TGSTGF,datrp_2d,NumActivePlants=NumActivePlants, &
+    !print*,'TotalReprodNodeNumNormByMatrgrp_brch'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,TotalReprodNodeNumNormByMatrgrp_brch,datrp_2d,NumActivePlants=NumActivePlants, &
       IsPlantActive=IsPlantActive)            
     datpr2 => datrp_2d(1:npfts,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='TGSTGF', dim1name='pft',dim2name='nbranches',&
+    call restartvar(ncid, flag, varname='TotalReprodNodeNumNormByMatrgrp_brch', dim1name='pft',dim2name='nbranches',&
      long_name='normalized node number during reproductive growth stages', units='none', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
 
@@ -1356,48 +1356,48 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrp_2d(1:npfts,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='FLG4', dim1name='pft',dim2name='nbranches',&
+    call restartvar(ncid, flag, varname='HourWithNoGrainFill_brch', dim1name='pft',dim2name='nbranches',&
      long_name='flag to detect physiological maturity from  grain fill', units='none', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,FLG4,datrp_2d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)          
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,HourWithNoGrainFill_brch,datrp_2d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)          
   else
-    !print*,'FLG4'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,FLG4,datrp_2d,NumActivePlants=NumActivePlants,&
+    !print*,'HourWithNoGrainFill_brch'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,HourWithNoGrainFill_brch,datrp_2d,NumActivePlants=NumActivePlants,&
       IsPlantActive=IsPlantActive)          
     datpr2 => datrp_2d(1:npfts,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='FLG4', dim1name='pft',dim2name='nbranches',&
+    call restartvar(ncid, flag, varname='HourWithNoGrainFill_brch', dim1name='pft',dim2name='nbranches',&
      long_name='flag to detect physiological maturity from  grain fill', units='none', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
   endif  
 
   if(flag=='read')then
     datpr2 => datrp_2d(1:npfts,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='FLGZ', dim1name='pft',dim2name='nbranches',&
+    call restartvar(ncid, flag, varname='HoursDoingRemob_brch', dim1name='pft',dim2name='nbranches',&
      long_name='counter for mobilizing nonstructural C during autumn leafoff/hardening', units='h', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,FLGZ,datrp_2d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)          
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,HoursDoingRemob_brch,datrp_2d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)          
   else
     !print*,'FLGZ'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,FLGZ,datrp_2d,NumActivePlants=NumActivePlants,&
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,HoursDoingRemob_brch,datrp_2d,NumActivePlants=NumActivePlants,&
       IsPlantActive=IsPlantActive)     
     datpr2 => datrp_2d(1:npfts,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='FLGZ', dim1name='pft',dim2name='nbranches',&
+    call restartvar(ncid, flag, varname='HoursDoingRemob_brch', dim1name='pft',dim2name='nbranches',&
      long_name='counter for mobilizing nonstructural C during autumn leafoff/hardening', units='h', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
   endif  
 
   if(flag=='read')then
     datpr2 => datrp_2d(1:npfts,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='doInitLeafOut', dim1name='pft',dim2name='nbranches',&
+    call restartvar(ncid, flag, varname='doInitLeafOut_brch', dim1name='pft',dim2name='nbranches',&
      long_name='branch phenology flag', units='none', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,doInitLeafOut,datip_2d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)          
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,doInitLeafOut_brch,datip_2d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)          
   else
-    !print*,'doInitLeafOut'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,doInitLeafOut,datip_2d,&
+    !print*,'doInitLeafOut_brch'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,doInitLeafOut_brch,datip_2d,&
       NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)            
     datpr2 => datrp_2d(1:npfts,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='doInitLeafOut', dim1name='pft',dim2name='nbranches',&
+    call restartvar(ncid, flag, varname='doInitLeafOut_brch', dim1name='pft',dim2name='nbranches',&
      long_name='branch phenology flag', units='none', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
 
@@ -1405,63 +1405,63 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrp_2d(1:npfts,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='doPlantLeafOut', dim1name='pft',dim2name='nbranches',&
+    call restartvar(ncid, flag, varname='doPlantLeafOut_brch', dim1name='pft',dim2name='nbranches',&
      long_name='branch phenology flag', units='none', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,doPlantLeafOut,datip_2d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)          
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,doPlantLeafOut_brch,datip_2d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)          
   else
-    !print*,'doPlantLeafOut'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,doPlantLeafOut,datip_2d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)    
+    !print*,'doPlantLeafOut_brch'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,doPlantLeafOut_brch,datip_2d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)    
     datpr2 => datrp_2d(1:npfts,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='doPlantLeafOut', dim1name='pft',dim2name='nbranches',&
+    call restartvar(ncid, flag, varname='doPlantLeafOut_brch', dim1name='pft',dim2name='nbranches',&
      long_name='branch phenology flag', units='none', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
   endif  
 
   if(flag=='read')then
     datpr2 => datrp_2d(1:npfts,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='doPlantLeaveOff', dim1name='pft',dim2name='nbranches',&
+    call restartvar(ncid, flag, varname='doPlantLeaveOff_brch', dim1name='pft',dim2name='nbranches',&
      long_name='branch phenology flag', units='none', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,doPlantLeaveOff,datip_2d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)          
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,doPlantLeaveOff_brch,datip_2d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)          
   else
-    !print*,'doPlantLeaveOff'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,doPlantLeaveOff,datip_2d,NumActivePlants=NumActivePlants,&
+    !print*,'doPlantLeaveOff_brch'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,doPlantLeaveOff_brch,datip_2d,NumActivePlants=NumActivePlants,&
       IsPlantActive=IsPlantActive)    
     datpr2 => datrp_2d(1:npfts,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='doPlantLeaveOff', dim1name='pft',dim2name='nbranches',&
+    call restartvar(ncid, flag, varname='doPlantLeaveOff_brch', dim1name='pft',dim2name='nbranches',&
      long_name='branch phenology flag', units='none', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
   endif  
 
   if(flag=='read')then
     datpr2 => datrp_2d(1:npfts,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='IFLGR', dim1name='pft',dim2name='nbranches',&
+    call restartvar(ncid, flag, varname='Prep4Literfall_brch', dim1name='pft',dim2name='nbranches',&
      long_name='branch phenology flag', units='none', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,IFLGR,datip_2d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)          
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,Prep4Literfall_brch,datip_2d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)          
   else
-    !print*,'IFLGR'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,IFLGR,datip_2d,NumActivePlants=NumActivePlants,&
+    !print*,'Prep4Literfall_brch'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,Prep4Literfall_brch,datip_2d,NumActivePlants=NumActivePlants,&
       IsPlantActive=IsPlantActive)            
     datpr2 => datrp_2d(1:npfts,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='IFLGR', dim1name='pft',dim2name='nbranches',&
+    call restartvar(ncid, flag, varname='Prep4Literfall_brch', dim1name='pft',dim2name='nbranches',&
      long_name='branch phenology flag', units='none', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
   endif  
 
   if(flag=='read')then
     datpr2 => datrp_2d(1:npfts,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='IFLGQ', dim1name='pft',dim2name='nbranches',&
+    call restartvar(ncid, flag, varname='Hours4LiterfalAftMature_brch', dim1name='pft',dim2name='nbranches',&
      long_name='branch phenology flag', units='h', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,IFLGQ,datip_2d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)          
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,Hours4LiterfalAftMature_brch,datip_2d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)          
   else
-    !print*,'IFLGQ'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,IFLGQ,datip_2d,NumActivePlants=NumActivePlants,&
+    !print*,'Hours4LiterfalAftMature_brch'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,Hours4LiterfalAftMature_brch,datip_2d,NumActivePlants=NumActivePlants,&
       IsPlantActive=IsPlantActive)    
     datpr2 => datrp_2d(1:npfts,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='IFLGQ', dim1name='pft',dim2name='nbranches',&
+    call restartvar(ncid, flag, varname='Hours4LiterfalAftMature_brch', dim1name='pft',dim2name='nbranches',&
      long_name='branch phenology flag', units='h', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
   endif  
@@ -1501,15 +1501,15 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrp_2d(1:npfts,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='KLEAF', dim1name='pft',dim2name='nbranches',&
+    call restartvar(ncid, flag, varname='KLeafNumber_brch', dim1name='pft',dim2name='nbranches',&
      long_name='leaf number', units='none', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,KLEAF,datip_2d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)          
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,KLeafNumber_brch,datip_2d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)          
   else
     !print*,'KLEAF'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,KLEAF,datip_2d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)    
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,KLeafNumber_brch,datip_2d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)    
     datpr2 => datrp_2d(1:npfts,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='KLEAF', dim1name='pft',dim2name='nbranches',&
+    call restartvar(ncid, flag, varname='KLeafNumber_brch', dim1name='pft',dim2name='nbranches',&
      long_name='leaf number', units='none', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
   endif  
@@ -1532,16 +1532,16 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrp_2d(1:npfts,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='KVSTGN', dim1name='pft',dim2name='nbranches',&
+    call restartvar(ncid, flag, varname='KLeafNumLowestGrowing_pft', dim1name='pft',dim2name='nbranches',&
      long_name='leaf growth stage counter', units='none', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,KVSTGN,datip_2d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive) 
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,KLeafNumLowestGrowing_pft,datip_2d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive) 
   else
-    !print*,'KVSTGN'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,KVSTGN,datip_2d,NumActivePlants=NumActivePlants,&
+    !print*,'KLeafNumLowestGrowing_pft'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,KLeafNumLowestGrowing_pft,datip_2d,NumActivePlants=NumActivePlants,&
       IsPlantActive=IsPlantActive)   
     datpr2 => datrp_2d(1:npfts,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='KVSTGN', dim1name='pft',dim2name='nbranches',&
+    call restartvar(ncid, flag, varname='KLeafNumLowestGrowing_pft', dim1name='pft',dim2name='nbranches',&
      long_name='leaf growth stage counter', units='none', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
   endif  
@@ -1680,111 +1680,111 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrp_2d(1:npfts,1:NumOfPlantChemElmnts)
-    call restartvar(ncid, flag, varname='LeafChemElmnts', dim1name='pft',dim2name='elmnts',&
+    call restartvar(ncid, flag, varname='LeafChemElmnts_pft', dim1name='pft',dim2name='elmnts',&
      long_name='canopy leaf element', units='g d-2', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,LeafChemElmnts,datrp_2d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)   
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,LeafChemElmnts_pft,datrp_2d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)   
   else
-    !print*,'LeafChemElmnts'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,LeafChemElmnts,datrp_2d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)     
+    !print*,'LeafChemElmnts_pft'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,LeafChemElmnts_pft,datrp_2d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)     
     datpr2 => datrp_2d(1:npfts,1:NumOfPlantChemElmnts)
-    call restartvar(ncid, flag, varname='LeafChemElmnts', dim1name='pft',dim2name='elmnts',&
+    call restartvar(ncid, flag, varname='LeafChemElmnts_pft', dim1name='pft',dim2name='elmnts',&
      long_name='canopy leaf element', units='g d-2', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
   endif  
 
   if(flag=='read')then
     datpr2 => datrp_2d(1:npfts,1:NumOfPlantChemElmnts)
-    call restartvar(ncid, flag, varname='SheathChemElmnts', dim1name='pft',dim2name='elmnts',&
+    call restartvar(ncid, flag, varname='PetioleChemElmnts_pft', dim1name='pft',dim2name='elmnts',&
      long_name='canopy sheath element', units='g d-2', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,SheathChemElmnts,datrp_2d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)   
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,PetioleChemElmnts_pft,datrp_2d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)   
   else
-    !print*,'SheathChemElmnts'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,SheathChemElmnts,datrp_2d,NumActivePlants=NumActivePlants,&
+    !print*,'PetioleChemElmnts_pft'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,PetioleChemElmnts_pft,datrp_2d,NumActivePlants=NumActivePlants,&
       IsPlantActive=IsPlantActive)     
     datpr2 => datrp_2d(1:npfts,1:NumOfPlantChemElmnts)
-    call restartvar(ncid, flag, varname='SheathChemElmnts', dim1name='pft',dim2name='elmnts',&
+    call restartvar(ncid, flag, varname='PetioleChemElmnts_pft', dim1name='pft',dim2name='elmnts',&
      long_name='canopy sheath element', units='g d-2', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)  
   endif  
 
   if(flag=='read')then
     datpr2 => datrp_2d(1:npfts,1:NumOfPlantChemElmnts)
-    call restartvar(ncid, flag, varname='StalkChemElmnts', dim1name='pft',dim2name='elmnts',&
+    call restartvar(ncid, flag, varname='StalkChemElmnts_pft', dim1name='pft',dim2name='elmnts',&
      long_name='canopy stalk element', units='g d-2', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,StalkChemElmnts,datrp_2d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)   
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,StalkChemElmnts_pft,datrp_2d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)   
   else
-    !print*,'StalkChemElmnts'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,StalkChemElmnts,datrp_2d,NumActivePlants=NumActivePlants,&
+    !print*,'StalkChemElmnts_pft'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,StalkChemElmnts_pft,datrp_2d,NumActivePlants=NumActivePlants,&
       IsPlantActive=IsPlantActive)   
     datpr2 => datrp_2d(1:npfts,1:NumOfPlantChemElmnts)
-    call restartvar(ncid, flag, varname='StalkChemElmnts', dim1name='pft',dim2name='elmnts',&
+    call restartvar(ncid, flag, varname='StalkChemElmnts_pft', dim1name='pft',dim2name='elmnts',&
      long_name='canopy stalk element', units='g d-2', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
   endif  
 
   if(flag=='read')then
     datpr2 => datrp_2d(1:npfts,1:NumOfPlantChemElmnts)
-    call restartvar(ncid, flag, varname='CanopyReserveChemElmnts', dim1name='pft',dim2name='elmnts',&
+    call restartvar(ncid, flag, varname='ReserveChemElmnts_pft', dim1name='pft',dim2name='elmnts',&
      long_name='canopy reserve element', units='g d-2', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,CanopyReserveChemElmnts,datrp_2d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)   
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,ReserveChemElmnts_pft,datrp_2d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)   
   else
-    !print*,'CanopyReserveChemElmnts'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,CanopyReserveChemElmnts,datrp_2d,NumActivePlants=NumActivePlants,&
+    !print*,'ReserveChemElmnts_pft'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,ReserveChemElmnts_pft,datrp_2d,NumActivePlants=NumActivePlants,&
       IsPlantActive=IsPlantActive)   
     datpr2 => datrp_2d(1:npfts,1:NumOfPlantChemElmnts)
-    call restartvar(ncid, flag, varname='CanopyReserveChemElmnts', dim1name='pft',dim2name='elmnts',&
+    call restartvar(ncid, flag, varname='ReserveChemElmnts_pft', dim1name='pft',dim2name='elmnts',&
      long_name='canopy reserve element', units='g d-2', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
   endif  
 
   if(flag=='read')then
     datpr2 => datrp_2d(1:npfts,1:NumOfPlantChemElmnts)
-    call restartvar(ncid, flag, varname='HuskChemElmnts', dim1name='pft',dim2name='elmnts',&
+    call restartvar(ncid, flag, varname='HuskChemElmnts_pft', dim1name='pft',dim2name='elmnts',&
      long_name='canopy husk element', units='g d-2', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,HuskChemElmnts,datrp_2d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)   
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,HuskChemElmnts_pft,datrp_2d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)   
   else
-    !print*,'HuskChemElmnts'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,HuskChemElmnts,datrp_2d,NumActivePlants=NumActivePlants,&
+    !print*,'HuskChemElmnts_pft'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,HuskChemElmnts_pft,datrp_2d,NumActivePlants=NumActivePlants,&
       IsPlantActive=IsPlantActive)   
     datpr2 => datrp_2d(1:npfts,1:NumOfPlantChemElmnts)
-    call restartvar(ncid, flag, varname='HuskChemElmnts', dim1name='pft',dim2name='elmnts',&
+    call restartvar(ncid, flag, varname='HuskChemElmnts_pft', dim1name='pft',dim2name='elmnts',&
      long_name='canopy husk element', units='g d-2', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
   endif  
 
   if(flag=='read')then
     datpr2 => datrp_2d(1:npfts,1:NumOfPlantChemElmnts)
-    call restartvar(ncid, flag, varname='EarChemElmnts', dim1name='pft',dim2name='elmnts',&
+    call restartvar(ncid, flag, varname='EarChemElmnts_pft', dim1name='pft',dim2name='elmnts',&
      long_name='canopy ear element', units='g d-2', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,EarChemElmnts,datrp_2d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)   
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,EarChemElmnts_pft,datrp_2d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)   
   else
-    !print*,'EarChemElmnts'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,EarChemElmnts,datrp_2d,NumActivePlants=NumActivePlants,&
+    !print*,'EarChemElmnts_pft'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,EarChemElmnts_pft,datrp_2d,NumActivePlants=NumActivePlants,&
       IsPlantActive=IsPlantActive)   
     datpr2 => datrp_2d(1:npfts,1:NumOfPlantChemElmnts)
-    call restartvar(ncid, flag, varname='EarChemElmnts', dim1name='pft',dim2name='elmnts',&
+    call restartvar(ncid, flag, varname='EarChemElmnts_pft', dim1name='pft',dim2name='elmnts',&
      long_name='canopy ear element', units='g d-2', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
   endif  
 
   if(flag=='read')then
     datpr2 => datrp_2d(1:npfts,1:NumOfPlantChemElmnts)
-    call restartvar(ncid, flag, varname='GrainChemElmnts', dim1name='pft',dim2name='elmnts',&
+    call restartvar(ncid, flag, varname='GrainChemElmnts_pft', dim1name='pft',dim2name='elmnts',&
      long_name='canopy grain element', units='g d-2', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)     
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,GrainChemElmnts,datrp_2d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)   
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,GrainChemElmnts_pft,datrp_2d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)   
   else
-    !print*,'GrainChemElmnts'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,GrainChemElmnts,datrp_2d,NumActivePlants=NumActivePlants,&
+    !print*,'GrainChemElmnts_pft'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,GrainChemElmnts_pft,datrp_2d,NumActivePlants=NumActivePlants,&
       IsPlantActive=IsPlantActive)     
     datpr2 => datrp_2d(1:npfts,1:NumOfPlantChemElmnts)
-    call restartvar(ncid, flag, varname='GrainChemElmnts', dim1name='pft',dim2name='elmnts',&
+    call restartvar(ncid, flag, varname='GrainChemElmnts_pft', dim1name='pft',dim2name='elmnts',&
      long_name='canopy grain element', units='g d-2', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)     
   endif  
@@ -1889,16 +1889,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='FracPARByCanP', dim1name='pft',&
+    call restartvar(ncid, flag, varname='FracPARbyCanopy_pft', dim1name='pft',&
      long_name='fraction of incoming PAR absorbed by canopy', units='m', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)   
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,FracPARByCanP,datrp_1d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)     
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,FracPARbyCanopy_pft,datrp_1d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)     
   else
-    !print*,'FracPARByCanP'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,FracPARByCanP,datrp_1d,NumActivePlants=NumActivePlants,&
+    !print*,'FracPARbyCanopy_pft'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,FracPARbyCanopy_pft,datrp_1d,NumActivePlants=NumActivePlants,&
       IsPlantActive=IsPlantActive)       
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='FracPARByCanP', dim1name='pft',&
+    call restartvar(ncid, flag, varname='FracPARbyCanopy_pft', dim1name='pft',&
      long_name='fraction of incoming PAR absorbed by canopy', units='m', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)   
 
@@ -1906,16 +1906,16 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrp_2d(1:npfts,1:NumOfPlantChemElmnts)
-    call restartvar(ncid, flag, varname='WTRTSE', dim1name='pft',dim2name='elmnts',&
+    call restartvar(ncid, flag, varname='RootStructChemElmnt_pft', dim1name='pft',dim2name='elmnts',&
      long_name='plant root structural element', units='g d-2', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)   
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,WTRTSE,datrp_2d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)       
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,RootStructChemElmnt_pft,datrp_2d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive)       
   else
-    !print*,'WTRTSE'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,WTRTSE,datrp_2d,NumActivePlants=NumActivePlants,&
+    !print*,'RootStructChemElmnt_pft'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,RootStructChemElmnt_pft,datrp_2d,NumActivePlants=NumActivePlants,&
       IsPlantActive=IsPlantActive)         
     datpr2 => datrp_2d(1:npfts,1:NumOfPlantChemElmnts)
-    call restartvar(ncid, flag, varname='WTRTSE', dim1name='pft',dim2name='elmnts',&
+    call restartvar(ncid, flag, varname='RootStructChemElmnt_pft', dim1name='pft',dim2name='elmnts',&
      long_name='plant root structural element', units='g d-2', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)   
   endif  
@@ -1987,16 +1987,16 @@ implicit none
 
   if(flag=='read')then
     datpr3 => datrp_3d(1:npfts,1:NumOfPlantChemElmnts,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='WTSHTBE', dim1name='pft',dim2name='elmnts',&
+    call restartvar(ncid, flag, varname='ShootChemElmnt_brch', dim1name='pft',dim2name='elmnts',&
       dim3name='nbranches',long_name='branch shoot element', units='g d-2', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)   
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,WTSHTBE,datrp_3d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive) 
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,ShootChemElmnt_brch,datrp_3d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive) 
   else
-    !print*,'WTSHTBE'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,WTSHTBE,datrp_3d,NumActivePlants=NumActivePlants,&
+    !print*,'ShootChemElmnt_brch'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,ShootChemElmnt_brch,datrp_3d,NumActivePlants=NumActivePlants,&
       IsPlantActive=IsPlantActive)   
     datpr3 => datrp_3d(1:npfts,1:NumOfPlantChemElmnts,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='WTSHTBE', dim1name='pft',dim2name='elmnts',&
+    call restartvar(ncid, flag, varname='ShootChemElmnt_brch', dim1name='pft',dim2name='elmnts',&
       dim3name='nbranches',long_name='branch shoot element', units='g d-2', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)   
   endif  
@@ -2019,16 +2019,16 @@ implicit none
 
   if(flag=='read')then
     datpr3 => datrp_3d(1:npfts,1:NumOfPlantChemElmnts,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='WTNDBE', dim1name='pft',dim2name='elmnts',&
+    call restartvar(ncid, flag, varname='CanopyNoduleChemElmnt_brch', dim1name='pft',dim2name='elmnts',&
       dim3name='nbranches',long_name='branch nodule element', units='g d-2', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)   
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,WTNDBE,datrp_3d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive) 
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,CanopyNoduleChemElmnt_brch,datrp_3d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive) 
   else
-    !print*,'WTNDBE'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,WTNDBE,datrp_3d,NumActivePlants=NumActivePlants,&
+    !print*,'CanopyNoduleChemElmnt_brch'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,CanopyNoduleChemElmnt_brch,datrp_3d,NumActivePlants=NumActivePlants,&
       IsPlantActive=IsPlantActive)   
     datpr3 => datrp_3d(1:npfts,1:NumOfPlantChemElmnts,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='WTNDBE', dim1name='pft',dim2name='elmnts',&
+    call restartvar(ncid, flag, varname='CanopyNoduleChemElmnt_brch', dim1name='pft',dim2name='elmnts',&
       dim3name='nbranches',long_name='branch nodule element', units='g d-2', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)   
   endif  
@@ -2131,32 +2131,32 @@ implicit none
 
   if(flag=='read')then
     datpr3 => datrp_3d(1:npfts,1:NumOfPlantChemElmnts,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='GRNXB', dim1name='pft',dim2name='elmnts',&
+    call restartvar(ncid, flag, varname='PotentialSeedSites_brch', dim1name='pft',dim2name='elmnts',&
       dim3name='nbranches',long_name='branch grain element', units='g d-2', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)    
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,GRNXB,datrp_2d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive) 
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,PotentialSeedSites_brch,datrp_2d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive) 
   else
-    !print*,'GRNXB'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,GRNXB,datrp_2d,NumActivePlants=NumActivePlants,&
+    !print*,'PotentialSeedSites_brch'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,PotentialSeedSites_brch,datrp_2d,NumActivePlants=NumActivePlants,&
       IsPlantActive=IsPlantActive)   
     datpr3 => datrp_3d(1:npfts,1:NumOfPlantChemElmnts,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='GRNXB', dim1name='pft',dim2name='elmnts',&
+    call restartvar(ncid, flag, varname='PotentialSeedSites_brch', dim1name='pft',dim2name='elmnts',&
       dim3name='nbranches',long_name='branch grain element', units='g d-2', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)    
   endif  
 
   if(flag=='read')then
     datpr2 => datrp_2d(1:npfts,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='GRNOB', dim1name='pft',dim2name='nbranches',&
+    call restartvar(ncid, flag, varname='SeedNumberSet_brch', dim1name='pft',dim2name='nbranches',&
      long_name='branch grain number', units='# d-2', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,GRNOB,datrp_2d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive) 
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,SeedNumberSet_brch,datrp_2d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive) 
   else
-    !print*,'GRNOB'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,GRNOB,datrp_2d,NumActivePlants=NumActivePlants,&
+    !print*,'SeedNumberSet_brch'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,SeedNumberSet_brch,datrp_2d,NumActivePlants=NumActivePlants,&
       IsPlantActive=IsPlantActive) 
     datpr2 => datrp_2d(1:npfts,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='GRNOB', dim1name='pft',dim2name='nbranches',&
+    call restartvar(ncid, flag, varname='SeedNumberSet_brch', dim1name='pft',dim2name='nbranches',&
      long_name='branch grain number', units='# d-2', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
 
@@ -2164,16 +2164,16 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrp_2d(1:npfts,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='GRWTB', dim1name='pft',dim2name='nbranches',&
+    call restartvar(ncid, flag, varname='GrainSeedBiomCMean_brch', dim1name='pft',dim2name='nbranches',&
      long_name='maximum grain C during grain fill', units='g d-2', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,GRWTB,datrp_2d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive) 
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,GrainSeedBiomCMean_brch,datrp_2d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive) 
   else
-    !print*,'GRWTB'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,GRWTB,datrp_2d,NumActivePlants=NumActivePlants,&
+    !print*,'GrainSeedBiomCMean_brch'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,GrainSeedBiomCMean_brch,datrp_2d,NumActivePlants=NumActivePlants,&
       IsPlantActive=IsPlantActive) 
     datpr2 => datrp_2d(1:npfts,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='GRWTB', dim1name='pft',dim2name='nbranches',&
+    call restartvar(ncid, flag, varname='GrainSeedBiomCMean_brch', dim1name='pft',dim2name='nbranches',&
      long_name='maximum grain C during grain fill', units='g d-2', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
 
@@ -2295,16 +2295,16 @@ implicit none
 
   if(flag=='read')then
     datpr3 => datrp_3d(1:npfts,1:NumOfPlantChemElmnts,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='WTSTXBE', dim1name='pft',dim2name='elmnts',&
+    call restartvar(ncid, flag, varname='BranchStalkChemElmnts_pft_pft', dim1name='pft',dim2name='elmnts',&
      dim3name='nbranches',long_name='branch stalk structural C', units='g d-2', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval) 
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,WTSTXBE,datrp_3d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive) 
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,BranchStalkChemElmnts_pft_pft,datrp_3d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive) 
   else
-    !print*,'WTSTXBE'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,WTSTXBE,datrp_3d,NumActivePlants=NumActivePlants,&
+    !print*,'BranchStalkChemElmnts_pft_pft'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,BranchStalkChemElmnts_pft_pft,datrp_3d,NumActivePlants=NumActivePlants,&
       IsPlantActive=IsPlantActive)   
     datpr3 => datrp_3d(1:npfts,1:NumOfPlantChemElmnts,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='WTSTXBE', dim1name='pft',dim2name='elmnts',&
+    call restartvar(ncid, flag, varname='BranchStalkChemElmnts_pft_pft', dim1name='pft',dim2name='elmnts',&
      dim3name='nbranches',long_name='branch stalk structural C', units='g d-2', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)   
   endif
@@ -2377,32 +2377,32 @@ implicit none
 
   if(flag=='read')then
     datpr3 => datrp_3d(1:npfts,1:MaxNodesPerBranch,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='CO2B', dim1name='pft',dim2name='nodes',&
+    call restartvar(ncid, flag, varname='CMassCO2BundleSheath_node', dim1name='pft',dim2name='nodes',&
      dim3name='nbranches',long_name='bundle sheath nonstructural C3 content in C4 photosynthesis', units='g d-2', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)   
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,CO2B,datrp_3d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive) 
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,CMassCO2BundleSheath_node,datrp_3d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive) 
   else
-    !print*,'CO2B'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,CO2B,datrp_3d,NumActivePlants=NumActivePlants,&
+    !print*,'CMassCO2BundleSheath_node'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,CMassCO2BundleSheath_node,datrp_3d,NumActivePlants=NumActivePlants,&
       IsPlantActive=IsPlantActive)   
     datpr3 => datrp_3d(1:npfts,1:MaxNodesPerBranch,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='CO2B', dim1name='pft',dim2name='nodes',&
+    call restartvar(ncid, flag, varname='CMassCO2BundleSheath_node', dim1name='pft',dim2name='nodes',&
      dim3name='nbranches',long_name='bundle sheath nonstructural C3 content in C4 photosynthesis', units='g d-2', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)     
   endif
 
   if(flag=='read')then
     datpr3 => datrp_3d(1:npfts,1:MaxNodesPerBranch,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='HCOB', dim1name='pft',dim2name='nodes',&
+    call restartvar(ncid, flag, varname='CMassHCO3BundleSheath_node', dim1name='pft',dim2name='nodes',&
      dim3name='nbranches',long_name='bundle sheath nonstructural C3 content in C4 photosynthesis', units='g d-2', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)     
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,HCOB,datrp_3d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive) 
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,CMassHCO3BundleSheath_node,datrp_3d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive) 
   else
-    !print*,'HCOB'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,HCOB,datrp_3d,NumActivePlants=NumActivePlants,&
+    !print*,'CMassHCO3BundleSheath_node'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,CMassHCO3BundleSheath_node,datrp_3d,NumActivePlants=NumActivePlants,&
       IsPlantActive=IsPlantActive)   
     datpr3 => datrp_3d(1:npfts,1:MaxNodesPerBranch,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='HCOB', dim1name='pft',dim2name='nodes',&
+    call restartvar(ncid, flag, varname='CMassHCO3BundleSheath_node', dim1name='pft',dim2name='nodes',&
      dim3name='nbranches',long_name='bundle sheath nonstructural C3 content in C4 photosynthesis', units='g d-2', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)     
   endif  
@@ -2554,32 +2554,32 @@ implicit none
 
   if(flag=='read')then 
     datpr4 => datrp_4d(1:npfts,1:JC,1:MaxNodesPerBranch,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='CanPLNBLA', dim1name='pft',dim2name='levcan',&
+    call restartvar(ncid, flag, varname='CanopyLeafAreaByLayer_pft', dim1name='pft',dim2name='levcan',&
      dim3name='nodes',dim4name='nbranches',long_name='plant layer node branch leaf area', units='m2 d-2', &
      interpinic_flag='skip', data=datpr4, missing_value=spval, fill_value=spval)
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,CanPLNBLA,datrp_4d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive) 
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,CanopyLeafAreaByLayer_pft,datrp_4d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive) 
   else
-    !print*,'CanPLNBLA'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,CanPLNBLA,datrp_4d,NumActivePlants=NumActivePlants,&
+    !print*,'CanopyLeafAreaByLayer_pft'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,CanopyLeafAreaByLayer_pft,datrp_4d,NumActivePlants=NumActivePlants,&
       IsPlantActive=IsPlantActive)   
     datpr4 => datrp_4d(1:npfts,1:JC,1:MaxNodesPerBranch,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='CanPLNBLA', dim1name='pft',dim2name='levcan',&
+    call restartvar(ncid, flag, varname='CanopyLeafAreaByLayer_pft', dim1name='pft',dim2name='levcan',&
      dim3name='nodes',dim4name='nbranches',long_name='plant layer node branch leaf area', units='m2 d-2', &
      interpinic_flag='skip', data=datpr4, missing_value=spval, fill_value=spval)
   endif  
 
   if(flag=='read')then 
     datpr5 => datrp_5d(1:npfts,1:NumOfPlantChemElmnts,1:JC,1:MaxNodesPerBranch,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='WGLFLE', dim1name='pft',dim2name='elmnts',&
+    call restartvar(ncid, flag, varname='LeafChemElmntByLayer_pft', dim1name='pft',dim2name='elmnts',&
      dim3name='levcan',dim4name='nodes',dim5name='nbranches',long_name='layer leaf element',&
      units='g d-2',interpinic_flag='skip', data=datpr5, missing_value=spval, fill_value=spval)
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,WGLFLE,datrp_5d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive) 
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,LeafChemElmntByLayer_pft,datrp_5d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive) 
   else
-    !print*,'WGLFLE'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,WGLFLE,datrp_5d,NumActivePlants=NumActivePlants,&
+    !print*,'LeafChemElmntByLayer_pft'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,LeafChemElmntByLayer_pft,datrp_5d,NumActivePlants=NumActivePlants,&
       IsPlantActive=IsPlantActive)   
     datpr5 => datrp_5d(1:npfts,1:NumOfPlantChemElmnts,1:JC,1:MaxNodesPerBranch,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='WGLFLE', dim1name='pft',dim2name='elmnts',&
+    call restartvar(ncid, flag, varname='LeafChemElmntByLayer_pft', dim1name='pft',dim2name='elmnts',&
       dim3name='levcan',dim4name='nodes',dim5name='nbranches',long_name='layer leaf element',&
       units='g d-2',interpinic_flag='skip', data=datpr5, missing_value=spval, fill_value=spval)
   endif  
@@ -2701,16 +2701,16 @@ implicit none
 
   if(flag=='read')then
     datpr3 => datrp_3d(1:npfts,1:pltpar%jroots,1:JZ)
-    call restartvar(ncid, flag, varname='SecndRootXNumL', dim1name='pft',dim2name='rootyps',&
+    call restartvar(ncid, flag, varname='SecndRootXNum_pvr', dim1name='pft',dim2name='rootyps',&
      dim3name='levsoi',long_name='soil layer 2nd order root number axes', units='# d-2', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)   
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,SecndRootXNumL,datrp_3d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive) 
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,SecndRootXNum_pvr,datrp_3d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive) 
   else
-    !print*,'SecndRootXNumL'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,SecndRootXNumL,datrp_3d,NumActivePlants=NumActivePlants,&
+    !print*,'SecndRootXNum_pvr'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,SecndRootXNum_pvr,datrp_3d,NumActivePlants=NumActivePlants,&
       IsPlantActive=IsPlantActive) 
     datpr3 => datrp_3d(1:npfts,1:pltpar%jroots,1:JZ)
-    call restartvar(ncid, flag, varname='SecndRootXNumL', dim1name='pft',dim2name='rootyps',&
+    call restartvar(ncid, flag, varname='SecndRootXNum_pvr', dim1name='pft',dim2name='rootyps',&
      dim3name='levsoi',long_name='soil layer 2nd order root number axes', units='# d-2', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)   
      
@@ -2718,64 +2718,64 @@ implicit none
 
   if(flag=='read')then
     datpr3 => datrp_3d(1:npfts,1:pltpar%jroots,1:JZ)
-    call restartvar(ncid, flag, varname='RootLenPerP', dim1name='pft',dim2name='rootyps',&
+    call restartvar(ncid, flag, varname='RootLenPerPopu_pvr', dim1name='pft',dim2name='rootyps',&
      dim3name='levsoi',long_name='root layer length per plant', units='m p-1', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)   
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,RootLenPerP,datrp_3d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive) 
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,RootLenPerPopu_pvr,datrp_3d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive) 
   else
-    !print*,'RootLenPerP'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,RootLenPerP,datrp_3d,NumActivePlants=NumActivePlants,&
+    !print*,'RootLenPerPopu_pvr'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,RootLenPerPopu_pvr,datrp_3d,NumActivePlants=NumActivePlants,&
       IsPlantActive=IsPlantActive)   
     datpr3 => datrp_3d(1:npfts,1:pltpar%jroots,1:JZ)
-    call restartvar(ncid, flag, varname='RootLenPerP', dim1name='pft',dim2name='rootyps',&
+    call restartvar(ncid, flag, varname='RootLenPerPopu_pvr', dim1name='pft',dim2name='rootyps',&
      dim3name='levsoi',long_name='root layer length per plant', units='m p-1', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)
   endif  
 
   if(flag=='read')then
     datpr3 => datrp_3d(1:npfts,1:pltpar%jroots,1:JZ)
-    call restartvar(ncid, flag, varname='RootLenDensNLP', dim1name='pft',dim2name='rootyps',&
+    call restartvar(ncid, flag, varname='RootLenthDensPerPopu_pvr', dim1name='pft',dim2name='rootyps',&
      dim3name='levsoi',long_name='soil layer root length density', units='m m-3', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)   
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,RootLenDensNLP,datrp_3d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive) 
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,RootLenthDensPerPopu_pvr,datrp_3d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive) 
   else
-    !print*,'RootLenDensNLP'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,RootLenDensNLP,datrp_3d,NumActivePlants=NumActivePlants,&
+    !print*,'RootLenthDensPerPopu_pvr'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,RootLenthDensPerPopu_pvr,datrp_3d,NumActivePlants=NumActivePlants,&
       IsPlantActive=IsPlantActive)   
     datpr3 => datrp_3d(1:npfts,1:pltpar%jroots,1:JZ)
-    call restartvar(ncid, flag, varname='RootLenDensNLP', dim1name='pft',dim2name='rootyps',&
+    call restartvar(ncid, flag, varname='RootLenthDensPerPopu_pvr', dim1name='pft',dim2name='rootyps',&
      dim3name='levsoi',long_name='soil layer root length density', units='m m-3', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)   
   endif  
 
   if(flag=='read')then
     datpr3 => datrp_3d(1:npfts,1:pltpar%jroots,1:JZ)
-    call restartvar(ncid, flag, varname='RTVLP', dim1name='pft',dim2name='rootyps',&
+    call restartvar(ncid, flag, varname='RootVolume_vr', dim1name='pft',dim2name='rootyps',&
      dim3name='levsoi',long_name='root layer volume air', units='m2 d-2', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)   
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,RTVLP,datrp_3d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive) 
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,RootVolume_vr,datrp_3d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive) 
   else
-    !print*,'RTVLP'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,RTVLP,datrp_3d,NumActivePlants=NumActivePlants,&
+    !print*,'RootVolume_vr'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,RootVolume_vr,datrp_3d,NumActivePlants=NumActivePlants,&
       IsPlantActive=IsPlantActive)   
     datpr3 => datrp_3d(1:npfts,1:pltpar%jroots,1:JZ)
-    call restartvar(ncid, flag, varname='RTVLP', dim1name='pft',dim2name='rootyps',&
+    call restartvar(ncid, flag, varname='RootVolume_vr', dim1name='pft',dim2name='rootyps',&
      dim3name='levsoi',long_name='root layer volume air', units='m2 d-2', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)   
   endif  
 
   if(flag=='read')then
     datpr3 => datrp_3d(1:npfts,1:pltpar%jroots,1:JZ)
-    call restartvar(ncid, flag, varname='RTVLW', dim1name='pft',dim2name='rootyps',&
+    call restartvar(ncid, flag, varname='RootVH2O_vr', dim1name='pft',dim2name='rootyps',&
      dim3name='levsoi',long_name='root layer volume water', units='m2 d-2', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)  
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,RTVLW,datrp_3d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive) 
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,RootVH2O_vr,datrp_3d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive) 
   else
     !print*,'RTVLW'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,RTVLW,datrp_3d,NumActivePlants=NumActivePlants,&
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,RootVH2O_vr,datrp_3d,NumActivePlants=NumActivePlants,&
       IsPlantActive=IsPlantActive)   
     datpr3 => datrp_3d(1:npfts,1:pltpar%jroots,1:JZ)
-    call restartvar(ncid, flag, varname='RTVLW', dim1name='pft',dim2name='rootyps',&
+    call restartvar(ncid, flag, varname='RootVH2O_vr', dim1name='pft',dim2name='rootyps',&
      dim3name='levsoi',long_name='root layer volume water', units='m2 d-2', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)  
   endif  
@@ -2814,16 +2814,16 @@ implicit none
 
   if(flag=='read')then
     datpr3 => datrp_3d(1:npfts,1:pltpar%jroots,1:JZ)
-    call restartvar(ncid, flag, varname='RTARP', dim1name='pft',dim2name='rootyps',&
+    call restartvar(ncid, flag, varname='RootAreaPerPlant_vr', dim1name='pft',dim2name='rootyps',&
      dim3name='levsoi',long_name='root layer area per plant', units='m p-1', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval) 
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,RTARP,datrp_3d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive) 
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,RootAreaPerPlant_vr,datrp_3d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive) 
   else
-    !print*,'RTARP'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,RTARP,datrp_3d,NumActivePlants=NumActivePlants,&
+    !print*,'RootAreaPerPlant_vr'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,RootAreaPerPlant_vr,datrp_3d,NumActivePlants=NumActivePlants,&
       IsPlantActive=IsPlantActive)   
     datpr3 => datrp_3d(1:npfts,1:pltpar%jroots,1:JZ)
-    call restartvar(ncid, flag, varname='RTARP', dim1name='pft',dim2name='rootyps',&
+    call restartvar(ncid, flag, varname='RootAreaPerPlant_vr', dim1name='pft',dim2name='rootyps',&
      dim3name='levsoi',long_name='root layer area per plant', units='m p-1', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval) 
 
@@ -2847,16 +2847,16 @@ implicit none
 
   if(flag=='read')then
     datpr3 => datrp_3d(1:npfts,1:pltpar%jroots,1:JZ)
-    call restartvar(ncid, flag, varname='RCO2M', dim1name='pft',dim2name='rootyps',&
+    call restartvar(ncid, flag, varname='RootRespPotential_vr', dim1name='pft',dim2name='rootyps',&
      dim3name='levsoi',long_name='root respiration unconstrained by O2', units='g d-2 h-1', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval) 
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,RCO2M,datrp_3d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive) 
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,RootRespPotential_vr,datrp_3d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive) 
   else
-    !print*,'RCO2M'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,RCO2M,datrp_3d,NumActivePlants=NumActivePlants,&
+    !print*,'RootRespPotential_vr'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,RootRespPotential_vr,datrp_3d,NumActivePlants=NumActivePlants,&
       IsPlantActive=IsPlantActive)   
     datpr3 => datrp_3d(1:npfts,1:pltpar%jroots,1:JZ)
-    call restartvar(ncid, flag, varname='RCO2M', dim1name='pft',dim2name='rootyps',&
+    call restartvar(ncid, flag, varname='RootRespPotential_vr', dim1name='pft',dim2name='rootyps',&
      dim3name='levsoi',long_name='root respiration unconstrained by O2', units='g d-2 h-1', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval) 
   endif  
@@ -2959,16 +2959,16 @@ implicit none
 
   if(flag=='read')then
     datpr3 => datrp_3d(1:npfts,1:pltpar%jroots,1:JZ)
-    call restartvar(ncid, flag, varname='WSRTL', dim1name='pft',dim2name='rootyps',&
+    call restartvar(ncid, flag, varname='RootProteinC_pvr', dim1name='pft',dim2name='rootyps',&
      dim3name='levsoi',long_name='root layer protein C', units='g d-2', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,WSRTL,datrp_3d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive) 
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,RootProteinC_pvr,datrp_3d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive) 
   else
-    !print*,'WSRTL'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,WSRTL,datrp_3d,NumActivePlants=NumActivePlants,&
+    !print*,'RootProteinC_pvr'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,RootProteinC_pvr,datrp_3d,NumActivePlants=NumActivePlants,&
       IsPlantActive=IsPlantActive)   
     datpr3 => datrp_3d(1:npfts,1:pltpar%jroots,1:JZ)
-    call restartvar(ncid, flag, varname='WSRTL', dim1name='pft',dim2name='rootyps',&
+    call restartvar(ncid, flag, varname='RootProteinC_pvr', dim1name='pft',dim2name='rootyps',&
      dim3name='levsoi',long_name='root layer protein C', units='g d-2', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)
 
@@ -3120,16 +3120,16 @@ implicit none
 
   if(flag=='read')then
     datpr3 => datrp_3d(1:npfts,1:pltpar%jroots,1:JZ)
-    call restartvar(ncid, flag, varname='WFR', dim1name='pft',dim2name='rootyps',&
+    call restartvar(ncid, flag, varname='RootAutoRO2Limiter_pvr', dim1name='pft',dim2name='rootyps',&
      dim3name='levsoi',long_name='O2 constraint/stress to root respiration', units='none', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,WFR,datrp_3d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive) 
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,RootAutoRO2Limiter_pvr,datrp_3d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive) 
   else
     !print*,'WFR'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,WFR,datrp_3d,NumActivePlants=NumActivePlants,&
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,RootAutoRO2Limiter_pvr,datrp_3d,NumActivePlants=NumActivePlants,&
       IsPlantActive=IsPlantActive) 
     datpr3 => datrp_3d(1:npfts,1:pltpar%jroots,1:JZ)
-    call restartvar(ncid, flag, varname='WFR', dim1name='pft',dim2name='rootyps',&
+    call restartvar(ncid, flag, varname='RootAutoRO2Limiter_pvr', dim1name='pft',dim2name='rootyps',&
      dim3name='levsoi',long_name='O2 constraint/stress to root respiration', units='none', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)
   endif  
@@ -3167,32 +3167,32 @@ implicit none
 
   if(flag=='read')then
     datpr4 => datrp_4d(1:npfts, 1:NumOfPlantChemElmnts, 1:pltpar%jroots,1:JRS)
-    call restartvar(ncid, flag, varname='RTWT1E', dim1name='pft',dim2name='elmnts',&
+    call restartvar(ncid, flag, varname='Root1stChemElmnt', dim1name='pft',dim2name='elmnts',&
      dim3name='rootyps',dim4name='rootaxs',long_name='elmnts in primary root axes', units='g d-2', &
      interpinic_flag='skip', data=datpr4, missing_value=spval, fill_value=spval)  
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,RTWT1E,datrp_4d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive) 
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,Root1stChemElmnt,datrp_4d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive) 
   else
-    !print*,'RTWT1E'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,RTWT1E,datrp_4d,NumActivePlants=NumActivePlants,&
+    !print*,'Root1stChemElmnt'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,Root1stChemElmnt,datrp_4d,NumActivePlants=NumActivePlants,&
       IsPlantActive=IsPlantActive)   
     datpr4 => datrp_4d(1:npfts, 1:NumOfPlantChemElmnts, 1:pltpar%jroots,1:JRS)
-    call restartvar(ncid, flag, varname='RTWT1E', dim1name='pft',dim2name='elmnts',&
+    call restartvar(ncid, flag, varname='Root1stChemElmnt', dim1name='pft',dim2name='elmnts',&
      dim3name='rootyps',dim4name='rootaxs',long_name='elmnts in primary root axes', units='g d-2', &
      interpinic_flag='skip', data=datpr4, missing_value=spval, fill_value=spval)  
   endif  
 
   if(flag=='read')then
     datpr4 => datrp_4d(1:npfts, 1:pltpar%jroots,1:JZ,1:JC)
-    call restartvar(ncid, flag, varname='RTN2', dim1name='pft',dim2name='rootyps',&
+    call restartvar(ncid, flag, varname='SecndRootXNum_rpvr', dim1name='pft',dim2name='rootyps',&
      dim3name='levsoi',dim4name='levcan',long_name='root layer secondary axes number', units=' d-2', &
      interpinic_flag='skip', data=datpr4, missing_value=spval, fill_value=spval)  
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,RTN2,datrp_4d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive) 
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,SecndRootXNum_rpvr,datrp_4d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive) 
   else
     !print*,'RTN2'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,RTN2,datrp_4d,NumActivePlants=NumActivePlants,&
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,SecndRootXNum_rpvr,datrp_4d,NumActivePlants=NumActivePlants,&
       IsPlantActive=IsPlantActive)   
     datpr4 => datrp_4d(1:npfts, 1:pltpar%jroots,1:JZ,1:JC)
-    call restartvar(ncid, flag, varname='RTN2', dim1name='pft',dim2name='rootyps',&
+    call restartvar(ncid, flag, varname='SecndRootXNum_rpvr', dim1name='pft',dim2name='rootyps',&
      dim3name='levsoi',dim4name='levcan',long_name='root layer secondary axes number', units=' d-2', &
      interpinic_flag='skip', data=datpr4, missing_value=spval, fill_value=spval)  
   endif  
@@ -3215,32 +3215,32 @@ implicit none
 
   if(flag=='read')then
     datpr4 => datrp_4d(1:npfts, 1:pltpar%jroots,1:JZ,1:JC)
-    call restartvar(ncid, flag, varname='WTRT1E', dim1name='pft',dim2name='rootyps',&
+    call restartvar(ncid, flag, varname='Root1stStructChemElmnt_pvr', dim1name='pft',dim2name='rootyps',&
      dim3name='levsoi',dim4name='levcan',long_name='root layer element primary axes', units='g d-2', &
      interpinic_flag='skip', data=datpr4, missing_value=spval, fill_value=spval)  
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,WTRT1E,datrp_5d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive) 
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,Root1stStructChemElmnt_pvr,datrp_5d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive) 
   else
-    !print*,'WTRT1E'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,WTRT1E,datrp_5d,NumActivePlants=NumActivePlants,&
+    !print*,'Root1stStructChemElmnt_pvr'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,Root1stStructChemElmnt_pvr,datrp_5d,NumActivePlants=NumActivePlants,&
       IsPlantActive=IsPlantActive)   
     datpr4 => datrp_4d(1:npfts, 1:pltpar%jroots,1:JZ,1:JC)
-    call restartvar(ncid, flag, varname='WTRT1E', dim1name='pft',dim2name='rootyps',&
+    call restartvar(ncid, flag, varname='Root1stStructChemElmnt_pvr', dim1name='pft',dim2name='rootyps',&
      dim3name='levsoi',dim4name='levcan',long_name='root layer primary axes element', units='g d-2', &
      interpinic_flag='skip', data=datpr4, missing_value=spval, fill_value=spval)
   endif  
 
   if(flag=='read')then
     datpr4 => datrp_4d(1:npfts, 1:pltpar%jroots,1:JZ,1:JC)
-    call restartvar(ncid, flag, varname='WTRT2E', dim1name='pft',dim2name='rootyps',&
+    call restartvar(ncid, flag, varname='Root2ndStructChemElmnt_pvr', dim1name='pft',dim2name='rootyps',&
      dim3name='levsoi',dim4name='levcan',long_name='root layer secondary axes element', units='g d-2', &
      interpinic_flag='skip', data=datpr4, missing_value=spval, fill_value=spval)  
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,WTRT2E,datrp_5d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive) 
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,Root2ndStructChemElmnt_pvr,datrp_5d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive) 
   else
-    !print*,'WTRT2E'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,WTRT2E,datrp_5d,NumActivePlants=NumActivePlants,&
+    !print*,'Root2ndStructChemElmnt_pvr'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,Root2ndStructChemElmnt_pvr,datrp_5d,NumActivePlants=NumActivePlants,&
       IsPlantActive=IsPlantActive)   
     datpr4 => datrp_4d(1:npfts, 1:pltpar%jroots,1:JZ,1:JC)
-    call restartvar(ncid, flag, varname='WTRT2E', dim1name='pft',dim2name='rootyps',&
+    call restartvar(ncid, flag, varname='Root2ndStructChemElmnt_pvr', dim1name='pft',dim2name='rootyps',&
      dim3name='levsoi',dim4name='levcan',long_name='root layer secondary axes element', units='g d-2', &
      interpinic_flag='skip', data=datpr4, missing_value=spval, fill_value=spval)  
   endif  
@@ -3279,16 +3279,16 @@ implicit none
 
   if(flag=='read')then
     datpr3 => datrp_3d(1:npfts, 1:NumOfPlantChemElmnts,1:JZ)
-    call restartvar(ncid, flag, varname='WTNDLE', dim1name='pft',dim2name='elmnts',&
+    call restartvar(ncid, flag, varname='RootNodueChemElmnt_pvr', dim1name='pft',dim2name='elmnts',&
      dim3name='levsoi',long_name='root layer nodule element', units='g d-2', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)  
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,WTNDLE,datrp_3d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive) 
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,RootNodueChemElmnt_pvr,datrp_3d,NumActivePlants=NumActivePlants,IsPlantActive=IsPlantActive) 
   else
-    !print*,'WTNDLE'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,WTNDLE,datrp_3d,NumActivePlants=NumActivePlants,&
+    !print*,'RootNodueChemElmnt_pvr'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,RootNodueChemElmnt_pvr,datrp_3d,NumActivePlants=NumActivePlants,&
       IsPlantActive=IsPlantActive)   
     datpr3 => datrp_3d(1:npfts, 1:NumOfPlantChemElmnts,1:JZ)
-    call restartvar(ncid, flag, varname='WTNDLE', dim1name='pft',dim2name='elmnts',&
+    call restartvar(ncid, flag, varname='RootNodueChemElmnt_pvr', dim1name='pft',dim2name='elmnts',&
      dim3name='levsoi',long_name='root layer nodule element', units='g d-2', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval) 
   endif  
@@ -4792,8 +4792,8 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrc_2d(1:ncols,1:jcplx)    
-    call restartvar(ncid, flag, varname='RC0', dim1name='column',dim2name='nomcomplx',&
-       long_name='surface mic OM in each complex', units='g d-2', &
+    call restartvar(ncid, flag, varname='RC0', dim1name='column',dim2name='nomCO2CompenPoint_nodex',&
+       long_name='surface mic OM in each CO2CompenPoint_nodeex', units='g d-2', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
     call cpcol(flag,NHW,NHE,NVN,NVS,RC0,datrc_2d) 
@@ -4801,8 +4801,8 @@ implicit none
     !print*,'RC0',size(RC0,1),size(RC0,2)
     if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RC0,datrc_2d)   
     datpr2 => datrc_2d(1:ncols,1:jcplx)    
-    call restartvar(ncid, flag, varname='RC0', dim1name='column',dim2name='nomcomplx',&
-       long_name='surface mic OM in each complex', units='g d-2', &
+    call restartvar(ncid, flag, varname='RC0', dim1name='column',dim2name='nomCO2CompenPoint_nodex',&
+       long_name='surface mic OM in each CO2CompenPoint_nodeex', units='g d-2', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
   endif  
@@ -4810,7 +4810,7 @@ implicit none
   if(flag=='read')then
     datpr1 => datrc_1d    
     call restartvar(ncid, flag, varname='RC0ff', dim1name='column',&
-       long_name='surface mic OM in autotroph complex', units='m', &
+       long_name='surface mic OM in autotroph CO2CompenPoint_nodeex', units='m', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
     call cpcol(flag,NHW,NHE,NVN,NVS,RC0ff,datrc_1d) 
@@ -4819,7 +4819,7 @@ implicit none
     if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RC0ff,datrc_1d)   
     datpr1 => datrc_1d    
     call restartvar(ncid, flag, varname='RC0ff', dim1name='column',&
-       long_name='surface mic OM in autotroph complex', units='m', &
+       long_name='surface mic OM in autotroph CO2CompenPoint_nodeex', units='m', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
   endif  
@@ -5901,7 +5901,7 @@ implicit none
 
   if(flag=='read')then
     datpr3 => datrc_3d(1:ncols,1:jcplx, 1:JZ+1)        
-    call restartvar(ncid, flag, varname='ROQCX', dim1name='column',dim2name='nomcomplx',&
+    call restartvar(ncid, flag, varname='ROQCX', dim1name='column',dim2name='nomCO2CompenPoint_nodex',&
        dim3name='levsoi1',long_name='total root + microbial DOC uptake', units='g d-2 h-1', &
        interpinic_flag='skip', data=datpr3, missing_value=spval, &
        fill_value=spval)  
@@ -5910,7 +5910,7 @@ implicit none
     !print*,'ROQCX'
     if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,ROQCX,datrc_3d)        
     datpr3 => datrc_3d(1:ncols,1:jcplx, 1:JZ+1)            
-    call restartvar(ncid, flag, varname='ROQCX', dim1name='column',dim2name='nomcomplx',&
+    call restartvar(ncid, flag, varname='ROQCX', dim1name='column',dim2name='nomCO2CompenPoint_nodex',&
        dim3name='levsoi1',long_name='total root + microbial DOC uptake', units='g d-2 h-1', &
        interpinic_flag='skip', data=datpr3, missing_value=spval, &
        fill_value=spval)  
@@ -5918,7 +5918,7 @@ implicit none
 
   if(flag=='read')then
     datpr3 => datrc_3d(1:ncols,1:jcplx, 1:JZ+1)            
-    call restartvar(ncid, flag, varname='ROQAX', dim1name='column',dim2name='nomcomplx',&
+    call restartvar(ncid, flag, varname='ROQAX', dim1name='column',dim2name='nomCO2CompenPoint_nodex',&
        dim3name='levsoi1',long_name='total root + microbial acetate uptake', units='g d-2 h-1', &
        interpinic_flag='skip', data=datpr3, missing_value=spval, &
        fill_value=spval)  
@@ -5927,7 +5927,7 @@ implicit none
     !print*,'ROQAX'
     if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,ROQAX,datrc_3d)        
     datpr3 => datrc_3d(1:ncols,1:jcplx, 1:JZ+1)            
-    call restartvar(ncid, flag, varname='ROQAX', dim1name='column',dim2name='nomcomplx',&
+    call restartvar(ncid, flag, varname='ROQAX', dim1name='column',dim2name='nomCO2CompenPoint_nodex',&
        dim3name='levsoi1',long_name='total root + microbial acetate uptake', units='g d-2 h-1', &
        interpinic_flag='skip', data=datpr3, missing_value=spval, &
        fill_value=spval)  
@@ -6180,7 +6180,7 @@ implicit none
   if(flag=='read')then
     datpr4 => datrc_4d(1:ncols,1:NumOfMicrobs1HetertrophCmplx,1:jcplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='ROXYS', dim1name='column',dim2name='hetrmicb',&
-      dim3name='nomcomplx',dim4name='levsoi1',long_name='microbial aqueous O2 demand', units='g d-2 h-1', &
+      dim3name='nomCO2CompenPoint_nodex',dim4name='levsoi1',long_name='microbial aqueous O2 demand', units='g d-2 h-1', &
       interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)  
     call cpcol(flag,NHW,NHE,NVN,NVS,ROXYS,datrc_4d)      
@@ -6189,7 +6189,7 @@ implicit none
     if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,ROXYS,datrc_4d)        
     datpr4 => datrc_4d(1:ncols,1:NumOfMicrobs1HetertrophCmplx,1:jcplx,1:JZ+1)        
     call restartvar(ncid, flag, varname='ROXYS', dim1name='column',dim2name='hetrmicb',&
-      dim3name='nomcomplx',dim4name='levsoi1',long_name='microbial aqueous O2 demand', units='g d-2 h-1', &
+      dim3name='nomCO2CompenPoint_nodex',dim4name='levsoi1',long_name='microbial aqueous O2 demand', units='g d-2 h-1', &
       interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)  
   endif
@@ -6197,7 +6197,7 @@ implicit none
   if(flag=='read')then
     datpr4 => datrc_4d(1:ncols,1:NumOfMicrobs1HetertrophCmplx,1:jcplx,1:JZ+1)        
     call restartvar(ncid, flag, varname='RVMX4', dim1name='column',dim2name='hetrmicb',&
-      dim3name='nomcomplx',dim4name='levsoi1',long_name='total microbial NH4 uptake non-band unconstrained by NH4',&
+      dim3name='nomCO2CompenPoint_nodex',dim4name='levsoi1',long_name='total microbial NH4 uptake non-band unconstrained by NH4',&
       units='g d-2 h-1', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)    
     call cpcol(flag,NHW,NHE,NVN,NVS,RVMX4,datrc_4d)      
@@ -6206,7 +6206,7 @@ implicit none
     if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RVMX4,datrc_4d)        
     datpr4 => datrc_4d(1:ncols,1:NumOfMicrobs1HetertrophCmplx,1:jcplx,1:JZ+1)            
     call restartvar(ncid, flag, varname='RVMX4', dim1name='column',dim2name='hetrmicb',&
-      dim3name='nomcomplx',dim4name='levsoi1',long_name='total microbial NH4 uptake non-band unconstrained by NH4',&
+      dim3name='nomCO2CompenPoint_nodex',dim4name='levsoi1',long_name='total microbial NH4 uptake non-band unconstrained by NH4',&
       units='g d-2 h-1', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)    
   endif  
@@ -6214,7 +6214,7 @@ implicit none
   if(flag=='read')then
     datpr4 => datrc_4d(1:ncols,1:NumOfMicrobs1HetertrophCmplx,1:jcplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='RVMX3', dim1name='column',dim2name='hetrmicb',&
-      dim3name='nomcomplx',dim4name='levsoi1',long_name='total microbial NO3 uptake non-band unconstrained by NO3', &
+      dim3name='nomCO2CompenPoint_nodex',dim4name='levsoi1',long_name='total microbial NO3 uptake non-band unconstrained by NO3', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)  
     call cpcol(flag,NHW,NHE,NVN,NVS,RVMX3,datrc_4d)      
@@ -6223,7 +6223,7 @@ implicit none
     if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RVMX3,datrc_4d)        
     datpr4 => datrc_4d(1:ncols,1:NumOfMicrobs1HetertrophCmplx,1:jcplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='RVMX3', dim1name='column',dim2name='hetrmicb',&
-      dim3name='nomcomplx',dim4name='levsoi1',long_name='total microbial NO3 uptake non-band unconstrained by NO3', &
+      dim3name='nomCO2CompenPoint_nodex',dim4name='levsoi1',long_name='total microbial NO3 uptake non-band unconstrained by NO3', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)  
   
@@ -6232,7 +6232,7 @@ implicit none
   if(flag=='read')then
     datpr4 => datrc_4d(1:ncols,1:NumOfMicrobs1HetertrophCmplx,1:jcplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='RVMX2', dim1name='column',dim2name='hetrmicb',&
-      dim3name='nomcomplx',dim4name='levsoi1',long_name='total microbial NO2 uptake non-band unconstrained by NO2', &
+      dim3name='nomCO2CompenPoint_nodex',dim4name='levsoi1',long_name='total microbial NO2 uptake non-band unconstrained by NO2', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)  
     call cpcol(flag,NHW,NHE,NVN,NVS,RVMX2,datrc_4d)      
@@ -6241,7 +6241,7 @@ implicit none
     if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RVMX2,datrc_4d)        
     datpr4 => datrc_4d(1:ncols,1:NumOfMicrobs1HetertrophCmplx,1:jcplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='RVMX2', dim1name='column',dim2name='hetrmicb',&
-      dim3name='nomcomplx',dim4name='levsoi1',long_name='total microbial NO2 uptake non-band unconstrained by NO2', &
+      dim3name='nomCO2CompenPoint_nodex',dim4name='levsoi1',long_name='total microbial NO2 uptake non-band unconstrained by NO2', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)  
   endif  
@@ -6249,7 +6249,7 @@ implicit none
   if(flag=='read')then
     datpr4 => datrc_4d(1:ncols,1:NumOfMicrobs1HetertrophCmplx,1:jcplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='RVMX1', dim1name='column',dim2name='hetrmicb',&
-      dim3name='nomcomplx',dim4name='levsoi1',long_name='total microbial N2O uptake unconstrained by N2O', &
+      dim3name='nomCO2CompenPoint_nodex',dim4name='levsoi1',long_name='total microbial N2O uptake unconstrained by N2O', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)  
     call cpcol(flag,NHW,NHE,NVN,NVS,RVMX1,datrc_4d)      
@@ -6258,7 +6258,7 @@ implicit none
     if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RVMX1,datrc_4d)        
     datpr4 => datrc_4d(1:ncols,1:NumOfMicrobs1HetertrophCmplx,1:jcplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='RVMX1', dim1name='column',dim2name='hetrmicb',&
-      dim3name='nomcomplx',dim4name='levsoi1',long_name='total microbial N2O uptake unconstrained by N2O', &
+      dim3name='nomCO2CompenPoint_nodex',dim4name='levsoi1',long_name='total microbial N2O uptake unconstrained by N2O', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)    
   endif  
@@ -6266,7 +6266,7 @@ implicit none
   if(flag=='read')then
     datpr4 => datrc_4d(1:ncols,1:NumOfMicrobs1HetertrophCmplx,1:jcplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='RVMB4', dim1name='column',dim2name='hetrmicb',&
-      dim3name='nomcomplx',dim4name='levsoi1',long_name='total microbial NH4 uptake non-band unconstrained by NH4', &
+      dim3name='nomCO2CompenPoint_nodex',dim4name='levsoi1',long_name='total microbial NH4 uptake non-band unconstrained by NH4', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)  
     call cpcol(flag,NHW,NHE,NVN,NVS,RVMB4,datrc_4d)      
@@ -6275,7 +6275,7 @@ implicit none
     if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RVMB4,datrc_4d)        
     datpr4 => datrc_4d(1:ncols,1:NumOfMicrobs1HetertrophCmplx,1:jcplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='RVMB4', dim1name='column',dim2name='hetrmicb',&
-      dim3name='nomcomplx',dim4name='levsoi1',long_name='total microbial NH4 uptake non-band unconstrained by NH4', &
+      dim3name='nomCO2CompenPoint_nodex',dim4name='levsoi1',long_name='total microbial NH4 uptake non-band unconstrained by NH4', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)  
   endif  
@@ -6283,7 +6283,7 @@ implicit none
   if(flag=='read')then
     datpr4 => datrc_4d(1:ncols,1:NumOfMicrobs1HetertrophCmplx,1:jcplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='RVMB3', dim1name='column',dim2name='hetrmicb',&
-      dim3name='nomcomplx',dim4name='levsoi1',long_name='total microbial NO3 uptake band unconstrained by NO3', &
+      dim3name='nomCO2CompenPoint_nodex',dim4name='levsoi1',long_name='total microbial NO3 uptake band unconstrained by NO3', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)  
     call cpcol(flag,NHW,NHE,NVN,NVS,RVMB3,datrc_4d)      
@@ -6292,7 +6292,7 @@ implicit none
     if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RVMB3,datrc_4d)        
     datpr4 => datrc_4d(1:ncols,1:NumOfMicrobs1HetertrophCmplx,1:jcplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='RVMB3', dim1name='column',dim2name='hetrmicb',&
-      dim3name='nomcomplx',dim4name='levsoi1',long_name='total microbial NO3 uptake band unconstrained by NO3', &
+      dim3name='nomCO2CompenPoint_nodex',dim4name='levsoi1',long_name='total microbial NO3 uptake band unconstrained by NO3', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)  
   endif  
@@ -6300,7 +6300,7 @@ implicit none
   if(flag=='read')then
     datpr4 => datrc_4d(1:ncols,1:NumOfMicrobs1HetertrophCmplx,1:jcplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='RVMB2', dim1name='column',dim2name='hetrmicb',&
-      dim3name='nomcomplx',dim4name='levsoi1',long_name='total microbial NO2 uptake band unconstrained by NO2', &
+      dim3name='nomCO2CompenPoint_nodex',dim4name='levsoi1',long_name='total microbial NO2 uptake band unconstrained by NO2', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)  
     call cpcol(flag,NHW,NHE,NVN,NVS,RVMB2,datrc_4d)      
@@ -6309,7 +6309,7 @@ implicit none
     if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RVMB2,datrc_4d)        
     datpr4 => datrc_4d(1:ncols,1:NumOfMicrobs1HetertrophCmplx,1:jcplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='RVMB2', dim1name='column',dim2name='hetrmicb',&
-      dim3name='nomcomplx',dim4name='levsoi1',long_name='total microbial NO2 uptake band unconstrained by NO2', &
+      dim3name='nomCO2CompenPoint_nodex',dim4name='levsoi1',long_name='total microbial NO2 uptake band unconstrained by NO2', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)  
   endif  
@@ -6317,7 +6317,7 @@ implicit none
   if(flag=='read')then
     datpr4 => datrc_4d(1:ncols,1:NumOfMicrobs1HetertrophCmplx,1:jcplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='RINHO', dim1name='column',dim2name='hetrmicb',&
-      dim3name='nomcomplx',dim4name='levsoi1',long_name='microbial NH4 demand in soil', &
+      dim3name='nomCO2CompenPoint_nodex',dim4name='levsoi1',long_name='microbial NH4 demand in soil', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)  
     call cpcol(flag,NHW,NHE,NVN,NVS,RINHO,datrc_4d)      
@@ -6326,7 +6326,7 @@ implicit none
     if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RINHO,datrc_4d)        
     datpr4 => datrc_4d(1:ncols,1:NumOfMicrobs1HetertrophCmplx,1:jcplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='RINHO', dim1name='column',dim2name='hetrmicb',&
-      dim3name='nomcomplx',dim4name='levsoi1',long_name='microbial NH4 demand in soil', &
+      dim3name='nomCO2CompenPoint_nodex',dim4name='levsoi1',long_name='microbial NH4 demand in soil', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)  
   endif  
@@ -6334,7 +6334,7 @@ implicit none
   if(flag=='read')then
     datpr4 => datrc_4d(1:ncols,1:NumOfMicrobs1HetertrophCmplx,1:jcplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='RINOO', dim1name='column',dim2name='hetrmicb',&
-      dim3name='nomcomplx',dim4name='levsoi1',long_name='microbial NO3 demand in soil', &
+      dim3name='nomCO2CompenPoint_nodex',dim4name='levsoi1',long_name='microbial NO3 demand in soil', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)  
     call cpcol(flag,NHW,NHE,NVN,NVS,RINOO,datrc_4d)      
@@ -6343,7 +6343,7 @@ implicit none
     if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RINOO,datrc_4d)        
     datpr4 => datrc_4d(1:ncols,1:NumOfMicrobs1HetertrophCmplx,1:jcplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='RINOO', dim1name='column',dim2name='hetrmicb',&
-      dim3name='nomcomplx',dim4name='levsoi1',long_name='microbial NO3 demand in soil', &
+      dim3name='nomCO2CompenPoint_nodex',dim4name='levsoi1',long_name='microbial NO3 demand in soil', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)  
   endif  
@@ -6351,7 +6351,7 @@ implicit none
   if(flag=='read')then
     datpr4 => datrc_4d(1:ncols,1:NumOfMicrobs1HetertrophCmplx,1:jcplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='RIPOO', dim1name='column',dim2name='hetrmicb',&
-      dim3name='nomcomplx',dim4name='levsoi1',long_name='microbial PO4 demand in soil', &
+      dim3name='nomCO2CompenPoint_nodex',dim4name='levsoi1',long_name='microbial PO4 demand in soil', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)  
     call cpcol(flag,NHW,NHE,NVN,NVS,RIPOO,datrc_4d)      
@@ -6360,7 +6360,7 @@ implicit none
     if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RIPOO,datrc_4d)        
     datpr4 => datrc_4d(1:ncols,1:NumOfMicrobs1HetertrophCmplx,1:jcplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='RIPOO', dim1name='column',dim2name='hetrmicb',&
-      dim3name='nomcomplx',dim4name='levsoi1',long_name='microbial PO4 demand in soil', &
+      dim3name='nomCO2CompenPoint_nodex',dim4name='levsoi1',long_name='microbial PO4 demand in soil', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)  
   endif  
@@ -6368,7 +6368,7 @@ implicit none
   if(flag=='read')then
     datpr4 => datrc_4d(1:ncols,1:NumOfMicrobs1HetertrophCmplx,1:jcplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='RINHB', dim1name='column',dim2name='hetrmicb',&
-      dim3name='nomcomplx',dim4name='levsoi1',long_name='microbial NH4 immobilization (+ve) - mineralization (-ve) band', &
+      dim3name='nomCO2CompenPoint_nodex',dim4name='levsoi1',long_name='microbial NH4 immobilization (+ve) - mineralization (-ve) band', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)  
     call cpcol(flag,NHW,NHE,NVN,NVS,RINHB,datrc_4d)      
@@ -6377,7 +6377,7 @@ implicit none
     if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RINHB,datrc_4d)        
     datpr4 => datrc_4d(1:ncols,1:NumOfMicrobs1HetertrophCmplx,1:jcplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='RINHB', dim1name='column',dim2name='hetrmicb',&
-      dim3name='nomcomplx',dim4name='levsoi1',long_name='microbial NH4 immobilization (+ve) - mineralization (-ve) band', &
+      dim3name='nomCO2CompenPoint_nodex',dim4name='levsoi1',long_name='microbial NH4 immobilization (+ve) - mineralization (-ve) band', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)  
   endif  
@@ -6385,7 +6385,7 @@ implicit none
   if(flag=='read')then
     datpr4 => datrc_4d(1:ncols,1:NumOfMicrobs1HetertrophCmplx,1:jcplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='RINOB', dim1name='column',dim2name='hetrmicb',&
-      dim3name='nomcomplx',dim4name='levsoi1',long_name='microbial NO3 immobilization (+ve) - mineralization (-ve) band', &
+      dim3name='nomCO2CompenPoint_nodex',dim4name='levsoi1',long_name='microbial NO3 immobilization (+ve) - mineralization (-ve) band', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)  
     call cpcol(flag,NHW,NHE,NVN,NVS,RINOB,datrc_4d)      
@@ -6394,7 +6394,7 @@ implicit none
     if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RINOB,datrc_4d)        
     datpr4 => datrc_4d(1:ncols,1:NumOfMicrobs1HetertrophCmplx,1:jcplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='RINOB', dim1name='column',dim2name='hetrmicb',&
-      dim3name='nomcomplx',dim4name='levsoi1',long_name='microbial NO3 immobilization (+ve) - mineralization (-ve) band', &
+      dim3name='nomCO2CompenPoint_nodex',dim4name='levsoi1',long_name='microbial NO3 immobilization (+ve) - mineralization (-ve) band', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)  
   endif  
@@ -6402,7 +6402,7 @@ implicit none
   if(flag=='read')then
     datpr4 => datrc_4d(1:ncols,1:NumOfMicrobs1HetertrophCmplx,1:jcplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='RIPBO', dim1name='column',dim2name='hetrmicb',&
-      dim3name='nomcomplx',dim4name='levsoi1',long_name='substrate-unlimited H2PO4 mineraln-immobiln', &
+      dim3name='nomCO2CompenPoint_nodex',dim4name='levsoi1',long_name='substrate-unlimited H2PO4 mineraln-immobiln', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)  
     call cpcol(flag,NHW,NHE,NVN,NVS,RIPBO,datrc_4d)      
@@ -6411,7 +6411,7 @@ implicit none
     if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RIPBO,datrc_4d)        
     datpr4 => datrc_4d(1:ncols,1:NumOfMicrobs1HetertrophCmplx,1:jcplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='RIPBO', dim1name='column',dim2name='hetrmicb',&
-      dim3name='nomcomplx',dim4name='levsoi1',long_name='substrate-unlimited H2PO4 mineraln-immobiln', &
+      dim3name='nomCO2CompenPoint_nodex',dim4name='levsoi1',long_name='substrate-unlimited H2PO4 mineraln-immobiln', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)  
   endif  
@@ -6419,7 +6419,7 @@ implicit none
   if(flag=='read')then
     datpr4 => datrc_4d(1:ncols,1:NumOfMicrobs1HetertrophCmplx,1:jcplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='ROQCS', dim1name='column',dim2name='hetrmicb',&
-      dim3name='nomcomplx',dim4name='levsoi1',long_name='net microbial DOC flux', &
+      dim3name='nomCO2CompenPoint_nodex',dim4name='levsoi1',long_name='net microbial DOC flux', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)  
     call cpcol(flag,NHW,NHE,NVN,NVS,ROQCS,datrc_4d)      
@@ -6428,7 +6428,7 @@ implicit none
     if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,ROQCS,datrc_4d)        
     datpr4 => datrc_4d(1:ncols,1:NumOfMicrobs1HetertrophCmplx,1:jcplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='ROQCS', dim1name='column',dim2name='hetrmicb',&
-      dim3name='nomcomplx',dim4name='levsoi1',long_name='net microbial DOC flux', &
+      dim3name='nomCO2CompenPoint_nodex',dim4name='levsoi1',long_name='net microbial DOC flux', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)  
   endif  
@@ -6436,7 +6436,7 @@ implicit none
   if(flag=='read')then
     datpr4 => datrc_4d(1:ncols,1:NumOfMicrobs1HetertrophCmplx,1:jcplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='ROQAS', dim1name='column',dim2name='hetrmicb',&
-      dim3name='nomcomplx',dim4name='levsoi1',long_name='net microbial acetate flux', &
+      dim3name='nomCO2CompenPoint_nodex',dim4name='levsoi1',long_name='net microbial acetate flux', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)      
     call cpcol(flag,NHW,NHE,NVN,NVS,ROQAS,datrc_4d)      
@@ -6445,7 +6445,7 @@ implicit none
     if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,ROQAS,datrc_4d)        
     datpr4 => datrc_4d(1:ncols,1:NumOfMicrobs1HetertrophCmplx,1:jcplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='ROQAS', dim1name='column',dim2name='hetrmicb',&
-      dim3name='nomcomplx',dim4name='levsoi1',long_name='net microbial acetate flux', &
+      dim3name='nomCO2CompenPoint_nodex',dim4name='levsoi1',long_name='net microbial acetate flux', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)      
   endif  
@@ -6453,7 +6453,7 @@ implicit none
   if(flag=='read')then
     datpr3 => datrc_3d(1:ncols,1:NumOfMicrobs1HetertrophCmplx,1:jcplx)    
     call restartvar(ncid, flag, varname='RINHOR', dim1name='column',dim2name='hetrmicb',&
-      dim3name='nomcomplx',long_name='microbial NH4 demand in surface litte', &
+      dim3name='nomCO2CompenPoint_nodex',long_name='microbial NH4 demand in surface litte', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr3, missing_value=spval, &
       fill_value=spval)      
     call cpcol(flag,NHW,NHE,NVN,NVS,RINHOR,datrc_3d)      
@@ -6462,7 +6462,7 @@ implicit none
     if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RINHOR,datrc_3d)        
     datpr3 => datrc_3d(1:ncols,1:NumOfMicrobs1HetertrophCmplx,1:jcplx)    
     call restartvar(ncid, flag, varname='RINHOR', dim1name='column',dim2name='hetrmicb',&
-      dim3name='nomcomplx',long_name='microbial NH4 demand in surface litter', &
+      dim3name='nomCO2CompenPoint_nodex',long_name='microbial NH4 demand in surface litter', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr3, missing_value=spval, &
       fill_value=spval)      
   endif  
@@ -6470,7 +6470,7 @@ implicit none
   if(flag=='read')then
     datpr3 => datrc_3d(1:ncols,1:NumOfMicrobs1HetertrophCmplx,1:jcplx)    
     call restartvar(ncid, flag, varname='RINOOR', dim1name='column',dim2name='hetrmicb',&
-      dim3name='nomcomplx',long_name='microbial NO3 demand in surface litter', &
+      dim3name='nomCO2CompenPoint_nodex',long_name='microbial NO3 demand in surface litter', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr3, missing_value=spval, &
       fill_value=spval)      
     call cpcol(flag,NHW,NHE,NVN,NVS,RINOOR,datrc_3d)      
@@ -6479,7 +6479,7 @@ implicit none
     if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RINOOR,datrc_3d)        
     datpr3 => datrc_3d(1:ncols,1:NumOfMicrobs1HetertrophCmplx,1:jcplx)    
     call restartvar(ncid, flag, varname='RINOOR', dim1name='column',dim2name='hetrmicb',&
-      dim3name='nomcomplx',long_name='microbial NO3 demand in surface litter', &
+      dim3name='nomCO2CompenPoint_nodex',long_name='microbial NO3 demand in surface litter', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr3, missing_value=spval, &
       fill_value=spval)      
   endif  
@@ -6487,7 +6487,7 @@ implicit none
   if(flag=='read')then
     datpr3 => datrc_3d(1:ncols,1:NumOfMicrobs1HetertrophCmplx,1:jcplx)    
     call restartvar(ncid, flag, varname='RIPOOR', dim1name='column',dim2name='hetrmicb',&
-      dim3name='nomcomplx',long_name='microbial PO4 demand in surface litter', &
+      dim3name='nomCO2CompenPoint_nodex',long_name='microbial PO4 demand in surface litter', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr3, missing_value=spval, &
       fill_value=spval)      
     call cpcol(flag,NHW,NHE,NVN,NVS,RIPOOR,datrc_3d)      
@@ -6496,7 +6496,7 @@ implicit none
     if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RIPOOR,datrc_3d)        
     datpr3 => datrc_3d(1:ncols,1:NumOfMicrobs1HetertrophCmplx,1:jcplx)    
     call restartvar(ncid, flag, varname='RIPOOR', dim1name='column',dim2name='hetrmicb',&
-      dim3name='nomcomplx',long_name='microbial PO4 demand in surface litter', &
+      dim3name='nomCO2CompenPoint_nodex',long_name='microbial PO4 demand in surface litter', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr3, missing_value=spval, &
       fill_value=spval)      
   endif  
@@ -6504,7 +6504,7 @@ implicit none
   if(flag=='read')then
     datpr5 => datrc_5d(1:ncols,1:nlbiomcp,1:NumOfMicrobs1HetertrophCmplx,1:jcplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='OMC', dim1name='column',dim2name='nlbiomcp',&
-      dim3name='hetrmicb',dim4name='nomcomplx',dim5name='levsoi1',long_name='microbial biomass C', &
+      dim3name='hetrmicb',dim4name='nomCO2CompenPoint_nodex',dim5name='levsoi1',long_name='microbial biomass C', &
       units='g d-2', interpinic_flag='skip', data=datpr5, missing_value=spval, &
       fill_value=spval)      
     call cpcol(flag,NHW,NHE,NVN,NVS,OMC,datrc_5d)      
@@ -6513,7 +6513,7 @@ implicit none
     if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,OMC,datrc_5d)        
     datpr5 => datrc_5d(1:ncols,1:nlbiomcp,1:NumOfMicrobs1HetertrophCmplx,1:jcplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='OMC', dim1name='column',dim2name='nlbiomcp',&
-      dim3name='hetrmicb',dim4name='nomcomplx',dim5name='levsoi1',long_name='microbial biomass C', &
+      dim3name='hetrmicb',dim4name='nomCO2CompenPoint_nodex',dim5name='levsoi1',long_name='microbial biomass C', &
       units='g d-2', interpinic_flag='skip', data=datpr5, missing_value=spval, &
       fill_value=spval)      
   endif  
@@ -6521,7 +6521,7 @@ implicit none
   if(flag=='read')then
     datpr5 => datrc_5d(1:ncols,1:nlbiomcp,1:NumOfMicrobs1HetertrophCmplx,1:jcplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='OMN', dim1name='column',dim2name='nlbiomcp',&
-      dim3name='hetrmicb',dim4name='nomcomplx',dim5name='levsoi1',long_name='microbial biomass N', &
+      dim3name='hetrmicb',dim4name='nomCO2CompenPoint_nodex',dim5name='levsoi1',long_name='microbial biomass N', &
       units='g d-2', interpinic_flag='skip', data=datpr5, missing_value=spval, &
       fill_value=spval)      
     call cpcol(flag,NHW,NHE,NVN,NVS,OMN,datrc_5d)      
@@ -6530,7 +6530,7 @@ implicit none
     if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,OMN,datrc_5d)        
     datpr5 => datrc_5d(1:ncols,1:nlbiomcp,1:NumOfMicrobs1HetertrophCmplx,1:jcplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='OMN', dim1name='column',dim2name='nlbiomcp',&
-      dim3name='hetrmicb',dim4name='nomcomplx',dim5name='levsoi1',long_name='microbial biomass N', &
+      dim3name='hetrmicb',dim4name='nomCO2CompenPoint_nodex',dim5name='levsoi1',long_name='microbial biomass N', &
       units='g d-2', interpinic_flag='skip', data=datpr5, missing_value=spval, &
       fill_value=spval)      
   endif  
@@ -6538,7 +6538,7 @@ implicit none
   if(flag=='read')then
     datpr5 => datrc_5d(1:ncols,1:nlbiomcp,1:NumOfMicrobs1HetertrophCmplx,1:jcplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='OMP', dim1name='column',dim2name='nlbiomcp',&
-      dim3name='hetrmicb',dim4name='nomcomplx',dim5name='levsoi1',long_name='microbial biomass P', &
+      dim3name='hetrmicb',dim4name='nomCO2CompenPoint_nodex',dim5name='levsoi1',long_name='microbial biomass P', &
       units='g d-2', interpinic_flag='skip', data=datpr5, missing_value=spval, &
       fill_value=spval)      
     call cpcol(flag,NHW,NHE,NVN,NVS,OMP,datrc_5d)      
@@ -6547,7 +6547,7 @@ implicit none
     if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,OMP,datrc_5d)        
     datpr5 => datrc_5d(1:ncols,1:nlbiomcp,1:NumOfMicrobs1HetertrophCmplx,1:jcplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='OMP', dim1name='column',dim2name='nlbiomcp',&
-      dim3name='hetrmicb',dim4name='nomcomplx',dim5name='levsoi1',long_name='microbial biomass P', &
+      dim3name='hetrmicb',dim4name='nomCO2CompenPoint_nodex',dim5name='levsoi1',long_name='microbial biomass P', &
       units='g d-2', interpinic_flag='skip', data=datpr5, missing_value=spval, &
       fill_value=spval)      
   endif  
@@ -6896,7 +6896,7 @@ implicit none
   if(flag=='read')then
     datpr4 => datrc_4d(1:ncols,1:nlbiomcp,1:jcplx,1:JZ+1)           
     call restartvar(ncid, flag, varname='ORC', dim1name='column',dim2name='nlbiomcp',&
-      dim3name='nomcomplx',dim4name='levsoi1',long_name='microbial residue C', &
+      dim3name='nomCO2CompenPoint_nodex',dim4name='levsoi1',long_name='microbial residue C', &
       units='g d-2', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)      
     call cpcol(flag,NHW,NHE,NVN,NVS,ORC,datrc_4d)     
@@ -6905,7 +6905,7 @@ implicit none
     if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,ORC,datrc_4d)       
     datpr4 => datrc_4d(1:ncols,1:nlbiomcp,1:jcplx,1:JZ+1)               
     call restartvar(ncid, flag, varname='ORC', dim1name='column',dim2name='nlbiomcp',&
-      dim3name='nomcomplx',dim4name='levsoi1',long_name='microbial residue C', &
+      dim3name='nomCO2CompenPoint_nodex',dim4name='levsoi1',long_name='microbial residue C', &
       units='g d-2', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)      
   endif  
@@ -6913,7 +6913,7 @@ implicit none
   if(flag=='read')then
     datpr4 => datrc_4d(1:ncols,1:nlbiomcp,1:jcplx,1:JZ+1)               
     call restartvar(ncid, flag, varname='ORN', dim1name='column',dim2name='nlbiomcp',&
-      dim3name='nomcomplx',dim4name='levsoi1',long_name='microbial residue N', &
+      dim3name='nomCO2CompenPoint_nodex',dim4name='levsoi1',long_name='microbial residue N', &
       units='g d-2', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)      
     call cpcol(flag,NHW,NHE,NVN,NVS,ORN,datrc_4d)     
@@ -6922,7 +6922,7 @@ implicit none
     if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,ORN,datrc_4d)       
     datpr4 => datrc_4d(1:ncols,1:nlbiomcp,1:jcplx,1:JZ+1)               
     call restartvar(ncid, flag, varname='ORN', dim1name='column',dim2name='nlbiomcp',&
-      dim3name='nomcomplx',dim4name='levsoi1',long_name='microbial residue N', &
+      dim3name='nomCO2CompenPoint_nodex',dim4name='levsoi1',long_name='microbial residue N', &
       units='g d-2', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)      
   endif  
@@ -6930,7 +6930,7 @@ implicit none
   if(flag=='read')then
     datpr4 => datrc_4d(1:ncols,1:nlbiomcp,1:jcplx,1:JZ+1)               
     call restartvar(ncid, flag, varname='ORP', dim1name='column',dim2name='nlbiomcp',&
-      dim3name='nomcomplx',dim4name='levsoi1',long_name='microbial residue P', &
+      dim3name='nomCO2CompenPoint_nodex',dim4name='levsoi1',long_name='microbial residue P', &
       units='g d-2', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)      
     call cpcol(flag,NHW,NHE,NVN,NVS,ORP,datrc_4d)     
@@ -6939,7 +6939,7 @@ implicit none
     if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,ORP,datrc_4d)     
     datpr4 => datrc_4d(1:ncols,1:nlbiomcp,1:jcplx,1:JZ+1)               
     call restartvar(ncid, flag, varname='ORP', dim1name='column',dim2name='nlbiomcp',&
-      dim3name='nomcomplx',dim4name='levsoi1',long_name='microbial residue P', &
+      dim3name='nomCO2CompenPoint_nodex',dim4name='levsoi1',long_name='microbial residue P', &
       units='g d-2', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)      
   endif  
@@ -6947,7 +6947,7 @@ implicit none
   if(flag=='read')then
     datpr4 => datrc_4d(1:ncols,1:trc_confs%NDOMS,1:jcplx,1:JZ+1)               
     call restartvar(ncid, flag, varname='DOM', dim1name='column',dim2name='ndoms',&
-      dim3name='nomcomplx',dim4name='levsoi1',long_name='dissolved organic C micropore', &
+      dim3name='nomCO2CompenPoint_nodex',dim4name='levsoi1',long_name='dissolved organic C micropore', &
       units='g d-2', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)      
     call cpcol(flag,NHW,NHE,NVN,NVS,DOM,datrc_4d)     
@@ -6955,7 +6955,7 @@ implicit none
     if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,DOM,datrc_4d)       
     datpr4 => datrc_4d(1:ncols,1:trc_confs%NDOMS,1:jcplx,1:JZ+1)                   
     call restartvar(ncid, flag, varname='DOM', dim1name='column',dim2name='ndoms',&
-      dim3name='nomcomplx',dim4name='levsoi1',long_name='dissolved organic matter micropore', &
+      dim3name='nomCO2CompenPoint_nodex',dim4name='levsoi1',long_name='dissolved organic matter micropore', &
       units='g d-2', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)      
 
@@ -6964,7 +6964,7 @@ implicit none
   if(flag=='read')then
     datpr4 => datrc_4d(1:ncols,1:trc_confs%NDOMS,1:jcplx,1:JZ+1)                   
     call restartvar(ncid, flag, varname='DOM_MacP', dim1name='column',dim2name='ndoms',&
-      dim3name='nomcomplx',dim4name='levsoi1',long_name='dissolved organic matter macropore', &
+      dim3name='nomCO2CompenPoint_nodex',dim4name='levsoi1',long_name='dissolved organic matter macropore', &
       units='g d-2', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)      
     call cpcol(flag,NHW,NHE,NVN,NVS,DOM_MacP,datrc_4d)
@@ -6973,7 +6973,7 @@ implicit none
     if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,DOM_MacP,datrc_4d)  
     datpr4 => datrc_4d(1:ncols,1:trc_confs%NDOMS,1:jcplx,1:JZ+1)                   
     call restartvar(ncid, flag, varname='DOM_MacP', dim1name='column',dim2name='ndoms',&
-      dim3name='nomcomplx',dim4name='levsoi1',long_name='dissolved organic matter macropore', &
+      dim3name='nomCO2CompenPoint_nodex',dim4name='levsoi1',long_name='dissolved organic matter macropore', &
       units='g d-2', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)      
   endif  
@@ -6981,7 +6981,7 @@ implicit none
   if(flag=='read')then
     datpr3 => datrc_3d(1:ncols,1:jcplx,1:JZ+1)                   
     call restartvar(ncid, flag, varname='OHC', dim1name='column',&
-      dim2name='nomcomplx',dim3name='levsoi1',long_name='adsorbed soil C', &
+      dim2name='nomCO2CompenPoint_nodex',dim3name='levsoi1',long_name='adsorbed soil C', &
       units='g d-2', interpinic_flag='skip', data=datpr3, missing_value=spval, &
       fill_value=spval)      
     call cpcol(flag,NHW,NHE,NVN,NVS,OHC,datrc_3d)
@@ -6990,7 +6990,7 @@ implicit none
     if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,OHC,datrc_3d)  
     datpr3 => datrc_3d(1:ncols,1:jcplx,1:JZ+1)                   
     call restartvar(ncid, flag, varname='OHC', dim1name='column',&
-      dim2name='nomcomplx',dim3name='levsoi1',long_name='adsorbed soil C', &
+      dim2name='nomCO2CompenPoint_nodex',dim3name='levsoi1',long_name='adsorbed soil C', &
       units='g d-2', interpinic_flag='skip', data=datpr3, missing_value=spval, &
       fill_value=spval)      
   endif  
@@ -6998,7 +6998,7 @@ implicit none
   if(flag=='read')then
     datpr3 => datrc_3d(1:ncols,1:jcplx,1:JZ+1)                   
     call restartvar(ncid, flag, varname='OHN', dim1name='column',&
-      dim2name='nomcomplx',dim3name='levsoi1',long_name='adsorbed soil N', &
+      dim2name='nomCO2CompenPoint_nodex',dim3name='levsoi1',long_name='adsorbed soil N', &
       units='g d-2', interpinic_flag='skip', data=datpr3, missing_value=spval, &
       fill_value=spval)      
     call cpcol(flag,NHW,NHE,NVN,NVS,OHN,datrc_3d)
@@ -7007,7 +7007,7 @@ implicit none
     if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,OHN,datrc_3d)  
     datpr3 => datrc_3d(1:ncols,1:jcplx,1:JZ+1)                   
     call restartvar(ncid, flag, varname='OHN', dim1name='column',&
-      dim2name='nomcomplx',dim3name='levsoi1',long_name='adsorbed soil N', &
+      dim2name='nomCO2CompenPoint_nodex',dim3name='levsoi1',long_name='adsorbed soil N', &
       units='g d-2', interpinic_flag='skip', data=datpr3, missing_value=spval, &
       fill_value=spval)      
   endif  
@@ -7015,7 +7015,7 @@ implicit none
   if(flag=='read')then
     datpr3 => datrc_3d(1:ncols,1:jcplx,1:JZ+1)                   
     call restartvar(ncid, flag, varname='OHP', dim1name='column',&
-      dim2name='nomcomplx',dim3name='levsoi1',long_name='adsorbed soil P', &
+      dim2name='nomCO2CompenPoint_nodex',dim3name='levsoi1',long_name='adsorbed soil P', &
       units='g d-2', interpinic_flag='skip', data=datpr3, missing_value=spval, &
       fill_value=spval)      
     call cpcol(flag,NHW,NHE,NVN,NVS,OHP,datrc_3d)
@@ -7024,7 +7024,7 @@ implicit none
     if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,OHP,datrc_3d)  
     datpr3 => datrc_3d(1:ncols,1:jcplx,1:JZ+1)                   
     call restartvar(ncid, flag, varname='OHP', dim1name='column',&
-      dim2name='nomcomplx',dim3name='levsoi1',long_name='adsorbed soil P', &
+      dim2name='nomCO2CompenPoint_nodex',dim3name='levsoi1',long_name='adsorbed soil P', &
       units='g d-2', interpinic_flag='skip', data=datpr3, missing_value=spval, &
       fill_value=spval)      
   endif  
@@ -7032,7 +7032,7 @@ implicit none
   if(flag=='read')then
     datpr3 => datrc_3d(1:ncols,1:jcplx,1:JZ+1)                   
     call restartvar(ncid, flag, varname='OHA', dim1name='column',&
-      dim2name='nomcomplx',dim3name='levsoi1',long_name='adsorbed soil acetate', &
+      dim2name='nomCO2CompenPoint_nodex',dim3name='levsoi1',long_name='adsorbed soil acetate', &
       units='g d-2', interpinic_flag='skip', data=datpr3, missing_value=spval, &
       fill_value=spval)      
     call cpcol(flag,NHW,NHE,NVN,NVS,OHA,datrc_3d)
@@ -7041,7 +7041,7 @@ implicit none
     if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,OHA,datrc_3d)  
     datpr3 => datrc_3d(1:ncols,1:jcplx,1:JZ+1)                   
     call restartvar(ncid, flag, varname='OHA', dim1name='column',&
-      dim2name='nomcomplx',dim3name='levsoi1',long_name='adsorbed soil acetate', &
+      dim2name='nomCO2CompenPoint_nodex',dim3name='levsoi1',long_name='adsorbed soil acetate', &
       units='g d-2', interpinic_flag='skip', data=datpr3, missing_value=spval, &
       fill_value=spval)      
 
@@ -7050,7 +7050,7 @@ implicit none
   if(flag=='read')then
     datpr4 => datrc_4d(1:ncols,1:jsken,1:jcplx,1:JZ+1)                   
     call restartvar(ncid, flag, varname='OSC', dim1name='column',dim2name='nkinecmp',&
-      dim3name='nomcomplx',dim4name='levsoi1',long_name='soil organic C', &
+      dim3name='nomCO2CompenPoint_nodex',dim4name='levsoi1',long_name='soil organic C', &
       units='g d-2', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)      
     call cpcol(flag,NHW,NHE,NVN,NVS,OSC,datrc_4d)
@@ -7059,7 +7059,7 @@ implicit none
     if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,OSC,datrc_4d)  
     datpr4 => datrc_4d(1:ncols,1:jsken,1:jcplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='OSC', dim1name='column',dim2name='nkinecmp',&
-      dim3name='nomcomplx',dim4name='levsoi1',long_name='soil organic C', &
+      dim3name='nomCO2CompenPoint_nodex',dim4name='levsoi1',long_name='soil organic C', &
       units='g d-2', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)      
   endif  
@@ -7067,7 +7067,7 @@ implicit none
   if(flag=='read')then
     datpr4 => datrc_4d(1:ncols,1:jsken,1:jcplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='OSA', dim1name='column',dim2name='nkinecmp',&
-      dim3name='nomcomplx',dim4name='levsoi1',long_name='colonized soil organic C', &
+      dim3name='nomCO2CompenPoint_nodex',dim4name='levsoi1',long_name='colonized soil organic C', &
       units='g d-2', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)      
     call cpcol(flag,NHW,NHE,NVN,NVS,OSA,datrc_4d)
@@ -7076,7 +7076,7 @@ implicit none
     if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,OSA,datrc_4d)  
     datpr4 => datrc_4d(1:ncols,1:jsken,1:jcplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='OSA', dim1name='column',dim2name='nkinecmp',&
-      dim3name='nomcomplx',dim4name='levsoi1',long_name='colonized soil organic C', &
+      dim3name='nomCO2CompenPoint_nodex',dim4name='levsoi1',long_name='colonized soil organic C', &
       units='g d-2', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)      
   endif  
@@ -7084,7 +7084,7 @@ implicit none
   if(flag=='read')then
     datpr4 => datrc_4d(1:ncols,1:jsken,1:jcplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='OSN', dim1name='column',dim2name='nkinecmp',&
-      dim3name='nomcomplx',dim4name='levsoi1',long_name='soil organic N', &
+      dim3name='nomCO2CompenPoint_nodex',dim4name='levsoi1',long_name='soil organic N', &
       units='g d-2', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)      
     call cpcol(flag,NHW,NHE,NVN,NVS,OSN,datrc_4d)
@@ -7093,7 +7093,7 @@ implicit none
     if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,OSN,datrc_4d)  
     datpr4 => datrc_4d(1:ncols,1:jsken,1:jcplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='OSN', dim1name='column',dim2name='nkinecmp',&
-      dim3name='nomcomplx',dim4name='levsoi1',long_name='soil organic N', &
+      dim3name='nomCO2CompenPoint_nodex',dim4name='levsoi1',long_name='soil organic N', &
       units='g d-2', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)      
   endif  
@@ -7101,7 +7101,7 @@ implicit none
   if(flag=='read')then
     datpr4 => datrc_4d(1:ncols,1:jsken,1:jcplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='OSP', dim1name='column',dim2name='nkinecmp',&
-      dim3name='nomcomplx',dim4name='levsoi1',long_name='soil organic P', &
+      dim3name='nomCO2CompenPoint_nodex',dim4name='levsoi1',long_name='soil organic P', &
       units='g d-2', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)      
     call cpcol(flag,NHW,NHE,NVN,NVS,OSP,datrc_4d)
@@ -7110,7 +7110,7 @@ implicit none
     if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,OSP,datrc_4d)  
     datpr4 => datrc_4d(1:ncols,1:jsken,1:jcplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='OSP', dim1name='column',dim2name='nkinecmp',&
-      dim3name='nomcomplx',dim4name='levsoi1',long_name='soil organic P', &
+      dim3name='nomCO2CompenPoint_nodex',dim4name='levsoi1',long_name='soil organic P', &
       units='g d-2', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)      
   endif  
@@ -7943,7 +7943,7 @@ implicit none
   call check_dim(ncid, 'ngrstages',NumGrowthStages)
   call check_dim(ncid, 'elmnts',NumOfPlantChemElmnts)
   call check_dim(ncid, 'nkinecmp',jsken)
-  call check_dim(ncid, 'nomcomplx',jcplx)
+  call check_dim(ncid, 'nomCO2CompenPoint_nodex',jcplx)
   call check_dim(ncid, 'sdim',3)   !grid dimension
   call check_dim(ncid,'hetrmicb',NumOfMicrobs1HetertrophCmplx)
   call check_dim(ncid,'rootyps'  , pltpar%jroots)
@@ -8223,7 +8223,7 @@ implicit none
   call ncd_defdim(ncid, 'ngrstages',NumGrowthStages,dimid)
   call ncd_defdim(ncid, 'elmnts',NumOfPlantChemElmnts,dimid)
   call ncd_defdim(ncid, 'nkinecmp',jsken,dimid)
-  call ncd_defdim(ncid, 'nomcomplx',jcplx,dimid)
+  call ncd_defdim(ncid, 'nomCO2CompenPoint_nodex',jcplx,dimid)
   call ncd_defdim(ncid, 'sdim',3,dimid)   !grid dimension
   call ncd_defdim(ncid,'hetrmicb',NumOfMicrobs1HetertrophCmplx,dimid)
   call ncd_defdim(ncid,'rootyps'  , pltpar%jroots, dimid)

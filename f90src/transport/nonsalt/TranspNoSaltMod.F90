@@ -224,10 +224,10 @@ module TranspNoSaltMod
 !     TR_H2PO4_soil=H2PO4 dissolution from solute.f
 !     RH1PO4MicbTransf_vr=net change in HPO4 from nitro.f
 !     TR_H1PO4_soil=HPO4 dissolution from solute.f
-!     TUPNH4,TUPNHB=root NH4 uptake in non-band,band from extract.f
-!     TUPNO3,TUPNOB=root NO3 uptake in non-band,band from extract.f
-!     TUPH2P,TUPH2B=root H2PO4 uptake in non-band,band from extract.f
-!     TUPH1P,TUPH1B=root HPO4 uptake in non-band,band from extract.f
+!     TRootNH4Uptake_pft,TUPNHB=root NH4 uptake in non-band,band from extract.f
+!     TRootNO3Uptake_pft,TUPNOB=root NO3 uptake in non-band,band from extract.f
+!     TRootH2PO4Uptake_pft,TUPH2B=root H2PO4 uptake in non-band,band from extract.f
+!     TRootHPO4Uptake_pft,TUPH1B=root HPO4 uptake in non-band,band from extract.f
 !
       call ImportFluxFromOutsideModules(I,NY,NX)
     ENDDO

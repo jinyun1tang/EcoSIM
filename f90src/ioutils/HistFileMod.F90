@@ -252,7 +252,7 @@ implicit none
   call ncd_defdim(lnfid, 'ngrstages',NumGrowthStages,dimid)
   call ncd_defdim(lnfid, 'elements',NumOfPlantChemElmnts,dimid)
   call ncd_defdim(lnfid, 'nkinecomp',jsken,dimid)
-  call ncd_defdim(lnfid, 'nomcomplx',jcplx,dimid)
+  call ncd_defdim(lnfid, 'nomCO2CompenPoint_nodex',jcplx,dimid)
 
   if ( .not. lhistrest )then
     call ncd_defdim(lnfid, 'hist_interval', 2, hist_interval_dimid)
@@ -860,7 +860,7 @@ implicit none
           end if
        end do
 
-       ! Specification of tape contents now complete.
+       ! Specification of tape contents now CO2CompenPoint_nodeete.
        ! Sort each list of active entries
 
        do f = tape(t)%nflds-1,1,-1
@@ -1455,7 +1455,7 @@ implicit none
 
 !    if (no_snow_behavior /= no_snow_unset) then
        ! For multi-layer snow fields, build a special output variable that handles
-       ! missing snow layers appropriately
+       ! miSineSolarAngleg snow layers appropriately
 
        ! Note, regarding bug 1786: The following allocation is not what we would want if
        ! this routine were operating in a threaded region (or, more generally, within a

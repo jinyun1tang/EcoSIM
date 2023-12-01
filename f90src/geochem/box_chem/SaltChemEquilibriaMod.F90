@@ -58,7 +58,7 @@ module SaltChemEquilibriaMod
   real(r8) :: Fe_3p_activity,FeOH_2p_activity,FeO2H2_p_activity,FeO3H3_activity,FeO4H4_1e_activity,Ca_2p_activity,CO3_2e_activity,HCO3_e_activity
   real(r8) :: H2PO4_1e_CaHPO4_dissolB_flx,H2PO4_1e_apatite_dissolB_flx
   real(r8) :: H2PO4_1e_CaH4P2O8_dissolB_flx,H2PO4_1e_FePO4_dissolB_flx,RSO4,RX1P,RX2P
-  real(r8) :: RXFE,RXCA,RXMG,RXNA,RXKA,RXHC,RXALO2,RXFEO2,RCO2Q
+  real(r8) :: RXFE,RXCA,RXMG,RXNA,RXKA,RXHC,RXALO2,RXFEO2,RCanopyGasCO2_pft
   real(r8) :: RXH1,RXH2,RXNB,Ca_2p_conc,OH_1e_conc,H1PO4_to_XHPO4_ROH_flx
   real(r8) :: H2PO4_1e_to_XH2PO4_ROH2_Bflx,H2PO4_1e_FePO4_dissol_flx
   real(r8) :: RALO1,RALO2,RALO3,RALO4,RNHB,RXH1B,RXN4
@@ -968,7 +968,7 @@ module SaltChemEquilibriaMod
 !     GO TO NEXT ITERATION
 !
 1000  CONTINUE
-!     CONVERGENCE ITERATIONS COMPLETED
+!     CONVERGENCE ITERATIONS CO2CompenPoint_nodeETED
 !
 !     IF(J.EQ.24)THEN
 !     WRITE(*,1119)'GAPON',I,J,L,M,H0PO4_3e_conc,Al_3p_conc,Fe_3p_conc,H0PO4_3e_conc*A3*Al_3p_conc*A3
@@ -1482,7 +1482,7 @@ module SaltChemEquilibriaMod
 !    2,TRHCO,TR_CaCO3_soil,TR_MgCO3_soil
 !    2,TR_NaCO3_soil,TR_CaHCO3_soil
 !    2,TR_MgHCO3_soil,TR_CaCO3_precip_soil,VLWatMicPM,RCO2
-!    3,RHCO,RHCACH,RCO2Q,RCAH,RMGH,RHCO3,H_1p_activity,HCO3_e_activity,H2CO3_activity,DPCO2
+!    3,RHCO,RHCACH,RCanopyGasCO2_pft,RCAH,RMGH,RHCO3,H_1p_activity,HCO3_e_activity,H2CO3_activity,DPCO2
 !     WRITE(*,1111)'TBION',I,J,L,M,TBION
 !     ENDIF
   end subroutine SummarizeIonFluxes
@@ -2218,12 +2218,12 @@ module SaltChemEquilibriaMod
     RNHB=0._r8
   ENDIF
 !
-! RCO2Q=CO2-HCO3+H dissociation
+! RCanopyGasCO2_pft=CO2-HCO3+H dissociation
 ! H2CO3 <-> HCO3(-) + H(+)
 
   S0=H_1p_activity+HCO3_e_activity+DPCO2
   S1=AZMAX1(S0**2-4.0_r8*(H_1p_activity*HCO3_e_activity-DPCO2*H2CO3_activity))
-  RCO2Q=TSLX*(S0-SQRT(S1))
+  RCanopyGasCO2_pft=TSLX*(S0-SQRT(S1))
 !
 !     RHCO3=HCO3-CO3+H dissociation
 ! HCO3(-) <-> CO3(--)+H(+)
@@ -2495,7 +2495,7 @@ module SaltChemEquilibriaMod
     +3.0_r8*(RHAL1+RHFE1-(RHA4P1+RHF4P1)*VLPO4 &
     -(RHF4B1+RHA4B1)*VLPOB)+4.0*(RHCAH1*VLPO4+RHCHB1*VLPOB) &
     +7.0_r8*(RHCAH2*VLPO4+RHCHB2*VLPOB) &
-    +RHALO2+RHFEO2-RHALO4-RHFEO4+RHCACH-RCO2Q-RHCO3 &
+    +RHALO2+RHFEO2-RHALO4-RHFEO4+RHCACH-RCanopyGasCO2_pft-RHCO3 &
     +(RHA0P1-RHA2P1+RHA1P2-RHA3P2+RHF0P1-RHF2P1+RHF1P2-RHF3P2 &
     +RHCAD2-RXOH2-RXOH1-RH1P-H2PO4_e_to_HPO4_2e_flx-RH3P)*VLPO4 &
     +(RHA0B1-RHA2B1+RHA1B2-RHA3B2+RHF0B1-RHF2B1+RHF1B2-RHF3B2 &
@@ -2511,8 +2511,8 @@ module SaltChemEquilibriaMod
     -(-H2PO4_to_XH2PO4_ROH_flx-H1PO4_to_XHPO4_ROH_flx)*VLPO4-(-H2PO4_to_XH2PO4_ROH_Bflx-RXH1B)*VLPOB
   RSO4=-RPCASO-RALS-RFES-RCAS-RMGS-RNAS-RKAS
   RCO3=-RHCAC3-RHCO3-RCAC-RMGC-RNAC
-  RHCO=-RHCACH-RCO2Q-RCAH-RMGH+RHCO3
-  RCO2=-RHCACO+RCO2Q
+  RHCO=-RHCACH-RCanopyGasCO2_pft-RCAH-RMGH+RHCO3
+  RCO2=-RHCACO+RCanopyGasCO2_pft
   RAL1=-RHALO1+RALO1-RALO2-(RHA1P1+RHA1P2)*VLPO4-(RHA1B1+RHA1B2)*VLPOB
   RAL2=-RHALO2+RALO2-RALO3-(RHA2P1+RHA2P2)*VLPO4-(RHA2B1+RHA2B2)*VLPOB
   RAL3=-RHALO3+RALO3-RALO4-(RHA3P1+RHA3P2)*VLPO4-(RHA3B1+RHA3B2)*VLPOB
