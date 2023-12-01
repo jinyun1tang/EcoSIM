@@ -263,6 +263,24 @@ contains
   THRMR(NY,NX)=SurfLitREmisivity*2.04E-10_r8*AREA(3,NUM(NY,NX),NY,NX)*FracSurfSnoFree(NY,NX)*&
     FracSurfByLitR(NY,NX)*dts_litrhtwtp
 !
+  ! Print variable descriptions and values
+  write(* ,*) "Writing out surface radiation values: "
+  write(*, *) "Shortwave radiation at ground surface:", RADGX
+  write(*, *) "Shortwave radiation at snowpack surface:", RADXW(NY, NX)
+  write(*, *) "Shortwave radiation at soil surface:", RADXG(NY, NX)
+  write(*, *) "Shortwave radiation at litter surface:", RADXR(NY, NX)
+  write(*, *) "Longwave radiation at ground surface:", THRYX
+  write(*, *) "Longwave radiation at snowpack surface:", LWRad2Snow(NY, NX)
+  write(*, *) "Longwave radiation at soil surface:", LWRad2Grnd(NY, NX)
+  write(*, *) "Longwave radiation at litter surface:", LWRad2LitR(NY, NX)
+  write(*, *) "Emissivity of snowpack surface:", SnowEmisivity
+  write(*, *) "Emissivity of soil surface:", SoilEmisivity
+  write(*, *) "Emissivity of litter surface:", SurfLitREmisivity
+  write(*, *) "Longwave radiation emitted by snowpack:", THRMW(NY, NX)
+  write(*, *) "Longwave radiation emitted by soil:", THRMS(NY, NX)
+  write(*, *) "Longwave radiation emitted by litter:", THRMR(NY, NX)
+
+  write(*,*)
   end subroutine SurfaceRadiation
 !------------------------------------------------------------------------------------------
   subroutine SurfaceResistances(NY,NX,ResistanceLitRLay)
@@ -500,6 +518,9 @@ contains
   HFLX0=Radnet2LitGrnd+LatentHeatEvapAir2Grnd+HeatSensAir2Grnd
   !total heat plus convective heat 
   HeatFluxAir2Soi=HFLX0+HeatSensVapAir2Soi
+
+  write(*,*) "Surface Heat Flux parameters:"
+  write(*,*) "HeatFluxAir2Soi = ", HeatFluxAir2Soi
 
   end subroutine SoilSRFEnerbyBalance
 
