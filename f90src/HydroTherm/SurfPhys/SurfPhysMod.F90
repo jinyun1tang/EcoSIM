@@ -506,6 +506,9 @@ contains
   HFLX0=Radnet2LitGrnd+LatentHeatEvapAir2Grnd+HeatSensAir2Grnd
   !total heat plus convective heat 
   HeatFluxAir2Soi=HFLX0+HeatSensVapAir2Soi
+
+  write(*,*) "Surface Heat Flux parameters:"
+  write(*,*) "HeatFluxAir2Soi = ", HeatFluxAir2Soi
 !  write(*,*)'tks',TKQ(NY,NX),TKX1
   end subroutine SoilSRFEnerbyBalance
 
