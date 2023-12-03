@@ -162,12 +162,12 @@ module GrosubPars
   integer :: JRS          !maximum number of root axes
   integer  :: JP1         !number of plants
   integer  :: MaxNumBranches         !maximum number of branches
-  integer  :: JSA1        !number of sectors for the sky azimuth  [0,2*pi]
+  integer  :: NumOfSkyAzimuthSectors1        !number of sectors for the sky azimuth  [0,2*pi]
   integer  :: jcplx       !number of organo-microbial CO2CompenPoint_nodeexes
-  integer  :: JLA1        !number of sectors for the leaf azimuth, [0,pi]
+  integer  :: NumOfLeafAzimuthSectors        !number of sectors for the leaf azimuth, [0,pi]
   integer  :: NumOfCanopyLayers1         !number of canopy layers
   integer  :: JZ1         !number of soil layers
-  integer  :: JLI1        !number of sectors for the leaf zenith [0,pi/2]
+  integer  :: NumOfLeafZenithSectors1        !number of sectors for the leaf zenith [0,pi/2]
   integer  :: MaxNodesPerBranch1      !number of canopy nodes
   integer  :: jsken       !number of kinetic components in litter,  PROTEIN(*,1),CH2O(*,2),CELLULOSE(*,3),LIGNIN(*,4) IN SOIL LITTER
   integer  :: NumLitterGroups     !number of litter groups nonstructural(0,*),

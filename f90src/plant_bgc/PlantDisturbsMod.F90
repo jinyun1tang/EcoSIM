@@ -79,7 +79,7 @@ module PlantDisturbsMod
     pftPlantPopulation       =>  plt_site%pftPlantPopulation      , &
     NU       =>  plt_site%NU      , &
     ZERO     =>  plt_site%ZERO    , &
-    ZNOON    =>  plt_site%ZNOON   , &
+    SolarNoonHour_col   =>  plt_site%SolarNoonHour_col  , &
     AREA3    =>  plt_site%AREA3   , &
     ZEROQ    =>  plt_rbgc%ZEROQ   , &
     ZEROP    =>  plt_biom%ZEROP   , &
@@ -119,7 +119,7 @@ module PlantDisturbsMod
 !     WTHTX4E(ielmc),WTHTX4E(ielmn),WTHTX4E(ielmp)=harvested standing dead C,N,P to litter
 !
   IF(IHVST(NZ).GE.0)THEN
-    IF(J.EQ.INT(ZNOON).AND.IHVST(NZ).NE.4.AND.IHVST(NZ).NE.6)THEN
+    IF(J.EQ.INT(SolarNoonHour_col).AND.IHVST(NZ).NE.4.AND.IHVST(NZ).NE.6)THEN
       IF(isclose(THIN_pft(NZ),0._r8))THEN
         FHVSE(ielmc)=AZMAX1(1._r8-EHVST(1,4,NZ))
         FHVSH=FHVSE(ielmc)
@@ -735,7 +735,7 @@ module PlantDisturbsMod
     MaxRootLayNum       =>  plt_site%MaxRootLayNum         , &
     pftPlantPopulation       =>  plt_site%pftPlantPopulation         , &
     iYearCurrent     =>  plt_site%iYearCurrent       , &
-    ZNOON    =>  plt_site%ZNOON      , &
+    SolarNoonHour_col   =>  plt_site%SolarNoonHour_col     , &
     VOLWOU   =>  plt_site%VOLWOU     , &
     NU       =>  plt_site%NU         , &
     k_fine_litr=> pltpar%k_fine_litr ,&
@@ -751,7 +751,7 @@ module PlantDisturbsMod
     RCO2A    =>  plt_rbgc%RCO2A      , &
     RootRespPotential_vr    =>  plt_rbgc%RootRespPotential_vr      , &
     RCO2N    =>  plt_rbgc%RCO2N      , &
-    FracPARbyCanopy_pft    =>  plt_rad%FracPARbyCanopy_pft       , &
+    FracRadPARbyCanopy_pft    =>  plt_rad%FracRadPARbyCanopy_pft       , &
     PrimRootLen    =>  plt_morph%PrimRootLen     , &
     RootVH2O_vr   =>  plt_morph%RootVH2O_vr    , &
     RootAreaPerPlant_vr    =>  plt_morph%RootAreaPerPlant_vr     , &
@@ -773,7 +773,7 @@ module PlantDisturbsMod
     SeedNumberSet_brch    =>  plt_morph%SeedNumberSet_brch     , &
     CanopyLeafAreaByLayer_pft    =>  plt_morph%CanopyLeafAreaByLayer_pft       &
   )
-!     ZNOON=hour of solar noon
+!     SolarNoonHour_col=hour of solar noon
 !     iPlantTurnoverPattern=turnover:0=all abve-grd,1=all leaf+petiole,2=none,3=between 1,2
 !     iPlantMorphologyType=growth type:0=bryophyte,1=graminoid,2=shrub,tree
 !     iDayPlanting,iYearPlanting=day,year of planting
@@ -781,10 +781,10 @@ module PlantDisturbsMod
 !     ITILL=soil disturbance type 1-20:tillage,21=litter removal,22=fire,23-24=drainage
 !     XHVST=fraction of PFT remaining after disturbance
 !     PPX,PP=PFT population per m2,grid cell
-!     FracPARbyCanopy_pft=fraction of radiation received by each PFT canopy
+!     FracRadPARbyCanopy_pft=fraction of radiation received by each PFT canopy
 !     VHeatCapCanP=canopy heat capacity
 !
-  IF(J.EQ.INT(ZNOON).AND.(iPlantTurnoverPattern(NZ).EQ.0 &
+  IF(J.EQ.INT(SolarNoonHour_col).AND.(iPlantTurnoverPattern(NZ).EQ.0 &
     .OR.(.not.is_plant_treelike(iPlantMorphologyType(NZ)))) &
     .AND.(I.NE.iDayPlanting(NZ) &
     .OR.iYearCurrent.NE.iYearPlanting(NZ)))THEN
@@ -793,7 +793,7 @@ module PlantDisturbsMod
         XHVST=XCORP
         PPX(NZ)=PPX(NZ)*XHVST
         pftPlantPopulation(NZ)=pftPlantPopulation(NZ)*XHVST
-        FracPARbyCanopy_pft(NZ)=FracPARbyCanopy_pft(NZ)*XHVST
+        FracRadPARbyCanopy_pft(NZ)=FracRadPARbyCanopy_pft(NZ)*XHVST
         VHeatCapCanP(NZ)=VHeatCapCanP(NZ)*XHVST
         CanopyLeafShethC_pft(NZ)=0._r8
         CanopyStalkC_pft(NZ)=0._r8
@@ -1175,7 +1175,7 @@ module PlantDisturbsMod
     PPX      =>  plt_site%PPX      , &
     NU       =>  plt_site%NU       , &
     MaxRootLayNum       => plt_site%MaxRootLayNum        , &
-    ZNOON    => plt_site%ZNOON     , &
+    SolarNoonHour_col   => plt_site%SolarNoonHour_col    , &
     ZEROS    => plt_site%ZEROS     , &
     ZERO     => plt_site%ZERO      , &
     AREA3    => plt_site%AREA3     , &
@@ -1275,12 +1275,12 @@ module PlantDisturbsMod
     RootVolume_vr    =>  plt_morph%RootVolume_vr   , &
     NGTopRootLayer_pft      =>  plt_morph%NGTopRootLayer_pft     , &
     MY       =>  plt_morph%MY      , &
-    CanopyHeight       =>  plt_morph%CanopyHeight      , &
+    CanopyHeight_pft      =>  plt_morph%CanopyHeight_pft     , &
     RootVH2O_vr   =>  plt_morph%RootVH2O_vr  , &
     RootLenthDensPerPopu_pvr    =>  plt_morph%RootLenthDensPerPopu_pvr   , &
     iPlantNfixType   =>  plt_morph%iPlantNfixType  , &
     CanopyLAgrid_lyr    =>  plt_morph%CanopyLAgrid_lyr   , &
-    CanopyHeightz       =>  plt_morph%CanopyHeightz      , &
+    CanopyHeightz_col       =>  plt_morph%CanopyHeightz_col      , &
     LeafAreaLive_brch    =>  plt_morph%LeafAreaLive_brch   , &
     NumOfBranches_pft      =>  plt_morph%NumOfBranches_pft     , &
     CanopyStemA_pft    =>  plt_morph%CanopyStemA_pft   , &
@@ -1303,13 +1303,13 @@ module PlantDisturbsMod
     NodeNumberToInitFloral    =>  plt_morph%NodeNumberToInitFloral   , &
     ShootNodeNumber    =>  plt_morph%ShootNodeNumber   , &
     ClumpFactor      =>  plt_morph%ClumpFactor     , &
-    CanopyLA_grd    =>  plt_morph%CanopyLA_grd   , &
+    CanopyLeafArea_grd    =>  plt_morph%CanopyLeafArea_grd   , &
     iPlantPhotosynthesisType   =>  plt_photo%iPlantPhotosynthesisType    &
   )
 !     IHVST=harvest type:0=none,1=grain,2=all above-ground
 !                       ,3=pruning,4=grazing,5=fire,6=herbivory
 !
-  IF((IHVST(NZ).GE.0.AND.J.EQ.INT(ZNOON) &
+  IF((IHVST(NZ).GE.0.AND.J.EQ.INT(SolarNoonHour_col) &
     .AND.IHVST(NZ).NE.4.AND.IHVST(NZ).NE.6) &
     .OR.(IHVST(NZ).EQ.4.OR.IHVST(NZ).EQ.6))THEN
 !
@@ -1325,7 +1325,7 @@ module PlantDisturbsMod
 !          IHVST=4 or 6:animal or insect biomass(g LM m-2),IHVST=5:fire
 !     THIN_pft=IHVST=0-3,5: fraction of population removed,
 !          IHVST=4 or 6:specific herbivory rate (g DM g-1 LM d-1)
-!     CanopyLA_grd,CanopyLAgrid_lyr=leaf area of combined canopy, canopy layer
+!     CanopyLeafArea_grd,CanopyLAgrid_lyr=leaf area of combined canopy, canopy layer
 !     ARLFR,ARLFY=leaf area harvested,remaining
 !     ZL=height to bottom of each canopy layer
 !
@@ -1343,12 +1343,12 @@ module PlantDisturbsMod
         ClumpFactor(NZ)=ClumpFactor(NZ)*HVST(NZ)
       ENDIF
       IF(IHVST(NZ).LE.2.AND.HVST(NZ).LT.0.0)THEN
-        ARLFY=(1._r8-ABS(HVST(NZ)))*CanopyLA_grd
+        ARLFY=(1._r8-ABS(HVST(NZ)))*CanopyLeafArea_grd
         ARLFR=0._r8
         D9875: DO L=1,NumOfCanopyLayers1
-          IF(CanopyHeightz(L).GT.CanopyHeightz(L-1).AND.CanopyLAgrid_lyr(L).GT.ZEROS.AND.ARLFR.LT.ARLFY)THEN
+          IF(CanopyHeightz_col(L).GT.CanopyHeightz_col(L-1).AND.CanopyLAgrid_lyr(L).GT.ZEROS.AND.ARLFR.LT.ARLFY)THEN
             IF(ARLFR+CanopyLAgrid_lyr(L).GT.ARLFY)THEN
-              HVST(NZ)=CanopyHeightz(L-1)+((ARLFY-ARLFR)/CanopyLAgrid_lyr(L))*(CanopyHeightz(L)-CanopyHeightz(L-1))
+              HVST(NZ)=CanopyHeightz_col(L-1)+((ARLFY-ARLFR)/CanopyLAgrid_lyr(L))*(CanopyHeightz_col(L)-CanopyHeightz_col(L-1))
             ENDIF
           ELSE
             HVST(NZ)=0._r8
@@ -1541,8 +1541,8 @@ module PlantDisturbsMod
     D9865: DO L=NumOfCanopyLayers1,1,-1
       IF(IHVST(NZ).NE.4.AND.IHVST(NZ).NE.6)THEN
         IF(IHVST(NZ).NE.3)THEN
-          IF(CanopyHeightz(L).GT.CanopyHeightz(L-1))THEN
-            FHGT=AZMAX1(AMIN1(1.0_r8,1._r8-((CanopyHeightz(L))-HVST(NZ))/(CanopyHeightz(L)-CanopyHeightz(L-1))))
+          IF(CanopyHeightz_col(L).GT.CanopyHeightz_col(L-1))THEN
+            FHGT=AZMAX1(AMIN1(1.0_r8,1._r8-((CanopyHeightz_col(L))-HVST(NZ))/(CanopyHeightz_col(L)-CanopyHeightz_col(L-1))))
           ELSE
             FHGT=1.0_r8
           ENDIF
@@ -2263,7 +2263,7 @@ module PlantDisturbsMod
 !
         IF((iPlantTurnoverPattern(NZ).EQ.0.OR.(.not.is_plant_treelike(iPlantMorphologyType(NZ)))) &
           .AND.(IHVST(NZ).NE.4.AND.IHVST(NZ).NE.6) &
-          .AND.CanopyHeight(NZ).GT.HVST(NZ))THEN
+          .AND.CanopyHeight_pft(NZ).GT.HVST(NZ))THEN
           IF((iPlantPhenologyType(NZ).NE.0.AND.Hours4LeafOff(NB,NZ) &
             .LE.FVRN(iPlantPhenologyType(NZ))*HourThreshold4LeafOff(NB,NZ)) &
             .OR.(iPlantPhenologyType(NZ).EQ.iphenotyp_evgreen.AND.iPlantCalendar(ipltcal_Emerge,NB,NZ).NE.0))THEN

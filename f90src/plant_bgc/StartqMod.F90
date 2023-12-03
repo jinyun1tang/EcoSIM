@@ -44,7 +44,7 @@ module StartqMod
 !     IsPlantActive=PFT flag:0=not active,1=active
 !     iYearPlanting,iDayPlanting,iYearPlantHarvest,iDayPlantHarvest=year,day of planting,arvesting
 !     PPI,PPX=initial,current population (m-2)
-!     CF,ClumpFactort0=current,initial clumping factor
+!     CF,ClumpFactorInit_pft=current,initial clumping factor
 !     MaxCanPStomaResistH2O=cuticular resistance to water (h m-1)
 !     CO2CuticleResist_pft=cuticular resistance to CO2 (s m-1)
 !     CNWS,rCPNonstructRemob_pft=protein:N,protein:P ratios
@@ -112,7 +112,7 @@ module StartqMod
   iDayPlantHarvest(NZ,NY,NX)=IDAYY(NZ,NY,NX)
   PPI(NZ,NY,NX)=PPZ(NZ,NY,NX)
   PPX(NZ,NY,NX)=PPI(NZ,NY,NX)
-  ClumpFactor(NZ,NY,NX)=ClumpFactort0(NZ,NY,NX)       !clumping factor
+  ClumpFactor(NZ,NY,NX)=ClumpFactorInit_pft(NZ,NY,NX)       !clumping factor
   
   MaxCanPStomaResistH2O(NZ,NY,NX)=RSMX(NZ,NY,NX)/3600.0_r8
   CO2CuticleResist_pft(NZ,NY,NX)=RSMX(NZ,NY,NX)*1.56_r8
@@ -483,7 +483,7 @@ module StartqMod
   BranchNumber_pft(NZ,NY,NX)=0
   NumOfBranches_pft(NZ,NY,NX)=0
   HypoctoylHeight(NZ,NY,NX)=0._r8
-  CanopyHeight(NZ,NY,NX)=0._r8
+  CanopyHeight_pft(NZ,NY,NX)=0._r8
   D10: DO NB=1,MaxNumBranches
     doInitLeafOut_brch(NB,NZ,NY,NX)=0
     doPlantLeafOut_brch(NB,NZ,NY,NX)=iDisable
@@ -554,8 +554,8 @@ module StartqMod
     
     D5: DO L=1,JC
       CanopyBranchStemApft_lyr(L,NB,NZ,NY,NX)=0._r8
-      DO N=1,JLI
-        StemA_lyrnodbrchpft(N,L,NB,NZ,NY,NX)=0._r8
+      DO N=1,NumOfLeafZenithSectors
+        StemAreaZsec_brch(N,L,NB,NZ,NY,NX)=0._r8
       enddo
     ENDDO D5
     DO K=0,MaxNodesPerBranch
@@ -579,8 +579,8 @@ module StartqMod
         CMassHCO3BundleSheath_node(K,NB,NZ,NY,NX)=0._r8
         CPOOL4(K,NB,NZ,NY,NX)=0._r8
         D45: DO L=1,JC
-          DO N=1,JLI
-            LeafA_lyrnodbrchpft(N,L,K,NB,NZ,NY,NX)=0._r8
+          DO N=1,NumOfLeafZenithSectors
+            LeafAreaZsec_brch(N,L,K,NB,NZ,NY,NX)=0._r8
           enddo
         ENDDO D45
       ENDIF
@@ -608,7 +608,7 @@ module StartqMod
   NoduleChemElmnts_pft(1:NumOfPlantChemElmnts,NZ,NY,NX)=0._r8
   CanopyLeafShethC_pft(NZ,NY,NX)=0._r8
 
-  CanopyLeafA_pft(NZ,NY,NX)=0._r8
+  CanopyLeafArea_pft(NZ,NY,NX)=0._r8
   RootBiomCPerPlant_pft(NZ,NY,NX)=0._r8
   CanopyStemA_pft(NZ,NY,NX)=0._r8
   end subroutine InitPlantPhenoMorphoBio
@@ -688,7 +688,7 @@ module StartqMod
   PSICanPOsmo(NZ,NY,NX)=OSMO(NZ,NY,NX)+PSICanP(NZ,NY,NX)
   PSICanPTurg(NZ,NY,NX)=AZMAX1(PSICanP(NZ,NY,NX)-PSICanPOsmo(NZ,NY,NX))
   PTrans(NZ,NY,NX)=0._r8
-  FracPARbyCanopy_pft(NZ,NY,NX)=0._r8
+  FracRadPARbyCanopy_pft(NZ,NY,NX)=0._r8
   end subroutine InitPlantHeatandWater
 !------------------------------------------------------------------------------------------
 

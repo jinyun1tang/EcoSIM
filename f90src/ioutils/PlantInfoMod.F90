@@ -423,8 +423,8 @@ implicit none
   call ncd_getvar(pft_nfid, 'SNL1', loc,SNL1(NZ,NY,NX))
 
 
-  call ncd_getvar(pft_nfid, 'CLASS', loc,CLASS(1:JLI,NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'CFI', loc,ClumpFactort0(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'CLASS', loc,CLASS(1:NumOfLeafZenithSectors,NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'CFI', loc,ClumpFactorInit_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'ANGBR', loc,BranchAngle_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'ANGSH', loc,PetioleAngle_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'STMX', loc,MaxPotentSeedNumber_pft(NZ,NY,NX))
@@ -709,8 +709,8 @@ implicit none
   write(*,*)'growth in petiole length vs mass: SSL1 ',SSL1(NZ,NY,NX)
   write(*,*)'growth in internode length vs mass: SNL1',SNL1(NZ,NY,NX)
   write(*,*)'fraction of leaf area in 0-22.5,45,67.5,90o '// &
-    'inclination classes: CLASS',(CLASS(N,NZ,NY,NX),N=1,JLI)
-  write(*,*)'initial clumping factor: CFI',ClumpFactort0(NZ,NY,NX)
+    'inclination classes: CLASS',(CLASS(N,NZ,NY,NX),N=1,NumOfLeafZenithSectors)
+  write(*,*)'initial clumping factor: CFI',ClumpFactorInit_pft(NZ,NY,NX)
   write(*,*)'stem angle from horizontal: BranchAngle_pft',BranchAngle_pft(NZ,NY,NX)
   write(*,*)'petiole angle from horizontal: PetioleAngle_pft',PetioleAngle_pft(NZ,NY,NX)
   write(*,*)'maximum potential seed mumber from '// &
@@ -981,8 +981,8 @@ implicit none
           D4975: DO NX=NH1,NH2
             D4970: DO NY=NV1,NV2
               D4965: DO NZ=1,NS
-                IF(IETYP(NY,NX).GT.0)THEN
-                  WRITE(CLIMATE,'(I2)')IETYP(NY,NX)
+                IF(KoppenClimZone(NY,NX).GT.0)THEN
+                  WRITE(CLIMATE,'(I2)')KoppenClimZone(NY,NX)
                   !the type of pft is specified by genra+Koppen climate zone
                   DATAX(NZ)=pft_gtype(NZ)(1:4)//CLIMATE
                 ENDIF

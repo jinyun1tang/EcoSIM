@@ -255,7 +255,7 @@ module RedistMod
   integer, intent(in) :: I,J,NY,NX
   real(r8) :: DCORPW
 !     begin_execution
-!     ZNOON=hour of solar noon from weather file
+!     SolarNoonHour_col=hour of solar noon from weather file
 !     ITILL=soil disturbance type 1-20:tillage,21=litter removal,22=fire,23-24=drainage
 !     DCORP=mixing intensity (fire) or depth (tillage,drainage) of disturbance
 !     CumDepth2LayerBottom(NU=soil surface elevation
@@ -268,7 +268,7 @@ module RedistMod
 !        :3,4=artificial stationary,mobile
 !     FWatDischarge=hourly water loss through lateral and lower boundaries
 !
-  IF(J.EQ.INT(ZNOON(NY,NX)).AND.ITILL(I,NY,NX).EQ.23)THEN
+  IF(J.EQ.INT(SolarNoonHour_col(NY,NX)).AND.ITILL(I,NY,NX).EQ.23)THEN
     ! drainage is on
     DCORPW=DCORP(I,NY,NX)+CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)
     DTBLI(NY,NX)=DCORPW
@@ -276,7 +276,7 @@ module RedistMod
     ExtWaterTable(NY,NX)=ExtWaterTablet0(NY,NX)+CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)
   ENDIF
 
-  IF(J.EQ.INT(ZNOON(NY,NX)).AND.ITILL(I,NY,NX).EQ.24)THEN
+  IF(J.EQ.INT(SolarNoonHour_col(NY,NX)).AND.ITILL(I,NY,NX).EQ.24)THEN
     ! drainage in on
     DCORPW=DCORP(I,NY,NX)+CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)
     IF(IDWaterTable(NY,NX).EQ.1)THEN

@@ -303,7 +303,7 @@ module readiMod
       CH4E(NY,NX)=ach4_ppm
       Z2OE(NY,NX)=an2o_ppm
       ZNH3E(NY,NX)=ZNH3EG
-      IETYP(NY,NX)=IETYPG
+      KoppenClimZone(NY,NX)=IETYPG
       FlowDirIndicator(NY,NX)=NCNG
       DTBLI(NY,NX)=DTBLIG
       DTBLDI(NY,NX)=DTBLDIG

@@ -299,13 +299,6 @@ module MicBGCMod
 
   call MicrobPhysTempFun(TKSO, TFNX, TFNY)
 
-!  RTK=RGAS*TKSO
-!  STK=710.0_r8*TKSO
-!  ACTV=1+EXP((197500._r8-STK)/RTK)+EXP((STK-222500._r8)/RTK)
-!  TFNX=EXP(25.229_r8-62500._r8/RTK)/ACTV
-!  ACTVM=1+EXP((195000._r8-STK)/RTK)+EXP((STK-232500._r8)/RTK)
-!  TFNY=EXP(25.214_r8-62500._r8/RTK)/ACTVM
-
 !
 !     OXYI=inhibition of fermenters by O2
 !     ORGCL=SOC used to calculate microbial concentration

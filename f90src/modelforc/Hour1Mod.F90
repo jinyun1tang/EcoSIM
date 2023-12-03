@@ -254,16 +254,16 @@ module Hour1Mod
 !     CANOPY RETENTION OF PRECIPITATION
 !
 !     XVOLWC=foliar surface water retention capacity
-!     CanopyLeafA_pft,CanopyStemA_pft=leaf,stalk area of PFT
+!     CanopyLeafArea_pft,CanopyStemA_pft=leaf,stalk area of PFT
 !     FLWC,TFLWC=water retention of PFT,combined canopy
 !     PRECA=precipitation+irrigation
-!     FracPARbyCanopy_pft=fraction of radiation received by each PFT canopy
+!     FracRadPARbyCanopy_pft=fraction of radiation received by each PFT canopy
 !     VOLWC=canopy surface water retention
 !
   DO  NZ=1,NP(NY,NX)
-    VOLWCX=XVOLWC(iPlantMorphologyType(NZ,NY,NX))*(CanopyLeafA_pft(NZ,NY,NX)+CanopyStemA_pft(NZ,NY,NX))
-    PrecIntcptByCanP(NZ,NY,NX)=AZMAX1(AMIN1(PrecRainAndSurfirrig(NY,NX)*FracPARbyCanopy_pft(NZ,NY,NX),VOLWCX-WatByPCanopy(NZ,NY,NX)))
-    TFLWCI(NY,NX)=TFLWCI(NY,NX)+PrecRainAndSurfirrig(NY,NX)*FracPARbyCanopy_pft(NZ,NY,NX)
+    VOLWCX=XVOLWC(iPlantMorphologyType(NZ,NY,NX))*(CanopyLeafArea_pft(NZ,NY,NX)+CanopyStemA_pft(NZ,NY,NX))
+    PrecIntcptByCanP(NZ,NY,NX)=AZMAX1(AMIN1(PrecRainAndSurfirrig(NY,NX)*FracRadPARbyCanopy_pft(NZ,NY,NX),VOLWCX-WatByPCanopy(NZ,NY,NX)))
+    TFLWCI(NY,NX)=TFLWCI(NY,NX)+PrecRainAndSurfirrig(NY,NX)*FracRadPARbyCanopy_pft(NZ,NY,NX)
     PrecIntcptByCanG(NY,NX)=PrecIntcptByCanG(NY,NX)+PrecIntcptByCanP(NZ,NY,NX)
   ENDDO
 
@@ -1547,7 +1547,7 @@ module Hour1Mod
 
   D8990: DO NX=NHW,NHE
     D8995: DO NY=NVN,NVS
-      IF(J.EQ.INT(ZNOON(NY,NX)))THEN
+      IF(J.EQ.INT(SolarNoonHour_col(NY,NX)))THEN
 
         call ApplyMineralFertilizer(I,J,NY,NX,LFDPTH,OFC,OFN,OFP)
 !

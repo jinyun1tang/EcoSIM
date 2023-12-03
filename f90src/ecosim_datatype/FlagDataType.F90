@@ -15,7 +15,7 @@ implicit none
 
   integer,target,allocatable ::  IYTYP(:,:,:,:)                      !fertilizer release type from fertilizer input file
   integer,target,allocatable ::  ITILL(:,:,:)                        !soil disturbance type, [-]
-  integer,target,allocatable ::  IETYP(:,:)                          !Koppen climate zone
+  integer,target,allocatable ::  KoppenClimZone(:,:)                          !Koppen climate zone
   integer,target,allocatable ::  IFLGV(:,:)                          !flag for irrigation criterion,0=SWC,1=canopy water potential
   integer,target,allocatable ::  IFLGS(:,:)                          !disturbance flag
   integer,target,allocatable ::  IFNHB(:,:)                          !banded NH4 fertilizer flag
@@ -47,7 +47,7 @@ contains
   implicit none
   allocate(IYTYP(0:2,366,JY,JX));IYTYP=0
   allocate(ITILL(366,JY,JX));   ITILL=0
-  allocate(IETYP(JY,JX));       IETYP=0
+  allocate(KoppenClimZone(JY,JX));       KoppenClimZone=0
   allocate(IFLGV(JY,JX));       IFLGV=0
   allocate(IFLGS(JY,JX));       IFLGS=0
   allocate(IFNHB(JY,JX));       IFNHB=0
@@ -78,7 +78,7 @@ contains
   implicit none
   call destroy(IYTYP)
   call destroy(ITILL)
-  call destroy(IETYP)
+  call destroy(KoppenClimZone)
   call destroy(IFLGV)
   call destroy(IFLGS)
   call destroy(IFNHB)

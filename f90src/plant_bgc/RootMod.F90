@@ -13,10 +13,10 @@ implicit none
   public :: RootBGCModel
   contains
 
-  subroutine RootBGCModel(I,J,NZ,IFLGZ,ICHK1,IDTHRN,NRX,PTRT,TFN6,CNRTW,CPRTW,RootAreaPopu)
+  subroutine RootBGCModel(I,J,NZ,BegRemoblize,ICHK1,IDTHRN,NRX,PTRT,TFN6,CNRTW,CPRTW,RootAreaPopu)
 
   implicit none
-  integer, intent(in) :: I,J,NZ,IFLGZ
+  integer, intent(in) :: I,J,NZ,BegRemoblize
   integer, intent(inout) :: ICHK1(jroots,JZ1)
   integer, intent(inout)  :: NRX(jroots,JZ1)
   real(r8), intent(in) :: TFN6(JZ1),CNRTW,CPRTW,RootAreaPopu
@@ -79,7 +79,7 @@ implicit none
 !     ROOT N2 FIXATION (RHIZOBIA)
   call RootNoduleBiomchemistry(I,J,NZ,TFN6,fRootGrowPsiSense)
 
-  call NonstructlBiomTransfer(I,J,NZ,PTRT,RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,RootSinkC,IFLGZ)
+  call NonstructlBiomTransfer(I,J,NZ,PTRT,RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,RootSinkC,BegRemoblize)
   end associate
   end subroutine RootBGCModel
 
@@ -1491,9 +1491,9 @@ implicit none
   end subroutine WithdrawPrimRoot
 !------------------------------------------------------------------------------------------
 
-  subroutine NonstructlBiomTransfer(I,J,NZ,PTRT,RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,RootSinkC,IFLGZ)
+  subroutine NonstructlBiomTransfer(I,J,NZ,PTRT,RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,RootSinkC,BegRemoblize)
   implicit none
-  integer, intent(in) :: I,J,NZ,IFLGZ
+  integer, intent(in) :: I,J,NZ,BegRemoblize
   real(r8), intent(in):: PTRT
   real(r8), INTENT(IN) :: RootSinkC_vr(2,JZ1)
   real(r8),intent(in) :: Root1stSink_pvr(2,JZ1,10),Root2ndSink_pvr(2,JZ1,10)
@@ -1701,7 +1701,7 @@ implicit none
 !     TRANSFER ROOT NON-STRUCTURAL C,N,P TO SEASONAL STORAGE
 !     IN PERENNIALS
 !
-  IF(IFLGZ.EQ.1.AND.iPlantPhenologyPattern(NZ).NE.iplt_annual)THEN
+  IF(BegRemoblize.EQ.1.AND.iPlantPhenologyPattern(NZ).NE.iplt_annual)THEN
     D5545: DO N=1,MY(NZ)
       D5550: DO L=NU,NI(NZ)
         IF(RootNonstructElementConcpft_vr(ielmc,N,L,NZ).GT.ZERO)THEN

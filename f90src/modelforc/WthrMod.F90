@@ -117,16 +117,16 @@ module WthrMod
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
       !
-      !     IETYP=Koppen climate zone:-2=phytotron
+      !     KoppenClimZone=Koppen climate zone:-2=phytotron
       !     RADN=hourky SW radiation
       !     RMAX=maximum hourly radiation
-      !     ZNOON=time of solar noon
+      !     SolarNoonHour_col=time of solar noon
       !     DayLenthCurrent=daylength
 !
-      IF(IETYP(NY,NX).NE.-2)THEN
+      IF(KoppenClimZone(NY,NX).NE.-2)THEN
 !       not phytotron
         IF(DayLenthCurrent(NY,NX).GT.ZERO)THEN
-          RADN(NY,NX)=AZMAX1(RMAX*SIN((J-(ZNOON(NY,NX) &
+          RADN(NY,NX)=AZMAX1(RMAX*SIN((J-(SolarNoonHour_col(NY,NX) &
             -DayLenthCurrent(NY,NX)/2.0_r8))*PICON/DayLenthCurrent(NY,NX)))
         ELSE
           RADN(NY,NX)=0.0_r8
@@ -139,14 +139,14 @@ module WthrMod
       !     TCA,TairK=air temperature (oC,K)
       !     TAVG*,AMP*=daily averages, amplitudes from day.f
       !
-      IF(J.LT.(ZNOON(NY,NX)-DayLenthCurrent(NY,NX)/2))THEN
-        TCA(NY,NX)=TAVG1+AMP1*SIN(((J+ZNOON(NY,NX)-3.0)*PICON &
-          /(ZNOON(NY,NX)+9.0-DayLenthCurrent(NY,NX)/2.0))+PICON2h)
-      ELSEIF(J.GT.ZNOON(NY,NX)+3)THEN
-        TCA(NY,NX)=TAVG3+AMP3*SIN(((J-ZNOON(NY,NX)-3.0)*PICON &
-          /(ZNOON(NY,NX)+9.0-DayLenthCurrent(NY,NX)/2.0))+PICON2h)
+      IF(J.LT.(SolarNoonHour_col(NY,NX)-DayLenthCurrent(NY,NX)/2))THEN
+        TCA(NY,NX)=TAVG1+AMP1*SIN(((J+SolarNoonHour_col(NY,NX)-3.0)*PICON &
+          /(SolarNoonHour_col(NY,NX)+9.0-DayLenthCurrent(NY,NX)/2.0))+PICON2h)
+      ELSEIF(J.GT.SolarNoonHour_col(NY,NX)+3)THEN
+        TCA(NY,NX)=TAVG3+AMP3*SIN(((J-SolarNoonHour_col(NY,NX)-3.0)*PICON &
+          /(SolarNoonHour_col(NY,NX)+9.0-DayLenthCurrent(NY,NX)/2.0))+PICON2h)
       ELSE
-        TCA(NY,NX)=TAVG2+AMP2*SIN(((J-(ZNOON(NY,NX) &
+        TCA(NY,NX)=TAVG2+AMP2*SIN(((J-(SolarNoonHour_col(NY,NX) &
           -DayLenthCurrent(NY,NX)/2.0_r8))*PICON/(3.0_r8+DayLenthCurrent(NY,NX)/2.0_r8))-PICON2h)
       ENDIF
       TairK(NY,NX)=units%Celcius2Kelvin(TCA(NY,NX))
@@ -158,14 +158,14 @@ module WthrMod
       !     VAVG*,VAMP*=daily averages, amplitudes from day.f
       !      ALTI=altitude
       !
-      IF(J.LT.(ZNOON(NY,NX)-DayLenthCurrent(NY,NX)/2))THEN
-        VPK(NY,NX)=VAVG1+VMP1*SIN(((J+ZNOON(NY,NX)-3.0_r8)*PICON &
-          /(ZNOON(NY,NX)+9.0_r8-DayLenthCurrent(NY,NX)/2.0_r8))+PICON2h)
-      ELSEIF(J.GT.ZNOON(NY,NX)+3)THEN
-        VPK(NY,NX)=VAVG3+VMP3*SIN(((J-ZNOON(NY,NX)-3.0_r8)*PICON &
-          /(ZNOON(NY,NX)+9.0_r8-DayLenthCurrent(NY,NX)/2.0_r8))+PICON2h)
+      IF(J.LT.(SolarNoonHour_col(NY,NX)-DayLenthCurrent(NY,NX)/2))THEN
+        VPK(NY,NX)=VAVG1+VMP1*SIN(((J+SolarNoonHour_col(NY,NX)-3.0_r8)*PICON &
+          /(SolarNoonHour_col(NY,NX)+9.0_r8-DayLenthCurrent(NY,NX)/2.0_r8))+PICON2h)
+      ELSEIF(J.GT.SolarNoonHour_col(NY,NX)+3)THEN
+        VPK(NY,NX)=VAVG3+VMP3*SIN(((J-SolarNoonHour_col(NY,NX)-3.0_r8)*PICON &
+          /(SolarNoonHour_col(NY,NX)+9.0_r8-DayLenthCurrent(NY,NX)/2.0_r8))+PICON2h)
       ELSE
-        VPK(NY,NX)=VAVG2+VMP2*SIN(((J-(ZNOON(NY,NX) &
+        VPK(NY,NX)=VAVG2+VMP2*SIN(((J-(SolarNoonHour_col(NY,NX) &
           -DayLenthCurrent(NY,NX)/2.0_r8))*PICON /(3.0_r8+DayLenthCurrent(NY,NX)/2.0_r8))-PICON2h)
       ENDIF
       !VPS(NY,NX)=0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/TairK(NY,NX))) &
@@ -266,12 +266,12 @@ module WthrMod
 !     RADN=SW radiation at horizontal surface
 !     radian per degree 1.7453E-02_r8
 !     IETYP: koppen climate zone
-      IF(IETYP(NY,NX).GE.-1)THEN
+      IF(KoppenClimZone(NY,NX).GE.-1)THEN
         AZI=SIN(ALAT(NY,NX)*1.7453E-02_r8)*SIN(DECLIN*1.7453E-02_r8)
         DEC=COS(ALAT(NY,NX)*1.7453E-02_r8)*COS(DECLIN*1.7453E-02_r8)
 
-        SineSolarAngle(NY,NX)=AZMAX1(AZI+DEC*COS(.2618_r8*(ZNOON(NY,NX)-(J-0.5_r8))))
-        SineSolarAngleNextHour(NY,NX)=AZMAX1(AZI+DEC*COS(.2618_r8*(ZNOON(NY,NX)-(J+0.5_r8))))
+        SineSolarAngle(NY,NX)=AZMAX1(AZI+DEC*COS(.2618_r8*(SolarNoonHour_col(NY,NX)-(J-0.5_r8))))
+        SineSolarAngleNextHour(NY,NX)=AZMAX1(AZI+DEC*COS(.2618_r8*(SolarNoonHour_col(NY,NX)-(J+0.5_r8))))
 
         !     IF(SineSolarAngle(NY,NX).GT.0.0.AND.SineSolarAngle(NY,NX).LT.TWILGT)SineSolarAngle(NY,NX)=TWILGT
         IF(RADN(NY,NX).LE.0.0)SineSolarAngle(NY,NX)=0.0_r8
@@ -282,15 +282,15 @@ module WthrMod
         !     DIRECT VS DIFFUSE RADIATION IN SOLAR OR SKY BEAMS
         !
         !     RADZ=diffuse radiation at horizontal surface
-        !     RADS,RADY,RAPS,RAPY=direct,diffuse SW,PAR in solar beam
+        !     RADS,RADY,RAPS,PARDiffus_col=direct,diffuse SW,PAR in solar beam
 !
 
         RADZ=AMIN1(RADN(NY,NX),0.5_r8*(RADX-RADN(NY,NX)))
-        RADS(NY,NX)=safe_adb(RADN(NY,NX)-RADZ,SineSolarAngle(NY,NX))
-        RADS(NY,NX)=AMIN1(4.167_r8,RADS(NY,NX))
-        RADY(NY,NX)=RADZ/TYSIN
-        RAPS(NY,NX)=RADS(NY,NX)*CDIR*PDIR
-        RAPY(NY,NX)=RADY(NY,NX)*CDIF*PDIF
+        RadSWDirect_col(NY,NX)=safe_adb(RADN(NY,NX)-RADZ,SineSolarAngle(NY,NX))
+        RadSWDirect_col(NY,NX)=AMIN1(4.167_r8,RadSWDirect_col(NY,NX))
+        RadSWDiffus_col(NY,NX)=RADZ/TYSIN
+        PARDirect_col(NY,NX)=RadSWDirect_col(NY,NX)*CDIR*PDIR
+        PARDiffus_col(NY,NX)=RadSWDiffus_col(NY,NX)*CDIF*PDIF
         !
         !     ATMOSPHERIC RADIATIVE PROPERTIES AFM 139:171
         !
@@ -337,9 +337,9 @@ module WthrMod
       !
       !     ELSE
       !     RADS=DIRECT SW RADIATION (MJ M-2 H-1)
-      !     RADY=INDIRECT SW RADIATION (MJ M-2 H-1)
-      !     RAPS=DIRECT PAR (UMOL M-2 S-1)
-      !     RAPY=INDIRECT PAR (UMOL M-2 S-1)
+      !     RadSWDiffus_col=INDIRECT SW RADIATION (MJ M-2 H-1)
+      !     PARDirect_col=DIRECT PAR (UMOL M-2 S-1)
+      !     PARDiffus_col=INDIRECT PAR (UMOL M-2 S-1)
       !     THSX=LW RADIATION (MJ M-2 H-1)
       !     TCA=AIR TEMPERATURE (C)
       !     TairK=AIR TEMPERATURE (K)
@@ -437,7 +437,7 @@ module WthrMod
       IF(.not.isclose(TDTPX(N,NY,NX),0.0_r8).OR.(.not.isclose(TDTPN(N,NY,NX),0.0_r8)))THEN
         DTA=0.5_r8*(TDTPX(N,NY,NX)+TDTPN(N,NY,NX))
         AMP=0.5_r8*(TDTPX(N,NY,NX)-TDTPN(N,NY,NX))
-        DHR=SIN(0.2618_r8*(J-(ZNOON(NY,NX)+3.0_r8))+PICON2h)
+        DHR=SIN(0.2618_r8*(J-(SolarNoonHour_col(NY,NX)+3.0_r8))+PICON2h)
         TCA(NY,NX)=TCA(NY,NX)+DTA+AMP*DHR
         TairK(NY,NX)=units%Celcius2Kelvin(TCA(NY,NX))
 !
@@ -492,10 +492,10 @@ module WthrMod
       !     TDPRC,TDIRRI=change in precipitation,irrigation
       !     TDCO2,TDCN4,TDCNO=change in atm CO2,NH4,NO3 concn in precipitation
 !
-      RADS(NY,NX)=RADS(NY,NX)*TDRAD(N,NY,NX)
-      RADY(NY,NX)=RADY(NY,NX)*TDRAD(N,NY,NX)
-      RAPS(NY,NX)=RAPS(NY,NX)*TDRAD(N,NY,NX)
-      RAPY(NY,NX)=RAPY(NY,NX)*TDRAD(N,NY,NX)
+      RadSWDirect_col(NY,NX)=RadSWDirect_col(NY,NX)*TDRAD(N,NY,NX)
+      RadSWDiffus_col(NY,NX)=RadSWDiffus_col(NY,NX)*TDRAD(N,NY,NX)
+      PARDirect_col(NY,NX)=PARDirect_col(NY,NX)*TDRAD(N,NY,NX)
+      PARDiffus_col(NY,NX)=PARDiffus_col(NY,NX)*TDRAD(N,NY,NX)
       WindSpeedAtm(NY,NX)=WindSpeedAtm(NY,NX)*TDWND(N,NY,NX)
       VPK(NY,NX)=AMIN1(VPS(NY,NX),VPK(NY,NX)*TDHUM(N,NY,NX))
       PrecAsRain(NY,NX)=PrecAsRain(NY,NX)*TDPRC(N,NY,NX)
@@ -525,8 +525,8 @@ module WthrMod
 
   DO NX=NHW,NHE
     DO  NY=NVN,NVS
-      IF(SineSolarAngle(NY,NX).GT.0.0_r8)TRAD(NY,NX)=TRAD(NY,NX)+RADS(NY,NX) &
-        *SineSolarAngle(NY,NX)+RADY(NY,NX)*TYSIN
+      IF(SineSolarAngle(NY,NX).GT.0.0_r8)TRAD(NY,NX)=TRAD(NY,NX)+RadSWDirect_col(NY,NX) &
+        *SineSolarAngle(NY,NX)+RadSWDiffus_col(NY,NX)*TYSIN
       TAMX(NY,NX)=AMAX1(TAMX(NY,NX),TCA(NY,NX))
       TAMN(NY,NX)=AMIN1(TAMN(NY,NX),TCA(NY,NX))
       HUDX(NY,NX)=AMAX1(HUDX(NY,NX),VPK(NY,NX))

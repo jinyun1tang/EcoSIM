@@ -10,15 +10,15 @@ module InitVegBGC
 
 
 !------------------------------------------------------------------------------------------
-  subroutine InitIrradianceGeometry(YSIN,YCOS,YAZI)
+  subroutine InitIrradianceGeometry(YSIN,YCOS,SkyAzimuthAngle)
   use CanopyRadDataType
   implicit none
 
 
-  real(r8), intent(out) :: YSIN(JSA)
-  real(r8), intent(out) :: YCOS(JSA)
-  real(r8), intent(out) :: YAZI(JSA)
-  real(r8) :: ZAZI(JLA)
+  real(r8), intent(out) :: YSIN(NumOfSkyAzimuthSectors)
+  real(r8), intent(out) :: YCOS(NumOfSkyAzimuthSectors)
+  real(r8), intent(out) :: SkyAzimuthAngle(NumOfSkyAzimuthSectors)
+  real(r8) :: ZAZI(NumOfLeafAzimuthSectors)
   real(r8) :: YAGL
   real(r8) :: OMEGZ,OMEGY
   real(r8) :: ZAGL,DAZI
@@ -28,41 +28,41 @@ module InitVegBGC
   write(*,*) "In InitIrradianceGeometry"
 
   !     begin_execution
-  !     ZSIN,ZCOS=sine,cosine of leaf inclination class
+  !     SineLeafAngle,CosineLeafAngle=sine,cosine of leaf inclination class
   !     ZAZI=leaf azimuth class, it is pi because only on one side of the leaf
-  !     YAZI,YSIN,YCOS=sky azimuth,sine,cosine of sky azimuth
+  !     SkyAzimuthAngle,YSIN,YCOS=sky azimuth,sine,cosine of sky azimuth
   !     OMEGA,OMEGX=incident aNGLe of diffuse radn at leaf,horizontal surface
   !     IALBY:1=backscattering,2=forward scattering of sky radiation
   !
 
   write(*,*) "First do loop over leaf azimuth sectors"
-  D205: DO L=1,JLA
+  D205: DO L=1,NumOfLeafAzimuthSectors
     write(*,*) "Setting ZAZI"
-    write(*,*) "L = ", L, " of ", JLA
-    ZAZI(L)=(L-0.5)*PICON/real(JLA,r8)
+    write(*,*) "L = ", L, " of ", NumOfLeafAzimuthSectors
+    ZAZI(L)=(L-0.5)*PICON/real(NumOfLeafAzimuthSectors,r8)
   ENDDO D205
   write(*,*) "Loop over sky azimuth sectors"
-  !JSA: number of sky azimuth sectors
-  !JLA: number of leaf azimuth sectors
-  D230: DO N=1,JSA
+  !NumOfSkyAzimuthSectors: number of sky azimuth sectors
+  !NumOfLeafAzimuthSectors: number of leaf azimuth sectors
+  D230: DO N=1,NumOfSkyAzimuthSectors
     write(*,*) "Setting Yvars"
-    write(*,*) "N = ", N, " of ", JSA
-    YAZI(N)=PICON*(2*N-1)/real(JSA,r8)
-    YAGL=PICON/real(JSA,r8)
+    write(*,*) "N = ", N, " of ", NumOfSkyAzimuthSectors
+    SkyAzimuthAngle(N)=PICON*(2*N-1)/real(NumOfSkyAzimuthSectors,r8)
+    YAGL=PICON/real(NumOfSkyAzimuthSectors,r8)
     YSIN(N)=SIN(YAGL)
     YCOS(N)=COS(YAGL)
     TYSIN=TYSIN+YSIN(N)
-    D225: DO L=1,JLA
+    D225: DO L=1,NumOfLeafAzimuthSectors
       write(*,*) "Setting DAZI"
-      write(*,*) "L = ", L, " of ", JLA
-      DAZI=COS(ZAZI(L)-YAZI(N))
-      DO  M=1,JLI
+      write(*,*) "L = ", L, " of ", NumOfLeafAzimuthSectors
+      DAZI=COS(ZAZI(L)-SkyAzimuthAngle(N))
+      DO  M=1,NumOfLeafZenithSectors
         write(*,*) "Setting Omega vars"
-        write(*,*) "M = ", M, " of ", JLI
-        OMEGY=ZCOS(M)*YSIN(N)+ZSIN(M)*YCOS(N)*DAZI
+        write(*,*) "M = ", M, " of ", NumOfLeafZenithSectors
+        OMEGY=CosineLeafAngle(M)*YSIN(N)+SineLeafAngle(M)*YCOS(N)*DAZI
         OMEGA(N,M,L)=ABS(OMEGY)
         OMEGX(N,M,L)=OMEGA(N,M,L)/YSIN(N)
-        IF(ZCOS(M).GT.YSIN(N))THEN
+        IF(CosineLeafAngle(M).GT.YSIN(N))THEN
           OMEGZ=ACOS(OMEGY)
         ELSE
           OMEGZ=-ACOS(OMEGY)

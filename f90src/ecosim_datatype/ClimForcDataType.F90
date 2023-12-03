@@ -92,11 +92,11 @@ implicit none
   real(r8),target,allocatable ::  H2GE(:,:)                          !atmospheric H2 concentration, [umol mol-1]
   real(r8),target,allocatable ::  CO2E(:,:)                          !atmospheric CO2 concentration, [umol mol-1]
 
-  real(r8),target,allocatable ::  ZNOON(:,:)                         !time of solar noon, [h]
-  real(r8),target,allocatable ::  RADS(:,:)                          !direct shortwave radiation, [W m-2]
-  real(r8),target,allocatable ::  RADY(:,:)                          !diffuse shortwave radiation, [W m-2]
-  real(r8),target,allocatable ::  RAPS(:,:)                          !direct PAR, [umol m-2 s-1]
-  real(r8),target,allocatable ::  RAPY(:,:)                          !diffuse PAR, [umol m-2 s-1]
+  real(r8),target,allocatable ::  SolarNoonHour_col(:,:)                         !time of solar noon, [h]
+  real(r8),target,allocatable ::  RadSWDirect_col(:,:)                          !direct shortwave radiation, [W m-2]
+  real(r8),target,allocatable ::  RadSWDiffus_col(:,:)                          !diffuse shortwave radiation, [W m-2]
+  real(r8),target,allocatable ::  PARDirect_col(:,:)                          !direct PAR, [umol m-2 s-1]
+  real(r8),target,allocatable ::  PARDiffus_col(:,:)                          !diffuse PAR, [umol m-2 s-1]
   real(r8),target,allocatable ::  SineSolarAngle(:,:)                          !sine of solar angle, [-]
   real(r8),target,allocatable ::  SineSolarAngleNextHour(:,:)                         !sine of solar angle next hour, [-]
   real(r8),target,allocatable ::  TLEX(:,:)                          !total latent heat flux x boundary layer resistance, [MJ m-1]
@@ -106,8 +106,8 @@ implicit none
   real(r8),target,allocatable ::  SoilHeatSrcDepth(:,:)                        !depth of soil heat sink/source, [m]
   real(r8),target,allocatable ::  TKSD(:,:)                          !temperature of soil heat sink/source, [oC]
   real(r8),target,allocatable ::  ATCAI(:,:)                         !initial mean annual air temperature, [oC]
-  real(r8),target,allocatable ::  RAD(:,:)                           !shortwave radiation in solar beam, [MJ m-2 h-1]
-  real(r8),target,allocatable ::  RAP(:,:)                           !PAR radiation in solar beam, [umol m-2 s-1]
+  real(r8),target,allocatable ::  RadSWSolarBeam_col(:,:)                           !shortwave radiation in solar beam, [MJ m-2 h-1]
+  real(r8),target,allocatable ::  RadPARSolarBeam_col(:,:)                           !PAR radiation in solar beam, [umol m-2 s-1]
   real(r8),target,allocatable ::  ATCA(:,:)                          !mean annual air temperature, [oC]
   real(r8),target,allocatable ::  ATCS(:,:)                          !mean annual soil temperature, [oC]
   real(r8),target,allocatable ::  TairKClimMean(:,:)                 !mean annual air temperature, [K]
@@ -196,7 +196,7 @@ implicit none
   allocate(DayLenthCurrent(JY,JX));        DayLenthCurrent=0._r8
   allocate(DayLenthPrev(JY,JX));        DayLenthPrev=0._r8
   allocate(DayLenthMax(JY,JX));        DayLenthMax=0._r8
-  allocate(OMEGAG(JSA,JY,JX));  OMEGAG=0._r8
+  allocate(OMEGAG(NumOfSkyAzimuthSectors,JY,JX));  OMEGAG=0._r8
   allocate(LWRadSky(JY,JX));         LWRadSky=0._r8
   allocate(TRAD(JY,JX));        TRAD=0._r8
   allocate(TAMX(JY,JX));        TAMX=0._r8
@@ -223,11 +223,11 @@ implicit none
   allocate(H2GE(JY,JX));        H2GE=0._r8
   allocate(CO2E(JY,JX));        CO2E=0._r8
 
-  allocate(ZNOON(JY,JX));       ZNOON=0._r8
-  allocate(RADS(JY,JX));        RADS=0._r8
-  allocate(RADY(JY,JX));        RADY=0._r8
-  allocate(RAPS(JY,JX));        RAPS=0._r8
-  allocate(RAPY(JY,JX));        RAPY=0._r8
+  allocate(SolarNoonHour_col(JY,JX));       SolarNoonHour_col=0._r8
+  allocate(RadSWDirect_col(JY,JX));        RadSWDirect_col=0._r8
+  allocate(RadSWDiffus_col(JY,JX));        RadSWDiffus_col=0._r8
+  allocate(PARDirect_col(JY,JX));        PARDirect_col=0._r8
+  allocate(PARDiffus_col(JY,JX));        PARDiffus_col=0._r8
   allocate(SineSolarAngle(JY,JX));        SineSolarAngle=0._r8
   allocate(SineSolarAngleNextHour(JY,JX));       SineSolarAngleNextHour=0._r8
   allocate(TLEX(JY,JX));        TLEX=0._r8
@@ -237,8 +237,8 @@ implicit none
   allocate(SoilHeatSrcDepth(JY,JX));      SoilHeatSrcDepth=0._r8
   allocate(TKSD(JY,JX));        TKSD=0._r8
   allocate(ATCAI(JY,JX));       ATCAI=0._r8
-  allocate(RAD(JY,JX));         RAD=0._r8
-  allocate(RAP(JY,JX));         RAP=0._r8
+  allocate(RadSWSolarBeam_col(JY,JX));         RadSWSolarBeam_col=0._r8
+  allocate(RadPARSolarBeam_col(JY,JX));         RadPARSolarBeam_col=0._r8
   allocate(ATCA(JY,JX));        ATCA=0._r8
   allocate(ATCS(JY,JX));        ATCS=0._r8
   allocate(TairKClimMean(JY,JX));        TairKClimMean=0._r8
@@ -353,12 +353,12 @@ implicit none
   call destroy(CH4E)
   call destroy(H2GE)
 
-  call destroy(ZNOON)
+  call destroy(SolarNoonHour_col)
   call destroy(CO2E)
-  call destroy(RADS)
-  call destroy(RADY)
-  call destroy(RAPS)
-  call destroy(RAPY)
+  call destroy(RadSWDirect_col)
+  call destroy(RadSWDiffus_col)
+  call destroy(PARDirect_col)
+  call destroy(PARDiffus_col)
   call destroy(SineSolarAngle)
   call destroy(SineSolarAngleNextHour)
   call destroy(TLEX)
@@ -368,8 +368,8 @@ implicit none
   call destroy(SoilHeatSrcDepth)
   call destroy(TKSD)
   call destroy(ATCAI)
-  call destroy(RAD)
-  call destroy(RAP)
+  call destroy(RadSWSolarBeam_col)
+  call destroy(RadPARSolarBeam_col)
   call destroy(ATCA)
   call destroy(ATCS)
   call destroy(TairKClimMean)

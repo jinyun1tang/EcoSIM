@@ -59,8 +59,8 @@ module ExtractsMod
    NI       => plt_morph%NI        , &
    CanopyStemA_lyr    => plt_morph%CanopyStemA_lyr     , &
    CanopyLAgrid_lyr    =>  plt_morph%CanopyLAgrid_lyr    , &
-   StemAreag    =>  plt_morph%StemAreag    , &
-   CanopyLA_grd    =>  plt_morph%CanopyLA_grd      &
+   StemArea_grd    =>  plt_morph%StemArea_grd    , &
+   CanopyLeafArea_grd    =>  plt_morph%CanopyLeafArea_grd      &
   )
   DO NZ=1,NP0
 !
@@ -88,8 +88,8 @@ module ExtractsMod
       ENDDO
     ENDDO
   ENDDO
-  CanopyLA_grd=0._r8
-  StemAreag=0._r8
+  CanopyLeafArea_grd=0._r8
+  StemArea_grd=0._r8
   DO  L=1,NumOfCanopyLayers1
     CanopyLAgrid_lyr(L)=0._r8
     WGLFT(L)=0._r8
@@ -382,12 +382,12 @@ module ExtractsMod
     Eco_Heat_Latent_col   => plt_ew%Eco_Heat_Latent_col      , &
     CanH2OHeldVg=> plt_ew%CanH2OHeldVg   , &
     NU    => plt_site%NU     , &
-    StemAreag => plt_morph%StemAreag , &
-    CanopyLA_grd => plt_morph%CanopyLA_grd , &
+    StemArea_grd => plt_morph%StemArea_grd , &
+    CanopyLeafArea_grd => plt_morph%CanopyLeafArea_grd , &
     NI    => plt_morph%NI    , &
     NumOfBranches_pft   => plt_morph%NumOfBranches_pft   , &
     CanopyStemA_pft => plt_morph%CanopyStemA_pft , &
-    CanopyLeafA_pft => plt_morph%CanopyLeafA_pft , &
+    CanopyLeafArea_pft => plt_morph%CanopyLeafArea_pft , &
     RadNet2CanP  => plt_rad%RadNet2CanP    , &
     LWRadCanP => plt_rad%LWRadCanP   , &
     Eco_NetRad_col   => plt_rad%Eco_NetRad_col       &
@@ -414,8 +414,8 @@ module ExtractsMod
 !     VapXAir2PCan,PTrans=water flux to,from canopy surfaces, inside canopy
 !     TENGYC=total canopy water heat content
 !     ENGYC=PFT canopy water heat content
-!     CanopyLA_grd,StemAreag=total leaf,stalk area
-!     CanopyLeafA_pft,CanopyStemA_pft=PFT leaf,stalk area
+!     CanopyLeafArea_grd,StemArea_grd=total leaf,stalk area
+!     CanopyLeafArea_pft,CanopyStemA_pft=PFT leaf,stalk area
 !     ZCSNC,ZZSNC,ZPSNC=total net root-soil C,N,P exchange
 !     HCUPTK,HZUPTK,HPUPTK=PFT net root-soil C,N,P exchange
 !     TBALC,TBALN,TBALP=total C,N,P balance
@@ -438,8 +438,8 @@ module ExtractsMod
   THFLXC=THFLXC+ENGYC-ENGYX(NZ)-(PrecIntcptByCanP(NZ)*cpw*TairK)
   ENGYX(NZ)=ENGYC
   LWRadCanG=LWRadCanG+LWRadCanP(NZ)
-  CanopyLA_grd=CanopyLA_grd+CanopyLeafA_pft(NZ)
-  StemAreag=StemAreag+CanopyStemA_pft(NZ)
+  CanopyLeafArea_grd=CanopyLeafArea_grd+CanopyLeafArea_pft(NZ)
+  StemArea_grd=StemArea_grd+CanopyStemA_pft(NZ)
   DO NE=1,NumOfPlantChemElmnts
     LitterFallChemElmnt_col(NE)=LitterFallChemElmnt_col(NE)-PlantRootSoilChemNetX_pft(NE,NZ)
     PlantElemntStoreLandscape(NE)=PlantElemntStoreLandscape(NE)+ElmntBalanceCum_pft(NE,NZ)

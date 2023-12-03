@@ -49,7 +49,7 @@
     TKCZ     =>  plt_ew%TKCZ      , &
     CO2E     =>  plt_site%CO2E    , &
     CanopyGasCO2_pft     =>  plt_photo%CanopyGasCO2_pft   , &
-    CanopyLeafA_pft    =>  plt_morph%CanopyLeafA_pft  , &
+    CanopyLeafArea_pft    =>  plt_morph%CanopyLeafArea_pft  , &
     ZEROP    =>  plt_biom%ZEROP   , &
     CNETX    =>  plt_bgcr%CNETX   , &
     SineSolarAngle     =>  plt_rad%SineSolarAngle     , &
@@ -92,11 +92,11 @@
 !     LeafIntracellularCO2_pft=intercellular CO2 concentration
 !     CanPCi2CaRatio=intercellular:atmospheric CO2 concn ratio from PFT file, parameter
 !     SineSolarAngle=sine of solar angle
-!     CanopyLeafA_pft=PFT leaf area
+!     CanopyLeafArea_pft=PFT leaf area
 !
   LeafIntracellularCO2_pft(NZ)=CanPCi2CaRatio(NZ)*CanopyGasCO2_pft(NZ)
 
-  IF(SineSolarAngle.GT.0.0.AND.CanopyLeafA_pft(NZ).GT.ZEROP(NZ))THEN
+  IF(SineSolarAngle.GT.0.0.AND.CanopyLeafArea_pft(NZ).GT.ZEROP(NZ))THEN
 !
     call PhotoActivePFT(NZ)
   ELSE
@@ -117,8 +117,8 @@
   real(r8) :: VL
 !     begin_execution
   associate(                        &
-    PARDIF => plt_rad%PARDIF  , &
-    PAR    => plt_rad%PAR     , &
+    PARDiffus_zsec => plt_rad%PARDiffus_zsec  , &
+    PARDirect_zsec   => plt_rad%PARDirect_zsec    , &
     CO2lmtRubiscoCarboxyRate_node  => plt_photo%CO2lmtRubiscoCarboxyRate_node , &
     LeafAUnshaded_seclyrnodbrpft  => plt_photo%LeafAUnshaded_seclyrnodbrpft , &
     RubiscoActivity_brpft   => plt_photo%RubiscoActivity_brpft  , &
@@ -130,13 +130,13 @@
 !     LIGHT-LIMITED CARBOXYLATION RATES
 !
 !     QNTM=quantum efficiency
-!     PARDIF=diffuse PAR flux
+!     PARDiffus_zsec=diffuse PAR flux
 !     ETGR=light saturated e- transport rate
 !     ETLF=light-limited e- transport rate
 !     CURV=shape parameter for e- transport response to PAR
 !     EGRO=light-limited rubisco carboxylation rate
 !
-  PARX=QNTM*PARDIF(N,M,L,NZ)
+  PARX=QNTM*PARDiffus_zsec(N,M,L,NZ)
   PARJ=PARX+LigthSatCarboxyRate_node(K,NB,NZ)
   ETLF=(PARJ-SQRT(PARJ**2-CURV4*PARX*LigthSatCarboxyRate_node(K,NB,NZ)))/CURV2
   EGRO=ETLF*RubiscoCarboxyEff_node(K,NB,NZ)
@@ -165,7 +165,7 @@
   real(r8) :: VL
 !     begin_execution
   associate(                            &
-    PAR     => plt_rad%PAR        , &
+    PARDirect_zsec    => plt_rad%PARDirect_zsec       , &
     CO2lmtRubiscoCarboxyRate_node   => plt_photo%CO2lmtRubiscoCarboxyRate_node    , &
     RubiscoCarboxyEff_node   => plt_photo%RubiscoCarboxyEff_node    , &
     LigthSatCarboxyRate_node   => plt_photo%LigthSatCarboxyRate_node    , &
@@ -183,7 +183,7 @@
 !     CURV=shape parameter for e- transport response to PAR
 !     EGRO=light-limited rubisco carboxylation rate
 !
-  PARX=QNTM*PAR(N,M,L,NZ)
+  PARX=QNTM*PARDirect_zsec(N,M,L,NZ)
   PARJ=PARX+LigthSatCarboxyRate_node(K,NB,NZ)
   ETLF=(PARJ-SQRT(PARJ**2-CURV4*PARX*LigthSatCarboxyRate_node(K,NB,NZ)))/CURV2
   EGRO=ETLF*RubiscoCarboxyEff_node(K,NB,NZ)
@@ -213,24 +213,24 @@
   associate(                           &
     ZEROP  => plt_biom%ZEROP     , &
     LeafAUnshaded_seclyrnodbrpft  => plt_photo%LeafAUnshaded_seclyrnodbrpft    , &
-    PAR    => plt_rad%PAR        , &
-    PARDIF => plt_rad%PARDIF       &
+    PARDirect_zsec   => plt_rad%PARDirect_zsec       , &
+    PARDiffus_zsec => plt_rad%PARDiffus_zsec       &
   )
 !     FOR EACH INCLINATION AND AZIMUTH CLASS
 !
-  DO N=1,JLI1
-    DO M=1,JSA1
+  DO N=1,NumOfLeafZenithSectors1
+    DO M=1,NumOfSkyAzimuthSectors1
       IF(LeafAUnshaded_seclyrnodbrpft(N,L,K,NB,NZ).GT.ZEROP(NZ))THEN
 !
 !     SUNLIT LEAVES
 !
 
-        IF(PAR(N,M,L,NZ).GT.0.0_r8)THEN
+        IF(PARDirect_zsec(N,M,L,NZ).GT.0.0_r8)THEN
           call C3SunlitLeaves(K,N,M,L,NB,NZ,CH2O)
         ENDIF
 !
 !     SHADED LEAVES
-        IF(PARDIF(N,M,L,NZ).GT.0.0_r8)THEN
+        IF(PARDiffus_zsec(N,M,L,NZ).GT.0.0_r8)THEN
           call C3ShadedLeaves(K,N,M,L,NB,NZ,CH2O)
         ENDIF
 !
@@ -492,23 +492,23 @@
   associate(                        &
     LeafAUnshaded_seclyrnodbrpft  => plt_photo%LeafAUnshaded_seclyrnodbrpft , &
     ZEROP  =>  plt_biom%ZEROP , &
-    PAR    => plt_rad%PAR     , &
-    PARDIF => plt_rad%PARDIF    &
+    PARDirect_zsec   => plt_rad%PARDirect_zsec    , &
+    PARDiffus_zsec => plt_rad%PARDiffus_zsec    &
   )
 !
 !     FOR EACH INCLINATION AND AZIMUTH CLASS
 !
-  DO  N=1,JLI1
-    DO  M=1,JSA1
+  DO  N=1,NumOfLeafZenithSectors1
+    DO  M=1,NumOfSkyAzimuthSectors1
       IF(LeafAUnshaded_seclyrnodbrpft(N,L,K,NB,NZ).GT.ZEROP(NZ))THEN
 !
 !     SUNLIT LEAVES
-        IF(PAR(N,M,L,NZ).GT.0.0_r8)THEN
+        IF(PARDirect_zsec(N,M,L,NZ).GT.0.0_r8)THEN
           call C4SunlitLeaves(K,N,M,L,NB,NZ,CH2O)
         ENDIF
 !
 !     SHADED LEAVES
-        IF(PARDIF(N,M,L,NZ).GT.0.0_r8)THEN
+        IF(PARDiffus_zsec(N,M,L,NZ).GT.0.0_r8)THEN
           call C4ShadedLeaves(K,N,M,L,NB,NZ,CH2O)
         ENDIF
       ENDIF
@@ -532,21 +532,21 @@
     C4CarboxyEff_node  => plt_photo%C4CarboxyEff_node   , &
     CO2lmtPEPCarboxyRate_node => plt_photo%CO2lmtPEPCarboxyRate_node  , &
     LigthSatC4CarboxyRate_node  => plt_photo%LigthSatC4CarboxyRate_node   , &
-    PAR    => plt_rad%PAR       , &
-    PARDIF => plt_rad%PARDIF    , &
+    PARDirect_zsec   => plt_rad%PARDirect_zsec      , &
+    PARDiffus_zsec => plt_rad%PARDiffus_zsec    , &
     TAU0   => plt_rad%TAU0        &
   )
 !
 !     LIGHT-LIMITED CARBOXYLATION RATES
 !
 !     QNTM=quantum efficiency
-!     PARDIF=diffuse PAR flux
+!     PARDiffus_zsec=diffuse PAR flux
 !     LigthSatC4CarboxyRate_node=light saturated e- transport rate
 !     ETLF4=light-limited e- transport rate
 !     CURV=shape parameter for e- transport response to PAR
 !     EGRO4=light-limited PEP carboxylation rate
 !
-  PARX=QNTM*PARDIF(N,M,L,NZ)
+  PARX=QNTM*PARDiffus_zsec(N,M,L,NZ)
   PARJ=PARX+LigthSatC4CarboxyRate_node(K,NB,NZ)
   ETLF4=(PARJ-SQRT(PARJ**2-CURV4*PARX*LigthSatC4CarboxyRate_node(K,NB,NZ)))/CURV2
   EGRO4=ETLF4*C4CarboxyEff_node(K,NB,NZ)
@@ -580,7 +580,7 @@
   LigthSatC4CarboxyRate_node  =>  plt_photo%LigthSatC4CarboxyRate_node , &
   NutrientCtrlonC4Carboxy_node  =>  plt_photo%NutrientCtrlonC4Carboxy_node , &
   CO2lmtPEPCarboxyRate_node =>  plt_photo%CO2lmtPEPCarboxyRate_node, &
-  PAR    =>  plt_rad%PAR     , &
+  PARDirect_zsec   =>  plt_rad%PARDirect_zsec    , &
   TAUS   =>  plt_rad%TAUS      &
   )
 !
@@ -593,7 +593,7 @@
 !     CURV=shape parameter for e- transport response to PAR
 !     EGRO4=light-limited PEP carboxylation rate
 !
-  PARX=QNTM*PAR(N,M,L,NZ)
+  PARX=QNTM*PARDirect_zsec(N,M,L,NZ)
   PARJ=PARX+LigthSatC4CarboxyRate_node(K,NB,NZ)
   ETLF4=(PARJ-SQRT(PARJ**2-CURV4*PARX*LigthSatC4CarboxyRate_node(K,NB,NZ)))/CURV2
   EGRO4=ETLF4*C4CarboxyEff_node(K,NB,NZ)
@@ -646,7 +646,7 @@
       IF(iPlantPhotosynthesisType(NZ).EQ.ic4_photo)THEN
 !     C4 PHOTOSYNTHESIS
         call C4Photosynthesis(K,NB,NZ,CH2O,TFN1,TFN2,TFNE,XKO2L,WSDN)
-      ELSE
+      ELSE IF(iPlantPhotosynthesisType(NZ).EQ.ic3_photo)then
 !     C3 PHOTOSYNTHESIS
         call C3Photosynthesis(K,NB,NZ,CH2O,TFN1,TFN2,TFNE,XKO2L,WSDN)
       ENDIF
@@ -703,7 +703,7 @@
 !     ATRP=hours above threshold temperature for dehardening since leafout
 !     ATRPZ=hours to full dehardening of conifers in spring
 ! deciduous
-  IF(iPlantPhenologyType(NZ).NE.0.AND.iPlantTurnoverPattern(NZ).GE.2)THEN
+  IF(iPlantPhenologyType(NZ).NE.iphenotyp_evgreen.AND.iPlantTurnoverPattern(NZ).GE.2)THEN
     RubiscoActivity_brpft(NB,NZ)=RubiscoActivity_brpft(NB,NZ)*AZMAX1(AMIN1(1.0_r8 &
       ,HourCounter4LeafOut_brch(NB,NZ)/(0.9_r8*ATRPZ)))
   ENDIF
@@ -838,7 +838,7 @@
     MinCanPStomaResistH2O   =>  plt_photo%MinCanPStomaResistH2O   , &
     DiffCO2Atmos2Intracel_pft  =>  plt_photo%DiffCO2Atmos2Intracel_pft  , &
     MaxCanPStomaResistH2O   =>  plt_photo%MaxCanPStomaResistH2O   , &
-    FracPARbyCanopy_pft  =>  plt_rad%FracPARbyCanopy_pft    , &
+    FracRadPARbyCanopy_pft  =>  plt_rad%FracRadPARbyCanopy_pft    , &
     NumOfBranches_pft    =>  plt_morph%NumOfBranches_pft      &
   )
 
@@ -872,13 +872,13 @@
 !
 !     RSX,MinCanPStomaResistH2O=minimum canopy stomatal resistance to CO2,H2O (h m-1)
 !     CH2O=total PEP(C4) or rubisco(C3) carboxylation rate
-!     FracPARbyCanopy_pft=fraction of radiation received by each PFT canopy
+!     FracRadPARbyCanopy_pft=fraction of radiation received by each PFT canopy
 !     DiffCO2Atmos2Intracel_pft=difference between atmosph and intercellular CO2 concn (umol m-3)
 !     AREA=area of grid cell
 !     RSMY=minimum stomatal resistance for CO2 uptake (h m-1)
 ! hourly time step
   IF(CH2O.GT.ZEROP(NZ))THEN
-    RSX=FracPARbyCanopy_pft(NZ)*DiffCO2Atmos2Intracel_pft(NZ)*AREA3(NU)/(CH2O*secsperhour)
+    RSX=FracRadPARbyCanopy_pft(NZ)*DiffCO2Atmos2Intracel_pft(NZ)*AREA3(NU)/(CH2O*secsperhour)
   ELSE
     RSX=MaxCanPStomaResistH2O(NZ)*1.56_r8
   ENDIF

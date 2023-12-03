@@ -142,9 +142,9 @@ implicit none
   pltpar%JZ1    = JZ
   pltpar%NumOfCanopyLayers1    = JC
   pltpar%JP1    = JP
-  pltpar%JLA1   = JLA
-  pltpar%JSA1   = JSA
-  pltpar%JLI1   = JLI
+  pltpar%NumOfLeafAzimuthSectors   = NumOfLeafAzimuthSectors
+  pltpar%NumOfSkyAzimuthSectors1   = NumOfSkyAzimuthSectors
+  pltpar%NumOfLeafZenithSectors1   = NumOfLeafZenithSectors
   pltpar%MaxNodesPerBranch1 = MaxNodesPerBranch
   pltpar%iprotein =micpar%iprotein
   pltpar%icarbhyro=micpar%icarbhyro

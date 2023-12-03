@@ -6,17 +6,17 @@ module CanopyRadDataType
   public
   character(len=*),private, parameter :: mod_filename = &
   __FILE__
-  real(r8),target,allocatable :: ZSIN(:)                        !sine of leaf angle	-
-  real(r8),target,allocatable :: ZCOS(:)                        !cosine of leaf angle	-
+  real(r8),target,allocatable :: SineLeafAngle(:)                        !sine of leaf angle	-
+  real(r8),target,allocatable :: CosineLeafAngle(:)                        !cosine of leaf angle	-
   real(r8),target,allocatable :: OMEGA(:,:,:)                   !sine of indirect sky radiation on leaf surface
   real(r8),target,allocatable :: OMEGX(:,:,:)                   !sine of indirect sky radiation on leaf surface/sine of indirect sky radiation
   integer,target,allocatable :: IALBY(:,:,:)                    !flag for calculating backscattering of radiation in canopy
-  real(r8),target,allocatable :: PARDIF(:,:,:,:,:,:)           !diffuse incoming PAR, [umol m-2 s-1]
-  real(r8),target,allocatable :: PAR(:,:,:,:,:,:)              !direct incoming PAR, [umol m-2 s-1]
+  real(r8),target,allocatable :: PARDiffus_zsec(:,:,:,:,:,:)           !diffuse incoming PAR, [umol m-2 s-1]
+  real(r8),target,allocatable :: PARDirect_zsec(:,:,:,:,:,:)              !direct incoming PAR, [umol m-2 s-1]
   real(r8),target,allocatable :: CLASS(:,:,:,:)                !fractionction of leaves in different angle classes, [-]
-  real(r8),target,allocatable :: LeafA_lyrnodbrchpft(:,:,:,:,:,:,:)           !leaf surface area, [m2 d-2]
+  real(r8),target,allocatable :: LeafAreaZsec_brch(:,:,:,:,:,:,:)           !leaf surface area, [m2 d-2]
   real(r8),target,allocatable :: LeafAUnshaded_seclyrnodbrpft(:,:,:,:,:,:,:)          !leaf irradiated surface area, [m2 d-2]
-  real(r8),target,allocatable :: StemA_lyrnodbrchpft(:,:,:,:,:,:)            !stem surface area, [m2 d-2]
+  real(r8),target,allocatable :: StemAreaZsec_brch(:,:,:,:,:,:)            !stem surface area, [m2 d-2]
 
   real(r8) :: TYSIN
   real(r8) :: dangle
@@ -31,16 +31,16 @@ module CanopyRadDataType
   real(r8) :: da
   real(r8) :: aa
   integer :: N
-! JLI: number of leaf inclination groups, 90 deg into JLI groups
+! NumOfLeafZenithSectors: number of leaf inclination groups, 90 deg into NumOfLeafZenithSectors groups
 
   call InitAllocate
 
-  dangle=PICON2h/real(JLI,r8)         !the angle section width
+  dangle=PICON2h/real(NumOfLeafZenithSectors,r8)         !the angle section width
 
-  DO N = 1, JLI
+  DO N = 1, NumOfLeafZenithSectors
     aa=real(N-0.5,r8)*dangle
-    ZSIN(N)=sin(aa)
-    ZCOS(N)=cos(aa)
+    SineLeafAngle(N)=sin(aa)
+    CosineLeafAngle(N)=cos(aa)
   ENDDO
   TYSIN = 0._r8
   end subroutine InitCanopyRad
@@ -54,17 +54,17 @@ module CanopyRadDataType
   integer :: ncols
   ncols = bounds%ncols
 
-  allocate(ZSIN(JLI))
-  allocate(ZCOS(JLI))
-  allocate(OMEGA(JSA,JLI,JLA))
-  allocate(OMEGX(JSA,JLI,JLA))
-  allocate(IALBY(JSA,JLI,JLA))
-  allocate(CLASS(JLI,JP,JY,JX))
-  allocate(LeafA_lyrnodbrchpft(JLI,JC,MaxNodesPerBranch,MaxNumBranches,JP,JY,JX))
-  allocate(LeafAUnshaded_seclyrnodbrpft(JLI,JC,MaxNodesPerBranch,MaxNumBranches,JP,JY,JX))
-  allocate(PAR(JLI,JSA,JC,JP,JY,JX))
-  allocate(PARDIF(JLI,JSA,JC,JP,JY,JX))
-  allocate(StemA_lyrnodbrchpft(JLI,JC,MaxNumBranches,JP,JY,JX))
+  allocate(SineLeafAngle(NumOfLeafZenithSectors))
+  allocate(CosineLeafAngle(NumOfLeafZenithSectors))
+  allocate(OMEGA(NumOfSkyAzimuthSectors,NumOfLeafZenithSectors,NumOfLeafAzimuthSectors))
+  allocate(OMEGX(NumOfSkyAzimuthSectors,NumOfLeafZenithSectors,NumOfLeafAzimuthSectors))
+  allocate(IALBY(NumOfSkyAzimuthSectors,NumOfLeafZenithSectors,NumOfLeafAzimuthSectors))
+  allocate(CLASS(NumOfLeafZenithSectors,JP,JY,JX))
+  allocate(LeafAreaZsec_brch(NumOfLeafZenithSectors,JC,MaxNodesPerBranch,MaxNumBranches,JP,JY,JX))
+  allocate(LeafAUnshaded_seclyrnodbrpft(NumOfLeafZenithSectors,JC,MaxNodesPerBranch,MaxNumBranches,JP,JY,JX))
+  allocate(PARDirect_zsec(NumOfLeafZenithSectors,NumOfSkyAzimuthSectors,JC,JP,JY,JX))
+  allocate(PARDiffus_zsec(NumOfLeafZenithSectors,NumOfSkyAzimuthSectors,JC,JP,JY,JX))
+  allocate(StemAreaZsec_brch(NumOfLeafZenithSectors,JC,MaxNumBranches,JP,JY,JX))
 
   end subroutine InitAllocate
 !------------------------------------------------------------------------------------------
@@ -73,16 +73,16 @@ module CanopyRadDataType
   subroutine DestructCanopyRad
   use abortutils, only : destroy
   implicit none
-  call destroy(ZSIN)
-  call destroy(ZCOS)
+  call destroy(SineLeafAngle)
+  call destroy(CosineLeafAngle)
   call destroy(OMEGA)
   call destroy(OMEGX)
   call destroy(IALBY)
   call destroy(CLASS)
-  call destroy(LeafA_lyrnodbrchpft)
+  call destroy(LeafAreaZsec_brch)
   call destroy(LeafAUnshaded_seclyrnodbrpft)
-  call destroy(PAR)
-  call destroy(PARDIF)
-  call destroy(StemA_lyrnodbrchpft)
+  call destroy(PARDirect_zsec)
+  call destroy(PARDiffus_zsec)
+  call destroy(StemAreaZsec_brch)
   end subroutine DestructCanopyRad
 end module CanopyRadDataType

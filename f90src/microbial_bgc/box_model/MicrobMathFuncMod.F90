@@ -14,7 +14,8 @@ implicit none
   !the physiological temperature dependence of microbes
   implicit none
   real(r8), intent(in) :: TKSO
-  real(r8), intent(out):: TFNX, TFNY
+  real(r8), intent(out):: TFNX !temperature sensitivity for growth respiration
+  real(r8), intent(out):: TFNY !temperature sensitivity for maintenance respiration
   real(r8) :: RTK,STK
   real(r8) :: ACTV,ACTVM
 

@@ -288,12 +288,12 @@ contains
 !     AREA=surface area of grid cell
 !
   ALFZ=2.0_r8*(1.0_r8-FracSWRad2Grnd(NY,NX))
-  IF(BndlResistAboveCanG(NY,NX).GT.ZERO.AND.GridMaxCanopyHeight(NY,NX).GT.SoiSurfRoughnesst0(NY,NX)&
+  IF(BndlResistAboveCanG(NY,NX).GT.ZERO.AND.MaxCanopyHeight_grd(NY,NX).GT.SoiSurfRoughnesst0(NY,NX)&
     .AND.ALFZ.GT.ZERO)THEN
     !if there is plant
-    BndlResistCanG(NY,NX)=AMIN1(RACX,AZMAX1(GridMaxCanopyHeight(NY,NX)*EXP(ALFZ) &
-      /(ALFZ/BndlResistAboveCanG(NY,NX))*AZMAX1(EXP(-ALFZ*SoiSurfRoughnesst0(NY,NX)/GridMaxCanopyHeight(NY,NX)) &
-      -EXP(-ALFZ*(ZeroPlanDisp(NY,NX)+RoughHeight(NY,NX))/GridMaxCanopyHeight(NY,NX)))))
+    BndlResistCanG(NY,NX)=AMIN1(RACX,AZMAX1(MaxCanopyHeight_grd(NY,NX)*EXP(ALFZ) &
+      /(ALFZ/BndlResistAboveCanG(NY,NX))*AZMAX1(EXP(-ALFZ*SoiSurfRoughnesst0(NY,NX)/MaxCanopyHeight_grd(NY,NX)) &
+      -EXP(-ALFZ*(ZeroPlanDisp(NY,NX)+RoughHeight(NY,NX))/MaxCanopyHeight_grd(NY,NX)))))
     WindSpeedGrnd=WindSpeedAtm(NY,NX)*EXP(-ALFZ)
   ELSE
     BndlResistCanG(NY,NX)=0.0_r8
@@ -1138,7 +1138,7 @@ contains
     ENGYD=0.0_r8
   ENDIF
   IF(PRECB(NY,NX).GT.ZERO)THEN
-    ENGYB=AZMAX1(15.8_r8*SQRT(AMIN1(2.5_r8,GridMaxCanopyHeight(NY,NX)))-5.87_r8)
+    ENGYB=AZMAX1(15.8_r8*SQRT(AMIN1(2.5_r8,MaxCanopyHeight_grd(NY,NX)))-5.87_r8)
   ELSE
     ENGYB=0.0_r8
   ENDIF

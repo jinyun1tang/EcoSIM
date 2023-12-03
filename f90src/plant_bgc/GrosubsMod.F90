@@ -78,7 +78,7 @@ module grosubsMod
     CO2NetFix_pft     => plt_bgcr%CO2NetFix_pft     , &
     LitterFallChemElmnt_pft    => plt_bgcr%LitterFallChemElmnt_pft    , &
     LitterFallChemElmnt_pftvr     => plt_bgcr%LitterFallChemElmnt_pftvr     , &
-    CanopyHeight       => plt_morph%CanopyHeight        &
+    CanopyHeight_pft      => plt_morph%CanopyHeight_pft       &
   )
 !     TOTAL AGB FOR GRAZING IN LANDSCAPE SECTION
 !
@@ -98,8 +98,8 @@ module grosubsMod
     ENDDO D1
     LitterFallChemElmnt_pft(1:NumOfPlantChemElmnts,NZ)=0._r8
     CO2NetFix_pft(NZ)=0._r8
-    CanopyHeight_copy(NZ)=CanopyHeight(NZ)
-    CanopyHeight(NZ)=0._r8
+    CanopyHeight_copy(NZ)=CanopyHeight_pft(NZ)
+    CanopyHeight_pft(NZ)=0._r8
   ENDDO D9980
 !
 !     TRANSFORMATIONS IN LIVING PLANT POPULATIONS
@@ -307,7 +307,7 @@ module grosubsMod
 
   real(r8)  :: CanopyN2Fix_pft(JP1)
   integer  :: ICHK1(2,JZ1),IDTHRN,NB
-  integer  :: NRX(2,JZ1),IFLGZ
+  integer  :: NRX(2,JZ1),BegRemoblize
   real(r8) :: TFN6(JZ1)
   real(r8) :: CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW
   real(r8) :: PTRT
@@ -333,7 +333,7 @@ module grosubsMod
   )
   IF(iPlantShootState(NZ).EQ.0.OR.iPlantRootState(NZ).EQ.iLive)THEN
     CanopyN2Fix_pft(NZ)=0._r8
-    IFLGZ = 0
+    BegRemoblize = 0
     call StagePlantForGrowth(I,J,NZ,ICHK1,NRX,TFN6,CNLFW,CPLFW,&
       CNSHW,CPSHW,CNRTW,CPRTW,RootAreaPopu,TFN5,WFNG,Stomata_Activity,WFNS,WFNSG)
 !
@@ -344,10 +344,10 @@ module grosubsMod
 !
     DO  NB=1,NumOfBranches_pft(NZ)
       call GrowOneBranch(I,J,NB,NZ,TFN6,CanopyHeight_copy,CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW,&
-        TFN5,WFNG,Stomata_Activity,WFNS,WFNSG,PTRT,CanopyN2Fix_pft,IFLGZ)
+        TFN5,WFNG,Stomata_Activity,WFNS,WFNSG,PTRT,CanopyN2Fix_pft,BegRemoblize)
     ENDDO
 !
-    call RootBGCModel(I,J,NZ,IFLGZ,ICHK1,IDTHRN,NRX,PTRT,TFN6,CNRTW,CPRTW,RootAreaPopu)
+    call RootBGCModel(I,J,NZ,BegRemoblize,ICHK1,IDTHRN,NRX,PTRT,TFN6,CNRTW,CPRTW,RootAreaPopu)
 !
     call ComputeTotalBiom(NZ,ShootNonstructC_brch)
   ELSE
@@ -702,7 +702,7 @@ module grosubsMod
     CanopyStemA_pft    =>  plt_morph%CanopyStemA_pft  , &
     CanopyBranchStemApft_lyr    =>  plt_morph%CanopyBranchStemApft_lyr  , &
     SeedNumberSet_brch    =>  plt_morph%SeedNumberSet_brch  , &
-    CanopyLeafA_pft    =>  plt_morph%CanopyLeafA_pft  , &
+    CanopyLeafArea_pft    =>  plt_morph%CanopyLeafArea_pft  , &
     CanopyStemApft_lyr    =>  plt_morph%CanopyStemApft_lyr  , &
     iPlantNfixType   =>  plt_morph%iPlantNfixType , &
     CanopySeedNumber_pft     =>  plt_morph%CanopySeedNumber_pft     &
@@ -745,7 +745,7 @@ module grosubsMod
   CanopyStalkC_pft(NZ)=sum(StalkBiomassC_brch(1:NumOfBranches_pft(NZ),NZ))
   CanopyLeafShethC_pft(NZ) =sum(LeafPetioleBiomassC_brch(1:NumOfBranches_pft(NZ),NZ))
   CanopySeedNumber_pft(NZ) =sum(SeedNumberSet_brch(1:NumOfBranches_pft(NZ),NZ))
-  CanopyLeafA_pft(NZ)=sum(LeafAreaLive_brch(1:NumOfBranches_pft(NZ),NZ))
+  CanopyLeafArea_pft(NZ)=sum(LeafAreaLive_brch(1:NumOfBranches_pft(NZ),NZ))
   CanopyStemA_pft(NZ)=sum(CanopyBranchStemApft_lyr(1:NumOfCanopyLayers1,1:NumOfBranches_pft(NZ),NZ))
   CanopyStemApft_lyr(1:NumOfCanopyLayers1,1:NumOfBranches_pft(NZ))=0._r8
   DO NB=1,NumOfBranches_pft(NZ)

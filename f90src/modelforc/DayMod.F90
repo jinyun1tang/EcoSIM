@@ -224,10 +224,10 @@
 !     TMPX,TMPN=maximum,minimum daily temperature from weather file
 !     DWPT=daily vapor pressure from weather file
 !     TAVG*,AMP*,VAVG*,VMP*=daily avgs, amps to calc hourly values in wthr.f
-!     IETYP=Koppen climate zone
+!     KoppenClimZone=Koppen climate zone
 
       IF(ITYPE.EQ.1)THEN
-        IF(IETYP(NY,NX).GE.-1)THEN
+        IF(KoppenClimZone(NY,NX).GE.-1)THEN
           IF(DayLenthCurrent(NY,NX).GT.ZERO)THEN
             RMAX=SRAD(I)/(DayLenthCurrent(NY,NX)*0.658_r8)
           ELSE

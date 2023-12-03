@@ -55,8 +55,8 @@ implicit none
   DiffCO2Atmos2Intracel_pft      => plt_photo%DiffCO2Atmos2Intracel_pft , &
   ZEROP      => plt_biom%ZEROP  , &
   CanopyLeafAreaByLayer_pft      => plt_morph%CanopyLeafAreaByLayer_pft , &
-  PARDIF     => plt_rad%PARDIF  , &
-  PAR        => plt_rad%PAR     , &
+  PARDiffus_zsec     => plt_rad%PARDiffus_zsec  , &
+  PARDirect_zsec       => plt_rad%PARDirect_zsec    , &
   TAU0       => plt_rad%TAU0    , &
   TAUS       => plt_rad%TAUS      &
   )
@@ -68,15 +68,15 @@ implicit none
 !
 !     FOR EACH LEAF AZIMUTH AND INCLINATION
 !
-      D215: DO N=1,JLI1
-        D220: DO M=1,JSA1
+      D215: DO N=1,NumOfLeafZenithSectors1
+        D220: DO M=1,NumOfSkyAzimuthSectors1
 !
 !         CO2 FIXATION BY SUNLIT LEAVES
 !
 !         LeafAUnshaded_seclyrnodbrpft=unself-shaded leaf surface area
 !
           IF(LeafAUnshaded_seclyrnodbrpft(N,L,K,NB,NZ).GT.ZEROP(NZ))THEN
-            IF(PAR(N,M,L,NZ).GT.0.0)THEN
+            IF(PARDirect_zsec(N,M,L,NZ).GT.0.0_r8)THEN
 !
 !             C3 CARBOXYLATION REACTIONS IN MESOPHYLL
 !
@@ -91,7 +91,7 @@ implicit none
 !             CO2lmtRubiscoCarboxyRate_node=rubisco carboxylation rate limited by CO2 from stomate.f
 !             RubiscoActivity_brpft=N,P feedback inhibition on C4 CO2 fixation
 !
-              PARX=QNTM*PAR(N,M,L,NZ)
+              PARX=QNTM*PARDirect_zsec(N,M,L,NZ)
               PARJ=PARX+LigthSatCarboxyRate_node(K,NB,NZ)
               ETLF=(PARJ-SQRT(PARJ**2-CURV4*PARX*LigthSatCarboxyRate_node(K,NB,NZ)))/CURV2
               EGRO=ETLF*RubiscoCarboxyEff_node(K,NB,NZ)
@@ -177,12 +177,12 @@ implicit none
 !
 !           CO2 FIXATION IN MESOPHYLL BY SHADED LEAVES
 !
-            IF(PARDIF(N,M,L,NZ).GT.0.0_r8)THEN
+            IF(PARDiffus_zsec(N,M,L,NZ).GT.0.0_r8)THEN
 !
 !             C3 CARBOXYLATION REACTIONS USING VARIABLES FROM 'STOMATE'
 !
 !             QNTM=quantum efficiency
-!             PARDIF=diffuse PAR flux
+!             PARDiffus_zsec=diffuse PAR flux
 !             LigthSatCarboxyRate_node=light saturated e- transport rate from stomate.f
 !             ETLF=light-limited e- transport rate
 !             CURV=shape parameter for e- transport response to PAR
@@ -192,7 +192,7 @@ implicit none
 !             CO2lmtRubiscoCarboxyRate_node=rubisco carboxylation rate limited by CO2 from stomate.f
 !             RubiscoActivity_brpft=N,P feedback inhibition on C3 CO2 fixation
 !
-              PARX=QNTM*PARDIF(N,M,L,NZ)
+              PARX=QNTM*PARDiffus_zsec(N,M,L,NZ)
               PARJ=PARX+LigthSatCarboxyRate_node(K,NB,NZ)
               ETLF=(PARJ-SQRT(PARJ**2-CURV4*PARX*LigthSatCarboxyRate_node(K,NB,NZ)))/CURV2
               EGRO=ETLF*RubiscoCarboxyEff_node(K,NB,NZ)
@@ -331,8 +331,8 @@ implicit none
   Vmax4PEPCarboxy_pft      => plt_photo%Vmax4PEPCarboxy_pft , &
   CanopyLeafAreaByLayer_pft      => plt_morph%CanopyLeafAreaByLayer_pft , &
   ZERO       => plt_site%ZERO   , &
-  PARDIF     => plt_rad%PARDIF  , &
-  PAR        => plt_rad%PAR     , &
+  PARDiffus_zsec     => plt_rad%PARDiffus_zsec  , &
+  PARDirect_zsec       => plt_rad%PARDirect_zsec    , &
   TAU0       => plt_rad%TAU0    , &
   TAUS       => plt_rad%TAUS      &
   )
@@ -343,15 +343,15 @@ implicit none
 !
 !     FOR EACH LEAF AZIMUTH AND INCLINATION
 !
-      D115: DO N =1,JLI1
-        D120: DO M =1,JSA1
+      D115: DO N =1,NumOfLeafZenithSectors1
+        D120: DO M =1,NumOfSkyAzimuthSectors1
 !
 !         CO2 FIXATION IN MESOPHYLL BY SUNLIT LEAVES
 !
 !         LeafAUnshaded_seclyrnodbrpft=unself-shaded leaf surface area
 !
           IF(LeafAUnshaded_seclyrnodbrpft(N,L,K,NB,NZ).GT.ZEROP(NZ))THEN
-            IF(PAR(N,M,L,NZ).GT.0.0)THEN
+            IF(PARDirect_zsec(N,M,L,NZ).GT.0.0)THEN
 !
 !             C4 CARBOXYLATION REACTIONS IN MESOPHYLL
 !
@@ -366,7 +366,7 @@ implicit none
 !             CO2lmtPEPCarboxyRate_node=PEP carboxylation rate limited by CO2 from stomate.f
 !             NutrientCtrlonC4Carboxy_node=N,P feedback inhibition on C4 CO2 fixation
 !
-              PARX=QNTM*PAR(N,M,L,NZ)
+              PARX=QNTM*PARDirect_zsec(N,M,L,NZ)
               PARJ=PARX+LigthSatC4CarboxyRate_node(K,NB,NZ)
               ETLF4=(PARJ-SQRT(PARJ**2-CURV4*PARX*LigthSatC4CarboxyRate_node(K,NB,NZ)))/CURV2
               EGRO4=ETLF4*C4CarboxyEff_node(K,NB,NZ)
@@ -478,12 +478,12 @@ implicit none
 !
 !           CO2 FIXATION IN MESOPHYLL BY SHADED LEAVES
 !
-            IF(PARDIF(N,M,L,NZ).GT.0.0)THEN
+            IF(PARDiffus_zsec(N,M,L,NZ).GT.0.0)THEN
 !
 !           C4 CARBOXYLATION REACTIONS IN MESOPHYLL
 !
 !           QNTM=quantum efficiency
-!           PARDIF=diffuse PAR flux
+!           PARDiffus_zsec=diffuse PAR flux
 !           LigthSatC4CarboxyRate_node=light saturated e- transport rate from stomate.f
 !           ETLF4=light-limited e- transport rate
 !           CURV=shape parameter for e- transport response to PAR
@@ -493,7 +493,7 @@ implicit none
 !           CO2lmtPEPCarboxyRate_node=PEP carboxylation rate limited by CO2 from stomate.f
 !           NutrientCtrlonC4Carboxy_node=N,P feedback inhibition on C4 CO2 fixation
 !
-              PARX=QNTM*PARDIF(N,M,L,NZ)
+              PARX=QNTM*PARDiffus_zsec(N,M,L,NZ)
               PARJ=PARX+LigthSatC4CarboxyRate_node(K,NB,NZ)
               ETLF4=(PARJ-SQRT(PARJ**2-CURV4*PARX*LigthSatC4CarboxyRate_node(K,NB,NZ)))/CURV2
               EGRO4=ETLF4*C4CarboxyEff_node(K,NB,NZ)
@@ -633,14 +633,14 @@ implicit none
     Vmax4RubiscoCarboxy_pft   =>  plt_photo%Vmax4RubiscoCarboxy_pft  , &
     iPlantMorphologyType  =>  plt_pheno%iPlantMorphologyType , &
     SineSolarAngle    =>  plt_rad%SineSolarAngle     , &
-    PARbyCanopy_pft    =>  plt_rad%PARbyCanopy_pft     , &
+    RadPARbyCanopy_pft    =>  plt_rad%RadPARbyCanopy_pft     , &
     ZEROP   =>  plt_biom%ZEROP   , &
     LeafAreaNode_brch   =>  plt_morph%LeafAreaNode_brch  , &
     RubiscoActivity_brpft    =>  plt_photo%RubiscoActivity_brpft     &
   )
 
   IF(abs(RubiscoActivity_brpft(NB,NZ)).GT.0._r8)THEN
-    IF(SineSolarAngle.GT.0.0_r8.AND.PARbyCanopy_pft(NZ).GT.0.0_r8.AND.CanopyGasCO2_pft(NZ).GT.0.0_r8)THEN
+    IF(SineSolarAngle.GT.0.0_r8.AND.RadPARbyCanopy_pft(NZ).GT.0.0_r8.AND.CanopyGasCO2_pft(NZ).GT.0.0_r8)THEN
       CO2F=0._r8
       CH2O=0._r8
       IF(.not.is_plant_bryophyte(iPlantMorphologyType(NZ)).OR.Stomata_Activity.GT.0.0_r8)THEN

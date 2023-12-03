@@ -52,7 +52,7 @@ module NitroDisturbMod
   real(r8) :: DCORPC1
 !     begin_execution
 
-  IF(J.EQ.INT(ZNOON(NY,NX)).AND.(ITILL(I,NY,NX).EQ.21.OR.ITILL(I,NY,NX).EQ.22))THEN
+  IF(J.EQ.INT(SolarNoonHour_col(NY,NX)).AND.(ITILL(I,NY,NX).EQ.21.OR.ITILL(I,NY,NX).EQ.22))THEN
     IF(ITILL(I,NY,NX).EQ.22)THEN
       IFLGS(NY,NX)=1
       IFLGJ=0

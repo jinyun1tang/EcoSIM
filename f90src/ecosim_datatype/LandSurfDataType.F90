@@ -19,9 +19,9 @@ module LandSurfDataType
   real(r8),target,allocatable ::  BndlResistAboveCanG(:,:)                           !isothermal boundary layer resistance, [h m-1]
   real(r8),target,allocatable ::  RIB(:,:)                           !Richardson number for calculating boundary layer resistance, [-]
   real(r8),target,allocatable ::  ALTI(:,:)                          !altitude of landscape, [m]
-  real(r8),target,allocatable ::  GSIN(:,:)                          !sine of slope, [-]
-  real(r8),target,allocatable ::  GCOS(:,:)                          !cosine of slope, [-]
-  real(r8),target,allocatable ::  GAZI(:,:)                          !azimuth of slope, [-]
+  real(r8),target,allocatable ::  SineGrndSlope_col(:,:)                          !sine of slope, [-]
+  real(r8),target,allocatable ::  CosineGrndSlope_col(:,:)                          !cosine of slope, [-]
+  real(r8),target,allocatable ::  GroundSurfAzimuth_col(:,:)                          !azimuth of slope, [-]
   real(r8),target,allocatable ::  ALTZ(:,:)                          !altitude, [m]
   real(r8),target,allocatable ::  SL(:,:)                            !slope, [o]
   real(r8),target,allocatable ::  ASP(:,:)                           !aspect , [o]
@@ -49,9 +49,9 @@ contains
   allocate(BndlResistAboveCanG(JY,JX));         BndlResistAboveCanG=0._r8
   allocate(RIB(JY,JX));         RIB=0._r8
   allocate(ALTI(JY,JX));        ALTI=0._r8
-  allocate(GSIN(JY,JX));        GSIN=0._r8
-  allocate(GCOS(JY,JX));        GCOS=0._r8
-  allocate(GAZI(JY,JX));        GAZI=0._r8
+  allocate(SineGrndSlope_col(JY,JX));        SineGrndSlope_col=0._r8
+  allocate(CosineGrndSlope_col(JY,JX));        CosineGrndSlope_col=0._r8
+  allocate(GroundSurfAzimuth_col(JY,JX));        GroundSurfAzimuth_col=0._r8
   allocate(ALTZ(JY,JX));        ALTZ=0._r8
   allocate(SL(JY,JX));          SL=0._r8
   allocate(ASP(JY,JX));         ASP=0._r8
@@ -80,9 +80,9 @@ contains
   call destroy(BndlResistAboveCanG)
   call destroy(RIB)
   call destroy(ALTI)
-  call destroy(GSIN)
-  call destroy(GCOS)
-  call destroy(GAZI)
+  call destroy(SineGrndSlope_col)
+  call destroy(CosineGrndSlope_col)
+  call destroy(GroundSurfAzimuth_col)
   call destroy(ALTZ)
   call destroy(SL)
   call destroy(ASP)

@@ -9,7 +9,7 @@ module PlantAPI
   use EcoSiMParDataMod, only : micpar, pltpar
   use PlantDisturbMod , only : PrepLandscapeGrazing
   use timings         , only : start_timer, end_timer
-  use SoilPhysDataType, only : ALBX
+  use SoilPhysDataType, only : SurfAlbedo_col
   use EcoSIMSolverPar
   use EcoSIMHistMod
   use SnowDataType
@@ -129,8 +129,8 @@ implicit none
   Eco_Heat_Sens_col(NY,NX)   =plt_ew%Eco_Heat_Sens_col
   StandingDeadChemElmnt_col(1:NumOfPlantChemElmnts,NY,NX)=plt_biom%StandingDeadChemElmnt_col(1:NumOfPlantChemElmnts)
   UVOLO(NY,NX) =plt_ew%UVOLO
-  StemAreag(NY,NX) =plt_morph%StemAreag
-  CanopyLA_grd(NY,NX) =plt_morph%CanopyLA_grd
+  StemArea_grd(NY,NX) =plt_morph%StemArea_grd
+  CanopyLeafArea_grd(NY,NX) =plt_morph%CanopyLeafArea_grd
   Eco_NetRad_col(NY,NX)   =plt_rad%Eco_NetRad_col
   Eco_Heat_Latent_col(NY,NX)   =plt_ew%Eco_Heat_Latent_col
   Eco_Heat_Grnd_col(NY,NX)   =plt_ew%Eco_Heat_Grnd_col
@@ -228,7 +228,7 @@ implicit none
     RootStructChemElmnt_pft(1:NumOfPlantChemElmnts,NZ,NY,NX)  =plt_biom%RootStructChemElmnt_pft(1:NumOfPlantChemElmnts,NZ)
     NoduleChemElmnts_pft(1:NumOfPlantChemElmnts,NZ,NY,NX)   =plt_biom%NoduleChemElmnts_pft(1:NumOfPlantChemElmnts,NZ)
     PlantRootSoilChemNetX_pft(1:NumOfPlantChemElmnts,NZ,NY,NX)=plt_rbgc%PlantRootSoilChemNetX_pft(1:NumOfPlantChemElmnts,NZ)
-    CanopyLeafA_pft(NZ,NY,NX) =plt_morph%CanopyLeafA_pft(NZ)
+    CanopyLeafArea_pft(NZ,NY,NX) =plt_morph%CanopyLeafArea_pft(NZ)
     CanopyStemA_pft(NZ,NY,NX) =plt_morph%CanopyStemA_pft(NZ)
     NoduleNonstructCconc_pft(NZ,NY,NX)=plt_biom%NoduleNonstructCconc_pft(NZ)
     CO2NetFix_pft(NZ,NY,NX)  =plt_bgcr%CO2NetFix_pft(NZ)
@@ -251,7 +251,7 @@ implicit none
     VapXAir2PCan(NZ,NY,NX) =plt_ew%VapXAir2PCan(NZ)
     EvapTransHeatP(NZ,NY,NX) =plt_ew%EvapTransHeatP(NZ)
     AirConc_pft(NZ,NY,NX)  =plt_photo%AirConc_pft(NZ)
-    FracPARbyCanopy_pft(NZ,NY,NX) =plt_rad%FracPARbyCanopy_pft(NZ)
+    FracRadPARbyCanopy_pft(NZ,NY,NX) =plt_rad%FracRadPARbyCanopy_pft(NZ)
     FNOD(NZ,NY,NX)  =plt_allom%FNOD(NZ)
     CanopySeedNumber_pft(NZ,NY,NX)  =plt_morph%CanopySeedNumber_pft(NZ)
     HypoctoylHeight(NZ,NY,NX) =plt_morph%HypoctoylHeight(NZ)
@@ -339,7 +339,7 @@ implicit none
     RootBiomCPerPlant_pft(NZ,NY,NX)  =plt_biom%RootBiomCPerPlant_pft(NZ)
     XKCO2L(NZ,NY,NX) =plt_photo%XKCO2L(NZ)
     Km4RubiscoCarboxy_pft(NZ,NY,NX) =plt_photo%Km4RubiscoCarboxy_pft(NZ)
-    CanopyHeight(NZ,NY,NX)     =plt_morph%CanopyHeight(NZ)
+    CanopyHeight_pft(NZ,NY,NX)     =plt_morph%CanopyHeight_pft(NZ)
     NetPrimaryProductvity_pft(NZ,NY,NX)   =plt_bgcr%NetPrimaryProductvity_pft(NZ)
     ZEROP(NZ,NY,NX)  =plt_biom%ZEROP(NZ)
     ZEROQ(NZ,NY,NX)  =plt_rbgc%ZEROQ(NZ)
@@ -459,8 +459,8 @@ implicit none
         PetioleProteinCNode_brch(K,NB,NZ,NY,NX) =plt_biom%PetioleProteinCNode_brch(K,NB,NZ)
       ENDDO
       DO  L=1,JC
-        DO N=1,JLI
-          StemA_lyrnodbrchpft(N,L,NB,NZ,NY,NX)=plt_morph%StemA_lyrnodbrchpft(N,L,NB,NZ)
+        DO N=1,NumOfLeafZenithSectors
+          StemAreaZsec_brch(N,L,NB,NZ,NY,NX)=plt_morph%StemAreaZsec_brch(N,L,NB,NZ)
         ENDDO
       ENDDO
       DO K=0,MaxNodesPerBranch
@@ -474,8 +474,8 @@ implicit none
       ENDDO
       DO K=1,MaxNodesPerBranch
         DO  L=1,JC
-          DO N=1,JLI
-            LeafA_lyrnodbrchpft(N,L,K,NB,NZ,NY,NX) =plt_morph%LeafA_lyrnodbrchpft(N,L,K,NB,NZ)
+          DO N=1,NumOfLeafZenithSectors
+            LeafAreaZsec_brch(N,L,K,NB,NZ,NY,NX) =plt_morph%LeafAreaZsec_brch(N,L,K,NB,NZ)
             LeafAUnshaded_seclyrnodbrpft(N,L,K,NB,NZ,NY,NX)=plt_photo%LeafAUnshaded_seclyrnodbrpft(N,L,K,NB,NZ)
           ENDDO
         ENDDO
@@ -671,7 +671,7 @@ implicit none
   plt_site%ALAT=ALAT(NY,NX)
   plt_site%ATCA=ATCA(NY,NX)
   plt_morph%CanopyArea_grid=CanopyArea_grid(NY,NX)
-  plt_morph%CanopyLA_grd=CanopyLA_grd(NY,NX)
+  plt_morph%CanopyLeafArea_grd=CanopyLeafArea_grd(NY,NX)
   plt_site%ALT=ALT(NY,NX)
   plt_site%CCO2EI=CCO2EI(NY,NX)
   plt_site%CO2EI=CO2EI(NY,NX)
@@ -687,7 +687,7 @@ implicit none
   plt_site%DayLenthCurrent=DayLenthCurrent(NY,NX)
   plt_ew%SnowDepth=SnowDepth(NY,NX)
   plt_site%DayLenthMax=DayLenthMax(NY,NX)
-  plt_site%IETYP=IETYP(NY,NX)
+  plt_site%KoppenClimZone=KoppenClimZone(NY,NX)
   plt_site%iYearCurrent=iYearCurrent
   plt_site%NL=NL(NY,NX)
   plt_site%NP0=NP0(NY,NX)
@@ -705,27 +705,27 @@ implicit none
   plt_rad%LWRadSky=LWRadSky(NY,NX)
   plt_ew%VPA=VPA(NY,NX)
   plt_distb%XCORP=XCORP(NY,NX)
-  plt_site%ZNOON =ZNOON(NY,NX)
+  plt_site%SolarNoonHour_col=SolarNoonHour_col(NY,NX)
   plt_site%ZEROS2=ZEROS2(NY,NX)
   plt_site%ZEROS =ZEROS(NY,NX)
   plt_ew%RoughHeight=RoughHeight(NY,NX)
-  plt_morph%GridMaxCanopyHeight=GridMaxCanopyHeight(NY,NX)
+  plt_morph%MaxCanopyHeight_grd=MaxCanopyHeight_grd(NY,NX)
   plt_ew%ZeroPlanDisp=ZeroPlanDisp(NY,NX)
   plt_site%IDATA(:)=IDATA(:)
   plt_distb%DCORP=DCORP(I,NY,NX)
   plt_distb%ITILL=ITILL(I,NY,NX)
 
-  plt_morph%CanopyHeightz(0)=CanopyHeightz(0,NY,NX)
+  plt_morph%CanopyHeightz_col(0)=CanopyHeightz_col(0,NY,NX)
   DO  L=1,JC
-    plt_morph%CanopyHeightz(L)=CanopyHeightz(L,NY,NX)
+    plt_morph%CanopyHeightz_col(L)=CanopyHeightz_col(L,NY,NX)
     plt_rad%TAUS(L)=TAUS(L,NY,NX)
     plt_rad%TAU0(L)=TAU0(L,NY,NX)
   ENDDO
   plt_rad%TAUS(JC+1)=TAUS(JC+1,NY,NX)
   plt_rad%TAU0(JC+1)=TAU0(JC+1,NY,NX)
 
-  DO N=1,JLI
-    plt_rad%ZSIN(N)=ZSIN(N)
+  DO N=1,NumOfLeafZenithSectors
+    plt_rad%SineLeafAngle(N)=SineLeafAngle(N)
   ENDDO
 
   DO L=1,NL(NY,NX)
@@ -834,10 +834,10 @@ implicit none
     plt_morph%SLA1(NZ)=SLA1(NZ,NY,NX)
     plt_morph%SSL1(NZ)=SSL1(NZ,NY,NX)
     plt_morph%SNL1(NZ)=SNL1(NZ,NY,NX)
-    DO  N=1,JLI
+    DO  N=1,NumOfLeafZenithSectors
       plt_morph%CLASS(N,NZ)=CLASS(N,NZ,NY,NX)
     ENDDO
-    plt_morph%ClumpFactort0(NZ)=ClumpFactort0(NZ,NY,NX)
+    plt_morph%ClumpFactorInit_pft(NZ)=ClumpFactorInit_pft(NZ,NY,NX)
     plt_morph%SineBranchAngle_pft(NZ)=SineBranchAngle_pft(NZ,NY,NX)
     plt_morph%SinePetioleAngle_pft(NZ)=SinePetioleAngle_pft(NZ,NY,NX)
     plt_morph%MaxPotentSeedNumber_pft(NZ)=MaxPotentSeedNumber_pft(NZ,NY,NX)
@@ -905,13 +905,13 @@ implicit none
     plt_distb%IYRX(NZ)=IYRX(NZ,NY,NX)
     plt_distb%IDAYX(NZ)=IDAYX(NZ,NY,NX)
     plt_distb%IYRY(NZ)=IYRY(NZ,NY,NX)
-    plt_rad%PARbyCanopy_pft(NZ)=PARbyCanopy_pft(NZ,NY,NX)
-    plt_rad%SWRadByCanP(NZ)=SWRadByCanP(NZ,NY,NX)
+    plt_rad%RadPARbyCanopy_pft(NZ)=RadPARbyCanopy_pft(NZ,NY,NX)
+    plt_rad%RadSWbyCanopy_pft(NZ)=RadSWbyCanopy_pft(NZ,NY,NX)
     plt_ew%PrecIntcptByCanP(NZ)=PrecIntcptByCanP(NZ,NY,NX)
 
     plt_site%PPZ(NZ)=PPZ(NZ,NY,NX)
     plt_distb%IDAYY(NZ)=IDAYY(NZ,NY,NX)
-    plt_morph%ClumpFactort(NZ)=ClumpFactort(NZ,NY,NX)
+    plt_morph%ClumpFactorCurrent_pft(NZ)=ClumpFactorCurrent_pft(NZ,NY,NX)
     plt_site%DATAP(NZ)=DATAP(NZ,NY,NX)
     plt_pheno%MatureGroup_pft(NZ)=MatureGroup_pft(NZ,NY,NX)
     plt_biom%WTSHTA(NZ)=WTSHTA(NZ,NY,NX)
@@ -923,10 +923,10 @@ implicit none
     ENDDO
 
     DO L=1,JC
-      DO  M=1,JSA
-        DO  N=1,JLI
-          plt_rad%PAR(N,M,L,NZ)=PAR(N,M,L,NZ,NY,NX)
-          plt_rad%PARDIF(N,M,L,NZ)=PARDIF(N,M,L,NZ,NY,NX)
+      DO  M=1,NumOfSkyAzimuthSectors
+        DO  N=1,NumOfLeafZenithSectors
+          plt_rad%PARDirect_zsec(N,M,L,NZ)=PARDirect_zsec(N,M,L,NZ,NY,NX)
+          plt_rad%PARDiffus_zsec(N,M,L,NZ)=PARDiffus_zsec(N,M,L,NZ,NY,NX)
         ENDDO
       ENDDO
     ENDDO
@@ -949,7 +949,7 @@ implicit none
   plt_bgcr%ECO_ER_col=ECO_ER_col(NY,NX)
   plt_biom%StandingDeadChemElmnt_col(1:NumOfPlantChemElmnts)=StandingDeadChemElmnt_col(1:NumOfPlantChemElmnts,NY,NX)
   plt_bgcr%LitterFallChemElmnt_col(1:NumOfPlantChemElmnts)=LitterFallChemElmnt_col(1:NumOfPlantChemElmnts,NY,NX)
-  plt_morph%StemAreag=StemAreag(NY,NX)
+  plt_morph%StemArea_grd=StemArea_grd(NY,NX)
   plt_ew%Eco_Heat_Sens_col=Eco_Heat_Sens_col(NY,NX)
   plt_ew%CanH2OHeldVg=CanH2OHeldVg(NY,NX)
   plt_bgcr%Eco_NBP_col=Eco_NBP_col(NY,NX)
@@ -1087,7 +1087,7 @@ implicit none
 
     plt_rbgc%ZEROQ(NZ)=ZEROQ(NZ,NY,NX)
     plt_pheno%SSTX(NZ)=SSTX(NZ,NY,NX)
-    plt_rad%FracPARbyCanopy_pft(NZ) =FracPARbyCanopy_pft(NZ,NY,NX)
+    plt_rad%FracRadPARbyCanopy_pft(NZ) =FracRadPARbyCanopy_pft(NZ,NY,NX)
     plt_bgcr%RNH3C(NZ)=RNH3C(NZ,NY,NX)
     plt_ew%DTKC(NZ)   =DTKC(NZ,NY,NX)
     plt_pheno%iPlantThermoAdaptZone(NZ)=iPlantThermoAdaptZone(NZ,NY,NX)
@@ -1131,7 +1131,7 @@ implicit none
     plt_distb%JHVST(NZ)=JHVST(NZ,I,NY,NX)
     plt_distb%THIN_pft(NZ) =THIN_pft(NZ,I,NY,NX)
     plt_morph%CanopyStemA_pft(NZ)=CanopyStemA_pft(NZ,NY,NX)
-    plt_morph%CanopyLeafA_pft(NZ)=CanopyLeafA_pft(NZ,NY,NX)
+    plt_morph%CanopyLeafArea_pft(NZ)=CanopyLeafArea_pft(NZ,NY,NX)
 
     plt_photo%O2I(NZ)  =O2I(NZ,NY,NX)
     plt_photo%LeafIntracellularCO2_pft(NZ) =LeafIntracellularCO2_pft(NZ,NY,NX)
@@ -1204,7 +1204,7 @@ implicit none
 
     plt_biom%ZEROL(NZ) =ZEROL(NZ,NY,NX)
     plt_biom%ZEROP(NZ) =ZEROP(NZ,NY,NX)
-    plt_morph%CanopyHeight(NZ)   =CanopyHeight(NZ,NY,NX)
+    plt_morph%CanopyHeight_pft(NZ)   =CanopyHeight_pft(NZ,NY,NX)
     plt_bgcr%NetPrimaryProductvity_pft(NZ)  =NetPrimaryProductvity_pft(NZ,NY,NX)
 
 
@@ -1287,8 +1287,8 @@ implicit none
       ENDDO
       DO K=1,MaxNodesPerBranch
         DO  L=1,JC
-          DO N=1,JLI
-            plt_morph%LeafA_lyrnodbrchpft(N,L,K,NB,NZ) =LeafA_lyrnodbrchpft(N,L,K,NB,NZ,NY,NX)
+          DO N=1,NumOfLeafZenithSectors
+            plt_morph%LeafAreaZsec_brch(N,L,K,NB,NZ) =LeafAreaZsec_brch(N,L,K,NB,NZ,NY,NX)
             plt_photo%LeafAUnshaded_seclyrnodbrpft(N,L,K,NB,NZ)=LeafAUnshaded_seclyrnodbrpft(N,L,K,NB,NZ,NY,NX)
           ENDDO
         ENDDO
@@ -1484,26 +1484,26 @@ implicit none
 
   integer :: L,N,M,NN,NZ,K,NB
 !  Integers
-  plt_site%IETYP=IETYP(NY,NX)
+  plt_site%KoppenClimZone=KoppenClimZone(NY,NX)
   plt_site%NP=NP(NY,NX)
   plt_site%NU=NU(NY,NX)
-  plt_morph%StemAreag=StemAreag(NY,NX)
-  plt_morph%CanopyLA_grd=CanopyLA_grd(NY,NX)
+  plt_morph%StemArea_grd=StemArea_grd(NY,NX)
+  plt_morph%CanopyLeafArea_grd=CanopyLeafArea_grd(NY,NX)
   plt_site%ZEROS =ZEROS(NY,NX)
   plt_site%ZERO  =ZERO
   plt_ew%SnowDepth   =SnowDepth(NY,NX)
   plt_ew%TairK     =TairK(NY,NX)
-  plt_morph%GridMaxCanopyHeight   =GridMaxCanopyHeight(NY,NX)
+  plt_morph%MaxCanopyHeight_grd   =MaxCanopyHeight_grd(NY,NX)
   plt_site%WindMesHeight=WindMesHeight(NY,NX)
   plt_ew%ZeroPlanDisp=ZeroPlanDisp(NY,NX)
   plt_site%WindSpeedAtm=WindSpeedAtm(NY,NX)
   plt_ew%VLHeatCapSnowMin=VLHeatCapSnowMin(NY,NX)
   plt_ew%VLHeatCapSurfSnow=VLHeatCapSnow(1,NY,NX)
-  plt_morph%CanopyHeightz(0)=CanopyHeightz(0,NY,NX)
+  plt_morph%CanopyHeightz_col(0)=CanopyHeightz_col(0,NY,NX)
   DO L=1,JC
     plt_morph%CanopyStemA_lyr(L)=CanopyStemA_lyr(L,NY,NX)
     plt_morph%CanopyLAgrid_lyr(L)=CanopyLAgrid_lyr(L,NY,NX)
-    plt_morph%CanopyHeightz(L)=CanopyHeightz(L,NY,NX)
+    plt_morph%CanopyHeightz_col(L)=CanopyHeightz_col(L,NY,NX)
     plt_rad%TAUS(L)=TAUS(L,NY,NX)
   ENDDO
   plt_rad%TAUS(JC+1)=TAUS(JC+1,NY,NX)
@@ -1515,28 +1515,28 @@ implicit none
     plt_soilchem%VLWatMicP(L)=VLWatMicP(L,NY,NX)
   ENDDO
   plt_rad%SineSolarAngle=SineSolarAngle(NY,NX)
-  plt_site%ZNOON=ZNOON(NY,NX)
+  plt_site%SolarNoonHour_col=SolarNoonHour_col(NY,NX)
   plt_morph%CanopyArea_grid=CanopyArea_grid(NY,NX)
-  plt_rad%GAZI=GAZI(NY,NX)
-  plt_rad%GCOS=GCOS(NY,NX)
-  plt_rad%GSIN=GSIN(NY,NX)
-  plt_rad%RADY=RADY(NY,NX)
-  plt_rad%RAPY=RAPY(NY,NX)
-  plt_rad%RADS=RADS(NY,NX)
-  plt_rad%RAPS=RAPS(NY,NX)
+  plt_rad%GroundSurfAzimuth_col=GroundSurfAzimuth_col(NY,NX)
+  plt_rad%CosineGrndSlope_col=CosineGrndSlope_col(NY,NX)
+  plt_rad%SineGrndSlope_col=SineGrndSlope_col(NY,NX)
+  plt_rad%RadSWDiffus_col=RadSWDiffus_col(NY,NX)
+  plt_rad%PARDiffus_col=PARDiffus_col(NY,NX)
+  plt_rad%RadSWDirect_col=RadSWDirect_col(NY,NX)
+  plt_rad%PARDirect_col=PARDirect_col(NY,NX)
   plt_site%SoiSurfRoughnesst0=SoiSurfRoughnesst0(NY,NX)
   plt_ew%VcumWatSnow=VcumWatSnow(NY,NX)
   plt_ew%VcumIceSnow=VcumIceSnow(NY,NX)
   plt_ew%VcumDrySnoWE=VcumDrySnoWE(NY,NX)
   plt_rad%TYSIN  =TYSIN
   plt_rad%SoilAlbedo   =SoilAlbedo(NY,NX)
-  plt_rad%ALBX   =ALBX(NY,NX)
+  plt_rad%SurfAlbedo_col   =SurfAlbedo_col(NY,NX)
   plt_site%ZEROS2=ZEROS2(NY,NX)
   plt_site%POROS1=POROS(NU(NY,NX),NY,NX)
   DO NZ=1,NP(NY,NX)
-    plt_morph%CanopyLeafA_pft(NZ)=CanopyLeafA_pft(NZ,NY,NX)
-    plt_morph%CanopyHeight(NZ)=CanopyHeight(NZ,NY,NX)
-    plt_morph%ClumpFactort(NZ)=ClumpFactort(NZ,NY,NX)
+    plt_morph%CanopyLeafArea_pft(NZ)=CanopyLeafArea_pft(NZ,NY,NX)
+    plt_morph%CanopyHeight_pft(NZ)=CanopyHeight_pft(NZ,NY,NX)
+    plt_morph%ClumpFactorCurrent_pft(NZ)=ClumpFactorCurrent_pft(NZ,NY,NX)
     plt_rad%CanopySWabsorpty_pft(NZ)=CanopySWabsorpty_pft(NZ,NY,NX)
     plt_rad%CanopyPARabsorpty_pft(NZ)=CanopyPARabsorpty_pft(NZ,NY,NX)
     plt_rad%TAUR(NZ)=TAUR(NZ,NY,NX)
@@ -1556,28 +1556,28 @@ implicit none
       ENDDO
       DO K=1,MaxNodesPerBranch
         DO  L=1,JC
-          DO N=1,JLI
-            plt_morph%LeafA_lyrnodbrchpft(N,L,K,NB,NZ)=LeafA_lyrnodbrchpft(N,L,K,NB,NZ,NY,NX)
+          DO N=1,NumOfLeafZenithSectors
+            plt_morph%LeafAreaZsec_brch(N,L,K,NB,NZ)=LeafAreaZsec_brch(N,L,K,NB,NZ,NY,NX)
           ENDDO
         ENDDO
       ENDDO
       DO  L=1,JC
-        DO N=1,JLI
-          plt_morph%StemA_lyrnodbrchpft(N,L,NB,NZ)=StemA_lyrnodbrchpft(N,L,NB,NZ,NY,NX)
+        DO N=1,NumOfLeafZenithSectors
+          plt_morph%StemAreaZsec_brch(N,L,NB,NZ)=StemAreaZsec_brch(N,L,NB,NZ,NY,NX)
         ENDDO
       ENDDO
     ENDDO
   ENDDO
-  DO N=1,JSA
+  DO N=1,NumOfSkyAzimuthSectors
     plt_rad%OMEGAG(N)=OMEGAG(N,NY,NX)
   ENDDO
-  DO N=1,JLI
-    plt_rad%ZCOS(N)=ZCOS(N)
-    plt_rad%ZSIN(N)=ZSIN(N)
+  DO N=1,NumOfLeafZenithSectors
+    plt_rad%CosineLeafAngle(N)=CosineLeafAngle(N)
+    plt_rad%SineLeafAngle(N)=SineLeafAngle(N)
   ENDDO
-  DO NN=1,JLA
-    DO M=1,JLI
-      DO N=1,JSA
+  DO NN=1,NumOfLeafAzimuthSectors
+    DO M=1,NumOfLeafZenithSectors
+      DO N=1,NumOfSkyAzimuthSectors
         plt_rad%OMEGA(N,M,NN)=OMEGA(N,M,NN)
         plt_rad%OMEGX(N,M,NN)=OMEGX(N,M,NN)
         plt_rad%IALBY(N,M,NN)=IALBY(N,M,NN)
@@ -1600,17 +1600,17 @@ implicit none
   RoughHeight(NY,NX)=plt_ew%RoughHeight
   BndlResistAboveCanG(NY,NX)=plt_ew%BndlResistAboveCanG
   RIB(NY,NX)=plt_ew%RIB
-  GridMaxCanopyHeight(NY,NX)=plt_morph%GridMaxCanopyHeight
-  RADS(NY,NX)=plt_rad%RADS
-  RADY(NY,NX)=plt_rad%RADY
-  RAPS(NY,NX)=plt_rad%RAPS
-  RAPY(NY,NX)=plt_rad%RAPY
+  MaxCanopyHeight_grd(NY,NX)=plt_morph%MaxCanopyHeight_grd
+  RadSWDirect_col(NY,NX)=plt_rad%RadSWDirect_col
+  RadSWDiffus_col(NY,NX)=plt_rad%RadSWDiffus_col
+  PARDirect_col(NY,NX)=plt_rad%PARDirect_col
+  PARDiffus_col(NY,NX)=plt_rad%PARDiffus_col
   SWRadOnGrnd(NY,NX)=plt_rad%SWRadOnGrnd
   FracSWRad2Grnd(NY,NX)=plt_rad%FracSWRad2Grnd
-  RAD(NY,NX)=plt_rad%RAD0
-  RAP(NY,NX)=plt_rad%RAP0
+  RadSWSolarBeam_col(NY,NX)=plt_rad%RadSWSolarBeam_col
+  RadPARSolarBeam_col(NY,NX)=plt_rad%RadPARSolarBeam_col
   DO L=0,JC
-    CanopyHeightz(L,NY,NX)=plt_morph%CanopyHeightz(L)
+    CanopyHeightz_col(L,NY,NX)=plt_morph%CanopyHeightz_col(L)
   ENDDO
   DO L=1,JC
     TAUS(L,NY,NX)=plt_rad%TAUS(L)
@@ -1619,16 +1619,16 @@ implicit none
   CanopyArea_grid(NY,NX)=plt_morph%CanopyArea_grid
   DO NZ=1,NP(NY,NX)
     CanopyArea_pft(NZ,NY,NX)=plt_morph%CanopyArea_pft(NZ)
-    SWRadByCanP(NZ,NY,NX) =plt_rad%SWRadByCanP(NZ)
-    PARbyCanopy_pft(NZ,NY,NX) =plt_rad%PARbyCanopy_pft(NZ)
-    ClumpFactort(NZ,NY,NX)  =plt_morph%ClumpFactort(NZ)
-    FracPARbyCanopy_pft(NZ,NY,NX)=plt_rad%FracPARbyCanopy_pft(NZ)
+    RadSWbyCanopy_pft(NZ,NY,NX) =plt_rad%RadSWbyCanopy_pft(NZ)
+    RadPARbyCanopy_pft(NZ,NY,NX) =plt_rad%RadPARbyCanopy_pft(NZ)
+    ClumpFactorCurrent_pft(NZ,NY,NX)  =plt_morph%ClumpFactorCurrent_pft(NZ)
+    FracRadPARbyCanopy_pft(NZ,NY,NX)=plt_rad%FracRadPARbyCanopy_pft(NZ)
 
     DO L=1,JC
-      DO M=1,JSA
-        DO  N=1,JLI
-          PARDIF(N,M,L,NZ,NY,NX)=plt_rad%PARDIF(N,M,L,NZ)
-          PAR(N,M,L,NZ,NY,NX)   =plt_rad%PAR(N,M,L,NZ)
+      DO M=1,NumOfSkyAzimuthSectors
+        DO  N=1,NumOfLeafZenithSectors
+          PARDiffus_zsec(N,M,L,NZ,NY,NX)=plt_rad%PARDiffus_zsec(N,M,L,NZ)
+          PARDirect_zsec(N,M,L,NZ,NY,NX)   =plt_rad%PARDirect_zsec(N,M,L,NZ)
         ENDDO
       ENDDO
     ENDDO

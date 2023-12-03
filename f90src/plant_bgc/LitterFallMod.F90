@@ -37,14 +37,14 @@ implicit none
     pftPlantPopulation         =>   plt_site%pftPlantPopulation        , &
     iYearCurrent       =>   plt_site%iYearCurrent      , &
     VOLWOU     =>   plt_site%VOLWOU    , &
-    ZNOON      =>   plt_site%ZNOON     , &
+    SolarNoonHour_col     =>   plt_site%SolarNoonHour_col    , &
     HypoctoylHeight      =>   plt_morph%HypoctoylHeight    , &
     NumOfBranches_pft        =>   plt_morph%NumOfBranches_pft      , &
     NumOfMainBranch_pft        =>   plt_morph%NumOfMainBranch_pft      , &
     BranchNumber_pft        =>   plt_morph%BranchNumber_pft        &
   )
 !
-!     ZNOON=hour of solar noon
+!     SolarNoonHour_col=hour of solar noon
 !     iPlantCalendar(ipltcal_Emerge,=emergence date
 !     iPlantPhenologyPattern=growth habit:0=annual,1=perennial from PFT file
 !     iDayPlantHarvest,iYearPlantHarvest=day,year of harvesting
@@ -68,7 +68,7 @@ implicit none
 !     doPlantLeaveOff_brch=flag for enabling leafoff:0=enable,1=disable
 !     Hours4LiterfalAftMature_brch=current hours after physl maturity until start of litterfall
 !
-  IF(J.EQ.INT(ZNOON).AND.iPlantCalendar(ipltcal_Emerge,NumOfMainBranch_pft(NZ),NZ).NE.0 &
+  IF(J.EQ.INT(SolarNoonHour_col).AND.iPlantCalendar(ipltcal_Emerge,NumOfMainBranch_pft(NZ),NZ).NE.0 &
     .AND.(iPlantPhenologyPattern(NZ).NE.iplt_annual.OR.(I.GE.iDayPlantHarvest(NZ) &
     .AND.iYearCurrent.GE.iYearPlantHarvest(NZ))))THEN
     IDTHY=0
@@ -778,10 +778,10 @@ implicit none
     LeafAreaNode_brch    => plt_morph%LeafAreaNode_brch     , &
     PetioleLengthNode_brch    => plt_morph%PetioleLengthNode_brch     , &
     InternodeHeightDying_brch   => plt_morph%InternodeHeightDying_brch    , &
-    LeafA_lyrnodbrchpft     => plt_morph%LeafA_lyrnodbrchpft      , &
+    LeafAreaZsec_brch     => plt_morph%LeafAreaZsec_brch      , &
     InternodeHeightLive_brch   => plt_morph%InternodeHeightLive_brch    , &
     CanopyLeafApft_lyr    => plt_morph%CanopyLeafApft_lyr     , &
-    StemA_lyrnodbrchpft    => plt_morph%StemA_lyrnodbrchpft     , &
+    StemAreaZsec_brch    => plt_morph%StemAreaZsec_brch     , &
     CanopyLeafAreaByLayer_pft    => plt_morph%CanopyLeafAreaByLayer_pft       &
   )
 !
@@ -851,16 +851,16 @@ implicit none
       CanopyLeafAreaByLayer_pft(L,K,NB,NZ)=0._r8
       LeafChemElmntByLayer_pft(1:NumOfPlantChemElmnts,L,K,NB,NZ)=0._r8
       IF(K.NE.0)THEN
-        D8860: DO N=1,JLI1
-          LeafA_lyrnodbrchpft(N,L,K,NB,NZ)=0._r8
+        D8860: DO N=1,NumOfLeafZenithSectors1
+          LeafAreaZsec_brch(N,L,K,NB,NZ)=0._r8
         ENDDO D8860
       ENDIF
     ENDDO D8865
   ENDDO D8855
   D8875: DO L=1,NumOfCanopyLayers1
     CanopyBranchStemApft_lyr(L,NB,NZ)=0._r8
-    DO  N=1,JLI1
-      StemA_lyrnodbrchpft(N,L,NB,NZ)=0._r8
+    DO  N=1,NumOfLeafZenithSectors1
+      StemAreaZsec_brch(N,L,NB,NZ)=0._r8
     enddo
   ENDDO D8875
   end associate

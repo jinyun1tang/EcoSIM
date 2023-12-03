@@ -384,7 +384,7 @@ module HfuncsMod
     NumOfMainBranch_pft    =>  plt_morph%NumOfMainBranch_pft     , &
     PrimRootDepth  =>  plt_morph%PrimRootDepth   , &
     MY     =>  plt_morph%MY      , &
-    CanopyLeafA_pft  =>  plt_morph%CanopyLeafA_pft   , &
+    CanopyLeafArea_pft  =>  plt_morph%CanopyLeafArea_pft   , &
     NGTopRootLayer_pft    =>  plt_morph%NGTopRootLayer_pft     , &
     NIXBotRootLayer_pft   =>  plt_morph%NIXBotRootLayer_pft     , &
     NumOfBranches_pft    =>  plt_morph%NumOfBranches_pft     , &
@@ -475,14 +475,14 @@ module HfuncsMod
 ! EMERGENCE DATE FROM COTYLEDON HEIGHT, LEAF AREA, ROOT DEPTH
 !
 ! iPlantCalendar(ipltcal_Emerge,=emergence date
-! CanopyLeafA_pft,CanopyStemA_pft=leaf,stalk areas
+! CanopyLeafArea_pft,CanopyStemA_pft=leaf,stalk areas
 ! HypoctoylHeight=hypocotyledon height
 ! SeedinDepth=seeding depth
 ! PrimRootDepth=primary root depth
 ! VHeatCapCanP,WTSHT,WatByPCanopy=canopy heat capacity,mass,water content
 !
   IF(iPlantCalendar(ipltcal_Emerge,NumOfMainBranch_pft(NZ),NZ).EQ.0)THEN
-    ARLSP=CanopyLeafA_pft(NZ)+CanopyStemA_pft(NZ)
+    ARLSP=CanopyLeafArea_pft(NZ)+CanopyStemA_pft(NZ)
     IF((HypoctoylHeight(NZ).GT.SeedinDepth(NZ)).AND.(ARLSP.GT.ZEROL(NZ)) &
       .AND.(PrimRootDepth(1,1,NZ).GT.SeedinDepth(NZ)+ppmc))THEN
       iPlantCalendar(ipltcal_Emerge,NumOfMainBranch_pft(NZ),NZ)=I
@@ -799,7 +799,7 @@ module HfuncsMod
     Hours4LeafOff    =>  plt_pheno%Hours4LeafOff    , &
     HourThreshold4LeafOff   =>  plt_pheno%HourThreshold4LeafOff   , &
     RefNodeInitRate   =>  plt_pheno%RefNodeInitRate   , &
-    CanopyHeight      =>  plt_morph%CanopyHeight      , &
+    CanopyHeight_pft     =>  plt_morph%CanopyHeight_pft     , &
     ShootNodeNumber   =>   plt_morph%ShootNodeNumber  , &
     NodeNumberToInitFloral   =>   plt_morph%NodeNumberToInitFloral  , &
     NodeNumberAtAnthesis   =>   plt_morph%NodeNumberAtAnthesis  , &
@@ -909,7 +909,7 @@ module HfuncsMod
       .OR.(((iPlantPhenologyPattern(NZ).EQ.iplt_perennial.AND.(iPlantPhenologyType(NZ).EQ.iphenotyp_coldecidu &
       .OR.iPlantPhenologyType(NZ).EQ.iphenotyp_coldroutdecidu)) &
       .OR.(iPlantPhenologyPattern(NZ).EQ.iplt_annual.AND.iPlantPhenologyType(NZ).EQ.iphenotyp_evgreen)) &
-      .AND.CanopyHeight(NZ).GE.SnowDepth-ZERO &
+      .AND.CanopyHeight_pft(NZ).GE.SnowDepth-ZERO &
       .AND.DayLenthCurrent.LT.DayLenthPrev))THEN
 !
 !     FINAL VEGETATIVE NODE NUMBER DEPENDS ON PHOTOPERIOD FROM 'DAY'
@@ -935,7 +935,7 @@ module HfuncsMod
         .OR.(((iPlantPhenologyPattern(NZ).EQ.iplt_perennial.AND.(iPlantPhenologyType(NZ).EQ.iphenotyp_coldecidu &
         .OR.iPlantPhenologyType(NZ).EQ.iphenotyp_coldroutdecidu)) &
         .OR.(iPlantPhenologyPattern(NZ).EQ.iplt_annual.AND.iPlantPhenologyType(NZ).EQ.iphenotyp_evgreen)) &
-        .AND.CanopyHeight(NZ).GE.SnowDepth-ZERO &
+        .AND.CanopyHeight_pft(NZ).GE.SnowDepth-ZERO &
         .AND.DayLenthCurrent.LT.DayLenthPrev))THEN
         write(101,*)'plant init floral',I,NB,NZ
         iPlantCalendar(ipltcal_InitFloral,NB,NZ)=I

@@ -89,7 +89,7 @@ implicit none
   real(r8),pointer   :: histr_1D_ATM_CO2_col(:)        !CO2E(NY,NX)
   real(r8),pointer   :: histr_1D_NBP_col(:)            !Eco_NBP_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_ECO_HVST_C_col(:)     !XHVSTE(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: histr_1D_ECO_LAI_col(:)        !CanopyLA_grd(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: histr_1D_ECO_LAI_col(:)        !CanopyLeafArea_grd(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_ECO_GPP_col(:)        !Eco_GPP_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_ECO_RA_col(:)         !Eco_AutoR_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_ECO_NPP_col(:)        !Eco_NPP_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -176,7 +176,7 @@ implicit none
   real(r8),pointer   :: histr_1D_NODULE_C_ptc(:)      !NoduleChemElmnts_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), nodule
   real(r8),pointer   :: histr_1D_STORED_C_ptc(:)      !NonstructalChemElmnts_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_GRAIN_NO_ptc(:)      !CanopySeedNumber_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: histr_1D_LAIb_ptc(:)          !CanopyLeafA_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total branch leaf area
+  real(r8),pointer   :: histr_1D_LAIb_ptc(:)          !CanopyLeafArea_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total branch leaf area
   real(r8),pointer   :: histr_1D_EXUD_C_FLX_ptc(:)        !PlantExudChemElmntCum_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_LITRf_C_FLX_ptc(:)       !LitrfallChemElmnts_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_LITRf_P_FLX_ptc(:)       !LitrfallChemElmnts_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -189,7 +189,7 @@ implicit none
   real(r8),pointer   :: histr_1D_FIREp_CO2_FLX_ptc(:)     !CO2ByFire_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), plant CO2 from fire
   real(r8),pointer   :: histr_1D_FIREp_CH4_FLX_ptc(:)     !CH4ByFire_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_NPP_ptc(:)           !NetPrimaryProductvity_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: histr_1D_CAN_HT_ptc(:)        !CanopyHeight(NZ,NY,NX), canopy height, m
+  real(r8),pointer   :: histr_1D_CAN_HT_ptc(:)        !CanopyHeight_pft(NZ,NY,NX), canopy height, m
   real(r8),pointer   :: histr_1D_POPN_ptc(:)          !PP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), plant population
   real(r8),pointer   :: histr_1D_tTRANSPN_ptc(:)      !-ETCanP(NZ,NY,NX)*1000.0/AREA(3,NU(NY,NX),NY,NX), total transpiration
   real(r8),pointer   :: histr_1D_WTR_STRESS_ptc(:)    !HoursCanopyPSITooLow(NZ,NY,NX)
@@ -340,7 +340,7 @@ implicit none
   allocate(this%histr_1D_ATM_CO2_col(beg_col:end_col))       !CO2E(NY,NX)
   allocate(this%histr_1D_NBP_col(beg_col:end_col))           !Eco_NBP_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
 
-  allocate(this%histr_1D_ECO_LAI_col(beg_col:end_col))       !CanopyLA_grd(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  allocate(this%histr_1D_ECO_LAI_col(beg_col:end_col))       !CanopyLeafArea_grd(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_ECO_GPP_col(beg_col:end_col))       !Eco_GPP_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_ECO_RA_col(beg_col:end_col))        !Eco_AutoR_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_ECO_NPP_col(beg_col:end_col))       !Eco_NPP_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -426,7 +426,7 @@ implicit none
   allocate(this%histr_1D_NODULE_C_ptc(beg_ptc:end_ptc))        !NoduleChemElmnts_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), nodule
   allocate(this%histr_1D_STORED_C_ptc(beg_ptc:end_ptc))     !NonstructalChemElmnts_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_GRAIN_NO_ptc(beg_ptc:end_ptc))     !CanopySeedNumber_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  allocate(this%histr_1D_LAIb_ptc(beg_ptc:end_ptc))         !CanopyLeafA_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total branch leaf area
+  allocate(this%histr_1D_LAIb_ptc(beg_ptc:end_ptc))         !CanopyLeafArea_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total branch leaf area
   allocate(this%histr_1D_EXUD_C_FLX_ptc(beg_ptc:end_ptc))       !PlantExudChemElmntCum_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_LITRf_C_FLX_ptc(beg_ptc:end_ptc));  this%histr_1D_LITRf_C_FLX_ptc=spval
   allocate(this%histr_1D_LITRf_P_FLX_ptc(beg_ptc:end_ptc));  this%histr_1D_LITRf_P_FLX_ptc=spval
@@ -438,7 +438,7 @@ implicit none
   allocate(this%histr_1D_FIREp_CO2_FLX_ptc(beg_ptc:end_ptc))     !CO2ByFire_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), plant CO2 from fire
   allocate(this%histr_1D_FIREp_CH4_FLX_ptc(beg_ptc:end_ptc))     !CH4ByFire_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_NPP_ptc(beg_ptc:end_ptc))           !NetPrimaryProductvity_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  allocate(this%histr_1D_CAN_HT_ptc(beg_ptc:end_ptc))        !CanopyHeight(NZ,NY,NX), canopy height, m
+  allocate(this%histr_1D_CAN_HT_ptc(beg_ptc:end_ptc))        !CanopyHeight_pft(NZ,NY,NX), canopy height, m
   allocate(this%histr_1D_POPN_ptc(beg_ptc:end_ptc))          !PP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), plant population
   allocate(this%histr_1D_tTRANSPN_ptc(beg_ptc:end_ptc))      !-ETCanP(NZ,NY,NX)*1000.0/AREA(3,NU(NY,NX),NY,NX), total transpiration
   allocate(this%histr_1D_WTR_STRESS_ptc(beg_ptc:end_ptc))    !HoursCanopyPSITooLow(NZ,NY,NX)
@@ -1484,7 +1484,7 @@ implicit none
       this%histr_1D_ATM_CO2_col(ncol)     = CO2E(NY,NX)
       this%histr_1D_NBP_col(ncol)         = Eco_NBP_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_ECO_HVST_C_col(ncol)  = XHVSTE(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%histr_1D_ECO_LAI_col(ncol)     = CanopyLA_grd(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%histr_1D_ECO_LAI_col(ncol)     = CanopyLeafArea_grd(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_ECO_GPP_col(ncol)     = Eco_GPP_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_ECO_RA_col(ncol)      = Eco_AutoR_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_ECO_NPP_col(ncol)     = Eco_NPP_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -1497,7 +1497,7 @@ implicit none
       this%histr_1D_ET_col(ncol)          = 1000.0_r8*UEVAP(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_N2O_LITR_col(ncol)    = trc_solcl(idg_N2O,0,NY,NX)
       this%histr_1D_NH3_LITR_col(ncol)    = trc_solcl(idg_NH3,0,NY,NX)
-      this%histr_1D_SOL_RADN_col(ncol)    = RAD(NY,NX)*277.8_r8
+      this%histr_1D_SOL_RADN_col(ncol)    = RadSWSolarBeam_col(NY,NX)*277.8_r8
       this%histr_1D_AIR_TEMP_col(ncol)    = TCA(NY,NX)
       this%histr_1D_HUM_col(ncol)         = VPK(NY,NX)
       this%histr_1D_WIND_col(ncol)        = WindSpeedAtm(NY,NX)/3600.0_r8
@@ -1595,7 +1595,7 @@ implicit none
         this%histr_1D_NODULE_C_ptc(nptc)        = NoduleChemElmnts_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_STORED_C_ptc(nptc)     = NonstructalChemElmnts_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_GRAIN_NO_ptc(nptc)     = CanopySeedNumber_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%histr_1D_LAIb_ptc(nptc)         = CanopyLeafA_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%histr_1D_LAIb_ptc(nptc)         = CanopyLeafArea_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_EXUD_C_FLX_ptc(nptc)       = PlantExudChemElmntCum_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_LITRf_C_FLX_ptc(nptc)      = LitrfallChemElmnts_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_SURF_LITRf_C_FLX_ptc(nptc) = SurfLitrfallChemElmnts_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -1611,7 +1611,7 @@ implicit none
         this%histr_1D_FIREp_CO2_FLX_ptc(nptc)    = CO2ByFire_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_FIREp_CH4_FLX_ptc(nptc)    = CH4ByFire_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_NPP_ptc(nptc)          = NetPrimaryProductvity_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%histr_1D_CAN_HT_ptc(nptc)       = CanopyHeight(NZ,NY,NX)
+        this%histr_1D_CAN_HT_ptc(nptc)       = CanopyHeight_pft(NZ,NY,NX)
         this%histr_1D_POPN_ptc(nptc)         = pftPlantPopulation(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_tTRANSPN_ptc(nptc)     =-ETCanP(NZ,NY,NX)*1000.0/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_WTR_STRESS_ptc(nptc)   = HoursCanopyPSITooLow(NZ,NY,NX)

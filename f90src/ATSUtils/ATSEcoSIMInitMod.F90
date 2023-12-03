@@ -22,7 +22,7 @@ implicit none
   implicit none
   integer :: NY,NX,L,NHW,NHE,NVN,NVS
   integer, intent(in) :: NYS
-  real(r8) :: YSIN(JSA),YCOS(JSA),YAZI(JSA)
+  real(r8) :: YSIN(NumOfSkyAzimuthSectors),YCOS(NumOfSkyAzimuthSectors),SkyAzimuthAngle(NumOfSkyAzimuthSectors)
 
   NHW=1;NHE=1;NVN=1;NVS=NYS
 

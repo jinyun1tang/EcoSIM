@@ -75,7 +75,8 @@ module StartsMod
   real(r8) :: ALTZG
   real(r8) :: tPBOT
   real(r8) :: LandScape1stSoiLayDepth
-  real(r8) :: YSIN(JSA),YCOS(JSA),YAZI(JSA)
+  real(r8) :: YSIN(NumOfSkyAzimuthSectors),YCOS(NumOfSkyAzimuthSectors)
+  real(r8) :: SkyAzimuthAngle(NumOfSkyAzimuthSectors)
 ! begin_execution
 
 
@@ -83,10 +84,10 @@ module StartsMod
   call InitControlParms
   !
   !  IRRADIANCE INTERCEPTION GEOMETRY, plant model
-  call InitIrradianceGeometry(YSIN,YCOS,YAZI)
+  call InitIrradianceGeometry(YSIN,YCOS,SkyAzimuthAngle)
   !  CALCULATE ELEVATION OF EACH GRID CELL
   !
-  call InitGridElevation(NHW,NHE,NVN,NVS,YSIN,YCOS,YAZI,ALTY)
+  call InitGridElevation(NHW,NHE,NVN,NVS,YSIN,YCOS,SkyAzimuthAngle,ALTY)
   !
   !     INITIALIZE ACCUMULATORS AND MASS BALANCE CHECKS
   !     OF EACH GRID CELL
@@ -188,8 +189,8 @@ module StartsMod
 !
 !     INITIALIZE COMMUNITY CANOPY
 !
-  GridMaxCanopyHeight(:,:)=0.0_r8
-  CanopyHeightz(0:JC,:,:)=0.0_r8
+  MaxCanopyHeight_grd(:,:)=0.0_r8
+  CanopyHeightz_col(0:JC,:,:)=0.0_r8
   CanopyLAgrid_lyr(1:JC,:,:)=0.0_r8
   CanopyStemA_lyr(1:JC,:,:)=0.0_r8
   WGLFT(1:JC,:,:)=0.0_r8
@@ -557,18 +558,18 @@ module StartsMod
   end subroutine initFertArrays
 
 !------------------------------------------------------------------------------------------
-  subroutine InitGridElevation(NHW,NHE,NVN,NVS,YSIN,YCOS,YAZI,ALTY)
+  subroutine InitGridElevation(NHW,NHE,NVN,NVS,YSIN,YCOS,SkyAzimuthAngle,ALTY)
   implicit none
   integer, intent(in) :: NHW,NHE,NVN,NVS
-  real(r8),intent(in) :: YSIN(JSA),YCOS(JSA),YAZI(JSA)
+  real(r8),intent(in) :: YSIN(NumOfSkyAzimuthSectors),YCOS(NumOfSkyAzimuthSectors),SkyAzimuthAngle(NumOfSkyAzimuthSectors)
   REAL(R8),INTENT(OUT):: ALTY
   integer :: NY,NX,N,NN
   REAL(R8) :: DGAZI
-  real(r8) :: GSINA(JY,JX),GCOSA(JY,JX)  !diagnostic
+  real(r8) :: SineGrndSurfAzimuth_col(JY,JX),CosineGrndSurfAzimuth_col(JY,JX)  !diagnostic
 
 ! begin_execution
-! GAZI=ground surface azimuth, aspect in radians
-! GSIN,GCOS=sine,cosine of ground surface
+! GroundSurfAzimuth_col=ground surface azimuth, aspect in radians
+! SineGrndSlope_col,CosineGrndSlope_col=sine,cosine of ground surface
 ! OMEGAG=incident sky angle at ground surface
 ! SLOPE=sine of ground surface slope in (0)aspect, (1)EW,(2)NS directions
 ! ALT=ground surface elevation
@@ -577,16 +578,16 @@ module StartsMod
 ! ASP=aspect angle in degree
   ALTY=0.0_r8
   write(*,1112)'NY','NX','east','west','south','north','altitude','Dist(m):E-W','Dist(m):N-S',&
-    'aspect(o)','slope(o)','slope0','slope-east','slope-north','GSIN','GCOS','GSINA'
+    'aspect(o)','slope(o)','slope0','slope-east','slope-north','SineGrndSlope_col','CosineGrndSlope_col','SineGrndSurfAzimuth_col'
 1112    FORMAT(2A4,4A6,20A12)
   D9985: DO NX=NHW,NHE
     D9980: DO NY=NVN,NVS
       ZEROS(NY,NX)=ZERO*DH(NY,NX)*DV(NY,NX)
       ZEROS2(NY,NX)=ZERO2*DH(NY,NX)*DV(NY,NX)
 !     compute slopes
-      GAZI(NY,NX)=ASP(NY,NX)*RadianPerDegree   !radian
-      GSINA(NY,NX)=ABS(SIN(GAZI(NY,NX)))
-      GCOSA(NY,NX)=ABS(COS(GAZI(NY,NX)))
+      GroundSurfAzimuth_col(NY,NX)=ASP(NY,NX)*RadianPerDegree   !radian
+      SineGrndSurfAzimuth_col(NY,NX)=ABS(SIN(GroundSurfAzimuth_col(NY,NX)))
+      CosineGrndSurfAzimuth_col(NY,NX)=ABS(COS(GroundSurfAzimuth_col(NY,NX)))
       SLOPE(0,NY,NX)=AMAX1(1.745E-04_r8,SIN(SL(NY,NX)*RadianPerDegree))  !small slope approximation
 
       IF(ASP(NY,NX).GE.0.0_r8.AND.ASP(NY,NX).LT.90.0_r8)THEN
@@ -633,11 +634,12 @@ module StartsMod
       ENDIF
 
 !    compute incident sky angle at ground surface
-      GSIN(NY,NX)=SLOPE(0,NY,NX)    !this is exact
-      GCOS(NY,NX)=SQRT(1.0_r8-GSIN(NY,NX)**2._r8)
-      D240: DO N=1,JSA
-        DGAZI=COS(GAZI(NY,NX)-YAZI(N))
-        OMEGAG(N,NY,NX)=AZMAX1(AMIN1(1.0_r8,GCOS(NY,NX)*YSIN(N)+GSIN(NY,NX)*YCOS(N)*DGAZI))
+      SineGrndSlope_col(NY,NX)=SLOPE(0,NY,NX)    !this is exact
+      CosineGrndSlope_col(NY,NX)=SQRT(1.0_r8-SineGrndSlope_col(NY,NX)**2._r8)
+      D240: DO N=1,NumOfSkyAzimuthSectors
+        DGAZI=COS(GroundSurfAzimuth_col(NY,NX)-SkyAzimuthAngle(N))
+        OMEGAG(N,NY,NX)=AZMAX1(AMIN1(1.0_r8,CosineGrndSlope_col(NY,NX)*YSIN(N)+ &
+          SineGrndSlope_col(NY,NX)*YCOS(N)*DGAZI))
       ENDDO D240
 !     compute ground surface elevation
 !     DH, length in e-w direction
@@ -679,7 +681,7 @@ module StartsMod
       WRITE(*,1111)NX,NY,((XGridRunoffFlag(NN,N,NY,NX),NN=1,2),N=1,2) &
         ,ALT(NY,NX),DH(NY,NX),DV(NY,NX),ASP(NY,NX),SL(NY,NX) &
         ,SLOPE(0,NY,NX),SLOPE(1,NY,NX),SLOPE(2,NY,NX) &
-        ,GSIN(NY,NX),GCOSA(NY,NX),GSINA(NY,NX)
+        ,SineGrndSlope_col(NY,NX),CosineGrndSurfAzimuth_col(NY,NX),SineGrndSurfAzimuth_col(NY,NX)
 1111  FORMAT(2I4,4L6,20E12.4)
     ENDDO D9980
   ENDDO D9985
@@ -815,12 +817,12 @@ module StartsMod
   TSHX(:,:)=0.0_r8
   Eco_NEE_col(:,:)=0.0_r8
   CanH2OHeldVg(:,:)=0.0_r8
-  CanopyLA_grd(:,:)=0.0_r8
-  StemAreag(:,:)=0.0_r8
+  CanopyLeafArea_grd(:,:)=0.0_r8
+  StemArea_grd(:,:)=0.0_r8
   PrecIntcptByCanG(:,:)=0.0_r8
   PPT(:,:)=0.0_r8
   DayLenthCurrent(:,:)=12.0_r8
-  ALBX(:,:)=SoilAlbedo(:,:)
+  SurfAlbedo_col(:,:)=SoilAlbedo(:,:)
   XHVSTE(:,:,:)=0.0_r8
   EnergyImpact4Erosion(:,:)=0.0_r8
   end subroutine InitAccumulators
@@ -970,7 +972,7 @@ module StartsMod
   real(r8) :: tPBOT
   integer :: NY,NX,NM
   real(r8) :: LandScape1stSoiLayDepth
-  real(r8) :: YSIN(JSA),YCOS(JSA),YAZI(JSA)
+  real(r8) :: YSIN(NumOfSkyAzimuthSectors),YCOS(NumOfSkyAzimuthSectors),SkyAzimuthAngle(NumOfSkyAzimuthSectors)
 
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
@@ -983,10 +985,10 @@ module StartsMod
   call InitControlParms
 
   !  IRRADIANCE INTERCEPTION GEOMETRY, plant model
-  call InitIrradianceGeometry(YSIN,YCOS,YAZI)
+  call InitIrradianceGeometry(YSIN,YCOS,SkyAzimuthAngle)
   !  CALCULATE ELEVATION OF EACH GRID CELL
   !
-  call InitGridElevation(NHW,NHE,NVN,NVS,YSIN,YCOS,YAZI,ALTY)
+  call InitGridElevation(NHW,NHE,NVN,NVS,YSIN,YCOS,SkyAzimuthAngle,ALTY)
 
 
   call InitAccumulators()
@@ -1084,8 +1086,8 @@ module StartsMod
 !
 !     INITIALIZE COMMUNITY CANOPY
 !
-  GridMaxCanopyHeight(:,:)=0.0_r8
-  CanopyHeightz(0:JC,:,:)=0.0_r8
+  MaxCanopyHeight_grd(:,:)=0.0_r8
+  CanopyHeightz_col(0:JC,:,:)=0.0_r8
   CanopyLAgrid_lyr(1:JC,:,:)=0.0_r8
   CanopyStemA_lyr(1:JC,:,:)=0.0_r8
   WGLFT(1:JC,:,:)=0.0_r8

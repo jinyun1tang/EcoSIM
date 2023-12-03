@@ -63,9 +63,9 @@ module CanopyDataType
   real(r8),target,allocatable ::  CanPCi2CaRatio(:,:,:)                        !Ci:Ca ratio, [-]
   real(r8),target,allocatable ::  RadNet2CanP(:,:,:)                 !canopy net radiation , [MJ d-2 h-1] >0
   real(r8),target,allocatable ::  LWRadCanP(:,:,:)                   !canopy longwave radiation , [MJ d-2 h-1]
-  real(r8),target,allocatable ::  SWRadByCanP(:,:,:)                 !canopy absorbed shortwave radiation , [MJ d-2 h-1]
-  real(r8),target,allocatable ::  PARbyCanopy_pft(:,:,:)                   !canopy absorbed PAR , [umol m-2 s-1]
-  real(r8),target,allocatable ::  FracPARbyCanopy_pft(:,:,:)                       !fraction of incoming PAR absorbed by canopy, [-]
+  real(r8),target,allocatable ::  RadSWbyCanopy_pft(:,:,:)                 !canopy absorbed shortwave radiation , [MJ d-2 h-1]
+  real(r8),target,allocatable ::  RadPARbyCanopy_pft(:,:,:)                   !canopy absorbed PAR , [umol m-2 s-1]
+  real(r8),target,allocatable ::  FracRadPARbyCanopy_pft(:,:,:)                       !fraction of incoming PAR absorbed by canopy, [-]
   real(r8),target,allocatable ::  TAU0(:,:,:)                        !fraction of radiation transmitted by canopy layer, [-]
   real(r8),target,allocatable ::  TAUS(:,:,:)                        !fraction of radiation intercepted by canopy layer, [-]
   real(r8),target,allocatable ::  FracSWRad2Grnd(:,:)                         !fraction of radiation intercepted by ground surface, [-]
@@ -212,9 +212,9 @@ module CanopyDataType
   allocate(CanPCi2CaRatio(JP,JY,JX));     CanPCi2CaRatio=0._r8
   allocate(RadNet2CanP(JP,JY,JX));     RadNet2CanP=0._r8
   allocate(LWRadCanP(JP,JY,JX));    LWRadCanP=0._r8
-  allocate(SWRadByCanP(JP,JY,JX));     SWRadByCanP=0._r8
-  allocate(PARbyCanopy_pft(JP,JY,JX));     PARbyCanopy_pft=0._r8
-  allocate(FracPARbyCanopy_pft(JP,JY,JX));    FracPARbyCanopy_pft=0._r8
+  allocate(RadSWbyCanopy_pft(JP,JY,JX));     RadSWbyCanopy_pft=0._r8
+  allocate(RadPARbyCanopy_pft(JP,JY,JX));     RadPARbyCanopy_pft=0._r8
+  allocate(FracRadPARbyCanopy_pft(JP,JY,JX));    FracRadPARbyCanopy_pft=0._r8
   allocate(TAU0(JC+1,JY,JX));   TAU0=0._r8
   allocate(TAUS(JC+1,JY,JX));   TAUS=0._r8
   allocate(FracSWRad2Grnd(JY,JX));       FracSWRad2Grnd=0._r8
@@ -362,9 +362,9 @@ module CanopyDataType
   call destroy(CanPCi2CaRatio)
   call destroy(RadNet2CanP)
   call destroy(LWRadCanP)
-  call destroy(SWRadByCanP)
-  call destroy(PARbyCanopy_pft)
-  call destroy(FracPARbyCanopy_pft)
+  call destroy(RadSWbyCanopy_pft)
+  call destroy(RadPARbyCanopy_pft)
+  call destroy(FracRadPARbyCanopy_pft)
   call destroy(TAU0)
   call destroy(TAUS)
   call destroy(FracSWRad2Grnd)
