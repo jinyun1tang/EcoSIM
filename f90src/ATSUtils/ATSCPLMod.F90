@@ -106,6 +106,24 @@ contains
   pressure_at_field_capacity = props%field_capacity
   pressure_at_wilting_point = props%wilting_point
 
+  ! Move write statements to the end
+  !write(*, *) "Shortwave Radiation (SRAD):", srad
+  !write(*, *) "Longwave Radiation (SUNRAD):", sunrad
+  !write(*, *) "Air Temperature (TAIRC):", tairc
+  !write(*, *) "Vapor Pressure in Air (VPAIR):", vpair
+  !write(*, *) "Wind Speed (UWIND):", uwind
+  !write(*, *) "Precipitation (PREC):", prec
+  !write(*, *) "Atmospheric N2 (ATM_N2):", atm_n2
+  !write(*, *) "Atmospheric O2 (ATM_O2):", atm_o2
+  !write(*, *) "Atmospheric CO2 (ATM_CO2):", atm_co2
+  !write(*, *) "Atmospheric CH4 (ATM_CH4):", atm_ch4
+  !write(*, *) "Atmospheric N2O (ATM_N2O):", atm_n2o
+  !write(*, *) "Atmospheric H2 (ATM_H2):", atm_h2
+  !write(*, *) "Atmospheric NH3 (ATM_NH3):", atm_nh3
+  !write(*, *) "Heat Capacity (HEAT_CAPACITY):", heat_capacity
+  !write(*, *) "Pressure at Field Capacity (PRESSURE_AT_FIELD_CAPACITY):", pressure_at_field_capacity
+  !write(*, *) "Pressure at Wilting Point (PRESSURE_AT_WILTING_POINT):", pressure_at_wilting_point
+
   !call c_f_pointer(props%plant_wilting_factor%data, data2D, [(/size_col/),(/num_cols/)])
   !a_WP=data2D(:,:)
 
@@ -126,8 +144,6 @@ contains
 
   call c_f_pointer(state%surface_energy_source%data, data, (/num_cols/))
   surf_e_source = data(:)
-
-
 
   write(*,*) "Data Transfer Finished"
   end subroutine ATS2EcoSIMData
