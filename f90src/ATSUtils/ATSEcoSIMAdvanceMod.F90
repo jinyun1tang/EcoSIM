@@ -75,6 +75,13 @@ implicit none
   PSIAtFldCapacity = pressure_at_field_capacity
   PSIAtWiltPoint = pressure_at_wilting_point
 
+  SWRadOnGrnd = srad
+  LWRadSky = sunrad
+  TairK = tairc+273.15
+  VPA = vpair
+  WindSpeedAtm = uwind
+  RainH = prec
+
   !What are I and J are these a loop?
   write(*,*) "Running StageSurfacePhysModel"
   call StageSurfacePhysModel(I,J,NHW,NHE,NVN,NVS,ResistanceLitRLay)
