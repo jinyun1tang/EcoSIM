@@ -66,7 +66,12 @@ implicit none
 
   PSIAtFldCapacity = pressure_at_field_capacity
   PSIAtWiltPoint = pressure_at_wilting_point
-
+  SWRadOnGrnd = srad
+  LWRadSky = sunrad
+  TairK = tairc+273.15
+  VPA = vpair
+  WindSpeedAtm = uwind
+  RainH = prec
   call startsim(NHW,NHE,NVN,NVS)
 
   write(*,*) "Finished Subroutine Init_EcoSIM_Soil"
