@@ -7,7 +7,9 @@ module ATSEcoSIMAdvanceMod
   use SOMDataType
   USE SoilPhysDataType
   use LandSurfDataType
-  use ClimForcDataType
+  use CanopyDataType, only: SWRadOnGrnd
+  use ClimForcDataType, only : LWRadSky, TairK, &
+      VPA, WindSpeedAtm, RainH  
   use SoilPropertyDataType
   use HydroThermData, only : PSISM1, TKSoi1, VLHeatCapacity, &
       SoilFracAsMicP, VLWatMicP1, VLiceMicP1 !need the only as some vars are double defined
