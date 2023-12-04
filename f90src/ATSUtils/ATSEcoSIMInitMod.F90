@@ -6,7 +6,9 @@ module ATSEcoSIMInitMod
   use SOMDataType
   USE SoilPhysDataType
   use LandSurfDataType
-  use ClimForcDataType
+  use CanopyDataType, only: SWRadOnGrnd
+  use ClimForcDataType, only : LWRadSky, TairK, &
+      VPA, WindSpeedAtm, RainH
   use SoilPropertyDataType
 implicit none
   character(len=*), private, parameter :: mod_filename=&
