@@ -41,6 +41,7 @@ Module SharedDataMod
   real(r8), allocatable :: uwind(:)       !wind speed, m/s
   real(r8), allocatable :: prec(:)        !precipitation, mm H2O/hr
   real(r8), allocatable :: sunrad(:)      !solar radiation,
+  real(r8), allocatable :: swrad(:)       !shortwave radiation,
   real(r8), allocatable :: vpair(:)       !vapor pressure deficit
   real(r8), allocatable :: surf_e_source(:) !surface energy source
   real(r8), allocatable :: surf_w_source(:) !surface water source
