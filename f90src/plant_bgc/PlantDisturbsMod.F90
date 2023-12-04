@@ -76,7 +76,7 @@ module PlantDisturbsMod
     HVST     =>  plt_distb%HVST   , &
     IHVST    =>  plt_distb%IHVST  , &
     THIN_pft     =>  plt_distb%THIN_pft   , &
-    pftPlantPopulation       =>  plt_site%pftPlantPopulation      , &
+    PlantPopulation_pft       =>  plt_site%PlantPopulation_pft      , &
     NU       =>  plt_site%NU      , &
     ZERO     =>  plt_site%ZERO    , &
     SolarNoonHour_col   =>  plt_site%SolarNoonHour_col  , &
@@ -158,9 +158,9 @@ module PlantDisturbsMod
 !
     call PlantDisturbance(I,J,NZ)
 
-    ZEROP(NZ)=ZERO*pftPlantPopulation(NZ)
-    ZEROQ(NZ)=ZERO*pftPlantPopulation(NZ)/AREA3(NU)
-    ZEROL(NZ)=ZERO*pftPlantPopulation(NZ)*1.0E+06_r8
+    ZEROP(NZ)=ZERO*PlantPopulation_pft(NZ)
+    ZEROQ(NZ)=ZERO*PlantPopulation_pft(NZ)/AREA3(NU)
+    ZEROL(NZ)=ZERO*PlantPopulation_pft(NZ)*1.0E+06_r8
   ENDIF
   end associate
   end subroutine RemoveBiomassByDisturbance
@@ -681,7 +681,7 @@ module PlantDisturbsMod
     UVOLO    =>  plt_ew%UVOLO        , &
     CanWatP    =>  plt_ew%CanWatP        , &
     VHeatCapCanP    =>  plt_ew%VHeatCapCanP        , &
-    PSICanP    =>  plt_ew%PSICanP        , &
+    PSICanopy_pft   =>  plt_ew%PSICanopy_pft       , &
     PPX      =>  plt_site%PPX        , &
      RootMycoNonstructElmnt_vr   =>  plt_biom%RootMycoNonstructElmnt_vr     , &
     RootProteinC_pvr    =>  plt_biom%RootProteinC_pvr      , &
@@ -721,19 +721,19 @@ module PlantDisturbsMod
     FWODLE   =>  plt_allom%FWODLE    , &
     FWODRE   =>  plt_allom%FWODRE    , &
     iPlantBranchState    =>  plt_pheno%iPlantBranchState     , &
-    iPlantPhenologyPattern   =>  plt_pheno%iPlantPhenologyPattern    , &
+    iPlantPhenologyPattern_pft   =>  plt_pheno%iPlantPhenologyPattern_pft    , &
     iPlantState    =>  plt_pheno%iPlantState     , &
     iPlantMorphologyType   =>  plt_pheno%iPlantMorphologyType    , &
     iPlantTurnoverPattern   =>  plt_pheno%iPlantTurnoverPattern    , &
-    iPlantPhenologyType   =>  plt_pheno%iPlantPhenologyType    , &
-    iPlantRootState   =>  plt_pheno%iPlantRootState    , &
-    iPlantShootState    =>  plt_pheno%iPlantShootState     , &
+    iPlantPhenologyType_pft   =>  plt_pheno%iPlantPhenologyType_pft    , &
+    iPlantRootState_pft   =>  plt_pheno%iPlantRootState_pft    , &
+    iPlantShootState_pft    =>  plt_pheno%iPlantShootState_pft     , &
     CMassHCO3BundleSheath_node     =>  plt_photo%CMassHCO3BundleSheath_node      , &
     CMassCO2BundleSheath_node     =>  plt_photo%CMassCO2BundleSheath_node      , &
     CPOOL3   =>  plt_photo%CPOOL3    , &
     CPOOL4   =>  plt_photo%CPOOL4    , &
-    MaxRootLayNum       =>  plt_site%MaxRootLayNum         , &
-    pftPlantPopulation       =>  plt_site%pftPlantPopulation         , &
+    MaxNumRootLays       =>  plt_site%MaxNumRootLays         , &
+    PlantPopulation_pft       =>  plt_site%PlantPopulation_pft         , &
     iYearCurrent     =>  plt_site%iYearCurrent       , &
     SolarNoonHour_col   =>  plt_site%SolarNoonHour_col     , &
     VOLWOU   =>  plt_site%VOLWOU     , &
@@ -792,7 +792,7 @@ module PlantDisturbsMod
       IF(I.GT.iDayPlanting(NZ).OR.iYearCurrent.GT.iYearPlanting(NZ))THEN
         XHVST=XCORP
         PPX(NZ)=PPX(NZ)*XHVST
-        pftPlantPopulation(NZ)=pftPlantPopulation(NZ)*XHVST
+        PlantPopulation_pft(NZ)=PlantPopulation_pft(NZ)*XHVST
         FracRadPARbyCanopy_pft(NZ)=FracRadPARbyCanopy_pft(NZ)*XHVST
         VHeatCapCanP(NZ)=VHeatCapCanP(NZ)*XHVST
         CanopyLeafShethC_pft(NZ)=0._r8
@@ -805,7 +805,7 @@ module PlantDisturbsMod
 !
         D8975: DO NB=1,NumOfBranches_pft(NZ)
           IF(iPlantBranchState(NB,NZ).EQ.iLive)THEN
-            IF(pftPlantPopulation(NZ).LE.0.0)then
+            IF(PlantPopulation_pft(NZ).LE.0.0)then
               iPlantBranchState(NB,NZ)=iDead
             endif
 !
@@ -825,8 +825,8 @@ module PlantDisturbsMod
 !     WTHSKB,WTEARB,WTGRB=branch husk,ear,grain C mass
 !     WTHSBN,WTEABN,WTGRBN=branch husk,ear,grain N mass
 !     WTHSBP,WTEABP,WTGRBP=branch husk,ear,grain P mass
-!     iPlantPhenologyPattern=growth habit:0=annual,1=perennial from PFT file
-!     iPlantPhenologyType=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
+!     iPlantPhenologyPattern_pft=growth habit:0=annual,1=perennial from PFT file
+!     iPlantPhenologyType_pft=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
 !     WTRVC,WTRVN,WTRVP=storage C,N,P
 !     iPlantTurnoverPattern=turnover:0=all abve-grd,1=all leaf+petiole,2=none,3=between 1,2
 !     iPlantMorphologyType=growth type:0=bryophyte,1=graminoid,2=shrub,tree
@@ -857,7 +857,7 @@ module PlantDisturbsMod
                   *CFOPE(NE,icwood,M,NZ)*(LeafChemElmnts_brch(NE,NB,NZ)*FWODLE(NE,k_woody_litr) &
                   +PetioleChemElmnts_brch(NE,NB,NZ)*FWODBE(NE,k_woody_litr))
 
-                IF(iPlantPhenologyPattern(NZ).EQ.iplt_annual.AND.iPlantPhenologyType(NZ).NE.0)THEN
+                IF(iPlantPhenologyPattern_pft(NZ).EQ.iplt_annual.AND.iPlantPhenologyType_pft(NZ).NE.0)THEN
                   NonstructalChemElmnts_pft(NE,NZ)=NonstructalChemElmnts_pft(NE,NZ)+XHVST1*CFOPE(NE,inonfoliar,M,NZ)*GrainChemElmnts_brch(NE,NB,NZ)
                 ELSE
                   LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,0,NZ)=LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,0,NZ)+XHVST1 &
@@ -929,15 +929,15 @@ module PlantDisturbsMod
           ENDIF
         ENDDO D8975
 !
-!     PSICanP=canopy water potential
+!     PSICanopy_pft=canopy water potential
 !     CanWatP=water volume in canopy
 !     VOLWOU,UVOLO=accumulated water loss for water balance calculation
 !
         VOLWPX=CanWatP(NZ)
         WVPLT=AZMAX1(CanopyLeafShethC_pft(NZ)+CanopyStalkC_pft(NZ))
 
-        FDM=get_FDM(PSICanP(NZ))
-!        APSILT=ABS(PSICanP(NZ))
+        FDM=get_FDM(PSICanopy_pft(NZ))
+!        APSILT=ABS(PSICanopy_pft(NZ))
 !        FDM=0.16_r8+0.10_r8*APSILT/(0.05_r8*APSILT+2.0_r8)
 
         CanWatP(NZ)=ppmc*WVPLT/FDM
@@ -947,15 +947,15 @@ module PlantDisturbsMod
 !     TERMINATE ROOTS IF TILLAGE IMPLEMENT 10 IS SELECTED
 !
 !     PP=PFT population
-!     IDTHR,iPlantShootState=PFT root,shoot living flag: 0=alive,1=dead
+!     IDTHR,iPlantShootState_pft=PFT root,shoot living flag: 0=alive,1=dead
 !     IDTH=PFT living flag: 0=alive,1=dead
 !     JHVST=terminate PFT:0=no,1=yes,2=yes,and reseed
 !     iDayPlantHarvest,iYearPlantHarvest=day,year of harvesting
 !     iYearCurrent=current year
 !
-        IF(pftPlantPopulation(NZ).LE.0.0_r8)THEN
-          iPlantRootState(NZ)=iDead
-          iPlantShootState(NZ)=iDead
+        IF(PlantPopulation_pft(NZ).LE.0.0_r8)THEN
+          iPlantRootState_pft(NZ)=iDead
+          iPlantShootState_pft(NZ)=iDead
           iPlantState(NZ)=iDead
           JHVST(NZ)=ihv_terminate
           iDayPlantHarvest(NZ)=I
@@ -971,7 +971,7 @@ module PlantDisturbsMod
 !     WTRT1,WTRT1N,WTRT1P=primary root C,N,P mass in soil layer
 !     WTRT2,WTRT2N,WTRT2P=secondary root C,N,P mass in soil layer
 !
-        D8980: DO L=NU,MaxRootLayNum
+        D8980: DO L=NU,MaxNumRootLays
           D8985: DO N=1,MY(NZ)
 
             D6385: DO M=1,jsken
@@ -1075,7 +1075,7 @@ module PlantDisturbsMod
 !     LITTERFALL AND STATE VARIABLES FOR SEASONAL STORAGE RESERVES
 !     DURING TILLAGE
 !
-!     iPlantPhenologyPattern=growth habit:0=annual,1=perennial from PFT file
+!     iPlantPhenologyPattern_pft=growth habit:0=annual,1=perennial from PFT file
 !     CSNC,ZSNC,PSNC=C,N,P litterfall from disturbance
 !     CFOPC,CFOPN,CFOPC=fraction of litterfall C,N,P allocated to litter components
 !     XHVST,XHVSN,XHVSP=fraction of root C,N,P remaining after disturbance
@@ -1165,24 +1165,24 @@ module PlantDisturbsMod
     CO2ByFire_pft    =>  plt_distb%CO2ByFire_pft   , &
     UVOLO    =>  plt_ew%UVOLO      , &
     CanWatP    =>  plt_ew%CanWatP      , &
-    PSICanP    =>  plt_ew%PSICanP      , &
+    PSICanopy_pft   =>  plt_ew%PSICanopy_pft     , &
     CMassHCO3BundleSheath_node     =>  plt_photo%CMassHCO3BundleSheath_node    , &
     CMassCO2BundleSheath_node     =>  plt_photo%CMassCO2BundleSheath_node    , &
     CPOOL3   =>  plt_photo%CPOOL3  , &
     CPOOL4   =>  plt_photo%CPOOL4  , &
-    pftPlantPopulation       =>  plt_site%pftPlantPopulation       , &
+    PlantPopulation_pft       =>  plt_site%PlantPopulation_pft       , &
     PPI      =>  plt_site%PPI      , &
     PPX      =>  plt_site%PPX      , &
     NU       =>  plt_site%NU       , &
-    MaxRootLayNum       => plt_site%MaxRootLayNum        , &
+    MaxNumRootLays       => plt_site%MaxNumRootLays        , &
     SolarNoonHour_col   => plt_site%SolarNoonHour_col    , &
     ZEROS    => plt_site%ZEROS     , &
     ZERO     => plt_site%ZERO      , &
     AREA3    => plt_site%AREA3     , &
     VOLWOU   => plt_site%VOLWOU    , &
-     RootMycoNonstructElmnt_vr   => plt_biom%RootMycoNonstructElmnt_vr    , &
+    RootMycoNonstructElmnt_vr   => plt_biom%RootMycoNonstructElmnt_vr    , &
     RootProteinC_pvr    => plt_biom%RootProteinC_pvr     , &
-     PopuPlantRootC_vr    => plt_biom% PopuPlantRootC_vr     , &
+    PopuPlantRootC_vr    => plt_biom% PopuPlantRootC_vr     , &
     RootStructBiomC_vr   => plt_biom%RootStructBiomC_vr    , &
     NonstructalChemElmnts_pft    => plt_biom%NonstructalChemElmnts_pft     , &
     CanopyStalkC_pft    => plt_biom%CanopyStalkC_pft     , &
@@ -1234,16 +1234,16 @@ module PlantDisturbsMod
     GrainSeedBiomCMean_brch    => plt_allom%GrainSeedBiomCMean_brch    , &
     iPlantBranchState    =>  plt_pheno%iPlantBranchState   , &
     fTgrowCanP     =>  plt_pheno%fTgrowCanP    , &
-    iPlantCalendar    =>  plt_pheno%iPlantCalendar   , &
+    iPlantCalendar_brch   =>  plt_pheno%iPlantCalendar_brch  , &
     MatureGroup_brch   =>  plt_pheno%MatureGroup_brch  , &
     LeafNumberAtFloralInit_brch   =>  plt_pheno%LeafNumberAtFloralInit_brch  , &
     iPlantMorphologyType   =>  plt_pheno%iPlantMorphologyType  , &
     iPlantTurnoverPattern   =>  plt_pheno%iPlantTurnoverPattern  , &
     doInitLeafOut_brch    =>  plt_pheno%doInitLeafOut_brch   , &
-    iPlantPhenologyPattern   =>  plt_pheno%iPlantPhenologyPattern  , &
+    iPlantPhenologyPattern_pft   =>  plt_pheno%iPlantPhenologyPattern_pft  , &
     HourThreshold4LeafOff    =>  plt_pheno%HourThreshold4LeafOff   , &
     Hours4LeafOff     =>  plt_pheno%Hours4LeafOff    , &
-    iPlantPhenologyType   =>  plt_pheno%iPlantPhenologyType  , &
+    iPlantPhenologyType_pft   =>  plt_pheno%iPlantPhenologyType_pft  , &
     TotalNodeNumNormByMatgrp_brch   =>  plt_pheno%TotalNodeNumNormByMatgrp_brch  , &
     TotalReprodNodeNumNormByMatrgrp_brch   =>  plt_pheno%TotalReprodNodeNumNormByMatrgrp_brch  , &
     HourWithNoGrainFill_brch     =>  plt_pheno%HourWithNoGrainFill_brch    , &
@@ -1333,11 +1333,11 @@ module PlantDisturbsMod
       IF(JHVST(NZ).NE.ihv_tmareseed)THEN
         !terminate and reseed
         PPX(NZ)=PPX(NZ)*(1._r8-THIN_pft(NZ))
-        pftPlantPopulation(NZ)=pftPlantPopulation(NZ)*(1._r8-THIN_pft(NZ))
+        PlantPopulation_pft(NZ)=PlantPopulation_pft(NZ)*(1._r8-THIN_pft(NZ))
       ELSE
 !     PPI(NZ)=AMAX1(1.0_r8,0.5_r8*(PPI(NZ)+CanopySeedNumber_pft(NZ)/AREA3(NU)))
         PPX(NZ)=PPI(NZ)
-        pftPlantPopulation(NZ)=PPX(NZ)*AREA3(NU)
+        PlantPopulation_pft(NZ)=PPX(NZ)*AREA3(NU)
       ENDIF
       IF(IHVST(NZ).EQ.3)THEN
         ClumpFactor(NZ)=ClumpFactor(NZ)*HVST(NZ)
@@ -2207,7 +2207,7 @@ module PlantDisturbsMod
 !     WTEARB,WTEABN,WTEABP=ear C,N,P mass
 !     WTGRB,WTGRBN,WTGRBP=grain C,N,P mass
 !     StalkBiomassC_brch=stalk sapwood mass
-!     PSICanP=canopy water potential
+!     PSICanopy_pft=canopy water potential
 !     CanWatP=water volume in canopy
 !     VOLWOU,UVOLO=accumulated water loss for water balance calculation
 !
@@ -2231,8 +2231,8 @@ module PlantDisturbsMod
         VOLWPX=CanWatP(NZ)
         WVPLT=AZMAX1(CanopyLeafShethC_pft(NZ)+CanopyStalkC_pft(NZ))
 
-        FDM=get_FDM(PSICanP(NZ))
-!        APSILT=ABS(PSICanP(NZ))
+        FDM=get_FDM(PSICanopy_pft(NZ))
+!        APSILT=ABS(PSICanopy_pft(NZ))
 !        FDM=0.16_r8+0.10_r8*APSILT/(0.05_r8*APSILT+2.0_r8)
         CanWatP(NZ)=ppmc*WVPLT/FDM
 
@@ -2249,9 +2249,9 @@ module PlantDisturbsMod
 !          IHVST=3:reduction of clumping factor
 !          IHVST=4 or 6:animal or insect biomass(g LM m-2),IHVST=5:fire
 !     ZC=canopy height
-!     iPlantPhenologyType=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
+!     iPlantPhenologyType_pft=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
 !     Hours4LeafOff,VRNX=leafoff hours,hours required for leafoff
-!     iPlantCalendar(ipltcal_Emerge,=emergence date
+!     iPlantCalendar_brch(ipltcal_Emerge,=emergence date
 !     GROUP=node number required for floral initiation
 !     NodeNumberToInitFloral=node number at floral initiation
 !     NodeNumberAtAnthesis=node number at flowering
@@ -2264,9 +2264,9 @@ module PlantDisturbsMod
         IF((iPlantTurnoverPattern(NZ).EQ.0.OR.(.not.is_plant_treelike(iPlantMorphologyType(NZ)))) &
           .AND.(IHVST(NZ).NE.4.AND.IHVST(NZ).NE.6) &
           .AND.CanopyHeight_pft(NZ).GT.HVST(NZ))THEN
-          IF((iPlantPhenologyType(NZ).NE.0.AND.Hours4LeafOff(NB,NZ) &
-            .LE.FVRN(iPlantPhenologyType(NZ))*HourThreshold4LeafOff(NB,NZ)) &
-            .OR.(iPlantPhenologyType(NZ).EQ.iphenotyp_evgreen.AND.iPlantCalendar(ipltcal_Emerge,NB,NZ).NE.0))THEN
+          IF((iPlantPhenologyType_pft(NZ).NE.0.AND.Hours4LeafOff(NB,NZ) &
+            .LE.FVRN(iPlantPhenologyType_pft(NZ))*HourThreshold4LeafOff(NB,NZ)) &
+            .OR.(iPlantPhenologyType_pft(NZ).EQ.iphenotyp_evgreen.AND.iPlantCalendar_brch(ipltcal_Emerge,NB,NZ).NE.0))THEN
             MatureGroup_brch(NB,NZ)=MatureGroup_pft(NZ)
             NodeNumberToInitFloral(NB,NZ)=ShootNodeNumber(NB,NZ)
             NodeNumberAtAnthesis(NB,NZ)=0._r8
@@ -2274,9 +2274,9 @@ module PlantDisturbsMod
             TotalNodeNumNormByMatgrp_brch(NB,NZ)=0._r8
             TotalReprodNodeNumNormByMatrgrp_brch(NB,NZ)=0._r8
             HourWithNoGrainFill_brch(NB,NZ)=0._r8
-            iPlantCalendar(ipltcal_Emerge,NB,NZ)=I
+            iPlantCalendar_brch(ipltcal_Emerge,NB,NZ)=I
             D3005: DO M=2,10
-              iPlantCalendar(M,NB,NZ)=0
+              iPlantCalendar_brch(M,NB,NZ)=0
             ENDDO D3005
             doInitLeafOut_brch(NB,NZ)=0
             IF(NB.EQ.NumOfMainBranch_pft(NZ))THEN
@@ -2289,9 +2289,9 @@ module PlantDisturbsMod
                   TotalNodeNumNormByMatgrp_brch(NBX,NZ)=0._r8
                   TotalReprodNodeNumNormByMatrgrp_brch(NBX,NZ)=0._r8
                   HourWithNoGrainFill_brch(NBX,NZ)=0._r8
-                  iPlantCalendar(ipltcal_Emerge,NBX,NZ)=I
+                  iPlantCalendar_brch(ipltcal_Emerge,NBX,NZ)=I
                   D3015: DO M=2,10
-                    iPlantCalendar(M,NBX,NZ)=0
+                    iPlantCalendar_brch(M,NBX,NZ)=0
                   ENDDO D3015
                   doInitLeafOut_brch(NBX,NZ)=0
                 ENDIF
@@ -2313,7 +2313,7 @@ module PlantDisturbsMod
         IF(JHVST(NZ).NE.ihv_noaction)then
           iPlantBranchState(NB,NZ)=iDead
         endif
-        IF(pftPlantPopulation(NZ).LE.0.0)then
+        IF(PlantPopulation_pft(NZ).LE.0.0)then
           iPlantBranchState(NB,NZ)=iDead
         endif
       ENDDO D9835
@@ -2355,7 +2355,7 @@ module PlantDisturbsMod
       IF(IHVST(NZ).NE.4.AND.IHVST(NZ).NE.6)THEN
         XHVST(ielmc)=1.0_r8-THIN_pft(NZ)
         D3985: DO N=1,MY(NZ)
-          D3980: DO L=NU,MaxRootLayNum
+          D3980: DO L=NU,MaxNumRootLays
             IF(IHVST(NZ).NE.5)THEN
               XHVST(ielmc)=1.0_r8-THIN_pft(NZ)
               XHVST(ielmn)=XHVST(ielmc)
@@ -2505,13 +2505,13 @@ module PlantDisturbsMod
 !
 !     STORAGE LITTERFALL AND STATE VARIABLES DURING HARVESTING
 !
-!     iPlantPhenologyPattern=growth habit:0=annual,1=perennial from PFT file
+!     iPlantPhenologyPattern_pft=growth habit:0=annual,1=perennial from PFT file
 !     CSNC,ZSNC,PSNC=C,N,P litterfall from disturbance
 !     CFOPC,CFOPN,CFOPC=fraction of litterfall C,N,P allocated to litter components
 !     XHVST,XHVSN,XHVSP=fraction of root C,N,P remaining after disturbance
 !     WTRVC,WTRVN,WTRVP=storage C,N,P
 !
-        IF(iPlantPhenologyPattern(NZ).NE.iplt_annual)THEN
+        IF(iPlantPhenologyPattern_pft(NZ).NE.iplt_annual)THEN
           DO NE=1,NumOfPlantChemElmnts
             D3400: DO M=1,jsken
               LitterFallChemElmnt_pftvr(NE,M,k_woody_litr,NGTopRootLayer_pft(NZ),NZ)=LitterFallChemElmnt_pftvr(NE,M,k_woody_litr,NGTopRootLayer_pft(NZ),NZ) &

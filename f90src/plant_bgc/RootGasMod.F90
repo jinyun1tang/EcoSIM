@@ -62,7 +62,7 @@ module RootGasMod
   associate(                       &
     RootStructChemElmnt_pft =>  plt_biom%RootStructChemElmnt_pft   , &
     ZEROP  =>  plt_biom%ZEROP    , &
-    pftPlantPopulation     =>  plt_site%pftPlantPopulation       , &
+    PlantPopulation_pft     =>  plt_site%PlantPopulation_pft       , &
     DPTHZ  =>  plt_site%DPTHZ    , &
     CCH4E  =>  plt_site%CCH4E    , &
     CCO2E  =>  plt_site%CCO2E    , &
@@ -111,7 +111,7 @@ module RootGasMod
     THETPM =>  plt_soilchem%THETPM,&
     trc_gasml=> plt_soilchem%trc_gasml,&
     DiffusivitySolutEff   =>  plt_soilchem%DiffusivitySolutEff , &
-    iPlantCalendar  =>  plt_pheno%iPlantCalendar   , &
+    iPlantCalendar_brch =>  plt_pheno%iPlantCalendar_brch  , &
     RootPoreTortu4Gas  =>  plt_morph%RootPoreTortu4Gas   , &
     PrimRootRadius  =>  plt_morph%PrimRootRadius   , &
     AveSecndRootLen  =>  plt_morph%AveSecndRootLen   , &
@@ -187,7 +187,7 @@ module RootGasMod
 
     RTVLWA=RootVH2O_vr(N,L,NZ)*trcs_VLN(ids_NH4,L)
     RTVLWB=RootVH2O_vr(N,L,NZ)*trcs_VLN(ids_NH4B,L)
-    UPMXP=ROXYP(N,L,NZ)*dts_gas/pftPlantPopulation(NZ)
+    UPMXP=ROXYP(N,L,NZ)*dts_gas/PlantPopulation_pft(NZ)
     ROXYFX=ROXYF(L)*FOXYX*dts_gas
     RCO2FX=RCO2F(L)*FOXYX*dts_gas
     ROXYLX=ROXYL(L)*FOXYX*dts_gas
@@ -233,7 +233,7 @@ module RootGasMod
 !     AveSecndRootLen=average secondary root length
 !
     IF(RootStructChemElmnt_pft(ielmc,NZ).GT.ZEROP(NZ).AND.FracSoiLayByPrimRoot(L,NZ).GT.ZERO)THEN
-      RTCR1=AMAX1(pftPlantPopulation(NZ),PrimRootXNumL(N,L,NZ)) &
+      RTCR1=AMAX1(PlantPopulation_pft(NZ),PrimRootXNumL(N,L,NZ)) &
         *PICON*PrimRootRadius(N,L,NZ)**2/DPTHZ(L)
       RTCR2=(SecndRootXNum_pvr(N,L,NZ)*PICON*SecndRootRadius(N,L,NZ)**2 &
         /AveSecndRootLen(N,L,NZ))/FracSoiLayByPrimRoot(L,NZ)
@@ -250,7 +250,7 @@ module RootGasMod
 !     BETWEEN AQUEOUS AND GASEOUS PHASES
 !
 !     RootLenPerPopu_pvr=root,myco length per plant
-!     iPlantCalendar(ipltcal_Emerge,=emergence date
+!     iPlantCalendar_brch(ipltcal_Emerge,=emergence date
 !     RTARR=root surface area/radius for uptake
 !     RRADP=path length for radial diffusion within root
 !     DIFOP=aqueous diffusivity of O2 within root
@@ -262,7 +262,7 @@ module RootGasMod
 !     RCO2PX=root CO2 gas flux at time step for gas flux calculations
 !     RCO2A=root CO2 flux from grosub.f
 !
-    IF(N.EQ.1.AND.iPlantCalendar(ipltcal_Emerge,NumOfMainBranch_pft(NZ),NZ).GT.0.AND.RootLenPerPopu_pvr(N,L,NZ).GT.ZEROP(NZ))THEN
+    IF(N.EQ.1.AND.iPlantCalendar_brch(ipltcal_Emerge,NumOfMainBranch_pft(NZ),NZ).GT.0.AND.RootLenPerPopu_pvr(N,L,NZ).GT.ZEROP(NZ))THEN
       RTARRX=RootAreaDivRadius(N,L)/RRADP(N,NZ)
       DIFOP=OLSGLP*RTARRX
 
@@ -450,32 +450,32 @@ module RootGasMod
 !     C*P1=root aqueous concentration
 !
 
-          RUPOSX=RDFOXS*pftPlantPopulation(NZ)
-          RUPOPX=RDFOXP*pftPlantPopulation(NZ)
+          RUPOSX=RDFOXS*PlantPopulation_pft(NZ)
+          RUPOPX=RDFOXP*PlantPopulation_pft(NZ)
           RDFCOS=RMFCOS+DIFCL*(CCO2S1-CCO2P1)
           RDXCOS=(RootVH2O_vr(N,L,NZ)*AMAX1(ZEROP(NZ),CO2S1) &
             -VLWatMicPMM*AMAX1(ZEROP(NZ),CO2P1))/VOLWSP
           IF(RDFCOS.GT.0.0)THEN
-            RCO2SX=AMIN1(AZMAX1(RDXCOS),RDFCOS*pftPlantPopulation(NZ))
+            RCO2SX=AMIN1(AZMAX1(RDXCOS),RDFCOS*PlantPopulation_pft(NZ))
           ELSE
-            RCO2SX=AMAX1(AZMIN1(RDXCOS),RDFCOS*pftPlantPopulation(NZ))
+            RCO2SX=AMAX1(AZMIN1(RDXCOS),RDFCOS*PlantPopulation_pft(NZ))
           ENDIF
           IF(N.EQ.1)THEN
             RDFCHS=RMFCHS+DIFCL*(CCH4S1-CCH4P1)
             RDXCHS=(RootVH2O_vr(N,L,NZ)*AMAX1(ZEROP(NZ),CH4S1) &
               -VLWatMicPMM*AMAX1(ZEROP(NZ),CH4P1))/VOLWSP
             IF(RDFCHS.GT.0.0)THEN
-              RUPCSX=AMIN1(AZMAX1(RDXCHS),RDFCHS*pftPlantPopulation(NZ))
+              RUPCSX=AMIN1(AZMAX1(RDXCHS),RDFCHS*PlantPopulation_pft(NZ))
             ELSE
-              RUPCSX=AMAX1(AZMIN1(RDXCHS),RDFCHS*pftPlantPopulation(NZ))
+              RUPCSX=AMAX1(AZMIN1(RDXCHS),RDFCHS*PlantPopulation_pft(NZ))
             ENDIF
             RDFN2S=RMFN2S+DIFZL*(CN2OS1-CN2OP1)
             RDXN2S=(RootVH2O_vr(N,L,NZ)*AMAX1(ZEROP(NZ),Z2OS1) &
               -VLWatMicPMM*AMAX1(ZEROP(NZ),Z2OP1))/VOLWSP
             IF(RDFN2S.GT.0.0)THEN
-              RUPZSX=AMIN1(AZMAX1(RDXN2S),RDFN2S*pftPlantPopulation(NZ))
+              RUPZSX=AMIN1(AZMAX1(RDXN2S),RDFN2S*PlantPopulation_pft(NZ))
             ELSE
-              RUPZSX=AMAX1(AZMIN1(RDXN2S),RDFN2S*pftPlantPopulation(NZ))
+              RUPZSX=AMAX1(AZMIN1(RDXN2S),RDFN2S*PlantPopulation_pft(NZ))
             ENDIF
             RDFN3S=RMFN3S+DIFNL*(CNH3S1-CNH3P1)
             IF(VOLWSA.GT.ZEROP(NZ))THEN
@@ -486,9 +486,9 @@ module RootGasMod
               RDXNHS=0.0_r8
             ENDIF
             IF(RDFN3S.GT.0.0)THEN
-              RUPNSX=AMIN1(AZMAX1(RDXNHS),RDFN3S*pftPlantPopulation(NZ))
+              RUPNSX=AMIN1(AZMAX1(RDXNHS),RDFN3S*PlantPopulation_pft(NZ))
             ELSE
-              RUPNSX=AMAX1(AZMIN1(RDXNHS),RDFN3S*pftPlantPopulation(NZ))
+              RUPNSX=AMAX1(AZMIN1(RDXNHS),RDFN3S*PlantPopulation_pft(NZ))
             ENDIF
             RDFN3B=RMFN3B+DIFNB*(CNH3B1-CNH3P1)
             IF(VOLWSB.GT.ZEROP(NZ))THEN
@@ -499,17 +499,17 @@ module RootGasMod
               RDXNHB=0.0_r8
             ENDIF
             IF(RDFN3B.GT.0.0)THEN
-              RUPNBX=AMIN1(AZMAX1(RDXNHB),RDFN3B*pftPlantPopulation(NZ))
+              RUPNBX=AMIN1(AZMAX1(RDXNHB),RDFN3B*PlantPopulation_pft(NZ))
             ELSE
-              RUPNBX=AMAX1(AZMIN1(RDXNHB),RDFN3B*pftPlantPopulation(NZ))
+              RUPNBX=AMAX1(AZMIN1(RDXNHB),RDFN3B*PlantPopulation_pft(NZ))
             ENDIF
             RDFHGS=RMFHGS+DIFHL*(CH2GS1-CH2GP1)
             RDXHGS=(RootVH2O_vr(N,L,NZ)*AMAX1(ZEROP(NZ),H2GS1) &
               -VLWatMicPMM*AMAX1(ZEROP(NZ),H2GP1))/VOLWSP
             IF(RDFHGS.GT.0.0)THEN
-              RUPHGX=AMIN1(AZMAX1(RDXHGS),RDFHGS*pftPlantPopulation(NZ))
+              RUPHGX=AMIN1(AZMAX1(RDXHGS),RDFHGS*PlantPopulation_pft(NZ))
             ELSE
-              RUPHGX=AMAX1(AZMIN1(RDXHGS),RDFHGS*pftPlantPopulation(NZ))
+              RUPHGX=AMAX1(AZMIN1(RDXHGS),RDFHGS*PlantPopulation_pft(NZ))
             ENDIF
           ELSE
             RUPCSX=0.0_r8

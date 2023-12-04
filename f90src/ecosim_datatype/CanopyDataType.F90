@@ -80,12 +80,12 @@ module CanopyDataType
   real(r8),target,allocatable ::  HeatStorCanP(:,:,:)                       !canopy storage heat flux, [MJ d-2 h-1]
   real(r8),target,allocatable ::  ENGYX(:,:,:)                       !canopy heat storage from previous time step, [MJ d-2]
   real(r8),target,allocatable ::  VHeatCapCanP(:,:,:)                       !canopy heat capacity, [MJ d-2 K-1]
-  real(r8),target,allocatable ::  PSICanP(:,:,:)                     !plant canopy total water potential , [Mpa]
+  real(r8),target,allocatable ::  PSICanopy_pft(:,:,:)                     !plant canopy total water potential , [Mpa]
   real(r8),target,allocatable ::  PSICanPTurg(:,:,:)                       !plant canopy turgor water potential, [Mpa]
   real(r8),target,allocatable ::  PSICanPOsmo(:,:,:)                 !platn canopy osmotic water potential, [Mpa]
   real(r8),target,allocatable ::  CanPbndlResist(:,:,:)                          !canopy boundary layer resistance, [h m-1]
-  real(r8),target,allocatable ::  PTrans(:,:,:)                          !canopy transpiration, [m2 d-2 h-1]
-  real(r8),target,allocatable ::  VapXAir2PCan(:,:,:)                !negative of canopy evaporation, [m2 d-2 h-1]
+  real(r8),target,allocatable ::  Transpiration_pft(:,:,:)                          !canopy transpiration, [m2 d-2 h-1]
+  real(r8),target,allocatable ::  VapXAir2Canopy_pft(:,:,:)                !negative of canopy evaporation, [m2 d-2 h-1]
   real(r8),target,allocatable ::  CanWatP(:,:,:)                       !canopy water content associated with dry matter, [m3 d-2]
   real(r8),target,allocatable ::  TEVAPP(:,:)                        !total canopy evaporation + transpiration, [m3 d-2]
   real(r8),target,allocatable ::  VapXAir2CanG(:,:)                        !total canopy evaporation, [m3 d-2]
@@ -95,10 +95,10 @@ module CanopyDataType
   real(r8),target,allocatable ::  LWRadCanG(:,:)                         !total canopy LW emission, [MJ d-2 h-1]
   real(r8),target,allocatable ::  CanopySWAlbedo_pft(:,:,:)                        !canopy shortwave albedo , [-]
   real(r8),target,allocatable ::  TAUR(:,:,:)                        !canopy shortwave transmissivity , [-]
-  real(r8),target,allocatable ::  PrecIntcptByCanP(:,:,:)                        !water flux into plant canopy, [m3 d-2 h-1]
+  real(r8),target,allocatable ::  PrecIntcptByCanopy_pft(:,:,:)                        !water flux into plant canopy, [m3 d-2 h-1]
   real(r8),target,allocatable ::  WatByPCanopy(:,:,:)                   !canopy held water content, [m3 d-2]
   real(r8),target,allocatable ::  TKC(:,:,:)                         !canopy temperature, [K]
-  real(r8),target,allocatable ::  TCelciusCanopy(:,:,:)                         !canopy temperature, [oC]
+  real(r8),target,allocatable ::  TCelciusCanopy_pft(:,:,:)                         !canopy temperature, [oC]
   real(r8),target,allocatable ::  DTKC(:,:,:)                        !change in canopy temperature, [K]
   real(r8),target,allocatable ::  TKCZ(:,:,:)                        !canopy temperature, [K]
   real(r8),target,allocatable ::  CPOOL3(:,:,:,:,:)                  !minimum sink strength for nonstructural C transfer, [g d-2]
@@ -229,12 +229,12 @@ module CanopyDataType
   allocate(HeatStorCanP(JP,JY,JX));    HeatStorCanP=0._r8
   allocate(ENGYX(JP,JY,JX));    ENGYX=0._r8
   allocate(VHeatCapCanP(JP,JY,JX));    VHeatCapCanP=0._r8
-  allocate(PSICanP(JP,JY,JX));    PSICanP=0._r8
+  allocate(PSICanopy_pft(JP,JY,JX));    PSICanopy_pft=0._r8
   allocate(PSICanPTurg(JP,JY,JX));    PSICanPTurg=0._r8
   allocate(PSICanPOsmo(JP,JY,JX));    PSICanPOsmo=0._r8
   allocate(CanPbndlResist(JP,JY,JX));       CanPbndlResist=0._r8
-  allocate(PTrans(JP,JY,JX));       PTrans=0._r8
-  allocate(VapXAir2PCan(JP,JY,JX));    VapXAir2PCan=0._r8
+  allocate(Transpiration_pft(JP,JY,JX));       Transpiration_pft=0._r8
+  allocate(VapXAir2Canopy_pft(JP,JY,JX));    VapXAir2Canopy_pft=0._r8
   allocate(CanWatP(JP,JY,JX));    CanWatP=0._r8
   allocate(TEVAPP(JY,JX));      TEVAPP=0._r8
   allocate(VapXAir2CanG(JY,JX));      VapXAir2CanG=0._r8
@@ -244,10 +244,10 @@ module CanopyDataType
   allocate(LWRadCanG(JY,JX));       LWRadCanG=0._r8
   allocate(CanopySWAlbedo_pft(JP,JY,JX));     CanopySWAlbedo_pft=0._r8
   allocate(TAUR(JP,JY,JX));     TAUR=0._r8
-  allocate(PrecIntcptByCanP(JP,JY,JX));     PrecIntcptByCanP=0._r8
+  allocate(PrecIntcptByCanopy_pft(JP,JY,JX));     PrecIntcptByCanopy_pft=0._r8
   allocate(WatByPCanopy(JP,JY,JX));    WatByPCanopy=0._r8
   allocate(TKC(JP,JY,JX));      TKC=0._r8
-  allocate(TCelciusCanopy(JP,JY,JX));      TCelciusCanopy=0._r8
+  allocate(TCelciusCanopy_pft(JP,JY,JX));      TCelciusCanopy_pft=0._r8
   allocate(DTKC(JP,JY,JX));     DTKC=0._r8
   allocate(TKCZ(JP,JY,JX));     TKCZ=0._r8
   allocate(CPOOL3(MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));CPOOL3=0._r8
@@ -379,12 +379,12 @@ module CanopyDataType
   call destroy(HeatStorCanP)
   call destroy(ENGYX)
   call destroy(VHeatCapCanP)
-  call destroy(PSICanP)
+  call destroy(PSICanopy_pft)
   call destroy(PSICanPTurg)
   call destroy(PSICanPOsmo)
   call destroy(CanPbndlResist)
-  call destroy(PTrans)
-  call destroy(VapXAir2PCan)
+  call destroy(Transpiration_pft)
+  call destroy(VapXAir2Canopy_pft)
   call destroy(CanWatP)
   call destroy(TEVAPP)
   call destroy(VapXAir2CanG)
@@ -394,10 +394,10 @@ module CanopyDataType
   call destroy(LWRadCanG)
   call destroy(CanopySWAlbedo_pft)
   call destroy(TAUR)
-  call destroy(PrecIntcptByCanP)
+  call destroy(PrecIntcptByCanopy_pft)
   call destroy(WatByPCanopy)
   call destroy(TKC)
-  call destroy(TCelciusCanopy)
+  call destroy(TCelciusCanopy_pft)
   call destroy(DTKC)
   call destroy(TKCZ)
   call destroy(CPOOL3)

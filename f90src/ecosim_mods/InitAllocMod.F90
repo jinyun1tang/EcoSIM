@@ -63,7 +63,7 @@ implicit none
 
   call InitPlantMorphSize()
 
-  call InitGrosub(NumGrowthStages,JRS)
+  call InitGrosub(NumGrowthStages,MaxNumRootAxes)
 
   call InitGridData
 
@@ -160,7 +160,7 @@ implicit none
   pltpar%MaxNumBranches    = 10    !number of branches
   MaxNumBranches=pltpar%MaxNumBranches
   NumLitterGroups=pltpar%NumLitterGroups
-  JRS=pltpar%JRS
+  MaxNumRootAxes=pltpar%MaxNumRootAxes
 
 
   end subroutine InitPlantMorphSize

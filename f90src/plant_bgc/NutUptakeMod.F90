@@ -55,7 +55,7 @@ module NutUptakeMod
   integer :: NB
 
   associate(                        &
-    TCelciusCanopy    =>  plt_ew%TCelciusCanopy       , &
+    TCelciusCanopy_pft    =>  plt_ew%TCelciusCanopy_pft       , &
     NU      =>  plt_site%NU       , &
     AREA3   =>  plt_site%AREA3    , &
     CNH3E   =>  plt_site%CNH3E    , &
@@ -76,8 +76,8 @@ module NutUptakeMod
   !     CONCENTRATION DIFFERENCES 'CNH3E' (ATMOSPHERE FROM 'READS') AND
   !     'CNH3P' (CANOPY), AND FROM STOMATAL + BOUNDARY LAYER RESISTANCE
   !
-  !     SNH3P,SNH3X=NH3 solubility at TCelciusCanopy, 25 oC
-  !     TCelciusCanopy=canopy temperature (oC)
+  !     SNH3P,SNH3X=NH3 solubility at TCelciusCanopy_pft, 25 oC
+  !     TCelciusCanopy_pft=canopy temperature (oC)
   !     FDMP,FNH3P=canopy dry matter content,NH3 concentration
   !     LeafAreaLive_brch,CanopyLeafArea_pft=branch,canopy leaf area
   !     CNH3P,CNH3E=gaseous NH3 concentration in branch,atmosphere
@@ -86,7 +86,7 @@ module NutUptakeMod
   !     RA,CanPStomaResistH2O=canopy boundary layer,stomatal resistance
   !     FracRadPARbyCanopy_pft=fraction of radiation received by each PFT canopy
   !
-  SNH3P=SNH3X*EXP(0.513_r8-0.0171_r8*TCelciusCanopy(NZ))
+  SNH3P=SNH3X*EXP(0.513_r8-0.0171_r8*TCelciusCanopy_pft(NZ))
   FNH3P=1.0E-04_r8*FDMP
   D105: DO NB=1,NumOfBranches_pft(NZ)
     IF(LeafPetioleBiomassC_brch(NB,NZ).GT.ZEROP(NZ).AND.LeafAreaLive_brch(NB,NZ).GT.ZEROP(NZ) &
@@ -359,7 +359,7 @@ module NutUptakeMod
 
 ! begin_execution
   associate(                              &
-    pftPlantPopulation      =>  plt_site%pftPlantPopulation         , &
+    PlantPopulation_pft      =>  plt_site%PlantPopulation_pft         , &
     TortMicPM    =>  plt_site%TortMicPM       , &
     ZERO    =>  plt_site%ZERO       , &
     RootAreaPerPlant_vr   =>  plt_morph%RootAreaPerPlant_vr     , &
@@ -449,7 +449,7 @@ module NutUptakeMod
     PlantSoluteUptakeConfig%SoluteConc =trc_solml(ids_NO3,L)
     PlantSoluteUptakeConfig%SoluteMassMax=ZNO3X
     PlantSoluteUptakeConfig%CAvailStress=FCUP
-    PlantSoluteUptakeConfig%PlantPopulation= pftPlantPopulation(NZ)
+    PlantSoluteUptakeConfig%PlantPopulation= PlantPopulation_pft(NZ)
     PlantSoluteUptakeConfig%SoluteKM=UPKMZO(N,NZ)
 
     call SoluteUptakeByPlantRoots(PlantSoluteUptakeConfig,RUNNOP(N,L,NZ),RootNO3Uptake_pvr(N,L,NZ),&
@@ -510,7 +510,7 @@ module NutUptakeMod
     PlantSoluteUptakeConfig%SoluteConc =trc_solcl(ids_NO3B,L)
     PlantSoluteUptakeConfig%SoluteMassMax=ZNOBX
     PlantSoluteUptakeConfig%CAvailStress=FCUP
-    PlantSoluteUptakeConfig%PlantPopulation= pftPlantPopulation(NZ)
+    PlantSoluteUptakeConfig%PlantPopulation= PlantPopulation_pft(NZ)
     PlantSoluteUptakeConfig%SoluteKM=UPKMZO(N,NZ)
 
     call SoluteUptakeByPlantRoots(PlantSoluteUptakeConfig,RUNNXP(N,L,NZ),RUONOB(N,L,NZ),&
@@ -538,7 +538,7 @@ module NutUptakeMod
   type(PlantSoluteUptakeConfig_type) :: PlantSoluteUptakeConfig
 ! begin_execution
   associate(                              &
-    pftPlantPopulation      =>  plt_site%pftPlantPopulation         , &
+    PlantPopulation_pft      =>  plt_site%PlantPopulation_pft         , &
     ZERO    =>  plt_site%ZERO       , &
     TortMicPM    =>  plt_site%TortMicPM       , &
     fTgrowRootP    =>  plt_pheno%fTgrowRootP      , &
@@ -623,7 +623,7 @@ module NutUptakeMod
     PlantSoluteUptakeConfig%SoluteConc =trc_solcl(ids_NH4,L)
     PlantSoluteUptakeConfig%SoluteMassMax=ZNH4X
     PlantSoluteUptakeConfig%CAvailStress=FCUP
-    PlantSoluteUptakeConfig%PlantPopulation= pftPlantPopulation(NZ)
+    PlantSoluteUptakeConfig%PlantPopulation= PlantPopulation_pft(NZ)
     PlantSoluteUptakeConfig%SoluteKM=UPKMZH(N,NZ)
 
     call SoluteUptakeByPlantRoots(PlantSoluteUptakeConfig,RUNNHP(N,L,NZ),RUONH4(N,L,NZ),&
@@ -685,7 +685,7 @@ module NutUptakeMod
     PlantSoluteUptakeConfig%SoluteConc =trc_solcl(ids_NH4B,L)
     PlantSoluteUptakeConfig%SoluteMassMax=ZNHBX
     PlantSoluteUptakeConfig%CAvailStress=FCUP
-    PlantSoluteUptakeConfig%PlantPopulation= pftPlantPopulation(NZ)
+    PlantSoluteUptakeConfig%PlantPopulation= PlantPopulation_pft(NZ)
     PlantSoluteUptakeConfig%SoluteKM=UPKMZH(N,NZ)
 
     call SoluteUptakeByPlantRoots(PlantSoluteUptakeConfig,RUNNBP(N,L,NZ),RUONHB(N,L,NZ),&
@@ -716,7 +716,7 @@ module NutUptakeMod
   type(PlantSoluteUptakeConfig_type) :: PlantSoluteUptakeConfig
   !     begin_execution
   associate(                             &
-    pftPlantPopulation      => plt_site%pftPlantPopulation         , &
+    PlantPopulation_pft      => plt_site%PlantPopulation_pft         , &
     ZERO    => plt_site%ZERO       , &
     fTgrowRootP    => plt_pheno%fTgrowRootP      , &
     RootAutoRO2Limiter_pvr    => plt_rbgc%RootAutoRO2Limiter_pvr       , &
@@ -791,7 +791,7 @@ module NutUptakeMod
     PlantSoluteUptakeConfig%SoluteConc =trc_solcl(ids_H1PO4,L)
     PlantSoluteUptakeConfig%SoluteMassMax=H1POX
     PlantSoluteUptakeConfig%CAvailStress=FCUP
-    PlantSoluteUptakeConfig%PlantPopulation= pftPlantPopulation(NZ)
+    PlantSoluteUptakeConfig%PlantPopulation= PlantPopulation_pft(NZ)
     PlantSoluteUptakeConfig%SoluteKM=UPKMPO(N,NZ)
 
     call SoluteUptakeByPlantRoots(PlantSoluteUptakeConfig,RUPP1P(N,L,NZ),RUOH1P(N,L,NZ),&
@@ -851,7 +851,7 @@ module NutUptakeMod
     PlantSoluteUptakeConfig%SoluteConc =trc_solcl(ids_H1PO4B,L)
     PlantSoluteUptakeConfig%SoluteMassMax=H1PXB
     PlantSoluteUptakeConfig%CAvailStress=FCUP
-    PlantSoluteUptakeConfig%PlantPopulation= pftPlantPopulation(NZ)
+    PlantSoluteUptakeConfig%PlantPopulation= PlantPopulation_pft(NZ)
     PlantSoluteUptakeConfig%SoluteKM=UPKMPO(N,NZ)
 
     call SoluteUptakeByPlantRoots(PlantSoluteUptakeConfig,RUPP1B(N,L,NZ),RUOH1B(N,L,NZ),&
@@ -878,7 +878,7 @@ module NutUptakeMod
   type(PlantSoluteUptakeConfig_type) :: PlantSoluteUptakeConfig
   !
   associate(                             &
-    pftPlantPopulation      => plt_site%pftPlantPopulation         , &
+    PlantPopulation_pft      => plt_site%PlantPopulation_pft         , &
     ZERO    => plt_site%ZERO       , &
     RootAutoRO2Limiter_pvr    => plt_rbgc%RootAutoRO2Limiter_pvr       , &
     UPKMPO  => plt_rbgc%UPKMPO     , &
@@ -951,7 +951,7 @@ module NutUptakeMod
       PlantSoluteUptakeConfig%SoluteConc =trc_solcl(ids_H2PO4,L)
       PlantSoluteUptakeConfig%SoluteMassMax=H2POX
       PlantSoluteUptakeConfig%CAvailStress=FCUP
-      PlantSoluteUptakeConfig%PlantPopulation= pftPlantPopulation(NZ)
+      PlantSoluteUptakeConfig%PlantPopulation= PlantPopulation_pft(NZ)
       PlantSoluteUptakeConfig%SoluteKM=UPKMPO(N,NZ)
 
       call SoluteUptakeByPlantRoots(PlantSoluteUptakeConfig,RUPP2P(N,L,NZ),RUOH2P(N,L,NZ),&
@@ -1013,7 +1013,7 @@ module NutUptakeMod
     PlantSoluteUptakeConfig%SoluteConc =trc_solcl(ids_H2PO4B,L)
     PlantSoluteUptakeConfig%SoluteMassMax=H2PXB
     PlantSoluteUptakeConfig%CAvailStress=FCUP
-    PlantSoluteUptakeConfig%PlantPopulation= pftPlantPopulation(NZ)
+    PlantSoluteUptakeConfig%PlantPopulation= PlantPopulation_pft(NZ)
     PlantSoluteUptakeConfig%SoluteKM=UPKMPO(N,NZ)
 
     call SoluteUptakeByPlantRoots(PlantSoluteUptakeConfig,RUPP2B(N,L,NZ),RUOH2B(N,L,NZ),&
@@ -1113,7 +1113,7 @@ module NutUptakeMod
     ROXYY   => plt_bgcr%ROXYY   , &
     RCO2N   => plt_rbgc%RCO2N   , &
     ROXYP   => plt_rbgc%ROXYP   , &
-    pftPlantPopulation      => plt_site%pftPlantPopulation      , &
+    PlantPopulation_pft      => plt_site%PlantPopulation_pft      , &
     ZEROS   => plt_site%ZEROS   , &
     ZERO    => plt_site%ZERO    , &
     AllPlantRootH2OUptake_vr   => plt_ew%AllPlantRootH2OUptake_vr     , &
@@ -1175,7 +1175,7 @@ module NutUptakeMod
     FPUP=0.0_r8
   ENDIF
   !NN=0
-  PerPlantRootH2OUptake=AZMAX1(-AllPlantRootH2OUptake_vr(N,L,NZ)/pftPlantPopulation(NZ))
+  PerPlantRootH2OUptake=AZMAX1(-AllPlantRootH2OUptake_vr(N,L,NZ)/PlantPopulation_pft(NZ))
   CumPerPlantRootH2OUptake=PerPlantRootH2OUptake*dts_gas
   !
   !     FACTORS CONSTRAINING O2 AND NUTRIENT UPTAKE AMONG

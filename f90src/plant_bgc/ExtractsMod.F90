@@ -141,7 +141,7 @@ module ExtractsMod
   associate(                       &
     NU    => plt_site%NU     , &
     AREA3 => plt_site%AREA3  , &
-    pftPlantPopulation    => plt_site%pftPlantPopulation     , &
+    PlantPopulation_pft    => plt_site%PlantPopulation_pft     , &
     RUPP1B=> plt_rbgc%RUPP1B , &
     RUPP2B=> plt_rbgc%RUPP2B , &
     RUNNXP=> plt_rbgc%RUNNXP , &
@@ -212,7 +212,7 @@ module ExtractsMod
 !     PP=PFT population, this is dynamic, and can goes to zero
 !
       IF(N.EQ.ipltroot)THEN
-        RTDNT(L)=RTDNT(L)+RootLenthDensPerPopu_pvr(N,L,NZ)*pftPlantPopulation(NZ)/AREA3(L)
+        RTDNT(L)=RTDNT(L)+RootLenthDensPerPopu_pvr(N,L,NZ)*PlantPopulation_pft(NZ)/AREA3(L)
       ENDIF
 !
 !     TOTAL WATER UPTAKE
@@ -359,9 +359,9 @@ module ExtractsMod
     RNH3B => plt_rbgc%RNH3B  , &
     PlantRootSoilChemNetX_pft=> plt_rbgc%PlantRootSoilChemNetX_pft , &
     TRootGasLoss_disturb => plt_rbgc%TRootGasLoss_disturb  , &
-    PTrans    => plt_ew%PTrans       , &
-    PrecIntcptByCanP  => plt_ew%PrecIntcptByCanP     , &
-    VapXAir2PCan => plt_ew%VapXAir2PCan    , &
+    Transpiration_pft   => plt_ew%Transpiration_pft      , &
+    PrecIntcptByCanopy_pft  => plt_ew%PrecIntcptByCanopy_pft     , &
+    VapXAir2Canopy_pft=> plt_ew%VapXAir2Canopy_pft   , &
     WatByPCanopy => plt_ew%WatByPCanopy    , &
     CanWatP => plt_ew%CanWatP    , &
     Eco_Heat_Grnd_col   => plt_ew%Eco_Heat_Grnd_col      , &
@@ -411,7 +411,7 @@ module ExtractsMod
 !     CanWatg,CanH2OHeldVg=total water volume in canopy,on canopy surfaces
 !     CanWatP,WatByPCanopy=PFT water volume in canopy,on canopy surfaces
 !     TEVAPP,VapXAir2CanG=total water flux to,from canopy,canopy surfaces
-!     VapXAir2PCan,PTrans=water flux to,from canopy surfaces, inside canopy
+!     VapXAir2PCan,Transpiration_pft=water flux to,from canopy surfaces, inside canopy
 !     TENGYC=total canopy water heat content
 !     ENGYC=PFT canopy water heat content
 !     CanopyLeafArea_grd,StemArea_grd=total leaf,stalk area
@@ -428,14 +428,14 @@ module ExtractsMod
   Eco_Heat_Sens_col=Eco_Heat_Sens_col+HeatXAir2PCan(NZ)
   Eco_Heat_Grnd_col=Eco_Heat_Grnd_col+HeatStorCanP(NZ)
   Canopy_NEE_col=Canopy_NEE_col+CO2NetFix_pft(NZ)
-  ETCanP(NZ)=ETCanP(NZ)+PTrans(NZ)+VapXAir2PCan(NZ)
+  ETCanP(NZ)=ETCanP(NZ)+Transpiration_pft(NZ)+VapXAir2Canopy_pft(NZ)
   CanWatg=CanWatg+CanWatP(NZ)
   CanH2OHeldVg=CanH2OHeldVg+WatByPCanopy(NZ)
-  TEVAPP=TEVAPP+PTrans(NZ)+VapXAir2PCan(NZ)
-  VapXAir2CanG=VapXAir2CanG+VapXAir2PCan(NZ)
-  ENGYC=cpw*(WatByPCanopy(NZ)+PrecIntcptByCanP(NZ)+VapXAir2PCan(NZ))*TKC(NZ)
+  TEVAPP=TEVAPP+Transpiration_pft(NZ)+VapXAir2Canopy_pft(NZ)
+  VapXAir2CanG=VapXAir2CanG+VapXAir2Canopy_pft(NZ)
+  ENGYC=cpw*(WatByPCanopy(NZ)+PrecIntcptByCanopy_pft(NZ)+VapXAir2Canopy_pft(NZ))*TKC(NZ)
   TENGYC=TENGYC+ENGYC
-  THFLXC=THFLXC+ENGYC-ENGYX(NZ)-(PrecIntcptByCanP(NZ)*cpw*TairK)
+  THFLXC=THFLXC+ENGYC-ENGYX(NZ)-(PrecIntcptByCanopy_pft(NZ)*cpw*TairK)
   ENGYX(NZ)=ENGYC
   LWRadCanG=LWRadCanG+LWRadCanP(NZ)
   CanopyLeafArea_grd=CanopyLeafArea_grd+CanopyLeafArea_pft(NZ)

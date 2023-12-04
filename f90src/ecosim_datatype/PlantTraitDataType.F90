@@ -54,7 +54,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  SeedNumberSet_brch(:,:,:,:)                     !branch grain number, [d-2]
   real(r8),target,allocatable ::  PotentialSeedSites_brch(:,:,:,:)                     !branch potential grain number, [d-2]
   real(r8),target,allocatable ::  CanopySeedNumber_pft(:,:,:)                        !canopy grain number, [d-2]
-  real(r8),target,allocatable ::  pftPlantPopulation(:,:,:)             !plant population, [d-2]
+  real(r8),target,allocatable ::  PlantPopulation_pft(:,:,:)             !plant population, [d-2]
   real(r8),target,allocatable ::  InternodeHeightDying_brch(:,:,:,:,:)                  !internode height, [m]
   real(r8),target,allocatable ::  CNLF(:,:,:)                        !maximum leaf N:C ratio, [g g-1]
   real(r8),target,allocatable ::  CPLF(:,:,:)                        !maximum leaf P:C ratio, [g g-1]
@@ -145,7 +145,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  PSICanPDailyMin(:,:,:)                       !minimum daily canopy water potential, [MPa]
   real(r8),target,allocatable ::  ClumpFactorCurrent_pft(:,:,:)                         !clumping factor for self-shading in canopy layer at current LAI, [-]
   real(r8),target,allocatable ::  ClumpFactor(:,:,:)                          !clumping factor for self-shading in canopy layer, [-]
-  integer,target,allocatable ::  iPlantShootState(:,:,:)                        !flag to detect canopy death , [-]
+  integer,target,allocatable ::  iPlantShootState_pft(:,:,:)                        !flag to detect canopy death , [-]
   real(r8),target,allocatable ::  MaxPotentSeedNumber_pft(:,:,:)                        !maximum grain node number per branch, [-]
   real(r8),target,allocatable ::  MaxSeedNumPerSite_pft(:,:,:)                        !maximum grain number per node , [-]
   real(r8),target,allocatable ::  MaxSeedCMass(:,:,:)                        !maximum grain size   , [g]
@@ -155,7 +155,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  HourWithNoGrainFill_brch(:,:,:,:)                      !flag to detect physiological maturity from  grain fill , [-]
   real(r8),target,allocatable ::  HourCounter4LeafOut_brch(:,:,:,:)                      !counter for mobilizing nonstructural C during spring leafout/dehardening, [h]
   real(r8),target,allocatable ::  HoursDoingRemob_brch(:,:,:,:)                      !counter for mobilizing nonstructural C during autumn leafoff/hardening, [h]
-  integer,target,allocatable ::  iPlantCalendar(:,:,:,:,:)                     !plant growth stage, [-]
+  integer,target,allocatable ::  iPlantCalendar_brch(:,:,:,:,:)                     !plant growth stage, [-]
   real(r8),target,allocatable ::  TCelciusChill4Seed(:,:,:)                         !temperature below which seed set is adversely affected, [oC]
   real(r8),target,allocatable ::  HTC(:,:,:)                         !temperature above which seed set is adversely affected, [oC]
   real(r8),target,allocatable ::  SSTX(:,:,:)                        !sensitivity to HTC (seeds oC-1 above HTC)
@@ -213,7 +213,7 @@ contains
   allocate(SeedNumberSet_brch(MaxNumBranches,JP,JY,JX)); SeedNumberSet_brch=0._r8
   allocate(PotentialSeedSites_brch(MaxNumBranches,JP,JY,JX)); PotentialSeedSites_brch=0._r8
   allocate(CanopySeedNumber_pft(JP,JY,JX));     CanopySeedNumber_pft=0._r8
-  allocate(pftPlantPopulation(JP,JY,JX));       pftPlantPopulation=0._r8
+  allocate(PlantPopulation_pft(JP,JY,JX));       PlantPopulation_pft=0._r8
   allocate(InternodeHeightDying_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));InternodeHeightDying_brch=0._r8
   allocate(CNLF(JP,JY,JX));     CNLF=0._r8
   allocate(CPLF(JP,JY,JX));     CPLF=0._r8
@@ -304,7 +304,7 @@ contains
   allocate(PSICanPDailyMin(JP,JY,JX));    PSICanPDailyMin=0._r8
   allocate(ClumpFactorCurrent_pft(JP,JY,JX));      ClumpFactorCurrent_pft=0._r8
   allocate(ClumpFactor(JP,JY,JX));       ClumpFactor=0._r8
-  allocate(iPlantShootState(JP,JY,JX));    iPlantShootState=0
+  allocate(iPlantShootState_pft(JP,JY,JX));    iPlantShootState_pft=0
   allocate(MaxPotentSeedNumber_pft(JP,JY,JX));     MaxPotentSeedNumber_pft=0._r8
   allocate(MaxSeedNumPerSite_pft(JP,JY,JX));     MaxSeedNumPerSite_pft=0._r8
   allocate(MaxSeedCMass(JP,JY,JX));     MaxSeedCMass=0._r8
@@ -314,7 +314,7 @@ contains
   allocate(HourWithNoGrainFill_brch(MaxNumBranches,JP,JY,JX));  HourWithNoGrainFill_brch=0._r8
   allocate(HourCounter4LeafOut_brch(MaxNumBranches,JP,JY,JX));  HourCounter4LeafOut_brch=0._r8
   allocate(HoursDoingRemob_brch(MaxNumBranches,JP,JY,JX));  HoursDoingRemob_brch=0._r8
-  allocate(iPlantCalendar(NumGrowthStages,MaxNumBranches,JP,JY,JX));iPlantCalendar=0
+  allocate(iPlantCalendar_brch(NumGrowthStages,MaxNumBranches,JP,JY,JX));iPlantCalendar_brch=0
   allocate(TCelciusChill4Seed(JP,JY,JX));      TCelciusChill4Seed=0._r8
   allocate(HTC(JP,JY,JX));      HTC=0._r8
   allocate(SSTX(JP,JY,JX));     SSTX=0._r8
@@ -369,7 +369,7 @@ contains
   call destroy(SeedNumberSet_brch)
   call destroy(PotentialSeedSites_brch)
   call destroy(CanopySeedNumber_pft)
-  call destroy(pftPlantPopulation)
+  call destroy(PlantPopulation_pft)
   call destroy(InternodeHeightDying_brch)
   call destroy(CNLF)
   call destroy(CPLF)
@@ -460,7 +460,7 @@ contains
   call destroy(PSICanPDailyMin)
   call destroy(ClumpFactorCurrent_pft)
   call destroy(ClumpFactor)
-  call destroy(iPlantShootState)
+  call destroy(iPlantShootState_pft)
   call destroy(MaxPotentSeedNumber_pft)
   call destroy(MaxSeedNumPerSite_pft)
   call destroy(MaxSeedCMass)
@@ -470,7 +470,7 @@ contains
   call destroy(HourWithNoGrainFill_brch)
   call destroy(HourCounter4LeafOut_brch)
   call destroy(HoursDoingRemob_brch)
-  call destroy(iPlantCalendar)
+  call destroy(iPlantCalendar_brch)
   call destroy(TCelciusChill4Seed)
   call destroy(HTC)
   call destroy(SSTX)

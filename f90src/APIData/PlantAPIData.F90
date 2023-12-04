@@ -11,7 +11,7 @@ implicit none
   public
 
   integer, pointer :: NumGrowthStages       !number of growth stages
-  integer, pointer :: JRS          !maximum number of root layers
+  integer, pointer :: MaxNumRootAxes          !maximum number of root layers
   integer, pointer :: MaxNumBranches         !maximum number of plant branches
   integer, pointer :: JP1         !number of plants
   integer, pointer :: NumOfSkyAzimuthSectors1        !number of sectors for the sky azimuth  [0,2*pi]
@@ -61,7 +61,7 @@ implicit none
   integer :: NumActivePlants      !number of active PFT
   integer :: NL         !lowest soil layer number
   integer :: NP0        !intitial number of plant species
-  integer :: MaxRootLayNum         !maximum root layer number
+  integer :: MaxNumRootLays         !maximum root layer number
   integer :: NP         !number of plant species
   integer :: NU         !soil surface layer number
   integer :: LYRC       !number of days in current year
@@ -77,7 +77,7 @@ implicit none
   real(r8), pointer :: PPI(:)     => null()    !initial plant population, [m-2]
   real(r8), pointer :: PPZ(:)     => null()    !plant population at seeding, [m-2]
   real(r8), pointer :: PPX(:)     => null()    !plant population, [m-2]
-  real(r8), pointer :: pftPlantPopulation(:)      => null()    !plant population, [d-2]
+  real(r8), pointer :: PlantPopulation_pft(:)      => null()    !plant population, [d-2]
   real(r8), pointer :: DPTHZ(:)   => null()    !depth to middle of soil layer from  surface of grid cell [m]
   real(r8), pointer :: FracSoiAsMicP(:)    => null()    !micropore fraction
   real(r8), pointer :: DLYR3(:)   => null()    !vertical thickness of soil layer [m]
@@ -201,8 +201,8 @@ implicit none
   real(r8), pointer :: RootPorosity(:,:)       => null() !root porosity, [m3 m-3]
   real(r8), pointer :: SecndRootXSecArea(:,:)     => null() !root  cross-sectional area  secondary axes, [m2]
   real(r8), pointer :: PrimRootXSecArea(:,:)     => null() !root cross-sectional area primary axes, [m2]
-  real(r8), pointer :: MaxPrimRootRadius1(:,:)     => null() !root diameter primary axes, [m]
-  real(r8), pointer :: MaxSecndRootRadius1(:,:)     => null() !root diameter secondary axes, [m]
+  real(r8), pointer :: Max1stRootRadius1(:,:)     => null() !root diameter primary axes, [m]
+  real(r8), pointer :: Max2ndRootRadius1(:,:)     => null() !root diameter secondary axes, [m]
   real(r8), pointer :: SeedCMass(:)         => null() !grain size at seeding, [g]
   real(r8), pointer :: RootPoreTortu4Gas(:,:)      => null() !power function of root porosity used to calculate root gaseous diffusivity, [-]
   real(r8), pointer :: PrimRootLen(:,:,:,:)  => null() !root layer length primary axes, [m d-2]
@@ -280,8 +280,8 @@ implicit none
   real(r8), pointer :: PrimRootRadius(:,:,:)    => null() !root layer diameter primary axes, [m ]
   real(r8), pointer :: SecndRootRadius(:,:,:)    => null() !root layer diameter secondary axes, [m ]
   real(r8), pointer :: RRADP(:,:)      => null() !root internal radius, [m]
-  real(r8), pointer :: MaxPrimRootRadius(:,:)     => null() !maximum radius of primary roots, [m]
-  real(r8), pointer :: MaxSecndRootRadius(:,:)     => null() !maximum radius of secondary roots, [m]
+  real(r8), pointer :: Max1stRootRadius(:,:)     => null() !maximum radius of primary roots, [m]
+  real(r8), pointer :: Max2ndRootRadius(:,:)     => null() !maximum radius of secondary roots, [m]
   real(r8), pointer :: RSRR(:,:)       => null() !root radial resistivity, [MPa h m-2]
   real(r8), pointer :: RSRA(:,:)       => null() !root axial resistivity, [MPa h m-4]
   real(r8), pointer :: RTDNT(:)        => null() !total root length density, [m m-3]
@@ -311,7 +311,7 @@ implicit none
   real(r8), pointer :: TCelcius4LeafOffHarden(:)     => null()     !threshold temperature for autumn leafoff/hardening, [oC]
   real(r8), pointer :: TKG(:)     => null()     !canopy growth temperature, [K]
   real(r8), pointer :: fTgrowCanP(:)    => null()     !canopy temperature growth function, [-]
-  real(r8), pointer :: HoursCanopyPSITooLow(:)    => null()     !canopy plant water stress indicator, number of hours PSICanP < PSILY, []
+  real(r8), pointer :: HoursCanopyPSITooLow(:)    => null()     !canopy plant water stress indicator, number of hours PSICanopy_pft(< PSILY, []
   real(r8), pointer :: TCelciusChill4Seed(:)     => null()     !temperature below which seed set is adversely affected, [oC]
   real(r8), pointer :: iPlantThermoAdaptZone(:)    => null()     !plant thermal adaptation zone, [-]
   real(r8), pointer :: iPlantInitThermoAdaptZone(:)   => null()     !initial plant thermal adaptation zone, [-]
@@ -333,17 +333,17 @@ implicit none
   integer,  pointer :: Prep4Literfall_brch(:,:)  => null()  !branch phenology flag, [-]
   integer,  pointer :: Hours4LiterfalAftMature_brch(:,:)  => null()  !branch phenology flag, [h]
   integer,  pointer :: KLeafNodeNumber(:,:)  => null()  !leaf growth stage counter, [-]
-  integer,  pointer :: iPlantPhenologyType(:)    => null()  !climate signal for phenological progress: none, temperature, water stress
+  integer,  pointer :: iPlantPhenologyType_pft(:)    => null()  !climate signal for phenological progress: none, temperature, water stress
   integer,  pointer :: iPlantTurnoverPattern(:)    => null()  !phenologically-driven above-ground turnover: all, foliar only, none
-  integer,  pointer :: iPlantShootState(:)    => null()  !flag to detect canopy death
-  integer,  pointer :: iPlantPhenologyPattern(:)    => null()  !plant growth habit: annual or perennial
-  integer,  pointer :: iPlantRootState(:)    => null()  !flag to detect root system death
+  integer,  pointer :: iPlantShootState_pft(:)    => null()  !flag to detect canopy death
+  integer,  pointer :: iPlantPhenologyPattern_pft(:)    => null()  !plant growth habit: annual or perennial
+  integer,  pointer :: iPlantRootState_pft(:)    => null()  !flag to detect root system death
   integer,  pointer :: iPlantDevelopPattern(:)    => null()  !plant growth habit (determinate or indeterminate)
   integer,  pointer :: iPlantPhotoperiodType(:)    => null()  !photoperiod type (neutral, long day, short day)
   integer,  pointer :: iPlantMorphologyType(:)    => null()  !plant growth type (vascular, non-vascular)
   integer,  pointer :: doInitPlant(:)    => null()  !PFT initialization flag:0=no,1=yes
   integer,  pointer :: KLeafNumLowestGrowing_pft(:,:) => null()  !leaf growth stage counter, [-]
-  integer,  pointer :: iPlantCalendar(:,:,:) => null()  !plant growth stage, [-]
+  integer,  pointer :: iPlantCalendar_brch(:,:,:) => null()  !plant growth stage, [-]
   real(r8), pointer :: TotalNodeNumNormByMatgrp_brch(:,:) => null()  !normalized node number during vegetative growth stages , [-]
   real(r8), pointer :: TotalReprodNodeNumNormByMatrgrp_brch(:,:) => null()  !normalized node number during reproductive growth stages , [-]
   real(r8), pointer :: LeafNumberAtFloralInit_brch(:,:)  => null()  !leaf number at floral initiation, [-]
@@ -548,17 +548,17 @@ implicit none
   real(r8) :: BndlResistAboveCanG       !isothermal boundary layer resistance, [h m-1]
   real(r8) :: RIB       !Richardson number for calculating boundary layer resistance, [-]
   real(r8) :: Eco_Heat_Grnd_col       !ecosystem storage heat flux, [MJ d-2 h-1]
-  real(r8), pointer :: PTrans(:)     => null()    !canopy transpiration, [m2 d-2 h-1]
+  real(r8), pointer :: Transpiration_pft(:)     => null()    !canopy transpiration, [m2 d-2 h-1]
   real(r8), pointer :: PSICanPTurg(:)  => null()    !plant canopy turgor water potential, [MPa]
-  real(r8), pointer :: PrecIntcptByCanP(:)   => null()    !water flux into canopy, [m3 d-2 h-1]
-  real(r8), pointer :: PSICanP(:)  => null()    !canopy total water potential , [Mpa]
-  real(r8), pointer :: VapXAir2PCan(:)  => null()    !canopy evaporation, [m2 d-2 h-1]
+  real(r8), pointer :: PrecIntcptByCanopy_pft(:)   => null()    !water flux into canopy, [m3 d-2 h-1]
+  real(r8), pointer :: PSICanopy_pft(:)  => null()    !canopy total water potential , [Mpa]
+  real(r8), pointer :: VapXAir2Canopy_pft(:)  => null()    !canopy evaporation, [m2 d-2 h-1]
   real(r8), pointer :: HeatStorCanP(:)  => null()    !canopy storage heat flux, [MJ d-2 h-1]
   real(r8), pointer :: EvapTransHeatP(:)  => null()    !canopy latent heat flux, [MJ d-2 h-1]
   real(r8), pointer :: RAZ(:)    => null()    !canopy roughness height, [m]
   real(r8), pointer :: TKS(:)    => null()    !mean annual soil temperature, [K]
   real(r8), pointer :: PSICanPDailyMin(:)  => null()    !minimum daily canopy water potential, [MPa]
-  real(r8), pointer :: TCelciusCanopy(:)    => null()    !canopy temperature, [oC]
+  real(r8), pointer :: TCelciusCanopy_pft(:)    => null()    !canopy temperature, [oC]
   real(r8), pointer :: DTKC(:)   => null()    !change in canopy temperature, [K]
   real(r8), pointer :: ENGYX(:)  => null()    !canopy heat storage from previous time step, [MJ d-2]
   real(r8), pointer :: TKC(:)    => null()    !canopy temperature, [K]
@@ -566,9 +566,9 @@ implicit none
   real(r8), pointer :: OSMO(:)   => null()    !canopy osmotic potential when canopy water potential = 0 MPa, [MPa]
   real(r8), pointer :: HeatXAir2PCan(:)  => null()    !canopy sensible heat flux, [MJ d-2 h-1]
   real(r8), pointer :: TKCZ(:)   => null()    !canopy temperature, [K]
-  real(r8), pointer :: PSIRoot(:,:,:) => null() !root total water potential , [Mpa]
-  real(r8), pointer :: PSIRootOSMO(:,:,:) => null() !root osmotic water potential , [Mpa]
-  real(r8), pointer :: PSIRootTurg(:,:,:) => null() !root turgor water potential , [Mpa]
+  real(r8), pointer :: PSIRoot_vr(:,:,:) => null() !root total water potential , [Mpa]
+  real(r8), pointer :: PSIRootOSMO_vr(:,:,:) => null() !root osmotic water potential , [Mpa]
+  real(r8), pointer :: PSIRootTurg_vr(:,:,:) => null() !root turgor water potential , [Mpa]
   real(r8), pointer :: AllPlantRootH2OUptake_vr(:,:,:) => null() !root water uptake, [m2 d-2 h-1]
   real(r8), pointer :: THeatRootUptake(:)     => null()   !total root heat uptake, [MJ d-2]
   real(r8), pointer :: GridPlantRootH2OUptake_vr(:)    => null()   !total root water uptake, [m3 d-2]
@@ -987,7 +987,7 @@ implicit none
   allocate(this%PPI(JP1))
   allocate(this%PPZ(JP1))
   allocate(this%PPX(JP1))
-  allocate(this%pftPlantPopulation(JP1))
+  allocate(this%PlantPopulation_pft(JP1))
   allocate(this%VLWatMicPM(60,0:JZ1))
   allocate(this%VLsoiAirPM(60,0:JZ1))
   allocate(this%TortMicPM(60,0:JZ1))
@@ -1157,21 +1157,21 @@ implicit none
   allocate(this%THeatRootUptake(0:JZ1))
   allocate(this%TKCZ(JP1))
   allocate(this%HeatXAir2PCan(JP1))
-  allocate(this%PrecIntcptByCanP(JP1))
+  allocate(this%PrecIntcptByCanopy_pft(JP1))
   allocate(this%PSICanPTurg(JP1))
-  allocate(this%PSICanP(JP1))
-  allocate(this%VapXAir2PCan(JP1))
+  allocate(this%PSICanopy_pft(JP1))
+  allocate(this%VapXAir2Canopy_pft(JP1))
   allocate(this%HeatStorCanP(JP1))
   allocate(this%EvapTransHeatP(JP1))
   allocate(this%WatByPCanopy(JP1))
   allocate(this%VHeatCapCanP(JP1))
   allocate(this%CanWatP(JP1))
-  allocate(this%PSIRoot(jroots,JZ1,JP1))
-  allocate(this%PSIRootOSMO(jroots,JZ1,JP1))
-  allocate(this%PSIRootTurg(jroots,JZ1,JP1))
+  allocate(this%PSIRoot_vr(jroots,JZ1,JP1))
+  allocate(this%PSIRootOSMO_vr(jroots,JZ1,JP1))
+  allocate(this%PSIRootTurg_vr(jroots,JZ1,JP1))
   allocate(this%AllPlantRootH2OUptake_vr(jroots,JZ1,JP1))
   allocate(this%GridPlantRootH2OUptake_vr(0:JZ1))
-  allocate(this%PTrans(JP1))
+  allocate(this%Transpiration_pft(JP1))
   allocate(this%PSICanPOsmo(JP1))
   allocate(this%TKS(0:JZ1))
   allocate(this%OSMO(JP1))
@@ -1179,7 +1179,7 @@ implicit none
   allocate(this%DTKC(JP1))
   allocate(this%TKC(JP1))
   allocate(this%ENGYX(JP1))
-  allocate(this%TCelciusCanopy(JP1))
+  allocate(this%TCelciusCanopy_pft(JP1))
   allocate(this%PSICanPDailyMin(JP1))
 
   end subroutine plt_ew_init
@@ -1194,21 +1194,21 @@ implicit none
 !  if(allocated(THeatRootUptake))deallocate(THeatRootUptake)
 !  if(allocated(TKCZ))deallocate(TKCZ)
 !  if(allocated(HeatXAir2PCan))deallocate(HeatXAir2PCan)
-!  if(allocated(PrecIntcptByCanP))deallocate(PrecIntcptByCanP)
+!  if(allocated(PrecIntcptByCanopy_pft))deallocate(PrecIntcptByCanopy_pft)
 !  if(allocated(PSICanPTurg))deallocate(PSICanPTurg)
-!  if(allocated(PSICanP))deallocate(PSICanP)
-!  if(allocated(VapXAir2PCan))deallocate(VapXAir2PCan)
+!  if(allocated(PSICanopy_pft))deallocate(PSICanopy_pft)
+!  if(allocated(VapXAir2Canopy_pft))deallocate(VapXAir2Canopy_pft)
 !  if(allocated(HeatStorCanP))deallocate(HeatStorCanP)
 !  if(allocated(EvapTransHeatP))deallocate(EvapTransHeatP)
 !  if(allocated(VHeatCapCanP))deallocate(VHeatCapCanP)
 !  if(allocated(WatByPCanopy))deallocate(WatByPCanopy)
 !  if(allocated(CanWatP))deallocate(CanWatP)
-!  if(allocated(PSIRoot))deallocate(PSIRoot)
-!  if(allocated(PSIRootOSMO))deallocate(PSIRootOSMO)
-!  if(allocated(PSIRootTurg))deallocate(PSIRootTurg)
+!  if(allocated(PSIRoot_vr))deallocate(PSIRoot_vr)
+!  if(allocated(PSIRootOSMO_vr))deallocate(PSIRootOSMO_vr)
+!  if(allocated(PSIRootTurg_vr))deallocate(PSIRootTurg_vr)
 !  if(allocated(AllPlantRootH2OUptake_vr))deallocate(AllPlantRootH2OUptake_vr)
 !  if(allocated(TAllPlantRootH2OUptake_vr))deallocate(TAllPlantRootH2OUptake_vr)
-!  if(allocated(PTrans))deallocate(PTrans)
+!  if(allocated(Transpiration_pft))deallocate(Transpiration_pft)
 !  if(allocated(PSICanPOsmo))deallocate(PSICanPOsmo)
 !  if(allocated(TKS))deallocate(TKS)
 !  if(allocated(PSICanPDailyMin))deallocate(PSICanPDailyMin)
@@ -1217,7 +1217,7 @@ implicit none
 !  if(allocated(DTKC))deallocate(DTKC)
 !  if(allocated(TKC))deallocate(TKC)
 !  if(allocated(ENGYX))deallocate(ENGYX)
-!  if(allocated(TCelciusCanopy))deallocate(TCelciusCanopy)
+!  if(allocated(TCelciusCanopy_pft))deallocate(TCelciusCanopy_pft)
 
   end subroutine plt_ew_destroy
 
@@ -1385,7 +1385,7 @@ implicit none
   allocate(this%StalkChemElmnts_brch(NumOfPlantChemElmnts,MaxNumBranches,JP1))
   allocate(this%ShootChemElmnt_brch(NumOfPlantChemElmnts,MaxNumBranches,JP1))
   allocate(this%BranchStalkChemElmnts_pft_pft(NumOfPlantChemElmnts,MaxNumBranches,JP1))
-  allocate(this%Root1stChemElmnt(NumOfPlantChemElmnts,jroots,JRS,JP1))
+  allocate(this%Root1stChemElmnt(NumOfPlantChemElmnts,jroots,MaxNumRootAxes,JP1))
 
   end subroutine plt_biom_init
 !----------------------------------------------------------------------
@@ -1577,7 +1577,7 @@ implicit none
   jsken  => pltpar%jsken
   NumLitterGroups=> pltpar%NumLitterGroups
   MaxNumBranches    => pltpar%MaxNumBranches
-  JRS    => pltpar%JRS
+  MaxNumRootAxes    => pltpar%MaxNumRootAxes
   NumOfPlantMorphUnits   => pltpar%NumOfPlantMorphUnits
   NumOfPlantLitrCmplxs => pltpar%NumOfPlantLitrCmplxs
   NumGrowthStages => pltpar%NumGrowthStages
@@ -1851,7 +1851,7 @@ implicit none
   allocate(this%iPlantState(JP1))
   allocate(this%RSETE(NumOfPlantChemElmnts,JP1))
   allocate(this%MatureGroup_brch(MaxNumBranches,JP1))
-  allocate(this%iPlantShootState(JP1))
+  allocate(this%iPlantShootState_pft(JP1))
   allocate(this%HourCounter4LeafOut_brch(MaxNumBranches,JP1))
   allocate(this%HoursDoingRemob_brch(MaxNumBranches,JP1))
   allocate(this%HourlyNodeNumNormByMatgrp_brch(MaxNumBranches,JP1))
@@ -1859,17 +1859,17 @@ implicit none
   allocate(this%NodeNumNormByMatgrp_brch(MaxNumBranches,JP1))
   allocate(this%ReprodNodeNumNormByMatrgrp_brch(MaxNumBranches,JP1))
   allocate(this%HourWithNoGrainFill_brch(MaxNumBranches,JP1))
-  allocate(this%iPlantPhenologyType(JP1))
-  allocate(this%iPlantPhenologyPattern(JP1))
+  allocate(this%iPlantPhenologyType_pft(JP1))
+  allocate(this%iPlantPhenologyPattern_pft(JP1))
   allocate(this%iPlantTurnoverPattern(JP1))
-  allocate(this%iPlantRootState(JP1))
+  allocate(this%iPlantRootState_pft(JP1))
   allocate(this%iPlantDevelopPattern(JP1))
   allocate(this%iPlantPhotoperiodType(JP1))
   allocate(this%doInitPlant(JP1))
   allocate(this%iPlantMorphologyType(JP1))
   allocate(this%KLeafNodeNumber(MaxNumBranches,JP1))
   allocate(this%KLeafNumLowestGrowing_pft(MaxNumBranches,JP1))
-  allocate(this%iPlantCalendar(NumGrowthStages,MaxNumBranches,JP1))
+  allocate(this%iPlantCalendar_brch(NumGrowthStages,MaxNumBranches,JP1))
   allocate(this%TotalNodeNumNormByMatgrp_brch(MaxNumBranches,JP1))
   allocate(this%TotalReprodNodeNumNormByMatrgrp_brch(MaxNumBranches,JP1))
   allocate(this%LeafNumberAtFloralInit_brch(MaxNumBranches,JP1))
@@ -1926,7 +1926,7 @@ implicit none
 !  if(allocated(IDTH))deallocate(IDTH)
 !  if(allocated(RSETE))deallocate(RSETE)
 !  if(allocated(GROUP))deallocate(GROUP)
-!  if(allocated(iPlantShootState))deallocate(iPlantShootState)
+!  if(allocated(iPlantShootState_pft))deallocate(iPlantShootState_pft)
 !  if(allocated(HourCounter4LeafOut_brch))deallocate(HourCounter4LeafOut_brch)
 !  if(allocated(HoursDoingRemob_brch))deallocate(HoursDoingRemob_brch)
 !  if(allocated(HourlyNodeNumNormByMatgrp_brch))deallocate(HourlyNodeNumNormByMatgrp_brch)
@@ -1934,9 +1934,9 @@ implicit none
 !  if(allocated(NodeNumNormByMatgrp_brch))deallocate(NodeNumNormByMatgrp_brch)
 !  if(allocated(ReprodNodeNumNormByMatrgrp_brch))deallocate(ReprodNodeNumNormByMatrgrp_brch)
 !  if(allocated(HourWithNoGrainFill_brch))deallocate(HourWithNoGrainFill_brch)
-!  if(allocated(iPlantPhenologyType))deallocate(iPlantPhenologyType)
+!  if(allocated(iPlantPhenologyType_pft))deallocate(iPlantPhenologyType_pft)
 !  if(allocated(iPlantTurnoverPattern))deallocate(iPlantTurnoverPattern)
-!  if(allocated(iPlantPhenologyPattern))deallocate(iPlantPhenologyPattern)
+!  if(allocated(iPlantPhenologyPattern_pft))deallocate(iPlantPhenologyPattern_pft)
 !  if(allocated(IDTHR))deallocate(IDTHR)
 !  if(allocated(iPlantDevelopPattern))deallocate(iPlantDevelopPattern)
 !  if(allocated(iPlantPhotoperiodType))deallocate(iPlantPhotoperiodType)
@@ -1991,13 +1991,13 @@ implicit none
   allocate(this%MaxSeedNumPerSite_pft(JP1))
   allocate(this%MaxPotentSeedNumber_pft(JP1))
   allocate(this%MaxSeedCMass(JP1))
-  allocate(this%MaxPrimRootRadius1(jroots,JP1))
-  allocate(this%MaxSecndRootRadius1(jroots,JP1))
+  allocate(this%Max1stRootRadius1(jroots,JP1))
+  allocate(this%Max2ndRootRadius1(jroots,JP1))
   allocate(this%RRADP(jroots,JP1))
   allocate(this%PrimRootRadius(jroots,JZ1,JP1))
   allocate(this%SecndRootRadius(jroots,JZ1,JP1))
-  allocate(this%MaxPrimRootRadius(jroots,JP1))
-  allocate(this%MaxSecndRootRadius(jroots,JP1))
+  allocate(this%Max1stRootRadius(jroots,JP1))
+  allocate(this%Max2ndRootRadius(jroots,JP1))
 
   allocate(this%PrimRootDepth(jroots,NumOfCanopyLayers1,JP1))
   allocate(this%RootLenPerPopu_pvr(jroots,JZ1,JP1))

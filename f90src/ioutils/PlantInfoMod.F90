@@ -350,7 +350,7 @@ implicit none
       CriticalPhotoPeriod_pft(NZ,NY,NX)=DayLenthMax(NY,NX)
     ENDIF
     D5: DO NB=1,JC
-      IF(iPlantPhenologyType(NZ,NY,NX).EQ.0.AND.iPlantPhenologyPattern(NZ,NY,NX).NE.iplt_annual)THEN
+      IF(iPlantPhenologyType_pft(NZ,NY,NX).EQ.0.AND.iPlantPhenologyPattern_pft(NZ,NY,NX).NE.iplt_annual)THEN
         HourThreshold4LeafOut_brch(NB,NZ,NY,NX)=AMIN1(4380.0_r8,VRNLI+144.0_r8*iPlantInitThermoAdaptZone(NZ,NY,NX)*(NB-1))
         HourThreshold4LeafOff(NB,NZ,NY,NX)=AMIN1(4380.0_r8,VRNXI+144.0_r8*iPlantInitThermoAdaptZone(NZ,NY,NX)*(NB-1))
       ELSE
@@ -377,10 +377,10 @@ implicit none
   DATAPI(NZ,NY,NX)=loc
   call ncd_getvar(pft_nfid, 'ICTYP', loc, iPlantPhotosynthesisType(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'IGTYP', loc, iPlantMorphologyType(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'ISTYP', loc, iPlantPhenologyPattern(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'ISTYP', loc, iPlantPhenologyPattern_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'IDTYP', loc, iPlantDevelopPattern(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'INTYP', loc, iPlantNfixType(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'IWTYP', loc, iPlantPhenologyType(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'IWTYP', loc, iPlantPhenologyType_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'IPTYP', loc, iPlantPhotoperiodType(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'IBTYP', loc, iPlantTurnoverPattern(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'IRTYP', loc, iPlantGrainType(NZ,NY,NX))
@@ -434,8 +434,8 @@ implicit none
   call ncd_getvar(pft_nfid, 'GFILL', loc,GrainFillRateat25C_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'WTSTDI', loc,StandingDeadInitC_pft(NZ,NY,NX))
 
-  call ncd_getvar(pft_nfid, 'RRAD1M', loc,MaxPrimRootRadius(1,NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'RRAD2M', loc,MaxSecndRootRadius(1,NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'RRAD1M', loc,Max1stRootRadius(1,NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'RRAD2M', loc,Max2ndRootRadius(1,NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'PORT', loc,RootPorosity(1,NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'PR', loc,MinNonstructuralC4InitRoot(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'RSRR', loc,RSRR(1,NZ,NY,NX))
@@ -510,11 +510,11 @@ implicit none
   integer, intent(in) :: NZ,NY,NX
 !   iPlantPhotosynthesisType=photosynthesis type:3=C3,4=C4
 !   iPlantMorphologyType=root profile:0=shallow (eg bryophytes),1=intermediate(eg herbs),2=deep (eg trees)
-!   iPlantPhenologyPattern=growth habit:0=annual,1=perennial
+!   iPlantPhenologyPattern_pft=growth habit:0=annual,1=perennial
 !   iPlantDevelopPattern=growth habit:0=determinate,1=indetermimate
 !   iPlantNfixType=N2 fixation:1,2,3=rapid to slow root symbiosis (e.g.legumes),
 !   4,5,6=rapid to slow canopy symbiosis (e.g. cyanobacteria)
-!   iPlantPhenologyType=phenology type:0=evergreen,1=cold deciduous,2=drought deciduous,3=1+2
+!   iPlantPhenologyType_pft=phenology type:0=evergreen,1=cold deciduous,2=drought deciduous,3=1+2
 !   iPlantPhotoperiodType=photoperiod type:0=day neutral,1=short day,2=long day
 !   iPlantTurnoverPattern=turnover:if iPlantMorphologyType=0 or 1:all above-ground:0,1=rapid(deciduous),2=very slow(evergreen),3=slow(semi-deciduous)
 !                   :if iPlantMorphologyType=2:trees:1=rapid(deciduous),2=very slow(coniferous),3=slow(semi-deciduous)
@@ -544,7 +544,7 @@ implicit none
     write(*,*)'root profile not defined'
   end select
 
-  select case (iPlantPhenologyPattern(NZ,NY,NX))
+  select case (iPlantPhenologyPattern_pft(NZ,NY,NX))
   case (0)
     write(*,*)'Annual plant'
   case (1)
@@ -581,7 +581,7 @@ implicit none
     write(*,*)'No N2 fixation symbiosis defined'
   end select
 
-  select case(iPlantPhenologyType(NZ,NY,NX))
+  select case(iPlantPhenologyType_pft(NZ,NY,NX))
   case (0)
     write(*,*)'phenology type: evergreen'
   case (1)
@@ -728,8 +728,8 @@ implicit none
   integer, intent(in) :: NZ,NY,NX
 
   write(*,*)'ROOT CHARACTERISTICS'
-  write(*,*)'radius of primary roots: MaxPrimRootRadius',MaxPrimRootRadius(1,NZ,NY,NX)
-  write(*,*)'radius of secondary roots: MaxSecndRootRadius',MaxSecndRootRadius(1,NZ,NY,NX)
+  write(*,*)'radius of primary roots: Max1stRootRadius',Max1stRootRadius(1,NZ,NY,NX)
+  write(*,*)'radius of secondary roots: Max2ndRootRadius',Max2ndRootRadius(1,NZ,NY,NX)
   write(*,*)'primary/fine root porosity: PORT',RootPorosity(1,NZ,NY,NX)
   write(*,*)'nonstructural C concentration needed for root'// &
     ' branching: PR',MinNonstructuralC4InitRoot(NZ,NY,NX)

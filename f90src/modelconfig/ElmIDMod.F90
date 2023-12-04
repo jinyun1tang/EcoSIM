@@ -41,13 +41,13 @@ implicit none
   integer, parameter :: ifert_plant_manuN=18
   integer, parameter :: ifert_plant_manuP=19
 ! root order
-  integer, parameter :: fstroot =1
-  integer, parameter :: sndroot =2
+  integer, parameter :: iroot_1st =1
+  integer, parameter :: iroot_2nd =2
 ! root profile
-  integer, parameter :: irtshallow=0
+  integer, parameter :: irootp_shallow=0
 ! mycorrhizae
-  integer, parameter :: mycornone=1
-  integer, parameter :: mycorarbu=2   !arbuscular
+  integer, parameter :: imycorr_none=1
+  integer, parameter :: imycorr_arbu=2   !arbuscular
 
   integer, parameter :: ipltroot=1
   integer, parameter :: imycorrhz=2

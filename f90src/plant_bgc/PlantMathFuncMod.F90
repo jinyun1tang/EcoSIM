@@ -23,17 +23,17 @@ implicit none
   end type PlantSoluteUptakeConfig_type
 contains
 
-  pure function get_FDM(PSICanP)result(FDMP)
+  pure function get_FDM(PSICanopy)result(FDMP)
   !
   !compute the Ratio of leaf+sheath dry mass to symplasmic water (g g–1)
   !as a function of absolute value of leaf water potential (MPa)
   
   implicit none
-  real(r8), intent(in) :: PSICanP   !canopy water potential, MPa
+  real(r8), intent(in) :: PSICanopy !canopy water potential, MPa
   real(r8) :: APSILT
   real(r8) :: FDMP
 
-  APSILT=ABS(PSICanP)
+  APSILT=ABS(PSICanopy)
   FDMP=0.16_r8+0.10_r8*APSILT/(0.05_r8*APSILT+2.0_r8)
 
   end function get_FDM

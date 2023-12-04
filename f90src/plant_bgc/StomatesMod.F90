@@ -668,11 +668,11 @@
 !     begin_execution
   associate(                          &
     LeafPetioNonstructElmntConc_brch =>  plt_biom%LeafPetioNonstructElmntConc_brch  , &
-    iPlantPhenologyType =>  plt_pheno%iPlantPhenologyType , &
+    iPlantPhenologyType_pft =>  plt_pheno%iPlantPhenologyType_pft , &
     iPlantTurnoverPattern =>  plt_pheno%iPlantTurnoverPattern , &
     HourWithNoGrainFill_brch   =>  plt_pheno%HourWithNoGrainFill_brch   , &
     HourCounter4LeafOut_brch   =>  plt_pheno%HourCounter4LeafOut_brch   , &
-    iPlantPhenologyPattern =>  plt_pheno%iPlantPhenologyPattern , &
+    iPlantPhenologyPattern_pft =>  plt_pheno%iPlantPhenologyPattern_pft , &
     iPlantBranchState  =>  plt_pheno%iPlantBranchState  , &
     ZERO   =>  plt_site%ZERO    , &
     C4PhotosynDowreg_brch  => plt_photo%C4PhotosynDowreg_brch   , &
@@ -703,19 +703,19 @@
 !     ATRP=hours above threshold temperature for dehardening since leafout
 !     ATRPZ=hours to full dehardening of conifers in spring
 ! deciduous
-  IF(iPlantPhenologyType(NZ).NE.iphenotyp_evgreen.AND.iPlantTurnoverPattern(NZ).GE.2)THEN
+  IF(iPlantPhenologyType_pft(NZ).NE.iphenotyp_evgreen.AND.iPlantTurnoverPattern(NZ).GE.2)THEN
     RubiscoActivity_brpft(NB,NZ)=RubiscoActivity_brpft(NB,NZ)*AZMAX1(AMIN1(1.0_r8 &
       ,HourCounter4LeafOut_brch(NB,NZ)/(0.9_r8*ATRPZ)))
   ENDIF
 !
 !     TERMINATION OF ANNUALS
 !
-!     iPlantPhenologyPattern=growth habit:0=annual,1=perennial from PFT file
+!     iPlantPhenologyPattern_pft=growth habit:0=annual,1=perennial from PFT file
 !     HourWithNoGrainFill_brch=number of hours with no grain fill after start of grain fill
 !     Hours2KillAnuals=number of hours with no grain fill to terminate annuals
 !
-  IF(iPlantPhenologyPattern(NZ).EQ.iplt_annual.AND.HourWithNoGrainFill_brch(NB,NZ).GT.0.0_r8)THEN
-    C4PhotosynDowreg_brch(NB,NZ)=AZMAX1(1.0_r8-HourWithNoGrainFill_brch(NB,NZ)/Hours2KillAnuals(iPlantPhenologyType(NZ)))
+  IF(iPlantPhenologyPattern_pft(NZ).EQ.iplt_annual.AND.HourWithNoGrainFill_brch(NB,NZ).GT.0.0_r8)THEN
+    C4PhotosynDowreg_brch(NB,NZ)=AZMAX1(1.0_r8-HourWithNoGrainFill_brch(NB,NZ)/Hours2KillAnuals(iPlantPhenologyType_pft(NZ)))
   ELSE
     C4PhotosynDowreg_brch(NB,NZ)=1.0_r8
   ENDIF
@@ -826,7 +826,7 @@
     Hours4LeafOff   =>  plt_pheno%Hours4LeafOff   , &
     HourThreshold4LeafOut_brch  =>  plt_pheno%HourThreshold4LeafOut_brch  , &
     Hours4Leafout   =>  plt_pheno%Hours4Leafout   , &
-    iPlantPhenologyType =>  plt_pheno%iPlantPhenologyType , &
+    iPlantPhenologyType_pft =>  plt_pheno%iPlantPhenologyType_pft , &
     ZEROP  =>  plt_biom%ZEROP   , &
     NU     =>  plt_site%NU      , &
     AREA3  =>  plt_site%AREA3   , &
@@ -850,11 +850,11 @@
 !
 !     FEEDBACK ON CO2 FIXATION
 !
-!     iPlantPhenologyType=phenology type from PFT file
+!     iPlantPhenologyType_pft=phenology type from PFT file
 !     Hours4Leafout,VRNL=leafout hours,hours required for leafout
 !     Hours4LeafOff,VRNX=leafoff hours,hours required for leafoff
 !
-    IF(iPlantPhenologyType(NZ).EQ.iphenotyp_evgreen.OR.Hours4Leafout(NB,NZ).GE.HourThreshold4LeafOut_brch(NB,NZ).OR.Hours4LeafOff(NB,NZ).LT.HourThreshold4LeafOff(NB,NZ))THEN
+    IF(iPlantPhenologyType_pft(NZ).EQ.iphenotyp_evgreen.OR.Hours4Leafout(NB,NZ).GE.HourThreshold4LeafOut_brch(NB,NZ).OR.Hours4LeafOff(NB,NZ).LT.HourThreshold4LeafOff(NB,NZ))THEN
 
       call PhenoActiveBranch(NB,NZ,CH2O,TFN1,TFN2,TFNE,XKO2L)
     ELSE

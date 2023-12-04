@@ -15,7 +15,7 @@ implicit none
   integer :: JD
   integer :: MaxNumBranches=10     !number of plant branches
   integer :: NumGrowthStages=10  !number of plant growth states
-  integer :: JRS     !maximum number of root layers
+  integer :: MaxNumRootAxes     !maximum number of root layers
   integer :: NumLitterGroups !number of liter groups
   integer, PARAMETER :: JP=5    !maximum pft in a given topgraphic column
   integer, PARAMETER :: JC=10   !# of canopy layers

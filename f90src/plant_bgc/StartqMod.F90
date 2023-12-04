@@ -76,9 +76,9 @@ module StartqMod
 
           call InitSeedMorphoBio(NZ,NY,NX)
         ENDIF
-        ZEROP(NZ,NY,NX)=ZERO*pftPlantPopulation(NZ,NY,NX)
-        ZEROQ(NZ,NY,NX)=ZERO*pftPlantPopulation(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        ZEROL(NZ,NY,NX)=ZERO*pftPlantPopulation(NZ,NY,NX)*1.0E+06
+        ZEROP(NZ,NY,NX)=ZERO*PlantPopulation_pft(NZ,NY,NX)
+        ZEROQ(NZ,NY,NX)=ZERO*PlantPopulation_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        ZEROL(NZ,NY,NX)=ZERO*PlantPopulation_pft(NZ,NY,NX)*1.0E+06
       ENDDO D9985
 !
 !     FILL OUT UNUSED ARRAYS
@@ -408,7 +408,7 @@ module StartqMod
 !     CumSoilThickness=depth to soil layer bottom from surface(m)
 !     NG,NIX,NIXBotRootLayer_rpft=seeding,upper,lower rooting layer
 !     CNRTS,CPRTS=N,P root growth yield
-!     MaxPrimRootRadius,MaxSecndRootRadius=maximum primary,secondary mycorrhizal radius (m)
+!     Max1stRootRadius,Max2ndRootRadius=maximum primary,secondary mycorrhizal radius (m)
 !     PORT=mycorrhizal porosity
 !     UPMXZH,UPKMZH,UPMNZH=NH4 max uptake(g m-2 h-1),Km(uM),min concn (uM)
 !     UPMXZO,UPKMZO,UPMNZO=NO3 max uptake(g m-2 h-1),Km(uM), min concn (uM)
@@ -422,15 +422,15 @@ module StartqMod
       !find the seeding layer
       NGTopRootLayer_pft(NZ,NY,NX)=L
       NIXBotRootLayer_pft(NZ,NY,NX)=L
-      D9790: DO NR=1,pltpar%JRS
+      D9790: DO NR=1,pltpar%MaxNumRootAxes
         NIXBotRootLayer_rpft(NR,NZ,NY,NX)=L
       ENDDO D9790
     ENDIF
   ENDDO D9795  
   CNRTS(NZ,NY,NX)=RootrNC_pft(NZ,NY,NX)*RootBiomGrowthYield(NZ,NY,NX)
   CPRTS(NZ,NY,NX)=RootrPC_pft(NZ,NY,NX)*RootBiomGrowthYield(NZ,NY,NX)
-  MaxPrimRootRadius(imycorrhz,NZ,NY,NX)=5.0E-06
-  MaxSecndRootRadius(imycorrhz,NZ,NY,NX)=5.0E-06
+  Max1stRootRadius(imycorrhz,NZ,NY,NX)=5.0E-06
+  Max2ndRootRadius(imycorrhz,NZ,NY,NX)=5.0E-06
   RootPorosity(imycorrhz,NZ,NY,NX)=RootPorosity(1,NZ,NY,NX)
   UPMXZH(imycorrhz,NZ,NY,NX)=UPMXZH(1,NZ,NY,NX)
   UPKMZH(imycorrhz,NZ,NY,NX)=UPKMZH(1,NZ,NY,NX)
@@ -454,14 +454,14 @@ module StartqMod
     RootPoreTortu4Gas(N,NZ,NY,NX)=RootPorosity(N,NZ,NY,NX)**1.33_r8
     RRADP(N,NZ,NY,NX)=LOG(1.0_r8/SQRT(AMAX1(0.01_r8,RootPorosity(N,NZ,NY,NX))))
     RootVolPerMassC_pft(N,NZ,NY,NX)=ppmc/(0.05_r8*(1.0-RootPorosity(N,NZ,NY,NX)))
-    PrimRootSpecLen(N,NZ,NY,NX)=RootVolPerMassC_pft(N,NZ,NY,NX)/(PICON*MaxPrimRootRadius(N,NZ,NY,NX)**2)
-    SecndRootSpecLen(N,NZ,NY,NX)=RootVolPerMassC_pft(N,NZ,NY,NX)/(PICON*MaxSecndRootRadius(N,NZ,NY,NX)**2)
-    MaxPrimRootRadius1(N,NZ,NY,NX)=MaxPrimRootRadius(N,NZ,NY,NX)
+    PrimRootSpecLen(N,NZ,NY,NX)=RootVolPerMassC_pft(N,NZ,NY,NX)/(PICON*Max1stRootRadius(N,NZ,NY,NX)**2)
+    SecndRootSpecLen(N,NZ,NY,NX)=RootVolPerMassC_pft(N,NZ,NY,NX)/(PICON*Max2ndRootRadius(N,NZ,NY,NX)**2)
+    Max1stRootRadius1(N,NZ,NY,NX)=Max1stRootRadius(N,NZ,NY,NX)
 !    2*SQRT(0.25*(1.0-RootPorosity(N,NZ,NY,NX)))
-    MaxSecndRootRadius1(N,NZ,NY,NX)=MaxSecndRootRadius(N,NZ,NY,NX)
+    Max2ndRootRadius1(N,NZ,NY,NX)=Max2ndRootRadius(N,NZ,NY,NX)
 !    2*SQRT(0.25*(1.0-RootPorosity(N,NZ,NY,NX)))
-    PrimRootXSecArea(N,NZ,NY,NX)=PICON*MaxPrimRootRadius1(N,NZ,NY,NX)**2._r8
-    SecndRootXSecArea(N,NZ,NY,NX)=PICON*MaxSecndRootRadius1(N,NZ,NY,NX)**2._r8
+    PrimRootXSecArea(N,NZ,NY,NX)=PICON*Max1stRootRadius1(N,NZ,NY,NX)**2._r8
+    SecndRootXSecArea(N,NZ,NY,NX)=PICON*Max2ndRootRadius1(N,NZ,NY,NX)**2._r8
   ENDDO D500 
   end subroutine InitDimensionsandUptake
 !------------------------------------------------------------------------------------------
@@ -476,10 +476,10 @@ module StartqMod
 !
 !     PP=population (grid cell-1)
 !
-  pftPlantPopulation(NZ,NY,NX)=PPX(NZ,NY,NX)*AREA(3,NU(NY,NX),NY,NX)
+  PlantPopulation_pft(NZ,NY,NX)=PPX(NZ,NY,NX)*AREA(3,NU(NY,NX),NY,NX)
   doInitPlant(NZ,NY,NX)=ifalse
-  iPlantShootState(NZ,NY,NX)=iDead
-  iPlantRootState(NZ,NY,NX)=iDead
+  iPlantShootState_pft(NZ,NY,NX)=iDead
+  iPlantRootState_pft(NZ,NY,NX)=iDead
   BranchNumber_pft(NZ,NY,NX)=0
   NumOfBranches_pft(NZ,NY,NX)=0
   HypoctoylHeight(NZ,NY,NX)=0._r8
@@ -516,7 +516,7 @@ module StartqMod
     BranchNumber_brch(NB,NZ,NY,NX)=0
     iPlantBranchState(NB,NZ,NY,NX)=1
     D15: DO M=1,NumGrowthStages
-      iPlantCalendar(M,NB,NZ,NY,NX)=0
+      iPlantCalendar_brch(M,NB,NZ,NY,NX)=0
     ENDDO D15
   ENDDO D10
 !
@@ -672,22 +672,22 @@ module StartqMod
 !     INITIALIZE PLANT HEAT AND WATER STATUS
 !
 !     VHeatCapCanP=canopy heat capacity (MJ m-3 K-1)
-!     TCelciusCanopy,TKC=canopy temperature for growth (oC,K)
+!     TCelciusCanopy_pft,TKC=canopy temperature for growth (oC,K)
 !     TCG,TKG=canopy temperature for phenology (oC,K)
-!     PSICanP,PSICanPOsmo,PSICanPTurg=canopy total,osmotic,turgor water potl(MPa)
+!     PSICanopy_pft,PSICanPOsmo,PSICanPTurg=canopy total,osmotic,turgor water potl(MPa)
 !
   VHeatCapCanP(NZ,NY,NX)=cpw*ShootChemElmnts_pft(ielmc,NZ,NY,NX)*10.0E-06
   ENGYX(NZ,NY,NX)=0._r8
   DTKC(NZ,NY,NX)=0._r8
-  TCelciusCanopy(NZ,NY,NX)=ATCA(NY,NX)
-  TKC(NZ,NY,NX)=units%Celcius2Kelvin(TCelciusCanopy(NZ,NY,NX))
-  TCG(NZ,NY,NX)=TCelciusCanopy(NZ,NY,NX)
+  TCelciusCanopy_pft(NZ,NY,NX)=ATCA(NY,NX)
+  TKC(NZ,NY,NX)=units%Celcius2Kelvin(TCelciusCanopy_pft(NZ,NY,NX))
+  TCG(NZ,NY,NX)=TCelciusCanopy_pft(NZ,NY,NX)
   TKG(NZ,NY,NX)=units%Celcius2Kelvin(TCG(NZ,NY,NX))
   fTgrowCanP(NZ,NY,NX)=1.0
-  PSICanP(NZ,NY,NX)=-1.0E-03
-  PSICanPOsmo(NZ,NY,NX)=OSMO(NZ,NY,NX)+PSICanP(NZ,NY,NX)
-  PSICanPTurg(NZ,NY,NX)=AZMAX1(PSICanP(NZ,NY,NX)-PSICanPOsmo(NZ,NY,NX))
-  PTrans(NZ,NY,NX)=0._r8
+  PSICanopy_pft(NZ,NY,NX)=-1.0E-03
+  PSICanPOsmo(NZ,NY,NX)=OSMO(NZ,NY,NX)+PSICanopy_pft(NZ,NY,NX)
+  PSICanPTurg(NZ,NY,NX)=AZMAX1(PSICanopy_pft(NZ,NY,NX)-PSICanPOsmo(NZ,NY,NX))
+  Transpiration_pft(NZ,NY,NX)=0._r8
   FracRadPARbyCanopy_pft(NZ,NY,NX)=0._r8
   end subroutine InitPlantHeatandWater
 !------------------------------------------------------------------------------------------
@@ -703,7 +703,7 @@ module StartqMod
 !
 !     INITIALIZE ROOT(N=1),MYCORRHIZAL(N=2) MORPHOLOGY AND BIOMASS
 !
-!     PSIRoot,PSIRootOSMO,PSIRootTurg=root,myco total,osmotic,turgor water potl(MPa)
+!     PSIRoot_vr,PSIRootOSMO_vr,PSIRootTurg_vr=root,myco total,osmotic,turgor water potl(MPa)
 !     CO2A,CO2P=root,myco gaseous,aqueous CO2 content (g)
 !     OXYA,OXYP=root,myco gaseous,aqueous O2 content (g)
 !
@@ -716,9 +716,9 @@ module StartqMod
   D40: DO N=1,pltpar%jroots
     D20: DO L=1,NL(NY,NX)
       AllPlantRootH2OUptake_vr(N,L,NZ,NY,NX)=0._r8
-      PSIRoot(N,L,NZ,NY,NX)=-0.01
-      PSIRootOSMO(N,L,NZ,NY,NX)=OSMO(NZ,NY,NX)+PSIRoot(N,L,NZ,NY,NX)
-      PSIRootTurg(N,L,NZ,NY,NX)=AZMAX1(PSIRoot(N,L,NZ,NY,NX)-PSIRootOSMO(N,L,NZ,NY,NX))
+      PSIRoot_vr(N,L,NZ,NY,NX)=-0.01
+      PSIRootOSMO_vr(N,L,NZ,NY,NX)=OSMO(NZ,NY,NX)+PSIRoot_vr(N,L,NZ,NY,NX)
+      PSIRootTurg_vr(N,L,NZ,NY,NX)=AZMAX1(PSIRoot_vr(N,L,NZ,NY,NX)-PSIRootOSMO_vr(N,L,NZ,NY,NX))
        RootMycoNonstructElmnt_vr(1:NumOfPlantChemElmnts,N,L,NZ,NY,NX)=0._r8
       RootNonstructElementConcpft_vr(1:NumOfPlantChemElmnts,N,L,NZ,NY,NX)=0._r8
       RootProteinConc_pftvr(N,L,NZ,NY,NX)=RootFracRemobilizableBiom(NZ,NY,NX)
@@ -731,8 +731,8 @@ module StartqMod
       RootLenthDensPerPopu_pvr(N,L,NZ,NY,NX)=0._r8
       RootVolume_vr(N,L,NZ,NY,NX)=0._r8
       RootVH2O_vr(N,L,NZ,NY,NX)=0._r8
-      PrimRootRadius(N,L,NZ,NY,NX)=MaxPrimRootRadius(N,NZ,NY,NX)
-      SecndRootRadius(N,L,NZ,NY,NX)=MaxSecndRootRadius(N,NZ,NY,NX)
+      PrimRootRadius(N,L,NZ,NY,NX)=Max1stRootRadius(N,NZ,NY,NX)
+      SecndRootRadius(N,L,NZ,NY,NX)=Max2ndRootRadius(N,NZ,NY,NX)
       RootAreaPerPlant_vr(N,L,NZ,NY,NX)=0._r8
       AveSecndRootLen(N,L,NZ,NY,NX)=1.0E-03
       RootNH4Uptake_pvr(N,L,NZ,NY,NX)=0._r8
@@ -768,7 +768,7 @@ module StartqMod
       trcs_rootml(idg_O2,N,L,NZ,NY,NX)=COXYP*RootVH2O_vr(N,L,NZ,NY,NX)
 
       RootAutoRO2Limiter_pvr(N,L,NZ,NY,NX)=1.0
-      D30: DO NR=1,JRS
+      D30: DO NR=1,MaxNumRootAxes
         SecndRootXNum_rpvr(N,L,NR,NZ,NY,NX)=0._r8
         PrimRootLen(N,L,NR,NZ,NY,NX)=0._r8
         Root1stStructChemElmnt_pvr(1:NumOfPlantChemElmnts,N,L,NR,NZ,NY,NX)=0._r8
@@ -818,7 +818,7 @@ module StartqMod
 !     RootProteinC_pvr=total root protein C mass (g)
 !     CPOOLR,ZPOOLR,PPOOLR=C,N,P in root,myco nonstructural pools (g)
 !
-  SeedCPlanted_pft(NZ,NY,NX)=SeedCMass(NZ,NY,NX)*pftPlantPopulation(NZ,NY,NX)
+  SeedCPlanted_pft(NZ,NY,NX)=SeedCMass(NZ,NY,NX)*PlantPopulation_pft(NZ,NY,NX)
   NonstructalChemElmnts_pft(ielmc,NZ,NY,NX)=SeedCPlanted_pft(NZ,NY,NX)
   NonstructalChemElmnts_pft(ielmn,NZ,NY,NX)=CNGR(NZ,NY,NX)*NonstructalChemElmnts_pft(ielmc,NZ,NY,NX)
   NonstructalChemElmnts_pft(ielmp,NZ,NY,NX)=CPGR(NZ,NY,NX)*NonstructalChemElmnts_pft(ielmc,NZ,NY,NX)
@@ -826,7 +826,7 @@ module StartqMod
   LeafChemElmnts_brch(ielmp,1,NZ,NY,NX)=CPGR(NZ,NY,NX)*LeafChemElmnts_brch(ielmc,1,NZ,NY,NX)
   LeafPetioleBiomassC_brch(1,NZ,NY,NX)=LeafChemElmnts_brch(ielmc,1,NZ,NY,NX)+PetioleChemElmnts_brch(ielmc,1,NZ,NY,NX)
   CanopyLeafShethC_pft(NZ,NY,NX)=CanopyLeafShethC_pft(NZ,NY,NX)+LeafPetioleBiomassC_brch(1,NZ,NY,NX)  
-  FDM=AMIN1(1.0_r8,0.16_r8-0.045_r8*PSICanP(NZ,NY,NX))
+  FDM=AMIN1(1.0_r8,0.16_r8-0.045_r8*PSICanopy_pft(NZ,NY,NX))
   CanWatP(NZ,NY,NX)=ppmc*CanopyLeafShethC_pft(NZ,NY,NX)/FDM
   WatByPCanopy(NZ,NY,NX)=0._r8
   NonstructElmnt_brch(ielmn,1,NZ,NY,NX)=CNGR(NZ,NY,NX)*NonstructElmnt_brch(ielmc,1,NZ,NY,NX)

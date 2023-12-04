@@ -44,14 +44,14 @@ module grosubsMod
   public :: InitGrosub
   contains
 
-  subroutine InitGrosub(NumGrowthStages,JRS)
+  subroutine InitGrosub(NumGrowthStages,MaxNumRootAxes)
 
   implicit none
-  integer, intent(out) :: NumGrowthStages,JRS
+  integer, intent(out) :: NumGrowthStages,MaxNumRootAxes
 
   call InitVegPars(pltpar)
   NumGrowthStages = pltpar%NumGrowthStages
-  jrs = pltpar%JRS
+  MaxNumRootAxes = pltpar%MaxNumRootAxes
 
 
   end subroutine InitGrosub
@@ -74,7 +74,7 @@ module grosubsMod
     IsPlantActive    => plt_pheno%IsPlantActive   , &
     NP       => plt_site%NP       , &
     NP0      => plt_site%NP0      , &
-    MaxRootLayNum       => plt_site%MaxRootLayNum       , &
+    MaxNumRootLays       => plt_site%MaxNumRootLays       , &
     CO2NetFix_pft     => plt_bgcr%CO2NetFix_pft     , &
     LitterFallChemElmnt_pft    => plt_bgcr%LitterFallChemElmnt_pft    , &
     LitterFallChemElmnt_pftvr     => plt_bgcr%LitterFallChemElmnt_pftvr     , &
@@ -87,7 +87,7 @@ module grosubsMod
 !
 
   D9980: DO NZ=1,NP0
-    D1: DO L=0,MaxRootLayNum
+    D1: DO L=0,MaxNumRootLays
       DO K=1,pltpar%NumOfPlantLitrCmplxs
         DO M=1,jsken
           DO NE=1,NumOfPlantChemElmnts
@@ -159,7 +159,7 @@ module grosubsMod
     Hours4Leafout    => plt_pheno%Hours4Leafout    , &
     ElmntBalanceCum_pft    => plt_site%ElmntBalanceCum_pft     , &
     NP0     => plt_site%NP0      , &
-    MaxRootLayNum      => plt_site%MaxRootLayNum       , &
+    MaxNumRootLays      => plt_site%MaxNumRootLays       , &
     iYearCurrent    => plt_site%iYearCurrent     , &
     LitterFallChemElmnt_pftvr    => plt_bgcr%LitterFallChemElmnt_pftvr     , &
     NetPrimaryProductvity_pft    => plt_bgcr%NetPrimaryProductvity_pft     , &
@@ -220,7 +220,7 @@ module grosubsMod
       DO NE=1,NumOfPlantChemElmnts
         D6430: DO M=1,jsken
           SurfLitrfallChemElmnts_pft(NE,NZ)=SurfLitrfallChemElmnts_pft(NE,NZ)+LitterFallChemElmnt_pftvr(NE,M,K,0,NZ)
-          D8955: DO L=0,MaxRootLayNum
+          D8955: DO L=0,MaxNumRootLays
             LitterFallChemElmnt_pft(NE,NZ)=LitterFallChemElmnt_pft(NE,NZ)+LitterFallChemElmnt_pftvr(NE,M,K,L,NZ)
             LitrfallChemElmnts_pft(NE,NZ)=LitrfallChemElmnts_pft(NE,NZ)+LitterFallChemElmnt_pftvr(NE,M,K,L,NZ)
           ENDDO D8955
@@ -319,8 +319,8 @@ module grosubsMod
 ! begin_execution
   associate(                              &
     iPlantMorphologyType => plt_pheno%iPlantMorphologyType      , &
-    iPlantRootState => plt_pheno%iPlantRootState      , &
-    iPlantShootState  => plt_pheno%iPlantShootState       , &
+    iPlantRootState_pft => plt_pheno%iPlantRootState_pft      , &
+    iPlantShootState_pft  => plt_pheno%iPlantShootState_pft       , &
     RootN2Fix_pft   => plt_rbgc%RootN2Fix_pft         , &
     RootH2PO4Uptake_pft  => plt_rbgc%RootH2PO4Uptake_pft        , &
     RootNH4Uptake_pft  => plt_rbgc%RootNH4Uptake_pft        , &
@@ -331,7 +331,7 @@ module grosubsMod
     NumOfBranches_pft    => plt_morph%NumOfBranches_pft         , &
     NumRootAxes_pft   => plt_morph%NumRootAxes_pft          &
   )
-  IF(iPlantShootState(NZ).EQ.0.OR.iPlantRootState(NZ).EQ.iLive)THEN
+  IF(iPlantShootState_pft(NZ).EQ.0.OR.iPlantRootState_pft(NZ).EQ.iLive)THEN
     CanopyN2Fix_pft(NZ)=0._r8
     BegRemoblize = 0
     call StagePlantForGrowth(I,J,NZ,ICHK1,NRX,TFN6,CNLFW,CPLFW,&
@@ -382,11 +382,11 @@ module grosubsMod
   associate(                            &
     TKC    =>  plt_ew%TKC         , &
     TKS    =>  plt_ew%TKS         , &
-    PSICanP  =>  plt_ew%PSICanP       , &
+    PSICanopy_pft =>  plt_ew%PSICanopy_pft      , &
     PSICanPTurg  =>  plt_ew%PSICanPTurg       , &
-    pftPlantPopulation     =>  plt_site%pftPlantPopulation        , &
+    PlantPopulation_pft     =>  plt_site%PlantPopulation_pft        , &
     NU     =>  plt_site%NU        , &
-    MaxRootLayNum     =>  plt_site%MaxRootLayNum        , &
+    MaxNumRootLays     =>  plt_site%MaxNumRootLays        , &
     OFFST  =>  plt_pheno%OFFST    , &
     ZEROP  =>  plt_biom%ZEROP     , &
     CanopyStalkC_pft  =>  plt_biom%CanopyStalkC_pft     , &
@@ -435,7 +435,7 @@ module grosubsMod
     enddo
   ENDDO D5
   D9: DO N=1,MY(NZ)
-    D6: DO L=NU,MaxRootLayNum
+    D6: DO L=NU,MaxNumRootLays
       RootProteinC_pvr(N,L,NZ)=0._r8
       PrimRootXNumL(N,L,NZ)=0._r8
       SecndRootXNum_pvr(N,L,NZ)=0._r8
@@ -515,7 +515,7 @@ module grosubsMod
   TKCM=TKC(NZ)+OFFST(NZ)
 
   TFN5=calc_plant_maint_tempf(TKCM)  
-  D7: DO L=NU,MaxRootLayNum
+  D7: DO L=NU,MaxNumRootLays
     TKSM=TKS(L)+OFFST(NZ)
     TFN6(L)=calc_plant_maint_tempf(TKSM)  
   ENDDO D7
@@ -527,8 +527,8 @@ module grosubsMod
 !     RootAreaPopu=multiplier for number of primary root axes
 !
   RootBiomCPerPlant_pft(NZ)=AMAX1(0.999992087_r8*RootBiomCPerPlant_pft(NZ),&
-    RootChemElmnts_pft(ielmc,NZ)/pftPlantPopulation(NZ))
-  RootAreaPopu=AMAX1(1.0_r8,RootBiomCPerPlant_pft(NZ)**0.667_r8)*pftPlantPopulation(NZ)
+    RootChemElmnts_pft(ielmc,NZ)/PlantPopulation_pft(NZ))
+  RootAreaPopu=AMAX1(1.0_r8,RootBiomCPerPlant_pft(NZ)**0.667_r8)*PlantPopulation_pft(NZ)
 !
 !     WATER STRESS FUNCTIONS FOR EXPANSION AND GROWTH RESPIRATION
 !     FROM CANOPY TURGOR
@@ -536,7 +536,7 @@ module grosubsMod
 !     WFNS=turgor expansion,extension function
 !     PSICanPTurg,PSIMin4OrganExtension=current,minimum canopy turgor potl for expansion,extension
 !     Stomata_Activity=stomatal resistance function of canopy turgor
-!     PSICanP=canopy water potential
+!     PSICanopy_pft=canopy water potential
 !     WFNG=growth function of canopy water potential
 !     WFNSG=expansion,extension function of canopy water potential
 !
@@ -545,12 +545,12 @@ module grosubsMod
   IF(is_plant_bryophyte(iPlantMorphologyType(NZ)))THEN
     !bryophyte, no turgor
     Stomata_Activity=1.0_r8
-    WFNG=EXP(0.05_r8*PSICanP(NZ))
+    WFNG=EXP(0.05_r8*PSICanopy_pft(NZ))
     WFNSG=WFNS**0.10_r8
   ELSE
     !others
     Stomata_Activity=EXP(RCS(NZ)*PSICanPTurg(NZ))
-    WFNG=EXP(0.10_r8*PSICanP(NZ))
+    WFNG=EXP(0.10_r8*PSICanopy_pft(NZ))
     WFNSG=WFNS**0.25_r8
   ENDIF
   end associate
@@ -602,8 +602,8 @@ module grosubsMod
 !     WTHSKB,WTEARB,WTGRB=branch husk,ear,grain C mass
 !     WTHSBN,WTEABN,WTGRBN=branch husk,ear,grain N mass
 !     WTHSBP,WTEABP,WTGRBP=branch husk,ear,grain P mass
-!     iPlantPhenologyPattern=growth habit:0=annual,1=perennial from PFT file
-!     iPlantPhenologyType=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
+!     iPlantPhenologyPattern_pft=growth habit:0=annual,1=perennial from PFT file
+!     iPlantPhenologyType_pft=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
 !     WTRVC,WTRVN,WTRVP=storage C,N,P
 !
   DO NE=1,NumOfPlantChemElmnts
@@ -692,7 +692,7 @@ module grosubsMod
     RootNO3Uptake_pft    =>  plt_rbgc%RootNO3Uptake_pft   , &
     RootNH4Uptake_pft    =>  plt_rbgc%RootNH4Uptake_pft   , &
     RootExudChemElmnt_pft    =>  plt_rbgc%RootExudChemElmnt_pft   , &
-    MaxRootLayNum       =>  plt_site%MaxRootLayNum      , &
+    MaxNumRootLays       =>  plt_site%MaxNumRootLays      , &
     NU       =>  plt_site%NU      , &
     NumOfBranches_pft      =>  plt_morph%NumOfBranches_pft    , &
     MY       =>  plt_morph%MY     , &
@@ -736,9 +736,9 @@ module grosubsMod
     GrainChemElmnts_pft(NE,NZ)=sum(GrainChemElmnts_brch(NE,1:NumOfBranches_pft(NZ),NZ))
     EarChemElmnts_pft(NE,NZ)=sum(EarChemElmnts_brch(NE,1:NumOfBranches_pft(NZ),NZ))
     !root state variables
-    RootChemElmnts_pft(NE,NZ)=sum(RootMycoNonstructElmnt_vr(NE,1:MY(NZ),NU:MaxRootLayNum,NZ))
-    RootStructChemElmnt_pft(NE,NZ)=sum(Root1stStructChemElmnt_pvr(NE,1:MY(NZ),NU:MaxRootLayNum,1:NumRootAxes_pft(NZ),NZ)) &
-      +sum(Root2ndStructChemElmnt_pvr(NE,1:MY(NZ),NU:MaxRootLayNum,1:NumRootAxes_pft(NZ),NZ))
+    RootChemElmnts_pft(NE,NZ)=sum(RootMycoNonstructElmnt_vr(NE,1:MY(NZ),NU:MaxNumRootLays,NZ))
+    RootStructChemElmnt_pft(NE,NZ)=sum(Root1stStructChemElmnt_pvr(NE,1:MY(NZ),NU:MaxNumRootLays,1:NumRootAxes_pft(NZ),NZ)) &
+      +sum(Root2ndStructChemElmnt_pvr(NE,1:MY(NZ),NU:MaxNumRootLays,1:NumRootAxes_pft(NZ),NZ))
     RootChemElmnts_pft(NE,NZ)=RootChemElmnts_pft(NE,NZ)+RootStructChemElmnt_pft(NE,NZ)
   ENDDO
 

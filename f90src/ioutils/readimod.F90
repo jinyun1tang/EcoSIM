@@ -418,14 +418,14 @@ module readiMod
     call ncd_getvar(grid_nfid, 'IXTYP1',ntp,IXTYP(1,NV1,NH1))
     call ncd_getvar(grid_nfid, 'IXTYP2',ntp,IXTYP(2,NV1,NH1))
     call ncd_getvar(grid_nfid, 'NUI'   ,ntp,NUI(NV1,NH1))
-    call ncd_getvar(grid_nfid, 'NJ'    ,ntp,MaxRootLayNum(NV1,NH1))
+    call ncd_getvar(grid_nfid, 'NJ'    ,ntp,MaxNumRootLays(NV1,NH1))
     call ncd_getvar(grid_nfid, 'NL1'   ,ntp,NL1)
     call ncd_getvar(grid_nfid, 'NL2'   ,ntp,NL2)
     call ncd_getvar(grid_nfid, 'ISOILR',ntp,ISOILR(NV1,NH1))
 
     NU(NV1,NH1)=NUI(NV1,NH1)
-    NK(NV1,NH1)=MaxRootLayNum(NV1,NH1)+1
-    NM(NV1,NH1)=MaxRootLayNum(NV1,NH1)+NL1
+    NK(NV1,NH1)=MaxNumRootLays(NV1,NH1)+1
+    NM(NV1,NH1)=MaxNumRootLays(NV1,NH1)+NL1
 !  the extra soil layer below root zone cannot be greater than what is allowed
     NL2=min0(JZ-NM(NV1,NH1),NL2)
     NLI(NV1,NH1)=NM(NV1,NH1)+NL2
@@ -508,7 +508,7 @@ module readiMod
 !     PH=litter pH
 !     RSC,RSC,RSP=C,N,P in fine(1,0),woody(0,0),manure(2,0) surface litter (g m-2)
 !     IXTYP=surface litter type:1=plant,2=manure
-!     NUI,MaxRootLayNum=number of soil surface layer,maximum rooting layer
+!     NUI,MaxNumRootLays=number of soil surface layer,maximum rooting layer
 !     NL1,NL2=number of additional layers below NJ with,without data in file
 !     ISOILR=natural(0),reconstructed(1) soil profile
 !
@@ -528,7 +528,7 @@ module readiMod
           IXTYP(1,NY,NX) =IXTYP(1,NV1,NH1)
           IXTYP(2,NY,NX) =IXTYP(2,NV1,NH1)
           NUI(NY,NX) = NUI(NV1,NH1)
-          MaxRootLayNum(NY,NX)  = MaxRootLayNum(NV1,NH1)
+          MaxNumRootLays(NY,NX)  = MaxNumRootLays(NV1,NH1)
           ISOILR(NY,NX)=ISOILR(NV1,NH1)
           NU(NY,NX)=NU(NV1,NH1)
           NK(NY,NX)=NK(NV1,NH1)
@@ -819,7 +819,7 @@ module readiMod
   write(*,*)'P in surface manure litter (g m-2)',RSP(k_manure,0,NY,NX)
   write(*,*)'surface litter type:1=plant,2=manure',IXTYP(1,NY,NX),IXTYP(2,NY,NX)
   write(*,*)'layer number of soil surface layer NUI',NUI(NY,NX)
-  write(*,*)'layer number of maximum rooting layer NJ',MaxRootLayNum(NY,NX)
+  write(*,*)'layer number of maximum rooting layer NJ',MaxNumRootLays(NY,NX)
   write(*,*)'number of layers involved in model calculation',NL(NY,NX)
   write(*,*)'Flag for natural(0),reconstructed(1) soil profile', ISOILR(NY,NX)
   write(*,*)

@@ -136,13 +136,16 @@ implicit none
   real(r8),pointer   :: histr_1D_sN2G_FLX_col(:)        !SurfGasFlx(idg_N2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_sNH3_FLX_col(:)        !SurfGasFlx(idg_NH3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
 
+  real(r8),pointer   :: histr_1D_Plant_C_ptc(:)        !whole plant C  
+  real(r8),pointer   :: histr_1D_Plant_N_ptc(:)        !whole plant N  
+  real(r8),pointer   :: histr_1D_Plant_P_ptc(:)        !whole plant P  
   real(r8),pointer   :: histr_1D_LEAF_PC_ptc(:)       !(LeafChemElmnts_pft(ielmp,NZ,NY,NX)+CanopyNonstructElements_pft(ielmp,NZ,NY,NX))/(LeafChemElmnts_pft(ielmc,NZ,NY,NX)+CanopyNonstructElements_pft(ielmc,NZ,NY,NX)),mass based CP ratio of leaf
   real(r8),pointer   :: histr_2D_tSOC_vr_col(:,:)        !ORGC(1:JZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total soil C
   real(r8),pointer   :: histr_1D_CAN_RN_ptc(:)        !277.8*RadNet2CanP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), W m-2
   real(r8),pointer   :: histr_1D_CAN_LE_ptc(:)        !277.8*EvapTransHeatP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_CAN_H_ptc(:)         !277.8*HeatXAir2PCan(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_CAN_G_ptc(:)         !277.8*HeatStorCanP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: histr_1D_CAN_TEMP_ptc(:)      !TCelciusCanopy(NZ,NY,NX)
+  real(r8),pointer   :: histr_1D_CAN_TEMP_ptc(:)      !TCelciusCanopy_pft(NZ,NY,NX)
   real(r8),pointer   :: histr_1D_TEMP_FN_ptc(:)       !fTgrowCanP(NZ,NY,NX), canopy temperature growth function/stress
   real(r8),pointer   :: histr_1D_CAN_CO2_FLX_ptc(:)   !CO2NetFix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.148, umol m-2 s-1
   real(r8),pointer   :: histr_1D_CAN_GPP_ptc(:)       !GrossCO2Fix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total gross CO2 fixation, gC m-2
@@ -154,11 +157,11 @@ implicit none
   real(r8),pointer   :: histr_1D_BLYR_RSC_CO2_ptc(:)  !CanPbndlResist(NZ,NY,NX)*1.34*3600.0_r8, s m-1, for CO2
   real(r8),pointer   :: histr_1D_CAN_CO2_ptc(:)       !CanopyGasCO2_pft(NZ,NY,NX), umol mol-1
   real(r8),pointer   :: histr_1D_LAI_ptc(:)           !CanopyArea_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), plant leaf area, include stalk
-  real(r8),pointer   :: histr_1D_PSI_CAN_ptc(:)       !PSICanP(NZ,NY,NX), canopy total water potential , MPa
+  real(r8),pointer   :: histr_1D_PSI_CAN_ptc(:)       !PSICanopy_pft(NZ,NY,NX), canopy total water potential , MPa
   real(r8),pointer   :: histr_1D_TURG_CAN_ptc(:)      !PSICanPTurg(NZ,NY,NX), canopy turgor water potential, MPa
   real(r8),pointer   :: histr_1D_STOM_RSC_H2O_ptc(:)  !CanPStomaResistH2O(NZ,NY,NX)*3600.0_r8, s m-1, for H2O
   real(r8),pointer   :: histr_1D_BLYR_RSC_H2O_ptc(:)  !CanPbndlResist(NZ,NY,NX)*3600.0_r8, s m-1, for H2O
-  real(r8),pointer   :: histr_1D_TRANSPN_ptc(:)       !PTrans(NZ,NY,NX)*1000.0_r8/AREA(3,NU(NY,NX),NY,NX), canopy transpiration mm H2O/m2/h
+  real(r8),pointer   :: histr_1D_TRANSPN_ptc(:)       !Transpiration_pft(NZ,NY,NX)*1000.0_r8/AREA(3,NU(NY,NX),NY,NX), canopy transpiration mm H2O/m2/h
   real(r8),pointer   :: histr_1D_O2_STRESS_ptc(:)     !OSTR(NZ,NY,NX), plant O2 stress indicator
   real(r8),pointer   :: histr_1D_NH4_UPTK_FLX_ptc(:)      !RootNH4Uptake_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_NO3_UPTK_FLX_ptc(:)      !RootNO3Uptake_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -167,7 +170,7 @@ implicit none
   real(r8),pointer   :: histr_1D_PO4_UPTK_FLX_ptc(:)      !RootH2PO4Uptake_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_SHOOT_C_ptc(:)       !ShootChemElmnts_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_LEAF_C_ptc(:)        !LeafChemElmnts_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: histr_1D_SHTH_C_ptc(:)        !PetioleChemElmnts_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), canopy sheath element
+  real(r8),pointer   :: histr_1D_Petiole_C_ptc(:)        !PetioleChemElmnts_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), canopy sheath element
   real(r8),pointer   :: histr_1D_STALK_C_ptc(:)       !StalkChemElmnts_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_RESERVE_C_ptc(:)     !ReserveChemElmnts_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_HUSK_C_ptc(:)        !(HuskChemElmnts_pft(ielmc,NZ,NY,NX)+EarChemElmnts_pft(ielmc,NZ,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
@@ -196,7 +199,7 @@ implicit none
   real(r8),pointer   :: histr_1D_OXY_STRESS_ptc(:)    !OSTR(NZ,NY,NX)
   real(r8),pointer   :: histr_1D_SHOOT_N_ptc(:)       !ShootChemElmnts_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_LEAF_N_ptc(:)        !LeafChemElmnts_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: histr_1D_SHTH_N_ptc(:)        !PetioleChemElmnts_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: histr_1D_Petiole_N_ptc(:)        !PetioleChemElmnts_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_STALK_N_ptc(:)       !StalkChemElmnts_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_RESERVE_N_ptc(:)     !ReserveChemElmnts_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_HUSK_N_ptc(:)        !(HuskChemElmnts_pft(ielmn,NZ,NY,NX)+EarChemElmnts_pft(ielmn,NZ,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
@@ -215,7 +218,7 @@ implicit none
   real(r8),pointer   :: histr_1D_SURF_LITRf_N_FLX_ptc(:)   !SurfLitrfallChemElmnts_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), surface litter fall
   real(r8),pointer   :: histr_1D_SHOOT_P_ptc(:)       !ShootChemElmnts_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_LEAF_P_ptc(:)        !LeafChemElmnts_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: histr_1D_SHTH_P_ptc(:)        !PetioleChemElmnts_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: histr_1D_Petiole_P_ptc(:)        !PetioleChemElmnts_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_STALK_P_ptc(:)       !StalkChemElmnts_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_RESERVE_P_ptc(:)     !ReserveChemElmnts_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_HUSK_P_ptc(:)        !(HuskChemElmnts_pft(ielmp,NZ,NY,NX)+EarChemElmnts_pft(ielmp,NZ,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
@@ -253,7 +256,7 @@ implicit none
   real(r8),pointer   :: histr_2D_cEXCH_P_vr_col(:,:)     !31.0*(trcx_solml(idx_HPO4,1,NY,NX)+trcx_solml(idx_H2PO4,1,NY,NX)+trcx_solml(idx_HPO4B,1,NY,NX)+trcx_solml(idx_H2PO4B,1,NY,NX))/SoilMicPMassLayer(1,NY,NX)
   real(r8),pointer   :: histr_2D_ECND_vr_col(:,:)         !ECND(1:JZ,NY,NX)
 
-  real(r8),pointer   :: histr_2D_PSI_RT_vr_ptc(:,:)     !PSIRoot(1,1:JZ,NZ,NY,NX), root total water potential , MPa
+  real(r8),pointer   :: histr_2D_PSI_RT_vr_ptc(:,:)     !PSIRoot_vr(1,1:JZ,NZ,NY,NX), root total water potential , MPa
   real(r8),pointer   :: histr_2D_prtUP_NH4_vr_ptc(:,:)     !(RootNH4Uptake_pvr(1,1:JZ,NZ,NY,NX)+RootNH4Uptake_pvr(2,1:JZ,NZ,NY,NX) &
                                                                    !+RUPNHB(1,1:JZ,NZ,NY,NX)+RUPNHB(2,1:JZ,NZ,NY,NX))/AREA(3,1,NY,NX)
   real(r8),pointer   :: histr_2D_prtUP_NO3_vr_ptc(:,:)     !(RootNO3Uptake_pvr(1,1:JZ,NZ,NY,NX)+RootNO3Uptake_pvr(2,1:JZ,NZ,NY,NX) &
@@ -392,7 +395,7 @@ implicit none
   allocate(this%histr_1D_CAN_LE_ptc(beg_ptc:end_ptc))        !277.8*EvapTransHeatP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_CAN_H_ptc(beg_ptc:end_ptc))         !277.8*HeatXAir2PCan(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_CAN_G_ptc(beg_ptc:end_ptc))         !277.8*HeatStorCanP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  allocate(this%histr_1D_CAN_TEMP_ptc(beg_ptc:end_ptc))     !TCelciusCanopy(NZ,NY,NX)
+  allocate(this%histr_1D_CAN_TEMP_ptc(beg_ptc:end_ptc))     !TCelciusCanopy_pft(NZ,NY,NX)
   allocate(this%histr_1D_TEMP_FN_ptc(beg_ptc:end_ptc))      !fTgrowCanP(NZ,NY,NX), canopy temperature growth function/stress
   allocate(this%histr_1D_CAN_CO2_FLX_ptc(beg_ptc:end_ptc))  !CO2NetFix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.148, umol m-2 s-1
   allocate(this%histr_1D_CAN_GPP_ptc(beg_ptc:end_ptc))      !GrossCO2Fix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total gross CO2 fixation, gC m-2
@@ -404,11 +407,11 @@ implicit none
   allocate(this%histr_1D_BLYR_RSC_CO2_ptc(beg_ptc:end_ptc)) !CanPbndlResist(NZ,NY,NX)*1.34*3600.0_r8, s m-1, for CO2
   allocate(this%histr_1D_CAN_CO2_ptc(beg_ptc:end_ptc))      !CanopyGasCO2_pft(NZ,NY,NX), umol mol-1
   allocate(this%histr_1D_LAI_ptc(beg_ptc:end_ptc))          !CanopyArea_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), plant leaf area, include stalk
-  allocate(this%histr_1D_PSI_CAN_ptc(beg_ptc:end_ptc))      !PSICanP(NZ,NY,NX), canopy total water potential , MPa
+  allocate(this%histr_1D_PSI_CAN_ptc(beg_ptc:end_ptc))      !PSICanopy_pft(NZ,NY,NX), canopy total water potential , MPa
   allocate(this%histr_1D_TURG_CAN_ptc(beg_ptc:end_ptc))     !PSICanPTurg(NZ,NY,NX), canopy turgor water potential, MPa
   allocate(this%histr_1D_STOM_RSC_H2O_ptc(beg_ptc:end_ptc)) !CanPStomaResistH2O(NZ,NY,NX)*3600.0_r8, s m-1, for H2O
   allocate(this%histr_1D_BLYR_RSC_H2O_ptc(beg_ptc:end_ptc)) !CanPbndlResist(NZ,NY,NX)*3600.0_r8, s m-1, for H2O
-  allocate(this%histr_1D_TRANSPN_ptc(beg_ptc:end_ptc))      !PTrans(NZ,NY,NX)*1000.0_r8/AREA(3,NU(NY,NX),NY,NX), canopy transpiration mm H2O/m2/h
+  allocate(this%histr_1D_TRANSPN_ptc(beg_ptc:end_ptc))      !Transpiration_pft(NZ,NY,NX)*1000.0_r8/AREA(3,NU(NY,NX),NY,NX), canopy transpiration mm H2O/m2/h
   allocate(this%histr_1D_O2_STRESS_ptc(beg_ptc:end_ptc))    !OSTR(NZ,NY,NX), plant O2 stress indicator
   allocate(this%histr_1D_NH4_UPTK_FLX_ptc(beg_ptc:end_ptc))     !RootNH4Uptake_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_NO3_UPTK_FLX_ptc(beg_ptc:end_ptc))     !RootNO3Uptake_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -416,8 +419,9 @@ implicit none
   allocate(this%histr_1D_cNH3_FLX_ptc(beg_ptc:end_ptc))      !RNH3C(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_PO4_UPTK_FLX_ptc(beg_ptc:end_ptc))     !RootH2PO4Uptake_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_SHOOT_C_ptc(beg_ptc:end_ptc))      !ShootChemElmnts_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  allocate(this%histr_1D_Plant_C_ptc(beg_ptc:end_ptc))
   allocate(this%histr_1D_LEAF_C_ptc(beg_ptc:end_ptc))       !LeafChemElmnts_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  allocate(this%histr_1D_SHTH_C_ptc(beg_ptc:end_ptc))       !PetioleChemElmnts_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), canopy sheath element
+  allocate(this%histr_1D_Petiole_C_ptc(beg_ptc:end_ptc))       !PetioleChemElmnts_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), canopy sheath element
   allocate(this%histr_1D_STALK_C_ptc(beg_ptc:end_ptc))      !StalkChemElmnts_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_RESERVE_C_ptc(beg_ptc:end_ptc))    !ReserveChemElmnts_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_HUSK_C_ptc(beg_ptc:end_ptc))       !(HuskChemElmnts_pft(ielmc,NZ,NY,NX)+EarChemElmnts_pft(ielmc,NZ,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
@@ -444,8 +448,9 @@ implicit none
   allocate(this%histr_1D_WTR_STRESS_ptc(beg_ptc:end_ptc))    !HoursCanopyPSITooLow(NZ,NY,NX)
   allocate(this%histr_1D_OXY_STRESS_ptc(beg_ptc:end_ptc))    !OSTR(NZ,NY,NX)
   allocate(this%histr_1D_SHOOT_N_ptc(beg_ptc:end_ptc))       !ShootChemElmnts_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  allocate(this%histr_1D_Plant_N_ptc(beg_ptc:end_ptc))  
   allocate(this%histr_1D_LEAF_N_ptc(beg_ptc:end_ptc))        !LeafChemElmnts_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  allocate(this%histr_1D_SHTH_N_ptc(beg_ptc:end_ptc))        !PetioleChemElmnts_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  allocate(this%histr_1D_Petiole_N_ptc(beg_ptc:end_ptc))        !PetioleChemElmnts_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_STALK_N_ptc(beg_ptc:end_ptc))       !StalkChemElmnts_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_RESERVE_N_ptc(beg_ptc:end_ptc))     !ReserveChemElmnts_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_HUSK_N_ptc(beg_ptc:end_ptc))        !(HuskChemElmnts_pft(ielmn,NZ,NY,NX)+EarChemElmnts_pft(ielmn,NZ,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
@@ -465,8 +470,9 @@ implicit none
   allocate(this%histr_1D_FIREp_N_FLX_ptc(beg_ptc:end_ptc))        !VNH3F(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), plant N emission from fire
   allocate(this%histr_1D_SURF_LITRf_N_FLX_ptc(beg_ptc:end_ptc))   !SurfLitrfallChemElmnts_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), surface litter fall
   allocate(this%histr_1D_SHOOT_P_ptc(beg_ptc:end_ptc))       !ShootChemElmnts_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  allocate(this%histr_1D_Plant_P_ptc(beg_ptc:end_ptc))
   allocate(this%histr_1D_LEAF_P_ptc(beg_ptc:end_ptc))        !LeafChemElmnts_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  allocate(this%histr_1D_SHTH_P_ptc(beg_ptc:end_ptc))        !PetioleChemElmnts_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  allocate(this%histr_1D_Petiole_P_ptc(beg_ptc:end_ptc))        !PetioleChemElmnts_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_STALK_P_ptc(beg_ptc:end_ptc))       !StalkChemElmnts_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_RESERVE_P_ptc(beg_ptc:end_ptc))     !ReserveChemElmnts_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_HUSK_P_ptc(beg_ptc:end_ptc))        !(HuskChemElmnts_pft(ielmp,NZ,NY,NX)+EarChemElmnts_pft(ielmp,NZ,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
@@ -502,7 +508,7 @@ implicit none
   allocate(this%histr_2D_cPO4_vr_col(beg_col:end_col,1:JZ))         !(trc_solml(ids_H1PO4,1:JZ,NY,NX)+trc_solml(ids_H1PO4B,1,NY,NX)+trc_solml(ids_H2PO4,1,NY,NX)+trc_solml(ids_H2PO4B,1,NY,NX))/VLWatMicP(1,NY,NX)
   allocate(this%histr_2D_cEXCH_P_vr_col(beg_col:end_col,1:JZ))      !31.0*(trcx_solml(idx_HPO4,1:JZ,NY,NX)+trcx_solml(idx_H2PO4,1:JZ,NY,NX)+trcx_solml(idx_HPO4B,1:JZ,NY,NX)+trcx_solml(idx_H2PO4B,1,NY,NX))/SoilMicPMassLayer(1,NY,NX)
   allocate(this%histr_2D_ECND_vr_col(beg_col:end_col,1:JZ))         !ECND(1:JZ,NY,NX)
-  allocate(this%histr_2D_PSI_RT_vr_ptc(beg_ptc:end_ptc,1:JZ))       !PSIRoot(1,1:JZ,NZ,NY,NX), root total water potential , MPa
+  allocate(this%histr_2D_PSI_RT_vr_ptc(beg_ptc:end_ptc,1:JZ))       !PSIRoot_vr(1,1:JZ,NZ,NY,NX), root total water potential , MPa
   allocate(this%histr_2D_prtUP_NH4_vr_ptc(beg_ptc:end_ptc,1:JZ))       !(RootNH4Uptake_pvr(1,1:JZ,NZ,NY,NX)+RootNH4Uptake_pvr(2,1:JZ,NZ,NY,NX) &
                                                                !+RUPNHB(1,1:JZ,NZ,NY,NX)+RUPNHB(2,1:JZ,NZ,NY,NX))/AREA(3,1,NY,NX)
   allocate(this%histr_2D_prtUP_NO3_vr_ptc(beg_ptc:end_ptc,1:JZ))       !(RootNO3Uptake_pvr(1,1:JZ,NZ,NY,NX)+RootNO3Uptake_pvr(2,1:JZ,NZ,NY,NX) &
@@ -1045,12 +1051,16 @@ implicit none
   call hist_addfld1d(fname='SHOOT_C',units='gC/m2',avgflag='A',&
     long_name='canopy shoot C',ptr_patch=data1d_ptr)      
 
+  data1d_ptr => this%histr_1D_Plant_C_ptc(beg_ptc:end_ptc)     
+  call hist_addfld1d(fname='PLANT_C',units='gC/m2',avgflag='A',&
+    long_name='plant C',ptr_patch=data1d_ptr)      
+
   data1d_ptr => this%histr_1D_LEAF_C_ptc(beg_ptc:end_ptc)      
   call hist_addfld1d(fname='LEAF_C',units='gC/m2',avgflag='A',&
     long_name='canopy leaf C',ptr_patch=data1d_ptr)      
 
-  data1d_ptr => this%histr_1D_SHTH_C_ptc(beg_ptc:end_ptc)   
-  call hist_addfld1d(fname='SHTH_C',units='gC/m2',avgflag='A',&
+  data1d_ptr => this%histr_1D_Petiole_C_ptc(beg_ptc:end_ptc)   
+  call hist_addfld1d(fname='PETIOLE_C',units='gC/m2',avgflag='A',&
     long_name='canopy sheath C',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%histr_1D_STALK_C_ptc(beg_ptc:end_ptc)   
@@ -1147,7 +1157,7 @@ implicit none
 
   data1d_ptr => this%histr_1D_WTR_STRESS_ptc(beg_ptc:end_ptc)    !HoursCanopyPSITooLow(NZ,NY,NX)
   call hist_addfld1d(fname='WTR_STRESS',units='hr',avgflag='A',&
-    long_name='canopy plant water stress indicator: number of hours PSICanP < PSILY',ptr_patch=data1d_ptr)      
+    long_name='canopy plant water stress indicator: number of hours PSICanopy_pft(< PSILY',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%histr_1D_OXY_STRESS_ptc(beg_ptc:end_ptc)    !OSTR(NZ,NY,NX)
   call hist_addfld1d(fname='OXY_STRESS',units='none',avgflag='A',&
@@ -1157,12 +1167,16 @@ implicit none
   call hist_addfld1d(fname='SHOOT_N',units='gN/m2',avgflag='A',&
     long_name='canopy shoot N',ptr_patch=data1d_ptr)      
 
+  data1d_ptr => this%histr_1D_Plant_N_ptc(beg_ptc:end_ptc)     
+  call hist_addfld1d(fname='PLANT_N',units='gN/m2',avgflag='A',&
+    long_name='plant N',ptr_patch=data1d_ptr)      
+
   data1d_ptr => this%histr_1D_LEAF_N_ptc(beg_ptc:end_ptc)  
   call hist_addfld1d(fname='LEAF_N',units='gN/m2',avgflag='A',&
     long_name='Canopy leaf N',ptr_patch=data1d_ptr)      
 
-  data1d_ptr => this%histr_1D_SHTH_N_ptc(beg_ptc:end_ptc)      
-  call hist_addfld1d(fname='SHTH_N',units='gN/m2',avgflag='A',&
+  data1d_ptr => this%histr_1D_Petiole_N_ptc(beg_ptc:end_ptc)      
+  call hist_addfld1d(fname='Petiole_N',units='gN/m2',avgflag='A',&
     long_name='canopy sheath N',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%histr_1D_STALK_N_ptc(beg_ptc:end_ptc)       
@@ -1233,12 +1247,16 @@ implicit none
   call hist_addfld1d(fname='SHOOT_P',units='gP/m2',avgflag='A',&
     long_name='canopy shoot P',ptr_patch=data1d_ptr)      
 
+  data1d_ptr => this%histr_1D_Plant_P_ptc(beg_ptc:end_ptc)     
+  call hist_addfld1d(fname='PLANT_P',units='gP/m2',avgflag='A',&
+    long_name='plant P',ptr_patch=data1d_ptr)      
+
   data1d_ptr => this%histr_1D_LEAF_P_ptc(beg_ptc:end_ptc)       
   call hist_addfld1d(fname='LEAF_P',units='gP/m2',avgflag='A',&
     long_name='Canopy leaf P',ptr_patch=data1d_ptr)      
 
-  data1d_ptr => this%histr_1D_SHTH_P_ptc(beg_ptc:end_ptc)  
-  call hist_addfld1d(fname='SHTH_P',units='gP/m2',avgflag='A',&
+  data1d_ptr => this%histr_1D_Petiole_P_ptc(beg_ptc:end_ptc)  
+  call hist_addfld1d(fname='Petiole_P',units='gP/m2',avgflag='A',&
     long_name='canopy sheath P',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%histr_1D_STALK_P_ptc(beg_ptc:end_ptc)      
@@ -1561,7 +1579,7 @@ implicit none
         this%histr_1D_CAN_LE_ptc(nptc)       = 277.8_r8*EvapTransHeatP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_CAN_H_ptc(nptc)        = 277.8_r8*HeatXAir2PCan(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_CAN_G_ptc(nptc)        = 277.8_r8*HeatStorCanP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%histr_1D_CAN_TEMP_ptc(nptc)     = TCelciusCanopy(NZ,NY,NX)
+        this%histr_1D_CAN_TEMP_ptc(nptc)     = TCelciusCanopy_pft(NZ,NY,NX)
         this%histr_1D_TEMP_FN_ptc(nptc)      = fTgrowCanP(NZ,NY,NX)
         this%histr_1D_CAN_CO2_FLX_ptc(nptc)  = CO2NetFix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.148_r8
         this%histr_1D_CAN_GPP_ptc(nptc)      = GrossCO2Fix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -1573,11 +1591,11 @@ implicit none
         this%histr_1D_BLYR_RSC_CO2_ptc(nptc) = CanPbndlResist(NZ,NY,NX)*1.34_r8*3600.0_r8
         this%histr_1D_CAN_CO2_ptc(nptc)      = CanopyGasCO2_pft(NZ,NY,NX)
         this%histr_1D_LAI_ptc(nptc)          = CanopyArea_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%histr_1D_PSI_CAN_ptc(nptc)      = PSICanP(NZ,NY,NX)
+        this%histr_1D_PSI_CAN_ptc(nptc)      = PSICanopy_pft(NZ,NY,NX)
         this%histr_1D_TURG_CAN_ptc(nptc)     = PSICanPTurg(NZ,NY,NX)
         this%histr_1D_STOM_RSC_H2O_ptc(nptc) = CanPStomaResistH2O(NZ,NY,NX)*3600.0_r8
         this%histr_1D_BLYR_RSC_H2O_ptc(nptc) = CanPbndlResist(NZ,NY,NX)*3600.0_r8
-        this%histr_1D_TRANSPN_ptc(nptc)      = PTrans(NZ,NY,NX)*1000.0_r8/AREA(3,NU(NY,NX),NY,NX)
+        this%histr_1D_TRANSPN_ptc(nptc)      = Transpiration_pft(NZ,NY,NX)*1000.0_r8/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_O2_STRESS_ptc(nptc)    = PlantO2Stress(NZ,NY,NX)
         this%histr_1D_NH4_UPTK_FLX_ptc(nptc)     = RootNH4Uptake_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_NO3_UPTK_FLX_ptc(nptc)     = RootNO3Uptake_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -1585,8 +1603,9 @@ implicit none
         this%histr_1D_cNH3_FLX_ptc(nptc)      = RNH3C(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_PO4_UPTK_FLX_ptc(nptc)     = RootH2PO4Uptake_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_SHOOT_C_ptc(nptc)      = ShootChemElmnts_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%histr_1D_Plant_C_ptc(nptc)      = (ShootChemElmnts_pft(ielmc,NZ,NY,NX)+RootChemElmnts_pft(ielmc,NZ,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_LEAF_C_ptc(nptc)       = LeafChemElmnts_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%histr_1D_SHTH_C_ptc(nptc)       = PetioleChemElmnts_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%histr_1D_Petiole_C_ptc(nptc)       = PetioleChemElmnts_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_STALK_C_ptc(nptc)      = StalkChemElmnts_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_RESERVE_C_ptc(nptc)    = ReserveChemElmnts_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_HUSK_C_ptc(nptc)       = (HuskChemElmnts_pft(ielmc,NZ,NY,NX)+EarChemElmnts_pft(ielmc,NZ,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
@@ -1612,13 +1631,14 @@ implicit none
         this%histr_1D_FIREp_CH4_FLX_ptc(nptc)    = CH4ByFire_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_NPP_ptc(nptc)          = NetPrimaryProductvity_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_CAN_HT_ptc(nptc)       = CanopyHeight_pft(NZ,NY,NX)
-        this%histr_1D_POPN_ptc(nptc)         = pftPlantPopulation(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%histr_1D_POPN_ptc(nptc)         = PlantPopulation_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_tTRANSPN_ptc(nptc)     =-ETCanP(NZ,NY,NX)*1000.0/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_WTR_STRESS_ptc(nptc)   = HoursCanopyPSITooLow(NZ,NY,NX)
         this%histr_1D_OXY_STRESS_ptc(nptc)   = PlantO2Stress(NZ,NY,NX)
         this%histr_1D_SHOOT_N_ptc(nptc)      = ShootChemElmnts_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%histr_1D_Plant_N_ptc(nptc)      = (ShootChemElmnts_pft(ielmn,NZ,NY,NX)+RootChemElmnts_pft(ielmn,NZ,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_LEAF_N_ptc(nptc)       = LeafChemElmnts_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%histr_1D_SHTH_N_ptc(nptc)       = PetioleChemElmnts_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%histr_1D_Petiole_N_ptc(nptc)       = PetioleChemElmnts_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_STALK_N_ptc(nptc)      = StalkChemElmnts_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_RESERVE_N_ptc(nptc)    = ReserveChemElmnts_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_HUSK_N_ptc(nptc)       = (HuskChemElmnts_pft(ielmn,NZ,NY,NX)+EarChemElmnts_pft(ielmn,NZ,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
@@ -1634,8 +1654,9 @@ implicit none
         this%histr_1D_FIREp_N_FLX_ptc(nptc)       = VNH3F(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_SURF_LITRf_N_FLX_ptc(nptc)  = SurfLitrfallChemElmnts_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_SHOOT_P_ptc(nptc)      = ShootChemElmnts_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%histr_1D_Plant_P_ptc(nptc)      = (ShootChemElmnts_pft(ielmp,NZ,NY,NX)+RootChemElmnts_pft(ielmp,NZ,NY,NX))/AREA(3,NU(NY,NX),NY,NX)        
         this%histr_1D_LEAF_P_ptc(nptc)       = LeafChemElmnts_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%histr_1D_SHTH_P_ptc(nptc)       = PetioleChemElmnts_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%histr_1D_Petiole_P_ptc(nptc)       = PetioleChemElmnts_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_STALK_P_ptc(nptc)      = StalkChemElmnts_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_RESERVE_P_ptc(nptc)    = ReserveChemElmnts_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_HUSK_P_ptc(nptc)       = (HuskChemElmnts_pft(ielmp,NZ,NY,NX)+EarChemElmnts_pft(ielmp,NZ,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
@@ -1656,7 +1677,7 @@ implicit none
             IF(KN==0)THEN
               this%histr_1D_Growth_Stage_ptc(nptc)   =KN
             ELSE
-              if(iPlantCalendar(KN,NumOfMainBranch_pft(NZ,NY,NX),NZ,NY,NX)>0)then
+              if(iPlantCalendar_brch(KN,NumOfMainBranch_pft(NZ,NY,NX),NZ,NY,NX)>0)then
                 this%histr_1D_Growth_Stage_ptc(nptc) =KN
                 exit    
               endif  
@@ -1668,11 +1689,11 @@ implicit none
           ENDDO
         endif
         DO L=1,JZ
-          this%histr_2D_PSI_RT_vr_ptc(nptc,L)  = PSIRoot(ipltroot,L,NZ,NY,NX)
+          this%histr_2D_PSI_RT_vr_ptc(nptc,L)  = PSIRoot_vr(ipltroot,L,NZ,NY,NX)
           this%histr_2D_prtUP_NH4_vr_ptc(nptc,L)  = (sum(RootNH4Uptake_pvr(:,L,NZ,NY,NX))+sum(RUPNHB(:,L,NZ,NY,NX)))/AREA(3,L,NY,NX)
           this%histr_2D_prtUP_NO3_vr_ptc(nptc,L)  = (sum(RootNO3Uptake_pvr(:,L,NZ,NY,NX))+sum(RUPNOB(:,L,NZ,NY,NX)))/AREA(3,L,NY,NX)
           this%histr_2D_prtUP_PO4_vr_ptc(nptc,L)  = (sum(RootH2PO4Uptake_pvr(:,L,NZ,NY,NX))+sum(RUPH2B(:,L,NZ,NY,NX)))/AREA(3,L,NY,NX)
-          this%histr_2D_DNS_RT_vr_ptc(nptc,L)  = RootLenthDensPerPopu_pvr(ipltroot,L,NZ,NY,NX)*pftPlantPopulation(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          this%histr_2D_DNS_RT_vr_ptc(nptc,L)  = RootLenthDensPerPopu_pvr(ipltroot,L,NZ,NY,NX)*PlantPopulation_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         ENDDO
       ENDDO 
     ENDDO 

@@ -161,8 +161,8 @@ module VisualMod
 !     TCCTD=0.0
 !     TCCMD=-50.0
 !     ENDIF
-!     TCCTD=TCCTD+TCelciusCanopy(NZ,NY,NX)
-!     TCCMD=AMAX1(TCCMD,TCelciusCanopy(NZ,NY,NX))
+!     TCCTD=TCCTD+TCelciusCanopy_pft(NZ,NY,NX)
+!     TCCMD=AMAX1(TCCMD,TCelciusCanopy_pft(NZ,NY,NX))
 !     IF(J.EQ.24)THEN
 !     TCCAD=TCCTD/24
 !     TCCTX=TCCTX+TCCAD

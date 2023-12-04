@@ -28,13 +28,13 @@ implicit none
     CanWatP      =>   plt_ew%CanWatP       , &
     RootChemElmnts_pft      =>   plt_biom%RootChemElmnts_pft     , &
     NonstructalChemElmnts_pft      =>   plt_biom%NonstructalChemElmnts_pft     , &
-    iPlantPhenologyPattern     =>   plt_pheno%iPlantPhenologyPattern   , &
-    iPlantRootState     =>   plt_pheno%iPlantRootState   , &
-    iPlantShootState      =>   plt_pheno%iPlantShootState    , &
+    iPlantPhenologyPattern_pft     =>   plt_pheno%iPlantPhenologyPattern_pft   , &
+    iPlantRootState_pft     =>   plt_pheno%iPlantRootState_pft   , &
+    iPlantShootState_pft      =>   plt_pheno%iPlantShootState_pft    , &
     doInitPlant      =>   plt_pheno%doInitPlant    , &
     HoursCanopyPSITooLow       =>   plt_pheno%HoursCanopyPSITooLow     , &
-    iPlantCalendar      =>   plt_pheno%iPlantCalendar    , &
-    pftPlantPopulation         =>   plt_site%pftPlantPopulation        , &
+    iPlantCalendar_brch     =>   plt_pheno%iPlantCalendar_brch   , &
+    PlantPopulation_pft         =>   plt_site%PlantPopulation_pft        , &
     iYearCurrent       =>   plt_site%iYearCurrent      , &
     VOLWOU     =>   plt_site%VOLWOU    , &
     SolarNoonHour_col     =>   plt_site%SolarNoonHour_col    , &
@@ -45,8 +45,8 @@ implicit none
   )
 !
 !     SolarNoonHour_col=hour of solar noon
-!     iPlantCalendar(ipltcal_Emerge,=emergence date
-!     iPlantPhenologyPattern=growth habit:0=annual,1=perennial from PFT file
+!     iPlantCalendar_brch(ipltcal_Emerge,=emergence date
+!     iPlantPhenologyPattern_pft=growth habit:0=annual,1=perennial from PFT file
 !     iDayPlantHarvest,iYearPlantHarvest=day,year of harvesting
 !     iYearCurrent=current year
 !     iPlantBranchState=branch living flag: 0=alive,1=dead
@@ -68,8 +68,8 @@ implicit none
 !     doPlantLeaveOff_brch=flag for enabling leafoff:0=enable,1=disable
 !     Hours4LiterfalAftMature_brch=current hours after physl maturity until start of litterfall
 !
-  IF(J.EQ.INT(SolarNoonHour_col).AND.iPlantCalendar(ipltcal_Emerge,NumOfMainBranch_pft(NZ),NZ).NE.0 &
-    .AND.(iPlantPhenologyPattern(NZ).NE.iplt_annual.OR.(I.GE.iDayPlantHarvest(NZ) &
+  IF(J.EQ.INT(SolarNoonHour_col).AND.iPlantCalendar_brch(ipltcal_Emerge,NumOfMainBranch_pft(NZ),NZ).NE.0 &
+    .AND.(iPlantPhenologyPattern_pft(NZ).NE.iplt_annual.OR.(I.GE.iDayPlantHarvest(NZ) &
     .AND.iYearCurrent.GE.iYearPlantHarvest(NZ))))THEN
     IDTHY=0
 !
@@ -78,7 +78,7 @@ implicit none
     call LiterfallFromDeadBranches(I,J,NZ,IDTHY,ShootNonstructC_brch)
 
     IF(IDTHY.EQ.NumOfBranches_pft(NZ))THEN
-      iPlantShootState(NZ)=iDead
+      iPlantShootState_pft(NZ)=iDead
       BranchNumber_pft(NZ)=0
       HoursCanopyPSITooLow(NZ)=0._r8
       IF(doInitPlant(NZ).EQ.itrue)THEN
@@ -94,25 +94,25 @@ implicit none
 !     RESET LIVING FLAGS
 !
 !     WTRVC,WTRT=PFT storage,root C
-!     iPlantPhenologyPattern=growth habit:0=annual,1=perennial
+!     iPlantPhenologyPattern_pft=growth habit:0=annual,1=perennial
 !     JHVST=terminate PFT:0=no,1=yes,2=yes,but reseed
 !     PP=PFT population
-!     iPlantShootState,IDTHR=PFT shoot,root living flag: 0=alive,1=dead
+!     iPlantShootState_pft,IDTHR=PFT shoot,root living flag: 0=alive,1=dead
 !
-      IF(NonstructalChemElmnts_pft(ielmc,NZ).LT.1.0E-04_r8*RootChemElmnts_pft(ielmc,NZ).AND.iPlantPhenologyPattern(NZ).NE.iplt_annual)then
-        iPlantRootState(NZ)=iDead
+      IF(NonstructalChemElmnts_pft(ielmc,NZ).LT.1.0E-04_r8*RootChemElmnts_pft(ielmc,NZ).AND.iPlantPhenologyPattern_pft(NZ).NE.iplt_annual)then
+        iPlantRootState_pft(NZ)=iDead
       endif
-      IF(iPlantPhenologyPattern(NZ).EQ.iplt_annual)then
-        iPlantRootState(NZ)=iDead
+      IF(iPlantPhenologyPattern_pft(NZ).EQ.iplt_annual)then
+        iPlantRootState_pft(NZ)=iDead
       endif
       IF(JHVST(NZ).NE.ihv_noaction)then
-        iPlantRootState(NZ)=iDead
+        iPlantRootState_pft(NZ)=iDead
       endif
-      IF(pftPlantPopulation(NZ).LE.0.0_r8)then
-        iPlantRootState(NZ)=iDead
+      IF(PlantPopulation_pft(NZ).LE.0.0_r8)then
+        iPlantRootState_pft(NZ)=iDead
       endif
-      IF(iPlantRootState(NZ).EQ.iDead)then
-        iPlantShootState(NZ)=iDead
+      IF(iPlantRootState_pft(NZ).EQ.iDead)then
+        iPlantShootState_pft(NZ)=iDead
       endif
     ENDIF
 !
@@ -161,12 +161,12 @@ implicit none
     FWOODE     =>   plt_allom%FWOODE  , &
     FWODRE     =>   plt_allom%FWODRE  , &
     doInitPlant      =>   plt_pheno%doInitPlant   , &
-    iPlantPhenologyPattern     =>   plt_pheno%iPlantPhenologyPattern  , &
-    iPlantPhenologyType     =>   plt_pheno%iPlantPhenologyType  , &
-    iPlantRootState     =>   plt_pheno%iPlantRootState  , &
+    iPlantPhenologyPattern_pft     =>   plt_pheno%iPlantPhenologyPattern_pft  , &
+    iPlantPhenologyType_pft     =>   plt_pheno%iPlantPhenologyType_pft  , &
+    iPlantRootState_pft     =>   plt_pheno%iPlantRootState_pft  , &
     iPlantMorphologyType     =>   plt_pheno%iPlantMorphologyType  , &
     iPlantTurnoverPattern     =>   plt_pheno%iPlantTurnoverPattern  , &
-    iPlantShootState      =>   plt_pheno%iPlantShootState   , &
+    iPlantShootState_pft      =>   plt_pheno%iPlantShootState_pft   , &
     icwood     =>   pltpar%icwood     , &
     ifoliar    =>   pltpar%ifoliar    , &
     k_fine_litr=>   pltpar%k_fine_litr, &
@@ -177,7 +177,7 @@ implicit none
     iroot      =>   pltpar%iroot      , &
     inonstruct   =>   pltpar%inonstruct   , &
     LYRC       =>   plt_site%LYRC     , &
-    MaxRootLayNum         =>   plt_site%MaxRootLayNum       , &
+    MaxNumRootLays         =>   plt_site%MaxNumRootLays       , &
     NU         =>   plt_site%NU       , &
     IDATA      =>   plt_site%IDATA    , &
     CFOPE      =>   plt_soilchem%CFOPE, &
@@ -189,7 +189,7 @@ implicit none
 !     LITTERFALL AND STATE VARIABLES FOR SEASONAL STORAGE
 !     RESERVES FROM SHOOT AT DEATH
 !
-!     iPlantShootState,IDTHR=PFT shoot,root living flag: 0=alive,1=dead
+!     iPlantShootState_pft,IDTHR=PFT shoot,root living flag: 0=alive,1=dead
 !     doInitPlant=PFT initialization flag:0=no,1=yes
 !     CSNC,ZSNC,PSNC=C,N,P litterfall from senescence
 !     CFOPC,CFOPN,CFOPC=fraction of litterfall C,N,P allocated to litter components
@@ -204,12 +204,12 @@ implicit none
 !     WTHSKB,WTEARB,WTGRB=branch husk,ear,grain C mass
 !     WTHSBN,WTEABN,WTGRBN=branch husk,ear,grain N mass
 !     WTHSBP,WTEABP,WTGRBP=branch husk,ear,grain P mass
-!     iPlantPhenologyPattern=growth habit:0=annual,1=perennial from PFT file
-!     iPlantPhenologyType=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
+!     iPlantPhenologyPattern_pft=growth habit:0=annual,1=perennial from PFT file
+!     iPlantPhenologyType_pft=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
 !     WTRVC,WTRVN,WTRVP=storage C,N,P
 !     WTSTG,WTSTDN,WTSTDP=standing dead C,N,P mass
 !
-  IF(iPlantShootState(NZ).EQ.iDead.AND.iPlantRootState(NZ).EQ.iDead)THEN
+  IF(iPlantShootState_pft(NZ).EQ.iDead.AND.iPlantRootState_pft(NZ).EQ.iDead)THEN
     !both plant shoots and roots are dead
     IF(doInitPlant(NZ).EQ.ifalse)THEN
       D6425: DO M=1,jsken
@@ -231,7 +231,7 @@ implicit none
               +CFOPE(NE,inonfoliar,M,NZ)*(PetioleChemElmnts_brch(NE,NB,NZ)*FWODBE(NE,k_fine_litr) &
               +HuskChemElmnts_brch(NE,NB,NZ)+EarChemElmnts_brch(NE,NB,NZ))
 
-            IF(iPlantPhenologyPattern(NZ).EQ.iplt_annual.AND.iPlantPhenologyType(NZ).NE.0)THEN
+            IF(iPlantPhenologyPattern_pft(NZ).EQ.iplt_annual.AND.iPlantPhenologyType_pft(NZ).NE.0)THEN
               NonstructalChemElmnts_pft(NE,NZ)=NonstructalChemElmnts_pft(NE,NZ)+CFOPE(NE,inonfoliar,M,NZ)*GrainChemElmnts_brch(NE,NB,NZ)
             ELSE
               LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,0,NZ)=LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,0,NZ)+CFOPE(NE,inonfoliar,M,NZ)*GrainChemElmnts_brch(NE,NB,NZ)
@@ -257,7 +257,7 @@ implicit none
 !     WTRVC,WTRVN,WTRVP=storage C,N,P
 !
         DO NE=1,NumOfPlantChemElmnts
-          D6415: DO L=NU,MaxRootLayNum
+          D6415: DO L=NU,MaxNumRootLays
             DO N=1,MY(NZ)
               LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,L,NZ)=LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,L,NZ) &
                 +CFOPE(NE,inonstruct,M,NZ)* RootMycoNonstructElmnt_vr(NE,N,L,NZ)
@@ -283,12 +283,12 @@ implicit none
 !
 !     RESEED DEAD PERENNIALS
 !
-!     iPlantPhenologyPattern=growth habit:0=annual,1=perennial from PFT file
+!     iPlantPhenologyPattern_pft=growth habit:0=annual,1=perennial from PFT file
 !     JHVST=terminate PFT:0=no,1=yes,2=yes,but reseed
 !     LYRC=number of days in current year
 !     iDayPlanting,iYearPlanting=day,year of planting
 !
-    IF(iPlantPhenologyPattern(NZ).NE.iplt_annual.AND.JHVST(NZ).EQ.ihv_noaction)THEN
+    IF(iPlantPhenologyPattern_pft(NZ).NE.iplt_annual.AND.JHVST(NZ).EQ.ihv_noaction)THEN
       IF(I.LT.LYRC)THEN
         iDayPlanting(NZ)=I+1
         iYearPlanting(NZ)=iYearCurrent
@@ -318,11 +318,11 @@ implicit none
     RootNoduleNonstructElmnt_vr   =>   plt_biom%RootNoduleNonstructElmnt_vr   , &
     RootNodueChemElmnt_pvr    =>   plt_biom%RootNodueChemElmnt_pvr    , &
     FWODRE    =>   plt_allom%FWODRE   , &
-    iPlantRootState    =>   plt_pheno%iPlantRootState   , &
+    iPlantRootState_pft    =>   plt_pheno%iPlantRootState_pft   , &
     CFOPE     =>   plt_soilchem%CFOPE , &
     trcg_rootml      =>   plt_rbgc%trcg_rootml  , &
     trcs_rootml => plt_rbgc%trcs_rootml, &
-    MaxRootLayNum        =>   plt_site%MaxRootLayNum        , &
+    MaxNumRootLays        =>   plt_site%MaxNumRootLays        , &
     NU        =>   plt_site%NU        , &
     RootGasLoss_disturb     =>   plt_bgcr%RootGasLoss_disturb     , &
     LitterFallChemElmnt_pftvr      =>   plt_bgcr%LitterFallChemElmnt_pftvr      , &
@@ -341,8 +341,8 @@ implicit none
     AveSecndRootLen     =>   plt_morph%AveSecndRootLen    , &
     PrimRootRadius     =>   plt_morph%PrimRootRadius    , &
     SecndRootRadius     =>   plt_morph%SecndRootRadius    , &
-    MaxPrimRootRadius    =>   plt_morph%MaxPrimRootRadius   , &
-    MaxSecndRootRadius    =>   plt_morph%MaxSecndRootRadius   , &
+    Max1stRootRadius    =>   plt_morph%Max1stRootRadius   , &
+    Max2ndRootRadius    =>   plt_morph%Max2ndRootRadius   , &
     RootLenPerPopu_pvr     =>   plt_morph%RootLenPerPopu_pvr    , &
     PrimRootLen     =>   plt_morph%PrimRootLen    , &
     SecndRootLen     =>   plt_morph%SecndRootLen    , &
@@ -367,10 +367,10 @@ implicit none
 !     RCO2Z,ROXYZ,RCH4Z,RN2OZ,RNH3Z,RH2GZ=root gaseous CO2,O2,CH4,N2O,NH3,H2 loss from disturbance
 !
 
-  IF(iPlantRootState(NZ).EQ.iDead)THEN
+  IF(iPlantRootState_pft(NZ).EQ.iDead)THEN
     !add root to litterfall
     D8900: DO N=1,MY(NZ)
-      D8895: DO L=NU,MaxRootLayNum
+      D8895: DO L=NU,MaxNumRootLays
         DO NE=1,NumOfPlantChemElmnts
           D6410: DO M=1,jsken
             LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,L,NZ)=LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,L,NZ) &
@@ -427,8 +427,8 @@ implicit none
         RootLenthDensPerPopu_pvr(N,L,NZ)=0._r8
         RootVolume_vr(N,L,NZ)=0._r8
         RootVH2O_vr(N,L,NZ)=0._r8
-        PrimRootRadius(N,L,NZ)=MaxPrimRootRadius(N,NZ)
-        SecndRootRadius(N,L,NZ)=MaxSecndRootRadius(N,NZ)
+        PrimRootRadius(N,L,NZ)=Max1stRootRadius(N,NZ)
+        SecndRootRadius(N,L,NZ)=Max2ndRootRadius(N,NZ)
         RootAreaPerPlant_vr(N,L,NZ)=0._r8
         AveSecndRootLen(N,L,NZ)=MinAve2ndRootLen
 !
@@ -517,11 +517,11 @@ implicit none
     Hours4LiterfalAftMature_brch     =>  plt_pheno%Hours4LiterfalAftMature_brch     , &
     MatureGroup_pft   =>  plt_pheno%MatureGroup_pft   , &
     doPlantLeaveOff_brch     =>  plt_pheno%doPlantLeaveOff_brch     , &
-    iPlantCalendar     =>  plt_pheno%iPlantCalendar     , &
+    iPlantCalendar_brch    =>  plt_pheno%iPlantCalendar_brch    , &
     iPlantTurnoverPattern    =>  plt_pheno%iPlantTurnoverPattern    , &
     iPlantMorphologyType    =>  plt_pheno%iPlantMorphologyType    , &
-    iPlantPhenologyType    =>  plt_pheno%iPlantPhenologyType    , &
-    iPlantPhenologyPattern    =>  plt_pheno%iPlantPhenologyPattern    , &
+    iPlantPhenologyType_pft    =>  plt_pheno%iPlantPhenologyType_pft    , &
+    iPlantPhenologyPattern_pft    =>  plt_pheno%iPlantPhenologyPattern_pft    , &
     LitterFallChemElmnt_pftvr      =>  plt_bgcr%LitterFallChemElmnt_pftvr       , &
     NumOfBranches_pft       =>  plt_morph%NumOfBranches_pft       , &
     NodeNumberToInitFloral     =>  plt_morph%NodeNumberToInitFloral     , &
@@ -568,7 +568,7 @@ implicit none
       Hours4LiterfalAftMature_brch(NB,NZ)=0
       BranchNumber_brch(NB,NZ)=0
       D8850: DO M=1,pltpar%NumGrowthStages
-        iPlantCalendar(M,NB,NZ)=0
+        iPlantCalendar_brch(M,NB,NZ)=0
       ENDDO D8850
 !
 !     LITTERFALL FROM DEAD BRANCHES
@@ -587,8 +587,8 @@ implicit none
 !     WTGRB,WTGRBN,WTGRBP=grain C,N,P mass
 !     WTRVC,WTRVN,WTRVP=storage C,N,P
 !     WTSTG,WTSTDN,WTSTDP=standing dead C,N,P mass
-!     iPlantPhenologyPattern=growth habit:0=annual,1=perennial from PFT file
-!     iPlantPhenologyType=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
+!     iPlantPhenologyPattern_pft=growth habit:0=annual,1=perennial from PFT file
+!     iPlantPhenologyType_pft=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
 !     iPlantTurnoverPattern=turnover:0=all abve-grd,1=all leaf+petiole,2=none,3=between 1,2
 !     iPlantMorphologyType=growth type:0=bryophyte,1=graminoid,2=shrub,tree
 !
@@ -605,7 +605,7 @@ implicit none
             +CFOPE(NE,icwood,M,NZ)*(LeafChemElmnts_brch(NE,NB,NZ)*FWODBE(NE,k_woody_litr) &
             +PetioleChemElmnts_brch(NE,NB,NZ)*FWODBE(NE,k_woody_litr))
 
-          IF(iPlantPhenologyPattern(NZ).EQ.iplt_annual.AND.iPlantPhenologyType(NZ).NE.0)THEN
+          IF(iPlantPhenologyPattern_pft(NZ).EQ.iplt_annual.AND.iPlantPhenologyType_pft(NZ).NE.0)THEN
             NonstructalChemElmnts_pft(NE,NZ)=NonstructalChemElmnts_pft(NE,NZ)+CFOPE(NE,inonfoliar,M,NZ)*GrainChemElmnts_brch(NE,NB,NZ)
           ELSE
             LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,0,NZ)=LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,0,NZ) &
@@ -680,7 +680,7 @@ implicit none
     CanopyNoduleChemElmnt_brch => plt_biom%CanopyNoduleChemElmnt_brch        , &
     StalkChemElmnts_brch=> plt_biom%StalkChemElmnts_brch       , &
     Root1stChemElmnt => plt_biom%Root1stChemElmnt        , &
-    MaxRootLayNum     => plt_site%MaxRootLayNum            , &
+    MaxNumRootLays     => plt_site%MaxNumRootLays            , &
     NU     => plt_site%NU            , &
     iPlantState  => plt_pheno%iPlantState        , &
     SecndRootLen  => plt_morph%SecndRootLen        , &
@@ -716,7 +716,7 @@ implicit none
 !
 !     RESET ROOT STATE VARIABLES
 !
-  D6416: DO L=NU,MaxRootLayNum
+  D6416: DO L=NU,MaxNumRootLays
     DO  N=1,MY(NZ)
        RootMycoNonstructElmnt_vr(1:NumOfPlantChemElmnts,N,L,NZ)=0._r8
       DO  NR=1,NumRootAxes_pft(NZ)
@@ -797,7 +797,7 @@ implicit none
 !     WTGRB,WTGRBN,WTGRBP=grain C,N,P mass
 !     WTRVC,WTRVN,WTRVP=storage C,N,P
 !     WTSTG,WTSTDN,WTSTDP=standing dead C,N,P mass
-!     iPlantPhenologyPattern=growth habit:0=annual,1=perennial from PFT file
+!     iPlantPhenologyPattern_pft=growth habit:0=annual,1=perennial from PFT file
 !     SeedNumberSet_brch=seed set number
 !     PotentialSeedSites_brch=potential number of seed set sites
 !     GrainSeedBiomCMean_brch=individual seed size

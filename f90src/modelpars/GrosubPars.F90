@@ -159,7 +159,7 @@ module GrosubPars
   integer :: iroot
   integer :: icwood
   integer :: NumGrowthStages       !number of growth stages
-  integer :: JRS          !maximum number of root axes
+  integer :: MaxNumRootAxes          !maximum number of root axes
   integer  :: JP1         !number of plants
   integer  :: MaxNumBranches         !maximum number of branches
   integer  :: NumOfSkyAzimuthSectors1        !number of sectors for the sky azimuth  [0,2*pi]
@@ -213,7 +213,7 @@ module GrosubPars
   pltpar%iroot=4
   pltpar%icwood=5
   pltpar%NumGrowthStages=10
-  pltpar%JRS=10
+  pltpar%MaxNumRootAxes=10
   pltpar%NumOfPlantMorphUnits=7
   pltpar%jroots=2
 

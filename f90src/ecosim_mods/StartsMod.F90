@@ -372,7 +372,7 @@ module StartsMod
 !     TORGM=TORGL used to calculate allocation (g m-2)
 !     HCX=shape parameter for depth effect on allocation
 !
-  TORGM=AMAX1(2.0E+03_r8,AMIN1(5.0E+03_r8,0.25_r8*TORGL(MaxRootLayNum(NY,NX))))
+  TORGM=AMAX1(2.0E+03_r8,AMIN1(5.0E+03_r8,0.25_r8*TORGL(MaxNumRootLays(NY,NX))))
   IF(TORGM.GT.ZERO)THEN
     HCX=LOG(0.5_r8)/TORGM
   ELSE
@@ -976,7 +976,7 @@ module StartsMod
 
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
-      NM=MaxRootLayNum(NY,NX)+1
+      NM=MaxNumRootLays(NY,NX)+1
       call ComputeSoilHydroPars(NY,NX,NU(NY,NX),NM)
       call SetDeepSoil(NY,NX,NM,JZ)
     enddo
