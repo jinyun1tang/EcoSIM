@@ -20,7 +20,7 @@ implicit none
   use EcoSimConst
   use GridMod           , only : SetMeshATS
   use InitAllocMod
-  use StartsMod, only : startsim
+  use StartsMod, only : startsim, set_ecosim_solver
   implicit none
   integer :: NY,NX,L,NHW,NHE,NVN,NVS
   integer, intent(in) :: NYS
@@ -31,6 +31,8 @@ implicit none
   write(*,*) "Init Soil"
 
   call SetMeshATS(NHW,NVN,NHE,NVS)
+  
+  call set_ecosim_solver(1, 1, 1, 1)
 
   call InitAlloc(NOMicrobeGuilds=1)
 
