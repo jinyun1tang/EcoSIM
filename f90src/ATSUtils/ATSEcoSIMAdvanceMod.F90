@@ -26,6 +26,7 @@ implicit none
   use EcoSimConst
   use GridMod           , only : SetMeshATS
   use SurfPhysMod       , only : RunSurfacePhysModel, StageSurfacePhysModel
+  use StartsMod         , only : set_ecosim_solver
   implicit none
   integer :: NY,NX,L,NHW,NHE,NVN,NVS, I, J, M, heat_vec_size
   integer, intent(in) :: NYS
@@ -41,6 +42,8 @@ implicit none
 
   call SetMeshATS(NHW,NVN,NHE,NVS)
 
+  !call set_ecosim_solver(1, 1, 1, 1)
+  
   NX=1
 
   write(*,*) "Starting loop: "
