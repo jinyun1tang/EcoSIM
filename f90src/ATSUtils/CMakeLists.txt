@@ -21,6 +21,7 @@ target_include_directories(ATSUtils_mods  PRIVATE
    ${CMAKE_BINARY_DIR}/f90src/HydroTherm/PhysData/
    ${CMAKE_BINARY_DIR}/f90src/HydroTherm/SoilPhys/
    ${CMAKE_BINARY_DIR}/f90src/HydroTherm/SurfPhys/
+   ${CMAKE_BINARY_DIR}/f90src/APIData/
    ${CMAKE_BINARY_DIR}/f90src/ecosim_mods/)
 
 

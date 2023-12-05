@@ -114,6 +114,7 @@ Module SharedDataMod
   call destroy(uwind)
   call destroy(prec)
   call destroy(sunrad)
+  call destroy(swrad)
   call destroy(vpair)
   call destroy(a_ATKA)
   end subroutine DestroySharedData

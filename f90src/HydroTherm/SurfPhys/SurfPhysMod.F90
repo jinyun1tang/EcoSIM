@@ -246,6 +246,8 @@ contains
 !     THS=sky longwave radiation
 !     LWRadCanGPrev=longwave radiation emitted by canopy
 
+  
+
   RADGX=SWRadOnGrnd(NY,NX)*dts_HeatWatTP
   RADXW(NY,NX)=RADGX*FracSurfAsSnow(NY,NX)*XNPS
   RADXG(NY,NX)=RADGX*FracSurfSnoFree(NY,NX)*FracSurfAsBareSoi(NY,NX)      
@@ -265,6 +267,8 @@ contains
 !
   ! Print variable descriptions and values
   write(* ,*) "Writing out surface radiation values: "
+  write(* ,*) "Input shortwave on ground: ",SWRadOnGrnd(NY,NX)   
+  write(* ,*) "Input Longwave: ",LWRadSky(NY,NX)
   write(*, *) "Shortwave radiation at ground surface:", RADGX
   write(*, *) "Shortwave radiation at snowpack surface:", RADXW(NY, NX)
   write(*, *) "Shortwave radiation at soil surface:", RADXG(NY, NX)
@@ -280,7 +284,21 @@ contains
   write(*, *) "Longwave radiation emitted by soil:", THRMS(NY, NX)
   write(*, *) "Longwave radiation emitted by litter:", THRMR(NY, NX)
 
-  write(*,*)
+  ! Write statements for right-hand side variables
+  write(* ,*) "Right-hand side variables: "
+  write(* ,*) "FracSWRad2Grnd:", FracSWRad2Grnd(NY, NX)
+  write(* ,*) "FracSurfAsSnow:", FracSurfAsSnow(NY, NX)
+  write(* ,*) "FracSurfSnoFree:", FracSurfSnoFree(NY, NX)
+  write(* ,*) "FracSurfAsBareSoi:", FracSurfAsBareSoi(NY, NX)
+  write(* ,*) "FracSurfByLitR:", FracSurfByLitR(NY, NX)
+  write(* ,*) "XNPS:", XNPS
+  write(* ,*) "XNPR:", XNPR
+  write(* ,*) "dts_HeatWatTP:", dts_HeatWatTP
+  write(* ,*) "dts_snohttp:", dts_snohttp
+  write(* ,*) "dts_litrhtwtp:", dts_litrhtwtp
+  write(* ,*) "AREA:", AREA(3, NUM(NY, NX), NY, NX)
+  ! Add similar statements for other right-hand side variables
+
   end subroutine SurfaceRadiation
 !------------------------------------------------------------------------------------------
   subroutine SurfaceResistances(NY,NX,ResistanceLitRLay)

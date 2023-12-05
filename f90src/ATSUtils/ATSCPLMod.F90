@@ -78,7 +78,7 @@ contains
   a_CumDepth2LayerBottom=data2D(:,:)
 
   call c_f_pointer(props%shortwave_radiation%data, data, (/num_cols/))
-  srad = data(:)
+  swrad = data(:)
 
   call c_f_pointer(props%longwave_radiation%data, data, (/num_cols/))
   sunrad = data(:)

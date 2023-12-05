@@ -899,9 +899,6 @@ module StartsMod
       IF(SoiBulkDensityt0(L,NY,NX).LE.ZERO)SoilFracAsMacP(L,NY,NX)=0.0_r8
 !     thickness:=bottom depth-upper depth
       DLYRI(3,L,NY,NX)=(CumDepth2LayerBottom(L,NY,NX)-CumDepth2LayerBottom(L-1,NY,NX))
-     
-      write(*,*) "Printing layer diff:"
-      write(*,*) DLYRI(3,L,NY,NX)
       call check_bool(DLYRI(3,L,NY,NX)<0._r8,'negative soil layer thickness',&
         __LINE__,mod_filename)
       DLYR(3,L,NY,NX)=DLYRI(3,L,NY,NX)
