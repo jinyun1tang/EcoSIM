@@ -8,8 +8,8 @@ module ATSEcoSIMAdvanceMod
   USE SoilPhysDataType
   use LandSurfDataType
   use CanopyDataType, only: SWRadOnGrnd
-  use PlantAPIData, only: CO2E, CH4E, OXYE, Z2GE, Z2OE, ZNH3E, &
-      H2GE
+  !use PlantAPIData, only: CO2E, CH4E, OXYE, Z2GE, Z2OE, ZNH3E, &
+  !    H2GE
   use ClimForcDataType, only : LWRadSky, TairK, &
       VPA, WindSpeedAtm, RainH  
   use SoilPropertyDataType
@@ -52,17 +52,19 @@ implicit none
     AREA(3,NU(NY,NX),NY,NX)=a_AREA3(NY)
     ASP(NY,NX)=a_ASP(NY)
     !TairKClimMean(NY,NX)=a_ATKA(NY)
-    CO2E(NY,NX)=atm_co2
-    CH4E(NY,NX)=atm_ch4
-    OXYE(NY,NX)=atm_o2
-    Z2GE(NY,NX)=atm_n2
-    Z2OE(NY,NX)=atm_n2o
-    ZNH3E(NY,NX)=atm_nh3
-    H2GE(NY,NX)=atm_H2
-    TairK(NY,NX)=tairc+273.15_r8
-    VPA(NY,NX) = vpair
-    WindSpeedAtm(NY,NX) = uwind
-    RainH(NY,NX) = prec
+    !CO2E(NY,NX)=atm_co2
+    !CH4E(NY,NX)=atm_ch4
+    !OXYE(NY,NX)=atm_o2
+    !Z2GE(NY,NX)=atm_n2
+    !Z2OE(NY,NX)=atm_n2o
+    !ZNH3E(NY,NX)=atm_nh3
+    !H2GE(NY,NX)=atm_H2
+    TairK(NY,NX)=tairc(NY)+273.15_r8
+    VPA(NY,NX) = vpair(NY)
+    WindSpeedAtm(NY,NX) = uwind(NY)
+    SWRadOnGrnd(NY,NX) = swrad(NY)
+    LWRadSky(NY,NX) = sunrad(NY)
+    !RainH(NY,NX) = prec
     DO L=NU(NY,NX),NL(NY,NX)
       !FieldCapacity(L,NY,NX)=a_FC(L,ny)
       !WiltPoint(L,NY,NX)=a_WP(L,NY)
@@ -83,8 +85,8 @@ implicit none
   PSIAtFldCapacity = pressure_at_field_capacity
   PSIAtWiltPoint = pressure_at_wilting_point
 
-  SWRadOnGrnd = srad
-  LWRadSky = sunrad
+  !SWRadOnGrnd = srad
+  !LWRadSky = sunrad
   !TairK = tairc+273.15_r8
   !VPA = vpair
   !WindSpeedAtm = uwind

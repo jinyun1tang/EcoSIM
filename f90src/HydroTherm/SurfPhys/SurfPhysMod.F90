@@ -249,6 +249,8 @@ contains
 !     THS=sky longwave radiation
 !     LWRadCanGPrev=longwave radiation emitted by canopy
 
+  
+
   RADGX=SWRadOnGrnd(NY,NX)*dts_HeatWatTP
   RadSWonSno(NY,NX)=RADGX*FracSurfAsSnow(NY,NX)*XNPS
   RadSWonSoi(NY,NX)=RADGX*FracSurfSnoFree(NY,NX)*FracSurfAsBareSoi(NY,NX)      
