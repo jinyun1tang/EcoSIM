@@ -539,7 +539,14 @@ contains
 
   write(*,*) "Surface Heat Flux parameters:"
   write(*,*) "HeatFluxAir2Soi = ", HeatFluxAir2Soi
-
+  write(*,*) "HFLX0 = ", HFLX0
+  write(*,*) "HeatSensVapAir2Soi = ", HeatSensVapAir2Soi
+  write(*,*) "Radnet2LitGrnd = ", Radnet2LitGrnd
+  write(*,*) "LatentHeatEvapAir2Grnd = ", LatentHeatEvapAir2Grnd
+  write(*,*) "HeatSensAir2Grnd = ", HeatSensAir2Grnd
+  write(*,*) "PARS = ", PARS
+  write(*,*) "TKQ(NY,NX) = ", TKQ(NY,NX)
+  write(*,*) "TKSoi1(NUM(NY,NX),NY,NX) = ", TKSoi1(NUM(NY,NX),NY,NX)
   end subroutine SoilSRFEnerbyBalance
 
 !------------------------------------------------------------------------------------------
