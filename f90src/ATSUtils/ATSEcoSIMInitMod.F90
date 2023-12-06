@@ -44,6 +44,11 @@ implicit none
   NJ = 1 !Is the number of layers down the roots go
 
   NX=1
+ 
+  write(*,*) "What are the dimensions of these variables?"
+  write(*, *) "Dimensions of TKSoi1:", SIZE(TKSoi1, 1), SIZE(TKSoi1, 2), SIZE(TKSoi1, 3)
+  write(*, *) "Dimensions of a_TEMP:", SIZE(a_TEMP, 1), SIZE(a_TEMP, 2)
+
 
   do NY=1,NYS
     NU(NY,NX)=a_NU(NY)
@@ -64,7 +69,6 @@ implicit none
     WindSpeedAtm(NY,NX) = uwind(NY)  
     DO L=NU(NY,NX),NL(NY,NX)
       TKSoi1(L,NY,NX) = a_TEMP(L,NY)
-      write(*,*) "a_TEMP(", L, ",  ", NY, ") = ", a_TEMP(L,NY)
       !FieldCapacity(L,NY,NX)=a_FC(L,ny)
       !WiltPoint(L,NY,NX)=a_WP(L,NY)
       CumDepth2LayerBottom(L,NY,NX)=a_CumDepth2LayerBottom(L,NY)

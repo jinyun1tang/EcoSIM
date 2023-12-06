@@ -481,9 +481,6 @@ contains
 
   TKX1=TKSoi1(NUM(NY,NX),NY,NX)
   write(*,*) "TKSoi1 = ", TKSoi1(NUM(NY,NX),NY,NX)
-  write(*,*) "NUM(NY,NX) = ", NUM(NY,NX)
-  write(*,*) "NY = ", NY
-  write(*,*) "NX = ", NX
 
   IF(TKX1.LE.0.0_r8)THEN
     write(*,*) "TKX1 is zero, resetting"
@@ -1535,7 +1532,8 @@ contains
       call SurfaceEnergyModel(M,NX,NY,ResistanceLitRLay,KSatReductByRainKineticEnergy(NY,NX),&
         HeatFluxAir2Soi(NY,NX),LatentHeatAir2Sno,HeatSensEvap,HeatSensAir2Snow,Radnet2Snow,&
         TopLayWatVol,VapXAir2TopLay)
-
+      
+      write(*,*) "HeatFlux2Ground = ", HeatFlux2Ground
       write(*,*)'TXKR SurfaceEnergyModel MM=',M,TKSoi1(0,NY,NX)
 
     ! CAPILLARY EXCHANGE OF WATER BETWEEN SOIL SURFACE AND RESIDUE

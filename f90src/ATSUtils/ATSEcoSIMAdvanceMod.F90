@@ -46,6 +46,10 @@ implicit none
   
   NX=1
 
+  write(*,*) "Checking dimensions:"
+  write(*, *) "Dimensions of TKSoi1:", SIZE(TKSoi1, 1), SIZE(TKSoi1, 2), SIZE(TKSoi1, 3)
+  write(*, *) "Dimensions of a_TEMP:", SIZE(a_TEMP, 1), SIZE(a_TEMP, 2)
+
   write(*,*) "Starting loop: "
 
   do NY=1,NYS
@@ -88,29 +92,13 @@ implicit none
   PSIAtFldCapacity = pressure_at_field_capacity
   PSIAtWiltPoint = pressure_at_wilting_point
 
-  !SWRadOnGrnd = srad
-  !LWRadSky = sunrad
-  !TairK = tairc+273.15_r8
-  !VPA = vpair
-  !WindSpeedAtm = uwind
-  !RainH = prec
-
-  !What are I and J are these a loop?
   write(*,*) "Running StageSurfacePhysModel"
   call StageSurfacePhysModel(I,J,NHW,NHE,NVN,NVS,ResistanceLitRLay)
-
-  heat_vec_size = size(HeatFlux2Ground)
-  write(*,*) "Size of heat flux before: ", heat_vec_size 
 
   DO M=1,NPH
     call RunSurfacePhysModel(M,NHE,NHW,NVS,NVN,ResistanceLitRLay,&
       KSatReductByRainKineticEnergyS,HeatFlux2Ground,TopLayWatVol)
   ENDDO
-
-  write(*,*) "Printing Heat Flux"
-
-  heat_vec_size = size(HeatFlux2Ground)
-  write(*,*) "Size of heat flux after: ", heat_vec_size 
 
   do NY=1,NYS
     write(*,*) "Col: ", NY , "Heat Flux: ", HeatFlux2Ground(NY,1)
