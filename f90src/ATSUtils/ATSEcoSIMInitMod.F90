@@ -6,6 +6,8 @@ module ATSEcoSIMInitMod
   use SOMDataType
   USE SoilPhysDataType
   use LandSurfDataType
+  use HydroThermData, only : PSISM1, TKSoi1, VLHeatCapacity, &
+      SoilFracAsMicP, VLWatMicP1, VLiceMicP1 !need the only as some vars
   use CanopyDataType, only: SWRadOnGrnd
   use ClimForcDataType, only : LWRadSky, TairK, &
       VPA, WindSpeedAtm, RainH
@@ -61,6 +63,8 @@ implicit none
     VPA(NY,NX) = vpair(NY)
     WindSpeedAtm(NY,NX) = uwind(NY)  
     DO L=NU(NY,NX),NL(NY,NX)
+      TKSoi1(L,NY,NX) = a_TEMP(L,NY)
+      write(*,*) "a_TEMP(", L, ",  ", NY, ") = ", a_TEMP(L,NY)
       !FieldCapacity(L,NY,NX)=a_FC(L,ny)
       !WiltPoint(L,NY,NX)=a_WP(L,NY)
       CumDepth2LayerBottom(L,NY,NX)=a_CumDepth2LayerBottom(L,NY)

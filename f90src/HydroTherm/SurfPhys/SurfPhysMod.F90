@@ -480,6 +480,16 @@ contains
   CdSoiHSens=PARSG(NY,NX)/RAa
 
   TKX1=TKSoi1(NUM(NY,NX),NY,NX)
+  write(*,*) "TKSoi1 = ", TKSoi1(NUM(NY,NX),NY,NX)
+  write(*,*) "NUM(NY,NX) = ", NUM(NY,NX)
+  write(*,*) "NY = ", NY
+  write(*,*) "NX = ", NX
+
+  IF(TKX1.LE.0.0_r8)THEN
+    write(*,*) "TKX1 is zero, resetting"
+    TKX1 = 273.15_r8
+  ENDIF
+
   VaporSoi1=vapsat(TKX1)*EXP(18.0_r8*PSISV1/(RGAS*TKX1))
 
   !evaporation, no more than what is available, g H2O
@@ -509,9 +519,6 @@ contains
   !total heat plus convective heat 
   HeatFluxAir2Soi=HFLX0+HeatSensVapAir2Soi
 
-  write(*,*) "Surface Heat Flux parameters:"
-  write(*,*) "HeatFluxAir2Soi = ", HeatFluxAir2Soi
-!  write(*,*)'tks',TKQ(NY,NX),TKX1
   end subroutine SoilSRFEnerbyBalance
 
 !------------------------------------------------------------------------------------------
