@@ -81,6 +81,7 @@ implicit none
 
   PSIAtFldCapacity = pressure_at_field_capacity
   PSIAtWiltPoint = pressure_at_wilting_point
+  write(*,*) "What's going on with the temperature: ", a_TEMP(1,1)
   !SWRadOnGrnd = srad
   !LWRadSky = sunrad
   !TairK = tairc+273.15
