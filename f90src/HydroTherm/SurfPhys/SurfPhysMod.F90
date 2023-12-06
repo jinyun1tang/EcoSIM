@@ -264,7 +264,25 @@ contains
     FracSurfAsBareSoi(NY,NX)*dts_HeatWatTP
   THRMR(NY,NX)=SurfLitREmisivity*2.04E-10_r8*AREA(3,NUM(NY,NX),NY,NX)*FracSurfSnoFree(NY,NX)*&
     FracSurfByLitR(NY,NX)*dts_litrhtwtp
-  ! Add similar statements for other right-hand side variables
+
+  ! Print variable descriptions and values
+  write(* ,*) "Writing out surface radiation values: "
+  write(* ,*) "Shortwave radiation at ground surface (RADGX):", RADGX
+  write(*, *) "Shortwave radiation at snowpack surface (RADXW):", RADXW(NY, NX)
+  write(*, *) "Shortwave radiation at soil surface (RADXG):", RADXG(NY, NX)
+  write(*, *) "Shortwave radiation at litter surface (RADXR):", RADXR(NY, NX)
+  write(*, *) "Longwave radiation at ground surface (THRYX):", THRYX
+  write(*, *) "Longwave radiation at snowpack surface (LWRad2Snow):", LWRad2Snow(NY, NX)
+  write(*, *) "Longwave radiation at soil surface (LWRad2Grnd):", LWRad2Grnd(NY, NX)
+  write(*, *) "Longwave radiation at litter surface (LWRad2LitR):", LWRad2LitR(NY, NX)
+  write(*, *) "Emissivity of snowpack surface (SnowEmisivity):", SnowEmisivity
+  write(*, *) "Emissivity of soil surface (SoilEmisivity):", SoilEmisivity
+  write(*, *) "Emissivity of litter surface (SurfLitREmisivity):", SurfLitREmisivity
+  write(*, *) "Longwave radiation emitted by snowpack (THRMW):", THRMW(NY, NX)
+  write(*, *) "Longwave radiation emitted by soil (THRMS):", THRMS(NY, NX)
+  write(*, *) "Longwave radiation emitted by litter (THRMR):", THRMR(NY, NX)
+
+
 
   end subroutine SurfaceRadiation
 !------------------------------------------------------------------------------------------
@@ -476,9 +494,6 @@ contains
 
   TKX1=TKSoi1(NUM(NY,NX),NY,NX)
   write(*,*) "TKSoi1 = ", TKSoi1(NUM(NY,NX),NY,NX)
-  write(*,*) "NUM(NY,NX) = ", NUM(NY,NX)
-  write(*,*) "NY = ", NY
-  write(*,*) "NX = ", NX
 
   IF(TKX1.LE.0.0_r8)THEN
     write(*,*) "TKX1 is zero, resetting"
@@ -1526,7 +1541,8 @@ contains
       call SurfaceEnergyModel(M,NX,NY,ResistanceLitRLay,KSatReductByRainKineticEnergy(NY,NX),&
         HeatFlux2Ground(NY,NX),LatentHeatAir2Sno,HeatSensEvap,HeatSensAir2Snow,Radnet2Snow,&
         TopLayWatVol,VapXAir2TopLay)
-
+      
+      write(*,*) "HeatFlux2Ground = ", HeatFlux2Ground
       write(*,*)'TXKR SurfaceEnergyModel MM=',M,TKSoi1(0,NY,NX)
 
     ! CAPILLARY EXCHANGE OF WATER BETWEEN SOIL SURFACE AND RESIDUE
@@ -1567,6 +1583,8 @@ contains
     HeatSensEvap,HeatSensAir2Snow,Radnet2Snow,VapXAir2TopLay)
 
   HeatFlux2Ground1=HeatFluxAir2Soi
+
+  write(*,*) "HeatFlux2Ground1 = ", HeatFlux2Ground1 
 
   !update snow pack before doing snow redistribution to avoid negative mass values  
   call UpdateSnowPack1(M,NY,NX)
