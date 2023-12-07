@@ -152,7 +152,7 @@ module VisualMod
 !     HOURLY AGGREGATION
 !
 !     IF(IsPlantActive(NZ,NY,NX).EQ.iPlantIsActive)THEN
-!     IF(I.EQ.iDayPlanting(NZ,NY,NX))THEN
+!     IF(I.EQ.iDayPlanting_pft(NZ,NY,NX))THEN
 !     ND=0
 !     TCCTX=0.0
 !     TCCMX=0.0
@@ -169,7 +169,7 @@ module VisualMod
 !     TCCMX=TCCMX+TCCMD
 !     ND=ND+1
 !     ENDIF
-!     IF(I.EQ.iDayPlantHarvest(NZ,NY,NX)-1)THEN
+!     IF(I.EQ.iDayPlantHarvest_pft(NZ,NY,NX)-1)THEN
 !     TCCAS=TCCTX/ND
 !     TCCMS=TCCMX/ND
 !     ENDIF
@@ -185,9 +185,9 @@ module VisualMod
 !     IF(J.EQ.24)THEN
 !     IYRZ=iYearCurrent
 !     XI=REAL(I)
-!     XP=REAL(iDayPlanting(NZ,NY,NX))
-!     XH=REAL(iDayPlantHarvest(NZ,NY,NX))
-!     IF(I.EQ.iDayPlanting(NZ,NY,NX))THEN
+!     XP=REAL(iDayPlanting_pft(NZ,NY,NX))
+!     XH=REAL(iDayPlantHarvest_pft(NZ,NY,NX))
+!     IF(I.EQ.iDayPlanting_pft(NZ,NY,NX))THEN
          D9980: DO N=1,100
            OUT(N)=0.0_r8
          ENDDO D9980
@@ -198,7 +198,7 @@ module VisualMod
 !     DTCSN=SurfLitrfallChemElmnts_pft(ielmc,NZ,NY,NX)-TCSNY
 !     TCSNX=TCSNX+DTCSN
 !     TCSNY=SurfLitrfallChemElmnts_pft(ielmc,NZ,NY,NX)
-!     IF(I.EQ.iDayPlanting(NZ,NY,NX).OR.I.EQ.iDayPlantHarvest(NZ,NY,NX))THEN
+!     IF(I.EQ.iDayPlanting_pft(NZ,NY,NX).OR.I.EQ.iDayPlantHarvest_pft(NZ,NY,NX))THEN
 !     ICHKA=0
 !     ICHKM=0
 !     TCSNX=0.0
@@ -230,9 +230,9 @@ module VisualMod
             OUT(N)=TKS(L,NY,NX)
             L=L+1
           ENDDO D61
-          OUT(39)=-1000.0*ETCanP(1,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(40)=-1000.0*ETCanP(3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(41)=-1000.0*ETCanP(2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(39)=-1000.0*ETCanopy_pft(1,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(40)=-1000.0*ETCanopy_pft(3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(41)=-1000.0*ETCanopy_pft(2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
           OUT(42)=1000.0*UEVAP(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
           OUT(43)=OUT(42)-OUT(39)-OUT(40)-OUT(41)
           OUT(44)=1000.0*URUN(NY,NX)/AREA(3,NU(NY,NX),NY,NX)

@@ -82,7 +82,7 @@ implicit none
   real(r8),target,allocatable ::  CO2EI(:,:)                         !initial atmospheric CO2 concentration, [umol mol-1]
   real(r8),target,allocatable ::  CCO2EI(:,:)                        !initial atmospheric CO2 concentration, [gC m-3]
 
-  real(r8),target,allocatable ::  AtmGgms(:,:,:)                     !atmospheric gas concentration in g m-3
+  real(r8),target,allocatable ::  AtmGasCgperm3(:,:,:)                     !atmospheric gas concentration in g m-3
   real(r8),target,allocatable ::  AtmGmms(:,:,:)                     !atmospheric gas concentration in umol mol-1
   real(r8),target,allocatable ::  OXYE(:,:)                          !atmospheric O2 concentration, [umol mol-1]
   real(r8),target,allocatable ::  Z2OE(:,:)                          !atmospheric N2O concentration, [umol mol-1]
@@ -212,7 +212,7 @@ implicit none
   allocate(CO2EI(JY,JX));       CO2EI=0._r8
   allocate(CCO2EI(JY,JX));      CCO2EI=0._r8
 
-  allocate(AtmGgms(idg_beg:idg_end,JY,JX)); AtmGgms=0._r8
+  allocate(AtmGasCgperm3(idg_beg:idg_end,JY,JX)); AtmGasCgperm3=0._r8
   allocate(AtmGmms(idg_beg:idg_end,JY,JX)); AtmGmms=0._r8
 
   allocate(OXYE(JY,JX));        OXYE=0._r8
@@ -343,7 +343,7 @@ implicit none
   call destroy(CO2EI)
   call destroy(CCO2EI)
 
-  call destroy(AtmGgms)
+  call destroy(AtmGasCgperm3)
   call destroy(AtmGmms)
 
   call destroy(OXYE)

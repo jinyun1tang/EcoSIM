@@ -32,8 +32,8 @@ implicit none
   real(r8) :: XN2GS
   real(r8) :: RVMXC
   real(r8) :: RVMBC
-  real(r8) :: TRINH4
-  real(r8) :: TRIPO4
+  real(r8) :: NetNH4Mineralize_col
+  real(r8) :: NetPO4Mineralize_col
   real(r8), allocatable :: RDOM_micb_flx(:,:)
   real(r8), allocatable :: ROXYSff(:)
   real(r8), allocatable :: RVMX4ff(:)

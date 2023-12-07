@@ -145,25 +145,12 @@ module ExtractsMod
     RUPP1B=> plt_rbgc%RUPP1B , &
     RUPP2B=> plt_rbgc%RUPP2B , &
     RUNNXP=> plt_rbgc%RUNNXP , &
+    RUPOXP=> plt_rbgc%RUPOXP , &
     trcg_Root_DisEvap_flx_vr=> plt_rbgc%trcg_Root_DisEvap_flx_vr , &
     trcg_air2root_flx_pft_vr=> plt_rbgc%trcg_air2root_flx_pft_vr , &
     RCO2P => plt_rbgc%RCO2P  , &
-    RUPCHS=> plt_rbgc%RUPCHS , &
-    RUPOXP=> plt_rbgc%RUPOXP , &
-    RUPN2S=> plt_rbgc%RUPN2S , &
-    RUPN3B=> plt_rbgc%RUPN3B , &
-    RUPHGS=> plt_rbgc%RUPHGS , &
-    RUPN3S=> plt_rbgc%RUPN3S , &
-    RUPNOB=> plt_rbgc%RUPNOB , &
-    RCO2S => plt_rbgc%RCO2S  , &
-    RUPOXS=> plt_rbgc%RUPOXS , &
-    RootNH4Uptake_pvr=> plt_rbgc%RootNH4Uptake_pvr , &
-    RootNO3Uptake_pvr=> plt_rbgc%RootNO3Uptake_pvr , &
-    RootHPO4Uptake_pvr=> plt_rbgc%RootHPO4Uptake_pvr , &
-    RootH2PO4Uptake_pvr=> plt_rbgc%RootH2PO4Uptake_pvr , &
-    RUPNHB=> plt_rbgc%RUPNHB , &
-    RUPH2B=> plt_rbgc%RUPH2B , &
-    RUPH1B=> plt_rbgc%RUPH1B , &
+    RUPGasSol_vr=> plt_rbgc%RUPGasSol_vr , &
+    RootNutUptake_pvr=> plt_rbgc%RootNutUptake_pvr , &
     trcg_air2root_flx_vr=> plt_rbgc%trcg_air2root_flx_vr , &
     trcg_TLP=> plt_rbgc%trcg_TLP , &
     ROXYP => plt_rbgc%ROXYP  , &
@@ -190,8 +177,8 @@ module ExtractsMod
     THeatRootUptake => plt_ew%THeatRootUptake    , &
     GridPlantRootH2OUptake_vr=> plt_ew%GridPlantRootH2OUptake_vr   , &
     AllPlantRootH2OUptake_vr => plt_ew%AllPlantRootH2OUptake_vr    , &
-    trcg_rootml  => plt_rbgc%trcg_rootml,&
-    trcs_rootml => plt_rbgc%trcs_rootml, &
+    trcg_rootml_vr  => plt_rbgc%trcg_rootml_vr,&
+    trcs_rootml_vr => plt_rbgc%trcs_rootml_vr, &
     RootLenthDensPerPopu_pvr => plt_morph%RootLenthDensPerPopu_pvr , &
     RTDNT => plt_morph%RTDNT , &
     MY    => plt_morph%MY    , &
@@ -228,15 +215,15 @@ module ExtractsMod
 !     R*DFA=root aqueous-gaseous CO2 exchange
 !
       DO NTG=idg_beg,idg_NH3
-        trcg_rootml(NTG,N,L,NZ)=trcg_rootml(NTG,N,L,NZ)+trcg_air2root_flx_pft_vr(NTG,N,L,NZ)-trcg_Root_DisEvap_flx_vr(NTG,N,L,NZ)
+        trcg_rootml_vr(NTG,N,L,NZ)=trcg_rootml_vr(NTG,N,L,NZ)+trcg_air2root_flx_pft_vr(NTG,N,L,NZ)-trcg_Root_DisEvap_flx_vr(NTG,N,L,NZ)
       ENDDO
 
-      trcs_rootml(idg_CO2,N,L,NZ)=trcs_rootml(idg_CO2,N,L,NZ)+trcg_Root_DisEvap_flx_vr(idg_CO2,N,L,NZ)+RCO2P(N,L,NZ)
-      trcs_rootml(idg_O2,N,L,NZ)=trcs_rootml(idg_O2,N,L,NZ)+trcg_Root_DisEvap_flx_vr(idg_O2,N,L,NZ)-RUPOXP(N,L,NZ)
-      trcs_rootml(idg_CH4,N,L,NZ)=trcs_rootml(idg_CH4,N,L,NZ)+trcg_Root_DisEvap_flx_vr(idg_CH4,N,L,NZ)+RUPCHS(N,L,NZ)
-      trcs_rootml(idg_N2O,N,L,NZ)=trcs_rootml(idg_N2O,N,L,NZ)+trcg_Root_DisEvap_flx_vr(idg_N2O,N,L,NZ)+RUPN2S(N,L,NZ)
-      trcs_rootml(idg_NH3,N,L,NZ)=trcs_rootml(idg_NH3,N,L,NZ)+trcg_Root_DisEvap_flx_vr(idg_NH3,N,L,NZ)+RUPN3S(N,L,NZ)+RUPN3B(N,L,NZ)
-      trcs_rootml(idg_H2,N,L,NZ)=trcs_rootml(idg_H2,N,L,NZ)+trcg_Root_DisEvap_flx_vr(idg_H2,N,L,NZ)+RUPHGS(N,L,NZ)
+      trcs_rootml_vr(idg_CO2,N,L,NZ)=trcs_rootml_vr(idg_CO2,N,L,NZ)+trcg_Root_DisEvap_flx_vr(idg_CO2,N,L,NZ)+RCO2P(N,L,NZ)
+      trcs_rootml_vr(idg_O2,N,L,NZ)=trcs_rootml_vr(idg_O2,N,L,NZ)+trcg_Root_DisEvap_flx_vr(idg_O2,N,L,NZ)-RUPOXP(N,L,NZ)
+      trcs_rootml_vr(idg_CH4,N,L,NZ)=trcs_rootml_vr(idg_CH4,N,L,NZ)+trcg_Root_DisEvap_flx_vr(idg_CH4,N,L,NZ)+RUPGasSol_vr(idg_CH4,N,L,NZ)
+      trcs_rootml_vr(idg_N2O,N,L,NZ)=trcs_rootml_vr(idg_N2O,N,L,NZ)+trcg_Root_DisEvap_flx_vr(idg_N2O,N,L,NZ)+RUPGasSol_vr(idg_N2O,N,L,NZ)
+      trcs_rootml_vr(idg_NH3,N,L,NZ)=trcs_rootml_vr(idg_NH3,N,L,NZ)+trcg_Root_DisEvap_flx_vr(idg_NH3,N,L,NZ)+RUPGasSol_vr(idg_NH3,N,L,NZ)+RUPGasSol_vr(idg_NH3B,N,L,NZ)
+      trcs_rootml_vr(idg_H2,N,L,NZ)=trcs_rootml_vr(idg_H2,N,L,NZ)+trcg_Root_DisEvap_flx_vr(idg_H2,N,L,NZ)+RUPGasSol_vr(idg_H2,N,L,NZ)
 !
 !     TOTAL ROOT GAS CONTENTS
 !
@@ -244,7 +231,7 @@ module ExtractsMod
 !     *A,*P=PFT root gaseous, aqueous gas content
 !
       DO NTG=idg_beg,idg_end-1
-        trcg_TLP(NTG,L)=trcg_TLP(NTG,L)+trcs_rootml(NTG,N,L,NZ)+trcg_rootml(NTG,N,L,NZ)
+        trcg_TLP(NTG,L)=trcg_TLP(NTG,L)+trcs_rootml_vr(NTG,N,L,NZ)+trcg_rootml_vr(NTG,N,L,NZ)
       ENDDO
 !
 !     TOTAL ROOT BOUNDARY GAS FLUXES
@@ -264,22 +251,23 @@ module ExtractsMod
 
       TCO2P(L)=TCO2P(L)-RCO2P(N,L,NZ)
       TUPOXP(L)=TUPOXP(L)+RUPOXP(N,L,NZ)
-      trcs_plant_uptake_vr(idg_CO2,L)=trcs_plant_uptake_vr(idg_CO2,L)+RCO2S(N,L,NZ)
-      trcs_plant_uptake_vr(idg_O2,L)=trcs_plant_uptake_vr(idg_O2,L)+RUPOXS(N,L,NZ)
-      trcs_plant_uptake_vr(idg_CH4,L)=trcs_plant_uptake_vr(idg_CH4,L)+RUPCHS(N,L,NZ)
-      trcs_plant_uptake_vr(idg_N2O,L)=trcs_plant_uptake_vr(idg_N2O,L)+RUPN2S(N,L,NZ)
-      trcs_plant_uptake_vr(idg_NH3,L)=trcs_plant_uptake_vr(idg_NH3,L)+RUPN3S(N,L,NZ)
-      trcs_plant_uptake_vr(idg_NH3B,L)=trcs_plant_uptake_vr(idg_NH3B,L)+RUPN3B(N,L,NZ)
-      trcs_plant_uptake_vr(idg_H2,L)=trcs_plant_uptake_vr(idg_H2,L)+RUPHGS(N,L,NZ)
+      trcs_plant_uptake_vr(idg_CO2,L)=trcs_plant_uptake_vr(idg_CO2,L)+RUPGasSol_vr(idg_CO2,N,L,NZ)
+      trcs_plant_uptake_vr(idg_O2,L)=trcs_plant_uptake_vr(idg_O2,L)+RUPGasSol_vr(idg_O2,N,L,NZ)
+      trcs_plant_uptake_vr(idg_CH4,L)=trcs_plant_uptake_vr(idg_CH4,L)+RUPGasSol_vr(idg_CH4,N,L,NZ)
+      trcs_plant_uptake_vr(idg_N2O,L)=trcs_plant_uptake_vr(idg_N2O,L)+RUPGasSol_vr(idg_N2O,N,L,NZ)
+      trcs_plant_uptake_vr(idg_NH3,L)=trcs_plant_uptake_vr(idg_NH3,L)+RUPGasSol_vr(idg_NH3,N,L,NZ)
+      trcs_plant_uptake_vr(idg_NH3B,L)=trcs_plant_uptake_vr(idg_NH3B,L)+RUPGasSol_vr(idg_NH3B,N,L,NZ)
+      trcs_plant_uptake_vr(idg_H2,L)=trcs_plant_uptake_vr(idg_H2,L)+RUPGasSol_vr(idg_H2,N,L,NZ)
+      trcs_plant_uptake_vr(idg_N2,L)=trcs_plant_uptake_vr(idg_N2,L)+RUPGasSol_vr(idg_N2,N,L,NZ)
 
-      trcs_plant_uptake_vr(ids_NH4,L)=trcs_plant_uptake_vr(ids_NH4,L)+RootNH4Uptake_pvr(N,L,NZ)
-      trcs_plant_uptake_vr(ids_NO3,L)=trcs_plant_uptake_vr(ids_NO3,L)+RootNO3Uptake_pvr(N,L,NZ)
-      trcs_plant_uptake_vr(ids_H2PO4,L)=trcs_plant_uptake_vr(ids_H2PO4,L)+RootH2PO4Uptake_pvr(N,L,NZ)
-      trcs_plant_uptake_vr(ids_H1PO4,L)=trcs_plant_uptake_vr(ids_H1PO4,L)+RootHPO4Uptake_pvr(N,L,NZ)
-      trcs_plant_uptake_vr(ids_NH4B,L)=trcs_plant_uptake_vr(ids_NH4B,L)+RUPNHB(N,L,NZ)
-      trcs_plant_uptake_vr(ids_NO3B,L)=trcs_plant_uptake_vr(ids_NO3B,L)+RUPNOB(N,L,NZ)
-      trcs_plant_uptake_vr(ids_H2PO4B,L)=trcs_plant_uptake_vr(ids_H2PO4B,L)+RUPH2B(N,L,NZ)
-      trcs_plant_uptake_vr(ids_H1PO4B,L)=trcs_plant_uptake_vr(ids_H1PO4B,L)+RUPH1B(N,L,NZ)
+      trcs_plant_uptake_vr(ids_NH4,L)=trcs_plant_uptake_vr(ids_NH4,L)+RootNutUptake_pvr(ids_NH4,N,L,NZ)
+      trcs_plant_uptake_vr(ids_NO3,L)=trcs_plant_uptake_vr(ids_NO3,L)+RootNutUptake_pvr(ids_NO3,N,L,NZ)
+      trcs_plant_uptake_vr(ids_H2PO4,L)=trcs_plant_uptake_vr(ids_H2PO4,L)+RootNutUptake_pvr(ids_H2PO4,N,L,NZ)
+      trcs_plant_uptake_vr(ids_H1PO4,L)=trcs_plant_uptake_vr(ids_H1PO4,L)+RootNutUptake_pvr(ids_H1PO4,N,L,NZ)
+      trcs_plant_uptake_vr(ids_NH4B,L)=trcs_plant_uptake_vr(ids_NH4B,L)+RootNutUptake_pvr(ids_NH4B,N,L,NZ)
+      trcs_plant_uptake_vr(ids_NO3B,L)=trcs_plant_uptake_vr(ids_NO3B,L)+RootNutUptake_pvr(ids_NO3B,N,L,NZ)
+      trcs_plant_uptake_vr(ids_H2PO4B,L)=trcs_plant_uptake_vr(ids_H2PO4B,L)+RootNutUptake_pvr(ids_H2PO4B,N,L,NZ)
+      trcs_plant_uptake_vr(ids_H1PO4B,L)=trcs_plant_uptake_vr(ids_H1PO4B,L)+RootNutUptake_pvr(ids_H1PO4B,N,L,NZ)
 !
 !     TOTAL ROOT C,N,P EXUDATION
 !
@@ -353,7 +341,7 @@ module ExtractsMod
     RootGasLoss_disturb => plt_bgcr%RootGasLoss_disturb, &
     RootN2Fix_pvr => plt_bgcr%RootN2Fix_pvr  , &
     CO2NetFix_pft  => plt_bgcr%CO2NetFix_pft   , &
-    ETCanP => plt_ew%ETCanP    , &
+    ETCanopy_pft => plt_ew%ETCanopy_pft    , &
     TH2GZ => plt_bgcr%TH2GZ  , &
     trcs_plant_uptake_vr => plt_rbgc%trcs_plant_uptake_vr, &    
     RNH3B => plt_rbgc%RNH3B  , &
@@ -363,7 +351,7 @@ module ExtractsMod
     PrecIntcptByCanopy_pft  => plt_ew%PrecIntcptByCanopy_pft     , &
     VapXAir2Canopy_pft=> plt_ew%VapXAir2Canopy_pft   , &
     WatByPCanopy => plt_ew%WatByPCanopy    , &
-    CanWatP => plt_ew%CanWatP    , &
+    CanopyWater_pft => plt_ew%CanopyWater_pft    , &
     Eco_Heat_Grnd_col   => plt_ew%Eco_Heat_Grnd_col      , &
     HeatXAir2PCan => plt_ew%HeatXAir2PCan    , &
     EvapTransHeatP => plt_ew%EvapTransHeatP    , &
@@ -409,7 +397,7 @@ module ExtractsMod
 !     Canopy_NEE_col=total net CO2 fixation
 !     CO2NetFix_pft=PFT net CO2 fixation
 !     CanWatg,CanH2OHeldVg=total water volume in canopy,on canopy surfaces
-!     CanWatP,WatByPCanopy=PFT water volume in canopy,on canopy surfaces
+!     CanopyWater_pft,WatByPCanopy=PFT water volume in canopy,on canopy surfaces
 !     TEVAPP,VapXAir2CanG=total water flux to,from canopy,canopy surfaces
 !     VapXAir2PCan,Transpiration_pft=water flux to,from canopy surfaces, inside canopy
 !     TENGYC=total canopy water heat content
@@ -428,8 +416,8 @@ module ExtractsMod
   Eco_Heat_Sens_col=Eco_Heat_Sens_col+HeatXAir2PCan(NZ)
   Eco_Heat_Grnd_col=Eco_Heat_Grnd_col+HeatStorCanP(NZ)
   Canopy_NEE_col=Canopy_NEE_col+CO2NetFix_pft(NZ)
-  ETCanP(NZ)=ETCanP(NZ)+Transpiration_pft(NZ)+VapXAir2Canopy_pft(NZ)
-  CanWatg=CanWatg+CanWatP(NZ)
+  ETCanopy_pft(NZ)=ETCanopy_pft(NZ)+Transpiration_pft(NZ)+VapXAir2Canopy_pft(NZ)
+  CanWatg=CanWatg+CanopyWater_pft(NZ)
   CanH2OHeldVg=CanH2OHeldVg+WatByPCanopy(NZ)
   TEVAPP=TEVAPP+Transpiration_pft(NZ)+VapXAir2Canopy_pft(NZ)
   VapXAir2CanG=VapXAir2CanG+VapXAir2Canopy_pft(NZ)

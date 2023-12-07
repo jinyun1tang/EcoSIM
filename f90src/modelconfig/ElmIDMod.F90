@@ -13,10 +13,10 @@ implicit none
   integer, parameter :: isoi_scnv=3
   integer, parameter :: isoi_scnh=4
 ! plant harvest
-  integer, parameter :: ipld_leaf=1 !leaf
-  integer, parameter :: ipld_nofoliar=2 !leaf
-  integer, parameter :: ipld_woody=3 !leaf
-  integer, parameter :: ipld_stdead=4 !leaf
+  integer, parameter :: iplthvst_leaf=1 !leaf
+  integer, parameter :: iplthvst_finenonleaf=2 !fine non-leaf
+  integer, parameter :: iplthvst_woody=3 !woody
+  integer, parameter :: iplthvst_stdead=4 !standing dead
 ! photosynthesis
   integer, parameter :: ic4_photo=4
   integer, parameter :: ic3_photo=3
@@ -66,9 +66,18 @@ implicit none
   integer, parameter :: iPlantIsActive=1  !plant active
   integer, parameter :: iPlantIsDormant =0  !plant dormant/dead
 
-  integer, parameter :: ihv_noaction=0
-  integer, parameter :: ihv_terminate=1
-  integer, parameter :: ihv_tmareseed=2
+  integer, parameter :: jharvtyp_noaction=0
+  integer, parameter :: jharvtyp_terminate=1
+  integer, parameter :: jharvtyp_tmareseed=2
+
+  integer, parameter :: iharvtyp_none=0
+  integer, parameter :: iharvtyp_grain=1
+  integer, parameter :: iharvtyp_allabv=2
+  integer, parameter :: iharvtyp_pruning=3
+  integer, parameter :: iharvtyp_grazing=4
+  integer, parameter :: iharvtyp_fire=5
+  integer, parameter :: iharvtyp_herbivo=6
+
 
   integer, parameter :: iplt_annual=0
   integer, parameter :: iplt_perennial=1

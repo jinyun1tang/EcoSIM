@@ -459,15 +459,15 @@ module WthrMod
           DO NZ=1,NP(NY,NX)
             iPlantThermoAdaptZone(NZ,NY,NX)=iPlantInitThermoAdaptZone(NZ,NY,NX)+0.30/2.667*DTA
             OFFST(NZ,NY,NX)=2.667*(2.5-iPlantThermoAdaptZone(NZ,NY,NX))
-            !     TCelciusChill4Leaf(NZ,NY,NX)=TCZD-OFFST(NZ,NY,NX)
-            !     TCelcius4LeafOffHarden(NZ,NY,NX)=AMIN1(15.0,TCelciusChill4Leaf(NZ,NY,NX)+TCXD)
+            !     TCelsChill4Leaf_pft(NZ,NY,NX)=TCZD-OFFST(NZ,NY,NX)
+            !     TCelcius4LeafOffHarden_pft(NZ,NY,NX)=AMIN1(15.0,TCelsChill4Leaf_pft(NZ,NY,NX)+TCXD)
             IF(iPlantPhotosynthesisType(NZ,NY,NX).EQ.3)THEN
               HTC(NZ,NY,NX)=27.0+3.0*iPlantThermoAdaptZone(NZ,NY,NX)
             ELSE
               HTC(NZ,NY,NX)=30.0+3.0*iPlantThermoAdaptZone(NZ,NY,NX)
             ENDIF
             MatureGroup_pft(NZ,NY,NX)=GROUPX(NZ,NY,NX)+0.30*DTA
-            IF(iPlantTurnoverPattern(NZ,NY,NX).NE.0)THEN
+            IF(iPlantTurnoverPattern_pft(NZ,NY,NX).NE.0)THEN
               MatureGroup_pft(NZ,NY,NX)=MatureGroup_pft(NZ,NY,NX)/25.0
             ENDIF
             MatureGroup_pft(NZ,NY,NX)=MatureGroup_pft(NZ,NY,NX)-XTLI(NZ,NY,NX)

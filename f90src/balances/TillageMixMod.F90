@@ -271,10 +271,10 @@ module TillageMixMod
     ENDDO
 
     DO NTS=ids_beg,idg_NH3
-      TS0_solml(NTS)=trc_solml(NTS,0,NY,NX)*CORP0
+      TS0_solml(NTS)=trc_solml_vr(NTS,0,NY,NX)*CORP0
     ENDDO
     DO NTS=ids_nut_beg,ids_nuts_end
-      TS0_solml(NTS)=trc_solml(NTS,0,NY,NX)*CORP0
+      TS0_solml(NTS)=trc_solml_vr(NTS,0,NY,NX)*CORP0
     ENDDO
 
     TXN4G=trcx_solml(idx_NH4,0,NY,NX)*CORP0
@@ -302,11 +302,11 @@ module TillageMixMod
     ORGR(0,NY,NX)=DC
 
     DO NTS=ids_beg,idg_NH3
-      trc_solml(NTS,0,NY,NX)=trc_solml(NTS,0,NY,NX)*XCORP0
+      trc_solml_vr(NTS,0,NY,NX)=trc_solml_vr(NTS,0,NY,NX)*XCORP0
     ENDDO
 
     DO NTS=ids_nut_beg,ids_nuts_end
-      trc_solml(NTS,0,NY,NX)=trc_solml(NTS,0,NY,NX)*XCORP0
+      trc_solml_vr(NTS,0,NY,NX)=trc_solml_vr(NTS,0,NY,NX)*XCORP0
     ENDDO
 
     trcx_solml(idx_NH4,0,NY,NX)=trcx_solml(idx_NH4,0,NY,NX)*XCORP0
@@ -373,7 +373,7 @@ module TillageMixMod
         ENDDO
 
         DO NTS=ids_beg,ids_end
-          TS_solml(NTS)=TS_solml(NTS)+TI*trc_solml(NTS,L,NY,NX)
+          TS_solml(NTS)=TS_solml(NTS)+TI*trc_solml_vr(NTS,L,NY,NX)
         ENDDO
 
         DO NTSA=idsalt_beg,idsalt_end
@@ -393,7 +393,7 @@ module TillageMixMod
         ENDDO
 
         DO NTG=idg_beg,idg_end-1
-          TG_gasml(NTG)=TG_gasml(NTG)+TI*trc_gasml(NTG,L,NY,NX)
+          TG_gasml(NTG)=TG_gasml(NTG)+TI*trc_gasml_vr(NTG,L,NY,NX)
         ENDDO
 
         DO  K=1,jcplx
@@ -510,9 +510,9 @@ module TillageMixMod
 
         ! solute
         DO NTS=ids_beg,ids_end
-          trc_solml(NTS,L,NY,NX)=TI*trc_solml(NTS,L,NY,NX) &
-            +CORP*(FI*TS_solml(NTS)-TI*trc_solml(NTS,L,NY,NX)) &
-            +TX*trc_solml(NTS,L,NY,NX)+CORP*trc_soHml(NTS,L,NY,NX)
+          trc_solml_vr(NTS,L,NY,NX)=TI*trc_solml_vr(NTS,L,NY,NX) &
+            +CORP*(FI*TS_solml(NTS)-TI*trc_solml_vr(NTS,L,NY,NX)) &
+            +TX*trc_solml_vr(NTS,L,NY,NX)+CORP*trc_soHml(NTS,L,NY,NX)
         ENDDO
 
         DO NTX=idx_CEC,idx_cation_end
@@ -531,8 +531,8 @@ module TillageMixMod
         ENDDO
 
         DO NTG=idg_beg,idg_end-1
-          trc_gasml(NTG,L,NY,NX)=TI*trc_gasml(NTG,L,NY,NX)+CORP*(FI*TG_gasml(NTG) &
-            -TI*trc_gasml(NTG,L,NY,NX))+TX*trc_gasml(NTG,L,NY,NX)
+          trc_gasml_vr(NTG,L,NY,NX)=TI*trc_gasml_vr(NTG,L,NY,NX)+CORP*(FI*TG_gasml(NTG) &
+            -TI*trc_gasml_vr(NTG,L,NY,NX))+TX*trc_gasml_vr(NTG,L,NY,NX)
         ENDDO
 
         call MixSoluteH(L,NY,NX)
@@ -735,11 +735,11 @@ module TillageMixMod
         ORGR(L,NY,NX)=DC
 
         DO NTS=ids_beg,idg_NH3
-          trc_solml(NTS,L,NY,NX)=trc_solml(NTS,L,NY,NX)+FI*TS0_solml(NTS)
+          trc_solml_vr(NTS,L,NY,NX)=trc_solml_vr(NTS,L,NY,NX)+FI*TS0_solml(NTS)
         ENDDO
 
         DO NTS=ids_nut_beg,ids_nuts_end
-          trc_solml(NTS,L,NY,NX)=trc_solml(NTS,L,NY,NX)+FI*TS0_solml(NTS)
+          trc_solml_vr(NTS,L,NY,NX)=trc_solml_vr(NTS,L,NY,NX)+FI*TS0_solml(NTS)
         ENDDO
 
         trcx_solml(idx_NH4,L,NY,NX)=trcx_solml(idx_NH4,L,NY,NX)+FI*TXN4G

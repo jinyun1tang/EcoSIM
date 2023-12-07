@@ -83,7 +83,7 @@ module MicBGCMod
   call ncplxs%Init()
   call naqfdiag%ZeroOut()
 
-  micflx%TRINH4=0._r8;micflx%TRIPO4=0._r8
+  micflx%NetNH4Mineralize_col=0._r8;micflx%NetPO4Mineralize_col=0._r8
 ! write(*,*)'StageBGCEnvironCondition'
   call StageBGCEnvironCondition(micfor,KL,micstt,naqfdiag,nmicdiag,nmics,ncplxs)
 !
@@ -832,8 +832,8 @@ module MicBGCMod
   IF(micpar%is_aerobic_hetr(N))THEN
 !  N=(1)OBLIGATE AEROBES,(2)FACULTATIVE ANAEROBES,(3)FUNGI
 !    (6)N2 FIXERS
-!   write(*,*)'AerobsO2Uptake'
-    call AerobsO2Uptake(NGL,N,K,FOXYX,OXKX,RGOMP,RVOXP,RVOXPA,RVOXPB,&
+!   write(*,*)'AerobLeafO2Solubility_pftUptake'
+    call AerobLeafO2Solubility_pftUptake(NGL,N,K,FOXYX,OXKX,RGOMP,RVOXP,RVOXPA,RVOXPB,&
       micfor,micstt,nmicf,nmics,micflx)
   !anaerboic heterotrophs
   ELSEIF(micpar%is_anerobic_hetr(N))THEN
@@ -2977,7 +2977,7 @@ module MicBGCMod
   end subroutine HeteroDenitrificCatabolism
 !------------------------------------------------------------------------------------------
 
-  subroutine AerobsO2Uptake(NGL,N,K,FOXYX,OXKX,RGOMP,RVOXP,RVOXPA,RVOXPB,&
+  subroutine AerobLeafO2Solubility_pftUptake(NGL,N,K,FOXYX,OXKX,RGOMP,RVOXP,RVOXPA,RVOXPB,&
     micfor,micstt,nmicf,nmics,micflx)
   implicit none
   integer, intent(in) :: NGL,N,K
@@ -3156,9 +3156,9 @@ module MicBGCMod
   RCH4X(NGL,K)=0.0_r8
   ROXYO(NGL,K)=ROXYM(NGL,K)*WFN(NGL,K)
   RH2GX(NGL,K)=0.0_r8
-  !write(*,*)'finish AerobsO2Uptake'
+  !write(*,*)'finish AerobLeafO2Solubility_pftUptake'
   end associate
-  end subroutine AerobsO2Uptake
+  end subroutine AerobLeafO2Solubility_pftUptake
 
 !------------------------------------------------------------------------------------------
 
@@ -3267,8 +3267,8 @@ module MicBGCMod
    RINOOR => micflx%RINOOR, &
    RIPOOR  => micflx%RIPOOR, &
    RIPO1R => micflx%RIPO1R, &
-   TRINH4  => micflx%TRINH4, &
-   TRIPO4 => micflx%TRIPO4 &
+   NetNH4Mineralize_col  => micflx%NetNH4Mineralize_col, &
+   NetPO4Mineralize_col => micflx%NetPO4Mineralize_col &
   )
 !     MINERALIZATION-IMMOBILIZATION OF NH4 IN SOIL FROM MICROBIAL
 !     C:N AND NH4 CONCENTRATION IN BAND AND NON-BAND SOIL ZONES
@@ -3288,7 +3288,7 @@ module MicBGCMod
 !     ZNH4M,ZNHBM=NH4 not available for uptake in non-band, band
 !     FNH4X,FNB4X=fractions of biological NH4 demand in non-band, band
 !     RINH4,RINB4=substrate-limited NH4 mineraln-immobiln in non-band, band
-!     TRINH4=total NH4 net mineraln (-ve) or immobiln (+ve)
+!     NetNH4Mineralize_col=total NH4 net mineraln (-ve) or immobiln (+ve)
 ! update may be needed, May 17th, 2023, jyt.
   FNH4S=VLNH4
   FNHBS=VLNHB
@@ -3309,7 +3309,7 @@ module MicBGCMod
     RINH4(NGL,K)=RINHP*FNH4S
     RINB4(NGL,K)=RINHP*FNHBS
   ENDIF
-  TRINH4=TRINH4+(RINH4(NGL,K)+RINB4(NGL,K))
+  NetNH4Mineralize_col=NetNH4Mineralize_col+(RINH4(NGL,K)+RINB4(NGL,K))
 !
 !     MINERALIZATION-IMMOBILIZATION OF NO3 IN SOIL FROM MICROBIAL
 !     C:N AND NO3 CONCENTRATION IN BAND AND NON-BAND SOIL ZONES
@@ -3327,7 +3327,7 @@ module MicBGCMod
 !     ZNO3M,ZNOBM=NO3 not available for uptake in non-band, band
 !     FNO3X,FNB3X=fractions of biological NO3 demand in non-band, band
 !     RINO3,RINB3=substrate-limited NO3 immobiln in non-band, band
-!     TRINH4=total net NH4+NO3 mineraln (-ve) or immobiln (+ve)
+!     NetNH4Mineralize_col=total net NH4+NO3 mineraln (-ve) or immobiln (+ve)
 !
   FNO3S=VLNO3
   FNO3B=VLNOB
@@ -3348,7 +3348,7 @@ module MicBGCMod
     RINO3(NGL,K)=RINOP*FNO3S
     RINB3(NGL,K)=RINOP*FNO3B
   ENDIF
-  TRINH4=TRINH4+(RINO3(NGL,K)+RINB3(NGL,K))
+  NetNH4Mineralize_col=NetNH4Mineralize_col+(RINO3(NGL,K)+RINB3(NGL,K))
 !
 !     MINERALIZATION-IMMOBILIZATION OF H2PO4 IN SOIL FROM MICROBIAL
 !     C:P AND PO4 CONCENTRATION IN BAND AND NON-BAND SOIL ZONES
@@ -3368,7 +3368,7 @@ module MicBGCMod
 !     VOLW=water content
 !     FPO4X,FPOBX=fractions of biol H2PO4 demand in non-band, band
 !     RIPO4,RIPOB=substrate-limited H2PO4 mineraln-immobn in non-band, band
-!     TRIPO4=total H2PO4 net mineraln (-ve) or immobiln (+ve)
+!     NetPO4Mineralize_col=total H2PO4 net mineraln (-ve) or immobiln (+ve)
 !
   FH2PS=VLPO4
   FH2PB=VLPOB
@@ -3389,7 +3389,7 @@ module MicBGCMod
     RIPO4(NGL,K)=RIPOP*FH2PS
     RIPOB(NGL,K)=RIPOP*FH2PB
   ENDIF
-  TRIPO4=TRIPO4+(RIPO4(NGL,K)+RIPOB(NGL,K))
+  NetPO4Mineralize_col=NetPO4Mineralize_col+(RIPO4(NGL,K)+RIPOB(NGL,K))
 !
 !     MINERALIZATION-IMMOBILIZATION OF HPO4 IN SOIL FROM MICROBIAL
 !     C:P AND PO4 CONCENTRATION IN BAND AND NON-BAND SOIL ZONES
@@ -3407,7 +3407,7 @@ module MicBGCMod
 !     VOLW=water content
 !     FP14X,FP1BX=fractions of biol HPO4 demand in non-band, band
 !     RIP14,RIP1B=substrate-limited HPO4 mineraln-immobn in non-band, band
-!     TRIPO4=total H2PO4+HPO4 net mineraln (-ve) or immobiln (+ve)
+!     NetPO4Mineralize_col=total H2PO4+HPO4 net mineraln (-ve) or immobiln (+ve)
 !
   FH1PS=VLPO4
   FH1PB=VLPOB
@@ -3428,7 +3428,7 @@ module MicBGCMod
     RIP14(NGL,K)=RIP1P*FH1PS
     RIP1B(NGL,K)=RIP1P*FH1PB
   ENDIF
-  TRIPO4=TRIPO4+(RIP14(NGL,K)+RIP1B(NGL,K))
+  NetPO4Mineralize_col=NetPO4Mineralize_col+(RIP14(NGL,K)+RIP1B(NGL,K))
 !
 !     MINERALIZATION-IMMOBILIZATION OF NH4 IN SURFACE RESIDUE FROM
 !     MICROBIAL C:N AND NH4 CONCENTRATION IN BAND AND NON-BAND SOIL
@@ -3447,7 +3447,7 @@ module MicBGCMod
 !     ZNH4M=NH4 not available for uptake
 !     FNH4XR=fractions of biological NH4 demand
 !     RINH4R=substrate-limited NH4 mineraln-immobiln
-!     TRINH4=total NH4 net mineraln (-ve) or immobiln (+ve)
+!     NetNH4Mineralize_col=total NH4 net mineraln (-ve) or immobiln (+ve)
 !
   IF(litrm)THEN
     RINHPR=RINHP-RINH4(NGL,K)-RINO3(NGL,K)
@@ -3462,7 +3462,7 @@ module MicBGCMod
       RINHOR(NGL,K)=0.0_r8
       RINH4R(NGL,K)=RINHPR
     ENDIF
-    TRINH4=TRINH4+RINH4R(NGL,K)
+    NetNH4Mineralize_col=NetNH4Mineralize_col+RINH4R(NGL,K)
 !
 !     MINERALIZATION-IMMOBILIZATION OF NO3 IN SURFACE RESIDUE FROM
 !     MICROBIAL C:N AND NO3 CONCENTRATION IN BAND AND NON-BAND SOIL
@@ -3482,7 +3482,7 @@ module MicBGCMod
 !     ZNO3M=NO3 not available for uptake
 !     FNO3XR=fraction of biological NO3 demand
 !     RINO3R=substrate-limited NO3 immobiln
-!     TRINH4=total NH4+NO3 net mineraln (-ve) or immobiln (+ve)
+!     NetNH4Mineralize_col=total NH4+NO3 net mineraln (-ve) or immobiln (+ve)
 !
     RINOPR=AZMAX1(RINHPR-RINH4R(NGL,K))
     IF(RINOPR.GT.0.0_r8)THEN
@@ -3496,7 +3496,7 @@ module MicBGCMod
       RINOOR(NGL,K)=0.0_r8
       RINO3R(NGL,K)=RINOPR
     ENDIF
-    TRINH4=TRINH4+RINO3R(NGL,K)
+    NetNH4Mineralize_col=NetNH4Mineralize_col+RINO3R(NGL,K)
 !
 !     MINERALIZATION-IMMOBILIZATION OF H2PO4 IN SURFACE RESIDUE FROM
 !     MICROBIAL C:P AND PO4 CONCENTRATION IN BAND AND NON-BAND SOIL
@@ -3516,7 +3516,7 @@ module MicBGCMod
 !     H2P4M=H2PO4 not available for uptake
 !     FPO4XR=fractions of biological H2PO4 demand
 !     RIPO4R=substrate-limited H2PO4 mineraln-immobiln
-!     TRIPO4=total H2PO4 net mineraln (-ve) or immobiln (+ve)
+!     NetPO4Mineralize_col=total H2PO4 net mineraln (-ve) or immobiln (+ve)
 !
     RIPOPR=RIPOP-RIPO4(NGL,K)
     IF(RIPOPR.GT.0.0_r8)THEN
@@ -3530,7 +3530,7 @@ module MicBGCMod
       RIPOOR(NGL,K)=0.0_r8
       RIPO4R(NGL,K)=RIPOPR
     ENDIF
-    TRIPO4=TRIPO4+RIPO4R(NGL,K)
+    NetPO4Mineralize_col=NetPO4Mineralize_col+RIPO4R(NGL,K)
 !
 !     MINERALIZATION-IMMOBILIZATION OF HPO4 IN SURFACE RESIDUE FROM
 !     MICROBIAL C:P AND PO4 CONCENTRATION IN BAND AND NON-BAND SOIL
@@ -3550,7 +3550,7 @@ module MicBGCMod
 !     H1P4M=HPO4 not available for uptake
 !     FP14XR=fraction of biological HPO4 demand
 !     RIP14R=substrate-limited HPO4 minereraln-immobiln
-!     TRIPO4=total HPO4 net mineraln (-ve) or immobiln (+ve)
+!     NetPO4Mineralize_col=total HPO4 net mineraln (-ve) or immobiln (+ve)
 !
     FH1PS=VLPO4
     FH1PB=VLPOB
@@ -3566,7 +3566,7 @@ module MicBGCMod
       RIPO1R(NGL,K)=0.0_r8
       RIP14R(NGL,K)=RIP1PR
     ENDIF
-    TRIPO4=TRIPO4+RIP14R(NGL,K)
+    NetPO4Mineralize_col=NetPO4Mineralize_col+RIP14R(NGL,K)
   ENDIF
   end associate
   end subroutine BiomassMineralization

@@ -51,24 +51,24 @@ module RootDataType
   real(r8),target,allocatable ::  PrimRootLen(:,:,:,:,:,:)                 !root layer length primary axes, [m d-2]
   real(r8),target,allocatable ::  SecndRootLen(:,:,:,:,:,:)                 !root layer length secondary axes, [m d-2]
   real(r8),target,allocatable ::  RootLenthDensPerPopu_pvr(:,:,:,:,:)          !root length density in soil layers, [m m-3]
-  real(r8),target,allocatable ::  PrimRootXNumL(:,:,:,:,:)                    !root layer number primary axes, [d-2]
+  real(r8),target,allocatable ::  PrimRootXNumL_pvr(:,:,:,:,:)                    !root layer number primary axes, [d-2]
   real(r8),target,allocatable ::  SecndRootXNum_pvr(:,:,:,:,:)                    !root layer number axes, [d-2]
   real(r8),target,allocatable ::  SecndRootXNum_rpvr(:,:,:,:,:,:)                  !root layer number secondary axes, [d-2]
   real(r8),target,allocatable ::  AveSecndRootLen(:,:,:,:,:)                   !root layer average length, [m]
   real(r8),target,allocatable ::  RootAreaPerPlant_vr(:,:,:,:,:)                   !root layer area per plant, [m p-1]
   real(r8),target,allocatable ::  RootVH2O_vr(:,:,:,:,:)                   !root layer volume water, [m2 d-2]
-  real(r8),target,allocatable ::  PrimRootRadius(:,:,:,:,:)                   !root layer diameter primary axes, [m ]
+  real(r8),target,allocatable ::  PrimRootRadius_pvr(:,:,:,:,:)                   !root layer diameter primary axes, [m ]
   real(r8),target,allocatable ::  RootVolume_vr(:,:,:,:,:)                   !root layer volume air, [m2 d-2]
   real(r8),target,allocatable ::  PrimRootDepth(:,:,:,:,:)                   !root layer depth, [m]
-  real(r8),target,allocatable ::  SecndRootRadius(:,:,:,:,:)                   !root layer diameter secondary axes, [m ]
+  real(r8),target,allocatable ::  SecndRootRadius_pvr(:,:,:,:,:)                   !root layer diameter secondary axes, [m ]
   real(r8),target,allocatable ::  PrimRootSpecLen(:,:,:,:)                    !specific root length primary axes, [m g-1]
   real(r8),target,allocatable ::  SecndRootSpecLen(:,:,:,:)                    !specific root length secondary axes, [m g-1]
   real(r8),target,allocatable ::  AllPlantRootH2OUptake_vr(:,:,:,:,:)                   !root water uptake, [m2 d-2 h-1]
   real(r8),target,allocatable ::  PSIRoot_vr(:,:,:,:,:)                   !root total water potential , [Mpa]
   real(r8),target,allocatable ::  PSIRootOSMO_vr(:,:,:,:,:)                   !root osmotic water potential , [Mpa]
   real(r8),target,allocatable ::  PSIRootTurg_vr(:,:,:,:,:)                   !root turgor water potential , [Mpa]
-  real(r8),target,allocatable ::  trcg_rootml(:,:,:,:,:,:)           !root gaseous tracer content [g d-2]
-  real(r8),target,allocatable ::  trcs_rootml(:,:,:,:,:,:)           !root dissolved gaseous tracer content [g d-2]
+  real(r8),target,allocatable ::  trcg_rootml_vr(:,:,:,:,:,:)           !root gaseous tracer content [g d-2]
+  real(r8),target,allocatable ::  trcs_rootml_vr(:,:,:,:,:,:)           !root dissolved gaseous tracer content [g d-2]
   real(r8),target,allocatable ::  TRootGasLoss_disturb(:,:,:)                 !total root gas content, [g d-2]
   real(r8),target,allocatable ::  RootBiomCPerPlant_pft(:,:,:)                       !root C per plant, [g p-1]
   real(r8),target,allocatable ::  RootChemElmnts_pft(:,:,:,:)                     !plant root element, [g d-2]
@@ -133,24 +133,24 @@ contains
   allocate(PrimRootLen(jroots,JZ,JC,JP,JY,JX));PrimRootLen=0._r8
   allocate(SecndRootLen(jroots,JZ,JC,JP,JY,JX));SecndRootLen=0._r8
   allocate(RootLenthDensPerPopu_pvr(jroots,JZ,JP,JY,JX));RootLenthDensPerPopu_pvr=0._r8
-  allocate(PrimRootXNumL(jroots,JZ,JP,JY,JX));PrimRootXNumL=0._r8
+  allocate(PrimRootXNumL_pvr(jroots,JZ,JP,JY,JX));PrimRootXNumL_pvr=0._r8
   allocate(SecndRootXNum_pvr(jroots,JZ,JP,JY,JX));SecndRootXNum_pvr=0._r8
   allocate(SecndRootXNum_rpvr(jroots,JZ,JC,JP,JY,JX));SecndRootXNum_rpvr=0._r8
   allocate(AveSecndRootLen(jroots,JZ,JP,JY,JX));AveSecndRootLen=0._r8
   allocate(RootAreaPerPlant_vr(jroots,JZ,JP,JY,JX));RootAreaPerPlant_vr=0._r8
   allocate(RootVH2O_vr(jroots,JZ,JP,JY,JX));RootVH2O_vr=0._r8
-  allocate(PrimRootRadius(jroots,JZ,JP,JY,JX));PrimRootRadius=0._r8
+  allocate(PrimRootRadius_pvr(jroots,JZ,JP,JY,JX));PrimRootRadius_pvr=0._r8
   allocate(RootVolume_vr(jroots,JZ,JP,JY,JX));RootVolume_vr=0._r8
   allocate(PrimRootDepth(jroots,JC,JP,JY,JX));PrimRootDepth=0._r8
-  allocate(SecndRootRadius(jroots,JZ,JP,JY,JX));SecndRootRadius=0._r8
+  allocate(SecndRootRadius_pvr(jroots,JZ,JP,JY,JX));SecndRootRadius_pvr=0._r8
   allocate(PrimRootSpecLen(jroots,JP,JY,JX)); PrimRootSpecLen=0._r8
   allocate(SecndRootSpecLen(jroots,JP,JY,JX)); SecndRootSpecLen=0._r8
   allocate(AllPlantRootH2OUptake_vr(jroots,JZ,JP,JY,JX));AllPlantRootH2OUptake_vr=0._r8
   allocate(PSIRoot_vr(jroots,JZ,JP,JY,JX));PSIRoot_vr=0._r8
   allocate(PSIRootOSMO_vr(jroots,JZ,JP,JY,JX));PSIRootOSMO_vr=0._r8
   allocate(PSIRootTurg_vr(jroots,JZ,JP,JY,JX));PSIRootTurg_vr=0._r8
-  allocate(trcg_rootml(idg_beg:idg_end-1,2,JZ,JP,JY,JX)); trcg_rootml =0._r8
-  allocate(trcs_rootml(idg_beg:idg_end-1,2,JZ,JP,JY,JX)); trcs_rootml =0._r8
+  allocate(trcg_rootml_vr(idg_beg:idg_end-1,2,JZ,JP,JY,JX)); trcg_rootml_vr =0._r8
+  allocate(trcs_rootml_vr(idg_beg:idg_end-1,2,JZ,JP,JY,JX)); trcs_rootml_vr =0._r8
   allocate(TRootGasLoss_disturb(idg_beg:idg_end-1,JY,JX));TRootGasLoss_disturb=0._r8
   allocate(RootBiomCPerPlant_pft(JP,JY,JX));    RootBiomCPerPlant_pft=0._r8
   allocate(RootChemElmnts_pft(NumOfPlantChemElmnts,JP,JY,JX)); RootChemElmnts_pft=0._r8
@@ -213,24 +213,24 @@ contains
   call destroy(PrimRootLen)
   call destroy(SecndRootLen)
   call destroy(RootLenthDensPerPopu_pvr)
-  call destroy(PrimRootXNumL)
+  call destroy(PrimRootXNumL_pvr)
   call destroy(SecndRootXNum_pvr)
   call destroy(SecndRootXNum_rpvr)
   call destroy(AveSecndRootLen)
   call destroy(RootAreaPerPlant_vr)
   call destroy(RootVH2O_vr)
-  call destroy(PrimRootRadius)
+  call destroy(PrimRootRadius_pvr)
   call destroy(RootVolume_vr)
   call destroy(PrimRootDepth)
-  call destroy(SecndRootRadius)
+  call destroy(SecndRootRadius_pvr)
   call destroy(PrimRootSpecLen)
   call destroy(SecndRootSpecLen)
   call destroy(AllPlantRootH2OUptake_vr)
   call destroy(PSIRoot_vr)
   call destroy(PSIRootOSMO_vr)
   call destroy(PSIRootTurg_vr)
-  call destroy(trcg_rootml)
-  call destroy(trcs_rootml)
+  call destroy(trcg_rootml_vr)
+  call destroy(trcs_rootml_vr)
   call destroy(TRootGasLoss_disturb)
   call destroy(RootBiomCPerPlant_pft)
   call destroy(RootChemElmnts_pft)

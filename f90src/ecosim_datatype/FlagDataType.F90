@@ -29,13 +29,13 @@ implicit none
   integer,target,allocatable ::  IsPlantActive(:,:,:)                        ! flag for living pft
   integer,target,allocatable ::  doInitPlant(:,:,:)                        !PFT initialization flag:0=no,1=yes
   integer,target,allocatable ::  iPlantPhotosynthesisType(:,:,:)                        !plant photosynthetic type (C3 or C4)
-  integer,target,allocatable ::  iPlantMorphologyType(:,:,:)                        !plant growth type (vascular, non-vascular)
+  integer,target,allocatable ::  iPlantMorphologyType_pft(:,:,:)                        !plant growth type (vascular, non-vascular)
   integer,target,allocatable ::  iPlantPhenologyPattern_pft(:,:,:)                        !plant growth habit (annual or perennial)
-  integer,target,allocatable ::  iPlantDevelopPattern(:,:,:)                        !plant growth habit (determinate or indeterminate)
+  integer,target,allocatable ::  iPlantDevelopPattern_pft(:,:,:)                        !plant growth habit (determinate or indeterminate)
   integer,target,allocatable ::  iPlantNfixType(:,:,:)                        !N2 fixation type
   integer,target,allocatable ::  iPlantPhenologyType_pft(:,:,:)                        !climate signal for phenological progress none, temperature, water stress)
-  integer,target,allocatable ::  iPlantPhotoperiodType(:,:,:)                        !photoperiod type (neutral, long day, short day)
-  integer,target,allocatable ::  iPlantTurnoverPattern(:,:,:)                        !phenologically-driven above-ground turnover (all, foliar only, none)
+  integer,target,allocatable ::  iPlantPhotoperiodType_pft(:,:,:)                        !photoperiod type (neutral, long day, short day)
+  integer,target,allocatable ::  iPlantTurnoverPattern_pft(:,:,:)                        !phenologically-driven above-ground turnover (all, foliar only, none)
   integer,target,allocatable ::  iPlantGrainType(:,:,:)                        !grain type (below or above-ground), e.g. potato and onion are below
   integer,target,allocatable ::  MY(:,:,:)                           !mycorrhizal type (no or yes)
   integer,target,allocatable ::  IDWaterTable(:,:)                   !water table flag from site file
@@ -60,13 +60,13 @@ contains
   allocate(IsPlantActive(JP,JY,JX));    IsPlantActive=0
   allocate(doInitPlant(JP,JY,JX));    doInitPlant=ifalse
   allocate(iPlantPhotosynthesisType(JP,JY,JX));    iPlantPhotosynthesisType=0
-  allocate(iPlantMorphologyType(JP,JY,JX));    iPlantMorphologyType=0
+  allocate(iPlantMorphologyType_pft(JP,JY,JX));    iPlantMorphologyType_pft=0
   allocate(iPlantPhenologyPattern_pft(JP,JY,JX));    iPlantPhenologyPattern_pft=0
-  allocate(iPlantDevelopPattern(JP,JY,JX));    iPlantDevelopPattern=0
+  allocate(iPlantDevelopPattern_pft(JP,JY,JX));    iPlantDevelopPattern_pft=0
   allocate(iPlantNfixType(JP,JY,JX));    iPlantNfixType=0
   allocate(iPlantPhenologyType_pft(JP,JY,JX));    iPlantPhenologyType_pft=0
-  allocate(iPlantPhotoperiodType(JP,JY,JX));    iPlantPhotoperiodType=0
-  allocate(iPlantTurnoverPattern(JP,JY,JX));    iPlantTurnoverPattern=0
+  allocate(iPlantPhotoperiodType_pft(JP,JY,JX));    iPlantPhotoperiodType_pft=0
+  allocate(iPlantTurnoverPattern_pft(JP,JY,JX));    iPlantTurnoverPattern_pft=0
   allocate(iPlantGrainType(JP,JY,JX));    iPlantGrainType=0
   allocate(MY(JP,JY,JX));       MY=0
   allocate(IDWaterTable(JY,JX));       IDWaterTable=0
@@ -91,13 +91,13 @@ contains
   call destroy(IsPlantActive)
   call destroy(doInitPlant)
   call destroy(iPlantPhotosynthesisType)
-  call destroy(iPlantMorphologyType)
+  call destroy(iPlantMorphologyType_pft)
   call destroy(iPlantPhenologyPattern_pft)
-  call destroy(iPlantDevelopPattern)
+  call destroy(iPlantDevelopPattern_pft)
   call destroy(iPlantNfixType)
   call destroy(iPlantPhenologyType_pft)
-  call destroy(iPlantPhotoperiodType)
-  call destroy(iPlantTurnoverPattern)
+  call destroy(iPlantPhotoperiodType_pft)
+  call destroy(iPlantTurnoverPattern_pft)
   call destroy(iPlantGrainType)
   call destroy(MY)
   call destroy(IDWaterTable)

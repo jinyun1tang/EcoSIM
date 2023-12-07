@@ -737,7 +737,7 @@ implicit none
 
   DO NTU=ids_nuts_beg,ids_nuts_end
     if(NTU/=ids_H2PO4B .and. NTU/=ids_H1PO4B)THEN
-      trc_solml(NTU,L1,NY,NX)=trc_solml(NTU,L1,NY,NX)+FX*trc_solml(NTU,L0,NY,NX)
+      trc_solml_vr(NTU,L1,NY,NX)=trc_solml_vr(NTU,L1,NY,NX)+FX*trc_solml_vr(NTU,L0,NY,NX)
     ENDIF
   ENDDO
 
@@ -749,10 +749,10 @@ implicit none
   ENDIF
 
   IF(L0.NE.0)THEN
-    trc_solml(ids_H1PO4B,L1,NY,NX)=trc_solml(ids_H1PO4B,L1,NY,NX) &
-      +FX*trc_solml(ids_H1PO4B,L0,NY,NX)
-    trc_solml(ids_H2PO4B,L1,NY,NX)=trc_solml(ids_H2PO4B,L1,NY,NX) &
-      +FX*trc_solml(ids_H2PO4B,L0,NY,NX)
+    trc_solml_vr(ids_H1PO4B,L1,NY,NX)=trc_solml_vr(ids_H1PO4B,L1,NY,NX) &
+      +FX*trc_solml_vr(ids_H1PO4B,L0,NY,NX)
+    trc_solml_vr(ids_H2PO4B,L1,NY,NX)=trc_solml_vr(ids_H2PO4B,L1,NY,NX) &
+      +FX*trc_solml_vr(ids_H2PO4B,L0,NY,NX)
 
     IF(salt_model)THEN
       DO NTSAB=idsaltb_beg,idsaltb_end
@@ -773,12 +773,12 @@ implicit none
     ENDDO
 
     DO NTG=idg_beg,idg_end-1
-      trc_gasml(NTG,L1,NY,NX)=trc_gasml(NTG,L1,NY,NX)+FX*trc_gasml(NTG,L0,NY,NX)
+      trc_gasml_vr(NTG,L1,NY,NX)=trc_gasml_vr(NTG,L1,NY,NX)+FX*trc_gasml_vr(NTG,L0,NY,NX)
     ENDDO
   ENDIF
 !exclude NH3 and NH3B, which are accounted in nutrients
   DO NTG=idg_beg,idg_end-2
-    trc_solml(NTG,L1,NY,NX)=trc_solml(NTG,L1,NY,NX)+FX*trc_solml(NTG,L0,NY,NX)
+    trc_solml_vr(NTG,L1,NY,NX)=trc_solml_vr(NTG,L1,NY,NX)+FX*trc_solml_vr(NTG,L0,NY,NX)
   ENDDO
 
   IF(IFLGL(L,3).EQ.0)THEN
@@ -838,8 +838,8 @@ implicit none
         .AND.RootStructBiomC_vr(ipltroot,L1,NZ,NY,NX).GT.ZEROP(NZ,NY,NX))THEN
         DO N=1,MY(NZ,NY,NX)
           DO NTG=idg_beg,idg_end-1
-            trcg_rootml(NTG,N,L1,NZ,NY,NX)=trcg_rootml(NTG,N,L1,NZ,NY,NX)+FX*trcg_rootml(NTG,N,L0,NZ,NY,NX)
-            trcs_rootml(NTG,N,L1,NZ,NY,NX)=trcs_rootml(NTG,N,L1,NZ,NY,NX)+FX*trcs_rootml(NTG,N,L0,NZ,NY,NX)
+            trcg_rootml_vr(NTG,N,L1,NZ,NY,NX)=trcg_rootml_vr(NTG,N,L1,NZ,NY,NX)+FX*trcg_rootml_vr(NTG,N,L0,NZ,NY,NX)
+            trcs_rootml_vr(NTG,N,L1,NZ,NY,NX)=trcs_rootml_vr(NTG,N,L1,NZ,NY,NX)+FX*trcs_rootml_vr(NTG,N,L0,NZ,NY,NX)
           ENDDO
           DO  NR=1,NumRootAxes_pft(NZ,NY,NX)
             DO NE=1,NumOfPlantChemElmnts
@@ -856,14 +856,14 @@ implicit none
           RootStructBiomC_vr(N,L1,NZ,NY,NX)=RootStructBiomC_vr(N,L1,NZ,NY,NX)+FX*RootStructBiomC_vr(N,L0,NZ,NY,NX)
            PopuPlantRootC_vr(N,L1,NZ,NY,NX)= PopuPlantRootC_vr(N,L1,NZ,NY,NX)+FX* PopuPlantRootC_vr(N,L0,NZ,NY,NX)
           RootProteinC_pvr(N,L1,NZ,NY,NX)=RootProteinC_pvr(N,L1,NZ,NY,NX)+FX*RootProteinC_pvr(N,L0,NZ,NY,NX)
-          PrimRootXNumL(N,L1,NZ,NY,NX)=PrimRootXNumL(N,L1,NZ,NY,NX)+FX*PrimRootXNumL(N,L0,NZ,NY,NX)
+          PrimRootXNumL_pvr(N,L1,NZ,NY,NX)=PrimRootXNumL_pvr(N,L1,NZ,NY,NX)+FX*PrimRootXNumL_pvr(N,L0,NZ,NY,NX)
           SecndRootXNum_pvr(N,L1,NZ,NY,NX)=SecndRootXNum_pvr(N,L1,NZ,NY,NX)+FX*SecndRootXNum_pvr(N,L0,NZ,NY,NX)
           RootLenPerPopu_pvr(N,L1,NZ,NY,NX)=RootLenPerPopu_pvr(N,L1,NZ,NY,NX)+FX*RootLenPerPopu_pvr(N,L0,NZ,NY,NX)
           RootLenthDensPerPopu_pvr(N,L1,NZ,NY,NX)=RootLenthDensPerPopu_pvr(N,L1,NZ,NY,NX)+FX*RootLenthDensPerPopu_pvr(N,L0,NZ,NY,NX)
           RootVolume_vr(N,L1,NZ,NY,NX)=RootVolume_vr(N,L1,NZ,NY,NX)+FX*RootVolume_vr(N,L0,NZ,NY,NX)
           RootVH2O_vr(N,L1,NZ,NY,NX)=RootVH2O_vr(N,L1,NZ,NY,NX)+FX*RootVH2O_vr(N,L0,NZ,NY,NX)
-          PrimRootRadius(N,L1,NZ,NY,NX)=PrimRootRadius(N,L1,NZ,NY,NX)+FX*PrimRootRadius(N,L0,NZ,NY,NX)
-          SecndRootRadius(N,L1,NZ,NY,NX)=SecndRootRadius(N,L1,NZ,NY,NX)+FX*SecndRootRadius(N,L0,NZ,NY,NX)
+          PrimRootRadius_pvr(N,L1,NZ,NY,NX)=PrimRootRadius_pvr(N,L1,NZ,NY,NX)+FX*PrimRootRadius_pvr(N,L0,NZ,NY,NX)
+          SecndRootRadius_pvr(N,L1,NZ,NY,NX)=SecndRootRadius_pvr(N,L1,NZ,NY,NX)+FX*SecndRootRadius_pvr(N,L0,NZ,NY,NX)
           RootAreaPerPlant_vr(N,L1,NZ,NY,NX)=RootAreaPerPlant_vr(N,L1,NZ,NY,NX)+FX*RootAreaPerPlant_vr(N,L0,NZ,NY,NX)
           AveSecndRootLen(N,L1,NZ,NY,NX)=AveSecndRootLen(N,L1,NZ,NY,NX)+FX*AveSecndRootLen(N,L0,NZ,NY,NX)
         ENDDO
@@ -920,7 +920,7 @@ implicit none
 
   DO NTU=ids_nuts_beg,ids_nuts_end
     if(NTU/=ids_H1PO4B .and. NTU/=ids_H2PO4B)THEN
-      trc_solml(NTU,L0,NY,NX)=FY*trc_solml(NTU,L0,NY,NX)
+      trc_solml_vr(NTU,L0,NY,NX)=FY*trc_solml_vr(NTU,L0,NY,NX)
     ENDIF
   ENDDO
   IF(salt_model)THEN
@@ -929,8 +929,8 @@ implicit none
     ENDDO
   ENDIF
   IF(L0.NE.0)THEN
-    trc_solml(ids_H1PO4B,L0,NY,NX)=FY*trc_solml(ids_H1PO4B,L0,NY,NX)
-    trc_solml(ids_H2PO4B,L0,NY,NX)=FY*trc_solml(ids_H2PO4B,L0,NY,NX)
+    trc_solml_vr(ids_H1PO4B,L0,NY,NX)=FY*trc_solml_vr(ids_H1PO4B,L0,NY,NX)
+    trc_solml_vr(ids_H2PO4B,L0,NY,NX)=FY*trc_solml_vr(ids_H2PO4B,L0,NY,NX)
     IF(salt_model)THEN
       DO NTSAB=idsaltb_beg,idsaltb_end
         trcSalt_solml(NTSAB,L0,NY,NX)=FY*trcSalt_solml(NTSAB,L0,NY,NX)
@@ -950,12 +950,12 @@ implicit none
 
 
     DO NTG=idg_beg,idg_end-1
-      trc_gasml(NTG,L0,NY,NX)=FY*trc_gasml(NTG,L0,NY,NX)
+      trc_gasml_vr(NTG,L0,NY,NX)=FY*trc_gasml_vr(NTG,L0,NY,NX)
     ENDDO
   ENDIF
 !exclude NH3 and NH3B, which are accounted in nutrients
   DO NTG=idg_beg,idg_end-2
-    trc_solml(NTG,L0,NY,NX)=FY*trc_solml(NTG,L0,NY,NX)
+    trc_solml_vr(NTG,L0,NY,NX)=FY*trc_solml_vr(NTG,L0,NY,NX)
   ENDDO
   IF(IFLGL(L,3).EQ.0)THEN
     DO  K=1,jcplx
@@ -1015,8 +1015,8 @@ implicit none
         .AND.RootStructBiomC_vr(ipltroot,L1,NZ,NY,NX).GT.ZEROP(NZ,NY,NX))THEN
         DO  N=1,MY(NZ,NY,NX)
           DO NTG=idg_beg,idg_end-1
-            trcg_rootml(NTG,N,L0,NZ,NY,NX)=FY*trcg_rootml(NTG,N,L0,NZ,NY,NX)
-            trcs_rootml(NTG,N,L0,NZ,NY,NX)=FY*trcs_rootml(NTG,N,L0,NZ,NY,NX)
+            trcg_rootml_vr(NTG,N,L0,NZ,NY,NX)=FY*trcg_rootml_vr(NTG,N,L0,NZ,NY,NX)
+            trcs_rootml_vr(NTG,N,L0,NZ,NY,NX)=FY*trcs_rootml_vr(NTG,N,L0,NZ,NY,NX)
           ENDDO
           DO NR=1,NumRootAxes_pft(NZ,NY,NX)
             DO NE=1,NumOfPlantChemElmnts
@@ -1033,14 +1033,14 @@ implicit none
           RootStructBiomC_vr(N,L0,NZ,NY,NX)=FY*RootStructBiomC_vr(N,L0,NZ,NY,NX)
            PopuPlantRootC_vr(N,L0,NZ,NY,NX)=FY* PopuPlantRootC_vr(N,L0,NZ,NY,NX)
           RootProteinC_pvr(N,L0,NZ,NY,NX)=FY*RootProteinC_pvr(N,L0,NZ,NY,NX)
-          PrimRootXNumL(N,L0,NZ,NY,NX)=FY*PrimRootXNumL(N,L0,NZ,NY,NX)
+          PrimRootXNumL_pvr(N,L0,NZ,NY,NX)=FY*PrimRootXNumL_pvr(N,L0,NZ,NY,NX)
           SecndRootXNum_pvr(N,L0,NZ,NY,NX)=FY*SecndRootXNum_pvr(N,L0,NZ,NY,NX)
           RootLenPerPopu_pvr(N,L0,NZ,NY,NX)=FY*RootLenPerPopu_pvr(N,L0,NZ,NY,NX)
           RootLenthDensPerPopu_pvr(N,L0,NZ,NY,NX)=FY*RootLenthDensPerPopu_pvr(N,L0,NZ,NY,NX)
           RootVolume_vr(N,L0,NZ,NY,NX)=FY*RootVolume_vr(N,L0,NZ,NY,NX)
           RootVH2O_vr(N,L0,NZ,NY,NX)=FY*RootVH2O_vr(N,L0,NZ,NY,NX)
-          PrimRootRadius(N,L0,NZ,NY,NX)=FY*PrimRootRadius(N,L0,NZ,NY,NX)
-          SecndRootRadius(N,L0,NZ,NY,NX)=FY*SecndRootRadius(N,L0,NZ,NY,NX)
+          PrimRootRadius_pvr(N,L0,NZ,NY,NX)=FY*PrimRootRadius_pvr(N,L0,NZ,NY,NX)
+          SecndRootRadius_pvr(N,L0,NZ,NY,NX)=FY*SecndRootRadius_pvr(N,L0,NZ,NY,NX)
           RootAreaPerPlant_vr(N,L0,NZ,NY,NX)=FY*RootAreaPerPlant_vr(N,L0,NZ,NY,NX)
           AveSecndRootLen(N,L0,NZ,NY,NX)=FY*AveSecndRootLen(N,L0,NZ,NY,NX)
         ENDDO
@@ -1208,13 +1208,13 @@ implicit none
 
         DO  N=1,MY(NZ,NY,NX)
           DO NTG=idg_beg,idg_end-1
-            FXGA=FRO*trcg_rootml(NTG,N,L0,NZ,NY,NX)
-            trcg_rootml(NTG,N,L1,NZ,NY,NX)=trcg_rootml(NTG,N,L1,NZ,NY,NX)+FXGA
-            trcg_rootml(NTG,N,L0,NZ,NY,NX)=trcg_rootml(NTG,N,L0,NZ,NY,NX)-FXGA
+            FXGA=FRO*trcg_rootml_vr(NTG,N,L0,NZ,NY,NX)
+            trcg_rootml_vr(NTG,N,L1,NZ,NY,NX)=trcg_rootml_vr(NTG,N,L1,NZ,NY,NX)+FXGA
+            trcg_rootml_vr(NTG,N,L0,NZ,NY,NX)=trcg_rootml_vr(NTG,N,L0,NZ,NY,NX)-FXGA
 
-            FXGP=FRO*trcs_rootml(NTG,N,L0,NZ,NY,NX)
-            trcs_rootml(NTG,N,L1,NZ,NY,NX)=trcs_rootml(NTG,N,L1,NZ,NY,NX)+FXGP
-            trcs_rootml(NTG,N,L0,NZ,NY,NX)=trcs_rootml(NTG,N,L0,NZ,NY,NX)-FXGP
+            FXGP=FRO*trcs_rootml_vr(NTG,N,L0,NZ,NY,NX)
+            trcs_rootml_vr(NTG,N,L1,NZ,NY,NX)=trcs_rootml_vr(NTG,N,L1,NZ,NY,NX)+FXGP
+            trcs_rootml_vr(NTG,N,L0,NZ,NY,NX)=trcs_rootml_vr(NTG,N,L0,NZ,NY,NX)-FXGP
           ENDDO
 
           DO  NR=1,NumRootAxes_pft(NZ,NY,NX)
@@ -1252,9 +1252,9 @@ implicit none
           FXWSRTL=FRO*RootProteinC_pvr(N,L0,NZ,NY,NX)
           RootProteinC_pvr(N,L1,NZ,NY,NX)=RootProteinC_pvr(N,L1,NZ,NY,NX)+FXWSRTL
           RootProteinC_pvr(N,L0,NZ,NY,NX)=RootProteinC_pvr(N,L0,NZ,NY,NX)-FXWSRTL
-          FRootAreaPopu=FRO*PrimRootXNumL(N,L0,NZ,NY,NX)
-          PrimRootXNumL(N,L1,NZ,NY,NX)=PrimRootXNumL(N,L1,NZ,NY,NX)+FRootAreaPopu
-          PrimRootXNumL(N,L0,NZ,NY,NX)=PrimRootXNumL(N,L0,NZ,NY,NX)-FRootAreaPopu
+          FRootAreaPopu=FRO*PrimRootXNumL_pvr(N,L0,NZ,NY,NX)
+          PrimRootXNumL_pvr(N,L1,NZ,NY,NX)=PrimRootXNumL_pvr(N,L1,NZ,NY,NX)+FRootAreaPopu
+          PrimRootXNumL_pvr(N,L0,NZ,NY,NX)=PrimRootXNumL_pvr(N,L0,NZ,NY,NX)-FRootAreaPopu
           FXRTNL=FRO*SecndRootXNum_pvr(N,L0,NZ,NY,NX)
           SecndRootXNum_pvr(N,L1,NZ,NY,NX)=SecndRootXNum_pvr(N,L1,NZ,NY,NX)+FXRTNL
           SecndRootXNum_pvr(N,L0,NZ,NY,NX)=SecndRootXNum_pvr(N,L0,NZ,NY,NX)-FXRTNL
@@ -1270,12 +1270,12 @@ implicit none
           FXRTVLW=FRO*RootVH2O_vr(N,L0,NZ,NY,NX)
           RootVH2O_vr(N,L1,NZ,NY,NX)=RootVH2O_vr(N,L1,NZ,NY,NX)+FXRTVLW
           RootVH2O_vr(N,L0,NZ,NY,NX)=RootVH2O_vr(N,L0,NZ,NY,NX)-FXRTVLW
-          FXRRAD1=FRO*PrimRootRadius(N,L0,NZ,NY,NX)
-          PrimRootRadius(N,L1,NZ,NY,NX)=PrimRootRadius(N,L1,NZ,NY,NX)+FXRRAD1
-          PrimRootRadius(N,L0,NZ,NY,NX)=PrimRootRadius(N,L0,NZ,NY,NX)-FXRRAD1
-          FXRRAD2=FRO*SecndRootRadius(N,L0,NZ,NY,NX)
-          SecndRootRadius(N,L1,NZ,NY,NX)=SecndRootRadius(N,L1,NZ,NY,NX)+FXRRAD2
-          SecndRootRadius(N,L0,NZ,NY,NX)=SecndRootRadius(N,L0,NZ,NY,NX)-FXRRAD2
+          FXRRAD1=FRO*PrimRootRadius_pvr(N,L0,NZ,NY,NX)
+          PrimRootRadius_pvr(N,L1,NZ,NY,NX)=PrimRootRadius_pvr(N,L1,NZ,NY,NX)+FXRRAD1
+          PrimRootRadius_pvr(N,L0,NZ,NY,NX)=PrimRootRadius_pvr(N,L0,NZ,NY,NX)-FXRRAD1
+          FXRRAD2=FRO*SecndRootRadius_pvr(N,L0,NZ,NY,NX)
+          SecndRootRadius_pvr(N,L1,NZ,NY,NX)=SecndRootRadius_pvr(N,L1,NZ,NY,NX)+FXRRAD2
+          SecndRootRadius_pvr(N,L0,NZ,NY,NX)=SecndRootRadius_pvr(N,L0,NZ,NY,NX)-FXRRAD2
           FXRootAreaPerPlant_vr=FRO*RootAreaPerPlant_vr(N,L0,NZ,NY,NX)
           RootAreaPerPlant_vr(N,L1,NZ,NY,NX)=RootAreaPerPlant_vr(N,L1,NZ,NY,NX)+FXRootAreaPerPlant_vr
           RootAreaPerPlant_vr(N,L0,NZ,NY,NX)=RootAreaPerPlant_vr(N,L0,NZ,NY,NX)-FXRootAreaPerPlant_vr
@@ -1348,13 +1348,13 @@ implicit none
   real(r8) :: FXH1POB,FXH2POB
 
 ! only phosphrous is considered below because there is no gaseous phase.
-  FXH1POB=FWO*trc_solml(ids_H1PO4B,L0,NY,NX)
-  trc_solml(ids_H1PO4B,L1,NY,NX)=trc_solml(ids_H1PO4B,L1,NY,NX)+FXH1POB
-  trc_solml(ids_H1PO4B,L0,NY,NX)=trc_solml(ids_H1PO4B,L0,NY,NX)-FXH1POB
+  FXH1POB=FWO*trc_solml_vr(ids_H1PO4B,L0,NY,NX)
+  trc_solml_vr(ids_H1PO4B,L1,NY,NX)=trc_solml_vr(ids_H1PO4B,L1,NY,NX)+FXH1POB
+  trc_solml_vr(ids_H1PO4B,L0,NY,NX)=trc_solml_vr(ids_H1PO4B,L0,NY,NX)-FXH1POB
 
-  FXH2POB=FWO*trc_solml(ids_H2PO4B,L0,NY,NX)
-  trc_solml(ids_H2PO4B,L1,NY,NX)=trc_solml(ids_H2PO4B,L1,NY,NX)+FXH2POB
-  trc_solml(ids_H2PO4B,L0,NY,NX)=trc_solml(ids_H2PO4B,L0,NY,NX)-FXH2POB
+  FXH2POB=FWO*trc_solml_vr(ids_H2PO4B,L0,NY,NX)
+  trc_solml_vr(ids_H2PO4B,L1,NY,NX)=trc_solml_vr(ids_H2PO4B,L1,NY,NX)+FXH2POB
+  trc_solml_vr(ids_H2PO4B,L0,NY,NX)=trc_solml_vr(ids_H2PO4B,L0,NY,NX)-FXH2POB
 
   IF(salt_model)THEN
     DO NTSAB=idsaltb_beg,idsaltb_end
@@ -1415,20 +1415,20 @@ implicit none
 !     SOIL GASEOUS GASES
 ! exclude NH3B, NH3
   DO NTG=idg_beg,idg_end-2
-    FXG=FWO*trc_gasml(NTG,L0,NY,NX)
-    trc_gasml(NTG,L1,NY,NX)=trc_gasml(NTG,L1,NY,NX)+FXG
-    trc_gasml(NTG,L0,NY,NX)=trc_gasml(NTG,L0,NY,NX)-FXG
+    FXG=FWO*trc_gasml_vr(NTG,L0,NY,NX)
+    trc_gasml_vr(NTG,L1,NY,NX)=trc_gasml_vr(NTG,L1,NY,NX)+FXG
+    trc_gasml_vr(NTG,L0,NY,NX)=trc_gasml_vr(NTG,L0,NY,NX)-FXG
 
-    FXG=FWO*trc_solml(NTG,L0,NY,NX)
-    trc_solml(NTG,L1,NY,NX)=trc_solml(NTG,L1,NY,NX)+FXG
-    trc_solml(NTG,L0,NY,NX)=trc_solml(NTG,L0,NY,NX)-FXG
+    FXG=FWO*trc_solml_vr(NTG,L0,NY,NX)
+    trc_solml_vr(NTG,L1,NY,NX)=trc_solml_vr(NTG,L1,NY,NX)+FXG
+    trc_solml_vr(NTG,L0,NY,NX)=trc_solml_vr(NTG,L0,NY,NX)-FXG
 
   ENDDO
 ! add NH3
   NTG=idg_NH3
-  FXG=FWO*trc_gasml(NTG,L0,NY,NX)
-  trc_gasml(NTG,L1,NY,NX)=trc_gasml(NTG,L1,NY,NX)+FXG
-  trc_gasml(NTG,L0,NY,NX)=trc_gasml(NTG,L0,NY,NX)-FXG
+  FXG=FWO*trc_gasml_vr(NTG,L0,NY,NX)
+  trc_gasml_vr(NTG,L1,NY,NX)=trc_gasml_vr(NTG,L1,NY,NX)+FXG
+  trc_gasml_vr(NTG,L0,NY,NX)=trc_gasml_vr(NTG,L0,NY,NX)-FXG
 
   end Subroutine MoveDisolvGas
 
@@ -1461,9 +1461,9 @@ implicit none
 !
   DO NTS=ids_nuts_beg,ids_nuts_end
     if(NTS/=ids_H2PO4B .and. NTS/=ids_H1PO4B)THEN
-      FXNUT=FWO*trc_solml(NTS,L0,NY,NX)
-      trc_solml(NTS,L1,NY,NX)=trc_solml(NTS,L1,NY,NX)+FXNUT
-      trc_solml(NTS,L0,NY,NX)=trc_solml(NTS,L0,NY,NX)-FXNUT
+      FXNUT=FWO*trc_solml_vr(NTS,L0,NY,NX)
+      trc_solml_vr(NTS,L1,NY,NX)=trc_solml_vr(NTS,L1,NY,NX)+FXNUT
+      trc_solml_vr(NTS,L0,NY,NX)=trc_solml_vr(NTS,L0,NY,NX)-FXNUT
     ENDIF
   ENDDO
 
@@ -1510,17 +1510,17 @@ implicit none
           DPNHB(L1,NY,NX)=DPNHB(L1,NY,NX)+FXDPNHB
           DPNHB(L0,NY,NX)=DPNHB(L0,NY,NX)-FXDPNHB
         ENDIF
-        trcs_VLN(ids_NH4B,L1,NY,NX)=AZMAX1(AMIN1(0.999,WDNHB(L1,NY,NX) &
+        trcs_VLN_vr(ids_NH4B,L1,NY,NX)=AZMAX1(AMIN1(0.999,WDNHB(L1,NY,NX) &
           /ROWN(NY,NX)*DPNHB(L1,NY,NX)/DLYR(3,L1,NY,NX)))
-        trcs_VLN(ids_NH4B,L0,NY,NX)=AZMAX1(AMIN1(0.999,WDNHB(L0,NY,NX) &
+        trcs_VLN_vr(ids_NH4B,L0,NY,NX)=AZMAX1(AMIN1(0.999,WDNHB(L0,NY,NX) &
           /ROWN(NY,NX)*DPNHB(L0,NY,NX)/DLYR(3,L0,NY,NX)))
-        trcs_VLN(ids_NH4,L1,NY,NX)=1.0_r8-trcs_VLN(ids_NH4B,L1,NY,NX)
-        trcs_VLN(ids_NH4,L0,NY,NX)=1.0_r8-trcs_VLN(ids_NH4B,L0,NY,NX)
+        trcs_VLN_vr(ids_NH4,L1,NY,NX)=1.0_r8-trcs_VLN_vr(ids_NH4B,L1,NY,NX)
+        trcs_VLN_vr(ids_NH4,L0,NY,NX)=1.0_r8-trcs_VLN_vr(ids_NH4B,L0,NY,NX)
 
-        trcs_VLN(idg_NH3B,L1,NY,NX)=trcs_VLN(ids_NH4B,L1,NY,NX)
-        trcs_VLN(idg_NH3B,L0,NY,NX)=trcs_VLN(ids_NH4B,L0,NY,NX)
-        trcs_VLN(idg_NH3,L1,NY,NX)=trcs_VLN(ids_NH4,L1,NY,NX)
-        trcs_VLN(idg_NH3,L0,NY,NX)=trcs_VLN(ids_NH4,L0,NY,NX)
+        trcs_VLN_vr(idg_NH3B,L1,NY,NX)=trcs_VLN_vr(ids_NH4B,L1,NY,NX)
+        trcs_VLN_vr(idg_NH3B,L0,NY,NX)=trcs_VLN_vr(ids_NH4B,L0,NY,NX)
+        trcs_VLN_vr(idg_NH3,L1,NY,NX)=trcs_VLN_vr(ids_NH4,L1,NY,NX)
+        trcs_VLN_vr(idg_NH3,L0,NY,NX)=trcs_VLN_vr(ids_NH4,L0,NY,NX)
       ENDIF
     ENDIF
     IF(IFNOB(NY,NX).EQ.1.AND.ROWO(NY,NX).GT.0.0)THEN
@@ -1538,17 +1538,17 @@ implicit none
           DPNOB(L1,NY,NX)=DPNOB(L1,NY,NX)+FXDPNOB
           DPNOB(L0,NY,NX)=DPNOB(L0,NY,NX)-FXDPNOB
         ENDIF
-        trcs_VLN(ids_NO3B,L1,NY,NX)=AZMAX1(AMIN1(0.999_r8,WDNOB(L1,NY,NX) &
+        trcs_VLN_vr(ids_NO3B,L1,NY,NX)=AZMAX1(AMIN1(0.999_r8,WDNOB(L1,NY,NX) &
           /ROWO(NY,NX)*DPNOB(L1,NY,NX)/DLYR(3,L1,NY,NX)))
-        trcs_VLN(ids_NO3B,L0,NY,NX)=AZMAX1(AMIN1(0.999_r8,WDNOB(L0,NY,NX) &
+        trcs_VLN_vr(ids_NO3B,L0,NY,NX)=AZMAX1(AMIN1(0.999_r8,WDNOB(L0,NY,NX) &
           /ROWO(NY,NX)*DPNOB(L0,NY,NX)/DLYR(3,L0,NY,NX)))
-        trcs_VLN(ids_NO3,L1,NY,NX)=1.0_r8-trcs_VLN(ids_NO3B,L1,NY,NX)
-        trcs_VLN(ids_NO3,L0,NY,NX)=1.0_r8-trcs_VLN(ids_NO3B,L0,NY,NX)
+        trcs_VLN_vr(ids_NO3,L1,NY,NX)=1.0_r8-trcs_VLN_vr(ids_NO3B,L1,NY,NX)
+        trcs_VLN_vr(ids_NO3,L0,NY,NX)=1.0_r8-trcs_VLN_vr(ids_NO3B,L0,NY,NX)
 
-        trcs_VLN(ids_NO2,L1,NY,NX)=trcs_VLN(ids_NO3,L1,NY,NX)
-        trcs_VLN(ids_NO2,L0,NY,NX)=trcs_VLN(ids_NO3,L0,NY,NX)
-        trcs_VLN(ids_NO2B,L1,NY,NX)=trcs_VLN(ids_NO3B,L1,NY,NX)
-        trcs_VLN(ids_NO2B,L0,NY,NX)=trcs_VLN(ids_NO3B,L0,NY,NX)
+        trcs_VLN_vr(ids_NO2,L1,NY,NX)=trcs_VLN_vr(ids_NO3,L1,NY,NX)
+        trcs_VLN_vr(ids_NO2,L0,NY,NX)=trcs_VLN_vr(ids_NO3,L0,NY,NX)
+        trcs_VLN_vr(ids_NO2B,L1,NY,NX)=trcs_VLN_vr(ids_NO3B,L1,NY,NX)
+        trcs_VLN_vr(ids_NO2B,L0,NY,NX)=trcs_VLN_vr(ids_NO3B,L0,NY,NX)
       ENDIF
     ENDIF
     IF(IFPOB(NY,NX).EQ.1.AND.ROWP(NY,NX).GT.0.0)THEN
@@ -1566,17 +1566,17 @@ implicit none
           DPPOB(L1,NY,NX)=DPPOB(L1,NY,NX)+FXDPPOB
           DPPOB(L0,NY,NX)=DPPOB(L0,NY,NX)-FXDPPOB
         ENDIF
-        trcs_VLN(ids_H1PO4B,L1,NY,NX)=AZMAX1(AMIN1(0.999,WDPOB(L1,NY,NX) &
+        trcs_VLN_vr(ids_H1PO4B,L1,NY,NX)=AZMAX1(AMIN1(0.999,WDPOB(L1,NY,NX) &
           /ROWP(NY,NX)*DPPOB(L1,NY,NX)/DLYR(3,L1,NY,NX)))
-        trcs_VLN(ids_H1PO4B,L0,NY,NX)=AZMAX1(AMIN1(0.999,WDPOB(L0,NY,NX) &
+        trcs_VLN_vr(ids_H1PO4B,L0,NY,NX)=AZMAX1(AMIN1(0.999,WDPOB(L0,NY,NX) &
           /ROWP(NY,NX)*DPPOB(L0,NY,NX)/DLYR(3,L0,NY,NX)))
-        trcs_VLN(ids_H1PO4,L1,NY,NX)=1.0_r8-trcs_VLN(ids_H1PO4B,L1,NY,NX)
-        trcs_VLN(ids_H1PO4,L0,NY,NX)=1.0_r8-trcs_VLN(ids_H1PO4B,L0,NY,NX)
+        trcs_VLN_vr(ids_H1PO4,L1,NY,NX)=1.0_r8-trcs_VLN_vr(ids_H1PO4B,L1,NY,NX)
+        trcs_VLN_vr(ids_H1PO4,L0,NY,NX)=1.0_r8-trcs_VLN_vr(ids_H1PO4B,L0,NY,NX)
 
-        trcs_VLN(ids_H2PO4B,L1,NY,NX)=trcs_VLN(ids_H1PO4B,L1,NY,NX)
-        trcs_VLN(ids_H2PO4B,L0,NY,NX)=trcs_VLN(ids_H1PO4B,L0,NY,NX)
-        trcs_VLN(ids_H2PO4,L1,NY,NX)=trcs_VLN(ids_H1PO4,L1,NY,NX)
-        trcs_VLN(ids_H2PO4,L0,NY,NX)=trcs_VLN(ids_H1PO4,L0,NY,NX)
+        trcs_VLN_vr(ids_H2PO4B,L1,NY,NX)=trcs_VLN_vr(ids_H1PO4B,L1,NY,NX)
+        trcs_VLN_vr(ids_H2PO4B,L0,NY,NX)=trcs_VLN_vr(ids_H1PO4B,L0,NY,NX)
+        trcs_VLN_vr(ids_H2PO4,L1,NY,NX)=trcs_VLN_vr(ids_H1PO4,L1,NY,NX)
+        trcs_VLN_vr(ids_H2PO4,L0,NY,NX)=trcs_VLN_vr(ids_H1PO4,L0,NY,NX)
       ENDIF
     ENDIF
   ENDIF

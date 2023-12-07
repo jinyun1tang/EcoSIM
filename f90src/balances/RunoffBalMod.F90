@@ -168,8 +168,8 @@ implicit none
 !     XN=direction indicator
 !     TCOU,OXYGOU,H2GOU,TZOU,TPOU=cumulative C,O2,H2,N,P loss through lateral and lower boundaries
 !     HDOCQ,HDICQ=dissolved organic,inorganic C loss through runoff
-!     UDONQ,UDINQ=dissolved organic,inorganic N loss through runoff
-!     UDOPQ,UDIPQ=dissolved organic,inorganic P loss through runoff
+!     HydroDONFlx_col,HydroDINFlx_col=dissolved organic,inorganic N loss through runoff
+!     HydroDOPFlx_col,HydroDIPFlx_col=dissolved organic,inorganic P loss through runoff
 !
       CXR=XN*(trcg_2DFloXSurRunoff(idg_CO2,N,NN,N5,N4)+trcg_2DFloXSurRunoff(idg_CH4,N,NN,N5,N4))
       ZXR=XN*(trcn_2DFloXSurRunoff(ids_NH4,N,NN,N5,N4)+trcg_2DFloXSurRunoff(idg_NH3,N,NN,N5,N4) &
@@ -189,10 +189,10 @@ implicit none
       TPOU=TPOU-PXR-POR
       HDOCQ(NY,NX)=-COR
       HDICQ(NY,NX)=-CXR
-      UDONQ(NY,NX)=UDONQ(NY,NX)-ZOR
-      UDINQ(NY,NX)=UDINQ(NY,NX)-ZXR-ZGR
-      UDOPQ(NY,NX)=UDOPQ(NY,NX)-POR
-      UDIPQ(NY,NX)=UDIPQ(NY,NX)-PXR
+      HydroDONFlx_col(NY,NX)=HydroDONFlx_col(NY,NX)-ZOR
+      HydroDINFlx_col(NY,NX)=HydroDINFlx_col(NY,NX)-ZXR-ZGR
+      HydroDOPFlx_col(NY,NX)=HydroDOPFlx_col(NY,NX)-POR
+      HydroDIPFlx_col(NY,NX)=HydroDIPFlx_col(NY,NX)-PXR
       OXR=XN*trcg_2DFloXSurRunoff(idg_O2,N,NN,N5,N4)
       OXYGOU=OXYGOU-OXR
       HGR=XN*trcg_2DFloXSurRunoff(idg_H2,N,NN,N5,N4)
@@ -251,7 +251,7 @@ implicit none
         TPOU=TPOU-PSS
         SSR=SS1+SS2+SS3+SS4
         TIONOU=TIONOU-SSR
-        UIONOU(NY,NX)=UIONOU(NY,NX)-SSR
+        HydroIonFlx_col(NY,NX)=HydroIonFlx_col(NY,NX)-SSR
 !     WRITE(20,3336)'SSR',I,J,N,N5,N4,SSR,SS1,SS2,SS3,SS4,TIONOU
 !3336  FORMAT(A8,5I6,20F16.9)
 !
@@ -305,8 +305,8 @@ implicit none
 !                      :OHC,OHN,OHP=adsorbed C,N,P; OSC,OSN,OSP=humus C,N,P
 !         TSEDOU,USEDOU=cumulative sediment loss through lateral and lower boundaries
 !         HDOCQ,HDICQ=dissolved organic,inorganic C loss through lateral and lower boundaries
-!         UDONQ,UDINQ=dissolved organic,inorganic N loss through lateral and lower boundaries
-!         UDOPQ,UDIPQ=dissolved organic,inorganic P loss through lateral and lower boundaries
+!         HydroDONFlx_col,HydroDINFlx_col=dissolved organic,inorganic N loss through lateral and lower boundaries
+!         HydroDOPFlx_col,HydroDIPFlx_col=dissolved organic,inorganic P loss through lateral and lower boundaries
 !         TCOU,TZOU,TPOU=total C,N,P loss through lateral and lower boundaries
 
 !         MICROBIAL C IN RUNOFF SEDIMENT
@@ -373,10 +373,10 @@ implicit none
           TPOU=TPOU-POE-PXE-PPE
           HDOCQ(NY,NX)=HDOCQ(NY,NX)-COE
           HDICQ(NY,NX)=HDICQ(NY,NX)-CXE
-          UDONQ(NY,NX)=UDONQ(NY,NX)-ZOE
-          UDINQ(NY,NX)=UDINQ(NY,NX)-ZXE-ZPE
-          UDOPQ(NY,NX)=UDOPQ(NY,NX)-POE
-          UDIPQ(NY,NX)=UDIPQ(NY,NX)-PXE-PPE
+          HydroDONFlx_col(NY,NX)=HydroDONFlx_col(NY,NX)-ZOE
+          HydroDINFlx_col(NY,NX)=HydroDINFlx_col(NY,NX)-ZXE-ZPE
+          HydroDOPFlx_col(NY,NX)=HydroDOPFlx_col(NY,NX)-POE
+          HydroDIPFlx_col(NY,NX)=HydroDIPFlx_col(NY,NX)-PXE-PPE
 !     WRITE(*,6635)'POE',I,J,N4,N5,N,NN
 !    2,COE,CXE,ZOE,ZXE,ZPE
 !    3,POE,PXE,PPE,TPOU,cumSedErosion(N,NN,N5,N4)
@@ -403,7 +403,7 @@ implicit none
 !           :PALPB,PFEPB=precip AlPO4,FEPO4 in band
 !           :PCPM,PCPD,PCPH=precip CaH4P2O8,CaHPO4,apatite in non-band
 !           :PCPMB,PCPDB,PCPHB=precip CaH4P2O8,CaHPO4,apatite in band
-!         TIONOU,UIONOU=total salt loss through lateral and lower boundaries
+!         TIONOU,HydroIonFlx_col=total salt loss through lateral and lower boundaries
 !
           IF(salt_model)THEN
             SEF=XN*(XNH3ER(N,NN,N5,N4)+XNHUER(N,NN,N5,N4)+XNO3ER(N,NN,N5,N4) &
@@ -428,7 +428,7 @@ implicit none
               +XN*9.0*(trcp_ER(idsp_HA,N,NN,N5,N4)+trcp_ER(idsp_HAB,N,NN,N5,N4))
             SET=SEF+SEX+SEP
             TIONOU=TIONOU-SET
-            UIONOU(NY,NX)=UIONOU(NY,NX)-SET
+            HydroIonFlx_col(NY,NX)=HydroIonFlx_col(NY,NX)-SET
 !     WRITE(*,3342)'SET',I,J,N4,N5,NN,N,SET,SEF,SEX,SEP,TIONOU
 !3342  FORMAT(A8,6I4,12F18.6)
           ENDIF
@@ -554,7 +554,7 @@ implicit none
 !     X*FLW,X*FLB= hourly convective + diffusive solute flux through micropores in non-band,band from TranspSalt.f
 !     X*FHS=hourly convective + diffusive solute flux through macropores from TranspSalt.f
 !     X*FHW,X*FHB= hourly convective + diffusive solute flux through macropores in non-band,band from TranspSalt.f
-!     TIONOU,UIONOU=total salt loss through lateral and lower boundaries
+!     TIONOU,HydroIonFlx_col=total salt loss through lateral and lower boundaries
 !
       IF(salt_model)THEN
         PQD=XN*patomw*(trcSalt3DFlo2Cell(idsalt_H0PO4,N,N6,N5,N4)+trcSalt3DFlo2Cell(idsalt_H0PO4B,N,N6,N5,N4) &
@@ -648,7 +648,7 @@ implicit none
 
         SO=SSD+SHD
         TIONOU=TIONOU-SO
-        UIONOU(N2,N1)=UIONOU(N2,N1)-SO
+        HydroIonFlx_col(N2,N1)=HydroIonFlx_col(N2,N1)-SO
 
 !
 !     SUBSURFACE FLUX ELECTRICAL CONDUCTIVITY
@@ -716,8 +716,8 @@ implicit none
       TZOU=TZOU-ZXS-ZGS
       TPOU=TPOU-PXS
       HDICQ(NY,NX)=HDICQ(NY,NX)-CXR
-      UDINQ(NY,NX)=UDINQ(NY,NX)-ZXR-ZGR
-      UDIPQ(NY,NX)=UDIPQ(NY,NX)-PXR
+      HydroDINFlx_col(NY,NX)=HydroDINFlx_col(NY,NX)-ZXR-ZGR
+      HydroDIPFlx_col(NY,NX)=HydroDIPFlx_col(NY,NX)-PXR
       OXS=XN*trcg_FloXSnow(idg_O2,N,N5,N4)
       OXYGOU=OXYGOU-OXS
       IF(salt_model)THEN
@@ -750,7 +750,7 @@ implicit none
           +XN*5.0*(trcSalt_XQS(idsalt_AlOH4,N,N5,N4)+trcSalt_XQS(idsalt_FeOH4,N,N5,N4))
         SSR=SS1+SS2+SS3+SS4
         TIONOU=TIONOU-SSR
-        UIONOU(NY,NX)=UIONOU(NY,NX)-SSR
+        HydroIonFlx_col(NY,NX)=HydroIonFlx_col(NY,NX)-SSR
       ENDIF
     ENDIF
   ENDIF

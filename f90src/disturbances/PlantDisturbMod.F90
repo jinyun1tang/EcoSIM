@@ -44,12 +44,12 @@ module PlantDisturbMod
     D2990: DO NY=NVN,NVS
       D2985: DO NZ=1,NP(NY,NX)
 !
-!     IHVST=harvest type:0=none,1=grain,2=all above-ground
+!     iHarvstType_pft=harvest type:0=none,1=grain,2=all above-ground
 !                       ,3=pruning,4=grazing,5=fire,6=herbivory
 !     LSG=landscape grazing section number
-!     WTSHTZ,WTSHTA=total,average biomass in landscape grazing section
+!     WTSHTZ,AvgCanopyBiomC2Graze_pft=total,average biomass in landscape grazing section
 !
-        IF(IHVST(NZ,I,NY,NX).EQ.4.OR.IHVST(NZ,I,NY,NX).EQ.6)THEN
+        IF(iHarvstType_pft(NZ,I,NY,NX).EQ.4.OR.iHarvstType_pft(NZ,I,NY,NX).EQ.6)THEN
           WTSHTZ=0
           NN=0
           D1995: DO NX1=NHW,NHE
@@ -63,9 +63,9 @@ module PlantDisturbMod
             ENDDO D1990
           ENDDO D1995
           IF(NN.GT.0)THEN
-            WTSHTA(NZ,NY,NX)=WTSHTZ/NN
+            AvgCanopyBiomC2Graze_pft(NZ,NY,NX)=WTSHTZ/NN
           ELSE
-            WTSHTA(NZ,NY,NX)=ShootChemElmnts_pft(ielmc,NZ,NY,NX)
+            AvgCanopyBiomC2Graze_pft(NZ,NY,NX)=ShootChemElmnts_pft(ielmc,NZ,NY,NX)
           ENDIF
         ENDIF
       ENDDO D2985

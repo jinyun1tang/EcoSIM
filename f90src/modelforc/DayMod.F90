@@ -95,8 +95,8 @@
 
   integer :: NZ,NE
 
-  UORGF(NY,NX)=0._r8
-  UXCSN(NY,NX)=0._r8
+  AmendCFlx_col(NY,NX)=0._r8
+  LiterfalOrgC_col(NY,NX)=0._r8
   UCOP(NY,NX)=0._r8
   Eco_NBP_col(NY,NX)=0._r8
   URAIN(NY,NX)=0._r8
@@ -104,57 +104,57 @@
   URUN(NY,NX)=0._r8
   USEDOU(NY,NX)=0._r8
   UVOLO(NY,NX)=0._r8
-  UIONOU(NY,NX)=0._r8
-  UFERTN(NY,NX)=0._r8
-  UXZSN(NY,NX)=0._r8
-  UDONQ(NY,NX)=0._r8
-  UDINQ(NY,NX)=0._r8
-  UFERTP(NY,NX)=0._r8
-  UXPSN(NY,NX)=0._r8
-  UDOPQ(NY,NX)=0._r8
-  UDIPQ(NY,NX)=0._r8
-  UCO2F(NY,NX)=0._r8
-  UCH4F(NY,NX)=0._r8
-  UOXYF(NY,NX)=0._r8
-  UN2OF(NY,NX)=0._r8
-  UNH3F(NY,NX)=0._r8
-  UPO4F(NY,NX)=0._r8
+  HydroIonFlx_col(NY,NX)=0._r8
+  FertNFlx_col(NY,NX)=0._r8
+  LiterfalOrgN_col(NY,NX)=0._r8
+  HydroDONFlx_col(NY,NX)=0._r8
+  HydroDINFlx_col(NY,NX)=0._r8
+  FerPFlx_col(NY,NX)=0._r8
+  LiterfalOrgP_col(NY,NX)=0._r8
+  HydroDOPFlx_col(NY,NX)=0._r8
+  HydroDIPFlx_col(NY,NX)=0._r8
+  CO2byFire_col(NY,NX)=0._r8
+  CH4byFire_col(NY,NX)=0._r8
+  O2byFire_col(NY,NX)=0._r8
+  N2ObyFire_col(NY,NX)=0._r8
+  NH3byFire_col(NY,NX)=0._r8
+  PO4byFire_col(NY,NX)=0._r8
   Eco_HR_col(NY,NX)=0._r8
   Eco_GPP_col(NY,NX)=0._r8
   Eco_NPP_col(NY,NX)=0._r8
   Eco_AutoR_col(NY,NX)=0._r8
-  XHVSTE(:,NY,NX)=0._r8
-  TRINH4(NY,NX)=0._r8
-  TRIPO4(NY,NX)=0._r8
+  EcoHavstElmnt_col(:,NY,NX)=0._r8
+  NetNH4Mineralize_col(NY,NX)=0._r8
+  NetPO4Mineralize_col(NY,NX)=0._r8
 
   D960: DO NZ=1,NP0(NY,NX)
-  !RSETE: effect of canopy element status on seed set
+  !NetCumElmntFlx2Plant_pft: effect of canopy element status on seed set
     DO NE=1,NumOfPlantChemElmnts
-      RSETE(NE,NZ,NY,NX)=RSETE(NE,NZ,NY,NX)+PlantExudChemElmntCum_pft(NE,NZ,NY,NX)-LitrfallChemElmnts_pft(NE,NZ,NY,NX)
-      THVSTE(NE,NZ,NY,NX)=THVSTE(NE,NZ,NY,NX)+HVSTE(NE,NZ,NY,NX)
+      NetCumElmntFlx2Plant_pft(NE,NZ,NY,NX)=NetCumElmntFlx2Plant_pft(NE,NZ,NY,NX)+PlantExudChemElmntCum_pft(NE,NZ,NY,NX)-LitrfallChemElmnts_pft(NE,NZ,NY,NX)
+      EcoHavstElmntCum_pft(NE,NZ,NY,NX)=EcoHavstElmntCum_pft(NE,NZ,NY,NX)+EcoHavstElmnt_pft(NE,NZ,NY,NX)
     enddo
-    RSETE(ielmc,NZ,NY,NX)=RSETE(ielmc,NZ,NY,NX)+GrossCO2Fix_pft(NZ,NY,NX)+GrossResp_pft(NZ,NY,NX) &
+    NetCumElmntFlx2Plant_pft(ielmc,NZ,NY,NX)=NetCumElmntFlx2Plant_pft(ielmc,NZ,NY,NX)+GrossCO2Fix_pft(NZ,NY,NX)+GrossResp_pft(NZ,NY,NX) &
       -CO2ByFire_pft(NZ,NY,NX)-CH4ByFire_pft(NZ,NY,NX)
-    RSETE(ielmn,NZ,NY,NX)=RSETE(ielmn,NZ,NY,NX)+NH3EmiCum_pft(NZ,NY,NX)+PlantN2FixCum_pft(NZ,NY,NX) &
-      -VNH3F(NZ,NY,NX)-VN2OF(NZ,NY,NX)
-    RSETE(ielmp,NZ,NY,NX)=RSETE(ielmp,NZ,NY,NX)-VPO4F(NZ,NY,NX)
+    NetCumElmntFlx2Plant_pft(ielmn,NZ,NY,NX)=NetCumElmntFlx2Plant_pft(ielmn,NZ,NY,NX)+NH3EmiCum_pft(NZ,NY,NX)+PlantN2FixCum_pft(NZ,NY,NX) &
+      -NH3byFire_pft(NZ,NY,NX)-N2ObyFire_pft(NZ,NY,NX)
+    NetCumElmntFlx2Plant_pft(ielmp,NZ,NY,NX)=NetCumElmntFlx2Plant_pft(ielmp,NZ,NY,NX)-PO4byFire_pft(NZ,NY,NX)
 
 ! the following variables are accumulated daily
     GrossCO2Fix_pft(NZ,NY,NX)=0._r8
     PlantExudChemElmntCum_pft(:,NZ,NY,NX)=0._r8
     GrossResp_pft(NZ,NY,NX)=0._r8
     CanopyPlusNoduRespC_pft(NZ,NY,NX)=0._r8
-    ETCanP(NZ,NY,NX)=0._r8
+    ETCanopy_pft(NZ,NY,NX)=0._r8
     PlantN2FixCum_pft(NZ,NY,NX)=0._r8
     NH3EmiCum_pft(NZ,NY,NX)=0._r8
     CO2ByFire_pft(NZ,NY,NX)=0._r8
     CH4ByFire_pft(NZ,NY,NX)=0._r8
     VOXYF(NZ,NY,NX)=0._r8
-    VNH3F(NZ,NY,NX)=0._r8
-    VN2OF(NZ,NY,NX)=0._r8
-    VPO4F(NZ,NY,NX)=0._r8
+    NH3byFire_pft(NZ,NY,NX)=0._r8
+    N2ObyFire_pft(NZ,NY,NX)=0._r8
+    PO4byFire_pft(NZ,NY,NX)=0._r8
 
-    HVSTE(:,NZ,NY,NX)=0._r8
+    EcoHavstElmnt_pft(:,NZ,NY,NX)=0._r8
     SurfLitrfallChemElmnts_pft(:,NZ,NY,NX)=0._r8
     LitrfallChemElmnts_pft(:,NZ,NY,NX)=0._r8
   ENDDO D960

@@ -13,8 +13,8 @@ module ChemTranspDataType
   real(r8),target,allocatable ::  DISP(:,:,:,:)                      !aqueous dispersivity
 
   real(r8),target,allocatable ::  Gas_Disol_Flx_vr(:,:,:,:)                 !Gas dissolution flux
-  real(r8),target,allocatable ::  GasDifc(:,:,:,:)                   !gaseous diffusivity [m2 h-1]
-  real(r8),target,allocatable ::  SolDifc(:,:,:,:)
+  real(r8),target,allocatable ::  GasDifc_vr(:,:,:,:)                   !gaseous diffusivity [m2 h-1]
+  real(r8),target,allocatable ::  SolDifc_vr(:,:,:,:)
   real(r8),target,allocatable ::  CGSGL(:,:,:)                       !gaseous CO2 diffusivity	[m2 h-1]
   real(r8),target,allocatable ::  CLSGL(:,:,:)                       !aqueous CO2 diffusivity	[m2 h-1]
   real(r8),target,allocatable ::  OGSGL(:,:,:)                       !gaseous O2 diffusivity	m2 h-1
@@ -38,7 +38,7 @@ module ChemTranspDataType
   real(r8),target,allocatable ::  VaporDiffusivityLitR(:,:)                         !water vapor diffusivity, [m2 h-1]
   real(r8),target,allocatable ::  WGSGA(:,:)                         !water vapor diffusivity, [m2 h-1]
 
-  real(r8),target,allocatable ::  GasSolbility(:,:,:,:)                !solubility of gases
+  real(r8),target,allocatable ::  GasSolbility_vr(:,:,:,:)                !solubility of gases
   real(r8),target,allocatable ::  HGSGL(:,:,:)                       !gaseous H2 diffusivity, [m2 h-1]
   real(r8),target,allocatable ::  HLSGL(:,:,:)                       !aqueous H2 diffusivity, [m2 h-1]
   real(r8),target,allocatable ::  XCODFG(:,:,:)                      !soil CO2 dissolution (+ve) - volatilization (-ve) , [g d-2 h-1]
@@ -90,8 +90,8 @@ module ChemTranspDataType
   allocate(TFND(0:JZ,JY,JX));   TFND=0._r8
   allocate(DISP(3,JD,JV,JH));   DISP=0._r8
 
-  allocate(GasDifc(idg_beg:idg_end,JZ,JY,JX));GasDifc=0._r8
-  allocate(SolDifc(ids_beg:ids_end,0:JZ,JY,JX));SolDifc=0._r8
+  allocate(GasDifc_vr(idg_beg:idg_end,JZ,JY,JX));GasDifc_vr=0._r8
+  allocate(SolDifc_vr(ids_beg:ids_end,0:JZ,JY,JX));SolDifc_vr=0._r8
   allocate(CGSGL(JZ,JY,JX));    CGSGL=0._r8
   allocate(CLSGL(0:JZ,JY,JX));  CLSGL=0._r8
   allocate(OGSGL(JZ,JY,JX));    OGSGL=0._r8
@@ -114,7 +114,7 @@ module ChemTranspDataType
   allocate(H2OVapDifscSno(JS,JY,JX));    H2OVapDifscSno=0._r8
   allocate(VaporDiffusivityLitR(JY,JX));       VaporDiffusivityLitR=0._r8
   allocate(WGSGA(JY,JX));       WGSGA=0._r8
-  allocate(GasSolbility(idg_beg:idg_end,0:JZ,JY,JX)); GasSolbility=0._r8
+  allocate(GasSolbility_vr(idg_beg:idg_end,0:JZ,JY,JX)); GasSolbility_vr=0._r8
 
   allocate(Gas_Disol_Flx_vr(idg_beg:idg_end,0:JZ,JY,JX)); Gas_Disol_Flx_vr=0._r8
   allocate(HGSGL(JZ,JY,JX));    HGSGL=0._r8
@@ -160,8 +160,8 @@ module ChemTranspDataType
   implicit none
 
   call destroy(trcSaltRunoffBoundary)
-  call destroy(GasDifc)
-  call destroy(SolDifc)
+  call destroy(GasDifc_vr)
+  call destroy(SolDifc_vr)
   call destroy(TFND)
   call destroy(DISP)
   call destroy(CGSGL)
@@ -189,7 +189,7 @@ module ChemTranspDataType
 
   call destroy(trcn_2DFloXSurRunoff)
   call destroy(trcg_2DFloXSurRunoff)
-  call destroy(GasSolbility)
+  call destroy(GasSolbility_vr)
 
   call destroy(HGSGL)
   call destroy(HLSGL)

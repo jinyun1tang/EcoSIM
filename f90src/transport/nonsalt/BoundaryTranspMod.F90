@@ -322,11 +322,11 @@ module BoundaryTranspMod
     enddo
     !does not include NH3 and NH3B
     DO idg=idg_beg,idg_end-2
-      R3PoreSolFlx(idg,N,M6,M5,M4)=VFLW*AZMAX1(trc_solml2(idg,M3,M2,M1))
+      R3PoreSolFlx(idg,N,M6,M5,M4)=VFLW*AZMAX1(trc_solml_vr2(idg,M3,M2,M1))
     ENDDo
 
     DO NTN=ids_nuts_beg,ids_nuts_end
-      R3PoreSolFlx(NTN,N,M6,M5,M4)=VFLW*AZMAX1(trc_solml2(NTN,M3,M2,M1))*trcs_VLN(NTN,M3,M2,M1)
+      R3PoreSolFlx(NTN,N,M6,M5,M4)=VFLW*AZMAX1(trc_solml_vr2(NTN,M3,M2,M1))*trcs_VLN_vr(NTN,M3,M2,M1)
     ENDDO
 !
 !     SOLUTE GAIN WITH SUBSURFACE MICROPORE WATER GAIN
@@ -340,7 +340,7 @@ module BoundaryTranspMod
 !add irrigation flux
     DO ids=ids_nuts_beg,ids_nuts_end
       R3PoreSolFlx(ids,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4) &
-        *trcn_irrig(ids,M3,M2,M1)*trcs_VLN(ids,M3,M2,M1)
+        *trcn_irrig(ids,M3,M2,M1)*trcs_VLN_vr(ids,M3,M2,M1)
     ENDDO
 
   ENDIF
@@ -373,7 +373,7 @@ module BoundaryTranspMod
     ENDDO
 
     DO NTN=ids_nuts_beg,ids_nuts_end
-      R3PoreSoHFlx(NTN,N,M6,M5,M4)=VFLW*AZMAX1(trc_soHml2(NTN,M3,M2,M1))*trcs_VLN(NTN,M3,M2,M1)
+      R3PoreSoHFlx(NTN,N,M6,M5,M4)=VFLW*AZMAX1(trc_soHml2(NTN,M3,M2,M1))*trcs_VLN_vr(NTN,M3,M2,M1)
     ENDDO
 !
 !     NO SOLUTE GAIN IN SUBSURFACE MACROPORES
@@ -471,7 +471,7 @@ module BoundaryTranspMod
 !     X*FLG=hourly convective gas flux
 !
       DO idg=idg_beg,idg_NH3
-        R3GasADFlx(idg,N,M6,M5,M4)=VFLW*AZMAX1(trc_gasml2(idg,M3,M2,M1))
+        R3GasADFlx(idg,N,M6,M5,M4)=VFLW*AZMAX1(trc_gasml_vr2(idg,M3,M2,M1))
         Gas_3DAdvDif_Flx_vr(idg,N,M6,M5,M4)=Gas_3DAdvDif_Flx_vr(idg,N,M6,M5,M4)+R3GasADFlx(idg,N,M6,M5,M4)
       ENDDO
 

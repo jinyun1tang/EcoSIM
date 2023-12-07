@@ -820,11 +820,11 @@ implicit none
     !    SOLUTES
 !  exclude NH3B
     DO NTG=idg_beg,idg_end-1
-      trc_solml(NTG,0,NY,NX)=trc_solml(NTG,0,NY,NX)+trcg_TFloXSurRunoff(NTG,NY,NX)
+      trc_solml_vr(NTG,0,NY,NX)=trc_solml_vr(NTG,0,NY,NX)+trcg_TFloXSurRunoff(NTG,NY,NX)
     ENDDO
 
   DO NTU=ids_nut_beg,ids_nuts_end
-    trc_solml(NTU,0,NY,NX)=trc_solml(NTU,0,NY,NX)+trcn_TFloXSurRunoff(NTU,NY,NX)
+    trc_solml_vr(NTU,0,NY,NX)=trc_solml_vr(NTU,0,NY,NX)+trcn_TFloXSurRunoff(NTU,NY,NX)
   ENDDO
 
   IF(salt_model)THEN

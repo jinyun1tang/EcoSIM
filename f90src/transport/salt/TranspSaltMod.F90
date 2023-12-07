@@ -219,9 +219,9 @@ module TranspSaltMod
   DO nsalts=idsalt_H0PO4,idsalt_MgHPO4
     ids=nsalts-idsalt_H0PO4+idsalt_H0PO4B  
     trcSalt3DFlo2Cell(nsalts,3,NU(NY,NX),NY,NX)=(Rain2SoilSurf(NY,NX)*trcsalt_rain_conc(nsalts,NY,NX) &
-      +Irrig2SoilSurf(NY,NX)*trcsalt_irrig_conc(nsalts,I,NY,NX))*trcs_VLN(ids_H1PO4,NU(NY,NX),NY,NX)
+      +Irrig2SoilSurf(NY,NX)*trcsalt_irrig_conc(nsalts,I,NY,NX))*trcs_VLN_vr(ids_H1PO4,NU(NY,NX),NY,NX)
     trcSalt3DFlo2Cell(ids,3,NU(NY,NX),NY,NX)=(Rain2SoilSurf(NY,NX)*trcsalt_rain_conc(nsalts,NY,NX) &
-      +Irrig2SoilSurf(NY,NX)*trcsalt_irrig_conc(nsalts,I,NY,NX))*trcs_VLN(ids_H1PO4B,NU(NY,NX),NY,NX)    
+      +Irrig2SoilSurf(NY,NX)*trcsalt_irrig_conc(nsalts,I,NY,NX))*trcs_VLN_vr(ids_H1PO4B,NU(NY,NX),NY,NX)    
   ENDDO
 
   end subroutine AtmosSoluteFluxToTopsoil
@@ -331,8 +331,8 @@ module TranspSaltMod
 
     DO nsalts=idsalt_H0PO4,idsalt_MgHPO4
       ids=nsalts-idsalt_H0PO4+idsalt_H0PO4B
-      trcSalt_RFLU(nsalts,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*trcsalt_irrig_conc(nsalts,I,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-      trcSalt_RFLU(ids,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*trcsalt_irrig_conc(nsalts,I,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
+      trcSalt_RFLU(nsalts,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*trcsalt_irrig_conc(nsalts,I,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
+      trcSalt_RFLU(ids,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*trcsalt_irrig_conc(nsalts,I,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
     ENDDO
 
 !
@@ -351,7 +351,7 @@ module TranspSaltMod
 !     *SGL*=solute diffusivity from hour1.f
 !     solute code:PO=PO4,AL=Al,FE=Fe,HY=H,CA=Ca,GM=Mg,AN=Na,AK=KOH=OH
 !                :SO=SO4,CL=Cl,C3=CO3,HC=HCO3
-    POSGL2(L,NY,NX)=SolDifc(ids_H1PO4,L,NY,NX)*dts_HeatWatTP
+    POSGL2(L,NY,NX)=SolDifc_vr(ids_H1PO4,L,NY,NX)*dts_HeatWatTP
     ALSGL2(L,NY,NX)=ALSGL(L,NY,NX)*dts_HeatWatTP
     FESGL2(L,NY,NX)=FESGL(L,NY,NX)*dts_HeatWatTP
     HYSGL2(L,NY,NX)=HYSGL(L,NY,NX)*dts_HeatWatTP
@@ -545,8 +545,8 @@ module TranspSaltMod
   ENDDO
   DO nsalts=idsalt_H0PO4,idsalt_MgHPO4
     ids=nsalts-idsalt_H0PO4+idsalt_H0PO4B
-    trcSalt3DFlo2CellM(nsalts,N,M6,M5,M4)=VFLOW*trcsalt_subirrig_conc(nsalts,M3,M2,M1)*trcs_VLN(ids_H1PO4,M3,M2,M1)
-    trcSalt3DFlo2CellM(ids,N,M6,M5,M4)=VFLOW*trcsalt_subirrig_conc(nsalts,M3,M2,M1)*trcs_VLN(ids_H1PO4B,M3,M2,M1)
+    trcSalt3DFlo2CellM(nsalts,N,M6,M5,M4)=VFLOW*trcsalt_subirrig_conc(nsalts,M3,M2,M1)*trcs_VLN_vr(ids_H1PO4,M3,M2,M1)
+    trcSalt3DFlo2CellM(ids,N,M6,M5,M4)=VFLOW*trcsalt_subirrig_conc(nsalts,M3,M2,M1)*trcs_VLN_vr(ids_H1PO4B,M3,M2,M1)
   ENDDO
   end subroutine SoluteGainSubsurfMicropore
 !------------------------------------------------------------------------------------------
@@ -573,8 +573,8 @@ module TranspSaltMod
 
   DO nsalts=idsalt_H0PO4,idsalt_MgHPO4
     ids=nsalts-idsalt_H0PO4+idsalt_H0PO4B
-    trcSalt3DFlo2CellM(nsalts,N,M6,M5,M4)=VFLW*AZMAX1(trcSalt_solml2(nsalts,M3,M2,M1))*trcs_VLN(ids_H1PO4,M3,M2,M1)
-    trcSalt3DFlo2CellM(ids,N,M6,M5,M4)=VFLW*AZMAX1(trcSalt_solml2(ids,M3,M2,M1))*trcs_VLN(ids_H1PO4B,M3,M2,M1)
+    trcSalt3DFlo2CellM(nsalts,N,M6,M5,M4)=VFLW*AZMAX1(trcSalt_solml2(nsalts,M3,M2,M1))*trcs_VLN_vr(ids_H1PO4,M3,M2,M1)
+    trcSalt3DFlo2CellM(ids,N,M6,M5,M4)=VFLW*AZMAX1(trcSalt_solml2(ids,M3,M2,M1))*trcs_VLN_vr(ids_H1PO4B,M3,M2,M1)
   ENDDO
   end subroutine SoluteLossSubsurfMicropore
 !------------------------------------------------------------------------------------------
@@ -599,9 +599,9 @@ module TranspSaltMod
     DO nsalts=idsalt_H0PO4,idsalt_MgHPO4
       ids=nsalts-idsalt_H0PO4+idsalt_H0PO4B
       trcSalt_RFHS(nsalts,N,M6,M5,M4)=VFLW*AZMAX1(trcSalt_soHml2(nsalts,M3,M2,M1)) &
-        *trcs_VLN(ids_H1PO4,M3,M2,M1)
+        *trcs_VLN_vr(ids_H1PO4,M3,M2,M1)
       trcSalt_RFHS(ids,N,M6,M5,M4)=VFLW*AZMAX1(trcSalt_soHml2(ids,M3,M2,M1)) &
-        *trcs_VLN(ids_H1PO4B,M3,M2,M1)
+        *trcs_VLN_vr(ids_H1PO4B,M3,M2,M1)
     ENDDO
 
   ELSE

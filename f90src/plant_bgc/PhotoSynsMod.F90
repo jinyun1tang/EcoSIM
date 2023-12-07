@@ -37,7 +37,7 @@ implicit none
 !begin_execution
   associate(                          &
   ZERO       => plt_site%ZERO   , &
-  iPlantMorphologyType     => plt_pheno%iPlantMorphologyType, &
+  iPlantMorphologyType_pft     => plt_pheno%iPlantMorphologyType_pft, &
   RubiscoActivity_brpft       => plt_photo%RubiscoActivity_brpft  , &
   CanopyGasCO2_pft       => plt_photo%CanopyGasCO2_pft  , &
   LeafAUnshaded_seclyrnodbrpft      => plt_photo%LeafAUnshaded_seclyrnodbrpft , &
@@ -114,10 +114,10 @@ implicit none
 !
 !               EFFECT OF WATER DEFICIT IN MESOPHYLL
 !
-!               iPlantMorphologyType=growth type:0=bryophyte,1=graminoid,2=shrub,tree
+!               iPlantMorphologyType_pft=growth type:0=bryophyte,1=graminoid,2=shrub,tree
 !               WFNB=non-stomatal effects of water stress on CO2 fixation
 !
-                IF(.not.is_plant_bryophyte(iPlantMorphologyType(NZ)))THEN
+                IF(.not.is_plant_bryophyte(iPlantMorphologyType_pft(NZ)))THEN
                   WFNB=SQRT(RS/RSL)
                 ELSE
                   WFNB=WFNG
@@ -215,10 +215,10 @@ implicit none
 !
 !               EFFECT OF WATER DEFICIT IN MESOPHYLL
 !
-!               iPlantMorphologyType=growth type:0=bryophyte,1=graminoid,2=shrub,tree
+!               iPlantMorphologyType_pft=growth type:0=bryophyte,1=graminoid,2=shrub,tree
 !               WFNB=non-stomatal effects of water stress on C3 CO2 fixation
 !
-                IF(.not.is_plant_bryophyte(iPlantMorphologyType(NZ)))THEN
+                IF(.not.is_plant_bryophyte(iPlantMorphologyType_pft(NZ)))THEN
                   WFNB=SQRT(RS/RSL)
                 ELSE
                   WFNB=WFNG
@@ -310,7 +310,7 @@ implicit none
   real(r8) :: VA,VG
 ! begin_execution
   associate(                          &
-  iPlantMorphologyType     => plt_pheno%iPlantMorphologyType, &
+  iPlantMorphologyType_pft     => plt_pheno%iPlantMorphologyType_pft, &
   ZEROP      => plt_biom%ZEROP  , &
   Km4PEPCarboxy_pft     => plt_photo%Km4PEPCarboxy_pft, &
   NutrientCtrlonC4Carboxy_node      => plt_photo%NutrientCtrlonC4Carboxy_node , &
@@ -389,10 +389,10 @@ implicit none
 !
 !               EFFECT OF WATER DEFICIT IN MESOPHYLL
 !
-!               iPlantMorphologyType=growth type:0=bryophyte,1=graminoid,2=shrub,tree
+!               iPlantMorphologyType_pft=growth type:0=bryophyte,1=graminoid,2=shrub,tree
 !               WFNB=non-stomatal effects of water stress on C4,C3 CO2 fixation
 !
-                IF(.not.is_plant_bryophyte(iPlantMorphologyType(NZ)))THEN
+                IF(.not.is_plant_bryophyte(iPlantMorphologyType_pft(NZ)))THEN
                   WFN4=RS/RSL
                   WFNB=SQRT(RS/RSL)
                 ELSE
@@ -516,10 +516,10 @@ implicit none
 !
 !               EFFECT OF WATER DEFICIT IN MESOPHYLL
 !
-!               iPlantMorphologyType=growth type:0=bryophyte,1=graminoid,2=shrub,tree
+!               iPlantMorphologyType_pft=growth type:0=bryophyte,1=graminoid,2=shrub,tree
 !               WFN4,WFNB=non-stomatal effects of water stress on C4,C3 CO2 fixation
 !
-                IF(.not.is_plant_bryophyte(iPlantMorphologyType(NZ)))THEN
+                IF(.not.is_plant_bryophyte(iPlantMorphologyType_pft(NZ)))THEN
                   WFN4=(RS/RSL)**1.00_r8
                   WFNB=SQRT(RS/RSL)
                 ELSE
@@ -631,7 +631,7 @@ implicit none
     iPlantPhotosynthesisType  =>  plt_photo%iPlantPhotosynthesisType , &
     Vmax4PEPCarboxy_pft   =>  plt_photo%Vmax4PEPCarboxy_pft  , &
     Vmax4RubiscoCarboxy_pft   =>  plt_photo%Vmax4RubiscoCarboxy_pft  , &
-    iPlantMorphologyType  =>  plt_pheno%iPlantMorphologyType , &
+    iPlantMorphologyType_pft  =>  plt_pheno%iPlantMorphologyType_pft , &
     SineSolarAngle    =>  plt_rad%SineSolarAngle     , &
     RadPARbyCanopy_pft    =>  plt_rad%RadPARbyCanopy_pft     , &
     ZEROP   =>  plt_biom%ZEROP   , &
@@ -643,7 +643,7 @@ implicit none
     IF(SineSolarAngle.GT.0.0_r8.AND.RadPARbyCanopy_pft(NZ).GT.0.0_r8.AND.CanopyGasCO2_pft(NZ).GT.0.0_r8)THEN
       CO2F=0._r8
       CH2O=0._r8
-      IF(.not.is_plant_bryophyte(iPlantMorphologyType(NZ)).OR.Stomata_Activity.GT.0.0_r8)THEN
+      IF(.not.is_plant_bryophyte(iPlantMorphologyType_pft(NZ)).OR.Stomata_Activity.GT.0.0_r8)THEN
 !
 !         FOR EACH NODE
 !

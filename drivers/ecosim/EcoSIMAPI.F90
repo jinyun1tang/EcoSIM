@@ -466,8 +466,8 @@ subroutine regressiontest(nmfile,case_name, NX, NY)
         datv=0._r8
         do ll=1,12
           if(AREA(3,ll,NY,NX)>0._r8)then
-            datv(ll)=safe_adb(RootNH4Uptake_pvr(1,ll,NZ,NY,NX)+RootNH4Uptake_pvr(2,ll,NZ,NY,NX) &
-              +RUPNHB(1,ll,NZ,NY,NX)+RUPNHB(2,ll,NZ,NY,NX),AREA(3,ll,NY,NX))
+            datv(ll)=safe_adb(RootNutUptake_pvr(ids_NH4,1,ll,NZ,NY,NX)+RootNutUptake_pvr(ids_NH4,2,ll,NZ,NY,NX) &
+              +RootNutUptake_pvr(ids_NH4B,1,ll,NZ,NY,NX)+RootNutUptake_pvr(ids_NH4B,2,ll,NZ,NY,NX),AREA(3,ll,NY,NX))
           endif
         enddo
         call regression%writedata(category,name, datv)
@@ -478,7 +478,7 @@ subroutine regressiontest(nmfile,case_name, NX, NY)
 
     category = 'state'
     name = 'aqueous soil O2 (g m^3)'
-    datv=trc_solcl(idg_O2,1:12,NY,NX)
+    datv=trc_solcl_vr(idg_O2,1:12,NY,NX)
     call regression%writedata(category,name,datv)
 
     category = 'state'

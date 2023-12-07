@@ -268,8 +268,8 @@ module IngridTranspMod
             VFLWR=FracSurfByLitR(NY,NX)
             VFLWS=FracSurfAsBareSoi(NY,NX)
           ENDIF
-          VFLWPO4=VFLWS*trcs_VLN(ids_H1PO4,NU(NY,NX),NY,NX)
-          VFLWPOB=VFLWS*trcs_VLN(ids_H1PO4B,NU(NY,NX),NY,NX)
+          VFLWPO4=VFLWS*trcs_VLN_vr(ids_H1PO4,NU(NY,NX),NY,NX)
+          VFLWPOB=VFLWS*trcs_VLN_vr(ids_H1PO4B,NU(NY,NX),NY,NX)
 
           DO nsalts=idsalt_beg,idsalt_end
             trcSaltSnoFlo2LitR(nsalts)=trcSalt_sosml2(nsalts,L,NY,NX)*VFLWR
@@ -341,9 +341,9 @@ module IngridTranspMod
   DO nsalts=idsalt_H0PO4,idsalt_MgHPO4
     ids=nsalts-idsalt_H0PO4+idsalt_H0PO4B  
     trcSalt_RFL(nsalts)=VFLW*AZMAX1(trcSalt_solml2(nsalts,0,NY,NX)) &
-      *trcs_VLN(ids_H1PO4,NU(NY,NX),NY,NX)
+      *trcs_VLN_vr(ids_H1PO4,NU(NY,NX),NY,NX)
     trcSalt_RFL(ids)=VFLW*AZMAX1(trcSalt_solml2(ids,0,NY,NX)) &
-      *trcs_VLN(ids_H1PO4B,NU(NY,NX),NY,NX)
+      *trcs_VLN_vr(ids_H1PO4B,NU(NY,NX),NY,NX)
   ENDDO
   end subroutine Residue2TopsoilSoluteAdvExch
 !------------------------------------------------------------------------------------------
@@ -415,8 +415,8 @@ module IngridTranspMod
 !     C*1,C*2=solute concentration in litter, soil
 !     Z*1,Z*2=solute content in litter, soil
 !
-  VOLWPA=VLWatMicPM(M,NU(NY,NX),NY,NX)*trcs_VLN(ids_H1PO4,NU(NY,NX),NY,NX)
-  VOLWPB=VLWatMicPM(M,NU(NY,NX),NY,NX)*trcs_VLN(ids_H1PO4B,NU(NY,NX),NY,NX)
+  VOLWPA=VLWatMicPM(M,NU(NY,NX),NY,NX)*trcs_VLN_vr(ids_H1PO4,NU(NY,NX),NY,NX)
+  VOLWPB=VLWatMicPM(M,NU(NY,NX),NY,NX)*trcs_VLN_vr(ids_H1PO4B,NU(NY,NX),NY,NX)
 
   DO nsalts=idsalt_beg,idsalt_end
     trcSalt_conc_src(nsalts)=AZMAX1(trcSalt_solml2(nsalts,0,NY,NX)/VLWatMicPM(M,0,NY,NX))
@@ -524,12 +524,12 @@ module IngridTranspMod
 
   DO nsalts=idsalt_psoil_beg,idsalt_psoil_end
     trcSalt_flx_diffus(nsalts)=DIFPO*(trcSalt_conc_src(nsalts)-trcSalt_conc_dest(nsalts)) &
-      *trcs_VLN(ids_H1PO4,NU(NY,NX),NY,NX)
+      *trcs_VLN_vr(ids_H1PO4,NU(NY,NX),NY,NX)
   ENDDO
 
   DO nsalts=0,idsalt_nuts
     trcSalt_flx_diffus(idsalt_H0PO4B+nsalts)=DIFPO*(trcSalt_conc_src(idsalt_H0PO4+nsalts)&
-      -trcSalt_conc_dest(idsalt_H0PO4B+nsalts))*trcs_VLN(ids_H1PO4B,NU(NY,NX),NY,NX)
+      -trcSalt_conc_dest(idsalt_H0PO4B+nsalts))*trcs_VLN_vr(ids_H1PO4B,NU(NY,NX),NY,NX)
   ENDDO
   end subroutine TopsoilResidueSolutedifusExch
 !------------------------------------------------------------------------------------------
@@ -630,12 +630,12 @@ module IngridTranspMod
 
   DO nsalts=idsalt_psoil_beg,idsalt_psoil_end
     trcSalt_RFL(nsalts)=VFLW*AZMAX1(trcSalt_soHml2(nsalts,NU(NY,NX),NY,NX)) &
-      *trcs_VLN(ids_H1PO4,NU(NY,NX),NY,NX)
+      *trcs_VLN_vr(ids_H1PO4,NU(NY,NX),NY,NX)
   ENDDO
 
   DO nsalts=idsalt_pband_beg,idsalt_pband_end
     trcSalt_RFL(nsalts)=VFLW*AZMAX1(trcSalt_soHml2(nsalts,NU(NY,NX),NY,NX)) &
-      *trcs_VLN(ids_H1PO4B,NU(NY,NX),NY,NX)
+      *trcs_VLN_vr(ids_H1PO4B,NU(NY,NX),NY,NX)
   ENDDO
 
   DO nsalts=idsalt_beg,idsaltb_end
@@ -666,12 +666,12 @@ module IngridTranspMod
 
   DO nsalts=idsalt_psoil_beg,idsalt_psoil_end
     trcSalt_RFL(nsalts)=VFLW*AZMAX1(trcSalt_solml2(nsalts,NU(NY,NX),NY,NX)) &
-      *trcs_VLN(ids_H1PO4,NU(NY,NX),NY,NX)
+      *trcs_VLN_vr(ids_H1PO4,NU(NY,NX),NY,NX)
   ENDDO
 
   DO nsalts=idsalt_pband_beg,idsalt_pband_end
     trcSalt_RFL(nsalts)=VFLW*AZMAX1(trcSalt_solml2(nsalts,NU(NY,NX),NY,NX)) &
-      *trcs_VLN(ids_H1PO4B,NU(NY,NX),NY,NX)
+      *trcs_VLN_vr(ids_H1PO4B,NU(NY,NX),NY,NX)
   ENDDO
 
   DO nsalts=idsalt_beg,idsaltb_end
@@ -720,12 +720,12 @@ module IngridTranspMod
 
   DO nsalts=idsalt_psoil_beg,idsalt_psoil_end
     trcSalt_flx_diffus(nsalts)=dts_HeatWatTP*(AZMAX1(trcSalt_soHml2(nsalts,NU(NY,NX),NY,NX))*VLWatMicPMNU &
-      -AZMAX1(trcSalt_solml2(nsalts,NU(NY,NX),NY,NX))*VOLWHS)/VOLWT*trcs_VLN(ids_H1PO4,NU(NY,NX),NY,NX)
+      -AZMAX1(trcSalt_solml2(nsalts,NU(NY,NX),NY,NX))*VOLWHS)/VOLWT*trcs_VLN_vr(ids_H1PO4,NU(NY,NX),NY,NX)
   ENDDO
 
   DO nsalts=idsalt_pband_beg,idsalt_pband_end
     trcSalt_flx_diffus(nsalts)=dts_HeatWatTP*(AZMAX1(trcSalt_soHml2(nsalts,NU(NY,NX),NY,NX))*VLWatMicPMNU &
-      -AZMAX1(trcSalt_solml2(nsalts,NU(NY,NX),NY,NX))*VOLWHS)/VOLWT*trcs_VLN(ids_H1PO4B,NU(NY,NX),NY,NX)
+      -AZMAX1(trcSalt_solml2(nsalts,NU(NY,NX),NY,NX))*VOLWHS)/VOLWT*trcs_VLN_vr(ids_H1PO4B,NU(NY,NX),NY,NX)
   ENDDO
 
 
@@ -1013,11 +1013,11 @@ module IngridTranspMod
     ENDDO
 
     DO nsalts=idsalt_psoil_beg,idsalt_psoil_end
-      trcSalt_RFL(nsalts)=VFLW*AZMAX1(trcSalt_solml2(nsalts,N3,N2,N1))*trcs_VLN(ids_H1PO4,N3,N2,N1)
+      trcSalt_RFL(nsalts)=VFLW*AZMAX1(trcSalt_solml2(nsalts,N3,N2,N1))*trcs_VLN_vr(ids_H1PO4,N3,N2,N1)
     ENDDO
 
     DO nsalts=idsalt_pband_beg,idsalt_pband_end
-      trcSalt_RFL(nsalts)=VFLW*AZMAX1(trcSalt_solml2(nsalts,N3,N2,N1))*trcs_VLN(ids_H1PO4B,N3,N2,N1)
+      trcSalt_RFL(nsalts)=VFLW*AZMAX1(trcSalt_solml2(nsalts,N3,N2,N1))*trcs_VLN_vr(ids_H1PO4B,N3,N2,N1)
     ENDDO
 !
 !     IF MICROPORE WATER FLUX FROM 'WATSUB' IS TO CURRENT FROM
@@ -1036,11 +1036,11 @@ module IngridTranspMod
     ENDDO
 
     DO nsalts=idsalt_psoil_beg,idsalt_psoil_end
-      trcSalt_RFL(nsalts)=VFLW*AZMAX1(trcSalt_solml2(nsalts,N6,N5,N4))*trcs_VLN(ids_H1PO4,N6,N5,N4)
+      trcSalt_RFL(nsalts)=VFLW*AZMAX1(trcSalt_solml2(nsalts,N6,N5,N4))*trcs_VLN_vr(ids_H1PO4,N6,N5,N4)
     ENDDO
 
     DO nsalts=idsalt_pband_beg,idsalt_pband_end
-      trcSalt_RFL(nsalts)=VFLW*AZMAX1(trcSalt_solml2(nsalts,N6,N5,N4))*trcs_VLN(ids_H1PO4B,N6,N5,N4)
+      trcSalt_RFL(nsalts)=VFLW*AZMAX1(trcSalt_solml2(nsalts,N6,N5,N4))*trcs_VLN_vr(ids_H1PO4B,N6,N5,N4)
     ENDDO
   ENDIF
 
@@ -1090,10 +1090,10 @@ module IngridTranspMod
 !          :*1=non-band,*B=band
 !     *S2,*B2=soil solute content in non-band,band
 !
-    VLWPA1=VLWatMicPM(M,N3,N2,N1)*trcs_VLN(ids_H1PO4,N3,N2,N1)
-    VLWPB1=VLWatMicPM(M,N3,N2,N1)*trcs_VLN(ids_H1PO4B,N3,N2,N1)
-    VLWPA2=VLWatMicPM(M,N6,N5,N4)*trcs_VLN(ids_H1PO4,N6,N5,N4)
-    VLWPB2=VLWatMicPM(M,N6,N5,N4)*trcs_VLN(ids_H1PO4B,N6,N5,N4)
+    VLWPA1=VLWatMicPM(M,N3,N2,N1)*trcs_VLN_vr(ids_H1PO4,N3,N2,N1)
+    VLWPB1=VLWatMicPM(M,N3,N2,N1)*trcs_VLN_vr(ids_H1PO4B,N3,N2,N1)
+    VLWPA2=VLWatMicPM(M,N6,N5,N4)*trcs_VLN_vr(ids_H1PO4,N6,N5,N4)
+    VLWPB2=VLWatMicPM(M,N6,N5,N4)*trcs_VLN_vr(ids_H1PO4B,N6,N5,N4)
 
     DO nsalts=idsalt_beg,idsalt_KSO4
       trcSalt_conc_src(nsalts)=AZMAX1(trcSalt_solml2(nsalts,N3,N2,N1)/VLWatMicPM(M,N3,N2,N1))
@@ -1205,11 +1205,11 @@ module IngridTranspMod
     ENDDO
 
     DO nsalts=idsalt_psoil_beg,idsalt_psoiL_end
-      trcSalt_flx_diffus(nsalts)=DIFPO*(trcSalt_conc_src(nsalts)-trcSalt_conc_dest(nsalts))*trcs_VLN(ids_H1PO4,N6,N5,N4)
+      trcSalt_flx_diffus(nsalts)=DIFPO*(trcSalt_conc_src(nsalts)-trcSalt_conc_dest(nsalts))*trcs_VLN_vr(ids_H1PO4,N6,N5,N4)
     ENDDO
 
     DO nsalts=idsalt_pband_beg,idsalt_pband_end
-      trcSalt_flx_diffus(nsalts)=DIFPO*(trcSalt_conc_src(nsalts)-trcSalt_conc_dest(nsalts))*trcs_VLN(ids_H1PO4B,N6,N5,N4)
+      trcSalt_flx_diffus(nsalts)=DIFPO*(trcSalt_conc_src(nsalts)-trcSalt_conc_dest(nsalts))*trcs_VLN_vr(ids_H1PO4B,N6,N5,N4)
     ENDDO
   ELSE
     trcSalt_flx_diffus(idsalt_beg:idsaltb_end)=0.0_r8
@@ -1272,12 +1272,12 @@ module IngridTranspMod
 
       DO nsalts=idsalt_psoil_beg,idsalt_psoil_end
         trcSalt_RFH(nsalts)=VFLW*AZMAX1((trcSalt_soHml2(nsalts,N3,N2,N1) &
-          -AZMIN1(trcSalt_RFXS(nsalts,NU(N2,N1),N2,N1))))*trcs_VLN(ids_H1PO4,N3,N2,N1)
+          -AZMIN1(trcSalt_RFXS(nsalts,NU(N2,N1),N2,N1))))*trcs_VLN_vr(ids_H1PO4,N3,N2,N1)
       ENDDO
 
       DO nsalts=idsalt_pband_beg,idsalt_pband_end
         trcSalt_RFH(nsalts)=VFLW*AZMAX1((trcSalt_soHml2(nsalts,N3,N2,N1) &
-          -AZMIN1(trcSalt_RFXS(nsalts,NU(N2,N1),N2,N1))))*trcs_VLN(ids_H1PO4B,N3,N2,N1)
+          -AZMIN1(trcSalt_RFXS(nsalts,NU(N2,N1),N2,N1))))*trcs_VLN_vr(ids_H1PO4B,N3,N2,N1)
       ENDDO
 !
 !     OTHERWISE
@@ -1290,12 +1290,12 @@ module IngridTranspMod
 
       DO nsalts=idsalt_psoil_beg,idsalt_psoil_end
         trcSalt_RFH(nsalts)=VFLW*AZMAX1(trcSalt_soHml2(nsalts,N3,N2,N1)) &
-          *trcs_VLN(ids_H1PO4,N6,N5,N4)
+          *trcs_VLN_vr(ids_H1PO4,N6,N5,N4)
       ENDDO
 
       DO nsalts=idsalt_pband_beg,idsalt_pband_end
         trcSalt_RFH(nsalts)=VFLW*AZMAX1(trcSalt_soHml2(nsalts,N3,N2,N1)) &
-          *trcs_VLN(ids_H1PO4B,N6,N5,N4)
+          *trcs_VLN_vr(ids_H1PO4B,N6,N5,N4)
       ENDDO
     ENDIF
   ELSEIF(WaterFlow2MacPM(M,N,N6,N5,N4).LT.0.0)THEN
@@ -1316,12 +1316,12 @@ module IngridTranspMod
     ENDDO
     DO nsalts=idsalt_psoil_beg,idsalt_psoil_end
       trcSalt_RFH(nsalts)=VFLW*AZMAX1(trcSalt_soHml2(nsalts,N6,N5,N4)) &
-        *trcs_VLN(ids_H1PO4,N6,N5,N4)
+        *trcs_VLN_vr(ids_H1PO4,N6,N5,N4)
     ENDDO
 
     DO nsalts=idsalt_pband_beg,idsalt_pband_end
       trcSalt_RFH(nsalts)=VFLW*AZMAX1(trcSalt_soHml2(nsalts,N6,N5,N4)) &
-        *trcs_VLN(ids_H1PO4B,N6,N5,N4)
+        *trcs_VLN_vr(ids_H1PO4B,N6,N5,N4)
     ENDDO
 !
 !     NO MACROPORE FLUX
@@ -1447,11 +1447,11 @@ module IngridTranspMod
     ENDDO
 
     DO nsalts=idsalt_psoil_beg,idsalt_psoil_end
-      trcSalt_DFH(nsalts)=DIFPO*(trcSalt_conc_src(nsalts)-trcSalt_conc_dest(nsalts))*trcs_VLN(ids_H1PO4,N6,N5,N4)
+      trcSalt_DFH(nsalts)=DIFPO*(trcSalt_conc_src(nsalts)-trcSalt_conc_dest(nsalts))*trcs_VLN_vr(ids_H1PO4,N6,N5,N4)
     ENDDO
 
     DO nsalts=idsalt_pband_beg,idsalt_pband_end
-      trcSalt_DFH(nsalts)=DIFPO*(trcSalt_conc_src(nsalts)-trcSalt_conc_dest(nsalts))*trcs_VLN(ids_H1PO4B,N6,N5,N4)
+      trcSalt_DFH(nsalts)=DIFPO*(trcSalt_conc_src(nsalts)-trcSalt_conc_dest(nsalts))*trcs_VLN_vr(ids_H1PO4B,N6,N5,N4)
     ENDDO
   ELSE
     trcSalt_DFH(idsalt_beg:idsaltb_end)=0._r8
@@ -1506,11 +1506,11 @@ module IngridTranspMod
     ENDDO
 
     DO nsalts=idsalt_psoil_beg,idsalt_psoil_end
-      trcSalt_RFL(nsalts)=VFLW*AZMAX1(trcSalt_soHml2(nsalts,N6,N5,N4))*trcs_VLN(ids_H1PO4,N6,N5,N4)
+      trcSalt_RFL(nsalts)=VFLW*AZMAX1(trcSalt_soHml2(nsalts,N6,N5,N4))*trcs_VLN_vr(ids_H1PO4,N6,N5,N4)
     ENDDO
 
     DO nsalts=idsalt_pband_beg,idsalt_pband_end
-      trcSalt_RFL(nsalts)=VFLW*AZMAX1(trcSalt_soHml2(nsalts,N6,N5,N4))*trcs_VLN(ids_H1PO4B,N6,N5,N4)
+      trcSalt_RFL(nsalts)=VFLW*AZMAX1(trcSalt_soHml2(nsalts,N6,N5,N4))*trcs_VLN_vr(ids_H1PO4B,N6,N5,N4)
     ENDDO
 !
 !     MICROPORE TO MACROPORE TRANSFER
@@ -1526,11 +1526,11 @@ module IngridTranspMod
     ENDDO
 
     DO nsalts=idsalt_psoil_beg,idsalt_psoil_end
-      trcSalt_RFL(nsalts)=VFLW*AZMAX1(trcSalt_solml2(nsalts,N6,N5,N4))*trcs_VLN(ids_H1PO4,N6,N5,N4)
+      trcSalt_RFL(nsalts)=VFLW*AZMAX1(trcSalt_solml2(nsalts,N6,N5,N4))*trcs_VLN_vr(ids_H1PO4,N6,N5,N4)
     ENDDO
 
     DO nsalts=idsalt_pband_beg,idsalt_pband_end
-      trcSalt_RFL(nsalts)=VFLW*AZMAX1(trcSalt_solml2(nsalts,N6,N5,N4))*trcs_VLN(ids_H1PO4,N6,N5,N4)
+      trcSalt_RFL(nsalts)=VFLW*AZMAX1(trcSalt_solml2(nsalts,N6,N5,N4))*trcs_VLN_vr(ids_H1PO4,N6,N5,N4)
     ENDDO
 !
 !     NO MACROPORE TO MICROPORE TRANSFER
@@ -1577,12 +1577,12 @@ module IngridTranspMod
 
     DO nsalts=idsalt_psoil_beg,idsalt_psoil_end
       trcSalt_flx_diffus(nsalts)=dts_HeatWatTP*(AZMAX1(trcSalt_soHml2(nsalts,N6,N5,N4))*VLWatMicPM(M,N6,N5,N4) &
-        -AZMAX1(trcSalt_solml2(nsalts,N6,N5,N4))*VOLWHS)/VOLWT*trcs_VLN(ids_H1PO4,N6,N5,N4)
+        -AZMAX1(trcSalt_solml2(nsalts,N6,N5,N4))*VOLWHS)/VOLWT*trcs_VLN_vr(ids_H1PO4,N6,N5,N4)
     ENDDO
 
     DO nsalts=idsalt_pband_beg,idsalt_pband_end
       trcSalt_flx_diffus(nsalts)=dts_HeatWatTP*(AZMAX1(trcSalt_soHml2(nsalts,N6,N5,N4))*VLWatMicPM(M,N6,N5,N4) &
-        -AZMAX1(trcSalt_solml2(nsalts,N6,N5,N4))*VOLWHS)/VOLWT*trcs_VLN(ids_H1PO4B,N6,N5,N4)
+        -AZMAX1(trcSalt_solml2(nsalts,N6,N5,N4))*VOLWHS)/VOLWT*trcs_VLN_vr(ids_H1PO4B,N6,N5,N4)
     ENDDO
   ELSE
     trcSalt_flx_diffus(idsalt_beg:idsaltb_end)=0.0_r8

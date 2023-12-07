@@ -90,8 +90,8 @@ implicit none
   real(r8), allocatable ::  TQRH1P(:,:)                        !
   real(r8), allocatable ::  TH1PFS(:,:,:)                      !
 
-  real(r8), allocatable ::  GasDifcc(:,:,:,:)
-  real(r8), allocatable ::  SolDifcc(:,:,:,:)
+  real(r8), allocatable ::  GasDifc_vrc(:,:,:,:)
+  real(r8), allocatable ::  SolDifc_vrc(:,:,:,:)
   real(r8), allocatable ::  DifuscG(:,:,:,:,:)
   real(r8), allocatable ::  DCO2G(:,:,:,:)                     !
   real(r8), allocatable ::  DCH4G(:,:,:,:)                     !
@@ -196,8 +196,8 @@ implicit none
   real(r8), allocatable ::  H2PBH2(:,:,:)                      !
   real(r8), allocatable ::  ZNO2H2(:,:,:)                      !
 
-  real(r8), allocatable :: trc_gasml2(:,:,:,:)
-  real(r8), allocatable :: trc_solml2(:,:,:,:)
+  real(r8), allocatable :: trc_gasml_vr2(:,:,:,:)
+  real(r8), allocatable :: trc_solml_vr2(:,:,:,:)
   real(r8), allocatable :: trc_soHml2(:,:,:,:)
 
   real(r8), allocatable ::  trcn_2DSnowDrift(:,:,:,:)                      !
@@ -326,8 +326,8 @@ contains
   allocate(CDOM_MicP1(idom_beg:idom_end,1:jcplx)); CDOM_MicP1=0._r8
   allocate(CDOM_MicP2(idom_beg:idom_end,1:jcplx)); CDOM_MicP2=0._r8
 
-  allocate(GasDifcc(idg_beg:idg_end,JZ,JY,JX))
-  allocate(SolDifcc(ids_beg:ids_end,0:JZ,JY,JX));SolDifcc=0._r8
+  allocate(GasDifc_vrc(idg_beg:idg_end,JZ,JY,JX))
+  allocate(SolDifc_vrc(ids_beg:ids_end,0:JZ,JY,JX));SolDifc_vrc=0._r8
   allocate(DifuscG(idg_beg:idg_end,3,JZ,JY,JX)); DifuscG=0._r8
   allocate(DCO2G(3,JZ,JY,JX));  DCO2G=0._r8
   allocate(DCH4G(3,JZ,JY,JX));  DCH4G=0._r8
@@ -437,8 +437,8 @@ contains
   allocate(H2PBH2(JZ,JY,JX));   H2PBH2=0._r8
   allocate(ZNO2H2(JZ,JY,JX));   ZNO2H2=0._r8
 
-  allocate(trc_gasml2(idg_beg:idg_end,0:JZ,JY,JX)); trc_gasml2(:,:,:,:)=0._r8
-  allocate(trc_solml2(ids_beg:ids_end,0:JZ,JY,JX)); trc_solml2(:,:,:,:)=0._r8
+  allocate(trc_gasml_vr2(idg_beg:idg_end,0:JZ,JY,JX)); trc_gasml_vr2(:,:,:,:)=0._r8
+  allocate(trc_solml_vr2(ids_beg:ids_end,0:JZ,JY,JX)); trc_solml_vr2(:,:,:,:)=0._r8
   allocate(trc_soHml2(ids_beg:ids_end,0:JZ,JY,JX)); trc_soHml2(:,:,:,:)=0._r8
 
   allocate(trcg_2DSnowDrift(idg_beg:idg_NH3,2,JV,JH));    trcg_2DSnowDrift=0._r8
@@ -670,8 +670,8 @@ contains
   call destroy(ZNO2H2)
   call destroy(DOM_MacP2)
 
-  call destroy(trc_gasml2)
-  call destroy(trc_solml2)
+  call destroy(trc_gasml_vr2)
+  call destroy(trc_solml_vr2)
   call destroy(trc_soHml2)
   call destroy(trcn_band_VFloSnow)
   call destroy(trcn_soil_VFloSnow)

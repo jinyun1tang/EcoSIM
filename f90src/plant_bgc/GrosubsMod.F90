@@ -133,15 +133,15 @@ module grosubsMod
   associate(                       &
     k_fine_litr=> pltpar%k_fine_litr ,&
     k_woody_litr=> pltpar%k_woody_litr,&
-    iDayPlanting   => plt_distb%iDayPlanting   , &
-    iYearPlanting    => plt_distb%iYearPlanting    , &
-    THVSTE  => plt_distb%THVSTE  , &
-    HVSTE   => plt_distb%HVSTE   , &
-    VPO4F   => plt_distb%VPO4F   , &
-    VN2OF   => plt_distb%VN2OF   , &
+    iDayPlanting_pft   => plt_distb%iDayPlanting_pft   , &
+    iYearPlanting_pft    => plt_distb%iYearPlanting_pft    , &
+    EcoHavstElmntCum_pft  => plt_distb%EcoHavstElmntCum_pft  , &
+    EcoHavstElmnt_pft   => plt_distb%EcoHavstElmnt_pft   , &
+    PO4byFire_pft   => plt_distb%PO4byFire_pft   , &
+    N2ObyFire_pft   => plt_distb%N2ObyFire_pft   , &
     CH4ByFire_pft   => plt_distb%CH4ByFire_pft   , &
     CO2ByFire_pft   => plt_distb%CO2ByFire_pft   , &
-    VNH3F   => plt_distb%VNH3F   , &
+    NH3byFire_pft   => plt_distb%NH3byFire_pft   , &
     StandingDeadKCompChemElmnts_pft  => plt_biom%StandingDeadKCompChemElmnts_pft   , &
     RootChemElmnts_pft   => plt_biom%RootChemElmnts_pft    , &
     ShootChemElmnts_pft  => plt_biom%ShootChemElmnts_pft  , &
@@ -149,14 +149,14 @@ module grosubsMod
     NonstructalChemElmnts_pft   => plt_biom%NonstructalChemElmnts_pft    , &
     StandingDeadChemElmnts_pft  => plt_biom%StandingDeadChemElmnts_pft   , &
     fTgrowCanP    => plt_pheno%fTgrowCanP    , &
-    RSETE   => plt_pheno%RSETE   , &
+    NetCumElmntFlx2Plant_pft   => plt_pheno%NetCumElmntFlx2Plant_pft   , &
     IsPlantActive   => plt_pheno%IsPlantActive   , &
-    iPlantMorphologyType  => plt_pheno%iPlantMorphologyType  , &
+    iPlantMorphologyType_pft  => plt_pheno%iPlantMorphologyType_pft  , &
     doInitPlant   => plt_pheno%doInitPlant   , &
     doPlantLeafOut_brch   => plt_pheno%doPlantLeafOut_brch   , &
-    iPlantTurnoverPattern  => plt_pheno%iPlantTurnoverPattern  , &
+    iPlantTurnoverPattern_pft  => plt_pheno%iPlantTurnoverPattern_pft  , &
     HourThreshold4LeafOut_brch   => plt_pheno%HourThreshold4LeafOut_brch   , &
-    Hours4Leafout    => plt_pheno%Hours4Leafout    , &
+    Hours4Leafout_brch    => plt_pheno%Hours4Leafout_brch    , &
     ElmntBalanceCum_pft    => plt_site%ElmntBalanceCum_pft     , &
     NP0     => plt_site%NP0      , &
     MaxNumRootLays      => plt_site%MaxNumRootLays       , &
@@ -181,9 +181,9 @@ module grosubsMod
 !
     D205: DO NB=1,NumOfBranches_pft(NZ)
       IF(doInitPlant(NZ).EQ.itrue)THEN
-        IF(doPlantLeafOut_brch(NB,NZ).EQ.iEnable.AND.Hours4Leafout(NB,NZ).GE.HourThreshold4LeafOut_brch(NB,NZ))THEN
-          iDayPlanting(NZ)=I
-          iYearPlanting(NZ)=iYearCurrent
+        IF(doPlantLeafOut_brch(NB,NZ).EQ.iEnable.AND.Hours4Leafout_brch(NB,NZ).GE.HourThreshold4LeafOut_brch(NB,NZ))THEN
+          iDayPlanting_pft(NZ)=I
+          iYearPlanting_pft(NZ)=iYearCurrent
           PlantinDepth(NZ)=0.005_r8+CumSoilThickness(0)
           !mark plant as initialized
           doInitPlant(NZ)=ifalse
@@ -201,7 +201,7 @@ module grosubsMod
     DO NE=1,NumOfPlantChemElmnts
       D6235: DO M=1,jsken
         XFRE=1.5814E-05_r8*fTgrowCanP(NZ)*StandingDeadKCompChemElmnts_pft(NE,M,NZ)
-        IF(iPlantTurnoverPattern(NZ).EQ.0.OR.iPlantMorphologyType(NZ).LE.1)THEN
+        IF(iPlantTurnoverPattern_pft(NZ).EQ.0.OR.iPlantMorphologyType_pft(NZ).LE.1)THEN
           LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,0,NZ)=LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,0,NZ)+XFRE
         ELSE
           LitterFallChemElmnt_pftvr(NE,M,k_woody_litr,0,NZ)=LitterFallChemElmnt_pftvr(NE,M,k_woody_litr,0,NZ)+XFRE
@@ -258,7 +258,7 @@ module grosubsMod
       DO NE=1,NumOfPlantChemElmnts
         ElmntBalanceCum_pft(NE,NZ)=ShootChemElmnts_pft(NE,NZ)+RootChemElmnts_pft(NE,NZ)+NoduleChemElmnts_pft(NE,NZ) &
           +NonstructalChemElmnts_pft(NE,NZ)+LitrfallChemElmnts_pft(NE,NZ)-PlantExudChemElmntCum_pft(NE,NZ) &
-          -RSETE(NE,NZ)+StandingDeadChemElmnts_pft(NE,NZ)+HVSTE(NE,NZ)+THVSTE(NE,NZ)
+          -NetCumElmntFlx2Plant_pft(NE,NZ)+StandingDeadChemElmnts_pft(NE,NZ)+EcoHavstElmnt_pft(NE,NZ)+EcoHavstElmntCum_pft(NE,NZ)
       ENDDO
       ElmntBalanceCum_pft(ielmc,NZ)=ElmntBalanceCum_pft(ielmc,NZ)-NetPrimaryProductvity_pft(NZ)-CO2ByFire_pft(NZ)-CH4ByFire_pft(NZ)
 !
@@ -273,11 +273,11 @@ module grosubsMod
 !     RSETN=cumulative N balance from previous year
 !     THVSTN=cumulative PFT N removed from ecosystem from previous year
 !     HVSTN=total PFT N removed from ecosystem in current year
-!     VNH3F,VN2OF=NH3,N2O emission from disturbance
+!     NH3byFire_pft,N2ObyFire_pft=NH3,N2O emission from disturbance
 !     PlantN2FixCum_pft=cumulative PFT N2 fixation
 !
       ElmntBalanceCum_pft(ielmn,NZ)=ElmntBalanceCum_pft(ielmn,NZ)-NH3EmiCum_pft(NZ) &
-        -VNH3F(NZ)-VN2OF(NZ)-PlantN2FixCum_pft(NZ)
+        -NH3byFire_pft(NZ)-N2ObyFire_pft(NZ)-PlantN2FixCum_pft(NZ)
 !
 !     PLANT P BALANCE = TOTAL P STATE VARIABLES + TOTAL P LITTERFALL
 !     - TOTAL P UPTAKE FROM SOIL
@@ -289,9 +289,9 @@ module grosubsMod
 !     RSETP=cumulative P balance from previous year
 !     THVSTP=cumulative PFT P removed from ecosystem from previous year
 !     HVSTP=total PFT P removed from ecosystem in current year
-!     VPO4F=PO4 emission from disturbance
+!     PO4byFire_pft=PO4 emission from disturbance
 !
-      ElmntBalanceCum_pft(ielmp,NZ)=ElmntBalanceCum_pft(ielmp,NZ)-VPO4F(NZ)
+      ElmntBalanceCum_pft(ielmp,NZ)=ElmntBalanceCum_pft(ielmp,NZ)-PO4byFire_pft(NZ)
     ENDIF
   ENDDO D9975
   end associate
@@ -318,7 +318,7 @@ module grosubsMod
   real(r8) :: WFNS,WFNSG
 ! begin_execution
   associate(                              &
-    iPlantMorphologyType => plt_pheno%iPlantMorphologyType      , &
+    iPlantMorphologyType_pft => plt_pheno%iPlantMorphologyType_pft      , &
     iPlantRootState_pft => plt_pheno%iPlantRootState_pft      , &
     iPlantShootState_pft  => plt_pheno%iPlantShootState_pft       , &
     RootN2Fix_pft   => plt_rbgc%RootN2Fix_pft         , &
@@ -340,7 +340,7 @@ module grosubsMod
 !     CALCULATE GROWTH OF EACH BRANCH
 !
 !     WTLFB,WTSHEB,LeafPetioleBiomassC_brch=leaf,petiole,leaf+petiole mass
-!     iPlantBranchState=branch living flag: 0=alive,1=dead
+!     iPlantBranchState_brch=branch living flag: 0=alive,1=dead
 !
     DO  NB=1,NumOfBranches_pft(NZ)
       call GrowOneBranch(I,J,NB,NZ,TFN6,CanopyHeight_copy,CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW,&
@@ -383,7 +383,7 @@ module grosubsMod
     TKC    =>  plt_ew%TKC         , &
     TKS    =>  plt_ew%TKS         , &
     PSICanopy_pft =>  plt_ew%PSICanopy_pft      , &
-    PSICanPTurg  =>  plt_ew%PSICanPTurg       , &
+    PSICanopyTurg_pft  =>  plt_ew%PSICanopyTurg_pft       , &
     PlantPopulation_pft     =>  plt_site%PlantPopulation_pft        , &
     NU     =>  plt_site%NU        , &
     MaxNumRootLays     =>  plt_site%MaxNumRootLays        , &
@@ -395,8 +395,8 @@ module grosubsMod
     StalkChemElmnts_pft =>  plt_biom%StalkChemElmnts_pft    , &
     RootChemElmnts_pft  =>  plt_biom%RootChemElmnts_pft     , &
     CanopyLeafCpft_lyr  =>  plt_biom%CanopyLeafCpft_lyr     , &
-    iPlantTurnoverPattern =>  plt_pheno%iPlantTurnoverPattern   , &
-    iPlantMorphologyType =>  plt_pheno%iPlantMorphologyType   , &
+    iPlantTurnoverPattern_pft =>  plt_pheno%iPlantTurnoverPattern_pft   , &
+    iPlantMorphologyType_pft =>  plt_pheno%iPlantMorphologyType_pft   , &
     RCO2A  =>  plt_rbgc%RCO2A     , &
     RootRespPotential_vr  =>  plt_rbgc%RootRespPotential_vr     , &
     RCO2N  =>  plt_rbgc%RCO2N     , &
@@ -416,7 +416,7 @@ module grosubsMod
     k_fine_litr=> pltpar%k_fine_litr,&
     k_woody_litr=> pltpar%k_woody_litr,&
     RCS    =>  plt_photo%RCS      , &
-    PrimRootXNumL  =>  plt_morph%PrimRootXNumL    , &
+    PrimRootXNumL_pvr  =>  plt_morph%PrimRootXNumL_pvr    , &
     SecndRootXNum_pvr   =>  plt_morph%SecndRootXNum_pvr     , &
     MY     =>  plt_morph%MY       , &
     CanopyLeafApft_lyr  =>  plt_morph%CanopyLeafApft_lyr    , &
@@ -437,7 +437,7 @@ module grosubsMod
   D9: DO N=1,MY(NZ)
     D6: DO L=NU,MaxNumRootLays
       RootProteinC_pvr(N,L,NZ)=0._r8
-      PrimRootXNumL(N,L,NZ)=0._r8
+      PrimRootXNumL_pvr(N,L,NZ)=0._r8
       SecndRootXNum_pvr(N,L,NZ)=0._r8
       RootRespPotential_vr(N,L,NZ)=0._r8
       RCO2N(N,L,NZ)=0._r8
@@ -445,7 +445,7 @@ module grosubsMod
     ENDDO D6
   ENDDO D9
 !
-!     iPlantTurnoverPattern=turnover:0=all abve-grd,1=all leaf+petiole,2=none,3=between 1,2
+!     iPlantTurnoverPattern_pft=turnover:0=all abve-grd,1=all leaf+petiole,2=none,3=between 1,2
 !     WTSTK,WVSTK=stalk,sapwood mass
 !     FWOOD,FWODB=C woody fraction in stalk,other organs:0=woody,1=non-woody
 !     CN*,CP*=N:C,P:C ratios in plant organs from PFT files
@@ -455,7 +455,7 @@ module grosubsMod
 !     FWODSN,FWODSP=N,P woody fraction in petiole:0=woody,1=non-woody
 !     FWOODN,FWOODP=N,P woody fraction in stalk:0=woody,1=non-woody
 !
-  IF(iPlantTurnoverPattern(NZ).EQ.0.OR.(.not.is_plant_treelike(iPlantMorphologyType(NZ)))&
+  IF(iPlantTurnoverPattern_pft(NZ).EQ.0.OR.(.not.is_plant_treelike(iPlantMorphologyType_pft(NZ)))&
     .OR.StalkChemElmnts_pft(ielmc,NZ).LE.ZEROP(NZ))THEN
     FWODBE(ielmc,k_fine_litr)=1.0_r8
     FWOODE(ielmc,k_fine_litr)=1.0_r8
@@ -534,22 +534,22 @@ module grosubsMod
 !     FROM CANOPY TURGOR
 !
 !     WFNS=turgor expansion,extension function
-!     PSICanPTurg,PSIMin4OrganExtension=current,minimum canopy turgor potl for expansion,extension
+!     PSICanopyTurg_pft,PSIMin4OrganExtension=current,minimum canopy turgor potl for expansion,extension
 !     Stomata_Activity=stomatal resistance function of canopy turgor
 !     PSICanopy_pft=canopy water potential
 !     WFNG=growth function of canopy water potential
 !     WFNSG=expansion,extension function of canopy water potential
 !
-  WFNS=AMIN1(1.0_r8,AZMAX1(PSICanPTurg(NZ)-PSIMin4OrganExtension))
+  WFNS=AMIN1(1.0_r8,AZMAX1(PSICanopyTurg_pft(NZ)-PSIMin4OrganExtension))
 
-  IF(is_plant_bryophyte(iPlantMorphologyType(NZ)))THEN
+  IF(is_plant_bryophyte(iPlantMorphologyType_pft(NZ)))THEN
     !bryophyte, no turgor
     Stomata_Activity=1.0_r8
     WFNG=EXP(0.05_r8*PSICanopy_pft(NZ))
     WFNSG=WFNS**0.10_r8
   ELSE
     !others
-    Stomata_Activity=EXP(RCS(NZ)*PSICanPTurg(NZ))
+    Stomata_Activity=EXP(RCS(NZ)*PSICanopyTurg_pft(NZ))
     WFNG=EXP(0.10_r8*PSICanopy_pft(NZ))
     WFNSG=WFNS**0.25_r8
   ENDIF

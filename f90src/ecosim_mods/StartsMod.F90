@@ -124,13 +124,13 @@ module StartsMod
 !
       tPBOT=PBOT(NY,NX)/1.01325E+02_r8
       CCO2EI(NY,NX)=CO2EI(NY,NX)*5.36E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
-      AtmGgms(idg_CO2,NY,NX)=CO2E(NY,NX)*5.36E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
-      AtmGgms(idg_CH4,NY,NX)=CH4E(NY,NX)*5.36E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
-      AtmGgms(idg_O2,NY,NX)=OXYE(NY,NX)*1.43E-03_r8*Tref/TairKClimMean(NY,NX)*tPBOT
-      AtmGgms(idg_N2,NY,NX)=Z2GE(NY,NX)*1.25E-03_r8*Tref/TairKClimMean(NY,NX)*tPBOT
-      AtmGgms(idg_N2O,NY,NX)=Z2OE(NY,NX)*1.25E-03_r8*Tref/TairKClimMean(NY,NX)*tPBOT
-      AtmGgms(idg_NH3,NY,NX)=ZNH3E(NY,NX)*6.25E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
-      AtmGgms(idg_H2,NY,NX)=H2GE(NY,NX)*8.92E-05_r8*Tref/TairKClimMean(NY,NX)*tPBOT
+      AtmGasCgperm3(idg_CO2,NY,NX)=CO2E(NY,NX)*5.36E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
+      AtmGasCgperm3(idg_CH4,NY,NX)=CH4E(NY,NX)*5.36E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
+      AtmGasCgperm3(idg_O2,NY,NX)=OXYE(NY,NX)*1.43E-03_r8*Tref/TairKClimMean(NY,NX)*tPBOT
+      AtmGasCgperm3(idg_N2,NY,NX)=Z2GE(NY,NX)*1.25E-03_r8*Tref/TairKClimMean(NY,NX)*tPBOT
+      AtmGasCgperm3(idg_N2O,NY,NX)=Z2OE(NY,NX)*1.25E-03_r8*Tref/TairKClimMean(NY,NX)*tPBOT
+      AtmGasCgperm3(idg_NH3,NY,NX)=ZNH3E(NY,NX)*6.25E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
+      AtmGasCgperm3(idg_H2,NY,NX)=H2GE(NY,NX)*8.92E-05_r8*Tref/TairKClimMean(NY,NX)*tPBOT
 !
 !     MICROBIAL THERMAL ADAPTATION
 !
@@ -512,18 +512,18 @@ module StartsMod
   L2=NL(NY,NX)
   FertN_soil(ifertn_beg:ifertn_end,0:L2,NY,NX)=0._r8
   FertN_band(ifertnb_beg:ifertnb_end,1:L2,NY,NX)=0._r8
-  trcs_VLN(ids_NH4,0:L2,NY,NX)=1.0_r8
-  trcs_VLN(idg_NH3,0:L2,NY,NX)=trcs_VLN(ids_NH4,0:L2,NY,NX)
-  trcs_VLN(ids_NO3,0:L2,NY,NX)=1.0_r8
-  trcs_VLN(ids_NO2,0:L2,NY,NX)=trcs_VLN(ids_NO3,0:L2,NY,NX)
-  trcs_VLN(ids_H1PO4,0:L2,NY,NX)=1.0_r8
-  trcs_VLN(ids_H2PO4,0:L2,NY,NX)=trcs_VLN(ids_H1PO4,0:L2,NY,NX)
-  trcs_VLN(ids_NH4B,0:L2,NY,NX)=0.0_r8
-  trcs_VLN(idg_NH3B,0:L2,NY,NX)= trcs_VLN(ids_NH4B,0:L2,NY,NX)
-  trcs_VLN(ids_NO3B,0:L2,NY,NX)=0.0_r8
-  trcs_VLN(ids_NO2B,0:L2,NY,NX)=trcs_VLN(ids_NO3B,0:L2,NY,NX)
-  trcs_VLN(ids_H1PO4B,0:L2,NY,NX)=0.0_r8
-  trcs_VLN(ids_H2PO4B,0:L2,NY,NX)=trcs_VLN(ids_H1PO4B,0:L2,NY,NX)
+  trcs_VLN_vr(ids_NH4,0:L2,NY,NX)=1.0_r8
+  trcs_VLN_vr(idg_NH3,0:L2,NY,NX)=trcs_VLN_vr(ids_NH4,0:L2,NY,NX)
+  trcs_VLN_vr(ids_NO3,0:L2,NY,NX)=1.0_r8
+  trcs_VLN_vr(ids_NO2,0:L2,NY,NX)=trcs_VLN_vr(ids_NO3,0:L2,NY,NX)
+  trcs_VLN_vr(ids_H1PO4,0:L2,NY,NX)=1.0_r8
+  trcs_VLN_vr(ids_H2PO4,0:L2,NY,NX)=trcs_VLN_vr(ids_H1PO4,0:L2,NY,NX)
+  trcs_VLN_vr(ids_NH4B,0:L2,NY,NX)=0.0_r8
+  trcs_VLN_vr(idg_NH3B,0:L2,NY,NX)= trcs_VLN_vr(ids_NH4B,0:L2,NY,NX)
+  trcs_VLN_vr(ids_NO3B,0:L2,NY,NX)=0.0_r8
+  trcs_VLN_vr(ids_NO2B,0:L2,NY,NX)=trcs_VLN_vr(ids_NO3B,0:L2,NY,NX)
+  trcs_VLN_vr(ids_H1PO4B,0:L2,NY,NX)=0.0_r8
+  trcs_VLN_vr(ids_H2PO4B,0:L2,NY,NX)=trcs_VLN_vr(ids_H1PO4B,0:L2,NY,NX)
 
   ROXYX(0:L2,NY,NX)=0.0_r8
   RNH4X(0:L2,NY,NX)=0.0_r8
@@ -767,15 +767,15 @@ module StartsMod
   ATKS(:,:)=units%Celcius2Kelvin(ATCS)
   URAIN(:,:)=0.0_r8
 
-  UCO2F(:,:)=0.0_r8
-  UCH4F(:,:)=0.0_r8
-  UOXYF(:,:)=0.0_r8
-  UN2OF(:,:)=0.0_r8
-  UNH3F(:,:)=0.0_r8
-  UPO4F(:,:)=0.0_r8
-  UORGF(:,:)=0.0_r8
-  UFERTN(:,:)=0.0_r8
-  UFERTP(:,:)=0.0_r8
+  CO2byFire_col(:,:)=0.0_r8
+  CH4byFire_col(:,:)=0.0_r8
+  O2byFire_col(:,:)=0.0_r8
+  N2ObyFire_col(:,:)=0.0_r8
+  NH3byFire_col(:,:)=0.0_r8
+  PO4byFire_col(:,:)=0.0_r8
+  AmendCFlx_col(:,:)=0.0_r8
+  FertNFlx_col(:,:)=0.0_r8
+  FerPFlx_col(:,:)=0.0_r8
   UVOLO(:,:)=0.0_r8
   UEVAP(:,:)=0.0_r8
   URUN(:,:)=0.0_r8
@@ -783,27 +783,27 @@ module StartsMod
   UCOP(:,:)=0.0_r8
   HDOCQ(:,:)=0.0_r8
   HDOCD(:,:)=0.0_r8
-  UDONQ(:,:)=0.0_r8
+  HydroDONFlx_col(:,:)=0.0_r8
   HDOND(:,:)=0.0_r8
-  UDOPQ(:,:)=0.0_r8
+  HydroDOPFlx_col(:,:)=0.0_r8
   HDOPD(:,:)=0.0_r8
   HDICQ(:,:)=0.0_r8
   HDICD(:,:)=0.0_r8
-  UDINQ(:,:)=0.0_r8
+  HydroDINFlx_col(:,:)=0.0_r8
   HDIND(:,:)=0.0_r8
-  UDIPQ(:,:)=0.0_r8
+  HydroDIPFlx_col(:,:)=0.0_r8
   HDIPD(:,:)=0.0_r8
-  UIONOU(:,:)=0.0_r8
-  UXCSN(:,:)=0.0_r8
-  UXZSN(:,:)=0.0_r8
-  UXPSN(:,:)=0.0_r8
+  HydroIonFlx_col(:,:)=0.0_r8
+  LiterfalOrgC_col(:,:)=0.0_r8
+  LiterfalOrgN_col(:,:)=0.0_r8
+  LiterfalOrgP_col(:,:)=0.0_r8
   UDRAIN(:,:)=0.0_r8
   ZDRAIN(:,:)=0.0_r8
   PDRAIN(:,:)=0.0_r8
   DPNH4(:,:)=0.0_r8
   DPNO3(:,:)=0.0_r8
   DPPO4(:,:)=0.0_r8
-  trc_solml(idg_O2,0,:,:)=0.0_r8
+  trc_solml_vr(idg_O2,0,:,:)=0.0_r8
   FracSWRad2Grnd(:,:)=1.0_r8
   LWRadBySurf(:,:)=0.0_r8
   LWRadCanG(:,:)=0.0_r8
@@ -823,7 +823,7 @@ module StartsMod
   PPT(:,:)=0.0_r8
   DayLenthCurrent(:,:)=12.0_r8
   SurfAlbedo_col(:,:)=SoilAlbedo(:,:)
-  XHVSTE(:,:,:)=0.0_r8
+  EcoHavstElmnt_col(:,:,:)=0.0_r8
   EnergyImpact4Erosion(:,:)=0.0_r8
   end subroutine InitAccumulators
 
@@ -1022,13 +1022,13 @@ module StartsMod
 !
       tPBOT=1._r8
       CCO2EI(NY,NX)=CO2EI(NY,NX)*5.36E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
-      AtmGgms(idg_CO2,NY,NX)=CO2E(NY,NX)*5.36E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
-      AtmGgms(idg_CH4,NY,NX)=CH4E(NY,NX)*5.36E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
-      AtmGgms(idg_O2,NY,NX)=OXYE(NY,NX)*1.43E-03_r8*Tref/TairKClimMean(NY,NX)*tPBOT
-      AtmGgms(idg_N2,NY,NX)=Z2GE(NY,NX)*1.25E-03_r8*Tref/TairKClimMean(NY,NX)*tPBOT
-      AtmGgms(idg_N2O,NY,NX)=Z2OE(NY,NX)*1.25E-03_r8*Tref/TairKClimMean(NY,NX)*tPBOT
-      AtmGgms(idg_NH3,NY,NX)=ZNH3E(NY,NX)*6.25E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
-      AtmGgms(idg_H2,NY,NX)=H2GE(NY,NX)*8.92E-05_r8*Tref/TairKClimMean(NY,NX)*tPBOT
+      AtmGasCgperm3(idg_CO2,NY,NX)=CO2E(NY,NX)*5.36E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
+      AtmGasCgperm3(idg_CH4,NY,NX)=CH4E(NY,NX)*5.36E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
+      AtmGasCgperm3(idg_O2,NY,NX)=OXYE(NY,NX)*1.43E-03_r8*Tref/TairKClimMean(NY,NX)*tPBOT
+      AtmGasCgperm3(idg_N2,NY,NX)=Z2GE(NY,NX)*1.25E-03_r8*Tref/TairKClimMean(NY,NX)*tPBOT
+      AtmGasCgperm3(idg_N2O,NY,NX)=Z2OE(NY,NX)*1.25E-03_r8*Tref/TairKClimMean(NY,NX)*tPBOT
+      AtmGasCgperm3(idg_NH3,NY,NX)=ZNH3E(NY,NX)*6.25E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
+      AtmGasCgperm3(idg_H2,NY,NX)=H2GE(NY,NX)*8.92E-05_r8*Tref/TairKClimMean(NY,NX)*tPBOT
 !
 !     MICROBIAL THERMAL ADAPTATION
 !

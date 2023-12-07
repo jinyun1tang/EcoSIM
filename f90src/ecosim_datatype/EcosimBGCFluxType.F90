@@ -19,9 +19,9 @@ module EcosimBGCFluxType
   real(r8),target,allocatable ::  Eco_AutoR_col(:,:)                          !ecosystem autotrophic respiration, [g d-2 h-1]
   real(r8),target,allocatable ::  Eco_NPP_col(:,:)                          !ecosystem NPP, [g d-2 h-1]
   real(r8),target,allocatable ::  Eco_HR_col(:,:)                          !ecosystem heterotrophic respiration, [g d-2 h-1]
-  real(r8),target,allocatable ::  XHVSTE(:,:,:)                      !ecosystem harvest , [g d-2]
-  real(r8),target,allocatable ::  TRINH4(:,:)                        !total NH4 net mineraln (-ve) or immobiln (+ve)
-  real(r8),target,allocatable ::  TRIPO4(:,:)                        !total H2PO4 net mineraln (-ve) or immobiln (+ve)
+  real(r8),target,allocatable ::  EcoHavstElmnt_col(:,:,:)                      !ecosystem harvest , [g d-2]
+  real(r8),target,allocatable ::  NetNH4Mineralize_col(:,:)                        !total NH4 net mineraln (-ve) or immobiln (+ve)
+  real(r8),target,allocatable ::  NetPO4Mineralize_col(:,:)                        !total H2PO4 net mineraln (-ve) or immobiln (+ve)
   real(r8),target,allocatable ::  GPP(:,:)                           !gross primary productivity, [g d-2 h-1]
   real(r8),target,allocatable ::  Canopy_NEE_col(:,:)                         !total net CO2 fixation
   real(r8),target,allocatable ::  LitterFallChemElmnt_col(:,:,:)                       !total litterfall element, [g d-2 h-1]
@@ -45,9 +45,9 @@ contains
   allocate(Eco_AutoR_col(JY,JX));        Eco_AutoR_col=0._r8
   allocate(Eco_NPP_col(JY,JX));        Eco_NPP_col=0._r8
   allocate(Eco_HR_col(JY,JX));        Eco_HR_col=0._r8
-  allocate(XHVSTE(NumOfPlantChemElmnts,JY,JX));      XHVSTE=0._r8
-  allocate(TRINH4(JY,JX));      TRINH4=0._r8
-  allocate(TRIPO4(JY,JX));      TRIPO4=0._r8
+  allocate(EcoHavstElmnt_col(NumOfPlantChemElmnts,JY,JX));      EcoHavstElmnt_col=0._r8
+  allocate(NetNH4Mineralize_col(JY,JX));      NetNH4Mineralize_col=0._r8
+  allocate(NetPO4Mineralize_col(JY,JX));      NetPO4Mineralize_col=0._r8
   allocate(GPP(JY,JX));         GPP=0._r8
   allocate(Canopy_NEE_col(JY,JX));       Canopy_NEE_col=0._r8
   allocate(LitterFallChemElmnt_col(NumOfPlantChemElmnts,JY,JX));       LitterFallChemElmnt_col=0._r8
@@ -71,9 +71,9 @@ contains
   call destroy(Eco_AutoR_col)
   call destroy(Eco_NPP_col)
   call destroy(Eco_HR_col)
-  call destroy(XHVSTE)
-  call destroy(TRINH4)
-  call destroy(TRIPO4)
+  call destroy(EcoHavstElmnt_col)
+  call destroy(NetNH4Mineralize_col)
+  call destroy(NetPO4Mineralize_col)
   call destroy(GPP)
   call destroy(Canopy_NEE_col)
   call destroy(LitterFallChemElmnt_col)

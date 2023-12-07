@@ -19,16 +19,16 @@ implicit none
   real(r8),target,allocatable :: CPO4S(:,:,:)                       !PO4 concentration non-band micropore	[g m-3]
 
   real(r8),target,allocatable :: trc_soHml(:,:,:,:)                 !solute mass in macropore [g d-2]
-  real(r8),target,allocatable :: trc_solml(:,:,:,:)                 !solute mass in micropore [g d-2]
-  real(r8),target,allocatable :: trc_solcl(:,:,:,:)                 !solute concentration in micropre [g m-3]
-  real(r8),target,allocatable :: trc_gascl(:,:,:,:)                 !gaseous concentation [g m-3]
+  real(r8),target,allocatable :: trc_solml_vr(:,:,:,:)                 !solute mass in micropore [g d-2]
+  real(r8),target,allocatable :: trc_solcl_vr(:,:,:,:)                 !solute concentration in micropre [g m-3]
+  real(r8),target,allocatable :: trc_gascl_vr(:,:,:,:)                 !gaseous concentation [g m-3]
 
   real(r8),target,allocatable ::  ZNFNI(:,:,:)                      !current nitrification inhibition activity
   real(r8),target,allocatable ::  ZNFN0(:,:,:)                      !initial nitrification inhibition activity
   real(r8),target,allocatable ::  ZNHUI(:,:,:)                      !current inhibition activity
   real(r8),target,allocatable ::  ZNHU0(:,:,:)                      !urea hydrolysis inhibition activity
 
-  real(r8),target,allocatable :: trc_gasml(:,:,:,:)     !layer mass of gases [g d-2]
+  real(r8),target,allocatable :: trc_gasml_vr(:,:,:,:)     !layer mass of gases [g d-2]
 
   real(r8),target,allocatable :: PH(:,:,:)             !soil pH
   real(r8),target,allocatable :: CEC(:,:,:)            !soil cation exchange capacity	[cmol kg-1]
@@ -36,32 +36,32 @@ implicit none
 
   real(r8),target,allocatable ::  ROXSK(:,:,:,:)                     !total O2 sink, [g d-2 t-1]
   real(r8),target,allocatable ::  SurfGasFlx(:,:,:)                  !soil gas flux, [g d-2 h-1]
-  real(r8),target,allocatable ::  UORGF(:,:)                         !total C amendment, [g d-2]
-  real(r8),target,allocatable ::  UFERTN(:,:)                        !total fertilizer N amendment, [g d-2]
-  real(r8),target,allocatable ::  UFERTP(:,:)                        !total fertilizer P amendment, [g d-2]
+  real(r8),target,allocatable ::  AmendCFlx_col(:,:)                         !total C amendment, [g d-2]
+  real(r8),target,allocatable ::  FertNFlx_col(:,:)                        !total fertilizer N amendment, [g d-2]
+  real(r8),target,allocatable ::  FerPFlx_col(:,:)                        !total fertilizer P amendment, [g d-2]
   real(r8),target,allocatable ::  HDOCQ(:,:)                         !total surface DOC flux, [g d-2]
   real(r8),target,allocatable ::  HDOCD(:,:)                         !total subsurface DOC flux, [g d-2]
-  real(r8),target,allocatable ::  UXCSN(:,:)                         !total litterfall C, [g d-2]
-  real(r8),target,allocatable ::  UXZSN(:,:)                         !total litterfall N, [g d-2]
-  real(r8),target,allocatable ::  UXPSN(:,:)                         !total litterfall P, [g d-2]
-  real(r8),target,allocatable ::  UDONQ(:,:)                         !total surface DON flux, [g d-2]
+  real(r8),target,allocatable ::  LiterfalOrgC_col(:,:)                         !total litterfall C, [g d-2]
+  real(r8),target,allocatable ::  LiterfalOrgN_col(:,:)                         !total litterfall N, [g d-2]
+  real(r8),target,allocatable ::  LiterfalOrgP_col(:,:)                         !total litterfall P, [g d-2]
+  real(r8),target,allocatable ::  HydroDONFlx_col(:,:)                         !total surface DON flux, [g d-2]
   real(r8),target,allocatable ::  HDOND(:,:)                         !total subsurface DON flux, [g d-2]
-  real(r8),target,allocatable ::  UDOPQ(:,:)                         !total surface DOP flux, [g d-2]
+  real(r8),target,allocatable ::  HydroDOPFlx_col(:,:)                         !total surface DOP flux, [g d-2]
   real(r8),target,allocatable ::  HDOPD(:,:)                         !total subsurface DOP flux, [g d-2]
   real(r8),target,allocatable ::  UPP4(:,:)                          !total soil precipited P, [g d-2]
   real(r8),target,allocatable ::  UCOP(:,:)                          !total soil autotrophic respiration, [g d-2]
   real(r8),target,allocatable ::  USEDOU(:,:)                        !total sediment subsurface flux, [Mg d-2]
   real(r8),target,allocatable ::  HDICQ(:,:)                         !total surface DIC flux, [g d-2]
   real(r8),target,allocatable ::  HDICD(:,:)                         !total subsurface DIC flux, [g d-2]
-  real(r8),target,allocatable ::  UDINQ(:,:)                         !total surface DIN flux, [g d-2]
+  real(r8),target,allocatable ::  HydroDINFlx_col(:,:)                         !total surface DIN flux, [g d-2]
   real(r8),target,allocatable ::  HDIND(:,:)                         !total subsurface DIN flux, [g d-2]
-  real(r8),target,allocatable ::  UDIPQ(:,:)                         !total surface DIP flux, [g d-2]
+  real(r8),target,allocatable ::  HydroDIPFlx_col(:,:)                         !total surface DIP flux, [g d-2]
   real(r8),target,allocatable ::  HDIPD(:,:)                         !total subsurface DIP flux, [g d-2]
   real(r8),target,allocatable ::  StandingDeadChemElmnt_col(:,:,:)                        !total standing dead C, [g d-2]
   real(r8),target,allocatable ::  ZDRAIN(:,:)                        !total N drainage below root zone, [g d-2]
   real(r8),target,allocatable ::  PDRAIN(:,:)                        !total P drainage below root zone, [g d-2]
   real(r8),target,allocatable ::  UION(:,:)                          !total soil ion content, [mol d-2]
-  real(r8),target,allocatable ::  UIONOU(:,:)                        !total subsurface ion flux, [mol d-2]
+  real(r8),target,allocatable ::  HydroIonFlx_col(:,:)                        !total subsurface ion flux, [mol d-2]
   real(r8),target,allocatable ::  RNutMicbTransf_vr(:,:,:,:)         !total nutrient exchange, [g d-2 h-1]
   real(r8),target,allocatable ::  trcg_RMicbTransf_vr(:,:,:,:)       !microbial gases transformation, [g d-2 h-1]
   real(r8),target,allocatable ::  Micb_N2Fixation_vr(:,:,:)                       !net microbial N2 exchange, [g d-2 h-1]
@@ -70,7 +70,7 @@ implicit none
   real(r8),target,allocatable ::  VOLQ(:,:,:)                        !soil water volume occupied by microial biomass, [m3 m-3]
   real(r8),target,allocatable ::  TFNQ(:,:,:)                        !constraints of temperature and water potential on microbial activity, []
   real(r8),target,allocatable ::  LitrfalChemElemnts_vr(:,:,:,:,:,:)                    !total litterfall C, [g d-2 h-1]
-  real(r8),target,allocatable :: trcs_VLN(:,:,:,:)
+  real(r8),target,allocatable :: trcs_VLN_vr(:,:,:,:)
 
   real(r8),target,allocatable ::  VLNHB(:,:,:)                       !NH4 band volume fracrion, []
   real(r8),target,allocatable ::  VLNOB(:,:,:)                       !NO3 band volume fracrion, []
@@ -122,11 +122,11 @@ implicit none
   allocate(CNO3(JZ,JY,JX));     CNO3=0._r8
   allocate(CPO4(JZ,JY,JX));     CPO4=0._r8
 
-  allocate(trc_gasml(idg_beg:idg_end,JZ,JY,JX)); trc_gasml=0._r8
+  allocate(trc_gasml_vr(idg_beg:idg_end,JZ,JY,JX)); trc_gasml_vr=0._r8
   allocate(trc_soHml(ids_beg:ids_end,0:JZ,JY,JX)); trc_soHml=0._r8
-  allocate(trc_solml(ids_beg:ids_end,0:JZ,JY,JX)); trc_solml=0._r8
-  allocate(trc_solcl(ids_beg:ids_end,0:JZ,JY,JX)); trc_solcl=0._r8
-  allocate(trc_gascl(idg_beg:idg_end,0:JZ,JY,JX)); trc_gascl=0._r8
+  allocate(trc_solml_vr(ids_beg:ids_end,0:JZ,JY,JX)); trc_solml_vr=0._r8
+  allocate(trc_solcl_vr(ids_beg:ids_end,0:JZ,JY,JX)); trc_solcl_vr=0._r8
+  allocate(trc_gascl_vr(idg_beg:idg_end,0:JZ,JY,JX)); trc_gascl_vr=0._r8
 
   allocate(ZNFNI(0:JZ,JY,JX));  ZNFNI=0._r8
   allocate(ZNFN0(0:JZ,JY,JX));  ZNFN0=0._r8
@@ -140,17 +140,17 @@ implicit none
 
   allocate(ROXSK(60,0:JZ,JY,JX));ROXSK=0._r8
   allocate(SurfGasFlx(idg_beg:idg_NH3,JY,JX));  SurfGasFlx=0._r8
-  allocate(UORGF(JY,JX));       UORGF=0._r8
-  allocate(UFERTN(JY,JX));      UFERTN=0._r8
-  allocate(UFERTP(JY,JX));      UFERTP=0._r8
+  allocate(AmendCFlx_col(JY,JX));       AmendCFlx_col=0._r8
+  allocate(FertNFlx_col(JY,JX));      FertNFlx_col=0._r8
+  allocate(FerPFlx_col(JY,JX));      FerPFlx_col=0._r8
   allocate(HDOCQ(JY,JX));       HDOCQ=0._r8
   allocate(HDOCD(JY,JX));       HDOCD=0._r8
-  allocate(UXCSN(JY,JX));       UXCSN=0._r8
-  allocate(UXZSN(JY,JX));       UXZSN=0._r8
-  allocate(UXPSN(JY,JX));       UXPSN=0._r8
-  allocate(UDONQ(JY,JX));       UDONQ=0._r8
+  allocate(LiterfalOrgC_col(JY,JX));       LiterfalOrgC_col=0._r8
+  allocate(LiterfalOrgN_col(JY,JX));       LiterfalOrgN_col=0._r8
+  allocate(LiterfalOrgP_col(JY,JX));       LiterfalOrgP_col=0._r8
+  allocate(HydroDONFlx_col(JY,JX));       HydroDONFlx_col=0._r8
   allocate(HDOND(JY,JX));       HDOND=0._r8
-  allocate(UDOPQ(JY,JX));       UDOPQ=0._r8
+  allocate(HydroDOPFlx_col(JY,JX));       HydroDOPFlx_col=0._r8
   allocate(HDOPD(JY,JX));       HDOPD=0._r8
   allocate(UPP4(JY,JX));        UPP4=0._r8
 
@@ -158,15 +158,15 @@ implicit none
   allocate(USEDOU(JY,JX));      USEDOU=0._r8
   allocate(HDICQ(JY,JX));       HDICQ=0._r8
   allocate(HDICD(JY,JX));       HDICD=0._r8
-  allocate(UDINQ(JY,JX));       UDINQ=0._r8
+  allocate(HydroDINFlx_col(JY,JX));       HydroDINFlx_col=0._r8
   allocate(HDIND(JY,JX));       HDIND=0._r8
-  allocate(UDIPQ(JY,JX));       UDIPQ=0._r8
+  allocate(HydroDIPFlx_col(JY,JX));       HydroDIPFlx_col=0._r8
   allocate(HDIPD(JY,JX));       HDIPD=0._r8
   allocate(StandingDeadChemElmnt_col(NumOfPlantChemElmnts,JY,JX));      StandingDeadChemElmnt_col=0._r8
   allocate(ZDRAIN(JY,JX));      ZDRAIN=0._r8
   allocate(PDRAIN(JY,JX));      PDRAIN=0._r8
   allocate(UION(JY,JX));        UION=0._r8
-  allocate(UIONOU(JY,JX));      UIONOU=0._r8
+  allocate(HydroIonFlx_col(JY,JX));      HydroIonFlx_col=0._r8
   allocate(RNutMicbTransf_vr(ids_NH4B:ids_nuts_end,0:JZ,JY,JX)); RNutMicbTransf_vr=0._r8
   allocate(trcg_RMicbTransf_vr(idg_beg:idg_NH3-1,0:JZ,JY,JX)); trcg_RMicbTransf_vr=0._r8
   allocate(Micb_N2Fixation_vr(0:JZ,JY,JX));  Micb_N2Fixation_vr=0._r8
@@ -176,7 +176,7 @@ implicit none
   allocate(VOLQ(0:JZ,JY,JX));   VOLQ=0._r8
   allocate(TFNQ(0:JZ,JY,JX));   TFNQ=0._r8
   allocate(LitrfalChemElemnts_vr(NumOfPlantChemElmnts,jsken,1:NumOfPlantLitrCmplxs,0:JZ,JY,JX));LitrfalChemElemnts_vr=0._r8
-  allocate(trcs_VLN(ids_beg:ids_end,0:JZ,JY,JX));trcs_VLN=1._r8
+  allocate(trcs_VLN_vr(ids_beg:ids_end,0:JZ,JY,JX));trcs_VLN_vr=1._r8
 
   allocate(VLNHB(0:JZ,JY,JX));  VLNHB=0._r8
 
@@ -220,10 +220,10 @@ implicit none
   call destroy(CNO3)
   call destroy(CPO4)
 
-  call destroy(trc_gasml)
+  call destroy(trc_gasml_vr)
   call destroy(CPO4B)
 
-  call destroy(trc_solml)
+  call destroy(trc_solml_vr)
   call destroy(trc_soHml)
 
   call destroy(ZNFNI)
@@ -236,32 +236,32 @@ implicit none
   call destroy(AEC)
   call destroy(CPO4S)
   call destroy(ROXSK)
-  call destroy(UORGF)
-  call destroy(UFERTN)
-  call destroy(UFERTP)
+  call destroy(AmendCFlx_col)
+  call destroy(FertNFlx_col)
+  call destroy(FerPFlx_col)
   call destroy(HDOCQ)
   call destroy(HDOCD)
-  call destroy(UXCSN)
-  call destroy(UXZSN)
-  call destroy(UXPSN)
-  call destroy(UDONQ)
+  call destroy(LiterfalOrgC_col)
+  call destroy(LiterfalOrgN_col)
+  call destroy(LiterfalOrgP_col)
+  call destroy(HydroDONFlx_col)
   call destroy(HDOND)
-  call destroy(UDOPQ)
+  call destroy(HydroDOPFlx_col)
   call destroy(HDOPD)
   call destroy(UPP4)
   call destroy(UCOP)
   call destroy(USEDOU)
   call destroy(HDICQ)
   call destroy(HDICD)
-  call destroy(UDINQ)
+  call destroy(HydroDINFlx_col)
   call destroy(HDIND)
-  call destroy(UDIPQ)
+  call destroy(HydroDIPFlx_col)
   call destroy(HDIPD)
   call destroy(StandingDeadChemElmnt_col)
   call destroy(ZDRAIN)
   call destroy(PDRAIN)
   call destroy(UION)
-  call destroy(UIONOU)
+  call destroy(HydroIonFlx_col)
   call destroy(Micb_N2Fixation_vr)
   call destroy(RNutMicbTransf_vr)
   call destroy(RDOM_micb_flx)
@@ -270,7 +270,7 @@ implicit none
   call destroy(TFNQ)
   call destroy(LitrfalChemElemnts_vr)
 
-  call destroy(trcs_VLN)
+  call destroy(trcs_VLN_vr)
   call destroy(trcg_ebu_flx_vr)
   call destroy(VLNHB)
   call destroy(trcg_surf_disevap_flx)

@@ -123,18 +123,18 @@ implicit none
       DO NY=NVN,NVS
         DO NZ=1,NP(NY,NX)
           DO M=1,366
-            IHVST(NZ,M,NY,NX)=-1
-            JHVST(NZ,M,NY,NX)=0
+            iHarvstType_pft(NZ,M,NY,NX)=-1
+            jHarvst_pft(NZ,M,NY,NX)=0
             HVST(NZ,M,NY,NX)=1.0E+06_r8
             THIN_pft(NZ,M,NY,NX)=-1.0_r8
-            EHVST(1,ipld_leaf,NZ,M,NY,NX)=1.0_r8
-            EHVST(1,ipld_nofoliar,NZ,M,NY,NX)=1.0_r8
-            EHVST(1,ipld_woody,NZ,M,NY,NX)=1.0_r8
-            EHVST(1,ipld_stdead,NZ,M,NY,NX)=1.0_r8
-            EHVST(2,ipld_leaf,NZ,M,NY,NX)=1.0_r8
-            EHVST(2,ipld_nofoliar,NZ,M,NY,NX)=1.0_r8
-            EHVST(2,ipld_woody,NZ,M,NY,NX)=1.0_r8
-            EHVST(2,ipld_stdead,NZ,M,NY,NX)=1.0_r8
+            EHVST(1,iplthvst_leaf,NZ,M,NY,NX)=1.0_r8
+            EHVST(1,iplthvst_finenonleaf,NZ,M,NY,NX)=1.0_r8
+            EHVST(1,iplthvst_woody,NZ,M,NY,NX)=1.0_r8
+            EHVST(1,iplthvst_stdead,NZ,M,NY,NX)=1.0_r8
+            EHVST(2,iplthvst_leaf,NZ,M,NY,NX)=1.0_r8
+            EHVST(2,iplthvst_finenonleaf,NZ,M,NY,NX)=1.0_r8
+            EHVST(2,iplthvst_woody,NZ,M,NY,NX)=1.0_r8
+            EHVST(2,iplthvst_stdead,NZ,M,NY,NX)=1.0_r8
           ENDDO
           PlantinDepth(NZ,NY,NX)=ppmc
         ENDDO
@@ -216,11 +216,11 @@ implicit none
               IDY=30*(IMO-1)+ICOR(IMO-1)+IDX+LPY
             endif
             IF(IDY.GT.0.AND.IYR.GT.0)THEN
-              iDayPlanting(NZ,NY,NX)=IDY
+              iDayPlanting_pft(NZ,NY,NX)=IDY
               IYR=yearc
-              iYearPlanting(NZ,NY,NX)=MIN(IYR,iYearCurrent)
-              IDAYX(NZ,NY,NX)=iDayPlanting(NZ,NY,NX) !planting day
-              IYRX(NZ,NY,NX)=iYearPlanting(NZ,NY,NX)   !planting year
+              iYearPlanting_pft(NZ,NY,NX)=MIN(IYR,iYearCurrent)
+              IDAYX(NZ,NY,NX)=iDayPlanting_pft(NZ,NY,NX) !planting day
+              IYRX(NZ,NY,NX)=iYearPlanting_pft(NZ,NY,NX)   !planting year
               PPZ(NZ,NY,NX)=PPI(NZ,NY,NX)     !population density
             ENDIF
 
@@ -241,42 +241,42 @@ implicit none
                 endif
 
                 IF(IDY.GT.0.AND.JCUT.EQ.1)THEN
-                  iDayPlantHarvest(NZ,NY,NX)=IDY
+                  iDayPlantHarvest_pft(NZ,NY,NX)=IDY
                   IYR=yearc
-                  iYearPlantHarvest(NZ,NY,NX)=MIN(IYR,iYearCurrent)
+                  iYearPlantHarvest_pft(NZ,NY,NX)=MIN(IYR,iYearCurrent)
                 ENDIF
 
-                IHVST(NZ,IDY,NY,NX)=ICUT
-                JHVST(NZ,IDY,NY,NX)=JCUT
+                iHarvstType_pft(NZ,IDY,NY,NX)=ICUT
+                jHarvst_pft(NZ,IDY,NY,NX)=JCUT
                 HVST(NZ,IDY,NY,NX)=HCUT
                 THIN_pft(NZ,IDY,NY,NX)=PCUT
-                EHVST(1,ipld_leaf,NZ,IDY,NY,NX)=ECUT11
-                EHVST(1,ipld_nofoliar,NZ,IDY,NY,NX)=ECUT12
-                EHVST(1,ipld_woody,NZ,IDY,NY,NX)=ECUT13
-                EHVST(1,ipld_stdead,NZ,IDY,NY,NX)=ECUT14
-                EHVST(2,ipld_leaf,NZ,IDY,NY,NX)=ECUT21
-                EHVST(2,ipld_nofoliar,NZ,IDY,NY,NX)=ECUT22
-                EHVST(2,ipld_woody,NZ,IDY,NY,NX)=ECUT23
-                EHVST(2,ipld_stdead,NZ,IDY,NY,NX)=ECUT24
+                EHVST(1,iplthvst_leaf,NZ,IDY,NY,NX)=ECUT11
+                EHVST(1,iplthvst_finenonleaf,NZ,IDY,NY,NX)=ECUT12
+                EHVST(1,iplthvst_woody,NZ,IDY,NY,NX)=ECUT13
+                EHVST(1,iplthvst_stdead,NZ,IDY,NY,NX)=ECUT14
+                EHVST(2,iplthvst_leaf,NZ,IDY,NY,NX)=ECUT21
+                EHVST(2,iplthvst_finenonleaf,NZ,IDY,NY,NX)=ECUT22
+                EHVST(2,iplthvst_woody,NZ,IDY,NY,NX)=ECUT23
+                EHVST(2,iplthvst_stdead,NZ,IDY,NY,NX)=ECUT24
 
-                IF(IHVST(NZ,IDY,NY,NX).EQ.4.OR.IHVST(NZ,IDY,NY,NX).EQ.6)THEN
+                IF(iHarvstType_pft(NZ,IDY,NY,NX).EQ.4.OR.iHarvstType_pft(NZ,IDY,NY,NX).EQ.6)THEN
                   !animal or insect biomass
                   NN=NN+1
                   if(mod(nn,2)==0)then
                     IDYE=IDY
                     D580: DO IDYG=IDYS+1,IDYE-1
-                      IHVST(NZ,IDYG,NY,NX)=ICUT
-                      JHVST(NZ,IDYG,NY,NX)=JCUT
+                      iHarvstType_pft(NZ,IDYG,NY,NX)=ICUT
+                      jHarvst_pft(NZ,IDYG,NY,NX)=JCUT
                       HVST(NZ,IDYG,NY,NX)=HCUT
                       THIN_pft(NZ,IDYG,NY,NX)=PCUT
-                      EHVST(1,ipld_leaf,NZ,IDYG,NY,NX)=ECUT11
-                      EHVST(1,ipld_nofoliar,NZ,IDYG,NY,NX)=ECUT12
-                      EHVST(1,ipld_woody,NZ,IDYG,NY,NX)=ECUT13
-                      EHVST(1,ipld_stdead,NZ,IDYG,NY,NX)=ECUT14
-                      EHVST(2,ipld_leaf,NZ,IDYG,NY,NX)=ECUT21
-                      EHVST(2,ipld_nofoliar,NZ,IDYG,NY,NX)=ECUT22
-                      EHVST(2,ipld_woody,NZ,IDYG,NY,NX)=ECUT23
-                      EHVST(2,ipld_stdead,NZ,IDYG,NY,NX)=ECUT24
+                      EHVST(1,iplthvst_leaf,NZ,IDYG,NY,NX)=ECUT11
+                      EHVST(1,iplthvst_finenonleaf,NZ,IDYG,NY,NX)=ECUT12
+                      EHVST(1,iplthvst_woody,NZ,IDYG,NY,NX)=ECUT13
+                      EHVST(1,iplthvst_stdead,NZ,IDYG,NY,NX)=ECUT14
+                      EHVST(2,iplthvst_leaf,NZ,IDYG,NY,NX)=ECUT21
+                      EHVST(2,iplthvst_finenonleaf,NZ,IDYG,NY,NX)=ECUT22
+                      EHVST(2,iplthvst_woody,NZ,IDYG,NY,NX)=ECUT23
+                      EHVST(2,iplthvst_stdead,NZ,IDYG,NY,NX)=ECUT24
                     ENDDO D580
                   endif
                   IDYS=IDY
@@ -295,8 +295,8 @@ implicit none
   DO NX=NHW,NHE
     DO NY=NVN,NVS
       DO NZ=1,NP(NY,NX)
-        IDAYY(NZ,NY,NX)=iDayPlantHarvest(NZ,NY,NX)
-        IYRY(NZ,NY,NX)=iYearPlantHarvest(NZ,NY,NX)
+        IDAYY(NZ,NY,NX)=iDayPlantHarvest_pft(NZ,NY,NX)
+        IYRY(NZ,NY,NX)=iYearPlantHarvest_pft(NZ,NY,NX)
       ENDDO
     ENDDO
   ENDDO
@@ -338,10 +338,10 @@ implicit none
     SinePetioleAngle_pft(NZ,NY,NX)=SIN(PetioleAngle_pft(NZ,NY,NX)*RadianPerDegree)
     MatureGroup_pft(NZ,NY,NX)=GROUPX(NZ,NY,NX)
 
-    IF(iPlantTurnoverPattern(NZ,NY,NX).NE.0)THEN
+    IF(iPlantTurnoverPattern_pft(NZ,NY,NX).NE.0)THEN
 !
-      RefNodeInitRate(NZ,NY,NX)=RefNodeInitRate(NZ,NY,NX)/MaxNodesPerBranch
-      RefLeafAppearRate(NZ,NY,NX)=RefLeafAppearRate(NZ,NY,NX)/MaxNodesPerBranch
+      RefNodeInitRate_pft(NZ,NY,NX)=RefNodeInitRate_pft(NZ,NY,NX)/MaxNodesPerBranch
+      RefLeafAppearRate_pft(NZ,NY,NX)=RefLeafAppearRate_pft(NZ,NY,NX)/MaxNodesPerBranch
       MatureGroup_pft(NZ,NY,NX)=MatureGroup_pft(NZ,NY,NX)/MaxNodesPerBranch
       XTLI(NZ,NY,NX)=XTLI(NZ,NY,NX)/MaxNodesPerBranch
     ENDIF
@@ -352,10 +352,10 @@ implicit none
     D5: DO NB=1,JC
       IF(iPlantPhenologyType_pft(NZ,NY,NX).EQ.0.AND.iPlantPhenologyPattern_pft(NZ,NY,NX).NE.iplt_annual)THEN
         HourThreshold4LeafOut_brch(NB,NZ,NY,NX)=AMIN1(4380.0_r8,VRNLI+144.0_r8*iPlantInitThermoAdaptZone(NZ,NY,NX)*(NB-1))
-        HourThreshold4LeafOff(NB,NZ,NY,NX)=AMIN1(4380.0_r8,VRNXI+144.0_r8*iPlantInitThermoAdaptZone(NZ,NY,NX)*(NB-1))
+        HourThreshold4LeafOff_brch(NB,NZ,NY,NX)=AMIN1(4380.0_r8,VRNXI+144.0_r8*iPlantInitThermoAdaptZone(NZ,NY,NX)*(NB-1))
       ELSE
         HourThreshold4LeafOut_brch(NB,NZ,NY,NX)=VRNLI
-        HourThreshold4LeafOff(NB,NZ,NY,NX)=VRNXI
+        HourThreshold4LeafOff_brch(NB,NZ,NY,NX)=VRNXI
       ENDIF
     ENDDO D5
   ENDIF
@@ -376,13 +376,13 @@ implicit none
   loc=get_pft_loc(DATAP(NZ,NY,NX)(1:6))
   DATAPI(NZ,NY,NX)=loc
   call ncd_getvar(pft_nfid, 'ICTYP', loc, iPlantPhotosynthesisType(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'IGTYP', loc, iPlantMorphologyType(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'IGTYP', loc, iPlantMorphologyType_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'ISTYP', loc, iPlantPhenologyPattern_pft(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'IDTYP', loc, iPlantDevelopPattern(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'IDTYP', loc, iPlantDevelopPattern_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'INTYP', loc, iPlantNfixType(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'IWTYP', loc, iPlantPhenologyType_pft(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'IPTYP', loc, iPlantPhotoperiodType(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'IBTYP', loc, iPlantTurnoverPattern(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'IPTYP', loc, iPlantPhotoperiodType_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'IBTYP', loc, iPlantTurnoverPattern_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'IRTYP', loc, iPlantGrainType(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'MY', loc, MY(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'ZTYPI', loc, iPlantInitThermoAdaptZone(NZ,NY,NX))
@@ -405,8 +405,8 @@ implicit none
   call ncd_getvar(pft_nfid, 'TAUR', loc, TAUR(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'TAUP', loc, TAUP(NZ,NY,NX))
 
-  call ncd_getvar(pft_nfid, 'XRNI', loc, RefNodeInitRate(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'XRLA', loc, RefLeafAppearRate(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'XRNI', loc, RefNodeInitRate_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'XRLA', loc, RefLeafAppearRate_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'CTC', loc, TCelciusChill4Seed(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'VRNLI', loc,VRNLI)
   call ncd_getvar(pft_nfid, 'VRNXI', loc,VRNXI)
@@ -509,15 +509,15 @@ implicit none
   implicit none
   integer, intent(in) :: NZ,NY,NX
 !   iPlantPhotosynthesisType=photosynthesis type:3=C3,4=C4
-!   iPlantMorphologyType=root profile:0=shallow (eg bryophytes),1=intermediate(eg herbs),2=deep (eg trees)
+!   iPlantMorphologyType_pft=root profile:0=shallow (eg bryophytes),1=intermediate(eg herbs),2=deep (eg trees)
 !   iPlantPhenologyPattern_pft=growth habit:0=annual,1=perennial
-!   iPlantDevelopPattern=growth habit:0=determinate,1=indetermimate
+!   iPlantDevelopPattern_pft=growth habit:0=determinate,1=indetermimate
 !   iPlantNfixType=N2 fixation:1,2,3=rapid to slow root symbiosis (e.g.legumes),
 !   4,5,6=rapid to slow canopy symbiosis (e.g. cyanobacteria)
 !   iPlantPhenologyType_pft=phenology type:0=evergreen,1=cold deciduous,2=drought deciduous,3=1+2
-!   iPlantPhotoperiodType=photoperiod type:0=day neutral,1=short day,2=long day
-!   iPlantTurnoverPattern=turnover:if iPlantMorphologyType=0 or 1:all above-ground:0,1=rapid(deciduous),2=very slow(evergreen),3=slow(semi-deciduous)
-!                   :if iPlantMorphologyType=2:trees:1=rapid(deciduous),2=very slow(coniferous),3=slow(semi-deciduous)
+!   iPlantPhotoperiodType_pft=photoperiod type:0=day neutral,1=short day,2=long day
+!   iPlantTurnoverPattern_pft=turnover:if iPlantMorphologyType_pft=0 or 1:all above-ground:0,1=rapid(deciduous),2=very slow(evergreen),3=slow(semi-deciduous)
+!                   :if iPlantMorphologyType_pft=2:trees:1=rapid(deciduous),2=very slow(coniferous),3=slow(semi-deciduous)
 !   iPlantGrainType=storage organ:0=above ground,1=below ground
 !   MY=mycorrhizal:1=no,2=yes
 !   iPlantInitThermoAdaptZone=thermal adaptation zone:1=arctic,boreal,2=cool temperate,
@@ -533,7 +533,7 @@ implicit none
     write(*,*)'photosynthesis type not defined'
   end select
 
-  select case(iPlantMorphologyType(NZ,NY,NX))
+  select case(iPlantMorphologyType_pft(NZ,NY,NX))
   case (0)
     write(*,*)'shallow root profile, like bryophytes'
   case (1)
@@ -553,7 +553,7 @@ implicit none
     write(*,*)'growth habit not defined'
   end select
 
-  select case (iPlantDevelopPattern(NZ,NY,NX))
+  select case (iPlantDevelopPattern_pft(NZ,NY,NX))
   case (0)
     write(*,*)'determinate growth habit'
   case (1)
@@ -594,7 +594,7 @@ implicit none
     write(*,*)'phenology type not defined'
   end select
 
-  select case(iPlantPhotoperiodType(NZ,NY,NX))
+  select case(iPlantPhotoperiodType_pft(NZ,NY,NX))
   case (0)
     write(*,*)'day neutral photoperiod'
   case (1)
@@ -605,7 +605,7 @@ implicit none
     write(*,*)'photoperiod not defined'
   end select
 
-  select case(iPlantTurnoverPattern(NZ,NY,NX))
+  select case(iPlantTurnoverPattern_pft(NZ,NY,NX))
   case (0, 1)
     write(*,*)'plant biome turnover rapid (deciduous)'
   case (2)
@@ -688,8 +688,8 @@ implicit none
   integer, intent(in) :: NZ,NY,NX
   real(r8), intent(in) :: VRNLI,VRNXI
   write(*,*)'PHENOLOGICAL PROPERTIES'
-  write(*,*)'rate of node initiation at 25oC (h-1): XRNI',RefNodeInitRate(NZ,NY,NX)
-  write(*,*)'rate of leaf appearance at 25oC (h-1): XRLA',RefLeafAppearRate(NZ,NY,NX)
+  write(*,*)'rate of node initiation at 25oC (h-1): XRNI',RefNodeInitRate_pft(NZ,NY,NX)
+  write(*,*)'rate of leaf appearance at 25oC (h-1): XRLA',RefLeafAppearRate_pft(NZ,NY,NX)
   write(*,*)'chilling temperature for CO2 fixation, '// &
     'seed loss (oC): CTC',TCelciusChill4Seed(NZ,NY,NX)
   write(*,*)'hour requirement for spring leafout: VRNLI',VRNLI
@@ -861,10 +861,10 @@ implicit none
     D9999: DO NX=NHW,NHE
       DO  NY=NVN,NVS
         DO NZ=1,JP
-          iDayPlanting(NZ,NY,NX)=-1E+06
-          iYearPlanting(NZ,NY,NX)=-1E+06
-          iDayPlantHarvest(NZ,NY,NX)=1E+06
-          iYearPlantHarvest(NZ,NY,NX)=1E+06
+          iDayPlanting_pft(NZ,NY,NX)=-1E+06
+          iYearPlanting_pft(NZ,NY,NX)=-1E+06
+          iDayPlantHarvest_pft(NZ,NY,NX)=1E+06
+          iYearPlantHarvest_pft(NZ,NY,NX)=1E+06
         enddo
       enddo
     ENDDO D9999
