@@ -4,6 +4,7 @@ module ErosionBalMod
   use RootDataType
   use EcoSiMParDataMod, only : micpar
   USE EcoSIMCtrlDataType
+  use EcoSIMCtrlMod
   use MicrobialDataType
   USE SOMDataType
   use SedimentDataType
@@ -221,7 +222,7 @@ implicit none
   implicit none
   integer, intent(in) :: NY,NX
 
-  IF(IERSNG.EQ.1.OR.IERSNG.EQ.3)THEN
+  IF(iErosionMode.EQ.ieros_frzthaweros.OR.iErosionMode.EQ.ieros_frzthawsomeros)THEN
     TSEDER(NY,NX)=0.0_r8
     TSANER(NY,NX)=0.0_r8
     TSILER(NY,NX)=0.0_r8

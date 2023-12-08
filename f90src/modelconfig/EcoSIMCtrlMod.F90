@@ -7,9 +7,10 @@ implicit none
   save
   logical :: salt_model   =.false.    !toggle for salt model
   logical :: erosion_model=.false.
+  integer :: iErosionMode =-1         !erosion option  
   logical :: plant_model  =.true.
   logical :: microbial_model   =.true.
-  logical :: soichem_model=.true.
+  logical :: soichem_model   =.true.
   logical :: snowRedist_model=.true.
   logical :: ATS_cpl_mode=.false.
   real(r8) :: aco2_ppm  = 280._r8
@@ -25,7 +26,7 @@ implicit none
   character(len=300) :: soil_mgmt_in     !file for soil management information
   character(len=300) :: clm_factor_in    !file for climate change factors
   character(len=300) :: atm_ghg_in       !file for atmospheric GHG concentrations
-  logical :: do_budgets   = .false.
+  logical :: do_budgets = .false.
   type(file_desc_t)  :: pft_nfid 
   type(ecosim_time_type) :: etimer
   logical :: Lirri_auto=.false.
@@ -43,9 +44,10 @@ implicit none
   integer :: NCYC_LITR  !number of subcycles for litr
   integer :: NCYC_SNOW  !number of subcycles for snow
   logical :: lverb           !logical switch for verbose output
-  logical :: disp_planttrait =.false.
+  logical :: disp_planttrait =.true.
+  logical :: disp_modelconfig=.true.
   logical :: do_rgres        !logical switch for regression tests
-
+  integer :: grid_mode = 3  !vertical only
   type, public :: forc_data_rec_type
   integer :: pft_rec
   integer :: yearclm

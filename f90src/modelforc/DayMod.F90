@@ -4,6 +4,7 @@
   use EcosimConst
   use minimathmod  , only : isLeap,AZMAX1
   use MiniFuncMod  , only : GetDayLength
+  use EcoSIMCtrlMod
   use GridConsts
   use SoilPhysDataType
   use FlagDataType
@@ -158,7 +159,7 @@
     SurfLitrfallChemElmnts_pft(:,NZ,NY,NX)=0._r8
     LitrfallChemElmnts_pft(:,NZ,NY,NX)=0._r8
   ENDDO D960
-  IF(IERSNG.EQ.1.OR.IERSNG.EQ.3)THEN
+  IF(iErosionMode.EQ.ieros_frzthaweros.OR.iErosionMode.EQ.ieros_frzthawsomeros)THEN
     TSED(NY,NX)=0._r8
   ENDIF
   end subroutine SetAnnualAccumlators        

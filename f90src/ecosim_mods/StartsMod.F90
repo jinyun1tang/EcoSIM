@@ -12,6 +12,7 @@ module StartsMod
   use MicrobialDataType
   use EcoSIMSolverPar
   use SOMDataType
+  use EcoSIMCtrlMod
   use ChemTranspDataType
   use FertilizerDataType
   use SnowPhysMod, only : InitSnowLayers
@@ -225,7 +226,7 @@ module StartsMod
 
 !     INITIALIZE SEDIMENT LOAD IN EROSION MODEL
 !
-  IF(IERSNG.EQ.1.OR.IERSNG.EQ.3)THEN
+  IF(iErosionMode.EQ.ieros_frzthaweros.OR.iErosionMode.EQ.ieros_frzthawsomeros)THEN
     SED(:,:)=0.0_r8
   ENDIF
 !

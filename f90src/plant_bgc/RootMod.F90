@@ -1557,7 +1557,7 @@ implicit none
     iPlantMorphologyType_pft     =>   plt_pheno%iPlantMorphologyType_pft  , &
     iPlantBranchState_brch      =>   plt_pheno%iPlantBranchState_brch   , &
     iPlantPhenologyPattern_pft     =>   plt_pheno%iPlantPhenologyPattern_pft  , &
-    ShutRutNonstructElmntConducts     =>   plt_pheno%ShutRutNonstructElmntConducts  , &
+    ShutRutNonstructElmntConducts_pft     =>   plt_pheno%ShutRutNonstructElmntConducts_pft  , &
     iPlantCalendar_brch     =>   plt_pheno%iPlantCalendar_brch  , &
     HourCounter4LeafOut_brch       =>   plt_pheno%HourCounter4LeafOut_brch    , &
     RCO2A      =>   plt_rbgc%RCO2A    , &
@@ -1812,8 +1812,8 @@ implicit none
 !     iPlantPhenologyPattern_pft=growth habit:0=annual,1=perennial from PFT file
 !     iPlantCalendar_brch(ipltcal_SetSeedNumber,=end date for setting final seed number
 !     FWTB=branch sink weighting factor
-!     ShutRutNonstructElmntConducts=rate constant for equilibrating shoot-root nonstructural C concn from PFT file
-!     PTRT=allocation to leaf+petiole used to modify ShutRutNonstructElmntConductsin annuals
+!     ShutRutNonstructElmntConducts_pft=rate constant for equilibrating shoot-root nonstructural C concn from PFT file
+!     PTRT=allocation to leaf+petiole used to modify ShutRutNonstructElmntConducts_pftin annuals
 !     FWTC,FWTS,FWTR=canopy,root system,root layer sink weighting factor
 !     FWOOD,FWOODN,FWOODP=C,N,P woody fraction in root:0=woody,1=non-woody
 !     FWODB=C woody fraction in branch:0=woody,1=non-woody
@@ -1829,9 +1829,9 @@ implicit none
         FWTB(NB)=1.0_r8
       ENDIF
       IF(iPlantPhenologyPattern_pft(NZ).EQ.iplt_annual)THEN
-        PTSHTR=ShutRutNonstructElmntConducts(NZ)*PTRT**0.167_r8
+        PTSHTR=ShutRutNonstructElmntConducts_pft(NZ)*PTRT**0.167_r8
       ELSE
-        PTSHTR=ShutRutNonstructElmntConducts(NZ)
+        PTSHTR=ShutRutNonstructElmntConducts_pft(NZ)
       ENDIF
       D415: DO L=NU,NI(NZ)
         WTLSBX=LeafPetioleBiomassC_brch(NB,NZ)*FWODBE(ielmc,k_fine_litr)*FWTR(L)*FWTC

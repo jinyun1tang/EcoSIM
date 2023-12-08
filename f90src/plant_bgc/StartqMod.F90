@@ -410,9 +410,9 @@ module StartqMod
 !     CNRTS,CPRTS=N,P root growth yield
 !     Max1stRootRadius,Max2ndRootRadius=maximum primary,secondary mycorrhizal radius (m)
 !     PORT=mycorrhizal porosity
-!     UPMXZH,UPKMZH,UPMNZH=NH4 max uptake(g m-2 h-1),Km(uM),min concn (uM)
-!     UPMXZO,UPKMZO,UPMNZO=NO3 max uptake(g m-2 h-1),Km(uM), min concn (uM)
-!     UPMXPO,UPKMPO,UPMNPO=H2PO4 max uptake(g m-2 h-1),Km(uM),min concn (uM)
+!     VmaxNH4Root_pft,KmNH4Root_pft,CMinNH4Root_pft=NH4 max uptake(g m-2 h-1),Km(uM),min concn (uM)
+!     VmaxNO3Root_pft,KmNO3Root_pft,CminNO3Root_pft=NO3 max uptake(g m-2 h-1),Km(uM), min concn (uM)
+!     VmaxPO4Root_pft,KmPO4Root_pft,CMinPO4Root_pft=H2PO4 max uptake(g m-2 h-1),Km(uM),min concn (uM)
 !     RSRR,RSRA=radial,axial root resistivity (m2 MPa-1 h-1)
 !
   SeedinDepth(NZ,NY,NX)=PlantinDepth(NZ,NY,NX)
@@ -432,15 +432,15 @@ module StartqMod
   Max1stRootRadius(imycorrhz,NZ,NY,NX)=5.0E-06
   Max2ndRootRadius(imycorrhz,NZ,NY,NX)=5.0E-06
   RootPorosity(imycorrhz,NZ,NY,NX)=RootPorosity(1,NZ,NY,NX)
-  UPMXZH(imycorrhz,NZ,NY,NX)=UPMXZH(1,NZ,NY,NX)
-  UPKMZH(imycorrhz,NZ,NY,NX)=UPKMZH(1,NZ,NY,NX)
-  UPMNZH(imycorrhz,NZ,NY,NX)=UPMNZH(1,NZ,NY,NX)
-  UPMXZO(imycorrhz,NZ,NY,NX)=UPMXZO(1,NZ,NY,NX)
-  UPKMZO(imycorrhz,NZ,NY,NX)=UPKMZO(1,NZ,NY,NX)
-  UPMNZO(imycorrhz,NZ,NY,NX)=UPMNZO(1,NZ,NY,NX)
-  UPMXPO(imycorrhz,NZ,NY,NX)=UPMXPO(1,NZ,NY,NX)
-  UPKMPO(imycorrhz,NZ,NY,NX)=UPKMPO(1,NZ,NY,NX)
-  UPMNPO(imycorrhz,NZ,NY,NX)=UPMNPO(1,NZ,NY,NX)
+  VmaxNH4Root_pft(imycorrhz,NZ,NY,NX)=VmaxNH4Root_pft(1,NZ,NY,NX)
+  KmNH4Root_pft(imycorrhz,NZ,NY,NX)=KmNH4Root_pft(1,NZ,NY,NX)
+  CMinNH4Root_pft(imycorrhz,NZ,NY,NX)=CMinNH4Root_pft(1,NZ,NY,NX)
+  VmaxNO3Root_pft(imycorrhz,NZ,NY,NX)=VmaxNO3Root_pft(1,NZ,NY,NX)
+  KmNO3Root_pft(imycorrhz,NZ,NY,NX)=KmNO3Root_pft(1,NZ,NY,NX)
+  CminNO3Root_pft(imycorrhz,NZ,NY,NX)=CminNO3Root_pft(1,NZ,NY,NX)
+  VmaxPO4Root_pft(imycorrhz,NZ,NY,NX)=VmaxPO4Root_pft(1,NZ,NY,NX)
+  KmPO4Root_pft(imycorrhz,NZ,NY,NX)=KmPO4Root_pft(1,NZ,NY,NX)
+  CMinPO4Root_pft(imycorrhz,NZ,NY,NX)=CMinPO4Root_pft(1,NZ,NY,NX)
   RSRR(imycorrhz,NZ,NY,NX)=1.0E+04
   RSRA(imycorrhz,NZ,NY,NX)=1.0E+12
 !

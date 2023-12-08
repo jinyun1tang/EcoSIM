@@ -20,7 +20,7 @@ PROGRAM main
   use EcoSIMCtrlMod
   use EcoSIMCtrlDataType
   use EcoSIMHistMod
-  use EcoSIMAPI         , only : soil,readnamelist,regressiontest
+  use EcoSIMAPI         , only : soil,readnamelist,regressiontest,write_modelconfig
   use EcosimConst
   implicit none
 
@@ -88,6 +88,7 @@ PROGRAM main
   if(lverb)WRITE(*,*)'read initialization information READI'
   CALL readi(NE,NEX,NHW,NHE,NVN,NVS)
 
+  call write_modelconfig()
   NE=1;NEX=1
 
   call set_sim_type()

@@ -24,17 +24,6 @@ module readsmod
 
   character(len=*), parameter :: mod_filename = &
   __FILE__
-  integer, SAVE :: N1,N2,N1X,N2X
-
-  real(r8) :: CN4RIG,CNORIG,CN4RG,CNORG,CPORG,CALRG
-  real(r8) :: CFERG,CCARG,CMGRG,CNARG,CKARG,CSORG,CCLRG
-  real(r8) :: Z0G,ZNOONG
-  real(r8) :: PHRG
-
-  CHARACTER(len=16) :: OUTW,OUTI,OUTT,OUTN,OUTF
-  CHARACTER(len=4) :: CHARY
-
-  integer :: IDATE,IDY,IFLG3,I,ICHECK
 
   public :: ReadClimSoilForcing
   contains
@@ -54,6 +43,14 @@ module readsmod
   integer :: kk,N,L,NY,NX,NZ,K
   integer :: LL,J
   integer :: LPY,IX
+  real(r8) :: CN4RIG,CNORIG,CN4RG,CNORG,CPORG,CALRG
+  real(r8) :: CFERG,CCARG,CMGRG,CNARG,CKARG,CSORG,CCLRG
+  real(r8) :: Z0G,ZNOONG
+  real(r8) :: PHRG
+  CHARACTER(len=16) :: OUTW,OUTI,OUTT,OUTN,OUTF
+  CHARACTER(len=4) :: CHARY
+  integer :: IDATE,IDY,IFLG3,I,ICHECK
+
   type(atm_forc_type) :: atmf
 
   ICLM=0

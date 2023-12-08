@@ -447,23 +447,23 @@ implicit none
   call ncd_getvar(pft_nfid, 'RRAD1M', loc,Max1stRootRadius(1,NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'RRAD2M', loc,Max2ndRootRadius(1,NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'PORT', loc,RootPorosity(1,NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'PR', loc,MinNonstructuralC4InitRoot(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'PR', loc,MinNonstructuralC4InitRoot_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'RSRR', loc,RSRR(1,NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'RSRA', loc,RSRA(1,NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'PTSHT', loc,ShutRutNonstructElmntConducts(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'PTSHT', loc,ShutRutNonstructElmntConducts_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'RTFQ', loc,RootBranchFreq_pft(NZ,NY,NX))
 
-  call ncd_getvar(pft_nfid, 'UPMXZH', loc,UPMXZH(1,NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'UPKMZH', loc,UPKMZH(1,NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'UPMNZH', loc,UPMNZH(1,NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'UPMXZH', loc,VmaxNH4Root_pft(ipltroot,NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'UPKMZH', loc,KmNH4Root_pft(ipltroot,NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'UPMNZH', loc,CMinNH4Root_pft(ipltroot,NZ,NY,NX))
 
-  call ncd_getvar(pft_nfid, 'UPMXZO', loc,UPMXZO(1,NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'UPKMZO', loc,UPKMZO(1,NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'UPMNZO', loc,UPMNZO(1,NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'UPMXZO', loc,VmaxNO3Root_pft(ipltroot,NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'UPKMZO', loc,KmNO3Root_pft(ipltroot,NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'UPMNZO', loc,CminNO3Root_pft(ipltroot,NZ,NY,NX))
 
-  call ncd_getvar(pft_nfid, 'UPMXPO', loc,UPMXPO(1,NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'UPKMPO', loc,UPKMPO(1,NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'UPMNPO', loc,UPMNPO(1,NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'UPMXPO', loc,VmaxPO4Root_pft(ipltroot,NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'UPKMPO', loc,KmPO4Root_pft(ipltroot,NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'UPMNPO', loc,CMinPO4Root_pft(ipltroot,NZ,NY,NX))
 
   call ncd_getvar(pft_nfid, 'OSMO', loc,OSMO(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'RCS', loc,RCS(NZ,NY,NX))
@@ -702,7 +702,7 @@ implicit none
   write(nu_plt,*)'KM for VCMX4 (uM): ',Km4PEPCarboxy_pft(NZ,NY,NX)
   write(nu_plt,*)'Fraction of leaf protein in rubisco (g rub/(g protein)): ',LeafRuBPConc_pft(NZ,NY,NX)
   write(nu_plt,*)'Fraction of leaf protein in PEP carboxylase (g pep/(g protein)): ',PEPC(NZ,NY,NX)
-  write(nu_plt,*)'Specific chlorophyll activity (umol e gC-1 s-1): ',SpecChloryfilAct_pft(NZ,NY,NX)
+  write(nu_plt,*)'Specific chlorophyll activity (umol e- gC-1 s-1): ',SpecChloryfilAct_pft(NZ,NY,NX)
   if(iPlantPhotosynthesisType(NZ,NY,NX).eq.ic3_photo)then
     write(nu_plt,*)'Fraction of leaf protein as chlorophyll in mesophyll (C3) (g Chl /(g protein))',LeafC3ChlorofilConc_pft(NZ,NY,NX)
   elseif(iPlantPhotosynthesisType(NZ,NY,NX).eq.ic4_photo)then
@@ -745,9 +745,9 @@ implicit none
 
   write(nu_plt,*)('-',j=1,100)  
   write(nu_plt,*)'MORPHOLOGICAL PROPERTIES'
-  write(nu_plt,*)'growth in leaf area vs mass: SLA1 ',SLA1(NZ,NY,NX)
-  write(nu_plt,*)'growth in petiole length vs mass: SSL1 ',SSL1(NZ,NY,NX)
-  write(nu_plt,*)'growth in internode length vs mass: SNL1',SNL1(NZ,NY,NX)
+  write(nu_plt,*)'growth in leaf area vs mass (m2 g-1): SLA1 ',SLA1(NZ,NY,NX)
+  write(nu_plt,*)'growth in petiole length vs mass (m g-1): SSL1 ',SSL1(NZ,NY,NX)
+  write(nu_plt,*)'growth in internode length vs mass (m g-1): SNL1',SNL1(NZ,NY,NX)
   write(nu_plt,*)'fraction of leaf area in 0-22.5,45,67.5,90o '// &
     'inclination classes: CLASS',(CLASS(N,NZ,NY,NX),N=1,NumOfLeafZenithSectors)
   write(nu_plt,*)'initial clumping factor: CFI',ClumpFactorInit_pft(NZ,NY,NX)
@@ -757,9 +757,9 @@ implicit none
     'pre-anthesis stalk growth: STMX',MaxPotentSeedNumber_pft(NZ,NY,NX)
   write(nu_plt,*)'maximum seed number per MaxPotentSeedNumber_pft: SDMX',MaxSeedNumPerSite_pft(NZ,NY,NX)
   write(nu_plt,*)'maximum seed size per MaxSeedNumPerSite_pft (g): GRMX',MaxSeedCMass(NZ,NY,NX)
-  write(nu_plt,*)'seed size at planting (g): GRDM',SeedCMass(NZ,NY,NX)    !could be greater than MaxSeedCMass, accouting for seedling
+  write(nu_plt,*)'seed size at planting (gC): GRDM',SeedCMass(NZ,NY,NX)    !could be greater than MaxSeedCMass, accouting for seedling
   write(nu_plt,*)'grain filling rate at 25 oC (g seed-1 h-1): GFILL',GrainFillRateat25C_pft(NZ,NY,NX)
-  write(nu_plt,*)'mass of dead standing biomass at planting: WTSTDI',StandingDeadInitC_pft(NZ,NY,NX)
+  write(nu_plt,*)'mass of dead standing biomass at planting (gC m-2): WTSTDI',StandingDeadInitC_pft(NZ,NY,NX)
   end subroutine morphology_trait_disp
 
 !------------------------------------------------------------------------------------------
@@ -771,15 +771,15 @@ implicit none
 
   write(nu_plt,*)('-',j=1,100)
   write(nu_plt,*)'ROOT CHARACTERISTICS'
-  write(nu_plt,*)'radius of primary roots: Max1stRootRadius',Max1stRootRadius(1,NZ,NY,NX)
-  write(nu_plt,*)'radius of secondary roots: Max2ndRootRadius',Max2ndRootRadius(1,NZ,NY,NX)
-  write(nu_plt,*)'primary/fine root porosity: PORT',RootPorosity(1,NZ,NY,NX)
+  write(nu_plt,*)'radius of primary roots (m): Max1stRootRadius',Max1stRootRadius(1,NZ,NY,NX)
+  write(nu_plt,*)'radius of secondary roots (m): Max2ndRootRadius',Max2ndRootRadius(1,NZ,NY,NX)
+  write(nu_plt,*)'primary/fine root porosity (m3 m-3): PORT',RootPorosity(1,NZ,NY,NX)
   write(nu_plt,*)'nonstructural C concentration needed for root'// &
-    ' branching: PR',MinNonstructuralC4InitRoot(NZ,NY,NX)
+    ' branching (gC/gC): PR',MinNonstructuralC4InitRoot_pft(NZ,NY,NX)
   write(nu_plt,*)'radial root resistivity for water uptake (m2 MPa-1 h-1): RSRR',RSRR(1,NZ,NY,NX)
   write(nu_plt,*)'axial root resistivity for water uptake (m2 MPa-1 h-1): RSRA',RSRA(1,NZ,NY,NX)
   write(nu_plt,*)'rate constant for equilibrating shoot-root '// &
-    'nonstructural C concn: PTSHT',ShutRutNonstructElmntConducts(NZ,NY,NX)
+    'nonstructural C concn: PTSHT',ShutRutNonstructElmntConducts_pft(NZ,NY,NX)
   write(nu_plt,*)'root branching frequency (m-1): RootBranchFreq_pft',RootBranchFreq_pft(NZ,NY,NX)
   end subroutine Root_trait_disp
 
@@ -792,15 +792,15 @@ implicit none
 
   write(nu_plt,*)('-',j=1,100)
   write(nu_plt,*)'ROOT UPTAKE PARAMETERS'
-  write(nu_plt,*)'NH4 max uptake (g m-2 h-1): UPMXZH',UPMXZH(1,NZ,NY,NX)
-  write(nu_plt,*)'NH4 uptake Km (uM): UPKMZH',UPKMZH(1,NZ,NY,NX)
-  write(nu_plt,*)'NH4 uptake min concn (uM): UPMNZH',UPMNZH(1,NZ,NY,NX)
-  write(nu_plt,*)'NO3 max uptake (g m-2 h-1): UPMXZO',UPMXZO(1,NZ,NY,NX)
-  write(nu_plt,*)'NO3 uptake Km (uM): UPKMZO',UPKMZO(1,NZ,NY,NX)
-  write(nu_plt,*)'NO3 uptake min concn (uM): UPMNZO',UPMNZO(1,NZ,NY,NX)
-  write(nu_plt,*)'H2PO4 max uptake (g m-2 h-1): UPMXPO',UPMXPO(1,NZ,NY,NX)
-  write(nu_plt,*)'H2PO4 uptake Km (uM): UPKMPO',UPKMPO(1,NZ,NY,NX)
-  write(nu_plt,*)'H2PO4 uptake min conc (uM): UPMNPO',UPMNPO(1,NZ,NY,NX)
+  write(nu_plt,*)'NH4 max uptake (g m-2 h-1): UPMXZH',VmaxNH4Root_pft(ipltroot,NZ,NY,NX)
+  write(nu_plt,*)'NH4 uptake Km (uM): UPKMZH',KmNH4Root_pft(ipltroot,NZ,NY,NX)
+  write(nu_plt,*)'NH4 uptake min concn (uM): UPMNZH',CMinNH4Root_pft(ipltroot,NZ,NY,NX)
+  write(nu_plt,*)'NO3 max uptake (g m-2 h-1): UPMXZO',VmaxNO3Root_pft(ipltroot,NZ,NY,NX)
+  write(nu_plt,*)'NO3 uptake Km (uM): UPKMZO',KmNO3Root_pft(ipltroot,NZ,NY,NX)
+  write(nu_plt,*)'NO3 uptake min concn (uM): UPMNZO',CminNO3Root_pft(ipltroot,NZ,NY,NX)
+  write(nu_plt,*)'H2PO4 or H1PO4 max uptake (g m-2 h-1): UPMXPO',VmaxPO4Root_pft(ipltroot,NZ,NY,NX)
+  write(nu_plt,*)'H2PO4 or H1PO4 uptake Km (uM): UPKMPO',KmPO4Root_pft(ipltroot,NZ,NY,NX)
+  write(nu_plt,*)'H2PO4 or H1PO4 uptake min conc (uM): UPMNPO',CMinPO4Root_pft(ipltroot,NZ,NY,NX)
   end subroutine Root_nutrient_trait_disp
 
 
@@ -859,24 +859,24 @@ implicit none
 
   write(nu_plt,*)('-',j=1,100)
   write(nu_plt,*)'ORGAN N AND P CONCENTRATIONS'
-  write(nu_plt,*)'NC ratio in plant leaves: CNLF',CNLF(NZ,NY,NX)
-  write(nu_plt,*)'NC ratio in plant petiole: CNSHE',CNSHE(NZ,NY,NX)
-  write(nu_plt,*)'NC ratio in plant stalk: CNSTK',rNCStalk_pft(NZ,NY,NX)
-  write(nu_plt,*)'NC ratio in plant stalk reserve: CNRSV',rNCReserve_pft(NZ,NY,NX)
-  write(nu_plt,*)'NC ratio in plant husk: CNHSK',rNCHusk_pft(NZ,NY,NX)
-  write(nu_plt,*)'NC ratio in plant ear: CNEAR',rNCEar_pft(NZ,NY,NX)
-  write(nu_plt,*)'NC ratio in plant grain: CNGR',CNGR(NZ,NY,NX)
-  write(nu_plt,*)'NC ratio in plant root: CNumRootAxes_pft',RootrNC_pft(NZ,NY,NX)
-  write(nu_plt,*)'NC ratio in plant nodule: CNND',NodulerNC_pft(NZ,NY,NX)
-  write(nu_plt,*)'PC ratio in plant leaves: CPLF',CPLF(NZ,NY,NX)
-  write(nu_plt,*)'PC ratio in plant petiole: CPSHE',CPSHE(NZ,NY,NX)
-  write(nu_plt,*)'PC ratio in plant stalk: CPSTK',rPCStalk_pft(NZ,NY,NX)
-  write(nu_plt,*)'PC ratio in plant stalk reserve: CPRSV',rPCReserve_pft(NZ,NY,NX)
-  write(nu_plt,*)'PC ratio in plant husk: CPHSK',rPCHusk_pft(NZ,NY,NX)
-  write(nu_plt,*)'PC ratio in plant ear: CPEAR',rPCEar_pft(NZ,NY,NX)
-  write(nu_plt,*)'PC ratio in plant grain: CPGR',CPGR(NZ,NY,NX)
-  write(nu_plt,*)'PC ratio in plant root: CPRT',RootrPC_pft(NZ,NY,NX)
-  write(nu_plt,*)'PC ratio in plant nodule: CPND',NodulerPC_pft(NZ,NY,NX)
+  write(nu_plt,*)'NC ratio in plant leaves (gN/gC): CNLF',CNLF(NZ,NY,NX)
+  write(nu_plt,*)'NC ratio in plant petiole (gN/gC): CNSHE',CNSHE(NZ,NY,NX)
+  write(nu_plt,*)'NC ratio in plant stalk (gN/gC): CNSTK',rNCStalk_pft(NZ,NY,NX)
+  write(nu_plt,*)'NC ratio in plant stalk reserve (gN/gC): CNRSV',rNCReserve_pft(NZ,NY,NX)
+  write(nu_plt,*)'NC ratio in plant husk (gN/gC): CNHSK',rNCHusk_pft(NZ,NY,NX)
+  write(nu_plt,*)'NC ratio in plant ear (gN/gC): CNEAR',rNCEar_pft(NZ,NY,NX)
+  write(nu_plt,*)'NC ratio in plant grain (gN/gC): CNGR',CNGR(NZ,NY,NX)
+  write(nu_plt,*)'NC ratio in plant root (gN/gC): CNumRootAxes_pft',RootrNC_pft(NZ,NY,NX)
+  write(nu_plt,*)'NC ratio in plant nodule (gN/gC): CNND',NodulerNC_pft(NZ,NY,NX)
+  write(nu_plt,*)'PC ratio in plant leaves (gP/gC): CPLF',CPLF(NZ,NY,NX)
+  write(nu_plt,*)'PC ratio in plant petiole (gP/gC): CPSHE',CPSHE(NZ,NY,NX)
+  write(nu_plt,*)'PC ratio in plant stalk (gP/gC): CPSTK',rPCStalk_pft(NZ,NY,NX)
+  write(nu_plt,*)'PC ratio in plant stalk reserve (gP/gC): CPRSV',rPCReserve_pft(NZ,NY,NX)
+  write(nu_plt,*)'PC ratio in plant husk (gP/gC): CPHSK',rPCHusk_pft(NZ,NY,NX)
+  write(nu_plt,*)'PC ratio in plant ear (gP/gC): CPEAR',rPCEar_pft(NZ,NY,NX)
+  write(nu_plt,*)'PC ratio in plant grain (gP/gC): CPGR',CPGR(NZ,NY,NX)
+  write(nu_plt,*)'PC ratio in plant root (gP/gC): CPRT',RootrPC_pft(NZ,NY,NX)
+  write(nu_plt,*)'PC ratio in plant nodule (gP/gC): CPND',NodulerPC_pft(NZ,NY,NX)
   end subroutine plant_biomstoich_trait_disp
 
 !------------------------------------------------------------------------------------------

@@ -15,6 +15,7 @@ module SoilLayerDynMod
   use AqueChemDatatype
   use FertilizerDataType
   use SoilHeatDataType
+  use EcoSIMCtrlMod
   use SoilPhysDataType
   use SurfSoilDataType
   use SurfLitterDataType
@@ -63,7 +64,7 @@ implicit none
   !     begin_execution
   !     SOIL SUBSIDENCE
   !
-  IF(IERSNG < 0)return
+  IF(iErosionMode < 0)return
   !soil relayering can occur due to freeze-thaw, soc change, and erosion
   !
     IF(SoiBulkDensity(NU(NY,NX),NY,NX).LE.ZERO)THEN
@@ -138,7 +139,7 @@ implicit none
 !
 !     RESET LOWER LAYER NUMBER WITH EROSION
 !
-            IF(IERSNG.EQ.1.OR.IERSNG.EQ.3)THEN
+            IF(iErosionMode.EQ.ieros_frzthaweros.OR.iErosionMode.EQ.ieros_frzthawsomeros)THEN
               IF(L.EQ.NL(NY,NX).AND.DLYR(3,L,NY,NX).GT.DLYRI(3,L,NY,NX))THEN
                 NL(NY,NX)=MIN(NLI(NY,NX),NL(NY,NX)+1)
               ENDIF
@@ -310,7 +311,8 @@ implicit none
       !
       !     EROSION model is on
       !
-      IF((IERSNG.EQ.1.OR.IERSNG.EQ.3).AND.ABS(TSEDER(NY,NX)).GT.ZEROS(NY,NX))THEN
+      IF((iErosionMode.EQ.ieros_frzthaweros.OR.iErosionMode.EQ.ieros_frzthawsomeros) &
+        .AND.ABS(TSEDER(NY,NX)).GT.ZEROS(NY,NX))THEN
         IF(LX.EQ.NL(NY,NX))THEN
 !  5: due to sediment erosion
 !         total soil layer reduction due to erosion
@@ -335,8 +337,10 @@ implicit none
       ! DDLEqv_OrgC: soil thickness added due to change in organic matter,
       ! keeping macropore fraction
       ! SoiBulkDensityt0: initial bulk density,
-      IF((IERSNG.EQ.2.OR.IERSNG.EQ.3).AND.ABS(DORGC(LX)).GT.ZEROS(NY,NX))THEN
-        DDLEqv_OrgC=MWC2Soil*DORGC(LX)/((1.0_r8-SoilFracAsMacP(LX,NY,NX))*SoiBulkDensityt0(LX,NY,NX))/AREA(3,LX,NY,NX)
+      IF((iErosionMode.EQ.ieros_frzthawsom.OR.iErosionMode.EQ.ieros_frzthawsomeros)&
+        .AND.ABS(DORGC(LX)).GT.ZEROS(NY,NX))THEN
+        DDLEqv_OrgC=MWC2Soil*DORGC(LX)/((1.0_r8-SoilFracAsMacP(LX,NY,NX)) &
+          *SoiBulkDensityt0(LX,NY,NX))/AREA(3,LX,NY,NX)
 
         ! obtain diagnostics only for NX==1
 !        IF(NX.EQ.1)THEN

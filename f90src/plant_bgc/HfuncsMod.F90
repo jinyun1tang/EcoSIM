@@ -201,12 +201,10 @@ module HfuncsMod
           !the living plant has actual properties set
           IF(DATAP(NZ).NE.'NO'.AND.iPlantState_pft(NZ).EQ.iLive)then
             IsPlantActive(NZ)=iPlantIsActive
-            print*,'plant is activated',NZ
           endif
         ENDIF
       ELSE
         IsPlantActive(NZ)=iPlantIsDormant
-        print*,'plant is dormant',NZ
       ENDIF
     ELSE
       IF((I.LT.iDayPlanting_pft(NZ).AND.I.GT.iDayPlantHarvest_pft(NZ) &
@@ -223,12 +221,10 @@ module HfuncsMod
         ENDIF
         IF(DATAP(NZ).NE.'NO'.AND.iPlantState_pft(NZ).EQ.iLive)then
           IsPlantActive(NZ)=iPlantIsActive
-          print*,'plant is activated',NZ
         endif
       ENDIF
     ENDIF
     NumActivePlants=NumActivePlants+IsPlantActive(NZ)
-    print*,'NumActivePlants=',NumActivePlants
   ENDIF
   
   end associate
@@ -252,7 +248,7 @@ module HfuncsMod
     iPlantBranchState_brch   =>   plt_pheno%iPlantBranchState_brch  , &
     iPlantShootState_pft   =>   plt_pheno%iPlantShootState_pft  , &
     iPlantTurnoverPattern_pft  =>   plt_pheno%iPlantTurnoverPattern_pft , &
-    MinNonstructuralC4InitRoot     =>   plt_pheno%MinNonstructuralC4InitRoot    , &
+    MinNonstructuralC4InitRoot_pft     =>   plt_pheno%MinNonstructuralC4InitRoot_pft    , &
     MatureGroup_pft =>   plt_pheno%MatureGroup_pft, &
     MinNonstructalC4InitBranch     =>   plt_pheno%MinNonstructalC4InitBranch    , &
     PlantPopulation_pft      =>   plt_site%PlantPopulation_pft      , &
@@ -341,8 +337,8 @@ module HfuncsMod
       IF(PSIRootTurg_vr(ipltroot,NGTopRootLayer_pft(NZ),NZ).GT.PSIMin4LeafExpansion)THEN
         IF(NumRootAxes_pft(NZ).EQ.0 .OR.ShootNodeNumber_brch(NumOfMainBranch_pft(NZ),NZ).GT.NumRootAxes_pft(NZ)/FNOD(NZ)+XTLI(NZ))THEN
           IF((NumRootAxes_pft(NZ).EQ.0 .AND. NonstructalChemElmnts_pft(ielmc,NZ).GT.0.0_r8) &
-            .OR.(CanopyNonstructElementConc_pft(ielmc,NZ).GT.MinNonstructuralC4InitRoot(NZ) & 
-            .AND.MinNonstructuralC4InitRoot(NZ).GT.0.0_r8))THEN
+            .OR.(CanopyNonstructElementConc_pft(ielmc,NZ).GT.MinNonstructuralC4InitRoot_pft(NZ) & 
+            .AND.MinNonstructuralC4InitRoot_pft(NZ).GT.0.0_r8))THEN
             NumRootAxes_pft(NZ)=MIN(NumOfCanopyLayers1,NumRootAxes_pft(NZ)+1)
             iPlantRootState_pft(NZ)=iLive
           ENDIF
@@ -419,7 +415,6 @@ module HfuncsMod
   !find main branch number, which is the most recent live branch
   DO NB=1,NumOfBranches_pft(NZ)
     IF(iPlantBranchState_brch(NB,NZ).EQ.iLive)THEN
-      print*,'BranchNumber_brch(NB,NZ).LT.BranchNumber_pftX',BranchNumber_brch(NB,NZ),BranchNumber_pftX
       IF(BranchNumber_brch(NB,NZ).LT.BranchNumber_pftX)THEN
         NumOfMainBranch_pft(NZ)=NB
         BranchNumber_pftX=BranchNumber_brch(NB,NZ)

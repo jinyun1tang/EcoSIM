@@ -57,7 +57,6 @@ module InitEcoSIM
 
   subroutine InitModules2
 
-  use FlagDataType , only : ISALTG
   use TranspSaltMod   , only : InitTranspSalt
   use TranspNoSaltMod    , only : InitTranspNoSalt
 

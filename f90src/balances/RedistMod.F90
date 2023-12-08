@@ -16,6 +16,7 @@ module RedistMod
   USE SurfLitterDataType
   USE SoilHeatDataType
   USE EcoSIMCtrlDataType
+  use EcoSIMCtrlMod
   USE SoilBGCDataType
   USE EcosimBGCFluxType
   use PlantDataRateType
@@ -599,7 +600,8 @@ module RedistMod
   !
   ! INTERNAL SURFACE SEDIMENT TRANSPORT
   !
-  IF((IERSNG.EQ.1.OR.IERSNG.EQ.3).AND.ABS(TSEDER(NY,NX)).GT.ZEROS(NY,NX))THEN
+  IF((iErosionMode.EQ.ieros_frzthaweros.OR.iErosionMode.EQ.ieros_frzthawsomeros) &
+    .AND.ABS(TSEDER(NY,NX)).GT.ZEROS(NY,NX))THEN
     TSED(NY,NX)=TSED(NY,NX)+TSEDER(NY,NX)
     !
     !     SOIL MINERAL FRACTIONS
@@ -1489,7 +1491,7 @@ module RedistMod
   ORGN(L,NY,NX)=DN+ON
   ORGR(L,NY,NX)=DC
 
-  IF(IERSNG.EQ.2.OR.IERSNG.EQ.3)THEN
+  IF(iErosionMode.EQ.ieros_frzthawsom.OR.iErosionMode.EQ.ieros_frzthawsomeros)THEN
 ! change in organic C
     DORGCC=ORGCX(L,NY,NX)-ORGC(L,NY,NX)
     IF(L.EQ.NU(NY,NX))THEN

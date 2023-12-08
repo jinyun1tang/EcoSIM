@@ -23,6 +23,7 @@ module LateralTranspMod
   use EcoSIMConfig, only : nlbiomcp=>NumOfLiveMicrobiomComponents
   use ErosionBalMod
   use SnowBalanceMod
+  use EcoSIMCtrlMod
 implicit none
   private
   character(len=*), parameter :: mod_filename = &
@@ -331,7 +332,7 @@ implicit none
 !       :PCPM,PCPD,PCPH=precip CaH4P2O8,CaHPO4,apatite in non-band
 !       :PCPMB,PCPDB,PCPHB=precip CaH4P2O8,CaHPO4,apatite in band
 !
-  IF(N.NE.3.AND.(IERSNG.EQ.1.OR.IERSNG.EQ.3))THEN
+  IF(N.NE.3.AND.(iErosionMode.EQ.ieros_frzthaweros.OR.iErosionMode.EQ.ieros_frzthawsomeros))THEN
     !horizontal direction
     D9350: DO NN=1,2
       IF(ABS(cumSedErosion(N,NN,N2,N1)).GT.ZEROS(N2,N1) &

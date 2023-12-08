@@ -9,7 +9,7 @@ module EcoSIMDesctruct
 
   subroutine DestructEcoSIM
   use EcoSimSumDataType   , only : DestructEcoSimSum
-  use FlagDataType        , only : DestructFlagData,ISALTG
+  use FlagDataType        , only : DestructFlagData
   use WatsubDataMod       , only : DestructWatSubData
   use TranspSaltMod       , only : DestructTranspSalt
   use ErosionMod          , only : DestructErosion

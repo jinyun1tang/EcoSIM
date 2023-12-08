@@ -365,9 +365,9 @@ module NutUptakeMod
     RootAreaPerPlant_vr   =>  plt_morph%RootAreaPerPlant_vr     , &
     fTgrowRootP    =>  plt_pheno%fTgrowRootP      , &
     RootAutoRO2Limiter_pvr    =>  plt_rbgc%RootAutoRO2Limiter_pvr       , &
-    UPMXZO  =>  plt_rbgc%UPMXZO     , &
-    UPMNZO  =>  plt_rbgc%UPMNZO     , &
-    UPKMZO  =>  plt_rbgc%UPKMZO     , &
+    VmaxNO3Root_pft  =>  plt_rbgc%VmaxNO3Root_pft     , &
+    CminNO3Root_pft  =>  plt_rbgc%CminNO3Root_pft     , &
+    KmNO3Root_pft  =>  plt_rbgc%KmNO3Root_pft     , &
     RUCNOB  =>  plt_rbgc%RUCNOB     , &
     RUNNOP  =>  plt_rbgc%RUNNOP     , &
     RUCNO3  =>  plt_rbgc%RUCNO3     , &
@@ -399,12 +399,12 @@ module NutUptakeMod
   !
   !  VLNO3,VLNOB=fraction of soil volume in NO3 non-band,band
   !     CNO3S=NO3 concentration in non-band
-  !     UPMXZO,UPKMZO,UPMNZO=NO3 max uptake,Km,min concn from PFT file
+  !     VmaxNO3Root_pft,KmNO3Root_pft,CminNO3Root_pft=NO3 max uptake,Km,min concn from PFT file
   !     PerPlantRootH2OUptake=root water uptake per plant
   !     RMFNO3=soil-root convective NO3 flux per plant in non-band
   !     DIFNO3=soil-root NO3 diffusion per plant in non-band
   !
-  IF(trcs_VLN_vr(ids_NO3,L).GT.ZERO.AND.trc_solcl_vr(ids_NO3,L).GT.UPMNZO(N,NZ))THEN
+  IF(trcs_VLN_vr(ids_NO3,L).GT.ZERO.AND.trc_solcl_vr(ids_NO3,L).GT.CminNO3Root_pft(N,NZ))THEN
     RMFNO3=PerPlantRootH2OUptake*trcs_VLN_vr(ids_NO3,L)
     DIFNO3=DIFFL*trcs_VLN_vr(ids_NO3,L)
     !
@@ -418,7 +418,7 @@ module NutUptakeMod
     !     FCUP,FZUP=limitn to active uptake respiration from CCPOLR,CZPOLR
     !     RootAutoRO2Limiter_pvr=constraint by O2 consumption on all biological processes
     !
-    UPMXP=UPMXZO(N,NZ)*RootAreaPerPlant_vr(N,L,NZ) &
+    UPMXP=VmaxNO3Root_pft(N,NZ)*RootAreaPerPlant_vr(N,L,NZ) &
       *FWSRT*fTgrowRootP(L,NZ)*trcs_VLN_vr(ids_NO3,L)*AMIN1(FCUP,FZUP)
 
     !
@@ -429,7 +429,7 @@ module NutUptakeMod
     !     RMFNO3=soil-root convective N03 flux per plant in non-band
     !     DIFNO3=soil-root N03 diffusion per plant in non-band
     !     CNO3S=NO3 concentration in non-band
-    !     UPMXZO,UPKMZO,UPMNZO=NO3 max uptake,Km,min concn from PFT file
+    !     VmaxNO3Root_pft,KmNO3Root_pft,CminNO3Root_pft=NO3 max uptake,Km,min concn from PFT file
     !     RTKNO3,RTKNOP=NO3 uptake per plant in non-band lmtd,unlmtd by O2
     !     ZNO3M,ZNO3X=minimum,maximum NO3 available for uptake in non-band
     !     FNO3X=fraction of total NH4 uptake in non-band by root,myco populn
@@ -437,10 +437,10 @@ module NutUptakeMod
     !     RUONO3=NO3 uptake in non-band unlimited by O2
     !     RUCNO3=NO3 uptake in non-band unlimited by nonstructural C
 !
-    ZNO3M=UPMNZO(N,NZ)*VLWatMicP(L)*trcs_VLN_vr(ids_NO3,L)
+    ZNO3M=CminNO3Root_pft(N,NZ)*VLWatMicP(L)*trcs_VLN_vr(ids_NO3,L)
     ZNO3X=AZMAX1(FNO3X*(trc_solml_vr(ids_NO3,L)-ZNO3M))
 
-    PlantSoluteUptakeConfig%SoluteConcMin=UPMNZO(N,NZ)
+    PlantSoluteUptakeConfig%SoluteConcMin=CminNO3Root_pft(N,NZ)
     PlantSoluteUptakeConfig%SolAdvFlx = RMFNO3
     PlantSoluteUptakeConfig%SolDifusFlx = DIFNO3
     PlantSoluteUptakeConfig%UptakeRateMax = UPMXP
@@ -449,7 +449,7 @@ module NutUptakeMod
     PlantSoluteUptakeConfig%SoluteMassMax=ZNO3X
     PlantSoluteUptakeConfig%CAvailStress=FCUP
     PlantSoluteUptakeConfig%PlantPopulation= PlantPopulation_pft(NZ)
-    PlantSoluteUptakeConfig%SoluteKM=UPKMZO(N,NZ)
+    PlantSoluteUptakeConfig%SoluteKM=KmNO3Root_pft(N,NZ)
 
     call SoluteUptakeByPlantRoots(PlantSoluteUptakeConfig,RUNNOP(N,L,NZ),RootNutUptake_pvr(ids_NO3,N,L,NZ),&
       RootNutUptake_pvr(ids_NO3B,N,L,NZ),RUCNO3(N,L,NZ))
@@ -460,13 +460,13 @@ module NutUptakeMod
   !
   !     VLNO3,VLNOB=fraction of soil volume in NO3 non-band,band
   !     CNO3B=NO3 concentration in band
-  !     UPMXZO,UPKMZO,UPMNZO=NO3 max uptake,Km,min concn from PFT file
+  !     VmaxNO3Root_pft,KmNO3Root_pft,CminNO3Root_pft=NO3 max uptake,Km,min concn from PFT file
   !     PerPlantRootH2OUptake=root water uptake per plant
   !     RMFNOB=soil-root convective NO3 flux per plant in band
   !     DIFNOB=soil-root NO3 diffusion per plant in band
   !
 
-  IF(trcs_VLN_vr(ids_NO3B,L).GT.ZERO.AND.trc_solcl_vr(ids_NO3B,L).GT.UPMNZO(N,NZ))THEN
+  IF(trcs_VLN_vr(ids_NO3B,L).GT.ZERO.AND.trc_solcl_vr(ids_NO3B,L).GT.CminNO3Root_pft(N,NZ))THEN
     RMFNOB=PerPlantRootH2OUptake*trcs_VLN_vr(ids_NO3B,L)
     DIFNOB=DIFFL*trcs_VLN_vr(ids_NO3B,L)
     !
@@ -480,7 +480,7 @@ module NutUptakeMod
     !     FCUP,FZUP=limitn to active uptake respiration from CCPOLR,CZPOLR
     !     RootAutoRO2Limiter_pvr=constraint by O2 consumption on all biological processes
     !
-    UPMXP=UPMXZO(N,NZ)*RootAreaPerPlant_vr(N,L,NZ) &
+    UPMXP=VmaxNO3Root_pft(N,NZ)*RootAreaPerPlant_vr(N,L,NZ) &
       *FWSRT*fTgrowRootP(L,NZ)*trcs_VLN_vr(ids_NO3B,L)*AMIN1(FCUP,FZUP)
     !
     !     SOLUTION FOR MASS FLOW + DIFFUSION OF NO3 IN AQUEOUS PHASE OF
@@ -490,7 +490,7 @@ module NutUptakeMod
     !     RMFNOB=soil-root convective NO3 flux per plant in band
     !     DIFNOB=soil-root NO3 diffusion per plant in band
     !     CNO3B=NH4 concentration in band
-    !     UPMXZO,UPKMZO,UPMNZO=NO3 max uptake,Km,min concn from PFT file
+    !     VmaxNO3Root_pft,KmNO3Root_pft,CminNO3Root_pft=NO3 max uptake,Km,min concn from PFT file
     !     RTKNOB,RTKNPB=NO3 uptake per plant in band lmtd,unlmtd by O2
     !     ZNOBM,ZNOBX=minimum,maximum NO3 available for uptake in band
     !     FNOBX=fraction of total NO3 uptake in band by root,myco populn
@@ -498,10 +498,10 @@ module NutUptakeMod
     !     RUONOB=NO3 uptake in band unlimited by O2
     !     RUCNOB=NO3 uptake in band unlimited by nonstructural C
     !
-    ZNOBM=UPMNZO(N,NZ)*VLWatMicP(L)*trcs_VLN_vr(ids_NO3B,L)
+    ZNOBM=CminNO3Root_pft(N,NZ)*VLWatMicP(L)*trcs_VLN_vr(ids_NO3B,L)
     ZNOBX=AZMAX1(FNOBX*(trc_solml_vr(ids_NO3B,L)-ZNOBM))
 
-    PlantSoluteUptakeConfig%SoluteConcMin=UPMNZO(N,NZ)
+    PlantSoluteUptakeConfig%SoluteConcMin=CminNO3Root_pft(N,NZ)
     PlantSoluteUptakeConfig%SolAdvFlx = RMFNOB
     PlantSoluteUptakeConfig%SolDifusFlx = DIFNOB
     PlantSoluteUptakeConfig%UptakeRateMax = UPMXP
@@ -510,7 +510,7 @@ module NutUptakeMod
     PlantSoluteUptakeConfig%SoluteMassMax=ZNOBX
     PlantSoluteUptakeConfig%CAvailStress=FCUP
     PlantSoluteUptakeConfig%PlantPopulation= PlantPopulation_pft(NZ)
-    PlantSoluteUptakeConfig%SoluteKM=UPKMZO(N,NZ)
+    PlantSoluteUptakeConfig%SoluteKM=KmNO3Root_pft(N,NZ)
 
     call SoluteUptakeByPlantRoots(PlantSoluteUptakeConfig,RUNNXP(N,L,NZ),RUONOB(N,L,NZ),&
       RootNutUptake_pvr(ids_NO3B,N,L,NZ),RUCNOB(N,L,NZ))
@@ -542,9 +542,9 @@ module NutUptakeMod
     TortMicPM    =>  plt_site%TortMicPM       , &
     fTgrowRootP    =>  plt_pheno%fTgrowRootP      , &
     RootAutoRO2Limiter_pvr    =>  plt_rbgc%RootAutoRO2Limiter_pvr       , &
-    UPMNZH  =>  plt_rbgc%UPMNZH     , &
-    UPMXZH  =>  plt_rbgc%UPMXZH     , &
-    UPKMZH  =>  plt_rbgc%UPKMZH     , &
+    CMinNH4Root_pft  =>  plt_rbgc%CMinNH4Root_pft     , &
+    VmaxNH4Root_pft  =>  plt_rbgc%VmaxNH4Root_pft     , &
+    KmNH4Root_pft  =>  plt_rbgc%KmNH4Root_pft     , &
     RootNutUptake_pvr  =>  plt_rbgc%RootNutUptake_pvr     , &
     RUCNH4  =>  plt_rbgc%RUCNH4     , &
     RUONHB  =>  plt_rbgc%RUONHB     , &
@@ -573,12 +573,12 @@ module NutUptakeMod
 !
 ! VLNH4,VLNHB=fraction of soil volume in NH4 non-band,band
 ! CNH4S=NH4 concentration in non-band
-! UPMXZH,UPKMZH,UPMNZH=NH4 max uptake,Km,min concn from PFT file
+! VmaxNH4Root_pft,KmNH4Root_pft,CMinNH4Root_pft=NH4 max uptake,Km,min concn from PFT file
 ! PerPlantRootH2OUptake=root water uptake per plant
 ! RMFNH4=soil-root convective NH4 flux per plant in non-band
 ! DIFNH4=soil-root NH4 diffusion per plant in non-band
 !
-  IF(trcs_VLN_vr(ids_NH4,L).GT.ZERO.AND.trc_solcl_vr(ids_NH4,L).GT.UPMNZH(N,NZ))THEN
+  IF(trcs_VLN_vr(ids_NH4,L).GT.ZERO.AND.trc_solcl_vr(ids_NH4,L).GT.CMinNH4Root_pft(N,NZ))THEN
     RMFNH4=PerPlantRootH2OUptake*trcs_VLN_vr(ids_NH4,L)
     DIFNH4=DIFFL*trcs_VLN_vr(ids_NH4,L)
 !
@@ -592,7 +592,7 @@ module NutUptakeMod
 !   FCUP,FZUP=limitn to active uptake respiration from CCPOLR,CZPOLR
 !   RootAutoRO2Limiter_pvr=constraint by O2 consumption on all biological processes
 !
-    UPMXP=UPMXZH(N,NZ)*RootAreaPerPlant_vr(N,L,NZ) &
+    UPMXP=VmaxNH4Root_pft(N,NZ)*RootAreaPerPlant_vr(N,L,NZ) &
       *FWSRT*fTgrowRootP(L,NZ)*trcs_VLN_vr(ids_NH4,L)*AMIN1(FCUP,FZUP)
 !
 !   SOLUTION FOR MASS FLOW + DIFFUSION OF NH4 IN AQUEOUS PHASE OF
@@ -602,7 +602,7 @@ module NutUptakeMod
 !   RMFNH4=soil-root convective NH4 flux per plant in non-band
 !   DIFNH4=soil-root NH4 diffusion per plant in non-band
 !   CNH4S=NH4 concentration in non-band
-!   UPMXZH,UPKMZH,UPMNZH=NH4 max uptake,Km,min concn from PFT file
+!   VmaxNH4Root_pft,KmNH4Root_pft,CMinNH4Root_pft=NH4 max uptake,Km,min concn from PFT file
 !   RTKNH4,RTKNHP=NH4 uptake per plant in non-band lmtd,unlmtd by O2
 !   ZNH4M,ZNH4X=minimum,maximum NH4 available for uptake in non-band
 !   FNH4X=fraction of total NH4 uptake in non-band by root,myco populn
@@ -610,10 +610,10 @@ module NutUptakeMod
 !   RUONH4=NH4 uptake in non-band unlimited by O2
 !   RUCNH4=NH4 uptake in non-band unlimited by nonstructural C
 !
-    ZNH4M=UPMNZH(N,NZ)*VLWatMicP(L)*trcs_VLN_vr(ids_NH4,L)
+    ZNH4M=CMinNH4Root_pft(N,NZ)*VLWatMicP(L)*trcs_VLN_vr(ids_NH4,L)
     ZNH4X=AZMAX1(FNH4X*(trc_solml_vr(ids_NH4,L)-ZNH4M))
 
-    PlantSoluteUptakeConfig%SoluteConcMin=UPMNZH(N,NZ)
+    PlantSoluteUptakeConfig%SoluteConcMin=CMinNH4Root_pft(N,NZ)
     PlantSoluteUptakeConfig%SolAdvFlx = RMFNH4
     PlantSoluteUptakeConfig%SolDifusFlx = DIFNH4
     PlantSoluteUptakeConfig%UptakeRateMax = UPMXP
@@ -622,7 +622,7 @@ module NutUptakeMod
     PlantSoluteUptakeConfig%SoluteMassMax=ZNH4X
     PlantSoluteUptakeConfig%CAvailStress=FCUP
     PlantSoluteUptakeConfig%PlantPopulation= PlantPopulation_pft(NZ)
-    PlantSoluteUptakeConfig%SoluteKM=UPKMZH(N,NZ)
+    PlantSoluteUptakeConfig%SoluteKM=KmNH4Root_pft(N,NZ)
 
     call SoluteUptakeByPlantRoots(PlantSoluteUptakeConfig,RUNNHP(N,L,NZ),RUONH4(N,L,NZ),&
       RootNutUptake_pvr(ids_NH4,N,L,NZ),RUCNH4(N,L,NZ))
@@ -633,13 +633,13 @@ module NutUptakeMod
 !
 ! VLNH4,VLNHB=fraction of soil volume in NH4 non-band,band
 ! CNH4B=NH4 concentration in band
-! UPMXZH,UPKMZH,UPMNZH=NH4 max uptake,Km,min concn from PFT file
+! VmaxNH4Root_pft,KmNH4Root_pft,CMinNH4Root_pft=NH4 max uptake,Km,min concn from PFT file
 ! PerPlantRootH2OUptake=root water uptake per plant
 ! RMFNHB=soil-root convective NH4 flux per plant in band
 ! DIFNHB=soil-root NH4 diffusion per plant in band
 !
 
-  IF(trcs_VLN_vr(ids_NH4B,L).GT.ZERO.AND.trc_solcl_vr(ids_NH4B,L).GT.UPMNZH(N,NZ))THEN
+  IF(trcs_VLN_vr(ids_NH4B,L).GT.ZERO.AND.trc_solcl_vr(ids_NH4B,L).GT.CMinNH4Root_pft(N,NZ))THEN
     RMFNHB=PerPlantRootH2OUptake*trcs_VLN_vr(ids_NH4B,L)
     DIFNHB=DIFFL*trcs_VLN_vr(ids_NH4B,L)
 !
@@ -653,7 +653,7 @@ module NutUptakeMod
 !   FCUP,FZUP=limitn to active uptake respiration from CCPOLR,CZPOLR
 !   RootAutoRO2Limiter_pvr=constraint by O2 consumption on all biological processes
 !
-    UPMXP=UPMXZH(N,NZ)*RootAreaPerPlant_vr(N,L,NZ) &
+    UPMXP=VmaxNH4Root_pft(N,NZ)*RootAreaPerPlant_vr(N,L,NZ) &
       *FWSRT*fTgrowRootP(L,NZ)*trcs_VLN_vr(ids_NH4B,L)*AMIN1(FCUP,FZUP)
 !
 !   SOLUTION FOR MASS FLOW + DIFFUSION OF NH4 IN AQUEOUS PHASE OF
@@ -663,7 +663,7 @@ module NutUptakeMod
 !   RMFNHB=soil-root convective NH4 flux per plant in band
 !   DIFNHB=soil-root NH4 diffusion per plant in band
 !   CNH4B=NH4 concentration in band
-!   UPMXZH,UPKMZH,UPMNZH=NH4 max uptake,Km,min concn from PFT file
+!   VmaxNH4Root_pft,KmNH4Root_pft,CMinNH4Root_pft=NH4 max uptake,Km,min concn from PFT file
 !   RTKNHB,RTKNBP=NH4 uptake per plant in band lmtd,unlmtd by O2
 !   ZNHBM,ZNHBX=minimum,maximum NH4 available for uptake in band
 !   FNHBX=fraction of total NH4 uptake in band by root,myco populn
@@ -672,10 +672,10 @@ module NutUptakeMod
 !   RUCNHB=NH4 uptake in band unlimited by nonstructural C
 !
 
-    ZNHBM=UPMNZH(N,NZ)*VLWatMicP(L)*trcs_VLN_vr(ids_NH4B,L)
+    ZNHBM=CMinNH4Root_pft(N,NZ)*VLWatMicP(L)*trcs_VLN_vr(ids_NH4B,L)
     ZNHBX=AZMAX1(FNHBX*(trc_solml_vr(ids_NH4B,L)-ZNHBM))
 
-    PlantSoluteUptakeConfig%SoluteConcMin=UPMNZH(N,NZ)
+    PlantSoluteUptakeConfig%SoluteConcMin=CMinNH4Root_pft(N,NZ)
     PlantSoluteUptakeConfig%SolAdvFlx = RMFNHB
     PlantSoluteUptakeConfig%SolDifusFlx = DIFNHB
     PlantSoluteUptakeConfig%UptakeRateMax = UPMXP
@@ -684,7 +684,7 @@ module NutUptakeMod
     PlantSoluteUptakeConfig%SoluteMassMax=ZNHBX
     PlantSoluteUptakeConfig%CAvailStress=FCUP
     PlantSoluteUptakeConfig%PlantPopulation= PlantPopulation_pft(NZ)
-    PlantSoluteUptakeConfig%SoluteKM=UPKMZH(N,NZ)
+    PlantSoluteUptakeConfig%SoluteKM=KmNH4Root_pft(N,NZ)
 
     call SoluteUptakeByPlantRoots(PlantSoluteUptakeConfig,RUNNBP(N,L,NZ),RUONHB(N,L,NZ),&
       RootNutUptake_pvr(ids_NH4B,N,L,NZ),RUCNHB(N,L,NZ))
@@ -718,9 +718,9 @@ module NutUptakeMod
     ZERO    => plt_site%ZERO       , &
     fTgrowRootP    => plt_pheno%fTgrowRootP      , &
     RootAutoRO2Limiter_pvr    => plt_rbgc%RootAutoRO2Limiter_pvr       , &
-    UPMNPO  => plt_rbgc%UPMNPO     , &
-    UPKMPO  => plt_rbgc%UPKMPO     , &
-    UPMXPO  => plt_rbgc%UPMXPO     , &
+    CMinPO4Root_pft  => plt_rbgc%CMinPO4Root_pft     , &
+    KmPO4Root_pft  => plt_rbgc%KmPO4Root_pft     , &
+    VmaxPO4Root_pft  => plt_rbgc%VmaxPO4Root_pft     , &
     RUCH1P  => plt_rbgc%RUCH1P     , &
     RUOH1P  => plt_rbgc%RUOH1P     , &
     RUPP1P  => plt_rbgc%RUPP1P     , &
@@ -740,12 +740,12 @@ module NutUptakeMod
   !
   !     VLPO4,VLPOB=fraction of soil volume in H2PO4 non-band,band
   !     CH1P4=HPO4 concentration in non-band
-  !     UPMXPO,UPKMPO,UPMNPO=H2PO4 max uptake,Km,min concn from PFT file
+  !     VmaxPO4Root_pft,KmPO4Root_pft,CMinPO4Root_pft=H2PO4 max uptake,Km,min concn from PFT file
   !     PerPlantRootH2OUptake=root water uptake per plant > 0._r8
   !     RMFH1P=soil-root convective HPO4 flux per plant in non-band
   !     DIFH1P=soil-root HPO4 diffusion per plant in non-band > 0._r8
 !
-    IF(trcs_VLN_vr(ids_H1PO4,L).GT.ZERO.AND.trc_solcl_vr(ids_H1PO4,L).GT.UPMNPO(N,NZ))THEN
+    IF(trcs_VLN_vr(ids_H1PO4,L).GT.ZERO.AND.trc_solcl_vr(ids_H1PO4,L).GT.CMinPO4Root_pft(N,NZ))THEN
       RMFH1P=PerPlantRootH2OUptake*trcs_VLN_vr(ids_H1PO4,L)
       DIFH1P=DIFFL*trcs_VLN_vr(ids_H1PO4,L)
     !
@@ -759,7 +759,7 @@ module NutUptakeMod
     !     FCUP,FPUP=limitn to active uptake respiration from CCPOLR,CPPOLR
     !     RootAutoRO2Limiter_pvr=constraint by O2 consumption on all biological processes
     !
-    UPMXP=0.1_r8*UPMXPO(N,NZ)*RootAreaPerPlant_vr(N,L,NZ) &
+    UPMXP=0.1_r8*VmaxPO4Root_pft(N,NZ)*RootAreaPerPlant_vr(N,L,NZ) &
       *FWSRT*fTgrowRootP(L,NZ)*trcs_VLN_vr(ids_H1PO4,L)*AMIN1(FCUP,FPUP)
     !
     !     SOLUTION FOR MASS FLOW + DIFFUSION OF HPO4 IN AQUEOUS PHASE OF
@@ -769,7 +769,7 @@ module NutUptakeMod
     !     RMFH1P=soil-root convective HPO4 flux per plant in non-band
     !     DIFH1P=soil-root HPO4 diffusion per plant in non-band
     !     CH1P4=HPO4 concentration in non-band
-    !     UPMXPO,UPKMPO,UPMNPO=H2PO4 max uptake,Km,min concn from PFT file
+    !     VmaxPO4Root_pft,KmPO4Root_pft,CMinPO4Root_pft=H2PO4 max uptake,Km,min concn from PFT file
     !     RTKH1P,RTKHP1=HPO4 uptake per plant in non-band lmtd,unlmtd by O2
     !     H1POM,H1POX=minimum,maximum HPO4 available for uptake in non-band
     !     FP14X=fraction of total HPO4 uptake in non-band by root,myco populn
@@ -777,10 +777,10 @@ module NutUptakeMod
     !     RUOH1P=HPO4 uptake in non-band unlimited by O2
     !     RUCH1P=HPO4 uptake in non-band unlimited by nonstructural C
 
-    H1POM=UPMNPO(N,NZ)*VLWatMicP(L)*trcs_VLN_vr(ids_H1PO4,L)
+    H1POM=CMinPO4Root_pft(N,NZ)*VLWatMicP(L)*trcs_VLN_vr(ids_H1PO4,L)
     H1POX=AZMAX1(FP14X*(trc_solml_vr(ids_H1PO4,L)-H1POM))
 
-    PlantSoluteUptakeConfig%SoluteConcMin=UPMNPO(N,NZ)
+    PlantSoluteUptakeConfig%SoluteConcMin=CMinPO4Root_pft(N,NZ)
     PlantSoluteUptakeConfig%SolAdvFlx = RMFH1P
     PlantSoluteUptakeConfig%SolDifusFlx = DIFH1P
     PlantSoluteUptakeConfig%UptakeRateMax = UPMXP
@@ -789,7 +789,7 @@ module NutUptakeMod
     PlantSoluteUptakeConfig%SoluteMassMax=H1POX
     PlantSoluteUptakeConfig%CAvailStress=FCUP
     PlantSoluteUptakeConfig%PlantPopulation= PlantPopulation_pft(NZ)
-    PlantSoluteUptakeConfig%SoluteKM=UPKMPO(N,NZ)
+    PlantSoluteUptakeConfig%SoluteKM=KmPO4Root_pft(N,NZ)
 
     call SoluteUptakeByPlantRoots(PlantSoluteUptakeConfig,RUPP1P(N,L,NZ),RUOH1P(N,L,NZ),&
       RootNutUptake_pvr(ids_H1PO4,N,L,NZ),RUCH1P(N,L,NZ))
@@ -800,12 +800,12 @@ module NutUptakeMod
   !
   !     VLPO4,VLPOB=fraction of soil volume in H2PO4 non-band,band
   !     CH1P4B=HPO4 concentration in band
-  !     UPMXPO,UPKMPO,UPMNPO=H2PO4 max uptake,Km,min concn from PFT file
+  !     VmaxPO4Root_pft,KmPO4Root_pft,CMinPO4Root_pft=H2PO4 max uptake,Km,min concn from PFT file
   !     PerPlantRootH2OUptake=root water uptake per plant
   !     RMFH1B=soil-root convective HPO4 flux per plant in band
   !     DIFH1B=soil-root HPO4 diffusion per plant in band
   !
-  IF(trcs_VLN_vr(ids_H1PO4B,L).GT.ZERO.AND.trc_solcl_vr(ids_H1PO4B,L).GT.UPMNPO(N,NZ))THEN
+  IF(trcs_VLN_vr(ids_H1PO4B,L).GT.ZERO.AND.trc_solcl_vr(ids_H1PO4B,L).GT.CMinPO4Root_pft(N,NZ))THEN
     RMFH2B=PerPlantRootH2OUptake*trcs_VLN_vr(ids_H1PO4B,L)
     DIFH1B=DIFFL*trcs_VLN_vr(ids_H1PO4B,L)
     !
@@ -819,7 +819,7 @@ module NutUptakeMod
     !     FCUP,FPUP=limitn to active uptake respiration from CCPOLR,CPPOLR
     !     RootAutoRO2Limiter_pvr=constraint by O2 consumption on all biological processes
     !
-    UPMXP=0.1_r8*UPMXPO(N,NZ)*RootAreaPerPlant_vr(N,L,NZ) &
+    UPMXP=0.1_r8*VmaxPO4Root_pft(N,NZ)*RootAreaPerPlant_vr(N,L,NZ) &
       *FWSRT*fTgrowRootP(L,NZ)*trcs_VLN_vr(ids_H1PO4B,L)*AMIN1(FCUP,FPUP)
     !
     !     SOLUTION FOR MASS FLOW + DIFFUSION OF HPO4 IN AQUEOUS PHASE OF
@@ -829,7 +829,7 @@ module NutUptakeMod
     !     RMFH1B=soil-root convective HPO4 flux per plant in band
     !     DIFH1B=soil-root HPO4 diffusion per plant in band
     !     CH1P4B=HPO4 concentration in band
-    !     UPMXPO,UPKMPO,UPMNPO=H2PO4 max uptake,Km,min concn from PFT file
+    !     VmaxPO4Root_pft,KmPO4Root_pft,CMinPO4Root_pft=H2PO4 max uptake,Km,min concn from PFT file
     !     RTKH1B,RTKHB1=HPO4 uptake per plant in band lmtd,unlmtd by O2
     !     H1PXM,H1PXB=minimum,maximum HPO4 available for uptake in band
     !     FP1BX=fraction of total HPO4 uptake in band by root,myco populn
@@ -837,10 +837,10 @@ module NutUptakeMod
     !     RUOH1B=HPO4 uptake in band unlimited by O2
     !     RUCH1B=HPO4 uptake in band unlimited by nonstructural C
 
-    H1PXM=UPMNPO(N,NZ)*VLWatMicP(L)*trcs_VLN_vr(ids_H1PO4B,L)
+    H1PXM=CMinPO4Root_pft(N,NZ)*VLWatMicP(L)*trcs_VLN_vr(ids_H1PO4B,L)
     H1PXB=AZMAX1(FP1BX*(trc_solml_vr(ids_H1PO4B,L)-H1PXM))
 
-    PlantSoluteUptakeConfig%SoluteConcMin=UPMNPO(N,NZ)
+    PlantSoluteUptakeConfig%SoluteConcMin=CMinPO4Root_pft(N,NZ)
     PlantSoluteUptakeConfig%SolAdvFlx = RMFH2B
     PlantSoluteUptakeConfig%SolDifusFlx = DIFH1B
     PlantSoluteUptakeConfig%UptakeRateMax = UPMXP
@@ -849,7 +849,7 @@ module NutUptakeMod
     PlantSoluteUptakeConfig%SoluteMassMax=H1PXB
     PlantSoluteUptakeConfig%CAvailStress=FCUP
     PlantSoluteUptakeConfig%PlantPopulation= PlantPopulation_pft(NZ)
-    PlantSoluteUptakeConfig%SoluteKM=UPKMPO(N,NZ)
+    PlantSoluteUptakeConfig%SoluteKM=KmPO4Root_pft(N,NZ)
 
     call SoluteUptakeByPlantRoots(PlantSoluteUptakeConfig,RUPP1B(N,L,NZ),RUOH1B(N,L,NZ),&
       RootNutUptake_pvr(ids_H1PO4B,N,L,NZ),RUCH1B(N,L,NZ))
@@ -878,9 +878,9 @@ module NutUptakeMod
     PlantPopulation_pft      => plt_site%PlantPopulation_pft         , &
     ZERO    => plt_site%ZERO       , &
     RootAutoRO2Limiter_pvr    => plt_rbgc%RootAutoRO2Limiter_pvr       , &
-    UPKMPO  => plt_rbgc%UPKMPO     , &
-    UPMXPO  => plt_rbgc%UPMXPO     , &
-    UPMNPO  => plt_rbgc%UPMNPO     , &
+    KmPO4Root_pft  => plt_rbgc%KmPO4Root_pft     , &
+    VmaxPO4Root_pft  => plt_rbgc%VmaxPO4Root_pft     , &
+    CMinPO4Root_pft  => plt_rbgc%CMinPO4Root_pft     , &
     RUCH2B  => plt_rbgc%RUCH2B     , &
     RUOH2B  => plt_rbgc%RUOH2B     , &
     RootNutUptake_pvr  => plt_rbgc%RootNutUptake_pvr     , &
@@ -899,12 +899,12 @@ module NutUptakeMod
   !
   !     VLPO4,VLPOB=fraction of soil volume in H2PO4 non-band,band
   !     CH2P4=H2PO4 concentration in non-band
-  !     UPMXPO,UPKMPO,UPMNPO=H2PO4 max uptake,Km,min concn from PFT file
+  !     VmaxPO4Root_pft,KmPO4Root_pft,CMinPO4Root_pft=H2PO4 max uptake,Km,min concn from PFT file
   !     PerPlantRootH2OUptake=root water uptake per plant
   !     RMFH2P=soil-root convective H2PO4 flux per plant in non-band
   !     DIFH2P=soil-root H2PO4 diffusion per plant in non-band
 !
-    IF(trcs_VLN_vr(ids_H1PO4,L).GT.ZERO.AND.trc_solcl_vr(ids_H2PO4,L).GT.UPMNPO(N,NZ))THEN
+    IF(trcs_VLN_vr(ids_H1PO4,L).GT.ZERO.AND.trc_solcl_vr(ids_H2PO4,L).GT.CMinPO4Root_pft(N,NZ))THEN
       RMFH2P=PerPlantRootH2OUptake*trcs_VLN_vr(ids_H1PO4,L)
       DIFH2P=DIFFL*trcs_VLN_vr(ids_H1PO4,L)
       !
@@ -918,7 +918,7 @@ module NutUptakeMod
       !     FCUP,FPUP=limitn to active uptake respiration from CCPOLR,CPPOLR
       !     RootAutoRO2Limiter_pvr=constraint by O2 consumption on all biological processes
 !
-      UPMXP=UPMXPO(N,NZ)*RootAreaPerPlant_vr(N,L,NZ) &
+      UPMXP=VmaxPO4Root_pft(N,NZ)*RootAreaPerPlant_vr(N,L,NZ) &
         *FWSRT*fTgrowRootP(L,NZ)*trcs_VLN_vr(ids_H1PO4,L)*AMIN1(FCUP,FPUP)
       !
       !     SOLUTION FOR MASS FLOW + DIFFUSION OF H2PO4 IN AQUEOUS PHASE OF
@@ -928,7 +928,7 @@ module NutUptakeMod
       !     RMFH2P=soil-root convective H2PO4 flux per plant in non-band
       !     DIFH2P=soil-root H2PO4 diffusion per plant in non-band
       !     CH2P4=H2PO4 concentration in non-band
-      !     UPMXPO,UPKMPO,UPMNPO=H2PO4 max uptake,Km,min concn from PFT file
+      !     VmaxPO4Root_pft,KmPO4Root_pft,CMinPO4Root_pft=H2PO4 max uptake,Km,min concn from PFT file
       !     RTKH2P,RTKHPP=H2PO4 uptake per plant in non-band lmtd,unlmtd by O2
       !     H2POM,H2POX=minimum,maximum H2PO4 available for uptake in non-band
       !     FPO4X=fraction of total H2PO4 uptake in non-band by root,myco populn
@@ -936,10 +936,10 @@ module NutUptakeMod
       !     RUOH2P=H2PO4 uptake in non-band unlimited by O2
       !     RUCH2P=H2PO4 uptake in non-band unlimited by nonstructural C
 
-      H2POM=UPMNPO(N,NZ)*VLWatMicP(L)*trcs_VLN_vr(ids_H1PO4,L)
+      H2POM=CMinPO4Root_pft(N,NZ)*VLWatMicP(L)*trcs_VLN_vr(ids_H1PO4,L)
       H2POX=AZMAX1(FPO4X*(trc_solml_vr(ids_H2PO4,L)-H2POM))
 
-      PlantSoluteUptakeConfig%SoluteConcMin=UPMNPO(N,NZ)
+      PlantSoluteUptakeConfig%SoluteConcMin=CMinPO4Root_pft(N,NZ)
       PlantSoluteUptakeConfig%SolAdvFlx = RMFH2P
       PlantSoluteUptakeConfig%SolDifusFlx = DIFH2P
       PlantSoluteUptakeConfig%UptakeRateMax = UPMXP
@@ -948,7 +948,7 @@ module NutUptakeMod
       PlantSoluteUptakeConfig%SoluteMassMax=H2POX
       PlantSoluteUptakeConfig%CAvailStress=FCUP
       PlantSoluteUptakeConfig%PlantPopulation= PlantPopulation_pft(NZ)
-      PlantSoluteUptakeConfig%SoluteKM=UPKMPO(N,NZ)
+      PlantSoluteUptakeConfig%SoluteKM=KmPO4Root_pft(N,NZ)
 
       call SoluteUptakeByPlantRoots(PlantSoluteUptakeConfig,RUPP2P(N,L,NZ),RUOH2P(N,L,NZ),&
         RootNutUptake_pvr(ids_H2PO4,N,L,NZ),RUCH2P(N,L,NZ))
@@ -959,13 +959,13 @@ module NutUptakeMod
     !
     !     VLPO4,VLPOB=fraction of soil volume in H2PO4 non-band,band
     !     CH2P4B=H2PO4 concentration in band
-    !     UPMXPO,UPKMPO,UPMNPO=H2PO4 max uptake,Km,min concn from PFT file
+    !     VmaxPO4Root_pft,KmPO4Root_pft,CMinPO4Root_pft=H2PO4 max uptake,Km,min concn from PFT file
     !     PerPlantRootH2OUptake=root water uptake per plant
     !     RMFH2B=soil-root convective H2PO4 flux per plant in band
     !     DIFH2B=soil-root H2PO4 diffusion per plant in band
     !
 
-  IF(trcs_VLN_vr(ids_H1PO4B,L).GT.ZERO.AND.trc_solcl_vr(ids_H2PO4B,L).GT.UPMNPO(N,NZ))THEN
+  IF(trcs_VLN_vr(ids_H1PO4B,L).GT.ZERO.AND.trc_solcl_vr(ids_H2PO4B,L).GT.CMinPO4Root_pft(N,NZ))THEN
     RMFH2B=PerPlantRootH2OUptake*trcs_VLN_vr(ids_H1PO4B,L)
     DIFH2B=DIFFL*trcs_VLN_vr(ids_H1PO4B,L)
     !
@@ -979,7 +979,7 @@ module NutUptakeMod
     !     FCUP,FPUP=limitn to active uptake respiration from CCPOLR,CPPOLR
     !     RootAutoRO2Limiter_pvr=constraint by O2 consumption on all biological processes
     !
-    UPMXP=UPMXPO(N,NZ)*RootAreaPerPlant_vr(N,L,NZ) &
+    UPMXP=VmaxPO4Root_pft(N,NZ)*RootAreaPerPlant_vr(N,L,NZ) &
       *FWSRT*fTgrowRootP(L,NZ)*trcs_VLN_vr(ids_H1PO4B,L)*AMIN1(FCUP,FPUP)
 
     !
@@ -990,7 +990,7 @@ module NutUptakeMod
     !     RMFH2B=soil-root convective H2PO4 flux per plant in band
     !     DIFH2B=soil-root H2PO4 diffusion per plant in band
     !     CH2P4B=H2PO4 concentration in band
-    !     UPMXPO,UPKMPO,UPMNPO=H2PO4 max uptake,Km,min concn from PFT file
+    !     VmaxPO4Root_pft,KmPO4Root_pft,CMinPO4Root_pft=H2PO4 max uptake,Km,min concn from PFT file
     !     RTKH2B,RTKHPB=H2PO4 uptake per plant in band lmtd,unlmtd by O2
     !     H2PXM,H2PXB=minimum,maximum H2PO4 available for uptake in band
     !     FPOBX=fraction of total H2PO4 uptake in band by root,myco populn
@@ -998,10 +998,10 @@ module NutUptakeMod
     !     RUOH2B=H2PO4 uptake in band unlimited by O2
     !     RUCH2B=H2PO4 uptake in band unlimited by nonstructural C
 
-    H2PXM=UPMNPO(N,NZ)*VLWatMicP(L)*trcs_VLN_vr(ids_H1PO4B,L)
+    H2PXM=CMinPO4Root_pft(N,NZ)*VLWatMicP(L)*trcs_VLN_vr(ids_H1PO4B,L)
     H2PXB=AZMAX1(FPOBX*(trc_solml_vr(ids_H2PO4B,L)-H2PXM))
 
-    PlantSoluteUptakeConfig%SoluteConcMin=UPMNPO(N,NZ)
+    PlantSoluteUptakeConfig%SoluteConcMin=CMinPO4Root_pft(N,NZ)
     PlantSoluteUptakeConfig%SolAdvFlx = RMFH2B
     PlantSoluteUptakeConfig%SolDifusFlx = DIFH2B
     PlantSoluteUptakeConfig%UptakeRateMax = UPMXP
@@ -1010,7 +1010,7 @@ module NutUptakeMod
     PlantSoluteUptakeConfig%SoluteMassMax=H2PXB
     PlantSoluteUptakeConfig%CAvailStress=FCUP
     PlantSoluteUptakeConfig%PlantPopulation= PlantPopulation_pft(NZ)
-    PlantSoluteUptakeConfig%SoluteKM=UPKMPO(N,NZ)
+    PlantSoluteUptakeConfig%SoluteKM=KmPO4Root_pft(N,NZ)
 
     call SoluteUptakeByPlantRoots(PlantSoluteUptakeConfig,RUPP2B(N,L,NZ),RUOH2B(N,L,NZ),&
       RootNutUptake_pvr(ids_H2PO4B,N,L,NZ),RUCH2B(N,L,NZ))

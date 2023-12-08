@@ -13,6 +13,7 @@ module RunoffBalMod
   USE AqueChemDatatype
   USE EcoSIMCtrlDataType
   USE GridDataType
+  use EcoSIMCtrlMod
   use EcoSIMConfig, only : jcplx => jcplxc
   use EcosimConst, only : patomw,natomw
 implicit none
@@ -200,7 +201,6 @@ implicit none
 !
 !     RUNOFF BOUNDARY FLUXES OF SOLUTES
 !
-!     ISALTG=salt flag
 !     XQR*,XQS*=solute loss in runoff,snow drift from TranspSalt.f
 !     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
 !          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
@@ -286,12 +286,12 @@ implicit none
 !
 !     RUNOFF BOUNDARY FLUXES OF SEDIMENT FROM EROSION
 !
-!     IERSNG=erosion flag
+!     iErosionMode=erosion flag
 !     *ER=sediment flux from erosion.f
 !     sediment code:XSED=total,XSAN=sand,XSIL=silt,XCLA=clay
 !     TSEDOU,USEDOU=cumulative sediment loss through lateral and lower boundaries
 !
-      IF(N.NE.3.AND.IERSNG.EQ.1.OR.IERSNG.EQ.3)THEN
+      IF(N.NE.3.AND.iErosionMode.EQ.ieros_frzthaweros.OR.iErosionMode.EQ.ieros_frzthawsomeros)THEN
         IF(ABS(cumSedErosion(N,NN,N5,N4)).GT.ZEROS(N5,N4))THEN
           ER=XN*cumSedErosion(N,NN,N5,N4)
           TSEDOU=TSEDOU-ER
@@ -385,7 +385,6 @@ implicit none
 !
 !         ADSORBED AND PRECIPITATED SALTS IN RUNOFF SEDIMENTS
 
-!         ISALTG=salt flag
 !         *ER=sediment flux from erosion.f
 !         sediment code
 !           :NH4,NH3,NHU,NO3=fertilizer NH4,NH3,urea,NO3 in non-band

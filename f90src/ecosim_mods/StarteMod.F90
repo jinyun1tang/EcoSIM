@@ -164,7 +164,7 @@ module StarteMod
             solutevar%GKCM  = GKCM(L,NY,NX)
             solutevar%VLWatMicP = VLWatMicP(L,NY,NX)
 
-            call InitSoluteModel(K,BulkSoilMass,ISALTG,solutevar)
+            call InitSoluteModel(K,BulkSoilMass,solutevar)
 
             call InitSoluteConcs(K,I,L,NY,NX,solutevar)
           ENDDO

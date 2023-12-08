@@ -7,6 +7,7 @@ module Hour1Mod
   use TracerPropMod
   use TracerIDMod
   use EcoSimConst
+  use EcoSIMCtrlMod
   use MiniFuncMod
   use SoilHydroParaMod
   use PlantAPI, only : PlantCanopyRadsModel
@@ -166,7 +167,7 @@ module Hour1Mod
 !     IF SOC FLAG IS SET
 !
 
-      IF(IERSNG.EQ.2.OR.IERSNG.EQ.3)THEN
+      IF(iErosionMode.EQ.ieros_frzthawsom.OR.iErosionMode.EQ.ieros_frzthawsomeros)THEN
         call UpdateTotalSOC(NY,NX)
       ENDIF
 
@@ -433,7 +434,7 @@ module Hour1Mod
 
 !     IF EROSION FLAG SET
 !
-  IF(IERSNG.EQ.1.OR.IERSNG.EQ.3)THEN
+  IF(iErosionMode.EQ.ieros_frzthaweros.OR.iErosionMode.EQ.ieros_frzthawsomeros)THEN
     DO NX=NHW,NHE+extragrid
       DO NY=NVN,NVS+extragrid
         cumSedErosion(1:2,1:2,NY,NX)=0.0_r8
@@ -954,7 +955,7 @@ module Hour1Mod
     CCLAY(NU(NY,NX),NY,NX)=0.0_r8
   ENDIF
   
-  IF(IERSNG.EQ.2.OR.IERSNG.EQ.3)THEN
+  IF(iErosionMode.EQ.ieros_frzthawsom.OR.iErosionMode.EQ.ieros_frzthawsomeros)THEN
     D50=1.0_r8*CCLAY(NU(NY,NX),NY,NX)+10.0_r8*CSILT(NU(NY,NX),NY,NX) &
       +100.0_r8*CSAND(NU(NY,NX),NY,NX)+100.0_r8*CORGM
     ZD50=0.041*(ppmc*D50)**0.167_r8

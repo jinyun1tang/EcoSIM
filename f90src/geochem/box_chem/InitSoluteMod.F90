@@ -207,13 +207,13 @@ module InitSoluteMod
   end subroutine InitSoluteProperty
 !------------------------------------------------------------------------------------------
 
-  SUBROUTINE InitSoluteModel(K,BulkSoilMass,ISALTG,solutevar)
+  SUBROUTINE InitSoluteModel(K,BulkSoilMass,solutevar)
 !
 !     THIS SUBROUTINE INITIALIZES ALL SOIL CHEMISTRY VARIABLES
 !
 
   implicit none
-  integer, intent(in) :: K,ISALTG
+  integer, intent(in) :: K
   real(r8), intent(in) :: BulkSoilMass
   type(solutedtype), target, intent(inout) :: solutevar
 
@@ -345,7 +345,7 @@ module InitSoluteMod
   ZEROS     => solutevar%ZEROS
   VLWatMicP      => solutevar%VLWatMicP
 
-  call InitEquilibria(K,BulkSoilMass,ISALTG)
+  call InitEquilibria(K,BulkSoilMass)
 !
 !     CONVERGE TOWARDS ALL SOLUBILITY EQUILIBRIA
 !     IF SALT OPTION IS SELECTED
@@ -366,10 +366,10 @@ module InitSoluteMod
   end SUBROUTINE InitSoluteModel
 !------------------------------------------------------------------------------------------
 
-  subroutine InitEquilibria(K,BulkSoilMass,ISALTG)
+  subroutine InitEquilibria(K,BulkSoilMass)
 
   implicit none
-  integer, intent(in) :: K,ISALTG
+  integer, intent(in) :: K
   real(r8), intent(in) :: BulkSoilMass
   integer :: MM
   real(r8) :: XNAQ,XPT,XN4Q,XMGQ,XKAQ,XHYQ,XFEQ

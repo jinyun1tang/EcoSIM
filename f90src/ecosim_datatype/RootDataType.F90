@@ -16,7 +16,7 @@ module RootDataType
   integer,target,allocatable ::  NIXBotRootLayer_pft(:,:,:)              !maximum soil layer number for all root axes, [-]
   integer,target,allocatable ::  NI(:,:,:)                           !maximum soil layer number for all root axes, [-]
   real(r8),target,allocatable ::  RootBiomGrowthYield(:,:,:)                        !root growth yield, [g g-1]
-  real(r8),target,allocatable ::  MinNonstructuralC4InitRoot(:,:,:)                          !threshold root nonstructural C content for initiating new root axis, [g g-1]
+  real(r8),target,allocatable ::  MinNonstructuralC4InitRoot_pft(:,:,:)                          !threshold root nonstructural C content for initiating new root axis, [g g-1]
   real(r8),target,allocatable ::  RootFracRemobilizableBiom(:,:,:)                       !fraction of remobilizable nonstructural biomass in root, [-]
   real(r8),target,allocatable ::  RootVolPerMassC_pft(:,:,:,:)                      !root volume:mass ratio, [m3 g-1]
   real(r8),target,allocatable ::  Max1stRootRadius1(:,:,:,:)                    !root diameter primary axes, [m]
@@ -29,16 +29,16 @@ module RootDataType
   real(r8),target,allocatable ::  RootPorosity(:,:,:,:)                      !root porosity, [m3 m-3]
   real(r8),target,allocatable ::  RSRR(:,:,:,:)                      !root radial resistivity, [MPa h m-2]
   real(r8),target,allocatable ::  RSRA(:,:,:,:)                      !root axial resistivity, [MPa h m-4]
-  real(r8),target,allocatable ::  ShutRutNonstructElmntConducts(:,:,:)                       !shoot-root rate constant for nonstructural C exchange, [h-1]
-  real(r8),target,allocatable ::  UPMXZH(:,:,:,:)                    !maximum root NH4 uptake rate, [g m-2 h-1]
-  real(r8),target,allocatable ::  UPKMZH(:,:,:,:)                    !Km for root NH4 uptake, [g m-3]
-  real(r8),target,allocatable ::  UPMNZH(:,:,:,:)                    !minimum NH4 concentration for root NH4 uptake, [g m-3]
-  real(r8),target,allocatable ::  UPMXZO(:,:,:,:)                    !maximum root NO3 uptake rate, [g m-2 h-1]
-  real(r8),target,allocatable ::  UPKMZO(:,:,:,:)                    !Km for root NO3 uptake, [g m-3]
-  real(r8),target,allocatable ::  UPMNZO(:,:,:,:)                    !minimum NO3 concentration for root NH4 uptake, [g m-3]
-  real(r8),target,allocatable ::  UPMXPO(:,:,:,:)                    !maximum root PO4 uptake rate, [g m-2 h-1]
-  real(r8),target,allocatable ::  UPKMPO(:,:,:,:)                    !Km for root PO4 uptake, [g m-3]
-  real(r8),target,allocatable ::  UPMNPO(:,:,:,:)                    !minimum PO4 concentration for root NH4 uptake, [g m-3]
+  real(r8),target,allocatable ::  ShutRutNonstructElmntConducts_pft(:,:,:)                       !shoot-root rate constant for nonstructural C exchange, [h-1]
+  real(r8),target,allocatable ::  VmaxNH4Root_pft(:,:,:,:)                    !maximum root NH4 uptake rate, [g m-2 h-1]
+  real(r8),target,allocatable ::  KmNH4Root_pft(:,:,:,:)                    !Km for root NH4 uptake, [g m-3]
+  real(r8),target,allocatable ::  CMinNH4Root_pft(:,:,:,:)                    !minimum NH4 concentration for root NH4 uptake, [g m-3]
+  real(r8),target,allocatable ::  VmaxNO3Root_pft(:,:,:,:)                    !maximum root NO3 uptake rate, [g m-2 h-1]
+  real(r8),target,allocatable ::  KmNO3Root_pft(:,:,:,:)                    !Km for root NO3 uptake, [g m-3]
+  real(r8),target,allocatable ::  CminNO3Root_pft(:,:,:,:)                    !minimum NO3 concentration for root NH4 uptake, [g m-3]
+  real(r8),target,allocatable ::  VmaxPO4Root_pft(:,:,:,:)                    !maximum root PO4 uptake rate, [g m-2 h-1]
+  real(r8),target,allocatable ::  KmPO4Root_pft(:,:,:,:)                    !Km for root PO4 uptake, [g m-3]
+  real(r8),target,allocatable ::  CMinPO4Root_pft(:,:,:,:)                    !minimum PO4 concentration for root NH4 uptake, [g m-3]
   real(r8),target,allocatable ::  RRADP(:,:,:,:)                     !root internal radius, [m]
   real(r8),target,allocatable ::  CNRTS(:,:,:)                       !root N:C ratio x root growth yield, [-]
   real(r8),target,allocatable ::  CPRTS(:,:,:)                       !root P:C ratio x root growth yield, [-]
@@ -98,7 +98,7 @@ contains
   allocate(NIXBotRootLayer_pft(JP,JY,JX));      NIXBotRootLayer_pft=0
   allocate(NI(JP,JY,JX));       NI=0
   allocate(RootBiomGrowthYield(JP,JY,JX));     RootBiomGrowthYield=0._r8
-  allocate(MinNonstructuralC4InitRoot(JP,JY,JX));       MinNonstructuralC4InitRoot=0._r8
+  allocate(MinNonstructuralC4InitRoot_pft(JP,JY,JX));       MinNonstructuralC4InitRoot_pft=0._r8
   allocate(RootFracRemobilizableBiom(JP,JY,JX));    RootFracRemobilizableBiom=0._r8
   allocate(RootVolPerMassC_pft(jroots,JP,JY,JX));   RootVolPerMassC_pft=0._r8
   allocate(Max1stRootRadius1(jroots,JP,JY,JX)); Max1stRootRadius1=0._r8
@@ -111,16 +111,16 @@ contains
   allocate(RootPorosity(jroots,JP,JY,JX));   RootPorosity=0._r8
   allocate(RSRR(jroots,JP,JY,JX));   RSRR=0._r8
   allocate(RSRA(jroots,JP,JY,JX));   RSRA=0._r8
-  allocate(ShutRutNonstructElmntConducts(JP,JY,JX));    ShutRutNonstructElmntConducts=0._r8
-  allocate(UPMXZH(jroots,JP,JY,JX)); UPMXZH=0._r8
-  allocate(UPKMZH(jroots,JP,JY,JX)); UPKMZH=0._r8
-  allocate(UPMNZH(jroots,JP,JY,JX)); UPMNZH=0._r8
-  allocate(UPMXZO(jroots,JP,JY,JX)); UPMXZO=0._r8
-  allocate(UPKMZO(jroots,JP,JY,JX)); UPKMZO=0._r8
-  allocate(UPMNZO(jroots,JP,JY,JX)); UPMNZO=0._r8
-  allocate(UPMXPO(jroots,JP,JY,JX)); UPMXPO=0._r8
-  allocate(UPKMPO(jroots,JP,JY,JX)); UPKMPO=0._r8
-  allocate(UPMNPO(jroots,JP,JY,JX)); UPMNPO=0._r8
+  allocate(ShutRutNonstructElmntConducts_pft(JP,JY,JX));    ShutRutNonstructElmntConducts_pft=0._r8
+  allocate(VmaxNH4Root_pft(jroots,JP,JY,JX)); VmaxNH4Root_pft=0._r8
+  allocate(KmNH4Root_pft(jroots,JP,JY,JX)); KmNH4Root_pft=0._r8
+  allocate(CMinNH4Root_pft(jroots,JP,JY,JX)); CMinNH4Root_pft=0._r8
+  allocate(VmaxNO3Root_pft(jroots,JP,JY,JX)); VmaxNO3Root_pft=0._r8
+  allocate(KmNO3Root_pft(jroots,JP,JY,JX)); KmNO3Root_pft=0._r8
+  allocate(CminNO3Root_pft(jroots,JP,JY,JX)); CminNO3Root_pft=0._r8
+  allocate(VmaxPO4Root_pft(jroots,JP,JY,JX)); VmaxPO4Root_pft=0._r8
+  allocate(KmPO4Root_pft(jroots,JP,JY,JX)); KmPO4Root_pft=0._r8
+  allocate(CMinPO4Root_pft(jroots,JP,JY,JX)); CMinPO4Root_pft=0._r8
   allocate(RRADP(jroots,JP,JY,JX));  RRADP=0._r8
   allocate(CNRTS(JP,JY,JX));    CNRTS=0._r8
   allocate(CPRTS(JP,JY,JX));    CPRTS=0._r8
@@ -178,7 +178,7 @@ contains
   call destroy(NIXBotRootLayer_pft)
   call destroy(NI)
   call destroy(RootBiomGrowthYield)
-  call destroy(MinNonstructuralC4InitRoot)
+  call destroy(MinNonstructuralC4InitRoot_pft)
   call destroy(RootFracRemobilizableBiom)
   call destroy(RootVolPerMassC_pft)
   call destroy(Max1stRootRadius1)
@@ -191,16 +191,16 @@ contains
   call destroy(RootPorosity)
   call destroy(RSRR)
   call destroy(RSRA)
-  call destroy(ShutRutNonstructElmntConducts)
-  call destroy(UPMXZH)
-  call destroy(UPKMZH)
-  call destroy(UPMNZH)
-  call destroy(UPMXZO)
-  call destroy(UPKMZO)
-  call destroy(UPMNZO)
-  call destroy(UPMXPO)
-  call destroy(UPKMPO)
-  call destroy(UPMNPO)
+  call destroy(ShutRutNonstructElmntConducts_pft)
+  call destroy(VmaxNH4Root_pft)
+  call destroy(KmNH4Root_pft)
+  call destroy(CMinNH4Root_pft)
+  call destroy(VmaxNO3Root_pft)
+  call destroy(KmNO3Root_pft)
+  call destroy(CminNO3Root_pft)
+  call destroy(VmaxPO4Root_pft)
+  call destroy(KmPO4Root_pft)
+  call destroy(CMinPO4Root_pft)
   call destroy(RRADP)
   call destroy(CNRTS)
   call destroy(CPRTS)

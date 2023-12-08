@@ -293,12 +293,12 @@ implicit none
 
   type, public :: plant_pheno_type
   real(r8), pointer :: fTgrowRootP(:,:)   => null()     !root layer temperature growth functiom, [-]
-  real(r8), pointer :: ShutRutNonstructElmntConducts(:)    => null()     !shoot-root rate constant for nonstructural C exchange, [h-1]
+  real(r8), pointer :: ShutRutNonstructElmntConducts_pft(:)    => null()     !shoot-root rate constant for nonstructural C exchange, [h-1]
   real(r8), pointer :: GrainFillRateat25C_pft(:)    => null()     !maximum rate of fill per grain, [g h-1]
   real(r8), pointer :: OFFST(:)    => null()     !adjustment of Arhhenius curves for plant thermal acclimation, [oC]
   real(r8), pointer :: PlantO2Stress(:)     => null()     !plant O2 stress indicator, []
   real(r8), pointer :: MinNonstructalC4InitBranch(:)       => null()     !branch nonstructural C content required for new branch, [gC gC-1]
-  real(r8), pointer :: MinNonstructuralC4InitRoot(:)       => null()     !threshold root nonstructural C content for initiating new root axis, [gC gC-1]
+  real(r8), pointer :: MinNonstructuralC4InitRoot_pft(:)       => null()     !threshold root nonstructural C content for initiating new root axis, [gC gC-1]
   real(r8), pointer :: LeafElmntRemobFlx_brch(:,:,:) => null()    !element translocated from leaf during senescence, [g d-2 h-1]
   real(r8), pointer :: PetioleChemElmntRemobFlx_brch(:,:,:) => null()    !element translocated from sheath during senescence, [g d-2 h-1]
   real(r8), pointer :: TCelsChill4Leaf_pft(:)     => null()     !threshold temperature for spring leafout/dehardening, [oC]
@@ -681,15 +681,15 @@ implicit none
   real(r8), pointer :: PlantRootSoilChemNetX_pft(:,:)      => null()  !net root element uptake (+ve) - exudation (-ve), [gC d-2 h-1]
   real(r8), pointer :: ROXSK(:,:)       => null()  !total O2 sink, [g d-2 t-1]
   real(r8), pointer :: ZEROQ(:)         => null()  !threshold zero for uptake calculation
-  real(r8), pointer :: UPMNPO(:,:)      => null()  !minimum PO4 concentration for root NH4 uptake, [g m-3]
-  real(r8), pointer :: UPMXPO(:,:)      => null()  !maximum root PO4 uptake rate, [g m-2 h-1]
-  real(r8), pointer :: UPKMPO(:,:)      => null()  !Km for root PO4 uptake, [g m-3]
-  real(r8), pointer :: UPMNZO(:,:)      => null()  !minimum NO3 concentration for root NH4 uptake, [g m-3]
-  real(r8), pointer :: UPMXZO(:,:)      => null()  !maximum root NO3 uptake rate, [g m-2 h-1]
-  real(r8), pointer :: UPKMZO(:,:)      => null()  !Km for root NO3 uptake, [g m-3]
-  real(r8), pointer :: UPMNZH(:,:)      => null()  !minimum NH4 concentration for root NH4 uptake, [g m-3]
-  real(r8), pointer :: UPMXZH(:,:)      => null()  !maximum root NH4 uptake rate, [g m-2 h-1]
-  real(r8), pointer :: UPKMZH(:,:)      => null()  !Km for root NH4 uptake, [g m-3]
+  real(r8), pointer :: CMinPO4Root_pft(:,:)      => null()  !minimum PO4 concentration for root NH4 uptake, [g m-3]
+  real(r8), pointer :: VmaxPO4Root_pft(:,:)      => null()  !maximum root PO4 uptake rate, [g m-2 h-1]
+  real(r8), pointer :: KmPO4Root_pft(:,:)      => null()  !Km for root PO4 uptake, [g m-3]
+  real(r8), pointer :: CminNO3Root_pft(:,:)      => null()  !minimum NO3 concentration for root NH4 uptake, [g m-3]
+  real(r8), pointer :: VmaxNO3Root_pft(:,:)      => null()  !maximum root NO3 uptake rate, [g m-2 h-1]
+  real(r8), pointer :: KmNO3Root_pft(:,:)      => null()  !Km for root NO3 uptake, [g m-3]
+  real(r8), pointer :: CMinNH4Root_pft(:,:)      => null()  !minimum NH4 concentration for root NH4 uptake, [g m-3]
+  real(r8), pointer :: VmaxNH4Root_pft(:,:)      => null()  !maximum root NH4 uptake rate, [g m-2 h-1]
+  real(r8), pointer :: KmNH4Root_pft(:,:)      => null()  !Km for root NH4 uptake, [g m-3]
   real(r8), pointer :: RCO2P(:,:,:)     => null()  !aqueous CO2 flux from roots to root water , [g d-2 h-1]
   real(r8), pointer :: RUPOXP(:,:,:)    => null()  !aqueous O2 flux from roots to root water , [g d-2 h-1]
   real(r8), pointer :: RUPGasSol_vr(:,:,:,:)     => null()  !aqueous CO2 flux from roots to soil water, [g d-2 h-1]
@@ -811,15 +811,15 @@ implicit none
   allocate(this%RUPP1B(jroots,JZ1,JP1))
 
   allocate(this%RootAutoRO2Limiter_pvr(jroots,JZ1,JP1))
-  allocate(this%UPMNPO(jroots,JP1))
-  allocate(this%UPMXPO(jroots,JP1))
-  allocate(this%UPKMPO(jroots,JP1))
-  allocate(this%UPMNZO(jroots,JP1))
-  allocate(this%UPMXZO(jroots,JP1))
-  allocate(this%UPKMZO(jroots,JP1))
-  allocate(this%UPMNZH(jroots,JP1))
-  allocate(this%UPMXZH(jroots,JP1))
-  allocate(this%UPKMZH(jroots,JP1))
+  allocate(this%CMinPO4Root_pft(jroots,JP1))
+  allocate(this%VmaxPO4Root_pft(jroots,JP1))
+  allocate(this%KmPO4Root_pft(jroots,JP1))
+  allocate(this%CminNO3Root_pft(jroots,JP1))
+  allocate(this%VmaxNO3Root_pft(jroots,JP1))
+  allocate(this%KmNO3Root_pft(jroots,JP1))
+  allocate(this%CMinNH4Root_pft(jroots,JP1))
+  allocate(this%VmaxNH4Root_pft(jroots,JP1))
+  allocate(this%KmNH4Root_pft(jroots,JP1))
   allocate(this%RCO2P(jroots,JZ1,JP1))
   allocate(this%RUPOXP(jroots,JZ1,JP1))
   allocate(this%RUPGasSol_vr(idg_beg:idg_end,jroots,JZ1,JP1))
@@ -927,15 +927,15 @@ implicit none
 !  if(allocated(RUPP1P))deallocate(RUPP1P)
 !  if(allocated(RUPP1B))deallocate(RUPP1B)
 !  if(allocated(RootAutoRO2Limiter_pvr))deallocate(RootAutoRO2Limiter_pvr)
-!  if(allocated(UPMNPO))deallocate(UPMNPO)
-!  if(allocated(UPMXPO))deallocate(UPMXPO)
-!  if(allocated(UPKMPO))deallocate(UPKMPO)
-!  if(allocated(UPMNZO))deallocate(UPMNZO)
-!  if(allocated(UPMXZO))deallocate(UPMXZO)
-!  if(allocated(UPKMZO))deallocate(UPKMZO)
-!  if(allocated(UPMNZH))deallocate(UPMNZH)
-!  if(allocated(UPMXZH))deallocate(UPMXZH)
-!  if(allocated(UPKMZH))deallocate(UPKMZH)
+!  if(allocated(CMinPO4Root_pft))deallocate(CMinPO4Root_pft)
+!  if(allocated(VmaxPO4Root_pft))deallocate(VmaxPO4Root_pft)
+!  if(allocated(KmPO4Root_pft))deallocate(KmPO4Root_pft)
+!  if(allocated(CminNO3Root_pft))deallocate(CminNO3Root_pft)
+!  if(allocated(VmaxNO3Root_pft))deallocate(VmaxNO3Root_pft)
+!  if(allocated(KmNO3Root_pft))deallocate(KmNO3Root_pft)
+!  if(allocated(CMinNH4Root_pft))deallocate(CMinNH4Root_pft)
+!  if(allocated(VmaxNH4Root_pft))deallocate(VmaxNH4Root_pft)
+!  if(allocated(KmNH4Root_pft))deallocate(KmNH4Root_pft)
   end subroutine plt_rootbgc_destroy
 !----------------------------------------------------------------------
   subroutine plt_site_Init(this)
@@ -1797,7 +1797,7 @@ implicit none
   allocate(this%MatureGroup_pft(JP1))
   allocate(this%PlantO2Stress(JP1))
   allocate(this%MinNonstructalC4InitBranch(JP1))
-  allocate(this%MinNonstructuralC4InitRoot(JP1))
+  allocate(this%MinNonstructuralC4InitRoot_pft(JP1))
   allocate(this%fTgrowCanP(JP1))
   allocate(this%TCelsChill4Leaf_pft(JP1))
   allocate(this%TCG(JP1))
@@ -1809,7 +1809,7 @@ implicit none
 
   allocate(this%fTgrowRootP(JZ1,JP1))
   allocate(this%GrainFillRateat25C_pft(JP1))
-  allocate(this%ShutRutNonstructElmntConducts(JP1))
+  allocate(this%ShutRutNonstructElmntConducts_pft(JP1))
   allocate(this%SSTX(JP1))
   allocate(this%HTC(JP1))
   allocate(this%iPlantInitThermoAdaptZone(JP1))
@@ -1884,7 +1884,7 @@ implicit none
 !  if(allocated(fTgrowRootP))deallocate(fTgrowRootP)
 !  if(allocated(GrainFillRateat25C_pft))deallocate(GrainFillRateat25C_pft)
 !  if(allocated(RootAreaPerPlant_vr))deallocate(RootAreaPerPlant_vr)
-!  if(allocated(ShutRutNonstructElmntConducts))deallocate(ShutRutNonstructElmntConducts)
+!  if(allocated(ShutRutNonstructElmntConducts_pft))deallocate(ShutRutNonstructElmntConducts_pft)
 !  if(allocated(SSTX)) deallocate(SSTX)
 !  if(allocated(HTC))deallocate(HTC)
 !  if(allocated(iPlantInitThermoAdaptZone))deallocate(iPlantInitThermoAdaptZone)

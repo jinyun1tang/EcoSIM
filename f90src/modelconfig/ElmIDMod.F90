@@ -7,6 +7,13 @@ implicit none
   integer, parameter :: ielmn=2    !nitrogen element
   integer, parameter :: ielmp=3    !phosphorus element
   integer, parameter :: NumOfPlantChemElmnts=3   !totally three elements
+! erosion model options
+  integer, parameter :: ieros_noaction=-1
+  integer, parameter :: ieros_frzthawelv=0
+  integer, parameter :: ieros_frzthaweros=1
+  integer, parameter :: ieros_frzthawsom=2
+  integer, parameter :: ieros_frzthawsomeros=3
+  
 ! soil properties
   integer, parameter :: isoi_fc=1
   integer, parameter :: isoi_wp=2

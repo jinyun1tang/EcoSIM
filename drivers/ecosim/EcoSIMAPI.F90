@@ -7,10 +7,9 @@ module EcoSIMAPI
   use GeochemAPI   , only : soluteModel
   use PlantAPI     , only : PlantModel
   use MicBGCAPI    , only : MicrobeModel, MicAPI_Init, MicAPI_cleanup
-  use TranspNoSaltMod    , only : TranspNoSalt
+  use TranspNoSaltMod , only : TranspNoSalt
   use TranspSaltMod   , only : TranspSalt
-  use EcoSIMCtrlMod, only : lverb,plant_model,soichem_model,microbial_model,salt_model
-  use EcoSIMCtrlMod, only : disp_planttrait  
+  use EcoSIMCtrlMod  
   use WatsubMod    , only : watsub
 implicit none
   private
@@ -18,7 +17,7 @@ implicit none
   __FILE__
   public :: soil
   public :: readnamelist
-  public :: regressiontest
+  public :: regressiontest,write_modelconfig
 contains
 
   subroutine Run_EcoSIM_one_step(I,J,NHW,NHE,NVN,NVS)
@@ -41,7 +40,7 @@ contains
   !
   !   CALCULATE SOIL BIOLOGICAL TRANSFORMATIONS IN 'NITRO'
   !
-  if(  microbial_model)then
+  if(microbial_model)then
     if(lverb)WRITE(*,334)'NIT'
     call start_timer(t1)
     CALL MicrobeModel(I,J,NHW,NHE,NVN,NVS)
@@ -54,7 +53,6 @@ contains
   if(plant_model)then
     call PlantModel(I,J,NHW,NHE,NVN,NVS)
   endif
-  if(TKS(2,1,1)>400.)PRINT*,'plantTKS',TKS(2,1,1)
   !
   !
   !   CALCULATE SOLUTE EQUILIBRIA IN 'SOLUTE'
@@ -143,7 +141,7 @@ contains
     NPXS,NPYS,JOUTS,continue_run,visual_out,restart_out,&
     finidat,restartFileFullPath,brnch_retain_casename,plant_model,microbial_model,&
     soichem_model,atm_ghg_in,aco2_ppm,ao2_ppm,an2_ppm,an2_ppm,ach4_ppm,anh3_ppm,&
-    snowRedist_model,disp_planttrait
+    snowRedist_model,disp_planttrait,iErosionMode,grid_mode
 
   namelist /ecosim/hist_nhtfrq,hist_mfilt,hist_fincl1,hist_fincl2,hist_yrclose, &
     do_budgets,ref_date,start_date
@@ -164,6 +162,8 @@ contains
   JOUTS=1   !frequency on hourly scale
   NCYC_LITR=20
   NCYC_SNOW=20
+  grid_mode=3
+  iErosionMode=-1
   visual_out =.false.
   restart_out=.false.
   do_budgets =.false.
@@ -231,6 +231,7 @@ contains
     write(iulog, *) '--------------------'
 
   endif
+  erosion_model=iErosionMode<0
   read(start_date,'(I4)')year0
   call etimer%Init(nml_buffer,year0=year0)
   if(do_bgcforc_write)then
@@ -369,7 +370,6 @@ subroutine soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
         call etimer%update_time_stamp()
         cycle
       endif
-
     !
     !   UPDATE HOURLY VARIABLES IN 'HOUR1'
     !   set up climate forcing for the new hour
@@ -496,5 +496,27 @@ subroutine regressiontest(nmfile,case_name, NX, NY)
     call regression%CloseOutput()
   endif
 end subroutine regressiontest
+
+!------------------------------------------------------------------------------------------
+  subroutine write_modelconfig()
+  use fileUtil, only : getavu, relavu, opnfil
+  use readiMod
+  implicit none
+  character(len=64) :: fnm_loc
+  integer :: nu_cfg
+
+  if(disp_modelconfig)then
+    nu_cfg=getavu()
+    write(fnm_loc,'(A,I4,A)')'ecosim.cfg'
+    call opnfil(fnm_loc,nu_cfg,'f')    
+
+    write(nu_cfg,*)'microbial_model=',microbial_model
+    write(nu_cfg,*)'plant_model=',plant_model
+    write(nu_cfg,*)'salt_model=',salt_model
+    write(nu_cfg,*)'erosion_model=',erosion_model_status(iErosionMode)
+    write(nu_cfg,*)'grid_mode=',GridConectionMode(grid_mode)
+    call relavu(nu_cfg)
+  endif
+  end subroutine write_modelconfig
 
 end module EcoSIMAPI
