@@ -32,7 +32,8 @@ module WthrMod
   !     PDIR,PDIF=PAR:SW ratio (umol s-1/(MJ h-1))
   !     TSNOW=temperature below which precipitation is snow (oC)
   !
-  real(r8), PARAMETER :: CDIR=0.42_r8
+  real(r8), parameter :: SolConst=4.896_r8 !MJ/m2/hour, solar constant
+  real(r8), PARAMETER :: CDIR=0.42_r8   !
   real(r8), parameter :: CDIF=0.58_r8
   real(r8), parameter :: PDIR=1269.4_r8
   real(r8), parameter :: PDIF=1269.4_r8
@@ -211,14 +212,14 @@ module WthrMod
   DO  NX=NHW,NHE
     DO NY=NVN,NVS
  !
-      !     RADN=SW radiation at horizontal surface
+      !     RADN=SW radiation at horizontal surface,MJ/m2/hour
       !     TCA,TairK=air temperature (oC,K)
       !     VPK,VPS=ambient,saturated vapor pressure
       !     UA=wind speed
       !     TSNOW=temperature below which precipitation is snow (oC)
       !     PrecAsRain,PrecAsSnow=rainfall,snowfall
 !
-      RADN(NY,NX)=SWRad_hrly(J,I)
+      RADN(NY,NX)=SWRad_hrly(J,I)  
       TCA(NY,NX)=TMPH(J,I)
 
       TairK(NY,NX)=units%Celcius2Kelvin(TCA(NY,NX))
@@ -263,7 +264,7 @@ module WthrMod
 !
 !     SineSolarAngle,SineSolarAngleNextHour=sine solar angle of current,next hour
 !     RADX=solar constant at horizontal surface
-!     RADN=SW radiation at horizontal surface
+!     RADN=SW radiation at horizontal surface, MJ/
 !     radian per degree 1.7453E-02_r8
 !     IETYP: koppen climate zone
       IF(KoppenClimZone(NY,NX).GE.-1)THEN
@@ -274,23 +275,23 @@ module WthrMod
         SineSolarAngleNextHour(NY,NX)=AZMAX1(AZI+DEC*COS(.2618_r8*(SolarNoonHour_col(NY,NX)-(J+0.5_r8))))
 
         !     IF(SineSolarAngle(NY,NX).GT.0.0.AND.SineSolarAngle(NY,NX).LT.TWILGT)SineSolarAngle(NY,NX)=TWILGT
-        IF(RADN(NY,NX).LE.0.0)SineSolarAngle(NY,NX)=0.0_r8
+        IF(RADN(NY,NX).LE.0.0_r8)SineSolarAngle(NY,NX)=0.0_r8
         IF(SineSolarAngle(NY,NX).LE.-TWILGT)RADN(NY,NX)=0.0_r8
-        RADX=4.896_r8*AZMAX1(SineSolarAngle(NY,NX))
+        RADX=SolConst*AZMAX1(SineSolarAngle(NY,NX))
         RADN(NY,NX)=AMIN1(RADX,RADN(NY,NX))
 !
         !     DIRECT VS DIFFUSE RADIATION IN SOLAR OR SKY BEAMS
         !
         !     RADZ=diffuse radiation at horizontal surface
         !     RADS,RADY,RAPS,PARDiffus_col=direct,diffuse SW,PAR in solar beam
-!
+!       !
 
         RADZ=AMIN1(RADN(NY,NX),0.5_r8*(RADX-RADN(NY,NX)))
         RadSWDirect_col(NY,NX)=safe_adb(RADN(NY,NX)-RADZ,SineSolarAngle(NY,NX))
         RadSWDirect_col(NY,NX)=AMIN1(4.167_r8,RadSWDirect_col(NY,NX))
-        RadSWDiffus_col(NY,NX)=RADZ/TYSIN
-        PARDirect_col(NY,NX)=RadSWDirect_col(NY,NX)*CDIR*PDIR
-        PARDiffus_col(NY,NX)=RadSWDiffus_col(NY,NX)*CDIF*PDIF
+        RadSWDiffus_col(NY,NX)=RADZ/TotSineSkyAngles_grd
+        PARDirect_col(NY,NX)=RadSWDirect_col(NY,NX)*CDIR*PDIR  !MJ/m2/hr
+        PARDiffus_col(NY,NX)=RadSWDiffus_col(NY,NX)*CDIF*PDIF  !MJ/m2/hr
         !
         !     ATMOSPHERIC RADIATIVE PROPERTIES AFM 139:171
         !
@@ -526,7 +527,7 @@ module WthrMod
   DO NX=NHW,NHE
     DO  NY=NVN,NVS
       IF(SineSolarAngle(NY,NX).GT.0.0_r8)TRAD(NY,NX)=TRAD(NY,NX)+RadSWDirect_col(NY,NX) &
-        *SineSolarAngle(NY,NX)+RadSWDiffus_col(NY,NX)*TYSIN
+        *SineSolarAngle(NY,NX)+RadSWDiffus_col(NY,NX)*TotSineSkyAngles_grd
       TAMX(NY,NX)=AMAX1(TAMX(NY,NX),TCA(NY,NX))
       TAMN(NY,NX)=AMIN1(TAMN(NY,NX),TCA(NY,NX))
       HUDX(NY,NX)=AMAX1(HUDX(NY,NX),VPK(NY,NX))

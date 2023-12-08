@@ -9,7 +9,8 @@ module EcoSIMAPI
   use MicBGCAPI    , only : MicrobeModel, MicAPI_Init, MicAPI_cleanup
   use TranspNoSaltMod    , only : TranspNoSalt
   use TranspSaltMod   , only : TranspSalt
-  use EcoSIMCtrlMod, only : lverb,plant_model,soichem_model,  microbial_model,salt_model
+  use EcoSIMCtrlMod, only : lverb,plant_model,soichem_model,microbial_model,salt_model
+  use EcoSIMCtrlMod, only : disp_planttrait  
   use WatsubMod    , only : watsub
 implicit none
   private
@@ -142,7 +143,7 @@ contains
     NPXS,NPYS,JOUTS,continue_run,visual_out,restart_out,&
     finidat,restartFileFullPath,brnch_retain_casename,plant_model,microbial_model,&
     soichem_model,atm_ghg_in,aco2_ppm,ao2_ppm,an2_ppm,an2_ppm,ach4_ppm,anh3_ppm,&
-    snowRedist_model
+    snowRedist_model,disp_planttrait
 
   namelist /ecosim/hist_nhtfrq,hist_mfilt,hist_fincl1,hist_fincl2,hist_yrclose, &
     do_budgets,ref_date,start_date
@@ -168,7 +169,8 @@ contains
   do_budgets =.false.
   plant_model=.true.
   soichem_model=.true.
-    microbial_model=.true.
+  microbial_model=.true.
+  disp_planttrait=.false.
   ref_date  = '18000101000000'   !place holder for future
   start_date= '18000101000000'   !start date of the simulation, differ from the forcing date
   finidat=' '
@@ -242,7 +244,7 @@ contains
   LYRG=num_of_simdays
   lverb=lverbose
   nmicbguilds=num_microbial_guilds
-  if(.not. soichem_model)then
+  if(.not.soichem_model)then
     salt_model=.false.
   endif
 end subroutine readnamelist

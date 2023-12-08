@@ -86,11 +86,11 @@ implicit none
   end type plant_siteinfo_type
 
   type, public :: plant_photosyns_type
-  real(r8), pointer :: ETMX(:)   => null()  !cholorophyll activity , [umol g-1 h-1 at 25 oC]
-  real(r8), pointer :: CHL(:)    => null()  !leaf C3 chlorophyll content, [gC gC-1]
+  real(r8), pointer :: SpecChloryfilAct_pft(:)   => null()  !cholorophyll activity , [umol g-1 h-1 at 25 oC]
+  real(r8), pointer :: LeafC3ChlorofilConc_pft(:)    => null()  !leaf C3 chlorophyll content, [gC gC-1]
   real(r8), pointer :: PEPC(:)   => null()  !leaf PEP carboxylase content, [gC gC-1]
-  real(r8), pointer :: CHL4(:)   => null()  !leaf C4 chlorophyll content, [gC gC-1]
-  real(r8), pointer :: RUBP(:)   => null()  !leaf rubisco content, [gC gC-1]
+  real(r8), pointer :: LeafC4ChlorofilConc_pft(:)   => null()  !leaf C4 chlorophyll content, [gC gC-1]
+  real(r8), pointer :: LeafRuBPConc_pft(:)   => null()  !leaf rubisco content, [gC gC-1]
   real(r8), pointer :: VCMX4(:)  => null()  !PEP carboxylase activity, [umol g-1 h-1 at 25 oC]
   real(r8), pointer :: VOMX(:)   => null()  !rubisco oxygenase activity, [umol g-1 h-1 at 25 oC]
   real(r8), pointer :: VCMX(:)   => null()  !rubisco carboxylase activity, [umol g-1 h-1 at 25 oC]
@@ -142,7 +142,7 @@ implicit none
   end type plant_photosyns_type
 
   type, public ::  plant_radiation_type
-  real(r8) :: TYSIN     !sine of sky angles
+  real(r8) :: TotSineSkyAngles_grd     !sine of sky angles
   real(r8) :: SoilAlbedo      !soil albedo
   real(r8) :: SurfAlbedo_col      !Surface albedo
   real(r8) :: RadPARSolarBeam_col      !PAR radiation in solar beam, [umol m-2 s-1]
@@ -188,7 +188,7 @@ implicit none
   end type plant_radiation_type
 
   type, public :: plant_morph_type
-  real(r8) :: CanopyArea_grid                     !stalk area of combined, each PFT canopy
+  real(r8) :: CanopyArea_grd                     !stalk area of combined, each PFT canopy
   real(r8) :: CanopyLeafArea_grd                     !grid canopy leaf area, [m2 d-2]
   real(r8) :: StemArea_grd                 !grid canopy stem area, [m2 d-2]
   real(r8) :: MaxCanopyHeight_grd                        !canopy height , [m]
@@ -267,7 +267,7 @@ implicit none
   integer,  pointer :: NGTopRootLayer_pft(:)           => null() !soil layer at planting depth, [-]
   integer,  pointer :: KLeafNumber_brch(:,:)      => null() !leaf number, [-]
   real(r8), pointer :: NumOfLeaves_brch(:,:)       => null() !leaf number, [-]
-  integer , pointer :: iPlantGrainType(:)        => null() !grain type (below or above-ground)
+  integer , pointer :: iPlantGrainType_pft(:)        => null() !grain type (below or above-ground)
   real(r8), pointer :: MaxPotentSeedNumber_pft(:)         => null() !maximum grain node number per branch, [-]
   real(r8), pointer :: MaxSeedNumPerSite_pft(:)         => null() !maximum grain number per node , [-]
   real(r8), pointer :: WDLF(:)         => null() !leaf length:width ratio, [-]
@@ -1707,11 +1707,11 @@ implicit none
   allocate(this%CO2Solubility_pft(JP1))
   allocate(this%CanopyGasCO2_pft(JP1))
   allocate(this%CHILL(JP1))
-  allocate(this%ETMX(JP1))
-  allocate(this%CHL(JP1))
+  allocate(this%SpecChloryfilAct_pft(JP1))
+  allocate(this%LeafC3ChlorofilConc_pft(JP1))
   allocate(this%PEPC(JP1))
-  allocate(this%CHL4(JP1))
-  allocate(this%RUBP(JP1))
+  allocate(this%LeafC4ChlorofilConc_pft(JP1))
+  allocate(this%LeafRuBPConc_pft(JP1))
   allocate(this%VCMX4(JP1))
   allocate(this%VOMX(JP1))
   allocate(this%VCMX(JP1))
@@ -1764,11 +1764,11 @@ implicit none
 !  if(allocated(CO2Solubility_pft))deallocate(CO2Solubility_pft)
 !  if(allocated(CanopyGasCO2_pft))deallocate(CanopyGasCO2_pft)
 !  if(allocated(CHILL))deallocate(CHILL)
-!  if(allocated(ETMX))deallocate(ETMX)
-!  if(allocated(CHL))deallocate(CHL)
+!  if(allocated(SpecChloryfilAct_pft))deallocate(SpecChloryfilAct_pft)
+!  if(allocated(LeafC3ChlorofilConc_pft))deallocate(LeafC3ChlorofilConc_pft)
 !  if(allocated(PEPC))deallocate(PEPC)
-!  if(allocated(CHL4))deallocate(CHL4)
-!  if(allocated(RUBP))deallocate(RUBP)
+!  if(allocated(LeafC4ChlorofilConc_pft))deallocate(LeafC4ChlorofilConc_pft)
+!  if(allocated(LeafRuBPConc_pft))deallocate(LeafRuBPConc_pft)
 !  if(allocated(VCMX4))deallocate(VCMX4)
 !  if(allocated(VOMX))deallocate(VOMX)
 !  if(allocated(VCMX))deallocate(VCMX)
@@ -2035,7 +2035,7 @@ implicit none
   allocate(this%PrimRootXSecArea(jroots,JP1))
   allocate(this%RSRR(jroots,JP1))
   allocate(this%RSRA(jroots,JP1))
-  allocate(this%iPlantGrainType(JP1))
+  allocate(this%iPlantGrainType_pft(JP1))
   end subroutine plt_morph_init
 
 !------------------------------------------------------------------------

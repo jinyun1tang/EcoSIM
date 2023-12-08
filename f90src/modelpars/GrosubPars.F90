@@ -148,7 +148,11 @@ module GrosubPars
   real(r8) :: GVMX(0:1)
   real(r8) :: RTSK(0:3)
   character(len=6), allocatable :: pftss(:)
-
+  character(len=40),allocatable :: pft_long(:)
+  character(len=4), allocatable :: pft_short(:)
+  character(len=2), allocatable :: koppen_clim_no(:)
+  character(len=3), allocatable :: koppen_clim_short(:)
+  character(len=64),allocatable :: koppen_clim_long(:)
   type, public :: plant_bgc_par_type
    !nonstructural(0,*),
    !     foliar(1,*),non-foliar(2,*),stalk(3,*),root(4,*), coarse woody (5,*)
@@ -193,6 +197,8 @@ module GrosubPars
   implicit none
   type(plant_bgc_par_type)  :: pltpar
   integer :: npfts
+  integer :: npft
+  integer :: nkopenclms
 
   if(.not. file_exists(pft_file_in))then
     !call endrun(msg='Fail to locate plant trait file specified by pft_file_in in ' &
@@ -201,10 +207,21 @@ module GrosubPars
     npfts=1
   else
     npfts=get_dim_len(pft_file_in, 'npfts')
+    npft=get_dim_len(pft_file_in, 'npft')
+    nkopenclms=get_dim_len(pft_file_in,'nkopenclms')
     allocate(pftss(npfts))
-
+    allocate(pft_long(npft))
+    allocate(pft_short(npft))
+    allocate(koppen_clim_no(nkopenclms))
+    allocate(koppen_clim_short(nkopenclms))
+    allocate(koppen_clim_long(nkopenclms))
     call ncd_pio_openfile(pft_nfid, pft_file_in, ncd_nowrite)
     call ncd_getvar(pft_nfid, 'pfts', pftss)
+    call ncd_getvar(pft_nfid,'pfts_long',pft_long)
+    call ncd_getvar(pft_nfid,'pfts_short',pft_short)
+    call ncd_getvar(pft_nfid,'koppen_clim_no',koppen_clim_no)
+    call ncd_getvar(pft_nfid,'koppen_clim_short',koppen_clim_short)
+    call ncd_getvar(pft_nfid,'koppen_clim_long',koppen_clim_long)
   endif
   pltpar%inonstruct=0
   pltpar%ifoliar=1
@@ -309,19 +326,35 @@ module GrosubPars
   end subroutine InitVegPars
 !------------------------------------------------------------------------------------------
 
-  function get_pft_loc(pft_name)result(loc)
+  function get_pft_loc(pft_name,pft_lname,koppen_climl,koppen_clims)result(loc)
 !
 !!DESCRIPTION
 ! return the id of pft to be read
   implicit none
   character(len=6), intent(in) :: pft_name
-
-  integer :: loc
+  character(len=40),intent(out):: pft_lname
+  character(len=64),intent(out):: koppen_climl
+  character(len=3), intent(out):: koppen_clims
+  integer :: loc,loc1
 
   loc=1
   DO
     if(pftss(loc)==pft_name)exit
     loc=loc+1
   enddo
+  loc1=1
+  do 
+    if(pft_name(1:4)==pft_short(loc1))exit
+    loc1=loc1+1
+  enddo
+  pft_lname=pft_long(loc1)
+
+  loc1=1
+  do
+    if(koppen_clim_no(loc1)==pft_name(5:6))exit
+    loc1=loc1+1
+  enddo
+  koppen_climl=koppen_clim_long(loc1)
+  koppen_clims=koppen_clim_short(loc1)
   end function get_pft_loc
 end module GrosubPars

@@ -43,6 +43,7 @@ implicit none
   integer :: NCYC_LITR  !number of subcycles for litr
   integer :: NCYC_SNOW  !number of subcycles for snow
   logical :: lverb           !logical switch for verbose output
+  logical :: disp_planttrait =.false.
   logical :: do_rgres        !logical switch for regression tests
 
   type, public :: forc_data_rec_type

@@ -55,11 +55,11 @@ module CanopyDataType
   real(r8),target,allocatable ::  XKCO2(:,:,:)                       !Km for rubisco carboxylase activity, [uM]
   real(r8),target,allocatable ::  XKO2(:,:,:)                        !Km for rubisco oxygenase activity, [uM]
   real(r8),target,allocatable ::  Km4PEPCarboxy_pft(:,:,:)                      !Km for PEP carboxylase activity, [uM]
-  real(r8),target,allocatable ::  RUBP(:,:,:)                        !leaf rubisco content, [g g-1]
+  real(r8),target,allocatable ::  LeafRuBPConc_pft(:,:,:)                        !leaf rubisco content, [g g-1]
   real(r8),target,allocatable ::  PEPC(:,:,:)                        !leaf PEP carboxylase content, [g g-1]
-  real(r8),target,allocatable ::  ETMX(:,:,:)                        !cholorophyll activity , [umol g-1 h-1 at 25 oC]
-  real(r8),target,allocatable ::  CHL(:,:,:)                         !leaf C3 chlorophyll content, [g g-1]
-  real(r8),target,allocatable ::  CHL4(:,:,:)                        !leaf C4 chlorophyll content, [g g-1]
+  real(r8),target,allocatable ::  SpecChloryfilAct_pft(:,:,:)                        !cholorophyll activity , [umol g-1 h-1 at 25 oC]
+  real(r8),target,allocatable ::  LeafC3ChlorofilConc_pft(:,:,:)                         !leaf C3 chlorophyll content, [g g-1]
+  real(r8),target,allocatable ::  LeafC4ChlorofilConc_pft(:,:,:)                        !leaf C4 chlorophyll content, [g g-1]
   real(r8),target,allocatable ::  CanPCi2CaRatio(:,:,:)                        !Ci:Ca ratio, [-]
   real(r8),target,allocatable ::  RadNet2CanP(:,:,:)                 !canopy net radiation , [MJ d-2 h-1] >0
   real(r8),target,allocatable ::  LWRadCanP(:,:,:)                   !canopy longwave radiation , [MJ d-2 h-1]
@@ -204,11 +204,11 @@ module CanopyDataType
   allocate(XKCO2(JP,JY,JX));    XKCO2=0._r8
   allocate(XKO2(JP,JY,JX));     XKO2=0._r8
   allocate(Km4PEPCarboxy_pft(JP,JY,JX));   Km4PEPCarboxy_pft=0._r8
-  allocate(RUBP(JP,JY,JX));     RUBP=0._r8
+  allocate(LeafRuBPConc_pft(JP,JY,JX));     LeafRuBPConc_pft=0._r8
   allocate(PEPC(JP,JY,JX));     PEPC=0._r8
-  allocate(ETMX(JP,JY,JX));     ETMX=0._r8
-  allocate(CHL(JP,JY,JX));      CHL=0._r8
-  allocate(CHL4(JP,JY,JX));     CHL4=0._r8
+  allocate(SpecChloryfilAct_pft(JP,JY,JX));     SpecChloryfilAct_pft=0._r8
+  allocate(LeafC3ChlorofilConc_pft(JP,JY,JX));      LeafC3ChlorofilConc_pft=0._r8
+  allocate(LeafC4ChlorofilConc_pft(JP,JY,JX));     LeafC4ChlorofilConc_pft=0._r8
   allocate(CanPCi2CaRatio(JP,JY,JX));     CanPCi2CaRatio=0._r8
   allocate(RadNet2CanP(JP,JY,JX));     RadNet2CanP=0._r8
   allocate(LWRadCanP(JP,JY,JX));    LWRadCanP=0._r8
@@ -354,11 +354,11 @@ module CanopyDataType
   call destroy(XKCO2)
   call destroy(XKO2)
   call destroy(Km4PEPCarboxy_pft)
-  call destroy(RUBP)
+  call destroy(LeafRuBPConc_pft)
   call destroy(PEPC)
-  call destroy(ETMX)
-  call destroy(CHL)
-  call destroy(CHL4)
+  call destroy(SpecChloryfilAct_pft)
+  call destroy(LeafC3ChlorofilConc_pft)
+  call destroy(LeafC4ChlorofilConc_pft)
   call destroy(CanPCi2CaRatio)
   call destroy(RadNet2CanP)
   call destroy(LWRadCanP)

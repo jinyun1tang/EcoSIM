@@ -36,7 +36,7 @@ implicit none
   integer,target,allocatable ::  iPlantPhenologyType_pft(:,:,:)                        !climate signal for phenological progress none, temperature, water stress)
   integer,target,allocatable ::  iPlantPhotoperiodType_pft(:,:,:)                        !photoperiod type (neutral, long day, short day)
   integer,target,allocatable ::  iPlantTurnoverPattern_pft(:,:,:)                        !phenologically-driven above-ground turnover (all, foliar only, none)
-  integer,target,allocatable ::  iPlantGrainType(:,:,:)                        !grain type (below or above-ground), e.g. potato and onion are below
+  integer,target,allocatable ::  iPlantGrainType_pft(:,:,:)                        !grain type (below or above-ground), e.g. potato and onion are below
   integer,target,allocatable ::  MY(:,:,:)                           !mycorrhizal type (no or yes)
   integer,target,allocatable ::  IDWaterTable(:,:)                   !water table flag from site file
 !----------------------------------------------------------------------
@@ -67,7 +67,7 @@ contains
   allocate(iPlantPhenologyType_pft(JP,JY,JX));    iPlantPhenologyType_pft=0
   allocate(iPlantPhotoperiodType_pft(JP,JY,JX));    iPlantPhotoperiodType_pft=0
   allocate(iPlantTurnoverPattern_pft(JP,JY,JX));    iPlantTurnoverPattern_pft=0
-  allocate(iPlantGrainType(JP,JY,JX));    iPlantGrainType=0
+  allocate(iPlantGrainType_pft(JP,JY,JX));    iPlantGrainType_pft=0
   allocate(MY(JP,JY,JX));       MY=0
   allocate(IDWaterTable(JY,JX));       IDWaterTable=0
   end subroutine InitFlagData
@@ -98,7 +98,7 @@ contains
   call destroy(iPlantPhenologyType_pft)
   call destroy(iPlantPhotoperiodType_pft)
   call destroy(iPlantTurnoverPattern_pft)
-  call destroy(iPlantGrainType)
+  call destroy(iPlantGrainType_pft)
   call destroy(MY)
   call destroy(IDWaterTable)
   end subroutine DestructFlagData

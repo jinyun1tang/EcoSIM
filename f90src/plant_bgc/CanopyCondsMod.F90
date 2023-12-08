@@ -63,7 +63,6 @@ module CanopyCondsMod
     SnowDepth   => plt_ew%SnowDepth     , &
     VLHeatCapSurfSnow  => plt_ew%VLHeatCapSurfSnow    , &
     MaxCanopyHeight_grd      => plt_morph%MaxCanopyHeight_grd     , &
-    iPlantGrainType  => plt_morph%iPlantGrainType , &
     StemArea_grd   => plt_morph%StemArea_grd  , &
     CanopyLeafArea_grd   => plt_morph%CanopyLeafArea_grd    &
   )
@@ -247,13 +246,13 @@ module CanopyCondsMod
   !     IN SW AND VISIBLE BANDS BY INCLINATION N, AZIMUTH M, LAYER L,
   !     NODE K, BRANCH NB, PFT NZ
   !
-  !     CanopyArea_pft,CanopyArea_grid=leaf+stalk area of combined,each PFT canopy
+  !     CanopyArea_pft,CanopyArea_grd=leaf+stalk area of combined,each PFT canopy
   !     ZL=height to bottom of canopy layer
   !     SnowDepth,DPTH0=snowpack,surface water depths
   !     CanopyLeafAreaByLayer_pft,CanopyBranchStemApft_lyr=leaf,stalk areas of PFT
   !     RAD,RadPARSolarBeam_col=vertical direct+diffuse SW,PAR
   !     RADS,RADY,RAPS,PARDiffus_col=solar beam direct,diffuse SW,PAR
-  !     SineSolarAngle,TYSIN=sine of solar,sky angles
+  !     SineSolarAngle,TotSineSkyAngles_grd=sine of solar,sky angles
   !     RadSWbyCanopy_pft,RADP=total SW,PAR absorbed by canopy
   !     ClumpFactorCurrent_pft=clumping factor for self-shading
   !
@@ -279,16 +278,16 @@ module CanopyCondsMod
     PARDiffus_zsec  => plt_rad%PARDiffus_zsec, &
     OMEGAG  => plt_rad%OMEGAG   , &
     OMEGX   => plt_rad%OMEGX    , &
-    RadSWSolarBeam_col    => plt_rad%RadSWSolarBeam_col     , &
+    RadSWSolarBeam_col    => plt_rad%RadSWSolarBeam_col     , &  !MJ/hour/m2
     SWRadOnGrnd    => plt_rad%SWRadOnGrnd     , &
-    RadSWDirect_col   => plt_rad%RadSWDirect_col    , &
+    RadSWDirect_col   => plt_rad%RadSWDirect_col    , &  !MJ/hour/m2
     RadPARSolarBeam_col    => plt_rad%RadPARSolarBeam_col     , &
     RadSWbyCanopy_pft    => plt_rad%RadSWbyCanopy_pft     , &
-    PARDiffus_col   => plt_rad%PARDiffus_col    , &
-    PARDirect_col   => plt_rad%PARDirect_col    , &
+    PARDiffus_col   => plt_rad%PARDiffus_col    , & !umol /m2/s
+    PARDirect_col   => plt_rad%PARDirect_col    , & !umol /m2/s
     RadSWDiffus_col   => plt_rad%RadSWDiffus_col    , &
     SineSolarAngle    => plt_rad%SineSolarAngle     , &
-    TYSIN   => plt_rad%TYSIN    , &
+    TotSineSkyAngles_grd   => plt_rad%TotSineSkyAngles_grd    , &
     TAU0    => plt_rad%TAU0     , &
     TAUS    => plt_rad%TAUS     , &
     SineLeafAngle    => plt_rad%SineLeafAngle     , &
@@ -319,9 +318,9 @@ module CanopyCondsMod
     CanopyBranchStemApft_lyr   => plt_morph%CanopyBranchStemApft_lyr  , &
     CanopyArea_pft   => plt_morph%CanopyArea_pft  , &
     ClumpFactor     => plt_morph%ClumpFactor    , &
-    CanopyArea_grid   => plt_morph%CanopyArea_grid    &
+    CanopyArea_grd   => plt_morph%CanopyArea_grd    &
   )
-  CanopyArea_grid=0.0_r8
+  CanopyArea_grd=0.0_r8
   D1135: DO NZ=1,NP
     CanopyArea_pft(NZ)=0.0_r8
     DO  NB=1,NumOfBranches_pft(NZ)
@@ -331,18 +330,18 @@ module CanopyCondsMod
           !above snow depth and above water/ice surface
           D1130: DO K=1,MaxNodesPerBranch1
             CanopyArea_pft(NZ)=CanopyArea_pft(NZ)+CanopyLeafAreaByLayer_pft(L,K,NB,NZ)
-            CanopyArea_grid=CanopyArea_grid+CanopyLeafAreaByLayer_pft(L,K,NB,NZ)
+            CanopyArea_grd=CanopyArea_grd+CanopyLeafAreaByLayer_pft(L,K,NB,NZ)
           ENDDO D1130
           !add stem/stalk area
           CanopyArea_pft(NZ)=CanopyArea_pft(NZ)+CanopyBranchStemApft_lyr(L,NB,NZ)
-          CanopyArea_grid=CanopyArea_grid+CanopyBranchStemApft_lyr(L,NB,NZ)
+          CanopyArea_grd=CanopyArea_grd+CanopyBranchStemApft_lyr(L,NB,NZ)
         ENDIF
       enddo
     enddo
   ENDDO D1135
   IF(SineSolarAngle.GT.ZERO)THEN
-    RadSWSolarBeam_col=RadSWDirect_col*SineSolarAngle+RadSWDiffus_col*TYSIN
-    RadPARSolarBeam_col=PARDirect_col*SineSolarAngle+PARDiffus_col*TYSIN
+    RadSWSolarBeam_col=RadSWDirect_col*SineSolarAngle+RadSWDiffus_col*TotSineSkyAngles_grd
+    RadPARSolarBeam_col=PARDirect_col*SineSolarAngle+PARDiffus_col*TotSineSkyAngles_grd
   ELSE
     RadSWDirect_col=0.0_r8
     RadSWDiffus_col=0.0_r8
@@ -372,7 +371,7 @@ module CanopyCondsMod
     DGAZI=COS(GroundSurfAzimuth_col-SolarAzimuthAngle)
     GrndIncidSolarAngle=AZMAX1(AMIN1(1.0_r8,CosineGrndSlope_col*SineSolarAngle+&
       SineGrndSlope_col*CosineSolarAngle*DGAZI))
-    IF(CanopyArea_grid.GT.0.0_r8)THEN
+    IF(CanopyArea_grd.GT.0.0_r8)THEN
       SolarAngle=ASIN(SineSolarAngle)
       !
       !     ABSORBED RADIATION FROM OPTICAL PROPERTIES ENTERED IN 'READS'
@@ -786,6 +785,7 @@ module CanopyCondsMod
       fwdsRadSW2NextL(0)=0.0_r8
       fwdsRadPAR2NextL(0)=0.0_r8
       D2800: DO L=1,NumOfCanopyLayers1
+        !the following line shuts off radiation when it is below water 
         IF(CanopyHeightz_col(L-1).GE.SnowDepth-ZERO.AND.CanopyHeightz_col(L-1).GE.DPTH0-ZERO)THEN
           RadSWDiffusL=RadSWDiffusL*TAUY(L-1)+fwdsRadSW2NextL(L-1)+baksRadSW2NextL(L-1)
           PARDiffusL=PARDiffusL*TAUY(L-1)+fwdsRadPAR2NextL(L-1)+baksRadPAR2NextL(L-1)
@@ -857,13 +857,13 @@ module CanopyCondsMod
   !
   !     FracSWRad2Grnd=fraction of radiation received by ground surface
   !     FRADP=fraction of radiation received by each PFT canopy
-  !     CanopyArea_grid,CanopyArea_pft=leaf+stalk area of all PFTs,each PFT
+  !     CanopyArea_grd,CanopyArea_pft=leaf+stalk area of all PFTs,each PFT
   !
   FracSWRad2Grnd=1.0_r8
-  IF(CanopyArea_grid.GT.ZEROS)THEN
-    FRadPARbyLeafT=1.0_r8-EXP(-0.65_r8*CanopyArea_grid/AREA3(NU))
+  IF(CanopyArea_grd.GT.ZEROS)THEN
+    FRadPARbyLeafT=1.0_r8-EXP(-0.65_r8*CanopyArea_grd/AREA3(NU))
     D145: DO NZ=1,NP
-      FracRadPARbyCanopy_pft(NZ)=FRadPARbyLeafT*CanopyArea_pft(NZ)/CanopyArea_grid
+      FracRadPARbyCanopy_pft(NZ)=FRadPARbyLeafT*CanopyArea_pft(NZ)/CanopyArea_grd
       FracSWRad2Grnd=FracSWRad2Grnd-FracRadPARbyCanopy_pft(NZ)
     ENDDO D145
   ELSE

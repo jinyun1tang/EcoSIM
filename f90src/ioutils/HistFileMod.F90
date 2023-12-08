@@ -252,7 +252,7 @@ implicit none
   call ncd_defdim(lnfid, 'ngrstages',NumGrowthStages,dimid)
   call ncd_defdim(lnfid, 'elements',NumOfPlantChemElmnts,dimid)
   call ncd_defdim(lnfid, 'nkinecomp',jsken,dimid)
-  call ncd_defdim(lnfid, 'nomCO2CompenPoint_nodex',jcplx,dimid)
+  call ncd_defdim(lnfid, 'nomcomplx',jcplx,dimid)
 
   if ( .not. lhistrest )then
     call ncd_defdim(lnfid, 'hist_interval', 2, hist_interval_dimid)

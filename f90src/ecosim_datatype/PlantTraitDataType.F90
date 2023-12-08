@@ -29,7 +29,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  CanopyStemA_lyr(:,:,:)                       !total stem area, [m2 d-2]
   real(r8),target,allocatable ::  CanopyLeafArea_grd(:,:)                         !grid level plant canopy leaf area, [m2 d-2]
   real(r8),target,allocatable ::  StemArea_grd(:,:)                     !total canopy stem area, [m2 d-2]
-  real(r8),target,allocatable ::  CanopyArea_grid(:,:)                         !canopy area of combined over the grid [m2 d-2]
+  real(r8),target,allocatable ::  CanopyArea_grd(:,:)                         !canopy area of combined over the grid [m2 d-2]
   integer ,target,allocatable ::  NGTopRootLayer_pft(:,:,:)                           !soil layer at planting depth, [-]
   real(r8),target,allocatable ::  PlantinDepth(:,:,:)                      !planting depth, [m]
   real(r8),target,allocatable ::  SeedinDepth(:,:,:)                       !seeding depth, [m]
@@ -188,7 +188,7 @@ contains
   allocate(CanopyStemA_lyr(JC,JY,JX));    CanopyStemA_lyr=0._r8
   allocate(CanopyLeafArea_grd(JY,JX));       CanopyLeafArea_grd=0._r8
   allocate(StemArea_grd(JY,JX));       StemArea_grd=0._r8
-  allocate(CanopyArea_grid(JY,JX));       CanopyArea_grid=0._r8
+  allocate(CanopyArea_grd(JY,JX));       CanopyArea_grd=0._r8
   allocate(NGTopRootLayer_pft(JP,JY,JX));       NGTopRootLayer_pft=0
   allocate(PlantinDepth(JP,JY,JX));   PlantinDepth=0._r8
   allocate(SeedinDepth(JP,JY,JX));    SeedinDepth=0._r8
@@ -344,7 +344,7 @@ contains
   call destroy(CanopyStemA_lyr)
   call destroy(CanopyLeafArea_grd)
   call destroy(StemArea_grd)
-  call destroy(CanopyArea_grid)
+  call destroy(CanopyArea_grd)
   call destroy(NGTopRootLayer_pft)
   call destroy(PlantinDepth)
   call destroy(SeedinDepth)

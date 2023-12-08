@@ -93,7 +93,7 @@ module UptakesMod
     IsPlantActive  => plt_pheno%IsPlantActive  , &
     CanopyLeafArea_grd  => plt_morph%CanopyLeafArea_grd  , &
     PrimRootDepth  => plt_morph%PrimRootDepth  , &
-    CanopyArea_grid  => plt_morph%CanopyArea_grid  , &
+    CanopyArea_grd  => plt_morph%CanopyArea_grd  , &
     CanopyArea_pft  => plt_morph%CanopyArea_pft  , &
     SeedinDepth  => plt_morph%SeedinDepth  , &
     NumOfMainBranch_pft    => plt_morph%NumOfMainBranch_pft    , &
@@ -153,9 +153,9 @@ module UptakesMod
         VapXAir2Canopy_pft(NZ)=0.0_r8
         PrecHeatIntcptByCanP1=PrecIntcptByCanopy_pft(NZ)*cpw*TairK
 
-        IF(CanopyArea_grid.GT.ZEROS)THEN
+        IF(CanopyArea_grd.GT.ZEROS)THEN
           !the grid has significant canopy (leaf+steam) area
-          FracGrndByPFT=CanopyArea_pft(NZ)/CanopyArea_grid*AMIN1(1.0_r8,0.5_r8*CanopyLeafArea_grd/AREA3(NU))
+          FracGrndByPFT=CanopyArea_pft(NZ)/CanopyArea_grd*AMIN1(1.0_r8,0.5_r8*CanopyLeafArea_grd/AREA3(NU))
         ELSEIF(PPT.GT.ZEROS)THEN
           !total population is > 0
           FracGrndByPFT=PlantPopulation_pft(NZ)/PPT

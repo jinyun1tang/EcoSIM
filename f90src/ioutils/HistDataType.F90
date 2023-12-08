@@ -135,7 +135,9 @@ implicit none
   real(r8),pointer   :: histr_1D_sN2O_FLX_col(:)        !SurfGasFlx(idg_N2O,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_sN2G_FLX_col(:)        !SurfGasFlx(idg_N2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_sNH3_FLX_col(:)        !SurfGasFlx(idg_NH3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-
+  real(r8),pointer   :: histr_1D_frcPARabs_ptc(:)      !fraction of PAR absorbed
+  real(r8),pointer   :: histr_1d_PARbyCanopy_ptc(:)    !PAR absorbed by Canopy, umol /m2/s
+  real(r8),pointer   :: histr_1d_PAR_col(:)            !incoming PAR, umol/s
   real(r8),pointer   :: histr_1D_Plant_C_ptc(:)        !whole plant C  
   real(r8),pointer   :: histr_1D_Plant_N_ptc(:)        !whole plant N  
   real(r8),pointer   :: histr_1D_Plant_P_ptc(:)        !whole plant P  
@@ -378,6 +380,7 @@ implicit none
   allocate(this%histr_1D_CO2_LITR_col(beg_col:end_col))      !trc_solcl_vr(idg_CO2,0,NY,NX)
   allocate(this%histr_1D_EVAPN_col(beg_col:end_col))         !VapXAir2GSurf(NY,NX)*1000.0/AREA(3,NU(NY,NX),NY,NX), mm H2O/h/m2
 
+  allocate(this%histr_1d_PAR_col(beg_col:end_col))
   allocate(this%histr_1D_tSWC_col(beg_col:end_col))       !UVLWatMicP(NY,NX)*1000.0/AREA(3,NU(NY,NX),NY,NX), volumetric soil water content
   allocate(this%histr_1D_SNOWPACK_col(beg_col:end_col))      !AZMAX1((VcumDrySnoWE(NY,NX)+VcumIceSnow(NY,NX)*DENSICE+VOLWS(NY,NX))*1000.0/AREA(3,NU(NY,NX),NY,NX))
   allocate(this%histr_1D_SURF_WTR_col(beg_col:end_col))      !THETWZ(0,NY,NX)
@@ -420,6 +423,8 @@ implicit none
   allocate(this%histr_1D_PO4_UPTK_FLX_ptc(beg_ptc:end_ptc))     !RootH2PO4Uptake_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_SHOOT_C_ptc(beg_ptc:end_ptc))      !ShootChemElmnts_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_Plant_C_ptc(beg_ptc:end_ptc))
+  allocate(this%histr_1D_frcPARabs_ptc(beg_ptc:end_ptc))
+  allocate(this%histr_1d_PARbyCanopy_ptc(beg_ptc:end_ptc))
   allocate(this%histr_1D_LEAF_C_ptc(beg_ptc:end_ptc))       !LeafChemElmnts_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_Petiole_C_ptc(beg_ptc:end_ptc))       !PetioleChemElmnts_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), canopy sheath element
   allocate(this%histr_1D_STALK_C_ptc(beg_ptc:end_ptc))      !StalkChemElmnts_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -915,6 +920,11 @@ implicit none
   call hist_addfld1d(fname='sN2O_FLX',units='g/m2/hr',avgflag='A',&
     long_name='*soil N2O flux',ptr_col=data1d_ptr)      
 
+  data1d_ptr => this%histr_1d_PAR_col(beg_col:end_col)
+  call hist_addfld1d(fname='PAR',units='umol m-2 s-1',avgflag='A',&
+    long_name='Direct plus diffusive incoming photosynthetic photon flux density',&
+    ptr_col=data1d_ptr)      
+
   data1d_ptr => this%histr_1D_sN2G_FLX_col(beg_col:end_col)      
   call hist_addfld1d(fname='sN2G_FLX',units='g/m2/hr',&
     avgflag='A',long_name='soil N2 flux',ptr_col=data1d_ptr)      
@@ -1050,6 +1060,14 @@ implicit none
   data1d_ptr => this%histr_1D_SHOOT_C_ptc(beg_ptc:end_ptc)     
   call hist_addfld1d(fname='SHOOT_C',units='gC/m2',avgflag='A',&
     long_name='canopy shoot C',ptr_patch=data1d_ptr)      
+
+  data1d_ptr => this%histr_1D_frcPARabs_ptc(beg_ptc:end_ptc)
+  call hist_addfld1d(fname='frcPARabs',units='none',avgflag='A',&
+    long_name='fraction of PAR absorbed by plant',ptr_patch=data1d_ptr)      
+
+  data1d_ptr => this%histr_1d_PARbyCanopy_ptc(beg_ptc:end_ptc)
+  call hist_addfld1d(fname='Canopy_PAR',units='umol m-2 s-1',avgflag='A',&
+    long_name='PAR absorbed by plant canopy',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%histr_1D_Plant_C_ptc(beg_ptc:end_ptc)     
   call hist_addfld1d(fname='PLANT_C',units='gC/m2',avgflag='A',&
@@ -1516,6 +1534,7 @@ implicit none
       this%histr_1D_N2O_LITR_col(ncol)    = trc_solcl_vr(idg_N2O,0,NY,NX)
       this%histr_1D_NH3_LITR_col(ncol)    = trc_solcl_vr(idg_NH3,0,NY,NX)
       this%histr_1D_SOL_RADN_col(ncol)    = RadSWSolarBeam_col(NY,NX)*277.8_r8
+      
       this%histr_1D_AIR_TEMP_col(ncol)    = TCA(NY,NX)
       this%histr_1D_HUM_col(ncol)         = VPK(NY,NX)
       this%histr_1D_WIND_col(ncol)        = WindSpeedAtm(NY,NX)/3600.0_r8
@@ -1547,6 +1566,7 @@ implicit none
       this%histr_1D_sN2O_FLX_col(ncol)     =  SurfGasFlx(idg_N2O,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_sN2G_FLX_col(ncol)     =  SurfGasFlx(idg_N2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_sNH3_FLX_col(ncol)     =  SurfGasFlx(idg_NH3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%histr_1d_PAR_col(ncol)          = PARDirect_col(NY,NX)+PARDiffus_col(NY,NX)
 
       DO L=1,JZ
         this%histr_2D_tSOC_vr_col(ncol,L) =  ORGC(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -1601,7 +1621,10 @@ implicit none
         this%histr_1D_NO3_UPTK_FLX_ptc(nptc)     = RootNO3Uptake_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_N2_FIXN_FLX_ptc(nptc)      = RootN2Fix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_cNH3_FLX_ptc(nptc)      = RNH3C(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%histr_1D_PO4_UPTK_FLX_ptc(nptc)     = RootH2PO4Uptake_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%histr_1D_PO4_UPTK_FLX_ptc(nptc)  = RootH2PO4Uptake_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%histr_1D_frcPARabs_ptc(nptc)     = FracRadPARbyCanopy_pft(NZ,NY,NX)
+        this%histr_1d_PARbyCanopy_ptc(nptc)   = RadPARbyCanopy_pft(NZ,NY,NX)   !umol /m2/s        
+
         this%histr_1D_SHOOT_C_ptc(nptc)      = ShootChemElmnts_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_Plant_C_ptc(nptc)      = (ShootChemElmnts_pft(ielmc,NZ,NY,NX)+RootChemElmnts_pft(ielmc,NZ,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_LEAF_C_ptc(nptc)       = LeafChemElmnts_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)

@@ -327,8 +327,9 @@ module ncdio_pio
 !EOP
 !
 ! !LOCAL VARIABLES:
-  integer :: ret     ! return value
+  integer :: ret      ! return value
   logical :: log_err ! if should log error
+  integer :: var_size
   character(len=255) :: msg
 !-----------------------------------------------------------------------
 
@@ -341,7 +342,6 @@ module ncdio_pio
   readvar = .true.
 
   ret = nf90_inq_varid (ncid%fh, varname, vardesc%varid)
-
   if (ret/=nf90_noerr) then
     readvar = .false.
     if(log_err)then
@@ -1370,8 +1370,9 @@ module ncdio_pio
 
   call check_var(ncid, trim(varname), vardesc, readvar)
 
+  print*,len(data(1:1)),size(data),varname
   call check_ret(nf90_get_var(ncid%fh, vardesc%varid, data), &
-    'ncd_getvar_str_1ds')
+    'ncd_getvar_str_1ds::'//trim(varname))
 
   end subroutine ncd_getvar_str_1ds
 

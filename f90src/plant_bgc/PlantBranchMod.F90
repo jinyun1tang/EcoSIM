@@ -1809,7 +1809,7 @@ module PlantBranchMod
     MaxPotentSeedNumber_pft     =>  plt_morph%MaxPotentSeedNumber_pft     , &
     NGTopRootLayer_pft      =>  plt_morph%NGTopRootLayer_pft      , &
     PotentialSeedSites_brch    =>  plt_morph%PotentialSeedSites_brch    , &
-    iPlantGrainType   =>  plt_morph%iPlantGrainType   , &
+    iPlantGrainType_pft   =>  plt_morph%iPlantGrainType_pft   , &
     SeedNumberSet_brch    =>  plt_morph%SeedNumberSet_brch      &
   )
 !
@@ -1905,7 +1905,7 @@ module PlantBranchMod
   IF(iPlantCalendar_brch(ipltcal_BeginSeedFill,NB,NZ).NE.0)THEN
     IF(GrainChemElmnts_brch(ielmc,NB,NZ).GE.GrainSeedBiomCMean_brch(NB,NZ)*SeedNumberSet_brch(NB,NZ))THEN
       GROLM=0._r8
-    ELSEIF(iPlantGrainType(NZ).EQ.0)THEN
+    ELSEIF(iPlantGrainType_pft(NZ).EQ.igraintyp_abvgrnd)THEN
       GROLM=AZMAX1(GrainFillRateat25C_pft(NZ)*SeedNumberSet_brch(NB,NZ)*SQRT(fTgrowCanP(NZ)))
     ELSE
       GROLM=AZMAX1(GrainFillRateat25C_pft(NZ)*SeedNumberSet_brch(NB,NZ)*SQRT(fTgrowRootP(NGTopRootLayer_pft(NZ),NZ)))

@@ -51,7 +51,7 @@ module InitVegBGC
     YAGL=PICON/real(NumOfSkyAzimuthSectors,r8)
     YSIN(N)=SIN(YAGL)
     YCOS(N)=COS(YAGL)
-    TYSIN=TYSIN+YSIN(N)
+    TotSineSkyAngles_grd=TotSineSkyAngles_grd+YSIN(N)
     D225: DO L=1,NumOfLeafAzimuthSectors
       write(*,*) "Setting DAZI"
       write(*,*) "L = ", L, " of ", NumOfLeafAzimuthSectors

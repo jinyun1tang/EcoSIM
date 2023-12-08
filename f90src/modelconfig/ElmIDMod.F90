@@ -78,13 +78,15 @@ implicit none
   integer, parameter :: iharvtyp_fire=5
   integer, parameter :: iharvtyp_herbivo=6
 
-
   integer, parameter :: iplt_annual=0
   integer, parameter :: iplt_perennial=1
 
   integer, parameter :: iplt_bryophyte=0
   integer, parameter :: iplt_grasslike=1
   integer, parameter :: iplt_treelike =2
+  
+  integer, parameter :: igraintyp_abvgrnd=0
+  integer, parameter :: igraintyp_blwgrnd=1
 
   integer, parameter :: ideterminate=0
   integer, parameter :: inondeterminate=1
@@ -117,5 +119,9 @@ implicit none
   integer, parameter :: in2fixtyp_canopy_medium=5
   integer, parameter :: in2fixtyp_canopy_slow=6
 
-  
+  integer, parameter :: ithermozone_arcboreal=1
+  integer, parameter :: ithermozone_cooltempr=2
+  integer, parameter :: ithermozone_warmtempr=3
+  integer, parameter :: ithermozone_subtropic=4
+  integer, parameter :: ithermozone_tropical=5
 end module ElmIDMod

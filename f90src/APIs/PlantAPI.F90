@@ -670,7 +670,7 @@ implicit none
   plt_site%ZERO2=ZERO2
   plt_site%ALAT=ALAT(NY,NX)
   plt_site%ATCA=ATCA(NY,NX)
-  plt_morph%CanopyArea_grid=CanopyArea_grid(NY,NX)
+  plt_morph%CanopyArea_grd=CanopyArea_grd(NY,NX)
   plt_morph%CanopyLeafArea_grd=CanopyLeafArea_grd(NY,NX)
   plt_site%ALT=ALT(NY,NX)
   plt_site%CCO2EI=CCO2EI(NY,NX)
@@ -801,7 +801,7 @@ implicit none
     plt_pheno%iPlantPhotoperiodType_pft(NZ)=iPlantPhotoperiodType_pft(NZ,NY,NX)
     plt_pheno%iPlantTurnoverPattern_pft(NZ)=iPlantTurnoverPattern_pft(NZ,NY,NX)
     plt_pheno%iPlantInitThermoAdaptZone(NZ)=iPlantInitThermoAdaptZone(NZ,NY,NX)
-    plt_morph%iPlantGrainType(NZ)=iPlantGrainType(NZ,NY,NX)
+    plt_morph%iPlantGrainType_pft(NZ)=iPlantGrainType_pft(NZ,NY,NX)
     plt_morph%iPlantNfixType(NZ)=iPlantNfixType(NZ,NY,NX)
     plt_morph%MY(NZ)=MY(NZ,NY,NX)
     plt_photo%VCMX(NZ)=VCMX(NZ,NY,NX)
@@ -810,11 +810,11 @@ implicit none
     plt_photo%XKCO2(NZ)=XKCO2(NZ,NY,NX)
     plt_photo%XKO2(NZ)=XKO2(NZ,NY,NX)
     plt_photo%Km4PEPCarboxy_pft(NZ)=Km4PEPCarboxy_pft(NZ,NY,NX)
-    plt_photo%RUBP(NZ)=RUBP(NZ,NY,NX)
+    plt_photo%LeafRuBPConc_pft(NZ)=LeafRuBPConc_pft(NZ,NY,NX)
     plt_photo%PEPC(NZ)=PEPC(NZ,NY,NX)
-    plt_photo%ETMX(NZ)=ETMX(NZ,NY,NX)
-    plt_photo%CHL(NZ)=CHL(NZ,NY,NX)
-    plt_photo%CHL4(NZ)=CHL4(NZ,NY,NX)
+    plt_photo%SpecChloryfilAct_pft(NZ)=SpecChloryfilAct_pft(NZ,NY,NX)
+    plt_photo%LeafC3ChlorofilConc_pft(NZ)=LeafC3ChlorofilConc_pft(NZ,NY,NX)
+    plt_photo%LeafC4ChlorofilConc_pft(NZ)=LeafC4ChlorofilConc_pft(NZ,NY,NX)
     plt_photo%CanPCi2CaRatio(NZ)=CanPCi2CaRatio(NZ,NY,NX)
 
     plt_pheno%RefNodeInitRate_pft(NZ)=RefNodeInitRate_pft(NZ,NY,NX)
@@ -1510,7 +1510,7 @@ implicit none
   ENDDO
   plt_rad%SineSolarAngle=SineSolarAngle(NY,NX)
   plt_site%SolarNoonHour_col=SolarNoonHour_col(NY,NX)
-  plt_morph%CanopyArea_grid=CanopyArea_grid(NY,NX)
+  plt_morph%CanopyArea_grd=CanopyArea_grd(NY,NX)
   plt_rad%GroundSurfAzimuth_col=GroundSurfAzimuth_col(NY,NX)
   plt_rad%CosineGrndSlope_col=CosineGrndSlope_col(NY,NX)
   plt_rad%SineGrndSlope_col=SineGrndSlope_col(NY,NX)
@@ -1522,7 +1522,7 @@ implicit none
   plt_ew%VcumWatSnow=VcumWatSnow(NY,NX)
   plt_ew%VcumIceSnow=VcumIceSnow(NY,NX)
   plt_ew%VcumDrySnoWE=VcumDrySnoWE(NY,NX)
-  plt_rad%TYSIN  =TYSIN
+  plt_rad%TotSineSkyAngles_grd  =TotSineSkyAngles_grd
   plt_rad%SoilAlbedo   =SoilAlbedo(NY,NX)
   plt_rad%SurfAlbedo_col   =SurfAlbedo_col(NY,NX)
   plt_site%ZEROS2=ZEROS2(NY,NX)
@@ -1610,7 +1610,7 @@ implicit none
     TAUS(L,NY,NX)=plt_rad%TAUS(L)
     TAU0(L,NY,NX)=plt_rad%TAU0(L)
   ENDDO
-  CanopyArea_grid(NY,NX)=plt_morph%CanopyArea_grid
+  CanopyArea_grd(NY,NX)=plt_morph%CanopyArea_grd
   DO NZ=1,NP(NY,NX)
     CanopyArea_pft(NZ,NY,NX)=plt_morph%CanopyArea_pft(NZ)
     RadSWbyCanopy_pft(NZ,NY,NX) =plt_rad%RadSWbyCanopy_pft(NZ)

@@ -18,7 +18,7 @@ module CanopyRadDataType
   real(r8),target,allocatable :: LeafAUnshaded_seclyrnodbrpft(:,:,:,:,:,:,:)          !leaf irradiated surface area, [m2 d-2]
   real(r8),target,allocatable :: StemAreaZsec_brch(:,:,:,:,:,:)            !stem surface area, [m2 d-2]
 
-  real(r8) :: TYSIN
+  real(r8) :: TotSineSkyAngles_grd
   real(r8) :: dangle
   private :: InitAllocate
 
@@ -42,7 +42,7 @@ module CanopyRadDataType
     SineLeafAngle(N)=sin(aa)
     CosineLeafAngle(N)=cos(aa)
   ENDDO
-  TYSIN = 0._r8
+  TotSineSkyAngles_grd = 0._r8
   end subroutine InitCanopyRad
 
 !------------------------------------------------------------------------------------------
