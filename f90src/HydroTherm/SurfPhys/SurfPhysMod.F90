@@ -1580,7 +1580,7 @@ contains
   call AtmLandSurfExchange(M,NY,NX,ResistanceLitRLay,TopLayWatVol,LatentHeatAir2Sno,&
     HeatSensEvap,HeatSensAir2Snow,Radnet2Snow,VapXAir2TopLay,HeatFluxAir2Soi1)
 
-  HeatFlux2Ground1=0.0_r8
+  !HeatFlux2Ground1=0.0_r8
 
   !update snow pack before doing snow redistribution to avoid negative mass values  
   call UpdateSnowPack1(M,NY,NX)
