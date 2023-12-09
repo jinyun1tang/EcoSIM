@@ -1588,7 +1588,7 @@ contains
 
   write(*,*) "HeatFlux2Ground1 = ", HeatFlux2Ground1 
 
-  HeatFlux2Ground1=0.0_r8
+  !HeatFlux2Ground1=0.0_r8
 
   !update snow pack before doing snow redistribution to avoid negative mass values  
   call UpdateSnowPack1(M,NY,NX)

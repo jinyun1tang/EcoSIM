@@ -66,7 +66,7 @@ implicit none
     !Z2OE(NY,NX)=atm_n2o
     !ZNH3E(NY,NX)=atm_nh3
     !H2GE(NY,NX)=atm_H2
-    TairK(NY,NX)=tairc(NY)+273.15_r8
+    TairK(NY,NX)=tairc(NY)
     VPA(NY,NX) = vpair(NY)
     WindSpeedAtm(NY,NX) = uwind(NY)
     SWRadOnGrnd(NY,NX) = swrad(NY)
@@ -91,6 +91,8 @@ implicit none
 
   PSIAtFldCapacity = pressure_at_field_capacity
   PSIAtWiltPoint = pressure_at_wilting_point
+  write(*,*) "Air temp", tairc(1)
+  write(*,*) "What's going on with the temperature: ", a_TEMP(1,1)
 
   write(*,*) "Running StageSurfacePhysModel"
   call StageSurfacePhysModel(I,J,NHW,NHE,NVN,NVS,ResistanceLitRLay)
