@@ -25,14 +25,15 @@ module RootGasMod
   real(r8), intent(in) :: FineRootRadius(jroots,JZ1),FracPRoot4Uptake(jroots,JZ1,JP1),FracSoiLayByPrimRoot(JZ1,JP1)
   real(r8), intent(in) :: RootAreaDivRadius_vr(jroots,JZ1),dtPerPlantRootH2OUptake,FOXYX
   real(r8), intent(out):: PopPlantO2Uptake_vr
+  !local variables
   integer :: M,MX
   real(r8) :: B,C
-  real(r8) :: trcg_gmas(idg_beg:idg_end-1)
+  real(r8) :: trcg_gmas_loc(idg_beg:idg_end-1)
   real(r8) :: trcaquconc_loc(idg_beg:idg_end)
   real(r8) :: trcrootconc_loc(idg_beg:idg_end-1)
   real(r8) :: GasDifc_loc(idg_beg:idg_end-1)
   real(r8) :: SolDifc_loc(idg_beg:idg_end-1)
-  real(r8) :: trcg_gcon(idg_beg:idg_end-1)
+  real(r8) :: trcg_gcon_loc(idg_beg:idg_end-1)
   real(r8) :: COXYR,GasPX(idg_beg:idg_end-1)
   real(r8) :: DIFOP,DIFLGas(idg_beg:idg_end),DIFOX,DiffusivitySolutEffP
   real(r8) :: DFAGas(idg_beg:idg_end-1),DFGP
@@ -119,7 +120,7 @@ module RootGasMod
 !     INITIALIZE VARIABLES USED IN ROOT GAS EXCHANGE
 !     (CO2, O2, CH4, N2, N2O, NH3, H2)
 !
-!     trcg_gmas(idg_CO2),trcs_rootml_loc(idg_CO2),trc_gasml_loc(idg_CO2),trc_solml_loc(idg_CO2)=gaseous,aqueous CO2 in root,soil
+!     trcg_gmas_loc(idg_CO2),trcs_rootml_loc(idg_CO2),trc_gasml_loc(idg_CO2),trc_solml_loc(idg_CO2)=gaseous,aqueous CO2 in root,soil
 !     trcaquconc_loc(idg_CH4),trcrootconc_loc(idg_CH4)=aqueous gas concentration in soil,root
 !     RTVLWA,RTVLWB=root aqueous volume in non-band,band
 !     dts_gas=time step of flux calculation
@@ -130,7 +131,7 @@ module RootGasMod
 !
 
     DO NTG=idg_beg,idg_end-1
-      trcg_gmas(NTG)=AMAX1(ZEROP(NZ),trcg_rootml_vr(NTG,N,L,NZ))
+      trcg_gmas_loc(NTG)=AMAX1(ZEROP(NZ),trcg_rootml_vr(NTG,N,L,NZ))
       trcs_rootml_loc(NTG)=AMAX1(ZEROP(NZ),trcs_rootml_vr(NTG,N,L,NZ))
     ENDDO
 
@@ -303,10 +304,10 @@ module RootGasMod
           trcaquconc_loc(idg_O2)=AMIN1(AtmGasc(idg_O2)*GasSolbility_vr(idg_O2,L),AZMAX1(trc_solml_loc(idg_O2)/VLWatMicPMO))
           IF(RootVolume_vr(N,L,NZ).GT.ZERO)THEN
             DO NTG=idg_beg,idg_end-1
-              trcg_gcon(NTG)=AZMAX1(trcg_gmas(NTG)/RootVolume_vr(N,L,NZ))
+              trcg_gcon_loc(NTG)=AZMAX1(trcg_gmas_loc(NTG)/RootVolume_vr(N,L,NZ))
             ENDDO
           ELSE
-            trcg_gcon(idg_beg:idg_end-1)=0.0_r8
+            trcg_gcon_loc(idg_beg:idg_end-1)=0.0_r8
           ENDIF
 
           do NTG=idg_beg,idg_end-1
@@ -505,7 +506,7 @@ module RootGasMod
 !     R*DF1=root gas exchange between gaseous-aqueous phases
 !     R*FL1=root gas exchange with atmosphere
 !     gas code:CO=CO2,OX=O2,CH=CH4,N2=N2O,NH=NH3,H2=H2
-!     trcg_gmas(:),trcs_rootml_loc(:)=gaseous,aqueous gas in root
+!     trcg_gmas_loc(:),trcs_rootml_loc(:)=gaseous,aqueous gas in root
 !     RootVH2O_vr,RootVolume_vr=root aqueous,gaseous volume
 !     VOLW*=RTVLW*gas solubility
 !     C*E,C*A1=atmosphere,root gas concentration
@@ -520,10 +521,10 @@ module RootGasMod
             GasPX(idg_N2)=trcs_rootml_loc(idg_N2O)+RUPSolute(idg_N2)
             GasPX(idg_H2)=trcs_rootml_loc(idg_H2)+RUPSolute(idg_H2)
             DO NTG=idg_beg,idg_end-1
-              trcg_Root2Soil_flx(NTG)=AMAX1(-GasPX(NTG),DFGP*(AMAX1(ZEROP(NZ),trcg_gmas(NTG))*DisolvedGasVolume(NTG) &
+              trcg_Root2Soil_flx(NTG)=AMAX1(-GasPX(NTG),DFGP*(AMAX1(ZEROP(NZ),trcg_gmas_loc(NTG))*DisolvedGasVolume(NTG) &
                 -GasPX(NTG)*RootVolume_vr(N,L,NZ))/(DisolvedGasVolume(NTG)+RootVolume_vr(N,L,NZ)))
               !positive into root
-              trcg_air2root_flx1(NTG)=AMIN1(DFAGas(NTG),RootVolume_vr(N,L,NZ))*(AtmGasc(NTG)-trcg_gcon(NTG))
+              trcg_air2root_flx1(NTG)=AMIN1(DFAGas(NTG),RootVolume_vr(N,L,NZ))*(AtmGasc(NTG)-trcg_gcon_loc(NTG))
             enddo
           ELSE
             trcg_Root2Soil_flx(idg_beg:idg_end-1)=0.0_r8
@@ -534,7 +535,7 @@ module RootGasMod
 !     FOR ROOT AQUEOUS-GASEOUS, GASEOUS-ATMOSPHERE EXCHANGES
 !
           DO NTG=idg_beg,idg_end-1
-            trcg_gmas(NTG)=trcg_gmas(NTG)-trcg_Root2Soil_flx(NTG)+trcg_air2root_flx1(NTG)
+            trcg_gmas_loc(NTG)=trcg_gmas_loc(NTG)-trcg_Root2Soil_flx(NTG)+trcg_air2root_flx1(NTG)
           ENDDO
 
           trcs_rootml_loc(idg_CO2)=trcs_rootml_loc(idg_CO2)+trcg_Root2Soil_flx(idg_CO2)+RUPSolute(idg_CO2)+RCO2PX

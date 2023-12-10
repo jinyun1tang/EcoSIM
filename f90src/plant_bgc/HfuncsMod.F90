@@ -972,7 +972,7 @@ module HfuncsMod
       .AND.doPlantLeafOut_brch(NB,NZ).EQ.iDisable &
       .AND.Hours4LeafOff_brch(NB,NZ).GT.HourThreshold4LeafOff_brch(NB,NZ))THEN
       iPlantCalendar_brch(ipltcal_Elongation,NB,NZ)=I
-      write(101,*)'plant elongation',etimer%get_curr_yearAD(),I,NB,NZ
+      write(101,*)'plant elongation, year, I, NB,NZ',etimer%get_curr_yearAD(),I,NB,NZ
       IF(iPlantPhenologyPattern_pft(NZ).EQ.iplt_annual.AND.iPlantDevelopPattern_pft(NZ).NE.ideterminate)THEN
         LeafNumberAtFloralInit_brch(NB,NZ)=ShootNodeNumber_brch(NB,NZ)
       ENDIF

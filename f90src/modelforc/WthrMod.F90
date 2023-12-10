@@ -322,16 +322,16 @@ module WthrMod
 !
       !     LONGWAVE RADIATION
       !
-      !     XRADH=longwave radiation
+      !     RadLWClm=longwave radiation
       !     THSX=longwave radiation from weather file or calculated from
       !     atmospheric properties
 !
-      IF(XRADH(J,I).GT.0.0_r8)THEN
-        !     THSX(NY,NX)=EMM*(2.04E-10*TairK(NY,NX)**4)
-        !     THSX(NY,NX)=THSX(NY,NX)+XRADH(J,I)
-        THSX(NY,NX)=XRADH(J,I)
+      IF(RadLWClm(J,I).GT.0.0_r8)THEN
+        !     THSX(NY,NX)=EMM*(stefboltz_const*TairK(NY,NX)**4)
+        !     THSX(NY,NX)=THSX(NY,NX)+RadLWClm(J,I)
+        THSX(NY,NX)=RadLWClm(J,I)
       ELSE
-        THSX(NY,NX)=EMM*(2.04E-10_r8*TairK(NY,NX)**4._r8)
+        THSX(NY,NX)=EMM*(stefboltz_const*TairK(NY,NX)**4._r8)
       ENDIF
 !
       !     INSERT CESM WEATHER HERE

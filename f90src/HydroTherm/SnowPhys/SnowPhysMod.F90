@@ -429,7 +429,7 @@ contains
           TotHeatFlow2LitrByWat=HeatFlowSno2LitrByWat+CumHeatConvFlxSno2Litr+CumHeatCndFlxSno2Litr &
             -cumHeatConvFlxLitr2Soi1-cumHeatCndFlxLitr2Soi
           CumHeatFlow2LitR=CumHeatFlow2LitR+TotHeatFlow2LitrByWat
-
+!          write(*,*)'insnow',CumHeatFlow2LitR,CumWatFlow2LitR,safe_adb(CumHeatFlow2LitR,CumWatFlow2LitR*cpw)
           WatFlowSno2LitRM(M,NY,NX)=WatFlowSno2LitRM(M,NY,NX)+WatFlowSno2LitR
           WatFlowSno2MicPM(M,NY,NX)=WatFlowSno2MicPM(M,NY,NX)+WatFlowSno2MicP
           WatFlowSno2MacPM(M,NY,NX)=WatFlowSno2MacPM(M,NY,NX)+WatFlowSno2MacP
@@ -454,7 +454,7 @@ contains
   implicit none
   integer, intent(in) :: M,NY,NX
   real(r8), intent(inout) :: HeatSensEvap
-  real(r8), intent(inout) :: CumWatFlow2LitR
+  real(r8), intent(out) :: CumWatFlow2LitR
   real(r8), intent(out) :: HeatNetFlx2Snow
   real(r8), intent(out) :: LatentHeatAir2Sno
   real(r8), intent(out) :: Radnet2Snow
@@ -481,7 +481,7 @@ contains
   !     SnowAlbedo=snowpack albedo
   !     VLDrySnoWE0M,VOLI0M,VOLW0M=snow,ice,water volumes
   !     RFLX0=net radiation input
-  !     RADXW=shortwave radiation at snowpack surface
+  !     RadSWonSno=shortwave radiation at snowpack surface
   !     LWRad2Snow=longwave radn incident at snowpack surface
   !     LWRadSno1=longwave radn emitted by snowpack surface
   !     TKSnow1=snowpack surface temperature
@@ -496,7 +496,8 @@ contains
   Radnet2Snow=0.0_r8
   LatentHeatAir2Sno=0.0_r8
   HeatNetFlx2Snow=0.0_r8
-
+  CumWatFlow2LitR=0._r8
+!  print*,'snowsolve'
   D3000: DO MM=1,NPS
 
      if(TKSoi1(0,NY,NX)<100._r8 .or. TKSoi1(0,NY,NX)>400._r8)write(*,*)'TXKR MM=',MM,TKSoi1(0,NY,NX)
@@ -506,6 +507,7 @@ contains
     call SnowPackIterationM(M,NY,NX,TotWatXFlx2SoiMicP,TotHeatFlow2Soi,WatFlowSno2MacP,&
       TotWatFlow2LitrByWat,TotHeatFlow2LitrByWat,CumWatFlx2SoiMacP,CumWatFlx2SoiMicP,&
       CumWatXFlx2SoiMicP,CumWatFlow2LitR,CumHeatFlow2LitR,cumHeatFlowSno2Soi)
+!    print*,'WatFlow2LitR',MM,CumWatFlow2LitR,CumHeatFlow2LitR,safe_adb(CumHeatFlow2LitR,cpw*CumWatFlow2LitR)
 !
 !     ACCUMULATE SNOWPACK FLUXES TO LONGER TIME STEP FOR
 !     LITTER, SOIL FLUX CALCULATIONS
@@ -675,7 +677,7 @@ contains
   real(r8) :: SnowAlbedo,RFLX0,RI
   real(r8) :: LWRadSno1,RadNet2Sno2
   real(r8) :: RAGX
-  real(r8):: Raa,PARE,PARS
+  real(r8):: Raa,CdSnoEvap,CdSnoHSens
   real(r8) :: VPSno0,EVAPW2,EVAPX2,HeatSensAir2Sno2
   real(r8) :: LatentHeatAir2Sno2,EvapSublimation2,MaxVapXAir2Sno
   real(r8) :: HeatNetFlx2Sno1,HeatNetFlx2Sno2,HeatSensAir2SnoByEvap2
@@ -686,8 +688,8 @@ contains
   SnowAlbedo=(0.85_r8*VLDrySnoWE0M(1,NY,NX)+0.30_r8*VLIceSnow0M(1,NY,NX)+0.06_r8*VLWatSnow0M(1,NY,NX)) &
     /(VLDrySnoWE0M(1,NY,NX)+VLIceSnow0M(1,NY,NX)+VLWatSnow0M(1,NY,NX))
 
-  RFLX0=(1.0_r8-SnowAlbedo)*RADXW(NY,NX)+LWRad2Snow(NY,NX)    !incoming radiation, short + longwave
-  LWRadSno1=THRMW(NY,NX)*TKSnow1(1,NY,NX)**4._r8         !emitting longwave radiation,
+  RFLX0=(1.0_r8-SnowAlbedo)*RadSWonSno(NY,NX)+LWRad2Snow(NY,NX)    !incoming radiation, short + longwave
+  LWRadSno1=LWEmscefSnow(NY,NX)*TKSnow1(1,NY,NX)**4._r8         !emitting longwave radiation,
   RadNet2Sno2=RFLX0-LWRadSno1                            !net radiation
   !
   !     AERODYNAMIC RESISTANCE ABOVE SNOWPACK INCLUDING
@@ -706,7 +708,7 @@ contains
   !
   ! PARAMETERS FOR CALCULATING LATENT AND SENSIBLE HEAT FLUXES
   !
-  !     PARE,PARS=blcs for snowpack latent,sensible heat fluxes
+  !     CdSnoEvap,CdSnoHSens=conductance for snowpack latent,sensible heat fluxes
   !     PAREW,PARSW=conductances for latent,sensible heat fluxes
   !     RZ=surface resistance
   !     VPSno0,VPQ=vapor pressure at snowpack surface, canopy air
@@ -716,11 +718,11 @@ contains
   !     VAP,VAPS=latent heat of evaporation,sublimation
   !     HeatSensAir2SnoByEvap2=convective heat of evaporation flux
   !
-  PARE=PAREW(NY,NX)/(RAa+RZ)
-  PARS=PARSW(NY,NX)/RAa    
+  CdSnoEvap=PAREW(NY,NX)/(RAa+RZ)
+  CdSnoHSens=PARSW(NY,NX)/RAa    
   VPSno0=vapsat(TKSnow1(1,NY,NX))
 
-  MaxVapXAir2Sno=PARE*(VPQ(NY,NX)-VPSno0)  
+  MaxVapXAir2Sno=CdSnoEvap*(VPQ(NY,NX)-VPSno0)  
   !first the loss is evaporation from snow held water
   EVAPW2=AMAX1(MaxVapXAir2Sno,-AZMAX1(VLWatSnow0M(1,NY,NX)*dts_sno))    
   !then the loss is sublimation from dry snow
@@ -747,7 +749,7 @@ contains
 !     FLQ0S2,FLQ0W2,FLQ0I2=snow,water,ice input to snowpack
 !     HeatSnofall2Snow=convective heat from snow,water,ice input to snowpack
 !
-  HeatSensAir2Sno2=PARS*(TKQ(NY,NX)-TKSnow1(1,NY,NX))
+  HeatSensAir2Sno2=CdSnoHSens*(TKQ(NY,NX)-TKSnow1(1,NY,NX))
   !occasionally, RadNet2Sno2 and HeatSensAir2Sno2 go to infinity
   HeatNetFlx2Sno1=RadNet2Sno2+LatentHeatAir2Sno2+HeatSensAir2Sno2   
   HeatNetFlx2Sno2=HeatNetFlx2Sno1+HeatSensAir2SnoByEvap2
@@ -782,7 +784,7 @@ contains
 !    5,VLWatSnow0M(1,NY,NX),VLDrySnoWE0M(1,NY,NX),VLIceSnow0M(1,NY,NX)
 !    6,HeatX2SnoLay(1,NY,NX),NetHeatAir2Snow,HWFLQ02,HeatNetFlx2Sno2,RadNet2Sno2,LatentHeatAir2Sno2
 !    7,HeatSensAir2Sno2,HeatSensAir2SnoByEvap2,TKSnow1(1,NY,NX),TKQ(NY,NX)
-!    8,PARE,RA,RZ,EvapSublimation2,EVAPW2,MaxVapXAir2Sno
+!    8,CdSnoEvap,RA,RZ,EvapSublimation2,EVAPW2,MaxVapXAir2Sno
 !7759  FORMAT(A8,4I4,40E14.6)
 !     ENDIF
 !

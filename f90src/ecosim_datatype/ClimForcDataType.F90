@@ -31,11 +31,11 @@ implicit none
   real(r8) :: DWPT(2,366)                       !daily dewpoint temperature, [oC]
 
   real(r8) :: TMPH(24,366)                      !hourly air temperature, [oC]
-  real(r8) :: SWRad_hrly(24,366)                     !hourly solar radiation, [MJ m-2 h-1]
+  real(r8) :: SWRad_hrly(24,366)                !hourly solar radiation, [MJ m-2 h-1]
   real(r8) :: RAINH(24,366)                     !hourly precipitation, [mm h-1]
   real(r8) :: WINDH(24,366)                     !hourly wind speed, [m h-1]
   real(r8) :: DWPTH(24,366)                     !hourly dewpoint temperature, [oC]
-  real(r8) :: XRADH(24,366)                     !longwave radiation (MJ m-2 h-1)
+  real(r8) :: RadLWClm(24,366)                     !longwave radiation (MJ m-2 h-1)
 
   real(r8) :: DRAD(12)                          !change factor for radiation, [-]
   real(r8) :: DTMPX(12)                         !change factor for maximum temperature, [-]

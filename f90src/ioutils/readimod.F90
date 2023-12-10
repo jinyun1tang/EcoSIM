@@ -143,7 +143,7 @@ module readiMod
   case (2)
     status='2D Along the north-south direction' !2d, no x direction
   case (3)
-    status='1D lateral connection'           !1d, vertical only
+    status='1D vertical column'           !1d, vertical only
   case default
     status=''
     call endrun('wrong option for NCNG in '//trim(mod_filename)//' at line',__LINE__)

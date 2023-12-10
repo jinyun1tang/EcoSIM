@@ -1455,7 +1455,7 @@ implicit none
 
 !    if (no_snow_behavior /= no_snow_unset) then
        ! For multi-layer snow fields, build a special output variable that handles
-       ! miSineSolarAngleg snow layers appropriately
+       ! missing snow layers appropriately
 
        ! Note, regarding bug 1786: The following allocation is not what we would want if
        ! this routine were operating in a threaded region (or, more generally, within a

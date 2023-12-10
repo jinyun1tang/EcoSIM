@@ -586,7 +586,7 @@ module UptakesMod
       plt_ew%Transpiration_pft(NZ)=0.0_r8
       TKC(NZ)=TairK+DTKC(NZ)
       TCelciusCanopy_pft(NZ)=units%Kelvin2Celcius(TKC(NZ))
-      FTHRM=EMMC*2.04E-10_r8*FracRadPARbyCanopy_pft(NZ)*AREA3(NU)
+      FTHRM=EMMC*stefboltz_const*FracRadPARbyCanopy_pft(NZ)*AREA3(NU)
       LWRadCanP(NZ)=FTHRM*TKC(NZ)**4._r8
       PSICanopy_pft(NZ)=ElvAdjstedtSoiPSIMPa(NGTopRootLayer_pft(NZ))      
       CCPOLT=CanopyNonstructElementConc_pft(ielmc,NZ)+CanopyNonstructElementConc_pft(ielmn,NZ)+CanopyNonstructElementConc_pft(ielmp,NZ)
@@ -686,7 +686,7 @@ module UptakesMod
     LWRadGrnd  => plt_rad%LWRadGrnd     &
   )
   CCPOLT=CanopyNonstructElementConc_pft(ielmc,NZ)+CanopyNonstructElementConc_pft(ielmn,NZ)+CanopyNonstructElementConc_pft(ielmp,NZ)
-  FTHRM=EMMC*2.04E-10_r8*FracRadPARbyCanopy_pft(NZ)*AREA3(NU)
+  FTHRM=EMMC*stefboltz_const*FracRadPARbyCanopy_pft(NZ)*AREA3(NU)
   LWRad2CanP=(LWRadSky+LWRadGrnd)*FracRadPARbyCanopy_pft(NZ)
 !     RAZ=canopy isothermal boundary later resistance
 
@@ -1160,7 +1160,7 @@ module UptakesMod
     TKC(NZ)=TKSnow
   ENDIF
   TCelciusCanopy_pft(NZ)=units%Kelvin2Celcius(TKC(NZ))
-  FTHRM=EMMC*2.04E-10_r8*FracRadPARbyCanopy_pft(NZ)*AREA3(NU)
+  FTHRM=EMMC*stefboltz_const*FracRadPARbyCanopy_pft(NZ)*AREA3(NU)
   LWRadCanP(NZ)=FTHRM*TKC(NZ)**4._r8
   PSICanopy_pft(NZ)=ElvAdjstedtSoiPSIMPa(NGTopRootLayer_pft(NZ))
   

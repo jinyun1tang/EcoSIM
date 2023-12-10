@@ -25,7 +25,7 @@ implicit none
   real(r8),allocatable ::  PARSW(:,:)                         !  
   real(r8),allocatable ::  Ice2Snowt(:,:)                         !  
   real(r8),allocatable ::  TKQ(:,:)                           !  
-  real(r8),allocatable ::  THRMW(:,:)                         !  
+  real(r8),allocatable ::  LWEmscefSnow(:,:)                         !  
   real(r8),allocatable ::  RAGW(:,:)                          !  
   real(r8),allocatable ::  LWRad2Snow(:,:)                         !  
   real(r8),allocatable ::  VLairMicP1(:,:,:)                       ! corrected air-filled micropore volume 
@@ -38,7 +38,7 @@ implicit none
   real(r8),allocatable ::  PAREW(:,:)                         ! 
   real(r8),allocatable ::  Altitude_grid(:,:)                          ! 
   real(r8),allocatable ::  VLiceMacP1(:,:,:)                      !
-  real(r8),allocatable ::  RADXW(:,:)                         !  
+  real(r8),allocatable ::  RadSWonSno(:,:)                         !  
   real(r8),allocatable ::  WatFlx2LitRByRunoff(:,:,:,:)                       !  
   real(r8),allocatable ::  HeatFlx2LitRByRunoff(:,:,:,:)                      !  
   real(r8),allocatable ::  DrySnoFlxBySnowRedistribut(:,:,:)                         !  
@@ -84,7 +84,7 @@ implicit none
   allocate(PARSW(JY,JX));       PARSW=0._r8
   allocate(Ice2Snowt(JY,JX));       Ice2Snowt=0._r8    
   allocate(TKQ(JY,JX));         TKQ=0._r8  
-  allocate(THRMW(JY,JX));       THRMW=0._r8  
+  allocate(LWEmscefSnow(JY,JX));       LWEmscefSnow=0._r8  
   allocate(RAGW(JY,JX));        RAGW=0._r8  
   allocate(LWRad2Snow(JY,JX));       LWRad2Snow=0._r8  
   allocate(VLairMicP1(0:JZ,JY,JX));  VLairMicP1=0._r8  
@@ -97,7 +97,7 @@ implicit none
   allocate(PAREW(JY,JX));       PAREW=0._r8
   allocate(Altitude_grid(JY,JX));        Altitude_grid=0._r8  
   allocate(VLiceMacP1(JZ,JY,JX));   VLiceMacP1=0._r8  
-  allocate(RADXW(JY,JX));       RADXW=0._r8  
+  allocate(RadSWonSno(JY,JX));       RadSWonSno=0._r8  
   allocate(WatFlx2LitRByRunoff(2,2,JV,JH));     WatFlx2LitRByRunoff=0._r8  
   allocate(HeatFlx2LitRByRunoff(2,2,JV,JH));    HeatFlx2LitRByRunoff=0._r8
   allocate(DrySnoFlxBySnowRedistribut(2,JV,JH));       DrySnoFlxBySnowRedistribut=0._r8
@@ -142,7 +142,7 @@ implicit none
   call destroy(PARSW)  
   call destroy(Ice2Snowt)
   call destroy(TKQ)
-  call destroy(THRMW)
+  call destroy(LWEmscefSnow)
   call destroy(RAGW) 
   call destroy(LWRad2Snow)
   call destroy(VLairMicP1)
@@ -155,7 +155,7 @@ implicit none
   call destroy(PAREW)
   call destroy(Altitude_grid)
   call destroy(VLiceMacP1)
-  call destroy(RADXW)
+  call destroy(RadSWonSno)
   call destroy(HeatFlx2LitRByRunoff)    
   call destroy(DrySnoFlxBySnowRedistribut)  
   call destroy(WatFlxBySnowRedistribut)
