@@ -484,7 +484,7 @@ contains
 
   IF(TKX1.LE.0.0_r8)THEN
     write(*,*) "TKX1 is zero, resetting"
-    TKX1 = 1.0_r8
+    TKX1 = 273.15_r8
   ENDIF
 
   write(*,*) "TKSoi1 = ", TKSoi1(NUM(NY,NX),NY,NX)
@@ -1579,8 +1579,6 @@ contains
 ! updates ResistanceLitRLay
   call AtmLandSurfExchange(M,NY,NX,ResistanceLitRLay,TopLayWatVol,LatentHeatAir2Sno,&
     HeatSensEvap,HeatSensAir2Snow,Radnet2Snow,VapXAir2TopLay,HeatFluxAir2Soi1)
-
-  !HeatFlux2Ground1=0.0_r8
 
   !update snow pack before doing snow redistribution to avoid negative mass values  
   call UpdateSnowPack1(M,NY,NX)
