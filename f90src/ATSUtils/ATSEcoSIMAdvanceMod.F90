@@ -91,10 +91,7 @@ implicit none
 
   PSIAtFldCapacity = pressure_at_field_capacity
   PSIAtWiltPoint = pressure_at_wilting_point
-  write(*,*) "Air temp", tairc(1)
-  write(*,*) "What's going on with the temperature: ", a_TEMP(1,1)
 
-  write(*,*) "Running StageSurfacePhysModel"
   call StageSurfacePhysModel(I,J,NHW,NHE,NVN,NVS,ResistanceLitRLay)
 
   DO M=1,NPH
@@ -108,7 +105,7 @@ implicit none
 
   DO NY=1,NYS
     !for every column send the top layer to the transfer var
-    surf_e_source(NY) = HeatFlux2Ground(NY,1) 
+    surf_e_source(NY) = HeatFlux2Ground(NY,1) / (dts_HeatWatTP*3600._r8)
   ENDDO
 
   write(*,*) "Finished Subroutine RunEcoSIMSurfaceBalance"
