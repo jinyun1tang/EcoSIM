@@ -957,29 +957,6 @@ module StartsMod
   dts_sno=dts_wat*XNPS
   XNPB=dts_wat*XNPR
   dt_watvap=dts_wat*XNPV
-  
-  ! Write statements for each variable
-  write(*, *) "NPX:", NPX
-  write(*, *) "NPY:", NPY
-  write(*, *) "NPH:", NPH
-  write(*, *) "NPT:", NPT
-  write(*, *) "NPG:", NPG
-  write(*, *) "NPR:", NPR
-  write(*, *) "NPS:", NPS
-  write(*, *) "dts_HeatWatTP:", dts_HeatWatTP
-  write(*, *) "XNPT:", XNPT
-  write(*, *) "dts_gas:", dts_gas
-  write(*, *) "XNPR:", XNPR
-  write(*, *) "XNPS:", XNPS
-  write(*, *) "dts_snohttp:", dts_snohttp
-  write(*, *) "dts_litrhtwtp:", dts_litrhtwtp
-  write(*, *) "dts_litrvapht:", dts_litrvapht
-  write(*, *) "XNPV:", XNPV
-  write(*, *) "XNPD:", XNPD
-  write(*, *) "dts_wat:", dts_wat
-  write(*, *) "dts_sno:", dts_sno
-  write(*, *) "XNPB:", XNPB
-  write(*, *) "dt_watvap:", dt_watvap
 
   end subroutine set_ecosim_solver
 
