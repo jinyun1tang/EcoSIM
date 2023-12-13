@@ -15,7 +15,7 @@ module ATSEcoSIMAdvanceMod
   use SoilPropertyDataType
   use HydroThermData, only : PSISM1, TKSoi1, VLHeatCapacity, &
       SoilFracAsMicP, VLWatMicP1, VLiceMicP1 !need the only as some vars are double defined
-  use EcoSIMSolverPar, only : NPH
+  use EcoSIMSolverPar, only : NPH, dts_HeatWatTP
 implicit none
   character(len=*), private, parameter :: mod_filename=&
   __FILE__
@@ -99,13 +99,11 @@ implicit none
       KSatReductByRainKineticEnergyS,HeatFlux2Ground,TopLayWatVol)
   ENDDO
 
-  do NY=1,NYS
-    write(*,*) "Col: ", NY , "Heat Flux: ", HeatFlux2Ground(NY,1)
-  ENDDO
-
   DO NY=1,NYS
     !for every column send the top layer to the transfer var
-    surf_e_source(NY) = HeatFlux2Ground(NY,1) / (dts_HeatWatTP*3600._r8)
+    !surf_e_source(NY) = HeatFlux2Ground(NY,1) / (dts_HeatWatTP*3600._r8)
+    !returns total heat flux (MJ/timestep)
+    surf_e_source(NY) = HeatFlux2Ground(NY,1)
   ENDDO
 
   write(*,*) "Finished Subroutine RunEcoSIMSurfaceBalance"
