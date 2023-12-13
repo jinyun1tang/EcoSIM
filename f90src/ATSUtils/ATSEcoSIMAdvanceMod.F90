@@ -46,9 +46,9 @@ implicit none
   
   NX=1
 
-  write(*,*) "Checking dimensions:"
-  write(*, *) "Dimensions of TKSoi1:", SIZE(TKSoi1, 1), SIZE(TKSoi1, 2), SIZE(TKSoi1, 3)
-  write(*, *) "Dimensions of a_TEMP:", SIZE(a_TEMP, 1), SIZE(a_TEMP, 2)
+  !write(*,*) "Checking dimensions:"
+  !write(*, *) "Dimensions of TKSoi1:", SIZE(TKSoi1, 1), SIZE(TKSoi1, 2), SIZE(TKSoi1, 3)
+  !write(*, *) "Dimensions of a_TEMP:", SIZE(a_TEMP, 1), SIZE(a_TEMP, 2)
 
   write(*,*) "Starting loop: "
 
@@ -98,7 +98,8 @@ implicit none
     call RunSurfacePhysModel(M,NHE,NHW,NVS,NVN,ResistanceLitRLay,&
       KSatReductByRainKineticEnergyS,HeatFlux2Ground,TopLayWatVol)
   ENDDO
-
+  
+  write(*,*) "Timestep in EcoSIM: ", dts_HeatWatTP, " hr"
   DO NY=1,NYS
     !for every column send the top layer to the transfer var
     !surf_e_source(NY) = HeatFlux2Ground(NY,1) / (dts_HeatWatTP*3600._r8)

@@ -480,14 +480,11 @@ contains
   CdSoiHSens=PARSG(NY,NX)/RAa
 
   TKX1=TKSoi1(NUM(NY,NX),NY,NX)
-  write(*,*) "TKSoi1 = ", TKSoi1(NUM(NY,NX),NY,NX)
 
   IF(TKX1.LE.0.0_r8)THEN
     write(*,*) "TKX1 is zero, resetting"
     TKX1 = 273.15_r8
   ENDIF
-
-  write(*,*) "TKSoi1 = ", TKSoi1(NUM(NY,NX),NY,NX)
 
   VaporSoi1=vapsat(TKX1)*EXP(18.0_r8*PSISV1/(RGAS*TKX1))
 
@@ -1535,8 +1532,8 @@ contains
         HeatFluxAir2Soi(NY,NX),LatentHeatAir2Sno,HeatSensEvap,HeatSensAir2Snow,Radnet2Snow,&
         TopLayWatVol,VapXAir2TopLay)
       
-      write(*,*) "HeatFlux2Ground = ", HeatFlux2Ground
-      write(*,*)'TXKR SurfaceEnergyModel MM=',M,TKSoi1(0,NY,NX)
+      !write(*,*) "HeatFlux2Ground = ", HeatFlux2Ground
+      !write(*,*)'TXKR SurfaceEnergyModel MM=',M,TKSoi1(0,NY,NX)
 
     ! CAPILLARY EXCHANGE OF WATER BETWEEN SOIL SURFACE AND RESIDUE
       call SurfLitrSoilWaterExchange(M,NY,NX,KSatReductByRainKineticEnergy(NY,NX))
