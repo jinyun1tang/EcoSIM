@@ -1186,7 +1186,7 @@ module restUtilMod
   end subroutine cpcol_r_5d
 
 !------------------------------------------------------------------------------------------
-  subroutine cppft_i_1d(flag,NHW,NHE,NVN,NVS,NP,dat_arp,datip_1d,NumActivePlants,IsPlantActive)
+  subroutine cppft_i_1d(flag,NHW,NHE,NVN,NVS,NP,dat_arp,datip_1d,NumActivePlants,IsPlantActive_pft)
   implicit none
   character(len=*),intent(in) :: flag
   integer, intent(in) :: NHW,NHE,NVN,NVS
@@ -1194,7 +1194,7 @@ module restUtilMod
   integer, intent(inout) :: dat_arp(:,:,:)
   integer, intent(inout):: datip_1d(:)
   integer, intent(in), optional :: NumActivePlants(:,:)
-  integer, intent(in), optional :: IsPlantActive(:,:,:)
+  integer, intent(in), optional :: IsPlantActive_pft(:,:,:)
   integer :: NZ,NY,NX,ip
 
   if (flag=='read')then
@@ -1203,8 +1203,8 @@ module restUtilMod
         DO NY=NVN,NVS
           IF(NumActivePlants(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
-              if(present(IsPlantActive))then
-                IF(IsPlantActive(NZ,NY,NX)==iPlantIsActive)THEN
+              if(present(IsPlantActive_pft))then
+                IF(IsPlantActive_pft(NZ,NY,NX)==iPlantIsActive)THEN
                   ip=get_pft(NZ,NY,NX)
                   dat_arp(NZ,NY,NX)=datip_1d(ip)
                 endif
@@ -1233,8 +1233,8 @@ module restUtilMod
         DO NY=NVN,NVS
           IF(NumActivePlants(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
-              if(present(IsPlantActive))then
-                IF(IsPlantActive(NZ,NY,NX)==iPlantIsActive)THEN
+              if(present(IsPlantActive_pft))then
+                IF(IsPlantActive_pft(NZ,NY,NX)==iPlantIsActive)THEN
                   ip=get_pft(NZ,NY,NX)
                   datip_1d(ip)=dat_arp(NZ,NY,NX)
                 endif
@@ -1260,7 +1260,7 @@ module restUtilMod
   end subroutine cppft_i_1d
 
 !------------------------------------------------------------------------------------------
-  subroutine cppft_i_2d(flag,NHW,NHE,NVN,NVS,NP,dat_arp,datip_2d,NumActivePlants,IsPlantActive)
+  subroutine cppft_i_2d(flag,NHW,NHE,NVN,NVS,NP,dat_arp,datip_2d,NumActivePlants,IsPlantActive_pft)
   implicit none
   character(len=*),intent(in) :: flag
   integer, intent(in) :: NHW,NHE,NVN,NVS
@@ -1268,7 +1268,7 @@ module restUtilMod
   integer, intent(inout) :: dat_arp(:,:,:,:)
   integer, intent(inout):: datip_2d(:,:)
   integer, intent(in), optional :: NumActivePlants(:,:)
-  integer, intent(in), optional :: IsPlantActive(:,:,:)
+  integer, intent(in), optional :: IsPlantActive_pft(:,:,:)
   integer :: NZ,NY,NX,ip,NN
 
   if (flag=='read')then
@@ -1277,8 +1277,8 @@ module restUtilMod
         DO NY=NVN,NVS
           IF(NumActivePlants(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
-              if(present(IsPlantActive))then
-                IF(IsPlantActive(NZ,NY,NX)==iPlantIsActive)THEN
+              if(present(IsPlantActive_pft))then
+                IF(IsPlantActive_pft(NZ,NY,NX)==iPlantIsActive)THEN
                   ip=get_pft(NZ,NY,NX)
                   DO NN=1,SIZE(dat_arp,1)
                     dat_arp(NN,NZ,NY,NX)=datip_2d(ip,NN)
@@ -1314,8 +1314,8 @@ module restUtilMod
 
           IF(NumActivePlants(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
-              if(present(IsPlantActive))then
-                IF(IsPlantActive(NZ,NY,NX)==iPlantIsActive)THEN
+              if(present(IsPlantActive_pft))then
+                IF(IsPlantActive_pft(NZ,NY,NX)==iPlantIsActive)THEN
                   ip=get_pft(NZ,NY,NX)
                   DO NN=1,SIZE(dat_arp,1)
                     datip_2d(ip,NN)=dat_arp(NN,NZ,NY,NX)
@@ -1347,7 +1347,7 @@ module restUtilMod
   end subroutine cppft_i_2d
 
 !------------------------------------------------------------------------------------------
-  subroutine cppft_i_3d(flag,NHW,NHE,NVN,NVS,NP,dat_arp,datip_3d,NumActivePlants,IsPlantActive)
+  subroutine cppft_i_3d(flag,NHW,NHE,NVN,NVS,NP,dat_arp,datip_3d,NumActivePlants,IsPlantActive_pft)
   implicit none
   character(len=*),intent(in) :: flag
   integer, intent(in) :: NHW,NHE,NVN,NVS
@@ -1355,7 +1355,7 @@ module restUtilMod
   integer, intent(inout) :: dat_arp(:,:,:,:,:)
   integer, intent(inout):: datip_3d(:,:,:)
   integer, intent(in), optional :: NumActivePlants(:,:)
-  integer, intent(in), optional :: IsPlantActive(:,:,:)
+  integer, intent(in), optional :: IsPlantActive_pft(:,:,:)
   integer :: NZ,NY,NX,ip,N1,N2
 
   if (flag=='read')then
@@ -1364,8 +1364,8 @@ module restUtilMod
         DO NY=NVN,NVS
           IF(NumActivePlants(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
-              if(present(IsPlantActive))then
-                IF(IsPlantActive(NZ,NY,NX)==iPlantIsActive)THEN
+              if(present(IsPlantActive_pft))then
+                IF(IsPlantActive_pft(NZ,NY,NX)==iPlantIsActive)THEN
                   ip=get_pft(NZ,NY,NX)
                   DO N2=1,SIZE(dat_arp,2)
                     DO N1=1,SIZE(dat_arp,1)
@@ -1406,8 +1406,8 @@ module restUtilMod
         DO NY=NVN,NVS
           IF(NumActivePlants(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
-              if(present(IsPlantActive))then
-                IF(IsPlantActive(NZ,NY,NX)==iPlantIsActive)THEN
+              if(present(IsPlantActive_pft))then
+                IF(IsPlantActive_pft(NZ,NY,NX)==iPlantIsActive)THEN
                   ip=get_pft(NZ,NY,NX)
                   DO N2=1,SIZE(dat_arp,2)
                     DO N1=1,SIZE(dat_arp,1)
@@ -1445,7 +1445,7 @@ module restUtilMod
   end subroutine cppft_i_3d
 
 !------------------------------------------------------------------------------------------
-  subroutine cppft_r_1d(flag,NHW,NHE,NVN,NVS,NP,dat_arp,datrp_1d,NumActivePlants,IsPlantActive)
+  subroutine cppft_r_1d(flag,NHW,NHE,NVN,NVS,NP,dat_arp,datrp_1d,NumActivePlants,IsPlantActive_pft)
   implicit none
   character(len=*),intent(in) :: flag
   integer, intent(in) :: NHW,NHE,NVN,NVS
@@ -1453,7 +1453,7 @@ module restUtilMod
   real(r8), intent(inout) :: dat_arp(:,:,:)
   real(r8), intent(inout):: datrp_1d(:)
   integer, intent(in), optional :: NumActivePlants(:,:)
-  integer, intent(in), optional :: IsPlantActive(:,:,:)
+  integer, intent(in), optional :: IsPlantActive_pft(:,:,:)
   integer :: NZ,NY,NX,ip
 
   if (flag=='read')then
@@ -1462,8 +1462,8 @@ module restUtilMod
         DO NY=NVN,NVS
           IF(NumActivePlants(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
-              if(present(IsPlantActive))then
-                IF(IsPlantActive(NZ,NY,NX)==iPlantIsActive)THEN
+              if(present(IsPlantActive_pft))then
+                IF(IsPlantActive_pft(NZ,NY,NX)==iPlantIsActive)THEN
                   ip=get_pft(NZ,NY,NX)
                   dat_arp(NZ,NY,NX)=datrp_1d(ip)
                 endif
@@ -1492,8 +1492,8 @@ module restUtilMod
         DO NY=NVN,NVS
           IF(NumActivePlants(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
-              if(present(IsPlantActive))then
-                IF(IsPlantActive(NZ,NY,NX)==iPlantIsActive)THEN
+              if(present(IsPlantActive_pft))then
+                IF(IsPlantActive_pft(NZ,NY,NX)==iPlantIsActive)THEN
                   ip=get_pft(NZ,NY,NX)
                   datrp_1d(ip)=dat_arp(NZ,NY,NX)
                 endif
@@ -1519,7 +1519,7 @@ module restUtilMod
   end subroutine cppft_r_1d
 
 !------------------------------------------------------------------------------------------
-  subroutine cppft_r_2d(flag,NHW,NHE,NVN,NVS,NP,dat_arp,datrp_2d,NumActivePlants,IsPlantActive)
+  subroutine cppft_r_2d(flag,NHW,NHE,NVN,NVS,NP,dat_arp,datrp_2d,NumActivePlants,IsPlantActive_pft)
   implicit none
   character(len=*),intent(in) :: flag
   integer, intent(in) :: NHW,NHE,NVN,NVS
@@ -1527,7 +1527,7 @@ module restUtilMod
   real(r8), intent(inout) :: dat_arp(:,:,:,:)
   real(r8), intent(inout):: datrp_2d(:,:)
   integer, intent(in), optional :: NumActivePlants(:,:)
-  integer, intent(in), optional :: IsPlantActive(:,:,:)
+  integer, intent(in), optional :: IsPlantActive_pft(:,:,:)
   integer :: NZ,NY,NX,ip,NN
 
   if (flag=='read')then
@@ -1536,8 +1536,8 @@ module restUtilMod
         DO NY=NVN,NVS
           IF(NumActivePlants(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
-              if(present(IsPlantActive))then
-                IF(IsPlantActive(NZ,NY,NX)==iPlantIsActive)THEN
+              if(present(IsPlantActive_pft))then
+                IF(IsPlantActive_pft(NZ,NY,NX)==iPlantIsActive)THEN
                   ip=get_pft(NZ,NY,NX)
                   DO NN=1,SIZE(dat_arp,1)
                     dat_arp(NN,NZ,NY,NX)=datrp_2d(ip,NN)
@@ -1572,8 +1572,8 @@ module restUtilMod
         DO NY=NVN,NVS
           IF(NumActivePlants(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
-              if(present(IsPlantActive))then
-                IF(IsPlantActive(NZ,NY,NX)==iPlantIsActive)THEN
+              if(present(IsPlantActive_pft))then
+                IF(IsPlantActive_pft(NZ,NY,NX)==iPlantIsActive)THEN
                   ip=get_pft(NZ,NY,NX)
                   DO NN=1,SIZE(dat_arp,1)
                     datrp_2d(ip,NN)=dat_arp(NN,NZ,NY,NX)
@@ -1605,7 +1605,7 @@ module restUtilMod
   end subroutine cppft_r_2d
 
 !------------------------------------------------------------------------------------------
-  subroutine cppft_r_3d(flag,NHW,NHE,NVN,NVS,NP,dat_arp,datrp_3d,NumActivePlants,IsPlantActive)
+  subroutine cppft_r_3d(flag,NHW,NHE,NVN,NVS,NP,dat_arp,datrp_3d,NumActivePlants,IsPlantActive_pft)
   implicit none
   character(len=*),intent(in) :: flag
   integer, intent(in) :: NHW,NHE,NVN,NVS
@@ -1613,7 +1613,7 @@ module restUtilMod
   real(r8), intent(inout) :: dat_arp(:,:,:,:,:)
   real(r8), intent(inout):: datrp_3d(:,:,:)
   integer, intent(in), optional :: NumActivePlants(:,:)
-  integer, intent(in), optional :: IsPlantActive(:,:,:)
+  integer, intent(in), optional :: IsPlantActive_pft(:,:,:)
   integer :: NZ,NY,NX,ip,N1,N2
 
   if (flag=='read')then
@@ -1622,8 +1622,8 @@ module restUtilMod
         DO NY=NVN,NVS
           IF(NumActivePlants(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
-              if(present(IsPlantActive))then
-                IF(IsPlantActive(NZ,NY,NX)==iPlantIsActive)THEN
+              if(present(IsPlantActive_pft))then
+                IF(IsPlantActive_pft(NZ,NY,NX)==iPlantIsActive)THEN
                   ip=get_pft(NZ,NY,NX)
                 DO N2=1,SIZE(dat_arp,2)
                   DO N1=1,SIZE(dat_arp,1)
@@ -1664,8 +1664,8 @@ module restUtilMod
         DO NY=NVN,NVS
           IF(NumActivePlants(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
-              if(present(IsPlantActive))then
-                IF(IsPlantActive(NZ,NY,NX)==iPlantIsActive)THEN
+              if(present(IsPlantActive_pft))then
+                IF(IsPlantActive_pft(NZ,NY,NX)==iPlantIsActive)THEN
                   ip=get_pft(NZ,NY,NX)
                   DO N2=1,SIZE(dat_arp,2)
                     DO N1=1,SIZE(dat_arp,1)
@@ -1702,7 +1702,7 @@ module restUtilMod
   endif
   end subroutine cppft_r_3d
 !------------------------------------------------------------------------------------------
-  subroutine cppft_r_4d(flag,NHW,NHE,NVN,NVS,NP,dat_arp,datrp_4d,NumActivePlants,IsPlantActive)
+  subroutine cppft_r_4d(flag,NHW,NHE,NVN,NVS,NP,dat_arp,datrp_4d,NumActivePlants,IsPlantActive_pft)
   implicit none
   character(len=*),intent(in) :: flag
   integer, intent(in) :: NHW,NHE,NVN,NVS
@@ -1710,7 +1710,7 @@ module restUtilMod
   real(r8), intent(inout) :: dat_arp(:,:,:,:,:,:)
   real(r8), intent(inout):: datrp_4d(:,:,:,:)
   integer, intent(in), optional :: NumActivePlants(:,:)
-  integer, intent(in), optional :: IsPlantActive(:,:,:)
+  integer, intent(in), optional :: IsPlantActive_pft(:,:,:)
   integer :: NZ,NY,NX,ip,N1,N2,N3
 
   if (flag=='read')then
@@ -1719,8 +1719,8 @@ module restUtilMod
         DO NY=NVN,NVS
           IF(NumActivePlants(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
-              if(present(IsPlantActive))then
-                IF(IsPlantActive(NZ,NY,NX)==iPlantIsActive)THEN
+              if(present(IsPlantActive_pft))then
+                IF(IsPlantActive_pft(NZ,NY,NX)==iPlantIsActive)THEN
                   ip=get_pft(NZ,NY,NX)
                   DO N3=1,SIZE(dat_arp,3)
                     DO N2=1,SIZE(dat_arp,2)
@@ -1767,8 +1767,8 @@ module restUtilMod
         DO NY=NVN,NVS
           IF(NumActivePlants(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
-              if(present(IsPlantActive))then
-                IF(IsPlantActive(NZ,NY,NX)==iPlantIsActive)THEN
+              if(present(IsPlantActive_pft))then
+                IF(IsPlantActive_pft(NZ,NY,NX)==iPlantIsActive)THEN
                   ip=get_pft(NZ,NY,NX)
                   DO N3=1,SIZE(dat_arp,3)
                     DO N2=1,SIZE(dat_arp,2)
@@ -1811,7 +1811,7 @@ module restUtilMod
   endif
   end subroutine cppft_r_4d
 !------------------------------------------------------------------------------------------
-  subroutine cppft_r_5d(flag,NHW,NHE,NVN,NVS,NP,dat_arp,datrp_5d,NumActivePlants,IsPlantActive)
+  subroutine cppft_r_5d(flag,NHW,NHE,NVN,NVS,NP,dat_arp,datrp_5d,NumActivePlants,IsPlantActive_pft)
   implicit none
   character(len=*),intent(in) :: flag
   integer, intent(in) :: NHW,NHE,NVN,NVS
@@ -1819,7 +1819,7 @@ module restUtilMod
   real(r8), intent(inout) :: dat_arp(:,:,:,:,:,:,:)
   real(r8), intent(inout):: datrp_5d(:,:,:,:,:)
   integer, intent(in), optional :: NumActivePlants(:,:)
-  integer, intent(in), optional :: IsPlantActive(:,:,:)
+  integer, intent(in), optional :: IsPlantActive_pft(:,:,:)
   integer :: NZ,NY,NX,ip,N1,N2,N3,N4
 
   if (flag=='read')then
@@ -1828,8 +1828,8 @@ module restUtilMod
         DO NY=NVN,NVS
           IF(NumActivePlants(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
-              if(present(IsPlantActive))then
-                IF(IsPlantActive(NZ,NY,NX)==iPlantIsActive)THEN
+              if(present(IsPlantActive_pft))then
+                IF(IsPlantActive_pft(NZ,NY,NX)==iPlantIsActive)THEN
                   ip=get_pft(NZ,NY,NX)
                   DO N4=1,SIZE(dat_arp,4)
                     DO N3=1,SIZE(dat_arp,3)
@@ -1882,8 +1882,8 @@ module restUtilMod
         DO NY=NVN,NVS
           IF(NumActivePlants(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
-              if(present(IsPlantActive))then
-                IF(IsPlantActive(NZ,NY,NX)==iPlantIsActive)THEN
+              if(present(IsPlantActive_pft))then
+                IF(IsPlantActive_pft(NZ,NY,NX)==iPlantIsActive)THEN
                   ip=get_pft(NZ,NY,NX)
                   DO N4=1,SIZE(dat_arp,4)
                     DO N3=1,SIZE(dat_arp,3)

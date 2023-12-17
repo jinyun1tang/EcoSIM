@@ -41,7 +41,7 @@ module StartqMod
 !
 !     INITIALIZE SHOOT GROWTH VARIABLES
 !
-!     IsPlantActive=PFT flag:0=not active,1=active
+!     IsPlantActive_pft=PFT flag:0=not active,1=active
 !     iYearPlanting_pft,iDayPlanting_pft,iYearPlantHarvest_pft,iDayPlantHarvest_pft=year,day of planting,arvesting
 !     PPI,PPX=initial,current population (m-2)
 !     CF,ClumpFactorInit_pft=current,initial clumping factor
@@ -56,7 +56,7 @@ module StartqMod
     D9990: DO NY=NVNQ,NVSQ
       NZ2X=MIN(NZ2Q,NP(NY,NX))
       D9985: DO NZ=NZ1Q,NZ2X
-        IF(IsPlantActive(NZ,NY,NX).EQ.iPlantIsDormant)THEN
+        IF(IsPlantActive_pft(NZ,NY,NX).EQ.iPlantIsDormant)THEN
 
           call InitShootGrowth(NZ,NY,NX)
 
@@ -404,7 +404,7 @@ module StartqMod
 !
 !     INITIALIZE ROOT(N=1),MYCORRHIZAL(N=2) DIMENSIONS, UPTAKE PARAMETERS
 !
-!     SeedinDepth=seeding depth(m) from PFT management file
+!     SeedDepth_pft=seeding depth(m) from PFT management file
 !     CumSoilThickness=depth to soil layer bottom from surface(m)
 !     NG,NIX,NIXBotRootLayer_rpft=seeding,upper,lower rooting layer
 !     CNRTS,CPRTS=N,P root growth yield
@@ -415,10 +415,10 @@ module StartqMod
 !     VmaxPO4Root_pft,KmPO4Root_pft,CMinPO4Root_pft=H2PO4 max uptake(g m-2 h-1),Km(uM),min concn (uM)
 !     RSRR,RSRA=radial,axial root resistivity (m2 MPa-1 h-1)
 !
-  SeedinDepth(NZ,NY,NX)=PlantinDepth(NZ,NY,NX)
+  SeedDepth_pft(NZ,NY,NX)=PlantinDepth(NZ,NY,NX)
   D9795: DO L=NU(NY,NX),NL(NY,NX)
-    IF(SeedinDepth(NZ,NY,NX).GE.CumSoilThickness(L-1,NY,NX) &
-      .AND.SeedinDepth(NZ,NY,NX).LT.CumSoilThickness(L,NY,NX))THEN
+    IF(SeedDepth_pft(NZ,NY,NX).GE.CumSoilThickness(L-1,NY,NX) &
+      .AND.SeedDepth_pft(NZ,NY,NX).LT.CumSoilThickness(L,NY,NX))THEN
       !find the seeding layer
       NGTopRootLayer_pft(NZ,NY,NX)=L
       NIXBotRootLayer_pft(NZ,NY,NX)=L
@@ -477,12 +477,12 @@ module StartqMod
 !     PP=population (grid cell-1)
 !
   PlantPopulation_pft(NZ,NY,NX)=PPX(NZ,NY,NX)*AREA(3,NU(NY,NX),NY,NX)
-  doInitPlant(NZ,NY,NX)=ifalse
+  doInitPlant_pft(NZ,NY,NX)=ifalse
   iPlantShootState_pft(NZ,NY,NX)=iDead
   iPlantRootState_pft(NZ,NY,NX)=iDead
   BranchNumber_pft(NZ,NY,NX)=0
   NumOfBranches_pft(NZ,NY,NX)=0
-  HypoctoylHeight(NZ,NY,NX)=0._r8
+  HypoctoylHeight_pft(NZ,NY,NX)=0._r8
   CanopyHeight_pft(NZ,NY,NX)=0._r8
   D10: DO NB=1,MaxNumBranches
     doInitLeafOut_brch(NB,NZ,NY,NX)=0
@@ -509,9 +509,9 @@ module StartqMod
     Hours4Leafout_brch(NB,NZ,NY,NX)=Hours4LenthenPhotoPeriod_brch(NB,NZ,NY,NX)
     Hours4LeafOff_brch(NB,NZ,NY,NX)=Hours4ShortenPhotoPeriod_brch(NB,NZ,NY,NX)
     HourCounter4LeafOut_brch(NB,NZ,NY,NX)=0._r8
-    RubiscoActivity_brpft(NB,NZ,NY,NX)=1.0
+    RubiscoActivity_brch(NB,NZ,NY,NX)=1.0
     C4PhotosynDowreg_brch(NB,NZ,NY,NX)=1.0
-    HourWithNoGrainFill_brch(NB,NZ,NY,NX)=0
+    HourFailGrainFill_brch(NB,NZ,NY,NX)=0
     HoursDoingRemob_brch(NB,NZ,NY,NX)=0
     BranchNumber_brch(NB,NZ,NY,NX)=0
     iPlantBranchState_brch(NB,NZ,NY,NX)=1
@@ -527,7 +527,7 @@ module StartqMod
   NonstructElmnt_brch(1:NumOfPlantChemElmnts,1:MaxNumBranches,NZ,NY,NX)=0._r8
   NoduleNonstructElmnt_brch(1:NumOfPlantChemElmnts,1:MaxNumBranches,NZ,NY,NX)=0._r8
   ShootChemElmnt_brch(1:NumOfPlantChemElmnts,1:MaxNumBranches,NZ,NY,NX)=0._r8
-  PetioleChemElmnts_brch(1:NumOfPlantChemElmnts,1:MaxNumBranches,NZ,NY,NX)=0._r8
+  PetoleChemElmnt_brch(1:NumOfPlantChemElmnts,1:MaxNumBranches,NZ,NY,NX)=0._r8
   StalkChemElmnts_brch(1:NumOfPlantChemElmnts,1:MaxNumBranches,NZ,NY,NX)=0._r8
   LeafChemElmnts_brch(1:NumOfPlantChemElmnts,1:MaxNumBranches,NZ,NY,NX)=0._r8
   ReserveChemElmnts_brch(1:NumOfPlantChemElmnts,1:MaxNumBranches,NZ,NY,NX)=0._r8
@@ -543,7 +543,7 @@ module StartqMod
   
   D25: DO NB=1,MaxNumBranches
     StalkBiomassC_brch(NB,NZ,NY,NX)=0._r8
-    LeafPetioleBiomassC_brch(NB,NZ,NY,NX)=0._r8
+    LeafPetolBiomassC_brch(NB,NZ,NY,NX)=0._r8
     PotentialSeedSites_brch(NB,NZ,NY,NX)=0._r8
     SeedNumberSet_brch(NB,NZ,NY,NX)=0._r8
     GrainSeedBiomCMean_brch(NB,NZ,NY,NX)=0._r8
@@ -563,7 +563,7 @@ module StartqMod
       InternodeHeightLive_brch(K,NB,NZ,NY,NX)=0._r8
       InternodeHeightDying_brch(K,NB,NZ,NY,NX)=0._r8
       PetioleLengthNode_brch(K,NB,NZ,NY,NX)=0._r8
-      LeafChemElmntNode_brch(1:NumOfPlantChemElmnts,K,NB,NZ,NY,NX)=0._r8
+      LeafElmntNode_brch(1:NumOfPlantChemElmnts,K,NB,NZ,NY,NX)=0._r8
       PetioleElmntNode_brch(1:NumOfPlantChemElmnts,K,NB,NZ,NY,NX)=0._r8
       InternodeChemElmnt_brch(1:NumOfPlantChemElmnts,K,NB,NZ,NY,NX)=0._r8
       LeafProteinCNode_brch(K,NB,NZ,NY,NX)=0._r8
@@ -774,7 +774,7 @@ module StartqMod
         Root1stStructChemElmnt_pvr(1:NumOfPlantChemElmnts,N,L,NR,NZ,NY,NX)=0._r8
         SecndRootLen(N,L,NR,NZ,NY,NX)=0._r8
         Root2ndStructChemElmnt_pvr(1:NumOfPlantChemElmnts,N,L,NR,NZ,NY,NX)=0._r8
-        PrimRootDepth(N,NR,NZ,NY,NX)=SeedinDepth(NZ,NY,NX)
+        PrimRootDepth(N,NR,NZ,NY,NX)=SeedDepth_pft(NZ,NY,NX)
         Root1stChemElmnt(1:NumOfPlantChemElmnts,N,NR,NZ,NY,NX)=0._r8
       ENDDO D30
       IF(N.EQ.1)THEN
@@ -808,7 +808,7 @@ module StartqMod
 !
 !     WTRVC,WTRVN,WTRVP=C,N,P in storage reserves (g)
 !     WTLFB,WTLFBN,WTLFBP=C,N,P in leaves (g)
-!     LeafPetioleBiomassC_brch=C in leaves+petioles (g)
+!     LeafPetolBiomassC_brch=C in leaves+petioles (g)
 !     FDM-dry matter fraction (g DM C g FM C-1)
 !     CanopyWater_pft,WatByPCanopy=water volume in,on canopy (m3)
 !     CPOOL,ZPOOL,PPOOL=C,N,P in canopy nonstructural pools (g)
@@ -824,8 +824,8 @@ module StartqMod
   NonstructalChemElmnts_pft(ielmp,NZ,NY,NX)=CPGR(NZ,NY,NX)*NonstructalChemElmnts_pft(ielmc,NZ,NY,NX)
   LeafChemElmnts_brch(ielmn,1,NZ,NY,NX)=CNGR(NZ,NY,NX)*LeafChemElmnts_brch(ielmc,1,NZ,NY,NX)
   LeafChemElmnts_brch(ielmp,1,NZ,NY,NX)=CPGR(NZ,NY,NX)*LeafChemElmnts_brch(ielmc,1,NZ,NY,NX)
-  LeafPetioleBiomassC_brch(1,NZ,NY,NX)=LeafChemElmnts_brch(ielmc,1,NZ,NY,NX)+PetioleChemElmnts_brch(ielmc,1,NZ,NY,NX)
-  CanopyLeafShethC_pft(NZ,NY,NX)=CanopyLeafShethC_pft(NZ,NY,NX)+LeafPetioleBiomassC_brch(1,NZ,NY,NX)  
+  LeafPetolBiomassC_brch(1,NZ,NY,NX)=LeafChemElmnts_brch(ielmc,1,NZ,NY,NX)+PetoleChemElmnt_brch(ielmc,1,NZ,NY,NX)
+  CanopyLeafShethC_pft(NZ,NY,NX)=CanopyLeafShethC_pft(NZ,NY,NX)+LeafPetolBiomassC_brch(1,NZ,NY,NX)  
   FDM=AMIN1(1.0_r8,0.16_r8-0.045_r8*PSICanopy_pft(NZ,NY,NX))
   CanopyWater_pft(NZ,NY,NX)=ppmc*CanopyLeafShethC_pft(NZ,NY,NX)/FDM
   WatByPCanopy(NZ,NY,NX)=0._r8

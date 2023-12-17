@@ -32,11 +32,11 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  CanopyArea_grd(:,:)                         !canopy area of combined over the grid [m2 d-2]
   integer ,target,allocatable ::  NGTopRootLayer_pft(:,:,:)                           !soil layer at planting depth, [-]
   real(r8),target,allocatable ::  PlantinDepth(:,:,:)                      !planting depth, [m]
-  real(r8),target,allocatable ::  SeedinDepth(:,:,:)                       !seeding depth, [m]
+  real(r8),target,allocatable ::  SeedDepth_pft(:,:,:)                       !seeding depth, [m]
   real(r8),target,allocatable ::  SeedVolumeMean_pft(:,:,:)                        !seed volume, [m3 ]
   real(r8),target,allocatable ::  SeedLengthMean_pft(:,:,:)                        !seed length, [m]
   real(r8),target,allocatable ::  SeedAreaMean_pft(:,:,:)                        !seed surface area, [m2]
-  real(r8),target,allocatable ::  HypoctoylHeight(:,:,:)                       !cotyledon height, [m]
+  real(r8),target,allocatable ::  HypoctoylHeight_pft(:,:,:)                       !cotyledon height, [m]
   real(r8),target,allocatable ::  MaxCanopyHeight_grd(:,:)                            !canopy height , [m]
   real(r8),target,allocatable ::  CanopyHeightz_col(:,:,:)                          !canopy layer height , [m]
   real(r8),target,allocatable ::  BranchAngle_pft(:,:,:)                       !branching angle, [degree from horizontal]
@@ -152,7 +152,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  XTLI(:,:,:)                        !number of nodes in seed, [-]
   real(r8),target,allocatable ::  SeedCMass(:,:,:)                        !grain size at seeding, [g]
   real(r8),target,allocatable ::  GrainFillRateat25C_pft(:,:,:)                       !maximum rate of fill per grain, [g h-1]
-  real(r8),target,allocatable ::  HourWithNoGrainFill_brch(:,:,:,:)                      !flag to detect physiological maturity from  grain fill , [-]
+  real(r8),target,allocatable ::  HourFailGrainFill_brch(:,:,:,:)                      !flag to detect physiological maturity from  grain fill , [-]
   real(r8),target,allocatable ::  HourCounter4LeafOut_brch(:,:,:,:)                      !counter for mobilizing nonstructural C during spring leafout/dehardening, [h]
   real(r8),target,allocatable ::  HoursDoingRemob_brch(:,:,:,:)                      !counter for mobilizing nonstructural C during autumn leafoff/hardening, [h]
   integer,target,allocatable ::  iPlantCalendar_brch(:,:,:,:,:)                     !plant growth stage, [-]
@@ -191,11 +191,11 @@ contains
   allocate(CanopyArea_grd(JY,JX));       CanopyArea_grd=0._r8
   allocate(NGTopRootLayer_pft(JP,JY,JX));       NGTopRootLayer_pft=0
   allocate(PlantinDepth(JP,JY,JX));   PlantinDepth=0._r8
-  allocate(SeedinDepth(JP,JY,JX));    SeedinDepth=0._r8
+  allocate(SeedDepth_pft(JP,JY,JX));    SeedDepth_pft=0._r8
   allocate(SeedVolumeMean_pft(JP,JY,JX));     SeedVolumeMean_pft=0._r8
   allocate(SeedLengthMean_pft(JP,JY,JX));     SeedLengthMean_pft=0._r8
   allocate(SeedAreaMean_pft(JP,JY,JX));     SeedAreaMean_pft=0._r8
-  allocate(HypoctoylHeight(JP,JY,JX));    HypoctoylHeight=0._r8
+  allocate(HypoctoylHeight_pft(JP,JY,JX));    HypoctoylHeight_pft=0._r8
   allocate(MaxCanopyHeight_grd(JY,JX));          MaxCanopyHeight_grd=0._r8
   allocate(CanopyHeightz_col(0:JC,JY,JX));     CanopyHeightz_col=0._r8
   allocate(BranchAngle_pft(JP,JY,JX));    BranchAngle_pft=0._r8
@@ -311,7 +311,7 @@ contains
   allocate(XTLI(JP,JY,JX));     XTLI=0._r8
   allocate(SeedCMass(JP,JY,JX));     SeedCMass=0._r8
   allocate(GrainFillRateat25C_pft(JP,JY,JX));    GrainFillRateat25C_pft=0._r8
-  allocate(HourWithNoGrainFill_brch(MaxNumBranches,JP,JY,JX));  HourWithNoGrainFill_brch=0._r8
+  allocate(HourFailGrainFill_brch(MaxNumBranches,JP,JY,JX));  HourFailGrainFill_brch=0._r8
   allocate(HourCounter4LeafOut_brch(MaxNumBranches,JP,JY,JX));  HourCounter4LeafOut_brch=0._r8
   allocate(HoursDoingRemob_brch(MaxNumBranches,JP,JY,JX));  HoursDoingRemob_brch=0._r8
   allocate(iPlantCalendar_brch(NumGrowthStages,MaxNumBranches,JP,JY,JX));iPlantCalendar_brch=0
@@ -347,11 +347,11 @@ contains
   call destroy(CanopyArea_grd)
   call destroy(NGTopRootLayer_pft)
   call destroy(PlantinDepth)
-  call destroy(SeedinDepth)
+  call destroy(SeedDepth_pft)
   call destroy(SeedVolumeMean_pft)
   call destroy(SeedLengthMean_pft)
   call destroy(SeedAreaMean_pft)
-  call destroy(HypoctoylHeight)
+  call destroy(HypoctoylHeight_pft)
   call destroy(MaxCanopyHeight_grd)
   call destroy(CanopyHeightz_col)
   call destroy(BranchAngle_pft)
@@ -467,7 +467,7 @@ contains
   call destroy(XTLI)
   call destroy(SeedCMass)
   call destroy(GrainFillRateat25C_pft)
-  call destroy(HourWithNoGrainFill_brch)
+  call destroy(HourFailGrainFill_brch)
   call destroy(HourCounter4LeafOut_brch)
   call destroy(HoursDoingRemob_brch)
   call destroy(iPlantCalendar_brch)

@@ -330,9 +330,9 @@ implicit none
 !
 !   CanopySWabsorpty_pft,CanopyPARabsorpty_pft=leaf SW,PAR absorbtivity
 !
-    VCMX(NZ,NY,NX)=2.5_r8*VCMX(NZ,NY,NX)
-    VOMX(NZ,NY,NX)=2.5_r8*VOMX(NZ,NY,NX)
-    VCMX4(NZ,NY,NX)=2.5_r8*VCMX4(NZ,NY,NX)
+    VmaxRubCarboxyRef_pft(NZ,NY,NX)=2.5_r8*VmaxRubCarboxyRef_pft(NZ,NY,NX)
+    VmaxRubOxyRef_pft(NZ,NY,NX)=2.5_r8*VmaxRubOxyRef_pft(NZ,NY,NX)
+    VmaxPEPCarboxyRef_pft(NZ,NY,NX)=2.5_r8*VmaxPEPCarboxyRef_pft(NZ,NY,NX)
     SpecChloryfilAct_pft(NZ,NY,NX)=2.5_r8*SpecChloryfilAct_pft(NZ,NY,NX)
     CanopySWabsorpty_pft(NZ,NY,NX)=1.0_r8-CanopySWAlbedo_pft(NZ,NY,NX)-TAUR(NZ,NY,NX)
     CanopyPARabsorpty_pft(NZ,NY,NX)=1.0_r8-CanopyPARalbedo_pft(NZ,NY,NX)-TAUP(NZ,NY,NX)
@@ -397,14 +397,14 @@ implicit none
   call ncd_getvar(pft_nfid, 'MY', loc, MY(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'ZTYPI', loc, iPlantInitThermoAdaptZone(NZ,NY,NX))
 
-  call ncd_getvar(pft_nfid, 'VCMX', loc, VCMX(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'VOMX', loc, VOMX(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'VCMX4', loc, VCMX4(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'VCMX', loc, VmaxRubCarboxyRef_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'VOMX', loc, VmaxRubOxyRef_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'VCMX4', loc, VmaxPEPCarboxyRef_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'XKCO2', loc, XKCO2(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'XKO2', loc, XKO2(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'XKCO24', loc, Km4PEPCarboxy_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'RUBP', loc, LeafRuBPConc_pft(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'PEPC', loc, PEPC(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'PEPC', loc, FracLeafProtinAsPEPCarboxyl_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'ETMX', loc, SpecChloryfilAct_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'CHL', loc, LeafC3ChlorofilConc_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'CHL4', loc, LeafC4ChlorofilConc_pft(NZ,NY,NX))
@@ -693,15 +693,15 @@ implicit none
 
   write(nu_plt,*)('-',j=1,100)
   write(nu_plt,*)'PHOTOSYNTHETIC PROPERTIES'
-  write(nu_plt,*)'Specific rubisco carboxylase (umol C g-1 s-1): ',VCMX(NZ,NY,NX)
-  write(nu_plt,*)'Specific rubisco oxygenase (umol O2 g-1 s-1): ',VOMX(NZ,NY,NX)
+  write(nu_plt,*)'Specific rubisco carboxylase (umol C g-1 s-1): ',VmaxRubCarboxyRef_pft(NZ,NY,NX)
+  write(nu_plt,*)'Specific rubisco oxygenase (umol O2 g-1 s-1): ',VmaxRubOxyRef_pft(NZ,NY,NX)
   write(nu_plt,*)'Specific PEP carboxylase activity (umol g-1 s-1): '&
-    ,VCMX4(NZ,NY,NX)
-  write(nu_plt,*)'Km for VCMX (uM): ',XKCO2(NZ,NY,NX)
-  write(nu_plt,*)'Km for VOMX (uM): ',XKO2(NZ,NY,NX)
-  write(nu_plt,*)'KM for VCMX4 (uM): ',Km4PEPCarboxy_pft(NZ,NY,NX)
+    ,VmaxPEPCarboxyRef_pft(NZ,NY,NX)
+  write(nu_plt,*)'Km for VmaxRubCarboxyRef_pft(uM): ',XKCO2(NZ,NY,NX)
+  write(nu_plt,*)'Km for VmaxRubOxyRef_pft (uM): ',XKO2(NZ,NY,NX)
+  write(nu_plt,*)'KM for VmaxPEPCarboxyRef_pft (uM): ',Km4PEPCarboxy_pft(NZ,NY,NX)
   write(nu_plt,*)'Fraction of leaf protein in rubisco (g rub/(g protein)): ',LeafRuBPConc_pft(NZ,NY,NX)
-  write(nu_plt,*)'Fraction of leaf protein in PEP carboxylase (g pep/(g protein)): ',PEPC(NZ,NY,NX)
+  write(nu_plt,*)'Fraction of leaf protein in PEP carboxylase (g pep/(g protein)): ',FracLeafProtinAsPEPCarboxyl_pft(NZ,NY,NX)
   write(nu_plt,*)'Specific chlorophyll activity (umol e- gC-1 s-1): ',SpecChloryfilAct_pft(NZ,NY,NX)
   if(iPlantPhotosynthesisType(NZ,NY,NX).eq.ic3_photo)then
     write(nu_plt,*)'Fraction of leaf protein as chlorophyll in mesophyll (C3) (g Chl /(g protein))',LeafC3ChlorofilConc_pft(NZ,NY,NX)
@@ -1095,7 +1095,7 @@ implicit none
     D9990: DO NY=NVN,NVS
 ! read one line
       READ(30,90,END=1002)IDATE,IYR,NPP(NY,NX) &
-        ,(DATAZ(NZ,NY,NX),IsPlantActive(NZ,NY,NX),NZ=1,NPP(NY,NX))
+        ,(DATAZ(NZ,NY,NX),IsPlantActive_pft(NZ,NY,NX),NZ=1,NPP(NY,NX))
 90        FORMAT(2I4,1I3,5(A16,I4))
     ENDDO D9990
   ENDDO D9995
@@ -1128,7 +1128,7 @@ implicit none
 ! the check point file has non-zero pft
           D200: DO NN=1,NPP(NY,NX)
             D205: DO NZ=1,NS
-              IF(DATAZ(NN,NY,NX).EQ.DATAX(NZ).AND.IsPlantActive(NN,NY,NX).EQ.iPlantIsActive)THEN
+              IF(DATAZ(NN,NY,NX).EQ.DATAX(NZ).AND.IsPlantActive_pft(NN,NY,NX).EQ.iPlantIsActive)THEN
                 DATAP(NN,NY,NX)=DATAX(NZ)
                 DATAM(NN,NY,NX)=DATAY(NZ)
                 DATAA(NZ,NY,NX)='NO'

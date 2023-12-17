@@ -237,7 +237,7 @@ module CanopyCondsMod
   real(r8) :: THETW1
   real(r8) :: TSURFX,UnselfShadeLeafArea,UnselfShadeLeafAreaAzclass,TSURFS
   real(r8) :: UnselfShadeStalkArea,UnselfShadeStalkAreaAzclass,TSURWS,TSURWX
-  real(r8) :: XTAUS,XTAUY,XAREA
+  real(r8) :: XTAU_RadCapt,XTAUY,XAREA
   real(r8) :: YAREA
   REAL(R8) :: LeafAzimuthAngle,ZAGL
   real(r8) :: SolarAzimuthAngle,CosineSolarAngle
@@ -288,8 +288,8 @@ module CanopyCondsMod
     RadSWDiffus_col   => plt_rad%RadSWDiffus_col    , &
     SineSolarAngle    => plt_rad%SineSolarAngle     , &
     TotSineSkyAngles_grd   => plt_rad%TotSineSkyAngles_grd    , &
-    TAU0    => plt_rad%TAU0     , &
-    TAUS    => plt_rad%TAUS     , &
+    TAU_RadThru    => plt_rad%TAU_RadThru     , &
+    TAU_RadCapt    => plt_rad%TAU_RadCapt     , &
     SineLeafAngle    => plt_rad%SineLeafAngle     , &
     CanopyPARabsorpty_pft    => plt_rad%CanopyPARabsorpty_pft     , &
     CanopySWabsorpty_pft    => plt_rad%CanopySWabsorpty_pft     , &
@@ -423,7 +423,7 @@ module CanopyCondsMod
           !     PAR,PARDiffus_zsec=direct,diffuse PAR flux
           !     RadSWDiffusL,PARDiffusL=solar beam diffuse SW,PAR flux
           !     RAFYL,fwdsRadPAR2NextL=forward scattered diffuse SW,PAR flux
-          !     TAUS,TAUY=fraction of direct,diffuse radiation transmitted
+          !     TAU_RadCapt,TAUY=fraction of direct,diffuse radiation transmitted
 !
           DO  NZ=1,NP
             RadSWbyLeafSurf_zsec(N,M,NZ)=RadSWatLeafSurf_pft(NZ)*ABS(BETA(N,M))
@@ -441,7 +441,7 @@ module CanopyCondsMod
       YAREA=1.00_r8/(AREA3(NU)*REAL(NumOfLeafZenithSectors1,R8))
       RadSWDiffusL=RadSWDiffus_col
       PARDiffusL=PARDiffus_col
-      TAUS(NumOfCanopyLayers1+1)=1.0_r8
+      TAU_RadCapt(NumOfCanopyLayers1+1)=1.0_r8
       TAUY(NumOfCanopyLayers1+1)=1.0_r8
       fwdsRadSW2NextL(NumOfCanopyLayers1+1)=0.0_r8
       fwdsRadPAR2NextL(NumOfCanopyLayers1+1)=0.0_r8
@@ -535,11 +535,11 @@ module CanopyCondsMod
             D1600: DO N=1,NumOfLeafZenithSectors1
               UnselfShadeLeafArea=CanopyLeafArea_zsec(N,L,NZ)*ClumpFactorCurrent_pft(NZ)
               UnselfShadeLeafAreaAzclass=UnselfShadeLeafArea*YAREA
-              TSURFS=UnselfShadeLeafArea*TAUS(L+1)
+              TSURFS=UnselfShadeLeafArea*TAU_RadCapt(L+1)
               TSURFX=TSURFS*XAREA
               UnselfShadeStalkArea=CanopyStemArea_zsec(N,L,NZ)*StalkClumpFactor
               UnselfShadeStalkAreaAzclass=UnselfShadeStalkArea*YAREA
-              TSURWS=UnselfShadeStalkArea*TAUS(L+1)
+              TSURWS=UnselfShadeStalkArea*TAU_RadCapt(L+1)
               TSURWX=TSURWS*XAREA
               !
               !     ABSORPTION OF DIRECT RADIATION BY SUNLIT LEAF SURFACES
@@ -616,32 +616,32 @@ module CanopyCondsMod
           !
           !     ACCUMULATED INTERCEPTION BY CANOPY LAYER
           !
-          !     XTAUS=interception of direct radiation in current layer
+          !     XTAU_RadCapt=interception of direct radiation in current layer
           !     STOPZ=accumulated interception of direct radiation from topmost layer
-          !     TAUS=transmission of direct radiation to next lower layer
+          !     TAU_RadCapt=transmission of direct radiation to next lower layer
 !
           IF(fracDirectRadAbsorbtCum+fracDirectRadAbsorbt.GT.1.0_r8)THEN
             IF(fracDirectRadAbsorbt.GT.ZERO)THEN
-              XTAUS=(1.0_r8-fracDirectRadAbsorbtCum)/((1.0_r8-fracDirectRadAbsorbtCum)-&
+              XTAU_RadCapt=(1.0_r8-fracDirectRadAbsorbtCum)/((1.0_r8-fracDirectRadAbsorbtCum)-&
                 (1.0_r8-fracDirectRadAbsorbtCum-fracDirectRadAbsorbt))
             ELSE
-              XTAUS=0.0_r8
+              XTAU_RadCapt=0.0_r8
             ENDIF
-            TAUS(L+1)=TAUS(L+1)*XTAUS
-            fracDirectRadAbsorbt=fracDirectRadAbsorbt*XTAUS
+            TAU_RadCapt(L+1)=TAU_RadCapt(L+1)*XTAU_RadCapt
+            fracDirectRadAbsorbt=fracDirectRadAbsorbt*XTAU_RadCapt
             D1510: DO NZ=1,NP
-              DirectSWbyLeafL_pft(NZ)=DirectSWbyLeafL_pft(NZ)*XTAUS
-              DirectSWbyStalkL_pft(NZ)=DirectSWbyStalkL_pft(NZ)*XTAUS
-              DirectPARbyLeafL_pft(NZ)=DirectPARbyLeafL_pft(NZ)*XTAUS
-              DirectPARbyStalkL_pft(NZ)=DirectPARbyStalkL_pft(NZ)*XTAUS
-              baksDirectSWbyLeafL_pft(NZ)=baksDirectSWbyLeafL_pft(NZ)*XTAUS
-              baksDirectSWbyStalkL_pft(NZ)=baksDirectSWbyStalkL_pft(NZ)*XTAUS
-              baksDirectPARbyLeafL_pft(NZ)=baksDirectPARbyLeafL_pft(NZ)*XTAUS
-              baksDirectPARbyStalkL_pft(NZ)=baksDirectPARbyStalkL_pft(NZ)*XTAUS
-              fwdsDirectSWbyLeafL_pft(NZ)=fwdsDirectSWbyLeafL_pft(NZ)*XTAUS
-              fwdsDirectSWbyStalkL_pft(NZ)=fwdsDirectSWbyStalkL_pft(NZ)*XTAUS
-              fwdsDirectPARbyLeafL_pft(NZ)=fwdsDirectPARbyLeafL_pft(NZ)*XTAUS
-              fwdsDirectPARbyStalkL_pft(NZ)=fwdsDirectPARbyStalkL_pft(NZ)*XTAUS
+              DirectSWbyLeafL_pft(NZ)=DirectSWbyLeafL_pft(NZ)*XTAU_RadCapt
+              DirectSWbyStalkL_pft(NZ)=DirectSWbyStalkL_pft(NZ)*XTAU_RadCapt
+              DirectPARbyLeafL_pft(NZ)=DirectPARbyLeafL_pft(NZ)*XTAU_RadCapt
+              DirectPARbyStalkL_pft(NZ)=DirectPARbyStalkL_pft(NZ)*XTAU_RadCapt
+              baksDirectSWbyLeafL_pft(NZ)=baksDirectSWbyLeafL_pft(NZ)*XTAU_RadCapt
+              baksDirectSWbyStalkL_pft(NZ)=baksDirectSWbyStalkL_pft(NZ)*XTAU_RadCapt
+              baksDirectPARbyLeafL_pft(NZ)=baksDirectPARbyLeafL_pft(NZ)*XTAU_RadCapt
+              baksDirectPARbyStalkL_pft(NZ)=baksDirectPARbyStalkL_pft(NZ)*XTAU_RadCapt
+              fwdsDirectSWbyLeafL_pft(NZ)=fwdsDirectSWbyLeafL_pft(NZ)*XTAU_RadCapt
+              fwdsDirectSWbyStalkL_pft(NZ)=fwdsDirectSWbyStalkL_pft(NZ)*XTAU_RadCapt
+              fwdsDirectPARbyLeafL_pft(NZ)=fwdsDirectPARbyLeafL_pft(NZ)*XTAU_RadCapt
+              fwdsDirectPARbyStalkL_pft(NZ)=fwdsDirectPARbyStalkL_pft(NZ)*XTAU_RadCapt
             ENDDO D1510
           ENDIF
 !
@@ -680,7 +680,7 @@ module CanopyCondsMod
           !
           !     RadSWbyCanopy_pft,TRADC,RADP,TRADP=total atmospheric SW,PAR absbd by each,all PFT
           !     fracDirectRadAbsorbtCum,fracDiffusRadAbsorbtCum=accumulated interception of direct,diffuse radiation
-          !     TAUS,TAUY=transmission of direct,diffuse radiation to next lower layer
+          !     TAU_RadCapt,TAUY=transmission of direct,diffuse radiation to next lower layer
           !
           D1530: DO NZ=1,NP
             RadSWbyLeafT=DirectSWbyLeafL_pft(NZ)+DiffusSWbyLeafL_pft(NZ)
@@ -710,14 +710,14 @@ module CanopyCondsMod
           ENDDO D1530
           fracDirectRadAbsorbtCum=fracDirectRadAbsorbtCum+fracDirectRadAbsorbt
           fracDiffusRadAbsorbtCum=fracDiffusRadAbsorbtCum+fracDiffusRadAbsorbt
-          TAUS(L)=1.0_r8-fracDirectRadAbsorbtCum
-          TAU0(L)=1.0_r8-TAUS(L)
+          TAU_RadCapt(L)=1.0_r8-fracDirectRadAbsorbtCum
+          TAU_RadThru(L)=1.0_r8-TAU_RadCapt(L)
           TAUY(L)=1.0_r8-fracDiffusRadAbsorbtCum
         ELSE
           fwdsRadSW2NextL(L)=fwdsRadSW2NextL(L+1)
           fwdsRadPAR2NextL(L)=fwdsRadPAR2NextL(L+1)
-          TAUS(L)=TAUS(L+1)
-          TAU0(L)=1.0_r8-TAUS(L)
+          TAU_RadCapt(L)=TAU_RadCapt(L+1)
+          TAU_RadThru(L)=1.0_r8-TAU_RadCapt(L)
           TAUY(L)=TAUY(L+1)
         ENDIF
       ENDDO D1800
@@ -726,14 +726,14 @@ module CanopyCondsMod
       !
       !     RADSG,RADYG,RAPSG,RAPYG=direct,diffuse SW,PAR at horiCanopyHeightz_col ground surface
       !     RADS,PARDirect_col=solar beam direct SW,PAR flux
-      !     TAUS,TAUY=transmission of direct,diffuse radiation below canopy
+      !     TAU_RadCapt,TAUY=transmission of direct,diffuse radiation below canopy
       !     RadSWDiffusL,PARDiffusL=solar beam diffuse SW,PAR flux
       !     RadSW_Grnd,RadPAR_Grnd=total SW,PAR at ground surface
       !     GrndIncidSolarAngle,OMEGAG=incident solar,sky angle at ground surface
 !
-      RADSG=RadSWDirect_col*TAUS(1)
+      RADSG=RadSWDirect_col*TAU_RadCapt(1)
       RADYG=RadSWDiffusL*TAUY(1)+fwdsRadSW2NextL(1)
-      RAPSG=PARDirect_col*TAUS(1)
+      RAPSG=PARDirect_col*TAU_RadCapt(1)
       RAPYG=PARDiffusL*TAUY(1)+fwdsRadPAR2NextL(1)
       RadSW_Grnd=ABS(GrndIncidSolarAngle)*RADSG
       RadPAR_Grnd=ABS(GrndIncidSolarAngle)*RAPSG

@@ -1010,7 +1010,7 @@ module WatsubMod
 
   real(r8) :: tk1pres,tk1l
   real(r8) :: ENGY1,VLTSoiPore,VHXX
-  real(r8) :: TKXX
+  real(r8) :: TKXX,VLWMicPre
   
 ! begin_execution
   D9795: DO NX=NHW,NHE
@@ -1042,7 +1042,7 @@ module WatsubMod
 
       D9785: DO L=NUM(NY,NX),NL(NY,NX)
         IF(VGeomLayer(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-
+          VLWMicPre=VLWatMicP1(L,NY,NX)
           VLWatMicP1(L,NY,NX)=VLWatMicP1(L,NY,NX)+TWatCharge2MicP(L,NY,NX)+FWatExMacP2MicPi(L,NY,NX) &
             +TMLiceThawMicP(L,NY,NX)+FWatIrrigate2MicP1(L,NY,NX)
           
@@ -1112,12 +1112,13 @@ module WatsubMod
           ENGY1=VLHeatCapacity(L,NY,NX)*TKSoi1(L,NY,NX)
           if(TKSoi1(L,NY,NX)>1.e3_r8.or.TKSoi1(L,NY,NX)<0._r8)then
             write(*,*)'======'
-            write(*,*)'VLWatMicP1(L,NY,NX)=',VLWatMicP1(L,NY,NX),L,VLairMicP(L,NY,NX),VLiceMicP1(L,NY,NX)
+            write(*,*)'VLWatMicP1(L,NY,NX)=',VLWMicPre,VLWatMicP1(L,NY,NX),L,VLairMicP(L,NY,NX),&
+              VLiceMicP1(L,NY,NX)
             write(*,*)TWatCharge2MicP(L,NY,NX),FWatExMacP2MicPi(L,NY,NX), &
               TMLiceThawMicP(L,NY,NX),FWatIrrigate2MicP1(L,NY,NX)
             write(*,*)'M, L=',M,L,NY,NX,NUM(NY,NX),VGeomLayer(L,NY,NX),ZEROS2(NY,NX),VLWatMicPX1(L,NY,NX)
             write(*,*)'SoiBulkDensity(L,NY,NX)=',SoiBulkDensity(L,NY,NX),TKS(L,NY,NX),ZEROS(NY,NX)
-            write(*,*)'VLHeatCapacity(L,NY,NX),TKSoi1(L,NY,NX)',L,VLHeatCapacity(L,NY,NX),TKSoi1(L,NY,NX)
+            write(*,*)'VLHeatCapacity(L,NY,NX),TKSoi1(L,NY,NX),TKXX',L,VLHeatCapacity(L,NY,NX),TKSoi1(L,NY,NX),TKXX
             write(*,*)VLMicP1(L,NY,NX),VLMacP1(L,NY,NX)
             if(TKSoi1(L,NY,NX)>1.e3_r8.or.TKSoi1(L,NY,NX)<0._r8)call endrun(trim(mod_filename)//' at line',__LINE__)
           endif

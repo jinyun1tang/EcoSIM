@@ -140,7 +140,7 @@ implicit none
   THFLXC(NY,NX)=plt_ew%THFLXC
   CanWatg(NY,NX)=plt_ew%CanWatg
   TENGYC(NY,NX)=plt_ew%TENGYC
-  TRootGasLoss_disturb(idg_beg:idg_end-1,NY,NX) =plt_rbgc%TRootGasLoss_disturb(idg_beg:idg_end-1)
+  TRootGasLossDisturb_pft(idg_beg:idg_end-1,NY,NX) =plt_rbgc%TRootGasLossDisturb_pft(idg_beg:idg_end-1)
   Canopy_NEE_col(NY,NX)=plt_bgcr%Canopy_NEE_col
 
   FERT(17:19,I1,NY,NX)=plt_distb%FERT(17:19)
@@ -254,17 +254,17 @@ implicit none
     FracRadPARbyCanopy_pft(NZ,NY,NX) =plt_rad%FracRadPARbyCanopy_pft(NZ)
     FNOD(NZ,NY,NX)  =plt_allom%FNOD(NZ)
     CanopySeedNumber_pft(NZ,NY,NX)  =plt_morph%CanopySeedNumber_pft(NZ)
-    HypoctoylHeight(NZ,NY,NX) =plt_morph%HypoctoylHeight(NZ)
+    HypoctoylHeight_pft(NZ,NY,NX) =plt_morph%HypoctoylHeight_pft(NZ)
     HTC(NZ,NY,NX)   =plt_pheno%HTC(NZ)
     HeatStorCanP(NZ,NY,NX) =plt_ew%HeatStorCanP(NZ)
     CanPHeight4WatUptake(NZ,NY,NX) =plt_morph%CanPHeight4WatUptake(NZ)
-    IsPlantActive(NZ,NY,NX) =plt_pheno%IsPlantActive(NZ)
+    IsPlantActive_pft(NZ,NY,NX) =plt_pheno%IsPlantActive_pft(NZ)
     iPlantState_pft(NZ,NY,NX)  =plt_pheno%iPlantState_pft(NZ)
     iPlantShootState_pft(NZ,NY,NX) =plt_pheno%iPlantShootState_pft(NZ)
     iPlantRootState_pft(NZ,NY,NX) =plt_pheno%iPlantRootState_pft(NZ)
     iDayPlanting_pft(NZ,NY,NX) =plt_distb%iDayPlanting_pft(NZ)
     iYearPlanting_pft(NZ,NY,NX)  =plt_distb%iYearPlanting_pft(NZ)
-    doInitPlant(NZ,NY,NX) =plt_pheno%doInitPlant(NZ)
+    doInitPlant_pft(NZ,NY,NX) =plt_pheno%doInitPlant_pft(NZ)
     iDayPlantHarvest_pft(NZ,NY,NX) =plt_distb%iDayPlantHarvest_pft(NZ)
     iYearPlantHarvest_pft(NZ,NY,NX)  =plt_distb%iYearPlantHarvest_pft(NZ)
     NIXBotRootLayer_pft(NZ,NY,NX)   =plt_morph%NIXBotRootLayer_pft(NZ)
@@ -287,7 +287,7 @@ implicit none
     PSICanopyTurg_pft(NZ,NY,NX) =plt_ew%PSICanopyTurg_pft(NZ)
     PSICanPDailyMin(NZ,NY,NX) =plt_ew%PSICanPDailyMin(NZ)
 
-    RootGasLoss_disturb(idg_beg:idg_end-1,NZ,NY,NX) =plt_bgcr%RootGasLoss_disturb(idg_beg:idg_end-1,NZ)
+    RootGasLossDisturb_pft(idg_beg:idg_end-1,NZ,NY,NX) =plt_bgcr%RootGasLossDisturb_pft(idg_beg:idg_end-1,NZ)
     MinCanPStomaResistH2O_pft(NZ,NY,NX)  =plt_photo%MinCanPStomaResistH2O_pft(NZ)
     MaxCanPStomaResistH2O_pft(NZ,NY,NX)  =plt_photo%MaxCanPStomaResistH2O_pft(NZ)
     CO2CuticleResist_pft(NZ,NY,NX)  =plt_photo%CO2CuticleResist_pft(NZ)
@@ -303,7 +303,7 @@ implicit none
     SeedVolumeMean_pft(NZ,NY,NX)  =plt_morph%SeedVolumeMean_pft(NZ)
     SeedLengthMean_pft(NZ,NY,NX)  =plt_morph%SeedLengthMean_pft(NZ)
     SeedAreaMean_pft(NZ,NY,NX)  =plt_morph%SeedAreaMean_pft(NZ)
-    SeedinDepth(NZ,NY,NX) =plt_morph%SeedinDepth(NZ)
+    SeedDepth_pft(NZ,NY,NX) =plt_morph%SeedDepth_pft(NZ)
     HeatXAir2PCan(NZ,NY,NX) =plt_ew%HeatXAir2PCan(NZ)
     GrossResp_pft(NZ,NY,NX) =plt_bgcr%GrossResp_pft(NZ)
     CanopyPlusNoduRespC_pft(NZ,NY,NX) =plt_bgcr%CanopyPlusNoduRespC_pft(NZ)
@@ -382,9 +382,9 @@ implicit none
       DO NE=1,NumOfPlantChemElmnts
         NoduleNonstructElmnt_brch(NE,NB,NZ,NY,NX)=plt_biom%NoduleNonstructElmnt_brch(NE,NB,NZ)
         ShootChemElmnt_brch(NE,NB,NZ,NY,NX)=plt_biom%ShootChemElmnt_brch(NE,NB,NZ)
-        PetioleChemElmnts_brch(NE,NB,NZ,NY,NX)=plt_biom%PetioleChemElmnts_brch(NE,NB,NZ)
+        PetoleChemElmnt_brch(NE,NB,NZ,NY,NX)=plt_biom%PetoleChemElmnt_brch(NE,NB,NZ)
         StalkChemElmnts_brch(NE,NB,NZ,NY,NX)=plt_biom%StalkChemElmnts_brch(NE,NB,NZ)
-        LeafPetioNonstructElmntConc_brch(NE,NB,NZ,NY,NX)=plt_biom%LeafPetioNonstructElmntConc_brch(NE,NB,NZ)
+        LeafPetoNonstructElmntConc_brch(NE,NB,NZ,NY,NX)=plt_biom%LeafPetoNonstructElmntConc_brch(NE,NB,NZ)
         LeafChemElmnts_brch(NE,NB,NZ,NY,NX) =plt_biom%LeafChemElmnts_brch(NE,NB,NZ)
         ReserveChemElmnts_brch(NE,NB,NZ,NY,NX)=plt_biom%ReserveChemElmnts_brch(NE,NB,NZ)
         HuskChemElmnts_brch(NE,NB,NZ,NY,NX)=plt_biom%HuskChemElmnts_brch(NE,NB,NZ)
@@ -403,8 +403,8 @@ implicit none
 
       HourlyNodeNumNormByMatgrp_brch(NB,NZ,NY,NX)=plt_pheno%HourlyNodeNumNormByMatgrp_brch(NB,NZ)
       HourReprodNodeNumNormByMatrgrp_brch(NB,NZ,NY,NX)=plt_pheno%HourReprodNodeNumNormByMatrgrp_brch(NB,NZ)
-      HourWithNoGrainFill_brch(NB,NZ,NY,NX)  =plt_pheno%HourWithNoGrainFill_brch(NB,NZ)
-      RubiscoActivity_brpft(NB,NZ,NY,NX)  =plt_photo%RubiscoActivity_brpft(NB,NZ)
+      HourFailGrainFill_brch(NB,NZ,NY,NX)  =plt_pheno%HourFailGrainFill_brch(NB,NZ)
+      RubiscoActivity_brch(NB,NZ,NY,NX)  =plt_photo%RubiscoActivity_brch(NB,NZ)
       C4PhotosynDowreg_brch(NB,NZ,NY,NX) =plt_photo%C4PhotosynDowreg_brch(NB,NZ)
       HoursDoingRemob_brch(NB,NZ,NY,NX)  =plt_pheno%HoursDoingRemob_brch(NB,NZ)
       MatureGroup_brch(NB,NZ,NY,NX) =plt_pheno%MatureGroup_brch(NB,NZ)
@@ -441,7 +441,7 @@ implicit none
       Hours4LeafOff_brch(NB,NZ,NY,NX)  =plt_pheno%Hours4LeafOff_brch(NB,NZ)
       NumOfLeaves_brch(NB,NZ,NY,NX)  =plt_morph%NumOfLeaves_brch(NB,NZ)
       LeafNumberAtFloralInit_brch(NB,NZ,NY,NX) =plt_pheno%LeafNumberAtFloralInit_brch(NB,NZ)
-      LeafPetioleBiomassC_brch(NB,NZ,NY,NX) =plt_biom%LeafPetioleBiomassC_brch(NB,NZ)
+      LeafPetolBiomassC_brch(NB,NZ,NY,NX) =plt_biom%LeafPetolBiomassC_brch(NB,NZ)
 
       LeafChemElmntRemob_brch(1:NumOfPlantChemElmnts,NB,NZ,NY,NX) =plt_biom%LeafChemElmntRemob_brch(1:NumOfPlantChemElmnts,NB,NZ)
       BranchStalkChemElmnts_pft_pft(1:NumOfPlantChemElmnts,NB,NZ,NY,NX)=plt_biom%BranchStalkChemElmnts_pft_pft(1:NumOfPlantChemElmnts,NB,NZ)
@@ -453,7 +453,7 @@ implicit none
         InternodeHeightLive_brch(K,NB,NZ,NY,NX)=plt_morph%InternodeHeightLive_brch(K,NB,NZ)
         PetioleLengthNode_brch(K,NB,NZ,NY,NX) =plt_morph%PetioleLengthNode_brch(K,NB,NZ)
         InternodeChemElmnt_brch(1:NumOfPlantChemElmnts,K,NB,NZ,NY,NX)=plt_biom%InternodeChemElmnt_brch(1:NumOfPlantChemElmnts,K,NB,NZ)
-        LeafChemElmntNode_brch(1:NumOfPlantChemElmnts,K,NB,NZ,NY,NX)  =plt_biom%LeafChemElmntNode_brch(1:NumOfPlantChemElmnts,K,NB,NZ)
+        LeafElmntNode_brch(1:NumOfPlantChemElmnts,K,NB,NZ,NY,NX)  =plt_biom%LeafElmntNode_brch(1:NumOfPlantChemElmnts,K,NB,NZ)
         LeafProteinCNode_brch(K,NB,NZ,NY,NX)  =plt_biom%LeafProteinCNode_brch(K,NB,NZ)
         PetioleElmntNode_brch(1:NumOfPlantChemElmnts,K,NB,NZ,NY,NX) =plt_biom%PetioleElmntNode_brch(1:NumOfPlantChemElmnts,K,NB,NZ)
         PetioleProteinCNode_brch(K,NB,NZ,NY,NX) =plt_biom%PetioleProteinCNode_brch(K,NB,NZ)
@@ -476,7 +476,7 @@ implicit none
         DO  L=1,JC
           DO N=1,NumOfLeafZenithSectors
             LeafAreaZsec_brch(N,L,K,NB,NZ,NY,NX) =plt_morph%LeafAreaZsec_brch(N,L,K,NB,NZ)
-            LeafAUnshaded_seclyrnodbrpft(N,L,K,NB,NZ,NY,NX)=plt_photo%LeafAUnshaded_seclyrnodbrpft(N,L,K,NB,NZ)
+            LeafAUnshaded_zsec(N,L,K,NB,NZ,NY,NX)=plt_photo%LeafAUnshaded_zsec(N,L,K,NB,NZ)
           ENDDO
         ENDDO
         CPOOL3(K,NB,NZ,NY,NX)=plt_photo%CPOOL3(K,NB,NZ)
@@ -712,11 +712,11 @@ implicit none
   plt_morph%CanopyHeightz_col(0)=CanopyHeightz_col(0,NY,NX)
   DO  L=1,JC
     plt_morph%CanopyHeightz_col(L)=CanopyHeightz_col(L,NY,NX)
-    plt_rad%TAUS(L)=TAUS(L,NY,NX)
-    plt_rad%TAU0(L)=TAU0(L,NY,NX)
+    plt_rad%TAU_RadCapt(L)=TAU_RadCapt(L,NY,NX)
+    plt_rad%TAU_RadThru(L)=TAU_RadThru(L,NY,NX)
   ENDDO
-  plt_rad%TAUS(JC+1)=TAUS(JC+1,NY,NX)
-  plt_rad%TAU0(JC+1)=TAU0(JC+1,NY,NX)
+  plt_rad%TAU_RadCapt(JC+1)=TAU_RadCapt(JC+1,NY,NX)
+  plt_rad%TAU_RadThru(JC+1)=TAU_RadThru(JC+1,NY,NX)
 
   DO N=1,NumOfLeafZenithSectors
     plt_rad%SineLeafAngle(N)=SineLeafAngle(N)
@@ -804,14 +804,14 @@ implicit none
     plt_morph%iPlantGrainType_pft(NZ)=iPlantGrainType_pft(NZ,NY,NX)
     plt_morph%iPlantNfixType(NZ)=iPlantNfixType(NZ,NY,NX)
     plt_morph%MY(NZ)=MY(NZ,NY,NX)
-    plt_photo%VCMX(NZ)=VCMX(NZ,NY,NX)
-    plt_photo%VOMX(NZ)=VOMX(NZ,NY,NX)
-    plt_photo%VCMX4(NZ)=VCMX4(NZ,NY,NX)
+    plt_photo%VmaxRubCarboxyRef_pft(NZ)=VmaxRubCarboxyRef_pft(NZ,NY,NX)
+    plt_photo%VmaxRubOxyRef_pft(NZ)=VmaxRubOxyRef_pft(NZ,NY,NX)
+    plt_photo%VmaxPEPCarboxyRef_pft(NZ)=VmaxPEPCarboxyRef_pft(NZ,NY,NX)
     plt_photo%XKCO2(NZ)=XKCO2(NZ,NY,NX)
     plt_photo%XKO2(NZ)=XKO2(NZ,NY,NX)
     plt_photo%Km4PEPCarboxy_pft(NZ)=Km4PEPCarboxy_pft(NZ,NY,NX)
     plt_photo%LeafRuBPConc_pft(NZ)=LeafRuBPConc_pft(NZ,NY,NX)
-    plt_photo%PEPC(NZ)=PEPC(NZ,NY,NX)
+    plt_photo%FracLeafProtinAsPEPCarboxyl_pft(NZ)=FracLeafProtinAsPEPCarboxyl_pft(NZ,NY,NX)
     plt_photo%SpecChloryfilAct_pft(NZ)=SpecChloryfilAct_pft(NZ,NY,NX)
     plt_photo%LeafC3ChlorofilConc_pft(NZ)=LeafC3ChlorofilConc_pft(NZ,NY,NX)
     plt_photo%LeafC4ChlorofilConc_pft(NZ)=LeafC4ChlorofilConc_pft(NZ,NY,NX)
@@ -956,7 +956,7 @@ implicit none
   plt_rad%Eco_NetRad_col     =Eco_NetRad_col(NY,NX)
   plt_ew%VapXAir2CanG=VapXAir2CanG(NY,NX)
   plt_ew%Eco_Heat_Latent_col=Eco_Heat_Latent_col(NY,NX)
-  plt_rbgc%TRootGasLoss_disturb(idg_beg:idg_end-1)=TRootGasLoss_disturb(idg_beg:idg_end-1,NY,NX)
+  plt_rbgc%TRootGasLossDisturb_pft(idg_beg:idg_end-1)=TRootGasLossDisturb_pft(idg_beg:idg_end-1,NY,NX)
   plt_ew%Eco_Heat_Grnd_col    =Eco_Heat_Grnd_col(NY,NX)
   plt_ew%TEVAPP =TEVAPP(NY,NX)
   plt_ew%THFLXC =THFLXC(NY,NX)
@@ -1108,13 +1108,13 @@ implicit none
 
     plt_morph%BranchNumber_pft(NZ)=BranchNumber_pft(NZ,NY,NX)
     plt_morph%NGTopRootLayer_pft(NZ)=NGTopRootLayer_pft(NZ,NY,NX)
-    plt_pheno%doInitPlant(NZ)=doInitPlant(NZ,NY,NX)
+    plt_pheno%doInitPlant_pft(NZ)=doInitPlant_pft(NZ,NY,NX)
     plt_morph%NIXBotRootLayer_pft(NZ)=NIXBotRootLayer_pft(NZ,NY,NX)
     plt_morph%NumRootAxes_pft(NZ)=NumRootAxes_pft(NZ,NY,NX)
     plt_morph%NumOfMainBranch_pft(NZ)=NumOfMainBranch_pft(NZ,NY,NX)
     plt_morph%NumOfBranches_pft(NZ)=NumOfBranches_pft(NZ,NY,NX)
 
-    plt_pheno%IsPlantActive(NZ)=IsPlantActive(NZ,NY,NX)
+    plt_pheno%IsPlantActive_pft(NZ)=IsPlantActive_pft(NZ,NY,NX)
     plt_distb%iDayPlanting_pft(NZ)=iDayPlanting_pft(NZ,NY,NX)
     plt_distb%iDayPlantHarvest_pft(NZ)=iDayPlantHarvest_pft(NZ,NY,NX)
     plt_distb%iYearPlantHarvest_pft(NZ)=iYearPlantHarvest_pft(NZ,NY,NX)
@@ -1141,7 +1141,7 @@ implicit none
     plt_photo%AirConc_pft(NZ)=AirConc_pft(NZ,NY,NX)
     plt_allom%FNOD(NZ)=FNOD(NZ,NY,NX)
 
-    plt_morph%HypoctoylHeight(NZ)=HypoctoylHeight(NZ,NY,NX)
+    plt_morph%HypoctoylHeight_pft(NZ)=HypoctoylHeight_pft(NZ,NY,NX)
     plt_rbgc%PlantRootSoilChemNetX_pft(1:NumOfPlantChemElmnts,NZ)=PlantRootSoilChemNetX_pft(1:NumOfPlantChemElmnts,NZ,NY,NX)
     plt_morph%CanPHeight4WatUptake(NZ)=CanPHeight4WatUptake(NZ,NY,NX)
     plt_morph%NI(NZ)   =NI(NZ,NY,NX)
@@ -1160,10 +1160,10 @@ implicit none
     plt_ew%PSICanopy_pft(NZ)=PSICanopy_pft(NZ,NY,NX)
     plt_ew%PSICanopyTurg_pft(NZ)=PSICanopyTurg_pft(NZ,NY,NX)
     plt_photo%CO2CuticleResist_pft(NZ)=CO2CuticleResist_pft(NZ,NY,NX)
-    plt_bgcr%RootGasLoss_disturb(idg_beg:idg_end-1,NZ)=RootGasLoss_disturb(idg_beg:idg_end-1,NZ,NY,NX)
+    plt_bgcr%RootGasLossDisturb_pft(idg_beg:idg_end-1,NZ)=RootGasLossDisturb_pft(idg_beg:idg_end-1,NZ,NY,NX)
     plt_ew%RAZ(NZ)=RAZ(NZ,NY,NX)
     plt_photo%CO2Solubility_pft(NZ)=CO2Solubility_pft(NZ,NY,NX)
-    plt_morph%SeedinDepth(NZ)=SeedinDepth(NZ,NY,NX)
+    plt_morph%SeedDepth_pft(NZ)=SeedDepth_pft(NZ,NY,NX)
     plt_morph%PlantinDepth(NZ)=PlantinDepth(NZ,NY,NX)
     plt_morph%SeedLengthMean_pft(NZ)=SeedLengthMean_pft(NZ,NY,NX)
     plt_morph%SeedVolumeMean_pft(NZ)=SeedVolumeMean_pft(NZ,NY,NX)
@@ -1216,8 +1216,8 @@ implicit none
         plt_biom%NonstructElmnt_brch(NE,NB,NZ)=NonstructElmnt_brch(NE,NB,NZ,NY,NX)
         plt_biom%NoduleNonstructElmnt_brch(NE,NB,NZ)=NoduleNonstructElmnt_brch(NE,NB,NZ,NY,NX)
         plt_biom%ShootChemElmnt_brch(NE,NB,NZ)=ShootChemElmnt_brch(NE,NB,NZ,NY,NX)
-        plt_biom%LeafPetioNonstructElmntConc_brch(NE,NB,NZ)=LeafPetioNonstructElmntConc_brch(NE,NB,NZ,NY,NX)
-        plt_biom%PetioleChemElmnts_brch(NE,NB,NZ)=PetioleChemElmnts_brch(NE,NB,NZ,NY,NX)
+        plt_biom%LeafPetoNonstructElmntConc_brch(NE,NB,NZ)=LeafPetoNonstructElmntConc_brch(NE,NB,NZ,NY,NX)
+        plt_biom%PetoleChemElmnt_brch(NE,NB,NZ)=PetoleChemElmnt_brch(NE,NB,NZ,NY,NX)
         plt_biom%StalkChemElmnts_brch(NE,NB,NZ)=StalkChemElmnts_brch(NE,NB,NZ,NY,NX)
         plt_biom%LeafChemElmnts_brch(NE,NB,NZ)=LeafChemElmnts_brch(NE,NB,NZ,NY,NX)
         plt_biom%ReserveChemElmnts_brch(NE,NB,NZ)=ReserveChemElmnts_brch(NE,NB,NZ,NY,NX)
@@ -1230,7 +1230,7 @@ implicit none
     ENDDO
 
     DO NB=1,NumOfBranches_pft(NZ,NY,NX)
-      plt_photo%RubiscoActivity_brpft(NB,NZ)=RubiscoActivity_brpft(NB,NZ,NY,NX)
+      plt_photo%RubiscoActivity_brch(NB,NZ)=RubiscoActivity_brch(NB,NZ,NY,NX)
       plt_photo%C4PhotosynDowreg_brch(NB,NZ)=C4PhotosynDowreg_brch(NB,NZ,NY,NX)
       plt_pheno%HourCounter4LeafOut_brch(NB,NZ)=HourCounter4LeafOut_brch(NB,NZ,NY,NX)
       plt_morph%LeafAreaDying_brch(NB,NZ)=LeafAreaDying_brch(NB,NZ,NY,NX)
@@ -1238,7 +1238,7 @@ implicit none
 
       plt_pheno%HourlyNodeNumNormByMatgrp_brch(NB,NZ)=HourlyNodeNumNormByMatgrp_brch(NB,NZ,NY,NX)
       plt_pheno%HourReprodNodeNumNormByMatrgrp_brch(NB,NZ)=HourReprodNodeNumNormByMatrgrp_brch(NB,NZ,NY,NX)
-      plt_pheno%HourWithNoGrainFill_brch(NB,NZ)=HourWithNoGrainFill_brch(NB,NZ,NY,NX)
+      plt_pheno%HourFailGrainFill_brch(NB,NZ)=HourFailGrainFill_brch(NB,NZ,NY,NX)
       plt_pheno%HoursDoingRemob_brch(NB,NZ)=HoursDoingRemob_brch(NB,NZ,NY,NX)
       plt_pheno%MatureGroup_brch(NB,NZ)=MatureGroup_brch(NB,NZ,NY,NX)
       plt_pheno%NodeNumNormByMatgrp_brch(NB,NZ)=NodeNumNormByMatgrp_brch(NB,NZ,NY,NX)
@@ -1272,7 +1272,7 @@ implicit none
       plt_pheno%Hours4ShortenPhotoPeriod_brch(NB,NZ)=Hours4ShortenPhotoPeriod_brch(NB,NZ,NY,NX)
       plt_pheno%Hours4Leafout_brch(NB,NZ)=Hours4Leafout_brch(NB,NZ,NY,NX)
       plt_pheno%Hours4LeafOff_brch(NB,NZ)=Hours4LeafOff_brch(NB,NZ,NY,NX)
-      plt_biom%LeafPetioleBiomassC_brch(NB,NZ)=LeafPetioleBiomassC_brch(NB,NZ,NY,NX)
+      plt_biom%LeafPetolBiomassC_brch(NB,NZ)=LeafPetolBiomassC_brch(NB,NZ,NY,NX)
       plt_biom%LeafChemElmntRemob_brch(1:NumOfPlantChemElmnts,NB,NZ) =LeafChemElmntRemob_brch(1:NumOfPlantChemElmnts,NB,NZ,NY,NX)
       plt_biom%BranchStalkChemElmnts_pft_pft(1:NumOfPlantChemElmnts,NB,NZ)=BranchStalkChemElmnts_pft_pft(1:NumOfPlantChemElmnts,NB,NZ,NY,NX)
       plt_biom%StalkBiomassC_brch(NB,NZ)=StalkBiomassC_brch(NB,NZ,NY,NX)
@@ -1283,7 +1283,7 @@ implicit none
         DO  L=1,JC
           DO N=1,NumOfLeafZenithSectors
             plt_morph%LeafAreaZsec_brch(N,L,K,NB,NZ) =LeafAreaZsec_brch(N,L,K,NB,NZ,NY,NX)
-            plt_photo%LeafAUnshaded_seclyrnodbrpft(N,L,K,NB,NZ)=LeafAUnshaded_seclyrnodbrpft(N,L,K,NB,NZ,NY,NX)
+            plt_photo%LeafAUnshaded_zsec(N,L,K,NB,NZ)=LeafAUnshaded_zsec(N,L,K,NB,NZ,NY,NX)
           ENDDO
         ENDDO
         plt_photo%CPOOL3(K,NB,NZ)=CPOOL3(K,NB,NZ,NY,NX)
@@ -1307,7 +1307,7 @@ implicit none
         plt_morph%PetioleLengthNode_brch(K,NB,NZ) =PetioleLengthNode_brch(K,NB,NZ,NY,NX)
         plt_morph%InternodeHeightLive_brch(K,NB,NZ)=InternodeHeightLive_brch(K,NB,NZ,NY,NX)
         plt_biom%InternodeChemElmnt_brch(1:NumOfPlantChemElmnts,K,NB,NZ) =InternodeChemElmnt_brch(1:NumOfPlantChemElmnts,K,NB,NZ,NY,NX)
-        plt_biom%LeafChemElmntNode_brch(1:NumOfPlantChemElmnts,K,NB,NZ)   =LeafChemElmntNode_brch(1:NumOfPlantChemElmnts,K,NB,NZ,NY,NX)
+        plt_biom%LeafElmntNode_brch(1:NumOfPlantChemElmnts,K,NB,NZ)   =LeafElmntNode_brch(1:NumOfPlantChemElmnts,K,NB,NZ,NY,NX)
         plt_biom%LeafProteinCNode_brch(K,NB,NZ)   =LeafProteinCNode_brch(K,NB,NZ,NY,NX)
         plt_biom%PetioleElmntNode_brch(1:NumOfPlantChemElmnts,K,NB,NZ)  =PetioleElmntNode_brch(1:NumOfPlantChemElmnts,K,NB,NZ,NY,NX)
         plt_biom%PetioleProteinCNode_brch(K,NB,NZ)  =PetioleProteinCNode_brch(K,NB,NZ,NY,NX)
@@ -1498,9 +1498,9 @@ implicit none
     plt_morph%CanopyStemA_lyr(L)=CanopyStemA_lyr(L,NY,NX)
     plt_morph%CanopyLAgrid_lyr(L)=CanopyLAgrid_lyr(L,NY,NX)
     plt_morph%CanopyHeightz_col(L)=CanopyHeightz_col(L,NY,NX)
-    plt_rad%TAUS(L)=TAUS(L,NY,NX)
+    plt_rad%TAU_RadCapt(L)=TAU_RadCapt(L,NY,NX)
   ENDDO
-  plt_rad%TAUS(JC+1)=TAUS(JC+1,NY,NX)
+  plt_rad%TAU_RadCapt(JC+1)=TAU_RadCapt(JC+1,NY,NX)
 
   DO L=0,NL(NY,NX)
     plt_site%AREA3(L)=AREA(3,L,NY,NX)
@@ -1607,8 +1607,8 @@ implicit none
     CanopyHeightz_col(L,NY,NX)=plt_morph%CanopyHeightz_col(L)
   ENDDO
   DO L=1,JC
-    TAUS(L,NY,NX)=plt_rad%TAUS(L)
-    TAU0(L,NY,NX)=plt_rad%TAU0(L)
+    TAU_RadCapt(L,NY,NX)=plt_rad%TAU_RadCapt(L)
+    TAU_RadThru(L,NY,NX)=plt_rad%TAU_RadThru(L)
   ENDDO
   CanopyArea_grd(NY,NX)=plt_morph%CanopyArea_grd
   DO NZ=1,NP(NY,NX)

@@ -33,7 +33,7 @@ module grosubsMod
 !     FXFY,FXFZ=rate constant for leaf-reserve nonstructural C,N,P exchange (h-1)
 !     EFIRE=combustion  of N,P relative to C
 !     PSILY=canopy water potential below which leafoff is induced (MPa)
-!     HourWithNoGrainFill_brchY=number of hours after physiol maturity required for senescence
+!     HourFailGrainFill_brchY=number of hours after physiol maturity required for senescence
 !     ATRPX=number of hours required to initiate remobilization of storage C for leafout
 !     GVMX=specific oxidation rate of nonstructural C during leafout at 25 C
 !     FVRN=fraction of hours required for leafoff to initiate remobilization
@@ -71,7 +71,7 @@ module grosubsMod
   real(r8) :: ShootNonstructC_brch(NumOfCanopyLayers1,JP1)
 ! begin_execution
   associate(                            &
-    IsPlantActive    => plt_pheno%IsPlantActive   , &
+    IsPlantActive_pft    => plt_pheno%IsPlantActive_pft   , &
     NP       => plt_site%NP       , &
     NP0      => plt_site%NP0      , &
     MaxNumRootLays       => plt_site%MaxNumRootLays       , &
@@ -106,8 +106,8 @@ module grosubsMod
 !
   D9985: DO NZ=1,NP
 
-! IsPlantActive= flag for living pft
-    IF(IsPlantActive(NZ).EQ.iPlantIsActive)THEN
+! IsPlantActive_pft= flag for living pft
+    IF(IsPlantActive_pft(NZ).EQ.iPlantIsActive)THEN
       call GrowPlant(I,J,NZ,CanopyHeight_copy,ShootNonstructC_brch)
     ENDIF
 
@@ -150,9 +150,9 @@ module grosubsMod
     StandingDeadChemElmnts_pft  => plt_biom%StandingDeadChemElmnts_pft   , &
     fTgrowCanP    => plt_pheno%fTgrowCanP    , &
     NetCumElmntFlx2Plant_pft   => plt_pheno%NetCumElmntFlx2Plant_pft   , &
-    IsPlantActive   => plt_pheno%IsPlantActive   , &
+    IsPlantActive_pft   => plt_pheno%IsPlantActive_pft   , &
     iPlantMorphologyType_pft  => plt_pheno%iPlantMorphologyType_pft  , &
-    doInitPlant   => plt_pheno%doInitPlant   , &
+    doInitPlant_pft   => plt_pheno%doInitPlant_pft   , &
     doPlantLeafOut_brch   => plt_pheno%doPlantLeafOut_brch   , &
     iPlantTurnoverPattern_pft  => plt_pheno%iPlantTurnoverPattern_pft  , &
     HourThreshold4LeafOut_brch   => plt_pheno%HourThreshold4LeafOut_brch   , &
@@ -180,13 +180,13 @@ module grosubsMod
 !     ACTIVATE DORMANT SEEDS
 !
     D205: DO NB=1,NumOfBranches_pft(NZ)
-      IF(doInitPlant(NZ).EQ.itrue)THEN
+      IF(doInitPlant_pft(NZ).EQ.itrue)THEN
         IF(doPlantLeafOut_brch(NB,NZ).EQ.iEnable.AND.Hours4Leafout_brch(NB,NZ).GE.HourThreshold4LeafOut_brch(NB,NZ))THEN
           iDayPlanting_pft(NZ)=I
           iYearPlanting_pft(NZ)=iYearCurrent
           PlantinDepth(NZ)=0.005_r8+CumSoilThickness(0)
           !mark plant as initialized
-          doInitPlant(NZ)=ifalse
+          doInitPlant_pft(NZ)=ifalse
         ENDIF
       ENDIF
     ENDDO D205
@@ -253,7 +253,7 @@ module grosubsMod
 !
     NetPrimaryProductvity_pft(NZ)=GrossCO2Fix_pft(NZ)+GrossResp_pft(NZ)
 
-    IF(IsPlantActive(NZ).EQ.iPlantIsActive)THEN
+    IF(IsPlantActive_pft(NZ).EQ.iPlantIsActive)THEN
       !check for living plant
       DO NE=1,NumOfPlantChemElmnts
         ElmntBalanceCum_pft(NE,NZ)=ShootChemElmnts_pft(NE,NZ)+RootChemElmnts_pft(NE,NZ)+NoduleChemElmnts_pft(NE,NZ) &
@@ -331,7 +331,7 @@ module grosubsMod
     NumOfBranches_pft    => plt_morph%NumOfBranches_pft         , &
     NumRootAxes_pft   => plt_morph%NumRootAxes_pft          &
   )
-  IF(iPlantShootState_pft(NZ).EQ.0.OR.iPlantRootState_pft(NZ).EQ.iLive)THEN
+  IF(iPlantShootState_pft(NZ).EQ.iLive.OR.iPlantRootState_pft(NZ).EQ.iLive)THEN
     CanopyN2Fix_pft(NZ)=0._r8
     BegRemoblize = 0
     call StagePlantForGrowth(I,J,NZ,ICHK1,NRX,TFN6,CNLFW,CPLFW,&
@@ -339,7 +339,7 @@ module grosubsMod
 !
 !     CALCULATE GROWTH OF EACH BRANCH
 !
-!     WTLFB,WTSHEB,LeafPetioleBiomassC_brch=leaf,petiole,leaf+petiole mass
+!     WTLFB,WTSHEB,LeafPetolBiomassC_brch=leaf,petiole,leaf+petiole mass
 !     iPlantBranchState_brch=branch living flag: 0=alive,1=dead
 !
     DO  NB=1,NumOfBranches_pft(NZ)
@@ -571,7 +571,7 @@ module grosubsMod
     ShootChemElmnt_brch    =>  plt_biom%ShootChemElmnt_brch    , &
     EarChemElmnts_brch    =>  plt_biom%EarChemElmnts_brch    , &
     StalkChemElmnts_brch    =>  plt_biom%StalkChemElmnts_brch    , &
-    PetioleChemElmnts_brch   =>  plt_biom%PetioleChemElmnts_brch   , &
+    PetoleChemElmnt_brch   =>  plt_biom%PetoleChemElmnt_brch   , &
     HuskChemElmnts_brch    =>  plt_biom%HuskChemElmnts_brch    , &
     ReserveChemElmnts_brch    =>  plt_biom%ReserveChemElmnts_brch    , &
     NonstructElmnt_brch     =>  plt_biom%NonstructElmnt_brch     , &
@@ -609,7 +609,7 @@ module grosubsMod
   DO NE=1,NumOfPlantChemElmnts
     DO NB=1,NumOfBranches_pft(NZ)
       ShootChemElmnt_brch(NE,NB,NZ)=LeafChemElmnts_brch(NE,NB,NZ) &
-        +PetioleChemElmnts_brch(NE,NB,NZ)+StalkChemElmnts_brch(NE,NB,NZ)+ReserveChemElmnts_brch(NE,NB,NZ) &
+        +PetoleChemElmnt_brch(NE,NB,NZ)+StalkChemElmnts_brch(NE,NB,NZ)+ReserveChemElmnts_brch(NE,NB,NZ) &
         +HuskChemElmnts_brch(NE,NB,NZ)+EarChemElmnts_brch(NE,NB,NZ)+GrainChemElmnts_brch(NE,NB,NZ) &
         +NonstructElmnt_brch(NE,NB,NZ)
     ENDDO
@@ -662,11 +662,11 @@ module grosubsMod
     HuskChemElmnts_brch  =>  plt_biom%HuskChemElmnts_brch , &
     ReserveChemElmnts_brch   =>  plt_biom%ReserveChemElmnts_brch  , &
     EarChemElmnts_brch  =>  plt_biom%EarChemElmnts_brch , &
-    LeafPetioleBiomassC_brch    =>  plt_biom%LeafPetioleBiomassC_brch   , &
+    LeafPetolBiomassC_brch    =>  plt_biom%LeafPetolBiomassC_brch   , &
     GrainChemElmnts_brch   =>  plt_biom%GrainChemElmnts_brch  , &
     LeafChemElmnts_brch  =>  plt_biom%LeafChemElmnts_brch , &
     StalkBiomassC_brch   =>  plt_biom%StalkBiomassC_brch  , &
-    PetioleChemElmnts_brch =>  plt_biom%PetioleChemElmnts_brch, &
+    PetoleChemElmnt_brch =>  plt_biom%PetoleChemElmnt_brch, &
     ShootChemElmnts_pft   =>  plt_biom%ShootChemElmnts_pft  , &
     LeafChemElmnts_pft    =>  plt_biom%LeafChemElmnts_pft   , &
     PetioleChemElmnts_pft   =>  plt_biom%PetioleChemElmnts_pft  , &
@@ -728,7 +728,7 @@ module grosubsMod
     CanopyNonstructElements_pft(NE,NZ)=sum(NonstructElmnt_brch(NE,1:NumOfBranches_pft(NZ),NZ))
     ShootChemElmnts_pft(NE,NZ)=sum(ShootChemElmnt_brch(NE,1:NumOfBranches_pft(NZ),NZ))
 
-    PetioleChemElmnts_pft(NE,NZ)=sum(PetioleChemElmnts_brch(NE,1:NumOfBranches_pft(NZ),NZ))
+    PetioleChemElmnts_pft(NE,NZ)=sum(PetoleChemElmnt_brch(NE,1:NumOfBranches_pft(NZ),NZ))
     StalkChemElmnts_pft(NE,NZ)=sum(StalkChemElmnts_brch(NE,1:NumOfBranches_pft(NZ),NZ))
     LeafChemElmnts_pft(NE,NZ)=sum(LeafChemElmnts_brch(NE,1:NumOfBranches_pft(NZ),NZ))
     ReserveChemElmnts_pft(NE,NZ)=sum(ReserveChemElmnts_brch(NE,1:NumOfBranches_pft(NZ),NZ))
@@ -743,7 +743,7 @@ module grosubsMod
   ENDDO
 
   CanopyStalkC_pft(NZ)=sum(StalkBiomassC_brch(1:NumOfBranches_pft(NZ),NZ))
-  CanopyLeafShethC_pft(NZ) =sum(LeafPetioleBiomassC_brch(1:NumOfBranches_pft(NZ),NZ))
+  CanopyLeafShethC_pft(NZ) =sum(LeafPetolBiomassC_brch(1:NumOfBranches_pft(NZ),NZ))
   CanopySeedNumber_pft(NZ) =sum(SeedNumberSet_brch(1:NumOfBranches_pft(NZ),NZ))
   CanopyLeafArea_pft(NZ)=sum(LeafAreaLive_brch(1:NumOfBranches_pft(NZ),NZ))
   CanopyStemA_pft(NZ)=sum(CanopyBranchStemApft_lyr(1:NumOfCanopyLayers1,1:NumOfBranches_pft(NZ),NZ))

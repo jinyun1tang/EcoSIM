@@ -69,7 +69,7 @@ module RootDataType
   real(r8),target,allocatable ::  PSIRootTurg_vr(:,:,:,:,:)                   !root turgor water potential , [Mpa]
   real(r8),target,allocatable ::  trcg_rootml_vr(:,:,:,:,:,:)           !root gaseous tracer content [g d-2]
   real(r8),target,allocatable ::  trcs_rootml_vr(:,:,:,:,:,:)           !root dissolved gaseous tracer content [g d-2]
-  real(r8),target,allocatable ::  TRootGasLoss_disturb(:,:,:)                 !total root gas content, [g d-2]
+  real(r8),target,allocatable ::  TRootGasLossDisturb_pft(:,:,:)                 !total root gas content, [g d-2]
   real(r8),target,allocatable ::  RootBiomCPerPlant_pft(:,:,:)                       !root C per plant, [g p-1]
   real(r8),target,allocatable ::  RootChemElmnts_pft(:,:,:,:)                     !plant root element, [g d-2]
   real(r8),target,allocatable ::  RootStructChemElmnt_pft(:,:,:,:)                    !plant root structural element, [g d-2]
@@ -151,7 +151,7 @@ contains
   allocate(PSIRootTurg_vr(jroots,JZ,JP,JY,JX));PSIRootTurg_vr=0._r8
   allocate(trcg_rootml_vr(idg_beg:idg_end-1,2,JZ,JP,JY,JX)); trcg_rootml_vr =0._r8
   allocate(trcs_rootml_vr(idg_beg:idg_end-1,2,JZ,JP,JY,JX)); trcs_rootml_vr =0._r8
-  allocate(TRootGasLoss_disturb(idg_beg:idg_end-1,JY,JX));TRootGasLoss_disturb=0._r8
+  allocate(TRootGasLossDisturb_pft(idg_beg:idg_end-1,JY,JX));TRootGasLossDisturb_pft=0._r8
   allocate(RootBiomCPerPlant_pft(JP,JY,JX));    RootBiomCPerPlant_pft=0._r8
   allocate(RootChemElmnts_pft(NumOfPlantChemElmnts,JP,JY,JX)); RootChemElmnts_pft=0._r8
   allocate(RootStructChemElmnt_pft(NumOfPlantChemElmnts,JP,JY,JX));   RootStructChemElmnt_pft=0._r8
@@ -231,7 +231,7 @@ contains
   call destroy(PSIRootTurg_vr)
   call destroy(trcg_rootml_vr)
   call destroy(trcs_rootml_vr)
-  call destroy(TRootGasLoss_disturb)
+  call destroy(TRootGasLossDisturb_pft)
   call destroy(RootBiomCPerPlant_pft)
   call destroy(RootChemElmnts_pft)
   call destroy(RootStructChemElmnt_pft)

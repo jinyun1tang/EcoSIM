@@ -28,7 +28,7 @@ module ExtractsMod
   call TotalLitterfall()
 
   DO NZ=1,plt_site%NP
-    IF(plt_pheno%IsPlantActive(NZ).EQ.iPlantIsActive)THEN
+    IF(plt_pheno%IsPlantActive_pft(NZ).EQ.iPlantIsActive)THEN
 
       call TotalLeafArea(NZ)
 
@@ -338,7 +338,7 @@ module ExtractsMod
     RNH3C => plt_bgcr%RNH3C  , &
     Canopy_NEE_col => plt_bgcr%Canopy_NEE_col  , &
     LitterFallChemElmnt_col => plt_bgcr%LitterFallChemElmnt_col  , &
-    RootGasLoss_disturb => plt_bgcr%RootGasLoss_disturb, &
+    RootGasLossDisturb_pft => plt_bgcr%RootGasLossDisturb_pft, &
     RootN2Fix_pvr => plt_bgcr%RootN2Fix_pvr  , &
     CO2NetFix_pft  => plt_bgcr%CO2NetFix_pft   , &
     ETCanopy_pft => plt_ew%ETCanopy_pft    , &
@@ -346,7 +346,7 @@ module ExtractsMod
     trcs_plant_uptake_vr => plt_rbgc%trcs_plant_uptake_vr, &    
     RNH3B => plt_rbgc%RNH3B  , &
     PlantRootSoilChemNetX_pft=> plt_rbgc%PlantRootSoilChemNetX_pft , &
-    TRootGasLoss_disturb => plt_rbgc%TRootGasLoss_disturb  , &
+    TRootGasLossDisturb_pft => plt_rbgc%TRootGasLossDisturb_pft  , &
     Transpiration_pft   => plt_ew%Transpiration_pft      , &
     PrecIntcptByCanopy_pft  => plt_ew%PrecIntcptByCanopy_pft     , &
     VapXAir2Canopy_pft=> plt_ew%VapXAir2Canopy_pft   , &
@@ -408,8 +408,8 @@ module ExtractsMod
 !     HCUPTK,HZUPTK,HPUPTK=PFT net root-soil C,N,P exchange
 !     TBALC,TBALN,TBALP=total C,N,P balance
 !     BALC,BALN,BALP=PFT C,N,P balance
-!     TRootGasLoss_disturb=total loss of root CO2, O2, CH4, N2O, NH3, H2
-!     RootGasLoss_disturb=PFT loss of root CO2, O2, CH4, N2O, NH3, H2
+!     TRootGasLossDisturb_pft=total loss of root CO2, O2, CH4, N2O, NH3, H2
+!     RootGasLossDisturb_pft=PFT loss of root CO2, O2, CH4, N2O, NH3, H2
 !
   Eco_NetRad_col=Eco_NetRad_col+RadNet2CanP(NZ)
   Eco_Heat_Latent_col=Eco_Heat_Latent_col+EvapTransHeatP(NZ)
@@ -434,7 +434,7 @@ module ExtractsMod
   ENDDO
 
   DO NTG=idg_beg,idg_end-1
-    TRootGasLoss_disturb(NTG)=TRootGasLoss_disturb(NTG)+RootGasLoss_disturb(NTG,NZ)
+    TRootGasLossDisturb_pft(NTG)=TRootGasLossDisturb_pft(NTG)+RootGasLossDisturb_pft(NTG,NZ)
   ENDDO
 !
 !     TOTAL CANOPY NH3 EXCHANGE AND EXUDATION

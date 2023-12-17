@@ -240,7 +240,7 @@ implicit none
   real(r8),pointer   :: histr_1D_Growth_Stage_ptc(:)    !plant development stage, integer, 0-10, planting, emergence, floral_init, jointing, 
                                       !elongation, heading, anthesis, seed_fill, see_no_set, seed_mass_set, end_seed_fill
   real(r8),pointer   :: histr_2D_LEAF_NODE_NO_ptc(:,:)       !NumOfLeaves_brch(NumOfMainBranch_pft(NZ,NY,NX),NZ,NY,NX), leaf NO
-  real(r8),pointer   :: histr_2D_RUB_ACTVN_ptc(:,:)     !RubiscoActivity_brpft(NumOfMainBranch_pft(NZ,NY,NX),NZ,NY,NX), branch down-regulation of CO2 fixation
+  real(r8),pointer   :: histr_2D_RUB_ACTVN_ptc(:,:)     !RubiscoActivity_brch(NumOfMainBranch_pft(NZ,NY,NX),NZ,NY,NX), branch down-regulation of CO2 fixation
   real(r8),pointer   :: histr_2D_CO2_vr_col(:,:)        !trc_solcl_vr(idg_CO2,1:JZ,NY,NX)
   real(r8),pointer   :: histr_2D_CH4_vr_col(:,:)        !trc_solcl_vr(idg_CH4,1:JZ,NY,NX)
   real(r8),pointer   :: histr_2D_O2_vr_col(:,:)         !trc_solcl_vr(idg_O2,1:JZ,NY,NX)
@@ -1356,7 +1356,7 @@ implicit none
   call hist_addfld2d(fname='LEAF_NODE_NO',units='none',type2d='nbranches',avgflag='I',&
     long_name='Leaf number',ptr_patch=data2d_ptr)      
 
-  data2d_ptr => this%histr_2D_RUB_ACTVN_ptc(beg_ptc:end_ptc,1:MaxNumBranches)      !RubiscoActivity_brpft(NumOfMainBranch_pft(NZ,NY,NX),NZ,NY,NX), branch down-regulation of CO2 fixation
+  data2d_ptr => this%histr_2D_RUB_ACTVN_ptc(beg_ptc:end_ptc,1:MaxNumBranches)      !RubiscoActivity_brch(NumOfMainBranch_pft(NZ,NY,NX),NZ,NY,NX), branch down-regulation of CO2 fixation
   call hist_addfld2d(fname='RUB_ACTVN',units='none',type2d='nbranches',avgflag='A',&
     long_name='branch rubisco activity for CO2 fixation, 0-1',ptr_patch=data2d_ptr)      
 
@@ -1708,7 +1708,7 @@ implicit none
           ENDDO
           DO NB=1,NumOfMainBranch_pft(NZ,NY,NX)
             this%histr_2D_LEAF_NODE_NO_ptc(nptc,NB) = NumOfLeaves_brch(NB,NZ,NY,NX)
-            this%histr_2D_RUB_ACTVN_ptc(nptc,NB)  = RubiscoActivity_brpft(NB,NZ,NY,NX)
+            this%histr_2D_RUB_ACTVN_ptc(nptc,NB)  = RubiscoActivity_brch(NB,NZ,NY,NX)
           ENDDO
         endif
         DO L=1,JZ

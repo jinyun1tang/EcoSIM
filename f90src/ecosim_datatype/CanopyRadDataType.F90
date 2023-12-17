@@ -15,7 +15,7 @@ module CanopyRadDataType
   real(r8),target,allocatable :: PARDirect_zsec(:,:,:,:,:,:)              !direct incoming PAR, [umol m-2 s-1]
   real(r8),target,allocatable :: CLASS(:,:,:,:)                !fractionction of leaves in different angle classes, [-]
   real(r8),target,allocatable :: LeafAreaZsec_brch(:,:,:,:,:,:,:)           !leaf surface area, [m2 d-2]
-  real(r8),target,allocatable :: LeafAUnshaded_seclyrnodbrpft(:,:,:,:,:,:,:)          !leaf irradiated surface area, [m2 d-2]
+  real(r8),target,allocatable :: LeafAUnshaded_zsec(:,:,:,:,:,:,:)          !leaf irradiated surface area, [m2 d-2]
   real(r8),target,allocatable :: StemAreaZsec_brch(:,:,:,:,:,:)            !stem surface area, [m2 d-2]
 
   real(r8) :: TotSineSkyAngles_grd
@@ -61,7 +61,7 @@ module CanopyRadDataType
   allocate(IALBY(NumOfSkyAzimuthSectors,NumOfLeafZenithSectors,NumOfLeafAzimuthSectors))
   allocate(CLASS(NumOfLeafZenithSectors,JP,JY,JX))
   allocate(LeafAreaZsec_brch(NumOfLeafZenithSectors,JC,MaxNodesPerBranch,MaxNumBranches,JP,JY,JX))
-  allocate(LeafAUnshaded_seclyrnodbrpft(NumOfLeafZenithSectors,JC,MaxNodesPerBranch,MaxNumBranches,JP,JY,JX))
+  allocate(LeafAUnshaded_zsec(NumOfLeafZenithSectors,JC,MaxNodesPerBranch,MaxNumBranches,JP,JY,JX))
   allocate(PARDirect_zsec(NumOfLeafZenithSectors,NumOfSkyAzimuthSectors,JC,JP,JY,JX))
   allocate(PARDiffus_zsec(NumOfLeafZenithSectors,NumOfSkyAzimuthSectors,JC,JP,JY,JX))
   allocate(StemAreaZsec_brch(NumOfLeafZenithSectors,JC,MaxNumBranches,JP,JY,JX))
@@ -80,7 +80,7 @@ module CanopyRadDataType
   call destroy(IALBY)
   call destroy(CLASS)
   call destroy(LeafAreaZsec_brch)
-  call destroy(LeafAUnshaded_seclyrnodbrpft)
+  call destroy(LeafAUnshaded_zsec)
   call destroy(PARDirect_zsec)
   call destroy(PARDiffus_zsec)
   call destroy(StemAreaZsec_brch)

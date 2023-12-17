@@ -70,7 +70,7 @@ module NoduleBGCMod
     NoduGrowthYield_pft    =>  plt_allom%NoduGrowthYield_pft   , &
     NodulerNC_pft    =>  plt_allom%NodulerNC_pft   , &
     NodulerPC_pft    =>  plt_allom%NodulerPC_pft   , &
-    LeafPetioleBiomassC_brch    =>  plt_biom%LeafPetioleBiomassC_brch    , &
+    LeafPetolBiomassC_brch    =>  plt_biom%LeafPetolBiomassC_brch    , &
     NonstructElmnt_brch   =>  plt_biom%NonstructElmnt_brch   , &
     NoduleNonstructElmnt_brch   =>  plt_biom%NoduleNonstructElmnt_brch   , &
     ZEROP    =>  plt_biom%ZEROP    , &
@@ -197,7 +197,7 @@ module NoduleBGCMod
 !     RCCC,RCCN,RCCP=remobilization coefficient for C,N,P
 !     RCCZN,RCCYN=min,max fractions for bacteria C recycling
 !     RCCXN,RCCQN=max fractions for bacteria N,P recycling
-!     LeafPetioleBiomassC_brch=leaf+petiole mass
+!     LeafPetolBiomassC_brch=leaf+petiole mass
 !     CCNDLB=bacteria:leaf+petiole ratio
 !     RDNDBX=effect of CCNDLB on bacteria decomposition rate
 !     SPNDX=specific bacterial decomposition rate at current CCNDLB
@@ -340,7 +340,7 @@ module NoduleBGCMod
 !     FROM NON-STRUCTURAL C,N,P CONCENTRATION DIFFERENCES
 !
 !     CPOOL,ZPOOL,PPOOL=branch non-structural C,N,P mass
-!     LeafPetioleBiomassC_brch=leaf+petiole C mass
+!     LeafPetolBiomassC_brch=leaf+petiole C mass
 !     WTNDB=bacterial C mass
 !     NoduleBiomCatInfection=initial bacterial mass at infection
 !     FXRN=rate constant for plant-bacteria nonstructural C,N,P exchange
@@ -349,10 +349,10 @@ module NoduleBGCMod
 !     XFRC,XFRN,XFRC=nonstructural C,N,P transfer
 !     CPOLNB,ZPOLNB,PPOLNB=nonstructural C,N,P in bacteria
 !
-    IF(NonstructElmnt_brch(ielmc,NB,NZ).GT.ZEROP(NZ).AND.LeafPetioleBiomassC_brch(NB,NZ).GT.ZEROL(NZ))THEN
-      CCNDLB=CanopyNoduleChemElmnt_brch(ielmc,NB,NZ)/LeafPetioleBiomassC_brch(NB,NZ)
-      WTLSB1=LeafPetioleBiomassC_brch(NB,NZ)
-      WTNDB1=AMIN1(LeafPetioleBiomassC_brch(NB,NZ),AMAX1(NoduleBiomCatInfection*AREA3(NU),CanopyNoduleChemElmnt_brch(ielmc,NB,NZ)))
+    IF(NonstructElmnt_brch(ielmc,NB,NZ).GT.ZEROP(NZ).AND.LeafPetolBiomassC_brch(NB,NZ).GT.ZEROL(NZ))THEN
+      CCNDLB=CanopyNoduleChemElmnt_brch(ielmc,NB,NZ)/LeafPetolBiomassC_brch(NB,NZ)
+      WTLSB1=LeafPetolBiomassC_brch(NB,NZ)
+      WTNDB1=AMIN1(LeafPetolBiomassC_brch(NB,NZ),AMAX1(NoduleBiomCatInfection*AREA3(NU),CanopyNoduleChemElmnt_brch(ielmc,NB,NZ)))
       WTLSBT=WTLSB1+WTNDB1
       IF(WTLSBT.GT.ZEROP(NZ))THEN
         FXRNX=FXRN(iPlantNfixType(NZ))/(1.0+CCNDLB/CCNGB)

@@ -56,7 +56,7 @@ module PlantDataRateType
   real(r8),target,allocatable ::  RootH2PO4Uptake_pft(:,:,:)                       !total root uptake of PO4, [g d-2 h-1]
   real(r8),target,allocatable ::  RootHPO4Uptake_pft(:,:,:)                       !total root uptake of HPO4, [g d-2 h-1]
   real(r8),target,allocatable ::  RootN2Fix_pft(:,:,:)                        !total root N2 fixation, [g d-2 h-1]
-  real(r8),target,allocatable ::  RootGasLoss_disturb(:,:,:,:)                !gas flux from root disturbance [g d-2 h-1]
+  real(r8),target,allocatable ::  RootGasLossDisturb_pft(:,:,:,:)                !gas flux from root disturbance [g d-2 h-1]
   real(r8),target,allocatable ::  RUONH4(:,:,:,:,:)                  !root uptake of NH4 non-band unconstrained by O2, [g d-2 h-1]
   real(r8),target,allocatable ::  RUONHB(:,:,:,:,:)                  !root uptake of NH4 band unconstrained by O2, [g d-2 h-1]
   real(r8),target,allocatable ::  RUONO3(:,:,:,:,:)                  !root uptake of NO3 non-band unconstrained by O2, [g d-2 h-1]
@@ -181,7 +181,7 @@ module PlantDataRateType
   allocate(RootH2PO4Uptake_pft(JP,JY,JX));    RootH2PO4Uptake_pft=0._r8
   allocate(RootHPO4Uptake_pft(JP,JY,JX));    RootHPO4Uptake_pft=0._r8
   allocate(RootN2Fix_pft(JP,JY,JX));     RootN2Fix_pft=0._r8
-  allocate(RootGasLoss_disturb(idg_beg:idg_end-1,JP,JY,JX)); RootGasLoss_disturb=0._r8
+  allocate(RootGasLossDisturb_pft(idg_beg:idg_end-1,JP,JY,JX)); RootGasLossDisturb_pft=0._r8
   allocate(RUONH4(jroots,JZ,JP,JY,JX));RUONH4=0._r8
   allocate(RUONHB(jroots,JZ,JP,JY,JX));RUONHB=0._r8
   allocate(RUONO3(jroots,JZ,JP,JY,JX));RUONO3=0._r8

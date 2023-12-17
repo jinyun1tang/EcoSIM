@@ -36,7 +36,7 @@ module RootGasMod
   real(r8) :: trcg_gcon_loc(idg_beg:idg_end-1)
   real(r8) :: COXYR,GasPX(idg_beg:idg_end-1)
   real(r8) :: DIFOP,DIFLGas(idg_beg:idg_end),DIFOX,DiffusivitySolutEffP
-  real(r8) :: DFAGas(idg_beg:idg_end-1),DFGP
+  real(r8) :: DFAGas(idg_beg:idg_end-1),DFGP,RUPOSX
   real(r8) :: trcs_rootml_loc(idg_beg:idg_end-1),trc_solml_loc(idg_beg:idg_end)
   real(r8) :: trc_gasml_loc(idg_beg:idg_end-1)
   real(r8) :: OLSGLP,RTVLWA
@@ -44,7 +44,7 @@ module RootGasMod
   real(r8) :: RDFQSolute(idg_beg:idg_end)
   real(r8) :: RTCR1,RTCR2,RTCRA,RTARRX,RCO2PX,RRADS
   real(r8) :: RMFGas(idg_beg:idg_end),RUPOXR,RDFOXS
-  real(r8) :: RDFOXP,RUPSolute(idg_beg:idg_end),RUPOPX
+  real(r8) :: RDFOXP,RUPSolute(idg_beg:idg_end)
   real(r8) :: RDXSolute(idg_beg:idg_end),RDFSolute(idg_beg:idg_end)
   real(r8) :: RUPOST,RUPNTX
   real(r8) :: trcg_Root2Soil_flx(idg_beg:idg_end-1)
@@ -363,7 +363,7 @@ module RootGasMod
 !     BETWEEN ROOT AND SOIL, CONSTRAINED BY COMPETITION
 !     WITH OTHER ROOT AND MICROBIAL POPULATIONS
 !
-!     RUPSolute(idg_O2),RUPOPX=aqueous O2 uptake from soil,root
+!     RUPOSX,-RUPSolute(idg_O2)=aqueous O2 uptake from soil,root
 !     PP=PFT population
 !     RDFSolute(:),RUPSolute(:)=aqueous gas soil-root diffusion,root uptake, > 0 into soil
 !     RMF*=soil convective solute flux
@@ -373,8 +373,8 @@ module RootGasMod
 !     C*P1=root aqueous concentration
 !
 
-          RUPSolute(idg_O2)=RDFOXS*PlantPopulation_pft(NZ)
-          RUPOPX=RDFOXP*PlantPopulation_pft(NZ)
+          RUPOSX=RDFOXS*PlantPopulation_pft(NZ)
+          RUPSolute(idg_O2)=-RDFOXP*PlantPopulation_pft(NZ)
           RDFSolute(idg_CO2)=RMFGas(idg_CO2)+DIFLGas(idg_CH4)*(trcaquconc_loc(idg_CO2)-trcrootconc_loc(idg_CO2))
           RDXSolute(idg_CO2)=(RootVH2O_vr(N,L,NZ)*AMAX1(ZEROP(NZ),trc_solml_loc(idg_CO2)) &
             -VLWatMicPMM*AMAX1(ZEROP(NZ),trcs_rootml_loc(idg_CO2)))/VOLWSP
@@ -449,7 +449,7 @@ module RootGasMod
             DiffusivitySolutEffP=FracPRoot4Uptake(N,L,NZ)*DiffusivitySolutEff(M,L)
             RDFQSolute(idg_CO2)=DiffusivitySolutEffP*(AMAX1(ZEROP(NZ),trc_gasml_loc(idg_CO2))*VOLWSolute(idg_CO2) &
               -(AMAX1(ZEROS,trc_solml_loc(idg_CO2))-RUPSolute(idg_CO2))*VLsoiAirPMM)/(VOLWSolute(idg_CO2)+VLsoiAirPMM)
-            RUPOST=RUPSolute(idg_O2)-ROXYLX
+            RUPOST=RUPOSX-ROXYLX
             RDFQSolute(idg_O2)=DiffusivitySolutEffP*(AMAX1(ZEROP(NZ),trc_gasml_loc(idg_O2))*VOLWSolute(idg_O2) &
               -(AMAX1(ZEROS,trc_solml_loc(idg_O2))-RUPOST)*VLsoiAirPMM)/(VOLWSolute(idg_O2)+VLsoiAirPMM)
             IF(N.EQ.ipltroot)THEN
@@ -513,14 +513,10 @@ module RootGasMod
 !     DF*A=root-atmosphere gas conductance
 !
             GasPX(idg_CO2)=trcs_rootml_loc(idg_CO2)+RCO2PX
-            GasPX(idg_O2)=trcs_rootml_loc(idg_O2)-RUPOPX
             GasPX(idg_NH3)=trcs_rootml_loc(idg_NH3)+RUPNTX
 
-            GasPX(idg_CH4)=trcs_rootml_loc(idg_CH4)+RUPSolute(idg_CH4)
-            GasPX(idg_N2O)=trcs_rootml_loc(idg_N2O)+RUPSolute(idg_N2O)
-            GasPX(idg_N2)=trcs_rootml_loc(idg_N2O)+RUPSolute(idg_N2)
-            GasPX(idg_H2)=trcs_rootml_loc(idg_H2)+RUPSolute(idg_H2)
             DO NTG=idg_beg,idg_end-1
+              if(NTG/=idg_CO2.and.NTG/=idg_NH3)GasPX(NTG)=trcs_rootml_loc(NTG)+RUPSolute(NTG)
               trcg_Root2Soil_flx(NTG)=AMAX1(-GasPX(NTG),DFGP*(AMAX1(ZEROP(NZ),trcg_gmas_loc(NTG))*DisolvedGasVolume(NTG) &
                 -GasPX(NTG)*RootVolume_vr(N,L,NZ))/(DisolvedGasVolume(NTG)+RootVolume_vr(N,L,NZ)))
               !positive into root
@@ -536,14 +532,10 @@ module RootGasMod
 !
           DO NTG=idg_beg,idg_end-1
             trcg_gmas_loc(NTG)=trcg_gmas_loc(NTG)-trcg_Root2Soil_flx(NTG)+trcg_air2root_flx1(NTG)
+            trcs_rootml_loc(NTG)=trcs_rootml_loc(NTG)+trcg_Root2Soil_flx(NTG)+RUPSolute(NTG)
           ENDDO
-
-          trcs_rootml_loc(idg_CO2)=trcs_rootml_loc(idg_CO2)+trcg_Root2Soil_flx(idg_CO2)+RUPSolute(idg_CO2)+RCO2PX
-          trcs_rootml_loc(idg_O2)=trcs_rootml_loc(idg_O2)+trcg_Root2Soil_flx(idg_O2)-RUPOPX
-          trcs_rootml_loc(idg_CH4)=trcs_rootml_loc(idg_CH4)+trcg_Root2Soil_flx(idg_CH4)+RUPSolute(idg_CH4)
-          trcs_rootml_loc(idg_N2O)=trcs_rootml_loc(idg_N2O)+trcg_Root2Soil_flx(idg_N2O)+RUPSolute(idg_N2O)
-          trcs_rootml_loc(idg_NH3)=trcs_rootml_loc(idg_NH3)+trcg_Root2Soil_flx(idg_NH3)+RUPSolute(idg_NH3)+RUPSolute(idg_NH3B)
-          trcs_rootml_loc(idg_H2)=trcs_rootml_loc(idg_H2)+trcg_Root2Soil_flx(idg_H2)+RUPSolute(idg_H2)
+          trcs_rootml_loc(idg_CO2)=trcs_rootml_loc(idg_CO2)+RCO2PX
+          trcs_rootml_loc(idg_NH3)=trcs_rootml_loc(idg_NH3)+RUPSolute(idg_NH3B)
 !
 !     ACCUMULATE SOIL-ROOT GAS EXCHANGE TO HOURLY TIME SCALE
 !
@@ -571,8 +563,8 @@ module RootGasMod
 !     ROXSK=total O2 uptake from soil by all microbial,root popns
 !
           RCO2P(N,L,NZ)=RCO2P(N,L,NZ)+RCO2PX+RUPSolute(idg_CO2)
-          RUPOXP(N,L,NZ)=RUPOXP(N,L,NZ)+RUPOPX
-          ROXSK(M,L)=ROXSK(M,L)+RUPSolute(idg_O2)
+          RUPOXP(N,L,NZ)=RUPOXP(N,L,NZ)-RUPSolute(idg_O2)
+          ROXSK(M,L)=ROXSK(M,L)+RUPOSX
 
         ENDDO D90
       ENDIF
