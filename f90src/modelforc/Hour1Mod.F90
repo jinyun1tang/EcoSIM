@@ -10,7 +10,7 @@ module Hour1Mod
   use EcoSIMCtrlMod
   use MiniFuncMod
   use SoilHydroParaMod
-  use PlantAPI, only : PlantCanopyRadsModel
+  use PlantMod, only : PlantCanopyRadsModel
   use MicrobialDataType
   use SOMDataType
   use ChemTranspDataType

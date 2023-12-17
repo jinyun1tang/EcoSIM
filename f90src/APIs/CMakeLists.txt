@@ -1,5 +1,6 @@
 set(APIS_SOURCES
 	PlantAPI.F90
+  PlantMod.F90
   MicBGCAPI.F90
   GeochemAPI.F90
   SurfPhysAPI.F90  
@@ -19,7 +20,7 @@ target_include_directories(APIs PRIVATE
   ${CMAKE_BINARY_DIR}/f90src/plant_bgc/
   ${CMAKE_BINARY_DIR}/f90src/microbial_bgc/box_model
   ${CMAKE_BINARY_DIR}/f90src/microbial_bgc/layers_model
-  ${CMAKE_BINARY_DIR}/f90src/SoilHydroTherm/
+  ${CMAKE_BINARY_DIR}/f90src/HydroTherm/
   ${CMAKE_BINARY_DIR}/f90src/disturbances/
   ${CMAKE_BINARY_DIR}/f90src/ecosim_mods/
   ${CMAKE_BINARY_DIR}/f90src/balances/

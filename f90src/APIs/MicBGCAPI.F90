@@ -1,13 +1,13 @@
 module MicBGCAPI
 
-  use data_kind_mod, only : r8 => DAT_KIND_R8
+  use data_kind_mod  , only : r8 => DAT_KIND_R8
   use NitrosMod      , only : VerticalLitterMixLvsLL
   use NitroDisturbMod, only : SOMRemovalByDisturbance
   use EcoSIMSolverPar
   use MicFLuxTypeMod, only : micfluxtype
   use MicStateTraitTypeMod, only : micsttype
-  use MicForcTypeMod, only : micforctype
-  use minimathmod, only : AZMAX1
+  use MicForcTypeMod , only : micforctype
+  use minimathmod    , only : AZMAX1
   use TracerIDMod
   use SoilBGCDataType
   USE PlantDataRateType

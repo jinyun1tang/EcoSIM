@@ -1,12 +1,12 @@
 module EcoSIMAPI
   USE EcoSIMCtrlDataType
-  use timings      , only : start_timer, end_timer
-  use ErosionMod   , only : erosion
-  use Hour1Mod     , only : hour1
-  use RedistMod    , only : redist
-  use GeochemAPI   , only : soluteModel
-  use PlantAPI     , only : PlantModel
-  use MicBGCAPI    , only : MicrobeModel, MicAPI_Init, MicAPI_cleanup
+  use timings         , only : start_timer, end_timer
+  use ErosionMod      , only : erosion
+  use Hour1Mod        , only : hour1
+  use RedistMod       , only : redist
+  use GeochemAPI      , only : soluteModel
+  use PlantMod        , only : PlantModel
+  use MicBGCAPI       , only : MicrobeModel, MicAPI_Init, MicAPI_cleanup
   use TranspNoSaltMod , only : TranspNoSalt
   use TranspSaltMod   , only : TranspSalt
   use EcoSIMCtrlMod  
@@ -268,10 +268,7 @@ subroutine soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
   use PlantInfoMod , only : ReadPlantInfo
   use readsmod     , only : ReadClimSoilForcing
   use timings      , only : init_timer, start_timer, end_timer,end_timer_loop
-  use InitEcoSIM   , only : InitModules2
   use EcoSIMCtrlMod
-  use PlantAPI     , only : PlantModel
-  use MicBGCAPI    , only : MicrobeModel, MicAPI_Init, MicAPI_cleanup
   use ForcWriterMod, only : do_bgcforc_write,WriteBBGCForc
   use GridConsts
   use EcoSIMCtrlDataType

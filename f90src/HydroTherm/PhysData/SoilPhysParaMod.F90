@@ -5,7 +5,6 @@ module SoilPhysParaMod
   USE SoilPhysDataType
   use EcoSIMCtrlDataType
   use HydroThermData
-  use MiniMathMod, only : safe_adb
   use PhysPars
   use EcoSiMParDataMod, only : micpar
   use EcoSimConst
