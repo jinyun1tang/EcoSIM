@@ -6,9 +6,9 @@ set(ECOSIM_CONFG_SOURCES
   TracerIDMod.F90
 )
 include(add_ecosim_library)
-#add_ecosim_library(modelconfig ${ECOSIM_CONFG_SOURCES})
-add_library(modelconfig OBJECT ${ECOSIM_CONFG_SOURCES})
-install(TARGETS modelconfig OBJECTS DESTINATION lib)  
+add_ecosim_library(modelconfig ${ECOSIM_CONFG_SOURCES})
+#add_library(modelconfig OBJECT ${ECOSIM_CONFG_SOURCES})
+#install(TARGETS modelconfig OBJECTS DESTINATION lib)  
 
 target_include_directories(modelconfig  PRIVATE
   ${CMAKE_BINARY_DIR}/f90src/utils/

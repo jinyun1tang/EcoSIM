@@ -12,9 +12,9 @@ set(IOUTILS_SOURCES
     bhistMod.F90
 )
 include(add_ecosim_library)
-#add_ecosim_library(ioutils ${IOUTILS_SOURCES})
-add_library(ioutils OBJECT ${IOUTILS_SOURCES})
-install(TARGETS ioutils OBJECTS DESTINATION lib)
+add_ecosim_library(ioutils ${IOUTILS_SOURCES})
+#add_library(ioutils OBJECT ${IOUTILS_SOURCES})
+#install(TARGETS ioutils OBJECTS DESTINATION lib)
 
 target_include_directories(ioutils  PRIVATE
   ${CMAKE_BINARY_DIR}/f90src/utils/

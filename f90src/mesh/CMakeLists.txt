@@ -9,9 +9,9 @@ set(ECOSIM_MESH_SOURCES
 
 
 include(add_ecosim_library)
-#add_ecosim_library(mesh ${ECOSIM_MESH_SOURCES})
-add_library(mesh OBJECT ${ECOSIM_MESH_SOURCES})
-install(TARGETS mesh OBJECTS DESTINATION lib)  
+add_ecosim_library(mesh ${ECOSIM_MESH_SOURCES})
+#add_library(mesh OBJECT ${ECOSIM_MESH_SOURCES})
+#install(TARGETS mesh OBJECTS DESTINATION lib)  
 
 target_include_directories(mesh PRIVATE 
   ${CMAKE_BINARY_DIR}/f90src/utils/
