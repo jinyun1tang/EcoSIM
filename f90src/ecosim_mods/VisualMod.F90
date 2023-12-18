@@ -246,9 +246,9 @@ module VisualMod
           OUT(52)=0.001_r8*StalkChemElmnts_pft(ielmc,1,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
           OUT(53)=0.001_r8*StalkChemElmnts_pft(ielmc,3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
           OUT(54)=0.001_r8*StalkChemElmnts_pft(ielmc,2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(55)=0.001_r8*RootChemElmnts_pft(ielmc,1,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(56)=0.001_r8*RootChemElmnts_pft(ielmc,3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(57)=0.001_r8*RootChemElmnts_pft(ielmc,2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(55)=0.001_r8*RootElmnts_pft(ielmc,1,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(56)=0.001_r8*RootElmnts_pft(ielmc,3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(57)=0.001_r8*RootElmnts_pft(ielmc,2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
           L=0
           D62: DO N=58,68
             OUT(N)=0.001_r8*ORGC(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)

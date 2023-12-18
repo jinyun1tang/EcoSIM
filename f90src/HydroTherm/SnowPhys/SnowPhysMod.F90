@@ -421,6 +421,10 @@ contains
           TotHeatFlow2Soi=HeatFlowSno2SoiByWat+HeatConvFlxSno2Soi1+HeatCndFlxSno2Soi &
             +cumHeatConvFlxLitr2Soi1+cumHeatCndFlxLitr2Soi
           cumHeatFlowSno2Soi=cumHeatFlowSno2Soi+TotHeatFlow2Soi
+!          if(cumHeatFlowSno2Soi>10.)then
+!            write(*,*)'cumHeatFlowSno2Soi=',cumHeatFlowSno2Soi,TotHeatFlow2Soi
+!            call endrun()
+!          endif
           TotWatFlow2LitrByWat=WatFlowSno2LitR+CumVapFlxSno2Litr-CumVapFlxLitr2Soi
 !          if(M>=28 .and. NY==3 .and. L==1)THEN
 !            write(*,*)'TotWatFlow2LitrByWat',TotWatFlow2LitrByWat,WatFlowSno2LitR,CumVapFlxSno2Litr,CumVapFlxLitr2Soi

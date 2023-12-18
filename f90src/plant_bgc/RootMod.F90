@@ -30,7 +30,7 @@ implicit none
   real(r8) :: RootSinkC(jroots)
 
   associate(                                &
-    NonstructalChemElmnts_pft    =>   plt_biom%NonstructalChemElmnts_pft      , &
+    NonstructalElmnts_pft    =>   plt_biom%NonstructalElmnts_pft      , &
     ZEROL    =>   plt_biom%ZEROL      , &
     DLYR3    =>   plt_site%DLYR3      , &
     PlantPopulation_pft       =>   plt_site%PlantPopulation_pft         , &
@@ -73,7 +73,7 @@ implicit none
     SeedAreaMean_pft(NZ)
 
   IF(IDTHRN.EQ.NumRootAxes_pft(NZ).OR. &
-    (NonstructalChemElmnts_pft(ielmc,NZ).LE.ZEROL(NZ).AND. &
+    (NonstructalElmnts_pft(ielmc,NZ).LE.ZEROL(NZ).AND. &
     iPlantPhenologyPattern_pft(NZ).NE.iplt_annual))THEN
     iPlantRootState_pft(NZ)=iDead
     iPlantShootState_pft(NZ)=iDead
@@ -126,9 +126,9 @@ implicit none
   associate(                            &
     RootMycoNonstructElmnt_vr   =>   plt_biom%RootMycoNonstructElmnt_vr     , &
     RootStructBiomC_vr   =>   plt_biom%RootStructBiomC_vr     , &
-    RootChemElmnts_pft    =>   plt_biom%RootChemElmnts_pft      , &
+    RootElmnts_pft    =>   plt_biom%RootElmnts_pft      , &
     ZEROP    =>   plt_biom%ZEROP      , &
-    NonstructalChemElmnts_pft    =>   plt_biom%NonstructalChemElmnts_pft      , &
+    NonstructalElmnts_pft    =>   plt_biom%NonstructalElmnts_pft      , &
     FWODRE   =>   plt_allom%FWODRE    , &
     RootBiomGrowthYield    =>   plt_allom%RootBiomGrowthYield     , &
     iPlantMorphologyType_pft   =>   plt_pheno%iPlantMorphologyType_pft    , &
@@ -230,18 +230,18 @@ implicit none
 !
         IF(L.LE.NIXBotRootLayer_pft(NZ))THEN
           IF(RootStructBiomC_vr(N,L,NZ).GT.ZEROP(NZ).AND. &
-            RootChemElmnts_pft(ielmc,NZ).GT.ZEROP(NZ) &
-            .AND.NonstructalChemElmnts_pft(ielmc,NZ).LT.XFRX*RootChemElmnts_pft(ielmc,NZ))THEN
-            FWTRT=RootStructBiomC_vr(N,L,NZ)/RootChemElmnts_pft(ielmc,NZ)
+            RootElmnts_pft(ielmc,NZ).GT.ZEROP(NZ) &
+            .AND.NonstructalElmnts_pft(ielmc,NZ).LT.XFRX*RootElmnts_pft(ielmc,NZ))THEN
+            FWTRT=RootStructBiomC_vr(N,L,NZ)/RootElmnts_pft(ielmc,NZ)
             WTRTLX=RootStructBiomC_vr(N,L,NZ)
-            WTRTTX=RootChemElmnts_pft(ielmc,NZ)*FWTRT
+            WTRTTX=RootElmnts_pft(ielmc,NZ)*FWTRT
             WTRTTT=WTRTLX+WTRTTX
             CPOOLX=AZMAX1(RootMycoNonstructElmnt_vr(ielmc,N,L,NZ))
-            WTRVCX=AZMAX1(NonstructalChemElmnts_pft(ielmc,NZ)*FWTRT)
+            WTRVCX=AZMAX1(NonstructalElmnts_pft(ielmc,NZ)*FWTRT)
             CPOOLD=(WTRVCX*WTRTLX-CPOOLX*WTRTTX)/WTRTTT
             XFRC=AZMIN1(XFRY*CPOOLD)
             RootMycoNonstructElmnt_vr(ielmc,N,L,NZ)= RootMycoNonstructElmnt_vr(ielmc,N,L,NZ)+XFRC
-            NonstructalChemElmnts_pft(ielmc,NZ)=NonstructalChemElmnts_pft(ielmc,NZ)-XFRC
+            NonstructalElmnts_pft(ielmc,NZ)=NonstructalElmnts_pft(ielmc,NZ)-XFRC
           ENDIF
         ENDIF
 !
@@ -1547,10 +1547,10 @@ implicit none
     NonstructElmnt_brch     =>   plt_biom%NonstructElmnt_brch   , &
      PopuPlantRootC_vr     =>   plt_biom% PopuPlantRootC_vr   , &
     StalkBiomassC_brch     =>   plt_biom%StalkBiomassC_brch   , &
-    ReserveChemElmnts_brch    =>   plt_biom%ReserveChemElmnts_brch  , &
-    NonstructalChemElmnts_pft      =>   plt_biom%NonstructalChemElmnts_pft    , &
+    ReserveElmnts_brch    =>   plt_biom%ReserveElmnts_brch  , &
+    NonstructalElmnts_pft      =>   plt_biom%NonstructalElmnts_pft    , &
     CanopyLeafShethC_pft       =>   plt_biom%CanopyLeafShethC_pft     , &
-    RootChemElmnts_pft      =>   plt_biom%RootChemElmnts_pft    , &
+    RootElmnts_pft      =>   plt_biom%RootElmnts_pft    , &
     ZEROL      =>   plt_biom%ZEROL    , &
     ZEROP      =>   plt_biom%ZEROP    , &
     iPlantTurnoverPattern_pft     =>   plt_pheno%iPlantTurnoverPattern_pft  , &
@@ -1642,9 +1642,9 @@ implicit none
       IF(iPlantBranchState_brch(NB,NZ).EQ.iLive)THEN
         IF(iPlantCalendar_brch(ipltcal_BeginSeedFill,NB,NZ).NE.0)THEN
           WTSTKT=WTSTKT+StalkBiomassC_brch(NB,NZ)
-          WTRSVT=WTRSVT+ReserveChemElmnts_brch(ielmc,NB,NZ)
-          WTRSNT=WTRSNT+ReserveChemElmnts_brch(ielmn,NB,NZ)
-          WTRSPT=WTRSPT+ReserveChemElmnts_brch(ielmp,NB,NZ)
+          WTRSVT=WTRSVT+ReserveElmnts_brch(ielmc,NB,NZ)
+          WTRSNT=WTRSNT+ReserveElmnts_brch(ielmn,NB,NZ)
+          WTRSPT=WTRSPT+ReserveElmnts_brch(ielmp,NB,NZ)
         ENDIF
       ENDIF
     ENDDO D330
@@ -1652,15 +1652,15 @@ implicit none
       D335: DO NB=1,NumOfBranches_pft(NZ)
         IF(iPlantBranchState_brch(NB,NZ).EQ.iLive)THEN
           IF(iPlantCalendar_brch(ipltcal_BeginSeedFill,NB,NZ).NE.0)THEN
-            WTRSVD=WTRSVT*StalkBiomassC_brch(NB,NZ)-ReserveChemElmnts_brch(ielmc,NB,NZ)*WTSTKT
+            WTRSVD=WTRSVT*StalkBiomassC_brch(NB,NZ)-ReserveElmnts_brch(ielmc,NB,NZ)*WTSTKT
             XFRE(ielmc)=0.1_r8*WTRSVD/WTSTKT
-            ReserveChemElmnts_brch(ielmc,NB,NZ)=ReserveChemElmnts_brch(ielmc,NB,NZ)+XFRE(ielmc)
-            WTRSND=WTRSNT*ReserveChemElmnts_brch(ielmc,NB,NZ)-ReserveChemElmnts_brch(ielmn,NB,NZ)*WTRSVT
+            ReserveElmnts_brch(ielmc,NB,NZ)=ReserveElmnts_brch(ielmc,NB,NZ)+XFRE(ielmc)
+            WTRSND=WTRSNT*ReserveElmnts_brch(ielmc,NB,NZ)-ReserveElmnts_brch(ielmn,NB,NZ)*WTRSVT
             XFRE(ielmn)=0.1_r8*WTRSND/WTRSVT
-            ReserveChemElmnts_brch(ielmn,NB,NZ)=ReserveChemElmnts_brch(ielmn,NB,NZ)+XFRE(ielmn)
-            WTRSPD=WTRSPT*ReserveChemElmnts_brch(ielmc,NB,NZ)-ReserveChemElmnts_brch(ielmp,NB,NZ)*WTRSVT
+            ReserveElmnts_brch(ielmn,NB,NZ)=ReserveElmnts_brch(ielmn,NB,NZ)+XFRE(ielmn)
+            WTRSPD=WTRSPT*ReserveElmnts_brch(ielmc,NB,NZ)-ReserveElmnts_brch(ielmp,NB,NZ)*WTRSVT
             XFRE(ielmp)=0.1_r8*WTRSPD/WTRSVT
-            ReserveChemElmnts_brch(ielmp,NB,NZ)=ReserveChemElmnts_brch(ielmp,NB,NZ)+XFRE(ielmp)
+            ReserveElmnts_brch(ielmp,NB,NZ)=ReserveElmnts_brch(ielmp,NB,NZ)+XFRE(ielmp)
           ENDIF
         ENDIF
       ENDDO D335
@@ -1729,7 +1729,7 @@ implicit none
         XFRE(ielmp)=AMIN1(XFRPX,XFRE(ielmc)*CPMX,XFRNX*CPMX/CNMN*0.5_r8)
         DO NE=1,NumOfPlantChemElmnts
            RootMycoNonstructElmnt_vr(NE,N,L,NZ)= RootMycoNonstructElmnt_vr(NE,N,L,NZ)-XFRE(NE)
-          NonstructalChemElmnts_pft(NE,NZ)=NonstructalChemElmnts_pft(NE,NZ)+XFRE(NE)
+          NonstructalElmnts_pft(NE,NZ)=NonstructalElmnts_pft(NE,NZ)+XFRE(NE)
         ENDDO
 
       ENDDO D5550
@@ -1775,12 +1775,12 @@ implicit none
 !
 !     IF(iPlantPhenologyPattern_pft(NZ).EQ.iplt_perennial)THEN
   IF(CanopyLeafShethC_pft(NZ).GT.ZEROP(NZ))THEN
-    FWTC=AMIN1(1.0_r8,0.667_r8*RootChemElmnts_pft(ielmc,NZ)/CanopyLeafShethC_pft(NZ))
+    FWTC=AMIN1(1.0_r8,0.667_r8*RootElmnts_pft(ielmc,NZ)/CanopyLeafShethC_pft(NZ))
   ELSE
     FWTC=1.0_r8
   ENDIF
-  IF(RootChemElmnts_pft(ielmc,NZ).GT.ZEROP(NZ))THEN
-    FWTS=AMIN1(1.0_r8,CanopyLeafShethC_pft(NZ)/(0.667_r8*RootChemElmnts_pft(ielmc,NZ)))
+  IF(RootElmnts_pft(ielmc,NZ).GT.ZEROP(NZ))THEN
+    FWTS=AMIN1(1.0_r8,CanopyLeafShethC_pft(NZ)/(0.667_r8*RootElmnts_pft(ielmc,NZ)))
   ELSE
     FWTS=1.0_r8
   ENDIF

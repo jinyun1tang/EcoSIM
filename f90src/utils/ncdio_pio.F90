@@ -1806,11 +1806,11 @@ module ncdio_pio
     integer :: ierr
     !-----------------------------------------------------------------------
 
-
     write(iulog,*) 'Opened existing file ', trim(fname)
     call check_ret(nf90_open(fname, mode, file%fh),'open file '//trim(fname))
 
   end subroutine ncd_pio_openfile
+
 !-----------------------------------------------------------------------
   subroutine ncd_pio_openfile_for_write(file, fname)
     !

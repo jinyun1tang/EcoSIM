@@ -530,7 +530,7 @@ module StartqMod
   PetoleChemElmnt_brch(1:NumOfPlantChemElmnts,1:MaxNumBranches,NZ,NY,NX)=0._r8
   StalkChemElmnts_brch(1:NumOfPlantChemElmnts,1:MaxNumBranches,NZ,NY,NX)=0._r8
   LeafChemElmnts_brch(1:NumOfPlantChemElmnts,1:MaxNumBranches,NZ,NY,NX)=0._r8
-  ReserveChemElmnts_brch(1:NumOfPlantChemElmnts,1:MaxNumBranches,NZ,NY,NX)=0._r8
+  ReserveElmnts_brch(1:NumOfPlantChemElmnts,1:MaxNumBranches,NZ,NY,NX)=0._r8
   HuskChemElmnts_brch(1:NumOfPlantChemElmnts,1:MaxNumBranches,NZ,NY,NX)=0._r8
   GrainChemElmnts_brch(1:NumOfPlantChemElmnts,1:MaxNumBranches,NZ,NY,NX)=0._r8
   EarChemElmnts_brch(1:NumOfPlantChemElmnts,1:MaxNumBranches,NZ,NY,NX)=0._r8
@@ -603,7 +603,7 @@ module StartqMod
   HuskChemElmnts_pft(1:NumOfPlantChemElmnts,NZ,NY,NX)=0._r8
   EarChemElmnts_pft(1:NumOfPlantChemElmnts,NZ,NY,NX)=0._r8
   GrainChemElmnts_pft(1:NumOfPlantChemElmnts,NZ,NY,NX)=0._r8
-  RootChemElmnts_pft(1:NumOfPlantChemElmnts,NZ,NY,NX)=0._r8
+  RootElmnts_pft(1:NumOfPlantChemElmnts,NZ,NY,NX)=0._r8
   RootStructChemElmnt_pft(1:NumOfPlantChemElmnts,NZ,NY,NX)=0._r8
   NoduleChemElmnts_pft(1:NumOfPlantChemElmnts,NZ,NY,NX)=0._r8
   CanopyLeafShethC_pft(NZ,NY,NX)=0._r8
@@ -819,9 +819,9 @@ module StartqMod
 !     CPOOLR,ZPOOLR,PPOOLR=C,N,P in root,myco nonstructural pools (g)
 !
   SeedCPlanted_pft(NZ,NY,NX)=SeedCMass(NZ,NY,NX)*PlantPopulation_pft(NZ,NY,NX)
-  NonstructalChemElmnts_pft(ielmc,NZ,NY,NX)=SeedCPlanted_pft(NZ,NY,NX)
-  NonstructalChemElmnts_pft(ielmn,NZ,NY,NX)=CNGR(NZ,NY,NX)*NonstructalChemElmnts_pft(ielmc,NZ,NY,NX)
-  NonstructalChemElmnts_pft(ielmp,NZ,NY,NX)=CPGR(NZ,NY,NX)*NonstructalChemElmnts_pft(ielmc,NZ,NY,NX)
+  NonstructalElmnts_pft(ielmc,NZ,NY,NX)=SeedCPlanted_pft(NZ,NY,NX)
+  NonstructalElmnts_pft(ielmn,NZ,NY,NX)=CNGR(NZ,NY,NX)*NonstructalElmnts_pft(ielmc,NZ,NY,NX)
+  NonstructalElmnts_pft(ielmp,NZ,NY,NX)=CPGR(NZ,NY,NX)*NonstructalElmnts_pft(ielmc,NZ,NY,NX)
   LeafChemElmnts_brch(ielmn,1,NZ,NY,NX)=CNGR(NZ,NY,NX)*LeafChemElmnts_brch(ielmc,1,NZ,NY,NX)
   LeafChemElmnts_brch(ielmp,1,NZ,NY,NX)=CPGR(NZ,NY,NX)*LeafChemElmnts_brch(ielmc,1,NZ,NY,NX)
   LeafPetolBiomassC_brch(1,NZ,NY,NX)=LeafChemElmnts_brch(ielmc,1,NZ,NY,NX)+PetoleChemElmnt_brch(ielmc,1,NZ,NY,NX)

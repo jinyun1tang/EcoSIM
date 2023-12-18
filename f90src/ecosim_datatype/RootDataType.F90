@@ -71,7 +71,7 @@ module RootDataType
   real(r8),target,allocatable ::  trcs_rootml_vr(:,:,:,:,:,:)           !root dissolved gaseous tracer content [g d-2]
   real(r8),target,allocatable ::  TRootGasLossDisturb_pft(:,:,:)                 !total root gas content, [g d-2]
   real(r8),target,allocatable ::  RootBiomCPerPlant_pft(:,:,:)                       !root C per plant, [g p-1]
-  real(r8),target,allocatable ::  RootChemElmnts_pft(:,:,:,:)                     !plant root element, [g d-2]
+  real(r8),target,allocatable ::  RootElmnts_pft(:,:,:,:)                     !plant root element, [g d-2]
   real(r8),target,allocatable ::  RootStructChemElmnt_pft(:,:,:,:)                    !plant root structural element, [g d-2]
   real(r8),target,allocatable ::  RootProteinC_pvr(:,:,:,:,:)                   !root layer protein C, [g d-2]
   real(r8),target,allocatable ::  Root1stStructChemElmnt_pvr(:,:,:,:,:,:,:)              !root layer element primary axes, [g d-2]
@@ -153,7 +153,7 @@ contains
   allocate(trcs_rootml_vr(idg_beg:idg_end-1,2,JZ,JP,JY,JX)); trcs_rootml_vr =0._r8
   allocate(TRootGasLossDisturb_pft(idg_beg:idg_end-1,JY,JX));TRootGasLossDisturb_pft=0._r8
   allocate(RootBiomCPerPlant_pft(JP,JY,JX));    RootBiomCPerPlant_pft=0._r8
-  allocate(RootChemElmnts_pft(NumOfPlantChemElmnts,JP,JY,JX)); RootChemElmnts_pft=0._r8
+  allocate(RootElmnts_pft(NumOfPlantChemElmnts,JP,JY,JX)); RootElmnts_pft=0._r8
   allocate(RootStructChemElmnt_pft(NumOfPlantChemElmnts,JP,JY,JX));   RootStructChemElmnt_pft=0._r8
   allocate(RootProteinC_pvr(jroots,JZ,JP,JY,JX));RootProteinC_pvr=0._r8
   allocate(Root1stStructChemElmnt_pvr(NumOfPlantChemElmnts,jroots,JZ,JC,JP,JY,JX));Root1stStructChemElmnt_pvr=0._r8
@@ -233,7 +233,7 @@ contains
   call destroy(trcs_rootml_vr)
   call destroy(TRootGasLossDisturb_pft)
   call destroy(RootBiomCPerPlant_pft)
-  call destroy(RootChemElmnts_pft)
+  call destroy(RootElmnts_pft)
   call destroy(RootStructChemElmnt_pft)
   call destroy(RootProteinC_pvr)
   call destroy(Root1stStructChemElmnt_pvr)

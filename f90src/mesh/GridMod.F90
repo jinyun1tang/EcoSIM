@@ -16,7 +16,7 @@ contains
   use EcoSIMCtrlMod,only : grid_file_in,lverb
   use ncdio_pio
   use netcdf
-  USE fileUtil, ONLY : iulog
+  USE fileUtil  , ONLY : iulog
   use abortutils, only : endrun
   use GridConsts, only : JX,JY,JZ,JH,JV,JD,bounds,JP,JX0,JY0
 !  set up the landscape rectangular mesh

@@ -477,10 +477,10 @@ implicit none
   real(r8), pointer :: LeafChemElmntByLayer_pft(:,:,:,:,:) => null()    !layer leaf element, [g d-2]
   real(r8), pointer :: WGLFT(:)       => null()  !total leaf mass, [gC d-2]
   real(r8), pointer :: StandingDeadInitC_pft(:)      => null()  !initial standing dead C, [g C m-2]
-  real(r8), pointer :: RootChemElmnts_pft(:,:)     => null()  !plant root element, [gC d-2]
+  real(r8), pointer :: RootElmnts_pft(:,:)     => null()  !plant root element, [gC d-2]
   real(r8), pointer :: RootStructChemElmnt_pft(:,:)    => null()  !plant root structural element, [gC d-2]
   real(r8), pointer :: SeedCPlanted_pft(:)       => null()  !plant stored nonstructural C at planting, [gC d-2]
-  real(r8), pointer :: NonstructalChemElmnts_pft(:,:)     => null()  !plant stored nonstructural element, [gC d-2]
+  real(r8), pointer :: NonstructalElmnts_pft(:,:)     => null()  !plant stored nonstructural element, [gC d-2]
   real(r8), pointer :: CanopyLeafShethC_pft(:)        => null()  !canopy leaf + sheath C, [g d-2]
   real(r8), pointer :: ShootChemElmnts_pft(:,:)    => null()  !canopy shoot C, [g d-2]
   real(r8), pointer :: AvgCanopyBiomC2Graze_pft(:)      => null()  !landscape average canopy shoot C, [g d-2]
@@ -489,7 +489,7 @@ implicit none
   real(r8), pointer :: NonstructElmnt_brch(:,:,:)   => null()  !branch nonstructural element, [g d-2]
   real(r8), pointer :: NoduleNonstructElmnt_brch(:,:,:)  => null()  !branch nodule nonstructural element, [g d-2]
   real(r8), pointer :: LeafPetolBiomassC_brch(:,:)     => null()  !plant branch leaf + sheath C, [g d-2]
-  real(r8), pointer :: ReserveChemElmnts_brch(:,:,:) => null()  !branch reserve element, [g d-2]
+  real(r8), pointer :: ReserveElmnts_brch(:,:,:) => null()  !branch reserve element, [g d-2]
   real(r8), pointer :: LeafChemElmnts_brch(:,:,:)  => null()   !branch leaf element, [g d-2]
   real(r8), pointer :: CanopyNoduleChemElmnt_brch(:,:,:)  => null()   !branch nodule element, [g d-2]
   real(r8), pointer :: PetoleChemElmnt_brch(:,:,:) => null()   !branch sheath element , [g d-2]
@@ -1322,9 +1322,9 @@ implicit none
   allocate(this%LeafPetoNonstructElmntConc_brch(NumOfPlantChemElmnts,MaxNumBranches,JP1))
   allocate(this%RootStructChemElmnt_pft(NumOfPlantChemElmnts,JP1))
   allocate(this%WGLFT(NumOfCanopyLayers1))
-  allocate(this%RootChemElmnts_pft(NumOfPlantChemElmnts,JP1))
+  allocate(this%RootElmnts_pft(NumOfPlantChemElmnts,JP1))
   allocate(this%SeedCPlanted_pft(JP1))
-  allocate(this%NonstructalChemElmnts_pft(NumOfPlantChemElmnts,JP1))
+  allocate(this%NonstructalElmnts_pft(NumOfPlantChemElmnts,JP1))
   allocate(this%CanopyLeafShethC_pft(JP1))
   allocate(this%StandingDeadChemElmnts_pft(NumOfPlantChemElmnts,JP1))
   allocate(this%RootBiomCPerPlant_pft(JP1))
@@ -1342,7 +1342,7 @@ implicit none
   allocate(this%LeafChemElmnts_pft(NumOfPlantChemElmnts,JP1))
   allocate(this%StandingDeadInitC_pft(JP1))
   allocate(this%LeafPetolBiomassC_brch(MaxNumBranches,JP1))
-  allocate(this%ReserveChemElmnts_brch(NumOfPlantChemElmnts,MaxNumBranches,JP1))
+  allocate(this%ReserveElmnts_brch(NumOfPlantChemElmnts,MaxNumBranches,JP1))
   allocate(this%LeafChemElmnts_brch(NumOfPlantChemElmnts,MaxNumBranches,JP1))
   allocate(this%CanopyNoduleChemElmnt_brch(NumOfPlantChemElmnts,MaxNumBranches,JP1))
   allocate(this%PetoleChemElmnt_brch(NumOfPlantChemElmnts,MaxNumBranches,JP1))
@@ -1407,7 +1407,7 @@ implicit none
 !  if(allocated(LeafChemElmntRemob_brch))deallocate(LeafChemElmntRemob_brch)
 !  if(allocated(PetioleChemElmntRemob_brch))deallocate(PetioleChemElmntRemob_brch)
 !  if(allocated(LeafPetolBiomassC_brch))deallocate(LeafPetolBiomassC_brch)
-!  if(allocated(ReserveChemElmnts_brch))deallocate(ReserveChemElmnts_brch)
+!  if(allocated(ReserveElmnts_brch))deallocate(ReserveElmnts_brch)
 !  if(allocated(LeafChemElmnts_brch))deallocate(LeafChemElmnts_brch)
 !  if(allocated(CanopyNoduleChemElmnt_brch))deallocate(CanopyNoduleChemElmnt_brch)
 !  if(allocated(PetoleChemElmnt_brch))deallocate(PetoleChemElmnt_brch)

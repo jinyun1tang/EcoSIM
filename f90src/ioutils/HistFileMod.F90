@@ -1654,6 +1654,8 @@ implicit none
     character(len=256) :: str             ! global attribute string
     logical :: if_stop                    ! true => last time step of run
     logical, save :: do_3Dtconst = .true. ! true => write out 3D time-constant data
+    integer :: hist_ntimes(ntapes)
+    integer :: hist_mfilt(ntapes)
     character(len=*),parameter :: subname = trim(mod_filename)//'::hist_htapes_wrapup'
     !-----------------------------------------------------------------------
 
@@ -1764,11 +1766,14 @@ implicit none
           call hfields_zero(t)
 
        end if
-
+      hist_ntimes(t)=tape(t)%ntimes
+      hist_mfilt(t)=tape(t)%mfilt
     end do  ! end loop over history tapes
     ! Determine if file needs to be closed
 
-    call hist_do_disp (ntapes, tape(:)%ntimes, tape(:)%mfilt, if_stop, if_disphist, rstwr, nlend)
+    if(ntapes>0)then
+      call hist_do_disp (ntapes, hist_ntimes, hist_mfilt, if_stop, if_disphist, rstwr, nlend)
+    endif
 
     ! Close open history file
     ! Auxilary files may have been closed and saved off without being full,

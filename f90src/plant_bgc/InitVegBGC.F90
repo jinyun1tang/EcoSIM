@@ -45,20 +45,20 @@ module InitVegBGC
   !NumOfSkyAzimuthSectors: number of sky azimuth sectors
   !NumOfLeafAzimuthSectors: number of leaf azimuth sectors
   D230: DO N=1,NumOfSkyAzimuthSectors
-    write(*,*) "Setting Yvars"
-    write(*,*) "N = ", N, " of ", NumOfSkyAzimuthSectors
+!    write(*,*) "Setting Yvars"
+!    write(*,*) "N = ", N, " of ", NumOfSkyAzimuthSectors
     SkyAzimuthAngle(N)=PICON*(2*N-1)/real(NumOfSkyAzimuthSectors,r8)
     YAGL=PICON/real(NumOfSkyAzimuthSectors,r8)
     YSIN(N)=SIN(YAGL)
     YCOS(N)=COS(YAGL)
     TotSineSkyAngles_grd=TotSineSkyAngles_grd+YSIN(N)
     D225: DO L=1,NumOfLeafAzimuthSectors
-      write(*,*) "Setting DAZI"
-      write(*,*) "L = ", L, " of ", NumOfLeafAzimuthSectors
+!      write(*,*) "Setting DAZI"
+!      write(*,*) "L = ", L, " of ", NumOfLeafAzimuthSectors
       DAZI=COS(ZAZI(L)-SkyAzimuthAngle(N))
       DO  M=1,NumOfLeafZenithSectors
-        write(*,*) "Setting Omega vars"
-        write(*,*) "M = ", M, " of ", NumOfLeafZenithSectors
+!        write(*,*) "Setting Omega vars"
+!        write(*,*) "M = ", M, " of ", NumOfLeafZenithSectors
         OMEGY=CosineLeafAngle(M)*YSIN(N)+SineLeafAngle(M)*YCOS(N)*DAZI
         OMEGA(N,M,L)=ABS(OMEGY)
         OMEGX(N,M,L)=OMEGA(N,M,L)/YSIN(N)
