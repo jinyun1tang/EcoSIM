@@ -153,11 +153,11 @@ module NoduleBGCMod
 !     NODULE STRUCTURAL N
 !
 !     RMNDL=bacterial maintenance respiration
-!     RMPLT=specific maintenance respiration rate (g C g-1 N h-1)
+!     RmSpecPlant=specific maintenance respiration rate (g C g-1 N h-1)
 !     TFN5=temperature function for canopy maintenance respiration
 !     WTNDBN=bacterial N mass
 !
-    RMNDL=AZMAX1(RMPLT*TFN5*CanopyNoduleChemElmnt_brch(ielmn,NB,NZ))*SPNDLI
+    RMNDL=AZMAX1(RmSpecPlant*TFN5*CanopyNoduleChemElmnt_brch(ielmn,NB,NZ))*SPNDLI
 !
 !     NODULE GROWTH RESPIRATION FROM TOTAL - MAINTENANCE
 !     IF > 0 DRIVES GROWTH, IF < 0 DRIVES REMOBILIZATION
@@ -532,11 +532,11 @@ module NoduleBGCMod
 !     NODULE STRUCTURAL N
 !
 !     RMNDL=bacterial maintenance respiration
-!     RMPLT=specific maintenance respiration rate (g C g-1 N h-1)
+!     RmSpecPlant=specific maintenance respiration rate (g C g-1 N h-1)
 !     TFN6=temperature function for root maintenance respiration
 !     WTNDLN=bacterial N mass
 !
-        RMNDL=AZMAX1(RMPLT*TFN6(L)*RootNodueChemElmnt_pvr(ielmn,L,NZ))*SPNDLI
+        RMNDL=AZMAX1(RmSpecPlant*TFN6(L)*RootNodueChemElmnt_pvr(ielmn,L,NZ))*SPNDLI
 !
 !     NODULE GROWTH RESPIRATION FROM TOTAL - MAINTENANCE
 !     IF > 0 DRIVES GROWTH, IF < 0 DRIVES REMOBILIZATION

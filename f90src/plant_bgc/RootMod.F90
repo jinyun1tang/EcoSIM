@@ -30,25 +30,25 @@ implicit none
   real(r8) :: RootSinkC(jroots)
 
   associate(                                &
-    NonstructalElmnts_pft    =>   plt_biom%NonstructalElmnts_pft      , &
-    ZEROL    =>   plt_biom%ZEROL      , &
-    DLYR3    =>   plt_site%DLYR3      , &
-    PlantPopulation_pft       =>   plt_site%PlantPopulation_pft         , &
-    ZERO     =>   plt_site%ZERO       , &
+    NonstructalElmnts_pft        =>   plt_biom%NonstructalElmnts_pft      , &
+    ZEROL                        =>   plt_biom%ZEROL      , &
+    DLYR3                        =>   plt_site%DLYR3      , &
+    PlantPopulation_pft          =>   plt_site%PlantPopulation_pft         , &
+    ZERO                         =>   plt_site%ZERO       , &
     iPlantPhenologyPattern_pft   =>   plt_pheno%iPlantPhenologyPattern_pft    , &
-    iPlantRootState_pft    =>   plt_pheno%iPlantRootState_pft     , &
-    iPlantShootState_pft    =>   plt_pheno%iPlantShootState_pft     , &
-    SeedLengthMean_pft     =>   plt_morph%SeedLengthMean_pft      , &
-    RootVH2O_vr   =>   plt_morph%RootVH2O_vr    , &
-    RootAreaPerPlant_vr    =>   plt_morph%RootAreaPerPlant_vr     , &
-    RootVolume_vr    =>   plt_morph%RootVolume_vr     , &
-    RootLenthDensPerPopu_pvr    =>   plt_morph%RootLenthDensPerPopu_pvr     , &
-    RootLenPerPopu_pvr    =>   plt_morph%RootLenPerPopu_pvr     , &
-    NGTopRootLayer_pft       =>   plt_morph%NGTopRootLayer_pft        , &
-    RootPorosity     =>   plt_morph%RootPorosity      , &
-    SeedVolumeMean_pft     =>   plt_morph%SeedVolumeMean_pft      , &
-    SeedAreaMean_pft     =>   plt_morph%SeedAreaMean_pft      , &
-    NumRootAxes_pft     =>  plt_morph%NumRootAxes_pft         &
+    iPlantRootState_pft          =>   plt_pheno%iPlantRootState_pft     , &
+    iPlantShootState_pft         =>   plt_pheno%iPlantShootState_pft     , &
+    SeedLengthMean_pft           =>   plt_morph%SeedLengthMean_pft      , &
+    RootVH2O_vr                  =>   plt_morph%RootVH2O_vr    , &
+    RootAreaPerPlant_vr          =>   plt_morph%RootAreaPerPlant_vr     , &
+    RootVolume_vr                =>   plt_morph%RootVolume_vr     , &
+    RootLenDensPerPlant_pvr     =>   plt_morph%RootLenDensPerPlant_pvr     , &
+    RootLenPerPlant_pvr           =>   plt_morph%RootLenPerPlant_pvr     , &
+    NGTopRootLayer_pft           =>   plt_morph%NGTopRootLayer_pft        , &
+    RootPorosity                 =>   plt_morph%RootPorosity      , &
+    SeedVolumeMean_pft           =>   plt_morph%SeedVolumeMean_pft      , &
+    SeedAreaMean_pft             =>   plt_morph%SeedAreaMean_pft      , &
+    NumRootAxes_pft              =>  plt_morph%NumRootAxes_pft         &
   )
 !     ROOT GROWTH
 !
@@ -58,12 +58,18 @@ implicit none
 !     ADD SEED DIMENSIONS TO ROOT DIMENSIONS (ONLY IMPORTANT DURING
 !     GERMINATION)
 !
-  RootLenPerPopu_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)=RootLenPerPopu_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)+ &
+!  if(NZ==1)THEN
+!    WRITE(33,*)'ROOTL',RootLenPerPlant_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ),SeedLengthMean_pft(NZ)
+!  ELSE
+!    WRITE(34,*)'ROOTL',RootLenPerPlant_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ),SeedLengthMean_pft(NZ)    
+!  ENDIF
+
+  RootLenPerPlant_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)=RootLenPerPlant_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)+ &
     SeedLengthMean_pft(NZ)
   IF(DLYR3(NGTopRootLayer_pft(NZ)).GT.ZERO)THEN
-    RootLenthDensPerPopu_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)=RootLenPerPopu_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)/DLYR3(NGTopRootLayer_pft(NZ))
+    RootLenDensPerPlant_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)=RootLenPerPlant_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)/DLYR3(NGTopRootLayer_pft(NZ))
   ELSE
-    RootLenthDensPerPopu_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)=0._r8
+    RootLenDensPerPlant_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)=0._r8
   ENDIF
   RTVL=RootVolume_vr(ipltroot,NGTopRootLayer_pft(NZ),NZ)+RootVH2O_vr(ipltroot,NGTopRootLayer_pft(NZ),NZ)+ &
     SeedVolumeMean_pft(NZ)*PlantPopulation_pft(NZ)
@@ -110,8 +116,8 @@ implicit none
   real(r8) :: FWTRT
   real(r8) :: SoilResit4SecndRootPentration
   real(r8) :: TotSecndRootLen,TotPrimRootLen
-  real(r8) :: RTLGX
-  real(r8) :: RTLGT
+  real(r8) :: TotPopuPrimRootLen
+  real(r8) :: TotPopuRootLen
   real(r8) :: RTVL
   real(r8) :: RTAR
   real(r8) :: WTRTTX
@@ -147,14 +153,14 @@ implicit none
     NL       =>   plt_site%NL         , &
     k_fine_litr=> pltpar%k_fine_litr  , &
     RootVolume_vr    =>   plt_morph%RootVolume_vr     , &
-    RootLenthDensPerPopu_pvr    =>   plt_morph%RootLenthDensPerPopu_pvr     , &
+    RootLenDensPerPlant_pvr    =>   plt_morph%RootLenDensPerPlant_pvr     , &
     RootAreaPerPlant_vr    =>   plt_morph%RootAreaPerPlant_vr     , &
     RootVH2O_vr   =>   plt_morph%RootVH2O_vr    , &
     Max1stRootRadius1   =>   plt_morph%Max1stRootRadius1    , &
     Max2ndRootRadius1   =>   plt_morph%Max2ndRootRadius1    , &
     Max1stRootRadius   =>   plt_morph%Max1stRootRadius    , &
     PrimRootRadius_pvr   =>   plt_morph%PrimRootRadius_pvr    , &
-    RootLenPerPopu_pvr    =>   plt_morph%RootLenPerPopu_pvr     , &
+    RootLenPerPlant_pvr    =>   plt_morph%RootLenPerPlant_pvr     , &
     AveSecndRootLen    =>   plt_morph%AveSecndRootLen     , &
     SecndRootRadius_pvr    =>   plt_morph%SecndRootRadius_pvr     , &
     SecndRootXSecArea   =>   plt_morph%SecndRootXSecArea    , &
@@ -217,7 +223,8 @@ implicit none
 !     FOR EACH ROOT AXIS
 !
         call GrowRootAxes(N,L,L1,NZ,NRX,fRootGrowPsiSense,ICHK1,WFNR,WFNRG,TFN6,RootAreaPopu,DMRTD,&
-          RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,CNRTW,CPRTW,TotPrimRootLen,Root2ndC,Root1stC,TotSecndRootLen)
+          RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,CNRTW,CPRTW,TotPrimRootLen,Root2ndC,Root1stC,&
+          TotSecndRootLen)
 
 !
 !     DRAW FROM ROOT NON-STRUCTURAL POOL WHEN
@@ -252,11 +259,11 @@ implicit none
 !     Root1stC=total primary root C mass
 !     TotSecndRootLen=total secondary root length
 !     Root2ndC=total secondary root C mass
-!     RTLGT=total root length
+!     TotPopuRootLen=total root length
 !     WTRTT=total root C mass
 !     FWOOD=C woody fraction in root:0=woody,1=non-woody
 !     PP=PFT population
-!     RootLenthDensPerPopu_pvr,RootLenPerPopu_pvr=root length density,root length per plant
+!     RootLenDensPerPlant_pvr,RootLenPerPlant_pvr=root length density,root length per plant
 !     RTVL,RootVH2O_vr,RootVolume_vr=root or myco total,aqueous,gaseous volume
 !     RRAD1,SecndRootRadius_pvr=primary,secondary root radius
 !     RootAreaPerPlant_vr=root surface area per plant
@@ -269,17 +276,17 @@ implicit none
           TotPrimRootLen=TotPrimRootLen*FWODRE(ielmc,k_fine_litr)
           TotSecndRootLen=TotSecndRootLen*FWODRE(ielmc,k_fine_litr)
         ENDIF
-        RTLGX=TotPrimRootLen*PlantPopulation_pft(NZ)
-        RTLGT=TotSecndRootLen+RTLGX
+        TotPopuPrimRootLen=TotPrimRootLen*PlantPopulation_pft(NZ)
+        TotPopuRootLen=TotSecndRootLen+TotPopuPrimRootLen
         WTRTT=Root2ndC+Root1stC
-        IF(RTLGT.GT.ZEROP(NZ).AND.WTRTT.GT.ZEROP(NZ).AND.PlantPopulation_pft(NZ).GT.ZEROP(NZ))THEN
-          RootLenPerPopu_pvr(N,L,NZ)=RTLGT/PlantPopulation_pft(NZ)
+        IF(TotPopuRootLen.GT.ZEROP(NZ).AND.WTRTT.GT.ZEROP(NZ).AND.PlantPopulation_pft(NZ).GT.ZEROP(NZ))THEN
+          RootLenPerPlant_pvr(N,L,NZ)=TotPopuRootLen/PlantPopulation_pft(NZ)
           IF(DLYR3(L).GT.ZERO)THEN
-            RootLenthDensPerPopu_pvr(N,L,NZ)=RootLenPerPopu_pvr(N,L,NZ)/DLYR3(L)
+            RootLenDensPerPlant_pvr(N,L,NZ)=RootLenPerPlant_pvr(N,L,NZ)/DLYR3(L)
           ELSE
-            RootLenthDensPerPopu_pvr(N,L,NZ)=0._r8
+            RootLenDensPerPlant_pvr(N,L,NZ)=0._r8
           ENDIF
-          RTVL=AMAX1(PrimRootXSecArea(N,NZ)*RTLGX+SecndRootXSecArea(N,NZ)*TotSecndRootLen &
+          RTVL=AMAX1(PrimRootXSecArea(N,NZ)*TotPopuPrimRootLen+SecndRootXSecArea(N,NZ)*TotSecndRootLen &
             ,WTRTT*RootVolPerMassC_pft(N,NZ)*PSIRootTurg_vr(N,L,NZ))
           RootVolume_vr(N,L,NZ)=RootPorosity(N,NZ)*RTVL
           RootVH2O_vr(N,L,NZ)=(1.0_r8-RootPorosity(N,NZ))*RTVL
@@ -289,7 +296,7 @@ implicit none
           !secondary roots
           SecndRootRadius_pvr(N,L,NZ)=AMAX1(Max2ndRootRadius1(N,NZ),&
             (1.0_r8+PSIRoot_vr(N,L,NZ)/EMODR)*Max2ndRootRadius(N,NZ))
-          RTAR=TwoPiCON*(PrimRootRadius_pvr(N,L,NZ)*RTLGX+SecndRootRadius_pvr(N,L,NZ)*TotSecndRootLen)
+          RTAR=TwoPiCON*(PrimRootRadius_pvr(N,L,NZ)*TotPopuPrimRootLen+SecndRootRadius_pvr(N,L,NZ)*TotSecndRootLen)
           IF(SecndRootXNum_pvr(N,L,NZ).GT.ZEROP(NZ))THEN
             AveSecndRootLen(N,L,NZ)=AMAX1(MinAve2ndRootLen,TotSecndRootLen/SecndRootXNum_pvr(N,L,NZ))
           ELSE
@@ -300,8 +307,8 @@ implicit none
 !     RootAreaPerPlant_vr(N,L,NZ)=RootAreaPerPlant_vr(N,L,NZ)*MinAve2ndRootLen/AveSecndRootLen(N,L,NZ)
 !     ENDIF
         ELSE
-          RootLenPerPopu_pvr(N,L,NZ)=0._r8
-          RootLenthDensPerPopu_pvr(N,L,NZ)=0._r8
+          RootLenPerPlant_pvr(N,L,NZ)=0._r8
+          RootLenDensPerPlant_pvr(N,L,NZ)=0._r8
           RootVolume_vr(N,L,NZ)=0._r8
           RootVH2O_vr(N,L,NZ)=0._r8
           PrimRootRadius_pvr(N,L,NZ)=Max1stRootRadius(N,NZ)
@@ -469,14 +476,14 @@ implicit none
 !     ROOT STRUCTURAL N
 !
 !     RMNCR=root maintenance respiration
-!     RMPLT=specific maintenance respiration rate (g C g-1 N h-1)
+!     RmSpecPlant=specific maintenance respiration rate (g C g-1 N h-1)
 !     WTRT2N=secondary root N mass
 !     TFN6=temperature function for root maintenance respiration
 !     iPlantMorphologyType_pft=growth type:0=bryophyte,1=graminoid,2=shrub,tree
 !     iPlantPhenologyType_pft=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
 !     fRootGrowPsiSense=growth function of root water potential
 !
-      RMNCR=AZMAX1(RMPLT*Root2ndStructChemElmnt_pvr(ielmn,N,L,NR,NZ))*TFN6(L)
+      RMNCR=AZMAX1(RmSpecPlant*Root2ndStructChemElmnt_pvr(ielmn,N,L,NR,NZ))*TFN6(L)
       IF(is_plant_bryophyte(iPlantMorphologyType_pft(NZ)).OR. &
         iPlantPhenologyType_pft(NZ).EQ.iphenotyp_drouhtdecidu)THEN
         RMNCR=RMNCR*fRootGrowPsiSense(N,L)
@@ -798,15 +805,16 @@ implicit none
 !     ROOT STRUCTURAL N
 !
 !     RMNCR=root maintenance respiration
-!     RMPLT=specific maintenance respiration rate (g C g-1 N h-1)
+!     RmSpecPlant=specific maintenance respiration rate (g C g-1 N h-1)
 !     WTRT1N=primary root N mass
 !     TFN6=temperature function for root maintenance respiration
 !     iPlantMorphologyType_pft=growth type:0=bryophyte,1=graminoid,2=shrub,tree
 !     iPlantPhenologyType_pft=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
 !     fRootGrowPsiSense=growth function of root water potential
 !
-              RMNCR=AZMAX1(RMPLT*Root1stChemElmnt(ielmn,N,NR,NZ))*TFN6(L)
-              IF(is_plant_bryophyte(iPlantMorphologyType_pft(NZ)).OR.iPlantPhenologyType_pft(NZ).EQ.iphenotyp_drouhtdecidu)THEN
+              RMNCR=AZMAX1(RmSpecPlant*Root1stChemElmnt(ielmn,N,NR,NZ))*TFN6(L)
+              IF(is_plant_bryophyte(iPlantMorphologyType_pft(NZ)).OR.&
+                iPlantPhenologyType_pft(NZ).EQ.iphenotyp_drouhtdecidu)THEN
                 RMNCR=RMNCR*fRootGrowPsiSense(N,L)
               ENDIF
 !
@@ -1921,7 +1929,7 @@ implicit none
     MY         =>   plt_morph%MY       , &
     PrimRootRadius_pvr     =>   plt_morph%PrimRootRadius_pvr   , &
     PrimRootDepth     =>   plt_morph%PrimRootDepth   , &
-    HypoctoylHeight_pft      =>   plt_morph%HypoctoylHeight_pft    , &
+    HypoctoHeight_pft      =>   plt_morph%HypoctoHeight_pft    , &
     SecndRootRadius_pvr      =>   plt_morph%SecndRootRadius_pvr    , &
     SecndRootXNum_rpvr      =>   plt_morph%SecndRootXNum_rpvr    , &
     AveSecndRootLen      =>   plt_morph%AveSecndRootLen    , &
@@ -2030,7 +2038,7 @@ implicit none
 !     RTDPX=distance behind growing point for secondary roots
 !     DLYR=layer thickness
 !     SeedDepth_pft=seeding depth
-!     HypoctoylHeight_pft=hypocotyledon height
+!     HypoctoHeight_pft=hypocotyledon height
 !     CanPHeight4WatUptake=canopy height for water uptake
 !     RTDPS=secondary root depth from canopy
 !     RTSKP,RTSKS=primary,secondary root sink strength
@@ -2042,7 +2050,7 @@ implicit none
           IF(N.EQ.ipltroot)THEN
             Root1stDepz_vr(NR,L)=AZMAX1(PrimRootDepth(ipltroot,NR,NZ)-CumSoilThickness(L-1)-RTDPX)
             Root1stDepz_vr(NR,L)=AZMAX1(AMIN1(DLYR3(L),Root1stDepz_vr(NR,L)) &
-              -AZMAX1(SeedDepth_pft(NZ)-CumSoilThickness(L-1)-HypoctoylHeight_pft(NZ)))
+              -AZMAX1(SeedDepth_pft(NZ)-CumSoilThickness(L-1)-HypoctoHeight_pft(NZ)))
             RTDPS=AMAX1(SeedDepth_pft(NZ),CumSoilThickness(L-1))+0.5_r8*Root1stDepz_vr(NR,L)+CanPHeight4WatUptake(NZ)
             IF(RTDPS.GT.ZERO)THEN
               RTSKP=RootAreaPopu*PrimRootRadius_pvr(N,L,NZ)**2._r8/RTDPS

@@ -202,7 +202,7 @@ implicit none
   real(r8), pointer :: RootPoreTortu4Gas(:,:)      => null() !power function of root porosity used to calculate root gaseous diffusivity, [-]
   real(r8), pointer :: PrimRootLen(:,:,:,:)  => null() !root layer length primary axes, [m d-2]
   real(r8), pointer :: SecndRootLen(:,:,:,:)  => null() !root layer length secondary axes, [m d-2]
-  real(r8), pointer :: RootLenPerPopu_pvr(:,:,:)    => null() !root layer length per plant, [m p-1]
+  real(r8), pointer :: RootLenPerPlant_pvr(:,:,:)    => null() !root layer length per plant, [m p-1]
   real(r8), pointer :: AveSecndRootLen(:,:,:)    => null() !root layer average length, [m]
   real(r8), pointer :: PrimRootSpecLen(:,:)     => null() !specific root length primary axes, [m g-1]
   real(r8), pointer :: SecndRootSpecLen(:,:)     => null() !specific root length secondary axes, [m g-1]
@@ -211,7 +211,7 @@ implicit none
   real(r8), pointer :: ClumpFactorInit_pft(:)          => null() !initial clumping factor for self-shading in canopy layer, [-]
   real(r8), pointer :: ClumpFactorCurrent_pft(:)          => null() !clumping factor for self-shading in canopy layer at current LAI, [-]
   real(r8), pointer :: RootBranchFreq_pft(:)         => null() !root brancing frequency, [m-1]
-  real(r8), pointer :: HypoctoylHeight_pft(:)        => null() !cotyledon height, [m]
+  real(r8), pointer :: HypoctoHeight_pft(:)        => null() !cotyledon height, [m]
   integer,  pointer :: iPlantNfixType(:)        => null() !N2 fixation type
   integer,  pointer :: MY(:)           => null() !mycorrhizal type (no or yes)
   real(r8), pointer :: CanPHeight4WatUptake(:)        => null() !canopy height, [m]
@@ -274,7 +274,7 @@ implicit none
   real(r8), pointer :: MaxSeedCMass(:)         => null() !maximum grain size   , [g]
   real(r8), pointer :: PrimRootRadius_pvr(:,:,:)    => null() !root layer diameter primary axes, [m ]
   real(r8), pointer :: SecndRootRadius_pvr(:,:,:)    => null() !root layer diameter secondary axes, [m ]
-  real(r8), pointer :: RRADP(:,:)      => null() !root internal radius, [m]
+  real(r8), pointer :: RootRaidus_rpft(:,:)      => null() !root internal radius, [m]
   real(r8), pointer :: Max1stRootRadius(:,:)     => null() !maximum radius of primary roots, [m]
   real(r8), pointer :: Max2ndRootRadius(:,:)     => null() !maximum radius of secondary roots, [m]
   real(r8), pointer :: RSRR(:,:)       => null() !root radial resistivity, [MPa h m-2]
@@ -282,7 +282,7 @@ implicit none
   real(r8), pointer :: RTDNT(:)        => null() !total root length density, [m m-3]
   real(r8), pointer :: PrimRootXNumL_pvr(:,:,:)     => null() !root layer number primary axes, [d-2]
   real(r8), pointer :: SecndRootXNum_pvr(:,:,:)     => null() !root layer number axes, [d-2]
-  real(r8), pointer :: RootLenthDensPerPopu_pvr(:,:,:)    => null() !root layer length density, [m m-3]
+  real(r8), pointer :: RootLenDensPerPlant_pvr(:,:,:)    => null() !root layer length density, [m m-3]
   real(r8), pointer :: RootVolume_vr(:,:,:)    => null() !root layer volume air, [m2 d-2]
   real(r8), pointer :: RootVH2O_vr(:,:,:)    => null() !root layer volume water, [m2 d-2]
   real(r8), pointer :: RootAreaPerPlant_vr(:,:,:)    => null() !root layer area per plant, [m p-1]
@@ -478,7 +478,7 @@ implicit none
   real(r8), pointer :: WGLFT(:)       => null()  !total leaf mass, [gC d-2]
   real(r8), pointer :: StandingDeadInitC_pft(:)      => null()  !initial standing dead C, [g C m-2]
   real(r8), pointer :: RootElmnts_pft(:,:)     => null()  !plant root element, [gC d-2]
-  real(r8), pointer :: RootStructChemElmnt_pft(:,:)    => null()  !plant root structural element, [gC d-2]
+  real(r8), pointer :: RootStructElmnt_pft(:,:)    => null()  !plant root structural element, [gC d-2]
   real(r8), pointer :: SeedCPlanted_pft(:)       => null()  !plant stored nonstructural C at planting, [gC d-2]
   real(r8), pointer :: NonstructalElmnts_pft(:,:)     => null()  !plant stored nonstructural element, [gC d-2]
   real(r8), pointer :: CanopyLeafShethC_pft(:)        => null()  !canopy leaf + sheath C, [g d-2]
@@ -1320,7 +1320,7 @@ implicit none
   allocate(this%StalkBiomassC_brch(MaxNumBranches,JP1))
   allocate(this%NoduleNonstructElmnt_brch(NumOfPlantChemElmnts,MaxNumBranches,JP1))
   allocate(this%LeafPetoNonstructElmntConc_brch(NumOfPlantChemElmnts,MaxNumBranches,JP1))
-  allocate(this%RootStructChemElmnt_pft(NumOfPlantChemElmnts,JP1))
+  allocate(this%RootStructElmnt_pft(NumOfPlantChemElmnts,JP1))
   allocate(this%WGLFT(NumOfCanopyLayers1))
   allocate(this%RootElmnts_pft(NumOfPlantChemElmnts,JP1))
   allocate(this%SeedCPlanted_pft(JP1))
@@ -1391,7 +1391,7 @@ implicit none
 !  if(allocated(PPOOL))deallocate(PPOOL)
 !  if(allocated(NoduleNonstructElmnt_brch))deallocate(NoduleNonstructElmnt_brch)
 !  if(allocated(LeafPetoNonstructElmntConc_brch))deallocate(LeafPetoNonstructElmntConc_brch)
-!  if(allocated(RootStructChemElmnt_pft))deallocate(RootStructChemElmnt_pft)
+!  if(allocated(RootStructElmnt_pft))deallocate(RootStructElmnt_pft)
 !  if(allocated(WGLFT))deallocate(WGLFT)
 !  if(allocated(NonstructElmnt_brch))deallocate(NonstructElmnt_brch)
 !  if(allocated(RootBiomCPerPlant_pft))deallocate(RootBiomCPerPlant_pft)
@@ -1942,7 +1942,7 @@ implicit none
   class(plant_morph_type) :: this
 
   allocate(this%RootAreaPerPlant_vr(jroots,JZ1,JP1))
-  allocate(this%RootLenthDensPerPopu_pvr(jroots,JZ1,JP1))
+  allocate(this%RootLenDensPerPlant_pvr(jroots,JZ1,JP1))
   allocate(this%RootVolume_vr(jroots,JZ1,JP1))
   allocate(this%RootVH2O_vr(jroots,JZ1,JP1))
   allocate(this%PrimRootXNumL_pvr(jroots,JZ1,JP1))
@@ -1952,7 +1952,7 @@ implicit none
   allocate(this%RootBranchFreq_pft(JP1))
   allocate(this%ClumpFactorInit_pft(JP1))
   allocate(this%ClumpFactorCurrent_pft(JP1))
-  allocate(this%HypoctoylHeight_pft(JP1))
+  allocate(this%HypoctoHeight_pft(JP1))
   allocate(this%RootPoreTortu4Gas(jroots,JP1))
   allocate(this%WDLF(JP1))
   allocate(this%MaxSeedNumPerSite_pft(JP1))
@@ -1960,14 +1960,14 @@ implicit none
   allocate(this%MaxSeedCMass(JP1))
   allocate(this%Max1stRootRadius1(jroots,JP1))
   allocate(this%Max2ndRootRadius1(jroots,JP1))
-  allocate(this%RRADP(jroots,JP1))
+  allocate(this%RootRaidus_rpft(jroots,JP1))
   allocate(this%PrimRootRadius_pvr(jroots,JZ1,JP1))
   allocate(this%SecndRootRadius_pvr(jroots,JZ1,JP1))
   allocate(this%Max1stRootRadius(jroots,JP1))
   allocate(this%Max2ndRootRadius(jroots,JP1))
 
   allocate(this%PrimRootDepth(jroots,NumOfCanopyLayers1,JP1))
-  allocate(this%RootLenPerPopu_pvr(jroots,JZ1,JP1))
+  allocate(this%RootLenPerPlant_pvr(jroots,JZ1,JP1))
   allocate(this%AveSecndRootLen(jroots,JZ1,JP1))
   allocate(this%PrimRootSpecLen(jroots,JP1))
   allocate(this%SecndRootSpecLen(jroots,JP1))

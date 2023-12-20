@@ -21,7 +21,7 @@ module GrosubPars
 !
 !
 !     CNKI,CPKI=nonstructural N,P inhibition constant on growth (g N,P g-1 C)
-!     RMPLT=specific maintenance respiration rate (g C g-1 N h-1)
+!     RmSpecPlant=specific maintenance respiration rate (g C g-1 N h-1)
 !     PSIMin4OrganExtension=minimum water potential for organ expansion,extension (MPa)
 !     RCMN=minimum stomatal resistance to CO2 (s m-1)
 !     RTDPX=distance behind growing point for secondary roots (m)
@@ -80,7 +80,7 @@ module GrosubPars
   real(r8) :: FMYC
   real(r8) :: CNKI
   real(r8) :: CPKI
-  real(r8) :: RMPLT
+  real(r8) :: RmSpecPlant
   real(r8) :: PSIMin4OrganExtension
   real(r8) :: RCMN
   real(r8) :: RTDPX
@@ -247,7 +247,7 @@ module GrosubPars
   FMYC=0.1_r8
   CNKI=1.0E-01_r8
   CPKI=1.0E-02_r8
-  RMPLT=0.010_r8
+  RmSpecPlant=0.010_r8
   PSIMin4OrganExtension=0.1_r8
   RCMN=1.560E+01_r8
   RTDPX=0.00_r8

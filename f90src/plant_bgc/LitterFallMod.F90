@@ -38,7 +38,7 @@ implicit none
     iYearCurrent       =>   plt_site%iYearCurrent      , &
     VOLWOU     =>   plt_site%VOLWOU    , &
     SolarNoonHour_col     =>   plt_site%SolarNoonHour_col    , &
-    HypoctoylHeight_pft      =>   plt_morph%HypoctoylHeight_pft    , &
+    HypoctoHeight_pft      =>   plt_morph%HypoctoHeight_pft    , &
     NumOfBranches_pft        =>   plt_morph%NumOfBranches_pft      , &
     NumOfMainBranch_pft        =>   plt_morph%NumOfMainBranch_pft      , &
     BranchNumber_pft        =>   plt_morph%BranchNumber_pft        &
@@ -86,7 +86,7 @@ implicit none
       ELSE
         NumOfBranches_pft(NZ)=0
       ENDIF
-      HypoctoylHeight_pft(NZ)=0._r8
+      HypoctoHeight_pft(NZ)=0._r8
       VOLWOU=VOLWOU+CanopyWater_pft(NZ)
       UVOLO=UVOLO+CanopyWater_pft(NZ)
       CanopyWater_pft(NZ)=0._r8
@@ -330,7 +330,7 @@ implicit none
     inonstruct   =>   pltpar%inonstruct   , &
     k_fine_litr=>  pltpar%k_fine_litr , &
     k_woody_litr=> pltpar%k_woody_litr, &
-    RootLenthDensPerPopu_pvr     =>   plt_morph%RootLenthDensPerPopu_pvr    , &
+    RootLenDensPerPlant_pvr     =>   plt_morph%RootLenDensPerPlant_pvr    , &
     RootVH2O_vr    =>   plt_morph%RootVH2O_vr   , &
     RootAreaPerPlant_vr     =>   plt_morph%RootAreaPerPlant_vr    , &
     RootVolume_vr     =>   plt_morph%RootVolume_vr    , &
@@ -342,7 +342,7 @@ implicit none
     SecndRootRadius_pvr     =>   plt_morph%SecndRootRadius_pvr    , &
     Max1stRootRadius    =>   plt_morph%Max1stRootRadius   , &
     Max2ndRootRadius    =>   plt_morph%Max2ndRootRadius   , &
-    RootLenPerPopu_pvr     =>   plt_morph%RootLenPerPopu_pvr    , &
+    RootLenPerPlant_pvr     =>   plt_morph%RootLenPerPlant_pvr    , &
     PrimRootLen     =>   plt_morph%PrimRootLen    , &
     SecndRootLen     =>   plt_morph%SecndRootLen    , &
     iPlantNfixType    =>   plt_morph%iPlantNfixType   , &
@@ -403,7 +403,7 @@ implicit none
 !     RootStructBiomC_vr,WTRTD=active,actual root C mass
 !     RootProteinC_pvr=root protein C mass
 !     RTN1,SecndRootXNum_pvr=number of primary,secondary root axes
-!     RootLenthDensPerPopu_pvr,RootLenPerPopu_pvr=root length density,root length per plant
+!     RootLenDensPerPlant_pvr,RootLenPerPlant_pvr=root length density,root length per plant
 !     RootVH2O_vr,RootVolume_vr=root or myco aqueous,gaseous volume
 !     RootAreaPerPlant_vr=root surface area per plant
 !     AveSecndRootLen=average secondary root length
@@ -422,8 +422,8 @@ implicit none
         RootProteinC_pvr(N,L,NZ)=0._r8
         PrimRootXNumL_pvr(N,L,NZ)=0._r8
         SecndRootXNum_pvr(N,L,NZ)=0._r8
-        RootLenPerPopu_pvr(N,L,NZ)=0._r8
-        RootLenthDensPerPopu_pvr(N,L,NZ)=0._r8
+        RootLenPerPlant_pvr(N,L,NZ)=0._r8
+        RootLenDensPerPlant_pvr(N,L,NZ)=0._r8
         RootVolume_vr(N,L,NZ)=0._r8
         RootVH2O_vr(N,L,NZ)=0._r8
         PrimRootRadius_pvr(N,L,NZ)=Max1stRootRadius(N,NZ)

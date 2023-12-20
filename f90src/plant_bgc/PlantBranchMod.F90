@@ -8,7 +8,6 @@ module PlantBranchMod
   use GrosubPars
   use PlantAPIData
   use PhotoSynsMod
-  use RootMod, only : RootBGCModel
   use PlantMathFuncMod
   use NoduleBGCMod
   use LitterFallMod
@@ -25,6 +24,7 @@ module PlantBranchMod
   integer, parameter :: ibrch_husk=5
   integer, parameter :: ibrch_ear=6
   integer, parameter :: ibrch_grain=7
+  integer, save :: iter=0
   contains
 !------------------------------------------------------------------------------------------
 
@@ -137,7 +137,7 @@ module PlantBranchMod
     ZERO       =>  plt_site%ZERO      , &
     PSICanopy_pft     =>  plt_ew%PSICanopy_pft      , &
     NumOfMainBranch_pft        =>  plt_morph%NumOfMainBranch_pft      , &
-    HypoctoylHeight_pft      =>   plt_morph%HypoctoylHeight_pft   , &
+    HypoctoHeight_pft      =>   plt_morph%HypoctoHeight_pft   , &
     SeedDepth_pft      =>   plt_morph%SeedDepth_pft   , &
     InternodeHeightLive_brch     =>   plt_morph%InternodeHeightLive_brch  , &
     NumConCurrentGrowinNode      =>   plt_morph%NumConCurrentGrowinNode     &
@@ -224,7 +224,11 @@ module PlantBranchMod
     call UpdatePhotosynthates(I,J,NB,NZ,TFN6,DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,&
       CNLFX,CPLFX,WTSHXN,TFN5,WFNG,Stomata_Activity,WFNSG,CH2O3,CH2O4,CNPG,rco2c,RMNCS,&
       SNCR,NonStructalC4Growth_brch,CNRDM,CNRDA)
-    write(101,*)'NonStructalC4Growth_brch',NonStructalC4Growth_brch  
+!    if(nz==1)then
+!    write(111,*)'NonStructalC4Growth_brch',I,NonStructalC4Growth_brch  
+!    else
+!    write(112,*)'NonStructalC4Growth_brch',I,NonStructalC4Growth_brch  
+!    endif
 !
 !
 !   TRANSFER OF C4 FIXATION PRODUCTS FROM NON-STRUCTURAL POOLS
@@ -300,12 +304,16 @@ module PlantBranchMod
 !
 !   DISTRIBUTE LEAF GROWTH AMONG CURRENTLY GROWING NODES
 !
-    IF(NB.EQ.NumOfMainBranch_pft(NZ).AND.HypoctoylHeight_pft(NZ).LE.SeedDepth_pft(NZ))THEN
+    IF(NB.EQ.NumOfMainBranch_pft(NZ).AND.HypoctoHeight_pft(NZ).LE.SeedDepth_pft(NZ))THEN
       NNOD1=0
     ELSE
       NNOD1=1
     ENDIF
-
+!    if(NZ==1)then
+!      write(163,*)'ht',I,NB,NumOfMainBranch_pft(NZ),HypoctoHeight_pft(NZ),SeedDepth_pft(NZ)
+!    else
+!      write(164,*)'ht',I,NB,NumOfMainBranch_pft(NZ),HypoctoHeight_pft(NZ),SeedDepth_pft(NZ)
+!    endif
     CALL GrowLeavesOnBranch(NZ,NB,NNOD1,GrowthLeaf,ETOL,WFNS,ALLOCL)
 !
 !     DISTRIBUTE SHEATH OR PETIOLE GROWTH AMONG CURRENTLY GROWING NODES
@@ -732,8 +740,10 @@ module PlantBranchMod
 !   SHOOT AUTOTROPHIC RESPIRATION BEFORE EMERGENCE
 !
   ELSE
-    call ComputRAutoB4Emergence(NB,NZ,TFN6,DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX,WTSHXN,&
+    
+    call ComputRAutoB4Emergence(I,NB,NZ,TFN6,DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX,WTSHXN,&
       WFNG,WFNSG,ZADDB,CNPG,PADDB,RCO2C,RMNCS,SNCR,NonStructalC4Growth_brch,CNRDM,CNRDA,CH2O)
+    write(101,*)'ComputRAutoB4Emergence',NonStructalC4Growth_brch  
   ENDIF
 
 !   REMOVE C,N,P USED IN MAINTENANCE + GROWTH REPIRATION AND GROWTH
@@ -1478,7 +1488,7 @@ module PlantBranchMod
     InternodeHeightLive_brch   => plt_morph%InternodeHeightLive_brch  , &
     CanopyHeightz_col       => plt_morph%CanopyHeightz_col      , &
     CanopyHeight_pft      => plt_morph%CanopyHeight_pft     , &
-    HypoctoylHeight_pft    => plt_morph%HypoctoylHeight_pft   , &
+    HypoctoHeight_pft    => plt_morph%HypoctoHeight_pft   , &
     CLASS    => plt_morph%CLASS   , &
     LeafAreaNode_brch    => plt_morph%LeafAreaNode_brch   , &
     CanopyLeafApft_lyr    => plt_morph%CanopyLeafApft_lyr   , &
@@ -1488,22 +1498,22 @@ module PlantBranchMod
   )
 !   ALLOCATION OF LEAF AREA TO CANOPY LAYERS
 !
-!   HypoctoylHeight_pft=hypocotyledon height
+!   HypoctoHeight_pft=hypocotyledon height
 !   SeedDepth_pft=seeding depth
 !   LeafAreaNode_brch=node leaf area
 !   PetioleLengthNode_brch=petiole length
 !
   KLeafNumLowestGrowing_pft(NB,NZ)=0
-  IF(HypoctoylHeight_pft(NZ).LE.SeedDepth_pft(NZ).AND. &
+  IF(HypoctoHeight_pft(NZ).LE.SeedDepth_pft(NZ).AND. &
     LeafAreaNode_brch(0,NumOfMainBranch_pft(NZ),NZ).GT.0.0_r8)THEN
     LeafLength=SQRT(1.0E+02_r8*LeafAreaNode_brch(0,NumOfMainBranch_pft(NZ),NZ)/PlantPopulation_pft(NZ))
-    HypoctoylHeight_pft(NZ)=LeafLength+PetioleLengthNode_brch(0,NumOfMainBranch_pft(NZ),NZ) &
+    HypoctoHeight_pft(NZ)=LeafLength+PetioleLengthNode_brch(0,NumOfMainBranch_pft(NZ),NZ) &
       +InternodeHeightLive_brch(0,NumOfMainBranch_pft(NZ),NZ)
   ENDIF
 !
 ! IF CANOPY HAS EMERGED
 !
-  IF(HypoctoylHeight_pft(NZ).GT.SeedDepth_pft(NZ))THEN
+  IF(HypoctoHeight_pft(NZ).GT.SeedDepth_pft(NZ))THEN
     D540: DO K=0,MaxNodesPerBranch1
       DO  L=1,NumOfCanopyLayers1
         CanopyLeafAreaByLayer_pft(L,K,NB,NZ)=0._r8
@@ -2033,82 +2043,82 @@ module PlantBranchMod
   real(r8) :: FSNR1
 ! begin_execution
   associate(                        &
-    ifoliar  =>  pltpar%ifoliar   , &
-    istalk   =>  pltpar%istalk    , &
-    iroot    =>  pltpar%iroot     , &
-    inonfoliar =>  pltpar%inonfoliar  , &
-    icwood   =>  pltpar%icwood    , &
-    k_fine_litr => pltpar%k_fine_litr, &
-    k_woody_litr=> pltpar%k_woody_litr, &
-    EHVST    =>  plt_distb%EHVST     , &
-    iYearPlantHarvest_pft     =>  plt_distb%iYearPlantHarvest_pft      , &
-    THIN_pft     =>  plt_distb%THIN_pft      , &
-    HVST     =>  plt_distb%HVST      , &
-    iHarvstType_pft    =>  plt_distb%iHarvstType_pft     , &
-    jHarvst_pft    =>  plt_distb%jHarvst_pft     , &
-    iDayPlanting_pft    =>  plt_distb%iDayPlanting_pft     , &
-    iDayPlantHarvest_pft    =>  plt_distb%iDayPlantHarvest_pft     , &
-    iYearPlanting_pft     =>  plt_distb%iYearPlanting_pft      , &
-    GrainChemElmnts_brch   =>  plt_biom%GrainChemElmnts_brch     , &
-    LeafElmntNode_brch    =>  plt_biom%LeafElmntNode_brch      , &
-    PopuPlantRootC_vr   =>  plt_biom% PopuPlantRootC_vr     , &
-    BranchStalkChemElmnts_pft_pft  =>  plt_biom%BranchStalkChemElmnts_pft_pft    , &
-    StalkChemElmnts_brch  =>  plt_biom%StalkChemElmnts_brch    , &
-    RootMycoNonstructElmnt_vr   =>  plt_biom%RootMycoNonstructElmnt_vr     , &
-    PetoleChemElmnt_brch =>  plt_biom%PetoleChemElmnt_brch   , &
-    EarChemElmnts_brch  =>  plt_biom%EarChemElmnts_brch    , &
-    LeafProteinCNode_brch     =>  plt_biom%LeafProteinCNode_brch       , &
-    PetioleProteinCNode_brch   =>  plt_biom%PetioleProteinCNode_brch     , &
-    HuskChemElmnts_brch  =>  plt_biom%HuskChemElmnts_brch    , &
-    PetioleElmntNode_brch   =>  plt_biom%PetioleElmntNode_brch     , &
-    LeafChemElmnts_brch  =>  plt_biom%LeafChemElmnts_brch    , &
-    NonstructalElmnts_pft    =>  plt_biom%NonstructalElmnts_pft      , &
-    InternodeChemElmnt_brch   =>  plt_biom%InternodeChemElmnt_brch     , &
-    FWODLE   =>  plt_allom%FWODLE    , &
-    FWODBE   =>  plt_allom%FWODBE    , &
-    GrainSeedBiomCMean_brch    => plt_allom%GrainSeedBiomCMean_brch      , &
-    HourThreshold4LeafOff_brch    =>  plt_pheno%HourThreshold4LeafOff_brch     , &
-    iPlantPhenologyType_pft   =>  plt_pheno%iPlantPhenologyType_pft    , &
-    iPlantMorphologyType_pft   =>  plt_pheno%iPlantMorphologyType_pft    , &
-    Hours4LeafOff_brch     =>  plt_pheno%Hours4LeafOff_brch      , &
-    HourThreshold4LeafOut_brch    =>  plt_pheno%HourThreshold4LeafOut_brch     , &
-    iPlantPhenologyPattern_pft   =>  plt_pheno%iPlantPhenologyPattern_pft    , &
-    doPlantLeaveOff_brch    =>  plt_pheno%doPlantLeaveOff_brch     , &
-    doInitPlant_pft    =>  plt_pheno%doInitPlant_pft     , &
-    iPlantCalendar_brch   =>  plt_pheno%iPlantCalendar_brch    , &
-    doPlantLeafOut_brch    =>  plt_pheno%doPlantLeafOut_brch     , &
-    iPlantTurnoverPattern_pft   =>  plt_pheno%iPlantTurnoverPattern_pft    , &
-    TotalNodeNumNormByMatgrp_brch   =>  plt_pheno%TotalNodeNumNormByMatgrp_brch    , &
+    ifoliar                                =>  pltpar%ifoliar   , &
+    istalk                                 =>  pltpar%istalk    , &
+    iroot                                  =>  pltpar%iroot     , &
+    inonfoliar                             =>  pltpar%inonfoliar  , &
+    icwood                                 =>  pltpar%icwood    , &
+    k_fine_litr                            => pltpar%k_fine_litr, &
+    k_woody_litr                           => pltpar%k_woody_litr, &
+    EHVST                                  =>  plt_distb%EHVST     , &
+    iYearPlantHarvest_pft                  =>  plt_distb%iYearPlantHarvest_pft      , &
+    THIN_pft                               =>  plt_distb%THIN_pft      , &
+    HVST                                   =>  plt_distb%HVST      , &
+    iHarvstType_pft                        =>  plt_distb%iHarvstType_pft     , &
+    jHarvst_pft                            =>  plt_distb%jHarvst_pft     , &
+    iDayPlanting_pft                       =>  plt_distb%iDayPlanting_pft     , &
+    iDayPlantHarvest_pft                   =>  plt_distb%iDayPlantHarvest_pft     , &
+    iYearPlanting_pft                      =>  plt_distb%iYearPlanting_pft      , &
+    GrainChemElmnts_brch                   =>  plt_biom%GrainChemElmnts_brch     , &
+    LeafElmntNode_brch                     =>  plt_biom%LeafElmntNode_brch      , &
+    PopuPlantRootC_vr                      =>  plt_biom% PopuPlantRootC_vr     , &
+    BranchStalkChemElmnts_pft_pft          =>  plt_biom%BranchStalkChemElmnts_pft_pft    , &
+    StalkChemElmnts_brch                   =>  plt_biom%StalkChemElmnts_brch    , &
+    RootMycoNonstructElmnt_vr              =>  plt_biom%RootMycoNonstructElmnt_vr     , &
+    PetoleChemElmnt_brch                   =>  plt_biom%PetoleChemElmnt_brch   , &
+    EarChemElmnts_brch                     =>  plt_biom%EarChemElmnts_brch    , &
+    LeafProteinCNode_brch                  =>  plt_biom%LeafProteinCNode_brch       , &
+    PetioleProteinCNode_brch               =>  plt_biom%PetioleProteinCNode_brch     , &
+    HuskChemElmnts_brch                    =>  plt_biom%HuskChemElmnts_brch    , &
+    PetioleElmntNode_brch                  =>  plt_biom%PetioleElmntNode_brch     , &
+    LeafChemElmnts_brch                    =>  plt_biom%LeafChemElmnts_brch    , &
+    NonstructalElmnts_pft                  =>  plt_biom%NonstructalElmnts_pft      , &
+    InternodeChemElmnt_brch                =>  plt_biom%InternodeChemElmnt_brch     , &
+    FWODLE                                 =>  plt_allom%FWODLE    , &
+    FWODBE                                 =>  plt_allom%FWODBE    , &
+    GrainSeedBiomCMean_brch                => plt_allom%GrainSeedBiomCMean_brch      , &
+    HourThreshold4LeafOff_brch             =>  plt_pheno%HourThreshold4LeafOff_brch     , &
+    iPlantPhenologyType_pft                =>  plt_pheno%iPlantPhenologyType_pft    , &
+    iPlantMorphologyType_pft               =>  plt_pheno%iPlantMorphologyType_pft    , &
+    Hours4LeafOff_brch                     =>  plt_pheno%Hours4LeafOff_brch      , &
+    HourThreshold4LeafOut_brch             =>  plt_pheno%HourThreshold4LeafOut_brch     , &
+    iPlantPhenologyPattern_pft             =>  plt_pheno%iPlantPhenologyPattern_pft    , &
+    doPlantLeaveOff_brch                   =>  plt_pheno%doPlantLeaveOff_brch     , &
+    doInitPlant_pft                        =>  plt_pheno%doInitPlant_pft     , &
+    iPlantCalendar_brch                    =>  plt_pheno%iPlantCalendar_brch    , &
+    doPlantLeafOut_brch                    =>  plt_pheno%doPlantLeafOut_brch     , &
+    iPlantTurnoverPattern_pft              =>  plt_pheno%iPlantTurnoverPattern_pft    , &
+    TotalNodeNumNormByMatgrp_brch          =>  plt_pheno%TotalNodeNumNormByMatgrp_brch    , &
     TotalReprodNodeNumNormByMatrgrp_brch   =>  plt_pheno%TotalReprodNodeNumNormByMatrgrp_brch    , &
-    Hours4Leafout_brch     =>  plt_pheno%Hours4Leafout_brch      , &
-    MatureGroup_brch   =>  plt_pheno%MatureGroup_brch    , &
-    LeafNumberAtFloralInit_brch   =>  plt_pheno%LeafNumberAtFloralInit_brch    , &
-    HourFailGrainFill_brch     =>  plt_pheno%HourFailGrainFill_brch      , &
-    Prep4Literfall_brch    =>  plt_pheno%Prep4Literfall_brch     , &
-    doInitLeafOut_brch    =>  plt_pheno%doInitLeafOut_brch     , &
-    MatureGroup_pft  =>  plt_pheno%MatureGroup_pft   , &
-    HoursCanopyPSITooLow     =>   plt_pheno%HoursCanopyPSITooLow     , &
-    Hours4LiterfalAftMature_brch    =>  plt_pheno%Hours4LiterfalAftMature_brch     , &
-    KLeafNodeNumber   =>  plt_pheno%KLeafNodeNumber    , &
-    CFOPE    =>  plt_soilchem%CFOPE  , &
-    iYearCurrent     =>  plt_site%iYearCurrent       , &
-    LitterFallChemElmnt_pftvr     =>  plt_bgcr%LitterFallChemElmnt_pftvr       , &
-    MY       =>  plt_morph%MY        , &
-    NumOfLeaves_brch    =>  plt_morph%NumOfLeaves_brch     , &
-    XTLI     =>  plt_morph%XTLI      , &
-    PetioleLengthNode_brch    =>  plt_morph%PetioleLengthNode_brch     , &
-    KLeafNumber_brch   =>  plt_morph%KLeafNumber_brch    , &
-    InternodeHeightDying_brch   =>  plt_morph%InternodeHeightDying_brch    , &
-    InternodeHeightLive_brch   =>  plt_morph%InternodeHeightLive_brch    , &
-    PotentialSeedSites_brch    =>  plt_morph%PotentialSeedSites_brch     , &
-    NodeNumberAtAnthesis_brch    =>  plt_morph%NodeNumberAtAnthesis_brch     , &
-    NumOfMainBranch_pft      =>  plt_morph%NumOfMainBranch_pft       , &
-    BranchNumber_brch     =>  plt_morph%BranchNumber_brch      , &
-    LeafAreaLive_brch    =>  plt_morph%LeafAreaLive_brch     , &
-    LeafAreaNode_brch    =>  plt_morph%LeafAreaNode_brch     , &
-    ShootNodeNumber_brch    =>  plt_morph%ShootNodeNumber_brch     , &
-    NodeNumberToInitFloral_brch    =>  plt_morph%NodeNumberToInitFloral_brch     , &
-    SeedNumberSet_brch    =>  plt_morph%SeedNumberSet_brch       &
+    Hours4Leafout_brch                     =>  plt_pheno%Hours4Leafout_brch      , &
+    MatureGroup_brch                       =>  plt_pheno%MatureGroup_brch    , &
+    LeafNumberAtFloralInit_brch            =>  plt_pheno%LeafNumberAtFloralInit_brch    , &
+    HourFailGrainFill_brch                 =>  plt_pheno%HourFailGrainFill_brch      , &
+    Prep4Literfall_brch                    =>  plt_pheno%Prep4Literfall_brch     , &
+    doInitLeafOut_brch                     =>  plt_pheno%doInitLeafOut_brch     , &
+    MatureGroup_pft                        =>  plt_pheno%MatureGroup_pft   , &
+    HoursCanopyPSITooLow                   =>   plt_pheno%HoursCanopyPSITooLow     , &
+    Hours4LiterfalAftMature_brch           =>  plt_pheno%Hours4LiterfalAftMature_brch     , &
+    KLeafNodeNumber                        =>  plt_pheno%KLeafNodeNumber    , &
+    CFOPE                                  =>  plt_soilchem%CFOPE  , &
+    iYearCurrent                           =>  plt_site%iYearCurrent       , &
+    LitterFallChemElmnt_pftvr              =>  plt_bgcr%LitterFallChemElmnt_pftvr       , &
+    MY                                     =>  plt_morph%MY        , &
+    NumOfLeaves_brch                       =>  plt_morph%NumOfLeaves_brch     , &
+    XTLI                                   =>  plt_morph%XTLI      , &
+    PetioleLengthNode_brch                 =>  plt_morph%PetioleLengthNode_brch     , &
+    KLeafNumber_brch                       =>  plt_morph%KLeafNumber_brch    , &
+    InternodeHeightDying_brch              =>  plt_morph%InternodeHeightDying_brch    , &
+    InternodeHeightLive_brch               =>  plt_morph%InternodeHeightLive_brch    , &
+    PotentialSeedSites_brch                =>  plt_morph%PotentialSeedSites_brch     , &
+    NodeNumberAtAnthesis_brch              =>  plt_morph%NodeNumberAtAnthesis_brch     , &
+    NumOfMainBranch_pft                    =>  plt_morph%NumOfMainBranch_pft       , &
+    BranchNumber_brch                      =>  plt_morph%BranchNumber_brch      , &
+    LeafAreaLive_brch                      =>  plt_morph%LeafAreaLive_brch     , &
+    LeafAreaNode_brch                      =>  plt_morph%LeafAreaNode_brch     , &
+    ShootNodeNumber_brch                   =>  plt_morph%ShootNodeNumber_brch     , &
+    NodeNumberToInitFloral_brch            =>  plt_morph%NodeNumberToInitFloral_brch     , &
+    SeedNumberSet_brch                     =>  plt_morph%SeedNumberSet_brch       &
   )
 !   RESET PHENOLOGY AT EMERGENCE ('Hours4Leafout_brch' > 'VRNL')
 !   AND END OF SEASON ('Hours4LeafOff_brch' > 'VRNX')
@@ -2122,8 +2132,10 @@ module PlantBranchMod
 !
   IF(iPlantPhenologyPattern_pft(NZ).NE.iplt_annual.OR. &
     (iPlantPhenologyPattern_pft(NZ).EQ.iplt_annual.AND.iPlantPhenologyType_pft(NZ).GT.1))THEN
+    write(192,*)'emerge plant',NB,doPlantLeafOut_brch(NB,NZ),Hours4Leafout_brch(NB,NZ),HourThreshold4LeafOut_brch(NB,NZ)
     IF((doPlantLeafOut_brch(NB,NZ).EQ.iEnable.AND.Hours4Leafout_brch(NB,NZ).GE.HourThreshold4LeafOut_brch(NB,NZ)) &
       .OR.(doPlantLeaveOff_brch(NB,NZ).EQ.iEnable.AND.Hours4LeafOff_brch(NB,NZ).GE.HourThreshold4LeafOff_brch(NB,NZ)))THEN
+      
 !
   !    SPRING PHENOLOGY RESET
   !
@@ -2251,7 +2263,8 @@ module PlantBranchMod
 !
   !   SPRING OR FALL FLAG RESET
   !
-      IF(doPlantLeafOut_brch(NB,NZ).EQ.iEnable.AND.Hours4Leafout_brch(NB,NZ).GE.HourThreshold4LeafOut_brch(NB,NZ))THEN
+      IF(doPlantLeafOut_brch(NB,NZ).EQ.iEnable.AND.Hours4Leafout_brch(NB,NZ) &
+        .GE.HourThreshold4LeafOut_brch(NB,NZ))THEN
         doPlantLeafOut_brch(NB,NZ)=iDisable
         doPlantLeaveOff_brch(NB,NZ)=iEnable
         Prep4Literfall_brch(NB,NZ)=ifalse
@@ -2883,8 +2896,9 @@ module PlantBranchMod
 ! iPlantPhenologyType_pft=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
 ! WFNG=growth function of canopy water potential
 !
-  RMNCS=AZMAX1(RMPLT*TFN5*WTSHXN)
-  IF(is_plant_bryophyte(iPlantMorphologyType_pft(NZ)).OR.iPlantPhenologyType_pft(NZ).EQ.iphenotyp_drouhtdecidu)THEN
+  RMNCS=AZMAX1(RmSpecPlant*TFN5*WTSHXN)
+  IF(is_plant_bryophyte(iPlantMorphologyType_pft(NZ)).OR.&
+    iPlantPhenologyType_pft(NZ).EQ.iphenotyp_drouhtdecidu)THEN
     RMNCS=RMNCS*WFNG
   ENDIF
 !
@@ -2974,16 +2988,17 @@ module PlantBranchMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine ComputRAutoB4Emergence(NB,NZ,TFN6,DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,&
+  subroutine ComputRAutoB4Emergence(I,NB,NZ,TFN6,DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,&
     CNLFX,CPLFX,WTSHXN,WFNG,WFNSG,ZADDB,CNPG,PADDB,RCO2C,RMNCS,SNCR,&
     NonStructalC4Growth_brch,CNRDM,CNRDA,CH2O)
   implicit none
-  integer, intent(in) :: NB,NZ
+  integer, intent(in) :: I,NB,NZ
   real(r8),intent(in) :: TFN6(JZ1)
-  real(r8), intent(out) :: ZADDB,rco2c
-  real(r8), INTENT(OUT) :: CNPG,PADDB,RMNCS,SNCR,NonStructalC4Growth_brch,CNRDM,CNRDA,CH2O
   real(r8), intent(in) :: DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX,WTSHXN,WFNG
   real(r8), intent(in) :: WFNSG
+  real(r8), intent(out) :: ZADDB,rco2c
+  real(r8), INTENT(OUT) :: CNPG,PADDB,RMNCS,SNCR
+  real(r8), intent(out) :: NonStructalC4Growth_brch,CNRDM,CNRDA,CH2O
   real(r8) :: ZPOOLB,ZADDBM,CGROSM
   real(r8) :: FNP
   real(r8) :: PPOOLB
@@ -2994,21 +3009,22 @@ module PlantBranchMod
   real(r8) :: RCO2TM
   real(r8) :: SNCRM
 ! begin_execution
-  associate(                          &
+  associate(                                                                            &
     LeafPetoNonstructElmntConc_brch    =>  plt_biom%LeafPetoNonstructElmntConc_brch   , &
-    NonstructElmnt_brch    =>  plt_biom%NonstructElmnt_brch   , &
-    iPlantMorphologyType_pft    =>  plt_pheno%iPlantMorphologyType_pft  , &
-    fTgrowRootP      =>  plt_pheno%fTgrowRootP    , &
-    RootAutoRO2Limiter_pvr      =>  plt_rbgc%RootAutoRO2Limiter_pvr     , &
-    iPlantPhenologyType_pft    =>  plt_pheno%iPlantPhenologyType_pft  , &
-    CO2NetFix_pft      =>  plt_bgcr%CO2NetFix_pft     , &
-    RootRespPotential_vr     =>  plt_rbgc%RootRespPotential_vr    , &
-    RCO2N     =>  plt_rbgc%RCO2N    , &
-    RCO2A     =>  plt_rbgc%RCO2A    , &
-    ZERO      => plt_site%ZERO      , &
-    NGTopRootLayer_pft       =>  plt_morph%NGTopRootLayer_pft     , &
-    C4PhotosynDowreg_brch     =>  plt_photo%C4PhotosynDowreg_brch     &
+    NonstructElmnt_brch                =>  plt_biom%NonstructElmnt_brch   , &
+    iPlantMorphologyType_pft           =>  plt_pheno%iPlantMorphologyType_pft  , &
+    fTgrowRootP                        =>  plt_pheno%fTgrowRootP    , &
+    RootAutoRO2Limiter_pvr             =>  plt_rbgc%RootAutoRO2Limiter_pvr     , &
+    iPlantPhenologyType_pft            =>  plt_pheno%iPlantPhenologyType_pft  , &
+    CO2NetFix_pft                      =>  plt_bgcr%CO2NetFix_pft     , &
+    RootRespPotential_vr               =>  plt_rbgc%RootRespPotential_vr    , &
+    RCO2N                              =>  plt_rbgc%RCO2N    , &
+    RCO2A                              =>  plt_rbgc%RCO2A    , &
+    ZERO                               => plt_site%ZERO      , &
+    NGTopRootLayer_pft                 =>  plt_morph%NGTopRootLayer_pft     , &
+    C4PhotosynDowreg_brch              =>  plt_photo%C4PhotosynDowreg_brch     &
   )
+  iter=iter+1
 !
 ! N,P CONSTRAINT ON RESPIRATION FROM NON-STRUCTURAL C:N:P
 !
@@ -3037,8 +3053,8 @@ module PlantBranchMod
 !
   RCO2CM=AZMAX1(VMXC*NonstructElmnt_brch(ielmc,NB,NZ) &
     *fTgrowRootP(NGTopRootLayer_pft(NZ),NZ))*CNPG*WFNG*C4PhotosynDowreg_brch(NB,NZ)
-  write(101,*)'RCO2CM',RCO2CM,NonstructElmnt_brch(ielmc,NB,NZ),NB,NZ
-  RCO2C=RCO2CM*RootAutoRO2Limiter_pvr(1,NGTopRootLayer_pft(NZ),NZ)
+!  write(104,*)'RCO2CM',iter,RCO2CM,NonstructElmnt_brch(ielmc,NB,NZ),NB,NZ,NGTopRootLayer_pft(NZ)  
+  RCO2C=RCO2CM*RootAutoRO2Limiter_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)
 !
 ! MAINTENANCE RESPIRATION FROM TEMPERATURE, PLANT STRUCTURAL N
 !
@@ -3049,8 +3065,9 @@ module PlantBranchMod
 ! iPlantPhenologyType_pft=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
 ! WFNG=growth function of canopy water potential
 !
-  RMNCS=AZMAX1(RMPLT*TFN6(NGTopRootLayer_pft(NZ))*WTSHXN)
-  IF(is_plant_bryophyte(iPlantMorphologyType_pft(NZ)).OR.iPlantPhenologyType_pft(NZ).EQ.iphenotyp_drouhtdecidu)THEN
+  RMNCS=AZMAX1(RmSpecPlant*TFN6(NGTopRootLayer_pft(NZ))*WTSHXN)
+  IF(is_plant_bryophyte(iPlantMorphologyType_pft(NZ)).OR.&
+    iPlantPhenologyType_pft(NZ).EQ.iphenotyp_drouhtdecidu)THEN
     RMNCS=RMNCS*WFNG
   ENDIF
 !
@@ -3064,7 +3081,6 @@ module PlantBranchMod
 !
   RCO2XM=RCO2CM-RMNCS
   RCO2X=RCO2C-RMNCS
-  WRITE(101,*)'RCO2X',RCO2C,RMNCS
   RCO2YM=AZMAX1(RCO2XM)*WFNSG
   RCO2Y=AZMAX1(RCO2X)*WFNSG
   SNCRM=AZMAX1(-RCO2XM)
@@ -3089,22 +3105,29 @@ module PlantBranchMod
     ZPOOLB=AZMAX1(NonstructElmnt_brch(ielmn,NB,NZ))
     PPOOLB=AZMAX1(NonstructElmnt_brch(ielmp,NB,NZ))
     FNP=AMIN1(ZPOOLB*DMSHD/(CNSHX+CNLFM+CNLFX*CNPG),PPOOLB*DMSHD/(CPSHX+CPLFM+CPLFX*CNPG))
-
     IF(RCO2YM.GT.0.0_r8)THEN
       RCO2GM=AMIN1(RCO2YM,FNP)
     ELSE
       RCO2GM=0._r8
     ENDIF
-
     IF(RCO2Y.GT.0.0_r8)THEN
-      RCO2G=AMIN1(RCO2Y,FNP*RootAutoRO2Limiter_pvr(1,NGTopRootLayer_pft(NZ),NZ))
+      RCO2G=AMIN1(RCO2Y,FNP*RootAutoRO2Limiter_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ))
     ELSE
       RCO2G=0._r8
     ENDIF
+!    if(NZ==1)THEN
+!    WRITE(143,*)'RCO2Y',I,RCO2Y,FNP,RootAutoRO2Limiter_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ),&
+!      NGTopRootLayer_pft(NZ)
+!    ELSE
+!    WRITE(144,*)'RCO2Y',I,RCO2Y,FNP,RootAutoRO2Limiter_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ),&
+!      NGTopRootLayer_pft(NZ)  
+!    ENDIF
+
   ELSE
     RCO2GM=0._r8
     RCO2G=0._r8
   ENDIF
+!  write(104,*)'RCO2G',RCO2G,RCO2Y,RCO2X,FNP  
 !
 ! TOTAL NON-STRUCTURAL C,N,P USED IN GROWTH
 ! AND GROWTH RESPIRATION DEPENDS ON GROWTH YIELDS
@@ -3122,7 +3145,6 @@ module PlantBranchMod
 ! CNRDM,CNRDA=respiration for N assimilation unltd,ltd by O2
 !
   CGROSM=RCO2GM/DMSHD
-  write(101,*)'RCO2G',RCO2G,RCO2Y,RCO2X
   NonStructalC4Growth_brch=RCO2G/DMSHD
   ZADDBM=AZMAX1(CGROSM*(CNSHX+CNLFM+CNLFX*CNPG))
   ZADDB=AZMAX1(NonStructalC4Growth_brch*(CNSHX+CNLFM+CNLFX*CNPG))
@@ -3226,7 +3248,11 @@ module PlantBranchMod
         ,LeafElmntNode_brch(ielmc,K,NB,NZ))/(PlantPopulation_pft(NZ)*GSLA))**SLA2*WFNS
       LeafAreaGrowth=GrowthChemElmt(ielmc)*SpecAreaLeafGrowth
       LeafAreaLive_brch(NB,NZ)=LeafAreaLive_brch(NB,NZ)+LeafAreaGrowth
-      WRITE(101,*)'leafarea growth',NB,NZ,LeafAreaLive_brch(NB,NZ),LeafAreaGrowth
+!      if(NZ==1)THEN
+!      WRITE(171,*)'leafarea growth',NB,LeafAreaGrowth
+!      ELSE
+!      WRITE(172,*)'leafarea growth',NB,LeafAreaGrowth
+!      ENDIF
       LeafAreaNode_brch(K,NB,NZ)=LeafAreaNode_brch(K,NB,NZ)+LeafAreaGrowth
     ENDDO D490
   ENDIF

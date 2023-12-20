@@ -205,7 +205,7 @@ module PlantDataRateType
   allocate(RUNNXP(jroots,JZ,JP,JY,JX));RUNNXP=0._r8
   allocate(RNH3Z(JP,JY,JX));    RNH3Z=0._r8
   allocate(RNH3B(MaxNumBranches,JP,JY,JX)); RNH3B=0._r8
-  allocate(RootAutoRO2Limiter_pvr(2,JZ,JP,JY,JX)); RootAutoRO2Limiter_pvr=0._r8
+  allocate(RootAutoRO2Limiter_pvr(jroots,JZ,JP,JY,JX)); RootAutoRO2Limiter_pvr=0._r8
   allocate(RH2GZ(JP,JY,JX));    RH2GZ=0._r8
   allocate(PlantRootSoilChemNetX_pft(NumOfPlantChemElmnts,JP,JY,JX));   PlantRootSoilChemNetX_pft=0._r8
   allocate(PlantExudChemElmntCum_pft(NumOfPlantChemElmnts,JP,JY,JX));   PlantExudChemElmntCum_pft=0._r8

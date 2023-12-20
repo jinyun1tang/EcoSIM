@@ -202,7 +202,7 @@ module UptakesMod
 
       call SetCanopyGrowthFuncs(NZ)
 
-      call PopPlantNutientO2Uptake(NZ,FDMP,PopPlantO2Uptake,PopPlantO2Demand,&
+      call PopPlantNutientO2Uptake(I,NZ,FDMP,PopPlantO2Uptake,PopPlantO2Demand,&
         PATH,FineRootRadius,FracPRoot4Uptake,MinFracPRoot4Uptake,FracSoiLayByPrimRoot,RootAreaDivRadius_vr)
 
       Canopy_Heat_Latent_col=Canopy_Heat_Latent_col+EvapTransHeatP(NZ)*CanopyBndlResist_pft(NZ)
@@ -457,10 +457,10 @@ module UptakesMod
     NU     =>  plt_site%NU       , &
     NumRootAxes_pft   =>  plt_morph%NumRootAxes_pft    , &
     MY     =>  plt_morph%MY      , &
-    RootLenthDensPerPopu_pvr  =>  plt_morph%RootLenthDensPerPopu_pvr   , &
+    RootLenDensPerPlant_pvr  =>  plt_morph%RootLenDensPerPlant_pvr   , &
     Max2ndRootRadius1 =>  plt_morph%Max2ndRootRadius1  , &
-    HypoctoylHeight_pft  =>  plt_morph%HypoctoylHeight_pft   , &
-    RootLenPerPopu_pvr  =>  plt_morph%RootLenPerPopu_pvr   , &
+    HypoctoHeight_pft  =>  plt_morph%HypoctoHeight_pft   , &
+    RootLenPerPlant_pvr  =>  plt_morph%RootLenPerPlant_pvr   , &
     PrimRootDepth  =>  plt_morph%PrimRootDepth   , &
     RootPorosity   =>  plt_morph%RootPorosity    , &
     RootVH2O_vr =>  plt_morph%RootVH2O_vr  , &
@@ -473,9 +473,9 @@ module UptakesMod
 !     DLYR=layer thickness
 !     CumSoilThickness=depth from soil surface to layer bottom
 !     SeedDepth_pft=seeding depth
-!     HypoctoylHeight_pft=hypocotyledon height
+!     HypoctoHeight_pft=hypocotyledon height
 !     FracPRoot4Uptake=PFT fraction of biome root mass
-!     RootLenthDensPerPopu_pvr,RootLenPerPopu_pvr=root length density,root length per plant
+!     RootLenDensPerPlant_pvr,RootLenPerPlant_pvr=root length density,root length per plant
 !     FineRootRadius=root radius
 !     RootPorosity=root porosity
 !     FracSoiAsMicP=micropore fraction excluding macropore,rock
@@ -496,7 +496,7 @@ module UptakesMod
         ELSE
           IF(DLYR3(L).GT.ZERO)THEN
             RTDPX=AZMAX1(RootDepZ-CumSoilThickness(L-1))
-            RTDPX=AZMAX1(AMIN1(DLYR3(L),RTDPX)-AZMAX1(SeedDepth_pft(NZ)-CumSoilThickness(L-1)-HypoctoylHeight_pft(NZ)))
+            RTDPX=AZMAX1(AMIN1(DLYR3(L),RTDPX)-AZMAX1(SeedDepth_pft(NZ)-CumSoilThickness(L-1)-HypoctoHeight_pft(NZ)))
             FracSoiLayByPrimRoot(L,NZ)=RTDPX/DLYR3(L)
           ELSE
             FracSoiLayByPrimRoot(L,NZ)=0.0_r8
@@ -510,15 +510,15 @@ module UptakesMod
         FracPRoot4Uptake(N,L,NZ)=1.0_r8
       ENDIF
       MinFracPRoot4Uptake(N,L,NZ)=FMN*FracPRoot4Uptake(N,L,NZ)
-      IF(RootLenthDensPerPopu_pvr(N,L,NZ).GT.ZERO.AND.FracSoiLayByPrimRoot(L,NZ).GT.ZERO)THEN
+      IF(RootLenDensPerPlant_pvr(N,L,NZ).GT.ZERO.AND.FracSoiLayByPrimRoot(L,NZ).GT.ZERO)THEN
         FineRootRadius(N,L)=AMAX1(Max2ndRootRadius1(N,NZ),SQRT((RootVH2O_vr(N,L,NZ) &
-          /(1.0_r8-RootPorosity(N,NZ)))/(PICON*PlantPopulation_pft(NZ)*RootLenPerPopu_pvr(N,L,NZ))))
-        PATH(N,L)=AMAX1(1.001_r8*FineRootRadius(N,L),1.0_r8/(SQRT(PICON*(RootLenthDensPerPopu_pvr(N,L,NZ)/FracSoiLayByPrimRoot(L,NZ))/FracSoiAsMicP(L))))
-        RootAreaDivRadius_vr(N,L)=TwoPiCON*RootLenPerPopu_pvr(N,L,NZ)/FracSoiLayByPrimRoot(L,NZ)
+          /(1.0_r8-RootPorosity(N,NZ)))/(PICON*PlantPopulation_pft(NZ)*RootLenPerPlant_pvr(N,L,NZ))))
+        PATH(N,L)=AMAX1(1.001_r8*FineRootRadius(N,L),1.0_r8/(SQRT(PICON*(RootLenDensPerPlant_pvr(N,L,NZ)/FracSoiLayByPrimRoot(L,NZ))/FracSoiAsMicP(L))))
+        RootAreaDivRadius_vr(N,L)=TwoPiCON*RootLenPerPlant_pvr(N,L,NZ)/FracSoiLayByPrimRoot(L,NZ)
       ELSE
         FineRootRadius(N,L)=Max2ndRootRadius(N,NZ)
         PATH(N,L)=1.001_r8*FineRootRadius(N,L)
-        RootAreaDivRadius_vr(N,L)=TwoPiCON*RootLenPerPopu_pvr(N,L,NZ)
+        RootAreaDivRadius_vr(N,L)=TwoPiCON*RootLenPerPlant_pvr(N,L,NZ)
       ENDIF
     enddo
   ENDDO D2000
@@ -981,9 +981,9 @@ module UptakesMod
     Max2ndRootRadius => plt_morph%Max2ndRootRadius  , &
     RSRA   => plt_morph%RSRA    , &
     SecndRootRadius_pvr  => plt_morph%SecndRootRadius_pvr   , &
-    RootLenthDensPerPopu_pvr  => plt_morph%RootLenthDensPerPopu_pvr   , &
+    RootLenDensPerPlant_pvr  => plt_morph%RootLenDensPerPlant_pvr   , &
     CanPHeight4WatUptake  => plt_morph%CanPHeight4WatUptake   , &
-    RootLenPerPopu_pvr  => plt_morph%RootLenPerPopu_pvr   , &
+    RootLenPerPlant_pvr  => plt_morph%RootLenPerPlant_pvr   , &
     AveSecndRootLen  => plt_morph%AveSecndRootLen   , &
     PrimRootRadius_pvr  => plt_morph%PrimRootRadius_pvr   , &
     MY     => plt_morph%MY      , &
@@ -1009,7 +1009,7 @@ module UptakesMod
   !     SOIL AND ROOT HYDRAULIC RESISTANCES TO ROOT WATER UPTAKE
   !
   !      VLSoilPoreMicP,VLWatMicPM,THETW=soil,water volume,content
-  !     RootLenthDensPerPopu_pvr,RootLenPerPopu_pvr=root length density,root length per plant
+  !     RootLenDensPerPlant_pvr,RootLenPerPlant_pvr=root length density,root length per plant
   !     HydroCondMicP4RootUptake=soil hydraulic conductivity for root uptake
   !     PrimRootXNumL_pvr,SecndRootXNum_pvr=number of root,myco primary,secondary axes
   !     LayrHasRoot:1=rooted,0=not rooted
@@ -1019,7 +1019,7 @@ module UptakesMod
     DO  L=NU,NI(NZ)
       IF(VLSoilPoreMicP(L).GT.ZEROS2 &
         .AND.VLWatMicPM(NPH,L).GT.ZEROS2 &
-        .AND.RootLenthDensPerPopu_pvr(N,L,NZ).GT.ZERO &
+        .AND.RootLenDensPerPlant_pvr(N,L,NZ).GT.ZERO &
         .AND.HydroCondMicP4RootUptake(L).GT.ZERO &
         .AND.PrimRootXNumL_pvr(ipltroot,L,NZ).GT.ZEROP(NZ) &
         .AND.SecndRootXNum_pvr(N,L,NZ).GT.ZEROP(NZ) &
@@ -1041,12 +1041,12 @@ module UptakesMod
         !     ENTERED IN 'READQ'
         !
         !     SecndRootRadius_pvr=secondary root radius
-        !     RootLenPerPopu_pvr=root length per plant
+        !     RootLenPerPlant_pvr=root length per plant
         !     RootResistSoi=radial resistance
         !     RSRR=radial resistivity from PFT file
         !     VLMicP,VLWatMicPM=soil micropore,water volume
         !
-        RTAR2=TwoPiCON*SecndRootRadius_pvr(N,L,NZ)*RootLenPerPopu_pvr(N,L,NZ)*PlantPopulation_pft(NZ)
+        RTAR2=TwoPiCON*SecndRootRadius_pvr(N,L,NZ)*RootLenPerPlant_pvr(N,L,NZ)*PlantPopulation_pft(NZ)
         RootResistSoi(N,L)=RSRR(N,NZ)/RTAR2*VLMicP(L)/VLWatMicPM(NPH,L)
 !
         !     ROOT AXIAL RESISTANCE FROM RADII AND LENGTHS OF PRIMARY AND

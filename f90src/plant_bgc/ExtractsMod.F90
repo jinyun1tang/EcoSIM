@@ -179,7 +179,7 @@ module ExtractsMod
     AllPlantRootH2OUptake_vr => plt_ew%AllPlantRootH2OUptake_vr    , &
     trcg_rootml_vr  => plt_rbgc%trcg_rootml_vr,&
     trcs_rootml_vr => plt_rbgc%trcs_rootml_vr, &
-    RootLenthDensPerPopu_pvr => plt_morph%RootLenthDensPerPopu_pvr , &
+    RootLenDensPerPlant_pvr => plt_morph%RootLenDensPerPlant_pvr , &
     RTDNT => plt_morph%RTDNT , &
     MY    => plt_morph%MY    , &
     NI    => plt_morph%NI      &
@@ -191,7 +191,7 @@ module ExtractsMod
 !     TOTAL ROOT DENSITY
 !
 !     RTDNT=total root length density
-!     RootLenthDensPerPopu_pvr=PFT root length density per plant
+!     RootLenDensPerPlant_pvr=PFT root length density per plant
 !     AllPlantRootH2OUptake_vr=total water uptake
 !     AllPlantRootH2OUptake_vr=PFT root water uptake
 !     THeatRootUptake=total convective heat in root water uptake
@@ -199,7 +199,7 @@ module ExtractsMod
 !     PP=PFT population, this is dynamic, and can goes to zero
 !
       IF(N.EQ.ipltroot)THEN
-        RTDNT(L)=RTDNT(L)+RootLenthDensPerPopu_pvr(N,L,NZ)*PlantPopulation_pft(NZ)/AREA3(L)
+        RTDNT(L)=RTDNT(L)+RootLenDensPerPlant_pvr(N,L,NZ)*PlantPopulation_pft(NZ)/AREA3(L)
       ENDIF
 !
 !     TOTAL WATER UPTAKE

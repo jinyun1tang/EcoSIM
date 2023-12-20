@@ -39,7 +39,7 @@ module RootDataType
   real(r8),target,allocatable ::  VmaxPO4Root_pft(:,:,:,:)                    !maximum root PO4 uptake rate, [g m-2 h-1]
   real(r8),target,allocatable ::  KmPO4Root_pft(:,:,:,:)                    !Km for root PO4 uptake, [g m-3]
   real(r8),target,allocatable ::  CMinPO4Root_pft(:,:,:,:)                    !minimum PO4 concentration for root NH4 uptake, [g m-3]
-  real(r8),target,allocatable ::  RRADP(:,:,:,:)                     !root internal radius, [m]
+  real(r8),target,allocatable ::  RootRaidus_rpft(:,:,:,:)                     !root internal radius, [m]
   real(r8),target,allocatable ::  CNRTS(:,:,:)                       !root N:C ratio x root growth yield, [-]
   real(r8),target,allocatable ::  CPRTS(:,:,:)                       !root P:C ratio x root growth yield, [-]
   real(r8),target,allocatable ::  Max1stRootRadius(:,:,:,:)                    !maximum radius of primary roots, [m]
@@ -47,10 +47,10 @@ module RootDataType
   real(r8),target,allocatable ::  RootBranchFreq_pft(:,:,:)                        !root brancing frequency, [m-1]
   real(r8),target,allocatable ::  RootPoreTortu4Gas(:,:,:,:)                     !power function of root porosity used to calculate root gaseous diffusivity, [-]
   real(r8),target,allocatable ::  RootNoduleNonstructElmnt_vr(:,:,:,:,:)                  !root  layer nonstructural element, [g d-2]
-  real(r8),target,allocatable ::  RootLenPerPopu_pvr(:,:,:,:,:)                   !root layer length per plant, [m p-1]
+  real(r8),target,allocatable ::  RootLenPerPlant_pvr(:,:,:,:,:)                   !root layer length per plant, [m p-1]
   real(r8),target,allocatable ::  PrimRootLen(:,:,:,:,:,:)                 !root layer length primary axes, [m d-2]
   real(r8),target,allocatable ::  SecndRootLen(:,:,:,:,:,:)                 !root layer length secondary axes, [m d-2]
-  real(r8),target,allocatable ::  RootLenthDensPerPopu_pvr(:,:,:,:,:)          !root length density in soil layers, [m m-3]
+  real(r8),target,allocatable ::  RootLenDensPerPlant_pvr(:,:,:,:,:)          !root length density in soil layers, [m m-3]
   real(r8),target,allocatable ::  PrimRootXNumL_pvr(:,:,:,:,:)                    !root layer number primary axes, [d-2]
   real(r8),target,allocatable ::  SecndRootXNum_pvr(:,:,:,:,:)                    !root layer number axes, [d-2]
   real(r8),target,allocatable ::  SecndRootXNum_rpvr(:,:,:,:,:,:)                  !root layer number secondary axes, [d-2]
@@ -72,7 +72,7 @@ module RootDataType
   real(r8),target,allocatable ::  TRootGasLossDisturb_pft(:,:,:)                 !total root gas content, [g d-2]
   real(r8),target,allocatable ::  RootBiomCPerPlant_pft(:,:,:)                       !root C per plant, [g p-1]
   real(r8),target,allocatable ::  RootElmnts_pft(:,:,:,:)                     !plant root element, [g d-2]
-  real(r8),target,allocatable ::  RootStructChemElmnt_pft(:,:,:,:)                    !plant root structural element, [g d-2]
+  real(r8),target,allocatable ::  RootStructElmnt_pft(:,:,:,:)                    !plant root structural element, [g d-2]
   real(r8),target,allocatable ::  RootProteinC_pvr(:,:,:,:,:)                   !root layer protein C, [g d-2]
   real(r8),target,allocatable ::  Root1stStructChemElmnt_pvr(:,:,:,:,:,:,:)              !root layer element primary axes, [g d-2]
   real(r8),target,allocatable ::  Root2ndStructChemElmnt_pvr(:,:,:,:,:,:,:)              !root layer element secondary axes, [g d-2]
@@ -121,7 +121,7 @@ contains
   allocate(VmaxPO4Root_pft(jroots,JP,JY,JX)); VmaxPO4Root_pft=0._r8
   allocate(KmPO4Root_pft(jroots,JP,JY,JX)); KmPO4Root_pft=0._r8
   allocate(CMinPO4Root_pft(jroots,JP,JY,JX)); CMinPO4Root_pft=0._r8
-  allocate(RRADP(jroots,JP,JY,JX));  RRADP=0._r8
+  allocate(RootRaidus_rpft(jroots,JP,JY,JX));  RootRaidus_rpft=0._r8
   allocate(CNRTS(JP,JY,JX));    CNRTS=0._r8
   allocate(CPRTS(JP,JY,JX));    CPRTS=0._r8
   allocate(Max1stRootRadius(jroots,JP,JY,JX)); Max1stRootRadius=0._r8
@@ -129,10 +129,10 @@ contains
   allocate(RootBranchFreq_pft(JP,JY,JX));     RootBranchFreq_pft=0._r8
   allocate(RootPoreTortu4Gas(jroots,JP,JY,JX));  RootPoreTortu4Gas=0._r8
   allocate(RootNoduleNonstructElmnt_vr(NumOfPlantChemElmnts,JZ,JP,JY,JX));RootNoduleNonstructElmnt_vr=0._r8
-  allocate(RootLenPerPopu_pvr(jroots,JZ,JP,JY,JX));RootLenPerPopu_pvr=0._r8
+  allocate(RootLenPerPlant_pvr(jroots,JZ,JP,JY,JX));RootLenPerPlant_pvr=0._r8
   allocate(PrimRootLen(jroots,JZ,JC,JP,JY,JX));PrimRootLen=0._r8
   allocate(SecndRootLen(jroots,JZ,JC,JP,JY,JX));SecndRootLen=0._r8
-  allocate(RootLenthDensPerPopu_pvr(jroots,JZ,JP,JY,JX));RootLenthDensPerPopu_pvr=0._r8
+  allocate(RootLenDensPerPlant_pvr(jroots,JZ,JP,JY,JX));RootLenDensPerPlant_pvr=0._r8
   allocate(PrimRootXNumL_pvr(jroots,JZ,JP,JY,JX));PrimRootXNumL_pvr=0._r8
   allocate(SecndRootXNum_pvr(jroots,JZ,JP,JY,JX));SecndRootXNum_pvr=0._r8
   allocate(SecndRootXNum_rpvr(jroots,JZ,JC,JP,JY,JX));SecndRootXNum_rpvr=0._r8
@@ -154,7 +154,7 @@ contains
   allocate(TRootGasLossDisturb_pft(idg_beg:idg_end-1,JY,JX));TRootGasLossDisturb_pft=0._r8
   allocate(RootBiomCPerPlant_pft(JP,JY,JX));    RootBiomCPerPlant_pft=0._r8
   allocate(RootElmnts_pft(NumOfPlantChemElmnts,JP,JY,JX)); RootElmnts_pft=0._r8
-  allocate(RootStructChemElmnt_pft(NumOfPlantChemElmnts,JP,JY,JX));   RootStructChemElmnt_pft=0._r8
+  allocate(RootStructElmnt_pft(NumOfPlantChemElmnts,JP,JY,JX));   RootStructElmnt_pft=0._r8
   allocate(RootProteinC_pvr(jroots,JZ,JP,JY,JX));RootProteinC_pvr=0._r8
   allocate(Root1stStructChemElmnt_pvr(NumOfPlantChemElmnts,jroots,JZ,JC,JP,JY,JX));Root1stStructChemElmnt_pvr=0._r8
   allocate(Root2ndStructChemElmnt_pvr(NumOfPlantChemElmnts,jroots,JZ,JC,JP,JY,JX));Root2ndStructChemElmnt_pvr=0._r8
@@ -201,7 +201,7 @@ contains
   call destroy(VmaxPO4Root_pft)
   call destroy(KmPO4Root_pft)
   call destroy(CMinPO4Root_pft)
-  call destroy(RRADP)
+  call destroy(RootRaidus_rpft)
   call destroy(CNRTS)
   call destroy(CPRTS)
   call destroy(Max1stRootRadius)
@@ -209,10 +209,10 @@ contains
   call destroy(RootBranchFreq_pft)
   call destroy(RootPoreTortu4Gas)
   call destroy(RootNoduleNonstructElmnt_vr)
-  call destroy(RootLenPerPopu_pvr)
+  call destroy(RootLenPerPlant_pvr)
   call destroy(PrimRootLen)
   call destroy(SecndRootLen)
-  call destroy(RootLenthDensPerPopu_pvr)
+  call destroy(RootLenDensPerPlant_pvr)
   call destroy(PrimRootXNumL_pvr)
   call destroy(SecndRootXNum_pvr)
   call destroy(SecndRootXNum_rpvr)
@@ -234,7 +234,7 @@ contains
   call destroy(TRootGasLossDisturb_pft)
   call destroy(RootBiomCPerPlant_pft)
   call destroy(RootElmnts_pft)
-  call destroy(RootStructChemElmnt_pft)
+  call destroy(RootStructElmnt_pft)
   call destroy(RootProteinC_pvr)
   call destroy(Root1stStructChemElmnt_pvr)
   call destroy(Root2ndStructChemElmnt_pvr)

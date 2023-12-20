@@ -445,14 +445,14 @@ module StartqMod
   RSRA(imycorrhz,NZ,NY,NX)=1.0E+12
 !
 !     RootPoreTortu4Gas=tortuosity for gas transport
-!     RRADP=path length for radial diffusion within root (m)
+!     RootRaidus_rpft=path length for radial diffusion within root (m)
 !     RootVolPerMassC_pft=volume:C ratio (m3 g-1)
 !     PrimRootSpecLen,SecndRootSpecLen=specific primary,secondary root length (m g-1)
 !     PrimRootXSecArea,SecndRootXSecArea=specific primary,secondary root area (m2 g-1)
 !
   D500: DO N=1,2
     RootPoreTortu4Gas(N,NZ,NY,NX)=RootPorosity(N,NZ,NY,NX)**1.33_r8
-    RRADP(N,NZ,NY,NX)=LOG(1.0_r8/SQRT(AMAX1(0.01_r8,RootPorosity(N,NZ,NY,NX))))
+    RootRaidus_rpft(N,NZ,NY,NX)=LOG(1.0_r8/SQRT(AMAX1(0.01_r8,RootPorosity(N,NZ,NY,NX))))
     RootVolPerMassC_pft(N,NZ,NY,NX)=ppmc/(0.05_r8*(1.0-RootPorosity(N,NZ,NY,NX)))
     PrimRootSpecLen(N,NZ,NY,NX)=RootVolPerMassC_pft(N,NZ,NY,NX)/(PICON*Max1stRootRadius(N,NZ,NY,NX)**2)
     SecndRootSpecLen(N,NZ,NY,NX)=RootVolPerMassC_pft(N,NZ,NY,NX)/(PICON*Max2ndRootRadius(N,NZ,NY,NX)**2)
@@ -482,7 +482,7 @@ module StartqMod
   iPlantRootState_pft(NZ,NY,NX)=iDead
   BranchNumber_pft(NZ,NY,NX)=0
   NumOfBranches_pft(NZ,NY,NX)=0
-  HypoctoylHeight_pft(NZ,NY,NX)=0._r8
+  HypoctoHeight_pft(NZ,NY,NX)=0._r8
   CanopyHeight_pft(NZ,NY,NX)=0._r8
   D10: DO NB=1,MaxNumBranches
     doInitLeafOut_brch(NB,NZ,NY,NX)=0
@@ -604,7 +604,7 @@ module StartqMod
   EarChemElmnts_pft(1:NumOfPlantChemElmnts,NZ,NY,NX)=0._r8
   GrainChemElmnts_pft(1:NumOfPlantChemElmnts,NZ,NY,NX)=0._r8
   RootElmnts_pft(1:NumOfPlantChemElmnts,NZ,NY,NX)=0._r8
-  RootStructChemElmnt_pft(1:NumOfPlantChemElmnts,NZ,NY,NX)=0._r8
+  RootStructElmnt_pft(1:NumOfPlantChemElmnts,NZ,NY,NX)=0._r8
   NoduleChemElmnts_pft(1:NumOfPlantChemElmnts,NZ,NY,NX)=0._r8
   CanopyLeafShethC_pft(NZ,NY,NX)=0._r8
 
@@ -727,8 +727,8 @@ module StartqMod
       RootProteinC_pvr(N,L,NZ,NY,NX)=0._r8
       PrimRootXNumL_pvr(N,L,NZ,NY,NX)=0._r8
       SecndRootXNum_pvr(N,L,NZ,NY,NX)=0._r8
-      RootLenPerPopu_pvr(N,L,NZ,NY,NX)=0._r8
-      RootLenthDensPerPopu_pvr(N,L,NZ,NY,NX)=0._r8
+      RootLenPerPlant_pvr(N,L,NZ,NY,NX)=0._r8
+      RootLenDensPerPlant_pvr(N,L,NZ,NY,NX)=0._r8
       RootVolume_vr(N,L,NZ,NY,NX)=0._r8
       RootVH2O_vr(N,L,NZ,NY,NX)=0._r8
       PrimRootRadius_pvr(N,L,NZ,NY,NX)=Max1stRootRadius(N,NZ,NY,NX)
@@ -794,7 +794,7 @@ module StartqMod
   RootNutUptake_pvr(ids_NH4B,1:2,NL(NY,NX)+1:JZ,NZ,NY,NX)=0._r8
   RootNutUptake_pvr(ids_H2PO4,1:2,NL(NY,NX)+1:JZ,NZ,NY,NX)=0._r8
   RootNutUptake_pvr(ids_H2PO4B,1:2,NL(NY,NX)+1:JZ,NZ,NY,NX)=0._r8
-  RootLenthDensPerPopu_pvr(1:2,NL(NY,NX)+1:JZ,NZ,NY,NX)=0._r8
+  RootLenDensPerPlant_pvr(1:2,NL(NY,NX)+1:JZ,NZ,NY,NX)=0._r8
   end subroutine InitRootMychorMorphoBio
 !------------------------------------------------------------------------------------------
 

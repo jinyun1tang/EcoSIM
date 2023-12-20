@@ -738,10 +738,10 @@ module PlantDisturbsMod
     RootVH2O_vr   =>  plt_morph%RootVH2O_vr    , &
     RootAreaPerPlant_vr    =>  plt_morph%RootAreaPerPlant_vr     , &
     RootVolume_vr    =>  plt_morph%RootVolume_vr     , &
-    RootLenthDensPerPopu_pvr    =>  plt_morph%RootLenthDensPerPopu_pvr     , &
+    RootLenDensPerPlant_pvr    =>  plt_morph%RootLenDensPerPlant_pvr     , &
     PrimRootXNumL_pvr    =>  plt_morph%PrimRootXNumL_pvr     , &
     iPlantNfixType   =>  plt_morph%iPlantNfixType    , &
-    RootLenPerPopu_pvr    =>  plt_morph%RootLenPerPopu_pvr     , &
+    RootLenPerPlant_pvr    =>  plt_morph%RootLenPerPlant_pvr     , &
     SecndRootXNum_rpvr    =>  plt_morph%SecndRootXNum_rpvr     , &
     SecndRootLen    =>  plt_morph%SecndRootLen     , &
     SecndRootXNum_pvr     =>  plt_morph%SecndRootXNum_pvr      , &
@@ -1002,7 +1002,7 @@ module PlantDisturbsMod
 !     RootStructBiomC_vr, PopuPlantRootC_vr=active,actual root C mass
 !     RootProteinC_pvr=root protein C mass
 !     RTN1,SecndRootXNum_pvr=number of primary,secondary root axes
-!     RootLenthDensPerPopu_pvr,RootLenPerPopu_pvr=root length density,root length per plant
+!     RootLenDensPerPlant_pvr,RootLenPerPlant_pvr=root length density,root length per plant
 !     RootVH2O_vr,RootVolume_vr=root or myco aqueous,gaseous volume
 !     RootAreaPerPlant_vr=root surface area per plant
 !     RootRespPotential_vr,RCO2N,RCO2A unlimited by O2,nonstructural C
@@ -1025,8 +1025,8 @@ module PlantDisturbsMod
             RootProteinC_pvr(N,L,NZ)=RootProteinC_pvr(N,L,NZ)*XHVST
             PrimRootXNumL_pvr(N,L,NZ)=PrimRootXNumL_pvr(N,L,NZ)*XHVST
             SecndRootXNum_pvr(N,L,NZ)=SecndRootXNum_pvr(N,L,NZ)*XHVST
-            RootLenPerPopu_pvr(N,L,NZ)=RootLenPerPopu_pvr(N,L,NZ)*XHVST
-            RootLenthDensPerPopu_pvr(N,L,NZ)=RootLenthDensPerPopu_pvr(N,L,NZ)*XHVST
+            RootLenPerPlant_pvr(N,L,NZ)=RootLenPerPlant_pvr(N,L,NZ)*XHVST
+            RootLenDensPerPlant_pvr(N,L,NZ)=RootLenDensPerPlant_pvr(N,L,NZ)*XHVST
             RootVolume_vr(N,L,NZ)=RootVolume_vr(N,L,NZ)*XHVST
             RootVH2O_vr(N,L,NZ)=RootVH2O_vr(N,L,NZ)*XHVST
             RootAreaPerPlant_vr(N,L,NZ)=RootAreaPerPlant_vr(N,L,NZ)*XHVST
@@ -1256,14 +1256,14 @@ module PlantDisturbsMod
     RCO2N    =>  plt_rbgc%RCO2N    , &
     SecndRootXNum_pvr     =>  plt_morph%SecndRootXNum_pvr    , &
     SecndRootXNum_rpvr    =>  plt_morph%SecndRootXNum_rpvr   , &
-    RootLenPerPopu_pvr    =>  plt_morph%RootLenPerPopu_pvr   , &
+    RootLenPerPlant_pvr    =>  plt_morph%RootLenPerPlant_pvr   , &
     RootAreaPerPlant_vr    =>  plt_morph%RootAreaPerPlant_vr   , &
     RootVolume_vr    =>  plt_morph%RootVolume_vr   , &
     NGTopRootLayer_pft      =>  plt_morph%NGTopRootLayer_pft     , &
     MY       =>  plt_morph%MY      , &
     CanopyHeight_pft      =>  plt_morph%CanopyHeight_pft     , &
     RootVH2O_vr   =>  plt_morph%RootVH2O_vr  , &
-    RootLenthDensPerPopu_pvr    =>  plt_morph%RootLenthDensPerPopu_pvr   , &
+    RootLenDensPerPlant_pvr    =>  plt_morph%RootLenDensPerPlant_pvr   , &
     iPlantNfixType   =>  plt_morph%iPlantNfixType  , &
     CanopyLAgrid_lyr    =>  plt_morph%CanopyLAgrid_lyr   , &
     CanopyHeightz_col       =>  plt_morph%CanopyHeightz_col      , &
@@ -2441,7 +2441,7 @@ module PlantDisturbsMod
 !     RootStructBiomC_vr, PopuPlantRootC_vr=active,actual root C mass
 !     RootProteinC_pvr=root protein C mass
 !     RTN1,SecndRootXNum_pvr=number of primary,secondary root axes
-!     RootLenthDensPerPopu_pvr,RootLenPerPopu_pvr=root length density,root length per plant
+!     RootLenDensPerPlant_pvr,RootLenPerPlant_pvr=root length density,root length per plant
 !     RootVH2O_vr,RootVolume_vr=root or myco aqueous,gaseous volume
 !     RootAreaPerPlant_vr=root surface area per plant
 !     RootRespPotential_vr,RCO2N,RCO2A unlimited by O2,nonstructural C
@@ -2464,8 +2464,8 @@ module PlantDisturbsMod
             RootProteinC_pvr(N,L,NZ)=RootProteinC_pvr(N,L,NZ)*XHVST(ielmc)
             PrimRootXNumL_pvr(N,L,NZ)=PrimRootXNumL_pvr(N,L,NZ)*XHVST(ielmc)
             SecndRootXNum_pvr(N,L,NZ)=SecndRootXNum_pvr(N,L,NZ)*XHVST(ielmc)
-            RootLenPerPopu_pvr(N,L,NZ)=RootLenPerPopu_pvr(N,L,NZ)*XHVST(ielmc)
-            RootLenthDensPerPopu_pvr(N,L,NZ)=RootLenthDensPerPopu_pvr(N,L,NZ)*XHVST(ielmc)
+            RootLenPerPlant_pvr(N,L,NZ)=RootLenPerPlant_pvr(N,L,NZ)*XHVST(ielmc)
+            RootLenDensPerPlant_pvr(N,L,NZ)=RootLenDensPerPlant_pvr(N,L,NZ)*XHVST(ielmc)
             RootVolume_vr(N,L,NZ)=RootVolume_vr(N,L,NZ)*XHVST(ielmc)
             RootVH2O_vr(N,L,NZ)=RootVH2O_vr(N,L,NZ)*XHVST(ielmc)
             RootAreaPerPlant_vr(N,L,NZ)=RootAreaPerPlant_vr(N,L,NZ)*XHVST(ielmc)

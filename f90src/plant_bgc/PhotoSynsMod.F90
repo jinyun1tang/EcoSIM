@@ -636,7 +636,7 @@ implicit none
     LeafAreaNode_brch         =>  plt_morph%LeafAreaNode_brch  , &
     RubiscoActivity_brch     =>  plt_photo%RubiscoActivity_brch     &
   )
-  write(193,*)'rubisco',NB,NZ,RubiscoActivity_brch(NB,NZ)
+!  write(193,*)'rubisco',NB,NZ,RubiscoActivity_brch(NB,NZ)
   IF(abs(RubiscoActivity_brch(NB,NZ)).GT.0._r8)THEN
     IF(SineSolarAngle.GT.0.0_r8.AND.RadPARbyCanopy_pft(NZ).GT.0.0_r8 &
       .AND.CanopyGasCO2_pft(NZ).GT.0.0_r8)THEN
@@ -649,7 +649,7 @@ implicit none
         D100: DO K=1,MaxNodesPerBranch1
           CH2O3(K)=0._r8
           CH2O4(K)=0._r8
-          write(192,*)'leafarea',K,NB,NZ,LeafAreaNode_brch(K,NB,NZ)
+!          write(192,*)'leafarea',K,NB,NZ,LeafAreaNode_brch(K,NB,NZ)
           IF(LeafAreaNode_brch(K,NB,NZ).GT.ZEROP(NZ))THEN
 !
 !             C4 PHOTOSYNTHESIS

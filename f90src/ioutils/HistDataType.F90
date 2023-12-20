@@ -265,7 +265,7 @@ implicit none
                                                                    !+RootNutUptake_pvr(ids_NO3B,1,1:JZ,NZ,NY,NX)+RootNutUptake_pvr(ids_NO3B,2,1:JZ,NZ,NY,NX))/AREA(3,1,NY,NX)
   real(r8),pointer   :: histr_2D_prtUP_PO4_vr_ptc(:,:)     !(RootNutUptake_pvr(ids_H2PO4,1,1:JZ,NZ,NY,NX)+RootNutUptake_pvr(ids_H2PO4,2,1:JZ,NZ,NY,NX) &
                                                                    !+RootNutUptake_pvr(ids_H2PO4B,1,1:JZ,NZ,NY,NX)+RootNutUptake_pvr(ids_H2PO4B,2,1:JZ,NZ,NY,NX))/AREA(3,1,NY,NX)
-  real(r8),pointer   :: histr_2D_DNS_RT_vr_ptc(:,:)     !RootLenthDensPerPopu_pvr(1,1:JZ,NZ,NY,NX)*PP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: histr_2D_DNS_RT_vr_ptc(:,:)     !RootLenDensPerPlant_pvr(1,1:JZ,NZ,NY,NX)*PP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   contains
     procedure, public :: Init  => init_hist_data
     procedure, public :: hist_update
@@ -520,7 +520,7 @@ implicit none
                                                                !+RootNutUptake_pvr(ids_NO3B,1,1:JZ,NZ,NY,NX)+RootNutUptake_pvr(ids_NO3B,2,1:JZ,NZ,NY,NX))/AREA(3,1,NY,NX)
   allocate(this%histr_2D_prtUP_PO4_vr_ptc(beg_ptc:end_ptc,1:JZ))       !(RootNutUptake_pvr(ids_H2PO4,1,1:JZ,NZ,NY,NX)+RootNutUptake_pvr(ids_H2PO4,2,1:JZ,NZ,NY,NX) &
                                                                !+RootNutUptake_pvr(ids_H2PO4B,1,1:JZ,NZ,NY,NX)+RootNutUptake_pvr(ids_H2PO4B,2,1:JZ,NZ,NY,NX))/AREA(3,1,NY,NX)
-  allocate(this%histr_2D_DNS_RT_vr_ptc(beg_ptc:end_ptc,1:JZ))       !RootLenthDensPerPopu_pvr(1,1:JZ,NZ,NY,NX)*PP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  allocate(this%histr_2D_DNS_RT_vr_ptc(beg_ptc:end_ptc,1:JZ))       !RootLenDensPerPlant_pvr(1,1:JZ,NZ,NY,NX)*PP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
 
 
   !-----------------------------------------------------------------------
@@ -1716,7 +1716,7 @@ implicit none
           this%histr_2D_prtUP_NH4_vr_ptc(nptc,L)  = (sum(RootNutUptake_pvr(ids_NH4,:,L,NZ,NY,NX))+sum(RootNutUptake_pvr(ids_NH4B,:,L,NZ,NY,NX)))/AREA(3,L,NY,NX)
           this%histr_2D_prtUP_NO3_vr_ptc(nptc,L)  = (sum(RootNutUptake_pvr(ids_NO3,:,L,NZ,NY,NX))+sum(RootNutUptake_pvr(ids_NO3B,:,L,NZ,NY,NX)))/AREA(3,L,NY,NX)
           this%histr_2D_prtUP_PO4_vr_ptc(nptc,L)  = (sum(RootNutUptake_pvr(ids_H2PO4,:,L,NZ,NY,NX))+sum(RootNutUptake_pvr(ids_H2PO4B,:,L,NZ,NY,NX)))/AREA(3,L,NY,NX)
-          this%histr_2D_DNS_RT_vr_ptc(nptc,L)  = RootLenthDensPerPopu_pvr(ipltroot,L,NZ,NY,NX)*PlantPopulation_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          this%histr_2D_DNS_RT_vr_ptc(nptc,L)  = RootLenDensPerPlant_pvr(ipltroot,L,NZ,NY,NX)*PlantPopulation_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         ENDDO
       ENDDO 
     ENDDO 

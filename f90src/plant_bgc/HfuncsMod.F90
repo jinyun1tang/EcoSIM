@@ -98,13 +98,13 @@ module HfuncsMod
 !           doInitLeafOut_brch,doPlantLeafOut_brch=flags for initializing leafout,leafoff
 !           Hours4Leafout_brch=leafout hours
 !
-        write(101,*)'plant active',I,NZ,doInitPlant_pft(NZ)==itrue
+!        write(101,*)'plant active',I,NZ,doInitPlant_pft(NZ)==itrue
         IF(iPlantCalendar_brch(ipltcal_Emerge,NumOfMainBranch_pft(NZ),NZ).NE.0 &
           .OR.doInitPlant_pft(NZ).EQ.itrue)THEN
           
           D2010: DO NB=1,NumOfBranches_pft(NZ)
             IF(iPlantBranchState_brch(NB,NZ).EQ.iLive)THEN
-              write(101,*)'live branch',NB,NZ
+!              write(101,*)'live branch',NB,NZ
               call live_branch_phenology(I,J,NB,nz)
             ENDIF
 !
@@ -293,7 +293,7 @@ module HfuncsMod
     IF(J.EQ.1.AND.PlantPopulation_pft(NZ).GT.0.0_r8)THEN
       !first hour of the day, population > 0
       IF(PSIRootTurg_vr(ipltroot,NGTopRootLayer_pft(NZ),NZ).GT.PSIMin4LeafExpansion)THEN
-        WRITE(101,*)'root is hydraulically active for expansion',NZ
+!        WRITE(101,*)'root is hydraulically active for expansion',NZ
         IF(iPlantPhenologyPattern_pft(NZ).NE.iplt_annual.OR. &
           iPlantCalendar_brch(ipltcal_InitFloral,NumOfMainBranch_pft(NZ),NZ).EQ.0)THEN
           !perennial plant or flower not initiated for annual plant 
@@ -312,7 +312,7 @@ module HfuncsMod
                   iPlantShootState_pft(NZ)=iLive
                   iPlantBranchState_brch(NB,NZ)=iLive
                   Hours4Leafout_brch(NB,NZ)=0.0_r8
-                  write(101,*)'plant shoot is alive',NB,NZ
+!                  write(101,*)'plant shoot is alive',NB,NZ
                   IF(iPlantPhenologyPattern_pft(NZ).EQ.iplt_annual)THEN
                     MatureGroup_brch(NB,NZ)=AZMAX1(MatureGroup_pft(NZ)-BranchNumber_brch(NB,NZ))
                   ELSE
@@ -339,14 +339,14 @@ module HfuncsMod
 !     NonstructalElmnts_pft: non-structural carbon
 
       IF(PSIRootTurg_vr(ipltroot,NGTopRootLayer_pft(NZ),NZ).GT.PSIMin4LeafExpansion)THEN
-        write(101,*)'root OK for leaf expansion',NZ
+!        write(101,*)'root OK for leaf expansion',NZ
         IF(NumRootAxes_pft(NZ).EQ.0.OR.ShootNodeNumber_brch(NumOfMainBranch_pft(NZ),NZ).GT.NumRootAxes_pft(NZ)/FNOD(NZ)+XTLI(NZ))THEN
           IF((NumRootAxes_pft(NZ).EQ.0 .AND. NonstructalElmnts_pft(ielmc,NZ).GT.0.0_r8) &
             .OR.(CanopyNonstructElementConc_pft(ielmc,NZ).GT.MinNonstructuralC4InitRoot_pft(NZ) & 
             .AND.MinNonstructuralC4InitRoot_pft(NZ).GT.0.0_r8))THEN
             NumRootAxes_pft(NZ)=MIN(NumOfCanopyLayers1,NumRootAxes_pft(NZ)+1)
             iPlantRootState_pft(NZ)=iLive
-            write(101,*)'plant root is active',NZ
+!            write(101,*)'plant root is active',NZ
           ENDIF
         ENDIF
       ENDIF
@@ -391,7 +391,7 @@ module HfuncsMod
     NIXBotRootLayer_pft             =>  plt_morph%NIXBotRootLayer_pft     , &
     NumOfBranches_pft               =>  plt_morph%NumOfBranches_pft     , &
     BranchNumber_brch               =>  plt_morph%BranchNumber_brch    , &
-    HypoctoylHeight_pft                 =>  plt_morph%HypoctoylHeight_pft   , &
+    HypoctoHeight_pft                 =>  plt_morph%HypoctoHeight_pft   , &
     SeedDepth_pft                   =>  plt_morph%SeedDepth_pft   , &
     CanopyStemA_pft                 =>  plt_morph%CanopyStemA_pft   , &
     NI                              =>  plt_morph%NI        &
@@ -477,19 +477,26 @@ module HfuncsMod
 !
 ! iPlantCalendar_brch(ipltcal_Emerge,=emergence date
 ! CanopyLeafArea_pft,CanopyStemA_pft=leaf,stalk areas
-! HypoctoylHeight_pft=hypocotyledon height
+! HypoctoHeight_pft=hypocotyledon height
 ! SeedDepth_pft=seeding depth
 ! PrimRootDepth=primary root depth
 ! VHeatCapCanP,WTSHT,WatByPCanopy=canopy heat capacity,mass,water content
 !
   IF(iPlantCalendar_brch(ipltcal_Emerge,NumOfMainBranch_pft(NZ),NZ).EQ.0)THEN
     ARLSP=CanopyLeafArea_pft(NZ)+CanopyStemA_pft(NZ)
-    write(101,*)'set_emergence',NZ,ARLSP
-    IF((HypoctoylHeight_pft(NZ).GT.SeedDepth_pft(NZ)).AND.(ARLSP.GT.ZEROL(NZ)) &
-      .AND.(PrimRootDepth(1,1,NZ).GT.SeedDepth_pft(NZ)+ppmc))THEN
+!    if(NZ==1)then
+!      write(193,*)'ARLSP',NZ,I,ARLSP,HypoctoHeight_pft(NZ),SeedDepth_pft(NZ),&
+!        PrimRootDepth(ipltroot,1,NZ),SeedDepth_pft(NZ)+ppmc
+!    else
+!      write(194,*)'ARLSP',NZ,I,ARLSP,HypoctoHeight_pft(NZ),SeedDepth_pft(NZ),&
+!        PrimRootDepth(ipltroot,1,NZ),SeedDepth_pft(NZ)+ppmc
+!    endif  
+!    if(I>=148)stop  
+    IF((HypoctoHeight_pft(NZ).GT.SeedDepth_pft(NZ)).AND.(ARLSP.GT.ZEROL(NZ)) &
+      .AND.(PrimRootDepth(ipltroot,1,NZ).GT.SeedDepth_pft(NZ)+ppmc))THEN
       iPlantCalendar_brch(ipltcal_Emerge,NumOfMainBranch_pft(NZ),NZ)=I
       VHeatCapCanP(NZ)=cpw*(ShootChemElmnts_pft(ielmc,NZ)*10.0E-06_r8+WatByPCanopy(NZ))
-      write(101,*)'emergence',etimer%get_curr_yearAD(),I,NumOfMainBranch_pft(NZ),NZ
+!      write(101,*)'emergence',etimer%get_curr_yearAD(),I,NumOfMainBranch_pft(NZ),NZ
     ENDIF
   ENDIF
   end associate
@@ -574,19 +581,24 @@ module HfuncsMod
 !   iPlantCalendar_brch(ipltcal_InitFloral,=date of floral initiation
 !
   ELSEIF(iPlantPhenologyType_pft(NZ).EQ.iphenotyp_coldecidu)THEN
+!    write(193,*)'doPlantLeafOut_brch(NB,NZ)',doPlantLeafOut_brch(NB,NZ),DayLenthCurrent,DayLenthPrev
     IF((DayLenthCurrent.GE.DayLenthPrev.OR.&
-      (DayLenthCurrent.LT.DayLenthPrev.AND.Hours4LeafOff_brch(NB,NZ).LT.HourThreshold4LeafOff_brch(NB,NZ))) &
+      (DayLenthCurrent.LT.DayLenthPrev.AND.Hours4LeafOff_brch(NB,NZ).LT.&
+      HourThreshold4LeafOff_brch(NB,NZ))) &
       .AND.doPlantLeafOut_brch(NB,NZ).EQ.iEnable)THEN
+      !favorable temperature for leafout
       IF(TCG(NZ).GE.TCelsChill4Leaf_pft(NZ))THEN
         Hours4Leafout_brch(NB,NZ)=Hours4Leafout_brch(NB,NZ)+1.0_r8
       ENDIF
+      !not sufficient leafout hour
       IF(Hours4Leafout_brch(NB,NZ).LT.HourThreshold4LeafOut_brch(NB,NZ))THEN
+        !unfavorable temperature
         IF(TCG(NZ).LT.TCelciusChill4Seed(NZ))THEN
           Hours4Leafout_brch(NB,NZ)=AZMAX1(Hours4Leafout_brch(NB,NZ)-1.0)
         ENDIF
       ENDIF
       IF(Hours4Leafout_brch(NB,NZ).GE.HourThreshold4LeafOut_brch(NB,NZ) &
-        .OR.(ALAT.GT.0.0.AND.I.EQ.173) &
+        .OR.(ALAT.GT.0.0_r8.AND.I.EQ.173) &
         .OR.(ALAT.LT.0.0.AND.I.EQ.355))THEN
         Hours4LeafOff_brch(NB,NZ)=0.0
       ENDIF
@@ -613,8 +625,9 @@ module HfuncsMod
       IF(TCG(NZ).LE.TCelcius4LeafOffHarden_pft(NZ))THEN
         Hours4LeafOff_brch(NB,NZ)=Hours4LeafOff_brch(NB,NZ)+1.0_r8
       ENDIF
-      IF(Hours4LeafOff_brch(NB,NZ).GE.HourThreshold4LeafOff_brch(NB,NZ).AND.doPlantLeafOut_brch(NB,NZ).EQ.iDisable)THEN
-        Hours4Leafout_brch(NB,NZ)=0.0
+      IF(Hours4LeafOff_brch(NB,NZ).GE.HourThreshold4LeafOff_brch(NB,NZ).AND.&
+        doPlantLeafOut_brch(NB,NZ).EQ.iDisable)THEN
+        Hours4Leafout_brch(NB,NZ)=0.0_r8
         doPlantLeafOut_brch(NB,NZ)=iEnable
       ENDIF
     ENDIF
@@ -939,7 +952,7 @@ module HfuncsMod
         .OR.(iPlantPhenologyPattern_pft(NZ).EQ.iplt_annual.AND.iPlantPhenologyType_pft(NZ).EQ.iphenotyp_evgreen)) &
         .AND.CanopyHeight_pft(NZ).GE.SnowDepth-ZERO &
         .AND.DayLenthCurrent.LT.DayLenthPrev))THEN
-        write(101,*)'plant init floral',etimer%get_curr_yearAD(),I,NB,NZ
+!        write(101,*)'plant init floral',etimer%get_curr_yearAD(),I,NB,NZ
         iPlantCalendar_brch(ipltcal_InitFloral,NB,NZ)=I
         NodeNumberToInitFloral_brch(NB,NZ)=ShootNodeNumber_brch(NB,NZ)
         IF(iPlantPhenologyPattern_pft(NZ).EQ.iplt_annual.AND.iPlantDevelopPattern_pft(NZ).EQ.ideterminate)THEN
@@ -964,7 +977,7 @@ module HfuncsMod
       .AND.doPlantLeafOut_brch(NB,NZ).EQ.iDisable &
       .AND.Hours4LeafOff_brch(NB,NZ).GT.HourThreshold4LeafOff_brch(NB,NZ))THEN
       iPlantCalendar_brch(ipltcal_Jointing,NB,NZ)=I
-      write(101,*)'plant jointing',etimer%get_curr_yearAD(),I,NB,NZ
+!      write(101,*)'plant jointing',etimer%get_curr_yearAD(),I,NB,NZ
     ENDIF
 !
 !   iPlantCalendar_brch(ipltcal_Elongation,=mid stem elongation
@@ -979,7 +992,7 @@ module HfuncsMod
       .AND.doPlantLeafOut_brch(NB,NZ).EQ.iDisable &
       .AND.Hours4LeafOff_brch(NB,NZ).GT.HourThreshold4LeafOff_brch(NB,NZ))THEN
       iPlantCalendar_brch(ipltcal_Elongation,NB,NZ)=I
-      write(101,*)'plant elongation, year, I, NB,NZ',etimer%get_curr_yearAD(),I,NB,NZ
+!      write(101,*)'plant elongation, year, I, NB,NZ',etimer%get_curr_yearAD(),I,NB,NZ
       IF(iPlantPhenologyPattern_pft(NZ).EQ.iplt_annual.AND.iPlantDevelopPattern_pft(NZ).NE.ideterminate)THEN
         LeafNumberAtFloralInit_brch(NB,NZ)=ShootNodeNumber_brch(NB,NZ)
       ENDIF
@@ -997,7 +1010,7 @@ module HfuncsMod
       .AND.doPlantLeafOut_brch(NB,NZ).EQ.iDisable &
       .AND.Hours4LeafOff_brch(NB,NZ).GT.HourThreshold4LeafOff_brch(NB,NZ))THEN
       iPlantCalendar_brch(ipltcal_Heading,NB,NZ)=I
-      write(101,*)'plant heading',etimer%get_curr_yearAD(),I,NB,NZ
+!      write(101,*)'plant heading',etimer%get_curr_yearAD(),I,NB,NZ
     ENDIF
 !
 !   ANTHESIS OCCURS WHEN THE NUMBER OF LEAVES THAT HAVE APPEARED
@@ -1026,7 +1039,7 @@ module HfuncsMod
       IF(NB.EQ.NumOfMainBranch_pft(NZ).OR.iPlantCalendar_brch(ipltcal_Anthesis,NumOfMainBranch_pft(NZ),NZ).NE.0)THEN
         iPlantCalendar_brch(ipltcal_Anthesis,NB,NZ)=I
         NodeNumberAtAnthesis_brch(NB,NZ)=ShootNodeNumber_brch(NB,NZ)
-        write(101,*)'plant anthesis',etimer%get_curr_yearAD(),I,NB,NZ
+!        write(101,*)'plant anthesis',etimer%get_curr_yearAD(),I,NB,NZ
       ENDIF
     ENDIF
 !
@@ -1047,7 +1060,7 @@ module HfuncsMod
       .AND.doPlantLeafOut_brch(NB,NZ).EQ.iDisable &
       .AND.Hours4LeafOff_brch(NB,NZ).GT.HourThreshold4LeafOff_brch(NB,NZ))THEN
         iPlantCalendar_brch(ipltcal_BeginSeedFill,NB,NZ)=I
-        write(101,*)'plant begin seed fill',etimer%get_curr_yearAD(),I,NB,NZ
+!        write(101,*)'plant begin seed fill',etimer%get_curr_yearAD(),I,NB,NZ
     ENDIF
 !
 !   END SEED NUMBER SET PERIOD
@@ -1057,7 +1070,7 @@ module HfuncsMod
   ELSEIF(iPlantCalendar_brch(ipltcal_SetSeedNumber,NB,NZ).EQ.0)THEN
     IF(ReprodNodeNumNormByMatrgrp_brch(NB,NZ).GT.1.00_r8*GrowStageNorm4ReprodPheno)THEN
       iPlantCalendar_brch(ipltcal_SetSeedNumber,NB,NZ)=I
-      write(101,*)'plant set seed number',etimer%get_curr_yearAD(),I,NB,NZ
+!      write(101,*)'plant set seed number',etimer%get_curr_yearAD(),I,NB,NZ
     ENDIF
 !
 !   END SEED SIZE SET PERIOD
@@ -1067,7 +1080,7 @@ module HfuncsMod
   ELSEIF(iPlantCalendar_brch(ipltcal_SetSeedMass,NB,NZ).EQ.0)THEN
     IF(ReprodNodeNumNormByMatrgrp_brch(NB,NZ).GT.1.50_r8*GrowStageNorm4ReprodPheno)THEN
       iPlantCalendar_brch(ipltcal_SetSeedMass,NB,NZ)=I
-      write(101,*)'plant set seed mass',etimer%get_curr_yearAD(),I,NB,NZ
+!      write(101,*)'plant set seed mass',etimer%get_curr_yearAD(),I,NB,NZ
     ENDIF
   ENDIF
   end associate

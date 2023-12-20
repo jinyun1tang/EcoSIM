@@ -654,7 +654,7 @@ module grosubsMod
     RootMycoNonstructElmnt_vr   =>  plt_biom%RootMycoNonstructElmnt_vr  , &
     NoduleNonstructElmnt_brch   =>  plt_biom%NoduleNonstructElmnt_brch  , &
     NoduleChemElmnts_pft    =>  plt_biom%NoduleChemElmnts_pft   , &
-    RootStructChemElmnt_pft   =>  plt_biom%RootStructChemElmnt_pft  , &
+    RootStructElmnt_pft   =>  plt_biom%RootStructElmnt_pft  , &
     RootElmnts_pft    =>  plt_biom%RootElmnts_pft   , &
     CanopyNoduleChemElmnt_brch   =>  plt_biom%CanopyNoduleChemElmnt_brch  , &
     ShootChemElmnt_brch  =>  plt_biom%ShootChemElmnt_brch , &
@@ -737,9 +737,9 @@ module grosubsMod
     EarChemElmnts_pft(NE,NZ)=sum(EarChemElmnts_brch(NE,1:NumOfBranches_pft(NZ),NZ))
     !root state variables
     RootElmnts_pft(NE,NZ)=sum(RootMycoNonstructElmnt_vr(NE,1:MY(NZ),NU:MaxNumRootLays,NZ))
-    RootStructChemElmnt_pft(NE,NZ)=sum(Root1stStructChemElmnt_pvr(NE,1:MY(NZ),NU:MaxNumRootLays,1:NumRootAxes_pft(NZ),NZ)) &
+    RootStructElmnt_pft(NE,NZ)=sum(Root1stStructChemElmnt_pvr(NE,1:MY(NZ),NU:MaxNumRootLays,1:NumRootAxes_pft(NZ),NZ)) &
       +sum(Root2ndStructChemElmnt_pvr(NE,1:MY(NZ),NU:MaxNumRootLays,1:NumRootAxes_pft(NZ),NZ))
-    RootElmnts_pft(NE,NZ)=RootElmnts_pft(NE,NZ)+RootStructChemElmnt_pft(NE,NZ)
+    RootElmnts_pft(NE,NZ)=RootElmnts_pft(NE,NZ)+RootStructElmnt_pft(NE,NZ)
   ENDDO
 
   CanopyStalkC_pft(NZ)=sum(StalkBiomassC_brch(1:NumOfBranches_pft(NZ),NZ))

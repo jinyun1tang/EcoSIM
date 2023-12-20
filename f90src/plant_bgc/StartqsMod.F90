@@ -470,7 +470,7 @@ module StartqsMod
     PrimRootSpecLen           =>  plt_morph%PrimRootSpecLen  , &
     RootPorosity              =>  plt_morph%RootPorosity   , &
     RootPoreTortu4Gas         =>  plt_morph%RootPoreTortu4Gas   , &
-    RRADP                     =>  plt_morph%RRADP   , &
+    RootRaidus_rpft                     =>  plt_morph%RootRaidus_rpft   , &
     RootVolPerMassC_pft       =>  plt_morph%RootVolPerMassC_pft    , &
     RSRA                      =>  plt_morph%RSRA    , &
     NIXBotRootLayer_rpft      =>  plt_morph%NIXBotRootLayer_rpft    , &
@@ -526,14 +526,14 @@ module StartqsMod
   RSRA(2,NZ)=1.0E+12_r8
 !
 !     RootPoreTortu4Gas=tortuosity for gas transport
-!     RRADP=path length for radial diffusion within root (m)
+!     RootRaidus_rpft=path length for radial diffusion within root (m)
 !     RootVolPerMassC_pft=volume:C ratio (m3 g-1)
 !     PrimRootSpecLen,SecndRootSpecLen=specific primary,secondary root length (m g-1)
 !     PrimRootXSecArea,SecndRootXSecArea=specific primary,secondary root area (m2 g-1)
 !
   D500: DO N=1,2
     RootPoreTortu4Gas(N,NZ)=RootPorosity(N,NZ)**1.33_r8
-    RRADP(N,NZ)=LOG(1.0_r8/SQRT(AMAX1(0.01_r8,RootPorosity(N,NZ))))
+    RootRaidus_rpft(N,NZ)=LOG(1.0_r8/SQRT(AMAX1(0.01_r8,RootPorosity(N,NZ))))
     RootVolPerMassC_pft(N,NZ)=ppmc/(0.05_r8*(1.0_r8-RootPorosity(N,NZ)))
     PrimRootSpecLen(N,NZ)=RootVolPerMassC_pft(N,NZ)/(PICON*Max1stRootRadius(N,NZ)**2._r8)
     SecndRootSpecLen(N,NZ)=RootVolPerMassC_pft(N,NZ)/(PICON*Max2ndRootRadius(N,NZ)**2._r8)
@@ -609,7 +609,7 @@ module StartqsMod
     LeafAreaZsec_brch    =>  plt_morph%LeafAreaZsec_brch   , &
     LeafAreaNode_brch   =>  plt_morph%LeafAreaNode_brch  , &
     CanPBranchHeight  =>  plt_morph%CanPBranchHeight , &
-    HypoctoylHeight_pft   =>  plt_morph%HypoctoylHeight_pft  , &
+    HypoctoHeight_pft   =>  plt_morph%HypoctoHeight_pft  , &
     BranchNumber_brch    =>  plt_morph%BranchNumber_brch   , &
     NodeNumberToInitFloral_brch   =>  plt_morph%NodeNumberToInitFloral_brch  , &
     KLEAFX  =>  plt_morph%KLEAFX , &
@@ -626,7 +626,7 @@ module StartqsMod
   plt_pheno%iPlantRootState_pft(NZ)=iDead
   BranchNumber_pft(NZ)=0
   NumOfBranches_pft(NZ)=0
-  HypoctoylHeight_pft(NZ)=0._r8
+  HypoctoHeight_pft(NZ)=0._r8
   CanopyHeight_pft(NZ)=0._r8
   D10: DO NB=1,MaxNumBranches
     plt_pheno%doInitLeafOut_brch(NB,NZ)=0
@@ -747,7 +747,7 @@ module StartqsMod
   plt_biom%HuskChemElmnts_pft(1:NumOfPlantChemElmnts,NZ)=0._r8
   plt_biom%EarChemElmnts_pft(1:NumOfPlantChemElmnts,NZ)=0._r8
   plt_biom%GrainChemElmnts_pft(1:NumOfPlantChemElmnts,NZ)=0._r8
-  plt_biom%RootStructChemElmnt_pft(1:NumOfPlantChemElmnts,NZ)=0._r8
+  plt_biom%RootStructElmnt_pft(1:NumOfPlantChemElmnts,NZ)=0._r8
   plt_biom%NoduleChemElmnts_pft(1:NumOfPlantChemElmnts,NZ)=0._r8
   plt_biom%CanopyLeafShethC_pft(NZ)=0._r8
   CanopyLeafArea_pft(NZ)=0._r8
@@ -938,8 +938,8 @@ module StartqsMod
       RootProteinC_pvr(N,L,NZ)=0._r8
       plt_morph%PrimRootXNumL_pvr(N,L,NZ)=0._r8
       plt_morph%SecndRootXNum_pvr(N,L,NZ)=0._r8
-      plt_morph%RootLenPerPopu_pvr(N,L,NZ)=0._r8
-      plt_morph%RootLenthDensPerPopu_pvr(N,L,NZ)=0._r8
+      plt_morph%RootLenPerPlant_pvr(N,L,NZ)=0._r8
+      plt_morph%RootLenDensPerPlant_pvr(N,L,NZ)=0._r8
       RootVolume_vr(N,L,NZ)=0._r8
       RootVH2O_vr(N,L,NZ)=0._r8
       PrimRootRadius_pvr(N,L,NZ)=Max1stRootRadius(N,NZ)
@@ -1002,7 +1002,7 @@ module StartqsMod
   plt_rbgc%RootNutUptake_pvr(ids_NH4B,1:2,NL+1:JZ1,NZ)=0._r8
   plt_rbgc%RootNutUptake_pvr(ids_H2PO4,1:2,NL+1:JZ1,NZ)=0._r8
   plt_rbgc%RootNutUptake_pvr(ids_H2PO4B,1:2,NL+1:JZ1,NZ)=0._r8
-  plt_morph%RootLenthDensPerPopu_pvr(1:2,NL+1:JZ1,NZ)=0._r8
+  plt_morph%RootLenDensPerPlant_pvr(1:2,NL+1:JZ1,NZ)=0._r8
   end associate
   end subroutine InitRootMychorMorphoBio
 !------------------------------------------------------------------------------------------
