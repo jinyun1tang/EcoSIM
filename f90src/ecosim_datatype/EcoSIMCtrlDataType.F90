@@ -19,7 +19,6 @@ module EcoSIMCtrlDataType
   integer :: NPY             !number of cycles per NPX for gas flux calculations
   integer :: IGO             !flag for first scenario
   integer :: IDAYR           !day of recovery from earlier run
-  integer :: IYRC            !current year
   integer :: IYRR            !year of recovery from earlier run
   integer :: NYR             !flag for new year
   integer :: ITERM           !end date for reading weather data
@@ -35,7 +34,7 @@ module EcoSIMCtrlDataType
   integer :: LYRC            !number of days in current year
   integer :: LYRG            !num_of_simdays, defined for regression tests
 
-  integer :: iYear_cur        !current year
+  integer :: iYearCurrent     !current year
   integer :: iyear_pre        !previous year
   integer :: iyear_rest       !restart year
   contains

@@ -11,18 +11,18 @@ module GrosubPars
 ! VMXC=rate constant for nonstructural C oxidation in respiration (h-1)
 ! FSNR=rate constant for litterfall at end of growing season (h-1)
 ! Hours4PhyslMature=number of hours with no grain filling required for physilogical maturity
-! FLGZX=number of hours until full senescence after physl maturity
+! Hours4FullSenescence=number of hours until full senescence after physl maturity
 ! XFRX=maximum storage C content for remobiln from stalk,root reserves
 ! XFRY=rate const for remobiln to storage from stalk,root reserves (h-1)
-! IFLGQ,IFLGQX=current,required hours after physl maturity until start of litterfall
+! Hours4LiterfalAftMature_brch,HoursReq4LiterfalAftMature=current,required hours after physl maturity until start of litterfall
 ! FSNK=min ratio of branch or mycorrhizae to root for calculating C transfer
 ! FXFS=rate constant for remobilization of stalk C,N,P (h-1)
 ! FMYC=rate constant for root-mycorrhizal C,N,P exchange (h-1)
 !
 !
 !     CNKI,CPKI=nonstructural N,P inhibition constant on growth (g N,P g-1 C)
-!     RMPLT=specific maintenance respiration rate (g C g-1 N h-1)
-!     PSILM=minimum water potential for organ expansion,extension (MPa)
+!     RmSpecPlant=specific maintenance respiration rate (g C g-1 N h-1)
+!     PSIMin4OrganExtension=minimum water potential for organ expansion,extension (MPa)
 !     RCMN=minimum stomatal resistance to CO2 (s m-1)
 !     RTDPX=distance behind growing point for secondary roots (m)
 !     MinAve2ndRootLen=minimum average secondary root length (m)
@@ -34,7 +34,7 @@ module GrosubPars
 !     ELEC3,ELEC4=e- requirement for CO2 fixn by rubisco,PEP carboxylase
 !     (umol e- umol CO2)
 !     CO2KI=Ki for C3 leakage from bundle sheath to mesophyll in C4 (uM)
-!     FCO2B,FHCOB=partition decarboxylation,leakage to CO2,HCO3 in C4
+!     FCMassCO2BundleSheath_node,FCMassHCO3BundleSheath_node=partition decarboxylation,leakage to CO2,HCO3 in C4
 !     COMP4=C4 CO2 compensation point (uM)
 !     FDML=leaf water content (g H2O g-1 C)
 !     FBS,FMP=leaf water content in bundle sheath, mesophyll in C4 CO2 fixn
@@ -58,7 +58,7 @@ module GrosubPars
 !     VMXO=specific respiration rate by bacterial N2 fixers (g g-1 h-1)
 !     SPNDL=specific decomposition rate by canopy,root bacterial N2 fixers (g g-1 h-1)
 !     CCNGB,CCNGR=parameters to calculate nonstructural C,N,P exchange between bacteria and branch,root
-!     WTNDI=initial bacterial mass at infection (g C m-2)
+!     NoduleBiomCatInfection=initial bacterial mass at infection (g C m-2)
 !     CZKM,CPKM=Km for nonstructural N,P uptake by bacteria (g N,P g-1 C)
 !     RCCZR,RCCYR=min,max fractions for root C recycling
 !     RCCXR,RCCQR=max fractions for root N,P recycling
@@ -72,7 +72,7 @@ module GrosubPars
   real(r8) :: VMXC
   real(r8) :: FSNR
   real(r8) :: Hours4PhyslMature
-  real(r8) :: FLGZX
+  real(r8) :: Hours4FullSenescence
   real(r8) :: XFRX
   real(r8) :: XFRY
   real(r8) :: FSNK
@@ -80,8 +80,8 @@ module GrosubPars
   real(r8) :: FMYC
   real(r8) :: CNKI
   real(r8) :: CPKI
-  real(r8) :: RMPLT
-  real(r8) :: PSILM
+  real(r8) :: RmSpecPlant
+  real(r8) :: PSIMin4OrganExtension
   real(r8) :: RCMN
   real(r8) :: RTDPX
   real(r8) :: MinAve2ndRootLen
@@ -93,8 +93,8 @@ module GrosubPars
   real(r8) :: ELEC3
   real(r8) :: ELEC4
   real(r8) :: CO2KI
-  real(r8) :: FCO2B
-  real(r8) :: FHCOB
+  real(r8) :: FCMassCO2BundleSheath_node
+  real(r8) :: FCMassHCO3BundleSheath_node
   real(r8) :: COMP4
   real(r8) :: FDML
   real(r8) :: FBS
@@ -126,7 +126,7 @@ module GrosubPars
   real(r8) :: SPNDL
   real(r8) :: CCNGR
   real(r8) :: CCNGB
-  real(r8) :: WTNDI
+  real(r8) :: NoduleBiomCatInfection
   real(r8) :: CZKM
   real(r8) :: CPKM
   real(r8) :: RCCZR
@@ -138,7 +138,7 @@ module GrosubPars
   real(r8) :: RCCXN
   real(r8) :: RCCQN
 
-  integer :: IFLGQX
+  integer :: HoursReq4LiterfalAftMature
   REAL(R8) :: FRSV(0:3),FXFY(0:1),FXFZ(0:1)
   real(r8) :: FXFB(0:3),FXFR(0:3),FXRT(0:1),FXSH(0:1),FXRN(6)
   REAL(R8) :: RCCX(0:3),RCCQ(0:3)
@@ -148,31 +148,36 @@ module GrosubPars
   real(r8) :: GVMX(0:1)
   real(r8) :: RTSK(0:3)
   character(len=6), allocatable :: pftss(:)
+  character(len=40),allocatable :: pft_long(:)
+  character(len=4), allocatable :: pft_short(:)
+  character(len=2), allocatable :: koppen_clim_no(:)
+  character(len=3), allocatable :: koppen_clim_short(:)
+  character(len=64),allocatable :: koppen_clim_long(:)
   type, public :: plant_bgc_par_type
    !nonstructural(0,*),
    !     foliar(1,*),non-foliar(2,*),stalk(3,*),root(4,*), coarse woody (5,*)
-  integer :: instruct
+  integer :: inonstruct
   integer :: ifoliar
-  integer :: infoliar
+  integer :: inonfoliar
   integer :: istalk
   integer :: iroot
   integer :: icwood
-  integer :: NumGrothStages       !number of growth stages
-  integer :: JRS          !maximum number of root axes
+  integer :: NumGrowthStages       !number of growth stages
+  integer :: MaxNumRootAxes          !maximum number of root axes
   integer  :: JP1         !number of plants
-  integer  :: JBR         !maximum number of branches
-  integer  :: JSA1        !number of sectors for the sky azimuth  [0,2*pi]
-  integer  :: jcplx       !number of organo-microbial complexes
-  integer  :: JLA1        !number of sectors for the leaf azimuth, [0,pi]
+  integer  :: MaxNumBranches         !maximum number of branches
+  integer  :: NumOfSkyAzimuSects1        !number of sectors for the sky azimuth  [0,2*pi]
+  integer  :: jcplx       !number of organo-microbial CO2CompenPoint_nodeexes
+  integer  :: NumOfLeafAzimuthSectors        !number of sectors for the leaf azimuth, [0,pi]
   integer  :: NumOfCanopyLayers1         !number of canopy layers
   integer  :: JZ1         !number of soil layers
-  integer  :: JLI1        !number of sectors for the leaf zenith [0,pi/2]
-  integer  :: JNODS1      !number of canopy nodes
+  integer  :: NumOfLeafZenithSectors1        !number of sectors for the leaf zenith [0,pi/2]
+  integer  :: MaxNodesPerBranch1      !number of canopy nodes
   integer  :: jsken       !number of kinetic components in litter,  PROTEIN(*,1),CH2O(*,2),CELLULOSE(*,3),LIGNIN(*,4) IN SOIL LITTER
-  integer  :: Jlitgrp     !number of litter groups nonstructural(0,*),
+  integer  :: NumLitterGroups     !number of litter groups nonstructural(0,*),
                           !     foliar(1,*),non-foliar(2,*),stalk(3,*),root(4,*), coarse woody (5,*)
-  integer  :: JPRT        !number of plant organs
-  integer  :: NumOfPlantLitrCmplxs  !number of plant litter microbial-om complexes
+  integer  :: NumOfPlantMorphUnits        !number of plant organs
+  integer  :: NumOfPlantLitrCmplxs  !number of plant litter microbial-om CO2CompenPoint_nodeexes
   integer :: iprotein
   integer :: icarbhyro
   integer :: icellulos
@@ -192,6 +197,8 @@ module GrosubPars
   implicit none
   type(plant_bgc_par_type)  :: pltpar
   integer :: npfts
+  integer :: npft
+  integer :: nkopenclms
 
   if(.not. file_exists(pft_file_in))then
     !call endrun(msg='Fail to locate plant trait file specified by pft_file_in in ' &
@@ -200,20 +207,31 @@ module GrosubPars
     npfts=1
   else
     npfts=get_dim_len(pft_file_in, 'npfts')
+    npft=get_dim_len(pft_file_in, 'npft')
+    nkopenclms=get_dim_len(pft_file_in,'nkopenclms')
     allocate(pftss(npfts))
-
+    allocate(pft_long(npft))
+    allocate(pft_short(npft))
+    allocate(koppen_clim_no(nkopenclms))
+    allocate(koppen_clim_short(nkopenclms))
+    allocate(koppen_clim_long(nkopenclms))
     call ncd_pio_openfile(pft_nfid, pft_file_in, ncd_nowrite)
     call ncd_getvar(pft_nfid, 'pfts', pftss)
+    call ncd_getvar(pft_nfid,'pfts_long',pft_long)
+    call ncd_getvar(pft_nfid,'pfts_short',pft_short)
+    call ncd_getvar(pft_nfid,'koppen_clim_no',koppen_clim_no)
+    call ncd_getvar(pft_nfid,'koppen_clim_short',koppen_clim_short)
+    call ncd_getvar(pft_nfid,'koppen_clim_long',koppen_clim_long)
   endif
-  pltpar%instruct=0
+  pltpar%inonstruct=0
   pltpar%ifoliar=1
-  pltpar%infoliar=2
+  pltpar%inonfoliar=2
   pltpar%istalk=3
   pltpar%iroot=4
   pltpar%icwood=5
-  pltpar%NumGrothStages=10
-  pltpar%JRS=10
-  pltpar%JPRT=7
+  pltpar%NumGrowthStages=10
+  pltpar%MaxNumRootAxes=10
+  pltpar%NumOfPlantMorphUnits=7
   pltpar%jroots=2
 
   PART1X=0.05_r8
@@ -221,7 +239,7 @@ module GrosubPars
   VMXC=0.015_r8
   FSNR=2.884E-03_r8
   Hours4PhyslMature=168.0_r8
-  FLGZX=240.0_r8
+  Hours4FullSenescence=240.0_r8
   XFRX=2.5E-02_r8
   XFRY=2.5E-03_r8
   FSNK=0.05_r8
@@ -229,8 +247,8 @@ module GrosubPars
   FMYC=0.1_r8
   CNKI=1.0E-01_r8
   CPKI=1.0E-02_r8
-  RMPLT=0.010_r8
-  PSILM=0.1_r8
+  RmSpecPlant=0.010_r8
+  PSIMin4OrganExtension=0.1_r8
   RCMN=1.560E+01_r8
   RTDPX=0.00_r8
   MinAve2ndRootLen=1.0E-03_r8
@@ -242,8 +260,8 @@ module GrosubPars
   ELEC3=4.5_r8
   ELEC4=3.0_r8
   CO2KI=1.0E+03_r8
-  FCO2B=0.02_r8
-  FHCOB=1.0_r8-FCO2B
+  FCMassCO2BundleSheath_node=0.02_r8
+  FCMassHCO3BundleSheath_node=1.0_r8-FCMassCO2BundleSheath_node
   COMP4=0.5_r8
   FDML=6.0_r8
   FBS=0.2_r8*FDML
@@ -275,7 +293,7 @@ module GrosubPars
   SPNDL=5.0E-04_r8
   CCNGR=2.5E-01_r8
   CCNGB=6.0E-04_r8
-  WTNDI=1.0E-03_r8
+  NoduleBiomCatInfection=1.0E-03_r8
   CZKM=2.5E-03_r8
   CPKM=2.5E-04_r8
   RCCZR=0.056_r8
@@ -287,7 +305,7 @@ module GrosubPars
   RCCXN=0.833_r8
   RCCQN=0.833_r8
 
-  IFLGQX=960
+  HoursReq4LiterfalAftMature=960
 
 
   RCCZ=real((/0.167,0.167,0.167,0.056/),r8)
@@ -308,19 +326,35 @@ module GrosubPars
   end subroutine InitVegPars
 !------------------------------------------------------------------------------------------
 
-  function get_pft_loc(pft_name)result(loc)
+  function get_pft_loc(pft_name,pft_lname,koppen_climl,koppen_clims)result(loc)
 !
 !!DESCRIPTION
 ! return the id of pft to be read
   implicit none
   character(len=6), intent(in) :: pft_name
-
-  integer :: loc
+  character(len=40),intent(out):: pft_lname
+  character(len=64),intent(out):: koppen_climl
+  character(len=3), intent(out):: koppen_clims
+  integer :: loc,loc1
 
   loc=1
   DO
     if(pftss(loc)==pft_name)exit
     loc=loc+1
   enddo
+  loc1=1
+  do 
+    if(pft_name(1:4)==pft_short(loc1))exit
+    loc1=loc1+1
+  enddo
+  pft_lname=pft_long(loc1)
+
+  loc1=1
+  do
+    if(koppen_clim_no(loc1)==pft_name(5:6))exit
+    loc1=loc1+1
+  enddo
+  koppen_climl=koppen_clim_long(loc1)
+  koppen_clims=koppen_clim_short(loc1)
   end function get_pft_loc
 end module GrosubPars

@@ -13,10 +13,10 @@ contains
   subroutine SetMesh(NHW,NVN,NHE,NVS)
 
   use EcoSIMConfig, only : column_mode
-  use EcoSIMCtrlMod,only : grid_file_in
+  use EcoSIMCtrlMod,only : grid_file_in,lverb
   use ncdio_pio
   use netcdf
-  USE fileUtil, ONLY : iulog
+  USE fileUtil  , ONLY : iulog
   use abortutils, only : endrun
   use GridConsts, only : JX,JY,JZ,JH,JV,JD,bounds,JP,JX0,JY0
 !  set up the landscape rectangular mesh
@@ -41,11 +41,12 @@ contains
   logical :: readvar
 
   call ncd_pio_openfile(grid_nfid, grid_file_in, ncd_nowrite)
-
+  write(*,*)'open file ok',grid_file_in
   bounds%ngrid=get_dim_len(grid_nfid, 'ngrid')
 
   bounds%ntopou=get_dim_len(grid_nfid, 'ntopou')
 
+  write(*,*)bounds%ngrid
   call check_var(grid_nfid, 'NHW', vardesc, readvar)
   if(.not. readvar)then
     call endrun('fail to find NHW in '//trim(mod_filename), __LINE__)
@@ -71,7 +72,7 @@ contains
   call check_ret(nf90_get_var(grid_nfid%fh, vardesc%varid, NVS), 'in '//trim(mod_filename))
 
   call ncd_pio_closefile(grid_nfid)
-
+  if(lverb)write(*,*)'read grid finished'
   bounds%NHW =NHW
   bounds%NVN =NVN
   bounds%NHE =NHE

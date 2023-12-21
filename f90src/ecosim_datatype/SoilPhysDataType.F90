@@ -16,7 +16,7 @@ implicit none
   real(r8),target,allocatable ::  PSIAtWiltPoint(:,:)                         !water potentials at wilting point [MPa]
   real(r8),target,allocatable ::  THW(:,:,:)                         !initial soil water content
   real(r8),target,allocatable ::  THI(:,:,:)                         !initial ice content
-  REAL(R8),target,allocatable ::  ALBX(:,:)                          !Surface albedo
+  REAL(R8),target,allocatable ::  SurfAlbedo_col(:,:)                          !Surface albedo
   real(r8),target,allocatable ::  LOGPOROS(:,:,:)                         !log soil porosity	-
   real(r8),target,allocatable ::  LOGFldCapacity(:,:,:)                         !log water content at field capacity
   real(r8),target,allocatable ::  LOGWiltPoint(:,:,:)                         !log water content at wilting point
@@ -47,7 +47,7 @@ contains
   allocate(PSIAtWiltPoint(JY,JX));       PSIAtWiltPoint=0._r8
   allocate(THW(JZ,JY,JX));      THW=0._r8
   allocate(THI(JZ,JY,JX));      THI=0._r8
-  allocate(ALBX(JY,JX));        ALBX=0._r8
+  allocate(SurfAlbedo_col(JY,JX));        SurfAlbedo_col=0._r8
   allocate(LOGPOROS(0:JZ,JY,JX));    LOGPOROS=0._r8
   allocate(LOGFldCapacity(0:JZ,JY,JX));    LOGFldCapacity=0._r8
   allocate(LOGWiltPoint(0:JZ,JY,JX));    LOGWiltPoint=0._r8
@@ -78,7 +78,7 @@ contains
   call destroy(PSIAtWiltPoint)
   call destroy(THW)
   call destroy(THI)
-  call destroy(ALBX)
+  call destroy(SurfAlbedo_col)
   call destroy(LOGPOROS)
   call destroy(LOGFldCapacity)
   call destroy(LOGWiltPoint)

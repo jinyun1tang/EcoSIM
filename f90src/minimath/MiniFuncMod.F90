@@ -83,7 +83,7 @@ implicit none
   end function TortMacporeW
 
 !------------------------------------------------------------------------------------------
-  pure function fDFGS(scalar,THETWA,Z3SR,is_litter)result(ans)
+  pure function fDiffusivitySolutEff(scalar,THETWA,Z3SR,is_litter)result(ans)
 !
 ! compute coefficient for air-water gas transfer
   implicit none
@@ -120,7 +120,7 @@ implicit none
       ans=AMIN1(1.0_r8,scalar/((Z1S**(-1._r8))*EXP(Z2SD*(THETWA-Z3S))))
     ENDIF
   endif
-  end function fDFGS
+  end function fDiffusivitySolutEff
 !------------------------------------------------------------------------------------------
   pure function fOFFSET(atcs)result(ans)
   implicit none
@@ -132,19 +132,22 @@ implicit none
   end function fOFFSET
 
 !------------------------------------------------------------------------------------------
-  function GetDayLength(ALAT,XI,DECLIN)result(DYL)
+  function GetDayLength(ALAT,I,DECLIN)result(DYL)
 ! Description:
 ! CALCULATE MAXIMUM DAYLENTH FOR PLANT PHENOLOGY
   implicit none
-  real(r8), intent(in) :: ALAT,XI
+  real(r8), intent(in) :: ALAT   !latitude in degree
+  integer, intent(in) :: I      !day of year
   real(r8), optional, intent(out) :: DECLIN
   real(r8) :: DYL
-  real(r8) :: DECDAY,AZI,DEC,DECLIN1
+  real(r8) :: AZI,DEC,DECLIN1
+  !the following calculation makes Sep 22 and Mar 23 as the 
+  !days that has solar declination close to zero.
+  !0.9863=360./365
 
-  DECDAY=XI+100._r8
-  DECLIN1=SIN((DECDAY*0.9863_r8)*1.7453E-02_r8)*(-23.47_r8)
-  AZI=SIN(ALAT*1.7453E-02_r8)*SIN(DECLIN1*1.7453E-02_r8)
-  DEC=COS(ALAT*1.7453E-02_r8)*COS(DECLIN1*1.7453E-02_r8)
+  DECLIN1=get_sun_declin(I)
+  AZI=SIN(ALAT*RadianPerDegree)*SIN(DECLIN1*RadianPerDegree)
+  DEC=COS(ALAT*RadianPerDegree)*COS(DECLIN1*RadianPerDegree)
   IF(AZI/DEC.GE.1.0_r8-TWILGT)THEN
     DYL=24.0_r8
   ELSEIF(AZI/DEC.LE.-1.0_r8+TWILGT)THEN
@@ -154,5 +157,20 @@ implicit none
   ENDIF
   if(present(DECLIN))DECLIN=DECLIN1
   end function GetDayLength
+!------------------------------------------------------------------------------------------
+
+  function get_sun_declin(I)result(DECLIN)
+  implicit none
+  integer, intent(in) :: I  !day of year
+  real(r8)  :: XI     
+  real(r8) :: decday
+  real(r8) :: DECLIN
+
+  XI=I
+  IF(I.EQ.366)XI=365.5_r8
+  DECDAY=XI+100._r8
+  DECLIN=SIN((DECDAY*0.9863_r8)*RadianPerDegree)*(-23.47_r8)
+
+  end function get_sun_declin
 !------------------------------------------------------------------------------------------
 end module MiniFuncMod

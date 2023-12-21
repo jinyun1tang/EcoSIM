@@ -59,10 +59,7 @@ module TillageMixMod
   real(r8) :: TORC(ndbiomcp,1:jcplx)
   real(r8) :: TORN(ndbiomcp,1:jcplx)
   real(r8) :: TORP(ndbiomcp,1:jcplx)
-  real(r8) :: TOQC(1:jcplx)
-  real(r8) :: TOQN(1:jcplx)
-  real(r8) :: TOQP(1:jcplx)
-  real(r8) :: TOQA(1:jcplx)
+  real(r8) :: TDOM(idom_beg:idom_end,1:jcplx)
   real(r8) :: TOHC(1:jcplx)
   real(r8) :: TOHN(1:jcplx)
   real(r8) :: TOHP(1:jcplx)
@@ -96,12 +93,13 @@ module TillageMixMod
   real(r8) :: DC,DN,DP,OC,ON,OP
   real(r8) :: TVOLI,HFLXD
   real(r8) :: FI,TI,TX,TL
-  integer  :: NTX,NTP,NTG,NTSA,NTN
+  integer  :: NTX,NTP,NTG,NTSA,NTN,idom
+
 !     begin_execution
 !
   !DCORP=soil mixing fraction with tillage
   !XCORP=factor for surface litter incorporation and soil mixing
-  IF(J.EQ.INT(ZNOON(NY,NX)).AND.XCORP(NY,NX).LT.1.0.AND.DCORP(I,NY,NX).GT.0.0_r8)THEN
+  IF(J.EQ.INT(SolarNoonHour_col(NY,NX)).AND.XCORP(NY,NX).LT.1.0.AND.DCORP(I,NY,NX).GT.0.0_r8)THEN
 !
 !     EXTENT OF MIXING
 !
@@ -149,10 +147,7 @@ module TillageMixMod
     TORC=0.0_r8
     TORN=0.0_r8
     TORP=0.0_r8
-    TOQC=0.0_r8
-    TOQN=0.0_r8
-    TOQP=0.0_r8
-    TOQA=0.0_r8
+    TDOM=0.0_r8
     TOHC=0.0_r8
     TOHN=0.0_r8
     TOHP=0.0_r8
@@ -229,14 +224,14 @@ module TillageMixMod
         DN=DN+ORN(M,K,0,NY,NX)
         DP=DP+ORP(M,K,0,NY,NX)
       ENDDO
-      TOQGC(K)=OQC(K,0,NY,NX)*CORP0
-      TOQGN(K)=OQN(K,0,NY,NX)*CORP0
-      TOQGP(K)=OQP(K,0,NY,NX)*CORP0
-      TOQGA(K)=OQA(K,0,NY,NX)*CORP0
-      TOQHC(K)=OQCH(K,0,NY,NX)*CORP0
-      TOQHN(K)=OQNH(K,0,NY,NX)*CORP0
-      TOQHP(K)=OQPH(K,0,NY,NX)*CORP0
-      TOQHA(K)=OQAH(K,0,NY,NX)*CORP0
+      TOQGC(K)=DOM(idom_doc,K,0,NY,NX)*CORP0
+      TOQGN(K)=DOM(idom_don,K,0,NY,NX)*CORP0
+      TOQGP(K)=DOM(idom_dop,K,0,NY,NX)*CORP0
+      TOQGA(K)=DOM(idom_acetate,K,0,NY,NX)*CORP0
+      TOQHC(K)=DOM_Macp(idom_doc,K,0,NY,NX)*CORP0
+      TOQHN(K)=DOM_Macp(idom_don,K,0,NY,NX)*CORP0
+      TOQHP(K)=DOM_Macp(idom_dop,K,0,NY,NX)*CORP0
+      TOQHA(K)=DOM_Macp(idom_acetate,K,0,NY,NX)*CORP0
       TOHGC(K)=OHC(K,0,NY,NX)*CORP0
       TOHGN(K)=OHN(K,0,NY,NX)*CORP0
       TOHGP(K)=OHP(K,0,NY,NX)*CORP0
@@ -244,22 +239,22 @@ module TillageMixMod
   !
   !     REDUCE SURFACE RESIDUE STATE VARIABLES FOR INCORPORATION
   !
-      OQC(K,0,NY,NX)=OQC(K,0,NY,NX)*XCORP0
-      OQN(K,0,NY,NX)=OQN(K,0,NY,NX)*XCORP0
-      OQP(K,0,NY,NX)=OQP(K,0,NY,NX)*XCORP0
-      OQA(K,0,NY,NX)=OQA(K,0,NY,NX)*XCORP0
-      OQCH(K,0,NY,NX)=OQCH(K,0,NY,NX)*XCORP0
-      OQNH(K,0,NY,NX)=OQNH(K,0,NY,NX)*XCORP0
-      OQPH(K,0,NY,NX)=OQPH(K,0,NY,NX)*XCORP0
-      OQAH(K,0,NY,NX)=OQAH(K,0,NY,NX)*XCORP0
+      DOM(idom_doc,K,0,NY,NX)=DOM(idom_doc,K,0,NY,NX)*XCORP0
+      DOM(idom_don,K,0,NY,NX)=DOM(idom_don,K,0,NY,NX)*XCORP0
+      DOM(idom_dop,K,0,NY,NX)=DOM(idom_dop,K,0,NY,NX)*XCORP0
+      DOM(idom_acetate,K,0,NY,NX)=DOM(idom_acetate,K,0,NY,NX)*XCORP0
+      DOM_Macp(idom_doc,K,0,NY,NX)=DOM_Macp(idom_doc,K,0,NY,NX)*XCORP0
+      DOM_Macp(idom_don,K,0,NY,NX)=DOM_Macp(idom_don,K,0,NY,NX)*XCORP0
+      DOM_Macp(idom_dop,K,0,NY,NX)=DOM_Macp(idom_dop,K,0,NY,NX)*XCORP0
+      DOM_Macp(idom_acetate,K,0,NY,NX)=DOM_Macp(idom_acetate,K,0,NY,NX)*XCORP0
       OHC(K,0,NY,NX)=OHC(K,0,NY,NX)*XCORP0
       OHN(K,0,NY,NX)=OHN(K,0,NY,NX)*XCORP0
       OHP(K,0,NY,NX)=OHP(K,0,NY,NX)*XCORP0
       OHA(K,0,NY,NX)=OHA(K,0,NY,NX)*XCORP0
-      DC=DC+OQC(K,0,NY,NX)+OQCH(K,0,NY,NX)+OHC(K,0,NY,NX) &
-        +OQA(K,0,NY,NX)+OQAH(K,0,NY,NX)+OHA(K,0,NY,NX)
-      DN=DN+OQN(K,0,NY,NX)+OQNH(K,0,NY,NX)+OHN(K,0,NY,NX)
-      DP=DP+OQP(K,0,NY,NX)+OQPH(K,0,NY,NX)+OHP(K,0,NY,NX)
+      DC=DC+DOM(idom_doc,K,0,NY,NX)+DOM_Macp(idom_doc,K,0,NY,NX)+OHC(K,0,NY,NX) &
+        +DOM(idom_acetate,K,0,NY,NX)+DOM_Macp(idom_acetate,K,0,NY,NX)+OHA(K,0,NY,NX)
+      DN=DN+DOM(idom_don,K,0,NY,NX)+DOM_Macp(idom_don,K,0,NY,NX)+OHN(K,0,NY,NX)
+      DP=DP+DOM(idom_dop,K,0,NY,NX)+DOM_Macp(idom_dop,K,0,NY,NX)+OHP(K,0,NY,NX)
       DO  M=1,jsken
         TOSGC(M,K)=OSC(M,K,0,NY,NX)*CORP0
         TOSGA(M,K)=OSA(M,K,0,NY,NX)*CORP0
@@ -276,10 +271,10 @@ module TillageMixMod
     ENDDO
 
     DO NTS=ids_beg,idg_NH3
-      TS0_solml(NTS)=trc_solml(NTS,0,NY,NX)*CORP0
+      TS0_solml(NTS)=trc_solml_vr(NTS,0,NY,NX)*CORP0
     ENDDO
     DO NTS=ids_nut_beg,ids_nuts_end
-      TS0_solml(NTS)=trc_solml(NTS,0,NY,NX)*CORP0
+      TS0_solml(NTS)=trc_solml_vr(NTS,0,NY,NX)*CORP0
     ENDDO
 
     TXN4G=trcx_solml(idx_NH4,0,NY,NX)*CORP0
@@ -307,11 +302,11 @@ module TillageMixMod
     ORGR(0,NY,NX)=DC
 
     DO NTS=ids_beg,idg_NH3
-      trc_solml(NTS,0,NY,NX)=trc_solml(NTS,0,NY,NX)*XCORP0
+      trc_solml_vr(NTS,0,NY,NX)=trc_solml_vr(NTS,0,NY,NX)*XCORP0
     ENDDO
 
     DO NTS=ids_nut_beg,ids_nuts_end
-      trc_solml(NTS,0,NY,NX)=trc_solml(NTS,0,NY,NX)*XCORP0
+      trc_solml_vr(NTS,0,NY,NX)=trc_solml_vr(NTS,0,NY,NX)*XCORP0
     ENDDO
 
     trcx_solml(idx_NH4,0,NY,NX)=trcx_solml(idx_NH4,0,NY,NX)*XCORP0
@@ -324,7 +319,7 @@ module TillageMixMod
     trcp_salml(idsp_FePO4,0,NY,NX)=trcp_salml(idsp_FePO4,0,NY,NX)*XCORP0
     trcp_salml(idsp_CaHPO4,0,NY,NX)=trcp_salml(idsp_CaHPO4,0,NY,NX)*XCORP0
     trcp_salml(idsp_HA,0,NY,NX)=trcp_salml(idsp_HA,0,NY,NX)*XCORP0
-    trcp_salml(idsp_CaH2PO4,0,NY,NX)=trcp_salml(idsp_CaH2PO4,0,NY,NX)*XCORP0
+    trcp_salml(idsp_CaH4P2O8,0,NY,NX)=trcp_salml(idsp_CaH4P2O8,0,NY,NX)*XCORP0
 
     DO NTN=ifertn_beg,ifertn_end
       FertN_soil(NTN,0,NY,NX)=FertN_soil(NTN,0,NY,NX)*XCORP0
@@ -378,7 +373,7 @@ module TillageMixMod
         ENDDO
 
         DO NTS=ids_beg,ids_end
-          TS_solml(NTS)=TS_solml(NTS)+TI*trc_solml(NTS,L,NY,NX)
+          TS_solml(NTS)=TS_solml(NTS)+TI*trc_solml_vr(NTS,L,NY,NX)
         ENDDO
 
         DO NTSA=idsalt_beg,idsalt_end
@@ -398,7 +393,7 @@ module TillageMixMod
         ENDDO
 
         DO NTG=idg_beg,idg_end-1
-          TG_gasml(NTG)=TG_gasml(NTG)+TI*trc_gasml(NTG,L,NY,NX)
+          TG_gasml(NTG)=TG_gasml(NTG)+TI*trc_gasml_vr(NTG,L,NY,NX)
         ENDDO
 
         DO  K=1,jcplx
@@ -429,10 +424,9 @@ module TillageMixMod
           TORN(M,K)=TORN(M,K)+TI*ORN(M,K,L,NY,NX)
           TORP(M,K)=TORP(M,K)+TI*ORP(M,K,L,NY,NX)
         ENDDO
-        TOQC(K)=TOQC(K)+TI*OQC(K,L,NY,NX)
-        TOQN(K)=TOQN(K)+TI*OQN(K,L,NY,NX)
-        TOQP(K)=TOQP(K)+TI*OQP(K,L,NY,NX)
-        TOQA(K)=TOQA(K)+TI*OQA(K,L,NY,NX)
+        do idom=idom_beg,idom_end
+          TDOM(idom,K)=TDOM(idom,K)+TI*DOM(idom,K,L,NY,NX)
+        enddo
         TOHC(K)=TOHC(K)+TI*OHC(K,L,NY,NX)
         TOHN(K)=TOHN(K)+TI*OHN(K,L,NY,NX)
         TOHP(K)=TOHP(K)+TI*OHP(K,L,NY,NX)
@@ -516,9 +510,9 @@ module TillageMixMod
 
         ! solute
         DO NTS=ids_beg,ids_end
-          trc_solml(NTS,L,NY,NX)=TI*trc_solml(NTS,L,NY,NX) &
-            +CORP*(FI*TS_solml(NTS)-TI*trc_solml(NTS,L,NY,NX)) &
-            +TX*trc_solml(NTS,L,NY,NX)+CORP*trc_soHml(NTS,L,NY,NX)
+          trc_solml_vr(NTS,L,NY,NX)=TI*trc_solml_vr(NTS,L,NY,NX) &
+            +CORP*(FI*TS_solml(NTS)-TI*trc_solml_vr(NTS,L,NY,NX)) &
+            +TX*trc_solml_vr(NTS,L,NY,NX)+CORP*trc_soHml(NTS,L,NY,NX)
         ENDDO
 
         DO NTX=idx_CEC,idx_cation_end
@@ -537,8 +531,8 @@ module TillageMixMod
         ENDDO
 
         DO NTG=idg_beg,idg_end-1
-          trc_gasml(NTG,L,NY,NX)=TI*trc_gasml(NTG,L,NY,NX)+CORP*(FI*TG_gasml(NTG) &
-            -TI*trc_gasml(NTG,L,NY,NX))+TX*trc_gasml(NTG,L,NY,NX)
+          trc_gasml_vr(NTG,L,NY,NX)=TI*trc_gasml_vr(NTG,L,NY,NX)+CORP*(FI*TG_gasml(NTG) &
+            -TI*trc_gasml_vr(NTG,L,NY,NX))+TX*trc_gasml_vr(NTG,L,NY,NX)
         ENDDO
 
         call MixSoluteH(L,NY,NX)
@@ -579,19 +573,19 @@ module TillageMixMod
             ORP(M,K,L,NY,NX)=TI*ORP(M,K,L,NY,NX)+CORP*(FI*TORP(M,K) &
               -TI*ORP(M,K,L,NY,NX))+TX*ORP(M,K,L,NY,NX)
           ENDDO
-          OQC(K,L,NY,NX)=TI*OQC(K,L,NY,NX)+CORP*(FI*TOQC(K) &
-            -TI*OQC(K,L,NY,NX))+TX*OQC(K,L,NY,NX)+CORP*OQCH(K,L,NY,NX)
-          OQN(K,L,NY,NX)=TI*OQN(K,L,NY,NX)+CORP*(FI*TOQN(K) &
-            -TI*OQN(K,L,NY,NX))+TX*OQN(K,L,NY,NX)+CORP*OQNH(K,L,NY,NX)
-          OQP(K,L,NY,NX)=TI*OQP(K,L,NY,NX)+CORP*(FI*TOQP(K) &
-            -TI*OQP(K,L,NY,NX))+TX*OQP(K,L,NY,NX)+CORP*OQPH(K,L,NY,NX)
-          OQA(K,L,NY,NX)=TI*OQA(K,L,NY,NX)+CORP*(FI*TOQA(K) &
-            -TI*OQA(K,L,NY,NX))+TX*OQA(K,L,NY,NX)+CORP*OQAH(K,L,NY,NX)
+          DOM(idom_doc,K,L,NY,NX)=TI*DOM(idom_doc,K,L,NY,NX)+CORP*(FI*TDOM(idom_doc,K) &
+            -TI*DOM(idom_doc,K,L,NY,NX))+TX*DOM(idom_doc,K,L,NY,NX)+CORP*DOM_Macp(idom_doc,K,L,NY,NX)
+          DOM(idom_don,K,L,NY,NX)=TI*DOM(idom_don,K,L,NY,NX)+CORP*(FI*TDOM(idom_don,K) &
+            -TI*DOM(idom_don,K,L,NY,NX))+TX*DOM(idom_don,K,L,NY,NX)+CORP*DOM_Macp(idom_don,K,L,NY,NX)
+          DOM(idom_dop,K,L,NY,NX)=TI*DOM(idom_dop,K,L,NY,NX)+CORP*(FI*TDOM(idom_dop,K) &
+            -TI*DOM(idom_dop,K,L,NY,NX))+TX*DOM(idom_dop,K,L,NY,NX)+CORP*DOM_Macp(idom_dop,K,L,NY,NX)
+          DOM(idom_acetate,K,L,NY,NX)=TI*DOM(idom_acetate,K,L,NY,NX)+CORP*(FI*TDOM(idom_acetate,K) &
+            -TI*DOM(idom_acetate,K,L,NY,NX))+TX*DOM(idom_acetate,K,L,NY,NX)+CORP*DOM_Macp(idom_acetate,K,L,NY,NX)
 
-          OQCH(K,L,NY,NX)=XCORP(NY,NX)*OQCH(K,L,NY,NX)
-          OQNH(K,L,NY,NX)=XCORP(NY,NX)*OQNH(K,L,NY,NX)
-          OQPH(K,L,NY,NX)=XCORP(NY,NX)*OQPH(K,L,NY,NX)
-          OQAH(K,L,NY,NX)=XCORP(NY,NX)*OQAH(K,L,NY,NX)
+          DOM_Macp(idom_doc,K,L,NY,NX)=XCORP(NY,NX)*DOM_Macp(idom_doc,K,L,NY,NX)
+          DOM_Macp(idom_don,K,L,NY,NX)=XCORP(NY,NX)*DOM_Macp(idom_don,K,L,NY,NX)
+          DOM_Macp(idom_dop,K,L,NY,NX)=XCORP(NY,NX)*DOM_Macp(idom_dop,K,L,NY,NX)
+          DOM_Macp(idom_acetate,K,L,NY,NX)=XCORP(NY,NX)*DOM_Macp(idom_acetate,K,L,NY,NX)
 
           OHC(K,L,NY,NX)=TI*OHC(K,L,NY,NX)+CORP*(FI*TOHC(K) &
             -TI*OHC(K,L,NY,NX))+TX*OHC(K,L,NY,NX)
@@ -644,14 +638,14 @@ module TillageMixMod
             ORN(M,K,L,NY,NX)=ORN(M,K,L,NY,NX)+FI*TORXN(M,K)
             ORP(M,K,L,NY,NX)=ORP(M,K,L,NY,NX)+FI*TORXP(M,K)
           ENDDO
-          OQC(K,L,NY,NX)=OQC(K,L,NY,NX)+FI*TOQGC(K)
-          OQN(K,L,NY,NX)=OQN(K,L,NY,NX)+FI*TOQGN(K)
-          OQP(K,L,NY,NX)=OQP(K,L,NY,NX)+FI*TOQGP(K)
-          OQA(K,L,NY,NX)=OQA(K,L,NY,NX)+FI*TOQGA(K)
-          OQCH(K,L,NY,NX)=OQCH(K,L,NY,NX)+FI*TOQHC(K)
-          OQNH(K,L,NY,NX)=OQNH(K,L,NY,NX)+FI*TOQHN(K)
-          OQPH(K,L,NY,NX)=OQPH(K,L,NY,NX)+FI*TOQHP(K)
-          OQAH(K,L,NY,NX)=OQAH(K,L,NY,NX)+FI*TOQHA(K)
+          DOM(idom_doc,K,L,NY,NX)=DOM(idom_doc,K,L,NY,NX)+FI*TOQGC(K)
+          DOM(idom_don,K,L,NY,NX)=DOM(idom_don,K,L,NY,NX)+FI*TOQGN(K)
+          DOM(idom_dop,K,L,NY,NX)=DOM(idom_dop,K,L,NY,NX)+FI*TOQGP(K)
+          DOM(idom_acetate,K,L,NY,NX)=DOM(idom_acetate,K,L,NY,NX)+FI*TOQGA(K)
+          DOM_Macp(idom_doc,K,L,NY,NX)=DOM_Macp(idom_doc,K,L,NY,NX)+FI*TOQHC(K)
+          DOM_Macp(idom_don,K,L,NY,NX)=DOM_Macp(idom_don,K,L,NY,NX)+FI*TOQHN(K)
+          DOM_Macp(idom_dop,K,L,NY,NX)=DOM_Macp(idom_dop,K,L,NY,NX)+FI*TOQHP(K)
+          DOM_Macp(idom_acetate,K,L,NY,NX)=DOM_Macp(idom_acetate,K,L,NY,NX)+FI*TOQHA(K)
           OHC(K,L,NY,NX)=OHC(K,L,NY,NX)+FI*TOHGC(K)
           OHN(K,L,NY,NX)=OHN(K,L,NY,NX)+FI*TOHGN(K)
           OHP(K,L,NY,NX)=OHP(K,L,NY,NX)+FI*TOHGP(K)
@@ -715,15 +709,15 @@ module TillageMixMod
             ENDIF
           ENDDO
 
-          OC=OC+OQC(K,L,NY,NX)+OQCH(K,L,NY,NX)+OHC(K,L,NY,NX) &
-            +OQA(K,L,NY,NX)+OQAH(K,L,NY,NX)+OHA(K,L,NY,NX)
-          ON=ON+OQN(K,L,NY,NX)+OQNH(K,L,NY,NX)+OHN(K,L,NY,NX)
-          OP=OP+OQP(K,L,NY,NX)+OQPH(K,L,NY,NX)+OHP(K,L,NY,NX)
+          OC=OC+DOM(idom_doc,K,L,NY,NX)+DOM_Macp(idom_doc,K,L,NY,NX)+OHC(K,L,NY,NX) &
+            +DOM(idom_acetate,K,L,NY,NX)+DOM_Macp(idom_acetate,K,L,NY,NX)+OHA(K,L,NY,NX)
+          ON=ON+DOM(idom_don,K,L,NY,NX)+DOM_Macp(idom_don,K,L,NY,NX)+OHN(K,L,NY,NX)
+          OP=OP+DOM(idom_dop,K,L,NY,NX)+DOM_Macp(idom_dop,K,L,NY,NX)+OHP(K,L,NY,NX)
           IF(micpar%is_litter(K))THEN
-            DC=DC+OQC(K,L,NY,NX)+OQCH(K,L,NY,NX)+OHC(K,L,NY,NX) &
-                +OQA(K,L,NY,NX)+OQAH(K,L,NY,NX)+OHA(K,L,NY,NX)
-            DN=DN+OQN(K,L,NY,NX)+OQNH(K,L,NY,NX)+OHN(K,L,NY,NX)
-            DC=DC+OQC(K,L,NY,NX)+OQCH(K,L,NY,NX)+OHC(K,L,NY,NX)
+            DC=DC+DOM(idom_doc,K,L,NY,NX)+DOM_Macp(idom_doc,K,L,NY,NX)+OHC(K,L,NY,NX) &
+                +DOM(idom_acetate,K,L,NY,NX)+DOM_Macp(idom_acetate,K,L,NY,NX)+OHA(K,L,NY,NX)
+            DN=DN+DOM(idom_don,K,L,NY,NX)+DOM_Macp(idom_don,K,L,NY,NX)+OHN(K,L,NY,NX)
+            DC=DC+DOM(idom_doc,K,L,NY,NX)+DOM_Macp(idom_doc,K,L,NY,NX)+OHC(K,L,NY,NX)
           ENDIF
           DO  M=1,jsken
             OC=OC+OSC(M,K,L,NY,NX)
@@ -741,11 +735,11 @@ module TillageMixMod
         ORGR(L,NY,NX)=DC
 
         DO NTS=ids_beg,idg_NH3
-          trc_solml(NTS,L,NY,NX)=trc_solml(NTS,L,NY,NX)+FI*TS0_solml(NTS)
+          trc_solml_vr(NTS,L,NY,NX)=trc_solml_vr(NTS,L,NY,NX)+FI*TS0_solml(NTS)
         ENDDO
 
         DO NTS=ids_nut_beg,ids_nuts_end
-          trc_solml(NTS,L,NY,NX)=trc_solml(NTS,L,NY,NX)+FI*TS0_solml(NTS)
+          trc_solml_vr(NTS,L,NY,NX)=trc_solml_vr(NTS,L,NY,NX)+FI*TS0_solml(NTS)
         ENDDO
 
         trcx_solml(idx_NH4,L,NY,NX)=trcx_solml(idx_NH4,L,NY,NX)+FI*TXN4G

@@ -143,7 +143,7 @@ end program main
 
 ! set up solver
 
-  NPH=1;NPT=15;NPG=NPT*NPH;dts_gas=1.0_r8/NPG;dts_HeatWatTP=1._r8/NPH;XNPT=1.0_r8/NPT
+  NPH=1;NPT=15;NPG=NPT*NPH;dts_gas=1.0_r8/NPG;dts_HeatWatTP=1._r8/NPH;dt_GasCyc=1.0_r8/NPT
 
   ncols=1
 !!============================================================

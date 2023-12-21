@@ -1,6 +1,7 @@
 module SOMDataType
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use GridConsts
+  use TracerIDMod
   use EcoSIMConfig, only : jcplx => jcplxc,jsken=>jskenc, ndbiomcp=>NumOfDeadMicrobiomComponents
   implicit none
   public
@@ -24,18 +25,12 @@ module SOMDataType
   real(r8),target,allocatable :: ORC(:,:,:,:,:)                     !microbial residue [C	g d-2]
   real(r8),target,allocatable :: ORN(:,:,:,:,:)                     !microbial residue N	[g d-2]
   real(r8),target,allocatable :: ORP(:,:,:,:,:)                     !microbial residue P	[g d-2]
-  real(r8),target,allocatable :: OQC(:,:,:,:)                       !dissolved organic C micropore	[g d-2]
-  real(r8),target,allocatable :: OQN(:,:,:,:)                       !dissolved organic N micropore	[g d-2]
-  real(r8),target,allocatable :: OQP(:,:,:,:)                       !dissolved organic P micropore	[g d-2]
-  real(r8),target,allocatable :: OQA(:,:,:,:)                       !dissolved acetate micropore	[g d-2]
-  real(r8),target,allocatable :: OQCH(:,:,:,:)                      !dissolved organic C macropore	[g d-2]
-  real(r8),target,allocatable :: OQNH(:,:,:,:)                      !dissolved organic N macropore	[g d-2]
-  real(r8),target,allocatable :: OQPH(:,:,:,:)                      !dissolved organic P macropore	[g d-2]
-  real(r8),target,allocatable :: OQAH(:,:,:,:)                      !dissolved acetate macropore	[g d-2]
+  real(r8),target,allocatable :: DOM(:,:,:,:,:)                       !dissolved organic C micropore	[g d-2]
+  real(r8),target,allocatable :: DOM_Macp(:,:,:,:,:)                      !dissolved organic C macropore	[g d-2]
   real(r8),target,allocatable :: ORGC(:,:,:)                        !total soil organic C [g d-2]
   real(r8),target,allocatable :: ORGN(:,:,:)                        !total soil organic N [g d-2]
   real(r8),target,allocatable :: ORGCX(:,:,:)                       !SOC concentration	[g Mg-1]
-  real(r8),target,allocatable :: OSA(:,:,:,:,:)                     !colonized humus C in each complex [g d-2]
+  real(r8),target,allocatable :: OSA(:,:,:,:,:)                     !colonized humus C in each CO2CompenPoint_nodeex [g d-2]
   real(r8),target,allocatable :: ORGR(:,:,:)                        !total particulate organic C [g d-2]
   real(r8),target,allocatable :: CORGC(:,:,:)                       !soil organic C content [g kg-1]
   real(r8),target,allocatable :: CORGN(:,:,:)                       !soil organic N content [mg kg-1]
@@ -53,10 +48,9 @@ module SOMDataType
   real(r8),target,allocatable ::  UORGP(:,:)                        !total humus P, [g d-2]
   real(r8),target,allocatable ::  EPOC(:,:,:)                       !partitioning coefficient between POC and litter, []
   real(r8),target,allocatable ::  EHUM(:,:,:)                       !partitioning coefficient between humus and microbial residue, []
-  real(r8),target,allocatable ::  COQC(:,:,:,:)                     !DOC concentration, [g m-3]
-  real(r8),target,allocatable ::  COQA(:,:,:,:)                     !acetate concentration, [g m-3]
-  real(r8),target,allocatable ::  FOSRH(:,:,:,:)                    !fraction of total organic C in complex, [-]
-  real(r8),target,allocatable ::  UCO2S(:,:)                        !total soil DIC, [g d-2]
+  real(r8),target,allocatable ::  CDOM(:,:,:,:,:)                     !DOC concentration, [g m-3]
+  real(r8),target,allocatable ::  FOSRH(:,:,:,:)                    !fraction of total organic C in CO2CompenPoint_nodeex, [-]
+  real(r8),target,allocatable ::  DIC_mass_col(:,:)                        !total soil DIC, [g d-2]
   real(r8),target,allocatable ::  UNH4(:,:)                         !total soil NH4 + NH3 content, [g d-2]
   real(r8),target,allocatable ::  UNO3(:,:)                         !total soil NO3 + NO2 content, [g d-2]
   real(r8),target,allocatable ::  UPO4(:,:)                         !total soil PO4 content, [g d-2]
@@ -96,14 +90,8 @@ module SOMDataType
   allocate(ORC(ndbiomcp,1:jcplx,0:JZ,JY,JX))
   allocate(ORN(ndbiomcp,1:jcplx,0:JZ,JY,JX))
   allocate(ORP(ndbiomcp,1:jcplx,0:JZ,JY,JX))
-  allocate(OQC(1:jcplx,0:JZ,JY,JX))
-  allocate(OQN(1:jcplx,0:JZ,JY,JX))
-  allocate(OQP(1:jcplx,0:JZ,JY,JX))
-  allocate(OQA(1:jcplx,0:JZ,JY,JX))
-  allocate(OQCH(1:jcplx,0:JZ,JY,JX))
-  allocate(OQNH(1:jcplx,0:JZ,JY,JX))
-  allocate(OQPH(1:jcplx,0:JZ,JY,JX))
-  allocate(OQAH(1:jcplx,0:JZ,JY,JX))
+  allocate(DOM(idom_beg:idom_end,1:jcplx,0:JZ,JY,JX))
+  allocate(DOM_Macp(idom_beg:idom_end,1:jcplx,0:JZ,JY,JX));DOM_MacP=0._r8
   allocate(ORGC(0:JZ,JY,JX))
   allocate(ORGN(0:JZ,JY,JX))
   allocate(ORGCX(0:JZ,JY,JX))
@@ -125,10 +113,9 @@ module SOMDataType
   allocate(UORGP(JY,JX));       UORGP=0._r8
   allocate(EPOC(0:JZ,JY,JX));   EPOC=0._r8
   allocate(EHUM(0:JZ,JY,JX));   EHUM=0._r8
-  allocate(COQC(1:jcplx,0:JZ,JY,JX));COQC=0._r8
-  allocate(COQA(1:jcplx,0:JZ,JY,JX));COQA=0._r8
+  allocate(CDOM(idom_beg:idom_end,1:jcplx,0:JZ,JY,JX));CDOM=0._r8
   allocate(FOSRH(1:jcplx,0:JZ,JY,JX));FOSRH=0._r8
-  allocate(UCO2S(JY,JX));       UCO2S=0._r8
+  allocate(DIC_mass_col(JY,JX));       DIC_mass_col=0._r8
   allocate(UNH4(JY,JX));        UNH4=0._r8
   allocate(UNO3(JY,JX));        UNO3=0._r8
   allocate(UPO4(JY,JX));        UPO4=0._r8
@@ -158,14 +145,8 @@ module SOMDataType
   call destroy(ORC)
   call destroy(ORN)
   call destroy(ORP)
-  call destroy(OQC)
-  call destroy(OQN)
-  call destroy(OQP)
-  call destroy(OQA)
-  call destroy(OQCH)
-  call destroy(OQNH)
-  call destroy(OQPH)
-  call destroy(OQAH)
+  call destroy(DOM)
+  call destroy(DOM_MacP)
   call destroy(ORGC)
   call destroy(ORGN)
   call destroy(ORGCX)
@@ -187,10 +168,10 @@ module SOMDataType
   call destroy(UORGP)
   call destroy(EPOC)
   call destroy(EHUM)
-  call destroy(COQC)
-  call destroy(COQA)
+
+  call destroy(CDOM)
   call destroy(FOSRH)
-  call destroy(UCO2S)
+  call destroy(DIC_mass_col)
   call destroy(UNH4)
   call destroy(UNO3)
   call destroy(UPO4)

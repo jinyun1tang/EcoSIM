@@ -16,7 +16,7 @@ module EcoSIMSolverPar
   real(r8) :: dts_litrhtwtp  !1/hour, time step for litter heat 
   real(r8) :: dts_litrvapht  !1/hour, time step for litter vapor-heat computation
   real(r8) :: dts_HeatWatTP   !1/hour, time step for heat, water, solute transport
-  real(r8) :: XNPT
+  real(r8) :: dt_GasCyc
   real(r8) :: dts_gas         !1/hour, time step for gas flx update
   real(r8) :: XNPR
   real(r8) :: XNPS

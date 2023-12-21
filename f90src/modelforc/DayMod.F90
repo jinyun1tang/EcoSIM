@@ -4,6 +4,7 @@
   use EcosimConst
   use minimathmod  , only : isLeap,AZMAX1
   use MiniFuncMod  , only : GetDayLength
+  use EcoSIMCtrlMod
   use GridConsts
   use SoilPhysDataType
   use FlagDataType
@@ -36,7 +37,7 @@
   CHARACTER(len=3) :: CHARN1,CHARN2
   CHARACTER(len=4) :: CHARN3
 
-  real(r8) :: CORP,DECDAY,DIRRA1,DIRRA2,FW,FZ
+  real(r8) :: CORP,DIRRA1,DIRRA2,FW,FZ
   real(r8) :: RR,TFZ,TWP,TVW,XI
 
   integer :: ITYPE,I2,I3,J,L,M,N,NN,N1,N2,N3,NX,NY,NZ
@@ -66,16 +67,16 @@
     N=30*M+ICOR(M)
 
 !  leap year February.
-    IF(isLeap(iyear_cur) .and. M.GE.2)N=N+1
+    IF(isLeap(iYearCurrent) .and. M.GE.2)N=N+1
       IF(I.LE.N)THEN
         N1=I-NN
         N2=M
-        N3=iyear_cur
+        N3=iYearCurrent
         WRITE(CHARN1,'(I3)')N1+100
         WRITE(CHARN2,'(I3)')N2+100
         WRITE(CHARN3,'(I4)')N3
         WRITE(CDATE,'(2A2,A4)')CHARN1(2:3),CHARN2(2:3),CHARN3(1:4)
-        call WriteDailyAccumulators(I, NHW, NHE, NVN, NVS)
+        call UpdateDailyAccumulators(I, NHW, NHE, NVN, NVS)
         exit
       ENDIF
       NN=N
@@ -88,95 +89,82 @@
 !------------------------------------------------------------------------------------------
 
   subroutine SetAnnualAccumlators(NY,NX)
+  
+  !set accumulators at the beginning of year
   implicit none
   integer, intent(in) :: NY,NX
 
   integer :: NZ,NE
 
-  UORGF(NY,NX)=0._r8
-  UXCSN(NY,NX)=0._r8
+  AmendCFlx_col(NY,NX)=0._r8
+  LiterfalOrgC_col(NY,NX)=0._r8
   UCOP(NY,NX)=0._r8
-  UDOCQ(NY,NX)=0._r8
-  UDOCD(NY,NX)=0._r8
-  UDICQ(NY,NX)=0._r8
-  UDICD(NY,NX)=0._r8
-  TNBP(NY,NX)=0._r8
+  Eco_NBP_col(NY,NX)=0._r8
   URAIN(NY,NX)=0._r8
   UEVAP(NY,NX)=0._r8
   URUN(NY,NX)=0._r8
   USEDOU(NY,NX)=0._r8
   UVOLO(NY,NX)=0._r8
-  UIONOU(NY,NX)=0._r8
-  UFERTN(NY,NX)=0._r8
-  UXZSN(NY,NX)=0._r8
-  UDONQ(NY,NX)=0._r8
-  UDOND(NY,NX)=0._r8
-  UDINQ(NY,NX)=0._r8
-  UDIND(NY,NX)=0._r8
-  UFERTP(NY,NX)=0._r8
-  UXPSN(NY,NX)=0._r8
-  UDOPQ(NY,NX)=0._r8
-  UDOPD(NY,NX)=0._r8
-  UDIPQ(NY,NX)=0._r8
-  UDIPD(NY,NX)=0._r8
-  UCO2G(NY,NX)=0._r8
-  UCH4G(NY,NX)=0._r8
-  UOXYG(NY,NX)=0._r8
-  UN2OG(NY,NX)=0._r8
-  UN2GG(NY,NX)=0._r8
-  UNH3G(NY,NX)=0._r8
-  UN2GS(NY,NX)=0._r8
-  UH2GG(NY,NX)=0._r8
-  UCO2F(NY,NX)=0._r8
-  UCH4F(NY,NX)=0._r8
-  UOXYF(NY,NX)=0._r8
-  UN2OF(NY,NX)=0._r8
-  UNH3F(NY,NX)=0._r8
-  UPO4F(NY,NX)=0._r8
-  THRE(NY,NX)=0._r8
-  TGPP(NY,NX)=0._r8
-  TNPP(NY,NX)=0._r8
-  TRAU(NY,NX)=0._r8
-  TCAN(NY,NX)=0._r8
-  XHVSTE(:,NY,NX)=0._r8
-  TRINH4(NY,NX)=0._r8
-  TRIPO4(NY,NX)=0._r8
+  HydroIonFlx_col(NY,NX)=0._r8
+  FertNFlx_col(NY,NX)=0._r8
+  LiterfalOrgN_col(NY,NX)=0._r8
+  HydroDONFlx_col(NY,NX)=0._r8
+  HydroDINFlx_col(NY,NX)=0._r8
+  FerPFlx_col(NY,NX)=0._r8
+  LiterfalOrgP_col(NY,NX)=0._r8
+  HydroDOPFlx_col(NY,NX)=0._r8
+  HydroDIPFlx_col(NY,NX)=0._r8
+  CO2byFire_col(NY,NX)=0._r8
+  CH4byFire_col(NY,NX)=0._r8
+  O2byFire_col(NY,NX)=0._r8
+  N2ObyFire_col(NY,NX)=0._r8
+  NH3byFire_col(NY,NX)=0._r8
+  PO4byFire_col(NY,NX)=0._r8
+  Eco_HR_col(NY,NX)=0._r8
+  Eco_GPP_col(NY,NX)=0._r8
+  Eco_NPP_col(NY,NX)=0._r8
+  Eco_AutoR_col(NY,NX)=0._r8
+  EcoHavstElmnt_col(:,NY,NX)=0._r8
+  NetNH4Mineralize_col(NY,NX)=0._r8
+  NetPO4Mineralize_col(NY,NX)=0._r8
 
   D960: DO NZ=1,NP0(NY,NX)
-  !RSETE: effect of canopy element status on seed set
-    DO NE=1,NumOfPlantChemElements
-      RSETE(NE,NZ,NY,NX)=RSETE(NE,NZ,NY,NX)+TEUPTK(NE,NZ,NY,NX)-TESNC(NE,NZ,NY,NX)
-      THVSTE(NE,NZ,NY,NX)=THVSTE(NE,NZ,NY,NX)+HVSTE(NE,NZ,NY,NX)
+  !NetCumElmntFlx2Plant_pft: effect of canopy element status on seed set
+    DO NE=1,NumOfPlantChemElmnts
+      NetCumElmntFlx2Plant_pft(NE,NZ,NY,NX)=NetCumElmntFlx2Plant_pft(NE,NZ,NY,NX)+PlantExudChemElmntCum_pft(NE,NZ,NY,NX)-LitrfallChemElmnts_pft(NE,NZ,NY,NX)
+      EcoHavstElmntCum_pft(NE,NZ,NY,NX)=EcoHavstElmntCum_pft(NE,NZ,NY,NX)+EcoHavstElmnt_pft(NE,NZ,NY,NX)
     enddo
-    RSETE(ielmc,NZ,NY,NX)=RSETE(ielmc,NZ,NY,NX)+CARBN(NZ,NY,NX)+TCO2T(NZ,NY,NX)-VCO2F(NZ,NY,NX)-VCH4F(NZ,NY,NX)
-    RSETE(ielmn,NZ,NY,NX)=RSETE(ielmn,NZ,NY,NX)+TNH3C(NZ,NY,NX)+TZUPFX(NZ,NY,NX)-VNH3F(NZ,NY,NX)-VN2OF(NZ,NY,NX)
-    RSETE(ielmp,NZ,NY,NX)=RSETE(ielmp,NZ,NY,NX)-VPO4F(NZ,NY,NX)
+    NetCumElmntFlx2Plant_pft(ielmc,NZ,NY,NX)=NetCumElmntFlx2Plant_pft(ielmc,NZ,NY,NX)+GrossCO2Fix_pft(NZ,NY,NX)+GrossResp_pft(NZ,NY,NX) &
+      -CO2ByFire_pft(NZ,NY,NX)-CH4ByFire_pft(NZ,NY,NX)
+    NetCumElmntFlx2Plant_pft(ielmn,NZ,NY,NX)=NetCumElmntFlx2Plant_pft(ielmn,NZ,NY,NX)+NH3EmiCum_pft(NZ,NY,NX)+PlantN2FixCum_pft(NZ,NY,NX) &
+      -NH3byFire_pft(NZ,NY,NX)-N2ObyFire_pft(NZ,NY,NX)
+    NetCumElmntFlx2Plant_pft(ielmp,NZ,NY,NX)=NetCumElmntFlx2Plant_pft(ielmp,NZ,NY,NX)-PO4byFire_pft(NZ,NY,NX)
 
 ! the following variables are accumulated daily
-    CARBN(NZ,NY,NX)=0._r8
-    TEUPTK(:,NZ,NY,NX)=0._r8
-    TCO2T(NZ,NY,NX)=0._r8
-    TCO2A(NZ,NY,NX)=0._r8
-    ETCanP(NZ,NY,NX)=0._r8
-    TZUPFX(NZ,NY,NX)=0._r8
-    TNH3C(NZ,NY,NX)=0._r8
-    VCO2F(NZ,NY,NX)=0._r8
-    VCH4F(NZ,NY,NX)=0._r8
+    GrossCO2Fix_pft(NZ,NY,NX)=0._r8
+    PlantExudChemElmntCum_pft(:,NZ,NY,NX)=0._r8
+    GrossResp_pft(NZ,NY,NX)=0._r8
+    CanopyPlusNoduRespC_pft(NZ,NY,NX)=0._r8
+    ETCanopy_pft(NZ,NY,NX)=0._r8
+    PlantN2FixCum_pft(NZ,NY,NX)=0._r8
+    NH3EmiCum_pft(NZ,NY,NX)=0._r8
+    CO2ByFire_pft(NZ,NY,NX)=0._r8
+    CH4ByFire_pft(NZ,NY,NX)=0._r8
     VOXYF(NZ,NY,NX)=0._r8
-    VNH3F(NZ,NY,NX)=0._r8
-    VN2OF(NZ,NY,NX)=0._r8
-    VPO4F(NZ,NY,NX)=0._r8
+    NH3byFire_pft(NZ,NY,NX)=0._r8
+    N2ObyFire_pft(NZ,NY,NX)=0._r8
+    PO4byFire_pft(NZ,NY,NX)=0._r8
 
-    HVSTE(:,NZ,NY,NX)=0._r8
-    TESN0(:,NZ,NY,NX)=0._r8
-    TESNC(:,NZ,NY,NX)=0._r8
+    EcoHavstElmnt_pft(:,NZ,NY,NX)=0._r8
+    SurfLitrfallChemElmnts_pft(:,NZ,NY,NX)=0._r8
+    LitrfallChemElmnts_pft(:,NZ,NY,NX)=0._r8
   ENDDO D960
-  IF(IERSNG.EQ.1.OR.IERSNG.EQ.3)THEN
+  IF(iErosionMode.EQ.ieros_frzthaweros.OR.iErosionMode.EQ.ieros_frzthawsomeros)THEN
     TSED(NY,NX)=0._r8
   ENDIF
   end subroutine SetAnnualAccumlators        
 !------------------------------------------------------------------------------------------     
-  subroutine WriteDailyAccumulators(I, NHW, NHE, NVN, NVS)
+  subroutine UpdateDailyAccumulators(I, NHW, NHE, NVN, NVS)
 !     WRITE DAILY MAX MIN ACCUMULATORS FOR WEATHER VARIABLES
 
   implicit none
@@ -199,22 +187,18 @@
 !     RESET ANNUAL FLUX ACCUMULATORS AT START OF ANNUAL CYCLE
 !     ALAT=latitude +ve=N,-ve=S
 !
-      IF((ALAT(NY,NX).GE.0.0.AND.I.EQ.1).OR.(ALAT(NY,NX).LT.0.0.AND.I.EQ.1))THEN
+      IF((ALAT(NY,NX).GE.0.0.AND.I.EQ.1).OR.(ALAT(NY,NX).LT.0.0.AND.I.EQ.1))THEN        
         call SetAnnualAccumlators(NY,NX)
-
       ENDIF
 !
 !     CALCULATE DAYLENGTH FROM SOLAR ANGLE
 !
-!     DYLX,DLYN=daylength of previous,current day
+!     DayLenthPrev,DLYN=daylength of previous,current day
 !     ALAT=latitude
 !
-      DYLX(NY,NX)=DYLN(NY,NX)
-      XI=I
-      IF(I.EQ.366)XI=365.5_r8
-      DECDAY=XI+100
+      DayLenthPrev(NY,NX)=DayLenthCurrent(NY,NX)
 
-      DYLN(NY,NX)=GetDayLength(ALAT(NY,NX),XI,DECLIN)
+      DayLenthCurrent(NY,NX)=GetDayLength(ALAT(NY,NX),I)
 !
 !     TIME STEP OF WEARHER DATA
 !     ITYPE 1=daily,2=hourly
@@ -238,12 +222,12 @@
 !     TMPX,TMPN=maximum,minimum daily temperature from weather file
 !     DWPT=daily vapor pressure from weather file
 !     TAVG*,AMP*,VAVG*,VMP*=daily avgs, amps to calc hourly values in wthr.f
-!     IETYP=Koppen climate zone
+!     KoppenClimZone=Koppen climate zone
 
       IF(ITYPE.EQ.1)THEN
-        IF(IETYP(NY,NX).GE.-1)THEN
-          IF(DYLN(NY,NX).GT.ZERO)THEN
-            RMAX=SRAD(I)/(DYLN(NY,NX)*0.658_r8)
+        IF(KoppenClimZone(NY,NX).GE.-1)THEN
+          IF(DayLenthCurrent(NY,NX).GT.ZERO)THEN
+            RMAX=SRAD(I)/(DayLenthCurrent(NY,NX)*0.658_r8)
           ELSE
             RMAX=0._r8
           ENDIF
@@ -314,7 +298,7 @@
     ENDDO D950
   ENDDO D955
 
-  END subroutine WriteDailyAccumulators
+  END subroutine UpdateDailyAccumulators
 !-----------------------------------------------------------------------------------------
 
   subroutine TillageandIrrigationEvents(I, NHW, NHE, NVN, NVS)
@@ -389,7 +373,7 @@
                 RRIG(J,I,NY,NX)=RR/(IIRRA(4,NY,NX)-IIRRA(3,NY,NX)+1)
               ENDDO D170
               WDPTH(I,NY,NX)=DIRRA(2,NY,NX)
-              WRITE(*,2222)'auto',IYRC,I,IIRRA(3,NY,NX),IIRRA(4,NY,NX) &
+              WRITE(*,2222)'auto',iYearCurrent,I,IIRRA(3,NY,NX),IIRRA(4,NY,NX) &
                 ,IFLGV(NY,NX),RR,TFZ,TVW,TWP,FIRRA(NY,NX),PSICanPDailyMin(1,NY,NX) &
                 ,CIRRA(NY,NX),DIRRA1,WDPTH(I,NY,NX)
 

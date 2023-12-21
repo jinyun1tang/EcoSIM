@@ -9,9 +9,9 @@ module EcoSIMDesctruct
 
   subroutine DestructEcoSIM
   use EcoSimSumDataType   , only : DestructEcoSimSum
-  use FlagDataType        , only : DestructFlagData,ISALTG
+  use FlagDataType        , only : DestructFlagData
   use WatsubDataMod       , only : DestructWatSubData
-  use TrnsfrsMod          , only : DestructTrnsfrs
+  use TranspSaltMod       , only : DestructTranspSalt
   use ErosionMod          , only : DestructErosion
   use SoilHeatDatatype    , only : DestructSoilHeatData
   use SoilPhysDataType    , only : DestructSoilPhysData
@@ -44,7 +44,7 @@ module EcoSIMDesctruct
   use PlantAPIData        , only : DestructPlantAPIData
   use PlantMngmtDataType  , only : DestructPlantMngmtData
   use InitSOMBGCMOD       , only : DestructSOMBGC
-  use TrnsfrMod           , only : DestructTrnsfr
+  use TranspNoSaltMod           , only : DestructTranspNoSalt
   use SnowPhysData        , only : DestructSnowPhysData
   use HydroThermData      , only : DestructHydroThermData
   implicit none
@@ -80,9 +80,9 @@ module EcoSIMDesctruct
   call DestructFlagData
 
   if(salt_model)then
-    call DestructTrnsfrs
+    call DestructTranspSalt
   else
-    call DestructTrnsfr
+    call DestructTranspNoSalt
   endif
   call DestructEcoSIMCtrlData
 

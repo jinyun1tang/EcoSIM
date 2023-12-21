@@ -43,7 +43,7 @@ implicit none
   end type atm_forc_type
   public :: ReadClim
   public :: ReadClimNC
-  public :: getGHGts
+  public :: geEco_Heat_Grnd_colGts
   contains
 
 !------------------------------------------------------------------------------------------
@@ -74,8 +74,8 @@ implicit none
     RAINH(J,I)=RAINH(J,I)/3.0_r8
     RAINH(J-2,I)=RAINH(J,I)
     RAINH(J-1,I)=RAINH(J,I)
-    XRADH(J-2,I)=XRADH(J,I)
-    XRADH(J-1,I)=XRADH(J,I)
+    RadLWClm(J-2,I)=RadLWClm(J,I)
+    RadLWClm(J-1,I)=RadLWClm(J,I)
   ELSE
     TMPH(J-2,I)=0.667_r8*TMPH(JJ,II)+0.333_r8*TMPH(J,I)
     TMPH(J-1,I)=0.333_r8*TMPH(JJ,II)+0.667_r8*TMPH(J,I)
@@ -88,8 +88,8 @@ implicit none
     RAINH(J,I)=RAINH(J,I)/3.0_r8
     RAINH(J-2,I)=RAINH(J,I)
     RAINH(J-1,I)=RAINH(J,I)
-    XRADH(J-2,I)=0.667_r8*XRADH(JJ,II)+0.333_r8*XRADH(J,I)
-    XRADH(J-1,I)=0.333_r8*XRADH(JJ,II)+0.667_r8*XRADH(J,I)
+    RadLWClm(J-2,I)=0.667_r8*RadLWClm(JJ,II)+0.333_r8*RadLWClm(J,I)
+    RadLWClm(J-1,I)=0.333_r8*RadLWClm(JJ,II)+0.667_r8*RadLWClm(J,I)
   ENDIF
   end subroutine interp3hourweather
 
@@ -135,7 +135,7 @@ implicit none
     ENDIF
   ENDDO D190
 
-  IF(IFLGY.EQ.1.AND.IYRX.LT.IYRC)then
+  IF(IFLGY.EQ.1.AND.IYRX.LT.iYearCurrent)then
     GO60=.true.
     return
   endif
@@ -184,7 +184,7 @@ implicit none
       return
     endif
   ENDIF
-  XRADH(J,I)=0.0
+  RadLWClm(J,I)=0.0
 !
 !     CONVERT HOURLY WEATHER VARIABLES TO MODEL UNITS
 !     AND ENTER INTO MODEL ARRAYS
@@ -194,7 +194,7 @@ implicit none
 !     WINDH=windspeed (m h-1)
 !     DWPTH=vapor pressure (kPa)
 !     RAINH=precipitation (m h-1)
-!     XRADH=longwave radiation (MJ m-2 h-1)
+!     RadLWClm=longwave radiation (MJ m-2 h-1)
 !
   D95: DO K=1,NN
 !
@@ -313,14 +313,14 @@ implicit none
   ELSEIF(VAR(K).EQ.'L')THEN
     IF(TYP(K).EQ.'W')THEN
       ! watss m-2, into MJ per hour, *3600 seconds * 1.0-6 = 0.0036
-      XRADH(J,I)=AZMAX1((DAT(K)+DATK(K))/IH*0.0036_r8)
+      RadLWClm(J,I)=AZMAX1((DAT(K)+DATK(K))/IH*0.0036_r8)
     ELSEIF(TYP(K).EQ.'J')THEN
-      XRADH(J,I)=AZMAX1((DAT(K)+DATK(K))/IH*0.01_r8)
+      RadLWClm(J,I)=AZMAX1((DAT(K)+DATK(K))/IH*0.01_r8)
     ELSEIF(TYP(K).EQ.'K')THEN
         ! kJ m-2, into MJ per hour, * 0.001
-        XRADH(J,I)=AZMAX1((DAT(K)+DATK(K))/IH*0.001_r8)
+        RadLWClm(J,I)=AZMAX1((DAT(K)+DATK(K))/IH*0.001_r8)
       ELSE
-        XRADH(J,I)=AZMAX1((DAT(K)+DATK(K))/IH)
+        RadLWClm(J,I)=AZMAX1((DAT(K)+DATK(K))/IH)
       ENDIF
     ENDIF
     DATK(K)=0.0_r8
@@ -365,7 +365,7 @@ implicit none
     ENDIF
   ENDDO D160
 
-  IF(IFLGY.EQ.1.AND.IYRX.LT.IYRC)THEN
+  IF(IFLGY.EQ.1.AND.IYRX.LT.iYearCurrent)THEN
 ! if the year read in is not equal to year required
     GO60=.TRUE.
     RETURN
@@ -719,9 +719,9 @@ implicit none
 
   call check_var(clm_nfid, 'XRADH', vardesc, readvar,print_err=.false.)
   if(readvar)then
-    call ncd_getvar(clm_nfid,'XRADH',irec,fdatam); call reshape2(XRADH,fdatam)
+    call ncd_getvar(clm_nfid,'XRADH',irec,fdatam); call reshape2(RadLWClm,fdatam)
   else
-    XRADH=0._r8
+    RadLWClm=0._r8
   endif
 
   if (I==365 .and. isLeap(yearc))then
@@ -731,7 +731,7 @@ implicit none
       DWPTH(J,I+1)= DWPTH(J,I)
       RAINH(J,I+1)= RAINH(J,I)
       SWRad_hrly(J,I+1)= SWRad_hrly(J,I)
-      XRADH(J,I+1)= XRADH(J,I)
+      RadLWClm(J,I+1)= RadLWClm(J,I)
     ENDDO
   endif
 
@@ -774,7 +774,7 @@ implicit none
 
 !----------------------------------------------------------------------
 
-  subroutine getGHGts(yeari,NHW,NHE,NVN,NVS)
+  subroutine geEco_Heat_Grnd_colGts(yeari,NHW,NHE,NVN,NVS)
   !
   !DESCRIPTION
   !read in atmospheric concentrations for CO2, CH4, and N2O
@@ -812,7 +812,7 @@ implicit none
       Z2OE(NY,NX) =atm_n2o*1.e-3_r8  !ppb to ppm
     ENDDO
   ENDDO
-  end subroutine getGHGts
+  end subroutine geEco_Heat_Grnd_colGts
 
 
 

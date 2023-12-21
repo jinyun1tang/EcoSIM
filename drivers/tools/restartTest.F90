@@ -5,7 +5,7 @@ program restartTest
   use fileUtil          , only : iulog
   use data_kind_mod     , only : r8 => DAT_KIND_R8
   use EcoSIMCtrlMod     , only : etimer
-  use GridConsts        , only : JZ,JS,JBR,bounds,JP
+  use GridConsts        , only : JZ,JS,MaxNumBranches,bounds,JP
 implicit none
   character(len=*), parameter :: prognm=&
   __FILE__

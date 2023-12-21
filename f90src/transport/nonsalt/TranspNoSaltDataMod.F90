@@ -1,4 +1,4 @@
-module TransfrDataMod
+module TranspNoSaltDataMod
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use GridConsts
   use TracerIDMod
@@ -9,52 +9,26 @@ implicit none
   real(r8), parameter :: XFRS=0.05_r8
   real(r8), Parameter :: VFLWX=0.5
 
-  real(r8), allocatable :: RFLOC(:)
-  real(r8), allocatable :: RFLON(:)
-  real(r8), allocatable :: RFLOP(:)
-  real(r8), allocatable :: RFLOA(:)
-  real(r8), allocatable :: DFVOC(:)
-  real(r8), allocatable :: DFVON(:)
-  real(r8), allocatable :: DFVOP(:)
-  real(r8), allocatable :: DFVOA(:)
-  real(r8), allocatable :: DFHOC(:)
-  real(r8), allocatable :: DFHON(:)
-  real(r8), allocatable :: DFHOP(:)
-  real(r8), allocatable :: DFHOA(:)
-  real(r8), allocatable :: COQC1(:)
-  real(r8), allocatable :: COQC2(:)
-  real(r8), allocatable :: COQN1(:)
-  real(r8), allocatable :: COQN2(:)
-  real(r8), allocatable :: COQP1(:)
-  real(r8), allocatable :: COQP2(:)
-  real(r8), allocatable :: COQA1(:)
-  real(r8), allocatable :: COQA2(:)
-  real(r8), allocatable :: OQC2(:,:,:,:)
-  real(r8), allocatable :: OQN2(:,:,:,:)
-  real(r8), allocatable :: OQP2(:,:,:,:)
-  real(r8), allocatable :: OQA2(:,:,:,:)
-  real(r8), allocatable :: ROCFLS(:,:,:,:,:)
-  real(r8), allocatable :: RONFLS(:,:,:,:,:)
-  real(r8), allocatable :: ROPFLS(:,:,:,:,:)
-  real(r8), allocatable :: ROAFLS(:,:,:,:,:)
-  real(r8), allocatable :: ROCFHS(:,:,:,:,:)
-  real(r8), allocatable :: RONFHS(:,:,:,:,:)
-  real(r8), allocatable :: ROPFHS(:,:,:,:,:)
-  real(r8), allocatable :: ROAFHS(:,:,:,:,:)
-  real(r8), allocatable :: TOCFLS(:,:,:,:)
-  real(r8), allocatable :: TONFLS(:,:,:,:)
-  real(r8), allocatable :: TOPFLS(:,:,:,:)
-  real(r8), allocatable :: TOAFLS(:,:,:,:)
-  real(r8), allocatable :: ROCSK2(:,:,:,:)
-  real(r8), allocatable :: RONSK2(:,:,:,:)
-  real(r8), allocatable :: ROPSK2(:,:,:,:)
-  real(r8), allocatable :: ROASK2(:,:,:,:)
+  real(r8), allocatable :: trcg_VFloSnow(:)
+  real(r8), allocatable :: trcn_band_VFloSnow(:)
+  real(r8), allocatable :: trcn_soil_VFloSnow(:)
+  real(r8),allocatable :: DOM_Adv2MacP_flx(:,:)
 
-  real(r8), allocatable :: RQROC0(:,:,:)
-  real(r8), allocatable :: RQRON0(:,:,:)
-  real(r8), allocatable :: RQROA0(:,:,:)
-  real(r8), allocatable :: RQROP0(:,:,:)
+  real(r8),allocatable :: CDOM_MacP1(:,:)
+  real(r8),allocatable :: CDOM_MacP2(:,:)
+  
+  real(r8), allocatable :: DOM_Adv2MicP_flx(:,:)
+  real(r8), allocatable :: Difus_Micp_flx_DOM(:,:)
+  real(r8), allocatable :: Difus_Macp_flx_DOM(:,:)
+  real(r8), allocatable :: CDOM_MicP1(:,:)
+  real(r8), allocatable :: CDOM_MicP2(:,:)
+  real(r8), allocatable :: DOM_MicP2(:,:,:,:,:)
+  real(r8), allocatable :: DOM_3DMicp_Transp_flxM(:,:,:,:,:,:)
+  real(r8), allocatable :: DOM_3DMacp_Transp_flxM(:,:,:,:,:,:)
+  real(r8), allocatable :: DOM_Transp2Micp_flx(:,:,:,:,:)
+  real(r8), allocatable :: RDOM_micb_cumflx(:,:,:,:,:)
 
+  real(r8), allocatable :: dom_FloXSurRunoff(:,:,:,:)
   real(r8), allocatable :: RBGCSinkG(:,:,:,:)   !BGC sink for gaseous tracers
   real(r8), allocatable :: RBGCSinkS(:,:,:,:)   !BGC sink for solute tracers
   real(r8), allocatable ::  trcg_RBLS(:,:,:,:)                      !
@@ -70,10 +44,7 @@ implicit none
   real(r8), allocatable ::  trcg_RFL0(:,:,:)                        !
   real(r8), allocatable ::  trcn_RFL0(:,:,:)                        !
   real(r8), allocatable ::  trcs_RFL1(:,:,:)                        !
-  real(r8), allocatable ::  ROCFXS(:,:,:,:)                    !
-  real(r8), allocatable ::  RONFXS(:,:,:,:)                    !
-  real(r8), allocatable ::  ROPFXS(:,:,:,:)                    !
-  real(r8), allocatable ::  ROAFXS(:,:,:,:)                    !
+  real(r8), allocatable ::  DOM_XPoreTransp_flx(:,:,:,:,:)                    !
   real(r8), allocatable ::  RCOFXS(:,:,:)                      !
   real(r8), allocatable ::  RCHFXS(:,:,:)                      !
   real(r8), allocatable ::  ROXFXS(:,:,:)                      !
@@ -103,15 +74,12 @@ implicit none
   real(r8), allocatable ::  TQRCOS(:,:)
   real(r8), allocatable ::  TQSCOS(:,:)
   real(r8), allocatable ::  RNBDFG(:,:,:)                      !NH3 volatilization/dissolution within soil layer band	g d-2 t-1
-  real(r8), allocatable ::  TQROC(:,:,:)                       !
-  real(r8), allocatable ::  TQRON(:,:,:)                       !
-  real(r8), allocatable ::  TQROP(:,:,:)                       !
-  real(r8), allocatable ::  TQROA(:,:,:)                       !
+  real(r8), allocatable ::  dom_TFloXSurRunoff(:,:,:,:)                       !
 
-  real(r8), allocatable ::  trcg_TQ(:,:,:)                        !
-  real(r8), allocatable ::  trcn_TQ(:,:,:)
-  real(r8), allocatable ::  trcg_TQR(:,:,:)
-  real(r8), allocatable ::  trcn_TQR(:,:,:)
+  real(r8), allocatable ::  trcg_SnowDrift(:,:,:)                        !
+  real(r8), allocatable ::  trcn_SnowDrift(:,:,:)
+  real(r8), allocatable ::  trcg_TFloXSurRunoff(:,:,:)
+  real(r8), allocatable ::  trcn_TFloXSurRunoff(:,:,:)
   real(r8), allocatable ::  R3PorTSolFlx(:,:,:,:) !total 3D micropore flux
   real(r8), allocatable ::  R3PorTSoHFlx(:,:,:,:) !total 3D macropore flux
 
@@ -122,8 +90,8 @@ implicit none
   real(r8), allocatable ::  TQRH1P(:,:)                        !
   real(r8), allocatable ::  TH1PFS(:,:,:)                      !
 
-  real(r8), allocatable ::  GasDifcc(:,:,:,:)
-  real(r8), allocatable ::  SolDifcc(:,:,:,:)
+  real(r8), allocatable ::  GasDifc_vrc(:,:,:,:)
+  real(r8), allocatable ::  SolDifc_vrc(:,:,:,:)
   real(r8), allocatable ::  DifuscG(:,:,:,:,:)
   real(r8), allocatable ::  DCO2G(:,:,:,:)                     !
   real(r8), allocatable ::  DCH4G(:,:,:,:)                     !
@@ -131,14 +99,7 @@ implicit none
   real(r8), allocatable ::  DZ2GG(:,:,:,:)                     !
   real(r8), allocatable ::  DZ2OG(:,:,:,:)                     !
   real(r8), allocatable ::  DNH3G(:,:,:,:)                     !
-  real(r8), allocatable ::  VLWatMicPCO(:,:,:)                      !
-  real(r8), allocatable ::  VLWatMicPCH(:,:,:)                      !
-  real(r8), allocatable ::  VLWatMicPOX(:,:,:)                      !
-  real(r8), allocatable ::  VLWatMicPNG(:,:,:)                      !
-  real(r8), allocatable ::  VLWatMicPN2(:,:,:)                      !
-  real(r8), allocatable ::  VLWatMicPN3(:,:,:)                      !
-  real(r8), allocatable ::  VLWatMicPNB(:,:,:)                      !
-  real(r8), allocatable ::  VLWatMicPHG(:,:,:)                      !
+  real(r8), allocatable ::  trcg_VLWatMicP(:,:,:,:)                      !
   real(r8), allocatable ::  HGSGL2(:,:,:)                      !
   real(r8), allocatable ::  DH2GG(:,:,:,:)                     !
   real(r8), allocatable ::  RHGFXS(:,:,:)                      !
@@ -175,16 +136,11 @@ implicit none
 
   real(r8), allocatable ::  TN3FLG(:,:,:)                      !
   real(r8), allocatable ::  trcg_BBL(:,:,:,:)                      !
-  real(r8), allocatable ::  trcg_RQR0(:,:,:)                       !
+  real(r8), allocatable ::  trcg_FloXSurRunoff(:,:,:)                       !
 
-  real(r8), allocatable ::  trcn_RQR0(:,:,:)                       !
-  real(r8), allocatable ::  OQNH2(:,:,:,:)                     !
-  real(r8), allocatable ::  OQPH2(:,:,:,:)                     !
-  real(r8), allocatable ::  OQAH2(:,:,:,:)                     !
-  real(r8), allocatable ::  TOCFHS(:,:,:,:)                    !
-  real(r8), allocatable ::  TONFHS(:,:,:,:)                    !
-  real(r8), allocatable ::  TOPFHS(:,:,:,:)                    !
-  real(r8), allocatable ::  TOAFHS(:,:,:,:)                    !
+  real(r8), allocatable ::  trcn_FloXSurRunoff(:,:,:)                       !
+  real(r8), allocatable ::  DOM_MacP2(:,:,:,:,:)                     !
+  real(r8), allocatable ::  DOM_Transp2Macp_flx(:,:,:,:,:)                    !
   real(r8), allocatable ::  TN4FHW(:,:,:)                      !
   real(r8), allocatable ::  TN3FHW(:,:,:)                      !
   real(r8), allocatable ::  TNOFHW(:,:,:)                      !
@@ -215,9 +171,8 @@ implicit none
   real(r8), allocatable ::  Z1PW2(:,:,:)                       !
   real(r8), allocatable ::  trcg_TBLS(:,:,:,:)                      !
   real(r8), allocatable ::  trcn_TBLS(:,:,:,:)
-  real(r8), allocatable ::  RQROP(:,:,:,:,:)                   !
-  real(r8), allocatable ::  RQROA(:,:,:,:,:)                   !
-  real(r8), allocatable ::  trcg_RQR(:,:,:,:,:)                    !
+  real(r8), allocatable ::  dom_2DFloXSurRunoffM(:,:,:,:,:,:)                   !
+  real(r8), allocatable ::  trcg_2DFloXSurRunoffM(:,:,:,:,:)                    !
   real(r8), allocatable ::  RQRHGS(:,:,:,:)                    !
   real(r8), allocatable ::  RQRNH4(:,:,:,:)                    !
   real(r8), allocatable ::  RCODFS(:,:)                        !
@@ -230,9 +185,6 @@ implicit none
   real(r8), allocatable ::  RHGDFS(:,:)                        !
   real(r8), allocatable ::  RDFR_gas(:,:,:)                        !
   real(r8), allocatable ::  R1BSK2(:,:,:)                      !
-  real(r8), allocatable ::  RQROC(:,:,:,:,:)                   !
-  real(r8), allocatable ::  RQRON(:,:,:,:,:)                   !
-
 
   real(r8), allocatable ::  ZNH4H2(:,:,:)                      !
   real(r8), allocatable ::  ZN4BH2(:,:,:)                      !
@@ -243,16 +195,14 @@ implicit none
   real(r8), allocatable ::  H2P4H2(:,:,:)                      !
   real(r8), allocatable ::  H2PBH2(:,:,:)                      !
   real(r8), allocatable ::  ZNO2H2(:,:,:)                      !
-  real(r8), allocatable ::  OQCH2(:,:,:,:)                     !
 
-  real(r8), allocatable :: trc_gasml2(:,:,:,:)
-  real(r8), allocatable :: trc_solml2(:,:,:,:)
+  real(r8), allocatable :: trc_gasml_vr2(:,:,:,:)
+  real(r8), allocatable :: trc_solml_vr2(:,:,:,:)
   real(r8), allocatable :: trc_soHml2(:,:,:,:)
 
-  real(r8), allocatable ::  RQSH2P(:,:,:)                      !
-  real(r8), allocatable ::  RQSH1P(:,:,:)                      !
-  real(r8), allocatable ::  trcg_RQS(:,:,:,:)                      !
-  real(r8), allocatable ::  trcn_RQR(:,:,:,:,:)                    !
+  real(r8), allocatable ::  trcn_2DSnowDrift(:,:,:,:)                      !
+  real(r8), allocatable ::  trcg_2DSnowDrift(:,:,:,:)                      !
+  real(r8), allocatable ::  trcn_2DFloXSurRunoffM(:,:,:,:,:)                    !
 
   real(r8), allocatable ::  RNXFHS(:,:,:,:)                    !
   real(r8), allocatable ::  RNXFHB(:,:,:,:)                    !
@@ -273,14 +223,12 @@ implicit none
   real(r8), allocatable ::  RGasSSVol(:,:,:)     !soil surface gas volatization
   real(r8), allocatable ::  RGasDSFlx(:,:,:,:)   !gas dissolution-volatilization
   real(r8), allocatable ::  R3GasADFlx(:,:,:,:,:) !3D gas flux advection + diffusion
-  real(r8), allocatable ::  RTGasADFlx(:,:,:,:)  !total 3D gas flux advection + diffusion
+  real(r8), allocatable ::  Gas_AdvDif_Flx_vr(:,:,:,:)  !total 3D gas flux advection + diffusion
 
   real(r8), allocatable ::  RHGFHS(:,:,:,:)                    !
   real(r8), allocatable ::  RCHFHS(:,:,:,:)                    !
   real(r8), allocatable ::  ROXFHS(:,:,:,:)                    !
   real(r8), allocatable ::  RNGFHS(:,:,:,:)                    !
-  real(r8), allocatable ::  RQSNH4(:,:,:)                      !
-  real(r8), allocatable ::  RQSNO3(:,:,:)                      !
   real(r8), allocatable ::  RCOFLS(:,:,:,:)                    !
   real(r8), allocatable ::  RCHFLS(:,:,:,:)                    !
   real(r8), allocatable ::  ROXFLS(:,:,:,:)                    !
@@ -310,32 +258,17 @@ contains
   implicit none
   integer :: NumOfLitrCmplxs
   NumOfLitrCmplxs=micpar%NumOfLitrCmplxs
-  allocate(RQROC0(1:jcplx,JV,JH));       RQROC0=0._r8
-  allocate(RQRON0(1:jcplx,JV,JH));       RQRON0=0._r8
-  allocate(RQROA0(1:jcplx,JV,JH));       RQROA0=0._r8
-  allocate(RQROP0(1:jcplx,JV,JH));       RQROP0=0._r8
-  allocate(OQC2(1:jcplx,0:JZ,JY,JX));    OQC2=0._r8
-  allocate(OQN2(1:jcplx,0:JZ,JY,JX));    OQN2=0._r8
-  allocate(OQP2(1:jcplx,0:JZ,JY,JX));    OQP2=0._r8
-  allocate(OQA2(1:jcplx,0:JZ,JY,JX));    OQA2=0._r8
-  allocate(ROCSK2(1:jcplx,0:JZ,JY,JX));  ROCSK2=0._r8
-  allocate(RONSK2(1:jcplx,0:JZ,JY,JX));  RONSK2=0._r8
-  allocate(ROPSK2(1:jcplx,0:JZ,JY,JX));  ROPSK2=0._r8
-  allocate(ROASK2(1:jcplx,0:JZ,JY,JX));  ROASK2=0._r8
-  allocate(ROCFLS(1:jcplx,3,0:JD,JV,JH));ROCFLS=0._r8
-  allocate(RONFLS(1:jcplx,3,0:JD,JV,JH));RONFLS=0._r8
-  allocate(ROPFLS(1:jcplx,3,0:JD,JV,JH));ROPFLS=0._r8
-  allocate(ROAFLS(1:jcplx,3,0:JD,JV,JH));ROAFLS=0._r8
-  allocate(ROCFHS(1:jcplx,3,JD,JV,JH));  ROCFHS=0._r8
-  allocate(RONFHS(1:jcplx,3,JD,JV,JH));  RONFHS=0._r8
-  allocate(ROPFHS(1:jcplx,3,JD,JV,JH));  ROPFHS=0._r8
-  allocate(ROAFHS(1:jcplx,3,JD,JV,JH));  ROAFHS=0._r8
-  allocate(TOCFLS(1:jcplx,JZ,JY,JX));    TOCFLS=0._r8
-  allocate(TONFLS(1:jcplx,JZ,JY,JX));    TONFLS=0._r8
-  allocate(TOPFLS(1:jcplx,JZ,JY,JX));    TOPFLS=0._r8
-  allocate(TOAFLS(1:jcplx,JZ,JY,JX));    TOAFLS=0._r8
+  allocate(CDOM_MacP1(idom_beg:idom_end,1:jcplx));CDOM_MacP1=0._r8
+  allocate(CDOM_MacP2(idom_beg:idom_end,1:jcplx));CDOM_MacP2=0._r8
 
-  allocate(trcg_RBLS(idg_beg:idg_end-1,JS,JY,JX));   trcg_RBLS=0._r8
+  allocate(dom_FloXSurRunoff(idom_beg:idom_end,1:jcplx,JV,JH));    dom_FloXSurRunoff=0._r8
+  allocate(DOM_MicP2(idom_beg:idom_end,1:jcplx,0:JZ,JY,JX));    DOM_MicP2=0._r8
+  allocate(RDOM_micb_cumflx(idom_beg:idom_end,1:jcplx,0:JZ,JY,JX));  RDOM_micb_cumflx=0._r8
+  allocate(DOM_3DMicp_Transp_flxM(idom_beg:idom_end,1:jcplx,3,0:JD,JV,JH));DOM_3DMicp_Transp_flxM=0._r8
+  allocate(DOM_3DMacp_Transp_flxM(idom_beg:idom_end,1:jcplx,3,JD,JV,JH));  DOM_3DMacp_Transp_flxM=0._r8
+  allocate(DOM_Transp2Micp_flx(idom_beg:idom_end,1:jcplx,JZ,JY,JX));    DOM_Transp2Micp_flx=0._r8
+
+  allocate(trcg_RBLS(idg_beg:idg_NH3,JS,JY,JX));   trcg_RBLS=0._r8
   allocate(trcn_RBLS(ids_nut_beg:ids_nuts_end,JS,JY,JX));   trcn_RBLS=0._r8
   allocate(ROCFL0(1:NumOfLitrCmplxs,JY,JX));  ROCFL0=0._r8
   allocate(RONFL0(1:NumOfLitrCmplxs,JY,JX));  RONFL0=0._r8
@@ -345,13 +278,10 @@ contains
   allocate(RONFL1(1:NumOfLitrCmplxs,JY,JX));  RONFL1=0._r8
   allocate(ROPFL1(1:NumOfLitrCmplxs,JY,JX));  ROPFL1=0._r8
   allocate(ROAFL1(1:NumOfLitrCmplxs,JY,JX));  ROAFL1=0._r8
-  allocate(trcg_RFL0(idg_beg:idg_end-1,JY,JX));      trcg_RFL0=0._r8
+  allocate(trcg_RFL0(idg_beg:idg_NH3,JY,JX));      trcg_RFL0=0._r8
   allocate(trcn_RFL0(ids_nut_beg:ids_nuts_end,JY,JX));      trcn_RFL0=0._r8
   allocate(trcs_RFL1(ids_beg:ids_end,JY,JX));      trcs_RFL1=0._r8
-  allocate(ROCFXS(1:jcplx,JZ,JY,JX));ROCFXS=0._r8
-  allocate(RONFXS(1:jcplx,JZ,JY,JX));RONFXS=0._r8
-  allocate(ROPFXS(1:jcplx,JZ,JY,JX));ROPFXS=0._r8
-  allocate(ROAFXS(1:jcplx,JZ,JY,JX));ROAFXS=0._r8
+  allocate(DOM_XPoreTransp_flx(idom_beg:idom_end,1:jcplx,JZ,JY,JX));DOM_XPoreTransp_flx=0._r8
   allocate(RCOFXS(JZ,JY,JX));   RCOFXS=0._r8
   allocate(RCHFXS(JZ,JY,JX));   RCHFXS=0._r8
   allocate(ROXFXS(JZ,JY,JX));   ROXFXS=0._r8
@@ -380,25 +310,24 @@ contains
   allocate(ZOSGL2(0:JZ,JY,JX)); ZOSGL2=0._r8
   allocate(RNBDFG(0:JZ,JY,JX)); RNBDFG=0._r8
 
-  allocate(TQROC(1:jcplx,JY,JX));   TQROC=0._r8
-  allocate(TQRON(1:jcplx,JY,JX));   TQRON=0._r8
-  allocate(TQROP(1:jcplx,JY,JX));   TQROP=0._r8
-  allocate(TQROA(1:jcplx,JY,JX));   TQROA=0._r8
-
+  allocate(dom_TFloXSurRunoff(idom_beg:idom_end,1:jcplx,JY,JX)); dom_TFloXSurRunoff=0._r8
+  allocate(Difus_Macp_flx_DOM(idom_beg:idom_end,1:jcplx));Difus_Macp_flx_DOM=0._r8
   allocate(TQSCOS(JY,JX));      TQSCOS=0._r8
-  allocate(trcg_TQ(idg_beg:idg_end-1,JY,JX));      trcg_TQ=0._r8
-  allocate(trcn_TQ(ids_nut_beg:ids_nuts_end,JY,JX)); trcn_TQ=0._r8
-  allocate(trcg_TQR(idg_beg:idg_end-1,JY,JX)); trcg_TQR=0._r8
-  allocate(trcn_TQR(ids_nut_beg:ids_nuts_end,JY,JX));trcn_TQR=0._r8
+  allocate(trcg_SnowDrift(idg_beg:idg_NH3,JY,JX));      trcg_SnowDrift=0._r8
+  allocate(trcn_SnowDrift(ids_nut_beg:ids_nuts_end,JY,JX)); trcn_SnowDrift=0._r8
+  allocate(trcg_TFloXSurRunoff(idg_beg:idg_NH3,JY,JX)); trcg_TFloXSurRunoff=0._r8
+  allocate(trcn_TFloXSurRunoff(ids_nut_beg:ids_nuts_end,JY,JX));trcn_TFloXSurRunoff=0._r8
   allocate(TN4FLW(JZ,JY,JX));   TN4FLW=0._r8
   allocate(TN3FLW(JZ,JY,JX));   TN3FLW=0._r8
   allocate(TNOFLW(JZ,JY,JX));   TNOFLW=0._r8
   allocate(TH2PFS(JZ,JY,JX));   TH2PFS=0._r8
   allocate(TQRH1P(JY,JX));      TQRH1P=0._r8
   allocate(TH1PFS(JZ,JY,JX));   TH1PFS=0._r8
+  allocate(CDOM_MicP1(idom_beg:idom_end,1:jcplx)); CDOM_MicP1=0._r8
+  allocate(CDOM_MicP2(idom_beg:idom_end,1:jcplx)); CDOM_MicP2=0._r8
 
-  allocate(GasDifcc(idg_beg:idg_end,JZ,JY,JX))
-  allocate(SolDifcc(ids_beg:ids_end,0:JZ,JY,JX));SolDifcc=0._r8
+  allocate(GasDifc_vrc(idg_beg:idg_end,JZ,JY,JX))
+  allocate(SolDifc_vrc(ids_beg:ids_end,0:JZ,JY,JX));SolDifc_vrc=0._r8
   allocate(DifuscG(idg_beg:idg_end,3,JZ,JY,JX)); DifuscG=0._r8
   allocate(DCO2G(3,JZ,JY,JX));  DCO2G=0._r8
   allocate(DCH4G(3,JZ,JY,JX));  DCH4G=0._r8
@@ -406,14 +335,7 @@ contains
   allocate(DZ2GG(3,JZ,JY,JX));  DZ2GG=0._r8
   allocate(DZ2OG(3,JZ,JY,JX));  DZ2OG=0._r8
   allocate(DNH3G(3,JZ,JY,JX));  DNH3G=0._r8
-  allocate(VLWatMicPCO(0:JZ,JY,JX)); VLWatMicPCO=0._r8
-  allocate(VLWatMicPCH(0:JZ,JY,JX)); VLWatMicPCH=0._r8
-  allocate(VLWatMicPOX(0:JZ,JY,JX)); VLWatMicPOX=0._r8
-  allocate(VLWatMicPNG(0:JZ,JY,JX)); VLWatMicPNG=0._r8
-  allocate(VLWatMicPN2(0:JZ,JY,JX)); VLWatMicPN2=0._r8
-  allocate(VLWatMicPN3(0:JZ,JY,JX)); VLWatMicPN3=0._r8
-  allocate(VLWatMicPNB(0:JZ,JY,JX)); VLWatMicPNB=0._r8
-  allocate(VLWatMicPHG(0:JZ,JY,JX)); VLWatMicPHG=0._r8
+  allocate(trcg_VLWatMicP(idg_beg:idg_end,0:JZ,JY,JX)); trcg_VLWatMicP=0._r8
   allocate(HGSGL2(JZ,JY,JX));   HGSGL2=0._r8
   allocate(DH2GG(3,JZ,JY,JX));  DH2GG=0._r8
   allocate(RHGFXS(JZ,JY,JX));   RHGFXS=0._r8
@@ -427,7 +349,7 @@ contains
   allocate(VLWatMicPMB(JZ,JY,JX));   VLWatMicPMB=0._r8
   allocate(VLWatMicPXA(0:JZ,JY,JX)); VLWatMicPXA=0._r8
   allocate(VLWatMicPXB(JZ,JY,JX));   VLWatMicPXB=0._r8
-  allocate(PARG_cef(idg_beg:idg_end-1,JY,JX));      PARG_cef=0._r8
+  allocate(PARG_cef(idg_beg:idg_NH3,JY,JX));      PARG_cef=0._r8
 
   allocate(RBGCSinkG(idg_beg:idg_end,0:JZ,JY,JX));RBGCSinkG=0._r8
   allocate(RBGCSinkS(ids_nuts_beg:ids_nuts_end,0:JZ,JY,JX));RBGCSinkS=0._r8
@@ -453,15 +375,10 @@ contains
 
   allocate(TN3FLG(JZ,JY,JX));   TN3FLG=0._r8
   allocate(trcg_BBL(idg_beg:idg_end,JZ,JY,JX));   trcg_BBL=0._r8
-  allocate(trcg_RQR0(idg_beg:idg_end,JV,JH));     trcg_RQR0=0._r8
-  allocate(trcn_RQR0(ids_nut_beg:ids_nuts_end,JV,JH));     trcn_RQR0=0._r8
-  allocate(OQNH2(1:jcplx,JZ,JY,JX));OQNH2=0._r8
-  allocate(OQPH2(1:jcplx,JZ,JY,JX));OQPH2=0._r8
-  allocate(OQAH2(1:jcplx,JZ,JY,JX));OQAH2=0._r8
-  allocate(TOCFHS(1:jcplx,JZ,JY,JX));TOCFHS=0._r8
-  allocate(TONFHS(1:jcplx,JZ,JY,JX));TONFHS=0._r8
-  allocate(TOPFHS(1:jcplx,JZ,JY,JX));TOPFHS=0._r8
-  allocate(TOAFHS(1:jcplx,JZ,JY,JX));TOAFHS=0._r8
+  allocate(trcg_FloXSurRunoff(idg_beg:idg_end,JV,JH));     trcg_FloXSurRunoff=0._r8
+  allocate(trcn_FloXSurRunoff(ids_nut_beg:ids_nuts_end,JV,JH));     trcn_FloXSurRunoff=0._r8
+  allocate(DOM_MacP2(idom_beg:idom_end,1:jcplx,JZ,JY,JX));DOM_MacP2=0._r8
+  allocate(DOM_Transp2Macp_flx(idom_beg:idom_end,1:jcplx,JZ,JY,JX));DOM_Transp2Macp_flx=0._r8
   allocate(TN4FHW(JZ,JY,JX));   TN4FHW=0._r8
   allocate(TN3FHW(JZ,JY,JX));   TN3FHW=0._r8
   allocate(TNOFHW(JZ,JY,JX));   TNOFHW=0._r8
@@ -478,7 +395,7 @@ contains
   allocate(OPSGL2(0:JZ,JY,JX)); OPSGL2=0._r8
   allocate(OASGL2(0:JZ,JY,JX)); OASGL2=0._r8
 
-  allocate(trcg_solsml2(idg_beg:idg_end-1,JS,JY,JX));trcg_solsml2=0._r8
+  allocate(trcg_solsml2(idg_beg:idg_NH3,JS,JY,JX));trcg_solsml2=0._r8
   allocate(trcn_solsml2(ids_nut_beg:ids_nuts_end,JS,JY,JX));trcn_solsml2=0._r8
 
   allocate(CO2W2(JS,JY,JX));    CO2W2=0._r8
@@ -492,12 +409,11 @@ contains
   allocate(ZHPW2(JS,JY,JX));    ZHPW2=0._r8
   allocate(Z1PW2(JS,JY,JX));    Z1PW2=0._r8
 
-  allocate(trcg_TBLS(idg_beg:idg_end-1,JS,JY,JX));   trcg_TBLS=0._r8
+  allocate(trcg_TBLS(idg_beg:idg_NH3,JS,JY,JX));   trcg_TBLS=0._r8
   allocate(trcn_TBLS(ids_nut_beg:ids_nuts_end,JS,JY,JX));trcn_TBLS=0._r8
 
-  allocate(RQROP(1:jcplx,2,2,JV,JH));RQROP=0._r8
-  allocate(RQROA(1:jcplx,2,2,JV,JH));RQROA=0._r8
-  allocate(trcg_RQR(idg_beg:idg_end-1,2,2,JV,JH));  trcg_RQR=0._r8
+  allocate(dom_2DFloXSurRunoffM(idom_beg:idom_end,1:jcplx,2,2,JV,JH));dom_2DFloXSurRunoffM=0._r8
+  allocate(trcg_2DFloXSurRunoffM(idg_beg:idg_NH3,2,2,JV,JH));  trcg_2DFloXSurRunoffM=0._r8
   allocate(RQRHGS(2,2,JV,JH));  RQRHGS=0._r8
   allocate(RQRNH4(2,2,JV,JH));  RQRNH4=0._r8
   allocate(RCODFS(JY,JX));      RCODFS=0._r8
@@ -508,10 +424,8 @@ contains
   allocate(RN3DFS(JY,JX));      RN3DFS=0._r8
   allocate(RNBDFS(JY,JX));      RNBDFS=0._r8
   allocate(RHGDFS(JY,JX));      RHGDFS=0._r8
-  allocate(RDFR_gas(idg_beg:idg_end-1,JY,JX));      RDFR_gas=0._r8
+  allocate(RDFR_gas(idg_beg:idg_NH3,JY,JX));      RDFR_gas=0._r8
   allocate(R1BSK2(JZ,JY,JX));   R1BSK2=0._r8
-  allocate(RQROC(1:jcplx,2,2,JV,JH));RQROC=0._r8
-  allocate(RQRON(1:jcplx,2,2,JV,JH));RQRON=0._r8
 
   allocate(ZNH4H2(JZ,JY,JX));   ZNH4H2=0._r8
   allocate(ZN4BH2(JZ,JY,JX));   ZN4BH2=0._r8
@@ -522,18 +436,15 @@ contains
   allocate(H2P4H2(JZ,JY,JX));   H2P4H2=0._r8
   allocate(H2PBH2(JZ,JY,JX));   H2PBH2=0._r8
   allocate(ZNO2H2(JZ,JY,JX));   ZNO2H2=0._r8
-  allocate(OQCH2(1:jcplx,JZ,JY,JX));OQCH2=0._r8
 
-  allocate(trc_gasml2(idg_beg:idg_end,0:JZ,JY,JX)); trc_gasml2(:,:,:,:)=0._r8
-  allocate(trc_solml2(ids_beg:ids_end,0:JZ,JY,JX)); trc_solml2(:,:,:,:)=0._r8
+  allocate(trc_gasml_vr2(idg_beg:idg_end,0:JZ,JY,JX)); trc_gasml_vr2(:,:,:,:)=0._r8
+  allocate(trc_solml_vr2(ids_beg:ids_end,0:JZ,JY,JX)); trc_solml_vr2(:,:,:,:)=0._r8
   allocate(trc_soHml2(ids_beg:ids_end,0:JZ,JY,JX)); trc_soHml2(:,:,:,:)=0._r8
 
-  allocate(RQSH2P(2,JV,JH));    RQSH2P=0._r8
-  allocate(RQSH1P(2,JV,JH));    RQSH1P=0._r8
-  allocate(trcg_RQS(idg_beg:idg_end-1,2,JV,JH));    trcg_RQS=0._r8
-  allocate(trcn_RQR(ids_nut_beg:ids_nuts_end,2,2,JV,JH));  trcn_RQR=0._r8
-  allocate(R3GasADFlx(idg_beg:idg_end-1,3,JD,JV,JH));R3GasADFlx=0._r8
-  allocate(RTGasADFlx(idg_beg:idg_end-1,JZ,JY,JH));RTGasADFlx=0._r8
+  allocate(trcg_2DSnowDrift(idg_beg:idg_NH3,2,JV,JH));    trcg_2DSnowDrift=0._r8
+  allocate(trcn_2DFloXSurRunoffM(ids_nut_beg:ids_nuts_end,2,2,JV,JH));  trcn_2DFloXSurRunoffM=0._r8
+  allocate(R3GasADFlx(idg_beg:idg_NH3,3,JD,JV,JH));R3GasADFlx=0._r8
+  allocate(Gas_AdvDif_Flx_vr(idg_beg:idg_NH3,JZ,JY,JH));Gas_AdvDif_Flx_vr=0._r8
 
   allocate(RNXFHS(3,JD,JV,JH)); RNXFHS=0._r8
   allocate(RNXFHB(3,JD,JV,JH)); RNXFHB=0._r8
@@ -550,6 +461,7 @@ contains
   allocate(RN2FHS(3,JD,JV,JH)); RN2FHS=0._r8
   allocate(RN4FHW(3,JD,JV,JH)); RN4FHW=0._r8
   allocate(RN3FHW(3,JD,JV,JH)); RN3FHW=0._r8
+  allocate(DOM_Adv2MicP_flx(idom_beg:idom_end,1:jcplx));DOM_Adv2MicP_flx=0._r8
 
   allocate(RGasDSFlx(idg_beg:idg_end,0:JZ,JY,JX)); RGasDSFlx=0._r8
   allocate(RGasSSVol(idg_beg:idg_end,JY,JX)); RGasSSVol=0._r8
@@ -557,8 +469,7 @@ contains
   allocate(RCHFHS(3,JD,JV,JH)); RCHFHS=0._r8
   allocate(ROXFHS(3,JD,JV,JH)); ROXFHS=0._r8
   allocate(RNGFHS(3,JD,JV,JH)); RNGFHS=0._r8
-  allocate(RQSNH4(2,JV,JH));    RQSNH4=0._r8
-  allocate(RQSNO3(2,JV,JH));    RQSNO3=0._r8
+  allocate(trcn_2DSnowDrift(ids_nut_beg:ids_nuts_end,2,JV,JH)); trcn_2DSnowDrift=0._r8
   allocate(RCOFLS(3,0:JD,JV,JH));RCOFLS=0._r8
   allocate(RCHFLS(3,0:JD,JV,JH));RCHFLS=0._r8
   allocate(ROXFLS(3,0:JD,JV,JH));ROXFLS=0._r8
@@ -582,6 +493,12 @@ contains
   allocate(RporeSoXFlx(ids_beg:ids_end,JZ,JY,JX));RporeSoXFlx=0._r8
   allocate(R3PorTSolFlx(ids_beg:ids_end,JZ,JY,JX));R3PorTSolFlx=0._r8
   allocate(R3PorTSoHFlx(ids_beg:ids_end,JZ,JY,JX));R3PorTSoHFlx=0._r8
+  allocate(trcg_VFloSnow(idg_beg:idg_end));trcg_VFloSnow=0._r8
+  allocate(trcn_band_VFloSnow(ids_nutb_beg:ids_nutb_end));trcn_band_VFloSnow=0._r8
+  allocate(trcn_soil_VFloSnow(ids_nuts_beg:ids_nuts_end));trcn_soil_VFloSnow=0._r8
+  allocate(DOM_Adv2MacP_flx(idom_beg:idom_end,1:jcplx));
+  allocate(Difus_Micp_flx_DOM(idom_beg:idom_end,1:jcplx));
+
   end subroutine InitTransfrData
 
 !----------------------------------------------------------------------
@@ -589,31 +506,15 @@ contains
   use abortutils, only : destroy
   implicit none
 
-  call destroy(OQC2)
-  call destroy(OQN2)
-  call destroy(OQP2)
-  call destroy(OQA2)
-  call destroy(ROCSK2)
-  call destroy(RONSK2)
-  call destroy(ROPSK2)
-  call destroy(ROASK2)
-  call destroy(ROCFLS)
-  call destroy(RONFLS)
-  call destroy(ROPFLS)
-  call destroy(ROAFLS)
-  call destroy(ROCFHS)
-  call destroy(RONFHS)
-  call destroy(ROPFHS)
-  call destroy(ROAFHS)
-  call destroy(TOCFLS)
-  call destroy(TONFLS)
-  call destroy(TOPFLS)
-  call destroy(TOAFLS)
+  call destroy(DOM_MicP2)
+  call destroy(CDOM_MicP1)
+  call destroy(CDOM_MicP2)
+  call destroy(RDOM_micb_cumflx)
+  call destroy(DOM_3DMicp_Transp_flxM)
+  call destroy(DOM_3DMacp_Transp_flxM)
 
-  call destroy(RQROC0)
-  call destroy(RQRON0)
-  call destroy(RQROA0)
-  call destroy(RQROP0)
+  call destroy(dom_FloXSurRunoff)
+  call destroy(dom_2DFloXSurRunoffM)
   call destroy(ROCFL0)
   call destroy(RONFL0)
   call destroy(ROPFL0)
@@ -625,10 +526,7 @@ contains
 
   call destroy(trcs_RFL1)
 
-  call destroy(ROCFXS)
-  call destroy(RONFXS)
-  call destroy(ROPFXS)
-  call destroy(ROAFXS)
+  call destroy(DOM_XPoreTransp_flx)
   call destroy(RCOFXS)
   call destroy(RCHFXS)
   call destroy(ROXFXS)
@@ -659,14 +557,11 @@ contains
   call destroy(ZOSGL2)
 
   call destroy(RNBDFG)
-  call destroy(TQROC)
-  call destroy(TQRON)
-  call destroy(TQROP)
-  call destroy(TQROA)
-  call destroy(trcg_TQR)
-  call destroy(trcn_TQR)
-  call destroy(trcg_TQ)
-  call destroy(trcn_TQ)
+  call destroy(dom_TFloXSurRunoff)
+  call destroy(trcg_TFloXSurRunoff)
+  call destroy(trcn_TFloXSurRunoff)
+  call destroy(trcg_SnowDrift)
+  call destroy(trcn_SnowDrift)
 
   call destroy(TN4FLW)
   call destroy(TN3FLW)
@@ -680,14 +575,7 @@ contains
   call destroy(DZ2GG)
   call destroy(DZ2OG)
   call destroy(DNH3G)
-  call destroy(VLWatMicPCO)
-  call destroy(VLWatMicPCH)
-  call destroy(VLWatMicPOX)
-  call destroy(VLWatMicPNG)
-  call destroy(VLWatMicPN2)
-  call destroy(VLWatMicPN3)
-  call destroy(VLWatMicPNB)
-  call destroy(VLWatMicPHG)
+  call destroy(trcg_VLWatMicP)
   call destroy(HGSGL2)
   call destroy(DH2GG)
   call destroy(RHGFXS)
@@ -721,13 +609,6 @@ contains
   call destroy(RNHSK2)
   call destroy(R1PSK2)
   call destroy(TN3FLG)
-  call destroy(OQNH2)
-  call destroy(OQPH2)
-  call destroy(OQAH2)
-  call destroy(TOCFHS)
-  call destroy(TONFHS)
-  call destroy(TOPFHS)
-  call destroy(TOAFHS)
   call destroy(TN4FHW)
   call destroy(TN3FHW)
   call destroy(TNOFHW)
@@ -761,10 +642,10 @@ contains
   call destroy(trcg_TBLS)
   call destroy(trcn_TBLS)
   call destroy(trcg_RFL0)
-  call destroy(trcg_RQS)
+  call destroy(trcg_2DSnowDrift)
+  call destroy(Difus_Micp_flx_DOM)
+  call destroy(Difus_Macp_flx_DOM)
 
-  call destroy(RQROP)
-  call destroy(RQROA)
   call destroy(RQRHGS)
   call destroy(RQRNH4)
   call destroy(RCODFS)
@@ -777,8 +658,6 @@ contains
   call destroy(RHGDFS)
   call destroy(RDFR_gas)
   call destroy(R1BSK2)
-  call destroy(RQROC)
-  call destroy(RQRON)
 
   call destroy(ZNH4H2)
   call destroy(ZN4BH2)
@@ -789,14 +668,13 @@ contains
   call destroy(H2P4H2)
   call destroy(H2PBH2)
   call destroy(ZNO2H2)
-  call destroy(OQCH2)
+  call destroy(DOM_MacP2)
 
-  call destroy(trc_gasml2)
-  call destroy(trc_solml2)
+  call destroy(trc_gasml_vr2)
+  call destroy(trc_solml_vr2)
   call destroy(trc_soHml2)
-
-  call destroy(RQSH2P)
-  call destroy(RQSH1P)
+  call destroy(trcn_band_VFloSnow)
+  call destroy(trcn_soil_VFloSnow)
 
   call destroy(RNXFHS)
   call destroy(RNXFHB)
@@ -819,8 +697,7 @@ contains
   call destroy(RCHFHS)
   call destroy(ROXFHS)
   call destroy(RNGFHS)
-  call destroy(RQSNH4)
-  call destroy(RQSNO3)
+  call destroy(trcn_2DSnowDrift)
   call destroy(RCOFLS)
   call destroy(RCHFLS)
   call destroy(ROXFLS)
@@ -841,6 +718,12 @@ contains
   call destroy(R3PoreSoHFlx)
   call destroy(R3PoreSolFlx)
   call destroy(RporeSoXFlx)
+  call destroy(CDOM_MacP1)
+  call destroy(CDOM_MacP2)
+  call destroy(DOM_Adv2MicP_flx)
+  call destroy(DOM_Adv2MacP_flx)
+  call destroy(DOM_Transp2Macp_flx)
+  call destroy(DOM_Transp2Micp_flx)
   end subroutine DestructTransfrData
 
-end module TransfrDataMod
+end module TranspNoSaltDataMod

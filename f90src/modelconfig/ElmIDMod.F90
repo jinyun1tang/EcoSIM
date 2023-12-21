@@ -6,17 +6,29 @@ implicit none
   integer, parameter :: ielmc=1    !carbon element
   integer, parameter :: ielmn=2    !nitrogen element
   integer, parameter :: ielmp=3    !phosphorus element
-  integer, parameter :: NumOfPlantChemElements=3   !totally three elements
+  integer, parameter :: NumOfPlantChemElmnts=3   !totally three elements
+! erosion model options
+  integer, parameter :: ieros_noaction=-1
+  integer, parameter :: ieros_frzthawelv=0
+  integer, parameter :: ieros_frzthaweros=1
+  integer, parameter :: ieros_frzthawsom=2
+  integer, parameter :: ieros_frzthawsomeros=3
+
+! water flux direction
+  integer, parameter :: iewstdir=1   !east-west direction
+  integer, parameter :: insthdir=2   !north-south direction
+  integer, parameter :: ivertdir=3   !vertical direction
+
 ! soil properties
   integer, parameter :: isoi_fc=1
   integer, parameter :: isoi_wp=2
   integer, parameter :: isoi_scnv=3
   integer, parameter :: isoi_scnh=4
 ! plant harvest
-  integer, parameter :: ipld_leaf=1 !leaf
-  integer, parameter :: ipld_nofoliar=2 !leaf
-  integer, parameter :: ipld_woody=3 !leaf
-  integer, parameter :: ipld_stdead=4 !leaf
+  integer, parameter :: iplthvst_leaf=1 !leaf
+  integer, parameter :: iplthvst_finenonleaf=2 !fine non-leaf
+  integer, parameter :: iplthvst_woody=3 !woody
+  integer, parameter :: iplthvst_stdead=4 !standing dead
 ! photosynthesis
   integer, parameter :: ic4_photo=4
   integer, parameter :: ic3_photo=3
@@ -41,13 +53,13 @@ implicit none
   integer, parameter :: ifert_plant_manuN=18
   integer, parameter :: ifert_plant_manuP=19
 ! root order
-  integer, parameter :: fstroot =1
-  integer, parameter :: sndroot =2
+  integer, parameter :: iroot_1st =1
+  integer, parameter :: iroot_2nd =2
 ! root profile
-  integer, parameter :: irtshallow=0
+  integer, parameter :: irootp_shallow=0
 ! mycorrhizae
-  integer, parameter :: mycornone=1
-  integer, parameter :: mycorarbu=2   !arbuscular
+  integer, parameter :: imycorr_none=1
+  integer, parameter :: imycorr_arbu=2   !arbuscular
 
   integer, parameter :: ipltroot=1
   integer, parameter :: imycorrhz=2
@@ -57,22 +69,71 @@ implicit none
   integer, parameter :: itrue=1
   integer, parameter :: ifalse=0
 
-  integer, parameter :: ibralive=0  !branch alive
-  integer, parameter :: ibrdead =1  !branch dead
+  integer, parameter :: iEnable=0
+  integer, parameter :: iDisable=1
 
-  integer, parameter :: PlantIsActive=1  !plant active
-  integer, parameter :: ipltdorm =0  !plant dormant/dead
+  integer, parameter :: iLive=0  !plant organ alive
+  integer, parameter :: iDead=1  !plant organ dead
 
-  integer, parameter :: ihv_noaction=0
-  integer, parameter :: ihv_terminate=1
-  integer, parameter :: ihv_tmareseed=2
+  integer, parameter :: iPlantIsActive=1  !plant active
+  integer, parameter :: iPlantIsDormant =0  !plant dormant/dead
+
+  integer, parameter :: jharvtyp_noaction=0
+  integer, parameter :: jharvtyp_terminate=1
+  integer, parameter :: jharvtyp_tmareseed=2
+
+  integer, parameter :: iharvtyp_none=0
+  integer, parameter :: iharvtyp_grain=1
+  integer, parameter :: iharvtyp_allabv=2
+  integer, parameter :: iharvtyp_pruning=3
+  integer, parameter :: iharvtyp_grazing=4
+  integer, parameter :: iharvtyp_fire=5
+  integer, parameter :: iharvtyp_herbivo=6
 
   integer, parameter :: iplt_annual=0
-  integer, parameter :: iplt_preanu=1
+  integer, parameter :: iplt_perennial=1
 
   integer, parameter :: iplt_bryophyte=0
   integer, parameter :: iplt_grasslike=1
-  integer, parameter :: iplt_treelike=2
+  integer, parameter :: iplt_treelike =2
+  
+  integer, parameter :: igraintyp_abvgrnd=0
+  integer, parameter :: igraintyp_blwgrnd=1
 
+  integer, parameter :: ideterminate=0
+  integer, parameter :: inondeterminate=1
+  integer, parameter :: ipltcal_Planting     =0
+  integer, parameter :: ipltcal_Emerge       =1
+  integer, parameter :: ipltcal_InitFloral   =2
+  integer, parameter :: ipltcal_Jointing     =3
+  integer, parameter :: ipltcal_Elongation   =4
+  integer, parameter :: ipltcal_Heading      =5
+  integer, parameter :: ipltcal_Anthesis     =6
+  integer, parameter :: ipltcal_BeginSeedFill=7
+  integer, parameter :: ipltcal_SetSeedNumber=8
+  integer, parameter :: ipltcal_SetSeedMass  =9
+  integer, parameter :: ipltcal_EndSeedFill  =10
 
+  integer, parameter :: iphotop_neutral=0
+  integer, parameter :: iphotop_short  =1
+  integer, parameter :: iphotop_long   =2
+
+  integer, parameter :: iphenotyp_evgreen=0
+  integer, parameter :: iphenotyp_coldecidu=1
+  integer, parameter :: iphenotyp_drouhtdecidu=2
+  integer, parameter :: iphenotyp_coldroutdecidu=3
+
+  integer, parameter :: in2fixtyp_none=0
+  integer, parameter :: in2fixtyp_root_fast=1
+  integer, parameter :: in2fixtyp_root_medium=2
+  integer, parameter :: in2fixtyp_root_slow=3
+  integer, parameter :: in2fixtyp_canopy_fast=4
+  integer, parameter :: in2fixtyp_canopy_medium=5
+  integer, parameter :: in2fixtyp_canopy_slow=6
+
+  integer, parameter :: ithermozone_arcboreal=1
+  integer, parameter :: ithermozone_cooltempr=2
+  integer, parameter :: ithermozone_warmtempr=3
+  integer, parameter :: ithermozone_subtropic=4
+  integer, parameter :: ithermozone_tropical=5
 end module ElmIDMod

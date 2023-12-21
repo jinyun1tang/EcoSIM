@@ -5,12 +5,11 @@ module readiMod
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use abortutils   , only : endrun
   use ncdio_pio
+  use EcoSIMCtrlMod
   use fileUtil     , only : open_safe, check_read
   use minimathmod  , only : isclose, AZMAX1
   use MiniFuncMod  , only : GetDayLength
-  use EcoSIMConfig, only : column_mode
-  use EcoSIMCtrlMod, only : grid_file_in,lverb,an2_ppm,ao2_ppm
-  use EcoSIMCtrlMod, only : aco2_ppm,an2o_ppm,anh3_ppm,ach4_ppm
+  use EcoSIMConfig , only : column_mode
   use EcoSiMParDataMod, only : micpar
   use SOMDataType
   use CanopyRadDataType
@@ -51,11 +50,12 @@ module readiMod
   real(r8) :: RCHGNTG,RCHGETG,RCHGSTG,RCHGWTG,RCHGDG
   real(r8) :: SL0,Z2GEG,Z2OEG,ZNH3EG,SLX,SL1,SL2
 
-  integer :: IDWaterTableG,IETYPG,L,NCNG,NH1,NH2,NV1,NV2,NL1
+  integer :: L,NH1,NH2,NV1,NV2,NL1
   integer :: NL2
   type(file_desc_t) :: grid_nfid
 
-  public :: readi
+  public :: readi,erosion_model_status
+  public :: GridConectionMode
   contains
 
   SUBROUTINE readi(NE,NEX,NHW,NHE,NVN,NVS)
@@ -97,8 +97,9 @@ module readiMod
   endif
   IOLD=0
   call ncd_pio_closefile(grid_nfid)
-  END SUBROUTINE readi
 
+
+  END SUBROUTINE readi
 
 !------------------------------------------------------------------------------------------
 
@@ -131,47 +132,46 @@ module readiMod
 
 !------------------------------------------------------------------------------------------
 
-  function GridConectionModel(NCNG)result(status)
+  function GridConectionMode(NCNG)result(status)
   implicit none
   integer, intent(in) :: NCNG
   character(len=40) :: status
 
   select case(NCNG)
   case (1)
-    status='Along the west-east direction'   !3D
+    status='3D grid'   !3D
   case (2)
-    status='Along the north-south direction' !2d, no x direction
+    status='2D Along the north-south direction' !2d, no x direction
   case (3)
-    status='3D lateral connection'           !1d, vertical only
+    status='1D vertical column'           !1d, vertical only
   case default
     status=''
     call endrun('wrong option for NCNG in '//trim(mod_filename)//' at line',__LINE__)
   end select
 
-  end function GridConectionModel
+  end function GridConectionMode
 
 !------------------------------------------------------------------------------------------
-  function WaterTableStatus(IDWaterTableG)result(status)
+  function WaterTableStatus(iWaterTabelMode)result(status)
 
   implicit none
-  integer, intent(in) :: IDWaterTableG
+  integer, intent(in) :: iWaterTabelMode
 
   character(len=64) :: status
 
-  select case(IDWaterTableG)
-
+  select case(iWaterTabelMode)
   case (0)
-    status='no water table'
+    status='No external water table'
   case (1)
-    status='Natural stationary water table'
+    status='Natural stationary external water table'
   case (2)
-    status='Natural mobile water table'
+    status='Natural mobile external water table'
   case (3)
-    status='Artificial stationary water table'
+    status='Artificial stationary extneral water table'
   case (4)
-    status='Artificial mobile water table'
+    status='Artificial mobile external water table'
   case default
-    call endrun('wrong option for IDWaterTableG in '//trim(mod_filename)//' at line',__LINE__)
+    call endrun('wrong option for iWaterTabelMode in '//trim(mod_filename)//' at line',__LINE__)
   end select
   end function WaterTableStatus
 
@@ -183,22 +183,23 @@ module readiMod
   integer, intent(in) :: NHW,NHE,NVN,NVS
   real(r8) :: DHI(JX),DVI(JY)
   character(len=200) :: tline
-  real(r8) :: XI
+  integer :: XI
   integer :: NY,NX
+  integer :: IETYPG
   integer :: ierr,jj,loc
-
+  integer :: iWaterTabelMode
 !
 ! READ SITE DATA
 !
 ! ALATG,ALTIG,ATCAG=latitude,altitude,MAT(oC)
-! IDWaterTableG=water table flag
+! iWaterTabelMode=water table flag
 ! :0=none
 ! :1,2=natural stationary,mobile
 ! :3,4=artificial stationary,mobile
 ! OXYEG,Z2GEG,CO2EIG,CH4EG,Z2OEG,ZNH3EG=atm O2,N2,CO2,CH4,N2O,NH3 (ppm)
-! IETYPG,ISALTG,IERSNG=Koppen climate zone,salt,erosion options
+! IETYPG,iErosionMode=Koppen climate zone,erosion options
 ! NCNG=1:lateral connections between grid cells,3:no connections
-! DTBLIG,DTBLDIG=depth of natural,artificial (tile) water table (IDWaterTableG)
+! DTBLIG,DTBLDIG=depth of natural,artificial (tile) water table (iWaterTabelMode)
 ! DTBLGG=slope of natural water table relative to landscape surface
 ! RCHQNG,RCHQEG,RCHQSG,RCHQWG=boundary condns for N,E,S,W surface runoff
 ! RCHGNUG,RCHGEUG,RCHGSUG,RCHGWUG=bound condns for N,E,S,W subsurf flow
@@ -212,8 +213,7 @@ module readiMod
   call ncd_getvar(grid_nfid,'ALATG',loc,ALATG)
   call ncd_getvar(grid_nfid,'ALTIG',loc,ALTIG)
   call ncd_getvar(grid_nfid,'ATCAG',loc,ATCAG)
-  call ncd_getvar(grid_nfid,'IDTBLG',loc,IDWaterTableG)
-
+  call ncd_getvar(grid_nfid,'IDTBLG',loc,iWaterTabelMode)
 !  call ncd_getvar(grid_nfid,'OXYEG',loc,OXYEG)
 !  call ncd_getvar(grid_nfid,'Z2GEG',loc,Z2GEG)
 !  call ncd_getvar(grid_nfid,'CO2EIG',loc,CO2EIG)
@@ -222,8 +222,7 @@ module readiMod
 !  call ncd_getvar(grid_nfid,'ZNH3EG',loc,ZNH3EG)
 
   call ncd_getvar(grid_nfid,'IETYPG',loc,IETYPG)
-  call ncd_getvar(grid_nfid,'IERSNG',loc,IERSNG)
-  call ncd_getvar(grid_nfid,'NCNG',loc,NCNG)
+!  call ncd_getvar(grid_nfid,'NCNG',loc,NCNG)
   call ncd_getvar(grid_nfid,'DTBLIG',loc,DTBLIG)
   call ncd_getvar(grid_nfid,'DTBLDIG',loc,DTBLDIG)
   call ncd_getvar(grid_nfid,'DTBLGG',loc,DTBLGG)
@@ -251,7 +250,6 @@ module readiMod
     write(*,*)'Latitude (o): ALATG',ALATG
     write(*,*)'Altitude (m): ALTIG',ALTIG
     write(*,*)'Mean annual temperaure (oC): ATCAG',ATCAG
-    write(*,*)'water table flag ',IDWaterTableG, WaterTableStatus(IDWaterTableG)
     write(*,'(40A)')('-',ll=1,40)
     write(*,*)'atmospheric O2 (ppm): OXYEG',OXYEG
     write(*,*)'atmospheric N2 (ppm): Z2GEG',Z2GEG
@@ -261,10 +259,8 @@ module readiMod
     write(*,*)'atmospheric NH3 (ppm): ZNH3EG',ZNH3EG
     write(*,'(40A)')('-',ll=1,40)
     write(*,*)'Koppen climate zone: IETYPG',IETYPG
-    write(*,*)'flag for salt model: ISALTG',ISALTG,model_status(isaltg)
-    write(*,*)'flag for erosion model: IERSNG',IERSNG,erosion_model_status(iersng)
-    write(*,*)'flag for lateral connections between grid cells (1),'// &
-      ' no connections (3): NCNG',GridConectionModel(NCNG)
+!    write(*,*)'flag for lateral connections between grid cells (1),'// &
+!      ' no connections (3): NCNG',GridConectionMode(NCNG)
     write(*,*)'depth of natural water table: DTBLIG',DTBLIG
     write(*,*)'depth of artificial water table: DTBLDIG',DTBLDIG
     write(*,*)'slope of natural water table relative to landscape '// &
@@ -296,15 +292,15 @@ module readiMod
       PBOT(NY,NX)=PBOT(NY,NX)*exp(-ALT(NY,NX)/hpresc)
       ALTI(NY,NX)=ALTIG
       ATCAI(NY,NX)=ATCAG
-      IDWaterTable(NY,NX)=IDWaterTableG
+      IDWaterTable(NY,NX)=iWaterTabelMode
       OXYE(NY,NX)=ao2_ppm
       Z2GE(NY,NX)=an2_ppm
       CO2EI(NY,NX)=aco2_ppm
       CH4E(NY,NX)=ach4_ppm
       Z2OE(NY,NX)=an2o_ppm
       ZNH3E(NY,NX)=ZNH3EG
-      IETYP(NY,NX)=IETYPG
-      FlowDirIndicator(NY,NX)=NCNG
+      KoppenClimZone(NY,NX)=IETYPG
+      FlowDirIndicator(NY,NX)=grid_mode
       DTBLI(NY,NX)=DTBLIG
       DTBLDI(NY,NX)=DTBLDIG
       WaterTBLSlope(NY,NX)=DTBLGG
@@ -328,14 +324,14 @@ module readiMod
 !
 !     CALCULATE MAXIMUM DAYLENTH FOR PLANT PHENOLOGY
 !
-!     DYLM=maximum daylength (h)
+!     DayLenthMax=maximum daylength (h)
 !
       IF(ALAT(NY,NX).GT.0.0_r8)THEN
-        XI=173._r8
+        XI=173
       ELSE
-        XI=356._r8
+        XI=356
       ENDIF
-      DYLM(NY,NX)=GetDayLength(ALAT(NY,NX),XI)
+      DayLenthMax(NY,NX)=GetDayLength(ALAT(NY,NX),XI)
 
     ENDDO D9890
   ENDDO D9895
@@ -418,14 +414,14 @@ module readiMod
     call ncd_getvar(grid_nfid, 'IXTYP1',ntp,IXTYP(1,NV1,NH1))
     call ncd_getvar(grid_nfid, 'IXTYP2',ntp,IXTYP(2,NV1,NH1))
     call ncd_getvar(grid_nfid, 'NUI'   ,ntp,NUI(NV1,NH1))
-    call ncd_getvar(grid_nfid, 'NJ'    ,ntp,NJ(NV1,NH1))
+    call ncd_getvar(grid_nfid, 'NJ'    ,ntp,MaxNumRootLays(NV1,NH1))
     call ncd_getvar(grid_nfid, 'NL1'   ,ntp,NL1)
     call ncd_getvar(grid_nfid, 'NL2'   ,ntp,NL2)
     call ncd_getvar(grid_nfid, 'ISOILR',ntp,ISOILR(NV1,NH1))
 
     NU(NV1,NH1)=NUI(NV1,NH1)
-    NK(NV1,NH1)=NJ(NV1,NH1)+1
-    NM(NV1,NH1)=NJ(NV1,NH1)+NL1
+    NK(NV1,NH1)=MaxNumRootLays(NV1,NH1)+1
+    NM(NV1,NH1)=MaxNumRootLays(NV1,NH1)+NL1
 !  the extra soil layer below root zone cannot be greater than what is allowed
     NL2=min0(JZ-NM(NV1,NH1),NL2)
     NLI(NV1,NH1)=NM(NV1,NH1)+NL2
@@ -508,7 +504,7 @@ module readiMod
 !     PH=litter pH
 !     RSC,RSC,RSP=C,N,P in fine(1,0),woody(0,0),manure(2,0) surface litter (g m-2)
 !     IXTYP=surface litter type:1=plant,2=manure
-!     NUI,NJ=number of soil surface layer,maximum rooting layer
+!     NUI,MaxNumRootLays=number of soil surface layer,maximum rooting layer
 !     NL1,NL2=number of additional layers below NJ with,without data in file
 !     ISOILR=natural(0),reconstructed(1) soil profile
 !
@@ -528,7 +524,7 @@ module readiMod
           IXTYP(1,NY,NX) =IXTYP(1,NV1,NH1)
           IXTYP(2,NY,NX) =IXTYP(2,NV1,NH1)
           NUI(NY,NX) = NUI(NV1,NH1)
-          NJ(NY,NX)  = NJ(NV1,NH1)
+          MaxNumRootLays(NY,NX)  = MaxNumRootLays(NV1,NH1)
           ISOILR(NY,NX)=ISOILR(NV1,NH1)
           NU(NY,NX)=NU(NV1,NH1)
           NK(NY,NX)=NK(NV1,NH1)
@@ -819,7 +815,7 @@ module readiMod
   write(*,*)'P in surface manure litter (g m-2)',RSP(k_manure,0,NY,NX)
   write(*,*)'surface litter type:1=plant,2=manure',IXTYP(1,NY,NX),IXTYP(2,NY,NX)
   write(*,*)'layer number of soil surface layer NUI',NUI(NY,NX)
-  write(*,*)'layer number of maximum rooting layer NJ',NJ(NY,NX)
+  write(*,*)'layer number of maximum rooting layer NJ',MaxNumRootLays(NY,NX)
   write(*,*)'number of layers involved in model calculation',NL(NY,NX)
   write(*,*)'Flag for natural(0),reconstructed(1) soil profile', ISOILR(NY,NX)
   write(*,*)

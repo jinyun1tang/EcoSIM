@@ -4,6 +4,7 @@ module MicFluxTypeMod
   use EcoSiMParDataMod, only : micpar
   use EcoSIMSolverPar, only : NPH
   use abortutils, only : destroy
+  use TracerIDMod
 implicit none
 
   private
@@ -18,11 +19,11 @@ implicit none
   real(r8) :: RUPOXO
   real(r8) :: RN2G
   real(r8) :: RN2O
-  real(r8) :: XNH4S
-  real(r8) :: XNO3S
-  real(r8) :: XNO2S
-  real(r8) :: XH2PS
-  real(r8) :: XH1PS
+  real(r8) :: RNH4MicbTransf_vr
+  real(r8) :: RNO3MicbTransf_vr
+  real(r8) :: RNO2MicbTransf_vr
+  real(r8) :: RH2PO4MicbTransf_vr
+  real(r8) :: RH1PO4MicbTransf_vr
   real(r8) :: XNH4B
   real(r8) :: XNO3B
   real(r8) :: XNO2B
@@ -31,12 +32,9 @@ implicit none
   real(r8) :: XN2GS
   real(r8) :: RVMXC
   real(r8) :: RVMBC
-  real(r8) :: TRINH4
-  real(r8) :: TRIPO4
-  real(r8), allocatable :: XOQCS(:)
-  real(r8), allocatable :: XOQNS(:)
-  real(r8), allocatable :: XOQPS(:)
-  real(r8), allocatable :: XOQAS(:)
+  real(r8) :: NetNH4Mineralize_col
+  real(r8) :: NetPO4Mineralize_col
+  real(r8), allocatable :: RDOM_micb_flx(:,:)
   real(r8), allocatable :: ROXYSff(:)
   real(r8), allocatable :: RVMX4ff(:)
   real(r8), allocatable :: RVMB4ff(:)
@@ -98,10 +96,7 @@ implicit none
   NumOfMicrobs1HetertrophCmplx=micpar%NumOfMicrobs1HetertrophCmplx
   NumOfMicrobsInAutotrophCmplx=micpar%NumOfMicrobsInAutotrophCmplx
   allocate(this%ROXSK(NPH));this%ROXSK = 0._r8
-  allocate(this%XOQCS(1:jcplx));this%XOQCS=0._r8
-  allocate(this%XOQNS(1:jcplx));this%XOQNS=0._r8
-  allocate(this%XOQPS(1:jcplx));this%XOQPS=0._r8
-  allocate(this%XOQAS(1:jcplx));this%XOQAS=0._r8
+  allocate(this%RDOM_micb_flx(idom_beg:idom_end,1:jcplx));this%RDOM_micb_flx=0._r8
   allocate(this%ROXYS(NumOfMicrobs1HetertrophCmplx,1:jcplx));this%ROXYS=0._r8
   allocate(this%ROQCS(NumOfMicrobs1HetertrophCmplx,1:jcplx));this%ROQCS=0._r8
   allocate(this%ROQAS(NumOfMicrobs1HetertrophCmplx,1:jcplx));this%ROQAS=0._r8
@@ -151,10 +146,7 @@ implicit none
   integer :: jcplx,JG,NFGs
 
   this%ROXSK = 0._r8
-  this%XOQCS=0._r8
-  this%XOQNS=0._r8
-  this%XOQPS=0._r8
-  this%XOQAS=0._r8
+  this%RDOM_micb_flx=0._r8
   this%ROXYS=0._r8
   this%ROQCS=0._r8
   this%ROQAS=0._r8
@@ -202,10 +194,7 @@ implicit none
   implicit none
   class(micfluxtype) :: this
 
-  call destroy(this%XOQCS)
-  call destroy(this%XOQNS)
-  call destroy(this%XOQPS)
-  call destroy(this%XOQAS)
+  call destroy(this%RDOM_micb_flx)
   call destroy(this%RVMX4ff)
   call destroy(this%RVMB4ff)
   call destroy(this%RVMX2ff)

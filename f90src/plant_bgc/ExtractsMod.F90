@@ -28,7 +28,7 @@ module ExtractsMod
   call TotalLitterfall()
 
   DO NZ=1,plt_site%NP
-    IF(plt_pheno%IFLGC(NZ).EQ.PlantIsActive)THEN
+    IF(plt_pheno%IsPlantActive_pft(NZ).EQ.iPlantIsActive)THEN
 
       call TotalLeafArea(NZ)
 
@@ -50,17 +50,17 @@ module ExtractsMod
   associate(                             &
    NP0      => plt_site%NP0        , &
    WGLFT    => plt_biom%WGLFT      , &
-   WTSTGET  => plt_biom%WTSTGET   , &
-   WTSTGE   => plt_biom%WTSTGE     , &
-   HESNC    => plt_bgcr%HESNC      , &
-   ZESNC    => plt_bgcr%ZESNC      , &
+   StandingDeadChemElmnt_col  => plt_biom%StandingDeadChemElmnt_col   , &
+   StandingDeadChemElmnts_pft   => plt_biom%StandingDeadChemElmnts_pft     , &
+   LitterFallChemElmnt_pft    => plt_bgcr%LitterFallChemElmnt_pft      , &
+   LitterFallChemElmnt_col    => plt_bgcr%LitterFallChemElmnt_col      , &
    LitrfalChemElemnts_vr     => plt_bgcr%LitrfalChemElemnts_vr       , &
-   ESNC     => plt_bgcr%ESNC       , &
+   LitterFallChemElmnt_pftvr     => plt_bgcr%LitterFallChemElmnt_pftvr       , &
    NI       => plt_morph%NI        , &
    CanopyStemA_lyr    => plt_morph%CanopyStemA_lyr     , &
    CanopyLAgrid_lyr    =>  plt_morph%CanopyLAgrid_lyr    , &
-   StemAreag    =>  plt_morph%StemAreag    , &
-   CanopyLA_grd    =>  plt_morph%CanopyLA_grd      &
+   StemArea_grd    =>  plt_morph%StemArea_grd    , &
+   CanopyLeafArea_grd    =>  plt_morph%CanopyLeafArea_grd      &
   )
   DO NZ=1,NP0
 !
@@ -68,28 +68,28 @@ module ExtractsMod
 !
 !   ZCSNC,ZZSNC,ZPSNC=total C,N,P litterfall
 !   HCSNC,HZSNC,HPSNC=hourly PFT C,N,P litterfall from grosub.f
-!   WTSTGET=total standing dead C,N,P mass
+!   StandingDeadChemElmnt_col=total standing dead C,N,P mass
 !   WTSTG=PFT standing dead C,N,P mass
-!   ESNC,=cumulative PFT C,N,P litterfall from grosub.f
+!   LitterFallChemElmnt_pftvr,=cumulative PFT C,N,P litterfall from grosub.f
 !   LitrfalChemElemnts_vr,=cumulative total C,N,P litterfall
 !
-    DO NE=1,NumOfPlantChemElements
-      ZESNC(NE)=ZESNC(NE)+HESNC(NE,NZ)
-      WTSTGET(NE)=WTSTGET(NE)+WTSTGE(NE,NZ)
+    DO NE=1,NumOfPlantChemElmnts
+      LitterFallChemElmnt_col(NE)=LitterFallChemElmnt_col(NE)+LitterFallChemElmnt_pft(NE,NZ)
+      StandingDeadChemElmnt_col(NE)=StandingDeadChemElmnt_col(NE)+StandingDeadChemElmnts_pft(NE,NZ)
     ENDDO
 
     DO  L=0,NI(NZ)
       DO K=1,pltpar%NumOfPlantLitrCmplxs
-        DO NE=1,NumOfPlantChemElements
+        DO NE=1,NumOfPlantChemElmnts
           DO  M=1,pltpar%jsken
-            LitrfalChemElemnts_vr(NE,M,K,L)=LitrfalChemElemnts_vr(NE,M,K,L)+ESNC(NE,M,K,L,NZ)
+            LitrfalChemElemnts_vr(NE,M,K,L)=LitrfalChemElemnts_vr(NE,M,K,L)+LitterFallChemElmnt_pftvr(NE,M,K,L,NZ)
           enddo
         ENDDO
       ENDDO
     ENDDO
   ENDDO
-  CanopyLA_grd=0._r8
-  StemAreag=0._r8
+  CanopyLeafArea_grd=0._r8
+  StemArea_grd=0._r8
   DO  L=1,NumOfCanopyLayers1
     CanopyLAgrid_lyr(L)=0._r8
     WGLFT(L)=0._r8
@@ -141,30 +141,17 @@ module ExtractsMod
   associate(                       &
     NU    => plt_site%NU     , &
     AREA3 => plt_site%AREA3  , &
-    pftPlantPopulation    => plt_site%pftPlantPopulation     , &
+    PlantPopulation_pft    => plt_site%PlantPopulation_pft     , &
     RUPP1B=> plt_rbgc%RUPP1B , &
     RUPP2B=> plt_rbgc%RUPP2B , &
     RUNNXP=> plt_rbgc%RUNNXP , &
-    trcg_RDFA=> plt_rbgc%trcg_RDFA , &
-    trcg_RFLA=> plt_rbgc%trcg_RFLA , &
-    RCO2P => plt_rbgc%RCO2P  , &
-    RUPCHS=> plt_rbgc%RUPCHS , &
     RUPOXP=> plt_rbgc%RUPOXP , &
-    RUPN2S=> plt_rbgc%RUPN2S , &
-    RUPN3B=> plt_rbgc%RUPN3B , &
-    RUPHGS=> plt_rbgc%RUPHGS , &
-    RUPN3S=> plt_rbgc%RUPN3S , &
-    RUPNOB=> plt_rbgc%RUPNOB , &
-    RCO2S => plt_rbgc%RCO2S  , &
-    RUPOXS=> plt_rbgc%RUPOXS , &
-    RUPNH4=> plt_rbgc%RUPNH4 , &
-    RUPNO3=> plt_rbgc%RUPNO3 , &
-    RUPH1P=> plt_rbgc%RUPH1P , &
-    RUPH2P=> plt_rbgc%RUPH2P , &
-    RUPNHB=> plt_rbgc%RUPNHB , &
-    RUPH2B=> plt_rbgc%RUPH2B , &
-    RUPH1B=> plt_rbgc%RUPH1B , &
-    trcg_TFLA=> plt_rbgc%trcg_TFLA , &
+    trcg_Root_DisEvap_flx_vr=> plt_rbgc%trcg_Root_DisEvap_flx_vr , &
+    trcg_air2root_flx_pft_vr=> plt_rbgc%trcg_air2root_flx_pft_vr , &
+    RCO2P => plt_rbgc%RCO2P  , &
+    RUPGasSol_vr=> plt_rbgc%RUPGasSol_vr , &
+    RootNutUptake_pvr=> plt_rbgc%RootNutUptake_pvr , &
+    trcg_air2root_flx_vr=> plt_rbgc%trcg_air2root_flx_vr , &
     trcg_TLP=> plt_rbgc%trcg_TLP , &
     ROXYP => plt_rbgc%ROXYP  , &
     RDFOME=> plt_rbgc%RDFOME , &
@@ -173,6 +160,7 @@ module ExtractsMod
     RUPP2P=> plt_rbgc%RUPP2P , &
     RUNNBP=> plt_rbgc%RUNNBP , &
     RUPP1P=> plt_rbgc%RUPP1P , &
+    trcs_plant_uptake_vr=> plt_rbgc%trcs_plant_uptake_vr , &
     RNO3X => plt_bgcr%RNO3X  , &
     RNH4X => plt_bgcr%RNH4X  , &
     RPO4X => plt_bgcr%RPO4X  , &
@@ -181,22 +169,7 @@ module ExtractsMod
     RNHBX => plt_bgcr%RNHBX  , &
     ROXYX => plt_bgcr%ROXYX  , &
     TDFOME=> plt_bgcr%TDFOME , &
-    TUPH1B=> plt_bgcr%TUPH1B , &
-    TUPH2B=> plt_bgcr%TUPH2B , &
-    TUPNOB=> plt_bgcr%TUPNOB , &
-    TUPNHB=> plt_bgcr%TUPNHB , &
-    TUPH1P=> plt_bgcr%TUPH1P , &
-    TUPNO3=> plt_bgcr%TUPNO3 , &
-    TUPH2P=> plt_bgcr%TUPH2P , &
-    TUPN3S=> plt_bgcr%TUPN3S , &
-    TUPN3B=> plt_bgcr%TUPN3B , &
-    TUPNH4=> plt_bgcr%TUPNH4 , &
-    TUPHGS=> plt_bgcr%TUPHGS , &
-    TUPOXS=> plt_bgcr%TUPOXS , &
-    TUPCHS=> plt_bgcr%TUPCHS , &
-    TUPN2S=> plt_bgcr%TUPN2S , &
     TUPOXP=> plt_bgcr%TUPOXP , &
-    TCO2S => plt_bgcr%TCO2S  , &
     TCO2P => plt_bgcr%TCO2P  , &
     RPOBX => plt_bgcr%RPOBX  , &
     RP1BX => plt_bgcr%RP1BX  , &
@@ -204,9 +177,9 @@ module ExtractsMod
     THeatRootUptake => plt_ew%THeatRootUptake    , &
     GridPlantRootH2OUptake_vr=> plt_ew%GridPlantRootH2OUptake_vr   , &
     AllPlantRootH2OUptake_vr => plt_ew%AllPlantRootH2OUptake_vr    , &
-    trcg_rootml  => plt_rbgc%trcg_rootml,&
-    trcs_rootml => plt_rbgc%trcs_rootml, &
-    RootLenDensNLP => plt_morph%RootLenDensNLP , &
+    trcg_rootml_vr  => plt_rbgc%trcg_rootml_vr,&
+    trcs_rootml_vr => plt_rbgc%trcs_rootml_vr, &
+    RootLenDensPerPlant_pvr => plt_morph%RootLenDensPerPlant_pvr , &
     RTDNT => plt_morph%RTDNT , &
     MY    => plt_morph%MY    , &
     NI    => plt_morph%NI      &
@@ -218,7 +191,7 @@ module ExtractsMod
 !     TOTAL ROOT DENSITY
 !
 !     RTDNT=total root length density
-!     RootLenDensNLP=PFT root length density per plant
+!     RootLenDensPerPlant_pvr=PFT root length density per plant
 !     AllPlantRootH2OUptake_vr=total water uptake
 !     AllPlantRootH2OUptake_vr=PFT root water uptake
 !     THeatRootUptake=total convective heat in root water uptake
@@ -226,7 +199,7 @@ module ExtractsMod
 !     PP=PFT population, this is dynamic, and can goes to zero
 !
       IF(N.EQ.ipltroot)THEN
-        RTDNT(L)=RTDNT(L)+RootLenDensNLP(N,L,NZ)*pftPlantPopulation(NZ)/AREA3(L)
+        RTDNT(L)=RTDNT(L)+RootLenDensPerPlant_pvr(N,L,NZ)*PlantPopulation_pft(NZ)/AREA3(L)
       ENDIF
 !
 !     TOTAL WATER UPTAKE
@@ -241,16 +214,16 @@ module ExtractsMod
 !     R*FLA=root gaseous-atmosphere CO2 exchange
 !     R*DFA=root aqueous-gaseous CO2 exchange
 !
-      DO NTG=idg_beg,idg_end-1
-        trcg_rootml(NTG,N,L,NZ)=trcg_rootml(NTG,N,L,NZ)+trcg_RFLA(NTG,N,L,NZ)-trcg_RDFA(NTG,N,L,NZ)
+      DO NTG=idg_beg,idg_NH3
+        trcg_rootml_vr(NTG,N,L,NZ)=trcg_rootml_vr(NTG,N,L,NZ)+trcg_air2root_flx_pft_vr(NTG,N,L,NZ)-trcg_Root_DisEvap_flx_vr(NTG,N,L,NZ)
       ENDDO
 
-      trcs_rootml(idg_CO2,N,L,NZ)=trcs_rootml(idg_CO2,N,L,NZ)+trcg_RDFA(idg_CO2,N,L,NZ)+RCO2P(N,L,NZ)
-      trcs_rootml(idg_O2,N,L,NZ)=trcs_rootml(idg_O2,N,L,NZ)+trcg_RDFA(idg_O2,N,L,NZ)-RUPOXP(N,L,NZ)
-      trcs_rootml(idg_CH4,N,L,NZ)=trcs_rootml(idg_CH4,N,L,NZ)+trcg_RDFA(idg_CH4,N,L,NZ)+RUPCHS(N,L,NZ)
-      trcs_rootml(idg_N2O,N,L,NZ)=trcs_rootml(idg_N2O,N,L,NZ)+trcg_RDFA(idg_N2O,N,L,NZ)+RUPN2S(N,L,NZ)
-      trcs_rootml(idg_NH3,N,L,NZ)=trcs_rootml(idg_NH3,N,L,NZ)+trcg_RDFA(idg_NH3,N,L,NZ)+RUPN3S(N,L,NZ)+RUPN3B(N,L,NZ)
-      trcs_rootml(idg_H2,N,L,NZ)=trcs_rootml(idg_H2,N,L,NZ)+trcg_RDFA(idg_H2,N,L,NZ)+RUPHGS(N,L,NZ)
+      trcs_rootml_vr(idg_CO2,N,L,NZ)=trcs_rootml_vr(idg_CO2,N,L,NZ)+trcg_Root_DisEvap_flx_vr(idg_CO2,N,L,NZ)+RCO2P(N,L,NZ)
+      trcs_rootml_vr(idg_O2,N,L,NZ)=trcs_rootml_vr(idg_O2,N,L,NZ)+trcg_Root_DisEvap_flx_vr(idg_O2,N,L,NZ)-RUPOXP(N,L,NZ)
+      trcs_rootml_vr(idg_CH4,N,L,NZ)=trcs_rootml_vr(idg_CH4,N,L,NZ)+trcg_Root_DisEvap_flx_vr(idg_CH4,N,L,NZ)+RUPGasSol_vr(idg_CH4,N,L,NZ)
+      trcs_rootml_vr(idg_N2O,N,L,NZ)=trcs_rootml_vr(idg_N2O,N,L,NZ)+trcg_Root_DisEvap_flx_vr(idg_N2O,N,L,NZ)+RUPGasSol_vr(idg_N2O,N,L,NZ)
+      trcs_rootml_vr(idg_NH3,N,L,NZ)=trcs_rootml_vr(idg_NH3,N,L,NZ)+trcg_Root_DisEvap_flx_vr(idg_NH3,N,L,NZ)+RUPGasSol_vr(idg_NH3,N,L,NZ)+RUPGasSol_vr(idg_NH3B,N,L,NZ)
+      trcs_rootml_vr(idg_H2,N,L,NZ)=trcs_rootml_vr(idg_H2,N,L,NZ)+trcg_Root_DisEvap_flx_vr(idg_H2,N,L,NZ)+RUPGasSol_vr(idg_H2,N,L,NZ)
 !
 !     TOTAL ROOT GAS CONTENTS
 !
@@ -258,7 +231,7 @@ module ExtractsMod
 !     *A,*P=PFT root gaseous, aqueous gas content
 !
       DO NTG=idg_beg,idg_end-1
-        trcg_TLP(NTG,L)=trcg_TLP(NTG,L)+trcs_rootml(NTG,N,L,NZ)+trcg_rootml(NTG,N,L,NZ)
+        trcg_TLP(NTG,L)=trcg_TLP(NTG,L)+trcs_rootml_vr(NTG,N,L,NZ)+trcg_rootml_vr(NTG,N,L,NZ)
       ENDDO
 !
 !     TOTAL ROOT BOUNDARY GAS FLUXES
@@ -273,26 +246,28 @@ module ExtractsMod
 !                :NHB=NH4,NOB=NO3,H2B=H2PO4,H1B=H1PO4 in band
 !
       DO NTG=idg_beg,idg_end-1
-        trcg_TFLA(NTG,L)=trcg_TFLA(NTG,L)+trcg_RFLA(NTG,N,L,NZ)
+        trcg_air2root_flx_vr(NTG,L)=trcg_air2root_flx_vr(NTG,L)+trcg_air2root_flx_pft_vr(NTG,N,L,NZ)
       ENDDO
 
       TCO2P(L)=TCO2P(L)-RCO2P(N,L,NZ)
       TUPOXP(L)=TUPOXP(L)+RUPOXP(N,L,NZ)
-      TCO2S(L)=TCO2S(L)+RCO2S(N,L,NZ)
-      TUPOXS(L)=TUPOXS(L)+RUPOXS(N,L,NZ)
-      TUPCHS(L)=TUPCHS(L)+RUPCHS(N,L,NZ)
-      TUPN2S(L)=TUPN2S(L)+RUPN2S(N,L,NZ)
-      TUPN3S(L)=TUPN3S(L)+RUPN3S(N,L,NZ)
-      TUPN3B(L)=TUPN3B(L)+RUPN3B(N,L,NZ)
-      TUPHGS(L)=TUPHGS(L)+RUPHGS(N,L,NZ)
-      TUPNH4(L)=TUPNH4(L)+RUPNH4(N,L,NZ)
-      TUPNO3(L)=TUPNO3(L)+RUPNO3(N,L,NZ)
-      TUPH2P(L)=TUPH2P(L)+RUPH2P(N,L,NZ)
-      TUPH1P(L)=TUPH1P(L)+RUPH1P(N,L,NZ)
-      TUPNHB(L)=TUPNHB(L)+RUPNHB(N,L,NZ)
-      TUPNOB(L)=TUPNOB(L)+RUPNOB(N,L,NZ)
-      TUPH2B(L)=TUPH2B(L)+RUPH2B(N,L,NZ)
-      TUPH1B(L)=TUPH1B(L)+RUPH1B(N,L,NZ)
+      trcs_plant_uptake_vr(idg_CO2,L)=trcs_plant_uptake_vr(idg_CO2,L)+RUPGasSol_vr(idg_CO2,N,L,NZ)
+      trcs_plant_uptake_vr(idg_O2,L)=trcs_plant_uptake_vr(idg_O2,L)+RUPGasSol_vr(idg_O2,N,L,NZ)
+      trcs_plant_uptake_vr(idg_CH4,L)=trcs_plant_uptake_vr(idg_CH4,L)+RUPGasSol_vr(idg_CH4,N,L,NZ)
+      trcs_plant_uptake_vr(idg_N2O,L)=trcs_plant_uptake_vr(idg_N2O,L)+RUPGasSol_vr(idg_N2O,N,L,NZ)
+      trcs_plant_uptake_vr(idg_NH3,L)=trcs_plant_uptake_vr(idg_NH3,L)+RUPGasSol_vr(idg_NH3,N,L,NZ)
+      trcs_plant_uptake_vr(idg_NH3B,L)=trcs_plant_uptake_vr(idg_NH3B,L)+RUPGasSol_vr(idg_NH3B,N,L,NZ)
+      trcs_plant_uptake_vr(idg_H2,L)=trcs_plant_uptake_vr(idg_H2,L)+RUPGasSol_vr(idg_H2,N,L,NZ)
+      trcs_plant_uptake_vr(idg_N2,L)=trcs_plant_uptake_vr(idg_N2,L)+RUPGasSol_vr(idg_N2,N,L,NZ)
+
+      trcs_plant_uptake_vr(ids_NH4,L)=trcs_plant_uptake_vr(ids_NH4,L)+RootNutUptake_pvr(ids_NH4,N,L,NZ)
+      trcs_plant_uptake_vr(ids_NO3,L)=trcs_plant_uptake_vr(ids_NO3,L)+RootNutUptake_pvr(ids_NO3,N,L,NZ)
+      trcs_plant_uptake_vr(ids_H2PO4,L)=trcs_plant_uptake_vr(ids_H2PO4,L)+RootNutUptake_pvr(ids_H2PO4,N,L,NZ)
+      trcs_plant_uptake_vr(ids_H1PO4,L)=trcs_plant_uptake_vr(ids_H1PO4,L)+RootNutUptake_pvr(ids_H1PO4,N,L,NZ)
+      trcs_plant_uptake_vr(ids_NH4B,L)=trcs_plant_uptake_vr(ids_NH4B,L)+RootNutUptake_pvr(ids_NH4B,N,L,NZ)
+      trcs_plant_uptake_vr(ids_NO3B,L)=trcs_plant_uptake_vr(ids_NO3B,L)+RootNutUptake_pvr(ids_NO3B,N,L,NZ)
+      trcs_plant_uptake_vr(ids_H2PO4B,L)=trcs_plant_uptake_vr(ids_H2PO4B,L)+RootNutUptake_pvr(ids_H2PO4B,N,L,NZ)
+      trcs_plant_uptake_vr(ids_H1PO4B,L)=trcs_plant_uptake_vr(ids_H1PO4B,L)+RootNutUptake_pvr(ids_H1PO4B,N,L,NZ)
 !
 !     TOTAL ROOT C,N,P EXUDATION
 !
@@ -300,7 +275,7 @@ module ExtractsMod
 !     RDFOMC,RDFOMN,RDFOMP=PFT nonstructl C,N,P exchange
 !
       DO K=1,jcplx
-        DO NE=1,NumOfPlantChemElements
+        DO NE=1,NumOfPlantChemElmnts
           TDFOME(NE,K,L)=TDFOME(NE,K,L)-RDFOME(ielmc,N,K,L,NZ)
         ENDDO
       ENDDO
@@ -347,8 +322,8 @@ module ExtractsMod
 !
 !     TOTAL ROOT N2 FIXATION BY ALL PLANT SPECIES
 !
-!     TUPNF=total root N2 fixation
-!     RUPNF=PFT root N2 fixation
+!     TRootN2Fix_pft=total root N2 fixation
+!     RootN2Fix_pvr=PFT root N2 fixation
 !
 
   implicit none
@@ -358,33 +333,33 @@ module ExtractsMod
 
   associate(                       &
     PlantElemntStoreLandscape => plt_site%PlantElemntStoreLandscape  , &
-    BALE  => plt_site%BALE   , &
-    TNH3C => plt_bgcr%TNH3C  , &
+    ElmntBalanceCum_pft  => plt_site%ElmntBalanceCum_pft   , &
+    NH3EmiCum_pft => plt_bgcr%NH3EmiCum_pft  , &
     RNH3C => plt_bgcr%RNH3C  , &
-    TCCAN => plt_bgcr%TCCAN  , &
-    ZESNC => plt_bgcr%ZESNC  , &
-    RootGasLoss_disturb => plt_bgcr%RootGasLoss_disturb, &
-    RUPNF => plt_bgcr%RUPNF  , &
+    Canopy_NEE_col => plt_bgcr%Canopy_NEE_col  , &
+    LitterFallChemElmnt_col => plt_bgcr%LitterFallChemElmnt_col  , &
+    RootGasLossDisturb_pft => plt_bgcr%RootGasLossDisturb_pft, &
+    RootN2Fix_pvr => plt_bgcr%RootN2Fix_pvr  , &
     CO2NetFix_pft  => plt_bgcr%CO2NetFix_pft   , &
-    ETCanP => plt_ew%ETCanP    , &
+    ETCanopy_pft => plt_ew%ETCanopy_pft    , &
     TH2GZ => plt_bgcr%TH2GZ  , &
+    trcs_plant_uptake_vr => plt_rbgc%trcs_plant_uptake_vr, &    
     RNH3B => plt_rbgc%RNH3B  , &
-    HEUPTK=> plt_rbgc%HEUPTK , &
-    TUPNF => plt_rbgc%TUPNF  , &
-    TRootGasLoss_disturb => plt_rbgc%TRootGasLoss_disturb  , &
-    PTrans    => plt_ew%PTrans       , &
-    PrecIntcptByCanP  => plt_ew%PrecIntcptByCanP     , &
-    VapXAir2PCan => plt_ew%VapXAir2PCan    , &
-    WatByPCan => plt_ew%WatByPCan    , &
-    CanWatP => plt_ew%CanWatP    , &
-    TGH   => plt_ew%TGH      , &
+    PlantRootSoilChemNetX_pft=> plt_rbgc%PlantRootSoilChemNetX_pft , &
+    TRootGasLossDisturb_pft => plt_rbgc%TRootGasLossDisturb_pft  , &
+    Transpiration_pft   => plt_ew%Transpiration_pft      , &
+    PrecIntcptByCanopy_pft  => plt_ew%PrecIntcptByCanopy_pft     , &
+    VapXAir2Canopy_pft=> plt_ew%VapXAir2Canopy_pft   , &
+    WatByPCanopy => plt_ew%WatByPCanopy    , &
+    CanopyWater_pft => plt_ew%CanopyWater_pft    , &
+    Eco_Heat_Grnd_col   => plt_ew%Eco_Heat_Grnd_col      , &
     HeatXAir2PCan => plt_ew%HeatXAir2PCan    , &
     EvapTransHeatP => plt_ew%EvapTransHeatP    , &
     CanWatg=> plt_ew%CanWatg   , &
     TKC   => plt_ew%TKC      , &
     TKS   => plt_ew%TKS      , &
     ENGYX => plt_ew%ENGYX    , &
-    TSH   => plt_ew%TSH      , &
+    Eco_Heat_Sens_col   => plt_ew%Eco_Heat_Sens_col      , &
     VapXAir2CanG=> plt_ew%VapXAir2CanG   , &
     TENGYC=> plt_ew%TENGYC   , &
     TEVAPP=> plt_ew%TEVAPP   , &
@@ -392,85 +367,85 @@ module ExtractsMod
     LWRadCanG => plt_ew%LWRadCanG    , &
     TairK   => plt_ew%TairK      , &
     HeatStorCanP => plt_ew%HeatStorCanP    , &
-    TLE   => plt_ew%TLE      , &
+    Eco_Heat_Latent_col   => plt_ew%Eco_Heat_Latent_col      , &
     CanH2OHeldVg=> plt_ew%CanH2OHeldVg   , &
     NU    => plt_site%NU     , &
-    StemAreag => plt_morph%StemAreag , &
-    CanopyLA_grd => plt_morph%CanopyLA_grd , &
+    StemArea_grd => plt_morph%StemArea_grd , &
+    CanopyLeafArea_grd => plt_morph%CanopyLeafArea_grd , &
     NI    => plt_morph%NI    , &
     NumOfBranches_pft   => plt_morph%NumOfBranches_pft   , &
-    CanPSA => plt_morph%CanPSA , &
-    CanopyLeafA_pft => plt_morph%CanopyLeafA_pft , &
+    CanopyStemA_pft => plt_morph%CanopyStemA_pft , &
+    CanopyLeafArea_pft => plt_morph%CanopyLeafArea_pft , &
     RadNet2CanP  => plt_rad%RadNet2CanP    , &
     LWRadCanP => plt_rad%LWRadCanP   , &
-    TRN   => plt_rad%TRN       &
+    Eco_NetRad_col   => plt_rad%Eco_NetRad_col       &
   )
   DO L=NU,NI(NZ)
-    TUPNF(L)=TUPNF(L)+RUPNF(L,NZ)
+    trcs_plant_uptake_vr(idg_N2,L)=trcs_plant_uptake_vr(idg_N2,L)+RootN2Fix_pvr(L,NZ)
   ENDDO
 !
 !     TOTAL ENERGY, WATER, CO2 FLUXES
 !
-!     TRN=total net SW+LW absorbed by canopy
+!     Eco_NetRad_col=total net SW+LW absorbed by canopy
 !     RadNet2CanP=PFT net SW+LW absorbed by canopy
-!     TLE=total canopy latent heat flux
+!     Eco_Heat_Latent_col=total canopy latent heat flux
 !     EvapTransHeatP=PFT canopy latent heat flux
-!     TSH=total canopy sensible heat flux
+!     Eco_Heat_Sens_col=total canopy sensible heat flux
 !     HeatXAir2PCan=PFT canopy sensible heat flux
-!     TGH=total canopy storage heat flux
+!     Eco_Heat_Grnd_col=total canopy storage heat flux
 !     HeatStorCanP=PFT canopy storage heat flux
-!     TCCAN=total net CO2 fixation
+!     Canopy_NEE_col=total net CO2 fixation
 !     CO2NetFix_pft=PFT net CO2 fixation
 !     CanWatg,CanH2OHeldVg=total water volume in canopy,on canopy surfaces
-!     CanWatP,WatByPCan=PFT water volume in canopy,on canopy surfaces
+!     CanopyWater_pft,WatByPCanopy=PFT water volume in canopy,on canopy surfaces
 !     TEVAPP,VapXAir2CanG=total water flux to,from canopy,canopy surfaces
-!     VapXAir2PCan,PTrans=water flux to,from canopy surfaces, inside canopy
+!     VapXAir2PCan,Transpiration_pft=water flux to,from canopy surfaces, inside canopy
 !     TENGYC=total canopy water heat content
 !     ENGYC=PFT canopy water heat content
-!     CanopyLA_grd,StemAreag=total leaf,stalk area
-!     CanopyLeafA_pft,CanPSA=PFT leaf,stalk area
+!     CanopyLeafArea_grd,StemArea_grd=total leaf,stalk area
+!     CanopyLeafArea_pft,CanopyStemA_pft=PFT leaf,stalk area
 !     ZCSNC,ZZSNC,ZPSNC=total net root-soil C,N,P exchange
 !     HCUPTK,HZUPTK,HPUPTK=PFT net root-soil C,N,P exchange
 !     TBALC,TBALN,TBALP=total C,N,P balance
 !     BALC,BALN,BALP=PFT C,N,P balance
-!     TRootGasLoss_disturb=total loss of root CO2, O2, CH4, N2O, NH3, H2
-!     RootGasLoss_disturb=PFT loss of root CO2, O2, CH4, N2O, NH3, H2
+!     TRootGasLossDisturb_pft=total loss of root CO2, O2, CH4, N2O, NH3, H2
+!     RootGasLossDisturb_pft=PFT loss of root CO2, O2, CH4, N2O, NH3, H2
 !
-  TRN=TRN+RadNet2CanP(NZ)
-  TLE=TLE+EvapTransHeatP(NZ)
-  TSH=TSH+HeatXAir2PCan(NZ)
-  TGH=TGH+HeatStorCanP(NZ)
-  TCCAN=TCCAN+CO2NetFix_pft(NZ)
-  ETCanP(NZ)=ETCanP(NZ)+PTrans(NZ)+VapXAir2PCan(NZ)
-  CanWatg=CanWatg+CanWatP(NZ)
-  CanH2OHeldVg=CanH2OHeldVg+WatByPCan(NZ)
-  TEVAPP=TEVAPP+PTrans(NZ)+VapXAir2PCan(NZ)
-  VapXAir2CanG=VapXAir2CanG+VapXAir2PCan(NZ)
-  ENGYC=cpw*(WatByPCan(NZ)+PrecIntcptByCanP(NZ)+VapXAir2PCan(NZ))*TKC(NZ)
+  Eco_NetRad_col=Eco_NetRad_col+RadNet2CanP(NZ)
+  Eco_Heat_Latent_col=Eco_Heat_Latent_col+EvapTransHeatP(NZ)
+  Eco_Heat_Sens_col=Eco_Heat_Sens_col+HeatXAir2PCan(NZ)
+  Eco_Heat_Grnd_col=Eco_Heat_Grnd_col+HeatStorCanP(NZ)
+  Canopy_NEE_col=Canopy_NEE_col+CO2NetFix_pft(NZ)
+  ETCanopy_pft(NZ)=ETCanopy_pft(NZ)+Transpiration_pft(NZ)+VapXAir2Canopy_pft(NZ)
+  CanWatg=CanWatg+CanopyWater_pft(NZ)
+  CanH2OHeldVg=CanH2OHeldVg+WatByPCanopy(NZ)
+  TEVAPP=TEVAPP+Transpiration_pft(NZ)+VapXAir2Canopy_pft(NZ)
+  VapXAir2CanG=VapXAir2CanG+VapXAir2Canopy_pft(NZ)
+  ENGYC=cpw*(WatByPCanopy(NZ)+PrecIntcptByCanopy_pft(NZ)+VapXAir2Canopy_pft(NZ))*TKC(NZ)
   TENGYC=TENGYC+ENGYC
-  THFLXC=THFLXC+ENGYC-ENGYX(NZ)-(PrecIntcptByCanP(NZ)*cpw*TairK)
+  THFLXC=THFLXC+ENGYC-ENGYX(NZ)-(PrecIntcptByCanopy_pft(NZ)*cpw*TairK)
   ENGYX(NZ)=ENGYC
   LWRadCanG=LWRadCanG+LWRadCanP(NZ)
-  CanopyLA_grd=CanopyLA_grd+CanopyLeafA_pft(NZ)
-  StemAreag=StemAreag+CanPSA(NZ)
-  DO NE=1,NumOfPlantChemElements
-    ZESNC(NE)=ZESNC(NE)-HEUPTK(NE,NZ)
-    PlantElemntStoreLandscape(NE)=PlantElemntStoreLandscape(NE)+BALE(NE,NZ)
+  CanopyLeafArea_grd=CanopyLeafArea_grd+CanopyLeafArea_pft(NZ)
+  StemArea_grd=StemArea_grd+CanopyStemA_pft(NZ)
+  DO NE=1,NumOfPlantChemElmnts
+    LitterFallChemElmnt_col(NE)=LitterFallChemElmnt_col(NE)-PlantRootSoilChemNetX_pft(NE,NZ)
+    PlantElemntStoreLandscape(NE)=PlantElemntStoreLandscape(NE)+ElmntBalanceCum_pft(NE,NZ)
   ENDDO
 
   DO NTG=idg_beg,idg_end-1
-    TRootGasLoss_disturb(NTG)=TRootGasLoss_disturb(NTG)+RootGasLoss_disturb(NTG,NZ)
+    TRootGasLossDisturb_pft(NTG)=TRootGasLossDisturb_pft(NTG)+RootGasLossDisturb_pft(NTG,NZ)
   ENDDO
 !
 !     TOTAL CANOPY NH3 EXCHANGE AND EXUDATION
 !
 !     RNH3B,RNH3C=PFT NH3 flux between atmosphere and branch,canopy
-!     TNH3C=total NH3 flux between atmosphere and canopy
+!     NH3EmiCum_pft=total NH3 flux between atmosphere and canopy
 !
   RNH3C(NZ)=0._r8
   DO NB=1,NumOfBranches_pft(NZ)
     RNH3C(NZ)=RNH3C(NZ)+RNH3B(NB,NZ)
-    TNH3C(NZ)=TNH3C(NZ)+RNH3B(NB,NZ)
+    NH3EmiCum_pft(NZ)=NH3EmiCum_pft(NZ)+RNH3B(NB,NZ)
   ENDDO
   end associate
   end subroutine CanopyFluxesandFixation

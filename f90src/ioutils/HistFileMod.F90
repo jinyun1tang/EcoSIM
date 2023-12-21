@@ -6,7 +6,7 @@ module HistFileMod
   use fileUtil          , only : iulog,strip_null
   use abortutils        , only : endrun
   use TestMod           , only : errMsg
-  use GridConsts        , only : JZ,JS,JBR,bounds,bounds_type
+  use GridConsts        , only : JZ,JS,MaxNumBranches,bounds,bounds_type
   use data_const_mod    , only : spval => DAT_CONST_SPVAL
   use EcosimConst       , only : secspday
   use EcoSIMCtrlMod     , only : etimer
@@ -183,9 +183,9 @@ implicit none
   !create history file for output
 
   use EcoSIMConfig      , only : case_name
-  use GridConsts        , only : JZ,JS,JBR,JC,JP,NumGrothStages
+  use GridConsts        , only : JZ,JS,MaxNumBranches,NumOfCanopyLayers,JP,NumGrowthStages
   use EcoSIMConfig      , only : jcplx=>jcplxc,jsken=>jskenc
-  use ElmIDMod          , only : NumOfPlantChemElements
+  use ElmIDMod          , only : NumOfPlantChemElmnts
   implicit none
   integer, intent(in) :: t        ! tape index
   logical, optional, intent(in) :: histrest  !if creating the history restart file
@@ -246,11 +246,11 @@ implicit none
   ! "level" dimensions
   call ncd_defdim(lnfid, 'levsoi', JZ, dimid)
   call ncd_defdim(lnfid, 'levsno',  JS,dimid)
-  call ncd_defdim(lnfid, 'levcan',JC,dimid)
+  call ncd_defdim(lnfid, 'levcan',NumOfCanopyLayers,dimid)
   call ncd_defdim(lnfid, 'npfts',  JP,dimid)
-  call ncd_defdim(lnfid, 'nbranches',JBR,dimid)
-  call ncd_defdim(lnfid, 'ngrstages',NumGrothStages,dimid)
-  call ncd_defdim(lnfid, 'elements',NumOfPlantChemElements,dimid)
+  call ncd_defdim(lnfid, 'nbranches',MaxNumBranches,dimid)
+  call ncd_defdim(lnfid, 'ngrstages',NumGrowthStages,dimid)
+  call ncd_defdim(lnfid, 'elements',NumOfPlantChemElmnts,dimid)
   call ncd_defdim(lnfid, 'nkinecomp',jsken,dimid)
   call ncd_defdim(lnfid, 'nomcomplx',jcplx,dimid)
 
@@ -558,7 +558,7 @@ implicit none
   case ('levsoi')
       num2d = JZ
   case ('nbranches')
-      num2d = JBR
+      num2d = MaxNumBranches
   case default
       write(iulog,*) trim(subname),' ERROR: unsupported 2d type ',type2d, &
         ' currently supported types for multi level fields are: ', &
@@ -860,7 +860,7 @@ implicit none
           end if
        end do
 
-       ! Specification of tape contents now complete.
+       ! Specification of tape contents now CO2CompenPoint_nodeete.
        ! Sort each list of active entries
 
        do f = tape(t)%nflds-1,1,-1
@@ -1654,6 +1654,8 @@ implicit none
     character(len=256) :: str             ! global attribute string
     logical :: if_stop                    ! true => last time step of run
     logical, save :: do_3Dtconst = .true. ! true => write out 3D time-constant data
+    integer :: hist_ntimes(ntapes)
+    integer :: hist_mfilt(ntapes)
     character(len=*),parameter :: subname = trim(mod_filename)//'::hist_htapes_wrapup'
     !-----------------------------------------------------------------------
 
@@ -1764,11 +1766,14 @@ implicit none
           call hfields_zero(t)
 
        end if
-
+      hist_ntimes(t)=tape(t)%ntimes
+      hist_mfilt(t)=tape(t)%mfilt
     end do  ! end loop over history tapes
     ! Determine if file needs to be closed
 
-    call hist_do_disp (ntapes, tape(:)%ntimes, tape(:)%mfilt, if_stop, if_disphist, rstwr, nlend)
+    if(ntapes>0)then
+      call hist_do_disp (ntapes, hist_ntimes, hist_mfilt, if_stop, if_disphist, rstwr, nlend)
+    endif
 
     ! Close open history file
     ! Auxilary files may have been closed and saved off without being full,

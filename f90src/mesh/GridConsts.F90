@@ -13,23 +13,23 @@ implicit none
   integer :: JH
   integer :: JV
   integer :: JD
-  integer :: JBR=10     !number of plant branches
-  integer :: NumGrothStages=10  !number of plant growth states
-  integer :: JRS     !maximum number of root layers
-  integer :: Jlitgrp !number of liter groups
+  integer :: MaxNumBranches=10     !number of plant branches
+  integer :: NumGrowthStages=10  !number of plant growth states
+  integer :: MaxNumRootAxes     !maximum number of root layers
+  integer :: NumLitterGroups !number of liter groups
   integer, PARAMETER :: JP=5    !maximum pft in a given topgraphic column
-  integer, PARAMETER :: JC=10   !# of canopy layers
+  integer, PARAMETER :: NumOfCanopyLayers=10   !# of canopy layers
   integer, PARAMETER :: JS=5
-  integer, PARAMETER :: JLI=4   !# of sectors for the leaf zenith [0,pi/2]
-  integer, PARAMETER :: JLA=4   !# of sectors for the leaf azimuth, [0,pi]
-  integer, PARAMETER :: JSA=4   !# of sectors for the sky azimuth  [0,2*pi]
-  integer, parameter :: JNODS=25!# of nodes for plant canopy
-  integer, pointer :: JGnio(:)   !guid indices for organic-microbial complex
-  integer, pointer :: JGnfo(:)   !guid indices for organic-microbial complex
-  integer, pointer :: JGniA(:)   !guid indices for autotrophic-microbial complex
-  integer, pointer :: JGnfA(:)   !guid indices for autotrophic-microbial complex
-  integer  :: NumOfMicrobsInAutotrophCmplx             !total number of microbial guilds in the autotrophic complex
-  integer  :: NumOfMicrobs1HetertrophCmplx             !total number of microbial guilds in one organic-microbial complex
+  integer, PARAMETER :: NumOfLeafZenithSectors=4   !# of sectors for the leaf zenith [0,pi/2]
+  integer, PARAMETER :: NumOfLeafAzimuthSectors=4   !# of sectors for the leaf azimuth, [0,pi]
+  integer, PARAMETER :: NumOfSkyAzimuSects=4   !# of sectors for the sky azimuth  [0,2*pi]
+  integer, parameter :: MaxNodesPerBranch=25!# of nodes for plant canopy
+  integer, pointer :: JGnio(:)   !guid indices for organic-microbial CO2CompenPoint_nodeex
+  integer, pointer :: JGnfo(:)   !guid indices for organic-microbial CO2CompenPoint_nodeex
+  integer, pointer :: JGniA(:)   !guid indices for autotrophic-microbial CO2CompenPoint_nodeex
+  integer, pointer :: JGnfA(:)   !guid indices for autotrophic-microbial CO2CompenPoint_nodeex
+  integer  :: NumOfMicrobsInAutotrophCmplx             !total number of microbial guilds in the autotrophic CO2CompenPoint_nodeex
+  integer  :: NumOfMicrobs1HetertrophCmplx             !total number of microbial guilds in one organic-microbial CO2CompenPoint_nodeex
    
   type, public :: bounds_type
    integer :: NHW

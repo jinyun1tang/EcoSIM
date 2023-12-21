@@ -1,15 +1,15 @@
 module EcoSIMAPI
   USE EcoSIMCtrlDataType
-  use timings      , only : start_timer, end_timer
-  use ErosionMod   , only : erosion
-  use Hour1Mod     , only : hour1
-  use RedistMod    , only : redist
-  use GeochemAPI   , only : soluteModel
-  use PlantAPI     , only : PlantModel
-  use MicBGCAPI    , only : MicrobeModel, MicAPI_Init, MicAPI_cleanup
-  use TrnsfrMod    , only : trnsfr
-  use TrnsfrsMod   , only : trnsfrs
-  use EcoSIMCtrlMod, only : lverb,plant_model,soichem_model,  microbial_model,salt_model
+  use timings         , only : start_timer, end_timer
+  use ErosionMod      , only : erosion
+  use Hour1Mod        , only : hour1
+  use RedistMod       , only : redist
+  use GeochemAPI      , only : soluteModel
+  use PlantMod        , only : PlantModel
+  use MicBGCAPI       , only : MicrobeModel, MicAPI_Init, MicAPI_cleanup
+  use TranspNoSaltMod , only : TranspNoSalt
+  use TranspSaltMod   , only : TranspSalt
+  use EcoSIMCtrlMod  
   use WatsubMod    , only : watsub
 implicit none
   private
@@ -17,7 +17,7 @@ implicit none
   __FILE__
   public :: soil
   public :: readnamelist
-  public :: regressiontest
+  public :: regressiontest,write_modelconfig
 contains
 
   subroutine Run_EcoSIM_one_step(I,J,NHW,NHE,NVN,NVS)
@@ -40,7 +40,7 @@ contains
   !
   !   CALCULATE SOIL BIOLOGICAL TRANSFORMATIONS IN 'NITRO'
   !
-  if(  microbial_model)then
+  if(microbial_model)then
     if(lverb)WRITE(*,334)'NIT'
     call start_timer(t1)
     CALL MicrobeModel(I,J,NHW,NHE,NVN,NVS)
@@ -53,7 +53,6 @@ contains
   if(plant_model)then
     call PlantModel(I,J,NHW,NHE,NVN,NVS)
   endif
-  if(TKS(2,1,1)>400.)PRINT*,'plantTKS',TKS(2,1,1)
   !
   !
   !   CALCULATE SOLUTE EQUILIBRIA IN 'SOLUTE'
@@ -66,21 +65,21 @@ contains
     call end_timer('SOL',t1)
   endif
   !
-  !   CALCULATE GAS AND SOLUTE FLUXES IN 'TRNSFR'
+  !   CALCULATE GAS AND SOLUTE FLUXES IN 'TranspNoSalt'
   !
   if(lverb)WRITE(*,334)'TRN'
   call start_timer(t1)
-  CALL TRNSFR(I,J,NHW,NHE,NVN,NVS)
+  CALL TranspNoSalt(I,J,NHW,NHE,NVN,NVS)
   call end_timer('TRN',t1)
   !
-  !   CALCULATE ADDITIONAL SOLUTE FLUXES IN 'TRNSFRS' IF SALT OPTION SELECTED
+  !   CALCULATE ADDITIONAL SOLUTE FLUXES IN 'TranspSalt' IF SALT OPTION SELECTED
   !
   if(lverb)WRITE(*,334)'TRNS'
   !    if(I>=170)print*,TKS(0,NVN,NHW)'
   if(salt_model)then
     call start_timer(t1)
-    CALL TRNSFRS(I,J,NHW,NHE,NVN,NVS)
-    call end_timer('TRNSFRS',t1)
+    CALL TranspSalt(I,J,NHW,NHE,NVN,NVS)
+    call end_timer('TranspSalt',t1)
   endif
 
   !
@@ -142,7 +141,7 @@ contains
     NPXS,NPYS,JOUTS,continue_run,visual_out,restart_out,&
     finidat,restartFileFullPath,brnch_retain_casename,plant_model,microbial_model,&
     soichem_model,atm_ghg_in,aco2_ppm,ao2_ppm,an2_ppm,an2_ppm,ach4_ppm,anh3_ppm,&
-    snowRedist_model
+    snowRedist_model,disp_planttrait,iErosionMode,grid_mode
 
   namelist /ecosim/hist_nhtfrq,hist_mfilt,hist_fincl1,hist_fincl2,hist_yrclose, &
     do_budgets,ref_date,start_date
@@ -159,16 +158,19 @@ contains
 
   continue_run=.false.
   NPXS=30   !number of cycles per hour for water,heat,solute flux calcns
-  NPYS=20   !number of cycles per NPX for gas flux calcns
+  NPYS=20   !number of cycles per NPX for gas flux calculations
   JOUTS=1   !frequency on hourly scale
   NCYC_LITR=20
   NCYC_SNOW=20
+  grid_mode=3
+  iErosionMode=-1
   visual_out =.false.
   restart_out=.false.
   do_budgets =.false.
   plant_model=.true.
   soichem_model=.true.
-    microbial_model=.true.
+  microbial_model=.true.
+  disp_planttrait=.false.
   ref_date  = '18000101000000'   !place holder for future
   start_date= '18000101000000'   !start date of the simulation, differ from the forcing date
   finidat=' '
@@ -229,6 +231,7 @@ contains
     write(iulog, *) '--------------------'
 
   endif
+  erosion_model=iErosionMode<0
   read(start_date,'(I4)')year0
   call etimer%Init(nml_buffer,year0=year0)
   if(do_bgcforc_write)then
@@ -242,7 +245,7 @@ contains
   LYRG=num_of_simdays
   lverb=lverbose
   nmicbguilds=num_microbial_guilds
-  if(.not. soichem_model)then
+  if(.not.soichem_model)then
     salt_model=.false.
   endif
 end subroutine readnamelist
@@ -265,10 +268,7 @@ subroutine soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
   use PlantInfoMod , only : ReadPlantInfo
   use readsmod     , only : ReadClimSoilForcing
   use timings      , only : init_timer, start_timer, end_timer,end_timer_loop
-  use InitEcoSIM   , only : InitModules2
   use EcoSIMCtrlMod
-  use PlantAPI     , only : PlantModel
-  use MicBGCAPI    , only : MicrobeModel, MicAPI_Init, MicAPI_cleanup
   use ForcWriterMod, only : do_bgcforc_write,WriteBBGCForc
   use GridConsts
   use EcoSIMCtrlDataType
@@ -344,7 +344,7 @@ subroutine soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
     CALL STARTE(NHW,NHE,NVN,NVS)
   endif
 
-  iyear_cur=frectyp%yearcur
+  iYearCurrent=frectyp%yearcur
   LYRC=etimer%get_days_cur_year()
 
   DO I=1,LYRC
@@ -367,7 +367,6 @@ subroutine soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
         call etimer%update_time_stamp()
         cycle
       endif
-
     !
     !   UPDATE HOURLY VARIABLES IN 'HOUR1'
     !   set up climate forcing for the new hour
@@ -459,15 +458,15 @@ subroutine regressiontest(nmfile,case_name, NX, NY)
     call regression%OpenOutput()
 
     do NZ=1,NP(NY,NX)
-      IF(IFLGC(NZ,NY,NX).EQ.PlantIsActive)THEN
+      IF(IsPlantActive_pft(NZ,NY,NX).EQ.iPlantIsActive)THEN
 
         category = 'flux'
         name = 'NH4_UPTK (g m^-3 h^-1)'
         datv=0._r8
         do ll=1,12
           if(AREA(3,ll,NY,NX)>0._r8)then
-            datv(ll)=safe_adb(RUPNH4(1,ll,NZ,NY,NX)+RUPNH4(2,ll,NZ,NY,NX) &
-              +RUPNHB(1,ll,NZ,NY,NX)+RUPNHB(2,ll,NZ,NY,NX),AREA(3,ll,NY,NX))
+            datv(ll)=safe_adb(RootNutUptake_pvr(ids_NH4,1,ll,NZ,NY,NX)+RootNutUptake_pvr(ids_NH4,2,ll,NZ,NY,NX) &
+              +RootNutUptake_pvr(ids_NH4B,1,ll,NZ,NY,NX)+RootNutUptake_pvr(ids_NH4B,2,ll,NZ,NY,NX),AREA(3,ll,NY,NX))
           endif
         enddo
         call regression%writedata(category,name, datv)
@@ -478,7 +477,7 @@ subroutine regressiontest(nmfile,case_name, NX, NY)
 
     category = 'state'
     name = 'aqueous soil O2 (g m^3)'
-    datv=trc_solcl(idg_O2,1:12,NY,NX)
+    datv=trc_solcl_vr(idg_O2,1:12,NY,NX)
     call regression%writedata(category,name,datv)
 
     category = 'state'
@@ -494,5 +493,27 @@ subroutine regressiontest(nmfile,case_name, NX, NY)
     call regression%CloseOutput()
   endif
 end subroutine regressiontest
+
+!------------------------------------------------------------------------------------------
+  subroutine write_modelconfig()
+  use fileUtil, only : getavu, relavu, opnfil
+  use readiMod
+  implicit none
+  character(len=64) :: fnm_loc
+  integer :: nu_cfg
+
+  if(disp_modelconfig)then
+    nu_cfg=getavu()
+    write(fnm_loc,'(A,I4,A)')'ecosim.cfg'
+    call opnfil(fnm_loc,nu_cfg,'f')    
+
+    write(nu_cfg,*)'microbial_model=',microbial_model
+    write(nu_cfg,*)'plant_model=',plant_model
+    write(nu_cfg,*)'salt_model=',salt_model
+    write(nu_cfg,*)'erosion_model=',erosion_model_status(iErosionMode)
+    write(nu_cfg,*)'grid_mode=',GridConectionMode(grid_mode)
+    call relavu(nu_cfg)
+  endif
+  end subroutine write_modelconfig
 
 end module EcoSIMAPI

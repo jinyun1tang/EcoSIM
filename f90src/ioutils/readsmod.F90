@@ -18,22 +18,12 @@ module readsmod
   use GridDataType
   use EcoSIMConfig
   use ClimReadMod
+  use AqueChemDatatype
   implicit none
   private
 
   character(len=*), parameter :: mod_filename = &
   __FILE__
-  integer, SAVE :: N1,N2,N1X,N2X
-
-  real(r8) :: CN4RIG,CNORIG,CN4RG,CNORG,CPORG,CALRG
-  real(r8) :: CFERG,CCARG,CMGRG,CNARG,CKARG,CSORG,CCLRG
-  real(r8) :: Z0G,ZNOONG
-  real(r8) :: PHRG
-
-  CHARACTER(len=16) :: OUTW,OUTI,OUTT,OUTN,OUTF
-  CHARACTER(len=4) :: CHARY
-
-  integer :: IDATE,IDY,IFLG3,I,ICHECK
 
   public :: ReadClimSoilForcing
   contains
@@ -53,6 +43,14 @@ module readsmod
   integer :: kk,N,L,NY,NX,NZ,K
   integer :: LL,J
   integer :: LPY,IX
+  real(r8) :: CN4RIG,CNORIG,CN4RG,CNORG,CPORG,CALRG
+  real(r8) :: CFERG,CCARG,CMGRG,CNARG,CKARG,CSORG,CCLRG
+  real(r8) :: Z0G,ZNOONG
+  real(r8) :: PHRG
+  CHARACTER(len=16) :: OUTW,OUTI,OUTT,OUTN,OUTF
+  CHARACTER(len=4) :: CHARY
+  integer :: IDATE,IDY,IFLG3,I,ICHECK
+
   type(atm_forc_type) :: atmf
 
   ICLM=0
@@ -128,7 +126,7 @@ module readsmod
 !
 ! IDATA(3),IDATA(6)=start,end year of current scene
 !
-  IYRC=yearc
+  iYearCurrent=yearc
 
 !
 ! OPEN CHECKPOINT FILES FOR SOIL VARIABLES
@@ -193,21 +191,21 @@ module readsmod
   D8970: DO NX=NHW,NHE
     D8975: DO NY=NVN,NVS
       WindMesHeight(NY,NX)=Z0G         !windspeed meast height
-      ZNOON(NY,NX)=ZNOONG
+      SolarNoonHour_col(NY,NX)=ZNOONG
       PHR(NY,NX)=PHRG
       CN4RI(NY,NX)=CN4RIG
       CNORI(NY,NX)=CNORIG
-      CN4R(NY,NX)=CN4RIG
-      CNOR(NY,NX)=CNORIG
-      CPOR(NY,NX)=CPORG
-      CALR(NY,NX)=CALRG
-      CFER(NY,NX)=CFERG
-      CCAR(NY,NX)=CCARG
-      CMGR(NY,NX)=CMGRG
-      CNAR(NY,NX)=CNARG
-      CKAR(NY,NX)=CKARG
-      CSOR(NY,NX)=CSORG
-      CCLR(NY,NX)=CCLRG
+      NH4_rain_conc(NY,NX)=CN4RIG
+      NO3_rain_conc(NY,NX)=CNORIG
+      H2PO4_rain_conc(NY,NX)=CPORG
+      trcsalt_rain_conc(idsalt_Al,NY,NX)=CALRG
+      trcsalt_rain_conc(idsalt_Fe,NY,NX)=CFERG
+      trcsalt_rain_conc(idsalt_Ca,NY,NX)=CCARG
+      trcsalt_rain_conc(idsalt_Mg,NY,NX)=CMGRG
+      trcsalt_rain_conc(idsalt_Na,NY,NX)=CNARG
+      trcsalt_rain_conc(idsalt_K,NY,NX)=CKARG
+      trcsalt_rain_conc(idsalt_SO4,NY,NX)=CSORG
+      trcsalt_rain_conc(idsalt_Cl,NY,NX)=CCLRG
     ENDDO D8975
   ENDDO D8970
 !
@@ -254,17 +252,17 @@ module readsmod
           RRIG(J,I,NY,NX)=0.0_r8
         ENDDO D120
         PHQ(I,NY,NX)=7.0_r8
-        CN4Q(I,NY,NX)=0.0_r8
-        CNOQ(I,NY,NX)=0.0_r8
-        CPOQ(I,NY,NX)=0.0_r8
-        CALQ(I,NY,NX)=0.0_r8
-        CFEQ(I,NY,NX)=0.0_r8
-        CCAQ(I,NY,NX)=0.0_r8
-        CMGQ(I,NY,NX)=0.0_r8
-        CNAQ(I,NY,NX)=0.0_r8
-        CKAQ(I,NY,NX)=0.0_r8
-        CSOQ(I,NY,NX)=0.0_r8
-        CCLQ(I,NY,NX)=0.0_r8
+        NH4_irrig_conc(I,NY,NX)=0.0_r8
+        NO3_irrig_conc(I,NY,NX)=0.0_r8
+        H2PO4_irrig_conc(I,NY,NX)=0.0_r8
+        trcsalt_irrig_conc(idsalt_Al,I,NY,NX)=0.0_r8
+        trcsalt_irrig_conc(idsalt_Fe,I,NY,NX)=0.0_r8
+        trcsalt_irrig_conc(idsalt_Ca,I,NY,NX)=0.0_r8
+        trcsalt_irrig_conc(idsalt_Mg,I,NY,NX)=0.0_r8
+        trcsalt_irrig_conc(idsalt_Na,I,NY,NX)=0.0_r8
+        trcsalt_irrig_conc(idsalt_K,I,NY,NX)=0.0_r8
+        trcsalt_irrig_conc(idsalt_SO4,I,NY,NX)=0.0_r8
+        trcsalt_irrig_conc(idsalt_Cl,I,NY,NX)=0.0_r8
         WDPTH(I,NY,NX)=0.0_r8
         ROWI(I,NY,NX)=0.0_r8
       ENDDO D125
@@ -280,7 +278,7 @@ module readsmod
   ENDIF
   IMNG=1
 
-  call getGHGts(yearc,NHW,NHE,NVN,NVS)
+  call geEco_Heat_Grnd_colGts(yearc,NHW,NHE,NVN,NVS)
 
   RETURN
   END subroutine ReadClimSoilForcing

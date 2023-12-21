@@ -81,10 +81,14 @@ module ncdio_pio
     module procedure ncd_putvar_real_sp_all_3d
     module procedure ncd_putvar_real_sp_all_4d
     module procedure ncd_putvar_real_sp_all_5d
+
+    module procedure ncd_putvar_logical_1d
+    module procedure ncd_putvar_logical_all_1d    
   end interface ncd_putvar
 
   interface ncd_getvar
     module procedure ncd_getvar_int
+    module procedure ncd_getvar_logical_1d    
     module procedure ncd_getvar_real_sp
     module procedure ncd_getvar_int_1d
     module procedure ncd_getvar_int_all_1d
@@ -106,7 +110,7 @@ module ncdio_pio
     module procedure ncd_getvar_real_sp_all_5d
     module procedure ncd_getvar_str_1ds
     module procedure ncd_getvar_string_1d
-
+    module procedure ncd_getvar_logical_all_1d
   end interface ncd_getvar
 
   interface get_dim_len
@@ -323,8 +327,9 @@ module ncdio_pio
 !EOP
 !
 ! !LOCAL VARIABLES:
-  integer :: ret     ! return value
+  integer :: ret      ! return value
   logical :: log_err ! if should log error
+  integer :: var_size
   character(len=255) :: msg
 !-----------------------------------------------------------------------
 
@@ -337,7 +342,6 @@ module ncdio_pio
   readvar = .true.
 
   ret = nf90_inq_varid (ncid%fh, varname, vardesc%varid)
-
   if (ret/=nf90_noerr) then
     readvar = .false.
     if(log_err)then
@@ -682,6 +686,32 @@ module ncdio_pio
 
   end subroutine ncd_putvar_int_1d
 !----------------------------------------------------------------------
+  subroutine ncd_putvar_logical_1d(ncid, varname, rec, data)
+
+  implicit none
+  class(file_desc_t), intent(in) :: ncid
+  integer, intent(in) :: rec
+  logical, dimension(:), intent(in) :: data
+  character(len=*), intent(in) :: varname
+  integer :: varid
+  logical :: readvar
+  type(Var_desc_t)  :: vardesc
+
+  integer :: data_loc(size(data))
+  integer :: jj, nsz
+
+  nsz=size(data)
+  data_loc=0
+  do jj=1,nsz
+    if(data(jj))data_loc(jj)=1      
+  enddo
+
+  call check_var(ncid, trim(varname), vardesc, readvar)
+
+  call check_ret( nf90_put_var(ncid%fh, vardesc%varid, data_loc, start = (/1,rec/)),'ncd_putvar_logical_1d')
+
+  end subroutine ncd_putvar_logical_1d
+!----------------------------------------------------------------------
   subroutine ncd_putvar_int_all_1d(ncid, varname, data)
   !
   ! DESCRIPTION
@@ -809,6 +839,35 @@ module ncdio_pio
     call check_ret( nf90_put_var(ncid%fh, vardesc%varid, data),'ncd_putvar_real_sp_all_1d')
 
     end subroutine ncd_putvar_real_sp_all_1d
+  !----------------------------------------------------------------------
+    subroutine ncd_putvar_logical_all_1d(ncid, varname,  data)
+    !
+    ! DESCRIPTIONS
+    ! put 1d real array to file
+
+    use data_kind_mod, only : r8 => DAT_kind_r8
+  !**********************************************************************
+    implicit none
+    class(file_desc_t), intent(in) :: ncid
+    logical,dimension(:), intent(in) :: data
+
+    character(len=*), intent(in) :: varname
+    integer :: varid
+    logical :: readvar
+    type(Var_desc_t)  :: vardesc
+    integer :: data_loc(size(data))
+    integer :: jj, nsz
+
+    call check_var(ncid, trim(varname), vardesc, readvar)
+
+    nsz=size(data)
+    data_loc=0
+    do jj=1,nsz
+      if(data(jj))data_loc(jj)=1
+    enddo
+    call check_ret( nf90_put_var(ncid%fh, vardesc%varid, data_loc),'ncd_putvar_logical_all_1d')
+
+    end subroutine ncd_putvar_logical_all_1d
 
   !----------------------------------------------------------------------
     subroutine ncd_putvar_real_sp_all_2d(ncid, varname,  data)
@@ -1146,6 +1205,35 @@ module ncdio_pio
     call check_ret( nf90_get_var(ncid%fh, vardesc%varid, data),'ncd_getvar_real_sp_all_1d')
 
     end subroutine ncd_getvar_real_sp_all_1d
+  !----------------------------------------------------------------------
+
+    subroutine ncd_getvar_logical_all_1d(ncid, varname, data)
+    !
+    !DESCRIPTION
+    ! read a real scalar
+
+    use data_kind_mod, only : r8 => DAT_kind_r8
+   !**********************************************************************
+    implicit none
+    class(file_desc_t), intent(in) :: ncid
+    character(len=*),intent(in) :: varname
+    logical, dimension(:), intent(out) :: data
+
+    integer :: varid
+    logical :: readvar
+    integer :: data_loc(size(data))
+    type(Var_desc_t)  :: vardesc
+    integer :: jj, nsz
+
+    call check_var(ncid, trim(varname), vardesc, readvar)
+
+    call check_ret( nf90_get_var(ncid%fh, vardesc%varid, data_loc),'ncd_getvar_logical_all_1d')
+
+    nsz=size(data)
+    do jj=1,nsz
+      data(jj)=(data_loc(jj)==1)
+    enddo
+    end subroutine ncd_getvar_logical_all_1d
 
     !----------------------------------------------------------------------
 
@@ -1282,8 +1370,9 @@ module ncdio_pio
 
   call check_var(ncid, trim(varname), vardesc, readvar)
 
+  print*,len(data(1:1)),size(data),varname
   call check_ret(nf90_get_var(ncid%fh, vardesc%varid, data), &
-    'ncd_getvar_str_1ds')
+    'ncd_getvar_str_1ds::'//trim(varname))
 
   end subroutine ncd_getvar_str_1ds
 
@@ -1353,6 +1442,35 @@ module ncdio_pio
      start = (/1,rec/)),trim(mod_filename)//'::ncd_getvar_int_1d::'//trim(varname))
 
   end subroutine ncd_getvar_int_1d
+!----------------------------------------------------------------------
+  subroutine ncd_getvar_logical_1d(ncid, varname, rec, data)
+  !
+  !DESCRIPTION
+  !read 1d integer array
+  !
+
+!**********************************************************************
+  implicit none
+  class(file_desc_t), intent(in) :: ncid
+  integer,           intent(in) :: rec
+  logical, dimension(:), intent(out) :: data
+  character(len=*), intent(in) :: varname
+  integer :: varid
+  logical :: readvar
+  type(Var_desc_t)  :: vardesc
+  integer :: data_loc(size(data))
+  integer :: nsz, jj
+  call check_var(ncid, trim(varname), vardesc, readvar)
+
+  call check_ret( nf90_get_var(ncid%fh, vardesc%varid, data_loc,  &
+     start = (/1,rec/)),trim(mod_filename)//'::ncd_getvar_logical_1d::'//trim(varname))
+
+  nsz=size(data)
+
+  do jj = 1, nsz
+    data(jj)=(data_loc(jj)==1)
+  enddo  
+  end subroutine ncd_getvar_logical_1d
 !----------------------------------------------------------------------
   subroutine ncd_getvar_int_all_1d(ncid, varname, data)
   !
@@ -1688,11 +1806,11 @@ module ncdio_pio
     integer :: ierr
     !-----------------------------------------------------------------------
 
-
     write(iulog,*) 'Opened existing file ', trim(fname)
     call check_ret(nf90_open(fname, mode, file%fh),'open file '//trim(fname))
 
   end subroutine ncd_pio_openfile
+
 !-----------------------------------------------------------------------
   subroutine ncd_pio_openfile_for_write(file, fname)
     !
@@ -1970,19 +2088,19 @@ module ncdio_pio
     if (ier == nf90_noerr) ier = nf90_inquire_dimension(ncid%fh, dimid, len=ni)
 
     ier = nf90_inq_dimid (ncid%fh, 'lat', dimid)
-    if (ier == nf90_noerr) ier = nf90_inquire_dimension(ncid%fh, dimid, len=nj)
+    if (ier == nf90_noerr) ier = nf90_inquire_dimension(ncid%fh, dimid, len=NJ)
 
     ier = nf90_inq_dimid (ncid%fh, 'lsmlon', dimid)
     if (ier == nf90_noerr) ier = nf90_inquire_dimension(ncid%fh, dimid, len=ni)
 
     ier = nf90_inq_dimid (ncid%fh, 'lsmlat', dimid)
-    if (ier == nf90_noerr) ier = nf90_inquire_dimension(ncid%fh, dimid, len=nj)
+    if (ier == nf90_noerr) ier = nf90_inquire_dimension(ncid%fh, dimid, len=NJ)
 
     ier = nf90_inq_dimid (ncid%fh, 'ni', dimid)
     if (ier == nf90_noerr) ier = nf90_inquire_dimension(ncid%fh, dimid, len=ni)
 
     ier = nf90_inq_dimid (ncid%fh, 'nj', dimid)
-    if (ier == nf90_noerr) ier = nf90_inquire_dimension(ncid%fh, dimid, len=nj)
+    if (ier == nf90_noerr) ier = nf90_inquire_dimension(ncid%fh, dimid, len=NJ)
 
     ier = nf90_inq_dimid (ncid%fh, 'gridcell', dimid)
     if (ier == nf90_noerr) then
@@ -2763,6 +2881,21 @@ module ncdio_pio
     type(iodesc_plus_type) , pointer :: iodesc_plus
     type(var_desc_t)                 :: vardesc
     character(len=*),parameter       :: subname=trim(mod_filename)//'::ncd_io_1d_logical' ! subroutine name
+
+    if(flag=='read')then
+      if(present(nt))then
+        call ncd_getvar_logical_1d(ncid, varname, nt, data)
+      else
+        call ncd_getvar_logical_all_1d(ncid, varname, data)
+      endif
+      if(present(readvar))readvar=.true.
+    else if(flag=='write')then
+      if(present(nt))then
+        call ncd_putvar_logical_1d(ncid, varname, nt, data)
+      else
+        call ncd_putvar_logical_all_1d(ncid, varname, data)
+      endif
+    endif    
   end subroutine ncd_io_1d_logical
 !----------------------------------------------------------------------
 

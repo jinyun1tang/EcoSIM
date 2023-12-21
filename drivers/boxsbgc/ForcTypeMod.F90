@@ -77,10 +77,7 @@ implicit none
     real(r8), allocatable :: OHC(:)
     real(r8), allocatable :: OHN(:)
     real(r8), allocatable :: OHP(:)
-    real(r8), allocatable :: OQC(:)
-    real(r8), allocatable :: OQN(:)
-    real(r8), allocatable :: OQP(:)
-    real(r8), allocatable :: OQA(:)
+    real(r8), allocatable :: DOM(:,:)
     real(r8), allocatable :: OMC(:,:,:)
     real(r8), allocatable :: OMN(:,:,:)
     real(r8), allocatable :: OMP(:,:,:)
@@ -88,10 +85,10 @@ implicit none
     real(r8), allocatable :: OMNff(:,:)
     real(r8), allocatable :: OMPff(:,:)
 
-!    real(r8) :: COXQ        !surface irrigation  O2 concentration, [g m-3]
-!    real(r8) :: COXR        !precipitation  O2 concentration, [g m-3]
-!    real(r8) :: FLQRI       !irrigation flux into surface litter, [m3 d-2 h-1]
-!    real(r8) :: FLQRQ       !precipitation flux into surface litter, [m3 d-2 h-1]
+!    real(r8) :: O2_irrig_conc        !surface irrigation  O2 concentration, [g m-3]
+!    real(r8) :: O2_rain_conc        !precipitation  O2 concentration, [g m-3]
+!    real(r8) :: Irrig2LitRSurf       !irrigation flux into surface litter, [m3 d-2 h-1]
+!    real(r8) :: Rain2LitRSurf       !precipitation flux into surface litter, [m3 d-2 h-1]
 !
     real(r8) :: TKS          !temperature in kelvin, [K]
     real(r8) :: THETW        !volumetric water content [m3 m-3]
@@ -169,7 +166,7 @@ implicit none
     real(r8) :: CNO3S       !NO3 concentration non-band micropore	[g m-3], derived from ZNO3S
     real(r8) :: CH2P4       !aqueous PO4 concentration non-band	[g m-3], derived from H2PO4
     real(r8) :: CH1P4       !aqueous H1PO4 concentration non-band [g m-3], derived from H1PO4
-    real(r8) :: DFGS        !coefficient for dissolution - volatilization, []
+    real(r8) :: DiffusivitySolutEff        !coefficient for dissolution - volatilization, []
     real(r8) :: THETPM      !soil air-filled porosity, [m3 m-3]
 
 !derived variables
@@ -248,10 +245,7 @@ implicit none
   allocate(forc%OMC(nlbiomcp,NumOfMicrobs1HetertrophCmplx,1:jcplx))
   allocate(forc%OMN(nlbiomcp,NumOfMicrobs1HetertrophCmplx,1:jcplx))
   allocate(forc%OMP(nlbiomcp,NumOfMicrobs1HetertrophCmplx,1:jcplx))
-  allocate(forc%OQC(1:jcplx))
-  allocate(forc%OQN(1:jcplx))
-  allocate(forc%OQP(1:jcplx))
-  allocate(forc%OQA(1:jcplx))
+  allocate(forc%DOM(idom_beg:idom_end,1:jcplx))
   allocate(forc%OSC(jsken,1:jcplx))
   allocate(forc%OSA(jsken,1:jcplx))
   allocate(forc%OSN(jsken,1:jcplx))
@@ -329,10 +323,7 @@ implicit none
   call ncd_getvar(ncf,'OHN',forc%OHN)
   call ncd_getvar(ncf,'OHP',forc%OHP)
   call ncd_getvar(ncf,'OHA',forc%OHA)
-  call ncd_getvar(ncf,'OQA',forc%OQA)
-  call ncd_getvar(ncf,'OQC',forc%OQC)
-  call ncd_getvar(ncf,'OQN',forc%OQN)
-  call ncd_getvar(ncf,'OQP',forc%OQP)
+  call ncd_getvar(ncf,'DOM',forc%DOM)
   call ncd_getvar(ncf,'THETY',forc%THETY)
   call ncd_getvar(ncf,'PSIMX',forc%LOGPSIMX)
   call ncd_getvar(ncf,'PSIMD',forc%LOGPSIMND)
@@ -473,7 +464,7 @@ implicit none
     Z3S=forc%FieldCapacity/forc%POROS
     XNPD=600.0_r8*dts_gas
     scalar=forc%TFND*XNPD
-    forc%DFGS=fDFGS(scalar,THETW,Z3S)
+    forc%DiffusivitySolutEff=fDiffusivitySolutEff(scalar,THETW,Z3S)
 
     DFLG2=2.0_r8*AZMAX1(forc%THETPM)*POROQ &
       *forc%THETPM/forc%POROS*forc%AREA3/forc%DLYR3
@@ -487,7 +478,7 @@ implicit none
     forc%HGSGL=HGSG*TFACG*DFLG2
 
     forc%PARG=forc%AREA3*dts_HeatWatTP/(0.0139_r8+1.39E-03_r8)
-    PARGM=forc%PARG*XNPT
+    PARGM=forc%PARG*dt_GasCyc
     !GASEOUS BOUNDARY LAYER CONDUCTANCES
     PARGCO=PARGM*0.74_r8
     PARGCH=PARGM*1.04_r8

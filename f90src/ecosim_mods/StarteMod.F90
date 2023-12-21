@@ -47,7 +47,7 @@ module StarteMod
   implicit none
   integer, intent(in) :: NHW,NHE,NVN,NVS
   type(solutedtype)  :: solutevar
-  REAL(R8) :: BKVLX
+  REAL(R8) :: BulkSoilMass
 !     begin_execution
 !
 !     INITIALIZE CATION AND ANION CONCENTRATIONS
@@ -57,66 +57,67 @@ module StarteMod
   DO   NX=NHW,NHE
     DO  NY=NVN,NVS
       solutevar%CCO2M=CCO2EI(NY,NX)/catomw
-      solutevar%CCH4M=AtmGgms(idg_CH4,NY,NX)/catomw
-      solutevar%COXYM=AtmGgms(idg_O2,NY,NX)/32.0_r8
-      solutevar%CZ2GM=AtmGgms(idg_N2,NY,NX)/natomw
-      solutevar%CZ2OM=AtmGgms(idg_N2O,NY,NX)/natomw
+      solutevar%CCH4M=AtmGasCgperm3(idg_CH4,NY,NX)/catomw
+      solutevar%COXYM=AtmGasCgperm3(idg_O2,NY,NX)/32.0_r8
+      solutevar%CZ2GM=AtmGasCgperm3(idg_N2,NY,NX)/natomw
+      solutevar%CZ2OM=AtmGasCgperm3(idg_N2O,NY,NX)/natomw
       solutevar%ATCA  = ATCA(NY,NX)
       solutevar%ZEROS = ZEROS(NY,NX)
 
       DO I=1,366
         DO  L=NU(NY,NX),NL(NY,NX)
           DO K=micpar%k_fine_litr,micpar%k_POM
-            BKVLX=0._r8
+            BulkSoilMass=0._r8
 !
             IF(K.EQ.micpar%k_manure.AND.L.EQ.1)THEN
 !     INITIALIZE IRRIGATION WATER
-              solutevar%CN4Z=CN4Q(I,NY,NX)
-              solutevar%CNOZ=CNOQ(I,NY,NX)
-              solutevar%CPOZ=CPOQ(I,NY,NX)
-              solutevar%CALZ=CALQ(I,NY,NX)
-              solutevar%CFEZ=CFEQ(I,NY,NX)
-              solutevar%CCAZ=CCAQ(I,NY,NX)
-              solutevar%CMGZ=CMGQ(I,NY,NX)
-              solutevar%CNAZ=CNAQ(I,NY,NX)
-              solutevar%CKAZ=CKAQ(I,NY,NX)
-              solutevar%CSOZ=CSOQ(I,NY,NX)
-              solutevar%CCLZ=CCLQ(I,NY,NX)
-              solutevar%CHY1=10.0_r8**(-(PHQ(I,NY,NX)-3.0_r8))
-              solutevar%COH1=DPH2O/solutevar%CHY1
+              solutevar%CN4Z=NH4_irrig_conc(I,NY,NX)
+              solutevar%CNOZ=NO3_irrig_conc(I,NY,NX)
+              solutevar%CPOZ=H2PO4_irrig_conc(I,NY,NX)
+              solutevar%CALZ=trcsalt_irrig_conc(idsalt_Al,I,NY,NX)
+              solutevar%CFEZ=trcsalt_irrig_conc(idsalt_Fe,I,NY,NX)
+              solutevar%CCAZ=trcsalt_irrig_conc(idsalt_Ca,I,NY,NX)
+              solutevar%CMGZ=trcsalt_irrig_conc(idsalt_Mg,I,NY,NX)
+              solutevar%CNAZ=trcsalt_irrig_conc(idsalt_Na,I,NY,NX)
+              solutevar%CKAZ=trcsalt_irrig_conc(idsalt_K,I,NY,NX)
+              solutevar%CSOZ=trcsalt_irrig_conc(idsalt_SO4,I,NY,NX)
+              solutevar%CCLZ=trcsalt_irrig_conc(idsalt_Cl,I,NY,NX)
+              solutevar%H_1p_conc=10.0_r8**(-(PHQ(I,NY,NX)-3.0_r8))
+              solutevar%OH_1e_conc=DPH2O/solutevar%H_1p_conc
             ELSE
               IF(I.EQ.1)then
                 IF(K.EQ.micpar%k_fine_litr.AND.L.EQ.1)THEN
 !     INITIALIZE RAINFALL, top layer
-                  solutevar%CHY1=10.0_r8**(-(PHR(NY,NX)-3.0_r8))
-                  solutevar%COH1=DPH2O/solutevar%CHY1
-                  solutevar%CN4Z=CN4R(NY,NX)
-                  solutevar%CNOZ=CNOR(NY,NX)
-                  solutevar%CPOZ=CPOR(NY,NX)
-                  solutevar%CALZ=CALR(NY,NX)
-                  solutevar%CFEZ=CFER(NY,NX)
-                  solutevar%CCAZ=CCAR(NY,NX)
-                  solutevar%CMGZ=CMGR(NY,NX)
-                  solutevar%CNAZ=CNAR(NY,NX)
-                  solutevar%CKAZ=CKAR(NY,NX)
-                  solutevar%CSOZ=CSOR(NY,NX)
-                  solutevar%CCLZ=CCLR(NY,NX)
+                  solutevar%H_1p_conc=10.0_r8**(-(PHR(NY,NX)-3.0_r8))
+                  solutevar%OH_1e_conc=DPH2O/solutevar%H_1p_conc
+                  solutevar%CN4Z=NH4_rain_conc(NY,NX)
+                  solutevar%CNOZ=NO3_rain_conc(NY,NX)
+                  solutevar%CPOZ=H2PO4_rain_conc(NY,NX)
+                  solutevar%CALZ=trcsalt_rain_conc(idsalt_Al,NY,NX)
+                  solutevar%CFEZ=trcsalt_rain_conc(idsalt_Fe,NY,NX)
+                  solutevar%CCAZ=trcsalt_rain_conc(idsalt_Ca,NY,NX)
+                  solutevar%CMGZ=trcsalt_rain_conc(idsalt_Mg,NY,NX)
+                  solutevar%CNAZ=trcsalt_rain_conc(idsalt_Na,NY,NX)
+                  solutevar%CKAZ=trcsalt_rain_conc(idsalt_K,NY,NX)
+                  solutevar%CSOZ=trcsalt_rain_conc(idsalt_SO4,NY,NX)
+                  solutevar%CCLZ=trcsalt_rain_conc(idsalt_Cl,NY,NX)
 !               ELSEIF(K.EQ.micpar%k_POM.AND.(.not.is_restart()).AND.is_first_year)THEN
 !
 !     INITIALIZE SOIL WATER
 
                   IF(SoilMicPMassLayer(L,NY,NX).GT.ZEROS(NY,NX))THEN
-                    BKVLX=SoilMicPMassLayer(L,NY,NX)
+                    BulkSoilMass=SoilMicPMassLayer(L,NY,NX)
                   ELSE
-                    BKVLX=VLMicP(L,NY,NX)
+                    !this is for water
+                    BulkSoilMass=VLMicP(L,NY,NX)
                   ENDIF
-                  trcx_solml(idx_CEC,L,NY,NX)=AMAX1(CNH4(L,NY,NX),CEC(L,NY,NX))*BKVLX
-                  trcx_solml(idx_AEC,L,NY,NX)=AMAX1(CPO4(L,NY,NX),AEC(L,NY,NX))*BKVLX
+                  trcx_solml(idx_CEC,L,NY,NX)=AMAX1(CNH4(L,NY,NX),CEC(L,NY,NX))*BulkSoilMass
+                  trcx_solml(idx_AEC,L,NY,NX)=AMAX1(CPO4(L,NY,NX),AEC(L,NY,NX))*BulkSoilMass
                   solutevar%CN4X=CNH4(L,NY,NX)
                   solutevar%CALX=CAL(L,NY,NX)
                   solutevar%CFEX=CFE(L,NY,NX)
-                  solutevar%CCAX=CCA(L,NY,NX)
-                  solutevar%CMGX=CMG(L,NY,NX)
+                  solutevar%CaX_conc=CCA(L,NY,NX)
+                  solutevar%MgX_conc=CMG(L,NY,NX)
                   solutevar%CNAX=CNA(L,NY,NX)
                   solutevar%CKAX=CKA(L,NY,NX)
                   solutevar%CSOX=CSO4(L,NY,NX)
@@ -129,15 +130,15 @@ module StarteMod
                   solutevar%CFEOHX=CFEOH(L,NY,NX)
                   solutevar%CCACOX=CCACO(L,NY,NX)
                   solutevar%CCASOX=CCASO(L,NY,NX)
-                  solutevar%CHY1=10.0_r8**(-(PH(L,NY,NX)-3.0_r8))
+                  solutevar%H_1p_conc=10.0_r8**(-(PH(L,NY,NX)-3.0_r8))
                   solutevar%CNOZ=CNO3(L,NY,NX)
                   solutevar%CPOZ=CPO4(L,NY,NX)
-                  solutevar%COH1=DPH2O/solutevar%CHY1
+                  solutevar%OH_1e_conc=DPH2O/solutevar%H_1p_conc
                   solutevar%CN4Z=solutevar%CN4X
                   solutevar%CALZ=solutevar%CALX
                   solutevar%CFEZ=solutevar%CFEX
-                  solutevar%CCAZ=solutevar%CCAX
-                  solutevar%CMGZ=solutevar%CMGX
+                  solutevar%CCAZ=solutevar%CaX_conc
+                  solutevar%CMGZ=solutevar%MgX_conc
                   solutevar%CNAZ=solutevar%CNAX
                   solutevar%CKAZ=solutevar%CKAX
                   solutevar%CSOZ=solutevar%CSOX
@@ -153,7 +154,7 @@ module StarteMod
             solutevar%XAEC  = trcx_solml(idx_AEC,L,NY,NX)
             solutevar%CEC   = CEC(L,NY,NX)
             solutevar%ORGC  = ORGC(L,NY,NX)
-            solutevar%VLPO4 = trcs_VLN(ids_H1PO4,L,NY,NX)
+            solutevar%VLPO4 = trcs_VLN_vr(ids_H1PO4,L,NY,NX)
             solutevar%XCEC  = trcx_solml(idx_CEC,L,NY,NX)
             solutevar%GKC4  = GKC4(L,NY,NX)
             solutevar%GKCA  = GKCA(L,NY,NX)
@@ -163,9 +164,9 @@ module StarteMod
             solutevar%GKCM  = GKCM(L,NY,NX)
             solutevar%VLWatMicP = VLWatMicP(L,NY,NX)
 
-            call InitSoluteModel(K,BKVLX,ISALTG,solutevar)
+            call InitSoluteModel(K,BulkSoilMass,solutevar)
 
-            call SoluteConcentrations(K,I,L,NY,NX,solutevar)
+            call InitSoluteConcs(K,I,L,NY,NX,solutevar)
           ENDDO
         enddo
       ENDDO
@@ -178,11 +179,12 @@ module StarteMod
   END subroutine starte
 !------------------------------------------------------------------------------------------
 
-  subroutine SoluteConcentrations(K,I,L,NY,NX,solutevar)
+  subroutine InitSoluteConcs(K,I,L,NY,NX,solutevar)
 
   implicit none
   integer, intent(in) :: K, I, L, NY, NX
   type(solutedtype), intent(in) :: solutevar
+  integer :: nsalts,ids
 !
 !     SOLUTE CONCENTRATIONS IN PRECIPITATION
 !
@@ -192,282 +194,242 @@ module StarteMod
   )
   IF(K.EQ.micpar%k_fine_litr.AND.L.EQ.1.AND.I.EQ.1)THEN
   !litter pool, top soil layer
-    CCOR(NY,NX)=solutevar%CCO21
-    CCHR(NY,NX)=solutevar%CCH41
-    COXR(NY,NX)=solutevar%COXY1
-    CNNR(NY,NX)=solutevar%CZ2G1
-    CN2R(NY,NX)=solutevar%CZ2O1
-    CN4R(NY,NX)=solutevar%CN41
-    CN3R(NY,NX)=solutevar%CN31
-    CALR(NY,NX)=solutevar%CAL1
-    CFER(NY,NX)=solutevar%CFE1
-    CHYR(NY,NX)=solutevar%CHY1
-    CCAR(NY,NX)=solutevar%CCA1
-    CMGR(NY,NX)=solutevar%CMG1
-    CNAR(NY,NX)=solutevar%CNA1
-    CKAR(NY,NX)=solutevar%CKA1
-    COHR(NY,NX)=solutevar%COH1
-    CSOR(NY,NX)=solutevar%CSO41
-    CCLR(NY,NX)=solutevar%CCL1
-    CC3R(NY,NX)=solutevar%CCO31
-    CHCR(NY,NX)=solutevar%CHCO31
-    CAL1R(NY,NX)=solutevar%CALO1
-    CAL2R(NY,NX)=solutevar%CALO2
-    CAL3R(NY,NX)=solutevar%CALO3
-    CAL4R(NY,NX)=solutevar%CALO4
-    CALSR(NY,NX)=solutevar%CALS1
-    CFE1R(NY,NX)=solutevar%CFEO1
-    CFE2R(NY,NX)=solutevar%CFEO2
-    CFE3R(NY,NX)=solutevar%CFEO3
-    CFE4R(NY,NX)=solutevar%CFEO4
-    CFESR(NY,NX)=solutevar%CFES1
-    CCAOR(NY,NX)=solutevar%CCAO1
-    CCACR(NY,NX)=solutevar%CCAC1
-    CCAHR(NY,NX)=solutevar%CCAH1
-    CCASR(NY,NX)=solutevar%CCAS1
-    CMGOR(NY,NX)=solutevar%CMGO1
-    CMGCR(NY,NX)=solutevar%CMGC1
-    CMGHR(NY,NX)=solutevar%CMGH1
-    CMGSR(NY,NX)=solutevar%CMGS1
-    CNACR(NY,NX)=solutevar%CNAC1
-    CNASR(NY,NX)=solutevar%CNAS1
-    CKASR(NY,NX)=solutevar%CKAS1
-    CH0PR(NY,NX)=solutevar%CH0P1
-    CH1PR(NY,NX)=solutevar%CH1P1
-    CPOR(NY,NX)=solutevar%CH2P1
-    CH3PR(NY,NX)=solutevar%CH3P1
-    CF1PR(NY,NX)=solutevar%CF1P1
-    CF2PR(NY,NX)=solutevar%CF2P1
-    CC0PR(NY,NX)=solutevar%CC0P1
-    CC1PR(NY,NX)=solutevar%CC1P1
-    CC2PR(NY,NX)=solutevar%CC2P1
-    CM1PR(NY,NX)=solutevar%CM1P1
+    CO2_rain_conc(NY,NX)=solutevar%H2CO3_aqu_conc
+    CH4_rain_conc(NY,NX)=solutevar%CH4_aqu_conc
+    O2_rain_conc(NY,NX)=solutevar%O2_aqu_conc
+    N2_rain_conc(NY,NX)=solutevar%N2_aqu_conc
+    N2O_rain_conc(NY,NX)=solutevar%N2O_aqu_conc
+    NH4_rain_conc(NY,NX)=solutevar%NH4_1p_conc
+    NH3_rain_conc(NY,NX)=solutevar%NH3_aqu_conc
+    trcsalt_rain_conc(idsalt_Al,NY,NX)=solutevar%Al_3p_conc
+    trcsalt_rain_conc(idsalt_Fe,NY,NX)=solutevar%Fe_3p_conc
+    trcsalt_rain_conc(idsalt_Hp,NY,NX)=solutevar%H_1p_conc
+    trcsalt_rain_conc(idsalt_Ca,NY,NX)=solutevar%Ca_2p_conc
+    trcsalt_rain_conc(idsalt_Mg,NY,NX)=solutevar%Mg_2p_conc
+    trcsalt_rain_conc(idsalt_Na,NY,NX)=solutevar%Na_1p_conc
+    trcsalt_rain_conc(idsalt_K,NY,NX)=solutevar%K_1p_conc
+    trcsalt_rain_conc(idsalt_OH,NY,NX)=solutevar%OH_1e_conc
+    trcsalt_rain_conc(idsalt_SO4,NY,NX)=solutevar%SO4_2e_conc
+    trcsalt_rain_conc(idsalt_Cl,NY,NX)=solutevar%Cl_e_conc
+    trcsalt_rain_conc(idsalt_CO3,NY,NX)=solutevar%CO3_2e_conc
+    trcsalt_rain_conc(idsalt_HCO3,NY,NX)=solutevar%HCO3_e_conc
+    trcsalt_rain_conc(idsalt_AlOH,NY,NX)=solutevar%AlOH_2p_conc
+    trcsalt_rain_conc(idsalt_AlOH2,NY,NX)=solutevar%AlO2H2_1p_conc
+    trcsalt_rain_conc(idsalt_AlOH3,NY,NX)=solutevar%AlO3H3_conc
+    trcsalt_rain_conc(idsalt_AlOH4,NY,NX)=solutevar%AlO4H4_1e_conc
+    trcsalt_rain_conc(idsalt_AlSO4,NY,NX)=solutevar%AlSO4_1p_conc
+    trcsalt_rain_conc(idsalt_FeOH,NY,NX)=solutevar%FeOH_2p_conc
+    trcsalt_rain_conc(idsalt_FeOH2,NY,NX)=solutevar%FeO2H2_p_conc
+    trcsalt_rain_conc(idsalt_FeOH3,NY,NX)=solutevar%FeO3H3_conc
+    trcsalt_rain_conc(idsalt_FeOH4,NY,NX)=solutevar%FeO4H4_1e_conc
+    trcsalt_rain_conc(idsalt_FeSO4,NY,NX)=solutevar%FeSO4_1p_conc
+    trcsalt_rain_conc(idsalt_CaOH,NY,NX)=solutevar%CaO2H2_conc
+    trcsalt_rain_conc(idsalt_CaCO3,NY,NX)=solutevar%CaCO3_conc
+    trcsalt_rain_conc(idsalt_CaHCO3,NY,NX)=solutevar%CaHCO3_1p_conc
+    trcsalt_rain_conc(idsalt_CaSO4,NY,NX)=solutevar%CaSO4_conc
+    trcsalt_rain_conc(idsalt_MgOH2,NY,NX)=solutevar%MgOH_1p_conc
+    trcsalt_rain_conc(idsalt_MgCO3,NY,NX)=solutevar%MgCO3_conc
+    trcsalt_rain_conc(idsalt_MgHCO3,NY,NX)=solutevar%MgHCO3_1p_conc
+    trcsalt_rain_conc(idsalt_MgSO4,NY,NX)=solutevar%MgSO4_conc
+    trcsalt_rain_conc(idsalt_NaCO3,NY,NX)=solutevar%NaCO3_1e_conc
+    trcsalt_rain_conc(idsalt_NaSO4,NY,NX)=solutevar%NaSO4_1e_conc
+    trcsalt_rain_conc(idsalt_KSO4,NY,NX)=solutevar%KSO4_1e_conc
+    trcsalt_rain_conc(idsalt_H0PO4,NY,NX)=solutevar%H0PO4_3e_conc
+    HPO4_rain_conc(NY,NX)=solutevar%H1PO4_2e_conc
+    H2PO4_rain_conc(NY,NX)=solutevar%H2PO4_1e_conc
+    trcsalt_rain_conc(idsalt_H3PO4,NY,NX)=solutevar%H3PO4_conc
+    trcsalt_rain_conc(idsalt_FeHPO4,NY,NX)=solutevar%FeHPO4_p_conc
+    trcsalt_rain_conc(idsalt_FeH2PO4,NY,NX)=solutevar%FeH2PO4_2p_conc
+    trcsalt_rain_conc(idsalt_CaPO4,NY,NX)=solutevar%CaPO4_1e_con
+    trcsalt_rain_conc(idsalt_CaHPO4,NY,NX)=solutevar%CaHPO4_conc
+    trcsalt_rain_conc(idsalt_CaH4P2O8,NY,NX)=solutevar%CaH4P2O8_1p_conc
+    trcsalt_rain_conc(idsalt_MgHPO4,NY,NX)=solutevar%MgHPO4_conc
     CSTRR(NY,NX)=solutevar%CSTR1
 !
 !     SOLUTE CONCENTRATIONS IN IRRIGATION
 !
   ELSEIF(K.EQ.micpar%k_manure.AND.L.EQ.1)THEN
   ! manure, top layer
-    CCOQ(NY,NX)=solutevar%CCO21
-    CCHQ(NY,NX)=solutevar%CCH41
-    COXQ(NY,NX)=solutevar%COXY1
-    CNNQ(NY,NX)=solutevar%CZ2G1
-    CN2Q(NY,NX)=solutevar%CZ2O1
-    CN4Q(I,NY,NX)=solutevar%CN41
-    CN3Q(I,NY,NX)=solutevar%CN31
-    CALQ(I,NY,NX)=solutevar%CAL1
-    CFEQ(I,NY,NX)=solutevar%CFE1
-    CHYQ(I,NY,NX)=solutevar%CHY1
-    CCAQ(I,NY,NX)=solutevar%CCA1
-    CMGQ(I,NY,NX)=solutevar%CMG1
-    CNAQ(I,NY,NX)=solutevar%CNA1
-    CKAQ(I,NY,NX)=solutevar%CKA1
-    COHQ(I,NY,NX)=solutevar%COH1
-    CSOQ(I,NY,NX)=solutevar%CSO41
-    CCLQ(I,NY,NX)=solutevar%CCL1
-    CC3Q(I,NY,NX)=solutevar%CCO31
-    CHCQ(I,NY,NX)=solutevar%CHCO31
-    CAL1Q(I,NY,NX)=solutevar%CALO1
-    CAL2Q(I,NY,NX)=solutevar%CALO2
-    CAL3Q(I,NY,NX)=solutevar%CALO3
-    CAL4Q(I,NY,NX)=solutevar%CALO4
-    CALSQ(I,NY,NX)=solutevar%CALS1
-    CFE1Q(I,NY,NX)=solutevar%CFEO1
-    CFE2Q(I,NY,NX)=solutevar%CFEO2
-    CFE3Q(I,NY,NX)=solutevar%CFEO3
-    CFE4Q(I,NY,NX)=solutevar%CFEO4
-    CFESQ(I,NY,NX)=solutevar%CFES1
-    CCAOQ(I,NY,NX)=solutevar%CCAO1
-    CCACQ(I,NY,NX)=solutevar%CCAC1
-    CCAHQ(I,NY,NX)=solutevar%CCAH1
-    CCASQ(I,NY,NX)=solutevar%CCAS1
-    CMGOQ(I,NY,NX)=solutevar%CMGO1
-    CMGCQ(I,NY,NX)=solutevar%CMGC1
-    CMGHQ(I,NY,NX)=solutevar%CMGH1
-    CMGSQ(I,NY,NX)=solutevar%CMGS1
-    CNACQ(I,NY,NX)=solutevar%CNAC1
-    CNASQ(I,NY,NX)=solutevar%CNAS1
-    CKASQ(I,NY,NX)=solutevar%CKAS1
-    CH0PQ(I,NY,NX)=solutevar%CH0P1
-    CH1PQ(I,NY,NX)=solutevar%CH1P1
-    CPOQ(I,NY,NX)=solutevar%CH2P1
-    CH3PQ(I,NY,NX)=solutevar%CH3P1
-    CF1PQ(I,NY,NX)=solutevar%CF1P1
-    CF2PQ(I,NY,NX)=solutevar%CF2P1
-    CC0PQ(I,NY,NX)=solutevar%CC0P1
-    CC1PQ(I,NY,NX)=solutevar%CC1P1
-    CC2PQ(I,NY,NX)=solutevar%CC2P1
-    CM1PQ(I,NY,NX)=solutevar%CM1P1
+    CO2_irrig_conc(NY,NX)=solutevar%H2CO3_aqu_conc
+    CH4_irrig_conc(NY,NX)=solutevar%CH4_aqu_conc
+    O2_irrig_conc(NY,NX)=solutevar%O2_aqu_conc
+    N2_irrig_conc(NY,NX)=solutevar%N2_aqu_conc
+    N2O_irrig_conc(NY,NX)=solutevar%N2O_aqu_conc
+    NH4_irrig_conc(I,NY,NX)=solutevar%NH4_1p_conc
+    NH3_irrig_conc(I,NY,NX)=solutevar%NH3_aqu_conc
+    trcsalt_irrig_conc(idsalt_Al,I,NY,NX)=solutevar%Al_3p_conc
+    trcsalt_irrig_conc(idsalt_Fe,I,NY,NX)=solutevar%Fe_3p_conc
+    trcsalt_irrig_conc(idsalt_Hp,I,NY,NX)=solutevar%H_1p_conc
+    trcsalt_irrig_conc(idsalt_Ca,I,NY,NX)=solutevar%Ca_2p_conc
+    trcsalt_irrig_conc(idsalt_Mg,I,NY,NX)=solutevar%Mg_2p_conc
+    trcsalt_irrig_conc(idsalt_Na,I,NY,NX)=solutevar%Na_1p_conc
+    trcsalt_irrig_conc(idsalt_K,I,NY,NX)=solutevar%K_1p_conc
+    trcsalt_irrig_conc(idsalt_OH,I,NY,NX)=solutevar%OH_1e_conc
+    trcsalt_irrig_conc(idsalt_SO4,I,NY,NX)=solutevar%SO4_2e_conc
+    trcsalt_irrig_conc(idsalt_Cl,I,NY,NX)=solutevar%Cl_e_conc
+    trcsalt_irrig_conc(idsalt_CO3,I,NY,NX)=solutevar%CO3_2e_conc
+    trcsalt_irrig_conc(idsalt_HCO3,I,NY,NX)=solutevar%HCO3_e_conc
+    trcsalt_irrig_conc(idsalt_AlOH,I,NY,NX)=solutevar%AlOH_2p_conc
+    trcsalt_irrig_conc(idsalt_AlOH2,I,NY,NX)=solutevar%AlO2H2_1p_conc
+    trcsalt_irrig_conc(idsalt_AlOH3,I,NY,NX)=solutevar%AlO3H3_conc
+    trcsalt_irrig_conc(idsalt_AlOH4,I,NY,NX)=solutevar%AlO4H4_1e_conc
+    trcsalt_irrig_conc(idsalt_AlSO4,I,NY,NX)=solutevar%AlSO4_1p_conc
+    trcsalt_irrig_conc(idsalt_FeOH,I,NY,NX)=solutevar%FeOH_2p_conc
+    trcsalt_irrig_conc(idsalt_FeOH2,I,NY,NX)=solutevar%FeO2H2_p_conc
+    trcsalt_irrig_conc(idsalt_FeOH3,I,NY,NX)=solutevar%FeO3H3_conc
+    trcsalt_irrig_conc(idsalt_FeOH4,I,NY,NX)=solutevar%FeO4H4_1e_conc
+    trcsalt_irrig_conc(idsalt_FeSO4,I,NY,NX)=solutevar%FeSO4_1p_conc
+    trcsalt_irrig_conc(idsalt_CaOH,I,NY,NX)=solutevar%CaO2H2_conc
+    trcsalt_irrig_conc(idsalt_CaCO3,I,NY,NX)=solutevar%CaCO3_conc
+    trcsalt_irrig_conc(idsalt_CaHCO3,I,NY,NX)=solutevar%CaHCO3_1p_conc
+    trcsalt_irrig_conc(idsalt_CaSO4,I,NY,NX)=solutevar%CaSO4_conc
+    trcsalt_irrig_conc(idsalt_MgOH2,I,NY,NX)=solutevar%MgOH_1p_conc
+    trcsalt_irrig_conc(idsalt_MgCO3,I,NY,NX)=solutevar%MgCO3_conc
+    trcsalt_irrig_conc(idsalt_MgHCO3,I,NY,NX)=solutevar%MgHCO3_1p_conc
+    trcsalt_irrig_conc(idsalt_MgSO4,I,NY,NX)=solutevar%MgSO4_conc
+    trcsalt_irrig_conc(idsalt_NaCO3,I,NY,NX)=solutevar%NaCO3_1e_conc
+    trcsalt_irrig_conc(idsalt_NaSO4,I,NY,NX)=solutevar%NaSO4_1e_conc
+    trcsalt_irrig_conc(idsalt_KSO4,I,NY,NX)=solutevar%KSO4_1e_conc
+    trcsalt_irrig_conc(idsalt_H0PO4,I,NY,NX)=solutevar%H0PO4_3e_conc
+    HPO4_irrig_conc(I,NY,NX)=solutevar%H1PO4_2e_conc
+    H2PO4_irrig_conc(I,NY,NX)=solutevar%H2PO4_1e_conc
+    trcsalt_irrig_conc(idsalt_H3PO4,I,NY,NX)=solutevar%H3PO4_conc
+    trcsalt_irrig_conc(idsalt_FeHPO4,I,NY,NX)=solutevar%FeHPO4_p_conc
+    trcsalt_irrig_conc(idsalt_FeH2PO4,I,NY,NX)=solutevar%FeH2PO4_2p_conc
+    trcsalt_irrig_conc(idsalt_CaPO4,I,NY,NX)=solutevar%CaPO4_1e_con
+    trcsalt_irrig_conc(idsalt_CaHPO4,I,NY,NX)=solutevar%CaHPO4_conc
+    trcsalt_irrig_conc(idsalt_CaH4P2O8,I,NY,NX)=solutevar%CaH4P2O8_1p_conc
+    trcsalt_irrig_conc(idsalt_MgHPO4,I,NY,NX)=solutevar%MgHPO4_conc
     CSTRQ(I,NY,NX)=solutevar%CSTR1
 !
 !     SOLUTE CONCENTRATIONS IN SOIL
-! for the POM complex, on the first day in the first year
+! for the POM CO2CompenPoint_nodeex, on the first day in the first year
 ! U means surface irrigation
   ELSEIF(K.EQ.micpar%k_POM.AND.I.EQ.1.AND.(.not.is_restart()).AND.is_first_year)THEN
-    CCOU=solutevar%CCO21
-    CCHU=solutevar%CCH41
+    CCOU=solutevar%H2CO3_aqu_conc
+    CCHU=solutevar%CH4_aqu_conc
     COXU=0._r8
-    CNNU=solutevar%CZ2G1
-    CN2U=solutevar%CZ2O1
-    trcn_irrig(ids_NH4,L,NY,NX)=solutevar%CN41
-    trcn_irrig(idg_NH3,L,NY,NX)=solutevar%CN31
+    CNNU=solutevar%N2_aqu_conc
+    CN2U=solutevar%N2O_aqu_conc
+    trcn_irrig(ids_NH4,L,NY,NX)=solutevar%NH4_1p_conc
+    trcn_irrig(idg_NH3,L,NY,NX)=solutevar%NH3_aqu_conc
     trcn_irrig(ids_NO3,L,NY,NX)=solutevar%CNOX
     trcn_irrig(ids_NH4B,L,NY,NX)=trcn_irrig(ids_NH4,L,NY,NX)
     trcn_irrig(idg_NH3B,L,NY,NX)=trcn_irrig(idg_NH3,L,NY,NX)
     trcn_irrig(ids_NO3B,L,NY,NX)=trcn_irrig(ids_NO3,L,NY,NX)
 
-    CALU(L,NY,NX)=solutevar%CAL1
-    CFEU(L,NY,NX)=solutevar%CFE1
-    CHYU(L,NY,NX)=solutevar%CHY1
-    CCAU(L,NY,NX)=solutevar%CCA1
-    CMGU(L,NY,NX)=solutevar%CMG1
-    CNAU(L,NY,NX)=solutevar%CNA1
-    CKAU(L,NY,NX)=solutevar%CKA1
-    COHU(L,NY,NX)=solutevar%COH1
-    CSOU(L,NY,NX)=solutevar%CSO41
-    CCLU(L,NY,NX)=solutevar%CCL1
-    CC3U(L,NY,NX)=solutevar%CCO31
-    CHCU(L,NY,NX)=solutevar%CHCO31
-    CAL1U(L,NY,NX)=solutevar%CALO1
-    CAL2U(L,NY,NX)=solutevar%CALO2
-    CAL3U(L,NY,NX)=solutevar%CALO3
-    CAL4U(L,NY,NX)=solutevar%CALO4
-    CALSU(L,NY,NX)=solutevar%CALS1
-    CFE1U(L,NY,NX)=solutevar%CFEO1
-    CFE2U(L,NY,NX)=solutevar%CFEO2
-    CFE3U(L,NY,NX)=solutevar%CFEO3
-    CFE4U(L,NY,NX)=solutevar%CFEO4
-    CFESU(L,NY,NX)=solutevar%CFES1
-    CCAOU(L,NY,NX)=solutevar%CCAO1
-    CCACU(L,NY,NX)=solutevar%CCAC1
-    CCAHU(L,NY,NX)=solutevar%CCAH1
-    CCASU(L,NY,NX)=solutevar%CCAS1
-    CMGOU(L,NY,NX)=solutevar%CMGO1
-    CMGCU(L,NY,NX)=solutevar%CMGC1
-    CMGHU(L,NY,NX)=solutevar%CMGH1
-    CMGSU(L,NY,NX)=solutevar%CMGS1
-    CNACU(L,NY,NX)=solutevar%CNAC1
-    CNASU(L,NY,NX)=solutevar%CNAS1
-    CKASU(L,NY,NX)=solutevar%CKAS1
-    CH0PU(L,NY,NX)=solutevar%CH0P1
-    trcn_irrig(ids_H1PO4,L,NY,NX)=solutevar%CH1P1
-    trcn_irrig(ids_H2PO4,L,NY,NX)=solutevar%CH2P1
+    trcsalt_subirrig_conc(idsalt_Al,L,NY,NX)=solutevar%Al_3p_conc
+    trcsalt_subirrig_conc(idsalt_Fe,L,NY,NX)=solutevar%Fe_3p_conc
+    trcsalt_subirrig_conc(idsalt_Hp,L,NY,NX)=solutevar%H_1p_conc
+    trcsalt_subirrig_conc(idsalt_Ca,L,NY,NX)=solutevar%Ca_2p_conc
+    trcsalt_subirrig_conc(idsalt_Mg,L,NY,NX)=solutevar%Mg_2p_conc
+    trcsalt_subirrig_conc(idsalt_Na,L,NY,NX)=solutevar%Na_1p_conc
+    trcsalt_subirrig_conc(idsalt_K,L,NY,NX)=solutevar%K_1p_conc
+    trcsalt_subirrig_conc(idsalt_OH,L,NY,NX)=solutevar%OH_1e_conc
+    trcsalt_subirrig_conc(idsalt_SO4,L,NY,NX)=solutevar%SO4_2e_conc
+    trcsalt_subirrig_conc(idsalt_Cl,L,NY,NX)=solutevar%Cl_e_conc
+    trcsalt_subirrig_conc(idsalt_CO3,L,NY,NX)=solutevar%CO3_2e_conc
+    trcsalt_subirrig_conc(idsalt_HCO3,L,NY,NX)=solutevar%HCO3_e_conc
+    trcsalt_subirrig_conc(idsalt_AlOH,L,NY,NX)=solutevar%AlOH_2p_conc
+    trcsalt_subirrig_conc(idsalt_AlOH2,L,NY,NX)=solutevar%AlO2H2_1p_conc
+    trcsalt_subirrig_conc(idsalt_AlOH3,L,NY,NX)=solutevar%AlO3H3_conc
+    trcsalt_subirrig_conc(idsalt_AlOH4,L,NY,NX)=solutevar%AlO4H4_1e_conc
+    trcsalt_subirrig_conc(idsalt_AlSO4,L,NY,NX)=solutevar%AlSO4_1p_conc
+    trcsalt_subirrig_conc(idsalt_FeOH,L,NY,NX)=solutevar%FeOH_2p_conc
+    trcsalt_subirrig_conc(idsalt_FeOH2,L,NY,NX)=solutevar%FeO2H2_p_conc
+    trcsalt_subirrig_conc(idsalt_FeOH3,L,NY,NX)=solutevar%FeO3H3_conc
+    trcsalt_subirrig_conc(idsalt_FeOH4,L,NY,NX)=solutevar%FeO4H4_1e_conc
+    trcsalt_subirrig_conc(idsalt_FeSO4,L,NY,NX)=solutevar%FeSO4_1p_conc
+    trcsalt_subirrig_conc(idsalt_CaOH,L,NY,NX)=solutevar%CaO2H2_conc
+    trcsalt_subirrig_conc(idsalt_CaCO3,L,NY,NX)=solutevar%CaCO3_conc
+    trcsalt_subirrig_conc(idsalt_CaHCO3,L,NY,NX)=solutevar%CaHCO3_1p_conc
+    trcsalt_subirrig_conc(idsalt_CaSO4,L,NY,NX)=solutevar%CaSO4_conc
+    trcsalt_subirrig_conc(idsalt_MgOH2,L,NY,NX)=solutevar%MgOH_1p_conc
+    trcsalt_subirrig_conc(idsalt_MgCO3,L,NY,NX)=solutevar%MgCO3_conc
+    trcsalt_subirrig_conc(idsalt_MgHCO3,L,NY,NX)=solutevar%MgHCO3_1p_conc
+    trcsalt_subirrig_conc(idsalt_MgSO4,L,NY,NX)=solutevar%MgSO4_conc
+    trcsalt_subirrig_conc(idsalt_NaCO3,L,NY,NX)=solutevar%NaCO3_1e_conc
+    trcsalt_subirrig_conc(idsalt_NaSO4,L,NY,NX)=solutevar%NaSO4_1e_conc
+    trcsalt_subirrig_conc(idsalt_KSO4,L,NY,NX)=solutevar%KSO4_1e_conc
+    trcsalt_subirrig_conc(idsalt_H0PO4,L,NY,NX)=solutevar%H0PO4_3e_conc
+    trcn_irrig(ids_H1PO4,L,NY,NX)=solutevar%H1PO4_2e_conc
+    trcn_irrig(ids_H2PO4,L,NY,NX)=solutevar%H2PO4_1e_conc
     trcn_irrig(ids_H1PO4B,L,NY,NX)=trcn_irrig(ids_H1PO4,L,NY,NX)
     trcn_irrig(ids_H2PO4B,L,NY,NX)=trcn_irrig(ids_H2PO4,L,NY,NX)
-    CH3PU(L,NY,NX)=solutevar%CH3P1
-    CF1PU(L,NY,NX)=solutevar%CF1P1
-    CF2PU(L,NY,NX)=solutevar%CF2P1
-    CC0PU(L,NY,NX)=solutevar%CC0P1
-    CC1PU(L,NY,NX)=solutevar%CC1P1
-    CC2PU(L,NY,NX)=solutevar%CC2P1
-    CM1PU(L,NY,NX)=solutevar%CM1P1
+    trcsalt_subirrig_conc(idsalt_H3PO4,L,NY,NX)=solutevar%H3PO4_conc
+    trcsalt_subirrig_conc(idsalt_FeHPO4,L,NY,NX)=solutevar%FeHPO4_p_conc
+    trcsalt_subirrig_conc(idsalt_FeH2PO4,L,NY,NX)=solutevar%FeH2PO4_2p_conc
+    trcsalt_subirrig_conc(idsalt_CaPO4,L,NY,NX)=solutevar%CaPO4_1e_con
+    trcsalt_subirrig_conc(idsalt_CaHPO4,L,NY,NX)=solutevar%CaHPO4_conc
+    trcsalt_subirrig_conc(idsalt_CaH4P2O8,L,NY,NX)=solutevar%CaH4P2O8_1p_conc
+    trcsalt_subirrig_conc(idsalt_MgHPO4,L,NY,NX)=solutevar%MgHPO4_conc
 !
 !   INITIAL STATE VARIABLES FOR GAS IN SOIL
-!   CCO2EI is set to the first year, because AtmGgms(idg_CO2,x)
+!   CCO2EI is set to the first year, because AtmGasCgperm3(idg_CO2,x)
 !   varies year by year, while other tracer gases are fixed year by year,
 !   this is not quite right for CH4, and N2O. However, the current implementation
-!   make sure the inexact restart run works. When exact restart is used, trc_gasml
-!   and trc_solml will be read from restart file, so that the following inconsistent
+!   make sure the inexact restart run works. When exact restart is used, trc_gasml_vr
+!   and trc_solml_vr will be read from restart file, so that the following inconsistent
 !   use between CO2 and other gas tracers can be avoided.
 !   Comment by Jinyun Tang, Nov 11, 2022
 !
-    trc_gasml(idg_CO2,L,NY,NX)=CCO2EI(NY,NX)*VLsoiAirP(L,NY,NX)
-    trc_gasml(idg_CH4,L,NY,NX)=AtmGgms(idg_CH4,NY,NX)*VLsoiAirP(L,NY,NX)
-    trc_gasml(idg_O2,L,NY,NX)=AtmGgms(idg_O2,NY,NX)*VLsoiAirP(L,NY,NX)
-    trc_gasml(idg_N2,L,NY,NX)=AtmGgms(idg_N2,NY,NX)*VLsoiAirP(L,NY,NX)
-    trc_gasml(idg_N2O,L,NY,NX)=AtmGgms(idg_N2O,NY,NX)*VLsoiAirP(L,NY,NX)
-    trc_gasml(idg_NH3,L,NY,NX)=AtmGgms(idg_NH3,NY,NX)*VLsoiAirP(L,NY,NX)
-    trc_gasml(idg_H2,L,NY,NX)=AtmGgms(idg_H2,NY,NX)*VLsoiAirP(L,NY,NX)
+    trc_gasml_vr(idg_CO2,L,NY,NX)=CCO2EI(NY,NX)*VLsoiAirP(L,NY,NX)
+    trc_gasml_vr(idg_CH4,L,NY,NX)=AtmGasCgperm3(idg_CH4,NY,NX)*VLsoiAirP(L,NY,NX)
+    trc_gasml_vr(idg_O2,L,NY,NX)=AtmGasCgperm3(idg_O2,NY,NX)*VLsoiAirP(L,NY,NX)
+    trc_gasml_vr(idg_N2,L,NY,NX)=AtmGasCgperm3(idg_N2,NY,NX)*VLsoiAirP(L,NY,NX)
+    trc_gasml_vr(idg_N2O,L,NY,NX)=AtmGasCgperm3(idg_N2O,NY,NX)*VLsoiAirP(L,NY,NX)
+    trc_gasml_vr(idg_NH3,L,NY,NX)=AtmGasCgperm3(idg_NH3,NY,NX)*VLsoiAirP(L,NY,NX)
+    trc_gasml_vr(idg_H2,L,NY,NX)=AtmGasCgperm3(idg_H2,NY,NX)*VLsoiAirP(L,NY,NX)
 
 !   ExtWaterTablet0: external water table depth
     IF(CumDepth2LayerBottom(L-1,NY,NX).LT.ExtWaterTablet0(NY,NX))THEN
       ! above water table
-      trc_solml(idg_O2,L,NY,NX)=AtmGgms(idg_O2,NY,NX)*gas_solubility(idg_O2, ATCA(NY,NX)) &
+      trc_solml_vr(idg_O2,L,NY,NX)=AtmGasCgperm3(idg_O2,NY,NX)*gas_solubility(idg_O2, ATCA(NY,NX)) &
         /(EXP(ACTCG(idg_O2)*solutevar%CSTR1))*solutevar%FH2O*VLWatMicP(L,NY,NX)
     ELSE
       !below water table
-      trc_solml(idg_O2,L,NY,NX)=0._r8
+      trc_solml_vr(idg_O2,L,NY,NX)=0._r8
     ENDIF
 
-    trc_solml(idg_CO2,L,NY,NX)=CCO2EI(NY,NX)*gas_solubility(idg_CO2, ATCA(NY,NX)) &
+    trc_solml_vr(idg_CO2,L,NY,NX)=CCO2EI(NY,NX)*gas_solubility(idg_CO2, ATCA(NY,NX)) &
       /(EXP(ACTCG(idg_CO2)*solutevar%CSTR1))*solutevar%FH2O*VLWatMicP(L,NY,NX)
-    trc_solml(idg_CH4,L,NY,NX)=AtmGgms(idg_CH4,NY,NX)*gas_solubility(idg_CH4, ATCA(NY,NX)) &
+    trc_solml_vr(idg_CH4,L,NY,NX)=AtmGasCgperm3(idg_CH4,NY,NX)*gas_solubility(idg_CH4, ATCA(NY,NX)) &
       /(EXP(ACTCG(idg_CH4)*solutevar%CSTR1))*solutevar%FH2O*VLWatMicP(L,NY,NX)
-    trc_solml(idg_N2,L,NY,NX)=AtmGgms(idg_N2,NY,NX)*gas_solubility(idg_N2, ATCA(NY,NX)) &
+    trc_solml_vr(idg_N2,L,NY,NX)=AtmGasCgperm3(idg_N2,NY,NX)*gas_solubility(idg_N2, ATCA(NY,NX)) &
       /(EXP(ACTCG(idg_N2)*solutevar%CSTR1))*solutevar%FH2O*VLWatMicP(L,NY,NX)
-    trc_solml(idg_N2O,L,NY,NX)=AtmGgms(idg_N2O,NY,NX)*gas_solubility(idg_N2O, ATCA(NY,NX)) &
+    trc_solml_vr(idg_N2O,L,NY,NX)=AtmGasCgperm3(idg_N2O,NY,NX)*gas_solubility(idg_N2O, ATCA(NY,NX)) &
       /(EXP(ACTCG(idg_N2O)*solutevar%CSTR1))*solutevar%FH2O*VLWatMicP(L,NY,NX)
-    trc_solml(idg_H2,L,NY,NX)=AtmGgms(idg_H2,NY,NX)*gas_solubility(idg_H2, ATCA(NY,NX)) &
+    trc_solml_vr(idg_H2,L,NY,NX)=AtmGasCgperm3(idg_H2,NY,NX)*gas_solubility(idg_H2, ATCA(NY,NX)) &
       /(EXP(ACTCG(idg_H2)*solutevar%CSTR1))*solutevar%FH2O*VLWatMicP(L,NY,NX)
 !
 !     INITIAL STATE VARIABLES FOR MINERAL N AND P IN SOIL
 !
-    trc_solml(ids_NH4,L,NY,NX)=trcn_irrig(ids_NH4,L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN(ids_NH4,L,NY,NX)*natomw
-    trc_solml(ids_NH4B,L,NY,NX)=trcn_irrig(ids_NH4B,L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN(ids_NH4B,L,NY,NX)*natomw
-    trc_solml(idg_NH3,L,NY,NX)=trcn_irrig(idg_NH3,L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN(ids_NH4,L,NY,NX)*natomw
-    trc_solml(idg_NH3B,L,NY,NX)=trcn_irrig(idg_NH3B,L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN(ids_NH4B,L,NY,NX)*natomw
-    trc_solml(ids_NO3,L,NY,NX)=trcn_irrig(ids_NO3,L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN(ids_NO3,L,NY,NX)*natomw
-    trc_solml(ids_NO3B,L,NY,NX)=trcn_irrig(ids_NO3B,L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN(ids_NO3B,L,NY,NX)*natomw
+    trc_solml_vr(ids_NH4,L,NY,NX)=trcn_irrig(ids_NH4,L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN_vr(ids_NH4,L,NY,NX)*natomw
+    trc_solml_vr(ids_NH4B,L,NY,NX)=trcn_irrig(ids_NH4B,L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN_vr(ids_NH4B,L,NY,NX)*natomw
+    trc_solml_vr(idg_NH3,L,NY,NX)=trcn_irrig(idg_NH3,L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN_vr(ids_NH4,L,NY,NX)*natomw
+    trc_solml_vr(idg_NH3B,L,NY,NX)=trcn_irrig(idg_NH3B,L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN_vr(ids_NH4B,L,NY,NX)*natomw
+    trc_solml_vr(ids_NO3,L,NY,NX)=trcn_irrig(ids_NO3,L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN_vr(ids_NO3,L,NY,NX)*natomw
+    trc_solml_vr(ids_NO3B,L,NY,NX)=trcn_irrig(ids_NO3B,L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN_vr(ids_NO3B,L,NY,NX)*natomw
 
-    trc_solml(ids_H2PO4,L,NY,NX)=trcn_irrig(ids_H2PO4,L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)*patomw
-    trc_solml(ids_H2PO4B,L,NY,NX)=trcn_irrig(ids_H2PO4B,L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)*patomw
-    trc_solml(ids_H1PO4,L,NY,NX)=trcn_irrig(ids_H1PO4,L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)*patomw
-    trc_solml(ids_H1PO4B,L,NY,NX)=trcn_irrig(ids_H1PO4B,L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)*patomw
+    trc_solml_vr(ids_H2PO4,L,NY,NX)=trcn_irrig(ids_H2PO4,L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)*patomw
+    trc_solml_vr(ids_H2PO4B,L,NY,NX)=trcn_irrig(ids_H2PO4B,L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)*patomw
+    trc_solml_vr(ids_H1PO4,L,NY,NX)=trcn_irrig(ids_H1PO4,L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)*patomw
+    trc_solml_vr(ids_H1PO4B,L,NY,NX)=trcn_irrig(ids_H1PO4B,L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)*patomw
 
-    trc_solml(ids_NO2,L,NY,NX)=0._r8
-    trc_solml(ids_NO2B,L,NY,NX)=0._r8
+    trc_solml_vr(ids_NO2,L,NY,NX)=0._r8
+    trc_solml_vr(ids_NO2B,L,NY,NX)=0._r8
 !
 !     INITIAL STATE VARIABLES FOR CATIONS, ANIONS AND ION PAIRS IN SOIL
 !
-    trcSalt_solml(idsalt_Al,L,NY,NX)=CALU(L,NY,NX)*VLWatMicP(L,NY,NX)
-    trcSalt_solml(idsalt_Fe,L,NY,NX)=CFEU(L,NY,NX)*VLWatMicP(L,NY,NX)
-    trcSalt_solml(idsalt_Hp,L,NY,NX)=CHYU(L,NY,NX)*VLWatMicP(L,NY,NX)
-    trcSalt_solml(idsalt_Ca,L,NY,NX)=CCAU(L,NY,NX)*VLWatMicP(L,NY,NX)
-    trcSalt_solml(idsalt_Mg,L,NY,NX)=CMGU(L,NY,NX)*VLWatMicP(L,NY,NX)
-    trcSalt_solml(idsalt_Na,L,NY,NX)=CNAU(L,NY,NX)*VLWatMicP(L,NY,NX)
-    trcSalt_solml(idsalt_K,L,NY,NX)=CKAU(L,NY,NX)*VLWatMicP(L,NY,NX)
-    trcSalt_solml(idsalt_OH,L,NY,NX)=COHU(L,NY,NX)*VLWatMicP(L,NY,NX)
-    trcSalt_solml(idsalt_SO4,L,NY,NX)=CSOU(L,NY,NX)*VLWatMicP(L,NY,NX)
-    trcSalt_solml(idsalt_Cl,L,NY,NX)=CCLU(L,NY,NX)*VLWatMicP(L,NY,NX)
-    trcSalt_solml(idsalt_CO3,L,NY,NX)=CC3U(L,NY,NX)*VLWatMicP(L,NY,NX)
-    trcSalt_solml(idsalt_HCO3,L,NY,NX)=CHCU(L,NY,NX)*VLWatMicP(L,NY,NX)
-    trcSalt_solml(idsalt_AlOH,L,NY,NX)=CAL1U(L,NY,NX)*VLWatMicP(L,NY,NX)
-    trcSalt_solml(idsalt_AlOH2,L,NY,NX)=CAL2U(L,NY,NX)*VLWatMicP(L,NY,NX)
-    trcSalt_solml(idsalt_AlOH3,L,NY,NX)=CAL3U(L,NY,NX)*VLWatMicP(L,NY,NX)
-    trcSalt_solml(idsalt_AlOH4,L,NY,NX)=CAL4U(L,NY,NX)*VLWatMicP(L,NY,NX)
-    trcSalt_solml(idsalt_AlSO4,L,NY,NX)=CALSU(L,NY,NX)*VLWatMicP(L,NY,NX)
-    trcSalt_solml(idsalt_FeOH,L,NY,NX)=CFE1U(L,NY,NX)*VLWatMicP(L,NY,NX)
-    trcSalt_solml(idsalt_FeOH2,L,NY,NX)=CFE2U(L,NY,NX)*VLWatMicP(L,NY,NX)
-    trcSalt_solml(idsalt_FeOH3,L,NY,NX)=CFE3U(L,NY,NX)*VLWatMicP(L,NY,NX)
-    trcSalt_solml(idsalt_FeOH4,L,NY,NX)=CFE4U(L,NY,NX)*VLWatMicP(L,NY,NX)
-    trcSalt_solml(idsalt_FeSO4,L,NY,NX)=CFESU(L,NY,NX)*VLWatMicP(L,NY,NX)
-    trcSalt_solml(idsalt_CaOH2,L,NY,NX)=CCAOU(L,NY,NX)*VLWatMicP(L,NY,NX)
-    trcSalt_solml(idsalt_CaCO3,L,NY,NX)=CCACU(L,NY,NX)*VLWatMicP(L,NY,NX)
-    trcSalt_solml(idsalt_CaHCO3,L,NY,NX)=CCAHU(L,NY,NX)*VLWatMicP(L,NY,NX)
-    trcSalt_solml(idsalt_CaSO4,L,NY,NX)=CCASU(L,NY,NX)*VLWatMicP(L,NY,NX)
-    trcSalt_solml(idsalt_MgOH2,L,NY,NX)=CMGOU(L,NY,NX)*VLWatMicP(L,NY,NX)
-    trcSalt_solml(idsalt_MgCO3,L,NY,NX)=CMGCU(L,NY,NX)*VLWatMicP(L,NY,NX)
-    trcSalt_solml(idsalt_MgHCO3,L,NY,NX)=CMGHU(L,NY,NX)*VLWatMicP(L,NY,NX)
-    trcSalt_solml(idsalt_MgSO4,L,NY,NX)=CMGSU(L,NY,NX)*VLWatMicP(L,NY,NX)
-    trcSalt_solml(idsalt_NaCO3,L,NY,NX)=CNACU(L,NY,NX)*VLWatMicP(L,NY,NX)
-    trcSalt_solml(idsalt_NaSO4,L,NY,NX)=CNASU(L,NY,NX)*VLWatMicP(L,NY,NX)
-    trcSalt_solml(idsalt_KSO4,L,NY,NX)=CKASU(L,NY,NX)*VLWatMicP(L,NY,NX)
-    trcSalt_solml(idsalt_H0PO4,L,NY,NX)=CH0PU(L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-    trcSalt_solml(idsalt_H3PO4,L,NY,NX)=CH3PU(L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-    trcSalt_solml(idsalt_FeHPO4,L,NY,NX)=CF1PU(L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-    trcSalt_solml(idsalt_FeH2PO4,L,NY,NX)=CF2PU(L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-    trcSalt_solml(idsalt_CaPO4,L,NY,NX)=CC0PU(L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-    trcSalt_solml(idsalt_CaHPO4,L,NY,NX)=CC1PU(L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-    trcSalt_solml(idsalt_CaH2PO4,L,NY,NX)=CC2PU(L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-    trcSalt_solml(idsalt_MgHPO4,L,NY,NX)=CM1PU(L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-    trcSalt_solml(idsalt_H0PO4B,L,NY,NX)=CH0PU(L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
-    trcSalt_solml(idsalt_H3PO4B,L,NY,NX)=CH3PU(L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
-    trcSalt_solml(idsalt_FeHPO4B,L,NY,NX)=CF1PU(L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
-    trcSalt_solml(idsalt_FeH2PO4B,L,NY,NX)=CF2PU(L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
-    trcSalt_solml(idsalt_CaPO4B,L,NY,NX)=CC0PU(L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
-    trcSalt_solml(idsalt_CaHPO4B,L,NY,NX)=CC1PU(L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
-    trcSalt_solml(idsalt_CaH2PO4B,L,NY,NX)=CC2PU(L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
-    trcSalt_solml(idsalt_MgHPO4B,L,NY,NX)=CM1PU(L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
+    do nsalts=idsalt_beg,idsalt_KSO4
+      trcSalt_solml(nsalts,L,NY,NX)=trcsalt_subirrig_conc(nsalts,L,NY,NX)*VLWatMicP(L,NY,NX)
+    ENDDO
+
+    DO nsalts=idsalt_H0PO4,idsalt_MgHPO4
+      ids=nsalts-idsalt_H0PO4+idsalt_H0PO4B
+      trcSalt_solml(nsalts,L,NY,NX)=trcsalt_subirrig_conc(nsalts,L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
+      trcSalt_solml(ids,L,NY,NX)=trcsalt_subirrig_conc(nsalts,L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
+    ENDDO
 !
 !     INITIAL STATE VARIABLES FOR ALL MATERIAL IN SOIL MACROPORES
 !
@@ -476,54 +438,54 @@ module StarteMod
 !
 !     INITIAL STATE VARIABLES FOR EXCHANGEABLE CATIONS AND ANIONS
 !
-    trcx_solml(idx_NH4,L,NY,NX)=solutevar%XN41*SoilMicPMassLayer(L,NY,NX)*trcs_VLN(ids_NH4,L,NY,NX)
-    trcx_solml(idx_NH4B,L,NY,NX)=solutevar%XN41*SoilMicPMassLayer(L,NY,NX)*trcs_VLN(ids_NH4B,L,NY,NX)
+    trcx_solml(idx_NH4,L,NY,NX)=solutevar%XNH4_conc*SoilMicPMassLayer(L,NY,NX)*trcs_VLN_vr(ids_NH4,L,NY,NX)
+    trcx_solml(idx_NH4B,L,NY,NX)=solutevar%XNH4_conc*SoilMicPMassLayer(L,NY,NX)*trcs_VLN_vr(ids_NH4B,L,NY,NX)
     trcx_solml(idx_Hp,L,NY,NX)=solutevar%XHY1*SoilMicPMassLayer(L,NY,NX)
-    trcx_solml(idx_Al,L,NY,NX)=solutevar%XAL1*SoilMicPMassLayer(L,NY,NX)
-    trcx_solml(idx_Fe,L,NY,NX)=solutevar%XFE1*SoilMicPMassLayer(L,NY,NX)
-    trcx_solml(idx_Ca,L,NY,NX)=solutevar%XCA1*SoilMicPMassLayer(L,NY,NX)
-    trcx_solml(idx_Mg,L,NY,NX)=solutevar%XMG1*SoilMicPMassLayer(L,NY,NX)
-    trcx_solml(idx_Na,L,NY,NX)=solutevar%XNA1*SoilMicPMassLayer(L,NY,NX)
-    trcx_solml(idx_K,L,NY,NX)=solutevar%XKA1*SoilMicPMassLayer(L,NY,NX)
+    trcx_solml(idx_Al,L,NY,NX)=solutevar%XAl_conc*SoilMicPMassLayer(L,NY,NX)
+    trcx_solml(idx_Fe,L,NY,NX)=solutevar%XFe_conc*SoilMicPMassLayer(L,NY,NX)
+    trcx_solml(idx_Ca,L,NY,NX)=solutevar%XCa_conc*SoilMicPMassLayer(L,NY,NX)
+    trcx_solml(idx_Mg,L,NY,NX)=solutevar%XMg_conc*SoilMicPMassLayer(L,NY,NX)
+    trcx_solml(idx_Na,L,NY,NX)=solutevar%XNa_conc*SoilMicPMassLayer(L,NY,NX)
+    trcx_solml(idx_K,L,NY,NX)=solutevar%XK_conc*SoilMicPMassLayer(L,NY,NX)
     trcx_solml(idx_COOH,L,NY,NX)=solutevar%XHC1*SoilMicPMassLayer(L,NY,NX)
-    trcx_solml(idx_AlOH2,L,NY,NX)=solutevar%XALO21*SoilMicPMassLayer(L,NY,NX)
-    trcx_solml(idx_FeOH2,L,NY,NX)=solutevar%XFEO21*SoilMicPMassLayer(L,NY,NX)
-    trcx_solml(idx_OHe,L,NY,NX)=solutevar%XOH01*SoilMicPMassLayer(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-    trcx_solml(idx_OH,L,NY,NX)=solutevar%XOH11*SoilMicPMassLayer(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-    trcx_solml(idx_OHp,L,NY,NX)=solutevar%XOH21*SoilMicPMassLayer(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-    trcx_solml(idx_HPO4,L,NY,NX)=solutevar%XH1P1*SoilMicPMassLayer(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-    trcx_solml(idx_H2PO4,L,NY,NX)=solutevar%XH2P1*SoilMicPMassLayer(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-    trcx_solml(idx_OHeB,L,NY,NX)=solutevar%XOH01*SoilMicPMassLayer(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
-    trcx_solml(idx_OHB,L,NY,NX)=solutevar%XOH11*SoilMicPMassLayer(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
-    trcx_solml(idx_OHpB,L,NY,NX)=solutevar%XOH21*SoilMicPMassLayer(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
-    trcx_solml(idx_HPO4B,L,NY,NX)=solutevar%XH1P1*SoilMicPMassLayer(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
-    trcx_solml(idx_H2PO4B,L,NY,NX)=solutevar%XH2P1*SoilMicPMassLayer(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
+    trcx_solml(idx_AlOH2,L,NY,NX)=solutevar%XAlO2H2_conc*SoilMicPMassLayer(L,NY,NX)
+    trcx_solml(idx_FeOH2,L,NY,NX)=solutevar%XFeO2H2_conc*SoilMicPMassLayer(L,NY,NX)
+    trcx_solml(idx_OHe,L,NY,NX)=solutevar%XOH_conc*SoilMicPMassLayer(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
+    trcx_solml(idx_OH,L,NY,NX)=solutevar%XROH1_conc*SoilMicPMassLayer(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
+    trcx_solml(idx_OHp,L,NY,NX)=solutevar%XROH2_conc*SoilMicPMassLayer(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
+    trcx_solml(idx_HPO4,L,NY,NX)=solutevar%XHPO4_conc*SoilMicPMassLayer(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
+    trcx_solml(idx_H2PO4,L,NY,NX)=solutevar%XH2PO4_conc*SoilMicPMassLayer(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
+    trcx_solml(idx_OHeB,L,NY,NX)=solutevar%XOH_conc*SoilMicPMassLayer(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
+    trcx_solml(idx_OHB,L,NY,NX)=solutevar%XROH1_conc*SoilMicPMassLayer(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
+    trcx_solml(idx_OHpB,L,NY,NX)=solutevar%XROH2_conc*SoilMicPMassLayer(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
+    trcx_solml(idx_HPO4B,L,NY,NX)=solutevar%XHPO4_conc*SoilMicPMassLayer(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
+    trcx_solml(idx_H2PO4B,L,NY,NX)=solutevar%XH2PO4_conc*SoilMicPMassLayer(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
 !
 !     INITIAL STATE VARIABLES FOR PRECIPITATES
 !
-    trcp_salml(idsp_AlOH3,L,NY,NX)=solutevar%PALOH1*SoilMicPMassLayer(L,NY,NX)
-    trcp_salml(idsp_FeOH3,L,NY,NX)=solutevar%PFEOH1*SoilMicPMassLayer(L,NY,NX)
-    trcp_salml(idsp_CaCO3,L,NY,NX)=solutevar%PCACO1*SoilMicPMassLayer(L,NY,NX)
-    trcp_salml(idsp_CaSO4,L,NY,NX)=solutevar%PCASO1*SoilMicPMassLayer(L,NY,NX)
-    trcp_salml(idsp_AlPO4,L,NY,NX)=solutevar%PALPO1*SoilMicPMassLayer(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-    trcp_salml(idsp_FePO4,L,NY,NX)=solutevar%PFEPO1*SoilMicPMassLayer(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-    trcp_salml(idsp_CaHPO4,L,NY,NX)=solutevar%PCAPD1*SoilMicPMassLayer(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-    trcp_salml(idsp_HA,L,NY,NX)=solutevar%PCAPH1*SoilMicPMassLayer(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-    trcp_salml(idsp_CaH2PO4,L,NY,NX)=0._r8
-    trcp_salml(idsp_AlPO4B,L,NY,NX)=solutevar%PALPO1*SoilMicPMassLayer(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
-    trcp_salml(idsp_FePO4B,L,NY,NX)=solutevar%PFEPO1*SoilMicPMassLayer(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
-    trcp_salml(idsp_CaHPO4B,L,NY,NX)=solutevar%PCAPD1*SoilMicPMassLayer(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
-    trcp_salml(idsp_HAB,L,NY,NX)=solutevar%PCAPH1*SoilMicPMassLayer(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
-    trcp_salml(idsp_CaH2PO4B,L,NY,NX)=0._r8
+    trcp_salml(idsp_AlOH3,L,NY,NX)=solutevar%Precp_AlO3H3_conc*SoilMicPMassLayer(L,NY,NX)
+    trcp_salml(idsp_FeOH3,L,NY,NX)=solutevar%Precp_FeO3H3_conc*SoilMicPMassLayer(L,NY,NX)
+    trcp_salml(idsp_CaCO3,L,NY,NX)=solutevar%Precp_CaCO3_conc*SoilMicPMassLayer(L,NY,NX)
+    trcp_salml(idsp_CaSO4,L,NY,NX)=solutevar%Precp_CaSO4_conc*SoilMicPMassLayer(L,NY,NX)
+    trcp_salml(idsp_AlPO4,L,NY,NX)=solutevar%Precp_AlPO4_conc*SoilMicPMassLayer(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
+    trcp_salml(idsp_FePO4,L,NY,NX)=solutevar%Precp_FePO4_conc*SoilMicPMassLayer(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
+    trcp_salml(idsp_CaHPO4,L,NY,NX)=solutevar%Precp_CaHPO4_conc*SoilMicPMassLayer(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
+    trcp_salml(idsp_HA,L,NY,NX)=solutevar%Precp_Ca5P3O12O3H3_conc*SoilMicPMassLayer(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
+    trcp_salml(idsp_CaH4P2O8,L,NY,NX)=0._r8
+    trcp_salml(idsp_AlPO4B,L,NY,NX)=solutevar%Precp_AlPO4_conc*SoilMicPMassLayer(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
+    trcp_salml(idsp_FePO4B,L,NY,NX)=solutevar%Precp_FePO4_conc*SoilMicPMassLayer(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
+    trcp_salml(idsp_CaHPO4B,L,NY,NX)=solutevar%Precp_CaHPO4_conc*SoilMicPMassLayer(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
+    trcp_salml(idsp_HAB,L,NY,NX)=solutevar%Precp_Ca5P3O12O3H3_conc*SoilMicPMassLayer(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
+    trcp_salml(idsp_CaH4P2O8B,L,NY,NX)=0._r8
     ECND(L,NY,NX)=0._r8
     CSTR(L,NY,NX)=0._r8
     CION(L,NY,NX)=0._r8
 ! the following line is quite interesting, Jinyun Tang, Nov 17, 2022
-    trc_solml(ids_NH4,L,NY,NX)=trc_solml(ids_NH4,L,NY,NX)+0.5_r8*OSN(iprotein,k_manure,L,NY,NX)
+    trc_solml_vr(ids_NH4,L,NY,NX)=trc_solml_vr(ids_NH4,L,NY,NX)+0.5_r8*OSN(iprotein,k_manure,L,NY,NX)
     OSN(iprotein,k_manure,L,NY,NX)=OSN(iprotein,k_manure,L,NY,NX)-0.5_r8*OSN(iprotein,k_manure,L,NY,NX)
   ENDIF
   end associate
-  end subroutine SoluteConcentrations
+  end subroutine InitSoluteConcs
 !------------------------------------------------------------------------------------------
 
   subroutine InitialState(NY,NX)
@@ -531,11 +493,12 @@ module StarteMod
   implicit none
   integer, intent(in) :: NY, NX
   real(R8) :: VOLWW
+  integer :: nsalts
 !
 !     INITIAL STATE VARIABLES FOR MINERALS IN SURFACE RESIDUE
 !
   IF(.not.is_restart().AND.is_first_year)THEN
-    trc_solml(ids_nuts_beg:ids_nuts_end,0,NY,NX)=0._r8
+    trc_solml_vr(ids_nuts_beg:ids_nuts_end,0,NY,NX)=0._r8
 
     trcx_solml(idx_NH4,0,NY,NX)=0._r8
     trcx_solml(idx_NH4B,0,NY,NX)=0._r8
@@ -555,74 +518,36 @@ module StarteMod
     trcp_salml(idsp_FePO4,0,NY,NX)=0._r8
     trcp_salml(idsp_CaHPO4,0,NY,NX)=0._r8
     trcp_salml(idsp_HA,0,NY,NX)=0._r8
-    trcp_salml(idsp_CaH2PO4,0,NY,NX)=0._r8
+    trcp_salml(idsp_CaH4P2O8,0,NY,NX)=0._r8
     trcp_salml(idsp_AlPO4B,0,NY,NX)=0._r8
     trcp_salml(idsp_FePO4B,0,NY,NX)=0._r8
     trcp_salml(idsp_CaHPO4B,0,NY,NX)=0._r8
     trcp_salml(idsp_HAB,0,NY,NX)=0._r8
-    trcp_salml(idsp_CaH2PO4B,0,NY,NX)=0._r8
+    trcp_salml(idsp_CaH4P2O8B,0,NY,NX)=0._r8
 !
 !     INITIAL STATE VARIABLES FOR MINERAL N AND P IN SNOWPACK
 !
     D9985: DO L=1,JS
       IF(VLHeatCapSnow(L,NY,NX).GT.VLHeatCapSnowMin(NY,NX))THEN
         VOLWW=VLWatSnow(L,NY,NX)+VLDrySnoWE(L,NY,NX)+VLIceSnow(L,NY,NX)*DENSICE
-        trcg_solsml(idg_CO2,L,NY,NX)=VOLWW*CCOR(NY,NX)
-        trcg_solsml(idg_CH4,L,NY,NX)=VOLWW*CCHR(NY,NX)
-        trcg_solsml(idg_O2,L,NY,NX)=VOLWW*COXR(NY,NX)
-        trcg_solsml(idg_N2,L,NY,NX)=VOLWW*CNNR(NY,NX)
-        trcg_solsml(idg_N2O,L,NY,NX)=VOLWW*CN2R(NY,NX)
-        trcg_solsml(idg_NH3,L,NY,NX)=VOLWW*CN3R(NY,NX)*natomw
+        trcg_solsml(idg_CO2,L,NY,NX)=VOLWW*CO2_rain_conc(NY,NX)
+        trcg_solsml(idg_CH4,L,NY,NX)=VOLWW*CH4_rain_conc(NY,NX)
+        trcg_solsml(idg_O2,L,NY,NX)=VOLWW*O2_rain_conc(NY,NX)
+        trcg_solsml(idg_N2,L,NY,NX)=VOLWW*N2_rain_conc(NY,NX)
+        trcg_solsml(idg_N2O,L,NY,NX)=VOLWW*N2O_rain_conc(NY,NX)
+        trcg_solsml(idg_NH3,L,NY,NX)=VOLWW*NH3_rain_conc(NY,NX)*natomw
 
-        trcn_solsml(ids_NH4,L,NY,NX)=VOLWW*CN4R(NY,NX)*natomw
-        trcn_solsml(ids_NO3,L,NY,NX)=VOLWW*CNOR(NY,NX)*natomw
-        trcn_solsml(ids_H1PO4,L,NY,NX)=VOLWW*CH1PR(NY,NX)*patomw
-        trcn_solsml(ids_H2PO4,L,NY,NX)=VOLWW*CPOR(NY,NX)*patomw
+        trcn_solsml(ids_NH4,L,NY,NX)=VOLWW*NH4_rain_conc(NY,NX)*natomw
+        trcn_solsml(ids_NO3,L,NY,NX)=VOLWW*NO3_rain_conc(NY,NX)*natomw
+        trcn_solsml(ids_H1PO4,L,NY,NX)=VOLWW*HPO4_rain_conc(NY,NX)*patomw
+        trcn_solsml(ids_H2PO4,L,NY,NX)=VOLWW*H2PO4_rain_conc(NY,NX)*patomw
 !
 !     INITIAL STATE VARIABLES FOR CATIONS AND ANIONS IN SNOWPACK
 !
         IF(salt_model)THEN
-          trcs_solsml(idsalt_Al,L,NY,NX)=VOLWW*CALR(NY,NX)
-          trcs_solsml(idsalt_Fe,L,NY,NX)=VOLWW*CFER(NY,NX)
-          trcs_solsml(idsalt_Hp,L,NY,NX)=VOLWW*CHYR(NY,NX)
-          trcs_solsml(idsalt_Ca,L,NY,NX)=VOLWW*CCAR(NY,NX)
-          trcs_solsml(idsalt_Mg,L,NY,NX)=VOLWW*CMGR(NY,NX)
-          trcs_solsml(idsalt_Na,L,NY,NX)=VOLWW*CNAR(NY,NX)
-          trcs_solsml(idsalt_K,L,NY,NX)=VOLWW*CKAR(NY,NX)
-          trcs_solsml(idsalt_OH,L,NY,NX)=VOLWW*COHR(NY,NX)
-          trcs_solsml(idsalt_SO4,L,NY,NX)=VOLWW*CSOR(NY,NX)
-          trcs_solsml(idsalt_Cl,L,NY,NX)=VOLWW*CCLR(NY,NX)
-          trcs_solsml(idsalt_CO3,L,NY,NX)=VOLWW*CC3R(NY,NX)
-          trcs_solsml(idsalt_HCO3,L,NY,NX)=VOLWW*CHCR(NY,NX)
-          trcs_solsml(idsalt_AlOH,L,NY,NX)=VOLWW*CAL1R(NY,NX)
-          trcs_solsml(idsalt_AlOH2,L,NY,NX)=VOLWW*CAL2R(NY,NX)
-          trcs_solsml(idsalt_AlOH3,L,NY,NX)=VOLWW*CAL3R(NY,NX)
-          trcs_solsml(idsalt_AlOH4,L,NY,NX)=VOLWW*CAL4R(NY,NX)
-          trcs_solsml(idsalt_AlSO4,L,NY,NX)=VOLWW*CALSR(NY,NX)
-          trcs_solsml(idsalt_FeOH,L,NY,NX)=VOLWW*CFE1R(NY,NX)
-          trcs_solsml(idsalt_FeOH2,L,NY,NX)=VOLWW*CFE2R(NY,NX)
-          trcs_solsml(idsalt_FeOH3,L,NY,NX)=VOLWW*CFE3R(NY,NX)
-          trcs_solsml(idsalt_FeOH4,L,NY,NX)=VOLWW*CFE4R(NY,NX)
-          trcs_solsml(idsalt_FeSO4,L,NY,NX)=VOLWW*CFESR(NY,NX)
-          trcs_solsml(idsalt_CaOH2,L,NY,NX)=VOLWW*CCAOR(NY,NX)
-          trcs_solsml(idsalt_CaCO3,L,NY,NX)=VOLWW*CCACR(NY,NX)
-          trcs_solsml(idsalt_CaHCO3,L,NY,NX)=VOLWW*CCAHR(NY,NX)
-          trcs_solsml(idsalt_CaSO4,L,NY,NX)=VOLWW*CCASR(NY,NX)
-          trcs_solsml(idsalt_MgOH2,L,NY,NX)=VOLWW*CMGOR(NY,NX)
-          trcs_solsml(idsalt_MgCO3,L,NY,NX)=VOLWW*CMGCR(NY,NX)
-          trcs_solsml(idsalt_MgHCO3,L,NY,NX)=VOLWW*CMGHR(NY,NX)
-          trcs_solsml(idsalt_MgSO4,L,NY,NX)=VOLWW*CMGSR(NY,NX)
-          trcs_solsml(idsalt_NaCO3,L,NY,NX)=VOLWW*CNACR(NY,NX)
-          trcs_solsml(idsalt_NaSO4,L,NY,NX)=VOLWW*CNASR(NY,NX)
-          trcs_solsml(idsalt_KSO4,L,NY,NX)=VOLWW*CKASR(NY,NX)
-          trcs_solsml(idsalt_H0PO4,L,NY,NX)=VOLWW*CH0PR(NY,NX)
-          trcs_solsml(idsalt_H3PO4,L,NY,NX)=VOLWW*CH3PR(NY,NX)
-          trcs_solsml(idsalt_FeHPO4,L,NY,NX)=VOLWW*CF1PR(NY,NX)
-          trcs_solsml(idsalt_FeH2PO4,L,NY,NX)=VOLWW*CF2PR(NY,NX)
-          trcs_solsml(idsalt_CaPO4,L,NY,NX)=VOLWW*CC0PR(NY,NX)
-          trcs_solsml(idsalt_CaHPO4,L,NY,NX)=VOLWW*CC1PR(NY,NX)
-          trcs_solsml(idsalt_CaH2PO4,L,NY,NX)=VOLWW*CC2PR(NY,NX)
-          trcs_solsml(idsalt_MgHPO4,L,NY,NX)=VOLWW*CM1PR(NY,NX)
+          do nsalts=idsalt_beg,idsalt_end
+            trcs_solsml(nsalts,L,NY,NX)=VOLWW*trcsalt_rain_conc(nsalts,NY,NX)
+          enddo
         ENDIF
       ELSE
         trcg_solsml(idg_beg:idg_end-1,L,NY,NX)=0._r8

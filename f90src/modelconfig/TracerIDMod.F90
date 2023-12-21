@@ -22,7 +22,8 @@ implicit none
   integer :: ids_H1PO4,ids_H1PO4B
   integer :: ids_H2PO4,ids_H2PO4B
 
-  integer :: ids_DOC,ids_DON,ids_DOP,ids_ODA
+  integer :: idom_DOC,idom_DON,idom_DOP,idom_acetate
+  integer :: idom_beg,idom_end
   integer :: idg_beg,idg_end
   integer :: ids_beg,ids_end
   integer :: ids_nut_beg,ids_nuts_beg,ids_nuts_end
@@ -52,7 +53,7 @@ implicit none
   integer :: idsalt_FeOH3   ! FeOH3
   integer :: idsalt_FeOH4   ! FeOH4
   integer :: idsalt_FeSO4   ! FeSO4
-  integer :: idsalt_CaOH2   ! CaOH2
+  integer :: idsalt_CaOH   ! CaOH
   integer :: idsalt_CaCO3   ! CaCO3
   integer :: idsalt_CaHCO3  ! CaHCO3
   integer :: idsalt_CaSO4   ! CaSO4
@@ -69,7 +70,7 @@ implicit none
   integer :: idsalt_FeH2PO4 ! FeH2PO4
   integer :: idsalt_CaPO4   ! CaPO4
   integer :: idsalt_CaHPO4  ! CaHPO4
-  integer :: idsalt_CaH2PO4 ! CaH2PO4
+  integer :: idsalt_CaH4P2O8 ! CaH4P2O8
   integer :: idsalt_MgHPO4 ! MgHPO4
 !band salt
   integer :: idsalt_H0PO4B   ! PO4
@@ -78,7 +79,7 @@ implicit none
   integer :: idsalt_FeH2PO4B ! FeH2PO4
   integer :: idsalt_CaPO4B   ! CaPO4
   integer :: idsalt_CaHPO4B  ! CaHPO4
-  integer :: idsalt_CaH2PO4B ! CaH2PO4
+  integer :: idsalt_CaH4P2O8B ! CaH4P2O8
   integer :: idsalt_MgHPO4B ! MgHPO4
   integer :: idsaltb_beg    !band begin
   integer :: idsaltb_end    !band end
@@ -96,12 +97,12 @@ implicit none
   integer :: idsp_CaSO4
   integer :: idsp_AlPO4
   integer :: idsp_FePO4
-  integer :: idsp_CaH2PO4
+  integer :: idsp_CaH4P2O8
   integer :: idsp_CaHPO4B
   integer :: idsp_HAB
   integer :: idsp_AlPO4B
   integer :: idsp_FePO4B
-  integer :: idsp_CaH2PO4B
+  integer :: idsp_CaH4P2O8B
   integer :: idsp_psoi_beg,idsp_psoi_end
   integer :: idsp_p_beg, idsp_p_end
   
@@ -139,6 +140,7 @@ implicit none
   integer :: ifertnb_beg,ifertnb_end
   integer :: ids_nuts
   integer :: idsalt_nuts
+
   type, public :: trc_def_type
    integer :: NGasTracers    !number of gas tracers
    integer :: NSolutTracers    !number of solute tracers
@@ -148,6 +150,7 @@ implicit none
    integer :: NnutrientTracers    !number of nutrient tracers
    integer :: NFertNitro
    integer :: NFertNitrob
+   integer :: NDOMS
   end type trc_def_type
 
   type(trc_def_type), public :: trc_confs
@@ -189,6 +192,12 @@ implicit none
   ids_nut_beg=ids_NH4;  !the first non-band non-gaseous nutrient tracer
   ids_nuts_end=ids_H2PO4;!the last non-band nutrient tracer
 
+  idom_beg=1;idom_end=0
+  idom_doc=addone(idom_end)
+  idom_don=addone(idom_end)
+  idom_dop=addone(idom_end)
+  idom_acetate=addone(idom_end)
+  
   if(lsalt_model)then
     idsalt_beg=1;idsalt_end=0
     idsalt_Al=addone(idsalt_end)
@@ -213,7 +222,7 @@ implicit none
     idsalt_FeOH3=addone(idsalt_end)
     idsalt_FeOH4=addone(idsalt_end)
     idsalt_FeSO4=addone(idsalt_end)
-    idsalt_CaOH2=addone(idsalt_end)
+    idsalt_CaOH=addone(idsalt_end)
     idsalt_CaCO3=addone(idsalt_end)
     idsalt_CaHCO3=addone(idsalt_end)
     idsalt_CaSO4 =addone(idsalt_end)
@@ -231,7 +240,7 @@ implicit none
     idsalt_FeH2PO4=addone(idsalt_end)
     idsalt_CaPO4 =addone(idsalt_end)
     idsalt_CaHPO4=addone(idsalt_end)
-    idsalt_CaH2PO4=addone(idsalt_end)
+    idsalt_CaH4P2O8=addone(idsalt_end)
     idsalt_MgHPO4=addone(idsalt_end)
     idsalt_end=idsalt_MgHPO4
     idsaltb_beg=idsalt_end+1
@@ -246,92 +255,64 @@ implicit none
     idsalt_FeH2PO4B=addone(idsaltb_end) ! FeH2PO4
     idsalt_CaPO4B=addone(idsaltb_end)   ! CaPO4
     idsalt_CaHPO4B=addone(idsaltb_end)  ! CaHPO4
-    idsalt_CaH2PO4B=addone(idsaltb_end) ! CaH2PO4
+    idsalt_CaH4P2O8B=addone(idsaltb_end) ! CaH4P2O8
     idsalt_MgHPO4B =addone(idsaltb_end)! MgHPO4
     idsalt_pband_beg=idsalt_H0PO4B;idsalt_pband_end=idsalt_MgHPO4B
 
     idsaltb_end=idsalt_MgHPO4B
 
-
-    idsp_beg=1
-    idsp_end=0;
-
-
-    idsp_AlOH3=addone(idsp_end)  !
-    idsp_FeOH3=addone(idsp_end) !
-    idsp_CaCO3=addone(idsp_end) !
-    idsp_CaSO4=addone(idsp_end)
-
-    idsp_HA   =addone(idsp_end)     !hydroxyapatite
-    idsp_AlPO4=addone(idsp_end)
-    idsp_FePO4=addone(idsp_end)
-    idsp_CaHPO4=addone(idsp_end) !
-    idsp_CaH2PO4=addone(idsp_end)
-
-    idsp_HAB  =addone(idsp_end)
-    idsp_AlPO4B=addone(idsp_end)
-    idsp_FePO4B=addone(idsp_end)
-    idsp_CaHPO4B=addone(idsp_end)
-    idsp_CaH2PO4B=addone(idsp_end)
-
-    idsp_end=idsp_CaH2PO4B
-    idsp_beg_band=idsp_HAB
-    idsp_p_beg=idsp_HA;idsp_p_end=idsp_CaH2PO4B
-
-  else
-!  double check
-    idsp_beg=1
-    idsp_end=0;
-
-    idsp_AlOH3=addone(idsp_end)  !
-    idsp_FeOH3=addone(idsp_end) !
-    idsp_CaCO3=addone(idsp_end) !
-    idsp_CaSO4=addone(idsp_end)
-
-    idsp_HA   =addone(idsp_end)     !hydroxyapatite
-    idsp_AlPO4=addone(idsp_end)
-    idsp_FePO4=addone(idsp_end)
-    idsp_CaHPO4=addone(idsp_end) !
-    idsp_CaH2PO4=addone(idsp_end)
-    idsp_psoi_beg=idsp_HA;idsp_psoi_end=idsp_CaH2PO4
-
-    idsp_HAB  =addone(idsp_end)
-    idsp_AlPO4B=addone(idsp_end)
-    idsp_FePO4B=addone(idsp_end)
-    idsp_CaHPO4B=addone(idsp_end)
-    idsp_CaH2PO4B=addone(idsp_end)
-    idsp_end=idsp_CaH2PO4B
-    idsp_beg_band=idsp_HAB
-
-    idsp_p_beg=idsp_HA;idsp_p_end=idsp_CaH2PO4B
   endif
+!  double check
+  idsp_beg=1
+  idsp_end=0;
+
+  idsp_AlOH3=addone(idsp_end)     !Al(3+)+3OH(-)
+  idsp_FeOH3=addone(idsp_end)     !Fe(3+)+3OH(-)
+  idsp_CaCO3=addone(idsp_end)     !Ca(2+)+CO3(2-)
+  idsp_CaSO4=addone(idsp_end)     !Ca(2+)+SO4(2-)
+
+  idsp_HA   =addone(idsp_end)     !hydroxyapatite
+  idsp_AlPO4=addone(idsp_end)     !Al(3+)+PO4(3-)
+  idsp_FePO4=addone(idsp_end)     !Fe(3+)+PO4(3-)
+  idsp_CaHPO4=addone(idsp_end)    !Ca(2+)+H(+)+PO4(3-)
+  idsp_CaH4P2O8=addone(idsp_end)  !Ca(2+)+4H(+)+2PO4(3-)
+  idsp_psoi_beg=idsp_HA;idsp_psoi_end=idsp_CaH4P2O8
+
+  idsp_HAB  =addone(idsp_end)
+  idsp_AlPO4B=addone(idsp_end)
+  idsp_FePO4B=addone(idsp_end)
+  idsp_CaHPO4B=addone(idsp_end)
+  idsp_CaH4P2O8B=addone(idsp_end)
+  idsp_end=idsp_CaH4P2O8B
+  idsp_beg_band=idsp_HAB
+  idsp_p_beg=idsp_HA;idsp_p_end=idsp_CaH4P2O8B
 
   idx_beg=1
   idx_end=0
 
   idx_CEC=addone(idx_end)    ! XCEC,  cation exchange capacity, [mol d-2]
-  idx_NH4=addone(idx_end)    ! XN4, exchangeable NH4 non-band, [mol d-2]
-  idx_Hp =addone(idx_end)    ! XHY, exchangeable H , [mol d-2]
-  idx_Al =addone(idx_end)    ! XAL, exchangeable Al, [mol d-2]
-  idx_Fe =addone(idx_end)    ! XFE, exchangeable Fe, [mol d-2]
-  idx_Ca =addone(idx_end)    ! XCA, exchangeable Ca, [mol d-2]
-  idx_Mg =addone(idx_end)    ! XMG, exchangeable Mg , [mol d-2]
-  idx_Na =addone(idx_end)    ! XNA, exchangeable Na, [mol d-2]
-  idx_K  =addone(idx_end)    ! XKA, exchangeable K, [mol d-2]
-  idx_COOH  =addone(idx_end)  ! XHC, exchangeable COOH , [mol d-2]
-  idx_AlOH2 =addone(idx_end) ! XALO2, exchangeable AlOH2 , [mol d-2]
-  idx_FeOH2 =addone(idx_end) ! XFEO2, exchangeable Fe(OH)2, [mol d-2]
+  idx_NH4=addone(idx_end)    ! XN4, exchangeable NH4 non-band, [mol d-2], X-NH4
+  idx_Hp =addone(idx_end)    ! XHY, exchangeable H , [mol d-2], X-H
+  idx_Al =addone(idx_end)    ! XAL, exchangeable Al, [mol d-2], X-Al
+  idx_Fe =addone(idx_end)    ! XFE, exchangeable Fe, [mol d-2], X-Fe
+  idx_Ca =addone(idx_end)    ! XCA, exchangeable Ca, [mol d-2], X-Ca
+  idx_Mg =addone(idx_end)    ! XMG, exchangeable Mg , [mol d-2], X-Mg
+  idx_Na =addone(idx_end)    ! XNA, exchangeable Na, [mol d-2], X-Na
+  idx_K  =addone(idx_end)    ! XKA, exchangeable K, [mol d-2], X-K
+  idx_COOH  =addone(idx_end)  ! XHC, exchangeable COOH , [mol d-2], X-COOH
+  idx_AlOH2 =addone(idx_end) ! XALO2, exchangeable AlOH2 , [mol d-2], X-Al(OH)2
+  idx_FeOH2 =addone(idx_end) ! XFEO2, exchangeable Fe(OH)2, [mol d-2], X-Fe(OH)2
   idx_NH4B=addone(idx_end)   ! XNB, exchangeable NH4 band, [mol d-2]
   idx_cation_end=idx_NH4B
   idx_cation_soil_end=idx_FeOH2
 
   idx_AEC =addone(idx_end)   ! XAEC, anion exchange capacity, [mol d-2]
-  idx_OHe =addone(idx_end)   ! XOH0, exchangeable OH- non-band, [mol d-2]
-  idx_OH  =addone(idx_end)   ! XOH1, exchangeable OH  non-band, [mol d-2]
-  idx_OHp =addone(idx_end)   ! XOH2, exchangeable OH2  non-band, [mol d-2]
-  idx_HPO4 =addone(idx_end)  ! XH1P, exchangeable HPO4  non-band, [mol d-2]
-  idx_H2PO4 =addone(idx_end) ! XH2P, exchangeable H2PO4  non-band, [mol d-2]
-  idx_OHeB  =addone(idx_end) ! XOH0B, exchangeable OH- band, [mol d-2]
+  idx_OHe =addone(idx_end)   ! XOH0, exchangeable OH- non-band, [mol d-2], X-O(-)
+  idx_OH  =addone(idx_end)   ! XOH1, exchangeable OH  non-band, [mol d-2], X-OH
+  idx_OHp =addone(idx_end)   ! XOH2, exchangeable OH2  non-band, [mol d-2], X-OH2(+)
+  idx_HPO4 =addone(idx_end)  ! XH1P, exchangeable HPO4  non-band, [mol d-2],X-HPO4(-)
+  idx_H2PO4 =addone(idx_end) ! XH2P, exchangeable H2PO4  non-band, [mol d-2],X-H2PO4
+  idx_OHeB  =addone(idx_end) ! XOH0B, exchangeable OH- band, [mol d-2],
   idx_OHB  =addone(idx_end)  ! XOH1B, exchangeable OH  band, [mol d-2]
   idx_OHpB  =addone(idx_end) ! XOH2B, exchangeable OH2  band, [mol d-2]
   idx_HPO4B =addone(idx_end) ! XH1PB, exchangeable HPO4  band, [mol d-2]
@@ -348,6 +329,7 @@ implicit none
   trc_confs%NnutrientTracers=ids_nuts_end-ids_nut_beg+1
   trc_confs%NFertNitro    = ifertn_end-ifertn_beg+1
   trc_confs%NFertNitrob   = ifertnb_end-ifertnb_beg+1
+  trc_confs%NDOMS         = idom_end-idom_beg+1
   end subroutine InitTracerIDs
 end module TracerIDMod
 

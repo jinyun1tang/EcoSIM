@@ -12,6 +12,7 @@ module StartsMod
   use MicrobialDataType
   use EcoSIMSolverPar
   use SOMDataType
+  use EcoSIMCtrlMod
   use ChemTranspDataType
   use FertilizerDataType
   use SnowPhysMod, only : InitSnowLayers
@@ -75,7 +76,8 @@ module StartsMod
   real(r8) :: ALTZG
   real(r8) :: tPBOT
   real(r8) :: LandScape1stSoiLayDepth
-  real(r8) :: YSIN(JSA),YCOS(JSA),YAZI(JSA)
+  real(r8) :: YSIN(NumOfSkyAzimuSects),YCOS(NumOfSkyAzimuSects)
+  real(r8) :: SkyAzimuthAngle(NumOfSkyAzimuSects)
 ! begin_execution
 
 
@@ -83,10 +85,10 @@ module StartsMod
   call InitControlParms
   !
   !  IRRADIANCE INTERCEPTION GEOMETRY, plant model
-  call InitIrradianceGeometry(YSIN,YCOS,YAZI)
+  call InitIrradianceGeometry(YSIN,YCOS,SkyAzimuthAngle)
   !  CALCULATE ELEVATION OF EACH GRID CELL
   !
-  call InitGridElevation(NHW,NHE,NVN,NVS,YSIN,YCOS,YAZI,ALTY)
+  call InitGridElevation(NHW,NHE,NVN,NVS,YSIN,YCOS,SkyAzimuthAngle,ALTY)
   !
   !     INITIALIZE ACCUMULATORS AND MASS BALANCE CHECKS
   !     OF EACH GRID CELL
@@ -123,13 +125,13 @@ module StartsMod
 !
       tPBOT=PBOT(NY,NX)/1.01325E+02_r8
       CCO2EI(NY,NX)=CO2EI(NY,NX)*5.36E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
-      AtmGgms(idg_CO2,NY,NX)=CO2E(NY,NX)*5.36E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
-      AtmGgms(idg_CH4,NY,NX)=CH4E(NY,NX)*5.36E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
-      AtmGgms(idg_O2,NY,NX)=OXYE(NY,NX)*1.43E-03_r8*Tref/TairKClimMean(NY,NX)*tPBOT
-      AtmGgms(idg_N2,NY,NX)=Z2GE(NY,NX)*1.25E-03_r8*Tref/TairKClimMean(NY,NX)*tPBOT
-      AtmGgms(idg_N2O,NY,NX)=Z2OE(NY,NX)*1.25E-03_r8*Tref/TairKClimMean(NY,NX)*tPBOT
-      AtmGgms(idg_NH3,NY,NX)=ZNH3E(NY,NX)*6.25E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
-      AtmGgms(idg_H2,NY,NX)=H2GE(NY,NX)*8.92E-05_r8*Tref/TairKClimMean(NY,NX)*tPBOT
+      AtmGasCgperm3(idg_CO2,NY,NX)=CO2E(NY,NX)*5.36E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
+      AtmGasCgperm3(idg_CH4,NY,NX)=CH4E(NY,NX)*5.36E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
+      AtmGasCgperm3(idg_O2,NY,NX)=OXYE(NY,NX)*1.43E-03_r8*Tref/TairKClimMean(NY,NX)*tPBOT
+      AtmGasCgperm3(idg_N2,NY,NX)=Z2GE(NY,NX)*1.25E-03_r8*Tref/TairKClimMean(NY,NX)*tPBOT
+      AtmGasCgperm3(idg_N2O,NY,NX)=Z2OE(NY,NX)*1.25E-03_r8*Tref/TairKClimMean(NY,NX)*tPBOT
+      AtmGasCgperm3(idg_NH3,NY,NX)=ZNH3E(NY,NX)*6.25E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
+      AtmGasCgperm3(idg_H2,NY,NX)=H2GE(NY,NX)*8.92E-05_r8*Tref/TairKClimMean(NY,NX)*tPBOT
 !
 !     MICROBIAL THERMAL ADAPTATION
 !
@@ -188,11 +190,11 @@ module StartsMod
 !
 !     INITIALIZE COMMUNITY CANOPY
 !
-  GridMaxCanopyHeight(:,:)=0.0_r8
-  CanopyHeightz(0:JC,:,:)=0.0_r8
-  CanopyLAgrid_lyr(1:JC,:,:)=0.0_r8
-  CanopyStemA_lyr(1:JC,:,:)=0.0_r8
-  WGLFT(1:JC,:,:)=0.0_r8
+  MaxCanopyHeight_grd(:,:)=0.0_r8
+  CanopyHeightz_col(0:NumOfCanopyLayers,:,:)=0.0_r8
+  CanopyLAgrid_lyr(1:NumOfCanopyLayers,:,:)=0.0_r8
+  CanopyStemA_lyr(1:NumOfCanopyLayers,:,:)=0.0_r8
+  WGLFT(1:NumOfCanopyLayers,:,:)=0.0_r8
 
 !
   call InitSoilVars(NHW,NHE,NVN,NVS,ALTZG,LandScape1stSoiLayDepth)
@@ -224,7 +226,7 @@ module StartsMod
 
 !     INITIALIZE SEDIMENT LOAD IN EROSION MODEL
 !
-  IF(IERSNG.EQ.1.OR.IERSNG.EQ.3)THEN
+  IF(iErosionMode.EQ.ieros_frzthaweros.OR.iErosionMode.EQ.ieros_frzthawsomeros)THEN
     SED(:,:)=0.0_r8
   ENDIF
 !
@@ -371,7 +373,7 @@ module StartsMod
 !     TORGM=TORGL used to calculate allocation (g m-2)
 !     HCX=shape parameter for depth effect on allocation
 !
-  TORGM=AMAX1(2.0E+03_r8,AMIN1(5.0E+03_r8,0.25_r8*TORGL(NJ(NY,NX))))
+  TORGM=AMAX1(2.0E+03_r8,AMIN1(5.0E+03_r8,0.25_r8*TORGL(MaxNumRootLays(NY,NX))))
   IF(TORGM.GT.ZERO)THEN
     HCX=LOG(0.5_r8)/TORGM
   ELSE
@@ -511,18 +513,18 @@ module StartsMod
   L2=NL(NY,NX)
   FertN_soil(ifertn_beg:ifertn_end,0:L2,NY,NX)=0._r8
   FertN_band(ifertnb_beg:ifertnb_end,1:L2,NY,NX)=0._r8
-  trcs_VLN(ids_NH4,0:L2,NY,NX)=1.0_r8
-  trcs_VLN(idg_NH3,0:L2,NY,NX)=trcs_VLN(ids_NH4,0:L2,NY,NX)
-  trcs_VLN(ids_NO3,0:L2,NY,NX)=1.0_r8
-  trcs_VLN(ids_NO2,0:L2,NY,NX)=trcs_VLN(ids_NO3,0:L2,NY,NX)
-  trcs_VLN(ids_H1PO4,0:L2,NY,NX)=1.0_r8
-  trcs_VLN(ids_H2PO4,0:L2,NY,NX)=trcs_VLN(ids_H1PO4,0:L2,NY,NX)
-  trcs_VLN(ids_NH4B,0:L2,NY,NX)=0.0_r8
-  trcs_VLN(idg_NH3B,0:L2,NY,NX)= trcs_VLN(ids_NH4B,0:L2,NY,NX)
-  trcs_VLN(ids_NO3B,0:L2,NY,NX)=0.0_r8
-  trcs_VLN(ids_NO2B,0:L2,NY,NX)=trcs_VLN(ids_NO3B,0:L2,NY,NX)
-  trcs_VLN(ids_H1PO4B,0:L2,NY,NX)=0.0_r8
-  trcs_VLN(ids_H2PO4B,0:L2,NY,NX)=trcs_VLN(ids_H1PO4B,0:L2,NY,NX)
+  trcs_VLN_vr(ids_NH4,0:L2,NY,NX)=1.0_r8
+  trcs_VLN_vr(idg_NH3,0:L2,NY,NX)=trcs_VLN_vr(ids_NH4,0:L2,NY,NX)
+  trcs_VLN_vr(ids_NO3,0:L2,NY,NX)=1.0_r8
+  trcs_VLN_vr(ids_NO2,0:L2,NY,NX)=trcs_VLN_vr(ids_NO3,0:L2,NY,NX)
+  trcs_VLN_vr(ids_H1PO4,0:L2,NY,NX)=1.0_r8
+  trcs_VLN_vr(ids_H2PO4,0:L2,NY,NX)=trcs_VLN_vr(ids_H1PO4,0:L2,NY,NX)
+  trcs_VLN_vr(ids_NH4B,0:L2,NY,NX)=0.0_r8
+  trcs_VLN_vr(idg_NH3B,0:L2,NY,NX)= trcs_VLN_vr(ids_NH4B,0:L2,NY,NX)
+  trcs_VLN_vr(ids_NO3B,0:L2,NY,NX)=0.0_r8
+  trcs_VLN_vr(ids_NO2B,0:L2,NY,NX)=trcs_VLN_vr(ids_NO3B,0:L2,NY,NX)
+  trcs_VLN_vr(ids_H1PO4B,0:L2,NY,NX)=0.0_r8
+  trcs_VLN_vr(ids_H2PO4B,0:L2,NY,NX)=trcs_VLN_vr(ids_H1PO4B,0:L2,NY,NX)
 
   ROXYX(0:L2,NY,NX)=0.0_r8
   RNH4X(0:L2,NY,NX)=0.0_r8
@@ -557,18 +559,18 @@ module StartsMod
   end subroutine initFertArrays
 
 !------------------------------------------------------------------------------------------
-  subroutine InitGridElevation(NHW,NHE,NVN,NVS,YSIN,YCOS,YAZI,ALTY)
+  subroutine InitGridElevation(NHW,NHE,NVN,NVS,YSIN,YCOS,SkyAzimuthAngle,ALTY)
   implicit none
   integer, intent(in) :: NHW,NHE,NVN,NVS
-  real(r8),intent(in) :: YSIN(JSA),YCOS(JSA),YAZI(JSA)
+  real(r8),intent(in) :: YSIN(NumOfSkyAzimuSects),YCOS(NumOfSkyAzimuSects),SkyAzimuthAngle(NumOfSkyAzimuSects)
   REAL(R8),INTENT(OUT):: ALTY
   integer :: NY,NX,N,NN
   REAL(R8) :: DGAZI
-  real(r8) :: GSINA(JY,JX),GCOSA(JY,JX)  !diagnostic
+  real(r8) :: SineGrndSurfAzimuth_col(JY,JX),CosineGrndSurfAzimuth_col(JY,JX)  !diagnostic
 
 ! begin_execution
-! GAZI=ground surface azimuth, aspect in radians
-! GSIN,GCOS=sine,cosine of ground surface
+! GroundSurfAzimuth_col=ground surface azimuth, aspect in radians
+! SineGrndSlope_col,CosineGrndSlope_col=sine,cosine of ground surface
 ! OMEGAG=incident sky angle at ground surface
 ! SLOPE=sine of ground surface slope in (0)aspect, (1)EW,(2)NS directions
 ! ALT=ground surface elevation
@@ -577,46 +579,46 @@ module StartsMod
 ! ASP=aspect angle in degree
   ALTY=0.0_r8
   write(*,1112)'NY','NX','east','west','south','north','altitude','Dist(m):E-W','Dist(m):N-S',&
-    'aspect(o)','slope(o)','slope0','slope-east','slope-north','GSIN','GCOS','GSINA'
+    'aspect(o)','slope(o)','slope0','slope-east','slope-north','SineGrndSlope_col','CosineGrndSlope_col','SineGrndSurfAzimuth_col'
 1112    FORMAT(2A4,4A6,20A12)
   D9985: DO NX=NHW,NHE
     D9980: DO NY=NVN,NVS
       ZEROS(NY,NX)=ZERO*DH(NY,NX)*DV(NY,NX)
       ZEROS2(NY,NX)=ZERO2*DH(NY,NX)*DV(NY,NX)
 !     compute slopes
-      GAZI(NY,NX)=ASP(NY,NX)*RadianPerDegree   !radian
-      GSINA(NY,NX)=ABS(SIN(GAZI(NY,NX)))
-      GCOSA(NY,NX)=ABS(COS(GAZI(NY,NX)))
+      GroundSurfAzimuth_col(NY,NX)=ASP(NY,NX)*RadianPerDegree   !radian
+      SineGrndSurfAzimuth_col(NY,NX)=ABS(SIN(GroundSurfAzimuth_col(NY,NX)))
+      CosineGrndSurfAzimuth_col(NY,NX)=ABS(COS(GroundSurfAzimuth_col(NY,NX)))
       SLOPE(0,NY,NX)=AMAX1(1.745E-04_r8,SIN(SL(NY,NX)*RadianPerDegree))  !small slope approximation
 
       IF(ASP(NY,NX).GE.0.0_r8.AND.ASP(NY,NX).LT.90.0_r8)THEN
       ! along the northeast
-        SLOPE(1,NY,NX)=-SLOPE(0,NY,NX)*COS(ASP(NY,NX)*RadianPerDegree)    !to east
-        SLOPE(2,NY,NX)=SLOPE(0,NY,NX)*SIN(ASP(NY,NX)*RadianPerDegree)     !to north
+        SLOPE(1,NY,NX)=-SLOPE(0,NY,NX)*COS(ASP(NY,NX)*RadianPerDegree)    !to south (thus -)
+        SLOPE(2,NY,NX)=SLOPE(0,NY,NX)*SIN(ASP(NY,NX)*RadianPerDegree)     !to east
         XGridRunoffFlag(1,1,NY,NX)=.true.    !east
         XGridRunoffFlag(2,1,NY,NX)=.false.
         XGridRunoffFlag(1,2,NY,NX)=.false.
         XGridRunoffFlag(2,2,NY,NX)=.true.    !north
       ELSEIF(ASP(NY,NX).GE.90.0_r8.AND.ASP(NY,NX).LT.180.0_r8)THEN
-      ! along the northwest
-        SLOPE(1,NY,NX)=SLOPE(0,NY,NX)*SIN((ASP(NY,NX)-90.0_r8)*RadianPerDegree)   !to west
-        SLOPE(2,NY,NX)=SLOPE(0,NY,NX)*COS((ASP(NY,NX)-90.0_r8)*RadianPerDegree)   !to north
+      ! along the southeast
+        SLOPE(1,NY,NX)=SLOPE(0,NY,NX)*SIN((ASP(NY,NX)-90.0_r8)*RadianPerDegree)   !to south
+        SLOPE(2,NY,NX)=SLOPE(0,NY,NX)*COS((ASP(NY,NX)-90.0_r8)*RadianPerDegree)   !to east
         XGridRunoffFlag(1,1,NY,NX)=.false.
-        XGridRunoffFlag(2,1,NY,NX)=.true.   !west
+        XGridRunoffFlag(2,1,NY,NX)=.true.   !west to east
         XGridRunoffFlag(1,2,NY,NX)=.false.
-        XGridRunoffFlag(2,2,NY,NX)=.true.   !north
+        XGridRunoffFlag(2,2,NY,NX)=.true.   !north to south
       ELSEIF(ASP(NY,NX).GE.180.0_r8.AND.ASP(NY,NX).LT.270.0_r8)THEN
       !along the southwest
-        SLOPE(1,NY,NX)=SLOPE(0,NY,NX)*COS((ASP(NY,NX)-180.0_r8)*RadianPerDegree)    !to west
-        SLOPE(2,NY,NX)=-SLOPE(0,NY,NX)*SIN((ASP(NY,NX)-180.0_r8)*RadianPerDegree)   !to south
+        SLOPE(1,NY,NX)=SLOPE(0,NY,NX)*COS((ASP(NY,NX)-180.0_r8)*RadianPerDegree)    !to south
+        SLOPE(2,NY,NX)=-SLOPE(0,NY,NX)*SIN((ASP(NY,NX)-180.0_r8)*RadianPerDegree)   !to east (thus -)
         XGridRunoffFlag(1,1,NY,NX)=.false.
         XGridRunoffFlag(2,1,NY,NX)=.true.  !west
         XGridRunoffFlag(1,2,NY,NX)=.true.  !south
         XGridRunoffFlag(2,2,NY,NX)=.false.
       ELSEIF(ASP(NY,NX).GE.270.0_r8.AND.ASP(NY,NX).LE.360.0_r8)THEN
-      ! along the southeast
-        SLOPE(1,NY,NX)=-SLOPE(0,NY,NX)*SIN((ASP(NY,NX)-270.0_r8)*RadianPerDegree)   !to east
-        SLOPE(2,NY,NX)=-SLOPE(0,NY,NX)*COS((ASP(NY,NX)-270.0_r8)*RadianPerDegree)   !to south
+      ! along the northwest
+        SLOPE(1,NY,NX)=-SLOPE(0,NY,NX)*SIN((ASP(NY,NX)-270.0_r8)*RadianPerDegree)   !to north (thus -)
+        SLOPE(2,NY,NX)=-SLOPE(0,NY,NX)*COS((ASP(NY,NX)-270.0_r8)*RadianPerDegree)   !to west (thus -)
         XGridRunoffFlag(1,1,NY,NX)=.true.  !east
         XGridRunoffFlag(2,1,NY,NX)=.false.
         XGridRunoffFlag(1,2,NY,NX)=.true.  !south
@@ -633,11 +635,12 @@ module StartsMod
       ENDIF
 
 !    compute incident sky angle at ground surface
-      GSIN(NY,NX)=SLOPE(0,NY,NX)    !this is exact
-      GCOS(NY,NX)=SQRT(1.0_r8-GSIN(NY,NX)**2._r8)
-      D240: DO N=1,JSA
-        DGAZI=COS(GAZI(NY,NX)-YAZI(N))
-        OMEGAG(N,NY,NX)=AZMAX1(AMIN1(1.0_r8,GCOS(NY,NX)*YSIN(N)+GSIN(NY,NX)*YCOS(N)*DGAZI))
+      SineGrndSlope_col(NY,NX)=SLOPE(0,NY,NX)    !this is exact
+      CosineGrndSlope_col(NY,NX)=SQRT(1.0_r8-SineGrndSlope_col(NY,NX)**2._r8)
+      D240: DO N=1,NumOfSkyAzimuSects
+        DGAZI=COS(GroundSurfAzimuth_col(NY,NX)-SkyAzimuthAngle(N))
+        OMEGAG(N,NY,NX)=AZMAX1(AMIN1(1.0_r8,CosineGrndSlope_col(NY,NX)*YSIN(N)+ &
+          SineGrndSlope_col(NY,NX)*YCOS(N)*DGAZI))
       ENDDO D240
 !     compute ground surface elevation
 !     DH, length in e-w direction
@@ -679,7 +682,7 @@ module StartsMod
       WRITE(*,1111)NX,NY,((XGridRunoffFlag(NN,N,NY,NX),NN=1,2),N=1,2) &
         ,ALT(NY,NX),DH(NY,NX),DV(NY,NX),ASP(NY,NX),SL(NY,NX) &
         ,SLOPE(0,NY,NX),SLOPE(1,NY,NX),SLOPE(2,NY,NX) &
-        ,GSIN(NY,NX),GCOSA(NY,NX),GSINA(NY,NX)
+        ,SineGrndSlope_col(NY,NX),CosineGrndSurfAzimuth_col(NY,NX),SineGrndSurfAzimuth_col(NY,NX)
 1111  FORMAT(2I4,4L6,20E12.4)
     ENDDO D9980
   ENDDO D9985
@@ -758,76 +761,70 @@ module StartsMod
   IFNOB(:,:)=0
   IFPOB(:,:)=0
   IFLGS(:,:)=1
-  IFLGT(:,:)=0
+  NumActivePlants(:,:)=0
   ATCA(:,:)=ATCAI(:,:)
   ATCS(:,:)=ATCAI(:,:)
   TairKClimMean(:,:)=units%Celcius2Kelvin(ATCA)
   ATKS(:,:)=units%Celcius2Kelvin(ATCS)
   URAIN(:,:)=0.0_r8
-  UCO2G(:,:)=0.0_r8
-  UCH4G(:,:)=0.0_r8
-  UOXYG(:,:)=0.0_r8
-  UN2GG(:,:)=0.0_r8
-  UN2OG(:,:)=0.0_r8
-  UNH3G(:,:)=0.0_r8
-  UN2GS(:,:)=0.0_r8
-  UCO2F(:,:)=0.0_r8
-  UCH4F(:,:)=0.0_r8
-  UOXYF(:,:)=0.0_r8
-  UN2OF(:,:)=0.0_r8
-  UNH3F(:,:)=0.0_r8
-  UPO4F(:,:)=0.0_r8
-  UORGF(:,:)=0.0_r8
-  UFERTN(:,:)=0.0_r8
-  UFERTP(:,:)=0.0_r8
+
+  CO2byFire_col(:,:)=0.0_r8
+  CH4byFire_col(:,:)=0.0_r8
+  O2byFire_col(:,:)=0.0_r8
+  N2ObyFire_col(:,:)=0.0_r8
+  NH3byFire_col(:,:)=0.0_r8
+  PO4byFire_col(:,:)=0.0_r8
+  AmendCFlx_col(:,:)=0.0_r8
+  FertNFlx_col(:,:)=0.0_r8
+  FerPFlx_col(:,:)=0.0_r8
   UVOLO(:,:)=0.0_r8
   UEVAP(:,:)=0.0_r8
   URUN(:,:)=0.0_r8
   USEDOU(:,:)=0.0_r8
   UCOP(:,:)=0.0_r8
-  UDOCQ(:,:)=0.0_r8
-  UDOCD(:,:)=0.0_r8
-  UDONQ(:,:)=0.0_r8
-  UDOND(:,:)=0.0_r8
-  UDOPQ(:,:)=0.0_r8
-  UDOPD(:,:)=0.0_r8
-  UDICQ(:,:)=0.0_r8
-  UDICD(:,:)=0.0_r8
-  UDINQ(:,:)=0.0_r8
-  UDIND(:,:)=0.0_r8
-  UDIPQ(:,:)=0.0_r8
-  UDIPD(:,:)=0.0_r8
-  UIONOU(:,:)=0.0_r8
-  UXCSN(:,:)=0.0_r8
-  UXZSN(:,:)=0.0_r8
-  UXPSN(:,:)=0.0_r8
+  HDOCQ(:,:)=0.0_r8
+  HDOCD(:,:)=0.0_r8
+  HydroDONFlx_col(:,:)=0.0_r8
+  HDOND(:,:)=0.0_r8
+  HydroDOPFlx_col(:,:)=0.0_r8
+  HDOPD(:,:)=0.0_r8
+  HDICQ(:,:)=0.0_r8
+  HDICD(:,:)=0.0_r8
+  HydroDINFlx_col(:,:)=0.0_r8
+  HDIND(:,:)=0.0_r8
+  HydroDIPFlx_col(:,:)=0.0_r8
+  HDIPD(:,:)=0.0_r8
+  HydroIonFlx_col(:,:)=0.0_r8
+  LiterfalOrgC_col(:,:)=0.0_r8
+  LiterfalOrgN_col(:,:)=0.0_r8
+  LiterfalOrgP_col(:,:)=0.0_r8
   UDRAIN(:,:)=0.0_r8
   ZDRAIN(:,:)=0.0_r8
   PDRAIN(:,:)=0.0_r8
   DPNH4(:,:)=0.0_r8
   DPNO3(:,:)=0.0_r8
   DPPO4(:,:)=0.0_r8
-  trc_solml(idg_O2,0,:,:)=0.0_r8
+  trc_solml_vr(idg_O2,0,:,:)=0.0_r8
   FracSWRad2Grnd(:,:)=1.0_r8
   LWRadBySurf(:,:)=0.0_r8
   LWRadCanG(:,:)=0.0_r8
-  TRN(:,:)=0.0_r8
-  TLE(:,:)=0.0_r8
-  TSH(:,:)=0.0_r8
-  TGH(:,:)=0.0_r8
-  TLEC(:,:)=0.0_r8
-  TSHC(:,:)=0.0_r8
+  Eco_NetRad_col(:,:)=0.0_r8
+  Eco_Heat_Latent_col(:,:)=0.0_r8
+  Eco_Heat_Sens_col(:,:)=0.0_r8
+  Eco_Heat_Grnd_col(:,:)=0.0_r8
+  Canopy_Heat_Latent_col(:,:)=0.0_r8
+  Canopy_Heat_Sens_col(:,:)=0.0_r8
   TLEX(:,:)=0.0_r8
   TSHX(:,:)=0.0_r8
-  TCNET(:,:)=0.0_r8
+  Eco_NEE_col(:,:)=0.0_r8
   CanH2OHeldVg(:,:)=0.0_r8
-  CanopyLA_grd(:,:)=0.0_r8
-  StemAreag(:,:)=0.0_r8
+  CanopyLeafArea_grd(:,:)=0.0_r8
+  StemArea_grd(:,:)=0.0_r8
   PrecIntcptByCanG(:,:)=0.0_r8
   PPT(:,:)=0.0_r8
-  DYLN(:,:)=12.0_r8
-  ALBX(:,:)=SoilAlbedo(:,:)
-  XHVSTE(:,:,:)=0.0_r8
+  DayLenthCurrent(:,:)=12.0_r8
+  SurfAlbedo_col(:,:)=SoilAlbedo(:,:)
+  EcoHavstElmnt_col(:,:,:)=0.0_r8
   EnergyImpact4Erosion(:,:)=0.0_r8
   end subroutine InitAccumulators
 
@@ -947,7 +944,7 @@ module StartsMod
   NPR=NCYC_LITR     !sub-cycles of litter
   NPS=NCYC_SNOW     !sub-cycles of snow iteration
   dts_HeatWatTP=1.0_r8/NPH
-  XNPT=1.0_r8/NPT
+  dt_GasCyc=1.0_r8/NPT
   dts_gas=1.0_r8/NPG
   XNPR=1.0_r8/NPR
   XNPS=1.0_r8/NPS
@@ -956,7 +953,7 @@ module StartsMod
   dts_litrvapht=dts_litrhtwtp*XNPS
   XNPV=XNPR*XNPS
   XNPD=600.0_r8*dts_gas
-  dts_wat=AMIN1(1.0_r8,20.0_r8*dts_HeatWatTP)  !adjust/recompute the time step for water/heat update, no greater than 1 hour
+  dts_wat=AMIN1(1.0_r8,5.0_r8*dts_HeatWatTP)  !adjust/recompute the time step for water/heat update, no greater than 1 hour
   dts_sno=dts_wat*XNPS
   XNPB=dts_wat*XNPR
   dt_watvap=dts_wat*XNPV
@@ -976,11 +973,11 @@ module StartsMod
   real(r8) :: tPBOT
   integer :: NY,NX,NM
   real(r8) :: LandScape1stSoiLayDepth
-  real(r8) :: YSIN(JSA),YCOS(JSA),YAZI(JSA)
+  real(r8) :: YSIN(NumOfSkyAzimuSects),YCOS(NumOfSkyAzimuSects),SkyAzimuthAngle(NumOfSkyAzimuSects)
 
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
-      NM=NJ(NY,NX)+1
+      NM=MaxNumRootLays(NY,NX)+1
       call ComputeSoilHydroPars(NY,NX,NU(NY,NX),NM)
       call SetDeepSoil(NY,NX,NM,JZ)
     enddo
@@ -989,10 +986,10 @@ module StartsMod
   call InitControlParms
 
   !  IRRADIANCE INTERCEPTION GEOMETRY, plant model
-  call InitIrradianceGeometry(YSIN,YCOS,YAZI)
+  call InitIrradianceGeometry(YSIN,YCOS,SkyAzimuthAngle)
   !  CALCULATE ELEVATION OF EACH GRID CELL
   !
-  call InitGridElevation(NHW,NHE,NVN,NVS,YSIN,YCOS,YAZI,ALTY)
+  call InitGridElevation(NHW,NHE,NVN,NVS,YSIN,YCOS,SkyAzimuthAngle,ALTY)
 
 
   call InitAccumulators()
@@ -1026,13 +1023,13 @@ module StartsMod
 !
       tPBOT=1._r8
       CCO2EI(NY,NX)=CO2EI(NY,NX)*5.36E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
-      AtmGgms(idg_CO2,NY,NX)=CO2E(NY,NX)*5.36E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
-      AtmGgms(idg_CH4,NY,NX)=CH4E(NY,NX)*5.36E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
-      AtmGgms(idg_O2,NY,NX)=OXYE(NY,NX)*1.43E-03_r8*Tref/TairKClimMean(NY,NX)*tPBOT
-      AtmGgms(idg_N2,NY,NX)=Z2GE(NY,NX)*1.25E-03_r8*Tref/TairKClimMean(NY,NX)*tPBOT
-      AtmGgms(idg_N2O,NY,NX)=Z2OE(NY,NX)*1.25E-03_r8*Tref/TairKClimMean(NY,NX)*tPBOT
-      AtmGgms(idg_NH3,NY,NX)=ZNH3E(NY,NX)*6.25E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
-      AtmGgms(idg_H2,NY,NX)=H2GE(NY,NX)*8.92E-05_r8*Tref/TairKClimMean(NY,NX)*tPBOT
+      AtmGasCgperm3(idg_CO2,NY,NX)=CO2E(NY,NX)*5.36E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
+      AtmGasCgperm3(idg_CH4,NY,NX)=CH4E(NY,NX)*5.36E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
+      AtmGasCgperm3(idg_O2,NY,NX)=OXYE(NY,NX)*1.43E-03_r8*Tref/TairKClimMean(NY,NX)*tPBOT
+      AtmGasCgperm3(idg_N2,NY,NX)=Z2GE(NY,NX)*1.25E-03_r8*Tref/TairKClimMean(NY,NX)*tPBOT
+      AtmGasCgperm3(idg_N2O,NY,NX)=Z2OE(NY,NX)*1.25E-03_r8*Tref/TairKClimMean(NY,NX)*tPBOT
+      AtmGasCgperm3(idg_NH3,NY,NX)=ZNH3E(NY,NX)*6.25E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
+      AtmGasCgperm3(idg_H2,NY,NX)=H2GE(NY,NX)*8.92E-05_r8*Tref/TairKClimMean(NY,NX)*tPBOT
 !
 !     MICROBIAL THERMAL ADAPTATION
 !
@@ -1090,11 +1087,11 @@ module StartsMod
 !
 !     INITIALIZE COMMUNITY CANOPY
 !
-  GridMaxCanopyHeight(:,:)=0.0_r8
-  CanopyHeightz(0:JC,:,:)=0.0_r8
-  CanopyLAgrid_lyr(1:JC,:,:)=0.0_r8
-  CanopyStemA_lyr(1:JC,:,:)=0.0_r8
-  WGLFT(1:JC,:,:)=0.0_r8
+  MaxCanopyHeight_grd(:,:)=0.0_r8
+  CanopyHeightz_col(0:NumOfCanopyLayers,:,:)=0.0_r8
+  CanopyLAgrid_lyr(1:NumOfCanopyLayers,:,:)=0.0_r8
+  CanopyStemA_lyr(1:NumOfCanopyLayers,:,:)=0.0_r8
+  WGLFT(1:NumOfCanopyLayers,:,:)=0.0_r8
 
 !
   call InitSoilVars(NHW,NHE,NVN,NVS,ALTZG,LandScape1stSoiLayDepth)

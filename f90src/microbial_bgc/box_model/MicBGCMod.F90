@@ -6,6 +6,7 @@ module MicBGCMod
 ! USES:
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use abortutils  , only : endrun,destroy
+  use TracerIDMod
   use MicAutoCPLXMod
   use minimathmod, only : safe_adb,AZMAX1
   use EcosimConst
@@ -82,7 +83,7 @@ module MicBGCMod
   call ncplxs%Init()
   call naqfdiag%ZeroOut()
 
-  micflx%TRINH4=0._r8;micflx%TRIPO4=0._r8
+  micflx%NetNH4Mineralize_col=0._r8;micflx%NetPO4Mineralize_col=0._r8
 ! write(*,*)'StageBGCEnvironCondition'
   call StageBGCEnvironCondition(micfor,KL,micstt,naqfdiag,nmicdiag,nmics,ncplxs)
 !
@@ -111,7 +112,7 @@ module MicBGCMod
         !     TRANSFER ALL PRIMING AMONG ALL K
         !
         !     TOQCK=total respiration of DOC+DOA in soil layer
-        !     ROQCK=total respiration of DOC+DOA in substrate complex
+        !     ROQCK=total respiration of DOC+DOA in substrate CO2CompenPoint_nodeex
         !     OQC,OQN,OQP,OQA=DOC,DON,DOP,acetate in micropores
         !     OMC,OMN,OMP=microbial C,N,P
         !
@@ -182,8 +183,7 @@ module MicBGCMod
     FOAA  => ncplxs%FOAA,      &
     CNQ  => ncplxs%CNQ,        &
     CPQ  => ncplxs%CPQ,        &
-    COQC    => ncplxs%COQC, &
-    COQA    => ncplxs%COQA,  &
+    CDOM    => ncplxs%CDOM, &
     ORCT  => ncplxs%ORCT,      &
     OSCT  => ncplxs%OSCT,      &
     OSAT  => ncplxs%OSAT,      &
@@ -247,10 +247,7 @@ module MicBGCMod
     OMC     => micstt%OMC   , &
     OMN     => micstt%OMN   , &
     OMP     => micstt%OMP   , &
-    OQC     => micstt%OQC   , &
-    OQN     => micstt%OQN   , &
-    OQP     => micstt%OQP   , &
-    OQA     => micstt%OQA   , &
+    DOM     => micstt%DOM   , &
     H1PO4 => micstt%H1PO4, &
     H1POB => micstt%H1POB, &
     H2PO4 => micstt%H2PO4, &
@@ -267,7 +264,7 @@ module MicBGCMod
     FOSRH   => micstt%FOSRH   &
   )
 
-! get KL, the number of mic-om complexes
+! get KL, the number of mic-om CO2CompenPoint_nodeexes
 
 !
 !     TEMPERATURE FUNCTIONS FOR GROWTH AND MAINTENANCE
@@ -301,13 +298,6 @@ module MicBGCMod
   TKSO=TKS+OFFSET
 
   call MicrobPhysTempFun(TKSO, TFNX, TFNY)
-
-!  RTK=RGAS*TKSO
-!  STK=710.0_r8*TKSO
-!  ACTV=1+EXP((197500._r8-STK)/RTK)+EXP((STK-222500._r8)/RTK)
-!  TFNX=EXP(25.229_r8-62500._r8/RTK)/ACTV
-!  ACTVM=1+EXP((195000._r8-STK)/RTK)+EXP((STK-232500._r8)/RTK)
-!  TFNY=EXP(25.214_r8-62500._r8/RTK)/ACTVM
 
 !
 !     OXYI=inhibition of fermenters by O2
@@ -386,7 +376,7 @@ module MicBGCMod
   TOMN=0.0_r8
   D890: DO K=1,jcplx
     IF(.not.litrm.OR.(K.NE.k_POM.AND.K.NE.k_humus))THEN
-! the omb complexes
+! the omb CO2CompenPoint_nodeexes
       D895: DO N=1,NFGs
         DO NGL=JGnio(n),JGnfo(n)
           IF(OMC(1,NGL,K).GT.ZEROS)THEN
@@ -422,7 +412,7 @@ module MicBGCMod
     ENDIF
   ENDDO D890
 
-! the abstract complex
+! the abstract CO2CompenPoint_nodeex
   DO N=1,NFGs
     IF(is_activef_micb(N))THEN
       DO NGL=JGniA(N),JGnfA(N)
@@ -488,7 +478,7 @@ module MicBGCMod
   ENDDO
 
 !
-!     FOSRH=fraction of total SOC in each substrate complex K
+!     FOSRH=fraction of total SOC in each substrate CO2CompenPoint_nodeex K
 !
   D790: DO K=1,KL
     IF(TSRH.GT.ZEROS)THEN
@@ -501,34 +491,34 @@ module MicBGCMod
     !
     !     COQC,COQA=aqueous DOC,acetate concentrations
     !     VLWatMicPM=soil water content, FOSRH=fraction of total SOC
-    !     occupied by each substrate complex K
+    !     occupied by each substrate CO2CompenPoint_nodeex K
     !
     IF(VLWatMicPM(NPH).GT.ZEROS2)THEN
       IF(FOSRH(K).GT.ZERO)THEN
-        COQC(K)=AZMAX1(OQC(K)/(VLWatMicPM(NPH)*FOSRH(K)))
-        COQA(K)=AZMAX1(OQA(K)/(VLWatMicPM(NPH)*FOSRH(K)))
+        CDOM(idom_doc,K)=AZMAX1(DOM(idom_doc,K)/(VLWatMicPM(NPH)*FOSRH(K)))
+        CDOM(idom_acetate,K)=AZMAX1(DOM(idom_acetate,K)/(VLWatMicPM(NPH)*FOSRH(K)))
       ELSE
-        COQC(K)=AZMAX1(OQC(K)/VLWatMicPM(NPH))
-        COQA(K)=AZMAX1(OQA(K)/VLWatMicPM(NPH))
+        CDOM(idom_doc,K)=AZMAX1(DOM(idom_doc,K)/VLWatMicPM(NPH))
+        CDOM(idom_acetate,K)=AZMAX1(DOM(idom_acetate,K)/VLWatMicPM(NPH))
       ENDIF
     ELSE
-      COQC(K)=0.0_r8
-      COQA(K)=0.0_r8
+      CDOM(idom_doc,K)=0.0_r8
+      CDOM(idom_acetate,K)=0.0_r8
     ENDIF
 !
 !     CNQ,CPQ=DON:DOC,DOP:DOC,FOCA,FOAA=DOC,DOA:(DOC+DOA)
 !
-    IF(OQC(K).GT.ZEROS)THEN
-      CNQ(K)=AZMAX1(OQN(K)/OQC(K))
-      CPQ(K)=AZMAX1(OQP(K)/OQC(K))
+    IF(DOM(idom_doc,K).GT.ZEROS)THEN
+      CNQ(K)=AZMAX1(DOM(idom_don,K)/DOM(idom_doc,K))
+      CPQ(K)=AZMAX1(DOM(idom_dop,K)/DOM(idom_doc,K))
     ELSE
       CNQ(K)=0.0_r8
       CPQ(K)=0.0_r8
     ENDIF
-    IF(OQC(K).GT.ZEROS.AND.OQA(K).GT.ZEROS)THEN
-      FOCA(K)=OQC(K)/(OQC(K)+OQA(K))
+    IF(DOM(idom_doc,K).GT.ZEROS.AND.DOM(idom_acetate,K).GT.ZEROS)THEN
+      FOCA(K)=DOM(idom_doc,K)/(DOM(idom_doc,K)+DOM(idom_acetate,K))
       FOAA(K)=1.0_r8-FOCA(K)
-    ELSEIF(OQC(K).GT.ZEROS)THEN
+    ELSEIF(DOM(idom_doc,K).GT.ZEROS)THEN
       FOCA(K)=1.0_r8
       FOAA(K)=0.0_r8
     ELSE
@@ -834,16 +824,16 @@ module MicBGCMod
 ! ROXYF,ROXYL=net O2 gaseous, aqueous fluxes from previous hour
 ! OLSGL=aqueous O2 diffusivity
 ! OXYG,OXYS=gaseous, aqueous O2 amounts
-! FLQRQ,FLQRI=surface water flux from precipitation, irrigation
-! COXR,COXQ=O2 concentration in FLQRQ,FLQRI
+! Rain2LitRSurf,Irrig2LitRSurf=surface water flux from precipitation, irrigation
+! O2_rain_conc,O2_irrig_conc=O2 concentration in Rain2LitRSurf,Irrig2LitRSurf
 !
   RUPOX(NGL,K)=0.0_r8
   !aerobic heterotrophs
   IF(micpar%is_aerobic_hetr(N))THEN
 !  N=(1)OBLIGATE AEROBES,(2)FACULTATIVE ANAEROBES,(3)FUNGI
 !    (6)N2 FIXERS
-!   write(*,*)'AerobsO2Uptake'
-    call AerobsO2Uptake(NGL,N,K,FOXYX,OXKX,RGOMP,RVOXP,RVOXPA,RVOXPB,&
+!   write(*,*)'AerobLeafO2Solubility_pftUptake'
+    call AerobLeafO2Solubility_pftUptake(NGL,N,K,FOXYX,OXKX,RGOMP,RVOXP,RVOXPA,RVOXPB,&
       micfor,micstt,nmicf,nmics,micflx)
   !anaerboic heterotrophs
   ELSEIF(micpar%is_anerobic_hetr(N))THEN
@@ -904,7 +894,7 @@ module MicBGCMod
   type(NitroMicDiagType), intent(inout) :: nmicdiag
   type(NitroAQMFluxDiagType), INTENT(INOUT):: naqfdiag
   type(micfluxtype), intent(inout) :: micflx
-  real(r8) :: chy1,CHNO2,CHNOB
+  real(r8) :: H_1p_conc,CHNO2,CHNOB
   real(r8) :: FNO3S,FNO3B
   REAL(R8) :: FNO2,FNB2
   real(r8) :: VMXC4S,VMXC4B
@@ -946,9 +936,9 @@ module MicBGCMod
 !     RCOQN=DON production from nitrous acid reduction
 !     RVMXC,RVMBC=demand for NO2 reduction in non-band,band
 !     nitrous acid concn CHNO2
-  CHY1=AMAX1(ZERO,10.0**(-(PH-3.0)))
-  CHNO2=CNO2S*CHY1/0.5
-  CHNOB=CNO2B*CHY1/0.5
+  H_1p_conc=AMAX1(ZERO,10.0**(-(PH-3.0_r8)))
+  CHNO2=CNO2S*H_1p_conc/0.5_r8
+  CHNOB=CNO2B*H_1p_conc/0.5_r8
 
   IF(RNO2Y.GT.ZEROS)THEN
     FNO2=AMAX1(FMN,RVMXC/RNO2Y)
@@ -1009,10 +999,7 @@ module MicBGCMod
     XOQAZ  => ncplxf%XOQAZ,  &
     OSRH  => ncplxs%OSRH  ,  &
     TOQCK => micstt%TOQCK, &
-    OQC => micstt%OQC, &
-    OQN => micstt%OQN, &
-    OQP => micstt%OQP, &
-    OQA => micstt%OQA, &
+    DOM => micstt%DOM, &
     OMC => micstt%OMC, &
     OMN => micstt%OMN, &
     OMP => micstt%OMP, &
@@ -1033,28 +1020,28 @@ module MicBGCMod
         OSRT=OSRH(K)+OSRH(KK)
         IF(OSRH(K).GT.ZEROS.AND.OSRH(KK).GT.ZEROS)THEN
           XFRK=FPRIM*TFND*(ROQCK(K)*OSRH(KK)-ROQCK(KK)*OSRH(K))/OSRT
-          XFRC=FPRIM*TFND*(OQC(K)*OSRH(KK)-OQC(KK)*OSRH(K))/OSRT
-          XFRN=FPRIM*TFND*(OQN(K)*OSRH(KK)-OQN(KK)*OSRH(K))/OSRT
-          XFRP=FPRIM*TFND*(OQP(K)*OSRH(KK)-OQP(KK)*OSRH(K))/OSRT
-          XFRA=FPRIM*TFND*(OQA(K)*OSRH(KK)-OQA(KK)*OSRH(K))/OSRT
+          XFRC=FPRIM*TFND*(DOM(idom_doc,K)*OSRH(KK)-DOM(idom_doc,KK)*OSRH(K))/OSRT
+          XFRN=FPRIM*TFND*(DOM(idom_don,K)*OSRH(KK)-DOM(idom_don,KK)*OSRH(K))/OSRT
+          XFRP=FPRIM*TFND*(DOM(idom_dop,K)*OSRH(KK)-DOM(idom_dop,KK)*OSRH(K))/OSRT
+          XFRA=FPRIM*TFND*(DOM(idom_acetate,K)*OSRH(KK)-DOM(idom_acetate,KK)*OSRH(K))/OSRT
           IF(ROQCK(K)+XOQCK(K)-XFRK.GT.0.0_r8.AND.ROQCK(KK)+XOQCK(KK)+XFRK.GT.0.0_r8)THEN
             XOQCK(K)=XOQCK(K)-XFRK
             XOQCK(KK)=XOQCK(KK)+XFRK
           ENDIF
-          IF(OQC(K)+XOQCZ(K)-XFRC.GT.0.0_r8.AND.OQC(KK)+XOQCZ(KK)+XFRC.GT.0.0_r8)THEN
+          IF(DOM(idom_doc,K)+XOQCZ(K)-XFRC.GT.0.0_r8.AND.DOM(idom_doc,KK)+XOQCZ(KK)+XFRC.GT.0.0_r8)THEN
             XOQCZ(K)=XOQCZ(K)-XFRC
             XOQCZ(KK)=XOQCZ(KK)+XFRC
 
           ENDIF
-          IF(OQN(K)+XOQNZ(K)-XFRN.GT.0.0_r8.AND.OQN(KK)+XOQNZ(KK)+XFRN.GT.0.0_r8)THEN
+          IF(DOM(idom_don,K)+XOQNZ(K)-XFRN.GT.0.0_r8.AND.DOM(idom_don,KK)+XOQNZ(KK)+XFRN.GT.0.0_r8)THEN
             XOQNZ(K)=XOQNZ(K)-XFRN
             XOQNZ(KK)=XOQNZ(KK)+XFRN
           ENDIF
-          IF(OQP(K)+XOQPZ(K)-XFRP.GT.0.0_r8.AND.OQP(KK)+XOQPZ(KK)+XFRP.GT.0.0_r8)THEN
+          IF(DOM(idom_dop,K)+XOQPZ(K)-XFRP.GT.0.0_r8.AND.DOM(idom_dop,KK)+XOQPZ(KK)+XFRP.GT.0.0_r8)THEN
             XOQPZ(K)=XOQPZ(K)-XFRP
             XOQPZ(KK)=XOQPZ(KK)+XFRP
           ENDIF
-          IF(OQA(K)+XOQAZ(K)-XFRA.GT.0.0_r8.AND.OQA(KK)+XOQAZ(KK)+XFRA.GT.0.0_r8)THEN
+          IF(DOM(idom_acetate,K)+XOQAZ(K)-XFRA.GT.0.0_r8.AND.DOM(idom_acetate,KK)+XOQAZ(KK)+XFRA.GT.0.0_r8)THEN
             XOQAZ(K)=XOQAZ(K)-XFRA
             XOQAZ(KK)=XOQAZ(KK)+XFRA
           ENDIF
@@ -1103,7 +1090,7 @@ module MicBGCMod
 !     TRANSFER ALL PRIMING AMONG ALL K
 !
 !     TOQCK=total respiration of DOC+DOA in soil layer
-!     ROQCK=total respiration of DOC+DOA in substrate complex
+!     ROQCK=total respiration of DOC+DOA in substrate CO2CompenPoint_nodeex
 !     OQC,OQN,OQP,OQA=DOC,DON,DOP,acetate in micropores
 !     OMC,OMN,OMP=microbial C,N,P
 !
@@ -1111,10 +1098,10 @@ module MicBGCMod
   D840: DO K=1,KL
     ROQCK(K)=ROQCK(K)+XOQCK(K)
     TOQCK=TOQCK+ROQCK(K)
-    OQC(K)=OQC(K)+XOQCZ(K)
-    OQN(K)=OQN(K)+XOQNZ(K)
-    OQP(K)=OQP(K)+XOQPZ(K)
-    OQA(K)=OQA(K)+XOQAZ(K)
+    DOM(idom_doc,K)=DOM(idom_doc,K)+XOQCZ(K)
+    DOM(idom_don,K)=DOM(idom_don,K)+XOQNZ(K)
+    DOM(idom_dop,K)=DOM(idom_dop,K)+XOQPZ(K)
+    DOM(idom_acetate,K)=DOM(idom_acetate,K)+XOQAZ(K)
     DO  N=1,NFGs
       DO  M=1,nlbiomcp
         do NGL=JGnio(N),JGnfo(N)
@@ -1167,10 +1154,7 @@ module MicBGCMod
     litrm => micfor%litrm, &
     VLWatMicPM => micfor%VLWatMicPM, &
     FOSRH => micstt%FOSRH, &
-    OQC => micstt%OQC, &
-    OQN => micstt%OQN, &
-    OQP => micstt%OQP, &
-    OQA => micstt%OQA, &
+    DOM => micstt%DOM, &
     OHC => micstt%OHC, &
     OHN => micstt%OHN, &
     OHP => micstt%OHP, &
@@ -1192,10 +1176,10 @@ module MicBGCMod
     ELSE
       AECX=AEC
     ENDIF
-    OQCX=AMAX1(ZEROS,OQC(K)-TCGOQC(K))
-    OQNX=AMAX1(ZEROS,OQN(K)-TCGOMN(K))
-    OQPX=AMAX1(ZEROS,OQP(K)-TCGOMP(K))
-    OQAX=AMAX1(ZEROS,OQA(K)-TCGOAC(K))
+    OQCX=AMAX1(ZEROS,DOM(idom_doc,K)-TCGOQC(K))
+    OQNX=AMAX1(ZEROS,DOM(idom_don,K)-TCGOMN(K))
+    OQPX=AMAX1(ZEROS,DOM(idom_dop,K)-TCGOMP(K))
+    OQAX=AMAX1(ZEROS,DOM(idom_acetate,K)-TCGOAC(K))
     OHCX=AMAX1(ZEROS,OHC(K))
     OHNX=AMAX1(ZEROS,OHN(K))
     OHPX=AMAX1(ZEROS,OHP(K))
@@ -1209,6 +1193,7 @@ module MicBGCMod
     ELSE
       CSORP(K)=TSORP*(OQCX*VLSoilPoreMicPX-OHCX*VLSoilPoreMicPW)/(VLSoilPoreMicPX+VLSoilPoreMicPW)
     ENDIF
+
     IF(FOAA(K).GT.ZERO)THEN
       VOLAX=FOAA(K)*VLSoilPoreMicPX
       VOLAW=FOAA(K)*VLSoilPoreMicPW
@@ -1286,7 +1271,7 @@ module MicBGCMod
     k_POM => micpar%k_POM   , &
     CNRH  => micpar%CNRH    ,&
     CPRH  => micpar%CPRH    ,&
-    COQC  => ncplxs%COQC  ,&
+    CDOM  => ncplxs%CDOM  ,&
     EPOC => micstt%EPOC, &
     CNOSC => micstt%CNOSC, &
     CPOSC => micstt%CPOSC, &
@@ -1350,7 +1335,7 @@ module MicBGCMod
       COSC=OSRH(K)/VLSoilMicP
     ENDIF
     DFNS=COSC/(COSC+DCKD)
-    OQCI=1.0_r8/(1.0_r8+COQC(K)/OQKI)
+    OQCI=1.0_r8/(1.0_r8+CDOM(idom_doc,K)/OQKI)
 !
 !     C, N, P DECOMPOSITION RATE OF SOLID SUBSTRATES 'RDOS*' FROM
 !     RATE CONSTANT, TOTAL ACTIVE BIOMASS, DENSITY FACTOR,
@@ -1590,10 +1575,7 @@ module MicBGCMod
     OSC13U      => micstt%OSC13U   , &
     OSN13U      => micstt%OSN13U   , &
     OSP13U      => micstt%OSP13U   , &
-    OQC  => micstt%OQC, &
-    OQN  => micstt%OQN, &
-    OQP  => micstt%OQP, &
-    OQA  => micstt%OQA, &
+    DOM  => micstt%DOM, &
     ORC  => micstt%ORC, &
     ORN  => micstt%ORN, &
     ORP  => micstt%ORP, &
@@ -1606,7 +1588,7 @@ module MicBGCMod
   )
 !
 !     REDISTRIBUTE AUTOTROPHIC DECOMPOSITION PRODUCTS AMONG
-!     HETEROTROPHIC SUBSTRATE-MICROBE COMPLEXES
+!     HETEROTROPHIC SUBSTRATE-MICROBE CO2CompenPoint_nodeEXES
 !
 !     FORC=fraction of total microbial residue
 !     ORCT=microbial residue
@@ -1636,7 +1618,7 @@ module MicBGCMod
   ENDDO D1690
 !
 !   REDISTRIBUTE C,N AND P TRANSFORMATIONS AMONG STATE
-!   VARIABLES IN SUBSTRATE-MICROBE COMPLEXES
+!   VARIABLES IN SUBSTRATE-MICROBE CO2CompenPoint_nodeEXES
 !
 
   D590: DO K=1,KL
@@ -1653,9 +1635,9 @@ module MicBGCMod
 !     OSA(M,K)=OSA(M,K)-RDOSC(M,K)
       OSN(M,K)=OSN(M,K)-RDOSN(M,K)
       OSP(M,K)=OSP(M,K)-RDOSP(M,K)
-      OQC(K)=OQC(K)+RCOSC(M,K)
-      OQN(K)=OQN(K)+RCOSN(M,K)
-      OQP(K)=OQP(K)+RCOSP(M,K)
+      DOM(idom_doc,K)=DOM(idom_doc,K)+RCOSC(M,K)
+      DOM(idom_don,K)=DOM(idom_don,K)+RCOSN(M,K)
+      DOM(idom_dop,K)=DOM(idom_dop,K)+RCOSP(M,K)
 !
 !     LIGNIFICATION PRODUCTS
 !
@@ -1687,14 +1669,14 @@ module MicBGCMod
       ORC(M,K)=ORC(M,K)-RDORC(M,K)
       ORN(M,K)=ORN(M,K)-RDORN(M,K)
       ORP(M,K)=ORP(M,K)-RDORP(M,K)
-      OQC(K)=OQC(K)+RDORC(M,K)
-      OQN(K)=OQN(K)+RDORN(M,K)
-      OQP(K)=OQP(K)+RDORP(M,K)
+      DOM(idom_doc,K)=DOM(idom_doc,K)+RDORC(M,K)
+      DOM(idom_don,K)=DOM(idom_don,K)+RDORN(M,K)
+      DOM(idom_dop,K)=DOM(idom_dop,K)+RDORP(M,K)
     ENDDO D575
-    OQC(K)=OQC(K)+RDOHC(K)
-    OQN(K)=OQN(K)+RDOHN(K)+RCOQN*FORC(K)
-    OQP(K)=OQP(K)+RDOHP(K)
-    OQA(K)=OQA(K)+RDOHA(K)
+    DOM(idom_doc,K)=DOM(idom_doc,K)+RDOHC(K)
+    DOM(idom_don,K)=DOM(idom_don,K)+RDOHN(K)+RCOQN*FORC(K)
+    DOM(idom_dop,K)=DOM(idom_dop,K)+RDOHP(K)
+    DOM(idom_acetate,K)=DOM(idom_acetate,K)+RDOHA(K)
     OHC(K)=OHC(K)-RDOHC(K)
     OHN(K)=OHN(K)-RDOHN(K)
     OHP(K)=OHP(K)-RDOHP(K)
@@ -1707,10 +1689,10 @@ module MicBGCMod
 !
     D570: DO N=1,NFGs
       DO NGL=JGnio(N),JGnfo(N)
-        OQC(K)=OQC(K)-CGOQC(NGL,K)
-        OQN(K)=OQN(K)-CGOMN(NGL,K)
-        OQP(K)=OQP(K)-CGOMP(NGL,K)
-        OQA(K)=OQA(K)-CGOAC(NGL,K)+RCH3X(NGL,K)
+        DOM(idom_doc,K)=DOM(idom_doc,K)-CGOQC(NGL,K)
+        DOM(idom_don,K)=DOM(idom_don,K)-CGOMN(NGL,K)
+        DOM(idom_dop,K)=DOM(idom_dop,K)-CGOMP(NGL,K)
+        DOM(idom_acetate,K)=DOM(idom_acetate,K)-CGOAC(NGL,K)+RCH3X(NGL,K)
 !
 !     MICROBIAL DECOMPOSITION PRODUCTS
 !
@@ -1731,10 +1713,10 @@ module MicBGCMod
 !
 !     CSORP,CSORPA,ZSORP,PSORP=sorption(ad=+ve,de=-ve) of OQC,acetate,DON,DOP
 !
-    OQC(K)=OQC(K)-CSORP(K)
-    OQN(K)=OQN(K)-ZSORP(K)
-    OQP(K)=OQP(K)-PSORP(K)
-    OQA(K)=OQA(K)-CSORPA(K)
+    DOM(idom_doc,K)=DOM(idom_doc,K)-CSORP(K)
+    DOM(idom_don,K)=DOM(idom_don,K)-ZSORP(K)
+    DOM(idom_dop,K)=DOM(idom_dop,K)-PSORP(K)
+    DOM(idom_acetate,K)=DOM(idom_acetate,K)-CSORPA(K)
     OHC(K)=OHC(K)+CSORP(K)
     OHN(K)=OHN(K)+ZSORP(K)
     OHP(K)=OHP(K)+PSORP(K)
@@ -2062,20 +2044,17 @@ module MicBGCMod
     RN2O => micflx%RN2O, &
     RUPOXO => micflx%RUPOXO, &
     XH1BS => micflx%XH1BS, &
-    XH1PS => micflx%XH1PS, &
+    RH1PO4MicbTransf_vr => micflx%RH1PO4MicbTransf_vr, &
     XH2BS => micflx%XH2BS, &
-    XH2PS => micflx%XH2PS, &
+    RH2PO4MicbTransf_vr => micflx%RH2PO4MicbTransf_vr, &
     XN2GS => micflx%XN2GS, &
     XNH4B => micflx%XNH4B, &
-    XNH4S => micflx%XNH4S, &
+    RNH4MicbTransf_vr => micflx%RNH4MicbTransf_vr, &
     XNO2B => micflx%XNO2B, &
-    XNO2S => micflx%XNO2S, &
+    RNO2MicbTransf_vr => micflx%RNO2MicbTransf_vr, &
     XNO3B => micflx%XNO3B, &
-    XNO3S => micflx%XNO3S, &
-    XOQCS =>micflx%XOQCS     , &
-    XOQNS =>micflx%XOQNS     , &
-    XOQPS =>micflx%XOQPS     , &
-    XOQAS =>micflx%XOQAS       &
+    RNO3MicbTransf_vr => micflx%RNO3MicbTransf_vr, &
+    RDOM_micb_flx =>micflx%RDOM_micb_flx      &
   )
   D650: DO K=1,jcplx
     IF(.not.litrm.OR.(K.NE.k_POM.AND.K.NE.k_humus))THEN
@@ -2185,74 +2164,72 @@ module MicBGCMod
   RN2G  =-naqfdiag%TRDNO
   RN2O  =-naqfdiag%TRDN2-naqfdiag%TRD2B-RCN2O-RCN2B+naqfdiag%TRDNO
 !
-!     XOQCS,XOQNZ,XOQPS,XOQAS=net change in DOC,DON,DOP,acetate
-!
   D655: DO K=1,jcplx
     D660: DO M=1,jsken
-      XOQCS(K)=XOQCS(K)+RCOSC(M,K)
-      XOQNS(K)=XOQNS(K)+RCOSN(M,K)
-      XOQPS(K)=XOQPS(K)+RCOSP(M,K)
+      RDOM_micb_flx(idom_doc,K)=RDOM_micb_flx(idom_doc,K)+RCOSC(M,K)
+      RDOM_micb_flx(idom_don,K)=RDOM_micb_flx(idom_don,K)+RCOSN(M,K)
+      RDOM_micb_flx(idom_dop,K)=RDOM_micb_flx(idom_dop,K)+RCOSP(M,K)
     ENDDO D660
 
     D665: DO M=1,ndbiomcp
-      XOQCS(K)=XOQCS(K)+RDORC(M,K)
-      XOQNS(K)=XOQNS(K)+RDORN(M,K)
-      XOQPS(K)=XOQPS(K)+RDORP(M,K)
+      RDOM_micb_flx(idom_doc,K)=RDOM_micb_flx(idom_doc,K)+RDORC(M,K)
+      RDOM_micb_flx(idom_don,K)=RDOM_micb_flx(idom_don,K)+RDORN(M,K)
+      RDOM_micb_flx(idom_dop,K)=RDOM_micb_flx(idom_dop,K)+RDORP(M,K)
     ENDDO D665
-    XOQCS(K)=XOQCS(K)+RDOHC(K)
-    XOQNS(K)=XOQNS(K)+RDOHN(K)
-    XOQPS(K)=XOQPS(K)+RDOHP(K)
-    XOQAS(K)=XOQAS(K)+RDOHA(K)
+    RDOM_micb_flx(idom_doc,K)=RDOM_micb_flx(idom_doc,K)+RDOHC(K)
+    RDOM_micb_flx(idom_don,K)=RDOM_micb_flx(idom_don,K)+RDOHN(K)
+    RDOM_micb_flx(idom_dop,K)=RDOM_micb_flx(idom_dop,K)+RDOHP(K)
+    RDOM_micb_flx(idom_acetate,K)=RDOM_micb_flx(idom_acetate,K)+RDOHA(K)
     D670: DO N=1,NFGs
       DO NGL=JGnio(N),JGnfo(N)
-        XOQCS(K)=XOQCS(K)-CGOQC(NGL,K)
-        XOQNS(K)=XOQNS(K)-CGOMN(NGL,K)
-        XOQPS(K)=XOQPS(K)-CGOMP(NGL,K)
-        XOQAS(K)=XOQAS(K)-CGOAC(NGL,K)+RCH3X(NGL,K)
+        RDOM_micb_flx(idom_doc,K)=RDOM_micb_flx(idom_doc,K)-CGOQC(NGL,K)
+        RDOM_micb_flx(idom_don,K)=RDOM_micb_flx(idom_don,K)-CGOMN(NGL,K)
+        RDOM_micb_flx(idom_dop,K)=RDOM_micb_flx(idom_dop,K)-CGOMP(NGL,K)
+        RDOM_micb_flx(idom_acetate,K)=RDOM_micb_flx(idom_acetate,K)-CGOAC(NGL,K)+RCH3X(NGL,K)
       ENDDO
     ENDDO D670
-    XOQCS(K)=XOQCS(K)-CSORP(K)
-    XOQNS(K)=XOQNS(K)-ZSORP(K)
-    XOQPS(K)=XOQPS(K)-PSORP(K)
-    XOQAS(K)=XOQAS(K)-CSORPA(K)
+    RDOM_micb_flx(idom_doc,K)=RDOM_micb_flx(idom_doc,K)-CSORP(K)
+    RDOM_micb_flx(idom_don,K)=RDOM_micb_flx(idom_don,K)-ZSORP(K)
+    RDOM_micb_flx(idom_dop,K)=RDOM_micb_flx(idom_dop,K)-PSORP(K)
+    RDOM_micb_flx(idom_acetate,K)=RDOM_micb_flx(idom_acetate,K)-CSORPA(K)
   ENDDO D655
 !
-!     XNH4S,XNH4B=net change in NH4 in band,non-band
+!     RNH4MicbTransf_vr,XNH4B=net change in NH4 in band,non-band
 !     TRINH,TRINB=total NH4 mineraln-immobn in non-band,band
 !     RVOXA(1),RVOXB(1)=total NH4 oxidation in non-band,band
-!     XNO3S,XNO3B=net change in NO3 in band,non-band
+!     RNO3MicbTransf_vr,XNO3B=net change in NO3 in band,non-band
 !     TRINO,TRIOB=total NO3 immobn in non-band,band
 !     RVOXA(2),RVOXB(2)=total NO2 oxidation in non-band,band
 !     TRDN3,TRDNB=total NO3 reduction in non-band,band
 !     RCNO3,RCN3B=NO3 production from nitrous acid reduction in non-band,band
-!     XNO2S,XNO2B=net change in NO3 in band,non-band
+!     RNO2MicbTransf_vr,XNO2B=net change in NO3 in band,non-band
 !     TRDN2,TRD2B=total NO2 reduction in non-band,band
 !     RCNO2,RCNOB=substrate-limited nitrous acid reduction in non-band,band
-!     XH2PS,XH2BS=net change in H2PO4 in band,non-band
+!     RH2PO4MicbTransf_vr,XH2BS=net change in H2PO4 in band,non-band
 !     TRIPO,TRIPB=total H2PO4 mineraln-immobn in non-band,band
-!     XH1PS,XH1BS=net change in HPO4 in band,non-band
+!     RH1PO4MicbTransf_vr,XH1BS=net change in HPO4 in band,non-band
 !     TRIP1,TRIB1=total HPO4 mineraln-immobn in non-band,band
 !     XN2GS=total N2 fixation
 !     XZHYS=total H+ production
 !     TRN2F=total N2 fixation
 !
-  XNH4S=-naqfdiag%TRINH
-  XNO3S=-naqfdiag%TRINO-naqfdiag%TRDN3+RCNO3
-  XNO2S=+naqfdiag%TRDN3-naqfdiag%TRDN2-RCNO2
-  XH2PS=-naqfdiag%TRIPO
-  XH1PS=-naqfdiag%TRIP1
+  RNH4MicbTransf_vr=-naqfdiag%TRINH
+  RNO3MicbTransf_vr=-naqfdiag%TRINO-naqfdiag%TRDN3+RCNO3
+  RNO2MicbTransf_vr=+naqfdiag%TRDN3-naqfdiag%TRDN2-RCNO2
+  RH2PO4MicbTransf_vr=-naqfdiag%TRIPO
+  RH1PO4MicbTransf_vr=-naqfdiag%TRIP1
   XNH4B=-naqfdiag%TRINB
   XNO3B=-naqfdiag%TRIOB-naqfdiag%TRDNB+RCN3B
   XNO2B=naqfdiag%TRDNB-naqfdiag%TRD2B-RCNOB
   !AmmoniaOxidizeBacteria=1, NitriteOxidizeBacteria=2, AerobicMethanotrophBacteria=3
   DO NGL=JGniA(AmmoniaOxidizeBacteria),JGnfA(AmmoniaOxidizeBacteria)
-    XNH4S=XNH4S-RVOXA(NGL)
-    XNO2S=XNO2S+RVOXA(NGL)
+    RNH4MicbTransf_vr=RNH4MicbTransf_vr-RVOXA(NGL)
+    RNO2MicbTransf_vr=RNO2MicbTransf_vr+RVOXA(NGL)
     XNH4B=XNH4B-RVOXB(NGL)
   ENDDO
   DO NGL=JGniA(NitriteOxidizeBacteria),JGnfA(NitriteOxidizeBacteria)
-    XNO3S=XNO3S+RVOXA(NGL)
-    XNO2S=XNO2S-RVOXA(NGL)
+    RNO3MicbTransf_vr=RNO3MicbTransf_vr+RVOXA(NGL)
+    RNO2MicbTransf_vr=RNO2MicbTransf_vr-RVOXA(NGL)
     XNO3B=XNO3B+RVOXB(NGL)
     XNO2B=XNO2B-RVOXB(NGL)
   ENDDO
@@ -2466,15 +2443,15 @@ module MicBGCMod
     ROXYP => nmicf%ROXYP,     &
     ROXYM => nmicf%ROXYM,     &
     ROQCD => nmicf%ROQCD,     &
-    COQA  => ncplxs%COQA,   &
-    OQA => micstt%OQA, &
+    CDOM  => ncplxs%CDOM,   &
+    DOM => micstt%DOM, &
     ROXYS => micflx%ROXYS, &
     ROQCS => micflx%ROQCS, &
     ROQAS => micflx%ROQAS, &
     ZERO  => micfor%ZERO, &
     TKS  => micfor%TKS &
   )
-  GOMX=RGAS*1.E-3_r8*TKS*LOG((AMAX1(ZERO,COQA(K))/OAKI))
+  GOMX=RGAS*1.E-3_r8*TKS*LOG((AMAX1(ZERO,CDOM(idom_acetate,K))/OAKI))
   GOMM=GOMX/24.0_r8
   ECHZ=AMAX1(EO2X,AMIN1(1.0_r8,1.0_r8/(1.0_r8+AZMAX1((GC4X+GOMM))/EOMH)))
 !
@@ -2496,10 +2473,10 @@ module MicBGCMod
 !     ROXY*=O2 demand, ROQCS,ROQCA=DOC, acetate demand
 !     ROQCD=microbial respiration used to represent microbial activity
 !
-  FSBST=COQA(K)/(COQA(K)+OQKAM)
+  FSBST=CDOM(idom_acetate,K)/(CDOM(idom_acetate,K)+OQKAM)
   RGOGY=AZMAX1(FCNP(NGL,K)*VMXM*WFNG*OMA(NGL,K))
   RGOGZ=RGOGY*FSBST*TFNX
-  RGOGX=AZMAX1(OQA(K)*FOQA*ECHZ)
+  RGOGX=AZMAX1(DOM(idom_acetate,K)*FOQA*ECHZ)
   RGOMP=AMIN1(RGOGX,RGOGZ)
   FGOCP=0.0_r8
   FGOAP=1.0_r8
@@ -2545,8 +2522,7 @@ module MicBGCMod
     ROXYP=> nmicf%ROXYP ,     &
     ROQCD => nmicf%ROQCD,     &
     ZEROS => micfor%ZEROS, &
-    OQC  => micstt%OQC, &
-    OQA => micstt%OQA, &
+    DOM  => micstt%DOM, &
     n_aero_hetrophb => micpar%n_aero_hetrophb, &
     n_anero_faculb => micpar%n_anero_faculb, &
     n_aero_fungi => micpar%n_aero_fungi, &
@@ -2556,8 +2532,7 @@ module MicBGCMod
     ROQAS => micflx%ROQAS, &
     FOCA  => ncplxs%FOCA,     &
     FOAA  => ncplxs%FOAA,     &
-    COQC  => ncplxs%COQC,   &
-    COQA  => ncplxs%COQA    &
+    CDOM  => ncplxs%CDOM     &
   )
 !     ENERGY YIELDS OF O2 REDOX REACTIONS
 !     E* = growth respiration efficiency calculated in PARAMETERS
@@ -2585,14 +2560,14 @@ module MicBGCMod
 ! RGOMP=O2-unlimited respiration of DOC+DOA
 ! RGOCP,RGOAP,RGOMP=O2-unlimited respiration of DOC, DOA, DOC+DOA
 !
-  FSBSTC=COQC(K)/(COQC(K)+OQKM)
-  FSBSTA=COQA(K)/(COQA(K)+OQKA)
+  FSBSTC=CDOM(idom_doc,K)/(CDOM(idom_doc,K)+OQKM)
+  FSBSTA=CDOM(idom_acetate,K)/(CDOM(idom_acetate,K)+OQKA)
   FSBST=FOCA(K)*FSBSTC+FOAA(K)*FSBSTA
   RGOCY=AZMAX1(FCNP(NGL,K)*VMXO*WFNG*OMA(NGL,K))
   RGOCZ=RGOCY*FSBSTC*FOCA(K)*TFNX
   RGOAZ=RGOCY*FSBSTA*FOAA(K)*TFNX
-  RGOCX=AZMAX1(OQC(K)*FOQC*EO2Q)
-  RGOAX=AZMAX1(OQA(K)*FOQA*EO2A)
+  RGOCX=AZMAX1(DOM(idom_doc,K)*FOQC*EO2Q)
+  RGOAX=AZMAX1(DOM(idom_acetate,K)*FOQA*EO2A)
   RGOCP=AMIN1(RGOCX,RGOCZ)
   RGOAP=AMIN1(RGOAX,RGOAZ)
   RGOMP=RGOCP+RGOAP
@@ -2656,19 +2631,18 @@ module MicBGCMod
     ROQCD  => nmicf%ROQCD  ,    &
     TKS => micfor%TKS, &
     ZERO => micfor%ZERO, &
-    OQC  => micstt%OQC, &
+    DOM  => micstt%DOM, &
     CH2GS => micstt%CH2GS , &
     COXYS => micstt%COXYS, &
     ROXYS  => micflx%ROXYS, &
     ROQCS => micflx%ROQCS , &
     ROQAS => micflx%ROQAS, &
     n_anaero_ferm => micpar%n_anaero_ferm, &
-    COQA    => ncplxs%COQA,  &
-    COQC   => ncplxs%COQC     &
+    CDOM    => ncplxs%CDOM   &
   )
   GH2X=RGAS*1.E-3_r8*TKS*LOG((AMAX1(1.0E-03,CH2GS)/H2KI)**4)
   GH2F=GH2X/72.0
-  GOAX=RGAS*1.E-3_r8*TKS*LOG((AMAX1(ZERO,COQA(K))/OAKI)**2)
+  GOAX=RGAS*1.E-3_r8*TKS*LOG((AMAX1(ZERO,CDOM(idom_acetate,K))/OAKI)**2)
   GOAF=GOAX/72.0
   GHAX=GH2F+GOAF
   IF(N.EQ.n_anaero_ferm)THEN
@@ -2693,10 +2667,10 @@ module MicBGCMod
 !     ROQCD=microbial respiration used to represent microbial activity
 !
   OXYI=1.0_r8-1.0_r8/(1.0_r8+EXP(1.0_r8*(-COXYS+2.5_r8)))
-  FSBST=COQC(K)/(COQC(K)+OQKM)*OXYI
+  FSBST=CDOM(idom_doc,K)/(CDOM(idom_doc,K)+OQKM)*OXYI
   RGOFY=AZMAX1(FCNP(NGL,K)*VMXF*WFNG*OMA(NGL,K))
   RGOFZ=RGOFY*FSBST*TFNX
-  RGOFX=AZMAX1(OQC(K)*FOQC*ECHZ)
+  RGOFX=AZMAX1(DOM(idom_doc,K)*FOQC*ECHZ)
   RGOMP=AMIN1(RGOFX,RGOFZ)
   FGOCP=1.0_r8
   FGOAP=0.0_r8
@@ -2793,7 +2767,7 @@ module MicBGCMod
     CNO2S => micstt%CNO2S, &
     FOSRH => micstt%FOSRH, &
     CH2GS => micstt%CH2GS, &
-    OQC => micstt%OQC, &
+    DOM => micstt%DOM, &
     RVMX3 => micflx%RVMX3,  &
     RVMX2 => micflx%RVMX2, &
     RVMX1 => micflx%RVMX1, &
@@ -2861,7 +2835,7 @@ module MicBGCMod
   ENDIF
   VMXD3S=VMXDXS*FVMXDX
   VMXD3B=VMXDXB*FVMXDX
-  OQCZ3=AZMAX1(OQC(K)*FOQC-RGOCP*WFN(NGL,K))
+  OQCZ3=AZMAX1(DOM(idom_doc,K)*FOQC-RGOCP*WFN(NGL,K))
   OQCD3=OQCZ3/ECN3
   OQCD3S=OQCD3*FNO3S
   OQCD3B=OQCD3*FNO3B
@@ -3003,7 +2977,7 @@ module MicBGCMod
   end subroutine HeteroDenitrificCatabolism
 !------------------------------------------------------------------------------------------
 
-  subroutine AerobsO2Uptake(NGL,N,K,FOXYX,OXKX,RGOMP,RVOXP,RVOXPA,RVOXPB,&
+  subroutine AerobLeafO2Solubility_pftUptake(NGL,N,K,FOXYX,OXKX,RGOMP,RVOXP,RVOXPA,RVOXPB,&
     micfor,micstt,nmicf,nmics,micflx)
   implicit none
   integer, intent(in) :: NGL,N,K
@@ -3043,13 +3017,13 @@ module MicBGCMod
     RCH4X  => nmicf%RCH4X,    &
     RVOXA  => nmicf%RVOXA,    &
     RVOXB  => nmicf%RVOXB,    &
-    COXQ   => micfor%COXQ, &
-    COXR   => micfor%COXR, &
+    O2_irrig_conc   => micfor%O2_irrig_conc, &
+    O2_rain_conc   => micfor%O2_rain_conc, &
     COXYE => micfor%COXYE, &
     ROXYF  => micfor%ROXYF,   &
     ROXYL => micfor%ROXYL, &
-    FLQRI  => micfor%FLQRI, &
-    FLQRQ => micfor%FLQRQ , &
+    Irrig2LitRSurf  => micfor%Irrig2LitRSurf, &
+    Rain2LitRSurf => micfor%Rain2LitRSurf , &
     litrm => micfor%litrm , &
     OLSGL  => micfor%OLSGL, &
     VLSoilPoreMicP => micfor%VLSoilPoreMicP, &
@@ -3060,7 +3034,7 @@ module MicBGCMod
     VLWatMicP  => micfor%VLWatMicP , &
     VLWatMicPM => micfor%VLWatMicPM, &
     THETPM => micfor%THETPM, &
-    DFGS => micfor%DFGS, &
+    DiffusivitySolutEff => micfor%DiffusivitySolutEff, &
     FILM => micfor%FILM, &
     TortMicPM  => micfor%TortMicPM, &
     OXYG => micstt%OXYG, &
@@ -3088,7 +3062,7 @@ module MicBGCMod
         ROXYLX=ROXYL*dts_gas*FOXYX
       ELSE
         OXYG1=COXYG*VLsoiAirPM(1)*FOXYX
-        ROXYLX=(ROXYL+FLQRQ*COXR+FLQRI*COXQ)*dts_gas*FOXYX
+        ROXYLX=(ROXYL+Rain2LitRSurf*O2_rain_conc+Irrig2LitRSurf*O2_irrig_conc)*dts_gas*FOXYX
       ENDIF
       OXYS1=OXYS*FOXYX
 !
@@ -3100,7 +3074,7 @@ module MicBGCMod
         !     ACTUAL REDUCTION OF AQUEOUS BY AEROBES CALCULATED
         !     FROM MASS FLOW PLUS DIFFUSION = ACTIVE UPTAKE
         !     COUPLED WITH DISSOLUTION OF GASEOUS O2 DURING REDUCTION
-        !     OF AQUEOUS O2 FROM DISSOLUTION RATE CONSTANT 'DFGS'
+        !     OF AQUEOUS O2 FROM DISSOLUTION RATE CONSTANT 'DiffusivitySolutEff'
         !     CALCULATED IN 'WATSUB'
         !
         !     VLWatMicPM,VLsoiAirPM,VLSoilPoreMicP=water, air and total volumes
@@ -3136,7 +3110,7 @@ module MicBGCMod
           OXYS1=OXYS1-RMPOX
           !apply dissolution-volatilization
           IF(THETPM(M).GT.THETX.AND.VOLPOX.GT.ZEROS)THEN
-            ROXDFQ=DFGS(M)*(AMAX1(ZEROS,OXYG1)*VOLWOX-OXYS1*VOLPOX)/VOLWPM
+            ROXDFQ=DiffusivitySolutEff(M)*(AMAX1(ZEROS,OXYG1)*VOLWOX-OXYS1*VOLPOX)/VOLWPM
           ELSE
             ROXDFQ=0.0_r8
           ENDIF
@@ -3182,9 +3156,9 @@ module MicBGCMod
   RCH4X(NGL,K)=0.0_r8
   ROXYO(NGL,K)=ROXYM(NGL,K)*WFN(NGL,K)
   RH2GX(NGL,K)=0.0_r8
-  !write(*,*)'finish AerobsO2Uptake'
+  !write(*,*)'finish AerobLeafO2Solubility_pftUptake'
   end associate
-  end subroutine AerobsO2Uptake
+  end subroutine AerobLeafO2Solubility_pftUptake
 
 !------------------------------------------------------------------------------------------
 
@@ -3293,8 +3267,8 @@ module MicBGCMod
    RINOOR => micflx%RINOOR, &
    RIPOOR  => micflx%RIPOOR, &
    RIPO1R => micflx%RIPO1R, &
-   TRINH4  => micflx%TRINH4, &
-   TRIPO4 => micflx%TRIPO4 &
+   NetNH4Mineralize_col  => micflx%NetNH4Mineralize_col, &
+   NetPO4Mineralize_col => micflx%NetPO4Mineralize_col &
   )
 !     MINERALIZATION-IMMOBILIZATION OF NH4 IN SOIL FROM MICROBIAL
 !     C:N AND NH4 CONCENTRATION IN BAND AND NON-BAND SOIL ZONES
@@ -3314,7 +3288,7 @@ module MicBGCMod
 !     ZNH4M,ZNHBM=NH4 not available for uptake in non-band, band
 !     FNH4X,FNB4X=fractions of biological NH4 demand in non-band, band
 !     RINH4,RINB4=substrate-limited NH4 mineraln-immobiln in non-band, band
-!     TRINH4=total NH4 net mineraln (-ve) or immobiln (+ve)
+!     NetNH4Mineralize_col=total NH4 net mineraln (-ve) or immobiln (+ve)
 ! update may be needed, May 17th, 2023, jyt.
   FNH4S=VLNH4
   FNHBS=VLNHB
@@ -3335,7 +3309,7 @@ module MicBGCMod
     RINH4(NGL,K)=RINHP*FNH4S
     RINB4(NGL,K)=RINHP*FNHBS
   ENDIF
-  TRINH4=TRINH4+(RINH4(NGL,K)+RINB4(NGL,K))
+  NetNH4Mineralize_col=NetNH4Mineralize_col+(RINH4(NGL,K)+RINB4(NGL,K))
 !
 !     MINERALIZATION-IMMOBILIZATION OF NO3 IN SOIL FROM MICROBIAL
 !     C:N AND NO3 CONCENTRATION IN BAND AND NON-BAND SOIL ZONES
@@ -3353,7 +3327,7 @@ module MicBGCMod
 !     ZNO3M,ZNOBM=NO3 not available for uptake in non-band, band
 !     FNO3X,FNB3X=fractions of biological NO3 demand in non-band, band
 !     RINO3,RINB3=substrate-limited NO3 immobiln in non-band, band
-!     TRINH4=total net NH4+NO3 mineraln (-ve) or immobiln (+ve)
+!     NetNH4Mineralize_col=total net NH4+NO3 mineraln (-ve) or immobiln (+ve)
 !
   FNO3S=VLNO3
   FNO3B=VLNOB
@@ -3374,7 +3348,7 @@ module MicBGCMod
     RINO3(NGL,K)=RINOP*FNO3S
     RINB3(NGL,K)=RINOP*FNO3B
   ENDIF
-  TRINH4=TRINH4+(RINO3(NGL,K)+RINB3(NGL,K))
+  NetNH4Mineralize_col=NetNH4Mineralize_col+(RINO3(NGL,K)+RINB3(NGL,K))
 !
 !     MINERALIZATION-IMMOBILIZATION OF H2PO4 IN SOIL FROM MICROBIAL
 !     C:P AND PO4 CONCENTRATION IN BAND AND NON-BAND SOIL ZONES
@@ -3394,7 +3368,7 @@ module MicBGCMod
 !     VOLW=water content
 !     FPO4X,FPOBX=fractions of biol H2PO4 demand in non-band, band
 !     RIPO4,RIPOB=substrate-limited H2PO4 mineraln-immobn in non-band, band
-!     TRIPO4=total H2PO4 net mineraln (-ve) or immobiln (+ve)
+!     NetPO4Mineralize_col=total H2PO4 net mineraln (-ve) or immobiln (+ve)
 !
   FH2PS=VLPO4
   FH2PB=VLPOB
@@ -3415,7 +3389,7 @@ module MicBGCMod
     RIPO4(NGL,K)=RIPOP*FH2PS
     RIPOB(NGL,K)=RIPOP*FH2PB
   ENDIF
-  TRIPO4=TRIPO4+(RIPO4(NGL,K)+RIPOB(NGL,K))
+  NetPO4Mineralize_col=NetPO4Mineralize_col+(RIPO4(NGL,K)+RIPOB(NGL,K))
 !
 !     MINERALIZATION-IMMOBILIZATION OF HPO4 IN SOIL FROM MICROBIAL
 !     C:P AND PO4 CONCENTRATION IN BAND AND NON-BAND SOIL ZONES
@@ -3433,7 +3407,7 @@ module MicBGCMod
 !     VOLW=water content
 !     FP14X,FP1BX=fractions of biol HPO4 demand in non-band, band
 !     RIP14,RIP1B=substrate-limited HPO4 mineraln-immobn in non-band, band
-!     TRIPO4=total H2PO4+HPO4 net mineraln (-ve) or immobiln (+ve)
+!     NetPO4Mineralize_col=total H2PO4+HPO4 net mineraln (-ve) or immobiln (+ve)
 !
   FH1PS=VLPO4
   FH1PB=VLPOB
@@ -3454,7 +3428,7 @@ module MicBGCMod
     RIP14(NGL,K)=RIP1P*FH1PS
     RIP1B(NGL,K)=RIP1P*FH1PB
   ENDIF
-  TRIPO4=TRIPO4+(RIP14(NGL,K)+RIP1B(NGL,K))
+  NetPO4Mineralize_col=NetPO4Mineralize_col+(RIP14(NGL,K)+RIP1B(NGL,K))
 !
 !     MINERALIZATION-IMMOBILIZATION OF NH4 IN SURFACE RESIDUE FROM
 !     MICROBIAL C:N AND NH4 CONCENTRATION IN BAND AND NON-BAND SOIL
@@ -3473,7 +3447,7 @@ module MicBGCMod
 !     ZNH4M=NH4 not available for uptake
 !     FNH4XR=fractions of biological NH4 demand
 !     RINH4R=substrate-limited NH4 mineraln-immobiln
-!     TRINH4=total NH4 net mineraln (-ve) or immobiln (+ve)
+!     NetNH4Mineralize_col=total NH4 net mineraln (-ve) or immobiln (+ve)
 !
   IF(litrm)THEN
     RINHPR=RINHP-RINH4(NGL,K)-RINO3(NGL,K)
@@ -3488,7 +3462,7 @@ module MicBGCMod
       RINHOR(NGL,K)=0.0_r8
       RINH4R(NGL,K)=RINHPR
     ENDIF
-    TRINH4=TRINH4+RINH4R(NGL,K)
+    NetNH4Mineralize_col=NetNH4Mineralize_col+RINH4R(NGL,K)
 !
 !     MINERALIZATION-IMMOBILIZATION OF NO3 IN SURFACE RESIDUE FROM
 !     MICROBIAL C:N AND NO3 CONCENTRATION IN BAND AND NON-BAND SOIL
@@ -3508,7 +3482,7 @@ module MicBGCMod
 !     ZNO3M=NO3 not available for uptake
 !     FNO3XR=fraction of biological NO3 demand
 !     RINO3R=substrate-limited NO3 immobiln
-!     TRINH4=total NH4+NO3 net mineraln (-ve) or immobiln (+ve)
+!     NetNH4Mineralize_col=total NH4+NO3 net mineraln (-ve) or immobiln (+ve)
 !
     RINOPR=AZMAX1(RINHPR-RINH4R(NGL,K))
     IF(RINOPR.GT.0.0_r8)THEN
@@ -3522,7 +3496,7 @@ module MicBGCMod
       RINOOR(NGL,K)=0.0_r8
       RINO3R(NGL,K)=RINOPR
     ENDIF
-    TRINH4=TRINH4+RINO3R(NGL,K)
+    NetNH4Mineralize_col=NetNH4Mineralize_col+RINO3R(NGL,K)
 !
 !     MINERALIZATION-IMMOBILIZATION OF H2PO4 IN SURFACE RESIDUE FROM
 !     MICROBIAL C:P AND PO4 CONCENTRATION IN BAND AND NON-BAND SOIL
@@ -3542,7 +3516,7 @@ module MicBGCMod
 !     H2P4M=H2PO4 not available for uptake
 !     FPO4XR=fractions of biological H2PO4 demand
 !     RIPO4R=substrate-limited H2PO4 mineraln-immobiln
-!     TRIPO4=total H2PO4 net mineraln (-ve) or immobiln (+ve)
+!     NetPO4Mineralize_col=total H2PO4 net mineraln (-ve) or immobiln (+ve)
 !
     RIPOPR=RIPOP-RIPO4(NGL,K)
     IF(RIPOPR.GT.0.0_r8)THEN
@@ -3556,7 +3530,7 @@ module MicBGCMod
       RIPOOR(NGL,K)=0.0_r8
       RIPO4R(NGL,K)=RIPOPR
     ENDIF
-    TRIPO4=TRIPO4+RIPO4R(NGL,K)
+    NetPO4Mineralize_col=NetPO4Mineralize_col+RIPO4R(NGL,K)
 !
 !     MINERALIZATION-IMMOBILIZATION OF HPO4 IN SURFACE RESIDUE FROM
 !     MICROBIAL C:P AND PO4 CONCENTRATION IN BAND AND NON-BAND SOIL
@@ -3576,7 +3550,7 @@ module MicBGCMod
 !     H1P4M=HPO4 not available for uptake
 !     FP14XR=fraction of biological HPO4 demand
 !     RIP14R=substrate-limited HPO4 minereraln-immobiln
-!     TRIPO4=total HPO4 net mineraln (-ve) or immobiln (+ve)
+!     NetPO4Mineralize_col=total HPO4 net mineraln (-ve) or immobiln (+ve)
 !
     FH1PS=VLPO4
     FH1PB=VLPOB
@@ -3592,7 +3566,7 @@ module MicBGCMod
       RIPO1R(NGL,K)=0.0_r8
       RIP14R(NGL,K)=RIP1PR
     ENDIF
-    TRIPO4=TRIPO4+RIP14R(NGL,K)
+    NetPO4Mineralize_col=NetPO4Mineralize_col+RIP14R(NGL,K)
   ENDIF
   end associate
   end subroutine BiomassMineralization
@@ -3772,8 +3746,7 @@ module MicBGCMod
     OMC     => micstt%OMC   , &
     OMN     => micstt%OMN   , &
     OMP     => micstt%OMP   , &
-    OQN     => micstt%OQN   , &
-    OQP     => micstt%OQP   , &
+    DOM     => micstt%DOM   , &
     ZEROS   => micfor%ZEROS , &
     ZERO    => micfor%ZERO    &
   )
@@ -3805,8 +3778,8 @@ module MicBGCMod
   CGOQC(NGL,K)=CGOMX*FGOCP+CGOMD
   CGOAC(NGL,K)=CGOMX*FGOAP
   CGOXC=CGOQC(NGL,K)+CGOAC(NGL,K)
-  CGOMN(NGL,K)=AZMAX1(AMIN1(OQN(K)*FOMK(NGL,K),CGOXC*CNQ(K)/FCN(NGL,K)))
-  CGOMP(NGL,K)=AZMAX1(AMIN1(OQP(K)*FOMK(NGL,K),CGOXC*CPQ(K)/FCP(NGL,K)))
+  CGOMN(NGL,K)=AZMAX1(AMIN1(DOM(idom_don,K)*FOMK(NGL,K),CGOXC*CNQ(K)/FCN(NGL,K)))
+  CGOMP(NGL,K)=AZMAX1(AMIN1(DOM(idom_dop,K)*FOMK(NGL,K),CGOXC*CPQ(K)/FCP(NGL,K)))
   TCGOQC(K)=TCGOQC(K)+CGOQC(NGL,K)
   TCGOAC(K)=TCGOAC(K)+CGOAC(NGL,K)
   TCGOMN(K)=TCGOMN(K)+CGOMN(NGL,K)

@@ -45,8 +45,8 @@ implicit none
 
   DO L =0,NL(NY,NX)
     DO NTG=idg_beg,idg_end-1
-      call PhasePartition(VLsoiAirP(L,NY,NX),VLWatMicP(L,NY,NX),GasSolbility(NTG,L,NY,NX),&
-        trc_solcl(NTG,L,NY,NX),trc_gascl(NTG,L,NY,NX))
+      call PhasePartition(VLsoiAirP(L,NY,NX),VLWatMicP(L,NY,NX),GasSolbility_vr(NTG,L,NY,NX),&
+        trc_solcl_vr(NTG,L,NY,NX),trc_gascl_vr(NTG,L,NY,NX))
     ENDDO
   ENDDO
 

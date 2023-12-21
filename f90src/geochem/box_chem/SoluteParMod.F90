@@ -20,10 +20,10 @@ module SoluteParMod
 !     DPFE4=FeOH4,DPFES=FeSO4,DPCAO=CaOH,DPCAC=CaCO3,DPCAH=CaHCO3
 !     DPCAS=CaSO4,DPMGO=MgOH,DPMGC=MgCO3,DPMGH=MgHCO3,DPMGS=MgSO4
 !     DPNAC=NaCO3,DPNAS=NaSO4,DPKAS=KSO4,DPH1P=HPO4,DPH2P=H2PO4,DPH3P=H3PO4
-!     DPF1P=FeHPO4,DPF2P=FeH2PO4,DPC0P=CaPO4,DPC1P=CaHPO4,DPC2P=CaH2PO4
+!     DPF1P=FeHPO4,DPF2P=FeH2PO4,DPC0P=CaPO4,DPC1P=CaHPO4,DPC2P=CaH4P2O8
 !     DPM1P=MgHPO4,DPCOH=R-COO,DPALO=R-AlOH2,DPFEO=R-FeOH2
 !
-  real(r8), PARAMETER :: DPH2O=6.5E-09_r8
+  real(r8), PARAMETER :: DPH2O=6.5E-09_r8     !=[H(+)][OH(-)] in the unit of mol/m3, 
   real(r8), PARAMETER :: SPALO=6.5E-22_r8
   real(r8), PARAMETER :: SPFEO=6.5E-27_r8
   real(r8), PARAMETER :: SPCAC=3.8E-03_r8
@@ -140,10 +140,10 @@ module SoluteParMod
   real(r8), PARAMETER :: SYCAH2=SHCAH2*DPH2O**7
 !
 !     MRXN=number of cycles for solving reaction equilibria
-!     TPD,TADA,TADC,TSL=rate constants for dissoln,adsorpn,solute equilibria
+!     TPD,TADA,TADC,TSL=adsorpn,solute equilibria
 !
   integer, PARAMETER :: MRXN=1
-  real(r8), parameter :: TPD=2.5E-03_r8   !1/h
+  real(r8), parameter :: TPD=2.5E-03_r8   !1/h,rate constants for dissoln
   real(r8), PARAMETER :: TPDX=TPD/MRXN    !1/h
   real(r8), PARAMETER :: TADA=5.0E-02_r8
   real(r8), PARAMETER :: TADAX=TADA/MRXN

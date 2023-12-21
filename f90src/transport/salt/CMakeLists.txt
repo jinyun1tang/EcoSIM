@@ -1,7 +1,7 @@
 set(SALT_MOD_SOURCES
-  TrnsfrsDataMod.F90
+  TranspSaltDataMod.F90
   IngridTranspMod.F90
-	TrnsfrsMod.F90
+	TranspSaltMod.F90
 )
 include(add_ecosim_library)
 add_ecosim_library(salt ${SALT_MOD_SOURCES})

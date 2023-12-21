@@ -52,7 +52,7 @@ module NitroDisturbMod
   real(r8) :: DCORPC1
 !     begin_execution
 
-  IF(J.EQ.INT(ZNOON(NY,NX)).AND.(ITILL(I,NY,NX).EQ.21.OR.ITILL(I,NY,NX).EQ.22))THEN
+  IF(J.EQ.INT(SolarNoonHour_col(NY,NX)).AND.(ITILL(I,NY,NX).EQ.21.OR.ITILL(I,NY,NX).EQ.22))THEN
     IF(ITILL(I,NY,NX).EQ.22)THEN
       IFLGS(NY,NX)=1
       IFLGJ=0
@@ -193,10 +193,10 @@ module NitroDisturbMod
 !
 !     REMOVE DOC, DON, DOP
 !
-            OCH=DCORPC*OQC(K,L,NY,NX)
-            OCA=DCORPC*OQA(K,L,NY,NX)
-            ONH=DCORPC*OQN(K,L,NY,NX)
-            OPH=DCORPC*OQP(K,L,NY,NX)
+            OCH=DCORPC*DOM(idom_doc,K,L,NY,NX)
+            OCA=DCORPC*DOM(idom_acetate,K,L,NY,NX)
+            ONH=DCORPC*DOM(idom_don,K,L,NY,NX)
+            OPH=DCORPC*DOM(idom_dop,K,L,NY,NX)
             ONX=EFIRE(1,ITILL(I,NY,NX))*ONH
             OPX=EFIRE(2,ITILL(I,NY,NX))*OPH
             IF(micpar%is_litter(K))THEN
@@ -206,17 +206,17 @@ module NitroDisturbMod
               ONL(1,K)=ONL(1,K)+ONH-ONX
               OPL(1,K)=OPL(1,K)+OPH-OPX
             ENDIF
-            OQC(K,L,NY,NX)=OQC(K,L,NY,NX)-OCH
-            OQA(K,L,NY,NX)=OQA(K,L,NY,NX)-OCA
-            OQN(K,L,NY,NX)=OQN(K,L,NY,NX)-ONH
-            OQP(K,L,NY,NX)=OQP(K,L,NY,NX)-OPH
+            DOM(idom_doc,K,L,NY,NX)=DOM(idom_doc,K,L,NY,NX)-OCH
+            DOM(idom_acetate,K,L,NY,NX)=DOM(idom_acetate,K,L,NY,NX)-OCA
+            DOM(idom_don,K,L,NY,NX)=DOM(idom_don,K,L,NY,NX)-ONH
+            DOM(idom_dop,K,L,NY,NX)=DOM(idom_dop,K,L,NY,NX)-OPH
             OC=OC+OCH+OCA
             ON=ON+ONX
             OP=OP+OPX
-            OCH=DCORPC*OQCH(K,L,NY,NX)
-            ONH=DCORPC*OQNH(K,L,NY,NX)
-            OPH=DCORPC*OQPH(K,L,NY,NX)
-            OAH=DCORPC*OQAH(K,L,NY,NX)
+            OCH=DCORPC*DOM_Macp(idom_doc,K,L,NY,NX)
+            ONH=DCORPC*DOM_Macp(idom_don,K,L,NY,NX)
+            OPH=DCORPC*DOM_Macp(idom_dop,K,L,NY,NX)
+            OAH=DCORPC*DOM_Macp(idom_acetate,K,L,NY,NX)
             ONX=EFIRE(1,ITILL(I,NY,NX))*ONH
             OPX=EFIRE(2,ITILL(I,NY,NX))*OPH
             IF(micpar%is_litter(K))THEN
@@ -226,10 +226,10 @@ module NitroDisturbMod
               ONL(1,K)=ONL(1,K)+ONH-ONX
               OPL(1,K)=OPL(1,K)+OPH-OPX
             ENDIF
-            OQCH(K,L,NY,NX)=OQCH(K,L,NY,NX)-OCH
-            OQNH(K,L,NY,NX)=OQNH(K,L,NY,NX)-ONH
-            OQPH(K,L,NY,NX)=OQPH(K,L,NY,NX)-OPH
-            OQAH(K,L,NY,NX)=OQAH(K,L,NY,NX)-OAH
+            DOM_Macp(idom_doc,K,L,NY,NX)=DOM_Macp(idom_doc,K,L,NY,NX)-OCH
+            DOM_Macp(idom_don,K,L,NY,NX)=DOM_Macp(idom_don,K,L,NY,NX)-ONH
+            DOM_Macp(idom_dop,K,L,NY,NX)=DOM_Macp(idom_dop,K,L,NY,NX)-OPH
+            DOM_Macp(idom_acetate,K,L,NY,NX)=DOM_Macp(idom_acetate,K,L,NY,NX)-OAH
             OC=OC+OCH+OAH
             ON=ON+ONX
             OP=OP+OPX
@@ -253,10 +253,10 @@ module NitroDisturbMod
             OHN(K,L,NY,NX)=OHN(K,L,NY,NX)-ONH
             OHP(K,L,NY,NX)=OHP(K,L,NY,NX)-OPH
             OHA(K,L,NY,NX)=OHA(K,L,NY,NX)-OAH
-            DC=DC+OQC(K,L,NY,NX)+OQCH(K,L,NY,NX)+OHC(K,L,NY,NX) &
-              +OQA(K,L,NY,NX)+OQAH(K,L,NY,NX)+OHA(K,L,NY,NX)
-            DN=DN+OQN(K,L,NY,NX)+OQNH(K,L,NY,NX)+OHN(K,L,NY,NX)
-            DP=DP+OQP(K,L,NY,NX)+OQPH(K,L,NY,NX)+OHP(K,L,NY,NX)
+            DC=DC+DOM(idom_doc,K,L,NY,NX)+DOM_Macp(idom_doc,K,L,NY,NX)+OHC(K,L,NY,NX) &
+              +DOM(idom_acetate,K,L,NY,NX)+DOM_Macp(idom_acetate,K,L,NY,NX)+OHA(K,L,NY,NX)
+            DN=DN+DOM(idom_don,K,L,NY,NX)+DOM_Macp(idom_don,K,L,NY,NX)+OHN(K,L,NY,NX)
+            DP=DP+DOM(idom_dop,K,L,NY,NX)+DOM_Macp(idom_dop,K,L,NY,NX)+OHP(K,L,NY,NX)
             OC=OC+OCH
             ON=ON+ONX
             OP=OP+OPX
@@ -300,22 +300,22 @@ module NitroDisturbMod
 !     REMOVE FERTILIZER IN RESIDUE
 !
         IF(ITILL(I,NY,NX).EQ.21)THEN
-          ON=ON+DCORPC*(trc_solml(ids_NH4,L,NY,NX)+trc_solml(idg_NH3,L,NY,NX) &
-            +trc_solml(ids_NO3,L,NY,NX)+trc_solml(ids_NO2,L,NY,NX))
-          OP=OP+DCORPC*(trc_solml(ids_H1PO4,L,NY,NX)+trc_solml(ids_H2PO4,L,NY,NX))
+          ON=ON+DCORPC*(trc_solml_vr(ids_NH4,L,NY,NX)+trc_solml_vr(idg_NH3,L,NY,NX) &
+            +trc_solml_vr(ids_NO3,L,NY,NX)+trc_solml_vr(ids_NO2,L,NY,NX))
+          OP=OP+DCORPC*(trc_solml_vr(ids_H1PO4,L,NY,NX)+trc_solml_vr(ids_H2PO4,L,NY,NX))
           DCORPC1=1.0_r8-DCORPC
-          trc_solml(ids_NH4,L,NY,NX)=DCORPC1*trc_solml(ids_NH4,L,NY,NX)
-          trc_solml(idg_NH3,L,NY,NX)=DCORPC1*trc_solml(idg_NH3,L,NY,NX)
-          trc_solml(ids_NO3,L,NY,NX)=DCORPC1*trc_solml(ids_NO3,L,NY,NX)
-          trc_solml(ids_NO2,L,NY,NX)=DCORPC1*trc_solml(ids_NO2,L,NY,NX)
-          trc_solml(ids_H1PO4,L,NY,NX)=DCORPC1*trc_solml(ids_H1PO4,L,NY,NX)
-          trc_solml(ids_H2PO4,L,NY,NX)=DCORPC1*trc_solml(ids_H2PO4,L,NY,NX)
+          trc_solml_vr(ids_NH4,L,NY,NX)=DCORPC1*trc_solml_vr(ids_NH4,L,NY,NX)
+          trc_solml_vr(idg_NH3,L,NY,NX)=DCORPC1*trc_solml_vr(idg_NH3,L,NY,NX)
+          trc_solml_vr(ids_NO3,L,NY,NX)=DCORPC1*trc_solml_vr(ids_NO3,L,NY,NX)
+          trc_solml_vr(ids_NO2,L,NY,NX)=DCORPC1*trc_solml_vr(ids_NO2,L,NY,NX)
+          trc_solml_vr(ids_H1PO4,L,NY,NX)=DCORPC1*trc_solml_vr(ids_H1PO4,L,NY,NX)
+          trc_solml_vr(ids_H2PO4,L,NY,NX)=DCORPC1*trc_solml_vr(ids_H2PO4,L,NY,NX)
           trcx_solml(idx_NH4,L,NY,NX)  =DCORPC1*trcx_solml(idx_NH4,L,NY,NX)
           trcp_salml(idsp_AlPO4,L,NY,NX)=DCORPC1*trcp_salml(idsp_AlPO4,L,NY,NX)
           trcp_salml(idsp_FePO4,L,NY,NX)=DCORPC1*trcp_salml(idsp_FePO4,L,NY,NX)
           trcp_salml(idsp_CaHPO4,L,NY,NX)=DCORPC1*trcp_salml(idsp_CaHPO4,L,NY,NX)
           trcp_salml(idsp_HA,L,NY,NX)=DCORPC1*trcp_salml(idsp_HA,L,NY,NX)
-          trcp_salml(idsp_CaH2PO4,L,NY,NX)=DCORPC1*trcp_salml(idsp_CaH2PO4,L,NY,NX)
+          trcp_salml(idsp_CaH4P2O8,L,NY,NX)=DCORPC1*trcp_salml(idsp_CaH4P2O8,L,NY,NX)
 
           DO NTF=ifertn_beg,ifertn_end
             FertN_soil(NTF,L,NY,NX)=DCORPC1*FertN_soil(NTF,L,NY,NX)
@@ -338,23 +338,23 @@ module NitroDisturbMod
           TCOU=TCOU+OC
           TZOU=TZOU+ON
           TPOU=TPOU+OP
-          UDOCQ(NY,NX)=UDOCQ(NY,NX)+OC
-          UDONQ(NY,NX)=UDONQ(NY,NX)+ON
-          UDOPQ(NY,NX)=UDOPQ(NY,NX)+OP
-          TNBP(NY,NX)=TNBP(NY,NX)-OC
+          HDOCQ(NY,NX)=HDOCQ(NY,NX)+OC
+          HydroDONFlx_col(NY,NX)=HydroDONFlx_col(NY,NX)+ON
+          HydroDOPFlx_col(NY,NX)=HydroDOPFlx_col(NY,NX)+OP
+          Eco_NBP_col(NY,NX)=Eco_NBP_col(NY,NX)-OC
         ELSEIF(ITILL(I,NY,NX).EQ.22)THEN
           CO2GIN=CO2GIN-OC
           OXYGIN=OXYGIN+2.667_r8*OC
           OXYGOU=OXYGOU+2.667_r8*OC
           TZOU=TZOU+ON
           TPOU=TPOU+OP
-          UCO2F(NY,NX)=UCO2F(NY,NX)-(1.0_r8-FCH4F)*OC
-          UCH4F(NY,NX)=UCH4F(NY,NX)-FCH4F*OC
-          UOXYF(NY,NX)=UOXYF(NY,NX)+(1.0_r8-FCH4F)*2.667_r8*OC
-          UNH3F(NY,NX)=UNH3F(NY,NX)-ON
-          UN2OF(NY,NX)=UN2OF(NY,NX)-0.0_r8
-          UPO4F(NY,NX)=UPO4F(NY,NX)-OP
-          TNBP(NY,NX)=TNBP(NY,NX)-OC
+          CO2byFire_col(NY,NX)=CO2byFire_col(NY,NX)-(1.0_r8-FCH4F)*OC
+          CH4byFire_col(NY,NX)=CH4byFire_col(NY,NX)-FCH4F*OC
+          O2byFire_col(NY,NX)=O2byFire_col(NY,NX)+(1.0_r8-FCH4F)*2.667_r8*OC
+          NH3byFire_col(NY,NX)=NH3byFire_col(NY,NX)-ON
+          N2ObyFire_col(NY,NX)=N2ObyFire_col(NY,NX)-0.0_r8
+          PO4byFire_col(NY,NX)=PO4byFire_col(NY,NX)-OP
+          Eco_NBP_col(NY,NX)=Eco_NBP_col(NY,NX)-OC
         ENDIF
       ENDIF
     ENDDO D2950

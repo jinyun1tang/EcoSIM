@@ -4,6 +4,7 @@ module ErosionBalMod
   use RootDataType
   use EcoSiMParDataMod, only : micpar
   USE EcoSIMCtrlDataType
+  use EcoSIMCtrlMod
   use MicrobialDataType
   USE SOMDataType
   use SedimentDataType
@@ -108,7 +109,7 @@ implicit none
 !     :PALO,PFEO=precip AlOH,FeOH
 !     :PCAC,PCAS=precip CaCO3,CaSO4
 !     :PALP,PFEP=precip AlPO4,FEPO4
-!     :PCPM,PCPD,PCPH=precip CaH2PO4,CaHPO4,apatite
+!     :PCPM,PCPD,PCPH=precip CaH4P2O8,CaHPO4,apatite
 !
 ! only for non-banded precipitates
       DO NTP=idsp_beg,idsp_beg_band-1
@@ -221,7 +222,7 @@ implicit none
   implicit none
   integer, intent(in) :: NY,NX
 
-  IF(IERSNG.EQ.1.OR.IERSNG.EQ.3)THEN
+  IF(iErosionMode.EQ.ieros_frzthaweros.OR.iErosionMode.EQ.ieros_frzthawsomeros)THEN
     TSEDER(NY,NX)=0.0_r8
     TSANER(NY,NX)=0.0_r8
     TSILER(NY,NX)=0.0_r8

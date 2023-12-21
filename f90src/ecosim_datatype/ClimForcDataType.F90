@@ -5,7 +5,6 @@ implicit none
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
 
-  real(r8) :: DECLIN
   real(r8) :: RMAX       !maximum hourly radiation,	[MJ m-2 h-1]
   real(r8) :: TAVG1      !parameter to calculate hourly  air temperature from daily value	[oC]
   real(r8) :: TAVG2      !parameter to calculate hourly  air temperature from daily value	[oC]
@@ -31,11 +30,11 @@ implicit none
   real(r8) :: DWPT(2,366)                       !daily dewpoint temperature, [oC]
 
   real(r8) :: TMPH(24,366)                      !hourly air temperature, [oC]
-  real(r8) :: SWRad_hrly(24,366)                     !hourly solar radiation, [MJ m-2 h-1]
+  real(r8) :: SWRad_hrly(24,366)                !hourly solar radiation, [MJ m-2 h-1]
   real(r8) :: RAINH(24,366)                     !hourly precipitation, [mm h-1]
   real(r8) :: WINDH(24,366)                     !hourly wind speed, [m h-1]
   real(r8) :: DWPTH(24,366)                     !hourly dewpoint temperature, [oC]
-  real(r8) :: XRADH(24,366)                     !longwave radiation (MJ m-2 h-1)
+  real(r8) :: RadLWClm(24,366)                     !longwave radiation (MJ m-2 h-1)
 
   real(r8) :: DRAD(12)                          !change factor for radiation, [-]
   real(r8) :: DTMPX(12)                         !change factor for maximum temperature, [-]
@@ -63,9 +62,9 @@ implicit none
   real(r8),target,allocatable ::  VPA(:,:)                           !vapor concentration, [m3 m-3]
   real(r8),target,allocatable ::  VPK(:,:)                           !vapor pressure, [kPa]
   real(r8),target,allocatable ::  Pbot(:,:)                          !atmospheric pressure [kPa]
-  real(r8),target,allocatable ::  DYLN(:,:)                          !daylength, [h]
-  real(r8),target,allocatable ::  DYLX(:,:)                          !daylength of previous day, [h]
-  real(r8),target,allocatable ::  DYLM(:,:)                          !maximum daylength, [h]
+  real(r8),target,allocatable ::  DayLenthCurrent(:,:)                          !daylength, [h]
+  real(r8),target,allocatable ::  DayLenthPrev(:,:)                          !daylength of previous day, [h]
+  real(r8),target,allocatable ::  DayLenthMax(:,:)                          !maximum daylength, [h]
   real(r8),target,allocatable ::  OMEGAG(:,:,:)                      !sine of solar beam on leaf surface, [-]
   real(r8),target,allocatable ::  LWRadSky(:,:)                           !sky longwave radiation , [MJ d-2 h-1]
   real(r8),target,allocatable ::  TRAD(:,:)                          !total daily solar radiation, [MJ d-1]
@@ -82,7 +81,7 @@ implicit none
   real(r8),target,allocatable ::  CO2EI(:,:)                         !initial atmospheric CO2 concentration, [umol mol-1]
   real(r8),target,allocatable ::  CCO2EI(:,:)                        !initial atmospheric CO2 concentration, [gC m-3]
 
-  real(r8),target,allocatable ::  AtmGgms(:,:,:)                     !atmospheric gas concentration in g m-3
+  real(r8),target,allocatable ::  AtmGasCgperm3(:,:,:)                     !atmospheric gas concentration in g m-3
   real(r8),target,allocatable ::  AtmGmms(:,:,:)                     !atmospheric gas concentration in umol mol-1
   real(r8),target,allocatable ::  OXYE(:,:)                          !atmospheric O2 concentration, [umol mol-1]
   real(r8),target,allocatable ::  Z2OE(:,:)                          !atmospheric N2O concentration, [umol mol-1]
@@ -92,22 +91,22 @@ implicit none
   real(r8),target,allocatable ::  H2GE(:,:)                          !atmospheric H2 concentration, [umol mol-1]
   real(r8),target,allocatable ::  CO2E(:,:)                          !atmospheric CO2 concentration, [umol mol-1]
 
-  real(r8),target,allocatable ::  ZNOON(:,:)                         !time of solar noon, [h]
-  real(r8),target,allocatable ::  RADS(:,:)                          !direct shortwave radiation, [W m-2]
-  real(r8),target,allocatable ::  RADY(:,:)                          !diffuse shortwave radiation, [W m-2]
-  real(r8),target,allocatable ::  RAPS(:,:)                          !direct PAR, [umol m-2 s-1]
-  real(r8),target,allocatable ::  RAPY(:,:)                          !diffuse PAR, [umol m-2 s-1]
-  real(r8),target,allocatable ::  SSIN(:,:)                          !sine of solar angle, [-]
-  real(r8),target,allocatable ::  SSINN(:,:)                         !sine of solar angle next hour, [-]
+  real(r8),target,allocatable ::  SolarNoonHour_col(:,:)                         !time of solar noon, [h]
+  real(r8),target,allocatable ::  RadSWDirect_col(:,:)                          !direct shortwave radiation, [W m-2]
+  real(r8),target,allocatable ::  RadSWDiffus_col(:,:)                          !diffuse shortwave radiation, [W m-2]
+  real(r8),target,allocatable ::  PARDirect_col(:,:)                          !direct PAR, [umol m-2 s-1]
+  real(r8),target,allocatable ::  PARDiffus_col(:,:)                          !diffuse PAR, [umol m-2 s-1]
+  real(r8),target,allocatable ::  SineSolarIncliAngle(:,:)                          !sine of solar angle, [-]
+  real(r8),target,allocatable ::  SineSolarIncliAngleNextHour(:,:)                         !sine of solar angle next hour, [-]
   real(r8),target,allocatable ::  TLEX(:,:)                          !total latent heat flux x boundary layer resistance, [MJ m-1]
   real(r8),target,allocatable ::  TSHX(:,:)                          !total sensible heat flux x boundary layer resistance, [MJ m-1]
-  real(r8),target,allocatable ::  TLEC(:,:)                          !total latent heat flux x boundary layer resistance, [MJ m-1]
-  real(r8),target,allocatable ::  TSHC(:,:)                          !total sensible heat flux x boundary layer resistance, [MJ m-1]
+  real(r8),target,allocatable ::  Canopy_Heat_Latent_col(:,:)                          !total latent heat flux x boundary layer resistance, [MJ m-1]
+  real(r8),target,allocatable ::  Canopy_Heat_Sens_col(:,:)                          !total sensible heat flux x boundary layer resistance, [MJ m-1]
   real(r8),target,allocatable ::  SoilHeatSrcDepth(:,:)                        !depth of soil heat sink/source, [m]
   real(r8),target,allocatable ::  TKSD(:,:)                          !temperature of soil heat sink/source, [oC]
   real(r8),target,allocatable ::  ATCAI(:,:)                         !initial mean annual air temperature, [oC]
-  real(r8),target,allocatable ::  RAD(:,:)                           !shortwave radiation in solar beam, [MJ m-2 h-1]
-  real(r8),target,allocatable ::  RAP(:,:)                           !PAR radiation in solar beam, [umol m-2 s-1]
+  real(r8),target,allocatable ::  RadSWSolarBeam_col(:,:)                           !shortwave radiation in solar beam, [MJ m-2 h-1]
+  real(r8),target,allocatable ::  RadPARSolarBeam_col(:,:)                           !PAR radiation in solar beam, [umol m-2 s-1]
   real(r8),target,allocatable ::  ATCA(:,:)                          !mean annual air temperature, [oC]
   real(r8),target,allocatable ::  ATCS(:,:)                          !mean annual soil temperature, [oC]
   real(r8),target,allocatable ::  TairKClimMean(:,:)                 !mean annual air temperature, [K]
@@ -120,10 +119,10 @@ implicit none
   real(r8),target,allocatable ::  PHR(:,:)                           !precipitation pH, [-]
   real(r8),target,allocatable ::  CN4RI(:,:)                         !precipitation initial NH4 concentration, [g m-3]
   real(r8),target,allocatable ::  CNORI(:,:)                         !precipitation initial NO3 concentration, [g m-3]
-  real(r8),target,allocatable ::  CN4R(:,:)                          !precipitation  NH4 concentration, [g m-3]
-  real(r8),target,allocatable ::  CN3R(:,:)                          !precipitation  NH3 concentration, [g m-3]
-  real(r8),target,allocatable ::  CNOR(:,:)                          !precipitation  NO3 concentration, [g m-3]
-  real(r8),target,allocatable ::  CPOR(:,:)                          !precipitation  H2PO4 concentration, [g m-3]
+  real(r8),target,allocatable ::  NH4_rain_conc(:,:)                          !precipitation  NH4 concentration, [g m-3]
+  real(r8),target,allocatable ::  NH3_rain_conc(:,:)                          !precipitation  NH3 concentration, [g m-3]
+  real(r8),target,allocatable ::  NO3_rain_conc(:,:)                          !precipitation  NO3 concentration, [g m-3]
+  real(r8),target,allocatable ::  H2PO4_rain_conc(:,:)                          !precipitation  H2PO4 concentration, [g m-3]
   real(r8),target,allocatable ::  CALR(:,:)                          !precipitation  Al concentration, [g m-3]
   real(r8),target,allocatable ::  CFER(:,:)                          !precipitation  Fe concentration, [g m-3]
   real(r8),target,allocatable ::  CHYR(:,:)                          !precipitation  H concentration, [g m-3]
@@ -136,7 +135,7 @@ implicit none
   real(r8),target,allocatable ::  CCLR(:,:)                          !precipitation  Cl concentration, [g m-3]
   real(r8),target,allocatable ::  CC3R(:,:)                          !precipitation  CO3 concentration, [g m-3]
   real(r8),target,allocatable ::  CHCR(:,:)                          !precipitation  HCO3 concentration, [g m-3]
-  real(r8),target,allocatable ::  CCHR(:,:)                          !precipitation  CH4 concentration, [g m-3]
+  real(r8),target,allocatable ::  CH4_rain_conc(:,:)                          !precipitation  CH4 concentration, [g m-3]
   real(r8),target,allocatable ::  CAL1R(:,:)                         !precipitation  AlOH concentration, [g m-3]
   real(r8),target,allocatable ::  CAL2R(:,:)                         !precipitation  AlOH2 concentration, [g m-3]
   real(r8),target,allocatable ::  CAL3R(:,:)                         !precipitation  AlOH3 concentration, [g m-3]
@@ -159,18 +158,18 @@ implicit none
   real(r8),target,allocatable ::  CNASR(:,:)                         !precipitation  NaSO4 concentration, [g m-3]
   real(r8),target,allocatable ::  CKASR(:,:)                         !precipitation  K concentration, [g m-3]
   real(r8),target,allocatable ::  CH0PR(:,:)                         !precipitation  PO4 concentration, [g m-3]
-  real(r8),target,allocatable ::  CH1PR(:,:)                         !precipitation  HPO4 concentration, [g m-3]
+  real(r8),target,allocatable ::  HPO4_rain_conc(:,:)                         !precipitation  HPO4 concentration, [g m-3]
   real(r8),target,allocatable ::  CH3PR(:,:)                         !precipitation  H3PO4 concentration, [g m-3]
   real(r8),target,allocatable ::  CF1PR(:,:)                         !precipitation  FeHPO4 concentration, [g m-3]
   real(r8),target,allocatable ::  CF2PR(:,:)                         !precipitation  FeH2PO4 concentration, [g m-3]
   real(r8),target,allocatable ::  CC0PR(:,:)                         !precipitation  CaPO4 concentration, [g m-3]
   real(r8),target,allocatable ::  CC1PR(:,:)                         !precipitation  CaHPO4 concentration, [g m-3]
-  real(r8),target,allocatable ::  CC2PR(:,:)                         !precipitation  CaH2PO4 concentration, [g m-3]
+  real(r8),target,allocatable ::  CC2PR(:,:)                         !precipitation  CaH4P2O8 concentration, [g m-3]
   real(r8),target,allocatable ::  CM1PR(:,:)                         !precipitation  MgHPO4 concentration, [g m-3]
-  real(r8),target,allocatable ::  CCOR(:,:)                          !precipitation  CO2 concentration, [g m-3]
-  real(r8),target,allocatable ::  COXR(:,:)                          !precipitation  O2 concentration, [g m-3]
-  real(r8),target,allocatable ::  CNNR(:,:)                          !precipitation  N2 concentration, [g m-3]
-  real(r8),target,allocatable ::  CN2R(:,:)                          !precipitation  N2O concentration, [g m-3]
+  real(r8),target,allocatable ::  CO2_rain_conc(:,:)                          !precipitation  CO2 concentration, [g m-3]
+  real(r8),target,allocatable ::  O2_rain_conc(:,:)                          !precipitation  O2 concentration, [g m-3]
+  real(r8),target,allocatable ::  N2_rain_conc(:,:)                          !precipitation  N2 concentration, [g m-3]
+  real(r8),target,allocatable ::  N2O_rain_conc(:,:)                          !precipitation  N2O concentration, [g m-3]
   contains
 !----------------------------------------------------------------------
 
@@ -193,10 +192,10 @@ implicit none
   allocate(VPA(JY,JX));         VPA=0._r8
   allocate(VPK(JY,JX));         VPK=0._r8
   allocate(Pbot(JY,JX));        PBOT=1.01325E+02_r8
-  allocate(DYLN(JY,JX));        DYLN=0._r8
-  allocate(DYLX(JY,JX));        DYLX=0._r8
-  allocate(DYLM(JY,JX));        DYLM=0._r8
-  allocate(OMEGAG(JSA,JY,JX));  OMEGAG=0._r8
+  allocate(DayLenthCurrent(JY,JX));        DayLenthCurrent=0._r8
+  allocate(DayLenthPrev(JY,JX));        DayLenthPrev=0._r8
+  allocate(DayLenthMax(JY,JX));        DayLenthMax=0._r8
+  allocate(OMEGAG(NumOfSkyAzimuSects,JY,JX));  OMEGAG=0._r8
   allocate(LWRadSky(JY,JX));         LWRadSky=0._r8
   allocate(TRAD(JY,JX));        TRAD=0._r8
   allocate(TAMX(JY,JX));        TAMX=0._r8
@@ -212,7 +211,7 @@ implicit none
   allocate(CO2EI(JY,JX));       CO2EI=0._r8
   allocate(CCO2EI(JY,JX));      CCO2EI=0._r8
 
-  allocate(AtmGgms(idg_beg:idg_end,JY,JX)); AtmGgms=0._r8
+  allocate(AtmGasCgperm3(idg_beg:idg_end,JY,JX)); AtmGasCgperm3=0._r8
   allocate(AtmGmms(idg_beg:idg_end,JY,JX)); AtmGmms=0._r8
 
   allocate(OXYE(JY,JX));        OXYE=0._r8
@@ -223,22 +222,22 @@ implicit none
   allocate(H2GE(JY,JX));        H2GE=0._r8
   allocate(CO2E(JY,JX));        CO2E=0._r8
 
-  allocate(ZNOON(JY,JX));       ZNOON=0._r8
-  allocate(RADS(JY,JX));        RADS=0._r8
-  allocate(RADY(JY,JX));        RADY=0._r8
-  allocate(RAPS(JY,JX));        RAPS=0._r8
-  allocate(RAPY(JY,JX));        RAPY=0._r8
-  allocate(SSIN(JY,JX));        SSIN=0._r8
-  allocate(SSINN(JY,JX));       SSINN=0._r8
+  allocate(SolarNoonHour_col(JY,JX));       SolarNoonHour_col=0._r8
+  allocate(RadSWDirect_col(JY,JX));        RadSWDirect_col=0._r8
+  allocate(RadSWDiffus_col(JY,JX));        RadSWDiffus_col=0._r8
+  allocate(PARDirect_col(JY,JX));        PARDirect_col=0._r8
+  allocate(PARDiffus_col(JY,JX));        PARDiffus_col=0._r8
+  allocate(SineSolarIncliAngle(JY,JX));        SineSolarIncliAngle=0._r8
+  allocate(SineSolarIncliAngleNextHour(JY,JX));       SineSolarIncliAngleNextHour=0._r8
   allocate(TLEX(JY,JX));        TLEX=0._r8
   allocate(TSHX(JY,JX));        TSHX=0._r8
-  allocate(TLEC(JY,JX));        TLEC=0._r8
-  allocate(TSHC(JY,JX));        TSHC=0._r8
+  allocate(Canopy_Heat_Latent_col(JY,JX));        Canopy_Heat_Latent_col=0._r8
+  allocate(Canopy_Heat_Sens_col(JY,JX));        Canopy_Heat_Sens_col=0._r8
   allocate(SoilHeatSrcDepth(JY,JX));      SoilHeatSrcDepth=0._r8
   allocate(TKSD(JY,JX));        TKSD=0._r8
   allocate(ATCAI(JY,JX));       ATCAI=0._r8
-  allocate(RAD(JY,JX));         RAD=0._r8
-  allocate(RAP(JY,JX));         RAP=0._r8
+  allocate(RadSWSolarBeam_col(JY,JX));         RadSWSolarBeam_col=0._r8
+  allocate(RadPARSolarBeam_col(JY,JX));         RadPARSolarBeam_col=0._r8
   allocate(ATCA(JY,JX));        ATCA=0._r8
   allocate(ATCS(JY,JX));        ATCS=0._r8
   allocate(TairKClimMean(JY,JX));        TairKClimMean=0._r8
@@ -251,10 +250,10 @@ implicit none
   allocate(PHR(JY,JX));         PHR=0._r8
   allocate(CN4RI(JY,JX));       CN4RI=0._r8
   allocate(CNORI(JY,JX));       CNORI=0._r8
-  allocate(CN4R(JY,JX));        CN4R=0._r8
-  allocate(CN3R(JY,JX));        CN3R=0._r8
-  allocate(CNOR(JY,JX));        CNOR=0._r8
-  allocate(CPOR(JY,JX));        CPOR=0._r8
+  allocate(NH4_rain_conc(JY,JX));        NH4_rain_conc=0._r8
+  allocate(NH3_rain_conc(JY,JX));        NH3_rain_conc=0._r8
+  allocate(NO3_rain_conc(JY,JX));        NO3_rain_conc=0._r8
+  allocate(H2PO4_rain_conc(JY,JX));        H2PO4_rain_conc=0._r8
   allocate(CALR(JY,JX));        CALR=0._r8
   allocate(CFER(JY,JX));        CFER=0._r8
   allocate(CHYR(JY,JX));        CHYR=0._r8
@@ -267,7 +266,7 @@ implicit none
   allocate(CCLR(JY,JX));        CCLR=0._r8
   allocate(CC3R(JY,JX));        CC3R=0._r8
   allocate(CHCR(JY,JX));        CHCR=0._r8
-  allocate(CCHR(JY,JX));        CCHR=0._r8
+  allocate(CH4_rain_conc(JY,JX));        CH4_rain_conc=0._r8
   allocate(CAL1R(JY,JX));       CAL1R=0._r8
   allocate(CAL2R(JY,JX));       CAL2R=0._r8
   allocate(CAL3R(JY,JX));       CAL3R=0._r8
@@ -290,7 +289,7 @@ implicit none
   allocate(CNASR(JY,JX));       CNASR=0._r8
   allocate(CKASR(JY,JX));       CKASR=0._r8
   allocate(CH0PR(JY,JX));       CH0PR=0._r8
-  allocate(CH1PR(JY,JX));       CH1PR=0._r8
+  allocate(HPO4_rain_conc(JY,JX));       HPO4_rain_conc=0._r8
   allocate(CH3PR(JY,JX));       CH3PR=0._r8
   allocate(CF1PR(JY,JX));       CF1PR=0._r8
   allocate(CF2PR(JY,JX));       CF2PR=0._r8
@@ -298,10 +297,10 @@ implicit none
   allocate(CC1PR(JY,JX));       CC1PR=0._r8
   allocate(CC2PR(JY,JX));       CC2PR=0._r8
   allocate(CM1PR(JY,JX));       CM1PR=0._r8
-  allocate(CCOR(JY,JX));        CCOR=0._r8
-  allocate(COXR(JY,JX));        COXR=0._r8
-  allocate(CNNR(JY,JX));        CNNR=0._r8
-  allocate(CN2R(JY,JX));        CN2R=0._r8
+  allocate(CO2_rain_conc(JY,JX));        CO2_rain_conc=0._r8
+  allocate(O2_rain_conc(JY,JX));        O2_rain_conc=0._r8
+  allocate(N2_rain_conc(JY,JX));        N2_rain_conc=0._r8
+  allocate(N2O_rain_conc(JY,JX));        N2O_rain_conc=0._r8
   end subroutine InitClimForcData
 
 !----------------------------------------------------------------------
@@ -324,9 +323,9 @@ implicit none
   call destroy(VPA)
   call destroy(VPK)
   call destroy(PBOT)
-  call destroy(DYLN)
-  call destroy(DYLX)
-  call destroy(DYLM)
+  call destroy(DayLenthCurrent)
+  call destroy(DayLenthPrev)
+  call destroy(DayLenthMax)
   call destroy(OMEGAG)
   call destroy(LWRadSky)
   call destroy(TRAD)
@@ -343,7 +342,7 @@ implicit none
   call destroy(CO2EI)
   call destroy(CCO2EI)
 
-  call destroy(AtmGgms)
+  call destroy(AtmGasCgperm3)
   call destroy(AtmGmms)
 
   call destroy(OXYE)
@@ -353,23 +352,23 @@ implicit none
   call destroy(CH4E)
   call destroy(H2GE)
 
-  call destroy(ZNOON)
+  call destroy(SolarNoonHour_col)
   call destroy(CO2E)
-  call destroy(RADS)
-  call destroy(RADY)
-  call destroy(RAPS)
-  call destroy(RAPY)
-  call destroy(SSIN)
-  call destroy(SSINN)
+  call destroy(RadSWDirect_col)
+  call destroy(RadSWDiffus_col)
+  call destroy(PARDirect_col)
+  call destroy(PARDiffus_col)
+  call destroy(SineSolarIncliAngle)
+  call destroy(SineSolarIncliAngleNextHour)
   call destroy(TLEX)
   call destroy(TSHX)
-  call destroy(TLEC)
-  call destroy(TSHC)
+  call destroy(Canopy_Heat_Latent_col)
+  call destroy(Canopy_Heat_Sens_col)
   call destroy(SoilHeatSrcDepth)
   call destroy(TKSD)
   call destroy(ATCAI)
-  call destroy(RAD)
-  call destroy(RAP)
+  call destroy(RadSWSolarBeam_col)
+  call destroy(RadPARSolarBeam_col)
   call destroy(ATCA)
   call destroy(ATCS)
   call destroy(TairKClimMean)
@@ -382,10 +381,10 @@ implicit none
   call destroy(PHR)
   call destroy(CN4RI)
   call destroy(CNORI)
-  call destroy(CN4R)
-  call destroy(CN3R)
-  call destroy(CNOR)
-  call destroy(CPOR)
+  call destroy(NH4_rain_conc)
+  call destroy(NH3_rain_conc)
+  call destroy(NO3_rain_conc)
+  call destroy(H2PO4_rain_conc)
   call destroy(CALR)
   call destroy(CFER)
   call destroy(CHYR)
@@ -398,7 +397,7 @@ implicit none
   call destroy(CCLR)
   call destroy(CC3R)
   call destroy(CHCR)
-  call destroy(CCHR)
+  call destroy(CH4_rain_conc)
   call destroy(CAL1R)
   call destroy(CAL2R)
   call destroy(CAL3R)
@@ -421,7 +420,7 @@ implicit none
   call destroy(CNASR)
   call destroy(CKASR)
   call destroy(CH0PR)
-  call destroy(CH1PR)
+  call destroy(HPO4_rain_conc)
   call destroy(CH3PR)
   call destroy(CF1PR)
   call destroy(CF2PR)
@@ -429,9 +428,9 @@ implicit none
   call destroy(CC1PR)
   call destroy(CC2PR)
   call destroy(CM1PR)
-  call destroy(CCOR)
-  call destroy(COXR)
-  call destroy(CNNR)
-  call destroy(CN2R)
+  call destroy(CO2_rain_conc)
+  call destroy(O2_rain_conc)
+  call destroy(N2_rain_conc)
+  call destroy(N2O_rain_conc)
   end subroutine DestructClimForcData
 end module ClimForcDataType

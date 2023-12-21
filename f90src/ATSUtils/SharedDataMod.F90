@@ -41,7 +41,7 @@ Module SharedDataMod
   real(r8), allocatable :: a_AREA3(:)
   integer,  allocatable :: a_NU(:)
   integer,  allocatable :: a_NL(:)
-  integer,  allocatable :: a_NJ(:)
+  integer,  allocatable :: a_MaxNumRootLays(:)
   integer :: NYS, I                     !total number of columns
   contains
 

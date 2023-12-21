@@ -34,7 +34,7 @@ implicit none
   use FertilizerDataType  , only : InitFertilizerData
   use CanopyRadDataType   , only : InitCanopyRad
   use GrosubsMod          , only : InitGrosub
-
+  use InitSoluteMod       , only : InitSoluteProperty
   use AqueChemDatatype    , only : initaquachem
   use PlantDataRateType   , only : InitPlantRates
 
@@ -63,7 +63,7 @@ implicit none
 
   call InitPlantMorphSize()
 
-  call InitGrosub(NumGrothStages,JRS)
+  call InitGrosub(NumGrowthStages,MaxNumRootAxes)
 
   call InitGridData
 
@@ -131,6 +131,7 @@ implicit none
 
   call InitSoilPhysData
 
+  call InitSoluteProperty
   end subroutine InitAlloc
 !------------------------------------------------------------------------------------------
   subroutine InitPlantMorphSize()
@@ -139,12 +140,12 @@ implicit none
   implicit none
 
   pltpar%JZ1    = JZ
-  pltpar%NumOfCanopyLayers1    = JC
+  pltpar%NumOfCanopyLayers1    = NumOfCanopyLayers
   pltpar%JP1    = JP
-  pltpar%JLA1   = JLA
-  pltpar%JSA1   = JSA
-  pltpar%JLI1   = JLI
-  pltpar%JNODS1 = JNODS
+  pltpar%NumOfLeafAzimuthSectors   = NumOfLeafAzimuthSectors
+  pltpar%NumOfSkyAzimuSects1   = NumOfSkyAzimuSects
+  pltpar%NumOfLeafZenithSectors1   = NumOfLeafZenithSectors
+  pltpar%MaxNodesPerBranch1 = MaxNodesPerBranch
   pltpar%iprotein =micpar%iprotein
   pltpar%icarbhyro=micpar%icarbhyro
   pltpar%icellulos=micpar%icellulos
@@ -155,11 +156,11 @@ implicit none
   pltpar%jcplx= micpar%jcplx
   pltpar%NumOfPlantLitrCmplxs=micpar%NumOfPlantLitrCmplxs
   pltpar%jsken  = micpar%jsken
-  pltpar%Jlitgrp= 5     !number of liter groups
-  pltpar%JBR    = 10    !number of branches
-  JBR=pltpar%JBR
-  Jlitgrp=pltpar%Jlitgrp
-  JRS=pltpar%JRS
+  pltpar%NumLitterGroups= 5     !number of liter groups
+  pltpar%MaxNumBranches    = 10    !number of branches
+  MaxNumBranches=pltpar%MaxNumBranches
+  NumLitterGroups=pltpar%NumLitterGroups
+  MaxNumRootAxes=pltpar%MaxNumRootAxes
 
 
   end subroutine InitPlantMorphSize

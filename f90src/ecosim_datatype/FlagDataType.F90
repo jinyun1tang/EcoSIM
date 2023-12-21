@@ -1,20 +1,19 @@
 module FlagDataType
   use GridConsts
+  use ElmIDMod  
 implicit none
 
   public
   save
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
-  integer  ::  ISALTG                              !salt option
-  integer  ::  IERSNG                              !erosion option
   integer  ::  ICLM                                !changes to weather data (0=none,1=step,2=transient)
   integer  ::  IMNG                                !flag for land management
   integer  ::  IWTHR(2)                            !weather data type:1=daily,2=hourly for first(L=1) or second(L=2) scene
 
   integer,target,allocatable ::  IYTYP(:,:,:,:)                      !fertilizer release type from fertilizer input file
   integer,target,allocatable ::  ITILL(:,:,:)                        !soil disturbance type, [-]
-  integer,target,allocatable ::  IETYP(:,:)                          !Koppen climate zone
+  integer,target,allocatable ::  KoppenClimZone(:,:)                          !Koppen climate zone
   integer,target,allocatable ::  IFLGV(:,:)                          !flag for irrigation criterion,0=SWC,1=canopy water potential
   integer,target,allocatable ::  IFLGS(:,:)                          !disturbance flag
   integer,target,allocatable ::  IFNHB(:,:)                          !banded NH4 fertilizer flag
@@ -25,17 +24,17 @@ implicit none
 
   integer,target,allocatable ::  IUTYP(:,:)                          !urea hydrolysis inhibitor type (1=no,2=yes)
   integer,target,allocatable ::  ITILL1(:,:)                         !soil disturbance type, [-]
-  integer,target,allocatable ::  IFLGC(:,:,:)                        ! flag for living pft
-  integer,target,allocatable ::  IFLGI(:,:,:)                        !PFT initialization flag:0=no,1=yes
-  integer,target,allocatable ::  ICTYP(:,:,:)                        !plant photosynthetic type (C3 or C4)
-  integer,target,allocatable ::  IGTYP(:,:,:)                        !plant growth type (vascular, non-vascular)
-  integer,target,allocatable ::  ISTYP(:,:,:)                        !plant growth habit (annual or perennial)
-  integer,target,allocatable ::  IDTYP(:,:,:)                        !plant growth habit (determinate or indeterminate)
-  integer,target,allocatable ::  INTYP(:,:,:)                        !N2 fixation type
-  integer,target,allocatable ::  IWTYP(:,:,:)                        !climate signal for phenological progress none, temperature, water stress)
-  integer,target,allocatable ::  IPTYP(:,:,:)                        !photoperiod type (neutral, long day, short day)
-  integer,target,allocatable ::  IBTYP(:,:,:)                        !phenologically-driven above-ground turnover (all, foliar only, none)
-  integer,target,allocatable ::  IRTYP(:,:,:)                        !grain type (below or above-ground), e.g. potato and onion are below
+  integer,target,allocatable ::  IsPlantActive_pft(:,:,:)                        ! flag for living pft
+  integer,target,allocatable ::  doInitPlant_pft(:,:,:)                        !PFT initialization flag:0=no,1=yes
+  integer,target,allocatable ::  iPlantPhotosynthesisType(:,:,:)                        !plant photosynthetic type (C3 or C4)
+  integer,target,allocatable ::  iPlantMorphologyType_pft(:,:,:)                        !plant growth type (vascular, non-vascular)
+  integer,target,allocatable ::  iPlantPhenologyPattern_pft(:,:,:)                        !plant growth habit (annual or perennial)
+  integer,target,allocatable ::  iPlantDevelopPattern_pft(:,:,:)                        !plant growth habit (determinate or indeterminate)
+  integer,target,allocatable ::  iPlantNfixType(:,:,:)                        !N2 fixation type
+  integer,target,allocatable ::  iPlantPhenologyType_pft(:,:,:)                        !climate signal for phenological progress none, temperature, water stress)
+  integer,target,allocatable ::  iPlantPhotoperiodType_pft(:,:,:)                        !photoperiod type (neutral, long day, short day)
+  integer,target,allocatable ::  iPlantTurnoverPattern_pft(:,:,:)                        !phenologically-driven above-ground turnover (all, foliar only, none)
+  integer,target,allocatable ::  iPlantGrainType_pft(:,:,:)                        !grain type (below or above-ground), e.g. potato and onion are below
   integer,target,allocatable ::  MY(:,:,:)                           !mycorrhizal type (no or yes)
   integer,target,allocatable ::  IDWaterTable(:,:)                   !water table flag from site file
 !----------------------------------------------------------------------
@@ -46,7 +45,7 @@ contains
   implicit none
   allocate(IYTYP(0:2,366,JY,JX));IYTYP=0
   allocate(ITILL(366,JY,JX));   ITILL=0
-  allocate(IETYP(JY,JX));       IETYP=0
+  allocate(KoppenClimZone(JY,JX));       KoppenClimZone=0
   allocate(IFLGV(JY,JX));       IFLGV=0
   allocate(IFLGS(JY,JX));       IFLGS=0
   allocate(IFNHB(JY,JX));       IFNHB=0
@@ -56,17 +55,17 @@ contains
   allocate(ISOILR(JY,JX));      ISOILR=0
   allocate(IUTYP(JY,JX));       IUTYP=0
   allocate(ITILL1(JY,JX));      ITILL1=0
-  allocate(IFLGC(JP,JY,JX));    IFLGC=0
-  allocate(IFLGI(JP,JY,JX));    IFLGI=0
-  allocate(ICTYP(JP,JY,JX));    ICTYP=0
-  allocate(IGTYP(JP,JY,JX));    IGTYP=0
-  allocate(ISTYP(JP,JY,JX));    ISTYP=0
-  allocate(IDTYP(JP,JY,JX));    IDTYP=0
-  allocate(INTYP(JP,JY,JX));    INTYP=0
-  allocate(IWTYP(JP,JY,JX));    IWTYP=0
-  allocate(IPTYP(JP,JY,JX));    IPTYP=0
-  allocate(IBTYP(JP,JY,JX));    IBTYP=0
-  allocate(IRTYP(JP,JY,JX));    IRTYP=0
+  allocate(IsPlantActive_pft(JP,JY,JX));    IsPlantActive_pft=0
+  allocate(doInitPlant_pft(JP,JY,JX));    doInitPlant_pft=ifalse
+  allocate(iPlantPhotosynthesisType(JP,JY,JX));    iPlantPhotosynthesisType=0
+  allocate(iPlantMorphologyType_pft(JP,JY,JX));    iPlantMorphologyType_pft=0
+  allocate(iPlantPhenologyPattern_pft(JP,JY,JX));    iPlantPhenologyPattern_pft=0
+  allocate(iPlantDevelopPattern_pft(JP,JY,JX));    iPlantDevelopPattern_pft=0
+  allocate(iPlantNfixType(JP,JY,JX));    iPlantNfixType=0
+  allocate(iPlantPhenologyType_pft(JP,JY,JX));    iPlantPhenologyType_pft=0
+  allocate(iPlantPhotoperiodType_pft(JP,JY,JX));    iPlantPhotoperiodType_pft=0
+  allocate(iPlantTurnoverPattern_pft(JP,JY,JX));    iPlantTurnoverPattern_pft=0
+  allocate(iPlantGrainType_pft(JP,JY,JX));    iPlantGrainType_pft=0
   allocate(MY(JP,JY,JX));       MY=0
   allocate(IDWaterTable(JY,JX));       IDWaterTable=0
   end subroutine InitFlagData
@@ -77,7 +76,7 @@ contains
   implicit none
   call destroy(IYTYP)
   call destroy(ITILL)
-  call destroy(IETYP)
+  call destroy(KoppenClimZone)
   call destroy(IFLGV)
   call destroy(IFLGS)
   call destroy(IFNHB)
@@ -87,17 +86,17 @@ contains
   call destroy(ISOILR)
   call destroy(IUTYP)
   call destroy(ITILL1)
-  call destroy(IFLGC)
-  call destroy(IFLGI)
-  call destroy(ICTYP)
-  call destroy(IGTYP)
-  call destroy(ISTYP)
-  call destroy(IDTYP)
-  call destroy(INTYP)
-  call destroy(IWTYP)
-  call destroy(IPTYP)
-  call destroy(IBTYP)
-  call destroy(IRTYP)
+  call destroy(IsPlantActive_pft)
+  call destroy(doInitPlant_pft)
+  call destroy(iPlantPhotosynthesisType)
+  call destroy(iPlantMorphologyType_pft)
+  call destroy(iPlantPhenologyPattern_pft)
+  call destroy(iPlantDevelopPattern_pft)
+  call destroy(iPlantNfixType)
+  call destroy(iPlantPhenologyType_pft)
+  call destroy(iPlantPhotoperiodType_pft)
+  call destroy(iPlantTurnoverPattern_pft)
+  call destroy(iPlantGrainType_pft)
   call destroy(MY)
   call destroy(IDWaterTable)
   end subroutine DestructFlagData

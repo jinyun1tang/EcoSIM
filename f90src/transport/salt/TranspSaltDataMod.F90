@@ -1,4 +1,4 @@
-module TrnsfrsDataMod
+module TranspSaltDataMod
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use GridConsts
   use SoilPropertyDataType
@@ -30,12 +30,12 @@ implicit none
   real(r8),allocatable ::  ZFE2(:,:,:)                        !
   real(r8),allocatable ::  ZHCO32(:,:,:)                      !
   real(r8),allocatable ::  trcSalt_solml2R(:,:,:,:)                       !
-  real(r8),allocatable ::  trcSalt_RBLS(:,:,:,:)                      !
+  real(r8),allocatable ::  trcSaltAdv2SowLay(:,:,:,:)                      !
 
   real(r8),allocatable ::  trcSalt_TBLS(:,:,:,:)
 
   real(r8),allocatable ::  POSGL2(:,:,:)                      !
-  real(r8),allocatable ::  trcSalt_RFLS(:,:,:,:,:)                    !
+  real(r8),allocatable ::  trcSalt3DFlo2CellM(:,:,:,:,:)                    !
   real(r8),allocatable ::  trcSalt_RFHS(:,:,:,:,:)                    !
   real(r8),allocatable ::  trcSalt_soHml2(:,:,:,:)                       !
   real(r8),allocatable ::  trcSalt_RFXS(:,:,:,:)                      !
@@ -45,7 +45,7 @@ implicit none
 !----------------------------------------------------------------------
 
 contains
-  subroutine InitTrnsfrsData
+  subroutine InitTranspSaltData
 
   implicit none
   allocate(ALSGL2(JZ,JY,JX));   ALSGL2=0._r8
@@ -64,11 +64,11 @@ contains
   allocate(trcSalt_RQR(idsalt_beg:idsalt_end,2,2,JV,JH));   trcSalt_RQR=0._r8
   allocate(trcSalt_RQ(idsalt_beg:idsaltb_end,2,JV,JH));     trcSalt_RQ=0._r8
   allocate(trcSalt_RQR0(idsalt_beg:idsalt_end,JY,JX));     trcSalt_RQR0=0._r8
-  allocate(trcSalt_RBLS(idsalt_beg:idsalt_end,JS,JY,JX));   trcSalt_RBLS=0._r8
+  allocate(trcSaltAdv2SowLay(idsalt_beg:idsalt_end,JS,JY,JX));   trcSaltAdv2SowLay=0._r8
   allocate(trcSalt_TBLS(idsalt_beg:idsalt_end,JS,JY,JX)); trcSalt_TBLS=0._r8
 
   allocate(POSGL2(JZ,JY,JX));   POSGL2=0._r8
-  allocate(trcSalt_RFLS(idsalt_beg:idsaltb_end,3,0:JD,JV,JH));trcSalt_RFLS=0._r8
+  allocate(trcSalt3DFlo2CellM(idsalt_beg:idsaltb_end,3,0:JD,JV,JH));trcSalt3DFlo2CellM=0._r8
   allocate(trcSalt_RFHS(idsalt_beg:idsaltb_end,3,JD,JV,JH)); trcSalt_RFHS=0._r8
   allocate(trcSalt_soHml2(idsalt_beg:idsaltb_end,JZ,JY,JX));    trcSalt_soHml2=0._r8
   allocate(trcSalt_RFXS(idsalt_beg:idsaltb_end,JZ,JY,JX));   trcSalt_RFXS=0._r8
@@ -77,14 +77,14 @@ contains
 
   allocate(trcSalt_RFL0(idsalt_beg:idsalt_end,JY,JX));      trcSalt_RFL0=0._r8
   allocate(trcSalt_RFL1(idsalt_beg:idsaltb_end,JY,JX));     trcSalt_RFL1=0._r8
-  end subroutine InitTrnsfrsData
+  end subroutine InitTranspSaltData
 
 !----------------------------------------------------------------------
-  subroutine DestructTrnsfrsData
+  subroutine DestructTranspSaltData
   use abortutils, only : destroy
   implicit none
 
-  call destroy(trcSalt_RFLS)
+  call destroy(trcSalt3DFlo2CellM)
   call destroy(trcSalt_solml2)
   call destroy(trcSalt_solml2R)
 
@@ -107,6 +107,6 @@ contains
 
   call destroy(trcSalt_RQR)
   call destroy(trcSalt_RFXS)
-  end subroutine DestructTrnsfrsData
+  end subroutine DestructTranspSaltData
 
-end module TrnsfrsDataMod
+end module TranspSaltDataMod

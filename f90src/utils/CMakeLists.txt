@@ -19,9 +19,9 @@ set(ECOSIM_UTIL_SOURCES
 configure_file(dtypes.h dtypes.h COPYONLY)
 
 include(add_ecosim_library)
-#add_ecosim_library(util OBJECTS ${ECOSIM_UTIL_SOURCES})
-add_library(util OBJECT ${ECOSIM_UTIL_SOURCES})    
-install(TARGETS util OBJECTS DESTINATION lib)
+add_ecosim_library(util ${ECOSIM_UTIL_SOURCES})
+#add_library(util OBJECT ${ECOSIM_UTIL_SOURCES})    
+#install(TARGETS util OBJECTS DESTINATION lib)
 
 target_include_directories(util PUBLIC ${CMAKE_BINARY_DIR}/f90src/utils)
 

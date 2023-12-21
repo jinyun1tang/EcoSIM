@@ -7,9 +7,9 @@ set(MODELPARS_SOURCES
   ChemTracerParsMod.F90
 )
 include(add_ecosim_library)
-#add_ecosim_library(modelpars ${MODELPARS_SOURCES})
-add_library(modelpars OBJECT ${MODELPARS_SOURCES})
-install(TARGETS modelpars OBJECTS DESTINATION lib)
+add_ecosim_library(modelpars ${MODELPARS_SOURCES})
+#add_library(modelpars OBJECT ${MODELPARS_SOURCES})
+#install(TARGETS modelpars OBJECTS DESTINATION lib)
 
 target_include_directories(modelpars  PRIVATE
   ${CMAKE_BINARY_DIR}/f90src/utils/

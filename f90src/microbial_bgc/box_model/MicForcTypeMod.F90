@@ -14,10 +14,10 @@ module MicForcTypeMod
 
   real(r8) :: CCH4E
   real(r8) :: COXYE
-  real(r8) :: COXQ
-  real(r8) :: COXR
-  real(r8) :: FLQRI
-  real(r8) :: FLQRQ
+  real(r8) :: O2_irrig_conc
+  real(r8) :: O2_rain_conc
+  real(r8) :: Irrig2LitRSurf
+  real(r8) :: Rain2LitRSurf
   real(r8) :: offset
   real(r8) :: VLitR
   real(r8) :: VWatLitRHoldCapcity
@@ -75,7 +75,7 @@ module MicForcTypeMod
   real(r8), allocatable :: CFOMCU(:)
   real(r8), allocatable :: ROQCY(:)
   real(r8), allocatable :: ROQAY(:)
-  real(r8), allocatable :: DFGS(:)  !rate constant for air-water gas exchange
+  real(r8), allocatable :: DiffusivitySolutEff(:)  !rate constant for air-water gas exchange
   real(r8), allocatable :: FILM(:)
   real(r8), allocatable :: THETPM(:)
   real(r8), allocatable :: VLWatMicPM(:)
@@ -104,7 +104,7 @@ module MicForcTypeMod
   allocate(this%FILM(NPH))
   allocate(this%TortMicPM(NPH))
   allocate(this%VLsoiAirPM(NPH))
-  allocate(this%DFGS(NPH))
+  allocate(this%DiffusivitySolutEff(NPH))
   end subroutine Init
 !------------------------------------------------------------------------------------------
 
@@ -119,7 +119,7 @@ module MicForcTypeMod
   call destroy(this%FILM)
   call destroy(this%TortMicPM)
   call destroy(this%VLsoiAirPM)
-  call destroy(this%DFGS)
+  call destroy(this%DiffusivitySolutEff)
   call destroy(this%ROQCY)
   call destroy(this%ROQAY)
   call destroy(this%CFOMC)

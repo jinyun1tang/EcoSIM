@@ -3,6 +3,7 @@ module ErosionMod
   use minimathmod, only : isclose,AZMAX1
   use MicrobialDataType
   use SOMDataType
+  use EcoSIMCtrlMod, only : iErosionMode
   use EcoSIMSolverPar
   use FertilizerDataType
   use GridConsts
@@ -17,7 +18,8 @@ module ErosionMod
   use SoilPropertyDataType
   USE SedimentDataType
   use GridDataType
-  use EcoSIMConfig, only : nlbiomcp => NumOfLiveMicrobiomComponents, ndbiomcp=> NumOfDeadMicrobiomComponents
+  use EcoSIMConfig, only : nlbiomcp => NumOfLiveMicrobiomComponents
+  use EcoSIMConfig, only : ndbiomcp=> NumOfDeadMicrobiomComponents
   use EcoSIMConfig, only : jcplx1=> jcplx1c, NFGs => NFGsc,jcplx=>jcplxc
   use EcoSIMConfig, only : column_mode
   implicit none
@@ -69,7 +71,7 @@ module ErosionMod
 
 !     execution begins here
 !
-  IF(IERSNG.EQ.1.OR.IERSNG.EQ.3)THEN
+  IF(iErosionMode.EQ.ieros_frzthaweros.OR.iErosionMode.EQ.ieros_frzthawsomeros)THEN
     DO M=1,NPH
       call SedimentDetachment(M,NHW,NHE,NVN,NVS)
 
@@ -290,7 +292,6 @@ module ErosionMod
       ENDIF
 !
       if(.not. column_mode)call XBoundSedTransp(M,NY,NX,NHW,NHE,NVN,NVS,N1,N2)
-
 !
 !     UPDATE STATE VARIABLES FOR SEDIMENT TRANSPORT
 !
@@ -498,8 +499,8 @@ module ErosionMod
 !       :PCAC,PCAS=precip CaCO3,CaSO4
 !       :PALP,PFEP=precip AlPO4,FEPO4 in non-band
 !       :PALPB,PFEPB=precip AlPO4,FEPO4 in band
-!       :PCPM,PCPD,PCPH=precip CaH2PO4,CaHPO4,apatite in non-band
-!       :PCPMB,PCPDB,PCPHB=precip CaH2PO4,CaHPO4,apatite in band
+!       :PCPM,PCPD,PCPH=precip CaH4P2O8,CaHPO4,apatite in non-band
+!       :PCPMB,PCPDB,PCPHB=precip CaH4P2O8,CaHPO4,apatite in band
 !
               DO NTP=idsp_beg,idsp_end
                 trcp_ER(NTP,N,2,N5,N4)   =FSEDER*trcp_salml(NTP,NU(N2,N1),N2,N1)
@@ -656,8 +657,8 @@ module ErosionMod
 !       :PCAC,PCAS=precip CaCO3,CaSO4
 !       :PALP,PFEP=precip AlPO4,FEPO4 in non-band
 !       :PALPB,PFEPB=precip AlPO4,FEPO4 in band
-!       :PCPM,PCPD,PCPH=precip CaH2PO4,CaHPO4,apatite in non-band
-!       :PCPMB,PCPDB,PCPHB=precip CaH2PO4,CaHPO4,apatite in band
+!       :PCPM,PCPD,PCPH=precip CaH4P2O8,CaHPO4,apatite in non-band
+!       :PCPMB,PCPDB,PCPHB=precip CaH4P2O8,CaHPO4,apatite in band
 !
                 DO NTP=idsp_beg,idsp_end
                   trcp_ER(NTP,N,1,N5B,N4B)=FSEDER*trcp_salml(NTP,NU(N2,N1),N2,N1)

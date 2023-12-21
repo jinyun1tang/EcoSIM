@@ -133,7 +133,7 @@ module fileUtil
 
   character(len=*), parameter                            :: subname = 'namelist_to_buffer'
   character(len=ecosim_string_length_long)                 :: ioerror_msg
-  integer :: nml_unit, nml_error
+  integer :: nml_unit, nml_error,jj
 
   nml_unit = 16
 
@@ -152,7 +152,11 @@ module fileUtil
      else
         write(stdout, '(a, a, a)') "Read '", trim(namelist_filename), "' until EOF."
      end if
-
+     !remove junk
+     do jj=ecosim_namelist_buffer_size,1,-1
+       if(namelist_buffer(jj:jj)=='/')exit
+       namelist_buffer(jj:jj)=''
+     enddo
      write(stdout, '(a, a, i7, a)') subname, ": Read buffer of ", &
           len_trim(namelist_buffer), " characters."
      write(stdout, '(a)') "------------------------------"
@@ -163,6 +167,7 @@ module fileUtil
      write(stdout, '(a)') "------------------------------"
      write(stdout, '(a)') trim(namelist_buffer)
      write(stdout, '(a)') "------------------------------"
+     
   else
      write(stdout, '(a, a, i8, a, a)') subname, ": IO ERROR ", nml_error, &
           " opening namelist file : ", trim(namelist_filename)

@@ -10,22 +10,22 @@ module AqueChemDatatype
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
 
-  real(r8),target,allocatable ::  CAL(:,:,:)                         !soil Al content, [mg kg-1]
-  real(r8),target,allocatable ::  CFE(:,:,:)                         !soil Fe content, [mg kg-1]
-  real(r8),target,allocatable ::  CCA(:,:,:)                         !soil Ca content, [mg kg-1]
-  real(r8),target,allocatable ::  CMG(:,:,:)                         !soil Mg content, [mg kg-1]
-  real(r8),target,allocatable ::  CNA(:,:,:)                         !soil Na content, [mg kg-1]
-  real(r8),target,allocatable ::  CKA(:,:,:)                         !soil K content, [mg kg-1]
-  real(r8),target,allocatable ::  CSO4(:,:,:)                        !soil SO4 content, [mg kg-1]
-  real(r8),target,allocatable ::  CCL(:,:,:)                         !soil Cl content, [mg kg-1]
-  real(r8),target,allocatable ::  CALOH(:,:,:)                       !soil AlOH3 content, [mg kg-1]
-  real(r8),target,allocatable ::  CFEOH(:,:,:)                       !soil FeOH3 content, [mg kg-1]
-  real(r8),target,allocatable ::  CCACO(:,:,:)                       !soil CaCO3 content, [mg kg-1]
-  real(r8),target,allocatable ::  CCASO(:,:,:)                       !soil CaSO4 content, [mg kg-1]
-  real(r8),target,allocatable ::  CALPO(:,:,:)                       !soil AlPO4 content, [mg kg-1]
-  real(r8),target,allocatable ::  CFEPO(:,:,:)                       !soil FePO4 content, [mg kg-1]
-  real(r8),target,allocatable ::  CCAPD(:,:,:)                       !soil CaHPO4 content, [mg kg-1]
-  real(r8),target,allocatable ::  CCAPH(:,:,:)                       !soil apatite content, [mg kg-1]
+  real(r8),target,allocatable ::  CAL(:,:,:)                         !soil Al content, [mg Al kg-1]
+  real(r8),target,allocatable ::  CFE(:,:,:)                         !soil Fe content, [mg Fe kg-3]
+  real(r8),target,allocatable ::  CCA(:,:,:)                         !soil Ca content, [mg Ca kg-3]
+  real(r8),target,allocatable ::  CMG(:,:,:)                         !soil Mg content, [mg Mg kg-3]
+  real(r8),target,allocatable ::  CNA(:,:,:)                         !soil Na content, [mg Na kg-3]
+  real(r8),target,allocatable ::  CKA(:,:,:)                         !soil K content, [mg K kg-3]
+  real(r8),target,allocatable ::  CSO4(:,:,:)                        !soil SO4 content, [mg S kg-3]
+  real(r8),target,allocatable ::  CCL(:,:,:)                         !soil Cl content, [mg Cl kg-1]
+  real(r8),target,allocatable ::  CALOH(:,:,:)                       !soil AlOH3 content, [mg Al kg-1]
+  real(r8),target,allocatable ::  CFEOH(:,:,:)                       !soil FeOH3 content, [mg Fe kg-1]
+  real(r8),target,allocatable ::  CCACO(:,:,:)                       !soil CaCO3 content, [mg Ca kg-1]
+  real(r8),target,allocatable ::  CCASO(:,:,:)                       !soil CaSO4 content, [mg Ca kg-1]
+  real(r8),target,allocatable ::  CALPO(:,:,:)                       !soil AlPO4 content, [mg P kg-1]
+  real(r8),target,allocatable ::  CFEPO(:,:,:)                       !soil FePO4 content, [mg P kg-1]
+  real(r8),target,allocatable ::  CCAPD(:,:,:)                       !soil CaHPO4 content, [mg P kg-1]
+  real(r8),target,allocatable ::  CCAPH(:,:,:)                       !soil apatite content, [mg P kg-1]
   real(r8),target,allocatable ::  GKC4(:,:,:)                        !Ca-NH4 Gapon selectivity coefficient, [-]
   real(r8),target,allocatable ::  GKCH(:,:,:)                        !Ca-H Gapon selectivity coefficient, [-]
   real(r8),target,allocatable ::  GKCA(:,:,:)                        !Ca-Al Gapon selectivity coefficient, [-]
@@ -33,6 +33,7 @@ module AqueChemDatatype
   real(r8),target,allocatable ::  GKCN(:,:,:)                        !Ca-Na Gapon selectivity coefficient, [-]
   real(r8),target,allocatable ::  GKCK(:,:,:)                        !Ca-K Gapon selectivity coefficient, [-]
 
+  real(r8),target,allocatable :: trcsalt_rain_conc(:,:,:)            !salt tracer concentration in rain [g m-3]
   real(r8),target,allocatable :: trcSalt_solml(:,:,:,:)                !soil aqueous salt content micropre, [mol d-2]
   real(r8),target,allocatable :: trcx_solml(:,:,:,:)                 !exchangeable tracers
   real(r8),target,allocatable :: trcp_salml(:,:,:,:)                !salt precipitate in micropore
@@ -43,50 +44,39 @@ module AqueChemDatatype
 
   real(r8),target,allocatable :: trcSalt_soHml(:,:,:,:)
   real(r8),target,allocatable :: trcSalt_XFHS(:,:,:,:,:)
-  real(r8),target,allocatable :: trcSalt_XFLS(:,:,:,:,:)
-
-  real(r8),target,allocatable ::  XOCFXS(:,:,:,:)                    !total DOC micropore-macropore transfer, [g d-2 h-1]
-  real(r8),target,allocatable ::  XONFXS(:,:,:,:)                    !total DON micropore-macropore transfer, [g d-2 h-1]
-  real(r8),target,allocatable ::  XOPFXS(:,:,:,:)                    !total DOP micropore-macropore transfer, [g d-2 h-1]
-  real(r8),target,allocatable ::  XOAFXS(:,:,:,:)                    !total acetate micropore-macropore transfer, [g d-2 h-1]
-  real(r8),target,allocatable ::  trcs_XFXS(:,:,:,:)                 !total non-salt solute micropore-macropore transfer, [g d-2 h-1]
+  real(r8),target,allocatable :: trcSalt3DFlo2Cell(:,:,:,:,:)
+  real(r8),target,allocatable :: trcSaltIonNumber(:)                 !number of ions when the salt is fully dissociated
+  real(r8),target,allocatable ::  DOM_PoreTranspFlx(:,:,:,:,:)                    !total DOC micropore-macropore transfer, [g d-2 h-1]
+  real(r8),target,allocatable ::  trcs_PoreTranspFlx_vr(:,:,:,:)                 !total non-salt solute micropore-macropore transfer, [g d-2 h-1]
   real(r8),target,allocatable ::  trcSalt_XFXS(:,:,:,:)                !total salt micropore-macropore transfer non-band, [g d-2 h-1]
-  real(r8),target,allocatable ::  TRN4S(:,:,:)                       !total solute NH4 transformation non-band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRN3S(:,:,:)                       !total solute NH3 transformation non-band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRN4B(:,:,:)                       !total solute NH4 transformation band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRNO3(:,:,:)                       !total solute NO3 transformation non-band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRN3B(:,:,:)                       !total solute NH3 transformation band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRNOB(:,:,:)                       !total solute NO3 transformation band, [mol d-2 h-1]
+  real(r8),target,allocatable ::  trcn_RChem_soil_vr(:,:,:,:)                       !total solute NH4 transformation non-band, [mol d-2 h-1]
+  real(r8),target,allocatable ::  TR_NH3_soil_vr(:,:,:)                       !total solute NH3 transformation non-band, [mol d-2 h-1]
+
+  real(r8),target,allocatable ::  trcn_RChem_band_soil_vr(:,:,:,:)     !total solute nutrient transformation band, [mol d-2 h-1]
   real(r8),target,allocatable ::  trcSalt_TR(:,:,:,:)                  !total salt solute transformation non-band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRH1P(:,:,:)                       !total solute HPO4 transformation non-band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRH2P(:,:,:)                       !total solute H2PO4 transformation non-band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRH1B(:,:,:)                       !total solute HPO4 transformation band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRH2B(:,:,:)                       !total solute H2PO4 transformation band, [mol d-2 h-1]
   real(r8),target,allocatable ::  TRHCO(:,:,:)                       !total solute HCO3 transformation, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRCO2(:,:,:)                       !total solute CO2 transformation, [mol d-2 h-1]
+  real(r8),target,allocatable ::  TR_CO2_aqu_soil_vr(:,:,:)                       !total solute CO2 transformation, [mol d-2 h-1]
   real(r8),target,allocatable ::  TRH2O(:,:,:)                       !total solute H2O transformation, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRFE3(:,:,:)                       !total solute FeOH3 transformation, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRXHY(:,:,:)                       !total adsorbed H transformation, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRXAL(:,:,:)                       !total adsorbed Al transformation, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRXCA(:,:,:)                       !total adsorbed Ca transformation, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRXMG(:,:,:)                       !total adsorbed Mg transformation, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRXNA(:,:,:)                       !total adsorbed Na transformation, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRXKA(:,:,:)                       !total adsorbed K transformation, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRXHC(:,:,:)                       !total adsorbed COOH transformation, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRXAL2(:,:,:)                      !total adsorbed AlOH2 transformation, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRKAS(:,:,:)                       !total solute KSO4 transformation, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRXFE(:,:,:)                       !total Fe adsorption
-  real(r8),target,allocatable ::  TRXFE2(:,:,:)                      !total FeOH2 adsorption
-  real(r8),target,allocatable ::  trcx_TR(:,:,:,:)                   !total adsorbed OH- transformation non-band, [mol d-2 h-1]
+  real(r8),target,allocatable ::  TR_FeO3H3_soil(:,:,:)                       !total solute FeOH3 transformation, [mol d-2 h-1]
+  real(r8),target,allocatable ::  TR_H_p_sorbed_soil(:,:,:)                       !total adsorbed H transformation, [mol d-2 h-1]
+  real(r8),target,allocatable ::  TR_Al_sorbed_soil(:,:,:)                       !total adsorbed Al transformation, [mol d-2 h-1]
+  real(r8),target,allocatable ::  TR_Ca_sorbed_soil(:,:,:)                       !total adsorbed Ca transformation, [mol d-2 h-1]
+  real(r8),target,allocatable ::  TR_Mg_sorbed_soil(:,:,:)                       !total adsorbed Mg transformation, [mol d-2 h-1]
+  real(r8),target,allocatable ::  TR_Na_sorbed_soil(:,:,:)                       !total adsorbed Na transformation, [mol d-2 h-1]
+  real(r8),target,allocatable ::  TR_K_sorbed_soil(:,:,:)                       !total adsorbed K transformation, [mol d-2 h-1]
+  real(r8),target,allocatable ::  TR_HCO3_sorbed_soil(:,:,:)                       !total adsorbed COOH transformation, [mol d-2 h-1]
+  real(r8),target,allocatable ::  TR_AlO2H2_sorbed_soil(:,:,:)                      !total adsorbed AlOH2 transformation, [mol d-2 h-1]
+  real(r8),target,allocatable ::  TR_KSO4_soil(:,:,:)                       !total solute KSO4 transformation, [mol d-2 h-1]
+  real(r8),target,allocatable ::  TR_Fe_sorbed_soil(:,:,:)                       !total Fe adsorption
+  real(r8),target,allocatable ::  TR_FeO2H2_sorbed_soil(:,:,:)                      !total FeOH2 adsorption
+  real(r8),target,allocatable ::  trcx_TRSoilChem_vr(:,:,:,:)                   !total adsorbed OH- transformation non-band, [mol d-2 h-1]
   real(r8),target,allocatable ::  TBCO2(:,:,:)                       !total solute CO2 transformation boundary, [mol d-2 h-1]
   real(r8),target,allocatable ::  TBION(:,:,:)                       !total solute ion transformation boundary, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRNO2(:,:,:)                       !total solute NO2 transformation non-band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRN2B(:,:,:)                       !total solute NO2 transformation band, [mol d-2 h-1]
   real(r8),target,allocatable ::  TRN3G(:,:,:)                       !total gaseous NH3 transformation, [mol d-2 h-1]
-  real(r8),target,allocatable ::  trcp_TR(:,:,:,:)                   !total precipitated P containing transformation non-band, [mol d-2 h-1]
+  real(r8),target,allocatable ::  trcp_RChem_soil(:,:,:,:)                   !total precipitated P containing transformation non-band, [mol d-2 h-1]
   real(r8),target,allocatable ::  trcg_XBLS(:,:,:,:)
   real(r8),target,allocatable ::  trcn_XBLS(:,:,:,:)
-  real(r8),target,allocatable ::  trcSalt_XBLS(:,:,:,:)
+  real(r8),target,allocatable ::  trcSaltFlo2SnowLay(:,:,:,:)
   real(r8),target,allocatable ::  XCOBLS(:,:,:)                      !wet deposition of CO2, [g d-2 h-1]
   real(r8),target,allocatable ::  XCHBLS(:,:,:)                      !wet deposition of CH4, [g d-2 h-1]
   real(r8),target,allocatable ::  XOXBLS(:,:,:)                      !wet deposition of O2, [g d-2 h-1]
@@ -137,7 +127,7 @@ module AqueChemDatatype
   real(r8),target,allocatable ::  XF2PBS(:,:,:)                      !wet deposition of FeH2PO4, [g d-2 h-1]
   real(r8),target,allocatable ::  XC0PBS(:,:,:)                      !wet deposition of CaPO4, [g d-2 h-1]
   real(r8),target,allocatable ::  XC1PBS(:,:,:)                      !wet deposition of CHPO4, [g d-2 h-1]
-  real(r8),target,allocatable ::  XC2PBS(:,:,:)                      !wet deposition of CaH2PO4, [g d-2 h-1]
+  real(r8),target,allocatable ::  XC2PBS(:,:,:)                      !wet deposition of CaH4P2O8, [g d-2 h-1]
   real(r8),target,allocatable ::  XM1PBS(:,:,:)                      !wet deposition of MgHPO4, [g d-2 h-1]
   private :: InitAllocate
   contains
@@ -178,59 +168,51 @@ module AqueChemDatatype
   allocate(GKCK(JZ,JY,JX));     GKCK=0._r8
 
   allocate(trcSalt_solml(idsalt_beg:idsaltb_end,0:JZ,JY,JX));trcSalt_solml=0._r8
+  allocate(trcsalt_rain_conc(idsalt_beg:idsalt_end,JY,JX));trcsalt_rain_conc=0._r8
   allocate(trcx_solml(idx_beg:idx_end,0:JZ,JY,JX));trcx_solml=0._r8
   allocate(trcp_salml(idsp_beg:idsp_end,0:JZ,JY,JX)); trcp_salml=0._r8
-
+  allocate(trcSaltIonNumber(idsalt_beg:idsaltb_end))
   allocate(ECND(JZ,JY,JX));     ECND=0._r8
   allocate(CSTR(JZ,JY,JX));     CSTR=0._r8
   allocate(CION(JZ,JY,JX));     CION=0._r8
 
   allocate(trcSalt_soHml(idsalt_beg:idsaltb_end,JZ,JY,JX)); trcSalt_soHml=0._r8
-  allocate(XOCFXS(1:jcplx,JZ,JY,JX));XOCFXS=0._r8
-  allocate(XONFXS(1:jcplx,JZ,JY,JX));XONFXS=0._r8
-  allocate(XOPFXS(1:jcplx,JZ,JY,JX));XOPFXS=0._r8
-  allocate(XOAFXS(1:jcplx,JZ,JY,JX));XOAFXS=0._r8
-  allocate(trcs_XFXS(ids_beg:ids_end,JZ,JY,JX));   trcs_XFXS=0._r8
+  allocate(DOM_PoreTranspFlx(idom_beg:idom_end,1:jcplx,JZ,JY,JX));DOM_PoreTranspFlx=0._r8
+  allocate(trcs_PoreTranspFlx_vr(ids_beg:ids_end,JZ,JY,JX));   trcs_PoreTranspFlx_vr=0._r8
   allocate(trcSalt_XFXS(idsalt_beg:idsaltb_end,JZ,JY,JX));   trcSalt_XFXS=0._r8
-  allocate(TRN4S(0:JZ,JY,JX));  TRN4S=0._r8
-  allocate(TRN3S(0:JZ,JY,JX));  TRN3S=0._r8
-  allocate(TRN4B(JZ,JY,JX));    TRN4B=0._r8
-  allocate(TRNO3(0:JZ,JY,JX));  TRNO3=0._r8
-  allocate(TRN3B(JZ,JY,JX));    TRN3B=0._r8
-  allocate(TRNOB(JZ,JY,JX));    TRNOB=0._r8
-  allocate(trcSalt_TR(idsalt_beg:idsaltb_end,JZ,JY,JX));    trcSalt_TR=0._r8
-  allocate(trcx_TR(idx_beg:idx_end,0:JZ,JY,JX));  trcx_TR=0._r8
+  allocate(trcn_RChem_soil_vr(ids_nut_beg:ids_nuts_end,0:JZ,JY,JX)); trcn_RChem_soil_vr=0._r8
 
-  allocate(TRH1P(0:JZ,JY,JX));  TRH1P=0._r8
-  allocate(TRH2P(0:JZ,JY,JX));  TRH2P=0._r8
-  allocate(TRH1B(JZ,JY,JX));    TRH1B=0._r8
-  allocate(TRH2B(JZ,JY,JX));    TRH2B=0._r8
+  allocate(TR_NH3_soil_vr(0:JZ,JY,JX));  TR_NH3_soil_vr=0._r8
+
+  allocate(trcn_RChem_band_soil_vr(ids_nutb_beg:ids_nutb_end,JZ,JY,JX)); trcn_RChem_band_soil_vr=0._r8
+
+  allocate(trcSalt_TR(idsalt_beg:idsaltb_end,JZ,JY,JX));    trcSalt_TR=0._r8
+  allocate(trcx_TRSoilChem_vr(idx_beg:idx_end,0:JZ,JY,JX));  trcx_TRSoilChem_vr=0._r8
+
   allocate(TRHCO(JZ,JY,JX));    TRHCO=0._r8
-  allocate(TRCO2(JZ,JY,JX));    TRCO2=0._r8
+  allocate(TR_CO2_aqu_soil_vr(JZ,JY,JX));    TR_CO2_aqu_soil_vr=0._r8
   allocate(TRH2O(0:JZ,JY,JX));  TRH2O=0._r8
-  allocate(TRFE3(JZ,JY,JX));    TRFE3=0._r8
-  allocate(TRXHY(JZ,JY,JX));    TRXHY=0._r8
-  allocate(TRXAL(JZ,JY,JX));    TRXAL=0._r8
-  allocate(TRXCA(JZ,JY,JX));    TRXCA=0._r8
-  allocate(TRXMG(JZ,JY,JX));    TRXMG=0._r8
-  allocate(TRXNA(JZ,JY,JX));    TRXNA=0._r8
-  allocate(TRXKA(JZ,JY,JX));    TRXKA=0._r8
-  allocate(TRXHC(JZ,JY,JX));    TRXHC=0._r8
-  allocate(TRXAL2(JZ,JY,JX));   TRXAL2=0._r8
-  allocate(TRKAS(JZ,JY,JX));    TRKAS=0._r8
-  allocate(TRXFE(JZ,JY,JX));    TRXFE=0._r8
-  allocate(TRXFE2(JZ,JY,JX));   TRXFE2=0._r8
+  allocate(TR_FeO3H3_soil(JZ,JY,JX));    TR_FeO3H3_soil=0._r8
+  allocate(TR_H_p_sorbed_soil(JZ,JY,JX));    TR_H_p_sorbed_soil=0._r8
+  allocate(TR_Al_sorbed_soil(JZ,JY,JX));    TR_Al_sorbed_soil=0._r8
+  allocate(TR_Ca_sorbed_soil(JZ,JY,JX));    TR_Ca_sorbed_soil=0._r8
+  allocate(TR_Mg_sorbed_soil(JZ,JY,JX));    TR_Mg_sorbed_soil=0._r8
+  allocate(TR_Na_sorbed_soil(JZ,JY,JX));    TR_Na_sorbed_soil=0._r8
+  allocate(TR_K_sorbed_soil(JZ,JY,JX));    TR_K_sorbed_soil=0._r8
+  allocate(TR_HCO3_sorbed_soil(JZ,JY,JX));    TR_HCO3_sorbed_soil=0._r8
+  allocate(TR_AlO2H2_sorbed_soil(JZ,JY,JX));   TR_AlO2H2_sorbed_soil=0._r8
+  allocate(TR_KSO4_soil(JZ,JY,JX));    TR_KSO4_soil=0._r8
+  allocate(TR_Fe_sorbed_soil(JZ,JY,JX));    TR_Fe_sorbed_soil=0._r8
+  allocate(TR_FeO2H2_sorbed_soil(JZ,JY,JX));   TR_FeO2H2_sorbed_soil=0._r8
   allocate(TBCO2(JZ,JY,JX));    TBCO2=0._r8
   allocate(TBION(0:JZ,JY,JX));  TBION=0._r8
-  allocate(TRNO2(0:JZ,JY,JX));  TRNO2=0._r8
-  allocate(TRN2B(JZ,JY,JX));    TRN2B=0._r8
   allocate(TRN3G(0:JZ,JY,JX));  TRN3G=0._r8
-  allocate(trcp_TR(idsp_beg:idsp_end,0:JZ,JY,JX)); trcp_TR=0._r8
+  allocate(trcp_RChem_soil(idsp_beg:idsp_end,0:JZ,JY,JX)); trcp_RChem_soil=0._r8
   allocate(trcg_XBLS(idg_beg:idg_end-1,JS,JY,JX)); trcg_XBLS=0._r8
   allocate(trcn_XBLS(ids_nut_beg:ids_nuts_end,JS,JY,JX)); trcn_XBLS=0._r8
   if(salt_model)then
-    allocate(trcSalt_XBLS(idsalt_beg:idsalt_end,JS,JY,JX)); trcSalt_XBLS=0._r8
-    allocate(trcSalt_XFLS(idsalt_beg:idsaltb_end,3,0:JD,JV,JH));trcSalt_XFLS=0._r8
+    allocate(trcSaltFlo2SnowLay(idsalt_beg:idsalt_end,JS,JY,JX)); trcSaltFlo2SnowLay=0._r8
+    allocate(trcSalt3DFlo2Cell(idsalt_beg:idsaltb_end,3,0:JD,JV,JH));trcSalt3DFlo2Cell=0._r8
     allocate(trcSalt_XFHS(idsalt_beg:idsaltb_end,3,JD,JV,JH));trcSalt_XFHS=0._r8
   endif
   allocate(XCOBLS(JS,JY,JX));   XCOBLS=0._r8
@@ -318,46 +300,33 @@ module AqueChemDatatype
   call destroy(trcSalt_TR)
   call destroy(trcx_solml)
   call destroy(trcSalt_solml)
+  call destroy(trcsalt_rain_conc)
   call destroy(trcSalt_soHml)
   call destroy(trcp_salml)
   call destroy(ECND)
   call destroy(CSTR)
   call destroy(CION)
   call destroy(trcSalt_XFXS)
-  call destroy(trcSalt_XFLS)
+  call destroy(trcSalt3DFlo2Cell)
   call destroy(trcSalt_XFHS)
-  call destroy(XOCFXS)
-  call destroy(XONFXS)
-  call destroy(XOPFXS)
-  call destroy(XOAFXS)
-  call destroy(TRN4S)
-  call destroy(TRN3S)
-  call destroy(TRN4B)
-  call destroy(TRNO3)
-  call destroy(TRN3B)
-  call destroy(TRNOB)
-  call destroy(TRH1P)
-  call destroy(TRH2P)
-  call destroy(TRH1B)
-  call destroy(TRH2B)
+  call destroy(TR_NH3_soil_vr)
+  call destroy(trcn_RChem_band_soil_vr)
   call destroy(TRHCO)
-  call destroy(TRCO2)
+  call destroy(TR_CO2_aqu_soil_vr)
   call destroy(TRH2O)
-  call destroy(TRFE3)
-  call destroy(TRXAL)
-  call destroy(TRXCA)
-  call destroy(TRXMG)
-  call destroy(TRXNA)
-  call destroy(TRXKA)
-  call destroy(TRXHC)
-  call destroy(TRXAL2)
-  call destroy(TRKAS)
-  call destroy(TRXFE)
-  call destroy(TRXFE2)
+  call destroy(TR_FeO3H3_soil)
+  call destroy(TR_Al_sorbed_soil)
+  call destroy(TR_Ca_sorbed_soil)
+  call destroy(TR_Mg_sorbed_soil)
+  call destroy(TR_Na_sorbed_soil)
+  call destroy(TR_K_sorbed_soil)
+  call destroy(TR_HCO3_sorbed_soil)
+  call destroy(TR_AlO2H2_sorbed_soil)
+  call destroy(TR_KSO4_soil)
+  call destroy(TR_Fe_sorbed_soil)
+  call destroy(TR_FeO2H2_sorbed_soil)
   call destroy(TBCO2)
   call destroy(TBION)
-  call destroy(TRNO2)
-  call destroy(TRN2B)
   call destroy(TRN3G)
   call destroy(XCOBLS)
   call destroy(XCHBLS)
@@ -411,8 +380,10 @@ module AqueChemDatatype
   call destroy(XC1PBS)
   call destroy(XC2PBS)
   call destroy(XM1PBS)
-
-  call destroy(trcs_XFXS)
+  call destroy(trcSaltIonNumber)
+  call destroy(trcs_PoreTranspFlx_vr)
+  call destroy(DOM_PoreTranspFlx)
+  call destroy(trcn_RChem_soil_vr)
   end subroutine DestructAquaChem
 
 end module AqueChemDatatype

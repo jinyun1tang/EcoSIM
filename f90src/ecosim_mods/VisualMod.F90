@@ -26,7 +26,7 @@ module VisualMod
 
   character(len=*), parameter :: mod_filename = &
   __FILE__
-  real(r8) :: TCSNX,TTRN,TTLE,TTSH,TTGH,TTCO,TTCH
+  real(r8) :: TCSNX,TTRN,TTLE,TTSH,TEco_Heat_Grnd_col,TTCO,TTCH
 
   integer :: L,NX,NY,N
 
@@ -119,21 +119,21 @@ module VisualMod
 !
 ! SELECT YEARS
 !
-  IF(IYRC.GE.IYR1.AND.IYRC.LE.IYR2)THEN
+  IF(iYearCurrent.GE.IYR1.AND.iYearCurrent.LE.IYR2)THEN
     TTRN=0.0_r8
     TTLE=0.0_r8
     TTSH=0.0_r8
-    TTGH=0.0_r8
+    TEco_Heat_Grnd_col=0.0_r8
     TTCO=0.0_r8
     TTCH=0.0_r8
     D9995: DO NX=NHW,NHE
       D9990: DO NY=NVN,NVS
-        TTRN=TTRN+TRN(NY,NX)
-        TTLE=TTLE+TLE(NY,NX)
-        TTSH=TTSH+TSH(NY,NX)
-        TTGH=TTGH+TGH(NY,NX)
-        TTCO=TTCO+TCNET(NY,NX)
-        TTCH=TTCH+HCH4G(NY,NX)
+        TTRN=TTRN+Eco_NetRad_col(NY,NX)
+        TTLE=TTLE+Eco_Heat_Latent_col(NY,NX)
+        TTSH=TTSH+Eco_Heat_Sens_col(NY,NX)
+        TEco_Heat_Grnd_col=TEco_Heat_Grnd_col+Eco_Heat_Grnd_col(NY,NX)
+        TTCO=TTCO+Eco_NEE_col(NY,NX)
+        TTCH=TTCH+SurfGasFlx(idg_CH4,NY,NX)
         IF(J.EQ.24)THEN
           IF(NU(NY,NX).EQ.7)THEN
             SWC(NY,NX)=(VLWatMicP(8,NY,NX)+AMIN1(VLMacP(8,NY,NX) &
@@ -151,8 +151,8 @@ module VisualMod
 !
 !     HOURLY AGGREGATION
 !
-!     IF(IFLGC(NZ,NY,NX).EQ.PlantIsActive)THEN
-!     IF(I.EQ.IDAY0(NZ,NY,NX))THEN
+!     IF(IsPlantActive_pft(NZ,NY,NX).EQ.iPlantIsActive)THEN
+!     IF(I.EQ.iDayPlanting_pft(NZ,NY,NX))THEN
 !     ND=0
 !     TCCTX=0.0
 !     TCCMX=0.0
@@ -161,15 +161,15 @@ module VisualMod
 !     TCCTD=0.0
 !     TCCMD=-50.0
 !     ENDIF
-!     TCCTD=TCCTD+TCC(NZ,NY,NX)
-!     TCCMD=AMAX1(TCCMD,TCC(NZ,NY,NX))
+!     TCCTD=TCCTD+TCelciusCanopy_pft(NZ,NY,NX)
+!     TCCMD=AMAX1(TCCMD,TCelciusCanopy_pft(NZ,NY,NX))
 !     IF(J.EQ.24)THEN
 !     TCCAD=TCCTD/24
 !     TCCTX=TCCTX+TCCAD
 !     TCCMX=TCCMX+TCCMD
 !     ND=ND+1
 !     ENDIF
-!     IF(I.EQ.IDAYH(NZ,NY,NX)-1)THEN
+!     IF(I.EQ.iDayPlantHarvest_pft(NZ,NY,NX)-1)THEN
 !     TCCAS=TCCTX/ND
 !     TCCMS=TCCMX/ND
 !     ENDIF
@@ -183,11 +183,11 @@ module VisualMod
 !     DAILY AND SEASONAL OUTPUT
 !
 !     IF(J.EQ.24)THEN
-!     IYRZ=IYRC
+!     IYRZ=iYearCurrent
 !     XI=REAL(I)
-!     XP=REAL(IDAY0(NZ,NY,NX))
-!     XH=REAL(IDAYH(NZ,NY,NX))
-!     IF(I.EQ.IDAY0(NZ,NY,NX))THEN
+!     XP=REAL(iDayPlanting_pft(NZ,NY,NX))
+!     XH=REAL(iDayPlantHarvest_pft(NZ,NY,NX))
+!     IF(I.EQ.iDayPlanting_pft(NZ,NY,NX))THEN
          D9980: DO N=1,100
            OUT(N)=0.0_r8
          ENDDO D9980
@@ -195,30 +195,30 @@ module VisualMod
 !     IF(I.EQ.1)THEN
 !     TCSNY=0.0
 !     ENDIF
-!     DTCSN=TESN0(ielmc,NZ,NY,NX)-TCSNY
+!     DTCSN=SurfLitrfallChemElmnts_pft(ielmc,NZ,NY,NX)-TCSNY
 !     TCSNX=TCSNX+DTCSN
-!     TCSNY=TESN0(ielmc,NZ,NY,NX)
-!     IF(I.EQ.IDAY0(NZ,NY,NX).OR.I.EQ.IDAYH(NZ,NY,NX))THEN
+!     TCSNY=SurfLitrfallChemElmnts_pft(ielmc,NZ,NY,NX)
+!     IF(I.EQ.iDayPlanting_pft(NZ,NY,NX).OR.I.EQ.iDayPlantHarvest_pft(NZ,NY,NX))THEN
 !     ICHKA=0
 !     ICHKM=0
 !     TCSNX=0.0
 !     ENDIF
-          OUT(1)=0.001_r8*CARBN(1,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
-          OUT(2)=0.001_r8*CARBN(3,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
-          OUT(3)=0.001_r8*CARBN(2,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
-          OUT(4)=-0.001_r8*TCO2T(1,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
-          OUT(5)=-0.001_r8*TCO2T(3,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
-          OUT(6)=-0.001_r8*TCO2T(2,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
-          OUT(7)=0.001_r8*TGPP(NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
-          OUT(8)=0.001_r8*TNPP(NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
-          OUT(9)=-0.001_r8*TRAU(NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
-          OUT(10)=-0.001_r8*THRE(NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
-          OUT(11)=0.001_r8*TNBP(NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
-          OUT(12)=-0.001_r8*HCO2G(NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
-          OUT(13)=-0.001_r8*HCH4G(NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
-          OUT(14)=TRN(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
-          OUT(15)=-TLE(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
-          OUT(16)=-TSH(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
+          OUT(1)=0.001_r8*GrossCO2Fix_pft(1,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
+          OUT(2)=0.001_r8*GrossCO2Fix_pft(3,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
+          OUT(3)=0.001_r8*GrossCO2Fix_pft(2,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
+          OUT(4)=-0.001_r8*GrossResp_pft(1,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
+          OUT(5)=-0.001_r8*GrossResp_pft(3,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
+          OUT(6)=-0.001_r8*GrossResp_pft(2,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
+          OUT(7)=0.001_r8*Eco_GPP_col(NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
+          OUT(8)=0.001_r8*Eco_NPP_col(NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
+          OUT(9)=-0.001_r8*Eco_AutoR_col(NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
+          OUT(10)=-0.001_r8*Eco_HR_col(NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
+          OUT(11)=0.001_r8*Eco_NBP_col(NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
+          OUT(12)=-0.001_r8*SurfGasFlx(idg_CO2,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
+          OUT(13)=-0.001_r8*SurfGasFlx(idg_CH4,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
+          OUT(14)=Eco_NetRad_col(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
+          OUT(15)=-Eco_Heat_Latent_col(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
+          OUT(16)=-Eco_Heat_Sens_col(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
           L=1
           D60: DO N=17,27
             OUT(N)=(VLWatMicP(L,NY,NX)+AMIN1(VLMacP(L,NY,NX),VLWatMacP(L,NY,NX)))/VGeomLayer(L,NY,NX)
@@ -230,25 +230,25 @@ module VisualMod
             OUT(N)=TKS(L,NY,NX)
             L=L+1
           ENDDO D61
-          OUT(39)=-1000.0*ETCanP(1,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(40)=-1000.0*ETCanP(3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(41)=-1000.0*ETCanP(2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(39)=-1000.0*ETCanopy_pft(1,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(40)=-1000.0*ETCanopy_pft(3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(41)=-1000.0*ETCanopy_pft(2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
           OUT(42)=1000.0*UEVAP(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
           OUT(43)=OUT(42)-OUT(39)-OUT(40)-OUT(41)
           OUT(44)=1000.0*URUN(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
           OUT(45)=1000.0*UVOLO(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
           OUT(46)=-(DepthInternalWTBL(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX))
           OUT(47)=SnowDepth(NY,NX)
-          OUT(48)=CanopyLA_grd(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(49)=0.001_r8*WTLFE(ielmc,1,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(50)=0.001_r8*WTLFE(ielmc,3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(51)=0.001_r8*WTLFE(ielmc,2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(52)=0.001_r8*WTSTKE(ielmc,1,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(53)=0.001_r8*WTSTKE(ielmc,3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(54)=0.001_r8*WTSTKE(ielmc,2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(55)=0.001_r8*WTRTE(ielmc,1,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(56)=0.001_r8*WTRTE(ielmc,3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(57)=0.001_r8*WTRTE(ielmc,2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(48)=CanopyLeafArea_grd(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(49)=0.001_r8*LeafChemElmnts_pft(ielmc,1,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(50)=0.001_r8*LeafChemElmnts_pft(ielmc,3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(51)=0.001_r8*LeafChemElmnts_pft(ielmc,2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(52)=0.001_r8*StalkChemElmnts_pft(ielmc,1,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(53)=0.001_r8*StalkChemElmnts_pft(ielmc,3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(54)=0.001_r8*StalkChemElmnts_pft(ielmc,2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(55)=0.001_r8*RootElmnts_pft(ielmc,1,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(56)=0.001_r8*RootElmnts_pft(ielmc,3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(57)=0.001_r8*RootElmnts_pft(ielmc,2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
           L=0
           D62: DO N=58,68
             OUT(N)=0.001_r8*ORGC(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -257,9 +257,9 @@ module VisualMod
 !
 !     WRITE OUTPUT
 !
-!     WRITE(19,91)'ECOSYS_HUMMOCK',IYRC,I,J,(OUT(N),N=1,38)
+!     WRITE(19,91)'ECOSYS_HUMMOCK',iYearCurrent,I,J,(OUT(N),N=1,38)
 !     IF(J.EQ.24)THEN
-!     WRITE(20,96)'ECOSYS_HUMMOCK',IYRC,I,(OUT(N),N=39,68)
+!     WRITE(20,96)'ECOSYS_HUMMOCK',iYearCurrent,I,(OUT(N),N=39,68)
 !     ENDIF
 !     ENDIF
 90        FORMAT(50A16)
@@ -271,16 +271,16 @@ module VisualMod
 !
 !     WRITE LANDSCAPE OUTPUT
 !
-    WRITE(19,2025)'FLUXES',IYRC,I,J,TTRN*277.8/TAREA &
-      ,TTLE*277.8/TAREA,TTSH*277.8/TAREA,TTGH*277.8/TAREA &
+    WRITE(19,2025)'FLUXES',iYearCurrent,I,J,TTRN*277.8/TAREA &
+      ,TTLE*277.8/TAREA,TTSH*277.8/TAREA,TEco_Heat_Grnd_col*277.8/TAREA &
       ,TTCO*23.14815/TAREA,TTCH*23.14815/TAREA &
-      ,((TCNET(NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.14815 &
+      ,((Eco_NEE_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.14815 &
       ,NX=NHW,NHE),NY=NVN,NVS),DEFAULT &
-      ,((HCH4G(NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.14815 &
+      ,((SurfGasFlx(idg_CH4,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.14815 &
       ,NX=NHW,NHE),NY=NVN,NVS)
 2025  FORMAT(A16,3I6,100E12.4)
     IF(J.EQ.24)THEN
-      WRITE(20,2026)'SWC',IYRC,I,J,((SnowDepth(NY,NX) &
+      WRITE(20,2026)'SWC',iYearCurrent,I,J,((SnowDepth(NY,NX) &
       ,NX=NHW,NHE),NY=NVN,NVS),DEFAULT &
       ,((SWC(NY,NX),NX=NHW,NHE),NY=NVN,NVS),DEFAULT &
       ,((-(ActiveLayDepth(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)) &
