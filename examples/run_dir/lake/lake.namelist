@@ -17,7 +17,7 @@ lverbose=.false.
 plant_model=.true.
 microbial_model=.true.
 soichem_model=.true.
-
+grid_mode=1
 !set up output variable lists
 !set up the first year of simulation
 start_date  = '199010101000000'

@@ -15,7 +15,8 @@ clm_factor_in='NO'
 atm_ghg_in='../../../input_data/fatm_hist_GHGs_1750-2022.nc'
 
 lverbose=.false.
-
+grid_mode=3
+disp_planttrait=.true.
 !set up output variable lists
 !set up the first year of simulation
 start_date  = '19900101000000'
@@ -39,10 +40,10 @@ hist_nhtfrq=-24
 
 !namelist for timer
 &ecosim_time
-rest_opt='nmonths'  !'ndays','nmonths','nyears'
+rest_opt='never'  !'ndays','nmonths','nyears'
 rest_frq=1
 delta_time=3600.
-stop_n=1            !this shall overwrite what is set in forc_periods
+stop_n=3            !this shall overwrite what is set in forc_periods
 stop_option='nyears' !run by nyears, nmonths, ndays,
 diag_frq=1
 diag_opt='nsteps'
