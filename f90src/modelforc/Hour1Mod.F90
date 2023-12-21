@@ -227,7 +227,7 @@ module Hour1Mod
 !
         NGTopRootLayer_pft(NZ,NY,NX)=MAX(NGTopRootLayer_pft(NZ,NY,NX),NU(NY,NX))
         NIXBotRootLayer_pft(NZ,NY,NX)=MAX(NIXBotRootLayer_pft(NZ,NY,NX),NU(NY,NX))
-        DO  NR=1,JC
+        DO  NR=1,NumOfCanopyLayers
           NIXBotRootLayer_rpft(NR,NZ,NY,NX)=MAX(NIXBotRootLayer_rpft(NR,NZ,NY,NX),NU(NY,NX))
         ENDDO
       ENDDO

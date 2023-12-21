@@ -10,6 +10,7 @@ module WatsubMod
   use data_const_mod, only : GravAcceleration=>DAT_CONST_G
   use abortutils   , only : endrun, print_info
   use minimathmod  , only : isclose, isclose,safe_adb,vapsat,AZMAX1,AZMIN1,AZMAX1t
+  use ElmIDMod     , only : iewstdir,insthdir,ivertdir
   use EcosimConst
   use MiniFuncMod
   use EcoSIMSolverPar
@@ -48,9 +49,6 @@ module WatsubMod
 
   character(len=*), parameter :: mod_filename = &
   __FILE__
-  integer, parameter :: iewstdir=1   !east-west direction
-  integer, parameter :: insthdir=2   !north-south direction
-  integer, parameter :: ivertdir=3   !vertical direction
   real(r8), parameter :: mGravAccelerat=1.e-3_r8*GravAcceleration  !gravitational constant devided by 1000.
   integer :: curday,curhour
 

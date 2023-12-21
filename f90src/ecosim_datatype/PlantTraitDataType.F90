@@ -177,15 +177,15 @@ contains
   allocate(FWODBE(NumOfPlantChemElmnts,1:NumOfPlantLitrCmplxs));  FWODBE=0._r8
   allocate(FWODRE(NumOfPlantChemElmnts,1:NumOfPlantLitrCmplxs));  FWODRE=0._r8         !
   allocate(FWOODE(NumOfPlantChemElmnts,1:NumOfPlantLitrCmplxs));  FWOODE=0._r8         !woody element allocation
-  allocate(CanopyBranchStemApft_lyr(JC,MaxNumBranches,JP,JY,JX));CanopyBranchStemApft_lyr=0._r8
+  allocate(CanopyBranchStemApft_lyr(NumOfCanopyLayers,MaxNumBranches,JP,JY,JX));CanopyBranchStemApft_lyr=0._r8
   allocate(CanopyLeafArea_pft(JP,JY,JX));    CanopyLeafArea_pft=0._r8
   allocate(CanopyArea_pft(JP,JY,JX));    CanopyArea_pft=0._r8
   allocate(ARLFX(JY,JX));       ARLFX=0._r8
   allocate(CanopyStemA_pft(JP,JY,JX));    CanopyStemA_pft=0._r8
   allocate(CanopyHeight_pft(JP,JY,JX));       CanopyHeight_pft=0._r8
   allocate(ARSTX(JY,JX));       ARSTX=0._r8
-  allocate(CanopyLAgrid_lyr(JC,JY,JX));    CanopyLAgrid_lyr=0._r8
-  allocate(CanopyStemA_lyr(JC,JY,JX));    CanopyStemA_lyr=0._r8
+  allocate(CanopyLAgrid_lyr(NumOfCanopyLayers,JY,JX));    CanopyLAgrid_lyr=0._r8
+  allocate(CanopyStemA_lyr(NumOfCanopyLayers,JY,JX));    CanopyStemA_lyr=0._r8
   allocate(CanopyLeafArea_grd(JY,JX));       CanopyLeafArea_grd=0._r8
   allocate(StemArea_grd(JY,JX));       StemArea_grd=0._r8
   allocate(CanopyArea_grd(JY,JX));       CanopyArea_grd=0._r8
@@ -197,7 +197,7 @@ contains
   allocate(SeedAreaMean_pft(JP,JY,JX));     SeedAreaMean_pft=0._r8
   allocate(HypoctoHeight_pft(JP,JY,JX));    HypoctoHeight_pft=0._r8
   allocate(MaxCanopyHeight_grd(JY,JX));          MaxCanopyHeight_grd=0._r8
-  allocate(CanopyHeightz_col(0:JC,JY,JX));     CanopyHeightz_col=0._r8
+  allocate(CanopyHeightz_col(0:NumOfCanopyLayers,JY,JX));     CanopyHeightz_col=0._r8
   allocate(BranchAngle_pft(JP,JY,JX));    BranchAngle_pft=0._r8
   allocate(PetioleAngle_pft(JP,JY,JX));    PetioleAngle_pft=0._r8
   allocate(SineBranchAngle_pft(JP,JY,JX));    SineBranchAngle_pft=0._r8
@@ -274,7 +274,7 @@ contains
   allocate(SLA1(JP,JY,JX));     SLA1=0._r8
   allocate(TCelsChill4Leaf_pft(JP,JY,JX));      TCelsChill4Leaf_pft=0._r8
   allocate(SSL1(JP,JY,JX));     SSL1=0._r8
-  allocate(HourThreshold4LeafOut_brch(JC,JP,JY,JX));  HourThreshold4LeafOut_brch=0._r8
+  allocate(HourThreshold4LeafOut_brch(NumOfCanopyLayers,JP,JY,JX));  HourThreshold4LeafOut_brch=0._r8
   allocate(NumOfBranches_pft(JP,JY,JX));      NumOfBranches_pft=0
   allocate(BranchNumber_pft(JP,JY,JX));      BranchNumber_pft=0
   allocate(BranchNumber_brch(MaxNumBranches,JP,JY,JX));  BranchNumber_brch=0
@@ -321,7 +321,7 @@ contains
   allocate(CriticalPhotoPeriod_pft(JP,JY,JX));      CriticalPhotoPeriod_pft=0._r8
   allocate(PhotoPeriodSens_pft(JP,JY,JX));     PhotoPeriodSens_pft=0._r8
   allocate(ClumpFactorInit_pft(JP,JY,JX));      ClumpFactorInit_pft=0._r8
-  allocate(HourThreshold4LeafOff_brch(JC,JP,JY,JX));  HourThreshold4LeafOff_brch=0._r8
+  allocate(HourThreshold4LeafOff_brch(NumOfCanopyLayers,JP,JY,JX));  HourThreshold4LeafOff_brch=0._r8
   allocate(OFFST(JP,JY,JX));    OFFST=0._r8
   end subroutine InitPlantTraits
 

@@ -822,7 +822,7 @@ implicit none
 
   data1d_ptr => this%histr_1D_WIND_col(beg_col:end_col)   
   call hist_addfld1d(fname='WIND',units='m/s',avgflag='A',&
-    long_name='wind spee',ptr_col=data1d_ptr)      
+    long_name='wind speed',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%histr_1D_PREC_col(beg_col:end_col)   
   call hist_addfld1d(fname='PREC',units='mm H2O/m2',avgflag='A',&

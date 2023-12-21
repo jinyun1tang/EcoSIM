@@ -183,7 +183,7 @@ module readiMod
   integer, intent(in) :: NHW,NHE,NVN,NVS
   real(r8) :: DHI(JX),DVI(JY)
   character(len=200) :: tline
-  real(r8) :: XI
+  integer :: XI
   integer :: NY,NX
   integer :: IETYPG
   integer :: ierr,jj,loc
@@ -327,9 +327,9 @@ module readiMod
 !     DayLenthMax=maximum daylength (h)
 !
       IF(ALAT(NY,NX).GT.0.0_r8)THEN
-        XI=173._r8
+        XI=173
       ELSE
-        XI=356._r8
+        XI=356
       ENDIF
       DayLenthMax(NY,NX)=GetDayLength(ALAT(NY,NX),XI)
 

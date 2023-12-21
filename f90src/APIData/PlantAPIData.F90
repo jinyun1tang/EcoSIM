@@ -14,7 +14,7 @@ implicit none
   integer, pointer :: MaxNumRootAxes          !maximum number of root layers
   integer, pointer :: MaxNumBranches         !maximum number of plant branches
   integer, pointer :: JP1         !number of plants
-  integer, pointer :: NumOfSkyAzimuthSectors1        !number of sectors for the sky azimuth  [0,2*pi]
+  integer, pointer :: NumOfSkyAzimuSects1        !number of sectors for the sky azimuth  [0,2*pi]
   integer, pointer :: jcplx       !number of organo-microbial CO2CompenPoint_nodeexes
   integer, pointer :: NumOfLeafAzimuthSectors1        !number of sectors for the leaf azimuth, [0,pi]
   integer, pointer :: NumOfCanopyLayers1         !number of canopy layers
@@ -159,8 +159,8 @@ implicit none
   real(r8) :: CosineGrndSlope_col      !cosine of slope, [-]
   real(r8) :: LWRadGrnd    !longwave radiation emitted by ground surface, [MJ m-2 h-1]
   real(r8) :: LWRadSky       !sky longwave radiation , [MJ d-2 h-1]
-  real(r8) :: SineSolarAngleNextHour     !sine of solar angle next hour, [-]
-  real(r8) :: SineSolarAngle      !sine of solar angle, [-]
+  real(r8) :: SineSolarIncliAngleNextHour     !sine of solar angle next hour, [-]
+  real(r8) :: SineSolarIncliAngle      !sine of solar angle, [-]
   real(r8), pointer :: CanopySWAlbedo_pft(:)     => null() !canopy shortwave albedo , [-]
   real(r8), pointer :: CanopyPARalbedo_pft(:)     => null() !canopy PAR albedo , [-]
   real(r8), pointer :: TAU_RadCapt(:)     => null() !fraction of radiation intercepted by canopy layer, [-]
@@ -1536,7 +1536,7 @@ implicit none
   NumOfCanopyLayers1    => pltpar%NumOfCanopyLayers1
   JP1    => pltpar%JP1
   NumOfLeafAzimuthSectors1   => pltpar%NumOfLeafAzimuthSectors
-  NumOfSkyAzimuthSectors1   => pltpar%NumOfSkyAzimuthSectors1
+  NumOfSkyAzimuSects1   => pltpar%NumOfSkyAzimuSects1
   NumOfLeafZenithSectors1   => pltpar%NumOfLeafZenithSectors1
   MaxNodesPerBranch1 => pltpar%MaxNodesPerBranch1
   !the following variable should be consistent with the soil bgc model
@@ -1619,20 +1619,20 @@ implicit none
   implicit none
   class(plant_radiation_type) :: this
 
-  allocate(this%PARDirect_zsec(NumOfLeafZenithSectors1,NumOfSkyAzimuthSectors1,NumOfCanopyLayers1,JP1))
-  allocate(this%PARDiffus_zsec(NumOfLeafZenithSectors1,NumOfSkyAzimuthSectors1,NumOfCanopyLayers1,JP1))
+  allocate(this%PARDirect_zsec(NumOfLeafZenithSectors1,NumOfSkyAzimuSects1,NumOfCanopyLayers1,JP1))
+  allocate(this%PARDiffus_zsec(NumOfLeafZenithSectors1,NumOfSkyAzimuSects1,NumOfCanopyLayers1,JP1))
   allocate(this%CanopySWAlbedo_pft(JP1))
   allocate(this%CanopyPARalbedo_pft(JP1))
   allocate(this%TAU_RadCapt(NumOfCanopyLayers1+1))
   allocate(this%TAU_RadThru(NumOfCanopyLayers1+1))
   allocate(this%LWRadCanP(JP1))
   allocate(this%RadSWbyCanopy_pft(JP1))
-  allocate(this%OMEGX(NumOfSkyAzimuthSectors1,NumOfLeafZenithSectors1,NumOfLeafAzimuthSectors1))
-  allocate(this%OMEGAG(NumOfSkyAzimuthSectors1))
-  allocate(this%OMEGA(NumOfSkyAzimuthSectors1,NumOfLeafZenithSectors1,NumOfLeafAzimuthSectors1))
+  allocate(this%OMEGX(NumOfSkyAzimuSects1,NumOfLeafZenithSectors1,NumOfLeafAzimuthSectors1))
+  allocate(this%OMEGAG(NumOfSkyAzimuSects1))
+  allocate(this%OMEGA(NumOfSkyAzimuSects1,NumOfLeafZenithSectors1,NumOfLeafAzimuthSectors1))
   allocate(this%SineLeafAngle(NumOfLeafZenithSectors1))
   allocate(this%CosineLeafAngle(NumOfLeafZenithSectors1))
-  allocate(this%IALBY(NumOfSkyAzimuthSectors1,NumOfLeafZenithSectors1,NumOfLeafAzimuthSectors1))
+  allocate(this%IALBY(NumOfSkyAzimuSects1,NumOfLeafZenithSectors1,NumOfLeafAzimuthSectors1))
   allocate(this%RadNet2CanP(JP1))
   allocate(this%CanopySWabsorpty_pft(JP1))
   allocate(this%CanopyPARabsorpty_pft(JP1))

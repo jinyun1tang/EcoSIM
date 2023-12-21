@@ -15,6 +15,7 @@ module RunoffBalMod
   USE GridDataType
   use EcoSIMCtrlMod
   use EcoSIMConfig, only : jcplx => jcplxc
+  use ElmIDMod     , only : iewstdir,insthdir,ivertdir  
   use EcosimConst, only : patomw,natomw
 implicit none
   private
@@ -43,11 +44,12 @@ implicit none
 !     N2,N1=NY,NX of source grid cell
 !     N5,N4=NY,NX of destination grid cell
 !
+!flow from west to east, north to south, up to down
     N1=NX
     N2=NY
     D9980: DO N=FlowDirIndicator(NY,NX),3
       D9975: DO NN=1,2
-        IF(N.EQ.1)THEN
+        IF(N.EQ.iewstdir)THEN
           !east-west direction
           IF(NN.EQ.1)THEN
             IF(NX.EQ.NHE)THEN
@@ -70,7 +72,7 @@ implicit none
               cycle
             ENDIF
           ENDIF
-        ELSEIF(N.EQ.2)THEN
+        ELSEIF(N.EQ.insthdir)THEN
           !north-south direction
           IF(NN.EQ.1)THEN
             IF(NY.EQ.NVS)THEN
@@ -93,7 +95,7 @@ implicit none
               cycle
             ENDIF
           ENDIF
-        ELSEIF(N.EQ.3)THEN
+        ELSEIF(N.EQ.ivertdir)THEN
           !vertical direction
           IF(NN.EQ.1)THEN
             IF(L.EQ.NL(NY,NX))THEN
@@ -124,13 +126,15 @@ implicit none
 
   subroutine RunoffXBoundaryFluxes(L,N,NY,NX,N1,N2,N4,N5,NN,XN,CXR,ZXR,PXR,ZGR)
   implicit none
-  integer, intent(in) :: L,N,NY,NX
+  integer, intent(in) :: L   !vertical layer
+  integer, intent(in) :: N   !horizontal direction
+  integer, intent(in) :: NY,NX  !geographic location
   integer, intent(in) :: N1,N2,N4,N5,NN
-  real(r8), intent(in) :: XN
+  real(r8), intent(in) :: XN  !-1 outgoing, 1 incoming
   real(r8), intent(out) :: CXR,ZXR,PXR,ZGR
 
   real(r8) :: SS1,SS2,SS3,SS4,SSR
-  real(r8) :: COR,ZOR,POR
+  real(r8) :: OMRof(NumOfPlantChemElmnts)
   real(r8) :: CXE,COE,COD
   real(r8) :: ECHY,ECOH,ECAL,ECFE,ECCA,ECMG,ECNA,ECKA
   real(r8) :: ECCO,ECHC,ECSO,ECCL,ECNO
@@ -141,16 +145,17 @@ implicit none
   real(r8) :: WX,HGR,PSS
   real(r8) :: WQRN,HQRN
   real(r8) :: OXR,ER
-  integer :: K,M,NO,NGL
+  integer :: K,M,NO,NGL,NE
 
 !     begin_execution
 !     RUNOFF BOUNDARY FLUXES OF WATER AND HEAT
 !
-!     QR,QS,WatBySnowRedistribution,IceBySnowRedistribution=runoff from surface water, snowpack snow,water,ice from watsub.f
+!     QR,QS,WatBySnowRedistribution,IceBySnowRedistribution=runoff from surface water, 
+!     snowpack snow,water,ice from watsub.f
 !     CRUN,URUN=cumulative water and snow runoff
 !     HEATOU=cumulative heat loss through lateral and lower boundaries
 !
-  IF(N.NE.3.AND.L.EQ.NU(NY,NX))THEN
+  IF(N.NE.ivertdir.AND.L.EQ.NU(NY,NX))THEN
     !horizontal direction and surface layer
     WQRN=XN*Wat2GridBySurfRunoff(N,NN,N5,N4)
     WQRH(N2,N1)=WQRH(N2,N1)+WQRN
@@ -177,22 +182,21 @@ implicit none
         +trcn_2DFloXSurRunoff(ids_NO3,N,NN,N5,N4)+trcn_2DFloXSurRunoff(ids_NO2,N,NN,N5,N4))
       ZGR=XN*(trcg_2DFloXSurRunoff(idg_N2O,N,NN,N5,N4)+trcg_2DFloXSurRunoff(idg_N2,N,NN,N5,N4))
       PXR=XN*(trcn_2DFloXSurRunoff(ids_H2PO4,N,NN,N5,N4)+trcn_2DFloXSurRunoff(ids_H1PO4,N,NN,N5,N4))
-      COR=0.0_r8
-      ZOR=0.0_r8
-      POR=0.0_r8
+      OMRof(:)=0.0_r8
       D2575: DO K=1,jcplx
-        COR=COR+XN*(dom_2DFloXSurRunoff(idom_doc,K,N,NN,N5,N4)+dom_2DFloXSurRunoff(idom_acetate,K,N,NN,N5,N4))
-        ZOR=ZOR+XN*dom_2DFloXSurRunoff(idom_don,K,N,NN,N5,N4)
-        POR=POR+XN*dom_2DFloXSurRunoff(idom_dop,K,N,NN,N5,N4)
+        DO NE=1,NumOfPlantChemElmnts
+          OMRof(NE)=OMRof(NE)+XN*dom_2DFloXSurRunoff(idom_doc,K,N,NN,N5,N4)
+        ENDDO
+        OMRof(ielmc)=OMRof(ielmc)+XN*dom_2DFloXSurRunoff(idom_acetate,K,N,NN,N5,N4)
       ENDDO D2575
-      TCOU=TCOU-CXR-COR
-      TZOU=TZOU-ZXR-ZOR-ZGR
-      TPOU=TPOU-PXR-POR
-      HDOCQ(NY,NX)=-COR
+      TCOU=TCOU-CXR-OMRof(ielmc)
+      TZOU=TZOU-ZXR-OMRof(ielmn)-ZGR
+      TPOU=TPOU-PXR-OMRof(ielmp)
+      HDOCQ(NY,NX)=-OMRof(ielmc)
       HDICQ(NY,NX)=-CXR
-      HydroDONFlx_col(NY,NX)=HydroDONFlx_col(NY,NX)-ZOR
+      HydroDONFlx_col(NY,NX)=HydroDONFlx_col(NY,NX)-OMRof(ielmn)
       HydroDINFlx_col(NY,NX)=HydroDINFlx_col(NY,NX)-ZXR-ZGR
-      HydroDOPFlx_col(NY,NX)=HydroDOPFlx_col(NY,NX)-POR
+      HydroDOPFlx_col(NY,NX)=HydroDOPFlx_col(NY,NX)-OMRof(ielmp)
       HydroDIPFlx_col(NY,NX)=HydroDIPFlx_col(NY,NX)-PXR
       OXR=XN*trcg_2DFloXSurRunoff(idg_O2,N,NN,N5,N4)
       OXYGOU=OXYGOU-OXR
@@ -459,7 +463,7 @@ implicit none
 !     VOLWOU,HEATOU=cumulative water, heat loss through lateral and lower boundaries
 !     UVOLO,FWatDischarge=cumulative,hourly water loss through lateral and lower boundaries
 !
-  IF(FlowDirIndicator(NY,NX).NE.3.OR.N.EQ.3)THEN
+  IF(FlowDirIndicator(NY,NX).NE.3.OR.N.EQ.ivertdir)THEN
     HEATOU=HEATOU-XN*HeatFlow2Soil(N,N6,N5,N4)
     WO=XN*(WaterFlowSoiMicP(N,N6,N5,N4)+WaterFlowMacP(N,N6,N5,N4))   !<0, going out grid
 

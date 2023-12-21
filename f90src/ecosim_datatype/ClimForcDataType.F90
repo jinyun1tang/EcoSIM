@@ -5,7 +5,6 @@ implicit none
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
 
-  real(r8) :: DECLIN
   real(r8) :: RMAX       !maximum hourly radiation,	[MJ m-2 h-1]
   real(r8) :: TAVG1      !parameter to calculate hourly  air temperature from daily value	[oC]
   real(r8) :: TAVG2      !parameter to calculate hourly  air temperature from daily value	[oC]
@@ -97,8 +96,8 @@ implicit none
   real(r8),target,allocatable ::  RadSWDiffus_col(:,:)                          !diffuse shortwave radiation, [W m-2]
   real(r8),target,allocatable ::  PARDirect_col(:,:)                          !direct PAR, [umol m-2 s-1]
   real(r8),target,allocatable ::  PARDiffus_col(:,:)                          !diffuse PAR, [umol m-2 s-1]
-  real(r8),target,allocatable ::  SineSolarAngle(:,:)                          !sine of solar angle, [-]
-  real(r8),target,allocatable ::  SineSolarAngleNextHour(:,:)                         !sine of solar angle next hour, [-]
+  real(r8),target,allocatable ::  SineSolarIncliAngle(:,:)                          !sine of solar angle, [-]
+  real(r8),target,allocatable ::  SineSolarIncliAngleNextHour(:,:)                         !sine of solar angle next hour, [-]
   real(r8),target,allocatable ::  TLEX(:,:)                          !total latent heat flux x boundary layer resistance, [MJ m-1]
   real(r8),target,allocatable ::  TSHX(:,:)                          !total sensible heat flux x boundary layer resistance, [MJ m-1]
   real(r8),target,allocatable ::  Canopy_Heat_Latent_col(:,:)                          !total latent heat flux x boundary layer resistance, [MJ m-1]
@@ -196,7 +195,7 @@ implicit none
   allocate(DayLenthCurrent(JY,JX));        DayLenthCurrent=0._r8
   allocate(DayLenthPrev(JY,JX));        DayLenthPrev=0._r8
   allocate(DayLenthMax(JY,JX));        DayLenthMax=0._r8
-  allocate(OMEGAG(NumOfSkyAzimuthSectors,JY,JX));  OMEGAG=0._r8
+  allocate(OMEGAG(NumOfSkyAzimuSects,JY,JX));  OMEGAG=0._r8
   allocate(LWRadSky(JY,JX));         LWRadSky=0._r8
   allocate(TRAD(JY,JX));        TRAD=0._r8
   allocate(TAMX(JY,JX));        TAMX=0._r8
@@ -228,8 +227,8 @@ implicit none
   allocate(RadSWDiffus_col(JY,JX));        RadSWDiffus_col=0._r8
   allocate(PARDirect_col(JY,JX));        PARDirect_col=0._r8
   allocate(PARDiffus_col(JY,JX));        PARDiffus_col=0._r8
-  allocate(SineSolarAngle(JY,JX));        SineSolarAngle=0._r8
-  allocate(SineSolarAngleNextHour(JY,JX));       SineSolarAngleNextHour=0._r8
+  allocate(SineSolarIncliAngle(JY,JX));        SineSolarIncliAngle=0._r8
+  allocate(SineSolarIncliAngleNextHour(JY,JX));       SineSolarIncliAngleNextHour=0._r8
   allocate(TLEX(JY,JX));        TLEX=0._r8
   allocate(TSHX(JY,JX));        TSHX=0._r8
   allocate(Canopy_Heat_Latent_col(JY,JX));        Canopy_Heat_Latent_col=0._r8
@@ -359,8 +358,8 @@ implicit none
   call destroy(RadSWDiffus_col)
   call destroy(PARDirect_col)
   call destroy(PARDiffus_col)
-  call destroy(SineSolarAngle)
-  call destroy(SineSolarAngleNextHour)
+  call destroy(SineSolarIncliAngle)
+  call destroy(SineSolarIncliAngleNextHour)
   call destroy(TLEX)
   call destroy(TSHX)
   call destroy(Canopy_Heat_Latent_col)

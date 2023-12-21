@@ -215,8 +215,8 @@ module CanopyDataType
   allocate(RadSWbyCanopy_pft(JP,JY,JX));     RadSWbyCanopy_pft=0._r8
   allocate(RadPARbyCanopy_pft(JP,JY,JX));     RadPARbyCanopy_pft=0._r8
   allocate(FracRadPARbyCanopy_pft(JP,JY,JX));    FracRadPARbyCanopy_pft=0._r8
-  allocate(TAU_RadThru(JC+1,JY,JX));   TAU_RadThru=0._r8
-  allocate(TAU_RadCapt(JC+1,JY,JX));   TAU_RadCapt=0._r8
+  allocate(TAU_RadThru(NumOfCanopyLayers+1,JY,JX));   TAU_RadThru=0._r8
+  allocate(TAU_RadCapt(NumOfCanopyLayers+1,JY,JX));   TAU_RadCapt=0._r8
   allocate(FracSWRad2Grnd(JY,JX));       FracSWRad2Grnd=0._r8
   allocate(SWRadOnGrnd(JY,JX));        SWRadOnGrnd=0._r8
   allocate(LWRadCanGPrev(JY,JX));      LWRadCanGPrev=0._r8
@@ -252,7 +252,7 @@ module CanopyDataType
   allocate(TKCanopy_pft(JP,JY,JX));     TKCanopy_pft=0._r8
   allocate(CPOOL3(MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));CPOOL3=0._r8
   allocate(NetCumElmntFlx2Plant_pft(NumOfPlantChemElmnts,JP,JY,JX));    NetCumElmntFlx2Plant_pft=0._r8
-  allocate(WGLFT(JC,JY,JX));    WGLFT=0._r8
+  allocate(WGLFT(NumOfCanopyLayers,JY,JX));    WGLFT=0._r8
   allocate(CFOPE(NumOfPlantChemElmnts,0:NumLitterGroups,jsken,JP,JY,JX));CFOPE=0._r8
   allocate(ShootChemElmnts_pft(NumOfPlantChemElmnts,JP,JY,JX)); ShootChemElmnts_pft=0._r8
   allocate(LeafChemElmnts_pft(NumOfPlantChemElmnts,JP,JY,JX));  LeafChemElmnts_pft=0._r8
@@ -264,12 +264,12 @@ module CanopyDataType
   allocate(EarChemElmnts_pft(NumOfPlantChemElmnts,JP,JY,JX));    EarChemElmnts_pft=0._r8
   allocate(GrainChemElmnts_pft(NumOfPlantChemElmnts,JP,JY,JX));     GrainChemElmnts_pft=0._r8
   allocate(CanopyLeafShethC_pft(JP,JY,JX));     CanopyLeafShethC_pft=0._r8
-  allocate(CanopyLeafApft_lyr(JC,JP,JY,JX)); CanopyLeafApft_lyr=0._r8
+  allocate(CanopyLeafApft_lyr(NumOfCanopyLayers,JP,JY,JX)); CanopyLeafApft_lyr=0._r8
   allocate(CO2NetFix_pft(JP,JY,JX));     CO2NetFix_pft=0._r8
-  allocate(CanopyLeafCpft_lyr(JC,JP,JY,JX)); CanopyLeafCpft_lyr=0._r8
+  allocate(CanopyLeafCpft_lyr(NumOfCanopyLayers,JP,JY,JX)); CanopyLeafCpft_lyr=0._r8
   allocate(CanopyNonstructElements_pft(NumOfPlantChemElmnts,JP,JY,JX));   CanopyNonstructElements_pft=0._r8
   allocate(CanopyNonstructElementConc_pft(NumOfPlantChemElmnts,JP,JY,JX));   CanopyNonstructElementConc_pft=0._r8
-  allocate(CanopyStemApft_lyr(JC,JP,JY,JX)); CanopyStemApft_lyr=0._r8
+  allocate(CanopyStemApft_lyr(NumOfCanopyLayers,JP,JY,JX)); CanopyStemApft_lyr=0._r8
   allocate(NoduleNonstructElmnt_pft(NumOfPlantChemElmnts,JP,JY,JX));   NoduleNonstructElmnt_pft=0._r8
   allocate(StalkBiomassC_brch(MaxNumBranches,JP,JY,JX));StalkBiomassC_brch=0._r8
   allocate(NonstructElmnt_brch(NumOfPlantChemElmnts,MaxNumBranches,JP,JY,JX)); NonstructElmnt_brch=0._r8
@@ -291,8 +291,8 @@ module CanopyDataType
   allocate(LeafElmntNode_brch(NumOfPlantChemElmnts,0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));LeafElmntNode_brch=0._r8
   allocate(PetioleElmntNode_brch(NumOfPlantChemElmnts,0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));PetioleElmntNode_brch=0._r8
   allocate(InternodeChemElmnt_brch(NumOfPlantChemElmnts,0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));InternodeChemElmnt_brch=0._r8
-  allocate(LeafChemElmntByLayer_pft(NumOfPlantChemElmnts,JC,0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));LeafChemElmntByLayer_pft=0._r8
-  allocate(CanopyLeafAreaByLayer_pft(JC,0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));CanopyLeafAreaByLayer_pft=0._r8
+  allocate(LeafChemElmntByLayer_pft(NumOfPlantChemElmnts,NumOfCanopyLayers,0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));LeafChemElmntByLayer_pft=0._r8
+  allocate(CanopyLeafAreaByLayer_pft(NumOfCanopyLayers,0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));CanopyLeafAreaByLayer_pft=0._r8
   allocate(LeafProteinCNode_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));LeafProteinCNode_brch=0._r8
   allocate(PetioleProteinCNode_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));PetioleProteinCNode_brch=0._r8
   allocate(NoduleNonstructCconc_pft(JP,JY,JX));   NoduleNonstructCconc_pft=0._r8

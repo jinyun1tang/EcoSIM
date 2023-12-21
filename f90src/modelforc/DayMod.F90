@@ -37,7 +37,7 @@
   CHARACTER(len=3) :: CHARN1,CHARN2
   CHARACTER(len=4) :: CHARN3
 
-  real(r8) :: CORP,DECDAY,DIRRA1,DIRRA2,FW,FZ
+  real(r8) :: CORP,DIRRA1,DIRRA2,FW,FZ
   real(r8) :: RR,TFZ,TWP,TVW,XI
 
   integer :: ITYPE,I2,I3,J,L,M,N,NN,N1,N2,N3,NX,NY,NZ
@@ -197,11 +197,8 @@
 !     ALAT=latitude
 !
       DayLenthPrev(NY,NX)=DayLenthCurrent(NY,NX)
-      XI=I
-      IF(I.EQ.366)XI=365.5_r8
-      DECDAY=XI+100
 
-      DayLenthCurrent(NY,NX)=GetDayLength(ALAT(NY,NX),XI,DECLIN)
+      DayLenthCurrent(NY,NX)=GetDayLength(ALAT(NY,NX),I)
 !
 !     TIME STEP OF WEARHER DATA
 !     ITYPE 1=daily,2=hourly

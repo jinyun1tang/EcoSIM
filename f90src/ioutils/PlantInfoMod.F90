@@ -26,7 +26,7 @@ implicit none
   save
   character(len=*),private, parameter :: mod_filename = &
   __FILE__
-  integer :: IDX,IMO,IYR,IDY,ICUT,IDYE,IDYG,IDYS,JCUT,LPY
+  integer :: IDX,IMO,IYR,IDY,ICUT,IDYE,IDYG,IDYS,NumOfCanopyLayersUT,LPY
 
   public :: ReadPlantInfo
   contains
@@ -235,7 +235,7 @@ implicit none
               DO nn1=1,pft_nmgnt(NZ)
                 tstr=trim(pft_mgmtinfo(NN1,NZ))
                 read(tstr,'(I2,I2,I4)')IDX,IMO,IYR
-                READ(TSTR,*)DY,ICUT,JCUT,HCUT,PCUT,ECUT11,ECUT12,ECUT13,&
+                READ(TSTR,*)DY,ICUT,NumOfCanopyLayersUT,HCUT,PCUT,ECUT11,ECUT12,ECUT13,&
                    ECUT14,ECUT21,ECUT22,ECUT23,ECUT24
 
                 if(isLeap(iyr) .and. IMO.GT.2)LPY=1
@@ -246,14 +246,14 @@ implicit none
                   IDY=30*(IMO-1)+ICOR(IMO-1)+IDX+LPY
                 endif
 
-                IF(IDY.GT.0.AND.JCUT.EQ.1)THEN
+                IF(IDY.GT.0.AND.NumOfCanopyLayersUT.EQ.1)THEN
                   iDayPlantHarvest_pft(NZ,NY,NX)=IDY
                   IYR=yearc
                   iYearPlantHarvest_pft(NZ,NY,NX)=MIN(IYR,iYearCurrent)
                 ENDIF
 
                 iHarvstType_pft(NZ,IDY,NY,NX)=ICUT
-                jHarvst_pft(NZ,IDY,NY,NX)=JCUT
+                jHarvst_pft(NZ,IDY,NY,NX)=NumOfCanopyLayersUT
                 HVST(NZ,IDY,NY,NX)=HCUT
                 THIN_pft(NZ,IDY,NY,NX)=PCUT
                 EHVST(1,iplthvst_leaf,NZ,IDY,NY,NX)=ECUT11
@@ -272,7 +272,7 @@ implicit none
                     IDYE=IDY
                     D580: DO IDYG=IDYS+1,IDYE-1
                       iHarvstType_pft(NZ,IDYG,NY,NX)=ICUT
-                      jHarvst_pft(NZ,IDYG,NY,NX)=JCUT
+                      jHarvst_pft(NZ,IDYG,NY,NX)=NumOfCanopyLayersUT
                       HVST(NZ,IDYG,NY,NX)=HCUT
                       THIN_pft(NZ,IDYG,NY,NX)=PCUT
                       EHVST(1,iplthvst_leaf,NZ,IDYG,NY,NX)=ECUT11
@@ -355,7 +355,7 @@ implicit none
     IF(CriticalPhotoPeriod_pft(NZ,NY,NX).LT.0.0_r8)THEN
       CriticalPhotoPeriod_pft(NZ,NY,NX)=DayLenthMax(NY,NX)
     ENDIF
-    D5: DO NB=1,JC
+    D5: DO NB=1,NumOfCanopyLayers
       IF(iPlantPhenologyType_pft(NZ,NY,NX).EQ.iphenotyp_evgreen.AND.iPlantPhenologyPattern_pft(NZ,NY,NX).NE.iplt_annual)THEN
         HourThreshold4LeafOut_brch(NB,NZ,NY,NX)=AMIN1(4380.0_r8,VRNLI+144.0_r8*iPlantInitThermoAdaptZone(NZ,NY,NX)*(NB-1))
         HourThreshold4LeafOff_brch(NB,NZ,NY,NX)=AMIN1(4380.0_r8,VRNXI+144.0_r8*iPlantInitThermoAdaptZone(NZ,NY,NX)*(NB-1))

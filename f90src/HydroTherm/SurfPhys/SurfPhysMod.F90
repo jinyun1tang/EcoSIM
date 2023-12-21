@@ -887,7 +887,7 @@ contains
 !
   DO  N=1,2
     DO  NN=1,2
-      IF(N.EQ.idirew)THEN
+      IF(N.EQ.iewstdir)THEN
         !east-west
         IF(NX.EQ.NHE.AND.NN.EQ.1.OR.NX.EQ.NHW.AND.NN.EQ.2)THEN
           !at the boundary
@@ -898,7 +898,7 @@ contains
           N4B=NX-1
           N5B=NY
         ENDIF
-      ELSEIF(N.EQ.idirns)THEN
+      ELSEIF(N.EQ.insthdir)THEN
         !south-north
         IF(NY.EQ.NVS.AND.NN.EQ.1.OR.NY.EQ.NVN.AND.NN.EQ.2)THEN
           !at the boundary

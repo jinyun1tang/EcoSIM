@@ -52,7 +52,7 @@
     CanopyLeafArea_pft    =>  plt_morph%CanopyLeafArea_pft  , &
     ZEROP    =>  plt_biom%ZEROP   , &
     CNETX    =>  plt_bgcr%CNETX   , &
-    SineSolarAngle     =>  plt_rad%SineSolarAngle     , &
+    SineSolarIncliAngle     =>  plt_rad%SineSolarIncliAngle     , &
     AirConc_pft     =>  plt_photo%AirConc_pft   , &
     MinCanPStomaResistH2O_pft     =>  plt_photo%MinCanPStomaResistH2O_pft   , &
     CanPCi2CaRatio     =>  plt_photo%CanPCi2CaRatio   , &
@@ -91,12 +91,12 @@
 !
 !     LeafIntracellularCO2_pft=intercellular CO2 concentration
 !     CanPCi2CaRatio=intercellular:atmospheric CO2 concn ratio from PFT file, parameter
-!     SineSolarAngle=sine of solar angle
+!     SineSolarIncliAngle=sine of solar angle
 !     CanopyLeafArea_pft=PFT leaf area
 !
   LeafIntracellularCO2_pft(NZ)=CanPCi2CaRatio(NZ)*CanopyGasCO2_pft(NZ)
 
-  IF(SineSolarAngle.GT.0.0.AND.CanopyLeafArea_pft(NZ).GT.ZEROP(NZ))THEN
+  IF(SineSolarIncliAngle.GT.0.0.AND.CanopyLeafArea_pft(NZ).GT.ZEROP(NZ))THEN
 !
     call PhotoActivePFT(NZ)
   ELSE
@@ -219,7 +219,7 @@
 !     FOR EACH INCLINATION AND AZIMUTH CLASS
 !
   DO N=1,NumOfLeafZenithSectors1
-    DO M=1,NumOfSkyAzimuthSectors1
+    DO M=1,NumOfSkyAzimuSects1
       IF(LeafAUnshaded_zsec(N,L,K,NB,NZ).GT.ZEROP(NZ))THEN
 !
 !     SUNLIT LEAVES
@@ -501,7 +501,7 @@
 !     FOR EACH INCLINATION AND AZIMUTH CLASS
 !
   DO  N=1,NumOfLeafZenithSectors1
-    DO  M=1,NumOfSkyAzimuthSectors1
+    DO  M=1,NumOfSkyAzimuSects1
       IF(LeafAUnshaded_zsec(N,L,K,NB,NZ).GT.ZEROP(NZ))THEN
 !
 !     SUNLIT LEAVES

@@ -131,9 +131,9 @@ implicit none
   NHE = bounds%NHE;NVS = bounds%NVS
   ncols = bounds%ncols
   npfts = bounds%npfts
-  sz2=max(MaxNumBranches+1,JZ+1,JC)
+  sz2=max(MaxNumBranches+1,JZ+1,NumOfCanopyLayers)
   sz3=max(jsken,NumOfPlantChemElmnts,JZ+1,MaxNodesPerBranch+1)
-  sz4=max(MaxNodesPerBranch+1,JC)
+  sz4=max(MaxNodesPerBranch+1,NumOfCanopyLayers)
   sz5=max(NumOfLeafZenithSectors,NumOfPlantChemElmnts)
 
   allocate(datrp_3d(bounds%begp:bounds%endp,sz3,sz2))
@@ -2310,7 +2310,7 @@ implicit none
   endif
 
   if(flag=='read')then
-    datpr2 => datrp_2d(1:npfts,1:JC)
+    datpr2 => datrp_2d(1:npfts,1:NumOfCanopyLayers)
     call restartvar(ncid, flag, varname='CanopyLeafApft_lyr', dim1name='pft',dim2name='levcan',&
      long_name='pft canopy layer leaf area', units='m2 d-2', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
@@ -2320,14 +2320,14 @@ implicit none
     !print*,'CanopyLeafApft_lyr'
     if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,CanopyLeafApft_lyr,datrp_2d,&
       NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft)   
-    datpr2 => datrp_2d(1:npfts,1:JC)
+    datpr2 => datrp_2d(1:npfts,1:NumOfCanopyLayers)
     call restartvar(ncid, flag, varname='CanopyLeafApft_lyr', dim1name='pft',dim2name='levcan',&
      long_name='pft canopy layer leaf area', units='m2 d-2', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
   endif
 
   if(flag=='read')then
-    datpr2 => datrp_2d(1:npfts,1:JC)
+    datpr2 => datrp_2d(1:npfts,1:NumOfCanopyLayers)
     call restartvar(ncid, flag, varname='CanopyStemApft_lyr', dim1name='pft',dim2name='levcan',&
      long_name='plant canopy layer stem area', units='m2 d-2', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
@@ -2337,7 +2337,7 @@ implicit none
     !print*,'CanopyStemApft_lyr'
     if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,CanopyStemApft_lyr,datrp_2d,&
       NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft)   
-    datpr2 => datrp_2d(1:npfts,1:JC)
+    datpr2 => datrp_2d(1:npfts,1:NumOfCanopyLayers)
     call restartvar(ncid, flag, varname='CanopyStemApft_lyr', dim1name='pft',dim2name='levcan',&
      long_name='plant canopy layer stem area', units='m2 d-2', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
@@ -2553,7 +2553,7 @@ implicit none
   endif  
 
   if(flag=='read')then 
-    datpr4 => datrp_4d(1:npfts,1:JC,1:MaxNodesPerBranch,1:MaxNumBranches)
+    datpr4 => datrp_4d(1:npfts,1:NumOfCanopyLayers,1:MaxNodesPerBranch,1:MaxNumBranches)
     call restartvar(ncid, flag, varname='CanopyLeafAreaByLayer_pft', dim1name='pft',dim2name='levcan',&
      dim3name='nodes',dim4name='nbranches',long_name='plant layer node branch leaf area', units='m2 d-2', &
      interpinic_flag='skip', data=datpr4, missing_value=spval, fill_value=spval)
@@ -2562,14 +2562,14 @@ implicit none
     !print*,'CanopyLeafAreaByLayer_pft'
     if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,CanopyLeafAreaByLayer_pft,datrp_4d,NumActivePlants=NumActivePlants,&
       IsPlantActive_pft=IsPlantActive_pft)   
-    datpr4 => datrp_4d(1:npfts,1:JC,1:MaxNodesPerBranch,1:MaxNumBranches)
+    datpr4 => datrp_4d(1:npfts,1:NumOfCanopyLayers,1:MaxNodesPerBranch,1:MaxNumBranches)
     call restartvar(ncid, flag, varname='CanopyLeafAreaByLayer_pft', dim1name='pft',dim2name='levcan',&
      dim3name='nodes',dim4name='nbranches',long_name='plant layer node branch leaf area', units='m2 d-2', &
      interpinic_flag='skip', data=datpr4, missing_value=spval, fill_value=spval)
   endif  
 
   if(flag=='read')then 
-    datpr5 => datrp_5d(1:npfts,1:NumOfPlantChemElmnts,1:JC,1:MaxNodesPerBranch,1:MaxNumBranches)
+    datpr5 => datrp_5d(1:npfts,1:NumOfPlantChemElmnts,1:NumOfCanopyLayers,1:MaxNodesPerBranch,1:MaxNumBranches)
     call restartvar(ncid, flag, varname='LeafChemElmntByLayer_pft', dim1name='pft',dim2name='elmnts',&
      dim3name='levcan',dim4name='nodes',dim5name='nbranches',long_name='layer leaf element',&
      units='g d-2',interpinic_flag='skip', data=datpr5, missing_value=spval, fill_value=spval)
@@ -2578,14 +2578,14 @@ implicit none
     !print*,'LeafChemElmntByLayer_pft'
     if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,LeafChemElmntByLayer_pft,datrp_5d,NumActivePlants=NumActivePlants,&
       IsPlantActive_pft=IsPlantActive_pft)   
-    datpr5 => datrp_5d(1:npfts,1:NumOfPlantChemElmnts,1:JC,1:MaxNodesPerBranch,1:MaxNumBranches)
+    datpr5 => datrp_5d(1:npfts,1:NumOfPlantChemElmnts,1:NumOfCanopyLayers,1:MaxNodesPerBranch,1:MaxNumBranches)
     call restartvar(ncid, flag, varname='LeafChemElmntByLayer_pft', dim1name='pft',dim2name='elmnts',&
       dim3name='levcan',dim4name='nodes',dim5name='nbranches',long_name='layer leaf element',&
       units='g d-2',interpinic_flag='skip', data=datpr5, missing_value=spval, fill_value=spval)
   endif  
 
   if(flag=='read')then 
-    datpr5 => datrp_5d(1:npfts,1:NumOfLeafZenithSectors,1:JC,1:MaxNodesPerBranch,1:MaxNumBranches)
+    datpr5 => datrp_5d(1:npfts,1:NumOfLeafZenithSectors,1:NumOfCanopyLayers,1:MaxNodesPerBranch,1:MaxNumBranches)
     call restartvar(ncid, flag, varname='LeafAreaZsec_brch', dim1name='pft',dim2name='cansecz',&
       dim3name='levcan',dim4name='nodes',dim5name='nbranches',long_name='leaf surface area',&
       units='m2 d-2',interpinic_flag='skip', data=datpr5, missing_value=spval, fill_value=spval)
@@ -2595,14 +2595,14 @@ implicit none
     !print*,'LeafAreaZsec_brch'
     if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,LeafAreaZsec_brch,datrp_5d,&
       NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft) 
-    datpr5 => datrp_5d(1:npfts,1:NumOfLeafZenithSectors,1:JC,1:MaxNodesPerBranch,1:MaxNumBranches)
+    datpr5 => datrp_5d(1:npfts,1:NumOfLeafZenithSectors,1:NumOfCanopyLayers,1:MaxNodesPerBranch,1:MaxNumBranches)
     call restartvar(ncid, flag, varname='LeafAreaZsec_brch', dim1name='pft',dim2name='cansecz',&
       dim3name='levcan',dim4name='nodes',dim5name='nbranches',long_name='leaf surface area',&
       units='m2 d-2',interpinic_flag='skip', data=datpr5, missing_value=spval, fill_value=spval)
   endif  
 
   if(flag=='read')then 
-    datpr3 => datrp_3d(1:npfts,1:JC,1:MaxNumBranches)
+    datpr3 => datrp_3d(1:npfts,1:NumOfCanopyLayers,1:MaxNumBranches)
     call restartvar(ncid, flag, varname='CanopyBranchStemApft_lyr', dim1name='pft',dim2name='levcan',&
      dim3name='nbranches',long_name='plant canopy layer branch stem layer area', units='m2 d-2', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)       
@@ -2612,14 +2612,14 @@ implicit none
     !print*,'CanopyBranchStemApft_lyr'
     if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,CanopyBranchStemApft_lyr,datrp_3d,&
       NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft)   
-    datpr3 => datrp_3d(1:npfts,1:JC,1:MaxNumBranches)
+    datpr3 => datrp_3d(1:npfts,1:NumOfCanopyLayers,1:MaxNumBranches)
     call restartvar(ncid, flag, varname='CanopyBranchStemApft_lyr', dim1name='pft',dim2name='levcan',&
      dim3name='nbranches',long_name='plant canopy layer branch stem layer area', units='m2 d-2', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)   
   endif  
 
   if(flag=='read')then 
-    datpr4 => datrp_4d(1:npfts,1:NumOfLeafZenithSectors,1:JC,1:MaxNumBranches)
+    datpr4 => datrp_4d(1:npfts,1:NumOfLeafZenithSectors,1:NumOfCanopyLayers,1:MaxNumBranches)
     call restartvar(ncid, flag, varname='StemAreaZsec_brch', dim1name='pft',dim2name='cansecz',&
       dim3name='levcan',dim4name='nbranches',long_name='stem surface area', units='m2 d-2', &
      interpinic_flag='skip', data=datpr4, missing_value=spval, fill_value=spval)       
@@ -2629,7 +2629,7 @@ implicit none
     !print*,'StemAreaZsec_brch'
     if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,StemAreaZsec_brch,datrp_4d,&
       NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft)   
-    datpr4 => datrp_4d(1:npfts,1:NumOfLeafZenithSectors,1:JC,1:MaxNumBranches)
+    datpr4 => datrp_4d(1:npfts,1:NumOfLeafZenithSectors,1:NumOfCanopyLayers,1:MaxNumBranches)
     call restartvar(ncid, flag, varname='StemAreaZsec_brch', dim1name='pft',dim2name='cansecz',&
       dim3name='levcan',dim4name='nbranches',long_name='stem surface area', units='m2 d-2', &
      interpinic_flag='skip', data=datpr4, missing_value=spval, fill_value=spval)       
@@ -3150,7 +3150,7 @@ implicit none
   endif  
 
   if(flag=='read')then
-    datpr3 => datrp_3d(1:npfts, 1:pltpar%jroots,1:JC)
+    datpr3 => datrp_3d(1:npfts, 1:pltpar%jroots,1:NumOfCanopyLayers)
     call restartvar(ncid, flag, varname='PrimRootDepth', dim1name='pft',dim2name='rootyps',&
      dim3name='levcan',long_name='primary root layer depth', units='m', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)  
@@ -3159,7 +3159,7 @@ implicit none
     !print*,'PrimRootDepth'
     if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,PrimRootDepth,datrp_3d,NumActivePlants=NumActivePlants,&
       IsPlantActive_pft=IsPlantActive_pft)   
-    datpr3 => datrp_3d(1:npfts, 1:pltpar%jroots,1:JC)
+    datpr3 => datrp_3d(1:npfts, 1:pltpar%jroots,1:NumOfCanopyLayers)
     call restartvar(ncid, flag, varname='PrimRootDepth', dim1name='pft',dim2name='rootyps',&
      dim3name='levcan',long_name='primary root layer depth', units='m', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)  
@@ -3182,7 +3182,7 @@ implicit none
   endif  
 
   if(flag=='read')then
-    datpr4 => datrp_4d(1:npfts, 1:pltpar%jroots,1:JZ,1:JC)
+    datpr4 => datrp_4d(1:npfts, 1:pltpar%jroots,1:JZ,1:NumOfCanopyLayers)
     call restartvar(ncid, flag, varname='SecndRootXNum_rpvr', dim1name='pft',dim2name='rootyps',&
      dim3name='levsoi',dim4name='levcan',long_name='root layer secondary axes number', units=' d-2', &
      interpinic_flag='skip', data=datpr4, missing_value=spval, fill_value=spval)  
@@ -3191,14 +3191,14 @@ implicit none
     !print*,'RTN2'
     if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,SecndRootXNum_rpvr,datrp_4d,NumActivePlants=NumActivePlants,&
       IsPlantActive_pft=IsPlantActive_pft)   
-    datpr4 => datrp_4d(1:npfts, 1:pltpar%jroots,1:JZ,1:JC)
+    datpr4 => datrp_4d(1:npfts, 1:pltpar%jroots,1:JZ,1:NumOfCanopyLayers)
     call restartvar(ncid, flag, varname='SecndRootXNum_rpvr', dim1name='pft',dim2name='rootyps',&
      dim3name='levsoi',dim4name='levcan',long_name='root layer secondary axes number', units=' d-2', &
      interpinic_flag='skip', data=datpr4, missing_value=spval, fill_value=spval)  
   endif  
 
   if(flag=='read')then
-    datpr4 => datrp_4d(1:npfts, 1:pltpar%jroots,1:JZ,1:JC)
+    datpr4 => datrp_4d(1:npfts, 1:pltpar%jroots,1:JZ,1:NumOfCanopyLayers)
     call restartvar(ncid, flag, varname='PrimRootLen', dim1name='pft',dim2name='rootyps',&
      dim3name='levsoi',dim4name='levcan',long_name='root layer length primary axes', units='m d-2', &
      interpinic_flag='skip', data=datpr4, missing_value=spval, fill_value=spval)  
@@ -3207,14 +3207,14 @@ implicit none
     !print*,'PrimRootLen'
     if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,PrimRootLen,datrp_4d,NumActivePlants=NumActivePlants,&
       IsPlantActive_pft=IsPlantActive_pft)   
-    datpr4 => datrp_4d(1:npfts, 1:pltpar%jroots,1:JZ,1:JC)
+    datpr4 => datrp_4d(1:npfts, 1:pltpar%jroots,1:JZ,1:NumOfCanopyLayers)
     call restartvar(ncid, flag, varname='PrimRootLen', dim1name='pft',dim2name='rootyps',&
      dim3name='levsoi',dim4name='levcan',long_name='root layer length primary axes', units='m d-2', &
      interpinic_flag='skip', data=datpr4, missing_value=spval, fill_value=spval)    
   endif
 
   if(flag=='read')then
-    datpr4 => datrp_4d(1:npfts, 1:pltpar%jroots,1:JZ,1:JC)
+    datpr4 => datrp_4d(1:npfts, 1:pltpar%jroots,1:JZ,1:NumOfCanopyLayers)
     call restartvar(ncid, flag, varname='Root1stStructChemElmnt_pvr', dim1name='pft',dim2name='rootyps',&
      dim3name='levsoi',dim4name='levcan',long_name='root layer element primary axes', units='g d-2', &
      interpinic_flag='skip', data=datpr4, missing_value=spval, fill_value=spval)  
@@ -3223,14 +3223,14 @@ implicit none
     !print*,'Root1stStructChemElmnt_pvr'
     if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,Root1stStructChemElmnt_pvr,datrp_5d,NumActivePlants=NumActivePlants,&
       IsPlantActive_pft=IsPlantActive_pft)   
-    datpr4 => datrp_4d(1:npfts, 1:pltpar%jroots,1:JZ,1:JC)
+    datpr4 => datrp_4d(1:npfts, 1:pltpar%jroots,1:JZ,1:NumOfCanopyLayers)
     call restartvar(ncid, flag, varname='Root1stStructChemElmnt_pvr', dim1name='pft',dim2name='rootyps',&
      dim3name='levsoi',dim4name='levcan',long_name='root layer primary axes element', units='g d-2', &
      interpinic_flag='skip', data=datpr4, missing_value=spval, fill_value=spval)
   endif  
 
   if(flag=='read')then
-    datpr4 => datrp_4d(1:npfts, 1:pltpar%jroots,1:JZ,1:JC)
+    datpr4 => datrp_4d(1:npfts, 1:pltpar%jroots,1:JZ,1:NumOfCanopyLayers)
     call restartvar(ncid, flag, varname='Root2ndStructChemElmnt_pvr', dim1name='pft',dim2name='rootyps',&
      dim3name='levsoi',dim4name='levcan',long_name='root layer secondary axes element', units='g d-2', &
      interpinic_flag='skip', data=datpr4, missing_value=spval, fill_value=spval)  
@@ -3239,14 +3239,14 @@ implicit none
     !print*,'Root2ndStructChemElmnt_pvr'
     if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,Root2ndStructChemElmnt_pvr,datrp_5d,NumActivePlants=NumActivePlants,&
       IsPlantActive_pft=IsPlantActive_pft)   
-    datpr4 => datrp_4d(1:npfts, 1:pltpar%jroots,1:JZ,1:JC)
+    datpr4 => datrp_4d(1:npfts, 1:pltpar%jroots,1:JZ,1:NumOfCanopyLayers)
     call restartvar(ncid, flag, varname='Root2ndStructChemElmnt_pvr', dim1name='pft',dim2name='rootyps',&
      dim3name='levsoi',dim4name='levcan',long_name='root layer secondary axes element', units='g d-2', &
      interpinic_flag='skip', data=datpr4, missing_value=spval, fill_value=spval)  
   endif  
 
   if(flag=='read')then
-    datpr4 => datrp_4d(1:npfts, 1:pltpar%jroots,1:JZ,1:JC)
+    datpr4 => datrp_4d(1:npfts, 1:pltpar%jroots,1:JZ,1:NumOfCanopyLayers)
     call restartvar(ncid, flag, varname='SecndRootLen', dim1name='pft',dim2name='rootyps',&
      dim3name='levsoi',dim4name='levcan',long_name='root layer length secondary axes', units='m d-2', &
      interpinic_flag='skip', data=datpr4, missing_value=spval, fill_value=spval)  
@@ -3255,7 +3255,7 @@ implicit none
     !print*,'SecndRootLen'
     if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,SecndRootLen,datrp_4d,NumActivePlants=NumActivePlants,&
       IsPlantActive_pft=IsPlantActive_pft)   
-    datpr4 => datrp_4d(1:npfts, 1:pltpar%jroots,1:JZ,1:JC)
+    datpr4 => datrp_4d(1:npfts, 1:pltpar%jroots,1:JZ,1:NumOfCanopyLayers)
     call restartvar(ncid, flag, varname='SecndRootLen', dim1name='pft',dim2name='rootyps',&
      dim3name='levsoi',dim4name='levcan',long_name='root layer length secondary axes', units='m d-2', &
      interpinic_flag='skip', data=datpr4, missing_value=spval, fill_value=spval)  
@@ -6003,7 +6003,7 @@ implicit none
   endif  
 
   if(flag=='read')then
-    datpr2 => datrc_2d(1:ncols,1:JC+1)                    
+    datpr2 => datrc_2d(1:ncols,1:NumOfCanopyLayers+1)                    
     call restartvar(ncid, flag, varname='CanopyHeightz_col', dim1name='column',dim2name='levcan1',&
        long_name='canopy layer height', units='m m-3', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
@@ -6012,7 +6012,7 @@ implicit none
   else
     !print*,'ZL'
     if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,CanopyHeightz_col,datrc_2d)        
-    datpr2 => datrc_2d(1:ncols,1:JC+1)                        
+    datpr2 => datrc_2d(1:ncols,1:NumOfCanopyLayers+1)                        
     call restartvar(ncid, flag, varname='CanopyHeightz_col', dim1name='column',dim2name='levcan1',&
        long_name='canopy layer height', units='m', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
@@ -6020,7 +6020,7 @@ implicit none
   endif  
 
   if(flag=='read')then
-    datpr2 => datrc_2d(1:ncols,1:JC)                        
+    datpr2 => datrc_2d(1:ncols,1:NumOfCanopyLayers)                        
     call restartvar(ncid, flag, varname='CanopyLAgrid_lyr', dim1name='column',dim2name='levcan',&
        long_name='Grid total leaf area', units='m2 d-2', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
@@ -6029,7 +6029,7 @@ implicit none
   else
     !print*,'CanopyLAgrid_lyr'
     if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,CanopyLAgrid_lyr,datrc_2d)        
-    datpr2 => datrc_2d(1:ncols,1:JC)    
+    datpr2 => datrc_2d(1:ncols,1:NumOfCanopyLayers)    
     call restartvar(ncid, flag, varname='CanopyLAgrid_lyr', dim1name='column',dim2name='levcan',&
        long_name='Grid total leaf area', units='m2 d-2', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
@@ -6037,7 +6037,7 @@ implicit none
   endif  
 
   if(flag=='read')then
-    datpr2 => datrc_2d(1:ncols,1:JC)    
+    datpr2 => datrc_2d(1:ncols,1:NumOfCanopyLayers)    
     call restartvar(ncid, flag, varname='CanopyStemA_lyr', dim1name='column',dim2name='levcan',&
        long_name='total stem area', units='m2 d-2', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
@@ -6046,7 +6046,7 @@ implicit none
   else
     !print*,'CanopyStemA_lyr'
     if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,CanopyStemA_lyr,datrc_2d)        
-    datpr2 => datrc_2d(1:ncols,1:JC)    
+    datpr2 => datrc_2d(1:ncols,1:NumOfCanopyLayers)    
     call restartvar(ncid, flag, varname='CanopyStemA_lyr', dim1name='column',dim2name='levcan',&
        long_name='total stem area', units='m2 d-2', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
@@ -6054,7 +6054,7 @@ implicit none
   endif  
 
   if(flag=='read')then
-    datpr2 => datrc_2d(1:ncols,1:JC)    
+    datpr2 => datrc_2d(1:ncols,1:NumOfCanopyLayers)    
     call restartvar(ncid, flag, varname='WGLFT', dim1name='column',dim2name='levcan',&
        long_name='total leaf mass', units='g d-2', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
@@ -6063,7 +6063,7 @@ implicit none
   else
     !print*,'WGLFT'
     if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,WGLFT,datrc_2d)        
-    datpr2 => datrc_2d(1:ncols,1:JC)    
+    datpr2 => datrc_2d(1:ncols,1:NumOfCanopyLayers)    
     call restartvar(ncid, flag, varname='WGLFT', dim1name='column',dim2name='levcan',&
        long_name='total leaf mass', units='g d-2', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
@@ -6105,7 +6105,7 @@ implicit none
   endif  
 
   if(flag=='read')then
-    datpr2 => datrc_2d(1:ncols,1:JC)        
+    datpr2 => datrc_2d(1:ncols,1:NumOfCanopyLayers)        
     call restartvar(ncid, flag, varname='CION', dim1name='column',dim2name='levcan',&
        long_name='solution ion concentratiom', units='mol m-3', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
@@ -6114,7 +6114,7 @@ implicit none
   else
     !print*,'CION'
     if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,CION,datrc_2d)        
-    datpr2 => datrc_2d(1:ncols,1:JC)           
+    datpr2 => datrc_2d(1:ncols,1:NumOfCanopyLayers)           
     call restartvar(ncid, flag, varname='CION', dim1name='column',dim2name='levcan',&
        long_name='solution ion concentratiom', units='mol m-3', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
@@ -7936,8 +7936,8 @@ implicit none
   call check_dim(ncid, 'levsoi', JZ)
   call check_dim(ncid, 'levsoi1', JZ+1)
   call check_dim(ncid, 'levsno',  JS)
-  call check_dim(ncid, 'levcan',JC)
-  call check_dim(ncid, 'levcan1',JC+1)
+  call check_dim(ncid, 'levcan',NumOfCanopyLayers)
+  call check_dim(ncid, 'levcan1',NumOfCanopyLayers+1)
   call check_dim(ncid, 'npfts',  JP)
   call check_dim(ncid, 'nbranches',MaxNumBranches)
   call check_dim(ncid, 'ngrstages',NumGrowthStages)
@@ -8216,8 +8216,8 @@ implicit none
   call ncd_defdim(ncid, 'levsoi', JZ, dimid)
   call ncd_defdim(ncid, 'levsoi1', JZ+1, dimid)
   call ncd_defdim(ncid, 'levsno',  JS,dimid)
-  call ncd_defdim(ncid, 'levcan',JC,dimid)
-  call ncd_defdim(ncid, 'levcan1',JC+1,dimid)
+  call ncd_defdim(ncid, 'levcan',NumOfCanopyLayers,dimid)
+  call ncd_defdim(ncid, 'levcan1',NumOfCanopyLayers+1,dimid)
   call ncd_defdim(ncid, 'npfts',  JP,dimid)
   call ncd_defdim(ncid, 'nbranches',MaxNumBranches,dimid)
   call ncd_defdim(ncid, 'ngrstages',NumGrowthStages,dimid)

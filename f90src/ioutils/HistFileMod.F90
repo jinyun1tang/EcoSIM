@@ -183,7 +183,7 @@ implicit none
   !create history file for output
 
   use EcoSIMConfig      , only : case_name
-  use GridConsts        , only : JZ,JS,MaxNumBranches,JC,JP,NumGrowthStages
+  use GridConsts        , only : JZ,JS,MaxNumBranches,NumOfCanopyLayers,JP,NumGrowthStages
   use EcoSIMConfig      , only : jcplx=>jcplxc,jsken=>jskenc
   use ElmIDMod          , only : NumOfPlantChemElmnts
   implicit none
@@ -246,7 +246,7 @@ implicit none
   ! "level" dimensions
   call ncd_defdim(lnfid, 'levsoi', JZ, dimid)
   call ncd_defdim(lnfid, 'levsno',  JS,dimid)
-  call ncd_defdim(lnfid, 'levcan',JC,dimid)
+  call ncd_defdim(lnfid, 'levcan',NumOfCanopyLayers,dimid)
   call ncd_defdim(lnfid, 'npfts',  JP,dimid)
   call ncd_defdim(lnfid, 'nbranches',MaxNumBranches,dimid)
   call ncd_defdim(lnfid, 'ngrstages',NumGrowthStages,dimid)

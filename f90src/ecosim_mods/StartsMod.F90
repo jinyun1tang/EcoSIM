@@ -76,8 +76,8 @@ module StartsMod
   real(r8) :: ALTZG
   real(r8) :: tPBOT
   real(r8) :: LandScape1stSoiLayDepth
-  real(r8) :: YSIN(NumOfSkyAzimuthSectors),YCOS(NumOfSkyAzimuthSectors)
-  real(r8) :: SkyAzimuthAngle(NumOfSkyAzimuthSectors)
+  real(r8) :: YSIN(NumOfSkyAzimuSects),YCOS(NumOfSkyAzimuSects)
+  real(r8) :: SkyAzimuthAngle(NumOfSkyAzimuSects)
 ! begin_execution
 
 
@@ -191,10 +191,10 @@ module StartsMod
 !     INITIALIZE COMMUNITY CANOPY
 !
   MaxCanopyHeight_grd(:,:)=0.0_r8
-  CanopyHeightz_col(0:JC,:,:)=0.0_r8
-  CanopyLAgrid_lyr(1:JC,:,:)=0.0_r8
-  CanopyStemA_lyr(1:JC,:,:)=0.0_r8
-  WGLFT(1:JC,:,:)=0.0_r8
+  CanopyHeightz_col(0:NumOfCanopyLayers,:,:)=0.0_r8
+  CanopyLAgrid_lyr(1:NumOfCanopyLayers,:,:)=0.0_r8
+  CanopyStemA_lyr(1:NumOfCanopyLayers,:,:)=0.0_r8
+  WGLFT(1:NumOfCanopyLayers,:,:)=0.0_r8
 
 !
   call InitSoilVars(NHW,NHE,NVN,NVS,ALTZG,LandScape1stSoiLayDepth)
@@ -562,7 +562,7 @@ module StartsMod
   subroutine InitGridElevation(NHW,NHE,NVN,NVS,YSIN,YCOS,SkyAzimuthAngle,ALTY)
   implicit none
   integer, intent(in) :: NHW,NHE,NVN,NVS
-  real(r8),intent(in) :: YSIN(NumOfSkyAzimuthSectors),YCOS(NumOfSkyAzimuthSectors),SkyAzimuthAngle(NumOfSkyAzimuthSectors)
+  real(r8),intent(in) :: YSIN(NumOfSkyAzimuSects),YCOS(NumOfSkyAzimuSects),SkyAzimuthAngle(NumOfSkyAzimuSects)
   REAL(R8),INTENT(OUT):: ALTY
   integer :: NY,NX,N,NN
   REAL(R8) :: DGAZI
@@ -637,7 +637,7 @@ module StartsMod
 !    compute incident sky angle at ground surface
       SineGrndSlope_col(NY,NX)=SLOPE(0,NY,NX)    !this is exact
       CosineGrndSlope_col(NY,NX)=SQRT(1.0_r8-SineGrndSlope_col(NY,NX)**2._r8)
-      D240: DO N=1,NumOfSkyAzimuthSectors
+      D240: DO N=1,NumOfSkyAzimuSects
         DGAZI=COS(GroundSurfAzimuth_col(NY,NX)-SkyAzimuthAngle(N))
         OMEGAG(N,NY,NX)=AZMAX1(AMIN1(1.0_r8,CosineGrndSlope_col(NY,NX)*YSIN(N)+ &
           SineGrndSlope_col(NY,NX)*YCOS(N)*DGAZI))
@@ -973,7 +973,7 @@ module StartsMod
   real(r8) :: tPBOT
   integer :: NY,NX,NM
   real(r8) :: LandScape1stSoiLayDepth
-  real(r8) :: YSIN(NumOfSkyAzimuthSectors),YCOS(NumOfSkyAzimuthSectors),SkyAzimuthAngle(NumOfSkyAzimuthSectors)
+  real(r8) :: YSIN(NumOfSkyAzimuSects),YCOS(NumOfSkyAzimuSects),SkyAzimuthAngle(NumOfSkyAzimuSects)
 
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
@@ -1088,10 +1088,10 @@ module StartsMod
 !     INITIALIZE COMMUNITY CANOPY
 !
   MaxCanopyHeight_grd(:,:)=0.0_r8
-  CanopyHeightz_col(0:JC,:,:)=0.0_r8
-  CanopyLAgrid_lyr(1:JC,:,:)=0.0_r8
-  CanopyStemA_lyr(1:JC,:,:)=0.0_r8
-  WGLFT(1:JC,:,:)=0.0_r8
+  CanopyHeightz_col(0:NumOfCanopyLayers,:,:)=0.0_r8
+  CanopyLAgrid_lyr(1:NumOfCanopyLayers,:,:)=0.0_r8
+  CanopyStemA_lyr(1:NumOfCanopyLayers,:,:)=0.0_r8
+  WGLFT(1:NumOfCanopyLayers,:,:)=0.0_r8
 
 !
   call InitSoilVars(NHW,NHE,NVN,NVS,ALTZG,LandScape1stSoiLayDepth)

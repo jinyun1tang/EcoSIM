@@ -13,7 +13,12 @@ implicit none
   integer, parameter :: ieros_frzthaweros=1
   integer, parameter :: ieros_frzthawsom=2
   integer, parameter :: ieros_frzthawsomeros=3
-  
+
+! water flux direction
+  integer, parameter :: iewstdir=1   !east-west direction
+  integer, parameter :: insthdir=2   !north-south direction
+  integer, parameter :: ivertdir=3   !vertical direction
+
 ! soil properties
   integer, parameter :: isoi_fc=1
   integer, parameter :: isoi_wp=2

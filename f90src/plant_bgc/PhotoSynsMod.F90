@@ -70,7 +70,7 @@ implicit none
 !     FOR EACH LEAF AZIMUTH AND INCLINATION
 !
       D215: DO N=1,NumOfLeafZenithSectors1
-        D220: DO M=1,NumOfSkyAzimuthSectors1
+        D220: DO M=1,NumOfSkyAzimuSects1
 !
 !         CO2 FIXATION BY SUNLIT LEAVES
 !
@@ -344,7 +344,7 @@ implicit none
 !     FOR EACH LEAF AZIMUTH AND INCLINATION
 !
       D115: DO N =1,NumOfLeafZenithSectors1
-        D120: DO M =1,NumOfSkyAzimuthSectors1
+        D120: DO M =1,NumOfSkyAzimuSects1
 !
 !         CO2 FIXATION IN MESOPHYLL BY SUNLIT LEAVES
 !
@@ -624,13 +624,13 @@ implicit none
   integer :: K
 
 ! begin_execution
-  associate(                           &
+  associate(                                                     &
     CanopyGasCO2_pft          =>  plt_photo%CanopyGasCO2_pft   , &
     iPlantPhotosynthesisType  =>  plt_photo%iPlantPhotosynthesisType , &
     Vmax4PEPCarboxy_pft       =>  plt_photo%Vmax4PEPCarboxy_pft  , &
     Vmax4RubiscoCarboxy_pft   =>  plt_photo%Vmax4RubiscoCarboxy_pft  , &
     iPlantMorphologyType_pft  =>  plt_pheno%iPlantMorphologyType_pft , &
-    SineSolarAngle            =>  plt_rad%SineSolarAngle     , &
+    SineSolarIncliAngle            =>  plt_rad%SineSolarIncliAngle     , &
     RadPARbyCanopy_pft        =>  plt_rad%RadPARbyCanopy_pft     , &
     ZEROP                     =>  plt_biom%ZEROP   , &
     LeafAreaNode_brch         =>  plt_morph%LeafAreaNode_brch  , &
@@ -638,7 +638,7 @@ implicit none
   )
 !  write(193,*)'rubisco',NB,NZ,RubiscoActivity_brch(NB,NZ)
   IF(abs(RubiscoActivity_brch(NB,NZ)).GT.0._r8)THEN
-    IF(SineSolarAngle.GT.0.0_r8.AND.RadPARbyCanopy_pft(NZ).GT.0.0_r8 &
+    IF(SineSolarIncliAngle.GT.0.0_r8.AND.RadPARbyCanopy_pft(NZ).GT.0.0_r8 &
       .AND.CanopyGasCO2_pft(NZ).GT.0.0_r8)THEN
       CO2F=0._r8
       CH2O=0._r8
@@ -663,7 +663,7 @@ implicit none
               CALL ComputeGPP_C4(K,NB,NZ,WFNG,Stomata_Activity,CH2O3(K),CH2O4(K))
               CO2F=CO2F+CH2O4(K)
               CH2O=CH2O+CH2O3(K)
-              write(191,*)'ComputeGPP_C4',K,NB,NZ,CH2O3(K),CH2O4(K)
+!              write(192,*)'ComputeGPP_C4',K,NB,NZ,CH2O3(K),CH2O4(K)
               
 !
 !               C3 PHOTOSYNTHESIS
@@ -673,7 +673,7 @@ implicit none
               call ComputeGPP_C3(K,NB,NZ,WFNG,Stomata_Activity,CH2O3(K))
               CO2F=CO2F+CH2O3(K)
               CH2O=CH2O+CH2O3(K)
-              write(191,*)'ComputeGPP_C3',K,NB,NZ,CH2O3(K)
+!              write(191,*)'ComputeGPP_C3',K,NB,NZ,CH2O3(K)
             ENDIF
           ENDIF
         ENDDO D100

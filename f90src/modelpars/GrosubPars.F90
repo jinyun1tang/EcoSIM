@@ -166,7 +166,7 @@ module GrosubPars
   integer :: MaxNumRootAxes          !maximum number of root axes
   integer  :: JP1         !number of plants
   integer  :: MaxNumBranches         !maximum number of branches
-  integer  :: NumOfSkyAzimuthSectors1        !number of sectors for the sky azimuth  [0,2*pi]
+  integer  :: NumOfSkyAzimuSects1        !number of sectors for the sky azimuth  [0,2*pi]
   integer  :: jcplx       !number of organo-microbial CO2CompenPoint_nodeexes
   integer  :: NumOfLeafAzimuthSectors        !number of sectors for the leaf azimuth, [0,pi]
   integer  :: NumOfCanopyLayers1         !number of canopy layers

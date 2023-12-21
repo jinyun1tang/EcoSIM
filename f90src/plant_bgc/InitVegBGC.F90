@@ -15,9 +15,9 @@ module InitVegBGC
   implicit none
 
 
-  real(r8), intent(out) :: YSIN(NumOfSkyAzimuthSectors)
-  real(r8), intent(out) :: YCOS(NumOfSkyAzimuthSectors)
-  real(r8), intent(out) :: SkyAzimuthAngle(NumOfSkyAzimuthSectors)
+  real(r8), intent(out) :: YSIN(NumOfSkyAzimuSects)
+  real(r8), intent(out) :: YCOS(NumOfSkyAzimuSects)
+  real(r8), intent(out) :: SkyAzimuthAngle(NumOfSkyAzimuSects)
   real(r8) :: ZAZI(NumOfLeafAzimuthSectors)
   real(r8) :: YAGL
   real(r8) :: OMEGZ,OMEGY
@@ -25,7 +25,7 @@ module InitVegBGC
 
   integer :: L,M,N
 
-  write(*,*) "In InitIrradianceGeometry"
+!  write(*,*) "In InitIrradianceGeometry"
 
   !     begin_execution
   !     SineLeafAngle,CosineLeafAngle=sine,cosine of leaf inclination class
@@ -35,20 +35,20 @@ module InitVegBGC
   !     IALBY:1=backscattering,2=forward scattering of sky radiation
   !
 
-  write(*,*) "First do loop over leaf azimuth sectors"
+!  write(*,*) "First do loop over leaf azimuth sectors"
   D205: DO L=1,NumOfLeafAzimuthSectors
-    write(*,*) "Setting ZAZI"
-    write(*,*) "L = ", L, " of ", NumOfLeafAzimuthSectors
+!    write(*,*) "Setting ZAZI"
+!    write(*,*) "L = ", L, " of ", NumOfLeafAzimuthSectors
     ZAZI(L)=(L-0.5)*PICON/real(NumOfLeafAzimuthSectors,r8)
   ENDDO D205
-  write(*,*) "Loop over sky azimuth sectors"
-  !NumOfSkyAzimuthSectors: number of sky azimuth sectors
+!  write(*,*) "Loop over sky azimuth sectors"
+  !NumOfSkyAzimuSects: number of sky azimuth sectors
   !NumOfLeafAzimuthSectors: number of leaf azimuth sectors
-  D230: DO N=1,NumOfSkyAzimuthSectors
+  D230: DO N=1,NumOfSkyAzimuSects
 !    write(*,*) "Setting Yvars"
-!    write(*,*) "N = ", N, " of ", NumOfSkyAzimuthSectors
-    SkyAzimuthAngle(N)=PICON*(2*N-1)/real(NumOfSkyAzimuthSectors,r8)
-    YAGL=PICON/real(NumOfSkyAzimuthSectors,r8)
+!    write(*,*) "N = ", N, " of ", NumOfSkyAzimuSects
+    SkyAzimuthAngle(N)=PICON*(2*N-1)/real(NumOfSkyAzimuSects,r8)
+    YAGL=PICON/real(NumOfSkyAzimuSects,r8)
     YSIN(N)=SIN(YAGL)
     YCOS(N)=COS(YAGL)
     TotSineSkyAngles_grd=TotSineSkyAngles_grd+YSIN(N)

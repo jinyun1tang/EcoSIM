@@ -132,7 +132,7 @@ module PlantBranchMod
     iPlantTurnoverPattern_pft     =>  plt_pheno%iPlantTurnoverPattern_pft   , &
     iPlantPhenologyPattern_pft     =>  plt_pheno%iPlantPhenologyPattern_pft   , &
     TCelciusChill4Seed       =>  plt_pheno%TCelciusChill4Seed     , &
-    SineSolarAngleNextHour      =>  plt_rad%SineSolarAngleNextHour      , &
+    SineSolarIncliAngleNextHour      =>  plt_rad%SineSolarIncliAngleNextHour      , &
     PlantPopulation_pft         =>  plt_site%PlantPopulation_pft        , &
     ZERO       =>  plt_site%ZERO      , &
     PSICanopy_pft     =>  plt_ew%PSICanopy_pft      , &
@@ -145,7 +145,7 @@ module PlantBranchMod
 
 
   LeafPetolBiomassC_brch(NB,NZ)=AZMAX1(LeafChemElmnts_brch(ielmc,NB,NZ)+PetoleChemElmnt_brch(ielmc,NB,NZ))
-  write(101,*)'grow branch',NB,NZ,LeafPetolBiomassC_brch(NB,NZ)
+!  write(101,*)'grow branch',NB,NZ,LeafPetolBiomassC_brch(NB,NZ)
   IF(iPlantBranchState_brch(NB,NZ).EQ.iLive)THEN
 
     call CalcPartitionCoeff(I,J,NB,NZ,PART,PTRT,IFLGY,BegRemoblize)
@@ -424,13 +424,13 @@ module PlantBranchMod
     !     ALLOCATE LEAF AREA TO INCLINATION CLASSES ACCORDING TO
     !     DISTRIBUTION ENTERED IN 'READQ' ASSUMING AZIMUTH IS UNIFORM
     !
-    !     SineSolarAngle=sine of solar angle
+    !     SineSolarIncliAngle=sine of solar angle
     !     LeafAreaZsec_brch=leaf node surface area in canopy layer
     !     LeafAreaNode_brch,CanopyLeafAreaByLayer_pft=leaf node surface area in canopy layer
     !     ZC,DPTHS=canopy,snowpack height
     !     CLASS=leaf inclination class
     !
-    IF(SineSolarAngleNextHour.GT.0.0_r8)THEN
+    IF(SineSolarIncliAngleNextHour.GT.0.0_r8)THEN
       call LeafClassAllocation(NB,NZ)
     ENDIF
 
@@ -722,13 +722,13 @@ module PlantBranchMod
   )
 ! begin_execution
 ! FDBK=N,P feedback inhibition on C3 CO2 fixation
-! SineSolarAngle=sine of solar angle
+! SineSolarIncliAngle=sine of solar angle
 ! RADP=total PAR absorbed by canopy
 ! CanopyGasCO2_pft=canopy air CO2 concentration
 !
-  write(101,*)'emerge cal',NB,NZ,iPlantCalendar_brch(ipltcal_Emerge,NB,NZ)
+!  write(101,*)'emerge cal',NB,NZ,iPlantCalendar_brch(ipltcal_Emerge,NB,NZ)
   IF(iPlantCalendar_brch(ipltcal_Emerge,NB,NZ).NE.0)THEN
-    write(101,*)'computegpp branch',NB,NZ
+!    write(101,*)'computegpp branch',NB,NZ
     call ComputeGPP(NB,NZ,WFNG,Stomata_Activity,CH2O3,CH2O4,CH2O,CO2F)
 !
 !   SHOOT AUTOTROPHIC RESPIRATION AFTER EMERGENCE
@@ -743,7 +743,7 @@ module PlantBranchMod
     
     call ComputRAutoB4Emergence(I,NB,NZ,TFN6,DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX,WTSHXN,&
       WFNG,WFNSG,ZADDB,CNPG,PADDB,RCO2C,RMNCS,SNCR,NonStructalC4Growth_brch,CNRDM,CNRDA,CH2O)
-    write(101,*)'ComputRAutoB4Emergence',NonStructalC4Growth_brch  
+!    write(101,*)'ComputRAutoB4Emergence',NonStructalC4Growth_brch  
   ENDIF
 
 !   REMOVE C,N,P USED IN MAINTENANCE + GROWTH REPIRATION AND GROWTH
@@ -760,8 +760,8 @@ module PlantBranchMod
 !   XFRE(ielmc),XFRE(ielmn),XFRE(ielmp)=branch-root layer C,N,P transfer
 !
   NonstructElmnt_brch(ielmc,NB,NZ)=NonstructElmnt_brch(ielmc,NB,NZ)+CH2O-AMIN1(RMNCS,RCO2C)-NonStructalC4Growth_brch-CNRDA
-  write(101,*)'NonstructElmnt_brch ch2o',NonstructElmnt_brch(ielmc,NB,NZ),CH2O,&
-    AMIN1(RMNCS,RCO2C),NonStructalC4Growth_brch,CNRDA
+!  write(101,*)'NonstructElmnt_brch ch2o',NonstructElmnt_brch(ielmc,NB,NZ),CH2O,&
+!    AMIN1(RMNCS,RCO2C),NonStructalC4Growth_brch,CNRDA
   NonstructElmnt_brch(ielmn,NB,NZ)=NonstructElmnt_brch(ielmn,NB,NZ)-ZADDB+RNH3B(NB,NZ)
   NonstructElmnt_brch(ielmp,NB,NZ)=NonstructElmnt_brch(ielmp,NB,NZ)-PADDB
   end associate
@@ -2132,7 +2132,7 @@ module PlantBranchMod
 !
   IF(iPlantPhenologyPattern_pft(NZ).NE.iplt_annual.OR. &
     (iPlantPhenologyPattern_pft(NZ).EQ.iplt_annual.AND.iPlantPhenologyType_pft(NZ).GT.1))THEN
-    write(192,*)'emerge plant',NB,doPlantLeafOut_brch(NB,NZ),Hours4Leafout_brch(NB,NZ),HourThreshold4LeafOut_brch(NB,NZ)
+!    write(192,*)'emerge plant',NB,doPlantLeafOut_brch(NB,NZ),Hours4Leafout_brch(NB,NZ),HourThreshold4LeafOut_brch(NB,NZ)
     IF((doPlantLeafOut_brch(NB,NZ).EQ.iEnable.AND.Hours4Leafout_brch(NB,NZ).GE.HourThreshold4LeafOut_brch(NB,NZ)) &
       .OR.(doPlantLeaveOff_brch(NB,NZ).EQ.iEnable.AND.Hours4LeafOff_brch(NB,NZ).GE.HourThreshold4LeafOff_brch(NB,NZ)))THEN
       
@@ -2515,7 +2515,7 @@ module PlantBranchMod
       HourCounter4LeafOut_brch(NB,NZ)=HourCounter4LeafOut_brch(NB,NZ)+DATRP
       IF(HourCounter4LeafOut_brch(NB,NZ).LE.ATRPX(iPlantPhenologyPattern_pft(NZ)) &
         .OR.(iPlantPhenologyPattern_pft(NZ).EQ.iplt_annual.AND.iPlantPhenologyType_pft(NZ).EQ.iphenotyp_evgreen))THEN
-        write(101,*)'NonstructalElmnts_pft LEAFOUT',NonstructalElmnts_pft(ielmc,NZ),NZ
+!        write(101,*)'NonstructalElmnts_pft LEAFOUT',NonstructalElmnts_pft(ielmc,NZ),NZ
         IF(NonstructalElmnts_pft(ielmc,NZ).GT.ZEROP(NZ))THEN
           CPOOLT=TotPopuPlantRootNonstructElmnt(ielmc)+NonstructElmnt_brch(ielmc,NB,NZ)
   !
@@ -2533,7 +2533,7 @@ module PlantBranchMod
           CH2OH=AZMAX1(GFNX*NonstructalElmnts_pft(ielmc,NZ))
           NonstructalElmnts_pft(ielmc,NZ)=NonstructalElmnts_pft(ielmc,NZ)-CH2OH
           NonstructElmnt_brch(ielmc,NB,NZ)=NonstructElmnt_brch(ielmc,NB,NZ)+CH2OH*FXSH(iPlantPhenologyPattern_pft(NZ))
-          write(101,*)'LEAFOUTNonstructElmnt_brch',NonstructElmnt_brch(ielmc,NB,NZ),NB,NZ
+!          write(101,*)'LEAFOUTNonstructElmnt_brch',NonstructElmnt_brch(ielmc,NB,NZ),NB,NZ
           IF(TotPopuPlantRootC.GT.ZEROP(NZ).AND.TotPopuPlantRootNonstructElmnt(ielmc).GT.ZEROP(NZ))THEN
             D50: DO L=NU,NI(NZ)
               FXFC=AZMAX1( PopuPlantRootC_vr(ipltroot,L,NZ))/TotPopuPlantRootC
@@ -2653,10 +2653,10 @@ module PlantBranchMod
   ! CPOOL,ZPOOL,PPOOL=non-structural C,N,P mass
   ! XFRE(ielmc),XFRE(ielmn),XFRE(ielmc)=nonstructural C,N,P transfer
   ! 
-    write(101,*)NB,NumOfMainBranch_pft(NZ),HourCounter4LeafOut_brch(NB,NZ).LE.ATRPX(iPlantPhenologyPattern_pft(NZ))
+!    write(101,*)NB,NumOfMainBranch_pft(NZ),HourCounter4LeafOut_brch(NB,NZ).LE.ATRPX(iPlantPhenologyPattern_pft(NZ))
     IF(NB.NE.NumOfMainBranch_pft(NZ).AND.HourCounter4LeafOut_brch(NB,NZ).LE.ATRPX(iPlantPhenologyPattern_pft(NZ)))THEN
       HourCounter4LeafOut_brch(NB,NZ)=HourCounter4LeafOut_brch(NB,NZ)+fTgrowCanP(NZ)*WFNG
-      write(101,*)'HourCounter4LeafOut_brch',HourCounter4LeafOut_brch(NB,NZ),NB,NZ
+!      write(101,*)'HourCounter4LeafOut_brch',HourCounter4LeafOut_brch(NB,NZ),NB,NZ
       DO NE=1,NumOfPlantChemElmnts
         XFRE(NE)=AZMAX1(0.05_r8*fTgrowCanP(NZ) &
           *(0.5_r8*(NonstructElmnt_brch(NE,NumOfMainBranch_pft(NZ),NZ)+NonstructElmnt_brch(NE,NB,NZ)) &
@@ -2951,7 +2951,7 @@ module PlantBranchMod
 ! CNRDA=respiration for N assimilation
 ! CH2O=total CH2O production
 !
-  write(101,*)'RCO2G',RCO2G,RCO2Y
+!  write(101,*)'RCO2G',RCO2G,RCO2Y
   NonStructalC4Growth_brch=RCO2G/DMSHD
   ZADDB=AZMAX1(AMIN1(NonstructElmnt_brch(ielmn,NB,NZ),NonStructalC4Growth_brch*(CNSHX+CNLFM+CNLFX*CNPG)))
   PADDB=AZMAX1(AMIN1(NonstructElmnt_brch(ielmp,NB,NZ),NonStructalC4Growth_brch*(CPSHX+CPLFM+CPLFX*CNPG)))
@@ -3202,7 +3202,7 @@ module PlantBranchMod
     FNOD                         =>  plt_allom%FNOD     , &
     PlantPopulation_pft           =>  plt_site%PlantPopulation_pft          &
   )
-  write(101,*)'grow leave',NB,NZ,GrowthLeaf(ielmc)
+!  write(101,*)'grow leave',NB,NZ,GrowthLeaf(ielmc)
   IF(GrowthLeaf(ielmc).GT.0.0_r8)THEN
     MXNOD=KLeafNodeNumber(NB,NZ)
     MNNOD=MAX(NNOD1,MXNOD-NumConCurrentGrowinNode(NZ)+1)
