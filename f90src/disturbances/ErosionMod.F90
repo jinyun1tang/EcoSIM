@@ -3,6 +3,7 @@ module ErosionMod
   use minimathmod, only : isclose,AZMAX1
   use MicrobialDataType
   use SOMDataType
+  use EcoSiMParDataMod    , only : micpar  
   use EcoSIMCtrlMod, only : iErosionMode
   use EcoSIMSolverPar
   use FertilizerDataType
@@ -416,7 +417,7 @@ module ErosionMod
 
   integer :: NGL,NTX,NTP
   integer :: K,NN,N,NO,M,NY,NX
-  integer :: N1,N2,N4,N5,N4B,N5B
+  integer :: N1,N2,N4,N5,N4B,N5B,MID
   real(r8) :: FSEDER
 
   DO  NX=NHW,NHE
@@ -512,9 +513,10 @@ module ErosionMod
                 DO NO=1,NumMicbFunGroups
                   DO NGL=JGnio(NO),JGnfo(NO)
                     DO M=1,nlbiomcp
-                      OMCER(M+(NGL-1)*nlbiomcp,K,N,2,N5,N4)=FSEDER*OMC(M,NGL,K,NU(N2,N1),N2,N1)
-                      OMNER(M+(NGL-1)*nlbiomcp,K,N,2,N5,N4)=FSEDER*OMN(M,NGL,K,NU(N2,N1),N2,N1)
-                      OMPER(M+(NGL-1)*nlbiomcp,K,N,2,N5,N4)=FSEDER*OMP(M,NGL,K,NU(N2,N1),N2,N1)
+                      MID=micpar%get_hmicb_id(M,NGL)
+                      OMCER(MID,K,N,2,N5,N4)=FSEDER*OMC(MID,K,NU(N2,N1),N2,N1)
+                      OMNER(MID,K,N,2,N5,N4)=FSEDER*OMN(MID,K,NU(N2,N1),N2,N1)
+                      OMPER(MID,K,N,2,N5,N4)=FSEDER*OMP(MID,K,NU(N2,N1),N2,N1)
                     ENDDO
                   ENDDO
                 ENDDO
@@ -670,9 +672,10 @@ module ErosionMod
                   DO  NO=1,NumMicbFunGroups
                     DO NGL=JGnio(NO),JGnfo(NO)
                       DO  M=1,nlbiomcp
-                        OMCER(M+(NGL-1)*nlbiomcp,K,N,1,N5B,N4B)=FSEDER*OMC(M,NGL,K,NU(N2,N1),N2,N1)
-                        OMNER(M+(NGL-1)*nlbiomcp,K,N,1,N5B,N4B)=FSEDER*OMN(M,NGL,K,NU(N2,N1),N2,N1)
-                        OMPER(M+(NGL-1)*nlbiomcp,K,N,1,N5B,N4B)=FSEDER*OMP(M,NGL,K,NU(N2,N1),N2,N1)
+                        MID=micpar%get_hmicb_id(M,NGL)                      
+                        OMCER(M+(NGL-1)*nlbiomcp,K,N,1,N5B,N4B)=FSEDER*OMC(MID,K,NU(N2,N1),N2,N1)
+                        OMNER(M+(NGL-1)*nlbiomcp,K,N,1,N5B,N4B)=FSEDER*OMN(MID,K,NU(N2,N1),N2,N1)
+                        OMPER(M+(NGL-1)*nlbiomcp,K,N,1,N5B,N4B)=FSEDER*OMP(MID,K,NU(N2,N1),N2,N1)
                       enddo
                     enddo
                   ENDDO
@@ -788,7 +791,7 @@ module ErosionMod
   integer :: NY,NX
   integer :: N,NN,K,NO,M,NTX,NTP
   integer :: N1,N2,N4,N5
-  integer :: M1,M2,M4,M5
+  integer :: M1,M2,M4,M5,MID
   real(r8) :: XN
 
   DO  NX=NHW,NHE
@@ -956,9 +959,10 @@ module ErosionMod
                 DO NO=1,NumMicbFunGroups
                   DO NGL=JGnio(NO),JGnfo(NO)
                     DO M=1,nlbiomcp
-                      OMCER(M+(NGL-1)*nlbiomcp,K,N,NN,M5,M4)=FSEDER*OMC(M,NGL,K,NU(N2,N1),N2,N1)
-                      OMNER(M+(NGL-1)*nlbiomcp,K,N,NN,M5,M4)=FSEDER*OMN(M,NGL,K,NU(N2,N1),N2,N1)
-                      OMPER(M+(NGL-1)*nlbiomcp,K,N,NN,M5,M4)=FSEDER*OMP(M,NGL,K,NU(N2,N1),N2,N1)
+                      MID=micpar%get_hmicb_id(M,NGL)                    
+                      OMCER(M+(NGL-1)*nlbiomcp,K,N,NN,M5,M4)=FSEDER*OMC(MID,K,NU(N2,N1),N2,N1)
+                      OMNER(M+(NGL-1)*nlbiomcp,K,N,NN,M5,M4)=FSEDER*OMN(MID,K,NU(N2,N1),N2,N1)
+                      OMPER(M+(NGL-1)*nlbiomcp,K,N,NN,M5,M4)=FSEDER*OMP(MID,K,NU(N2,N1),N2,N1)
                     ENDDO
                   ENDDO
                 ENDDO

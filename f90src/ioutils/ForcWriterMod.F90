@@ -52,6 +52,7 @@ implicit none
     call ncd_defdim(ncf,'jsken',jsken,recordDimID)
     call ncd_defdim(ncf,'ndbiomcp',2,recordDimID)
     call ncd_defdim(ncf,'nlbiomcp',3,recordDimID)
+    call ncd_defdim(ncf,'NumLiveHeterBioms',NumLiveHeterBioms,recordDimID)
     call ncd_defdim(ncf,'NumMicrbHetetrophCmplx',NumMicrbHetetrophCmplx,recordDimID)
     call ncd_defdim(ncf,'NumMicrobAutotrophCmplx',NumMicrobAutotrophCmplx,recordDimID)
 
@@ -187,16 +188,13 @@ implicit none
     call ncd_defvar(ncf, 'ORP', ncd_float, dim1name='ndbiomcp',&
             dim2name='jcplx',long_name='microbial residue P in each complex',  &
             units='gP d-2', missing_value=spval, fill_value=spval)
-    call ncd_defvar(ncf, 'OMC', ncd_float, dim1name='nlbiomcp',&
-            dim2name='NumMicrbHetetrophCmplx',dim3name='jcplx',&
+    call ncd_defvar(ncf, 'OMC', ncd_float,dim1name='NumLiveHeterBioms',dim2name='jcplx',&
             long_name='microbial biomass C in each complex',  &
             units='gC d-2', missing_value=spval, fill_value=spval)
-    call ncd_defvar(ncf, 'OMN', ncd_float, dim1name='nlbiomcp',&
-            dim2name='NumMicrbHetetrophCmplx',dim3name='jcplx',&
+    call ncd_defvar(ncf, 'OMN', ncd_float, dim1name='NumLiveHeterBioms',dim2name='jcplx',&
             long_name='microbial biomass N in each complex',  &
             units='gN d-2', missing_value=spval, fill_value=spval)
-    call ncd_defvar(ncf, 'OMP', ncd_float, dim1name='nlbiomcp',&
-            dim2name='NumMicrbHetetrophCmplx',dim3name='jcplx',&
+    call ncd_defvar(ncf, 'OMP', ncd_float, dim1name='NumLiveHeterBioms',dim2name='jcplx',&
             long_name='microbial biomass P in each complex',  &
             units='gP d-2', missing_value=spval, fill_value=spval)
 
@@ -315,9 +313,9 @@ implicit none
     call ncd_putvar(ncf,'ORN',ORN(:,:,L,NY,NX))
     call ncd_putvar(ncf,'ORP',ORP(:,:,L,NY,NX))
 
-    call ncd_putvar(ncf,'OMC',OMC(:,:,:,L,NY,NX))
-    call ncd_putvar(ncf,'OMN',OMN(:,:,:,L,NY,NX))
-    call ncd_putvar(ncf,'OMP',OMP(:,:,:,L,NY,NX))
+    call ncd_putvar(ncf,'OMC',OMC(:,:,L,NY,NX))
+    call ncd_putvar(ncf,'OMN',OMN(:,:,L,NY,NX))
+    call ncd_putvar(ncf,'OMP',OMP(:,:,L,NY,NX))
 
     call ncd_putvar(ncf,'OMCff',OMCff(:,:,L,NY,NX))
     call ncd_putvar(ncf,'OMNff',OMNff(:,:,L,NY,NX))

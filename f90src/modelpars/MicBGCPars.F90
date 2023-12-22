@@ -77,6 +77,7 @@ implicit none
   integer :: NumMicrbHetetrophCmplx         !total number of microbial guilds in one organic-microbial complex
   integer :: NumOfLitrCmplxs                !number of litter organo-microbial complexes, plant litter + manure
   integer :: NumOfPlantLitrCmplxs           !number of plant litter complexs, woody + fine litter
+  integer :: NumLiveHeterBioms                  !total number of biomass components in heterotrophic OM complexes
   integer :: iprotein
   integer :: icarbhyro
   integer :: icellulos
@@ -84,6 +85,7 @@ implicit none
   contains
     procedure, public  :: Init
     procedure, public  :: SetPars
+    procedure, public  :: get_hmicb_id
     procedure, private :: InitAllocate
     procedure, public  :: destroy      =>DestructMicBGCPar
   end type MicParType
@@ -101,7 +103,7 @@ contains
 
   this%ndbiomcp=NumDeadMicrbCompts  !number of necrobiomass components
   this%nlbiomcp=NumLiveMicrbCompts  !number of living biomass components
-
+  
   this%jcplx=jcplxc         !# of microbe-substrate complexes
   this%jsken=jskenc         !# of kinetic components of the substrates
   this%jguilds=nmicbguilds
@@ -153,6 +155,7 @@ contains
   this%micbiom(1)='labile'
   this%micbiom(2)='resist'
   this%micbiom(3)='active'
+
   call this%Initallocate()
 
 !set up functional group ids
@@ -186,7 +189,6 @@ contains
   this%is_CO2_autotroph(this%AmmoniaOxidizeBacteria)=.true.
   this%is_CO2_autotroph(this%NitriteOxidizeBacteria)=.true.
   this%is_CO2_autotroph(this%HydrogenoMethanogenArchea)=.true.
-
 
   end subroutine Init
 !------------------------------------------------------------------------------------------
@@ -361,6 +363,7 @@ contains
     this%NumMicrobAutotrophCmplx=this%NumMicrobAutotrophCmplx+this%JGnfA(n)-this%JGniA(n)+1
     this%NumMicrbHetetrophCmplx=this%NumMicrbHetetrophCmplx+this%JGnfo(n)-this%JGnio(n)+1
   enddo
+  this%NumLiveHeterBioms=this%nlbiomcp*this%NumMicrbHetetrophCmplx
 
   allocate(this%DOSA(1:jcplx))
   allocate(this%SPOSC(jsken,1:jcplx))

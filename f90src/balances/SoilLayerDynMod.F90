@@ -2,6 +2,7 @@ module SoilLayerDynMod
 ! Description:
 ! subroutines to do soil relayering
   use data_kind_mod, only : r8 => DAT_KIND_R8
+  use EcoSiMParDataMod, only : micpar
   use RootDataType
   use GridDataType
   use minimathmod, only : AZMAX1
@@ -696,7 +697,7 @@ implicit none
   real(r8), intent(inout) :: CDPTHY(0:JZ)
   integer, intent(in) ::  IFLGL(0:JZ,6)
   integer :: N,M,NZ,K,NGL,NR,NE,NTU,NTSA,NTSAB,NTG,NTP
-  integer :: NTX,NTF
+  integer :: NTX,NTF,MID
   real(r8) :: ENGY0,ENGY1
 ! begin_execution
 
@@ -790,9 +791,10 @@ implicit none
       DO  N=1,NumMicbFunGroups
         DO  M=1,nlbiomcp
           DO NGL=JGnio(N),JGnfo(N)
-            OMC(M,NGL,K,L1,NY,NX)=OMC(M,NGL,K,L1,NY,NX)+FX*OMC(M,NGL,K,L0,NY,NX)
-            OMN(M,NGL,K,L1,NY,NX)=OMN(M,NGL,K,L1,NY,NX)+FX*OMN(M,NGL,K,L0,NY,NX)
-            OMP(M,NGL,K,L1,NY,NX)=OMP(M,NGL,K,L1,NY,NX)+FX*OMP(M,NGL,K,L0,NY,NX)
+            MID=micpar%get_hmicb_id(M,NGL)
+            OMC(MID,K,L1,NY,NX)=OMC(MID,K,L1,NY,NX)+FX*OMC(MID,K,L0,NY,NX)
+            OMN(MID,K,L1,NY,NX)=OMN(MID,K,L1,NY,NX)+FX*OMN(MID,K,L0,NY,NX)
+            OMP(MID,K,L1,NY,NX)=OMP(MID,K,L1,NY,NX)+FX*OMP(MID,K,L0,NY,NX)
           enddo
         enddo
       enddo
@@ -966,9 +968,10 @@ implicit none
        DO N=1,NumMicbFunGroups
         DO M=1,nlbiomcp
           DO NGL=JGnio(N),JGnfo(N)
-            OMC(M,NGL,K,L0,NY,NX)=FY*OMC(M,NGL,K,L0,NY,NX)
-            OMN(M,NGL,K,L0,NY,NX)=FY*OMN(M,NGL,K,L0,NY,NX)
-            OMP(M,NGL,K,L0,NY,NX)=FY*OMP(M,NGL,K,L0,NY,NX)
+            MID=micpar%get_hmicb_id(M,NGL)
+            OMC(MID,K,L0,NY,NX)=FY*OMC(MID,K,L0,NY,NX)
+            OMN(MID,K,L0,NY,NX)=FY*OMN(MID,K,L0,NY,NX)
+            OMP(MID,K,L0,NY,NX)=FY*OMP(MID,K,L0,NY,NX)
           ENDDO
         enddo
       enddo
@@ -1075,7 +1078,7 @@ implicit none
   real(r8),intent(in) :: FO
   integer, intent(in) :: IFLGL(0:JZ,6)
 
-  integer :: K,N,M,NGL,NR,NZ,NE,NTG
+  integer :: K,N,M,NGL,NR,NZ,NE,NTG,MID
   real(r8) :: FXO,FRO
   real(r8) :: FXRTLG2,FXRTN2,FXEPOOLR,FXWTRTL
   real(r8) :: WTNDLE,FXEPOOLN
@@ -1102,15 +1105,16 @@ implicit none
       DO  N=1,NumMicbFunGroups
         DO  M=1,nlbiomcp
           DO NGL=JGnio(N),JGnfo(N)
-            FXOMC=FXO*OMC(M,NGL,K,L0,NY,NX)
-            OMC(M,NGL,K,L1,NY,NX)=OMC(M,NGL,K,L1,NY,NX)+FXOMC
-            OMC(M,NGL,K,L0,NY,NX)=OMC(M,NGL,K,L0,NY,NX)-FXOMC
-            FXOMN=FXO*OMN(M,NGL,K,L0,NY,NX)
-            OMN(M,NGL,K,L1,NY,NX)=OMN(M,NGL,K,L1,NY,NX)+FXOMN
-            OMN(M,NGL,K,L0,NY,NX)=OMN(M,NGL,K,L0,NY,NX)-FXOMN
-            FXOMP=FXO*OMP(M,NGL,K,L0,NY,NX)
-            OMP(M,NGL,K,L1,NY,NX)=OMP(M,NGL,K,L1,NY,NX)+FXOMP
-            OMP(M,NGL,K,L0,NY,NX)=OMP(M,NGL,K,L0,NY,NX)-FXOMP
+            MID=micpar%get_hmicb_id(M,NGL)          
+            FXOMC=FXO*OMC(MID,K,L0,NY,NX)
+            OMC(MID,K,L1,NY,NX)=OMC(MID,K,L1,NY,NX)+FXOMC
+            OMC(MID,K,L0,NY,NX)=OMC(MID,K,L0,NY,NX)-FXOMC
+            FXOMN=FXO*OMN(MID,K,L0,NY,NX)
+            OMN(MID,K,L1,NY,NX)=OMN(MID,K,L1,NY,NX)+FXOMN
+            OMN(MID,K,L0,NY,NX)=OMN(MID,K,L0,NY,NX)-FXOMN
+            FXOMP=FXO*OMP(MID,K,L0,NY,NX)
+            OMP(MID,K,L1,NY,NX)=OMP(MID,K,L1,NY,NX)+FXOMP
+            OMP(MID,K,L0,NY,NX)=OMP(MID,K,L0,NY,NX)-FXOMP
           enddo
         enddo
       enddo

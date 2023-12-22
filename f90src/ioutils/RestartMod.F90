@@ -3349,8 +3349,8 @@ implicit none
           trc_confs%NPrecipTracers,  &
           trc_confs%nxtracers,  & 
           trc_confs%NnutrientTracers,  &
-          NumMicrobAutotrophCmplx)
-  sz4=NumMicrbHetetrophCmplx
+          NumMicrobAutotrophCmplx,jcplx)
+  sz4=NumLiveHeterBioms
   sz5=jsken
   allocate(datrc_3d(bounds%begc:bounds%endc,1:sz3,1:JZ+1))
   allocate(datrc_4d(bounds%begc:bounds%endc,1:sz4,1:sz3,1:JZ+1))    
@@ -6513,53 +6513,53 @@ implicit none
   endif  
 
   if(flag=='read')then
-    datpr5 => datrc_5d(1:ncols,1:nlbiomcp,1:NumMicrbHetetrophCmplx,1:jcplx,1:JZ+1)    
-    call restartvar(ncid, flag, varname='OMC', dim1name='column',dim2name='nlbiomcp',&
-      dim3name='hetrmicb',dim4name='nomcomplx',dim5name='levsoi1',long_name='microbial biomass C', &
-      units='g d-2', interpinic_flag='skip', data=datpr5, missing_value=spval, &
+    datpr4 => datrc_4d(1:ncols,1:NumLiveHeterBioms,1:jcplx,1:JZ+1)    
+    call restartvar(ncid, flag, varname='OMC', dim1name='column',dim2name='nlivehetermicb',&
+      dim3name='nomcomplx',dim4name='levsoi1',long_name='microbial biomass C', &
+      units='g d-2', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)      
-    call cpcol(flag,NHW,NHE,NVN,NVS,OMC,datrc_5d)      
+    call cpcol(flag,NHW,NHE,NVN,NVS,OMC,datrc_4d)      
   else
     !print*,'OMC'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,OMC,datrc_5d)        
-    datpr5 => datrc_5d(1:ncols,1:nlbiomcp,1:NumMicrbHetetrophCmplx,1:jcplx,1:JZ+1)    
-    call restartvar(ncid, flag, varname='OMC', dim1name='column',dim2name='nlbiomcp',&
-      dim3name='hetrmicb',dim4name='nomcomplx',dim5name='levsoi1',long_name='microbial biomass C', &
-      units='g d-2', interpinic_flag='skip', data=datpr5, missing_value=spval, &
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,OMC,datrc_4d)        
+    datpr4 => datrc_4d(1:ncols,1:NumLiveHeterBioms,1:jcplx,1:JZ+1)    
+    call restartvar(ncid, flag, varname='OMC', dim1name='column',dim2name='nlivehetermicb',&
+      dim3name='nomcomplx',dim4name='levsoi1',long_name='microbial biomass C', &
+      units='g d-2', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)      
   endif  
 
   if(flag=='read')then
-    datpr5 => datrc_5d(1:ncols,1:nlbiomcp,1:NumMicrbHetetrophCmplx,1:jcplx,1:JZ+1)    
-    call restartvar(ncid, flag, varname='OMN', dim1name='column',dim2name='nlbiomcp',&
-      dim3name='hetrmicb',dim4name='nomcomplx',dim5name='levsoi1',long_name='microbial biomass N', &
-      units='g d-2', interpinic_flag='skip', data=datpr5, missing_value=spval, &
+    datpr4 => datrc_4d(1:ncols,1:NumLiveHeterBioms,1:jcplx,1:JZ+1)    
+    call restartvar(ncid, flag, varname='OMN', dim1name='column',dim2name='nlivehetermicb',&
+      dim3name='nomcomplx',dim4name='levsoi1',long_name='microbial biomass N', &
+      units='g d-2', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)      
-    call cpcol(flag,NHW,NHE,NVN,NVS,OMN,datrc_5d)      
+    call cpcol(flag,NHW,NHE,NVN,NVS,OMN,datrc_4d)      
   else
     !print*,'OMN'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,OMN,datrc_5d)        
-    datpr5 => datrc_5d(1:ncols,1:nlbiomcp,1:NumMicrbHetetrophCmplx,1:jcplx,1:JZ+1)    
-    call restartvar(ncid, flag, varname='OMN', dim1name='column',dim2name='nlbiomcp',&
-      dim3name='hetrmicb',dim4name='nomcomplx',dim5name='levsoi1',long_name='microbial biomass N', &
-      units='g d-2', interpinic_flag='skip', data=datpr5, missing_value=spval, &
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,OMN,datrc_4d)        
+    datpr4 => datrc_4d(1:ncols,1:NumLiveHeterBioms,1:jcplx,1:JZ+1)    
+    call restartvar(ncid, flag, varname='OMN', dim1name='column',dim2name='nlivehetermicb',&
+      dim3name='nomcomplx',dim4name='levsoi1',long_name='microbial biomass N', &
+      units='g d-2', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)      
   endif  
 
   if(flag=='read')then
-    datpr5 => datrc_5d(1:ncols,1:nlbiomcp,1:NumMicrbHetetrophCmplx,1:jcplx,1:JZ+1)    
-    call restartvar(ncid, flag, varname='OMP', dim1name='column',dim2name='nlbiomcp',&
-      dim3name='hetrmicb',dim4name='nomcomplx',dim5name='levsoi1',long_name='microbial biomass P', &
-      units='g d-2', interpinic_flag='skip', data=datpr5, missing_value=spval, &
+    datpr4 => datrc_4d(1:ncols,1:NumLiveHeterBioms,1:jcplx,1:JZ+1)    
+    call restartvar(ncid, flag, varname='OMP', dim1name='column',dim2name='nlivehetermicb',&
+      dim3name='nomcomplx',dim4name='levsoi1',long_name='microbial biomass P', &
+      units='g d-2', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)      
-    call cpcol(flag,NHW,NHE,NVN,NVS,OMP,datrc_5d)      
+    call cpcol(flag,NHW,NHE,NVN,NVS,OMP,datrc_4d)      
   else
     !print*,'OMP'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,OMP,datrc_5d)        
-    datpr5 => datrc_5d(1:ncols,1:nlbiomcp,1:NumMicrbHetetrophCmplx,1:jcplx,1:JZ+1)    
-    call restartvar(ncid, flag, varname='OMP', dim1name='column',dim2name='nlbiomcp',&
-      dim3name='hetrmicb',dim4name='nomcomplx',dim5name='levsoi1',long_name='microbial biomass P', &
-      units='g d-2', interpinic_flag='skip', data=datpr5, missing_value=spval, &
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,OMP,datrc_4d)        
+    datpr4 => datrc_4d(1:ncols,1:NumLiveHeterBioms,1:jcplx,1:JZ+1)    
+    call restartvar(ncid, flag, varname='OMP', dim1name='column',dim2name='nlivehetermicb',&
+      dim3name='nomcomplx',dim4name='levsoi1',long_name='microbial biomass P', &
+      units='g d-2', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)      
   endif  
   
@@ -8224,6 +8224,7 @@ implicit none
   call ncd_defdim(ncid,'fertNb',trc_confs%NFertNitrob, dimid)
   call ncd_defdim(ncid,'automicb',NumMicrobAutotrophCmplx, dimid)
   call ncd_defdim(ncid,'nlbiomcp',nlbiomcp,dimid)
+  call ncd_defdim(ncid,'nlivehetermicb',NumLiveHeterBioms,dimid)
   call ncd_defdim(ncid, 'levsoi', JZ, dimid)
   call ncd_defdim(ncid, 'levsoi1', JZ+1, dimid)
   call ncd_defdim(ncid, 'levsno',  JS,dimid)

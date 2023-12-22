@@ -592,7 +592,7 @@ module RedistMod
   implicit none
   integer, intent(in) :: NY,NX
   real(r8), intent(out) :: DORGE(JY,JX)
-  integer :: K,NO,M,NGL,NTX,NTP
+  integer :: K,NO,M,NGL,NTX,NTP,MID
 
   REAL(R8) :: DORGP
 
@@ -641,9 +641,10 @@ module RedistMod
       DO  NO=1,NumMicbFunGroups
         DO NGL=JGnio(NO),JGnfo(NO)
           DO  M=1,nlbiomcp
-            OMC(M,NGL,K,NU(NY,NX),NY,NX)=OMC(M,NGL,K,NU(NY,NX),NY,NX)+TOMCER(M,NGL,K,NY,NX)
-            OMN(M,NGL,K,NU(NY,NX),NY,NX)=OMN(M,NGL,K,NU(NY,NX),NY,NX)+TOMNER(M,NGL,K,NY,NX)
-            OMP(M,NGL,K,NU(NY,NX),NY,NX)=OMP(M,NGL,K,NU(NY,NX),NY,NX)+TOMPER(M,NGL,K,NY,NX)
+            MID=micpar%get_hmicb_id(M,NGL)
+            OMC(MID,K,NU(NY,NX),NY,NX)=OMC(MID,K,NU(NY,NX),NY,NX)+TOMCER(M,NGL,K,NY,NX)
+            OMN(MID,K,NU(NY,NX),NY,NX)=OMN(MID,K,NU(NY,NX),NY,NX)+TOMNER(M,NGL,K,NY,NX)
+            OMP(MID,K,NU(NY,NX),NY,NX)=OMP(MID,K,NU(NY,NX),NY,NX)+TOMPER(M,NGL,K,NY,NX)
             DORGE(NY,NX)=DORGE(NY,NX)+TOMCER(M,NGL,K,NY,NX)
             DORGP=DORGP+TOMPER(M,NGL,K,NY,NX)
           enddo
@@ -723,9 +724,9 @@ module RedistMod
     !
     ! TOTAL heterotrophic MICROBIAL C,N,P
     !
-    tDC=SUM(OMC(1:nlbiomcp,1:NumMicrbHetetrophCmplx,K,0,NY,NX))
-    tDN=SUM(OMN(1:nlbiomcp,1:NumMicrbHetetrophCmplx,K,0,NY,NX))
-    tDP=SUM(OMP(1:nlbiomcp,1:NumMicrbHetetrophCmplx,K,0,NY,NX))
+    tDC=SUM(OMC(1:NumLiveHeterBioms,K,0,NY,NX))
+    tDN=SUM(OMN(1:NumLiveHeterBioms,K,0,NY,NX))
+    tDP=SUM(OMP(1:NumLiveHeterBioms,K,0,NY,NX))
     DC=DC+tDC
     DN=DN+tDN
     DP=DP+tDP
@@ -1416,9 +1417,9 @@ module RedistMod
 
 ! add living microbes
   DO K=1,jcplx
-    tDC=SUM(OMC(1:nlbiomcp,1:NumMicrbHetetrophCmplx,K,L,NY,NX))
-    tDN=SUM(OMN(1:nlbiomcp,1:NumMicrbHetetrophCmplx,K,L,NY,NX))
-    tDP=SUM(OMP(1:nlbiomcp,1:NumMicrbHetetrophCmplx,K,L,NY,NX))
+    tDC=SUM(OMC(1:NumLiveHeterBioms,K,L,NY,NX))
+    tDN=SUM(OMN(1:NumLiveHeterBioms,K,L,NY,NX))
+    tDP=SUM(OMP(1:NumLiveHeterBioms,K,L,NY,NX))
     IF(micpar%is_litter(K))THEN  
       !K=0,1,2: woody litr, nonwoody litr, and manure
       DC=DC+tDC

@@ -62,6 +62,7 @@ contains
     NumMicbFunGroups     => micpar%NumMicbFunGroups     , &
     NumMicrbHetetrophCmplx  => micpar%NumMicrbHetetrophCmplx  , &
     NumMicrobAutotrophCmplx  => micpar%NumMicrobAutotrophCmplx  , &
+    NumLiveHeterBioms => micpar%NumLiveHeterBioms, &
     jcplx    => micpar%jcplx    , &
     JG       => micpar%jguilds    &
   )
@@ -82,12 +83,12 @@ contains
   ystates0l(cid_orn_b:cid_orn_e)=reshape(forc%ORN(1:ndbiomcp,1:jcplx),(/ndbiomcp*jcplx/))
   ystates0l(cid_orp_b:cid_orp_e)=reshape(forc%ORP(1:ndbiomcp,1:jcplx),(/ndbiomcp*jcplx/))
 
-  ystates0l(cid_omc_b:cid_omc_e)=reshape(forc%OMC(1:nlbiomcp,1:NumMicrbHetetrophCmplx,1:jcplx),&
-    (/nlbiomcp*NumMicrbHetetrophCmplx*jcplx/))
-  ystates0l(cid_omn_b:cid_omn_e)=reshape(forc%OMN(1:nlbiomcp,1:NumMicrbHetetrophCmplx,1:jcplx),&
-    (/nlbiomcp*NumMicrbHetetrophCmplx*jcplx/))
-  ystates0l(cid_omp_b:cid_omp_e)=reshape(forc%OMP(1:nlbiomcp,1:NumMicrbHetetrophCmplx,1:jcplx),&
-    (/nlbiomcp*NumMicrbHetetrophCmplx*jcplx/))
+  ystates0l(cid_omc_b:cid_omc_e)=reshape(forc%OMC(1:NumLiveHeterBioms,1:jcplx),&
+    (/NumLiveHeterBioms*jcplx/))
+  ystates0l(cid_omn_b:cid_omn_e)=reshape(forc%OMN(1:NumLiveHeterBioms,1:jcplx),&
+    (/NumLiveHeterBioms*jcplx/))
+  ystates0l(cid_omp_b:cid_omp_e)=reshape(forc%OMP(1:NumLiveHeterBioms,1:jcplx),&
+    (/NumLiveHeterBioms*jcplx/))
   ystates0l(cid_omcff_b:cid_omcff_e)=reshape(forc%OMCff(1:nlbiomcp,1:NumMicrobAutotrophCmplx),&
     (/nlbiomcp*NumMicrobAutotrophCmplx/))
   ystates0l(cid_omnff_b:cid_omnff_e)=reshape(forc%OMNff(1:nlbiomcp,1:NumMicrobAutotrophCmplx),&
@@ -132,6 +133,7 @@ contains
     iprotein => micpar%iprotein , &
     jsken    => micpar%jsken    , &
     NumMicbFunGroups     => micpar%NumMicbFunGroups     , &
+    NumLiveHeterBioms => micpar%NumLiveHeterBioms, &
     jcplx    => micpar%jcplx    , &
     JG       => micpar%jguilds    &
   )
@@ -292,12 +294,12 @@ contains
   micstt%CNOSC(1:jsken,1:jcplx)=forc%CNOSC(1:jsken,1:jcplx)
   micstt%CPOSC(1:jsken,1:jcplx)=forc%CPOSC(1:jsken,1:jcplx)
 
-  micstt%OMC(1:nlbiomcp,1:NumMicrbHetetrophCmplx,1:jcplx)=reshape(ystates0l(cid_omc_b:cid_omc_e),&
-    (/nlbiomcp,NumMicrbHetetrophCmplx,jcplx/))
-  micstt%OMN(1:nlbiomcp,1:NumMicrbHetetrophCmplx,1:jcplx)=reshape(ystates0l(cid_omn_b:cid_omn_e),&
-    (/nlbiomcp,NumMicrbHetetrophCmplx,jcplx/))
-  micstt%OMP(1:nlbiomcp,1:NumMicrbHetetrophCmplx,1:jcplx)=reshape(ystates0l(cid_omp_b:cid_omp_e),&
-    (/nlbiomcp,NumMicrbHetetrophCmplx,jcplx/))
+  micstt%OMC(1:NumLiveHeterBioms,1:jcplx)=reshape(ystates0l(cid_omc_b:cid_omc_e),&
+    (/NumLiveHeterBioms,jcplx/))
+  micstt%OMN(1:NumLiveHeterBioms,1:jcplx)=reshape(ystates0l(cid_omn_b:cid_omn_e),&
+    (/NumLiveHeterBioms,jcplx/))
+  micstt%OMP(1:NumLiveHeterBioms,1:jcplx)=reshape(ystates0l(cid_omp_b:cid_omp_e),&
+    (/NumLiveHeterBioms,jcplx/))
   micstt%OMCff(1:nlbiomcp,1:NumMicrobAutotrophCmplx)=reshape(ystates0l(cid_omcff_b:cid_omcff_e),&
     (/nlbiomcp,NumMicrobAutotrophCmplx/))
   micstt%OMNff(1:nlbiomcp,1:NumMicrobAutotrophCmplx)=reshape(ystates0l(cid_omnff_b:cid_omnff_e),&
@@ -336,6 +338,7 @@ contains
     NumMicbFunGroups     => micpar%NumMicbFunGroups       , &
     NumMicrobAutotrophCmplx  => micpar%NumMicrobAutotrophCmplx    , &
     NumMicrbHetetrophCmplx  => micpar%NumMicrbHetetrophCmplx    , &
+    NumLiveHeterBioms => micpar%NumLiveHeterBioms, &
     ndbiomcp => micpar%ndbiomcp   , &
     nlbiomcp => micpar%nlbiomcp     &
   )
@@ -418,9 +421,9 @@ contains
   cid_orc_b=addone(itemp);cid_orc_e=cid_orc_b+ndbiomcp*jcplx;itemp=cid_orc_e
   cid_orn_b=addone(itemp);cid_orn_e=cid_orn_b+ndbiomcp*jcplx;itemp=cid_orn_e
   cid_orp_b=addone(itemp);cid_orp_e=cid_orp_b+ndbiomcp*jcplx;itemp=cid_orp_e
-  cid_omc_b=addone(itemp);cid_omc_e=cid_omc_b+nlbiomcp*NumMicrbHetetrophCmplx*jcplx;itemp=cid_omc_e
-  cid_omn_b=addone(itemp);cid_omn_e=cid_omn_b+nlbiomcp*NumMicrbHetetrophCmplx*jcplx;itemp=cid_omn_e
-  cid_omp_b=addone(itemp);cid_omp_e=cid_omp_b+nlbiomcp*NumMicrbHetetrophCmplx*jcplx;itemp=cid_omp_e
+  cid_omc_b=addone(itemp);cid_omc_e=cid_omc_b+NumLiveHeterBioms*jcplx;itemp=cid_omc_e
+  cid_omn_b=addone(itemp);cid_omn_e=cid_omn_b+NumLiveHeterBioms*jcplx;itemp=cid_omn_e
+  cid_omp_b=addone(itemp);cid_omp_e=cid_omp_b+NumLiveHeterBioms*jcplx;itemp=cid_omp_e
   cid_omcff_b=addone(itemp);cid_omcff_e=cid_omcff_b+nlbiomcp*NumMicrobAutotrophCmplx;itemp=cid_omcff_e
   cid_omnff_b=addone(itemp);cid_omnff_e=cid_omnff_b+nlbiomcp*NumMicrobAutotrophCmplx;itemp=cid_omnff_e
   cid_ompff_b=addone(itemp);cid_ompff_e=cid_ompff_b+nlbiomcp*NumMicrobAutotrophCmplx;itemp=cid_ompff_e
@@ -539,6 +542,7 @@ contains
     nlbiomcp  => micpar%nlbiomcp   , &
     ndbiomcp  => micpar%ndbiomcp   , &
     is_litter => micpar%is_litter  , &
+    NumLiveHeterBioms => micpar%NumLiveHeterBioms, &
     NumMicrbHetetrophCmplx   => micpar%NumMicrbHetetrophCmplx    , &
     NumMicrobAutotrophCmplx   => micpar%NumMicrobAutotrophCmplx    , &
     VLWatMicP  => micfor%VLWatMicP         &
@@ -613,12 +617,12 @@ contains
   ystatesfl(cid_orc_b:cid_orc_e)=reshape(micstt%ORC(1:ndbiomcp,1:jcplx),(/ndbiomcp*jcplx/))
   ystatesfl(cid_orn_b:cid_orn_e)=reshape(micstt%ORN(1:ndbiomcp,1:jcplx),(/ndbiomcp*jcplx/))
   ystatesfl(cid_orp_b:cid_orp_e)=reshape(micstt%ORP(1:ndbiomcp,1:jcplx),(/ndbiomcp*jcplx/))
-  ystatesfl(cid_omc_b:cid_omc_e)=reshape(micstt%OMC(1:nlbiomcp,1:NumMicrbHetetrophCmplx,1:jcplx),&
-    (/nlbiomcp*NumMicrbHetetrophCmplx*jcplx/))
-  ystatesfl(cid_omn_b:cid_omn_e)=reshape(micstt%OMN(1:nlbiomcp,1:NumMicrbHetetrophCmplx,1:jcplx),&
-    (/nlbiomcp*NumMicrbHetetrophCmplx*jcplx/))
-  ystatesfl(cid_omp_b:cid_omp_e)=reshape(micstt%OMP(1:nlbiomcp,1:NumMicrbHetetrophCmplx,1:jcplx),&
-    (/nlbiomcp*NumMicrbHetetrophCmplx*jcplx/))
+  ystatesfl(cid_omc_b:cid_omc_e)=reshape(micstt%OMC(1:NumLiveHeterBioms,1:jcplx),&
+    (/NumLiveHeterBioms*jcplx/))
+  ystatesfl(cid_omn_b:cid_omn_e)=reshape(micstt%OMN(1:NumLiveHeterBioms,1:jcplx),&
+    (/NumLiveHeterBioms*jcplx/))
+  ystatesfl(cid_omp_b:cid_omp_e)=reshape(micstt%OMP(1:NumLiveHeterBioms,1:jcplx),&
+    (/NumLiveHeterBioms*jcplx/))
   ystatesfl(cid_omcff_b:cid_omcff_e)=reshape(micstt%OMCff(1:nlbiomcp,1:NumMicrobAutotrophCmplx),&
     (/nlbiomcp*NumMicrobAutotrophCmplx/))
   ystatesfl(cid_omnff_b:cid_omnff_e)=reshape(micstt%OMNff(1:nlbiomcp,1:NumMicrobAutotrophCmplx),&
@@ -1692,7 +1696,7 @@ contains
   real(r8) :: DC,DN,DP        !litter
   real(r8) :: OC,ON,OP        !SOM
   real(r8) :: ORGC,ORGN,ORGR
-  integer :: K,N,M,NGL
+  integer :: K,N,M,NGL,MID
 
   DC=0.0_r8
   DN=0.0_r8
@@ -1706,9 +1710,10 @@ contains
       DO N=1,micpar%NumMicbFunGroups
         DO NGL=micpar%JGnio(N),micpar%JGnfo(N)
           DO  M=1,micpar%nlbiomcp
-            DC=DC+micstt%OMC(M,NGL,K)
-            DN=DN+micstt%OMN(M,NGL,K)
-            DP=DP+micstt%OMP(M,NGL,K)
+            MID=micpar%get_hmicb_id(M,NGL)
+            DC=DC+micstt%OMC(MID,K)
+            DN=DN+micstt%OMN(MID,K)
+            DP=DP+micstt%OMP(MID,K)
           ENDDO
         enddo
       ENDDO
@@ -1716,9 +1721,10 @@ contains
       DO N=1,micpar%NumMicbFunGroups
         DO NGL=micpar%JGnio(N),micpar%JGnfo(N)
           DO  M=1,micpar%nlbiomcp
-            OC=OC+micstt%OMC(M,NGL,K)
-            ON=ON+micstt%OMN(M,NGL,K)
-            OP=OP+micstt%OMP(M,NGL,K)
+            MID=micpar%get_hmicb_id(M,NGL)          
+            OC=OC+micstt%OMC(MID,K)
+            ON=ON+micstt%OMN(MID,K)
+            OP=OP+micstt%OMP(MID,K)
           enddo
         enddo
       ENDDO

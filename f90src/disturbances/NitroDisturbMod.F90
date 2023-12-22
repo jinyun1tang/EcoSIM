@@ -41,7 +41,7 @@ module NitroDisturbMod
   implicit none
   integer, intent(in) :: I,J,NY,NX
 
-  integer :: L,K,M,N,IFLGJ,NLL,NGL,NTF
+  integer :: L,K,M,N,IFLGJ,NLL,NGL,NTF,MID
   real(r8) :: DC,DN,DP
   real(r8) :: DCORPC
   real(r8) :: FORGCX
@@ -106,9 +106,10 @@ module NitroDisturbMod
             D2960: DO N=1,NumMicbFunGroups
               DO NGL=JGnio(N),JGnfo(N)
                 DO M=1,nlbiomcp
-                  OCH=DCORPC*OMC(M,NGL,K,L,NY,NX)
-                  ONH=DCORPC*OMN(M,NGL,K,L,NY,NX)
-                  OPH=DCORPC*OMP(M,NGL,K,L,NY,NX)
+                  MID=micpar%get_hmicb_id(M,NGL)
+                  OCH=DCORPC*OMC(MID,K,L,NY,NX)
+                  ONH=DCORPC*OMN(MID,K,L,NY,NX)
+                  OPH=DCORPC*OMP(MID,K,L,NY,NX)
                   ONX=EFIRE(1,ITILL(I,NY,NX))*ONH
                   OPX=EFIRE(2,ITILL(I,NY,NX))*OPH
                   IF(micpar%is_litter(K))THEN
@@ -118,12 +119,12 @@ module NitroDisturbMod
                     ONL(1,K)=ONL(1,K)+ONH-ONX
                     OPL(1,K)=OPL(1,K)+OPH-OPX
                   ENDIF
-                  OMC(M,NGL,K,L,NY,NX)=OMC(M,NGL,K,L,NY,NX)-OCH
-                  OMN(M,NGL,K,L,NY,NX)=OMN(M,NGL,K,L,NY,NX)-ONH
-                  OMP(M,NGL,K,L,NY,NX)=OMP(M,NGL,K,L,NY,NX)-OPH
-                  DC=DC+OMC(M,NGL,K,L,NY,NX)
-                  DN=DN+OMN(M,NGL,K,L,NY,NX)
-                  DP=DP+OMP(M,NGL,K,L,NY,NX)
+                  OMC(MID,K,L,NY,NX)=OMC(MID,K,L,NY,NX)-OCH
+                  OMN(MID,K,L,NY,NX)=OMN(MID,K,L,NY,NX)-ONH
+                  OMP(MID,K,L,NY,NX)=OMP(MID,K,L,NY,NX)-OPH
+                  DC=DC+OMC(MID,K,L,NY,NX)
+                  DN=DN+OMN(MID,K,L,NY,NX)
+                  DP=DP+OMP(MID,K,L,NY,NX)
                   OC=OC+OCH
                   ON=ON+ONX
                   OP=OP+OPX

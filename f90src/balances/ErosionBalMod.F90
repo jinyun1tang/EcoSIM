@@ -28,8 +28,7 @@ implicit none
   implicit none
   integer, intent(in) :: NY,NX
 
-  integer :: L,LL,M,N,K,NGL
-
+  integer :: L,LL,M,N,K,NGL,MID
   real(r8) :: FSINK,FSAN,FSIL,FCLA,FCEC,FAEC
   real(r8) :: FNX
   real(r8) :: FOMC,FOMN,FOMP
@@ -130,15 +129,16 @@ implicit none
         D1960: DO N=1,NumMicbFunGroups
           DO NGL=JGnio(N),JGnfo(N)
             DO M=1,nlbiomcp
-              FOMC=FSINK*OMC(M,NGL,K,L,NY,NX)
-              FOMN=FSINK*OMN(M,NGL,K,L,NY,NX)
-              FOMP=FSINK*OMP(M,NGL,K,L,NY,NX)
-              OMC(M,NGL,K,LL,NY,NX)=OMC(M,NGL,K,LL,NY,NX)+FOMC
-              OMN(M,NGL,K,LL,NY,NX)=OMN(M,NGL,K,LL,NY,NX)+FOMN
-              OMP(M,NGL,K,LL,NY,NX)=OMP(M,NGL,K,LL,NY,NX)+FOMP
-              OMC(M,NGL,K,L,NY,NX)=OMC(M,NGL,K,L,NY,NX)-FOMC
-              OMN(M,NGL,K,L,NY,NX)=OMN(M,NGL,K,L,NY,NX)-FOMN
-              OMP(M,NGL,K,L,NY,NX)=OMP(M,NGL,K,L,NY,NX)-FOMP
+              MID=micpar%get_hmicb_id(M,NGL)
+              FOMC=FSINK*OMC(MID,K,L,NY,NX)
+              FOMN=FSINK*OMN(MID,K,L,NY,NX)
+              FOMP=FSINK*OMP(MID,K,L,NY,NX)
+              OMC(MID,K,LL,NY,NX)=OMC(MID,K,LL,NY,NX)+FOMC
+              OMN(MID,K,LL,NY,NX)=OMN(MID,K,LL,NY,NX)+FOMN
+              OMP(MID,K,LL,NY,NX)=OMP(MID,K,LL,NY,NX)+FOMP
+              OMC(MID,K,L,NY,NX)=OMC(MID,K,L,NY,NX)-FOMC
+              OMN(MID,K,L,NY,NX)=OMN(MID,K,L,NY,NX)-FOMN
+              OMP(MID,K,L,NY,NX)=OMP(MID,K,L,NY,NX)-FOMP
             enddo
           enddo
         ENDDO D1960

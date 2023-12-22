@@ -962,7 +962,6 @@ module StartsMod
 
 !------------------------------------------------------------------------------------------
 
-
   subroutine startsim(NHW,NHE,NVN,NVS)
   use SoilHydroParaMod, only : ComputeSoilHydroPars
   use SoilPhysParaMod, only : SetDeepSoil

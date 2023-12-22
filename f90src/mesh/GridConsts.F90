@@ -30,7 +30,7 @@ implicit none
   integer, pointer :: JGnfA(:)   !guid indices for autotrophic-microbial complex
   integer  :: NumMicrobAutotrophCmplx             !total number of microbial guilds in the autotrophic complex
   integer  :: NumMicrbHetetrophCmplx             !total number of microbial guilds in one organic-microbial complex
-   
+  integer  :: NumLiveHeterBioms         !total number of live biomass component in one heterotroph organo-microbe complex
   type, public :: bounds_type
    integer :: NHW
    integer :: NVN

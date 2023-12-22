@@ -997,7 +997,7 @@ module Hour1Mod
 
   DO L=0,NL(NY,NX)
 !  add heterotrophic complexs
-    OC=OC+sum(OMC(1:nlbiomcp,1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX))
+    OC=OC+sum(OMC(1:NumLiveHeterBioms,1:jcplx,L,NY,NX))
 
 !  add autotrophic complex
     OC=OC+sum(OMCff(1:nlbiomcp,1:NumMicrobAutotrophCmplx,L,NY,NX))
@@ -1630,7 +1630,7 @@ module Hour1Mod
   real(r8) :: OQC1,OQN1,OQP1
   real(r8) :: OSC1,OSN1,OSP1
   REAL(R8) :: RNT,RPT
-  integer  :: L,K,M,N,NN,NGL
+  integer  :: L,K,M,N,NN,NGL,MID
   real(r8) :: tglds
   real(r8) :: OMC1g,OMN1g,OMP1g
 !     begin_execution
@@ -1800,12 +1800,13 @@ module Hour1Mod
           OMN1=AZMAX1(AMIN1(OMC1*micpar%rNCOMCa(M,N,K),OSNI-OSNX))
           OMP1=AZMAX1(AMIN1(OMC1*micpar%rPCOMCa(M,N,K),OSPI-OSPX))
           DO NGL=JGnio(N),JGnfo(N)
+            MID=micpar%get_hmicb_id(M,NGL)
             OMC1g=OMC1/tglds
             OMN1g=OMN1/tglds
             OMP1g=OMP1/tglds
-            OMC(M,NGL,K,LFDPTH,NY,NX)=OMC(M,NGL,K,LFDPTH,NY,NX)+OMC1g
-            OMN(M,NGL,K,LFDPTH,NY,NX)=OMN(M,NGL,K,LFDPTH,NY,NX)+OMN1g
-            OMP(M,NGL,K,LFDPTH,NY,NX)=OMP(M,NGL,K,LFDPTH,NY,NX)+OMP1g
+            OMC(MID,K,LFDPTH,NY,NX)=OMC(MID,K,LFDPTH,NY,NX)+OMC1g
+            OMN(MID,K,LFDPTH,NY,NX)=OMN(MID,K,LFDPTH,NY,NX)+OMN1g
+            OMP(MID,K,LFDPTH,NY,NX)=OMP(MID,K,LFDPTH,NY,NX)+OMP1g
           ENDDO
           OSCX=OSCX+OMC1
           OSNX=OSNX+OMN1

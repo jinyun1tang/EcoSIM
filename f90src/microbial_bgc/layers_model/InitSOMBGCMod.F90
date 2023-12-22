@@ -43,7 +43,7 @@ module InitSOMBGCMOD
   JGnfA  => micpar%JGnfA
   NumMicrobAutotrophCmplx= micpar%NumMicrobAutotrophCmplx
   NumMicrbHetetrophCmplx= micpar%NumMicrbHetetrophCmplx
-
+  NumLiveHeterBioms =micpar%NumLiveHeterBioms
   allocate(CORGCX(1:jcplx))
   allocate(CORGNX(1:jcplx))
   allocate(CORGPX(1:jcplx))
@@ -83,7 +83,8 @@ module InitSOMBGCMOD
   real(r8) :: OSNX(1:jcplx)
   real(r8) :: OSPX(1:jcplx)
   real(r8) :: tglds
-! begin_execution
+  integer :: MID
+  ! begin_execution
 
   associate(                  &
     rNCOMCa  => micpar%rNCOMCa ,&
@@ -250,9 +251,10 @@ module InitSOMBGCMOD
         OMN1=AZMAX1(OMC1*rNCOMCa(M,N,K)*FOSNI)
         OMP1=AZMAX1(OMC1*rPCOMCa(M,N,K)*FOSPI)
         do NGL=JGnio(N),JGnfo(N)
-          OMC(M,NGL,K,L,NY,NX)=OMC1/tglds
-          OMN(M,NGL,K,L,NY,NX)=OMN1/tglds
-          OMP(M,NGL,K,L,NY,NX)=OMP1/tglds
+          MID=micpar%get_hmicb_id(M,NGL)
+          OMC(MID,K,L,NY,NX)=OMC1/tglds
+          OMN(MID,K,L,NY,NX)=OMN1/tglds
+          OMP(MID,K,L,NY,NX)=OMP1/tglds
         ENDDO
         OSCX(KK)=OSCX(KK)+OMC1
         OSNX(KK)=OSNX(KK)+OMN1
@@ -374,13 +376,13 @@ module InitSOMBGCMOD
     DO  N=1,NumMicbFunGroups
       do NGL=JGnio(n),JGnfo(n)
         DO  M=1,nlbiomcp
-          OC=OC+OMC(M,NGL,K,L,NY,NX)
-          ON=ON+OMN(M,NGL,K,L,NY,NX)
-          OP=OP+OMP(M,NGL,K,L,NY,NX)
+          OC=OC+OMC(MID,K,L,NY,NX)
+          ON=ON+OMN(MID,K,L,NY,NX)
+          OP=OP+OMP(MID,K,L,NY,NX)
           IF(K.LE.micpar%NumOfLitrCmplxs)THEN
-            RC=RC+OMC(M,NGL,K,L,NY,NX)
+            RC=RC+OMC(MID,K,L,NY,NX)
           ENDIF
-          RC0(K,NY,NX)=RC0(K,NY,NX)+OMC(M,NGL,K,L,NY,NX)
+          RC0(K,NY,NX)=RC0(K,NY,NX)+OMC(MID,K,L,NY,NX)
         ENDDO
       ENDDO
     enddo

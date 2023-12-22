@@ -78,9 +78,9 @@ implicit none
     real(r8), allocatable :: OHN(:)
     real(r8), allocatable :: OHP(:)
     real(r8), allocatable :: DOM(:,:)
-    real(r8), allocatable :: OMC(:,:,:)
-    real(r8), allocatable :: OMN(:,:,:)
-    real(r8), allocatable :: OMP(:,:,:)
+    real(r8), allocatable :: OMC(:,:)
+    real(r8), allocatable :: OMN(:,:)
+    real(r8), allocatable :: OMP(:,:)
     real(r8), allocatable :: OMCff(:,:)
     real(r8), allocatable :: OMNff(:,:)
     real(r8), allocatable :: OMPff(:,:)
@@ -231,6 +231,7 @@ implicit none
   character(len=*), intent(in) :: fname
   integer :: jcplx,ndbiomcp,nlbiomcp
   integer :: NumMicbFunGroups,jsken,NumMicrbHetetrophCmplx,NumMicrobAutotrophCmplx
+  integer :: NumLiveHeterBioms
   type(file_desc_t) :: ncf
 
   call ncd_pio_openfile(ncf, fname, ncd_nowrite)
@@ -239,12 +240,13 @@ implicit none
   jsken =get_dim_len(ncf,'jsken')
   NumMicrbHetetrophCmplx=get_dim_len(ncf,'NumMicrbHetetrophCmplx')
   NumMicrobAutotrophCmplx=get_dim_len(ncf,'NumMicrobAutotrophCmplx')
+  NumLiveHeterBioms = get_dim_len(ncf,'NumLiveHeterBioms')
   nlbiomcp=get_dim_len(ncf,'nlbiomcp')
   ndbiomcp=get_dim_len(ncf,'ndbiomcp')
   NumMicbFunGroups    =get_dim_len(ncf,'NumMicbFunGroups')
-  allocate(forc%OMC(nlbiomcp,NumMicrbHetetrophCmplx,1:jcplx))
-  allocate(forc%OMN(nlbiomcp,NumMicrbHetetrophCmplx,1:jcplx))
-  allocate(forc%OMP(nlbiomcp,NumMicrbHetetrophCmplx,1:jcplx))
+  allocate(forc%OMC(NumLiveHeterBioms,1:jcplx))
+  allocate(forc%OMN(NumLiveHeterBioms,1:jcplx))
+  allocate(forc%OMP(NumLiveHeterBioms,1:jcplx))
   allocate(forc%DOM(idom_beg:idom_end,1:jcplx))
   allocate(forc%OSC(jsken,1:jcplx))
   allocate(forc%OSA(jsken,1:jcplx))

@@ -8,9 +8,9 @@ implicit none
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
 
-  real(r8),target,allocatable :: OMC(:,:,:,:,:,:)    !microbial biomass C	[g d-2]
-  real(r8),target,allocatable :: OMN(:,:,:,:,:,:)    !microbial biomass N	[g d-2]
-  real(r8),target,allocatable :: OMP(:,:,:,:,:,:)    !microbial biomass P	[g d-2]
+  real(r8),target,allocatable :: OMC(:,:,:,:,:)    !microbial biomass C	[g d-2]
+  real(r8),target,allocatable :: OMN(:,:,:,:,:)    !microbial biomass N	[g d-2]
+  real(r8),target,allocatable :: OMP(:,:,:,:,:)    !microbial biomass P	[g d-2]
   real(r8),target,allocatable :: ROXYS(:,:,:,:,:)    !aqueous O2 demand	[g d-2 h-1]
   real(r8),target,allocatable :: ROQCS(:,:,:,:,:)    !net microbial DOC flux	[g d-2 h-1]
   real(r8),target,allocatable :: ROQAS(:,:,:,:,:)    !net microbial acetate flux	[g d-2 h-1]
@@ -80,9 +80,9 @@ implicit none
   subroutine InitAllocate
 
   implicit none
-  allocate(OMC(nlbiomcp,NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(OMN(nlbiomcp,NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(OMP(nlbiomcp,NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
+  allocate(OMC(NumLiveHeterBioms,1:jcplx,0:JZ,JY,JX))
+  allocate(OMN(NumLiveHeterBioms,1:jcplx,0:JZ,JY,JX))
+  allocate(OMP(NumLiveHeterBioms,1:jcplx,0:JZ,JY,JX))
   allocate(ROXYS(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
   allocate(ROQCS(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
   allocate(ROQAS(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
@@ -105,9 +105,9 @@ implicit none
   allocate(RIPO1(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
   allocate(RIPB1(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
   allocate(RIPO1R(NumMicrbHetetrophCmplx,1:jcplx,JY,JX))
-  allocate(OMCER(nlbiomcp*NumMicrbHetetrophCmplx,1:jcplx,2,2,JV,JH))
-  allocate(OMNER(nlbiomcp*NumMicrbHetetrophCmplx,1:jcplx,2,2,JV,JH))
-  allocate(OMPER(nlbiomcp*NumMicrbHetetrophCmplx,1:jcplx,2,2,JV,JH))
+  allocate(OMCER(NumLiveHeterBioms,1:jcplx,2,2,JV,JH))
+  allocate(OMNER(NumLiveHeterBioms,1:jcplx,2,2,JV,JH))
+  allocate(OMPER(NumLiveHeterBioms,1:jcplx,2,2,JV,JH))
 
   allocate(OMCff(nlbiomcp,NumMicrobAutotrophCmplx,0:JZ,JY,JX))
   allocate(OMNff(nlbiomcp,NumMicrobAutotrophCmplx,0:JZ,JY,JX))

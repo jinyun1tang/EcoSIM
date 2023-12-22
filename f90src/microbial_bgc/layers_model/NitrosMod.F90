@@ -120,7 +120,8 @@ module nitrosMod
   real(r8) :: OQAHXS,OHAXS,OQNXS,OQNHXS
   real(r8) :: OHNXS,OQPXS,OQPHXS,OHPXS
   real(r8) :: OSCXS,OSAXS,OSNXS,OSPXS
-  integer :: K,M,N,NGL
+  integer :: K,M,N,NGL,MID
+  
 !     begin_execution
   IF(FOSCXS.GT.ZERO)THEN
     D7971: DO K=1,micpar%NumOfLitrCmplxs
@@ -128,21 +129,22 @@ module nitrosMod
       D7961: DO N=1,NumMicbFunGroups
         DO NGL=JGnio(N),JGnfo(N)
           D7962: DO M=1,micpar%nlbiomcp
+            MID=micpar%get_hmicb_id(M,NGL)
             IF(FOSCXS.GT.0.0)THEN
-              OMCXS=FOSCXS*AZMAX1(OMC(M,NGL,K,L,NY,NX))
-              OMNXS=FOSCXS*AZMAX1(OMN(M,NGL,K,L,NY,NX))
-              OMPXS=FOSCXS*AZMAX1(OMP(M,NGL,K,L,NY,NX))
+              OMCXS=FOSCXS*AZMAX1(OMC(MID,K,L,NY,NX))
+              OMNXS=FOSCXS*AZMAX1(OMN(MID,K,L,NY,NX))
+              OMPXS=FOSCXS*AZMAX1(OMP(MID,K,L,NY,NX))
             ELSE
-              OMCXS=FOSCXS*AZMAX1(OMC(M,NGL,K,LL,NY,NX))
-              OMNXS=FOSCXS*AZMAX1(OMN(M,NGL,K,LL,NY,NX))
-              OMPXS=FOSCXS*AZMAX1(OMP(M,NGL,K,LL,NY,NX))
+              OMCXS=FOSCXS*AZMAX1(OMC(MID,K,LL,NY,NX))
+              OMNXS=FOSCXS*AZMAX1(OMN(MID,K,LL,NY,NX))
+              OMPXS=FOSCXS*AZMAX1(OMP(MID,K,LL,NY,NX))
             ENDIF
-            OMC(M,NGL,K,L,NY,NX)=OMC(M,NGL,K,L,NY,NX)-OMCXS
-            OMN(M,NGL,K,L,NY,NX)=OMN(M,NGL,K,L,NY,NX)-OMNXS
-            OMP(M,NGL,K,L,NY,NX)=OMP(M,NGL,K,L,NY,NX)-OMPXS
-            OMC(M,NGL,K,LL,NY,NX)=OMC(M,NGL,K,LL,NY,NX)+OMCXS
-            OMN(M,NGL,K,LL,NY,NX)=OMN(M,NGL,K,LL,NY,NX)+OMNXS
-            OMP(M,NGL,K,LL,NY,NX)=OMP(M,NGL,K,LL,NY,NX)+OMPXS
+            OMC(MID,K,L,NY,NX)=OMC(MID,K,L,NY,NX)-OMCXS
+            OMN(MID,K,L,NY,NX)=OMN(MID,K,L,NY,NX)-OMNXS
+            OMP(MID,K,L,NY,NX)=OMP(MID,K,L,NY,NX)-OMPXS
+            OMC(MID,K,LL,NY,NX)=OMC(MID,K,LL,NY,NX)+OMCXS
+            OMN(MID,K,LL,NY,NX)=OMN(MID,K,LL,NY,NX)+OMNXS
+            OMP(MID,K,LL,NY,NX)=OMP(MID,K,LL,NY,NX)+OMPXS
           ENDDO D7962
         ENDDO
       ENDDO D7961

@@ -78,9 +78,9 @@ implicit none
   real(r8),allocatable :: ORP(:,:)
   real(r8),allocatable :: CNOSC(:,:)
   real(r8),allocatable :: CPOSC(:,:)
-  real(r8),allocatable :: OMC(:,:,:)
-  real(r8),allocatable :: OMN(:,:,:)
-  real(r8),allocatable :: OMP(:,:,:)
+  real(r8),allocatable :: OMC(:,:)
+  real(r8),allocatable :: OMN(:,:)
+  real(r8),allocatable :: OMP(:,:)
   real(r8),allocatable :: OMCff(:,:)
   real(r8),allocatable :: OMNff(:,:)
   real(r8),allocatable :: OMPff(:,:)
@@ -98,16 +98,18 @@ implicit none
   implicit none
   class(micsttype) :: this
   integer :: jcplx,NumMicbFunGroups,jsken
-  integer :: ndbiomcp, nlbiomcp
-  integer :: NumMicrobAutotrophCmplx, NumMicrbHetetrophCmplx
-
+  integer, pointer :: ndbiomcp, nlbiomcp
+  integer, pointer :: NumMicrobAutotrophCmplx, NumMicrbHetetrophCmplx
+  integer, pointer :: NumLiveHeterBioms
+  
   jcplx=micpar%jcplx
   NumMicbFunGroups=micpar%NumMicbFunGroups
   jsken=micpar%jsken
-  ndbiomcp=micpar%ndbiomcp
-  nlbiomcp=micpar%nlbiomcp
-  NumMicrobAutotrophCmplx=micpar%NumMicrobAutotrophCmplx
-  NumMicrbHetetrophCmplx=micpar%NumMicrbHetetrophCmplx
+  ndbiomcp =>micpar%ndbiomcp
+  nlbiomcp =>micpar%nlbiomcp
+  NumMicrobAutotrophCmplx=>micpar%NumMicrobAutotrophCmplx
+  NumMicrbHetetrophCmplx=>micpar%NumMicrbHetetrophCmplx
+  NumLiveHeterBioms => micpar%NumLiveHeterBioms
 
   allocate(this%FOSRH(1:jcplx))
   allocate(this%DOM(idom_beg:idom_end,1:jcplx))
@@ -124,9 +126,9 @@ implicit none
   allocate(this%ORP(ndbiomcp,1:jcplx))
   allocate(this%CNOSC(jsken,1:jcplx))
   allocate(this%CPOSC(jsken,1:jcplx))
-  allocate(this%OMC(nlbiomcp,NumMicrbHetetrophCmplx,1:jcplx))
-  allocate(this%OMN(nlbiomcp,NumMicrbHetetrophCmplx,1:jcplx))
-  allocate(this%OMP(nlbiomcp,NumMicrbHetetrophCmplx,1:jcplx))
+  allocate(this%OMC(NumLiveHeterBioms,1:jcplx))
+  allocate(this%OMN(NumLiveHeterBioms,1:jcplx))
+  allocate(this%OMP(NumLiveHeterBioms,1:jcplx))
   allocate(this%OMCff(nlbiomcp,NumMicrobAutotrophCmplx))
   allocate(this%OMNff(nlbiomcp,NumMicrobAutotrophCmplx))
   allocate(this%OMPff(nlbiomcp,NumMicrobAutotrophCmplx))
