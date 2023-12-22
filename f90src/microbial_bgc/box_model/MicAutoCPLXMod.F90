@@ -471,8 +471,8 @@ module MicAutoCPLXMod
     TCGOMP   => ncplxf%TCGOMP,    &
     CNQ      => ncplxs%CNQ,       &
     CPQ      => ncplxs%CPQ,       &
-    CNOMCff  => micpar%CNOMCff,   &
-    CPOMCff  => micpar%CPOMCff,   &
+    rNCOMCff  => micpar%rNCOMCff,   &
+    rPCOMCff  => micpar%rPCOMCff,   &
     FL       => micpar%FL       , &
     ZEROS    => micfor%ZEROS    , &
     ZERO     => micfor%ZERO     , &
@@ -519,21 +519,21 @@ module MicAutoCPLXMod
 !
 !     OMC,OMN,OMP=nonstructural C,N,P
 !     CCC,CNC,CPC=C:N:P ratios used to calculate C,N,P recycling
-!     CNOMC,CPOMC=maximum microbial N:C, P:C ratios
+!     rNCOMC,rPCOMC=maximum microbial N:C, P:C ratios
 !     RCCC,RCCN,RCCP=C,N,P recycling fractions
 !     RCCZ,RCCY=min, max C recycling fractions
 !     RCCX,RCCQ=max N,P recycling fractions
 !
   IF(OMCff(3,NGL).GT.ZEROS.AND.OMCff(1,NGL).GT.ZEROS)THEN
     CCC=AZMAX1(AMIN1(1.0_r8 &
-      ,OMNff(3,NGL)/(OMNff(3,NGL)+OMCff(3,NGL)*CNOMCff(3,NGL)) &
-      ,OMPff(3,NGL)/(OMPff(3,NGL)+OMCff(3,NGL)*CPOMCff(3,NGL))))
+      ,OMNff(3,NGL)/(OMNff(3,NGL)+OMCff(3,NGL)*rNCOMCff(3,NGL)) &
+      ,OMPff(3,NGL)/(OMPff(3,NGL)+OMCff(3,NGL)*rPCOMCff(3,NGL))))
     CXC=OMCff(3,NGL)/OMCff(1,NGL)
     C3C=1.0_r8/(1.0_r8+CXC/CKC)
     CNC=AZMAX1(AMIN1(1.0_r8 &
-      ,OMCff(3,NGL)/(OMCff(3,NGL)+OMNff(3,NGL)/CNOMCff(3,NGL))))
+      ,OMCff(3,NGL)/(OMCff(3,NGL)+OMNff(3,NGL)/rNCOMCff(3,NGL))))
     CPC=AZMAX1(AMIN1(1.0_r8 &
-      ,OMCff(3,NGL)/(OMCff(3,NGL)+OMPff(3,NGL)/CPOMCff(3,NGL))))
+      ,OMCff(3,NGL)/(OMCff(3,NGL)+OMPff(3,NGL)/rPCOMCff(3,NGL))))
     RCCC=RCCZ+AMAX1(CCC,C3C)*RCCY
     RCCN=CNC*RCCX
     RCCP=CPC*RCCQ
@@ -1498,8 +1498,8 @@ module MicAutoCPLXMod
    RIP14ff  => nmicf%RIP14ff,    &
    RIP1Bff  => nmicf%RIP1Bff,    &
    RIP14Rff  => nmicf%RIP14Rff,  &
-   CNOMCff  => micpar%CNOMCff   , &
-   CPOMCff  => micpar%CPOMCff   , &
+   rNCOMCff  => micpar%rNCOMCff   , &
+   rPCOMCff  => micpar%rPCOMCff   , &
    VLNH4    => micfor%VLNH4     , &
    VLNHB    => micfor%VLNHB     , &
    VLWatMicP     => micfor%VLWatMicP      , &
@@ -1552,7 +1552,7 @@ module MicAutoCPLXMod
 !
 !     RINHP=NH4 mineralization (-ve) or immobilization (+ve) demand
 !     OMC,OMN=microbial nonstructural C,N
-!     CNOMC=maximum microbial N:C ratio
+!     rNCOMC=maximum microbial N:C ratio
 !     CNH4S,CNH4B=aqueous NH4 concentrations in non-band, band
 !     Z4MX,Z4MN,Z4KU=parameters for max NH4 uptake rate,
 !     minimum NH4 concentration and Km for NH4 uptake
@@ -1569,7 +1569,7 @@ module MicAutoCPLXMod
 !
   FNH4S=VLNH4
   FNHBS=VLNHB
-  RINHP=OMCff(3,NGL)*CNOMCff(3,NGL)-OMNff(3,NGL)
+  RINHP=OMCff(3,NGL)*rNCOMCff(3,NGL)-OMNff(3,NGL)
   IF(RINHP.GT.0.0_r8)THEN
     CNH4X=AZMAX1(CNH4S-Z4MN)
     CNH4Y=AZMAX1(CNH4B-Z4MN)
@@ -1634,7 +1634,7 @@ module MicAutoCPLXMod
 !
 !     RIPOP=H2PO4 mineralization (-ve) or immobilization (+ve) demand
 !     OMC,OMP=microbial nonstructural C,P
-!     CPOMC=maximum microbial P:C ratio
+!     rPCOMC=maximum microbial P:C ratio
 !     CH2P4,CH2P4B=aqueous H2PO4 concentrations in non-band, band
 !     HPMX,HPMN,HPKU=parameters for max H2PO4 uptake rate,
 !     min H2PO4 concentration and Km for H2PO4 uptake
@@ -1651,7 +1651,7 @@ module MicAutoCPLXMod
 !
   FH2PS=VLPO4
   FH2PB=VLPOB
-  RIPOP=(OMCff(3,NGL)*CPOMCff(3,NGL)-OMPff(3,NGL))
+  RIPOP=(OMCff(3,NGL)*rPCOMCff(3,NGL)-OMPff(3,NGL))
   IF(RIPOP.GT.0.0)THEN
     CH2PX=AZMAX1(CH2P4-HPMN)
     CH2PY=AZMAX1(CH2P4B-HPMN)
@@ -1909,7 +1909,7 @@ module MicAutoCPLXMod
 !
 !     RGN2P=respiration to meet N2 fixation demand
 !     OMC,OMN=microbial nonstructural C,N
-!     CNOMC=maximum microbial N:C ratio
+!     rNCOMC=maximum microbial N:C ratio
 !     EN2F=N2 fixation yield per unit nonstructural C
 !     RGOMT=growth respiration
 !     RGN2F=respiration for N2 fixation
@@ -1993,13 +1993,13 @@ module MicAutoCPLXMod
     OSP24U    => micstt%OSP24U , &
     JGniA     => micpar%JGniA  , &
     JGnfA     => micpar%JGnfA  , &
-    NFGs      => micpar%NFGs   , &
+    NumMicbFunGroups      => micpar%NumMicbFunGroups   , &
     icarbhyro => micpar%icarbhyro, &
     iprotein  => micpar%iprotein , &
     k_POM     => micpar%k_POM  , &
     is_activef_micb => micpar%is_activef_micb  &
   )
-  DO  N=1,NFGs
+  DO  N=1,NumMicbFunGroups
     IF(is_activef_micb(N))THEN
       DO NGL=JGniA(N),JGnfA(N)
         DO  M=1,2

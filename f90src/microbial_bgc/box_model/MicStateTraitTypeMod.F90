@@ -97,17 +97,17 @@ implicit none
   subroutine Init(this)
   implicit none
   class(micsttype) :: this
-  integer :: jcplx,nfgs,jsken
+  integer :: jcplx,NumMicbFunGroups,jsken
   integer :: ndbiomcp, nlbiomcp
-  integer :: NumOfMicrobsInAutotrophCmplx, NumOfMicrobs1HetertrophCmplx
+  integer :: NumMicrobAutotrophCmplx, NumMicrbHetetrophCmplx
 
   jcplx=micpar%jcplx
-  NFGs=micpar%NFGs
+  NumMicbFunGroups=micpar%NumMicbFunGroups
   jsken=micpar%jsken
   ndbiomcp=micpar%ndbiomcp
   nlbiomcp=micpar%nlbiomcp
-  NumOfMicrobsInAutotrophCmplx=micpar%NumOfMicrobsInAutotrophCmplx
-  NumOfMicrobs1HetertrophCmplx=micpar%NumOfMicrobs1HetertrophCmplx
+  NumMicrobAutotrophCmplx=micpar%NumMicrobAutotrophCmplx
+  NumMicrbHetetrophCmplx=micpar%NumMicrbHetetrophCmplx
 
   allocate(this%FOSRH(1:jcplx))
   allocate(this%DOM(idom_beg:idom_end,1:jcplx))
@@ -124,12 +124,12 @@ implicit none
   allocate(this%ORP(ndbiomcp,1:jcplx))
   allocate(this%CNOSC(jsken,1:jcplx))
   allocate(this%CPOSC(jsken,1:jcplx))
-  allocate(this%OMC(nlbiomcp,NumOfMicrobs1HetertrophCmplx,1:jcplx))
-  allocate(this%OMN(nlbiomcp,NumOfMicrobs1HetertrophCmplx,1:jcplx))
-  allocate(this%OMP(nlbiomcp,NumOfMicrobs1HetertrophCmplx,1:jcplx))
-  allocate(this%OMCff(nlbiomcp,NumOfMicrobsInAutotrophCmplx))
-  allocate(this%OMNff(nlbiomcp,NumOfMicrobsInAutotrophCmplx))
-  allocate(this%OMPff(nlbiomcp,NumOfMicrobsInAutotrophCmplx))
+  allocate(this%OMC(nlbiomcp,NumMicrbHetetrophCmplx,1:jcplx))
+  allocate(this%OMN(nlbiomcp,NumMicrbHetetrophCmplx,1:jcplx))
+  allocate(this%OMP(nlbiomcp,NumMicrbHetetrophCmplx,1:jcplx))
+  allocate(this%OMCff(nlbiomcp,NumMicrobAutotrophCmplx))
+  allocate(this%OMNff(nlbiomcp,NumMicrobAutotrophCmplx))
+  allocate(this%OMPff(nlbiomcp,NumMicrobAutotrophCmplx))
 
   end subroutine Init
 

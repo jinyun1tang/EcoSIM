@@ -509,7 +509,7 @@ module TranspSaltMod
 !     RQR*=solute in runoff
 !
   DO nsalts=idsalt_beg,idsalt_end
-    trcSaltRunoffBoundary(nsalts,N,NN,M5,M4)=trcSaltRunoffBoundary(nsalts,N,NN,M5,M4)+trcSalt_RQR(nsalts,N,NN,M5,M4)
+    trc_salt_rof_bounds(nsalts,N,NN,M5,M4)=trc_salt_rof_bounds(nsalts,N,NN,M5,M4)+trcSalt_RQR(nsalts,N,NN,M5,M4)
   ENDDO
   end subroutine SoluteExportThruBoundary
 !------------------------------------------------------------------------------------------

@@ -503,7 +503,7 @@ module StartqMod
     NodeNumNormByMatgrp_brch(NB,NZ,NY,NX)=0._r8
     ReprodNodeNumNormByMatrgrp_brch(NB,NZ,NY,NX)=0._r8
     TotalNodeNumNormByMatgrp_brch(NB,NZ,NY,NX)=0._r8
-    TotalReprodNodeNumNormByMatrgrp_brch(NB,NZ,NY,NX)=0._r8
+    TotReproNodeNumNormByMatrgrp_brch(NB,NZ,NY,NX)=0._r8
     Hours4LenthenPhotoPeriod_brch(NB,NZ,NY,NX)=0._r8
     Hours4ShortenPhotoPeriod_brch(NB,NZ,NY,NX)=0._r8
     Hours4Leafout_brch(NB,NZ,NY,NX)=Hours4LenthenPhotoPeriod_brch(NB,NZ,NY,NX)

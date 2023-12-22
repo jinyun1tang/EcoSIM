@@ -477,7 +477,7 @@ module PlantBranchMod
     HourThreshold4LeafOff_brch   =>  plt_pheno%HourThreshold4LeafOff_brch     , &
     iPlantCalendar_brch  =>  plt_pheno%iPlantCalendar_brch    , &
     iPlantMorphologyType_pft  =>  plt_pheno%iPlantMorphologyType_pft    , &
-    TotalReprodNodeNumNormByMatrgrp_brch  =>  plt_pheno%TotalReprodNodeNumNormByMatrgrp_brch    , &
+    TotReproNodeNumNormByMatrgrp_brch  =>  plt_pheno%TotReproNodeNumNormByMatrgrp_brch    , &
     iPlantDevelopPattern_pft  =>  plt_pheno%iPlantDevelopPattern_pft    , &
     HoursDoingRemob_brch   =>  plt_pheno%HoursDoingRemob_brch     , &
     iPlantTurnoverPattern_pft  =>  plt_pheno%iPlantTurnoverPattern_pft    , &
@@ -535,19 +535,19 @@ module PlantBranchMod
 !
 !     iPlantCalendar_brch(ipltcal_BeginSeedFill,=start of grain filling and setting max seed size
 !     iPlantDevelopPattern_pft=growth habit:0=determinate,1=indetermimate from PFT file
-!     TotalReprodNodeNumNormByMatrgrp_brch=total change in reprv node number normalized for maturity group
+!     TotReproNodeNumNormByMatrgrp_brch=total change in reprv node number normalized for maturity group
 !
   ELSEIF(iPlantCalendar_brch(ipltcal_BeginSeedFill,NB,NZ).EQ.0)THEN
     IF(iPlantDevelopPattern_pft(NZ).EQ.ideterminate)THEN
       PART(ibrch_leaf)=0._r8
       PART(ibrch_petiole)=0._r8
     ELSE
-      PART(ibrch_leaf)=AMAX1(PART1X,(0.725_r8-FPART1)*(1.0_r8-TotalReprodNodeNumNormByMatrgrp_brch(NB,NZ)))
-      PART(ibrch_petiole)=AMAX1(PART2X,(0.275_r8-FPART2)*(1.0_r8-TotalReprodNodeNumNormByMatrgrp_brch(NB,NZ)))
+      PART(ibrch_leaf)=AMAX1(PART1X,(0.725_r8-FPART1)*(1.0_r8-TotReproNodeNumNormByMatrgrp_brch(NB,NZ)))
+      PART(ibrch_petiole)=AMAX1(PART2X,(0.275_r8-FPART2)*(1.0_r8-TotReproNodeNumNormByMatrgrp_brch(NB,NZ)))
     ENDIF
     PARTS=1.0_r8-PART(ibrch_leaf)-PART(ibrch_petiole)
-    PART(ibrch_stalk)=AZMAX1(0.60_r8*PARTS*(1.0_r8-TotalReprodNodeNumNormByMatrgrp_brch(NB,NZ)))
-    PART(ibrch_reserve)=AZMAX1(0.30_r8*PARTS*(1.0_r8-TotalReprodNodeNumNormByMatrgrp_brch(NB,NZ)))
+    PART(ibrch_stalk)=AZMAX1(0.60_r8*PARTS*(1.0_r8-TotReproNodeNumNormByMatrgrp_brch(NB,NZ)))
+    PART(ibrch_reserve)=AZMAX1(0.30_r8*PARTS*(1.0_r8-TotReproNodeNumNormByMatrgrp_brch(NB,NZ)))
     PARTX=PARTS-PART(ibrch_stalk)-PART(ibrch_reserve)
     PART(ibrch_husk)=0.5_r8*PARTX
     PART(ibrch_ear)=0.5_r8*PARTX
@@ -2089,7 +2089,7 @@ module PlantBranchMod
     doPlantLeafOut_brch                    =>  plt_pheno%doPlantLeafOut_brch     , &
     iPlantTurnoverPattern_pft              =>  plt_pheno%iPlantTurnoverPattern_pft    , &
     TotalNodeNumNormByMatgrp_brch          =>  plt_pheno%TotalNodeNumNormByMatgrp_brch    , &
-    TotalReprodNodeNumNormByMatrgrp_brch   =>  plt_pheno%TotalReprodNodeNumNormByMatrgrp_brch    , &
+    TotReproNodeNumNormByMatrgrp_brch   =>  plt_pheno%TotReproNodeNumNormByMatrgrp_brch    , &
     Hours4Leafout_brch                     =>  plt_pheno%Hours4Leafout_brch      , &
     MatureGroup_brch                       =>  plt_pheno%MatureGroup_brch    , &
     LeafNumberAtFloralInit_brch            =>  plt_pheno%LeafNumberAtFloralInit_brch    , &
@@ -2144,7 +2144,7 @@ module PlantBranchMod
   !    NodeNumberAtAnthesis_brch=node number at flowering
   !    VSTGX=leaf number on date of floral initiation
   !    TotalNodeNumNormByMatgrp_brch=total change in vegve node number normalized for maturity group
-  !    TotalReprodNodeNumNormByMatrgrp_brch=total change in reprve node number normalized for maturity group
+  !    TotReproNodeNumNormByMatrgrp_brch=total change in reprve node number normalized for maturity group
   !    iPlantCalendar_brch(ipltcal_Emerge,=emergence date
 !
       IF((doPlantLeafOut_brch(NB,NZ).EQ.iEnable.AND.iPlantPhenologyPattern_pft(NZ).NE.iplt_annual) &
@@ -2158,7 +2158,7 @@ module PlantBranchMod
         NodeNumberAtAnthesis_brch(NB,NZ)=0._r8
         LeafNumberAtFloralInit_brch(NB,NZ)=0._r8
         TotalNodeNumNormByMatgrp_brch(NB,NZ)=0._r8
-        TotalReprodNodeNumNormByMatrgrp_brch(NB,NZ)=0._r8
+        TotReproNodeNumNormByMatrgrp_brch(NB,NZ)=0._r8
         iPlantCalendar_brch(ipltcal_Emerge,NB,NZ)=I
         D2005: DO M=2,NumGrowthStages
           iPlantCalendar_brch(M,NB,NZ)=0

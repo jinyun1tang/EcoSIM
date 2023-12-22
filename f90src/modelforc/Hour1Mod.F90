@@ -42,8 +42,8 @@ module Hour1Mod
   use SedimentDataType
   use PlantDataRateType
   use GridDataType
-  use EcoSIMConfig, only : jcplx1 => jcplx1c,jcplx=>jcplxc,nlbiomcp=>NumOfLiveMicrobiomComponents
-  use EcoSIMConfig, only : ndbiomcp=>NumOfDeadMicrobiomComponents,jsken=>jskenc,NFGs=>NFGsc,do_instequil
+  use EcoSIMConfig, only : jcplx1 => jcplx1c,jcplx=>jcplxc,nlbiomcp=>NumLiveMicrbCompts
+  use EcoSIMConfig, only : ndbiomcp=>NumDeadMicrbCompts,jsken=>jskenc,NumMicbFunGroups=>NumMicbFunGroups,do_instequil
   use EcoSiMParDataMod, only : micpar,pltpar
   implicit none
 
@@ -493,7 +493,7 @@ module Hour1Mod
   DO  NX=NHW,NHE+extragrid
     DO  NY=NVN,NVS+extragrid
 
-      trcSaltRunoffBoundary(idsalt_beg:idsalt_end,1:2,1:2,NY,NX)=0.0_r8
+      trc_salt_rof_bounds(idsalt_beg:idsalt_end,1:2,1:2,NY,NX)=0.0_r8
       trcSalt_XQS(idsalt_beg:idsalt_end,1:2,NY,NX)=0.0_r8
 
       DO  L=1,NL(NY,NX)+1
@@ -996,18 +996,18 @@ module Hour1Mod
   OC=0.0_r8
 
   DO L=0,NL(NY,NX)
-!  add heterotrophic CO2CompenPoint_nodeexs
-    OC=OC+sum(OMC(1:nlbiomcp,1:NumOfMicrobs1HetertrophCmplx,1:jcplx,L,NY,NX))
+!  add heterotrophic complexs
+    OC=OC+sum(OMC(1:nlbiomcp,1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX))
 
-!  add autotrophic CO2CompenPoint_nodeex
-    OC=OC+sum(OMCff(1:nlbiomcp,1:NumOfMicrobsInAutotrophCmplx,L,NY,NX))
+!  add autotrophic complex
+    OC=OC+sum(OMCff(1:nlbiomcp,1:NumMicrobAutotrophCmplx,L,NY,NX))
 !  add microbial residue
     OC=OC+SUM(ORC(1:ndbiomcp,1:jcplx,L,NY,NX))
 !  add dissolved/sorbed OM and acetate
     OC=OC+SUM(DOM(idom_doc,1:jcplx,L,NY,NX))+SUM(DOM_Macp(idom_doc,1:jcplx,L,NY,NX)) &
          +SUM(OHC(1:jcplx,L,NY,NX))+SUM(DOM(idom_acetate,1:jcplx,L,NY,NX)) &
          +SUM(DOM_Macp(idom_acetate,1:jcplx,L,NY,NX))+SUM(OHA(1:jcplx,L,NY,NX))
-!  add OM CO2CompenPoint_nodeexes
+!  add OM complexes
     OC=OC+SUM(OSC(1:jsken,1:jcplx,L,NY,NX))
 !
     ORGCX(L,NY,NX)=OC
@@ -1769,7 +1769,7 @@ module Hour1Mod
       CFOSC(ilignin,k_manure,LFDPTH,NY,NX)=0.145_r8
     ENDIF
 !
-!     DISTRIBUTE RESIDUE APPLICATION AMONG COMPONENTS OF RESIDUE CO2CompenPoint_nodeEX
+!     DISTRIBUTE RESIDUE APPLICATION AMONG COMPONENTS OF RESIDUE complex
 !
 !     OFC,OFN,OFP=litter C,N,P application from fertilizer file
 !
@@ -1793,12 +1793,12 @@ module Hour1Mod
 !     OMCI=microbial biomass content in litter
 !     OMCF,OMCA=hetero,autotrophic biomass composition in litter
 !
-      D2960: DO N=1,NFGs
+      D2960: DO N=1,NumMicbFunGroups
         tglds=JGnfo(N)-JGnfo(N)+1
         D2961: DO M=1,nlbiomcp
           OMC1=AZMAX1(AMIN1(OSCI*micpar%OMCI(M,K)*micpar%OMCF(N),OSCI-OSCX))
-          OMN1=AZMAX1(AMIN1(OMC1*micpar%CNOMCa(M,N,K),OSNI-OSNX))
-          OMP1=AZMAX1(AMIN1(OMC1*micpar%CPOMCa(M,N,K),OSPI-OSPX))
+          OMN1=AZMAX1(AMIN1(OMC1*micpar%rNCOMCa(M,N,K),OSNI-OSNX))
+          OMP1=AZMAX1(AMIN1(OMC1*micpar%rPCOMCa(M,N,K),OSPI-OSPX))
           DO NGL=JGnio(N),JGnfo(N)
             OMC1g=OMC1/tglds
             OMN1g=OMN1/tglds
@@ -1810,7 +1810,7 @@ module Hour1Mod
           OSCX=OSCX+OMC1
           OSNX=OSNX+OMN1
           OSPX=OSPX+OMP1
-          D2962: DO NN=1,NFGs
+          D2962: DO NN=1,NumMicbFunGroups
             tglds=JGnfA(N)-JGniA(N)+1
             DO NGL=JGniA(NN),JGnfA(NN)
               OMC1g=OMC1/tglds

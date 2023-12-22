@@ -4,8 +4,8 @@ module TFlxTypeMod
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use abortutils, only : destroy
   use TracerIDMod
-  use EcoSIMConfig, only : jcplx => jcplxc,jsken=>jskenc,NFGs=>NFGsc
-  use EcoSIMConfig, only : nlbiomcp=>NumOfLiveMicrobiomComponents,ndbiomcp=>NumOfDeadMicrobiomComponents
+  use EcoSIMConfig, only : jcplx => jcplxc,jsken=>jskenc,NumMicbFunGroups=>NumMicbFunGroups
+  use EcoSIMConfig, only : nlbiomcp=>NumLiveMicrbCompts,ndbiomcp=>NumDeadMicrbCompts
 implicit none
 
   character(len=*), private, parameter :: mod_filename = &
@@ -154,13 +154,13 @@ implicit none
   allocate(VLiceMicP1(JZ,JY,JX));    VLiceMicP1=0._r8
   allocate(VLWatMacP1(JZ,JY,JX));   VLWatMacP1=0._r8
   allocate(VLiceMacP1(JZ,JY,JX));   VLiceMacP1=0._r8
-  allocate(TOMCER(nlbiomcp,NumOfMicrobs1HetertrophCmplx,1:jcplx,JY,JX)); TOMCER=0._r8
-  allocate(TOMNER(nlbiomcp,NumOfMicrobs1HetertrophCmplx,1:jcplx,JY,JX)); TOMNER=0._r8
-  allocate(TOMPER(nlbiomcp,NumOfMicrobs1HetertrophCmplx,1:jcplx,JY,JX)); TOMPER=0._r8
+  allocate(TOMCER(nlbiomcp,NumMicrbHetetrophCmplx,1:jcplx,JY,JX)); TOMCER=0._r8
+  allocate(TOMNER(nlbiomcp,NumMicrbHetetrophCmplx,1:jcplx,JY,JX)); TOMNER=0._r8
+  allocate(TOMPER(nlbiomcp,NumMicrbHetetrophCmplx,1:jcplx,JY,JX)); TOMPER=0._r8
 
-  allocate(TOMCERff(nlbiomcp,NumOfMicrobsInAutotrophCmplx,JY,JX));TOMCERff=0._r8
-  allocate(TOMNERff(nlbiomcp,NumOfMicrobsInAutotrophCmplx,JY,JX));TOMNERff=0._r8
-  allocate(TOMPERff(nlbiomcp,NumOfMicrobsInAutotrophCmplx,JY,JX));TOMPERff=0._r8
+  allocate(TOMCERff(nlbiomcp,NumMicrobAutotrophCmplx,JY,JX));TOMCERff=0._r8
+  allocate(TOMNERff(nlbiomcp,NumMicrobAutotrophCmplx,JY,JX));TOMNERff=0._r8
+  allocate(TOMPERff(nlbiomcp,NumMicrobAutotrophCmplx,JY,JX));TOMPERff=0._r8
 
   allocate(DOM_Transp2Micp_flx(idom_beg:idom_end,1:jcplx,JZ,JY,JX));DOM_Transp2Micp_flx=0._r8
   allocate(DOM_Transp2Macp_flx(idom_beg:idom_end,1:jcplx,JZ,JY,JX));DOM_Transp2Macp_flx=0._r8

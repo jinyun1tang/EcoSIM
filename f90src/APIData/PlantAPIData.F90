@@ -15,7 +15,7 @@ implicit none
   integer, pointer :: MaxNumBranches         !maximum number of plant branches
   integer, pointer :: JP1         !number of plants
   integer, pointer :: NumOfSkyAzimuSects1        !number of sectors for the sky azimuth  [0,2*pi]
-  integer, pointer :: jcplx       !number of organo-microbial CO2CompenPoint_nodeexes
+  integer, pointer :: jcplx       !number of organo-microbial complexes
   integer, pointer :: NumOfLeafAzimuthSectors1        !number of sectors for the leaf azimuth, [0,pi]
   integer, pointer :: NumOfCanopyLayers1         !number of canopy layers
   integer, pointer :: JZ1         !number of soil layers
@@ -340,7 +340,7 @@ implicit none
   integer,  pointer :: KLeafNumLowestGrowing_pft(:,:) => null()  !leaf growth stage counter, [-]
   integer,  pointer :: iPlantCalendar_brch(:,:,:) => null()  !plant growth stage, [-]
   real(r8), pointer :: TotalNodeNumNormByMatgrp_brch(:,:) => null()  !normalized node number during vegetative growth stages , [-]
-  real(r8), pointer :: TotalReprodNodeNumNormByMatrgrp_brch(:,:) => null()  !normalized node number during reproductive growth stages , [-]
+  real(r8), pointer :: TotReproNodeNumNormByMatrgrp_brch(:,:) => null()  !normalized node number during reproductive growth stages , [-]
   real(r8), pointer :: LeafNumberAtFloralInit_brch(:,:)  => null()  !leaf number at floral initiation, [-]
   real(r8), pointer :: Hours4LenthenPhotoPeriod_brch(:,:)   => null()  !initial heat requirement for spring leafout/dehardening, [h]
   real(r8), pointer :: Hours4ShortenPhotoPeriod_brch(:,:)   => null()  !initial cold requirement for autumn leafoff/hardening, [h]
@@ -363,7 +363,7 @@ implicit none
   end type plant_pheno_type
 
   type, public :: plant_soilchem_type
-  real(r8), pointer :: FOSRH(:,:)  => null()  !fraction of total organic C in CO2CompenPoint_nodeex, [-]
+  real(r8), pointer :: FOSRH(:,:)  => null()  !fraction of total organic C in complex, [-]
   real(r8), pointer :: CFOPE(:,:,:,:)=> null() !litter kinetic fraction, [-]
   real(r8), pointer :: TFND(:)     => null()  !temperature effect on diffusivity
   real(r8), pointer :: THETPM(:,:) => null()  !soil air-filled porosity, [m3 m-3]
@@ -1838,7 +1838,7 @@ implicit none
   allocate(this%KLeafNumLowestGrowing_pft(MaxNumBranches,JP1))
   allocate(this%iPlantCalendar_brch(NumGrowthStages,MaxNumBranches,JP1))
   allocate(this%TotalNodeNumNormByMatgrp_brch(MaxNumBranches,JP1))
-  allocate(this%TotalReprodNodeNumNormByMatrgrp_brch(MaxNumBranches,JP1))
+  allocate(this%TotReproNodeNumNormByMatrgrp_brch(MaxNumBranches,JP1))
   allocate(this%LeafNumberAtFloralInit_brch(MaxNumBranches,JP1))
   allocate(this%RefLeafAppearRate_pft(JP1))
   allocate(this%RefNodeInitRate_pft(JP1))
@@ -1911,7 +1911,7 @@ implicit none
 !  if(allocated(doInitPlant_pft))deallocate(doInitPlant_pft)
 !  if(allocated(KLeafNumLowestGrowing_pft))deallocate(KLeafNumLowestGrowing_pft)
 !  if(allocated(TotalNodeNumNormByMatgrp_brch))deallocate(TotalNodeNumNormByMatgrp_brch)
-!  if(allocated(TotalReprodNodeNumNormByMatrgrp_brch))deallocate(TotalReprodNodeNumNormByMatrgrp_brch)
+!  if(allocated(TotReproNodeNumNormByMatrgrp_brch))deallocate(TotReproNodeNumNormByMatrgrp_brch)
 !  if(allocated(LeafNumberAtFloralInit_brch))deallocate(LeafNumberAtFloralInit_brch)
 !  if(allocated(KLeafNodeNumber))deallocate(KLeafNodeNumber)
 !  if(allocated(CriticalPhotoPeriod_pft))deallocate(CriticalPhotoPeriod_pft)

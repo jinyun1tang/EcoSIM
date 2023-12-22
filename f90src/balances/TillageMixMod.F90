@@ -18,7 +18,7 @@ module TillageMixMod
   USE FlagDataType
   use EcoSIMCtrlDataType
   USE EcoSimSumDataType
-  use EcoSIMConfig , only : ndbiomcp => NumOfDeadMicrobiomComponents
+  use EcoSIMConfig , only : ndbiomcp => NumDeadMicrbCompts
   use UnitMod, only : units
   implicit none
   character(len=*),private, parameter :: mod_filename = __FILE__
@@ -44,18 +44,18 @@ module TillageMixMod
   real(r8) :: TOHGP(0:micpar%NumOfLitrCmplxs),TOHGA(0:micpar%NumOfLitrCmplxs)
   real(r8) :: TOQGA(0:micpar%NumOfLitrCmplxs),TOQHA(0:micpar%NumOfLitrCmplxs)
 
-  real(r8) :: TOMGCff(nlbiomcp,NumOfMicrobsInAutotrophCmplx)
-  real(r8) :: TOMGNff(nlbiomcp,NumOfMicrobsInAutotrophCmplx)
-  real(r8) :: TOMGPff(nlbiomcp,NumOfMicrobsInAutotrophCmplx)
-  real(r8) :: TOMGC(nlbiomcp,NumOfMicrobs1HetertrophCmplx,1:jcplx)
-  real(r8) :: TOMGN(nlbiomcp,NumOfMicrobs1HetertrophCmplx,1:jcplx)
-  real(r8) :: TOMGP(nlbiomcp,NumOfMicrobs1HetertrophCmplx,1:jcplx)
-  REAL(R8) :: TOMC(nlbiomcp,NumOfMicrobs1HetertrophCmplx,1:jcplx)
-  REAL(R8) :: TOMN(nlbiomcp,NumOfMicrobs1HetertrophCmplx,1:jcplx)
-  REAL(R8) :: TOMP(nlbiomcp,NumOfMicrobs1HetertrophCmplx,1:jcplx)
-  REAL(R8) :: TOMCff(nlbiomcp,NumOfMicrobsInAutotrophCmplx)
-  REAL(R8) :: TOMNff(nlbiomcp,NumOfMicrobsInAutotrophCmplx)
-  REAL(R8) :: TOMPff(nlbiomcp,NumOfMicrobsInAutotrophCmplx)
+  real(r8) :: TOMGCff(nlbiomcp,NumMicrobAutotrophCmplx)
+  real(r8) :: TOMGNff(nlbiomcp,NumMicrobAutotrophCmplx)
+  real(r8) :: TOMGPff(nlbiomcp,NumMicrobAutotrophCmplx)
+  real(r8) :: TOMGC(nlbiomcp,NumMicrbHetetrophCmplx,1:jcplx)
+  real(r8) :: TOMGN(nlbiomcp,NumMicrbHetetrophCmplx,1:jcplx)
+  real(r8) :: TOMGP(nlbiomcp,NumMicrbHetetrophCmplx,1:jcplx)
+  REAL(R8) :: TOMC(nlbiomcp,NumMicrbHetetrophCmplx,1:jcplx)
+  REAL(R8) :: TOMN(nlbiomcp,NumMicrbHetetrophCmplx,1:jcplx)
+  REAL(R8) :: TOMP(nlbiomcp,NumMicrbHetetrophCmplx,1:jcplx)
+  REAL(R8) :: TOMCff(nlbiomcp,NumMicrobAutotrophCmplx)
+  REAL(R8) :: TOMNff(nlbiomcp,NumMicrobAutotrophCmplx)
+  REAL(R8) :: TOMPff(nlbiomcp,NumMicrobAutotrophCmplx)
   real(r8) :: TORC(ndbiomcp,1:jcplx)
   real(r8) :: TORN(ndbiomcp,1:jcplx)
   real(r8) :: TORP(ndbiomcp,1:jcplx)
@@ -179,7 +179,7 @@ module TillageMixMod
     DP=0.0_r8
 
     DO  K=1,micpar%NumOfLitrCmplxs
-      DO  N=1,NFGs
+      DO  N=1,NumMicbFunGroups
         DO NGL=JGnio(N),JGnfo(N)
           DO  M=1,nlbiomcp
             TOMGC(M,NGL,K)=OMC(M,NGL,K,0,NY,NX)*CORP0
@@ -196,7 +196,7 @@ module TillageMixMod
       ENDDO
     ENDDO
 
-    DO  N=1,NFGs
+    DO  N=1,NumMicbFunGroups
       DO NGL=JGniA(N),JGnfA(N)
         DO  M=1,nlbiomcp
           TOMGCff(M,NGL)=OMCff(M,NGL,0,NY,NX)*CORP0
@@ -397,7 +397,7 @@ module TillageMixMod
         ENDDO
 
         DO  K=1,jcplx
-          DO  N=1,NFGs
+          DO  N=1,NumMicbFunGroups
             DO NGL=JGnio(N),JGnfo(N)
               DO  M=1,nlbiomcp
                 TOMC(M,NGL,K)=TOMC(M,NGL,K)+TI*OMC(M,NGL,K,L,NY,NX)
@@ -408,7 +408,7 @@ module TillageMixMod
           enddo
         ENDDO
 
-        DO  N=1,NFGs
+        DO  N=1,NumMicbFunGroups
           DO NGL=JGniA(N),JGnfA(N)
             DO  M=1,nlbiomcp
               TOMCff(M,NGL)=TOMCff(M,NGL)+TI*OMCff(M,NGL,L,NY,NX)
@@ -538,7 +538,7 @@ module TillageMixMod
         call MixSoluteH(L,NY,NX)
 
         DO  K=1,jcplx
-          DO  N=1,NFGs
+          DO  N=1,NumMicbFunGroups
             DO NGL=JGnio(N),JGnfo(N)
               DO  M=1,nlbiomcp
                 OMC(M,NGL,K,L,NY,NX)=TI*OMC(M,NGL,K,L,NY,NX)+CORP*(FI*TOMC(M,NGL,K) &
@@ -551,7 +551,7 @@ module TillageMixMod
             enddo
           enddo
         ENDDO
-        DO  N=1,NFGs
+        DO  N=1,NumMicbFunGroups
           DO NGL=JGniA(N),JGnfA(N)
             DO  M=1,nlbiomcp
               OMCff(M,NGL,L,NY,NX)=TI*OMCff(M,NGL,L,NY,NX)+CORP*(FI*TOMCff(M,NGL) &
@@ -611,7 +611,7 @@ module TillageMixMod
 !     WITHIN TILLAGE MIXING ZONE
 !
         DO  K=1,micpar%NumOfLitrCmplxs
-          DO  N=1,NFGs
+          DO  N=1,NumMicbFunGroups
             DO NGL=JGnio(N),JGnfo(N)
               DO M=1,nlbiomcp
                 OMC(M,NGL,K,L,NY,NX)=OMC(M,NGL,K,L,NY,NX)+FI*TOMGC(M,NGL,K)
@@ -622,7 +622,7 @@ module TillageMixMod
           ENDDO
         ENDDO
 
-        DO  N=1,NFGs
+        DO  N=1,NumMicbFunGroups
           DO NGL=JGniA(N),JGnfA(N)
             DO M=1,nlbiomcp
               OMCff(M,NGL,L,NY,NX)=OMCff(M,NGL,L,NY,NX)+FI*TOMGCff(M,NGL)
@@ -665,7 +665,7 @@ module TillageMixMod
         DP=0.0_r8
 
         DO  K=1,jcplx
-          DO  N=1,NFGs
+          DO  N=1,NumMicbFunGroups
             DO NGL=JGnio(N),JGnfo(N)
               DO  M=1,nlbiomcp
                 OC=OC+OMC(M,NGL,K,L,NY,NX)
@@ -677,7 +677,7 @@ module TillageMixMod
         ENDDO
 
         DO  K=1,micpar%NumOfLitrCmplxs
-          DO  N=1,NFGs
+          DO  N=1,NumMicbFunGroups
             DO NGL=JGnio(N),JGnfo(N)
               DO  M=1,nlbiomcp
                 DC=DC+OMC(M,NGL,K,L,NY,NX)
@@ -687,7 +687,7 @@ module TillageMixMod
             enddo
           enddo
         ENDDO
-        DO  N=1,NFGs
+        DO  N=1,NumMicbFunGroups
           DO NGL=JGniA(N),JGnfA(N)
             DO  M=1,nlbiomcp
               OC=OC+OMCff(M,NGL,L,NY,NX)

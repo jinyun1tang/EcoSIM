@@ -19,8 +19,8 @@ module LateralTranspMod
   use EcoSimConst
   use EcoSiMParDataMod, only : micpar
   use minimathmod , only : AZMAX1
-  use EcoSIMConfig, only : jcplx => jcplxc,NFGs=>NFGsc
-  use EcoSIMConfig, only : nlbiomcp=>NumOfLiveMicrobiomComponents
+  use EcoSIMConfig, only : jcplx => jcplxc,NumMicbFunGroups=>NumMicbFunGroups
+  use EcoSIMConfig, only : nlbiomcp=>NumLiveMicrbCompts
   use ErosionBalMod
   use SnowBalanceMod
   use EcoSIMCtrlMod
@@ -360,7 +360,7 @@ implicit none
         ENDDO
 
         DO  K=1,jcplx
-          DO NO=1,NFGs
+          DO NO=1,NumMicbFunGroups
             DO NGL=JGnio(NO),JGnfo(NO)
               DO M=1,nlbiomcp
                 TOMCER(M,NGL,K,N2,N1)=TOMCER(M,NGL,K,N2,N1) &
@@ -374,7 +374,7 @@ implicit none
           enddo
         ENDDO
 
-        DO NO=1,NFGs
+        DO NO=1,NumMicbFunGroups
           DO NGL=JGniA(NO),JGnfA(NO)
             DO M=1,nlbiomcp
               TOMCERff(M,NGL,N2,N1)=TOMCERff(M,NGL,N2,N1) &
@@ -430,7 +430,7 @@ implicit none
         ENDDO
 
         DO  K=1,jcplx
-          DO  NO=1,NFGs
+          DO  NO=1,NumMicbFunGroups
             DO NGL=JGnio(NO),JGnfo(NO)
               DO  M=1,nlbiomcp
                 TOMCER(M,NGL,K,N2,N1)=TOMCER(M,NGL,K,N2,N1) &
@@ -445,7 +445,7 @@ implicit none
         ENDDO
 
 
-        DO  NO=1,NFGs
+        DO  NO=1,NumMicbFunGroups
           DO  M=1,nlbiomcp
             DO NGL=JGniA(NO),JGnfA(NO)
               TOMCERff(M,NGL,N2,N1)=TOMCERff(M,NGL,N2,N1) &
@@ -501,7 +501,7 @@ implicit none
           ENDDO
 
           D8380: DO K=1,jcplx
-            DO  NO=1,NFGs
+            DO  NO=1,NumMicbFunGroups
               DO NGL=JGnio(NO),JGnfo(NO)
                 DO  M=1,nlbiomcp
                   TOMCER(M,NGL,K,N2,N1)=TOMCER(M,NGL,K,N2,N1) &
@@ -515,7 +515,7 @@ implicit none
             enddo
           ENDDO D8380
 
-          DO  NO=1,NFGs
+          DO  NO=1,NumMicbFunGroups
             DO NGL=JGniA(NO),JGnfA(NO)
               DO  M=1,nlbiomcp
                 TOMCERff(M,NGL,N2,N1)=TOMCERff(M,NGL,N2,N1) &

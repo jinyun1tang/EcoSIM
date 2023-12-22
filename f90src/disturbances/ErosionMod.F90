@@ -18,9 +18,9 @@ module ErosionMod
   use SoilPropertyDataType
   USE SedimentDataType
   use GridDataType
-  use EcoSIMConfig, only : nlbiomcp => NumOfLiveMicrobiomComponents
-  use EcoSIMConfig, only : ndbiomcp=> NumOfDeadMicrobiomComponents
-  use EcoSIMConfig, only : jcplx1=> jcplx1c, NFGs => NFGsc,jcplx=>jcplxc
+  use EcoSIMConfig, only : nlbiomcp => NumLiveMicrbCompts
+  use EcoSIMConfig, only : ndbiomcp=> NumDeadMicrbCompts
+  use EcoSIMConfig, only : jcplx1=> jcplx1c, NumMicbFunGroups => NumMicbFunGroups,jcplx=>jcplxc
   use EcoSIMConfig, only : column_mode
   implicit none
 
@@ -509,7 +509,7 @@ module ErosionMod
 !     ORGANIC MATTER
 !
               DO  K=1,jcplx
-                DO NO=1,NFGs
+                DO NO=1,NumMicbFunGroups
                   DO NGL=JGnio(NO),JGnfo(NO)
                     DO M=1,nlbiomcp
                       OMCER(M+(NGL-1)*nlbiomcp,K,N,2,N5,N4)=FSEDER*OMC(M,NGL,K,NU(N2,N1),N2,N1)
@@ -520,7 +520,7 @@ module ErosionMod
                 ENDDO
               ENDDO
 
-              DO NO=1,NFGs
+              DO NO=1,NumMicbFunGroups
                 DO NGL=JGniA(NO),JGnfA(NO)
                   DO M=1,nlbiomcp
                     OMCERff(M+(NGL-1)*nlbiomcp,N,2,N5,N4)=FSEDER*OMCff(M,NGL,NU(N2,N1),N2,N1)
@@ -574,7 +574,7 @@ module ErosionMod
 !     ORGANIC MATTER
 !
               DO  K=1,jcplx
-                DO  NO=1,NFGs
+                DO  NO=1,NumMicbFunGroups
                   DO NGL=JGnio(NO),JGnfo(NO)
                     DO  M=1,nlbiomcp
                       OMCER(M+(NGL-1)*nlbiomcp,K,N,2,N5,N4)=0._r8
@@ -585,7 +585,7 @@ module ErosionMod
                 enddo
               ENDDO
 
-              DO  NO=1,NFGs
+              DO  NO=1,NumMicbFunGroups
                 DO NGL=JGniA(NO),JGnfA(NO)
                   DO  M=1,nlbiomcp
                     OMCERff(M+(NGL-1)*nlbiomcp,N,2,N5,N4)=0._r8
@@ -667,7 +667,7 @@ module ErosionMod
 !     ORGANIC MATTER
 !
                 DO  K=1,jcplx
-                  DO  NO=1,NFGs
+                  DO  NO=1,NumMicbFunGroups
                     DO NGL=JGnio(NO),JGnfo(NO)
                       DO  M=1,nlbiomcp
                         OMCER(M+(NGL-1)*nlbiomcp,K,N,1,N5B,N4B)=FSEDER*OMC(M,NGL,K,NU(N2,N1),N2,N1)
@@ -677,7 +677,7 @@ module ErosionMod
                     enddo
                   ENDDO
                 ENDDO
-                DO  NO=1,NFGs
+                DO  NO=1,NumMicbFunGroups
                   DO NGL=JGniA(NO),JGnfA(NO)
                     DO  M=1,nlbiomcp
                       OMCERff(M+(NGL-1)*nlbiomcp,N,1,N5B,N4B)=FSEDER*OMCff(M,NGL,NU(N2,N1),N2,N1)
@@ -731,7 +731,7 @@ module ErosionMod
 !     ORGANIC MATTER
 !
                 DO  K=1,jcplx
-                  DO  NO=1,NFGs
+                  DO  NO=1,NumMicbFunGroups
                     DO NGL=JGnio(NO),JGnfo(NO)
                       DO  M=1,nlbiomcp
                         OMCER(M+(NGL-1)*nlbiomcp,K,N,1,N5B,N4B)=0._r8
@@ -742,7 +742,7 @@ module ErosionMod
                   enddo
                 ENDDO
 
-                DO  NO=1,NFGs
+                DO  NO=1,NumMicbFunGroups
                   DO NGL=JGniA(NO),JGnfA(NO)
                     DO  M=1,nlbiomcp
                       OMCERff(M+(NGL-1)*nlbiomcp,N,1,N5B,N4B)=0._r8
@@ -879,7 +879,7 @@ module ErosionMod
 !     ORGANIC MATTER
 !
               DO  K=1,jcplx
-                DO  NO=1,NFGs
+                DO  NO=1,NumMicbFunGroups
                   DO NGL=JGnio(NO),JGnfo(NO)
                     DO  M=1,nlbiomcp
                       OMCER(M+(NGL-1)*nlbiomcp,K,N,NN,M5,M4)=0._r8
@@ -889,7 +889,7 @@ module ErosionMod
                   ENDDO
                 enddo
               enddo
-              DO  NO=1,NFGs
+              DO  NO=1,NumMicbFunGroups
                 DO NGL=JGniA(NO),JGnfA(NO)
                   DO  M=1,nlbiomcp
                     OMCERff(M+(NGL-1)*nlbiomcp,N,NN,M5,M4)=0._r8
@@ -953,7 +953,7 @@ module ErosionMod
 !     ORGANIC MATTER
 !
               DO  K=1,jcplx
-                DO NO=1,NFGs
+                DO NO=1,NumMicbFunGroups
                   DO NGL=JGnio(NO),JGnfo(NO)
                     DO M=1,nlbiomcp
                       OMCER(M+(NGL-1)*nlbiomcp,K,N,NN,M5,M4)=FSEDER*OMC(M,NGL,K,NU(N2,N1),N2,N1)
@@ -963,7 +963,7 @@ module ErosionMod
                   ENDDO
                 ENDDO
               ENDDO
-              DO NO=1,NFGs
+              DO NO=1,NumMicbFunGroups
                 DO NGL=JGniA(NO),JGnfo(NO)
                   DO M=1,nlbiomcp
                     OMCERff(M+(NGL-1)*nlbiomcp,N,NN,M5,M4)=FSEDER*OMCff(M,NGL,NU(N2,N1),N2,N1)

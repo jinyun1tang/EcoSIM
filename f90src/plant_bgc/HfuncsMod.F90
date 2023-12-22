@@ -798,7 +798,7 @@ module HfuncsMod
     doSenescence_brch                    =>  plt_pheno%doSenescence_brch   , &
     LeafNumberAtFloralInit_brch          =>  plt_pheno%LeafNumberAtFloralInit_brch  , &
     iPlantDevelopPattern_pft             =>  plt_pheno%iPlantDevelopPattern_pft  , &
-    TotalReprodNodeNumNormByMatrgrp_brch =>  plt_pheno%TotalReprodNodeNumNormByMatrgrp_brch  , &
+    TotReproNodeNumNormByMatrgrp_brch =>  plt_pheno%TotReproNodeNumNormByMatrgrp_brch  , &
     CriticalPhotoPeriod_pft              =>  plt_pheno%CriticalPhotoPeriod_pft    , &
     HourlyNodeNumNormByMatgrp_brch       =>  plt_pheno%HourlyNodeNumNormByMatgrp_brch  , &
     PhotoPeriodSens_pft                  =>  plt_pheno%PhotoPeriodSens_pft   , &
@@ -883,7 +883,7 @@ module HfuncsMod
 !   HourlyNodeNumNormByMatgrp_brch,TotalNodeNumNormByMatgrp_brch=hourly,total change in NodeNumNormByMatgrp_brch
 !   ReprodNodeNumNormByMatrgrp_brch=reproductive node number normalized for maturity group
 !   NodeNumberAtAnthesis_brch=node number at flowering
-!   HourReprodNodeNumNormByMatrgrp_brch,TotalReprodNodeNumNormByMatrgrp_brch=hourly,total change in ReprodNodeNumNormByMatrgrp_brch
+!   HourReprodNodeNumNormByMatrgrp_brch,TotReproNodeNumNormByMatrgrp_brch=hourly,total change in ReprodNodeNumNormByMatrgrp_brch
 !   doSenescence_brch=PFT senescence flag
 !
     IF(iPlantCalendar_brch(ipltcal_InitFloral,NB,NZ).NE.0)THEN
@@ -894,7 +894,7 @@ module HfuncsMod
     IF(iPlantCalendar_brch(ipltcal_Anthesis,NB,NZ).NE.0)THEN
       ReprodNodeNumNormByMatrgrp_brch(NB,NZ)=(ShootNodeNumber_brch(NB,NZ)-NodeNumberAtAnthesis_brch(NB,NZ))/MatureGroup_pft(NZ)
       HourReprodNodeNumNormByMatrgrp_brch(NB,NZ)=NodeInitRate/(MatureGroup_pft(NZ)*GrowStageNorm4ReprodPheno)
-      TotalReprodNodeNumNormByMatrgrp_brch(NB,NZ)=TotalReprodNodeNumNormByMatrgrp_brch(NB,NZ) &
+      TotReproNodeNumNormByMatrgrp_brch(NB,NZ)=TotReproNodeNumNormByMatrgrp_brch(NB,NZ) &
         +HourReprodNodeNumNormByMatrgrp_brch(NB,NZ)
     ENDIF
     doSenescence_brch(NB,NZ)=itrue

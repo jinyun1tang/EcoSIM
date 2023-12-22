@@ -103,7 +103,7 @@ module NitroDisturbMod
 !
 !     REMOVE MICROBIAL BIOMASS
 !
-            D2960: DO N=1,NFGs
+            D2960: DO N=1,NumMicbFunGroups
               DO NGL=JGnio(N),JGnfo(N)
                 DO M=1,nlbiomcp
                   OCH=DCORPC*OMC(M,NGL,K,L,NY,NX)
@@ -138,7 +138,7 @@ module NitroDisturbMod
 !
 !     REMOVE MICROBIAL BIOMASS
 !
-        DO  N=1,NFGs
+        DO  N=1,NumMicbFunGroups
           DO NGL=JGniA(N),JGnfA(N)
             DO M=1,nlbiomcp
               OCH=DCORPC*OMCff(M,NGL,L,NY,NX)

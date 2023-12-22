@@ -870,7 +870,7 @@ module IngridTranspMod
 !     RQR*=solute in runoff
 !
           DO nsalts=idsalt_beg,idsalt_end
-            trcSaltRunoffBoundary(nsalts,N,2,N5,N4)=trcSaltRunoffBoundary(nsalts,N,2,N5,N4)+trcSalt_RQR(nsalts,N,2,N5,N4)
+            trc_salt_rof_bounds(nsalts,N,2,N5,N4)=trc_salt_rof_bounds(nsalts,N,2,N5,N4)+trcSalt_RQR(nsalts,N,2,N5,N4)
           ENDDO
         ELSE
           trcSalt_RQR(idsalt_beg:idsalt_end,N,2,N5,N4)=0.0_r8
@@ -891,7 +891,7 @@ module IngridTranspMod
 !     RQR*=solute in runoff
 !
             DO nsalts=idsalt_beg,idsalt_end
-              trcSaltRunoffBoundary(nsalts,N,1,N5B,N4B)=trcSaltRunoffBoundary(nsalts,N,1,N5B,N4B)+trcSalt_RQR(nsalts,N,1,N5B,N4B)
+              trc_salt_rof_bounds(nsalts,N,1,N5B,N4B)=trc_salt_rof_bounds(nsalts,N,1,N5B,N4B)+trcSalt_RQR(nsalts,N,1,N5B,N4B)
             ENDDO
           ELSE
             trcSalt_RQR(idsalt_beg:idsalt_end,N,1,N5B,N4B)=0.0_r8

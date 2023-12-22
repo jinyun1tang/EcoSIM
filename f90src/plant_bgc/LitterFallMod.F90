@@ -57,7 +57,7 @@ implicit none
 !     KLeafNodeNumber=integer of most recent leaf number currently growing
 !     VSTGX=leaf number on date of floral initiation
 !     TotalNodeNumNormByMatgrp_brch=total change in vegve node number normalized for maturity group
-!     TotalReprodNodeNumNormByMatrgrp_brch=total change in reprve node number normalized for maturity group
+!     TotReproNodeNumNormByMatrgrp_brch=total change in reprve node number normalized for maturity group
 !     HourFailGrainFill_brch=number of hours with no grain fill
 !     doInitLeafOut_brch=flag for initializing leafout
 !     Hours4Leafout_brch,VRNL=leafout hours,hours required for leafout
@@ -503,7 +503,7 @@ implicit none
     LeafNumberAtFloralInit_brch    =>  plt_pheno%LeafNumberAtFloralInit_brch    , &
     KLeafNodeNumber    =>  plt_pheno%KLeafNodeNumber    , &
     TotalNodeNumNormByMatgrp_brch    =>  plt_pheno%TotalNodeNumNormByMatgrp_brch    , &
-    TotalReprodNodeNumNormByMatrgrp_brch    =>  plt_pheno%TotalReprodNodeNumNormByMatrgrp_brch    , &
+    TotReproNodeNumNormByMatrgrp_brch    =>  plt_pheno%TotReproNodeNumNormByMatrgrp_brch    , &
     Hours4Leafout_brch      =>  plt_pheno%Hours4Leafout_brch      , &
     Hours4LeafOff_brch      =>  plt_pheno%Hours4LeafOff_brch      , &
     Hours4LenthenPhotoPeriod_brch      =>  plt_pheno%Hours4LenthenPhotoPeriod_brch      , &
@@ -551,7 +551,7 @@ implicit none
       KLeafNumber_brch(NB,NZ)=1
       KLeafNodeNumber(NB,NZ)=1
       TotalNodeNumNormByMatgrp_brch(NB,NZ)=0._r8
-      TotalReprodNodeNumNormByMatrgrp_brch(NB,NZ)=0._r8
+      TotReproNodeNumNormByMatrgrp_brch(NB,NZ)=0._r8
       Hours4Leafout_brch(NB,NZ)=0._r8
       Hours4LeafOff_brch(NB,NZ)=0._r8
       Hours4LenthenPhotoPeriod_brch(NB,NZ)=0._r8

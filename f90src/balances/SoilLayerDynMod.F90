@@ -21,7 +21,7 @@ module SoilLayerDynMod
   use SurfLitterDataType
   use EcosimConst
   use UnitMod     , only : units
-  use EcoSIMConfig, only : ndbiomcp => NumOfDeadMicrobiomComponents
+  use EcoSIMConfig, only : ndbiomcp => NumDeadMicrbCompts
   USE TFlxTypeMod , ONLY : TSEDER,TDLYXF,TDayLenthPrevC,TDVOLI,TDORGC
 implicit none
 
@@ -787,7 +787,7 @@ implicit none
 
   IF(IFLGL(L,3).EQ.0)THEN
     DO  K=1,jcplx
-      DO  N=1,NFGs
+      DO  N=1,NumMicbFunGroups
         DO  M=1,nlbiomcp
           DO NGL=JGnio(N),JGnfo(N)
             OMC(M,NGL,K,L1,NY,NX)=OMC(M,NGL,K,L1,NY,NX)+FX*OMC(M,NGL,K,L0,NY,NX)
@@ -797,7 +797,7 @@ implicit none
         enddo
       enddo
     ENDDO
-    DO  N=1,NFGs
+    DO  N=1,NumMicbFunGroups
       DO  M=1,nlbiomcp
         DO NGL=JGniA(N),JGnfA(N)
           OMCff(M,NGL,L1,NY,NX)=OMCff(M,NGL,L1,NY,NX)+FX*OMCff(M,NGL,L0,NY,NX)
@@ -963,7 +963,7 @@ implicit none
   ENDDO
   IF(IFLGL(L,3).EQ.0)THEN
     DO  K=1,jcplx
-       DO N=1,NFGs
+       DO N=1,NumMicbFunGroups
         DO M=1,nlbiomcp
           DO NGL=JGnio(N),JGnfo(N)
             OMC(M,NGL,K,L0,NY,NX)=FY*OMC(M,NGL,K,L0,NY,NX)
@@ -974,7 +974,7 @@ implicit none
       enddo
     ENDDO
 
-    DO N=1,NFGs
+    DO N=1,NumMicbFunGroups
       DO M=1,nlbiomcp
         DO NGL=JGniA(N),JGnfA(N)
           OMCff(M,NGL,L0,NY,NX)=FY*OMCff(M,NGL,L0,NY,NX)
@@ -1099,7 +1099,7 @@ implicit none
     ENDIF
 
     DO  K=1,jcplx
-      DO  N=1,NFGs
+      DO  N=1,NumMicbFunGroups
         DO  M=1,nlbiomcp
           DO NGL=JGnio(N),JGnfo(N)
             FXOMC=FXO*OMC(M,NGL,K,L0,NY,NX)
@@ -1116,7 +1116,7 @@ implicit none
       enddo
     ENDDO
 
-    DO  N=1,NFGs
+    DO  N=1,NumMicbFunGroups
       DO  M=1,nlbiomcp
         DO NGL=JGniA(N),JGnfA(N)
           FXOMC=FXO*OMCff(M,NGL,L0,NY,NX)

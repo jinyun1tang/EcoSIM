@@ -787,19 +787,19 @@ implicit none
     D1203: DO NN=1,2
 
       DO NTSA=idsalt_beg,idsalt_end
-        trcSalt_TQR(NTSA,N2,N1)=trcSalt_TQR(NTSA,N2,N1)+trcSaltRunoffBoundary(NTSA,N,NN,N2,N1)
+        trcSalt_TQR(NTSA,N2,N1)=trcSalt_TQR(NTSA,N2,N1)+trc_salt_rof_bounds(NTSA,N,NN,N2,N1)
       ENDDO
 
       IF(IFLBH(N,NN,N5,N4).EQ.0)THEN
 ! runoff direction
         DO NTSA=idsalt_beg,idsalt_end
-          trcSalt_TQR(NTSA,N2,N1)=trcSalt_TQR(NTSA,N2,N1)-trcSaltRunoffBoundary(NTSA,N,NN,N5,N4)
+          trcSalt_TQR(NTSA,N2,N1)=trcSalt_TQR(NTSA,N2,N1)-trc_salt_rof_bounds(NTSA,N,NN,N5,N4)
         ENDDO
       ENDIF
 
       IF(N4B.GT.0.AND.N5B.GT.0.AND.NN.EQ.1)THEN
         DO NTSA=idsalt_beg,idsalt_end
-          trcSalt_TQR(NTSA,N2,N1)=trcSalt_TQR(NTSA,N2,N1)-trcSaltRunoffBoundary(NTSA,N,NN,N5B,N4B)
+          trcSalt_TQR(NTSA,N2,N1)=trcSalt_TQR(NTSA,N2,N1)-trc_salt_rof_bounds(NTSA,N,NN,N5B,N4B)
         ENDDO
       ENDIF
     ENDDO D1203

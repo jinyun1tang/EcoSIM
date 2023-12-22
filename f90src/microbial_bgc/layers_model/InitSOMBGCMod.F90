@@ -9,7 +9,7 @@ module InitSOMBGCMOD
   use EcoSIMCtrlDataType
   use SoilWaterDataType
   use EcosimConst
-  use EcoSIMConfig, only : nlbiomcp => NumOfLiveMicrobiomComponents, ndbiomcp=> NumOfDeadMicrobiomComponents
+  use EcoSIMConfig, only : nlbiomcp => NumLiveMicrbCompts, ndbiomcp=> NumDeadMicrbCompts
   use SurfLitterDataType
   use SoilPropertyDataType
   use GridDataType
@@ -19,9 +19,9 @@ module InitSOMBGCMOD
 
   private
 
-  real(r8), allocatable :: CORGCX(:)  !C concentations from OM CO2CompenPoint_nodeexes
-  real(r8), allocatable :: CORGNX(:)  !N concentations from OM CO2CompenPoint_nodeexes
-  real(r8), allocatable :: CORGPX(:)  !P concentations from OM CO2CompenPoint_nodeexes
+  real(r8), allocatable :: CORGCX(:)  !C concentations from OM complexes
+  real(r8), allocatable :: CORGNX(:)  !N concentations from OM complexes
+  real(r8), allocatable :: CORGPX(:)  !P concentations from OM complexes
 
   public :: InitSOMVars
   public :: InitSOMProfile
@@ -41,8 +41,8 @@ module InitSOMBGCMOD
   JGnfo  => micpar%JGnfo
   JGniA  => micpar%JGniA
   JGnfA  => micpar%JGnfA
-  NumOfMicrobsInAutotrophCmplx= micpar%NumOfMicrobsInAutotrophCmplx
-  NumOfMicrobs1HetertrophCmplx= micpar%NumOfMicrobs1HetertrophCmplx
+  NumMicrobAutotrophCmplx= micpar%NumMicrobAutotrophCmplx
+  NumMicrbHetetrophCmplx= micpar%NumMicrbHetetrophCmplx
 
   allocate(CORGCX(1:jcplx))
   allocate(CORGNX(1:jcplx))
@@ -86,10 +86,10 @@ module InitSOMBGCMOD
 ! begin_execution
 
   associate(                  &
-    CNOMCa  => micpar%CNOMCa ,&
-    CPOMCa  => micpar%CPOMCa ,&
+    rNCOMCa  => micpar%rNCOMCa ,&
+    rPCOMCa  => micpar%rPCOMCa ,&
     nlbiomcp=> micpar%nlbiomcp, &
-    NumOfMicrobsInAutotrophCmplx => micpar%NumOfMicrobsInAutotrophCmplx, &
+    NumMicrobAutotrophCmplx => micpar%NumMicrobAutotrophCmplx, &
     k_humus => micpar%k_humus, &
     OHCK    => micpar%OHCK   ,&
     OMCK    => micpar%OMCK   ,&
@@ -155,9 +155,9 @@ module InitSOMBGCMOD
 !
 !     MICROBIAL BIOMASS,RESIDUE, DOC, ADSORBED
 !
-!     OSCI,OSNI,OSPI=initial SOC,SON,SOP mass in each CO2CompenPoint_nodeex (g)
+!     OSCI,OSNI,OSPI=initial SOC,SON,SOP mass in each complex (g)
 !     OMCK,ORCK,OQCK,OHCK=fractions of SOC in biomass,litter,DOC adsorbed C
-!     OSCM=total biomass in each CO2CompenPoint_nodeex (g)
+!     OSCM=total biomass in each complex (g)
 !     DCKR,DCKM=parameters to initialize microbial biomass from SOC
 !
   TOSCI=0.0_r8
@@ -167,7 +167,7 @@ module InitSOMBGCMOD
     IF(L.EQ.0)THEN
       KK=K
     ELSE
-      !humus CO2CompenPoint_nodeex
+      !humus complex
       KK=micpar%k_humus
     ENDIF
     IF(SoilMicPMassLayer(L,NY,NX).GT.ZEROS(NY,NX))THEN
@@ -184,8 +184,8 @@ module InitSOMBGCMOD
     TOSPK(K)=ORCK(K)*CPRH(K)+OQCK(K)*CPOSCT(KK)+OHCK(K)*CPOSCT(KK)
 !   based on aerobic heterotrophs
 
-    TOSNK(K)=TOSNK(K)+OMCI(1,K)*CNOMCa(1,1,K)+OMCI(2,K)*CNOMCa(2,1,K)
-    TOSPK(K)=TOSPK(K)+OMCI(1,K)*CPOMCa(1,1,K)+OMCI(2,K)*CPOMCa(2,1,K)
+    TOSNK(K)=TOSNK(K)+OMCI(1,K)*rNCOMCa(1,1,K)+OMCI(2,K)*rNCOMCa(2,1,K)
+    TOSPK(K)=TOSPK(K)+OMCI(1,K)*rPCOMCa(1,1,K)+OMCI(2,K)*rPCOMCa(2,1,K)
 
     TOSCI=TOSCI+OSCI(K)*TOSCK(K)
     TOSNI=TOSNI+OSCI(K)*TOSNK(K)
@@ -235,20 +235,20 @@ module InitSOMBGCMOD
 !     OMC,OMN,OMP=microbial C,N,P
 !     OMCI=microbial biomass content in litter
 !     OMCF,OMCA=hetero,autotrophic biomass composition in litter
-!     CNOMC,CPOMC=maximum N:C and P:C ratios in microbial biomass
+!     rNCOMC,rPCOMC=maximum N:C and P:C ratios in microbial biomass
 !     OSCX,OSNX,OSPX=remaining unallocated SOC,SON,SOP
-!  The reason that initialization of CO2CompenPoint_nodeex 5 microbes is repated for each
-! CO2CompenPoint_nodeex is because CO2CompenPoint_nodeex 5 is shared by the other CO2CompenPoint_nodeexes
-    OMCff(1:nlbiomcp,1:NumOfMicrobsInAutotrophCmplx,L,NY,NX)=0._r8
-    OMNff(1:nlbiomcp,1:NumOfMicrobsInAutotrophCmplx,L,NY,NX)=0._r8
-    OMPff(1:nlbiomcp,1:NumOfMicrobsInAutotrophCmplx,L,NY,NX)=0._r8
+!  The reason that initialization of complex 5 microbes is repated for each
+! complex is because complex 5 is shared by the other complexes
+    OMCff(1:nlbiomcp,1:NumMicrobAutotrophCmplx,L,NY,NX)=0._r8
+    OMNff(1:nlbiomcp,1:NumMicrobAutotrophCmplx,L,NY,NX)=0._r8
+    OMPff(1:nlbiomcp,1:NumMicrobAutotrophCmplx,L,NY,NX)=0._r8
 
-    D8990: DO N=1,NFGs
+    D8990: DO N=1,NumMicbFunGroups
       tglds=JGnfo(N)-JGnio(N)+1._r8
       D8991: DO M=1,nlbiomcp
         OMC1=AZMAX1(OSCM(K)*OMCI(M,K)*OMCF(N)*FOSCI)
-        OMN1=AZMAX1(OMC1*CNOMCa(M,N,K)*FOSNI)
-        OMP1=AZMAX1(OMC1*CPOMCa(M,N,K)*FOSPI)
+        OMN1=AZMAX1(OMC1*rNCOMCa(M,N,K)*FOSNI)
+        OMP1=AZMAX1(OMC1*rPCOMCa(M,N,K)*FOSPI)
         do NGL=JGnio(N),JGnfo(N)
           OMC(M,NGL,K,L,NY,NX)=OMC1/tglds
           OMN(M,NGL,K,L,NY,NX)=OMN1/tglds
@@ -257,7 +257,7 @@ module InitSOMBGCMOD
         OSCX(KK)=OSCX(KK)+OMC1
         OSNX(KK)=OSNX(KK)+OMN1
         OSPX(KK)=OSPX(KK)+OMP1
-        D8992: DO NN=1,NFGs
+        D8992: DO NN=1,NumMicbFunGroups
           tglds=JGnfA(N)-JGniA(N)+1._r8
           do NGL=JGniA(N),JGnfA(N)
             OMCff(M,NGL,L,NY,NX)=OMCff(M,NGL,L,NY,NX)+OMC1*OMCA(NN)/tglds
@@ -278,8 +278,8 @@ module InitSOMBGCMOD
 !  X is an indicator of surface residual layer
     D8985: DO M=1,ndbiomcp
       ORC(M,K,L,NY,NX)=X*AZMAX1(OSCM(K)*ORCI(M,K)*FOSCI)
-      ORN(M,K,L,NY,NX)=AZMAX1(ORC(M,K,L,NY,NX)*CNOMCa(M,1,K)*FOSNI)
-      ORP(M,K,L,NY,NX)=AZMAX1(ORC(M,K,L,NY,NX)*CPOMCa(M,1,K)*FOSPI)
+      ORN(M,K,L,NY,NX)=AZMAX1(ORC(M,K,L,NY,NX)*rNCOMCa(M,1,K)*FOSNI)
+      ORP(M,K,L,NY,NX)=AZMAX1(ORC(M,K,L,NY,NX)*rPCOMCa(M,1,K)*FOSPI)
       OSCX(KK)=OSCX(KK)+ORC(M,K,L,NY,NX)
       OSNX(KK)=OSNX(KK)+ORN(M,K,L,NY,NX)
       OSPX(KK)=OSPX(KK)+ORP(M,K,L,NY,NX)
@@ -371,7 +371,7 @@ module InitSOMBGCMOD
   ENDIF
 
   D6990: DO K=1,jcplx
-    DO  N=1,NFGs
+    DO  N=1,NumMicbFunGroups
       do NGL=JGnio(n),JGnfo(n)
         DO  M=1,nlbiomcp
           OC=OC+OMC(M,NGL,K,L,NY,NX)
@@ -405,7 +405,7 @@ module InitSOMBGCMOD
     RINOORff(:,NY,NX)=0.0_r8
     RIPOORff(:,NY,NX)=0.0_r8
   ENDIF
-    DO  N=1,NFGs
+    DO  N=1,NumMicbFunGroups
       do NGL=JGniA(n),JGnfA(n)
         DO  M=1,nlbiomcp
           OC=OC+OMCff(M,NGL,L,NY,NX)

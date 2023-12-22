@@ -1231,7 +1231,7 @@ module PlantDisturbsMod
     Hours4LeafOff_brch     =>  plt_pheno%Hours4LeafOff_brch    , &
     iPlantPhenologyType_pft   =>  plt_pheno%iPlantPhenologyType_pft  , &
     TotalNodeNumNormByMatgrp_brch   =>  plt_pheno%TotalNodeNumNormByMatgrp_brch  , &
-    TotalReprodNodeNumNormByMatrgrp_brch   =>  plt_pheno%TotalReprodNodeNumNormByMatrgrp_brch  , &
+    TotReproNodeNumNormByMatrgrp_brch   =>  plt_pheno%TotReproNodeNumNormByMatrgrp_brch  , &
     HourFailGrainFill_brch     =>  plt_pheno%HourFailGrainFill_brch    , &
     MatureGroup_pft  =>  plt_pheno%MatureGroup_pft , &
     CORGC    =>  plt_soilchem%CORGC, &
@@ -2247,7 +2247,7 @@ module PlantDisturbsMod
 !     NodeNumberAtAnthesis_brch=node number at flowering
 !     VSTGX=leaf number on date of floral initiation
 !     TotalNodeNumNormByMatgrp_brch=total change in vegve node number normalized for maturity group
-!     TotalReprodNodeNumNormByMatrgrp_brch=total change in reprve node number normalized for maturity group
+!     TotReproNodeNumNormByMatrgrp_brch=total change in reprve node number normalized for maturity group
 !     HourFailGrainFill_brch=number of hours with no grain fill
 !     doInitLeafOut_brch=flag for initializing leafout
 !
@@ -2263,7 +2263,7 @@ module PlantDisturbsMod
             NodeNumberAtAnthesis_brch(NB,NZ)=0._r8
             LeafNumberAtFloralInit_brch(NB,NZ)=0._r8
             TotalNodeNumNormByMatgrp_brch(NB,NZ)=0._r8
-            TotalReprodNodeNumNormByMatrgrp_brch(NB,NZ)=0._r8
+            TotReproNodeNumNormByMatrgrp_brch(NB,NZ)=0._r8
             HourFailGrainFill_brch(NB,NZ)=0._r8
             iPlantCalendar_brch(ipltcal_Emerge,NB,NZ)=I
             D3005: DO M=2,NumGrowthStages
@@ -2278,7 +2278,7 @@ module PlantDisturbsMod
                   NodeNumberAtAnthesis_brch(NBX,NZ)=0._r8
                   LeafNumberAtFloralInit_brch(NBX,NZ)=0._r8
                   TotalNodeNumNormByMatgrp_brch(NBX,NZ)=0._r8
-                  TotalReprodNodeNumNormByMatrgrp_brch(NBX,NZ)=0._r8
+                  TotReproNodeNumNormByMatrgrp_brch(NBX,NZ)=0._r8
                   HourFailGrainFill_brch(NBX,NZ)=0._r8
                   iPlantCalendar_brch(ipltcal_Emerge,NBX,NZ)=I
                   D3015: DO M=2,NumGrowthStages

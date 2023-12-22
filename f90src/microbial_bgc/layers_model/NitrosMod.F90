@@ -125,7 +125,7 @@ module nitrosMod
   IF(FOSCXS.GT.ZERO)THEN
     D7971: DO K=1,micpar%NumOfLitrCmplxs
       if(.not.micpar%is_finelitter(K))cycle
-      D7961: DO N=1,NFGs
+      D7961: DO N=1,NumMicbFunGroups
         DO NGL=JGnio(N),JGnfo(N)
           D7962: DO M=1,micpar%nlbiomcp
             IF(FOSCXS.GT.0.0)THEN

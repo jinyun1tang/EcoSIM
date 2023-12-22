@@ -494,14 +494,14 @@ module InitSoluteMod
 !
 !     INITIALIZE PHOSPHORUS EQUILIBRIA AMONG SOLUBLE, ADSORBED
 !     AND PRECIPITATED FORMS
-! NOT POM CO2CompenPoint_nodeex
+! NOT POM complex
   IF(K.NE.micpar%k_POM)THEN
     H3PO4_conc=CPOZ/(1.0_r8+DPH3P*A0/(H_1p_conc*A1)+DPH3P*DPH2P*A0 &
       /(H_1p_conc**2*A2)+DPH3P*DPH2P*DPH1P*A0/(H_1p_conc**3*A3))
     H2PO4_1e_conc=H3PO4_conc*DPH3P*A0/(H_1p_conc*A1)
     H1PO4_2e_conc=H3PO4_conc*DPH3P*DPH2P*A0/(H_1p_conc**2*A2)
     H0PO4_3e_conc=H3PO4_conc*DPH3P*DPH2P*DPH1P*A0/(H_1p_conc**3*A3)
-! POM CO2CompenPoint_nodeex
+! POM complex
   ELSE
     XHP=CPOZ
     XOH=XAEC/BulkSoilMass
@@ -565,7 +565,7 @@ module InitSoluteMod
   CX1=anion_1e_conc-HCO3_e_conc
 !
 !     INITIALIZE EQUILIBRIA BETWEEN SOLUBLE AND PRECIPITATED FORMS
-! POM CO2CompenPoint_nodeex
+! POM complex
   IF(K.EQ.micpar%k_POM)THEN
     Precp_AlO3H3_conc=CALOHX
     Precp_FeO3H3_conc=CFEOHX

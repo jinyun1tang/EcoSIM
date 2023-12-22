@@ -578,7 +578,7 @@ module StartqsMod
     HoursCanopyPSITooLow    =>  plt_pheno%HoursCanopyPSITooLow   , &
     MatureGroup_pft =>  plt_pheno%MatureGroup_pft, &
     PetioleChemElmntRemobFlx_brch   =>  plt_pheno%PetioleChemElmntRemobFlx_brch  , &
-    TotalReprodNodeNumNormByMatrgrp_brch  =>  plt_pheno%TotalReprodNodeNumNormByMatrgrp_brch , &
+    TotReproNodeNumNormByMatrgrp_brch  =>  plt_pheno%TotReproNodeNumNormByMatrgrp_brch , &
     TotalNodeNumNormByMatgrp_brch  =>  plt_pheno%TotalNodeNumNormByMatgrp_brch , &
     C4PhotosynDowreg_brch   =>  plt_photo%C4PhotosynDowreg_brch  , &
     CPOOL3  =>  plt_photo%CPOOL3 , &
@@ -647,7 +647,7 @@ module StartqsMod
     NodeNumNormByMatgrp_brch(NB,NZ)=0._r8
     ReprodNodeNumNormByMatrgrp_brch(NB,NZ)=0._r8
     TotalNodeNumNormByMatgrp_brch(NB,NZ)=0._r8
-    TotalReprodNodeNumNormByMatrgrp_brch(NB,NZ)=0._r8
+    TotReproNodeNumNormByMatrgrp_brch(NB,NZ)=0._r8
     Hours4LenthenPhotoPeriod_brch(NB,NZ)=0._r8
     Hours4ShortenPhotoPeriod_brch(NB,NZ)=0._r8
     Hours4Leafout_brch(NB,NZ)=Hours4LenthenPhotoPeriod_brch(NB,NZ)

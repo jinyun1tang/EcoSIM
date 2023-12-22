@@ -638,7 +638,7 @@ module RedistMod
 !
     DORGP=0.0_r8
     D9280: DO K=1,jcplx
-      DO  NO=1,NFGs
+      DO  NO=1,NumMicbFunGroups
         DO NGL=JGnio(NO),JGnfo(NO)
           DO  M=1,nlbiomcp
             OMC(M,NGL,K,NU(NY,NX),NY,NX)=OMC(M,NGL,K,NU(NY,NX),NY,NX)+TOMCER(M,NGL,K,NY,NX)
@@ -651,7 +651,7 @@ module RedistMod
       enddo
     ENDDO D9280
 
-    DO  NO=1,NFGs
+    DO  NO=1,NumMicbFunGroups
       DO NGL=JGniA(NO),JGnfA(NO)
         DO  M=1,nlbiomcp
           OMCff(M,NGL,NU(NY,NX),NY,NX)=OMCff(M,NGL,NU(NY,NX),NY,NX)+TOMCERff(M,NGL,NY,NX)
@@ -723,9 +723,9 @@ module RedistMod
     !
     ! TOTAL heterotrophic MICROBIAL C,N,P
     !
-    tDC=SUM(OMC(1:nlbiomcp,1:NumOfMicrobs1HetertrophCmplx,K,0,NY,NX))
-    tDN=SUM(OMN(1:nlbiomcp,1:NumOfMicrobs1HetertrophCmplx,K,0,NY,NX))
-    tDP=SUM(OMP(1:nlbiomcp,1:NumOfMicrobs1HetertrophCmplx,K,0,NY,NX))
+    tDC=SUM(OMC(1:nlbiomcp,1:NumMicrbHetetrophCmplx,K,0,NY,NX))
+    tDN=SUM(OMN(1:nlbiomcp,1:NumMicrbHetetrophCmplx,K,0,NY,NX))
+    tDP=SUM(OMP(1:nlbiomcp,1:NumMicrbHetetrophCmplx,K,0,NY,NX))
     DC=DC+tDC
     DN=DN+tDN
     DP=DP+tDP
@@ -740,9 +740,9 @@ module RedistMod
   !
   ! TOTAL autotrophic MICROBIAL C,N,P
   !
-  tDC=SUM(OMCff(1:nlbiomcp,1:NumOfMicrobsInAutotrophCmplx,0,NY,NX))
-  tDN=SUM(OMNff(1:nlbiomcp,1:NumOfMicrobsInAutotrophCmplx,0,NY,NX))
-  tDP=SUM(OMPff(1:nlbiomcp,1:NumOfMicrobsInAutotrophCmplx,0,NY,NX))
+  tDC=SUM(OMCff(1:nlbiomcp,1:NumMicrobAutotrophCmplx,0,NY,NX))
+  tDN=SUM(OMNff(1:nlbiomcp,1:NumMicrobAutotrophCmplx,0,NY,NX))
+  tDP=SUM(OMPff(1:nlbiomcp,1:NumMicrobAutotrophCmplx,0,NY,NX))
   DC=DC+tDC
   DN=DN+tDN
   DP=DP+tDP
@@ -1416,9 +1416,9 @@ module RedistMod
 
 ! add living microbes
   DO K=1,jcplx
-    tDC=SUM(OMC(1:nlbiomcp,1:NumOfMicrobs1HetertrophCmplx,K,L,NY,NX))
-    tDN=SUM(OMN(1:nlbiomcp,1:NumOfMicrobs1HetertrophCmplx,K,L,NY,NX))
-    tDP=SUM(OMP(1:nlbiomcp,1:NumOfMicrobs1HetertrophCmplx,K,L,NY,NX))
+    tDC=SUM(OMC(1:nlbiomcp,1:NumMicrbHetetrophCmplx,K,L,NY,NX))
+    tDN=SUM(OMN(1:nlbiomcp,1:NumMicrbHetetrophCmplx,K,L,NY,NX))
+    tDP=SUM(OMP(1:nlbiomcp,1:NumMicrbHetetrophCmplx,K,L,NY,NX))
     IF(micpar%is_litter(K))THEN  
       !K=0,1,2: woody litr, nonwoody litr, and manure
       DC=DC+tDC
@@ -1444,9 +1444,9 @@ module RedistMod
   ENDDO
 
 ! add autotrophs
-  tDC=SUM(OMCff(1:nlbiomcp,1:NumOfMicrobsInAutotrophCmplx,L,NY,NX))
-  tDN=SUM(OMNff(1:nlbiomcp,1:NumOfMicrobsInAutotrophCmplx,L,NY,NX))
-  tDP=SUM(OMPff(1:nlbiomcp,1:NumOfMicrobsInAutotrophCmplx,L,NY,NX))
+  tDC=SUM(OMCff(1:nlbiomcp,1:NumMicrobAutotrophCmplx,L,NY,NX))
+  tDN=SUM(OMNff(1:nlbiomcp,1:NumMicrobAutotrophCmplx,L,NY,NX))
+  tDP=SUM(OMPff(1:nlbiomcp,1:NumMicrobAutotrophCmplx,L,NY,NX))
   OC=OC+tDC
   ON=ON+tDN
   OP=OP+tDP
@@ -1592,7 +1592,7 @@ module RedistMod
 !
   DO K=1,jcplx
     IF(micpar%is_litter(K))THEN
-      DO  N=1,NFGs
+      DO  N=1,NumMicbFunGroups
         DO NGL=JGnio(N),JGnfo(N)
           ROXYX(0,NY,NX)=ROXYX(0,NY,NX)+ROXYS(NGL,K,0,NY,NX)
           RNH4X(0,NY,NX)=RNH4X(0,NY,NX)+RVMX4(NGL,K,0,NY,NX)
@@ -1614,7 +1614,7 @@ module RedistMod
     ENDIF
   ENDDO
 
-  DO  N=1,NFGs
+  DO  N=1,NumMicbFunGroups
     DO NGL=JGniA(N),JGnfA(N)
       ROXYX(0,NY,NX)=ROXYX(0,NY,NX)+ROXYSff(NGL,0,NY,NX)
       RNH4X(0,NY,NX)=RNH4X(0,NY,NX)+RVMX4ff(NGL,0,NY,NX)
@@ -1646,42 +1646,42 @@ module RedistMod
 
   integer :: K,N,NGL
 
-  ROXYX(L,NY,NX)=ROXYX(L,NY,NX)+SUM(ROXYS(1:NumOfMicrobs1HetertrophCmplx,1:jcplx,L,NY,NX))
-  RNH4X(L,NY,NX)=RNH4X(L,NY,NX)+SUM(RVMX4(1:NumOfMicrobs1HetertrophCmplx,1:jcplx,L,NY,NX)) &
-    +SUM(RINHO(1:NumOfMicrobs1HetertrophCmplx,1:jcplx,L,NY,NX))
-  RNO3X(L,NY,NX)=RNO3X(L,NY,NX)+SUM(RVMX3(1:NumOfMicrobs1HetertrophCmplx,1:jcplx,L,NY,NX)) &
-    +SUM(RINOO(1:NumOfMicrobs1HetertrophCmplx,1:jcplx,L,NY,NX))
-  RNO2X(L,NY,NX)=RNO2X(L,NY,NX)+SUM(RVMX2(1:NumOfMicrobs1HetertrophCmplx,1:jcplx,L,NY,NX))
-  RN2OX(L,NY,NX)=RN2OX(L,NY,NX)+SUM(RVMX1(1:NumOfMicrobs1HetertrophCmplx,1:jcplx,L,NY,NX))
-  RPO4X(L,NY,NX)=RPO4X(L,NY,NX)+SUM(RIPOO(1:NumOfMicrobs1HetertrophCmplx,1:jcplx,L,NY,NX))
-  RP14X(L,NY,NX)=RP14X(L,NY,NX)+SUM(RIPO1(1:NumOfMicrobs1HetertrophCmplx,1:jcplx,L,NY,NX))
-  RNHBX(L,NY,NX)=RNHBX(L,NY,NX)+SUM(RVMB4(1:NumOfMicrobs1HetertrophCmplx,1:jcplx,L,NY,NX)) &
-    +SUM(RINHB(1:NumOfMicrobs1HetertrophCmplx,1:jcplx,L,NY,NX))
-  RN3BX(L,NY,NX)=RN3BX(L,NY,NX)+SUM(RVMB3(1:NumOfMicrobs1HetertrophCmplx,1:jcplx,L,NY,NX)) &
-    +SUM(RINOB(1:NumOfMicrobs1HetertrophCmplx,1:jcplx,L,NY,NX))
-  RN2BX(L,NY,NX)=RN2BX(L,NY,NX)+SUM(RVMB2(1:NumOfMicrobs1HetertrophCmplx,1:jcplx,L,NY,NX))
-  RPOBX(L,NY,NX)=RPOBX(L,NY,NX)+SUM(RIPBO(1:NumOfMicrobs1HetertrophCmplx,1:jcplx,L,NY,NX))
-  RP1BX(L,NY,NX)=RP1BX(L,NY,NX)+SUM(RIPB1(1:NumOfMicrobs1HetertrophCmplx,1:jcplx,L,NY,NX))
+  ROXYX(L,NY,NX)=ROXYX(L,NY,NX)+SUM(ROXYS(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX))
+  RNH4X(L,NY,NX)=RNH4X(L,NY,NX)+SUM(RVMX4(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX)) &
+    +SUM(RINHO(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX))
+  RNO3X(L,NY,NX)=RNO3X(L,NY,NX)+SUM(RVMX3(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX)) &
+    +SUM(RINOO(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX))
+  RNO2X(L,NY,NX)=RNO2X(L,NY,NX)+SUM(RVMX2(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX))
+  RN2OX(L,NY,NX)=RN2OX(L,NY,NX)+SUM(RVMX1(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX))
+  RPO4X(L,NY,NX)=RPO4X(L,NY,NX)+SUM(RIPOO(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX))
+  RP14X(L,NY,NX)=RP14X(L,NY,NX)+SUM(RIPO1(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX))
+  RNHBX(L,NY,NX)=RNHBX(L,NY,NX)+SUM(RVMB4(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX)) &
+    +SUM(RINHB(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX))
+  RN3BX(L,NY,NX)=RN3BX(L,NY,NX)+SUM(RVMB3(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX)) &
+    +SUM(RINOB(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX))
+  RN2BX(L,NY,NX)=RN2BX(L,NY,NX)+SUM(RVMB2(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX))
+  RPOBX(L,NY,NX)=RPOBX(L,NY,NX)+SUM(RIPBO(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX))
+  RP1BX(L,NY,NX)=RP1BX(L,NY,NX)+SUM(RIPB1(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX))
   DO K=1,jcplx
-    ROQCX(K,L,NY,NX)=ROQCX(K,L,NY,NX)+SUM(ROQCS(1:NumOfMicrobs1HetertrophCmplx,1:jcplx,L,NY,NX))
-    ROQAX(K,L,NY,NX)=ROQAX(K,L,NY,NX)+SUM(ROQAS(1:NumOfMicrobs1HetertrophCmplx,1:jcplx,L,NY,NX))
+    ROQCX(K,L,NY,NX)=ROQCX(K,L,NY,NX)+SUM(ROQCS(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX))
+    ROQAX(K,L,NY,NX)=ROQAX(K,L,NY,NX)+SUM(ROQAS(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX))
   ENDDO
-  ROXYX(L,NY,NX)=ROXYX(L,NY,NX)+SUM(ROXYSff(1:NumOfMicrobs1HetertrophCmplx,L,NY,NX))
-  RNH4X(L,NY,NX)=RNH4X(L,NY,NX)+SUM(RVMX4ff(1:NumOfMicrobs1HetertrophCmplx,L,NY,NX)) &
-    +SUM(RINHOff(1:NumOfMicrobs1HetertrophCmplx,L,NY,NX))
-  RNO3X(L,NY,NX)=RNO3X(L,NY,NX)+SUM(RVMX3ff(1:NumOfMicrobs1HetertrophCmplx,L,NY,NX)) &
-    +SUM(RINOOff(1:NumOfMicrobs1HetertrophCmplx,L,NY,NX))
-  RNO2X(L,NY,NX)=RNO2X(L,NY,NX)+SUM(RVMX2ff(1:NumOfMicrobs1HetertrophCmplx,L,NY,NX))
-  RN2OX(L,NY,NX)=RN2OX(L,NY,NX)+SUM(RVMX1ff(1:NumOfMicrobs1HetertrophCmplx,L,NY,NX))
-  RPO4X(L,NY,NX)=RPO4X(L,NY,NX)+SUM(RIPOOff(1:NumOfMicrobs1HetertrophCmplx,L,NY,NX))
-  RP14X(L,NY,NX)=RP14X(L,NY,NX)+SUM(RIPO1ff(1:NumOfMicrobs1HetertrophCmplx,L,NY,NX))
-  RNHBX(L,NY,NX)=RNHBX(L,NY,NX)+SUM(RVMB4ff(1:NumOfMicrobs1HetertrophCmplx,L,NY,NX)) &
-    +SUM(RINHBff(1:NumOfMicrobs1HetertrophCmplx,L,NY,NX))
-  RN3BX(L,NY,NX)=RN3BX(L,NY,NX)+SUM(RVMB3ff(1:NumOfMicrobs1HetertrophCmplx,L,NY,NX)) &
-    +SUM(RINOBff(1:NumOfMicrobs1HetertrophCmplx,L,NY,NX))
-  RN2BX(L,NY,NX)=RN2BX(L,NY,NX)+SUM(RVMB2ff(1:NumOfMicrobs1HetertrophCmplx,L,NY,NX))
-  RPOBX(L,NY,NX)=RPOBX(L,NY,NX)+SUM(RIPBOff(1:NumOfMicrobs1HetertrophCmplx,L,NY,NX))
-  RP1BX(L,NY,NX)=RP1BX(L,NY,NX)+SUM(RIPB1ff(1:NumOfMicrobs1HetertrophCmplx,L,NY,NX))
+  ROXYX(L,NY,NX)=ROXYX(L,NY,NX)+SUM(ROXYSff(1:NumMicrbHetetrophCmplx,L,NY,NX))
+  RNH4X(L,NY,NX)=RNH4X(L,NY,NX)+SUM(RVMX4ff(1:NumMicrbHetetrophCmplx,L,NY,NX)) &
+    +SUM(RINHOff(1:NumMicrbHetetrophCmplx,L,NY,NX))
+  RNO3X(L,NY,NX)=RNO3X(L,NY,NX)+SUM(RVMX3ff(1:NumMicrbHetetrophCmplx,L,NY,NX)) &
+    +SUM(RINOOff(1:NumMicrbHetetrophCmplx,L,NY,NX))
+  RNO2X(L,NY,NX)=RNO2X(L,NY,NX)+SUM(RVMX2ff(1:NumMicrbHetetrophCmplx,L,NY,NX))
+  RN2OX(L,NY,NX)=RN2OX(L,NY,NX)+SUM(RVMX1ff(1:NumMicrbHetetrophCmplx,L,NY,NX))
+  RPO4X(L,NY,NX)=RPO4X(L,NY,NX)+SUM(RIPOOff(1:NumMicrbHetetrophCmplx,L,NY,NX))
+  RP14X(L,NY,NX)=RP14X(L,NY,NX)+SUM(RIPO1ff(1:NumMicrbHetetrophCmplx,L,NY,NX))
+  RNHBX(L,NY,NX)=RNHBX(L,NY,NX)+SUM(RVMB4ff(1:NumMicrbHetetrophCmplx,L,NY,NX)) &
+    +SUM(RINHBff(1:NumMicrbHetetrophCmplx,L,NY,NX))
+  RN3BX(L,NY,NX)=RN3BX(L,NY,NX)+SUM(RVMB3ff(1:NumMicrbHetetrophCmplx,L,NY,NX)) &
+    +SUM(RINOBff(1:NumMicrbHetetrophCmplx,L,NY,NX))
+  RN2BX(L,NY,NX)=RN2BX(L,NY,NX)+SUM(RVMB2ff(1:NumMicrbHetetrophCmplx,L,NY,NX))
+  RPOBX(L,NY,NX)=RPOBX(L,NY,NX)+SUM(RIPBOff(1:NumMicrbHetetrophCmplx,L,NY,NX))
+  RP1BX(L,NY,NX)=RP1BX(L,NY,NX)+SUM(RIPB1ff(1:NumMicrbHetetrophCmplx,L,NY,NX))
 
   RNO2X(L,NY,NX)=RNO2X(L,NY,NX)+RVMXC(L,NY,NX)
   RN2BX(L,NY,NX)=RN2BX(L,NY,NX)+RVMBC(L,NY,NX)

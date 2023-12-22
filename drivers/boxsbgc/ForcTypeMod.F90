@@ -230,21 +230,21 @@ implicit none
   type(forc_type), intent(inout) :: forc
   character(len=*), intent(in) :: fname
   integer :: jcplx,ndbiomcp,nlbiomcp
-  integer :: NFGs,jsken,NumOfMicrobs1HetertrophCmplx,NumOfMicrobsInAutotrophCmplx
+  integer :: NumMicbFunGroups,jsken,NumMicrbHetetrophCmplx,NumMicrobAutotrophCmplx
   type(file_desc_t) :: ncf
 
   call ncd_pio_openfile(ncf, fname, ncd_nowrite)
 
   jcplx=get_dim_len(ncf,'jcplx')
   jsken =get_dim_len(ncf,'jsken')
-  NumOfMicrobs1HetertrophCmplx=get_dim_len(ncf,'NumOfMicrobs1HetertrophCmplx')
-  NumOfMicrobsInAutotrophCmplx=get_dim_len(ncf,'NumOfMicrobsInAutotrophCmplx')
+  NumMicrbHetetrophCmplx=get_dim_len(ncf,'NumMicrbHetetrophCmplx')
+  NumMicrobAutotrophCmplx=get_dim_len(ncf,'NumMicrobAutotrophCmplx')
   nlbiomcp=get_dim_len(ncf,'nlbiomcp')
   ndbiomcp=get_dim_len(ncf,'ndbiomcp')
-  NFGs    =get_dim_len(ncf,'NFGs')
-  allocate(forc%OMC(nlbiomcp,NumOfMicrobs1HetertrophCmplx,1:jcplx))
-  allocate(forc%OMN(nlbiomcp,NumOfMicrobs1HetertrophCmplx,1:jcplx))
-  allocate(forc%OMP(nlbiomcp,NumOfMicrobs1HetertrophCmplx,1:jcplx))
+  NumMicbFunGroups    =get_dim_len(ncf,'NumMicbFunGroups')
+  allocate(forc%OMC(nlbiomcp,NumMicrbHetetrophCmplx,1:jcplx))
+  allocate(forc%OMN(nlbiomcp,NumMicrbHetetrophCmplx,1:jcplx))
+  allocate(forc%OMP(nlbiomcp,NumMicrbHetetrophCmplx,1:jcplx))
   allocate(forc%DOM(idom_beg:idom_end,1:jcplx))
   allocate(forc%OSC(jsken,1:jcplx))
   allocate(forc%OSA(jsken,1:jcplx))
@@ -253,9 +253,9 @@ implicit none
   allocate(forc%ORC(ndbiomcp,1:jcplx))
   allocate(forc%ORN(ndbiomcp,1:jcplx))
   allocate(forc%ORP(ndbiomcp,1:jcplx))
-  allocate(forc%OMCff(nlbiomcp,NumOfMicrobsInAutotrophCmplx))
-  allocate(forc%OMNff(nlbiomcp,NumOfMicrobsInAutotrophCmplx))
-  allocate(forc%OMPff(nlbiomcp,NumOfMicrobsInAutotrophCmplx))
+  allocate(forc%OMCff(nlbiomcp,NumMicrobAutotrophCmplx))
+  allocate(forc%OMNff(nlbiomcp,NumMicrobAutotrophCmplx))
+  allocate(forc%OMPff(nlbiomcp,NumMicrobAutotrophCmplx))
   allocate(forc%OHC(1:jcplx))
   allocate(forc%OHN(1:jcplx))
   allocate(forc%OHP(1:jcplx))

@@ -167,7 +167,7 @@ module GrosubPars
   integer  :: JP1         !number of plants
   integer  :: MaxNumBranches         !maximum number of branches
   integer  :: NumOfSkyAzimuSects1        !number of sectors for the sky azimuth  [0,2*pi]
-  integer  :: jcplx       !number of organo-microbial CO2CompenPoint_nodeexes
+  integer  :: jcplx       !number of organo-microbial complexes
   integer  :: NumOfLeafAzimuthSectors        !number of sectors for the leaf azimuth, [0,pi]
   integer  :: NumOfCanopyLayers1         !number of canopy layers
   integer  :: JZ1         !number of soil layers
@@ -177,7 +177,7 @@ module GrosubPars
   integer  :: NumLitterGroups     !number of litter groups nonstructural(0,*),
                           !     foliar(1,*),non-foliar(2,*),stalk(3,*),root(4,*), coarse woody (5,*)
   integer  :: NumOfPlantMorphUnits        !number of plant organs
-  integer  :: NumOfPlantLitrCmplxs  !number of plant litter microbial-om CO2CompenPoint_nodeexes
+  integer  :: NumOfPlantLitrCmplxs  !number of plant litter microbial-om complexes
   integer :: iprotein
   integer :: icarbhyro
   integer :: icellulos

@@ -14,12 +14,12 @@ implicit none
   character(len=256), public :: rpntfil = 'rpointer.esim'
   character(len=16) , public :: inst_suffix=''
 
-  integer, parameter :: NumOfDeadMicrobiomComponents = 2 !# of microbial residue components
-  integer, parameter :: NumOfLiveMicrobiomComponents = 3 !# of living biomass components
+  integer, parameter :: NumDeadMicrbCompts = 2 !# of microbial residue components
+  integer, parameter :: NumLiveMicrbCompts = 3 !# of living biomass components
   integer, parameter :: jskenc    = 4 !# of kinetic components of the substrates
-  integer, parameter :: jcplxc    = 5 !# of microbe-substrate CO2CompenPoint_nodeexes
+  integer, parameter :: jcplxc    = 5 !# of microbe-substrate complexes
   integer, parameter :: jcplx1c   = jcplxc-1
-  integer, parameter :: NFGsc     = 7 !# of microbial functional groups in each CO2CompenPoint_nodeex
+  integer, parameter :: NumMicbFunGroups     = 7 !# of microbial functional groups in each complex
 
   character(len=datestrlen)  :: ref_date  = '18000101000000'
   character(len=datestrlen)  :: start_date= '18000101000000'

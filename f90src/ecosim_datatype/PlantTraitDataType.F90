@@ -137,7 +137,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  ReprodNodeNumNormByMatrgrp_brch(:,:,:,:)                     !normalized node number during reproductive growth stages, [-]
   real(r8),target,allocatable ::  NodeNumberAtAnthesis_brch(:,:,:,:)                     !node number at anthesis, [-]
   real(r8),target,allocatable ::  TotalNodeNumNormByMatgrp_brch(:,:,:,:)                    !normalized node number during vegetative growth stages , [-]
-  real(r8),target,allocatable ::  TotalReprodNodeNumNormByMatrgrp_brch(:,:,:,:)                    !normalized node number during reproductive growth stages , [-]
+  real(r8),target,allocatable ::  TotReproNodeNumNormByMatrgrp_brch(:,:,:,:)                    !normalized node number during reproductive growth stages , [-]
   real(r8),target,allocatable ::  RefNodeInitRate_pft(:,:,:)                        !rate of node initiation, [h-1 at 25 oC]
   real(r8),target,allocatable ::  SNL1(:,:,:)                        !internode length:mass during growth, [m g-1]
   real(r8),target,allocatable ::  FNOD(:,:,:)                        !parameter for allocation of growth to nodes, [-]
@@ -296,7 +296,7 @@ contains
   allocate(ReprodNodeNumNormByMatrgrp_brch(MaxNumBranches,JP,JY,JX)); ReprodNodeNumNormByMatrgrp_brch=0._r8
   allocate(NodeNumberAtAnthesis_brch(MaxNumBranches,JP,JY,JX)); NodeNumberAtAnthesis_brch=0._r8
   allocate(TotalNodeNumNormByMatgrp_brch(MaxNumBranches,JP,JY,JX));TotalNodeNumNormByMatgrp_brch=0._r8
-  allocate(TotalReprodNodeNumNormByMatrgrp_brch(MaxNumBranches,JP,JY,JX));TotalReprodNodeNumNormByMatrgrp_brch=0._r8
+  allocate(TotReproNodeNumNormByMatrgrp_brch(MaxNumBranches,JP,JY,JX));TotReproNodeNumNormByMatrgrp_brch=0._r8
   allocate(RefNodeInitRate_pft(JP,JY,JX));     RefNodeInitRate_pft=0._r8
   allocate(SNL1(JP,JY,JX));     SNL1=0._r8
   allocate(FNOD(JP,JY,JX));     FNOD=0._r8
@@ -452,7 +452,7 @@ contains
   call destroy(ReprodNodeNumNormByMatrgrp_brch)
   call destroy(NodeNumberAtAnthesis_brch)
   call destroy(TotalNodeNumNormByMatgrp_brch)
-  call destroy(TotalReprodNodeNumNormByMatrgrp_brch)
+  call destroy(TotReproNodeNumNormByMatrgrp_brch)
   call destroy(RefNodeInitRate_pft)
   call destroy(SNL1)
   call destroy(FNOD)

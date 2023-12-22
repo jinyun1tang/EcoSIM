@@ -2,7 +2,7 @@ module SedimentDataType
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use GridConsts
   use TracerIDMod
-  use EcoSIMConfig, only : jcplx => jcplxc,ndbiomcp=>NumOfDeadMicrobiomComponents,jsken=>jskenc
+  use EcoSIMConfig, only : jcplx => jcplxc,ndbiomcp=>NumDeadMicrbCompts,jsken=>jskenc
 implicit none
 
   save
