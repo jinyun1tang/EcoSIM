@@ -129,7 +129,7 @@ implicit none
         D1960: DO N=1,NumMicbFunGroups
           DO NGL=JGnio(N),JGnfo(N)
             DO M=1,nlbiomcp
-              MID=micpar%get_hmicb_id(M,NGL)
+              MID=micpar%get_micb_id(M,NGL)
               FOMC=FSINK*OMC(MID,K,L,NY,NX)
               FOMN=FSINK*OMN(MID,K,L,NY,NX)
               FOMP=FSINK*OMP(MID,K,L,NY,NX)
@@ -152,15 +152,16 @@ implicit none
       DO N=1,NumMicbFunGroups
         DO NGL=JGniA(N),JGnfA(N)
           DO M=1,nlbiomcp
-            FOMC=FSINK*OMCff(M,NGL,L,NY,NX)
-            FOMN=FSINK*OMNff(M,NGL,L,NY,NX)
-            FOMP=FSINK*OMPff(M,NGL,L,NY,NX)
-            OMCff(M,NGL,LL,NY,NX)=OMCff(M,NGL,LL,NY,NX)+FOMC
-            OMNff(M,NGL,LL,NY,NX)=OMNff(M,NGL,LL,NY,NX)+FOMN
-            OMPff(M,NGL,LL,NY,NX)=OMPff(M,NGL,LL,NY,NX)+FOMP
-            OMCff(M,NGL,L,NY,NX)=OMCff(M,NGL,L,NY,NX)-FOMC
-            OMNff(M,NGL,L,NY,NX)=OMNff(M,NGL,L,NY,NX)-FOMN
-            OMPff(M,NGL,L,NY,NX)=OMPff(M,NGL,L,NY,NX)-FOMP
+            MID=micpar%get_micb_id(M,NGL)          
+            FOMC=FSINK*OMCff(MID,L,NY,NX)
+            FOMN=FSINK*OMNff(MID,L,NY,NX)
+            FOMP=FSINK*OMPff(MID,L,NY,NX)
+            OMCff(MID,LL,NY,NX)=OMCff(MID,LL,NY,NX)+FOMC
+            OMNff(MID,LL,NY,NX)=OMNff(MID,LL,NY,NX)+FOMN
+            OMPff(MID,LL,NY,NX)=OMPff(MID,LL,NY,NX)+FOMP
+            OMCff(MID,L,NY,NX)=OMCff(MID,L,NY,NX)-FOMC
+            OMNff(MID,L,NY,NX)=OMNff(MID,L,NY,NX)-FOMN
+            OMPff(MID,L,NY,NX)=OMPff(MID,L,NY,NX)-FOMP
           enddo
         enddo
       ENDDO

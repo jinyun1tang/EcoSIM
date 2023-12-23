@@ -53,9 +53,9 @@ module TillageMixMod
   REAL(R8) :: TOMC(NumLiveHeterBioms,1:jcplx)
   REAL(R8) :: TOMN(NumLiveHeterBioms,1:jcplx)
   REAL(R8) :: TOMP(NumLiveHeterBioms,1:jcplx)
-  REAL(R8) :: TOMCff(nlbiomcp,NumMicrobAutotrophCmplx)
-  REAL(R8) :: TOMNff(nlbiomcp,NumMicrobAutotrophCmplx)
-  REAL(R8) :: TOMPff(nlbiomcp,NumMicrobAutotrophCmplx)
+  REAL(R8) :: TOMCff(NumLiveAutoBioms)
+  REAL(R8) :: TOMNff(NumLiveAutoBioms)
+  REAL(R8) :: TOMPff(NumLiveAutoBioms)
   real(r8) :: TORC(ndbiomcp,1:jcplx)
   real(r8) :: TORN(ndbiomcp,1:jcplx)
   real(r8) :: TORP(ndbiomcp,1:jcplx)
@@ -182,7 +182,7 @@ module TillageMixMod
       DO  N=1,NumMicbFunGroups
         DO NGL=JGnio(N),JGnfo(N)
           DO  M=1,nlbiomcp
-            MID=micpar%get_hmicb_id(M,NGL)
+            MID=micpar%get_micb_id(M,NGL)
             TOMGC(M,NGL,K)=OMC(MID,K,0,NY,NX)*CORP0
             TOMGN(M,NGL,K)=OMN(MID,K,0,NY,NX)*CORP0
             TOMGP(M,NGL,K)=OMP(MID,K,0,NY,NX)*CORP0
@@ -200,15 +200,16 @@ module TillageMixMod
     DO  N=1,NumMicbFunGroups
       DO NGL=JGniA(N),JGnfA(N)
         DO  M=1,nlbiomcp
-          TOMGCff(M,NGL)=OMCff(M,NGL,0,NY,NX)*CORP0
-          TOMGNff(M,NGL)=OMNff(M,NGL,0,NY,NX)*CORP0
-          TOMGPff(M,NGL)=OMPff(M,NGL,0,NY,NX)*CORP0
-          OMCff(M,NGL,0,NY,NX)=OMCff(M,NGL,0,NY,NX)*XCORP0
-          OMNff(M,NGL,0,NY,NX)=OMNff(M,NGL,0,NY,NX)*XCORP0
-          OMPff(M,NGL,0,NY,NX)=OMPff(M,NGL,0,NY,NX)*XCORP0
-          DC=DC+OMCff(M,NGL,0,NY,NX)
-          DN=DN+OMNff(M,NGL,0,NY,NX)
-          DP=DP+OMPff(M,NGL,0,NY,NX)
+          MID=micpar%get_micb_id(M,NGL)
+          TOMGCff(M,NGL)=OMCff(MID,0,NY,NX)*CORP0
+          TOMGNff(M,NGL)=OMNff(MID,0,NY,NX)*CORP0
+          TOMGPff(M,NGL)=OMPff(MID,0,NY,NX)*CORP0
+          OMCff(MID,0,NY,NX)=OMCff(MID,0,NY,NX)*XCORP0
+          OMNff(MID,0,NY,NX)=OMNff(MID,0,NY,NX)*XCORP0
+          OMPff(MID,0,NY,NX)=OMPff(MID,0,NY,NX)*XCORP0
+          DC=DC+OMCff(MID,0,NY,NX)
+          DN=DN+OMNff(MID,0,NY,NX)
+          DP=DP+OMPff(MID,0,NY,NX)
         enddo
       enddo
     ENDDO
@@ -401,7 +402,7 @@ module TillageMixMod
           DO  N=1,NumMicbFunGroups
             DO NGL=JGnio(N),JGnfo(N)
               DO  M=1,nlbiomcp
-                MID=micpar%get_hmicb_id(M,NGL)
+                MID=micpar%get_micb_id(M,NGL)
                 TOMC(MID,K)=TOMC(MID,K)+TI*OMC(MID,K,L,NY,NX)
                 TOMN(MID,K)=TOMN(MID,K)+TI*OMN(MID,K,L,NY,NX)
                 TOMP(MID,K)=TOMP(MID,K)+TI*OMP(MID,K,L,NY,NX)
@@ -413,9 +414,10 @@ module TillageMixMod
         DO  N=1,NumMicbFunGroups
           DO NGL=JGniA(N),JGnfA(N)
             DO  M=1,nlbiomcp
-              TOMCff(M,NGL)=TOMCff(M,NGL)+TI*OMCff(M,NGL,L,NY,NX)
-              TOMNff(M,NGL)=TOMNff(M,NGL)+TI*OMNff(M,NGL,L,NY,NX)
-              TOMPff(M,NGL)=TOMPff(M,NGL)+TI*OMPff(M,NGL,L,NY,NX)
+              MID=micpar%get_micb_id(M,NGL)
+              TOMCff(MID)=TOMCff(MID)+TI*OMCff(MID,L,NY,NX)
+              TOMNff(MID)=TOMNff(MID)+TI*OMNff(MID,L,NY,NX)
+              TOMPff(MID)=TOMPff(MID)+TI*OMPff(MID,L,NY,NX)
             enddo
           enddo
         enddo
@@ -543,7 +545,7 @@ module TillageMixMod
           DO  N=1,NumMicbFunGroups
             DO NGL=JGnio(N),JGnfo(N)
               DO  M=1,nlbiomcp
-                MID=micpar%get_hmicb_id(M,NGL)
+                MID=micpar%get_micb_id(M,NGL)
                 OMC(MID,K,L,NY,NX)=TI*OMC(MID,K,L,NY,NX)+CORP*(FI*TOMC(MID,K) &
                   -TI*OMC(MID,K,L,NY,NX))+TX*OMC(MID,K,L,NY,NX)
                 OMN(MID,K,L,NY,NX)=TI*OMN(MID,K,L,NY,NX)+CORP*(FI*TOMN(MID,K) &
@@ -557,12 +559,13 @@ module TillageMixMod
         DO  N=1,NumMicbFunGroups
           DO NGL=JGniA(N),JGnfA(N)
             DO  M=1,nlbiomcp
-              OMCff(M,NGL,L,NY,NX)=TI*OMCff(M,NGL,L,NY,NX)+CORP*(FI*TOMCff(M,NGL) &
-                -TI*OMCff(M,NGL,L,NY,NX))+TX*OMCff(M,NGL,L,NY,NX)
-              OMNff(M,NGL,L,NY,NX)=TI*OMNff(M,NGL,L,NY,NX)+CORP*(FI*TOMNff(M,NGL) &
-                -TI*OMNff(M,NGL,L,NY,NX))+TX*OMNff(M,NGL,L,NY,NX)
-              OMPff(M,NGL,L,NY,NX)=TI*OMPff(M,NGL,L,NY,NX)+CORP*(FI*TOMPff(M,NGL) &
-                -TI*OMPff(M,NGL,L,NY,NX))+TX*OMPff(M,NGL,L,NY,NX)
+              MID=micpar%get_micb_id(M,NGL)
+              OMCff(MID,L,NY,NX)=TI*OMCff(MID,L,NY,NX)+CORP*(FI*TOMCff(MID) &
+                -TI*OMCff(MID,L,NY,NX))+TX*OMCff(MID,L,NY,NX)
+              OMNff(MID,L,NY,NX)=TI*OMNff(MID,L,NY,NX)+CORP*(FI*TOMNff(MID) &
+                -TI*OMNff(MID,L,NY,NX))+TX*OMNff(MID,L,NY,NX)
+              OMPff(MID,L,NY,NX)=TI*OMPff(MID,L,NY,NX)+CORP*(FI*TOMPff(MID) &
+                -TI*OMPff(MID,L,NY,NX))+TX*OMPff(MID,L,NY,NX)
             enddo
           enddo
         enddo
@@ -617,7 +620,7 @@ module TillageMixMod
           DO  N=1,NumMicbFunGroups
             DO NGL=JGnio(N),JGnfo(N)
               DO M=1,nlbiomcp
-                MID=micpar%get_hmicb_id(M,NGL)
+                MID=micpar%get_micb_id(M,NGL)
                 OMC(MID,K,L,NY,NX)=OMC(MID,K,L,NY,NX)+FI*TOMGC(M,NGL,K)
                 OMN(MID,K,L,NY,NX)=OMN(MID,K,L,NY,NX)+FI*TOMGN(M,NGL,K)
                 OMP(MID,K,L,NY,NX)=OMP(MID,K,L,NY,NX)+FI*TOMGP(M,NGL,K)
@@ -629,9 +632,10 @@ module TillageMixMod
         DO  N=1,NumMicbFunGroups
           DO NGL=JGniA(N),JGnfA(N)
             DO M=1,nlbiomcp
-              OMCff(M,NGL,L,NY,NX)=OMCff(M,NGL,L,NY,NX)+FI*TOMGCff(M,NGL)
-              OMNff(M,NGL,L,NY,NX)=OMNff(M,NGL,L,NY,NX)+FI*TOMGNff(M,NGL)
-              OMPff(M,NGL,L,NY,NX)=OMPff(M,NGL,L,NY,NX)+FI*TOMGPff(M,NGL)
+              MID=micpar%get_micb_id(M,NGL)
+              OMCff(MID,L,NY,NX)=OMCff(MID,L,NY,NX)+FI*TOMGCff(M,NGL)
+              OMNff(MID,L,NY,NX)=OMNff(MID,L,NY,NX)+FI*TOMGNff(M,NGL)
+              OMPff(MID,L,NY,NX)=OMPff(MID,L,NY,NX)+FI*TOMGPff(M,NGL)
             enddo
           enddo
         ENDDO
@@ -672,7 +676,7 @@ module TillageMixMod
           DO  N=1,NumMicbFunGroups
             DO NGL=JGnio(N),JGnfo(N)
               DO  M=1,nlbiomcp
-                MID=micpar%get_hmicb_id(M,NGL)
+                MID=micpar%get_micb_id(M,NGL)
                 OC=OC+OMC(MID,K,L,NY,NX)
                 ON=ON+OMN(MID,K,L,NY,NX)
                 OP=OP+OMP(MID,K,L,NY,NX)
@@ -685,7 +689,7 @@ module TillageMixMod
           DO  N=1,NumMicbFunGroups
             DO NGL=JGnio(N),JGnfo(N)
               DO  M=1,nlbiomcp
-                MID=micpar%get_hmicb_id(M,NGL)
+                MID=micpar%get_micb_id(M,NGL)
                 DC=DC+OMC(MID,K,L,NY,NX)
                 DN=DN+OMN(MID,K,L,NY,NX)
                 DP=DP+OMP(MID,K,L,NY,NX)
@@ -696,9 +700,10 @@ module TillageMixMod
         DO  N=1,NumMicbFunGroups
           DO NGL=JGniA(N),JGnfA(N)
             DO  M=1,nlbiomcp
-              OC=OC+OMCff(M,NGL,L,NY,NX)
-              ON=ON+OMNff(M,NGL,L,NY,NX)
-              OP=OP+OMPff(M,NGL,L,NY,NX)
+              MID=micpar%get_micb_id(M,NGL)
+              OC=OC+OMCff(MID,L,NY,NX)
+              ON=ON+OMNff(MID,L,NY,NX)
+              OP=OP+OMPff(MID,L,NY,NX)
             enddo
           enddo
         enddo

@@ -327,9 +327,9 @@ implicit none
   micstt%OMC(1:NumLiveHeterBioms,1:jcplx)=OMC(1:NumLiveHeterBioms,1:jcplx,L,NY,NX)
   micstt%OMN(1:NumLiveHeterBioms,1:jcplx)=OMN(1:NumLiveHeterBioms,1:jcplx,L,NY,NX)
   micstt%OMP(1:NumLiveHeterBioms,1:jcplx)=OMP(1:NumLiveHeterBioms,1:jcplx,L,NY,NX)
-  micstt%OMCff(1:nlbiomcp,1:NumMicrobAutotrophCmplx)=OMCff(1:nlbiomcp,1:NumMicrobAutotrophCmplx,L,NY,NX)
-  micstt%OMNff(1:nlbiomcp,1:NumMicrobAutotrophCmplx)=OMNff(1:nlbiomcp,1:NumMicrobAutotrophCmplx,L,NY,NX)
-  micstt%OMPff(1:nlbiomcp,1:NumMicrobAutotrophCmplx)=OMPff(1:nlbiomcp,1:NumMicrobAutotrophCmplx,L,NY,NX)
+  micstt%OMCff(1:NumLiveAutoBioms)=OMCff(1:NumLiveAutoBioms,L,NY,NX)
+  micstt%OMNff(1:NumLiveAutoBioms)=OMNff(1:NumLiveAutoBioms,L,NY,NX)
+  micstt%OMPff(1:NumLiveAutoBioms)=OMPff(1:NumLiveAutoBioms,L,NY,NX)
   if(.not.micfor%litrm)then
     micfor%AEC=AEC(L,NY,NX)
     micstt%OXYG=trc_gasml_vr(idg_O2,L,NY,NX)
@@ -479,9 +479,9 @@ implicit none
   OMC(1:NumLiveHeterBioms,1:jcplx,L,NY,NX)=micstt%OMC(1:NumLiveHeterBioms,1:jcplx)
   OMN(1:NumLiveHeterBioms,1:jcplx,L,NY,NX)=micstt%OMN(1:NumLiveHeterBioms,1:jcplx)
   OMP(1:NumLiveHeterBioms,1:jcplx,L,NY,NX)=micstt%OMP(1:NumLiveHeterBioms,1:jcplx)
-  OMCff(1:nlbiomcp,1:NumMicrobAutotrophCmplx,L,NY,NX)=micstt%OMCff(1:nlbiomcp,1:NumMicrobAutotrophCmplx)
-  OMNff(1:nlbiomcp,1:NumMicrobAutotrophCmplx,L,NY,NX)=micstt%OMNff(1:nlbiomcp,1:NumMicrobAutotrophCmplx)
-  OMPff(1:nlbiomcp,1:NumMicrobAutotrophCmplx,L,NY,NX)=micstt%OMPff(1:nlbiomcp,1:NumMicrobAutotrophCmplx)
+  OMCff(1:NumLiveAutoBioms,L,NY,NX)=micstt%OMCff(1:NumLiveAutoBioms)
+  OMNff(1:NumLiveAutoBioms,L,NY,NX)=micstt%OMNff(1:NumLiveAutoBioms)
+  OMPff(1:NumLiveAutoBioms,L,NY,NX)=micstt%OMPff(1:NumLiveAutoBioms)
 
   end subroutine MicAPIRecv
 end module MicBGCAPI

@@ -81,9 +81,9 @@ implicit none
   real(r8),allocatable :: OMC(:,:)
   real(r8),allocatable :: OMN(:,:)
   real(r8),allocatable :: OMP(:,:)
-  real(r8),allocatable :: OMCff(:,:)
-  real(r8),allocatable :: OMNff(:,:)
-  real(r8),allocatable :: OMPff(:,:)
+  real(r8),allocatable :: OMCff(:)
+  real(r8),allocatable :: OMNff(:)
+  real(r8),allocatable :: OMPff(:)
   real(r8) :: OSC13U,OSC14U,OSC24U
   real(r8) :: OSN13U,OSN14U,OSN24U
   real(r8) :: OSP13U,OSP14U,OSP24U
@@ -101,8 +101,11 @@ implicit none
   integer, pointer :: ndbiomcp, nlbiomcp
   integer, pointer :: NumMicrobAutotrophCmplx, NumMicrbHetetrophCmplx
   integer, pointer :: NumLiveHeterBioms
-  
+  integer, pointer :: NumLiveAutoBioms
+
+
   jcplx=micpar%jcplx
+  NumLiveAutoBioms => micpar%NumLiveAutoBioms
   NumMicbFunGroups=micpar%NumMicbFunGroups
   jsken=micpar%jsken
   ndbiomcp =>micpar%ndbiomcp
@@ -129,9 +132,9 @@ implicit none
   allocate(this%OMC(NumLiveHeterBioms,1:jcplx))
   allocate(this%OMN(NumLiveHeterBioms,1:jcplx))
   allocate(this%OMP(NumLiveHeterBioms,1:jcplx))
-  allocate(this%OMCff(nlbiomcp,NumMicrobAutotrophCmplx))
-  allocate(this%OMNff(nlbiomcp,NumMicrobAutotrophCmplx))
-  allocate(this%OMPff(nlbiomcp,NumMicrobAutotrophCmplx))
+  allocate(this%OMCff(NumLiveAutoBioms))
+  allocate(this%OMNff(NumLiveAutoBioms))
+  allocate(this%OMPff(NumLiveAutoBioms))
 
   end subroutine Init
 

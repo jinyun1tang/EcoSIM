@@ -129,7 +129,7 @@ module nitrosMod
       D7961: DO N=1,NumMicbFunGroups
         DO NGL=JGnio(N),JGnfo(N)
           D7962: DO M=1,micpar%nlbiomcp
-            MID=micpar%get_hmicb_id(M,NGL)
+            MID=micpar%get_micb_id(M,NGL)
             IF(FOSCXS.GT.0.0)THEN
               OMCXS=FOSCXS*AZMAX1(OMC(MID,K,L,NY,NX))
               OMNXS=FOSCXS*AZMAX1(OMN(MID,K,L,NY,NX))

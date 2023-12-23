@@ -38,9 +38,9 @@ implicit none
   real(r8),target,allocatable :: OMPER(:,:,:,:,:,:)  !microbial P  erosion 	[g d-2 h-1]
 
 
-  real(r8),target,allocatable :: OMCff(:,:,:,:,:)
-  real(r8),target,allocatable :: OMNff(:,:,:,:,:)
-  real(r8),target,allocatable :: OMPff(:,:,:,:,:)
+  real(r8),target,allocatable :: OMCff(:,:,:,:)
+  real(r8),target,allocatable :: OMNff(:,:,:,:)
+  real(r8),target,allocatable :: OMPff(:,:,:,:)
   real(r8),target,allocatable :: ROXYSff(:,:,:,:)
   real(r8),target,allocatable :: RINHOff(:,:,:,:)
   real(r8),target,allocatable :: RINOOff(:,:,:,:)
@@ -109,9 +109,9 @@ implicit none
   allocate(OMNER(NumLiveHeterBioms,1:jcplx,2,2,JV,JH))
   allocate(OMPER(NumLiveHeterBioms,1:jcplx,2,2,JV,JH))
 
-  allocate(OMCff(nlbiomcp,NumMicrobAutotrophCmplx,0:JZ,JY,JX))
-  allocate(OMNff(nlbiomcp,NumMicrobAutotrophCmplx,0:JZ,JY,JX))
-  allocate(OMPff(nlbiomcp,NumMicrobAutotrophCmplx,0:JZ,JY,JX))
+  allocate(OMCff(NumLiveAutoBioms,0:JZ,JY,JX))
+  allocate(OMNff(NumLiveAutoBioms,0:JZ,JY,JX))
+  allocate(OMPff(NumLiveAutoBioms,0:JZ,JY,JX))
   allocate(ROXYSff(NumMicrobAutotrophCmplx,0:JZ,JY,JX))
   allocate(RINHOff(NumMicrobAutotrophCmplx,0:JZ,JY,JX))
   allocate(RINOOff(NumMicrobAutotrophCmplx,0:JZ,JY,JX))

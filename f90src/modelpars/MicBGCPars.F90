@@ -77,7 +77,8 @@ implicit none
   integer :: NumMicrbHetetrophCmplx         !total number of microbial guilds in one organic-microbial complex
   integer :: NumOfLitrCmplxs                !number of litter organo-microbial complexes, plant litter + manure
   integer :: NumOfPlantLitrCmplxs           !number of plant litter complexs, woody + fine litter
-  integer :: NumLiveHeterBioms                  !total number of biomass components in heterotrophic OM complexes
+  integer :: NumLiveHeterBioms              !total number of biomass components in one heterotrophic OM complexes
+  integer :: NumLiveAutoBioms               !total number of biomass components in the autotroph complex
   integer :: iprotein
   integer :: icarbhyro
   integer :: icellulos
@@ -85,7 +86,7 @@ implicit none
   contains
     procedure, public  :: Init
     procedure, public  :: SetPars
-    procedure, public  :: get_hmicb_id
+    procedure, public  :: get_micb_id
     procedure, private :: InitAllocate
     procedure, public  :: destroy      =>DestructMicBGCPar
   end type MicParType
@@ -354,6 +355,7 @@ contains
   k=1
   this%NumMicrobAutotrophCmplx=0
   this%NumMicrbHetetrophCmplx=0
+  !replace the functional group specification with external input later
   do n=1,NumMicbFunGroups
     this%JGnio(n)=k
     this%JGniA(n)=k
@@ -364,6 +366,7 @@ contains
     this%NumMicrbHetetrophCmplx=this%NumMicrbHetetrophCmplx+this%JGnfo(n)-this%JGnio(n)+1
   enddo
   this%NumLiveHeterBioms=this%nlbiomcp*this%NumMicrbHetetrophCmplx
+  this%NumLiveAutoBioms=this%nlbiomcp*this%NumMicrobAutotrophCmplx
 
   allocate(this%DOSA(1:jcplx))
   allocate(this%SPOSC(jsken,1:jcplx))
@@ -429,7 +432,7 @@ contains
   end subroutine DestructMicBGCPar
 
 !------------------------------------------------------------------------------------------
-  pure function get_hmicb_id(this,M,NGL)result(id)
+  pure function get_micb_id(this,M,NGL)result(id)
   !return the id of biomass component M for
   !hetetroph guild NGL
   implicit none
@@ -440,5 +443,6 @@ contains
 
   id=this%nlbiomcp*(NGL-1)+M
 
-  end function get_hmicb_id
+  end function get_micb_id
+
 end module MicBGCPars

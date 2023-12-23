@@ -641,7 +641,7 @@ module RedistMod
       DO  NO=1,NumMicbFunGroups
         DO NGL=JGnio(NO),JGnfo(NO)
           DO  M=1,nlbiomcp
-            MID=micpar%get_hmicb_id(M,NGL)
+            MID=micpar%get_micb_id(M,NGL)
             OMC(MID,K,NU(NY,NX),NY,NX)=OMC(MID,K,NU(NY,NX),NY,NX)+TOMCER(M,NGL,K,NY,NX)
             OMN(MID,K,NU(NY,NX),NY,NX)=OMN(MID,K,NU(NY,NX),NY,NX)+TOMNER(M,NGL,K,NY,NX)
             OMP(MID,K,NU(NY,NX),NY,NX)=OMP(MID,K,NU(NY,NX),NY,NX)+TOMPER(M,NGL,K,NY,NX)
@@ -655,9 +655,10 @@ module RedistMod
     DO  NO=1,NumMicbFunGroups
       DO NGL=JGniA(NO),JGnfA(NO)
         DO  M=1,nlbiomcp
-          OMCff(M,NGL,NU(NY,NX),NY,NX)=OMCff(M,NGL,NU(NY,NX),NY,NX)+TOMCERff(M,NGL,NY,NX)
-          OMNff(M,NGL,NU(NY,NX),NY,NX)=OMNff(M,NGL,NU(NY,NX),NY,NX)+TOMNERff(M,NGL,NY,NX)
-          OMPff(M,NGL,NU(NY,NX),NY,NX)=OMPff(M,NGL,NU(NY,NX),NY,NX)+TOMPERff(M,NGL,NY,NX)
+          MID=micpar%get_micb_id(M,NGL)
+          OMCff(MID,NU(NY,NX),NY,NX)=OMCff(MID,NU(NY,NX),NY,NX)+TOMCERff(M,NGL,NY,NX)
+          OMNff(MID,NU(NY,NX),NY,NX)=OMNff(MID,NU(NY,NX),NY,NX)+TOMNERff(M,NGL,NY,NX)
+          OMPff(MID,NU(NY,NX),NY,NX)=OMPff(MID,NU(NY,NX),NY,NX)+TOMPERff(M,NGL,NY,NX)
           DORGE(NY,NX)=DORGE(NY,NX)+TOMCERff(M,NGL,NY,NX)
           DORGP=DORGP+TOMPER(M,NGL,K,NY,NX)
         enddo
@@ -741,9 +742,9 @@ module RedistMod
   !
   ! TOTAL autotrophic MICROBIAL C,N,P
   !
-  tDC=SUM(OMCff(1:nlbiomcp,1:NumMicrobAutotrophCmplx,0,NY,NX))
-  tDN=SUM(OMNff(1:nlbiomcp,1:NumMicrobAutotrophCmplx,0,NY,NX))
-  tDP=SUM(OMPff(1:nlbiomcp,1:NumMicrobAutotrophCmplx,0,NY,NX))
+  tDC=SUM(OMCff(1:NumLiveAutoBioms,0,NY,NX))
+  tDN=SUM(OMNff(1:NumLiveAutoBioms,0,NY,NX))
+  tDP=SUM(OMPff(1:NumLiveAutoBioms,0,NY,NX))
   DC=DC+tDC
   DN=DN+tDN
   DP=DP+tDP
@@ -1445,9 +1446,9 @@ module RedistMod
   ENDDO
 
 ! add autotrophs
-  tDC=SUM(OMCff(1:nlbiomcp,1:NumMicrobAutotrophCmplx,L,NY,NX))
-  tDN=SUM(OMNff(1:nlbiomcp,1:NumMicrobAutotrophCmplx,L,NY,NX))
-  tDP=SUM(OMPff(1:nlbiomcp,1:NumMicrobAutotrophCmplx,L,NY,NX))
+  tDC=SUM(OMCff(1:NumLiveAutoBioms,L,NY,NX))
+  tDN=SUM(OMNff(1:NumLiveAutoBioms,L,NY,NX))
+  tDP=SUM(OMPff(1:NumLiveAutoBioms,L,NY,NX))
   OC=OC+tDC
   ON=ON+tDN
   OP=OP+tDP

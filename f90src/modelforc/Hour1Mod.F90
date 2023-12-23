@@ -1000,7 +1000,7 @@ module Hour1Mod
     OC=OC+sum(OMC(1:NumLiveHeterBioms,1:jcplx,L,NY,NX))
 
 !  add autotrophic complex
-    OC=OC+sum(OMCff(1:nlbiomcp,1:NumMicrobAutotrophCmplx,L,NY,NX))
+    OC=OC+sum(OMCff(1:NumLiveAutoBioms,L,NY,NX))
 !  add microbial residue
     OC=OC+SUM(ORC(1:ndbiomcp,1:jcplx,L,NY,NX))
 !  add dissolved/sorbed OM and acetate
@@ -1800,7 +1800,7 @@ module Hour1Mod
           OMN1=AZMAX1(AMIN1(OMC1*micpar%rNCOMCa(M,N,K),OSNI-OSNX))
           OMP1=AZMAX1(AMIN1(OMC1*micpar%rPCOMCa(M,N,K),OSPI-OSPX))
           DO NGL=JGnio(N),JGnfo(N)
-            MID=micpar%get_hmicb_id(M,NGL)
+            MID=micpar%get_micb_id(M,NGL)
             OMC1g=OMC1/tglds
             OMN1g=OMN1/tglds
             OMP1g=OMP1/tglds
@@ -1814,12 +1814,13 @@ module Hour1Mod
           D2962: DO NN=1,NumMicbFunGroups
             tglds=JGnfA(N)-JGniA(N)+1
             DO NGL=JGniA(NN),JGnfA(NN)
+              MID=micpar%get_micb_id(M,NGL)
               OMC1g=OMC1/tglds
               OMN1g=OMN1/tglds
               OMP1g=OMP1/tglds
-              OMCff(M,NGL,LFDPTH,NY,NX)=OMCff(M,NGL,LFDPTH,NY,NX)+OMC1g*micpar%OMCA(NN)
-              OMNff(M,NGL,LFDPTH,NY,NX)=OMNff(M,NGL,LFDPTH,NY,NX)+OMN1g*micpar%OMCA(NN)
-              OMPff(M,NGL,LFDPTH,NY,NX)=OMPff(M,NGL,LFDPTH,NY,NX)+OMP1g*micpar%OMCA(NN)
+              OMCff(MID,LFDPTH,NY,NX)=OMCff(MID,LFDPTH,NY,NX)+OMC1g*micpar%OMCA(NN)
+              OMNff(MID,LFDPTH,NY,NX)=OMNff(MID,LFDPTH,NY,NX)+OMN1g*micpar%OMCA(NN)
+              OMPff(MID,LFDPTH,NY,NX)=OMPff(MID,LFDPTH,NY,NX)+OMP1g*micpar%OMCA(NN)
             ENDDO
             OSCX=OSCX+OMC1*micpar%OMCA(NN)
             OSNX=OSNX+OMN1*micpar%OMCA(NN)

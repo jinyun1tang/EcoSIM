@@ -6853,54 +6853,54 @@ implicit none
   endif  
 
   if(flag=='read')then
-    datpr4 => datrc_4d(1:ncols,1:nlbiomcp,1:NumMicrobAutotrophCmplx,1:JZ+1)       
-    call restartvar(ncid, flag, varname='OMCff', dim1name='column',dim2name='nlbiomcp',&
-      dim3name='automicb',dim4name='levsoi1',long_name='autotrophic microbial C', &
-      units='g d-2', interpinic_flag='skip', data=datpr4, missing_value=spval, &
+    datpr3 => datrc_3d(1:ncols,1:NumLiveAutoBioms,1:JZ+1)       
+    call restartvar(ncid, flag, varname='OMCff', dim1name='column',dim2name='nliveautomicb',&
+      dim3name='levsoi1',long_name='autotrophic microbial C', &
+      units='g d-2', interpinic_flag='skip', data=datpr3, missing_value=spval, &
       fill_value=spval)            
-    call cpcol(flag,NHW,NHE,NVN,NVS,OMCff,datrc_4d)     
+    call cpcol(flag,NHW,NHE,NVN,NVS,OMCff,datrc_3d)     
   else
     !print*,'OMCff'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,OMCff,datrc_4d)       
-    datpr4 => datrc_4d(1:ncols,1:nlbiomcp,1:NumMicrobAutotrophCmplx,1:JZ+1)           
-    call restartvar(ncid, flag, varname='OMCff', dim1name='column',dim2name='nlbiomcp',&
-      dim3name='automicb',dim4name='levsoi1',long_name='autotrophic microbial C', &
-      units='g d-2', interpinic_flag='skip', data=datpr4, missing_value=spval, &
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,OMCff,datrc_3d)       
+    datpr3 => datrc_3d(1:ncols,1:NumLiveAutoBioms,1:JZ+1)           
+    call restartvar(ncid, flag, varname='OMCff', dim1name='column',dim2name='nliveautomicb',&
+      dim3name='levsoi1',long_name='autotrophic microbial C', &
+      units='g d-2', interpinic_flag='skip', data=datpr3, missing_value=spval, &
       fill_value=spval)            
 
   endif  
 
   if(flag=='read')then
-    datpr4 => datrc_4d(1:ncols,1:nlbiomcp,1:NumMicrobAutotrophCmplx,1:JZ+1)           
-    call restartvar(ncid, flag, varname='OMNff', dim1name='column',dim2name='nlbiomcp',&
-      dim3name='automicb',dim4name='levsoi1',long_name='autotrophic microbial N', &
-      units='g d-2', interpinic_flag='skip', data=datpr4, missing_value=spval, &
+    datpr3 => datrc_3d(1:ncols,1:NumLiveAutoBioms,1:JZ+1)           
+    call restartvar(ncid, flag, varname='OMNff', dim1name='column',dim2name='nliveautomicb',&
+      dim3name='levsoi1',long_name='autotrophic microbial N', &
+      units='g d-2', interpinic_flag='skip', data=datpr3, missing_value=spval, &
       fill_value=spval)            
-    call cpcol(flag,NHW,NHE,NVN,NVS,OMNff,datrc_4d)     
+    call cpcol(flag,NHW,NHE,NVN,NVS,OMNff,datrc_3d)     
   else
     !print*,'OMNff'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,OMNff,datrc_4d)       
-    datpr4 => datrc_4d(1:ncols,1:nlbiomcp,1:NumMicrobAutotrophCmplx,1:JZ+1)           
-    call restartvar(ncid, flag, varname='OMNff', dim1name='column',dim2name='nlbiomcp',&
-      dim3name='automicb',dim4name='levsoi1',long_name='autotrophic microbial N', &
-      units='g d-2', interpinic_flag='skip', data=datpr4, missing_value=spval, &
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,OMNff,datrc_3d)       
+    datpr3 => datrc_3d(1:ncols,1:NumLiveAutoBioms,1:JZ+1)           
+    call restartvar(ncid, flag, varname='OMNff', dim1name='column',dim2name='nliveautomicb',&
+      dim3name='levsoi1',long_name='autotrophic microbial N', &
+      units='g d-2', interpinic_flag='skip', data=datpr3, missing_value=spval, &
       fill_value=spval)            
   endif  
 
   if(flag=='read')then
-    datpr4 => datrc_4d(1:ncols,1:nlbiomcp,1:NumMicrobAutotrophCmplx,1:JZ+1)           
-    call restartvar(ncid, flag, varname='OMPff', dim1name='column',dim2name='nlbiomcp',&
-      dim3name='automicb',dim4name='levsoi1',long_name='autotrophic microbial P', &
-      units='g d-2', interpinic_flag='skip', data=datpr4, missing_value=spval, &
+    datpr3 => datrc_3d(1:ncols,1:NumLiveAutoBioms,1:JZ+1)           
+    call restartvar(ncid, flag, varname='OMPff', dim1name='column',dim2name='nliveautomicb',&
+      dim3name='levsoi1',long_name='autotrophic microbial P', &
+      units='g d-2', interpinic_flag='skip', data=datpr3, missing_value=spval, &
       fill_value=spval)        
-    call cpcol(flag,NHW,NHE,NVN,NVS,OMPff,datrc_4d)     
+    call cpcol(flag,NHW,NHE,NVN,NVS,OMPff,datrc_3d)     
   else
     !print*,'OMPff'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,OMPff,datrc_4d)       
-    datpr4 => datrc_4d(1:ncols,1:nlbiomcp,1:NumMicrobAutotrophCmplx,1:JZ+1)           
-    call restartvar(ncid, flag, varname='OMPff', dim1name='column',dim2name='nlbiomcp',&
-      dim3name='automicb',dim4name='levsoi1',long_name='autotrophic microbial P', &
-      units='g d-2', interpinic_flag='skip', data=datpr4, missing_value=spval, &
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,OMPff,datrc_3d)       
+    datpr3 => datrc_3d(1:ncols,1:NumLiveAutoBioms,1:JZ+1)           
+    call restartvar(ncid, flag, varname='OMPff', dim1name='column',dim2name='nliveautomicb',&
+      dim3name='levsoi1',long_name='autotrophic microbial P', &
+      units='g d-2', interpinic_flag='skip', data=datpr3, missing_value=spval, &
       fill_value=spval)        
   endif  
 
@@ -8225,6 +8225,7 @@ implicit none
   call ncd_defdim(ncid,'automicb',NumMicrobAutotrophCmplx, dimid)
   call ncd_defdim(ncid,'nlbiomcp',nlbiomcp,dimid)
   call ncd_defdim(ncid,'nlivehetermicb',NumLiveHeterBioms,dimid)
+  call ncd_defdim(ncid,'nliveautomicb',NumLiveAutoBioms,dimid)
   call ncd_defdim(ncid, 'levsoi', JZ, dimid)
   call ncd_defdim(ncid, 'levsoi1', JZ+1, dimid)
   call ncd_defdim(ncid, 'levsno',  JS,dimid)

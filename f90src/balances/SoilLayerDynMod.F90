@@ -791,7 +791,7 @@ implicit none
       DO  N=1,NumMicbFunGroups
         DO  M=1,nlbiomcp
           DO NGL=JGnio(N),JGnfo(N)
-            MID=micpar%get_hmicb_id(M,NGL)
+            MID=micpar%get_micb_id(M,NGL)
             OMC(MID,K,L1,NY,NX)=OMC(MID,K,L1,NY,NX)+FX*OMC(MID,K,L0,NY,NX)
             OMN(MID,K,L1,NY,NX)=OMN(MID,K,L1,NY,NX)+FX*OMN(MID,K,L0,NY,NX)
             OMP(MID,K,L1,NY,NX)=OMP(MID,K,L1,NY,NX)+FX*OMP(MID,K,L0,NY,NX)
@@ -802,9 +802,10 @@ implicit none
     DO  N=1,NumMicbFunGroups
       DO  M=1,nlbiomcp
         DO NGL=JGniA(N),JGnfA(N)
-          OMCff(M,NGL,L1,NY,NX)=OMCff(M,NGL,L1,NY,NX)+FX*OMCff(M,NGL,L0,NY,NX)
-          OMNff(M,NGL,L1,NY,NX)=OMNff(M,NGL,L1,NY,NX)+FX*OMNff(M,NGL,L0,NY,NX)
-          OMPff(M,NGL,L1,NY,NX)=OMPff(M,NGL,L1,NY,NX)+FX*OMPff(M,NGL,L0,NY,NX)
+          MID=micpar%get_micb_id(M,NGL)
+          OMCff(MID,L1,NY,NX)=OMCff(MID,L1,NY,NX)+FX*OMCff(MID,L0,NY,NX)
+          OMNff(MID,L1,NY,NX)=OMNff(MID,L1,NY,NX)+FX*OMNff(MID,L0,NY,NX)
+          OMPff(MID,L1,NY,NX)=OMPff(MID,L1,NY,NX)+FX*OMPff(MID,L0,NY,NX)
         enddo
       enddo
     enddo
@@ -968,7 +969,7 @@ implicit none
        DO N=1,NumMicbFunGroups
         DO M=1,nlbiomcp
           DO NGL=JGnio(N),JGnfo(N)
-            MID=micpar%get_hmicb_id(M,NGL)
+            MID=micpar%get_micb_id(M,NGL)
             OMC(MID,K,L0,NY,NX)=FY*OMC(MID,K,L0,NY,NX)
             OMN(MID,K,L0,NY,NX)=FY*OMN(MID,K,L0,NY,NX)
             OMP(MID,K,L0,NY,NX)=FY*OMP(MID,K,L0,NY,NX)
@@ -980,9 +981,10 @@ implicit none
     DO N=1,NumMicbFunGroups
       DO M=1,nlbiomcp
         DO NGL=JGniA(N),JGnfA(N)
-          OMCff(M,NGL,L0,NY,NX)=FY*OMCff(M,NGL,L0,NY,NX)
-          OMNff(M,NGL,L0,NY,NX)=FY*OMNff(M,NGL,L0,NY,NX)
-          OMPff(M,NGL,L0,NY,NX)=FY*OMPff(M,NGL,L0,NY,NX)
+          MID=micpar%get_micb_id(M,NGL)
+          OMCff(MID,L0,NY,NX)=FY*OMCff(MID,L0,NY,NX)
+          OMNff(MID,L0,NY,NX)=FY*OMNff(MID,L0,NY,NX)
+          OMPff(MID,L0,NY,NX)=FY*OMPff(MID,L0,NY,NX)
         ENDDO
       enddo
     enddo
@@ -1105,7 +1107,7 @@ implicit none
       DO  N=1,NumMicbFunGroups
         DO  M=1,nlbiomcp
           DO NGL=JGnio(N),JGnfo(N)
-            MID=micpar%get_hmicb_id(M,NGL)          
+            MID=micpar%get_micb_id(M,NGL)          
             FXOMC=FXO*OMC(MID,K,L0,NY,NX)
             OMC(MID,K,L1,NY,NX)=OMC(MID,K,L1,NY,NX)+FXOMC
             OMC(MID,K,L0,NY,NX)=OMC(MID,K,L0,NY,NX)-FXOMC
@@ -1123,15 +1125,16 @@ implicit none
     DO  N=1,NumMicbFunGroups
       DO  M=1,nlbiomcp
         DO NGL=JGniA(N),JGnfA(N)
-          FXOMC=FXO*OMCff(M,NGL,L0,NY,NX)
-          OMCff(M,NGL,L1,NY,NX)=OMCff(M,NGL,L1,NY,NX)+FXOMC
-          OMCff(M,NGL,L0,NY,NX)=OMCff(M,NGL,L0,NY,NX)-FXOMC
-          FXOMN=FXO*OMNff(M,NGL,L0,NY,NX)
-          OMNff(M,NGL,L1,NY,NX)=OMNff(M,NGL,L1,NY,NX)+FXOMN
-          OMNff(M,NGL,L0,NY,NX)=OMNff(M,NGL,L0,NY,NX)-FXOMN
-          FXOMP=FXO*OMPff(M,NGL,L0,NY,NX)
-          OMPff(M,NGL,L1,NY,NX)=OMPff(M,NGL,L1,NY,NX)+FXOMP
-          OMPff(M,NGL,L0,NY,NX)=OMPff(M,NGL,L0,NY,NX)-FXOMP
+          MID=micpar%get_micb_id(M,NGL)
+          FXOMC=FXO*OMCff(MID,L0,NY,NX)
+          OMCff(MID,L1,NY,NX)=OMCff(MID,L1,NY,NX)+FXOMC
+          OMCff(MID,L0,NY,NX)=OMCff(MID,L0,NY,NX)-FXOMC
+          FXOMN=FXO*OMNff(MID,L0,NY,NX)
+          OMNff(MID,L1,NY,NX)=OMNff(MID,L1,NY,NX)+FXOMN
+          OMNff(MID,L0,NY,NX)=OMNff(MID,L0,NY,NX)-FXOMN
+          FXOMP=FXO*OMPff(MID,L0,NY,NX)
+          OMPff(MID,L1,NY,NX)=OMPff(MID,L1,NY,NX)+FXOMP
+          OMPff(MID,L0,NY,NX)=OMPff(MID,L0,NY,NX)-FXOMP
         enddo
       enddo
     enddo

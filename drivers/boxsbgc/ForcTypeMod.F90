@@ -81,9 +81,9 @@ implicit none
     real(r8), allocatable :: OMC(:,:)
     real(r8), allocatable :: OMN(:,:)
     real(r8), allocatable :: OMP(:,:)
-    real(r8), allocatable :: OMCff(:,:)
-    real(r8), allocatable :: OMNff(:,:)
-    real(r8), allocatable :: OMPff(:,:)
+    real(r8), allocatable :: OMCff(:)
+    real(r8), allocatable :: OMNff(:)
+    real(r8), allocatable :: OMPff(:)
 
 !    real(r8) :: O2_irrig_conc        !surface irrigation  O2 concentration, [g m-3]
 !    real(r8) :: O2_rain_conc        !precipitation  O2 concentration, [g m-3]
@@ -231,7 +231,7 @@ implicit none
   character(len=*), intent(in) :: fname
   integer :: jcplx,ndbiomcp,nlbiomcp
   integer :: NumMicbFunGroups,jsken,NumMicrbHetetrophCmplx,NumMicrobAutotrophCmplx
-  integer :: NumLiveHeterBioms
+  integer :: NumLiveHeterBioms,NumLiveAutoBioms
   type(file_desc_t) :: ncf
 
   call ncd_pio_openfile(ncf, fname, ncd_nowrite)
@@ -241,6 +241,7 @@ implicit none
   NumMicrbHetetrophCmplx=get_dim_len(ncf,'NumMicrbHetetrophCmplx')
   NumMicrobAutotrophCmplx=get_dim_len(ncf,'NumMicrobAutotrophCmplx')
   NumLiveHeterBioms = get_dim_len(ncf,'NumLiveHeterBioms')
+  NumLiveAutoBioms = get_dim_len(ncf,'NumLiveAutoBioms')
   nlbiomcp=get_dim_len(ncf,'nlbiomcp')
   ndbiomcp=get_dim_len(ncf,'ndbiomcp')
   NumMicbFunGroups    =get_dim_len(ncf,'NumMicbFunGroups')
@@ -255,9 +256,9 @@ implicit none
   allocate(forc%ORC(ndbiomcp,1:jcplx))
   allocate(forc%ORN(ndbiomcp,1:jcplx))
   allocate(forc%ORP(ndbiomcp,1:jcplx))
-  allocate(forc%OMCff(nlbiomcp,NumMicrobAutotrophCmplx))
-  allocate(forc%OMNff(nlbiomcp,NumMicrobAutotrophCmplx))
-  allocate(forc%OMPff(nlbiomcp,NumMicrobAutotrophCmplx))
+  allocate(forc%OMCff(NumLiveAutoBioms))
+  allocate(forc%OMNff(NumLiveAutoBioms))
+  allocate(forc%OMPff(NumLiveAutoBioms))
   allocate(forc%OHC(1:jcplx))
   allocate(forc%OHN(1:jcplx))
   allocate(forc%OHP(1:jcplx))

@@ -52,6 +52,7 @@ implicit none
     call ncd_defdim(ncf,'jsken',jsken,recordDimID)
     call ncd_defdim(ncf,'ndbiomcp',2,recordDimID)
     call ncd_defdim(ncf,'nlbiomcp',3,recordDimID)
+    call ncd_defdim(ncf,'NumLiveAutoBioms',NumLiveAutoBioms,recordDimID)
     call ncd_defdim(ncf,'NumLiveHeterBioms',NumLiveHeterBioms,recordDimID)
     call ncd_defdim(ncf,'NumMicrbHetetrophCmplx',NumMicrbHetetrophCmplx,recordDimID)
     call ncd_defdim(ncf,'NumMicrobAutotrophCmplx',NumMicrobAutotrophCmplx,recordDimID)
@@ -198,15 +199,15 @@ implicit none
             long_name='microbial biomass P in each complex',  &
             units='gP d-2', missing_value=spval, fill_value=spval)
 
-    call ncd_defvar(ncf, 'OMCff', ncd_float, dim1name='nlbiomcp',dim2name='NumMicrobAutotrophCmplx',&
+    call ncd_defvar(ncf, 'OMCff', ncd_float, dim1name='NumLiveAutoBioms',&
             long_name='microbial biomass C in autotrophic complex',  &
             units='gC d-2', missing_value=spval, fill_value=spval)
 
-    call ncd_defvar(ncf, 'OMNff', ncd_float, dim1name='nlbiomcp',dim2name='NumMicrobAutotrophCmplx',&
+    call ncd_defvar(ncf, 'OMNff', ncd_float, dim1name='NumLiveAutoBioms',&
             long_name='microbial biomass N in autotrophic complex',  &
             units='gN d-2', missing_value=spval, fill_value=spval)
 
-    call ncd_defvar(ncf, 'OMPff', ncd_float, dim1name='nlbiomcp',dim2name='NumMicrobAutotrophCmplx',&
+    call ncd_defvar(ncf, 'OMPff', ncd_float, dim1name='NumLiveAutoBioms',&
             long_name='microbial biomass P in autotrophic complex',  &
             units='gP d-2', missing_value=spval, fill_value=spval)
 
@@ -317,9 +318,9 @@ implicit none
     call ncd_putvar(ncf,'OMN',OMN(:,:,L,NY,NX))
     call ncd_putvar(ncf,'OMP',OMP(:,:,L,NY,NX))
 
-    call ncd_putvar(ncf,'OMCff',OMCff(:,:,L,NY,NX))
-    call ncd_putvar(ncf,'OMNff',OMNff(:,:,L,NY,NX))
-    call ncd_putvar(ncf,'OMPff',OMPff(:,:,L,NY,NX))
+    call ncd_putvar(ncf,'OMCff',OMCff(:,L,NY,NX))
+    call ncd_putvar(ncf,'OMNff',OMNff(:,L,NY,NX))
+    call ncd_putvar(ncf,'OMPff',OMPff(:,L,NY,NX))
 
     if(bgc_forc_conf%laddband)then
       call ncd_putvar(ncf,'ZNH4S',trc_solml_vr(ids_NH4,L,NY,NX)+trc_solml_vr(ids_NH4B,L,NY,NX))
