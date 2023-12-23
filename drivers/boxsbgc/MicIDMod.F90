@@ -54,12 +54,8 @@ implicit none
   integer :: cid_orc_b,cid_orc_e     !microbial mass residue C [gC d-2]
   integer :: cid_orn_b,cid_orn_e     !microbial mass residue N [gN d-2]
   integer :: cid_orp_b,cid_orp_e     !microbial mass residue P [gP d-2]
-  integer :: cid_omc_b,cid_omc_e     !microbial biomass C	[gC d-2]
-  integer :: cid_omn_b,cid_omn_e     !microbial biomass N	[gN d-2]
-  integer :: cid_omp_b,cid_omp_e     !microbial biomass P	[gP d-2]
-  integer :: cid_omcff_b,cid_omcff_e   !autotrophic microbial biomass C	[gC d-2]
-  integer :: cid_omnff_b,cid_omnff_e   !autotrophic microbial biomass N	[gN d-2]
-  integer :: cid_ompff_b,cid_ompff_e   !autotrophic microbial biomass C	[gC d-2]
+  integer :: cid_omehetr_b,cid_omehetr_e     !microbial biomass component	[g d-2]
+  integer :: cid_omeauto_b,cid_omeauto_e   !autotrophic microbial biomass component	[g d-2]
 
   integer :: fid_XCODFS             !CO2 dissolution (+)-volatiziation (-) with respect to atmosphere
   integer :: fid_XCHDFS             !CH4 dissolution (+)-volatiziation (-) with respect to atmosphere

@@ -792,9 +792,9 @@ implicit none
         DO  M=1,nlbiomcp
           DO NGL=JGnio(N),JGnfo(N)
             MID=micpar%get_micb_id(M,NGL)
-            OMC(MID,K,L1,NY,NX)=OMC(MID,K,L1,NY,NX)+FX*OMC(MID,K,L0,NY,NX)
-            OMN(MID,K,L1,NY,NX)=OMN(MID,K,L1,NY,NX)+FX*OMN(MID,K,L0,NY,NX)
-            OMP(MID,K,L1,NY,NX)=OMP(MID,K,L1,NY,NX)+FX*OMP(MID,K,L0,NY,NX)
+            OMEhetr(ielmc,MID,K,L1,NY,NX)=OMEhetr(ielmc,MID,K,L1,NY,NX)+FX*OMEhetr(ielmc,MID,K,L0,NY,NX)
+            OMEhetr(ielmn,MID,K,L1,NY,NX)=OMEhetr(ielmn,MID,K,L1,NY,NX)+FX*OMEhetr(ielmn,MID,K,L0,NY,NX)
+            OMEhetr(ielmp,MID,K,L1,NY,NX)=OMEhetr(ielmp,MID,K,L1,NY,NX)+FX*OMEhetr(ielmp,MID,K,L0,NY,NX)
           enddo
         enddo
       enddo
@@ -803,9 +803,9 @@ implicit none
       DO  M=1,nlbiomcp
         DO NGL=JGniA(N),JGnfA(N)
           MID=micpar%get_micb_id(M,NGL)
-          OMCff(MID,L1,NY,NX)=OMCff(MID,L1,NY,NX)+FX*OMCff(MID,L0,NY,NX)
-          OMNff(MID,L1,NY,NX)=OMNff(MID,L1,NY,NX)+FX*OMNff(MID,L0,NY,NX)
-          OMPff(MID,L1,NY,NX)=OMPff(MID,L1,NY,NX)+FX*OMPff(MID,L0,NY,NX)
+          OMEauto(ielmc,MID,L1,NY,NX)=OMEauto(ielmc,MID,L1,NY,NX)+FX*OMEauto(ielmc,MID,L0,NY,NX)
+          OMEauto(ielmn,MID,L1,NY,NX)=OMEauto(ielmn,MID,L1,NY,NX)+FX*OMEauto(ielmn,MID,L0,NY,NX)
+          OMEauto(ielmp,MID,L1,NY,NX)=OMEauto(ielmp,MID,L1,NY,NX)+FX*OMEauto(ielmp,MID,L0,NY,NX)
         enddo
       enddo
     enddo
@@ -849,7 +849,7 @@ implicit none
             trcs_rootml_vr(NTG,N,L1,NZ,NY,NX)=trcs_rootml_vr(NTG,N,L1,NZ,NY,NX)+FX*trcs_rootml_vr(NTG,N,L0,NZ,NY,NX)
           ENDDO
           DO  NR=1,NumRootAxes_pft(NZ,NY,NX)
-            DO NE=1,NumOfPlantChemElmnts
+            DO NE=1,NumPlantChemElmnts
               Root1stStructChemElmnt_pvr(NE,N,L1,NR,NZ,NY,NX)=Root1stStructChemElmnt_pvr(NE,N,L1,NR,NZ,NY,NX)+FX*Root1stStructChemElmnt_pvr(NE,N,L0,NR,NZ,NY,NX)
               Root2ndStructChemElmnt_pvr(NE,N,L1,NR,NZ,NY,NX)=Root2ndStructChemElmnt_pvr(NE,N,L1,NR,NZ,NY,NX)+FX*Root2ndStructChemElmnt_pvr(NE,N,L0,NR,NZ,NY,NX)
             ENDDO
@@ -857,7 +857,7 @@ implicit none
             SecndRootLen(N,L1,NR,NZ,NY,NX)=SecndRootLen(N,L1,NR,NZ,NY,NX)+FX*SecndRootLen(N,L0,NR,NZ,NY,NX)
             SecndRootXNum_rpvr(N,L1,NR,NZ,NY,NX)=SecndRootXNum_rpvr(N,L1,NR,NZ,NY,NX)+FX*SecndRootXNum_rpvr(N,L0,NR,NZ,NY,NX)
           ENDDO
-          DO NE=1,NumOfPlantChemElmnts
+          DO NE=1,NumPlantChemElmnts
              RootMycoNonstructElmnt_vr(NE,N,L1,NZ,NY,NX)= RootMycoNonstructElmnt_vr(NE,N,L1,NZ,NY,NX)+FX* RootMycoNonstructElmnt_vr(NE,N,L0,NZ,NY,NX)
           ENDDO
           RootStructBiomC_vr(N,L1,NZ,NY,NX)=RootStructBiomC_vr(N,L1,NZ,NY,NX)+FX*RootStructBiomC_vr(N,L0,NZ,NY,NX)
@@ -874,7 +874,7 @@ implicit none
           RootAreaPerPlant_vr(N,L1,NZ,NY,NX)=RootAreaPerPlant_vr(N,L1,NZ,NY,NX)+FX*RootAreaPerPlant_vr(N,L0,NZ,NY,NX)
           AveSecndRootLen(N,L1,NZ,NY,NX)=AveSecndRootLen(N,L1,NZ,NY,NX)+FX*AveSecndRootLen(N,L0,NZ,NY,NX)
         ENDDO
-        DO NE=1,NumOfPlantChemElmnts
+        DO NE=1,NumPlantChemElmnts
           RootNodueChemElmnt_pvr(NE,L1,NZ,NY,NX)=RootNodueChemElmnt_pvr(NE,L1,NZ,NY,NX)+FX*RootNodueChemElmnt_pvr(NE,L0,NZ,NY,NX)
           RootNoduleNonstructElmnt_vr(NE,L1,NZ,NY,NX)=RootNoduleNonstructElmnt_vr(NE,L1,NZ,NY,NX)+FX*RootNoduleNonstructElmnt_vr(NE,L0,NZ,NY,NX)
         ENDDO
@@ -970,9 +970,9 @@ implicit none
         DO M=1,nlbiomcp
           DO NGL=JGnio(N),JGnfo(N)
             MID=micpar%get_micb_id(M,NGL)
-            OMC(MID,K,L0,NY,NX)=FY*OMC(MID,K,L0,NY,NX)
-            OMN(MID,K,L0,NY,NX)=FY*OMN(MID,K,L0,NY,NX)
-            OMP(MID,K,L0,NY,NX)=FY*OMP(MID,K,L0,NY,NX)
+            OMEhetr(ielmc,MID,K,L0,NY,NX)=FY*OMEhetr(ielmc,MID,K,L0,NY,NX)
+            OMEhetr(ielmn,MID,K,L0,NY,NX)=FY*OMEhetr(ielmn,MID,K,L0,NY,NX)
+            OMEhetr(ielmp,MID,K,L0,NY,NX)=FY*OMEhetr(ielmp,MID,K,L0,NY,NX)
           ENDDO
         enddo
       enddo
@@ -982,9 +982,9 @@ implicit none
       DO M=1,nlbiomcp
         DO NGL=JGniA(N),JGnfA(N)
           MID=micpar%get_micb_id(M,NGL)
-          OMCff(MID,L0,NY,NX)=FY*OMCff(MID,L0,NY,NX)
-          OMNff(MID,L0,NY,NX)=FY*OMNff(MID,L0,NY,NX)
-          OMPff(MID,L0,NY,NX)=FY*OMPff(MID,L0,NY,NX)
+          OMEauto(ielmc,MID,L0,NY,NX)=FY*OMEauto(ielmc,MID,L0,NY,NX)
+          OMEauto(ielmn,MID,L0,NY,NX)=FY*OMEauto(ielmn,MID,L0,NY,NX)
+          OMEauto(ielmp,MID,L0,NY,NX)=FY*OMEauto(ielmp,MID,L0,NY,NX)
         ENDDO
       enddo
     enddo
@@ -1028,7 +1028,7 @@ implicit none
             trcs_rootml_vr(NTG,N,L0,NZ,NY,NX)=FY*trcs_rootml_vr(NTG,N,L0,NZ,NY,NX)
           ENDDO
           DO NR=1,NumRootAxes_pft(NZ,NY,NX)
-            DO NE=1,NumOfPlantChemElmnts
+            DO NE=1,NumPlantChemElmnts
               Root1stStructChemElmnt_pvr(NE,N,L0,NR,NZ,NY,NX)=FY*Root1stStructChemElmnt_pvr(NE,N,L0,NR,NZ,NY,NX)
               Root2ndStructChemElmnt_pvr(NE,N,L0,NR,NZ,NY,NX)=FY*Root2ndStructChemElmnt_pvr(NE,N,L0,NR,NZ,NY,NX)
             ENDDO
@@ -1036,7 +1036,7 @@ implicit none
             SecndRootLen(N,L0,NR,NZ,NY,NX)=FY*SecndRootLen(N,L0,NR,NZ,NY,NX)
             SecndRootXNum_rpvr(N,L0,NR,NZ,NY,NX)=FY*SecndRootXNum_rpvr(N,L0,NR,NZ,NY,NX)
           ENDDO
-          DO NE=1,NumOfPlantChemElmnts
+          DO NE=1,NumPlantChemElmnts
              RootMycoNonstructElmnt_vr(NE,N,L0,NZ,NY,NX)=FY* RootMycoNonstructElmnt_vr(NE,N,L0,NZ,NY,NX)
           ENDDO
           RootStructBiomC_vr(N,L0,NZ,NY,NX)=FY*RootStructBiomC_vr(N,L0,NZ,NY,NX)
@@ -1053,7 +1053,7 @@ implicit none
           RootAreaPerPlant_vr(N,L0,NZ,NY,NX)=FY*RootAreaPerPlant_vr(N,L0,NZ,NY,NX)
           AveSecndRootLen(N,L0,NZ,NY,NX)=FY*AveSecndRootLen(N,L0,NZ,NY,NX)
         ENDDO
-        DO NE=1,NumOfPlantChemElmnts
+        DO NE=1,NumPlantChemElmnts
           RootNodueChemElmnt_pvr(NE,L0,NZ,NY,NX)=FY*RootNodueChemElmnt_pvr(NE,L0,NZ,NY,NX)
 
           RootNoduleNonstructElmnt_vr(NE,L0,NZ,NY,NX)=FY*RootNoduleNonstructElmnt_vr(NE,L0,NZ,NY,NX)
@@ -1108,15 +1108,15 @@ implicit none
         DO  M=1,nlbiomcp
           DO NGL=JGnio(N),JGnfo(N)
             MID=micpar%get_micb_id(M,NGL)          
-            FXOMC=FXO*OMC(MID,K,L0,NY,NX)
-            OMC(MID,K,L1,NY,NX)=OMC(MID,K,L1,NY,NX)+FXOMC
-            OMC(MID,K,L0,NY,NX)=OMC(MID,K,L0,NY,NX)-FXOMC
-            FXOMN=FXO*OMN(MID,K,L0,NY,NX)
-            OMN(MID,K,L1,NY,NX)=OMN(MID,K,L1,NY,NX)+FXOMN
-            OMN(MID,K,L0,NY,NX)=OMN(MID,K,L0,NY,NX)-FXOMN
-            FXOMP=FXO*OMP(MID,K,L0,NY,NX)
-            OMP(MID,K,L1,NY,NX)=OMP(MID,K,L1,NY,NX)+FXOMP
-            OMP(MID,K,L0,NY,NX)=OMP(MID,K,L0,NY,NX)-FXOMP
+            FXOMC=FXO*OMEhetr(ielmc,MID,K,L0,NY,NX)
+            OMEhetr(ielmc,MID,K,L1,NY,NX)=OMEhetr(ielmc,MID,K,L1,NY,NX)+FXOMC
+            OMEhetr(ielmc,MID,K,L0,NY,NX)=OMEhetr(ielmc,MID,K,L0,NY,NX)-FXOMC
+            FXOMN=FXO*OMEhetr(ielmn,MID,K,L0,NY,NX)
+            OMEhetr(ielmn,MID,K,L1,NY,NX)=OMEhetr(ielmn,MID,K,L1,NY,NX)+FXOMN
+            OMEhetr(ielmn,MID,K,L0,NY,NX)=OMEhetr(ielmn,MID,K,L0,NY,NX)-FXOMN
+            FXOMP=FXO*OMEhetr(ielmp,MID,K,L0,NY,NX)
+            OMEhetr(ielmp,MID,K,L1,NY,NX)=OMEhetr(ielmp,MID,K,L1,NY,NX)+FXOMP
+            OMEhetr(ielmp,MID,K,L0,NY,NX)=OMEhetr(ielmp,MID,K,L0,NY,NX)-FXOMP
           enddo
         enddo
       enddo
@@ -1126,15 +1126,15 @@ implicit none
       DO  M=1,nlbiomcp
         DO NGL=JGniA(N),JGnfA(N)
           MID=micpar%get_micb_id(M,NGL)
-          FXOMC=FXO*OMCff(MID,L0,NY,NX)
-          OMCff(MID,L1,NY,NX)=OMCff(MID,L1,NY,NX)+FXOMC
-          OMCff(MID,L0,NY,NX)=OMCff(MID,L0,NY,NX)-FXOMC
-          FXOMN=FXO*OMNff(MID,L0,NY,NX)
-          OMNff(MID,L1,NY,NX)=OMNff(MID,L1,NY,NX)+FXOMN
-          OMNff(MID,L0,NY,NX)=OMNff(MID,L0,NY,NX)-FXOMN
-          FXOMP=FXO*OMPff(MID,L0,NY,NX)
-          OMPff(MID,L1,NY,NX)=OMPff(MID,L1,NY,NX)+FXOMP
-          OMPff(MID,L0,NY,NX)=OMPff(MID,L0,NY,NX)-FXOMP
+          FXOMC=FXO*OMEauto(ielmc,MID,L0,NY,NX)
+          OMEauto(ielmc,MID,L1,NY,NX)=OMEauto(ielmc,MID,L1,NY,NX)+FXOMC
+          OMEauto(ielmc,MID,L0,NY,NX)=OMEauto(ielmc,MID,L0,NY,NX)-FXOMC
+          FXOMN=FXO*OMEauto(ielmn,MID,L0,NY,NX)
+          OMEauto(ielmn,MID,L1,NY,NX)=OMEauto(ielmn,MID,L1,NY,NX)+FXOMN
+          OMEauto(ielmn,MID,L0,NY,NX)=OMEauto(ielmn,MID,L0,NY,NX)-FXOMN
+          FXOMP=FXO*OMEauto(ielmp,MID,L0,NY,NX)
+          OMEauto(ielmp,MID,L1,NY,NX)=OMEauto(ielmp,MID,L1,NY,NX)+FXOMP
+          OMEauto(ielmp,MID,L0,NY,NX)=OMEauto(ielmp,MID,L0,NY,NX)-FXOMP
         enddo
       enddo
     enddo
@@ -1229,7 +1229,7 @@ implicit none
           ENDDO
 
           DO  NR=1,NumRootAxes_pft(NZ,NY,NX)
-            DO NE=1,NumOfPlantChemElmnts
+            DO NE=1,NumPlantChemElmnts
               FXWTRT1E=FRO*Root1stStructChemElmnt_pvr(NE,N,L0,NR,NZ,NY,NX)
               Root1stStructChemElmnt_pvr(NE,N,L1,NR,NZ,NY,NX)=Root1stStructChemElmnt_pvr(NE,N,L1,NR,NZ,NY,NX)+FXWTRT1E
               Root1stStructChemElmnt_pvr(NE,N,L0,NR,NZ,NY,NX)=Root1stStructChemElmnt_pvr(NE,N,L0,NR,NZ,NY,NX)-FXWTRT1E
@@ -1248,7 +1248,7 @@ implicit none
             SecndRootXNum_rpvr(N,L1,NR,NZ,NY,NX)=SecndRootXNum_rpvr(N,L1,NR,NZ,NY,NX)+FXRTN2
             SecndRootXNum_rpvr(N,L0,NR,NZ,NY,NX)=SecndRootXNum_rpvr(N,L0,NR,NZ,NY,NX)-FXRTN2
           ENDDO
-          DO NE=1,NumOfPlantChemElmnts
+          DO NE=1,NumPlantChemElmnts
              FXEPOOLR=FRO*RootMycoNonstructElmnt_vr(NE,N,L0,NZ,NY,NX)
              RootMycoNonstructElmnt_vr(NE,N,L1,NZ,NY,NX)= RootMycoNonstructElmnt_vr(NE,N,L1,NZ,NY,NX)+FXEPOOLR
              RootMycoNonstructElmnt_vr(NE,N,L0,NZ,NY,NX)= RootMycoNonstructElmnt_vr(NE,N,L0,NZ,NY,NX)-FXEPOOLR
@@ -1297,7 +1297,7 @@ implicit none
 !
 !     ROOT NODULES
 !
-        DO NE=1,NumOfPlantChemElmnts
+        DO NE=1,NumPlantChemElmnts
           WTNDLE=FRO*RootNodueChemElmnt_pvr(NE,L0,NZ,NY,NX)
           RootNodueChemElmnt_pvr(NE,L1,NZ,NY,NX)=RootNodueChemElmnt_pvr(NE,L1,NZ,NY,NX)+WTNDLE
           RootNodueChemElmnt_pvr(NE,L0,NZ,NY,NX)=RootNodueChemElmnt_pvr(NE,L0,NZ,NY,NX)-WTNDLE

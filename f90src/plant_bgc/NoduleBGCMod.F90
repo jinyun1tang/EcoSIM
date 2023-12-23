@@ -38,13 +38,13 @@ module NoduleBGCMod
   real(r8) :: RGNDL,RSNDL
   real(r8) :: RGN2P,RGN2F
   real(r8) :: RCanopyN2Fix
-  real(r8) :: NoduleElmntLoss2decay(NumOfPlantChemElmnts)
-  real(r8) :: NoduleElmntDecay2Litr(NumOfPlantChemElmnts)
-  real(r8) :: NoduleElmntDecay2Recycle(NumOfPlantChemElmnts)
+  real(r8) :: NoduleElmntLoss2decay(NumPlantChemElmnts)
+  real(r8) :: NoduleElmntDecay2Litr(NumPlantChemElmnts)
+  real(r8) :: NoduleElmntDecay2Recycle(NumPlantChemElmnts)
   real(r8) :: NoduleCResp
-  real(r8) :: NoduleELmntLoss2Senes(NumOfPlantChemElmnts)
-  real(r8) :: NoduleELmntSenes2Litr(NumOfPlantChemElmnts)
-  real(r8) :: NoduleELmntSenes2Recycle(NumOfPlantChemElmnts)
+  real(r8) :: NoduleELmntLoss2Senes(NumPlantChemElmnts)
+  real(r8) :: NoduleELmntSenes2Litr(NumPlantChemElmnts)
+  real(r8) :: NoduleELmntSenes2Recycle(NumPlantChemElmnts)
   real(r8) :: SPNDLI
   real(r8) :: SPNDX
   real(r8) :: WTLSB1,WTNDB1,WTLSBT
@@ -211,7 +211,7 @@ module NoduleBGCMod
     RCCN=CNC*RCCXN
     RCCP=CPC*RCCQN
     SPNDX=SPNDL*SQRT(fTgrowCanP(NZ)*WFNG)
-    DO NE=1,NumOfPlantChemElmnts
+    DO NE=1,NumPlantChemElmnts
       NoduleElmntLoss2decay(NE)=SPNDX*CanopyNoduleChemElmnt_brch(NE,NB,NZ)
     ENDDO
 
@@ -219,7 +219,7 @@ module NoduleBGCMod
     NoduleElmntDecay2Litr(ielmn)=NoduleElmntLoss2decay(ielmn)*(1.0_r8-RCCC)*(1.0_r8-RCCN)
     NoduleElmntDecay2Litr(ielmp)=NoduleElmntLoss2decay(ielmp)*(1.0_r8-RCCC)*(1.0_r8-RCCP)
 
-    DO NE=1,NumOfPlantChemElmnts
+    DO NE=1,NumPlantChemElmnts
       NoduleElmntDecay2Recycle(NE)=NoduleElmntLoss2decay(NE)-NoduleElmntDecay2Litr(NE)
     ENDDO
 !
@@ -266,13 +266,13 @@ module NoduleBGCMod
       NoduleELmntSenes2Litr(ielmc)=NoduleELmntLoss2Senes(ielmc)*(1.0_r8-RCCC)
       NoduleELmntSenes2Litr(ielmn)=NoduleELmntLoss2Senes(ielmn)*(1.0_r8-RCCC)*(1.0_r8-RCCN)
       NoduleELmntSenes2Litr(ielmp)=NoduleELmntLoss2Senes(ielmp)*(1.0_r8-RCCC)*(1.0_r8-RCCP)
-      DO NE=1,NumOfPlantChemElmnts
+      DO NE=1,NumPlantChemElmnts
         NoduleELmntSenes2Recycle(NE)=NoduleELmntLoss2Senes(NE)-NoduleELmntSenes2Litr(NE)
       ENDDO
     ELSE
-      NoduleELmntLoss2Senes(1:NumOfPlantChemElmnts)=0._r8
-      NoduleELmntSenes2Litr(1:NumOfPlantChemElmnts)=0._r8
-      NoduleELmntSenes2Recycle(1:NumOfPlantChemElmnts)=0._r8
+      NoduleELmntLoss2Senes(1:NumPlantChemElmnts)=0._r8
+      NoduleELmntSenes2Litr(1:NumPlantChemElmnts)=0._r8
+      NoduleELmntSenes2Recycle(1:NumPlantChemElmnts)=0._r8
     ENDIF
 !
 !     TOTAL NODULE RESPIRATION
@@ -302,7 +302,7 @@ module NoduleBGCMod
 !     NoduleELmntSenes2Litr(ielmc),NoduleELmntSenes2Litr(ielmc),NoduleELmntSenes2Litr(ielmp)=bacterial C,N,P senescence to litterfall
 !
     D6470: DO M=1,jsken
-      DO NE=1,NumOfPlantChemElmnts
+      DO NE=1,NumPlantChemElmnts
         LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,0,NZ)=LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,0,NZ) &
           +CFOPE(NE,ifoliar,M,NZ)*(NoduleElmntDecay2Litr(NE)+NoduleELmntSenes2Litr(NE))
       ENDDO
@@ -405,13 +405,13 @@ module NoduleBGCMod
   real(r8) :: RCNDL,RMNDL,RXNDL
   real(r8) :: RGNDL,RSNDL
   real(r8) :: RGN2P,RGN2F
-  real(r8) :: NoduleElmntLoss2decay(NumOfPlantChemElmnts)
-  real(r8) :: NoduleElmntDecay2Litr(NumOfPlantChemElmnts)
-  real(r8) :: NoduleElmntDecay2Recycle(NumOfPlantChemElmnts)
+  real(r8) :: NoduleElmntLoss2decay(NumPlantChemElmnts)
+  real(r8) :: NoduleElmntDecay2Litr(NumPlantChemElmnts)
+  real(r8) :: NoduleElmntDecay2Recycle(NumPlantChemElmnts)
   real(r8) :: NoduleCResp
-  real(r8) :: NoduleELmntLoss2Senes(NumOfPlantChemElmnts)
-  real(r8) :: NoduleELmntSenes2Litr(NumOfPlantChemElmnts)
-  real(r8) :: NoduleELmntSenes2Recycle(NumOfPlantChemElmnts)
+  real(r8) :: NoduleELmntLoss2Senes(NumPlantChemElmnts)
+  real(r8) :: NoduleELmntSenes2Litr(NumPlantChemElmnts)
+  real(r8) :: NoduleELmntSenes2Recycle(NumPlantChemElmnts)
   real(r8) :: RCNDLM,RXNDLM,RGNDLM
   real(r8) :: RSNDLM
   real(r8) :: SPNDLI
@@ -592,7 +592,7 @@ module NoduleBGCMod
         RCCN=CNC*RCCXN
         RCCP=CPC*RCCQN
         SPNDX=SPNDL*SQRT(fTgrowRootP(L,NZ)*fRootGrowPsiSense(1,L))
-        DO NE=1,NumOfPlantChemElmnts
+        DO NE=1,NumPlantChemElmnts
           NoduleElmntLoss2decay(NE)=SPNDX*RootNodueChemElmnt_pvr(NE,L,NZ)
         ENDDO
 
@@ -645,13 +645,13 @@ module NoduleBGCMod
           NoduleELmntSenes2Litr(ielmc)=NoduleELmntLoss2Senes(ielmc)*(1.0_r8-RCCC)
           NoduleELmntSenes2Litr(ielmn)=NoduleELmntLoss2Senes(ielmn)*(1.0_r8-RCCC)*(1.0_r8-RCCN)
           NoduleELmntSenes2Litr(ielmp)=NoduleELmntLoss2Senes(ielmp)*(1.0_r8-RCCC)*(1.0_r8-RCCP)
-          DO NE=1,NumOfPlantChemElmnts
+          DO NE=1,NumPlantChemElmnts
             NoduleELmntSenes2Recycle(NE)=NoduleELmntLoss2Senes(NE)-NoduleELmntSenes2Litr(NE)
           ENDDO
         ELSE
-          NoduleELmntLoss2Senes(1:NumOfPlantChemElmnts)=0._r8
-          NoduleELmntSenes2Litr(1:NumOfPlantChemElmnts)=0._r8
-          NoduleELmntSenes2Recycle(1:NumOfPlantChemElmnts)=0._r8
+          NoduleELmntLoss2Senes(1:NumPlantChemElmnts)=0._r8
+          NoduleELmntSenes2Litr(1:NumPlantChemElmnts)=0._r8
+          NoduleELmntSenes2Recycle(1:NumPlantChemElmnts)=0._r8
         ENDIF
 !
 !     TOTAL NODULE RESPIRATION
@@ -679,7 +679,7 @@ module NoduleBGCMod
 !     NoduleELmntSenes2Litr(ielmc),NoduleELmntSenes2Litr(ielmc),NoduleELmntSenes2Litr(ielmp)=bacterial C,N,P senescence to litterfall
 !
         D6370: DO M=1,jsken
-          DO NE=1,NumOfPlantChemElmnts
+          DO NE=1,NumPlantChemElmnts
             LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,L,NZ)=LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,L,NZ)&
               +CFOPE(NE,iroot,M,NZ)*(NoduleElmntDecay2Litr(NE)+NoduleELmntSenes2Litr(NE))
           ENDDO

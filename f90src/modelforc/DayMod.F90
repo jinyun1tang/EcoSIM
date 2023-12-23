@@ -130,7 +130,7 @@
 
   D960: DO NZ=1,NP0(NY,NX)
   !NetCumElmntFlx2Plant_pft: effect of canopy element status on seed set
-    DO NE=1,NumOfPlantChemElmnts
+    DO NE=1,NumPlantChemElmnts
       NetCumElmntFlx2Plant_pft(NE,NZ,NY,NX)=NetCumElmntFlx2Plant_pft(NE,NZ,NY,NX)+PlantExudChemElmntCum_pft(NE,NZ,NY,NX)-LitrfallChemElmnts_pft(NE,NZ,NY,NX)
       EcoHavstElmntCum_pft(NE,NZ,NY,NX)=EcoHavstElmntCum_pft(NE,NZ,NY,NX)+EcoHavstElmnt_pft(NE,NZ,NY,NX)
     enddo

@@ -3,6 +3,7 @@ module RedistMod
   use abortutils, only : padr, print_info,endrun,destroy
   use minimathmod, only : safe_adb,AZMAX1
   use EcoSiMParDataMod, only : micpar
+  use ElmIDMod
   use EcosimConst
   use FlagDataType
   use GridDataType
@@ -309,7 +310,6 @@ module RedistMod
 
   subroutine HandleSurfaceBoundary(I,NY,NX)
 
-  use ElmIDMod
   implicit none
   integer, intent(in) :: I,NY,NX
 
@@ -642,11 +642,11 @@ module RedistMod
         DO NGL=JGnio(NO),JGnfo(NO)
           DO  M=1,nlbiomcp
             MID=micpar%get_micb_id(M,NGL)
-            OMC(MID,K,NU(NY,NX),NY,NX)=OMC(MID,K,NU(NY,NX),NY,NX)+TOMCER(M,NGL,K,NY,NX)
-            OMN(MID,K,NU(NY,NX),NY,NX)=OMN(MID,K,NU(NY,NX),NY,NX)+TOMNER(M,NGL,K,NY,NX)
-            OMP(MID,K,NU(NY,NX),NY,NX)=OMP(MID,K,NU(NY,NX),NY,NX)+TOMPER(M,NGL,K,NY,NX)
-            DORGE(NY,NX)=DORGE(NY,NX)+TOMCER(M,NGL,K,NY,NX)
-            DORGP=DORGP+TOMPER(M,NGL,K,NY,NX)
+            OMEhetr(ielmc,MID,K,NU(NY,NX),NY,NX)=OMEhetr(ielmc,MID,K,NU(NY,NX),NY,NX)+TOMEERhetr(ielmc,MID,K,NY,NX)
+            OMEhetr(ielmn,MID,K,NU(NY,NX),NY,NX)=OMEhetr(ielmn,MID,K,NU(NY,NX),NY,NX)+TOMEERhetr(ielmn,MID,K,NY,NX)
+            OMEhetr(ielmp,MID,K,NU(NY,NX),NY,NX)=OMEhetr(ielmp,MID,K,NU(NY,NX),NY,NX)+TOMEERhetr(ielmp,MID,K,NY,NX)
+            DORGE(NY,NX)=DORGE(NY,NX)+TOMEERhetr(ielmc,MID,K,NY,NX)
+            DORGP=DORGP+TOMEERhetr(ielmp,MID,K,NY,NX)
           enddo
         enddo
       enddo
@@ -656,11 +656,11 @@ module RedistMod
       DO NGL=JGniA(NO),JGnfA(NO)
         DO  M=1,nlbiomcp
           MID=micpar%get_micb_id(M,NGL)
-          OMCff(MID,NU(NY,NX),NY,NX)=OMCff(MID,NU(NY,NX),NY,NX)+TOMCERff(M,NGL,NY,NX)
-          OMNff(MID,NU(NY,NX),NY,NX)=OMNff(MID,NU(NY,NX),NY,NX)+TOMNERff(M,NGL,NY,NX)
-          OMPff(MID,NU(NY,NX),NY,NX)=OMPff(MID,NU(NY,NX),NY,NX)+TOMPERff(M,NGL,NY,NX)
-          DORGE(NY,NX)=DORGE(NY,NX)+TOMCERff(M,NGL,NY,NX)
-          DORGP=DORGP+TOMPER(M,NGL,K,NY,NX)
+          OMEauto(ielmc,MID,NU(NY,NX),NY,NX)=OMEauto(ielmc,MID,NU(NY,NX),NY,NX)+TOMEERauto(ielmc,MID,NY,NX)
+          OMEauto(ielmn,MID,NU(NY,NX),NY,NX)=OMEauto(ielmn,MID,NU(NY,NX),NY,NX)+TOMEERauto(ielmn,MID,NY,NX)
+          OMEauto(ielmp,MID,NU(NY,NX),NY,NX)=OMEauto(ielmp,MID,NU(NY,NX),NY,NX)+TOMEERauto(ielmp,MID,NY,NX)
+          DORGE(NY,NX)=DORGE(NY,NX)+TOMEERauto(ielmc,MID,NY,NX)
+          DORGP=DORGP+TOMEERauto(ielmp,MID,NY,NX)
         enddo
       enddo
     enddo
@@ -725,9 +725,9 @@ module RedistMod
     !
     ! TOTAL heterotrophic MICROBIAL C,N,P
     !
-    tDC=SUM(OMC(1:NumLiveHeterBioms,K,0,NY,NX))
-    tDN=SUM(OMN(1:NumLiveHeterBioms,K,0,NY,NX))
-    tDP=SUM(OMP(1:NumLiveHeterBioms,K,0,NY,NX))
+    tDC=SUM(OMEhetr(ielmc,1:NumLiveHeterBioms,K,0,NY,NX))
+    tDN=SUM(OMEhetr(ielmn,1:NumLiveHeterBioms,K,0,NY,NX))
+    tDP=SUM(OMEhetr(ielmp,1:NumLiveHeterBioms,K,0,NY,NX))
     DC=DC+tDC
     DN=DN+tDN
     DP=DP+tDP
@@ -742,9 +742,9 @@ module RedistMod
   !
   ! TOTAL autotrophic MICROBIAL C,N,P
   !
-  tDC=SUM(OMCff(1:NumLiveAutoBioms,0,NY,NX))
-  tDN=SUM(OMNff(1:NumLiveAutoBioms,0,NY,NX))
-  tDP=SUM(OMPff(1:NumLiveAutoBioms,0,NY,NX))
+  tDC=SUM(OMEauto(ielmc,1:NumLiveAutoBioms,0,NY,NX))
+  tDN=SUM(OMEauto(ielmn,1:NumLiveAutoBioms,0,NY,NX))
+  tDP=SUM(OMEauto(ielmp,1:NumLiveAutoBioms,0,NY,NX))
   DC=DC+tDC
   DN=DN+tDN
   DP=DP+tDP
@@ -968,7 +968,7 @@ module RedistMod
 !------------------------------------------------------------------------------------------
   subroutine UpdateChemInSoilLays(NY,NX,LG,DORGC,TXCO2,DORGE)
   !
-  use ElmIDMod
+
   implicit none
   integer,  intent(in) :: NY,NX,LG
   real(r8), intent(in) :: DORGE(JY,JX)
@@ -1418,9 +1418,9 @@ module RedistMod
 
 ! add living microbes
   DO K=1,jcplx
-    tDC=SUM(OMC(1:NumLiveHeterBioms,K,L,NY,NX))
-    tDN=SUM(OMN(1:NumLiveHeterBioms,K,L,NY,NX))
-    tDP=SUM(OMP(1:NumLiveHeterBioms,K,L,NY,NX))
+    tDC=SUM(OMEhetr(ielmc,1:NumLiveHeterBioms,K,L,NY,NX))
+    tDN=SUM(OMEhetr(ielmn,1:NumLiveHeterBioms,K,L,NY,NX))
+    tDP=SUM(OMEhetr(ielmp,1:NumLiveHeterBioms,K,L,NY,NX))
     IF(micpar%is_litter(K))THEN  
       !K=0,1,2: woody litr, nonwoody litr, and manure
       DC=DC+tDC
@@ -1446,9 +1446,9 @@ module RedistMod
   ENDDO
 
 ! add autotrophs
-  tDC=SUM(OMCff(1:NumLiveAutoBioms,L,NY,NX))
-  tDN=SUM(OMNff(1:NumLiveAutoBioms,L,NY,NX))
-  tDP=SUM(OMPff(1:NumLiveAutoBioms,L,NY,NX))
+  tDC=SUM(OMEauto(ielmc,1:NumLiveAutoBioms,L,NY,NX))
+  tDN=SUM(OMEauto(ielmn,1:NumLiveAutoBioms,L,NY,NX))
+  tDP=SUM(OMEauto(ielmp,1:NumLiveAutoBioms,L,NY,NX))
   OC=OC+tDC
   ON=ON+tDN
   OP=OP+tDP

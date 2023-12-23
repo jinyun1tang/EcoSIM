@@ -324,12 +324,8 @@ implicit none
   micstt%ORP(1:ndbiomcp,1:jcplx)=ORP(1:ndbiomcp,1:jcplx,L,NY,NX)
   micstt%CNOSC(1:jsken,1:jcplx)=CNOSC(1:jsken,1:jcplx,L,NY,NX)
   micstt%CPOSC(1:jsken,1:jcplx)=CPOSC(1:jsken,1:jcplx,L,NY,NX)
-  micstt%OMC(1:NumLiveHeterBioms,1:jcplx)=OMC(1:NumLiveHeterBioms,1:jcplx,L,NY,NX)
-  micstt%OMN(1:NumLiveHeterBioms,1:jcplx)=OMN(1:NumLiveHeterBioms,1:jcplx,L,NY,NX)
-  micstt%OMP(1:NumLiveHeterBioms,1:jcplx)=OMP(1:NumLiveHeterBioms,1:jcplx,L,NY,NX)
-  micstt%OMCff(1:NumLiveAutoBioms)=OMCff(1:NumLiveAutoBioms,L,NY,NX)
-  micstt%OMNff(1:NumLiveAutoBioms)=OMNff(1:NumLiveAutoBioms,L,NY,NX)
-  micstt%OMPff(1:NumLiveAutoBioms)=OMPff(1:NumLiveAutoBioms,L,NY,NX)
+  micstt%OMEhetr(1:NumPlantChemElmnts,1:NumLiveHeterBioms,1:jcplx)=OMEhetr(1:NumPlantChemElmnts,1:NumLiveHeterBioms,1:jcplx,L,NY,NX)
+  micstt%OMEauto(1:NumPlantChemElmnts,1:NumLiveAutoBioms)=OMEauto(1:NumPlantChemElmnts,1:NumLiveAutoBioms,L,NY,NX)
   if(.not.micfor%litrm)then
     micfor%AEC=AEC(L,NY,NX)
     micstt%OXYG=trc_gasml_vr(idg_O2,L,NY,NX)
@@ -476,12 +472,8 @@ implicit none
   ORC(1:ndbiomcp,1:jcplx,L,NY,NX)=micstt%ORC(1:ndbiomcp,1:jcplx)
   ORN(1:ndbiomcp,1:jcplx,L,NY,NX)=micstt%ORN(1:ndbiomcp,1:jcplx)
   ORP(1:ndbiomcp,1:jcplx,L,NY,NX)=micstt%ORP(1:ndbiomcp,1:jcplx)
-  OMC(1:NumLiveHeterBioms,1:jcplx,L,NY,NX)=micstt%OMC(1:NumLiveHeterBioms,1:jcplx)
-  OMN(1:NumLiveHeterBioms,1:jcplx,L,NY,NX)=micstt%OMN(1:NumLiveHeterBioms,1:jcplx)
-  OMP(1:NumLiveHeterBioms,1:jcplx,L,NY,NX)=micstt%OMP(1:NumLiveHeterBioms,1:jcplx)
-  OMCff(1:NumLiveAutoBioms,L,NY,NX)=micstt%OMCff(1:NumLiveAutoBioms)
-  OMNff(1:NumLiveAutoBioms,L,NY,NX)=micstt%OMNff(1:NumLiveAutoBioms)
-  OMPff(1:NumLiveAutoBioms,L,NY,NX)=micstt%OMPff(1:NumLiveAutoBioms)
+  OMEhetr(1:NumPlantChemElmnts,1:NumLiveHeterBioms,1:jcplx,L,NY,NX)=micstt%OMEhetr(1:NumPlantChemElmnts,1:NumLiveHeterBioms,1:jcplx)
+  OMEauto(1:NumPlantChemElmnts,1:NumLiveAutoBioms,L,NY,NX)=micstt%OMEauto(1:NumPlantChemElmnts,1:NumLiveAutoBioms)
 
   end subroutine MicAPIRecv
 end module MicBGCAPI

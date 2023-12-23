@@ -84,18 +84,10 @@ contains
   ystates0l(cid_orn_b:cid_orn_e)=reshape(forc%ORN(1:ndbiomcp,1:jcplx),(/ndbiomcp*jcplx/))
   ystates0l(cid_orp_b:cid_orp_e)=reshape(forc%ORP(1:ndbiomcp,1:jcplx),(/ndbiomcp*jcplx/))
 
-  ystates0l(cid_omc_b:cid_omc_e)=reshape(forc%OMC(1:NumLiveHeterBioms,1:jcplx),&
-    (/NumLiveHeterBioms*jcplx/))
-  ystates0l(cid_omn_b:cid_omn_e)=reshape(forc%OMN(1:NumLiveHeterBioms,1:jcplx),&
-    (/NumLiveHeterBioms*jcplx/))
-  ystates0l(cid_omp_b:cid_omp_e)=reshape(forc%OMP(1:NumLiveHeterBioms,1:jcplx),&
-    (/NumLiveHeterBioms*jcplx/))
-  ystates0l(cid_omcff_b:cid_omcff_e)=reshape(forc%OMCff(1:NumLiveAutoBioms),&
-    (/NumLiveAutoBioms/))
-  ystates0l(cid_omnff_b:cid_omnff_e)=reshape(forc%OMNff(1:NumLiveAutoBioms),&
-    (/NumLiveAutoBioms/))
-  ystates0l(cid_ompff_b:cid_ompff_e)=reshape(forc%OMPff(1:NumLiveAutoBioms),&
-    (/NumLiveAutoBioms/))
+  ystates0l(cid_omehetr_b:cid_omehetr_e)=reshape(forc%OMEhetr(1:NumPlantChemElmnts,1:NumLiveHeterBioms,1:jcplx),&
+    (/NumPlantChemElmnts*NumLiveHeterBioms*jcplx/))
+  ystates0l(cid_omeauto_b:cid_omeauto_e)=reshape(forc%OMEauto(1:NumPlantChemElmnts,1:NumLiveAutoBioms),&
+    (/NumPlantChemElmnts*NumLiveAutoBioms/))
 
   end associate
   end subroutine initmodel
@@ -296,19 +288,11 @@ contains
   micstt%CNOSC(1:jsken,1:jcplx)=forc%CNOSC(1:jsken,1:jcplx)
   micstt%CPOSC(1:jsken,1:jcplx)=forc%CPOSC(1:jsken,1:jcplx)
 
-  micstt%OMC(1:NumLiveHeterBioms,1:jcplx)=reshape(ystates0l(cid_omc_b:cid_omc_e),&
-    (/NumLiveHeterBioms,jcplx/))
-  micstt%OMN(1:NumLiveHeterBioms,1:jcplx)=reshape(ystates0l(cid_omn_b:cid_omn_e),&
-    (/NumLiveHeterBioms,jcplx/))
-  micstt%OMP(1:NumLiveHeterBioms,1:jcplx)=reshape(ystates0l(cid_omp_b:cid_omp_e),&
-    (/NumLiveHeterBioms,jcplx/))
-  micstt%OMCff(1:NumLiveAutoBioms)=reshape(ystates0l(cid_omcff_b:cid_omcff_e),&
-    (/NumLiveAutoBioms/))
-  micstt%OMNff(1:NumLiveAutoBioms)=reshape(ystates0l(cid_omnff_b:cid_omnff_e),&
-    (/NumLiveAutoBioms/))
-  micstt%OMPff(1:NumLiveAutoBioms)=reshape(ystates0l(cid_ompff_b:cid_ompff_e),&
-    (/NumLiveAutoBioms/))
-
+  micstt%OMEhetr(1:NumPlantChemElmnts,1:NumLiveHeterBioms,1:jcplx)=&
+    reshape(ystates0l(cid_omehetr_b:cid_omehetr_e),(/NumPlantChemElmnts,NumLiveHeterBioms,jcplx/))
+  micstt%OMEauto(1:NumPlantChemElmnts,1:NumLiveAutoBioms)=reshape(ystates0l(cid_omeauto_b:cid_omeauto_e),&
+    (/NumPlantChemElmnts,NumLiveAutoBioms/))
+  
   micflx%RINHO(1:NumMicrbHetetrophCmplx,1:jcplx)=reshape(ystates0l(fid_RINHO_b:fid_RINHO_e),(/NumMicrbHetetrophCmplx,JCPLX/))
   micflx%RINHB(1:NumMicrbHetetrophCmplx,1:jcplx)=reshape(ystates0l(fid_RINHB_b:fid_RINHB_e),(/NumMicrbHetetrophCmplx,JCPLX/))
   micflx%RINOO(1:NumMicrbHetetrophCmplx,1:jcplx)=reshape(ystates0l(fid_RINOO_b:fid_RINOO_e),(/NumMicrbHetetrophCmplx,JCPLX/))
@@ -424,12 +408,11 @@ contains
   cid_orc_b=addone(itemp);cid_orc_e=cid_orc_b+ndbiomcp*jcplx;itemp=cid_orc_e
   cid_orn_b=addone(itemp);cid_orn_e=cid_orn_b+ndbiomcp*jcplx;itemp=cid_orn_e
   cid_orp_b=addone(itemp);cid_orp_e=cid_orp_b+ndbiomcp*jcplx;itemp=cid_orp_e
-  cid_omc_b=addone(itemp);cid_omc_e=cid_omc_b+NumLiveHeterBioms*jcplx;itemp=cid_omc_e
-  cid_omn_b=addone(itemp);cid_omn_e=cid_omn_b+NumLiveHeterBioms*jcplx;itemp=cid_omn_e
-  cid_omp_b=addone(itemp);cid_omp_e=cid_omp_b+NumLiveHeterBioms*jcplx;itemp=cid_omp_e
-  cid_omcff_b=addone(itemp);cid_omcff_e=cid_omcff_b+NumLiveAutoBioms;itemp=cid_omcff_e
-  cid_omnff_b=addone(itemp);cid_omnff_e=cid_omnff_b+NumLiveAutoBioms;itemp=cid_omnff_e
-  cid_ompff_b=addone(itemp);cid_ompff_e=cid_ompff_b+NumLiveAutoBioms;itemp=cid_ompff_e
+
+  cid_omehetr_b=addone(itemp);cid_omehetr_e=cid_omehetr_b+NumPlantChemElmnts*NumLiveHeterBioms*jcplx
+  itemp=cid_omehetr_e
+  cid_omeauto_b=addone(itemp);cid_omeauto_e=cid_omeauto_b+NumPlantChemElmnts*NumLiveAutoBioms
+  itemp=cid_omeauto_e
 
   fid_ROXYY=addone(itemp)
   fid_ROXYF=addone(itemp)
@@ -621,18 +604,10 @@ contains
   ystatesfl(cid_orc_b:cid_orc_e)=reshape(micstt%ORC(1:ndbiomcp,1:jcplx),(/ndbiomcp*jcplx/))
   ystatesfl(cid_orn_b:cid_orn_e)=reshape(micstt%ORN(1:ndbiomcp,1:jcplx),(/ndbiomcp*jcplx/))
   ystatesfl(cid_orp_b:cid_orp_e)=reshape(micstt%ORP(1:ndbiomcp,1:jcplx),(/ndbiomcp*jcplx/))
-  ystatesfl(cid_omc_b:cid_omc_e)=reshape(micstt%OMC(1:NumLiveHeterBioms,1:jcplx),&
-    (/NumLiveHeterBioms*jcplx/))
-  ystatesfl(cid_omn_b:cid_omn_e)=reshape(micstt%OMN(1:NumLiveHeterBioms,1:jcplx),&
-    (/NumLiveHeterBioms*jcplx/))
-  ystatesfl(cid_omp_b:cid_omp_e)=reshape(micstt%OMP(1:NumLiveHeterBioms,1:jcplx),&
-    (/NumLiveHeterBioms*jcplx/))
-  ystatesfl(cid_omcff_b:cid_omcff_e)=reshape(micstt%OMCff(1:NumLiveAutoBioms),&
-    (/NumLiveAutoBioms/))
-  ystatesfl(cid_omnff_b:cid_omnff_e)=reshape(micstt%OMNff(1:NumLiveAutoBioms),&
-    (/NumLiveAutoBioms/))
-  ystatesfl(cid_ompff_b:cid_ompff_e)=reshape(micstt%OMPff(1:NumLiveAutoBioms),&
-    (/NumLiveAutoBioms/))
+  ystatesfl(cid_omehetr_b:cid_omehetr_e)=reshape(micstt%OMEhetr(1:NumPlantChemElmnts,1:NumLiveHeterBioms,1:jcplx),&
+    (/NumPlantChemElmnts*NumLiveHeterBioms*jcplx/))
+  ystatesfl(cid_omeauto_b:cid_omeauto_e)=reshape(micstt%OMEauto(1:NumPlantChemElmnts,1:NumLiveAutoBioms),&
+    (/NumPlantChemElmnts*NumLiveAutoBioms/))
 
 ! summarize diagnostic fluxes
   DO K=1,jcplx
@@ -951,7 +926,7 @@ contains
   DO N=1,NumMicbFunGroups
   DO NGL=micpar%JGnio(N),micpar%JGnfo(N)
   DO M=1,nlbiomcp
-    ll=cid_omc_b+jj
+    ll=cid_omehetr_b+jj;jj=jj+1
     write(varl(ll),'(A,I2.2,A)')'OMC'//trim(micpar%micbiom(M))//'g',NGL,&
       trim(micpar%hmicname(N))//trim(micpar%cplxname(k))
     write(varlnml(ll),'(A,I2.2,A)')trim(micpar%micbiom(M))//' microbial biomass C in guild ',NGL,&
@@ -959,7 +934,7 @@ contains
     unitl(ll)='gC d-2'
     vartypes(ll)=var_state_type
 
-    ll=cid_omn_b+jj
+    ll=cid_omehetr_b+jj;jj=jj+1
     write(varl(ll),'(A,I2.2,A)')'OMN'//trim(micpar%micbiom(M))//'g',NGL,&
       trim(micpar%hmicname(N))//trim(micpar%cplxname(k))
     write(varlnml(ll),'(A,I2.2,A)')trim(micpar%micbiom(M))//' microbial biomass N in guild ',NGL,&
@@ -967,14 +942,13 @@ contains
     unitl(ll)='gN d-2'
     vartypes(ll)=var_state_type
 
-    ll=cid_omp_b+jj
+    ll=cid_omehetr_b+jj;jj=jj+1
     write(varl(ll),'(A,I2.2,A)')'OMP'//trim(micpar%micbiom(M))//'g',NGL,&
       trim(micpar%hmicname(N))//trim(micpar%cplxname(k))
     write(varlnml(ll),'(A,I2.2,A)')trim(micpar%micbiom(M))//' microbial biomass P in guild ',NGL,&
       ' of '//trim(micpar%hmicname(N))//' in complex '//trim(micpar%cplxname(k))
     unitl(ll)='gP d-2'
-    vartypes(ll)=var_state_type
-    jj=jj+1
+    vartypes(ll)=var_state_type    
   enddo
   ENDDO
   ENDDO
@@ -984,7 +958,7 @@ contains
   DO N=1,NumMicbFunGroups
   DO NGL=micpar%JGnio(N),micpar%JGnfo(N)
   DO M=1,nlbiomcp
-    ll=cid_omcff_b+jj
+    ll=cid_omeauto_b+jj;jj=jj+1
     write(varl(ll),'(A,I2.2,A)')'OMC'//trim(micpar%micbiom(M))//'g',NGL,&
       trim(micpar%hmicname(N))
     write(varlnml(ll),'(A,I2.2,A)')trim(micpar%micbiom(M))//' microbial biomass C in guild ',NGL,&
@@ -992,7 +966,7 @@ contains
     unitl(ll)='gC d-2'
     vartypes(ll)=var_state_type
 
-    ll=cid_omnff_b+jj
+    ll=cid_omeauto_b+jj;jj=jj+1
     write(varl(ll),'(A,I2.2,A)')'OMN'//trim(micpar%micbiom(M))//'g',NGL,&
       trim(micpar%hmicname(N))
     write(varlnml(ll),'(A,I2.2,A)')trim(micpar%micbiom(M))//' microbial biomass N in guild ',NGL,&
@@ -1000,7 +974,7 @@ contains
     unitl(ll)='gN d-2'
     vartypes(ll)=var_state_type
 
-    ll=cid_ompff_b+jj
+    ll=cid_omeauto_b+jj;jj=jj+1
     write(varl(ll),'(A,I2.2,A)')'OMP'//trim(micpar%micbiom(M))//'g',NGL,&
       trim(micpar%hmicname(N))
     write(varlnml(ll),'(A,I2.2,A)')trim(micpar%micbiom(M))//' microbial biomass P in guild ',NGL,&
@@ -1008,7 +982,6 @@ contains
     unitl(ll)='gP d-2'
     vartypes(ll)=var_state_type
 
-    jj=jj+1
   enddo
   ENDDO
   ENDDO
@@ -1715,9 +1688,9 @@ contains
         DO NGL=micpar%JGnio(N),micpar%JGnfo(N)
           DO  M=1,micpar%nlbiomcp
             MID=micpar%get_micb_id(M,NGL)
-            DC=DC+micstt%OMC(MID,K)
-            DN=DN+micstt%OMN(MID,K)
-            DP=DP+micstt%OMP(MID,K)
+            DC=DC+micstt%OMEhetr(ielmc,MID,K)
+            DN=DN+micstt%OMEhetr(ielmn,MID,K)
+            DP=DP+micstt%OMEhetr(ielmp,MID,K)
           ENDDO
         enddo
       ENDDO
@@ -1726,9 +1699,9 @@ contains
         DO NGL=micpar%JGnio(N),micpar%JGnfo(N)
           DO  M=1,micpar%nlbiomcp
             MID=micpar%get_micb_id(M,NGL)          
-            OC=OC+micstt%OMC(MID,K)
-            ON=ON+micstt%OMN(MID,K)
-            OP=OP+micstt%OMP(MID,K)
+            OC=OC+micstt%OMEhetr(ielmc,MID,K)
+            ON=ON+micstt%OMEhetr(ielmn,MID,K)
+            OP=OP+micstt%OMEhetr(ielmp,MID,K)
           enddo
         enddo
       ENDDO
@@ -1739,9 +1712,9 @@ contains
     DO NGL=micpar%JGniA(N),micpar%JGnfA(N)
       DO  M=1,micpar%nlbiomcp
         MID=micpar%get_micb_id(M,NGL)               
-        OC=OC+micstt%OMCff(MID)
-        ON=ON+micstt%OMNff(MID)
-        OP=OP+micstt%OMPff(MID)
+        OC=OC+micstt%OMEauto(ielmc,MID)
+        ON=ON+micstt%OMEauto(ielmn,MID)
+        OP=OP+micstt%OMEauto(ielmp,MID)
       enddo
     enddo
   ENDDO

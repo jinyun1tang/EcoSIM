@@ -173,10 +173,10 @@ contains
   integer, intent(in) :: NumOfPlantLitrCmplxs
 
   FVRN =real((/0.75,0.5,0.5,0.5,0.5,0.5/),r8)
-  allocate(FWODLE(NumOfPlantChemElmnts,1:NumOfPlantLitrCmplxs));  FWODLE=0._r8
-  allocate(FWODBE(NumOfPlantChemElmnts,1:NumOfPlantLitrCmplxs));  FWODBE=0._r8
-  allocate(FWODRE(NumOfPlantChemElmnts,1:NumOfPlantLitrCmplxs));  FWODRE=0._r8         !
-  allocate(FWOODE(NumOfPlantChemElmnts,1:NumOfPlantLitrCmplxs));  FWOODE=0._r8         !woody element allocation
+  allocate(FWODLE(NumPlantChemElmnts,1:NumOfPlantLitrCmplxs));  FWODLE=0._r8
+  allocate(FWODBE(NumPlantChemElmnts,1:NumOfPlantLitrCmplxs));  FWODBE=0._r8
+  allocate(FWODRE(NumPlantChemElmnts,1:NumOfPlantLitrCmplxs));  FWODRE=0._r8         !
+  allocate(FWOODE(NumPlantChemElmnts,1:NumOfPlantLitrCmplxs));  FWOODE=0._r8         !woody element allocation
   allocate(CanopyBranchStemApft_lyr(NumOfCanopyLayers,MaxNumBranches,JP,JY,JX));CanopyBranchStemApft_lyr=0._r8
   allocate(CanopyLeafArea_pft(JP,JY,JX));    CanopyLeafArea_pft=0._r8
   allocate(CanopyArea_pft(JP,JY,JX));    CanopyArea_pft=0._r8

@@ -78,12 +78,8 @@ implicit none
     real(r8), allocatable :: OHN(:)
     real(r8), allocatable :: OHP(:)
     real(r8), allocatable :: DOM(:,:)
-    real(r8), allocatable :: OMC(:,:)
-    real(r8), allocatable :: OMN(:,:)
-    real(r8), allocatable :: OMP(:,:)
-    real(r8), allocatable :: OMCff(:)
-    real(r8), allocatable :: OMNff(:)
-    real(r8), allocatable :: OMPff(:)
+    real(r8), allocatable :: OMEhetr(:,:,:)
+    real(r8), allocatable :: OMEauto(:,:)
 
 !    real(r8) :: O2_irrig_conc        !surface irrigation  O2 concentration, [g m-3]
 !    real(r8) :: O2_rain_conc        !precipitation  O2 concentration, [g m-3]
@@ -232,6 +228,7 @@ implicit none
   integer :: jcplx,ndbiomcp,nlbiomcp
   integer :: NumMicbFunGroups,jsken,NumMicrbHetetrophCmplx,NumMicrobAutotrophCmplx
   integer :: NumLiveHeterBioms,NumLiveAutoBioms
+  integer :: NumPlantChemElmnts
   type(file_desc_t) :: ncf
 
   call ncd_pio_openfile(ncf, fname, ncd_nowrite)
@@ -242,12 +239,11 @@ implicit none
   NumMicrobAutotrophCmplx=get_dim_len(ncf,'NumMicrobAutotrophCmplx')
   NumLiveHeterBioms = get_dim_len(ncf,'NumLiveHeterBioms')
   NumLiveAutoBioms = get_dim_len(ncf,'NumLiveAutoBioms')
+  NumPlantChemElmnts=get_dim_len(ncf,'element')
   nlbiomcp=get_dim_len(ncf,'nlbiomcp')
   ndbiomcp=get_dim_len(ncf,'ndbiomcp')
   NumMicbFunGroups    =get_dim_len(ncf,'NumMicbFunGroups')
-  allocate(forc%OMC(NumLiveHeterBioms,1:jcplx))
-  allocate(forc%OMN(NumLiveHeterBioms,1:jcplx))
-  allocate(forc%OMP(NumLiveHeterBioms,1:jcplx))
+  allocate(forc%OMEhetr(NumPlantChemElmnts,NumLiveHeterBioms,1:jcplx))
   allocate(forc%DOM(idom_beg:idom_end,1:jcplx))
   allocate(forc%OSC(jsken,1:jcplx))
   allocate(forc%OSA(jsken,1:jcplx))
@@ -256,9 +252,7 @@ implicit none
   allocate(forc%ORC(ndbiomcp,1:jcplx))
   allocate(forc%ORN(ndbiomcp,1:jcplx))
   allocate(forc%ORP(ndbiomcp,1:jcplx))
-  allocate(forc%OMCff(NumLiveAutoBioms))
-  allocate(forc%OMNff(NumLiveAutoBioms))
-  allocate(forc%OMPff(NumLiveAutoBioms))
+  allocate(forc%OMEauto(NumPlantChemElmnts,NumLiveAutoBioms))
   allocate(forc%OHC(1:jcplx))
   allocate(forc%OHN(1:jcplx))
   allocate(forc%OHP(1:jcplx))
@@ -309,12 +303,8 @@ implicit none
   call ncd_getvar(ncf,'CCASO',forc%CCASO)
   call ncd_getvar(ncf,'BKDS',forc%BKDS)
   call ncd_getvar(ncf,'ATCS',forc%ATCS)
-  call ncd_getvar(ncf,'OMC',forc%OMC)
-  call ncd_getvar(ncf,'OMN',forc%OMN)
-  call ncd_getvar(ncf,'OMP',forc%OMP)
-  call ncd_getvar(ncf,'OMCff',forc%OMCff)
-  call ncd_getvar(ncf,'OMNff',forc%OMNff)
-  call ncd_getvar(ncf,'OMPff',forc%OMPff)
+  call ncd_getvar(ncf,'OMEhetr',forc%OMEhetr)
+  call ncd_getvar(ncf,'OMEauto',forc%OMEauto)
   call ncd_getvar(ncf,'OSC',forc%OSC)
   call ncd_getvar(ncf,'OSA',forc%OSA)
   call ncd_getvar(ncf,'OSN',forc%OSN)

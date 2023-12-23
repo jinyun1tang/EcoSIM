@@ -4,7 +4,7 @@ module SoilBGCDataType
 ! USES:
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use GridConsts
-  use ElmIDMod    , only : NumOfPlantChemElmnts
+  use ElmIDMod    , only : NumPlantChemElmnts
   use TracerIDMod
   use EcoSIMConfig, only : jcplx => jcplxc,jsken => jskenc
 implicit none
@@ -162,7 +162,7 @@ implicit none
   allocate(HDIND(JY,JX));       HDIND=0._r8
   allocate(HydroDIPFlx_col(JY,JX));       HydroDIPFlx_col=0._r8
   allocate(HDIPD(JY,JX));       HDIPD=0._r8
-  allocate(StandingDeadChemElmnt_col(NumOfPlantChemElmnts,JY,JX));      StandingDeadChemElmnt_col=0._r8
+  allocate(StandingDeadChemElmnt_col(NumPlantChemElmnts,JY,JX));      StandingDeadChemElmnt_col=0._r8
   allocate(ZDRAIN(JY,JX));      ZDRAIN=0._r8
   allocate(PDRAIN(JY,JX));      PDRAIN=0._r8
   allocate(UION(JY,JX));        UION=0._r8
@@ -175,7 +175,7 @@ implicit none
   allocate(TOQCK(0:JZ,JY,JX));  TOQCK=0._r8
   allocate(VOLQ(0:JZ,JY,JX));   VOLQ=0._r8
   allocate(TFNQ(0:JZ,JY,JX));   TFNQ=0._r8
-  allocate(LitrfalChemElemnts_vr(NumOfPlantChemElmnts,jsken,1:NumOfPlantLitrCmplxs,0:JZ,JY,JX));LitrfalChemElemnts_vr=0._r8
+  allocate(LitrfalChemElemnts_vr(NumPlantChemElmnts,jsken,1:NumOfPlantLitrCmplxs,0:JZ,JY,JX));LitrfalChemElemnts_vr=0._r8
   allocate(trcs_VLN_vr(ids_beg:ids_end,0:JZ,JY,JX));trcs_VLN_vr=1._r8
 
   allocate(VLNHB(0:JZ,JY,JX));  VLNHB=0._r8

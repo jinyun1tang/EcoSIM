@@ -453,13 +453,8 @@ module Hour1Mod
         trcx_XER(idx_beg:idx_end,1:2,1:2,NY,NX)=0.0_r8
         trcp_ER(idsp_beg:idsp_end,1:2,1:2,NY,NX)=0.0_r8
 
-        OMCER(:,:,1:2,1:2,NY,NX)=0.0_r8
-        OMNER(:,:,1:2,1:2,NY,NX)=0.0_r8
-        OMPER(:,:,1:2,1:2,NY,NX)=0.0_r8
-
-        OMCERff(:,1:2,1:2,NY,NX)=0.0_r8
-        OMNERff(:,1:2,1:2,NY,NX)=0.0_r8
-        OMPERff(:,1:2,1:2,NY,NX)=0.0_r8
+        OMEERhetr(:,:,:,1:2,1:2,NY,NX)=0.0_r8
+        OMEERauto(:,:,1:2,1:2,NY,NX)=0.0_r8
 
         ORCER(:,:,1:2,1:2,NY,NX)=0.0_r8
         ORNER(:,:,1:2,1:2,NY,NX)=0.0_r8
@@ -776,7 +771,7 @@ module Hour1Mod
 
   TRootGasLossDisturb_pft(idg_beg:idg_end-1,NY,NX)=0.0_r8
   LitterFallChemElmnt_col(:,NY,NX)=0.0_r8
-  StandingDeadChemElmnt_col(1:NumOfPlantChemElmnts,NY,NX)=0.0_r8
+  StandingDeadChemElmnt_col(1:NumPlantChemElmnts,NY,NX)=0.0_r8
   PPT(NY,NX)=0.0_r8
 ! zero arrays in the snow layers
   FLSW(1:JS,NY,NX)=0.0_r8
@@ -806,7 +801,7 @@ module Hour1Mod
 
 !     begin_execution
 
-  LitrfalChemElemnts_vr(1:NumOfPlantChemElmnts,1:jsken,1:pltpar%NumOfPlantLitrCmplxs,&
+  LitrfalChemElemnts_vr(1:NumPlantChemElmnts,1:jsken,1:pltpar%NumOfPlantLitrCmplxs,&
     0:NL(NY,NX),NY,NX)=0.0_r8
 
   RDOM_micb_flx(idom_doc,1:jcplx,0:NL(NY,NX),NY,NX)=0.0_r8
@@ -833,7 +828,7 @@ module Hour1Mod
 
   Gas_Disol_Flx_vr(idg_beg:idg_end,0:NL(NY,NX),NY,NX)=0.0_r8
 
-  TDFOME(1:NumOfPlantChemElmnts,1:jcplx,NU(NY,NX):NL(NY,NX),NY,NX)=0.0_r8
+  TDFOME(1:NumPlantChemElmnts,1:jcplx,NU(NY,NX):NL(NY,NX),NY,NX)=0.0_r8
   ROXSK(1:NPH,NU(NY,NX):NL(NY,NX),NY,NX)=0.0_r8
   end subroutine SetArrays4PlantSoilTransfer
 !------------------------------------------------------------------------------------------
@@ -997,10 +992,10 @@ module Hour1Mod
 
   DO L=0,NL(NY,NX)
 !  add heterotrophic complexs
-    OC=OC+sum(OMC(1:NumLiveHeterBioms,1:jcplx,L,NY,NX))
+    OC=OC+sum(OMEhetr(ielmc,1:NumLiveHeterBioms,1:jcplx,L,NY,NX))
 
 !  add autotrophic complex
-    OC=OC+sum(OMCff(1:NumLiveAutoBioms,L,NY,NX))
+    OC=OC+sum(OMEauto(ielmc,1:NumLiveAutoBioms,L,NY,NX))
 !  add microbial residue
     OC=OC+SUM(ORC(1:ndbiomcp,1:jcplx,L,NY,NX))
 !  add dissolved/sorbed OM and acetate
@@ -1804,9 +1799,9 @@ module Hour1Mod
             OMC1g=OMC1/tglds
             OMN1g=OMN1/tglds
             OMP1g=OMP1/tglds
-            OMC(MID,K,LFDPTH,NY,NX)=OMC(MID,K,LFDPTH,NY,NX)+OMC1g
-            OMN(MID,K,LFDPTH,NY,NX)=OMN(MID,K,LFDPTH,NY,NX)+OMN1g
-            OMP(MID,K,LFDPTH,NY,NX)=OMP(MID,K,LFDPTH,NY,NX)+OMP1g
+            OMEhetr(ielmc,MID,K,LFDPTH,NY,NX)=OMEhetr(ielmc,MID,K,LFDPTH,NY,NX)+OMC1g
+            OMEhetr(ielmn,MID,K,LFDPTH,NY,NX)=OMEhetr(ielmn,MID,K,LFDPTH,NY,NX)+OMN1g
+            OMEhetr(ielmp,MID,K,LFDPTH,NY,NX)=OMEhetr(ielmp,MID,K,LFDPTH,NY,NX)+OMP1g
           ENDDO
           OSCX=OSCX+OMC1
           OSNX=OSNX+OMN1
@@ -1818,9 +1813,9 @@ module Hour1Mod
               OMC1g=OMC1/tglds
               OMN1g=OMN1/tglds
               OMP1g=OMP1/tglds
-              OMCff(MID,LFDPTH,NY,NX)=OMCff(MID,LFDPTH,NY,NX)+OMC1g*micpar%OMCA(NN)
-              OMNff(MID,LFDPTH,NY,NX)=OMNff(MID,LFDPTH,NY,NX)+OMN1g*micpar%OMCA(NN)
-              OMPff(MID,LFDPTH,NY,NX)=OMPff(MID,LFDPTH,NY,NX)+OMP1g*micpar%OMCA(NN)
+              OMEauto(ielmc,MID,LFDPTH,NY,NX)=OMEauto(ielmc,MID,LFDPTH,NY,NX)+OMC1g*micpar%OMCA(NN)
+              OMEauto(ielmn,MID,LFDPTH,NY,NX)=OMEauto(ielmn,MID,LFDPTH,NY,NX)+OMN1g*micpar%OMCA(NN)
+              OMEauto(ielmp,MID,LFDPTH,NY,NX)=OMEauto(ielmp,MID,LFDPTH,NY,NX)+OMP1g*micpar%OMCA(NN)
             ENDDO
             OSCX=OSCX+OMC1*micpar%OMCA(NN)
             OSNX=OSNX+OMN1*micpar%OMCA(NN)

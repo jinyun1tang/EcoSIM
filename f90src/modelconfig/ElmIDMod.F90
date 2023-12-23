@@ -6,7 +6,7 @@ implicit none
   integer, parameter :: ielmc=1    !carbon element
   integer, parameter :: ielmn=2    !nitrogen element
   integer, parameter :: ielmp=3    !phosphorus element
-  integer, parameter :: NumOfPlantChemElmnts=3   !totally three elements
+  integer, parameter :: NumPlantChemElmnts=3   !totally three elements
 ! erosion model options
   integer, parameter :: ieros_noaction=-1
   integer, parameter :: ieros_frzthawelv=0

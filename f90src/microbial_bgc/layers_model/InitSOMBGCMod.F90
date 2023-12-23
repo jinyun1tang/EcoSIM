@@ -241,9 +241,7 @@ module InitSOMBGCMOD
 !     OSCX,OSNX,OSPX=remaining unallocated SOC,SON,SOP
 !  The reason that initialization of complex 5 microbes is repated for each
 ! complex is because complex 5 is shared by the other complexes
-    OMCff(1:NumLiveAutoBioms,L,NY,NX)=0._r8
-    OMNff(1:NumLiveAutoBioms,L,NY,NX)=0._r8
-    OMPff(1:NumLiveAutoBioms,L,NY,NX)=0._r8
+    OMEauto(1:NumPlantChemElmnts,1:NumLiveAutoBioms,L,NY,NX)=0._r8
 
     D8990: DO N=1,NumMicbFunGroups
       tglds=JGnfo(N)-JGnio(N)+1._r8
@@ -253,9 +251,9 @@ module InitSOMBGCMOD
         OMP1=AZMAX1(OMC1*rPCOMCa(M,N,K)*FOSPI)
         do NGL=JGnio(N),JGnfo(N)
           MID=micpar%get_micb_id(M,NGL)
-          OMC(MID,K,L,NY,NX)=OMC1/tglds
-          OMN(MID,K,L,NY,NX)=OMN1/tglds
-          OMP(MID,K,L,NY,NX)=OMP1/tglds
+          OMEhetr(ielmc,MID,K,L,NY,NX)=OMC1/tglds
+          OMEhetr(ielmn,MID,K,L,NY,NX)=OMN1/tglds
+          OMEhetr(ielmp,MID,K,L,NY,NX)=OMP1/tglds
         ENDDO
         OSCX(KK)=OSCX(KK)+OMC1
         OSNX(KK)=OSNX(KK)+OMN1
@@ -264,9 +262,9 @@ module InitSOMBGCMOD
           tglds=JGnfA(N)-JGniA(N)+1._r8
           do NGL=JGniA(N),JGnfA(N)
             MID=micpar%get_micb_id(M,NGL)
-            OMCff(MID,L,NY,NX)=OMCff(MID,L,NY,NX)+OMC1*OMCA(NN)/tglds
-            OMNff(MID,L,NY,NX)=OMNff(MID,L,NY,NX)+OMN1*OMCA(NN)/tglds
-            OMPff(MID,L,NY,NX)=OMPff(MID,L,NY,NX)+OMP1*OMCA(NN)/tglds
+            OMEauto(ielmc,MID,L,NY,NX)=OMEauto(ielmc,MID,L,NY,NX)+OMC1*OMCA(NN)/tglds
+            OMEauto(ielmn,MID,L,NY,NX)=OMEauto(ielmn,MID,L,NY,NX)+OMN1*OMCA(NN)/tglds
+            OMEauto(ielmp,MID,L,NY,NX)=OMEauto(ielmp,MID,L,NY,NX)+OMP1*OMCA(NN)/tglds
           ENDDO
           OSCX(KK)=OSCX(KK)+OMC1*OMCA(NN)
           OSNX(KK)=OSNX(KK)+OMN1*OMCA(NN)
@@ -378,13 +376,13 @@ module InitSOMBGCMOD
     DO  N=1,NumMicbFunGroups
       do NGL=JGnio(n),JGnfo(n)
         DO  M=1,nlbiomcp
-          OC=OC+OMC(MID,K,L,NY,NX)
-          ON=ON+OMN(MID,K,L,NY,NX)
-          OP=OP+OMP(MID,K,L,NY,NX)
+          OC=OC+OMEhetr(ielmc,MID,K,L,NY,NX)
+          ON=ON+OMEhetr(ielmn,MID,K,L,NY,NX)
+          OP=OP+OMEhetr(ielmp,MID,K,L,NY,NX)
           IF(K.LE.micpar%NumOfLitrCmplxs)THEN
-            RC=RC+OMC(MID,K,L,NY,NX)
+            RC=RC+OMEhetr(ielmc,MID,K,L,NY,NX)
           ENDIF
-          RC0(K,NY,NX)=RC0(K,NY,NX)+OMC(MID,K,L,NY,NX)
+          RC0(K,NY,NX)=RC0(K,NY,NX)+OMEhetr(ielmc,MID,K,L,NY,NX)
         ENDDO
       ENDDO
     enddo
@@ -413,10 +411,10 @@ module InitSOMBGCMOD
       do NGL=JGniA(n),JGnfA(n)
         DO  M=1,nlbiomcp
           MID=micpar%get_micb_id(M,NGL)
-          OC=OC+OMCff(MID,L,NY,NX)
-          ON=ON+OMNff(MID,L,NY,NX)
-          OP=OP+OMPff(MID,L,NY,NX)
-          RC0ff(NY,NX)=RC0ff(NY,NX)+OMCff(MID,L,NY,NX)
+          OC=OC+OMEauto(ielmc,MID,L,NY,NX)
+          ON=ON+OMEauto(ielmn,MID,L,NY,NX)
+          OP=OP+OMEauto(ielmp,MID,L,NY,NX)
+          RC0ff(NY,NX)=RC0ff(NY,NX)+OMEauto(ielmc,MID,L,NY,NX)
         ENDDO
       ENDDO
     enddo

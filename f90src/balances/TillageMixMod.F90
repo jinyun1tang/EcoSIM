@@ -44,18 +44,14 @@ module TillageMixMod
   real(r8) :: TOHGP(0:micpar%NumOfLitrCmplxs),TOHGA(0:micpar%NumOfLitrCmplxs)
   real(r8) :: TOQGA(0:micpar%NumOfLitrCmplxs),TOQHA(0:micpar%NumOfLitrCmplxs)
 
-  real(r8) :: TOMGCff(nlbiomcp,NumMicrobAutotrophCmplx)
-  real(r8) :: TOMGNff(nlbiomcp,NumMicrobAutotrophCmplx)
-  real(r8) :: TOMGPff(nlbiomcp,NumMicrobAutotrophCmplx)
-  real(r8) :: TOMGC(nlbiomcp,NumMicrbHetetrophCmplx,1:jcplx)
-  real(r8) :: TOMGN(nlbiomcp,NumMicrbHetetrophCmplx,1:jcplx)
-  real(r8) :: TOMGP(nlbiomcp,NumMicrbHetetrophCmplx,1:jcplx)
-  REAL(R8) :: TOMC(NumLiveHeterBioms,1:jcplx)
-  REAL(R8) :: TOMN(NumLiveHeterBioms,1:jcplx)
-  REAL(R8) :: TOMP(NumLiveHeterBioms,1:jcplx)
-  REAL(R8) :: TOMCff(NumLiveAutoBioms)
-  REAL(R8) :: TOMNff(NumLiveAutoBioms)
-  REAL(R8) :: TOMPff(NumLiveAutoBioms)
+  real(r8) :: TOMGCff(1:NumLiveAutoBioms)
+  real(r8) :: TOMGNff(1:NumLiveAutoBioms)
+  real(r8) :: TOMGPff(1:NumLiveAutoBioms)
+  real(r8) :: TOMGC(1:NumLiveHeterBioms,1:jcplx)
+  real(r8) :: TOMGN(1:NumLiveHeterBioms,1:jcplx)
+  real(r8) :: TOMGP(1:NumLiveHeterBioms,1:jcplx)
+  REAL(R8) :: TOMEhetr(NumPlantChemElmnts,NumLiveHeterBioms,1:jcplx)
+  REAL(R8) :: TOMEauto(NumPlantChemElmnts,NumLiveAutoBioms)
   real(r8) :: TORC(ndbiomcp,1:jcplx)
   real(r8) :: TORN(ndbiomcp,1:jcplx)
   real(r8) :: TORP(ndbiomcp,1:jcplx)
@@ -138,12 +134,8 @@ module TillageMixMod
     TP_salml(idsp_beg:idsp_end)=0._r8
     TG_gasml(idg_beg:idg_end-1)=0._r8
 
-    TOMC=0.0_r8
-    TOMN=0.0_r8
-    TOMP=0.0_r8
-    TOMCff=0.0_r8
-    TOMNff=0.0_r8
-    TOMPff=0.0_r8
+    TOMEhetr=0.0_r8
+    TOMEauto=0.0_r8
     TORC=0.0_r8
     TORN=0.0_r8
     TORP=0.0_r8
@@ -183,15 +175,15 @@ module TillageMixMod
         DO NGL=JGnio(N),JGnfo(N)
           DO  M=1,nlbiomcp
             MID=micpar%get_micb_id(M,NGL)
-            TOMGC(M,NGL,K)=OMC(MID,K,0,NY,NX)*CORP0
-            TOMGN(M,NGL,K)=OMN(MID,K,0,NY,NX)*CORP0
-            TOMGP(M,NGL,K)=OMP(MID,K,0,NY,NX)*CORP0
-            OMC(MID,K,0,NY,NX)=OMC(MID,K,0,NY,NX)*XCORP0
-            OMN(MID,K,0,NY,NX)=OMN(MID,K,0,NY,NX)*XCORP0
-            OMP(MID,K,0,NY,NX)=OMP(MID,K,0,NY,NX)*XCORP0
-            DC=DC+OMC(MID,K,0,NY,NX)
-            DN=DN+OMN(MID,K,0,NY,NX)
-            DP=DP+OMP(MID,K,0,NY,NX)
+            TOMGC(MID,K)=OMEhetr(ielmc,MID,K,0,NY,NX)*CORP0
+            TOMGN(MID,K)=OMEhetr(ielmn,MID,K,0,NY,NX)*CORP0
+            TOMGP(MID,K)=OMEhetr(ielmp,MID,K,0,NY,NX)*CORP0
+            OMEhetr(ielmc,MID,K,0,NY,NX)=OMEhetr(ielmc,MID,K,0,NY,NX)*XCORP0
+            OMEhetr(ielmn,MID,K,0,NY,NX)=OMEhetr(ielmn,MID,K,0,NY,NX)*XCORP0
+            OMEhetr(ielmp,MID,K,0,NY,NX)=OMEhetr(ielmp,MID,K,0,NY,NX)*XCORP0
+            DC=DC+OMEhetr(ielmc,MID,K,0,NY,NX)
+            DN=DN+OMEhetr(ielmn,MID,K,0,NY,NX)
+            DP=DP+OMEhetr(ielmp,MID,K,0,NY,NX)
           enddo
         enddo
       ENDDO
@@ -201,15 +193,15 @@ module TillageMixMod
       DO NGL=JGniA(N),JGnfA(N)
         DO  M=1,nlbiomcp
           MID=micpar%get_micb_id(M,NGL)
-          TOMGCff(M,NGL)=OMCff(MID,0,NY,NX)*CORP0
-          TOMGNff(M,NGL)=OMNff(MID,0,NY,NX)*CORP0
-          TOMGPff(M,NGL)=OMPff(MID,0,NY,NX)*CORP0
-          OMCff(MID,0,NY,NX)=OMCff(MID,0,NY,NX)*XCORP0
-          OMNff(MID,0,NY,NX)=OMNff(MID,0,NY,NX)*XCORP0
-          OMPff(MID,0,NY,NX)=OMPff(MID,0,NY,NX)*XCORP0
-          DC=DC+OMCff(MID,0,NY,NX)
-          DN=DN+OMNff(MID,0,NY,NX)
-          DP=DP+OMPff(MID,0,NY,NX)
+          TOMGCff(MID)=OMEauto(ielmc,MID,0,NY,NX)*CORP0
+          TOMGNff(MID)=OMEauto(ielmn,MID,0,NY,NX)*CORP0
+          TOMGPff(MID)=OMEauto(ielmp,MID,0,NY,NX)*CORP0
+          OMEauto(ielmc,MID,0,NY,NX)=OMEauto(ielmc,MID,0,NY,NX)*XCORP0
+          OMEauto(ielmn,MID,0,NY,NX)=OMEauto(ielmn,MID,0,NY,NX)*XCORP0
+          OMEauto(ielmp,MID,0,NY,NX)=OMEauto(ielmp,MID,0,NY,NX)*XCORP0
+          DC=DC+OMEauto(ielmc,MID,0,NY,NX)
+          DN=DN+OMEauto(ielmn,MID,0,NY,NX)
+          DP=DP+OMEauto(ielmp,MID,0,NY,NX)
         enddo
       enddo
     ENDDO
@@ -403,9 +395,9 @@ module TillageMixMod
             DO NGL=JGnio(N),JGnfo(N)
               DO  M=1,nlbiomcp
                 MID=micpar%get_micb_id(M,NGL)
-                TOMC(MID,K)=TOMC(MID,K)+TI*OMC(MID,K,L,NY,NX)
-                TOMN(MID,K)=TOMN(MID,K)+TI*OMN(MID,K,L,NY,NX)
-                TOMP(MID,K)=TOMP(MID,K)+TI*OMP(MID,K,L,NY,NX)
+                TOMEhetr(ielmc,MID,K)=TOMEhetr(ielmc,MID,K)+TI*OMEhetr(ielmc,MID,K,L,NY,NX)
+                TOMEhetr(ielmn,MID,K)=TOMEhetr(ielmn,MID,K)+TI*OMEhetr(ielmn,MID,K,L,NY,NX)
+                TOMEhetr(ielmp,MID,K)=TOMEhetr(ielmp,MID,K)+TI*OMEhetr(ielmp,MID,K,L,NY,NX)
               enddo
             enddo
           enddo
@@ -415,9 +407,9 @@ module TillageMixMod
           DO NGL=JGniA(N),JGnfA(N)
             DO  M=1,nlbiomcp
               MID=micpar%get_micb_id(M,NGL)
-              TOMCff(MID)=TOMCff(MID)+TI*OMCff(MID,L,NY,NX)
-              TOMNff(MID)=TOMNff(MID)+TI*OMNff(MID,L,NY,NX)
-              TOMPff(MID)=TOMPff(MID)+TI*OMPff(MID,L,NY,NX)
+              TOMEauto(ielmc,MID)=TOMEauto(ielmc,MID)+TI*OMEauto(ielmc,MID,L,NY,NX)
+              TOMEauto(ielmn,MID)=TOMEauto(ielmn,MID)+TI*OMEauto(ielmn,MID,L,NY,NX)
+              TOMEauto(ielmp,MID)=TOMEauto(ielmp,MID)+TI*OMEauto(ielmp,MID,L,NY,NX)
             enddo
           enddo
         enddo
@@ -546,12 +538,12 @@ module TillageMixMod
             DO NGL=JGnio(N),JGnfo(N)
               DO  M=1,nlbiomcp
                 MID=micpar%get_micb_id(M,NGL)
-                OMC(MID,K,L,NY,NX)=TI*OMC(MID,K,L,NY,NX)+CORP*(FI*TOMC(MID,K) &
-                  -TI*OMC(MID,K,L,NY,NX))+TX*OMC(MID,K,L,NY,NX)
-                OMN(MID,K,L,NY,NX)=TI*OMN(MID,K,L,NY,NX)+CORP*(FI*TOMN(MID,K) &
-                  -TI*OMN(MID,K,L,NY,NX))+TX*OMN(MID,K,L,NY,NX)
-                OMP(MID,K,L,NY,NX)=TI*OMP(MID,K,L,NY,NX)+CORP*(FI*TOMP(MID,K) &
-                  -TI*OMP(MID,K,L,NY,NX))+TX*OMP(MID,K,L,NY,NX)
+                OMEhetr(ielmc,MID,K,L,NY,NX)=TI*OMEhetr(ielmc,MID,K,L,NY,NX)+CORP*(FI*TOMEhetr(ielmc,MID,K) &
+                  -TI*OMEhetr(ielmc,MID,K,L,NY,NX))+TX*OMEhetr(ielmc,MID,K,L,NY,NX)
+                OMEhetr(ielmn,MID,K,L,NY,NX)=TI*OMEhetr(ielmn,MID,K,L,NY,NX)+CORP*(FI*TOMEhetr(ielmn,MID,K) &
+                  -TI*OMEhetr(ielmn,MID,K,L,NY,NX))+TX*OMEhetr(ielmn,MID,K,L,NY,NX)
+                OMEhetr(ielmp,MID,K,L,NY,NX)=TI*OMEhetr(ielmp,MID,K,L,NY,NX)+CORP*(FI*TOMEhetr(ielmp,MID,K) &
+                  -TI*OMEhetr(ielmp,MID,K,L,NY,NX))+TX*OMEhetr(ielmp,MID,K,L,NY,NX)
               enddo
             enddo
           enddo
@@ -560,12 +552,12 @@ module TillageMixMod
           DO NGL=JGniA(N),JGnfA(N)
             DO  M=1,nlbiomcp
               MID=micpar%get_micb_id(M,NGL)
-              OMCff(MID,L,NY,NX)=TI*OMCff(MID,L,NY,NX)+CORP*(FI*TOMCff(MID) &
-                -TI*OMCff(MID,L,NY,NX))+TX*OMCff(MID,L,NY,NX)
-              OMNff(MID,L,NY,NX)=TI*OMNff(MID,L,NY,NX)+CORP*(FI*TOMNff(MID) &
-                -TI*OMNff(MID,L,NY,NX))+TX*OMNff(MID,L,NY,NX)
-              OMPff(MID,L,NY,NX)=TI*OMPff(MID,L,NY,NX)+CORP*(FI*TOMPff(MID) &
-                -TI*OMPff(MID,L,NY,NX))+TX*OMPff(MID,L,NY,NX)
+              OMEauto(ielmc,MID,L,NY,NX)=TI*OMEauto(ielmc,MID,L,NY,NX)+CORP*(FI*TOMEauto(ielmc,MID) &
+                -TI*OMEauto(ielmc,MID,L,NY,NX))+TX*OMEauto(ielmc,MID,L,NY,NX)
+              OMEauto(ielmn,MID,L,NY,NX)=TI*OMEauto(ielmn,MID,L,NY,NX)+CORP*(FI*TOMEauto(ielmn,MID) &
+                -TI*OMEauto(ielmn,MID,L,NY,NX))+TX*OMEauto(ielmn,MID,L,NY,NX)
+              OMEauto(ielmp,MID,L,NY,NX)=TI*OMEauto(ielmp,MID,L,NY,NX)+CORP*(FI*TOMEauto(ielmp,MID) &
+                -TI*OMEauto(ielmp,MID,L,NY,NX))+TX*OMEauto(ielmp,MID,L,NY,NX)
             enddo
           enddo
         enddo
@@ -621,9 +613,9 @@ module TillageMixMod
             DO NGL=JGnio(N),JGnfo(N)
               DO M=1,nlbiomcp
                 MID=micpar%get_micb_id(M,NGL)
-                OMC(MID,K,L,NY,NX)=OMC(MID,K,L,NY,NX)+FI*TOMGC(M,NGL,K)
-                OMN(MID,K,L,NY,NX)=OMN(MID,K,L,NY,NX)+FI*TOMGN(M,NGL,K)
-                OMP(MID,K,L,NY,NX)=OMP(MID,K,L,NY,NX)+FI*TOMGP(M,NGL,K)
+                OMEhetr(ielmc,MID,K,L,NY,NX)=OMEhetr(ielmc,MID,K,L,NY,NX)+FI*TOMGC(MID,K)
+                OMEhetr(ielmn,MID,K,L,NY,NX)=OMEhetr(ielmn,MID,K,L,NY,NX)+FI*TOMGN(MID,K)
+                OMEhetr(ielmp,MID,K,L,NY,NX)=OMEhetr(ielmp,MID,K,L,NY,NX)+FI*TOMGP(MID,K)
               enddo
             enddo
           ENDDO
@@ -633,9 +625,9 @@ module TillageMixMod
           DO NGL=JGniA(N),JGnfA(N)
             DO M=1,nlbiomcp
               MID=micpar%get_micb_id(M,NGL)
-              OMCff(MID,L,NY,NX)=OMCff(MID,L,NY,NX)+FI*TOMGCff(M,NGL)
-              OMNff(MID,L,NY,NX)=OMNff(MID,L,NY,NX)+FI*TOMGNff(M,NGL)
-              OMPff(MID,L,NY,NX)=OMPff(MID,L,NY,NX)+FI*TOMGPff(M,NGL)
+              OMEauto(ielmc,MID,L,NY,NX)=OMEauto(ielmc,MID,L,NY,NX)+FI*TOMGCff(MID)
+              OMEauto(ielmn,MID,L,NY,NX)=OMEauto(ielmn,MID,L,NY,NX)+FI*TOMGNff(MID)
+              OMEauto(ielmp,MID,L,NY,NX)=OMEauto(ielmp,MID,L,NY,NX)+FI*TOMGPff(MID)
             enddo
           enddo
         ENDDO
@@ -677,9 +669,9 @@ module TillageMixMod
             DO NGL=JGnio(N),JGnfo(N)
               DO  M=1,nlbiomcp
                 MID=micpar%get_micb_id(M,NGL)
-                OC=OC+OMC(MID,K,L,NY,NX)
-                ON=ON+OMN(MID,K,L,NY,NX)
-                OP=OP+OMP(MID,K,L,NY,NX)
+                OC=OC+OMEhetr(ielmc,MID,K,L,NY,NX)
+                ON=ON+OMEhetr(ielmn,MID,K,L,NY,NX)
+                OP=OP+OMEhetr(ielmp,MID,K,L,NY,NX)
               enddo
             enddo
           enddo
@@ -690,9 +682,9 @@ module TillageMixMod
             DO NGL=JGnio(N),JGnfo(N)
               DO  M=1,nlbiomcp
                 MID=micpar%get_micb_id(M,NGL)
-                DC=DC+OMC(MID,K,L,NY,NX)
-                DN=DN+OMN(MID,K,L,NY,NX)
-                DP=DP+OMP(MID,K,L,NY,NX)
+                DC=DC+OMEhetr(ielmc,MID,K,L,NY,NX)
+                DN=DN+OMEhetr(ielmn,MID,K,L,NY,NX)
+                DP=DP+OMEhetr(ielmp,MID,K,L,NY,NX)
               enddo
             enddo
           enddo
@@ -701,9 +693,9 @@ module TillageMixMod
           DO NGL=JGniA(N),JGnfA(N)
             DO  M=1,nlbiomcp
               MID=micpar%get_micb_id(M,NGL)
-              OC=OC+OMCff(MID,L,NY,NX)
-              ON=ON+OMNff(MID,L,NY,NX)
-              OP=OP+OMPff(MID,L,NY,NX)
+              OC=OC+OMEauto(ielmc,MID,L,NY,NX)
+              ON=ON+OMEauto(ielmn,MID,L,NY,NX)
+              OP=OP+OMEauto(ielmp,MID,L,NY,NX)
             enddo
           enddo
         enddo

@@ -131,20 +131,20 @@ module nitrosMod
           D7962: DO M=1,micpar%nlbiomcp
             MID=micpar%get_micb_id(M,NGL)
             IF(FOSCXS.GT.0.0)THEN
-              OMCXS=FOSCXS*AZMAX1(OMC(MID,K,L,NY,NX))
-              OMNXS=FOSCXS*AZMAX1(OMN(MID,K,L,NY,NX))
-              OMPXS=FOSCXS*AZMAX1(OMP(MID,K,L,NY,NX))
+              OMCXS=FOSCXS*AZMAX1(OMEhetr(ielmc,MID,K,L,NY,NX))
+              OMNXS=FOSCXS*AZMAX1(OMEhetr(ielmn,MID,K,L,NY,NX))
+              OMPXS=FOSCXS*AZMAX1(OMEhetr(ielmp,MID,K,L,NY,NX))
             ELSE
-              OMCXS=FOSCXS*AZMAX1(OMC(MID,K,LL,NY,NX))
-              OMNXS=FOSCXS*AZMAX1(OMN(MID,K,LL,NY,NX))
-              OMPXS=FOSCXS*AZMAX1(OMP(MID,K,LL,NY,NX))
+              OMCXS=FOSCXS*AZMAX1(OMEhetr(ielmc,MID,K,LL,NY,NX))
+              OMNXS=FOSCXS*AZMAX1(OMEhetr(ielmn,MID,K,LL,NY,NX))
+              OMPXS=FOSCXS*AZMAX1(OMEhetr(ielmp,MID,K,LL,NY,NX))
             ENDIF
-            OMC(MID,K,L,NY,NX)=OMC(MID,K,L,NY,NX)-OMCXS
-            OMN(MID,K,L,NY,NX)=OMN(MID,K,L,NY,NX)-OMNXS
-            OMP(MID,K,L,NY,NX)=OMP(MID,K,L,NY,NX)-OMPXS
-            OMC(MID,K,LL,NY,NX)=OMC(MID,K,LL,NY,NX)+OMCXS
-            OMN(MID,K,LL,NY,NX)=OMN(MID,K,LL,NY,NX)+OMNXS
-            OMP(MID,K,LL,NY,NX)=OMP(MID,K,LL,NY,NX)+OMPXS
+            OMEhetr(ielmc,MID,K,L,NY,NX)=OMEhetr(ielmc,MID,K,L,NY,NX)-OMCXS
+            OMEhetr(ielmn,MID,K,L,NY,NX)=OMEhetr(ielmn,MID,K,L,NY,NX)-OMNXS
+            OMEhetr(ielmp,MID,K,L,NY,NX)=OMEhetr(ielmp,MID,K,L,NY,NX)-OMPXS
+            OMEhetr(ielmc,MID,K,LL,NY,NX)=OMEhetr(ielmc,MID,K,LL,NY,NX)+OMCXS
+            OMEhetr(ielmn,MID,K,LL,NY,NX)=OMEhetr(ielmn,MID,K,LL,NY,NX)+OMNXS
+            OMEhetr(ielmp,MID,K,LL,NY,NX)=OMEhetr(ielmp,MID,K,LL,NY,NX)+OMPXS
           ENDDO D7962
         ENDDO
       ENDDO D7961

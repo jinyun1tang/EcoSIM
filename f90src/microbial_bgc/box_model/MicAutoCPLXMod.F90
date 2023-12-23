@@ -6,6 +6,7 @@ module MicAutoCPLXMod
   use MicFluxTypeMod, only: micfluxtype
   use MicStateTraitTypeMod, only : micsttype
   use NitroDiagTypes
+  use ElmIDMod
   use EcoSiMParDataMod, only : micpar
   use EcoSIMSolverPar
   use EcoSimConst
@@ -476,9 +477,7 @@ module MicAutoCPLXMod
     FL       => micpar%FL       , &
     ZEROS    => micfor%ZEROS    , &
     ZERO     => micfor%ZERO     , &
-    OMCff    => micstt%OMCff    , &
-    OMNff    => micstt%OMNff    , &
-    OMPff    => micstt%OMPff    , &
+    OMEauto    => micstt%OMEauto    , &
     EHUM     => micstt%EHUM       &
   )
 
@@ -525,16 +524,16 @@ module MicAutoCPLXMod
 !     RCCX,RCCQ=max N,P recycling fractions
 !
   MID1=micpar%get_micb_id(1,NGL);MID3=micpar%get_micb_id(3,NGL)
-  IF(OMCff(MID3).GT.ZEROS.AND.OMCff(MID1).GT.ZEROS)THEN
+  IF(OMEauto(ielmc,MID3).GT.ZEROS.AND.OMEauto(ielmc,MID1).GT.ZEROS)THEN
     CCC=AZMAX1(AMIN1(1.0_r8 &
-      ,OMNff(MID3)/(OMNff(MID3)+OMCff(MID3)*rNCOMCff(3,NGL)) &
-      ,OMPff(MID3)/(OMPff(MID3)+OMCff(MID3)*rPCOMCff(3,NGL))))
-    CXC=OMCff(MID3)/OMCff(MID1)
+      ,OMEauto(ielmn,MID3)/(OMEauto(ielmn,MID3)+OMEauto(ielmc,MID3)*rNCOMCff(3,NGL)) &
+      ,OMEauto(ielmp,MID3)/(OMEauto(ielmp,MID3)+OMEauto(ielmc,MID3)*rPCOMCff(3,NGL))))
+    CXC=OMEauto(ielmc,MID3)/OMEauto(ielmc,MID1)
     C3C=1.0_r8/(1.0_r8+CXC/CKC)
     CNC=AZMAX1(AMIN1(1.0_r8 &
-      ,OMCff(MID3)/(OMCff(MID3)+OMNff(MID3)/rNCOMCff(3,NGL))))
+      ,OMEauto(ielmc,MID3)/(OMEauto(ielmc,MID3)+OMEauto(ielmn,MID3)/rNCOMCff(3,NGL))))
     CPC=AZMAX1(AMIN1(1.0_r8 &
-      ,OMCff(MID3)/(OMCff(MID3)+OMPff(MID3)/rPCOMCff(3,NGL))))
+      ,OMEauto(ielmc,MID3)/(OMEauto(ielmc,MID3)+OMEauto(ielmp,MID3)/rPCOMCff(3,NGL))))
     RCCC=RCCZ+AMAX1(CCC,C3C)*RCCY
     RCCN=CNC*RCCX
     RCCP=CPC*RCCQ
@@ -554,14 +553,14 @@ module MicAutoCPLXMod
 !     OMC,OMN,OMP=nonstructural microbial C,N,P
 !
   MID3=micpar%get_micb_id(3,NGL)
-  CGOMZ=TFNGff(NGL)*OMGR*AZMAX1(OMCff(MID3))
+  CGOMZ=TFNGff(NGL)*OMGR*AZMAX1(OMEauto(ielmc,MID3))
   DO  M=1,2
     CGOMSff(M,NGL)=FL(M)*CGOMZ
-    IF(OMCff(MID3).GT.ZEROS)THEN
-      CGONSff(M,NGL)=AMIN1(FL(M)*AZMAX1(OMNff(MID3)) &
-        ,CGOMSff(M,NGL)*OMNff(MID3)/OMCff(MID3))
-      CGOPSff(M,NGL)=AMIN1(FL(M)*AZMAX1(OMPff(MID3)) &
-        ,CGOMSff(M,NGL)*OMPff(MID3)/OMCff(MID3))
+    IF(OMEauto(ielmc,MID3).GT.ZEROS)THEN
+      CGONSff(M,NGL)=AMIN1(FL(M)*AZMAX1(OMEauto(ielmn,MID3)) &
+        ,CGOMSff(M,NGL)*OMEauto(ielmn,MID3)/OMEauto(ielmc,MID3))
+      CGOPSff(M,NGL)=AMIN1(FL(M)*AZMAX1(OMEauto(ielmp,MID3)) &
+        ,CGOMSff(M,NGL)*OMEauto(ielmp,MID3)/OMEauto(ielmc,MID3))
     ELSE
       CGONSff(M,NGL)=0.0_r8
       CGOPSff(M,NGL)=0.0_r8
@@ -579,9 +578,9 @@ module MicAutoCPLXMod
 !
     MID=micpar%get_micb_id(M,NGL)
     SPOMX=SQRT(TFNGff(NGL))*SPOMC(M)*SPOMK(M)
-    RXOMCff(M,NGL)=AZMAX1(OMCff(MID)*SPOMX)
-    RXOMNff(M,NGL)=AZMAX1(OMNff(MID)*SPOMX)
-    RXOMPff(M,NGL)=AZMAX1(OMPff(MID)*SPOMX)
+    RXOMCff(M,NGL)=AZMAX1(OMEauto(ielmc,MID)*SPOMX)
+    RXOMNff(M,NGL)=AZMAX1(OMEauto(ielmn,MID)*SPOMX)
+    RXOMPff(M,NGL)=AZMAX1(OMEauto(ielmp,MID)*SPOMX)
     RDOMCff(M,NGL)=RXOMCff(M,NGL)*(1.0_r8-RCCC)
     RDOMNff(M,NGL)=RXOMNff(M,NGL)*(1.0_r8-RCCC)*(1.0_r8-RCCN)
     RDOMPff(M,NGL)=RXOMPff(M,NGL)*(1.0_r8-RCCC)*(1.0_r8-RCCP)
@@ -623,9 +622,9 @@ module MicAutoCPLXMod
   IF(RXOMT.GT.ZEROS.AND.RMOMT.GT.ZEROS.AND.RCCC.GT.ZERO)THEN
     FRM=RXOMT/RMOMT
     DO  M=1,2
-      RXMMCff(M,NGL)=AMIN1(OMCff(MID),AZMAX1(FRM*RMOMCff(M,NGL)/RCCC))
-      RXMMNff(M,NGL)=AMIN1(OMNff(MID),AZMAX1(RXMMCff(M,NGL)*CNOMAff(NGL)))
-      RXMMPff(M,NGL)=AMIN1(OMPff(MID),AZMAX1(RXMMCff(M,NGL)*CPOMAff(NGL)))
+      RXMMCff(M,NGL)=AMIN1(OMEauto(ielmc,MID),AZMAX1(FRM*RMOMCff(M,NGL)/RCCC))
+      RXMMNff(M,NGL)=AMIN1(OMEauto(ielmn,MID),AZMAX1(RXMMCff(M,NGL)*CNOMAff(NGL)))
+      RXMMPff(M,NGL)=AMIN1(OMEauto(ielmp,MID),AZMAX1(RXMMCff(M,NGL)*CPOMAff(NGL)))
       RDMMCff(M,NGL)=RXMMCff(M,NGL)*(1.0_r8-RCCC)
       RDMMNff(M,NGL)=RXMMNff(M,NGL)*(1.0_r8-RCCN)*(1.0_r8-RCCC)
       RDMMPff(M,NGL)=RXMMPff(M,NGL)*(1.0_r8-RCCP)*(1.0_r8-RCCC)
@@ -1512,8 +1511,7 @@ module MicAutoCPLXMod
    VLPO4    => micfor%VLPO4     , &
    VLPOB    => micfor%VLPOB     , &
    litrm    => micfor%litrm     , &
-   OMCff    => micstt%OMCff     , &
-   OMNff    => micstt%OMNff     , &
+   OMEauto    => micstt%OMEauto     , &
    ZNH4S    => micstt%ZNH4S     , &
    ZNH4B    => micstt%ZNH4B     , &
    ZNO3S    => micstt%ZNO3S     , &
@@ -1530,7 +1528,6 @@ module MicAutoCPLXMod
    CH1P4B   => micstt%CH1P4B    , &
    H1PO4    => micstt%H1PO4     , &
    H1POB    => micstt%H1POB     , &
-   OMPff    => micstt%OMPff     , &
    RINHOff  => micflx%RINHOff   , &
    RINHBff  => micflx%RINHBff   , &
    RINOOff  => micflx%RINOOff   , &
@@ -1574,7 +1571,7 @@ module MicAutoCPLXMod
   FNH4S=VLNH4
   FNHBS=VLNHB
   MID3=micpar%get_micb_id(3,NGL)
-  RINHP=OMCff(MID3)*rNCOMCff(3,NGL)-OMNff(MID3)
+  RINHP=OMEauto(ielmc,MID3)*rNCOMCff(3,NGL)-OMEauto(ielmn,MID3)
   IF(RINHP.GT.0.0_r8)THEN
     CNH4X=AZMAX1(CNH4S-Z4MN)
     CNH4Y=AZMAX1(CNH4B-Z4MN)
@@ -1657,7 +1654,7 @@ module MicAutoCPLXMod
   FH2PS=VLPO4
   FH2PB=VLPOB
   MID3=micpar%get_micb_id(3,NGL)
-  RIPOP=(OMCff(MID3)*rPCOMCff(3,NGL)-OMPff(MID3))
+  RIPOP=(OMEauto(ielmc,MID3)*rPCOMCff(3,NGL)-OMEauto(ielmp,MID3))
   IF(RIPOP.GT.0.0)THEN
     CH2PX=AZMAX1(CH2P4-HPMN)
     CH2PY=AZMAX1(CH2P4B-HPMN)
@@ -1882,7 +1879,7 @@ module MicAutoCPLXMod
     RGN2Fff => nmicf%RGN2Fff,     &
     RN2FXff  => nmicf%RN2FXff,    &
     pH      => micfor%pH    ,    &
-    OMNff   => micstt%OMNFF       &
+    OMEauto   => micstt%OMEauto       &
 
   )
 !     pH EFFECT ON MAINTENANCE RESPIRATION
@@ -1896,7 +1893,7 @@ module MicAutoCPLXMod
   MID1=micpar%get_micb_id(1,NGL)
   FPH=1.0_r8+AZMAX1(0.25_r8*(6.5_r8-PH))
   RMOMX=RMOM*TFNRff(NGL)*FPH
-  RMOMCff(1,NGL)=OMNff(MID1)*RMOMX*RMOMK(1)
+  RMOMCff(1,NGL)=OMEauto(ielmn,MID1)*RMOMX*RMOMK(1)
   RMOMCff(2,NGL)=OMN2ff(NGL)*RMOMX*RMOMK(2)
 !
 !     MICROBIAL MAINTENANCE AND GROWTH RESPIRATION
@@ -1990,9 +1987,7 @@ module MicAutoCPLXMod
     OSC       => micstt%OSC    , &
     OSN       => micstt%OSN    , &
     OSP       => micstt%OSP    , &
-    OMCff     => micstt%OMCff  , &
-    OMNff     => micstt%OMNff  , &
-    OMPff     => micstt%OMPff  , &
+    OMEauto     => micstt%OMEauto  , &
     OSC14U    => micstt%OSC14U , &
     OSN14U    => micstt%OSN14U , &
     OSP14U    => micstt%OSP14U , &
@@ -2012,9 +2007,9 @@ module MicAutoCPLXMod
       DO NGL=JGniA(N),JGnfA(N)
         DO  M=1,2
           MID=micpar%get_micb_id(M,NGL)
-          OMCff(MID)=OMCff(MID)+CGOMSff(M,NGL)-RXOMCff(M,NGL)-RXMMCff(M,NGL)
-          OMNff(MID)=OMNff(MID)+CGONSff(M,NGL)-RXOMNff(M,NGL)-RXMMNff(M,NGL)
-          OMPff(MID)=OMPff(MID)+CGOPSff(M,NGL)-RXOMPff(M,NGL)-RXMMPff(M,NGL)
+          OMEauto(ielmc,MID)=OMEauto(ielmc,MID)+CGOMSff(M,NGL)-RXOMCff(M,NGL)-RXMMCff(M,NGL)
+          OMEauto(ielmn,MID)=OMEauto(ielmn,MID)+CGONSff(M,NGL)-RXOMNff(M,NGL)-RXMMNff(M,NGL)
+          OMEauto(ielmp,MID)=OMEauto(ielmp,MID)+CGOPSff(M,NGL)-RXOMPff(M,NGL)-RXMMPff(M,NGL)
 
 !     HUMIFICATION PRODUCTS
 !
@@ -2061,19 +2056,19 @@ module MicAutoCPLXMod
         RCO2Xff(NGL)=RCO2Xff(NGL)+RGN2Fff(NGL)
         MID3=micpar%get_micb_id(3,NGL)
         DO M=1,2
-          OMCff(MID3)=OMCff(MID3)-CGOMSff(M,NGL)+R3OMCff(M,NGL)
-          OMNff(MID3)=OMNff(MID3)-CGONSff(M,NGL)+R3OMNff(M,NGL)+R3MMNff(M,NGL)
-          OMPff(MID3)=OMPff(MID3)-CGOPSff(M,NGL)+R3OMPff(M,NGL)+R3MMPff(M,NGL)
+          OMEauto(ielmc,MID3)=OMEauto(ielmc,MID3)-CGOMSff(M,NGL)+R3OMCff(M,NGL)
+          OMEauto(ielmn,MID3)=OMEauto(ielmn,MID3)-CGONSff(M,NGL)+R3OMNff(M,NGL)+R3MMNff(M,NGL)
+          OMEauto(ielmp,MID3)=OMEauto(ielmp,MID3)-CGOPSff(M,NGL)+R3OMPff(M,NGL)+R3MMPff(M,NGL)
           RCO2Xff(NGL)=RCO2Xff(NGL)+R3MMCff(M,NGL)
         ENDDO
-        OMCff(MID3)=OMCff(MID3)+CGROMC
-        OMNff(MID3)=OMNff(MID3)+CGOMNff(NGL) &
+        OMEauto(ielmc,MID3)=OMEauto(ielmc,MID3)+CGROMC
+        OMEauto(ielmn,MID3)=OMEauto(ielmn,MID3)+CGOMNff(NGL) &
           +RINH4ff(NGL)+RINB4ff(NGL)+RINO3ff(NGL)+RINB3ff(NGL)+RN2FXff(NGL)
-        OMPff(MID3)=OMPff(MID3)+CGOMPff(NGL) &
+        OMEauto(ielmp,MID3)=OMEauto(ielmp,MID3)+CGOMPff(NGL) &
           +RIPO4ff(NGL)+RIPOBff(NGL)+RIP14ff(NGL)+RIP1Bff(NGL)
         IF(litrm)THEN
-          OMNff(MID3)=OMNff(MID3)+RINH4Rff(NGL)+RINO3Rff(NGL)
-          OMPff(MID3)=OMPff(MID3)+RIPO4Rff(NGL)+RIP14Rff(NGL)
+          OMEauto(ielmn,MID3)=OMEauto(ielmn,MID3)+RINH4Rff(NGL)+RINO3Rff(NGL)
+          OMEauto(ielmp,MID3)=OMEauto(ielmp,MID3)+RIPO4Rff(NGL)+RIP14Rff(NGL)
         ENDIF
       enddo
     ENDIF

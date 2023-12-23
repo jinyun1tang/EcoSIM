@@ -45,12 +45,12 @@ contains
   allocate(Eco_AutoR_col(JY,JX));        Eco_AutoR_col=0._r8
   allocate(Eco_NPP_col(JY,JX));        Eco_NPP_col=0._r8
   allocate(Eco_HR_col(JY,JX));        Eco_HR_col=0._r8
-  allocate(EcoHavstElmnt_col(NumOfPlantChemElmnts,JY,JX));      EcoHavstElmnt_col=0._r8
+  allocate(EcoHavstElmnt_col(NumPlantChemElmnts,JY,JX));      EcoHavstElmnt_col=0._r8
   allocate(NetNH4Mineralize_col(JY,JX));      NetNH4Mineralize_col=0._r8
   allocate(NetPO4Mineralize_col(JY,JX));      NetPO4Mineralize_col=0._r8
   allocate(GPP(JY,JX));         GPP=0._r8
   allocate(Canopy_NEE_col(JY,JX));       Canopy_NEE_col=0._r8
-  allocate(LitterFallChemElmnt_col(NumOfPlantChemElmnts,JY,JX));       LitterFallChemElmnt_col=0._r8
+  allocate(LitterFallChemElmnt_col(NumPlantChemElmnts,JY,JX));       LitterFallChemElmnt_col=0._r8
   allocate(ECO_ER_col(JY,JX));        ECO_ER_col=0._r8
   allocate(Eco_NBP_col(JY,JX));        Eco_NBP_col=0._r8
   allocate(RP14X(0:JZ,JY,JX));  RP14X=0._r8

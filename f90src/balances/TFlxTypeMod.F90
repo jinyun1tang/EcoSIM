@@ -61,15 +61,10 @@ implicit none
   real(r8),allocatable ::  VLWatMacP1(:,:,:)                      !
   real(r8),allocatable ::  VLiceMacP1(:,:,:)                      !
 
-  real(r8),allocatable :: TOMCER(:,:,:,:,:)
-  real(r8),allocatable :: TOMNER(:,:,:,:,:)
-  real(r8),allocatable :: TOMPER(:,:,:,:,:)
+  real(r8),allocatable :: TOMEERhetr(:,:,:,:,:)
 
-
-  real(r8),allocatable :: TOMCERff(:,:,:,:)
-  real(r8),allocatable :: TOMNERff(:,:,:,:)
-  real(r8),allocatable :: TOMPERff(:,:,:,:)
-
+  real(r8),allocatable :: TOMEERauto(:,:,:,:)
+ 
   real(r8),allocatable ::  DOM_Transp2Micp_flx(:,:,:,:,:)
   real(r8),allocatable ::  DOM_Transp2Macp_flx(:,:,:,:,:)
   real(r8),allocatable ::  TOCQRS(:,:,:)
@@ -154,13 +149,9 @@ implicit none
   allocate(VLiceMicP1(JZ,JY,JX));    VLiceMicP1=0._r8
   allocate(VLWatMacP1(JZ,JY,JX));   VLWatMacP1=0._r8
   allocate(VLiceMacP1(JZ,JY,JX));   VLiceMacP1=0._r8
-  allocate(TOMCER(nlbiomcp,NumMicrbHetetrophCmplx,1:jcplx,JY,JX)); TOMCER=0._r8
-  allocate(TOMNER(nlbiomcp,NumMicrbHetetrophCmplx,1:jcplx,JY,JX)); TOMNER=0._r8
-  allocate(TOMPER(nlbiomcp,NumMicrbHetetrophCmplx,1:jcplx,JY,JX)); TOMPER=0._r8
+  allocate(TOMEERhetr(NumPlantChemElmnts,1:NumLiveHeterBioms,1:jcplx,JY,JX)); TOMEERhetr=0._r8
 
-  allocate(TOMCERff(nlbiomcp,NumMicrobAutotrophCmplx,JY,JX));TOMCERff=0._r8
-  allocate(TOMNERff(nlbiomcp,NumMicrobAutotrophCmplx,JY,JX));TOMNERff=0._r8
-  allocate(TOMPERff(nlbiomcp,NumMicrobAutotrophCmplx,JY,JX));TOMPERff=0._r8
+  allocate(TOMEERauto(NumPlantChemElmnts,1:NumLiveAutoBioms,JY,JX));TOMEERauto=0._r8
 
   allocate(DOM_Transp2Micp_flx(idom_beg:idom_end,1:jcplx,JZ,JY,JX));DOM_Transp2Micp_flx=0._r8
   allocate(DOM_Transp2Macp_flx(idom_beg:idom_end,1:jcplx,JZ,JY,JX));DOM_Transp2Macp_flx=0._r8
@@ -191,12 +182,8 @@ implicit none
 
   call destroy(trcx_TER)
 
-  call destroy(TOMCER)
-  call destroy(TOMNER)
-  call destroy(TOMPER)
-  call destroy(TOMCERff)
-  call destroy(TOMNERff)
-  call destroy(TOMPERff)
+  call destroy(TOMEERhetr)
+  call destroy(TOMEERauto)
   call destroy(TOCQRS)
   call destroy(TONQRS)
   call destroy(TOPQRS)

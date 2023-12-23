@@ -130,15 +130,15 @@ implicit none
           DO NGL=JGnio(N),JGnfo(N)
             DO M=1,nlbiomcp
               MID=micpar%get_micb_id(M,NGL)
-              FOMC=FSINK*OMC(MID,K,L,NY,NX)
-              FOMN=FSINK*OMN(MID,K,L,NY,NX)
-              FOMP=FSINK*OMP(MID,K,L,NY,NX)
-              OMC(MID,K,LL,NY,NX)=OMC(MID,K,LL,NY,NX)+FOMC
-              OMN(MID,K,LL,NY,NX)=OMN(MID,K,LL,NY,NX)+FOMN
-              OMP(MID,K,LL,NY,NX)=OMP(MID,K,LL,NY,NX)+FOMP
-              OMC(MID,K,L,NY,NX)=OMC(MID,K,L,NY,NX)-FOMC
-              OMN(MID,K,L,NY,NX)=OMN(MID,K,L,NY,NX)-FOMN
-              OMP(MID,K,L,NY,NX)=OMP(MID,K,L,NY,NX)-FOMP
+              FOMC=FSINK*OMEhetr(ielmc,MID,K,L,NY,NX)
+              FOMN=FSINK*OMEhetr(ielmn,MID,K,L,NY,NX)
+              FOMP=FSINK*OMEhetr(ielmp,MID,K,L,NY,NX)
+              OMEhetr(ielmc,MID,K,LL,NY,NX)=OMEhetr(ielmc,MID,K,LL,NY,NX)+FOMC
+              OMEhetr(ielmn,MID,K,LL,NY,NX)=OMEhetr(ielmn,MID,K,LL,NY,NX)+FOMN
+              OMEhetr(ielmp,MID,K,LL,NY,NX)=OMEhetr(ielmp,MID,K,LL,NY,NX)+FOMP
+              OMEhetr(ielmc,MID,K,L,NY,NX)=OMEhetr(ielmc,MID,K,L,NY,NX)-FOMC
+              OMEhetr(ielmn,MID,K,L,NY,NX)=OMEhetr(ielmn,MID,K,L,NY,NX)-FOMN
+              OMEhetr(ielmp,MID,K,L,NY,NX)=OMEhetr(ielmp,MID,K,L,NY,NX)-FOMP
             enddo
           enddo
         ENDDO D1960
@@ -153,15 +153,15 @@ implicit none
         DO NGL=JGniA(N),JGnfA(N)
           DO M=1,nlbiomcp
             MID=micpar%get_micb_id(M,NGL)          
-            FOMC=FSINK*OMCff(MID,L,NY,NX)
-            FOMN=FSINK*OMNff(MID,L,NY,NX)
-            FOMP=FSINK*OMPff(MID,L,NY,NX)
-            OMCff(MID,LL,NY,NX)=OMCff(MID,LL,NY,NX)+FOMC
-            OMNff(MID,LL,NY,NX)=OMNff(MID,LL,NY,NX)+FOMN
-            OMPff(MID,LL,NY,NX)=OMPff(MID,LL,NY,NX)+FOMP
-            OMCff(MID,L,NY,NX)=OMCff(MID,L,NY,NX)-FOMC
-            OMNff(MID,L,NY,NX)=OMNff(MID,L,NY,NX)-FOMN
-            OMPff(MID,L,NY,NX)=OMPff(MID,L,NY,NX)-FOMP
+            FOMC=FSINK*OMEauto(ielmc,MID,L,NY,NX)
+            FOMN=FSINK*OMEauto(ielmn,MID,L,NY,NX)
+            FOMP=FSINK*OMEauto(ielmp,MID,L,NY,NX)
+            OMEauto(ielmc,MID,LL,NY,NX)=OMEauto(ielmc,MID,LL,NY,NX)+FOMC
+            OMEauto(ielmn,MID,LL,NY,NX)=OMEauto(ielmn,MID,LL,NY,NX)+FOMN
+            OMEauto(ielmp,MID,LL,NY,NX)=OMEauto(ielmp,MID,LL,NY,NX)+FOMP
+            OMEauto(ielmc,MID,L,NY,NX)=OMEauto(ielmc,MID,L,NY,NX)-FOMC
+            OMEauto(ielmn,MID,L,NY,NX)=OMEauto(ielmn,MID,L,NY,NX)-FOMN
+            OMEauto(ielmp,MID,L,NY,NX)=OMEauto(ielmp,MID,L,NY,NX)-FOMP
           enddo
         enddo
       ENDDO
@@ -240,13 +240,8 @@ implicit none
     trcx_TER(idx_beg:idx_end,NY,NX)=0.0_r8
     trcp_TER(idsp_beg:idsp_end,NY,NX)=0.0_r8
 
-    TOMCER(1:nlbiomcp,1:NumMicrbHetetrophCmplx,1:jcplx,NY,NX)=0.0_r8
-    TOMNER(1:nlbiomcp,1:NumMicrbHetetrophCmplx,1:jcplx,NY,NX)=0.0_r8
-    TOMPER(1:nlbiomcp,1:NumMicrbHetetrophCmplx,1:jcplx,NY,NX)=0.0_r8
-
-    TOMCERff(1:nlbiomcp,1:NumMicrobAutotrophCmplx,NY,NX)=0.0_r8
-    TOMNERff(1:nlbiomcp,1:NumMicrobAutotrophCmplx,NY,NX)=0.0_r8
-    TOMPERff(1:nlbiomcp,1:NumMicrobAutotrophCmplx,NY,NX)=0.0_r8
+    TOMEERhetr(1:NumPlantChemElmnts,1:NumLiveHeterBioms,1:jcplx,NY,NX)=0.0_r8
+    TOMEERauto(1:NumPlantChemElmnts,1:NumLiveAutoBioms,NY,NX)=0.0_r8
 
     TORCER(1:ndbiomcp,1:jcplx,NY,NX)=0.0_r8
     TORNER(1:ndbiomcp,1:jcplx,NY,NX)=0.0_r8

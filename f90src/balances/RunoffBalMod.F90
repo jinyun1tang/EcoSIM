@@ -14,8 +14,9 @@ module RunoffBalMod
   USE EcoSIMCtrlDataType
   USE GridDataType
   use EcoSIMCtrlMod
-  use EcoSIMConfig, only : jcplx => jcplxc
-  use ElmIDMod     , only : iewstdir,insthdir,ivertdir  
+  use ElmIDMod   
+  use EcoSiMParDataMod    , only : micpar  
+  use EcoSIMConfig, only : jcplx => jcplxc  
   use EcosimConst, only : patomw,natomw
 implicit none
   private
@@ -134,7 +135,7 @@ implicit none
   real(r8), intent(out) :: CXR,ZXR,PXR,ZGR
 
   real(r8) :: SS1,SS2,SS3,SS4,SSR
-  real(r8) :: OMRof(NumOfPlantChemElmnts)
+  real(r8) :: OMRof(NumPlantChemElmnts)
   real(r8) :: CXE,COE,COD
   real(r8) :: ECHY,ECOH,ECAL,ECFE,ECCA,ECMG,ECNA,ECKA
   real(r8) :: ECCO,ECHC,ECSO,ECCL,ECNO
@@ -145,7 +146,7 @@ implicit none
   real(r8) :: WX,HGR,PSS
   real(r8) :: WQRN,HQRN
   real(r8) :: OXR,ER
-  integer :: K,M,NO,NGL,NE
+  integer :: K,M,NO,NGL,NE,MID
 
 !     begin_execution
 !     RUNOFF BOUNDARY FLUXES OF WATER AND HEAT
@@ -184,7 +185,7 @@ implicit none
       PXR=XN*(trcn_2DFloXSurRunoff(ids_H2PO4,N,NN,N5,N4)+trcn_2DFloXSurRunoff(ids_H1PO4,N,NN,N5,N4))
       OMRof(:)=0.0_r8
       D2575: DO K=1,jcplx
-        DO NE=1,NumOfPlantChemElmnts
+        DO NE=1,NumPlantChemElmnts
           OMRof(NE)=OMRof(NE)+XN*dom_2DFloXSurRunoff(idom_doc,K,N,NN,N5,N4)
         ENDDO
         OMRof(ielmc)=OMRof(ielmc)+XN*dom_2DFloXSurRunoff(idom_acetate,K,N,NN,N5,N4)
@@ -334,9 +335,10 @@ implicit none
             DO NO=1,NumMicbFunGroups
               DO M=1,nlbiomcp
                 DO NGL=JGnio(NO),JGnfo(NO)
-                  COE=COE+XN*OMCER(M+(NGL-1)*nlbiomcp,K,N,NN,N5,N4)
-                  ZOE=ZOE+XN*OMNER(M+(NGL-1)*nlbiomcp,K,N,NN,N5,N4)
-                  POE=POE+XN*OMPER(M+(NGL-1)*nlbiomcp,K,N,NN,N5,N4)
+                  MID=micpar%get_micb_id(M,NGL)                
+                  COE=COE+XN*OMEERhetr(ielmc,MID,K,N,NN,N5,N4)
+                  ZOE=ZOE+XN*OMEERhetr(ielmn,MID,K,N,NN,N5,N4)
+                  POE=POE+XN*OMEERhetr(ielmp,MID,K,N,NN,N5,N4)
                 enddo
               enddo
             enddo
@@ -344,9 +346,10 @@ implicit none
           DO NO=1,NumMicbFunGroups
             DO M=1,nlbiomcp
               DO NGL=JGniA(NO),JGnfA(NO)
-                COE=COE+XN*OMCERff(M+(NGL-1)*nlbiomcp,N,NN,N5,N4)
-                ZOE=ZOE+XN*OMNERff(M+(NGL-1)*nlbiomcp,N,NN,N5,N4)
-                POE=POE+XN*OMPERff(M+(NGL-1)*nlbiomcp,N,NN,N5,N4)
+                MID=micpar%get_micb_id(M,NGL)
+                COE=COE+XN*OMEERauto(ielmc,MID,N,NN,N5,N4)
+                ZOE=ZOE+XN*OMEERauto(ielmn,MID,N,NN,N5,N4)
+                POE=POE+XN*OMEERauto(ielmp,MID,N,NN,N5,N4)
               enddo
             enddo
           enddo
