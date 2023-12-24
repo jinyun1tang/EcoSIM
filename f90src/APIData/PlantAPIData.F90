@@ -310,7 +310,7 @@ implicit none
   real(r8), pointer :: TCelciusChill4Seed(:)     => null()     !temperature below which seed set is adversely affected, [oC]
   real(r8), pointer :: iPlantThermoAdaptZone(:)    => null()     !plant thermal adaptation zone, [-]
   real(r8), pointer :: iPlantInitThermoAdaptZone(:)   => null()     !initial plant thermal adaptation zone, [-]
-  real(r8), pointer :: HTC(:)     => null()     !temperature above which seed set is adversely affected, [oC]
+  real(r8), pointer :: HighTCLimtSeed_pft(:)     => null()     !temperature above which seed set is adversely affected, [oC]
   real(r8), pointer :: SSTX(:)    => null()     !sensitivity to HTC (seeds oC-1 above HTC)
   integer,  pointer :: iPlantState_pft(:)    => null()     !flag for species death
   integer,  pointer :: IsPlantActive_pft(:)   => null()     !flag for living pft
@@ -1811,7 +1811,7 @@ implicit none
   allocate(this%GrainFillRateat25C_pft(JP1))
   allocate(this%ShutRutNonstructElmntConducts_pft(JP1))
   allocate(this%SSTX(JP1))
-  allocate(this%HTC(JP1))
+  allocate(this%HighTCLimtSeed_pft(JP1))
   allocate(this%iPlantInitThermoAdaptZone(JP1))
   allocate(this%iPlantThermoAdaptZone(JP1))
   allocate(this%IsPlantActive_pft(JP1))

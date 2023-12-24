@@ -1816,7 +1816,7 @@ module PlantBranchMod
     GrainFillRateat25C_pft    =>  plt_pheno%GrainFillRateat25C_pft    , &
     SSTX     =>  plt_pheno%SSTX     , &
     iPlantPhenologyPattern_pft   =>  plt_pheno%iPlantPhenologyPattern_pft   , &
-    HTC      =>  plt_pheno%HTC      , &
+    HighTCLimtSeed_pft     =>  plt_pheno%HighTCLimtSeed_pft     , &
     HourReprodNodeNumNormByMatrgrp_brch   =>  plt_pheno%HourReprodNodeNumNormByMatrgrp_brch   , &
     iPlantCalendar_brch   =>  plt_pheno%iPlantCalendar_brch   , &
     TCelciusChill4Seed     =>  plt_pheno%TCelciusChill4Seed     , &
@@ -1873,11 +1873,11 @@ module PlantBranchMod
       ELSE
         FGRNX=0._r8
       ENDIF
-    ELSEIF(TCelciusCanopy_pft(NZ).GT.HTC(NZ))THEN
+    ELSEIF(TCelciusCanopy_pft(NZ).GT.HighTCLimtSeed_pft(NZ))THEN
       IF(iPlantCalendar_brch(ipltcal_BeginSeedFill,NB,NZ).EQ.0)THEN
-        FGRNX=SSTX(NZ)*(TCelciusCanopy_pft(NZ)-HTC(NZ))
+        FGRNX=SSTX(NZ)*(TCelciusCanopy_pft(NZ)-HighTCLimtSeed_pft(NZ))
       ELSEIF(iPlantCalendar_brch(ipltcal_SetSeedNumber,NB,NZ).EQ.0)THEN
-        FGRNX=SSTX(NZ)*(TCelciusCanopy_pft(NZ)-HTC(NZ))
+        FGRNX=SSTX(NZ)*(TCelciusCanopy_pft(NZ)-HighTCLimtSeed_pft(NZ))
       ELSE
         FGRNX=0._r8
       ENDIF

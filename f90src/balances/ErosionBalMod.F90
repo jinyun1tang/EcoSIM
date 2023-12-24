@@ -224,7 +224,7 @@ implicit none
   integer, intent(in) :: NY,NX
 
   IF(iErosionMode.EQ.ieros_frzthaweros.OR.iErosionMode.EQ.ieros_frzthawsomeros)THEN
-    TSEDER(NY,NX)=0.0_r8
+    tErosionSedmLoss(NY,NX)=0.0_r8
     TSANER(NY,NX)=0.0_r8
     TSILER(NY,NX)=0.0_r8
     TCLAER(NY,NX)=0.0_r8

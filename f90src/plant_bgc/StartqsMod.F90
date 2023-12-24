@@ -391,15 +391,15 @@ module StartqsMod
   real(r8), parameter :: TCXD = 12.0_r8       !basal value for threshold temperature for autumn leafoff/hardening	oC
 
   associate(                            &
-    DATAP    =>  plt_site%DATAP   , &
+    DATAP                      =>  plt_site%DATAP   , &
     iPlantPhotosynthesisType   =>  plt_photo%iPlantPhotosynthesisType , &
-    HTC      =>  plt_pheno%HTC    , &
-    TCelcius4LeafOffHarden_pft      =>  plt_pheno%TCelcius4LeafOffHarden_pft    , &
-    TCelsChill4Leaf_pft     =>  plt_pheno%TCelsChill4Leaf_pft   , &
-    OFFST    =>  plt_pheno%OFFST  , &
-    iPlantInitThermoAdaptZone   =>  plt_pheno%iPlantInitThermoAdaptZone , &
-    iPlantThermoAdaptZone    =>  plt_pheno%iPlantThermoAdaptZone  , &
-    SSTX     =>  plt_pheno%SSTX     &
+    HighTCLimtSeed_pft         =>  plt_pheno%HighTCLimtSeed_pft   , &
+    TCelcius4LeafOffHarden_pft =>  plt_pheno%TCelcius4LeafOffHarden_pft    , &
+    TCelsChill4Leaf_pft        =>  plt_pheno%TCelsChill4Leaf_pft   , &
+    OFFST                      =>  plt_pheno%OFFST  , &
+    iPlantInitThermoAdaptZone  =>  plt_pheno%iPlantInitThermoAdaptZone , &
+    iPlantThermoAdaptZone      =>  plt_pheno%iPlantThermoAdaptZone  , &
+    SSTX                       =>  plt_pheno%SSTX     &
   )
 !
 !     PFT THERMAL ACCLIMATION
@@ -416,14 +416,14 @@ module StartqsMod
   TCelcius4LeafOffHarden_pft(NZ)=AMIN1(15.0_r8,TCXD-OFFST(NZ))
   IF(iPlantPhotosynthesisType(NZ).EQ.ic3_photo)THEN
     IF(DATAP(NZ)(1:4).EQ.'soyb')THEN
-      HTC(NZ)=30.0_r8+3.0_r8*iPlantThermoAdaptZone(NZ)
+      HighTCLimtSeed_pft(NZ)=30.0_r8+3.0_r8*iPlantThermoAdaptZone(NZ)
       SSTX(NZ)=0.002_r8
     ELSE
-      HTC(NZ)=27.0_r8+3.0_r8*iPlantThermoAdaptZone(NZ)
+      HighTCLimtSeed_pft(NZ)=27.0_r8+3.0_r8*iPlantThermoAdaptZone(NZ)
       SSTX(NZ)=0.002_r8
     ENDIF
   ELSE
-    HTC(NZ)=27.0_r8+3.0_r8*iPlantThermoAdaptZone(NZ)
+    HighTCLimtSeed_pft(NZ)=27.0_r8+3.0_r8*iPlantThermoAdaptZone(NZ)
     SSTX(NZ)=0.005_r8
   ENDIF
   end associate
@@ -885,31 +885,31 @@ module StartqsMod
   REAL(R8) :: COXYA
   REAL(R8) :: COXYP
   associate(                             &
-    OSMO     =>  plt_ew%OSMO       , &
-    PSICanopy_pft   =>  plt_ew%PSICanopy_pft     , &
-    PSIRoot_vr   =>  plt_ew%PSIRoot_vr     , &
-    PSIRootTurg_vr    =>  plt_ew%PSIRootTurg_vr      , &
-    PSIRootOSMO_vr    =>  plt_ew%PSIRootOSMO_vr      , &
-    RootN2Fix_pvr    =>  plt_bgcr%RootN2Fix_pvr    , &
-    trcg_rootml_vr     =>  plt_rbgc%trcg_rootml_vr     , &
-    trcs_rootml_vr     =>  plt_rbgc%trcs_rootml_vr     , &
-    OXYE     =>  plt_site%OXYE     , &
-    COXYE    =>  plt_site%COXYE    , &
-    CO2EI    =>  plt_site%CO2EI    , &
-    NL       =>  plt_site%NL       , &
-    ATCA     =>  plt_site%ATCA     , &
-    CCO2EI   =>  plt_site%CCO2EI   , &
+    OSMO                         =>  plt_ew%OSMO       , &
+    PSICanopy_pft                =>  plt_ew%PSICanopy_pft     , &
+    PSIRoot_vr                   =>  plt_ew%PSIRoot_vr     , &
+    PSIRootTurg_vr               =>  plt_ew%PSIRootTurg_vr      , &
+    PSIRootOSMO_vr               =>  plt_ew%PSIRootOSMO_vr      , &
+    RootN2Fix_pvr                =>  plt_bgcr%RootN2Fix_pvr    , &
+    trcg_rootml_vr               =>  plt_rbgc%trcg_rootml_vr     , &
+    trcs_rootml_vr               =>  plt_rbgc%trcs_rootml_vr     , &
+    OXYE                         =>  plt_site%OXYE     , &
+    COXYE                        =>  plt_site%COXYE    , &
+    CO2EI                        =>  plt_site%CO2EI    , &
+    NL                           =>  plt_site%NL       , &
+    ATCA                         =>  plt_site%ATCA     , &
+    CCO2EI                       =>  plt_site%CCO2EI   , &
     RootFracRemobilizableBiom    =>  plt_allom%RootFracRemobilizableBiom   , &
-    RootProteinConc_pftvr   =>  plt_biom%RootProteinConc_pftvr   , &
-    RootProteinC_pvr    =>  plt_biom%RootProteinC_pvr    , &
-    SeedDepth_pft    =>  plt_morph%SeedDepth_pft   , &
-    RootVH2O_vr   =>  plt_morph%RootVH2O_vr  , &
-    RootVolume_vr    =>  plt_morph%RootVolume_vr   , &
-    SecndRootRadius_pvr    =>  plt_morph%SecndRootRadius_pvr   , &
-    PrimRootRadius_pvr    =>  plt_morph%PrimRootRadius_pvr   , &
-    Max1stRootRadius   =>  plt_morph%Max1stRootRadius  , &
-    Max2ndRootRadius   =>  plt_morph%Max2ndRootRadius  , &
-    NumRootAxes_pft     =>  plt_morph%NumRootAxes_pft      &
+    RootProteinConc_pftvr        =>  plt_biom%RootProteinConc_pftvr   , &
+    RootProteinC_pvr             =>  plt_biom%RootProteinC_pvr    , &
+    SeedDepth_pft                =>  plt_morph%SeedDepth_pft   , &
+    RootVH2O_vr                  =>  plt_morph%RootVH2O_vr  , &
+    RootVolume_vr                =>  plt_morph%RootVolume_vr   , &
+    SecndRootRadius_pvr          =>  plt_morph%SecndRootRadius_pvr   , &
+    PrimRootRadius_pvr           =>  plt_morph%PrimRootRadius_pvr   , &
+    Max1stRootRadius             =>  plt_morph%Max1stRootRadius  , &
+    Max2ndRootRadius             =>  plt_morph%Max2ndRootRadius  , &
+    NumRootAxes_pft              =>  plt_morph%NumRootAxes_pft      &
   )
 !
 !     INITIALIZE ROOT(N=1),MYCORRHIZAL(N=2) MORPHOLOGY AND BIOMASS
@@ -927,7 +927,7 @@ module StartqsMod
   D40: DO N=1,pltpar%jroots
     D20: DO L=1,NL
       plt_ew%AllPlantRootH2OUptake_vr(N,L,NZ)=0._r8
-      PSIRoot_vr(N,L,NZ)=-0.01
+      PSIRoot_vr(N,L,NZ)=-0.01_r8
       PSIRootOSMO_vr(N,L,NZ)=OSMO(NZ)+PSIRoot_vr(N,L,NZ)
       PSIRootTurg_vr(N,L,NZ)=AZMAX1(PSIRoot_vr(N,L,NZ)-PSIRootOSMO_vr(N,L,NZ))
       plt_biom%RootMycoNonstructElmnt_vr(1:NumPlantChemElmnts,N,L,NZ)=0._r8
@@ -1015,14 +1015,14 @@ module StartqsMod
 
   associate(                             &
     PlantPopulation_pft       =>   plt_site%PlantPopulation_pft      , &
-    PSICanopy_pft   =>   plt_ew%PSICanopy_pft    , &
-    WatByPCanopy    =>   plt_ew%WatByPCanopy     , &
-    CanopyWater_pft    =>   plt_ew%CanopyWater_pft     , &
+    PSICanopy_pft             =>   plt_ew%PSICanopy_pft    , &
+    WatByPCanopy                 =>   plt_ew%WatByPCanopy     , &
+    CanopyWater_pft              =>   plt_ew%CanopyWater_pft     , &
     RootFracRemobilizableBiom    =>   plt_allom%RootFracRemobilizableBiom  , &
-    CNGR     =>   plt_allom%CNGR   , &
-    CPGR     =>   plt_allom%CPGR   , &
-    Root1stChemElmnt   =>   plt_biom%Root1stChemElmnt  , &
-    SeedCPlanted_pft    =>   plt_biom%SeedCPlanted_pft   , &
+    CNGR                         =>   plt_allom%CNGR   , &
+    CPGR                         =>   plt_allom%CPGR   , &
+    Root1stChemElmnt             =>   plt_biom%Root1stChemElmnt  , &
+    SeedCPlanted_pft             =>   plt_biom%SeedCPlanted_pft   , &
     Root1stStructChemElmnt_pvr   =>   plt_biom%Root1stStructChemElmnt_pvr  , &
     LeafPetolBiomassC_brch    =>   plt_biom%LeafPetolBiomassC_brch   , &
     CanopyLeafShethC_pft     =>   plt_biom%CanopyLeafShethC_pft    , &

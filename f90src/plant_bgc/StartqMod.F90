@@ -377,14 +377,14 @@ module StartqMod
   TCelcius4LeafOffHarden_pft(NZ,NY,NX)=AMIN1(15.0,TCXD-OFFST(NZ,NY,NX))
   IF(iPlantPhotosynthesisType(NZ,NY,NX).EQ.3)THEN
     IF(DATAP(NZ,NY,NX)(1:4).EQ.'soyb')THEN
-      HTC(NZ,NY,NX)=30.0_r8+3.0_r8*iPlantThermoAdaptZone(NZ,NY,NX)
+      HighTCLimtSeed_pft(NZ,NY,NX)=30.0_r8+3.0_r8*iPlantThermoAdaptZone(NZ,NY,NX)
       SSTX(NZ,NY,NX)=0.002_r8
     ELSE
-      HTC(NZ,NY,NX)=27.0_r8+3.0_r8*iPlantThermoAdaptZone(NZ,NY,NX)
+      HighTCLimtSeed_pft(NZ,NY,NX)=27.0_r8+3.0_r8*iPlantThermoAdaptZone(NZ,NY,NX)
       SSTX(NZ,NY,NX)=0.002_r8
     ENDIF
   ELSE
-    HTC(NZ,NY,NX)=27.0_r8+3.0_r8*iPlantThermoAdaptZone(NZ,NY,NX)
+    HighTCLimtSeed_pft(NZ,NY,NX)=27.0_r8+3.0_r8*iPlantThermoAdaptZone(NZ,NY,NX)
     SSTX(NZ,NY,NX)=0.005_r8
   ENDIF
   end subroutine PFTThermalAcclimation
@@ -716,14 +716,14 @@ module StartqMod
   D40: DO N=1,pltpar%jroots
     D20: DO L=1,NL(NY,NX)
       AllPlantRootH2OUptake_vr(N,L,NZ,NY,NX)=0._r8
-      PSIRoot_vr(N,L,NZ,NY,NX)=-0.01
+      PSIRoot_vr(N,L,NZ,NY,NX)=-0.01_r8
       PSIRootOSMO_vr(N,L,NZ,NY,NX)=OSMO(NZ,NY,NX)+PSIRoot_vr(N,L,NZ,NY,NX)
       PSIRootTurg_vr(N,L,NZ,NY,NX)=AZMAX1(PSIRoot_vr(N,L,NZ,NY,NX)-PSIRootOSMO_vr(N,L,NZ,NY,NX))
        RootMycoNonstructElmnt_vr(1:NumPlantChemElmnts,N,L,NZ,NY,NX)=0._r8
       RootNonstructElementConcpft_vr(1:NumPlantChemElmnts,N,L,NZ,NY,NX)=0._r8
       RootProteinConc_pftvr(N,L,NZ,NY,NX)=RootFracRemobilizableBiom(NZ,NY,NX)
       RootStructBiomC_vr(N,L,NZ,NY,NX)=0._r8
-       PopuPlantRootC_vr(N,L,NZ,NY,NX)=0._r8
+      PopuPlantRootC_vr(N,L,NZ,NY,NX)=0._r8
       RootProteinC_pvr(N,L,NZ,NY,NX)=0._r8
       PrimRootXNumL_pvr(N,L,NZ,NY,NX)=0._r8
       SecndRootXNum_pvr(N,L,NZ,NY,NX)=0._r8
@@ -836,10 +836,10 @@ module StartqMod
   Root1stChemElmnt(ielmn,1,1,NZ,NY,NX)=CNGR(NZ,NY,NX)*Root1stChemElmnt(ielmc,1,1,NZ,NY,NX)
   Root1stChemElmnt(ielmp,1,1,NZ,NY,NX)=CPGR(NZ,NY,NX)*Root1stChemElmnt(ielmc,1,1,NZ,NY,NX)
   RootStructBiomC_vr(ipltroot,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)=Root1stStructChemElmnt_pvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)
-   PopuPlantRootC_vr(ipltroot,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)=Root1stStructChemElmnt_pvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)
+  PopuPlantRootC_vr(ipltroot,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)=Root1stStructChemElmnt_pvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)
   RootProteinC_pvr(1,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)=RootStructBiomC_vr(ipltroot,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)*RootFracRemobilizableBiom(NZ,NY,NX)
-   RootMycoNonstructElmnt_vr(ielmn,1,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)=CNGR(NZ,NY,NX)* RootMycoNonstructElmnt_vr(ielmc,1,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)
-   RootMycoNonstructElmnt_vr(ielmp,1,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)=CPGR(NZ,NY,NX)* RootMycoNonstructElmnt_vr(ielmc,1,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)
+  RootMycoNonstructElmnt_vr(ielmn,1,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)=CNGR(NZ,NY,NX)* RootMycoNonstructElmnt_vr(ielmc,1,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)
+  RootMycoNonstructElmnt_vr(ielmp,1,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)=CPGR(NZ,NY,NX)* RootMycoNonstructElmnt_vr(ielmc,1,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)
   end subroutine InitSeedMorphoBio
 
   end module StartqMod

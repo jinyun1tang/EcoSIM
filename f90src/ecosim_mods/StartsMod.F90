@@ -835,8 +835,8 @@ module StartsMod
   integer :: L
 
   DO  L=0,NL(NY,NX)
-    DLYRI(1,L,NY,NX)=DH(NY,NX)
-    DLYRI(2,L,NY,NX)=DV(NY,NX)
+    DLYRI(1,L,NY,NX)=DH(NY,NX)    !east-west direction
+    DLYRI(2,L,NY,NX)=DV(NY,NX)    !north-south direction
     DLYR(1,L,NY,NX)=DLYRI(1,L,NY,NX)
     DLYR(2,L,NY,NX)=DLYRI(2,L,NY,NX)
     AREA(3,L,NY,NX)=DLYR(1,L,NY,NX)*DLYR(2,L,NY,NX)

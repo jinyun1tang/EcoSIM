@@ -78,17 +78,14 @@ module RedistMod
   integer, intent(in) :: NHW,NHE,NVN,NVS
 
   integer :: NY,NX,L,LG
-  real(r8) :: DORGC(JZ,JY,JX),DVLiceMicP(JZ,JY,JX)
+  real(r8) :: DORGC(JZ),DVLiceMicP(JZ)
   real(r8) :: TXCO2(JY,JX),DORGE(JY,JX)
-  real(r8) :: UDVLiceMicP,UDLYXF
   real(r8) :: VOLISO,VOLPT,VOLTT
   real(r8) :: TFLWT
 !     execution begins here
   curday=I
   curhour=J
   VOLISO=0.0_r8
-  UDVLiceMicP=0.0_r8
-  UDLYXF=0.0_r8
   TFLWT=0.0_r8
   VOLPT=0.0_r8
   VOLTT=0.0_r8
@@ -135,7 +132,7 @@ module RedistMod
 !     SNOWPACK LAYERING
       call SnowpackLayering(NY,NX)
 
-      call RelayerSoilProfile(NY,NX,DORGC(:,NY,NX),DVLiceMicP(:,NY,NX),UDVLiceMicP,UDLYXF)
+      call RelayerSoilProfile(NY,NX,DORGC,DVLiceMicP)
 
       call UpdateOutputVars(I,J,NY,NX,TXCO2)
 !
@@ -601,8 +598,8 @@ module RedistMod
   ! INTERNAL SURFACE SEDIMENT TRANSPORT
   !
   IF((iErosionMode.EQ.ieros_frzthaweros.OR.iErosionMode.EQ.ieros_frzthawsomeros) &
-    .AND.ABS(TSEDER(NY,NX)).GT.ZEROS(NY,NX))THEN
-    TSED(NY,NX)=TSED(NY,NX)+TSEDER(NY,NX)
+    .AND.ABS(tErosionSedmLoss(NY,NX)).GT.ZEROS(NY,NX))THEN
+    TSED(NY,NX)=TSED(NY,NX)+tErosionSedmLoss(NY,NX)
     !
     !     SOIL MINERAL FRACTIONS
     !
@@ -696,13 +693,13 @@ module RedistMod
   subroutine SumLitterLayerChemMass(NY,NX)
   implicit none
   integer, intent(in) :: NY,NX
-  integer :: K,N,M,NGL
+  integer :: K,N,M,NGL,NB,NE
   real(r8) :: PSS,HS,CS
   real(r8) :: DC,DN,DP,OS
   real(r8) :: POS,POX,POP
   real(r8) :: SSS,ZG,Z4S,WS,Z4X
   real(r8) :: Z4F,ZOS,ZOF
-  real(r8) :: tDC,tDN,tDP
+  real(r8) :: tDElmt(1:NumPlantChemElmnts)
   integer :: NumOfLitrCmplxs
 !     begin_execution
 !     TOTAL C,N,P, SALTS IN SURFACE RESIDUE
@@ -725,36 +722,42 @@ module RedistMod
     !
     ! TOTAL heterotrophic MICROBIAL C,N,P
     !
-    tDC=SUM(OMEhetr(ielmc,1:NumLiveHeterBioms,K,0,NY,NX))
-    tDN=SUM(OMEhetr(ielmn,1:NumLiveHeterBioms,K,0,NY,NX))
-    tDP=SUM(OMEhetr(ielmp,1:NumLiveHeterBioms,K,0,NY,NX))
-    DC=DC+tDC
-    DN=DN+tDN
-    DP=DP+tDP
-    RC0(K,NY,NX)=RC0(K,NY,NX)+tDC
-    TOMT(NY,NX)=TOMT(NY,NX)+tDC
-    TONT(NY,NX)=TONT(NY,NX)+tDN
-    TOPT(NY,NX)=TOPT(NY,NX)+tDP
-    OMCL(0,NY,NX)=OMCL(0,NY,NX)+tDC
-    OMNL(0,NY,NX)=OMNL(0,NY,NX)+tDN
+    tDElmt=0._r8    
+    DO NB=1,NumLiveHeterBioms
+      do NE=1,NumPlantChemElmnts
+        tDElmt(NE)=tDElmt(NE)+OMEhetr(NE,NB,K,0,NY,NX)
+      ENDDO
+    ENDDO
+    DC=DC+tDElmt(ielmc)
+    DN=DN+tDElmt(ielmn)
+    DP=DP+tDElmt(ielmp)
+    RC0(K,NY,NX)=RC0(K,NY,NX)+tDElmt(ielmc)
+    TOMT(NY,NX)=TOMT(NY,NX)+tDElmt(ielmc)
+    TONT(NY,NX)=TONT(NY,NX)+tDElmt(ielmn)
+    TOPT(NY,NX)=TOPT(NY,NX)+tDElmt(ielmp)
+    OMCL(0,NY,NX)=OMCL(0,NY,NX)+tDElmt(ielmc)
+    OMNL(0,NY,NX)=OMNL(0,NY,NX)+tDElmt(ielmn)
   ENDDO
 
   !
   ! TOTAL autotrophic MICROBIAL C,N,P
   !
-  tDC=SUM(OMEauto(ielmc,1:NumLiveAutoBioms,0,NY,NX))
-  tDN=SUM(OMEauto(ielmn,1:NumLiveAutoBioms,0,NY,NX))
-  tDP=SUM(OMEauto(ielmp,1:NumLiveAutoBioms,0,NY,NX))
-  DC=DC+tDC
-  DN=DN+tDN
-  DP=DP+tDP
+  tDElmt=0._r8
+  DO NB=1,NumLiveAutoBioms
+    DO NE=1,NumPlantChemElmnts
+      tDElmt(NE)=tDElmt(NE)+OMEauto(NE,NB,0,NY,NX)
+    ENDDO
+  ENDDO
+  DC=DC+tDElmt(ielmc)
+  DN=DN+tDElmt(ielmn)
+  DP=DP+tDElmt(ielmp)
 
-  RC0ff(NY,NX)=RC0ff(NY,NX)+tDC
-  TOMT(NY,NX)=TOMT(NY,NX)+tDC
-  TONT(NY,NX)=TONT(NY,NX)+tDN
-  TOPT(NY,NX)=TOPT(NY,NX)+tDP
-  OMCL(0,NY,NX)=OMCL(0,NY,NX)+tDC
-  OMNL(0,NY,NX)=OMNL(0,NY,NX)+tDN
+  RC0ff(NY,NX)=RC0ff(NY,NX)+tDElmt(ielmc)
+  TOMT(NY,NX)=TOMT(NY,NX)+tDElmt(ielmc)
+  TONT(NY,NX)=TONT(NY,NX)+tDElmt(ielmn)
+  TOPT(NY,NX)=TOPT(NY,NX)+tDElmt(ielmp)
+  OMCL(0,NY,NX)=OMCL(0,NY,NX)+tDElmt(ielmc)
+  OMNL(0,NY,NX)=OMNL(0,NY,NX)+tDElmt(ielmn)
 
   !
   !     TOTAL MICROBIAL RESIDUE C,N,P
@@ -765,21 +768,25 @@ module RedistMod
   DO K=1,NumOfLitrCmplxs
     RC0(K,NY,NX)=RC0(K,NY,NX)+SUM(ORC(1:ndbiomcp,K,0,NY,NX))
     RC0(K,NY,NX)=RC0(K,NY,NX)+DOM(idom_doc,K,0,NY,NX)+DOM_Macp(idom_doc,K,0,NY,NX) &
-      +OHC(K,0,NY,NX)+DOM(idom_acetate,K,0,NY,NX)+DOM_Macp(idom_acetate,K,0,NY,NX)+OHA(K,0,NY,NX)
+      +OHC(K,0,NY,NX)+DOM(idom_acetate,K,0,NY,NX) &
+      +DOM_Macp(idom_acetate,K,0,NY,NX)+OHA(K,0,NY,NX)
     RC0(K,NY,NX)=RC0(K,NY,NX)+SUM(OSC(1:jsken,K,0,NY,NX))
   ENDDO
 
 !
 !     TOTAL DOC, DON, DOP
 !
-  DC=DC+SUM(DOM(idom_doc,1:NumOfLitrCmplxs,0,NY,NX))+SUM(DOM_Macp(idom_doc,1:NumOfLitrCmplxs,0,NY,NX)) &
-       +SUM(OHC(1:NumOfLitrCmplxs,0,NY,NX))+SUM(DOM(idom_acetate,1:NumOfLitrCmplxs,0,NY,NX)) &
-       +SUM(DOM_Macp(idom_acetate,1:NumOfLitrCmplxs,0,NY,NX))+SUM(OHA(1:NumOfLitrCmplxs,0,NY,NX))
+  DC=DC+SUM(DOM(idom_doc,1:NumOfLitrCmplxs,0,NY,NX)) &
+    +SUM(DOM_Macp(idom_doc,1:NumOfLitrCmplxs,0,NY,NX)) &
+    +SUM(OHC(1:NumOfLitrCmplxs,0,NY,NX))+SUM(DOM(idom_acetate,1:NumOfLitrCmplxs,0,NY,NX)) &
+    +SUM(DOM_Macp(idom_acetate,1:NumOfLitrCmplxs,0,NY,NX))+SUM(OHA(1:NumOfLitrCmplxs,0,NY,NX))
 
-  DN=DN+SUM(DOM(idom_don,1:NumOfLitrCmplxs,0,NY,NX))+SUM(DOM_Macp(idom_don,1:NumOfLitrCmplxs,0,NY,NX)) &
-       +SUM(OHN(1:NumOfLitrCmplxs,0,NY,NX))
-  DP=DP+SUM(DOM(idom_dop,1:NumOfLitrCmplxs,0,NY,NX))+SUM(DOM_Macp(idom_dop,1:NumOfLitrCmplxs,0,NY,NX)) &
-       +SUM(OHP(1:NumOfLitrCmplxs,0,NY,NX))
+  DN=DN+SUM(DOM(idom_don,1:NumOfLitrCmplxs,0,NY,NX)) &
+    +SUM(DOM_Macp(idom_don,1:NumOfLitrCmplxs,0,NY,NX)) &
+    +SUM(OHN(1:NumOfLitrCmplxs,0,NY,NX))
+  DP=DP+SUM(DOM(idom_dop,1:NumOfLitrCmplxs,0,NY,NX)) &
+    +SUM(DOM_Macp(idom_dop,1:NumOfLitrCmplxs,0,NY,NX)) &
+    +SUM(OHP(1:NumOfLitrCmplxs,0,NY,NX))
 !
     !     TOTAL PLANT RESIDUE C,N,P
 !
@@ -867,8 +874,8 @@ module RedistMod
   implicit none
   integer, intent(in) :: NY,NX
   real(r8), intent(inout) :: VOLISO  
-  REAL(R8),INTENT(OUT) :: DVLiceMicP(JZ,JY,JX)  !change in ice volume
-  real(r8) :: TKS00,TKSX
+  REAL(R8),INTENT(OUT) :: DVLiceMicP(JZ)  !change in ice volume
+  real(r8) :: TKS00,TKSX,TKSpre
   real(r8) :: ENGY
   real(r8) :: TVHeatCapacity
   real(r8) :: TVHeatCapacitySoilM,TVOLW,TVOLWH,TVOLI,TVOLIH,TENGY
@@ -883,7 +890,7 @@ module RedistMod
   TVOLI=0.0_r8
   TVOLIH=0.0_r8
   TENGY=0.0_r8
-  
+  DVLiceMicP=0._r8
   DO L=NU(NY,NX),NL(NY,NX)
 
     TKSX=TKS(L,NY,NX)
@@ -906,7 +913,7 @@ module RedistMod
 
     !volume change
     DVLWatMicP(L,NY,NX)=VLWatMicP1(L,NY,NX)+VLWatMacP1(L,NY,NX)-VLWatMicP(L,NY,NX)-VLWatMacP(L,NY,NX)
-    DVLiceMicP(L,NY,NX)=VLiceMicP1(L,NY,NX)+VLiceMacP1(L,NY,NX)-VLiceMicP(L,NY,NX)-VLiceMacP(L,NY,NX)
+    DVLiceMicP(L)=VLiceMicP1(L,NY,NX)+VLiceMacP1(L,NY,NX)-VLiceMicP(L,NY,NX)-VLiceMacP(L,NY,NX)
 
     !update water/ice-unfilled pores
     IF(SoiBulkDensity(L,NY,NX).GT.ZERO)THEN
@@ -944,18 +951,31 @@ module RedistMod
     !
     !     END ARTIFICIAL SOIL WARMING
     !
+    TKSpre=TKS(L,NY,NX)
     IF(VHeatCapacity(L,NY,NX).GT.ZEROS(NY,NX))THEN
       TKS00=TKS(L,NY,NX)
       TKS(L,NY,NX)=(ENGY+THeatFlow2Soil(L,NY,NX)+THeatSoiThaw(L,NY,NX) &
         +THeatRootUptake(L,NY,NX)+HeatIrrigation(L,NY,NX))/VHeatCapacity(L,NY,NX)
 
-!      if(L==1.and.abs(TKS(L,NY,NX)/TKS00-1._r8)>0.025_r8)then
-!        TKS(L,NY,NX)=TKS00
-!      endif
+!      if(curday>=285.and.L<=2)write(*,*)'rexL=',L,NY,NX,curhour,VHeatCapacityX,VHeatCapacity(L,NY,NX),&
+!        SoiBulkDensity(L,NY,NX),NU(NY,NX)
+      if(TKS(L,NY,NX)>1.e3)then
+        write(*,*)'weird temperature in redist',L,NY,NX,TKSpre,TKS(L,NY,NX)
+        write(*,*)'heatcap',VHeatCapacityX,VHeatCapacity(L,NY,NX)
+        write(*,*)'itemized',ENGY/VHeatCapacity(L,NY,NX),&
+          THeatFlow2Soil(L,NY,NX)/VHeatCapacity(L,NY,NX),&
+          THeatSoiThaw(L,NY,NX)/VHeatCapacity(L,NY,NX), &
+          THeatRootUptake(L,NY,NX)/VHeatCapacity(L,NY,NX),&
+          HeatIrrigation(L,NY,NX)/VHeatCapacity(L,NY,NX)
+        write(*,*)'wat',VLWatMicP(L,NY,NX),VLWatMacP(L,NY,NX), &
+          VLiceMicP(L,NY,NX),VLiceMacP(L,NY,NX)  
+        write(*,*)'heat',ENGY,THeatFlow2Soil(L,NY,NX),VHeatCapacitySoilM(L,NY,NX)  
+        call endrun()  
+      endif
+
     ELSE
       TKS(L,NY,NX)=TKS(NUM(NY,NX),NY,NX)
     ENDIF
-
     TCS(L,NY,NX)=units%Kelvin2Celcius(TKS(L,NY,NX))
     WS=VLWatMicP(L,NY,NX)+VLWatMacP(L,NY,NX)+(VLiceMicP(L,NY,NX)+VLiceMacP(L,NY,NX))*DENSICE
     WaterStoreLandscape=WaterStoreLandscape+WS
@@ -973,7 +993,7 @@ module RedistMod
   integer,  intent(in) :: NY,NX,LG
   real(r8), intent(in) :: DORGE(JY,JX)
   real(r8), intent(inout) :: TXCO2(JY,JX)
-  real(r8), intent(out) :: DORGC(JZ,JY,JX)
+  real(r8), intent(out) :: DORGC(JZ)
 
   integer  :: L,K,M,N,LL,NGL,NTX,NTP,NTG,NTS
   real(r8) :: HS,CS
@@ -989,6 +1009,7 @@ module RedistMod
   !     begin_execution
   !     UPDATE SOIL LAYER VARIABLES WITH TOTAL FLUXES
 
+  DORGC=0._r8
   D125: DO L=NU(NY,NX),NL(NY,NX)
     !
 
@@ -1010,15 +1031,23 @@ module RedistMod
 !
     D8560: DO K=1,jcplx
       do idom=idom_beg,idom_end
-        DOM(idom,K,L,NY,NX)=DOM(idom,K,L,NY,NX)+DOM_Transp2Micp_flx(idom,K,L,NY,NX)+DOM_PoreTranspFlx(idom,K,L,NY,NX)
-        DOM(idom,K,L,NY,NX)=DOM(idom,K,L,NY,NX)+DOM_Transp2Micp_flx(idom,K,L,NY,NX)+DOM_PoreTranspFlx(idom,K,L,NY,NX)
-        DOM(idom,K,L,NY,NX)=DOM(idom,K,L,NY,NX)+DOM_Transp2Micp_flx(idom,K,L,NY,NX)+DOM_PoreTranspFlx(idom,K,L,NY,NX)
-        DOM(idom,K,L,NY,NX)=DOM(idom,K,L,NY,NX)+DOM_Transp2Micp_flx(idom,K,L,NY,NX)+DOM_PoreTranspFlx(idom,K,L,NY,NX)
+        DOM(idom,K,L,NY,NX)=DOM(idom,K,L,NY,NX)+DOM_Transp2Micp_flx(idom,K,L,NY,NX) &
+          +DOM_PoreTranspFlx(idom,K,L,NY,NX)
+        DOM(idom,K,L,NY,NX)=DOM(idom,K,L,NY,NX)+DOM_Transp2Micp_flx(idom,K,L,NY,NX) &
+          +DOM_PoreTranspFlx(idom,K,L,NY,NX)
+        DOM(idom,K,L,NY,NX)=DOM(idom,K,L,NY,NX)+DOM_Transp2Micp_flx(idom,K,L,NY,NX) &
+          +DOM_PoreTranspFlx(idom,K,L,NY,NX)
+        DOM(idom,K,L,NY,NX)=DOM(idom,K,L,NY,NX)+DOM_Transp2Micp_flx(idom,K,L,NY,NX) &
+          +DOM_PoreTranspFlx(idom,K,L,NY,NX)
 
-        DOM_Macp(idom,K,L,NY,NX)=DOM_Macp(idom,K,L,NY,NX)+DOM_Transp2Macp_flx(idom,K,L,NY,NX)-DOM_PoreTranspFlx(idom,K,L,NY,NX)
-        DOM_Macp(idom,K,L,NY,NX)=DOM_Macp(idom,K,L,NY,NX)+DOM_Transp2Macp_flx(idom,K,L,NY,NX)-DOM_PoreTranspFlx(idom,K,L,NY,NX)
-        DOM_Macp(idom,K,L,NY,NX)=DOM_Macp(idom,K,L,NY,NX)+DOM_Transp2Macp_flx(idom,K,L,NY,NX)-DOM_PoreTranspFlx(idom,K,L,NY,NX)
-        DOM_Macp(idom,K,L,NY,NX)=DOM_Macp(idom,K,L,NY,NX)+DOM_Transp2Macp_flx(idom,K,L,NY,NX)-DOM_PoreTranspFlx(idom,K,L,NY,NX)
+        DOM_Macp(idom,K,L,NY,NX)=DOM_Macp(idom,K,L,NY,NX)+DOM_Transp2Macp_flx(idom,K,L,NY,NX) &
+          -DOM_PoreTranspFlx(idom,K,L,NY,NX)
+        DOM_Macp(idom,K,L,NY,NX)=DOM_Macp(idom,K,L,NY,NX)+DOM_Transp2Macp_flx(idom,K,L,NY,NX) &
+          -DOM_PoreTranspFlx(idom,K,L,NY,NX)
+        DOM_Macp(idom,K,L,NY,NX)=DOM_Macp(idom,K,L,NY,NX)+DOM_Transp2Macp_flx(idom,K,L,NY,NX) &
+          -DOM_PoreTranspFlx(idom,K,L,NY,NX)
+        DOM_Macp(idom,K,L,NY,NX)=DOM_Macp(idom,K,L,NY,NX)+DOM_Transp2Macp_flx(idom,K,L,NY,NX) &
+          -DOM_PoreTranspFlx(idom,K,L,NY,NX)
       enddo
     ENDDO D8560
     !
@@ -1076,7 +1105,8 @@ module RedistMod
     enddo
 
 
-    Eco_HR_col(NY,NX)=Eco_HR_col(NY,NX)+trcg_RMicbTransf_vr(idg_CO2,L,NY,NX)+trcg_RMicbTransf_vr(idg_CH4,L,NY,NX)
+    Eco_HR_col(NY,NX)=Eco_HR_col(NY,NX)+trcg_RMicbTransf_vr(idg_CO2,L,NY,NX) &
+      +trcg_RMicbTransf_vr(idg_CH4,L,NY,NX)
     SurfGasFlx(idg_N2,NY,NX)=SurfGasFlx(idg_N2,NY,NX)+trcg_RMicbTransf_vr(idg_N2,L,NY,NX)
     !
     !     EXCHANGEABLE CATIONS AND ANIONS FROM EXCHANGE REACTIONS
@@ -1099,16 +1129,19 @@ module RedistMod
     !     MACROPORE SOLUTES FROM MACROPORE-MICROPORE EXCHANGE
     !
     DO NTS=ids_beg,ids_end
-      trc_soHml(NTS,L,NY,NX)=trc_soHml(NTS,L,NY,NX)+trcs_Transp2MacP_vr(NTS,L,NY,NX)-trcs_PoreTranspFlx_vr(NTS,L,NY,NX)
+      trc_soHml(NTS,L,NY,NX)=trc_soHml(NTS,L,NY,NX)+trcs_Transp2MacP_vr(NTS,L,NY,NX) &
+        -trcs_PoreTranspFlx_vr(NTS,L,NY,NX)
     ENDDO
     !
     !     GASES FROM VOLATILIZATION-DISSOLUTION AND GAS TRANSFER
 !
     DO NTG=idg_beg,idg_NH3
-      trc_gasml_vr(NTG,L,NY,NX)=trc_gasml_vr(NTG,L,NY,NX)+Gas_AdvDif_Flx_vr(NTG,L,NY,NX)-Gas_Disol_Flx_vr(NTG,L,NY,NX)
+      trc_gasml_vr(NTG,L,NY,NX)=trc_gasml_vr(NTG,L,NY,NX)+Gas_AdvDif_Flx_vr(NTG,L,NY,NX) &
+        -Gas_Disol_Flx_vr(NTG,L,NY,NX)
     ENDDO
 
-    trc_gasml_vr(idg_NH3,L,NY,NX)=trc_gasml_vr(idg_NH3,L,NY,NX)-Gas_Disol_Flx_vr(idg_NH3B,L,NY,NX)+TRN3G(L,NY,NX)
+    trc_gasml_vr(idg_NH3,L,NY,NX)=trc_gasml_vr(idg_NH3,L,NY,NX)-Gas_Disol_Flx_vr(idg_NH3B,L,NY,NX) &
+      +TRN3G(L,NY,NX)
     ROXYF(L,NY,NX)=Gas_AdvDif_Flx_vr(idg_O2,L,NY,NX)
     RCO2F(L,NY,NX)=Gas_AdvDif_Flx_vr(idg_CO2,L,NY,NX)
     RCH4F(L,NY,NX)=Gas_AdvDif_Flx_vr(idg_CH4,L,NY,NX)
@@ -1180,7 +1213,8 @@ module RedistMod
 !
     SNM=(2.0_r8*(RNutMicbTransf_vr(ids_NH4,L,NY,NX)+RNutMicbTransf_vr(ids_NH4B,L,NY,NX) &
       -trcs_plant_uptake_vr(ids_NH4,L,NY,NX) &
-      -trcs_plant_uptake_vr(ids_NH4B,L,NY,NX)-Micb_N2Fixation_vr(L,NY,NX))-trcs_plant_uptake_vr(idg_NH3,L,NY,NX) &
+      -trcs_plant_uptake_vr(ids_NH4B,L,NY,NX)-Micb_N2Fixation_vr(L,NY,NX))&
+      -trcs_plant_uptake_vr(idg_NH3,L,NY,NX) &
       -trcs_plant_uptake_vr(idg_NH3B,L,NY,NX) &
       +RNutMicbTransf_vr(ids_NO3,L,NY,NX)+RNutMicbTransf_vr(ids_NO3B,L,NY,NX) &
       -trcs_plant_uptake_vr(ids_NO3,L,NY,NX)-trcs_plant_uptake_vr(ids_NO3B,L,NY,NX) &
@@ -1268,7 +1302,7 @@ module RedistMod
     UPO4(NY,NX)=UPO4(NY,NX)+POX
     UPP4(NY,NX)=UPP4(NY,NX)+POP
     !
-    call SumOMStates(L,NY,NX,DORGC(L,NY,NX),DORGE(NY,NX))
+    call SumOMStates(L,NY,NX,DORGC(L),DORGE(NY,NX))
 !
 !     TOTAL SALT IONS
 !
@@ -1386,11 +1420,11 @@ module RedistMod
   end subroutine UpdateSaltIonInSoilLayers
 
 !------------------------------------------------------------------------------------------
-  subroutine SumOMStates(L,NY,NX,DORGCC,DORGEC)
+  subroutine SumOMStates(L,NY,NX,DORGCL,DORGEC)
   implicit none
   integer, intent(in) :: L,NY,NX
   real(r8), intent(in):: DORGEC
-  real(r8), intent(out):: DORGCC
+  real(r8), intent(out):: DORGCL
   real(r8) :: DC,DN,DP,OC,ON,OP
 
   integer :: K,N,M,NGL
@@ -1495,12 +1529,12 @@ module RedistMod
 
   IF(iErosionMode.EQ.ieros_frzthawsom.OR.iErosionMode.EQ.ieros_frzthawsomeros)THEN
 ! change in organic C
-    DORGCC=ORGCX(L,NY,NX)-ORGC(L,NY,NX)
+    DORGCL=ORGCX(L,NY,NX)-ORGC(L,NY,NX)
     IF(L.EQ.NU(NY,NX))THEN
-      DORGCC=DORGCC+DORGEC
+      DORGCL=DORGCL+DORGEC
     ENDIF
   ELSE
-    DORGCC=0.0_r8
+    DORGCL=0.0_r8
   ENDIF
 
   LitRCStoreLandscape=LitRCStoreLandscape+DC

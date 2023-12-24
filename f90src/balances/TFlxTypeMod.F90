@@ -45,7 +45,7 @@ implicit none
   real(r8),allocatable ::  TNO3EB(:,:)                        !
   real(r8),allocatable ::  trcx_TER(:,:,:)                         !
   real(r8),allocatable ::  trcp_TER(:,:,:)                        !
-  real(r8),allocatable ::  TSEDER(:,:)                        !
+  real(r8),allocatable ::  tErosionSedmLoss(:,:)                        !
   real(r8),allocatable ::  TWatFlowCellMicP(:,:,:)                        !
   real(r8),allocatable ::  TWatFlowCellMicPX(:,:,:)                       !
   real(r8),allocatable ::  THeatFlow2Soil(:,:,:)                       !
@@ -137,7 +137,7 @@ implicit none
   allocate(trcp_TER(idsp_beg:idsp_end,JY,JX));      trcp_TER=0._r8
   allocate(trcs_Transp2MicP_vr(ids_beg:ids_end,JZ,JY,JX));   trcs_Transp2MicP_vr=0._r8
 
-  allocate(TSEDER(JY,JX));      TSEDER=0._r8
+  allocate(tErosionSedmLoss(JY,JX));      tErosionSedmLoss=0._r8
   allocate(TWatFlowCellMicP(JZ,JY,JX));     TWatFlowCellMicP=0._r8
   allocate(TWatFlowCellMicPX(JZ,JY,JX));    TWatFlowCellMicPX=0._r8
   allocate(THeatFlow2Soil(JZ,JY,JX));    THeatFlow2Soil=0._r8
@@ -233,7 +233,7 @@ implicit none
   call destroy(TNH3EB)
   call destroy(TNHUEB)
   call destroy(TNO3EB)
-  call destroy(TSEDER)
+  call destroy(tErosionSedmLoss)
   call destroy(TWatFlowCellMicP)
   call destroy(TWatFlowCellMicPX)
   call destroy(THeatFlow2Soil)

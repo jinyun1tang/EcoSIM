@@ -99,6 +99,7 @@ contains
 
   !    if(I>=170)print*,TKS(0,NVN,NHW)
   call start_timer(t1)
+  if(TKS(2,1,1)>400.)PRINT*,'xrediTKS',TKS(2,1,1)
   CALL REDIST(I,J,NHW,NHE,NVN,NVS)
   call end_timer('RED',t1)
   if(TKS(2,1,1)>400.)PRINT*,'rediTKS',TKS(2,1,1)

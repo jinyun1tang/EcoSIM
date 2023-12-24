@@ -93,7 +93,7 @@ implicit none
   real(r8),pointer   :: histr_1D_ECO_GPP_col(:)        !Eco_GPP_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_ECO_RA_col(:)         !Eco_AutoR_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_ECO_NPP_col(:)        !Eco_NPP_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: histr_1D_ECO_RH_col(:)         !Eco_HR_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: histr_1D_ECO_HR_col(:)         !Eco_HR_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_tDIC_col(:)        !DIC_mass_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX), total soil DIC
   real(r8),pointer   :: histr_1D_tSTANDING_DEAD_C_col(:)       !StandingDeadChemElmnt_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_tSTANDING_DEAD_N_col(:)       !StandingDeadChemElmnt_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -349,7 +349,7 @@ implicit none
   allocate(this%histr_1D_ECO_GPP_col(beg_col:end_col))       !Eco_GPP_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_ECO_RA_col(beg_col:end_col))        !Eco_AutoR_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_ECO_NPP_col(beg_col:end_col))       !Eco_NPP_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  allocate(this%histr_1D_ECO_RH_col(beg_col:end_col))        !Eco_HR_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  allocate(this%histr_1D_ECO_HR_col(beg_col:end_col))        !Eco_HR_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_tDIC_col(beg_col:end_col))       ;  this%histr_1D_tDIC_col=spval
   allocate(this%histr_1D_tSTANDING_DEAD_C_col(beg_col:end_col));  this%histr_1D_tSTANDING_DEAD_C_col=spval 
   allocate(this%histr_1D_tSTANDING_DEAD_N_col(beg_col:end_col));  this%histr_1D_tSTANDING_DEAD_N_col=spval  
@@ -528,11 +528,11 @@ implicit none
   !--------------------------------------------------------------------
   data1d_ptr => this%histr_1D_tFIRE_CO2_col(beg_col:end_col) 
   call hist_addfld1d(fname='tFIRE_CO2',units='gC m-2',avgflag='A',&
-    long_name='total CO2 flux from fire',ptr_col=data1d_ptr)        
+    long_name='cumulative CO2 flux from fire',ptr_col=data1d_ptr)        
 
   data1d_ptr => this%histr_1D_tFIRE_CH4_col(beg_col:end_col)  
   call hist_addfld1d(fname='tFIRE_CH4',units='',avgflag='A', &
-    long_name='total CH4 flux from fire', ptr_col=data1d_ptr)      
+    long_name='cumulative CH4 flux from fire', ptr_col=data1d_ptr)      
 
   data1d_ptr => this%histr_1D_cNH4_LITR_col(beg_col:end_col) 
   call hist_addfld1d(fname='cNH4_LITR',units='gN NH4/Mg litter',avgflag='A', &
@@ -762,19 +762,19 @@ implicit none
 
   data1d_ptr => this%histr_1D_ECO_GPP_col(beg_col:end_col)       
   call hist_addfld1d(fname='ECO_GPP',units='gC/m2/hr',avgflag='A',&
-    long_name='ecosystem GPP',ptr_col=data1d_ptr)      
+    long_name='cumulative ecosystem GPP',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%histr_1D_ECO_RA_col(beg_col:end_col)       
   call hist_addfld1d(fname='ECO_RA',units='gC/m2/hr',avgflag='A',&
-    long_name='ecosystem autotrophic respiration',ptr_col=data1d_ptr)      
+    long_name='cumulative ecosystem autotrophic respiration',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%histr_1D_ECO_NPP_col(beg_col:end_col)      
   call hist_addfld1d(fname='ECO_NPP',units='gC/m2/hr',avgflag='A',&
-    long_name='ecosystem NPP',ptr_col=data1d_ptr)      
+    long_name='cumulative ecosystem NPP',ptr_col=data1d_ptr)      
 
-  data1d_ptr => this%histr_1D_ECO_RH_col(beg_col:end_col)      
+  data1d_ptr => this%histr_1D_ECO_HR_col(beg_col:end_col)      
   call hist_addfld1d(fname='ECO_RH',units='gC/m2/hr',avgflag='A',&
-    long_name='ecosystem heterotrophic respiration',ptr_col=data1d_ptr)      
+    long_name='cumulative ecosystem heterotrophic respiration',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%histr_1D_tDIC_col(beg_col:end_col)       
   call hist_addfld1d(fname='tDIC',units='gC/m2',avgflag='A',&
@@ -1524,7 +1524,7 @@ implicit none
       this%histr_1D_ECO_GPP_col(ncol)     = Eco_GPP_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_ECO_RA_col(ncol)      = Eco_AutoR_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_ECO_NPP_col(ncol)     = Eco_NPP_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%histr_1D_ECO_RH_col(ncol)      = Eco_HR_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%histr_1D_ECO_HR_col(ncol)      = Eco_HR_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_tDIC_col(ncol)     = DIC_mass_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_tSTANDING_DEAD_C_col(ncol)    = StandingDeadChemElmnt_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_tSTANDING_DEAD_N_col(ncol)    = StandingDeadChemElmnt_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)

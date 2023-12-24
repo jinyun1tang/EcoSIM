@@ -338,7 +338,7 @@ implicit none
       IF(ABS(cumSedErosion(N,NN,N2,N1)).GT.ZEROS(N2,N1) &
         .OR.ABS(cumSedErosion(N,NN,N5,N4)).GT.ZEROS(N5,N4))THEN
         !incoming from south or east grid 
-        TSEDER(N2,N1)=TSEDER(N2,N1)+cumSedErosion(N,NN,N2,N1)
+        tErosionSedmLoss(N2,N1)=tErosionSedmLoss(N2,N1)+cumSedErosion(N,NN,N2,N1)
         TSANER(N2,N1)=TSANER(N2,N1)+XSANER(N,NN,N2,N1)
         TSILER(N2,N1)=TSILER(N2,N1)+XSILER(N,NN,N2,N1)
         TCLAER(N2,N1)=TCLAER(N2,N1)+XCLAER(N,NN,N2,N1)
@@ -410,7 +410,7 @@ implicit none
 
 !     IF(NN.EQ.2)THEN
 !       outgoing
-        TSEDER(N2,N1)=TSEDER(N2,N1)-cumSedErosion(N,NN,N5,N4)
+        tErosionSedmLoss(N2,N1)=tErosionSedmLoss(N2,N1)-cumSedErosion(N,NN,N5,N4)
         TSANER(N2,N1)=TSANER(N2,N1)-XSANER(N,NN,N5,N4)
         TSILER(N2,N1)=TSILER(N2,N1)-XSILER(N,NN,N5,N4)
         TCLAER(N2,N1)=TCLAER(N2,N1)-XCLAER(N,NN,N5,N4)
@@ -483,7 +483,7 @@ implicit none
       ENDIF
       IF(N4B.GT.0.AND.N5B.GT.0.AND.NN.EQ.1)THEN
         IF(ABS(cumSedErosion(N,NN,N5B,N4B)).GT.ZEROS(N5,N4))THEN
-          TSEDER(N2,N1)=TSEDER(N2,N1)-cumSedErosion(N,NN,N5B,N4B)
+          tErosionSedmLoss(N2,N1)=tErosionSedmLoss(N2,N1)-cumSedErosion(N,NN,N5B,N4B)
           TSANER(N2,N1)=TSANER(N2,N1)-XSANER(N,NN,N5B,N4B)
           TSILER(N2,N1)=TSILER(N2,N1)-XSILER(N,NN,N5B,N4B)
           TCLAER(N2,N1)=TCLAER(N2,N1)-XCLAER(N,NN,N5B,N4B)

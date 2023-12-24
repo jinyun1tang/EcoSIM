@@ -194,7 +194,7 @@ implicit none
     FNOD(NZ,NY,NX)  =plt_allom%FNOD(NZ)
     CanopySeedNumber_pft(NZ,NY,NX)  =plt_morph%CanopySeedNumber_pft(NZ)
     HypoctoHeight_pft(NZ,NY,NX) =plt_morph%HypoctoHeight_pft(NZ)
-    HTC(NZ,NY,NX)   =plt_pheno%HTC(NZ)
+    HighTCLimtSeed_pft(NZ,NY,NX)   =plt_pheno%HighTCLimtSeed_pft(NZ)
     HeatStorCanP(NZ,NY,NX) =plt_ew%HeatStorCanP(NZ)
     CanPHeight4WatUptake(NZ,NY,NX) =plt_morph%CanPHeight4WatUptake(NZ)
     IsPlantActive_pft(NZ,NY,NX) =plt_pheno%IsPlantActive_pft(NZ)
@@ -1024,7 +1024,7 @@ implicit none
     plt_bgcr%RNH3C(NZ)=RNH3C(NZ,NY,NX)
     plt_ew%DTKC(NZ)   =DTKC(NZ,NY,NX)
     plt_pheno%iPlantThermoAdaptZone(NZ)=iPlantThermoAdaptZone(NZ,NY,NX)
-    plt_pheno%HTC(NZ) =HTC(NZ,NY,NX)
+    plt_pheno%HighTCLimtSeed_pft(NZ) =HighTCLimtSeed_pft(NZ,NY,NX)
     plt_ew%Transpiration_pft(NZ)      =Transpiration_pft(NZ,NY,NX)
 
     plt_biom%CanopyStalkC_pft(NZ) =CanopyStalkC_pft(NZ,NY,NX)

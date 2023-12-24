@@ -976,7 +976,7 @@ module Hour1Mod
   integer, intent(in) :: NY,NX
 
   real(r8) :: OC
-  integer :: K,M,N,NGL,L
+  integer :: K,M,N,NGL,L,NB,NC
   !     begin_execution
   !
   !     TOTAL SOC FOR CALCULATING CHANGES IN SOC CALCULATED IN NITRO.F
@@ -992,10 +992,16 @@ module Hour1Mod
 
   DO L=0,NL(NY,NX)
 !  add heterotrophic complexs
-    OC=OC+sum(OMEhetr(ielmc,1:NumLiveHeterBioms,1:jcplx,L,NY,NX))
+    DO NC=1,jcplx
+      DO NB=1,NumLiveHeterBioms
+        OC=OC+OMEhetr(ielmc,NB,NC,L,NY,NX)
+      ENDDO
+    ENDDO
 
 !  add autotrophic complex
-    OC=OC+sum(OMEauto(ielmc,1:NumLiveAutoBioms,L,NY,NX))
+    DO NB=1,NumLiveAutoBioms
+      OC=OC+OMEauto(ielmc,NB,L,NY,NX)
+    ENDDO
 !  add microbial residue
     OC=OC+SUM(ORC(1:ndbiomcp,1:jcplx,L,NY,NX))
 !  add dissolved/sorbed OM and acetate
