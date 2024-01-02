@@ -722,6 +722,7 @@ module Hour1Mod
   integer :: L
 !     begin_execution
 
+  HeatFlx2G(NY,NX)=0._r8
   DIC_mass_col(NY,NX)=0.0_r8
   TOMT(NY,NX)=0.0_r8
   TONT(NY,NX)=0.0_r8

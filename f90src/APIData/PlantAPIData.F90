@@ -250,7 +250,7 @@ implicit none
   real(r8), pointer :: SeedVolumeMean_pft(:)         => null() !seed volume, [m3 ]
   real(r8), pointer :: SeedAreaMean_pft(:)         => null() !seed surface area, [m2]
   real(r8), pointer :: CanopyStemA_lyr(:)        => null() !total stem area, [m2 d-2]
-  real(r8), pointer :: SSL1(:)         => null() !petiole length:mass during growth, [m gC-1]
+  real(r8), pointer :: PetoLen2Mass_pft(:)         => null() !petiole length:mass during growth, [m gC-1]
   real(r8), pointer :: SNL1(:)         => null() !internode length:mass during growth, [m gC-1]
   real(r8), pointer :: SLA1(:)         => null() !leaf area:mass during growth, [m2 gC-1]
   real(r8), pointer :: CanopyLAgrid_lyr(:)        => null() !total leaf area, [m2 d-2]
@@ -2015,7 +2015,7 @@ implicit none
   allocate(this%SeedVolumeMean_pft(JP1))
   allocate(this%SeedAreaMean_pft(JP1))
   allocate(this%CanopyStemA_lyr(NumOfCanopyLayers1))
-  allocate(this%SSL1(JP1))
+  allocate(this%PetoLen2Mass_pft(JP1))
   allocate(this%SNL1(JP1))
   allocate(this%SLA1(JP1))
   allocate(this%CanopyLAgrid_lyr(NumOfCanopyLayers1))

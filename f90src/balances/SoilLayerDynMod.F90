@@ -32,12 +32,16 @@ implicit none
   character(len=*), parameter :: mod_filename = &
   __FILE__
 
-  real(r8) :: DDLYRX(3)
   real(r8) :: XVOLWP,WDPOBDL,WDNOBD1,WDPOBD0,WDPOBD1
   real(r8) :: WDNHBDL,WDNHBD0,WDNHBD1,WDNOBDL,WDNOBD0
   real(r8), PARAMETER :: ZEROC=0.1E-03_r8
   integer, parameter :: ist_water=0
   integer, parameter :: ist_soil=1
+  integer, parameter :: ich_watlev =1
+  integer, parameter :: ich_frzthaw=4
+  integer, parameter :: ich_erosion=5
+  integer, parameter :: ich_somloss=6
+
   public :: RelayerSoilProfile
   contains
 
@@ -52,6 +56,7 @@ implicit none
 
   real(r8) :: CDPTHY(0:JZ),CDPTHX(JZ)
   integer :: IFLGL(0:JZ,6)  !flag for soil thickness change
+  real(r8) :: DDLYRX(3)
   integer :: NN,K,M,N,NR,NZ,L
   integer :: L0,L1,NUX,itoplyr_type,ICHKL,NGL
   real(r8) :: FX,FY
@@ -72,7 +77,7 @@ implicit none
     itoplyr_type=ist_soil
   ENDIF
 
-  call SoilSubsidence(itoplyr_type,NY,NX,DORGC,DVLiceMicP,CDPTHX,CDPTHY,IFLGL)
+  call SoilRelayering(itoplyr_type,NY,NX,DORGC,DVLiceMicP,CDPTHX,CDPTHY,IFLGL)
 
     !
     !     RECALCULATE SOIL LAYER THICKNESS
@@ -81,7 +86,7 @@ implicit none
   D245: DO L=NU(NY,NX),NL(NY,NX)-1
     D230: DO NN=1,3
 
-      call getTSlyrthicks(NN,L,NY,NX,ICHKL,NUX,CDPTHX,CDPTHY,IFLGL)
+      call UpdateLayerThickness(NN,L,NY,NX,ICHKL,NUX,CDPTHX,CDPTHY,IFLGL,DDLYRX)
 
       !
       !     TRANSFER STATE VARIABLES BETWEEN LAYERS
@@ -89,7 +94,7 @@ implicit none
       !     IF(IFLGL(L,NN).EQ.1)THEN
       IF(ABS(DDLYRX(NN)).GT.ZERO)THEN
 !L0,L1: target and source layers
-        call getFLs(L,NN,NY,NX,NUX,FX,FO,L1,L0,IFLGL)
+        call getFLs(L,NN,NY,NX,NUX,DDLYRX,IFLGL,FX,FO,L1,L0)
 
         IF(FX.GT.ZERO)THEN
           IFLGS(NY,NX)=1
@@ -156,7 +161,7 @@ implicit none
   ENDDO D245
   end subroutine RelayerSoilProfile
 !------------------------------------------------------------------------------------------
-  subroutine SoilSubsidence(itoplyr_type,NY,NX,DORGC,DVLiceMicP,CDPTHX,CDPTHY,IFLGL)
+  subroutine SoilRelayering(itoplyr_type,NY,NX,DORGC,DVLiceMicP,CDPTHX,CDPTHY,IFLGL)
 !
 ! IFLGL: c1, ponding water, c2, pond disappear, c3, pond reappare, c4: freeze-thaw, c5: erosion, c6: som change
   implicit none
@@ -165,8 +170,8 @@ implicit none
   REAL(R8),INTENT(IN) :: DVLiceMicP(JZ)        !change in ice volume, final - initial
   real(r8),intent(in) :: DORGC(JZ)             !change in SOM, initial - final
   real(r8), intent(out) :: CDPTHX(JZ)          !copy of the old depths of each layer
-  real(r8), intent(inout) :: CDPTHY(0:JZ)      !
-  integer, intent(inout) :: IFLGL(0:JZ,6)
+  real(r8), intent(out) :: CDPTHY(0:JZ)      !
+  integer, intent(out) :: IFLGL(0:JZ,6)
   real(r8) :: DDLYX(0:JZ,6)
   real(r8) :: DDLYR(0:JZ,6)                    !new layer thickness
   integer :: LX,LY,LL,NN,L
@@ -174,10 +179,6 @@ implicit none
   real(r8) :: DDLWatEqv_IceMicP
   real(r8) :: DENSJ,DLEqv_MicP
   real(r8) :: DLYR_ExludeMicP   !layer thickness excluding micropore
-  integer, parameter :: ich_watlev =1
-  integer, parameter :: ich_frzthaw=4
-  integer, parameter :: ich_erosion=5
-  integer, parameter :: ich_somloss=6
 ! begin_execution
 
   DDLYX=0._r8
@@ -404,7 +405,8 @@ implicit none
             ENDIF
             !  top layer
             IF(LX.EQ.NU(NY,NX))THEN
-              CumDepth2LayerBottom(LX-1,NY,NX)=CumDepth2LayerBottom(LX,NY,NX)-(VLWatMicP(LX,NY,NX)+VLiceMicP(LX,NY,NX))/AREA(3,LX,NY,NX)
+              CumDepth2LayerBottom(LX-1,NY,NX)=CumDepth2LayerBottom(LX,NY,NX) &
+                -(VLWatMicP(LX,NY,NX)+VLiceMicP(LX,NY,NX))/AREA(3,LX,NY,NX)
               CDPTHY(LX-1)=CDPTHY(LX)-(VLWatMicP(LX,NY,NX)+VLiceMicP(LX,NY,NX))/AREA(3,LX,NY,NX)
             ENDIF
           ENDIF
@@ -465,19 +467,20 @@ implicit none
     VLSoilMicP(LX,NY,NX)=VLSoilPoreMicP(LX,NY,NX)
   ENDDO D225
   VLSoilMicP(0,NY,NX)=VLWatMicP(0,NY,NX)+VLiceMicP(0,NY,NX)
-  end subroutine SoilSubsidence
+  end subroutine SoilRelayering
 
 !------------------------------------------------------------------------------------------
 
 
-  subroutine getFLs(L,NN,NY,NX,NUX,FX,FO,L1,L0,IFLGL)
+  subroutine getFLs(L,NN,NY,NX,NUX,DDLYRX,IFLGL,FX,FO,L1,L0)
 
   implicit none
   integer, intent(in) :: L,NN,NY,NX,NUX
+  real(r8),intent(in) :: DDLYRX(3)
+  integer, intent(in) :: IFLGL(0:JZ,6)
   real(r8), intent(out) :: FX,FO
   integer, intent(out) :: L1   !source
   integer, intent(out) :: L0   !target
-  integer, intent(in) :: IFLGL(0:JZ,6)
   real(r8) :: DLEqv_MicP
 
 ! begin_execution
@@ -493,8 +496,8 @@ implicit none
       L0=NUX
     ENDIF
 
-    IF((SoiBulkDensity(L,NY,NX).LE.ZERO.AND.IFLGL(L,1).EQ.2) &
-        .OR.(DLYR(3,L0,NY,NX).LE.ZEROC.AND.IFLGL(L,6).EQ.1))THEN
+    IF((SoiBulkDensity(L,NY,NX).LE.ZERO.AND.IFLGL(L,ich_watlev).EQ.2) &
+        .OR.(DLYR(3,L0,NY,NX).LE.ZEROC.AND.IFLGL(L,ich_somloss).EQ.1))THEN
       FX=1.0_r8
       FO=1.0_r8
     ELSE
@@ -550,14 +553,15 @@ implicit none
   end subroutine getFLs
 !------------------------------------------------------------------------------------------
 
-  subroutine getTSlyrthicks(NN,L,NY,NX,ICHKL,NUX,CDPTHX,CDPTHY,IFLGL)
+  subroutine UpdateLayerThickness(NN,L,NY,NX,ICHKL,NUX,CDPTHX,CDPTHY,IFLGL,DDLYRX)
   implicit none
   integer, intent(in) :: NN,L,NY,NX
   integer, intent(inout) :: ICHKL
-  integer, intent(out) :: NUX
+  integer, intent(out) :: NUX    !old top layer index
   real(r8), intent(in) :: CDPTHX(JZ)
   real(r8), intent(inout) :: CDPTHY(0:JZ)
   integer, intent(inout) :: IFLGL(0:JZ,6)
+  real(r8), intent(out) :: DDLYRX(3)
   real(r8) :: DDLYRY(JZ)
   real(r8) :: DLYR0
   real(r8) :: DLYRXX
@@ -565,9 +569,9 @@ implicit none
 
 ! begin_execution
   IF(NN.EQ.1)THEN
-    DLYR(3,L,NY,NX)=CumDepth2LayerBottom(L,NY,NX)-CumDepth2LayerBottom(L-1,NY,NX)
+    DLYR(3,L,NY,NX)=CumDepth2LayerBottom(L,NY,NX)-CumDepth2LayerBottom(L-1,NY,NX) !current layer depth
     DLYRXX=DLYR(3,L,NY,NX)
-    IF(IFLGL(L,1).EQ.0.AND.IFLGL(L+1,1).NE.0)THEN
+    IF(IFLGL(L,ich_watlev).EQ.0.AND.IFLGL(L+1,ich_watlev).NE.0)THEN
       DDLYRX(NN)=0.0_r8
       IF(SoiBulkDensity(L,NY,NX).LE.ZERO)THEN
         DDLYRY(L)=DLYRI(3,L,NY,NX)-DLYR(3,L,NY,NX)
@@ -575,7 +579,7 @@ implicit none
         DDLYRY(L)=0.0_r8
       ENDIF
       ICHKL=1
-    ELSEIF(IFLGL(L,1).EQ.2.AND.(IFLGL(L+1,1).EQ.0 &
+    ELSEIF(IFLGL(L,ich_watlev).EQ.2.AND.(IFLGL(L+1,ich_watlev).EQ.0 &
       .OR.DLYR(3,L,NY,NX).LE.DLYRI(3,L,NY,NX)))THEN
       DDLYRX(NN)=0.0_r8
       IF(L.EQ.NU(NY,NX).OR.ICHKL.EQ.0)THEN
@@ -583,7 +587,7 @@ implicit none
       ELSE
         DDLYRY(L)=DDLYRY(L-1)
       ENDIF
-      IF(IFLGL(L,1).EQ.2.AND.IFLGL(L+1,1).EQ.0)ICHKL=0
+      IF(IFLGL(L,ich_watlev).EQ.2.AND.IFLGL(L+1,ich_watlev).EQ.0)ICHKL=0
     ELSE
       IF(ICHKL.EQ.0)THEN
         DDLYRX(NN)=DLYRI(3,L,NY,NX)-DLYR(3,L,NY,NX)
@@ -614,12 +618,13 @@ implicit none
       DDLYRX(NN)=CDPTHY(L)-CDPTHX(L)
     ENDIF
 !
-  !     RESET POND SURFACE LAYER NUMBER IF LOST TO EVAPORATION
-      !
+!     RESET POND SURFACE LAYER NUMBER IF LOST TO EVAPORATION
+!
   ELSEIF(NN.EQ.2)THEN
     IF((L.EQ.NU(NY,NX).AND.SoiBulkDensity(NU(NY,NX),NY,NX).LE.ZERO) &
       .AND.(VHeatCapacity(NU(NY,NX),NY,NX).LE.VHCPNX(NY,NX) &
       .OR.NUM(NY,NX).GT.NU(NY,NX)))THEN
+      
       NUX=NU(NY,NX)
       DO LL=NUX+1,NL(NY,NX)
         IF(VLSoilPoreMicP(LL,NY,NX).GT.ZEROS2(NY,NX))THEN
@@ -643,6 +648,8 @@ implicit none
 !     RESET POND SURFACE LAYER NUMBER IF GAIN FROM PRECIPITATION
 !
   ELSEIF(NN.EQ.3)THEN
+    !CumSoilDeptht0 is the initial litter layer bottom
+    !obtain the water exceeds litter layer water holding capacity
     XVOLWP=AZMAX1(VLWatMicP(0,NY,NX)-MaxVLWatByLitR(NY,NX))
     IF(L.EQ.NU(NY,NX).AND.CumDepth2LayerBottom(0,NY,NX).GT.CumSoilDeptht0(NY,NX) &
       .AND.XVOLWP.GT.MaxVLWatByLitR(NY,NX)+VHCPNX(NY,NX)/cpw)THEN
@@ -677,7 +684,7 @@ implicit none
       IFLGL(L,NN)=0
     ENDIF
   ENDIF
-  end subroutine getTSlyrthicks
+  end subroutine UpdateLayerThickness
 !------------------------------------------------------------------------------------------
 
   subroutine tgtPondLyr(L,L0,L1,NY,NX,NN,FX,FY,CDPTHY,IFLGL)
@@ -1085,6 +1092,7 @@ implicit none
   real(r8) :: FXOHC,FXOHN,FXOHP,FXOHA,FXOSC,FXOSA,FXOSN,FXOSP
   real(r8) :: FXOMC,FXOMN,FXOMP,FXORC,FXORN,FXORP,FXOQC
   real(r8) :: FXGA,FXGP
+
 ! begin_execution
   IF(IFLGL(L,3).EQ.0.AND.L0.NE.0 &
     .AND.VLSoilPoreMicP(L0,NY,NX).GT.ZEROS(NY,NX) &

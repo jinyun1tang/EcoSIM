@@ -2680,7 +2680,7 @@ module PlantBranchMod
 ! CCPOLB,CZPOLB,CPPOLB=nonstructural C,N,P concn in branch
 ! iPlantPhenologyPattern_pft=growth habit:0=annual,1=perennial from PFT file
 ! BegRemoblize=remobilization flag
-! StalkBiomassC_brch=stalk sapwood mass
+! StalkBiomassC_brch=stalk sapwood mass, it holds reserve biomass
 ! WTRSVB,WTRSBN,WTRSBP=stalk reserve C,N,P mass
 ! CNKI,CPKI=nonstructural N,P inhibition constant on growth
 ! XFRE(ielmc),XFRE(ielmn),XFRE(ielmc)=nonstructural C,N,P transfer
@@ -2710,8 +2710,10 @@ module PlantBranchMod
       NonstructalElmnts_pft(NE,NZ)=NonstructalElmnts_pft(NE,NZ)+XFRE(NE)
     ENDDO
     IF(LeafPetoNonstructElmntConc_brch(ielmc,NB,NZ).GT.ZEROP(NZ))THEN
-      CNL=LeafPetoNonstructElmntConc_brch(ielmc,NB,NZ)/(LeafPetoNonstructElmntConc_brch(ielmc,NB,NZ)+LeafPetoNonstructElmntConc_brch(ielmn,NB,NZ)/CNKI)
-      CPL=LeafPetoNonstructElmntConc_brch(ielmc,NB,NZ)/(LeafPetoNonstructElmntConc_brch(ielmc,NB,NZ)+LeafPetoNonstructElmntConc_brch(ielmp,NB,NZ)/CPKI)
+      CNL=LeafPetoNonstructElmntConc_brch(ielmc,NB,NZ)/(LeafPetoNonstructElmntConc_brch(ielmc,NB,NZ) &
+        +LeafPetoNonstructElmntConc_brch(ielmn,NB,NZ)/CNKI)
+      CPL=LeafPetoNonstructElmntConc_brch(ielmc,NB,NZ)/(LeafPetoNonstructElmntConc_brch(ielmc,NB,NZ) &
+        +LeafPetoNonstructElmntConc_brch(ielmp,NB,NZ)/CPKI)
     ELSE
       CNL=0._r8
       CPL=0._r8
@@ -3185,7 +3187,7 @@ module PlantBranchMod
   integer :: K,NE,KK
   integer :: MXNOD,MNNOD,KNOD
   real(r8) :: GNOD
-  REAL(R8) :: GSLA,LeafAreaGrowth,SpecAreaLeafGrowth
+  REAL(R8) :: GrowthSLA,LeafAreaGrowth,SpecAreaLeafGrowth
   REAL(R8) :: GrowthChemElmt(NumPlantChemElmnts)
 
   associate(                                                                &
@@ -3193,14 +3195,14 @@ module PlantBranchMod
     LeafAreaNode_brch            =>   plt_morph%LeafAreaNode_brch    , &    
     LeafAreaLive_brch            =>   plt_morph%LeafAreaLive_brch   , &    
     SLA1                         =>   plt_morph%SLA1    , &
-    LeafElmntNode_brch       =>  plt_biom%LeafElmntNode_brch     , &    
+    LeafElmntNode_brch           =>  plt_biom%LeafElmntNode_brch     , &    
     LeafProteinCNode_brch        =>  plt_biom%LeafProteinCNode_brch      , &    
     KLeafNodeNumber              =>  plt_pheno%KLeafNodeNumber   , &        
     ZEROL                        =>  plt_biom%ZEROL     , &    
-    rCNNonstructRemob_pft                        =>  plt_allom%rCNNonstructRemob_pft    , &
-    rCPNonstructRemob_pft                         =>  plt_allom%rCPNonstructRemob_pft     , &    
+    rCNNonstructRemob_pft        =>  plt_allom%rCNNonstructRemob_pft    , &
+    rCPNonstructRemob_pft        =>  plt_allom%rCPNonstructRemob_pft     , &    
     FNOD                         =>  plt_allom%FNOD     , &
-    PlantPopulation_pft           =>  plt_site%PlantPopulation_pft          &
+    PlantPopulation_pft          =>  plt_site%PlantPopulation_pft          &
   )
 !  write(101,*)'grow leave',NB,NZ,GrowthLeaf(ielmc)
   IF(GrowthLeaf(ielmc).GT.0.0_r8)THEN
@@ -3213,7 +3215,7 @@ module PlantBranchMod
     DO NE=1,NumPlantChemElmnts
       GrowthChemElmt(NE)=ALLOCL*GrowthLeaf(NE)
     ENDDO
-    GSLA=ALLOCL*FNOD(NZ)*NumConCurrentGrowinNode(NZ)
+    GrowthSLA=ALLOCL*FNOD(NZ)*NumConCurrentGrowinNode(NZ)
 !
 !     GROWTH AT EACH CURRENT NODE
 !
@@ -3239,13 +3241,13 @@ module PlantBranchMod
 !         SLA2=parameter for calculating leaf area expansion
 !         WGLF=leaf C mass
 !         PP=PFT population
-!         GSLA=allocation of leaf area growth to each node
+!         GrowthSLA=allocation of leaf area growth to each node
 !         WFNS=turgor expansion,extension function
 !         LeafAreaGrowth,GRO=leaf area,mass growth
 !         LeafAreaLive_brch,LeafAreaNode_brch=branch,node leaf area
 !
       SpecAreaLeafGrowth=ETOL*SLA1(NZ)*(AMAX1(ZEROL(NZ) &
-        ,LeafElmntNode_brch(ielmc,K,NB,NZ))/(PlantPopulation_pft(NZ)*GSLA))**SLA2*WFNS
+        ,LeafElmntNode_brch(ielmc,K,NB,NZ))/(PlantPopulation_pft(NZ)*GrowthSLA))**SLA2*WFNS
       LeafAreaGrowth=GrowthChemElmt(ielmc)*SpecAreaLeafGrowth
       LeafAreaLive_brch(NB,NZ)=LeafAreaLive_brch(NB,NZ)+LeafAreaGrowth
 !      if(NZ==1)THEN
@@ -3274,16 +3276,16 @@ module PlantBranchMod
   associate(                           &
     NumConCurrentGrowinNode      =>   plt_morph%NumConCurrentGrowinNode ,   &      
     PetioleLengthNode_brch       =>   plt_morph%PetioleLengthNode_brch   , &    
-    SSL1                         =>   plt_morph%SSL1    , &    
-    SinePetioleAngle_pft      =>   plt_morph%SinePetioleAngle_pft   , &
+    PetoLen2Mass_pft                         =>   plt_morph%PetoLen2Mass_pft    , &    
+    SinePetioleAngle_pft         =>   plt_morph%SinePetioleAngle_pft   , &
     PetioleElmntNode_brch        =>  plt_biom%PetioleElmntNode_brch    , &    
     PetioleProteinCNode_brch     =>  plt_biom%PetioleProteinCNode_brch    , & 
-    LeafElmntNode_brch       =>  plt_biom%LeafElmntNode_brch     , &       
+    LeafElmntNode_brch           =>  plt_biom%LeafElmntNode_brch     , &       
     ZEROL                        =>  plt_biom%ZEROL     , &        
-    rCNNonstructRemob_pft                        =>  plt_allom%rCNNonstructRemob_pft    , &
-    rCPNonstructRemob_pft                         =>  plt_allom%rCPNonstructRemob_pft     , &    
+    rCNNonstructRemob_pft        =>  plt_allom%rCNNonstructRemob_pft    , &
+    rCPNonstructRemob_pft        =>  plt_allom%rCPNonstructRemob_pft     , &    
     FNOD                         =>  plt_allom%FNOD     , &
-    PlantPopulation_pft         =>  plt_site%PlantPopulation_pft        , &    
+    PlantPopulation_pft          =>  plt_site%PlantPopulation_pft        , &    
     KLeafNodeNumber              =>  plt_pheno%KLeafNodeNumber     &        
   )
 
@@ -3318,7 +3320,7 @@ module PlantBranchMod
     !
     !   SSL=specific length of petiole growth
     !   ETOL=coefficient for etoliation effects on expansion,extension
-    !   SSL1=growth in petiole length vs mass from PFT file
+    !   PetoLen2Mass_pft=growth in petiole length vs mass from PFT file
     !   SSL2=parameter for calculating petiole extension
     !   PetioleElmntNode_brch=petiole C mass
     !   PP=PFT population
@@ -3328,7 +3330,7 @@ module PlantBranchMod
     !   PetioleLengthNode_brch=petiole length
 !
       IF(LeafElmntNode_brch(ielmc,K,NB,NZ).GT.0.0_r8)THEN
-        SSL=ETOL*SSL1(NZ)*(AMAX1(ZEROL(NZ) &
+        SSL=ETOL*PetoLen2Mass_pft(NZ)*(AMAX1(ZEROL(NZ) &
           ,PetioleElmntNode_brch(ielmc,K,NB,NZ))/(PlantPopulation_pft(NZ)*GSSL))**SSL2*WFNS
         GROS=GrowthChemElmt(ielmc)/PlantPopulation_pft(NZ)*SSL
         PetioleLengthNode_brch(K,NB,NZ)=PetioleLengthNode_brch(K,NB,NZ)+GROS*SinePetioleAngle_pft(NZ)

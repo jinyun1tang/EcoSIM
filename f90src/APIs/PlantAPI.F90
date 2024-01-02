@@ -765,7 +765,7 @@ implicit none
     plt_pheno%CriticalPhotoPeriod_pft(NZ)=CriticalPhotoPeriod_pft(NZ,NY,NX)
     plt_pheno%PhotoPeriodSens_pft(NZ)=PhotoPeriodSens_pft(NZ,NY,NX)
     plt_morph%SLA1(NZ)=SLA1(NZ,NY,NX)
-    plt_morph%SSL1(NZ)=SSL1(NZ,NY,NX)
+    plt_morph%PetoLen2Mass_pft(NZ)=PetoLen2Mass_pft(NZ,NY,NX)
     plt_morph%SNL1(NZ)=SNL1(NZ,NY,NX)
     DO  N=1,NumOfLeafZenithSectors
       plt_morph%CLASS(N,NZ)=CLASS(N,NZ,NY,NX)

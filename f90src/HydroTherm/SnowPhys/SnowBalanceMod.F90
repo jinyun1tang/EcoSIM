@@ -1,5 +1,6 @@
 module SnowBalanceMod
   use data_kind_mod, only : r8 => DAT_KIND_R8
+  use data_const_mod, only : spval => DAT_CONST_SPVAL
   use abortutils, only : endrun
   use minimathmod, only : AZMAX1
   USE SnowDataType
@@ -52,12 +53,12 @@ implicit none
   VOLSWI=0.0_r8
 
   D9780: DO L=1,JS
-    call UpdateSnowLayers(L,NY,NX,VOLSWI)
+    call UpdateSnowLayerL(L,NY,NX,VOLSWI)
 
     call UpdateSoluteInSnow(L,NY,NX)
   ENDDO D9780
 !
-!     SNOW RUNOFF
+!     SNOW RUNOFF from snow laye near soil surface
 !
   VLDrySnoWE(1,NY,NX)=VLDrySnoWE(1,NY,NX)+TDrysnoBySnowRedist(NY,NX)
   VLWatSnow(1,NY,NX)=VLWatSnow(1,NY,NX)+TWatBySnowRedist(NY,NX)
@@ -112,6 +113,7 @@ implicit none
 
     D9770: DO L=1,JS
       SnoDensL(L,NY,NX)=NewSnowDens(NY,NX)
+      TKSnow(L,NY,NX)=spval
     ENDDO D9770
 
     !update top soil layer variables
@@ -139,7 +141,7 @@ implicit none
 
 !------------------------------------------------------------------------------------------
 
-  subroutine UpdateSnowLayers(L,NY,NX,VOLSWI)
+  subroutine UpdateSnowLayerL(L,NY,NX,VOLSWI)
   implicit none
   integer, intent(in) :: L,NY,NX
   real(r8), intent(inout) :: VOLSWI
@@ -183,7 +185,8 @@ implicit none
         XPhaseChangeHeatL(L,NY,NX)=XPhaseChangeHeatL(L,NY,NX)+dHPhaseChange        
         VLWatSnow(L,NY,NX)=0._r8
       else
-        write(*,*)'negative snowmass cannot be fixed',L,VLDrySnoWE(L,NY,NX),VLWatSnow(L,NY,NX),VLIceSnow(L,NY,NX)
+        write(*,*)'negative snowmass cannot be fixed',L,VLDrySnoWE(L,NY,NX),&
+          VLWatSnow(L,NY,NX),VLIceSnow(L,NY,NX)
         call endrun(trim(mod_filename)//' at line',__LINE__)        
       endif
     endif
@@ -297,7 +300,7 @@ implicit none
     ENDIF
   ENDIF
   TCSnow(L,NY,NX)=units%Kelvin2Celcius(TKSnow(L,NY,NX))
-  end subroutine UpdateSnowLayers
+  end subroutine UpdateSnowLayerL
 !------------------------------------------------------------------------------------------
 
   subroutine UpdateSoluteInSnow(L,NY,NX)

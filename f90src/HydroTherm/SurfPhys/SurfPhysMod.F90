@@ -59,7 +59,7 @@ implicit none
 
   real(r8) :: PrecHeat2LitR2,Prec2LitR2  
   real(r8) :: HeatSensVapAir2Soi
-  real(r8) :: HeatSensAir2Grnd,Radnet2LitGrnd,HeatFluxAir2Soi
+  real(r8) :: HeatSensAir2Grnd,Radnet2LitGrnd
   real(r8) :: LatentHeatEvapAir2Grnd,NetWatFlx2SoiMacP
   real(r8) :: CumHeatSensAir2LitR
   real(r8) :: cumHeatSensAir2Soil,NetWatFlx2LitR
@@ -347,13 +347,15 @@ contains
 
   !------------------------------------------------------------------------------------------
 
-  subroutine SoilSRFEnerbyBalance(M,NY,NX,PSISV1,LWRadGrnd,ResistanceLitRLay,TopLayWatVol,VapXAir2TopLay)
+  subroutine SoilSRFEnerbyBalance(M,NY,NX,PSISV1,LWRadGrnd,ResistanceLitRLay,TopLayWatVol,&
+    VapXAir2TopLay,HeatFluxAir2Soi)
   implicit none
   integer, intent(in) :: M,NY,NX
   real(r8), intent(out):: PSISV1,LWRadGrnd
   real(r8),dimension(:,:), intent(inout) :: ResistanceLitRLay
   real(r8), dimension(:,:),intent(inout) :: TopLayWatVol
   real(r8), intent(out) :: VapXAir2TopLay
+  real(r8), intent(out) :: HeatFluxAir2Soi
   real(r8) :: RAa,VaporSoi1,CdSoiEvap,CdSoiHSens,RAGX,RFLX0,RI,WPLX,WPX,FracSoiPAsAir0
   real(r8) :: VLWatGrnd,VLIceGrnd,DFVR
   real(r8) :: TKX1
@@ -502,38 +504,41 @@ contains
 
 !------------------------------------------------------------------------------------------
 
-  subroutine ExposedSoilFlux(M,NY,NX,ResistanceLitRLay,TopLayWatVol,VapXAir2TopLay)
+  subroutine ExposedSoilFlux(M,NY,NX,ResistanceLitRLay,TopLayWatVol,VapXAir2TopLay,HeatFluxAir2Soi)
   implicit none
   integer, intent(in) :: M,NY,NX
   real(r8),dimension(:,:),intent(inout) :: ResistanceLitRLay
   real(r8), dimension(:,:),intent(inout) :: TopLayWatVol  
   real(r8), intent(out) :: VapXAir2TopLay
+  real(r8), intent(out) :: HeatFluxAir2Soi
   real(r8) :: PSISV1
   real(r8) :: LWRadGrnd
   real(r8) :: HeatSensLitR2Soi1,HeatSensVapLitR2Soi1,EvapLitR2Soi1,TotHeatAir2LitR
 
 ! begin_execution
 ! Watch out for L, is its value defined?
-  call SoilSRFEnerbyBalance(M,NY,NX,PSISV1,LWRadGrnd,ResistanceLitRLay,TopLayWatVol,VapXAir2TopLay)
+  call SoilSRFEnerbyBalance(M,NY,NX,PSISV1,LWRadGrnd,ResistanceLitRLay,TopLayWatVol,&
+    VapXAir2TopLay,HeatFluxAir2Soi)
 !
   call SRFLitterEnergyBalance(M,NY,NX,PSISV1,Prec2LitR2,PrecHeat2LitR2,HeatSensLitR2Soi1,&
     HeatSensVapLitR2Soi1,EvapLitR2Soi1,TotHeatAir2LitR)
 !
   call SumAftEnergyBalance(NY,NX,LWRadGrnd,VapXAir2TopLay,HeatSensLitR2Soi1,&
-    HeatSensVapLitR2Soi1,EvapLitR2Soi1,TotHeatAir2LitR)
+    HeatSensVapLitR2Soi1,EvapLitR2Soi1,TotHeatAir2LitR,HeatFluxAir2Soi)
 
   end subroutine ExposedSoilFlux
 
 !------------------------------------------------------------------------------------------
 
   subroutine AtmLandSurfExchange(M,NY,NX,ResistanceLitRLay,TopLayWatVol,LatentHeatAir2Sno,&
-    HeatSensEvap,HeatSensAir2Snow,Radnet2Snow,VapXAir2TopLay)
+    HeatSensEvap,HeatSensAir2Snow,Radnet2Snow,VapXAir2TopLay,HeatFlux2Ground1)
   implicit none
   integer, intent(in) :: M,NY,NX
   real(r8), dimension(:,:), intent(inout) :: ResistanceLitRLay
   real(r8), dimension(:,:),intent(inout) :: TopLayWatVol  
   real(r8), intent(out) :: LatentHeatAir2Sno,HeatSensAir2Snow,Radnet2Snow,HeatSensEvap
   real(r8), intent(out) :: VapXAir2TopLay
+  real(r8), intent(out) :: HeatFlux2Ground1   !MJ/d2
   real(r8) :: cumHeatFlowSno2Soi
   real(r8) :: CumWatFlx2SoiMicP,CumWatFlx2SoiMacP
   real(r8) :: CumHeatFlow2LitR
@@ -565,7 +570,7 @@ contains
     VLHeatCapacity(NUM(NY,NX),NY,NX).GT.VHCPNX(NY,NX)))THEN
     !Ground partically covered by snow
      
-    call ExposedSoilFlux(M,NY,NX,ResistanceLitRLay,TopLayWatVol,VapXAir2TopLay)
+    call ExposedSoilFlux(M,NY,NX,ResistanceLitRLay,TopLayWatVol,VapXAir2TopLay,HeatFlux2Ground1)
 
   ELSE
 !   ground is fully snow covered, thus no flux from soil & litter
@@ -592,12 +597,13 @@ contains
   WatFLow2LitR(NY,NX)=CumWatFlow2LitR+NetWatFlx2LitR
   HeatFLoByWat2LitRi(NY,NX)=CumHeatFlow2LitR+CumHeatSensAir2LitR
 !  write(*,*)'WatFLow2LitR',CumWatFlow2LitR,CumHeatFlow2LitR,NetWatFlx2LitR
-!  write(*,*)'AtmLandSurfExchange  init',M,NY,NX,HeatFLoByWat2LitRi(NY,NX),CumHeatFlow2LitR,CumHeatSensAir2LitR
+!  write(*,*)'AtmLandSurfExchange  init',M,NY,NX,HeatFLoByWat2LitRi(NY,NX),&
+!  CumHeatFlow2LitR,CumHeatSensAir2LitR
 !  write(*,*)'atmlnd',HeatFLoByWat2LitRi(NY,NX),WatFLow2LitR(NY,NX),&
 !    safe_adb(HeatFLoByWat2LitRi(NY,NX),WatFLow2LitR(NY,NX)*cpw),&
 !    safe_adb(CumHeatFlow2LitR,cpw*CumWatFlow2LitR),&
 !    safe_adb(CumHeatSensAir2LitR,NetWatFlx2LitR*cpw)
-  end subroutine AtmLandSurfExchange  
+  end subroutine AtmLandSurfExchange
 !------------------------------------------------------------------------------------------
 
   subroutine SnowCoveredTopSoilFlux(NY,NX)
@@ -609,7 +615,6 @@ contains
   LatentHeatEvapAir2Grnd=0.0_r8   !latent heat flux from air and topsoil
   HeatSensVapAir2Soi=0.0_r8   !convective heat flux from air and topsoil
   HeatSensAir2Grnd=0.0_r8   !sensible heat flux from air to topsoil
-  HeatFluxAir2Soi=0.0_r8   !net heat flux into from air into topsoil
 
   WatNetFlo2TopSoiMicP=0.0_r8   !total water flux from air into soil
   NetWatFlx2SoiMicP=0.0_r8
@@ -656,6 +661,7 @@ contains
 ! HydroCond3D=lateral(1,2),vertical(3) micropore hydraulic conductivity
 !
   IF(SoiBulkDensity(NUM(NY,NX),NY,NX).GT.ZERO)THEN
+    !top layer is soil
     IF(VWatLitRHoldCapcity(NY,NX).GT.ZEROS2(NY,NX))THEN
       !surface litter holds water
       ThetaWLitR=AMIN1(VWatLitRHoldCapcity(NY,NX),VLWatMicP1(0,NY,NX))/VLitR(NY,NX)
@@ -730,6 +736,7 @@ contains
 !    write(*,*)'if1',HeatFlxLitR2Soi,WatDarcyFloLitR2SoiMicP,&
 !      safe_adb(HeatFlxLitR2Soi,(cpw*WatDarcyFloLitR2SoiMicP))
   ELSE
+    !top layer is water
     WatDarcyFloLitR2SoiMicP=XVLMobileWatMicP(NY,NX)*dts_wat
     HeatFlxLitR2Soi=cpw*TKSoi1(0,NY,NX)*WatDarcyFloLitR2SoiMicP
     WatXChange2WatTable(3,NUM(NY,NX),NY,NX)=WatXChange2WatTable(3,NUM(NY,NX),NY,NX)+WatDarcyFloLitR2SoiMicP
@@ -1419,7 +1426,7 @@ contains
 !------------------------------------------------------------------------------------------
 
   subroutine SumAftEnergyBalance(NY,NX,LWRadGrnd,VapXAir2TopLay,HeatSensLitR2Soi1,&
-    HeatSensVapLitR2Soi1,EvapLitR2Soi1,TotHeatAir2LitR)
+    HeatSensVapLitR2Soi1,EvapLitR2Soi1,TotHeatAir2LitR,HeatFluxAir2Soi)
   implicit none
   integer, intent(in)  :: NY,NX
   real(r8), intent(in) :: LWRadGrnd
@@ -1428,6 +1435,7 @@ contains
   real(r8), intent(in) :: HeatSensVapLitR2Soi1
   real(r8), intent(in) :: EvapLitR2Soi1
   real(r8), intent(in) :: TotHeatAir2LitR
+  real(r8), intent(in) :: HeatFluxAir2Soi
   real(r8) :: FLWVLS  
 ! begin_execution
 !
@@ -1522,6 +1530,7 @@ contains
        if(present(Qinfl2MicP))Qinfl2MicP(NY,NX)=TopLayWatVol(NY,NX)-Qinfl2MicP(NY,NX)
 
        call UpdateLitRB4RunoffM(M,NY,NX)
+
     ENDDO D9890
   ENDDO D9895
 
@@ -1529,7 +1538,8 @@ contains
 
 !------------------------------------------------------------------------------------------
   subroutine SurfaceEnergyModel(M,NX,NY,ResistanceLitRLay,KSatReductByRainKineticEnergy,&
-    HeatFlux2Ground1,LatentHeatAir2Sno,HeatSensEvap,HeatSensAir2Snow,Radnet2Snow,TopLayWatVol,VapXAir2TopLay)
+    HeatFlux2Ground1,LatentHeatAir2Sno,HeatSensEvap,HeatSensAir2Snow,Radnet2Snow,&
+    TopLayWatVol,VapXAir2TopLay)
   implicit none
   integer, intent(in) :: M,NX,NY
   real(r8), dimension(:,:),intent(inout) :: ResistanceLitRLay
@@ -1544,12 +1554,11 @@ contains
 
 ! updates ResistanceLitRLay
   call AtmLandSurfExchange(M,NY,NX,ResistanceLitRLay,TopLayWatVol,LatentHeatAir2Sno,&
-    HeatSensEvap,HeatSensAir2Snow,Radnet2Snow,VapXAir2TopLay)
-
-  HeatFlux2Ground1=HeatFluxAir2Soi
+    HeatSensEvap,HeatSensAir2Snow,Radnet2Snow,VapXAir2TopLay,HeatFlux2Ground1)
 
   !update snow pack before doing snow redistribution to avoid negative mass values  
   call UpdateSnowPack1(M,NY,NX)
+
   end subroutine SurfaceEnergyModel
 
 !------------------------------------------------------------------------------------------

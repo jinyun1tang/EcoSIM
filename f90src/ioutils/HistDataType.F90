@@ -51,7 +51,7 @@ implicit none
   real(r8),pointer   :: histr_1D_SUB_DOP_FLX_col(:)    !HDOPD(NY,NX)/TAREA
   real(r8),pointer   :: histr_1D_SUR_DIP_FLX_col(:)    !HydroDIPFlx_col(NY,NX)/TAREA
   real(r8),pointer   :: histr_1D_SUB_DIP_FLX_col(:)    !HDIPD(NY,NX)/TAREA
-  
+  real(r8),pointer   :: histr_1d_HeatFlx2G_col(:)       !
   real(r8),pointer   :: histr_1D_tPRECIP_P_col(:)       !UPP4(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_tMICRO_P_col(:)        !TOPT(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_PO4_FIRE_col(:)       !PO4byFire_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -307,6 +307,7 @@ implicit none
   allocate(this%histr_1D_SUB_DOP_FLX_col(beg_col:end_col))     !HDOPD(NY,NX)/TAREA
   allocate(this%histr_1D_SUR_DIP_FLX_col(beg_col:end_col))     !HydroDIPFlx_col(NY,NX)/TAREA
   allocate(this%histr_1D_SUB_DIP_FLX_col(beg_col:end_col))     !HDIPD(NY,NX)/TAREA
+  allocate(this%histr_1d_HeatFlx2G_col(beg_col:end_col))
   allocate(this%histr_1D_tSALT_DISCHG_FLX_col(beg_col:end_col)) !HydroIonFlx_col(NY,NX)/TAREA
   allocate(this%histr_1D_SUR_DON_FLX_col(beg_col:end_col))     !HydroDONFlx_col(NY,NX)/TAREA, daily flux
   allocate(this%histr_1D_SUB_DON_FLX_col(beg_col:end_col))     !HDOND(NY,NX)/TAREA, daily flux
@@ -657,6 +658,10 @@ implicit none
   data1d_ptr => this%histr_1D_SUB_DIP_FLX_col(beg_col:end_col)     
   call hist_addfld1d(fname='SUB_DIP_FLX',units='gP/m2/hr',avgflag='A',&
     long_name='total subsurface DIP flux',ptr_col=data1d_ptr)      
+
+  data1d_ptr => this%histr_1d_HeatFlx2G_col(beg_col:end_col)
+  call hist_addfld1d(fname='HeatFlx2G',units='MJ/m2/hr',avgflag='A',&
+    long_name='Heat flux into the ground',ptr_col=data1d_ptr)      
 
   IF(salt_model)THEN
     data1d_ptr => this%histr_1D_tSALT_DISCHG_FLX_col(beg_col:end_col) 
@@ -1484,6 +1489,7 @@ implicit none
       this%histr_1D_SUB_DOP_FLX_col(ncol)= HDOPD(NY,NX)/TAREA
       this%histr_1D_SUR_DIP_FLX_col(ncol)= HydroDIPFlx_col(NY,NX)/TAREA
       this%histr_1D_SUB_DIP_FLX_col(ncol)= HDIPD(NY,NX)/TAREA  
+      this%histr_1d_HeatFlx2G_col(ncol)  = HeatFlx2G(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_SUR_DON_FLX_col(ncol) = HydroDONFlx_col(NY,NX)/TAREA
       this%histr_1D_SUB_DON_FLX_col(ncol) = HDOND(NY,NX)/TAREA
       this%histr_1D_tSALT_DISCHG_FLX_col(ncol)= HydroIonFlx_col(NY,NX)/TAREA

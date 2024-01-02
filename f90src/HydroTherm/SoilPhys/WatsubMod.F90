@@ -117,6 +117,12 @@ module WatsubMod
     call LateralWatHeatExchMit(M,NHW,NHE,NVN,NVS,KSatRedusByRainKinetEnergyS)
 
 !   update states and fluxes
+    DO NX=NHW,NHE
+      DO  NY=NVN,NVS
+        HeatFlx2G(NY,NX)=HeatFlx2G(NY,NX)+HeatFlux2Ground(NY,NX)
+      ENDDO
+    ENDDO  
+
     IF(M.NE.NPH)THEN
 !     intermediate iteration
       call UpdateSurfaceAtM(M,NHW,NHE,NVN,NVS)
@@ -126,6 +132,7 @@ module WatsubMod
 !     last iteration
       call UpdateFluxAtExit(NHW,NHE,NVN,NVS)
     ENDIF
+
   ENDDO D3320
 
   END subroutine watsub
@@ -1217,6 +1224,7 @@ module WatsubMod
         LakeSurfFlowMicPX(NY,NX)=WaterFlowSoiMicPX(3,N6X(NY,NX),NY,NX)
         LakeSurfFlowMacP(NY,NX)=WaterFlowMacP(3,N6X(NY,NX),NY,NX)
         LakeSurfHeatFlux(NY,NX)=HeatFlow2Soil(3,N6X(NY,NX),NY,NX)
+        HeatFlx2G(NY,NX)=HeatFlow2Soil(3,NUM(NY,NX),NY,NX)
       ELSE
         !the top soil/water layer has changed
         LakeSurfFlowMicP(NY,NX)=FLWNX(NY,NX)

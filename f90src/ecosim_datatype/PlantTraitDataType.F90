@@ -114,7 +114,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  WDLF(:,:,:)                        !leaf length:width ratio, [-]
   real(r8),target,allocatable ::  SLA1(:,:,:)                        !leaf area:mass during growth, [m2 g-1]
   real(r8),target,allocatable ::  TCelsChill4Leaf_pft(:,:,:)                         !threshold temperature for spring leafout/dehardening, [oC]
-  real(r8),target,allocatable ::  SSL1(:,:,:)                        !petiole length:mass during growth, [m g-1]
+  real(r8),target,allocatable ::  PetoLen2Mass_pft(:,:,:)                        !petiole length:mass during growth, [m g-1]
   real(r8),target,allocatable ::  HourThreshold4LeafOut_brch(:,:,:,:)                      !hours above threshold temperature required for spring leafout/dehardening, [-]
   integer,target,allocatable ::  NumOfBranches_pft(:,:,:)                          !branch number, [-]
   integer,target,allocatable ::  BranchNumber_pft(:,:,:)                          !branch number, [-]
@@ -273,7 +273,7 @@ contains
   allocate(WDLF(JP,JY,JX));     WDLF=0._r8
   allocate(SLA1(JP,JY,JX));     SLA1=0._r8
   allocate(TCelsChill4Leaf_pft(JP,JY,JX));      TCelsChill4Leaf_pft=0._r8
-  allocate(SSL1(JP,JY,JX));     SSL1=0._r8
+  allocate(PetoLen2Mass_pft(JP,JY,JX));     PetoLen2Mass_pft=0._r8
   allocate(HourThreshold4LeafOut_brch(NumOfCanopyLayers,JP,JY,JX));  HourThreshold4LeafOut_brch=0._r8
   allocate(NumOfBranches_pft(JP,JY,JX));      NumOfBranches_pft=0
   allocate(BranchNumber_pft(JP,JY,JX));      BranchNumber_pft=0
@@ -429,7 +429,7 @@ contains
   call destroy(WDLF)
   call destroy(SLA1)
   call destroy(TCelsChill4Leaf_pft)
-  call destroy(SSL1)
+  call destroy(PetoLen2Mass_pft)
   call destroy(HourThreshold4LeafOut_brch)
   call destroy(NumOfBranches_pft)
   call destroy(BranchNumber_pft)

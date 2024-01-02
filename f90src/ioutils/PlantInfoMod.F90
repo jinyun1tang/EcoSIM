@@ -429,7 +429,7 @@ implicit none
   call ncd_getvar(pft_nfid, 'XPPD', loc,PhotoPeriodSens_pft(NZ,NY,NX))
 
   call ncd_getvar(pft_nfid, 'SLA1', loc,SLA1(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'SSL1', loc,SSL1(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'SSL1', loc,PetoLen2Mass_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'SNL1', loc,SNL1(NZ,NY,NX))
 
 
@@ -746,7 +746,7 @@ implicit none
   write(nu_plt,*)('-',j=1,100)  
   write(nu_plt,*)'MORPHOLOGICAL PROPERTIES'
   write(nu_plt,*)'growth in leaf area vs mass (m2 g-1): SLA1 ',SLA1(NZ,NY,NX)
-  write(nu_plt,*)'growth in petiole length vs mass (m g-1): SSL1 ',SSL1(NZ,NY,NX)
+  write(nu_plt,*)'growth in petiole length vs mass (m g-1): SSL1 ',PetoLen2Mass_pft(NZ,NY,NX)
   write(nu_plt,*)'growth in internode length vs mass (m g-1): SNL1',SNL1(NZ,NY,NX)
   write(nu_plt,*)'fraction of leaf area in 0-22.5,45,67.5,90o '// &
     'inclination classes: CLASS',(CLASS(N,NZ,NY,NX),N=1,NumOfLeafZenithSectors)
