@@ -89,6 +89,7 @@ module WatsubMod
   REAL(R8):: KSatRedusByRainKinetEnergyS(JY,JX)
 
   REAL(R8) :: TopLayWatVol(JY,JX)
+  real(r8) :: Qinfl2MicP(JY,JX)
 ! begin_execution
 !
   curday=i;curhour=j
@@ -107,7 +108,7 @@ module WatsubMod
 
     ! run surface energy balance model, uses ResistanceLitRLay
     call RunSurfacePhysModel(M,NHE,NHW,NVS,NVN,ResistanceLitRLay,KSatRedusByRainKinetEnergyS,&
-      TopLayWatVol,HeatFlux2Ground)
+      TopLayWatVol,HeatFlux2Ground,Qinfl2MicP)
 
     call CopySoilWatVolMit(NHW,NHE,NVN,NVS,TopLayWatVol)
         
@@ -119,7 +120,8 @@ module WatsubMod
 !   update states and fluxes
     DO NX=NHW,NHE
       DO  NY=NVN,NVS
-        HeatFlx2G(NY,NX)=HeatFlx2G(NY,NX)+HeatFlux2Ground(NY,NX)
+        HeatFlx2G_col(NY,NX)=HeatFlx2G_col(NY,NX)+HeatFlux2Ground(NY,NX)
+        Qinflx2Soil_col(NY,NX)=Qinflx2Soil_col(NY,NX)+Qinfl2MicP(NY,NX)
       ENDDO
     ENDDO  
 
@@ -1224,7 +1226,7 @@ module WatsubMod
         LakeSurfFlowMicPX(NY,NX)=WaterFlowSoiMicPX(3,N6X(NY,NX),NY,NX)
         LakeSurfFlowMacP(NY,NX)=WaterFlowMacP(3,N6X(NY,NX),NY,NX)
         LakeSurfHeatFlux(NY,NX)=HeatFlow2Soil(3,N6X(NY,NX),NY,NX)
-        HeatFlx2G(NY,NX)=HeatFlow2Soil(3,NUM(NY,NX),NY,NX)
+        HeatFlx2G_col(NY,NX)=HeatFlow2Soil(3,NUM(NY,NX),NY,NX)
       ELSE
         !the top soil/water layer has changed
         LakeSurfFlowMicP(NY,NX)=FLWNX(NY,NX)

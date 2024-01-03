@@ -368,14 +368,14 @@ module Hour1Mod
 !
 !     WATER,SNOW,SOLUTE RUNOFF
 !
-      HDOCQ(NY,NX)=0._r8
-      HDOCD(NY,NX)=0._r8
-      HDICQ(NY,NX)=0._r8
-      HDICD(NY,NX)=0._r8
-      HDOND(NY,NX)=0._r8
-      HDIND(NY,NX)=0._r8
-      HDOPD(NY,NX)=0._r8
-      HDIPD(NY,NX)=0._r8      
+      HydroSufDOCFlx_col(NY,NX)=0._r8
+      HydroSubsDOCFlx_col(NY,NX)=0._r8
+      HydroSufDICFlx_col(NY,NX)=0._r8
+      HydroSubsDICFlx_col(NY,NX)=0._r8
+      HydroSubsDONFlx_col(NY,NX)=0._r8
+      HydroSubsDINFlx_col(NY,NX)=0._r8
+      HydroSubsDOPFlx_col(NY,NX)=0._r8
+      HydroSubsDIPFlx_col(NY,NX)=0._r8      
       WatFlux4ErosionM(:,NY,NX)=0._r8
       Wat2GridBySurfRunoff(1:2,1:2,NY,NX)=0.0_r8
       Heat2GridBySurfRunoff(1:2,1:2,NY,NX)=0.0_r8
@@ -722,7 +722,8 @@ module Hour1Mod
   integer :: L
 !     begin_execution
 
-  HeatFlx2G(NY,NX)=0._r8
+  Qinflx2Soil_col(NY,NX)=0._r8
+  HeatFlx2G_col(NY,NX)=0._r8
   DIC_mass_col(NY,NX)=0.0_r8
   TOMT(NY,NX)=0.0_r8
   TONT(NY,NX)=0.0_r8

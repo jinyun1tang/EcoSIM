@@ -108,12 +108,12 @@
   HydroIonFlx_col(NY,NX)=0._r8
   FertNFlx_col(NY,NX)=0._r8
   LiterfalOrgN_col(NY,NX)=0._r8
-  HydroDONFlx_col(NY,NX)=0._r8
-  HydroDINFlx_col(NY,NX)=0._r8
+  HydroSufDONFlx_col(NY,NX)=0._r8
+  HydroSufDINFlx_col(NY,NX)=0._r8
   FerPFlx_col(NY,NX)=0._r8
   LiterfalOrgP_col(NY,NX)=0._r8
-  HydroDOPFlx_col(NY,NX)=0._r8
-  HydroDIPFlx_col(NY,NX)=0._r8
+  HydroSufDOPFlx_col(NY,NX)=0._r8
+  HydroSufDIPFlx_col(NY,NX)=0._r8
   CO2byFire_col(NY,NX)=0._r8
   CH4byFire_col(NY,NX)=0._r8
   O2byFire_col(NY,NX)=0._r8

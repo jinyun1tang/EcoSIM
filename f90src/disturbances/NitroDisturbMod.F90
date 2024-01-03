@@ -340,9 +340,9 @@ module NitroDisturbMod
           TCOU=TCOU+OC
           TZOU=TZOU+ON
           TPOU=TPOU+OP
-          HDOCQ(NY,NX)=HDOCQ(NY,NX)+OC
-          HydroDONFlx_col(NY,NX)=HydroDONFlx_col(NY,NX)+ON
-          HydroDOPFlx_col(NY,NX)=HydroDOPFlx_col(NY,NX)+OP
+          HydroSufDOCFlx_col(NY,NX)=HydroSufDOCFlx_col(NY,NX)+OC
+          HydroSufDONFlx_col(NY,NX)=HydroSufDONFlx_col(NY,NX)+ON
+          HydroSufDOPFlx_col(NY,NX)=HydroSufDOPFlx_col(NY,NX)+OP
           Eco_NBP_col(NY,NX)=Eco_NBP_col(NY,NX)-OC
         ELSEIF(ITILL(I,NY,NX).EQ.22)THEN
           CO2GIN=CO2GIN-OC

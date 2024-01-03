@@ -172,7 +172,7 @@ module RedistMod
   Eco_NPP_col(NY,NX)=Eco_GPP_col(NY,NX)+Eco_AutoR_col(NY,NX)
   Eco_NBP_col(NY,NX)=Eco_NBP_col(NY,NX)+Canopy_NEE_col(NY,NX) &
     +SurfGasFlx(idg_CO2,NY,NX)+SurfGasFlx(idg_CH4,NY,NX) &
-    +TXCO2(NY,NX)-HDOCQ(NY,NX)-HDICQ(NY,NX)-HDOCD(NY,NX)-HDICD(NY,NX)
+    +TXCO2(NY,NX)-HydroSufDOCFlx_col(NY,NX)-HydroSufDICFlx_col(NY,NX)-HydroSubsDOCFlx_col(NY,NX)-HydroSubsDICFlx_col(NY,NX)
     
   IF(NU(NY,NX).GT.NUI(NY,NX))THEN  !the surface is lowered
     DO L=NUI(NY,NX),NU(NY,NX)-1
@@ -1194,7 +1194,7 @@ module RedistMod
     SurfGasFlx(idg_CO2,NY,NX)=SurfGasFlx(idg_CO2,NY,NX)+CIB
     SurfGasFlx(idg_CH4,NY,NX)=SurfGasFlx(idg_CH4,NY,NX)+CHB
     UCOP(NY,NX)=UCOP(NY,NX)+TCO2P(L,NY,NX)+trcs_plant_uptake_vr(idg_CO2,L,NY,NX)
-    HDICD(NY,NX)=HDICD(NY,NX)-12.0*TBCO2(L,NY,NX)
+    HydroSubsDICFlx_col(NY,NX)=HydroSubsDICFlx_col(NY,NX)-12.0*TBCO2(L,NY,NX)
     TXCO2(NY,NX)=TXCO2(NY,NX)+12.0*TBCO2(L,NY,NX)
     OXYGIN=OXYGIN+OIB
     OOB=trcg_RMicbTransf_vr(idg_O2,L,NY,NX)+TUPOXP(L,NY,NX)+trcs_plant_uptake_vr(idg_O2,L,NY,NX)

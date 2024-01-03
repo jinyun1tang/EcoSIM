@@ -289,7 +289,7 @@ module CanopyCondsMod
     RadSWbyCanopy_pft        => plt_rad%RadSWbyCanopy_pft     , &
     PARDiffus_col            => plt_rad%PARDiffus_col    , & !umol /m2/s
     PARDirect_col            => plt_rad%PARDirect_col    , & !umol /m2/s
-    SineSolarIncliAngle           => plt_rad%SineSolarIncliAngle     , &
+    SineSolarIncliAngle      => plt_rad%SineSolarIncliAngle     , &
     TotSineSkyAngles_grd     => plt_rad%TotSineSkyAngles_grd    , &
     TAU_RadThru              => plt_rad%TAU_RadThru     , &
     TAU_RadCapt              => plt_rad%TAU_RadCapt     , &

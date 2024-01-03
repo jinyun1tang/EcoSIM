@@ -174,9 +174,9 @@ implicit none
 !             :N4=NH4,N3=NH3,NO=NO3,NX=NO2,PI=HPO4,P4=H2PO4 in non-band
 !     XN=direction indicator
 !     TCOU,OXYGOU,H2GOU,TZOU,TPOU=cumulative C,O2,H2,N,P loss through lateral and lower boundaries
-!     HDOCQ,HDICQ=dissolved organic,inorganic C loss through runoff
-!     HydroDONFlx_col,HydroDINFlx_col=dissolved organic,inorganic N loss through runoff
-!     HydroDOPFlx_col,HydroDIPFlx_col=dissolved organic,inorganic P loss through runoff
+!     HydroSufDOCFlx_col,HydroSufDICFlx_col=dissolved organic,inorganic C loss through runoff
+!     HydroSufDONFlx_col,HydroSufDINFlx_col=dissolved organic,inorganic N loss through runoff
+!     HydroSufDOPFlx_col,HydroSufDIPFlx_col=dissolved organic,inorganic P loss through runoff
 !
       CXR=XN*(trcg_2DFloXSurRunoff(idg_CO2,N,NN,N5,N4)+trcg_2DFloXSurRunoff(idg_CH4,N,NN,N5,N4))
       ZXR=XN*(trcn_2DFloXSurRunoff(ids_NH4,N,NN,N5,N4)+trcg_2DFloXSurRunoff(idg_NH3,N,NN,N5,N4) &
@@ -193,12 +193,12 @@ implicit none
       TCOU=TCOU-CXR-OMRof(ielmc)
       TZOU=TZOU-ZXR-OMRof(ielmn)-ZGR
       TPOU=TPOU-PXR-OMRof(ielmp)
-      HDOCQ(NY,NX)=-OMRof(ielmc)
-      HDICQ(NY,NX)=-CXR
-      HydroDONFlx_col(NY,NX)=HydroDONFlx_col(NY,NX)-OMRof(ielmn)
-      HydroDINFlx_col(NY,NX)=HydroDINFlx_col(NY,NX)-ZXR-ZGR
-      HydroDOPFlx_col(NY,NX)=HydroDOPFlx_col(NY,NX)-OMRof(ielmp)
-      HydroDIPFlx_col(NY,NX)=HydroDIPFlx_col(NY,NX)-PXR
+      HydroSufDOCFlx_col(NY,NX)=-OMRof(ielmc)
+      HydroSufDICFlx_col(NY,NX)=-CXR
+      HydroSufDONFlx_col(NY,NX)=HydroSufDONFlx_col(NY,NX)-OMRof(ielmn)
+      HydroSufDINFlx_col(NY,NX)=HydroSufDINFlx_col(NY,NX)-ZXR-ZGR
+      HydroSufDOPFlx_col(NY,NX)=HydroSufDOPFlx_col(NY,NX)-OMRof(ielmp)
+      HydroSufDIPFlx_col(NY,NX)=HydroSufDIPFlx_col(NY,NX)-PXR
       OXR=XN*trcg_2DFloXSurRunoff(idg_O2,N,NN,N5,N4)
       OXYGOU=OXYGOU-OXR
       HGR=XN*trcg_2DFloXSurRunoff(idg_H2,N,NN,N5,N4)
@@ -309,9 +309,9 @@ implicit none
 !         sediment code:OMC,OMN,OMP=microbial C,N,P; ORC=microbial residue C,N,P
 !                      :OHC,OHN,OHP=adsorbed C,N,P; OSC,OSN,OSP=humus C,N,P
 !         TSEDOU,USEDOU=cumulative sediment loss through lateral and lower boundaries
-!         HDOCQ,HDICQ=dissolved organic,inorganic C loss through lateral and lower boundaries
-!         HydroDONFlx_col,HydroDINFlx_col=dissolved organic,inorganic N loss through lateral and lower boundaries
-!         HydroDOPFlx_col,HydroDIPFlx_col=dissolved organic,inorganic P loss through lateral and lower boundaries
+!         HydroSufDOCFlx_col,HydroSufDICFlx_col=dissolved organic,inorganic C loss through lateral and lower boundaries
+!         HydroSufDONFlx_col,HydroSufDINFlx_col=dissolved organic,inorganic N loss through lateral and lower boundaries
+!         HydroSufDOPFlx_col,HydroSufDIPFlx_col=dissolved organic,inorganic P loss through lateral and lower boundaries
 !         TCOU,TZOU,TPOU=total C,N,P loss through lateral and lower boundaries
 
 !         MICROBIAL C IN RUNOFF SEDIMENT
@@ -378,12 +378,12 @@ implicit none
           TCOU=TCOU-COE-CXE
           TZOU=TZOU-ZOE-ZXE-ZPE
           TPOU=TPOU-POE-PXE-PPE
-          HDOCQ(NY,NX)=HDOCQ(NY,NX)-COE
-          HDICQ(NY,NX)=HDICQ(NY,NX)-CXE
-          HydroDONFlx_col(NY,NX)=HydroDONFlx_col(NY,NX)-ZOE
-          HydroDINFlx_col(NY,NX)=HydroDINFlx_col(NY,NX)-ZXE-ZPE
-          HydroDOPFlx_col(NY,NX)=HydroDOPFlx_col(NY,NX)-POE
-          HydroDIPFlx_col(NY,NX)=HydroDIPFlx_col(NY,NX)-PXE-PPE
+          HydroSufDOCFlx_col(NY,NX)=HydroSufDOCFlx_col(NY,NX)-COE
+          HydroSufDICFlx_col(NY,NX)=HydroSufDICFlx_col(NY,NX)-CXE
+          HydroSufDONFlx_col(NY,NX)=HydroSufDONFlx_col(NY,NX)-ZOE
+          HydroSufDINFlx_col(NY,NX)=HydroSufDINFlx_col(NY,NX)-ZXE-ZPE
+          HydroSufDOPFlx_col(NY,NX)=HydroSufDOPFlx_col(NY,NX)-POE
+          HydroSufDIPFlx_col(NY,NX)=HydroSufDIPFlx_col(NY,NX)-PXE-PPE
 !     WRITE(*,6635)'POE',I,J,N4,N5,N,NN
 !    2,COE,CXE,ZOE,ZXE,ZPE
 !    3,POE,PXE,PPE,TPOU,cumSedErosion(N,NN,N5,N4)
@@ -485,20 +485,20 @@ implicit none
 !     X*FLS,X*FHS=solute flux in macropores,micropores from TranspNoSalt.f
 !     X*FLG=convective+diffusive gas flux from TranspNoSalt.f
 !     TCOU=cumulative C loss through lateral and lower boundaries
-!     HDOCD,HDICD=dissolved organic,inorganic C loss through subsurface boundaries
+!     HydroSubsDOCFlx_col,HydroSubsDICFlx_col=dissolved organic,inorganic C loss through subsurface boundaries
 !
 !     SUBSURFACE BOUNDARY FLUXES OF N2O, N2, NH4, NH3, NO3, NO2 AND DON
 !
 !     X*FLS,X*FHS,X*FLB,X*FHB=solute flux in macropores,micropores in non-band,band from TranspNoSalt.f
 !     X*FLG=convective+diffusive gas flux from TranspNoSalt.f
 !     TZOU=cumulative N loss through lateral and lower boundaries
-!     HDOND,HDIND=dissolved organic,inorganic N loss through subsurface boundaries
+!     HydroSubsDONFlx_col,HydroSubsDINFlx_col=dissolved organic,inorganic N loss through subsurface boundaries
 !
 !     SUBSURFACE BOUNDARY FLUXES OF PO4 AND DOP
 !
 !     X*FLS,X*FHS,X*FLB,X*FHB=solute flux in macropores,micropores in non-band,band from TranspNoSalt.f
 !     TPOU=cumulative P loss through lateral and lower boundaries
-!     HDOPD,HDIPD=dissolved organic,inorganic P loss through subsurface boundaries
+!     HydroSubsDOPFlx_col,HydroSubsDIPFlx_col=dissolved organic,inorganic P loss through subsurface boundaries
 !
       COD=0.0_r8
       ZOD=0.0_r8
@@ -536,12 +536,12 @@ implicit none
       TCOU=TCOU-COD-CXD
       TZOU=TZOU-ZOD-ZXD-ZGD
       TPOU=TPOU-POD-PXD
-      HDOCD(N2,N1)=-COD
-      HDOND(N2,N1)=-ZOD
-      HDOPD(N2,N1)=-POD
-      HDICD(N2,N1)=-CXD
-      HDIND(N2,N1)=-ZXD
-      HDIPD(N2,N1)=-PXD
+      HydroSubsDOCFlx_col(N2,N1)=-COD
+      HydroSubsDONFlx_col(N2,N1)=-ZOD
+      HydroSubsDOPFlx_col(N2,N1)=-POD
+      HydroSubsDICFlx_col(N2,N1)=-CXD
+      HydroSubsDINFlx_col(N2,N1)=-ZXD
+      HydroSubsDIPFlx_col(N2,N1)=-PXD
 !
 !     SUBSURFACE BOUNDARY FLUXES OF O2
 !
@@ -721,9 +721,9 @@ implicit none
       TCOU=TCOU-CXS
       TZOU=TZOU-ZXS-ZGS
       TPOU=TPOU-PXS
-      HDICQ(NY,NX)=HDICQ(NY,NX)-CXR
-      HydroDINFlx_col(NY,NX)=HydroDINFlx_col(NY,NX)-ZXR-ZGR
-      HydroDIPFlx_col(NY,NX)=HydroDIPFlx_col(NY,NX)-PXR
+      HydroSufDICFlx_col(NY,NX)=HydroSufDICFlx_col(NY,NX)-CXR
+      HydroSufDINFlx_col(NY,NX)=HydroSufDINFlx_col(NY,NX)-ZXR-ZGR
+      HydroSufDIPFlx_col(NY,NX)=HydroSufDIPFlx_col(NY,NX)-PXR
       OXS=XN*trcg_FloXSnow(idg_O2,N,N5,N4)
       OXYGOU=OXYGOU-OXS
       IF(salt_model)THEN
