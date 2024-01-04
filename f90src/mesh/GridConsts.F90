@@ -24,13 +24,14 @@ implicit none
   integer, PARAMETER :: NumOfLeafAzimuthSectors=4   !# of sectors for the leaf azimuth, [0,pi]
   integer, PARAMETER :: NumOfSkyAzimuSects=4   !# of sectors for the sky azimuth  [0,2*pi]
   integer, parameter :: MaxNodesPerBranch=25!# of nodes for plant canopy
-  integer, pointer :: JGnio(:)   !guid indices for organic-microbial CO2CompenPoint_nodeex
-  integer, pointer :: JGnfo(:)   !guid indices for organic-microbial CO2CompenPoint_nodeex
-  integer, pointer :: JGniA(:)   !guid indices for autotrophic-microbial CO2CompenPoint_nodeex
-  integer, pointer :: JGnfA(:)   !guid indices for autotrophic-microbial CO2CompenPoint_nodeex
-  integer  :: NumOfMicrobsInAutotrophCmplx             !total number of microbial guilds in the autotrophic CO2CompenPoint_nodeex
-  integer  :: NumOfMicrobs1HetertrophCmplx             !total number of microbial guilds in one organic-microbial CO2CompenPoint_nodeex
-   
+  integer, pointer :: JGnio(:)   !guid indices for organic-microbial complex
+  integer, pointer :: JGnfo(:)   !guid indices for organic-microbial complex
+  integer, pointer :: JGniA(:)   !guid indices for autotrophic-microbial complex
+  integer, pointer :: JGnfA(:)   !guid indices for autotrophic-microbial complex
+  integer  :: NumMicrobAutotrophCmplx            !total number of microbial guilds in the autotrophic complex
+  integer  :: NumMicrbHetetrophCmplx             !total number of microbial guilds in one organic-microbial complex
+  integer  :: NumLiveHeterBioms         !total number of live biomass component in one heterotroph organo-microbe complex
+  integer  :: NumLiveAutoBioms          !total number of live biomass component in one autotrophic complex
   type, public :: bounds_type
    integer :: NHW
    integer :: NVN

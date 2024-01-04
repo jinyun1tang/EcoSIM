@@ -19,6 +19,7 @@ module SoilHeatDatatype
   real(r8),target,allocatable ::  TCS(:,:,:)                         !soil temperature [oC]
   real(r8),target,allocatable ::  STC(:,:,:)                         !numerator for soil solid thermal conductivity [MJ m h-1 K-1]
   real(r8),target,allocatable ::  DTC(:,:,:)                         !denominator for soil solid thermal conductivity
+  real(r8),target,allocatable ::  HeatFlx2G_col(:,:)                     !heat flux into ground, computed from surface energy balance model 
 !----------------------------------------------------------------------
 
 contains
@@ -27,6 +28,7 @@ contains
   implicit none
   allocate(TKSZ(366,24,JZ));    TKSZ=0._r8
   allocate(TKS(0:JZ,JY,JX));    TKS=0._r8
+  allocate(HeatFlx2G_col(JY,JX));   HeatFlx2G_col=0._r8
   allocate(TLIceThawMicP(JZ,JY,JX));     TLIceThawMicP=0._r8
   allocate(TLPhaseChangeHeat2Soi(JZ,JY,JX));    TLPhaseChangeHeat2Soi=0._r8
   allocate(TLIceThawMacP(JZ,JY,JX));    TLIceThawMacP=0._r8

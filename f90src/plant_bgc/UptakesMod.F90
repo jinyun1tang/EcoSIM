@@ -268,7 +268,7 @@ module UptakesMod
     LWRadCanP(NZ)=0.0_r8
     plt_ew%Transpiration_pft(NZ)=0.0_r8
     plt_ew%VapXAir2Canopy_pft(NZ)=0.0_r8
-    plt_rbgc%RootExudChemElmnt_pft(1:NumOfPlantChemElmnts,NZ)=0.0_r8
+    plt_rbgc%RootExudChemElmnt_pft(1:NumPlantChemElmnts,NZ)=0.0_r8
     plt_rbgc%RootNH4Uptake_pft(NZ)=0.0_r8
     plt_rbgc%RootNO3Uptake_pft(NZ)=0.0_r8
     plt_rbgc%RootH2PO4Uptake_pft(NZ)=0.0_r8
@@ -601,7 +601,7 @@ module UptakesMod
       D4290: DO N=1,MY(NZ)
         DO  L=NU,NI(NZ)
           PSIRoot_vr(N,L,NZ)=ElvAdjstedtSoiPSIMPa(L)
-          CCPOLT=sum(RootNonstructElementConcpft_vr(1:NumOfPlantChemElmnts,N,L,NZ))
+          CCPOLT=sum(RootNonstructElementConcpft_vr(1:NumPlantChemElmnts,N,L,NZ))
           CALL update_osmo_turg_pressure(PSIRoot_vr(N,L,NZ),CCPOLT,OSMO(NZ),TKS(L),&
             PSIRootOSMO_vr(N,L,NZ),PSIRootTurg_vr(N,L,NZ))
 
@@ -1164,7 +1164,7 @@ module UptakesMod
   LWRadCanP(NZ)=FTHRM*TKC(NZ)**4._r8
   PSICanopy_pft(NZ)=ElvAdjstedtSoiPSIMPa(NGTopRootLayer_pft(NZ))
   
-  CCPOLT=sum(CanopyNonstructElementConc_pft(1:NumOfPlantChemElmnts,NZ))
+  CCPOLT=sum(CanopyNonstructElementConc_pft(1:NumPlantChemElmnts,NZ))
 
   call update_osmo_turg_pressure(PSICanopy_pft(NZ),CCPOLT,OSMO(NZ),TKC(NZ),PSICanopyOsmo_pft(NZ),PSICanopyTurg_pft(NZ),FDMP)
 
@@ -1177,7 +1177,7 @@ module UptakesMod
   DO N=1,MY(NZ)
     DO  L=NU,NI(NZ)
       PSIRoot_vr(N,L,NZ)=ElvAdjstedtSoiPSIMPa(L)      
-      CCPOLT=sum(RootNonstructElementConcpft_vr(1:NumOfPlantChemElmnts,N,L,NZ))
+      CCPOLT=sum(RootNonstructElementConcpft_vr(1:NumPlantChemElmnts,N,L,NZ))
 
       call update_osmo_turg_pressure(PSIRoot_vr(N,L,NZ),CCPOLT,OSMO(NZ),TKS(L),&
         PSIRootOSMO_vr(N,L,NZ),PSIRootTurg_vr(N,L,NZ))
@@ -1259,7 +1259,7 @@ module UptakesMod
       ELSE
         PSIRoot_vr(N,L,NZ)=ElvAdjstedtSoiPSIMPa(L)
       ENDIF           
-      CCPOLT=sum(RootNonstructElementConcpft_vr(1:NumOfPlantChemElmnts,N,L,NZ))
+      CCPOLT=sum(RootNonstructElementConcpft_vr(1:NumPlantChemElmnts,N,L,NZ))
 
       CALL update_osmo_turg_pressure(PSIRoot_vr(N,L,NZ),CCPOLT,OSMO(NZ),TKS(L),&
         PSIRootOSMO_vr(N,L,NZ),PSIRootTurg_vr(N,L,NZ))

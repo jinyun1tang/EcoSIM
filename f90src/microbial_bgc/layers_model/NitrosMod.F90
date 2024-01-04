@@ -120,29 +120,31 @@ module nitrosMod
   real(r8) :: OQAHXS,OHAXS,OQNXS,OQNHXS
   real(r8) :: OHNXS,OQPXS,OQPHXS,OHPXS
   real(r8) :: OSCXS,OSAXS,OSNXS,OSPXS
-  integer :: K,M,N,NGL
+  integer :: K,M,N,NGL,MID
+  
 !     begin_execution
   IF(FOSCXS.GT.ZERO)THEN
     D7971: DO K=1,micpar%NumOfLitrCmplxs
       if(.not.micpar%is_finelitter(K))cycle
-      D7961: DO N=1,NFGs
+      D7961: DO N=1,NumMicbFunGroups
         DO NGL=JGnio(N),JGnfo(N)
           D7962: DO M=1,micpar%nlbiomcp
+            MID=micpar%get_micb_id(M,NGL)
             IF(FOSCXS.GT.0.0)THEN
-              OMCXS=FOSCXS*AZMAX1(OMC(M,NGL,K,L,NY,NX))
-              OMNXS=FOSCXS*AZMAX1(OMN(M,NGL,K,L,NY,NX))
-              OMPXS=FOSCXS*AZMAX1(OMP(M,NGL,K,L,NY,NX))
+              OMCXS=FOSCXS*AZMAX1(OMEhetr(ielmc,MID,K,L,NY,NX))
+              OMNXS=FOSCXS*AZMAX1(OMEhetr(ielmn,MID,K,L,NY,NX))
+              OMPXS=FOSCXS*AZMAX1(OMEhetr(ielmp,MID,K,L,NY,NX))
             ELSE
-              OMCXS=FOSCXS*AZMAX1(OMC(M,NGL,K,LL,NY,NX))
-              OMNXS=FOSCXS*AZMAX1(OMN(M,NGL,K,LL,NY,NX))
-              OMPXS=FOSCXS*AZMAX1(OMP(M,NGL,K,LL,NY,NX))
+              OMCXS=FOSCXS*AZMAX1(OMEhetr(ielmc,MID,K,LL,NY,NX))
+              OMNXS=FOSCXS*AZMAX1(OMEhetr(ielmn,MID,K,LL,NY,NX))
+              OMPXS=FOSCXS*AZMAX1(OMEhetr(ielmp,MID,K,LL,NY,NX))
             ENDIF
-            OMC(M,NGL,K,L,NY,NX)=OMC(M,NGL,K,L,NY,NX)-OMCXS
-            OMN(M,NGL,K,L,NY,NX)=OMN(M,NGL,K,L,NY,NX)-OMNXS
-            OMP(M,NGL,K,L,NY,NX)=OMP(M,NGL,K,L,NY,NX)-OMPXS
-            OMC(M,NGL,K,LL,NY,NX)=OMC(M,NGL,K,LL,NY,NX)+OMCXS
-            OMN(M,NGL,K,LL,NY,NX)=OMN(M,NGL,K,LL,NY,NX)+OMNXS
-            OMP(M,NGL,K,LL,NY,NX)=OMP(M,NGL,K,LL,NY,NX)+OMPXS
+            OMEhetr(ielmc,MID,K,L,NY,NX)=OMEhetr(ielmc,MID,K,L,NY,NX)-OMCXS
+            OMEhetr(ielmn,MID,K,L,NY,NX)=OMEhetr(ielmn,MID,K,L,NY,NX)-OMNXS
+            OMEhetr(ielmp,MID,K,L,NY,NX)=OMEhetr(ielmp,MID,K,L,NY,NX)-OMPXS
+            OMEhetr(ielmc,MID,K,LL,NY,NX)=OMEhetr(ielmc,MID,K,LL,NY,NX)+OMCXS
+            OMEhetr(ielmn,MID,K,LL,NY,NX)=OMEhetr(ielmn,MID,K,LL,NY,NX)+OMNXS
+            OMEhetr(ielmp,MID,K,LL,NY,NX)=OMEhetr(ielmp,MID,K,LL,NY,NX)+OMPXS
           ENDDO D7962
         ENDDO
       ENDDO D7961

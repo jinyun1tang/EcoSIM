@@ -26,7 +26,7 @@ module MicBGCMod
   character(len=*), parameter :: mod_filename = &
   __FILE__
 
-  integer :: jcplx,NFGs,jsken,ndbiomcp,nlbiomcp
+  integer :: jcplx,NumMicbFunGroups,jsken,ndbiomcp,nlbiomcp
   integer, pointer :: JGniA(:)
   integer, pointer :: JGnfA(:)
   integer, pointer :: JGnio(:)
@@ -45,7 +45,7 @@ module MicBGCMod
   implicit none
 
   jcplx =micpar%jcplx
-  NFGs  =micpar%NFGs
+  NumMicbFunGroups  =micpar%NumMicbFunGroups
   jsken =micpar%jsken
   ndbiomcp = micpar%ndbiomcp
   nlbiomcp = micpar%nlbiomcp
@@ -77,8 +77,8 @@ module MicBGCMod
   type(NitroOMcplxStateType) :: ncplxs
 
 ! begin_execution
-  call nmicf%Init(jcplx,NFGs)
-  call nmics%Init(jcplx,NFGs)
+  call nmicf%Init(jcplx,NumMicbFunGroups)
+  call nmics%Init(jcplx,NumMicbFunGroups)
   call ncplxf%Init()
   call ncplxs%Init()
   call naqfdiag%ZeroOut()
@@ -99,7 +99,7 @@ module MicBGCMod
 !     ROQCK=total respiration of DOC+DOA used to represent microbial activity
 !
   DO  K=1,KL
-    DO  N=1,NFGs
+    DO  N=1,NumMicbFunGroups
       DO NGL=JGnio(N),JGnfo(N)
         ncplxf%ROQCK(K)=ncplxf%ROQCK(K)+nmicf%ROQCD(NGL,K)
       enddo
@@ -112,7 +112,7 @@ module MicBGCMod
         !     TRANSFER ALL PRIMING AMONG ALL K
         !
         !     TOQCK=total respiration of DOC+DOA in soil layer
-        !     ROQCK=total respiration of DOC+DOA in substrate CO2CompenPoint_nodeex
+        !     ROQCK=total respiration of DOC+DOA in substrate complex
         !     OQC,OQN,OQP,OQA=DOC,DON,DOP,acetate in micropores
         !     OMC,OMN,OMP=microbial C,N,P
         !
@@ -159,7 +159,7 @@ module MicBGCMod
   type(NitroMicStateType), intent(inout) :: nmics
   type(NitroOMcplxStateType),intent(inout):: ncplxs
   integer  :: K
-  integer  :: M,N,NGL
+  integer  :: M,N,NGL,MID1,MID2
   real(r8) :: ORGCL
   real(r8) :: TKSO
   real(r8) :: TOSC,TOSA,TOHC
@@ -212,10 +212,10 @@ module MicBGCMod
     FCNff    => nmics%FCNff  ,     &
     FCPff    => nmics%FCPff  ,     &
     FCNPff   => nmics%FCNPff ,     &
-    CNOMCff  => micpar%CNOMCff,     &
-    CPOMCff  => micpar%CPOMCff,    &
-    CNOMC  => micpar%CNOMC,     &
-    CPOMC  => micpar%CPOMC,    &
+    rNCOMCff  => micpar%rNCOMCff,     &
+    rPCOMCff  => micpar%rPCOMCff,    &
+    rNCOMC  => micpar%rNCOMC,     &
+    rPCOMC  => micpar%rPCOMC,    &
     FL       => micpar%FL   ,      &
     k_humus=>micpar%k_humus, &
     k_POM=>micpar%k_POM                     , &
@@ -244,9 +244,7 @@ module MicBGCMod
     ORC     => micstt%ORC   , &
     OHC     => micstt%OHC   , &
     OHA     => micstt%OHA   , &
-    OMC     => micstt%OMC   , &
-    OMN     => micstt%OMN   , &
-    OMP     => micstt%OMP   , &
+    OMEhetr    => micstt%OMEhetr  , &
     DOM     => micstt%DOM   , &
     H1PO4 => micstt%H1PO4, &
     H1POB => micstt%H1POB, &
@@ -258,13 +256,11 @@ module MicBGCMod
     ZNO2S => micstt%ZNO2S, &
     ZNO3B => micstt%ZNO3B, &
     ZNO3S => micstt%ZNO3S, &
-    OMCff => micstt%OMCff, &
-    OMNff => micstt%OMNff, &
-    OMPff => micstt%OMPff, &
+    OMEauto => micstt%OMEauto, &
     FOSRH   => micstt%FOSRH   &
   )
 
-! get KL, the number of mic-om CO2CompenPoint_nodeexes
+! get KL, the number of mic-om complexes
 
 !
 !     TEMPERATURE FUNCTIONS FOR GROWTH AND MAINTENANCE
@@ -376,19 +372,20 @@ module MicBGCMod
   TOMN=0.0_r8
   D890: DO K=1,jcplx
     IF(.not.litrm.OR.(K.NE.k_POM.AND.K.NE.k_humus))THEN
-! the omb CO2CompenPoint_nodeexes
-      D895: DO N=1,NFGs
+! the omb complexes
+      D895: DO N=1,NumMicbFunGroups
         DO NGL=JGnio(n),JGnfo(n)
-          IF(OMC(1,NGL,K).GT.ZEROS)THEN
-            CNOMA(NGL,K)=AZMAX1(OMN(1,NGL,K)/OMC(1,NGL,K))
-            CPOMA(NGL,K)=AZMAX1(OMP(1,NGL,K)/OMC(1,NGL,K))
+          MID1=micpar%get_micb_id(1,NGL)
+          IF(OMEhetr(ielmc,MID1,K).GT.ZEROS)THEN
+            CNOMA(NGL,K)=AZMAX1(OMEhetr(ielmn,MID1,K)/OMEhetr(ielmc,MID1,K))
+            CPOMA(NGL,K)=AZMAX1(OMEhetr(ielmp,MID1,K)/OMEhetr(ielmc,MID1,K))
           ELSE
-            CNOMA(NGL,K)=CNOMC(1,NGL,K)
-            CPOMA(NGL,K)=CPOMC(1,NGL,K)
+            CNOMA(NGL,K)=rNCOMC(1,NGL,K)
+            CPOMA(NGL,K)=rPCOMC(1,NGL,K)
           ENDIF
-          OMA(NGL,K)=AZMAX1(OMC(1,NGL,K)/FL(1))
-          FCN(NGL,K)=AMIN1(1.0_r8,AMAX1(0.50_r8,SQRT(CNOMA(NGL,K)/CNOMC(1,NGL,K))))
-          FCP(NGL,K)=AMIN1(1.0_r8,AMAX1(0.50_r8,SQRT(CPOMA(NGL,K)/CPOMC(1,NGL,K))))
+          OMA(NGL,K)=AZMAX1(OMEhetr(ielmc,MID1,K)/FL(1))
+          FCN(NGL,K)=AMIN1(1.0_r8,AMAX1(0.50_r8,SQRT(CNOMA(NGL,K)/rNCOMC(1,NGL,K))))
+          FCP(NGL,K)=AMIN1(1.0_r8,AMAX1(0.50_r8,SQRT(CPOMA(NGL,K)/rPCOMC(1,NGL,K))))
           FCNP(NGL,K)=AMIN1(FCN(NGL,K),FCP(NGL,K))
 
 !       TOTAL BIOMASS
@@ -398,11 +395,11 @@ module MicBGCMod
           IF(N.EQ.n_anero_faculb)THEN
             TOMN=TOMN+OMA(NGL,K)
           ENDIF
-
-          OMC2(NGL,K)=AZMAX1(AMIN1(OMA(NGL,K)*FL(2),OMC(2,NGL,K)))
-          IF(OMC(2,NGL,K).GT.ZEROS)THEN
-            FOM2(NGL,K)=AZMAX1(OMC2(NGL,K)/OMC(2,NGL,K))
-            OMN2(NGL,K)=AZMAX1(FOM2(NGL,K)*OMN(2,NGL,K))
+          MID2=micpar%get_micb_id(2,NGL)
+          OMC2(NGL,K)=AZMAX1(AMIN1(OMA(NGL,K)*FL(2),OMEhetr(ielmc,MID2,K)))
+          IF(OMEhetr(ielmc,MID2,K).GT.ZEROS)THEN
+            FOM2(NGL,K)=AZMAX1(OMC2(NGL,K)/OMEhetr(ielmc,MID2,K))
+            OMN2(NGL,K)=AZMAX1(FOM2(NGL,K)*OMEhetr(ielmn,MID2,K))
           ELSE
             FOM2(NGL,K)=0.0_r8
             OMN2(NGL,K)=0.0_r8
@@ -412,20 +409,21 @@ module MicBGCMod
     ENDIF
   ENDDO D890
 
-! the abstract CO2CompenPoint_nodeex
-  DO N=1,NFGs
+! the abstract complex
+  DO N=1,NumMicbFunGroups
     IF(is_activef_micb(N))THEN
       DO NGL=JGniA(N),JGnfA(N)
-        IF(OMCff(1,NGL).GT.ZEROS)THEN
-          CNOMAff(NGL)=AZMAX1(OMNff(1,NGL)/OMCff(1,NGL))
-          CPOMAff(NGL)=AZMAX1(OMPff(1,NGL)/OMCff(1,NGL))
+        MID1=micpar%get_micb_id(1,NGL)
+        IF(OMEauto(ielmc,MID1).GT.ZEROS)THEN
+          CNOMAff(NGL)=AZMAX1(OMEauto(ielmn,MID1)/OMEauto(ielmc,MID1))
+          CPOMAff(NGL)=AZMAX1(OMEauto(ielmp,MID1)/OMEauto(ielmc,MID1))
         ELSE
-          CNOMAff(NGL)=CNOMCff(1,NGL)
-          CPOMAff(NGL)=CPOMCff(1,NGL)
+          CNOMAff(NGL)=rNCOMCff(1,NGL)
+          CPOMAff(NGL)=rPCOMCff(1,NGL)
         ENDIF
-        OMAff(NGL)=AZMAX1(OMCff(1,NGL)/FL(1))
-        FCNff(NGL)=AMIN1(1.0_r8,AMAX1(0.50_r8,SQRT(CNOMAff(NGL)/CNOMCff(1,NGL))))
-        FCPff(NGL)=AMIN1(1.0_r8,AMAX1(0.50_r8,SQRT(CPOMAff(NGL)/CPOMCff(1,NGL))))
+        OMAff(NGL)=AZMAX1(OMEauto(ielmc,MID1)/FL(1))
+        FCNff(NGL)=AMIN1(1.0_r8,AMAX1(0.50_r8,SQRT(CNOMAff(NGL)/rNCOMCff(1,NGL))))
+        FCPff(NGL)=AMIN1(1.0_r8,AMAX1(0.50_r8,SQRT(CPOMAff(NGL)/rPCOMCff(1,NGL))))
         FCNPff(NGL)=AMIN1(FCNff(NGL),FCPff(NGL))
 !
 !       TOTAL BIOMASS
@@ -436,11 +434,11 @@ module MicBGCMod
         IF(N.EQ.AmmoniaOxidizeBacteria)THEN
           TOMN=TOMN+OMAff(NGL)
         ENDIF
-
-        OMC2ff(NGL)=AZMAX1(AMIN1(OMAff(NGL)*FL(2),OMCff(2,NGL)))
-        IF(OMCff(2,NGL).GT.ZEROS)THEN
-          FOM2ff(NGL)=AZMAX1(OMC2ff(NGL)/OMCff(2,NGL))
-          OMN2ff(NGL)=AZMAX1(FOM2ff(NGL)*OMNff(2,NGL))
+        MID2=micpar%get_micb_id(2,NGL)
+        OMC2ff(NGL)=AZMAX1(AMIN1(OMAff(NGL)*FL(2),OMEauto(ielmc,MID2)))
+        IF(OMEauto(ielmc,MID2).GT.ZEROS)THEN
+          FOM2ff(NGL)=AZMAX1(OMC2ff(NGL)/OMEauto(ielmc,MID2))
+          OMN2ff(NGL)=AZMAX1(FOM2ff(NGL)*OMEauto(ielmn,MID2))
         ELSE
           FOM2ff(NGL)=0.0_r8
           OMN2ff(NGL)=0.0_r8
@@ -455,30 +453,30 @@ module MicBGCMod
     TOPK(K)=0.0_r8
     TONX(K)=0.0_r8
     TOPX(K)=0.0_r8
-    D685: DO N=1,NFGs
+    D685: DO N=1,NumMicbFunGroups
       DO NGL=JGnio(N),JGnfo(N)
         TOMK(K)=TOMK(K)+OMA(NGL,K)
         TONK(K)=TONK(K)+OMA(NGL,K)*CNOMA(NGL,K)
         TOPK(K)=TOPK(K)+OMA(NGL,K)*CPOMA(NGL,K)
-        TONX(K)=TONX(K)+OMA(NGL,K)*CNOMC(1,NGL,K)   !maximum total N in active micb
-        TOPX(K)=TOPX(K)+OMA(NGL,K)*CPOMC(1,NGL,K)   !maximum total P in active micb
+        TONX(K)=TONX(K)+OMA(NGL,K)*rNCOMC(1,NGL,K)   !maximum total N in active micb
+        TOPX(K)=TOPX(K)+OMA(NGL,K)*rPCOMC(1,NGL,K)   !maximum total P in active micb
       ENDDO
     ENDDO D685
   ENDDO D690
 
   K=jcplx+1
-  DO N=1,NFGs
+  DO N=1,NumMicbFunGroups
     DO NGL=JGniA(N),JGnfA(N)
       TOMK(K)=TOMK(K)+OMAff(NGL)
       TONK(K)=TONK(K)+OMAff(NGL)*CNOMAff(NGL)
       TOPK(K)=TOPK(K)+OMAff(NGL)*CPOMAff(NGL)
-      TONX(K)=TONX(K)+OMAff(NGL)*CNOMCff(1,NGL)   !maximum total N in active micb
-      TOPX(K)=TOPX(K)+OMAff(NGL)*CPOMCff(1,NGL)   !maximum total P in active micb
+      TONX(K)=TONX(K)+OMAff(NGL)*rNCOMCff(1,NGL)   !maximum total N in active micb
+      TOPX(K)=TOPX(K)+OMAff(NGL)*rPCOMCff(1,NGL)   !maximum total P in active micb
     ENDDO
   ENDDO
 
 !
-!     FOSRH=fraction of total SOC in each substrate CO2CompenPoint_nodeex K
+!     FOSRH=fraction of total SOC in each substrate complex K
 !
   D790: DO K=1,KL
     IF(TSRH.GT.ZEROS)THEN
@@ -491,7 +489,7 @@ module MicBGCMod
     !
     !     COQC,COQA=aqueous DOC,acetate concentrations
     !     VLWatMicPM=soil water content, FOSRH=fraction of total SOC
-    !     occupied by each substrate CO2CompenPoint_nodeex K
+    !     occupied by each substrate complex K
     !
     IF(VLWatMicPM(NPH).GT.ZEROS2)THEN
       IF(FOSRH(K).GT.ZERO)THEN
@@ -546,7 +544,7 @@ module MicBGCMod
   type(NitroMicStateType), intent(inout):: nmics
   type(NitroOMcplxFluxType), intent(inout) :: ncplxf
   type(NitroOMcplxStateType), intent(inout):: ncplxs
-  integer :: K,M,N,NGL
+  integer :: K,M,N,NGL,MID
   real(r8) :: TOMCNK(2)
   REAL(R8) :: OXKX
 ! begin_execution
@@ -584,8 +582,8 @@ module MicBGCMod
     H1POB => micstt%H1POB, &
     H2PO4 => micstt%H2PO4, &
     H2POB => micstt%H2POB, &
-    OMCff  => micstt%OMCff, &
-    OMC    => micstt%OMC    &
+    OMEauto  => micstt%OMEauto, &
+    OMEhetr   => micstt%OMEhetr   &
   )
   RH2GZ=0.0_r8
 
@@ -596,11 +594,12 @@ module MicBGCMod
 
   D760: DO K=1,jcplx
     IF(.not.litrm.OR.(K.NE.k_POM.AND.K.NE.k_humus))THEN
-      DO  N=1,NFGs
+      DO  N=1,NumMicbFunGroups
         TOMCNK(:)=0.0_r8
         DO NGL=JGnio(N),JGnfo(N)
           DO M=1,2
-            TOMCNK(M)=TOMCNK(M)+OMC(M,NGL,K)
+            MID=micpar%get_micb_id(M,NGL)          
+            TOMCNK(M)=TOMCNK(M)+OMEhetr(ielmc,MID,K)
           ENDDO
 
 !           WFNG=water potential (PSISoilMatricP) effect on microbial respiration
@@ -629,12 +628,13 @@ module MicBGCMod
   N=micpar%AmmoniaOxidizeBacteria
   nmicf%RVOXAAO=SUM(nmicf%RVOXA(JGniA(N):JGnfA(N)))
   nmicf%RVOXBAO=SUM(nmicf%RVOXB(JGniA(N):JGnfA(N)))
-  DO  N=1,NFGs
+  DO  N=1,NumMicbFunGroups
     IF(is_activef_micb(N))THEN
       TOMCNK(:)=0.0_r8
       DO NGL=JGniA(N),JGnfA(N)
         DO M=1,2
-          TOMCNK(M)=TOMCNK(M)+OMCff(M,NGL)
+          MID=micpar%get_micb_id(M,NGL)
+          TOMCNK(M)=TOMCNK(M)+OMEauto(ielmc,MID)
         ENDDO
 
         WFNG=EXP(0.2_r8*PSISoilMatricP)
@@ -980,7 +980,7 @@ module MicBGCMod
   type(NitroMicStateType), intent(inout) :: nmics
   type(NitroOMcplxFluxType), intent(inout):: ncplxf
   type(NitroOMcplxStateType),intent(inout):: ncplxs
-  integer  :: K,M,N,KK,NGL
+  integer  :: K,M,N,KK,NGL,MID
   real(r8) :: OSRT
   real(r8) :: XFRK,XFRC
   real(r8) :: XFRN,XFRP,XFRA
@@ -1000,9 +1000,7 @@ module MicBGCMod
     OSRH  => ncplxs%OSRH  ,  &
     TOQCK => micstt%TOQCK, &
     DOM => micstt%DOM, &
-    OMC => micstt%OMC, &
-    OMN => micstt%OMN, &
-    OMP => micstt%OMP, &
+    OMEhetr=> micstt%OMEhetr, &
     ZEROS => micfor%ZEROS , &
     TFND => micfor%TFND  &
   )
@@ -1055,27 +1053,28 @@ module MicBGCMod
 !     OSRH=total SOC in each K
 !     XOMCZ,XOMNZ,XOMPZ=total microbial C,N,P transfer for all K
 !
-          D850: DO N=1,NFGs
+          D850: DO N=1,NumMicbFunGroups
             DO  M=1,nlbiomcp
               DO NGL=JGnio(N),JGnfo(N)
-                XFMC=FPRIMM*TFNG(NGL,K)*(OMC(M,NGL,K)*OSRH(KK) &
-                  -OMC(M,NGL,KK)*OSRH(K))/OSRT
-                XFMN=FPRIMM*TFNG(NGL,K)*(OMN(M,NGL,K)*OSRH(KK) &
-                  -OMN(M,NGL,KK)*OSRH(K))/OSRT
-                XFMP=FPRIMM*TFNG(NGL,K)*(OMP(M,NGL,K)*OSRH(KK) &
-                  -OMP(M,NGL,KK)*OSRH(K))/OSRT
-                IF(OMC(M,NGL,K)+XOMCZ(M,NGL,K)-XFMC.GT.0.0_r8 &
-                  .AND.OMC(M,NGL,KK)+XOMCZ(M,NGL,KK)+XFMC.GT.0.0_r8)THEN
+                MID=micpar%get_micb_id(M,NGL)
+                XFMC=FPRIMM*TFNG(NGL,K)*(OMEhetr(ielmc,MID,K)*OSRH(KK) &
+                  -OMEhetr(ielmc,MID,KK)*OSRH(K))/OSRT
+                XFMN=FPRIMM*TFNG(NGL,K)*(OMEhetr(ielmn,MID,K)*OSRH(KK) &
+                  -OMEhetr(ielmn,MID,KK)*OSRH(K))/OSRT
+                XFMP=FPRIMM*TFNG(NGL,K)*(OMEhetr(ielmp,MID,K)*OSRH(KK) &
+                  -OMEhetr(ielmp,MID,KK)*OSRH(K))/OSRT
+                IF(OMEhetr(ielmc,MID,K)+XOMCZ(M,NGL,K)-XFMC.GT.0.0_r8 &
+                  .AND.OMEhetr(ielmc,MID,KK)+XOMCZ(M,NGL,KK)+XFMC.GT.0.0_r8)THEN
                   XOMCZ(M,NGL,K)=XOMCZ(M,NGL,K)-XFMC
                   XOMCZ(M,NGL,KK)=XOMCZ(M,NGL,KK)+XFMC
                 ENDIF
-                IF(OMN(M,NGL,K)+XOMNZ(M,NGL,K)-XFMN.GT.0.0_r8 &
-                  .AND.OMN(M,NGL,KK)+XOMNZ(M,NGL,KK)+XFMN.GT.0.0_r8)THEN
+                IF(OMEhetr(ielmn,MID,K)+XOMNZ(M,NGL,K)-XFMN.GT.0.0_r8 &
+                  .AND.OMEhetr(ielmn,MID,KK)+XOMNZ(M,NGL,KK)+XFMN.GT.0.0_r8)THEN
                   XOMNZ(M,NGL,K)=XOMNZ(M,NGL,K)-XFMN
                   XOMNZ(M,NGL,KK)=XOMNZ(M,NGL,KK)+XFMN
                 ENDIF
-                IF(OMP(M,NGL,K)+XOMPZ(M,NGL,K)-XFMP.GT.0.0_r8 &
-                  .AND.OMP(M,NGL,KK)+XOMPZ(M,NGL,KK)+XFMP.GT.0.0_r8)THEN
+                IF(OMEhetr(ielmp,MID,K)+XOMPZ(M,NGL,K)-XFMP.GT.0.0_r8 &
+                  .AND.OMEhetr(ielmp,MID,KK)+XOMPZ(M,NGL,KK)+XFMP.GT.0.0_r8)THEN
                   XOMPZ(M,NGL,K)=XOMPZ(M,NGL,K)-XFMP
                   XOMPZ(M,NGL,KK)=XOMPZ(M,NGL,KK)+XFMP
                 ENDIF
@@ -1090,7 +1089,7 @@ module MicBGCMod
 !     TRANSFER ALL PRIMING AMONG ALL K
 !
 !     TOQCK=total respiration of DOC+DOA in soil layer
-!     ROQCK=total respiration of DOC+DOA in substrate CO2CompenPoint_nodeex
+!     ROQCK=total respiration of DOC+DOA in substrate complex
 !     OQC,OQN,OQP,OQA=DOC,DON,DOP,acetate in micropores
 !     OMC,OMN,OMP=microbial C,N,P
 !
@@ -1102,12 +1101,13 @@ module MicBGCMod
     DOM(idom_don,K)=DOM(idom_don,K)+XOQNZ(K)
     DOM(idom_dop,K)=DOM(idom_dop,K)+XOQPZ(K)
     DOM(idom_acetate,K)=DOM(idom_acetate,K)+XOQAZ(K)
-    DO  N=1,NFGs
+    DO  N=1,NumMicbFunGroups
       DO  M=1,nlbiomcp
         do NGL=JGnio(N),JGnfo(N)
-          OMC(M,NGL,K)=OMC(M,NGL,K)+XOMCZ(M,NGL,K)
-          OMN(M,NGL,K)=OMN(M,NGL,K)+XOMNZ(M,NGL,K)
-          OMP(M,NGL,K)=OMP(M,NGL,K)+XOMPZ(M,NGL,K)
+          MID=micpar%get_micb_id(M,NGL)        
+          OMEhetr(ielmc,MID,K)=OMEhetr(ielmc,MID,K)+XOMCZ(M,NGL,K)
+          OMEhetr(ielmn,MID,K)=OMEhetr(ielmn,MID,K)+XOMNZ(M,NGL,K)
+          OMEhetr(ielmp,MID,K)=OMEhetr(ielmp,MID,K)+XOMPZ(M,NGL,K)
         enddo
       enddo
     enddo
@@ -1588,7 +1588,7 @@ module MicBGCMod
   )
 !
 !     REDISTRIBUTE AUTOTROPHIC DECOMPOSITION PRODUCTS AMONG
-!     HETEROTROPHIC SUBSTRATE-MICROBE CO2CompenPoint_nodeEXES
+!     HETEROTROPHIC SUBSTRATE-MICROBE complexES
 !
 !     FORC=fraction of total microbial residue
 !     ORCT=microbial residue
@@ -1606,7 +1606,7 @@ module MicBGCMod
         FORC(K)=0.0_r8
       ENDIF
     ENDIF
-    D1685: DO N=1,NFGs
+    D1685: DO N=1,NumMicbFunGroups
       D1680: DO M=1,ndbiomcp
         DO NGL=JGniA(N),JGnfA(N)
           RCCMC(M,NGL,K)=(RCOMCff(M,NGL)+RCMMCff(M,NGL))*FORC(K)
@@ -1618,7 +1618,7 @@ module MicBGCMod
   ENDDO D1690
 !
 !   REDISTRIBUTE C,N AND P TRANSFORMATIONS AMONG STATE
-!   VARIABLES IN SUBSTRATE-MICROBE CO2CompenPoint_nodeEXES
+!   VARIABLES IN SUBSTRATE-MICROBE complexES
 !
 
   D590: DO K=1,KL
@@ -1687,7 +1687,7 @@ module MicBGCMod
 !     CGOQC,CGOAC,CGOMN,CGOMP=DOC,acetate,DON,DOP uptake
 !     RCH3X=acetate production from fermentation
 !
-    D570: DO N=1,NFGs
+    D570: DO N=1,NumMicbFunGroups
       DO NGL=JGnio(N),JGnfo(N)
         DOM(idom_doc,K)=DOM(idom_doc,K)-CGOQC(NGL,K)
         DOM(idom_don,K)=DOM(idom_don,K)-CGOMN(NGL,K)
@@ -1732,7 +1732,7 @@ module MicBGCMod
   type(micforctype), intent(in) :: micfor
   type(micsttype), intent(inout) :: micstt
   type(NitroMicFluxType), intent(inout) :: nmicf
-  integer  :: K,M,N,NGL
+  integer  :: K,M,N,NGL,MID3,MID
   real(r8) ::CGROMC
 !     begin_execution
   associate(                  &
@@ -1779,9 +1779,7 @@ module MicBGCMod
     RINH4   => nmicf%RINH4,   &
     k_POM => micpar%k_POM, &
     k_humus => micpar%k_humus, &
-    OMC => micstt%OMC, &
-    OMN => micstt%OMN, &
-    OMP => micstt%OMP, &
+    OMEhetr=> micstt%OMEhetr, &
     OSC => micstt%OSC, &
     OSN => micstt%OSN, &
     OSP => micstt%OSP, &
@@ -1808,14 +1806,15 @@ module MicBGCMod
 
   D550: DO K=1,jcplx
     IF(.not.litrm.OR.(K.NE.k_POM.AND.K.NE.k_humus))THEN
-      DO  N=1,NFGs
+      DO  N=1,NumMicbFunGroups
         DO NGL=JGnio(N),JGnfo(N)
           D540: DO M=1,2
-            OMC(M,NGL,K)=OMC(M,NGL,K)+CGOMS(M,NGL,K) &
+            MID=micpar%get_micb_id(M,NGL)          
+            OMEhetr(ielmc,MID,K)=OMEhetr(ielmc,MID,K)+CGOMS(M,NGL,K) &
               -RXOMC(M,NGL,K)-RXMMC(M,NGL,K)
-            OMN(M,NGL,K)=OMN(M,NGL,K)+CGONS(M,NGL,K) &
+            OMEhetr(ielmn,MID,K)=OMEhetr(ielmn,MID,K)+CGONS(M,NGL,K) &
               -RXOMN(M,NGL,K)-RXMMN(M,NGL,K)
-            OMP(M,NGL,K)=OMP(M,NGL,K)+CGOPS(M,NGL,K) &
+            OMEhetr(ielmp,MID,K)=OMEhetr(ielmp,MID,K)+CGOPS(M,NGL,K) &
               -RXOMP(M,NGL,K)-RXMMP(M,NGL,K)
 !
 !     HUMIFICATION PRODUCTS
@@ -1864,20 +1863,21 @@ module MicBGCMod
 !
           CGROMC=CGOMC(NGL,K)-RGOMO(NGL,K)-RGOMD(NGL,K)-RGN2F(NGL,K)
           RCO2X(NGL,K)=RCO2X(NGL,K)+RGN2F(NGL,K)
+          MID3=micpar%get_micb_id(3,NGL)
           D555: DO M=1,2
-            OMC(3,NGL,K)=OMC(3,NGL,K)-CGOMS(M,NGL,K)+R3OMC(M,NGL,K)
-            OMN(3,NGL,K)=OMN(3,NGL,K)-CGONS(M,NGL,K)+R3OMN(M,NGL,K)+R3MMN(M,NGL,K)
-            OMP(3,NGL,K)=OMP(3,NGL,K)-CGOPS(M,NGL,K)+R3OMP(M,NGL,K)+R3MMP(M,NGL,K)
+            OMEhetr(ielmc,MID3,K)=OMEhetr(ielmc,MID3,K)-CGOMS(M,NGL,K)+R3OMC(M,NGL,K)
+            OMEhetr(ielmn,MID3,K)=OMEhetr(ielmn,MID3,K)-CGONS(M,NGL,K)+R3OMN(M,NGL,K)+R3MMN(M,NGL,K)
+            OMEhetr(ielmp,MID3,K)=OMEhetr(ielmp,MID3,K)-CGOPS(M,NGL,K)+R3OMP(M,NGL,K)+R3MMP(M,NGL,K)
             RCO2X(NGL,K)=RCO2X(NGL,K)+R3MMC(M,NGL,K)
           ENDDO D555
-          OMC(3,NGL,K)=OMC(3,NGL,K)+CGROMC
-          OMN(3,NGL,K)=OMN(3,NGL,K)+CGOMN(NGL,K) &
+          OMEhetr(ielmc,MID3,K)=OMEhetr(ielmc,MID3,K)+CGROMC
+          OMEhetr(ielmn,MID3,K)=OMEhetr(ielmn,MID3,K)+CGOMN(NGL,K) &
             +RINH4(NGL,K)+RINB4(NGL,K)+RINO3(NGL,K)+RINB3(NGL,K)+RN2FX(NGL,K)
-          OMP(3,NGL,K)=OMP(3,NGL,K)+CGOMP(NGL,K) &
+          OMEhetr(ielmp,MID3,K)=OMEhetr(ielmp,MID3,K)+CGOMP(NGL,K) &
             +RIPO4(NGL,K)+RIPOB(NGL,K)+RIP14(NGL,K)+RIP1B(NGL,K)
           IF(litrm)THEN
-            OMN(3,NGL,K)=OMN(3,NGL,K)+RINH4R(NGL,K)+RINO3R(NGL,K)
-            OMP(3,NGL,K)=OMP(3,NGL,K)+RIPO4R(NGL,K)+RIP14R(NGL,K)
+            OMEhetr(ielmn,MID3,K)=OMEhetr(ielmn,MID3,K)+RINH4R(NGL,K)+RINO3R(NGL,K)
+            OMEhetr(ielmp,MID3,K)=OMEhetr(ielmp,MID3,K)+RIPO4R(NGL,K)+RIP14R(NGL,K)
           ENDIF
         enddo
       ENDDO
@@ -2058,7 +2058,7 @@ module MicBGCMod
   )
   D650: DO K=1,jcplx
     IF(.not.litrm.OR.(K.NE.k_POM.AND.K.NE.k_humus))THEN
-      DO N=1,NFGs
+      DO N=1,NumMicbFunGroups
         DO NGL=JGnio(N),JGnfo(N)
           naqfdiag%TRINH=naqfdiag%TRINH+RINH4(NGL,K)
           naqfdiag%TRINO=naqfdiag%TRINO+RINO3(NGL,K)
@@ -2090,7 +2090,7 @@ module MicBGCMod
     ENDIF
   ENDDO D650
 
-  DO  N=1,NFGs
+  DO  N=1,NumMicbFunGroups
     IF(is_activef_micb(N))THEN
       DO NGL=JGniA(N),JGnfA(N)
         naqfdiag%TRINH=naqfdiag%TRINH+RINH4ff(NGL)
@@ -2124,7 +2124,7 @@ module MicBGCMod
 
 !     TRGOA=total CO2 uptake by autotrophs, ammonia oxidizer
 !  nitrite oxidizer, and hydrogenotophic methanogens
-  D645: DO N=1,NFGs
+  D645: DO N=1,NumMicbFunGroups
     IF(micpar%is_CO2_autotroph(N))THEN
       DO NGL=JGniA(N),JGnfA(N)
         naqfdiag%TRGOA=naqfdiag%TRGOA+CGOMCff(NGL)
@@ -2180,7 +2180,7 @@ module MicBGCMod
     RDOM_micb_flx(idom_don,K)=RDOM_micb_flx(idom_don,K)+RDOHN(K)
     RDOM_micb_flx(idom_dop,K)=RDOM_micb_flx(idom_dop,K)+RDOHP(K)
     RDOM_micb_flx(idom_acetate,K)=RDOM_micb_flx(idom_acetate,K)+RDOHA(K)
-    D670: DO N=1,NFGs
+    D670: DO N=1,NumMicbFunGroups
       DO NGL=JGnio(N),JGnfo(N)
         RDOM_micb_flx(idom_doc,K)=RDOM_micb_flx(idom_doc,K)-CGOQC(NGL,K)
         RDOM_micb_flx(idom_don,K)=RDOM_micb_flx(idom_don,K)-CGOMN(NGL,K)
@@ -3192,6 +3192,7 @@ module MicBGCMod
   real(r8) :: ZNH4M,ZNHBM
   real(r8) :: ZNO3M
   real(r8) :: ZNOBM
+  integer :: MID3
 
 !     begin_execution
   associate(                 &
@@ -3213,8 +3214,8 @@ module MicBGCMod
    RIP14  => nmicf%RIP14,    &
    RIP1B  => nmicf%RIP1B,    &
    RIP14R  => nmicf%RIP14R,  &
-   CNOMC  => micpar%CNOMC   , &
-   CPOMC  => micpar%CPOMC ,   &
+   rNCOMC  => micpar%rNCOMC   , &
+   rPCOMC  => micpar%rPCOMC ,   &
    litrm => micfor%litrm , &
    VLNH4  => micfor%VLNH4 , &
    VLNHB  => micfor%VLNHB , &
@@ -3252,9 +3253,7 @@ module MicBGCMod
    CNO3S  => micstt%CNO3S, &
    CNO3SU => micstt%CNO3SU, &
    CNO3BU => micstt%CNO3BU, &
-   OMC  => micstt%OMC, &
-   OMN  => micstt%OMN, &
-   OMP  => micstt%OMP, &
+   OMEhetr => micstt%OMEhetr, &
    RINOB => micflx%RINOB, &
    RINOO  => micflx%RINOO, &
    RINHO  => micflx%RINHO, &
@@ -3275,7 +3274,7 @@ module MicBGCMod
 !
 !     RINHP=NH4 mineralization (-ve) or immobilization (+ve) demand
 !     OMC,OMN=microbial nonstructural C,N
-!     CNOMC=maximum microbial N:C ratio
+!     rNCOMC=maximum microbial N:C ratio
 !     CNH4S,CNH4B=aqueous NH4 concentrations in non-band, band
 !     Z4MX,Z4MN,Z4KU=parameters for max NH4 uptake rate,
 !     minimum NH4 concentration and Km for NH4 uptake
@@ -3292,7 +3291,8 @@ module MicBGCMod
 ! update may be needed, May 17th, 2023, jyt.
   FNH4S=VLNH4
   FNHBS=VLNHB
-  RINHP=(OMC(3,NGL,K)*CNOMC(3,NGL,K)-OMN(3,NGL,K))
+  MID3=micpar%get_micb_id(3,NGL)
+  RINHP=(OMEhetr(ielmc,MID3,K)*rNCOMC(3,NGL,K)-OMEhetr(ielmn,MID3,K))
   IF(RINHP.GT.0.0_r8)THEN
     CNH4X=AZMAX1(CNH4S-Z4MN)
     CNH4Y=AZMAX1(CNH4B-Z4MN)
@@ -3355,7 +3355,7 @@ module MicBGCMod
 !
 !     RIPOP=H2PO4 mineralization (-ve) or immobilization (+ve) demand
 !     OMC,OMP=microbial nonstructural C,P
-!     CPOMC=maximum microbial P:C ratio
+!     rPCOMC=maximum microbial P:C ratio
 !     CH2P4,CH2P4B=aqueous H2PO4 concentrations in non-band, band
 !     HPMX,HPMN,HPKU=parameters for max H2PO4 uptake rate,
 !     min H2PO4 concentration and Km for H2PO4 uptake
@@ -3372,7 +3372,8 @@ module MicBGCMod
 !
   FH2PS=VLPO4
   FH2PB=VLPOB
-  RIPOP=(OMC(3,NGL,K)*CPOMC(3,NGL,K)-OMP(3,NGL,K))
+  MID3=micpar%get_micb_id(3,NGL)
+  RIPOP=(OMEhetr(ielmc,MID3,K)*rPCOMC(3,NGL,K)-OMEhetr(ielmp,MID3,K))
   IF(RIPOP.GT.0.0_r8)THEN
     CH2PX=AZMAX1(CH2P4-HPMN)
     CH2PY=AZMAX1(CH2P4B-HPMN)
@@ -3583,6 +3584,7 @@ module MicBGCMod
   type(micsttype), intent(inout) :: micstt
   type(NitroMicStateType), intent(inout) :: nmics
   type(NitroMicFluxType), intent(inout) :: nmicf
+  integer :: MID3,MID1
   REAL(R8) :: FPH,RMOMX
   real(r8) :: RGN2P
 !     begin_execution
@@ -3595,15 +3597,14 @@ module MicBGCMod
     RINH4 => nmicf%RINH4 ,    &
     RINO3  => nmicf%RINO3,    &
     RN2FX  => nmicf%RN2FX,    &
-    CNOMC  => micpar%CNOMC   , &
-    CPOMC  => micpar%CPOMC  ,  &
+    rNCOMC  => micpar%rNCOMC   , &
+    rPCOMC  => micpar%rPCOMC  ,  &
     pH  => micfor%pH, &
     ZEROS => micfor%ZEROS, &
     n_aero_n2fixer => micpar%n_aero_n2fixer, &
     n_anero_n2fixer => micpar%n_anero_n2fixer ,&
     CZ2GS => micstt%CZ2GS, &
-    OMC => micstt%OMC , &
-    OMN => micstt%OMN  &
+    OMEhetr=> micstt%OMEhetr   &
   )
 !     pH EFFECT ON MAINTENANCE RESPIRATION
 !
@@ -3616,7 +3617,8 @@ module MicBGCMod
   FPH=1.0_r8+AZMAX1(0.25_r8*(6.5_r8-PH))
 
   RMOMX=RMOM*TFNR(NGL,K)*FPH
-  RMOMC(1,NGL,K)=OMN(1,NGL,K)*RMOMX*RMOMK(1)
+  MID1=micpar%get_micb_id(1,NGL)
+  RMOMC(1,NGL,K)=OMEhetr(ielmn,MID1,K)*RMOMX*RMOMK(1)
   RMOMC(2,NGL,K)=OMN2(NGL,K)*RMOMX*RMOMK(2)
 !
 !     MICROBIAL MAINTENANCE AND GROWTH RESPIRATION
@@ -3636,7 +3638,7 @@ module MicBGCMod
 !
 !     RGN2P=respiration to meet N2 fixation demand
 !     OMC,OMN=microbial nonstructural C,N
-!     CNOMC=maximum microbial N:C ratio
+!     rNCOMC=maximum microbial N:C ratio
 !     EN2F=N2 fixation yield per unit nonstructural C
 !     RGOMT=growth respiration
 !     RGN2F=respiration for N2 fixation
@@ -3646,10 +3648,11 @@ module MicBGCMod
 !     RN2FX=N2 fixation rate
 !
   IF(N.EQ.n_aero_n2fixer.OR.N.EQ.n_anero_n2fixer)THEN
-    RGN2P=AZMAX1(OMC(3,NGL,K)*CNOMC(3,NGL,K)-OMN(3,NGL,K))/EN2F(N)
+    MID3=micpar%get_micb_id(3,NGL)
+    RGN2P=AZMAX1(OMEhetr(ielmc,MID3,K)*rNCOMC(3,NGL,K)-OMEhetr(ielmn,MID3,K))/EN2F(N)
     IF(RGOMT.GT.ZEROS)THEN
       RGN2F(NGL,K)=AMIN1(RGOMT*RGN2P/(RGOMT+RGN2P) &
-        *CZ2GS/(CZ2GS+ZFKM),OMGR*OMC(3,NGL,K))
+        *CZ2GS/(CZ2GS+ZFKM),OMGR*OMEhetr(ielmc,MID3,K))
     ELSE
       RGN2F(NGL,K)=0.0_r8
     ENDIF
@@ -3673,7 +3676,7 @@ module MicBGCMod
   type(NitroMicFluxType), intent(inout) :: nmicf
   type(NitroOMcplxFluxType), intent(inout) :: ncplxf
   type(NitroOMcplxStateType), intent(inout) :: ncplxs
-  integer :: M
+  integer :: M,MID1,MID3,MID
   real(r8) :: RCCC,RCCN,RCCP
   real(r8) :: CCC,CGOMX,CGOMD
   real(r8) :: CXC
@@ -3739,13 +3742,11 @@ module MicBGCMod
     TCGOMP  => ncplxf%TCGOMP, &
     CNQ     => ncplxs%CNQ   , &
     CPQ     => ncplxs%CPQ   , &
-    CNOMC   => micpar%CNOMC , &
-    CPOMC   => micpar%CPOMC , &
+    rNCOMC   => micpar%rNCOMC , &
+    rPCOMC   => micpar%rPCOMC , &
     FL      => micpar%FL    , &
     EHUM    => micstt%EHUM  , &
-    OMC     => micstt%OMC   , &
-    OMN     => micstt%OMN   , &
-    OMP     => micstt%OMP   , &
+    OMEhetr    => micstt%OMEhetr  , &
     DOM     => micstt%DOM   , &
     ZEROS   => micfor%ZEROS , &
     ZERO    => micfor%ZERO    &
@@ -3789,19 +3790,20 @@ module MicBGCMod
 !
 !     OMC,OMN,OMP=nonstructural C,N,P
 !     CCC,CNC,CPC=C:N:P ratios used to calculate C,N,P recycling
-!     CNOMC,CPOMC=maximum microbial N:C, P:C ratios
+!     rNCOMC,rPCOMC=maximum microbial N:C, P:C ratios
 !     RCCC,RCCN,RCCP=C,N,P recycling fractions
 !     RCCZ,RCCY=min, max C recycling fractions
 !     RCCX,RCCQ=max N,P recycling fractions
 !
-  IF(OMC(3,NGL,K).GT.ZEROS .AND.OMC(1,NGL,K).GT.ZEROS)THEN
+  MID1=micpar%get_micb_id(1,NGL);MID3=micpar%get_micb_id(3,NGL)
+  IF(OMEhetr(ielmc,MID3,K).GT.ZEROS .AND.OMEhetr(ielmc,MID1,K).GT.ZEROS)THEN
     CCC=AZMAX1(AMIN1(1.0_r8 &
-      ,OMN(3,NGL,K)/(OMN(3,NGL,K)+OMC(3,NGL,K)*CNOMC(3,NGL,K)) &
-      ,OMP(3,NGL,K)/(OMP(3,NGL,K)+OMC(3,NGL,K)*CPOMC(3,NGL,K))))
-    CXC=OMC(3,NGL,K)/OMC(1,NGL,K)
+      ,OMEhetr(ielmn,MID3,K)/(OMEhetr(ielmn,MID3,K)+OMEhetr(ielmc,MID3,K)*rNCOMC(3,NGL,K)) &
+      ,OMEhetr(ielmp,MID3,K)/(OMEhetr(ielmp,MID3,K)+OMEhetr(ielmc,MID3,K)*rPCOMC(3,NGL,K))))
+    CXC=OMEhetr(ielmc,MID3,K)/OMEhetr(ielmc,MID1,K)
     C3C=1.0_r8/(1.0_r8+CXC/CKC)
-    CNC=AZMAX1(AMIN1(1.0_r8,OMC(3,NGL,K)/(OMC(3,NGL,K)+OMN(3,NGL,K)/CNOMC(3,NGL,K))))
-    CPC=AZMAX1(AMIN1(1.0_r8,OMC(3,NGL,K)/(OMC(3,NGL,K)+OMP(3,NGL,K)/CPOMC(3,NGL,K))))
+    CNC=AZMAX1(AMIN1(1.0_r8,OMEhetr(ielmc,MID3,K)/(OMEhetr(ielmc,MID3,K)+OMEhetr(ielmn,MID3,K)/rNCOMC(3,NGL,K))))
+    CPC=AZMAX1(AMIN1(1.0_r8,OMEhetr(ielmc,MID3,K)/(OMEhetr(ielmc,MID3,K)+OMEhetr(ielmp,MID3,K)/rPCOMC(3,NGL,K))))
     RCCC=RCCZ+AMAX1(CCC,C3C)*RCCY
     RCCN=CNC*RCCX
     RCCP=CPC*RCCQ
@@ -3820,14 +3822,14 @@ module MicBGCMod
 !     FL=partitioning between labile and resistant microbial components
 !     OMC,OMN,OMP=nonstructural microbial C,N,P
 ! M=1:labile, 2, resistant
-  CGOMZ=TFNG(NGL,K)*OMGR*AZMAX1(OMC(3,NGL,K))
+  CGOMZ=TFNG(NGL,K)*OMGR*AZMAX1(OMEhetr(ielmc,MID3,K))
   D745: DO M=1,2
     CGOMS(M,NGL,K)=FL(M)*CGOMZ
-    IF(OMC(3,NGL,K).GT.ZEROS)THEN
-      CGONS(M,NGL,K)=AMIN1(FL(M)*AZMAX1(OMN(3,NGL,K)) &
-        ,CGOMS(M,NGL,K)*OMN(3,NGL,K)/OMC(3,NGL,K))
-      CGOPS(M,NGL,K)=AMIN1(FL(M)*AZMAX1(OMP(3,NGL,K)) &
-        ,CGOMS(M,NGL,K)*OMP(3,NGL,K)/OMC(3,NGL,K))
+    IF(OMEhetr(ielmc,MID3,K).GT.ZEROS)THEN
+      CGONS(M,NGL,K)=AMIN1(FL(M)*AZMAX1(OMEhetr(ielmn,MID3,K)) &
+        ,CGOMS(M,NGL,K)*OMEhetr(ielmn,MID3,K)/OMEhetr(ielmc,MID3,K))
+      CGOPS(M,NGL,K)=AMIN1(FL(M)*AZMAX1(OMEhetr(ielmp,MID3,K)) &
+        ,CGOMS(M,NGL,K)*OMEhetr(ielmp,MID3,K)/OMEhetr(ielmc,MID3,K))
     ELSE
       CGONS(M,NGL,K)=0.0_r8
       CGOPS(M,NGL,K)=0.0_r8
@@ -3843,10 +3845,11 @@ module MicBGCMod
 !     RDOMC,RDOMN,RDOMP=microbial C,N,P litterfall
 !     R3OMC,R3OMN,R3OMP=microbial C,N,P recycling
 !
+    MID=micpar%get_micb_id(M,NGL)
     SPOMX=SQRT(TFNG(NGL,K))*SPOMC(M)*SPOMK(M)
-    RXOMC(M,NGL,K)=AZMAX1(OMC(M,NGL,K)*SPOMX)
-    RXOMN(M,NGL,K)=AZMAX1(OMN(M,NGL,K)*SPOMX)
-    RXOMP(M,NGL,K)=AZMAX1(OMP(M,NGL,K)*SPOMX)
+    RXOMC(M,NGL,K)=AZMAX1(OMEhetr(ielmc,MID,K)*SPOMX)
+    RXOMN(M,NGL,K)=AZMAX1(OMEhetr(ielmn,MID,K)*SPOMX)
+    RXOMP(M,NGL,K)=AZMAX1(OMEhetr(ielmp,MID,K)*SPOMX)
     RDOMC(M,NGL,K)=RXOMC(M,NGL,K)*(1.0_r8-RCCC)
     RDOMN(M,NGL,K)=RXOMN(M,NGL,K)*(1.0_r8-RCCC)*(1.0_r8-RCCN)
     RDOMP(M,NGL,K)=RXOMP(M,NGL,K)*(1.0_r8-RCCC)*(1.0_r8-RCCP)
@@ -3888,9 +3891,10 @@ module MicBGCMod
   IF(RXOMT.GT.ZEROS.AND.RMOMT.GT.ZEROS.AND.RCCC.GT.ZERO)THEN
     FRM=RXOMT/RMOMT
     D730: DO M=1,2
-      RXMMC(M,NGL,K)=AMIN1(OMC(M,NGL,K),AZMAX1(FRM*RMOMC(M,NGL,K)/RCCC))
-      RXMMN(M,NGL,K)=AMIN1(OMN(M,NGL,K),AZMAX1(RXMMC(M,NGL,K)*CNOMA(NGL,K)))
-      RXMMP(M,NGL,K)=AMIN1(OMP(M,NGL,K),AZMAX1(RXMMC(M,NGL,K)*CPOMA(NGL,K)))
+      MID=micpar%get_micb_id(M,NGL)    
+      RXMMC(M,NGL,K)=AMIN1(OMEhetr(ielmc,MID,K),AZMAX1(FRM*RMOMC(M,NGL,K)/RCCC))
+      RXMMN(M,NGL,K)=AMIN1(OMEhetr(ielmn,MID,K),AZMAX1(RXMMC(M,NGL,K)*CNOMA(NGL,K)))
+      RXMMP(M,NGL,K)=AMIN1(OMEhetr(ielmp,MID,K),AZMAX1(RXMMC(M,NGL,K)*CPOMA(NGL,K)))
       RDMMC(M,NGL,K)=RXMMC(M,NGL,K)*(1.0_r8-RCCC)
       RDMMN(M,NGL,K)=RXMMN(M,NGL,K)*(1.0_r8-RCCN)*(1.0_r8-RCCC)
       RDMMP(M,NGL,K)=RXMMP(M,NGL,K)*(1.0_r8-RCCP)*(1.0_r8-RCCC)
@@ -3933,6 +3937,5 @@ module MicBGCMod
   ENDIF
   end associate
   end subroutine GetMicrobialAnabolismFlux
-
 
 end module MicBGCMod

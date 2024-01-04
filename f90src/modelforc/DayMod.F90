@@ -108,12 +108,12 @@
   HydroIonFlx_col(NY,NX)=0._r8
   FertNFlx_col(NY,NX)=0._r8
   LiterfalOrgN_col(NY,NX)=0._r8
-  HydroDONFlx_col(NY,NX)=0._r8
-  HydroDINFlx_col(NY,NX)=0._r8
+  HydroSufDONFlx_col(NY,NX)=0._r8
+  HydroSufDINFlx_col(NY,NX)=0._r8
   FerPFlx_col(NY,NX)=0._r8
   LiterfalOrgP_col(NY,NX)=0._r8
-  HydroDOPFlx_col(NY,NX)=0._r8
-  HydroDIPFlx_col(NY,NX)=0._r8
+  HydroSufDOPFlx_col(NY,NX)=0._r8
+  HydroSufDIPFlx_col(NY,NX)=0._r8
   CO2byFire_col(NY,NX)=0._r8
   CH4byFire_col(NY,NX)=0._r8
   O2byFire_col(NY,NX)=0._r8
@@ -130,7 +130,7 @@
 
   D960: DO NZ=1,NP0(NY,NX)
   !NetCumElmntFlx2Plant_pft: effect of canopy element status on seed set
-    DO NE=1,NumOfPlantChemElmnts
+    DO NE=1,NumPlantChemElmnts
       NetCumElmntFlx2Plant_pft(NE,NZ,NY,NX)=NetCumElmntFlx2Plant_pft(NE,NZ,NY,NX)+PlantExudChemElmntCum_pft(NE,NZ,NY,NX)-LitrfallChemElmnts_pft(NE,NZ,NY,NX)
       EcoHavstElmntCum_pft(NE,NZ,NY,NX)=EcoHavstElmntCum_pft(NE,NZ,NY,NX)+EcoHavstElmnt_pft(NE,NZ,NY,NX)
     enddo

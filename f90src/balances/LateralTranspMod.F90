@@ -19,8 +19,8 @@ module LateralTranspMod
   use EcoSimConst
   use EcoSiMParDataMod, only : micpar
   use minimathmod , only : AZMAX1
-  use EcoSIMConfig, only : jcplx => jcplxc,NFGs=>NFGsc
-  use EcoSIMConfig, only : nlbiomcp=>NumOfLiveMicrobiomComponents
+  use EcoSIMConfig, only : jcplx => jcplxc,NumMicbFunGroups=>NumMicbFunGroups
+  use EcoSIMConfig, only : nlbiomcp=>NumLiveMicrbCompts
   use ErosionBalMod
   use SnowBalanceMod
   use EcoSIMCtrlMod
@@ -308,7 +308,7 @@ implicit none
     integer, intent(in) :: N   !direction of calculation
     integer, intent(in) :: N1,N2,N4,N5,N4B,N5B,NY,NX
 
-    integer :: M,K,NO,NN,NGL,NTX,NTP
+    integer :: M,K,NO,NN,NGL,NTX,NTP,MID
 !     begin_execution
 !
 !     T*ER=net sediment flux
@@ -338,7 +338,7 @@ implicit none
       IF(ABS(cumSedErosion(N,NN,N2,N1)).GT.ZEROS(N2,N1) &
         .OR.ABS(cumSedErosion(N,NN,N5,N4)).GT.ZEROS(N5,N4))THEN
         !incoming from south or east grid 
-        TSEDER(N2,N1)=TSEDER(N2,N1)+cumSedErosion(N,NN,N2,N1)
+        tErosionSedmLoss(N2,N1)=tErosionSedmLoss(N2,N1)+cumSedErosion(N,NN,N2,N1)
         TSANER(N2,N1)=TSANER(N2,N1)+XSANER(N,NN,N2,N1)
         TSILER(N2,N1)=TSILER(N2,N1)+XSILER(N,NN,N2,N1)
         TCLAER(N2,N1)=TCLAER(N2,N1)+XCLAER(N,NN,N2,N1)
@@ -360,29 +360,31 @@ implicit none
         ENDDO
 
         DO  K=1,jcplx
-          DO NO=1,NFGs
+          DO NO=1,NumMicbFunGroups
             DO NGL=JGnio(NO),JGnfo(NO)
               DO M=1,nlbiomcp
-                TOMCER(M,NGL,K,N2,N1)=TOMCER(M,NGL,K,N2,N1) &
-                  +OMCER(M+(NGL-1)*nlbiomcp,K,N,NN,N2,N1)
-                TOMNER(M,NGL,K,N2,N1)=TOMNER(M,NGL,K,N2,N1) &
-                  +OMNER(M+(NGL-1)*nlbiomcp,K,N,NN,N2,N1)
-                TOMPER(M,NGL,K,N2,N1)=TOMPER(M,NGL,K,N2,N1) &
-                  +OMPER(M+(NGL-1)*nlbiomcp,K,N,NN,N2,N1)
+                MID=micpar%get_micb_id(M,NGL)
+                TOMEERhetr(ielmc,MID,K,N2,N1)=TOMEERhetr(ielmc,MID,K,N2,N1) &
+                  +OMEERhetr(ielmc,MID,K,N,NN,N2,N1)
+                TOMEERhetr(ielmn,MID,K,N2,N1)=TOMEERhetr(ielmn,MID,K,N2,N1) &
+                  +OMEERhetr(ielmn,MID,K,N,NN,N2,N1)
+                TOMEERhetr(ielmp,MID,K,N2,N1)=TOMEERhetr(ielmp,MID,K,N2,N1) &
+                  +OMEERhetr(ielmp,MID,K,N,NN,N2,N1)
               enddo
             enddo
           enddo
         ENDDO
 
-        DO NO=1,NFGs
+        DO NO=1,NumMicbFunGroups
           DO NGL=JGniA(NO),JGnfA(NO)
             DO M=1,nlbiomcp
-              TOMCERff(M,NGL,N2,N1)=TOMCERff(M,NGL,N2,N1) &
-                +OMCERff(M+(NGL-1)*nlbiomcp,N,NN,N2,N1)
-              TOMNERff(M,NGL,N2,N1)=TOMNERff(M,NGL,N2,N1) &
-                +OMNERff(M+(NGL-1)*nlbiomcp,N,NN,N2,N1)
-              TOMPERff(M,NGL,N2,N1)=TOMPERff(M,NGL,N2,N1) &
-                +OMPERff(M+(NGL-1)*nlbiomcp,N,NN,N2,N1)
+              MID=micpar%get_micb_id(M,NGL)
+              TOMEERauto(ielmc,MID,N2,N1)=TOMEERauto(ielmc,MID,N2,N1) &
+                +OMEERauto(ielmc,MID,N,NN,N2,N1)
+              TOMEERauto(ielmn,MID,N2,N1)=TOMEERauto(ielmn,MID,N2,N1) &
+                +OMEERauto(ielmn,MID,N,NN,N2,N1)
+              TOMEERauto(ielmp,MID,N2,N1)=TOMEERauto(ielmp,MID,N2,N1) &
+                +OMEERauto(ielmp,MID,N,NN,N2,N1)
             enddo
           enddo
         enddo
@@ -408,7 +410,7 @@ implicit none
 
 !     IF(NN.EQ.2)THEN
 !       outgoing
-        TSEDER(N2,N1)=TSEDER(N2,N1)-cumSedErosion(N,NN,N5,N4)
+        tErosionSedmLoss(N2,N1)=tErosionSedmLoss(N2,N1)-cumSedErosion(N,NN,N5,N4)
         TSANER(N2,N1)=TSANER(N2,N1)-XSANER(N,NN,N5,N4)
         TSILER(N2,N1)=TSILER(N2,N1)-XSILER(N,NN,N5,N4)
         TCLAER(N2,N1)=TCLAER(N2,N1)-XCLAER(N,NN,N5,N4)
@@ -430,30 +432,32 @@ implicit none
         ENDDO
 
         DO  K=1,jcplx
-          DO  NO=1,NFGs
+          DO  NO=1,NumMicbFunGroups
             DO NGL=JGnio(NO),JGnfo(NO)
               DO  M=1,nlbiomcp
-                TOMCER(M,NGL,K,N2,N1)=TOMCER(M,NGL,K,N2,N1) &
-                  -OMCER(M+(NGL-1)*nlbiomcp,K,N,NN,N5,N4)
-                TOMNER(M,NGL,K,N2,N1)=TOMNER(M,NGL,K,N2,N1) &
-                  -OMNER(M+(NGL-1)*nlbiomcp,K,N,NN,N5,N4)
-                TOMPER(M,NGL,K,N2,N1)=TOMPER(M,NGL,K,N2,N1) &
-                  -OMPER(M+(NGL-1)*nlbiomcp,K,N,NN,N5,N4)
+                MID=micpar%get_micb_id(M,NGL)
+                TOMEERhetr(ielmc,MID,K,N2,N1)=TOMEERhetr(ielmc,MID,K,N2,N1) &
+                  -OMEERhetr(ielmc,MID,K,N,NN,N5,N4)
+                TOMEERhetr(ielmn,MID,K,N2,N1)=TOMEERhetr(ielmn,MID,K,N2,N1) &
+                  -OMEERhetr(ielmn,MID,K,N,NN,N5,N4)
+                TOMEERhetr(ielmp,MID,K,N2,N1)=TOMEERhetr(ielmp,MID,K,N2,N1) &
+                  -OMEERhetr(ielmp,MID,K,N,NN,N5,N4)
               enddo
             enddo
           enddo
         ENDDO
 
 
-        DO  NO=1,NFGs
+        DO  NO=1,NumMicbFunGroups
           DO  M=1,nlbiomcp
             DO NGL=JGniA(NO),JGnfA(NO)
-              TOMCERff(M,NGL,N2,N1)=TOMCERff(M,NGL,N2,N1) &
-                -OMCERff(M+(NGL-1)*nlbiomcp,N,NN,N5,N4)
-              TOMNERff(M,NGL,N2,N1)=TOMNERff(M,NGL,N2,N1) &
-                -OMNERff(M+(NGL-1)*nlbiomcp,N,NN,N5,N4)
-              TOMPERff(M,NGL,N2,N1)=TOMPERff(M,NGL,N2,N1) &
-                -OMPERff(M+(NGL-1)*nlbiomcp,N,NN,N5,N4)
+              MID=micpar%get_micb_id(M,NGL)            
+              TOMEERauto(ielmc,MID,N2,N1)=TOMEERauto(ielmc,MID,N2,N1) &
+                -OMEERauto(ielmc,MID,N,NN,N5,N4)
+              TOMEERauto(ielmn,MID,N2,N1)=TOMEERauto(ielmn,MID,N2,N1) &
+                -OMEERauto(ielmn,MID,N,NN,N5,N4)
+              TOMEERauto(ielmp,MID,N2,N1)=TOMEERauto(ielmp,MID,N2,N1) &
+                -OMEERauto(ielmp,MID,N,NN,N5,N4)
             enddo
           enddo
         enddo
@@ -479,7 +483,7 @@ implicit none
       ENDIF
       IF(N4B.GT.0.AND.N5B.GT.0.AND.NN.EQ.1)THEN
         IF(ABS(cumSedErosion(N,NN,N5B,N4B)).GT.ZEROS(N5,N4))THEN
-          TSEDER(N2,N1)=TSEDER(N2,N1)-cumSedErosion(N,NN,N5B,N4B)
+          tErosionSedmLoss(N2,N1)=tErosionSedmLoss(N2,N1)-cumSedErosion(N,NN,N5B,N4B)
           TSANER(N2,N1)=TSANER(N2,N1)-XSANER(N,NN,N5B,N4B)
           TSILER(N2,N1)=TSILER(N2,N1)-XSILER(N,NN,N5B,N4B)
           TCLAER(N2,N1)=TCLAER(N2,N1)-XCLAER(N,NN,N5B,N4B)
@@ -501,29 +505,31 @@ implicit none
           ENDDO
 
           D8380: DO K=1,jcplx
-            DO  NO=1,NFGs
+            DO  NO=1,NumMicbFunGroups
               DO NGL=JGnio(NO),JGnfo(NO)
                 DO  M=1,nlbiomcp
-                  TOMCER(M,NGL,K,N2,N1)=TOMCER(M,NGL,K,N2,N1) &
-                    -OMCER(M+(NGL-1)*nlbiomcp,K,N,NN,N5B,N4B)
-                  TOMNER(M,NGL,K,N2,N1)=TOMNER(M,NGL,K,N2,N1) &
-                    -OMNER(M+(NGL-1)*nlbiomcp,K,N,NN,N5B,N4B)
-                  TOMPER(M,NGL,K,N2,N1)=TOMPER(M,NGL,K,N2,N1) &
-                    -OMPER(M+(NGL-1)*nlbiomcp,K,N,NN,N5B,N4B)
+                  MID=micpar%get_micb_id(M,NGL)                
+                  TOMEERhetr(ielmc,MID,K,N2,N1)=TOMEERhetr(ielmc,MID,K,N2,N1) &
+                    -OMEERhetr(ielmc,MID,K,N,NN,N5B,N4B)
+                  TOMEERhetr(ielmn,MID,K,N2,N1)=TOMEERhetr(ielmn,MID,K,N2,N1) &
+                    -OMEERhetr(ielmn,MID,K,N,NN,N5B,N4B)
+                  TOMEERhetr(ielmp,MID,K,N2,N1)=TOMEERhetr(ielmp,MID,K,N2,N1) &
+                    -OMEERhetr(ielmp,MID,K,N,NN,N5B,N4B)
                 enddo
               enddo
             enddo
           ENDDO D8380
 
-          DO  NO=1,NFGs
+          DO  NO=1,NumMicbFunGroups
             DO NGL=JGniA(NO),JGnfA(NO)
               DO  M=1,nlbiomcp
-                TOMCERff(M,NGL,N2,N1)=TOMCERff(M,NGL,N2,N1) &
-                  -OMCERff(M+(NGL-1)*nlbiomcp,N,NN,N5B,N4B)
-                TOMNERff(M,NGL,N2,N1)=TOMNERff(M,NGL,N2,N1) &
-                  -OMNERff(M+(NGL-1)*nlbiomcp,N,NN,N5B,N4B)
-                TOMPERff(M,NGL,N2,N1)=TOMPERff(M,NGL,N2,N1) &
-                  -OMPERff(M+(NGL-1)*nlbiomcp,N,NN,N5B,N4B)
+                MID=micpar%get_micb_id(M,NGL)              
+                TOMEERauto(ielmc,MID,N2,N1)=TOMEERauto(ielmc,MID,N2,N1) &
+                  -OMEERauto(ielmc,MID,N,NN,N5B,N4B)
+                TOMEERauto(ielmn,MID,N2,N1)=TOMEERauto(ielmn,MID,N2,N1) &
+                  -OMEERauto(ielmn,MID,N,NN,N5B,N4B)
+                TOMEERauto(ielmp,MID,N2,N1)=TOMEERauto(ielmp,MID,N2,N1) &
+                  -OMEERauto(ielmp,MID,N,NN,N5B,N4B)
               enddo
             enddo
           enddo

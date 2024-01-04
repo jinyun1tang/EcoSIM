@@ -3,7 +3,7 @@ module UnitMod
 !DESCRIPTION
 ! code for unit conversion
   use data_kind_mod , only : r8 => DAT_KIND_R8
-  use data_const_mod, only : Tref => DAT_CONST_TKFRZ
+  use data_const_mod, only : Tref => DAT_CONST_TKFRZ,spval => DAT_CONST_SPVAL
 implicit none
   private
   character(len=*), private, parameter :: mod_filename = &
@@ -72,7 +72,11 @@ contains
   real(r8), intent(in) :: TC
   real(r8) :: TK
 
-  TK=TC+Tref
+  if(TC/=spval)then
+    TK=TC+Tref
+  else
+    TK=spval
+  endif
 
   end function Celcius2Kelvin
 !------------------------------------------------------------------------
@@ -82,7 +86,11 @@ contains
   real(r8), intent(in) :: TK
   real(r8) :: TC
 
-  TC=TK-Tref
+  if(TK/=spval)then
+    TC=TK-Tref
+  else
+    TC=spval
+  endif
   
   end function Kelvin2Celcius
 !------------------------------------------------------------------------

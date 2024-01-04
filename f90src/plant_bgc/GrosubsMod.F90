@@ -90,13 +90,13 @@ module grosubsMod
     D1: DO L=0,MaxNumRootLays
       DO K=1,pltpar%NumOfPlantLitrCmplxs
         DO M=1,jsken
-          DO NE=1,NumOfPlantChemElmnts
+          DO NE=1,NumPlantChemElmnts
             LitterFallChemElmnt_pftvr(NE,M,K,L,NZ)=0._r8
           ENDDO
         ENDDO
       ENDDO
     ENDDO D1
-    LitterFallChemElmnt_pft(1:NumOfPlantChemElmnts,NZ)=0._r8
+    LitterFallChemElmnt_pft(1:NumPlantChemElmnts,NZ)=0._r8
     CO2NetFix_pft(NZ)=0._r8
     CanopyHeight_copy(NZ)=CanopyHeight_pft(NZ)
     CanopyHeight_pft(NZ)=0._r8
@@ -198,7 +198,7 @@ module grosubsMod
 !     WTSTG,WTSTDN,WTSTDP=standing dead C,N,P mass
 !     CSNC,ZSNC,PSNC=C,N,P litterfall
 !
-    DO NE=1,NumOfPlantChemElmnts
+    DO NE=1,NumPlantChemElmnts
       D6235: DO M=1,jsken
         XFRE=1.5814E-05_r8*fTgrowCanP(NZ)*StandingDeadKCompChemElmnts_pft(NE,M,NZ)
         IF(iPlantTurnoverPattern_pft(NZ).EQ.0.OR.iPlantMorphologyType_pft(NZ).LE.1)THEN
@@ -217,7 +217,7 @@ module grosubsMod
 !     HCSNC,HZSNC,HPSNC=hourly C,N,P litterfall
 !
     DO K=1,pltpar%NumOfPlantLitrCmplxs
-      DO NE=1,NumOfPlantChemElmnts
+      DO NE=1,NumPlantChemElmnts
         D6430: DO M=1,jsken
           SurfLitrfallChemElmnts_pft(NE,NZ)=SurfLitrfallChemElmnts_pft(NE,NZ)+LitterFallChemElmnt_pftvr(NE,M,K,0,NZ)
           D8955: DO L=0,MaxNumRootLays
@@ -232,7 +232,7 @@ module grosubsMod
 !
 !     WTSTG,WTSTDN,WTSTDP=standing dead C,N,P mass
 !
-    DO NE=1,NumOfPlantChemElmnts
+    DO NE=1,NumPlantChemElmnts
       StandingDeadChemElmnts_pft(NE,NZ)=sum(StandingDeadKCompChemElmnts_pft(NE,1:jsken,NZ))
     ENDDO
 
@@ -255,7 +255,7 @@ module grosubsMod
 
     IF(IsPlantActive_pft(NZ).EQ.iPlantIsActive)THEN
       !check for living plant
-      DO NE=1,NumOfPlantChemElmnts
+      DO NE=1,NumPlantChemElmnts
         ElmntBalanceCum_pft(NE,NZ)=ShootChemElmnts_pft(NE,NZ)+RootElmnts_pft(NE,NZ)+NoduleChemElmnts_pft(NE,NZ) &
           +NonstructalElmnts_pft(NE,NZ)+LitrfallChemElmnts_pft(NE,NZ)-PlantExudChemElmntCum_pft(NE,NZ) &
           -NetCumElmntFlx2Plant_pft(NE,NZ)+StandingDeadChemElmnts_pft(NE,NZ)+EcoHavstElmnt_pft(NE,NZ)+EcoHavstElmntCum_pft(NE,NZ)
@@ -351,7 +351,7 @@ module grosubsMod
 !
     call ComputeTotalBiom(NZ,ShootNonstructC_brch)
   ELSE
-    PlantRootSoilChemNetX_pft(1:NumOfPlantChemElmnts,NZ)=RootExudChemElmnt_pft(1:NumOfPlantChemElmnts,NZ)
+    PlantRootSoilChemNetX_pft(1:NumPlantChemElmnts,NZ)=RootExudChemElmnt_pft(1:NumPlantChemElmnts,NZ)
     PlantRootSoilChemNetX_pft(ielmn,NZ)=PlantRootSoilChemNetX_pft(ielmn,NZ)+RootNH4Uptake_pft(NZ)+RootNO3Uptake_pft(NZ)+RootN2Fix_pft(NZ)
     PlantRootSoilChemNetX_pft(ielmp,NZ)=PlantRootSoilChemNetX_pft(ielmp,NZ)+RootH2PO4Uptake_pft(NZ)+RootHPO4Uptake_pft(NZ)
   ENDIF
@@ -606,7 +606,7 @@ module grosubsMod
 !     iPlantPhenologyType_pft=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
 !     WTRVC,WTRVN,WTRVP=storage C,N,P
 !
-  DO NE=1,NumOfPlantChemElmnts
+  DO NE=1,NumPlantChemElmnts
     DO NB=1,NumOfBranches_pft(NZ)
       ShootChemElmnt_brch(NE,NB,NZ)=LeafChemElmnts_brch(NE,NB,NZ) &
         +PetoleChemElmnt_brch(NE,NB,NZ)+StalkChemElmnts_brch(NE,NB,NZ)+ReserveElmnts_brch(NE,NB,NZ) &
@@ -724,7 +724,7 @@ module grosubsMod
 !     CanopyBranchStemApft_lyr=total branch stalk surface area in each layer
 !     SeedNumberSet_brch=seed set number
 !
-  DO NE=1,NumOfPlantChemElmnts
+  DO NE=1,NumPlantChemElmnts
     CanopyNonstructElements_pft(NE,NZ)=sum(NonstructElmnt_brch(NE,1:NumOfBranches_pft(NZ),NZ))
     ShootChemElmnts_pft(NE,NZ)=sum(ShootChemElmnt_brch(NE,1:NumOfBranches_pft(NZ),NZ))
 
@@ -763,7 +763,7 @@ module grosubsMod
 !
   IF(is_plant_N2fix(iPlantNfixType(NZ)))THEN
     IF(is_canopy_N2fix(iPlantNfixType(NZ)))THEN
-      DO NE=1,NumOfPlantChemElmnts
+      DO NE=1,NumPlantChemElmnts
         D7950: DO NB=1,NumOfBranches_pft(NZ)
           NoduleNonstructElmnt_pft(NE,NZ)=NoduleNonstructElmnt_pft(NE,NZ)+NoduleNonstructElmnt_brch(NE,NB,NZ)
         ENDDO D7950
@@ -771,7 +771,7 @@ module grosubsMod
           sum(NoduleNonstructElmnt_brch(NE,1:NumOfBranches_pft(NZ),NZ))
       ENDDO
     ELSEIF(is_root_N2fix(iPlantNfixType(NZ)))THEN
-      DO NE=1,NumOfPlantChemElmnts
+      DO NE=1,NumPlantChemElmnts
         NoduleChemElmnts_pft(NE,NZ)=sum(RootNodueChemElmnt_pvr(NE,NU:NI(NZ),NZ))+&
           sum(RootNoduleNonstructElmnt_vr(NE,NU:NI(NZ),NZ))
       ENDDO
@@ -787,13 +787,13 @@ module grosubsMod
 !     TCUPTK,TZUPTK,TPUPTK=cumulative PFT root-soil C,N,P exchange
 !     PlantN2FixCum_pft=cumulative PFT N2 fixation
 !
-  PlantRootSoilChemNetX_pft(1:NumOfPlantChemElmnts,NZ)=RootExudChemElmnt_pft(1:NumOfPlantChemElmnts,NZ)
+  PlantRootSoilChemNetX_pft(1:NumPlantChemElmnts,NZ)=RootExudChemElmnt_pft(1:NumPlantChemElmnts,NZ)
   PlantRootSoilChemNetX_pft(ielmn,NZ)=PlantRootSoilChemNetX_pft(ielmn,NZ)+&
     RootNH4Uptake_pft(NZ)+RootNO3Uptake_pft(NZ)+RootN2Fix_pft(NZ)
   PlantRootSoilChemNetX_pft(ielmp,NZ)=PlantRootSoilChemNetX_pft(ielmp,NZ)+RootH2PO4Uptake_pft(NZ)+RootHPO4Uptake_pft(NZ)
 
-  PlantExudChemElmntCum_pft(1:NumOfPlantChemElmnts,NZ)=PlantExudChemElmntCum_pft(1:NumOfPlantChemElmnts,NZ)+&
-    RootExudChemElmnt_pft(1:NumOfPlantChemElmnts,NZ)
+  PlantExudChemElmntCum_pft(1:NumPlantChemElmnts,NZ)=PlantExudChemElmntCum_pft(1:NumPlantChemElmnts,NZ)+&
+    RootExudChemElmnt_pft(1:NumPlantChemElmnts,NZ)
   PlantExudChemElmntCum_pft(ielmn,NZ)=PlantExudChemElmntCum_pft(ielmn,NZ)+ &
     RootNH4Uptake_pft(NZ)+RootNO3Uptake_pft(NZ)
   PlantExudChemElmntCum_pft(ielmp,NZ)=PlantExudChemElmntCum_pft(ielmp,NZ)+ &

@@ -73,14 +73,14 @@ module ExtractsMod
 !   LitterFallChemElmnt_pftvr,=cumulative PFT C,N,P litterfall from grosub.f
 !   LitrfalChemElemnts_vr,=cumulative total C,N,P litterfall
 !
-    DO NE=1,NumOfPlantChemElmnts
+    DO NE=1,NumPlantChemElmnts
       LitterFallChemElmnt_col(NE)=LitterFallChemElmnt_col(NE)+LitterFallChemElmnt_pft(NE,NZ)
       StandingDeadChemElmnt_col(NE)=StandingDeadChemElmnt_col(NE)+StandingDeadChemElmnts_pft(NE,NZ)
     ENDDO
 
     DO  L=0,NI(NZ)
       DO K=1,pltpar%NumOfPlantLitrCmplxs
-        DO NE=1,NumOfPlantChemElmnts
+        DO NE=1,NumPlantChemElmnts
           DO  M=1,pltpar%jsken
             LitrfalChemElemnts_vr(NE,M,K,L)=LitrfalChemElemnts_vr(NE,M,K,L)+LitterFallChemElmnt_pftvr(NE,M,K,L,NZ)
           enddo
@@ -275,7 +275,7 @@ module ExtractsMod
 !     RDFOMC,RDFOMN,RDFOMP=PFT nonstructl C,N,P exchange
 !
       DO K=1,jcplx
-        DO NE=1,NumOfPlantChemElmnts
+        DO NE=1,NumPlantChemElmnts
           TDFOME(NE,K,L)=TDFOME(NE,K,L)-RDFOME(ielmc,N,K,L,NZ)
         ENDDO
       ENDDO
@@ -428,7 +428,7 @@ module ExtractsMod
   LWRadCanG=LWRadCanG+LWRadCanP(NZ)
   CanopyLeafArea_grd=CanopyLeafArea_grd+CanopyLeafArea_pft(NZ)
   StemArea_grd=StemArea_grd+CanopyStemA_pft(NZ)
-  DO NE=1,NumOfPlantChemElmnts
+  DO NE=1,NumPlantChemElmnts
     LitterFallChemElmnt_col(NE)=LitterFallChemElmnt_col(NE)-PlantRootSoilChemNetX_pft(NE,NZ)
     PlantElemntStoreLandscape(NE)=PlantElemntStoreLandscape(NE)+ElmntBalanceCum_pft(NE,NZ)
   ENDDO

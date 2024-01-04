@@ -88,6 +88,7 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  WQRH(:,:)                         !runoff from surface water, [m3 d-2 h-1]
   real(r8),target,allocatable ::  FWatDischarge(:,:)                !water discharge, [m3 d-2 h-1]
   real(r8),target,allocatable ::  QflxSurfRunoffM(:,:,:,:,:)        !surface runoff,
+  real(r8),target,allocatable ::  Qinflx2Soil_col(:,:)
   private :: InitAllocate
   contains
 
@@ -102,6 +103,7 @@ module SoilWaterDataType
   subroutine InitAllocate
 
   implicit none
+  allocate(Qinflx2Soil_col(JY,JX)); Qinflx2Soil_col=0._r8
   allocate(THETP(0:JZ,JY,JX));  THETP=0._r8
   allocate(VLsoiAirP(0:JZ,JY,JX));   VLsoiAirP=0._r8
   allocate(THETW(0:JZ,JY,JX));  THETW=0._r8
@@ -268,6 +270,7 @@ module SoilWaterDataType
   call destroy(WQRH)
   call destroy(FWatDischarge)
   call destroy(QflxSurfRunoffM)
+  call destroy(Qinflx2Soil_col)
   end subroutine DestructSoilWater
 
 end module SoilWaterDataType

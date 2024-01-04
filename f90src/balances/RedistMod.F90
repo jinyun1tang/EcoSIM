@@ -3,6 +3,7 @@ module RedistMod
   use abortutils, only : padr, print_info,endrun,destroy
   use minimathmod, only : safe_adb,AZMAX1
   use EcoSiMParDataMod, only : micpar
+  use ElmIDMod
   use EcosimConst
   use FlagDataType
   use GridDataType
@@ -77,17 +78,14 @@ module RedistMod
   integer, intent(in) :: NHW,NHE,NVN,NVS
 
   integer :: NY,NX,L,LG
-  real(r8) :: DORGC(JZ,JY,JX),DVLiceMicP(JZ,JY,JX)
+  real(r8) :: DORGC(JZ),DVLiceMicP(JZ)
   real(r8) :: TXCO2(JY,JX),DORGE(JY,JX)
-  real(r8) :: UDVLiceMicP,UDLYXF
   real(r8) :: VOLISO,VOLPT,VOLTT
   real(r8) :: TFLWT
 !     execution begins here
   curday=I
   curhour=J
   VOLISO=0.0_r8
-  UDVLiceMicP=0.0_r8
-  UDLYXF=0.0_r8
   TFLWT=0.0_r8
   VOLPT=0.0_r8
   VOLTT=0.0_r8
@@ -134,7 +132,7 @@ module RedistMod
 !     SNOWPACK LAYERING
       call SnowpackLayering(NY,NX)
 
-      call RelayerSoilProfile(NY,NX,DORGC(:,NY,NX),DVLiceMicP(:,NY,NX),UDVLiceMicP,UDLYXF)
+      call RelayerSoilProfile(NY,NX,DORGC,DVLiceMicP)
 
       call UpdateOutputVars(I,J,NY,NX,TXCO2)
 !
@@ -174,7 +172,7 @@ module RedistMod
   Eco_NPP_col(NY,NX)=Eco_GPP_col(NY,NX)+Eco_AutoR_col(NY,NX)
   Eco_NBP_col(NY,NX)=Eco_NBP_col(NY,NX)+Canopy_NEE_col(NY,NX) &
     +SurfGasFlx(idg_CO2,NY,NX)+SurfGasFlx(idg_CH4,NY,NX) &
-    +TXCO2(NY,NX)-HDOCQ(NY,NX)-HDICQ(NY,NX)-HDOCD(NY,NX)-HDICD(NY,NX)
+    +TXCO2(NY,NX)-HydroSufDOCFlx_col(NY,NX)-HydroSufDICFlx_col(NY,NX)-HydroSubsDOCFlx_col(NY,NX)-HydroSubsDICFlx_col(NY,NX)
     
   IF(NU(NY,NX).GT.NUI(NY,NX))THEN  !the surface is lowered
     DO L=NUI(NY,NX),NU(NY,NX)-1
@@ -309,7 +307,6 @@ module RedistMod
 
   subroutine HandleSurfaceBoundary(I,NY,NX)
 
-  use ElmIDMod
   implicit none
   integer, intent(in) :: I,NY,NX
 
@@ -592,7 +589,7 @@ module RedistMod
   implicit none
   integer, intent(in) :: NY,NX
   real(r8), intent(out) :: DORGE(JY,JX)
-  integer :: K,NO,M,NGL,NTX,NTP
+  integer :: K,NO,M,NGL,NTX,NTP,MID
 
   REAL(R8) :: DORGP
 
@@ -601,8 +598,8 @@ module RedistMod
   ! INTERNAL SURFACE SEDIMENT TRANSPORT
   !
   IF((iErosionMode.EQ.ieros_frzthaweros.OR.iErosionMode.EQ.ieros_frzthawsomeros) &
-    .AND.ABS(TSEDER(NY,NX)).GT.ZEROS(NY,NX))THEN
-    TSED(NY,NX)=TSED(NY,NX)+TSEDER(NY,NX)
+    .AND.ABS(tErosionSedmLoss(NY,NX)).GT.ZEROS(NY,NX))THEN
+    TSED(NY,NX)=TSED(NY,NX)+tErosionSedmLoss(NY,NX)
     !
     !     SOIL MINERAL FRACTIONS
     !
@@ -638,27 +635,29 @@ module RedistMod
 !
     DORGP=0.0_r8
     D9280: DO K=1,jcplx
-      DO  NO=1,NFGs
+      DO  NO=1,NumMicbFunGroups
         DO NGL=JGnio(NO),JGnfo(NO)
           DO  M=1,nlbiomcp
-            OMC(M,NGL,K,NU(NY,NX),NY,NX)=OMC(M,NGL,K,NU(NY,NX),NY,NX)+TOMCER(M,NGL,K,NY,NX)
-            OMN(M,NGL,K,NU(NY,NX),NY,NX)=OMN(M,NGL,K,NU(NY,NX),NY,NX)+TOMNER(M,NGL,K,NY,NX)
-            OMP(M,NGL,K,NU(NY,NX),NY,NX)=OMP(M,NGL,K,NU(NY,NX),NY,NX)+TOMPER(M,NGL,K,NY,NX)
-            DORGE(NY,NX)=DORGE(NY,NX)+TOMCER(M,NGL,K,NY,NX)
-            DORGP=DORGP+TOMPER(M,NGL,K,NY,NX)
+            MID=micpar%get_micb_id(M,NGL)
+            OMEhetr(ielmc,MID,K,NU(NY,NX),NY,NX)=OMEhetr(ielmc,MID,K,NU(NY,NX),NY,NX)+TOMEERhetr(ielmc,MID,K,NY,NX)
+            OMEhetr(ielmn,MID,K,NU(NY,NX),NY,NX)=OMEhetr(ielmn,MID,K,NU(NY,NX),NY,NX)+TOMEERhetr(ielmn,MID,K,NY,NX)
+            OMEhetr(ielmp,MID,K,NU(NY,NX),NY,NX)=OMEhetr(ielmp,MID,K,NU(NY,NX),NY,NX)+TOMEERhetr(ielmp,MID,K,NY,NX)
+            DORGE(NY,NX)=DORGE(NY,NX)+TOMEERhetr(ielmc,MID,K,NY,NX)
+            DORGP=DORGP+TOMEERhetr(ielmp,MID,K,NY,NX)
           enddo
         enddo
       enddo
     ENDDO D9280
 
-    DO  NO=1,NFGs
+    DO  NO=1,NumMicbFunGroups
       DO NGL=JGniA(NO),JGnfA(NO)
         DO  M=1,nlbiomcp
-          OMCff(M,NGL,NU(NY,NX),NY,NX)=OMCff(M,NGL,NU(NY,NX),NY,NX)+TOMCERff(M,NGL,NY,NX)
-          OMNff(M,NGL,NU(NY,NX),NY,NX)=OMNff(M,NGL,NU(NY,NX),NY,NX)+TOMNERff(M,NGL,NY,NX)
-          OMPff(M,NGL,NU(NY,NX),NY,NX)=OMPff(M,NGL,NU(NY,NX),NY,NX)+TOMPERff(M,NGL,NY,NX)
-          DORGE(NY,NX)=DORGE(NY,NX)+TOMCERff(M,NGL,NY,NX)
-          DORGP=DORGP+TOMPER(M,NGL,K,NY,NX)
+          MID=micpar%get_micb_id(M,NGL)
+          OMEauto(ielmc,MID,NU(NY,NX),NY,NX)=OMEauto(ielmc,MID,NU(NY,NX),NY,NX)+TOMEERauto(ielmc,MID,NY,NX)
+          OMEauto(ielmn,MID,NU(NY,NX),NY,NX)=OMEauto(ielmn,MID,NU(NY,NX),NY,NX)+TOMEERauto(ielmn,MID,NY,NX)
+          OMEauto(ielmp,MID,NU(NY,NX),NY,NX)=OMEauto(ielmp,MID,NU(NY,NX),NY,NX)+TOMEERauto(ielmp,MID,NY,NX)
+          DORGE(NY,NX)=DORGE(NY,NX)+TOMEERauto(ielmc,MID,NY,NX)
+          DORGP=DORGP+TOMEERauto(ielmp,MID,NY,NX)
         enddo
       enddo
     enddo
@@ -694,13 +693,13 @@ module RedistMod
   subroutine SumLitterLayerChemMass(NY,NX)
   implicit none
   integer, intent(in) :: NY,NX
-  integer :: K,N,M,NGL
+  integer :: K,N,M,NGL,NB,NE
   real(r8) :: PSS,HS,CS
   real(r8) :: DC,DN,DP,OS
   real(r8) :: POS,POX,POP
   real(r8) :: SSS,ZG,Z4S,WS,Z4X
   real(r8) :: Z4F,ZOS,ZOF
-  real(r8) :: tDC,tDN,tDP
+  real(r8) :: tDElmt(1:NumPlantChemElmnts)
   integer :: NumOfLitrCmplxs
 !     begin_execution
 !     TOTAL C,N,P, SALTS IN SURFACE RESIDUE
@@ -723,36 +722,42 @@ module RedistMod
     !
     ! TOTAL heterotrophic MICROBIAL C,N,P
     !
-    tDC=SUM(OMC(1:nlbiomcp,1:NumOfMicrobs1HetertrophCmplx,K,0,NY,NX))
-    tDN=SUM(OMN(1:nlbiomcp,1:NumOfMicrobs1HetertrophCmplx,K,0,NY,NX))
-    tDP=SUM(OMP(1:nlbiomcp,1:NumOfMicrobs1HetertrophCmplx,K,0,NY,NX))
-    DC=DC+tDC
-    DN=DN+tDN
-    DP=DP+tDP
-    RC0(K,NY,NX)=RC0(K,NY,NX)+tDC
-    TOMT(NY,NX)=TOMT(NY,NX)+tDC
-    TONT(NY,NX)=TONT(NY,NX)+tDN
-    TOPT(NY,NX)=TOPT(NY,NX)+tDP
-    OMCL(0,NY,NX)=OMCL(0,NY,NX)+tDC
-    OMNL(0,NY,NX)=OMNL(0,NY,NX)+tDN
+    tDElmt=0._r8    
+    DO NB=1,NumLiveHeterBioms
+      do NE=1,NumPlantChemElmnts
+        tDElmt(NE)=tDElmt(NE)+OMEhetr(NE,NB,K,0,NY,NX)
+      ENDDO
+    ENDDO
+    DC=DC+tDElmt(ielmc)
+    DN=DN+tDElmt(ielmn)
+    DP=DP+tDElmt(ielmp)
+    RC0(K,NY,NX)=RC0(K,NY,NX)+tDElmt(ielmc)
+    TOMT(NY,NX)=TOMT(NY,NX)+tDElmt(ielmc)
+    TONT(NY,NX)=TONT(NY,NX)+tDElmt(ielmn)
+    TOPT(NY,NX)=TOPT(NY,NX)+tDElmt(ielmp)
+    OMCL(0,NY,NX)=OMCL(0,NY,NX)+tDElmt(ielmc)
+    OMNL(0,NY,NX)=OMNL(0,NY,NX)+tDElmt(ielmn)
   ENDDO
 
   !
   ! TOTAL autotrophic MICROBIAL C,N,P
   !
-  tDC=SUM(OMCff(1:nlbiomcp,1:NumOfMicrobsInAutotrophCmplx,0,NY,NX))
-  tDN=SUM(OMNff(1:nlbiomcp,1:NumOfMicrobsInAutotrophCmplx,0,NY,NX))
-  tDP=SUM(OMPff(1:nlbiomcp,1:NumOfMicrobsInAutotrophCmplx,0,NY,NX))
-  DC=DC+tDC
-  DN=DN+tDN
-  DP=DP+tDP
+  tDElmt=0._r8
+  DO NB=1,NumLiveAutoBioms
+    DO NE=1,NumPlantChemElmnts
+      tDElmt(NE)=tDElmt(NE)+OMEauto(NE,NB,0,NY,NX)
+    ENDDO
+  ENDDO
+  DC=DC+tDElmt(ielmc)
+  DN=DN+tDElmt(ielmn)
+  DP=DP+tDElmt(ielmp)
 
-  RC0ff(NY,NX)=RC0ff(NY,NX)+tDC
-  TOMT(NY,NX)=TOMT(NY,NX)+tDC
-  TONT(NY,NX)=TONT(NY,NX)+tDN
-  TOPT(NY,NX)=TOPT(NY,NX)+tDP
-  OMCL(0,NY,NX)=OMCL(0,NY,NX)+tDC
-  OMNL(0,NY,NX)=OMNL(0,NY,NX)+tDN
+  RC0ff(NY,NX)=RC0ff(NY,NX)+tDElmt(ielmc)
+  TOMT(NY,NX)=TOMT(NY,NX)+tDElmt(ielmc)
+  TONT(NY,NX)=TONT(NY,NX)+tDElmt(ielmn)
+  TOPT(NY,NX)=TOPT(NY,NX)+tDElmt(ielmp)
+  OMCL(0,NY,NX)=OMCL(0,NY,NX)+tDElmt(ielmc)
+  OMNL(0,NY,NX)=OMNL(0,NY,NX)+tDElmt(ielmn)
 
   !
   !     TOTAL MICROBIAL RESIDUE C,N,P
@@ -763,21 +768,25 @@ module RedistMod
   DO K=1,NumOfLitrCmplxs
     RC0(K,NY,NX)=RC0(K,NY,NX)+SUM(ORC(1:ndbiomcp,K,0,NY,NX))
     RC0(K,NY,NX)=RC0(K,NY,NX)+DOM(idom_doc,K,0,NY,NX)+DOM_Macp(idom_doc,K,0,NY,NX) &
-      +OHC(K,0,NY,NX)+DOM(idom_acetate,K,0,NY,NX)+DOM_Macp(idom_acetate,K,0,NY,NX)+OHA(K,0,NY,NX)
+      +OHC(K,0,NY,NX)+DOM(idom_acetate,K,0,NY,NX) &
+      +DOM_Macp(idom_acetate,K,0,NY,NX)+OHA(K,0,NY,NX)
     RC0(K,NY,NX)=RC0(K,NY,NX)+SUM(OSC(1:jsken,K,0,NY,NX))
   ENDDO
 
 !
 !     TOTAL DOC, DON, DOP
 !
-  DC=DC+SUM(DOM(idom_doc,1:NumOfLitrCmplxs,0,NY,NX))+SUM(DOM_Macp(idom_doc,1:NumOfLitrCmplxs,0,NY,NX)) &
-       +SUM(OHC(1:NumOfLitrCmplxs,0,NY,NX))+SUM(DOM(idom_acetate,1:NumOfLitrCmplxs,0,NY,NX)) &
-       +SUM(DOM_Macp(idom_acetate,1:NumOfLitrCmplxs,0,NY,NX))+SUM(OHA(1:NumOfLitrCmplxs,0,NY,NX))
+  DC=DC+SUM(DOM(idom_doc,1:NumOfLitrCmplxs,0,NY,NX)) &
+    +SUM(DOM_Macp(idom_doc,1:NumOfLitrCmplxs,0,NY,NX)) &
+    +SUM(OHC(1:NumOfLitrCmplxs,0,NY,NX))+SUM(DOM(idom_acetate,1:NumOfLitrCmplxs,0,NY,NX)) &
+    +SUM(DOM_Macp(idom_acetate,1:NumOfLitrCmplxs,0,NY,NX))+SUM(OHA(1:NumOfLitrCmplxs,0,NY,NX))
 
-  DN=DN+SUM(DOM(idom_don,1:NumOfLitrCmplxs,0,NY,NX))+SUM(DOM_Macp(idom_don,1:NumOfLitrCmplxs,0,NY,NX)) &
-       +SUM(OHN(1:NumOfLitrCmplxs,0,NY,NX))
-  DP=DP+SUM(DOM(idom_dop,1:NumOfLitrCmplxs,0,NY,NX))+SUM(DOM_Macp(idom_dop,1:NumOfLitrCmplxs,0,NY,NX)) &
-       +SUM(OHP(1:NumOfLitrCmplxs,0,NY,NX))
+  DN=DN+SUM(DOM(idom_don,1:NumOfLitrCmplxs,0,NY,NX)) &
+    +SUM(DOM_Macp(idom_don,1:NumOfLitrCmplxs,0,NY,NX)) &
+    +SUM(OHN(1:NumOfLitrCmplxs,0,NY,NX))
+  DP=DP+SUM(DOM(idom_dop,1:NumOfLitrCmplxs,0,NY,NX)) &
+    +SUM(DOM_Macp(idom_dop,1:NumOfLitrCmplxs,0,NY,NX)) &
+    +SUM(OHP(1:NumOfLitrCmplxs,0,NY,NX))
 !
     !     TOTAL PLANT RESIDUE C,N,P
 !
@@ -865,8 +874,8 @@ module RedistMod
   implicit none
   integer, intent(in) :: NY,NX
   real(r8), intent(inout) :: VOLISO  
-  REAL(R8),INTENT(OUT) :: DVLiceMicP(JZ,JY,JX)  !change in ice volume
-  real(r8) :: TKS00,TKSX
+  REAL(R8),INTENT(OUT) :: DVLiceMicP(JZ)  !change in ice volume
+  real(r8) :: TKS00,TKSX,TKSpre
   real(r8) :: ENGY
   real(r8) :: TVHeatCapacity
   real(r8) :: TVHeatCapacitySoilM,TVOLW,TVOLWH,TVOLI,TVOLIH,TENGY
@@ -881,7 +890,7 @@ module RedistMod
   TVOLI=0.0_r8
   TVOLIH=0.0_r8
   TENGY=0.0_r8
-  
+  DVLiceMicP=0._r8
   DO L=NU(NY,NX),NL(NY,NX)
 
     TKSX=TKS(L,NY,NX)
@@ -904,7 +913,7 @@ module RedistMod
 
     !volume change
     DVLWatMicP(L,NY,NX)=VLWatMicP1(L,NY,NX)+VLWatMacP1(L,NY,NX)-VLWatMicP(L,NY,NX)-VLWatMacP(L,NY,NX)
-    DVLiceMicP(L,NY,NX)=VLiceMicP1(L,NY,NX)+VLiceMacP1(L,NY,NX)-VLiceMicP(L,NY,NX)-VLiceMacP(L,NY,NX)
+    DVLiceMicP(L)=VLiceMicP1(L,NY,NX)+VLiceMacP1(L,NY,NX)-VLiceMicP(L,NY,NX)-VLiceMacP(L,NY,NX)
 
     !update water/ice-unfilled pores
     IF(SoiBulkDensity(L,NY,NX).GT.ZERO)THEN
@@ -942,18 +951,31 @@ module RedistMod
     !
     !     END ARTIFICIAL SOIL WARMING
     !
+    TKSpre=TKS(L,NY,NX)
     IF(VHeatCapacity(L,NY,NX).GT.ZEROS(NY,NX))THEN
       TKS00=TKS(L,NY,NX)
       TKS(L,NY,NX)=(ENGY+THeatFlow2Soil(L,NY,NX)+THeatSoiThaw(L,NY,NX) &
         +THeatRootUptake(L,NY,NX)+HeatIrrigation(L,NY,NX))/VHeatCapacity(L,NY,NX)
 
-!      if(L==1.and.abs(TKS(L,NY,NX)/TKS00-1._r8)>0.025_r8)then
-!        TKS(L,NY,NX)=TKS00
-!      endif
+!      if(curday>=285.and.L<=2)write(*,*)'rexL=',L,NY,NX,curhour,VHeatCapacityX,VHeatCapacity(L,NY,NX),&
+!        SoiBulkDensity(L,NY,NX),NU(NY,NX)
+      if(TKS(L,NY,NX)>1.e3)then
+        write(*,*)'weird temperature in redist',L,NY,NX,TKSpre,TKS(L,NY,NX)
+        write(*,*)'heatcap',VHeatCapacityX,VHeatCapacity(L,NY,NX)
+        write(*,*)'itemized',ENGY/VHeatCapacity(L,NY,NX),&
+          THeatFlow2Soil(L,NY,NX)/VHeatCapacity(L,NY,NX),&
+          THeatSoiThaw(L,NY,NX)/VHeatCapacity(L,NY,NX), &
+          THeatRootUptake(L,NY,NX)/VHeatCapacity(L,NY,NX),&
+          HeatIrrigation(L,NY,NX)/VHeatCapacity(L,NY,NX)
+        write(*,*)'wat',VLWatMicP(L,NY,NX),VLWatMacP(L,NY,NX), &
+          VLiceMicP(L,NY,NX),VLiceMacP(L,NY,NX)  
+        write(*,*)'heat',ENGY,THeatFlow2Soil(L,NY,NX),VHeatCapacitySoilM(L,NY,NX)  
+        call endrun()  
+      endif
+
     ELSE
       TKS(L,NY,NX)=TKS(NUM(NY,NX),NY,NX)
     ENDIF
-
     TCS(L,NY,NX)=units%Kelvin2Celcius(TKS(L,NY,NX))
     WS=VLWatMicP(L,NY,NX)+VLWatMacP(L,NY,NX)+(VLiceMicP(L,NY,NX)+VLiceMacP(L,NY,NX))*DENSICE
     WaterStoreLandscape=WaterStoreLandscape+WS
@@ -966,12 +988,12 @@ module RedistMod
 !------------------------------------------------------------------------------------------
   subroutine UpdateChemInSoilLays(NY,NX,LG,DORGC,TXCO2,DORGE)
   !
-  use ElmIDMod
+
   implicit none
   integer,  intent(in) :: NY,NX,LG
   real(r8), intent(in) :: DORGE(JY,JX)
   real(r8), intent(inout) :: TXCO2(JY,JX)
-  real(r8), intent(out) :: DORGC(JZ,JY,JX)
+  real(r8), intent(out) :: DORGC(JZ)
 
   integer  :: L,K,M,N,LL,NGL,NTX,NTP,NTG,NTS
   real(r8) :: HS,CS
@@ -987,6 +1009,7 @@ module RedistMod
   !     begin_execution
   !     UPDATE SOIL LAYER VARIABLES WITH TOTAL FLUXES
 
+  DORGC=0._r8
   D125: DO L=NU(NY,NX),NL(NY,NX)
     !
 
@@ -1008,15 +1031,23 @@ module RedistMod
 !
     D8560: DO K=1,jcplx
       do idom=idom_beg,idom_end
-        DOM(idom,K,L,NY,NX)=DOM(idom,K,L,NY,NX)+DOM_Transp2Micp_flx(idom,K,L,NY,NX)+DOM_PoreTranspFlx(idom,K,L,NY,NX)
-        DOM(idom,K,L,NY,NX)=DOM(idom,K,L,NY,NX)+DOM_Transp2Micp_flx(idom,K,L,NY,NX)+DOM_PoreTranspFlx(idom,K,L,NY,NX)
-        DOM(idom,K,L,NY,NX)=DOM(idom,K,L,NY,NX)+DOM_Transp2Micp_flx(idom,K,L,NY,NX)+DOM_PoreTranspFlx(idom,K,L,NY,NX)
-        DOM(idom,K,L,NY,NX)=DOM(idom,K,L,NY,NX)+DOM_Transp2Micp_flx(idom,K,L,NY,NX)+DOM_PoreTranspFlx(idom,K,L,NY,NX)
+        DOM(idom,K,L,NY,NX)=DOM(idom,K,L,NY,NX)+DOM_Transp2Micp_flx(idom,K,L,NY,NX) &
+          +DOM_PoreTranspFlx(idom,K,L,NY,NX)
+        DOM(idom,K,L,NY,NX)=DOM(idom,K,L,NY,NX)+DOM_Transp2Micp_flx(idom,K,L,NY,NX) &
+          +DOM_PoreTranspFlx(idom,K,L,NY,NX)
+        DOM(idom,K,L,NY,NX)=DOM(idom,K,L,NY,NX)+DOM_Transp2Micp_flx(idom,K,L,NY,NX) &
+          +DOM_PoreTranspFlx(idom,K,L,NY,NX)
+        DOM(idom,K,L,NY,NX)=DOM(idom,K,L,NY,NX)+DOM_Transp2Micp_flx(idom,K,L,NY,NX) &
+          +DOM_PoreTranspFlx(idom,K,L,NY,NX)
 
-        DOM_Macp(idom,K,L,NY,NX)=DOM_Macp(idom,K,L,NY,NX)+DOM_Transp2Macp_flx(idom,K,L,NY,NX)-DOM_PoreTranspFlx(idom,K,L,NY,NX)
-        DOM_Macp(idom,K,L,NY,NX)=DOM_Macp(idom,K,L,NY,NX)+DOM_Transp2Macp_flx(idom,K,L,NY,NX)-DOM_PoreTranspFlx(idom,K,L,NY,NX)
-        DOM_Macp(idom,K,L,NY,NX)=DOM_Macp(idom,K,L,NY,NX)+DOM_Transp2Macp_flx(idom,K,L,NY,NX)-DOM_PoreTranspFlx(idom,K,L,NY,NX)
-        DOM_Macp(idom,K,L,NY,NX)=DOM_Macp(idom,K,L,NY,NX)+DOM_Transp2Macp_flx(idom,K,L,NY,NX)-DOM_PoreTranspFlx(idom,K,L,NY,NX)
+        DOM_Macp(idom,K,L,NY,NX)=DOM_Macp(idom,K,L,NY,NX)+DOM_Transp2Macp_flx(idom,K,L,NY,NX) &
+          -DOM_PoreTranspFlx(idom,K,L,NY,NX)
+        DOM_Macp(idom,K,L,NY,NX)=DOM_Macp(idom,K,L,NY,NX)+DOM_Transp2Macp_flx(idom,K,L,NY,NX) &
+          -DOM_PoreTranspFlx(idom,K,L,NY,NX)
+        DOM_Macp(idom,K,L,NY,NX)=DOM_Macp(idom,K,L,NY,NX)+DOM_Transp2Macp_flx(idom,K,L,NY,NX) &
+          -DOM_PoreTranspFlx(idom,K,L,NY,NX)
+        DOM_Macp(idom,K,L,NY,NX)=DOM_Macp(idom,K,L,NY,NX)+DOM_Transp2Macp_flx(idom,K,L,NY,NX) &
+          -DOM_PoreTranspFlx(idom,K,L,NY,NX)
       enddo
     ENDDO D8560
     !
@@ -1074,7 +1105,8 @@ module RedistMod
     enddo
 
 
-    Eco_HR_col(NY,NX)=Eco_HR_col(NY,NX)+trcg_RMicbTransf_vr(idg_CO2,L,NY,NX)+trcg_RMicbTransf_vr(idg_CH4,L,NY,NX)
+    Eco_HR_col(NY,NX)=Eco_HR_col(NY,NX)+trcg_RMicbTransf_vr(idg_CO2,L,NY,NX) &
+      +trcg_RMicbTransf_vr(idg_CH4,L,NY,NX)
     SurfGasFlx(idg_N2,NY,NX)=SurfGasFlx(idg_N2,NY,NX)+trcg_RMicbTransf_vr(idg_N2,L,NY,NX)
     !
     !     EXCHANGEABLE CATIONS AND ANIONS FROM EXCHANGE REACTIONS
@@ -1097,16 +1129,19 @@ module RedistMod
     !     MACROPORE SOLUTES FROM MACROPORE-MICROPORE EXCHANGE
     !
     DO NTS=ids_beg,ids_end
-      trc_soHml(NTS,L,NY,NX)=trc_soHml(NTS,L,NY,NX)+trcs_Transp2MacP_vr(NTS,L,NY,NX)-trcs_PoreTranspFlx_vr(NTS,L,NY,NX)
+      trc_soHml(NTS,L,NY,NX)=trc_soHml(NTS,L,NY,NX)+trcs_Transp2MacP_vr(NTS,L,NY,NX) &
+        -trcs_PoreTranspFlx_vr(NTS,L,NY,NX)
     ENDDO
     !
     !     GASES FROM VOLATILIZATION-DISSOLUTION AND GAS TRANSFER
 !
     DO NTG=idg_beg,idg_NH3
-      trc_gasml_vr(NTG,L,NY,NX)=trc_gasml_vr(NTG,L,NY,NX)+Gas_AdvDif_Flx_vr(NTG,L,NY,NX)-Gas_Disol_Flx_vr(NTG,L,NY,NX)
+      trc_gasml_vr(NTG,L,NY,NX)=trc_gasml_vr(NTG,L,NY,NX)+Gas_AdvDif_Flx_vr(NTG,L,NY,NX) &
+        -Gas_Disol_Flx_vr(NTG,L,NY,NX)
     ENDDO
 
-    trc_gasml_vr(idg_NH3,L,NY,NX)=trc_gasml_vr(idg_NH3,L,NY,NX)-Gas_Disol_Flx_vr(idg_NH3B,L,NY,NX)+TRN3G(L,NY,NX)
+    trc_gasml_vr(idg_NH3,L,NY,NX)=trc_gasml_vr(idg_NH3,L,NY,NX)-Gas_Disol_Flx_vr(idg_NH3B,L,NY,NX) &
+      +TRN3G(L,NY,NX)
     ROXYF(L,NY,NX)=Gas_AdvDif_Flx_vr(idg_O2,L,NY,NX)
     RCO2F(L,NY,NX)=Gas_AdvDif_Flx_vr(idg_CO2,L,NY,NX)
     RCH4F(L,NY,NX)=Gas_AdvDif_Flx_vr(idg_CH4,L,NY,NX)
@@ -1159,7 +1194,7 @@ module RedistMod
     SurfGasFlx(idg_CO2,NY,NX)=SurfGasFlx(idg_CO2,NY,NX)+CIB
     SurfGasFlx(idg_CH4,NY,NX)=SurfGasFlx(idg_CH4,NY,NX)+CHB
     UCOP(NY,NX)=UCOP(NY,NX)+TCO2P(L,NY,NX)+trcs_plant_uptake_vr(idg_CO2,L,NY,NX)
-    HDICD(NY,NX)=HDICD(NY,NX)-12.0*TBCO2(L,NY,NX)
+    HydroSubsDICFlx_col(NY,NX)=HydroSubsDICFlx_col(NY,NX)-12.0*TBCO2(L,NY,NX)
     TXCO2(NY,NX)=TXCO2(NY,NX)+12.0*TBCO2(L,NY,NX)
     OXYGIN=OXYGIN+OIB
     OOB=trcg_RMicbTransf_vr(idg_O2,L,NY,NX)+TUPOXP(L,NY,NX)+trcs_plant_uptake_vr(idg_O2,L,NY,NX)
@@ -1178,7 +1213,8 @@ module RedistMod
 !
     SNM=(2.0_r8*(RNutMicbTransf_vr(ids_NH4,L,NY,NX)+RNutMicbTransf_vr(ids_NH4B,L,NY,NX) &
       -trcs_plant_uptake_vr(ids_NH4,L,NY,NX) &
-      -trcs_plant_uptake_vr(ids_NH4B,L,NY,NX)-Micb_N2Fixation_vr(L,NY,NX))-trcs_plant_uptake_vr(idg_NH3,L,NY,NX) &
+      -trcs_plant_uptake_vr(ids_NH4B,L,NY,NX)-Micb_N2Fixation_vr(L,NY,NX))&
+      -trcs_plant_uptake_vr(idg_NH3,L,NY,NX) &
       -trcs_plant_uptake_vr(idg_NH3B,L,NY,NX) &
       +RNutMicbTransf_vr(ids_NO3,L,NY,NX)+RNutMicbTransf_vr(ids_NO3B,L,NY,NX) &
       -trcs_plant_uptake_vr(ids_NO3,L,NY,NX)-trcs_plant_uptake_vr(ids_NO3B,L,NY,NX) &
@@ -1266,7 +1302,7 @@ module RedistMod
     UPO4(NY,NX)=UPO4(NY,NX)+POX
     UPP4(NY,NX)=UPP4(NY,NX)+POP
     !
-    call SumOMStates(L,NY,NX,DORGC(L,NY,NX),DORGE(NY,NX))
+    call SumOMStates(L,NY,NX,DORGC(L),DORGE(NY,NX))
 !
 !     TOTAL SALT IONS
 !
@@ -1384,11 +1420,11 @@ module RedistMod
   end subroutine UpdateSaltIonInSoilLayers
 
 !------------------------------------------------------------------------------------------
-  subroutine SumOMStates(L,NY,NX,DORGCC,DORGEC)
+  subroutine SumOMStates(L,NY,NX,DORGCL,DORGEC)
   implicit none
   integer, intent(in) :: L,NY,NX
   real(r8), intent(in):: DORGEC
-  real(r8), intent(out):: DORGCC
+  real(r8), intent(out):: DORGCL
   real(r8) :: DC,DN,DP,OC,ON,OP
 
   integer :: K,N,M,NGL
@@ -1416,9 +1452,9 @@ module RedistMod
 
 ! add living microbes
   DO K=1,jcplx
-    tDC=SUM(OMC(1:nlbiomcp,1:NumOfMicrobs1HetertrophCmplx,K,L,NY,NX))
-    tDN=SUM(OMN(1:nlbiomcp,1:NumOfMicrobs1HetertrophCmplx,K,L,NY,NX))
-    tDP=SUM(OMP(1:nlbiomcp,1:NumOfMicrobs1HetertrophCmplx,K,L,NY,NX))
+    tDC=SUM(OMEhetr(ielmc,1:NumLiveHeterBioms,K,L,NY,NX))
+    tDN=SUM(OMEhetr(ielmn,1:NumLiveHeterBioms,K,L,NY,NX))
+    tDP=SUM(OMEhetr(ielmp,1:NumLiveHeterBioms,K,L,NY,NX))
     IF(micpar%is_litter(K))THEN  
       !K=0,1,2: woody litr, nonwoody litr, and manure
       DC=DC+tDC
@@ -1444,9 +1480,9 @@ module RedistMod
   ENDDO
 
 ! add autotrophs
-  tDC=SUM(OMCff(1:nlbiomcp,1:NumOfMicrobsInAutotrophCmplx,L,NY,NX))
-  tDN=SUM(OMNff(1:nlbiomcp,1:NumOfMicrobsInAutotrophCmplx,L,NY,NX))
-  tDP=SUM(OMPff(1:nlbiomcp,1:NumOfMicrobsInAutotrophCmplx,L,NY,NX))
+  tDC=SUM(OMEauto(ielmc,1:NumLiveAutoBioms,L,NY,NX))
+  tDN=SUM(OMEauto(ielmn,1:NumLiveAutoBioms,L,NY,NX))
+  tDP=SUM(OMEauto(ielmp,1:NumLiveAutoBioms,L,NY,NX))
   OC=OC+tDC
   ON=ON+tDN
   OP=OP+tDP
@@ -1493,12 +1529,12 @@ module RedistMod
 
   IF(iErosionMode.EQ.ieros_frzthawsom.OR.iErosionMode.EQ.ieros_frzthawsomeros)THEN
 ! change in organic C
-    DORGCC=ORGCX(L,NY,NX)-ORGC(L,NY,NX)
+    DORGCL=ORGCX(L,NY,NX)-ORGC(L,NY,NX)
     IF(L.EQ.NU(NY,NX))THEN
-      DORGCC=DORGCC+DORGEC
+      DORGCL=DORGCL+DORGEC
     ENDIF
   ELSE
-    DORGCC=0.0_r8
+    DORGCL=0.0_r8
   ENDIF
 
   LitRCStoreLandscape=LitRCStoreLandscape+DC
@@ -1592,7 +1628,7 @@ module RedistMod
 !
   DO K=1,jcplx
     IF(micpar%is_litter(K))THEN
-      DO  N=1,NFGs
+      DO  N=1,NumMicbFunGroups
         DO NGL=JGnio(N),JGnfo(N)
           ROXYX(0,NY,NX)=ROXYX(0,NY,NX)+ROXYS(NGL,K,0,NY,NX)
           RNH4X(0,NY,NX)=RNH4X(0,NY,NX)+RVMX4(NGL,K,0,NY,NX)
@@ -1614,7 +1650,7 @@ module RedistMod
     ENDIF
   ENDDO
 
-  DO  N=1,NFGs
+  DO  N=1,NumMicbFunGroups
     DO NGL=JGniA(N),JGnfA(N)
       ROXYX(0,NY,NX)=ROXYX(0,NY,NX)+ROXYSff(NGL,0,NY,NX)
       RNH4X(0,NY,NX)=RNH4X(0,NY,NX)+RVMX4ff(NGL,0,NY,NX)
@@ -1646,42 +1682,42 @@ module RedistMod
 
   integer :: K,N,NGL
 
-  ROXYX(L,NY,NX)=ROXYX(L,NY,NX)+SUM(ROXYS(1:NumOfMicrobs1HetertrophCmplx,1:jcplx,L,NY,NX))
-  RNH4X(L,NY,NX)=RNH4X(L,NY,NX)+SUM(RVMX4(1:NumOfMicrobs1HetertrophCmplx,1:jcplx,L,NY,NX)) &
-    +SUM(RINHO(1:NumOfMicrobs1HetertrophCmplx,1:jcplx,L,NY,NX))
-  RNO3X(L,NY,NX)=RNO3X(L,NY,NX)+SUM(RVMX3(1:NumOfMicrobs1HetertrophCmplx,1:jcplx,L,NY,NX)) &
-    +SUM(RINOO(1:NumOfMicrobs1HetertrophCmplx,1:jcplx,L,NY,NX))
-  RNO2X(L,NY,NX)=RNO2X(L,NY,NX)+SUM(RVMX2(1:NumOfMicrobs1HetertrophCmplx,1:jcplx,L,NY,NX))
-  RN2OX(L,NY,NX)=RN2OX(L,NY,NX)+SUM(RVMX1(1:NumOfMicrobs1HetertrophCmplx,1:jcplx,L,NY,NX))
-  RPO4X(L,NY,NX)=RPO4X(L,NY,NX)+SUM(RIPOO(1:NumOfMicrobs1HetertrophCmplx,1:jcplx,L,NY,NX))
-  RP14X(L,NY,NX)=RP14X(L,NY,NX)+SUM(RIPO1(1:NumOfMicrobs1HetertrophCmplx,1:jcplx,L,NY,NX))
-  RNHBX(L,NY,NX)=RNHBX(L,NY,NX)+SUM(RVMB4(1:NumOfMicrobs1HetertrophCmplx,1:jcplx,L,NY,NX)) &
-    +SUM(RINHB(1:NumOfMicrobs1HetertrophCmplx,1:jcplx,L,NY,NX))
-  RN3BX(L,NY,NX)=RN3BX(L,NY,NX)+SUM(RVMB3(1:NumOfMicrobs1HetertrophCmplx,1:jcplx,L,NY,NX)) &
-    +SUM(RINOB(1:NumOfMicrobs1HetertrophCmplx,1:jcplx,L,NY,NX))
-  RN2BX(L,NY,NX)=RN2BX(L,NY,NX)+SUM(RVMB2(1:NumOfMicrobs1HetertrophCmplx,1:jcplx,L,NY,NX))
-  RPOBX(L,NY,NX)=RPOBX(L,NY,NX)+SUM(RIPBO(1:NumOfMicrobs1HetertrophCmplx,1:jcplx,L,NY,NX))
-  RP1BX(L,NY,NX)=RP1BX(L,NY,NX)+SUM(RIPB1(1:NumOfMicrobs1HetertrophCmplx,1:jcplx,L,NY,NX))
+  ROXYX(L,NY,NX)=ROXYX(L,NY,NX)+SUM(ROXYS(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX))
+  RNH4X(L,NY,NX)=RNH4X(L,NY,NX)+SUM(RVMX4(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX)) &
+    +SUM(RINHO(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX))
+  RNO3X(L,NY,NX)=RNO3X(L,NY,NX)+SUM(RVMX3(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX)) &
+    +SUM(RINOO(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX))
+  RNO2X(L,NY,NX)=RNO2X(L,NY,NX)+SUM(RVMX2(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX))
+  RN2OX(L,NY,NX)=RN2OX(L,NY,NX)+SUM(RVMX1(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX))
+  RPO4X(L,NY,NX)=RPO4X(L,NY,NX)+SUM(RIPOO(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX))
+  RP14X(L,NY,NX)=RP14X(L,NY,NX)+SUM(RIPO1(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX))
+  RNHBX(L,NY,NX)=RNHBX(L,NY,NX)+SUM(RVMB4(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX)) &
+    +SUM(RINHB(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX))
+  RN3BX(L,NY,NX)=RN3BX(L,NY,NX)+SUM(RVMB3(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX)) &
+    +SUM(RINOB(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX))
+  RN2BX(L,NY,NX)=RN2BX(L,NY,NX)+SUM(RVMB2(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX))
+  RPOBX(L,NY,NX)=RPOBX(L,NY,NX)+SUM(RIPBO(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX))
+  RP1BX(L,NY,NX)=RP1BX(L,NY,NX)+SUM(RIPB1(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX))
   DO K=1,jcplx
-    ROQCX(K,L,NY,NX)=ROQCX(K,L,NY,NX)+SUM(ROQCS(1:NumOfMicrobs1HetertrophCmplx,1:jcplx,L,NY,NX))
-    ROQAX(K,L,NY,NX)=ROQAX(K,L,NY,NX)+SUM(ROQAS(1:NumOfMicrobs1HetertrophCmplx,1:jcplx,L,NY,NX))
+    ROQCX(K,L,NY,NX)=ROQCX(K,L,NY,NX)+SUM(ROQCS(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX))
+    ROQAX(K,L,NY,NX)=ROQAX(K,L,NY,NX)+SUM(ROQAS(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX))
   ENDDO
-  ROXYX(L,NY,NX)=ROXYX(L,NY,NX)+SUM(ROXYSff(1:NumOfMicrobs1HetertrophCmplx,L,NY,NX))
-  RNH4X(L,NY,NX)=RNH4X(L,NY,NX)+SUM(RVMX4ff(1:NumOfMicrobs1HetertrophCmplx,L,NY,NX)) &
-    +SUM(RINHOff(1:NumOfMicrobs1HetertrophCmplx,L,NY,NX))
-  RNO3X(L,NY,NX)=RNO3X(L,NY,NX)+SUM(RVMX3ff(1:NumOfMicrobs1HetertrophCmplx,L,NY,NX)) &
-    +SUM(RINOOff(1:NumOfMicrobs1HetertrophCmplx,L,NY,NX))
-  RNO2X(L,NY,NX)=RNO2X(L,NY,NX)+SUM(RVMX2ff(1:NumOfMicrobs1HetertrophCmplx,L,NY,NX))
-  RN2OX(L,NY,NX)=RN2OX(L,NY,NX)+SUM(RVMX1ff(1:NumOfMicrobs1HetertrophCmplx,L,NY,NX))
-  RPO4X(L,NY,NX)=RPO4X(L,NY,NX)+SUM(RIPOOff(1:NumOfMicrobs1HetertrophCmplx,L,NY,NX))
-  RP14X(L,NY,NX)=RP14X(L,NY,NX)+SUM(RIPO1ff(1:NumOfMicrobs1HetertrophCmplx,L,NY,NX))
-  RNHBX(L,NY,NX)=RNHBX(L,NY,NX)+SUM(RVMB4ff(1:NumOfMicrobs1HetertrophCmplx,L,NY,NX)) &
-    +SUM(RINHBff(1:NumOfMicrobs1HetertrophCmplx,L,NY,NX))
-  RN3BX(L,NY,NX)=RN3BX(L,NY,NX)+SUM(RVMB3ff(1:NumOfMicrobs1HetertrophCmplx,L,NY,NX)) &
-    +SUM(RINOBff(1:NumOfMicrobs1HetertrophCmplx,L,NY,NX))
-  RN2BX(L,NY,NX)=RN2BX(L,NY,NX)+SUM(RVMB2ff(1:NumOfMicrobs1HetertrophCmplx,L,NY,NX))
-  RPOBX(L,NY,NX)=RPOBX(L,NY,NX)+SUM(RIPBOff(1:NumOfMicrobs1HetertrophCmplx,L,NY,NX))
-  RP1BX(L,NY,NX)=RP1BX(L,NY,NX)+SUM(RIPB1ff(1:NumOfMicrobs1HetertrophCmplx,L,NY,NX))
+  ROXYX(L,NY,NX)=ROXYX(L,NY,NX)+SUM(ROXYSff(1:NumMicrbHetetrophCmplx,L,NY,NX))
+  RNH4X(L,NY,NX)=RNH4X(L,NY,NX)+SUM(RVMX4ff(1:NumMicrbHetetrophCmplx,L,NY,NX)) &
+    +SUM(RINHOff(1:NumMicrbHetetrophCmplx,L,NY,NX))
+  RNO3X(L,NY,NX)=RNO3X(L,NY,NX)+SUM(RVMX3ff(1:NumMicrbHetetrophCmplx,L,NY,NX)) &
+    +SUM(RINOOff(1:NumMicrbHetetrophCmplx,L,NY,NX))
+  RNO2X(L,NY,NX)=RNO2X(L,NY,NX)+SUM(RVMX2ff(1:NumMicrbHetetrophCmplx,L,NY,NX))
+  RN2OX(L,NY,NX)=RN2OX(L,NY,NX)+SUM(RVMX1ff(1:NumMicrbHetetrophCmplx,L,NY,NX))
+  RPO4X(L,NY,NX)=RPO4X(L,NY,NX)+SUM(RIPOOff(1:NumMicrbHetetrophCmplx,L,NY,NX))
+  RP14X(L,NY,NX)=RP14X(L,NY,NX)+SUM(RIPO1ff(1:NumMicrbHetetrophCmplx,L,NY,NX))
+  RNHBX(L,NY,NX)=RNHBX(L,NY,NX)+SUM(RVMB4ff(1:NumMicrbHetetrophCmplx,L,NY,NX)) &
+    +SUM(RINHBff(1:NumMicrbHetetrophCmplx,L,NY,NX))
+  RN3BX(L,NY,NX)=RN3BX(L,NY,NX)+SUM(RVMB3ff(1:NumMicrbHetetrophCmplx,L,NY,NX)) &
+    +SUM(RINOBff(1:NumMicrbHetetrophCmplx,L,NY,NX))
+  RN2BX(L,NY,NX)=RN2BX(L,NY,NX)+SUM(RVMB2ff(1:NumMicrbHetetrophCmplx,L,NY,NX))
+  RPOBX(L,NY,NX)=RPOBX(L,NY,NX)+SUM(RIPBOff(1:NumMicrbHetetrophCmplx,L,NY,NX))
+  RP1BX(L,NY,NX)=RP1BX(L,NY,NX)+SUM(RIPB1ff(1:NumMicrbHetetrophCmplx,L,NY,NX))
 
   RNO2X(L,NY,NX)=RNO2X(L,NY,NX)+RVMXC(L,NY,NX)
   RN2BX(L,NY,NX)=RN2BX(L,NY,NX)+RVMBC(L,NY,NX)

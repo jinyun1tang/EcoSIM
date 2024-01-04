@@ -3,6 +3,7 @@ module ErosionMod
   use minimathmod, only : isclose,AZMAX1
   use MicrobialDataType
   use SOMDataType
+  use EcoSiMParDataMod    , only : micpar  
   use EcoSIMCtrlMod, only : iErosionMode
   use EcoSIMSolverPar
   use FertilizerDataType
@@ -18,9 +19,9 @@ module ErosionMod
   use SoilPropertyDataType
   USE SedimentDataType
   use GridDataType
-  use EcoSIMConfig, only : nlbiomcp => NumOfLiveMicrobiomComponents
-  use EcoSIMConfig, only : ndbiomcp=> NumOfDeadMicrobiomComponents
-  use EcoSIMConfig, only : jcplx1=> jcplx1c, NFGs => NFGsc,jcplx=>jcplxc
+  use EcoSIMConfig, only : nlbiomcp => NumLiveMicrbCompts
+  use EcoSIMConfig, only : ndbiomcp=> NumDeadMicrbCompts
+  use EcoSIMConfig, only : jcplx1=> jcplx1c, NumMicbFunGroups => NumMicbFunGroups,jcplx=>jcplxc
   use EcoSIMConfig, only : column_mode
   implicit none
 
@@ -416,7 +417,7 @@ module ErosionMod
 
   integer :: NGL,NTX,NTP
   integer :: K,NN,N,NO,M,NY,NX
-  integer :: N1,N2,N4,N5,N4B,N5B
+  integer :: N1,N2,N4,N5,N4B,N5B,MID
   real(r8) :: FSEDER
 
   DO  NX=NHW,NHE
@@ -509,23 +510,25 @@ module ErosionMod
 !     ORGANIC MATTER
 !
               DO  K=1,jcplx
-                DO NO=1,NFGs
+                DO NO=1,NumMicbFunGroups
                   DO NGL=JGnio(NO),JGnfo(NO)
                     DO M=1,nlbiomcp
-                      OMCER(M+(NGL-1)*nlbiomcp,K,N,2,N5,N4)=FSEDER*OMC(M,NGL,K,NU(N2,N1),N2,N1)
-                      OMNER(M+(NGL-1)*nlbiomcp,K,N,2,N5,N4)=FSEDER*OMN(M,NGL,K,NU(N2,N1),N2,N1)
-                      OMPER(M+(NGL-1)*nlbiomcp,K,N,2,N5,N4)=FSEDER*OMP(M,NGL,K,NU(N2,N1),N2,N1)
+                      MID=micpar%get_micb_id(M,NGL)
+                      OMEERhetr(ielmc,MID,K,N,2,N5,N4)=FSEDER*OMEhetr(ielmc,MID,K,NU(N2,N1),N2,N1)
+                      OMEERhetr(ielmn,MID,K,N,2,N5,N4)=FSEDER*OMEhetr(ielmn,MID,K,NU(N2,N1),N2,N1)
+                      OMEERhetr(ielmp,MID,K,N,2,N5,N4)=FSEDER*OMEhetr(ielmp,MID,K,NU(N2,N1),N2,N1)
                     ENDDO
                   ENDDO
                 ENDDO
               ENDDO
 
-              DO NO=1,NFGs
+              DO NO=1,NumMicbFunGroups
                 DO NGL=JGniA(NO),JGnfA(NO)
                   DO M=1,nlbiomcp
-                    OMCERff(M+(NGL-1)*nlbiomcp,N,2,N5,N4)=FSEDER*OMCff(M,NGL,NU(N2,N1),N2,N1)
-                    OMNERff(M+(NGL-1)*nlbiomcp,N,2,N5,N4)=FSEDER*OMNff(M,NGL,NU(N2,N1),N2,N1)
-                    OMPERff(M+(NGL-1)*nlbiomcp,N,2,N5,N4)=FSEDER*OMPff(M,NGL,NU(N2,N1),N2,N1)
+                    MID=micpar%get_micb_id(M,NGL)
+                    OMEERauto(ielmc,MID,N,2,N5,N4)=FSEDER*OMEauto(ielmc,MID,NU(N2,N1),N2,N1)
+                    OMEERauto(ielmn,MID,N,2,N5,N4)=FSEDER*OMEauto(ielmn,MID,NU(N2,N1),N2,N1)
+                    OMEERauto(ielmp,MID,N,2,N5,N4)=FSEDER*OMEauto(ielmp,MID,NU(N2,N1),N2,N1)
                   ENDDO
                 ENDDO
               ENDDO
@@ -574,23 +577,25 @@ module ErosionMod
 !     ORGANIC MATTER
 !
               DO  K=1,jcplx
-                DO  NO=1,NFGs
+                DO  NO=1,NumMicbFunGroups
                   DO NGL=JGnio(NO),JGnfo(NO)
                     DO  M=1,nlbiomcp
-                      OMCER(M+(NGL-1)*nlbiomcp,K,N,2,N5,N4)=0._r8
-                      OMNER(M+(NGL-1)*nlbiomcp,K,N,2,N5,N4)=0._r8
-                      OMPER(M+(NGL-1)*nlbiomcp,K,N,2,N5,N4)=0._r8
+                      MID=micpar%get_micb_id(M,NGL)
+                      OMEERhetr(ielmc,MID,K,N,2,N5,N4)=0._r8
+                      OMEERhetr(ielmn,MID,K,N,2,N5,N4)=0._r8
+                      OMEERhetr(ielmp,MID,K,N,2,N5,N4)=0._r8
                     enddo
                   ENDDO
                 enddo
               ENDDO
 
-              DO  NO=1,NFGs
+              DO  NO=1,NumMicbFunGroups
                 DO NGL=JGniA(NO),JGnfA(NO)
                   DO  M=1,nlbiomcp
-                    OMCERff(M+(NGL-1)*nlbiomcp,N,2,N5,N4)=0._r8
-                    OMNERff(M+(NGL-1)*nlbiomcp,N,2,N5,N4)=0._r8
-                    OMPERff(M+(NGL-1)*nlbiomcp,N,2,N5,N4)=0._r8
+                    MID=micpar%get_micb_id(M,NGL)
+                    OMEERauto(ielmc,MID,N,2,N5,N4)=0._r8
+                    OMEERauto(ielmn,MID,N,2,N5,N4)=0._r8
+                    OMEERauto(ielmp,MID,N,2,N5,N4)=0._r8
                   enddo
                 ENDDO
               enddo
@@ -667,22 +672,24 @@ module ErosionMod
 !     ORGANIC MATTER
 !
                 DO  K=1,jcplx
-                  DO  NO=1,NFGs
+                  DO  NO=1,NumMicbFunGroups
                     DO NGL=JGnio(NO),JGnfo(NO)
                       DO  M=1,nlbiomcp
-                        OMCER(M+(NGL-1)*nlbiomcp,K,N,1,N5B,N4B)=FSEDER*OMC(M,NGL,K,NU(N2,N1),N2,N1)
-                        OMNER(M+(NGL-1)*nlbiomcp,K,N,1,N5B,N4B)=FSEDER*OMN(M,NGL,K,NU(N2,N1),N2,N1)
-                        OMPER(M+(NGL-1)*nlbiomcp,K,N,1,N5B,N4B)=FSEDER*OMP(M,NGL,K,NU(N2,N1),N2,N1)
+                        MID=micpar%get_micb_id(M,NGL)                      
+                        OMEERhetr(ielmc,MID,K,N,1,N5B,N4B)=FSEDER*OMEhetr(ielmc,MID,K,NU(N2,N1),N2,N1)
+                        OMEERhetr(ielmn,MID,K,N,1,N5B,N4B)=FSEDER*OMEhetr(ielmn,MID,K,NU(N2,N1),N2,N1)
+                        OMEERhetr(ielmp,MID,K,N,1,N5B,N4B)=FSEDER*OMEhetr(ielmp,MID,K,NU(N2,N1),N2,N1)
                       enddo
                     enddo
                   ENDDO
                 ENDDO
-                DO  NO=1,NFGs
+                DO  NO=1,NumMicbFunGroups
                   DO NGL=JGniA(NO),JGnfA(NO)
                     DO  M=1,nlbiomcp
-                      OMCERff(M+(NGL-1)*nlbiomcp,N,1,N5B,N4B)=FSEDER*OMCff(M,NGL,NU(N2,N1),N2,N1)
-                      OMNERff(M+(NGL-1)*nlbiomcp,N,1,N5B,N4B)=FSEDER*OMNff(M,NGL,NU(N2,N1),N2,N1)
-                      OMPERff(M+(NGL-1)*nlbiomcp,N,1,N5B,N4B)=FSEDER*OMPff(M,NGL,NU(N2,N1),N2,N1)
+                      MID=micpar%get_micb_id(M,NGL)
+                      OMEERauto(ielmc,MID,N,1,N5B,N4B)=FSEDER*OMEauto(ielmc,MID,NU(N2,N1),N2,N1)
+                      OMEERauto(ielmn,MID,N,1,N5B,N4B)=FSEDER*OMEauto(ielmn,MID,NU(N2,N1),N2,N1)
+                      OMEERauto(ielmp,MID,N,1,N5B,N4B)=FSEDER*OMEauto(ielmp,MID,NU(N2,N1),N2,N1)
                     enddo
                   enddo
                 ENDDO
@@ -731,23 +738,25 @@ module ErosionMod
 !     ORGANIC MATTER
 !
                 DO  K=1,jcplx
-                  DO  NO=1,NFGs
+                  DO  NO=1,NumMicbFunGroups
                     DO NGL=JGnio(NO),JGnfo(NO)
                       DO  M=1,nlbiomcp
-                        OMCER(M+(NGL-1)*nlbiomcp,K,N,1,N5B,N4B)=0._r8
-                        OMNER(M+(NGL-1)*nlbiomcp,K,N,1,N5B,N4B)=0._r8
-                        OMPER(M+(NGL-1)*nlbiomcp,K,N,1,N5B,N4B)=0._r8
+                        MID=micpar%get_micb_id(M,NGL)
+                        OMEERhetr(ielmc,MID,K,N,1,N5B,N4B)=0._r8
+                        OMEERhetr(ielmn,MID,K,N,1,N5B,N4B)=0._r8
+                        OMEERhetr(ielmp,MID,K,N,1,N5B,N4B)=0._r8
                       enddo
                     ENDDO
                   enddo
                 ENDDO
 
-                DO  NO=1,NFGs
+                DO  NO=1,NumMicbFunGroups
                   DO NGL=JGniA(NO),JGnfA(NO)
                     DO  M=1,nlbiomcp
-                      OMCERff(M+(NGL-1)*nlbiomcp,N,1,N5B,N4B)=0._r8
-                      OMNERff(M+(NGL-1)*nlbiomcp,N,1,N5B,N4B)=0._r8
-                      OMPERff(M+(NGL-1)*nlbiomcp,N,1,N5B,N4B)=0._r8
+                      MID=micpar%get_micb_id(M,NGL)
+                      OMEERauto(ielmc,MID,N,1,N5B,N4B)=0._r8
+                      OMEERauto(ielmn,MID,N,1,N5B,N4B)=0._r8
+                      OMEERauto(ielmp,MID,N,1,N5B,N4B)=0._r8
                     enddo
                   ENDDO
                 enddo
@@ -788,7 +797,7 @@ module ErosionMod
   integer :: NY,NX
   integer :: N,NN,K,NO,M,NTX,NTP
   integer :: N1,N2,N4,N5
-  integer :: M1,M2,M4,M5
+  integer :: M1,M2,M4,M5,MID
   real(r8) :: XN
 
   DO  NX=NHW,NHE
@@ -879,22 +888,24 @@ module ErosionMod
 !     ORGANIC MATTER
 !
               DO  K=1,jcplx
-                DO  NO=1,NFGs
+                DO  NO=1,NumMicbFunGroups
                   DO NGL=JGnio(NO),JGnfo(NO)
                     DO  M=1,nlbiomcp
-                      OMCER(M+(NGL-1)*nlbiomcp,K,N,NN,M5,M4)=0._r8
-                      OMNER(M+(NGL-1)*nlbiomcp,K,N,NN,M5,M4)=0._r8
-                      OMPER(M+(NGL-1)*nlbiomcp,K,N,NN,M5,M4)=0._r8
+                      MID=micpar%get_micb_id(M,NGL)
+                      OMEERhetr(ielmc,MID,K,N,NN,M5,M4)=0._r8
+                      OMEERhetr(ielmn,MID,K,N,NN,M5,M4)=0._r8
+                      OMEERhetr(ielmp,MID,K,N,NN,M5,M4)=0._r8
                     enddo
                   ENDDO
                 enddo
               enddo
-              DO  NO=1,NFGs
+              DO  NO=1,NumMicbFunGroups
                 DO NGL=JGniA(NO),JGnfA(NO)
                   DO  M=1,nlbiomcp
-                    OMCERff(M+(NGL-1)*nlbiomcp,N,NN,M5,M4)=0._r8
-                    OMNERff(M+(NGL-1)*nlbiomcp,N,NN,M5,M4)=0._r8
-                    OMPERff(M+(NGL-1)*nlbiomcp,N,NN,M5,M4)=0._r8
+                    MID=micpar%get_micb_id(M,NGL)
+                    OMEERauto(ielmc,MID,N,NN,M5,M4)=0._r8
+                    OMEERauto(ielmn,MID,N,NN,M5,M4)=0._r8
+                    OMEERauto(ielmp,MID,N,NN,M5,M4)=0._r8
                   enddo
                 ENDDO
               enddo
@@ -953,22 +964,24 @@ module ErosionMod
 !     ORGANIC MATTER
 !
               DO  K=1,jcplx
-                DO NO=1,NFGs
+                DO NO=1,NumMicbFunGroups
                   DO NGL=JGnio(NO),JGnfo(NO)
                     DO M=1,nlbiomcp
-                      OMCER(M+(NGL-1)*nlbiomcp,K,N,NN,M5,M4)=FSEDER*OMC(M,NGL,K,NU(N2,N1),N2,N1)
-                      OMNER(M+(NGL-1)*nlbiomcp,K,N,NN,M5,M4)=FSEDER*OMN(M,NGL,K,NU(N2,N1),N2,N1)
-                      OMPER(M+(NGL-1)*nlbiomcp,K,N,NN,M5,M4)=FSEDER*OMP(M,NGL,K,NU(N2,N1),N2,N1)
+                      MID=micpar%get_micb_id(M,NGL)                    
+                      OMEERhetr(ielmc,MID,K,N,NN,M5,M4)=FSEDER*OMEhetr(ielmc,MID,K,NU(N2,N1),N2,N1)
+                      OMEERhetr(ielmn,MID,K,N,NN,M5,M4)=FSEDER*OMEhetr(ielmn,MID,K,NU(N2,N1),N2,N1)
+                      OMEERhetr(ielmp,MID,K,N,NN,M5,M4)=FSEDER*OMEhetr(ielmp,MID,K,NU(N2,N1),N2,N1)
                     ENDDO
                   ENDDO
                 ENDDO
               ENDDO
-              DO NO=1,NFGs
+              DO NO=1,NumMicbFunGroups
                 DO NGL=JGniA(NO),JGnfo(NO)
                   DO M=1,nlbiomcp
-                    OMCERff(M+(NGL-1)*nlbiomcp,N,NN,M5,M4)=FSEDER*OMCff(M,NGL,NU(N2,N1),N2,N1)
-                    OMNERff(M+(NGL-1)*nlbiomcp,N,NN,M5,M4)=FSEDER*OMNff(M,NGL,NU(N2,N1),N2,N1)
-                    OMPERff(M+(NGL-1)*nlbiomcp,N,NN,M5,M4)=FSEDER*OMPff(M,NGL,NU(N2,N1),N2,N1)
+                    MID=micpar%get_micb_id(M,NGL)
+                    OMEERauto(ielmc,MID,N,NN,M5,M4)=FSEDER*OMEauto(ielmc,MID,NU(N2,N1),N2,N1)
+                    OMEERauto(ielmn,MID,N,NN,M5,M4)=FSEDER*OMEauto(ielmn,MID,NU(N2,N1),N2,N1)
+                    OMEERauto(ielmp,MID,N,NN,M5,M4)=FSEDER*OMEauto(ielmp,MID,NU(N2,N1),N2,N1)
                   ENDDO
                 ENDDO
               ENDDO

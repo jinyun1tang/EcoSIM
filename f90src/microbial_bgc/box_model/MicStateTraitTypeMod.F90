@@ -78,12 +78,8 @@ implicit none
   real(r8),allocatable :: ORP(:,:)
   real(r8),allocatable :: CNOSC(:,:)
   real(r8),allocatable :: CPOSC(:,:)
-  real(r8),allocatable :: OMC(:,:,:)
-  real(r8),allocatable :: OMN(:,:,:)
-  real(r8),allocatable :: OMP(:,:,:)
-  real(r8),allocatable :: OMCff(:,:)
-  real(r8),allocatable :: OMNff(:,:)
-  real(r8),allocatable :: OMPff(:,:)
+  real(r8),allocatable :: OMEhetr(:,:,:)
+  real(r8),allocatable :: OMEauto(:,:)
   real(r8) :: OSC13U,OSC14U,OSC24U
   real(r8) :: OSN13U,OSN14U,OSN24U
   real(r8) :: OSP13U,OSP14U,OSP24U
@@ -97,17 +93,22 @@ implicit none
   subroutine Init(this)
   implicit none
   class(micsttype) :: this
-  integer :: jcplx,nfgs,jsken
-  integer :: ndbiomcp, nlbiomcp
-  integer :: NumOfMicrobsInAutotrophCmplx, NumOfMicrobs1HetertrophCmplx
+  integer :: jcplx,NumMicbFunGroups,jsken
+  integer, pointer :: ndbiomcp, nlbiomcp
+  integer, pointer :: NumMicrobAutotrophCmplx, NumMicrbHetetrophCmplx
+  integer, pointer :: NumLiveHeterBioms
+  integer, pointer :: NumLiveAutoBioms
+
 
   jcplx=micpar%jcplx
-  NFGs=micpar%NFGs
+  NumLiveAutoBioms => micpar%NumLiveAutoBioms
+  NumMicbFunGroups=micpar%NumMicbFunGroups
   jsken=micpar%jsken
-  ndbiomcp=micpar%ndbiomcp
-  nlbiomcp=micpar%nlbiomcp
-  NumOfMicrobsInAutotrophCmplx=micpar%NumOfMicrobsInAutotrophCmplx
-  NumOfMicrobs1HetertrophCmplx=micpar%NumOfMicrobs1HetertrophCmplx
+  ndbiomcp =>micpar%ndbiomcp
+  nlbiomcp =>micpar%nlbiomcp
+  NumMicrobAutotrophCmplx=>micpar%NumMicrobAutotrophCmplx
+  NumMicrbHetetrophCmplx=>micpar%NumMicrbHetetrophCmplx
+  NumLiveHeterBioms => micpar%NumLiveHeterBioms
 
   allocate(this%FOSRH(1:jcplx))
   allocate(this%DOM(idom_beg:idom_end,1:jcplx))
@@ -124,12 +125,8 @@ implicit none
   allocate(this%ORP(ndbiomcp,1:jcplx))
   allocate(this%CNOSC(jsken,1:jcplx))
   allocate(this%CPOSC(jsken,1:jcplx))
-  allocate(this%OMC(nlbiomcp,NumOfMicrobs1HetertrophCmplx,1:jcplx))
-  allocate(this%OMN(nlbiomcp,NumOfMicrobs1HetertrophCmplx,1:jcplx))
-  allocate(this%OMP(nlbiomcp,NumOfMicrobs1HetertrophCmplx,1:jcplx))
-  allocate(this%OMCff(nlbiomcp,NumOfMicrobsInAutotrophCmplx))
-  allocate(this%OMNff(nlbiomcp,NumOfMicrobsInAutotrophCmplx))
-  allocate(this%OMPff(nlbiomcp,NumOfMicrobsInAutotrophCmplx))
+  allocate(this%OMEhetr(NumPlantChemElmnts,NumLiveHeterBioms,1:jcplx))
+  allocate(this%OMEauto(NumPlantChemElmnts,NumLiveAutoBioms))
 
   end subroutine Init
 
@@ -156,11 +153,7 @@ implicit none
   call destroy(this%ORP)
   call destroy(this%CNOSC)
   call destroy(this%CPOSC)
-  call destroy(this%OMC)
-  call destroy(this%OMN)
-  call destroy(this%OMP)
-  call destroy(this%OMCff)
-  call destroy(this%OMNff)
-  call destroy(this%OMPff)
+  call destroy(this%OMEhetr)
+  call destroy(this%OMEauto)
   end subroutine Destruct
 end module MicStateTraitTypeMod

@@ -31,7 +31,7 @@ module CanopyCondsMod
   curday=I
   call MultiLayerSurfaceRadiation(I,J,DepthSurfWatIce)
 
-  call DivideCanopyLayerByLAI()
+  call DivideCanopyDepthByLAI()
 
   call CalcBoundaryLayerProperties(DepthSurfWatIce)
 
@@ -116,25 +116,25 @@ module CanopyCondsMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine DivideCanopyLayerByLAI()
+  subroutine DivideCanopyDepthByLAI()
   implicit none
 
   real(r8) :: ZL1(0:NumOfCanopyLayers1)
-  real(r8) :: ART,ARL
+  real(r8) :: AreaInterval,AreaL
   real(r8) :: ARX
   real(r8) :: DZL
   integer :: NZ,L
   !     begin_execution
   associate(                      &
-    NP      => plt_site%NP      , &
-    ZEROS   => plt_site%ZEROS   , &
+    NP                       => plt_site%NP      , &
+    ZEROS                    => plt_site%ZEROS   , &
     MaxCanopyHeight_grd      => plt_morph%MaxCanopyHeight_grd     , &
-    CanopyHeightz_col      => plt_morph%CanopyHeightz_col     , &
-    CanopyHeight_pft     => plt_morph%CanopyHeight_pft    , &
-    CanopyStemA_lyr   => plt_morph%CanopyStemA_lyr  , &
-    CanopyLAgrid_lyr   => plt_morph%CanopyLAgrid_lyr  , &
-    StemArea_grd   => plt_morph%StemArea_grd  , &
-    CanopyLeafArea_grd   => plt_morph%CanopyLeafArea_grd    &
+    CanopyHeightz_col        => plt_morph%CanopyHeightz_col     , &
+    CanopyHeight_pft         => plt_morph%CanopyHeight_pft    , &
+    CanopyStemA_lyr          => plt_morph%CanopyStemA_lyr  , &
+    CanopyLAgrid_lyr         => plt_morph%CanopyLAgrid_lyr  , &
+    StemArea_grd             => plt_morph%StemArea_grd  , &
+    CanopyLeafArea_grd       => plt_morph%CanopyLeafArea_grd    &
   )
   !
   !     DIVISION OF CANOPY INTO NumOfCanopyLayers LAYERS WITH EQUAL LAI
@@ -151,19 +151,19 @@ module CanopyCondsMod
   CanopyHeightz_col(NumOfCanopyLayers1)=MaxCanopyHeight_grd+0.01_r8
   ZL1(NumOfCanopyLayers1)=CanopyHeightz_col(NumOfCanopyLayers1)
   ZL1(0)=0.0_r8
-  ART=(CanopyLeafArea_grd+StemArea_grd)/NumOfCanopyLayers1
+  AreaInterval=(CanopyLeafArea_grd+StemArea_grd)/NumOfCanopyLayers1
 
-  IF(ART.GT.ZEROS)THEN
+  IF(AreaInterval.GT.ZEROS)THEN
     D2765: DO L=NumOfCanopyLayers1,2,-1
-      ARL=CanopyLAgrid_lyr(L)+CanopyStemA_lyr(L)
-      IF(ARL.GT.1.01_r8*ART)THEN
+      AreaL=CanopyLAgrid_lyr(L)+CanopyStemA_lyr(L)
+      IF(AreaL.GT.1.01_r8*AreaInterval)THEN
         DZL=CanopyHeightz_col(L)-CanopyHeightz_col(L-1)
-        ZL1(L-1)=CanopyHeightz_col(L-1)+0.5_r8*AMIN1(1.0,(ARL-ART)/ARL)*DZL
-      ELSEIF(ARL.LT.0.99_r8*ART)THEN
+        ZL1(L-1)=CanopyHeightz_col(L-1)+0.5_r8*AMIN1(1.0_r8,(AreaL-AreaInterval)/AreaL)*DZL
+      ELSEIF(AreaL.LT.0.99_r8*AreaInterval)THEN
         ARX=CanopyLAgrid_lyr(L-1)+CanopyStemA_lyr(L-1)
         DZL=CanopyHeightz_col(L-1)-CanopyHeightz_col(L-2)
         IF(ARX.GT.ZEROS)THEN
-          ZL1(L-1)=CanopyHeightz_col(L-1)-0.5_r8*AMIN1(1.0_r8,(ART-ARL)/ARX)*DZL
+          ZL1(L-1)=CanopyHeightz_col(L-1)-0.5_r8*AMIN1(1.0_r8,(AreaInterval-AreaL)/ARX)*DZL
         ELSE
           ZL1(L-1)=CanopyHeightz_col(L-1)
         ENDIF
@@ -178,7 +178,7 @@ module CanopyCondsMod
     ENDDO D2770
   ENDIF
   end associate
-  end subroutine DivideCanopyLayerByLAI
+  end subroutine DivideCanopyDepthByLAI
 
 !------------------------------------------------------------------------------------------
 
@@ -289,7 +289,7 @@ module CanopyCondsMod
     RadSWbyCanopy_pft        => plt_rad%RadSWbyCanopy_pft     , &
     PARDiffus_col            => plt_rad%PARDiffus_col    , & !umol /m2/s
     PARDirect_col            => plt_rad%PARDirect_col    , & !umol /m2/s
-    SineSolarIncliAngle           => plt_rad%SineSolarIncliAngle     , &
+    SineSolarIncliAngle      => plt_rad%SineSolarIncliAngle     , &
     TotSineSkyAngles_grd     => plt_rad%TotSineSkyAngles_grd    , &
     TAU_RadThru              => plt_rad%TAU_RadThru     , &
     TAU_RadCapt              => plt_rad%TAU_RadCapt     , &

@@ -468,9 +468,9 @@ module WthrMod
             !     TCelsChill4Leaf_pft(NZ,NY,NX)=TCZD-OFFST(NZ,NY,NX)
             !     TCelcius4LeafOffHarden_pft(NZ,NY,NX)=AMIN1(15.0,TCelsChill4Leaf_pft(NZ,NY,NX)+TCXD)
             IF(iPlantPhotosynthesisType(NZ,NY,NX).EQ.3)THEN
-              HTC(NZ,NY,NX)=27.0+3.0*iPlantThermoAdaptZone(NZ,NY,NX)
+              HighTCLimtSeed_pft(NZ,NY,NX)=27.0+3.0*iPlantThermoAdaptZone(NZ,NY,NX)
             ELSE
-              HTC(NZ,NY,NX)=30.0+3.0*iPlantThermoAdaptZone(NZ,NY,NX)
+              HighTCLimtSeed_pft(NZ,NY,NX)=30.0+3.0*iPlantThermoAdaptZone(NZ,NY,NX)
             ENDIF
             MatureGroup_pft(NZ,NY,NX)=GROUPX(NZ,NY,NX)+0.30*DTA
             IF(iPlantTurnoverPattern_pft(NZ,NY,NX).NE.0)THEN

@@ -4,8 +4,8 @@ module TFlxTypeMod
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use abortutils, only : destroy
   use TracerIDMod
-  use EcoSIMConfig, only : jcplx => jcplxc,jsken=>jskenc,NFGs=>NFGsc
-  use EcoSIMConfig, only : nlbiomcp=>NumOfLiveMicrobiomComponents,ndbiomcp=>NumOfDeadMicrobiomComponents
+  use EcoSIMConfig, only : jcplx => jcplxc,jsken=>jskenc,NumMicbFunGroups=>NumMicbFunGroups
+  use EcoSIMConfig, only : nlbiomcp=>NumLiveMicrbCompts,ndbiomcp=>NumDeadMicrbCompts
 implicit none
 
   character(len=*), private, parameter :: mod_filename = &
@@ -45,7 +45,7 @@ implicit none
   real(r8),allocatable ::  TNO3EB(:,:)                        !
   real(r8),allocatable ::  trcx_TER(:,:,:)                         !
   real(r8),allocatable ::  trcp_TER(:,:,:)                        !
-  real(r8),allocatable ::  TSEDER(:,:)                        !
+  real(r8),allocatable ::  tErosionSedmLoss(:,:)                        !
   real(r8),allocatable ::  TWatFlowCellMicP(:,:,:)                        !
   real(r8),allocatable ::  TWatFlowCellMicPX(:,:,:)                       !
   real(r8),allocatable ::  THeatFlow2Soil(:,:,:)                       !
@@ -61,15 +61,10 @@ implicit none
   real(r8),allocatable ::  VLWatMacP1(:,:,:)                      !
   real(r8),allocatable ::  VLiceMacP1(:,:,:)                      !
 
-  real(r8),allocatable :: TOMCER(:,:,:,:,:)
-  real(r8),allocatable :: TOMNER(:,:,:,:,:)
-  real(r8),allocatable :: TOMPER(:,:,:,:,:)
+  real(r8),allocatable :: TOMEERhetr(:,:,:,:,:)
 
-
-  real(r8),allocatable :: TOMCERff(:,:,:,:)
-  real(r8),allocatable :: TOMNERff(:,:,:,:)
-  real(r8),allocatable :: TOMPERff(:,:,:,:)
-
+  real(r8),allocatable :: TOMEERauto(:,:,:,:)
+ 
   real(r8),allocatable ::  DOM_Transp2Micp_flx(:,:,:,:,:)
   real(r8),allocatable ::  DOM_Transp2Macp_flx(:,:,:,:,:)
   real(r8),allocatable ::  TOCQRS(:,:,:)
@@ -142,7 +137,7 @@ implicit none
   allocate(trcp_TER(idsp_beg:idsp_end,JY,JX));      trcp_TER=0._r8
   allocate(trcs_Transp2MicP_vr(ids_beg:ids_end,JZ,JY,JX));   trcs_Transp2MicP_vr=0._r8
 
-  allocate(TSEDER(JY,JX));      TSEDER=0._r8
+  allocate(tErosionSedmLoss(JY,JX));      tErosionSedmLoss=0._r8
   allocate(TWatFlowCellMicP(JZ,JY,JX));     TWatFlowCellMicP=0._r8
   allocate(TWatFlowCellMicPX(JZ,JY,JX));    TWatFlowCellMicPX=0._r8
   allocate(THeatFlow2Soil(JZ,JY,JX));    THeatFlow2Soil=0._r8
@@ -154,13 +149,9 @@ implicit none
   allocate(VLiceMicP1(JZ,JY,JX));    VLiceMicP1=0._r8
   allocate(VLWatMacP1(JZ,JY,JX));   VLWatMacP1=0._r8
   allocate(VLiceMacP1(JZ,JY,JX));   VLiceMacP1=0._r8
-  allocate(TOMCER(nlbiomcp,NumOfMicrobs1HetertrophCmplx,1:jcplx,JY,JX)); TOMCER=0._r8
-  allocate(TOMNER(nlbiomcp,NumOfMicrobs1HetertrophCmplx,1:jcplx,JY,JX)); TOMNER=0._r8
-  allocate(TOMPER(nlbiomcp,NumOfMicrobs1HetertrophCmplx,1:jcplx,JY,JX)); TOMPER=0._r8
+  allocate(TOMEERhetr(NumPlantChemElmnts,1:NumLiveHeterBioms,1:jcplx,JY,JX)); TOMEERhetr=0._r8
 
-  allocate(TOMCERff(nlbiomcp,NumOfMicrobsInAutotrophCmplx,JY,JX));TOMCERff=0._r8
-  allocate(TOMNERff(nlbiomcp,NumOfMicrobsInAutotrophCmplx,JY,JX));TOMNERff=0._r8
-  allocate(TOMPERff(nlbiomcp,NumOfMicrobsInAutotrophCmplx,JY,JX));TOMPERff=0._r8
+  allocate(TOMEERauto(NumPlantChemElmnts,1:NumLiveAutoBioms,JY,JX));TOMEERauto=0._r8
 
   allocate(DOM_Transp2Micp_flx(idom_beg:idom_end,1:jcplx,JZ,JY,JX));DOM_Transp2Micp_flx=0._r8
   allocate(DOM_Transp2Macp_flx(idom_beg:idom_end,1:jcplx,JZ,JY,JX));DOM_Transp2Macp_flx=0._r8
@@ -191,12 +182,8 @@ implicit none
 
   call destroy(trcx_TER)
 
-  call destroy(TOMCER)
-  call destroy(TOMNER)
-  call destroy(TOMPER)
-  call destroy(TOMCERff)
-  call destroy(TOMNERff)
-  call destroy(TOMPERff)
+  call destroy(TOMEERhetr)
+  call destroy(TOMEERauto)
   call destroy(TOCQRS)
   call destroy(TONQRS)
   call destroy(TOPQRS)
@@ -246,7 +233,7 @@ implicit none
   call destroy(TNH3EB)
   call destroy(TNHUEB)
   call destroy(TNO3EB)
-  call destroy(TSEDER)
+  call destroy(tErosionSedmLoss)
   call destroy(TWatFlowCellMicP)
   call destroy(TWatFlowCellMicPX)
   call destroy(THeatFlow2Soil)

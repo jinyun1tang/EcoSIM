@@ -210,7 +210,7 @@ module NutUptakeMod
   plt_rbgc%RUPGasSol_vr(idg_beg:idg_end,1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%RCO2P(1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%RUPOXP(1:NN,L1:L2,NZ)=0.0_r8
-  plt_rbgc%RDFOME(1:NumOfPlantChemElmnts,1:NN,1:jcplx,L1:L2,NZ)=0.0_r8
+  plt_rbgc%RDFOME(1:NumPlantChemElmnts,1:NN,1:jcplx,L1:L2,NZ)=0.0_r8
   plt_rbgc%RootAutoRO2Limiter_pvr(1:NN,L1:L2,NZ)=1.0
   plt_rbgc%RUNNHP(1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%RootNutUptake_pvr(ids_NH4,1:NN,L1:L2,NZ)=0.0_r8
@@ -1275,7 +1275,7 @@ module NutUptakeMod
         RDFOME(ielmp,N,K,L,NZ)=0.0_r8
       ENDIF
     ELSE
-      RDFOME(1:NumOfPlantChemElmnts,N,K,L,NZ)=0.0_r8
+      RDFOME(1:NumPlantChemElmnts,N,K,L,NZ)=0.0_r8
     ENDIF
 
   ENDDO D195

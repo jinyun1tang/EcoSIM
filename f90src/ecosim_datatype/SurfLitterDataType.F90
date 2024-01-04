@@ -25,7 +25,7 @@ module SurfLitterDataType
   real(r8) ,target,allocatable ::   Rain2LitRSurf(:,:)                       !precipitation flux into surface litter, [m3 d-2 h-1]
   real(r8) ,target,allocatable ::   Irrig2LitRSurf(:,:)                       !irrigation flux into surface litter, [m3 d-2 h-1]
   real(r8) ,target,allocatable ::   POROS0(:,:)                      !litter porosity
-  real(r8) ,target,allocatable ::   RC0(:,:,:)                       !surface litter in each CO2CompenPoint_nodeex	g d-2
+  real(r8) ,target,allocatable ::   RC0(:,:,:)                       !surface litter in each complex	g d-2
   real(r8),target,allocatable ::  RC0ff(:,:)
 
   private :: InitAllocate

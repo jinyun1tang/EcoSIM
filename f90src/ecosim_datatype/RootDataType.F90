@@ -128,7 +128,7 @@ contains
   allocate(Max2ndRootRadius(jroots,JP,JY,JX)); Max2ndRootRadius=0._r8
   allocate(RootBranchFreq_pft(JP,JY,JX));     RootBranchFreq_pft=0._r8
   allocate(RootPoreTortu4Gas(jroots,JP,JY,JX));  RootPoreTortu4Gas=0._r8
-  allocate(RootNoduleNonstructElmnt_vr(NumOfPlantChemElmnts,JZ,JP,JY,JX));RootNoduleNonstructElmnt_vr=0._r8
+  allocate(RootNoduleNonstructElmnt_vr(NumPlantChemElmnts,JZ,JP,JY,JX));RootNoduleNonstructElmnt_vr=0._r8
   allocate(RootLenPerPlant_pvr(jroots,JZ,JP,JY,JX));RootLenPerPlant_pvr=0._r8
   allocate(PrimRootLen(jroots,JZ,NumOfCanopyLayers,JP,JY,JX));PrimRootLen=0._r8
   allocate(SecndRootLen(jroots,JZ,NumOfCanopyLayers,JP,JY,JX));SecndRootLen=0._r8
@@ -153,18 +153,18 @@ contains
   allocate(trcs_rootml_vr(idg_beg:idg_end-1,2,JZ,JP,JY,JX)); trcs_rootml_vr =0._r8
   allocate(TRootGasLossDisturb_pft(idg_beg:idg_end-1,JY,JX));TRootGasLossDisturb_pft=0._r8
   allocate(RootBiomCPerPlant_pft(JP,JY,JX));    RootBiomCPerPlant_pft=0._r8
-  allocate(RootElmnts_pft(NumOfPlantChemElmnts,JP,JY,JX)); RootElmnts_pft=0._r8
-  allocate(RootStructElmnt_pft(NumOfPlantChemElmnts,JP,JY,JX));   RootStructElmnt_pft=0._r8
+  allocate(RootElmnts_pft(NumPlantChemElmnts,JP,JY,JX)); RootElmnts_pft=0._r8
+  allocate(RootStructElmnt_pft(NumPlantChemElmnts,JP,JY,JX));   RootStructElmnt_pft=0._r8
   allocate(RootProteinC_pvr(jroots,JZ,JP,JY,JX));RootProteinC_pvr=0._r8
-  allocate(Root1stStructChemElmnt_pvr(NumOfPlantChemElmnts,jroots,JZ,NumOfCanopyLayers,JP,JY,JX));Root1stStructChemElmnt_pvr=0._r8
-  allocate(Root2ndStructChemElmnt_pvr(NumOfPlantChemElmnts,jroots,JZ,NumOfCanopyLayers,JP,JY,JX));Root2ndStructChemElmnt_pvr=0._r8
+  allocate(Root1stStructChemElmnt_pvr(NumPlantChemElmnts,jroots,JZ,NumOfCanopyLayers,JP,JY,JX));Root1stStructChemElmnt_pvr=0._r8
+  allocate(Root2ndStructChemElmnt_pvr(NumPlantChemElmnts,jroots,JZ,NumOfCanopyLayers,JP,JY,JX));Root2ndStructChemElmnt_pvr=0._r8
   allocate( PopuPlantRootC_vr(jroots,JZ,JP,JY,JX)); PopuPlantRootC_vr=0._r8
-  allocate(RootNodueChemElmnt_pvr(NumOfPlantChemElmnts,JZ,JP,JY,JX)); RootNodueChemElmnt_pvr=0._r8
-  allocate(NoduleChemElmnts_pft(NumOfPlantChemElmnts,JP,JY,JX));  NoduleChemElmnts_pft=0._r8
+  allocate(RootNodueChemElmnt_pvr(NumPlantChemElmnts,JZ,JP,JY,JX)); RootNodueChemElmnt_pvr=0._r8
+  allocate(NoduleChemElmnts_pft(NumPlantChemElmnts,JP,JY,JX));  NoduleChemElmnts_pft=0._r8
   allocate(RootStructBiomC_vr(jroots,JZ,JP,JY,JX));RootStructBiomC_vr=0._r8
-  allocate(RootMycoNonstructElmnt_vr(NumOfPlantChemElmnts,jroots,JZ,JP,JY,JX)); RootMycoNonstructElmnt_vr=0._r8
-  allocate(RootNonstructElementConcpft_vr(NumOfPlantChemElmnts,jroots,JZ,JP,JY,JX));RootNonstructElementConcpft_vr=0._r8
-  allocate(Root1stChemElmnt(NumOfPlantChemElmnts,jroots,MaxNumRootAxes,JP,JY,JX));Root1stChemElmnt=0._r8
+  allocate(RootMycoNonstructElmnt_vr(NumPlantChemElmnts,jroots,JZ,JP,JY,JX)); RootMycoNonstructElmnt_vr=0._r8
+  allocate(RootNonstructElementConcpft_vr(NumPlantChemElmnts,jroots,JZ,JP,JY,JX));RootNonstructElementConcpft_vr=0._r8
+  allocate(Root1stChemElmnt(NumPlantChemElmnts,jroots,MaxNumRootAxes,JP,JY,JX));Root1stChemElmnt=0._r8
   allocate(RootProteinConc_pftvr(jroots,JZ,JP,JY,JX));RootProteinConc_pftvr=0._r8
   end subroutine InitRootData
 

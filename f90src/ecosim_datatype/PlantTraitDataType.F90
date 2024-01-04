@@ -114,7 +114,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  WDLF(:,:,:)                        !leaf length:width ratio, [-]
   real(r8),target,allocatable ::  SLA1(:,:,:)                        !leaf area:mass during growth, [m2 g-1]
   real(r8),target,allocatable ::  TCelsChill4Leaf_pft(:,:,:)                         !threshold temperature for spring leafout/dehardening, [oC]
-  real(r8),target,allocatable ::  SSL1(:,:,:)                        !petiole length:mass during growth, [m g-1]
+  real(r8),target,allocatable ::  PetoLen2Mass_pft(:,:,:)                        !petiole length:mass during growth, [m g-1]
   real(r8),target,allocatable ::  HourThreshold4LeafOut_brch(:,:,:,:)                      !hours above threshold temperature required for spring leafout/dehardening, [-]
   integer,target,allocatable ::  NumOfBranches_pft(:,:,:)                          !branch number, [-]
   integer,target,allocatable ::  BranchNumber_pft(:,:,:)                          !branch number, [-]
@@ -137,7 +137,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  ReprodNodeNumNormByMatrgrp_brch(:,:,:,:)                     !normalized node number during reproductive growth stages, [-]
   real(r8),target,allocatable ::  NodeNumberAtAnthesis_brch(:,:,:,:)                     !node number at anthesis, [-]
   real(r8),target,allocatable ::  TotalNodeNumNormByMatgrp_brch(:,:,:,:)                    !normalized node number during vegetative growth stages , [-]
-  real(r8),target,allocatable ::  TotalReprodNodeNumNormByMatrgrp_brch(:,:,:,:)                    !normalized node number during reproductive growth stages , [-]
+  real(r8),target,allocatable ::  TotReproNodeNumNormByMatrgrp_brch(:,:,:,:)                    !normalized node number during reproductive growth stages , [-]
   real(r8),target,allocatable ::  RefNodeInitRate_pft(:,:,:)                        !rate of node initiation, [h-1 at 25 oC]
   real(r8),target,allocatable ::  SNL1(:,:,:)                        !internode length:mass during growth, [m g-1]
   real(r8),target,allocatable ::  FNOD(:,:,:)                        !parameter for allocation of growth to nodes, [-]
@@ -157,7 +157,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  HoursDoingRemob_brch(:,:,:,:)                      !counter for mobilizing nonstructural C during autumn leafoff/hardening, [h]
   integer,target,allocatable ::  iPlantCalendar_brch(:,:,:,:,:)                     !plant growth stage, [-]
   real(r8),target,allocatable ::  TCelciusChill4Seed(:,:,:)                         !temperature below which seed set is adversely affected, [oC]
-  real(r8),target,allocatable ::  HTC(:,:,:)                         !temperature above which seed set is adversely affected, [oC]
+  real(r8),target,allocatable ::  HighTCLimtSeed_pft(:,:,:)                         !temperature above which seed set is adversely affected, [oC]
   real(r8),target,allocatable ::  SSTX(:,:,:)                        !sensitivity to HTC (seeds oC-1 above HTC)
   real(r8),target,allocatable ::  CriticalPhotoPeriod_pft(:,:,:)                         !critical daylength for phenological progress, [h]
   real(r8),target,allocatable ::  PhotoPeriodSens_pft(:,:,:)                        !difference between current and critical daylengths used to calculate  phenological progress, [h]
@@ -173,10 +173,10 @@ contains
   integer, intent(in) :: NumOfPlantLitrCmplxs
 
   FVRN =real((/0.75,0.5,0.5,0.5,0.5,0.5/),r8)
-  allocate(FWODLE(NumOfPlantChemElmnts,1:NumOfPlantLitrCmplxs));  FWODLE=0._r8
-  allocate(FWODBE(NumOfPlantChemElmnts,1:NumOfPlantLitrCmplxs));  FWODBE=0._r8
-  allocate(FWODRE(NumOfPlantChemElmnts,1:NumOfPlantLitrCmplxs));  FWODRE=0._r8         !
-  allocate(FWOODE(NumOfPlantChemElmnts,1:NumOfPlantLitrCmplxs));  FWOODE=0._r8         !woody element allocation
+  allocate(FWODLE(NumPlantChemElmnts,1:NumOfPlantLitrCmplxs));  FWODLE=0._r8
+  allocate(FWODBE(NumPlantChemElmnts,1:NumOfPlantLitrCmplxs));  FWODBE=0._r8
+  allocate(FWODRE(NumPlantChemElmnts,1:NumOfPlantLitrCmplxs));  FWODRE=0._r8         !
+  allocate(FWOODE(NumPlantChemElmnts,1:NumOfPlantLitrCmplxs));  FWOODE=0._r8         !woody element allocation
   allocate(CanopyBranchStemApft_lyr(NumOfCanopyLayers,MaxNumBranches,JP,JY,JX));CanopyBranchStemApft_lyr=0._r8
   allocate(CanopyLeafArea_pft(JP,JY,JX));    CanopyLeafArea_pft=0._r8
   allocate(CanopyArea_pft(JP,JY,JX));    CanopyArea_pft=0._r8
@@ -273,7 +273,7 @@ contains
   allocate(WDLF(JP,JY,JX));     WDLF=0._r8
   allocate(SLA1(JP,JY,JX));     SLA1=0._r8
   allocate(TCelsChill4Leaf_pft(JP,JY,JX));      TCelsChill4Leaf_pft=0._r8
-  allocate(SSL1(JP,JY,JX));     SSL1=0._r8
+  allocate(PetoLen2Mass_pft(JP,JY,JX));     PetoLen2Mass_pft=0._r8
   allocate(HourThreshold4LeafOut_brch(NumOfCanopyLayers,JP,JY,JX));  HourThreshold4LeafOut_brch=0._r8
   allocate(NumOfBranches_pft(JP,JY,JX));      NumOfBranches_pft=0
   allocate(BranchNumber_pft(JP,JY,JX));      BranchNumber_pft=0
@@ -296,7 +296,7 @@ contains
   allocate(ReprodNodeNumNormByMatrgrp_brch(MaxNumBranches,JP,JY,JX)); ReprodNodeNumNormByMatrgrp_brch=0._r8
   allocate(NodeNumberAtAnthesis_brch(MaxNumBranches,JP,JY,JX)); NodeNumberAtAnthesis_brch=0._r8
   allocate(TotalNodeNumNormByMatgrp_brch(MaxNumBranches,JP,JY,JX));TotalNodeNumNormByMatgrp_brch=0._r8
-  allocate(TotalReprodNodeNumNormByMatrgrp_brch(MaxNumBranches,JP,JY,JX));TotalReprodNodeNumNormByMatrgrp_brch=0._r8
+  allocate(TotReproNodeNumNormByMatrgrp_brch(MaxNumBranches,JP,JY,JX));TotReproNodeNumNormByMatrgrp_brch=0._r8
   allocate(RefNodeInitRate_pft(JP,JY,JX));     RefNodeInitRate_pft=0._r8
   allocate(SNL1(JP,JY,JX));     SNL1=0._r8
   allocate(FNOD(JP,JY,JX));     FNOD=0._r8
@@ -316,7 +316,7 @@ contains
   allocate(HoursDoingRemob_brch(MaxNumBranches,JP,JY,JX));  HoursDoingRemob_brch=0._r8
   allocate(iPlantCalendar_brch(NumGrowthStages,MaxNumBranches,JP,JY,JX));iPlantCalendar_brch=0
   allocate(TCelciusChill4Seed(JP,JY,JX));      TCelciusChill4Seed=0._r8
-  allocate(HTC(JP,JY,JX));      HTC=0._r8
+  allocate(HighTCLimtSeed_pft(JP,JY,JX));      HighTCLimtSeed_pft=0._r8
   allocate(SSTX(JP,JY,JX));     SSTX=0._r8
   allocate(CriticalPhotoPeriod_pft(JP,JY,JX));      CriticalPhotoPeriod_pft=0._r8
   allocate(PhotoPeriodSens_pft(JP,JY,JX));     PhotoPeriodSens_pft=0._r8
@@ -429,7 +429,7 @@ contains
   call destroy(WDLF)
   call destroy(SLA1)
   call destroy(TCelsChill4Leaf_pft)
-  call destroy(SSL1)
+  call destroy(PetoLen2Mass_pft)
   call destroy(HourThreshold4LeafOut_brch)
   call destroy(NumOfBranches_pft)
   call destroy(BranchNumber_pft)
@@ -452,7 +452,7 @@ contains
   call destroy(ReprodNodeNumNormByMatrgrp_brch)
   call destroy(NodeNumberAtAnthesis_brch)
   call destroy(TotalNodeNumNormByMatgrp_brch)
-  call destroy(TotalReprodNodeNumNormByMatrgrp_brch)
+  call destroy(TotReproNodeNumNormByMatrgrp_brch)
   call destroy(RefNodeInitRate_pft)
   call destroy(SNL1)
   call destroy(FNOD)
@@ -472,7 +472,7 @@ contains
   call destroy(HoursDoingRemob_brch)
   call destroy(iPlantCalendar_brch)
   call destroy(TCelciusChill4Seed)
-  call destroy(HTC)
+  call destroy(HighTCLimtSeed_pft)
   call destroy(SSTX)
   call destroy(CriticalPhotoPeriod_pft)
   call destroy(PhotoPeriodSens_pft)

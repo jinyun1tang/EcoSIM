@@ -782,18 +782,18 @@ module StartsMod
   URUN(:,:)=0.0_r8
   USEDOU(:,:)=0.0_r8
   UCOP(:,:)=0.0_r8
-  HDOCQ(:,:)=0.0_r8
-  HDOCD(:,:)=0.0_r8
-  HydroDONFlx_col(:,:)=0.0_r8
-  HDOND(:,:)=0.0_r8
-  HydroDOPFlx_col(:,:)=0.0_r8
-  HDOPD(:,:)=0.0_r8
-  HDICQ(:,:)=0.0_r8
-  HDICD(:,:)=0.0_r8
-  HydroDINFlx_col(:,:)=0.0_r8
-  HDIND(:,:)=0.0_r8
-  HydroDIPFlx_col(:,:)=0.0_r8
-  HDIPD(:,:)=0.0_r8
+  HydroSufDOCFlx_col(:,:)=0.0_r8
+  HydroSubsDOCFlx_col(:,:)=0.0_r8
+  HydroSufDONFlx_col(:,:)=0.0_r8
+  HydroSubsDONFlx_col(:,:)=0.0_r8
+  HydroSufDOPFlx_col(:,:)=0.0_r8
+  HydroSubsDOPFlx_col(:,:)=0.0_r8
+  HydroSufDICFlx_col(:,:)=0.0_r8
+  HydroSubsDICFlx_col(:,:)=0.0_r8
+  HydroSufDINFlx_col(:,:)=0.0_r8
+  HydroSubsDINFlx_col(:,:)=0.0_r8
+  HydroSufDIPFlx_col(:,:)=0.0_r8
+  HydroSubsDIPFlx_col(:,:)=0.0_r8
   HydroIonFlx_col(:,:)=0.0_r8
   LiterfalOrgC_col(:,:)=0.0_r8
   LiterfalOrgN_col(:,:)=0.0_r8
@@ -835,8 +835,8 @@ module StartsMod
   integer :: L
 
   DO  L=0,NL(NY,NX)
-    DLYRI(1,L,NY,NX)=DH(NY,NX)
-    DLYRI(2,L,NY,NX)=DV(NY,NX)
+    DLYRI(1,L,NY,NX)=DH(NY,NX)    !east-west direction
+    DLYRI(2,L,NY,NX)=DV(NY,NX)    !north-south direction
     DLYR(1,L,NY,NX)=DLYRI(1,L,NY,NX)
     DLYR(2,L,NY,NX)=DLYRI(2,L,NY,NX)
     AREA(3,L,NY,NX)=DLYR(1,L,NY,NX)*DLYR(2,L,NY,NX)
@@ -961,7 +961,6 @@ module StartsMod
   end subroutine set_ecosim_solver
 
 !------------------------------------------------------------------------------------------
-
 
   subroutine startsim(NHW,NHE,NVN,NVS)
   use SoilHydroParaMod, only : ComputeSoilHydroPars

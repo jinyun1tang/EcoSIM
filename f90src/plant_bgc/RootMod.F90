@@ -359,7 +359,7 @@ implicit none
   real(r8) :: GRTWGM
   real(r8) :: Root1stExtension
   real(r8) :: RootCYieldO2ltd
-  real(r8) :: RootNLigthSatCarboxyRate_nodewthElmnt(NumOfPlantChemElmnts)
+  real(r8) :: RootNLigthSatCarboxyRate_nodewthElmnt(NumPlantChemElmnts)
   real(r8) :: GRTWTM
   real(r8) :: PPOOLB
   real(r8) :: PADD2,PADD1
@@ -370,7 +370,7 @@ implicit none
   real(r8) :: RCO2GM
   real(r8) :: RCO2TM
   real(r8) :: RMNCR,RCO2RM,RCO2R
-  real(r8) :: RootChemElmntRemob(NumOfPlantChemElmnts)
+  real(r8) :: RootChemElmntRemob(NumPlantChemElmnts)
   real(r8) :: RTN2X,RTN2Y
   real(r8) :: RTDP1X,SoilResit4PrimRootPentration
   REAL(R8) :: SNCR,SNCRM
@@ -635,7 +635,7 @@ implicit none
           FSNC2=1.0_r8
         ENDIF
       ELSE
-        RootChemElmntRemob(1:NumOfPlantChemElmnts)=0._r8
+        RootChemElmntRemob(1:NumPlantChemElmnts)=0._r8
         FSNC2=0._r8
       ENDIF
 !
@@ -649,7 +649,7 @@ implicit none
 !     RootChemElmntRemob(ielmc),RootChemElmntRemob(ielmn),RootChemElmntRemob(ielmp)=remobilization of C,N,P from senescing root
 !     FWOOD,FWOODN,FWOODP=C,N,P woody fraction in root:0=woody,1=non-woody
 !
-      DO NE=1,NumOfPlantChemElmnts
+      DO NE=1,NumPlantChemElmnts
         D6350: DO M=1,jsken
           LitterFallChemElmnt_pftvr(NE,M,k_woody_litr,L,NZ)=LitterFallChemElmnt_pftvr(NE,M,k_woody_litr,L,NZ)+CFOPE(NE,icwood,M,NZ) &
             *FSNC2*(Root2ndStructChemElmnt_pvr(NE,N,L,NR,NZ)-RootChemElmntRemob(NE))*FWODRE(NE,k_woody_litr)
@@ -725,7 +725,7 @@ implicit none
 !     SecndRootXNum_rpvr,SecndRootXNum_pvr=number of secondary root axes
 !
       SecndRootLen(N,L,NR,NZ)=SecndRootLen(N,L,NR,NZ)+Root1stExtension
-      DO NE=1,NumOfPlantChemElmnts
+      DO NE=1,NumPlantChemElmnts
         Root2ndStructChemElmnt_pvr(NE,N,L,NR,NZ)=Root2ndStructChemElmnt_pvr(NE,N,L,NR,NZ)+RootNLigthSatCarboxyRate_nodewthElmnt(NE)
       ENDDO
       RootProteinC_pvr(N,L,NZ)=RootProteinC_pvr(N,L,NZ)+AMIN1(rCNNonstructRemob_pft(NZ)*Root2ndStructChemElmnt_pvr(ielmn,N,L,NR,NZ) &
@@ -978,7 +978,7 @@ implicit none
                 LX=MAX(1,L-1)
                 D5105: DO LL=L,LX,-1
                   GRTWTM=RootNLigthSatCarboxyRate_nodewthElmnt(ielmc)
-                  DO NE=1,NumOfPlantChemElmnts
+                  DO NE=1,NumPlantChemElmnts
                     IF(RootNLigthSatCarboxyRate_nodewthElmnt(NE).LT.0.0_r8)THEN
                       IF(RootNLigthSatCarboxyRate_nodewthElmnt(NE).GT.-Root2ndStructChemElmnt_pvr(NE,N,LL,NR,NZ))THEN
                         if(NE==ielmc)SecndRootLen(N,LL,NR,NZ)=SecndRootLen(N,LL,NR,NZ)+RootNLigthSatCarboxyRate_nodewthElmnt(NE) &
@@ -1019,7 +1019,7 @@ implicit none
                       FSNCP=1.0_r8
                     ENDIF
 
-                    DO NE=1,NumOfPlantChemElmnts
+                    DO NE=1,NumPlantChemElmnts
                       D6450: DO M=1,jsken
                         LitterFallChemElmnt_pftvr(NE,M,k_woody_litr,LL,NZ)=LitterFallChemElmnt_pftvr(NE,M,k_woody_litr,LL,NZ)+CFOPE(NE,icwood,M,NZ) &
                           *FSNCM*AZMAX1(Root2ndStructChemElmnt_pvr(NE,imycorrhz,LL,NR,NZ))*FWODRE(NE,k_woody_litr)
@@ -1094,7 +1094,7 @@ implicit none
   real(r8), intent(out) :: FSNC1
   integer :: M,NE
   real(r8) :: CCC,CNC,CPC
-  real(r8) :: RootChemElmntRemob(NumOfPlantChemElmnts)
+  real(r8) :: RootChemElmntRemob(NumPlantChemElmnts)
   real(r8) :: RCCC,RCCN,RCCP
   real(r8) :: SNCR,SNCRM
 ! begin_execution
@@ -1182,7 +1182,7 @@ implicit none
       FSNC1=1.0_r8
     ENDIF
   ELSE
-    RootChemElmntRemob(1:NumOfPlantChemElmnts)=0._r8
+    RootChemElmntRemob(1:NumPlantChemElmnts)=0._r8
     FSNC1=0._r8
   ENDIF
 !
@@ -1197,7 +1197,7 @@ implicit none
 !     FWOOD,FWOODN,FWOODP=C,N,P woody fraction in root:0=woody,1=non-woody
 !
   D6355: DO M=1,jsken
-    DO NE=1,NumOfPlantChemElmnts    
+    DO NE=1,NumPlantChemElmnts    
       LitterFallChemElmnt_pftvr(NE,M,k_woody_litr,L,NZ)=LitterFallChemElmnt_pftvr(NE,M,k_woody_litr,L,NZ) &
         +CFOPE(NE,icwood,M,NZ)*FSNC1*(Root1stChemElmnt(NE,N,NR,NZ)-RootChemElmntRemob(NE))*FWODRE(NE,k_woody_litr)
 
@@ -1215,12 +1215,12 @@ implicit none
   implicit none
   integer, intent(in) :: L,L1,N,NR,NZ
   real(r8), intent(in):: WFNR,FRTN,RootCYieldO2ltd
-  real(r8), intent(in) :: RootNLigthSatCarboxyRate_nodewthElmnt(NumOfPlantChemElmnts)
+  real(r8), intent(in) :: RootNLigthSatCarboxyRate_nodewthElmnt(NumPlantChemElmnts)
   real(r8), intent(inout) :: TotPrimRootLen,Root1stC
   real(r8), intent(out):: Root1stExtension
   real(r8) :: FGROL,FGROZ
   integer :: NE
-  REAL(R8) :: XFRE(NumOfPlantChemElmnts)
+  REAL(R8) :: XFRE(NumPlantChemElmnts)
 ! begin_execution
   associate(                             &
     Root1stStructChemElmnt_pvr    =>  plt_biom%Root1stStructChemElmnt_pvr      , &
@@ -1306,7 +1306,7 @@ implicit none
 !
   PrimRootDepth(N,NR,NZ)=PrimRootDepth(N,NR,NZ)+Root1stExtension
 
-  DO NE=1,NumOfPlantChemElmnts
+  DO NE=1,NumPlantChemElmnts
     Root1stChemElmnt(NE,N,NR,NZ)=Root1stChemElmnt(NE,N,NR,NZ)+RootNLigthSatCarboxyRate_nodewthElmnt(NE)
     Root1stStructChemElmnt_pvr(NE,N,L,NR,NZ)=Root1stStructChemElmnt_pvr(NE,N,L,NR,NZ)+RootNLigthSatCarboxyRate_nodewthElmnt(NE)*FGROL
   ENDDO
@@ -1332,7 +1332,7 @@ implicit none
 !     NIXBotRootLayer_rpft=deepest root layer
 !
   IF(FGROZ.GT.0.0_r8)THEN
-    DO NE=1,NumOfPlantChemElmnts
+    DO NE=1,NumPlantChemElmnts
       Root1stStructChemElmnt_pvr(NE,N,L1,NR,NZ)=Root1stStructChemElmnt_pvr(NE,N,L1,NR,NZ)+RootNLigthSatCarboxyRate_nodewthElmnt(NE)*FGROZ
     ENDDO
     RootProteinC_pvr(N,L1,NZ)=RootProteinC_pvr(N,L1,NZ)+AMIN1(rCNNonstructRemob_pft(NZ)*Root1stStructChemElmnt_pvr(ielmn,N,L1,NR,NZ) &
@@ -1343,7 +1343,7 @@ implicit none
     TotPrimRootLen=TotPrimRootLen+PrimRootLen(N,L1,NR,NZ)
     Root1stC=Root1stC+Root1stStructChemElmnt_pvr(ielmc,N,L1,NR,NZ)
 
-    DO NE=1,NumOfPlantChemElmnts
+    DO NE=1,NumPlantChemElmnts
       XFRE(NE)=FRTN* RootMycoNonstructElmnt_vr(NE,N,L,NZ)
       RootMycoNonstructElmnt_vr(NE,N,L,NZ)= RootMycoNonstructElmnt_vr(NE,N,L,NZ)-XFRE(NE)
       RootMycoNonstructElmnt_vr(NE,N,L1,NZ)= RootMycoNonstructElmnt_vr(NE,N,L1,NZ)+XFRE(NE)
@@ -1366,7 +1366,7 @@ implicit none
   real(r8), intent(in) :: RootAreaPopu
   integer :: LL,NN,NE,NTG
   real(r8) :: XFRD,XFRW,FRTN
-  real(r8) :: XFRE(NumOfPlantChemElmnts)
+  real(r8) :: XFRE(NumPlantChemElmnts)
 
 ! begin_execution
   associate(                             &
@@ -1424,7 +1424,7 @@ implicit none
       D5110: DO NN=1,MY(NZ)
         PrimRootLen(NN,LL-1,NR,NZ)=PrimRootLen(NN,LL-1,NR,NZ)+PrimRootLen(NN,LL,NR,NZ)
         PrimRootLen(NN,LL,NR,NZ)=0._r8
-        DO NE=1,NumOfPlantChemElmnts
+        DO NE=1,NumPlantChemElmnts
           Root1stStructChemElmnt_pvr(NE,NN,LL-1,NR,NZ)=Root1stStructChemElmnt_pvr(NE,NN,LL-1,NR,NZ)+Root1stStructChemElmnt_pvr(NE,NN,LL,NR,NZ)
 
           Root2ndStructChemElmnt_pvr(NE,NN,LL-1,NR,NZ)=Root2ndStructChemElmnt_pvr(NE,NN,LL-1,NR,NZ)+Root2ndStructChemElmnt_pvr(NE,NN,LL,NR,NZ)
@@ -1489,7 +1489,7 @@ implicit none
 !     CPOOLN,ZPOOLN,PPOOLN=nonstructural C,N,P in root bacteria
 !
       IF(is_root_N2fix(iPlantNfixType(NZ)))THEN
-        DO NE=1,NumOfPlantChemElmnts
+        DO NE=1,NumPlantChemElmnts
           XFRE(NE)=FRTN*RootNodueChemElmnt_pvr(NE,LL,NZ)
           RootNodueChemElmnt_pvr(NE,LL,NZ)=RootNodueChemElmnt_pvr(NE,LL,NZ)-XFRE(NE)
           RootNodueChemElmnt_pvr(NE,LL-1,NZ)=RootNodueChemElmnt_pvr(NE,LL-1,NZ)+XFRE(NE)
@@ -1540,7 +1540,7 @@ implicit none
   real(r8) :: WTRSVD,WTRSND,WTRSPD
   real(r8) :: WTRTD2,WTLSBX,WTLSBB
   real(r8) :: WTRTLR
-  real(r8) :: XFRE(NumOfPlantChemElmnts)
+  real(r8) :: XFRE(NumPlantChemElmnts)
 !     begin_execution
   associate(                                &
     FWODBE     =>   plt_allom%FWODBE  , &
@@ -1624,7 +1624,7 @@ implicit none
             XFRE(ielmc)=0.01_r8*CPOOLD/WTPLTT
             XFRE(ielmn)=0.01_r8*ZPOOLD/CPOOLT
             XFRE(ielmp)=0.01_r8*PPOOLD/CPOOLT
-            DO NE=1,NumOfPlantChemElmnts
+            DO NE=1,NumPlantChemElmnts
               NonstructElmnt_brch(NE,NB,NZ)=NonstructElmnt_brch(NE,NB,NZ)+XFRE(NE)
             ENDDO
           ENDIF
@@ -1701,7 +1701,7 @@ implicit none
           CPOOLT= RootMycoNonstructElmnt_vr(ielmc,ipltroot,L,NZ)+ RootMycoNonstructElmnt_vr(ielmc,imycorrhz,L,NZ)
 
           IF(CPOOLT.GT.ZEROP(NZ))THEN
-            DO NE=2,NumOfPlantChemElmnts
+            DO NE=2,NumPlantChemElmnts
               EPOOLD=(RootMycoNonstructElmnt_vr(NE,ipltroot,L,NZ)* RootMycoNonstructElmnt_vr(ielmc,imycorrhz,L,NZ) &
                 - RootMycoNonstructElmnt_vr(NE,imycorrhz,L,NZ)* RootMycoNonstructElmnt_vr(ielmc,ipltroot,L,NZ))/CPOOLT
               XFRE(NE)=FMYC*EPOOLD
@@ -1735,7 +1735,7 @@ implicit none
         XFRE(ielmc)=AMIN1(XFRCX,XFRNX/CNMN,XFRPX/CPMN)
         XFRE(ielmn)=AMIN1(XFRNX,XFRE(ielmc)*CNMX,XFRPX*CNMX/CPMN*0.5_r8)
         XFRE(ielmp)=AMIN1(XFRPX,XFRE(ielmc)*CPMX,XFRNX*CPMX/CNMN*0.5_r8)
-        DO NE=1,NumOfPlantChemElmnts
+        DO NE=1,NumPlantChemElmnts
            RootMycoNonstructElmnt_vr(NE,N,L,NZ)= RootMycoNonstructElmnt_vr(NE,N,L,NZ)-XFRE(NE)
           NonstructalElmnts_pft(NE,NZ)=NonstructalElmnts_pft(NE,NZ)+XFRE(NE)
         ENDDO
@@ -1866,7 +1866,7 @@ implicit none
             XFRE(ielmn)=0._r8
             XFRE(ielmp)=0._r8
           ENDIF
-          DO NE=1,NumOfPlantChemElmnts
+          DO NE=1,NumPlantChemElmnts
             NonstructElmnt_brch(NE,NB,NZ)=NonstructElmnt_brch(NE,NB,NZ)-XFRE(NE)
              RootMycoNonstructElmnt_vr(NE,ipltroot,L,NZ)= RootMycoNonstructElmnt_vr(NE,ipltroot,L,NZ)+XFRE(NE)
           ENDDO
@@ -1993,7 +1993,7 @@ implicit none
 !     RootH2PO4Uptake_pvr,RootH2PO4BUptake_pvr,RootHPO4Uptake_pvr,RootNutUptake_pvr=uptake from non-band,band of H2PO4,HPO4
 !
         D195: DO K=1,jcplx
-          DO NE=1,NumOfPlantChemElmnts
+          DO NE=1,NumPlantChemElmnts
              RootMycoNonstructElmnt_vr(NE,N,L,NZ)= RootMycoNonstructElmnt_vr(NE,N,L,NZ)+RDFOME(NE,N,K,L,NZ)
           ENDDO
         ENDDO D195

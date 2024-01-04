@@ -397,7 +397,7 @@ module HfuncsMod
     NI                              =>  plt_morph%NI        &
   )
   plt_bgcr%RootGasLossDisturb_pft(idg_beg:idg_end-1,NZ)=0.0_r8
-  CanopyNonstructElements_pft(1:NumOfPlantChemElmnts,NZ)=0.0_r8
+  CanopyNonstructElements_pft(1:NumPlantChemElmnts,NZ)=0.0_r8
   NI(NZ)=NIXBotRootLayer_pft(NZ)
   NGTopRootLayer_pft(NZ)=MIN(NI(NZ),MAX(NGTopRootLayer_pft(NZ),NU))
   NumOfMainBranch_pft(NZ)=1
@@ -409,7 +409,7 @@ module HfuncsMod
 ! CPOLN*,ZPOLN*,PPOLN*=non-structl C,N,P in branch,canopy nodules (g)
 ! NumOfMainBranch_pft=main branch number
 !
-  DO NE=1,NumOfPlantChemElmnts
+  DO NE=1,NumPlantChemElmnts
     D140: DO NB=1,NumOfBranches_pft(NZ)
       IF(iPlantBranchState_brch(NB,NZ).EQ.iLive)THEN
         CanopyNonstructElements_pft(NE,NZ)=CanopyNonstructElements_pft(NE,NZ)+NonstructElmnt_brch(NE,NB,NZ)
@@ -437,11 +437,11 @@ module HfuncsMod
   D180: DO N=1,MY(NZ)
     D160: DO L=NU,NI(NZ)
       IF(RootStructBiomC_vr(N,L,NZ).GT.ZEROL(NZ))THEN
-        DO NE=1,NumOfPlantChemElmnts
+        DO NE=1,NumPlantChemElmnts
           RootNonstructElementConcpft_vr(NE,N,L,NZ)=AZMAX1(RootMycoNonstructElmnt_vr(NE,N,L,NZ)/RootStructBiomC_vr(N,L,NZ))
         ENDDO
       ELSE
-        DO NE=1,NumOfPlantChemElmnts
+        DO NE=1,NumPlantChemElmnts
           RootNonstructElementConcpft_vr(NE,N,L,NZ)=1.0_r8
         ENDDO
       ENDIF
@@ -455,15 +455,15 @@ module HfuncsMod
 ! CCPOLB,CZPOLB,CPPOLB=nonstructural C,N,P concn in branch(g g-1)
 !
   IF(CanopyLeafShethC_pft(NZ).GT.ZEROL(NZ))THEN
-    DO NE=1,NumOfPlantChemElmnts
+    DO NE=1,NumPlantChemElmnts
       CanopyNonstructElementConc_pft(NE,NZ)=AZMAX1(AMIN1(1.0_r8,CanopyNonstructElements_pft(NE,NZ)/CanopyLeafShethC_pft(NZ)))
     ENDDO
     NoduleNonstructCconc_pft(NZ)=AZMAX1(AMIN1(1.0_r8,NoduleNonstructElmnt_pft(ielmc,NZ)/CanopyLeafShethC_pft(NZ)))
   ELSE
-    CanopyNonstructElementConc_pft(1:NumOfPlantChemElmnts,NZ)=1.0_r8
+    CanopyNonstructElementConc_pft(1:NumPlantChemElmnts,NZ)=1.0_r8
     NoduleNonstructCconc_pft(NZ)=1.0_r8
   ENDIF
-  DO NE=1,NumOfPlantChemElmnts
+  DO NE=1,NumPlantChemElmnts
     D190: DO NB=1,NumOfBranches_pft(NZ)
       IF(LeafPetolBiomassC_brch(NB,NZ).GT.ZEROP(NZ))THEN
         LeafPetoNonstructElmntConc_brch(NE,NB,NZ)=AZMAX1(NonstructElmnt_brch(NE,NB,NZ)/LeafPetolBiomassC_brch(NB,NZ))
@@ -798,7 +798,7 @@ module HfuncsMod
     doSenescence_brch                    =>  plt_pheno%doSenescence_brch   , &
     LeafNumberAtFloralInit_brch          =>  plt_pheno%LeafNumberAtFloralInit_brch  , &
     iPlantDevelopPattern_pft             =>  plt_pheno%iPlantDevelopPattern_pft  , &
-    TotalReprodNodeNumNormByMatrgrp_brch =>  plt_pheno%TotalReprodNodeNumNormByMatrgrp_brch  , &
+    TotReproNodeNumNormByMatrgrp_brch =>  plt_pheno%TotReproNodeNumNormByMatrgrp_brch  , &
     CriticalPhotoPeriod_pft              =>  plt_pheno%CriticalPhotoPeriod_pft    , &
     HourlyNodeNumNormByMatgrp_brch       =>  plt_pheno%HourlyNodeNumNormByMatgrp_brch  , &
     PhotoPeriodSens_pft                  =>  plt_pheno%PhotoPeriodSens_pft   , &
@@ -883,7 +883,7 @@ module HfuncsMod
 !   HourlyNodeNumNormByMatgrp_brch,TotalNodeNumNormByMatgrp_brch=hourly,total change in NodeNumNormByMatgrp_brch
 !   ReprodNodeNumNormByMatrgrp_brch=reproductive node number normalized for maturity group
 !   NodeNumberAtAnthesis_brch=node number at flowering
-!   HourReprodNodeNumNormByMatrgrp_brch,TotalReprodNodeNumNormByMatrgrp_brch=hourly,total change in ReprodNodeNumNormByMatrgrp_brch
+!   HourReprodNodeNumNormByMatrgrp_brch,TotReproNodeNumNormByMatrgrp_brch=hourly,total change in ReprodNodeNumNormByMatrgrp_brch
 !   doSenescence_brch=PFT senescence flag
 !
     IF(iPlantCalendar_brch(ipltcal_InitFloral,NB,NZ).NE.0)THEN
@@ -894,7 +894,7 @@ module HfuncsMod
     IF(iPlantCalendar_brch(ipltcal_Anthesis,NB,NZ).NE.0)THEN
       ReprodNodeNumNormByMatrgrp_brch(NB,NZ)=(ShootNodeNumber_brch(NB,NZ)-NodeNumberAtAnthesis_brch(NB,NZ))/MatureGroup_pft(NZ)
       HourReprodNodeNumNormByMatrgrp_brch(NB,NZ)=NodeInitRate/(MatureGroup_pft(NZ)*GrowStageNorm4ReprodPheno)
-      TotalReprodNodeNumNormByMatrgrp_brch(NB,NZ)=TotalReprodNodeNumNormByMatrgrp_brch(NB,NZ) &
+      TotReproNodeNumNormByMatrgrp_brch(NB,NZ)=TotReproNodeNumNormByMatrgrp_brch(NB,NZ) &
         +HourReprodNodeNumNormByMatrgrp_brch(NB,NZ)
     ENDIF
     doSenescence_brch(NB,NZ)=itrue

@@ -41,7 +41,7 @@ module NitroDisturbMod
   implicit none
   integer, intent(in) :: I,J,NY,NX
 
-  integer :: L,K,M,N,IFLGJ,NLL,NGL,NTF
+  integer :: L,K,M,N,IFLGJ,NLL,NGL,NTF,MID
   real(r8) :: DC,DN,DP
   real(r8) :: DCORPC
   real(r8) :: FORGCX
@@ -103,12 +103,13 @@ module NitroDisturbMod
 !
 !     REMOVE MICROBIAL BIOMASS
 !
-            D2960: DO N=1,NFGs
+            D2960: DO N=1,NumMicbFunGroups
               DO NGL=JGnio(N),JGnfo(N)
                 DO M=1,nlbiomcp
-                  OCH=DCORPC*OMC(M,NGL,K,L,NY,NX)
-                  ONH=DCORPC*OMN(M,NGL,K,L,NY,NX)
-                  OPH=DCORPC*OMP(M,NGL,K,L,NY,NX)
+                  MID=micpar%get_micb_id(M,NGL)
+                  OCH=DCORPC*OMEhetr(ielmc,MID,K,L,NY,NX)
+                  ONH=DCORPC*OMEhetr(ielmn,MID,K,L,NY,NX)
+                  OPH=DCORPC*OMEhetr(ielmp,MID,K,L,NY,NX)
                   ONX=EFIRE(1,ITILL(I,NY,NX))*ONH
                   OPX=EFIRE(2,ITILL(I,NY,NX))*OPH
                   IF(micpar%is_litter(K))THEN
@@ -118,12 +119,12 @@ module NitroDisturbMod
                     ONL(1,K)=ONL(1,K)+ONH-ONX
                     OPL(1,K)=OPL(1,K)+OPH-OPX
                   ENDIF
-                  OMC(M,NGL,K,L,NY,NX)=OMC(M,NGL,K,L,NY,NX)-OCH
-                  OMN(M,NGL,K,L,NY,NX)=OMN(M,NGL,K,L,NY,NX)-ONH
-                  OMP(M,NGL,K,L,NY,NX)=OMP(M,NGL,K,L,NY,NX)-OPH
-                  DC=DC+OMC(M,NGL,K,L,NY,NX)
-                  DN=DN+OMN(M,NGL,K,L,NY,NX)
-                  DP=DP+OMP(M,NGL,K,L,NY,NX)
+                  OMEhetr(ielmc,MID,K,L,NY,NX)=OMEhetr(ielmc,MID,K,L,NY,NX)-OCH
+                  OMEhetr(ielmn,MID,K,L,NY,NX)=OMEhetr(ielmn,MID,K,L,NY,NX)-ONH
+                  OMEhetr(ielmp,MID,K,L,NY,NX)=OMEhetr(ielmp,MID,K,L,NY,NX)-OPH
+                  DC=DC+OMEhetr(ielmc,MID,K,L,NY,NX)
+                  DN=DN+OMEhetr(ielmn,MID,K,L,NY,NX)
+                  DP=DP+OMEhetr(ielmp,MID,K,L,NY,NX)
                   OC=OC+OCH
                   ON=ON+ONX
                   OP=OP+OPX
@@ -138,22 +139,23 @@ module NitroDisturbMod
 !
 !     REMOVE MICROBIAL BIOMASS
 !
-        DO  N=1,NFGs
+        DO  N=1,NumMicbFunGroups
           DO NGL=JGniA(N),JGnfA(N)
             DO M=1,nlbiomcp
-              OCH=DCORPC*OMCff(M,NGL,L,NY,NX)
-              ONH=DCORPC*OMNff(M,NGL,L,NY,NX)
-              OPH=DCORPC*OMPff(M,NGL,L,NY,NX)
+              MID=micpar%get_micb_id(M,NGL)
+              OCH=DCORPC*OMEauto(ielmc,MID,L,NY,NX)
+              ONH=DCORPC*OMEauto(ielmn,MID,L,NY,NX)
+              OPH=DCORPC*OMEauto(ielmp,MID,L,NY,NX)
               ONX=EFIRE(1,ITILL(I,NY,NX))*ONH
               OPX=EFIRE(2,ITILL(I,NY,NX))*OPH
               ONL(4,1)=ONL(4,1)+ONH-ONX
               OPL(4,1)=OPL(4,1)+OPH-OPX
-              OMCff(M,NGL,L,NY,NX)=OMCff(M,NGL,L,NY,NX)-OCH
-              OMNff(M,NGL,L,NY,NX)=OMNff(M,NGL,L,NY,NX)-ONH
-              OMPff(M,NGL,L,NY,NX)=OMPff(M,NGL,L,NY,NX)-OPH
-              DC=DC+OMCff(M,NGL,L,NY,NX)
-              DN=DN+OMNff(M,NGL,L,NY,NX)
-              DP=DP+OMPff(M,NGL,L,NY,NX)
+              OMEauto(ielmc,MID,L,NY,NX)=OMEauto(ielmc,MID,L,NY,NX)-OCH
+              OMEauto(ielmn,MID,L,NY,NX)=OMEauto(ielmn,MID,L,NY,NX)-ONH
+              OMEauto(ielmp,MID,L,NY,NX)=OMEauto(ielmp,MID,L,NY,NX)-OPH
+              DC=DC+OMEauto(ielmc,MID,L,NY,NX)
+              DN=DN+OMEauto(ielmn,MID,L,NY,NX)
+              DP=DP+OMEauto(ielmp,MID,L,NY,NX)
               OC=OC+OCH
               ON=ON+ONX
               OP=OP+OPX
@@ -338,9 +340,9 @@ module NitroDisturbMod
           TCOU=TCOU+OC
           TZOU=TZOU+ON
           TPOU=TPOU+OP
-          HDOCQ(NY,NX)=HDOCQ(NY,NX)+OC
-          HydroDONFlx_col(NY,NX)=HydroDONFlx_col(NY,NX)+ON
-          HydroDOPFlx_col(NY,NX)=HydroDOPFlx_col(NY,NX)+OP
+          HydroSufDOCFlx_col(NY,NX)=HydroSufDOCFlx_col(NY,NX)+OC
+          HydroSufDONFlx_col(NY,NX)=HydroSufDONFlx_col(NY,NX)+ON
+          HydroSufDOPFlx_col(NY,NX)=HydroSufDOPFlx_col(NY,NX)+OP
           Eco_NBP_col(NY,NX)=Eco_NBP_col(NY,NX)-OC
         ELSEIF(ITILL(I,NY,NX).EQ.22)THEN
           CO2GIN=CO2GIN-OC

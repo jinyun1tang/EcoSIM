@@ -303,7 +303,7 @@ module StarteMod
     CSTRQ(I,NY,NX)=solutevar%CSTR1
 !
 !     SOLUTE CONCENTRATIONS IN SOIL
-! for the POM CO2CompenPoint_nodeex, on the first day in the first year
+! for the POM complex, on the first day in the first year
 ! U means surface irrigation
   ELSEIF(K.EQ.micpar%k_POM.AND.I.EQ.1.AND.(.not.is_restart()).AND.is_first_year)THEN
     CCOU=solutevar%H2CO3_aqu_conc

@@ -42,8 +42,8 @@ module Hour1Mod
   use SedimentDataType
   use PlantDataRateType
   use GridDataType
-  use EcoSIMConfig, only : jcplx1 => jcplx1c,jcplx=>jcplxc,nlbiomcp=>NumOfLiveMicrobiomComponents
-  use EcoSIMConfig, only : ndbiomcp=>NumOfDeadMicrobiomComponents,jsken=>jskenc,NFGs=>NFGsc,do_instequil
+  use EcoSIMConfig, only : jcplx1 => jcplx1c,jcplx=>jcplxc,nlbiomcp=>NumLiveMicrbCompts
+  use EcoSIMConfig, only : ndbiomcp=>NumDeadMicrbCompts,jsken=>jskenc,NumMicbFunGroups=>NumMicbFunGroups,do_instequil
   use EcoSiMParDataMod, only : micpar,pltpar
   implicit none
 
@@ -368,14 +368,14 @@ module Hour1Mod
 !
 !     WATER,SNOW,SOLUTE RUNOFF
 !
-      HDOCQ(NY,NX)=0._r8
-      HDOCD(NY,NX)=0._r8
-      HDICQ(NY,NX)=0._r8
-      HDICD(NY,NX)=0._r8
-      HDOND(NY,NX)=0._r8
-      HDIND(NY,NX)=0._r8
-      HDOPD(NY,NX)=0._r8
-      HDIPD(NY,NX)=0._r8      
+      HydroSufDOCFlx_col(NY,NX)=0._r8
+      HydroSubsDOCFlx_col(NY,NX)=0._r8
+      HydroSufDICFlx_col(NY,NX)=0._r8
+      HydroSubsDICFlx_col(NY,NX)=0._r8
+      HydroSubsDONFlx_col(NY,NX)=0._r8
+      HydroSubsDINFlx_col(NY,NX)=0._r8
+      HydroSubsDOPFlx_col(NY,NX)=0._r8
+      HydroSubsDIPFlx_col(NY,NX)=0._r8      
       WatFlux4ErosionM(:,NY,NX)=0._r8
       Wat2GridBySurfRunoff(1:2,1:2,NY,NX)=0.0_r8
       Heat2GridBySurfRunoff(1:2,1:2,NY,NX)=0.0_r8
@@ -453,13 +453,8 @@ module Hour1Mod
         trcx_XER(idx_beg:idx_end,1:2,1:2,NY,NX)=0.0_r8
         trcp_ER(idsp_beg:idsp_end,1:2,1:2,NY,NX)=0.0_r8
 
-        OMCER(:,:,1:2,1:2,NY,NX)=0.0_r8
-        OMNER(:,:,1:2,1:2,NY,NX)=0.0_r8
-        OMPER(:,:,1:2,1:2,NY,NX)=0.0_r8
-
-        OMCERff(:,1:2,1:2,NY,NX)=0.0_r8
-        OMNERff(:,1:2,1:2,NY,NX)=0.0_r8
-        OMPERff(:,1:2,1:2,NY,NX)=0.0_r8
+        OMEERhetr(:,:,:,1:2,1:2,NY,NX)=0.0_r8
+        OMEERauto(:,:,1:2,1:2,NY,NX)=0.0_r8
 
         ORCER(:,:,1:2,1:2,NY,NX)=0.0_r8
         ORNER(:,:,1:2,1:2,NY,NX)=0.0_r8
@@ -493,7 +488,7 @@ module Hour1Mod
   DO  NX=NHW,NHE+extragrid
     DO  NY=NVN,NVS+extragrid
 
-      trcSaltRunoffBoundary(idsalt_beg:idsalt_end,1:2,1:2,NY,NX)=0.0_r8
+      trc_salt_rof_bounds(idsalt_beg:idsalt_end,1:2,1:2,NY,NX)=0.0_r8
       trcSalt_XQS(idsalt_beg:idsalt_end,1:2,NY,NX)=0.0_r8
 
       DO  L=1,NL(NY,NX)+1
@@ -727,6 +722,8 @@ module Hour1Mod
   integer :: L
 !     begin_execution
 
+  Qinflx2Soil_col(NY,NX)=0._r8
+  HeatFlx2G_col(NY,NX)=0._r8
   DIC_mass_col(NY,NX)=0.0_r8
   TOMT(NY,NX)=0.0_r8
   TONT(NY,NX)=0.0_r8
@@ -776,7 +773,7 @@ module Hour1Mod
 
   TRootGasLossDisturb_pft(idg_beg:idg_end-1,NY,NX)=0.0_r8
   LitterFallChemElmnt_col(:,NY,NX)=0.0_r8
-  StandingDeadChemElmnt_col(1:NumOfPlantChemElmnts,NY,NX)=0.0_r8
+  StandingDeadChemElmnt_col(1:NumPlantChemElmnts,NY,NX)=0.0_r8
   PPT(NY,NX)=0.0_r8
 ! zero arrays in the snow layers
   FLSW(1:JS,NY,NX)=0.0_r8
@@ -806,7 +803,7 @@ module Hour1Mod
 
 !     begin_execution
 
-  LitrfalChemElemnts_vr(1:NumOfPlantChemElmnts,1:jsken,1:pltpar%NumOfPlantLitrCmplxs,&
+  LitrfalChemElemnts_vr(1:NumPlantChemElmnts,1:jsken,1:pltpar%NumOfPlantLitrCmplxs,&
     0:NL(NY,NX),NY,NX)=0.0_r8
 
   RDOM_micb_flx(idom_doc,1:jcplx,0:NL(NY,NX),NY,NX)=0.0_r8
@@ -833,7 +830,7 @@ module Hour1Mod
 
   Gas_Disol_Flx_vr(idg_beg:idg_end,0:NL(NY,NX),NY,NX)=0.0_r8
 
-  TDFOME(1:NumOfPlantChemElmnts,1:jcplx,NU(NY,NX):NL(NY,NX),NY,NX)=0.0_r8
+  TDFOME(1:NumPlantChemElmnts,1:jcplx,NU(NY,NX):NL(NY,NX),NY,NX)=0.0_r8
   ROXSK(1:NPH,NU(NY,NX):NL(NY,NX),NY,NX)=0.0_r8
   end subroutine SetArrays4PlantSoilTransfer
 !------------------------------------------------------------------------------------------
@@ -981,7 +978,7 @@ module Hour1Mod
   integer, intent(in) :: NY,NX
 
   real(r8) :: OC
-  integer :: K,M,N,NGL,L
+  integer :: K,M,N,NGL,L,NB,NC
   !     begin_execution
   !
   !     TOTAL SOC FOR CALCULATING CHANGES IN SOC CALCULATED IN NITRO.F
@@ -996,18 +993,24 @@ module Hour1Mod
   OC=0.0_r8
 
   DO L=0,NL(NY,NX)
-!  add heterotrophic CO2CompenPoint_nodeexs
-    OC=OC+sum(OMC(1:nlbiomcp,1:NumOfMicrobs1HetertrophCmplx,1:jcplx,L,NY,NX))
+!  add heterotrophic complexs
+    DO NC=1,jcplx
+      DO NB=1,NumLiveHeterBioms
+        OC=OC+OMEhetr(ielmc,NB,NC,L,NY,NX)
+      ENDDO
+    ENDDO
 
-!  add autotrophic CO2CompenPoint_nodeex
-    OC=OC+sum(OMCff(1:nlbiomcp,1:NumOfMicrobsInAutotrophCmplx,L,NY,NX))
+!  add autotrophic complex
+    DO NB=1,NumLiveAutoBioms
+      OC=OC+OMEauto(ielmc,NB,L,NY,NX)
+    ENDDO
 !  add microbial residue
     OC=OC+SUM(ORC(1:ndbiomcp,1:jcplx,L,NY,NX))
 !  add dissolved/sorbed OM and acetate
     OC=OC+SUM(DOM(idom_doc,1:jcplx,L,NY,NX))+SUM(DOM_Macp(idom_doc,1:jcplx,L,NY,NX)) &
          +SUM(OHC(1:jcplx,L,NY,NX))+SUM(DOM(idom_acetate,1:jcplx,L,NY,NX)) &
          +SUM(DOM_Macp(idom_acetate,1:jcplx,L,NY,NX))+SUM(OHA(1:jcplx,L,NY,NX))
-!  add OM CO2CompenPoint_nodeexes
+!  add OM complexes
     OC=OC+SUM(OSC(1:jsken,1:jcplx,L,NY,NX))
 !
     ORGCX(L,NY,NX)=OC
@@ -1630,7 +1633,7 @@ module Hour1Mod
   real(r8) :: OQC1,OQN1,OQP1
   real(r8) :: OSC1,OSN1,OSP1
   REAL(R8) :: RNT,RPT
-  integer  :: L,K,M,N,NN,NGL
+  integer  :: L,K,M,N,NN,NGL,MID
   real(r8) :: tglds
   real(r8) :: OMC1g,OMN1g,OMP1g
 !     begin_execution
@@ -1769,7 +1772,7 @@ module Hour1Mod
       CFOSC(ilignin,k_manure,LFDPTH,NY,NX)=0.145_r8
     ENDIF
 !
-!     DISTRIBUTE RESIDUE APPLICATION AMONG COMPONENTS OF RESIDUE CO2CompenPoint_nodeEX
+!     DISTRIBUTE RESIDUE APPLICATION AMONG COMPONENTS OF RESIDUE complex
 !
 !     OFC,OFN,OFP=litter C,N,P application from fertilizer file
 !
@@ -1793,32 +1796,34 @@ module Hour1Mod
 !     OMCI=microbial biomass content in litter
 !     OMCF,OMCA=hetero,autotrophic biomass composition in litter
 !
-      D2960: DO N=1,NFGs
+      D2960: DO N=1,NumMicbFunGroups
         tglds=JGnfo(N)-JGnfo(N)+1
         D2961: DO M=1,nlbiomcp
           OMC1=AZMAX1(AMIN1(OSCI*micpar%OMCI(M,K)*micpar%OMCF(N),OSCI-OSCX))
-          OMN1=AZMAX1(AMIN1(OMC1*micpar%CNOMCa(M,N,K),OSNI-OSNX))
-          OMP1=AZMAX1(AMIN1(OMC1*micpar%CPOMCa(M,N,K),OSPI-OSPX))
+          OMN1=AZMAX1(AMIN1(OMC1*micpar%rNCOMCa(M,N,K),OSNI-OSNX))
+          OMP1=AZMAX1(AMIN1(OMC1*micpar%rPCOMCa(M,N,K),OSPI-OSPX))
           DO NGL=JGnio(N),JGnfo(N)
+            MID=micpar%get_micb_id(M,NGL)
             OMC1g=OMC1/tglds
             OMN1g=OMN1/tglds
             OMP1g=OMP1/tglds
-            OMC(M,NGL,K,LFDPTH,NY,NX)=OMC(M,NGL,K,LFDPTH,NY,NX)+OMC1g
-            OMN(M,NGL,K,LFDPTH,NY,NX)=OMN(M,NGL,K,LFDPTH,NY,NX)+OMN1g
-            OMP(M,NGL,K,LFDPTH,NY,NX)=OMP(M,NGL,K,LFDPTH,NY,NX)+OMP1g
+            OMEhetr(ielmc,MID,K,LFDPTH,NY,NX)=OMEhetr(ielmc,MID,K,LFDPTH,NY,NX)+OMC1g
+            OMEhetr(ielmn,MID,K,LFDPTH,NY,NX)=OMEhetr(ielmn,MID,K,LFDPTH,NY,NX)+OMN1g
+            OMEhetr(ielmp,MID,K,LFDPTH,NY,NX)=OMEhetr(ielmp,MID,K,LFDPTH,NY,NX)+OMP1g
           ENDDO
           OSCX=OSCX+OMC1
           OSNX=OSNX+OMN1
           OSPX=OSPX+OMP1
-          D2962: DO NN=1,NFGs
+          D2962: DO NN=1,NumMicbFunGroups
             tglds=JGnfA(N)-JGniA(N)+1
             DO NGL=JGniA(NN),JGnfA(NN)
+              MID=micpar%get_micb_id(M,NGL)
               OMC1g=OMC1/tglds
               OMN1g=OMN1/tglds
               OMP1g=OMP1/tglds
-              OMCff(M,NGL,LFDPTH,NY,NX)=OMCff(M,NGL,LFDPTH,NY,NX)+OMC1g*micpar%OMCA(NN)
-              OMNff(M,NGL,LFDPTH,NY,NX)=OMNff(M,NGL,LFDPTH,NY,NX)+OMN1g*micpar%OMCA(NN)
-              OMPff(M,NGL,LFDPTH,NY,NX)=OMPff(M,NGL,LFDPTH,NY,NX)+OMP1g*micpar%OMCA(NN)
+              OMEauto(ielmc,MID,LFDPTH,NY,NX)=OMEauto(ielmc,MID,LFDPTH,NY,NX)+OMC1g*micpar%OMCA(NN)
+              OMEauto(ielmn,MID,LFDPTH,NY,NX)=OMEauto(ielmn,MID,LFDPTH,NY,NX)+OMN1g*micpar%OMCA(NN)
+              OMEauto(ielmp,MID,LFDPTH,NY,NX)=OMEauto(ielmp,MID,LFDPTH,NY,NX)+OMP1g*micpar%OMCA(NN)
             ENDDO
             OSCX=OSCX+OMC1*micpar%OMCA(NN)
             OSNX=OSNX+OMN1*micpar%OMCA(NN)
