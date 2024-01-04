@@ -85,11 +85,12 @@ module WatsubMod
   integer :: K0,K1
   integer :: KL,L,L2,LL,M,MM,M1,M2,M3,M4,M5,M6,NX,NY
   integer :: N,N1,N2,N3,N4,N5,N6,NN,N4B,N5B,NUX
-  real(r8):: ResistanceLitRLay(JY,JX),HeatFlux2Ground(JY,JX)
+  real(r8):: ResistanceLitRLay(JY,JX),HeatFluxAir2Soi(JY,JX)
   REAL(R8):: KSatRedusByRainKinetEnergyS(JY,JX)
 
   REAL(R8) :: TopLayWatVol(JY,JX)
   real(r8) :: Qinfl2MicP(JY,JX)
+  real(r8) :: Hinfl2Soil(JY,JX)
 ! begin_execution
 !
   curday=i;curhour=j
@@ -108,19 +109,19 @@ module WatsubMod
 
     ! run surface energy balance model, uses ResistanceLitRLay
     call RunSurfacePhysModel(M,NHE,NHW,NVS,NVN,ResistanceLitRLay,KSatRedusByRainKinetEnergyS,&
-      TopLayWatVol,HeatFlux2Ground,Qinfl2MicP)
+      TopLayWatVol,HeatFluxAir2Soi,Qinfl2MicP,Hinfl2Soil)
 
     call CopySoilWatVolMit(NHW,NHE,NVN,NVS,TopLayWatVol)
         
     ! do 3D water flow
-    call Subsurface3DFlowMit(M,NHW,NHE,NVN,NVS,KSatRedusByRainKinetEnergyS,HeatFlux2Ground)
+    call Subsurface3DFlowMit(M,NHW,NHE,NVN,NVS,KSatRedusByRainKinetEnergyS,HeatFluxAir2Soi)
 
     call LateralWatHeatExchMit(M,NHW,NHE,NVN,NVS,KSatRedusByRainKinetEnergyS)
 
 !   update states and fluxes
     DO NX=NHW,NHE
       DO  NY=NVN,NVS
-        HeatFlx2G_col(NY,NX)=HeatFlx2G_col(NY,NX)+HeatFlux2Ground(NY,NX)
+        HeatFlx2G_col(NY,NX)=HeatFlx2G_col(NY,NX)+Hinfl2Soil(NY,NX)
         Qinflx2Soil_col(NY,NX)=Qinflx2Soil_col(NY,NX)+Qinfl2MicP(NY,NX)
       ENDDO
     ENDDO  
@@ -424,11 +425,11 @@ module WatsubMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine Subsurface3DFlowMit(M,NHW,NHE,NVN,NVS,KSatRedusByRainKinetEnergy,HeatFlux2Ground)
+  subroutine Subsurface3DFlowMit(M,NHW,NHE,NVN,NVS,KSatRedusByRainKinetEnergy,HeatFluxAir2Soi)
   implicit none
   integer, intent(in)  :: M,NHW,NHE,NVN,NVS
   real(r8), dimension(:,:),intent(in) :: KSatRedusByRainKinetEnergy(:,:)
-  real(r8), dimension(:,:),intent(in) :: HeatFlux2Ground(:,:)
+  real(r8), dimension(:,:),intent(in) :: HeatFluxAir2Soi(:,:)
   integer :: N,N1,N2,N3,N4,N5,N6,L,LL,K1,KL,NY,NX
   real(r8) :: WTHET1,FCDX,FCLX,FCX
   real(r8) :: PSISV1,TKY,PSDX
@@ -569,7 +570,7 @@ module WatsubMod
           !    if(N6==1)write(*,*)'0HeatFlow2Soili(N,N6,N5,N4)',HeatFlow2Soili(N,N6,N5,N4)
           !
 
-              call Solve4Heat(N,NY,NX,N1,N2,N3,N4,N5,N6,ConvectHeatFluxMicP,HeatFlux2Ground(NY,NX))
+              call Solve4Heat(N,NY,NX,N1,N2,N3,N4,N5,N6,ConvectHeatFluxMicP,HeatFluxAir2Soi(NY,NX))
 
           !
           !     TOTAL WATER, VAPOR AND HEAT FLUXES
@@ -1226,7 +1227,6 @@ module WatsubMod
         LakeSurfFlowMicPX(NY,NX)=WaterFlowSoiMicPX(3,N6X(NY,NX),NY,NX)
         LakeSurfFlowMacP(NY,NX)=WaterFlowMacP(3,N6X(NY,NX),NY,NX)
         LakeSurfHeatFlux(NY,NX)=HeatFlow2Soil(3,N6X(NY,NX),NY,NX)
-        HeatFlx2G_col(NY,NX)=HeatFlow2Soil(3,NUM(NY,NX),NY,NX)
       ELSE
         !the top soil/water layer has changed
         LakeSurfFlowMicP(NY,NX)=FLWNX(NY,NX)
@@ -1765,10 +1765,12 @@ module WatsubMod
   end subroutine WaterVaporFlow  
 !------------------------------------------------------------------------------------------
 
-  subroutine Solve4Heat(N,NY,NX,N1,N2,N3,N4,N5,N6,ConvectHeatFluxMicP,HeatFlux2Ground)
+  subroutine Solve4Heat(N,NY,NX,N1,N2,N3,N4,N5,N6,ConvectHeatFluxMicP,HeatFluxAir2Soi)
   implicit none
-  integer , intent(in) :: N,NY,NX,N1,N2,N3,N4,N5,N6
-  real(r8), intent(in) :: ConvectHeatFluxMicP,HeatFlux2Ground
+  integer , intent(in) :: N,NY,NX
+  integer , intent(in) :: N1,N2,N3  !source
+  integer , intent(in) :: N4,N5,N6  !dest
+  real(r8), intent(in) :: ConvectHeatFluxMicP,HeatFluxAir2Soi
   real(r8) :: TK1X,TKLX,TKY,HFLWC,HFLWX,HeatCondSoi
   real(r8) :: ATCNDL,DTKX
   real(r8) :: ThermCondDst,ThermCondSrc
@@ -1795,8 +1797,8 @@ module WatsubMod
   !
   !     VLHeatCapacity,VHCPW=volumetric heat capacity of soil,snowpack
   !     TK1X,TKLX=interim temperatures of source,destination
-  !     ConvectiveHeatFlux,HeatFlux2Ground=convective heat from soil vapor flux
-  !     HeatFlux2Ground=storage heat flux from snowpack
+  !     ConvectiveHeatFlux,HeatFluxAir2Soi=convective heat from soil vapor flux
+  !     HeatFluxAir2Soi=storage heat flux from snowpack
   !     TKY=equilibrium source-destination temperature
   !     HFLWC,HFLWX=source-destination heat flux unltd,ltd by heat
   !     ATCNDL=source-destination thermal conductance
@@ -1807,10 +1809,10 @@ module WatsubMod
   IF(VLHeatCapacity(N3,N2,N1).GT.VHCPNX(NY,NX))THEN
     IF(N3.EQ.NUM(NY,NX).AND.VLHeatCapSnow(1,N2,N1).LE.VLHeatCapSnowMin(N2,N1))THEN
       !surface layer, not significant snowpack
-      TK1X=TKSoi1(N3,N2,N1)-(ConvectHeatFluxMicP-HeatFlux2Ground)/VLHeatCapacity(N3,N2,N1)
+      TK1X=TKSoi1(N3,N2,N1)-(ConvectHeatFluxMicP-HeatFluxAir2Soi)/VLHeatCapacity(N3,N2,N1)
       if(abs(TK1X)>1.e5_r8)then
         write(*,*)'TKSoi1(N3,N2,N1)-ConvectHeatFluxMicP/VLHeatCapacity(N3,N2,N1)',&
-          TKSoi1(N3,N2,N1),ConvectHeatFluxMicP,HeatFlux2Ground,VLHeatCapacity(N3,N2,N1)
+          TKSoi1(N3,N2,N1),ConvectHeatFluxMicP,HeatFluxAir2Soi,VLHeatCapacity(N3,N2,N1)
         write(*,*)'N1,n2,n3',N1,N2,N3
         call endrun(trim(mod_filename)//' at line',__LINE__)
       endif

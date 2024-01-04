@@ -666,7 +666,7 @@ implicit none
     long_name='Heat flux into the ground',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%histr_1d_Qinfl2soi_col(beg_col:end_col)
-  call hist_addfld1d(fname='Qinfl2soi_col',units='m H2O/hr',avgflag='A',&
+  call hist_addfld1d(fname='Qinfl2soi_col',units='mm H2O/hr',avgflag='A',&
     long_name='Water flux into the ground',ptr_col=data1d_ptr)      
 
   IF(salt_model)THEN
@@ -1496,7 +1496,7 @@ implicit none
       this%histr_1D_SUR_DIP_FLX_col(ncol)= HydroSufDIPFlx_col(NY,NX)/TAREA
       this%histr_1D_SUB_DIP_FLX_col(ncol)= HydroSubsDIPFlx_col(NY,NX)/TAREA  
       this%histr_1d_HeatFlx2G_col(ncol)  = HeatFlx2G_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%histr_1d_Qinfl2soi_col(ncol)  = Qinflx2Soil_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%histr_1d_Qinfl2soi_col(ncol)  = 1000._r8*Qinflx2Soil_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_SUR_DON_FLX_col(ncol) = HydroSufDONFlx_col(NY,NX)/TAREA
       this%histr_1D_SUB_DON_FLX_col(ncol) = HydroSubsDONFlx_col(NY,NX)/TAREA
       this%histr_1D_tSALT_DISCHG_FLX_col(ncol)= HydroIonFlx_col(NY,NX)/TAREA
