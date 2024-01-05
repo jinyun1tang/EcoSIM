@@ -1523,7 +1523,11 @@ implicit none
       this%histr_1D_tNO3_col(ncol)        = UNO3(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_tMICRO_N_col(ncol)     = TONT(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_TEMP_LITR_col(ncol)   = TCS(0,NY,NX)
-      this%histr_1D_TEMP_SNOW_col(ncol)   = TCSnow(1,NY,NX)
+      if(VcumSnowWE(NY,NX)<ZEROS(NY,NX))then
+        this%histr_1D_TEMP_SNOW_col(ncol)   = spval
+      else
+        this%histr_1D_TEMP_SNOW_col(ncol)   = TCSnow(1,NY,NX)
+      endif
       this%histr_1D_SURF_tLITR_C_FLX_col(ncol)   = URSDC(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
 
       this%histr_1D_AMENDED_C_col(ncol)   = AmendCFlx_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -1571,7 +1575,7 @@ implicit none
       this%histr_1D_SEDIMENT_FLX_col(ncol)    = USEDOU(NY,NX)*1000.0_r8/TAREA
       this%histr_1D_tSWC_col(ncol)     = UVLWatMicP(NY,NX)*1000.0_r8/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_DISCHG_FLX_col(ncol)      = FWatDischarge(NY,NX)*1000.0_r8/TAREA
-      this%histr_1D_SNOWPACK_col(ncol)    = AZMAX1((VcumDrySnoWE(NY,NX)+VcumIceSnow(NY,NX)*DENSICE+VcumWatSnow(NY,NX))*1000.0_r8/AREA(3,NU(NY,NX),NY,NX))
+      this%histr_1D_SNOWPACK_col(ncol)    = AZMAX1((VcumSnowWE(NY,NX))*1000.0_r8/AREA(3,NU(NY,NX),NY,NX))
       this%histr_1D_SURF_WTR_col(ncol)    = THETWZ(0,NY,NX)
       this%histr_1D_SURF_ICE_col(ncol)    = THETIZ(0,NY,NX)
       this%histr_1D_ACTV_LYR_col(ncol)    = -(ActiveLayDepth(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX))

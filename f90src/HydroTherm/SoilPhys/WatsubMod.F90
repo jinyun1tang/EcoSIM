@@ -811,7 +811,7 @@ module WatsubMod
                   WatFlxBySnowRedistribut(N,M5,M4)=0.0_r8
                   IceFlxBySnowRedistribut(N,M5,M4)=0.0_r8
                   HeatFlxBySnowRedistribut(N,M5,M4)=0.0_r8
-                  DrySnoFlxBySnowRedistributM(M,N,M5,M4)=DrySnoFlxBySnowRedistribut(N,M5,M4)
+                  DrySnoFlxBySnoRedistM(M,N,M5,M4)=DrySnoFlxBySnowRedistribut(N,M5,M4)
                 ENDIF
               ENDIF
             ELSE

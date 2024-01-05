@@ -790,7 +790,7 @@ contains
 !
 !     subroutine SnowdriftTransport(M)
 !
-!     DrySnoFlxBySnowRedistributM=snow transfer from watsub.f
+!     DrySnoFlxBySnoRedistM=snow transfer from watsub.f
 !     RQS*=solute flux in snow transfer
 !     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
 !             :OC=DOC,ON=DON,OP=DOP,OA=acetate
@@ -803,25 +803,25 @@ contains
 !
 !     IF NO SNOW DRIFT THEN NO TRANSPORT
 !
-        IF(ABS(DrySnoFlxBySnowRedistributM(M,N,N5,N4)).LE.ZEROS2(N2,N1))THEN
+        IF(ABS(DrySnoFlxBySnoRedistM(M,N,N5,N4)).LE.ZEROS2(N2,N1))THEN
           trcg_2DSnowDrift(idg_beg:idg_NH3,N,N5,N4)=0.0_r8
           trcn_2DSnowDrift(ids_nut_beg:ids_nuts_end,N,N5,N4)=0.0_r8
           VFLW=0._r8
     !
 !     IF DRIFT IS FROM CURRENT TO ADJACENT GRID CELL
 !
-        ELSEIF(DrySnoFlxBySnowRedistributM(M,N,N5,N4).GT.ZEROS2(N2,N1))THEN
+        ELSEIF(DrySnoFlxBySnoRedistM(M,N,N5,N4).GT.ZEROS2(N2,N1))THEN
           IF(VcumSnoDWI(N2,N1).GT.ZEROS2(N2,N1))THEN
-            VFLW=AZMAX1(AMIN1(VFLWX,DrySnoFlxBySnowRedistributM(M,N,N5,N4)/VcumSnoDWI(N2,N1)))
+            VFLW=AZMAX1(AMIN1(VFLWX,DrySnoFlxBySnoRedistM(M,N,N5,N4)/VcumSnoDWI(N2,N1)))
           ELSE
             VFLW=VFLWX
           ENDIF
 !
 !     IF DRIFT IS TO CURRENT FROM ADJACENT GRID CELL
 !
-        ELSEIF(DrySnoFlxBySnowRedistributM(M,N,N5,N4).LT.-ZEROS2(N2,N1))THEN
+        ELSEIF(DrySnoFlxBySnoRedistM(M,N,N5,N4).LT.-ZEROS2(N2,N1))THEN
           IF(VcumSnoDWI(N5,N4).GT.ZEROS2(N5,N4))THEN
-            VFLW=AZMIN1(AMAX1(-VFLWX,DrySnoFlxBySnowRedistributM(M,N,N5,N4)/VcumSnoDWI(N5,N4)))
+            VFLW=AZMIN1(AMAX1(-VFLWX,DrySnoFlxBySnoRedistM(M,N,N5,N4)/VcumSnoDWI(N5,N4)))
           ELSE
             VFLW=-VFLWX
           ENDIF

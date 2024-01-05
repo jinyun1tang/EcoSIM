@@ -11,7 +11,7 @@ module SnowDataType
 
   real(r8),target, allocatable ::  VLSnowHeatCapM(:,:,:,:)            !volumetric heat capacity of snowpack
   real(r8),target, allocatable ::  WatFlowInSnowM(:,:,:,:)            !snowpack water flux
-  real(r8),target, allocatable ::  DrySnoFlxBySnowRedistributM(:,:,:,:)                       !runoff snow flux, [m3 d-2 t-1]
+  real(r8),target, allocatable ::  DrySnoFlxBySnoRedistM(:,:,:,:)                       !runoff snow flux, [m3 d-2 t-1]
   REAL(R8),target, allocatable ::  SoilAlbedo(:,:)                          !snowpack albedo
   real(r8),target, allocatable ::  NewSnowDens(:,:)                   !new snowpack density, [Mg m-3]
   real(r8),target, allocatable ::  TCSnow(:,:,:)                         !snow temperature, [oC]
@@ -33,11 +33,12 @@ module SnowDataType
   real(r8),target, allocatable ::  SnowDepth(:,:)                     !snowpack depth, [m]
   real(r8),target, allocatable ::  VcumDrySnoWE(:,:)                  !snow volume in snowpack (water equivalent), [m3 d-2]
   real(r8),target, allocatable ::  VcumWatSnow(:,:)                   !water volume in snowpack, [m3 d-2]
-  real(r8),target, allocatable ::  VcumIceSnow(:,:)                         !ice volume in snowpack, [m3 d-2]
-  real(r8),target, allocatable ::  VcumSnoDWI(:,:)                          !snowpack volume, [m3 d-2]
-  real(r8),target, allocatable ::  VLHeatCapSnowMin(:,:)               !minimum layer integrated snowpack heat capacity  [MJ d-2 K-1]
+  real(r8),target, allocatable ::  VcumIceSnow(:,:)                   !ice volume in snowpack, [m3 d-2]
+  real(r8),target, allocatable ::  VcumSnoDWI(:,:)                    !snowpack volume, [m3 d-2]
+  real(r8),target, allocatable ::  VcumSnowWE(:,:)                    !water equivalent snowpack [m3 d-2]
+  real(r8),target, allocatable ::  VLHeatCapSnowMin(:,:)              !minimum layer integrated snowpack heat capacity  [MJ d-2 K-1]
   real(r8),target, allocatable ::  FLSW(:,:,:)                        !water from snowpack to soil micropores
-  real(r8),target, allocatable ::  WatConvSno2MacP(:,:,:)                       !water from snowpack to soil macropores
+  real(r8),target, allocatable ::  WatConvSno2MacP(:,:,:)             !water from snowpack to soil macropores
   real(r8),target, allocatable ::  HeatConvSno2Soi(:,:,:)                       !convective heat from snowpack to soil
   real(r8),target, allocatable ::  WatConvSno2LitR(:,:,:)                       !water flux from snowpack to litter
   real(r8),target, allocatable ::  HeatConvSno2LitR(:,:,:)                      !convective heat flux from snowpack to litter
@@ -62,7 +63,7 @@ contains
   implicit none
   allocate(VLSnowHeatCapM(60,JS,JY,JX));VLSnowHeatCapM=0._r8
   allocate(WatFlowInSnowM(60,JS,JY,JX)); WatFlowInSnowM=0._r8
-  allocate(DrySnoFlxBySnowRedistributM(60,2,JV,JH));    DrySnoFlxBySnowRedistributM=0._r8
+  allocate(DrySnoFlxBySnoRedistM(60,2,JV,JH));    DrySnoFlxBySnoRedistM=0._r8
   allocate(SoilAlbedo(JY,JX));        SoilAlbedo=0._r8
   allocate(NewSnowDens(JY,JX));       NewSnowDens=0._r8
   allocate(TCSnow(JS,JY,JX));      TCSnow=0._r8
@@ -82,6 +83,7 @@ contains
   allocate(cumSnowDepth(0:JS,JY,JX)); cumSnowDepth=0._r8
   allocate(VLSnowt0(JS,JY,JX));    VLSnowt0=0._r8
   allocate(SnowDepth(JY,JX));       SnowDepth=0._r8
+  allocate(VcumSnowWE(JY,JX));   VcumSnowWE=0._r8
   allocate(VcumDrySnoWE(JY,JX));       VcumDrySnoWE=0._r8
   allocate(VcumWatSnow(JY,JX));       VcumWatSnow=0._r8
   allocate(VcumIceSnow(JY,JX));       VcumIceSnow=0._r8
@@ -120,7 +122,7 @@ contains
   endif
   call destroy(VLSnowHeatCapM)
   call destroy(WatFlowInSnowM)
-  call destroy(DrySnoFlxBySnowRedistributM)
+  call destroy(DrySnoFlxBySnoRedistM)
   call destroy(SoilAlbedo)
   call destroy(NewSnowDens)
   call destroy(TCSnow)
@@ -139,6 +141,7 @@ contains
   call destroy(cumSnowDepth)
   call destroy(VLSnowt0)
   call destroy(SnowDepth)
+  call destroy(VcumSnowWE)
   call destroy(VcumDrySnoWE)
   call destroy(VcumWatSnow)
   call destroy(VcumIceSnow)

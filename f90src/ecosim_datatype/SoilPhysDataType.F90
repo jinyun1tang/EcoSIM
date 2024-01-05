@@ -7,13 +7,13 @@ implicit none
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
 
-  real(r8),target,allocatable ::  SLOPE(:,:,:)                       !slope	in four directions [o]
-  real(r8),target,allocatable ::  FieldCapacity(:,:,:)                          !water contents at field capacity
+  real(r8),target,allocatable ::  SLOPE(:,:,:)                              !slope	in four directions [o]
+  real(r8),target,allocatable ::  FieldCapacity(:,:,:)                      !water contents at field capacity
   real(r8),target,allocatable ::  WiltPoint(:,:,:)                          !water contents at wilting point
-  real(r8),target,allocatable ::  SatHydroCondVert(:,:,:)                        !soil vertical saturated hydraulic conductivity [mm h-1]
-  real(r8),target,allocatable ::  SatHydroCondHrzn(:,:,:)                        !soil horizontal saturated hydraulic conductivity, [mm h-1]
-  real(r8),target,allocatable ::  PSIAtFldCapacity(:,:)                         !water potentials at field capacity, [MPa]
-  real(r8),target,allocatable ::  PSIAtWiltPoint(:,:)                         !water potentials at wilting point [MPa]
+  real(r8),target,allocatable ::  SatHydroCondVert(:,:,:)                   !soil vertical saturated hydraulic conductivity [mm h-1]
+  real(r8),target,allocatable ::  SatHydroCondHrzn(:,:,:)                   !soil horizontal saturated hydraulic conductivity, [mm h-1]
+  real(r8),target,allocatable ::  PSIAtFldCapacity(:,:)                     !water potentials at field capacity, [MPa]
+  real(r8),target,allocatable ::  PSIAtWiltPoint(:,:)                       !water potentials at wilting point [MPa]
   real(r8),target,allocatable ::  THW(:,:,:)                         !initial soil water content
   real(r8),target,allocatable ::  THI(:,:,:)                         !initial ice content
   REAL(R8),target,allocatable ::  SurfAlbedo_col(:,:)                          !Surface albedo

@@ -2,7 +2,7 @@ module SnowBalanceMod
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use data_const_mod, only : spval => DAT_CONST_SPVAL
   use abortutils, only : endrun
-  use minimathmod, only : AZMAX1
+  use minimathmod, only : AZMAX1,isclose
   USE SnowDataType
   use GridConsts
   use GridDataType
@@ -50,6 +50,7 @@ implicit none
   VcumIceSnow(NY,NX)=0.0_r8
   VcumSnoDWI(NY,NX)=0.0_r8
   SnowDepth(NY,NX)=0.0_r8
+  VcumSnowWE(NY,NX)=0._r8
   VOLSWI=0.0_r8
 
   D9780: DO L=1,JS
@@ -70,10 +71,12 @@ implicit none
     TKSnow(1,NY,NX)=(ENGYW+THeatBySnowRedist(NY,NX))/VLHeatCapSnow(1,NY,NX)
   ELSE
     TKSnow(1,NY,NX)=TairK(NY,NX)
+    if(VcumSnowWE(NY,NX)<ZEROS(NY,NX))TKSnow(1,NY,NX)=spval
   ENDIF
 !
 ! IF SNOWPACK DISAPPEARS
   call SnowpackDisapper(NY,NX)
+  TCSnow(1,NY,NX)=units%Kelvin2Celcius(TKSnow(1,NY,NX))  
 
   end subroutine SnowMassUpdate
 
@@ -110,7 +113,7 @@ implicit none
     VcumIceSnow(NY,NX)=0.0_r8
     VcumSnoDWI(NY,NX)=0.0_r8
     SnowDepth(NY,NX)=0.0_r8    
-
+    VcumSnowWE(NY,NX)=0._r8
     D9770: DO L=1,JS
       SnoDensL(L,NY,NX)=NewSnowDens(NY,NX)
       TKSnow(L,NY,NX)=spval
@@ -153,6 +156,11 @@ implicit none
   real(r8) :: dHPhaseChange,VLDrySnoWEtmp
   real(r8) :: frcnew,SnowIceMass,VLwatNet
 ! begin_execution
+
+  !the line below is a hack, and likely a better snow layering scheme is needed.
+  if(L.eq.1.and.isclose(TCSnow(1,NY,NX),spval))then
+    TCSnow(1,NY,NX)=units%Kelvin2Celcius(TairK(NY,NX))    
+  endif
 !
 ! ADD CHANGES IN SNOW, WATER AND ICE
 !
@@ -166,7 +174,7 @@ implicit none
   VLIceSnow(L,NY,NX)=VLIceSnow(L,NY,NX)+CumIce2SnowLay(L,NY,NX)-XIceThawMassL(L,NY,NX)/DENSICE
 
   if(VLWatSnow(L,NY,NX)<0._r8)then
-    !melt dray snow
+    !melt dry snow
     VLDrySnoWEtmp=VLDrySnoWE(L,NY,NX)+VLWatSnow(L,NY,NX)
     if(VLDrySnoWEtmp>0._r8)then
       VLDrySnoWE(L,NY,NX)=VLDrySnoWEtmp
@@ -253,7 +261,7 @@ implicit none
   ENDIF
   CVISC=0.25_r8*EXP(-0.08_r8*TCSnow(L,NY,NX)+23.0_r8*SnoDensL(L,NY,NX))
 
-  !if(curday>=83)write(*,*)'CVISC=',CVISC,TCSnow(L,NY,NX),SnoDensL(L,NY,NX)
+!  write(*,*)L,'CVISC=',CVISC,TCSnow(L,NY,NX),SnoDensL(L,NY,NX)
   DDENS2=SnoDensL(L,NY,NX)*VOLSWI/(AREA(3,NU(NY,NX),NY,NX)*CVISC)
   
   if(DDENS2<0._r8)write(*,*)'DDENS2=',SnoDensL(L,NY,NX),VOLSWI,CVISC
@@ -285,6 +293,7 @@ implicit none
     VcumIceSnow(NY,NX)=VcumIceSnow(NY,NX)+VLIceSnow(L,NY,NX)
     VcumSnoDWI(NY,NX)=VcumSnoDWI(NY,NX)+VLSnoDWI(L,NY,NX)
     SnowDepth(NY,NX)=SnowDepth(NY,NX)+SnowLayerThick(L,NY,NX)
+    VcumSnowWE(NY,NX)=VcumSnowWE(NY,NX)+VLDrySnoWE(L,NY,NX)+VLIceSnow(L,NY,NX)*DENSICE+VLWatSnow(L,NY,NX)
   ELSE
     VLDrySnoWE(L,NY,NX)=0.0_r8
     VLWatSnow(L,NY,NX)=0.0_r8
@@ -551,7 +560,8 @@ implicit none
         !
         IF(salt_model)THEN
           DO NTSA=idsalt_beg,idsalt_end
-            trcSalt_TBLS(NTSA,LS,N2,N1)=trcSalt_TBLS(NTSA,LS,N2,N1)+trcSaltFlo2SnowLay(NTSA,LS,N2,N1)-trcSaltFlo2SnowLay(NTSA,LS2,N2,N1)
+            trcSalt_TBLS(NTSA,LS,N2,N1)=trcSalt_TBLS(NTSA,LS,N2,N1)+trcSaltFlo2SnowLay(NTSA,LS,N2,N1)&
+              -trcSaltFlo2SnowLay(NTSA,LS2,N2,N1)
           ENDDO
         ENDIF
         !
@@ -704,7 +714,8 @@ implicit none
     ENDIF
   ENDDO D1202
 
-  TDrysnoBySnowRedist(N2,N1)=TDrysnoBySnowRedist(N2,N1)+DrysnoBySnowRedistribution(N,N2,N1)-DrysnoBySnowRedistribution(N,N5,N4)
+  TDrysnoBySnowRedist(N2,N1)=TDrysnoBySnowRedist(N2,N1)+DrysnoBySnowRedistribution(N,N2,N1)&
+    -DrysnoBySnowRedistribution(N,N5,N4)
   TWatBySnowRedist(N2,N1)=TWatBySnowRedist(N2,N1)+WatBySnowRedistribution(N,N2,N1)-WatBySnowRedistribution(N,N5,N4)
   TIceBySnowRedist(N2,N1)=TIceBySnowRedist(N2,N1)+IceBySnowRedistribution(N,N2,N1)-IceBySnowRedistribution(N,N5,N4)
   THeatBySnowRedist(N2,N1)=THeatBySnowRedist(N2,N1)+HeatBySnowRedistribution(N,N2,N1)-HeatBySnowRedistribution(N,N5,N4)

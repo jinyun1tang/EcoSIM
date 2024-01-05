@@ -44,7 +44,7 @@ module PlantBranchMod
   real(r8), intent(out) :: PTRT
   integer, intent(out) :: BegRemoblize
   real(r8) :: DMSHD
-  integer  :: K,KNOD,KK,K1,K2,KVSTGX
+  integer  :: K,KNOD,KK,K1,K2,KMinGroingLeafNodeNum
   integer  :: NN,M,N,NNOD1,NE
   real(r8) :: ZPOOLD,XFRN1,XFRP1
   REAL(R8) :: CH2O3(pltpar%MaxNodesPerBranch1),CH2O4(pltpar%MaxNodesPerBranch1)
@@ -377,7 +377,7 @@ module PlantBranchMod
 !   iPlantTurnoverPattern_pft=turnover:0=all aboveground,1=all leaf+petiole,2=none,3=between 1,2
 !   iPlantMorphologyType_pft=growth type:0=bryophyte,1=graminoid,2=shrub,tree
 !   iPlantBranchState_brch=branch living flag: 0=alive,1=dead
-!   KVSTGX,KLeafNodeNumber=integer of lowest,highest leaf number currently growing
+!   KMinGroingLeafNodeNum,KLeafNodeNumber=integer of lowest,highest leaf number currently growing
 !   WGLF,WGLFN,WGLFP,LeafProteinCNode_brch=node leaf C,N,P,protein mass
 !   CPOOL,ZPOOL,PPOOL=non-structural C,N,P mass
 !   ZPLFM=min N:C,P:C in leaves relative to max values from PFT file
@@ -391,8 +391,8 @@ module PlantBranchMod
 !
 !     REMOBILIZE EXCESS LEAF STRUCTURAL N,P
 !
-    KVSTGX=MAX(0,KLeafNodeNumber(NB,NZ)-MaxNodesPerBranch1+1)
-    D495: DO KK=KVSTGX,KLeafNodeNumber(NB,NZ)
+    KMinGroingLeafNodeNum=MAX(0,KLeafNodeNumber(NB,NZ)-MaxNodesPerBranch1+1)
+    D495: DO KK=KMinGroingLeafNodeNum,KLeafNodeNumber(NB,NZ)
       K=pMOD(KK,MaxNodesPerBranch1)
       IF(LeafElmntNode_brch(ielmc,K,NB,NZ).GT.0.0_r8)THEN
         CPOOLT=LeafElmntNode_brch(ielmc,K,NB,NZ)+NonstructElmnt_brch(ielmc,NB,NZ)
@@ -412,7 +412,8 @@ module PlantBranchMod
             LeafChemElmnts_brch(NE,NB,NZ)=LeafChemElmnts_brch(NE,NB,NZ)-XFRE(NE)
             NonstructElmnt_brch(NE,NB,NZ)=NonstructElmnt_brch(NE,NB,NZ)+XFRE(NE)
           ENDDO
-          LeafProteinCNode_brch(K,NB,NZ)=AZMAX1(LeafProteinCNode_brch(K,NB,NZ)-AMAX1(XFRE(ielmn)*rCNNonstructRemob_pft(NZ),XFRE(ielmp)*rCPNonstructRemob_pft(NZ)))
+          LeafProteinCNode_brch(K,NB,NZ)=AZMAX1(LeafProteinCNode_brch(K,NB,NZ)-&
+            AMAX1(XFRE(ielmn)*rCNNonstructRemob_pft(NZ),XFRE(ielmp)*rCPNonstructRemob_pft(NZ)))
         ENDIF
       ENDIF
     ENDDO D495
@@ -1451,7 +1452,7 @@ module PlantBranchMod
   integer, intent(in) :: NB,NZ
   real(r8), intent(in) :: CanopyHeight_copy(JP1)
   integer  :: LL,LU,L,K,k1,k2,KK,NE
-  integer  :: KVSTGX,KLeafNumHighestGrowing,LHTLFU,LHTLFL
+  integer  :: KMinGroingLeafNodeNum,KLeafNumHighestGrowing,LHTLFU,LHTLFL
   integer  :: LHTBRU,LHTBRL,N
   real(r8) :: ZSTK
   real(r8) :: YLeafElmntNode_brch(NumPlantChemElmnts)
@@ -1547,11 +1548,11 @@ module PlantBranchMod
     ELSE
       HeightBranchBase=0._r8
     ENDIF
-    KVSTGX=MAX(0,KLeafNodeNumber(NB,NZ)-MaxNodesPerBranch1+1)
+    KMinGroingLeafNodeNum=MAX(0,KLeafNodeNumber(NB,NZ)-MaxNodesPerBranch1+1)
 !
 !   FOR ALL LEAFED NODES
 !
-    D560: DO KK=KVSTGX,KLeafNodeNumber(NB,NZ)
+    D560: DO KK=KMinGroingLeafNodeNum,KLeafNodeNumber(NB,NZ)
       K=pMOD(KK,MaxNodesPerBranch1)
       !
       !     HEIGHT OF STALK INTERNODE + SHEATH OR PETIOLE
@@ -2475,7 +2476,8 @@ module PlantBranchMod
     TotPopuPlantRootNonstructElmnt(ielmc)=0._r8
     D4: DO L=NU,NI(NZ)
       TotPopuPlantRootC=TotPopuPlantRootC+AZMAX1(PopuPlantRootC_vr(ipltroot,L,NZ))
-      TotPopuPlantRootNonstructElmnt(ielmc)=TotPopuPlantRootNonstructElmnt(ielmc)+AZMAX1(RootMycoNonstructElmnt_vr(ielmc,ipltroot,L,NZ))
+      TotPopuPlantRootNonstructElmnt(ielmc)=TotPopuPlantRootNonstructElmnt(ielmc)+&
+        AZMAX1(RootMycoNonstructElmnt_vr(ielmc,ipltroot,L,NZ))
     ENDDO D4
 !
   ! RESET TIME COUNTER
@@ -2532,16 +2534,19 @@ module PlantBranchMod
           GFNX=GVMX(iPlantPhenologyPattern_pft(NZ))*DATRP
           CH2OH=AZMAX1(GFNX*NonstructalElmnts_pft(ielmc,NZ))
           NonstructalElmnts_pft(ielmc,NZ)=NonstructalElmnts_pft(ielmc,NZ)-CH2OH
-          NonstructElmnt_brch(ielmc,NB,NZ)=NonstructElmnt_brch(ielmc,NB,NZ)+CH2OH*FXSH(iPlantPhenologyPattern_pft(NZ))
+          NonstructElmnt_brch(ielmc,NB,NZ)=NonstructElmnt_brch(ielmc,NB,NZ)+CH2OH &
+            *FXSH(iPlantPhenologyPattern_pft(NZ))
 !          write(101,*)'LEAFOUTNonstructElmnt_brch',NonstructElmnt_brch(ielmc,NB,NZ),NB,NZ
           IF(TotPopuPlantRootC.GT.ZEROP(NZ).AND.TotPopuPlantRootNonstructElmnt(ielmc).GT.ZEROP(NZ))THEN
             D50: DO L=NU,NI(NZ)
               FXFC=AZMAX1( PopuPlantRootC_vr(ipltroot,L,NZ))/TotPopuPlantRootC
-               RootMycoNonstructElmnt_vr(ielmc,ipltroot,L,NZ)=RootMycoNonstructElmnt_vr(ielmc,ipltroot,L,NZ)+FXFC*CH2OH*FXRT(iPlantPhenologyPattern_pft(NZ))
+               RootMycoNonstructElmnt_vr(ielmc,ipltroot,L,NZ)=RootMycoNonstructElmnt_vr(ielmc,ipltroot,L,NZ)&
+                 +FXFC*CH2OH*FXRT(iPlantPhenologyPattern_pft(NZ))
             ENDDO D50
           ELSE
-             RootMycoNonstructElmnt_vr(ielmc,ipltroot,NGTopRootLayer_pft(NZ),NZ)=RootMycoNonstructElmnt_vr(ielmc,ipltroot,NGTopRootLayer_pft(NZ),NZ)+&
-               CH2OH*FXRT(iPlantPhenologyPattern_pft(NZ))
+             RootMycoNonstructElmnt_vr(ielmc,ipltroot,NGTopRootLayer_pft(NZ),NZ)=&
+               RootMycoNonstructElmnt_vr(ielmc,ipltroot,NGTopRootLayer_pft(NZ),NZ)+CH2OH &
+               *FXRT(iPlantPhenologyPattern_pft(NZ))
           ENDIF
         ELSE
           CH2OH=0._r8
@@ -2635,8 +2640,8 @@ module PlantBranchMod
       IF(TotPopuPlantRootC.GT.ZEROP(NZ).AND.TotPopuPlantRootNonstructElmnt(ielmc).GT.ZEROP(NZ))THEN
         D51: DO L=NU,NI(NZ)
           FXFN=AZMAX1(RootMycoNonstructElmnt_vr(ielmc,ipltroot,L,NZ))/TotPopuPlantRootNonstructElmnt(ielmc)
-           RootMycoNonstructElmnt_vr(ielmn,ipltroot,L,NZ)=RootMycoNonstructElmnt_vr(ielmn,ipltroot,L,NZ)+FXFN*UPNH4R
-           RootMycoNonstructElmnt_vr(ielmp,ipltroot,L,NZ)=RootMycoNonstructElmnt_vr(ielmp,ipltroot,L,NZ)+FXFN*UPPO4R
+          RootMycoNonstructElmnt_vr(ielmn,ipltroot,L,NZ)=RootMycoNonstructElmnt_vr(ielmn,ipltroot,L,NZ)+FXFN*UPNH4R
+          RootMycoNonstructElmnt_vr(ielmp,ipltroot,L,NZ)=RootMycoNonstructElmnt_vr(ielmp,ipltroot,L,NZ)+FXFN*UPPO4R
         ENDDO D51
       ELSE
          RootMycoNonstructElmnt_vr(ielmn,ipltroot,NGTopRootLayer_pft(NZ),NZ)=RootMycoNonstructElmnt_vr(ielmn,ipltroot,NGTopRootLayer_pft(NZ),NZ)+UPNH4R
@@ -3572,7 +3577,7 @@ module PlantBranchMod
   implicit none
   integer, intent(in) :: NZ,NB
   real(r8), intent(in) :: RCCC,RCCN,RCCP
-  INTEGER :: K,KVSTGX,M,NE
+  INTEGER :: K,KMinGroingLeafNodeNum,M,NE
   real(r8) :: FSNC
   real(r8) :: FSNCL
   real(r8) :: FSNCS
@@ -3616,9 +3621,9 @@ module PlantBranchMod
     fTgrowCanP                   =>  plt_pheno%fTgrowCanP                &  
   )    
   IF(doSenescence_brch(NB,NZ).EQ.itrue)THEN
-    KVSTGX=MAX(0,KLeafNodeNumber(NB,NZ)-MaxNodesPerBranch1+1)
-    IF(KVSTGX.GT.0)THEN
-      K=pMOD(KVSTGX,MaxNodesPerBranch1)               
+    KMinGroingLeafNodeNum=MAX(0,KLeafNodeNumber(NB,NZ)-MaxNodesPerBranch1+1)
+    IF(KMinGroingLeafNodeNum.GT.0)THEN
+      K=pMOD(KMinGroingLeafNodeNum,MaxNodesPerBranch1)               
       FSNC=fTgrowCanP(NZ)*RefLeafAppearRate_pft(NZ)
 !
       !   REMOBILIZATION OF LEAF C,N,P ALSO DEPENDS ON STRUCTURAL C:N:P
