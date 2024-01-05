@@ -1,5 +1,5 @@
 
-!
+! This code is adapted from Alquimia with the credits below:
 ! Alquimia Copyright (c) 2013-2016, The Regents of the University of California,
 ! through Lawrence Berkeley National Laboratory (subject to receipt of any
 ! required approvals from the U.S. Dept. of Energy).  All rights reserved.
@@ -24,18 +24,19 @@
 ! and to permit others to do so.
 !
 ! Authors: Benjamin Andre <bandre@lbl.gov>
+!        : Andrew Graus <agraus@lbl.gov>
 !
 
 ! **************************************************************************** !
 !
-! Alquimia Containers module
+! ATS-EcoSIM Containers module
 !
-! Author: Benjamin Andre
+! Author: Andrew Graus
 !
 ! WARNINGS:
 !
-!   * The alquimia data structures defined in the this are dictated by
-!     the alquimia API! Do NOT change them unless you make
+!   * The data structures defined here are dictated by
+!     the API! Do NOT change them unless you make
 !     corresponding changes to the c containers (and doc).
 !
 !   * The order of the data members matters! If num_primary is the

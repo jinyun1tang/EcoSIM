@@ -80,7 +80,6 @@ contains
 
   watflw =0._r8;waticefl=0._r8
 
-  write(*,*) "Stage surface phys model"
   DO NX=NHW,NHE
     DO NY=NVN,NVS
     NUM(NY,NX)=2 
@@ -95,7 +94,7 @@ contains
 !     AND SOC
 !
 !     Altitude_grid,ALT=current,initial elevation of ground surface
-!     CumDepth2LayerBottom(NUM(NY,NX)-1,=depth of ground surface
+!     CumDepth2LayerBottom(NUM(NY,NX)-1),=depth of ground surface
 !     EnergyImpact4Erosion=cumulative rainfall energy impact on soil surface
 !
       Altitude_grid(NY,NX)=ALT(NY,NX)-CumDepth2LayerBottom(NUM(NY,NX)-1,NY,NX)
@@ -104,7 +103,7 @@ contains
       call CopySnowStates(NY,NX)
 
       call CopySurfaceVars(NY,NX)
-!
+
       call PartionSurfaceFraction(NY,NX)
 
       call PartitionPrecip(NY,NX)
@@ -249,8 +248,6 @@ contains
 !     THS=sky longwave radiation
 !     LWRadCanGPrev=longwave radiation emitted by canopy
 
-  
-
   RADGX=SWRadOnGrnd(NY,NX)*dts_HeatWatTP
   RadSWonSno(NY,NX)=RADGX*FracSurfAsSnow(NY,NX)*XNPS
   RadSWonSoi(NY,NX)=RADGX*FracSurfSnoFree(NY,NX)*FracSurfAsBareSoi(NY,NX)      
@@ -269,6 +266,7 @@ contains
     FracSurfByLitR(NY,NX)*dts_litrhtwtp
 !  print*,'frac',FracSurfByLitR(NY,NX),FracSurfSnoFree(NY,NX)
 !
+
   end subroutine SurfaceRadiation
 !------------------------------------------------------------------------------------------
   subroutine SurfaceResistances(NY,NX,ResistanceLitRLay)
@@ -1531,9 +1529,6 @@ contains
       call SurfaceEnergyModel(M,NX,NY,ResistanceLitRLay,KSatReductByRainKineticEnergy(NY,NX),&
         HeatFluxAir2Soi(NY,NX),LatentHeatAir2Sno,HeatSensEvap,HeatSensAir2Snow,Radnet2Snow,&
         TopLayWatVol,VapXAir2TopLay)
-      
-      !write(*,*) "HeatFlux2Ground = ", HeatFlux2Ground
-      !write(*,*)'TXKR SurfaceEnergyModel MM=',M,TKSoi1(0,NY,NX)
 
     ! CAPILLARY EXCHANGE OF WATER BETWEEN SOIL SURFACE AND RESIDUE
       call SurfLitrSoilWaterExchange(M,NY,NX,KSatReductByRainKineticEnergy(NY,NX))

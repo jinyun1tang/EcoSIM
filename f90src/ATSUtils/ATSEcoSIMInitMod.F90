@@ -30,25 +30,15 @@ implicit none
 
   NHW=1;NHE=1;NVN=1;NVS=NYS
 
-  write(*,*) "Init Soil"
-
   call SetMeshATS(NHW,NVN,NHE,NVS)
-  
   call set_ecosim_solver(1, 1, 1, 1)
-
   call InitAlloc(NOMicrobeGuilds=1)
 
   !Setting some variables by hand as they are set to bad
   !Values by default in InitAlloc, should this change?
   FlowDirIndicator = 3 !Basically a switch, setting to 3 removes lateral flow
   NJ = 1 !Is the number of layers down the roots go
-
   NX=1
- 
-  write(*,*) "What are the dimensions of these variables?"
-  write(*, *) "Dimensions of TKSoi1:", SIZE(TKSoi1, 1), SIZE(TKSoi1, 2), SIZE(TKSoi1, 3)
-  write(*, *) "Dimensions of a_TEMP:", SIZE(a_TEMP, 1), SIZE(a_TEMP, 2)
-
 
   do NY=1,NYS
     NU(NY,NX)=a_NU(NY)
@@ -69,8 +59,6 @@ implicit none
     WindSpeedAtm(NY,NX) = uwind(NY)  
     DO L=NU(NY,NX),NL(NY,NX)
       TKSoi1(L,NY,NX) = a_TEMP(L,NY)
-      !FieldCapacity(L,NY,NX)=a_FC(L,ny)
-      !WiltPoint(L,NY,NX)=a_WP(L,NY)
       CumDepth2LayerBottom(L,NY,NX)=a_CumDepth2LayerBottom(L,NY)
       SoiBulkDensityt0(L,NY,NX)=a_BKDSI(L,NY)
       CORGC(L,NY,NX)=a_CORGC(L,NY)
@@ -81,15 +69,8 @@ implicit none
 
   PSIAtFldCapacity = pressure_at_field_capacity
   PSIAtWiltPoint = pressure_at_wilting_point
-  !SWRadOnGrnd = srad
-  !LWRadSky = sunrad
-  !TairK = tairc+273.15
-  !VPA = vpair
-  !WindSpeedAtm = uwind
-  !RainH = prec
   call startsim(NHW,NHE,NVN,NVS)
 
-  write(*,*) "Finished Subroutine Init_EcoSIM_Soil"
   end subroutine Init_EcoSIM_Soil
 
 
