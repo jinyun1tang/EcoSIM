@@ -38,19 +38,9 @@ implicit none
 
   NHW=1;NHE=1;NVN=1;NVS=NYS
 
-  write(*,*) "In Run Surface Balance"
-
   call SetMeshATS(NHW,NVN,NHE,NVS)
 
-  !call set_ecosim_solver(1, 1, 1, 1)
-  
   NX=1
-
-  !write(*,*) "Checking dimensions:"
-  !write(*, *) "Dimensions of TKSoi1:", SIZE(TKSoi1, 1), SIZE(TKSoi1, 2), SIZE(TKSoi1, 3)
-  !write(*, *) "Dimensions of a_TEMP:", SIZE(a_TEMP, 1), SIZE(a_TEMP, 2)
-
-  write(*,*) "Starting loop: "
 
   do NY=1,NYS
     NU(NY,NX)=a_NU(NY)
@@ -99,15 +89,13 @@ implicit none
       KSatReductByRainKineticEnergyS,HeatFlux2Ground,TopLayWatVol)
   ENDDO
   
-  write(*,*) "Timestep in EcoSIM: ", dts_HeatWatTP, " hr"
+  write(*,*) "Timestep in EcoSIM: ", dts_HeatWatTP, " MJ/hr"
   DO NY=1,NYS
     !for every column send the top layer to the transfer var
-    !surf_e_source(NY) = HeatFlux2Ground(NY,1) / (dts_HeatWatTP*3600._r8)
-    !returns total heat flux (MJ/timestep)
-    surf_e_source(NY) = HeatFlux2Ground(NY,1)
+    surf_e_source(NY) = HeatFlux2Ground(NY,1) / (dts_HeatWatTP*3600._r8)
   ENDDO
 
-  write(*,*) "Finished Subroutine RunEcoSIMSurfaceBalance"
+  write(*,*) "After conversion ", dts_HeatWatTP, " MJ/s"  
   end subroutine RunEcoSIMSurfaceBalance
 
 end module ATSEcoSIMAdvanceMod

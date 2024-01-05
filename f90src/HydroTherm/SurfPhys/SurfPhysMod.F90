@@ -77,7 +77,6 @@ contains
   character(len=*), parameter :: subn=trim(mod_filename)//'::StageSurfacePhysModel'
   integer :: NY,NX
 
-  write(*,*) "Stage surface phys model"
   DO NX=NHW,NHE
     DO NY=NVN,NVS
     NUM(NY,NX)=2 
@@ -92,7 +91,7 @@ contains
 !     AND SOC
 !
 !     Altitude_grid,ALT=current,initial elevation of ground surface
-!     CumDepth2LayerBottom(NUM(NY,NX)-1,=depth of ground surface
+!     CumDepth2LayerBottom(NUM(NY,NX)-1),=depth of ground surface
 !     EnergyImpact4Erosion=cumulative rainfall energy impact on soil surface
 !
       Altitude_grid(NY,NX)=ALT(NY,NX)-CumDepth2LayerBottom(NUM(NY,NX)-1,NY,NX)
@@ -101,7 +100,7 @@ contains
       call CopySnowStates(NY,NX)
 
       call CopySurfaceVars(NY,NX)
-!
+
       call PartionSurfaceFraction(NY,NX)
 
       call PartitionPrecip(NY,NX)
@@ -246,8 +245,6 @@ contains
 !     THS=sky longwave radiation
 !     LWRadCanGPrev=longwave radiation emitted by canopy
 
-  
-
   RADGX=SWRadOnGrnd(NY,NX)*dts_HeatWatTP
   RADXW(NY,NX)=RADGX*FracSurfAsSnow(NY,NX)*XNPS
   RADXG(NY,NX)=RADGX*FracSurfSnoFree(NY,NX)*FracSurfAsBareSoi(NY,NX)      
@@ -264,25 +261,6 @@ contains
     FracSurfAsBareSoi(NY,NX)*dts_HeatWatTP
   THRMR(NY,NX)=SurfLitREmisivity*2.04E-10_r8*AREA(3,NUM(NY,NX),NY,NX)*FracSurfSnoFree(NY,NX)*&
     FracSurfByLitR(NY,NX)*dts_litrhtwtp
-
-  ! Print variable descriptions and values
-  !write(* ,*) "Writing out surface radiation values: "
-  !write(* ,*) "Shortwave radiation at ground surface (RADGX):", RADGX
-  !write(*, *) "Shortwave radiation at snowpack surface (RADXW):", RADXW(NY, NX)
-  !write(*, *) "Shortwave radiation at soil surface (RADXG):", RADXG(NY, NX)
-  !write(*, *) "Shortwave radiation at litter surface (RADXR):", RADXR(NY, NX)
-  !write(*, *) "Longwave radiation at ground surface (THRYX):", THRYX
-  !write(*, *) "Longwave radiation at snowpack surface (LWRad2Snow):", LWRad2Snow(NY, NX)
-  !write(*, *) "Longwave radiation at soil surface (LWRad2Grnd):", LWRad2Grnd(NY, NX)
-  !write(*, *) "Longwave radiation at litter surface (LWRad2LitR):", LWRad2LitR(NY, NX)
-  !write(*, *) "Emissivity of snowpack surface (SnowEmisivity):", SnowEmisivity
-  !write(*, *) "Emissivity of soil surface (SoilEmisivity):", SoilEmisivity
-  !write(*, *) "Emissivity of litter surface (SurfLitREmisivity):", SurfLitREmisivity
-  !write(*, *) "Longwave radiation emitted by snowpack (THRMW):", THRMW(NY, NX)
-  !write(*, *) "Longwave radiation emitted by soil (THRMS):", THRMS(NY, NX)
-  !write(*, *) "Longwave radiation emitted by litter (THRMR):", THRMR(NY, NX)
-
-
 
   end subroutine SurfaceRadiation
 !------------------------------------------------------------------------------------------
@@ -1535,14 +1513,9 @@ contains
   D9895: DO  NX=NHW,NHE
     D9890: DO  NY=NVN,NVS
 
-      write(*,*)'RunSurfacePhysModel',NY,NX,'M=',M,TKS(0,NY,NX)
-
       call SurfaceEnergyModel(M,NX,NY,ResistanceLitRLay,KSatReductByRainKineticEnergy(NY,NX),&
         HeatFlux2Ground(NY,NX),LatentHeatAir2Sno,HeatSensEvap,HeatSensAir2Snow,Radnet2Snow,&
         TopLayWatVol,VapXAir2TopLay)
-      
-      !write(*,*) "HeatFlux2Ground = ", HeatFlux2Ground
-      !write(*,*)'TXKR SurfaceEnergyModel MM=',M,TKSoi1(0,NY,NX)
 
     ! CAPILLARY EXCHANGE OF WATER BETWEEN SOIL SURFACE AND RESIDUE
       call SurfLitrSoilWaterExchange(M,NY,NX,KSatReductByRainKineticEnergy(NY,NX))
@@ -1556,7 +1529,6 @@ contains
     !
       call AccumWaterVaporHeatFluxes(M,NY,NX,LatentHeatAir2Sno,HeatSensEvap,HeatSensAir2Snow,&
         Radnet2Snow,VapXAir2TopLay)
-!      write(*,*)'end RunSurfacePhysModel'
     ENDDO D9890
   ENDDO D9895
 
