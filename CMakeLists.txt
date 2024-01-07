@@ -208,9 +208,9 @@ link_directories("${PROJECT_BINARY_DIR}/lib")
 list(APPEND ECOSIM_INCLUDE_DIRS "${PROJECT_BINARY_DIR}/include")
 include_directories(${ECOSIM_INCLUDE_DIRS})
 
-message("ECOSIM_INCLUDE_DIRS ${ECOSIM_INCLUDE_DIRS}")
-message("${PROJECT_BINARY_DIR}/include")
-message("${PROJECT_BINARY_DIR}/lib")
+#message("ECOSIM_INCLUDE_DIRS ${ECOSIM_INCLUDE_DIRS}")
+#message("${PROJECT_BINARY_DIR}/include")
+#message("${PROJECT_BINARY_DIR}/lib")
 # Unit testing.
 enable_testing()
 

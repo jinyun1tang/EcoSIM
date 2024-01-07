@@ -1,6 +1,20 @@
 #!/bin/bash
 
 #echo $HOST
+if [ -e "stage.txt" ]; then
+  source stage.txt
+  if [[ $stage == 1 ]];then
+    if [[ "$1" == *"prefix"* ]];
+    then
+      ./local/bin/nc-config --prefix
+    elif [[ "$1" == *"flibs"* ]];
+    then
+      ./local/bin/nf-config --flibs
+    fi
+    exit
+  fi
+fi
+
 if [[ $HOST == *"cori"* ]]; 
 then
  # echo "run on $HOST"
