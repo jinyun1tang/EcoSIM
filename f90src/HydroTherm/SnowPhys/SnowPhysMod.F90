@@ -4,9 +4,9 @@ module SnowPhysMod
 ! the snow model
 ! required input
 !
-
 ! codes for snow physics
   use data_kind_mod, only : r8 => DAT_KIND_R8
+  use data_const_mod, only : spval => DAT_CONST_SPVAL  
   use abortutils   , only : endrun   
   use SnowDataType
   use GridDataType
@@ -26,6 +26,8 @@ module SnowPhysMod
   use ChemTranspDataType
   use LandSurfDataType
   use PhysPars  
+  use UnitMod, only : units
+
 implicit none
   private
   character(len=*), parameter :: mod_filename=__FILE__
@@ -685,9 +687,9 @@ contains
   real(r8) :: VPSno0,EVAPW2,EVAPX2,HeatSensAir2Sno2
   real(r8) :: LatentHeatAir2Sno2,EvapSublimation2,MaxVapXAir2Sno
   real(r8) :: HeatNetFlx2Sno1,HeatNetFlx2Sno2,HeatSensAir2SnoByEvap2
-  real(r8) :: NetHeatAir2Snow,FLW0W2
-  real(r8) :: HeatSnofall2Snow,FLW0S2,FLW0I2
-  real(r8) :: FLQ0I2,FLQ0S2,FLQ0W2
+  real(r8) :: NetHeatAir2Snow,SnofallRain
+  real(r8) :: HeatSnofall2Snow,SnofallDry,Snofallice
+  real(r8) :: IceFall,SnoFall,Rainfall
 
   SnowAlbedo=(0.85_r8*VLDrySnoWE0M(1,NY,NX)+0.30_r8*VLIceSnow0M(1,NY,NX)+0.06_r8*VLWatSnow0M(1,NY,NX)) &
     /(VLDrySnoWE0M(1,NY,NX)+VLIceSnow0M(1,NY,NX)+VLWatSnow0M(1,NY,NX))
@@ -750,7 +752,7 @@ contains
 !     HeatSensAir2Sno2,LatentHeatAir2Sno2,RadNet2Sno2=sensible,latent heat fluxes, net radiation
 !     HeatSensAir2SnoByEvap2=convective heat flux from LatentHeatAir2Sno2
 !     HeatNetFlx2Sno1=storage heat flux
-!     FLQ0S2,FLQ0W2,FLQ0I2=snow,water,ice input to snowpack
+!     SnoFall,Rainfall,IceFall=snow,water,ice input to snowpack
 !     HeatSnofall2Snow=convective heat from snow,water,ice input to snowpack
 !
   HeatSensAir2Sno2=CdSnoHSens*(TKQ(NY,NX)-TKSnow1(1,NY,NX))
@@ -766,24 +768,27 @@ contains
   EVAPS(NY,NX)=EVAPS(NY,NX)+EvapSublimation2
   EVAPW(NY,NX)=EVAPW(NY,NX)+EVAPW2
   VapXAir2Sno(NY,NX)=VapXAir2Sno(NY,NX)+EvapSublimation2+EVAPW2
-  FLQ0S2=SnowFallt(NY,NX)*XNPS
-  FLQ0W2=Rain2Snowt(NY,NX)*XNPS
-  FLQ0I2=Ice2Snowt(NY,NX)*XNPS
+  SnoFall=SnowFallt(NY,NX)*XNPS
+  Rainfall=Rain2Snowt(NY,NX)*XNPS
+  IceFall=Ice2Snowt(NY,NX)*XNPS
   HeatSnofall2Snow=HeatFall2Snowt(NY,NX)*XNPS
-  FLW0S2=FLQ0S2+EvapSublimation2
-  FLW0W2=FLQ0W2+EVAPW2
-  FLW0I2=FLQ0I2
+  SnofallDry=SnoFall+EvapSublimation2
+  SnofallRain=Rainfall+EVAPW2
+  Snofallice=IceFall
   NetHeatAir2Snow=HeatSnofall2Snow+HeatNetFlx2Sno2
-  SnoX2SnoLay(1,NY,NX)=FLW0S2
-  WatX2SnoLay(1,NY,NX)=FLW0W2
-  IceX2SnoLay(1,NY,NX)=FLW0I2
+  SnoX2SnoLay(1,NY,NX)=SnofallDry
+  WatX2SnoLay(1,NY,NX)=SnofallRain
+  IceX2SnoLay(1,NY,NX)=Snofallice
   HeatX2SnoLay(1,NY,NX)=NetHeatAir2Snow
-  WatFlowInSnowM(M,1,NY,NX)=WatFlowInSnowM(M,1,NY,NX)+FLQ0S2+FLQ0I2+FLQ0W2
+  WatFlowInSnowM(M,1,NY,NX)=WatFlowInSnowM(M,1,NY,NX)+SnoFall+IceFall+Rainfall
+  if(WatFlowInSnowM(M,1,NY,NX)>0._r8 .and. isclose(TCSnow(1,NY,NX),spval))then
+    TCSnow(1,NY,NX)=units%Kelvin2Celcius(TairK(NY,NX))  
+  endif
   LWRadBySurf(NY,NX)=LWRadBySurf(NY,NX)+LWRadSno1
 !     IF(NX.EQ.3.AND.NY.EQ.3)THEN
-!     WRITE(*,7759)'EVAP',I,J,M,MM,FLW0S2
-!    2,FLQ0S2,EvapSublimation2,FLW0W2,FLQ0W2
-!    3,FracSurfAsSnow(NY,NX),FLW0I2,FLQ0I2,RadNet2Sno2,LatentHeatAir2Sno2
+!     WRITE(*,7759)'EVAP',I,J,M,MM,SnofallDry
+!    2,SnoFall,EvapSublimation2,SnofallRain,Rainfall
+!    3,FracSurfAsSnow(NY,NX),Snofallice,IceFall,RadNet2Sno2,LatentHeatAir2Sno2
 !    4,HeatSensAir2Sno2,HeatSensAir2SnoByEvap2,RA,MaxVapXAir2Sno,EVAPX2,VPQ(NY,NX),VPSno0
 !    5,VLWatSnow0M(1,NY,NX),VLDrySnoWE0M(1,NY,NX),VLIceSnow0M(1,NY,NX)
 !    6,HeatX2SnoLay(1,NY,NX),NetHeatAir2Snow,HWFLQ02,HeatNetFlx2Sno2,RadNet2Sno2,LatentHeatAir2Sno2
@@ -997,7 +1002,7 @@ contains
 !     MinSnowDepth=minimum snowpack depth for full cover
 !     QS,WatBySnowRedistribution,IceBySnowRedistribution=hourly-accumulated snow,water,ice transfer
 !     HeatBySnowRedistribution=hourly-accumd convective heat from snow,water,ice transfer
-!     DrySnoFlxBySnowRedistributM=snow transfer for solute flux calculation
+!     DrySnoFlxBySnoRedistM=snow transfer for solute flux calculation
 
   DO  N=1,2
     DO  NN=1,2
@@ -1056,7 +1061,7 @@ contains
         WatBySnowRedistribution(N,N5,N4)=WatBySnowRedistribution(N,N5,N4)+WatFlxBySnowRedistribut(N,N5,N4)
         IceBySnowRedistribution(N,N5,N4)=IceBySnowRedistribution(N,N5,N4)+IceFlxBySnowRedistribut(N,N5,N4)
         HeatBySnowRedistribution(N,N5,N4)=HeatBySnowRedistribution(N,N5,N4)+HeatFlxBySnowRedistribut(N,N5,N4)
-        DrySnoFlxBySnowRedistributM(M,N,N5,N4)=DrySnoFlxBySnowRedistribut(N,N5,N4)
+        DrySnoFlxBySnoRedistM(M,N,N5,N4)=DrySnoFlxBySnowRedistribut(N,N5,N4)
       ENDIF
 
       !add west and south

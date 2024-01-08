@@ -340,7 +340,8 @@ module HfuncsMod
 
       IF(PSIRootTurg_vr(ipltroot,NGTopRootLayer_pft(NZ),NZ).GT.PSIMin4LeafExpansion)THEN
 !        write(101,*)'root OK for leaf expansion',NZ
-        IF(NumRootAxes_pft(NZ).EQ.0.OR.ShootNodeNumber_brch(NumOfMainBranch_pft(NZ),NZ).GT.NumRootAxes_pft(NZ)/FNOD(NZ)+XTLI(NZ))THEN
+        IF(NumRootAxes_pft(NZ).EQ.0.OR.ShootNodeNumber_brch(NumOfMainBranch_pft(NZ),NZ) &
+          .GT.NumRootAxes_pft(NZ)/FNOD(NZ)+XTLI(NZ))THEN
           IF((NumRootAxes_pft(NZ).EQ.0 .AND. NonstructalElmnts_pft(ielmc,NZ).GT.0.0_r8) &
             .OR.(CanopyNonstructElementConc_pft(ielmc,NZ).GT.MinNonstructuralC4InitRoot_pft(NZ) & 
             .AND.MinNonstructuralC4InitRoot_pft(NZ).GT.0.0_r8))THEN

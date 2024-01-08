@@ -150,6 +150,17 @@ endif
 CONFIG_FLAGS += -DTPL_NETCDF_INCLUDE_DIRS="$(NETCDF_FFLAGS)"
 CONFIG_FLAGS += -DTPL_NETCDF_LIBRARIES="$(NETCDF_FLIBS)"
 
+define run-stage
+@rm -rf $(BUILDDIR)/stage
+@rm -f stage.txt
+@mkdir -p $(BUILDDIR)/stage
+@cd $(BUILDDIR)/stage && cmake $(CURDIR) $(CONFIG_FLAGS)
+@echo "stage=1" >> stage.txt
+@mkdir -p local/bin/
+@ln $(BUILDDIR)/stage/bin/nc-config local/bin/nc-config
+@ln $(BUILDDIR)/stage/bin/nf-config local/bin/nf-config
+endef
+
 define run-config
 @mkdir -p $(BUILDDIR)
 @cd $(BUILDDIR) && cmake $(CURDIR) $(CONFIG_FLAGS)
@@ -183,8 +194,10 @@ clean:
 	else \
 		$(MAKE) -C $(BUILDDIR) $@ --no-print-directory $(MAKEFLAGS); \
 	fi
+stage: distclean
+	$(run-stage)
 
-config: distclean
+config:
 	$(run-config)
 #	@export ENVCC=$(CC); export ENVCXX=$(CXX); export ENVFC=$(FC)
 

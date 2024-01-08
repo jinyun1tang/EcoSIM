@@ -1332,9 +1332,11 @@ module PlantDisturbsMod
         ARLFY=(1._r8-ABS(HVST(NZ)))*CanopyLeafArea_grd
         ARLFR=0._r8
         D9875: DO L=1,NumOfCanopyLayers1
-          IF(CanopyHeightz_col(L).GT.CanopyHeightz_col(L-1).AND.CanopyLAgrid_lyr(L).GT.ZEROS.AND.ARLFR.LT.ARLFY)THEN
+          IF(CanopyHeightz_col(L).GT.CanopyHeightz_col(L-1).AND.&
+            CanopyLAgrid_lyr(L).GT.ZEROS.AND.ARLFR.LT.ARLFY)THEN
             IF(ARLFR+CanopyLAgrid_lyr(L).GT.ARLFY)THEN
-              HVST(NZ)=CanopyHeightz_col(L-1)+((ARLFY-ARLFR)/CanopyLAgrid_lyr(L))*(CanopyHeightz_col(L)-CanopyHeightz_col(L-1))
+              HVST(NZ)=CanopyHeightz_col(L-1)+((ARLFY-ARLFR)/CanopyLAgrid_lyr(L))&
+                *(CanopyHeightz_col(L)-CanopyHeightz_col(L-1))
             ENDIF
           ELSE
             HVST(NZ)=0._r8

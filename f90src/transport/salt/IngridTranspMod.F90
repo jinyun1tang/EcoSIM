@@ -907,7 +907,7 @@ module IngridTranspMod
 !
 !     SNOW DRIFT
 !
-!     DrySnoFlxBySnowRedistributM=snow transfer from watsub.f
+!     DrySnoFlxBySnoRedistM=snow transfer from watsub.f
 !     RQS*=solute flux in snow transfer
 !     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
 !          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
@@ -926,14 +926,14 @@ module IngridTranspMod
 !
 !     IF NO SNOW DRIFT THEN NO TRANSPORT
 !
-        IF(ABS(DrySnoFlxBySnowRedistributM(M,N,N5,N4)).LE.ZEROS2(N2,N1))THEN
+        IF(ABS(DrySnoFlxBySnoRedistM(M,N,N5,N4)).LE.ZEROS2(N2,N1))THEN
           trcSalt_RQ(idsalt_beg:idsaltb_end,N,N5,N4)=0.0_r8
 !
 !     IF DRIFT IS FROM CURRENT TO ADJACENT GRID CELL
 !
-        ELSEIF(DrySnoFlxBySnowRedistributM(M,N,N5,N4).GT.0.0)THEN
+        ELSEIF(DrySnoFlxBySnoRedistM(M,N,N5,N4).GT.0.0)THEN
           IF(VcumSnoDWI(N2,N1).GT.ZEROS2(NY,NX))THEN
-            VFLW=AZMAX1(AMIN1(VFLWX,DrySnoFlxBySnowRedistributM(M,N,N5,N4)/VcumSnoDWI(N2,N1)))
+            VFLW=AZMAX1(AMIN1(VFLWX,DrySnoFlxBySnoRedistM(M,N,N5,N4)/VcumSnoDWI(N2,N1)))
           ELSE
             VFLW=VFLWX
           ENDIF
@@ -944,9 +944,9 @@ module IngridTranspMod
 !
 !     IF DRIFT IS TO CURRENT FROM ADJACENT GRID CELL
 !
-        ELSEIF(DrySnoFlxBySnowRedistributM(M,N,N5,N4).LT.-ZEROS2(N2,N1))THEN
+        ELSEIF(DrySnoFlxBySnoRedistM(M,N,N5,N4).LT.-ZEROS2(N2,N1))THEN
           IF(VcumSnoDWI(N5,N4).GT.ZEROS2(N5,N4))THEN
-            VFLW=AZMIN1(AMAX1(-VFLWX,DrySnoFlxBySnowRedistributM(M,N,N5,N4)/VcumSnoDWI(N5,N4)))
+            VFLW=AZMIN1(AMAX1(-VFLWX,DrySnoFlxBySnoRedistM(M,N,N5,N4)/VcumSnoDWI(N5,N4)))
           ELSE
             VFLW=-VFLWX
           ENDIF
