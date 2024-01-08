@@ -27,13 +27,27 @@ For mac, this can be done through either macport of homebrew.
 
 If a system provided netcdf libraray is provided. Use the following 
 
-make config CC=icc CXX=icpc FC=ifort netcdfsys=1
+make config CC=icx CXX=icpc FC=ifort netcdfsys=1
 
 to config, and use
 
-make install CC=icc CXX=icpc FC=ifort netcdfsys=1
+make install CC=icx CXX=icpc FC=ifort netcdfsys=1
 
 to build.
+
+There is another approach when your system does not have netcdf support. Assume using
+gnu compiler, first do
+
+make stage CC=gcc CXX=g++ FC=gfortran 
+
+then
+
+make config CC=gcc CXX=g++ FC=gfortran netcdfsys=1
+
+and 
+
+make install CC=gcc CXX=g++ FC=gfortran netcdfsys=1
+
 
 ## more about build
 

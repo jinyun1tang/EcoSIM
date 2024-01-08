@@ -460,7 +460,8 @@ endif ()
 
   execute_process(COMMAND env CC=${CMAKE_C_COMPILER} env CFLAGS=${CMAKE_C_FLAGS}
      env CPPFLAGS=${NETCDF_CPPFLAGS} env LDFLAGS=${NETCDF_LIBFLAGS} env FC=${CMAKE_Fortran_COMPILER}
-     env LD_LIBRARY_PATH=${PROJECT_BINARY_DIR}/lib/ ./configure  ${NETCDF_F_CONFIG_OPTS}
+     env LD_LIBRARY_PATH=${PROJECT_BINARY_DIR}/lib/ 
+     env LIBS=${NETCDF_LIBFLAGS} ./configure  ${NETCDF_F_CONFIG_OPTS}
                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/netcdf-fortran
                   OUTPUT_VARIABLE netcdf_fortran_config_log ERROR_VARIABLE netcdf_fortran_config_err
                   RESULT_VARIABLE stat)
