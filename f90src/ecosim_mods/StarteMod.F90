@@ -481,8 +481,8 @@ module StarteMod
     CSTR(L,NY,NX)=0._r8
     CION(L,NY,NX)=0._r8
 ! the following line is quite interesting, Jinyun Tang, Nov 17, 2022
-    trc_solml_vr(ids_NH4,L,NY,NX)=trc_solml_vr(ids_NH4,L,NY,NX)+0.5_r8*OSN(iprotein,k_manure,L,NY,NX)
-    OSN(iprotein,k_manure,L,NY,NX)=OSN(iprotein,k_manure,L,NY,NX)-0.5_r8*OSN(iprotein,k_manure,L,NY,NX)
+    trc_solml_vr(ids_NH4,L,NY,NX)=trc_solml_vr(ids_NH4,L,NY,NX)+0.5_r8*OSM(ielmn,iprotein,k_manure,L,NY,NX)
+    OSM(ielmn,iprotein,k_manure,L,NY,NX)=OSM(ielmn,iprotein,k_manure,L,NY,NX)-0.5_r8*OSM(ielmn,iprotein,k_manure,L,NY,NX)
   ENDIF
   end associate
   end subroutine InitSoluteConcs

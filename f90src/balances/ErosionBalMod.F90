@@ -171,47 +171,47 @@ implicit none
 !
       D1900: DO K=1,micpar%NumOfLitrCmplxs
         D1940: DO M=1,ndbiomcp
-          FORC=FSINK*ORC(M,K,L,NY,NX)
-          FORN=FSINK*ORN(M,K,L,NY,NX)
-          FORP=FSINK*ORP(M,K,L,NY,NX)
-          ORC(M,K,LL,NY,NX)=ORC(M,K,LL,NY,NX)+FORC
-          ORN(M,K,LL,NY,NX)=ORN(M,K,LL,NY,NX)+FORN
-          ORP(M,K,LL,NY,NX)=ORP(M,K,LL,NY,NX)+FORP
-          ORC(M,K,L,NY,NX)=ORC(M,K,L,NY,NX)-FORC
-          ORN(M,K,L,NY,NX)=ORN(M,K,L,NY,NX)-FORN
-          ORP(M,K,L,NY,NX)=ORP(M,K,L,NY,NX)-FORP
+          FORC=FSINK*ORM(ielmc,M,K,L,NY,NX)
+          FORN=FSINK*ORM(ielmn,M,K,L,NY,NX)
+          FORP=FSINK*ORM(ielmp,M,K,L,NY,NX)
+          ORM(ielmc,M,K,LL,NY,NX)=ORM(ielmc,M,K,LL,NY,NX)+FORC
+          ORM(ielmn,M,K,LL,NY,NX)=ORM(ielmn,M,K,LL,NY,NX)+FORN
+          ORM(ielmp,M,K,LL,NY,NX)=ORM(ielmp,M,K,LL,NY,NX)+FORP
+          ORM(ielmc,M,K,L,NY,NX)=ORM(ielmc,M,K,L,NY,NX)-FORC
+          ORM(ielmn,M,K,L,NY,NX)=ORM(ielmn,M,K,L,NY,NX)-FORN
+          ORM(ielmp,M,K,L,NY,NX)=ORM(ielmp,M,K,L,NY,NX)-FORP
         ENDDO D1940
 !
 !       ADSORBED C,N,P
 !
-        FOHC=FSINK*OHC(K,L,NY,NX)
-        FOHN=FSINK*OHN(K,L,NY,NX)
-        FOHP=FSINK*OHP(K,L,NY,NX)
-        FOHA=FSINK*OHA(K,L,NY,NX)
-        OHC(K,LL,NY,NX)=OHC(K,LL,NY,NX)+FOHC
-        OHN(K,LL,NY,NX)=OHN(K,LL,NY,NX)+FOHN
-        OHP(K,LL,NY,NX)=OHP(K,LL,NY,NX)+FOHP
-        OHA(K,LL,NY,NX)=OHA(K,LL,NY,NX)+FOHA
-        OHC(K,L,NY,NX)=OHC(K,L,NY,NX)-FOHC
-        OHN(K,L,NY,NX)=OHN(K,L,NY,NX)-FOHN
-        OHP(K,L,NY,NX)=OHP(K,L,NY,NX)-FOHP
-        OHA(K,L,NY,NX)=OHA(K,L,NY,NX)-FOHA
+        FOHC=FSINK*OHM(ielmc,K,L,NY,NX)
+        FOHN=FSINK*OHM(ielmn,K,L,NY,NX)
+        FOHP=FSINK*OHM(ielmp,K,L,NY,NX)
+        FOHA=FSINK*OHM(idom_acetate,K,L,NY,NX)
+        OHM(ielmc,K,LL,NY,NX)=OHM(ielmc,K,LL,NY,NX)+FOHC
+        OHM(ielmn,K,LL,NY,NX)=OHM(ielmn,K,LL,NY,NX)+FOHN
+        OHM(ielmp,K,LL,NY,NX)=OHM(ielmp,K,LL,NY,NX)+FOHP
+        OHM(idom_acetate,K,LL,NY,NX)=OHM(idom_acetate,K,LL,NY,NX)+FOHA
+        OHM(ielmc,K,L,NY,NX)=OHM(ielmc,K,L,NY,NX)-FOHC
+        OHM(ielmn,K,L,NY,NX)=OHM(ielmn,K,L,NY,NX)-FOHN
+        OHM(ielmp,K,L,NY,NX)=OHM(ielmp,K,L,NY,NX)-FOHP
+        OHM(idom_acetate,K,L,NY,NX)=OHM(idom_acetate,K,L,NY,NX)-FOHA
 !
 !       SOC,N,P
 !
         D1930: DO M=1,jsken
-          FOSC=FSINK*OSC(M,K,L,NY,NX)
+          FOSC=FSINK*OSM(ielmc,M,K,L,NY,NX)
           FOSA=FSINK*OSA(M,K,L,NY,NX)
-          FOSN=FSINK*OSN(M,K,L,NY,NX)
-          FOSP=FSINK*OSP(M,K,L,NY,NX)
-          OSC(M,K,LL,NY,NX)=OSC(M,K,LL,NY,NX)+FOSC
+          FOSN=FSINK*OSM(ielmn,M,K,L,NY,NX)
+          FOSP=FSINK*OSM(ielmp,M,K,L,NY,NX)
+          OSM(ielmc,M,K,LL,NY,NX)=OSM(ielmc,M,K,LL,NY,NX)+FOSC
           OSA(M,K,LL,NY,NX)=OSA(M,K,LL,NY,NX)+FOSA
-          OSN(M,K,LL,NY,NX)=OSN(M,K,LL,NY,NX)+FOSN
-          OSP(M,K,LL,NY,NX)=OSP(M,K,LL,NY,NX)+FOSP
-          OSC(M,K,L,NY,NX)=OSC(M,K,L,NY,NX)-FOSC
+          OSM(ielmn,M,K,LL,NY,NX)=OSM(ielmn,M,K,LL,NY,NX)+FOSN
+          OSM(ielmp,M,K,LL,NY,NX)=OSM(ielmp,M,K,LL,NY,NX)+FOSP
+          OSM(ielmc,M,K,L,NY,NX)=OSM(ielmc,M,K,L,NY,NX)-FOSC
           OSA(M,K,L,NY,NX)=OSA(M,K,L,NY,NX)-FOSA
-          OSN(M,K,L,NY,NX)=OSN(M,K,L,NY,NX)-FOSN
-          OSP(M,K,L,NY,NX)=OSP(M,K,L,NY,NX)-FOSP
+          OSM(ielmn,M,K,L,NY,NX)=OSM(ielmn,M,K,L,NY,NX)-FOSN
+          OSM(ielmp,M,K,L,NY,NX)=OSM(ielmp,M,K,L,NY,NX)-FOSP
         ENDDO D1930
       ENDDO D1900
     ENDIF

@@ -1005,13 +1005,13 @@ module Hour1Mod
       OC=OC+OMEauto(ielmc,NB,L,NY,NX)
     ENDDO
 !  add microbial residue
-    OC=OC+SUM(ORC(1:ndbiomcp,1:jcplx,L,NY,NX))
+    OC=OC+SUM(ORM(ielmc,1:ndbiomcp,1:jcplx,L,NY,NX))
 !  add dissolved/sorbed OM and acetate
     OC=OC+SUM(DOM(idom_doc,1:jcplx,L,NY,NX))+SUM(DOM_Macp(idom_doc,1:jcplx,L,NY,NX)) &
-         +SUM(OHC(1:jcplx,L,NY,NX))+SUM(DOM(idom_acetate,1:jcplx,L,NY,NX)) &
-         +SUM(DOM_Macp(idom_acetate,1:jcplx,L,NY,NX))+SUM(OHA(1:jcplx,L,NY,NX))
+         +SUM(OHM(ielmc,1:jcplx,L,NY,NX))+SUM(DOM(idom_acetate,1:jcplx,L,NY,NX)) &
+         +SUM(DOM_Macp(idom_acetate,1:jcplx,L,NY,NX))+SUM(OHM(idom_acetate,1:jcplx,L,NY,NX))
 !  add OM complexes
-    OC=OC+SUM(OSC(1:jsken,1:jcplx,L,NY,NX))
+    OC=OC+SUM(OSM(ielmc,1:jsken,1:jcplx,L,NY,NX))
 !
     ORGCX(L,NY,NX)=OC
   ENDDO
@@ -1888,10 +1888,10 @@ module Hour1Mod
         ELSE
           OSP1=0.0_r8
         ENDIF
-        OSC(M,K,LFDPTH,NY,NX)=OSC(M,K,LFDPTH,NY,NX)+OSC1
+        OSM(ielmc,M,K,LFDPTH,NY,NX)=OSM(ielmc,M,K,LFDPTH,NY,NX)+OSC1
+        OSM(ielmn,M,K,LFDPTH,NY,NX)=OSM(ielmn,M,K,LFDPTH,NY,NX)+OSN1
+        OSM(ielmp,M,K,LFDPTH,NY,NX)=OSM(ielmp,M,K,LFDPTH,NY,NX)+OSP1
         OSA(M,K,LFDPTH,NY,NX)=OSA(M,K,LFDPTH,NY,NX)+OSC1*micpar%OMCI(1,K)
-        OSN(M,K,LFDPTH,NY,NX)=OSN(M,K,LFDPTH,NY,NX)+OSN1
-        OSP(M,K,LFDPTH,NY,NX)=OSP(M,K,LFDPTH,NY,NX)+OSP1
         IF(LFDPTH.EQ.0)THEN
           VGeomLayer(LFDPTH,NY,NX)=VGeomLayer(LFDPTH,NY,NX)+OSC1*ppmc/BulkDensLitR(micpar%k_fine_litr)
         ENDIF

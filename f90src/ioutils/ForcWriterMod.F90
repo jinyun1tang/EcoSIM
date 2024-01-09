@@ -28,7 +28,7 @@ implicit none
   contains
 
 !------------------------------------------------------------------------------------------
-  subroutine WriteBBGCForc(doy,year)
+  subroutine WriteBBGCFORC(doy,year)
   !
   ! DESCRIPTION:
   ! Write initial condition for the batch soil bgc model.
@@ -57,6 +57,7 @@ implicit none
     call ncd_defdim(ncf,'NumMicrbHetetrophCmplx',NumMicrbHetetrophCmplx,recordDimID)
     call ncd_defdim(ncf,'NumMicrobAutotrophCmplx',NumMicrobAutotrophCmplx,recordDimID)
     call ncd_defdim(ncf,'element',NumPlantChemElmnts,recordDimID)
+    call ncd_defdim(ncf,'ndoms',trc_confs%NDOMS,recordDimID)
     call ncd_defvar(ncf, 'pH', ncd_float, long_name='soil pH',  &
             units='none', missing_value=spval, fill_value=spval)
     call ncd_defvar(ncf, 'VLSoilPoreMicP', ncd_float, long_name='volume of soil layer',  &
@@ -135,30 +136,12 @@ implicit none
     call ncd_defvar(ncf, 'FOSRH', ncd_float, dim1name='jcplx',&
             long_name='fraction of total organic C in complex',  &
             units='none', missing_value=spval, fill_value=spval)
-    call ncd_defvar(ncf, 'OQC', ncd_float, dim1name='jcplx',&
-            long_name='dissolved organic C micropore',  &
-            units='gC d-2', missing_value=spval, fill_value=spval)
-    call ncd_defvar(ncf, 'OQN', ncd_float, dim1name='jcplx',&
-            long_name='dissolved organic N micropore',  &
-            units='gN d-2', missing_value=spval, fill_value=spval)
-    call ncd_defvar(ncf, 'OQP', ncd_float, dim1name='jcplx',&
-            long_name='dissolved organic P micropore',  &
-            units='gP d-2', missing_value=spval, fill_value=spval)
-    call ncd_defvar(ncf, 'OQA', ncd_float, dim1name='jcplx',&
-            long_name='dissolved acetate micropore',  &
-            units='gC d-2', missing_value=spval, fill_value=spval)
-    call ncd_defvar(ncf, 'OHA', ncd_float, dim1name='jcplx',&
-            long_name='adsorbed acetate',  &
-            units='gC d-2', missing_value=spval, fill_value=spval)
-    call ncd_defvar(ncf, 'OHC', ncd_float, dim1name='jcplx',&
-            long_name='adsorbed soil C',  &
-            units='gC d-2', missing_value=spval, fill_value=spval)
-    call ncd_defvar(ncf, 'OHN', ncd_float, dim1name='jcplx',&
-            long_name='adsorbed soil N',  &
-            units='gN d-2', missing_value=spval, fill_value=spval)
-    call ncd_defvar(ncf, 'OHP', ncd_float, dim1name='jcplx',&
-            long_name='adsorbed soil P',  &
-            units='gP d-2', missing_value=spval, fill_value=spval)
+    call ncd_defvar(ncf, 'OQM', ncd_float, dim1name='ndom',dim2name='jcplx',&
+            long_name='dissolved organic matter micropore',  &
+            units='g d-2', missing_value=spval, fill_value=spval)
+    call ncd_defvar(ncf, 'OHM', ncd_float, dim1name='ndoms',dim2name='jcplx',&
+            long_name='adsorbed soil organic matter',  &
+            units='g d-2', missing_value=spval, fill_value=spval)
     call ncd_defvar(ncf, 'ATCS',ncd_float,long_name='Mean annual temperature',  &
             units='oC', missing_value=spval, fill_value=spval)
 
@@ -168,27 +151,15 @@ implicit none
     call ncd_defvar(ncf, 'CPOSC', ncd_float, dim1name='jsken',&
             dim2name='jcplx',long_name='P:C ratios of SOM kinetic components in each complex',  &
             units='gN/gC', missing_value=spval, fill_value=spval)
-    call ncd_defvar(ncf, 'OSC', ncd_float, dim1name='jsken',&
-            dim2name='jcplx',long_name='humus soil C in each complex',  &
+    call ncd_defvar(ncf, 'OSM', ncd_float, dim1name='element',dim2name='jsken',&
+            dim3name='jcplx',long_name='humus soil C in each complex',  &
             units='gC d-2', missing_value=spval, fill_value=spval)
     call ncd_defvar(ncf, 'OSA', ncd_float, dim1name='jsken',&
             dim2name='jcplx',long_name='colonized soil C in each complex',  &
             units='gC d-2', missing_value=spval, fill_value=spval)
-    call ncd_defvar(ncf, 'OSN', ncd_float, dim1name='jsken',&
-            dim2name='jcplx',long_name='humus soil N in each complex',  &
+    call ncd_defvar(ncf, 'ORM', ncd_float, dim1name='element',dim2name='ndbiomcp',&
+            dim3name='jcplx',long_name='microbial residue C in each complex',  &
             units='gC d-2', missing_value=spval, fill_value=spval)
-    call ncd_defvar(ncf, 'OSP', ncd_float, dim1name='jsken',&
-            dim2name='jcplx',long_name='humus soil P in each complex',  &
-            units='gP d-2', missing_value=spval, fill_value=spval)
-    call ncd_defvar(ncf, 'ORC', ncd_float, dim1name='ndbiomcp',&
-            dim2name='jcplx',long_name='microbial residue C in each complex',  &
-            units='gC d-2', missing_value=spval, fill_value=spval)
-    call ncd_defvar(ncf, 'ORN', ncd_float, dim1name='ndbiomcp',&
-            dim2name='jcplx',long_name='microbial residue N in each complex',  &
-            units='gN d-2', missing_value=spval, fill_value=spval)
-    call ncd_defvar(ncf, 'ORP', ncd_float, dim1name='ndbiomcp',&
-            dim2name='jcplx',long_name='microbial residue P in each complex',  &
-            units='gP d-2', missing_value=spval, fill_value=spval)
     call ncd_defvar(ncf, 'OMEhetr', ncd_float,dim1name='element',&
             dim2name='NumLiveHeterBioms',dim3name='jcplx',&
             long_name='heterotrophic microbial biomass element in each complex',  &
@@ -281,28 +252,16 @@ implicit none
     call ncd_putvar(ncf,'BKDS',SoiBulkDensity(L,NY,NX))
 
     call ncd_putvar(ncf,'FOSRH',FOSRH(:,L,NY,NX))
-    call ncd_putvar(ncf,'OQC',DOM(idom_doc,:,L,NY,NX))
-    call ncd_putvar(ncf,'OQN',DOM(idom_don,:,L,NY,NX))
-    call ncd_putvar(ncf,'OQP',DOM(idom_dop,:,L,NY,NX))
-    call ncd_putvar(ncf,'OQA',DOM(idom_acetate,:,L,NY,NX))
-    call ncd_putvar(ncf,'OHA',OHC(:,L,NY,NX))
-    call ncd_putvar(ncf,'OHC',OHC(:,L,NY,NX))
-    call ncd_putvar(ncf,'OHN',OHN(:,L,NY,NX))
-    call ncd_putvar(ncf,'OHP',OHP(:,L,NY,NX))
+    call ncd_putvar(ncf,'OQM',DOM(:,:,L,NY,NX))
+    call ncd_putvar(ncf,'OHM',OHM(:,:,L,NY,NX))
 
     call ncd_putvar(ncf,'CNOSC',CNOSC(:,:,L,NY,NX))
     call ncd_putvar(ncf,'CPOSC',CPOSC(:,:,L,NY,NX))
     call ncd_putvar(ncf,'ATCS',ATCS(NY,NX))
-    call ncd_putvar(ncf,'OSC',OSC(:,:,L,NY,NX))
+    call ncd_putvar(ncf,'OSM',OSM(:,:,:,L,NY,NX))
     call ncd_putvar(ncf,'OSA',OSA(:,:,L,NY,NX))
-    call ncd_putvar(ncf,'OSN',OSN(:,:,L,NY,NX))
-    call ncd_putvar(ncf,'OSP',OSP(:,:,L,NY,NX))
-    call ncd_putvar(ncf,'ORC',ORC(:,:,L,NY,NX))
-    call ncd_putvar(ncf,'ORN',ORN(:,:,L,NY,NX))
-    call ncd_putvar(ncf,'ORP',ORP(:,:,L,NY,NX))
-
+    call ncd_putvar(ncf,'ORM',ORM(:,:,:,L,NY,NX))
     call ncd_putvar(ncf,'OMEhetr',OMEhetr(:,:,:,L,NY,NX))
-
     call ncd_putvar(ncf,'OMEauto',OMEauto(:,:,L,NY,NX))
 
     if(bgc_forc_conf%laddband)then

@@ -66,17 +66,10 @@ implicit none
     real(r8), allocatable :: CFOMC(:)  !allocation coefficient to humus fractions
     real(r8), allocatable :: CNOSC(:,:)
     real(r8), allocatable :: CPOSC(:,:)
-    real(r8), allocatable :: OSC(:,:)
-    real(r8), allocatable :: OSN(:,:)
-    real(r8), allocatable :: OSP(:,:)
+    real(r8), allocatable :: OSM(:,:,:)
     real(r8), allocatable :: OSA(:,:)
-    real(r8), allocatable :: ORC(:,:)
-    real(r8), allocatable :: ORN(:,:)
-    real(r8), allocatable :: ORP(:,:)
-    real(r8), allocatable :: OHA(:)
-    real(r8), allocatable :: OHC(:)
-    real(r8), allocatable :: OHN(:)
-    real(r8), allocatable :: OHP(:)
+    real(r8), allocatable :: ORM(:,:,:)
+    real(r8), allocatable :: OHM(:,:)
     real(r8), allocatable :: DOM(:,:)
     real(r8), allocatable :: OMEhetr(:,:,:)
     real(r8), allocatable :: OMEauto(:,:)
@@ -220,7 +213,7 @@ implicit none
 
 !------------------------------------------------------------------------------------------
 
-  subroutine ReadForc(forc,fname)
+  subroutine ReadFORC(forc,fname)
   use ncdio_pio
   implicit none
   type(forc_type), intent(inout) :: forc
@@ -245,18 +238,11 @@ implicit none
   NumMicbFunGroups    =get_dim_len(ncf,'NumMicbFunGroups')
   allocate(forc%OMEhetr(NumPlantChemElmnts,NumLiveHeterBioms,1:jcplx))
   allocate(forc%DOM(idom_beg:idom_end,1:jcplx))
-  allocate(forc%OSC(jsken,1:jcplx))
+  allocate(forc%OSM(1:NumPlantChemElmnts,jsken,1:jcplx))
   allocate(forc%OSA(jsken,1:jcplx))
-  allocate(forc%OSN(jsken,1:jcplx))
-  allocate(forc%OSP(jsken,1:jcplx))
-  allocate(forc%ORC(ndbiomcp,1:jcplx))
-  allocate(forc%ORN(ndbiomcp,1:jcplx))
-  allocate(forc%ORP(ndbiomcp,1:jcplx))
+  allocate(forc%ORM(1:NumPlantChemElmnts,ndbiomcp,1:jcplx))
   allocate(forc%OMEauto(NumPlantChemElmnts,NumLiveAutoBioms))
-  allocate(forc%OHC(1:jcplx))
-  allocate(forc%OHN(1:jcplx))
-  allocate(forc%OHP(1:jcplx))
-  allocate(forc%OHA(1:jcplx))
+  allocate(forc%OHM(idom_beg:idom_end,1:jcplx))
   allocate(forc%CFOMC(ndbiomcp))
   allocate(forc%CNOSC(1:jsken,1:jcplx))
   allocate(forc%CPOSC(1:jsken,1:jcplx))
@@ -305,17 +291,10 @@ implicit none
   call ncd_getvar(ncf,'ATCS',forc%ATCS)
   call ncd_getvar(ncf,'OMEhetr',forc%OMEhetr)
   call ncd_getvar(ncf,'OMEauto',forc%OMEauto)
-  call ncd_getvar(ncf,'OSC',forc%OSC)
+  call ncd_getvar(ncf,'OSM',forc%OSM)
   call ncd_getvar(ncf,'OSA',forc%OSA)
-  call ncd_getvar(ncf,'OSN',forc%OSN)
-  call ncd_getvar(ncf,'OSP',forc%OSP)
-  call ncd_getvar(ncf,'ORC',forc%ORC)
-  call ncd_getvar(ncf,'ORN',forc%ORN)
-  call ncd_getvar(ncf,'ORP',forc%ORP)
-  call ncd_getvar(ncf,'OHC',forc%OHC)
-  call ncd_getvar(ncf,'OHN',forc%OHN)
-  call ncd_getvar(ncf,'OHP',forc%OHP)
-  call ncd_getvar(ncf,'OHA',forc%OHA)
+  call ncd_getvar(ncf,'ORM',forc%ORM)
+  call ncd_getvar(ncf,'OHM',forc%OHM)
   call ncd_getvar(ncf,'DOM',forc%DOM)
   call ncd_getvar(ncf,'THETY',forc%THETY)
   call ncd_getvar(ncf,'PSIMX',forc%LOGPSIMX)
@@ -355,7 +334,7 @@ implicit none
   end subroutine ReadForc
 !------------------------------------------------------------------------------------------
 
-  subroutine UpdateForc(forc, forctype)
+  subroutine UpdateFORC(forc, forctype)
   use MiniFuncMod
   implicit none
   integer, intent(in) :: forctype  ! 0: (transient), 1: T const, 2: water const, 3: T and water const

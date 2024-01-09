@@ -1984,9 +1984,7 @@ module MicAutoCPLXMod
     litrm     => micfor%litrm  , &
     CFOMC     => micfor%CFOMC  , &
     CFOMCU    => micfor%CFOMCU , &
-    OSC       => micstt%OSC    , &
-    OSN       => micstt%OSN    , &
-    OSP       => micstt%OSP    , &
+    OSM       => micstt%OSM    , &
     OMEauto     => micstt%OMEauto  , &
     OSC14U    => micstt%OSC14U , &
     OSN14U    => micstt%OSN14U , &
@@ -2018,12 +2016,13 @@ module MicAutoCPLXMod
 !     RHMMC,RHMMN,RHMMC=transfer of senesence litterfall C,N,P to humus
 !
           IF(.not.litrm)THEN
-            OSC(iprotein,k_POM)=OSC(iprotein,k_POM)+CFOMC(1)*(RHOMCff(M,NGL)+RHMMCff(M,NGL))
-            OSN(iprotein,k_POM)=OSN(iprotein,k_POM)+CFOMC(1)*(RHOMNff(M,NGL)+RHMMNff(M,NGL))
-            OSP(iprotein,k_POM)=OSP(iprotein,k_POM)+CFOMC(1)*(RHOMPff(M,NGL)+RHMMPff(M,NGL))
-            OSC(icarbhyro,k_POM)=OSC(icarbhyro,k_POM)+CFOMC(2)*(RHOMCff(M,NGL)+RHMMCff(M,NGL))
-            OSN(icarbhyro,k_POM)=OSN(icarbhyro,k_POM)+CFOMC(2)*(RHOMNff(M,NGL)+RHMMNff(M,NGL))
-            OSP(icarbhyro,k_POM)=OSP(icarbhyro,k_POM)+CFOMC(2)*(RHOMPff(M,NGL)+RHMMPff(M,NGL))
+            OSM(ielmc,iprotein,k_POM)=OSM(ielmc,iprotein,k_POM)+CFOMC(1)*(RHOMCff(M,NGL)+RHMMCff(M,NGL))
+            OSM(ielmn,iprotein,k_POM)=OSM(ielmn,iprotein,k_POM)+CFOMC(1)*(RHOMNff(M,NGL)+RHMMNff(M,NGL))
+            OSM(ielmp,iprotein,k_POM)=OSM(ielmp,iprotein,k_POM)+CFOMC(1)*(RHOMPff(M,NGL)+RHMMPff(M,NGL))
+            
+            OSM(ielmc,icarbhyro,k_POM)=OSM(ielmc,icarbhyro,k_POM)+CFOMC(2)*(RHOMCff(M,NGL)+RHMMCff(M,NGL))
+            OSM(ielmn,icarbhyro,k_POM)=OSM(ielmn,icarbhyro,k_POM)+CFOMC(2)*(RHOMNff(M,NGL)+RHMMNff(M,NGL))
+            OSM(ielmp,icarbhyro,k_POM)=OSM(ielmp,icarbhyro,k_POM)+CFOMC(2)*(RHOMPff(M,NGL)+RHMMPff(M,NGL))
           ELSE
             OSC14U=OSC14U+CFOMCU(1)*(RHOMCff(M,NGL)+RHMMCff(M,NGL))
             OSN14U=OSN14U+CFOMCU(1)*(RHOMNff(M,NGL)+RHMMNff(M,NGL))

@@ -175,9 +175,7 @@ type, public :: NitroAQMFluxDiagType
   real(r8),allocatable :: RVOXB(:)
   real(r8) :: RVOXAAO
   real(r8) :: RVOXBAO
-  real(r8),allocatable :: XOMCZ(:,:,:)
-  real(r8),allocatable :: XOMNZ(:,:,:)
-  real(r8),allocatable :: XOMPZ(:,:,:)
+  real(r8),allocatable :: XOMZ(:,:,:,:)
   real(r8),allocatable :: RIP14(:,:)
   real(r8),allocatable :: RIP1B(:,:)
   real(r8),allocatable :: RIP14R(:,:)
@@ -262,36 +260,19 @@ type, public :: NitroAQMFluxDiagType
   end type NitroMicFluxType
 
   type, public :: NitroOMcplxFluxType
-    real(r8),allocatable :: RDOSC(:,:)
-    real(r8),allocatable :: RDOSN(:,:)
-    real(r8),allocatable :: RDOSP(:,:)
-    real(r8),allocatable :: RHOSC(:,:)
-    real(r8),allocatable :: RHOSN(:,:)
-    real(r8),allocatable :: RHOSP(:,:)
-    real(r8),allocatable :: RCOSC(:,:)
-    real(r8),allocatable :: RCOSN(:,:)
-    real(r8),allocatable :: RCOSP(:,:)
-    real(r8),allocatable :: RDORC(:,:)
-    real(r8),allocatable :: RDORN(:,:)
-    real(r8),allocatable :: RDORP(:,:)
-    real(r8),allocatable :: RDOHC(:)
-    real(r8),allocatable :: RDOHN(:)
-    real(r8),allocatable :: RDOHP(:)
-    real(r8),allocatable :: RDOHA(:)
-    real(r8),allocatable :: CSORP(:)
-    real(r8),allocatable :: ZSORP(:)
-    real(r8),allocatable :: PSORP(:)
-    real(r8),allocatable :: CSORPA(:)
+    real(r8),allocatable :: RDOSM(:,:,:)
+    real(r8),allocatable :: RHOSM(:,:,:)
+    real(r8),allocatable :: RCOSM(:,:,:)
+    real(r8),allocatable :: RDORM(:,:,:)
+    real(r8),allocatable :: RDOHM(:,:)
+    real(r8),allocatable :: OMSORP(:,:)
     real(r8),allocatable :: TCGOQC(:)
     real(r8),allocatable :: TCGOAC(:)
     real(r8),allocatable :: TCGOMN(:)
     real(r8),allocatable :: TCGOMP(:)
     real(r8),allocatable :: ROQCK(:)
     real(r8),allocatable :: XOQCK(:)
-    real(r8),allocatable :: XOQCZ(:)
-    real(r8),allocatable :: XOQNZ(:)
-    real(r8),allocatable :: XOQPZ(:)
-    real(r8),allocatable :: XOQAZ(:)
+    real(r8),allocatable :: XOQMZ(:,:)
   contains
     procedure, public :: Init => nit_omcplxf_init
     procedure, public :: ZeroOut => nit_omcplxf_zero
@@ -483,9 +464,7 @@ type, public :: NitroAQMFluxDiagType
 
   allocate(this%RVOXA(NumMicrobAutotrophCmplx))
   allocate(this%RVOXB(NumMicrobAutotrophCmplx))
-  allocate(this%XOMCZ(3,NumMicrbHetetrophCmplx,1:jcplx))
-  allocate(this%XOMNZ(3,NumMicrbHetetrophCmplx,1:jcplx))
-  allocate(this%XOMPZ(3,NumMicrbHetetrophCmplx,1:jcplx))
+  allocate(this%XOMZ(1:NumPlantChemElmnts,3,NumMicrbHetetrophCmplx,1:jcplx))
   allocate(this%ROQCD(NumMicrbHetetrophCmplx,1:jcplx))
   allocate(this%RCCMC(ndbiomcp,NumMicrbHetetrophCmplx,1:jcplx))
   allocate(this%RCCMN(ndbiomcp,NumMicrbHetetrophCmplx,1:jcplx))
@@ -693,9 +672,7 @@ type, public :: NitroAQMFluxDiagType
   this%RCH4X = 0._r8
   this%RVOXA = 0._r8
   this%RVOXB = 0._r8
-  this%XOMCZ = 0._r8
-  this%XOMNZ = 0._r8
-  this%XOMPZ = 0._r8
+  this%XOMZ = 0._r8
   this%RIP14 = 0._r8
   this%RIP1B = 0._r8
   this%RIP14R = 0._r8
@@ -861,9 +838,7 @@ type, public :: NitroAQMFluxDiagType
   call destroy(this%RCH4X)
   call destroy(this%RVOXA)
   call destroy(this%RVOXB)
-  call destroy(this%XOMCZ)
-  call destroy(this%XOMNZ)
-  call destroy(this%XOMPZ)
+  call destroy(this%XOMZ)
   call destroy(this%RIP14)
   call destroy(this%RIP1B)
   call destroy(this%RIP14R)
@@ -992,36 +967,19 @@ type, public :: NitroAQMFluxDiagType
   nkinets=micpar%jsken
   ncplx=micpar%jcplx
   ndbiomcp=micpar%ndbiomcp
-  allocate(this%RDOSC(nkinets,1:ncplx))
-  allocate(this%RDOSN(nkinets,1:ncplx))
-  allocate(this%RDOSP(nkinets,1:ncplx))
-  allocate(this%RHOSC(nkinets,1:ncplx))
-  allocate(this%RHOSN(nkinets,1:ncplx))
-  allocate(this%RHOSP(nkinets,1:ncplx))
-  allocate(this%RCOSC(nkinets,1:ncplx))
-  allocate(this%RCOSN(nkinets,1:ncplx))
-  allocate(this%RCOSP(nkinets,1:ncplx))
-  allocate(this%RDORC(ndbiomcp,1:ncplx))
-  allocate(this%RDORN(ndbiomcp,1:ncplx))
-  allocate(this%RDORP(ndbiomcp,1:ncplx))
-  allocate(this%RDOHC(1:ncplx))
-  allocate(this%RDOHN(1:ncplx))
-  allocate(this%RDOHP(1:ncplx))
-  allocate(this%RDOHA(1:ncplx))
-  allocate(this%CSORP(1:ncplx))
-  allocate(this%ZSORP(1:ncplx))
-  allocate(this%PSORP(1:ncplx))
-  allocate(this%CSORPA(1:ncplx))
+  allocate(this%RDOSM(NumPlantChemElmnts,nkinets,1:ncplx))
+  allocate(this%RHOSM(1:NumPlantChemElmnts,nkinets,1:ncplx))
+  allocate(this%RCOSM(1:NumPlantChemElmnts,nkinets,1:ncplx))
+  allocate(this%RDORM(1:NumPlantChemElmnts,ndbiomcp,1:ncplx))
+  allocate(this%RDOHM(idom_beg:idom_end,1:ncplx))
+  allocate(this%OMSORP(idom_beg:idom_end,1:ncplx))
   allocate(this%TCGOQC(1:ncplx+1))
   allocate(this%TCGOAC(1:ncplx+1))
   allocate(this%TCGOMN(1:ncplx+1))
   allocate(this%TCGOMP(1:ncplx+1))
   allocate(this%ROQCK(1:ncplx))
   allocate(this%XOQCK(1:ncplx))
-  allocate(this%XOQCZ(1:ncplx))
-  allocate(this%XOQNZ(1:ncplx))
-  allocate(this%XOQPZ(1:ncplx))
-  allocate(this%XOQAZ(1:ncplx))
+  allocate(this%XOQMZ(idom_beg:idom_end,1:ncplx))
 
   call this%ZeroOut()
   end subroutine nit_omcplxf_init
@@ -1031,36 +989,19 @@ type, public :: NitroAQMFluxDiagType
   implicit none
   class(NitroOMcplxFluxType) :: this
 
-  call destroy(this%RDOSC)
-  call destroy(this%RDOSN)
-  call destroy(this%RDOSP)
-  call destroy(this%RHOSC)
-  call destroy(this%RHOSN)
-  call destroy(this%RHOSP)
-  call destroy(this%RCOSC)
-  call destroy(this%RCOSN)
-  call destroy(this%RCOSP)
-  call destroy(this%RDORC)
-  call destroy(this%RDORN)
-  call destroy(this%RDORP)
-  call destroy(this%RDOHC)
-  call destroy(this%RDOHN)
-  call destroy(this%RDOHP)
-  call destroy(this%RDOHA)
-  call destroy(this%CSORP)
-  call destroy(this%ZSORP)
-  call destroy(this%PSORP)
-  call destroy(this%CSORPA)
+  call destroy(this%RDOSM)
+  call destroy(this%RHOSM)
+  call destroy(this%RCOSM)
+  call destroy(this%RDORM)
+  call destroy(this%RDOHM)
+  call destroy(this%OMSORP)
   call destroy(this%TCGOQC)
   call destroy(this%TCGOAC)
   call destroy(this%TCGOMN)
   call destroy(this%TCGOMP)
   call destroy(this%ROQCK)
   call destroy(this%XOQCK)
-  call destroy(this%XOQCZ)
-  call destroy(this%XOQNZ)
-  call destroy(this%XOQPZ)
-  call destroy(this%XOQAZ)
+  call destroy(this%XOQMZ)
 
   end subroutine nit_omcplxf_destroy
 !------------------------------------------------------------------------------------------
@@ -1069,36 +1010,19 @@ type, public :: NitroAQMFluxDiagType
   implicit none
   class(NitroOMcplxFluxType) :: this
 
-  this%RDOSC=0._r8
-  this%RDOSN=0._r8
-  this%RDOSP=0._r8
-  this%RHOSC=0._r8
-  this%RHOSN=0._r8
-  this%RHOSP=0._r8
-  this%RCOSC=0._r8
-  this%RCOSN=0._r8
-  this%RCOSP=0._r8
-  this%RDORC=0._r8
-  this%RDORN=0._r8
-  this%RDORP=0._r8
-  this%RDOHC=0._r8
-  this%RDOHN=0._r8
-  this%RDOHP=0._r8
-  this%RDOHA=0._r8
-  this%CSORP=0._r8
-  this%ZSORP=0._r8
-  this%PSORP=0._r8
-  this%CSORPA=0._r8
+  this%RDOSM=0._r8
+  this%RHOSM=0._r8
+  this%RCOSM=0._r8
+  this%RDORM=0._r8
+  this%RDOHM=0._r8
+  this%OMSORP=0._r8
   this%TCGOQC=0._r8
   this%TCGOAC=0._r8
   this%TCGOMN=0._r8
   this%TCGOMP=0._r8
   this%ROQCK=0._r8
   this%XOQCK=0._r8
-  this%XOQCZ=0._r8
-  this%XOQNZ=0._r8
-  this%XOQPZ=0._r8
-  this%XOQAZ=0._r8
+  this%XOQMZ=0._r8
   end subroutine nit_omcplxf_zero
 !------------------------------------------------------------------------------------------
 

@@ -170,9 +170,9 @@ module NitroDisturbMod
         D2900: DO K=1,jcplx
           IF(L.NE.0.OR.(micpar%is_litter(K)))THEN
             D2940: DO M=1,ndbiomcp
-              OCH=DCORPC*ORC(M,K,L,NY,NX)
-              ONH=DCORPC*ORN(M,K,L,NY,NX)
-              OPH=DCORPC*ORP(M,K,L,NY,NX)
+              OCH=DCORPC*ORM(ielmc,M,K,L,NY,NX)
+              ONH=DCORPC*ORM(ielmn,M,K,L,NY,NX)
+              OPH=DCORPC*ORM(ielmp,M,K,L,NY,NX)
               ONX=EFIRE(1,ITILL(I,NY,NX))*ONH
               OPX=EFIRE(2,ITILL(I,NY,NX))*OPH
               IF(micpar%is_litter(K))THEN
@@ -182,12 +182,12 @@ module NitroDisturbMod
                 ONL(1,K)=ONL(1,K)+ONH-ONX
                 OPL(1,K)=OPL(1,K)+OPH-OPX
               ENDIF
-              ORC(M,K,L,NY,NX)=ORC(M,K,L,NY,NX)-OCH
-              ORN(M,K,L,NY,NX)=ORN(M,K,L,NY,NX)-ONH
-              ORP(M,K,L,NY,NX)=ORP(M,K,L,NY,NX)-OPH
-              DC=DC+ORC(M,K,L,NY,NX)
-              DN=DN+ORN(M,K,L,NY,NX)
-              DP=DP+ORP(M,K,L,NY,NX)
+              ORM(ielmc,M,K,L,NY,NX)=ORM(ielmc,M,K,L,NY,NX)-OCH
+              ORM(ielmn,M,K,L,NY,NX)=ORM(ielmn,M,K,L,NY,NX)-ONH
+              ORM(ielmp,M,K,L,NY,NX)=ORM(ielmp,M,K,L,NY,NX)-OPH
+              DC=DC+ORM(ielmc,M,K,L,NY,NX)
+              DN=DN+ORM(ielmn,M,K,L,NY,NX)
+              DP=DP+ORM(ielmp,M,K,L,NY,NX)
               OC=OC+OCH
               ON=ON+ONX
               OP=OP+OPX
@@ -238,10 +238,10 @@ module NitroDisturbMod
 !
 !     REMOVE ADSORBED OM
 !
-            OCH=DCORPC*OHC(K,L,NY,NX)
-            ONH=DCORPC*OHN(K,L,NY,NX)
-            OPH=DCORPC*OHP(K,L,NY,NX)
-            OAH=DCORPC*OHA(K,L,NY,NX)
+            OCH=DCORPC*OHM(ielmc,K,L,NY,NX)
+            ONH=DCORPC*OHM(ielmn,K,L,NY,NX)
+            OPH=DCORPC*OHM(ielmp,K,L,NY,NX)
+            OAH=DCORPC*OHM(idom_acetate,K,L,NY,NX)
             ONX=EFIRE(1,ITILL(I,NY,NX))*ONH
             OPX=EFIRE(2,ITILL(I,NY,NX))*OPH
             IF(micpar%is_litter(K))THEN
@@ -251,14 +251,14 @@ module NitroDisturbMod
               ONL(1,K)=ONL(1,K)+ONH-ONX
               OPL(1,K)=OPL(1,K)+OPH-OPX
             ENDIF
-            OHC(K,L,NY,NX)=OHC(K,L,NY,NX)-OCH
-            OHN(K,L,NY,NX)=OHN(K,L,NY,NX)-ONH
-            OHP(K,L,NY,NX)=OHP(K,L,NY,NX)-OPH
-            OHA(K,L,NY,NX)=OHA(K,L,NY,NX)-OAH
-            DC=DC+DOM(idom_doc,K,L,NY,NX)+DOM_Macp(idom_doc,K,L,NY,NX)+OHC(K,L,NY,NX) &
-              +DOM(idom_acetate,K,L,NY,NX)+DOM_Macp(idom_acetate,K,L,NY,NX)+OHA(K,L,NY,NX)
-            DN=DN+DOM(idom_don,K,L,NY,NX)+DOM_Macp(idom_don,K,L,NY,NX)+OHN(K,L,NY,NX)
-            DP=DP+DOM(idom_dop,K,L,NY,NX)+DOM_Macp(idom_dop,K,L,NY,NX)+OHP(K,L,NY,NX)
+            OHM(ielmc,K,L,NY,NX)=OHM(ielmc,K,L,NY,NX)-OCH
+            OHM(ielmn,K,L,NY,NX)=OHM(ielmn,K,L,NY,NX)-ONH
+            OHM(ielmp,K,L,NY,NX)=OHM(ielmp,K,L,NY,NX)-OPH
+            OHM(idom_acetate,K,L,NY,NX)=OHM(idom_acetate,K,L,NY,NX)-OAH
+            DC=DC+DOM(idom_doc,K,L,NY,NX)+DOM_Macp(idom_doc,K,L,NY,NX)+OHM(ielmc,K,L,NY,NX) &
+              +DOM(idom_acetate,K,L,NY,NX)+DOM_Macp(idom_acetate,K,L,NY,NX)+OHM(idom_acetate,K,L,NY,NX)
+            DN=DN+DOM(idom_don,K,L,NY,NX)+DOM_Macp(idom_don,K,L,NY,NX)+OHM(ielmn,K,L,NY,NX)
+            DP=DP+DOM(idom_dop,K,L,NY,NX)+DOM_Macp(idom_dop,K,L,NY,NX)+OHM(ielmp,K,L,NY,NX)
             OC=OC+OCH
             ON=ON+ONX
             OP=OP+OPX
@@ -266,21 +266,21 @@ module NitroDisturbMod
 !     REMOVE RESIDUE
 !
             D2930: DO M=1,jsken
-              OCH=DCORPC*OSC(M,K,L,NY,NX)
+              OCH=DCORPC*OSM(ielmc,M,K,L,NY,NX)
+              ONH=DCORPC*OSM(ielmn,M,K,L,NY,NX)
+              OPH=DCORPC*OSM(ielmp,M,K,L,NY,NX)
               OCA=DCORPC*OSA(M,K,L,NY,NX)
-              ONH=DCORPC*OSN(M,K,L,NY,NX)
-              OPH=DCORPC*OSP(M,K,L,NY,NX)
               ONX=EFIRE(1,ITILL(I,NY,NX))*ONH
               OPX=EFIRE(2,ITILL(I,NY,NX))*OPH
               ONL(M,K)=ONL(M,K)+ONH-ONX
               OPL(M,K)=OPL(M,K)+OPH-OPX
-              OSC(M,K,L,NY,NX)=OSC(M,K,L,NY,NX)-OCH
-              OSA(M,K,L,NY,NX)=OSA(M,K,L,NY,NX)-OCA
-              OSN(M,K,L,NY,NX)=OSN(M,K,L,NY,NX)-ONH
-              OSP(M,K,L,NY,NX)=OSP(M,K,L,NY,NX)-OPH
-              DC=DC+OSC(M,K,L,NY,NX)
-              DN=DN+OSN(M,K,L,NY,NX)
-              DP=DP+OSP(M,K,L,NY,NX)
+              OSM(ielmc,M,K,L,NY,NX)=OSM(ielmc,M,K,L,NY,NX)-OCH
+              OSM(ielmn,M,K,L,NY,NX)=OSM(ielmn,M,K,L,NY,NX)-ONH
+              OSM(ielmp,M,K,L,NY,NX)=OSM(ielmp,M,K,L,NY,NX)-OPH
+              OSA(M,K,L,NY,NX)=OSA(M,K,L,NY,NX)-OCA              
+              DC=DC+OSM(ielmc,M,K,L,NY,NX)
+              DN=DN+OSM(ielmn,M,K,L,NY,NX)
+              DP=DP+OSM(ielmp,M,K,L,NY,NX)
               OC=OC+OCH
               ON=ON+ONX
               OP=OP+OPX
@@ -292,8 +292,8 @@ module NitroDisturbMod
 !
         D2905: DO K=1,jcplx
           DO  M=1,jsken
-            OSN(M,K,L,NY,NX)=OSN(M,K,L,NY,NX)+ONL(M,K)
-            OSP(M,K,L,NY,NX)=OSP(M,K,L,NY,NX)+OPL(M,K)
+            OSM(ielmn,M,K,L,NY,NX)=OSM(ielmn,M,K,L,NY,NX)+ONL(M,K)
+            OSM(ielmp,M,K,L,NY,NX)=OSM(ielmp,M,K,L,NY,NX)+OPL(M,K)
             DN=DN+ONL(M,K)
             DP=DP+OPL(M,K)
           enddo

@@ -535,19 +535,20 @@ module ErosionMod
 
               DO  K=1,jcplx
                 DO  M=1,ndbiomcp
-                  ORCER(M,K,N,2,N5,N4)=FSEDER*ORC(M,K,NU(N2,N1),N2,N1)
-                  ORNER(M,K,N,2,N5,N4)=FSEDER*ORN(M,K,NU(N2,N1),N2,N1)
-                  ORPER(M,K,N,2,N5,N4)=FSEDER*ORP(M,K,NU(N2,N1),N2,N1)
+                  ORCER(M,K,N,2,N5,N4)=FSEDER*ORM(ielmc,M,K,NU(N2,N1),N2,N1)
+                  ORNER(M,K,N,2,N5,N4)=FSEDER*ORM(ielmn,M,K,NU(N2,N1),N2,N1)
+                  ORPER(M,K,N,2,N5,N4)=FSEDER*ORM(ielmp,M,K,NU(N2,N1),N2,N1)
                 ENDDO
-                OHCER(K,N,2,N5,N4)=FSEDER*OHC(K,NU(N2,N1),N2,N1)
-                OHNER(K,N,2,N5,N4)=FSEDER*OHN(K,NU(N2,N1),N2,N1)
-                OHPER(K,N,2,N5,N4)=FSEDER*OHP(K,NU(N2,N1),N2,N1)
-                OHAER(K,N,2,N5,N4)=FSEDER*OHA(K,NU(N2,N1),N2,N1)
+                OHCER(K,N,2,N5,N4)=FSEDER*OHM(ielmc,K,NU(N2,N1),N2,N1)
+                OHNER(K,N,2,N5,N4)=FSEDER*OHM(ielmn,K,NU(N2,N1),N2,N1)
+                OHPER(K,N,2,N5,N4)=FSEDER*OHM(ielmp,K,NU(N2,N1),N2,N1)
+                OHAER(K,N,2,N5,N4)=FSEDER*OHM(idom_acetate,K,NU(N2,N1),N2,N1)
                 DO  M=1,jsken
-                  OSCER(M,K,N,2,N5,N4)=FSEDER*OSC(M,K,NU(N2,N1),N2,N1)
+                  OSCER(M,K,N,2,N5,N4)=FSEDER*OSM(ielmc,M,K,NU(N2,N1),N2,N1)
+                  OSNER(M,K,N,2,N5,N4)=FSEDER*OSM(ielmn,M,K,NU(N2,N1),N2,N1)
+                  OSPER(M,K,N,2,N5,N4)=FSEDER*OSM(ielmp,M,K,NU(N2,N1),N2,N1)
+
                   OSAER(M,K,N,2,N5,N4)=FSEDER*OSA(M,K,NU(N2,N1),N2,N1)
-                  OSNER(M,K,N,2,N5,N4)=FSEDER*OSN(M,K,NU(N2,N1),N2,N1)
-                  OSPER(M,K,N,2,N5,N4)=FSEDER*OSP(M,K,NU(N2,N1),N2,N1)
                 ENDDO
               ENDDO
             ELSE
@@ -696,19 +697,19 @@ module ErosionMod
 
                 DO  K=1,jcplx
                   DO  M=1,ndbiomcp
-                    ORCER(M,K,N,1,N5B,N4B)=FSEDER*ORC(M,K,NU(N2,N1),N2,N1)
-                    ORNER(M,K,N,1,N5B,N4B)=FSEDER*ORN(M,K,NU(N2,N1),N2,N1)
-                    ORPER(M,K,N,1,N5B,N4B)=FSEDER*ORP(M,K,NU(N2,N1),N2,N1)
+                    ORCER(M,K,N,1,N5B,N4B)=FSEDER*ORM(ielmc,M,K,NU(N2,N1),N2,N1)
+                    ORNER(M,K,N,1,N5B,N4B)=FSEDER*ORM(ielmn,M,K,NU(N2,N1),N2,N1)
+                    ORPER(M,K,N,1,N5B,N4B)=FSEDER*ORM(ielmp,M,K,NU(N2,N1),N2,N1)
                   ENDDO
-                  OHCER(K,N,1,N5B,N4B)=FSEDER*OHC(K,NU(N2,N1),N2,N1)
-                  OHNER(K,N,1,N5B,N4B)=FSEDER*OHN(K,NU(N2,N1),N2,N1)
-                  OHPER(K,N,1,N5B,N4B)=FSEDER*OHP(K,NU(N2,N1),N2,N1)
-                  OHAER(K,N,1,N5B,N4B)=FSEDER*OHA(K,NU(N2,N1),N2,N1)
+                  OHCER(K,N,1,N5B,N4B)=FSEDER*OHM(ielmc,K,NU(N2,N1),N2,N1)
+                  OHNER(K,N,1,N5B,N4B)=FSEDER*OHM(ielmn,K,NU(N2,N1),N2,N1)
+                  OHPER(K,N,1,N5B,N4B)=FSEDER*OHM(ielmp,K,NU(N2,N1),N2,N1)
+                  OHAER(K,N,1,N5B,N4B)=FSEDER*OHM(idom_acetate,K,NU(N2,N1),N2,N1)
                   DO  M=1,jsken
-                    OSCER(M,K,N,1,N5B,N4B)=FSEDER*OSC(M,K,NU(N2,N1),N2,N1)
+                    OSCER(M,K,N,1,N5B,N4B)=FSEDER*OSM(ielmc,M,K,NU(N2,N1),N2,N1)
                     OSAER(M,K,N,1,N5B,N4B)=FSEDER*OSA(M,K,NU(N2,N1),N2,N1)
-                    OSNER(M,K,N,1,N5B,N4B)=FSEDER*OSN(M,K,NU(N2,N1),N2,N1)
-                    OSPER(M,K,N,1,N5B,N4B)=FSEDER*OSP(M,K,NU(N2,N1),N2,N1)
+                    OSNER(M,K,N,1,N5B,N4B)=FSEDER*OSM(ielmn,M,K,NU(N2,N1),N2,N1)
+                    OSPER(M,K,N,1,N5B,N4B)=FSEDER*OSM(ielmp,M,K,NU(N2,N1),N2,N1)
                   ENDDO
                 ENDDO
               ELSE
@@ -988,19 +989,19 @@ module ErosionMod
 
               DO  K=1,jcplx
                 DO  M=1,ndbiomcp
-                  ORCER(M,K,N,NN,M5,M4)=FSEDER*ORC(M,K,NU(N2,N1),N2,N1)
-                  ORNER(M,K,N,NN,M5,M4)=FSEDER*ORN(M,K,NU(N2,N1),N2,N1)
-                  ORPER(M,K,N,NN,M5,M4)=FSEDER*ORP(M,K,NU(N2,N1),N2,N1)
+                  ORCER(M,K,N,NN,M5,M4)=FSEDER*ORM(ielmc,M,K,NU(N2,N1),N2,N1)
+                  ORNER(M,K,N,NN,M5,M4)=FSEDER*ORM(ielmn,M,K,NU(N2,N1),N2,N1)
+                  ORPER(M,K,N,NN,M5,M4)=FSEDER*ORM(ielmp,M,K,NU(N2,N1),N2,N1)
                 ENDDO
-                OHCER(K,N,NN,M5,M4)=FSEDER*OHC(K,NU(N2,N1),N2,N1)
-                OHNER(K,N,NN,M5,M4)=FSEDER*OHN(K,NU(N2,N1),N2,N1)
-                OHPER(K,N,NN,M5,M4)=FSEDER*OHP(K,NU(N2,N1),N2,N1)
-                OHAER(K,N,NN,M5,M4)=FSEDER*OHA(K,NU(N2,N1),N2,N1)
+                OHCER(K,N,NN,M5,M4)=FSEDER*OHM(ielmc,K,NU(N2,N1),N2,N1)
+                OHNER(K,N,NN,M5,M4)=FSEDER*OHM(ielmn,K,NU(N2,N1),N2,N1)
+                OHPER(K,N,NN,M5,M4)=FSEDER*OHM(ielmp,K,NU(N2,N1),N2,N1)
+                OHAER(K,N,NN,M5,M4)=FSEDER*OHM(idom_acetate,K,NU(N2,N1),N2,N1)
                 DO  M=1,jsken
-                  OSCER(M,K,N,NN,M5,M4)=FSEDER*OSC(M,K,NU(N2,N1),N2,N1)
+                  OSCER(M,K,N,NN,M5,M4)=FSEDER*OSM(ielmc,M,K,NU(N2,N1),N2,N1)
                   OSAER(M,K,N,NN,M5,M4)=FSEDER*OSA(M,K,NU(N2,N1),N2,N1)
-                  OSNER(M,K,N,NN,M5,M4)=FSEDER*OSN(M,K,NU(N2,N1),N2,N1)
-                  OSPER(M,K,N,NN,M5,M4)=FSEDER*OSP(M,K,NU(N2,N1),N2,N1)
+                  OSNER(M,K,N,NN,M5,M4)=FSEDER*OSM(ielmn,M,K,NU(N2,N1),N2,N1)
+                  OSPER(M,K,N,NN,M5,M4)=FSEDER*OSM(ielmp,M,K,NU(N2,N1),N2,N1)
                 ENDDO
               ENDDO
             ENDIF

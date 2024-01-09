@@ -15,16 +15,9 @@ module SOMDataType
   real(r8),target,allocatable :: CFOSC(:,:,:,:,:)                   !fraction of SOC in kinetic components
   real(r8),target,allocatable :: CNOSC(:,:,:,:,:)                   !N:C,ratios of SOC kinetic components
   real(r8),target,allocatable :: CPOSC(:,:,:,:,:)                   !P:C ratios of SOC kinetic components
-  real(r8),target,allocatable :: OSC(:,:,:,:,:)                     !humus soil C	[g d-2]
-  real(r8),target,allocatable :: OSN(:,:,:,:,:)                     !humus soil N	[g d-2]
-  real(r8),target,allocatable :: OSP(:,:,:,:,:)                     !humus soil P	[g d-2]
-  real(r8),target,allocatable :: OHC(:,:,:,:)                       !adsorbed soil C	[g d-2]
-  real(r8),target,allocatable :: OHN(:,:,:,:)                       !adsorbed soil N	[g d-2]
-  real(r8),target,allocatable :: OHP(:,:,:,:)                       !adsorbed soil P	[g d-2]
-  real(r8),target,allocatable :: OHA(:,:,:,:)                       !adsorbed soil acetate	[g d-2]
-  real(r8),target,allocatable :: ORC(:,:,:,:,:)                     !microbial residue [C	g d-2]
-  real(r8),target,allocatable :: ORN(:,:,:,:,:)                     !microbial residue N	[g d-2]
-  real(r8),target,allocatable :: ORP(:,:,:,:,:)                     !microbial residue P	[g d-2]
+  real(r8),target,allocatable :: OSM(:,:,:,:,:,:)                   !humus soil OM	[g d-2]
+  real(r8),target,allocatable :: OHM(:,:,:,:,:)                     !adsorbed soil C	[g d-2]
+  real(r8),target,allocatable :: ORM(:,:,:,:,:,:)                     !microbial residue [C	g d-2]
   real(r8),target,allocatable :: DOM(:,:,:,:,:)                       !dissolved organic C micropore	[g d-2]
   real(r8),target,allocatable :: DOM_Macp(:,:,:,:,:)                      !dissolved organic C macropore	[g d-2]
   real(r8),target,allocatable :: ORGC(:,:,:)                        !total soil organic C [g d-2]
@@ -80,16 +73,9 @@ module SOMDataType
   allocate(CFOSC(jsken,1:jcplx,0:JZ,JY,JX))
   allocate(CNOSC(jsken,1:jcplx,0:JZ,JY,JX))
   allocate(CPOSC(jsken,1:jcplx,0:JZ,JY,JX))
-  allocate(OSC(jsken,1:jcplx,0:JZ,JY,JX))
-  allocate(OSN(jsken,1:jcplx,0:JZ,JY,JX))
-  allocate(OSP(jsken,1:jcplx,0:JZ,JY,JX))
-  allocate(OHC(1:jcplx,0:JZ,JY,JX))
-  allocate(OHN(1:jcplx,0:JZ,JY,JX))
-  allocate(OHP(1:jcplx,0:JZ,JY,JX))
-  allocate(OHA(1:jcplx,0:JZ,JY,JX))
-  allocate(ORC(ndbiomcp,1:jcplx,0:JZ,JY,JX))
-  allocate(ORN(ndbiomcp,1:jcplx,0:JZ,JY,JX))
-  allocate(ORP(ndbiomcp,1:jcplx,0:JZ,JY,JX))
+  allocate(OSM(NumPlantChemElmnts,jsken,1:jcplx,0:JZ,JY,JX))
+  allocate(OHM(idom_beg:idom_end,1:jcplx,0:JZ,JY,JX))
+  allocate(ORM(1:NumPlantChemElmnts,ndbiomcp,1:jcplx,0:JZ,JY,JX))
   allocate(DOM(idom_beg:idom_end,1:jcplx,0:JZ,JY,JX))
   allocate(DOM_Macp(idom_beg:idom_end,1:jcplx,0:JZ,JY,JX));DOM_MacP=0._r8
   allocate(ORGC(0:JZ,JY,JX))
@@ -135,16 +121,9 @@ module SOMDataType
   call destroy(CFOSC)
   call destroy(CNOSC)
   call destroy(CPOSC)
-  call destroy(OSC)
-  call destroy(OSN)
-  call destroy(OSP)
-  call destroy(OHC)
-  call destroy(OHN)
-  call destroy(OHP)
-  call destroy(OHA)
-  call destroy(ORC)
-  call destroy(ORN)
-  call destroy(ORP)
+  call destroy(OSM)
+  call destroy(OHM)
+  call destroy(ORM)
   call destroy(DOM)
   call destroy(DOM_MacP)
   call destroy(ORGC)

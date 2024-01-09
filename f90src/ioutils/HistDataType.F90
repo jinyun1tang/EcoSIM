@@ -856,7 +856,7 @@ implicit none
     long_name='*total heat flux into ground surface',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%histr_1D_ECO_RN_col(beg_col:end_col)     
-  call hist_addfld1d(fname='ECO_RN',units='W/m2',avgflag='A',&
+  call hist_addfld1d(fname='ECO_Radnet',units='W/m2',avgflag='A',&
     long_name='ecosystem net radiation',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%histr_1D_ECO_LE_col(beg_col:end_col)        
