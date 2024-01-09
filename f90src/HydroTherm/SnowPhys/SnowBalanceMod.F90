@@ -505,7 +505,7 @@ implicit none
 !     CumHeat2SnowLay=convective heat fluxes of snow,water,ice in snowpack
 !     XFLWS,WatXfer2SnoLay,IceXfer2SnoLay=snow,water,ice transfer from watsub.f
 !     HeatXfer2SnoLay=convective heat flux from snow,water,ice transfer from watsub.f
-!     FLSW,WatConvSno2MacP,WatConvSno2LitR=water flux from lowest snow layer to soil macropore,micropore,litter
+!     WatConvSno2MicP,WatConvSno2MacP,WatConvSno2LitR=water flux from lowest snow layer to soil macropore,micropore,litter
 !     HeatConvSno2Soi,HeatConvSno2LitR=heat flux from lowest snow layer to soil,litter
 
   D1205: DO LS=1,JS
@@ -519,7 +519,7 @@ implicit none
         !not surface layer, and is heat significant
         CumSno2SnowLay(LS,N2,N1)=CumSno2SnowLay(LS,N2,N1)+SnoXfer2SnoLay(LS,N2,N1)-SnoXfer2SnoLay(LS2,N2,N1)
         CumWat2SnowLay(LS,N2,N1)=CumWat2SnowLay(LS,N2,N1)+WatXfer2SnoLay(LS,N2,N1)-WatXfer2SnoLay(LS2,N2,N1) &
-          -WatConvSno2LitR(LS,N2,N1)-FLSW(LS,N2,N1)-WatConvSno2MacP(LS,N2,N1)
+          -WatConvSno2LitR(LS,N2,N1)-WatConvSno2MicP(LS,N2,N1)-WatConvSno2MacP(LS,N2,N1)
         CumIce2SnowLay(LS,N2,N1)=CumIce2SnowLay(LS,N2,N1)+IceXfer2SnoLay(LS,N2,N1)-IceXfer2SnoLay(LS2,N2,N1)
         CumHeat2SnowLay(LS,N2,N1)=CumHeat2SnowLay(LS,N2,N1)+HeatXfer2SnoLay(LS,N2,N1) &
           -HeatXfer2SnoLay(LS2,N2,N1)-HeatConvSno2LitR(LS,N2,N1)-HeatConvSno2Soi(LS,N2,N1)
@@ -570,7 +570,7 @@ implicit none
       ELSE
         CumSno2SnowLay(LS,N2,N1)=CumSno2SnowLay(LS,N2,N1)+SnoXfer2SnoLay(LS,N2,N1)
         CumWat2SnowLay(LS,N2,N1)=CumWat2SnowLay(LS,N2,N1)+WatXfer2SnoLay(LS,N2,N1) &
-          -WatConvSno2LitR(LS,N2,N1)-FLSW(LS,N2,N1)-WatConvSno2MacP(LS,N2,N1)
+          -WatConvSno2LitR(LS,N2,N1)-WatConvSno2MicP(LS,N2,N1)-WatConvSno2MacP(LS,N2,N1)
         CumIce2SnowLay(LS,N2,N1)=CumIce2SnowLay(LS,N2,N1)+IceXfer2SnoLay(LS,N2,N1)
         CumHeat2SnowLay(LS,N2,N1)=CumHeat2SnowLay(LS,N2,N1)+HeatXfer2SnoLay(LS,N2,N1) &
           -HeatConvSno2LitR(LS,N2,N1)-HeatConvSno2Soi(LS,N2,N1)

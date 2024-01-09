@@ -776,7 +776,7 @@ module Hour1Mod
   StandingDeadChemElmnt_col(1:NumPlantChemElmnts,NY,NX)=0.0_r8
   PPT(NY,NX)=0.0_r8
 ! zero arrays in the snow layers
-  FLSW(1:JS,NY,NX)=0.0_r8
+  WatConvSno2MicP(1:JS,NY,NX)=0.0_r8
   WatConvSno2MacP(1:JS,NY,NX)=0.0_r8
   HeatConvSno2Soi(1:JS,NY,NX)=0.0_r8
   WatConvSno2LitR(1:JS,NY,NX)=0.0_r8

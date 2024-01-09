@@ -168,7 +168,8 @@ contains
   real(r8) :: HeatFlowSno2LitrByWat,WatFloInSnoMax,HeatFlowSno2SoiByWat
   real(r8) :: HeatCndFlxSno2Soi,HeatCndFlxInSno,PSDX,TCND2W,THETRR
   real(r8) :: TK0X,TK1X,VapSnoSrc,VapSnoDest,WPX
-  integer :: L,L2,ICHKL
+  integer :: L,L2
+  logical :: ICHKL
 
   ! begin_execution
   ! PHYSICAL AND HYDRAULIC PROPERTIES OF SNOWPACK INCLUDING
@@ -188,7 +189,7 @@ contains
   ! DENSW1=snowpack density
   ! VHCPWMM=previous snowpack heat capacity
 
-  ICHKL=0
+  ICHKL=.false.
   !loop from surface to bottom
   D9880: DO L=1,JS
 
@@ -349,7 +350,7 @@ contains
       ELSE
         !dealing with residual snow
         !L==JS, or the layer L2 has insignificant snow, so layer L is directly interacting with litter and soil surface        
-        IF(ICHKL.EQ.0)THEN
+        IF(.not.ICHKL)THEN
 
           !interaction with respect to litter layer and topsoil 
           !potential flow to soil
@@ -408,7 +409,7 @@ contains
           ! TotWatFlow2LitrByWat,CumWatFlow2LitR=total,accumulated snow+soil water flux to litter
           ! TotHeatFlow2LitrByWat,CumHeatFlow2LitR=total,accumulated snow+soil heat flux to litter
           ! WatFlowSno2LitRM,WatFlowSno2MicPM,WatFlowSno2MacPM=total water flux to litter,soil micropore,macropore
-          ! FLSW,WatConvSno2MacP,WatConvSno2LitR=water flux from lowest snow layer to soil macropore,micropore,litter
+          ! WatConvSno2MicP,WatConvSno2MacP,WatConvSno2LitR=water flux from lowest snow layer to soil macropore,micropore,litter
           ! HeatConvSno2Soi,HeatConvSno2LitR=heat flux from lowest snow layer to soil,litter
 !
           TotWatXFlx2SoiMicP=WatFlowSno2MicP+VapFlxSno2Soi1+CumVapFlxLitr2Soi
@@ -439,13 +440,13 @@ contains
           WatFlowSno2LitRM(M,NY,NX)=WatFlowSno2LitRM(M,NY,NX)+WatFlowSno2LitR
           WatFlowSno2MicPM(M,NY,NX)=WatFlowSno2MicPM(M,NY,NX)+WatFlowSno2MicP
           WatFlowSno2MacPM(M,NY,NX)=WatFlowSno2MacPM(M,NY,NX)+WatFlowSno2MacP
-          FLSW(L,NY,NX)=FLSW(L,NY,NX)+TotWatXFlx2SoiMicP
+          WatConvSno2MicP(L,NY,NX)=WatConvSno2MicP(L,NY,NX)+TotWatXFlx2SoiMicP
           WatConvSno2MacP(L,NY,NX)=WatConvSno2MacP(L,NY,NX)+WatFlowSno2MacP
           HeatConvSno2Soi(L,NY,NX)=HeatConvSno2Soi(L,NY,NX)+TotHeatFlow2Soi
           WatConvSno2LitR(L,NY,NX)=WatConvSno2LitR(L,NY,NX)+TotWatFlow2LitrByWat
           HeatConvSno2LitR(L,NY,NX)=HeatConvSno2LitR(L,NY,NX)+TotHeatFlow2LitrByWat
 
-          ICHKL=1
+          ICHKL=.true.
         ENDIF
       ENDIF
     ENDIF
