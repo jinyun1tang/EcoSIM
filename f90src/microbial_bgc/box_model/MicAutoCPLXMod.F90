@@ -7,6 +7,7 @@ module MicAutoCPLXMod
   use MicStateTraitTypeMod, only : micsttype
   use NitroDiagTypes
   use ElmIDMod
+  use TracerIDMod
   use EcoSiMParDataMod, only : micpar
   use EcoSIMSolverPar
   use EcoSimConst
@@ -410,7 +411,7 @@ module MicAutoCPLXMod
   type(NitroMicFluxType), intent(inout) :: nmicf
   type(NitroOMcplxFluxType), intent(inout) :: ncplxf
   type(NitroOMcplxStateType), intent(inout) :: ncplxs
-  integer :: M,K,MID3,MID,MID1
+  integer :: M,K,MID3,MID,MID1,NE,idom
   real(r8) :: RCCC,RCCN,RCCP
   real(r8) :: CCC,CGOMX,CGOMD
   real(r8) :: CXC
@@ -424,52 +425,23 @@ module MicAutoCPLXMod
     CNOMAff  => nmics%CNOMAff,    &
     CPOMAff  => nmics%CPOMAff,    &
     TFNGff   => nmics%TFNGff ,    &
-    CGOMCff  => nmicf%CGOMCff,    &
-    CGOMNff  => nmicf%CGOMNff,    &
-    CGOMPff  => nmicf%CGOMPff,    &
-    CGOQCff  => nmicf%CGOQCff,    &
-    CGOACff  => nmicf%CGOACff,    &
-    CGOMSff  => nmicf%CGOMSff,    &
-    CGONSff  => nmicf%CGONSff,    &
-    CGOPSff  => nmicf%CGOPSff,    &
+    CGOMEautor  => nmicf%CGOMEautor,    &
+    CGOSEautor  => nmicf%CGOSEautor,    &
     RGOMOff  => nmicf%RGOMOff,    &
     RGOMDff  => nmicf%RGOMDff,    &
     RMOMCff  => nmicf%RMOMCff,    &
-    RDOMCff  => nmicf%RDOMCff,    &
-    RDOMNff  => nmicf%RDOMNff,    &
-    RDOMPff  => nmicf%RDOMPff,    &
-    RHOMCff  => nmicf%RHOMCff,    &
-    RHOMNff  => nmicf%RHOMNff,    &
-    RHOMPff  => nmicf%RHOMPff,    &
-    RCOMCff  => nmicf%RCOMCff,    &
-    RCOMNff  => nmicf%RCOMNff,    &
-    RCOMPff  => nmicf%RCOMPff,    &
-    RDMMCff  => nmicf%RDMMCff,    &
-    RHMMCff  => nmicf%RHMMCff,    &
-    RCMMCff  => nmicf%RCMMCff,    &
-    RDMMNff  => nmicf%RDMMNff,    &
-    RHMMNff  => nmicf%RHMMNff,    &
-    RCMMNff  => nmicf%RCMMNff,    &
-    RDMMPff  => nmicf%RDMMPff,    &
-    RHMMPff  => nmicf%RHMMPff,    &
-    RCMMPff  => nmicf%RCMMPff,    &
-    RXOMCff  => nmicf%RXOMCff,    &
-    RXOMNff  => nmicf%RXOMNff,    &
-    RXOMPff  => nmicf%RXOMPff,    &
-    R3OMCff  => nmicf%R3OMCff,    &
-    R3OMNff  => nmicf%R3OMNff,    &
-    R3OMPff  => nmicf%R3OMPff,    &
-    RXMMCff  => nmicf%RXMMCff,    &
-    RXMMNff  => nmicf%RXMMNff,    &
-    RXMMPff  => nmicf%RXMMPff,    &
-    R3MMCff  => nmicf%R3MMCff,    &
-    R3MMNff  => nmicf%R3MMNff,    &
-    R3MMPff  => nmicf%R3MMPff,    &
+    RDOMEautor => nmicf%RDOMEautor,    &
+    RHOMEautor  => nmicf%RHOMEautor,    &
+    RCOMEautor  => nmicf%RCOMEautor,    &
+    RDMMEautor  => nmicf%RDMMEautor,    &
+    RHMMEautor  => nmicf%RHMMEautor,    &
+    RCMMEautor  => nmicf%RCMMEautor,    &
+    RXOMEautor  => nmicf%RXOMEautor,    &
+    R3OMEautor  => nmicf%R3OMEautor,    &
+    RXMMEautor  => nmicf%RXMMEautor,    &
+    R3MMEautor  => nmicf%R3MMEautor,    &
     RGN2Fff  => nmicf%RGN2Fff,    &
-    TCGOQC   => ncplxf%TCGOQC,    &
-    TCGOAC   => ncplxf%TCGOAC,    &
-    TCGOMN   => ncplxf%TCGOMN,    &
-    TCGOMP   => ncplxf%TCGOMP,    &
+    TCGOMEheter   => ncplxf%TCGOMEheter,    &
     CNQ      => ncplxs%CNQ,       &
     CPQ      => ncplxs%CPQ,       &
     rNCOMCff  => micpar%rNCOMCff,   &
@@ -501,18 +473,14 @@ module MicAutoCPLXMod
 !     FCN,FCP=limitation from N,P
 !
 
+  CGOMEautor(idom_beg:idom_end,NGL)=0._r8
   CGOMX=AMIN1(RMOMT,RGOMOff(NGL))+RGN2Fff(NGL)+(RGOMT-RGN2Fff(NGL))/ECHZ
   CGOMD=RGOMDff(NGL)/ENOX
-  CGOMCff(NGL)=CGOMX+CGOMD
-  CGOQCff(NGL)=CGOMX+CGOMD
-  CGOACff(NGL)=0.0_r8
-  CGOMNff(NGL)=0.0_r8
-  CGOMPff(NGL)=0.0_r8
+  CGOMEautor(ielmc,NGL)=CGOMX+CGOMD
   K=micpar%jcplx
-  TCGOQC(K)=TCGOQC(K)+CGOQCff(NGL)
-  TCGOAC(K)=TCGOAC(K)+CGOACff(NGL)
-  TCGOMN(K)=TCGOMN(K)+CGOMNff(NGL)
-  TCGOMP(K)=TCGOMP(K)+CGOMPff(NGL)
+  DO idom=idom_beg,idom_end
+    TCGOMEheter(idom,K)=TCGOMEheter(idom,K)+CGOMEautor(idom,NGL)
+  ENDDO
 !
 !     TRANSFER UPTAKEN C,N,P FROM STORAGE TO ACTIVE BIOMASS
 !
@@ -555,15 +523,15 @@ module MicAutoCPLXMod
   MID3=micpar%get_micb_id(3,NGL)
   CGOMZ=TFNGff(NGL)*OMGR*AZMAX1(OMEauto(ielmc,MID3))
   DO  M=1,2
-    CGOMSff(M,NGL)=FL(M)*CGOMZ
+    CGOSEautor(ielmc,M,NGL)=FL(M)*CGOMZ
     IF(OMEauto(ielmc,MID3).GT.ZEROS)THEN
-      CGONSff(M,NGL)=AMIN1(FL(M)*AZMAX1(OMEauto(ielmn,MID3)) &
-        ,CGOMSff(M,NGL)*OMEauto(ielmn,MID3)/OMEauto(ielmc,MID3))
-      CGOPSff(M,NGL)=AMIN1(FL(M)*AZMAX1(OMEauto(ielmp,MID3)) &
-        ,CGOMSff(M,NGL)*OMEauto(ielmp,MID3)/OMEauto(ielmc,MID3))
+      CGOSEautor(ielmn,M,NGL)=AMIN1(FL(M)*AZMAX1(OMEauto(ielmn,MID3)) &
+        ,CGOSEautor(ielmc,M,NGL)*OMEauto(ielmn,MID3)/OMEauto(ielmc,MID3))
+      CGOSEautor(ielmp,M,NGL)=AMIN1(FL(M)*AZMAX1(OMEauto(ielmp,MID3)) &
+        ,CGOSEautor(ielmc,M,NGL)*OMEauto(ielmp,MID3)/OMEauto(ielmc,MID3))
     ELSE
-      CGONSff(M,NGL)=0.0_r8
-      CGOPSff(M,NGL)=0.0_r8
+      CGOSEautor(ielmn,M,NGL)=0.0_r8
+      CGOSEautor(ielmp,M,NGL)=0.0_r8
     ENDIF
 !
 !     MICROBIAL DECOMPOSITION FROM BIOMASS, SPECIFIC DECOMPOSITION
@@ -578,15 +546,15 @@ module MicAutoCPLXMod
 !
     MID=micpar%get_micb_id(M,NGL)
     SPOMX=SQRT(TFNGff(NGL))*SPOMC(M)*SPOMK(M)
-    RXOMCff(M,NGL)=AZMAX1(OMEauto(ielmc,MID)*SPOMX)
-    RXOMNff(M,NGL)=AZMAX1(OMEauto(ielmn,MID)*SPOMX)
-    RXOMPff(M,NGL)=AZMAX1(OMEauto(ielmp,MID)*SPOMX)
-    RDOMCff(M,NGL)=RXOMCff(M,NGL)*(1.0_r8-RCCC)
-    RDOMNff(M,NGL)=RXOMNff(M,NGL)*(1.0_r8-RCCC)*(1.0_r8-RCCN)
-    RDOMPff(M,NGL)=RXOMPff(M,NGL)*(1.0_r8-RCCC)*(1.0_r8-RCCP)
-    R3OMCff(M,NGL)=RXOMCff(M,NGL)-RDOMCff(M,NGL)
-    R3OMNff(M,NGL)=RXOMNff(M,NGL)-RDOMNff(M,NGL)
-    R3OMPff(M,NGL)=RXOMPff(M,NGL)-RDOMPff(M,NGL)
+    RXOMEautor(ielmc,M,NGL)=AZMAX1(OMEauto(ielmc,MID)*SPOMX)
+    RXOMEautor(ielmn,M,NGL)=AZMAX1(OMEauto(ielmn,MID)*SPOMX)
+    RXOMEautor(ielmp,M,NGL)=AZMAX1(OMEauto(ielmp,MID)*SPOMX)
+
+    RDOMEautor(ielmc,M,NGL)=RXOMEautor(ielmc,M,NGL)*(1.0_r8-RCCC)
+    RDOMEautor(ielmn,M,NGL)=RXOMEautor(ielmn,M,NGL)*(1.0_r8-RCCC)*(1.0_r8-RCCN)
+    RDOMEautor(ielmp,M,NGL)=RXOMEautor(ielmp,M,NGL)*(1.0_r8-RCCC)*(1.0_r8-RCCP)
+    DO NE=1,NumPlantChemElmnts
+      R3OMEautor(NE,M,NGL)=RXOMEautor(NE,M,NGL)-RDOMEautor(NE,M,NGL)
 !
 !     HUMIFICATION OF MICROBIAL DECOMPOSITION PRODUCTS FROM
 !     DECOMPOSITION RATE, SOIL CLAY AND OC 'EHUM' FROM 'HOUR1'
@@ -595,15 +563,12 @@ module MicAutoCPLXMod
 !     EHUM=humus transfer fraction from hour1.f
 !     RCOMC,RCOMN,RCOMP=transfer of microbial C,N,P litterfall to residue
 !
-    RHOMCff(M,NGL)=AZMAX1(RDOMCff(M,NGL)*EHUM)
-    RHOMNff(M,NGL)=AZMAX1(RDOMNff(M,NGL)*EHUM)
-    RHOMPff(M,NGL)=AZMAX1(RDOMPff(M,NGL)*EHUM)
-!
-!     NON-HUMIFIED PRODUCTS TO MICROBIAL RESIDUE
-!
-    RCOMCff(M,NGL)=RDOMCff(M,NGL)-RHOMCff(M,NGL)
-    RCOMNff(M,NGL)=RDOMNff(M,NGL)-RHOMNff(M,NGL)
-    RCOMPff(M,NGL)=RDOMPff(M,NGL)-RHOMPff(M,NGL)
+      RHOMEautor(NE,M,NGL)=AZMAX1(RDOMEautor(NE,M,NGL)*EHUM)
+  !
+  !     NON-HUMIFIED PRODUCTS TO MICROBIAL RESIDUE
+  !
+      RCOMEautor(NE,M,NGL)=RDOMEautor(NE,M,NGL)-RHOMEautor(NE,M,NGL)
+    ENDDO
   ENDDO
 !
 !     MICROBIAL DECOMPOSITION WHEN MAINTENANCE RESPIRATION
@@ -622,15 +587,16 @@ module MicAutoCPLXMod
   IF(RXOMT.GT.ZEROS.AND.RMOMT.GT.ZEROS.AND.RCCC.GT.ZERO)THEN
     FRM=RXOMT/RMOMT
     DO  M=1,2
-      RXMMCff(M,NGL)=AMIN1(OMEauto(ielmc,MID),AZMAX1(FRM*RMOMCff(M,NGL)/RCCC))
-      RXMMNff(M,NGL)=AMIN1(OMEauto(ielmn,MID),AZMAX1(RXMMCff(M,NGL)*CNOMAff(NGL)))
-      RXMMPff(M,NGL)=AMIN1(OMEauto(ielmp,MID),AZMAX1(RXMMCff(M,NGL)*CPOMAff(NGL)))
-      RDMMCff(M,NGL)=RXMMCff(M,NGL)*(1.0_r8-RCCC)
-      RDMMNff(M,NGL)=RXMMNff(M,NGL)*(1.0_r8-RCCN)*(1.0_r8-RCCC)
-      RDMMPff(M,NGL)=RXMMPff(M,NGL)*(1.0_r8-RCCP)*(1.0_r8-RCCC)
-      R3MMCff(M,NGL)=RXMMCff(M,NGL)-RDMMCff(M,NGL)
-      R3MMNff(M,NGL)=RXMMNff(M,NGL)-RDMMNff(M,NGL)
-      R3MMPff(M,NGL)=RXMMPff(M,NGL)-RDMMPff(M,NGL)
+      RXMMEautor(ielmc,M,NGL)=AMIN1(OMEauto(ielmc,MID),AZMAX1(FRM*RMOMCff(M,NGL)/RCCC))
+      RXMMEautor(ielmn,M,NGL)=AMIN1(OMEauto(ielmn,MID),AZMAX1(RXMMEautor(ielmc,M,NGL)*CNOMAff(NGL)))
+      RXMMEautor(ielmp,M,NGL)=AMIN1(OMEauto(ielmp,MID),AZMAX1(RXMMEautor(ielmc,M,NGL)*CPOMAff(NGL)))
+
+      RDMMEautor(ielmc,M,NGL)=RXMMEautor(ielmc,M,NGL)*(1.0_r8-RCCC)
+      RDMMEautor(ielmn,M,NGL)=RXMMEautor(ielmn,M,NGL)*(1.0_r8-RCCN)*(1.0_r8-RCCC)
+      RDMMEautor(ielmp,M,NGL)=RXMMEautor(ielmp,M,NGL)*(1.0_r8-RCCP)*(1.0_r8-RCCC)
+      DO NE=1,NumPlantChemElmnts
+        R3MMEautor(NE,M,NGL)=RXMMEautor(NE,M,NGL)-RDMMEautor(NE,M,NGL)
+      ENDDO
 !
 !     HUMIFICATION AND RECYCLING OF RESPIRATION DECOMPOSITION
 !     PRODUCTS
@@ -639,31 +605,20 @@ module MicAutoCPLXMod
 !     EHUM=humus transfer fraction
 !     RCMMC,RCMMN,RCMMC=transfer of senesence litterfall C,N,P to residue
 !
-      RHMMCff(M,NGL)=AZMAX1(RDMMCff(M,NGL)*EHUM)
-      RHMMNff(M,NGL)=AZMAX1(RDMMNff(M,NGL)*EHUM)
-      RHMMPff(M,NGL)=AZMAX1(RDMMPff(M,NGL)*EHUM)
-      RCMMCff(M,NGL)=RDMMCff(M,NGL)-RHMMCff(M,NGL)
-      RCMMNff(M,NGL)=RDMMNff(M,NGL)-RHMMNff(M,NGL)
-      RCMMPff(M,NGL)=RDMMPff(M,NGL)-RHMMPff(M,NGL)
-
+      DO NE=1,NumPlantChemElmnts
+        RHMMEautor(NE,M,NGL)=AZMAX1(RDMMEautor(NE,M,NGL)*EHUM)
+        RCMMEautor(NE,M,NGL)=RDMMEautor(NE,M,NGL)-RHMMEautor(NE,M,NGL)
+      ENDDO
     ENDDO
   ELSE
     DO  M=1,2
-      RXMMCff(M,NGL)=0.0_r8
-      RXMMNff(M,NGL)=0.0_r8
-      RXMMPff(M,NGL)=0.0_r8
-      RDMMCff(M,NGL)=0.0_r8
-      RDMMNff(M,NGL)=0.0_r8
-      RDMMPff(M,NGL)=0.0_r8
-      R3MMCff(M,NGL)=0.0_r8
-      R3MMNff(M,NGL)=0.0_r8
-      R3MMPff(M,NGL)=0.0_r8
-      RHMMCff(M,NGL)=0.0_r8
-      RHMMNff(M,NGL)=0.0_r8
-      RHMMPff(M,NGL)=0.0_r8
-      RCMMCff(M,NGL)=0.0_r8
-      RCMMNff(M,NGL)=0.0_r8
-      RCMMPff(M,NGL)=0.0_r8
+      DO NE=1,NumPlantChemElmnts
+        RXMMEautor(NE,M,NGL)=0.0_r8
+        RDMMEautor(NE,M,NGL)=0.0_r8
+        R3MMEautor(NE,M,NGL)=0.0_r8
+        RHMMEautor(NE,M,NGL)=0.0_r8
+        RCMMEautor(NE,M,NGL)=0.0_r8
+      ENDDO
     ENDDO
   ENDIF
   end associate
@@ -1938,14 +1893,10 @@ module MicAutoCPLXMod
   type(micsttype), intent(inout) :: micstt
   type(NitroMicFluxType), intent(inout) :: nmicf
   real(r8) :: CGROMC
-  integer :: N,M,NGL,MID,MID3
+  integer :: N,M,NGL,MID,MID3,NE
   associate(                      &
-    CGOMCff    => nmicf%CGOMCff,  &
-    CGOMNff  => nmicf%CGOMNff,    &
-    CGOMPff  => nmicf%CGOMPff,    &
-    CGOMSff  => nmicf%CGOMSff,    &
-    CGONSff  => nmicf%CGONSff,    &
-    CGOPSff  => nmicf%CGOPSff,    &
+    CGOMEautor    => nmicf%CGOMEautor,  &
+    CGOSEautor  => nmicf%CGOSEautor,    &
     RGN2Fff  => nmicf%RGN2Fff,    &
     RGOMOff  => nmicf%RGOMOff,    &
     RGOMDff  => nmicf%RGOMDff,    &
@@ -1955,25 +1906,13 @@ module MicAutoCPLXMod
     RINB4ff => nmicf%RINB4ff ,    &
     RINB3ff => nmicf%RINB3ff ,    &
     RIPOBff => nmicf%RIPOBff ,    &
-    RHOMCff => nmicf%RHOMCff ,    &
-    RHOMNff => nmicf%RHOMNff ,    &
-    RHOMPff => nmicf%RHOMPff ,    &
-    RHMMCff  => nmicf%RHMMCff,    &
-    RHMMNff  => nmicf%RHMMNff,    &
-    RHMMPff  => nmicf%RHMMPff,    &
+    RHOMEautor => nmicf%RHOMEautor ,    &
+    RHMMEautor  => nmicf%RHMMEautor,    &
     RN2FXff  => nmicf%RN2FXff,    &
-    RXOMCff  => nmicf%RXOMCff,    &
-    RXOMNff  => nmicf%RXOMNff,    &
-    RXOMPff  => nmicf%RXOMPff,    &
-    R3OMCff  => nmicf%R3OMCff,    &
-    R3OMNff  => nmicf%R3OMNff,    &
-    R3OMPff  => nmicf%R3OMPff,    &
-    RXMMCff  => nmicf%RXMMCff,    &
-    RXMMNff  => nmicf%RXMMNff,    &
-    RXMMPff  => nmicf%RXMMPff,    &
-    R3MMCff  => nmicf%R3MMCff,    &
-    R3MMNff  => nmicf%R3MMNff,    &
-    R3MMPff  => nmicf%R3MMPff,    &
+    RXOMEautor  => nmicf%RXOMEautor,    &
+    R3OMEautor  => nmicf%R3OMEautor,    &
+    RXMMEautor  => nmicf%RXMMEautor,    &
+    R3MMEautor  => nmicf%R3MMEautor,    &
     RINH4Rff  => nmicf%RINH4Rff,  &
     RINO3Rff  => nmicf%RINO3Rff,  &
     RIPO4Rff  => nmicf%RIPO4Rff,  &
@@ -2005,9 +1944,9 @@ module MicAutoCPLXMod
       DO NGL=JGniA(N),JGnfA(N)
         DO  M=1,2
           MID=micpar%get_micb_id(M,NGL)
-          OMEauto(ielmc,MID)=OMEauto(ielmc,MID)+CGOMSff(M,NGL)-RXOMCff(M,NGL)-RXMMCff(M,NGL)
-          OMEauto(ielmn,MID)=OMEauto(ielmn,MID)+CGONSff(M,NGL)-RXOMNff(M,NGL)-RXMMNff(M,NGL)
-          OMEauto(ielmp,MID)=OMEauto(ielmp,MID)+CGOPSff(M,NGL)-RXOMPff(M,NGL)-RXMMPff(M,NGL)
+          DO NE=1,NumPlantChemElmnts
+            OMEauto(NE,MID)=OMEauto(NE,MID)+CGOSEautor(NE,M,NGL)-RXOMEautor(NE,M,NGL)-RXMMEautor(NE,M,NGL)
+          ENDDO
 
 !     HUMIFICATION PRODUCTS
 !
@@ -2016,20 +1955,17 @@ module MicAutoCPLXMod
 !     RHMMC,RHMMN,RHMMC=transfer of senesence litterfall C,N,P to humus
 !
           IF(.not.litrm)THEN
-            OSM(ielmc,iprotein,k_POM)=OSM(ielmc,iprotein,k_POM)+CFOMC(1)*(RHOMCff(M,NGL)+RHMMCff(M,NGL))
-            OSM(ielmn,iprotein,k_POM)=OSM(ielmn,iprotein,k_POM)+CFOMC(1)*(RHOMNff(M,NGL)+RHMMNff(M,NGL))
-            OSM(ielmp,iprotein,k_POM)=OSM(ielmp,iprotein,k_POM)+CFOMC(1)*(RHOMPff(M,NGL)+RHMMPff(M,NGL))
-            
-            OSM(ielmc,icarbhyro,k_POM)=OSM(ielmc,icarbhyro,k_POM)+CFOMC(2)*(RHOMCff(M,NGL)+RHMMCff(M,NGL))
-            OSM(ielmn,icarbhyro,k_POM)=OSM(ielmn,icarbhyro,k_POM)+CFOMC(2)*(RHOMNff(M,NGL)+RHMMNff(M,NGL))
-            OSM(ielmp,icarbhyro,k_POM)=OSM(ielmp,icarbhyro,k_POM)+CFOMC(2)*(RHOMPff(M,NGL)+RHMMPff(M,NGL))
+            DO NE=1,NumPlantChemElmnts
+              OSM(NE,iprotein,k_POM)=OSM(NE,iprotein,k_POM)+CFOMC(1)*(RHOMEautor(NE,M,NGL)+RHMMEautor(NE,M,NGL))
+              OSM(NE,icarbhyro,k_POM)=OSM(NE,icarbhyro,k_POM)+CFOMC(2)*(RHOMEautor(NE,M,NGL)+RHMMEautor(NE,M,NGL))
+            ENDDO
           ELSE
-            OSC14U=OSC14U+CFOMCU(1)*(RHOMCff(M,NGL)+RHMMCff(M,NGL))
-            OSN14U=OSN14U+CFOMCU(1)*(RHOMNff(M,NGL)+RHMMNff(M,NGL))
-            OSP14U=OSP14U+CFOMCU(1)*(RHOMPff(M,NGL)+RHMMPff(M,NGL))
-            OSC24U=OSC24U+CFOMCU(2)*(RHOMCff(M,NGL)+RHMMCff(M,NGL))
-            OSN24U=OSN24U+CFOMCU(2)*(RHOMNff(M,NGL)+RHMMNff(M,NGL))
-            OSP24U=OSP24U+CFOMCU(2)*(RHOMPff(M,NGL)+RHMMPff(M,NGL))
+            OSC14U=OSC14U+CFOMCU(1)*(RHOMEautor(ielmc,M,NGL)+RHMMEautor(ielmc,M,NGL))
+            OSN14U=OSN14U+CFOMCU(1)*(RHOMEautor(ielmn,M,NGL)+RHMMEautor(ielmn,M,NGL))
+            OSP14U=OSP14U+CFOMCU(1)*(RHOMEautor(ielmp,M,NGL)+RHMMEautor(ielmp,M,NGL))
+            OSC24U=OSC24U+CFOMCU(2)*(RHOMEautor(ielmc,M,NGL)+RHMMEautor(ielmc,M,NGL))
+            OSN24U=OSN24U+CFOMCU(2)*(RHOMEautor(ielmn,M,NGL)+RHMMEautor(ielmn,M,NGL))
+            OSP24U=OSP24U+CFOMCU(2)*(RHOMEautor(ielmp,M,NGL)+RHMMEautor(ielmp,M,NGL))
           ENDIF
         ENDDO
 !
@@ -2051,19 +1987,19 @@ module MicAutoCPLXMod
 !     RINH4R,RINO3R =substrate-limited NH4,NO3 mineraln-immobiln
 !     RIPO4R,RIP14R=substrate-limited H2PO4,HPO4 mineraln-immobiln
 !
-        CGROMC=CGOMCff(NGL)-RGOMOff(NGL)-RGOMDff(NGL)-RGN2Fff(NGL)
+        CGROMC=CGOMEautor(ielmc,NGL)-RGOMOff(NGL)-RGOMDff(NGL)-RGN2Fff(NGL)
         RCO2Xff(NGL)=RCO2Xff(NGL)+RGN2Fff(NGL)
         MID3=micpar%get_micb_id(3,NGL)
         DO M=1,2
-          OMEauto(ielmc,MID3)=OMEauto(ielmc,MID3)-CGOMSff(M,NGL)+R3OMCff(M,NGL)
-          OMEauto(ielmn,MID3)=OMEauto(ielmn,MID3)-CGONSff(M,NGL)+R3OMNff(M,NGL)+R3MMNff(M,NGL)
-          OMEauto(ielmp,MID3)=OMEauto(ielmp,MID3)-CGOPSff(M,NGL)+R3OMPff(M,NGL)+R3MMPff(M,NGL)
-          RCO2Xff(NGL)=RCO2Xff(NGL)+R3MMCff(M,NGL)
+          OMEauto(ielmc,MID3)=OMEauto(ielmc,MID3)-CGOSEautor(ielmc,M,NGL)+R3OMEautor(ielmc,M,NGL)
+          OMEauto(ielmn,MID3)=OMEauto(ielmn,MID3)-CGOSEautor(ielmn,M,NGL)+R3OMEautor(ielmn,M,NGL)+R3MMEautor(ielmn,M,NGL)
+          OMEauto(ielmp,MID3)=OMEauto(ielmp,MID3)-CGOSEautor(ielmp,M,NGL)+R3OMEautor(ielmp,M,NGL)+R3MMEautor(ielmp,M,NGL)
+          RCO2Xff(NGL)=RCO2Xff(NGL)+R3MMEautor(ielmc,M,NGL)
         ENDDO
         OMEauto(ielmc,MID3)=OMEauto(ielmc,MID3)+CGROMC
-        OMEauto(ielmn,MID3)=OMEauto(ielmn,MID3)+CGOMNff(NGL) &
+        OMEauto(ielmn,MID3)=OMEauto(ielmn,MID3)+CGOMEautor(ielmn,NGL) &
           +RINH4ff(NGL)+RINB4ff(NGL)+RINO3ff(NGL)+RINB3ff(NGL)+RN2FXff(NGL)
-        OMEauto(ielmp,MID3)=OMEauto(ielmp,MID3)+CGOMPff(NGL) &
+        OMEauto(ielmp,MID3)=OMEauto(ielmp,MID3)+CGOMEautor(ielmp,NGL) &
           +RIPO4ff(NGL)+RIPOBff(NGL)+RIP14ff(NGL)+RIP1Bff(NGL)
         IF(litrm)THEN
           OMEauto(ielmn,MID3)=OMEauto(ielmn,MID3)+RINH4Rff(NGL)+RINO3Rff(NGL)
