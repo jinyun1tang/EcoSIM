@@ -31,17 +31,10 @@ implicit none
   real(r8),target,allocatable ::  trcx_XER(:,:,:,:,:)               !total adsorbed sediment erosion non-band , [g d-2 h-1]
   real(r8),target,allocatable ::  trcp_ER(:,:,:,:,:)                !total adsorbed ALOH3  erosion , [g d-2 h-1]
   real(r8),target,allocatable ::  cumSedErosion(:,:,:,:)            !sediment erosion, [Mg d-2 h-1]
-  real(r8),target,allocatable ::  ORCER(:,:,:,:,:,:)                !microbial residue C  erosion , [g d-2 h-1]
-  real(r8),target,allocatable ::  ORNER(:,:,:,:,:,:)                !microbial residue N  erosion , [g d-2 h-1]
-  real(r8),target,allocatable ::  ORPER(:,:,:,:,:,:)                !microbial residue P  erosion , [g d-2 h-1]
-  real(r8),target,allocatable ::  OHCER(:,:,:,:,:)                  !adsorbed C  erosion , [g d-2 h-1]
-  real(r8),target,allocatable ::  OHNER(:,:,:,:,:)                  !adsorbed N  erosion , [g d-2 h-1]
-  real(r8),target,allocatable ::  OHPER(:,:,:,:,:)                  !adsorbed P  erosion , [g d-2 h-1]
-  real(r8),target,allocatable ::  OHAER(:,:,:,:,:)                  !adsorbed acetate  erosion , [g d-2 h-1]
-  real(r8),target,allocatable ::  OSCER(:,:,:,:,:,:)                !humus C  erosion , [g d-2 h-1]
+  real(r8),target,allocatable ::  ORMER(:,:,:,:,:,:,:)                !microbial residue C  erosion , [g d-2 h-1]
+  real(r8),target,allocatable ::  OHMER(:,:,:,:,:,:)                  !adsorbed C  erosion , [g d-2 h-1]
+  real(r8),target,allocatable ::  OSMER(:,:,:,:,:,:,:)                !humus C  erosion , [g d-2 h-1]
   real(r8),target,allocatable ::  OSAER(:,:,:,:,:,:)                !colonized humus C  erosion , [g d-2 h-1]
-  real(r8),target,allocatable ::  OSNER(:,:,:,:,:,:)                !humus N  erosion , [g d-2 h-1]
-  real(r8),target,allocatable ::  OSPER(:,:,:,:,:,:)                !humus P  erosion , [g d-2 h-1]
   private :: InitAllocate
 
   contains
@@ -81,17 +74,10 @@ implicit none
   allocate(trcx_XER(idx_beg:idx_end,2,2,JV,JH));   trcx_XER=0._r8
   allocate(trcp_ER(idsp_beg:idsp_end,2,2,JV,JH));  trcp_ER=0._r8
   allocate(cumSedErosion(2,2,JV,JH));  cumSedErosion=0._r8
-  allocate(ORCER(ndbiomcp,1:jcplx,2,2,JV,JH));ORCER=0._r8
-  allocate(ORNER(ndbiomcp,1:jcplx,2,2,JV,JH));ORNER=0._r8
-  allocate(ORPER(ndbiomcp,1:jcplx,2,2,JV,JH));ORPER=0._r8
-  allocate(OHCER(1:jcplx,2,2,JV,JH));OHCER=0._r8
-  allocate(OHNER(1:jcplx,2,2,JV,JH));OHNER=0._r8
-  allocate(OHPER(1:jcplx,2,2,JV,JH));OHPER=0._r8
-  allocate(OHAER(1:jcplx,2,2,JV,JH));OHAER=0._r8
-  allocate(OSCER(jsken,1:jcplx,2,2,JV,JH));OSCER=0._r8
+  allocate(ORMER(NumPlantChemElmnts,ndbiomcp,1:jcplx,2,2,JV,JH));ORMER=0._r8
+  allocate(OHMER(idom_beg:idom_end,1:jcplx,2,2,JV,JH));OHMER=0._r8
+  allocate(OSMER(NumPlantChemElmnts,jsken,1:jcplx,2,2,JV,JH));OSMER=0._r8
   allocate(OSAER(jsken,1:jcplx,2,2,JV,JH));OSAER=0._r8
-  allocate(OSNER(jsken,1:jcplx,2,2,JV,JH));OSNER=0._r8
-  allocate(OSPER(jsken,1:jcplx,2,2,JV,JH));OSPER=0._r8
   end subroutine InitAllocate
 
 !----------------------------------------------------------------------
@@ -122,17 +108,10 @@ implicit none
   call destroy(XNHUEB)
   call destroy(XNO3EB)
   call destroy(cumSedErosion)
-  call destroy(ORCER)
-  call destroy(ORNER)
-  call destroy(ORPER)
-  call destroy(OHCER)
-  call destroy(OHNER)
-  call destroy(OHPER)
-  call destroy(OHAER)
-  call destroy(OSCER)
+  call destroy(ORMER)
+  call destroy(OHMER)
+  call destroy(OSMER)
   call destroy(OSAER)
-  call destroy(OSNER)
-  call destroy(OSPER)
   end subroutine DestructSedimentData
 
 

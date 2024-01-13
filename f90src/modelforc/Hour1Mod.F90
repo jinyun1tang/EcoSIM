@@ -280,13 +280,13 @@ module Hour1Mod
   OXYGSO=0.0_r8
   TLH2G=0.0_r8
   TSEDSO=0.0_r8
-  LitRCStoreLandscape=0.0_r8
-  LitRNStoreLandscape=0.0_r8
-  LitRPStoreLandscape=0.0_r8
+  LitRMStoreLndscap(ielmc)=0.0_r8
+  LitRMStoreLndscap(ielmn)=0.0_r8
+  LitRMStoreLndscap(ielmp)=0.0_r8
 
-  PomHumCStoreLandscape=0.0_r8
-  PomHumNStoreLandscape=0.0_r8
-  PomHumPStoreLandscape=0.0_r8
+  POMHumStoreLndscap(ielmc)=0.0_r8
+  POMHumStoreLndscap(ielmn)=0.0_r8
+  POMHumStoreLndscap(ielmp)=0.0_r8
   TLCO2G=0.0_r8
   TLN2G=0.0_r8
   TLNH4=0.0_r8
@@ -456,16 +456,16 @@ module Hour1Mod
         OMEERhetr(:,:,:,1:2,1:2,NY,NX)=0.0_r8
         OMEERauto(:,:,1:2,1:2,NY,NX)=0.0_r8
 
-        ORCER(:,:,1:2,1:2,NY,NX)=0.0_r8
-        ORNER(:,:,1:2,1:2,NY,NX)=0.0_r8
-        ORPER(:,:,1:2,1:2,NY,NX)=0.0_r8
-        OHCER(:,1:2,1:2,NY,NX)=0.0_r8
-        OHNER(:,1:2,1:2,NY,NX)=0.0_r8
-        OHPER(:,1:2,1:2,NY,NX)=0.0_r8
-        OSCER(:,:,1:2,1:2,NY,NX)=0.0_r8
+        ORMER(ielmc,:,:,1:2,1:2,NY,NX)=0.0_r8
+        ORMER(ielmn,:,:,1:2,1:2,NY,NX)=0.0_r8
+        ORMER(ielmp,:,:,1:2,1:2,NY,NX)=0.0_r8
+        OHMER(idom_doc,:,1:2,1:2,NY,NX)=0.0_r8
+        OHMER(idom_don,:,1:2,1:2,NY,NX)=0.0_r8
+        OHMER(idom_dop,:,1:2,1:2,NY,NX)=0.0_r8
+        OSMER(ielmc,:,:,1:2,1:2,NY,NX)=0.0_r8
         OSAER(:,:,1:2,1:2,NY,NX)=0.0_r8
-        OSNER(:,:,1:2,1:2,NY,NX)=0.0_r8
-        OSPER(:,:,1:2,1:2,NY,NX)=0.0_r8
+        OSMER(ielmn,:,:,1:2,1:2,NY,NX)=0.0_r8
+        OSMER(ielmp,:,:,1:2,1:2,NY,NX)=0.0_r8
       ENDDO
     ENDDO
   ENDIF
@@ -725,16 +725,16 @@ module Hour1Mod
   Qinflx2Soil_col(NY,NX)=0._r8
   HeatFlx2G_col(NY,NX)=0._r8
   DIC_mass_col(NY,NX)=0.0_r8
-  TOMT(NY,NX)=0.0_r8
-  TONT(NY,NX)=0.0_r8
-  TOPT(NY,NX)=0.0_r8
+  TOMET(ielmc,NY,NX)=0.0_r8
+  TOMET(ielmn,NY,NX)=0.0_r8
+  TOMET(ielmp,NY,NX)=0.0_r8
   UVLWatMicP(NY,NX)=0.0_r8
-  URSDC(NY,NX)=0.0_r8
-  UORGC(NY,NX)=0.0_r8
-  URSDN(NY,NX)=0.0_r8
-  UORGN(NY,NX)=0.0_r8
-  URSDP(NY,NX)=0.0_r8
-  UORGP(NY,NX)=0.0_r8
+  URSDM(ielmc,NY,NX)=0.0_r8
+  UORGM(ielmc,NY,NX)=0.0_r8
+  URSDM(ielmn,NY,NX)=0.0_r8
+  UORGM(ielmn,NY,NX)=0.0_r8
+  URSDM(ielmp,NY,NX)=0.0_r8
+  UORGM(ielmp,NY,NX)=0.0_r8
   UNH4(NY,NX)=0.0_r8
   UNO3(NY,NX)=0.0_r8
   UPO4(NY,NX)=0.0_r8

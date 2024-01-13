@@ -41,9 +41,7 @@ implicit none
   real(r8),target,allocatable ::  FerPFlx_col(:,:)                        !total fertilizer P amendment, [g d-2]
   real(r8),target,allocatable ::  HydroSufDOCFlx_col(:,:)                         !total surface DOC flux, [g d-2]
   real(r8),target,allocatable ::  HydroSubsDOCFlx_col(:,:)                         !total subsurface DOC flux, [g d-2]
-  real(r8),target,allocatable ::  LiterfalOrgC_col(:,:)                         !total litterfall C, [g d-2]
-  real(r8),target,allocatable ::  LiterfalOrgN_col(:,:)                         !total litterfall N, [g d-2]
-  real(r8),target,allocatable ::  LiterfalOrgP_col(:,:)                         !total litterfall P, [g d-2]
+  real(r8),target,allocatable ::  LiterfalOrgM_col(:,:,:)                         !total litterfall C, [g d-2]
   real(r8),target,allocatable ::  HydroSufDONFlx_col(:,:)                         !total surface DON flux, [g d-2]
   real(r8),target,allocatable ::  HydroSubsDONFlx_col(:,:)                         !total subsurface DON flux, [g d-2]
   real(r8),target,allocatable ::  HydroSufDOPFlx_col(:,:)                         !total surface DOP flux, [g d-2]
@@ -145,9 +143,7 @@ implicit none
   allocate(FerPFlx_col(JY,JX));      FerPFlx_col=0._r8
   allocate(HydroSufDOCFlx_col(JY,JX));       HydroSufDOCFlx_col=0._r8
   allocate(HydroSubsDOCFlx_col(JY,JX));       HydroSubsDOCFlx_col=0._r8
-  allocate(LiterfalOrgC_col(JY,JX));       LiterfalOrgC_col=0._r8
-  allocate(LiterfalOrgN_col(JY,JX));       LiterfalOrgN_col=0._r8
-  allocate(LiterfalOrgP_col(JY,JX));       LiterfalOrgP_col=0._r8
+  allocate(LiterfalOrgM_col(NumPlantChemElmnts,JY,JX));       LiterfalOrgM_col=0._r8
   allocate(HydroSufDONFlx_col(JY,JX));       HydroSufDONFlx_col=0._r8
   allocate(HydroSubsDONFlx_col(JY,JX));       HydroSubsDONFlx_col=0._r8
   allocate(HydroSufDOPFlx_col(JY,JX));       HydroSufDOPFlx_col=0._r8
@@ -241,9 +237,7 @@ implicit none
   call destroy(FerPFlx_col)
   call destroy(HydroSufDOCFlx_col)
   call destroy(HydroSubsDOCFlx_col)
-  call destroy(LiterfalOrgC_col)
-  call destroy(LiterfalOrgN_col)
-  call destroy(LiterfalOrgP_col)
+  call destroy(LiterfalOrgM_col)
   call destroy(HydroSufDONFlx_col)
   call destroy(HydroSubsDONFlx_col)
   call destroy(HydroSufDOPFlx_col)

@@ -30,15 +30,9 @@ module SOMDataType
   real(r8),target,allocatable :: CORGP(:,:,:)                       !soil organic P content  [mg kg-1]
   real(r8),target,allocatable :: CORGR(:,:,:)                       !soil particulate C content [g kg-1]
   real(r8),target,allocatable :: CFOMC(:,:,:,:)                     !allocation coefficient to humus fractions
-  real(r8),target,allocatable ::  TOMT(:,:)                         !total micriobial C, [g d-2]
-  real(r8),target,allocatable ::  TONT(:,:)                         !total micriobial N, [g d-2]
-  real(r8),target,allocatable ::  TOPT(:,:)                         !total micriobial P, [g d-2]
-  real(r8),target,allocatable ::  URSDC(:,:)                        !total litter C, [g d-2]
-  real(r8),target,allocatable ::  UORGC(:,:)                        !total humus C, [g d-2]
-  real(r8),target,allocatable ::  URSDN(:,:)                        !total litter N, [g d-2]
-  real(r8),target,allocatable ::  URSDP(:,:)                        !total litter P, [g d-2]
-  real(r8),target,allocatable ::  UORGN(:,:)                        !total humus N, [g d-2]
-  real(r8),target,allocatable ::  UORGP(:,:)                        !total humus P, [g d-2]
+  real(r8),target,allocatable ::  TOMET(:,:,:)                         !total micriobial C, [g d-2]
+  real(r8),target,allocatable ::  URSDM(:,:,:)                        !total litter C, [g d-2]
+  real(r8),target,allocatable ::  UORGM(:,:,:)                        !total humus C, [g d-2]
   real(r8),target,allocatable ::  EPOC(:,:,:)                       !partitioning coefficient between POC and litter, []
   real(r8),target,allocatable ::  EHUM(:,:,:)                       !partitioning coefficient between humus and microbial residue, []
   real(r8),target,allocatable ::  CDOM(:,:,:,:,:)                     !DOC concentration, [g m-3]
@@ -88,15 +82,9 @@ module SOMDataType
   allocate(CORGP(JZ,JY,JX))
   allocate(CORGR(JZ,JY,JX))
   allocate(CFOMC(2,JZ,JY,JX))
-  allocate(TOMT(JY,JX));        TOMT=0._r8
-  allocate(TONT(JY,JX));        TONT=0._r8
-  allocate(TOPT(JY,JX));        TOPT=0._r8
-  allocate(URSDC(JY,JX));       URSDC=0._r8
-  allocate(UORGC(JY,JX));       UORGC=0._r8
-  allocate(URSDN(JY,JX));       URSDN=0._r8
-  allocate(URSDP(JY,JX));       URSDP=0._r8
-  allocate(UORGN(JY,JX));       UORGN=0._r8
-  allocate(UORGP(JY,JX));       UORGP=0._r8
+  allocate(TOMET(NumPlantChemElmnts,JY,JX));        TOMET=0._r8
+  allocate(URSDM(NumPlantChemElmnts,JY,JX));       URSDM=0._r8
+  allocate(UORGM(NumPlantChemElmnts,JY,JX));       UORGM=0._r8
   allocate(EPOC(0:JZ,JY,JX));   EPOC=0._r8
   allocate(EHUM(0:JZ,JY,JX));   EHUM=0._r8
   allocate(CDOM(idom_beg:idom_end,1:jcplx,0:JZ,JY,JX));CDOM=0._r8
@@ -136,15 +124,9 @@ module SOMDataType
   call destroy(CORGP)
   call destroy(CORGR)
   call destroy(CFOMC)
-  call destroy(TOMT)
-  call destroy(TONT)
-  call destroy(TOPT)
-  call destroy(URSDC)
-  call destroy(UORGC)
-  call destroy(URSDN)
-  call destroy(URSDP)
-  call destroy(UORGN)
-  call destroy(UORGP)
+  call destroy(TOMET)
+  call destroy(URSDM)
+  call destroy(UORGM)
   call destroy(EPOC)
   call destroy(EHUM)
 

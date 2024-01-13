@@ -47,9 +47,9 @@ module ExecMod
 !    endif
     TLH=HeatStoreLandscape-HEATIN+HEATOU
     TLO=OXYGSO-OXYGIN+OXYGOU
-    TLC=LitRCStoreLandscape+PomHumCStoreLandscape+TLCO2G-CO2GIN+TCOU-TORGF-XCSN
-    TLN=LitRNStoreLandscape+PomHumNStoreLandscape+TLN2G+TLNH4+TLNO3-ZN2GIN-TZIN+TZOU-TORGN-XZSN
-    TLP=LitRPStoreLandscape+PomHumPStoreLandscape+TLPO4-TPIN+TPOU-TORGP-XPSN
+    TLC=LitRMStoreLndscap(ielmc)+POMHumStoreLndscap(ielmc)+TLCO2G-CO2GIN+TOMOU(ielmc)-TORGF-XESN(ielmc)
+    TLN=LitRMStoreLndscap(ielmn)+POMHumStoreLndscap(ielmn)+TLN2G+TLNH4+TLNO3-ZN2GIN-TZIN+TOMOU(ielmn)-TORGN-XESN(ielmn)
+    TLP=LitRMStoreLndscap(ielmp)+POMHumStoreLndscap(ielmp)+TLPO4-TPIN+TOMOU(ielmp)-TORGP-XESN(ielmp)
     TLI=TION-TIONIN+TIONOU
   ENDIF
 !
@@ -59,10 +59,10 @@ module ExecMod
     DIFFQ=(WaterStoreLandscape-CRAIN+CRUN+CEVAP+VOLWOU-TLW)/TAREA
     DIFFH=(HeatStoreLandscape-HEATIN+HEATOU-TLH)/TAREA
     DIFFO=(OXYGSO-OXYGIN+OXYGOU-TLO)/TAREA
-    DIFFC=(LitRCStoreLandscape+PomHumCStoreLandscape+TLCO2G-CO2GIN+TCOU-TORGF-XCSN-TLC)/TAREA
-    DIFFN=(LitRNStoreLandscape+PomHumNStoreLandscape+TLN2G+TLNH4+TLNO3-ZN2GIN-TZIN+TZOU &
-      -TORGN-XZSN-TLN)/TAREA
-    DIFFP=(LitRPStoreLandscape+PomHumPStoreLandscape+TLPO4-TPIN+TPOU-TORGP-XPSN-TLP)/TAREA
+    DIFFC=(LitRMStoreLndscap(ielmc)+POMHumStoreLndscap(ielmc)+TLCO2G-CO2GIN+TOMOU(ielmc)-TORGF-XESN(ielmc)-TLC)/TAREA
+    DIFFN=(LitRMStoreLndscap(ielmn)+POMHumStoreLndscap(ielmn)+TLN2G+TLNH4+TLNO3-ZN2GIN-TZIN+TOMOU(ielmn) &
+      -TORGN-XESN(ielmn)-TLN)/TAREA
+    DIFFP=(LitRMStoreLndscap(ielmp)+POMHumStoreLndscap(ielmp)+TLPO4-TPIN+TOMOU(ielmp)-TORGP-XESN(ielmp)-TLP)/TAREA
     DIFFI=(TION-TIONIN+TIONOU-TLI)/TAREA
     WRITE(*,212)I,iYearCurrent
     WRITE(18,213)I,iYearCurrent,DIFFQ,DIFFH,DIFFO,DIFFC,DIFFN &
@@ -87,17 +87,17 @@ module ExecMod
     IF(ABS(DIFFC).GT.ppmc)THEN
       WRITE(18,191)I,iYearCurrent
 191   FORMAT('CARBON BALANCE LOST ON DAY, YEAR',2I4)
-      TLC=LitRCStoreLandscape+PomHumCStoreLandscape+TLCO2G-CO2GIN+TCOU-TORGF-XCSN
+      TLC=LitRMStoreLndscap(ielmc)+POMHumStoreLndscap(ielmc)+TLCO2G-CO2GIN+TOMOU(ielmc)-TORGF-XESN(ielmc)
     ENDIF
     IF(ABS(DIFFN).GT.ppmc)THEN
       WRITE(18,192)I,iYearCurrent
 192   FORMAT('NITROGEN BALANCE LOST ON DAY, YEAR',2I4)
-      TLN=LitRNStoreLandscape+PomHumNStoreLandscape+TLN2G+TLNH4+TLNO3-ZN2GIN-TZIN+TZOU-TORGN-XZSN
+      TLN=LitRMStoreLndscap(ielmn)+POMHumStoreLndscap(ielmn)+TLN2G+TLNH4+TLNO3-ZN2GIN-TZIN+TOMOU(ielmn)-TORGN-XESN(ielmn)
     ENDIF
     IF(ABS(DIFFP).GT.ppmc)THEN
       WRITE(18,193)I,iYearCurrent
 193   FORMAT('PHOSPHORUS BALANCE LOST ON DAY, YEAR',2I4)
-      TLP=LitRPStoreLandscape+PomHumPStoreLandscape+TLPO4-TPIN+TPOU-TORGP-XPSN
+      TLP=LitRMStoreLndscap(ielmp)+POMHumStoreLndscap(ielmp)+TLPO4-TPIN+TOMOU(ielmp)-TORGP-XESN(ielmp)
     ENDIF
     IF(ABS(DIFFQ).GT.ppmc)THEN
       WRITE(18,194)I,iYearCurrent

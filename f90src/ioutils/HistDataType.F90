@@ -40,12 +40,12 @@ implicit none
   real(r8),pointer   :: histr_1D_cNO3_LITR_col(:)      !(trc_solml_vr(ids_NO3,0,NY,NX)+trc_solml_vr(ids_NO2,0,NY,NX))/SoilMicPMassLayer(0,NY,NX)                            
   real(r8),pointer   :: histr_1D_ECO_HVST_N_col(:)     !EcoHavstElmnt_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_NET_N_MIN_col(:)      !-NetNH4Mineralize_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: histr_1D_SURF_tLITR_P_FLX_col(:)    !URSDP(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: histr_1D_HUMUS_C_col(:)        !UORGC(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: histr_1D_HUMUS_N_col(:)        !UORGN(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: histr_1D_HUMUS_P_col(:)        !UORGP(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: histr_1D_SURF_tLITR_P_FLX_col(:)    !URSDM(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: histr_1D_HUMUS_C_col(:)        !UORGM(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: histr_1D_HUMUS_N_col(:)        !UORGM(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: histr_1D_HUMUS_P_col(:)        !UORGM(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_AMENDED_P_col(:)       !FerPFlx_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: histr_1D_tLITRf_P_FLX_col(:)   !LiterfalOrgP_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: histr_1D_tLITRf_P_FLX_col(:)   !LiterfalOrgM_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_tEXCH_PO4_col(:)       !UPO4(NY,NX)/AREA(3,NU(NY,NX),NY,NX), exchangeable 
   real(r8),pointer   :: histr_1D_SUR_DOP_FLX_col(:)    !HydroSufDOPFlx_col(NY,NX)/TAREA
   real(r8),pointer   :: histr_1D_SUB_DOP_FLX_col(:)    !HydroSubsDOPFlx_col(NY,NX)/TAREA
@@ -54,7 +54,7 @@ implicit none
   real(r8),pointer   :: histr_1d_HeatFlx2G_col(:)      !
   real(r8),pointer   :: histr_1d_Qinfl2soi_col(:)      !
   real(r8),pointer   :: histr_1D_tPRECIP_P_col(:)       !UPP4(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: histr_1D_tMICRO_P_col(:)        !TOPT(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: histr_1D_tMICRO_P_col(:)        !TOMET(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_PO4_FIRE_col(:)       !PO4byFire_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_cPO4_LITR_col(:)      !trc_solml_vr(ids_H2PO4,0,NY,NX)/SoilMicPMassLayer(0,NY,NX)
   real(r8),pointer   :: histr_1D_cEXCH_P_LITR_col(:)     !31.0*(trcx_solml(idx_HPO4,0,NY,NX)+trcx_solml(idx_H2PO4,0,NY,NX))/SoilMicPMassLayer(0,NY,NX)
@@ -64,24 +64,24 @@ implicit none
   real(r8),pointer   :: histr_1D_tSALT_DISCHG_FLX_col(:)    !HydroIonFlx_col(NY,NX)/TAREA
   real(r8),pointer   :: histr_1D_PSI_SURF_col(:)       !PSISM(0,NY,NX)
   real(r8),pointer   :: histr_1D_SURF_ELEV_col(:)      !-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)+DLYR(3,0,NY,NX)
-  real(r8),pointer   :: histr_1D_SURF_tLITR_N_FLX_col(:)      !URSDN(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: histr_1D_SURF_tLITR_N_FLX_col(:)      !URSDM(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
 
   real(r8),pointer   :: histr_1D_AMENDED_N_col(:)       !FertNFlx_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: histr_1D_tLITRf_N_FLX_col(:)  !LiterfalOrgN_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: histr_1D_tLITRf_C_FLX_col(:)  !LiterfalOrgC_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: histr_1D_tLITRf_N_FLX_col(:)  !LiterfalOrgM_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: histr_1D_tLITRf_C_FLX_col(:)  !LiterfalOrgM_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_tNH4X_col(:)           !UNH4(NY,NX)/AREA(3,NU(NY,NX),NY,NX), total NH3+NH4 content
   real(r8),pointer   :: histr_1D_tNO3_col(:)           !UNO3(NY,NX)/AREA(3,NU(NY,NX),NY,NX), total NO3+NO2 content
   real(r8),pointer   :: histr_1D_SUR_DON_FLX_col(:)    !HydroSufDONFlx_col(NY,NX)/TAREA, daily flux
   real(r8),pointer   :: histr_1D_SUB_DON_FLX_col(:)    !HydroSubsDONFlx_col(NY,NX)/TAREA, daily flux
   real(r8),pointer   :: histr_1D_SUR_DIN_FLX_col(:)    !HydroSufDINFlx_col(NY,NX)/TAREA
   real(r8),pointer   :: histr_1D_SUB_DIN_FLX_col(:)    !HydroSubsDINFlx_col(NY,NX)/TAREA
-  real(r8),pointer   :: histr_1D_tMICRO_N_col(:)        !TONT(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: histr_1D_tMICRO_N_col(:)        !TOMET(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_TEMP_LITR_col(:)      !TCS(0,NY,NX)
   real(r8),pointer   :: histr_1D_TEMP_SNOW_col(:)      !TCSnow(1,NY,NX)
-  real(r8),pointer   :: histr_1D_SURF_tLITR_C_FLX_col(:)      !URSDC(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: histr_1D_SURF_tLITR_C_FLX_col(:)      !URSDM(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_AMENDED_C_col(:)      !AmendCFlx_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_CO2_FLX_col(:)        !UCO2G(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: histr_1D_tMICRO_C_col(:)        !TOMT(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: histr_1D_tMICRO_C_col(:)        !TOMET(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_OMC_LITR_col(:)       !ORGC(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total residual C
   real(r8),pointer   :: histr_1D_SUR_DOC_FLX_col(:)    !HydroSufDOCFlx_col(NY,NX)/TAREA
   real(r8),pointer   :: histr_1D_SUB_DOC_FLX_col(:)    !HydroSubsDOCFlx_col(NY,NX)/TAREA
@@ -295,14 +295,14 @@ implicit none
   allocate(this%histr_1D_ECO_HVST_N_col(beg_col:end_col))      !EcoHavstElmnt_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_ECO_HVST_P_col(beg_col:end_col))      !EcoHavstElmnt_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_NET_N_MIN_col(beg_col:end_col))       !-NetNH4Mineralize_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  allocate(this%histr_1D_SURF_tLITR_P_FLX_col(beg_col:end_col))       !URSDP(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  allocate(this%histr_1D_HUMUS_C_col(beg_col:end_col))       !UORGC(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  allocate(this%histr_1D_HUMUS_N_col(beg_col:end_col))         !UORGN(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  allocate(this%histr_1D_HUMUS_P_col(beg_col:end_col))         !UORGP(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  allocate(this%histr_1D_SURF_tLITR_P_FLX_col(beg_col:end_col))       !URSDM(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  allocate(this%histr_1D_HUMUS_C_col(beg_col:end_col))       !UORGM(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  allocate(this%histr_1D_HUMUS_N_col(beg_col:end_col))         !UORGM(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  allocate(this%histr_1D_HUMUS_P_col(beg_col:end_col))         !UORGM(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_AMENDED_P_col(beg_col:end_col))        !FerPFlx_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  allocate(this%histr_1D_tLITRf_C_FLX_col(beg_col:end_col))   !LiterfalOrgC_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  allocate(this%histr_1D_tLITRf_N_FLX_col(beg_col:end_col))   !LiterfalOrgN_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  allocate(this%histr_1D_tLITRf_P_FLX_col(beg_col:end_col))   !LiterfalOrgP_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  allocate(this%histr_1D_tLITRf_C_FLX_col(beg_col:end_col))   !LiterfalOrgM_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  allocate(this%histr_1D_tLITRf_N_FLX_col(beg_col:end_col))   !LiterfalOrgM_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  allocate(this%histr_1D_tLITRf_P_FLX_col(beg_col:end_col))   !LiterfalOrgM_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_tEXCH_PO4_col(beg_col:end_col))       !UPO4(NY,NX)/AREA(3,NU(NY,NX),NY,NX), exchangeable 
   allocate(this%histr_1D_SUR_DOP_FLX_col(beg_col:end_col))     !HydroSufDOPFlx_col(NY,NX)/TAREA
   allocate(this%histr_1D_SUB_DOP_FLX_col(beg_col:end_col))     !HydroSubsDOPFlx_col(NY,NX)/TAREA
@@ -321,7 +321,7 @@ implicit none
   allocate(this%histr_1D_SUB_DIC_FLX_col(beg_col:end_col))     !HydroSubsDICFlx_col(NY,NX)/TAREA
 
   allocate(this%histr_1D_tPRECIP_P_col(beg_col:end_col))        !UPP4(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  allocate(this%histr_1D_tMICRO_P_col(beg_col:end_col))         !TOPT(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  allocate(this%histr_1D_tMICRO_P_col(beg_col:end_col))         !TOMET(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_PO4_FIRE_col(beg_col:end_col))        !PO4byFire_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_cPO4_LITR_col(beg_col:end_col))       !trc_solml_vr(ids_H2PO4,0,NY,NX)/SoilMicPMassLayer(0,NY,NX)
   allocate(this%histr_1D_cEXCH_P_LITR_col(beg_col:end_col))      !31.0*(trcx_solml(idx_HPO4,0,NY,NX)+trcx_solml(idx_H2PO4,0,NY,NX))/SoilMicPMassLayer(0,NY,NX)
@@ -330,20 +330,20 @@ implicit none
 
   allocate(this%histr_1D_PSI_SURF_col(beg_col:end_col))        !PSISM(0,NY,NX)
   allocate(this%histr_1D_SURF_ELEV_col(beg_col:end_col))       !-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)+DLYR(3,0,NY,NX)
-  allocate(this%histr_1D_SURF_tLITR_C_FLX_col(beg_col:end_col))       !URSDC(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  allocate(this%histr_1D_SURF_tLITR_N_FLX_col(beg_col:end_col))       !URSDN(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  allocate(this%histr_1D_SURF_tLITR_C_FLX_col(beg_col:end_col))       !URSDM(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  allocate(this%histr_1D_SURF_tLITR_N_FLX_col(beg_col:end_col))       !URSDM(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
 
   allocate(this%histr_1D_AMENDED_N_col(beg_col:end_col))        !FertNFlx_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
 
   allocate(this%histr_1D_tNH4X_col(beg_col:end_col))          !UNH4(NY,NX)/AREA(3,NU(NY,NX),NY,NX), total NH3+NH4 content
   allocate(this%histr_1D_tNO3_col(beg_col:end_col))          !UNO3(NY,NX)/AREA(3,NU(NY,NX),NY,NX), total NO3+NO2 content
-  allocate(this%histr_1D_tMICRO_N_col(beg_col:end_col))       !TONT(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  allocate(this%histr_1D_tMICRO_N_col(beg_col:end_col))       !TOMET(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_TEMP_LITR_col(beg_col:end_col))     !TCS(0,NY,NX), oC
   allocate(this%histr_1D_TEMP_SNOW_col(beg_col:end_col))     !TCSnow(1,NY,NX), oC
 
   allocate(this%histr_1D_AMENDED_C_col(beg_col:end_col))     !AmendCFlx_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_CO2_FLX_col(beg_col:end_col))       !UCO2G(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  allocate(this%histr_1D_tMICRO_C_col(beg_col:end_col))       !TOMT(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  allocate(this%histr_1D_tMICRO_C_col(beg_col:end_col))       !TOMET(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_OMC_LITR_col(beg_col:end_col))      !ORGC(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total residual C
   allocate(this%histr_1D_ATM_CO2_col(beg_col:end_col))       !CO2E(NY,NX)
   allocate(this%histr_1D_NBP_col(beg_col:end_col))           !Eco_NBP_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -1482,14 +1482,14 @@ implicit none
       this%histr_1D_cNO3_LITR_col(ncol) =  safe_adb(trc_solml_vr(ids_NO3,0,NY,NX)+trc_solml_vr(ids_NO2,0,NY,NX),SoilMicPMassLayer(0,NY,NX))
       this%histr_1D_ECO_HVST_N_col(ncol)=  EcoHavstElmnt_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_NET_N_MIN_col(ncol) = -NetNH4Mineralize_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%histr_1D_SURF_tLITR_P_FLX_col(ncol) =  URSDP(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%histr_1D_HUMUS_C_col(ncol)     = UORGC(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%histr_1D_HUMUS_N_col(ncol)     = UORGN(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%histr_1D_HUMUS_P_col(ncol)     = UORGP(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%histr_1D_SURF_tLITR_P_FLX_col(ncol) =  URSDM(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%histr_1D_HUMUS_C_col(ncol)     = UORGM(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%histr_1D_HUMUS_N_col(ncol)     = UORGM(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%histr_1D_HUMUS_P_col(ncol)     = UORGM(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_AMENDED_P_col(ncol)   = FerPFlx_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%histr_1D_tLITRf_C_FLX_col(ncol)= LiterfalOrgC_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%histr_1D_tLITRf_N_FLX_col(ncol)= LiterfalOrgN_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%histr_1D_tLITRf_P_FLX_col(ncol)= LiterfalOrgP_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%histr_1D_tLITRf_C_FLX_col(ncol)= LiterfalOrgM_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%histr_1D_tLITRf_N_FLX_col(ncol)= LiterfalOrgM_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%histr_1D_tLITRf_P_FLX_col(ncol)= LiterfalOrgM_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_tEXCH_PO4_col(ncol)   = UPO4(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_SUR_DOP_FLX_col(ncol)= HydroSufDOPFlx_col(NY,NX)/TAREA
       this%histr_1D_SUB_DOP_FLX_col(ncol)= HydroSubsDOPFlx_col(NY,NX)/TAREA
@@ -1508,7 +1508,7 @@ implicit none
       this%histr_1D_SUB_DIC_FLX_col(ncol) = HydroSubsDICFlx_col(NY,NX)/TAREA
       this%histr_1D_SUR_DIP_FLX_col(ncol)  = HydroSufDIPFlx_col(NY,NX)/TAREA
       this%histr_1D_tPRECIP_P_col(ncol)    = UPP4(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%histr_1D_tMICRO_P_col(ncol)     = TOPT(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%histr_1D_tMICRO_P_col(ncol)     = TOMET(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_PO4_FIRE_col(ncol)    = PO4byFire_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_cPO4_LITR_col(ncol)   = safe_adb(trc_solml_vr(ids_H2PO4,0,NY,NX),SoilMicPMassLayer(0,NY,NX))
       this%histr_1D_cEXCH_P_LITR_col(ncol)=  patomw*safe_adb(trcx_solml(idx_HPO4,0,NY,NX)+trcx_solml(idx_H2PO4,0,NY,NX),SoilMicPMassLayer(0,NY,NX))
@@ -1517,22 +1517,22 @@ implicit none
       this%histr_1D_RADN_col(ncol)        = TRAD(NY,NX)
       this%histr_1D_PSI_SURF_col(ncol)    = PSISoilMatricP(0,NY,NX)
       this%histr_1D_SURF_ELEV_col(ncol)   = -CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)+DLYR(3,0,NY,NX)
-      this%histr_1D_SURF_tLITR_N_FLX_col(ncol)   = URSDN(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%histr_1D_SURF_tLITR_N_FLX_col(ncol)   = URSDM(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_AMENDED_N_col(ncol)    = FertNFlx_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_tNH4X_col(ncol)        = UNH4(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_tNO3_col(ncol)        = UNO3(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%histr_1D_tMICRO_N_col(ncol)     = TONT(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%histr_1D_tMICRO_N_col(ncol)     = TOMET(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_TEMP_LITR_col(ncol)   = TCS(0,NY,NX)
       if(VcumSnowWE(NY,NX)<ZEROS(NY,NX))then
         this%histr_1D_TEMP_SNOW_col(ncol)   = spval
       else
         this%histr_1D_TEMP_SNOW_col(ncol)   = TCSnow(1,NY,NX)
       endif
-      this%histr_1D_SURF_tLITR_C_FLX_col(ncol)   = URSDC(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%histr_1D_SURF_tLITR_C_FLX_col(ncol)   = URSDM(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
 
       this%histr_1D_AMENDED_C_col(ncol)   = AmendCFlx_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_CO2_FLX_col(ncol)     = SurfGasFlx(idg_CO2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%histr_1D_tMICRO_C_col(ncol)     = TOMT(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%histr_1D_tMICRO_C_col(ncol)     = TOMET(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_OMC_LITR_col(ncol)    = ORGC(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_ATM_CO2_col(ncol)     = CO2E(NY,NX)
       this%histr_1D_NBP_col(ncol)         = Eco_NBP_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)

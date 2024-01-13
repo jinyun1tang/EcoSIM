@@ -816,18 +816,22 @@ implicit none
         ORM(ielmn,M,K,L1,NY,NX)=ORM(ielmn,M,K,L1,NY,NX)+FX*ORM(ielmn,M,K,L0,NY,NX)
         ORM(ielmp,M,K,L1,NY,NX)=ORM(ielmp,M,K,L1,NY,NX)+FX*ORM(ielmp,M,K,L0,NY,NX)
       ENDDO
+
       DOM(idom_doc,K,L1,NY,NX)=DOM(idom_doc,K,L1,NY,NX)+FX*DOM(idom_doc,K,L0,NY,NX)
       DOM(idom_don,K,L1,NY,NX)=DOM(idom_don,K,L1,NY,NX)+FX*DOM(idom_don,K,L0,NY,NX)
       DOM(idom_dop,K,L1,NY,NX)=DOM(idom_dop,K,L1,NY,NX)+FX*DOM(idom_dop,K,L0,NY,NX)
       DOM(idom_acetate,K,L1,NY,NX)=DOM(idom_acetate,K,L1,NY,NX)+FX*DOM(idom_acetate,K,L0,NY,NX)
+
       DOM_Macp(idom_doc,K,L1,NY,NX)=DOM_Macp(idom_doc,K,L1,NY,NX)+FX*DOM_Macp(idom_doc,K,L0,NY,NX)
       DOM_Macp(idom_don,K,L1,NY,NX)=DOM_Macp(idom_don,K,L1,NY,NX)+FX*DOM_Macp(idom_don,K,L0,NY,NX)
       DOM_Macp(idom_dop,K,L1,NY,NX)=DOM_Macp(idom_dop,K,L1,NY,NX)+FX*DOM_Macp(idom_dop,K,L0,NY,NX)
       DOM_Macp(idom_acetate,K,L1,NY,NX)=DOM_Macp(idom_acetate,K,L1,NY,NX)+FX*DOM_Macp(idom_acetate,K,L0,NY,NX)
+      
       OHM(ielmc,K,L1,NY,NX)=OHM(ielmc,K,L1,NY,NX)+FX*OHM(ielmc,K,L0,NY,NX)
       OHM(ielmn,K,L1,NY,NX)=OHM(ielmn,K,L1,NY,NX)+FX*OHM(ielmn,K,L0,NY,NX)
       OHM(ielmp,K,L1,NY,NX)=OHM(ielmp,K,L1,NY,NX)+FX*OHM(ielmp,K,L0,NY,NX)
       OHM(idom_acetate,K,L1,NY,NX)=OHM(idom_acetate,K,L1,NY,NX)+FX*OHM(idom_acetate,K,L0,NY,NX)
+      
       DO M=1,jsken
         OSA(M,K,L1,NY,NX)=OSA(M,K,L1,NY,NX)+FX*OSA(M,K,L0,NY,NX)
         OSM(ielmc,M,K,L1,NY,NX)=OSM(ielmc,M,K,L1,NY,NX)+FX*OSM(ielmc,M,K,L0,NY,NX)
@@ -861,7 +865,7 @@ implicit none
              RootMycoNonstructElmnt_vr(NE,N,L1,NZ,NY,NX)= RootMycoNonstructElmnt_vr(NE,N,L1,NZ,NY,NX)+FX* RootMycoNonstructElmnt_vr(NE,N,L0,NZ,NY,NX)
           ENDDO
           RootStructBiomC_vr(N,L1,NZ,NY,NX)=RootStructBiomC_vr(N,L1,NZ,NY,NX)+FX*RootStructBiomC_vr(N,L0,NZ,NY,NX)
-           PopuPlantRootC_vr(N,L1,NZ,NY,NX)= PopuPlantRootC_vr(N,L1,NZ,NY,NX)+FX* PopuPlantRootC_vr(N,L0,NZ,NY,NX)
+          PopuPlantRootC_vr(N,L1,NZ,NY,NX)= PopuPlantRootC_vr(N,L1,NZ,NY,NX)+FX* PopuPlantRootC_vr(N,L0,NZ,NY,NX)
           RootProteinC_pvr(N,L1,NZ,NY,NX)=RootProteinC_pvr(N,L1,NZ,NY,NX)+FX*RootProteinC_pvr(N,L0,NZ,NY,NX)
           PrimRootXNumL_pvr(N,L1,NZ,NY,NX)=PrimRootXNumL_pvr(N,L1,NZ,NY,NX)+FX*PrimRootXNumL_pvr(N,L0,NZ,NY,NX)
           SecndRootXNum_pvr(N,L1,NZ,NY,NX)=SecndRootXNum_pvr(N,L1,NZ,NY,NX)+FX*SecndRootXNum_pvr(N,L0,NZ,NY,NX)
@@ -999,10 +1003,12 @@ implicit none
       DOM(idom_don,K,L0,NY,NX)=FY*DOM(idom_don,K,L0,NY,NX)
       DOM(idom_dop,K,L0,NY,NX)=FY*DOM(idom_dop,K,L0,NY,NX)
       DOM(idom_acetate,K,L0,NY,NX)=FY*DOM(idom_acetate,K,L0,NY,NX)
+
       DOM_Macp(idom_doc,K,L0,NY,NX)=FY*DOM_Macp(idom_doc,K,L0,NY,NX)
       DOM_Macp(idom_don,K,L0,NY,NX)=FY*DOM_Macp(idom_don,K,L0,NY,NX)
       DOM_Macp(idom_dop,K,L0,NY,NX)=FY*DOM_Macp(idom_dop,K,L0,NY,NX)
       DOM_Macp(idom_acetate,K,L0,NY,NX)=FY*DOM_Macp(idom_acetate,K,L0,NY,NX)
+
       OHM(ielmc,K,L0,NY,NX)=FY*OHM(ielmc,K,L0,NY,NX)
       OHM(ielmn,K,L0,NY,NX)=FY*OHM(ielmn,K,L0,NY,NX)
       OHM(ielmp,K,L0,NY,NX)=FY*OHM(ielmp,K,L0,NY,NX)

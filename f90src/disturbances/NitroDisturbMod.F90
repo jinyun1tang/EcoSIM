@@ -337,9 +337,9 @@ module NitroDisturbMod
 !    2+1.9274*(VLiceMicP(L,NY,NX)+VLiceMacP(L,NY,NX))
 !     ENDIF
         IF(ITILL(I,NY,NX).EQ.21)THEN
-          TCOU=TCOU+OC
-          TZOU=TZOU+ON
-          TPOU=TPOU+OP
+          TOMOU(ielmc)=TOMOU(ielmc)+OC
+          TOMOU(ielmn)=TOMOU(ielmn)+ON
+          TOMOU(ielmp)=TOMOU(ielmp)+OP
           HydroSufDOCFlx_col(NY,NX)=HydroSufDOCFlx_col(NY,NX)+OC
           HydroSufDONFlx_col(NY,NX)=HydroSufDONFlx_col(NY,NX)+ON
           HydroSufDOPFlx_col(NY,NX)=HydroSufDOPFlx_col(NY,NX)+OP
@@ -348,8 +348,8 @@ module NitroDisturbMod
           CO2GIN=CO2GIN-OC
           OXYGIN=OXYGIN+2.667_r8*OC
           OXYGOU=OXYGOU+2.667_r8*OC
-          TZOU=TZOU+ON
-          TPOU=TPOU+OP
+          TOMOU(ielmn)=TOMOU(ielmn)+ON
+          TOMOU(ielmp)=TOMOU(ielmp)+OP
           CO2byFire_col(NY,NX)=CO2byFire_col(NY,NX)-(1.0_r8-FCH4F)*OC
           CH4byFire_col(NY,NX)=CH4byFire_col(NY,NX)-FCH4F*OC
           O2byFire_col(NY,NX)=O2byFire_col(NY,NX)+(1.0_r8-FCH4F)*2.667_r8*OC

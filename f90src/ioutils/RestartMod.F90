@@ -3432,17 +3432,17 @@ implicit none
 
   call restartvar(ncid, flag, varname='TCOU', &
        long_name='total subsurface C flux', units='g d-2', &
-       interpinic_flag='skip', data=TCOU, missing_value=spval, &
+       interpinic_flag='skip', data=TOMOU(ielmc), missing_value=spval, &
        fill_value=spval)
 
   call restartvar(ncid, flag, varname='TZOU', &
        long_name='total subsurface N flux', units='g d-2', &
-       interpinic_flag='skip', data=TZOU, missing_value=spval, &
+       interpinic_flag='skip', data=TOMOU(ielmn), missing_value=spval, &
        fill_value=spval)
 
   call restartvar(ncid, flag, varname='TPOU', &
        long_name='total subsurface P flux', units='g d-2', &
-       interpinic_flag='skip', data=TPOU, missing_value=spval, &
+       interpinic_flag='skip', data=TOMOU(ielmp), missing_value=spval, &
        fill_value=spval)
 
   call restartvar(ncid, flag, varname='TZIN', &
@@ -3457,18 +3457,18 @@ implicit none
 
   call restartvar(ncid, flag, varname='XCSN', &
        long_name='total litterfall C', units='g d-2', &
-       interpinic_flag='skip', data=XCSN, missing_value=spval, &
+       interpinic_flag='skip', data=XESN(ielmc), missing_value=spval, &
        fill_value=spval)
 
   call restartvar(ncid, flag, varname='XZSN', &
        long_name='total litterfall N', units='g d-2', &
-       interpinic_flag='skip', data=XZSN, missing_value=spval, &
+       interpinic_flag='skip', data=XESN(ielmn), missing_value=spval, &
        fill_value=spval)
 
   
   call restartvar(ncid, flag, varname='XPSN', &
        long_name='total litterfall P', units='g d-2', &
-       interpinic_flag='skip', data=XPSN, missing_value=spval, &
+       interpinic_flag='skip', data=XESN(ielmp), missing_value=spval, &
        fill_value=spval)
   
 
@@ -4242,53 +4242,18 @@ implicit none
   endif  
 
   if(flag=='read')then
-    datpr1 => datrc_1d            
-    call restartvar(ncid, flag, varname='LiterfalOrgC_col', dim1name='column',&
-       long_name='total litterfall C', units='g d-2', &
-       interpinic_flag='skip', data=datpr1, missing_value=spval, &
+    datpr2 => datrc_2d(1:ncols,1:NumPlantChemElmnts)            
+    call restartvar(ncid, flag, varname='LiterfalOrgM_col', dim1name='column',&
+       dim2name='elements',long_name='total litterfall C', units='g d-2', &
+       interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,LiterfalOrgC_col,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,LiterfalOrgM_col,datrc_2d) 
   else
     !print*,'LiterfalOrgC_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,LiterfalOrgC_col,datrc_1d)   
-    datpr1 => datrc_1d              
-    call restartvar(ncid, flag, varname='LiterfalOrgC_col', dim1name='column',&
-       long_name='total litterfall C', units='g d-2', &
-       interpinic_flag='skip', data=datpr1, missing_value=spval, &
-       fill_value=spval)    
-  endif  
-
-  if(flag=='read')then
-    datpr1 => datrc_1d            
-    call restartvar(ncid, flag, varname='LiterfalOrgN_col', dim1name='column',&
-       long_name='total litterfall N', units='g d-2', &
-       interpinic_flag='skip', data=datpr1, missing_value=spval, &
-       fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,LiterfalOrgN_col,datrc_1d) 
-  else
-    !print*,'LiterfalOrgN_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,LiterfalOrgN_col,datrc_1d)   
-    datpr1 => datrc_1d              
-    call restartvar(ncid, flag, varname='LiterfalOrgN_col', dim1name='column',&
-       long_name='total litterfall N', units='g d-2', &
-       interpinic_flag='skip', data=datpr1, missing_value=spval, &
-       fill_value=spval)    
-  endif  
-
-  if(flag=='read')then
-    datpr1 => datrc_1d            
-    call restartvar(ncid, flag, varname='LiterfalOrgP_col', dim1name='column',&
-       long_name='total litterfall P', units='g d-2', &
-       interpinic_flag='skip', data=datpr1, missing_value=spval, &
-       fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,LiterfalOrgP_col,datrc_1d) 
-  else
-    !print*,'LiterfalOrgP_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,LiterfalOrgP_col,datrc_1d)   
-    datpr1 => datrc_1d              
-    call restartvar(ncid, flag, varname='LiterfalOrgP_col', dim1name='column',&
-       long_name='total litterfall P', units='g d-2', &
-       interpinic_flag='skip', data=datpr1, missing_value=spval, &
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,LiterfalOrgM_col,datrc_2d)   
+    call restartvar(ncid, flag, varname='LiterfalOrgM_col', dim1name='column',&
+       dim2name='elements',long_name='total litterfall C', units='g d-2', &
+       interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
   endif  
 
