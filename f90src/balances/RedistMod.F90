@@ -379,7 +379,7 @@ module RedistMod
   SurfGasFlx(idg_CO2,NY,NX)=SurfGasFlx(idg_CO2,NY,NX)+CI
   SurfGasFlx(idg_CH4,NY,NX)=SurfGasFlx(idg_CH4,NY,NX)+CH
   CO2GIN=CO2GIN+CI+CH
-  TCOU=TCOU+CO+CX
+  TOMOU(ielmc)=TOMOU(ielmc)+CO+CX
   !
   !     SURFACE BOUNDARY O2 FLUXES
   !
@@ -408,7 +408,7 @@ module RedistMod
   ZXB=-IrrigSubsurf(NY,NX)*(N2_irrig_conc(NY,NX)+N2O_irrig_conc(NY,NX))-IrrigSubsurf(NY,NX) &
       *(NH4_irrig_conc(I,NY,NX)+NH3_irrig_conc(I,NY,NX)+NO3_irrig_conc(I,NY,NX))*14.0
   TZIN=TZIN+ZSI
-  TZOU=TZOU+ZXB
+  TOMOU(ielmn)=TOMOU(ielmn)+ZXB
   ZGI=(Rain2SoilSurf(NY,NX)+Rain2LitRSurf(NY,NX))*(N2_rain_conc(NY,NX)+N2O_rain_conc(NY,NX)) &
       +(Irrig2SoilSurf(NY,NX)+Irrig2LitRSurf(NY,NX))*(N2_irrig_conc(NY,NX)+N2O_irrig_conc(NY,NX)) &
       +GasSfAtmFlx(idg_N2,NY,NX)+GasSfAtmFlx(idg_N2O,NY,NX)+GasSfAtmFlx(idg_NH3,NY,NX) &
@@ -444,7 +444,7 @@ module RedistMod
       *(H2PO4_irrig_conc(I,NY,NX)+HPO4_irrig_conc(I,NY,NX)))
   PXB=-patomw*IrrigSubsurf(NY,NX)*(H2PO4_irrig_conc(I,NY,NX)+HPO4_irrig_conc(I,NY,NX))
   TPIN=TPIN+PI
-  TPOU=TPOU+PXB
+  TOMOU(ielmp)=TOMOU(ielmp)+PXB
   PDRAIN(NY,NX)=PDRAIN(NY,NX)+trcs_3DTransp2MicP(ids_H2PO4,3,NK(NY,NX),NY,NX) &
       +trcs_3DTransp2MicP(ids_H2PO4B,3,NK(NY,NX),NY,NX)+trcs_3DTransp2MicP(ids_H1PO4,3,NK(NY,NX),NY,NX) &
       +trcs_3DTransp2MicP(ids_H1PO4B,3,NK(NY,NX),NY,NX)
@@ -474,12 +474,13 @@ module RedistMod
   !
   !     ACCUMULATE PLANT LITTERFALL FLUXES
   !
-  XCSN=XCSN+LitterFallChemElmnt_col(ielmc,NY,NX)
-  XZSN=XZSN+LitterFallChemElmnt_col(ielmn,NY,NX)
-  XPSN=XPSN+LitterFallChemElmnt_col(ielmp,NY,NX)
-  LiterfalOrgC_col(NY,NX)=LiterfalOrgC_col(NY,NX)+LitterFallChemElmnt_col(ielmc,NY,NX)
-  LiterfalOrgN_col(NY,NX)=LiterfalOrgN_col(NY,NX)+LitterFallChemElmnt_col(ielmn,NY,NX)
-  LiterfalOrgP_col(NY,NX)=LiterfalOrgP_col(NY,NX)+LitterFallChemElmnt_col(ielmp,NY,NX)
+  XESN(ielmc)=XESN(ielmc)+LitterFallChemElmnt_col(ielmc,NY,NX)
+  XESN(ielmn)=XESN(ielmn)+LitterFallChemElmnt_col(ielmn,NY,NX)
+  XESN(ielmp)=XESN(ielmp)+LitterFallChemElmnt_col(ielmp,NY,NX)
+
+  LiterfalOrgM_col(ielmc,NY,NX)=LiterfalOrgM_col(ielmc,NY,NX)+LitterFallChemElmnt_col(ielmc,NY,NX)
+  LiterfalOrgM_col(ielmn,NY,NX)=LiterfalOrgM_col(ielmn,NY,NX)+LitterFallChemElmnt_col(ielmn,NY,NX)
+  LiterfalOrgM_col(ielmp,NY,NX)=LiterfalOrgM_col(ielmp,NY,NX)+LitterFallChemElmnt_col(ielmp,NY,NX)
   !
   !     SURFACE BOUNDARY SALT FLUXES FROM RAINFALL AND SURFACE IRRIGATION
   !
@@ -565,18 +566,17 @@ module RedistMod
   implicit none
   integer, intent(in) :: NY,NX
 
-  integer :: K,NTG
+  integer :: K,NTG,idom
   !     begin_execution
   !
   IF(ABS(TWat2GridBySurfRunoff(NY,NX)).GT.ZEROS(NY,NX))THEN
     !
     !     DOC, DON, DOP
     !
-    D8570: DO K=1,micpar%NumOfLitrCmplxs
-      DOM(idom_doc,K,0,NY,NX)=DOM(idom_doc,K,0,NY,NX)+TOCQRS(K,NY,NX)
-      DOM(idom_don,K,0,NY,NX)=DOM(idom_don,K,0,NY,NX)+TONQRS(K,NY,NX)
-      DOM(idom_dop,K,0,NY,NX)=DOM(idom_dop,K,0,NY,NX)+TOPQRS(K,NY,NX)
-      DOM(idom_acetate,K,0,NY,NX)=DOM(idom_acetate,K,0,NY,NX)+TOAQRS(K,NY,NX)
+    D8570: DO K=1,micpar%NumOfLitrCmplxs    
+      DO idom=idom_beg,idom_end
+        DOM(idom,K,0,NY,NX)=DOM(idom,K,0,NY,NX)+TOMQRS(idom,K,NY,NX)
+      ENDDO
     ENDDO D8570
 !
     call OverlandSnowFlow(NY,NX)
@@ -589,7 +589,7 @@ module RedistMod
   implicit none
   integer, intent(in) :: NY,NX
   real(r8), intent(out) :: DORGE(JY,JX)
-  integer :: K,NO,M,NGL,NTX,NTP,MID
+  integer :: K,NO,M,NGL,NTX,NTP,MID,NE,idom
 
   REAL(R8) :: DORGP
 
@@ -639,9 +639,9 @@ module RedistMod
         DO NGL=JGnio(NO),JGnfo(NO)
           DO  M=1,nlbiomcp
             MID=micpar%get_micb_id(M,NGL)
-            OMEhetr(ielmc,MID,K,NU(NY,NX),NY,NX)=OMEhetr(ielmc,MID,K,NU(NY,NX),NY,NX)+TOMEERhetr(ielmc,MID,K,NY,NX)
-            OMEhetr(ielmn,MID,K,NU(NY,NX),NY,NX)=OMEhetr(ielmn,MID,K,NU(NY,NX),NY,NX)+TOMEERhetr(ielmn,MID,K,NY,NX)
-            OMEhetr(ielmp,MID,K,NU(NY,NX),NY,NX)=OMEhetr(ielmp,MID,K,NU(NY,NX),NY,NX)+TOMEERhetr(ielmp,MID,K,NY,NX)
+            DO NE=1,NumPlantChemElmnts
+              OMEhetr(NE,MID,K,NU(NY,NX),NY,NX)=OMEhetr(NE,MID,K,NU(NY,NX),NY,NX)+TOMEERhetr(NE,MID,K,NY,NX)
+            ENDDO
             DORGE(NY,NX)=DORGE(NY,NX)+TOMEERhetr(ielmc,MID,K,NY,NX)
             DORGP=DORGP+TOMEERhetr(ielmp,MID,K,NY,NX)
           enddo
@@ -653,9 +653,9 @@ module RedistMod
       DO NGL=JGniA(NO),JGnfA(NO)
         DO  M=1,nlbiomcp
           MID=micpar%get_micb_id(M,NGL)
-          OMEauto(ielmc,MID,NU(NY,NX),NY,NX)=OMEauto(ielmc,MID,NU(NY,NX),NY,NX)+TOMEERauto(ielmc,MID,NY,NX)
-          OMEauto(ielmn,MID,NU(NY,NX),NY,NX)=OMEauto(ielmn,MID,NU(NY,NX),NY,NX)+TOMEERauto(ielmn,MID,NY,NX)
-          OMEauto(ielmp,MID,NU(NY,NX),NY,NX)=OMEauto(ielmp,MID,NU(NY,NX),NY,NX)+TOMEERauto(ielmp,MID,NY,NX)
+          DO NE=1,NumPlantChemElmnts
+            OMEauto(NE,MID,NU(NY,NX),NY,NX)=OMEauto(NE,MID,NU(NY,NX),NY,NX)+TOMEERauto(NE,MID,NY,NX)
+          ENDDO
           DORGE(NY,NX)=DORGE(NY,NX)+TOMEERauto(ielmc,MID,NY,NX)
           DORGP=DORGP+TOMEERauto(ielmp,MID,NY,NX)
         enddo
@@ -664,25 +664,24 @@ module RedistMod
 
     D9275: DO K=1,jcplx
       D9270: DO M=1,ndbiomcp
-        ORC(M,K,NU(NY,NX),NY,NX)=ORC(M,K,NU(NY,NX),NY,NX)+TORCER(M,K,NY,NX)
-        ORN(M,K,NU(NY,NX),NY,NX)=ORN(M,K,NU(NY,NX),NY,NX)+TORNER(M,K,NY,NX)
-        ORP(M,K,NU(NY,NX),NY,NX)=ORP(M,K,NU(NY,NX),NY,NX)+TORPER(M,K,NY,NX)
-        DORGE(NY,NX)=DORGE(NY,NX)+TORCER(M,K,NY,NX)
-        DORGP=DORGP+TORPER(M,K,NY,NX)
+        DO NE=1,NumPlantChemElmnts
+          ORM(NE,M,K,NU(NY,NX),NY,NX)=ORM(NE,M,K,NU(NY,NX),NY,NX)+TORMER(NE,M,K,NY,NX)
+        ENDDO
+        DORGE(NY,NX)=DORGE(NY,NX)+TORMER(ielmc,M,K,NY,NX)
+        DORGP=DORGP+TORMER(ielmp,M,K,NY,NX)
       ENDDO D9270
-      OHC(K,NU(NY,NX),NY,NX)=OHC(K,NU(NY,NX),NY,NX)+TOHCER(K,NY,NX)
-      OHN(K,NU(NY,NX),NY,NX)=OHN(K,NU(NY,NX),NY,NX)+TOHNER(K,NY,NX)
-      OHP(K,NU(NY,NX),NY,NX)=OHP(K,NU(NY,NX),NY,NX)+TOHPER(K,NY,NX)
-      OHA(K,NU(NY,NX),NY,NX)=OHA(K,NU(NY,NX),NY,NX)+TOHAER(K,NY,NX)
-      DORGE(NY,NX)=DORGE(NY,NX)+TOHCER(K,NY,NX)+TOHAER(K,NY,NX)
-      DORGP=DORGP+TOHPER(K,NY,NX)
+      DO idom=idom_beg,idom_end
+        OHM(idom,K,NU(NY,NX),NY,NX)=OHM(idom,K,NU(NY,NX),NY,NX)+TOHMER(idom,K,NY,NX)
+      ENDDO
+      DORGE(NY,NX)=DORGE(NY,NX)+TOHMER(idom_doc,K,NY,NX)+TOHMER(idom_acetate,K,NY,NX)
+      DORGP=DORGP+TOHMER(idom_dop,K,NY,NX)
       D9265: DO M=1,jsken
-        OSC(M,K,NU(NY,NX),NY,NX)=OSC(M,K,NU(NY,NX),NY,NX)+TOSCER(M,K,NY,NX)
         OSA(M,K,NU(NY,NX),NY,NX)=OSA(M,K,NU(NY,NX),NY,NX)+TOSAER(M,K,NY,NX)
-        OSN(M,K,NU(NY,NX),NY,NX)=OSN(M,K,NU(NY,NX),NY,NX)+TOSNER(M,K,NY,NX)
-        OSP(M,K,NU(NY,NX),NY,NX)=OSP(M,K,NU(NY,NX),NY,NX)+TOSPER(M,K,NY,NX)
-        DORGE(NY,NX)=DORGE(NY,NX)+TOSCER(M,K,NY,NX)
-        DORGP=DORGP+TOSPER(M,K,NY,NX)
+        DO NE=1,NumPlantChemElmnts
+          OSM(NE,M,K,NU(NY,NX),NY,NX)=OSM(NE,M,K,NU(NY,NX),NY,NX)+TOSMER(NE,M,K,NY,NX)
+        ENDDO
+        DORGE(NY,NX)=DORGE(NY,NX)+TOSMER(ielmc,M,K,NY,NX)
+        DORGP=DORGP+TOSMER(ielmp,M,K,NY,NX)
       ENDDO D9265
     ENDDO D9275
   ENDIF
@@ -695,7 +694,7 @@ module RedistMod
   integer, intent(in) :: NY,NX
   integer :: K,N,M,NGL,NB,NE
   real(r8) :: PSS,HS,CS
-  real(r8) :: DC,DN,DP,OS
+  real(r8) :: DES(1:NumPlantChemElmnts),OS
   real(r8) :: POS,POX,POP
   real(r8) :: SSS,ZG,Z4S,WS,Z4X
   real(r8) :: Z4F,ZOS,ZOF
@@ -707,14 +706,11 @@ module RedistMod
 
   NumOfLitrCmplxs   = micpar%NumOfLitrCmplxs
 
-  DC=0.0_r8
-  DN=0.0_r8
-  DP=0.0_r8
+  DES(:)=0.0_r8
   DO K=1,jcplx
     RC0(K,NY,NX)=0.0_r8
   ENDDO
   RC0ff(NY,NX)=0.0_r8
-
   OMCL(0,NY,NX)=0.0_r8
   OMNL(0,NY,NX)=0.0_r8
 
@@ -728,13 +724,12 @@ module RedistMod
         tDElmt(NE)=tDElmt(NE)+OMEhetr(NE,NB,K,0,NY,NX)
       ENDDO
     ENDDO
-    DC=DC+tDElmt(ielmc)
-    DN=DN+tDElmt(ielmn)
-    DP=DP+tDElmt(ielmp)
+
     RC0(K,NY,NX)=RC0(K,NY,NX)+tDElmt(ielmc)
-    TOMT(NY,NX)=TOMT(NY,NX)+tDElmt(ielmc)
-    TONT(NY,NX)=TONT(NY,NX)+tDElmt(ielmn)
-    TOPT(NY,NX)=TOPT(NY,NX)+tDElmt(ielmp)
+    do NE=1,NumPlantChemElmnts    
+      DES(NE)=DES(NE)+tDElmt(NE)
+      TOMET(NE,NY,NX)=TOMET(NE,NY,NX)+tDElmt(NE)
+    ENDDO
     OMCL(0,NY,NX)=OMCL(0,NY,NX)+tDElmt(ielmc)
     OMNL(0,NY,NX)=OMNL(0,NY,NX)+tDElmt(ielmn)
   ENDDO
@@ -748,62 +743,58 @@ module RedistMod
       tDElmt(NE)=tDElmt(NE)+OMEauto(NE,NB,0,NY,NX)
     ENDDO
   ENDDO
-  DC=DC+tDElmt(ielmc)
-  DN=DN+tDElmt(ielmn)
-  DP=DP+tDElmt(ielmp)
-
   RC0ff(NY,NX)=RC0ff(NY,NX)+tDElmt(ielmc)
-  TOMT(NY,NX)=TOMT(NY,NX)+tDElmt(ielmc)
-  TONT(NY,NX)=TONT(NY,NX)+tDElmt(ielmn)
-  TOPT(NY,NX)=TOPT(NY,NX)+tDElmt(ielmp)
+  DO NE=1,NumPlantChemElmnts  
+    DES(NE)=DES(NE)+tDElmt(NE)
+    TOMET(NE,NY,NX)=TOMET(NE,NY,NX)+tDElmt(NE)
+  ENDDO
   OMCL(0,NY,NX)=OMCL(0,NY,NX)+tDElmt(ielmc)
   OMNL(0,NY,NX)=OMNL(0,NY,NX)+tDElmt(ielmn)
 
   !
   !     TOTAL MICROBIAL RESIDUE C,N,P
   !
-  DC=DC+SUM(ORC(1:ndbiomcp,1:NumOfLitrCmplxs,0,NY,NX))
-  DN=DN+SUM(ORN(1:ndbiomcp,1:NumOfLitrCmplxs,0,NY,NX))
-  DP=DP+SUM(ORP(1:ndbiomcp,1:NumOfLitrCmplxs,0,NY,NX))
+  DO NE=1,NumPlantChemElmnts  
+    DES(NE)=DES(NE)+SUM(ORM(NE,1:ndbiomcp,1:NumOfLitrCmplxs,0,NY,NX))
+  ENDDO
   DO K=1,NumOfLitrCmplxs
-    RC0(K,NY,NX)=RC0(K,NY,NX)+SUM(ORC(1:ndbiomcp,K,0,NY,NX))
+    RC0(K,NY,NX)=RC0(K,NY,NX)+SUM(ORM(ielmc,1:ndbiomcp,K,0,NY,NX))
     RC0(K,NY,NX)=RC0(K,NY,NX)+DOM(idom_doc,K,0,NY,NX)+DOM_Macp(idom_doc,K,0,NY,NX) &
-      +OHC(K,0,NY,NX)+DOM(idom_acetate,K,0,NY,NX) &
-      +DOM_Macp(idom_acetate,K,0,NY,NX)+OHA(K,0,NY,NX)
-    RC0(K,NY,NX)=RC0(K,NY,NX)+SUM(OSC(1:jsken,K,0,NY,NX))
+      +OHM(ielmc,K,0,NY,NX)+DOM(idom_acetate,K,0,NY,NX) &
+      +DOM_Macp(idom_acetate,K,0,NY,NX)+OHM(idom_acetate,K,0,NY,NX)
+    RC0(K,NY,NX)=RC0(K,NY,NX)+SUM(OSM(ielmc,1:jsken,K,0,NY,NX))
   ENDDO
 
 !
 !     TOTAL DOC, DON, DOP
 !
-  DC=DC+SUM(DOM(idom_doc,1:NumOfLitrCmplxs,0,NY,NX)) &
+  DES(idom_doc)=DES(idom_doc)+SUM(DOM(idom_doc,1:NumOfLitrCmplxs,0,NY,NX)) &
     +SUM(DOM_Macp(idom_doc,1:NumOfLitrCmplxs,0,NY,NX)) &
-    +SUM(OHC(1:NumOfLitrCmplxs,0,NY,NX))+SUM(DOM(idom_acetate,1:NumOfLitrCmplxs,0,NY,NX)) &
-    +SUM(DOM_Macp(idom_acetate,1:NumOfLitrCmplxs,0,NY,NX))+SUM(OHA(1:NumOfLitrCmplxs,0,NY,NX))
+    +SUM(OHM(ielmc,1:NumOfLitrCmplxs,0,NY,NX))+SUM(DOM(idom_acetate,1:NumOfLitrCmplxs,0,NY,NX)) &
+    +SUM(DOM_Macp(idom_acetate,1:NumOfLitrCmplxs,0,NY,NX)) &
+    +SUM(OHM(idom_acetate,1:NumOfLitrCmplxs,0,NY,NX))
 
-  DN=DN+SUM(DOM(idom_don,1:NumOfLitrCmplxs,0,NY,NX)) &
+  DES(idom_don)=DES(idom_don)+SUM(DOM(idom_don,1:NumOfLitrCmplxs,0,NY,NX)) &
     +SUM(DOM_Macp(idom_don,1:NumOfLitrCmplxs,0,NY,NX)) &
-    +SUM(OHN(1:NumOfLitrCmplxs,0,NY,NX))
-  DP=DP+SUM(DOM(idom_dop,1:NumOfLitrCmplxs,0,NY,NX)) &
+    +SUM(OHM(ielmn,1:NumOfLitrCmplxs,0,NY,NX))
+  DES(idom_dop)=DES(idom_dop)+SUM(DOM(idom_dop,1:NumOfLitrCmplxs,0,NY,NX)) &
     +SUM(DOM_Macp(idom_dop,1:NumOfLitrCmplxs,0,NY,NX)) &
-    +SUM(OHP(1:NumOfLitrCmplxs,0,NY,NX))
+    +SUM(OHM(ielmp,1:NumOfLitrCmplxs,0,NY,NX))
 !
     !     TOTAL PLANT RESIDUE C,N,P
 !
-  DC=DC+SUM(OSC(1:jsken,1:NumOfLitrCmplxs,0,NY,NX))
-  DN=DN+SUM(OSN(1:jsken,1:NumOfLitrCmplxs,0,NY,NX))
-  DP=DP+SUM(OSP(1:jsken,1:NumOfLitrCmplxs,0,NY,NX))
+  DO NE=1,NumPlantChemElmnts
+    DES(NE)=DES(NE)+SUM(OSM(NE,1:jsken,1:NumOfLitrCmplxs,0,NY,NX))
+  ENDDO
 
-  ORGC(0,NY,NX)=DC
-  ORGN(0,NY,NX)=DN
-  ORGR(0,NY,NX)=DC
+  ORGC(0,NY,NX)=DES(ielmc)
+  ORGN(0,NY,NX)=DES(ielmn)
+  ORGR(0,NY,NX)=DES(ielmc)
 
-  LitRCStoreLandscape=LitRCStoreLandscape+DC
-  URSDC(NY,NX)=URSDC(NY,NX)+DC
-  LitRNStoreLandscape=LitRNStoreLandscape+DN
-  URSDN(NY,NX)=URSDN(NY,NX)+DN
-  LitRPStoreLandscape=LitRPStoreLandscape+DP
-  URSDP(NY,NX)=URSDP(NY,NX)+DP
+  DO NE=1,NumPlantChemElmnts
+    LitRMStoreLndscap(NE)=LitRMStoreLndscap(NE)+DES(NE)
+    URSDM(NE,NY,NX)=URSDM(NE,NY,NX)+DES(NE)
+  ENDDO
   WS=CanH2OHeldVg(NY,NX)+CanWatg(NY,NX)+VLWatMicP(0,NY,NX)+VLiceMicP(0,NY,NX)*DENSICE
   WaterStoreLandscape=WaterStoreLandscape+WS
   UVLWatMicP(NY,NX)=UVLWatMicP(NY,NX)+WS
@@ -1004,7 +995,7 @@ module RedistMod
 
   real(r8) :: WX,ZG,Z4S,Z4X,Z4F,ZOS,ZOF
   real(r8) :: ZGB,Z2B,ZHB
-  integer  :: idg,idom,ids
+  integer  :: idg,idom,ids,NE
 
   !     begin_execution
   !     UPDATE SOIL LAYER VARIABLES WITH TOTAL FLUXES
@@ -1020,10 +1011,10 @@ module RedistMod
 !
     D8565: DO K=1,micpar%NumOfPlantLitrCmplxs
       DO  M=1,jsken
-        OSC(M,K,L,NY,NX)=OSC(M,K,L,NY,NX)+LitrfalChemElemnts_vr(ielmc,M,K,L,NY,NX)
         OSA(M,K,L,NY,NX)=OSA(M,K,L,NY,NX)+LitrfalChemElemnts_vr(ielmc,M,K,L,NY,NX)*micpar%OMCI(1,K)
-        OSN(M,K,L,NY,NX)=OSN(M,K,L,NY,NX)+LitrfalChemElemnts_vr(ielmn,M,K,L,NY,NX)
-        OSP(M,K,L,NY,NX)=OSP(M,K,L,NY,NX)+LitrfalChemElemnts_vr(ielmp,M,K,L,NY,NX)
+        DO NE=1,NumPlantChemElmnts
+          OSM(NE,M,K,L,NY,NX)=OSM(NE,M,K,L,NY,NX)+LitrfalChemElemnts_vr(NE,M,K,L,NY,NX)
+        ENDDO
       enddo
     ENDDO D8565
 !
@@ -1054,9 +1045,9 @@ module RedistMod
     !     DOC, DON, DOP FROM PLANT EXUDATION
     !
     D195: DO K=1,jcplx
-      DOM(idom_doc,K,L,NY,NX)=DOM(idom_doc,K,L,NY,NX)+TDFOME(ielmc,K,L,NY,NX)
-      DOM(idom_don,K,L,NY,NX)=DOM(idom_don,K,L,NY,NX)+TDFOME(ielmn,K,L,NY,NX)
-      DOM(idom_dop,K,L,NY,NX)=DOM(idom_dop,K,L,NY,NX)+TDFOME(ielmp,K,L,NY,NX)
+      DO NE=1,NumPlantChemElmnts
+      DOM(NE,K,L,NY,NX)=DOM(NE,K,L,NY,NX)+TDFOME(NE,K,L,NY,NX)
+      ENDDO
     ENDDO D195
     !
     !     SOIL SOLUTES FROM AQUEOUS TRANSPORT, MICROBIAL AND ROOT
@@ -1190,7 +1181,7 @@ module RedistMod
     ENDIF
     CO2GIN=CO2GIN+CIB+CHB
     COB=TCO2P(L,NY,NX)+trcs_plant_uptake_vr(idg_CO2,L,NY,NX)-TR_CO2_aqu_soil_vr(L,NY,NX)
-    TCOU=TCOU+COB
+    TOMOU(ielmc)=TOMOU(ielmc)+COB
     SurfGasFlx(idg_CO2,NY,NX)=SurfGasFlx(idg_CO2,NY,NX)+CIB
     SurfGasFlx(idg_CH4,NY,NX)=SurfGasFlx(idg_CH4,NY,NX)+CHB
     UCOP(NY,NX)=UCOP(NY,NX)+TCO2P(L,NY,NX)+trcs_plant_uptake_vr(idg_CO2,L,NY,NX)
@@ -1425,11 +1416,11 @@ module RedistMod
   integer, intent(in) :: L,NY,NX
   real(r8), intent(in):: DORGEC
   real(r8), intent(out):: DORGCL
-  real(r8) :: DC,DN,DP,OC,ON,OP
+  real(r8) :: DES(NumPlantChemElmnts),OM(NumPlantChemElmnts)
 
-  integer :: K,N,M,NGL
+  integer :: K,N,M,NGL,NE
   integer :: NumOfLitrCmplxs
-  real(r8) :: tDC,tDN,tDP
+  real(r8) :: tDES(NumPlantChemElmnts)
     !     TOTAL SOC,SON,SOP
     !
     !     OMC=microbial biomass, ORC=microbial residue
@@ -1441,91 +1432,77 @@ module RedistMod
 !
   NumOfLitrCmplxs  = micpar%NumOfLitrCmplxs
 
-  DC=0.0_r8
-  DN=0.0_r8
-  DP=0.0_r8
-  OC=0.0_r8
-  ON=0.0_r8
-  OP=0.0_r8
+  DES(:)=0.0_r8
+  OM(:)=0.0_r8
   OMCL(L,NY,NX)=0.0_r8
   OMNL(L,NY,NX)=0.0_r8
 
 ! add living microbes
   DO K=1,jcplx
-    tDC=SUM(OMEhetr(ielmc,1:NumLiveHeterBioms,K,L,NY,NX))
-    tDN=SUM(OMEhetr(ielmn,1:NumLiveHeterBioms,K,L,NY,NX))
-    tDP=SUM(OMEhetr(ielmp,1:NumLiveHeterBioms,K,L,NY,NX))
+    DO NE=1,NumPlantChemElmnts
+      tDES(NE)=SUM(OMEhetr(NE,1:NumLiveHeterBioms,K,L,NY,NX))
+    ENDDO
+
     IF(micpar%is_litter(K))THEN  
       !K=0,1,2: woody litr, nonwoody litr, and manure
-      DC=DC+tDC
-      DN=DN+tDN
-      DP=DP+tDP
-
-      TOMT(NY,NX)=TOMT(NY,NX)+tDC
-      TONT(NY,NX)=TONT(NY,NX)+tDN
-      TOPT(NY,NX)=TOPT(NY,NX)+tDP
-      OMCL(L,NY,NX)=OMCL(L,NY,NX)+tDC
-      OMNL(L,NY,NX)=OMNL(L,NY,NX)+tDN
+      DO NE=1,NumPlantChemElmnts
+        DES(NE)=DES(NE)+tDES(NE)
+        TOMET(NE,NY,NX)=TOMET(NE,NY,NX)+tDES(NE)
+      ENDDO
+      OMCL(L,NY,NX)=OMCL(L,NY,NX)+tDES(ielmc)
+      OMNL(L,NY,NX)=OMNL(L,NY,NX)+tDES(ielmn)
     ELSE
-      OC=OC+tDC
-      ON=ON+tDN
-      OP=OP+tDP
-
-      TOMT(NY,NX)=TOMT(NY,NX)+tDC
-      TONT(NY,NX)=TONT(NY,NX)+tDN
-      TOPT(NY,NX)=TOPT(NY,NX)+tDP
-      OMCL(L,NY,NX)=OMCL(L,NY,NX)+tDC
-      OMNL(L,NY,NX)=OMNL(L,NY,NX)+tDN
+      DO NE=1,NumPlantChemElmnts
+        OM(NE)=OM(NE)+tDES(NE)
+        TOMET(NE,NY,NX)=TOMET(NE,NY,NX)+tDES(NE)
+      ENDDO
+      OMCL(L,NY,NX)=OMCL(L,NY,NX)+tDES(ielmc)
+      OMNL(L,NY,NX)=OMNL(L,NY,NX)+tDES(ielmn)
     ENDIF
   ENDDO
 
 ! add autotrophs
-  tDC=SUM(OMEauto(ielmc,1:NumLiveAutoBioms,L,NY,NX))
-  tDN=SUM(OMEauto(ielmn,1:NumLiveAutoBioms,L,NY,NX))
-  tDP=SUM(OMEauto(ielmp,1:NumLiveAutoBioms,L,NY,NX))
-  OC=OC+tDC
-  ON=ON+tDN
-  OP=OP+tDP
-  TOMT(NY,NX)=TOMT(NY,NX)+tDC
-  TONT(NY,NX)=TONT(NY,NX)+tDN
-  TOPT(NY,NX)=TOPT(NY,NX)+tDP
-  OMCL(L,NY,NX)=OMCL(L,NY,NX)+tDC
-  OMNL(L,NY,NX)=OMNL(L,NY,NX)+tDN
+  DO NE=1,NumPlantChemElmnts
+    tDES(NE)=SUM(OMEauto(NE,1:NumLiveAutoBioms,L,NY,NX))
+    OM(NE)=OM(NE)+tDES(NE)
+    TOMET(NE,NY,NX)=TOMET(NE,NY,NX)+tDES(NE)
+  ENDDO
+  OMCL(L,NY,NX)=OMCL(L,NY,NX)+tDES(ielmc)
+  OMNL(L,NY,NX)=OMNL(L,NY,NX)+tDES(ielmn)
 
   DO K=1,jcplx
     IF(micpar%is_litter(K))THEN
 ! litter + manure
-      DC=DC+SUM(ORC(1:ndbiomcp,K,L,NY,NX))
-      DN=DN+SUM(ORN(1:ndbiomcp,K,L,NY,NX))
-      DP=DP+SUM(ORP(1:ndbiomcp,K,L,NY,NX))
-      DC=DC+DOM(idom_doc,K,L,NY,NX)+DOM_Macp(idom_doc,K,L,NY,NX)+OHC(K,L,NY,NX) &
-        +DOM(idom_acetate,K,L,NY,NX)+DOM_Macp(idom_acetate,K,L,NY,NX)+OHA(K,L,NY,NX)
-      DN=DN+DOM(idom_don,K,L,NY,NX)+DOM_Macp(idom_don,K,L,NY,NX)+OHN(K,L,NY,NX)
-      DP=DP+DOM(idom_dop,K,L,NY,NX)+DOM_Macp(idom_dop,K,L,NY,NX)+OHP(K,L,NY,NX)
+      DO NE=1,NumPlantChemElmnts
+        DES(NE)=DES(NE)+SUM(ORM(NE,1:ndbiomcp,K,L,NY,NX))
+      ENDDO
 
-      DC=DC+SUM(OSC(1:jsken,K,L,NY,NX))
-      DN=DN+SUM(OSN(1:jsken,K,L,NY,NX))
-      DP=DP+SUM(OSP(1:jsken,K,L,NY,NX))
+      DES(ielmc)=DES(ielmc)+DOM(idom_doc,K,L,NY,NX)+DOM_Macp(idom_doc,K,L,NY,NX)+OHM(ielmc,K,L,NY,NX) &
+        +DOM(idom_acetate,K,L,NY,NX)+DOM_Macp(idom_acetate,K,L,NY,NX)+OHM(idom_acetate,K,L,NY,NX)
+      DES(ielmn)=DES(ielmn)+DOM(idom_don,K,L,NY,NX)+DOM_Macp(idom_don,K,L,NY,NX)+OHM(ielmn,K,L,NY,NX)
+      DES(ielmp)=DES(ielmp)+DOM(idom_dop,K,L,NY,NX)+DOM_Macp(idom_dop,K,L,NY,NX)+OHM(ielmp,K,L,NY,NX)
 
+      DO NE=1,NumPlantChemElmnts
+        DES(NE)=DES(NE)+SUM(OSM(NE,1:jsken,K,L,NY,NX))
+      ENDDO
     ELSE
-      OC=OC+SUM(ORC(1:ndbiomcp,K,L,NY,NX))
-      ON=ON+SUM(ORN(1:ndbiomcp,K,L,NY,NX))
-      OP=OP+SUM(ORP(1:ndbiomcp,K,L,NY,NX))
+      DO NE=1,NumPlantChemElmnts    
+        OM(NE)=OM(NE)+SUM(ORM(NE,1:ndbiomcp,K,L,NY,NX))
+      ENDDO
+      OM(ielmc)=OM(ielmc)+DOM(idom_doc,K,L,NY,NX)+DOM_Macp(idom_doc,K,L,NY,NX)+OHM(ielmc,K,L,NY,NX) &
+        +DOM(idom_acetate,K,L,NY,NX)+DOM_Macp(idom_acetate,K,L,NY,NX)+OHM(idom_acetate,K,L,NY,NX)
+      OM(ielmn)=OM(ielmn)+DOM(idom_don,K,L,NY,NX)+DOM_Macp(idom_don,K,L,NY,NX)+OHM(ielmn,K,L,NY,NX)
+      OM(ielmp)=OM(ielmp)+DOM(idom_dop,K,L,NY,NX)+DOM_Macp(idom_dop,K,L,NY,NX)+OHM(ielmp,K,L,NY,NX)
 
-      OC=OC+DOM(idom_doc,K,L,NY,NX)+DOM_Macp(idom_doc,K,L,NY,NX)+OHC(K,L,NY,NX) &
-        +DOM(idom_acetate,K,L,NY,NX)+DOM_Macp(idom_acetate,K,L,NY,NX)+OHA(K,L,NY,NX)
-      ON=ON+DOM(idom_don,K,L,NY,NX)+DOM_Macp(idom_don,K,L,NY,NX)+OHN(K,L,NY,NX)
-      OP=OP+DOM(idom_dop,K,L,NY,NX)+DOM_Macp(idom_dop,K,L,NY,NX)+OHP(K,L,NY,NX)
-
-      OC=OC+SUM(OSC(1:jsken,K,L,NY,NX))
-      ON=ON+SUM(OSN(1:jsken,K,L,NY,NX))
-      OP=OP+SUM(OSP(1:jsken,K,L,NY,NX))
+      DO NE=1,NumPlantChemElmnts    
+        OM(NE)=OM(NE)+SUM(OSM(NE,1:jsken,K,L,NY,NX))
+      ENDDO
     ENDIF
   ENDDO
   !litter plus non-litter
-  ORGC(L,NY,NX)=DC+OC
-  ORGN(L,NY,NX)=DN+ON
-  ORGR(L,NY,NX)=DC
+  ORGC(L,NY,NX)=DES(ielmc)+OM(ielmc)
+  ORGN(L,NY,NX)=DES(ielmn)+OM(ielmn)
+  ORGR(L,NY,NX)=DES(ielmc)
 
   IF(iErosionMode.EQ.ieros_frzthawsom.OR.iErosionMode.EQ.ieros_frzthawsomeros)THEN
 ! change in organic C
@@ -1536,20 +1513,14 @@ module RedistMod
   ELSE
     DORGCL=0.0_r8
   ENDIF
-
-  LitRCStoreLandscape=LitRCStoreLandscape+DC
-  URSDC(NY,NX)=URSDC(NY,NX)+DC
-  LitRNStoreLandscape=LitRNStoreLandscape+DN
-  URSDN(NY,NX)=URSDN(NY,NX)+DN
-  LitRPStoreLandscape=LitRPStoreLandscape+DP
-  URSDP(NY,NX)=URSDP(NY,NX)+DP
-  PomHumCStoreLandscape=PomHumCStoreLandscape+OC
-  UORGC(NY,NX)=UORGC(NY,NX)+OC
-  PomHumNStoreLandscape=PomHumNStoreLandscape+ON
-  UORGN(NY,NX)=UORGN(NY,NX)+ON
-  PomHumPStoreLandscape=PomHumPStoreLandscape+OP
-  UORGP(NY,NX)=UORGP(NY,NX)+OP
-  TSEDSO=TSEDSO+(DC+OC)*ppmc
+  DO NE=1,NumPlantChemElmnts
+    LitRMStoreLndscap(NE)=LitRMStoreLndscap(NE)+DES(NE)
+    URSDM(NE,NY,NX)=URSDM(NE,NY,NX)+DES(NE)
+    
+    POMHumStoreLndscap(NE)=POMHumStoreLndscap(NE)+OM(NE)
+    UORGM(NE,NY,NX)=UORGM(NE,NY,NX)+OM(NE)
+  ENDDO
+  TSEDSO=TSEDSO+(DES(ielmc)+OM(ielmc))*ppmc
   end subroutine SumOMStates
 
 !------------------------------------------------------------------------------------------
@@ -1558,7 +1529,7 @@ module RedistMod
   implicit none
   integer, intent(in) :: NY,NX
 
-  integer :: M,N,K,NGL
+  integer :: M,N,K,NGL,NE
   real(r8) :: HRAINR,RAINR
 
 !     begin_execution
@@ -1573,10 +1544,11 @@ module RedistMod
 !
   DO   K=1,micpar%NumOfPlantLitrCmplxs
     DO  M=1,jsken
-      OSC(M,K,0,NY,NX)=OSC(M,K,0,NY,NX)+LitrfalChemElemnts_vr(ielmc,M,K,0,NY,NX)
       OSA(M,K,0,NY,NX)=OSA(M,K,0,NY,NX)+LitrfalChemElemnts_vr(ielmc,M,K,0,NY,NX)*micpar%OMCI(1,K)
-      OSN(M,K,0,NY,NX)=OSN(M,K,0,NY,NX)+LitrfalChemElemnts_vr(ielmn,M,K,0,NY,NX)
-      OSP(M,K,0,NY,NX)=OSP(M,K,0,NY,NX)+LitrfalChemElemnts_vr(ielmp,M,K,0,NY,NX)
+      DO NE=1,NumPlantChemElmnts
+        OSM(NE,M,K,0,NY,NX)=OSM(NE,M,K,0,NY,NX)+LitrfalChemElemnts_vr(NE,M,K,0,NY,NX)
+      ENDDO
+
       ORGC(0,NY,NX)=ORGC(0,NY,NX)+LitrfalChemElemnts_vr(ielmc,M,K,0,NY,NX)
       RAINR=LitrfalChemElemnts_vr(ielmc,M,K,0,NY,NX)*ThetaCX(K)
       HRAINR=RAINR*cpw*TairK(NY,NX)

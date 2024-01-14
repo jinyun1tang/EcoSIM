@@ -169,7 +169,7 @@ end program main
   forc%H2GE =H2GE
   forc%disvolonly=disvolonly
 
-  call ReadForc(forc,forc_file)
+  call ReadFORC(forc,forc_file)
 
   call micfor%Init()
   call micstt%Init()
@@ -203,7 +203,7 @@ end program main
 
 !   setup forcing, e.g., add litter/om/nutrients, set up temperature/moisture
 !
-    call UpdateForc(forc,forctype)
+    call UpdateFORC(forc,forctype)
 
     call BatchModelConfig(nvars,ystates0l,forc,micfor,micstt,micflx,err_status)
 

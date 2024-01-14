@@ -414,7 +414,7 @@ subroutine soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
 !
 
     if(do_bgcforc_write)then
-      call WriteBBGCForc(I,IYRR)
+      call WriteBBGCFORC(I,IYRR)
     endif
     if(nlend)exit
   END DO

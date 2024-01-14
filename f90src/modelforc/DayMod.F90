@@ -97,7 +97,7 @@
   integer :: NZ,NE
 
   AmendCFlx_col(NY,NX)=0._r8
-  LiterfalOrgC_col(NY,NX)=0._r8
+  LiterfalOrgM_col(ielmc,NY,NX)=0._r8
   UCOP(NY,NX)=0._r8
   Eco_NBP_col(NY,NX)=0._r8
   URAIN(NY,NX)=0._r8
@@ -107,11 +107,11 @@
   UVOLO(NY,NX)=0._r8
   HydroIonFlx_col(NY,NX)=0._r8
   FertNFlx_col(NY,NX)=0._r8
-  LiterfalOrgN_col(NY,NX)=0._r8
+  LiterfalOrgM_col(ielmn,NY,NX)=0._r8
   HydroSufDONFlx_col(NY,NX)=0._r8
   HydroSufDINFlx_col(NY,NX)=0._r8
   FerPFlx_col(NY,NX)=0._r8
-  LiterfalOrgP_col(NY,NX)=0._r8
+  LiterfalOrgM_col(ielmp,NY,NX)=0._r8
   HydroSufDOPFlx_col(NY,NX)=0._r8
   HydroSufDIPFlx_col(NY,NX)=0._r8
   CO2byFire_col(NY,NX)=0._r8

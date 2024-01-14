@@ -101,14 +101,10 @@ type, public :: NitroAQMFluxDiagType
   real(r8),allocatable :: FPO4XR(:,:)
   real(r8),allocatable :: FP14XR(:,:)
 ! fluxes
-  real(r8),allocatable :: CGOMC(:,:)
-  real(r8),allocatable :: CGOMN(:,:)
-  real(r8),allocatable :: CGOMP(:,:)
+  real(r8),allocatable :: CGOMEheter(:,:,:)
   real(r8),allocatable :: CGOQC(:,:)
   real(r8),allocatable :: CGOAC(:,:)
-  real(r8),allocatable :: CGOMS(:,:,:)
-  real(r8),allocatable :: CGONS(:,:,:)
-  real(r8),allocatable :: CGOPS(:,:,:)
+  real(r8),allocatable :: CGOMES(:,:,:,:)
   real(r8),allocatable :: RUPOX(:,:)
   real(r8),allocatable :: RGN2F(:,:)
   real(r8),allocatable :: RGOMO(:,:)
@@ -128,41 +124,19 @@ type, public :: NitroAQMFluxDiagType
   real(r8),allocatable :: RINB4(:,:)
   real(r8),allocatable :: RINB3(:,:)
   real(r8),allocatable :: RIPOB(:,:)
-  real(r8),allocatable :: RDOMC(:,:,:)
-  real(r8),allocatable :: RDOMN(:,:,:)
-  real(r8),allocatable :: RDOMP(:,:,:)
-  real(r8),allocatable :: RHOMC(:,:,:)
-  real(r8),allocatable :: RHOMN(:,:,:)
-  real(r8),allocatable :: RHOMP(:,:,:)
-  real(r8),allocatable :: RCOMC(:,:,:)
-  real(r8),allocatable :: RCOMN(:,:,:)
-  real(r8),allocatable :: RCOMP(:,:,:)
+  real(r8),allocatable :: RDOMEheter(:,:,:,:)
+  real(r8),allocatable :: RHOMEheter(:,:,:,:)
+  real(r8),allocatable :: RCOMEheter(:,:,:,:)
   real(r8),allocatable :: RH2GX(:,:)
-  real(r8),allocatable :: RDMMC(:,:,:)
-  real(r8),allocatable :: RHMMC(:,:,:)
-  real(r8),allocatable :: RCMMC(:,:,:)
-  real(r8),allocatable :: RDMMN(:,:,:)
-  real(r8),allocatable :: RHMMN(:,:,:)
-  real(r8),allocatable :: RCMMN(:,:,:)
-  real(r8),allocatable :: RDMMP(:,:,:)
-  real(r8),allocatable :: RHMMP(:,:,:)
-  real(r8),allocatable :: RCMMP(:,:,:)
-  real(r8),allocatable :: RCCMC(:,:,:)
-  real(r8),allocatable :: RCCMN(:,:,:)
-  real(r8),allocatable :: RCCMP(:,:,:)
+  real(r8),allocatable :: RDMMEheter(:,:,:,:)
+  real(r8),allocatable :: RHMMEheter(:,:,:,:)
+  real(r8),allocatable :: RCMMEheter(:,:,:,:)
+  real(r8),allocatable :: RCCMEheter(:,:,:,:)
   real(r8),allocatable :: RN2FX(:,:)
-  real(r8),allocatable :: RXOMC(:,:,:)
-  real(r8),allocatable :: RXOMN(:,:,:)
-  real(r8),allocatable :: RXOMP(:,:,:)
-  real(r8),allocatable :: R3OMC(:,:,:)
-  real(r8),allocatable :: R3OMN(:,:,:)
-  real(r8),allocatable :: R3OMP(:,:,:)
-  real(r8),allocatable :: RXMMC(:,:,:)
-  real(r8),allocatable :: RXMMN(:,:,:)
-  real(r8),allocatable :: RXMMP(:,:,:)
-  real(r8),allocatable :: R3MMC(:,:,:)
-  real(r8),allocatable :: R3MMN(:,:,:)
-  real(r8),allocatable :: R3MMP(:,:,:)
+  real(r8),allocatable :: RXOMEheter(:,:,:,:)
+  real(r8),allocatable :: R3OMEheter(:,:,:,:)
+  real(r8),allocatable :: RXMMEheter(:,:,:,:)
+  real(r8),allocatable :: R3MMEheter(:,:,:,:)
   real(r8),allocatable :: RINH4R(:,:)
   real(r8),allocatable :: RINO3R(:,:)
   real(r8),allocatable :: RIPO4R(:,:)
@@ -175,9 +149,7 @@ type, public :: NitroAQMFluxDiagType
   real(r8),allocatable :: RVOXB(:)
   real(r8) :: RVOXAAO
   real(r8) :: RVOXBAO
-  real(r8),allocatable :: XOMCZ(:,:,:)
-  real(r8),allocatable :: XOMNZ(:,:,:)
-  real(r8),allocatable :: XOMPZ(:,:,:)
+  real(r8),allocatable :: XOMZ(:,:,:,:)
   real(r8),allocatable :: RIP14(:,:)
   real(r8),allocatable :: RIP1B(:,:)
   real(r8),allocatable :: RIP14R(:,:)
@@ -201,43 +173,19 @@ type, public :: NitroAQMFluxDiagType
   real(r8),allocatable :: RINB4ff(:)
   real(r8),allocatable :: RINB3ff(:)
   real(r8),allocatable :: RIPOBff(:)
-  real(r8),allocatable :: RDOMCff(:,:)
-  real(r8),allocatable :: RDOMNff(:,:)
-  real(r8),allocatable :: RDOMPff(:,:)
-  real(r8),allocatable :: RHOMCff(:,:)
-  real(r8),allocatable :: RHOMNff(:,:)
-  real(r8),allocatable :: RHOMPff(:,:)
-  real(r8),allocatable :: RCOMCff(:,:)
-  real(r8),allocatable :: RCOMNff(:,:)
-  real(r8),allocatable :: RCOMPff(:,:)
-  real(r8),allocatable :: CGOMCff(:)
-  real(r8),allocatable :: CGOMNff(:)
+  real(r8),allocatable :: RDOMEautor(:,:,:)
+  real(r8),allocatable :: RHOMEautor(:,:,:)
+  real(r8),allocatable :: RCOMEautor(:,:,:)
+  real(r8),allocatable :: CGOMEautor(:,:)
   real(r8),allocatable :: RH2GXff(:)
-  real(r8),allocatable :: CGOMPff(:)
-  real(r8),allocatable :: RDMMCff(:,:)
-  real(r8),allocatable :: RHMMCff(:,:)
-  real(r8),allocatable :: RCMMCff(:,:)
-  real(r8),allocatable :: RDMMNff(:,:)
-  real(r8),allocatable :: RHMMNff(:,:)
-  real(r8),allocatable :: RCMMNff(:,:)
-  real(r8),allocatable :: RDMMPff(:,:)
-  real(r8),allocatable :: RHMMPff(:,:)
-  real(r8),allocatable :: RCMMPff(:,:)
+  real(r8),allocatable :: RDMMEautor(:,:,:)
+  real(r8),allocatable :: RHMMEautor(:,:,:)
+  real(r8),allocatable :: RCMMEautor(:,:,:)
   real(r8),allocatable :: RN2FXff(:)
-  real(r8),allocatable :: RXOMCff(:,:)
-  real(r8),allocatable :: RXOMNff(:,:)
-  real(r8),allocatable :: RXOMPff(:,:)
-  real(r8),allocatable :: R3OMCff(:,:)
-  real(r8),allocatable :: R3OMNff(:,:)
-  real(r8),allocatable :: R3OMPff(:,:)
-  real(r8),allocatable :: RXMMCff(:,:)
-  real(r8),allocatable :: RXMMNff(:,:)
-  real(r8),allocatable :: RXMMPff(:,:)
-  real(r8),allocatable :: R3MMCff(:,:)
-  real(r8),allocatable :: R3MMNff(:,:)
-  real(r8),allocatable :: R3MMPff(:,:)
-  real(r8),allocatable :: CGOQCff(:)
-  real(r8),allocatable :: CGOACff(:)
+  real(r8),allocatable :: RXOMEautor(:,:,:)
+  real(r8),allocatable :: R3OMEautor(:,:,:)
+  real(r8),allocatable :: RXMMEautor(:,:,:)
+  real(r8),allocatable :: R3MMEautor(:,:,:)
   real(r8),allocatable :: RINH4Rff(:)
   real(r8),allocatable :: RINO3Rff(:)
   real(r8),allocatable :: RIPO4Rff(:)
@@ -245,9 +193,7 @@ type, public :: NitroAQMFluxDiagType
   real(r8),allocatable :: FNO3XRff(:)
   real(r8),allocatable :: FPO4XRff(:)
   real(r8),allocatable :: RGOMYff(:)
-  real(r8),allocatable :: CGOMSff(:,:)
-  real(r8),allocatable :: CGONSff(:,:)
-  real(r8),allocatable :: CGOPSff(:,:)
+  real(r8),allocatable :: CGOSEautor(:,:,:)
   real(r8),allocatable :: FP14XRff(:)
   real(r8),allocatable :: RCO2Xff(:)
   real(r8),allocatable :: RCH3Xff(:)
@@ -262,36 +208,16 @@ type, public :: NitroAQMFluxDiagType
   end type NitroMicFluxType
 
   type, public :: NitroOMcplxFluxType
-    real(r8),allocatable :: RDOSC(:,:)
-    real(r8),allocatable :: RDOSN(:,:)
-    real(r8),allocatable :: RDOSP(:,:)
-    real(r8),allocatable :: RHOSC(:,:)
-    real(r8),allocatable :: RHOSN(:,:)
-    real(r8),allocatable :: RHOSP(:,:)
-    real(r8),allocatable :: RCOSC(:,:)
-    real(r8),allocatable :: RCOSN(:,:)
-    real(r8),allocatable :: RCOSP(:,:)
-    real(r8),allocatable :: RDORC(:,:)
-    real(r8),allocatable :: RDORN(:,:)
-    real(r8),allocatable :: RDORP(:,:)
-    real(r8),allocatable :: RDOHC(:)
-    real(r8),allocatable :: RDOHN(:)
-    real(r8),allocatable :: RDOHP(:)
-    real(r8),allocatable :: RDOHA(:)
-    real(r8),allocatable :: CSORP(:)
-    real(r8),allocatable :: ZSORP(:)
-    real(r8),allocatable :: PSORP(:)
-    real(r8),allocatable :: CSORPA(:)
-    real(r8),allocatable :: TCGOQC(:)
-    real(r8),allocatable :: TCGOAC(:)
-    real(r8),allocatable :: TCGOMN(:)
-    real(r8),allocatable :: TCGOMP(:)
+    real(r8),allocatable :: RDOSM(:,:,:)
+    real(r8),allocatable :: RHOSM(:,:,:)
+    real(r8),allocatable :: RCOSM(:,:,:)
+    real(r8),allocatable :: RDORM(:,:,:)
+    real(r8),allocatable :: RDOHM(:,:)
+    real(r8),allocatable :: OMSORP(:,:)
+    real(r8),allocatable :: TCGOMEheter(:,:)
     real(r8),allocatable :: ROQCK(:)
     real(r8),allocatable :: XOQCK(:)
-    real(r8),allocatable :: XOQCZ(:)
-    real(r8),allocatable :: XOQNZ(:)
-    real(r8),allocatable :: XOQPZ(:)
-    real(r8),allocatable :: XOQAZ(:)
+    real(r8),allocatable :: XOQMZ(:,:)
   contains
     procedure, public :: Init => nit_omcplxf_init
     procedure, public :: ZeroOut => nit_omcplxf_zero
@@ -426,41 +352,19 @@ type, public :: NitroAQMFluxDiagType
   allocate(this%RINB4(NumMicrbHetetrophCmplx,1:jcplx))
   allocate(this%RINB3(NumMicrbHetetrophCmplx,1:jcplx))
   allocate(this%RIPOB(NumMicrbHetetrophCmplx,1:jcplx))
-  allocate(this%RDOMC(2,NumMicrbHetetrophCmplx,1:jcplx))
-  allocate(this%RDOMN(2,NumMicrbHetetrophCmplx,1:jcplx))
-  allocate(this%RDOMP(2,NumMicrbHetetrophCmplx,1:jcplx))
-  allocate(this%RHOMC(2,NumMicrbHetetrophCmplx,1:jcplx))
-  allocate(this%RHOMN(2,NumMicrbHetetrophCmplx,1:jcplx))
-  allocate(this%RHOMP(2,NumMicrbHetetrophCmplx,1:jcplx))
-  allocate(this%RCOMC(2,NumMicrbHetetrophCmplx,1:jcplx))
-  allocate(this%RCOMN(2,NumMicrbHetetrophCmplx,1:jcplx))
-  allocate(this%RCOMP(2,NumMicrbHetetrophCmplx,1:jcplx))
-  allocate(this%CGOMC(NumMicrbHetetrophCmplx,1:jcplx))
-  allocate(this%CGOMN(NumMicrbHetetrophCmplx,1:jcplx))
+  allocate(this%RDOMEheter(NumPlantChemElmnts,2,NumMicrbHetetrophCmplx,1:jcplx))
+  allocate(this%RHOMEheter(NumPlantChemElmnts,2,NumMicrbHetetrophCmplx,1:jcplx))
+  allocate(this%RCOMEheter(NumPlantChemElmnts,2,NumMicrbHetetrophCmplx,1:jcplx))
+  allocate(this%CGOMEheter(NumPlantChemElmnts,NumMicrbHetetrophCmplx,1:jcplx))
   allocate(this%RH2GX(NumMicrbHetetrophCmplx,1:jcplx))
-  allocate(this%CGOMP(NumMicrbHetetrophCmplx,1:jcplx))
-  allocate(this%RDMMC(2,NumMicrbHetetrophCmplx,1:jcplx))
-  allocate(this%RHMMC(2,NumMicrbHetetrophCmplx,1:jcplx))
-  allocate(this%RCMMC(2,NumMicrbHetetrophCmplx,1:jcplx))
-  allocate(this%RDMMN(2,NumMicrbHetetrophCmplx,1:jcplx))
-  allocate(this%RHMMN(2,NumMicrbHetetrophCmplx,1:jcplx))
-  allocate(this%RCMMN(2,NumMicrbHetetrophCmplx,1:jcplx))
-  allocate(this%RDMMP(2,NumMicrbHetetrophCmplx,1:jcplx))
-  allocate(this%RHMMP(2,NumMicrbHetetrophCmplx,1:jcplx))
-  allocate(this%RCMMP(2,NumMicrbHetetrophCmplx,1:jcplx))
+  allocate(this%RDMMEheter(NumPlantChemElmnts,2,NumMicrbHetetrophCmplx,1:jcplx))
+  allocate(this%RHMMEheter(NumPlantChemElmnts,2,NumMicrbHetetrophCmplx,1:jcplx))
+  allocate(this%RCMMEheter(NumPlantChemElmnts,2,NumMicrbHetetrophCmplx,1:jcplx))
   allocate(this%RN2FX(NumMicrbHetetrophCmplx,1:jcplx))
-  allocate(this%RXOMC(2,NumMicrbHetetrophCmplx,1:jcplx))
-  allocate(this%RXOMN(2,NumMicrbHetetrophCmplx,1:jcplx))
-  allocate(this%RXOMP(2,NumMicrbHetetrophCmplx,1:jcplx))
-  allocate(this%R3OMC(2,NumMicrbHetetrophCmplx,1:jcplx))
-  allocate(this%R3OMN(2,NumMicrbHetetrophCmplx,1:jcplx))
-  allocate(this%R3OMP(2,NumMicrbHetetrophCmplx,1:jcplx))
-  allocate(this%RXMMC(2,NumMicrbHetetrophCmplx,1:jcplx))
-  allocate(this%RXMMN(2,NumMicrbHetetrophCmplx,1:jcplx))
-  allocate(this%RXMMP(2,NumMicrbHetetrophCmplx,1:jcplx))
-  allocate(this%R3MMC(2,NumMicrbHetetrophCmplx,1:jcplx))
-  allocate(this%R3MMN(2,NumMicrbHetetrophCmplx,1:jcplx))
-  allocate(this%R3MMP(2,NumMicrbHetetrophCmplx,1:jcplx))
+  allocate(this%RXOMEheter(NumPlantChemElmnts,2,NumMicrbHetetrophCmplx,1:jcplx))
+  allocate(this%R3OMEheter(NumPlantChemElmnts,2,NumMicrbHetetrophCmplx,1:jcplx))
+  allocate(this%RXMMEheter(NumPlantChemElmnts,2,NumMicrbHetetrophCmplx,1:jcplx))
+  allocate(this%R3MMEheter(NumPlantChemElmnts,2,NumMicrbHetetrophCmplx,1:jcplx))
   allocate(this%CGOQC(NumMicrbHetetrophCmplx,1:jcplx))
   allocate(this%CGOAC(NumMicrbHetetrophCmplx,1:jcplx))
   allocate(this%RINH4R(NumMicrbHetetrophCmplx,1:jcplx))
@@ -470,9 +374,7 @@ type, public :: NitroAQMFluxDiagType
   allocate(this%FNO3XR(NumMicrbHetetrophCmplx,1:jcplx))
   allocate(this%FPO4XR(NumMicrbHetetrophCmplx,1:jcplx))
   allocate(this%RGOMY(NumMicrbHetetrophCmplx,1:jcplx))
-  allocate(this%CGOMS(2,NumMicrbHetetrophCmplx,1:jcplx))
-  allocate(this%CGONS(2,NumMicrbHetetrophCmplx,1:jcplx))
-  allocate(this%CGOPS(2,NumMicrbHetetrophCmplx,1:jcplx))
+  allocate(this%CGOMES(NumPlantChemElmnts,2,NumMicrbHetetrophCmplx,1:jcplx))
   allocate(this%FP14XR(NumMicrbHetetrophCmplx,1:jcplx))
   allocate(this%RCO2X(NumMicrbHetetrophCmplx,1:jcplx))
   allocate(this%RCH3X(NumMicrbHetetrophCmplx,1:jcplx))
@@ -483,13 +385,9 @@ type, public :: NitroAQMFluxDiagType
 
   allocate(this%RVOXA(NumMicrobAutotrophCmplx))
   allocate(this%RVOXB(NumMicrobAutotrophCmplx))
-  allocate(this%XOMCZ(3,NumMicrbHetetrophCmplx,1:jcplx))
-  allocate(this%XOMNZ(3,NumMicrbHetetrophCmplx,1:jcplx))
-  allocate(this%XOMPZ(3,NumMicrbHetetrophCmplx,1:jcplx))
+  allocate(this%XOMZ(1:NumPlantChemElmnts,3,NumMicrbHetetrophCmplx,1:jcplx))
   allocate(this%ROQCD(NumMicrbHetetrophCmplx,1:jcplx))
-  allocate(this%RCCMC(ndbiomcp,NumMicrbHetetrophCmplx,1:jcplx))
-  allocate(this%RCCMN(ndbiomcp,NumMicrbHetetrophCmplx,1:jcplx))
-  allocate(this%RCCMP(ndbiomcp,NumMicrbHetetrophCmplx,1:jcplx))
+  allocate(this%RCCMEheter(NumPlantChemElmnts,ndbiomcp,NumMicrbHetetrophCmplx,1:jcplx))
 
   allocate(this%RUPOXff(NumMicrobAutotrophCmplx))
   allocate(this%RGN2Fff(NumMicrobAutotrophCmplx))
@@ -510,43 +408,19 @@ type, public :: NitroAQMFluxDiagType
   allocate(this%RINB4ff(NumMicrobAutotrophCmplx))
   allocate(this%RINB3ff(NumMicrobAutotrophCmplx))
   allocate(this%RIPOBff(NumMicrobAutotrophCmplx))
-  allocate(this%RDOMCff(2,NumMicrobAutotrophCmplx))
-  allocate(this%RDOMNff(2,NumMicrobAutotrophCmplx))
-  allocate(this%RDOMPff(2,NumMicrobAutotrophCmplx))
-  allocate(this%RHOMCff(2,NumMicrobAutotrophCmplx))
-  allocate(this%RHOMNff(2,NumMicrobAutotrophCmplx))
-  allocate(this%RHOMPff(2,NumMicrobAutotrophCmplx))
-  allocate(this%RCOMCff(2,NumMicrobAutotrophCmplx))
-  allocate(this%RCOMNff(2,NumMicrobAutotrophCmplx))
-  allocate(this%RCOMPff(2,NumMicrobAutotrophCmplx))
-  allocate(this%CGOMCff(NumMicrobAutotrophCmplx))
-  allocate(this%CGOMNff(NumMicrobAutotrophCmplx))
+  allocate(this%RDOMEautor(NumPlantChemElmnts,2,NumMicrobAutotrophCmplx))
+  allocate(this%RHOMEautor(NumPlantChemElmnts,2,NumMicrobAutotrophCmplx))
+  allocate(this%RCOMEautor(NumPlantChemElmnts,2,NumMicrobAutotrophCmplx))
+  allocate(this%CGOMEautor(idom_beg:idom_end,NumMicrobAutotrophCmplx))
   allocate(this%RH2GXff(NumMicrobAutotrophCmplx))
-  allocate(this%CGOMPff(NumMicrobAutotrophCmplx))
-  allocate(this%RDMMCff(2,NumMicrobAutotrophCmplx))
-  allocate(this%RHMMCff(2,NumMicrobAutotrophCmplx))
-  allocate(this%RCMMCff(2,NumMicrobAutotrophCmplx))
-  allocate(this%RDMMNff(2,NumMicrobAutotrophCmplx))
-  allocate(this%RHMMNff(2,NumMicrobAutotrophCmplx))
-  allocate(this%RCMMNff(2,NumMicrobAutotrophCmplx))
-  allocate(this%RDMMPff(2,NumMicrobAutotrophCmplx))
-  allocate(this%RHMMPff(2,NumMicrobAutotrophCmplx))
-  allocate(this%RCMMPff(2,NumMicrobAutotrophCmplx))
+  allocate(this%RDMMEautor(NumPlantChemElmnts,2,NumMicrobAutotrophCmplx))
+  allocate(this%RHMMEautor(NumPlantChemElmnts,2,NumMicrobAutotrophCmplx))
+  allocate(this%RCMMEautor(NumPlantChemElmnts,2,NumMicrobAutotrophCmplx))
   allocate(this%RN2FXff(NumMicrobAutotrophCmplx))
-  allocate(this%RXOMCff(2,NumMicrobAutotrophCmplx))
-  allocate(this%RXOMNff(2,NumMicrobAutotrophCmplx))
-  allocate(this%RXOMPff(2,NumMicrobAutotrophCmplx))
-  allocate(this%R3OMCff(2,NumMicrobAutotrophCmplx))
-  allocate(this%R3OMNff(2,NumMicrobAutotrophCmplx))
-  allocate(this%R3OMPff(2,NumMicrobAutotrophCmplx))
-  allocate(this%RXMMCff(2,NumMicrobAutotrophCmplx))
-  allocate(this%RXMMNff(2,NumMicrobAutotrophCmplx))
-  allocate(this%RXMMPff(2,NumMicrobAutotrophCmplx))
-  allocate(this%R3MMCff(2,NumMicrobAutotrophCmplx))
-  allocate(this%R3MMNff(2,NumMicrobAutotrophCmplx))
-  allocate(this%R3MMPff(2,NumMicrobAutotrophCmplx))
-  allocate(this%CGOQCff(NumMicrobAutotrophCmplx))
-  allocate(this%CGOACff(NumMicrobAutotrophCmplx))
+  allocate(this%RXOMEautor(NumPlantChemElmnts,2,NumMicrobAutotrophCmplx))
+  allocate(this%R3OMEautor(NumPlantChemElmnts,2,NumMicrobAutotrophCmplx))
+  allocate(this%RXMMEautor(NumPlantChemElmnts,2,NumMicrobAutotrophCmplx))
+  allocate(this%R3MMEautor(NumPlantChemElmnts,2,NumMicrobAutotrophCmplx))
   allocate(this%RINH4Rff(NumMicrobAutotrophCmplx))
   allocate(this%RINO3Rff(NumMicrobAutotrophCmplx))
   allocate(this%RIPO4Rff(NumMicrobAutotrophCmplx))
@@ -554,9 +428,7 @@ type, public :: NitroAQMFluxDiagType
   allocate(this%FNO3XRff(NumMicrobAutotrophCmplx))
   allocate(this%FPO4XRff(NumMicrobAutotrophCmplx))
   allocate(this%RGOMYff(NumMicrobAutotrophCmplx))
-  allocate(this%CGOMSff(2,NumMicrobAutotrophCmplx))
-  allocate(this%CGONSff(2,NumMicrobAutotrophCmplx))
-  allocate(this%CGOPSff(2,NumMicrobAutotrophCmplx))
+  allocate(this%CGOSEautor(NumPlantChemElmnts,2,NumMicrobAutotrophCmplx))
   allocate(this%FP14XRff(NumMicrobAutotrophCmplx))
   allocate(this%RCO2Xff(NumMicrobAutotrophCmplx))
   allocate(this%RCH3Xff(NumMicrobAutotrophCmplx))
@@ -635,45 +507,21 @@ type, public :: NitroAQMFluxDiagType
   this%RINB4 = 0._r8
   this%RINB3 = 0._r8
   this%RIPOB = 0._r8
-  this%RDOMC = 0._r8
-  this%RDOMN = 0._r8
-  this%RDOMP = 0._r8
-  this%RHOMC = 0._r8
-  this%RHOMN = 0._r8
-  this%RHOMP = 0._r8
-  this%RCOMC = 0._r8
-  this%RCOMN = 0._r8
-  this%RCOMP = 0._r8
-  this%CGOMC = 0._r8
-  this%CGOMN = 0._r8
+  this%RDOMEheter = 0._r8
+  this%RHOMEheter = 0._r8
+  this%RCOMEheter = 0._r8
+  this%CGOMEheter = 0._r8
   this%RH2GX = 0._r8
-  this%CGOMP = 0._r8
-  this%RDMMC = 0._r8
-  this%RHMMC = 0._r8
-  this%RCMMC = 0._r8
-  this%RDMMN = 0._r8
-  this%RHMMN = 0._r8
-  this%RCMMN = 0._r8
-  this%RDMMP = 0._r8
-  this%RHMMP = 0._r8
-  this%RCMMP = 0._r8
-  this%RCCMC = 0._r8
-  this%RCCMN = 0._r8
-  this%RCCMP = 0._r8
+  this%RHMMEheter = 0._r8
+  this%RCMMEheter = 0._r8
+  this%RDMMEheter = 0._r8
+  this%RCCMEheter = 0._r8
   this%RN2FX = 0._r8
 
-  this%RXOMC = 0._r8
-  this%RXOMN = 0._r8
-  this%RXOMP = 0._r8
-  this%R3OMC = 0._r8
-  this%R3OMN = 0._r8
-  this%R3OMP = 0._r8
-  this%RXMMC = 0._r8
-  this%RXMMN = 0._r8
-  this%RXMMP = 0._r8
-  this%R3MMC = 0._r8
-  this%R3MMN = 0._r8
-  this%R3MMP = 0._r8
+  this%RXOMEheter = 0._r8
+  this%R3OMEheter = 0._r8
+  this%RXMMEheter = 0._r8
+  this%R3MMEheter = 0._r8
   this%CGOQC = 0._r8
   this%CGOAC = 0._r8
   this%RINH4R = 0._r8
@@ -684,18 +532,14 @@ type, public :: NitroAQMFluxDiagType
   this%FPO4XR = 0._r8
   this%RGOMY = 0._r8
   this%ROQCD = 0._r8
-  this%CGOMS = 0._r8
-  this%CGONS = 0._r8
-  this%CGOPS = 0._r8
+  this%CGOMES = 0._r8
   this%FP14XR = 0._r8
   this%RCO2X = 0._r8
   this%RCH3X = 0._r8
   this%RCH4X = 0._r8
   this%RVOXA = 0._r8
   this%RVOXB = 0._r8
-  this%XOMCZ = 0._r8
-  this%XOMNZ = 0._r8
-  this%XOMPZ = 0._r8
+  this%XOMZ = 0._r8
   this%RIP14 = 0._r8
   this%RIP1B = 0._r8
   this%RIP14R = 0._r8
@@ -719,44 +563,20 @@ type, public :: NitroAQMFluxDiagType
   this%RINB4ff = 0._r8
   this%RINB3ff = 0._r8
   this%RIPOBff = 0._r8
-  this%RDOMCff = 0._r8
-  this%RDOMNff = 0._r8
-  this%RDOMPff = 0._r8
-  this%RHOMCff = 0._r8
-  this%RHOMNff = 0._r8
-  this%RHOMPff = 0._r8
-  this%RCOMCff = 0._r8
-  this%RCOMNff = 0._r8
-  this%RCOMPff = 0._r8
-  this%CGOMCff = 0._r8
-  this%CGOMNff = 0._r8
+  this%RDOMEautor = 0._r8
+  this%RHOMEautor = 0._r8
+  this%RCOMEautor = 0._r8
+  this%CGOMEautor = 0._r8
   this%RH2GXff = 0._r8
-  this%CGOMPff = 0._r8
-  this%RDMMCff = 0._r8
-  this%RHMMCff = 0._r8
-  this%RCMMCff = 0._r8
-  this%RDMMNff = 0._r8
-  this%RHMMNff = 0._r8
-  this%RCMMNff = 0._r8
-  this%RDMMPff = 0._r8
-  this%RHMMPff = 0._r8
-  this%RCMMPff = 0._r8
+  this%RDMMEautor = 0._r8
+  this%RHMMEautor = 0._r8
+  this%RCMMEautor = 0._r8
   this%RN2FXff = 0._r8
 
-  this%RXOMCff = 0._r8
-  this%RXOMNff = 0._r8
-  this%RXOMPff = 0._r8
-  this%R3OMCff = 0._r8
-  this%R3OMNff = 0._r8
-  this%R3OMPff = 0._r8
-  this%RXMMCff = 0._r8
-  this%RXMMNff = 0._r8
-  this%RXMMPff = 0._r8
-  this%R3MMCff = 0._r8
-  this%R3MMNff = 0._r8
-  this%R3MMPff = 0._r8
-  this%CGOQCff = 0._r8
-  this%CGOACff = 0._r8
+  this%RXOMEautor = 0._r8
+  this%R3OMEautor = 0._r8
+  this%RXMMEautor = 0._r8
+  this%R3MMEautor = 0._r8
   this%RINH4Rff = 0._r8
   this%RINO3Rff = 0._r8
   this%RIPO4Rff = 0._r8
@@ -764,9 +584,7 @@ type, public :: NitroAQMFluxDiagType
   this%FNO3XRff = 0._r8
   this%FPO4XRff = 0._r8
   this%RGOMYff = 0._r8
-  this%CGOMSff = 0._r8
-  this%CGONSff = 0._r8
-  this%CGOPSff = 0._r8
+  this%CGOSEautor = 0._r8
   this%FP14XRff = 0._r8
   this%RCO2Xff = 0._r8
   this%RCH3Xff = 0._r8
@@ -804,44 +622,20 @@ type, public :: NitroAQMFluxDiagType
   call destroy(this%RINB4)
   call destroy(this%RINB3)
   call destroy(this%RIPOB)
-  call destroy(this%RDOMC)
-  call destroy(this%RDOMN)
-  call destroy(this%RDOMP)
-  call destroy(this%RHOMC)
-  call destroy(this%RHOMN)
-  call destroy(this%RHOMP)
-  call destroy(this%RCOMC)
-  call destroy(this%RCOMN)
-  call destroy(this%RCOMP)
-  call destroy(this%CGOMC)
-  call destroy(this%CGOMN)
+  call destroy(this%RDOMEheter)
+  call destroy(this%RHOMEheter)
+  call destroy(this%RCOMEheter)
+  call destroy(this%CGOMEheter)
   call destroy(this%RH2GX)
-  call destroy(this%CGOMP)
-  call destroy(this%RDMMC)
-  call destroy(this%RHMMC)
-  call destroy(this%RCMMC)
-  call destroy(this%RDMMN)
-  call destroy(this%RHMMN)
-  call destroy(this%RCMMN)
-  call destroy(this%RDMMP)
-  call destroy(this%RHMMP)
-  call destroy(this%RCMMP)
-  call destroy(this%RCCMC)
-  call destroy(this%RCCMN)
-  call destroy(this%RCCMP)
+  call destroy(this%RHMMEheter)
+  call destroy(this%RCMMEheter)
+  call destroy(this%RDMMEheter)
+  call destroy(this%RCCMEheter)
   call destroy(this%RN2FX)
-  call destroy(this%RXOMC)
-  call destroy(this%RXOMN)
-  call destroy(this%RXOMP)
-  call destroy(this%R3OMC)
-  call destroy(this%R3OMN)
-  call destroy(this%R3OMP)
-  call destroy(this%RXMMC)
-  call destroy(this%RXMMN)
-  call destroy(this%RXMMP)
-  call destroy(this%R3MMC)
-  call destroy(this%R3MMN)
-  call destroy(this%R3MMP)
+  call destroy(this%RXOMEheter)
+  call destroy(this%R3OMEheter)
+  call destroy(this%RXMMEheter)
+  call destroy(this%R3MMEheter)
   call destroy(this%CGOQC)
   call destroy(this%CGOAC)
   call destroy(this%RINH4R)
@@ -852,18 +646,14 @@ type, public :: NitroAQMFluxDiagType
   call destroy(this%FPO4XR)
   call destroy(this%RGOMY)
   call destroy(this%ROQCD)
-  call destroy(this%CGOMS)
-  call destroy(this%CGONS)
-  call destroy(this%CGOPS)
+  call destroy(this%CGOMES)
   call destroy(this%FP14XR)
   call destroy(this%RCO2X)
   call destroy(this%RCH3X)
   call destroy(this%RCH4X)
   call destroy(this%RVOXA)
   call destroy(this%RVOXB)
-  call destroy(this%XOMCZ)
-  call destroy(this%XOMNZ)
-  call destroy(this%XOMPZ)
+  call destroy(this%XOMZ)
   call destroy(this%RIP14)
   call destroy(this%RIP1B)
   call destroy(this%RIP14R)
@@ -887,43 +677,19 @@ type, public :: NitroAQMFluxDiagType
   call destroy(this%RINB4ff)
   call destroy(this%RINB3ff)
   call destroy(this%RIPOBff)
-  call destroy(this%RDOMCff)
-  call destroy(this%RDOMNff)
-  call destroy(this%RDOMPff)
-  call destroy(this%RHOMCff)
-  call destroy(this%RHOMNff)
-  call destroy(this%RHOMPff)
-  call destroy(this%RCOMCff)
-  call destroy(this%RCOMNff)
-  call destroy(this%RCOMPff)
-  call destroy(this%CGOMCff)
-  call destroy(this%CGOMNff)
+  call destroy(this%RDOMEautor)
+  call destroy(this%RHOMEautor)
+  call destroy(this%RCOMEautor)
+  call destroy(this%CGOMEautor)
   call destroy(this%RH2GXff)
-  call destroy(this%CGOMPff)
-  call destroy(this%RDMMCff)
-  call destroy(this%RHMMCff)
-  call destroy(this%RCMMCff)
-  call destroy(this%RDMMNff)
-  call destroy(this%RHMMNff)
-  call destroy(this%RCMMNff)
-  call destroy(this%RDMMPff)
-  call destroy(this%RHMMPff)
-  call destroy(this%RCMMPff)
+  call destroy(this%RDMMEautor)
+  call destroy(this%RHMMEautor)
+  call destroy(this%RCMMEautor)
   call destroy(this%RN2FXff)
-  call destroy(this%RXOMCff)
-  call destroy(this%RXOMNff)
-  call destroy(this%RXOMPff)
-  call destroy(this%R3OMCff)
-  call destroy(this%R3OMNff)
-  call destroy(this%R3OMPff)
-  call destroy(this%RXMMCff)
-  call destroy(this%RXMMNff)
-  call destroy(this%RXMMPff)
-  call destroy(this%R3MMCff)
-  call destroy(this%R3MMNff)
-  call destroy(this%R3MMPff)
-  call destroy(this%CGOQCff)
-  call destroy(this%CGOACff)
+  call destroy(this%RXOMEautor)
+  call destroy(this%R3OMEautor)
+  call destroy(this%RXMMEautor)
+  call destroy(this%R3MMEautor)
   call destroy(this%RINH4Rff)
   call destroy(this%RINO3Rff)
   call destroy(this%RIPO4Rff)
@@ -931,9 +697,7 @@ type, public :: NitroAQMFluxDiagType
   call destroy(this%FNO3XRff)
   call destroy(this%FPO4XRff)
   call destroy(this%RGOMYff)
-  call destroy(this%CGOMSff)
-  call destroy(this%CGONSff)
-  call destroy(this%CGOPSff)
+  call destroy(this%CGOSEautor)
   call destroy(this%FP14XRff)
   call destroy(this%RCO2Xff)
   call destroy(this%RCH3Xff)
@@ -992,36 +756,16 @@ type, public :: NitroAQMFluxDiagType
   nkinets=micpar%jsken
   ncplx=micpar%jcplx
   ndbiomcp=micpar%ndbiomcp
-  allocate(this%RDOSC(nkinets,1:ncplx))
-  allocate(this%RDOSN(nkinets,1:ncplx))
-  allocate(this%RDOSP(nkinets,1:ncplx))
-  allocate(this%RHOSC(nkinets,1:ncplx))
-  allocate(this%RHOSN(nkinets,1:ncplx))
-  allocate(this%RHOSP(nkinets,1:ncplx))
-  allocate(this%RCOSC(nkinets,1:ncplx))
-  allocate(this%RCOSN(nkinets,1:ncplx))
-  allocate(this%RCOSP(nkinets,1:ncplx))
-  allocate(this%RDORC(ndbiomcp,1:ncplx))
-  allocate(this%RDORN(ndbiomcp,1:ncplx))
-  allocate(this%RDORP(ndbiomcp,1:ncplx))
-  allocate(this%RDOHC(1:ncplx))
-  allocate(this%RDOHN(1:ncplx))
-  allocate(this%RDOHP(1:ncplx))
-  allocate(this%RDOHA(1:ncplx))
-  allocate(this%CSORP(1:ncplx))
-  allocate(this%ZSORP(1:ncplx))
-  allocate(this%PSORP(1:ncplx))
-  allocate(this%CSORPA(1:ncplx))
-  allocate(this%TCGOQC(1:ncplx+1))
-  allocate(this%TCGOAC(1:ncplx+1))
-  allocate(this%TCGOMN(1:ncplx+1))
-  allocate(this%TCGOMP(1:ncplx+1))
+  allocate(this%RDOSM(NumPlantChemElmnts,nkinets,1:ncplx))
+  allocate(this%RHOSM(1:NumPlantChemElmnts,nkinets,1:ncplx))
+  allocate(this%RCOSM(1:NumPlantChemElmnts,nkinets,1:ncplx))
+  allocate(this%RDORM(1:NumPlantChemElmnts,ndbiomcp,1:ncplx))
+  allocate(this%RDOHM(idom_beg:idom_end,1:ncplx))
+  allocate(this%OMSORP(idom_beg:idom_end,1:ncplx))
+  allocate(this%TCGOMEheter(idom_beg:idom_end,1:ncplx+1))
   allocate(this%ROQCK(1:ncplx))
   allocate(this%XOQCK(1:ncplx))
-  allocate(this%XOQCZ(1:ncplx))
-  allocate(this%XOQNZ(1:ncplx))
-  allocate(this%XOQPZ(1:ncplx))
-  allocate(this%XOQAZ(1:ncplx))
+  allocate(this%XOQMZ(idom_beg:idom_end,1:ncplx))
 
   call this%ZeroOut()
   end subroutine nit_omcplxf_init
@@ -1031,36 +775,15 @@ type, public :: NitroAQMFluxDiagType
   implicit none
   class(NitroOMcplxFluxType) :: this
 
-  call destroy(this%RDOSC)
-  call destroy(this%RDOSN)
-  call destroy(this%RDOSP)
-  call destroy(this%RHOSC)
-  call destroy(this%RHOSN)
-  call destroy(this%RHOSP)
-  call destroy(this%RCOSC)
-  call destroy(this%RCOSN)
-  call destroy(this%RCOSP)
-  call destroy(this%RDORC)
-  call destroy(this%RDORN)
-  call destroy(this%RDORP)
-  call destroy(this%RDOHC)
-  call destroy(this%RDOHN)
-  call destroy(this%RDOHP)
-  call destroy(this%RDOHA)
-  call destroy(this%CSORP)
-  call destroy(this%ZSORP)
-  call destroy(this%PSORP)
-  call destroy(this%CSORPA)
-  call destroy(this%TCGOQC)
-  call destroy(this%TCGOAC)
-  call destroy(this%TCGOMN)
-  call destroy(this%TCGOMP)
+  call destroy(this%RDOSM)
+  call destroy(this%RHOSM)
+  call destroy(this%RCOSM)
+  call destroy(this%RDORM)
+  call destroy(this%RDOHM)
+  call destroy(this%OMSORP)
   call destroy(this%ROQCK)
   call destroy(this%XOQCK)
-  call destroy(this%XOQCZ)
-  call destroy(this%XOQNZ)
-  call destroy(this%XOQPZ)
-  call destroy(this%XOQAZ)
+  call destroy(this%XOQMZ)
 
   end subroutine nit_omcplxf_destroy
 !------------------------------------------------------------------------------------------
@@ -1069,36 +792,15 @@ type, public :: NitroAQMFluxDiagType
   implicit none
   class(NitroOMcplxFluxType) :: this
 
-  this%RDOSC=0._r8
-  this%RDOSN=0._r8
-  this%RDOSP=0._r8
-  this%RHOSC=0._r8
-  this%RHOSN=0._r8
-  this%RHOSP=0._r8
-  this%RCOSC=0._r8
-  this%RCOSN=0._r8
-  this%RCOSP=0._r8
-  this%RDORC=0._r8
-  this%RDORN=0._r8
-  this%RDORP=0._r8
-  this%RDOHC=0._r8
-  this%RDOHN=0._r8
-  this%RDOHP=0._r8
-  this%RDOHA=0._r8
-  this%CSORP=0._r8
-  this%ZSORP=0._r8
-  this%PSORP=0._r8
-  this%CSORPA=0._r8
-  this%TCGOQC=0._r8
-  this%TCGOAC=0._r8
-  this%TCGOMN=0._r8
-  this%TCGOMP=0._r8
+  this%RDOSM=0._r8
+  this%RHOSM=0._r8
+  this%RCOSM=0._r8
+  this%RDORM=0._r8
+  this%RDOHM=0._r8
+  this%OMSORP=0._r8
   this%ROQCK=0._r8
   this%XOQCK=0._r8
-  this%XOQCZ=0._r8
-  this%XOQNZ=0._r8
-  this%XOQPZ=0._r8
-  this%XOQAZ=0._r8
+  this%XOQMZ=0._r8
   end subroutine nit_omcplxf_zero
 !------------------------------------------------------------------------------------------
 

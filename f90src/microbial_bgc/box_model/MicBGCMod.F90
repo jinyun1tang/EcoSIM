@@ -239,11 +239,10 @@ module MicBGCMod
     ZEROS2  => micfor%ZEROS2 , &
     ZERO   => micfor%ZERO    , &
     CCO2S   => micstt%CCO2S, &
-    OSC     => micstt%OSC  ,&
+    OSM     => micstt%OSM  ,&
     OSA     => micstt%OSA  ,&
-    ORC     => micstt%ORC   , &
-    OHC     => micstt%OHC   , &
-    OHA     => micstt%OHA   , &
+    ORM     => micstt%ORM   , &
+    OHM     => micstt%OHM   , &
     OMEhetr    => micstt%OMEhetr  , &
     DOM     => micstt%DOM   , &
     H1PO4 => micstt%H1PO4, &
@@ -336,7 +335,7 @@ module MicBGCMod
     OSAT(K)=0.0_r8
 
     DO M=1,jsken
-      OSCT(K)=OSCT(K)+OSC(M,K)
+      OSCT(K)=OSCT(K)+OSM(ielmc,M,K)
       OSAT(K)=OSAT(K)+OSA(M,K)
     enddo
     TOSC=TOSC+OSCT(K)
@@ -348,7 +347,7 @@ module MicBGCMod
   DO  K=1,KL
     ORCT(K)=0.0_r8
     DO  M=1,ndbiomcp
-      ORCT(K)=ORCT(K)+ORC(M,K)
+      ORCT(K)=ORCT(K)+ORM(ielmc,M,K)
     ENDDO
     TORC=TORC+ORCT(K)
 !
@@ -356,11 +355,11 @@ module MicBGCMod
 !
 !     OSRH=total SOC
 !
-    TOHC=TOHC+OHC(K)+OHA(K)
+    TOHC=TOHC+OHM(ielmc,K)+OHM(idom_acetate,K)
   enddo
 
   D860: DO K=1,KL
-    OSRH(K)=OSAT(K)+ORCT(K)+OHC(K)+OHA(K)
+    OSRH(K)=OSAT(K)+ORCT(K)+OHM(ielmc,K)+OHM(idom_acetate,K)
   ENDDO D860
   TSRH=TOSA+TORC+TOHC
 !
@@ -552,10 +551,7 @@ module MicBGCMod
     TFNR => nmics%TFNR,        &
     TFNG => nmics%TFNG,        &
     OMA  => nmics%OMA,         &
-    TCGOQC  => ncplxf%TCGOQC,  &
-    TCGOAC  => ncplxf%TCGOAC,  &
-    TCGOMN  => ncplxf%TCGOMN,  &
-    TCGOMP  => ncplxf%TCGOMP,  &
+    TCGOMEheter  => ncplxf%TCGOMEheter,  &
     XCO2   =>  nmicdiag%XCO2,   &
     TFNX   =>  nmicdiag%TFNX,   &
     TOMA   =>  nmicdiag%TOMA,   &
@@ -587,10 +583,9 @@ module MicBGCMod
   )
   RH2GZ=0.0_r8
 
-  TCGOQC(:)=0.0_r8
-  TCGOAC(:)=0.0_r8
-  TCGOMN(:)=0.0_r8
-  TCGOMP(:)=0.0_r8
+  TCGOMEheter(ielmc,:)=0.0_r8
+  TCGOMEheter(idom_acetate,:)=0.0_r8
+  TCGOMEheter(:,:)=0.0_r8
 
   D760: DO K=1,jcplx
     IF(.not.litrm.OR.(K.NE.k_POM.AND.K.NE.k_humus))THEN
@@ -980,23 +975,17 @@ module MicBGCMod
   type(NitroMicStateType), intent(inout) :: nmics
   type(NitroOMcplxFluxType), intent(inout):: ncplxf
   type(NitroOMcplxStateType),intent(inout):: ncplxs
-  integer  :: K,M,N,KK,NGL,MID
+  integer  :: K,M,N,KK,NGL,MID,idom,NE
   real(r8) :: OSRT
-  real(r8) :: XFRK,XFRC
-  real(r8) :: XFRN,XFRP,XFRA
-  real(r8) :: XFMC,XFMN,XFMP
+  real(r8) :: XFRK,XFROM(idom_beg:idom_end)
+  real(r8) :: XFME
 !     begin_execution
   associate(                 &
     TFNG  => nmics%TFNG,     &
-    XOMCZ  => nmicf%XOMCZ,   &
-    XOMNZ  => nmicf%XOMNZ,   &
-    XOMPZ  => nmicf%XOMPZ,   &
+    XOMZ  => nmicf%XOMZ,   &
     ROQCK  => ncplxf%ROQCK,  &
     XOQCK  => ncplxf%XOQCK,  &
-    XOQCZ  => ncplxf%XOQCZ,  &
-    XOQNZ  => ncplxf%XOQNZ,  &
-    XOQPZ  => ncplxf%XOQPZ,  &
-    XOQAZ  => ncplxf%XOQAZ,  &
+    XOQMZ  => ncplxf%XOQMZ,  &
     OSRH  => ncplxs%OSRH  ,  &
     TOQCK => micstt%TOQCK, &
     DOM => micstt%DOM, &
@@ -1018,31 +1007,20 @@ module MicBGCMod
         OSRT=OSRH(K)+OSRH(KK)
         IF(OSRH(K).GT.ZEROS.AND.OSRH(KK).GT.ZEROS)THEN
           XFRK=FPRIM*TFND*(ROQCK(K)*OSRH(KK)-ROQCK(KK)*OSRH(K))/OSRT
-          XFRC=FPRIM*TFND*(DOM(idom_doc,K)*OSRH(KK)-DOM(idom_doc,KK)*OSRH(K))/OSRT
-          XFRN=FPRIM*TFND*(DOM(idom_don,K)*OSRH(KK)-DOM(idom_don,KK)*OSRH(K))/OSRT
-          XFRP=FPRIM*TFND*(DOM(idom_dop,K)*OSRH(KK)-DOM(idom_dop,KK)*OSRH(K))/OSRT
-          XFRA=FPRIM*TFND*(DOM(idom_acetate,K)*OSRH(KK)-DOM(idom_acetate,KK)*OSRH(K))/OSRT
+          DO idom=idom_beg,idom_end
+            XFROM(idom)=FPRIM*TFND*(DOM(idom,K)*OSRH(KK)-DOM(idom,KK)*OSRH(K))/OSRT
+          ENDDO
           IF(ROQCK(K)+XOQCK(K)-XFRK.GT.0.0_r8.AND.ROQCK(KK)+XOQCK(KK)+XFRK.GT.0.0_r8)THEN
             XOQCK(K)=XOQCK(K)-XFRK
             XOQCK(KK)=XOQCK(KK)+XFRK
           ENDIF
-          IF(DOM(idom_doc,K)+XOQCZ(K)-XFRC.GT.0.0_r8.AND.DOM(idom_doc,KK)+XOQCZ(KK)+XFRC.GT.0.0_r8)THEN
-            XOQCZ(K)=XOQCZ(K)-XFRC
-            XOQCZ(KK)=XOQCZ(KK)+XFRC
-
-          ENDIF
-          IF(DOM(idom_don,K)+XOQNZ(K)-XFRN.GT.0.0_r8.AND.DOM(idom_don,KK)+XOQNZ(KK)+XFRN.GT.0.0_r8)THEN
-            XOQNZ(K)=XOQNZ(K)-XFRN
-            XOQNZ(KK)=XOQNZ(KK)+XFRN
-          ENDIF
-          IF(DOM(idom_dop,K)+XOQPZ(K)-XFRP.GT.0.0_r8.AND.DOM(idom_dop,KK)+XOQPZ(KK)+XFRP.GT.0.0_r8)THEN
-            XOQPZ(K)=XOQPZ(K)-XFRP
-            XOQPZ(KK)=XOQPZ(KK)+XFRP
-          ENDIF
-          IF(DOM(idom_acetate,K)+XOQAZ(K)-XFRA.GT.0.0_r8.AND.DOM(idom_acetate,KK)+XOQAZ(KK)+XFRA.GT.0.0_r8)THEN
-            XOQAZ(K)=XOQAZ(K)-XFRA
-            XOQAZ(KK)=XOQAZ(KK)+XFRA
-          ENDIF
+          DO iDOM=idom_beg,idom_end
+            IF(DOM(idom,K)+XOQMZ(idom,K)-XFROM(idom).GT.0.0_r8 &
+              .AND.DOM(idom,KK)+XOQMZ(idom,KK)+XFROM(idom).GT.0.0_r8)THEN
+              XOQMZ(idom,K)=XOQMZ(idom,K)-XFROM(idom)
+              XOQMZ(idom,KK)=XOQMZ(idom,KK)+XFROM(idom)
+            ENDIF
+          ENDDO
 !
 !     PRIMING of MICROBIAL C,N,P BETWEEN LITTER AND NON-LITTER C
 !
@@ -1057,27 +1035,15 @@ module MicBGCMod
             DO  M=1,nlbiomcp
               DO NGL=JGnio(N),JGnfo(N)
                 MID=micpar%get_micb_id(M,NGL)
-                XFMC=FPRIMM*TFNG(NGL,K)*(OMEhetr(ielmc,MID,K)*OSRH(KK) &
-                  -OMEhetr(ielmc,MID,KK)*OSRH(K))/OSRT
-                XFMN=FPRIMM*TFNG(NGL,K)*(OMEhetr(ielmn,MID,K)*OSRH(KK) &
-                  -OMEhetr(ielmn,MID,KK)*OSRH(K))/OSRT
-                XFMP=FPRIMM*TFNG(NGL,K)*(OMEhetr(ielmp,MID,K)*OSRH(KK) &
-                  -OMEhetr(ielmp,MID,KK)*OSRH(K))/OSRT
-                IF(OMEhetr(ielmc,MID,K)+XOMCZ(M,NGL,K)-XFMC.GT.0.0_r8 &
-                  .AND.OMEhetr(ielmc,MID,KK)+XOMCZ(M,NGL,KK)+XFMC.GT.0.0_r8)THEN
-                  XOMCZ(M,NGL,K)=XOMCZ(M,NGL,K)-XFMC
-                  XOMCZ(M,NGL,KK)=XOMCZ(M,NGL,KK)+XFMC
-                ENDIF
-                IF(OMEhetr(ielmn,MID,K)+XOMNZ(M,NGL,K)-XFMN.GT.0.0_r8 &
-                  .AND.OMEhetr(ielmn,MID,KK)+XOMNZ(M,NGL,KK)+XFMN.GT.0.0_r8)THEN
-                  XOMNZ(M,NGL,K)=XOMNZ(M,NGL,K)-XFMN
-                  XOMNZ(M,NGL,KK)=XOMNZ(M,NGL,KK)+XFMN
-                ENDIF
-                IF(OMEhetr(ielmp,MID,K)+XOMPZ(M,NGL,K)-XFMP.GT.0.0_r8 &
-                  .AND.OMEhetr(ielmp,MID,KK)+XOMPZ(M,NGL,KK)+XFMP.GT.0.0_r8)THEN
-                  XOMPZ(M,NGL,K)=XOMPZ(M,NGL,K)-XFMP
-                  XOMPZ(M,NGL,KK)=XOMPZ(M,NGL,KK)+XFMP
-                ENDIF
+                DO NE=1,NumPlantChemElmnts
+                  XFME=FPRIMM*TFNG(NGL,K)*(OMEhetr(NE,MID,K)*OSRH(KK) &
+                    -OMEhetr(NE,MID,KK)*OSRH(K))/OSRT
+                  IF(OMEhetr(NE,MID,K)+XOMZ(NE,M,NGL,K)-XFME.GT.0.0_r8 &
+                    .AND.OMEhetr(NE,MID,KK)+XOMZ(NE,M,NGL,KK)+XFME.GT.0.0_r8)THEN
+                    XOMZ(NE,M,NGL,K)=XOMZ(NE,M,NGL,K)-XFME
+                    XOMZ(NE,M,NGL,KK)=XOMZ(NE,M,NGL,KK)+XFME
+                  ENDIF
+                ENDDO
               enddo
             enddo
           ENDDO D850
@@ -1097,17 +1063,16 @@ module MicBGCMod
   D840: DO K=1,KL
     ROQCK(K)=ROQCK(K)+XOQCK(K)
     TOQCK=TOQCK+ROQCK(K)
-    DOM(idom_doc,K)=DOM(idom_doc,K)+XOQCZ(K)
-    DOM(idom_don,K)=DOM(idom_don,K)+XOQNZ(K)
-    DOM(idom_dop,K)=DOM(idom_dop,K)+XOQPZ(K)
-    DOM(idom_acetate,K)=DOM(idom_acetate,K)+XOQAZ(K)
+    DO idom=idom_beg,idom_end
+      DOM(idom,K)=DOM(idom,K)+XOQMZ(idom,K)
+    ENDDO
     DO  N=1,NumMicbFunGroups
       DO  M=1,nlbiomcp
         do NGL=JGnio(N),JGnfo(N)
           MID=micpar%get_micb_id(M,NGL)        
-          OMEhetr(ielmc,MID,K)=OMEhetr(ielmc,MID,K)+XOMCZ(M,NGL,K)
-          OMEhetr(ielmn,MID,K)=OMEhetr(ielmn,MID,K)+XOMNZ(M,NGL,K)
-          OMEhetr(ielmp,MID,K)=OMEhetr(ielmp,MID,K)+XOMPZ(M,NGL,K)
+          DO NE=1,NumPlantChemElmnts
+            OMEhetr(NE,MID,K)=OMEhetr(NE,MID,K)+XOMZ(NE,M,NGL,K)
+          ENDDO
         enddo
       enddo
     enddo
@@ -1125,25 +1090,18 @@ module MicBGCMod
   type(NitroOMcplxFluxType), intent(inout) :: ncplxf
   type(NitroOMcplxStateType),intent(inout) :: ncplxs
   real(r8) :: AECX
-  real(r8) :: OQCX
-  real(r8) :: OQNX,OQPX,OQAX
-  real(r8) :: OHCX,OHNX,OHPX,OHAX
+  real(r8) :: OQEX(idom_beg:idom_end)
+  real(r8) :: OHEX(idom_beg:idom_end)
+  integer :: idom
   real(r8) :: VLSoilPoreMicPX
   real(r8) :: VLSoilPoreMicPW,VOLCX,VOLCW,VOLAX,VOLAW
 !     begin_execution
   associate(                   &
-    CGOMN  => nmicf%CGOMN,     &
-    CGOMP  => nmicf%CGOMP,     &
+    CGOMEheter  => nmicf%CGOMEheter,     &
     CGOQC  => nmicf%CGOQC,     &
     CGOAC  => nmicf%CGOAC,     &
-    CSORP  => ncplxf%CSORP,    &
-    ZSORP  => ncplxf%ZSORP,    &
-    PSORP  => ncplxf%PSORP,    &
-    CSORPA  => ncplxf%CSORPA,  &
-    TCGOQC  => ncplxf%TCGOQC,  &
-    TCGOAC  => ncplxf%TCGOAC,  &
-    TCGOMN  => ncplxf%TCGOMN,  &
-    TCGOMP  => ncplxf%TCGOMP,  &
+    OMSORP  => ncplxf%OMSORP,    &
+    TCGOMEheter  => ncplxf%TCGOMEheter,  &
     OSRH  => ncplxs%OSRH,      &
     FOCA  => ncplxs%FOCA,      &
     FOAA  => ncplxs%FOAA,      &
@@ -1155,16 +1113,13 @@ module MicBGCMod
     VLWatMicPM => micfor%VLWatMicPM, &
     FOSRH => micstt%FOSRH, &
     DOM => micstt%DOM, &
-    OHC => micstt%OHC, &
-    OHN => micstt%OHN, &
-    OHP => micstt%OHP, &
-    OHA => micstt%OHA, &
+    OHM => micstt%OHM, &
     AEC => micfor%AEC  &
   )
 !     VLWatMicPM=soil water content, FOSRH=fraction of total SOC
 !     AEC,AECX=anion exchange capacity
 !     OQC,OQN,OQP,OQA=DOC,DON,DOP,acetate in micropores
-!     TCGOQC,TCGOMN,TCGOMP,TCGOAC=total uptake of DOC,DON,DOP,acetate
+!     TCGOQC,TCGOMEheter,TCGOMEheter,TCGOAC=total uptake of DOC,DON,DOP,acetate
 !     OHC,OHN,OHP,OHA=adsorbed C,N,P,acetate
 !     TSORP,HSORP=sorption rate constant and coefficient for OHC
 !     FOCA,FOAA=fractions of DOC and acetate vs. DOC+acetate
@@ -1176,38 +1131,34 @@ module MicBGCMod
     ELSE
       AECX=AEC
     ENDIF
-    OQCX=AMAX1(ZEROS,DOM(idom_doc,K)-TCGOQC(K))
-    OQNX=AMAX1(ZEROS,DOM(idom_don,K)-TCGOMN(K))
-    OQPX=AMAX1(ZEROS,DOM(idom_dop,K)-TCGOMP(K))
-    OQAX=AMAX1(ZEROS,DOM(idom_acetate,K)-TCGOAC(K))
-    OHCX=AMAX1(ZEROS,OHC(K))
-    OHNX=AMAX1(ZEROS,OHN(K))
-    OHPX=AMAX1(ZEROS,OHP(K))
-    OHAX=AMAX1(ZEROS,OHA(K))
+    DO idom=idom_beg,idom_end
+      OQEX(idom)=AMAX1(ZEROS,DOM(idom,K)-TCGOMEheter(idom,K))
+      OHEX(idom)=AMAX1(ZEROS,OHM(idom,K))
+    ENDDO
+
     VLSoilPoreMicPX=SoilMicPMassLayer*AECX*HSORP*FOSRH(K)
     VLSoilPoreMicPW=VLWatMicPM(NPH)*FOSRH(K)
     IF(FOCA(K).GT.ZERO)THEN
       VOLCX=FOCA(K)*VLSoilPoreMicPX
       VOLCW=FOCA(K)*VLSoilPoreMicPW
-      CSORP(K)=TSORP*(OQCX*VOLCX-OHCX*VOLCW)/(VOLCX+VOLCW)
+      OMSORP(idom_doc,K)=TSORP*(OQEX(idom_doc)*VOLCX-OHEX(idom_doc)*VOLCW)/(VOLCX+VOLCW)
     ELSE
-      CSORP(K)=TSORP*(OQCX*VLSoilPoreMicPX-OHCX*VLSoilPoreMicPW)/(VLSoilPoreMicPX+VLSoilPoreMicPW)
+      OMSORP(idom_doc,K)=TSORP*(OQEX(idom_doc)*VLSoilPoreMicPX-OHEX(idom_doc)*VLSoilPoreMicPW)/(VLSoilPoreMicPX+VLSoilPoreMicPW)
     ENDIF
 
     IF(FOAA(K).GT.ZERO)THEN
       VOLAX=FOAA(K)*VLSoilPoreMicPX
       VOLAW=FOAA(K)*VLSoilPoreMicPW
-      CSORPA(K)=TSORP*(OQAX*VOLAX-OHAX*VOLAW)/(VOLAX+VOLAW)
+      OMSORP(idom_acetate,K)=TSORP*(OQEX(idom_acetate)*VOLAX-OHEX(idom_acetate)*VOLAW)/(VOLAX+VOLAW)
     ELSE
-      CSORPA(K)=TSORP*(OQAX*VLSoilPoreMicPX-OHAX*VLSoilPoreMicPW)/(VLSoilPoreMicPX+VLSoilPoreMicPW)
+      OMSORP(idom_acetate,K)=TSORP*(OQEX(idom_acetate)*VLSoilPoreMicPX-OHEX(idom_acetate)*VLSoilPoreMicPW)/(VLSoilPoreMicPX+VLSoilPoreMicPW)
     ENDIF
-    ZSORP(K)=TSORP*(OQNX*VLSoilPoreMicPX-OHNX*VLSoilPoreMicPW)/(VLSoilPoreMicPX+VLSoilPoreMicPW)
-    PSORP(K)=TSORP*(OQPX*VLSoilPoreMicPX-OHPX*VLSoilPoreMicPW)/(VLSoilPoreMicPX+VLSoilPoreMicPW)
+    OMSORP(idom_don,K)=TSORP*(OQEX(idom_don)*VLSoilPoreMicPX-OHEX(idom_don)*VLSoilPoreMicPW)/(VLSoilPoreMicPX+VLSoilPoreMicPW)
+    OMSORP(idom_dop,K)=TSORP*(OQEX(idom_dop)*VLSoilPoreMicPX-OHEX(idom_dop)*VLSoilPoreMicPW)/(VLSoilPoreMicPX+VLSoilPoreMicPW)
   ELSE
-    CSORP(K)=0.0_r8
-    CSORPA(K)=0.0_r8
-    ZSORP(K)=0.0_r8
-    PSORP(K)=0.0_r8
+    DO idom=idom_beg,idom_end
+      OMSORP(idom,K)=0.0_r8
+    enddo
   ENDIF
   end associate
   end subroutine DOMSorption
@@ -1223,7 +1174,7 @@ module MicBGCMod
   type(NitroMicDiagType), intent(inout) :: nmicdiag
   type(NitroOMcplxFluxType), intent(inout) :: ncplxf
   type(NitroOMcplxStateType),intent(inout) :: ncplxs
-  integer  :: M
+  integer  :: M,NE,idom
   real(r8) :: CNOMX,CPOMX
   real(r8) :: COQCK,COSC
   real(r8) :: CPR,CNR
@@ -1236,22 +1187,11 @@ module MicBGCMod
 
 !     begin_execution
   associate(                 &
-    RDOSC  => ncplxf%RDOSC,  &
-    RDOSN  => ncplxf%RDOSN,  &
-    RDOSP  => ncplxf%RDOSP,  &
-    RHOSC  => ncplxf%RHOSC,  &
-    RHOSN  => ncplxf%RHOSN,  &
-    RHOSP  => ncplxf%RHOSP,  &
-    RCOSC  => ncplxf%RCOSC,  &
-    RCOSN  => ncplxf%RCOSN,  &
-    RCOSP  => ncplxf%RCOSP,  &
-    RDORC  => ncplxf%RDORC,  &
-    RDORN  => ncplxf%RDORN,  &
-    RDORP  => ncplxf%RDORP,  &
-    RDOHC  => ncplxf%RDOHC,  &
-    RDOHN  => ncplxf%RDOHN,  &
-    RDOHP  => ncplxf%RDOHP,  &
-    RDOHA  => ncplxf%RDOHA,  &
+    RDOSM  => ncplxf%RDOSM,  &
+    RHOSM  => ncplxf%RHOSM,  &
+    RCOSM  => ncplxf%RCOSM,  &
+    RDORM  => ncplxf%RDORM,  &
+    RDOHM  => ncplxf%RDOHM,  &
     ROQCK  => ncplxf%ROQCK,  &
     OSRH  => ncplxs%OSRH,    &
     TOMK  => ncplxs%TOMK,    &
@@ -1275,17 +1215,10 @@ module MicBGCMod
     EPOC => micstt%EPOC, &
     CNOSC => micstt%CNOSC, &
     CPOSC => micstt%CPOSC, &
-    OHC => micstt%OHC, &
-    OHN => micstt%OHN, &
-    OHP => micstt%OHP, &
-    OSC => micstt%OSC, &
-    OSN => micstt%OSN, &
-    OSP => micstt%OSP, &
+    OHM => micstt%OHM, &
+    OSM => micstt%OSM, &
     OSA => micstt%OSA, &
-    ORC => micstt%ORC, &
-    ORN => micstt%ORN, &
-    ORP => micstt%ORP, &
-    OHA => micstt%OHA, &
+    ORM => micstt%ORM, &
     VLSoilMicP => micfor%VLSoilMicP, &
     ZEROS => micfor%ZEROS, &
     ZEROS2 => micfor%ZEROS2, &
@@ -1353,20 +1286,20 @@ module MicBGCMod
 !     FCNK,FCPK=N,P limitation to microbial activity in each K
 !
     D785: DO M=1,jsken
-      IF(OSC(M,K).GT.ZEROS)THEN
-        CNS(M,K)=AZMAX1(OSN(M,K)/OSC(M,K))
-        CPS(M,K)=AZMAX1(OSP(M,K)/OSC(M,K))
-        RDOSC(M,K)=AZMAX1(AMIN1(0.5_r8*OSA(M,K) &
+      IF(OSM(ielmc,M,K).GT.ZEROS)THEN
+        CNS(M,K)=AZMAX1(OSM(ielmn,M,K)/OSM(ielmc,M,K))
+        CPS(M,K)=AZMAX1(OSM(ielmp,M,K)/OSM(ielmc,M,K))
+        RDOSM(ielmc,M,K)=AZMAX1(AMIN1(0.5_r8*OSA(M,K) &
           ,SPOSC(M,K)*ROQCK(K)*DFNS*OQCI*TFNX*OSA(M,K)/OSRH(K)))
-        RDOSN(M,K)=AZMAX1(AMIN1(OSN(M,K),CNS(M,K)*RDOSC(M,K)))/FCNK(K)
-        RDOSP(M,K)=AZMAX1(AMIN1(OSP(M,K),CPS(M,K)*RDOSC(M,K)))/FCPK(K)
+        RDOSM(ielmn,M,K)=AZMAX1(AMIN1(OSM(ielmn,M,K),CNS(M,K)*RDOSM(ielmc,M,K)))/FCNK(K)
+        RDOSM(ielmp,M,K)=AZMAX1(AMIN1(OSM(ielmp,M,K),CPS(M,K)*RDOSM(ielmc,M,K)))/FCPK(K)
 
       ELSE
         CNS(M,K)=CNOSC(M,K)
         CPS(M,K)=CPOSC(M,K)
-        RDOSC(M,K)=0.0_r8
-        RDOSN(M,K)=0.0_r8
-        RDOSP(M,K)=0.0_r8
+        DO NE=1,NumPlantChemElmnts
+          RDOSM(NE,M,K)=0.0_r8
+        ENDDO
       ENDIF
     ENDDO D785
 !
@@ -1380,46 +1313,40 @@ module MicBGCMod
 !     RCOSC,RCOSN,RCOSP=transfer of decomposition C,N,P to DOC,DON,DOP
 !
     IF(K.LE.micpar%NumOfLitrCmplxs)THEN
-      RHOSC(ilignin,K)=AZMAX1(AMIN1(RDOSN(ilignin,K)/CNRH(k_POM) &
-        ,RDOSP(ilignin,K)/CPRH(k_POM),EPOC*RDOSC(ilignin,K)))
-      RHOSCM=0.10_r8*RHOSC(ilignin,K)
-      RHOSC(iprotein,K)=AZMAX1(AMIN1(RDOSC(iprotein,K) &
-        ,RDOSN(iprotein,K)/CNRH(k_POM) &
-        ,RDOSP(iprotein,K)/CPRH(k_POM),RHOSCM))
-      RHOSC(icarbhyro,K)=AZMAX1(AMIN1(RDOSC(icarbhyro,K) &
-        ,RDOSN(icarbhyro,K)/CNRH(k_POM) &
-        ,RDOSP(icarbhyro,K)/CPRH(k_POM),RHOSCM))
-      RHOSC(icellulos,K)=AZMAX1(AMIN1(RDOSC(icellulos,K) &
-        ,RDOSN(icellulos,K)/CNRH(k_POM) &
-        ,RDOSP(icellulos,K)/CPRH(k_POM),RHOSCM-RHOSC(icarbhyro,K)))
+      RHOSM(ielmc,ilignin,K)=AZMAX1(AMIN1(RDOSM(ielmn,ilignin,K)/CNRH(k_POM) &
+        ,RDOSM(ielmp,ilignin,K)/CPRH(k_POM),EPOC*RDOSM(ielmc,ilignin,K)))
+      RHOSCM=0.10_r8*RHOSM(ielmc,ilignin,K)
+      RHOSM(ielmc,iprotein,K)=AZMAX1(AMIN1(RDOSM(ielmc,iprotein,K) &
+        ,RDOSM(ielmn,iprotein,K)/CNRH(k_POM) &
+        ,RDOSM(ielmp,iprotein,K)/CPRH(k_POM),RHOSCM))
+      RHOSM(ielmc,icarbhyro,K)=AZMAX1(AMIN1(RDOSM(ielmc,icarbhyro,K) &
+        ,RDOSM(ielmn,icarbhyro,K)/CNRH(k_POM) &
+        ,RDOSM(ielmp,icarbhyro,K)/CPRH(k_POM),RHOSCM))
+      RHOSM(ielmc,icellulos,K)=AZMAX1(AMIN1(RDOSM(ielmc,icellulos,K) &
+        ,RDOSM(ielmn,icellulos,K)/CNRH(k_POM) &
+        ,RDOSM(ielmp,icellulos,K)/CPRH(k_POM),RHOSCM-RHOSM(ielmc,icarbhyro,K)))
       D805: DO M=1,jsken
-        RHOSN(M,K)=AMIN1(RDOSN(M,K),RHOSC(M,K)*CNRH(k_POM))
-        RHOSP(M,K)=AMIN1(RDOSP(M,K),RHOSC(M,K)*CPRH(k_POM))
-        RCOSC(M,K)=RDOSC(M,K)-RHOSC(M,K)
-        RCOSN(M,K)=RDOSN(M,K)-RHOSN(M,K)
-        RCOSP(M,K)=RDOSP(M,K)-RHOSP(M,K)
+        RHOSM(ielmn,M,K)=AMIN1(RDOSM(ielmn,M,K),RHOSM(ielmc,M,K)*CNRH(k_POM))
+        RHOSM(ielmp,M,K)=AMIN1(RDOSM(ielmp,M,K),RHOSM(ielmc,M,K)*CPRH(k_POM))
+        DO NE=1,NumPlantChemElmnts
+          RCOSM(NE,M,K)=RDOSM(NE,M,K)-RHOSM(NE,M,K)
+        ENDDO
       ENDDO D805
     ELSE
       D810: DO M=1,jsken
-        RHOSC(M,K)=0.0_r8
-        RHOSN(M,K)=0.0_r8
-        RHOSP(M,K)=0.0_r8
-        RCOSC(M,K)=RDOSC(M,K)
-        RCOSN(M,K)=RDOSN(M,K)
-        RCOSP(M,K)=RDOSP(M,K)
+        DO NE=1,NumPlantChemElmnts      
+          RHOSM(NE,M,K)=0.0_r8
+          RCOSM(NE,M,K)=RDOSM(NE,M,K)
+        ENDDO
       ENDDO D810
     ENDIF
   ELSE
     D780: DO M=1,jsken
-      RDOSC(M,K)=0.0_r8
-      RDOSN(M,K)=0.0_r8
-      RDOSP(M,K)=0.0_r8
-      RHOSC(M,K)=0.0_r8
-      RHOSN(M,K)=0.0_r8
-      RHOSP(M,K)=0.0_r8
-      RCOSC(M,K)=0.0_r8
-      RCOSN(M,K)=0.0_r8
-      RCOSP(M,K)=0.0_r8
+      DO NE=1,NumPlantChemElmnts    
+        RDOSM(NE,M,K)=0.0_r8
+        RHOSM(NE,M,K)=0.0_r8
+        RCOSM(NE,M,K)=0.0_r8
+      ENDDO  
     ENDDO D780
   ENDIF
 !
@@ -1440,25 +1367,25 @@ module MicBGCMod
 !
   IF(OSRH(K).GT.ZEROS)THEN
     D775: DO M=1,ndbiomcp
-      IF(ORC(M,K).GT.ZEROS)THEN
-        CNR=AZMAX1(ORN(M,K)/ORC(M,K))
-        CPR=AZMAX1(ORP(M,K)/ORC(M,K))
-        RDORC(M,K)=AZMAX1(AMIN1(ORC(M,K) &
-          ,SPORC(M)*ROQCK(K)*DFNS*OQCI*TFNX*ORC(M,K)/OSRH(K)))
+      IF(ORM(ielmc,M,K).GT.ZEROS)THEN
+        CNR=AZMAX1(ORM(ielmn,M,K)/ORM(ielmc,M,K))
+        CPR=AZMAX1(ORM(ielmp,M,K)/ORM(ielmc,M,K))
+        RDORM(ielmc,M,K)=AZMAX1(AMIN1(ORM(ielmc,M,K) &
+          ,SPORC(M)*ROQCK(K)*DFNS*OQCI*TFNX*ORM(ielmc,M,K)/OSRH(K)))
     !    3*AMIN1(FCNK(K),FCPK(K))
-        RDORN(M,K)=AZMAX1(AMIN1(ORN(M,K),CNR*RDORC(M,K)))/FCNK(K)
-        RDORP(M,K)=AZMAX1(AMIN1(ORP(M,K),CPR*RDORC(M,K)))/FCPK(K)
+        RDORM(ielmn,M,K)=AZMAX1(AMIN1(ORM(ielmn,M,K),CNR*RDORM(ielmc,M,K)))/FCNK(K)
+        RDORM(ielmp,M,K)=AZMAX1(AMIN1(ORM(ielmp,M,K),CPR*RDORM(ielmc,M,K)))/FCPK(K)
       ELSE
-        RDORC(M,K)=0.0_r8
-        RDORN(M,K)=0.0_r8
-        RDORP(M,K)=0.0_r8
+        DO NE=1,NumPlantChemElmnts      
+          RDORM(NE,M,K)=0.0_r8
+        ENDDO  
       ENDIF
     ENDDO D775
   ELSE
     D776: DO M=1,ndbiomcp
-      RDORC(M,K)=0.0_r8
-      RDORN(M,K)=0.0_r8
-      RDORP(M,K)=0.0_r8
+      DO NE=1,NumPlantChemElmnts    
+        RDORM(NE,M,K)=0.0_r8
+      ENDDO  
     ENDDO D776
   ENDIF
 !
@@ -1478,32 +1405,30 @@ module MicBGCMod
 !     FCNK,FCPK=N,P limitation to microbial activity in each K
 !
   IF(OSRH(K).GT.ZEROS)THEN
-    IF(OHC(K).GT.ZEROS)THEN
-      CNH(K)=AZMAX1(OHN(K)/OHC(K))
-      CPH(K)=AZMAX1(OHP(K)/OHC(K))
-      RDOHC(K)=AZMAX1(AMIN1(OHC(K) &
-        ,SPOHC*ROQCK(K)*DFNS*OQCI*TFNX*OHC(K)/OSRH(K)))
+    IF(OHM(ielmc,K).GT.ZEROS)THEN
+      CNH(K)=AZMAX1(OHM(ielmn,K)/OHM(ielmc,K))
+      CPH(K)=AZMAX1(OHM(ielmp,K)/OHM(ielmc,K))
+      RDOHM(ielmc,K)=AZMAX1(AMIN1(OHM(ielmc,K) &
+        ,SPOHC*ROQCK(K)*DFNS*OQCI*TFNX*OHM(ielmc,K)/OSRH(K)))
 !    3*AMIN1(FCNK(K),FCPK(K))
-      RDOHN(K)=AZMAX1(AMIN1(OHN(K),CNH(K)*RDOHC(K)))/FCNK(K)
-      RDOHP(K)=AZMAX1(AMIN1(OHP(K),CPH(K)*RDOHC(K)))/FCPK(K)
-      RDOHA(K)=AZMAX1(AMIN1(OHA(K) &
-        ,SPOHA*ROQCK(K)*DFNS*TFNX*OHA(K)/OSRH(K)))
+      RDOHM(ielmn,K)=AZMAX1(AMIN1(OHM(ielmn,K),CNH(K)*RDOHM(ielmc,K)))/FCNK(K)
+      RDOHM(ielmp,K)=AZMAX1(AMIN1(OHM(ielmp,K),CPH(K)*RDOHM(ielmc,K)))/FCPK(K)
+      RDOHM(idom_acetate,K)=AZMAX1(AMIN1(OHM(idom_acetate,K) &
+        ,SPOHA*ROQCK(K)*DFNS*TFNX*OHM(idom_acetate,K)/OSRH(K)))
 !    3*AMIN1(FCNK(K),FCPK(K))
     ELSE
       CNH(K)=0.0_r8
       CPH(K)=0.0_r8
-      RDOHC(K)=0.0_r8
-      RDOHN(K)=0.0_r8
-      RDOHP(K)=0.0_r8
-      RDOHA(K)=0.0_r8
+      DO idom=idom_beg,idom_end
+        RDOHM(idom,K)=0.0_r8
+      ENDDO
     ENDIF
   ELSE
     CNH(K)=0.0_r8
     CPH(K)=0.0_r8
-    RDOHC(K)=0.0_r8
-    RDOHN(K)=0.0_r8
-    RDOHP(K)=0.0_r8
-    RDOHA(K)=0.0_r8
+    DO idom=idom_beg,idom_end          
+      RDOHM(idom,K)=0.0_r8
+    ENDDO
   ENDIF
   end associate
   end subroutine SolidOMDecomposition
@@ -1519,70 +1444,38 @@ module MicBGCMod
   type(NitroMicFluxType), intent(inout) :: nmicf
   type(NitroOMcplxFluxType), intent(inout) :: ncplxf
   type(NitroOMcplxStateType), intent(inout):: ncplxs
-  integer :: K,M,N,NGL
+  integer :: K,M,N,NGL,NE,idom
   real(r8) :: FORC(0:jcplx)
 !     begin_execution
   associate(                   &
     k_POM  => micpar%k_POM   , &
-    CGOMN  => nmicf%CGOMN,     &
-    CGOMP  => nmicf%CGOMP,     &
+    CGOMEheter  => nmicf%CGOMEheter,     &
     CGOQC  => nmicf%CGOQC,     &
     CGOAC  => nmicf%CGOAC,     &
-    RCOMC  => nmicf%RCOMC,     &
-    RCOMN  => nmicf%RCOMN,     &
-    RCOMP  => nmicf%RCOMP,     &
-    RCMMC  => nmicf%RCMMC,     &
-    RCMMN  => nmicf%RCMMN,     &
-    RCMMP  => nmicf%RCMMP,     &
-    RCCMC  => nmicf%RCCMC,     &
-    RCCMN  => nmicf%RCCMN,     &
-    RCCMP  => nmicf%RCCMP,     &
+    RCOMEheter  => nmicf%RCOMEheter,     &
+    RCMMEheter  => nmicf%RCMMEheter,     &
+    RCCMEheter  => nmicf%RCCMEheter,     &
     RCH3X  => nmicf%RCH3X,     &
-    RDOSC  => ncplxf%RDOSC,  &
-    RDOSN  => ncplxf%RDOSN,  &
-    RDOSP  => ncplxf%RDOSP,  &
-    RHOSC  => ncplxf%RHOSC,  &
-    RHOSN  => ncplxf%RHOSN,  &
-    RHOSP  => ncplxf%RHOSP,  &
-    RCOSC  => ncplxf%RCOSC,  &
-    RCOSN  => ncplxf%RCOSN,  &
-    RCOSP  => ncplxf%RCOSP,  &
-    RDORC  => ncplxf%RDORC,  &
-    RDORN  => ncplxf%RDORN,  &
-    RDORP  => ncplxf%RDORP,  &
-    RDOHC  => ncplxf%RDOHC,  &
-    RDOHN  => ncplxf%RDOHN,  &
-    RDOHP  => ncplxf%RDOHP,  &
-    RDOHA  => ncplxf%RDOHA,  &
-    CSORP  => ncplxf%CSORP,  &
-    ZSORP  => ncplxf%ZSORP,  &
-    PSORP  => ncplxf%PSORP,  &
-    CSORPA  => ncplxf%CSORPA,&
+    RDOSM  => ncplxf%RDOSM,    &
+    RHOSM  => ncplxf%RHOSM,    &
+    RCOSM  => ncplxf%RCOSM,  &
+    RDORM  => ncplxf%RDORM,  &
+    RDOHM  => ncplxf%RDOHM,  &
+    OMSORP  => ncplxf%OMSORP,  &
     ORCT  => ncplxs%ORCT    ,&
     RCOQN =>  nmicdiag%RCOQN,&
     TORC  =>  nmicdiag%TORC , &
-    RCMMCff  => nmicf%RCMMCff,     &
-    RCMMNff  => nmicf%RCMMNff,     &
-    RCMMPff  => nmicf%RCMMPff,     &
-    RCOMCff  => nmicf%RCOMCff,     &
-    RCOMNff  => nmicf%RCOMNff,     &
-    RCOMPff  => nmicf%RCOMPff,     &
-    OSC      => micstt%OSC   , &
-    OSN      => micstt%OSN   , &
-    OSP      => micstt%OSP   , &
+    RCMMEautor  => nmicf%RCMMEautor,     &
+    RCOMEautor  => nmicf%RCOMEautor,     &
+    OSM      => micstt%OSM   , &
     iprotein  => micpar%iprotein , &
 !    OSA      => micstt%OSA   , &
     OSC13U      => micstt%OSC13U   , &
     OSN13U      => micstt%OSN13U   , &
     OSP13U      => micstt%OSP13U   , &
     DOM  => micstt%DOM, &
-    ORC  => micstt%ORC, &
-    ORN  => micstt%ORN, &
-    ORP  => micstt%ORP, &
-    OHC  => micstt%OHC, &
-    OHN  => micstt%OHN, &
-    OHP  => micstt%OHP, &
-    OHA  => micstt%OHA, &
+    ORM  => micstt%ORM, &
+    OHM  => micstt%OHM, &
     ZEROS => micfor%ZEROS, &
     Litrm => micfor%litrm  &
   )
@@ -1592,9 +1485,9 @@ module MicBGCMod
 !
 !     FORC=fraction of total microbial residue
 !     ORCT=microbial residue
-!     RCCMC,RCCMN,RCCMP=transfer of auto litterfall C,N,P to each hetero K
-!     RCOMC,RCOMN,RCOMP=transfer of microbial C,N,P litterfall to residue
-!     RCMMC,RCMMN,RCMMC=transfer of senesence litterfall C,N,P to residue
+!     RCCMEheter,RCCMN,RCCMP=transfer of auto litterfall C,N,P to each hetero K
+!     RCOMEheter,RCOMEheter,RCOMP=transfer of microbial C,N,P litterfall to residue
+!     RCMMEheter,RCMMN,RCMMEheter=transfer of senesence litterfall C,N,P to residue
 !
   D1690: DO K=1,KL
     IF(TORC.GT.ZEROS)THEN
@@ -1609,9 +1502,9 @@ module MicBGCMod
     D1685: DO N=1,NumMicbFunGroups
       D1680: DO M=1,ndbiomcp
         DO NGL=JGniA(N),JGnfA(N)
-          RCCMC(M,NGL,K)=(RCOMCff(M,NGL)+RCMMCff(M,NGL))*FORC(K)
-          RCCMN(M,NGL,K)=(RCOMNff(M,NGL)+RCMMNff(M,NGL))*FORC(K)
-          RCCMP(M,NGL,K)=(RCOMPff(M,NGL)+RCMMPff(M,NGL))*FORC(K)
+        DO NE=1,NumPlantChemElmnts
+          RCCMEheter(NE,M,NGL,K)=(RCOMEautor(NE,M,NGL)+RCMMEautor(NE,M,NGL))*FORC(K)
+          ENDDO
         ENDDO
       ENDDO D1680
     ENDDO D1685
@@ -1631,13 +1524,14 @@ module MicBGCMod
 !     OQC,OQN,OQP,OQA=DOC,DON,DOP
 !     RCOSC,RCOSN,RCOSP=transfer of decomposition C,N,P to DOC,DON,DOP
 !
-      OSC(M,K)=OSC(M,K)-RDOSC(M,K)
-!     OSA(M,K)=OSA(M,K)-RDOSC(M,K)
-      OSN(M,K)=OSN(M,K)-RDOSN(M,K)
-      OSP(M,K)=OSP(M,K)-RDOSP(M,K)
-      DOM(idom_doc,K)=DOM(idom_doc,K)+RCOSC(M,K)
-      DOM(idom_don,K)=DOM(idom_don,K)+RCOSN(M,K)
-      DOM(idom_dop,K)=DOM(idom_dop,K)+RCOSP(M,K)
+      DO NE=1,NumPlantChemElmnts
+        OSM(NE,M,K)=OSM(NE,M,K)-RDOSM(NE,M,K)
+      ENDDO
+
+!     OSA(M,K)=OSA(M,K)-RDOSM(ielmc,M,K)
+      DO NE=1,NumPlantChemElmnts
+      DOM(NE,K)=DOM(NE,K)+RCOSM(NE,M,K)
+      ENDDO
 !
 !     LIGNIFICATION PRODUCTS
 !
@@ -1645,15 +1539,15 @@ module MicBGCMod
 !
       IF(.not.litrm)THEN
 ! add to POM carbonhydrate
-        OSC(iprotein,k_POM)=OSC(iprotein,k_POM)+RHOSC(M,K)
- !      OSA(1,k_POM)=OSA(1,k_POM)+RHOSC(M,K)
-        OSN(iprotein,k_POM)=OSN(iprotein,k_POM)+RHOSN(M,K)
-        OSP(iprotein,k_POM)=OSP(iprotein,k_POM)+RHOSP(M,K)
+ !      OSA(1,k_POM)=OSA(1,k_POM)+RHOSM(ielmc,M,K)
+        DO NE=1,NumPlantChemElmnts
+          OSM(NE,iprotein,k_POM)=OSM(NE,iprotein,k_POM)+RHOSM(NE,M,K)
+        ENDDO
       ELSE
-        OSC13U=OSC13U+RHOSC(M,K)
- !      OSA13U=OSA13U+RHOSC(M,K)
-        OSN13U=OSN13U+RHOSN(M,K)
-        OSP13U=OSP13U+RHOSP(M,K)
+ !      OSA13U=OSA13U+RHOSM(ielmc,M,K)
+        OSC13U=OSC13U+RHOSM(ielmc,M,K)
+        OSN13U=OSN13U+RHOSM(ielmn,M,K)
+        OSP13U=OSP13U+RHOSM(ielmp,M,K)
       ENDIF
 
     ENDDO D580
@@ -1666,45 +1560,39 @@ module MicBGCMod
 !     RCOQN=DON production from nitrous acid reduction
 !
     D575: DO M=1,ndbiomcp
-      ORC(M,K)=ORC(M,K)-RDORC(M,K)
-      ORN(M,K)=ORN(M,K)-RDORN(M,K)
-      ORP(M,K)=ORP(M,K)-RDORP(M,K)
-      DOM(idom_doc,K)=DOM(idom_doc,K)+RDORC(M,K)
-      DOM(idom_don,K)=DOM(idom_don,K)+RDORN(M,K)
-      DOM(idom_dop,K)=DOM(idom_dop,K)+RDORP(M,K)
+      DO NE=1,NumPlantChemElmnts    
+        ORM(NE,M,K)=ORM(NE,M,K)-RDORM(NE,M,K)
+        DOM(NE,K)=DOM(NE,K)+RDORM(NE,M,K)
+      ENDDO
     ENDDO D575
-    DOM(idom_doc,K)=DOM(idom_doc,K)+RDOHC(K)
-    DOM(idom_don,K)=DOM(idom_don,K)+RDOHN(K)+RCOQN*FORC(K)
-    DOM(idom_dop,K)=DOM(idom_dop,K)+RDOHP(K)
-    DOM(idom_acetate,K)=DOM(idom_acetate,K)+RDOHA(K)
-    OHC(K)=OHC(K)-RDOHC(K)
-    OHN(K)=OHN(K)-RDOHN(K)
-    OHP(K)=OHP(K)-RDOHP(K)
-    OHA(K)=OHA(K)-RDOHA(K)
+    DO idom=idom_beg,idom_end
+      DOM(idom,K)=DOM(idom,K)+RDOHM(idom,K)
+      OHM(idom,K)=OHM(idom,K)-RDOHM(idom,K)
+    ENDDO
 !
 !     MICROBIAL UPTAKE OF DISSOLVED C, N, P
 !
-!     CGOQC,CGOAC,CGOMN,CGOMP=DOC,acetate,DON,DOP uptake
+!     CGOQC,CGOAC,CGOMEheter,CGOMEheter=DOC,acetate,DON,DOP uptake
 !     RCH3X=acetate production from fermentation
 !
     D570: DO N=1,NumMicbFunGroups
       DO NGL=JGnio(N),JGnfo(N)
         DOM(idom_doc,K)=DOM(idom_doc,K)-CGOQC(NGL,K)
-        DOM(idom_don,K)=DOM(idom_don,K)-CGOMN(NGL,K)
-        DOM(idom_dop,K)=DOM(idom_dop,K)-CGOMP(NGL,K)
+        DOM(idom_don,K)=DOM(idom_don,K)-CGOMEheter(ielmp,NGL,K)
+        DOM(idom_dop,K)=DOM(idom_dop,K)-CGOMEheter(ielmp,NGL,K)
         DOM(idom_acetate,K)=DOM(idom_acetate,K)-CGOAC(NGL,K)+RCH3X(NGL,K)
 !
 !     MICROBIAL DECOMPOSITION PRODUCTS
 !
 !     ORC,ORN,ORP=microbial residue C,N,P
-!     RCOMC,RCOMN,RCOMP=transfer of microbial C,N,P litterfall to residue
-!     RCCMC,RCCMN,RCCMP=transfer of auto litterfall C,N,P to each hetero K
-!     RCMMC,RCMMN,RCMMC=transfer of senesence litterfall C,N,P to residue
+!     RCOMEheter,RCOMEheter,RCOMP=transfer of microbial C,N,P litterfall to residue
+!     RCCMEheter,RCCMN,RCCMP=transfer of auto litterfall C,N,P to each hetero K
+!     RCMMEheter,RCMMN,RCMMEheter=transfer of senesence litterfall C,N,P to residue
 !
         D565: DO M=1,ndbiomcp
-          ORC(M,K)=ORC(M,K)+RCOMC(M,NGL,K)+RCCMC(M,NGL,K)+RCMMC(M,NGL,K)
-          ORN(M,K)=ORN(M,K)+RCOMN(M,NGL,K)+RCCMN(M,NGL,K)+RCMMN(M,NGL,K)
-          ORP(M,K)=ORP(M,K)+RCOMP(M,NGL,K)+RCCMP(M,NGL,K)+RCMMP(M,NGL,K)
+          DO NE=1,NumPlantChemElmnts
+            ORM(NE,M,K)=ORM(NE,M,K)+RCOMEheter(NE,M,NGL,K)+RCCMEheter(NE,M,NGL,K)+RCMMEheter(NE,M,NGL,K)
+          ENDDO
         ENDDO D565
       enddo
     ENDDO D570
@@ -1713,14 +1601,10 @@ module MicBGCMod
 !
 !     CSORP,CSORPA,ZSORP,PSORP=sorption(ad=+ve,de=-ve) of OQC,acetate,DON,DOP
 !
-    DOM(idom_doc,K)=DOM(idom_doc,K)-CSORP(K)
-    DOM(idom_don,K)=DOM(idom_don,K)-ZSORP(K)
-    DOM(idom_dop,K)=DOM(idom_dop,K)-PSORP(K)
-    DOM(idom_acetate,K)=DOM(idom_acetate,K)-CSORPA(K)
-    OHC(K)=OHC(K)+CSORP(K)
-    OHN(K)=OHN(K)+ZSORP(K)
-    OHP(K)=OHP(K)+PSORP(K)
-    OHA(K)=OHA(K)+CSORPA(K)
+    DO idom=idom_beg,idom_end
+      DOM(idom,K)=DOM(idom,K)-OMSORP(idom,K)    
+      OHM(idom,K)=OHM(idom,K)+OMSORP(idom,K)
+    ENDDO
 
   ENDDO D590
   end associate
@@ -1732,16 +1616,12 @@ module MicBGCMod
   type(micforctype), intent(in) :: micfor
   type(micsttype), intent(inout) :: micstt
   type(NitroMicFluxType), intent(inout) :: nmicf
-  integer  :: K,M,N,NGL,MID3,MID
+  integer  :: K,M,N,NGL,MID3,MID,NE
   real(r8) ::CGROMC
 !     begin_execution
   associate(                  &
-    CGOMC    => nmicf%CGOMC,  &
-    CGOMN  => nmicf%CGOMN,    &
-    CGOMP  => nmicf%CGOMP,    &
-    CGOMS  => nmicf%CGOMS,    &
-    CGONS  => nmicf%CGONS,    &
-    CGOPS  => nmicf%CGOPS,    &
+    CGOMEheter    => nmicf%CGOMEheter,  &
+    CGOMES  => nmicf%CGOMES,    &
     RGN2F  => nmicf%RGN2F,    &
     RGOMO  => nmicf%RGOMO,    &
     RGOMD  => nmicf%RGOMD,    &
@@ -1751,25 +1631,13 @@ module MicBGCMod
     RINB4 => nmicf%RINB4 ,    &
     RINB3 => nmicf%RINB3 ,    &
     RIPOB => nmicf%RIPOB ,    &
-    RHOMC => nmicf%RHOMC ,    &
-    RHOMN => nmicf%RHOMN ,    &
-    RHOMP => nmicf%RHOMP ,    &
-    RHMMC  => nmicf%RHMMC,    &
-    RHMMN  => nmicf%RHMMN,    &
-    RHMMP  => nmicf%RHMMP,    &
+    RHOMEheter => nmicf%RHOMEheter ,    &
+    RHMMEheter  => nmicf%RHMMEheter,    &
     RN2FX  => nmicf%RN2FX,    &
-    RXOMC  => nmicf%RXOMC,    &
-    RXOMN  => nmicf%RXOMN,    &
-    RXOMP  => nmicf%RXOMP,    &
-    R3OMC  => nmicf%R3OMC,    &
-    R3OMN  => nmicf%R3OMN,    &
-    R3OMP  => nmicf%R3OMP,    &
-    RXMMC  => nmicf%RXMMC,    &
-    RXMMN  => nmicf%RXMMN,    &
-    RXMMP  => nmicf%RXMMP,    &
-    R3MMC  => nmicf%R3MMC,    &
-    R3MMN  => nmicf%R3MMN,    &
-    R3MMP  => nmicf%R3MMP,    &
+    RXOMEheter  => nmicf%RXOMEheter,    &
+    R3OMEheter  => nmicf%R3OMEheter,    &
+    RXMMEheter  => nmicf%RXMMEheter,    &
+    R3MMEheter  => nmicf%R3MMEheter,    &
     RINH4R  => nmicf%RINH4R,  &
     RINO3R  => nmicf%RINO3R,  &
     RIPO4R  => nmicf%RIPO4R,  &
@@ -1780,9 +1648,7 @@ module MicBGCMod
     k_POM => micpar%k_POM, &
     k_humus => micpar%k_humus, &
     OMEhetr=> micstt%OMEhetr, &
-    OSC => micstt%OSC, &
-    OSN => micstt%OSN, &
-    OSP => micstt%OSP, &
+    OSM => micstt%OSM, &
     OSC14U => micstt%OSC14U, &
     OSN14U=> micstt%OSN14U, &
     OSP14U=> micstt%OSP14U, &
@@ -1798,8 +1664,8 @@ module MicBGCMod
 !
 !     OMC,OMN,OMP=microbial C,N,P
 !     CGOMS,CGONS,CGOPS=transfer from nonstructural to structural C,N,P
-!     RXOMC,RXOMN,RXOMP=microbial C,N,P decomposition
-!     RXMMC,RXMMN,RXMMP=microbial C,N,P loss from senescence
+!     RXOMC,RXOMN,RXOMEheter=microbial C,N,P decomposition
+!     RXMMEheter,RXMMN,RXMMP=microbial C,N,P loss from senescence
 !
 
   call MicrobialAnabolicUpdateff(micfor,micstt,nmicf)
@@ -1810,50 +1676,48 @@ module MicBGCMod
         DO NGL=JGnio(N),JGnfo(N)
           D540: DO M=1,2
             MID=micpar%get_micb_id(M,NGL)          
-            OMEhetr(ielmc,MID,K)=OMEhetr(ielmc,MID,K)+CGOMS(M,NGL,K) &
-              -RXOMC(M,NGL,K)-RXMMC(M,NGL,K)
-            OMEhetr(ielmn,MID,K)=OMEhetr(ielmn,MID,K)+CGONS(M,NGL,K) &
-              -RXOMN(M,NGL,K)-RXMMN(M,NGL,K)
-            OMEhetr(ielmp,MID,K)=OMEhetr(ielmp,MID,K)+CGOPS(M,NGL,K) &
-              -RXOMP(M,NGL,K)-RXMMP(M,NGL,K)
+            OMEhetr(ielmc,MID,K)=OMEhetr(ielmc,MID,K)+CGOMES(ielmc,M,NGL,K) &
+              -RXOMEheter(ielmc,M,NGL,K)-RXMMEheter(ielmc,M,NGL,K)
+            OMEhetr(ielmn,MID,K)=OMEhetr(ielmn,MID,K)+CGOMES(ielmn,M,NGL,K) &
+              -RXOMEheter(ielmn,M,NGL,K)-RXMMEheter(ielmn,M,NGL,K)
+            OMEhetr(ielmp,MID,K)=OMEhetr(ielmp,MID,K)+CGOMES(ielmp,M,NGL,K) &
+              -RXOMEheter(ielmp,M,NGL,K)-RXMMEheter(ielmp,M,NGL,K)
 !
 !     HUMIFICATION PRODUCTS
 !
 !     CFOMC=fractions allocated to humic vs fulvic humus
-!     RHOMC,RHOMN,RHOMP=transfer of microbial C,N,P litterfall to humus
-!     RHMMC,RHMMN,RHMMC=transfer of senesence litterfall C,N,P to humus
+!     RHOMC,RHOMN,RHOMEheter=transfer of microbial C,N,P litterfall to humus
+!     RHMMEheter,RHMMN,RHMMEheter=transfer of senesence litterfall C,N,P to humus
 !
             IF(.not.litrm)THEN
 !add as protein
-              OSC(iprotein,k_humus)=OSC(iprotein,k_humus)+CFOMC(1)*(RHOMC(M,NGL,K)+RHMMC(M,NGL,K))
-              OSN(iprotein,k_humus)=OSN(iprotein,k_humus)+CFOMC(1)*(RHOMN(M,NGL,K)+RHMMN(M,NGL,K))
-              OSP(iprotein,k_humus)=OSP(iprotein,k_humus)+CFOMC(1)*(RHOMP(M,NGL,K)+RHMMP(M,NGL,K))
-!add as carbon hydro
-              OSC(icarbhyro,k_humus)=OSC(icarbhyro,k_humus)+CFOMC(2)*(RHOMC(M,NGL,K)+RHMMC(M,NGL,K))
-              OSN(icarbhyro,k_humus)=OSN(icarbhyro,k_humus)+CFOMC(2)*(RHOMN(M,NGL,K)+RHMMN(M,NGL,K))
-              OSP(icarbhyro,k_humus)=OSP(icarbhyro,k_humus)+CFOMC(2)*(RHOMP(M,NGL,K)+RHMMP(M,NGL,K))
+              DO NE=1,NumPlantChemElmnts
+                OSM(NE,iprotein,k_humus)=OSM(NE,iprotein,k_humus)+CFOMC(1)*(RHOMEheter(NE,M,NGL,K)+RHMMEheter(NE,M,NGL,K))
+  !add as carbon hydro
+                OSM(NE,icarbhyro,k_humus)=OSM(NE,icarbhyro,k_humus)+CFOMC(2)*(RHOMEheter(NE,M,NGL,K)+RHMMEheter(NE,M,NGL,K))
+              ENDDO
             ELSE
-              OSC14U=OSC14U+CFOMCU(1)*(RHOMC(M,NGL,K)+RHMMC(M,NGL,K))
-              OSN14U=OSN14U+CFOMCU(1)*(RHOMN(M,NGL,K)+RHMMN(M,NGL,K))
-              OSP14U=OSP14U+CFOMCU(1)*(RHOMP(M,NGL,K)+RHMMP(M,NGL,K))
-              OSC24U=OSC24U+CFOMC(2)*(RHOMC(M,NGL,K)+RHMMC(M,NGL,K))
-              OSN24U=OSN24U+CFOMCU(2)*(RHOMN(M,NGL,K)+RHMMN(M,NGL,K))
-              OSP24U=OSP24U+CFOMCU(2)*(RHOMP(M,NGL,K)+RHMMP(M,NGL,K))
+              OSC14U=OSC14U+CFOMCU(1)*(RHOMEheter(ielmc,M,NGL,K)+RHMMEheter(ielmc,M,NGL,K))
+              OSN14U=OSN14U+CFOMCU(1)*(RHOMEheter(ielmn,M,NGL,K)+RHMMEheter(ielmn,M,NGL,K))
+              OSP14U=OSP14U+CFOMCU(1)*(RHOMEheter(ielmp,M,NGL,K)+RHMMEheter(ielmp,M,NGL,K))
+              OSC24U=OSC24U+CFOMC(2)*(RHOMEheter(ielmc,M,NGL,K)+RHMMEheter(ielmc,M,NGL,K))
+              OSN24U=OSN24U+CFOMCU(2)*(RHOMEheter(ielmn,M,NGL,K)+RHMMEheter(ielmn,M,NGL,K))
+              OSP24U=OSP24U+CFOMCU(2)*(RHOMEheter(ielmp,M,NGL,K)+RHMMEheter(ielmp,M,NGL,K))
             ENDIF
           ENDDO D540
 
 !
 !     INPUTS TO NONSTRUCTURAL POOLS
 !
-!     CGOMC=total DOC+acetate uptake
+!     CGOMEheter=total DOC+acetate uptake
 !     RGOMO=total respiration
 !     RGOMD=respiration for denitrifcation
 !     RGN2F=respiration for N2 fixation
 !     RCO2X=total CO2 emission
 !     CGOMS,CGONS,CGOPS=transfer from nonstructural to structural C,N,P
-!     R3OMC,R3OMN,R3OMP=microbial C,N,P recycling
-!     R3MMC,R3MMN,R3MMP=microbial C,N,P recycling from senescence
-!     CGOMN,CGOMP=DON, DOP uptake
+!     R3OMC,R3OMN,R3OMEheter=microbial C,N,P recycling
+!     R3MMEheter,R3MMN,R3MMP=microbial C,N,P recycling from senescence
+!     CGOMEheter,CGOMEheter=DON, DOP uptake
 !     RINH4,RINB4=substrate-limited NH4 mineraln-immobiln in non-band, band
 !     RINO3,RINB3=substrate-limited NO3 immobiln in non-band, band
 !     RIPO4,RIPOB=substrate-limited H2PO4 mineraln-immobn in non-band, band
@@ -1861,19 +1725,22 @@ module MicBGCMod
 !     RINH4R,RINO3R =substrate-limited NH4,NO3 mineraln-immobiln
 !     RIPO4R,RIP14R=substrate-limited H2PO4,HPO4 mineraln-immobiln
 !
-          CGROMC=CGOMC(NGL,K)-RGOMO(NGL,K)-RGOMD(NGL,K)-RGN2F(NGL,K)
+          CGROMC=CGOMEheter(ielmc,NGL,K)-RGOMO(NGL,K)-RGOMD(NGL,K)-RGN2F(NGL,K)
           RCO2X(NGL,K)=RCO2X(NGL,K)+RGN2F(NGL,K)
           MID3=micpar%get_micb_id(3,NGL)
           D555: DO M=1,2
-            OMEhetr(ielmc,MID3,K)=OMEhetr(ielmc,MID3,K)-CGOMS(M,NGL,K)+R3OMC(M,NGL,K)
-            OMEhetr(ielmn,MID3,K)=OMEhetr(ielmn,MID3,K)-CGONS(M,NGL,K)+R3OMN(M,NGL,K)+R3MMN(M,NGL,K)
-            OMEhetr(ielmp,MID3,K)=OMEhetr(ielmp,MID3,K)-CGOPS(M,NGL,K)+R3OMP(M,NGL,K)+R3MMP(M,NGL,K)
-            RCO2X(NGL,K)=RCO2X(NGL,K)+R3MMC(M,NGL,K)
+            DO NE=1,NumPlantChemElmnts
+              OMEhetr(NE,MID3,K)=OMEhetr(NE,MID3,K)-CGOMES(NE,M,NGL,K)+R3OMEheter(NE,M,NGL,K)
+            ENDDO
+            OMEhetr(ielmn,MID3,K)=OMEhetr(ielmn,MID3,K)+R3MMEheter(ielmn,M,NGL,K)
+            OMEhetr(ielmp,MID3,K)=OMEhetr(ielmp,MID3,K)+R3MMEheter(ielmp,M,NGL,K)
+
+            RCO2X(NGL,K)=RCO2X(NGL,K)+R3MMEheter(ielmc,M,NGL,K)
           ENDDO D555
           OMEhetr(ielmc,MID3,K)=OMEhetr(ielmc,MID3,K)+CGROMC
-          OMEhetr(ielmn,MID3,K)=OMEhetr(ielmn,MID3,K)+CGOMN(NGL,K) &
+          OMEhetr(ielmn,MID3,K)=OMEhetr(ielmn,MID3,K)+CGOMEheter(ielmp,NGL,K) &
             +RINH4(NGL,K)+RINB4(NGL,K)+RINO3(NGL,K)+RINB3(NGL,K)+RN2FX(NGL,K)
-          OMEhetr(ielmp,MID3,K)=OMEhetr(ielmp,MID3,K)+CGOMP(NGL,K) &
+          OMEhetr(ielmp,MID3,K)=OMEhetr(ielmp,MID3,K)+CGOMEheter(ielmp,NGL,K) &
             +RIPO4(NGL,K)+RIPOB(NGL,K)+RIP14(NGL,K)+RIP1B(NGL,K)
           IF(litrm)THEN
             OMEhetr(ielmn,MID3,K)=OMEhetr(ielmn,MID3,K)+RINH4R(NGL,K)+RINO3R(NGL,K)
@@ -1904,7 +1771,7 @@ module MicBGCMod
     OSAT   => ncplxs%OSAT  ,  &
     ZEROS  => micfor%ZEROS  , &
     OSA    =>micstt%OSA     , &
-    OSC    =>micstt%OSC     , &
+    OSM    =>micstt%OSM     , &
     DOSA   => micpar%DOSA     &
   )
 !     OSCT,OSAT,OSCX=total,colonized,uncolonized SOC
@@ -1916,7 +1783,7 @@ module MicBGCMod
     OSCT(K)=0.0_r8
     OSAT(K)=0.0_r8
     DO  M=1,jsken
-      OSCT(K)=OSCT(K)+OSC(M,K)
+      OSCT(K)=OSCT(K)+OSM(ielmc,M,K)
       OSAT(K)=OSAT(K)+OSA(M,K)
     enddo
   ENDDO D475
@@ -1925,11 +1792,11 @@ module MicBGCMod
     IF(OSCT(K).GT.ZEROS)THEN
       DOSAK=DOSA(K)*AZMAX1(ROQCK(K))
       D485: DO M=1,jsken
-        OSA(M,K)=AMIN1(OSC(M,K),OSA(M,K)+DOSAK*OSC(M,K)/OSCT(K))
+        OSA(M,K)=AMIN1(OSM(ielmc,M,K),OSA(M,K)+DOSAK*OSM(ielmc,M,K)/OSCT(K))
       ENDDO D485
     ELSE
       D490: DO M=1,jsken
-        OSA(M,K)=AMIN1(OSC(M,K),OSA(M,K))
+        OSA(M,K)=AMIN1(OSM(ielmc,M,K),OSA(M,K))
       ENDDO D490
     ENDIF
   ENDDO D480
@@ -1946,12 +1813,10 @@ module MicBGCMod
   type(NitroMicFluxType), intent(inout) :: nmicf
   type(NitroOMcplxFluxType), intent(inout) :: ncplxf
   type(micfluxtype), intent(inout) :: micflx
-  integer  :: K,M,N,NGL
+  integer  :: K,M,N,NGL,NE
 !     begin_execution
   associate(                   &
-    CGOMC  => nmicf%CGOMC,     &
-    CGOMN  => nmicf%CGOMN,     &
-    CGOMP  => nmicf%CGOMP,     &
+    CGOMEheter  => nmicf%CGOMEheter,     &
     CGOQC  => nmicf%CGOQC,     &
     CGOAC  => nmicf%CGOAC,     &
     RUPOX  => nmicf%RUPOX,     &
@@ -1980,20 +1845,10 @@ module MicBGCMod
     RIP1B  => nmicf%RIP1B,     &
     RIP14R  => nmicf%RIP14R,   &
     RN2FX  => nmicf%RN2FX  ,   &
-    RCOSC  => ncplxf%RCOSC,    &
-    RCOSN  => ncplxf%RCOSN,    &
-    RCOSP  => ncplxf%RCOSP,    &
-    RDORC  => ncplxf%RDORC,    &
-    RDORN  => ncplxf%RDORN,    &
-    RDORP  => ncplxf%RDORP,    &
-    RDOHC  => ncplxf%RDOHC,    &
-    RDOHN  => ncplxf%RDOHN,    &
-    RDOHP  => ncplxf%RDOHP,    &
-    RDOHA  => ncplxf%RDOHA,    &
-    CSORP  => ncplxf%CSORP,    &
-    ZSORP  => ncplxf%ZSORP,    &
-    PSORP  => ncplxf%PSORP,    &
-    CSORPA  => ncplxf%CSORPA,  &
+    RCOSM  => ncplxf%RCOSM,    &
+    RDORM  => ncplxf%RDORM,    &
+    RDOHM  => ncplxf%RDOHM,    &
+    OMSORP  => ncplxf%OMSORP,    &
     TFNX  =>  nmicdiag%TFNX,   &
     RH2GZ  =>  nmicdiag%RH2GZ, &
     RCNO2  =>  nmicdiag%RCNO2, &
@@ -2003,7 +1858,7 @@ module MicBGCMod
     RCNO3  =>  nmicdiag%RCNO3, &
     RCN3B  =>  nmicdiag%RCN3B, &
     VOLWZ  =>  nmicdiag%VOLWZ, &
-    CGOMCff  => nmicf%CGOMCff,     &
+    CGOMEautor  => nmicf%CGOMEautor,     &
     RH2GXff  => nmicf%RH2GXff,     &
     RDN2Off => nmicf%RDN2Off,    &
     RDN2Bff => nmicf%RDN2Bff ,   &
@@ -2127,7 +1982,7 @@ module MicBGCMod
   D645: DO N=1,NumMicbFunGroups
     IF(micpar%is_CO2_autotroph(N))THEN
       DO NGL=JGniA(N),JGnfA(N)
-        naqfdiag%TRGOA=naqfdiag%TRGOA+CGOMCff(NGL)
+        naqfdiag%TRGOA=naqfdiag%TRGOA+CGOMEautor(ielmc,NGL)
       ENDDO
     ENDIF
   ENDDO D645
@@ -2140,7 +1995,7 @@ module MicBGCMod
 !     TRGOD=total CO2 emission by denitrifiers reducing NOx
 !     RVOXA(3)=CH4 oxidation
 !     RCH4O=net CH4 uptake
-!     CGOMC=total CH4 uptake by autotrophs
+!     CGOMEheter=total CH4 uptake by autotrophs
 !     TRGOC=total CH4 emission
 !     RH2GO=net H2 uptake
 !     RH2GZ,TRGOH=total H2 uptake, emission
@@ -2157,7 +2012,7 @@ module MicBGCMod
 
   DO NGL=JGniA(AerobicMethanotrophBacteria),JGnfA(AerobicMethanotrophBacteria)
     RCO2O=RCO2O-RVOXA(NGL)
-    RCH4O=RCH4O+RVOXA(NGL)+CGOMCff(NGL)
+    RCH4O=RCH4O+RVOXA(NGL)+CGOMEautor(ielmc,NGL)
   ENDDO
   RH2GO =RH2GZ-naqfdiag%TRGOH
   RUPOXO=naqfdiag%TUPOX
@@ -2166,32 +2021,32 @@ module MicBGCMod
 !
   D655: DO K=1,jcplx
     D660: DO M=1,jsken
-      RDOM_micb_flx(idom_doc,K)=RDOM_micb_flx(idom_doc,K)+RCOSC(M,K)
-      RDOM_micb_flx(idom_don,K)=RDOM_micb_flx(idom_don,K)+RCOSN(M,K)
-      RDOM_micb_flx(idom_dop,K)=RDOM_micb_flx(idom_dop,K)+RCOSP(M,K)
+      DO NE=1,NumPlantChemElmnts
+        RDOM_micb_flx(NE,K)=RDOM_micb_flx(NE,K)+RCOSM(NE,M,K)
+      ENDDO
     ENDDO D660
 
     D665: DO M=1,ndbiomcp
-      RDOM_micb_flx(idom_doc,K)=RDOM_micb_flx(idom_doc,K)+RDORC(M,K)
-      RDOM_micb_flx(idom_don,K)=RDOM_micb_flx(idom_don,K)+RDORN(M,K)
-      RDOM_micb_flx(idom_dop,K)=RDOM_micb_flx(idom_dop,K)+RDORP(M,K)
+      DO NE=1,NumPlantChemElmnts
+        RDOM_micb_flx(NE,K)=RDOM_micb_flx(NE,K)+RDORM(NE,M,K)
+      ENDDO
     ENDDO D665
-    RDOM_micb_flx(idom_doc,K)=RDOM_micb_flx(idom_doc,K)+RDOHC(K)
-    RDOM_micb_flx(idom_don,K)=RDOM_micb_flx(idom_don,K)+RDOHN(K)
-    RDOM_micb_flx(idom_dop,K)=RDOM_micb_flx(idom_dop,K)+RDOHP(K)
-    RDOM_micb_flx(idom_acetate,K)=RDOM_micb_flx(idom_acetate,K)+RDOHA(K)
+    DO NE=1,NumPlantChemElmnts
+      RDOM_micb_flx(NE,K)=RDOM_micb_flx(NE,K)+RDOHM(NE,K)
+    ENDDO
+    RDOM_micb_flx(idom_acetate,K)=RDOM_micb_flx(idom_acetate,K)+RDOHM(idom_acetate,K)
     D670: DO N=1,NumMicbFunGroups
       DO NGL=JGnio(N),JGnfo(N)
         RDOM_micb_flx(idom_doc,K)=RDOM_micb_flx(idom_doc,K)-CGOQC(NGL,K)
-        RDOM_micb_flx(idom_don,K)=RDOM_micb_flx(idom_don,K)-CGOMN(NGL,K)
-        RDOM_micb_flx(idom_dop,K)=RDOM_micb_flx(idom_dop,K)-CGOMP(NGL,K)
+        RDOM_micb_flx(idom_don,K)=RDOM_micb_flx(idom_don,K)-CGOMEheter(ielmp,NGL,K)
+        RDOM_micb_flx(idom_dop,K)=RDOM_micb_flx(idom_dop,K)-CGOMEheter(ielmp,NGL,K)
         RDOM_micb_flx(idom_acetate,K)=RDOM_micb_flx(idom_acetate,K)-CGOAC(NGL,K)+RCH3X(NGL,K)
       ENDDO
     ENDDO D670
-    RDOM_micb_flx(idom_doc,K)=RDOM_micb_flx(idom_doc,K)-CSORP(K)
-    RDOM_micb_flx(idom_don,K)=RDOM_micb_flx(idom_don,K)-ZSORP(K)
-    RDOM_micb_flx(idom_dop,K)=RDOM_micb_flx(idom_dop,K)-PSORP(K)
-    RDOM_micb_flx(idom_acetate,K)=RDOM_micb_flx(idom_acetate,K)-CSORPA(K)
+    DO NE=1,NumPlantChemElmnts
+      RDOM_micb_flx(NE,K)=RDOM_micb_flx(NE,K)-OMSORP(NE,K)
+    ENDDO
+    RDOM_micb_flx(idom_acetate,K)=RDOM_micb_flx(idom_acetate,K)-OMSORP(idom_acetate,K)
   ENDDO D655
 !
 !     RNH4MicbTransf_vr,XNH4B=net change in NH4 in band,non-band
@@ -3676,7 +3531,7 @@ module MicBGCMod
   type(NitroMicFluxType), intent(inout) :: nmicf
   type(NitroOMcplxFluxType), intent(inout) :: ncplxf
   type(NitroOMcplxStateType), intent(inout) :: ncplxs
-  integer :: M,MID1,MID3,MID
+  integer :: M,MID1,MID3,MID,NE
   real(r8) :: RCCC,RCCN,RCCP
   real(r8) :: CCC,CGOMX,CGOMD
   real(r8) :: CXC
@@ -3693,53 +3548,27 @@ module MicBGCMod
     FCN    => nmics%FCN  ,    &
     FCP    => nmics%FCP  ,    &
     FOMK   => nmics%FOMK ,    &
-    CGOMC  => nmicf%CGOMC,    &
-    CGOMN  => nmicf%CGOMN,    &
-    CGOMP  => nmicf%CGOMP,    &
+    CGOMEheter  => nmicf%CGOMEheter,    &
     CGOQC  => nmicf%CGOQC,    &
     CGOAC  => nmicf%CGOAC,    &
-    CGOMS  => nmicf%CGOMS,    &
-    CGONS  => nmicf%CGONS,    &
-    CGOPS  => nmicf%CGOPS,    &
+    CGOMES  => nmicf%CGOMES,    &
     RGOMO  => nmicf%RGOMO,    &
     RGOMD  => nmicf%RGOMD,    &
     RMOMC => nmicf%RMOMC ,    &
-    RDOMC  => nmicf%RDOMC,    &
-    RDOMN => nmicf%RDOMN ,    &
-    RDOMP => nmicf%RDOMP ,    &
-    RHOMC => nmicf%RHOMC ,    &
-    RHOMN => nmicf%RHOMN ,    &
-    RHOMP => nmicf%RHOMP ,    &
-    RCOMC  => nmicf%RCOMC,    &
-    RCOMN  => nmicf%RCOMN,    &
-    RCOMP  => nmicf%RCOMP,    &
-    RDMMC  => nmicf%RDMMC,    &
-    RHMMC  => nmicf%RHMMC,    &
-    RCMMC  => nmicf%RCMMC,    &
-    RDMMN  => nmicf%RDMMN,    &
-    RHMMN  => nmicf%RHMMN,    &
-    RCMMN  => nmicf%RCMMN,    &
-    RDMMP  => nmicf%RDMMP,    &
-    RHMMP  => nmicf%RHMMP,    &
-    RCMMP  => nmicf%RCMMP,    &
-    RXOMC  => nmicf%RXOMC,    &
-    RXOMN  => nmicf%RXOMN,    &
-    RXOMP  => nmicf%RXOMP,    &
-    R3OMC  => nmicf%R3OMC,    &
-    R3OMN  => nmicf%R3OMN,    &
-    R3OMP  => nmicf%R3OMP,    &
-    RXMMC  => nmicf%RXMMC,    &
-    RXMMN  => nmicf%RXMMN,    &
-    RXMMP  => nmicf%RXMMP,    &
-    R3MMC  => nmicf%R3MMC,    &
-    R3MMN  => nmicf%R3MMN,    &
-    R3MMP  => nmicf%R3MMP,    &
+    RDOMEheter  => nmicf%RDOMEheter,    &
+
+    RHOMEheter => nmicf%RHOMEheter ,    &
+    RCOMEheter  => nmicf%RCOMEheter,    &
+    RHMMEheter  => nmicf%RHMMEheter,    &
+    RCMMEheter  => nmicf%RCMMEheter,    &
+    RDMMEheter  => nmicf%RDMMEheter,    &
+    RXOMEheter  => nmicf%RXOMEheter,    &
+    R3OMEheter  => nmicf%R3OMEheter,    &
+    RXMMEheter  => nmicf%RXMMEheter,    &
+    R3MMEheter  => nmicf%R3MMEheter,    &
     RCO2X  => nmicf%RCO2X,    &
     RGN2F  => nmicf%RGN2F,    &
-    TCGOQC  => ncplxf%TCGOQC, &
-    TCGOAC  => ncplxf%TCGOAC, &
-    TCGOMN  => ncplxf%TCGOMN, &
-    TCGOMP  => ncplxf%TCGOMP, &
+    TCGOMEheter  => ncplxf%TCGOMEheter, &
     CNQ     => ncplxs%CNQ   , &
     CPQ     => ncplxs%CPQ   , &
     rNCOMC   => micpar%rNCOMC , &
@@ -3762,9 +3591,9 @@ module MicBGCMod
 !     RGOMD=respiration for denitrifcation
 !     RGN2F=respiration for N2 fixation
 !     ECHZ,ENOX=growth respiration efficiencies for O2, NOx reduction
-!     CGOMC,CGOQC,CGOAC=total DOC+acetate, DOC, acetate uptake(heterotrophs
-!     CGOMC=total CO2,CH4 uptake (autotrophs)
-!     CGOMN,CGOMP=DON, DOP uptake
+!     CGOMEheter,CGOQC,CGOAC=total DOC+acetate, DOC, acetate uptake(heterotrophs
+!     CGOMEheter=total CO2,CH4 uptake (autotrophs)
+!     CGOMEheter,CGOMEheter=DON, DOP uptake
 !     FGOCP,FGOAP=DOC,acetate/(DOC+acetate)
 !     OQN,OPQ=DON,DOP
 !     FOMK=faction of OMA in total OMA
@@ -3774,17 +3603,17 @@ module MicBGCMod
 
   CGOMX=AMIN1(RMOMT,RGOMO(NGL,K))+RGN2F(NGL,K)+(RGOMT-RGN2F(NGL,K))/ECHZ
   CGOMD=RGOMD(NGL,K)/ENOX
-  CGOMC(NGL,K)=CGOMX+CGOMD
+  CGOMEheter(ielmc,NGL,K)=CGOMX+CGOMD
 
   CGOQC(NGL,K)=CGOMX*FGOCP+CGOMD
   CGOAC(NGL,K)=CGOMX*FGOAP
   CGOXC=CGOQC(NGL,K)+CGOAC(NGL,K)
-  CGOMN(NGL,K)=AZMAX1(AMIN1(DOM(idom_don,K)*FOMK(NGL,K),CGOXC*CNQ(K)/FCN(NGL,K)))
-  CGOMP(NGL,K)=AZMAX1(AMIN1(DOM(idom_dop,K)*FOMK(NGL,K),CGOXC*CPQ(K)/FCP(NGL,K)))
-  TCGOQC(K)=TCGOQC(K)+CGOQC(NGL,K)
-  TCGOAC(K)=TCGOAC(K)+CGOAC(NGL,K)
-  TCGOMN(K)=TCGOMN(K)+CGOMN(NGL,K)
-  TCGOMP(K)=TCGOMP(K)+CGOMP(NGL,K)
+  CGOMEheter(ielmp,NGL,K)=AZMAX1(AMIN1(DOM(idom_don,K)*FOMK(NGL,K),CGOXC*CNQ(K)/FCN(NGL,K)))
+  CGOMEheter(ielmp,NGL,K)=AZMAX1(AMIN1(DOM(idom_dop,K)*FOMK(NGL,K),CGOXC*CPQ(K)/FCP(NGL,K)))
+  TCGOMEheter(ielmc,K)=TCGOMEheter(ielmc,K)+CGOQC(NGL,K)
+  TCGOMEheter(idom_acetate,K)=TCGOMEheter(idom_acetate,K)+CGOAC(NGL,K)
+  TCGOMEheter(ielmp,K)=TCGOMEheter(ielmp,K)+CGOMEheter(ielmp,NGL,K)
+  TCGOMEheter(ielmp,K)=TCGOMEheter(ielmp,K)+CGOMEheter(ielmp,NGL,K)
 !
 !     TRANSFER UPTAKEN C,N,P FROM STORAGE TO ACTIVE BIOMASS
 !
@@ -3824,15 +3653,15 @@ module MicBGCMod
 ! M=1:labile, 2, resistant
   CGOMZ=TFNG(NGL,K)*OMGR*AZMAX1(OMEhetr(ielmc,MID3,K))
   D745: DO M=1,2
-    CGOMS(M,NGL,K)=FL(M)*CGOMZ
+    CGOMES(ielmc,M,NGL,K)=FL(M)*CGOMZ
     IF(OMEhetr(ielmc,MID3,K).GT.ZEROS)THEN
-      CGONS(M,NGL,K)=AMIN1(FL(M)*AZMAX1(OMEhetr(ielmn,MID3,K)) &
-        ,CGOMS(M,NGL,K)*OMEhetr(ielmn,MID3,K)/OMEhetr(ielmc,MID3,K))
-      CGOPS(M,NGL,K)=AMIN1(FL(M)*AZMAX1(OMEhetr(ielmp,MID3,K)) &
-        ,CGOMS(M,NGL,K)*OMEhetr(ielmp,MID3,K)/OMEhetr(ielmc,MID3,K))
+      CGOMES(ielmn,M,NGL,K)=AMIN1(FL(M)*AZMAX1(OMEhetr(ielmn,MID3,K)) &
+        ,CGOMES(ielmc,M,NGL,K)*OMEhetr(ielmn,MID3,K)/OMEhetr(ielmc,MID3,K))
+      CGOMES(ielmp,M,NGL,K)=AMIN1(FL(M)*AZMAX1(OMEhetr(ielmp,MID3,K)) &
+        ,CGOMES(ielmc,M,NGL,K)*OMEhetr(ielmp,MID3,K)/OMEhetr(ielmc,MID3,K))
     ELSE
-      CGONS(M,NGL,K)=0.0_r8
-      CGOPS(M,NGL,K)=0.0_r8
+      CGOMES(ielmn,M,NGL,K)=0.0_r8
+      CGOMES(ielmp,M,NGL,K)=0.0_r8
     ENDIF
 !
 !     MICROBIAL DECOMPOSITION FROM BIOMASS, SPECIFIC DECOMPOSITION
@@ -3841,38 +3670,35 @@ module MicBGCMod
 !     SPOMX=rate constant for microbial decomposition
 !     SPOMC=basal decomposition rate
 !     SPOMK=effect of low microbial C concentration on microbial decay
-!     RXOMC,RXOMN,RXOMP=microbial C,N,P decomposition
-!     RDOMC,RDOMN,RDOMP=microbial C,N,P litterfall
-!     R3OMC,R3OMN,R3OMP=microbial C,N,P recycling
+!     RXOMC,RXOMN,RXOMEheter=microbial C,N,P decomposition
+!     RDOMEheter,RDOMN,RDOMP=microbial C,N,P litterfall
+!     R3OMC,R3OMN,R3OMEheter=microbial C,N,P recycling
 !
     MID=micpar%get_micb_id(M,NGL)
     SPOMX=SQRT(TFNG(NGL,K))*SPOMC(M)*SPOMK(M)
-    RXOMC(M,NGL,K)=AZMAX1(OMEhetr(ielmc,MID,K)*SPOMX)
-    RXOMN(M,NGL,K)=AZMAX1(OMEhetr(ielmn,MID,K)*SPOMX)
-    RXOMP(M,NGL,K)=AZMAX1(OMEhetr(ielmp,MID,K)*SPOMX)
-    RDOMC(M,NGL,K)=RXOMC(M,NGL,K)*(1.0_r8-RCCC)
-    RDOMN(M,NGL,K)=RXOMN(M,NGL,K)*(1.0_r8-RCCC)*(1.0_r8-RCCN)
-    RDOMP(M,NGL,K)=RXOMP(M,NGL,K)*(1.0_r8-RCCC)*(1.0_r8-RCCP)
-    R3OMC(M,NGL,K)=RXOMC(M,NGL,K)-RDOMC(M,NGL,K)
-    R3OMN(M,NGL,K)=RXOMN(M,NGL,K)-RDOMN(M,NGL,K)
-    R3OMP(M,NGL,K)=RXOMP(M,NGL,K)-RDOMP(M,NGL,K)
+    RXOMEheter(ielmc,M,NGL,K)=AZMAX1(OMEhetr(ielmc,MID,K)*SPOMX)
+    RXOMEheter(ielmn,M,NGL,K)=AZMAX1(OMEhetr(ielmn,MID,K)*SPOMX)
+    RXOMEheter(ielmp,M,NGL,K)=AZMAX1(OMEhetr(ielmp,MID,K)*SPOMX)
+    RDOMEheter(ielmc,M,NGL,K)=RXOMEheter(ielmc,M,NGL,K)*(1.0_r8-RCCC)
+    RDOMEheter(ielmn,M,NGL,K)=RXOMEheter(ielmn,M,NGL,K)*(1.0_r8-RCCC)*(1.0_r8-RCCN)
+    RDOMEheter(ielmp,M,NGL,K)=RXOMEheter(ielmp,M,NGL,K)*(1.0_r8-RCCC)*(1.0_r8-RCCP)
+    DO NE=1,NumPlantChemElmnts    
+      R3OMEheter(NE,M,NGL,K)=RXOMEheter(NE,M,NGL,K)-RDOMEheter(NE,M,NGL,K)
 !
 !     HUMIFICATION OF MICROBIAL DECOMPOSITION PRODUCTS FROM
 !     DECOMPOSITION RATE, SOIL CLAY AND OC 'EHUM' FROM 'HOUR1'
 !
-!     RHOMC,RHOMN,RHOMP=transfer of microbial C,N,P litterfall to humus
+!     RHOMC,RHOMN,RHOMEheter=transfer of microbial C,N,P litterfall to humus
 !     EHUM=humus transfer fraction from hour1.f
-!     RCOMC,RCOMN,RCOMP=transfer of microbial C,N,P litterfall to residue
+!     RCOMEheter,RCOMEheter,RCOMP=transfer of microbial C,N,P litterfall to residue
 !
-    RHOMC(M,NGL,K)=AZMAX1(RDOMC(M,NGL,K)*EHUM)
-    RHOMN(M,NGL,K)=AZMAX1(RDOMN(M,NGL,K)*EHUM)
-    RHOMP(M,NGL,K)=AZMAX1(RDOMP(M,NGL,K)*EHUM)
-!
-!     NON-HUMIFIED PRODUCTS TO MICROBIAL RESIDUE
-!
-    RCOMC(M,NGL,K)=RDOMC(M,NGL,K)-RHOMC(M,NGL,K)
-    RCOMN(M,NGL,K)=RDOMN(M,NGL,K)-RHOMN(M,NGL,K)
-    RCOMP(M,NGL,K)=RDOMP(M,NGL,K)-RHOMP(M,NGL,K)
+
+      RHOMEheter(NE,M,NGL,K)=AZMAX1(RDOMEheter(NE,M,NGL,K)*EHUM)
+  !
+  !     NON-HUMIFIED PRODUCTS TO MICROBIAL RESIDUE
+  !
+      RCOMEheter(NE,M,NGL,K)=RDOMEheter(NE,M,NGL,K)-RHOMEheter(NE,M,NGL,K)
+    ENDDO
   ENDDO D745
 !
 !     MICROBIAL DECOMPOSITION WHEN MAINTENANCE RESPIRATION
@@ -3882,57 +3708,47 @@ module MicBGCMod
 !     RMOMT=total maintenance respiration
 !     RXOMT=senescence respiration
 !     RCCC=C recycling fraction
-!     RXMMC,RXMMN,RXMMP=microbial C,N,P loss from senescence
+!     RXMMEheter,RXMMN,RXMMP=microbial C,N,P loss from senescence
 !     RMOMC=maintenance respiration
 !     CNOMA,CPOMA=N:C,P:C ratios of active biomass
-!     RDMMC,RDMMN,RDMMP=microbial C,N,P litterfall from senescence
-!     R3MMC,R3MMN,R3MMP=microbial C,N,P recycling from senescence
+!     RDMMC,RDMMEheter,RDMMP=microbial C,N,P litterfall from senescence
+!     R3MMEheter,R3MMN,R3MMP=microbial C,N,P recycling from senescence
 !
   IF(RXOMT.GT.ZEROS.AND.RMOMT.GT.ZEROS.AND.RCCC.GT.ZERO)THEN
     FRM=RXOMT/RMOMT
     D730: DO M=1,2
       MID=micpar%get_micb_id(M,NGL)    
-      RXMMC(M,NGL,K)=AMIN1(OMEhetr(ielmc,MID,K),AZMAX1(FRM*RMOMC(M,NGL,K)/RCCC))
-      RXMMN(M,NGL,K)=AMIN1(OMEhetr(ielmn,MID,K),AZMAX1(RXMMC(M,NGL,K)*CNOMA(NGL,K)))
-      RXMMP(M,NGL,K)=AMIN1(OMEhetr(ielmp,MID,K),AZMAX1(RXMMC(M,NGL,K)*CPOMA(NGL,K)))
-      RDMMC(M,NGL,K)=RXMMC(M,NGL,K)*(1.0_r8-RCCC)
-      RDMMN(M,NGL,K)=RXMMN(M,NGL,K)*(1.0_r8-RCCN)*(1.0_r8-RCCC)
-      RDMMP(M,NGL,K)=RXMMP(M,NGL,K)*(1.0_r8-RCCP)*(1.0_r8-RCCC)
-      R3MMC(M,NGL,K)=RXMMC(M,NGL,K)-RDMMC(M,NGL,K)
-      R3MMN(M,NGL,K)=RXMMN(M,NGL,K)-RDMMN(M,NGL,K)
-      R3MMP(M,NGL,K)=RXMMP(M,NGL,K)-RDMMP(M,NGL,K)
+      RXMMEheter(ielmc,M,NGL,K)=AMIN1(OMEhetr(ielmc,MID,K),AZMAX1(FRM*RMOMC(M,NGL,K)/RCCC))
+      RXMMEheter(ielmn,M,NGL,K)=AMIN1(OMEhetr(ielmn,MID,K),AZMAX1(RXMMEheter(ielmc,M,NGL,K)*CNOMA(NGL,K)))
+      RXMMEheter(ielmp,M,NGL,K)=AMIN1(OMEhetr(ielmp,MID,K),AZMAX1(RXMMEheter(ielmc,M,NGL,K)*CPOMA(NGL,K)))
+      RDMMEheter(ielmc,M,NGL,K)=RXMMEheter(ielmc,M,NGL,K)*(1.0_r8-RCCC)
+      RDMMEheter(ielmn,M,NGL,K)=RXMMEheter(ielmn,M,NGL,K)*(1.0_r8-RCCN)*(1.0_r8-RCCC)
+      RDMMEheter(ielmp,M,NGL,K)=RXMMEheter(ielmp,M,NGL,K)*(1.0_r8-RCCP)*(1.0_r8-RCCC)
+      DO NE=1,NumPlantChemElmnts
+        R3MMEheter(NE,M,NGL,K)=RXMMEheter(NE,M,NGL,K)-RDMMEheter(NE,M,NGL,K)
 !
 !     HUMIFICATION AND RECYCLING OF RESPIRATION DECOMPOSITION
 !     PRODUCTS
 !
-!     RHMMC,RHMMN,RHMMC=transfer of senesence litterfall C,N,P to humus
+!     RHMMEheter,RHMMN,RHMMEheter=transfer of senesence litterfall C,N,P to humus
 !     EHUM=humus transfer fraction
-!     RCMMC,RCMMN,RCMMC=transfer of senesence litterfall C,N,P to residue
+!     RCMMEheter,RCMMN,RCMMEheter=transfer of senesence litterfall C,N,P to residue
 !
-      RHMMC(M,NGL,K)=AZMAX1(RDMMC(M,NGL,K)*EHUM)
-      RHMMN(M,NGL,K)=AZMAX1(RDMMN(M,NGL,K)*EHUM)
-      RHMMP(M,NGL,K)=AZMAX1(RDMMP(M,NGL,K)*EHUM)
-      RCMMC(M,NGL,K)=RDMMC(M,NGL,K)-RHMMC(M,NGL,K)
-      RCMMN(M,NGL,K)=RDMMN(M,NGL,K)-RHMMN(M,NGL,K)
-      RCMMP(M,NGL,K)=RDMMP(M,NGL,K)-RHMMP(M,NGL,K)
+
+        RHMMEheter(NE,M,NGL,K)=AZMAX1(RDMMEheter(NE,M,NGL,K)*EHUM)
+        RCMMEheter(NE,M,NGL,K)=RDMMEheter(NE,M,NGL,K)-RHMMEheter(NE,M,NGL,K)
+      ENDDO
     ENDDO D730
   ELSE
     D720: DO M=1,2
-      RXMMC(M,NGL,K)=0.0_r8
-      RXMMN(M,NGL,K)=0.0_r8
-      RXMMP(M,NGL,K)=0.0_r8
-      RDMMC(M,NGL,K)=0.0_r8
-      RDMMN(M,NGL,K)=0.0_r8
-      RDMMP(M,NGL,K)=0.0_r8
-      R3MMC(M,NGL,K)=0.0_r8
-      R3MMN(M,NGL,K)=0.0_r8
-      R3MMP(M,NGL,K)=0.0_r8
-      RHMMC(M,NGL,K)=0.0_r8
-      RHMMN(M,NGL,K)=0.0_r8
-      RHMMP(M,NGL,K)=0.0_r8
-      RCMMC(M,NGL,K)=0.0_r8
-      RCMMN(M,NGL,K)=0.0_r8
-      RCMMP(M,NGL,K)=0.0_r8
+      DO NE=1,NumPlantChemElmnts
+        RXMMEheter(NE,M,NGL,K)=0.0_r8
+        RDMMEheter(NE,M,NGL,K)=0.0_r8
+        R3MMEheter(NE,M,NGL,K)=0.0_r8
+        RHMMEheter(NE,M,NGL,K)=0.0_r8
+        RCMMEheter(NE,M,NGL,K)=0.0_r8
+      ENDDO
+
     ENDDO D720
   ENDIF
   end associate

@@ -67,21 +67,11 @@ implicit none
  
   real(r8),allocatable ::  DOM_Transp2Micp_flx(:,:,:,:,:)
   real(r8),allocatable ::  DOM_Transp2Macp_flx(:,:,:,:,:)
-  real(r8),allocatable ::  TOCQRS(:,:,:)
-  real(r8),allocatable ::  TONQRS(:,:,:)
-  real(r8),allocatable ::  TOPQRS(:,:,:)
-  real(r8),allocatable ::  TOAQRS(:,:,:)
-  real(r8),allocatable ::  TORCER(:,:,:,:)
-  real(r8),allocatable ::  TORNER(:,:,:,:)
-  real(r8),allocatable ::  TORPER(:,:,:,:)
-  real(r8),allocatable ::  TOHCER(:,:,:)
-  real(r8),allocatable ::  TOHNER(:,:,:)
-  real(r8),allocatable ::  TOHPER(:,:,:)
-  real(r8),allocatable ::  TOHAER(:,:,:)
-  real(r8),allocatable ::  TOSCER(:,:,:,:)
+  real(r8),allocatable ::  TOMQRS(:,:,:,:)
+  real(r8),allocatable ::  TORMER(:,:,:,:,:)
+  real(r8),allocatable ::  TOHMER(:,:,:,:)
+  real(r8),allocatable ::  TOSMER(:,:,:,:,:)
   real(r8),allocatable ::  TOSAER(:,:,:,:)
-  real(r8),allocatable ::  TOSNER(:,:,:,:)
-  real(r8),allocatable ::  TOSPER(:,:,:,:)
 
   real(r8) :: TDLYXF,TDayLenthPrevC,TDVOLI,TDORGC
   DATA TDORGC,TDayLenthPrevC/0.0,0.0/
@@ -155,21 +145,11 @@ implicit none
 
   allocate(DOM_Transp2Micp_flx(idom_beg:idom_end,1:jcplx,JZ,JY,JX));DOM_Transp2Micp_flx=0._r8
   allocate(DOM_Transp2Macp_flx(idom_beg:idom_end,1:jcplx,JZ,JY,JX));DOM_Transp2Macp_flx=0._r8
-  allocate(TOCQRS(1:jcplx,JY,JX));TOCQRS=0._r8
-  allocate(TONQRS(1:jcplx,JY,JX));TONQRS=0._r8
-  allocate(TOPQRS(1:jcplx,JY,JX));TOPQRS=0._r8
-  allocate(TOAQRS(1:jcplx,JY,JX));TOAQRS=0._r8
-  allocate(TORCER(ndbiomcp,1:jcplx,JY,JX));TORCER=0._r8
-  allocate(TORNER(ndbiomcp,1:jcplx,JY,JX));TORNER=0._r8
-  allocate(TORPER(ndbiomcp,1:jcplx,JY,JX));TORPER=0._r8
-  allocate(TOHCER(1:jcplx,JY,JX));TOHCER=0._r8
-  allocate(TOHNER(1:jcplx,JY,JX));TOHNER=0._r8
-  allocate(TOHPER(1:jcplx,JY,JX));TOHPER=0._r8
-  allocate(TOHAER(1:jcplx,JY,JX));TOHAER=0._r8
-  allocate(TOSCER(jsken,1:jcplx,JY,JX));TOSCER=0._r8
+  allocate(TOMQRS(idom_beg:idom_end,1:jcplx,JY,JX));TOMQRS=0._r8
+  allocate(TORMER(NumPlantChemElmnts,ndbiomcp,1:jcplx,JY,JX));TORMER=0._r8
+  allocate(TOHMER(idom_beg:idom_end,1:jcplx,JY,JX));TOHMER=0._r8
+  allocate(TOSMER(NumPlantChemElmnts,jsken,1:jcplx,JY,JX));TOSMER=0._r8
   allocate(TOSAER(jsken,1:jcplx,JY,JX));TOSAER=0._r8
-  allocate(TOSNER(jsken,1:jcplx,JY,JX));TOSNER=0._r8
-  allocate(TOSPER(jsken,1:jcplx,JY,JX));TOSPER=0._r8
 
   end subroutine InitTflxType
 
@@ -184,21 +164,11 @@ implicit none
 
   call destroy(TOMEERhetr)
   call destroy(TOMEERauto)
-  call destroy(TOCQRS)
-  call destroy(TONQRS)
-  call destroy(TOPQRS)
-  call destroy(TOAQRS)
-  call destroy(TORCER)
-  call destroy(TORNER)
-  call destroy(TORPER)
-  call destroy(TOHCER)
-  call destroy(TOHNER)
-  call destroy(TOHPER)
-  call destroy(TOHAER)
-  call destroy(TOSCER)
+  call destroy(TOMQRS)
+  call destroy(TORMER)
+  call destroy(TOHMER)
+  call destroy(TOSMER)
   call destroy(TOSAER)
-  call destroy(TOSNER)
-  call destroy(TOSPER)
   call destroy(trcSalt_Flo2MicP_vr)
   call destroy(trcs_Transp2MicP_vr)
   call destroy(trcSalt_Flo2MacP_vr)

@@ -731,12 +731,12 @@ module StartsMod
   OXYGOU=0.0_r8
   H2GOU=0.0_r8
   TSEDOU=0.0_r8
-  TCOU=0.0_r8
-  TZOU=0.0_r8
-  TPOU=0.0_r8
-  XCSN=0.0_r8
-  XZSN=0.0_r8
-  XPSN=0.0_r8
+  TOMOU(ielmc)=0.0_r8
+  TOMOU(ielmn)=0.0_r8
+  TOMOU(ielmp)=0.0_r8
+  XESN(ielmc)=0.0_r8
+  XESN(ielmn)=0.0_r8
+  XESN(ielmp)=0.0_r8
   TIONIN=0.0_r8
   TIONOU=0.0_r8
   end subroutine InitControlParms
@@ -795,9 +795,9 @@ module StartsMod
   HydroSufDIPFlx_col(:,:)=0.0_r8
   HydroSubsDIPFlx_col(:,:)=0.0_r8
   HydroIonFlx_col(:,:)=0.0_r8
-  LiterfalOrgC_col(:,:)=0.0_r8
-  LiterfalOrgN_col(:,:)=0.0_r8
-  LiterfalOrgP_col(:,:)=0.0_r8
+  LiterfalOrgM_col(ielmc,:,:)=0.0_r8
+  LiterfalOrgM_col(ielmn,:,:)=0.0_r8
+  LiterfalOrgM_col(ielmp,:,:)=0.0_r8
   UDRAIN(:,:)=0.0_r8
   ZDRAIN(:,:)=0.0_r8
   PDRAIN(:,:)=0.0_r8

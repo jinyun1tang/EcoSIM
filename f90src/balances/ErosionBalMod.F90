@@ -28,7 +28,7 @@ implicit none
   implicit none
   integer, intent(in) :: NY,NX
 
-  integer :: L,LL,M,N,K,NGL,MID
+  integer :: L,LL,M,N,K,NGL,MID,idom,NE
   real(r8) :: FSINK,FSAN,FSIL,FCLA,FCEC,FAEC
   real(r8) :: FNX
   real(r8) :: FOMC,FOMN,FOMP
@@ -130,15 +130,11 @@ implicit none
           DO NGL=JGnio(N),JGnfo(N)
             DO M=1,nlbiomcp
               MID=micpar%get_micb_id(M,NGL)
-              FOMC=FSINK*OMEhetr(ielmc,MID,K,L,NY,NX)
-              FOMN=FSINK*OMEhetr(ielmn,MID,K,L,NY,NX)
-              FOMP=FSINK*OMEhetr(ielmp,MID,K,L,NY,NX)
-              OMEhetr(ielmc,MID,K,LL,NY,NX)=OMEhetr(ielmc,MID,K,LL,NY,NX)+FOMC
-              OMEhetr(ielmn,MID,K,LL,NY,NX)=OMEhetr(ielmn,MID,K,LL,NY,NX)+FOMN
-              OMEhetr(ielmp,MID,K,LL,NY,NX)=OMEhetr(ielmp,MID,K,LL,NY,NX)+FOMP
-              OMEhetr(ielmc,MID,K,L,NY,NX)=OMEhetr(ielmc,MID,K,L,NY,NX)-FOMC
-              OMEhetr(ielmn,MID,K,L,NY,NX)=OMEhetr(ielmn,MID,K,L,NY,NX)-FOMN
-              OMEhetr(ielmp,MID,K,L,NY,NX)=OMEhetr(ielmp,MID,K,L,NY,NX)-FOMP
+              DO NE=1,NumPlantChemElmnts
+                FOMC=FSINK*OMEhetr(NE,MID,K,L,NY,NX)
+                OMEhetr(NE,MID,K,LL,NY,NX)=OMEhetr(NE,MID,K,LL,NY,NX)+FOMC                
+                OMEhetr(NE,MID,K,L,NY,NX)=OMEhetr(NE,MID,K,L,NY,NX)-FOMC
+              ENDDO
             enddo
           enddo
         ENDDO D1960
@@ -152,16 +148,12 @@ implicit none
       DO N=1,NumMicbFunGroups
         DO NGL=JGniA(N),JGnfA(N)
           DO M=1,nlbiomcp
-            MID=micpar%get_micb_id(M,NGL)          
-            FOMC=FSINK*OMEauto(ielmc,MID,L,NY,NX)
-            FOMN=FSINK*OMEauto(ielmn,MID,L,NY,NX)
-            FOMP=FSINK*OMEauto(ielmp,MID,L,NY,NX)
-            OMEauto(ielmc,MID,LL,NY,NX)=OMEauto(ielmc,MID,LL,NY,NX)+FOMC
-            OMEauto(ielmn,MID,LL,NY,NX)=OMEauto(ielmn,MID,LL,NY,NX)+FOMN
-            OMEauto(ielmp,MID,LL,NY,NX)=OMEauto(ielmp,MID,LL,NY,NX)+FOMP
-            OMEauto(ielmc,MID,L,NY,NX)=OMEauto(ielmc,MID,L,NY,NX)-FOMC
-            OMEauto(ielmn,MID,L,NY,NX)=OMEauto(ielmn,MID,L,NY,NX)-FOMN
-            OMEauto(ielmp,MID,L,NY,NX)=OMEauto(ielmp,MID,L,NY,NX)-FOMP
+            MID=micpar%get_micb_id(M,NGL)        
+            DO NE=1,NumPlantChemElmnts              
+              FOMC=FSINK*OMEauto(NE,MID,L,NY,NX)
+              OMEauto(NE,MID,LL,NY,NX)=OMEauto(NE,MID,LL,NY,NX)+FOMC
+              OMEauto(NE,MID,L,NY,NX)=OMEauto(NE,MID,L,NY,NX)-FOMC
+            ENDDO
           enddo
         enddo
       ENDDO
@@ -171,47 +163,32 @@ implicit none
 !
       D1900: DO K=1,micpar%NumOfLitrCmplxs
         D1940: DO M=1,ndbiomcp
-          FORC=FSINK*ORC(M,K,L,NY,NX)
-          FORN=FSINK*ORN(M,K,L,NY,NX)
-          FORP=FSINK*ORP(M,K,L,NY,NX)
-          ORC(M,K,LL,NY,NX)=ORC(M,K,LL,NY,NX)+FORC
-          ORN(M,K,LL,NY,NX)=ORN(M,K,LL,NY,NX)+FORN
-          ORP(M,K,LL,NY,NX)=ORP(M,K,LL,NY,NX)+FORP
-          ORC(M,K,L,NY,NX)=ORC(M,K,L,NY,NX)-FORC
-          ORN(M,K,L,NY,NX)=ORN(M,K,L,NY,NX)-FORN
-          ORP(M,K,L,NY,NX)=ORP(M,K,L,NY,NX)-FORP
+          DO NE=1,NumPlantChemElmnts                   
+            FORC=FSINK*ORM(NE,M,K,L,NY,NX)
+            ORM(NE,M,K,LL,NY,NX)=ORM(NE,M,K,LL,NY,NX)+FORC
+            ORM(NE,M,K,L,NY,NX)=ORM(NE,M,K,L,NY,NX)-FORC
+          ENDDO
         ENDDO D1940
 !
 !       ADSORBED C,N,P
 !
-        FOHC=FSINK*OHC(K,L,NY,NX)
-        FOHN=FSINK*OHN(K,L,NY,NX)
-        FOHP=FSINK*OHP(K,L,NY,NX)
-        FOHA=FSINK*OHA(K,L,NY,NX)
-        OHC(K,LL,NY,NX)=OHC(K,LL,NY,NX)+FOHC
-        OHN(K,LL,NY,NX)=OHN(K,LL,NY,NX)+FOHN
-        OHP(K,LL,NY,NX)=OHP(K,LL,NY,NX)+FOHP
-        OHA(K,LL,NY,NX)=OHA(K,LL,NY,NX)+FOHA
-        OHC(K,L,NY,NX)=OHC(K,L,NY,NX)-FOHC
-        OHN(K,L,NY,NX)=OHN(K,L,NY,NX)-FOHN
-        OHP(K,L,NY,NX)=OHP(K,L,NY,NX)-FOHP
-        OHA(K,L,NY,NX)=OHA(K,L,NY,NX)-FOHA
+        DO idom=idom_beg,idom_end
+          FOHC=FSINK*OHM(idom,K,L,NY,NX)
+          OHM(idom,K,LL,NY,NX)=OHM(idom,K,LL,NY,NX)+FOHC
+          OHM(idom,K,L,NY,NX)=OHM(idom,K,L,NY,NX)-FOHC
+        ENDDO
 !
 !       SOC,N,P
 !
         D1930: DO M=1,jsken
-          FOSC=FSINK*OSC(M,K,L,NY,NX)
           FOSA=FSINK*OSA(M,K,L,NY,NX)
-          FOSN=FSINK*OSN(M,K,L,NY,NX)
-          FOSP=FSINK*OSP(M,K,L,NY,NX)
-          OSC(M,K,LL,NY,NX)=OSC(M,K,LL,NY,NX)+FOSC
           OSA(M,K,LL,NY,NX)=OSA(M,K,LL,NY,NX)+FOSA
-          OSN(M,K,LL,NY,NX)=OSN(M,K,LL,NY,NX)+FOSN
-          OSP(M,K,LL,NY,NX)=OSP(M,K,LL,NY,NX)+FOSP
-          OSC(M,K,L,NY,NX)=OSC(M,K,L,NY,NX)-FOSC
           OSA(M,K,L,NY,NX)=OSA(M,K,L,NY,NX)-FOSA
-          OSN(M,K,L,NY,NX)=OSN(M,K,L,NY,NX)-FOSN
-          OSP(M,K,L,NY,NX)=OSP(M,K,L,NY,NX)-FOSP
+          DO NE=1,NumPlantChemElmnts
+            FOSC=FSINK*OSM(NE,M,K,L,NY,NX)
+            OSM(NE,M,K,LL,NY,NX)=OSM(NE,M,K,LL,NY,NX)+FOSC
+            OSM(NE,M,K,L,NY,NX)=OSM(NE,M,K,L,NY,NX)-FOSC
+          ENDDO
         ENDDO D1930
       ENDDO D1900
     ENDIF
@@ -243,17 +220,10 @@ implicit none
     TOMEERhetr(1:NumPlantChemElmnts,1:NumLiveHeterBioms,1:jcplx,NY,NX)=0.0_r8
     TOMEERauto(1:NumPlantChemElmnts,1:NumLiveAutoBioms,NY,NX)=0.0_r8
 
-    TORCER(1:ndbiomcp,1:jcplx,NY,NX)=0.0_r8
-    TORNER(1:ndbiomcp,1:jcplx,NY,NX)=0.0_r8
-    TORPER(1:ndbiomcp,1:jcplx,NY,NX)=0.0_r8
-    TOHCER(1:jcplx,NY,NX)=0.0_r8
-    TOHNER(1:jcplx,NY,NX)=0.0_r8
-    TOHPER(1:jcplx,NY,NX)=0.0_r8
-    TOHAER(1:jcplx,NY,NX)=0.0_r8
-    TOSCER(1:jsken,1:jcplx,NY,NX)=0.0_r8
+    TORMER(1:NumPlantChemElmnts,1:ndbiomcp,1:jcplx,NY,NX)=0.0_r8
+    TOHMER(idom_beg:idom_end,1:jcplx,NY,NX)=0.0_r8
+    TOSMER(1:NumPlantChemElmnts,1:jsken,1:jcplx,NY,NX)=0.0_r8
     TOSAER(1:jsken,1:jcplx,NY,NX)=0.0_r8
-    TOSNER(1:jsken,1:jcplx,NY,NX)=0.0_r8
-    TOSPER(1:jsken,1:jcplx,NY,NX)=0.0_r8
   ENDIF
   end subroutine ZeroErosionArray
 

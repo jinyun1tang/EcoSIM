@@ -812,27 +812,31 @@ implicit none
 
     DO K=1,jcplx
       DO  M=1,ndbiomcp
-        ORC(M,K,L1,NY,NX)=ORC(M,K,L1,NY,NX)+FX*ORC(M,K,L0,NY,NX)
-        ORN(M,K,L1,NY,NX)=ORN(M,K,L1,NY,NX)+FX*ORN(M,K,L0,NY,NX)
-        ORP(M,K,L1,NY,NX)=ORP(M,K,L1,NY,NX)+FX*ORP(M,K,L0,NY,NX)
+        ORM(ielmc,M,K,L1,NY,NX)=ORM(ielmc,M,K,L1,NY,NX)+FX*ORM(ielmc,M,K,L0,NY,NX)
+        ORM(ielmn,M,K,L1,NY,NX)=ORM(ielmn,M,K,L1,NY,NX)+FX*ORM(ielmn,M,K,L0,NY,NX)
+        ORM(ielmp,M,K,L1,NY,NX)=ORM(ielmp,M,K,L1,NY,NX)+FX*ORM(ielmp,M,K,L0,NY,NX)
       ENDDO
+
       DOM(idom_doc,K,L1,NY,NX)=DOM(idom_doc,K,L1,NY,NX)+FX*DOM(idom_doc,K,L0,NY,NX)
       DOM(idom_don,K,L1,NY,NX)=DOM(idom_don,K,L1,NY,NX)+FX*DOM(idom_don,K,L0,NY,NX)
       DOM(idom_dop,K,L1,NY,NX)=DOM(idom_dop,K,L1,NY,NX)+FX*DOM(idom_dop,K,L0,NY,NX)
       DOM(idom_acetate,K,L1,NY,NX)=DOM(idom_acetate,K,L1,NY,NX)+FX*DOM(idom_acetate,K,L0,NY,NX)
+
       DOM_Macp(idom_doc,K,L1,NY,NX)=DOM_Macp(idom_doc,K,L1,NY,NX)+FX*DOM_Macp(idom_doc,K,L0,NY,NX)
       DOM_Macp(idom_don,K,L1,NY,NX)=DOM_Macp(idom_don,K,L1,NY,NX)+FX*DOM_Macp(idom_don,K,L0,NY,NX)
       DOM_Macp(idom_dop,K,L1,NY,NX)=DOM_Macp(idom_dop,K,L1,NY,NX)+FX*DOM_Macp(idom_dop,K,L0,NY,NX)
       DOM_Macp(idom_acetate,K,L1,NY,NX)=DOM_Macp(idom_acetate,K,L1,NY,NX)+FX*DOM_Macp(idom_acetate,K,L0,NY,NX)
-      OHC(K,L1,NY,NX)=OHC(K,L1,NY,NX)+FX*OHC(K,L0,NY,NX)
-      OHN(K,L1,NY,NX)=OHN(K,L1,NY,NX)+FX*OHN(K,L0,NY,NX)
-      OHP(K,L1,NY,NX)=OHP(K,L1,NY,NX)+FX*OHP(K,L0,NY,NX)
-      OHA(K,L1,NY,NX)=OHA(K,L1,NY,NX)+FX*OHA(K,L0,NY,NX)
+      
+      OHM(ielmc,K,L1,NY,NX)=OHM(ielmc,K,L1,NY,NX)+FX*OHM(ielmc,K,L0,NY,NX)
+      OHM(ielmn,K,L1,NY,NX)=OHM(ielmn,K,L1,NY,NX)+FX*OHM(ielmn,K,L0,NY,NX)
+      OHM(ielmp,K,L1,NY,NX)=OHM(ielmp,K,L1,NY,NX)+FX*OHM(ielmp,K,L0,NY,NX)
+      OHM(idom_acetate,K,L1,NY,NX)=OHM(idom_acetate,K,L1,NY,NX)+FX*OHM(idom_acetate,K,L0,NY,NX)
+      
       DO M=1,jsken
-        OSC(M,K,L1,NY,NX)=OSC(M,K,L1,NY,NX)+FX*OSC(M,K,L0,NY,NX)
         OSA(M,K,L1,NY,NX)=OSA(M,K,L1,NY,NX)+FX*OSA(M,K,L0,NY,NX)
-        OSN(M,K,L1,NY,NX)=OSN(M,K,L1,NY,NX)+FX*OSN(M,K,L0,NY,NX)
-        OSP(M,K,L1,NY,NX)=OSP(M,K,L1,NY,NX)+FX*OSP(M,K,L0,NY,NX)
+        OSM(ielmc,M,K,L1,NY,NX)=OSM(ielmc,M,K,L1,NY,NX)+FX*OSM(ielmc,M,K,L0,NY,NX)
+        OSM(ielmn,M,K,L1,NY,NX)=OSM(ielmn,M,K,L1,NY,NX)+FX*OSM(ielmn,M,K,L0,NY,NX)
+        OSM(ielmp,M,K,L1,NY,NX)=OSM(ielmp,M,K,L1,NY,NX)+FX*OSM(ielmp,M,K,L0,NY,NX)
       ENDDO
     ENDDO
   ENDIF
@@ -861,7 +865,7 @@ implicit none
              RootMycoNonstructElmnt_vr(NE,N,L1,NZ,NY,NX)= RootMycoNonstructElmnt_vr(NE,N,L1,NZ,NY,NX)+FX* RootMycoNonstructElmnt_vr(NE,N,L0,NZ,NY,NX)
           ENDDO
           RootStructBiomC_vr(N,L1,NZ,NY,NX)=RootStructBiomC_vr(N,L1,NZ,NY,NX)+FX*RootStructBiomC_vr(N,L0,NZ,NY,NX)
-           PopuPlantRootC_vr(N,L1,NZ,NY,NX)= PopuPlantRootC_vr(N,L1,NZ,NY,NX)+FX* PopuPlantRootC_vr(N,L0,NZ,NY,NX)
+          PopuPlantRootC_vr(N,L1,NZ,NY,NX)= PopuPlantRootC_vr(N,L1,NZ,NY,NX)+FX* PopuPlantRootC_vr(N,L0,NZ,NY,NX)
           RootProteinC_pvr(N,L1,NZ,NY,NX)=RootProteinC_pvr(N,L1,NZ,NY,NX)+FX*RootProteinC_pvr(N,L0,NZ,NY,NX)
           PrimRootXNumL_pvr(N,L1,NZ,NY,NX)=PrimRootXNumL_pvr(N,L1,NZ,NY,NX)+FX*PrimRootXNumL_pvr(N,L0,NZ,NY,NX)
           SecndRootXNum_pvr(N,L1,NZ,NY,NX)=SecndRootXNum_pvr(N,L1,NZ,NY,NX)+FX*SecndRootXNum_pvr(N,L0,NZ,NY,NX)
@@ -991,27 +995,29 @@ implicit none
 
     DO K=1,jcplx
       DO  M=1,ndbiomcp
-        ORC(M,K,L0,NY,NX)=FY*ORC(M,K,L0,NY,NX)
-        ORN(M,K,L0,NY,NX)=FY*ORN(M,K,L0,NY,NX)
-        ORP(M,K,L0,NY,NX)=FY*ORP(M,K,L0,NY,NX)
+        ORM(ielmc,M,K,L0,NY,NX)=FY*ORM(ielmc,M,K,L0,NY,NX)
+        ORM(ielmn,M,K,L0,NY,NX)=FY*ORM(ielmn,M,K,L0,NY,NX)
+        ORM(ielmp,M,K,L0,NY,NX)=FY*ORM(ielmp,M,K,L0,NY,NX)
       ENDDO
       DOM(idom_doc,K,L0,NY,NX)=FY*DOM(idom_doc,K,L0,NY,NX)
       DOM(idom_don,K,L0,NY,NX)=FY*DOM(idom_don,K,L0,NY,NX)
       DOM(idom_dop,K,L0,NY,NX)=FY*DOM(idom_dop,K,L0,NY,NX)
       DOM(idom_acetate,K,L0,NY,NX)=FY*DOM(idom_acetate,K,L0,NY,NX)
+
       DOM_Macp(idom_doc,K,L0,NY,NX)=FY*DOM_Macp(idom_doc,K,L0,NY,NX)
       DOM_Macp(idom_don,K,L0,NY,NX)=FY*DOM_Macp(idom_don,K,L0,NY,NX)
       DOM_Macp(idom_dop,K,L0,NY,NX)=FY*DOM_Macp(idom_dop,K,L0,NY,NX)
       DOM_Macp(idom_acetate,K,L0,NY,NX)=FY*DOM_Macp(idom_acetate,K,L0,NY,NX)
-      OHC(K,L0,NY,NX)=FY*OHC(K,L0,NY,NX)
-      OHN(K,L0,NY,NX)=FY*OHN(K,L0,NY,NX)
-      OHP(K,L0,NY,NX)=FY*OHP(K,L0,NY,NX)
-      OHA(K,L0,NY,NX)=FY*OHA(K,L0,NY,NX)
+
+      OHM(ielmc,K,L0,NY,NX)=FY*OHM(ielmc,K,L0,NY,NX)
+      OHM(ielmn,K,L0,NY,NX)=FY*OHM(ielmn,K,L0,NY,NX)
+      OHM(ielmp,K,L0,NY,NX)=FY*OHM(ielmp,K,L0,NY,NX)
+      OHM(idom_acetate,K,L0,NY,NX)=FY*OHM(idom_acetate,K,L0,NY,NX)
       DO  M=1,jsken
-        OSC(M,K,L0,NY,NX)=FY*OSC(M,K,L0,NY,NX)
+        OSM(ielmc,M,K,L0,NY,NX)=FY*OSM(ielmc,M,K,L0,NY,NX)
         OSA(M,K,L0,NY,NX)=FY*OSA(M,K,L0,NY,NX)
-        OSN(M,K,L0,NY,NX)=FY*OSN(M,K,L0,NY,NX)
-        OSP(M,K,L0,NY,NX)=FY*OSP(M,K,L0,NY,NX)
+        OSM(ielmn,M,K,L0,NY,NX)=FY*OSM(ielmn,M,K,L0,NY,NX)
+        OSM(ielmp,M,K,L0,NY,NX)=FY*OSM(ielmp,M,K,L0,NY,NX)
       ENDDO
     ENDDO
   ENDIF
@@ -1142,15 +1148,15 @@ implicit none
 
     DO  K=1,jcplx
       DO  M=1,ndbiomcp
-        FXORC=FXO*ORC(M,K,L0,NY,NX)
-        ORC(M,K,L1,NY,NX)=ORC(M,K,L1,NY,NX)+FXORC
-        ORC(M,K,L0,NY,NX)=ORC(M,K,L0,NY,NX)-FXORC
-        FXORN=FXO*ORN(M,K,L0,NY,NX)
-        ORN(M,K,L1,NY,NX)=ORN(M,K,L1,NY,NX)+FXORN
-        ORN(M,K,L0,NY,NX)=ORN(M,K,L0,NY,NX)-FXORN
-        FXORP=FXO*ORP(M,K,L0,NY,NX)
-        ORP(M,K,L1,NY,NX)=ORP(M,K,L1,NY,NX)+FXORP
-        ORP(M,K,L0,NY,NX)=ORP(M,K,L0,NY,NX)-FXORP
+        FXORC=FXO*ORM(ielmc,M,K,L0,NY,NX)
+        ORM(ielmc,M,K,L1,NY,NX)=ORM(ielmc,M,K,L1,NY,NX)+FXORC
+        ORM(ielmc,M,K,L0,NY,NX)=ORM(ielmc,M,K,L0,NY,NX)-FXORC
+        FXORN=FXO*ORM(ielmn,M,K,L0,NY,NX)
+        ORM(ielmn,M,K,L1,NY,NX)=ORM(ielmn,M,K,L1,NY,NX)+FXORN
+        ORM(ielmn,M,K,L0,NY,NX)=ORM(ielmn,M,K,L0,NY,NX)-FXORN
+        FXORP=FXO*ORM(ielmp,M,K,L0,NY,NX)
+        ORM(ielmp,M,K,L1,NY,NX)=ORM(ielmp,M,K,L1,NY,NX)+FXORP
+        ORM(ielmp,M,K,L0,NY,NX)=ORM(ielmp,M,K,L0,NY,NX)-FXORP
       ENDDO
       FXOQC=FXO*DOM(idom_doc,K,L0,NY,NX)
       DOM(idom_doc,K,L1,NY,NX)=DOM(idom_doc,K,L1,NY,NX)+FXOQC
@@ -1178,31 +1184,31 @@ implicit none
         DOM_Macp(idom_acetate,K,L1,NY,NX)=DOM_Macp(idom_acetate,K,L1,NY,NX)+FXOQAH
         DOM_Macp(idom_acetate,K,L0,NY,NX)=DOM_Macp(idom_acetate,K,L0,NY,NX)-FXOQAH
       ENDIF
-      FXOHC=FXO*OHC(K,L0,NY,NX)
-      OHC(K,L1,NY,NX)=OHC(K,L1,NY,NX)+FXOHC
-      OHC(K,L0,NY,NX)=OHC(K,L0,NY,NX)-FXOHC
-      FXOHN=FXO*OHN(K,L0,NY,NX)
-      OHN(K,L1,NY,NX)=OHN(K,L1,NY,NX)+FXOHN
-      OHN(K,L0,NY,NX)=OHN(K,L0,NY,NX)-FXOHN
-      FXOHP=FXO*OHP(K,L0,NY,NX)
-      OHP(K,L1,NY,NX)=OHP(K,L1,NY,NX)+FXOHP
-      OHP(K,L0,NY,NX)=OHP(K,L0,NY,NX)-FXOHP
-      FXOHA=FXO*OHA(K,L0,NY,NX)
-      OHA(K,L1,NY,NX)=OHA(K,L1,NY,NX)+FXOHA
-      OHA(K,L0,NY,NX)=OHA(K,L0,NY,NX)-FXOHA
+      FXOHC=FXO*OHM(ielmc,K,L0,NY,NX)
+      OHM(ielmc,K,L1,NY,NX)=OHM(ielmc,K,L1,NY,NX)+FXOHC
+      OHM(ielmc,K,L0,NY,NX)=OHM(ielmc,K,L0,NY,NX)-FXOHC
+      FXOHN=FXO*OHM(ielmn,K,L0,NY,NX)
+      OHM(ielmn,K,L1,NY,NX)=OHM(ielmn,K,L1,NY,NX)+FXOHN
+      OHM(ielmn,K,L0,NY,NX)=OHM(ielmn,K,L0,NY,NX)-FXOHN
+      FXOHP=FXO*OHM(ielmp,K,L0,NY,NX)
+      OHM(ielmp,K,L1,NY,NX)=OHM(ielmp,K,L1,NY,NX)+FXOHP
+      OHM(ielmp,K,L0,NY,NX)=OHM(ielmp,K,L0,NY,NX)-FXOHP
+      FXOHA=FXO*OHM(idom_acetate,K,L0,NY,NX)
+      OHM(idom_acetate,K,L1,NY,NX)=OHM(idom_acetate,K,L1,NY,NX)+FXOHA
+      OHM(idom_acetate,K,L0,NY,NX)=OHM(idom_acetate,K,L0,NY,NX)-FXOHA
       DO M=1,jsken
-        FXOSC=FXO*OSC(M,K,L0,NY,NX)
-        OSC(M,K,L1,NY,NX)=OSC(M,K,L1,NY,NX)+FXOSC
-        OSC(M,K,L0,NY,NX)=OSC(M,K,L0,NY,NX)-FXOSC
+        FXOSC=FXO*OSM(ielmc,M,K,L0,NY,NX)
+        OSM(ielmc,M,K,L1,NY,NX)=OSM(ielmc,M,K,L1,NY,NX)+FXOSC
+        OSM(ielmc,M,K,L0,NY,NX)=OSM(ielmc,M,K,L0,NY,NX)-FXOSC
         FXOSA=FXO*OSA(M,K,L0,NY,NX)
         OSA(M,K,L1,NY,NX)=OSA(M,K,L1,NY,NX)+FXOSA
         OSA(M,K,L0,NY,NX)=OSA(M,K,L0,NY,NX)-FXOSA
-        FXOSN=FXO*OSN(M,K,L0,NY,NX)
-        OSN(M,K,L1,NY,NX)=OSN(M,K,L1,NY,NX)+FXOSN
-        OSN(M,K,L0,NY,NX)=OSN(M,K,L0,NY,NX)-FXOSN
-        FXOSP=FXO*OSP(M,K,L0,NY,NX)
-        OSP(M,K,L1,NY,NX)=OSP(M,K,L1,NY,NX)+FXOSP
-        OSP(M,K,L0,NY,NX)=OSP(M,K,L0,NY,NX)-FXOSP
+        FXOSN=FXO*OSM(ielmn,M,K,L0,NY,NX)
+        OSM(ielmn,M,K,L1,NY,NX)=OSM(ielmn,M,K,L1,NY,NX)+FXOSN
+        OSM(ielmn,M,K,L0,NY,NX)=OSM(ielmn,M,K,L0,NY,NX)-FXOSN
+        FXOSP=FXO*OSM(ielmp,M,K,L0,NY,NX)
+        OSM(ielmp,M,K,L1,NY,NX)=OSM(ielmp,M,K,L1,NY,NX)+FXOSP
+        OSM(ielmp,M,K,L0,NY,NX)=OSM(ielmp,M,K,L0,NY,NX)-FXOSP
       ENDDO
     ENDDO
 !

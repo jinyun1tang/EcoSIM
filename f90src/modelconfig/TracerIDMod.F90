@@ -22,6 +22,8 @@ implicit none
   integer :: ids_H1PO4,ids_H1PO4B
   integer :: ids_H2PO4,ids_H2PO4B
 
+! be careful about the dom tracers and chemical elements associated
+! with plant and soil organic matter
   integer :: idom_DOC,idom_DON,idom_DOP,idom_acetate
   integer :: idom_beg,idom_end
   integer :: idg_beg,idg_end
@@ -192,6 +194,7 @@ implicit none
   ids_nut_beg=ids_NH4;  !the first non-band non-gaseous nutrient tracer
   ids_nuts_end=ids_H2PO4;!the last non-band nutrient tracer
 
+  
   idom_beg=1;idom_end=0
   idom_doc=addone(idom_end)
   idom_don=addone(idom_end)

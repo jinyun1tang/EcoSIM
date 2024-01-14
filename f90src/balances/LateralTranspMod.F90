@@ -168,10 +168,10 @@ implicit none
 !     INITIALIZE NET SOLUTE AND GAS FLUXES FOR RUNOFF
 !
   D9960: DO K=1,micpar%NumOfLitrCmplxs
-    TOCQRS(K,NY,NX)=0.0_r8
-    TONQRS(K,NY,NX)=0.0_r8
-    TOPQRS(K,NY,NX)=0.0_r8
-    TOAQRS(K,NY,NX)=0.0_r8
+    TOMQRS(idom_doc,K,NY,NX)=0.0_r8
+    TOMQRS(idom_don,K,NY,NX)=0.0_r8
+    TOMQRS(idom_dop,K,NY,NX)=0.0_r8
+    TOMQRS(idom_acetate,K,NY,NX)=0.0_r8
   ENDDO D9960
   end subroutine ZeroRunoffArray
 
@@ -259,10 +259,10 @@ implicit none
     !heat flux
     THeat2GridBySurfRunoff(N2,N1)=THeat2GridBySurfRunoff(N2,N1)+Heat2GridBySurfRunoff(N,NN,N2,N1)
     D8590: DO K=1,micpar%NumOfLitrCmplxs
-      TOCQRS(K,N2,N1)=TOCQRS(K,N2,N1)+dom_2DFloXSurRunoff(idom_doc,K,N,NN,N2,N1)
-      TONQRS(K,N2,N1)=TONQRS(K,N2,N1)+dom_2DFloXSurRunoff(idom_don,K,N,NN,N2,N1)
-      TOPQRS(K,N2,N1)=TOPQRS(K,N2,N1)+dom_2DFloXSurRunoff(idom_dop,K,N,NN,N2,N1)
-      TOAQRS(K,N2,N1)=TOAQRS(K,N2,N1)+dom_2DFloXSurRunoff(idom_acetate,K,N,NN,N2,N1)
+      TOMQRS(idom_doc,K,N2,N1)=TOMQRS(idom_doc,K,N2,N1)+dom_2DFloXSurRunoff(idom_doc,K,N,NN,N2,N1)
+      TOMQRS(idom_don,K,N2,N1)=TOMQRS(idom_don,K,N2,N1)+dom_2DFloXSurRunoff(idom_don,K,N,NN,N2,N1)
+      TOMQRS(idom_dop,K,N2,N1)=TOMQRS(idom_dop,K,N2,N1)+dom_2DFloXSurRunoff(idom_dop,K,N,NN,N2,N1)
+      TOMQRS(idom_acetate,K,N2,N1)=TOMQRS(idom_acetate,K,N2,N1)+dom_2DFloXSurRunoff(idom_acetate,K,N,NN,N2,N1)
     ENDDO D8590
 
     IF(IFLBH(N,NN,N5,N4).EQ.0)THEN
@@ -272,10 +272,10 @@ implicit none
       !heat flux
       THeat2GridBySurfRunoff(N2,N1)=THeat2GridBySurfRunoff(N2,N1)-Heat2GridBySurfRunoff(N,NN,N5,N4)
       D8591: DO K=1,micpar%NumOfLitrCmplxs
-        TOCQRS(K,N2,N1)=TOCQRS(K,N2,N1)-dom_2DFloXSurRunoff(idom_doc,K,N,NN,N5,N4)
-        TONQRS(K,N2,N1)=TONQRS(K,N2,N1)-dom_2DFloXSurRunoff(idom_don,K,N,NN,N5,N4)
-        TOPQRS(K,N2,N1)=TOPQRS(K,N2,N1)-dom_2DFloXSurRunoff(idom_dop,K,N,NN,N5,N4)
-        TOAQRS(K,N2,N1)=TOAQRS(K,N2,N1)-dom_2DFloXSurRunoff(idom_acetate,K,N,NN,N5,N4)
+        TOMQRS(idom_doc,K,N2,N1)=TOMQRS(idom_doc,K,N2,N1)-dom_2DFloXSurRunoff(idom_doc,K,N,NN,N5,N4)
+        TOMQRS(idom_don,K,N2,N1)=TOMQRS(idom_don,K,N2,N1)-dom_2DFloXSurRunoff(idom_don,K,N,NN,N5,N4)
+        TOMQRS(idom_dop,K,N2,N1)=TOMQRS(idom_dop,K,N2,N1)-dom_2DFloXSurRunoff(idom_dop,K,N,NN,N5,N4)
+        TOMQRS(idom_acetate,K,N2,N1)=TOMQRS(idom_acetate,K,N2,N1)-dom_2DFloXSurRunoff(idom_acetate,K,N,NN,N5,N4)
       ENDDO D8591
 
     ENDIF
@@ -285,10 +285,10 @@ implicit none
       TWat2GridBySurfRunoff(N2,N1)=TWat2GridBySurfRunoff(N2,N1)-Wat2GridBySurfRunoff(N,NN,N5B,N4B)
       THeat2GridBySurfRunoff(N2,N1)=THeat2GridBySurfRunoff(N2,N1)-Heat2GridBySurfRunoff(N,NN,N5B,N4B)
       D8592: DO K=1,micpar%NumOfLitrCmplxs
-        TOCQRS(K,N2,N1)=TOCQRS(K,N2,N1)-dom_2DFloXSurRunoff(idom_doc,K,N,NN,N5B,N4B)
-        TONQRS(K,N2,N1)=TONQRS(K,N2,N1)-dom_2DFloXSurRunoff(idom_don,K,N,NN,N5B,N4B)
-        TOPQRS(K,N2,N1)=TOPQRS(K,N2,N1)-dom_2DFloXSurRunoff(idom_dop,K,N,NN,N5B,N4B)
-        TOAQRS(K,N2,N1)=TOAQRS(K,N2,N1)-dom_2DFloXSurRunoff(idom_acetate,K,N,NN,N5B,N4B)
+        TOMQRS(idom_doc,K,N2,N1)=TOMQRS(idom_doc,K,N2,N1)-dom_2DFloXSurRunoff(idom_doc,K,N,NN,N5B,N4B)
+        TOMQRS(idom_don,K,N2,N1)=TOMQRS(idom_don,K,N2,N1)-dom_2DFloXSurRunoff(idom_don,K,N,NN,N5B,N4B)
+        TOMQRS(idom_dop,K,N2,N1)=TOMQRS(idom_dop,K,N2,N1)-dom_2DFloXSurRunoff(idom_dop,K,N,NN,N5B,N4B)
+        TOMQRS(idom_acetate,K,N2,N1)=TOMQRS(idom_acetate,K,N2,N1)-dom_2DFloXSurRunoff(idom_acetate,K,N,NN,N5B,N4B)
       ENDDO D8592
       ENDIF
 
@@ -392,19 +392,19 @@ implicit none
 
         D9375: DO K=1,jcplx
           D9370: DO M=1,ndbiomcp
-            TORCER(M,K,N2,N1)=TORCER(M,K,N2,N1)+ORCER(M,K,N,NN,N2,N1)
-            TORNER(M,K,N2,N1)=TORNER(M,K,N2,N1)+ORNER(M,K,N,NN,N2,N1)
-            TORPER(M,K,N2,N1)=TORPER(M,K,N2,N1)+ORPER(M,K,N,NN,N2,N1)
+            TORMER(ielmc,M,K,N2,N1)=TORMER(ielmc,M,K,N2,N1)+ORMER(ielmc,M,K,N,NN,N2,N1)
+            TORMER(ielmn,M,K,N2,N1)=TORMER(ielmn,M,K,N2,N1)+ORMER(ielmn,M,K,N,NN,N2,N1)
+            TORMER(ielmp,M,K,N2,N1)=TORMER(ielmp,M,K,N2,N1)+ORMER(ielmp,M,K,N,NN,N2,N1)
           ENDDO D9370
-          TOHCER(K,N2,N1)=TOHCER(K,N2,N1)+OHCER(K,N,NN,N2,N1)
-          TOHNER(K,N2,N1)=TOHNER(K,N2,N1)+OHNER(K,N,NN,N2,N1)
-          TOHPER(K,N2,N1)=TOHPER(K,N2,N1)+OHPER(K,N,NN,N2,N1)
-          TOHAER(K,N2,N1)=TOHAER(K,N2,N1)+OHAER(K,N,NN,N2,N1)
+          TOHMER(idom_doc,K,N2,N1)=TOHMER(idom_doc,K,N2,N1)+OHMER(idom_doc,K,N,NN,N2,N1)
+          TOHMER(idom_don,K,N2,N1)=TOHMER(idom_don,K,N2,N1)+OHMER(idom_don,K,N,NN,N2,N1)
+          TOHMER(idom_dop,K,N2,N1)=TOHMER(idom_dop,K,N2,N1)+OHMER(idom_dop,K,N,NN,N2,N1)
+          TOHMER(idom_acetate,K,N2,N1)=TOHMER(idom_acetate,K,N2,N1)+OHMER(idom_acetate,K,N,NN,N2,N1)
           D9365: DO M=1,jsken
-            TOSCER(M,K,N2,N1)=TOSCER(M,K,N2,N1)+OSCER(M,K,N,NN,N2,N1)
+            TOSMER(ielmc,M,K,N2,N1)=TOSMER(ielmc,M,K,N2,N1)+OSMER(ielmc,M,K,N,NN,N2,N1)
             TOSAER(M,K,N2,N1)=TOSAER(M,K,N2,N1)+OSAER(M,K,N,NN,N2,N1)
-            TOSNER(M,K,N2,N1)=TOSNER(M,K,N2,N1)+OSNER(M,K,N,NN,N2,N1)
-            TOSPER(M,K,N2,N1)=TOSPER(M,K,N2,N1)+OSPER(M,K,N,NN,N2,N1)
+            TOSMER(ielmn,M,K,N2,N1)=TOSMER(ielmn,M,K,N2,N1)+OSMER(ielmn,M,K,N,NN,N2,N1)
+            TOSMER(ielmp,M,K,N2,N1)=TOSMER(ielmp,M,K,N2,N1)+OSMER(ielmp,M,K,N,NN,N2,N1)
           ENDDO D9365
         ENDDO D9375
 
@@ -464,19 +464,19 @@ implicit none
 
         D7375: DO K=1,jcplx
           D7370: DO M=1,ndbiomcp
-            TORCER(M,K,N2,N1)=TORCER(M,K,N2,N1)-ORCER(M,K,N,NN,N5,N4)
-            TORNER(M,K,N2,N1)=TORNER(M,K,N2,N1)-ORNER(M,K,N,NN,N5,N4)
-            TORPER(M,K,N2,N1)=TORPER(M,K,N2,N1)-ORPER(M,K,N,NN,N5,N4)
+            TORMER(ielmc,M,K,N2,N1)=TORMER(ielmc,M,K,N2,N1)-ORMER(ielmc,M,K,N,NN,N5,N4)
+            TORMER(ielmn,M,K,N2,N1)=TORMER(ielmn,M,K,N2,N1)-ORMER(ielmn,M,K,N,NN,N5,N4)
+            TORMER(ielmp,M,K,N2,N1)=TORMER(ielmp,M,K,N2,N1)-ORMER(ielmp,M,K,N,NN,N5,N4)
           ENDDO D7370
-          TOHCER(K,N2,N1)=TOHCER(K,N2,N1)-OHCER(K,N,NN,N5,N4)
-          TOHNER(K,N2,N1)=TOHNER(K,N2,N1)-OHNER(K,N,NN,N5,N4)
-          TOHPER(K,N2,N1)=TOHPER(K,N2,N1)-OHPER(K,N,NN,N5,N4)
-          TOHAER(K,N2,N1)=TOHAER(K,N2,N1)-OHAER(K,N,NN,N5,N4)
+          TOHMER(idom_doc,K,N2,N1)=TOHMER(idom_doc,K,N2,N1)-OHMER(idom_doc,K,N,NN,N5,N4)
+          TOHMER(idom_don,K,N2,N1)=TOHMER(idom_don,K,N2,N1)-OHMER(idom_don,K,N,NN,N5,N4)
+          TOHMER(idom_dop,K,N2,N1)=TOHMER(idom_dop,K,N2,N1)-OHMER(idom_dop,K,N,NN,N5,N4)
+          TOHMER(idom_acetate,K,N2,N1)=TOHMER(idom_acetate,K,N2,N1)-OHMER(idom_acetate,K,N,NN,N5,N4)
           D7365: DO M=1,jsken
-            TOSCER(M,K,N2,N1)=TOSCER(M,K,N2,N1)-OSCER(M,K,N,NN,N5,N4)
+            TOSMER(ielmc,M,K,N2,N1)=TOSMER(ielmc,M,K,N2,N1)-OSMER(ielmc,M,K,N,NN,N5,N4)
             TOSAER(M,K,N2,N1)=TOSAER(M,K,N2,N1)-OSAER(M,K,N,NN,N5,N4)
-            TOSNER(M,K,N2,N1)=TOSNER(M,K,N2,N1)-OSNER(M,K,N,NN,N5,N4)
-            TOSPER(M,K,N2,N1)=TOSPER(M,K,N2,N1)-OSPER(M,K,N,NN,N5,N4)
+            TOSMER(ielmn,M,K,N2,N1)=TOSMER(ielmn,M,K,N2,N1)-OSMER(ielmn,M,K,N,NN,N5,N4)
+            TOSMER(ielmp,M,K,N2,N1)=TOSMER(ielmp,M,K,N2,N1)-OSMER(ielmp,M,K,N,NN,N5,N4)
           ENDDO D7365
         ENDDO D7375
 !     ENDIF
@@ -536,19 +536,19 @@ implicit none
 
           D8375: DO K=1,jcplx
             D8370: DO M=1,ndbiomcp
-              TORCER(M,K,N2,N1)=TORCER(M,K,N2,N1)-ORCER(M,K,N,NN,N5B,N4B)
-              TORNER(M,K,N2,N1)=TORNER(M,K,N2,N1)-ORNER(M,K,N,NN,N5B,N4B)
-              TORPER(M,K,N2,N1)=TORPER(M,K,N2,N1)-ORPER(M,K,N,NN,N5B,N4B)
+              TORMER(ielmc,M,K,N2,N1)=TORMER(ielmc,M,K,N2,N1)-ORMER(ielmc,M,K,N,NN,N5B,N4B)
+              TORMER(ielmn,M,K,N2,N1)=TORMER(ielmn,M,K,N2,N1)-ORMER(ielmn,M,K,N,NN,N5B,N4B)
+              TORMER(ielmp,M,K,N2,N1)=TORMER(ielmp,M,K,N2,N1)-ORMER(ielmp,M,K,N,NN,N5B,N4B)
             ENDDO D8370
-            TOHCER(K,N2,N1)=TOHCER(K,N2,N1)-OHCER(K,N,NN,N5B,N4B)
-            TOHNER(K,N2,N1)=TOHNER(K,N2,N1)-OHNER(K,N,NN,N5B,N4B)
-            TOHPER(K,N2,N1)=TOHPER(K,N2,N1)-OHPER(K,N,NN,N5B,N4B)
-            TOHAER(K,N2,N1)=TOHAER(K,N2,N1)-OHAER(K,N,NN,N5B,N4B)
+            TOHMER(idom_doc,K,N2,N1)=TOHMER(idom_doc,K,N2,N1)-OHMER(idom_doc,K,N,NN,N5B,N4B)
+            TOHMER(idom_don,K,N2,N1)=TOHMER(idom_don,K,N2,N1)-OHMER(idom_don,K,N,NN,N5B,N4B)
+            TOHMER(idom_dop,K,N2,N1)=TOHMER(idom_dop,K,N2,N1)-OHMER(idom_dop,K,N,NN,N5B,N4B)
+            TOHMER(idom_acetate,K,N2,N1)=TOHMER(idom_acetate,K,N2,N1)-OHMER(idom_acetate,K,N,NN,N5B,N4B)
             D8365: DO M=1,jsken
-              TOSCER(M,K,N2,N1)=TOSCER(M,K,N2,N1)-OSCER(M,K,N,NN,N5B,N4B)
+              TOSMER(ielmc,M,K,N2,N1)=TOSMER(ielmc,M,K,N2,N1)-OSMER(ielmc,M,K,N,NN,N5B,N4B)
               TOSAER(M,K,N2,N1)=TOSAER(M,K,N2,N1)-OSAER(M,K,N,NN,N5B,N4B)
-              TOSNER(M,K,N2,N1)=TOSNER(M,K,N2,N1)-OSNER(M,K,N,NN,N5B,N4B)
-              TOSPER(M,K,N2,N1)=TOSPER(M,K,N2,N1)-OSPER(M,K,N,NN,N5B,N4B)
+              TOSMER(ielmn,M,K,N2,N1)=TOSMER(ielmn,M,K,N2,N1)-OSMER(ielmn,M,K,N,NN,N5B,N4B)
+              TOSMER(ielmp,M,K,N2,N1)=TOSMER(ielmp,M,K,N2,N1)-OSMER(ielmp,M,K,N,NN,N5B,N4B)
             ENDDO D8365
           ENDDO D8375
         ENDIF

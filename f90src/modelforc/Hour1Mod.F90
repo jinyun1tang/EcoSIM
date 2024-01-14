@@ -280,13 +280,13 @@ module Hour1Mod
   OXYGSO=0.0_r8
   TLH2G=0.0_r8
   TSEDSO=0.0_r8
-  LitRCStoreLandscape=0.0_r8
-  LitRNStoreLandscape=0.0_r8
-  LitRPStoreLandscape=0.0_r8
+  LitRMStoreLndscap(ielmc)=0.0_r8
+  LitRMStoreLndscap(ielmn)=0.0_r8
+  LitRMStoreLndscap(ielmp)=0.0_r8
 
-  PomHumCStoreLandscape=0.0_r8
-  PomHumNStoreLandscape=0.0_r8
-  PomHumPStoreLandscape=0.0_r8
+  POMHumStoreLndscap(ielmc)=0.0_r8
+  POMHumStoreLndscap(ielmn)=0.0_r8
+  POMHumStoreLndscap(ielmp)=0.0_r8
   TLCO2G=0.0_r8
   TLN2G=0.0_r8
   TLNH4=0.0_r8
@@ -456,16 +456,16 @@ module Hour1Mod
         OMEERhetr(:,:,:,1:2,1:2,NY,NX)=0.0_r8
         OMEERauto(:,:,1:2,1:2,NY,NX)=0.0_r8
 
-        ORCER(:,:,1:2,1:2,NY,NX)=0.0_r8
-        ORNER(:,:,1:2,1:2,NY,NX)=0.0_r8
-        ORPER(:,:,1:2,1:2,NY,NX)=0.0_r8
-        OHCER(:,1:2,1:2,NY,NX)=0.0_r8
-        OHNER(:,1:2,1:2,NY,NX)=0.0_r8
-        OHPER(:,1:2,1:2,NY,NX)=0.0_r8
-        OSCER(:,:,1:2,1:2,NY,NX)=0.0_r8
+        ORMER(ielmc,:,:,1:2,1:2,NY,NX)=0.0_r8
+        ORMER(ielmn,:,:,1:2,1:2,NY,NX)=0.0_r8
+        ORMER(ielmp,:,:,1:2,1:2,NY,NX)=0.0_r8
+        OHMER(idom_doc,:,1:2,1:2,NY,NX)=0.0_r8
+        OHMER(idom_don,:,1:2,1:2,NY,NX)=0.0_r8
+        OHMER(idom_dop,:,1:2,1:2,NY,NX)=0.0_r8
+        OSMER(ielmc,:,:,1:2,1:2,NY,NX)=0.0_r8
         OSAER(:,:,1:2,1:2,NY,NX)=0.0_r8
-        OSNER(:,:,1:2,1:2,NY,NX)=0.0_r8
-        OSPER(:,:,1:2,1:2,NY,NX)=0.0_r8
+        OSMER(ielmn,:,:,1:2,1:2,NY,NX)=0.0_r8
+        OSMER(ielmp,:,:,1:2,1:2,NY,NX)=0.0_r8
       ENDDO
     ENDDO
   ENDIF
@@ -725,16 +725,16 @@ module Hour1Mod
   Qinflx2Soil_col(NY,NX)=0._r8
   HeatFlx2G_col(NY,NX)=0._r8
   DIC_mass_col(NY,NX)=0.0_r8
-  TOMT(NY,NX)=0.0_r8
-  TONT(NY,NX)=0.0_r8
-  TOPT(NY,NX)=0.0_r8
+  TOMET(ielmc,NY,NX)=0.0_r8
+  TOMET(ielmn,NY,NX)=0.0_r8
+  TOMET(ielmp,NY,NX)=0.0_r8
   UVLWatMicP(NY,NX)=0.0_r8
-  URSDC(NY,NX)=0.0_r8
-  UORGC(NY,NX)=0.0_r8
-  URSDN(NY,NX)=0.0_r8
-  UORGN(NY,NX)=0.0_r8
-  URSDP(NY,NX)=0.0_r8
-  UORGP(NY,NX)=0.0_r8
+  URSDM(ielmc,NY,NX)=0.0_r8
+  UORGM(ielmc,NY,NX)=0.0_r8
+  URSDM(ielmn,NY,NX)=0.0_r8
+  UORGM(ielmn,NY,NX)=0.0_r8
+  URSDM(ielmp,NY,NX)=0.0_r8
+  UORGM(ielmp,NY,NX)=0.0_r8
   UNH4(NY,NX)=0.0_r8
   UNO3(NY,NX)=0.0_r8
   UPO4(NY,NX)=0.0_r8
@@ -776,7 +776,7 @@ module Hour1Mod
   StandingDeadChemElmnt_col(1:NumPlantChemElmnts,NY,NX)=0.0_r8
   PPT(NY,NX)=0.0_r8
 ! zero arrays in the snow layers
-  FLSW(1:JS,NY,NX)=0.0_r8
+  WatConvSno2MicP(1:JS,NY,NX)=0.0_r8
   WatConvSno2MacP(1:JS,NY,NX)=0.0_r8
   HeatConvSno2Soi(1:JS,NY,NX)=0.0_r8
   WatConvSno2LitR(1:JS,NY,NX)=0.0_r8
@@ -1005,13 +1005,13 @@ module Hour1Mod
       OC=OC+OMEauto(ielmc,NB,L,NY,NX)
     ENDDO
 !  add microbial residue
-    OC=OC+SUM(ORC(1:ndbiomcp,1:jcplx,L,NY,NX))
+    OC=OC+SUM(ORM(ielmc,1:ndbiomcp,1:jcplx,L,NY,NX))
 !  add dissolved/sorbed OM and acetate
     OC=OC+SUM(DOM(idom_doc,1:jcplx,L,NY,NX))+SUM(DOM_Macp(idom_doc,1:jcplx,L,NY,NX)) &
-         +SUM(OHC(1:jcplx,L,NY,NX))+SUM(DOM(idom_acetate,1:jcplx,L,NY,NX)) &
-         +SUM(DOM_Macp(idom_acetate,1:jcplx,L,NY,NX))+SUM(OHA(1:jcplx,L,NY,NX))
+         +SUM(OHM(ielmc,1:jcplx,L,NY,NX))+SUM(DOM(idom_acetate,1:jcplx,L,NY,NX)) &
+         +SUM(DOM_Macp(idom_acetate,1:jcplx,L,NY,NX))+SUM(OHM(idom_acetate,1:jcplx,L,NY,NX))
 !  add OM complexes
-    OC=OC+SUM(OSC(1:jsken,1:jcplx,L,NY,NX))
+    OC=OC+SUM(OSM(ielmc,1:jsken,1:jcplx,L,NY,NX))
 !
     ORGCX(L,NY,NX)=OC
   ENDDO
@@ -1888,10 +1888,10 @@ module Hour1Mod
         ELSE
           OSP1=0.0_r8
         ENDIF
-        OSC(M,K,LFDPTH,NY,NX)=OSC(M,K,LFDPTH,NY,NX)+OSC1
+        OSM(ielmc,M,K,LFDPTH,NY,NX)=OSM(ielmc,M,K,LFDPTH,NY,NX)+OSC1
+        OSM(ielmn,M,K,LFDPTH,NY,NX)=OSM(ielmn,M,K,LFDPTH,NY,NX)+OSN1
+        OSM(ielmp,M,K,LFDPTH,NY,NX)=OSM(ielmp,M,K,LFDPTH,NY,NX)+OSP1
         OSA(M,K,LFDPTH,NY,NX)=OSA(M,K,LFDPTH,NY,NX)+OSC1*micpar%OMCI(1,K)
-        OSN(M,K,LFDPTH,NY,NX)=OSN(M,K,LFDPTH,NY,NX)+OSN1
-        OSP(M,K,LFDPTH,NY,NX)=OSP(M,K,LFDPTH,NY,NX)+OSP1
         IF(LFDPTH.EQ.0)THEN
           VGeomLayer(LFDPTH,NY,NX)=VGeomLayer(LFDPTH,NY,NX)+OSC1*ppmc/BulkDensLitR(micpar%k_fine_litr)
         ENDIF
