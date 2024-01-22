@@ -18,6 +18,7 @@ module MicBGCMod
   use MicForcTypeMod, only : micforctype
   use EcoSiMParDataMod, only : micpar
   use MicrobMathFuncMod
+  use MicrobMathFuncMod
   implicit none
 
   private

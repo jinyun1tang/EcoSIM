@@ -39,6 +39,7 @@ module RedistMod
   use UnitMod, only : units
   use SnowBalanceMod
   use SurfLitterPhysMod, only : UpdateLitRPhys
+  use SurfLitterPhysMod, only : UpdateLitRPhys
   implicit none
 
   private
@@ -194,6 +195,8 @@ module RedistMod
   !
   THETWZ(0,NY,NX)=AZMAX1((VLWatMicP(0,NY,NX)-VWatLitRHoldCapcity(NY,NX))/AREA(3,0,NY,NX))
   THETIZ(0,NY,NX)=AZMAX1((VLiceMicP(0,NY,NX)-VWatLitRHoldCapcity(NY,NX))/AREA(3,0,NY,NX))
+  THETWZ(0,NY,NX)=AZMAX1((VLWatMicP(0,NY,NX)-VWatLitRHoldCapcity(NY,NX))/AREA(3,0,NY,NX))
+  THETIZ(0,NY,NX)=AZMAX1((VLiceMicP(0,NY,NX)-VWatLitRHoldCapcity(NY,NX))/AREA(3,0,NY,NX))
   !THETWZ(0,NY,NX)=AZMAX1(AMIN1(1.0,VLWatMicP(0,NY,NX)/VLitR(NY,NX)))
   !THETIZ(0,NY,NX)=AZMAX1(AMIN1(1.0,VLiceMicP(0,NY,NX)/VLitR(NY,NX)))
   
@@ -333,6 +336,7 @@ module RedistMod
   !     SURFACE BOUNDARY WATER FLUXES
   !
   WI=PrecAtm(NY,NX)+IrrigSurface(NY,NX)   !total incoming water flux=rain/snowfall + irrigation
+  WI=PrecAtm(NY,NX)+IrrigSurface(NY,NX)   !total incoming water flux=rain/snowfall + irrigation
   CRAIN=CRAIN+WI
   URAIN(NY,NX)=URAIN(NY,NX)+WI
   WO=VapXAir2GSurf(NY,NX)+TEVAPP(NY,NX) !total outgoing water flux
@@ -345,6 +349,7 @@ module RedistMod
   !
   !     SURFACE BOUNDARY HEAT FLUXES
   !
+  HEATIN=HEATIN+cpw*TairK(NY,NX)*PrecRainAndSurfirrig(NY,NX)+cps*TairK(NY,NX)*SnoFalPrec(NY,NX)
   HEATIN=HEATIN+cpw*TairK(NY,NX)*PrecRainAndSurfirrig(NY,NX)+cps*TairK(NY,NX)*SnoFalPrec(NY,NX)
   HEATIN=HEATIN+HeatNet2Surf(NY,NX)+THFLXC(NY,NX)
   D5150: DO L=1,JS
@@ -570,6 +575,7 @@ module RedistMod
   !     begin_execution
   !
   IF(ABS(TWat2GridBySurfRunoff(NY,NX)).GT.ZEROS(NY,NX))THEN
+  IF(ABS(TWat2GridBySurfRunoff(NY,NX)).GT.ZEROS(NY,NX))THEN
     !
     !     DOC, DON, DOP
     !
@@ -705,6 +711,7 @@ module RedistMod
 !
 
   NumOfLitrCmplxs   = micpar%NumOfLitrCmplxs
+  NumOfLitrCmplxs   = micpar%NumOfLitrCmplxs
 
   DES(:)=0.0_r8
   DO K=1,jcplx
@@ -714,6 +721,7 @@ module RedistMod
   OMCL(0,NY,NX)=0.0_r8
   OMNL(0,NY,NX)=0.0_r8
 
+  DO K=1,NumOfLitrCmplxs
   DO K=1,NumOfLitrCmplxs
     !
     ! TOTAL heterotrophic MICROBIAL C,N,P
@@ -1009,6 +1017,7 @@ module RedistMod
     !
     !     RESIDUE FROM PLANT LITTERFALL
 !
+    D8565: DO K=1,micpar%NumOfPlantLitrCmplxs
     D8565: DO K=1,micpar%NumOfPlantLitrCmplxs
       DO  M=1,jsken
         OSA(M,K,L,NY,NX)=OSA(M,K,L,NY,NX)+LitrfalChemElemnts_vr(ielmc,M,K,L,NY,NX)*micpar%OMCI(1,K)
@@ -1431,6 +1440,7 @@ module RedistMod
     !     K=2:manure, K=3:POC, K=4:humus)
 !
   NumOfLitrCmplxs  = micpar%NumOfLitrCmplxs
+  NumOfLitrCmplxs  = micpar%NumOfLitrCmplxs
 
   DES(:)=0.0_r8
   OM(:)=0.0_r8
@@ -1542,6 +1552,7 @@ module RedistMod
 !     FLWR,HFLWR=water,heat flux into litter
 !     HEATIN=cumulative net surface heat transfer
 !
+  DO   K=1,micpar%NumOfPlantLitrCmplxs
   DO   K=1,micpar%NumOfPlantLitrCmplxs
     DO  M=1,jsken
       OSA(M,K,0,NY,NX)=OSA(M,K,0,NY,NX)+LitrfalChemElemnts_vr(ielmc,M,K,0,NY,NX)*micpar%OMCI(1,K)

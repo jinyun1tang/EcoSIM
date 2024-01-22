@@ -46,6 +46,7 @@ implicit none
   real(r8) :: PPT       !total plant population, [d-2]
   real(r8) :: POROS1    !top layer soil porosity
   real(r8) :: WindSpeedAtm        !wind speed, [m h-1]
+  real(r8) :: WindSpeedAtm        !wind speed, [m h-1]
   real(r8), pointer :: PlantElemntStoreLandscape(:)  => null() !total plant element balance	g d-2
   real(r8) :: WindMesHeight        !wind speed measurement height, [m]
   real(r8) :: ZEROS2    !threshold zero
@@ -176,6 +177,8 @@ implicit none
   real(r8), pointer :: RadNet2CanP(:)     => null() !canopy net radiation , [MJ d-2 h-1]
   real(r8), pointer :: CanopySWabsorpty_pft(:)     => null() !canopy shortwave absorptivity , [-]
   real(r8), pointer :: CanopyPARabsorpty_pft(:)     => null() !canopy PAR absorptivity
+  real(r8), pointer :: CanopySWabsorpty_pft(:)     => null() !canopy shortwave absorptivity , [-]
+  real(r8), pointer :: CanopyPARabsorpty_pft(:)     => null() !canopy PAR absorptivity
   real(r8), pointer :: TAUR(:)     => null() !canopy shortwave transmissivity , [-]
   real(r8), pointer :: TAUP(:)     => null() !canopy PAR transmissivity , [-]
   real(r8), pointer :: RadPARbyCanopy_pft(:)     => null() !canopy absorbed PAR , [umol m-2 s-1]
@@ -199,6 +202,7 @@ implicit none
   real(r8), pointer :: Max1stRootRadius1(:,:)     => null() !root diameter primary axes, [m]
   real(r8), pointer :: Max2ndRootRadius1(:,:)     => null() !root diameter secondary axes, [m]
   real(r8), pointer :: SeedCMass(:)         => null() !grain size at seeding, [g]
+  real(r8), pointer :: RootPoreTortu4Gas(:,:)      => null() !power function of root porosity used to calculate root gaseous diffusivity, [-]
   real(r8), pointer :: RootPoreTortu4Gas(:,:)      => null() !power function of root porosity used to calculate root gaseous diffusivity, [-]
   real(r8), pointer :: PrimRootLen(:,:,:,:)  => null() !root layer length primary axes, [m d-2]
   real(r8), pointer :: SecndRootLen(:,:,:,:)  => null() !root layer length secondary axes, [m d-2]
@@ -440,6 +444,7 @@ implicit none
   real(r8), pointer :: CNLF(:)     => null()  !maximum leaf N:C ratio, [g g-1]
   real(r8), pointer :: GrainSeedBiomCMean_brch(:,:)  => null()  !maximum grain C during grain fill, [g d-2]
   real(r8), pointer :: FNOD(:)     => null()  !parameter for allocation of growth to nodes, [-]
+  real(r8), pointer ::RootFracRemobilizableBiom(:)    => null()  !fraction of remobilizable nonstructural biomass in root, [-]
   real(r8), pointer ::RootFracRemobilizableBiom(:)    => null()  !fraction of remobilizable nonstructural biomass in root, [-]
 
   contains
@@ -1196,6 +1201,7 @@ implicit none
 
 
   allocate(this%RootFracRemobilizableBiom(JP1))
+  allocate(this%RootFracRemobilizableBiom(JP1))
   allocate(this%FNOD(JP1))
   allocate(this%GrainSeedBiomCMean_brch(MaxNumBranches,JP1))
   allocate(this%NoduGrowthYield_pft(JP1))
@@ -1534,6 +1540,7 @@ implicit none
 
   JZ1    => pltpar%JZ1
   NumOfCanopyLayers1    => pltpar%NumOfCanopyLayers1
+  NumOfCanopyLayers1    => pltpar%NumOfCanopyLayers1
   JP1    => pltpar%JP1
   NumOfLeafAzimuthSectors1   => pltpar%NumOfLeafAzimuthSectors
   NumOfSkyAzimuSects1   => pltpar%NumOfSkyAzimuSects1
@@ -1636,6 +1643,8 @@ implicit none
   allocate(this%RadNet2CanP(JP1))
   allocate(this%CanopySWabsorpty_pft(JP1))
   allocate(this%CanopyPARabsorpty_pft(JP1))
+  allocate(this%CanopySWabsorpty_pft(JP1))
+  allocate(this%CanopyPARabsorpty_pft(JP1))
   allocate(this%TAUP(JP1))
   allocate(this%TAUR(JP1))
   allocate(this%RadPARbyCanopy_pft(JP1))
@@ -1663,6 +1672,8 @@ implicit none
 !  if(associated(this%IALBY))deallocate(this%IALBY)
 !  if(associated(this%OMEGA))deallocate(this%OMEGA)
 !  if(associated(this%RadNet2CanP))deallocate(this%RadNet2CanP)
+!  if(allocated(CanopySWabsorpty_pft))deallocate(CanopySWabsorpty_pft)
+!  if(allocated(CanopyPARabsorpty_pft))deallocate(CanopyPARabsorpty_pft)
 !  if(allocated(CanopySWabsorpty_pft))deallocate(CanopySWabsorpty_pft)
 !  if(allocated(CanopyPARabsorpty_pft))deallocate(CanopyPARabsorpty_pft)
 !  if(allocated(TAUR))deallocate(TAUR)

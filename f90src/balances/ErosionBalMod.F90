@@ -120,6 +120,7 @@ implicit none
 !     MICROBIAL C,N,P
 !
       D1970: DO K=1,micpar%NumOfLitrCmplxs
+      D1970: DO K=1,micpar%NumOfLitrCmplxs
 
 !         OMC,OMN,OMP=microbial C,N,P
 !         ORC,ORN,ORP=microbial residue C,N,P
@@ -161,6 +162,7 @@ implicit none
 !
 !     MICROBIAL RESIDUE C,N,P
 !
+      D1900: DO K=1,micpar%NumOfLitrCmplxs
       D1900: DO K=1,micpar%NumOfLitrCmplxs
         D1940: DO M=1,ndbiomcp
           DO NE=1,NumPlantChemElmnts                   

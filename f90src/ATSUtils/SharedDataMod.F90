@@ -8,6 +8,8 @@ Module SharedDataMod
 !figure out the grid for ATS
 !  integer, intent(in) :: jzsoi            !number of soil layers
 !  integer, intent(in) :: js               !number of snow layers
+!  integer, intent(in) :: jzsoi            !number of soil layers
+!  integer, intent(in) :: js               !number of snow layers
 
 ! temporary data holder in ecosim
   real(r8) :: atm_n2, atm_o2,atm_co2,atm_ch4,atm_N2o,atm_H2,atm_NH3

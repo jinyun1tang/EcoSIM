@@ -11,7 +11,10 @@ module CanopyDataType
   __FILE__
 
   real(r8),target,allocatable ::  CanopyPARalbedo_pft(:,:,:)                        !canopy PAR albedo , [-]
+  real(r8),target,allocatable ::  CanopyPARalbedo_pft(:,:,:)                        !canopy PAR albedo , [-]
   real(r8),target,allocatable ::  TAUP(:,:,:)                        !canopy PAR transmissivity , [-]
+  real(r8),target,allocatable ::  CanopySWabsorpty_pft(:,:,:)                        !canopy shortwave absorptivity , [-]
+  real(r8),target,allocatable ::  CanopyPARabsorpty_pft(:,:,:)                        !canopy PAR absorptivity , [-]
   real(r8),target,allocatable ::  CanopySWabsorpty_pft(:,:,:)                        !canopy shortwave absorptivity , [-]
   real(r8),target,allocatable ::  CanopyPARabsorpty_pft(:,:,:)                        !canopy PAR absorptivity , [-]
   real(r8),target,allocatable ::  RSMX(:,:,:)                        !maximum stomatal resistance to vapor, [s m-1]
@@ -94,6 +97,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  CanWatg(:,:)                       !total canopy water content stored in dry matter, [m3 d-2]
   real(r8),target,allocatable ::  LWRadCanG(:,:)                         !total canopy LW emission, [MJ d-2 h-1]
   real(r8),target,allocatable ::  CanopySWAlbedo_pft(:,:,:)                        !canopy shortwave albedo , [-]
+  real(r8),target,allocatable ::  CanopySWAlbedo_pft(:,:,:)                        !canopy shortwave albedo , [-]
   real(r8),target,allocatable ::  TAUR(:,:,:)                        !canopy shortwave transmissivity , [-]
   real(r8),target,allocatable ::  PrecIntcptByCanopy_pft(:,:,:)                        !water flux into plant canopy, [m3 d-2 h-1]
   real(r8),target,allocatable ::  WatByPCanopy(:,:,:)                   !canopy held water content, [m3 d-2]
@@ -160,7 +164,10 @@ module CanopyDataType
 
   implicit none
   allocate(CanopyPARalbedo_pft(JP,JY,JX));     CanopyPARalbedo_pft=0._r8
+  allocate(CanopyPARalbedo_pft(JP,JY,JX));     CanopyPARalbedo_pft=0._r8
   allocate(TAUP(JP,JY,JX));     TAUP=0._r8
+  allocate(CanopySWabsorpty_pft(JP,JY,JX));     CanopySWabsorpty_pft=0._r8
+  allocate(CanopyPARabsorpty_pft(JP,JY,JX));     CanopyPARabsorpty_pft=0._r8
   allocate(CanopySWabsorpty_pft(JP,JY,JX));     CanopySWabsorpty_pft=0._r8
   allocate(CanopyPARabsorpty_pft(JP,JY,JX));     CanopyPARabsorpty_pft=0._r8
   allocate(RSMX(JP,JY,JX));     RSMX=0._r8
@@ -243,6 +250,7 @@ module CanopyDataType
   allocate(CanWatg(JY,JX));      CanWatg=0._r8
   allocate(LWRadCanG(JY,JX));       LWRadCanG=0._r8
   allocate(CanopySWAlbedo_pft(JP,JY,JX));     CanopySWAlbedo_pft=0._r8
+  allocate(CanopySWAlbedo_pft(JP,JY,JX));     CanopySWAlbedo_pft=0._r8
   allocate(TAUR(JP,JY,JX));     TAUR=0._r8
   allocate(PrecIntcptByCanopy_pft(JP,JY,JX));     PrecIntcptByCanopy_pft=0._r8
   allocate(WatByPCanopy(JP,JY,JX));    WatByPCanopy=0._r8
@@ -310,7 +318,10 @@ module CanopyDataType
   implicit none
 
   call destroy(CanopyPARalbedo_pft)
+  call destroy(CanopyPARalbedo_pft)
   call destroy(TAUP)
+  call destroy(CanopySWabsorpty_pft)
+  call destroy(CanopyPARabsorpty_pft)
   call destroy(CanopySWabsorpty_pft)
   call destroy(CanopyPARabsorpty_pft)
   call destroy(RSMX)
@@ -392,6 +403,7 @@ module CanopyDataType
   call destroy(THFLXC)
   call destroy(CanWatg)
   call destroy(LWRadCanG)
+  call destroy(CanopySWAlbedo_pft)
   call destroy(CanopySWAlbedo_pft)
   call destroy(TAUR)
   call destroy(PrecIntcptByCanopy_pft)

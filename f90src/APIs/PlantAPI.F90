@@ -94,6 +94,8 @@ implicit none
     WGLFT(L,NY,NX)=plt_biom%WGLFT(L)
     CanopyStemA_lyr(L,NY,NX)=plt_morph%CanopyStemA_lyr(L)
     CanopyLAgrid_lyr(L,NY,NX)=plt_morph%CanopyLAgrid_lyr(L)
+    CanopyStemA_lyr(L,NY,NX)=plt_morph%CanopyStemA_lyr(L)
+    CanopyLAgrid_lyr(L,NY,NX)=plt_morph%CanopyLAgrid_lyr(L)
   ENDDO
   DO L=NU(NY,NX),NL(NY,NX)
     DO K=1,jcplx
@@ -121,6 +123,7 @@ implicit none
     DO  K=1,micpar%NumOfPlantLitrCmplxs
       DO NE=1,NumPlantChemElmnts
         DO  M=1,jsken
+          LitrfalChemElemnts_vr(NE,M,K,L,NY,NX)=plt_bgcr%LitrfalChemElemnts_vr(NE,M,K,L)
           LitrfalChemElemnts_vr(NE,M,K,L,NY,NX)=plt_bgcr%LitrfalChemElemnts_vr(NE,M,K,L)
         ENDDO
       ENDDO
@@ -301,6 +304,7 @@ implicit none
     ENDDO
 
     DO L=0,JZ
+      DO K=1,micpar%NumOfPlantLitrCmplxs
       DO K=1,micpar%NumOfPlantLitrCmplxs
         DO M=1,jsken
           LitterFallChemElmnt_pftvr(1:NumPlantChemElmnts,M,K,L,NZ,NY,NX)=plt_bgcr%LitterFallChemElmnt_pftvr(1:NumPlantChemElmnts,M,K,L,NZ)
@@ -835,6 +839,7 @@ implicit none
 !plant properties end
 
     plt_morph%CanopyArea_pft(NZ)=CanopyArea_pft(NZ,NY,NX)
+    plt_morph%CanopyArea_pft(NZ)=CanopyArea_pft(NZ,NY,NX)
     plt_distb%IYRX(NZ)=IYRX(NZ,NY,NX)
     plt_distb%IDAYX(NZ)=IDAYX(NZ,NY,NX)
     plt_distb%IYRY(NZ)=IYRY(NZ,NY,NX)
@@ -909,6 +914,7 @@ implicit none
     plt_morph%CanopyStemA_lyr(L)=CanopyStemA_lyr(L,NY,NX)
     plt_biom%WGLFT(L)=WGLFT(L,NY,NX)
     plt_morph%CanopyLAgrid_lyr(L)=CanopyLAgrid_lyr(L,NY,NX)
+    plt_morph%CanopyLAgrid_lyr(L)=CanopyLAgrid_lyr(L,NY,NX)
   ENDDO
 
   plt_allom%FWOODE(1:NumPlantChemElmnts,1:NumOfPlantLitrCmplxs)=FWOODE(1:NumPlantChemElmnts,1:NumOfPlantLitrCmplxs)
@@ -939,6 +945,7 @@ implicit none
     DO  K=1,micpar%NumOfPlantLitrCmplxs
       DO NE=1,NumPlantChemElmnts
         DO  M=1,jsken
+          plt_bgcr%LitrfalChemElemnts_vr(NE,M,K,L)=LitrfalChemElemnts_vr(NE,M,K,L,NY,NX)
           plt_bgcr%LitrfalChemElemnts_vr(NE,M,K,L)=LitrfalChemElemnts_vr(NE,M,K,L,NY,NX)
         ENDDO
       ENDDO
@@ -1473,6 +1480,7 @@ implicit none
     plt_rad%CanopySWabsorpty_pft(NZ)=CanopySWabsorpty_pft(NZ,NY,NX)
     plt_rad%CanopyPARabsorpty_pft(NZ)=CanopyPARabsorpty_pft(NZ,NY,NX)
     plt_rad%TAUR(NZ)=TAUR(NZ,NY,NX)
+    plt_rad%CanopySWAlbedo_pft(NZ)=CanopySWAlbedo_pft(NZ,NY,NX)
     plt_rad%CanopySWAlbedo_pft(NZ)=CanopySWAlbedo_pft(NZ,NY,NX)
     plt_rad%TAUP(NZ)=TAUP(NZ,NY,NX)
     plt_rad%CanopyPARalbedo_pft(NZ)=CanopyPARalbedo_pft(NZ,NY,NX)

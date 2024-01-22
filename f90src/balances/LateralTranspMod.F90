@@ -164,6 +164,8 @@ implicit none
 !
   TWat2GridBySurfRunoff(NY,NX)=0.0_r8
   THeat2GridBySurfRunoff(NY,NX)=0.0_r8
+  TWat2GridBySurfRunoff(NY,NX)=0.0_r8
+  THeat2GridBySurfRunoff(NY,NX)=0.0_r8
 !
 !     INITIALIZE NET SOLUTE AND GAS FLUXES FOR RUNOFF
 !
@@ -248,6 +250,8 @@ implicit none
   !
   !     TWat2GridBySurfRunoff,TQS,TQW,TQI=net water and snowpack snow,water,ice runoff
   !     THeat2GridBySurfRunoff,THQS=net convective heat from surface water and snow runoff
+  !     TWat2GridBySurfRunoff,TQS,TQW,TQI=net water and snowpack snow,water,ice runoff
+  !     THeat2GridBySurfRunoff,THQS=net convective heat from surface water and snow runoff
   !     QR,HQR=runoff, convective heat from runoff from watsub.f
   !     QS,QW,QI=snow,water,ice transfer from watsub.f
   !     HQS=convective heat transfer from snow,water,ice transfer from watsub.f
@@ -255,6 +259,7 @@ implicit none
 
   D1202: DO NN=1,2
     !water flux
+    TWat2GridBySurfRunoff(N2,N1)=TWat2GridBySurfRunoff(N2,N1)+Wat2GridBySurfRunoff(N,NN,N2,N1)
     TWat2GridBySurfRunoff(N2,N1)=TWat2GridBySurfRunoff(N2,N1)+Wat2GridBySurfRunoff(N,NN,N2,N1)
     !heat flux
     THeat2GridBySurfRunoff(N2,N1)=THeat2GridBySurfRunoff(N2,N1)+Heat2GridBySurfRunoff(N,NN,N2,N1)
@@ -268,6 +273,7 @@ implicit none
     IF(IFLBH(N,NN,N5,N4).EQ.0)THEN
       !there is lateral runoff
       !water flux
+      TWat2GridBySurfRunoff(N2,N1)=TWat2GridBySurfRunoff(N2,N1)-Wat2GridBySurfRunoff(N,NN,N5,N4)
       TWat2GridBySurfRunoff(N2,N1)=TWat2GridBySurfRunoff(N2,N1)-Wat2GridBySurfRunoff(N,NN,N5,N4)
       !heat flux
       THeat2GridBySurfRunoff(N2,N1)=THeat2GridBySurfRunoff(N2,N1)-Heat2GridBySurfRunoff(N,NN,N5,N4)
@@ -295,6 +301,7 @@ implicit none
       !     WRITE(*,6631)'TQRB',I,J,N1,N2,N4B,N5B,N,NN
       !    2,IFLBH(N,NN,N5B,N4B)
       !    2,TWat2GridBySurfRunoff(N2,N1),Wat2GridBySurfRunoff(N,NN,N5B,N4B)
+      !    2,TWat2GridBySurfRunoff(N2,N1),Wat2GridBySurfRunoff(N,NN,N5B,N4B)
 !6631  FORMAT(A8,9I4,12E12.4)
     ENDIF
   ENDDO D1202
@@ -304,7 +311,10 @@ implicit none
 !------------------------------------------------------------------------------------------
 
   subroutine TotalFluxFromSedmentTransp(N,N1,N2,N4,N5,N4B,N5B,NY,NX)
+  subroutine TotalFluxFromSedmentTransp(N,N1,N2,N4,N5,N4B,N5B,NY,NX)
     implicit none
+    integer, intent(in) :: N   !direction of calculation
+    integer, intent(in) :: N1,N2,N4,N5,N4B,N5B,NY,NX
     integer, intent(in) :: N   !direction of calculation
     integer, intent(in) :: N1,N2,N4,N5,N4B,N5B,NY,NX
 

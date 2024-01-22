@@ -32,6 +32,7 @@ implicit none
   integer :: ids_nutb_beg,ids_nutb_end
 ! salt tracers
   integer :: idsalt_beg,idsalt_end
+  integer :: idsalt_beg,idsalt_end
 
   integer :: idsalt_Al      ! Al
   integer :: idsalt_Fe      ! Fe

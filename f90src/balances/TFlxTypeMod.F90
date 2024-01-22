@@ -91,6 +91,8 @@ implicit none
 
   allocate(TWat2GridBySurfRunoff(JY,JX));         TWat2GridBySurfRunoff=0._r8
   allocate(THeat2GridBySurfRunoff(JY,JX));        THeat2GridBySurfRunoff=0._r8
+  allocate(TWat2GridBySurfRunoff(JY,JX));         TWat2GridBySurfRunoff=0._r8
+  allocate(THeat2GridBySurfRunoff(JY,JX));        THeat2GridBySurfRunoff=0._r8
 
 !  allocate(TFLWS(JS,JY,JX));    TFLWS=0._r8
 !  allocate(TFLWW(JS,JY,JX));    TFLWW=0._r8
