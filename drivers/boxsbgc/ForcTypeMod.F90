@@ -189,7 +189,6 @@ implicit none
  !litter layer
     real(r8) :: VLitR      !surface litter volume, [m3 d-2]
     real(r8) :: VWatLitRHoldCapcity    !surface litter water holding capacity, [m3 d-2]
-    real(r8) :: VWatLitRHoldCapcity    !surface litter water holding capacity, [m3 d-2]
  !non litter layer
     real(r8) :: ROXYY       !total root + microbial O2 uptake from previous hour, [g d-2 h-1], updated in hour1
     real(r8) :: RN2OY       !total root + microbial N2O uptake from previous hour, [g d-2 h-1]

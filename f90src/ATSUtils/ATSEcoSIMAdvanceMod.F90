@@ -30,7 +30,7 @@ implicit none
   implicit none
   integer :: NY,NX,L,NHW,NHE,NVN,NVS, I, J, M, heat_vec_size
   integer, intent(in) :: NYS
-  real(r8) :: YSIN(JSA),YCOS(JSA),YAZI(JSA)
+  real(r8) :: YSIN(NumOfSkyAzimuSects),YCOS(NumOfSkyAzimuSects),SkyAzimuthAngle(NumOfSkyAzimuSects)
   real(r8) :: ResistanceLitRLay(JY,JX)
   real(r8) :: KSatReductByRainKineticEnergyS(JY,JX)
   real(r8) :: HeatFlux2Ground(JY,JX)

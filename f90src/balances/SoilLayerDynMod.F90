@@ -55,11 +55,9 @@ implicit none
   REAL(R8),INTENT(IN) :: DVLiceMicP(JZ)  !change in ice volume, initial-final
 
   real(r8) :: CDPTHY(0:JZ),CDPTHX(JZ)
-  real(r8) :: CDPTHY(0:JZ),CDPTHX(JZ)
   integer :: IFLGL(0:JZ,6)  !flag for soil thickness change
   real(r8) :: DDLYRX(3)
   integer :: NN,K,M,N,NR,NZ,L
-  integer :: L0,L1,NUX,itoplyr_type,ICHKL,NGL
   integer :: L0,L1,NUX,itoplyr_type,ICHKL,NGL
   real(r8) :: FX,FY
   real(r8) :: FBO
@@ -184,12 +182,9 @@ implicit none
 ! begin_execution
 
   DDLYX=0._r8
-  DDLYX=0._r8
 ! starting from bottom up
   D225: DO LX=NL(NY,NX),NU(NY,NX),-1
     !make a copy of the depth, bottom of the layer
-    CDPTHX(LX)=CumDepth2LayerBottom(LX,NY,NX)
-    CDPTHY(LX)=CumDepth2LayerBottom(LX,NY,NX)
     CDPTHX(LX)=CumDepth2LayerBottom(LX,NY,NX)
     CDPTHY(LX)=CumDepth2LayerBottom(LX,NY,NX)
     !
@@ -222,7 +217,6 @@ implicit none
             ! already has significant micropore volume/thickness
             IFLGL(LX,ich_watlev)=1
           ELSE
-            ! has no solid thickness
             ! has no solid thickness
             IFLGL(LX,ich_watlev)=2
           ENDIF
@@ -261,33 +255,23 @@ implicit none
       !DENSJ: volume added per unit addition of ice (with respect to ice)
       !the change is put to layer thickness
       !DDLWatEqv_IceMicP: added thickness change
-      !DDLWatEqv_IceMicP: added thickness change
       ! 4: due to freeze-thaw
       IF(ABS(DVLiceMicP(LX)).GT.ZEROS(NY,NX))THEN
-      IF(ABS(DVLiceMicP(LX)).GT.ZEROS(NY,NX))THEN
         DENSJ=1._r8-DENSICE
-        DDLWatEqv_IceMicP=DVLiceMicP(LX)*DENSJ/AREA(3,LX,NY,NX)
         DDLWatEqv_IceMicP=DVLiceMicP(LX)*DENSJ/AREA(3,LX,NY,NX)
         !bottom layer
         IF(LX.EQ.NL(NY,NX))THEN
           DDLYX(LX,ich_frzthaw)=DDLWatEqv_IceMicP
-          DDLYX(LX,ich_frzthaw)=DDLWatEqv_IceMicP
           DDLYR(LX,ich_frzthaw)=0.0_r8
           IFLGL(LX,ich_frzthaw)=0
          !not bottom layer
-         !not bottom layer
         ELSE
-          !add depth of two layers
-          DDLYX(LX,ich_frzthaw)=DDLWatEqv_IceMicP+DDLYX(LX+1,ich_frzthaw)
-          !make a copy 
           !add depth of two layers
           DDLYX(LX,ich_frzthaw)=DDLWatEqv_IceMicP+DDLYX(LX+1,ich_frzthaw)
           !make a copy 
           DDLYR(LX,ich_frzthaw)=DDLYX(LX+1,ich_frzthaw)
           !    2+DLYRI(3,LX,NY,NX)-DLYR(3,LX,NY,NX)
           IFLGL(LX,ich_frzthaw)=0
-
-          !top soil layer or layer above is water
 
           !top soil layer or layer above is water
           IF(LX.EQ.NU(NY,NX).OR.SoiBulkDensity(LX-1,NY,NX).LE.ZERO)THEN
@@ -299,7 +283,6 @@ implicit none
         ENDIF
       ELSE
         ! no change in ice volume
-        DDLWatEqv_IceMicP=0.0_r8
         DDLWatEqv_IceMicP=0.0_r8
         IF(LX.EQ.NL(NY,NX))THEN
           DDLYX(LX,ich_frzthaw)=0.0_r8
@@ -321,7 +304,6 @@ implicit none
 !      TDVOLI=TDVOLI+DVLiceMicP(LX)
 !      TDLYXF=TDLYXF+DDLWatEqv_IceMicP
       !
-      !     EROSION model is on
       !     EROSION model is on
       !
       IF((iErosionMode.EQ.ieros_frzthaweros.OR.iErosionMode.EQ.ieros_frzthawsomeros) &
@@ -346,9 +328,7 @@ implicit none
 
       !
       ! SOC GAIN OR LOSS, i.e. DORGC(LX) significantly non-zero
-      ! SOC GAIN OR LOSS, i.e. DORGC(LX) significantly non-zero
       ! SoilFracAsMacP: macropore fraction
-      ! DDLEqv_OrgC: soil thickness added due to change in organic matter,
       ! DDLEqv_OrgC: soil thickness added due to change in organic matter,
       ! keeping macropore fraction
       ! SoiBulkDensityt0: initial bulk density,
@@ -415,12 +395,10 @@ implicit none
           IF(IFLGL(LX,NN).NE.0)THEN
             CumDepth2LayerBottom(LX,NY,NX)=CumDepth2LayerBottom(LX,NY,NX)+DDLYR(LX,NN)
             CDPTHY(LX)=CDPTHY(LX)+DDLYR(LX,NN)
-            CDPTHY(LX)=CDPTHY(LX)+DDLYR(LX,NN)
             !  not top layer
             IF(LX.NE.NU(NY,NX).AND.IFLGL(LX,ich_watlev).EQ.2)THEN
               DO  LL=LX-1,0,-1
                 CumDepth2LayerBottom(LL,NY,NX)=CumDepth2LayerBottom(LL,NY,NX)+DDLYX(LX,NN)
-                CDPTHY(LL)=CDPTHY(LL)+DDLYX(LX,NN)
                 CDPTHY(LL)=CDPTHY(LL)+DDLYX(LX,NN)
               ENDDO
               DDLYX(LX,NN)=0.0_r8
@@ -443,11 +421,9 @@ implicit none
           IF(NN.EQ.ich_frzthaw)THEN
             CumDepth2LayerBottom(LX,NY,NX)=CumDepth2LayerBottom(LX,NY,NX)+DDLYR(LX,NN)
             !     CDPTHY(LX)=CDPTHY(LX)+DDLYR(LX,NN)
-            !     CDPTHY(LX)=CDPTHY(LX)+DDLYR(LX,NN)
 ! top layer
             IF(LX.EQ.NU(NY,NX))THEN
               CumDepth2LayerBottom(LX-1,NY,NX)=CumDepth2LayerBottom(LX-1,NY,NX)+DDLYR(LX-1,NN)
-              !     CDPTHY(LX-1)=CDPTHY(LX-1)+DDLYR(LX-1,NN)
               !     CDPTHY(LX-1)=CDPTHY(LX-1)+DDLYR(LX-1,NN)
 
             ENDIF
@@ -458,11 +434,9 @@ implicit none
           IF(NN.EQ.ich_erosion.AND.IFLGL(LX,NN).EQ.1)THEN
             CumDepth2LayerBottom(LX,NY,NX)=CumDepth2LayerBottom(LX,NY,NX)+DDLYR(LX,NN)
             CDPTHY(LX)=CDPTHY(LX)+DDLYR(LX,NN)
-            CDPTHY(LX)=CDPTHY(LX)+DDLYR(LX,NN)
 
             IF(LX.EQ.NU(NY,NX))THEN
               CumDepth2LayerBottom(LX-1,NY,NX)=CumDepth2LayerBottom(LX-1,NY,NX)+DDLYR(LX,NN)
-              CDPTHY(LX-1)=CDPTHY(LX-1)+DDLYR(LX,NN)
               CDPTHY(LX-1)=CDPTHY(LX-1)+DDLYR(LX,NN)
             ENDIF
           ENDIF
@@ -472,18 +446,15 @@ implicit none
           IF(NN.EQ.ich_somloss.AND.IFLGL(LX,NN).EQ.1)THEN
             CumDepth2LayerBottom(LX,NY,NX)=CumDepth2LayerBottom(LX,NY,NX)+DDLYR(LX,NN)
             CDPTHY(LX)=CDPTHY(LX)+DDLYR(LX,NN)
-            CDPTHY(LX)=CDPTHY(LX)+DDLYR(LX,NN)
 
             IF(LX.EQ.NU(NY,NX).OR.SoiBulkDensity(LX-1,NY,NX).LE.ZERO)THEN
               CumDepth2LayerBottom(LX-1,NY,NX)=CumDepth2LayerBottom(LX-1,NY,NX)+DDLYR(LX-1,NN)
-              CDPTHY(LX-1)=CDPTHY(LX-1)+DDLYR(LX-1,NN)
               CDPTHY(LX-1)=CDPTHY(LX-1)+DDLYR(LX-1,NN)
 
               IF(SoiBulkDensity(LX-1,NY,NX).LE.ZERO)THEN
                 DO  LY=LX-2,0,-1
                   IF(SoiBulkDensity(LY+1,NY,NX).LE.ZERO)THEN
                     CumDepth2LayerBottom(LY,NY,NX)=CumDepth2LayerBottom(LY,NY,NX)+DDLYR(LX-1,NN)
-                    CDPTHY(LY)=CDPTHY(LY)+DDLYR(LX-1,NN)
                     CDPTHY(LY)=CDPTHY(LY)+DDLYR(LX-1,NN)
                   ENDIF
                 ENDDO
@@ -534,9 +505,6 @@ implicit none
         DLEqv_MicP=(VLWatMicP(L0,NY,NX)+VLiceMicP(L0,NY,NX))/AREA(3,L0,NY,NX)
         IF(DLEqv_MicP.GT.ZERO)THEN
           FX=AMIN1(1.0_r8,DDLYRX(NN)/DLEqv_MicP)
-        DLEqv_MicP=(VLWatMicP(L0,NY,NX)+VLiceMicP(L0,NY,NX))/AREA(3,L0,NY,NX)
-        IF(DLEqv_MicP.GT.ZERO)THEN
-          FX=AMIN1(1.0_r8,DDLYRX(NN)/DLEqv_MicP)
           FO=FX
         ELSE
           FX=0.0_r8
@@ -564,9 +532,6 @@ implicit none
       L0=0
     ENDIF
     IF(SoiBulkDensity(L0,NY,NX).LE.ZERO)THEN
-      DLEqv_MicP=(VLWatMicP(L0,NY,NX)+VLiceMicP(L0,NY,NX))/AREA(3,L0,NY,NX)
-      IF(DLEqv_MicP.GT.ZERO)THEN
-        FX=AMIN1(1.0,-DDLYRX(NN)/DLEqv_MicP)
       DLEqv_MicP=(VLWatMicP(L0,NY,NX)+VLiceMicP(L0,NY,NX))/AREA(3,L0,NY,NX)
       IF(DLEqv_MicP.GT.ZERO)THEN
         FX=AMIN1(1.0,-DDLYRX(NN)/DLEqv_MicP)
@@ -634,7 +599,6 @@ implicit none
     ENDIF
     CumDepth2LayerBottom(L,NY,NX)=CumDepth2LayerBottom(L,NY,NX)+DDLYRY(L)
   !     CDPTHY(L)=CDPTHY(L)+DDLYRY(L)
-  !     CDPTHY(L)=CDPTHY(L)+DDLYRY(L)
     DLYR(3,L,NY,NX)=DLYR(3,L,NY,NX)+DDLYRY(L)
     SoiDepthMidLay(L,NY,NX)=0.5_r8*(CumDepth2LayerBottom(L,NY,NX)+CumDepth2LayerBottom(L-1,NY,NX))
     CumSoilThickness(L,NY,NX)=CumDepth2LayerBottom(L,NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)
@@ -650,8 +614,6 @@ implicit none
       DPTHZ(L,NY,NX)=0.5_r8*(CumSoilThickness(L,NY,NX)+CumSoilThickness(L-1,NY,NX))
     ENDIF
     IF(SoiBulkDensity(L,NY,NX).GT.ZERO)THEN
-    !     DDLYRX(NN)=CumDepth2LayerBottom(L,NY,NX)-CDPTHX(L)
-      DDLYRX(NN)=CDPTHY(L)-CDPTHX(L)
     !     DDLYRX(NN)=CumDepth2LayerBottom(L,NY,NX)-CDPTHX(L)
       DDLYRX(NN)=CDPTHY(L)-CDPTHX(L)
     ENDIF
@@ -691,16 +653,13 @@ implicit none
     XVOLWP=AZMAX1(VLWatMicP(0,NY,NX)-MaxVLWatByLitR(NY,NX))
     IF(L.EQ.NU(NY,NX).AND.CumDepth2LayerBottom(0,NY,NX).GT.CumSoilDeptht0(NY,NX) &
       .AND.XVOLWP.GT.MaxVLWatByLitR(NY,NX)+VHCPNX(NY,NX)/cpw)THEN
-      .AND.XVOLWP.GT.MaxVLWatByLitR(NY,NX)+VHCPNX(NY,NX)/cpw)THEN
           !     IF((SoiBulkDensity(L,NY,NX).GT.ZERO.AND.NU(NY,NX).GT.NUI(NY,NX))
           !    2.OR.(SoiBulkDensity(L,NY,NX).LE.ZERO))THEN
       IF(SoiBulkDensity(L,NY,NX).GT.ZERO.AND.NU(NY,NX).GT.NUI(NY,NX))THEN
         NU(NY,NX)=NUI(NY,NX)
         NUM(NY,NX)=NUI(NY,NX)
         DDLYRX(NN)=(MaxVLWatByLitR(NY,NX)-XVOLWP)/AREA(3,0,NY,NX)
-        DDLYRX(NN)=(MaxVLWatByLitR(NY,NX)-XVOLWP)/AREA(3,0,NY,NX)
         IFLGL(L,NN)=1
-        DLYR0=(AZMAX1(VLWatMicP(0,NY,NX)+VLiceMicP(0,NY,NX)-VWatLitRHoldCapcity(NY,NX)) &
         DLYR0=(AZMAX1(VLWatMicP(0,NY,NX)+VLiceMicP(0,NY,NX)-VWatLitRHoldCapcity(NY,NX)) &
           +VLitR(NY,NX))/AREA(3,0,NY,NX)
         DLYR(3,0,NY,NX)=DLYR0+DDLYRX(NN)
@@ -709,11 +668,9 @@ implicit none
           DO LL=L-2,NU(NY,NX),-1
             CumDepth2LayerBottom(LL,NY,NX)=CumDepth2LayerBottom(L-1,NY,NX)
             CDPTHY(LL)=CDPTHY(L-1)
-            CDPTHY(LL)=CDPTHY(L-1)
           ENDDO
         ENDIF
         CumDepth2LayerBottom(0,NY,NX)=CumDepth2LayerBottom(NU(NY,NX),NY,NX)-DLYR(3,NU(NY,NX),NY,NX)
-        CDPTHY(0)=CDPTHY(NU(NY,NX))-DLYR(3,NU(NY,NX),NY,NX)
         CDPTHY(0)=CDPTHY(NU(NY,NX))-DLYR(3,NU(NY,NX),NY,NX)
         SoiDepthMidLay(NU(NY,NX),NY,NX)=0.5_r8*(CumDepth2LayerBottom(NU(NY,NX),NY,NX)+CumDepth2LayerBottom(0,NY,NX))
         CumSoilThickness(NU(NY,NX),NY,NX)=DLYR(3,NU(NY,NX),NY,NX)
@@ -737,7 +694,6 @@ implicit none
   integer, intent(in) :: L1  !source
   integer, intent(in) :: NY,NX,NN
   real(r8), intent(in) :: FX,FY
-  real(r8), intent(inout) :: CDPTHY(0:JZ)
   real(r8), intent(inout) :: CDPTHY(0:JZ)
   integer, intent(in) ::  IFLGL(0:JZ,6)
   integer :: N,M,NZ,K,NGL,NR,NE,NTU,NTSA,NTSAB,NTG,NTP
@@ -794,9 +750,6 @@ implicit none
     DO NTSA=idsalt_beg,idsalt_end
       trcSalt_solml(NTSA,L1,NY,NX)=trcSalt_solml(NTSA,L1,NY,NX)&
         +FX*trcSalt_solml(NTSA,L0,NY,NX)
-    DO NTSA=idsalt_beg,idsalt_end
-      trcSalt_solml(NTSA,L1,NY,NX)=trcSalt_solml(NTSA,L1,NY,NX)&
-        +FX*trcSalt_solml(NTSA,L0,NY,NX)
     ENDDO
   ENDIF
 
@@ -807,8 +760,6 @@ implicit none
       +FX*trc_solml_vr(ids_H2PO4B,L0,NY,NX)
 
     IF(salt_model)THEN
-      DO NTSAB=idsaltb_beg,idsaltb_end
-        trcSalt_solml(NTSAB,L1,NY,NX)=trcSalt_solml(NTSAB,L1,NY,NX)+FX*trcSalt_solml(NTSAB,L0,NY,NX)
       DO NTSAB=idsaltb_beg,idsaltb_end
         trcSalt_solml(NTSAB,L1,NY,NX)=trcSalt_solml(NTSAB,L1,NY,NX)+FX*trcSalt_solml(NTSAB,L0,NY,NX)
       ENDDO
@@ -986,16 +937,12 @@ implicit none
   IF(salt_model)THEN
     DO NTSA=idsalt_beg,idsalt_end
       trcSalt_solml(NTSA,L0,NY,NX)=FY*trcSalt_solml(NTSA,L0,NY,NX)
-    DO NTSA=idsalt_beg,idsalt_end
-      trcSalt_solml(NTSA,L0,NY,NX)=FY*trcSalt_solml(NTSA,L0,NY,NX)
     ENDDO
   ENDIF
   IF(L0.NE.0)THEN
     trc_solml_vr(ids_H1PO4B,L0,NY,NX)=FY*trc_solml_vr(ids_H1PO4B,L0,NY,NX)
     trc_solml_vr(ids_H2PO4B,L0,NY,NX)=FY*trc_solml_vr(ids_H2PO4B,L0,NY,NX)
     IF(salt_model)THEN
-      DO NTSAB=idsaltb_beg,idsaltb_end
-        trcSalt_solml(NTSAB,L0,NY,NX)=FY*trcSalt_solml(NTSAB,L0,NY,NX)
       DO NTSAB=idsaltb_beg,idsaltb_end
         trcSalt_solml(NTSAB,L0,NY,NX)=FY*trcSalt_solml(NTSAB,L0,NY,NX)
       ENDDO
@@ -1124,7 +1071,6 @@ implicit none
     IF(SoiBulkDensity(L0,NY,NX).LE.ZERO.AND.SoiBulkDensity(L1,NY,NX).LE.ZERO &
       .AND.VLWatMicP(L0,NY,NX)+VLiceMicP(L0,NY,NX).LE.ZEROS(NY,NX))THEN
       CumDepth2LayerBottom(L1,NY,NX)=CumDepth2LayerBottom(L0,NY,NX)
-      CDPTHY(L1)=CDPTHY(L0)
       CDPTHY(L1)=CDPTHY(L0)
     ENDIF
   ENDIF
@@ -1402,10 +1348,6 @@ implicit none
         FXH=FHO*trcSalt_soHml(NTSA,L0,NY,NX)
         trcSalt_soHml(NTSA,L1,NY,NX)=trcSalt_soHml(NTSA,L1,NY,NX)+FXH
         trcSalt_soHml(NTSA,L0,NY,NX)=trcSalt_soHml(NTSA,L0,NY,NX)-FXH
-      DO NTSA=idsalt_beg,idsaltb_end
-        FXH=FHO*trcSalt_soHml(NTSA,L0,NY,NX)
-        trcSalt_soHml(NTSA,L1,NY,NX)=trcSalt_soHml(NTSA,L1,NY,NX)+FXH
-        trcSalt_soHml(NTSA,L0,NY,NX)=trcSalt_soHml(NTSA,L0,NY,NX)-FXH
       ENDDO
     ENDIF
 !
@@ -1433,10 +1375,6 @@ implicit none
   trc_solml_vr(ids_H2PO4B,L0,NY,NX)=trc_solml_vr(ids_H2PO4B,L0,NY,NX)-FXH2POB
 
   IF(salt_model)THEN
-    DO NTSAB=idsaltb_beg,idsaltb_end
-      FXB=FWO*trcSalt_solml(NTSAB,L0,NY,NX)
-      trcSalt_solml(NTSAB,L1,NY,NX)=trcSalt_solml(NTSAB,L1,NY,NX)+FXB
-      trcSalt_solml(NTSAB,L0,NY,NX)=trcSalt_solml(NTSAB,L0,NY,NX)-FXB
     DO NTSAB=idsaltb_beg,idsaltb_end
       FXB=FWO*trcSalt_solml(NTSAB,L0,NY,NX)
       trcSalt_solml(NTSAB,L1,NY,NX)=trcSalt_solml(NTSAB,L1,NY,NX)+FXB
@@ -1551,10 +1489,6 @@ implicit none
 !     SOIL SALT SOLUTES
 !
   IF(salt_model)THEN
-    DO NTSA=idsalt_beg,idsalt_end
-      FXZ=FWO*trcSalt_solml(NTSA,L0,NY,NX)
-      trcSalt_solml(NTSA,L1,NY,NX)=trcSalt_solml(NTSA,L1,NY,NX)+FXZ
-      trcSalt_solml(NTSA,L0,NY,NX)=trcSalt_solml(NTSA,L0,NY,NX)-FXZ
     DO NTSA=idsalt_beg,idsalt_end
       FXZ=FWO*trcSalt_solml(NTSA,L0,NY,NX)
       trcSalt_solml(NTSA,L1,NY,NX)=trcSalt_solml(NTSA,L1,NY,NX)+FXZ
@@ -1730,7 +1664,6 @@ implicit none
 !             SatHydroCondHrzn(L1,NY,NX)=SatHydroCondHrzn(L1,NY,NX)+FXSCNH
 !             SatHydroCondHrzn(L0,NY,NX)=SatHydroCondHrzn(L0,NY,NX)-FXSCNH
   IF(L0.EQ.0)THEN
-    FXVOLW=FX*AZMAX1(XVOLWP-MaxVLWatByLitR(NY,NX))
     FXVOLW=FX*AZMAX1(XVOLWP-MaxVLWatByLitR(NY,NX))
   ELSE
     FXVOLW=FWO*VLWatMicP(L0,NY,NX)
