@@ -56,39 +56,46 @@ Module SharedDataMod
   contains
 
   subroutine InitSharedData(ncells_per_col_,ncol)
-  use GridConsts, only : JX,JY,JZ
-  implicit none
-  integer, intent(in) :: ncells_per_col_   !number of vertical layers
-  integer, intent(in) :: ncol  !NUMBER of cols
-  !set # of soil layers
-  !JZSOI=JZs
-  !JX=1;JY=ncol;jz=jzs
-  JZ = ncells_per_col_
-  allocate(a_csand(ncells_per_col_,ncol))
-  allocate(a_CSILT(ncells_per_col_,ncol))   !silt mass fraction
-  !allocate(a_BKDSI(ncells_per_col_,ncol))   !bulk density
-  !allocate(a_CumDepth2LayerBottom(ncells_per_col_,ncol))   !dpeth (from surfce to bottom)
-  !allocate(a_FC(ncells_per_col_,ncol))      !field capacity
-  !allocate(a_WP(ncells_per_col_,ncol))      !wilting point
-  allocate(a_FHOL(ncells_per_col_,ncol))    !macropore fraction
-  allocate(a_ROCK(ncells_per_col_,ncol))    !mass fraction as rock
-  allocate(a_CORGC(ncells_per_col_,ncol))   !organic carbon content
-  allocate(a_CORGN(ncells_per_col_,ncol))   !organic nitrogen content
-  allocate(a_CORGP(ncells_per_col_,ncol))   !organic phosphorus content
-  !allocate(a_PORO(ncells_per_col_,ncol))
-  allocate(a_AREA3(ncells_per_col_))
-  allocate(a_NU(ncells_per_col_))
-  allocate(a_NL(ncells_per_col_))
-  allocate(a_ASP(ncells_per_col_))
-  allocate(a_ALT(ncells_per_col_))
-  !allocate(tairc(1:ncells_per_col_))
-  !allocate(uwind(1:ncells_per_col_))
-  !allocate(prec(1:ncells_per_col_))
-  !allocate(sunrad(1:ncells_per_col_))
-  !allocate(vpair(1:ncells_per_col_))
-  allocate(a_ATKA(1:ncells_per_col_))
-  a_NU=1
-  a_NL=ncells_per_col_
+    use GridConsts, only : JX,JY,JZ
+    implicit none
+    integer, intent(in) :: ncells_per_col_   !number of vertical layers
+    integer, intent(in) :: ncol  !NUMBER of cols
+    !set # of soil layers
+    !JZSOI=JZs
+    write(*,*) "In Shared data before setting: "
+    write(*,*) "JX=", JX, ", JY=", JY, ", JZ=", JZ
+    
+    JX=1;JY=ncol
+    JZ = ncells_per_col_
+   
+    write(*,*) "In Shared data after setting: "
+    write(*,*) "JX=", JX, ", JY=", JY, ", JZ=", JZ
+
+    allocate(a_csand(ncells_per_col_,ncol))
+    allocate(a_CSILT(ncells_per_col_,ncol))   !silt mass fraction
+    !allocate(a_BKDSI(ncells_per_col_,ncol))   !bulk density
+    !allocate(a_CumDepth2LayerBottom(ncells_per_col_,ncol))   !dpeth (from surfce to bottom)
+    !allocate(a_FC(ncells_per_col_,ncol))      !field capacity
+    !allocate(a_WP(ncells_per_col_,ncol))      !wilting point
+    allocate(a_FHOL(ncells_per_col_,ncol))    !macropore fraction
+    allocate(a_ROCK(ncells_per_col_,ncol))    !mass fraction as rock
+    allocate(a_CORGC(ncells_per_col_,ncol))   !organic carbon content
+    allocate(a_CORGN(ncells_per_col_,ncol))   !organic nitrogen content
+    allocate(a_CORGP(ncells_per_col_,ncol))   !organic phosphorus content
+    !allocate(a_PORO(ncells_per_col_,ncol))
+    allocate(a_AREA3(ncells_per_col_))
+    allocate(a_NU(ncells_per_col_))
+    allocate(a_NL(ncells_per_col_))
+    allocate(a_ASP(ncells_per_col_))
+    allocate(a_ALT(ncells_per_col_))
+    !allocate(tairc(1:ncells_per_col_))
+    !allocate(uwind(1:ncells_per_col_))
+    !allocate(prec(1:ncells_per_col_))
+    !allocate(sunrad(1:ncells_per_col_))
+    !allocate(vpair(1:ncells_per_col_))
+    allocate(a_ATKA(1:ncells_per_col_))
+    a_NU=1
+    a_NL=ncells_per_col_
 
   end subroutine InitSharedData
 

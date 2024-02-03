@@ -37,8 +37,10 @@ implicit none
   !Setting some variables by hand as they are set to bad
   !Values by default in InitAlloc, should this change?
   FlowDirIndicator = 3 !Basically a switch, setting to 3 removes lateral flow
-  NJ = 1 !Is the number of layers down the roots go
+  MaxNumRootLays = 1 !Is the number of layers down the roots go
   NX=1
+
+  write(*,*) "In init"
 
   do NY=1,NYS
     NU(NY,NX)=a_NU(NY)
@@ -60,6 +62,10 @@ implicit none
     DO L=NU(NY,NX),NL(NY,NX)
       TKSoi1(L,NY,NX) = a_TEMP(L,NY)
       CumDepth2LayerBottom(L,NY,NX)=a_CumDepth2LayerBottom(L,NY)
+      write(*,*) "CumDepth2LayerBottom(", L, ",", NY, ",", NX, ") = ", &
+      CumDepth2LayerBottom(L,NY,NX), "  a_CumDepth2LayerBottom(", L, ",", NY, ") = ", &
+      a_CumDepth2LayerBottom(L,NY)
+
       SoiBulkDensityt0(L,NY,NX)=a_BKDSI(L,NY)
       CORGC(L,NY,NX)=a_CORGC(L,NY)
       CORGN(L,NY,NX)=a_CORGN(L,NY)
@@ -69,6 +75,8 @@ implicit none
 
   PSIAtFldCapacity = pressure_at_field_capacity
   PSIAtWiltPoint = pressure_at_wilting_point
+  write(*,*) "Calling Startsim"
+
   call startsim(NHW,NHE,NVN,NVS)
 
   end subroutine Init_EcoSIM_Soil

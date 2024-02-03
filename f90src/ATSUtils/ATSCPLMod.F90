@@ -25,7 +25,7 @@ contains
   real(r8), pointer :: data(:)
   real(r8), pointer :: data2D(:,:)
   integer :: ncol, nvar, size_col, num_cols
-  integer :: j1,j2,j3
+  integer :: j1,j2,j3,i,j
 
   call SetBGCSizes(sizes)
 
@@ -35,14 +35,58 @@ contains
   call c_f_pointer(state%water_content%data, data2D, [(/size_col/),(/num_cols/)])
   a_WC=data2D(:,:)
 
+  do j = 1, num_cols
+    do i = 1, size_col
+        a_WC(i, j) = data2D(i+4, j)
+     end do
+  end do
+
+  do i = 1, size_col
+     write(*,*) "WC", i, ", 1) = ", a_WC(i, 1)
+  end do
+
+
   call c_f_pointer(state%temperature%data, data2D, [(/size_col/),(/num_cols/)])
   a_TEMP=data2D(:,:)
+
+  do j = 1, num_cols
+    do i = 1, size_col
+        a_TEMP(i, j) = data2D(i+4, j)
+     end do
+  end do
+
+  do i = 1, size_col
+     write(*,*) "TEMP(", i, ", 1) = ", a_TEMP(i, 1)
+  end do
+
 
   call c_f_pointer(state%bulk_density%data, data2D, [(/size_col/),(/num_cols/)])
   a_BKDSI=data2D(:,:)
 
+  do j = 1, num_cols
+    do i = 1, size_col
+        a_BKDSI(i, j) = data2D(i+4, j)
+     end do
+  end do
+
+  do i = 1, size_col
+     write(*,*) "BKDSI(", i, ", 1) = ", a_BKDSI(i, 1)
+  end do
+
+
   call c_f_pointer(state%matric_pressure%data, data2D, [(/size_col/),(/num_cols/)])
   a_MATP=data2D(:,:)
+
+  do j = 1, num_cols
+    do i = 1, size_col
+        a_MATP(i, j) = data2D(i+4, j)
+     end do
+  end do
+
+  do i = 1, size_col
+     write(*,*) "MATP(", i, ", 1) = ", a_MATP(i, 1)
+  end do
+
 
   call c_f_pointer(state%porosity%data, data2D, [(/size_col/),(/num_cols/)])
   a_PORO=data2D(:,:)
@@ -56,8 +100,19 @@ contains
   call c_f_pointer(state%hydraulic_conductivity%data, data2D, [(/size_col/),(/num_cols/)])
   a_HCOND=data2D(:,:)
 
-  call c_f_pointer(props%depth_c%data, data2D, [(/size_col/),(/num_cols/)])
+  !changed to depth
+  call c_f_pointer(props%depth%data, data2D, [(/size_col/),(/num_cols/)])
   a_CumDepth2LayerBottom=data2D(:,:)
+
+  do j = 1, num_cols
+    do i = 1, size_col
+        a_CumDepth2LayerBottom(i, j) = data2D(i+4, j)
+     end do
+  end do
+
+  do i = 1, size_col
+     write(*,*) "depth(", i, ", 1) = ", a_CumDepth2LayerBottom(i, 1)
+  end do
 
   call c_f_pointer(props%shortwave_radiation%data, data, (/num_cols/))
   swrad = data(:)
@@ -178,7 +233,7 @@ contains
 
   call InitSharedData(size_col,num_cols)
 
-  call Init_EcoSIM_Soil(size_col)
+  call Init_EcoSIM_Soil(num_cols)
   end subroutine Init_EcoSIM
 !------------------------------------------------------------------------------------------
 

@@ -32,9 +32,11 @@ implicit none
   integer, intent(in) :: NYS
   real(r8) :: YSIN(NumOfSkyAzimuSects),YCOS(NumOfSkyAzimuSects),SkyAzimuthAngle(NumOfSkyAzimuSects)
   real(r8) :: ResistanceLitRLay(JY,JX)
-  real(r8) :: KSatReductByRainKineticEnergyS(JY,JX)
-  real(r8) :: HeatFlux2Ground(JY,JX)
+  real(r8) :: KSatReductByRainKineticEnergy(JY,JX)
+  real(r8) :: HeatFluxAir2Soi(JY,JX)
   real(r8) :: TopLayWatVol(JY,JX)
+  real(r8) :: Qinfl2MicP(JY,JX)
+  real(r8) :: HInfl2Soil(JY,JX)
 
   NHW=1;NHE=1;NVN=1;NVS=NYS
 
@@ -86,13 +88,16 @@ implicit none
 
   DO M=1,NPH
     call RunSurfacePhysModel(M,NHE,NHW,NVS,NVN,ResistanceLitRLay,&
-      KSatReductByRainKineticEnergyS,HeatFlux2Ground,TopLayWatVol)
+      KSatReductByRainKineticEnergy,TopLayWatVol,HeatFluxAir2Soi,Qinfl2MicP,Hinfl2Soil)
   ENDDO
   
-  write(*,*) "Timestep in EcoSIM: ", dts_HeatWatTP, " MJ/hr"
+  write(*,*) "Heat and water souces: "
+  write(*,*) "Hinfl2Soil = ", Hinfl2Soil, " MJ"
+  write(*,*) "Qinfl2MicP = ", Qinfl2MicP 
+  write(*,*) "Timestep in EcoSIM: ", dts_HeatWatTP, " hr"
   DO NY=1,NYS
     !for every column send the top layer to the transfer var
-    surf_e_source(NY) = HeatFlux2Ground(NY,1) / (dts_HeatWatTP*3600._r8)
+    surf_e_source(NY) = Hinfl2Soil(NY,1) / (dts_HeatWatTP*3600._r8)
   ENDDO
 
   write(*,*) "After conversion ", dts_HeatWatTP, " MJ/s"  

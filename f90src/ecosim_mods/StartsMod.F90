@@ -897,6 +897,8 @@ module StartsMod
 !     VOLX=total micropore volume
       IF(SoiBulkDensityt0(L,NY,NX).LE.ZERO)SoilFracAsMacP(L,NY,NX)=0.0_r8
 !     thickness:=bottom depth-upper depth
+      write(*,*) "Soil thickness calc at L = ", L
+      write(*,*) "Depth: ", CumDepth2LayerBottom(L,NY,NX) ," - " , CumDepth2LayerBottom(L-1,NY,NX)  
       DLYRI(3,L,NY,NX)=(CumDepth2LayerBottom(L,NY,NX)-CumDepth2LayerBottom(L-1,NY,NX))
       call check_bool(DLYRI(3,L,NY,NX)<0._r8,'negative soil layer thickness',&
         __LINE__,mod_filename)
@@ -975,7 +977,9 @@ module StartsMod
 
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
+      write(*,*) "NY, NX = ", NY, ", ", NX 
       NM=MaxNumRootLays(NY,NX)+1
+      !NM=2
       call ComputeSoilHydroPars(NY,NX,NU(NY,NX),NM)
       call SetDeepSoil(NY,NX,NM,JZ)
     enddo

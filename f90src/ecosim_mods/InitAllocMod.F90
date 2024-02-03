@@ -66,6 +66,11 @@ implicit none
 
   call InitGrosub(NumGrowthStages,MaxNumRootAxes)
 
+  write(*,*) "JX = ", JX, "  JY = ", JY, "JZ = ", JZ
+  write(*,*) "Just explixitly setting"
+  JX=1
+  JY=1
+  JZ=100
   call InitGridData
 
   call InitTracerIDs(salt_model)
