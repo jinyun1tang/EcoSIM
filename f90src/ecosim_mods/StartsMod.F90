@@ -156,7 +156,10 @@ module StartsMod
 !     DISTRIBUTION OF OM AMONG FRACTIONS OF DIFFERING
 !     BIOLOGICAL ACTIVITY
 !
+      write(*,*) "calling InitHGrid"
       call InitHGrid(NY,NX)
+      write(*,*) "DH(NY, NX) = ", DH(NY,NX)
+      write(*,*) "DV(NY, NX) = ", DV(NY,NX)
 
       call InitLayerDepths(NY,NX)
     ! ActiveLayDepth=active layer depth (m)
@@ -833,6 +836,9 @@ module StartsMod
   integer, intent(in) :: NY,NX
   integer :: L
 
+  write(*,*) "DH(NY,NX) = ", DH(NY,NX)
+  write(*,*) "DV(NY,NX) = ", DV(NY,NX)
+
   DO  L=0,NL(NY,NX)
     DLYRI(1,L,NY,NX)=DH(NY,NX)    !east-west direction
     DLYRI(2,L,NY,NX)=DV(NY,NX)    !north-south direction
@@ -846,7 +852,7 @@ module StartsMod
   use EcoSiMParDataMod, only : micpar
   implicit none
   integer, intent(in) :: NY, NX
-  integer :: L,K
+  integer :: L,K,j
   real(r8) :: VLitR0
   associate(                              &
     NumOfLitrCmplxs    => micpar%NumOfLitrCmplxs    , &
@@ -921,6 +927,10 @@ module StartsMod
   CumDepth2LayerBottom(0,NY,NX)=CumDepth2LayerBottom(NU(NY,NX),NY,NX)-DLYR(3,NU(NY,NX),NY,NX)
   CumSoilDeptht0(NY,NX)=CumDepth2LayerBottom(0,NY,NX)
   AREA(3,NL(NY,NX)+1:JZ,NY,NX)=DLYR(1,NL(NY,NX),NY,NX)*DLYR(2,NL(NY,NX),NY,NX)
+
+  do j = NL(NY, NX) + 1, JZ
+     write(*,*) "AREA(3,j,NY,NX)", AREA(3, j, NY, NX)
+  end do
 
   end associate
   end subroutine InitLayerDepths
@@ -1056,7 +1066,7 @@ module StartsMod
 !     DISTRIBUTION OF OM AMONG FRACTIONS OF DIFFERING
 !     BIOLOGICAL ACTIVITY
 !
-
+      call InitHGrid(NY,NX)
       call InitLayerDepths(NY,NX)
     ! ActiveLayDepth=active layer depth (m)
       ActiveLayDepth(NY,NX)=9999.0_r8

@@ -44,11 +44,16 @@ implicit none
 
   NX=1
 
+  write(*,*) "In Advance:"
+
   do NY=1,NYS
     NU(NY,NX)=a_NU(NY)
     NL(NY,NX)=a_NL(NY)
     AREA(3,0,NY,NX)=a_AREA3(NY)
     AREA(3,NU(NY,NX),NY,NX)=a_AREA3(NY)
+
+   write(*,*) "a_AREA3(NY) = ", a_AREA3(NY)
+
     ASP(NY,NX)=a_ASP(NY)
     !TairKClimMean(NY,NX)=a_ATKA(NY)
     !CO2E(NY,NX)=atm_co2
@@ -78,6 +83,8 @@ implicit none
       VLHeatCapacity(L,NY,NX) = heat_capacity
       SoilFracAsMicP(L,NY,NX) = 1.0
       PSISM1(L,NY,NX) = a_MATP(L,NY)
+      write(*,*) 'PSISM1(', L, ',',NY, ',', NX, ') = ', PSISM1(L, NY, NX)
+      write(*,*) 'TKSoi1(', L, ',',NY, ',', NX, ') = ', TKSoi1(L, NY, NX)
     ENDDO
   ENDDO
 

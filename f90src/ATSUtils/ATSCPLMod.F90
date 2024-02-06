@@ -24,6 +24,7 @@ contains
   ! Ecosim variables
   real(r8), pointer :: data(:)
   real(r8), pointer :: data2D(:,:)
+  !real(r8), pointer :: ptr(:,:)
   integer :: ncol, nvar, size_col, num_cols
   integer :: j1,j2,j3,i,j
 
@@ -31,6 +32,18 @@ contains
 
   size_col = sizes%ncells_per_col_
   num_cols = props%shortwave_radiation%size
+
+  write(*,*) "size_col: ", size_col
+  write(*,*) "num_cols: ", num_cols
+
+  !ptr => props%depth%data
+
+  !a few more c_f_pointer tests:
+  !write(*,*) "testing data dictionary: ", props%depth%data
+  !write(*,*) "location: ", c_loc(props%depth%data)
+  !write(*,*) "testing cloc", c_loc(ptr)
+  call c_f_pointer(props%depth%data, data2D, [(/size_col/),(/num_cols/)])
+  
 
   call c_f_pointer(state%water_content%data, data2D, [(/size_col/),(/num_cols/)])
   a_WC=data2D(:,:)
@@ -41,11 +54,6 @@ contains
      end do
   end do
 
-  do i = 1, size_col
-     write(*,*) "WC", i, ", 1) = ", a_WC(i, 1)
-  end do
-
-
   call c_f_pointer(state%temperature%data, data2D, [(/size_col/),(/num_cols/)])
   a_TEMP=data2D(:,:)
 
@@ -54,11 +62,6 @@ contains
         a_TEMP(i, j) = data2D(i+4, j)
      end do
   end do
-
-  do i = 1, size_col
-     write(*,*) "TEMP(", i, ", 1) = ", a_TEMP(i, 1)
-  end do
-
 
   call c_f_pointer(state%bulk_density%data, data2D, [(/size_col/),(/num_cols/)])
   a_BKDSI=data2D(:,:)
@@ -69,11 +72,6 @@ contains
      end do
   end do
 
-  do i = 1, size_col
-     write(*,*) "BKDSI(", i, ", 1) = ", a_BKDSI(i, 1)
-  end do
-
-
   call c_f_pointer(state%matric_pressure%data, data2D, [(/size_col/),(/num_cols/)])
   a_MATP=data2D(:,:)
 
@@ -82,11 +80,6 @@ contains
         a_MATP(i, j) = data2D(i+4, j)
      end do
   end do
-
-  do i = 1, size_col
-     write(*,*) "MATP(", i, ", 1) = ", a_MATP(i, 1)
-  end do
-
 
   call c_f_pointer(state%porosity%data, data2D, [(/size_col/),(/num_cols/)])
   a_PORO=data2D(:,:)
@@ -108,10 +101,6 @@ contains
     do i = 1, size_col
         a_CumDepth2LayerBottom(i, j) = data2D(i+4, j)
      end do
-  end do
-
-  do i = 1, size_col
-     write(*,*) "depth(", i, ", 1) = ", a_CumDepth2LayerBottom(i, 1)
   end do
 
   call c_f_pointer(props%shortwave_radiation%data, data, (/num_cols/))
@@ -179,23 +168,23 @@ contains
   size_col = sizes%ncells_per_col_
   size_procs = state%porosity%cols
 
-  call c_f_pointer(state%bulk_density%data, data2D, [(/size_col/),(/size_procs/)])
-  data2D(:,:)=a_BKDSI
+  !call c_f_pointer(state%bulk_density%data, data2D, [(/size_col/),(/size_procs/)])
+  !data2D(:,:)=a_BKDSI
 
-  call c_f_pointer(state%water_content%data, data2D, [(/size_col/),(/size_procs/)])
-  data2D(:,:)=a_WC
+  !call c_f_pointer(state%water_content%data, data2D, [(/size_col/),(/size_procs/)])
+  !data2D(:,:)=a_WC
 
-  call c_f_pointer(state%hydraulic_conductivity%data, data2D, [(/size_col/),(/size_procs/)])
-  data2D(:,:)=a_HCOND
+  !call c_f_pointer(state%hydraulic_conductivity%data, data2D, [(/size_col/),(/size_procs/)])
+  !data2D(:,:)=a_HCOND
 
-  call c_f_pointer(state%temperature%data, data2D, [(/size_col/),(/size_procs/)])
-  data2D(:,:)=a_TEMP
+  !call c_f_pointer(state%temperature%data, data2D, [(/size_col/),(/size_procs/)])
+  !data2D(:,:)=a_TEMP
 
-  call c_f_pointer(state%subsurface_water_source%data, data2D, [(/size_col/),(/size_procs/)])
-  data2D(:,:)=a_SSWS
+  !call c_f_pointer(state%subsurface_water_source%data, data2D, [(/size_col/),(/size_procs/)])
+  !data2D(:,:)=a_SSWS
 
-  call c_f_pointer(state%subsurface_energy_source%data, data2D, [(/size_col/),(/size_procs/)])
-  data2D(:,:)=a_SSES
+  !call c_f_pointer(state%subsurface_energy_source%data, data2D, [(/size_col/),(/size_procs/)])
+  !data2D(:,:)=a_SSES
 
   !call c_f_pointer(state%surface_water_source%data, data, (/num_cols/))
   !data(:) = surf_w_source
