@@ -36,7 +36,7 @@ module grosubsMod
 !     HourFailGrainFill_brchY=number of hours after physiol maturity required for senescence
 !     ATRPX=number of hours required to initiate remobilization of storage C for leafout
 !     GVMX=specific oxidation rate of nonstructural C during leafout at 25 C
-!     FVRN=fraction of hours required for leafoff to initiate remobilization
+!     FracHour4LeafoffRemob=fraction of hours required for leafoff to initiate remobilization
 !
 
   integer,private :: curday,curhour
@@ -402,7 +402,7 @@ module grosubsMod
     RCO2N  =>  plt_rbgc%RCO2N     , &
     RootrNC_pft  =>  plt_allom%RootrNC_pft    , &
     RootrPC_pft  =>  plt_allom%RootrPC_pft    , &
-    FVRN   =>  plt_allom%FVRN     , &
+    FracHour4LeafoffRemob   =>  plt_allom%FracHour4LeafoffRemob     , &
     FWODLE =>  plt_allom%FWODLE   , &
     FWODBE =>  plt_allom%FWODBE   , &
     FWOODE =>  plt_allom%FWOODE   , &

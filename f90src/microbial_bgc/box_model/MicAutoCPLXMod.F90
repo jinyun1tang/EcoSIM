@@ -195,7 +195,7 @@ module MicAutoCPLXMod
 
   if (N.eq.AmmoniaOxidizeBacteria .or. N.eq.NitriteOxidizeBacteria .or. N.eq.AerobicMethanotrophBacteria)then
 !   write(*,*)'AerobLeafO2Solubility_pftUptake'
-    call AerobLeafO2Solubility_pftUptakeff(NGL,N,FOXYX,OXKX,RGOMP,RVOXP,RVOXPA,RVOXPB,&
+    call AerobicAutorO2Uptake(NGL,N,FOXYX,OXKX,RGOMP,RVOXP,RVOXPA,RVOXPB,&
       micfor,micstt,nmicf,nmics,micflx)
   elseif (N.eq.HydrogenoMethanogenArchea)then
     RGOMOff(NGL)=RGOMP
@@ -625,7 +625,7 @@ module MicAutoCPLXMod
   end subroutine GetMicrobialAnabolismFluxff
 !------------------------------------------------------------------------------------------
 
-  subroutine AerobLeafO2Solubility_pftUptakeff(NGL,N,FOXYX,OXKX,RGOMP,RVOXP,RVOXPA,RVOXPB,&
+  subroutine AerobicAutorO2Uptake(NGL,N,FOXYX,OXKX,RGOMP,RVOXP,RVOXPA,RVOXPB,&
     micfor,micstt,nmicf,nmics,micflx)
   implicit none
   integer, intent(in) :: NGL   !guild id
@@ -813,7 +813,7 @@ module MicAutoCPLXMod
   RVOXA(NGL)=RVOXPA*WFNff(NGL)
   RVOXB(NGL)=RVOXPB*WFNff(NGL)
   end associate
-  end subroutine AerobLeafO2Solubility_pftUptakeff
+  end subroutine AerobicAutorO2Uptake
 
 !------------------------------------------------------------------------------------------
 

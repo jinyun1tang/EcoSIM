@@ -13,11 +13,12 @@ module PlantTraitDataType
 
 
 !allocation parameter
-  real(r8) :: FVRN(0:5)              !allocation parameter
+  real(r8) :: FracHour4LeafoffRemob(0:5)              !allocation parameter
   REAL(R8),target,allocatable :: FWODBE(:,:)             !woody element allocation
   real(r8),target,allocatable :: FWODLE(:,:)             !element allocation for leaf
   real(r8),target,allocatable :: FWODRE(:,:)
   real(r8),target,allocatable :: FWOODE(:,:)             !woody C allocation
+  real(r8),target,allocatable :: PARTS_brch(:,:,:,:,:)       !C partitioning coefficient
   real(r8),target,allocatable ::  CanopyBranchStemApft_lyr(:,:,:,:,:)              !stem layer area, [m2 d-2]
   real(r8),target,allocatable ::  CanopyLeafArea_pft(:,:,:)                       !plant leaf area, [m2 d-2]
   real(r8),target,allocatable ::  CanopyArea_pft(:,:,:)                       !plant canopy leaf+stem/stalk area, [m2 d-2]
@@ -172,7 +173,7 @@ contains
   implicit none
   integer, intent(in) :: NumOfPlantLitrCmplxs
 
-  FVRN =real((/0.75,0.5,0.5,0.5,0.5,0.5/),r8)
+  FracHour4LeafoffRemob =real((/0.75,0.5,0.5,0.5,0.5,0.5/),r8)
   allocate(FWODLE(NumPlantChemElmnts,1:NumOfPlantLitrCmplxs));  FWODLE=0._r8
   allocate(FWODBE(NumPlantChemElmnts,1:NumOfPlantLitrCmplxs));  FWODBE=0._r8
   allocate(FWODRE(NumPlantChemElmnts,1:NumOfPlantLitrCmplxs));  FWODRE=0._r8         !
@@ -204,6 +205,7 @@ contains
   allocate(SinePetioleAngle_pft(JP,JY,JX));    SinePetioleAngle_pft=0._r8
   allocate(RAZ(JP,JY,JX));      RAZ=0._r8
   allocate(CanPHeight4WatUptake(JP,JY,JX));    CanPHeight4WatUptake=0._r8
+  allocate(PARTS_brch(NumOfPlantMorphUnits,MaxNumBranches,JP,JY,JX));PARTS_brch=0._r8
   allocate(LeafAreaNode_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));LeafAreaNode_brch=0._r8
   allocate(PetioleLengthNode_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));PetioleLengthNode_brch=0._r8
   allocate(InternodeHeightLive_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));InternodeHeightLive_brch=0._r8
@@ -371,6 +373,7 @@ contains
   call destroy(CanopySeedNumber_pft)
   call destroy(PlantPopulation_pft)
   call destroy(InternodeHeightDying_brch)
+  call destroy(PARTS_brch)
   call destroy(CNLF)
   call destroy(CPLF)
   call destroy(CNSHE)

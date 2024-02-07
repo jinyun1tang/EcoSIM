@@ -69,6 +69,7 @@ implicit none
   StandingDeadChemElmnt_col(1:NumPlantChemElmnts,NY,NX)=plt_biom%StandingDeadChemElmnt_col(1:NumPlantChemElmnts)
   UVOLO(NY,NX) =plt_ew%UVOLO
   StemArea_grd(NY,NX) =plt_morph%StemArea_grd
+
   CanopyLeafArea_grd(NY,NX) =plt_morph%CanopyLeafArea_grd
   Eco_NetRad_col(NY,NX)   =plt_rad%Eco_NetRad_col
   Eco_Heat_Latent_col(NY,NX)   =plt_ew%Eco_Heat_Latent_col
@@ -141,6 +142,8 @@ implicit none
     ENDDO
   ENDDO
   DO NZ=1,NP0(NY,NX)
+    PARTS_brch(1:pltpar%NumOfPlantMorphUnits,1:pltpar%MaxNumBranches,NZ,NY,NX)= &
+      plt_morph%PARTS_brch(1:pltpar%NumOfPlantMorphUnits,1:pltpar%MaxNumBranches,NZ)
     RootElmnts_pft(1:NumPlantChemElmnts,NZ,NY,NX) =plt_biom%RootElmnts_pft(1:NumPlantChemElmnts,NZ)
     ElmntBalanceCum_pft(1:NumPlantChemElmnts,NZ,NY,NX)  =plt_site%ElmntBalanceCum_pft(1:NumPlantChemElmnts,NZ)
     CanopyNonstructElements_pft(1:NumPlantChemElmnts,NZ,NY,NX)=plt_biom%CanopyNonstructElements_pft(1:NumPlantChemElmnts,NZ)
@@ -667,7 +670,7 @@ implicit none
     plt_soilchem%SoilResit4RootPentration(L)=SoilResit4RootPentration(L,NY,NX)
     plt_site%DPTHZ(L)=DPTHZ(L,NY,NX)
   ENDDO
-  plt_allom%FVRN(:) = FVRN(:)
+  plt_allom%FracHour4LeafoffRemob(:) = FracHour4LeafoffRemob(:)
   DO L=1,NL(NY,NX)
     plt_soilchem%trc_gasml_vr(idg_CO2,L)=trc_gasml_vr(idg_CO2,L,NY,NX)
     plt_soilchem%trc_gasml_vr(idg_O2,L)=trc_gasml_vr(idg_O2,L,NY,NX)

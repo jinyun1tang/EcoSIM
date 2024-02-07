@@ -827,8 +827,8 @@ module MicBGCMod
   IF(micpar%is_aerobic_hetr(N))THEN
 !  N=(1)OBLIGATE AEROBES,(2)FACULTATIVE ANAEROBES,(3)FUNGI
 !    (6)N2 FIXERS
-!   write(*,*)'AerobLeafO2Solubility_pftUptake'
-    call AerobLeafO2Solubility_pftUptake(NGL,N,K,FOXYX,OXKX,RGOMP,RVOXP,RVOXPA,RVOXPB,&
+!   write(*,*)'AerobicHeterO2Uptake'
+    call AerobicHeterO2Uptake(NGL,N,K,FOXYX,OXKX,RGOMP,RVOXP,RVOXPA,RVOXPB,&
       micfor,micstt,nmicf,nmics,micflx)
   !anaerboic heterotrophs
   ELSEIF(micpar%is_anerobic_hetr(N))THEN
@@ -2832,7 +2832,7 @@ module MicBGCMod
   end subroutine HeteroDenitrificCatabolism
 !------------------------------------------------------------------------------------------
 
-  subroutine AerobLeafO2Solubility_pftUptake(NGL,N,K,FOXYX,OXKX,RGOMP,RVOXP,RVOXPA,RVOXPB,&
+  subroutine AerobicHeterO2Uptake(NGL,N,K,FOXYX,OXKX,RGOMP,RVOXP,RVOXPA,RVOXPB,&
     micfor,micstt,nmicf,nmics,micflx)
   implicit none
   integer, intent(in) :: NGL,N,K
@@ -3011,9 +3011,9 @@ module MicBGCMod
   RCH4X(NGL,K)=0.0_r8
   ROXYO(NGL,K)=ROXYM(NGL,K)*WFN(NGL,K)
   RH2GX(NGL,K)=0.0_r8
-  !write(*,*)'finish AerobLeafO2Solubility_pftUptake'
+  !write(*,*)'finish AerobicHeterO2Uptake'
   end associate
-  end subroutine AerobLeafO2Solubility_pftUptake
+  end subroutine AerobicHeterO2Uptake
 
 !------------------------------------------------------------------------------------------
 
