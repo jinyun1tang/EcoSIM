@@ -89,6 +89,7 @@ implicit none
   real(r8),pointer   :: h1D_SUR_DIC_FLX_col(:)    !HydroSufDICFlx_col(NY,NX)/TAREA
   real(r8),pointer   :: h1D_SUB_DIC_FLX_col(:)    !HydroSubsDICFlx_col(NY,NX)/TAREA
   real(r8),pointer   :: h1D_ATM_CO2_col(:)        !CO2E(NY,NX)
+  real(r8),pointer   :: h1D_ATM_CH4_col(:)        !CH4E
   real(r8),pointer   :: h1D_NBP_col(:)            !Eco_NBP_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_ECO_HVST_C_col(:)     !EcoHavstElmnt_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_ECO_LAI_col(:)        !CanopyLeafArea_grd(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -350,6 +351,7 @@ implicit none
   allocate(this%h1D_tMICRO_C_col(beg_col:end_col))      
   allocate(this%h1D_OMC_LITR_col(beg_col:end_col))      
   allocate(this%h1D_ATM_CO2_col(beg_col:end_col))       
+  allocate(this%h1D_ATM_CH4_col(beg_col:end_col))
   allocate(this%h1D_NBP_col(beg_col:end_col))           
 
   allocate(this%h1D_ECO_LAI_col(beg_col:end_col))       
@@ -766,6 +768,10 @@ implicit none
   data1d_ptr => this%h1D_ATM_CO2_col(beg_col:end_col)   
   call hist_addfld1d(fname='ATM_CO2',units='umol/mol',avgflag='A',&
     long_name='Atmospheric CO2 concentration',ptr_col=data1d_ptr)      
+
+  data1d_ptr => this%h1D_ATM_CH4_col(beg_col:end_col)   
+  call hist_addfld1d(fname='ATM_CH4',units='umol/mol',avgflag='A',&
+    long_name='Atmospheric CH4 concentration',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_NBP_col(beg_col:end_col)   
   call hist_addfld1d(fname='NBP',units='gC/m2/hr',avgflag='A',&
@@ -1546,6 +1552,7 @@ implicit none
       this%h1D_tMICRO_C_col(ncol)     = TOMET(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_OMC_LITR_col(ncol)    = ORGC(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_ATM_CO2_col(ncol)     = CO2E(NY,NX)
+      this%h1D_ATM_CH4_col(ncol)     = CH4E(NY,NX)
       this%h1D_NBP_col(ncol)         = Eco_NBP_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_ECO_HVST_C_col(ncol)  = EcoHavstElmnt_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_ECO_LAI_col(ncol)     = CanopyLeafArea_grd(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
