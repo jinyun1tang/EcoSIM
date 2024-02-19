@@ -1001,7 +1001,7 @@ contains
 !     HeatFlxBySnowRedistribut=convective heat transfer from snow,water,ice transfer
 !     VOLS0,VOLW0,VOLI0=snow,water,ice volume
 !     MinSnowDepth=minimum snowpack depth for full cover
-!     QS,WatBySnowRedistribution,IceBySnowRedistribution=hourly-accumulated snow,water,ice transfer
+!     QS,WatBySnowRedistrib,IceBySnowRedistrib=hourly-accumulated snow,water,ice transfer
 !     HeatBySnowRedistribution=hourly-accumd convective heat from snow,water,ice transfer
 !     DrySnoFlxBySnoRedistM=snow transfer for solute flux calculation
 
@@ -1058,9 +1058,9 @@ contains
           IceFlxBySnowRedistribut(N,N5,N4)=0.0_r8
           HeatFlxBySnowRedistribut(N,N5,N4)=0.0_r8
         ENDIF
-        DrysnoBySnowRedistribution(N,N5,N4)=DrysnoBySnowRedistribution(N,N5,N4)+DrySnoFlxBySnowRedistribut(N,N5,N4)
-        WatBySnowRedistribution(N,N5,N4)=WatBySnowRedistribution(N,N5,N4)+WatFlxBySnowRedistribut(N,N5,N4)
-        IceBySnowRedistribution(N,N5,N4)=IceBySnowRedistribution(N,N5,N4)+IceFlxBySnowRedistribut(N,N5,N4)
+        DrysnoBySnowRedistrib(N,N5,N4)=DrysnoBySnowRedistrib(N,N5,N4)+DrySnoFlxBySnowRedistribut(N,N5,N4)
+        WatBySnowRedistrib(N,N5,N4)=WatBySnowRedistrib(N,N5,N4)+WatFlxBySnowRedistribut(N,N5,N4)
+        IceBySnowRedistrib(N,N5,N4)=IceBySnowRedistrib(N,N5,N4)+IceFlxBySnowRedistribut(N,N5,N4)
         HeatBySnowRedistribution(N,N5,N4)=HeatBySnowRedistribution(N,N5,N4)+HeatFlxBySnowRedistribut(N,N5,N4)
         DrySnoFlxBySnoRedistM(M,N,N5,N4)=DrySnoFlxBySnowRedistribut(N,N5,N4)
       ENDIF
@@ -1584,10 +1584,10 @@ contains
   ! HeatCndFlxSno2Soi=snowpack-soil heat flux
   ! FracSoilAsAirt=air-filled pores (including macropores and micropores)
   WTHET2=1.467_r8-0.467_r8*FracSoilAsAirt(NUM(NY,NX),NY,NX)
-  TCNDS=(STC(NUM(NY,NX),NY,NX)+FracSoiPAsWat(NUM(NY,NX),NY,NX) &
+  TCNDS=(NumerSolidThermCond(NUM(NY,NX),NY,NX)+FracSoiPAsWat(NUM(NY,NX),NY,NX) &
     *2.067E-03_r8+0.611_r8*FracSoiPAsIce(NUM(NY,NX),NY,NX)*7.844E-03_r8 &
     +WTHET2*FracSoiPAsAir(NUM(NY,NX),NY,NX)*9.050E-05_r8) &
-    /(DTC(NUM(NY,NX),NY,NX)+FracSoiPAsWat(NUM(NY,NX),NY,NX) &
+    /(DenomSolidThermCond(NUM(NY,NX),NY,NX)+FracSoiPAsWat(NUM(NY,NX),NY,NX) &
     +0.611_r8*FracSoiPAsIce(NUM(NY,NX),NY,NX) &
     +WTHET2*FracSoiPAsAir(NUM(NY,NX),NY,NX))
 

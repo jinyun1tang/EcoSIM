@@ -24,11 +24,6 @@ grid_info={
 'Z2OEG' :'Atmospheric N2O:ppm:f4',
 'ZNH3EG':'Atmospheric NH3:ppm:f4',
 'IETYPG':'Koppen climate zone:none:i1',
-'IERSNG':'Flag for erosion model:-1=no change in elevation,0=freeze-thaw to change elevation,' \
-  '1=freeze-thaw plus erosion to change elevation,2=freeze-thaw plus SOC accumulation to change elevation,' \
-  '3=freeze-thaw plus SOC accumulation, plus erosion to change elevation:none:i1',
-'NCNG':'Flag for lateral connections between grid cells:0=No lateral connnection,' \
-  '1=Along the west-east direction,2=Along the north-south direction,3=3D lateral connection:none:i1',
 'DTBLIG':'Depth of natural water table:m:f4',
 'DTBLDIG':'Depth of artificial water table:m:f4',
 'DTBLGG':'Slope of natural water table relative to landscape surface:none:f4',
@@ -175,8 +170,6 @@ def write_site_topo_data(config_dict):
     arr=strtool.strpack(line.strip().split(' '))
     IETYPG=int(arr[0])
     ISALTG=int(arr[1])
-    IERSNG=int(arr[2])
-    NCNG=int(arr[3])
     DTBLIG=float(arr[4])
     DTBLDIG=float(arr[5])
     DTBLGG=float(arr[6])
@@ -285,8 +278,6 @@ def write_site_topo_data(config_dict):
   nc_fid.variables['Z2OEG'][:]=[Z2OEG]
   nc_fid.variables['ZNH3EG'][:]=[ZNH3EG]
   nc_fid.variables['IETYPG'][:]=[IETYPG]
-  nc_fid.variables['IERSNG'][:]=[IERSNG]
-  nc_fid.variables['NCNG'][:]=[NCNG]
   nc_fid.variables['DTBLIG'][:]=[DTBLIG]
   nc_fid.variables['DTBLDIG'][:]=[DTBLDIG]
   nc_fid.variables['DTBLGG'][:]=[DTBLGG]

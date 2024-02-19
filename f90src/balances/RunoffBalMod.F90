@@ -115,10 +115,12 @@ implicit none
         call RunoffXBoundaryFluxes(L,N,NY,NX,N1,N2,N4,N5,NN,XN,CXR,ZXR,PXR,ZGR)
     !
         call SubsurfaceBoundaryFluxes(I,J,N,NY,NX,N1,N2,N3,N4,N5,N6,XN)
+
+    !     WATER, HEAT, SOLUTES IN SNOW DRIFT
+        call WaterHeatSoluteBySnowDrift(N,N4,N5,L,NY,NX,CXR,ZXR,PXR,ZGR,XN)
+
       ENDDO D9975
 !
-    !     WATER, HEAT, SOLUTES IN SNOW DRIFT
-      call WaterHeatSoluteBySnowDrift(N,N4,N5,L,NY,NX,CXR,ZXR,PXR,ZGR,XN)
     ENDDO D9980
   ENDDO D9985
   end subroutine RunoffBal
@@ -151,7 +153,7 @@ implicit none
 !     begin_execution
 !     RUNOFF BOUNDARY FLUXES OF WATER AND HEAT
 !
-!     QR,QS,WatBySnowRedistribution,IceBySnowRedistribution=runoff from surface water, 
+!     QR,QS,WatBySnowRedistrib,IceBySnowRedistrib=runoff from surface water, 
 !     snowpack snow,water,ice from watsub.f
 !     CRUN,URUN=cumulative water and snow runoff
 !     HEATOU=cumulative heat loss through lateral and lower boundaries
@@ -708,8 +710,9 @@ implicit none
   real(r8) :: SS1,SS2,SS3,SS4,SSR
   real(r8) :: WQRS,HQRS,OXS,PSS
 !     begin_execution
+  if(lverb)write(*,*)'WaterHeatSoluteBySnowDrift',N,N5,N4
   IF(N.NE.3.AND.L.EQ.NU(NY,NX))THEN
-    WQRS=XN*(DrysnoBySnowRedistribution(N,N5,N4)+WatBySnowRedistribution(N,N5,N4)+IceBySnowRedistribution(N,N5,N4))
+    WQRS=XN*(DrysnoBySnowRedistrib(N,N5,N4)+WatBySnowRedistrib(N,N5,N4)+IceBySnowRedistrib(N,N5,N4))
     IF(ABS(WQRS).GT.ZEROS(N5,N4))THEN
       CRUN=CRUN-WQRS
       URUN(NY,NX)=URUN(NY,NX)-WQRS
