@@ -742,7 +742,7 @@ implicit none
     plt_pheno%iPlantPhenologyType_pft(NZ)=iPlantPhenologyType_pft(NZ,NY,NX)
     plt_pheno%iPlantPhotoperiodType_pft(NZ)=iPlantPhotoperiodType_pft(NZ,NY,NX)
     plt_pheno%iPlantTurnoverPattern_pft(NZ)=iPlantTurnoverPattern_pft(NZ,NY,NX)
-    plt_pheno%iPlantInitThermoAdaptZone(NZ)=iPlantInitThermoAdaptZone(NZ,NY,NX)
+    plt_pheno%PlantInitThermoAdaptZone(NZ)=PlantInitThermoAdaptZone(NZ,NY,NX)
     plt_morph%iPlantGrainType_pft(NZ)=iPlantGrainType_pft(NZ,NY,NX)
     plt_morph%iPlantNfixType(NZ)=iPlantNfixType(NZ,NY,NX)
     plt_morph%MY(NZ)=MY(NZ,NY,NX)

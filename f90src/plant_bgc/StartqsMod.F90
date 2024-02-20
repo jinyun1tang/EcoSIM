@@ -397,20 +397,20 @@ module StartqsMod
     TCelcius4LeafOffHarden_pft =>  plt_pheno%TCelcius4LeafOffHarden_pft    , &
     TCelsChill4Leaf_pft        =>  plt_pheno%TCelsChill4Leaf_pft   , &
     OFFST                      =>  plt_pheno%OFFST  , &
-    iPlantInitThermoAdaptZone  =>  plt_pheno%iPlantInitThermoAdaptZone , &
+    PlantInitThermoAdaptZone  =>  plt_pheno%PlantInitThermoAdaptZone , &
     iPlantThermoAdaptZone      =>  plt_pheno%iPlantThermoAdaptZone  , &
     SSTX                       =>  plt_pheno%SSTX     &
   )
 !
 !     PFT THERMAL ACCLIMATION
 !
-!     ZTYP,iPlantInitThermoAdaptZone=dynamic,initial thermal adaptation zone from PFT file
+!     ZTYP,PlantInitThermoAdaptZone=dynamic,initial thermal adaptation zone from PFT file
 !     OFFST=shift in Arrhenius curve for thermal adaptation (oC)
 !     TCZ,TCelcius4LeafOffHarden_pft=threshold temperature for leafout,leafoff
 !     HTC=high temperature threshold for grain number loss (oC)
 !     SSTX=sensitivity to HTC (seeds oC-1 above HTC)
 !
-  iPlantThermoAdaptZone(NZ)=iPlantInitThermoAdaptZone(NZ)
+  iPlantThermoAdaptZone(NZ)=PlantInitThermoAdaptZone(NZ)
   OFFST(NZ)=2.667_r8*(2.5_r8-iPlantThermoAdaptZone(NZ))
   TCelsChill4Leaf_pft(NZ)=TCZD-OFFST(NZ)
   TCelcius4LeafOffHarden_pft(NZ)=AMIN1(15.0_r8,TCXD-OFFST(NZ))

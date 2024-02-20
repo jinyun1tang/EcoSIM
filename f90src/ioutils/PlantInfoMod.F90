@@ -357,8 +357,8 @@ implicit none
     ENDIF
     D5: DO NB=1,NumOfCanopyLayers
       IF(iPlantPhenologyType_pft(NZ,NY,NX).EQ.iphenotyp_evgreen.AND.iPlantPhenologyPattern_pft(NZ,NY,NX).NE.iplt_annual)THEN
-        HourThreshold4LeafOut_brch(NB,NZ,NY,NX)=AMIN1(4380.0_r8,VRNLI+144.0_r8*iPlantInitThermoAdaptZone(NZ,NY,NX)*(NB-1))
-        HourThreshold4LeafOff_brch(NB,NZ,NY,NX)=AMIN1(4380.0_r8,VRNXI+144.0_r8*iPlantInitThermoAdaptZone(NZ,NY,NX)*(NB-1))
+        HourThreshold4LeafOut_brch(NB,NZ,NY,NX)=AMIN1(4380.0_r8,VRNLI+144.0_r8*PlantInitThermoAdaptZone(NZ,NY,NX)*(NB-1))
+        HourThreshold4LeafOff_brch(NB,NZ,NY,NX)=AMIN1(4380.0_r8,VRNXI+144.0_r8*PlantInitThermoAdaptZone(NZ,NY,NX)*(NB-1))
       ELSE
         HourThreshold4LeafOut_brch(NB,NZ,NY,NX)=VRNLI
         HourThreshold4LeafOff_brch(NB,NZ,NY,NX)=VRNXI
@@ -395,7 +395,7 @@ implicit none
   call ncd_getvar(pft_nfid, 'IBTYP', loc, iPlantTurnoverPattern_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'IRTYP', loc, iPlantGrainType_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'MY', loc, MY(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'ZTYPI', loc, iPlantInitThermoAdaptZone(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'ZTYPI', loc, PlantInitThermoAdaptZone(NZ,NY,NX))
 
   call ncd_getvar(pft_nfid, 'VCMX', loc, VmaxRubCarboxyRef_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'VOMX', loc, VmaxRubOxyRef_pft(NZ,NY,NX))
@@ -536,7 +536,7 @@ implicit none
 !                   :if iPlantMorphologyType_pft=2:trees:1=rapid(deciduous),2=very slow(coniferous),3=slow(semi-deciduous)
 !   iPlantGrainType_pft=storage organ:0=above ground,1=below ground
 !   MY=mycorrhizal:1=no,2=yes
-!   iPlantInitThermoAdaptZone=thermal adaptation zone:1=arctic,boreal,2=cool temperate,
+!   PlantInitThermoAdaptZone=thermal adaptation zone:1=arctic,boreal,2=cool temperate,
 !   3=warm temperate,4=subtropical,5=tropical
   write(nu_plt,*)('=',j=1,100)
   write(nu_plt,*)'PLANT traits for FUNCTIONAL TYPE (NZ,NY,NX)=',NZ,NY,NX,DATAP(NZ,NY,NX)(1:6)
@@ -626,17 +626,17 @@ implicit none
   if(is_plant_treelike(iPlantMorphologyType_pft(NZ,NY,NX)))then
     select case(iPlantTurnoverPattern_pft(NZ,NY,NX))
     case (0, 1)
-      write(nu_plt,*)'Rapid plant biome turnover (deciduous)'
+      write(nu_plt,*)'Rapid tree biome turnover (deciduous)'
     case (2)
-      write(nu_plt,*)'Very slow plant biome turnover (needleleaf evergreen)'
+      write(nu_plt,*)'Very slow tree biome turnover (needleleaf evergreen)'
     case (3)
-      write(nu_plt,*)'Slow plant biome turnover (Broadleaf evergreen)'
+      write(nu_plt,*)'Slow tree biome turnover (Broadleaf evergreen)'
     case (4)
-      write(nu_plt,*)'Plant biome turnover semi-deciduous'
+      write(nu_plt,*)'Tree biome turnover semi-deciduous'
     case (5)
-      write(nu_plt,*)'Plant biome turnover semi-evergreen'
+      write(nu_plt,*)'Tree biome turnover semi-evergreen'
     case default
-      write(nu_plt,*)'Plant biome turnover not defined'
+      write(nu_plt,*)'Tree biome turnover not defined'
     end select
   else
     select case(iPlantTurnoverPattern_pft(NZ,NY,NX))
@@ -665,7 +665,7 @@ implicit none
     write(nu_plt,*)'Wrong option for mycorrhizae'
   end select
 
-  select case(INT(iPlantInitThermoAdaptZone(NZ,NY,NX)))
+  select case(INT(PlantInitThermoAdaptZone(NZ,NY,NX)))
   case (ithermozone_arcboreal)
     write(nu_plt,*)'thermal adaptation zone: arctic, boreal'
   case (ithermozone_cooltempr)

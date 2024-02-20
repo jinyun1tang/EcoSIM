@@ -6,7 +6,7 @@
 case_name='dryland_maize'
 prefix='../../inputs/dryland_maize/'
 do_regression_test=.false.
-pft_file_in='../../..//python_tools/ecosim_pft_20230731.nc'
+pft_file_in='../../..//python_tools/ecosim_pft_20240208.nc'
 grid_file_in='../../..//python_tools/dryland_grid_20230221.nc'
 pft_mgmt_in='../../..//python_tools/dryland_pft_20230509.nc'
 soil_mgmt_in='../../..//python_tools/dryland_soilmgmt_20230210.nc'

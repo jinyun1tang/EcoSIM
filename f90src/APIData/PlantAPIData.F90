@@ -310,7 +310,7 @@ implicit none
   real(r8), pointer :: HoursCanopyPSITooLow(:)    => null()     !canopy plant water stress indicator, number of hours PSICanopy_pft(< PSILY, []
   real(r8), pointer :: TCelciusChill4Seed(:)     => null()     !temperature below which seed set is adversely affected, [oC]
   real(r8), pointer :: iPlantThermoAdaptZone(:)    => null()     !plant thermal adaptation zone, [-]
-  real(r8), pointer :: iPlantInitThermoAdaptZone(:)   => null()     !initial plant thermal adaptation zone, [-]
+  real(r8), pointer :: PlantInitThermoAdaptZone(:)   => null()     !initial plant thermal adaptation zone, [-]
   real(r8), pointer :: HighTCLimtSeed_pft(:)     => null()     !temperature above which seed set is adversely affected, [oC]
   real(r8), pointer :: SSTX(:)    => null()     !sensitivity to HTC (seeds oC-1 above HTC)
   integer,  pointer :: iPlantState_pft(:)    => null()     !flag for species death
@@ -1743,7 +1743,7 @@ implicit none
   allocate(this%ShutRutNonstructElmntConducts_pft(JP1))
   allocate(this%SSTX(JP1))
   allocate(this%HighTCLimtSeed_pft(JP1))
-  allocate(this%iPlantInitThermoAdaptZone(JP1))
+  allocate(this%PlantInitThermoAdaptZone(JP1))
   allocate(this%iPlantThermoAdaptZone(JP1))
   allocate(this%IsPlantActive_pft(JP1))
   allocate(this%iPlantState_pft(JP1))
