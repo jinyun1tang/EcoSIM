@@ -5,6 +5,7 @@ from datetime import datetime
 from array import array
 import warnings
 import stringTools as strtool
+import os
 warnings.filterwarnings("ignore")
 
 
@@ -110,18 +111,19 @@ koppenDict_clim = {
       "ET": "Tundra climate",
       "EF": "Ice cap climate"
 }
-
-pft_names=['alfa43','barl43','bdlf11','bdlf31','bdlf32','bdlf43',
-'bdlf61','bdlf62','bdln32','bdln43','bdlw62','brom43',
-'bspr43','bspr62','bush11','bush26','bush31','bush32','bush43',
-'busn26','busn31','busn32','busn43','clva35',
-'clvs35','dfir32','fmos43','gr3a35','gr3s26','gr3s32','gr3s33',
-'gr3s35','gr3s61','gr3s62','gr4s26','jpin43','lich32','lich33',
-'lich61','lich62','maiz31','lpin31',
-'maiz33','mosf43','moss43','moss32','moss33','moss61','moss62',
-'ndlf31','ndlf32','ndlf33','ndlf35','ndlf43','ndlf61','ndlf62','oats43',
-'sedg61','sedg62','shru35','smos61','soyb31','soyb33','swhe33','swhe43',
-'tasp43','woak31']
+pft_path='/Users/jinyuntang/work/github/ecosim_data/pft/'
+#pft_names=['alfa43','barl43','bdlf11','bdlf31','bdlf32','bdlf43',
+#'bdlf61','bdlf62','bdln32','bdln43','bdlw62','brom43',
+#'bspr43','bspr62','bush11','bush26','bush31','bush32','bush43',
+#'busn26','busn31','busn32','busn43','clva35',
+#'clvs35','dfir32','fmos43','gr3a35','gr3s26','gr3s32','gr3s33',
+#'gr3s35','gr3s61','gr3s62','gr4s26','jpin43','lich32','lich33',
+#'lich61','lich62','maiz31','lpin31',
+#'maiz33','mosf43','moss43','moss32','moss33','moss61','moss62',
+#'ndlf31','ndlf32','ndlf33','ndlf35','ndlf43','ndlf61','ndlf62','oats43',
+#'sedg61','sedg62','shru35','smos61','soyb31','soyb33','swhe33','swhe43',
+#'tasp43','woak31']
+pft_names=os.listdir(pft_path)
 
 npfts=len(pft_names)
 
@@ -340,7 +342,7 @@ varname_dict={
 'CPND':'PC ratio in plant nodule:gP gC-1:f4'
 }
 for j in range(npfts):
-      pfile='/Users/jinyuntang/work/github/ecosim_data/pft/'+pft_names[j]
+      pfile=pft_path+pft_names[j]
       with open(pfile,"r") as pftfile:
             line=pftfile.readline()
 
@@ -621,8 +623,9 @@ for v in varname_dict:
 w_nc_var = nc_fid.createVariable('pfts', 'S1', ('npfts','nchars1'))
 
 for ll in range(npfts):
-      w_nc_var[ll,:]=strtool.string2arr(pft_names[ll])
-      print('pft[%d]=%s'%(ll,pft_names[ll]))
+    print('pft[%d]=%s'%(ll,pft_names[ll]))
+    w_nc_var[ll,:]=strtool.string2arr(pft_names[ll])
+
 
 w_nc_var = nc_fid.createVariable('pfts_short', 'S1', ('npft','nchars2'))
 w_nc_var1 = nc_fid.createVariable('pfts_long', 'S1', ('npft','nchars3'))

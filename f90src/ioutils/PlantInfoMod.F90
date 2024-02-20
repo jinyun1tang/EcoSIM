@@ -323,7 +323,7 @@ implicit none
 ! READ INPUTS FOR EACH PLANT SPECIES
 !
   IF(DATAP(NZ,NY,NX).NE.'NO')THEN
-    write(101,*)'NZ=',NZ,DATAP(NZ,NY,NX)
+!    write(101,*)'NZ=',NZ,DATAP(NZ,NY,NX)
     call ReadPlantTraitsNC(nu_plt,NZ,NY,NX,VRNLI,VRNXI)
 !
 !   RE-CALCULATE PLANT INPUTS IN MODEL UNITS

@@ -153,6 +153,7 @@ module GrosubPars
   character(len=2), allocatable :: koppen_clim_no(:)
   character(len=3), allocatable :: koppen_clim_short(:)
   character(len=64),allocatable :: koppen_clim_long(:)
+
   type, public :: plant_bgc_par_type
    !nonstructural(0,*),
    !     foliar(1,*),non-foliar(2,*),stalk(3,*),root(4,*), coarse woody (5,*)
@@ -229,9 +230,7 @@ module GrosubPars
   pltpar%istalk=3
   pltpar%iroot=4
   pltpar%icwood=5
-  pltpar%NumGrowthStages=10
-  pltpar%MaxNumRootAxes=10
-  pltpar%NumOfPlantMorphUnits=7
+
   pltpar%jroots=2
 
   PART1X=0.05_r8

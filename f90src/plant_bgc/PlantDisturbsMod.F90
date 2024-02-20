@@ -1212,7 +1212,7 @@ module PlantDisturbsMod
     ZEROP    => plt_biom%ZEROP     , &
     ZEROL    => plt_biom%ZEROL     , &
     CanopyLeafCpft_lyr    => plt_biom%CanopyLeafCpft_lyr     , &
-    FVRN     => plt_allom%FVRN     , &
+    FracHour4LeafoffRemob     => plt_allom%FracHour4LeafoffRemob     , &
     FWODRE   => plt_allom%FWODRE   , &
     FWOODE   => plt_allom%FWOODE   , &
     FWODBE   => plt_allom%FWODBE   , &
@@ -2257,7 +2257,7 @@ module PlantDisturbsMod
           .AND.(iHarvstType_pft(NZ).NE.iharvtyp_grazing.AND.iHarvstType_pft(NZ).NE.iharvtyp_herbivo) &
           .AND.CanopyHeight_pft(NZ).GT.HVST(NZ))THEN
           IF((iPlantPhenologyType_pft(NZ).NE.0.AND.Hours4LeafOff_brch(NB,NZ) &
-            .LE.FVRN(iPlantPhenologyType_pft(NZ))*HourThreshold4LeafOff_brch(NB,NZ)) &
+            .LE.FracHour4LeafoffRemob(iPlantPhenologyType_pft(NZ))*HourThreshold4LeafOff_brch(NB,NZ)) &
             .OR.(iPlantPhenologyType_pft(NZ).EQ.iphenotyp_evgreen.AND.&
             iPlantCalendar_brch(ipltcal_Emerge,NB,NZ).NE.0))THEN
             MatureGroup_brch(NB,NZ)=MatureGroup_pft(NZ)

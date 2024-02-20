@@ -87,18 +87,18 @@ module PlantBranchMod
 ! begin_execution
   associate(                            &
     LeafBiomGrowthYield      =>  plt_allom%LeafBiomGrowthYield    , &
-    PetioleBiomGrowthYield     =>  plt_allom%PetioleBiomGrowthYield   , &
-    EarBiomGrowthYield     =>  plt_allom%EarBiomGrowthYield   , &
-    rNCEar_pft          =>  plt_allom%rNCEar_pft    , &
-    rPCReserve_pft      =>  plt_allom%rPCReserve_pft    , &
-    rPCHusk_pft         =>  plt_allom%rPCHusk_pft    , &
-    rPCStalk_pft        =>  plt_allom%rPCStalk_pft    , &
-    rNCStalk_pft        =>  plt_allom%rNCStalk_pft   , &
+    PetioleBiomGrowthYield   =>  plt_allom%PetioleBiomGrowthYield   , &
+    EarBiomGrowthYield       =>  plt_allom%EarBiomGrowthYield   , &
+    rNCEar_pft               =>  plt_allom%rNCEar_pft    , &
+    rPCReserve_pft           =>  plt_allom%rPCReserve_pft    , &
+    rPCHusk_pft              =>  plt_allom%rPCHusk_pft    , &
+    rPCStalk_pft             =>  plt_allom%rPCStalk_pft    , &
+    rNCStalk_pft             =>  plt_allom%rNCStalk_pft   , &
     StalkBiomGrowthYield     =>  plt_allom%StalkBiomGrowthYield   , &
-    HuskBiomGrowthYield     =>  plt_allom%HuskBiomGrowthYield   , &
-    rNCHusk_pft      =>  plt_allom%rNCHusk_pft    , &
-    rPCEar_pft      =>  plt_allom%rPCEar_pft    , &
-    ReserveBiomGrowthYield     =>  plt_allom%ReserveBiomGrowthYield   , &
+    HuskBiomGrowthYield      =>  plt_allom%HuskBiomGrowthYield   , &
+    rNCHusk_pft              =>  plt_allom%rNCHusk_pft    , &
+    rPCEar_pft               =>  plt_allom%rPCEar_pft    , &
+    ReserveBiomGrowthYield   =>  plt_allom%ReserveBiomGrowthYield   , &
     GrainBiomGrowthYield      =>  plt_allom%GrainBiomGrowthYield    , &
     rCNNonstructRemob_pft      =>  plt_allom%rCNNonstructRemob_pft    , &
     rCPNonstructRemob_pft       =>  plt_allom%rCPNonstructRemob_pft     , &
@@ -140,7 +140,8 @@ module PlantBranchMod
     HypoctoHeight_pft      =>   plt_morph%HypoctoHeight_pft   , &
     SeedDepth_pft      =>   plt_morph%SeedDepth_pft   , &
     InternodeHeightLive_brch     =>   plt_morph%InternodeHeightLive_brch  , &
-    NumConCurrentGrowinNode      =>   plt_morph%NumConCurrentGrowinNode     &
+    NumConCurrentGrowinNode      =>   plt_morph%NumConCurrentGrowinNode   , &
+    PARTS_brch                  => plt_morph%PARTS_brch         &
   )
 
 
@@ -149,6 +150,8 @@ module PlantBranchMod
   IF(iPlantBranchState_brch(NB,NZ).EQ.iLive)THEN
 
     call CalcPartitionCoeff(I,J,NB,NZ,PART,PTRT,IFLGY,BegRemoblize)
+
+    PARTS_brch(:,NB,NZ)=PART
 !
 !   SHOOT COEFFICIENTS FOR GROWTH RESPIRATION AND N,P CONTENTS
 !   FROM GROWTH YIELDS ENTERED IN 'READQ', AND FROM PARTITIONING
@@ -474,7 +477,7 @@ module PlantBranchMod
     ZERO    =>  plt_site%ZERO       , &
     NU      =>  plt_site%NU         , &
     AREA3   =>  plt_site%AREA3      , &
-    FVRN    =>  plt_allom%FVRN      , &
+    FracHour4LeafoffRemob    =>  plt_allom%FracHour4LeafoffRemob      , &
     HourThreshold4LeafOff_brch   =>  plt_pheno%HourThreshold4LeafOff_brch     , &
     iPlantCalendar_brch  =>  plt_pheno%iPlantCalendar_brch    , &
     iPlantMorphologyType_pft  =>  plt_pheno%iPlantMorphologyType_pft    , &
@@ -637,14 +640,14 @@ module PlantBranchMod
 !     WATER STRESS
 !
 !     Hours4LeafOff_brch,VRNX=leafoff hours,hours required for leafoff
-!     FVRN=fraction of hours required for leafoff to initiate remobilization
+!     FracHour4LeafoffRemob=fraction of hours required for leafoff to initiate remobilization
 !     iPlantCalendar_brch(ipltcal_SetSeedNumber,=end date for setting final seed number
 !     iPlantPhenologyType_pft=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
 !     IFLGY,BegRemoblize=remobilization flags
 !     FLGZ=control rate of remobilization
 !
   IF((iPlantPhenologyPattern_pft(NZ).NE.iplt_annual.AND. &
-     Hours4LeafOff_brch(NB,NZ).GE.FVRN(iPlantPhenologyType_pft(NZ))*HourThreshold4LeafOff_brch(NB,NZ)) &
+     Hours4LeafOff_brch(NB,NZ).GE.FracHour4LeafoffRemob(iPlantPhenologyType_pft(NZ))*HourThreshold4LeafOff_brch(NB,NZ)) &
     .OR.(iPlantPhenologyPattern_pft(NZ).EQ.iplt_annual.AND.iPlantCalendar_brch(ipltcal_SetSeedNumber,NB,NZ).NE.0))THEN
     !set remobilization true
     BegRemoblize=1
@@ -2432,7 +2435,7 @@ module PlantBranchMod
     DayLenthCurrent                 =>  plt_site%DayLenthCurrent    , &
     k_woody_litr                    => pltpar%k_woody_litr, &    
     NU                              =>  plt_site%NU      , &
-    FVRN                            =>  plt_allom%FVRN   , &
+    FracHour4LeafoffRemob                            =>  plt_allom%FracHour4LeafoffRemob   , &
     FWODRE                          =>  plt_allom%FWODRE , &
     RootElmnts_pft                  =>  plt_biom%RootElmnts_pft   , &
      PopuPlantRootC_vr              =>  plt_biom% PopuPlantRootC_vr  , &
@@ -2473,9 +2476,9 @@ module PlantBranchMod
 
   IF((iPlantPhenologyPattern_pft(NZ).EQ.iplt_annual.AND.doInitPlant_pft(NZ).EQ.ifalse) &
     .OR.(I.GE.iDayPlanting_pft(NZ).AND.iYearCurrent.EQ.iYearPlanting_pft(NZ) &
-    .AND.Hours4LeafOff_brch(NB,NZ).LT.FVRN(iPlantPhenologyType_pft(NZ))*HourThreshold4LeafOff_brch(NB,NZ)) &
+    .AND.Hours4LeafOff_brch(NB,NZ).LT.FracHour4LeafoffRemob(iPlantPhenologyType_pft(NZ))*HourThreshold4LeafOff_brch(NB,NZ)) &
     .OR.(Hours4Leafout_brch(NumOfMainBranch_pft(NZ),NZ).GE.HourThreshold4LeafOut_brch(NB,NZ) &
-    .AND.Hours4LeafOff_brch(NB,NZ).LT.FVRN(iPlantPhenologyType_pft(NZ))*HourThreshold4LeafOff_brch(NB,NZ)))THEN
+    .AND.Hours4LeafOff_brch(NB,NZ).LT.FracHour4LeafoffRemob(iPlantPhenologyType_pft(NZ))*HourThreshold4LeafOff_brch(NB,NZ)))THEN
     TotPopuPlantRootC=0._r8
     TotPopuPlantRootNonstructElmnt(ielmc)=0._r8
     D4: DO L=NU,NI(NZ)

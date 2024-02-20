@@ -693,6 +693,7 @@ module readiMod
 !
 !     ADD SOIL BOUNDARY LAYERS BELOW SOIL ZONE
 !     depth of layer (L-1) is at the middle between that of layer L-2 and L
+        if(lverb)write(*,*)'SetDeepSoil'
         call SetDeepSoil(NY,NX,NM(NY,NX),JZ)
 
 !
