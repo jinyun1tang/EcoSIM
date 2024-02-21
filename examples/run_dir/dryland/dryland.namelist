@@ -13,13 +13,13 @@ soil_mgmt_in='../../..//python_tools/dryland_soilmgmt_20230210.nc'
 clm_file_in='../../..//examples/inputs/dryland_maize/dryland_clm_20230203.nc'
 clm_factor_in='NO'
 atm_ghg_in='../../../input_data/fatm_hist_GHGs_1750-2022.nc'
-
+atm_co2_fix=370.
 lverbose=.false.
 grid_mode=1
 disp_planttrait=.true.
 !set up output variable lists
 !set up the first year of simulation
-start_date  = '19900101000000'
+start_date  = '20010101000000'
 
 continue_run=.false.
 !set up simulation periods, spinup starts at 1, ends at 2, with 3 cycles, regular starts at 4, ends at 5.
