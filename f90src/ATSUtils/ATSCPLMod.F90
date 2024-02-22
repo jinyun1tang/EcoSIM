@@ -22,64 +22,92 @@ contains
   type (BGCSizes), intent(out) :: sizes
 
   ! Ecosim variables
-  real(r8), pointer :: data(:)
+  real(r8), pointer :: data(:), nested_ptr(:)
   real(r8), pointer :: data2D(:,:)
-  !real(r8), pointer :: ptr(:,:)
+  real(r8), pointer :: temp, temp_deref, double_deref
+  real(r8) :: real_deref
+  type(c_ptr), pointer :: cptr_temp, ptr1
+  real(r8), target :: target_val
+  real(r8), pointer :: ptr(:,:)
+  real(r8), pointer :: temp_array(:,:)
   integer :: ncol, nvar, size_col, num_cols
   integer :: j1,j2,j3,i,j
+  real(r8) :: temp_eq, double_eq
 
   call SetBGCSizes(sizes)
 
   size_col = sizes%ncells_per_col_
   num_cols = props%shortwave_radiation%size
 
+  allocate(temp_array(size_col, num_cols))
+
   write(*,*) "size_col: ", size_col
   write(*,*) "num_cols: ", num_cols
-
-  !ptr => props%depth%data
 
   !a few more c_f_pointer tests:
   !write(*,*) "testing data dictionary: ", props%depth%data
   !write(*,*) "location: ", c_loc(props%depth%data)
   !write(*,*) "testing cloc", c_loc(ptr)
-  call c_f_pointer(props%depth%data, data2D, [(/size_col/),(/num_cols/)])
-  
+  call c_f_pointer(props%depth%data, temp) 
+  call c_f_pointer(props%depth%data, cptr_temp)
+  !temp=>props%depth%data
+  temp_deref => temp
+  !call c_f_pointer(temp,temp_deref)
+  temp_eq = temp_deref
+
+  !a_CumDepth2LayerBottom=cptr_temp
+  !write(*,*) "direct equal"
+  !do i = 1, size_col
+  !   write(*,*) "a_depth = ", a_CumDepth2LayerBottom(i, 1)
+  !end do 
+  call c_f_pointer(cptr_temp,data2D,[(/size_col/),(/num_cols/)])
+
+  write(*,*) "using write: "
+  write(*,*) "address of temp_deref: ", temp_deref
+  write(*,*) "address of temp: ", temp  
+  write(*,*) "address of cptr_temp: ", cptr_temp
+  write(*,*) "temp_eq: ", temp_eq
+  write(*,*) "This is current" 
+  write(*,*) "using print: "
+  print '(A, Z8)', "address of temp_deref: ", temp_deref
+  print '(A, Z8)', "address of temp: ", temp  
+  print '(A, Z8)', "address of c_loc(temp): ", c_loc(temp)
+  print '(A, Z8)', "address of cptr_temp: ", cptr_temp 
+  write(*,*) "This is current" 
+  a_CumDepth2LayerBottom=data2D(:,:)
+
+  write(*,*) "double deref"
+  do i = 1, size_col
+     write(*,*) "a_depth = ", a_CumDepth2LayerBottom(i, 1)
+  end do  
 
   call c_f_pointer(state%water_content%data, data2D, [(/size_col/),(/num_cols/)])
   a_WC=data2D(:,:)
 
-  do j = 1, num_cols
-    do i = 1, size_col
-        a_WC(i, j) = data2D(i+4, j)
-     end do
-  end do
+  !do i = 1, size_col
+  !   write(*,*) "a_WC = ", a_WC(i, 1) 
+  !end do
 
   call c_f_pointer(state%temperature%data, data2D, [(/size_col/),(/num_cols/)])
   a_TEMP=data2D(:,:)
 
-  do j = 1, num_cols
-    do i = 1, size_col
-        a_TEMP(i, j) = data2D(i+4, j)
-     end do
-  end do
+  !do i = 1, size_col
+  !   write(*,*) "a_TEMP = ", a_TEMP(i, 1)   
+  !end do
 
   call c_f_pointer(state%bulk_density%data, data2D, [(/size_col/),(/num_cols/)])
   a_BKDSI=data2D(:,:)
-
-  do j = 1, num_cols
-    do i = 1, size_col
-        a_BKDSI(i, j) = data2D(i+4, j)
-     end do
-  end do
+  
+  !do i = 1, size_col
+  !   write(*,*) "a_BKDSI = ", a_BKDSI(i, 1)   
+  !end do  
 
   call c_f_pointer(state%matric_pressure%data, data2D, [(/size_col/),(/num_cols/)])
   a_MATP=data2D(:,:)
 
-  do j = 1, num_cols
-    do i = 1, size_col
-        a_MATP(i, j) = data2D(i+4, j)
-     end do
-  end do
+  !do i = 1, size_col
+  !   write(*,*) "a_MATP = ", a_MATP(i, 1)   
+  !end do
 
   call c_f_pointer(state%porosity%data, data2D, [(/size_col/),(/num_cols/)])
   a_PORO=data2D(:,:)
@@ -92,16 +120,6 @@ contains
 
   call c_f_pointer(state%hydraulic_conductivity%data, data2D, [(/size_col/),(/num_cols/)])
   a_HCOND=data2D(:,:)
-
-  !changed to depth
-  call c_f_pointer(props%depth%data, data2D, [(/size_col/),(/num_cols/)])
-  a_CumDepth2LayerBottom=data2D(:,:)
-
-  do j = 1, num_cols
-    do i = 1, size_col
-        a_CumDepth2LayerBottom(i, j) = data2D(i+4, j)
-     end do
-  end do
 
   call c_f_pointer(props%shortwave_radiation%data, data, (/num_cols/))
   swrad = data(:)
