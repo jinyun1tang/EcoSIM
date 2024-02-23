@@ -2,7 +2,7 @@ module SnowBalanceMod
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use data_const_mod, only : spval => DAT_CONST_SPVAL
   use abortutils, only : endrun
-  use minimathmod, only : AZMAX1,isclose
+  use minimathmod, only : AZMAX1,isclose,AZMIN1
   USE SnowDataType
   use GridConsts
   use GridDataType
@@ -180,7 +180,7 @@ implicit none
     VLDrySnoWEtmp=VLDrySnoWE(L,NY,NX)+VLWatSnow(L,NY,NX)
     if(VLDrySnoWEtmp>0._r8)then
       VLDrySnoWE(L,NY,NX)=VLDrySnoWEtmp
-      dHPhaseChange=-333.0_r8*VLWatSnow(L,NY,NX)
+      dHPhaseChange=-LtHeatIceMelt*VLWatSnow(L,NY,NX)
       XPhaseChangeHeatL(L,NY,NX)=XPhaseChangeHeatL(L,NY,NX)+dHPhaseChange
       VLWatSnow(L,NY,NX)=0._r8      
     else
@@ -191,7 +191,7 @@ implicit none
         frcnew=VLwatNet/SnowIceMass
         VLDrySnoWE(L,NY,NX)=VLDrySnoWE(L,NY,NX)*frcnew
         VLIceSnow(L,NY,NX)=VLIceSnow(L,NY,NX)*frcnew
-        dHPhaseChange=-333.0_r8*VLWatSnow(L,NY,NX)
+        dHPhaseChange=-LtHeatIceMelt*VLWatSnow(L,NY,NX)
         XPhaseChangeHeatL(L,NY,NX)=XPhaseChangeHeatL(L,NY,NX)+dHPhaseChange        
         VLWatSnow(L,NY,NX)=0._r8
       else
@@ -220,18 +220,22 @@ implicit none
 !
 !   RESET SNOW SURFACE DENSITY FOR SNOWFALL
 !
+!    print*,'here'
     IF(SnoXfer2SnoLay(L,NY,NX).GT.0.0_r8)THEN
       DENSX=SnoDensL(L,NY,NX)
       TCASF=AMAX1(-15.0_r8,AMIN1(2.0_r8,TCA(NY,NX)))
+      !fresh snow density
       DENSF=0.05_r8+1.7E-03_r8*(TCASF+15.0_r8)**1.5_r8
-      VOLSF=SnoXfer2SnoLay(L,NY,NX)/DENSF+(VLDrySnoWE(L,NY,NX)-SnoXfer2SnoLay(L,NY,NX))/SnoDensL(L,NY,NX)
+      VOLSF=AMIN1(SnoXfer2SnoLay(L,NY,NX),VLDrySnoWE(L,NY,NX))/DENSF + &
+        AZMAX1(VLDrySnoWE(L,NY,NX)-SnoXfer2SnoLay(L,NY,NX))/SnoDensL(L,NY,NX)
       SnoDensL(L,NY,NX)=VLDrySnoWE(L,NY,NX)/VOLSF
-      if(SnoDensL(L,NY,NX)<0._r8)write(*,*)'VOLSSL=',VLDrySnoWE(L,NY,NX),VOLSF
+      !write(*,*)'xVOLSSL=',VLDrySnoWE(L,NY,NX),SnoXfer2SnoLay(L,NY,NX),SnoDensL(L,NY,NX),VOLSF
     ENDIF
   ELSE
     VOLSWI=VOLSWI+0.5_r8*(VLDrySnoWE(L-1,NY,NX)+VLWatSnow(L-1,NY,NX) &
       +VLIceSnow(L-1,NY,NX)*DENSICE+VLDrySnoWE(L,NY,NX)+VLWatSnow(L,NY,NX) &
       +VLIceSnow(L,NY,NX)*DENSICE)
+    !write(*,*)'VOLSWI',VOLSWI
     if(VOLSWI<0._r8)then
       write(*,*)'iVOLSWI=',VOLSWI,VLDrySnoWE(L-1,NY,NX)+VLWatSnow(L-1,NY,NX) &
         +VLIceSnow(L-1,NY,NX)*DENSICE,VLDrySnoWE(L,NY,NX)+VLWatSnow(L,NY,NX) &
@@ -268,7 +272,11 @@ implicit none
   
   if(DDENS2<0._r8)write(*,*)'DDENS2=',SnoDensL(L,NY,NX),VOLSWI,CVISC
   SnoDensL(L,NY,NX)=SnoDensL(L,NY,NX)+DDENS1+DDENS2
-  if(SnoDensL(L,NY,NX)<0._r8)write(*,*)'DDENS1=',SnoDensL(L,NY,NX),DDENS1,DDENS2
+  if(SnoDensL(L,NY,NX)<0._r8)then
+    write(*,*)'DDENS1=',SnoDensL(L,NY,NX),DDENS1,DDENS2,L
+    write(*,*)SnoXfer2SnoLay(L,NY,NX),VLDrySnoWE(L,NY,NX)
+    call endrun("negative snow dens")
+  endif  
 
   IF(VLDrySnoWE(L,NY,NX)+VLWatSnow(L,NY,NX)+VLIceSnow(L,NY,NX).GT.ZEROS2(NY,NX))THEN
     VLSnoDWI(L,NY,NX)=VLDrySnoWE(L,NY,NX)/SnoDensL(L,NY,NX)+VLWatSnow(L,NY,NX)+VLIceSnow(L,NY,NX)
