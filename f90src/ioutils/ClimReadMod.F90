@@ -812,12 +812,24 @@ implicit none
     iyear=iyear+1
   ENDDO
 
-  call ncd_getvar(atm_ghg_nfid,'CO2',iyear,atm_co2)
-  call ncd_getvar(atm_ghg_nfid,'CH4',iyear,atm_ch4)
-  call ncd_getvar(atm_ghg_nfid,'N2O',iyear,atm_n2o)
+  if(atm_co2_fix>0._r8)then
+    atm_co2=atm_co2_fix
+  else
+    call ncd_getvar(atm_ghg_nfid,'CO2',iyear,atm_co2)
+  endif  
+  if(atm_ch4_fix>0._r8)then
+    atm_ch4=atm_ch4_fix
+  else
+    call ncd_getvar(atm_ghg_nfid,'CH4',iyear,atm_ch4)
+  endif
+  if(atm_n2o_fix>0._r8)then
+    atm_n2o=atm_n2o_fix
+  else
+    call ncd_getvar(atm_ghg_nfid,'N2O',iyear,atm_n2o)
+  endif
 
   call ncd_pio_closefile(atm_ghg_nfid)
-
+  
   DO NX=NHW,NHE
     DO NY=NVN,NVS
       CO2EI(NY,NX)=atm_co2

@@ -77,7 +77,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  rCPNonstructRemob_pft(:,:,:)                        !C:P ratio in remobilizable nonstructural biomass, [-]
   real(r8),target,allocatable ::  OSMO(:,:,:)                        !canopy osmotic potential when canopy water potential = 0 MPa, [MPa]
   real(r8),target,allocatable ::  TCelcius4LeafOffHarden_pft(:,:,:)                         !threshold temperature for autumn leafoff/hardening, [oC]
-  real(r8),target,allocatable ::  iPlantInitThermoAdaptZone(:,:,:)                       !initial plant thermal adaptation zone, [-]
+  real(r8),target,allocatable ::  PlantInitThermoAdaptZone(:,:,:)                       !initial plant thermal adaptation zone, [-]
   real(r8),target,allocatable ::  iPlantThermoAdaptZone(:,:,:)                        !plant thermal adaptation zone, [-]
   real(r8),target,allocatable ::  MatureGroup_brch(:,:,:,:)                     !plant maturity group, [-]
   real(r8),target,allocatable ::  MatureGroup_pft(:,:,:)                      !acclimated plant maturity group, [-]
@@ -237,7 +237,7 @@ contains
   allocate(rCPNonstructRemob_pft(JP,JY,JX));     rCPNonstructRemob_pft=0._r8
   allocate(OSMO(JP,JY,JX));     OSMO=0._r8
   allocate(TCelcius4LeafOffHarden_pft(JP,JY,JX));      TCelcius4LeafOffHarden_pft=0._r8
-  allocate(iPlantInitThermoAdaptZone(JP,JY,JX));    iPlantInitThermoAdaptZone=0._r8
+  allocate(PlantInitThermoAdaptZone(JP,JY,JX));    PlantInitThermoAdaptZone=0._r8
   allocate(iPlantThermoAdaptZone(JP,JY,JX));     iPlantThermoAdaptZone=0._r8
   allocate(MatureGroup_brch(MaxNumBranches,JP,JY,JX)); MatureGroup_brch=0._r8
   allocate(MatureGroup_pft(JP,JY,JX));   MatureGroup_pft=0._r8
@@ -394,7 +394,7 @@ contains
   call destroy(rCPNonstructRemob_pft)
   call destroy(OSMO)
   call destroy(TCelcius4LeafOffHarden_pft)
-  call destroy(iPlantInitThermoAdaptZone)
+  call destroy(PlantInitThermoAdaptZone)
   call destroy(iPlantThermoAdaptZone)
   call destroy(MatureGroup_brch)
   call destroy(MatureGroup_pft)

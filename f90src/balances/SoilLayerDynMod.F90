@@ -187,6 +187,7 @@ implicit none
     !make a copy of the depth, bottom of the layer
     CDPTHX(LX)=CumDepth2LayerBottom(LX,NY,NX)
     CDPTHY(LX)=CumDepth2LayerBottom(LX,NY,NX)
+    IFLGL(LX,:)=0
     !
     !     POND, from water to soil
     !
@@ -568,6 +569,7 @@ implicit none
   integer :: LL
 
 ! begin_execution
+  NUX=0
   IF(NN.EQ.1)THEN
     DLYR(3,L,NY,NX)=CumDepth2LayerBottom(L,NY,NX)-CumDepth2LayerBottom(L-1,NY,NX) !current layer depth
     DLYRXX=DLYR(3,L,NY,NX)

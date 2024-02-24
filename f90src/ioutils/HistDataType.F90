@@ -1540,7 +1540,7 @@ implicit none
       this%h1D_tNO3_col(ncol)        = UNO3(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tMICRO_N_col(ncol)     = TOMET(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_TEMP_LITR_col(ncol)   = TCS(0,NY,NX)
-      if(VcumSnowWE(NY,NX)<ZEROS(NY,NX))then
+      if(VcumSnowWE(NY,NX)<=ZEROS(NY,NX))then
         this%h1D_TEMP_SNOW_col(ncol)   = spval
       else
         this%h1D_TEMP_SNOW_col(ncol)   = TCSnow(1,NY,NX)

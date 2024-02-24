@@ -1269,7 +1269,6 @@ module Hour1Mod
         trc_solcl_vr(ids_NO3B,L,NY,NX)=0.0_r8
         trc_solcl_vr(ids_NO2B,L,NY,NX)=0.0_r8
       ENDIF
-
       IF(trcs_VLN_vr(ids_H1PO4B,L,NY,NX).GT.ZERO)THEN
         trc_solcl_vr(ids_H1PO4B,L,NY,NX)=AZMAX1(trc_solml_vr(ids_H1PO4B,L,NY,NX)/(VLWatMicP(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)))
         trc_solcl_vr(ids_H2PO4B,L,NY,NX)=AZMAX1(trc_solml_vr(ids_H2PO4B,L,NY,NX)/(VLWatMicP(L,NY,NX)*trcs_VLN_vr(ids_H2PO4B,L,NY,NX)))
@@ -2344,26 +2343,12 @@ module Hour1Mod
 !     begin_execution
   DO L=NUI(NY,NX),NLI(NY,NX)
     FWatExMacP2MicP(L,NY,NX)=0.0_r8
-    trcs_plant_uptake_vr(idg_CO2,L,NY,NX)=0.0_r8
+    trcs_plant_uptake_vr(ids_beg:ids_end,L,NY,NX)=0.0_r8
     TCO2P(L,NY,NX)=0.0_r8
     trcg_TLP(idg_beg:idg_end-1,L,NY,NX)=0.0_r8
     TUPOXP(L,NY,NX)=0.0_r8
-    trcs_plant_uptake_vr(idg_O2,L,NY,NX)=0.0_r8
-    trcs_plant_uptake_vr(idg_CH4,L,NY,NX)=0.0_r8
-    trcs_plant_uptake_vr(idg_N2O,L,NY,NX)=0.0_r8
-    trcs_plant_uptake_vr(idg_NH3,L,NY,NX)=0.0_r8
-    trcs_plant_uptake_vr(idg_NH3B,L,NY,NX)=0.0_r8
-    trcs_plant_uptake_vr(idg_H2,L,NY,NX)=0.0_r8
     trcg_air2root_flx_vr(idg_beg:idg_end-1,L,NY,NX)=0.0_r8
-    trcs_plant_uptake_vr(ids_NH4,L,NY,NX)=0.0_r8
-    trcs_plant_uptake_vr(ids_NO3,L,NY,NX)=0.0_r8
-    trcs_plant_uptake_vr(ids_H2PO4,L,NY,NX)=0.0_r8
-    trcs_plant_uptake_vr(ids_H1PO4,L,NY,NX)=0.0_r8
-    trcs_plant_uptake_vr(ids_NH4B,L,NY,NX)=0.0_r8
-    trcs_plant_uptake_vr(ids_NO3B,L,NY,NX)=0.0_r8
-    trcs_plant_uptake_vr(ids_H2PO4B,L,NY,NX)=0.0_r8
-    trcs_plant_uptake_vr(ids_H1PO4B,L,NY,NX)=0.0_r8
-    trcs_plant_uptake_vr(idg_N2,L,NY,NX)=0.0_r8
+
     trcn_RChem_band_soil_vr(ids_NH4B,L,NY,NX)=0.0_r8
     trcn_RChem_band_soil_vr(idg_NH3B,L,NY,NX)=0.0_r8
     trcn_RChem_band_soil_vr(ids_NO3B,L,NY,NX)=0.0_r8

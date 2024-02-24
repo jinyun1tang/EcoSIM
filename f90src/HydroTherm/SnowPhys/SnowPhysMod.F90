@@ -607,16 +607,16 @@ contains
               FVOLS0=0.0_r8
               FVOLI0=0.0_r8
             ENDIF
-            HeatByFrezThaw=AMAX1(-333.0_r8*TotSnowLMass*dts_wat,TFLX1)
-            SnowThawMass=-HeatByFrezThaw*FVOLS0/333.0_r8
-            IceThawMass=-HeatByFrezThaw*FVOLI0/333.0_r8
+            HeatByFrezThaw=AMAX1(-LtHeatIceMelt*TotSnowLMass*dts_wat,TFLX1)
+            SnowThawMass=-HeatByFrezThaw*FVOLS0/LtHeatIceMelt
+            IceThawMass=-HeatByFrezThaw*FVOLI0/LtHeatIceMelt
           ELSE
             !freeze
             FVOLS0=0.0_r8
             FVOLI0=0.0_r8
-            HeatByFrezThaw=AMIN1(333.0_r8*VOLW0X*dts_wat,TFLX1)
+            HeatByFrezThaw=AMIN1(LtHeatIceMelt*VOLW0X*dts_wat,TFLX1)
             SnowThawMass=0.0_r8
-            IceThawMass=-HeatByFrezThaw/333.0_r8
+            IceThawMass=-HeatByFrezThaw/LtHeatIceMelt
           ENDIF
         ELSE
           TFLX1=0.0_r8
@@ -880,7 +880,7 @@ contains
       VLDrySnoWE0(L,NY,NX)=VLDrySnoWEtmp
       ENGY0=VLSnowHeatCapM(M,L,NY,NX)*TKSnow0(L,NY,NX)
       VLSnowHeatCapM(M+1,L,NY,NX)=cps*VLDrySnoWE0(L,NY,NX)+cpw*VLWatSnow0(L,NY,NX)+cpi*VLIceSnow0(L,NY,NX)
-      dHPhaseChange=-333.0_r8*VLWatSnow0(L,NY,NX)
+      dHPhaseChange=-LtHeatIceMelt*VLWatSnow0(L,NY,NX)
       TKSnow0(L,NY,NX)=(ENGY0+dHPhaseChange)/VLSnowHeatCapM(M+1,L,NY,NX)
       PhaseChangeHeatL(L,NY,NX)=PhaseChangeHeatL(L,NY,NX)+dHPhaseChange
       VLWatSnow0(L,NY,NX)=0._r8      
@@ -982,13 +982,13 @@ contains
 ! currently, it does consider wind effect
   implicit none
   integer, intent(in) :: M,NY,NX,NHE,NHW,NVS,NVN
-  integer, intent(in) :: N1,N2
+  integer, intent(in) :: N1,N2   !reference grid
 
   integer :: N,NN,N4,N5,N4B,N5B
   real(r8) :: ALTS1,ALTS2
   real(r8) :: QSX,SnowDepthLateralGradient
-  integer, parameter :: idirew=1
-  integer, parameter :: idirns=2
+  integer, parameter :: idirew=1   !east-west direction
+  integer, parameter :: idirns=2   !north-south direction
 !
 !     SNOW REDISTRIBUTION FROM SNOWPACK
 !
@@ -1013,9 +1013,9 @@ contains
           !at the boundary
           cycle
         ELSE
-          N4=NX+1
+          N4=NX+1   !east
           N5=NY
-          N4B=NX-1
+          N4B=NX-1  !west grid
           N5B=NY
         ENDIF
       ELSEIF(N.EQ.idirns)THEN
@@ -1025,9 +1025,9 @@ contains
           cycle
         ELSE
           N4=NX
-          N5=NY+1
+          N5=NY+1   !north grid
           N4B=NX
-          N5B=NY-1
+          N5B=NY-1  !south grid
         ENDIF
       ENDIF
 
@@ -1038,6 +1038,7 @@ contains
         ALTS2=Altitude_grid(N5,N4)+SnowDepth(N5,N4)
         
         SnowDepthLateralGradient=(ALTS1-ALTS2)/DIST(N,NU(N5,N4),N5,N4)
+        !QSX>0, grid (N2,N1) loses mass
         QSX=SnowDepthLateralGradient/AMAX1(1.0_r8,DIST(N,NU(N5,N4),N5,N4))*dts_HeatWatTP
 
         IF(SnowDepthLateralGradient.GT.0.0_r8.AND.SnowDepth(N2,N1).GT.MinSnowDepth)THEN

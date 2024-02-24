@@ -129,7 +129,6 @@ implicit none
   ENDDO
 
   DO L=1,JZ
-    trcs_plant_uptake_vr(idg_N2,L,NY,NX) =plt_rbgc%trcs_plant_uptake_vr(idg_N2,L)
     RTDNT(L,NY,NX) =plt_morph%RTDNT(L)
     trcg_TLP(idg_beg:idg_end-1,L,NY,NX)=plt_rbgc%trcg_TLP(idg_beg:idg_end-1,L)
     trcg_air2root_flx_vr(idg_beg:idg_end-1,L,NY,NX)=plt_rbgc%trcg_air2root_flx_vr(idg_beg:idg_end-1,L)
@@ -742,7 +741,7 @@ implicit none
     plt_pheno%iPlantPhenologyType_pft(NZ)=iPlantPhenologyType_pft(NZ,NY,NX)
     plt_pheno%iPlantPhotoperiodType_pft(NZ)=iPlantPhotoperiodType_pft(NZ,NY,NX)
     plt_pheno%iPlantTurnoverPattern_pft(NZ)=iPlantTurnoverPattern_pft(NZ,NY,NX)
-    plt_pheno%iPlantInitThermoAdaptZone(NZ)=iPlantInitThermoAdaptZone(NZ,NY,NX)
+    plt_pheno%PlantInitThermoAdaptZone(NZ)=PlantInitThermoAdaptZone(NZ,NY,NX)
     plt_morph%iPlantGrainType_pft(NZ)=iPlantGrainType_pft(NZ,NY,NX)
     plt_morph%iPlantNfixType(NZ)=iPlantNfixType(NZ,NY,NX)
     plt_morph%MY(NZ)=MY(NZ,NY,NX)
@@ -948,27 +947,12 @@ implicit none
     ENDDO
   ENDDO
   DO L=1,JZ
-    plt_rbgc%trcs_plant_uptake_vr(idg_N2,L)=trcs_plant_uptake_vr(idg_N2,L,NY,NX)
+    plt_rbgc%trcs_plant_uptake_vr(ids_beg:ids_end,L)=trcs_plant_uptake_vr(ids_beg:ids_end,L,NY,NX)
     plt_morph%RTDNT(L)=RTDNT(L,NY,NX)
     plt_rbgc%trcg_TLP(idg_beg:idg_end-1,L)=trcg_TLP(idg_beg:idg_end-1,L,NY,NX)
     plt_rbgc%trcg_air2root_flx_vr(idg_beg:idg_end-1,L)=trcg_air2root_flx_vr(idg_beg:idg_end-1,L,NY,NX)
     plt_bgcr%TCO2P(L) =TCO2P(L,NY,NX)
     plt_bgcr%TUPOXP(L)=TUPOXP(L,NY,NX)
-    plt_rbgc%trcs_plant_uptake_vr(idg_CO2,L) =trcs_plant_uptake_vr(idg_CO2,L,NY,NX)
-    plt_rbgc%trcs_plant_uptake_vr(idg_O2,L)=trcs_plant_uptake_vr(idg_O2,L,NY,NX)
-    plt_rbgc%trcs_plant_uptake_vr(idg_CH4,L)=trcs_plant_uptake_vr(idg_CH4,L,NY,NX)
-    plt_rbgc%trcs_plant_uptake_vr(idg_N2O,L)=trcs_plant_uptake_vr(idg_N2O,L,NY,NX)
-    plt_rbgc%trcs_plant_uptake_vr(idg_NH3,L)=trcs_plant_uptake_vr(idg_NH3,L,NY,NX)
-    plt_rbgc%trcs_plant_uptake_vr(idg_NH3B,L)=trcs_plant_uptake_vr(idg_NH3B,L,NY,NX)
-    plt_rbgc%trcs_plant_uptake_vr(idg_H2,L)=trcs_plant_uptake_vr(idg_H2,L,NY,NX)
-    plt_rbgc%trcs_plant_uptake_vr(ids_NH4,L)=trcs_plant_uptake_vr(ids_NH4,L,NY,NX)
-    plt_rbgc%trcs_plant_uptake_vr(ids_NO3,L)=trcs_plant_uptake_vr(ids_NO3,L,NY,NX)
-    plt_rbgc%trcs_plant_uptake_vr(ids_H1PO4B,L)=trcs_plant_uptake_vr(ids_H1PO4B,L,NY,NX)
-    plt_rbgc%trcs_plant_uptake_vr(ids_H2PO4B,L)=trcs_plant_uptake_vr(ids_H2PO4B,L,NY,NX)
-    plt_rbgc%trcs_plant_uptake_vr(ids_NH4B,L)=trcs_plant_uptake_vr(ids_NH4B,L,NY,NX)
-    plt_rbgc%trcs_plant_uptake_vr(ids_NO3B,L)=trcs_plant_uptake_vr(ids_NO3B,L,NY,NX)
-    plt_rbgc%trcs_plant_uptake_vr(ids_H1PO4,L)=trcs_plant_uptake_vr(ids_H1PO4,L,NY,NX)
-    plt_rbgc%trcs_plant_uptake_vr(ids_H2PO4,L)=trcs_plant_uptake_vr(ids_H2PO4,L,NY,NX)
     DO  K=1,jcplx
       plt_bgcr%TDFOME(1:NumPlantChemElmnts,K,L)=TDFOME(1:NumPlantChemElmnts,K,L,NY,NX)
     ENDDO

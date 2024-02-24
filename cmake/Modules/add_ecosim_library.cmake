@@ -5,6 +5,6 @@ function(add_ecosim_library lib)
   else()
     add_library(${lib} STATIC ${ARGN})    
   endif()
-  target_link_libraries(${lib} ${ECOSIM_LIBRARIES})  
+  target_link_libraries(${lib} ${ECOSIM_LIBRARIES} ${ECOSIM_TPLS})  
 endfunction(add_ecosim_library)
 
