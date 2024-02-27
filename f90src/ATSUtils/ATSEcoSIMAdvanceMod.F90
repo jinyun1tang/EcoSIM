@@ -83,8 +83,9 @@ implicit none
       VLHeatCapacity(L,NY,NX) = heat_capacity
       SoilFracAsMicP(L,NY,NX) = 1.0
       PSISM1(L,NY,NX) = a_MATP(L,NY)
-      write(*,*) 'PSISM1(', L, ',',NY, ',', NX, ') = ', PSISM1(L, NY, NX)
-      write(*,*) 'TKSoi1(', L, ',',NY, ',', NX, ') = ', TKSoi1(L, NY, NX)
+      POROS(L,NY,NX) = a_PORO(L,NY)
+      !write(*,*) 'PSISM1(', L, ',',NY, ',', NX, ') = ', PSISM1(L, NY, NX)
+      !write(*,*) 'TKSoi1(', L, ',',NY, ',', NX, ') = ', TKSoi1(L, NY, NX)
     ENDDO
   ENDDO
 
@@ -105,6 +106,7 @@ implicit none
   DO NY=1,NYS
     !for every column send the top layer to the transfer var
     surf_e_source(NY) = Hinfl2Soil(NY,1) / (dts_HeatWatTP*3600._r8)
+    !surf_e_source(NY) = 1.0e-5
   ENDDO
 
   write(*,*) "After conversion ", dts_HeatWatTP, " MJ/s"  

@@ -48,12 +48,12 @@ contains
   !write(*,*) "testing data dictionary: ", props%depth%data
   !write(*,*) "location: ", c_loc(props%depth%data)
   !write(*,*) "testing cloc", c_loc(ptr)
-  call c_f_pointer(props%depth%data, temp) 
+  !call c_f_pointer(props%depth%data, temp) 
   call c_f_pointer(props%depth%data, cptr_temp)
   !temp=>props%depth%data
-  temp_deref => temp
+  !temp_deref => temp
   !call c_f_pointer(temp,temp_deref)
-  temp_eq = temp_deref
+  !temp_eq = temp_deref
 
   !a_CumDepth2LayerBottom=cptr_temp
   !write(*,*) "direct equal"
@@ -62,64 +62,85 @@ contains
   !end do 
   call c_f_pointer(cptr_temp,data2D,[(/size_col/),(/num_cols/)])
 
-  write(*,*) "using write: "
-  write(*,*) "address of temp_deref: ", temp_deref
-  write(*,*) "address of temp: ", temp  
-  write(*,*) "address of cptr_temp: ", cptr_temp
-  write(*,*) "temp_eq: ", temp_eq
-  write(*,*) "This is current" 
-  write(*,*) "using print: "
-  print '(A, Z8)', "address of temp_deref: ", temp_deref
-  print '(A, Z8)', "address of temp: ", temp  
-  print '(A, Z8)', "address of c_loc(temp): ", c_loc(temp)
-  print '(A, Z8)', "address of cptr_temp: ", cptr_temp 
-  write(*,*) "This is current" 
+  !write(*,*) "using write: "
+  !write(*,*) "address of temp_deref: ", temp_deref
+  !write(*,*) "address of temp: ", temp  
+  !write(*,*) "address of cptr_temp: ", cptr_temp
+  !write(*,*) "temp_eq: ", temp_eq
+  !write(*,*) "This is current" 
+  !write(*,*) "using print: "
+  !print '(A, Z8)', "address of temp_deref: ", temp_deref
+  !print '(A, Z8)', "address of temp: ", temp  
+  !print '(A, Z8)', "address of c_loc(temp): ", c_loc(temp)
+  !print '(A, Z8)', "address of cptr_temp: ", cptr_temp 
+  !write(*,*) "This is current" 
+  call c_f_pointer(props%depth%data, cptr_temp)
+  call c_f_pointer(cptr_temp,data2D,[(/size_col/),(/num_cols/)])
   a_CumDepth2LayerBottom=data2D(:,:)
 
-  write(*,*) "double deref"
-  do i = 1, size_col
-     write(*,*) "a_depth = ", a_CumDepth2LayerBottom(i, 1)
-  end do  
+  !do i = 1, size_col
+  !   write(*,*) "a_depth = ", a_CumDepth2LayerBottom(i, 1)
+  !end do  
 
-  call c_f_pointer(state%water_content%data, data2D, [(/size_col/),(/num_cols/)])
+  call c_f_pointer(state%water_content%data, cptr_temp)
+  call c_f_pointer(cptr_temp,data2D,[(/size_col/),(/num_cols/)])
   a_WC=data2D(:,:)
 
   !do i = 1, size_col
   !   write(*,*) "a_WC = ", a_WC(i, 1) 
   !end do
 
-  call c_f_pointer(state%temperature%data, data2D, [(/size_col/),(/num_cols/)])
+  call c_f_pointer(state%temperature%data, cptr_temp)
+  call c_f_pointer(cptr_temp,data2D,[(/size_col/),(/num_cols/)])
   a_TEMP=data2D(:,:)
 
   !do i = 1, size_col
   !   write(*,*) "a_TEMP = ", a_TEMP(i, 1)   
   !end do
 
-  call c_f_pointer(state%bulk_density%data, data2D, [(/size_col/),(/num_cols/)])
+  call c_f_pointer(state%bulk_density%data, cptr_temp)
+  call c_f_pointer(cptr_temp,data2D,[(/size_col/),(/num_cols/)])
   a_BKDSI=data2D(:,:)
   
   !do i = 1, size_col
   !   write(*,*) "a_BKDSI = ", a_BKDSI(i, 1)   
   !end do  
 
-  call c_f_pointer(state%matric_pressure%data, data2D, [(/size_col/),(/num_cols/)])
+  call c_f_pointer(state%matric_pressure%data, cptr_temp)
+  call c_f_pointer(cptr_temp,data2D,[(/size_col/),(/num_cols/)])
   a_MATP=data2D(:,:)
 
-  !do i = 1, size_col
-  !   write(*,*) "a_MATP = ", a_MATP(i, 1)   
-  !end do
+  do i = 1, size_col
+     a_MATP(i, 1) = 100.0  
+  end do
 
-  call c_f_pointer(state%porosity%data, data2D, [(/size_col/),(/num_cols/)])
+  call c_f_pointer(state%porosity%data, cptr_temp)
+  call c_f_pointer(cptr_temp,data2D,[(/size_col/),(/num_cols/)])
   a_PORO=data2D(:,:)
 
-  call c_f_pointer(props%liquid_saturation%data, data2D, [(/size_col/),(/num_cols/)])
+  call c_f_pointer(props%liquid_saturation%data, cptr_temp)
+  call c_f_pointer(cptr_temp,data2D,[(/size_col/),(/num_cols/)])
   a_LSAT=data2D(:,:)
 
-  call c_f_pointer(props%relative_permeability%data, data2D, [(/size_col/),(/num_cols/)])
+  call c_f_pointer(props%relative_permeability%data, cptr_temp)
+  call c_f_pointer(cptr_temp,data2D,[(/size_col/),(/num_cols/)])
   a_RELPERM=data2D(:,:)
 
-  call c_f_pointer(state%hydraulic_conductivity%data, data2D, [(/size_col/),(/num_cols/)])
+  call c_f_pointer(state%hydraulic_conductivity%data, cptr_temp)
+  call c_f_pointer(cptr_temp,data2D,[(/size_col/),(/num_cols/)])
   a_HCOND=data2D(:,:)
+
+  call c_f_pointer(props%rooting_depth_fraction%data, cptr_temp)
+  call c_f_pointer(cptr_temp,data2D,[(/size_col/),(/num_cols/)])
+  a_FC=data2D(:,:)
+
+  call c_f_pointer(state%subsurface_water_source%data, cptr_temp)
+  call c_f_pointer(cptr_temp,data2D,[(/size_col/),(/num_cols/)])
+  a_SSWS=data2D(:,:)
+
+  call c_f_pointer(state%subsurface_energy_source%data, cptr_temp)
+  call c_f_pointer(cptr_temp,data2D,[(/size_col/),(/num_cols/)])
+  a_SSES=data2D(:,:)
 
   call c_f_pointer(props%shortwave_radiation%data, data, (/num_cols/))
   swrad = data(:)
@@ -149,18 +170,6 @@ contains
   heat_capacity = props%heat_capacity
   pressure_at_field_capacity = props%field_capacity
   pressure_at_wilting_point = props%wilting_point
-
-  call c_f_pointer(props%rooting_depth_fraction%data, data2D, [(/size_col/),(/num_cols/)])
-  a_FC=data2D(:,:)
-
-  call c_f_pointer(state%bulk_density%data, data2D, [(/size_col/),(/num_cols/)])
-  a_BKDSI=data2D(:,:)
-
-  call c_f_pointer(state%subsurface_water_source%data, data2D, [(/size_col/),(/num_cols/)])
-  a_SSWS=data2D(:,:)
-
-  call c_f_pointer(state%subsurface_energy_source%data, data2D, [(/size_col/),(/num_cols/)])
-  a_SSES=data2D(:,:)
 
   !call c_f_pointer(state%surface_water_source%data, data, (/num_cols/))
   !surf_w_source = data(:)

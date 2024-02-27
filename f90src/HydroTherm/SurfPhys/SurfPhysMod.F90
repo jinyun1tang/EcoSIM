@@ -452,6 +452,19 @@ contains
   RAGX=AMAX1(RAM,0.8_r8*RAGS(NY,NX),AMIN1(1.2_r8*RAGS(NY,NX),ResistanceLitRLay(NY,NX)/(1.0_r8-10.0_r8*RI)))
   RAGS(NY,NX)=RAGX
   RAa=RAGR(NY,NX)+RAGS(NY,NX)
+  write(*,*) "RAa = ", RAa
+  write(*,*) "RAGR(NY,NX) = ", RAGR(NY,NX)
+  write(*,*) "RAGS(NY,NX) = ", RAGS(NY,NX)
+  write(*,*) "ResistanceLitRLay(NY,NX) = ", ResistanceLitRLay(NY,NX)
+  write(*,*) "RI = ", RI
+  write(*,*) "RAM = ", RAM
+  write(*,*) "RAGX = ", RAGX
+  write(*,*) "RAG(NY,NX) = ", RAG(NY,NX)
+  write(*,*) "VapDiffusResistanceLitR(NY,NX) = ", VapDiffusResistanceLitR(NY,NX)
+  write(*,*) "FracSoiPAsAir(0,NY,NX) = ", FracSoiPAsAir(0,NY,NX)
+  write(*,*) "POROS(0,NY,NX) = ", POROS(0,NY,NX)
+  write(*,*) "POROQ = ", POROQ
+
 ! IF(I.EQ.63.AND.NX.EQ.1)THEN
 !     WRITE(*,7776)'RAGX',I,J,M,NX,NY,RAGZ,FracSurfAsBareSoi(NY,NX),RAG(NY,NX)
 !    2,CVRDW(NY,NX),ResistanceLitRLay,RI,RIB(NY,NX),TKQ(NY,NX),TKSoi1(NUM(NY,NX),NY,NX)
@@ -512,6 +525,32 @@ contains
   HFLX0=Radnet2LitGrnd+LatentHeatEvapAir2Grnd+HeatSensAir2Grnd
   !total heat plus convective heat 
   HeatFluxAir2Soi=HFLX0+HeatSensVapAir2Soi
+
+  write(*,*) "printing heat flux vars: "
+  write(*,*) "CdSoiEvap:", CdSoiEvap
+  write(*,*) "CdSoiHSens:", CdSoiHSens
+  write(*,*) "TKX1:", TKX1
+  write(*,*) "VaporSoi1:", VaporSoi1
+  write(*,*) "VapXAir2TopLay:", VapXAir2TopLay
+  write(*,*) "LatentHeatEvapAir2Grnd:", LatentHeatEvapAir2Grnd
+  write(*,*) "HeatSensVapAir2Soi:", HeatSensVapAir2Soi
+  write(*,*) "TopLayWatVol(NY,NX):", TopLayWatVol(NY,NX)
+  write(*,*) "HeatSensAir2Grnd:", HeatSensAir2Grnd
+  write(*,*) "HFLX0:", HFLX0
+  write(*,*) "HeatFluxAir2Soi:", HeatFluxAir2Soi 
+  write(*,*) "PAREG(NY,NX):", PAREG(NY,NX)
+  write(*,*) "RAa:", RAa
+  write(*,*) "RZ:", RZ
+  write(*,*) "PARSG(NY,NX):", PARSG(NY,NX)
+  write(*,*) "VPQ(NY,NX):", VPQ(NY,NX)
+  write(*,*) "PSISV1:", PSISV1
+  write(*,*) "RGAS:", RGAS
+  write(*,*) "EvapLHTC:", EvapLHTC
+  write(*,*) "cpw:", cpw
+  write(*,*) "TKQ(NY,NX):", TKQ(NY,NX)
+  write(*,*) "Radnet2LitGrnd:", Radnet2LitGrnd
+  write(*,*) "dts_wat:", dts_wat
+  write(*,*) "NUM(NY,NX):", NUM(NY,NX)
 
   end subroutine SoilSRFEnerbyBalance
 

@@ -67,7 +67,7 @@ implicit none
       !write(*,*) "CumDepth2LayerBottom(", L, ",", NY, ",", NX, ") = ", &
       !CumDepth2LayerBottom(L,NY,NX), "  a_CumDepth2LayerBottom(", L, ",", NY, ") = ", &
       !a_CumDepth2LayerBottom(L,NY)
-
+      POROS(L,NY,NX)=a_PORO(L,NY)
       SoiBulkDensityt0(L,NY,NX)=a_BKDSI(L,NY)
       CORGC(L,NY,NX)=a_CORGC(L,NY)
       CORGN(L,NY,NX)=a_CORGN(L,NY)
