@@ -559,7 +559,8 @@ module InitSoluteMod
     +FeSO4_1p_conc+CaO2H2_conc+CaHCO3_1p_conc+MgOH_1p_conc+MgHCO3_1p_conc+FeHPO4_p_conc+CaH4P2O8_1p_conc
   anion_1e_conc=NO3_1e_conc+OH_1e_conc+HCO3_e_conc+Cl_e_conc+AlO4H4_1e_conc+FeO4H4_1e_conc+NaCO3_1e_conc &
     +NaSO4_1e_conc+KSO4_1e_conc+H2PO4_1e_conc+CaPO4_1e_con
-  CN=H2CO3_aqu_conc+CH4_aqu_conc+O2_aqu_conc+N2_aqu_conc+N2O_aqu_conc+NH3_aqu_conc+AlO3H3_conc+FeO3H3_conc+CaCO3_conc+CaSO4_conc &
+  CN=H2CO3_aqu_conc+CH4_aqu_conc+O2_aqu_conc+N2_aqu_conc+N2O_aqu_conc+NH3_aqu_conc &
+    +AlO3H3_conc+FeO3H3_conc+CaCO3_conc+CaSO4_conc &
     +MgCO3_conc+MgSO4_conc+H3PO4_conc+CaHPO4_conc+MgHPO4_conc
   CX2=anion_2e_conc-CO3_2e_conc
   CX1=anion_1e_conc-HCO3_e_conc

@@ -87,7 +87,7 @@ module readsmod
 !
 
 ! generating checkpoint files,resuming from earlier checkpt files
-! DRAD,DTMPX,DTMPN,DHUM,DPREC,DIRRI,DWIND,DCO2E,DCNR4,DCNOR
+! DRAD,DTMPX,DTMPN,DHUM,DPREC,DIRRI,DWIND,DCNR4,DCNOR
 ! =annual changes in radiation,max+min temperature,humidity,
 ! precip,irrign,windspeed,atm CO2 concn,NH4,NO3 concn in precip
 ! NPX=number of cycles per hour for water,heat,solute flux calcns
@@ -110,7 +110,6 @@ module readsmod
     write(*,*)'annual changes in precip: DPREC(1:4)',DPREC(1:4)
     write(*,*)'annual changes in irrigation: DIRRI(1:4)',DIRRI(1:4)
     write(*,*)'annual changes in wind speed: DWIND(1:4)',DWIND(1:4)
-    write(*,*)'annual changes in atm CO2 conc: DCO2E(1:4)',DCO2E(1:4)
     write(*,*)'annual changes in atm NH4 conc: DCN4R(1:4)',DCN4R(1:4)
     write(*,*)'annual changes in atm NO3 conc: DCNOR(1:4)',DCNOR(1:4)
     write(*,*)'number of cycles per hour for water, heat, and '// &
@@ -318,7 +317,6 @@ module readsmod
   call ncd_getvar(clm_factor_nfid,'DPREC',iyear,DPREC(1))
   call ncd_getvar(clm_factor_nfid,'DIRRI',iyear,DIRRI(1))
   call ncd_getvar(clm_factor_nfid,'DWIND',iyear,DWIND(1))
-  call ncd_getvar(clm_factor_nfid,'DCO2E',iyear,DCO2E(1))
   call ncd_getvar(clm_factor_nfid,'DCN4R',iyear,DCN4R(1))
   call ncd_getvar(clm_factor_nfid,'DCNOR',iyear,DCNOR(1))
   call ncd_getvar(clm_factor_nfid,'ICLM',iyear,ICLM)
@@ -333,7 +331,6 @@ module readsmod
     DPREC(N)=DPREC(1)
     DIRRI(N)=DIRRI(1)
     DWIND(N)=DWIND(1)
-    DCO2E(N)=DCO2E(1)
     DCN4R(N)=DCN4R(1)
     DCNOR(N)=DCNOR(1)
   ENDDO

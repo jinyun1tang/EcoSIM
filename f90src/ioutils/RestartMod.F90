@@ -7269,23 +7269,6 @@ implicit none
   endif  
 
   if(flag=='read')then
-    datpr2 => datrc_2d(1:ncols,1:12)    
-    call restartvar(ncid, flag, varname='TDCO2', dim1name='column', &
-      dim2name='month',long_name='accumulated change for atmospheric CO2 concentration', &
-      units='none', interpinic_flag='skip',&
-      data=datpr2, missing_value=spval, fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,TDCO2,datrc_2d)    
-  else
-    !print*,'TDCO2'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,TDCO2,datrc_2d)      
-    datpr2 => datrc_2d(1:ncols,1:12)     
-    call restartvar(ncid, flag, varname='TDCO2', dim1name='column', &
-      dim2name='month',long_name='accumulated change for atmospheric CO2 concentration', &
-      units='none', interpinic_flag='skip',&
-      data=datpr2, missing_value=spval, fill_value=spval)    
-  endif  
-
-  if(flag=='read')then
     datpr2 => datrc_2d(1:ncols,1:12)     
     call restartvar(ncid, flag, varname='TDCN4', dim1name='column', &
       dim2name='month',long_name='accumulated change for NH4 in precipitation', &

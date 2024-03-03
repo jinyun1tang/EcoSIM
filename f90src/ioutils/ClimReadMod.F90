@@ -800,42 +800,47 @@ implicit none
   real(r8) :: atm_ch4   !ppb
   real(r8) :: atm_n2o   !ppb
   type(file_desc_t) :: atm_ghg_nfid
-  integer :: iyear,year
-  INTEGER :: NY,NX
+  integer :: iyear
+  real(r8) :: year,year0
+  INTEGER :: NY,NX,K
 
   call ncd_pio_openfile(atm_ghg_nfid, atm_ghg_in, ncd_nowrite)
 
   iyear=1
-  DO while(.true.)
-    call ncd_getvar(atm_ghg_nfid,'year',iyear,year)
-    if(year==yeari)exit
-    iyear=iyear+1
-  ENDDO
+  call ncd_getvar(atm_ghg_nfid,'year',iyear,year0)
+  iyear=(yeari-int(year0))*12
+
 
   if(atm_co2_fix>0._r8)then
-    atm_co2=atm_co2_fix
+    atm_co2_mon=atm_co2_fix
   else
-    call ncd_getvar(atm_ghg_nfid,'CO2',iyear,atm_co2)
+    DO k=1,12
+      call ncd_getvar(atm_ghg_nfid,'CO2',iyear+k,atm_co2_mon(k))
+    enddo
   endif  
   if(atm_ch4_fix>0._r8)then
-    atm_ch4=atm_ch4_fix
+    atm_ch4_mon=atm_ch4_fix
   else
-    call ncd_getvar(atm_ghg_nfid,'CH4',iyear,atm_ch4)
+    do K=1,12
+      call ncd_getvar(atm_ghg_nfid,'CH4',iyear+k,atm_ch4_mon(k))
+    enddo
   endif
   if(atm_n2o_fix>0._r8)then
-    atm_n2o=atm_n2o_fix
+    atm_n2o_mon=atm_n2o_fix
   else
-    call ncd_getvar(atm_ghg_nfid,'N2O',iyear,atm_n2o)
+    do k=1,12
+      call ncd_getvar(atm_ghg_nfid,'N2O',iyear+k,atm_n2o_mon(k))
+    enddo
   endif
 
   call ncd_pio_closefile(atm_ghg_nfid)
   
   DO NX=NHW,NHE
     DO NY=NVN,NVS
-      CO2EI(NY,NX)=atm_co2
+      CO2EI(NY,NX)=atm_co2_mon(1)
       CO2E(NY,NX) =CO2EI(NY,NX)
-      CH4E(NY,NX) =atm_ch4*1.e-3_r8  !ppb to ppm
-      Z2OE(NY,NX) =atm_n2o*1.e-3_r8  !ppb to ppm
+      CH4E(NY,NX) =atm_ch4_mon(1)*1.e-3_r8  !ppb to ppm
+      Z2OE(NY,NX) =atm_n2o_mon(1)*1.e-3_r8  !ppb to ppm
     ENDDO
   ENDDO
   end subroutine GetAtmGts

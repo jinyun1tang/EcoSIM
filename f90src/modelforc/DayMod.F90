@@ -261,7 +261,7 @@
 !     TDTPX,TDTPN=change in max,min temperature
 !     TDRAD,TDWND,TDHUM=change in radiation,windspeed,vapor pressure
 !     TDPRC,TDIRRI=change in precipitation,irrigation
-!     TDCO2,TDCN4,TDCNO=change in atm CO2,NH4,NO3 concn in precipitation
+!     TDCN4,TDCNO=change in atm CO2,NH4,NO3 concn in precipitation
 !
       D600: DO N=1,12
 !
@@ -275,7 +275,6 @@
           TDHUM(N,NY,NX)=DHUM(N)
           TDPRC(N,NY,NX)=DPREC(N)
           TDIRI(N,NY,NX)=DIRRI(N)
-          TDCO2(N,NY,NX)=DCO2E(N)
           TDCN4(N,NY,NX)=DCN4R(N)
           TDCNO(N,NY,NX)=DCNOR(N)
 !
@@ -290,7 +289,6 @@
           TDHUM(N,NY,NX)=TDHUM(N,NY,NX)+(DHUM(N)-1.0_r8)/LYRC
           TDPRC(N,NY,NX)=TDPRC(N,NY,NX)+(DPREC(N)-1.0_r8)/LYRC
           TDIRI(N,NY,NX)=TDIRI(N,NY,NX)+(DIRRI(N)-1.0_r8)/LYRC
-          TDCO2(N,NY,NX)=TDCO2(N,NY,NX)*EXP(LOG(DCO2E(N))/LYRC)
           TDCN4(N,NY,NX)=TDCN4(N,NY,NX)+(DCN4R(N)-1.0_r8)/LYRC
           TDCNO(N,NY,NX)=TDCNO(N,NY,NX)+(DCNOR(N)-1.0_r8)/LYRC
         ENDIF

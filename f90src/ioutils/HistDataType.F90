@@ -110,14 +110,14 @@ implicit none
   real(r8),pointer   :: h1D_HUM_col(:)            !VPK(NY,NX)
   real(r8),pointer   :: h1D_WIND_col(:)           !WindSpeedAtm(NY,NX)/3600.0
   real(r8),pointer   :: h1D_PREC_col(:)           !(RainFalPrec(NY,NX)+SnoFalPrec(NY,NX))*1000.0/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_SOIL_RN_col(:)        !HeatByRadiation(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX), 1.e6/3600=277.8
-  real(r8),pointer   :: h1D_SOIL_LE_col(:)        !HeatEvapAir2Surf(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_SOIL_H_col(:)         !HeatSensAir2Surf(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_SOIL_G_col(:)         !-(HeatNet2Surf(NY,NX)-HeatSensVapAir2Surf(NY,NX))*277.8/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_ECO_RN_col(:)         !Eco_NetRad_col(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_ECO_LE_col(:)         !Eco_Heat_Latent_col(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_Eco_Heat_col(:)          !Eco_Heat_Sens_col(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_ECO_G_col(:)          !Eco_Heat_Grnd_col(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_SOIL_RN_col(:)        !HeatByRadiation(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX) 
+  real(r8),pointer   :: h1D_SOIL_LE_col(:)        !HeatEvapAir2Surf(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_SOIL_H_col(:)         !HeatSensAir2Surf(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_SOIL_G_col(:)         !-(HeatNet2Surf(NY,NX)-HeatSensVapAir2Surf(NY,NX))*MJ2W/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_ECO_RN_col(:)         !Eco_NetRad_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_ECO_LE_col(:)         !Eco_Heat_Latent_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_Eco_Heat_col(:)          !Eco_Heat_Sens_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_ECO_G_col(:)          !Eco_Heat_Grnd_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_O2_LITR_col(:)       !trc_solcl_vr(idg_O2,0,NY,NX)
   real(r8),pointer   :: h1D_MIN_LWP_ptc(:)       !PSICanPDailyMin(NZ,NY,NX), minimum daily canopy water potential, [MPa]
   real(r8),pointer   :: h1D_SOIL_CO2_FLX_col(:)  !SurfGasFlx(idg_CO2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.14815, umol m-2 s-1, 1.e6/(12*3600)=23.14815
@@ -1489,14 +1489,17 @@ implicit none
   type(bounds_type), intent(in) :: bounds
   integer :: ncol,nptc
   integer :: L,NZ,NY,NX,KN,NB
-  
+  real(r8),parameter ::   MJ2W=1.e6_r8/3600._r8
+
   DO NX=bounds%NHW,bounds%NHE   
     DO NY=bounds%NVN,bounds%NVS
       ncol=get_col(NY,NX)
       this%h1D_tFIRE_CO2_col(ncol) =  CO2byFire_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tFIRE_CH4_col(ncol) =  CH4byFire_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_cNH4_LITR_col(ncol) =  safe_adb(trc_solml_vr(ids_NH4,0,NY,NX)+natomw*trcx_solml(idx_NH4,0,NY,NX),SoilMicPMassLayer(0,NY,NX))
-      this%h1D_cNO3_LITR_col(ncol) =  safe_adb(trc_solml_vr(ids_NO3,0,NY,NX)+trc_solml_vr(ids_NO2,0,NY,NX),SoilMicPMassLayer(0,NY,NX))
+      this%h1D_cNH4_LITR_col(ncol) =  safe_adb(trc_solml_vr(ids_NH4,0,NY,NX)+&
+        natomw*trcx_solml(idx_NH4,0,NY,NX),SoilMicPMassLayer(0,NY,NX))
+      this%h1D_cNO3_LITR_col(ncol) =  safe_adb(trc_solml_vr(ids_NO3,0,NY,NX)+&
+        trc_solml_vr(ids_NO2,0,NY,NX),SoilMicPMassLayer(0,NY,NX))
       this%h1D_ECO_HVST_N_col(ncol)=  EcoHavstElmnt_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_NET_N_MIN_col(ncol) = -NetNH4Mineralize_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_SURF_tLITR_P_FLX_col(ncol) =  URSDM(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -1528,7 +1531,8 @@ implicit none
       this%h1D_tMICRO_P_col(ncol)     = TOMET(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_PO4_FIRE_col(ncol)    = PO4byFire_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_cPO4_LITR_col(ncol)   = safe_adb(trc_solml_vr(ids_H2PO4,0,NY,NX),SoilMicPMassLayer(0,NY,NX))
-      this%h1D_cEXCH_P_LITR_col(ncol)=  patomw*safe_adb(trcx_solml(idx_HPO4,0,NY,NX)+trcx_solml(idx_H2PO4,0,NY,NX),SoilMicPMassLayer(0,NY,NX))
+      this%h1D_cEXCH_P_LITR_col(ncol)=  patomw*safe_adb(trcx_solml(idx_HPO4,0,NY,NX)+&
+        trcx_solml(idx_H2PO4,0,NY,NX),SoilMicPMassLayer(0,NY,NX))
       this%h1D_ECO_HVST_P_col(ncol)  = EcoHavstElmnt_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_NET_P_MIN_col(ncol)   =  -NetPO4Mineralize_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_RADN_col(ncol)        = TRAD(NY,NX)
@@ -1568,20 +1572,19 @@ implicit none
       this%h1D_ET_col(ncol)          = 1000.0_r8*UEVAP(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_N2O_LITR_col(ncol)    = trc_solcl_vr(idg_N2O,0,NY,NX)
       this%h1D_NH3_LITR_col(ncol)    = trc_solcl_vr(idg_NH3,0,NY,NX)
-      this%h1D_SOL_RADN_col(ncol)    = RadSWSolarBeam_col(NY,NX)*277.8_r8
-      
+      this%h1D_SOL_RADN_col(ncol)    = RadSWSolarBeam_col(NY,NX)*MJ2W
       this%h1D_AIR_TEMP_col(ncol)    = TCA(NY,NX)
       this%h1D_HUM_col(ncol)         = VPK(NY,NX)
       this%h1D_WIND_col(ncol)        = WindSpeedAtm(NY,NX)/3600.0_r8
       this%h1D_PREC_col(ncol)        = (RainFalPrec(NY,NX)+SnoFalPrec(NY,NX))*1000.0_r8/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_SOIL_RN_col(ncol)     = HeatByRadiation(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_SOIL_LE_col(ncol)     = HeatEvapAir2Surf(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_SOIL_H_col(ncol)      = HeatSensAir2Surf(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_SOIL_G_col(ncol)      =-(HeatNet2Surf(NY,NX)-HeatSensVapAir2Surf(NY,NX))*277.8/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_ECO_RN_col(ncol)      = Eco_NetRad_col(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_ECO_LE_col(ncol)      = Eco_Heat_Latent_col(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_Eco_Heat_col(ncol)    = Eco_Heat_Sens_col(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_ECO_G_col(ncol)       = Eco_Heat_Grnd_col(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_SOIL_RN_col(ncol)     = HeatByRadiation(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_SOIL_LE_col(ncol)     = HeatEvapAir2Surf(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_SOIL_H_col(ncol)      = HeatSensAir2Surf(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_SOIL_G_col(ncol)      =-(HeatNet2Surf(NY,NX)-HeatSensVapAir2Surf(NY,NX))*MJ2W/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_ECO_RN_col(ncol)      = Eco_NetRad_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_ECO_LE_col(ncol)      = Eco_Heat_Latent_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_Eco_Heat_col(ncol)    = Eco_Heat_Sens_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_ECO_G_col(ncol)       = Eco_Heat_Grnd_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_O2_LITR_col(ncol)     = trc_solcl_vr(idg_O2,0,NY,NX)
       this%h1D_SOIL_CO2_FLX_col(ncol)= SurfGasFlx(idg_CO2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.14815_r8
       this%h1D_ECO_CO2_FLX_col(ncol) = Eco_NEE_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.14815_r8
@@ -1615,13 +1618,17 @@ implicit none
         this%h2D_vICE_vr_col(ncol,L)  =  THETIZ(L,NY,NX)
         this%h2D_PSI_vr_col(ncol,L)  =  PSISoilMatricP(L,NY,NX)+PSISoilOsmotic(L,NY,NX)     
         this%h2D_cNH4t_vr_col(ncol,L)=  safe_adb(trc_solml_vr(ids_NH4,L,NY,NX)+trc_solml_vr(ids_NH4B,L,NY,NX) &
-                                               +natomw*(trcx_solml(idx_NH4,L,NY,NX)+trcx_solml(idx_NH4B,L,NY,NX)),SoilMicPMassLayer(L,NY,NX))
+                                               +natomw*(trcx_solml(idx_NH4,L,NY,NX)+trcx_solml(idx_NH4B,L,NY,NX)),&
+                                               SoilMicPMassLayer(L,NY,NX))
         this%h2D_cNO3t_vr_col(ncol,L)= safe_adb(trc_solml_vr(ids_NO3,L,NY,NX)+trc_solml_vr(ids_NO3B,L,NY,NX) &
-                                               +trc_solml_vr(ids_NO2,L,NY,NX)+trc_solml_vr(ids_NO2B,L,NY,NX),SoilMicPMassLayer(L,NY,NX))
+                                               +trc_solml_vr(ids_NO2,L,NY,NX)+trc_solml_vr(ids_NO2B,L,NY,NX),&
+                                               SoilMicPMassLayer(L,NY,NX))
         this%h2D_cPO4_vr_col(ncol,L) = safe_adb(trc_solml_vr(ids_H1PO4,L,NY,NX)+trc_solml_vr(ids_H1PO4B,L,NY,NX) &
-                                               +trc_solml_vr(ids_H2PO4,L,NY,NX)+trc_solml_vr(ids_H2PO4B,L,NY,NX),VLWatMicP(L,NY,NX))
+                                               +trc_solml_vr(ids_H2PO4,L,NY,NX)+trc_solml_vr(ids_H2PO4B,L,NY,NX),&
+                                               VLWatMicP(L,NY,NX))
         this%h2D_cEXCH_P_vr_col(ncol,L)= patomw*safe_adb(trcx_solml(idx_HPO4,L,NY,NX)+trcx_solml(idx_H2PO4,L,NY,NX) &
-                                               +trcx_solml(idx_HPO4B,L,NY,NX)+trcx_solml(idx_H2PO4B,L,NY,NX),SoilMicPMassLayer(L,NY,NX))
+                                               +trcx_solml(idx_HPO4B,L,NY,NX)+trcx_solml(idx_H2PO4B,L,NY,NX),&
+                                               SoilMicPMassLayer(L,NY,NX))
         this%h2D_ECND_vr_col(ncol,L)     = ECND(L,NY,NX)
       ENDDO
 
@@ -1630,10 +1637,10 @@ implicit none
         this%h1D_MIN_LWP_ptc(nptc)      = PSICanPDailyMin(NZ,NY,NX)
         this%h1D_LEAF_PC_ptc(nptc)      = safe_adb(LeafChemElmnts_pft(ielmp,NZ,NY,NX)+CanopyNonstructElements_pft(ielmp,NZ,NY,NX), &
                                                  LeafChemElmnts_pft(ielmc,NZ,NY,NX)+CanopyNonstructElements_pft(ielmc,NZ,NY,NX))
-        this%h1D_CAN_RN_ptc(nptc)       = 277.8_r8*RadNet2CanP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_CAN_LE_ptc(nptc)       = 277.8_r8*EvapTransHeatP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_CAN_H_ptc(nptc)        = 277.8_r8*HeatXAir2PCan(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_CAN_G_ptc(nptc)        = 277.8_r8*HeatStorCanP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_CAN_RN_ptc(nptc)       = MJ2W*RadNet2CanP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_CAN_LE_ptc(nptc)       = MJ2W*EvapTransHeatP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_CAN_H_ptc(nptc)        = MJ2W*HeatXAir2PCan(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_CAN_G_ptc(nptc)        = MJ2W*HeatStorCanP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_CAN_TEMP_ptc(nptc)     = TCelciusCanopy_pft(NZ,NY,NX)
         this%h1D_TEMP_FN_ptc(nptc)      = fTgrowCanP(NZ,NY,NX)
         this%h1D_CAN_CO2_FLX_ptc(nptc)  = CO2NetFix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.148_r8
@@ -1696,13 +1703,13 @@ implicit none
         this%h1D_SHOOT_N_ptc(nptc)      = ShootChemElmnts_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_Plant_N_ptc(nptc)      = (ShootChemElmnts_pft(ielmn,NZ,NY,NX)+RootElmnts_pft(ielmn,NZ,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_LEAF_N_ptc(nptc)       = LeafChemElmnts_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_Petiole_N_ptc(nptc)       = PetioleChemElmnts_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_Petiole_N_ptc(nptc)   = PetioleChemElmnts_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_STALK_N_ptc(nptc)      = StalkChemElmnts_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_RESERVE_N_ptc(nptc)    = ReserveChemElmnts_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_HUSK_N_ptc(nptc)       = (HuskChemElmnts_pft(ielmn,NZ,NY,NX)+EarChemElmnts_pft(ielmn,NZ,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_GRAIN_N_ptc(nptc)      = GrainChemElmnts_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_ROOT_N_ptc(nptc)       = RootElmnts_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_NODULE_N_ptc(nptc)        = NoduleChemElmnts_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_NODULE_N_ptc(nptc)     = NoduleChemElmnts_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_STORED_N_ptc(nptc)     = NonstructalElmnts_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_EXUD_N_FLX_ptc(nptc)       = PlantExudChemElmntCum_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_LITRf_N_FLX_ptc(nptc)      = LitrfallChemElmnts_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -1714,13 +1721,13 @@ implicit none
         this%h1D_SHOOT_P_ptc(nptc)      = ShootChemElmnts_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_Plant_P_ptc(nptc)      = (ShootChemElmnts_pft(ielmp,NZ,NY,NX)+RootElmnts_pft(ielmp,NZ,NY,NX))/AREA(3,NU(NY,NX),NY,NX)        
         this%h1D_LEAF_P_ptc(nptc)       = LeafChemElmnts_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_Petiole_P_ptc(nptc)       = PetioleChemElmnts_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_Petiole_P_ptc(nptc)    = PetioleChemElmnts_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_STALK_P_ptc(nptc)      = StalkChemElmnts_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_RESERVE_P_ptc(nptc)    = ReserveChemElmnts_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_HUSK_P_ptc(nptc)       = (HuskChemElmnts_pft(ielmp,NZ,NY,NX)+EarChemElmnts_pft(ielmp,NZ,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_GRAIN_P_ptc(nptc)      = GrainChemElmnts_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_ROOT_P_ptc(nptc)       = RootElmnts_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_NODULE_P_ptc(nptc)        = NoduleChemElmnts_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_NODULE_P_ptc(nptc)     = NoduleChemElmnts_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_STORED_P_ptc(nptc)     = NonstructalElmnts_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_EXUD_P_FLX_ptc(nptc)       = PlantExudChemElmntCum_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_LITRf_P_FLX_ptc(nptc)      = LitrfallChemElmnts_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -1749,10 +1756,14 @@ implicit none
         endif
         DO L=1,JZ
           this%h2D_PSI_RT_vr_ptc(nptc,L)  = PSIRoot_vr(ipltroot,L,NZ,NY,NX)
-          this%h2D_prtUP_NH4_vr_ptc(nptc,L)  = (sum(RootNutUptake_pvr(ids_NH4,:,L,NZ,NY,NX))+sum(RootNutUptake_pvr(ids_NH4B,:,L,NZ,NY,NX)))/AREA(3,L,NY,NX)
-          this%h2D_prtUP_NO3_vr_ptc(nptc,L)  = (sum(RootNutUptake_pvr(ids_NO3,:,L,NZ,NY,NX))+sum(RootNutUptake_pvr(ids_NO3B,:,L,NZ,NY,NX)))/AREA(3,L,NY,NX)
-          this%h2D_prtUP_PO4_vr_ptc(nptc,L)  = (sum(RootNutUptake_pvr(ids_H2PO4,:,L,NZ,NY,NX))+sum(RootNutUptake_pvr(ids_H2PO4B,:,L,NZ,NY,NX)))/AREA(3,L,NY,NX)
-          this%h2D_DNS_RT_vr_ptc(nptc,L)  = RootLenDensPerPlant_pvr(ipltroot,L,NZ,NY,NX)*PlantPopulation_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          this%h2D_prtUP_NH4_vr_ptc(nptc,L)  = (sum(RootNutUptake_pvr(ids_NH4,:,L,NZ,NY,NX))+&
+            sum(RootNutUptake_pvr(ids_NH4B,:,L,NZ,NY,NX)))/AREA(3,L,NY,NX)
+          this%h2D_prtUP_NO3_vr_ptc(nptc,L)  = (sum(RootNutUptake_pvr(ids_NO3,:,L,NZ,NY,NX))+&
+            sum(RootNutUptake_pvr(ids_NO3B,:,L,NZ,NY,NX)))/AREA(3,L,NY,NX)
+          this%h2D_prtUP_PO4_vr_ptc(nptc,L)  = (sum(RootNutUptake_pvr(ids_H2PO4,:,L,NZ,NY,NX))+&
+            sum(RootNutUptake_pvr(ids_H2PO4B,:,L,NZ,NY,NX)))/AREA(3,L,NY,NX)
+          this%h2D_DNS_RT_vr_ptc(nptc,L)  = RootLenDensPerPlant_pvr(ipltroot,L,NZ,NY,NX)* &
+            PlantPopulation_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         ENDDO
       ENDDO 
     ENDDO 
