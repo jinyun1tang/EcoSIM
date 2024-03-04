@@ -38,6 +38,7 @@ Module SharedDataMod
   real(r8), allocatable :: a_TEMP(:,:)    !temperature
   real(r8), allocatable :: a_SSES(:,:)    !subsurface energy source
   real(r8), allocatable :: a_SSWS(:,:)    !subsurface water source
+  real(r8), allocatable :: a_AREA3(:,:) 
 
   real(r8), allocatable :: tairc(:)       !air temperature oC
   real(r8), allocatable :: uwind(:)       !wind speed, m/s
@@ -47,7 +48,7 @@ Module SharedDataMod
   real(r8), allocatable :: vpair(:)       !vapor pressure deficit
   real(r8), allocatable :: surf_e_source(:) !surface energy source
   real(r8), allocatable :: surf_w_source(:) !surface water source
-  real(r8), allocatable :: a_AREA3(:)
+  !real(r8), allocatable :: a_AREA3(:)
   integer,  allocatable :: a_NU(:)        !upper soil layer index
   integer,  allocatable :: a_NL(:)        !lower soil layer index
   integer,  allocatable :: a_NJ(:)
@@ -83,7 +84,7 @@ Module SharedDataMod
     allocate(a_CORGN(ncells_per_col_,ncol))   !organic nitrogen content
     allocate(a_CORGP(ncells_per_col_,ncol))   !organic phosphorus content
     !allocate(a_PORO(ncells_per_col_,ncol))
-    allocate(a_AREA3(ncells_per_col_))
+    !allocate(a_AREA3(ncells_per_col_))
     allocate(a_NU(ncells_per_col_))
     allocate(a_NL(ncells_per_col_))
     allocate(a_ASP(ncells_per_col_))

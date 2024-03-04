@@ -45,10 +45,8 @@ implicit none
   do NY=1,NYS
     NU(NY,NX)=a_NU(NY)
     NL(NY,NX)=a_NL(NY)
-    AREA(3,0,NY,NX)=a_AREA3(NY)
-    AREA(3,NU(NY,NX),NY,NX)=a_AREA3(NY)
-    write(*,*) "a_AREA3(NY) = ", a_Area3(NY)
-
+    AREA(3,0,NY,NX)=a_AREA3(0,NY)
+    AREA(3,NU(NY,NX),NY,NX)=a_AREA3(0,NY)
     ASP(NY,NX)=a_ASP(NY)
     !TairKClimMean(NY,NX)=a_ATKA(NY)
     !CO2E(NY,NX)=atm_co2
@@ -64,9 +62,6 @@ implicit none
     DO L=NU(NY,NX),NL(NY,NX)
       TKSoi1(L,NY,NX) = a_TEMP(L,NY)
       CumDepth2LayerBottom(L,NY,NX)=a_CumDepth2LayerBottom(L,NY)
-      !write(*,*) "CumDepth2LayerBottom(", L, ",", NY, ",", NX, ") = ", &
-      !CumDepth2LayerBottom(L,NY,NX), "  a_CumDepth2LayerBottom(", L, ",", NY, ") = ", &
-      !a_CumDepth2LayerBottom(L,NY)
       POROS(L,NY,NX)=a_PORO(L,NY)
       SoiBulkDensityt0(L,NY,NX)=a_BKDSI(L,NY)
       CORGC(L,NY,NX)=a_CORGC(L,NY)

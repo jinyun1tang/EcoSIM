@@ -43,48 +43,18 @@ contains
 
   write(*,*) "size_col: ", size_col
   write(*,*) "num_cols: ", num_cols
-
-  !a few more c_f_pointer tests:
-  !write(*,*) "testing data dictionary: ", props%depth%data
-  !write(*,*) "location: ", c_loc(props%depth%data)
-  !write(*,*) "testing cloc", c_loc(ptr)
-  !call c_f_pointer(props%depth%data, temp) 
-  call c_f_pointer(props%depth%data, cptr_temp)
-  !temp=>props%depth%data
-  !temp_deref => temp
-  !call c_f_pointer(temp,temp_deref)
-  !temp_eq = temp_deref
-
-  !a_CumDepth2LayerBottom=cptr_temp
-  !write(*,*) "direct equal"
-  !do i = 1, size_col
-  !   write(*,*) "a_depth = ", a_CumDepth2LayerBottom(i, 1)
-  !end do 
-  call c_f_pointer(cptr_temp,data2D,[(/size_col/),(/num_cols/)])
-
-  !write(*,*) "using write: "
-  !write(*,*) "address of temp_deref: ", temp_deref
-  !write(*,*) "address of temp: ", temp  
-  !write(*,*) "address of cptr_temp: ", cptr_temp
-  !write(*,*) "temp_eq: ", temp_eq
-  !write(*,*) "This is current" 
-  !write(*,*) "using print: "
-  !print '(A, Z8)', "address of temp_deref: ", temp_deref
-  !print '(A, Z8)', "address of temp: ", temp  
-  !print '(A, Z8)', "address of c_loc(temp): ", c_loc(temp)
-  !print '(A, Z8)', "address of cptr_temp: ", cptr_temp 
-  !write(*,*) "This is current" 
+  
   call c_f_pointer(props%depth%data, cptr_temp)
   call c_f_pointer(cptr_temp,data2D,[(/size_col/),(/num_cols/)])
   a_CumDepth2LayerBottom=data2D(:,:)
 
-  !do i = 1, size_col
-  !   write(*,*) "a_depth = ", a_CumDepth2LayerBottom(i, 1)
-  !end do  
-
   call c_f_pointer(state%water_content%data, cptr_temp)
   call c_f_pointer(cptr_temp,data2D,[(/size_col/),(/num_cols/)])
   a_WC=data2D(:,:)
+
+  call c_f_pointer(props%volume%data, cptr_temp)
+  call c_f_pointer(cptr_temp,data2D,[(/size_col/),(/num_cols/)])
+  a_AREA3=data2D(:,:)
 
   !do i = 1, size_col
   !   write(*,*) "a_WC = ", a_WC(i, 1) 

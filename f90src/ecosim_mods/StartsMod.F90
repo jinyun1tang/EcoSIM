@@ -411,16 +411,21 @@ module StartsMod
     RCH4F(L,NY,NX)=0.0_r8
     RCH4L(L,NY,NX)=0.0_r8
 
+    write(*,*) "In init soil profile: "
+    write(*,*) "   Before if:"
+    write(*,*) "POROS(L,NY,NX) = ", POROS(L,NY,NX)
     IF(L.GT.0)THEN
       IF(SoiBulkDensity(L,NY,NX).GT.ZERO)THEN
         !it is a soil layer
         !compute particle density
         PTDS=ppmc*(1.30_r8*CORGCM+2.66_r8*(1.0E+06_r8-CORGCM))
-        POROS(L,NY,NX)=1.0_r8-(SoiBulkDensity(L,NY,NX)/PTDS)
+        POROS(L,NY,NX)=1.0_r8-(SoiBulkDensity(L,NY,NX)/PTDS) 
+        write(*,*) "BKDSI GT zero POROS(L,NY,NX) = ", POROS(L,NY,NX)
       ELSE
         !for ponding water
         PTDS=0.0_r8
         POROS(L,NY,NX)=1.0_r8
+        write(*,*) "ponded water - POROS(L,NY,NX) = ", POROS(L,NY,NX)
       ENDIF
       POROSI(L,NY,NX)=POROS(L,NY,NX)*FracSoiAsMicP(L,NY,NX)
       VLMicP(L,NY,NX)=POROS(L,NY,NX)*VLSoilPoreMicP(L,NY,NX)

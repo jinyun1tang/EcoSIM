@@ -220,6 +220,18 @@ contains
   !VPQ=vapor pressure in canopy air, 
   !TKQ=temperature in canopy air, Kelvin
 
+  write(*,*) "For VPQ and TKQ calc:"
+  write(*,*) "VPA(NY,NX) = ", VPA(NY,NX)
+  write(*,*) "TLEX(NY,NX) = ", TLEX(NY,NX)
+  write(*,*) "EvapLHTC = ", EvapLHTC
+  write(*,*) "NY = ", NY
+  write(*,*) "NX = ", NX
+  write(*,*) "NUM(NY,NX) = ", NUM(NY,NX)
+  write(*,*) "AREA(3,NUM(NY,NX),NY,NX) = ", AREA(3,NUM(NY,NX),NY,NX)
+  write(*,*) "TairK(NY,NX) = ", TairK(NY,NX)
+  write(*,*) "TSHX(NY,NX) = ", TSHX(NY,NX)
+  write(*,*) "SensHeatCondctance = ", SensHeatCondctance
+
   VPQ(NY,NX)=VPA(NY,NX)-TLEX(NY,NX)/(EvapLHTC*AREA(3,NUM(NY,NX),NY,NX))
   TKQ(NY,NX)=TairK(NY,NX)-TSHX(NY,NX)/(SensHeatCondctance*AREA(3,NUM(NY,NX),NY,NX))
 
@@ -273,7 +285,7 @@ contains
   implicit none
   integer, intent(in) :: NY,NX
   real(r8), dimension(:,:), intent(out):: ResistanceLitRLay
-  real(r8) :: FracSoiPAsAir0,DFVR  
+  real(r8) :: FracSoiPAsAir0,DFVR,TFACR  
   real(r8) :: PAREX,PARSX,RAS
   real(r8) :: ALFZ,WindSpeedGrnd
 !
@@ -326,7 +338,16 @@ contains
 !     PAREG,PARSG=conductances for soil latent,sensible heat fluxes
 !     PARER,PARSR=conductances for litter latent,sensible heat fluxes
 !     XNPR=internal time step for fluxes through litter
-!
+
+! Note: VaporDiffusivityLitR is computed in Hour1 which is not used in the
+!       ATS coupler. However the calculation is simple so I'm just reproducing it
+!       here. This depends on the temperature of the liter (TKS) which is the same
+!       as TKSoi1 at the surface
+  TFACR = TEFGASDIF(TKS(0,NY,NX))
+  VaporDiffusivityLitR(NY,NX) = TFACR*7.70E-02_r8
+  !write(*,*) "for VapDiffusResistanceLitR(NY,NX): "
+  !write(*,*) "DLYRR(NY,NX) = ", DLYRR(NY,NX)
+  !write(*,*) "VaporDiffusivityLitR(NY,NX) = ", VaporDiffusivityLitR(NY,NX)
   VapDiffusResistanceLitR(NY,NX)=DLYRR(NY,NX)/VaporDiffusivityLitR(NY,NX)
   RAG(NY,NX)=BndlResistCanG(NY,NX)+BndlResistAboveCanG(NY,NX)
   RAGW(NY,NX)=RAG(NY,NX)
@@ -445,10 +466,26 @@ contains
 ! RAGZ,RAa=soil+litter blr
 ! RAGS=isothermal blr at ground surface
 !
+! POROS(0,NY,NX) = 0.5_r8
+!  write(*,*) "At FracSoiPAsAir0: "
+!  write(*,*) "FracSoiPAsAir(0,NY,NX) = ", FracSoiPAsAir(0,NY,NX)
   FracSoiPAsAir0=AMAX1(ZERO,FracSoiPAsAir(0,NY,NX))
+!  write(*,*) "At DFVR: "
+!  write(*,*) "FracSoiPAsAir0 = ", FracSoiPAsAir0
+!  write(*,*) "POROQ = ", POROQ
+!  write(*,*) "POROS(0,NY,NX) = ", POROS(0,NY,NX)
   DFVR=FracSoiPAsAir0*POROQ*FracSoiPAsAir0/POROS(0,NY,NX)
+!  write(*,*) "At ResistanceLitRLay: "
+!  write(*,*) "RAG(NY,NX) = ", RAG(NY,NX)
+!  write(*,*) "VapDiffusResistanceLitR(NY,NX) = ", VapDiffusResistanceLitR(NY,NX)
+!  write(*,*) "DFVR = ", DFVR  
   ResistanceLitRLay(NY,NX)=RAG(NY,NX)+VapDiffusResistanceLitR(NY,NX)/DFVR
   RI=RichardsonNumber(RIB(NY,NX),TKQ(NY,NX),TKSoi1(NUM(NY,NX),NY,NX))
+!  write(*,*) "At RagX: "
+!  write(*,*) "RAM = ", RAM
+!  write(*,*) "RAGS(NY,NX) = ", RAGS(NY,NX)
+!  write(*,*) "ResistanceLitRLay(NY,NX) = ", ResistanceLitRLay(NY,NX)
+!  write(*,*) "RI = ", RI
   RAGX=AMAX1(RAM,0.8_r8*RAGS(NY,NX),AMIN1(1.2_r8*RAGS(NY,NX),ResistanceLitRLay(NY,NX)/(1.0_r8-10.0_r8*RI)))
   RAGS(NY,NX)=RAGX
   RAa=RAGR(NY,NX)+RAGS(NY,NX)

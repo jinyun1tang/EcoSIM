@@ -49,10 +49,12 @@ implicit none
   do NY=1,NYS
     NU(NY,NX)=a_NU(NY)
     NL(NY,NX)=a_NL(NY)
-    AREA(3,0,NY,NX)=a_AREA3(NY)
-    AREA(3,NU(NY,NX),NY,NX)=a_AREA3(NY)
+    a_AREA3(0,NY) = 1.0_r8
+    AREA(3,0,NY,NX)=a_AREA3(0,NY)
+    AREA(3,NU(NY,NX),NY,NX)=a_AREA3(0,NY)
+    AREA(3,2,NY,NX)=a_AREA3(0,NY)
 
-   write(*,*) "a_AREA3(NY) = ", a_AREA3(NY)
+    write(*,*) "a_AREA3(NY) = ", a_AREA3(0,NY)
 
     ASP(NY,NX)=a_ASP(NY)
     !TairKClimMean(NY,NX)=a_ATKA(NY)
@@ -70,8 +72,7 @@ implicit none
     LWRadSky(NY,NX) = sunrad(NY)
     !RainH(NY,NX) = prec
     DO L=NU(NY,NX),NL(NY,NX)
-      !FieldCapacity(L,NY,NX)=a_FC(L,ny)
-      !WiltPoint(L,NY,NX)=a_WP(L,NY)
+      write(*,*) "L = ", L, "POROS(L,NY,NX) = ", POROS(L,NY,NX), " POROS(L,NY,NX) = ", POROS(L,NY,NX)
       CumDepth2LayerBottom(L,NY,NX)=a_CumDepth2LayerBottom(L,NY)
       SoiBulkDensityt0(L,NY,NX)=a_BKDSI(L,NY)
       CORGC(L,NY,NX)=a_CORGC(L,NY)
@@ -84,9 +85,9 @@ implicit none
       SoilFracAsMicP(L,NY,NX) = 1.0
       PSISM1(L,NY,NX) = a_MATP(L,NY)
       POROS(L,NY,NX) = a_PORO(L,NY)
-      !write(*,*) 'PSISM1(', L, ',',NY, ',', NX, ') = ', PSISM1(L, NY, NX)
-      !write(*,*) 'TKSoi1(', L, ',',NY, ',', NX, ') = ', TKSoi1(L, NY, NX)
-    ENDDO
+      !AREA3(L,NY,NX) = a_AREA3(L,NY)
+   ENDDO
+   POROS(0,NY,NX) = POROS(1,NY,NX)
   ENDDO
 
   PSIAtFldCapacity = pressure_at_field_capacity
@@ -105,7 +106,7 @@ implicit none
   write(*,*) "Timestep in EcoSIM: ", dts_HeatWatTP, " hr"
   DO NY=1,NYS
     !for every column send the top layer to the transfer var
-    surf_e_source(NY) = Hinfl2Soil(NY,1) / (dts_HeatWatTP*3600._r8)
+    surf_e_source(NY) = Hinfl2Soil(NY,1) / (dts_HeatWatTP*10000._r8*3600._r8)
     !surf_e_source(NY) = 1.0e-5
   ENDDO
 
