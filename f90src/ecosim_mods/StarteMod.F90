@@ -31,7 +31,6 @@ module StarteMod
   private
   character(len=*),private, parameter :: mod_filename = &
   __FILE__
-  integer :: I,K,L,MM,M,NX,NY,NR1,NP2,NP3
 
   public :: starte
   contains
@@ -48,6 +47,7 @@ module StarteMod
   integer, intent(in) :: NHW,NHE,NVN,NVS
   type(solutedtype)  :: solutevar
   REAL(R8) :: BulkSoilMass
+  integer :: NY,NX,L,I,K
 !     begin_execution
 !
 !     INITIALIZE CATION AND ANION CONCENTRATIONS
@@ -66,7 +66,7 @@ module StarteMod
 
       DO I=1,366
         DO  L=NU(NY,NX),NL(NY,NX)
-          DO K=micpar%k_fine_litr,micpar%k_POM
+          D2000: DO K=micpar%k_fine_litr,micpar%k_POM
             BulkSoilMass=0._r8
 !
             IF(K.EQ.micpar%k_manure.AND.L.EQ.1)THEN
@@ -167,7 +167,7 @@ module StarteMod
             call InitSoluteModel(K,BulkSoilMass,solutevar)
 
             call InitSoluteConcs(K,I,L,NY,NX,solutevar)
-          ENDDO
+          ENDDO D2000
         enddo
       ENDDO
 
@@ -495,6 +495,7 @@ module StarteMod
   integer, intent(in) :: NY, NX
   real(R8) :: VOLWW
   integer :: nsalts
+  integer :: L
 !
 !     INITIAL STATE VARIABLES FOR MINERALS IN SURFACE RESIDUE
 ! not restart run and first year
