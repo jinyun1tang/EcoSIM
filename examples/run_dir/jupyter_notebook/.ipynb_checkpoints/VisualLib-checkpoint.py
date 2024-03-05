@@ -1,4 +1,3 @@
-import numpy as np
 
 def get_hist_yr(histfile):
     """
@@ -18,13 +17,15 @@ def is_leap_year(year):
 def get_ts_nyears(ts):
     return int(len(ts)/365)
     
-def cumts2ts(cts,year0):
+def cumts2ts(cts,year0,pos=False):
     """
     convert cumulative time series into difference
     """
-    nyears=get_ts_nyears(cts)
+    import numpy as np
+    
+    nyears=get_ts_nyears(cts)    
+    ts=np.zeros((nyears*366,len(cts[0])))
     print('nyears=%d'%nyears)
-    ts=np.zeros((nyears*366,1))
     id0=0
     id1=365
     nmels=len(cts)
@@ -33,7 +34,11 @@ def cumts2ts(cts,year0):
         print('year=%d'%year)
         leap=is_leap_year(year)
         id1=min(id1+leap,nmels)        
-        ts[id0+1:id1]=cts[id0+1:id1]-cts[id0:id1-1]
+        
+        tmp=cts[id0+1:id1,:]-cts[id0:id1-1,:]
+        if pos:
+            tmp=np.maximum(0,tmp)
+        ts[id0+1:id1,:]=tmp    
         id0=id1
         id1=id1+365
     return ts
