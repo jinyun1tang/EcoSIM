@@ -2,7 +2,7 @@ module MicrobialDataType
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use EcoSIMConfig, only : jcplx => jcplxc,nlbiomcp=>NumLiveMicrbCompts,NumMicbFunGroups=> NumMicbFunGroups
   use GridConsts
-  use ElmIDMod, only : NumPlantChemElmnts
+  use ElmIDMod, only : NumPlantChemElms
 implicit none
   public
   save
@@ -72,7 +72,7 @@ implicit none
   subroutine InitAllocate
 
   implicit none
-  allocate(OMEhetr(NumPlantChemElmnts,NumLiveHeterBioms,1:jcplx,0:JZ,JY,JX))
+  allocate(OMEhetr(NumPlantChemElms,NumLiveHeterBioms,1:jcplx,0:JZ,JY,JX))
   allocate(ROXYS(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
   allocate(ROQCS(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
   allocate(ROQAS(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
@@ -95,9 +95,9 @@ implicit none
   allocate(RIPO1(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
   allocate(RIPB1(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
   allocate(RIPO1R(NumMicrbHetetrophCmplx,1:jcplx,JY,JX))
-  allocate(OMEERhetr(NumPlantChemElmnts,NumLiveHeterBioms,1:jcplx,2,2,JV,JH))
+  allocate(OMEERhetr(NumPlantChemElms,NumLiveHeterBioms,1:jcplx,2,2,JV,JH))
 
-  allocate(OMEauto(NumPlantChemElmnts,NumLiveAutoBioms,0:JZ,JY,JX))
+  allocate(OMEauto(NumPlantChemElms,NumLiveAutoBioms,0:JZ,JY,JX))
   allocate(ROXYSff(NumMicrobAutotrophCmplx,0:JZ,JY,JX))
   allocate(RINHOff(NumMicrobAutotrophCmplx,0:JZ,JY,JX))
   allocate(RINOOff(NumMicrobAutotrophCmplx,0:JZ,JY,JX))
@@ -118,7 +118,7 @@ implicit none
   allocate(RIPO1ff(NumMicrobAutotrophCmplx,0:JZ,JY,JX))
   allocate(RIPB1ff(NumMicrobAutotrophCmplx,0:JZ,JY,JX))
   allocate(RIPO1Rff(NumMicrobAutotrophCmplx,JY,JX))
-  allocate(OMEERauto(NumPlantChemElmnts,NumLiveAutoBioms,2,2,JV,JH))
+  allocate(OMEERauto(NumPlantChemElms,NumLiveAutoBioms,2,2,JV,JH))
   end subroutine InitAllocate
 !----------------------------------------------------------------------------------------------
 

@@ -4,7 +4,7 @@ module SoilBGCDataType
 ! USES:
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use GridConsts
-  use ElmIDMod    , only : NumPlantChemElmnts
+  use ElmIDMod    , only : NumPlantChemElms
   use TracerIDMod
   use EcoSIMConfig, only : jcplx => jcplxc,jsken => jskenc
 implicit none
@@ -55,7 +55,7 @@ implicit none
   real(r8),target,allocatable ::  HydroSubsDINFlx_col(:,:)                         !total subsurface DIN flux, [g d-2]
   real(r8),target,allocatable ::  HydroSufDIPFlx_col(:,:)                         !total surface DIP flux, [g d-2]
   real(r8),target,allocatable ::  HydroSubsDIPFlx_col(:,:)                         !total subsurface DIP flux, [g d-2]
-  real(r8),target,allocatable ::  StandingDeadChemElmnt_col(:,:,:)                        !total standing dead C, [g d-2]
+  real(r8),target,allocatable ::  StandingDeadChemElm_col(:,:,:)                        !total standing dead C, [g d-2]
   real(r8),target,allocatable ::  ZDRAIN(:,:)                        !total N drainage below root zone, [g d-2]
   real(r8),target,allocatable ::  PDRAIN(:,:)                        !total P drainage below root zone, [g d-2]
   real(r8),target,allocatable ::  UION(:,:)                          !total soil ion content, [mol d-2]
@@ -143,7 +143,7 @@ implicit none
   allocate(FerPFlx_col(JY,JX));      FerPFlx_col=0._r8
   allocate(HydroSufDOCFlx_col(JY,JX));       HydroSufDOCFlx_col=0._r8
   allocate(HydroSubsDOCFlx_col(JY,JX));       HydroSubsDOCFlx_col=0._r8
-  allocate(LiterfalOrgM_col(NumPlantChemElmnts,JY,JX));       LiterfalOrgM_col=0._r8
+  allocate(LiterfalOrgM_col(NumPlantChemElms,JY,JX));       LiterfalOrgM_col=0._r8
   allocate(HydroSufDONFlx_col(JY,JX));       HydroSufDONFlx_col=0._r8
   allocate(HydroSubsDONFlx_col(JY,JX));       HydroSubsDONFlx_col=0._r8
   allocate(HydroSufDOPFlx_col(JY,JX));       HydroSufDOPFlx_col=0._r8
@@ -158,7 +158,7 @@ implicit none
   allocate(HydroSubsDINFlx_col(JY,JX));       HydroSubsDINFlx_col=0._r8
   allocate(HydroSufDIPFlx_col(JY,JX));       HydroSufDIPFlx_col=0._r8
   allocate(HydroSubsDIPFlx_col(JY,JX));       HydroSubsDIPFlx_col=0._r8
-  allocate(StandingDeadChemElmnt_col(NumPlantChemElmnts,JY,JX));      StandingDeadChemElmnt_col=0._r8
+  allocate(StandingDeadChemElm_col(NumPlantChemElms,JY,JX));      StandingDeadChemElm_col=0._r8
   allocate(ZDRAIN(JY,JX));      ZDRAIN=0._r8
   allocate(PDRAIN(JY,JX));      PDRAIN=0._r8
   allocate(UION(JY,JX));        UION=0._r8
@@ -171,7 +171,7 @@ implicit none
   allocate(TOQCK(0:JZ,JY,JX));  TOQCK=0._r8
   allocate(VOLQ(0:JZ,JY,JX));   VOLQ=0._r8
   allocate(TFNQ(0:JZ,JY,JX));   TFNQ=0._r8
-  allocate(LitrfalChemElemnts_vr(NumPlantChemElmnts,jsken,1:NumOfPlantLitrCmplxs,0:JZ,JY,JX));LitrfalChemElemnts_vr=0._r8
+  allocate(LitrfalChemElemnts_vr(NumPlantChemElms,jsken,1:NumOfPlantLitrCmplxs,0:JZ,JY,JX));LitrfalChemElemnts_vr=0._r8
   allocate(trcs_VLN_vr(ids_beg:ids_end,0:JZ,JY,JX));trcs_VLN_vr=1._r8
 
   allocate(VLNHB(0:JZ,JY,JX));  VLNHB=0._r8
@@ -251,7 +251,7 @@ implicit none
   call destroy(HydroSubsDINFlx_col)
   call destroy(HydroSufDIPFlx_col)
   call destroy(HydroSubsDIPFlx_col)
-  call destroy(StandingDeadChemElmnt_col)
+  call destroy(StandingDeadChemElm_col)
   call destroy(ZDRAIN)
   call destroy(PDRAIN)
   call destroy(UION)

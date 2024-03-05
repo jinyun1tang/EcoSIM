@@ -107,12 +107,12 @@ implicit none
   allocate(this%DOM(idom_beg:idom_end,1:jcplx))
   allocate(this%OHM(idom_beg:idom_end,1:jcplx))
   allocate(this%OSA(jsken,1:jcplx))
-  allocate(this%OSM(NumPlantChemElmnts,jsken,1:jcplx))
-  allocate(this%ORM(1:NumPlantChemElmnts,ndbiomcp,1:jcplx))
+  allocate(this%OSM(NumPlantChemElms,jsken,1:jcplx))
+  allocate(this%ORM(1:NumPlantChemElms,ndbiomcp,1:jcplx))
   allocate(this%CNOSC(jsken,1:jcplx))
   allocate(this%CPOSC(jsken,1:jcplx))
-  allocate(this%OMEhetr(NumPlantChemElmnts,NumLiveHeterBioms,1:jcplx))
-  allocate(this%OMEauto(NumPlantChemElmnts,NumLiveAutoBioms))
+  allocate(this%OMEhetr(NumPlantChemElms,NumLiveHeterBioms,1:jcplx))
+  allocate(this%OMEauto(NumPlantChemElms,NumLiveAutoBioms))
 
   end subroutine Init
 

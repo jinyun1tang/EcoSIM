@@ -50,13 +50,13 @@ module ExtractsMod
   associate(                             &
    NP0      => plt_site%NP0        , &
    WGLFT    => plt_biom%WGLFT      , &
-   StandingDeadChemElmnt_col  => plt_biom%StandingDeadChemElmnt_col   , &
-   StandingDeadChemElmnts_pft   => plt_biom%StandingDeadChemElmnts_pft     , &
-   LitterFallChemElmnt_pft    => plt_bgcr%LitterFallChemElmnt_pft      , &
-   LitterFallChemElmnt_col    => plt_bgcr%LitterFallChemElmnt_col      , &
+   StandingDeadChemElm_col  => plt_biom%StandingDeadChemElm_col   , &
+   StandingDeadChemElms_pft   => plt_biom%StandingDeadChemElms_pft     , &
+   LitterFallChemElm_pft    => plt_bgcr%LitterFallChemElm_pft      , &
+   LitterFallChemElm_col    => plt_bgcr%LitterFallChemElm_col      , &
    LitrfalChemElemnts_vr     => plt_bgcr%LitrfalChemElemnts_vr       , &
-   LitterFallChemElmnt_pftvr     => plt_bgcr%LitterFallChemElmnt_pftvr       , &
-   NI       => plt_morph%NI        , &
+   LitterFallChemElm_pvr     => plt_bgcr%LitterFallChemElm_pvr       , &
+   MaxSoiL4Root      => plt_morph%MaxSoiL4Root       , &
    CanopyStemA_lyr    => plt_morph%CanopyStemA_lyr     , &
    CanopyLAgrid_lyr    =>  plt_morph%CanopyLAgrid_lyr    , &
    StemArea_grd    =>  plt_morph%StemArea_grd    , &
@@ -68,21 +68,21 @@ module ExtractsMod
 !
 !   ZCSNC,ZZSNC,ZPSNC=total C,N,P litterfall
 !   HCSNC,HZSNC,HPSNC=hourly PFT C,N,P litterfall from grosub.f
-!   StandingDeadChemElmnt_col=total standing dead C,N,P mass
+!   StandingDeadChemElm_col=total standing dead C,N,P mass
 !   WTSTG=PFT standing dead C,N,P mass
-!   LitterFallChemElmnt_pftvr,=cumulative PFT C,N,P litterfall from grosub.f
+!   LitterFallChemElm_pvr,=cumulative PFT C,N,P litterfall from grosub.f
 !   LitrfalChemElemnts_vr,=cumulative total C,N,P litterfall
 !
-    DO NE=1,NumPlantChemElmnts
-      LitterFallChemElmnt_col(NE)=LitterFallChemElmnt_col(NE)+LitterFallChemElmnt_pft(NE,NZ)
-      StandingDeadChemElmnt_col(NE)=StandingDeadChemElmnt_col(NE)+StandingDeadChemElmnts_pft(NE,NZ)
+    DO NE=1,NumPlantChemElms
+      LitterFallChemElm_col(NE)=LitterFallChemElm_col(NE)+LitterFallChemElm_pft(NE,NZ)
+      StandingDeadChemElm_col(NE)=StandingDeadChemElm_col(NE)+StandingDeadChemElms_pft(NE,NZ)
     ENDDO
 
-    DO  L=0,NI(NZ)
+    DO  L=0,MaxSoiL4Root(NZ)
       DO K=1,pltpar%NumOfPlantLitrCmplxs
-        DO NE=1,NumPlantChemElmnts
+        DO NE=1,NumPlantChemElms
           DO  M=1,pltpar%jsken
-            LitrfalChemElemnts_vr(NE,M,K,L)=LitrfalChemElemnts_vr(NE,M,K,L)+LitterFallChemElmnt_pftvr(NE,M,K,L,NZ)
+            LitrfalChemElemnts_vr(NE,M,K,L)=LitrfalChemElemnts_vr(NE,M,K,L)+LitterFallChemElm_pvr(NE,M,K,L,NZ)
           enddo
         ENDDO
       ENDDO
@@ -182,11 +182,11 @@ module ExtractsMod
     RootLenDensPerPlant_pvr => plt_morph%RootLenDensPerPlant_pvr , &
     RTDNT => plt_morph%RTDNT , &
     MY    => plt_morph%MY    , &
-    NI    => plt_morph%NI      &
+    MaxSoiL4Root   => plt_morph%MaxSoiL4Root     &
   )
 
   DO N=1,MY(NZ)
-    DO L=NU,NI(NZ)
+    DO L=NU,MaxSoiL4Root(NZ)
 !
 !     TOTAL ROOT DENSITY
 !
@@ -275,7 +275,7 @@ module ExtractsMod
 !     RDFOMC,RDFOMN,RDFOMP=PFT nonstructl C,N,P exchange
 !
       DO K=1,jcplx
-        DO NE=1,NumPlantChemElmnts
+        DO NE=1,NumPlantChemElms
           TDFOME(NE,K,L)=TDFOME(NE,K,L)-RDFOME(ielmc,N,K,L,NZ)
         ENDDO
       ENDDO
@@ -335,16 +335,16 @@ module ExtractsMod
     PlantElemntStoreLandscape => plt_site%PlantElemntStoreLandscape  , &
     ElmntBalanceCum_pft  => plt_site%ElmntBalanceCum_pft   , &
     NH3EmiCum_pft => plt_bgcr%NH3EmiCum_pft  , &
-    RNH3C => plt_bgcr%RNH3C  , &
+    NH3Dep2Can_pft => plt_bgcr%NH3Dep2Can_pft  , &
     Canopy_NEE_col => plt_bgcr%Canopy_NEE_col  , &
-    LitterFallChemElmnt_col => plt_bgcr%LitterFallChemElmnt_col  , &
+    LitterFallChemElm_col => plt_bgcr%LitterFallChemElm_col  , &
     RootGasLossDisturb_pft => plt_bgcr%RootGasLossDisturb_pft, &
     RootN2Fix_pvr => plt_bgcr%RootN2Fix_pvr  , &
     CO2NetFix_pft  => plt_bgcr%CO2NetFix_pft   , &
     ETCanopy_pft => plt_ew%ETCanopy_pft    , &
     TH2GZ => plt_bgcr%TH2GZ  , &
     trcs_plant_uptake_vr => plt_rbgc%trcs_plant_uptake_vr, &    
-    RNH3B => plt_rbgc%RNH3B  , &
+    NH3Dep2_brch => plt_rbgc%NH3Dep2_brch  , &
     PlantRootSoilChemNetX_pft=> plt_rbgc%PlantRootSoilChemNetX_pft , &
     TRootGasLossDisturb_pft => plt_rbgc%TRootGasLossDisturb_pft  , &
     Transpiration_pft   => plt_ew%Transpiration_pft      , &
@@ -354,7 +354,7 @@ module ExtractsMod
     CanopyWater_pft => plt_ew%CanopyWater_pft    , &
     Eco_Heat_Grnd_col   => plt_ew%Eco_Heat_Grnd_col      , &
     HeatXAir2PCan => plt_ew%HeatXAir2PCan    , &
-    EvapTransHeatP => plt_ew%EvapTransHeatP    , &
+    EvapTransHeat_pft => plt_ew%EvapTransHeat_pft    , &
     CanWatg=> plt_ew%CanWatg   , &
     TKC   => plt_ew%TKC      , &
     TKS   => plt_ew%TKS      , &
@@ -369,18 +369,18 @@ module ExtractsMod
     HeatStorCanP => plt_ew%HeatStorCanP    , &
     Eco_Heat_Latent_col   => plt_ew%Eco_Heat_Latent_col      , &
     CanH2OHeldVg=> plt_ew%CanH2OHeldVg   , &
-    NU    => plt_site%NU     , &
-    StemArea_grd => plt_morph%StemArea_grd , &
+    NU                 => plt_site%NU     , &
+    StemArea_grd       => plt_morph%StemArea_grd , &
     CanopyLeafArea_grd => plt_morph%CanopyLeafArea_grd , &
-    NI    => plt_morph%NI    , &
+    MaxSoiL4Root        => plt_morph%MaxSoiL4Root   , &
     NumOfBranches_pft   => plt_morph%NumOfBranches_pft   , &
-    CanopyStemA_pft => plt_morph%CanopyStemA_pft , &
-    CanopyLeafArea_pft => plt_morph%CanopyLeafArea_pft , &
-    RadNet2CanP  => plt_rad%RadNet2CanP    , &
-    LWRadCanP => plt_rad%LWRadCanP   , &
-    Eco_NetRad_col   => plt_rad%Eco_NetRad_col       &
+    CanopyStemA_pft     => plt_morph%CanopyStemA_pft , &
+    CanopyLeafArea_pft  => plt_morph%CanopyLeafArea_pft , &
+    RadNet2CanP         => plt_rad%RadNet2CanP    , &
+    LWRadCanP           => plt_rad%LWRadCanP   , &
+    Eco_NetRad_col      => plt_rad%Eco_NetRad_col       &
   )
-  DO L=NU,NI(NZ)
+  DO L=NU,MaxSoiL4Root(NZ)
     trcs_plant_uptake_vr(idg_N2,L)=trcs_plant_uptake_vr(idg_N2,L)+RootN2Fix_pvr(L,NZ)
   ENDDO
 !
@@ -389,7 +389,7 @@ module ExtractsMod
 !     Eco_NetRad_col=total net SW+LW absorbed by canopy
 !     RadNet2CanP=PFT net SW+LW absorbed by canopy
 !     Eco_Heat_Latent_col=total canopy latent heat flux
-!     EvapTransHeatP=PFT canopy latent heat flux
+!     EvapTransHeat_pft=PFT canopy latent heat flux
 !     Eco_Heat_Sens_col=total canopy sensible heat flux
 !     HeatXAir2PCan=PFT canopy sensible heat flux
 !     Eco_Heat_Grnd_col=total canopy storage heat flux
@@ -412,7 +412,7 @@ module ExtractsMod
 !     RootGasLossDisturb_pft=PFT loss of root CO2, O2, CH4, N2O, NH3, H2
 !
   Eco_NetRad_col=Eco_NetRad_col+RadNet2CanP(NZ)
-  Eco_Heat_Latent_col=Eco_Heat_Latent_col+EvapTransHeatP(NZ)
+  Eco_Heat_Latent_col=Eco_Heat_Latent_col+EvapTransHeat_pft(NZ)
   Eco_Heat_Sens_col=Eco_Heat_Sens_col+HeatXAir2PCan(NZ)
   Eco_Heat_Grnd_col=Eco_Heat_Grnd_col+HeatStorCanP(NZ)
   Canopy_NEE_col=Canopy_NEE_col+CO2NetFix_pft(NZ)
@@ -428,8 +428,8 @@ module ExtractsMod
   LWRadCanG=LWRadCanG+LWRadCanP(NZ)
   CanopyLeafArea_grd=CanopyLeafArea_grd+CanopyLeafArea_pft(NZ)
   StemArea_grd=StemArea_grd+CanopyStemA_pft(NZ)
-  DO NE=1,NumPlantChemElmnts
-    LitterFallChemElmnt_col(NE)=LitterFallChemElmnt_col(NE)-PlantRootSoilChemNetX_pft(NE,NZ)
+  DO NE=1,NumPlantChemElms
+    LitterFallChemElm_col(NE)=LitterFallChemElm_col(NE)-PlantRootSoilChemNetX_pft(NE,NZ)
     PlantElemntStoreLandscape(NE)=PlantElemntStoreLandscape(NE)+ElmntBalanceCum_pft(NE,NZ)
   ENDDO
 
@@ -439,13 +439,13 @@ module ExtractsMod
 !
 !     TOTAL CANOPY NH3 EXCHANGE AND EXUDATION
 !
-!     RNH3B,RNH3C=PFT NH3 flux between atmosphere and branch,canopy
+!     NH3Dep2_brch,NH3Dep2Can_pft=PFT NH3 flux between atmosphere and branch,canopy
 !     NH3EmiCum_pft=total NH3 flux between atmosphere and canopy
 !
-  RNH3C(NZ)=0._r8
+  NH3Dep2Can_pft(NZ)=0._r8
   DO NB=1,NumOfBranches_pft(NZ)
-    RNH3C(NZ)=RNH3C(NZ)+RNH3B(NB,NZ)
-    NH3EmiCum_pft(NZ)=NH3EmiCum_pft(NZ)+RNH3B(NB,NZ)
+    NH3Dep2Can_pft(NZ)=NH3Dep2Can_pft(NZ)+NH3Dep2_brch(NB,NZ)
+    NH3EmiCum_pft(NZ)=NH3EmiCum_pft(NZ)+NH3Dep2_brch(NB,NZ)
   ENDDO
   end associate
   end subroutine CanopyFluxesandFixation

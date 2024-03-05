@@ -130,7 +130,7 @@ implicit none
           DO NGL=JGnio(N),JGnfo(N)
             DO M=1,nlbiomcp
               MID=micpar%get_micb_id(M,NGL)
-              DO NE=1,NumPlantChemElmnts
+              DO NE=1,NumPlantChemElms
                 FOMC=FSINK*OMEhetr(NE,MID,K,L,NY,NX)
                 OMEhetr(NE,MID,K,LL,NY,NX)=OMEhetr(NE,MID,K,LL,NY,NX)+FOMC                
                 OMEhetr(NE,MID,K,L,NY,NX)=OMEhetr(NE,MID,K,L,NY,NX)-FOMC
@@ -149,7 +149,7 @@ implicit none
         DO NGL=JGniA(N),JGnfA(N)
           DO M=1,nlbiomcp
             MID=micpar%get_micb_id(M,NGL)        
-            DO NE=1,NumPlantChemElmnts              
+            DO NE=1,NumPlantChemElms              
               FOMC=FSINK*OMEauto(NE,MID,L,NY,NX)
               OMEauto(NE,MID,LL,NY,NX)=OMEauto(NE,MID,LL,NY,NX)+FOMC
               OMEauto(NE,MID,L,NY,NX)=OMEauto(NE,MID,L,NY,NX)-FOMC
@@ -163,7 +163,7 @@ implicit none
 !
       D1900: DO K=1,micpar%NumOfLitrCmplxs
         D1940: DO M=1,ndbiomcp
-          DO NE=1,NumPlantChemElmnts                   
+          DO NE=1,NumPlantChemElms                   
             FORC=FSINK*ORM(NE,M,K,L,NY,NX)
             ORM(NE,M,K,LL,NY,NX)=ORM(NE,M,K,LL,NY,NX)+FORC
             ORM(NE,M,K,L,NY,NX)=ORM(NE,M,K,L,NY,NX)-FORC
@@ -184,7 +184,7 @@ implicit none
           FOSA=FSINK*OSA(M,K,L,NY,NX)
           OSA(M,K,LL,NY,NX)=OSA(M,K,LL,NY,NX)+FOSA
           OSA(M,K,L,NY,NX)=OSA(M,K,L,NY,NX)-FOSA
-          DO NE=1,NumPlantChemElmnts
+          DO NE=1,NumPlantChemElms
             FOSC=FSINK*OSM(NE,M,K,L,NY,NX)
             OSM(NE,M,K,LL,NY,NX)=OSM(NE,M,K,LL,NY,NX)+FOSC
             OSM(NE,M,K,L,NY,NX)=OSM(NE,M,K,L,NY,NX)-FOSC
@@ -217,12 +217,12 @@ implicit none
     trcx_TER(idx_beg:idx_end,NY,NX)=0.0_r8
     trcp_TER(idsp_beg:idsp_end,NY,NX)=0.0_r8
 
-    TOMEERhetr(1:NumPlantChemElmnts,1:NumLiveHeterBioms,1:jcplx,NY,NX)=0.0_r8
-    TOMEERauto(1:NumPlantChemElmnts,1:NumLiveAutoBioms,NY,NX)=0.0_r8
+    TOMEERhetr(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx,NY,NX)=0.0_r8
+    TOMEERauto(1:NumPlantChemElms,1:NumLiveAutoBioms,NY,NX)=0.0_r8
 
-    TORMER(1:NumPlantChemElmnts,1:ndbiomcp,1:jcplx,NY,NX)=0.0_r8
+    TORMER(1:NumPlantChemElms,1:ndbiomcp,1:jcplx,NY,NX)=0.0_r8
     TOHMER(idom_beg:idom_end,1:jcplx,NY,NX)=0.0_r8
-    TOSMER(1:NumPlantChemElmnts,1:jsken,1:jcplx,NY,NX)=0.0_r8
+    TOSMER(1:NumPlantChemElms,1:jsken,1:jcplx,NY,NX)=0.0_r8
     TOSAER(1:jsken,1:jcplx,NY,NX)=0.0_r8
   ENDIF
   end subroutine ZeroErosionArray
