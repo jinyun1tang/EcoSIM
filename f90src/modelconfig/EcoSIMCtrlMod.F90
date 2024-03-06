@@ -7,6 +7,7 @@ implicit none
   save
   logical :: salt_model   =.false.    !toggle for salt model
   logical :: erosion_model=.false.
+  logical :: first_topou   = .false.
   integer :: iErosionMode =-1         !erosion option  
   logical :: plant_model  =.true.
   logical :: microbial_model   =.true.

@@ -8,7 +8,7 @@ module ReadManagementMod
   use FlagDataType
   use FertilizerDataType
   use ClimForcDataType
-  use EcoSIMCtrlMod, only : lverb
+  use EcoSIMCtrlMod, only : lverb, first_topou
   use SoilWaterDataType
   use LandSurfDataType
   use EcoSIMCtrlDataType
@@ -421,6 +421,7 @@ implicit none
 
   ntopou=get_dim_len(soilmgmt_nfid, 'ntopou')
   if(ntopou==0)return
+  if(first_topou)ntopou=1  
   DO NTOPO=1,ntopou
     call ncd_getvar(soilmgmt_nfid,'NH1',ntopo,NH1)
     call ncd_getvar(soilmgmt_nfid,'NV1',ntopo,NV1)

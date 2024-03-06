@@ -169,7 +169,7 @@ implicit none
     !obtain the number of topographic units
     ntopou=get_dim_len(pftinfo_nfid, 'ntopou')
     nyears=get_dim_len(pftinfo_nfid, 'year')
-
+    if(first_topou)ntopou=1
     DO NTOPO=1,ntopou
       call ncd_getvar(pftinfo_nfid,'NH1',ntopo,NH1)
       call ncd_getvar(pftinfo_nfid,'NV1',ntopo,NV1)
@@ -1007,7 +1007,7 @@ implicit none
       endif
       !obtain the number of topographic units
       ntopou=get_dim_len(pftinfo_nfid, 'ntopou')
-
+      if(first_topou)ntopou=1    
       DO NTOPO=1,ntopou
         call ncd_getvar(pftinfo_nfid,'NH1',ntopo,NH1)
         call ncd_getvar(pftinfo_nfid,'NV1',ntopo,NV1)
