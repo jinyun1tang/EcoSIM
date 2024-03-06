@@ -341,6 +341,7 @@ varname_dict={
 'CPRT':'PC ratio in plant root:gP gC-1:f4',
 'CPND':'PC ratio in plant nodule:gP gC-1:f4'
 }
+
 for j in range(npfts):
       pfile=pft_path+pft_names[j]
       with open(pfile,"r") as pftfile:
@@ -583,7 +584,7 @@ for j in range(npfts):
 
 #write pft file
 current_dateTime = datetime.now()
-nc_f='ecosim_pft_%4d%02d%02d.nc'%(current_dateTime.year,current_dateTime.month,current_dateTime.day)
+nc_f='../input_data/ecosim_pft_%4d%02d%02d.nc'%(current_dateTime.year,current_dateTime.month,current_dateTime.day)
 nc_fid = Dataset(nc_f, 'w')
 
 nc_fid.description='plant trait parameterization for ecosim created on %4d/%02d/%02d/%02d:%02d:%02d'% \

@@ -12,6 +12,7 @@ warnings.filterwarnings("ignore")
 config_lake_dict={
 'case':'lake',
 'mdir':'/Users/jinyuntang/work/github/ecosim2/EcoSIM/examples/inputs/lake/',
+'outdir':'/Users/jinyuntang/work/github/ecosim2/EcoSIM/examples/inputs/lake/',    
 'ntopu':'2'
 }
 
@@ -19,12 +20,14 @@ config_lake_dict={
 config_sample_dict={
 'case':'sample',
 'mdir':'/Users/jinyuntang/work/github/ecosim2/EcoSIM/examples/inputs/sample/',
+'outdir':'/Users/jinyuntang/work/github/ecosim2/EcoSIM/examples/inputs/sample/',    
 'ntopu':'1'
 }
 
 config_dry_dict={
 'case':'dryland',
 'mdir':'/Users/jinyuntang/work/github/ecosim2/EcoSIM/examples/inputs/dryland_maize/',
+'outdir':'/Users/jinyuntang/work/github/ecosim2/EcoSIM/examples/inputs/dryland_maize/',    
 'ntopu':'1'
 }
 
@@ -41,7 +44,7 @@ def write_soil_mgmt(config_dict):
   ntopu=int(config_dict['ntopu'])
 
   current_dateTime = datetime.now()
-  nc_f=case+'_soilmgmt_%4d%02d%02d.nc'%(current_dateTime.year,current_dateTime.month,current_dateTime.day)
+  nc_f=config_dict['mdir']+case+'_soilmgmt_%4d%02d%02d.nc'%(current_dateTime.year,current_dateTime.month,current_dateTime.day)
 
   print("check file %s"%nc_f)
 

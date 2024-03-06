@@ -9,8 +9,6 @@ import warnings
 warnings.filterwarnings("ignore")
 
 
-
-
 grid_info={
 'ALATG':'Latitude:degrees north:f4',
 'ALTIG':'Altitude above sea-level:m:f4',
@@ -203,7 +201,7 @@ def write_site_topo_data(config_dict):
 #write grid file
 
   current_dateTime = datetime.now()
-  nc_f=case+'_grid_%4d%02d%02d.nc'%(current_dateTime.year,current_dateTime.month,current_dateTime.day)
+  nc_f=config_dict['outdir']+case+'_grid_%4d%02d%02d.nc'%(current_dateTime.year,current_dateTime.month,current_dateTime.day)
   nc_fid = Dataset(nc_f, 'w')
 
   nc_fid.description='Grid input data created on %4d/%02d/%02d/%02d:%02d:%02d'% \
