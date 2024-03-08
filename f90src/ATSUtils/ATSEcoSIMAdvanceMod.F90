@@ -68,8 +68,9 @@ implicit none
     TairK(NY,NX)=tairc(NY)
     VPA(NY,NX) = vpair(NY)
     WindSpeedAtm(NY,NX) = uwind(NY)
-    SWRadOnGrnd(NY,NX) = swrad(NY)
-    LWRadSky(NY,NX) = sunrad(NY)
+    !converting radiation units from ATS (W m^-2) to EcoSIM (MJ m^-2 h^-1)
+    SWRadOnGrnd(NY,NX) = swrad(NY)*0.0036_r8
+    LWRadSky(NY,NX) = sunrad(NY)*0.0036_r8
     !RainH(NY,NX) = prec
     DO L=NU(NY,NX),NL(NY,NX)
       write(*,*) "L = ", L, "POROS(L,NY,NX) = ", POROS(L,NY,NX), " POROS(L,NY,NX) = ", POROS(L,NY,NX)
@@ -102,15 +103,17 @@ implicit none
   
   write(*,*) "Heat and water souces: "
   write(*,*) "Hinfl2Soil = ", Hinfl2Soil, " MJ"
+  write(*,*) "HeatFluxAir2Soi = ", HeatFluxAir2Soi
   write(*,*) "Qinfl2MicP = ", Qinfl2MicP 
   write(*,*) "Timestep in EcoSIM: ", dts_HeatWatTP, " hr"
   DO NY=1,NYS
+    write(*,*) "ATS true E source: ", Hinfl2Soil(NY,1) / (dts_HeatWatTP*3600._r8)
     !for every column send the top layer to the transfer var
-    surf_e_source(NY) = Hinfl2Soil(NY,1) / (dts_HeatWatTP*10000._r8*3600._r8)
+    surf_e_source(NY) = Hinfl2Soil(NY,1) / (dts_HeatWatTP*3600._r8)
     !surf_e_source(NY) = 1.0e-5
+    write(*,*) "After conversion ", surf_e_source(NY) , " MJ/s" 
   ENDDO
 
-  write(*,*) "After conversion ", dts_HeatWatTP, " MJ/s"  
   end subroutine RunEcoSIMSurfaceBalance
 
 end module ATSEcoSIMAdvanceMod
