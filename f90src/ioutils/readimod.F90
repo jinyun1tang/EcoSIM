@@ -366,7 +366,7 @@ module readiMod
 ! SLX: not used
 
   ntopus=get_dim_len(grid_nfid, 'ntopou')
-
+  if(first_topou)ntopus=1
   DO ntp=1,ntopus
     call ncd_getvar(grid_nfid, 'NH1', ntp, NH1)
     call ncd_getvar(grid_nfid, 'NV1', ntp, NV1)

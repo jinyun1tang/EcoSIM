@@ -130,8 +130,8 @@
 
   D960: DO NZ=1,NP0(NY,NX)
   !NetCumElmntFlx2Plant_pft: effect of canopy element status on seed set
-    DO NE=1,NumPlantChemElmnts
-      NetCumElmntFlx2Plant_pft(NE,NZ,NY,NX)=NetCumElmntFlx2Plant_pft(NE,NZ,NY,NX)+PlantExudChemElmntCum_pft(NE,NZ,NY,NX)-LitrfallChemElmnts_pft(NE,NZ,NY,NX)
+    DO NE=1,NumPlantChemElms
+      NetCumElmntFlx2Plant_pft(NE,NZ,NY,NX)=NetCumElmntFlx2Plant_pft(NE,NZ,NY,NX)+PlantExudChemElmCum_pft(NE,NZ,NY,NX)-LitrfallChemElms_pft(NE,NZ,NY,NX)
       EcoHavstElmntCum_pft(NE,NZ,NY,NX)=EcoHavstElmntCum_pft(NE,NZ,NY,NX)+EcoHavstElmnt_pft(NE,NZ,NY,NX)
     enddo
     NetCumElmntFlx2Plant_pft(ielmc,NZ,NY,NX)=NetCumElmntFlx2Plant_pft(ielmc,NZ,NY,NX)+GrossCO2Fix_pft(NZ,NY,NX)+GrossResp_pft(NZ,NY,NX) &
@@ -142,7 +142,7 @@
 
 ! the following variables are accumulated daily
     GrossCO2Fix_pft(NZ,NY,NX)=0._r8
-    PlantExudChemElmntCum_pft(:,NZ,NY,NX)=0._r8
+    PlantExudChemElmCum_pft(:,NZ,NY,NX)=0._r8
     GrossResp_pft(NZ,NY,NX)=0._r8
     CanopyPlusNoduRespC_pft(NZ,NY,NX)=0._r8
     ETCanopy_pft(NZ,NY,NX)=0._r8
@@ -156,8 +156,8 @@
     PO4byFire_pft(NZ,NY,NX)=0._r8
 
     EcoHavstElmnt_pft(:,NZ,NY,NX)=0._r8
-    SurfLitrfallChemElmnts_pft(:,NZ,NY,NX)=0._r8
-    LitrfallChemElmnts_pft(:,NZ,NY,NX)=0._r8
+    SurfLitrfallChemElms_pft(:,NZ,NY,NX)=0._r8
+    LitrfallChemElms_pft(:,NZ,NY,NX)=0._r8
   ENDDO D960
   IF(iErosionMode.EQ.ieros_frzthaweros.OR.iErosionMode.EQ.ieros_frzthawsomeros)THEN
     TSED(NY,NX)=0._r8

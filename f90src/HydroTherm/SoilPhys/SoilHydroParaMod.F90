@@ -402,9 +402,12 @@ contains
     HydroCond3D(3,K,0,NY,NX)=SatHydroCondVert(0,NY,NX)*YK*SUM1/SUM2
     HydroCond3D(1,K,0,NY,NX)=0.0_r8
     HydroCond3D(2,K,0,NY,NX)=0.0_r8
-    IF(K.GT.1.AND.PSISK(K).LT.PSISoilAirEntry(0,NY,NX).AND.PSISK(K-1).GE.PSISoilAirEntry(0,NY,NX))THEN
-      !moisture at air-entry saturation
-      Theta_sat(0,NY,NX)=H2OSOIatK(K)
+    if(PSISK(K)/=PSISK(K))write(*,*)'PSISK bad',K
+    IF(K.GT.1.AND.(PSISK(K).LT.PSISoilAirEntry(0,NY,NX)))THEN
+      IF(PSISK(K-1).GE.PSISoilAirEntry(0,NY,NX))THEN
+        !moisture at air-entry saturation
+        Theta_sat(0,NY,NX)=H2OSOIatK(K)
+      ENDIF
     ENDIF
   ENDDO D1235
   end subroutine LitterHydroproperty

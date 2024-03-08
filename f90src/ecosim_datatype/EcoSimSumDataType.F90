@@ -17,8 +17,8 @@ module EcoSimSumDataType
   real(r8) :: WaterStoreLandscape   !total soil water content	m3 d-2
   real(r8) :: HeatStoreLandscape   !total soil heat content	MJ d-2
   real(r8) :: OXYGSO   !total soil O2 content	g d-2
-  real(r8) :: LitRMStoreLndscap(1:NumPlantChemElmnts)   !total soil litter OM content	g d-2
-  real(r8) :: POMHumStoreLndscap(NumPlantChemElmnts)   !total soil POM + humus C content	g d-2
+  real(r8) :: LitRMStoreLndscap(1:NumPlantChemElms)   !total soil litter OM content	g d-2
+  real(r8) :: POMHumStoreLndscap(NumPlantChemElms)   !total soil POM + humus C content	g d-2
   real(r8) :: TLNH4    !total soil NH4 content	g d-2
   real(r8) :: TLNO3    !total soil NO3 content	g d-2
   real(r8) :: TLPO4    !total soil PO4 content	g d-2
@@ -36,10 +36,10 @@ module EcoSimSumDataType
   real(r8) :: CRUN     !total surface runoff	m3 d-2
   real(r8) :: HEATOU   !total subsurface heat flux	MJ d-2
   real(r8) :: OXYGOU   !total subsurface O2 flux	g d-2
-  real(r8) :: TOMOU(NumPlantChemElmnts)     !total subsurface C flux	g d-2
+  real(r8) :: TOMOU(NumPlantChemElms)     !total subsurface C flux	g d-2
   real(r8) :: TZIN     !total surface N flux	g d-2
   real(r8) :: TPIN     !total surface P flux	g d-2
-  real(r8) :: XESN(NumPlantChemElmnts)     !total litterfall C	g d-2
+  real(r8) :: XESN(NumPlantChemElms)     !total litterfall C	g d-2
   real(r8) :: TLCO2G   !total soil CO2	g d-2
   real(r8) :: TLN2G    !total soil N2	g d-2
 
@@ -57,7 +57,7 @@ module EcoSimSumDataType
   subroutine InitAllocate
   implicit none
 
-  allocate(PlantElemntStoreLandscape(NumPlantChemElmnts)); PlantElemntStoreLandscape=0._r8
+  allocate(PlantElemntStoreLandscape(NumPlantChemElms)); PlantElemntStoreLandscape=0._r8
   end subroutine InitAllocate
 
 !----------------------------------------------------------------------

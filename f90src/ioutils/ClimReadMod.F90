@@ -810,7 +810,6 @@ implicit none
   call ncd_getvar(atm_ghg_nfid,'year',iyear,year0)
   iyear=(yeari-int(year0))*12
 
-
   if(atm_co2_fix>0._r8)then
     atm_co2_mon=atm_co2_fix
   else
@@ -844,7 +843,5 @@ implicit none
     ENDDO
   ENDDO
   end subroutine GetAtmGts
-
-
 
 end module ClimReadMod

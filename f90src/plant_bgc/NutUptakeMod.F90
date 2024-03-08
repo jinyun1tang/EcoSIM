@@ -58,12 +58,12 @@ module NutUptakeMod
     TCelciusCanopy_pft    =>  plt_ew%TCelciusCanopy_pft       , &
     NU      =>  plt_site%NU       , &
     AREA3   =>  plt_site%AREA3    , &
-    RNH3B   =>  plt_rbgc%RNH3B    , &
+    NH3Dep2_brch   =>  plt_rbgc%NH3Dep2_brch    , &
     ZEROP   =>  plt_biom%ZEROP    , &
     AtmGasc=>  plt_site%AtmGasc  , &    
     LeafPetolBiomassC_brch   =>  plt_biom%LeafPetolBiomassC_brch    , &
     NonstructElmnt_brch  =>  plt_biom%NonstructElmnt_brch   , &
-    LeafPetoNonstructElmntConc_brch  =>  plt_biom%LeafPetoNonstructElmntConc_brch   , &
+    LeafPetoNonstElmConc_brch  =>  plt_biom%LeafPetoNonstElmConc_brch   , &
     CanPStomaResistH2O_pft      =>  plt_photo%CanPStomaResistH2O_pft      , &
     CanopyBndlResist_pft     =>  plt_photo%CanopyBndlResist_pft     , &
     LeafAreaLive_brch   =>  plt_morph%LeafAreaLive_brch   , &
@@ -82,7 +82,7 @@ module NutUptakeMod
   !     LeafAreaLive_brch,CanopyLeafArea_pft=branch,canopy leaf area
   !     CNH3P,AtmGasc(idg_NH3)=gaseous NH3 concentration in branch,atmosphere
   !     CZPOLB,ZPOOLB=nonstplt_rbgc%RUCtural N concentration,content in branch
-  !     RNH3B=NH3 flux between atmosphere and branch
+  !     NH3Dep2_brch=NH3 flux between atmosphere and branch
   !     RA,CanPStomaResistH2O_pft=canopy boundary layer,stomatal resistance
   !     FracRadPARbyCanopy_pft=fraction of radiation received by each PFT canopy
   !
@@ -92,16 +92,16 @@ module NutUptakeMod
     D105: DO NB=1,NumOfBranches_pft(NZ)
       IF(LeafPetolBiomassC_brch(NB,NZ).GT.ZEROP(NZ).AND.LeafAreaLive_brch(NB,NZ).GT.ZEROP(NZ) &
         .AND.CanopyLeafArea_pft(NZ).GT.ZEROP(NZ))THEN
-        CNH3P=AZMAX1(FNH3P*LeafPetoNonstructElmntConc_brch(ielmn,NB,NZ)/SNH3P)
+        CNH3P=AZMAX1(FNH3P*LeafPetoNonstElmConc_brch(ielmn,NB,NZ)/SNH3P)
         ZPOOLB=AZMAX1(NonstructElmnt_brch(ielmn,NB,NZ))
-        RNH3B(NB,NZ)=AMIN1(0.1_r8*ZPOOLB,AMAX1((AtmGasc(idg_NH3)-CNH3P)/(CanopyBndlResist_pft(NZ)+CanPStomaResistH2O_pft(NZ)) &
+        NH3Dep2_brch(NB,NZ)=AMIN1(0.1_r8*ZPOOLB,AMAX1((AtmGasc(idg_NH3)-CNH3P)/(CanopyBndlResist_pft(NZ)+CanPStomaResistH2O_pft(NZ)) &
           *FracRadPARbyCanopy_pft(NZ)*AREA3(NU)*LeafAreaLive_brch(NB,NZ)/CanopyLeafArea_pft(NZ),-0.1_r8*ZPOOLB))
       ELSE
-        RNH3B(NB,NZ)=0.0_r8
+        NH3Dep2_brch(NB,NZ)=0.0_r8
       ENDIF
     ENDDO D105
   ELSE
-    RNH3B(1:NumOfBranches_pft(NZ),NZ)=0.0_r8
+    NH3Dep2_brch(1:NumOfBranches_pft(NZ),NZ)=0.0_r8
   ENDIF
   end associate
   end subroutine CanopyNH3Flux
@@ -135,13 +135,13 @@ module NutUptakeMod
     MY                      =>  plt_morph%MY         , &
     RootLenDensPerPlant_pvr =>  plt_morph%RootLenDensPerPlant_pvr      , &
     RootVH2O_vr             =>  plt_morph%RootVH2O_vr     , &
-    NI                      =>  plt_morph%NI           &
+    MaxSoiL4Root            =>  plt_morph%MaxSoiL4Root           &
   )
 
   call ZeroUptake(NZ)
 
   D955: DO N=1,MY(NZ)
-    D950: DO L=NU,NI(NZ)
+    D950: DO L=NU,MaxSoiL4Root(NZ)
       IF(VLSoilPoreMicP(L).GT.ZEROS2.AND.RootLenDensPerPlant_pvr(N,L,NZ).GT.ZERO &
         .AND.RootVH2O_vr(N,L,NZ).GT.ZEROP(NZ).AND.THETW(L).GT.ZERO)THEN
         TFOXYX=0.0_r8
@@ -206,14 +206,14 @@ module NutUptakeMod
   integer :: K, L1,L2,NN
   !     begin_execution
 
-  L1=plt_site%NU;L2=plt_morph%NI(NZ);NN=plt_morph%MY(NZ)
+  L1=plt_site%NU;L2=plt_morph%MaxSoiL4Root(NZ);NN=plt_morph%MY(NZ)
 
   plt_rbgc%trcg_air2root_flx_pft_vr(idg_beg:idg_end-1,1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%trcg_Root_DisEvap_flx_vr(idg_beg:idg_end-1,1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%RUPGasSol_vr(idg_beg:idg_end,1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%RCO2P(1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%RUPOXP(1:NN,L1:L2,NZ)=0.0_r8
-  plt_rbgc%RDFOME(1:NumPlantChemElmnts,1:NN,1:jcplx,L1:L2,NZ)=0.0_r8
+  plt_rbgc%RDFOME(1:NumPlantChemElms,1:NN,1:jcplx,L1:L2,NZ)=0.0_r8
   plt_rbgc%RootAutoRO2Limiter_pvr(1:NN,L1:L2,NZ)=1.0
   plt_rbgc%RUNNHP(1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%RootNutUptake_pvr(ids_NH4,1:NN,L1:L2,NZ)=0.0_r8
@@ -1113,7 +1113,7 @@ module NutUptakeMod
     AllPlantRootH2OUptake_vr   => plt_ew%AllPlantRootH2OUptake_vr     , &
     RootFracRemobilizableBiom   => plt_allom%RootFracRemobilizableBiom  , &
     ZEROP   => plt_biom%ZEROP   , &
-    RootProteinConc_pftvr  => plt_biom%RootProteinConc_pftvr  , &
+    RootProteinConc_pvr  => plt_biom%RootProteinConc_pvr  , &
     RootProteinC_pvr   => plt_biom%RootProteinC_pvr   , &
      RootMycoNonstructElmnt_vr  => plt_biom%RootMycoNonstructElmnt_vr  , &
     RootNonstructElementConcpft_vr  => plt_biom%RootNonstructElementConcpft_vr  , &
@@ -1124,15 +1124,15 @@ module NutUptakeMod
   !     PROTEIN CONTENT RELATIVE TO 5% FOR WHICH ACTIVE UPTAKE
   !     PARAMETERS ARE DEFINED
   !
-  !     RootProteinConc_pftvr,RootFracRemobilizableBiom=current,maximum protein concentration
+  !     RootProteinConc_pvr,RootFracRemobilizableBiom=current,maximum protein concentration
   !     RootProteinC_pvr,WTRTL=protein content,mass
   !     FWSRT=protein concentration relative to 5%
   !
   IF(RootStructBiomC_vr(N,L,NZ).GT.ZEROP(NZ))THEN
-    RootProteinConc_pftvr(N,L,NZ)=AMIN1(RootFracRemobilizableBiom(NZ),RootProteinC_pvr(N,L,NZ)/RootStructBiomC_vr(N,L,NZ))
-    FWSRT=RootProteinConc_pftvr(N,L,NZ)/0.05_r8
+    RootProteinConc_pvr(N,L,NZ)=AMIN1(RootFracRemobilizableBiom(NZ),RootProteinC_pvr(N,L,NZ)/RootStructBiomC_vr(N,L,NZ))
+    FWSRT=RootProteinConc_pvr(N,L,NZ)/0.05_r8
   ELSE
-    RootProteinConc_pftvr(N,L,NZ)=RootFracRemobilizableBiom(NZ)
+    RootProteinConc_pvr(N,L,NZ)=RootFracRemobilizableBiom(NZ)
     FWSRT=1.0_r8
   ENDIF
   !
@@ -1253,7 +1253,7 @@ module NutUptakeMod
   !     FEXUC,FEXUN,FEXUP=rate constant for root C,N,P exudation
   !     Canopy_Heat_Latent_col,Canopy_Heat_Sens_col=total fluxes x blr for calculating canopy air temperature,
   !     vapor pressure in watsub.f
-  !      EvapTransHeatP,SFLXC=canopylatent,sensible heat fluxes
+  !      EvapTransHeat_pft,SFLXC=canopylatent,sensible heat fluxes
   !      RA=canopy boundary layer resistance
   !     OSTR=O2 stress indicator
   !
@@ -1278,7 +1278,7 @@ module NutUptakeMod
         RDFOME(ielmp,N,K,L,NZ)=0.0_r8
       ENDIF
     ELSE
-      RDFOME(1:NumPlantChemElmnts,N,K,L,NZ)=0.0_r8
+      RDFOME(1:NumPlantChemElms,N,K,L,NZ)=0.0_r8
     ENDIF
 
   ENDDO D195
@@ -1297,7 +1297,7 @@ module NutUptakeMod
   associate(                              &
     RDOM_micb_flx    =>  plt_bgcr%RDOM_micb_flx     , &
     RDFOME   =>  plt_rbgc%RDFOME    , &
-    RootExudChemElmnt_pft    =>  plt_rbgc%RootExudChemElmnt_pft     , &
+    RootExudChemElm_pft    =>  plt_rbgc%RootExudChemElm_pft     , &
     RootHPO4Uptake_pft    =>  plt_rbgc%RootHPO4Uptake_pft     , &
     RootH2PO4Uptake_pft    =>  plt_rbgc%RootH2PO4Uptake_pft     , &
     RootNH4Uptake_pft    =>  plt_rbgc%RootNH4Uptake_pft     , &
@@ -1314,9 +1314,9 @@ module NutUptakeMod
   !     RootNH4Uptake_pft,RootNO3Uptake_pft,RootH2PO4Uptake_pft,RootHPO4Uptake_pft=PFT uptake of NH4,NO3,H2PO4,HPO4
   !
   D295: DO K=1,jcplx
-    RootExudChemElmnt_pft(ielmc,NZ)=RootExudChemElmnt_pft(ielmc,NZ)+RDFOME(ielmc,N,K,L,NZ)
-    RootExudChemElmnt_pft(ielmn,NZ)=RootExudChemElmnt_pft(ielmn,NZ)+RDFOME(ielmn,N,K,L,NZ)
-    RootExudChemElmnt_pft(ielmp,NZ)=RootExudChemElmnt_pft(ielmp,NZ)+RDFOME(ielmp,N,K,L,NZ)
+    RootExudChemElm_pft(ielmc,NZ)=RootExudChemElm_pft(ielmc,NZ)+RDFOME(ielmc,N,K,L,NZ)
+    RootExudChemElm_pft(ielmn,NZ)=RootExudChemElm_pft(ielmn,NZ)+RDFOME(ielmn,N,K,L,NZ)
+    RootExudChemElm_pft(ielmp,NZ)=RootExudChemElm_pft(ielmp,NZ)+RDFOME(ielmp,N,K,L,NZ)
     RDOM_micb_flx(idom_doc,K,L)=RDOM_micb_flx(idom_doc,K,L)-RDFOME(ielmc,N,K,L,NZ)
     RDOM_micb_flx(idom_don,K,L)=RDOM_micb_flx(idom_don,K,L)-RDFOME(ielmn,N,K,L,NZ)
     RDOM_micb_flx(idom_dop,K,L)=RDOM_micb_flx(idom_dop,K,L)-RDFOME(ielmp,N,K,L,NZ)

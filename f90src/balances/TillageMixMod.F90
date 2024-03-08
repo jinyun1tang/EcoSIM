@@ -50,12 +50,12 @@ module TillageMixMod
   real(r8) :: TOMGC(1:NumLiveHeterBioms,1:jcplx)
   real(r8) :: TOMGN(1:NumLiveHeterBioms,1:jcplx)
   real(r8) :: TOMGP(1:NumLiveHeterBioms,1:jcplx)
-  REAL(R8) :: TOMEhetr(NumPlantChemElmnts,NumLiveHeterBioms,1:jcplx)
-  REAL(R8) :: TOMEauto(NumPlantChemElmnts,NumLiveAutoBioms)
-  real(r8) :: TORM(NumPlantChemElmnts,ndbiomcp,1:jcplx)
+  REAL(R8) :: TOMEhetr(NumPlantChemElms,NumLiveHeterBioms,1:jcplx)
+  REAL(R8) :: TOMEauto(NumPlantChemElms,NumLiveAutoBioms)
+  real(r8) :: TORM(NumPlantChemElms,ndbiomcp,1:jcplx)
   real(r8) :: TDOM(idom_beg:idom_end,1:jcplx)
   real(r8) :: TOHM(idom_beg:idom_end,1:jcplx)
-  real(r8) :: TOSM(1:NumPlantChemElmnts,jsken,1:jcplx)
+  real(r8) :: TOSM(1:NumPlantChemElms,jsken,1:jcplx)
   real(r8) :: TOSA(jsken,1:jcplx)
   real(r8) :: CORP,CORP0,XCORP0,DCORPZ
   real(r8) :: TBKDX,TFC,TWP,TSatHydroCondVert,TSCNH,TSAND
@@ -402,7 +402,7 @@ module TillageMixMod
 
       DO K=1,jcplx
         DO  M=1,ndbiomcp
-          DO NE=1,NumPlantChemElmnts
+          DO NE=1,NumPlantChemElms
             TORM(NE,M,K)=TORM(NE,M,K)+TI*ORM(NE,M,K,L,NY,NX)
           ENDDO
         ENDDO

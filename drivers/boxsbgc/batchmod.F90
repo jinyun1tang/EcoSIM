@@ -84,10 +84,10 @@ contains
   ystates0l(cid_orn_b:cid_orn_e)=reshape(forc%ORM(ielmn,1:ndbiomcp,1:jcplx),(/ndbiomcp*jcplx/))
   ystates0l(cid_orp_b:cid_orp_e)=reshape(forc%ORM(ielmp,1:ndbiomcp,1:jcplx),(/ndbiomcp*jcplx/))
 
-  ystates0l(cid_omehetr_b:cid_omehetr_e)=reshape(forc%OMEhetr(1:NumPlantChemElmnts,1:NumLiveHeterBioms,1:jcplx),&
-    (/NumPlantChemElmnts*NumLiveHeterBioms*jcplx/))
-  ystates0l(cid_omeauto_b:cid_omeauto_e)=reshape(forc%OMEauto(1:NumPlantChemElmnts,1:NumLiveAutoBioms),&
-    (/NumPlantChemElmnts*NumLiveAutoBioms/))
+  ystates0l(cid_omehetr_b:cid_omehetr_e)=reshape(forc%OMEhetr(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx),&
+    (/NumPlantChemElms*NumLiveHeterBioms*jcplx/))
+  ystates0l(cid_omeauto_b:cid_omeauto_e)=reshape(forc%OMEauto(1:NumPlantChemElms,1:NumLiveAutoBioms),&
+    (/NumPlantChemElms*NumLiveAutoBioms/))
 
   end associate
   end subroutine initmodel
@@ -288,10 +288,10 @@ contains
   micstt%CNOSC(1:jsken,1:jcplx)=forc%CNOSC(1:jsken,1:jcplx)
   micstt%CPOSC(1:jsken,1:jcplx)=forc%CPOSC(1:jsken,1:jcplx)
 
-  micstt%OMEhetr(1:NumPlantChemElmnts,1:NumLiveHeterBioms,1:jcplx)=&
-    reshape(ystates0l(cid_omehetr_b:cid_omehetr_e),(/NumPlantChemElmnts,NumLiveHeterBioms,jcplx/))
-  micstt%OMEauto(1:NumPlantChemElmnts,1:NumLiveAutoBioms)=reshape(ystates0l(cid_omeauto_b:cid_omeauto_e),&
-    (/NumPlantChemElmnts,NumLiveAutoBioms/))
+  micstt%OMEhetr(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx)=&
+    reshape(ystates0l(cid_omehetr_b:cid_omehetr_e),(/NumPlantChemElms,NumLiveHeterBioms,jcplx/))
+  micstt%OMEauto(1:NumPlantChemElms,1:NumLiveAutoBioms)=reshape(ystates0l(cid_omeauto_b:cid_omeauto_e),&
+    (/NumPlantChemElms,NumLiveAutoBioms/))
   
   micflx%RINHO(1:NumMicrbHetetrophCmplx,1:jcplx)=reshape(ystates0l(fid_RINHO_b:fid_RINHO_e),(/NumMicrbHetetrophCmplx,JCPLX/))
   micflx%RINHB(1:NumMicrbHetetrophCmplx,1:jcplx)=reshape(ystates0l(fid_RINHB_b:fid_RINHB_e),(/NumMicrbHetetrophCmplx,JCPLX/))
@@ -409,9 +409,9 @@ contains
   cid_orn_b=addone(itemp);cid_orn_e=cid_orn_b+ndbiomcp*jcplx;itemp=cid_orn_e
   cid_orp_b=addone(itemp);cid_orp_e=cid_orp_b+ndbiomcp*jcplx;itemp=cid_orp_e
 
-  cid_omehetr_b=addone(itemp);cid_omehetr_e=cid_omehetr_b+NumPlantChemElmnts*NumLiveHeterBioms*jcplx
+  cid_omehetr_b=addone(itemp);cid_omehetr_e=cid_omehetr_b+NumPlantChemElms*NumLiveHeterBioms*jcplx
   itemp=cid_omehetr_e
-  cid_omeauto_b=addone(itemp);cid_omeauto_e=cid_omeauto_b+NumPlantChemElmnts*NumLiveAutoBioms
+  cid_omeauto_b=addone(itemp);cid_omeauto_e=cid_omeauto_b+NumPlantChemElms*NumLiveAutoBioms
   itemp=cid_omeauto_e
 
   fid_ROXYY=addone(itemp)
@@ -604,10 +604,10 @@ contains
   ystatesfl(cid_orc_b:cid_orc_e)=reshape(micstt%ORM(ielmc,1:ndbiomcp,1:jcplx),(/ndbiomcp*jcplx/))
   ystatesfl(cid_orn_b:cid_orn_e)=reshape(micstt%ORM(ielmn,1:ndbiomcp,1:jcplx),(/ndbiomcp*jcplx/))
   ystatesfl(cid_orp_b:cid_orp_e)=reshape(micstt%ORM(ielmp,1:ndbiomcp,1:jcplx),(/ndbiomcp*jcplx/))
-  ystatesfl(cid_omehetr_b:cid_omehetr_e)=reshape(micstt%OMEhetr(1:NumPlantChemElmnts,1:NumLiveHeterBioms,1:jcplx),&
-    (/NumPlantChemElmnts*NumLiveHeterBioms*jcplx/))
-  ystatesfl(cid_omeauto_b:cid_omeauto_e)=reshape(micstt%OMEauto(1:NumPlantChemElmnts,1:NumLiveAutoBioms),&
-    (/NumPlantChemElmnts*NumLiveAutoBioms/))
+  ystatesfl(cid_omehetr_b:cid_omehetr_e)=reshape(micstt%OMEhetr(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx),&
+    (/NumPlantChemElms*NumLiveHeterBioms*jcplx/))
+  ystatesfl(cid_omeauto_b:cid_omeauto_e)=reshape(micstt%OMEauto(1:NumPlantChemElms,1:NumLiveAutoBioms),&
+    (/NumPlantChemElms*NumLiveAutoBioms/))
 
 ! summarize diagnostic fluxes
   DO K=1,jcplx

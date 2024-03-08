@@ -84,13 +84,13 @@ module StartqMod
 !     FILL OUT UNUSED ARRAYS
 !
       D9986: DO NZ=NP(NY,NX)+1,JP
-        SurfLitrfallChemElmnts_pft(1:NumPlantChemElmnts,NZ,NY,NX)=0._r8
-        LitrfallChemElmnts_pft(1:NumPlantChemElmnts,NZ,NY,NX)=0._r8
-        StandingDeadChemElmnts_pft(1:NumPlantChemElmnts,NZ,NY,NX)=0._r8
+        SurfLitrfallChemElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
+        LitrfallChemElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
+        StandingDeadChemElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
         D6401: DO L=1,NL(NY,NX)
           DO  K=1,pltpar%NumOfPlantLitrCmplxs
             DO  M=1,jskenc
-              LitterFallChemElmnt_pftvr(1:NumPlantChemElmnts,M,K,L,NZ,NY,NX)=0._r8
+              LitterFallChemElm_pvr(1:NumPlantChemElms,M,K,L,NZ,NY,NX)=0._r8
             enddo
           enddo
         ENDDO D6401
@@ -524,22 +524,22 @@ module StartqMod
 !
   HoursCanopyPSITooLow(NZ,NY,NX)=0._r8
   CHILL(NZ,NY,NX)=0._r8
-  NonstructElmnt_brch(1:NumPlantChemElmnts,1:MaxNumBranches,NZ,NY,NX)=0._r8
-  NoduleNonstructElmnt_brch(1:NumPlantChemElmnts,1:MaxNumBranches,NZ,NY,NX)=0._r8
-  ShootChemElmnt_brch(1:NumPlantChemElmnts,1:MaxNumBranches,NZ,NY,NX)=0._r8
-  PetoleChemElmnt_brch(1:NumPlantChemElmnts,1:MaxNumBranches,NZ,NY,NX)=0._r8
-  StalkChemElmnts_brch(1:NumPlantChemElmnts,1:MaxNumBranches,NZ,NY,NX)=0._r8
-  LeafChemElmnts_brch(1:NumPlantChemElmnts,1:MaxNumBranches,NZ,NY,NX)=0._r8
-  ReserveElmnts_brch(1:NumPlantChemElmnts,1:MaxNumBranches,NZ,NY,NX)=0._r8
-  HuskChemElmnts_brch(1:NumPlantChemElmnts,1:MaxNumBranches,NZ,NY,NX)=0._r8
-  GrainChemElmnts_brch(1:NumPlantChemElmnts,1:MaxNumBranches,NZ,NY,NX)=0._r8
-  EarChemElmnts_brch(1:NumPlantChemElmnts,1:MaxNumBranches,NZ,NY,NX)=0._r8
-  CanopyNoduleChemElmnt_brch(1:NumPlantChemElmnts,1:MaxNumBranches,NZ,NY,NX)=0._r8
-  LeafElmntRemobFlx_brch(1:NumPlantChemElmnts,1:MaxNumBranches,NZ,NY,NX)=0._r8
-  PetioleChemElmntRemobFlx_brch(1:NumPlantChemElmnts,1:MaxNumBranches,NZ,NY,NX)=0._r8
-  PetioleChemElmntRemob_brch(1:NumPlantChemElmnts,1:MaxNumBranches,NZ,NY,NX)=0._r8  
-  BranchStalkChemElmnts_pft_pft(1:NumPlantChemElmnts,1:MaxNumBranches,NZ,NY,NX)=0._r8
-  LeafChemElmntRemob_brch(1:NumPlantChemElmnts,1:MaxNumBranches,NZ,NY,NX)=0._r8
+  NonstructElmnt_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)=0._r8
+  NoduleNonstructElmnt_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)=0._r8
+  ShootChemElm_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)=0._r8
+  PetoleChemElm_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)=0._r8
+  StalkChemElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)=0._r8
+  LeafChemElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)=0._r8
+  ReserveElmnts_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)=0._r8
+  HuskChemElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)=0._r8
+  GrainChemElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)=0._r8
+  EarChemElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)=0._r8
+  CanopyNoduleChemElm_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)=0._r8
+  LeafElmntRemobFlx_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)=0._r8
+  PetioleChemElmRemobFlx_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)=0._r8
+  PetioleChemElmRemob_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)=0._r8  
+  BranchStalkChemElms_pft(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)=0._r8
+  LeafChemElmRemob_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)=0._r8
   
   D25: DO NB=1,MaxNumBranches
     StalkBiomassC_brch(NB,NZ,NY,NX)=0._r8
@@ -548,7 +548,7 @@ module StartqMod
     SeedNumberSet_brch(NB,NZ,NY,NX)=0._r8
     GrainSeedBiomCMean_brch(NB,NZ,NY,NX)=0._r8
     LeafAreaLive_brch(NB,NZ,NY,NX)=0._r8
-    RNH3B(NB,NZ,NY,NX)=0._r8
+    NH3Dep2_brch(NB,NZ,NY,NX)=0._r8
     LeafAreaDying_brch(NB,NZ,NY,NX)=0._r8
     CanPBranchHeight(NB,NZ,NY,NX)=0._r8
     
@@ -563,15 +563,15 @@ module StartqMod
       InternodeHeightLive_brch(K,NB,NZ,NY,NX)=0._r8
       InternodeHeightDying_brch(K,NB,NZ,NY,NX)=0._r8
       PetioleLengthNode_brch(K,NB,NZ,NY,NX)=0._r8
-      LeafElmntNode_brch(1:NumPlantChemElmnts,K,NB,NZ,NY,NX)=0._r8
-      PetioleElmntNode_brch(1:NumPlantChemElmnts,K,NB,NZ,NY,NX)=0._r8
-      InternodeChemElmnt_brch(1:NumPlantChemElmnts,K,NB,NZ,NY,NX)=0._r8
+      LeafElmntNode_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX)=0._r8
+      PetioleElmntNode_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX)=0._r8
+      InternodeChemElm_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX)=0._r8
       LeafProteinCNode_brch(K,NB,NZ,NY,NX)=0._r8
       PetioleProteinCNode_brch(K,NB,NZ,NY,NX)=0._r8
 
       D55: DO L=1,NumOfCanopyLayers
         CanopyLeafAreaByLayer_pft(L,K,NB,NZ,NY,NX)=0._r8
-        LeafChemElmntByLayer_pft(1:NumPlantChemElmnts,L,K,NB,NZ,NY,NX)=0._r8
+        LeafChemElmByLayer_pft(1:NumPlantChemElms,L,K,NB,NZ,NY,NX)=0._r8
       ENDDO D55
       IF(K.NE.0)THEN
         CPOOL3(K,NB,NZ,NY,NX)=0._r8
@@ -591,21 +591,21 @@ module StartqMod
     CanopyLeafCpft_lyr(L,NZ,NY,NX)=0._r8
     CanopyStemApft_lyr(L,NZ,NY,NX)=0._r8
   ENDDO D35
-  CanopyNonstructElements_pft(1:NumPlantChemElmnts,NZ,NY,NX)=0._r8
-  CanopyNonstructElementConc_pft(1:NumPlantChemElmnts,NZ,NY,NX)=0._r8
+  CanopyNonstructElements_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
+  CanopyNonstructElementConc_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
   NoduleNonstructCconc_pft(NZ,NY,NX)=0._r8
-  ShootChemElmnts_pft(1:NumPlantChemElmnts,NZ,NY,NX)=0._r8
-  LeafChemElmnts_pft(1:NumPlantChemElmnts,NZ,NY,NX)=0._r8
-  PetioleChemElmnts_pft(1:NumPlantChemElmnts,NZ,NY,NX)=0._r8
-  StalkChemElmnts_pft(1:NumPlantChemElmnts,NZ,NY,NX)=0._r8
+  ShootChemElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
+  LeafChemElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
+  PetioleChemElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
+  StalkChemElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
   CanopyStalkC_pft(NZ,NY,NX)=0._r8
-  ReserveChemElmnts_pft(1:NumPlantChemElmnts,NZ,NY,NX)=0._r8
-  HuskChemElmnts_pft(1:NumPlantChemElmnts,NZ,NY,NX)=0._r8
-  EarChemElmnts_pft(1:NumPlantChemElmnts,NZ,NY,NX)=0._r8
-  GrainChemElmnts_pft(1:NumPlantChemElmnts,NZ,NY,NX)=0._r8
-  RootElmnts_pft(1:NumPlantChemElmnts,NZ,NY,NX)=0._r8
-  RootStructElmnt_pft(1:NumPlantChemElmnts,NZ,NY,NX)=0._r8
-  NoduleChemElmnts_pft(1:NumPlantChemElmnts,NZ,NY,NX)=0._r8
+  ReserveChemElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
+  HuskChemElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
+  EarChemElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
+  GrainChemElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
+  RootElmnts_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
+  RootStructElmnt_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
+  NoduleChemElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
   CanopyLeafShethC_pft(NZ,NY,NX)=0._r8
 
   CanopyLeafArea_pft(NZ,NY,NX)=0._r8
@@ -628,13 +628,13 @@ module StartqMod
 !
   IF(.not.is_restart().AND.is_first_year)THEN
     GrossCO2Fix_pft(NZ,NY,NX)=0._r8
-    SurfLitrfallChemElmnts_pft(1:NumPlantChemElmnts,NZ,NY,NX)=0._r8
+    SurfLitrfallChemElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
     GrossResp_pft(NZ,NY,NX)=0._r8
     CanopyPlusNoduRespC_pft(NZ,NY,NX)=0._r8
-    PlantExudChemElmntCum_pft(1:NumPlantChemElmnts,NZ,NY,NX)=0._r8
-    LitrfallChemElmnts_pft(1:NumPlantChemElmnts,NZ,NY,NX)=0._r8
+    PlantExudChemElmCum_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
+    LitrfallChemElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
     PlantN2FixCum_pft(NZ,NY,NX)=0._r8
-    RNH3C(NZ,NY,NX)=0._r8
+    NH3Dep2Can_pft(NZ,NY,NX)=0._r8
     NH3EmiCum_pft(NZ,NY,NX)=0._r8
     CO2ByFire_pft(NZ,NY,NX)=0._r8
     CH4ByFire_pft(NZ,NY,NX)=0._r8
@@ -642,22 +642,22 @@ module StartqMod
     NH3byFire_pft(NZ,NY,NX)=0._r8
     N2ObyFire_pft(NZ,NY,NX)=0._r8
     PO4byFire_pft(NZ,NY,NX)=0._r8
-    EcoHavstElmntCum_pft(1:NumPlantChemElmnts,NZ,NY,NX)=0._r8
-    EcoHavstElmnt_pft(1:NumPlantChemElmnts,NZ,NY,NX)=0._r8
-    NetCumElmntFlx2Plant_pft(1:NumPlantChemElmnts,NZ,NY,NX)=0._r8
+    EcoHavstElmntCum_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
+    EcoHavstElmnt_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
+    NetCumElmntFlx2Plant_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
     ETCanopy_pft(NZ,NY,NX)=0._r8
-    StandingDeadChemElmnts_pft(1:NumPlantChemElmnts,NZ,NY,NX)=0._r8
+    StandingDeadChemElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
     WTSTDX=StandingDeadInitC_pft(NZ,NY,NX)*AREA(3,NU(NY,NX),NY,NX)
     D155: DO M=1,jskenc
-      StandingDeadKCompChemElmnts_pft(ielmc,M,NZ,NY,NX)=WTSTDX*CFOPE(ielmc,icwood,M,NZ,NY,NX)
-      StandingDeadKCompChemElmnts_pft(ielmn,M,NZ,NY,NX)=WTSTDX*rNCStalk_pft(NZ,NY,NX)*CFOPE(ielmn,icwood,M,NZ,NY,NX)
-      StandingDeadKCompChemElmnts_pft(ielmp,M,NZ,NY,NX)=WTSTDX*rPCStalk_pft(NZ,NY,NX)*CFOPE(ielmp,icwood,M,NZ,NY,NX)
-      StandingDeadChemElmnts_pft(ielmc,NZ,NY,NX)=StandingDeadChemElmnts_pft(ielmc,NZ,NY,NX) &
-        +StandingDeadKCompChemElmnts_pft(ielmc,M,NZ,NY,NX)
-      StandingDeadChemElmnts_pft(ielmn,NZ,NY,NX)=StandingDeadChemElmnts_pft(ielmn,NZ,NY,NX) &
-        +StandingDeadKCompChemElmnts_pft(ielmn,M,NZ,NY,NX)
-      StandingDeadChemElmnts_pft(ielmp,NZ,NY,NX)=StandingDeadChemElmnts_pft(ielmp,NZ,NY,NX) &
-        +StandingDeadKCompChemElmnts_pft(ielmp,M,NZ,NY,NX)
+      StandingDeadKCompChemElms_pft(ielmc,M,NZ,NY,NX)=WTSTDX*CFOPE(ielmc,icwood,M,NZ,NY,NX)
+      StandingDeadKCompChemElms_pft(ielmn,M,NZ,NY,NX)=WTSTDX*rNCStalk_pft(NZ,NY,NX)*CFOPE(ielmn,icwood,M,NZ,NY,NX)
+      StandingDeadKCompChemElms_pft(ielmp,M,NZ,NY,NX)=WTSTDX*rPCStalk_pft(NZ,NY,NX)*CFOPE(ielmp,icwood,M,NZ,NY,NX)
+      StandingDeadChemElms_pft(ielmc,NZ,NY,NX)=StandingDeadChemElms_pft(ielmc,NZ,NY,NX) &
+        +StandingDeadKCompChemElms_pft(ielmc,M,NZ,NY,NX)
+      StandingDeadChemElms_pft(ielmn,NZ,NY,NX)=StandingDeadChemElms_pft(ielmn,NZ,NY,NX) &
+        +StandingDeadKCompChemElms_pft(ielmn,M,NZ,NY,NX)
+      StandingDeadChemElms_pft(ielmp,NZ,NY,NX)=StandingDeadChemElms_pft(ielmp,NZ,NY,NX) &
+        +StandingDeadKCompChemElms_pft(ielmp,M,NZ,NY,NX)
     ENDDO D155
   ENDIF
   end associate
@@ -676,7 +676,7 @@ module StartqMod
 !     TCG,TKG=canopy temperature for phenology (oC,K)
 !     PSICanopy_pft,PSICanopyOsmo_pft,PSICanopyTurg_pft=canopy total,osmotic,turgor water potl(MPa)
 !
-  VHeatCapCanP(NZ,NY,NX)=cpw*ShootChemElmnts_pft(ielmc,NZ,NY,NX)*10.0E-06
+  VHeatCapCanP(NZ,NY,NX)=cpw*ShootChemElms_pft(ielmc,NZ,NY,NX)*10.0E-06
   ENGYX(NZ,NY,NX)=0._r8
   DTKC(NZ,NY,NX)=0._r8
   TCelciusCanopy_pft(NZ,NY,NX)=ATCA(NY,NX)
@@ -719,9 +719,9 @@ module StartqMod
       PSIRoot_vr(N,L,NZ,NY,NX)=-0.01_r8
       PSIRootOSMO_vr(N,L,NZ,NY,NX)=OSMO(NZ,NY,NX)+PSIRoot_vr(N,L,NZ,NY,NX)
       PSIRootTurg_vr(N,L,NZ,NY,NX)=AZMAX1(PSIRoot_vr(N,L,NZ,NY,NX)-PSIRootOSMO_vr(N,L,NZ,NY,NX))
-       RootMycoNonstructElmnt_vr(1:NumPlantChemElmnts,N,L,NZ,NY,NX)=0._r8
-      RootNonstructElementConcpft_vr(1:NumPlantChemElmnts,N,L,NZ,NY,NX)=0._r8
-      RootProteinConc_pftvr(N,L,NZ,NY,NX)=RootFracRemobilizableBiom(NZ,NY,NX)
+       RootMycoNonstructElmnt_vr(1:NumPlantChemElms,N,L,NZ,NY,NX)=0._r8
+      RootNonstructElementConcpft_vr(1:NumPlantChemElms,N,L,NZ,NY,NX)=0._r8
+      RootProteinConc_pvr(N,L,NZ,NY,NX)=RootFracRemobilizableBiom(NZ,NY,NX)
       RootStructBiomC_vr(N,L,NZ,NY,NX)=0._r8
       PopuPlantRootC_vr(N,L,NZ,NY,NX)=0._r8
       RootProteinC_pvr(N,L,NZ,NY,NX)=0._r8
@@ -771,20 +771,20 @@ module StartqMod
       D30: DO NR=1,MaxNumRootAxes
         SecndRootXNum_rpvr(N,L,NR,NZ,NY,NX)=0._r8
         PrimRootLen(N,L,NR,NZ,NY,NX)=0._r8
-        Root1stStructChemElmnt_pvr(1:NumPlantChemElmnts,N,L,NR,NZ,NY,NX)=0._r8
+        Root1stStructChemElm_pvr(1:NumPlantChemElms,N,L,NR,NZ,NY,NX)=0._r8
         SecndRootLen(N,L,NR,NZ,NY,NX)=0._r8
-        Root2ndStructChemElmnt_pvr(1:NumPlantChemElmnts,N,L,NR,NZ,NY,NX)=0._r8
+        Root2ndStructChemElm_pvr(1:NumPlantChemElms,N,L,NR,NZ,NY,NX)=0._r8
         PrimRootDepth(N,NR,NZ,NY,NX)=SeedDepth_pft(NZ,NY,NX)
-        Root1stChemElmnt(1:NumPlantChemElmnts,N,NR,NZ,NY,NX)=0._r8
+        Root1stChemElm(1:NumPlantChemElms,N,NR,NZ,NY,NX)=0._r8
       ENDDO D30
       IF(N.EQ.1)THEN
         D6400: DO K=1,pltpar%NumOfPlantLitrCmplxs
           DO  M=1,jskenc
-            LitterFallChemElmnt_pftvr(1:NumPlantChemElmnts,M,K,L,NZ,NY,NX)=0._r8
+            LitterFallChemElm_pvr(1:NumPlantChemElms,M,K,L,NZ,NY,NX)=0._r8
           enddo
         ENDDO D6400
-        RootNoduleNonstructElmnt_vr(1:NumPlantChemElmnts,L,NZ,NY,NX)=0._r8
-        RootNodueChemElmnt_pvr(1:NumPlantChemElmnts,L,NZ,NY,NX)=0._r8
+        RootNoduleNonstructElmnt_vr(1:NumPlantChemElms,L,NZ,NY,NX)=0._r8
+        RootNodueChemElm_pvr(1:NumPlantChemElms,L,NZ,NY,NX)=0._r8
         RootN2Fix_pvr(L,NZ,NY,NX)=0._r8
       ENDIF
     ENDDO D20
@@ -822,21 +822,21 @@ module StartqMod
   NonstructalElmnts_pft(ielmc,NZ,NY,NX)=SeedCPlanted_pft(NZ,NY,NX)
   NonstructalElmnts_pft(ielmn,NZ,NY,NX)=CNGR(NZ,NY,NX)*NonstructalElmnts_pft(ielmc,NZ,NY,NX)
   NonstructalElmnts_pft(ielmp,NZ,NY,NX)=CPGR(NZ,NY,NX)*NonstructalElmnts_pft(ielmc,NZ,NY,NX)
-  LeafChemElmnts_brch(ielmn,1,NZ,NY,NX)=CNGR(NZ,NY,NX)*LeafChemElmnts_brch(ielmc,1,NZ,NY,NX)
-  LeafChemElmnts_brch(ielmp,1,NZ,NY,NX)=CPGR(NZ,NY,NX)*LeafChemElmnts_brch(ielmc,1,NZ,NY,NX)
-  LeafPetolBiomassC_brch(1,NZ,NY,NX)=LeafChemElmnts_brch(ielmc,1,NZ,NY,NX)+PetoleChemElmnt_brch(ielmc,1,NZ,NY,NX)
+  LeafChemElms_brch(ielmn,1,NZ,NY,NX)=CNGR(NZ,NY,NX)*LeafChemElms_brch(ielmc,1,NZ,NY,NX)
+  LeafChemElms_brch(ielmp,1,NZ,NY,NX)=CPGR(NZ,NY,NX)*LeafChemElms_brch(ielmc,1,NZ,NY,NX)
+  LeafPetolBiomassC_brch(1,NZ,NY,NX)=LeafChemElms_brch(ielmc,1,NZ,NY,NX)+PetoleChemElm_brch(ielmc,1,NZ,NY,NX)
   CanopyLeafShethC_pft(NZ,NY,NX)=CanopyLeafShethC_pft(NZ,NY,NX)+LeafPetolBiomassC_brch(1,NZ,NY,NX)  
   FDM=AMIN1(1.0_r8,0.16_r8-0.045_r8*PSICanopy_pft(NZ,NY,NX))
   CanopyWater_pft(NZ,NY,NX)=ppmc*CanopyLeafShethC_pft(NZ,NY,NX)/FDM
   WatByPCanopy(NZ,NY,NX)=0._r8
   NonstructElmnt_brch(ielmn,1,NZ,NY,NX)=CNGR(NZ,NY,NX)*NonstructElmnt_brch(ielmc,1,NZ,NY,NX)
   NonstructElmnt_brch(ielmp,1,NZ,NY,NX)=CPGR(NZ,NY,NX)*NonstructElmnt_brch(ielmc,1,NZ,NY,NX)
-  Root1stStructChemElmnt_pvr(ielmn,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)=CNGR(NZ,NY,NX)*Root1stStructChemElmnt_pvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)
-  Root1stStructChemElmnt_pvr(ielmp,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)=CPGR(NZ,NY,NX)*Root1stStructChemElmnt_pvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)
-  Root1stChemElmnt(ielmn,1,1,NZ,NY,NX)=CNGR(NZ,NY,NX)*Root1stChemElmnt(ielmc,1,1,NZ,NY,NX)
-  Root1stChemElmnt(ielmp,1,1,NZ,NY,NX)=CPGR(NZ,NY,NX)*Root1stChemElmnt(ielmc,1,1,NZ,NY,NX)
-  RootStructBiomC_vr(ipltroot,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)=Root1stStructChemElmnt_pvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)
-  PopuPlantRootC_vr(ipltroot,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)=Root1stStructChemElmnt_pvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)
+  Root1stStructChemElm_pvr(ielmn,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)=CNGR(NZ,NY,NX)*Root1stStructChemElm_pvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)
+  Root1stStructChemElm_pvr(ielmp,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)=CPGR(NZ,NY,NX)*Root1stStructChemElm_pvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)
+  Root1stChemElm(ielmn,1,1,NZ,NY,NX)=CNGR(NZ,NY,NX)*Root1stChemElm(ielmc,1,1,NZ,NY,NX)
+  Root1stChemElm(ielmp,1,1,NZ,NY,NX)=CPGR(NZ,NY,NX)*Root1stChemElm(ielmc,1,1,NZ,NY,NX)
+  RootStructBiomC_vr(ipltroot,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)=Root1stStructChemElm_pvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)
+  PopuPlantRootC_vr(ipltroot,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)=Root1stStructChemElm_pvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)
   RootProteinC_pvr(1,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)=RootStructBiomC_vr(ipltroot,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)*RootFracRemobilizableBiom(NZ,NY,NX)
   RootMycoNonstructElmnt_vr(ielmn,1,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)=CNGR(NZ,NY,NX)* RootMycoNonstructElmnt_vr(ielmc,1,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)
   RootMycoNonstructElmnt_vr(ielmp,1,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)=CPGR(NZ,NY,NX)* RootMycoNonstructElmnt_vr(ielmc,1,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)

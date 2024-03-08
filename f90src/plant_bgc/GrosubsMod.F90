@@ -76,8 +76,8 @@ module grosubsMod
     NP0      => plt_site%NP0      , &
     MaxNumRootLays       => plt_site%MaxNumRootLays       , &
     CO2NetFix_pft     => plt_bgcr%CO2NetFix_pft     , &
-    LitterFallChemElmnt_pft    => plt_bgcr%LitterFallChemElmnt_pft    , &
-    LitterFallChemElmnt_pftvr     => plt_bgcr%LitterFallChemElmnt_pftvr     , &
+    LitterFallChemElm_pft    => plt_bgcr%LitterFallChemElm_pft    , &
+    LitterFallChemElm_pvr     => plt_bgcr%LitterFallChemElm_pvr     , &
     CanopyHeight_pft      => plt_morph%CanopyHeight_pft       &
   )
 !     TOTAL AGB FOR GRAZING IN LANDSCAPE SECTION
@@ -90,13 +90,13 @@ module grosubsMod
     D1: DO L=0,MaxNumRootLays
       DO K=1,pltpar%NumOfPlantLitrCmplxs
         DO M=1,jsken
-          DO NE=1,NumPlantChemElmnts
-            LitterFallChemElmnt_pftvr(NE,M,K,L,NZ)=0._r8
+          DO NE=1,NumPlantChemElms
+            LitterFallChemElm_pvr(NE,M,K,L,NZ)=0._r8
           ENDDO
         ENDDO
       ENDDO
     ENDDO D1
-    LitterFallChemElmnt_pft(1:NumPlantChemElmnts,NZ)=0._r8
+    LitterFallChemElm_pft(1:NumPlantChemElms,NZ)=0._r8
     CO2NetFix_pft(NZ)=0._r8
     CanopyHeight_copy(NZ)=CanopyHeight_pft(NZ)
     CanopyHeight_pft(NZ)=0._r8
@@ -142,12 +142,12 @@ module grosubsMod
     CH4ByFire_pft   => plt_distb%CH4ByFire_pft   , &
     CO2ByFire_pft   => plt_distb%CO2ByFire_pft   , &
     NH3byFire_pft   => plt_distb%NH3byFire_pft   , &
-    StandingDeadKCompChemElmnts_pft  => plt_biom%StandingDeadKCompChemElmnts_pft   , &
+    StandingDeadKCompChemElms_pft  => plt_biom%StandingDeadKCompChemElms_pft   , &
     RootElmnts_pft   => plt_biom%RootElmnts_pft    , &
-    ShootChemElmnts_pft  => plt_biom%ShootChemElmnts_pft  , &
-    NoduleChemElmnts_pft   => plt_biom%NoduleChemElmnts_pft    , &
+    ShootChemElms_pft  => plt_biom%ShootChemElms_pft  , &
+    NoduleChemElms_pft   => plt_biom%NoduleChemElms_pft    , &
     NonstructalElmnts_pft   => plt_biom%NonstructalElmnts_pft    , &
-    StandingDeadChemElmnts_pft  => plt_biom%StandingDeadChemElmnts_pft   , &
+    StandingDeadChemElms_pft  => plt_biom%StandingDeadChemElms_pft   , &
     fTgrowCanP    => plt_pheno%fTgrowCanP    , &
     NetCumElmntFlx2Plant_pft   => plt_pheno%NetCumElmntFlx2Plant_pft   , &
     IsPlantActive_pft   => plt_pheno%IsPlantActive_pft   , &
@@ -161,16 +161,16 @@ module grosubsMod
     NP0     => plt_site%NP0      , &
     MaxNumRootLays      => plt_site%MaxNumRootLays       , &
     iYearCurrent    => plt_site%iYearCurrent     , &
-    LitterFallChemElmnt_pftvr    => plt_bgcr%LitterFallChemElmnt_pftvr     , &
+    LitterFallChemElm_pvr    => plt_bgcr%LitterFallChemElm_pvr     , &
     NetPrimaryProductvity_pft    => plt_bgcr%NetPrimaryProductvity_pft     , &
     PlantN2FixCum_pft  => plt_bgcr%PlantN2FixCum_pft   , &
-    LitterFallChemElmnt_pft   => plt_bgcr%LitterFallChemElmnt_pft    , &
+    LitterFallChemElm_pft   => plt_bgcr%LitterFallChemElm_pft    , &
     NH3EmiCum_pft   => plt_bgcr%NH3EmiCum_pft    , &
-    LitrfallChemElmnts_pft   => plt_bgcr%LitrfallChemElmnts_pft    , &
-    SurfLitrfallChemElmnts_pft   => plt_bgcr%SurfLitrfallChemElmnts_pft    , &
+    LitrfallChemElms_pft   => plt_bgcr%LitrfallChemElms_pft    , &
+    SurfLitrfallChemElms_pft   => plt_bgcr%SurfLitrfallChemElms_pft    , &
     GrossResp_pft   => plt_bgcr%GrossResp_pft    , &
     GrossCO2Fix_pft   => plt_bgcr%GrossCO2Fix_pft    , &
-    PlantExudChemElmntCum_pft  => plt_rbgc%PlantExudChemElmntCum_pft   , &
+    PlantExudChemElmCum_pft  => plt_rbgc%PlantExudChemElmCum_pft   , &
     CumSoilThickness  => plt_site%CumSoilThickness   , &
     PlantinDepth  => plt_morph%PlantinDepth  , &
     NumOfBranches_pft     => plt_morph%NumOfBranches_pft       &
@@ -198,15 +198,15 @@ module grosubsMod
 !     WTSTG,WTSTDN,WTSTDP=standing dead C,N,P mass
 !     CSNC,ZSNC,PSNC=C,N,P litterfall
 !
-    DO NE=1,NumPlantChemElmnts
+    DO NE=1,NumPlantChemElms
       D6235: DO M=1,jsken
-        XFRE=1.5814E-05_r8*fTgrowCanP(NZ)*StandingDeadKCompChemElmnts_pft(NE,M,NZ)
+        XFRE=1.5814E-05_r8*fTgrowCanP(NZ)*StandingDeadKCompChemElms_pft(NE,M,NZ)
         IF(iPlantTurnoverPattern_pft(NZ).EQ.0.OR.iPlantMorphologyType_pft(NZ).LE.1)THEN
-          LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,0,NZ)=LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,0,NZ)+XFRE
+          LitterFallChemElm_pvr(NE,M,k_fine_litr,0,NZ)=LitterFallChemElm_pvr(NE,M,k_fine_litr,0,NZ)+XFRE
         ELSE
-          LitterFallChemElmnt_pftvr(NE,M,k_woody_litr,0,NZ)=LitterFallChemElmnt_pftvr(NE,M,k_woody_litr,0,NZ)+XFRE
+          LitterFallChemElm_pvr(NE,M,k_woody_litr,0,NZ)=LitterFallChemElm_pvr(NE,M,k_woody_litr,0,NZ)+XFRE
         ENDIF
-        StandingDeadKCompChemElmnts_pft(NE,M,NZ)=StandingDeadKCompChemElmnts_pft(NE,M,NZ)-XFRE
+        StandingDeadKCompChemElms_pft(NE,M,NZ)=StandingDeadKCompChemElms_pft(NE,M,NZ)-XFRE
       ENDDO D6235
     ENDDO
 !
@@ -217,12 +217,12 @@ module grosubsMod
 !     HCSNC,HZSNC,HPSNC=hourly C,N,P litterfall
 !
     DO K=1,pltpar%NumOfPlantLitrCmplxs
-      DO NE=1,NumPlantChemElmnts
+      DO NE=1,NumPlantChemElms
         D6430: DO M=1,jsken
-          SurfLitrfallChemElmnts_pft(NE,NZ)=SurfLitrfallChemElmnts_pft(NE,NZ)+LitterFallChemElmnt_pftvr(NE,M,K,0,NZ)
+          SurfLitrfallChemElms_pft(NE,NZ)=SurfLitrfallChemElms_pft(NE,NZ)+LitterFallChemElm_pvr(NE,M,K,0,NZ)
           D8955: DO L=0,MaxNumRootLays
-            LitterFallChemElmnt_pft(NE,NZ)=LitterFallChemElmnt_pft(NE,NZ)+LitterFallChemElmnt_pftvr(NE,M,K,L,NZ)
-            LitrfallChemElmnts_pft(NE,NZ)=LitrfallChemElmnts_pft(NE,NZ)+LitterFallChemElmnt_pftvr(NE,M,K,L,NZ)
+            LitterFallChemElm_pft(NE,NZ)=LitterFallChemElm_pft(NE,NZ)+LitterFallChemElm_pvr(NE,M,K,L,NZ)
+            LitrfallChemElms_pft(NE,NZ)=LitrfallChemElms_pft(NE,NZ)+LitterFallChemElm_pvr(NE,M,K,L,NZ)
           ENDDO D8955
         ENDDO D6430
       enddo
@@ -232,8 +232,8 @@ module grosubsMod
 !
 !     WTSTG,WTSTDN,WTSTDP=standing dead C,N,P mass
 !
-    DO NE=1,NumPlantChemElmnts
-      StandingDeadChemElmnts_pft(NE,NZ)=sum(StandingDeadKCompChemElmnts_pft(NE,1:jsken,NZ))
+    DO NE=1,NumPlantChemElms
+      StandingDeadChemElms_pft(NE,NZ)=sum(StandingDeadKCompChemElms_pft(NE,1:jsken,NZ))
     ENDDO
 
 !
@@ -255,10 +255,10 @@ module grosubsMod
 
     IF(IsPlantActive_pft(NZ).EQ.iPlantIsActive)THEN
       !check for living plant
-      DO NE=1,NumPlantChemElmnts
-        ElmntBalanceCum_pft(NE,NZ)=ShootChemElmnts_pft(NE,NZ)+RootElmnts_pft(NE,NZ)+NoduleChemElmnts_pft(NE,NZ) &
-          +NonstructalElmnts_pft(NE,NZ)+LitrfallChemElmnts_pft(NE,NZ)-PlantExudChemElmntCum_pft(NE,NZ) &
-          -NetCumElmntFlx2Plant_pft(NE,NZ)+StandingDeadChemElmnts_pft(NE,NZ)+EcoHavstElmnt_pft(NE,NZ)+EcoHavstElmntCum_pft(NE,NZ)
+      DO NE=1,NumPlantChemElms
+        ElmntBalanceCum_pft(NE,NZ)=ShootChemElms_pft(NE,NZ)+RootElmnts_pft(NE,NZ)+NoduleChemElms_pft(NE,NZ) &
+          +NonstructalElmnts_pft(NE,NZ)+LitrfallChemElms_pft(NE,NZ)-PlantExudChemElmCum_pft(NE,NZ) &
+          -NetCumElmntFlx2Plant_pft(NE,NZ)+StandingDeadChemElms_pft(NE,NZ)+EcoHavstElmnt_pft(NE,NZ)+EcoHavstElmntCum_pft(NE,NZ)
       ENDDO
       ElmntBalanceCum_pft(ielmc,NZ)=ElmntBalanceCum_pft(ielmc,NZ)-NetPrimaryProductvity_pft(NZ)-CO2ByFire_pft(NZ)-CH4ByFire_pft(NZ)
 !
@@ -327,7 +327,7 @@ module grosubsMod
     RootHPO4Uptake_pft  => plt_rbgc%RootHPO4Uptake_pft        , &
     RootNO3Uptake_pft  => plt_rbgc%RootNO3Uptake_pft        , &
     PlantRootSoilChemNetX_pft => plt_rbgc%PlantRootSoilChemNetX_pft       , &
-    RootExudChemElmnt_pft  => plt_rbgc%RootExudChemElmnt_pft        , &
+    RootExudChemElm_pft  => plt_rbgc%RootExudChemElm_pft        , &
     NumOfBranches_pft    => plt_morph%NumOfBranches_pft         , &
     NumRootAxes_pft   => plt_morph%NumRootAxes_pft          &
   )
@@ -351,7 +351,7 @@ module grosubsMod
 !
     call ComputeTotalBiom(NZ,ShootNonstructC_brch)
   ELSE
-    PlantRootSoilChemNetX_pft(1:NumPlantChemElmnts,NZ)=RootExudChemElmnt_pft(1:NumPlantChemElmnts,NZ)
+    PlantRootSoilChemNetX_pft(1:NumPlantChemElms,NZ)=RootExudChemElm_pft(1:NumPlantChemElms,NZ)
     PlantRootSoilChemNetX_pft(ielmn,NZ)=PlantRootSoilChemNetX_pft(ielmn,NZ)+RootNH4Uptake_pft(NZ)+RootNO3Uptake_pft(NZ)+RootN2Fix_pft(NZ)
     PlantRootSoilChemNetX_pft(ielmp,NZ)=PlantRootSoilChemNetX_pft(ielmp,NZ)+RootH2PO4Uptake_pft(NZ)+RootHPO4Uptake_pft(NZ)
   ENDIF
@@ -380,19 +380,19 @@ module grosubsMod
 !     begin_execution
 
   associate(                            &
-    TKC    =>  plt_ew%TKC         , &
-    TKS    =>  plt_ew%TKS         , &
-    PSICanopy_pft =>  plt_ew%PSICanopy_pft      , &
-    PSICanopyTurg_pft  =>  plt_ew%PSICanopyTurg_pft       , &
+    TKC                     =>  plt_ew%TKC         , &
+    TKS                     =>  plt_ew%TKS         , &
+    PSICanopy_pft           =>  plt_ew%PSICanopy_pft      , &
+    PSICanopyTurg_pft       =>  plt_ew%PSICanopyTurg_pft       , &
     PlantPopulation_pft     =>  plt_site%PlantPopulation_pft        , &
-    NU     =>  plt_site%NU        , &
-    MaxNumRootLays     =>  plt_site%MaxNumRootLays        , &
-    OFFST  =>  plt_pheno%OFFST    , &
-    ZEROP  =>  plt_biom%ZEROP     , &
-    CanopyStalkC_pft  =>  plt_biom%CanopyStalkC_pft     , &
-    RootProteinC_pvr  =>  plt_biom%RootProteinC_pvr     , &
-    RootBiomCPerPlant_pft  =>  plt_biom%RootBiomCPerPlant_pft     , &
-    StalkChemElmnts_pft =>  plt_biom%StalkChemElmnts_pft    , &
+    NU                      =>  plt_site%NU        , &
+    MaxNumRootLays          =>  plt_site%MaxNumRootLays        , &
+    OFFST                   =>  plt_pheno%OFFST    , &
+    ZEROP                   =>  plt_biom%ZEROP     , &
+    CanopyStalkC_pft        =>  plt_biom%CanopyStalkC_pft     , &
+    RootProteinC_pvr        =>  plt_biom%RootProteinC_pvr     , &
+    RootBiomCPerPlant_pft   =>  plt_biom%RootBiomCPerPlant_pft     , &
+    StalkChemElms_pft       =>  plt_biom%StalkChemElms_pft    , &
     RootElmnts_pft  =>  plt_biom%RootElmnts_pft     , &
     CanopyLeafCpft_lyr  =>  plt_biom%CanopyLeafCpft_lyr     , &
     iPlantTurnoverPattern_pft =>  plt_pheno%iPlantTurnoverPattern_pft   , &
@@ -418,10 +418,10 @@ module grosubsMod
     RCS    =>  plt_photo%RCS      , &
     PrimRootXNumL_pvr  =>  plt_morph%PrimRootXNumL_pvr    , &
     SecndRootXNum_pvr   =>  plt_morph%SecndRootXNum_pvr     , &
-    MY     =>  plt_morph%MY       , &
+    MY                  =>  plt_morph%MY       , &
     CanopyLeafApft_lyr  =>  plt_morph%CanopyLeafApft_lyr    , &
     CanopyStemApft_lyr  =>  plt_morph%CanopyStemApft_lyr    , &
-    NumRootAxes_pft   =>  plt_morph%NumRootAxes_pft       &
+    NumRootAxes_pft     =>  plt_morph%NumRootAxes_pft       &
   )
   D2: DO L=1,NumOfCanopyLayers1
     CanopyLeafApft_lyr(L,NZ)=0._r8
@@ -455,15 +455,16 @@ module grosubsMod
 !     FWODSN,FWODSP=N,P woody fraction in petiole:0=woody,1=non-woody
 !     FWOODN,FWOODP=N,P woody fraction in stalk:0=woody,1=non-woody
 !
-  IF(iPlantTurnoverPattern_pft(NZ).EQ.0.OR.(.not.is_plant_treelike(iPlantMorphologyType_pft(NZ)))&
-    .OR.StalkChemElmnts_pft(ielmc,NZ).LE.ZEROP(NZ))THEN
+  IF(iPlantTurnoverPattern_pft(NZ).EQ.0 &
+    .OR.(.not.is_plant_treelike(iPlantMorphologyType_pft(NZ)))&
+    .OR.StalkChemElms_pft(ielmc,NZ).LE.ZEROP(NZ))THEN
     FWODBE(ielmc,k_fine_litr)=1.0_r8
     FWOODE(ielmc,k_fine_litr)=1.0_r8
     FWODRE(ielmc,k_fine_litr)=1.0_r8
   ELSE
     FWODBE(ielmc,k_fine_litr)=1.0_r8
-    FWOODE(ielmc,k_fine_litr)=SQRT(CanopyStalkC_pft(NZ)/StalkChemElmnts_pft(ielmc,NZ))
-    FWODRE(ielmc,k_fine_litr)=SQRT(FRTX*CanopyStalkC_pft(NZ)/StalkChemElmnts_pft(ielmc,NZ))
+    FWOODE(ielmc,k_fine_litr)=SQRT(CanopyStalkC_pft(NZ)/StalkChemElms_pft(ielmc,NZ))
+    FWODRE(ielmc,k_fine_litr)=SQRT(FRTX*CanopyStalkC_pft(NZ)/StalkChemElms_pft(ielmc,NZ))
   ENDIF
 
   FWODBE(ielmc,k_woody_litr)=1.0_r8-FWODBE(ielmc,k_fine_litr)
@@ -564,15 +565,15 @@ module grosubsMod
   integer :: L,K,N,NE,NB
 !     begin_execution
   associate(                                 &
-    LeafChemElmnts_brch    =>  plt_biom%LeafChemElmnts_brch    , &
-    GrainChemElmnts_brch     =>  plt_biom%GrainChemElmnts_brch     , &
+    LeafChemElms_brch    =>  plt_biom%LeafChemElms_brch    , &
+    GrainChemElms_brch     =>  plt_biom%GrainChemElms_brch     , &
     RootMycoNonstructElmnt_vr     =>  plt_biom%RootMycoNonstructElmnt_vr     , &
     PopuPlantRootC_vr     =>  plt_biom% PopuPlantRootC_vr     , &
-    ShootChemElmnt_brch    =>  plt_biom%ShootChemElmnt_brch    , &
-    EarChemElmnts_brch    =>  plt_biom%EarChemElmnts_brch    , &
-    StalkChemElmnts_brch    =>  plt_biom%StalkChemElmnts_brch    , &
-    PetoleChemElmnt_brch   =>  plt_biom%PetoleChemElmnt_brch   , &
-    HuskChemElmnts_brch    =>  plt_biom%HuskChemElmnts_brch    , &
+    ShootChemElm_brch    =>  plt_biom%ShootChemElm_brch    , &
+    EarChemElms_brch    =>  plt_biom%EarChemElms_brch    , &
+    StalkChemElms_brch    =>  plt_biom%StalkChemElms_brch    , &
+    PetoleChemElm_brch   =>  plt_biom%PetoleChemElm_brch   , &
+    HuskChemElms_brch    =>  plt_biom%HuskChemElms_brch    , &
     ReserveElmnts_brch    =>  plt_biom%ReserveElmnts_brch    , &
     NonstructElmnt_brch     =>  plt_biom%NonstructElmnt_brch     , &
     NU         =>  plt_site%NU         , &
@@ -581,7 +582,7 @@ module grosubsMod
     CMassHCO3BundleSheath_node       =>  plt_photo%CMassHCO3BundleSheath_node      , &
     CMassCO2BundleSheath_node       =>  plt_photo%CMassCO2BundleSheath_node      , &
     MY         =>  plt_morph%MY        , &
-    NI         =>  plt_morph%NI        , &
+    MaxSoiL4Root         =>  plt_morph%MaxSoiL4Root        , &
     NumOfBranches_pft        =>  plt_morph%NumOfBranches_pft         &
   )
 !     TOTAL C,N,P IN EACH BRANCH
@@ -606,11 +607,11 @@ module grosubsMod
 !     iPlantPhenologyType_pft=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
 !     WTRVC,WTRVN,WTRVP=storage C,N,P
 !
-  DO NE=1,NumPlantChemElmnts
+  DO NE=1,NumPlantChemElms
     DO NB=1,NumOfBranches_pft(NZ)
-      ShootChemElmnt_brch(NE,NB,NZ)=LeafChemElmnts_brch(NE,NB,NZ) &
-        +PetoleChemElmnt_brch(NE,NB,NZ)+StalkChemElmnts_brch(NE,NB,NZ)+ReserveElmnts_brch(NE,NB,NZ) &
-        +HuskChemElmnts_brch(NE,NB,NZ)+EarChemElmnts_brch(NE,NB,NZ)+GrainChemElmnts_brch(NE,NB,NZ) &
+      ShootChemElm_brch(NE,NB,NZ)=LeafChemElms_brch(NE,NB,NZ) &
+        +PetoleChemElm_brch(NE,NB,NZ)+StalkChemElms_brch(NE,NB,NZ)+ReserveElmnts_brch(NE,NB,NZ) &
+        +HuskChemElms_brch(NE,NB,NZ)+EarChemElms_brch(NE,NB,NZ)+GrainChemElms_brch(NE,NB,NZ) &
         +NonstructElmnt_brch(NE,NB,NZ)
     ENDDO
   ENDDO
@@ -621,7 +622,7 @@ module grosubsMod
       ShootNonstructC_brch(NB,NZ)=ShootNonstructC_brch(NB,NZ)+CPOOL3(K,NB,NZ)+CPOOL4(K,NB,NZ) &
         +CMassCO2BundleSheath_node(K,NB,NZ)+CMassHCO3BundleSheath_node(K,NB,NZ)
     ENDDO D325
-    ShootChemElmnt_brch(ielmc,NB,NZ)=ShootChemElmnt_brch(ielmc,NB,NZ)+ShootNonstructC_brch(NB,NZ)
+    ShootChemElm_brch(ielmc,NB,NZ)=ShootChemElm_brch(ielmc,NB,NZ)+ShootNonstructC_brch(NB,NZ)
   ENDDO D320
 
 !
@@ -635,7 +636,7 @@ module grosubsMod
 !     RootN2Fix_pft=PFT N2 fixation
 !
   D345: DO N=1,MY(NZ)
-    DO  L=NU,NI(NZ)
+    DO  L=NU,MaxSoiL4Root(NZ)
       PopuPlantRootC_vr(N,L,NZ)= PopuPlantRootC_vr(N,L,NZ)+RootMycoNonstructElmnt_vr(ielmc,N,L,NZ)
     enddo
   ENDDO D345
@@ -653,50 +654,50 @@ module grosubsMod
     NonstructElmnt_brch   =>  plt_biom%NonstructElmnt_brch  , &
     RootMycoNonstructElmnt_vr   =>  plt_biom%RootMycoNonstructElmnt_vr  , &
     NoduleNonstructElmnt_brch   =>  plt_biom%NoduleNonstructElmnt_brch  , &
-    NoduleChemElmnts_pft    =>  plt_biom%NoduleChemElmnts_pft   , &
+    NoduleChemElms_pft    =>  plt_biom%NoduleChemElms_pft   , &
     RootStructElmnt_pft   =>  plt_biom%RootStructElmnt_pft  , &
     RootElmnts_pft    =>  plt_biom%RootElmnts_pft   , &
-    CanopyNoduleChemElmnt_brch   =>  plt_biom%CanopyNoduleChemElmnt_brch  , &
-    ShootChemElmnt_brch  =>  plt_biom%ShootChemElmnt_brch , &
-    StalkChemElmnts_brch  =>  plt_biom%StalkChemElmnts_brch , &
-    HuskChemElmnts_brch  =>  plt_biom%HuskChemElmnts_brch , &
+    CanopyNoduleChemElm_brch   =>  plt_biom%CanopyNoduleChemElm_brch  , &
+    ShootChemElm_brch  =>  plt_biom%ShootChemElm_brch , &
+    StalkChemElms_brch  =>  plt_biom%StalkChemElms_brch , &
+    HuskChemElms_brch  =>  plt_biom%HuskChemElms_brch , &
     ReserveElmnts_brch   =>  plt_biom%ReserveElmnts_brch  , &
-    EarChemElmnts_brch  =>  plt_biom%EarChemElmnts_brch , &
+    EarChemElms_brch  =>  plt_biom%EarChemElms_brch , &
     LeafPetolBiomassC_brch    =>  plt_biom%LeafPetolBiomassC_brch   , &
-    GrainChemElmnts_brch   =>  plt_biom%GrainChemElmnts_brch  , &
-    LeafChemElmnts_brch  =>  plt_biom%LeafChemElmnts_brch , &
+    GrainChemElms_brch   =>  plt_biom%GrainChemElms_brch  , &
+    LeafChemElms_brch  =>  plt_biom%LeafChemElms_brch , &
     StalkBiomassC_brch   =>  plt_biom%StalkBiomassC_brch  , &
-    PetoleChemElmnt_brch =>  plt_biom%PetoleChemElmnt_brch, &
-    ShootChemElmnts_pft   =>  plt_biom%ShootChemElmnts_pft  , &
-    LeafChemElmnts_pft    =>  plt_biom%LeafChemElmnts_pft   , &
-    PetioleChemElmnts_pft   =>  plt_biom%PetioleChemElmnts_pft  , &
-    StalkChemElmnts_pft   =>  plt_biom%StalkChemElmnts_pft  , &
+    PetoleChemElm_brch =>  plt_biom%PetoleChemElm_brch, &
+    ShootChemElms_pft   =>  plt_biom%ShootChemElms_pft  , &
+    LeafChemElms_pft    =>  plt_biom%LeafChemElms_pft   , &
+    PetioleChemElms_pft   =>  plt_biom%PetioleChemElms_pft  , &
+    StalkChemElms_pft   =>  plt_biom%StalkChemElms_pft  , &
     CanopyStalkC_pft    =>  plt_biom%CanopyStalkC_pft   , &
-    ReserveChemElmnts_pft   =>  plt_biom%ReserveChemElmnts_pft  , &
-    HuskChemElmnts_pft   =>  plt_biom%HuskChemElmnts_pft  , &
-    EarChemElmnts_pft   =>  plt_biom%EarChemElmnts_pft  , &
-    GrainChemElmnts_pft    =>  plt_biom%GrainChemElmnts_pft   , &
+    ReserveChemElms_pft   =>  plt_biom%ReserveChemElms_pft  , &
+    HuskChemElms_pft   =>  plt_biom%HuskChemElms_pft  , &
+    EarChemElms_pft   =>  plt_biom%EarChemElms_pft  , &
+    GrainChemElms_pft    =>  plt_biom%GrainChemElms_pft   , &
     CanopyLeafShethC_pft     =>  plt_biom%CanopyLeafShethC_pft    , &
-    RootNodueChemElmnt_pvr   =>  plt_biom%RootNodueChemElmnt_pvr  , &
+    RootNodueChemElm_pvr   =>  plt_biom%RootNodueChemElm_pvr  , &
     CanopyNonstructElements_pft   =>  plt_biom%CanopyNonstructElements_pft  , &
     NoduleNonstructElmnt_pft   =>  plt_biom%NoduleNonstructElmnt_pft  , &
-    Root1stStructChemElmnt_pvr   =>  plt_biom%Root1stStructChemElmnt_pvr  , &
-    Root2ndStructChemElmnt_pvr   =>  plt_biom%Root2ndStructChemElmnt_pvr  , &
+    Root1stStructChemElm_pvr   =>  plt_biom%Root1stStructChemElm_pvr  , &
+    Root2ndStructChemElm_pvr   =>  plt_biom%Root2ndStructChemElm_pvr  , &
     RootNoduleNonstructElmnt_vr  =>  plt_biom%RootNoduleNonstructElmnt_vr , &
     PlantN2FixCum_pft   =>  plt_bgcr%PlantN2FixCum_pft  , &
-    PlantExudChemElmntCum_pft   =>  plt_rbgc%PlantExudChemElmntCum_pft  , &
+    PlantExudChemElmCum_pft   =>  plt_rbgc%PlantExudChemElmCum_pft  , &
     RootHPO4Uptake_pft    =>  plt_rbgc%RootHPO4Uptake_pft   , &
     PlantRootSoilChemNetX_pft   =>  plt_rbgc%PlantRootSoilChemNetX_pft  , &
     RootN2Fix_pft     =>  plt_rbgc%RootN2Fix_pft    , &
     RootH2PO4Uptake_pft    =>  plt_rbgc%RootH2PO4Uptake_pft   , &
     RootNO3Uptake_pft    =>  plt_rbgc%RootNO3Uptake_pft   , &
     RootNH4Uptake_pft    =>  plt_rbgc%RootNH4Uptake_pft   , &
-    RootExudChemElmnt_pft    =>  plt_rbgc%RootExudChemElmnt_pft   , &
+    RootExudChemElm_pft    =>  plt_rbgc%RootExudChemElm_pft   , &
     MaxNumRootLays       =>  plt_site%MaxNumRootLays      , &
     NU       =>  plt_site%NU      , &
     NumOfBranches_pft      =>  plt_morph%NumOfBranches_pft    , &
     MY       =>  plt_morph%MY     , &
-    NI       =>  plt_morph%NI     , &
+    MaxSoiL4Root       =>  plt_morph%MaxSoiL4Root     , &
     NumRootAxes_pft     =>  plt_morph%NumRootAxes_pft   , &
     LeafAreaLive_brch    =>  plt_morph%LeafAreaLive_brch  , &
     CanopyStemA_pft    =>  plt_morph%CanopyStemA_pft  , &
@@ -724,21 +725,21 @@ module grosubsMod
 !     CanopyBranchStemApft_lyr=total branch stalk surface area in each layer
 !     SeedNumberSet_brch=seed set number
 !
-  DO NE=1,NumPlantChemElmnts
+  DO NE=1,NumPlantChemElms
     CanopyNonstructElements_pft(NE,NZ)=sum(NonstructElmnt_brch(NE,1:NumOfBranches_pft(NZ),NZ))
-    ShootChemElmnts_pft(NE,NZ)=sum(ShootChemElmnt_brch(NE,1:NumOfBranches_pft(NZ),NZ))
+    ShootChemElms_pft(NE,NZ)=sum(ShootChemElm_brch(NE,1:NumOfBranches_pft(NZ),NZ))
 
-    PetioleChemElmnts_pft(NE,NZ)=sum(PetoleChemElmnt_brch(NE,1:NumOfBranches_pft(NZ),NZ))
-    StalkChemElmnts_pft(NE,NZ)=sum(StalkChemElmnts_brch(NE,1:NumOfBranches_pft(NZ),NZ))
-    LeafChemElmnts_pft(NE,NZ)=sum(LeafChemElmnts_brch(NE,1:NumOfBranches_pft(NZ),NZ))
-    ReserveChemElmnts_pft(NE,NZ)=sum(ReserveElmnts_brch(NE,1:NumOfBranches_pft(NZ),NZ))
-    HuskChemElmnts_pft(NE,NZ)=sum(HuskChemElmnts_brch(NE,1:NumOfBranches_pft(NZ),NZ))
-    GrainChemElmnts_pft(NE,NZ)=sum(GrainChemElmnts_brch(NE,1:NumOfBranches_pft(NZ),NZ))
-    EarChemElmnts_pft(NE,NZ)=sum(EarChemElmnts_brch(NE,1:NumOfBranches_pft(NZ),NZ))
+    PetioleChemElms_pft(NE,NZ)=sum(PetoleChemElm_brch(NE,1:NumOfBranches_pft(NZ),NZ))
+    StalkChemElms_pft(NE,NZ)=sum(StalkChemElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
+    LeafChemElms_pft(NE,NZ)=sum(LeafChemElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
+    ReserveChemElms_pft(NE,NZ)=sum(ReserveElmnts_brch(NE,1:NumOfBranches_pft(NZ),NZ))
+    HuskChemElms_pft(NE,NZ)=sum(HuskChemElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
+    GrainChemElms_pft(NE,NZ)=sum(GrainChemElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
+    EarChemElms_pft(NE,NZ)=sum(EarChemElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
     !root state variables
     RootElmnts_pft(NE,NZ)=sum(RootMycoNonstructElmnt_vr(NE,1:MY(NZ),NU:MaxNumRootLays,NZ))
-    RootStructElmnt_pft(NE,NZ)=sum(Root1stStructChemElmnt_pvr(NE,1:MY(NZ),NU:MaxNumRootLays,1:NumRootAxes_pft(NZ),NZ)) &
-      +sum(Root2ndStructChemElmnt_pvr(NE,1:MY(NZ),NU:MaxNumRootLays,1:NumRootAxes_pft(NZ),NZ))
+    RootStructElmnt_pft(NE,NZ)=sum(Root1stStructChemElm_pvr(NE,1:MY(NZ),NU:MaxNumRootLays,1:NumRootAxes_pft(NZ),NZ)) &
+      +sum(Root2ndStructChemElm_pvr(NE,1:MY(NZ),NU:MaxNumRootLays,1:NumRootAxes_pft(NZ),NZ))
     RootElmnts_pft(NE,NZ)=RootElmnts_pft(NE,NZ)+RootStructElmnt_pft(NE,NZ)
   ENDDO
 
@@ -748,6 +749,7 @@ module grosubsMod
   CanopyLeafArea_pft(NZ)=sum(LeafAreaLive_brch(1:NumOfBranches_pft(NZ),NZ))
   CanopyStemA_pft(NZ)=sum(CanopyBranchStemApft_lyr(1:NumOfCanopyLayers1,1:NumOfBranches_pft(NZ),NZ))
   CanopyStemApft_lyr(1:NumOfCanopyLayers1,1:NumOfBranches_pft(NZ))=0._r8
+
   DO NB=1,NumOfBranches_pft(NZ)
     DO L=1,NumOfCanopyLayers1
       CanopyStemApft_lyr(L,NZ)=CanopyStemApft_lyr(L,NZ)+CanopyBranchStemApft_lyr(L,NB,NZ)
@@ -763,17 +765,17 @@ module grosubsMod
 !
   IF(is_plant_N2fix(iPlantNfixType(NZ)))THEN
     IF(is_canopy_N2fix(iPlantNfixType(NZ)))THEN
-      DO NE=1,NumPlantChemElmnts
+      DO NE=1,NumPlantChemElms
         D7950: DO NB=1,NumOfBranches_pft(NZ)
           NoduleNonstructElmnt_pft(NE,NZ)=NoduleNonstructElmnt_pft(NE,NZ)+NoduleNonstructElmnt_brch(NE,NB,NZ)
         ENDDO D7950
-        NoduleChemElmnts_pft(NE,NZ)=sum(CanopyNoduleChemElmnt_brch(NE,1:NumOfBranches_pft(NZ),NZ))+ &
+        NoduleChemElms_pft(NE,NZ)=sum(CanopyNoduleChemElm_brch(NE,1:NumOfBranches_pft(NZ),NZ))+ &
           sum(NoduleNonstructElmnt_brch(NE,1:NumOfBranches_pft(NZ),NZ))
       ENDDO
     ELSEIF(is_root_N2fix(iPlantNfixType(NZ)))THEN
-      DO NE=1,NumPlantChemElmnts
-        NoduleChemElmnts_pft(NE,NZ)=sum(RootNodueChemElmnt_pvr(NE,NU:NI(NZ),NZ))+&
-          sum(RootNoduleNonstructElmnt_vr(NE,NU:NI(NZ),NZ))
+      DO NE=1,NumPlantChemElms
+        NoduleChemElms_pft(NE,NZ)=sum(RootNodueChemElm_pvr(NE,NU:MaxSoiL4Root(NZ),NZ))+&
+          sum(RootNoduleNonstructElmnt_vr(NE,NU:MaxSoiL4Root(NZ),NZ))
       ENDDO
     ENDIF
   ENDIF
@@ -787,16 +789,16 @@ module grosubsMod
 !     TCUPTK,TZUPTK,TPUPTK=cumulative PFT root-soil C,N,P exchange
 !     PlantN2FixCum_pft=cumulative PFT N2 fixation
 !
-  PlantRootSoilChemNetX_pft(1:NumPlantChemElmnts,NZ)=RootExudChemElmnt_pft(1:NumPlantChemElmnts,NZ)
+  PlantRootSoilChemNetX_pft(1:NumPlantChemElms,NZ)=RootExudChemElm_pft(1:NumPlantChemElms,NZ)
   PlantRootSoilChemNetX_pft(ielmn,NZ)=PlantRootSoilChemNetX_pft(ielmn,NZ)+&
     RootNH4Uptake_pft(NZ)+RootNO3Uptake_pft(NZ)+RootN2Fix_pft(NZ)
   PlantRootSoilChemNetX_pft(ielmp,NZ)=PlantRootSoilChemNetX_pft(ielmp,NZ)+RootH2PO4Uptake_pft(NZ)+RootHPO4Uptake_pft(NZ)
 
-  PlantExudChemElmntCum_pft(1:NumPlantChemElmnts,NZ)=PlantExudChemElmntCum_pft(1:NumPlantChemElmnts,NZ)+&
-    RootExudChemElmnt_pft(1:NumPlantChemElmnts,NZ)
-  PlantExudChemElmntCum_pft(ielmn,NZ)=PlantExudChemElmntCum_pft(ielmn,NZ)+ &
+  PlantExudChemElmCum_pft(1:NumPlantChemElms,NZ)=PlantExudChemElmCum_pft(1:NumPlantChemElms,NZ)+&
+    RootExudChemElm_pft(1:NumPlantChemElms,NZ)
+  PlantExudChemElmCum_pft(ielmn,NZ)=PlantExudChemElmCum_pft(ielmn,NZ)+ &
     RootNH4Uptake_pft(NZ)+RootNO3Uptake_pft(NZ)
-  PlantExudChemElmntCum_pft(ielmp,NZ)=PlantExudChemElmntCum_pft(ielmp,NZ)+ &
+  PlantExudChemElmCum_pft(ielmp,NZ)=PlantExudChemElmCum_pft(ielmp,NZ)+ &
     RootH2PO4Uptake_pft(NZ)+RootHPO4Uptake_pft(NZ)
   PlantN2FixCum_pft(NZ)=PlantN2FixCum_pft(NZ)+RootN2Fix_pft(NZ)+CanopyN2Fix_pft(NZ)
   end associate

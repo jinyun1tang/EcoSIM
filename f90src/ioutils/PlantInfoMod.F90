@@ -169,7 +169,7 @@ implicit none
     !obtain the number of topographic units
     ntopou=get_dim_len(pftinfo_nfid, 'ntopou')
     nyears=get_dim_len(pftinfo_nfid, 'year')
-
+    if(first_topou)ntopou=1
     DO NTOPO=1,ntopou
       call ncd_getvar(pftinfo_nfid,'NH1',ntopo,NH1)
       call ncd_getvar(pftinfo_nfid,'NV1',ntopo,NV1)
@@ -430,7 +430,7 @@ implicit none
 
   call ncd_getvar(pft_nfid, 'SLA1', loc,SLA1(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'SSL1', loc,PetoLen2Mass_pft(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'SNL1', loc,SNL1(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'SNL1', loc,NodeLenPergC(NZ,NY,NX))
 
 
   call ncd_getvar(pft_nfid, 'CLASS', loc,CLASS(1:NumOfLeafZenithSectors,NZ,NY,NX))
@@ -665,7 +665,7 @@ implicit none
     write(nu_plt,*)'Wrong option for mycorrhizae'
   end select
 
-  select case(INT(PlantInitThermoAdaptZone(NZ,NY,NX)))
+  select case(INT(PlantInitThermoAdaptZone(NZ,NY,NX)+0.50005_r8))
   case (ithermozone_arcboreal)
     write(nu_plt,*)'thermal adaptation zone: arctic, boreal'
   case (ithermozone_cooltempr)
@@ -748,7 +748,7 @@ implicit none
   write(nu_plt,*)'MORPHOLOGICAL PROPERTIES'
   call writefixl(nu_plt,'growth in leaf area vs mass (m2 g-1) SLA1',SLA1(NZ,NY,NX),70)
   call writefixl(nu_plt,'growth in petiole length vs mass (m g-1) SSL1',PetoLen2Mass_pft(NZ,NY,NX),70)
-  call writefixl(nu_plt,'growth in internode length vs mass (m g-1) SNL1',SNL1(NZ,NY,NX),70)
+  call writefixl(nu_plt,'growth in internode length vs mass (m g-1) SNL1',NodeLenPergC(NZ,NY,NX),70)
   call writeafixl(nu_plt,'fraction of leaf area in 0-22.5,45,67.5,90o inclination classes CLASS',&
     CLASS(1:NumOfLeafZenithSectors,NZ,NY,NX),70)
   call writefixl(nu_plt,'initial clumping factor CFI',ClumpFactorInit_pft(NZ,NY,NX),70)
@@ -1007,7 +1007,7 @@ implicit none
       endif
       !obtain the number of topographic units
       ntopou=get_dim_len(pftinfo_nfid, 'ntopou')
-
+      if(first_topou)ntopou=1    
       DO NTOPO=1,ntopou
         call ncd_getvar(pftinfo_nfid,'NH1',ntopo,NH1)
         call ncd_getvar(pftinfo_nfid,'NV1',ntopo,NV1)

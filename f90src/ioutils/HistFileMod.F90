@@ -185,7 +185,7 @@ implicit none
   use EcoSIMConfig      , only : case_name
   use GridConsts        , only : JZ,JS,MaxNumBranches,NumOfCanopyLayers,JP,NumGrowthStages
   use EcoSIMConfig      , only : jcplx=>jcplxc,jsken=>jskenc
-  use ElmIDMod          , only : NumPlantChemElmnts
+  use ElmIDMod          , only : NumPlantChemElms
   implicit none
   integer, intent(in) :: t        ! tape index
   logical, optional, intent(in) :: histrest  !if creating the history restart file
@@ -250,7 +250,7 @@ implicit none
   call ncd_defdim(lnfid, 'npfts',  JP,dimid)
   call ncd_defdim(lnfid, 'nbranches',MaxNumBranches,dimid)
   call ncd_defdim(lnfid, 'ngrstages',NumGrowthStages,dimid)
-  call ncd_defdim(lnfid, 'elements',NumPlantChemElmnts,dimid)
+  call ncd_defdim(lnfid, 'elements',NumPlantChemElms,dimid)
   call ncd_defdim(lnfid, 'nkinecomp',jsken,dimid)
   call ncd_defdim(lnfid, 'nomcomplx',jcplx,dimid)
   call ncd_defdim(lnfid, 'pmorphunits',NumOfPlantMorphUnits,dimid)

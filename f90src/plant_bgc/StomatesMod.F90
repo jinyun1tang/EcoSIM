@@ -669,7 +669,7 @@
   real(r8), intent(in) :: TFN_Carboxy,TFN_Oxy,TFN_eTransp,Km4RubOxy
 !     begin_execution
   associate(                          &
-    LeafPetoNonstructElmntConc_brch =>  plt_biom%LeafPetoNonstructElmntConc_brch  , &
+    LeafPetoNonstElmConc_brch =>  plt_biom%LeafPetoNonstElmConc_brch  , &
     iPlantPhenologyType_pft =>  plt_pheno%iPlantPhenologyType_pft , &
     iPlantTurnoverPattern_pft =>  plt_pheno%iPlantTurnoverPattern_pft , &
     HourFailGrainFill_brch   =>  plt_pheno%HourFailGrainFill_brch   , &
@@ -687,11 +687,11 @@
 !     RubiscoActivity_brch=N,P feedback inhibition on C3 CO2 fixation
 !     CNKI,CPKI=nonstructural N,P inhibition constant on rubisco
 !
-  IF(LeafPetoNonstructElmntConc_brch(ielmc,NB,NZ).GT.ZERO)THEN
-    RubiscoActivity_brch(NB,NZ)=AMIN1(LeafPetoNonstructElmntConc_brch(ielmn,NB,NZ)/(LeafPetoNonstructElmntConc_brch(ielmn,NB,NZ)&
-      +LeafPetoNonstructElmntConc_brch(ielmc,NB,NZ)/CNKI) &
-      ,LeafPetoNonstructElmntConc_brch(ielmp,NB,NZ)/(LeafPetoNonstructElmntConc_brch(ielmp,NB,NZ)&
-      +LeafPetoNonstructElmntConc_brch(ielmc,NB,NZ)/CPKI))
+  IF(LeafPetoNonstElmConc_brch(ielmc,NB,NZ).GT.ZERO)THEN
+    RubiscoActivity_brch(NB,NZ)=AMIN1(LeafPetoNonstElmConc_brch(ielmn,NB,NZ)/(LeafPetoNonstElmConc_brch(ielmn,NB,NZ)&
+      +LeafPetoNonstElmConc_brch(ielmc,NB,NZ)/CNKI) &
+      ,LeafPetoNonstElmConc_brch(ielmp,NB,NZ)/(LeafPetoNonstElmConc_brch(ielmp,NB,NZ)&
+      +LeafPetoNonstElmConc_brch(ielmc,NB,NZ)/CPKI))
   ELSE
     RubiscoActivity_brch(NB,NZ)=1.0_r8
   ENDIF
@@ -749,7 +749,7 @@
   real(r8) :: TKCO
 !     begin_execution
   associate(                          &
-    LeafPetoNonstructElmntConc_brch =>  plt_biom%LeafPetoNonstructElmntConc_brch  , &
+    LeafPetoNonstElmConc_brch =>  plt_biom%LeafPetoNonstElmConc_brch  , &
     TKCanopy_pft                    =>  plt_ew%TKCanopy_pft      , &
     OFFST                           =>  plt_pheno%OFFST  , &
     XKO2                            =>  plt_photo%XKO2   , &

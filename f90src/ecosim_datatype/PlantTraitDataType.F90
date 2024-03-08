@@ -140,7 +140,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  TotalNodeNumNormByMatgrp_brch(:,:,:,:)                    !normalized node number during vegetative growth stages , [-]
   real(r8),target,allocatable ::  TotReproNodeNumNormByMatrgrp_brch(:,:,:,:)                    !normalized node number during reproductive growth stages , [-]
   real(r8),target,allocatable ::  RefNodeInitRate_pft(:,:,:)                        !rate of node initiation, [h-1 at 25 oC]
-  real(r8),target,allocatable ::  SNL1(:,:,:)                        !internode length:mass during growth, [m g-1]
+  real(r8),target,allocatable ::  NodeLenPergC(:,:,:)                        !internode length:mass during growth, [m g-1]
   real(r8),target,allocatable ::  FNOD(:,:,:)                        !parameter for allocation of growth to nodes, [-]
   integer,target,allocatable ::  NumConCurrentGrowinNode(:,:,:)                         !number of concurrently growing nodes
   real(r8),target,allocatable ::  PSICanPDailyMin(:,:,:)                       !minimum daily canopy water potential, [MPa]
@@ -174,10 +174,10 @@ contains
   integer, intent(in) :: NumOfPlantLitrCmplxs
 
   FracHour4LeafoffRemob =real((/0.75,0.5,0.5,0.5,0.5,0.5/),r8)
-  allocate(FWODLE(NumPlantChemElmnts,1:NumOfPlantLitrCmplxs));  FWODLE=0._r8
-  allocate(FWODBE(NumPlantChemElmnts,1:NumOfPlantLitrCmplxs));  FWODBE=0._r8
-  allocate(FWODRE(NumPlantChemElmnts,1:NumOfPlantLitrCmplxs));  FWODRE=0._r8         !
-  allocate(FWOODE(NumPlantChemElmnts,1:NumOfPlantLitrCmplxs));  FWOODE=0._r8         !woody element allocation
+  allocate(FWODLE(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FWODLE=0._r8
+  allocate(FWODBE(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FWODBE=0._r8
+  allocate(FWODRE(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FWODRE=0._r8         !
+  allocate(FWOODE(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FWOODE=0._r8         !woody element allocation
   allocate(CanopyBranchStemApft_lyr(NumOfCanopyLayers,MaxNumBranches,JP,JY,JX));CanopyBranchStemApft_lyr=0._r8
   allocate(CanopyLeafArea_pft(JP,JY,JX));    CanopyLeafArea_pft=0._r8
   allocate(CanopyArea_pft(JP,JY,JX));    CanopyArea_pft=0._r8
@@ -300,7 +300,7 @@ contains
   allocate(TotalNodeNumNormByMatgrp_brch(MaxNumBranches,JP,JY,JX));TotalNodeNumNormByMatgrp_brch=0._r8
   allocate(TotReproNodeNumNormByMatrgrp_brch(MaxNumBranches,JP,JY,JX));TotReproNodeNumNormByMatrgrp_brch=0._r8
   allocate(RefNodeInitRate_pft(JP,JY,JX));     RefNodeInitRate_pft=0._r8
-  allocate(SNL1(JP,JY,JX));     SNL1=0._r8
+  allocate(NodeLenPergC(JP,JY,JX));     NodeLenPergC=0._r8
   allocate(FNOD(JP,JY,JX));     FNOD=0._r8
   allocate(NumConCurrentGrowinNode(JP,JY,JX));     NumConCurrentGrowinNode=0
   allocate(PSICanPDailyMin(JP,JY,JX));    PSICanPDailyMin=0._r8
@@ -457,7 +457,7 @@ contains
   call destroy(TotalNodeNumNormByMatgrp_brch)
   call destroy(TotReproNodeNumNormByMatrgrp_brch)
   call destroy(RefNodeInitRate_pft)
-  call destroy(SNL1)
+  call destroy(NodeLenPergC)
   call destroy(FNOD)
   call destroy(NumConCurrentGrowinNode)
   call destroy(PSICanPDailyMin)

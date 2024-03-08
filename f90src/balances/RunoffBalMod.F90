@@ -137,8 +137,8 @@ implicit none
   real(r8), intent(out) :: CXR,ZXR,PXR,ZGR
 
   real(r8) :: SS1,SS2,SS3,SS4,SSR
-  real(r8) :: OMRof(NumPlantChemElmnts)
-  real(r8) :: MXE(NumPlantChemElmnts),MOE(NumPlantChemElmnts),MOD(ielmc)
+  real(r8) :: OMRof(NumPlantChemElms)
+  real(r8) :: MXE(NumPlantChemElms),MOE(NumPlantChemElms),MOD(ielmc)
   real(r8) :: ECHY,ECOH,ECAL,ECFE,ECCA,ECMG,ECNA,ECKA
   real(r8) :: ECCO,ECHC,ECSO,ECCL,ECNO
   real(r8) :: ECNDQ
@@ -187,7 +187,7 @@ implicit none
       PXR=XN*(trcn_2DFloXSurRunoff(ids_H2PO4,N,NN,N5,N4)+trcn_2DFloXSurRunoff(ids_H1PO4,N,NN,N5,N4))
       OMRof(:)=0.0_r8
       D2575: DO K=1,jcplx
-        DO NE=1,NumPlantChemElmnts
+        DO NE=1,NumPlantChemElms
           OMRof(NE)=OMRof(NE)+XN*dom_2DFloXSurRunoff(idom_doc,K,N,NN,N5,N4)
         ENDDO
         OMRof(ielmc)=OMRof(ielmc)+XN*dom_2DFloXSurRunoff(idom_acetate,K,N,NN,N5,N4)
@@ -457,8 +457,8 @@ implicit none
   real(r8) :: ECCO,ECHC,ECSO,ECCL,ECNO
   real(r8) :: ECNDX
   real(r8) :: WO,SO
-  real(r8) :: MOD(NumPlantChemElmnts),HOD,OOD
-  real(r8) :: MXD(NumPlantChemElmnts),ZGD
+  real(r8) :: MOD(NumPlantChemElms),HOD,OOD
+  real(r8) :: MXD(NumPlantChemElms),ZGD
   real(r8) :: SSD,SHD,PHD,PQD
   real(r8) :: WX
   integer :: K

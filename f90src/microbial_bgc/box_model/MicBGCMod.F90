@@ -1035,7 +1035,7 @@ module MicBGCMod
             DO  M=1,nlbiomcp
               DO NGL=JGnio(N),JGnfo(N)
                 MID=micpar%get_micb_id(M,NGL)
-                DO NE=1,NumPlantChemElmnts
+                DO NE=1,NumPlantChemElms
                   XFME=FPRIMM*TFNG(NGL,K)*(OMEhetr(NE,MID,K)*OSRH(KK) &
                     -OMEhetr(NE,MID,KK)*OSRH(K))/OSRT
                   IF(OMEhetr(NE,MID,K)+XOMZ(NE,M,NGL,K)-XFME.GT.0.0_r8 &
@@ -1070,7 +1070,7 @@ module MicBGCMod
       DO  M=1,nlbiomcp
         do NGL=JGnio(N),JGnfo(N)
           MID=micpar%get_micb_id(M,NGL)        
-          DO NE=1,NumPlantChemElmnts
+          DO NE=1,NumPlantChemElms
             OMEhetr(NE,MID,K)=OMEhetr(NE,MID,K)+XOMZ(NE,M,NGL,K)
           ENDDO
         enddo
@@ -1297,7 +1297,7 @@ module MicBGCMod
       ELSE
         CNS(M,K)=CNOSC(M,K)
         CPS(M,K)=CPOSC(M,K)
-        DO NE=1,NumPlantChemElmnts
+        DO NE=1,NumPlantChemElms
           RDOSM(NE,M,K)=0.0_r8
         ENDDO
       ENDIF
@@ -1328,13 +1328,13 @@ module MicBGCMod
       D805: DO M=1,jsken
         RHOSM(ielmn,M,K)=AMIN1(RDOSM(ielmn,M,K),RHOSM(ielmc,M,K)*CNRH(k_POM))
         RHOSM(ielmp,M,K)=AMIN1(RDOSM(ielmp,M,K),RHOSM(ielmc,M,K)*CPRH(k_POM))
-        DO NE=1,NumPlantChemElmnts
+        DO NE=1,NumPlantChemElms
           RCOSM(NE,M,K)=RDOSM(NE,M,K)-RHOSM(NE,M,K)
         ENDDO
       ENDDO D805
     ELSE
       D810: DO M=1,jsken
-        DO NE=1,NumPlantChemElmnts      
+        DO NE=1,NumPlantChemElms      
           RHOSM(NE,M,K)=0.0_r8
           RCOSM(NE,M,K)=RDOSM(NE,M,K)
         ENDDO
@@ -1342,7 +1342,7 @@ module MicBGCMod
     ENDIF
   ELSE
     D780: DO M=1,jsken
-      DO NE=1,NumPlantChemElmnts    
+      DO NE=1,NumPlantChemElms    
         RDOSM(NE,M,K)=0.0_r8
         RHOSM(NE,M,K)=0.0_r8
         RCOSM(NE,M,K)=0.0_r8
@@ -1376,14 +1376,14 @@ module MicBGCMod
         RDORM(ielmn,M,K)=AZMAX1(AMIN1(ORM(ielmn,M,K),CNR*RDORM(ielmc,M,K)))/FCNK(K)
         RDORM(ielmp,M,K)=AZMAX1(AMIN1(ORM(ielmp,M,K),CPR*RDORM(ielmc,M,K)))/FCPK(K)
       ELSE
-        DO NE=1,NumPlantChemElmnts      
+        DO NE=1,NumPlantChemElms      
           RDORM(NE,M,K)=0.0_r8
         ENDDO  
       ENDIF
     ENDDO D775
   ELSE
     D776: DO M=1,ndbiomcp
-      DO NE=1,NumPlantChemElmnts    
+      DO NE=1,NumPlantChemElms    
         RDORM(NE,M,K)=0.0_r8
       ENDDO  
     ENDDO D776
@@ -1502,7 +1502,7 @@ module MicBGCMod
     D1685: DO N=1,NumMicbFunGroups
       D1680: DO M=1,ndbiomcp
         DO NGL=JGniA(N),JGnfA(N)
-        DO NE=1,NumPlantChemElmnts
+        DO NE=1,NumPlantChemElms
           RCCMEheter(NE,M,NGL,K)=(RCOMEautor(NE,M,NGL)+RCMMEautor(NE,M,NGL))*FORC(K)
           ENDDO
         ENDDO
@@ -1524,12 +1524,12 @@ module MicBGCMod
 !     OQC,OQN,OQP,OQA=DOC,DON,DOP
 !     RCOSC,RCOSN,RCOSP=transfer of decomposition C,N,P to DOC,DON,DOP
 !
-      DO NE=1,NumPlantChemElmnts
+      DO NE=1,NumPlantChemElms
         OSM(NE,M,K)=OSM(NE,M,K)-RDOSM(NE,M,K)
       ENDDO
 
 !     OSA(M,K)=OSA(M,K)-RDOSM(ielmc,M,K)
-      DO NE=1,NumPlantChemElmnts
+      DO NE=1,NumPlantChemElms
       DOM(NE,K)=DOM(NE,K)+RCOSM(NE,M,K)
       ENDDO
 !
@@ -1540,7 +1540,7 @@ module MicBGCMod
       IF(.not.litrm)THEN
 ! add to POM carbonhydrate
  !      OSA(1,k_POM)=OSA(1,k_POM)+RHOSM(ielmc,M,K)
-        DO NE=1,NumPlantChemElmnts
+        DO NE=1,NumPlantChemElms
           OSM(NE,iprotein,k_POM)=OSM(NE,iprotein,k_POM)+RHOSM(NE,M,K)
         ENDDO
       ELSE
@@ -1560,7 +1560,7 @@ module MicBGCMod
 !     RCOQN=DON production from nitrous acid reduction
 !
     D575: DO M=1,ndbiomcp
-      DO NE=1,NumPlantChemElmnts    
+      DO NE=1,NumPlantChemElms    
         ORM(NE,M,K)=ORM(NE,M,K)-RDORM(NE,M,K)
         DOM(NE,K)=DOM(NE,K)+RDORM(NE,M,K)
       ENDDO
@@ -1590,7 +1590,7 @@ module MicBGCMod
 !     RCMMEheter,RCMMN,RCMMEheter=transfer of senesence litterfall C,N,P to residue
 !
         D565: DO M=1,ndbiomcp
-          DO NE=1,NumPlantChemElmnts
+          DO NE=1,NumPlantChemElms
             ORM(NE,M,K)=ORM(NE,M,K)+RCOMEheter(NE,M,NGL,K)+RCCMEheter(NE,M,NGL,K)+RCMMEheter(NE,M,NGL,K)
           ENDDO
         ENDDO D565
@@ -1691,7 +1691,7 @@ module MicBGCMod
 !
             IF(.not.litrm)THEN
 !add as protein
-              DO NE=1,NumPlantChemElmnts
+              DO NE=1,NumPlantChemElms
                 OSM(NE,iprotein,k_humus)=OSM(NE,iprotein,k_humus)+CFOMC(1)*(RHOMEheter(NE,M,NGL,K)+RHMMEheter(NE,M,NGL,K))
   !add as carbon hydro
                 OSM(NE,icarbhyro,k_humus)=OSM(NE,icarbhyro,k_humus)+CFOMC(2)*(RHOMEheter(NE,M,NGL,K)+RHMMEheter(NE,M,NGL,K))
@@ -1729,7 +1729,7 @@ module MicBGCMod
           RCO2X(NGL,K)=RCO2X(NGL,K)+RGN2F(NGL,K)
           MID3=micpar%get_micb_id(3,NGL)
           D555: DO M=1,2
-            DO NE=1,NumPlantChemElmnts
+            DO NE=1,NumPlantChemElms
               OMEhetr(NE,MID3,K)=OMEhetr(NE,MID3,K)-CGOMES(NE,M,NGL,K)+R3OMEheter(NE,M,NGL,K)
             ENDDO
             OMEhetr(ielmn,MID3,K)=OMEhetr(ielmn,MID3,K)+R3MMEheter(ielmn,M,NGL,K)
@@ -2021,17 +2021,17 @@ module MicBGCMod
 !
   D655: DO K=1,jcplx
     D660: DO M=1,jsken
-      DO NE=1,NumPlantChemElmnts
+      DO NE=1,NumPlantChemElms
         RDOM_micb_flx(NE,K)=RDOM_micb_flx(NE,K)+RCOSM(NE,M,K)
       ENDDO
     ENDDO D660
 
     D665: DO M=1,ndbiomcp
-      DO NE=1,NumPlantChemElmnts
+      DO NE=1,NumPlantChemElms
         RDOM_micb_flx(NE,K)=RDOM_micb_flx(NE,K)+RDORM(NE,M,K)
       ENDDO
     ENDDO D665
-    DO NE=1,NumPlantChemElmnts
+    DO NE=1,NumPlantChemElms
       RDOM_micb_flx(NE,K)=RDOM_micb_flx(NE,K)+RDOHM(NE,K)
     ENDDO
     RDOM_micb_flx(idom_acetate,K)=RDOM_micb_flx(idom_acetate,K)+RDOHM(idom_acetate,K)
@@ -2043,7 +2043,7 @@ module MicBGCMod
         RDOM_micb_flx(idom_acetate,K)=RDOM_micb_flx(idom_acetate,K)-CGOAC(NGL,K)+RCH3X(NGL,K)
       ENDDO
     ENDDO D670
-    DO NE=1,NumPlantChemElmnts
+    DO NE=1,NumPlantChemElms
       RDOM_micb_flx(NE,K)=RDOM_micb_flx(NE,K)-OMSORP(NE,K)
     ENDDO
     RDOM_micb_flx(idom_acetate,K)=RDOM_micb_flx(idom_acetate,K)-OMSORP(idom_acetate,K)
@@ -3682,7 +3682,7 @@ module MicBGCMod
     RDOMEheter(ielmc,M,NGL,K)=RXOMEheter(ielmc,M,NGL,K)*(1.0_r8-RCCC)
     RDOMEheter(ielmn,M,NGL,K)=RXOMEheter(ielmn,M,NGL,K)*(1.0_r8-RCCC)*(1.0_r8-RCCN)
     RDOMEheter(ielmp,M,NGL,K)=RXOMEheter(ielmp,M,NGL,K)*(1.0_r8-RCCC)*(1.0_r8-RCCP)
-    DO NE=1,NumPlantChemElmnts    
+    DO NE=1,NumPlantChemElms    
       R3OMEheter(NE,M,NGL,K)=RXOMEheter(NE,M,NGL,K)-RDOMEheter(NE,M,NGL,K)
 !
 !     HUMIFICATION OF MICROBIAL DECOMPOSITION PRODUCTS FROM
@@ -3724,7 +3724,7 @@ module MicBGCMod
       RDMMEheter(ielmc,M,NGL,K)=RXMMEheter(ielmc,M,NGL,K)*(1.0_r8-RCCC)
       RDMMEheter(ielmn,M,NGL,K)=RXMMEheter(ielmn,M,NGL,K)*(1.0_r8-RCCN)*(1.0_r8-RCCC)
       RDMMEheter(ielmp,M,NGL,K)=RXMMEheter(ielmp,M,NGL,K)*(1.0_r8-RCCP)*(1.0_r8-RCCC)
-      DO NE=1,NumPlantChemElmnts
+      DO NE=1,NumPlantChemElms
         R3MMEheter(NE,M,NGL,K)=RXMMEheter(NE,M,NGL,K)-RDMMEheter(NE,M,NGL,K)
 !
 !     HUMIFICATION AND RECYCLING OF RESPIRATION DECOMPOSITION
@@ -3741,7 +3741,7 @@ module MicBGCMod
     ENDDO D730
   ELSE
     D720: DO M=1,2
-      DO NE=1,NumPlantChemElmnts
+      DO NE=1,NumPlantChemElms
         RXMMEheter(NE,M,NGL,K)=0.0_r8
         RDMMEheter(NE,M,NGL,K)=0.0_r8
         R3MMEheter(NE,M,NGL,K)=0.0_r8
