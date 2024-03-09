@@ -6,7 +6,7 @@ module HistFileMod
   use fileUtil          , only : iulog,strip_null
   use abortutils        , only : endrun
   use TestMod           , only : errMsg
-  use GridConsts        , only : JZ,JS,MaxNumBranches,bounds,bounds_type
+  use GridConsts        , only : JZ,JS,MaxNumBranches,bounds,bounds_type,NumOfPlantMorphUnits
   use data_const_mod    , only : spval => DAT_CONST_SPVAL
   use EcosimConst       , only : secspday
   use EcoSIMCtrlMod     , only : etimer
@@ -185,7 +185,7 @@ implicit none
   use EcoSIMConfig      , only : case_name
   use GridConsts        , only : JZ,JS,MaxNumBranches,NumOfCanopyLayers,JP,NumGrowthStages
   use EcoSIMConfig      , only : jcplx=>jcplxc,jsken=>jskenc
-  use ElmIDMod          , only : NumPlantChemElmnts
+  use ElmIDMod          , only : NumPlantChemElms
   implicit none
   integer, intent(in) :: t        ! tape index
   logical, optional, intent(in) :: histrest  !if creating the history restart file
@@ -250,10 +250,10 @@ implicit none
   call ncd_defdim(lnfid, 'npfts',  JP,dimid)
   call ncd_defdim(lnfid, 'nbranches',MaxNumBranches,dimid)
   call ncd_defdim(lnfid, 'ngrstages',NumGrowthStages,dimid)
-  call ncd_defdim(lnfid, 'elements',NumPlantChemElmnts,dimid)
+  call ncd_defdim(lnfid, 'elements',NumPlantChemElms,dimid)
   call ncd_defdim(lnfid, 'nkinecomp',jsken,dimid)
   call ncd_defdim(lnfid, 'nomcomplx',jcplx,dimid)
-
+  call ncd_defdim(lnfid, 'pmorphunits',NumOfPlantMorphUnits,dimid)
   if ( .not. lhistrest )then
     call ncd_defdim(lnfid, 'hist_interval', 2, hist_interval_dimid)
     call ncd_defdim(lnfid, 'time', ncd_unlimited, time_dimid)
@@ -559,10 +559,13 @@ implicit none
       num2d = JZ
   case ('nbranches')
       num2d = MaxNumBranches
+  case ('pmorphunits')
+      num2d=NumOfPlantMorphUnits    
   case default
       write(iulog,*) trim(subname),' ERROR: unsupported 2d type ',type2d, &
         ' currently supported types for multi level fields are: ', &
-        '[levgrnd,levlak,numrad,nmonthlevdcmp,levtrc,ltype,natpft,cft,glc_nec,elevclas,levsno,levsoi,nbranches]'
+        '[levgrnd,levlak,numrad,nmonthlevdcmp,levtrc,ltype,natpft,cft,'&
+          //'glc_nec,elevclas,levsno,levsoi,nbranches,pmorphunits]'
       call endrun(msg=errMsg(__FILE__, __LINE__))
   end select
   if (present(ptr_gcell)) then

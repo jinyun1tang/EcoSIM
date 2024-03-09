@@ -759,7 +759,6 @@ module StartsMod
   TDHUM(:,:,:)=1.0_r8
   TDPRC(:,:,:)=1.0_r8
   TDIRI(:,:,:)=1.0_r8
-  TDCO2(:,:,:)=1.0_r8
   TDCN4(:,:,:)=1.0_r8
   TDCNO(:,:,:)=1.0_r8
 

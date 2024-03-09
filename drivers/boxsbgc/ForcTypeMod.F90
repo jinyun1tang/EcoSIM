@@ -221,7 +221,7 @@ implicit none
   integer :: jcplx,ndbiomcp,nlbiomcp
   integer :: NumMicbFunGroups,jsken,NumMicrbHetetrophCmplx,NumMicrobAutotrophCmplx
   integer :: NumLiveHeterBioms,NumLiveAutoBioms
-  integer :: NumPlantChemElmnts
+  integer :: NumPlantChemElms
   type(file_desc_t) :: ncf
 
   call ncd_pio_openfile(ncf, fname, ncd_nowrite)
@@ -232,16 +232,16 @@ implicit none
   NumMicrobAutotrophCmplx=get_dim_len(ncf,'NumMicrobAutotrophCmplx')
   NumLiveHeterBioms = get_dim_len(ncf,'NumLiveHeterBioms')
   NumLiveAutoBioms = get_dim_len(ncf,'NumLiveAutoBioms')
-  NumPlantChemElmnts=get_dim_len(ncf,'element')
+  NumPlantChemElms=get_dim_len(ncf,'element')
   nlbiomcp=get_dim_len(ncf,'nlbiomcp')
   ndbiomcp=get_dim_len(ncf,'ndbiomcp')
   NumMicbFunGroups    =get_dim_len(ncf,'NumMicbFunGroups')
-  allocate(forc%OMEhetr(NumPlantChemElmnts,NumLiveHeterBioms,1:jcplx))
+  allocate(forc%OMEhetr(NumPlantChemElms,NumLiveHeterBioms,1:jcplx))
   allocate(forc%DOM(idom_beg:idom_end,1:jcplx))
-  allocate(forc%OSM(1:NumPlantChemElmnts,jsken,1:jcplx))
+  allocate(forc%OSM(1:NumPlantChemElms,jsken,1:jcplx))
   allocate(forc%OSA(jsken,1:jcplx))
-  allocate(forc%ORM(1:NumPlantChemElmnts,ndbiomcp,1:jcplx))
-  allocate(forc%OMEauto(NumPlantChemElmnts,NumLiveAutoBioms))
+  allocate(forc%ORM(1:NumPlantChemElms,ndbiomcp,1:jcplx))
+  allocate(forc%OMEauto(NumPlantChemElms,NumLiveAutoBioms))
   allocate(forc%OHM(idom_beg:idom_end,1:jcplx))
   allocate(forc%CFOMC(ndbiomcp))
   allocate(forc%CNOSC(1:jsken,1:jcplx))

@@ -141,16 +141,16 @@ implicit none
   allocate(VLiceMicP1(JZ,JY,JX));    VLiceMicP1=0._r8
   allocate(VLWatMacP1(JZ,JY,JX));   VLWatMacP1=0._r8
   allocate(VLiceMacP1(JZ,JY,JX));   VLiceMacP1=0._r8
-  allocate(TOMEERhetr(NumPlantChemElmnts,1:NumLiveHeterBioms,1:jcplx,JY,JX)); TOMEERhetr=0._r8
+  allocate(TOMEERhetr(NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx,JY,JX)); TOMEERhetr=0._r8
 
-  allocate(TOMEERauto(NumPlantChemElmnts,1:NumLiveAutoBioms,JY,JX));TOMEERauto=0._r8
+  allocate(TOMEERauto(NumPlantChemElms,1:NumLiveAutoBioms,JY,JX));TOMEERauto=0._r8
 
   allocate(DOM_Transp2Micp_flx(idom_beg:idom_end,1:jcplx,JZ,JY,JX));DOM_Transp2Micp_flx=0._r8
   allocate(DOM_Transp2Macp_flx(idom_beg:idom_end,1:jcplx,JZ,JY,JX));DOM_Transp2Macp_flx=0._r8
   allocate(TOMQRS(idom_beg:idom_end,1:jcplx,JY,JX));TOMQRS=0._r8
-  allocate(TORMER(NumPlantChemElmnts,ndbiomcp,1:jcplx,JY,JX));TORMER=0._r8
+  allocate(TORMER(NumPlantChemElms,ndbiomcp,1:jcplx,JY,JX));TORMER=0._r8
   allocate(TOHMER(idom_beg:idom_end,1:jcplx,JY,JX));TOHMER=0._r8
-  allocate(TOSMER(NumPlantChemElmnts,jsken,1:jcplx,JY,JX));TOSMER=0._r8
+  allocate(TOSMER(NumPlantChemElms,jsken,1:jcplx,JY,JX));TOSMER=0._r8
   allocate(TOSAER(jsken,1:jcplx,JY,JX));TOSAER=0._r8
 
   end subroutine InitTflxType

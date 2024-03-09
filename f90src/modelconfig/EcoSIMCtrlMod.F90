@@ -7,6 +7,7 @@ implicit none
   save
   logical :: salt_model   =.false.    !toggle for salt model
   logical :: erosion_model=.false.
+  logical :: first_topou   = .false.
   integer :: iErosionMode =-1         !erosion option  
   logical :: plant_model  =.true.
   logical :: microbial_model   =.true.
@@ -19,6 +20,9 @@ implicit none
   real(r8) :: ao2_ppm   = 0.209e6_r8
   real(r8) :: an2_ppm   = 0.78e6_r8
   real(r8) :: anh3_ppm  = 5.e-3_r8
+  real(r8) :: atm_co2_fix=-100._r8
+  real(r8) :: atm_ch4_fix=-100._r8
+  real(r8) :: atm_n2o_fix=-100._r8
   character(len=300) :: pft_file_in
   character(len=300) :: pft_mgmt_in
   character(len=300) :: grid_file_in

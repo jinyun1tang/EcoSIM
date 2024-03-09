@@ -13,11 +13,12 @@ module PlantTraitDataType
 
 
 !allocation parameter
-  real(r8) :: FVRN(0:5)              !allocation parameter
+  real(r8) :: FracHour4LeafoffRemob(0:5)              !allocation parameter
   REAL(R8),target,allocatable :: FWODBE(:,:)             !woody element allocation
   real(r8),target,allocatable :: FWODLE(:,:)             !element allocation for leaf
   real(r8),target,allocatable :: FWODRE(:,:)
   real(r8),target,allocatable :: FWOODE(:,:)             !woody C allocation
+  real(r8),target,allocatable :: PARTS_brch(:,:,:,:,:)       !C partitioning coefficient
   real(r8),target,allocatable ::  CanopyBranchStemApft_lyr(:,:,:,:,:)              !stem layer area, [m2 d-2]
   real(r8),target,allocatable ::  CanopyLeafArea_pft(:,:,:)                       !plant leaf area, [m2 d-2]
   real(r8),target,allocatable ::  CanopyArea_pft(:,:,:)                       !plant canopy leaf+stem/stalk area, [m2 d-2]
@@ -76,7 +77,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  rCPNonstructRemob_pft(:,:,:)                        !C:P ratio in remobilizable nonstructural biomass, [-]
   real(r8),target,allocatable ::  OSMO(:,:,:)                        !canopy osmotic potential when canopy water potential = 0 MPa, [MPa]
   real(r8),target,allocatable ::  TCelcius4LeafOffHarden_pft(:,:,:)                         !threshold temperature for autumn leafoff/hardening, [oC]
-  real(r8),target,allocatable ::  iPlantInitThermoAdaptZone(:,:,:)                       !initial plant thermal adaptation zone, [-]
+  real(r8),target,allocatable ::  PlantInitThermoAdaptZone(:,:,:)                       !initial plant thermal adaptation zone, [-]
   real(r8),target,allocatable ::  iPlantThermoAdaptZone(:,:,:)                        !plant thermal adaptation zone, [-]
   real(r8),target,allocatable ::  MatureGroup_brch(:,:,:,:)                     !plant maturity group, [-]
   real(r8),target,allocatable ::  MatureGroup_pft(:,:,:)                      !acclimated plant maturity group, [-]
@@ -139,7 +140,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  TotalNodeNumNormByMatgrp_brch(:,:,:,:)                    !normalized node number during vegetative growth stages , [-]
   real(r8),target,allocatable ::  TotReproNodeNumNormByMatrgrp_brch(:,:,:,:)                    !normalized node number during reproductive growth stages , [-]
   real(r8),target,allocatable ::  RefNodeInitRate_pft(:,:,:)                        !rate of node initiation, [h-1 at 25 oC]
-  real(r8),target,allocatable ::  SNL1(:,:,:)                        !internode length:mass during growth, [m g-1]
+  real(r8),target,allocatable ::  NodeLenPergC(:,:,:)                        !internode length:mass during growth, [m g-1]
   real(r8),target,allocatable ::  FNOD(:,:,:)                        !parameter for allocation of growth to nodes, [-]
   integer,target,allocatable ::  NumConCurrentGrowinNode(:,:,:)                         !number of concurrently growing nodes
   real(r8),target,allocatable ::  PSICanPDailyMin(:,:,:)                       !minimum daily canopy water potential, [MPa]
@@ -172,11 +173,11 @@ contains
   implicit none
   integer, intent(in) :: NumOfPlantLitrCmplxs
 
-  FVRN =real((/0.75,0.5,0.5,0.5,0.5,0.5/),r8)
-  allocate(FWODLE(NumPlantChemElmnts,1:NumOfPlantLitrCmplxs));  FWODLE=0._r8
-  allocate(FWODBE(NumPlantChemElmnts,1:NumOfPlantLitrCmplxs));  FWODBE=0._r8
-  allocate(FWODRE(NumPlantChemElmnts,1:NumOfPlantLitrCmplxs));  FWODRE=0._r8         !
-  allocate(FWOODE(NumPlantChemElmnts,1:NumOfPlantLitrCmplxs));  FWOODE=0._r8         !woody element allocation
+  FracHour4LeafoffRemob =real((/0.75,0.5,0.5,0.5,0.5,0.5/),r8)
+  allocate(FWODLE(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FWODLE=0._r8
+  allocate(FWODBE(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FWODBE=0._r8
+  allocate(FWODRE(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FWODRE=0._r8         !
+  allocate(FWOODE(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FWOODE=0._r8         !woody element allocation
   allocate(CanopyBranchStemApft_lyr(NumOfCanopyLayers,MaxNumBranches,JP,JY,JX));CanopyBranchStemApft_lyr=0._r8
   allocate(CanopyLeafArea_pft(JP,JY,JX));    CanopyLeafArea_pft=0._r8
   allocate(CanopyArea_pft(JP,JY,JX));    CanopyArea_pft=0._r8
@@ -204,6 +205,7 @@ contains
   allocate(SinePetioleAngle_pft(JP,JY,JX));    SinePetioleAngle_pft=0._r8
   allocate(RAZ(JP,JY,JX));      RAZ=0._r8
   allocate(CanPHeight4WatUptake(JP,JY,JX));    CanPHeight4WatUptake=0._r8
+  allocate(PARTS_brch(NumOfPlantMorphUnits,MaxNumBranches,JP,JY,JX));PARTS_brch=0._r8
   allocate(LeafAreaNode_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));LeafAreaNode_brch=0._r8
   allocate(PetioleLengthNode_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));PetioleLengthNode_brch=0._r8
   allocate(InternodeHeightLive_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));InternodeHeightLive_brch=0._r8
@@ -235,7 +237,7 @@ contains
   allocate(rCPNonstructRemob_pft(JP,JY,JX));     rCPNonstructRemob_pft=0._r8
   allocate(OSMO(JP,JY,JX));     OSMO=0._r8
   allocate(TCelcius4LeafOffHarden_pft(JP,JY,JX));      TCelcius4LeafOffHarden_pft=0._r8
-  allocate(iPlantInitThermoAdaptZone(JP,JY,JX));    iPlantInitThermoAdaptZone=0._r8
+  allocate(PlantInitThermoAdaptZone(JP,JY,JX));    PlantInitThermoAdaptZone=0._r8
   allocate(iPlantThermoAdaptZone(JP,JY,JX));     iPlantThermoAdaptZone=0._r8
   allocate(MatureGroup_brch(MaxNumBranches,JP,JY,JX)); MatureGroup_brch=0._r8
   allocate(MatureGroup_pft(JP,JY,JX));   MatureGroup_pft=0._r8
@@ -298,7 +300,7 @@ contains
   allocate(TotalNodeNumNormByMatgrp_brch(MaxNumBranches,JP,JY,JX));TotalNodeNumNormByMatgrp_brch=0._r8
   allocate(TotReproNodeNumNormByMatrgrp_brch(MaxNumBranches,JP,JY,JX));TotReproNodeNumNormByMatrgrp_brch=0._r8
   allocate(RefNodeInitRate_pft(JP,JY,JX));     RefNodeInitRate_pft=0._r8
-  allocate(SNL1(JP,JY,JX));     SNL1=0._r8
+  allocate(NodeLenPergC(JP,JY,JX));     NodeLenPergC=0._r8
   allocate(FNOD(JP,JY,JX));     FNOD=0._r8
   allocate(NumConCurrentGrowinNode(JP,JY,JX));     NumConCurrentGrowinNode=0
   allocate(PSICanPDailyMin(JP,JY,JX));    PSICanPDailyMin=0._r8
@@ -371,6 +373,7 @@ contains
   call destroy(CanopySeedNumber_pft)
   call destroy(PlantPopulation_pft)
   call destroy(InternodeHeightDying_brch)
+  call destroy(PARTS_brch)
   call destroy(CNLF)
   call destroy(CPLF)
   call destroy(CNSHE)
@@ -391,7 +394,7 @@ contains
   call destroy(rCPNonstructRemob_pft)
   call destroy(OSMO)
   call destroy(TCelcius4LeafOffHarden_pft)
-  call destroy(iPlantInitThermoAdaptZone)
+  call destroy(PlantInitThermoAdaptZone)
   call destroy(iPlantThermoAdaptZone)
   call destroy(MatureGroup_brch)
   call destroy(MatureGroup_pft)
@@ -454,7 +457,7 @@ contains
   call destroy(TotalNodeNumNormByMatgrp_brch)
   call destroy(TotReproNodeNumNormByMatrgrp_brch)
   call destroy(RefNodeInitRate_pft)
-  call destroy(SNL1)
+  call destroy(NodeLenPergC)
   call destroy(FNOD)
   call destroy(NumConCurrentGrowinNode)
   call destroy(PSICanPDailyMin)

@@ -56,7 +56,7 @@ module PlantDisturbMod
             D1990: DO NY1=NVN,NVS
               IF(LSG(NZ,NY1,NX1).EQ.LSG(NZ,NY,NX))THEN
                 IF(IsPlantActive_pft(NZ,NY1,NX1).EQ.iPlantIsActive)THEN
-                  WTSHTZ=WTSHTZ+ShootChemElmnts_pft(ielmc,NZ,NY1,NX1)
+                  WTSHTZ=WTSHTZ+ShootChemElms_pft(ielmc,NZ,NY1,NX1)
                   NN=NN+1
                 ENDIF
               ENDIF
@@ -65,7 +65,7 @@ module PlantDisturbMod
           IF(NN.GT.0)THEN
             AvgCanopyBiomC2Graze_pft(NZ,NY,NX)=WTSHTZ/NN
           ELSE
-            AvgCanopyBiomC2Graze_pft(NZ,NY,NX)=ShootChemElmnts_pft(ielmc,NZ,NY,NX)
+            AvgCanopyBiomC2Graze_pft(NZ,NY,NX)=ShootChemElms_pft(ielmc,NZ,NY,NX)
           ENDIF
         ENDIF
       ENDDO D2985

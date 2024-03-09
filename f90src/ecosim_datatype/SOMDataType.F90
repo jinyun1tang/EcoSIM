@@ -67,9 +67,9 @@ module SOMDataType
   allocate(CFOSC(jsken,1:jcplx,0:JZ,JY,JX))
   allocate(CNOSC(jsken,1:jcplx,0:JZ,JY,JX))
   allocate(CPOSC(jsken,1:jcplx,0:JZ,JY,JX))
-  allocate(OSM(NumPlantChemElmnts,jsken,1:jcplx,0:JZ,JY,JX))
+  allocate(OSM(NumPlantChemElms,jsken,1:jcplx,0:JZ,JY,JX))
   allocate(OHM(idom_beg:idom_end,1:jcplx,0:JZ,JY,JX))
-  allocate(ORM(1:NumPlantChemElmnts,ndbiomcp,1:jcplx,0:JZ,JY,JX))
+  allocate(ORM(1:NumPlantChemElms,ndbiomcp,1:jcplx,0:JZ,JY,JX))
   allocate(DOM(idom_beg:idom_end,1:jcplx,0:JZ,JY,JX))
   allocate(DOM_Macp(idom_beg:idom_end,1:jcplx,0:JZ,JY,JX));DOM_MacP=0._r8
   allocate(ORGC(0:JZ,JY,JX))
@@ -82,9 +82,9 @@ module SOMDataType
   allocate(CORGP(JZ,JY,JX))
   allocate(CORGR(JZ,JY,JX))
   allocate(CFOMC(2,JZ,JY,JX))
-  allocate(TOMET(NumPlantChemElmnts,JY,JX));        TOMET=0._r8
-  allocate(URSDM(NumPlantChemElmnts,JY,JX));       URSDM=0._r8
-  allocate(UORGM(NumPlantChemElmnts,JY,JX));       UORGM=0._r8
+  allocate(TOMET(NumPlantChemElms,JY,JX));        TOMET=0._r8
+  allocate(URSDM(NumPlantChemElms,JY,JX));       URSDM=0._r8
+  allocate(UORGM(NumPlantChemElms,JY,JX));       UORGM=0._r8
   allocate(EPOC(0:JZ,JY,JX));   EPOC=0._r8
   allocate(EHUM(0:JZ,JY,JX));   EHUM=0._r8
   allocate(CDOM(idom_beg:idom_end,1:jcplx,0:JZ,JY,JX));CDOM=0._r8

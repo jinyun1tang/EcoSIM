@@ -19,10 +19,10 @@ implicit none
   character(len=*), parameter :: mod_filename = &
   __FILE__
   CHARACTER(len=1) :: IVAR(20),VAR(50),TYP(50),CTYPE
-  real(r8) :: DAT(50),DATK(50),OUT(50)
+  real(r8) :: DATK(50),OUT(50)
   real(r8) :: datav(40)
   integer,save :: IYRD,IFLGY,IYRX
-  integer :: IDAT(20),IFLG3
+  integer :: IFLG3
   DATA IYRD,IFLGY,IYRX/0,0,0/
 
   type, public :: atm_forc_type
@@ -43,12 +43,15 @@ implicit none
   end type atm_forc_type
   public :: ReadClim
   public :: ReadClimNC
-  public :: geEco_Heat_Grnd_colGts
+  public :: GetAtmGts
   contains
 
 !------------------------------------------------------------------------------------------
 
   subroutine interp3hourweather(I,J)
+  !
+  !interpolate 3-hourly weather to hourly
+  !I is day, J is hour
   implicit none
   integer, intent(in) :: I,J
 
@@ -95,13 +98,15 @@ implicit none
 
 !------------------------------------------------------------------------------------------
 
-  subroutine readhourweather(IYEAR,I,J,L,IH,go60,NN,NI,TTYPE)
+  subroutine readhourweather(idat,DAT,IYEAR,I,J,L,IH,go60,NN,NI,TTYPE)
 
 !     read hourly weather data, from ascii file
 !
 !     DERIVE DAY I AND HOUR J FROM TIME VARIABLES IVAR
 !
   implicit none
+  integer, intent(in) :: idat(:)
+  real(r8),intent(inout) :: dat(:)
   integer, intent(inout) :: I      !julian day
   integer, intent(inout) :: J      !hour
   integer, intent(inout) :: IH
@@ -328,7 +333,7 @@ implicit none
   end subroutine readhourweather
 !------------------------------------------------------------------------------------------
 
-  subroutine readdayweather(IYEAR,I,L,go110,go60,NTX,NFX,NN,NI,IX)
+  subroutine readdayweather(idat,dat,IYEAR,I,L,go110,go60,NTX,NFX,NN,NI,IX)
 !     read daily weather data
 !
 !     DERIVE DAY I FROM TIME VARIABLES IVAR
@@ -336,7 +341,8 @@ implicit none
 !     IWTHR=weather data type:1=daily,2=hourly for first(L=1) or second(L=2) scene
 !
   implicit none
-
+  integer, intent(in) :: idat(:)
+  real(r8),intent(inout) :: dat(:)
   integer, intent(in) :: NTX,NFX,NN,NI,IYEAR,L
   integer, intent(out) :: I
   logical, intent(out) :: go110, go60
@@ -548,6 +554,8 @@ implicit none
 !------------------------------------------------------------------------------------------
 
   subroutine ReadClim(iyear,clmfile,NTX,NFX,L,I,IX,TTYPE,atmf)
+  !
+  !read climate/weather data, 
   implicit none
   character(len=*), intent(in) :: clmfile
   integer, intent(in) :: iyear
@@ -555,10 +563,13 @@ implicit none
   integer, intent(out) :: I,IX
   CHARACTER(len=1),intent(out) :: TTYPE
   type(atm_forc_type), intent(out) :: atmf
+  real(r8) :: DAT(50)
+  integer :: IDAT(20)
 
   integer :: K, KK, IH, NI, NN, J
   integer :: LL
   LOGICAL :: GO110,GO60
+  character(len=100):: line
 
 ! OPEN WEATHER file(3,
   call OPEN_safe(3,PREFIX,clmfile,'OLD',mod_filename,__LINE__)
@@ -571,8 +582,10 @@ implicit none
   atmf%ZNOONG=datav(3)
 
 !  fourth line in the weather file
-  READ(3,*)atmf%PHRG,atmf%CN4RIG,atmf%CNORIG,atmf%CPORG,atmf%CALRG,&
+  read(3, '(A)') line
+  READ(line,*)atmf%PHRG,atmf%CN4RIG,atmf%CNORIG,atmf%CPORG,atmf%CALRG,&
     atmf%CFERG,atmf%CCARG,atmf%CMGRG,atmf%CNARG,atmf%CKARG,atmf%CSORG,atmf%CCLRG
+
   if(lverb)then
     write(*,'(40A)')('-',ll=1,40)
     write(*,*)'read weather file head from ',clmfile
@@ -607,6 +620,7 @@ implicit none
 
 ! the file reading loop
   DO while(.TRUE.)
+    !read one line data
     read(3,*,END=111)(datav(k),k=1,NI),(DAT(K),K=1,NN)
 
 !   time information
@@ -618,7 +632,7 @@ implicit none
 !   READ DAILY WEATHER DATA AND CONVERT TO MODEL UNITS
       if(lverb)write(*,*)'read daily weather file'
       IWTHR(L)=1
-      call readdayweather(iyear,I,L,GO110,GO60,NTX,NFX,NN,NI,IX)
+      call readdayweather(idat,dat,iyear,I,L,GO110,GO60,NTX,NFX,NN,NI,IX)
       IF(GO60)cycle  !year mismatch, read the next line
       IF(GO110)EXIT
 !!
@@ -626,7 +640,7 @@ implicit none
 !     READ HOURLY WEATHER DATA AND CONVERT TO MODEL UNITS
       IWTHR(L)=2
       if(lverb)write(*,*)'read hourly weather file'
-      call readhourweather(iyear,I,J,L,IH,go60,NN,NI,TTYPE)
+      call readhourweather(idat,dat,iyear,I,J,L,IH,go60,NN,NI,TTYPE)
       IF(GO60)cycle  !year mismatch,read the next year
       IH=1
       IX=I
@@ -774,7 +788,7 @@ implicit none
 
 !----------------------------------------------------------------------
 
-  subroutine geEco_Heat_Grnd_colGts(yeari,NHW,NHE,NVN,NVS)
+  subroutine GetAtmGts(yeari,NHW,NHE,NVN,NVS)
   !
   !DESCRIPTION
   !read in atmospheric concentrations for CO2, CH4, and N2O
@@ -786,34 +800,48 @@ implicit none
   real(r8) :: atm_ch4   !ppb
   real(r8) :: atm_n2o   !ppb
   type(file_desc_t) :: atm_ghg_nfid
-  integer :: iyear,year
-  INTEGER :: NY,NX
+  integer :: iyear
+  real(r8) :: year,year0
+  INTEGER :: NY,NX,K
 
   call ncd_pio_openfile(atm_ghg_nfid, atm_ghg_in, ncd_nowrite)
 
   iyear=1
-  DO while(.true.)
-    call ncd_getvar(atm_ghg_nfid,'year',iyear,year)
-    if(year==yeari)exit
-    iyear=iyear+1
-  ENDDO
+  call ncd_getvar(atm_ghg_nfid,'year',iyear,year0)
+  iyear=(yeari-int(year0))*12
 
-  call ncd_getvar(atm_ghg_nfid,'CO2',iyear,atm_co2)
-  call ncd_getvar(atm_ghg_nfid,'CH4',iyear,atm_ch4)
-  call ncd_getvar(atm_ghg_nfid,'N2O',iyear,atm_n2o)
+  if(atm_co2_fix>0._r8)then
+    atm_co2_mon=atm_co2_fix
+  else
+    DO k=1,12
+      call ncd_getvar(atm_ghg_nfid,'CO2',iyear+k,atm_co2_mon(k))
+    enddo
+  endif  
+  if(atm_ch4_fix>0._r8)then
+    atm_ch4_mon=atm_ch4_fix
+  else
+    do K=1,12
+      call ncd_getvar(atm_ghg_nfid,'CH4',iyear+k,atm_ch4_mon(k))
+    enddo
+  endif
+  if(atm_n2o_fix>0._r8)then
+    atm_n2o_mon=atm_n2o_fix
+  else
+    do k=1,12
+      call ncd_getvar(atm_ghg_nfid,'N2O',iyear+k,atm_n2o_mon(k))
+    enddo
+  endif
 
   call ncd_pio_closefile(atm_ghg_nfid)
-
+  
   DO NX=NHW,NHE
     DO NY=NVN,NVS
-      CO2EI(NY,NX)=atm_co2
+      CO2EI(NY,NX)=atm_co2_mon(1)
       CO2E(NY,NX) =CO2EI(NY,NX)
-      CH4E(NY,NX) =atm_ch4*1.e-3_r8  !ppb to ppm
-      Z2OE(NY,NX) =atm_n2o*1.e-3_r8  !ppb to ppm
+      CH4E(NY,NX) =atm_ch4_mon(1)*1.e-3_r8  !ppb to ppm
+      Z2OE(NY,NX) =atm_n2o_mon(1)*1.e-3_r8  !ppb to ppm
     ENDDO
   ENDDO
-  end subroutine geEco_Heat_Grnd_colGts
-
-
+  end subroutine GetAtmGts
 
 end module ClimReadMod

@@ -56,7 +56,7 @@ implicit none
     call ncd_defdim(ncf,'NumLiveHeterBioms',NumLiveHeterBioms,recordDimID)
     call ncd_defdim(ncf,'NumMicrbHetetrophCmplx',NumMicrbHetetrophCmplx,recordDimID)
     call ncd_defdim(ncf,'NumMicrobAutotrophCmplx',NumMicrobAutotrophCmplx,recordDimID)
-    call ncd_defdim(ncf,'element',NumPlantChemElmnts,recordDimID)
+    call ncd_defdim(ncf,'element',NumPlantChemElms,recordDimID)
     call ncd_defdim(ncf,'ndoms',trc_confs%NDOMS,recordDimID)
     call ncd_defvar(ncf, 'pH', ncd_float, long_name='soil pH',  &
             units='none', missing_value=spval, fill_value=spval)

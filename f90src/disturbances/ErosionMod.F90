@@ -514,7 +514,7 @@ module ErosionMod
                   DO NGL=JGnio(NO),JGnfo(NO)
                     DO M=1,nlbiomcp
                       MID=micpar%get_micb_id(M,NGL)
-                      DO NE=1,NumPlantChemElmnts
+                      DO NE=1,NumPlantChemElms
                         OMEERhetr(NE,MID,K,N,2,N5,N4)=FSEDER*OMEhetr(NE,MID,K,NU(N2,N1),N2,N1)
                       ENDDO
                     ENDDO
@@ -526,7 +526,7 @@ module ErosionMod
                 DO NGL=JGniA(NO),JGnfA(NO)
                   DO M=1,nlbiomcp
                     MID=micpar%get_micb_id(M,NGL)
-                    DO NE=1,NumPlantChemElmnts
+                    DO NE=1,NumPlantChemElms
                       OMEERauto(NE,MID,N,2,N5,N4)=FSEDER*OMEauto(NE,MID,NU(N2,N1),N2,N1)
                     ENDDO
                   ENDDO
@@ -535,7 +535,7 @@ module ErosionMod
 
               DO  K=1,jcplx
                 DO  M=1,ndbiomcp
-                  DO NE=1,NumPlantChemElmnts
+                  DO NE=1,NumPlantChemElms
                     ORMER(NE,M,K,N,2,N5,N4)=FSEDER*ORM(NE,M,K,NU(N2,N1),N2,N1)
                   ENDDO
                 ENDDO
@@ -543,7 +543,7 @@ module ErosionMod
                   OHMER(idom,K,N,2,N5,N4)=FSEDER*OHM(idom,K,NU(N2,N1),N2,N1)
                 ENDDO
                 DO  M=1,jsken
-                  DO NE=1,NumPlantChemElmnts
+                  DO NE=1,NumPlantChemElms
                     OSMER(NE,M,K,N,2,N5,N4)=FSEDER*OSM(NE,M,K,NU(N2,N1),N2,N1)
                   ENDDO
                   OSAER(M,K,N,2,N5,N4)=FSEDER*OSA(M,K,NU(N2,N1),N2,N1)
@@ -580,7 +580,7 @@ module ErosionMod
                   DO NGL=JGnio(NO),JGnfo(NO)
                     DO  M=1,nlbiomcp
                       MID=micpar%get_micb_id(M,NGL)
-                      DO NE=1,NumPlantChemElmnts
+                      DO NE=1,NumPlantChemElms
                         OMEERhetr(NE,MID,K,N,2,N5,N4)=0._r8
                       ENDDO
                     enddo
@@ -592,7 +592,7 @@ module ErosionMod
                 DO NGL=JGniA(NO),JGnfA(NO)
                   DO  M=1,nlbiomcp
                     MID=micpar%get_micb_id(M,NGL)
-                    DO NE=1,NumPlantChemElmnts                    
+                    DO NE=1,NumPlantChemElms                    
                       OMEERauto(NE,MID,N,2,N5,N4)=0._r8
                     ENDDO
                   enddo
@@ -601,7 +601,7 @@ module ErosionMod
 
               DO  K=1,jcplx
                 DO  M=1,ndbiomcp
-                  DO NE=1,NumPlantChemElmnts
+                  DO NE=1,NumPlantChemElms
                     ORMER(NE,M,K,N,2,N5,N4)=0._r8
                   ENDDO
                 ENDDO
@@ -610,7 +610,7 @@ module ErosionMod
                 ENDDO
                 DO  M=1,jsken
                   OSAER(M,K,N,2,N5,N4)=0._r8       
-                  DO NE=1,NumPlantChemElmnts         
+                  DO NE=1,NumPlantChemElms         
                     OSMER(NE,M,K,N,2,N5,N4)=0._r8
                   ENDDO
                 ENDDO
@@ -674,7 +674,7 @@ module ErosionMod
                     DO NGL=JGnio(NO),JGnfo(NO)
                       DO  M=1,nlbiomcp
                         MID=micpar%get_micb_id(M,NGL)      
-                        DO NE=1,NumPlantChemElmnts                                                 
+                        DO NE=1,NumPlantChemElms                                                 
                           OMEERhetr(NE,MID,K,N,1,N5B,N4B)=FSEDER*OMEhetr(NE,MID,K,NU(N2,N1),N2,N1)
                         ENDDO
                       enddo
@@ -685,7 +685,7 @@ module ErosionMod
                   DO NGL=JGniA(NO),JGnfA(NO)
                     DO  M=1,nlbiomcp
                       MID=micpar%get_micb_id(M,NGL)
-                      DO NE=1,NumPlantChemElmnts         
+                      DO NE=1,NumPlantChemElms         
                         OMEERauto(NE,MID,N,1,N5B,N4B)=FSEDER*OMEauto(NE,MID,NU(N2,N1),N2,N1)
                       ENDDO
                     enddo
@@ -694,7 +694,7 @@ module ErosionMod
 
                 DO  K=1,jcplx
                   DO  M=1,ndbiomcp
-                    DO NE=1,NumPlantChemElmnts   
+                    DO NE=1,NumPlantChemElms   
                       ORMER(NE,M,K,N,1,N5B,N4B)=FSEDER*ORM(NE,M,K,NU(N2,N1),N2,N1)
                     ENDDO
                   ENDDO
@@ -703,7 +703,7 @@ module ErosionMod
                   ENDDO
                   DO  M=1,jsken
                     OSAER(M,K,N,1,N5B,N4B)=FSEDER*OSA(M,K,NU(N2,N1),N2,N1)
-                    DO NE=1,NumPlantChemElmnts                      
+                    DO NE=1,NumPlantChemElms                      
                       OSMER(NE,M,K,N,1,N5B,N4B)=FSEDER*OSM(NE,M,K,NU(N2,N1),N2,N1)
                     ENDDO  
                   ENDDO
@@ -739,7 +739,7 @@ module ErosionMod
                     DO NGL=JGnio(NO),JGnfo(NO)
                       DO  M=1,nlbiomcp
                         MID=micpar%get_micb_id(M,NGL)
-                        DO NE=1,NumPlantChemElmnts  
+                        DO NE=1,NumPlantChemElms  
                           OMEERhetr(NE,MID,K,N,1,N5B,N4B)=0._r8
                         ENDDO  
                       enddo
@@ -751,7 +751,7 @@ module ErosionMod
                   DO NGL=JGniA(NO),JGnfA(NO)
                     DO  M=1,nlbiomcp
                       MID=micpar%get_micb_id(M,NGL)
-                      DO NE=1,NumPlantChemElmnts                        
+                      DO NE=1,NumPlantChemElms                        
                         OMEERauto(NE,MID,N,1,N5B,N4B)=0._r8
                       ENDDO  
                     enddo
@@ -760,7 +760,7 @@ module ErosionMod
 
                 DO  K=1,jcplx
                   DO  M=1,ndbiomcp
-                    DO NE=1,NumPlantChemElmnts                    
+                    DO NE=1,NumPlantChemElms                    
                       ORMER(NE,M,K,N,1,N5B,N4B)=0._r8
                     ENDDO  
                   ENDDO
@@ -769,7 +769,7 @@ module ErosionMod
                   ENDDO
                   DO  M=1,jsken
                     OSAER(M,K,N,1,N5B,N4B)=0._r8
-                    DO NE=1,NumPlantChemElmnts       
+                    DO NE=1,NumPlantChemElms       
                       OSMER(NE,M,K,N,1,N5B,N4B)=0._r8
                     ENDDO  
                   ENDDO
@@ -888,7 +888,7 @@ module ErosionMod
                   DO NGL=JGnio(NO),JGnfo(NO)
                     DO  M=1,nlbiomcp
                       MID=micpar%get_micb_id(M,NGL)
-                      DO NE=1,NumPlantChemElmnts
+                      DO NE=1,NumPlantChemElms
                         OMEERhetr(NE,MID,K,N,NN,M5,M4)=0._r8
                       ENDDO
                     enddo
@@ -899,7 +899,7 @@ module ErosionMod
                 DO NGL=JGniA(NO),JGnfA(NO)
                   DO  M=1,nlbiomcp
                     MID=micpar%get_micb_id(M,NGL)
-                    DO NE=1,NumPlantChemElmnts       
+                    DO NE=1,NumPlantChemElms       
                       OMEERauto(NE,MID,N,NN,M5,M4)=0._r8
                     ENDDO  
                   enddo
@@ -907,7 +907,7 @@ module ErosionMod
               enddo
               DO  K=1,jcplx
                 DO  M=1,ndbiomcp
-                  DO NE=1,NumPlantChemElmnts                       
+                  DO NE=1,NumPlantChemElms                       
                     ORMER(NE,M,K,N,NN,M5,M4)=0._r8
                   ENDDO  
                 ENDDO
@@ -916,7 +916,7 @@ module ErosionMod
                 ENDDO
                 DO  M=1,jsken
                   OSAER(M,K,N,NN,M5,M4)=0._r8
-                  DO NE=1,NumPlantChemElmnts                       
+                  DO NE=1,NumPlantChemElms                       
                     OSMER(NE,M,K,N,NN,M5,M4)=0._r8
                   ENDDO
                 ENDDO
@@ -963,7 +963,7 @@ module ErosionMod
                   DO NGL=JGnio(NO),JGnfo(NO)
                     DO M=1,nlbiomcp
                       MID=micpar%get_micb_id(M,NGL)                    
-                      DO NE=1,NumPlantChemElmnts                       
+                      DO NE=1,NumPlantChemElms                       
                         OMEERhetr(NE,MID,K,N,NN,M5,M4)=FSEDER*OMEhetr(NE,MID,K,NU(N2,N1),N2,N1)
                       ENDDO
                     ENDDO
@@ -974,7 +974,7 @@ module ErosionMod
                 DO NGL=JGniA(NO),JGnfo(NO)
                   DO M=1,nlbiomcp
                     MID=micpar%get_micb_id(M,NGL)
-                    DO NE=1,NumPlantChemElmnts                       
+                    DO NE=1,NumPlantChemElms                       
                       OMEERauto(NE,MID,N,NN,M5,M4)=FSEDER*OMEauto(NE,MID,NU(N2,N1),N2,N1)
                     ENDDO
                   ENDDO
@@ -983,7 +983,7 @@ module ErosionMod
 
               DO  K=1,jcplx
                 DO  M=1,ndbiomcp
-                  DO NE=1,NumPlantChemElmnts                       
+                  DO NE=1,NumPlantChemElms                       
                     ORMER(NE,M,K,N,NN,M5,M4)=FSEDER*ORM(NE,M,K,NU(N2,N1),N2,N1)
                   ENDDO  
                 ENDDO
@@ -992,7 +992,7 @@ module ErosionMod
                 ENDDO
                 DO  M=1,jsken
                   OSAER(M,K,N,NN,M5,M4)=FSEDER*OSA(M,K,NU(N2,N1),N2,N1)
-                  DO NE=1,NumPlantChemElmnts                       
+                  DO NE=1,NumPlantChemElms                       
                     OSMER(NE,M,K,N,NN,M5,M4)=FSEDER*OSM(NE,M,K,NU(N2,N1),N2,N1)
                   ENDDO
                 ENDDO

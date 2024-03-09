@@ -195,7 +195,7 @@ module MicAutoCPLXMod
 
   if (N.eq.AmmoniaOxidizeBacteria .or. N.eq.NitriteOxidizeBacteria .or. N.eq.AerobicMethanotrophBacteria)then
 !   write(*,*)'AerobLeafO2Solubility_pftUptake'
-    call AerobLeafO2Solubility_pftUptakeff(NGL,N,FOXYX,OXKX,RGOMP,RVOXP,RVOXPA,RVOXPB,&
+    call AerobicAutorO2Uptake(NGL,N,FOXYX,OXKX,RGOMP,RVOXP,RVOXPA,RVOXPB,&
       micfor,micstt,nmicf,nmics,micflx)
   elseif (N.eq.HydrogenoMethanogenArchea)then
     RGOMOff(NGL)=RGOMP
@@ -553,7 +553,7 @@ module MicAutoCPLXMod
     RDOMEautor(ielmc,M,NGL)=RXOMEautor(ielmc,M,NGL)*(1.0_r8-RCCC)
     RDOMEautor(ielmn,M,NGL)=RXOMEautor(ielmn,M,NGL)*(1.0_r8-RCCC)*(1.0_r8-RCCN)
     RDOMEautor(ielmp,M,NGL)=RXOMEautor(ielmp,M,NGL)*(1.0_r8-RCCC)*(1.0_r8-RCCP)
-    DO NE=1,NumPlantChemElmnts
+    DO NE=1,NumPlantChemElms
       R3OMEautor(NE,M,NGL)=RXOMEautor(NE,M,NGL)-RDOMEautor(NE,M,NGL)
 !
 !     HUMIFICATION OF MICROBIAL DECOMPOSITION PRODUCTS FROM
@@ -594,7 +594,7 @@ module MicAutoCPLXMod
       RDMMEautor(ielmc,M,NGL)=RXMMEautor(ielmc,M,NGL)*(1.0_r8-RCCC)
       RDMMEautor(ielmn,M,NGL)=RXMMEautor(ielmn,M,NGL)*(1.0_r8-RCCN)*(1.0_r8-RCCC)
       RDMMEautor(ielmp,M,NGL)=RXMMEautor(ielmp,M,NGL)*(1.0_r8-RCCP)*(1.0_r8-RCCC)
-      DO NE=1,NumPlantChemElmnts
+      DO NE=1,NumPlantChemElms
         R3MMEautor(NE,M,NGL)=RXMMEautor(NE,M,NGL)-RDMMEautor(NE,M,NGL)
       ENDDO
 !
@@ -605,14 +605,14 @@ module MicAutoCPLXMod
 !     EHUM=humus transfer fraction
 !     RCMMC,RCMMN,RCMMC=transfer of senesence litterfall C,N,P to residue
 !
-      DO NE=1,NumPlantChemElmnts
+      DO NE=1,NumPlantChemElms
         RHMMEautor(NE,M,NGL)=AZMAX1(RDMMEautor(NE,M,NGL)*EHUM)
         RCMMEautor(NE,M,NGL)=RDMMEautor(NE,M,NGL)-RHMMEautor(NE,M,NGL)
       ENDDO
     ENDDO
   ELSE
     DO  M=1,2
-      DO NE=1,NumPlantChemElmnts
+      DO NE=1,NumPlantChemElms
         RXMMEautor(NE,M,NGL)=0.0_r8
         RDMMEautor(NE,M,NGL)=0.0_r8
         R3MMEautor(NE,M,NGL)=0.0_r8
@@ -625,7 +625,7 @@ module MicAutoCPLXMod
   end subroutine GetMicrobialAnabolismFluxff
 !------------------------------------------------------------------------------------------
 
-  subroutine AerobLeafO2Solubility_pftUptakeff(NGL,N,FOXYX,OXKX,RGOMP,RVOXP,RVOXPA,RVOXPB,&
+  subroutine AerobicAutorO2Uptake(NGL,N,FOXYX,OXKX,RGOMP,RVOXP,RVOXPA,RVOXPB,&
     micfor,micstt,nmicf,nmics,micflx)
   implicit none
   integer, intent(in) :: NGL   !guild id
@@ -813,7 +813,7 @@ module MicAutoCPLXMod
   RVOXA(NGL)=RVOXPA*WFNff(NGL)
   RVOXB(NGL)=RVOXPB*WFNff(NGL)
   end associate
-  end subroutine AerobLeafO2Solubility_pftUptakeff
+  end subroutine AerobicAutorO2Uptake
 
 !------------------------------------------------------------------------------------------
 
@@ -1944,7 +1944,7 @@ module MicAutoCPLXMod
       DO NGL=JGniA(N),JGnfA(N)
         DO  M=1,2
           MID=micpar%get_micb_id(M,NGL)
-          DO NE=1,NumPlantChemElmnts
+          DO NE=1,NumPlantChemElms
             OMEauto(NE,MID)=OMEauto(NE,MID)+CGOSEautor(NE,M,NGL)-RXOMEautor(NE,M,NGL)-RXMMEautor(NE,M,NGL)
           ENDDO
 
@@ -1955,7 +1955,7 @@ module MicAutoCPLXMod
 !     RHMMC,RHMMN,RHMMC=transfer of senesence litterfall C,N,P to humus
 !
           IF(.not.litrm)THEN
-            DO NE=1,NumPlantChemElmnts
+            DO NE=1,NumPlantChemElms
               OSM(NE,iprotein,k_POM)=OSM(NE,iprotein,k_POM)+CFOMC(1)*(RHOMEautor(NE,M,NGL)+RHMMEautor(NE,M,NGL))
               OSM(NE,icarbhyro,k_POM)=OSM(NE,icarbhyro,k_POM)+CFOMC(2)*(RHOMEautor(NE,M,NGL)+RHMMEautor(NE,M,NGL))
             ENDDO

@@ -130,8 +130,8 @@
 
   D960: DO NZ=1,NP0(NY,NX)
   !NetCumElmntFlx2Plant_pft: effect of canopy element status on seed set
-    DO NE=1,NumPlantChemElmnts
-      NetCumElmntFlx2Plant_pft(NE,NZ,NY,NX)=NetCumElmntFlx2Plant_pft(NE,NZ,NY,NX)+PlantExudChemElmntCum_pft(NE,NZ,NY,NX)-LitrfallChemElmnts_pft(NE,NZ,NY,NX)
+    DO NE=1,NumPlantChemElms
+      NetCumElmntFlx2Plant_pft(NE,NZ,NY,NX)=NetCumElmntFlx2Plant_pft(NE,NZ,NY,NX)+PlantExudChemElmCum_pft(NE,NZ,NY,NX)-LitrfallChemElms_pft(NE,NZ,NY,NX)
       EcoHavstElmntCum_pft(NE,NZ,NY,NX)=EcoHavstElmntCum_pft(NE,NZ,NY,NX)+EcoHavstElmnt_pft(NE,NZ,NY,NX)
     enddo
     NetCumElmntFlx2Plant_pft(ielmc,NZ,NY,NX)=NetCumElmntFlx2Plant_pft(ielmc,NZ,NY,NX)+GrossCO2Fix_pft(NZ,NY,NX)+GrossResp_pft(NZ,NY,NX) &
@@ -142,7 +142,7 @@
 
 ! the following variables are accumulated daily
     GrossCO2Fix_pft(NZ,NY,NX)=0._r8
-    PlantExudChemElmntCum_pft(:,NZ,NY,NX)=0._r8
+    PlantExudChemElmCum_pft(:,NZ,NY,NX)=0._r8
     GrossResp_pft(NZ,NY,NX)=0._r8
     CanopyPlusNoduRespC_pft(NZ,NY,NX)=0._r8
     ETCanopy_pft(NZ,NY,NX)=0._r8
@@ -156,8 +156,8 @@
     PO4byFire_pft(NZ,NY,NX)=0._r8
 
     EcoHavstElmnt_pft(:,NZ,NY,NX)=0._r8
-    SurfLitrfallChemElmnts_pft(:,NZ,NY,NX)=0._r8
-    LitrfallChemElmnts_pft(:,NZ,NY,NX)=0._r8
+    SurfLitrfallChemElms_pft(:,NZ,NY,NX)=0._r8
+    LitrfallChemElms_pft(:,NZ,NY,NX)=0._r8
   ENDDO D960
   IF(iErosionMode.EQ.ieros_frzthaweros.OR.iErosionMode.EQ.ieros_frzthawsomeros)THEN
     TSED(NY,NX)=0._r8
@@ -261,7 +261,7 @@
 !     TDTPX,TDTPN=change in max,min temperature
 !     TDRAD,TDWND,TDHUM=change in radiation,windspeed,vapor pressure
 !     TDPRC,TDIRRI=change in precipitation,irrigation
-!     TDCO2,TDCN4,TDCNO=change in atm CO2,NH4,NO3 concn in precipitation
+!     TDCN4,TDCNO=change in atm CO2,NH4,NO3 concn in precipitation
 !
       D600: DO N=1,12
 !
@@ -275,7 +275,6 @@
           TDHUM(N,NY,NX)=DHUM(N)
           TDPRC(N,NY,NX)=DPREC(N)
           TDIRI(N,NY,NX)=DIRRI(N)
-          TDCO2(N,NY,NX)=DCO2E(N)
           TDCN4(N,NY,NX)=DCN4R(N)
           TDCNO(N,NY,NX)=DCNOR(N)
 !
@@ -290,7 +289,6 @@
           TDHUM(N,NY,NX)=TDHUM(N,NY,NX)+(DHUM(N)-1.0_r8)/LYRC
           TDPRC(N,NY,NX)=TDPRC(N,NY,NX)+(DPREC(N)-1.0_r8)/LYRC
           TDIRI(N,NY,NX)=TDIRI(N,NY,NX)+(DIRRI(N)-1.0_r8)/LYRC
-          TDCO2(N,NY,NX)=TDCO2(N,NY,NX)*EXP(LOG(DCO2E(N))/LYRC)
           TDCN4(N,NY,NX)=TDCN4(N,NY,NX)+(DCN4R(N)-1.0_r8)/LYRC
           TDCNO(N,NY,NX)=TDCNO(N,NY,NX)+(DCNOR(N)-1.0_r8)/LYRC
         ENDIF

@@ -311,12 +311,12 @@ implicit none
   micstt%OHM(idom_beg:idom_end,1:jcplx)=OHM(idom_beg:idom_end,1:jcplx,L,NY,NX)
 
   micstt%OSA(1:jsken,1:jcplx)=OSA(1:jsken,1:jcplx,L,NY,NX)
-  micstt%OSM(1:NumPlantChemElmnts,1:jsken,1:jcplx)=OSM(1:NumPlantChemElmnts,1:jsken,1:jcplx,L,NY,NX)
-  micstt%ORM(1:NumPlantChemElmnts,1:ndbiomcp,1:jcplx)=ORM(1:NumPlantChemElmnts,1:ndbiomcp,1:jcplx,L,NY,NX)
+  micstt%OSM(1:NumPlantChemElms,1:jsken,1:jcplx)=OSM(1:NumPlantChemElms,1:jsken,1:jcplx,L,NY,NX)
+  micstt%ORM(1:NumPlantChemElms,1:ndbiomcp,1:jcplx)=ORM(1:NumPlantChemElms,1:ndbiomcp,1:jcplx,L,NY,NX)
   micstt%CNOSC(1:jsken,1:jcplx)=CNOSC(1:jsken,1:jcplx,L,NY,NX)
   micstt%CPOSC(1:jsken,1:jcplx)=CPOSC(1:jsken,1:jcplx,L,NY,NX)
-  micstt%OMEhetr(1:NumPlantChemElmnts,1:NumLiveHeterBioms,1:jcplx)=OMEhetr(1:NumPlantChemElmnts,1:NumLiveHeterBioms,1:jcplx,L,NY,NX)
-  micstt%OMEauto(1:NumPlantChemElmnts,1:NumLiveAutoBioms)=OMEauto(1:NumPlantChemElmnts,1:NumLiveAutoBioms,L,NY,NX)
+  micstt%OMEhetr(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx)=OMEhetr(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx,L,NY,NX)
+  micstt%OMEauto(1:NumPlantChemElms,1:NumLiveAutoBioms)=OMEauto(1:NumPlantChemElms,1:NumLiveAutoBioms,L,NY,NX)
   if(.not.micfor%litrm)then
     micfor%AEC=AEC(L,NY,NX)
     micstt%OXYG=trc_gasml_vr(idg_O2,L,NY,NX)
@@ -409,7 +409,7 @@ implicit none
   RIPO1(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX)=micflx%RIPO1(1:NumMicrbHetetrophCmplx,1:jcplx)
   RIPB1(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX)=micflx%RIPB1(1:NumMicrbHetetrophCmplx,1:jcplx)
 
-  OSM(1:NumPlantChemElmnts,1:jsken,1:jcplx,L,NY,NX)=micstt%OSM(1:NumPlantChemElmnts,1:jsken,1:jcplx)
+  OSM(1:NumPlantChemElms,1:jsken,1:jcplx,L,NY,NX)=micstt%OSM(1:NumPlantChemElms,1:jsken,1:jcplx)
   OSA(1:jsken,1:jcplx,L,NY,NX)=micstt%OSA(1:jsken,1:jcplx)
 
   if(litrm)then
@@ -452,9 +452,9 @@ implicit none
   DOM(idom_beg:idom_end,1:jcplx,L,NY,NX)=micstt%DOM(idom_beg:idom_end,1:jcplx)
   OHM(idom_beg:idom_end,1:jcplx,L,NY,NX)=micstt%OHM(idom_beg:idom_end,1:jcplx)
 
-  ORM(1:NumPlantChemElmnts,1:ndbiomcp,1:jcplx,L,NY,NX)=micstt%ORM(1:NumPlantChemElmnts,1:ndbiomcp,1:jcplx)
-  OMEhetr(1:NumPlantChemElmnts,1:NumLiveHeterBioms,1:jcplx,L,NY,NX)=micstt%OMEhetr(1:NumPlantChemElmnts,1:NumLiveHeterBioms,1:jcplx)
-  OMEauto(1:NumPlantChemElmnts,1:NumLiveAutoBioms,L,NY,NX)=micstt%OMEauto(1:NumPlantChemElmnts,1:NumLiveAutoBioms)
+  ORM(1:NumPlantChemElms,1:ndbiomcp,1:jcplx,L,NY,NX)=micstt%ORM(1:NumPlantChemElms,1:ndbiomcp,1:jcplx)
+  OMEhetr(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx,L,NY,NX)=micstt%OMEhetr(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx)
+  OMEauto(1:NumPlantChemElms,1:NumLiveAutoBioms,L,NY,NX)=micstt%OMEauto(1:NumPlantChemElms,1:NumLiveAutoBioms)
 
   end subroutine MicAPIRecv
 end module MicBGCAPI

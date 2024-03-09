@@ -195,10 +195,10 @@ implicit none
     ThermalConducByWater=2.067E-03_r8*XNUSW1
     ThermalConducByAir=9.050E-05_r8*XNUSA1
     WTHET1=1.467_r8-0.467_r8*FracSoilAsAirt(N3,N2,N1)
-    TCND1=(STC(N3,N2,N1)+FracSoiPAsWat(N3,N2,N1)*ThermalConducByWater &
+    TCND1=(NumerSolidThermCond(N3,N2,N1)+FracSoiPAsWat(N3,N2,N1)*ThermalConducByWater &
       +0.611_r8*FracSoiPAsIce(N3,N2,N1)*7.844E-03_r8 &
       +WTHET1*FracSoiPAsAir(N3,N2,N1)*ThermalConducByAir) &
-      /(DTC(N3,N2,N1)+FracSoiPAsWat(N3,N2,N1)+0.611_r8*FracSoiPAsIce(N3,N2,N1) &
+      /(DenomSolidThermCond(N3,N2,N1)+FracSoiPAsWat(N3,N2,N1)+0.611_r8*FracSoiPAsIce(N3,N2,N1) &
       +WTHET1*FracSoiPAsAir(N3,N2,N1))
   ELSE
     TCND1=0.0_r8

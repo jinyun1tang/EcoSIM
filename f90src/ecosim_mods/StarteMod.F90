@@ -31,7 +31,6 @@ module StarteMod
   private
   character(len=*),private, parameter :: mod_filename = &
   __FILE__
-  integer :: I,K,L,MM,M,NX,NY,NR1,NP2,NP3
 
   public :: starte
   contains
@@ -48,6 +47,7 @@ module StarteMod
   integer, intent(in) :: NHW,NHE,NVN,NVS
   type(solutedtype)  :: solutevar
   REAL(R8) :: BulkSoilMass
+  integer :: NY,NX,L,I,K
 !     begin_execution
 !
 !     INITIALIZE CATION AND ANION CONCENTRATIONS
@@ -66,7 +66,7 @@ module StarteMod
 
       DO I=1,366
         DO  L=NU(NY,NX),NL(NY,NX)
-          DO K=micpar%k_fine_litr,micpar%k_POM
+          D2000: DO K=micpar%k_fine_litr,micpar%k_POM
             BulkSoilMass=0._r8
 !
             IF(K.EQ.micpar%k_manure.AND.L.EQ.1)THEN
@@ -167,7 +167,7 @@ module StarteMod
             call InitSoluteModel(K,BulkSoilMass,solutevar)
 
             call InitSoluteConcs(K,I,L,NY,NX,solutevar)
-          ENDDO
+          ENDDO D2000
         enddo
       ENDDO
 
@@ -305,6 +305,7 @@ module StarteMod
 !     SOLUTE CONCENTRATIONS IN SOIL
 ! for the POM complex, on the first day in the first year
 ! U means surface irrigation
+! first year and not a restart run
   ELSEIF(K.EQ.micpar%k_POM.AND.I.EQ.1.AND.(.not.is_restart()).AND.is_first_year)THEN
     CCOU=solutevar%H2CO3_aqu_conc
     CCHU=solutevar%CH4_aqu_conc
@@ -494,9 +495,10 @@ module StarteMod
   integer, intent(in) :: NY, NX
   real(R8) :: VOLWW
   integer :: nsalts
+  integer :: L
 !
 !     INITIAL STATE VARIABLES FOR MINERALS IN SURFACE RESIDUE
-!
+! not restart run and first year
   IF(.not.is_restart().AND.is_first_year)THEN
     trc_solml_vr(ids_nuts_beg:ids_nuts_end,0,NY,NX)=0._r8
 

@@ -13,7 +13,7 @@ contains
   subroutine SetMesh(NHW,NVN,NHE,NVS)
 
   use EcoSIMConfig, only : column_mode
-  use EcoSIMCtrlMod,only : grid_file_in,lverb
+  use EcoSIMCtrlMod,only : grid_file_in,lverb,first_topou
   use ncdio_pio
   use netcdf
   USE fileUtil  , ONLY : iulog
@@ -46,7 +46,7 @@ contains
 
   bounds%ntopou=get_dim_len(grid_nfid, 'ntopou')
 
-  write(*,*)bounds%ngrid
+  write(*,*)bounds%ngrid,' grids'
   call check_var(grid_nfid, 'NHW', vardesc, readvar)
   if(.not. readvar)then
     call endrun('fail to find NHW in '//trim(mod_filename), __LINE__)
@@ -73,10 +73,19 @@ contains
 
   call ncd_pio_closefile(grid_nfid)
   if(lverb)write(*,*)'read grid finished'
+
   bounds%NHW =NHW
   bounds%NVN =NVN
   bounds%NHE =NHE
   bounds%NVS =NVS
+  if(first_topou)then  
+    NHW=1;NVN=1;NHE=1;NVS=1
+    bounds%ntopou=1
+    bounds%NHW =1
+    bounds%NVN =1
+    bounds%NHE =1
+    bounds%NVS =1
+  endif  
 
   bounds%begg=1;bounds%endg=bounds%ngrid
   bounds%begt=1;bounds%endt=bounds%ntopou
@@ -158,6 +167,7 @@ contains
 
   bounds%begg=1;bounds%endg=bounds%ngrid
   bounds%begt=1;bounds%endt=bounds%ntopou
+  
   nextra_grid=1
   JX=(NHE-NHW)+1;JX0=JX
   JY=(NVS-NVN)+1;JY0=JY 
@@ -195,7 +205,6 @@ contains
   end subroutine SetMeshATS
 
 !------------------------------------------------------------------------
-
 
   integer function get_col(NY,NX)
 

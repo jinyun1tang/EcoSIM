@@ -5,6 +5,7 @@ module WthrMod
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use MiniMathMod  , only : safe_adb,vapsat0,isclose
   use MiniFuncMod  , only : get_sun_declin
+  use EcoSIMCtrlMod, only : etimer
   use EcosimConst
   use CanopyRadDataType
   use GridConsts
@@ -53,7 +54,7 @@ module WthrMod
   implicit none
   integer, intent(in) :: I, J
   integer, intent(in) :: NHW,NHE,NVN,NVS
-  integer :: ITYPE,NX,NY,N,NZ
+  integer :: ITYPE,NX,NY,N,NZ,mon
   real(r8) :: PrecAsRain(JY,JX)
   real(r8) :: PrecAsSnow(JY,JX)
   real(r8) :: PRECII(JY,JX)
@@ -100,6 +101,15 @@ module WthrMod
     call CorrectClimate(I,J,NHW,NHE,NVN,NVS,PRECUI,PrecAsRain,PRECII,PrecAsSnow,VPS)
   ENDIF
 !
+  mon=etimer%get_curr_mon()
+  DO NX=NHW,NHE
+    DO NY=NVN,NVS
+      CO2EI(NY,NX)=atm_co2_mon(mon)
+      CH4E(NY,NX) =atm_ch4_mon(mon)*1.e-3_r8  !ppb to ppm
+      Z2OE(NY,NX) =atm_n2o_mon(mon)*1.e-3_r8  !ppb to ppm
+      CO2E(NY,NX)=CO2EI(NY,NX)   !used in photosynthesis, soil CO2 transport
+    ENDDO
+  ENDDO
 
   call SummaryForOutput(NHW,NHE,NVN,NVS,PRECUI,PrecAsRain,PRECII,PrecAsSnow)
 
@@ -463,7 +473,7 @@ module WthrMod
           ATCS(NY,NX)=ATCAI(NY,NX)+DTS
           OFFSET(NY,NX)=0.33*(12.5-AZMAX1(AMIN1(25.0,ATCS(NY,NX))))
           DO NZ=1,NP(NY,NX)
-            iPlantThermoAdaptZone(NZ,NY,NX)=iPlantInitThermoAdaptZone(NZ,NY,NX)+0.30/2.667*DTA
+            iPlantThermoAdaptZone(NZ,NY,NX)=PlantInitThermoAdaptZone(NZ,NY,NX)+0.30_r8/2.667_r8*DTA
             OFFST(NZ,NY,NX)=2.667*(2.5-iPlantThermoAdaptZone(NZ,NY,NX))
             !     TCelsChill4Leaf_pft(NZ,NY,NX)=TCZD-OFFST(NZ,NY,NX)
             !     TCelcius4LeafOffHarden_pft(NZ,NY,NX)=AMIN1(15.0,TCelsChill4Leaf_pft(NZ,NY,NX)+TCXD)
@@ -472,9 +482,9 @@ module WthrMod
             ELSE
               HighTCLimtSeed_pft(NZ,NY,NX)=30.0+3.0*iPlantThermoAdaptZone(NZ,NY,NX)
             ENDIF
-            MatureGroup_pft(NZ,NY,NX)=GROUPX(NZ,NY,NX)+0.30*DTA
+            MatureGroup_pft(NZ,NY,NX)=GROUPX(NZ,NY,NX)+0.30_r8*DTA
             IF(iPlantTurnoverPattern_pft(NZ,NY,NX).NE.0)THEN
-              MatureGroup_pft(NZ,NY,NX)=MatureGroup_pft(NZ,NY,NX)/25.0
+              MatureGroup_pft(NZ,NY,NX)=MatureGroup_pft(NZ,NY,NX)/25.0_r8
             ENDIF
             MatureGroup_pft(NZ,NY,NX)=MatureGroup_pft(NZ,NY,NX)-XTLI(NZ,NY,NX)
 
@@ -496,7 +506,7 @@ module WthrMod
       !
       !     TDRAD,TDWND,TDHUM=change in radiation,windspeed,vapor pressure
       !     TDPRC,TDIRRI=change in precipitation,irrigation
-      !     TDCO2,TDCN4,TDCNO=change in atm CO2,NH4,NO3 concn in precipitation
+      !     TDCN4,TDCNO=change in atm CO2,NH4,NO3 concn in precipitation
 !
       RadSWDirect_col(NY,NX)=RadSWDirect_col(NY,NX)*TDRAD(N,NY,NX)
       RadSWDiffus_col(NY,NX)=RadSWDiffus_col(NY,NX)*TDRAD(N,NY,NX)
@@ -508,7 +518,6 @@ module WthrMod
       PrecAsSnow(NY,NX)=PrecAsSnow(NY,NX)*TDPRC(N,NY,NX)
       PRECII(NY,NX)=PRECII(NY,NX)*TDIRI(N,NY,NX)
       PRECUI(NY,NX)=PRECUI(NY,NX)*TDIRI(N,NY,NX)
-      CO2E(NY,NX)=CO2EI(NY,NX)   !used in photosynthesis, soil CO2 transport
       NH4_rain_conc(NY,NX)=CN4RI(NY,NX)*TDCN4(N,NY,NX)
       NO3_rain_conc(NY,NX)=CNORI(NY,NX)*TDCNO(N,NY,NX)
     ENDDO D9920

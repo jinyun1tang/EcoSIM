@@ -119,10 +119,12 @@ implicit none
         call RunoffXBoundaryFluxes(L,N,NY,NX,N1,N2,N4,N5,NN,XN,CXR,ZXR,PXR,ZGR)
     !
         call SubsurfaceBoundaryFluxes(I,J,N,NY,NX,N1,N2,N3,N4,N5,N6,XN)
+
+    !     WATER, HEAT, SOLUTES IN SNOW DRIFT
+        call WaterHeatSoluteBySnowDrift(N,N4,N5,L,NY,NX,CXR,ZXR,PXR,ZGR,XN)
+
       ENDDO D9975
 !
-    !     WATER, HEAT, SOLUTES IN SNOW DRIFT
-      call WaterHeatSoluteBySnowDrift(N,N4,N5,L,NY,NX,CXR,ZXR,PXR,ZGR,XN)
     ENDDO D9980
   ENDDO D9985
   end subroutine RunoffBal
@@ -139,8 +141,8 @@ implicit none
   real(r8), intent(out) :: CXR,ZXR,PXR,ZGR
 
   real(r8) :: SS1,SS2,SS3,SS4,SSR
-  real(r8) :: OMRof(NumPlantChemElmnts)
-  real(r8) :: MXE(NumPlantChemElmnts),MOE(NumPlantChemElmnts),MOD(ielmc)
+  real(r8) :: OMRof(NumPlantChemElms)
+  real(r8) :: MXE(NumPlantChemElms),MOE(NumPlantChemElms),MOD(ielmc)
   real(r8) :: ECHY,ECOH,ECAL,ECFE,ECCA,ECMG,ECNA,ECKA
   real(r8) :: ECCO,ECHC,ECSO,ECCL,ECNO
   real(r8) :: ECNDQ
@@ -155,7 +157,7 @@ implicit none
 !     begin_execution
 !     RUNOFF BOUNDARY FLUXES OF WATER AND HEAT
 !
-!     QR,QS,WatBySnowRedistribution,IceBySnowRedistribution=runoff from surface water, 
+!     QR,QS,WatBySnowRedistrib,IceBySnowRedistrib=runoff from surface water, 
 !     snowpack snow,water,ice from watsub.f
 !     CRUN,URUN=cumulative water and snow runoff
 !     HEATOU=cumulative heat loss through lateral and lower boundaries
@@ -190,7 +192,7 @@ implicit none
       PXR=XN*(trcn_2DFloXSurRunoff(ids_H2PO4,N,NN,N5,N4)+trcn_2DFloXSurRunoff(ids_H1PO4,N,NN,N5,N4))
       OMRof(:)=0.0_r8
       D2575: DO K=1,jcplx
-        DO NE=1,NumPlantChemElmnts
+        DO NE=1,NumPlantChemElms
           OMRof(NE)=OMRof(NE)+XN*dom_2DFloXSurRunoff(idom_doc,K,N,NN,N5,N4)
         ENDDO
         OMRof(ielmc)=OMRof(ielmc)+XN*dom_2DFloXSurRunoff(idom_acetate,K,N,NN,N5,N4)
@@ -461,8 +463,8 @@ implicit none
   real(r8) :: ECCO,ECHC,ECSO,ECCL,ECNO
   real(r8) :: ECNDX
   real(r8) :: WO,SO
-  real(r8) :: MOD(NumPlantChemElmnts),HOD,OOD
-  real(r8) :: MXD(NumPlantChemElmnts),ZGD
+  real(r8) :: MOD(NumPlantChemElms),HOD,OOD
+  real(r8) :: MXD(NumPlantChemElms),ZGD
   real(r8) :: SSD,SHD,PHD,PQD
   real(r8) :: WX
   integer :: K
@@ -714,9 +716,9 @@ implicit none
   real(r8) :: SS1,SS2,SS3,SS4,SSR
   real(r8) :: WQRS,HQRS,OXS,PSS
 !     begin_execution
+  if(lverb)write(*,*)'WaterHeatSoluteBySnowDrift',N,N5,N4
   IF(N.NE.3.AND.L.EQ.NU(NY,NX))THEN
-    WQRS=XN*(DrysnoBySnowRedistribution(N,N5,N4)+WatBySnowRedistribution(N,N5,N4)+IceBySnowRedistribution(N,N5,N4))
-    WQRS=XN*(DrysnoBySnowRedistribution(N,N5,N4)+WatBySnowRedistribution(N,N5,N4)+IceBySnowRedistribution(N,N5,N4))
+    WQRS=XN*(DrysnoBySnowRedistrib(N,N5,N4)+WatBySnowRedistrib(N,N5,N4)+IceBySnowRedistrib(N,N5,N4))
     IF(ABS(WQRS).GT.ZEROS(N5,N4))THEN
       CRUN=CRUN-WQRS
       URUN(NY,NX)=URUN(NY,NX)-WQRS

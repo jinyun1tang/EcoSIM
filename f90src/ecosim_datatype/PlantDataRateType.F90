@@ -10,9 +10,9 @@ module PlantDataRateType
   __FILE__
 
   real(r8),target,allocatable ::  Eco_NEE_col(:,:)                         !total canopy net CO2 exchange, [g d-2 h-1]
-  real(r8),target,allocatable ::  RNH3C(:,:,:)                       !canopy NH3 flux, [g d-2 h-1]
+  real(r8),target,allocatable ::  NH3Dep2Can_pft(:,:,:)                       !canopy NH3 flux, [g d-2 h-1]
   real(r8),target,allocatable ::  NH3EmiCum_pft(:,:,:)                       !total canopy NH3 flux, [g d-2 ]
-  real(r8),target,allocatable ::  SurfLitrfallChemElmnts_pft(:,:,:,:)                     !total surface litterfall element, [g d-2]
+  real(r8),target,allocatable ::  SurfLitrfallChemElms_pft(:,:,:,:)                     !total surface litterfall element, [g d-2]
   real(r8),target,allocatable ::  RDFOME(:,:,:,:,:,:,:)              !root uptake (+ve) - exudation (-ve) of DOC, [g d-2 h-1]
   real(r8),target,allocatable ::  RootNutUptake_pvr(:,:,:,:,:,:)       !root uptake of NH4 non-band, [g d-2 h-1]
   real(r8),target,allocatable ::  RootN2Fix_pvr(:,:,:,:)             !root N2 fixation, [g d-2 h-1]
@@ -24,14 +24,14 @@ module PlantDataRateType
   real(r8),target,allocatable ::  LeafElmntRemobFlx_brch(:,:,:,:,:)                   !element translocated from leaf during senescence, [g d-2 h-1]
   real(r8),target,allocatable ::  RCZSX(:,:,:,:)                     !N translocated from sheath during senescence, [g d-2 h-1]
   real(r8),target,allocatable ::  RCPSX(:,:,:,:)                     !P translocated from sheath during senescence, [g d-2 h-1]
-  real(r8),target,allocatable ::  PetioleChemElmntRemobFlx_brch(:,:,:,:,:)                   !element translocated from sheath during senescence, [g d-2 h-1]
+  real(r8),target,allocatable ::  PetioleChemElmRemobFlx_brch(:,:,:,:,:)                   !element translocated from sheath during senescence, [g d-2 h-1]
   real(r8),target,allocatable ::  GrossCO2Fix_pft(:,:,:)                       !total gross CO2 fixation, [g d-2 ]
-  real(r8),target,allocatable ::  LitrfallChemElmnts_pft(:,:,:,:)                     !total plant element litterfall , [g d-2 ]
+  real(r8),target,allocatable ::  LitrfallChemElms_pft(:,:,:,:)                     !total plant element litterfall , [g d-2 ]
   real(r8),target,allocatable ::  PlantN2FixCum_pft(:,:,:)                      !total plant N2 fixation, [g d-2 ]
   real(r8),target,allocatable ::  GrossResp_pft(:,:,:)                       !total plant respiration, [g d-2 ]
   real(r8),target,allocatable ::  ElmntBalanceCum_pft(:,:,:,:)                      !plant element balance, [g d-2]
-  real(r8),target,allocatable ::  LitterFallChemElmnt_pft(:,:,:,:)                     !plant element litterfall, [g d-2 h-1]
-  real(r8),target,allocatable ::  LitterFallChemElmnt_pftvr(:,:,:,:,:,:,:)                !plant litterfall element, [g d-2 h-1]
+  real(r8),target,allocatable ::  LitterFallChemElm_pft(:,:,:,:)                     !plant element litterfall, [g d-2 h-1]
+  real(r8),target,allocatable ::  LitterFallChemElm_pvr(:,:,:,:,:,:,:)                !plant litterfall element, [g d-2 h-1]
   real(r8),target,allocatable ::  NetPrimaryProductvity_pft(:,:,:)                        !total net primary productivity, [g d-2]
   real(r8),target,allocatable ::  ETCanopy_pft(:,:,:)                       !total transpiration, [m d-2], <0 into atmosphere
   real(r8),target,allocatable ::  CanopyPlusNoduRespC_pft(:,:,:)                       !total autotrophic respiration, [g d-2 ]
@@ -50,7 +50,7 @@ module PlantDataRateType
   real(r8),target,allocatable ::  RUPOXP(:,:,:,:,:)                  !aqueous O2 flux from roots to root water , [g d-2 h-1]
   real(r8),target,allocatable ::  RootRespPotential_vr(:,:,:,:,:)                   !root respiration unconstrained by O2, [g d-2 h-1]
   real(r8),target,allocatable ::  RCO2A(:,:,:,:,:)                   !root respiration constrained by O2, [g d-2 h-1]
-  real(r8),target,allocatable ::  RootExudChemElmnt_pft(:,:,:,:)                     !total root uptake (+ve) - exudation (-ve) of dissovled element, [g d-2 h-1]
+  real(r8),target,allocatable ::  RootExudChemElm_pft(:,:,:,:)                     !total root uptake (+ve) - exudation (-ve) of dissovled element, [g d-2 h-1]
   real(r8),target,allocatable ::  RootNH4Uptake_pft(:,:,:)                       !total root uptake of NH4, [g d-2 h-1]
   real(r8),target,allocatable ::  RootNO3Uptake_pft(:,:,:)                       !total root uptake of NO3, [g d-2 h-1]
   real(r8),target,allocatable ::  RootH2PO4Uptake_pft(:,:,:)                       !total root uptake of PO4, [g d-2 h-1]
@@ -79,11 +79,11 @@ module PlantDataRateType
   real(r8),target,allocatable ::  RUNNBP(:,:,:,:,:)                  !root uptake of NO3 band unconstrained by NO3, [g d-2 h-1]
   real(r8),target,allocatable ::  RUNNXP(:,:,:,:,:)                  !root uptake of NO3 non-band unconstrained by NO3, [g d-2 h-1]
   real(r8),target,allocatable ::  RNH3Z(:,:,:)                       !gaseous NH3 flux fron root disturbance non-band, [g d-2 h-1]
-  real(r8),target,allocatable ::  RNH3B(:,:,:,:)                     !gaseous NH3 flux fron root disturbance band, [g d-2 h-1]
+  real(r8),target,allocatable ::  NH3Dep2_brch(:,:,:,:)                     !gaseous NH3 flux fron root disturbance band, [g d-2 h-1]
   real(r8),target,allocatable ::  RootAutoRO2Limiter_pvr(:,:,:,:,:)                     !O2 constraint to root respiration, []
   real(r8),target,allocatable ::  RH2GZ(:,:,:)                       !gaseous H2 flux fron root disturbance, [g d-2 h-1]
   real(r8),target,allocatable ::  PlantRootSoilChemNetX_pft(:,:,:,:)                    !net root element uptake (+ve) - exudation (-ve), [g d-2 h-1]
-  real(r8),target,allocatable ::  PlantExudChemElmntCum_pft(:,:,:,:)                    !total net root element uptake (+ve) - exudation (-ve), [g d-2 ]
+  real(r8),target,allocatable ::  PlantExudChemElmCum_pft(:,:,:,:)                    !total net root element uptake (+ve) - exudation (-ve), [g d-2 ]
   real(r8),target,allocatable ::  GridPlantRootH2OUptake_vr(:,:,:)                      !total root water uptake, [m3 d-2]
   real(r8),target,allocatable ::  THeatRootUptake(:,:,:)                       !total root heat uptake, [MJ d-2]
   real(r8),target,allocatable ::  trcg_air2root_flx_vr(:,:,:,:)                 !total internal root gas flux , [g d-2 h-1]
@@ -137,30 +137,30 @@ module PlantDataRateType
   integer, intent(in) :: NumOfPlantLitrCmplxs
   integer, intent(in) :: jroots    !number of root types, root,mycos
   allocate(Eco_NEE_col(JY,JX));       Eco_NEE_col=0._r8
-  allocate(RNH3C(JP,JY,JX));    RNH3C=0._r8
+  allocate(NH3Dep2Can_pft(JP,JY,JX));    NH3Dep2Can_pft=0._r8
   allocate(NH3EmiCum_pft(JP,JY,JX));    NH3EmiCum_pft=0._r8
-  allocate(SurfLitrfallChemElmnts_pft(NumPlantChemElmnts,JP,JY,JX));    SurfLitrfallChemElmnts_pft=0._r8
-  allocate(RDFOME(NumPlantChemElmnts,2,1:jcplx,JZ,JP,JY,JX));RDFOME=0._r8
+  allocate(SurfLitrfallChemElms_pft(NumPlantChemElms,JP,JY,JX));    SurfLitrfallChemElms_pft=0._r8
+  allocate(RDFOME(NumPlantChemElms,2,1:jcplx,JZ,JP,JY,JX));RDFOME=0._r8
   allocate(RootNutUptake_pvr(ids_nutb_beg+1:ids_nuts_end,jroots,JZ,JP,JY,JX));RootNutUptake_pvr=0._r8
   allocate(RootN2Fix_pvr(JZ,JP,JY,JX)); RootN2Fix_pvr=0._r8
   allocate(RUPP2P(jroots,JZ,JP,JY,JX));RUPP2P=0._r8
   allocate(RUPP2B(jroots,JZ,JP,JY,JX));RUPP2B=0._r8
   allocate(RUPP1P(jroots,JZ,JP,JY,JX));RUPP1P=0._r8
   allocate(RUPP1B(jroots,JZ,JP,JY,JX));RUPP1B=0._r8
-  allocate(LeafElmntRemobFlx_brch(NumPlantChemElmnts,MaxNumBranches,JP,JY,JX)); LeafElmntRemobFlx_brch=0._r8
-  allocate(PetioleChemElmntRemobFlx_brch(NumPlantChemElmnts,MaxNumBranches,JP,JY,JX)); PetioleChemElmntRemobFlx_brch=0._r8
+  allocate(LeafElmntRemobFlx_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX)); LeafElmntRemobFlx_brch=0._r8
+  allocate(PetioleChemElmRemobFlx_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX)); PetioleChemElmRemobFlx_brch=0._r8
   allocate(GrossCO2Fix_pft(JP,JY,JX));    GrossCO2Fix_pft=0._r8
-  allocate(LitrfallChemElmnts_pft(NumPlantChemElmnts,JP,JY,JX));    LitrfallChemElmnts_pft=0._r8
+  allocate(LitrfallChemElms_pft(NumPlantChemElms,JP,JY,JX));    LitrfallChemElms_pft=0._r8
   allocate(PlantN2FixCum_pft(JP,JY,JX));   PlantN2FixCum_pft=0._r8
   allocate(GrossResp_pft(JP,JY,JX));    GrossResp_pft=0._r8
-  allocate(ElmntBalanceCum_pft(NumPlantChemElmnts,JP,JY,JX));     ElmntBalanceCum_pft=0._r8
-  allocate(LitterFallChemElmnt_pft(NumPlantChemElmnts,JP,JY,JX));    LitterFallChemElmnt_pft=0._r8
-  allocate(LitterFallChemElmnt_pftvr(NumPlantChemElmnts,jsken,1:NumOfPlantLitrCmplxs,0:JZ,JP,JY,JX));LitterFallChemElmnt_pftvr=0._r8
+  allocate(ElmntBalanceCum_pft(NumPlantChemElms,JP,JY,JX));     ElmntBalanceCum_pft=0._r8
+  allocate(LitterFallChemElm_pft(NumPlantChemElms,JP,JY,JX));    LitterFallChemElm_pft=0._r8
+  allocate(LitterFallChemElm_pvr(NumPlantChemElms,jsken,1:NumOfPlantLitrCmplxs,0:JZ,JP,JY,JX));LitterFallChemElm_pvr=0._r8
   allocate(NetPrimaryProductvity_pft(JP,JY,JX));     NetPrimaryProductvity_pft=0._r8
   allocate(ETCanopy_pft(JP,JY,JX));    ETCanopy_pft=0._r8
   allocate(CanopyPlusNoduRespC_pft(JP,JY,JX));    CanopyPlusNoduRespC_pft=0._r8
-  allocate(EcoHavstElmnt_pft(NumPlantChemElmnts,JP,JY,JX));    EcoHavstElmnt_pft=0._r8
-  allocate(EcoHavstElmntCum_pft(NumPlantChemElmnts,JP,JY,JX));   EcoHavstElmntCum_pft=0._r8
+  allocate(EcoHavstElmnt_pft(NumPlantChemElms,JP,JY,JX));    EcoHavstElmnt_pft=0._r8
+  allocate(EcoHavstElmntCum_pft(NumPlantChemElms,JP,JY,JX));   EcoHavstElmntCum_pft=0._r8
   allocate(CO2ByFire_pft(JP,JY,JX));    CO2ByFire_pft=0._r8
   allocate(CH4ByFire_pft(JP,JY,JX));    CH4ByFire_pft=0._r8
   allocate(VOXYF(JP,JY,JX));    VOXYF=0._r8
@@ -175,7 +175,7 @@ module PlantDataRateType
   allocate(RUPOXP(jroots,JZ,JP,JY,JX));RUPOXP=0._r8
   allocate(RootRespPotential_vr(jroots,JZ,JP,JY,JX));RootRespPotential_vr=0._r8
   allocate(RCO2A(jroots,JZ,JP,JY,JX));RCO2A=0._r8
-  allocate(RootExudChemElmnt_pft(1:NumPlantChemElmnts,JP,JY,JX));    RootExudChemElmnt_pft=0._r8
+  allocate(RootExudChemElm_pft(1:NumPlantChemElms,JP,JY,JX));    RootExudChemElm_pft=0._r8
   allocate(RootNH4Uptake_pft(JP,JY,JX));    RootNH4Uptake_pft=0._r8
   allocate(RootNO3Uptake_pft(JP,JY,JX));    RootNO3Uptake_pft=0._r8
   allocate(RootH2PO4Uptake_pft(JP,JY,JX));    RootH2PO4Uptake_pft=0._r8
@@ -204,17 +204,17 @@ module PlantDataRateType
   allocate(RUNNBP(jroots,JZ,JP,JY,JX));RUNNBP=0._r8
   allocate(RUNNXP(jroots,JZ,JP,JY,JX));RUNNXP=0._r8
   allocate(RNH3Z(JP,JY,JX));    RNH3Z=0._r8
-  allocate(RNH3B(MaxNumBranches,JP,JY,JX)); RNH3B=0._r8
+  allocate(NH3Dep2_brch(MaxNumBranches,JP,JY,JX)); NH3Dep2_brch=0._r8
   allocate(RootAutoRO2Limiter_pvr(jroots,JZ,JP,JY,JX)); RootAutoRO2Limiter_pvr=0._r8
   allocate(RH2GZ(JP,JY,JX));    RH2GZ=0._r8
-  allocate(PlantRootSoilChemNetX_pft(NumPlantChemElmnts,JP,JY,JX));   PlantRootSoilChemNetX_pft=0._r8
-  allocate(PlantExudChemElmntCum_pft(NumPlantChemElmnts,JP,JY,JX));   PlantExudChemElmntCum_pft=0._r8
+  allocate(PlantRootSoilChemNetX_pft(NumPlantChemElms,JP,JY,JX));   PlantRootSoilChemNetX_pft=0._r8
+  allocate(PlantExudChemElmCum_pft(NumPlantChemElms,JP,JY,JX));   PlantExudChemElmCum_pft=0._r8
   allocate(GridPlantRootH2OUptake_vr(0:JZ,JY,JX)); GridPlantRootH2OUptake_vr=0._r8
   allocate(THeatRootUptake(0:JZ,JY,JX));  THeatRootUptake=0._r8
   allocate(trcg_air2root_flx_vr(idg_beg:idg_end-1,JZ,JY,JX));   trcg_air2root_flx_vr=0._r8
   allocate(trcg_TLP(idg_beg:idg_end-1,JZ,JY,JX));   trcg_TLP=0._r8
   allocate(trcs_plant_uptake_vr(ids_beg:ids_end,JZ,JY,JX));    trcs_plant_uptake_vr=0._r8
-  allocate(TDFOME(NumPlantChemElmnts,1:jcplx,JZ,JY,JX));TDFOME=0._r8
+  allocate(TDFOME(NumPlantChemElms,1:jcplx,JZ,JY,JX));TDFOME=0._r8
   allocate(TCO2P(JZ,JY,JX));    TCO2P=0._r8
   allocate(TUPOXP(JZ,JY,JX));   TUPOXP=0._r8
   allocate(RTDNT(JZ,JY,JX));    RTDNT=0._r8
@@ -250,9 +250,9 @@ module PlantDataRateType
   use abortutils, only : destroy
   implicit none
   call destroy(Eco_NEE_col)
-  call destroy(RNH3C)
+  call destroy(NH3Dep2Can_pft)
   call destroy(NH3EmiCum_pft)
-  call destroy(SurfLitrfallChemElmnts_pft)
+  call destroy(SurfLitrfallChemElms_pft)
   call destroy(RDFOME)
   call destroy(RootNutUptake_pvr)
   call destroy(RUPGasSol_vr)
@@ -262,14 +262,14 @@ module PlantDataRateType
   call destroy(RUPP1P)
   call destroy(RUPP1B)
   call destroy(LeafElmntRemobFlx_brch)
-  call destroy(PetioleChemElmntRemobFlx_brch)
+  call destroy(PetioleChemElmRemobFlx_brch)
   call destroy(GrossCO2Fix_pft)
-  call destroy(LitrfallChemElmnts_pft)
+  call destroy(LitrfallChemElms_pft)
   call destroy(PlantN2FixCum_pft)
   call destroy(GrossResp_pft)
   call destroy(ElmntBalanceCum_pft)
-  call destroy(LitterFallChemElmnt_pft)
-  call destroy(LitterFallChemElmnt_pftvr)
+  call destroy(LitterFallChemElm_pft)
+  call destroy(LitterFallChemElm_pvr)
   call destroy(NetPrimaryProductvity_pft)
   call destroy(ETCanopy_pft)
   call destroy(CanopyPlusNoduRespC_pft)
@@ -286,7 +286,7 @@ module PlantDataRateType
   call destroy(RUPOXP)
   call destroy(RootRespPotential_vr)
   call destroy(RCO2A)
-  call destroy(RootExudChemElmnt_pft)
+  call destroy(RootExudChemElm_pft)
   call destroy(RootNH4Uptake_pft)
   call destroy(RootNO3Uptake_pft)
   call destroy(RootH2PO4Uptake_pft)
@@ -314,11 +314,11 @@ module PlantDataRateType
   call destroy(RUNNBP)
   call destroy(RUNNXP)
   call destroy(RNH3Z)
-  call destroy(RNH3B)
+  call destroy(NH3Dep2_brch)
   call destroy(RootAutoRO2Limiter_pvr)
   call destroy(RH2GZ)
   call destroy(PlantRootSoilChemNetX_pft)
-  call destroy(PlantExudChemElmntCum_pft)
+  call destroy(PlantExudChemElmCum_pft)
   call destroy(GridPlantRootH2OUptake_vr)
   call destroy(THeatRootUptake)
   call destroy(TDFOME)

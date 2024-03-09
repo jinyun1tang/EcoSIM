@@ -74,9 +74,9 @@ implicit none
   allocate(trcx_XER(idx_beg:idx_end,2,2,JV,JH));   trcx_XER=0._r8
   allocate(trcp_ER(idsp_beg:idsp_end,2,2,JV,JH));  trcp_ER=0._r8
   allocate(cumSedErosion(2,2,JV,JH));  cumSedErosion=0._r8
-  allocate(ORMER(NumPlantChemElmnts,ndbiomcp,1:jcplx,2,2,JV,JH));ORMER=0._r8
+  allocate(ORMER(NumPlantChemElms,ndbiomcp,1:jcplx,2,2,JV,JH));ORMER=0._r8
   allocate(OHMER(idom_beg:idom_end,1:jcplx,2,2,JV,JH));OHMER=0._r8
-  allocate(OSMER(NumPlantChemElmnts,jsken,1:jcplx,2,2,JV,JH));OSMER=0._r8
+  allocate(OSMER(NumPlantChemElms,jsken,1:jcplx,2,2,JV,JH));OSMER=0._r8
   allocate(OSAER(jsken,1:jcplx,2,2,JV,JH));OSAER=0._r8
   end subroutine InitAllocate
 

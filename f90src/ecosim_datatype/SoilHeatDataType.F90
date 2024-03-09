@@ -17,8 +17,8 @@ module SoilHeatDatatype
   real(r8),target,allocatable ::  XPhaseChangeHeatL(:,:,:)                      !hourly accumulated latent heat flux from freeze-thaw
   real(r8),target,allocatable ::  VHeatCapacity(:,:,:)                        !soil heat capacity [MJ m-3 K-1]
   real(r8),target,allocatable ::  TCS(:,:,:)                         !soil temperature [oC]
-  real(r8),target,allocatable ::  STC(:,:,:)                         !numerator for soil solid thermal conductivity [MJ m h-1 K-1]
-  real(r8),target,allocatable ::  DTC(:,:,:)                         !denominator for soil solid thermal conductivity
+  real(r8),target,allocatable ::  NumerSolidThermCond(:,:,:)                         !numerator for soil solid thermal conductivity [MJ m h-1 K-1]
+  real(r8),target,allocatable ::  DenomSolidThermCond(:,:,:)                         !denominator for soil solid thermal conductivity
   real(r8),target,allocatable ::  HeatFlx2G_col(:,:)                     !heat flux into ground, computed from surface energy balance model 
 !----------------------------------------------------------------------
 
@@ -35,8 +35,8 @@ contains
   allocate(XPhaseChangeHeatL(JS,JY,JX));   XPhaseChangeHeatL=0._r8
   allocate(VHeatCapacity(0:JZ,JY,JX));   VHeatCapacity=0._r8
   allocate(TCS(0:JZ,JY,JX));    TCS=0._r8
-  allocate(STC(JZ,JY,JX));      STC=0._r8
-  allocate(DTC(JZ,JY,JX));      DTC=0._r8
+  allocate(NumerSolidThermCond(JZ,JY,JX));      NumerSolidThermCond=0._r8
+  allocate(DenomSolidThermCond(JZ,JY,JX));      DenomSolidThermCond=0._r8
   end subroutine InitSoilHeatData
 
 !----------------------------------------------------------------------
@@ -51,8 +51,8 @@ contains
   call destroy(XPhaseChangeHeatL)
   call destroy(VHeatCapacity)
   call destroy(TCS)
-  call destroy(STC)
-  call destroy(DTC)
+  call destroy(NumerSolidThermCond)
+  call destroy(DenomSolidThermCond)
   end subroutine DestructSoilHeatData
 
 end module SoilHeatDatatype

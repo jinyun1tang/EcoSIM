@@ -241,7 +241,7 @@ module InitSOMBGCMOD
 !     OSCX,OSNX,OSPX=remaining unallocated SOC,SON,SOP
 !  The reason that initialization of complex 5 microbes is repated for each
 ! complex is because complex 5 is shared by the other complexes
-    OMEauto(1:NumPlantChemElmnts,1:NumLiveAutoBioms,L,NY,NX)=0._r8
+    OMEauto(1:NumPlantChemElms,1:NumLiveAutoBioms,L,NY,NX)=0._r8
 
     D8990: DO N=1,NumMicbFunGroups
       tglds=JGnfo(N)-JGnio(N)+1._r8

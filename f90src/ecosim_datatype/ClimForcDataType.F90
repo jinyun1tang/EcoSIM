@@ -22,6 +22,9 @@ implicit none
   real(r8) :: SCOS                              !cosine of solar angle
   real(r8) :: DOY                               !day of year
 
+  real(r8) :: atm_co2_mon(12)
+  real(r8) :: atm_ch4_mon(12)
+  real(r8) :: atm_n2o_mon(12)
   real(r8) :: TMPX(366)                         !maximum daily air temperature, [oC]
   real(r8) :: TMPN(366)                         !minimum daily air temperature, [oC]
   real(r8) :: SRAD(366)                         !daily solar radiation, [MJ m-2 d-1]
@@ -42,7 +45,6 @@ implicit none
   real(r8) :: DHUM(12)                          !change factor for humidity, [-]
   real(r8) :: DPREC(12)                         !change factor for precipitation, [-]
   real(r8) :: DWIND(12)                         !change factor for wind speed, [-]
-  real(r8) :: DCO2E(12)                         !change factor for atmospheric CO2 concentration, [-]
   real(r8) :: DCN4R(12)                         !change factor for NH4 in precipitation, [-]
   real(r8) :: DCNOR(12)                         !change factor for NO3 in precipitation, [-]
 
@@ -53,7 +55,6 @@ implicit none
   real(r8),target,allocatable ::  TDHUM(:,:,:)                       !accumulated change  for humidity, [-]
   real(r8),target,allocatable ::  TDPRC(:,:,:)                       !accumulated change  for precipitation, [-]
   real(r8),target,allocatable ::  TDWND(:,:,:)                       !accumulated change  for wind speed, [-]
-  real(r8),target,allocatable ::  TDCO2(:,:,:)                       !accumulated change  for atmospheric CO2 concentration, [-]
   real(r8),target,allocatable ::  TDCN4(:,:,:)                       !accumulated change  for NH4 in precipitation, [-]
   real(r8),target,allocatable ::  TDCNO(:,:,:)                       !accumulated change  for NO3 in precipitation, [-]
   real(r8),target,allocatable ::  TCA(:,:)                           !air temperature, [oC]
@@ -183,7 +184,6 @@ implicit none
   allocate(TDHUM(12,JY,JX));    TDHUM=0._r8
   allocate(TDPRC(12,JY,JX));    TDPRC=0._r8
   allocate(TDWND(12,JY,JX));    TDWND=0._r8
-  allocate(TDCO2(12,JY,JX));    TDCO2=0._r8
   allocate(TDCN4(12,JY,JX));    TDCN4=0._r8
   allocate(TDCNO(12,JY,JX));    TDCNO=0._r8
   allocate(TCA(JY,JX));         TCA=0._r8
@@ -314,7 +314,6 @@ implicit none
   call destroy(TDHUM)
   call destroy(TDPRC)
   call destroy(TDWND)
-  call destroy(TDCO2)
   call destroy(TDCN4)
   call destroy(TDCNO)
   call destroy(TCA)
