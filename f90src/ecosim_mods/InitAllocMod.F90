@@ -55,6 +55,7 @@ implicit none
   use SnowPhysData        , only : InitSnowPhysData
   use HydroThermData      , only : InitHydroThermData
   use GridConsts
+  use WatsubMod           , only : InitWatsub
 
   implicit none
   integer                 , intent(in) :: NOMicrobeGuilds   !number of microbial guilds per group
@@ -68,9 +69,9 @@ implicit none
 
   write(*,*) "JX = ", JX, "  JY = ", JY, "JZ = ", JZ
   write(*,*) "Just explixitly setting"
-  JX=1
-  JY=1
-  JZ=100
+!  JX=1
+!  JY=1
+!  JZ=100
   call InitGridData
 
   call InitTracerIDs(salt_model)
@@ -91,7 +92,7 @@ implicit none
 
   call InitSoilProperty
 
-  call InitSurfPhysData
+  call InitWatsub
 
   call InitSurfLitter(micpar%NumOfLitrCmplxs)
 
