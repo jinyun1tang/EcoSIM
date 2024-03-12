@@ -50,7 +50,7 @@ module ExtractsMod
   associate(                             &
    NP0      => plt_site%NP0        , &
    WGLFT    => plt_biom%WGLFT      , &
-   StandingDeadChemElm_col  => plt_biom%StandingDeadChemElm_col   , &
+   StandingDeadChemElmnt_col  => plt_biom%StandingDeadChemElmnt_col   , &
    StandingDeadChemElms_pft   => plt_biom%StandingDeadChemElms_pft     , &
    LitterFallChemElm_pft    => plt_bgcr%LitterFallChemElm_pft      , &
    LitterFallChemElm_col    => plt_bgcr%LitterFallChemElm_col      , &
@@ -68,14 +68,14 @@ module ExtractsMod
 !
 !   ZCSNC,ZZSNC,ZPSNC=total C,N,P litterfall
 !   HCSNC,HZSNC,HPSNC=hourly PFT C,N,P litterfall from grosub.f
-!   StandingDeadChemElm_col=total standing dead C,N,P mass
+!   StandingDeadChemElmnt_col=total standing dead C,N,P mass
 !   WTSTG=PFT standing dead C,N,P mass
 !   LitterFallChemElm_pvr,=cumulative PFT C,N,P litterfall from grosub.f
 !   LitrfalChemElemnts_vr,=cumulative total C,N,P litterfall
 !
     DO NE=1,NumPlantChemElms
       LitterFallChemElm_col(NE)=LitterFallChemElm_col(NE)+LitterFallChemElm_pft(NE,NZ)
-      StandingDeadChemElm_col(NE)=StandingDeadChemElm_col(NE)+StandingDeadChemElms_pft(NE,NZ)
+      StandingDeadChemElmnt_col(NE)=StandingDeadChemElmnt_col(NE)+StandingDeadChemElms_pft(NE,NZ)
     ENDDO
 
     DO  L=0,MaxSoiL4Root(NZ)

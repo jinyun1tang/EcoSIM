@@ -790,7 +790,7 @@ module Hour1Mod
 
   TRootGasLossDisturb_pft(idg_beg:idg_end-1,NY,NX)=0.0_r8
   LitterFallChemElm_col(:,NY,NX)=0.0_r8
-  StandingDeadChemElm_col(1:NumPlantChemElms,NY,NX)=0.0_r8
+  StandingDeadChemElmnt_col(1:NumPlantChemElms,NY,NX)=0.0_r8
   PPT(NY,NX)=0.0_r8
 ! zero arrays in the snow layers
   WatConvSno2MicP(1:JS,NY,NX)=0.0_r8
