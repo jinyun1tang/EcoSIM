@@ -474,13 +474,13 @@ module RedistMod
   !
   !     ACCUMULATE PLANT LITTERFALL FLUXES
   !
-  XESN(ielmc)=XESN(ielmc)+LitterFallChemElm_col(ielmc,NY,NX)
-  XESN(ielmn)=XESN(ielmn)+LitterFallChemElm_col(ielmn,NY,NX)
-  XESN(ielmp)=XESN(ielmp)+LitterFallChemElm_col(ielmp,NY,NX)
+  XESN(ielmc)=XESN(ielmc)+LitterFallChemElmnt_col(ielmc,NY,NX)
+  XESN(ielmn)=XESN(ielmn)+LitterFallChemElmnt_col(ielmn,NY,NX)
+  XESN(ielmp)=XESN(ielmp)+LitterFallChemElmnt_col(ielmp,NY,NX)
 
-  LiterfalOrgM_col(ielmc,NY,NX)=LiterfalOrgM_col(ielmc,NY,NX)+LitterFallChemElm_col(ielmc,NY,NX)
-  LiterfalOrgM_col(ielmn,NY,NX)=LiterfalOrgM_col(ielmn,NY,NX)+LitterFallChemElm_col(ielmn,NY,NX)
-  LiterfalOrgM_col(ielmp,NY,NX)=LiterfalOrgM_col(ielmp,NY,NX)+LitterFallChemElm_col(ielmp,NY,NX)
+  LiterfalOrgM_col(ielmc,NY,NX)=LiterfalOrgM_col(ielmc,NY,NX)+LitterFallChemElmnt_col(ielmc,NY,NX)
+  LiterfalOrgM_col(ielmn,NY,NX)=LiterfalOrgM_col(ielmn,NY,NX)+LitterFallChemElmnt_col(ielmn,NY,NX)
+  LiterfalOrgM_col(ielmp,NY,NX)=LiterfalOrgM_col(ielmp,NY,NX)+LitterFallChemElmnt_col(ielmp,NY,NX)
   !
   !     SURFACE BOUNDARY SALT FLUXES FROM RAINFALL AND SURFACE IRRIGATION
   !

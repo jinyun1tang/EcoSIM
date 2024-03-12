@@ -53,9 +53,9 @@ module ExtractsMod
    StandingDeadChemElmnt_col  => plt_biom%StandingDeadChemElmnt_col   , &
    StandingDeadChemElms_pft   => plt_biom%StandingDeadChemElms_pft     , &
    LitterFallChemElmnt_pft    => plt_bgcr%LitterFallChemElmnt_pft      , &
-   LitterFallChemElm_col    => plt_bgcr%LitterFallChemElm_col      , &
+   LitterFallChemElmnt_col    => plt_bgcr%LitterFallChemElmnt_col      , &
    LitrfalChemElemnts_vr     => plt_bgcr%LitrfalChemElemnts_vr       , &
-   LitterFallChemElm_pvr     => plt_bgcr%LitterFallChemElm_pvr       , &
+   LitterFallChemElmnt_pvr     => plt_bgcr%LitterFallChemElmnt_pvr       , &
    MaxSoiL4Root      => plt_morph%MaxSoiL4Root       , &
    CanopyStemA_lyr    => plt_morph%CanopyStemA_lyr     , &
    CanopyLAgrid_lyr    =>  plt_morph%CanopyLAgrid_lyr    , &
@@ -70,11 +70,11 @@ module ExtractsMod
 !   HCSNC,HZSNC,HPSNC=hourly PFT C,N,P litterfall from grosub.f
 !   StandingDeadChemElmnt_col=total standing dead C,N,P mass
 !   WTSTG=PFT standing dead C,N,P mass
-!   LitterFallChemElm_pvr,=cumulative PFT C,N,P litterfall from grosub.f
+!   LitterFallChemElmnt_pvr,=cumulative PFT C,N,P litterfall from grosub.f
 !   LitrfalChemElemnts_vr,=cumulative total C,N,P litterfall
 !
     DO NE=1,NumPlantChemElms
-      LitterFallChemElm_col(NE)=LitterFallChemElm_col(NE)+LitterFallChemElmnt_pft(NE,NZ)
+      LitterFallChemElmnt_col(NE)=LitterFallChemElmnt_col(NE)+LitterFallChemElmnt_pft(NE,NZ)
       StandingDeadChemElmnt_col(NE)=StandingDeadChemElmnt_col(NE)+StandingDeadChemElms_pft(NE,NZ)
     ENDDO
 
@@ -82,7 +82,7 @@ module ExtractsMod
       DO K=1,pltpar%NumOfPlantLitrCmplxs
         DO NE=1,NumPlantChemElms
           DO  M=1,pltpar%jsken
-            LitrfalChemElemnts_vr(NE,M,K,L)=LitrfalChemElemnts_vr(NE,M,K,L)+LitterFallChemElm_pvr(NE,M,K,L,NZ)
+            LitrfalChemElemnts_vr(NE,M,K,L)=LitrfalChemElemnts_vr(NE,M,K,L)+LitterFallChemElmnt_pvr(NE,M,K,L,NZ)
           enddo
         ENDDO
       ENDDO
@@ -337,7 +337,7 @@ module ExtractsMod
     NH3EmiCum_pft => plt_bgcr%NH3EmiCum_pft  , &
     NH3Dep2Can_pft => plt_bgcr%NH3Dep2Can_pft  , &
     Canopy_NEE_col => plt_bgcr%Canopy_NEE_col  , &
-    LitterFallChemElm_col => plt_bgcr%LitterFallChemElm_col  , &
+    LitterFallChemElmnt_col => plt_bgcr%LitterFallChemElmnt_col  , &
     RootGasLossDisturb_pft => plt_bgcr%RootGasLossDisturb_pft, &
     RootN2Fix_pvr => plt_bgcr%RootN2Fix_pvr  , &
     CO2NetFix_pft  => plt_bgcr%CO2NetFix_pft   , &
@@ -429,7 +429,7 @@ module ExtractsMod
   CanopyLeafArea_grd=CanopyLeafArea_grd+CanopyLeafArea_pft(NZ)
   StemArea_grd=StemArea_grd+CanopyStemA_pft(NZ)
   DO NE=1,NumPlantChemElms
-    LitterFallChemElm_col(NE)=LitterFallChemElm_col(NE)-PlantRootSoilChemNetX_pft(NE,NZ)
+    LitterFallChemElmnt_col(NE)=LitterFallChemElmnt_col(NE)-PlantRootSoilChemNetX_pft(NE,NZ)
     PlantElemntStoreLandscape(NE)=PlantElemntStoreLandscape(NE)+ElmntBalanceCum_pft(NE,NZ)
   ENDDO
 

@@ -31,7 +31,7 @@ module PlantDataRateType
   real(r8),target,allocatable ::  GrossResp_pft(:,:,:)                       !total plant respiration, [g d-2 ]
   real(r8),target,allocatable ::  ElmntBalanceCum_pft(:,:,:,:)                      !plant element balance, [g d-2]
   real(r8),target,allocatable ::  LitterFallChemElmnt_pft(:,:,:,:)                     !plant element litterfall, [g d-2 h-1]
-  real(r8),target,allocatable ::  LitterFallChemElm_pvr(:,:,:,:,:,:,:)                !plant litterfall element, [g d-2 h-1]
+  real(r8),target,allocatable ::  LitterFallChemElmnt_pvr(:,:,:,:,:,:,:)                !plant litterfall element, [g d-2 h-1]
   real(r8),target,allocatable ::  NetPrimaryProductvity_pft(:,:,:)                        !total net primary productivity, [g d-2]
   real(r8),target,allocatable ::  ETCanopy_pft(:,:,:)                       !total transpiration, [m d-2], <0 into atmosphere
   real(r8),target,allocatable ::  CanopyPlusNoduRespC_pft(:,:,:)                       !total autotrophic respiration, [g d-2 ]
@@ -155,7 +155,7 @@ module PlantDataRateType
   allocate(GrossResp_pft(JP,JY,JX));    GrossResp_pft=0._r8
   allocate(ElmntBalanceCum_pft(NumPlantChemElms,JP,JY,JX));     ElmntBalanceCum_pft=0._r8
   allocate(LitterFallChemElmnt_pft(NumPlantChemElms,JP,JY,JX));    LitterFallChemElmnt_pft=0._r8
-  allocate(LitterFallChemElm_pvr(NumPlantChemElms,jsken,1:NumOfPlantLitrCmplxs,0:JZ,JP,JY,JX));LitterFallChemElm_pvr=0._r8
+  allocate(LitterFallChemElmnt_pvr(NumPlantChemElms,jsken,1:NumOfPlantLitrCmplxs,0:JZ,JP,JY,JX));LitterFallChemElmnt_pvr=0._r8
   allocate(NetPrimaryProductvity_pft(JP,JY,JX));     NetPrimaryProductvity_pft=0._r8
   allocate(ETCanopy_pft(JP,JY,JX));    ETCanopy_pft=0._r8
   allocate(CanopyPlusNoduRespC_pft(JP,JY,JX));    CanopyPlusNoduRespC_pft=0._r8
@@ -269,7 +269,7 @@ module PlantDataRateType
   call destroy(GrossResp_pft)
   call destroy(ElmntBalanceCum_pft)
   call destroy(LitterFallChemElmnt_pft)
-  call destroy(LitterFallChemElm_pvr)
+  call destroy(LitterFallChemElmnt_pvr)
   call destroy(NetPrimaryProductvity_pft)
   call destroy(ETCanopy_pft)
   call destroy(CanopyPlusNoduRespC_pft)
