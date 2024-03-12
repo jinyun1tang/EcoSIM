@@ -777,7 +777,7 @@ module StartqsMod
     rPCStalk_pft  => plt_allom%rPCStalk_pft    , &
     PlantExudChemElmntCum_pft => plt_rbgc%PlantExudChemElmntCum_pft    , &
     NH3EmiCum_pft  => plt_bgcr%NH3EmiCum_pft     , &
-    RNH3C  => plt_bgcr%RNH3C     , &
+    NH3Dep2Can_pft  => plt_bgcr%NH3Dep2Can_pft     , &
     SurfLitrfallChemElms_pft  => plt_bgcr%SurfLitrfallChemElms_pft     , &
     GrossCO2Fix_pft  => plt_bgcr%GrossCO2Fix_pft     , &
     CanopyPlusNoduRespC_pft  => plt_bgcr%CanopyPlusNoduRespC_pft     , &
@@ -801,7 +801,7 @@ module StartqsMod
     LitrfallChemElms_pft(1:NumPlantChemElms,NZ)=0._r8
 
     PlantN2FixCum_pft(NZ)=0._r8
-    RNH3C(NZ)=0._r8
+    NH3Dep2Can_pft(NZ)=0._r8
     NH3EmiCum_pft(NZ)=0._r8
     plt_distb%CO2ByFire_pft(NZ)=0._r8
     plt_distb%CH4ByFire_pft(NZ)=0._r8

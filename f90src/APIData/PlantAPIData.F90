@@ -624,7 +624,7 @@ implicit none
   real(r8) :: Canopy_NEE_col     !total net CO2 fixation, [gC d-2]
   real(r8), pointer :: LitterFallChemElmnt_col(:) => null() !total litterfall element, [g d-2 h-1]
   real(r8), pointer :: NetPrimaryProductvity_pft(:)       => null()   !total net primary productivity, [gC d-2]
-  real(r8), pointer :: RNH3C(:)      => null()   !canopy NH3 flux, [g d-2 h-1]
+  real(r8), pointer :: NH3Dep2Can_pft(:)      => null()   !canopy NH3 flux, [g d-2 h-1]
   real(r8), pointer :: TDFOME(:,:,:)   =>  null()  !total root element exchange, [g d-2 h-1]
   real(r8), pointer :: RootN2Fix_pvr(:,:)    =>  null()  !root N2 fixation, [gN d-2 h-1]
   real(r8), pointer :: CanopyPlusNoduRespC_pft(:)      =>  null()  !total autotrophic respiration, [gC d-2 ]
@@ -1019,7 +1019,7 @@ implicit none
   allocate(this%SurfLitrfallChemElms_pft(NumPlantChemElms,JP1));this%SurfLitrfallChemElms_pft=spval
   allocate(this%LitterFallChemElmnt_col(NumPlantChemElms));this%LitterFallChemElmnt_col=spval
   allocate(this%NetPrimaryProductvity_pft(JP1));this%NetPrimaryProductvity_pft=spval
-  allocate(this%RNH3C(JP1));this%RNH3C=spval
+  allocate(this%NH3Dep2Can_pft(JP1));this%NH3Dep2Can_pft=spval
   allocate(this%TDFOME(NumPlantChemElms,1:jcplx,JZ1));this%TDFOME=spval
   allocate(this%RootN2Fix_pvr(JZ1,JP1));this%RootN2Fix_pvr=spval
   allocate(this%CanopyPlusNoduRespC_pft(JP1));this%CanopyPlusNoduRespC_pft=spval
