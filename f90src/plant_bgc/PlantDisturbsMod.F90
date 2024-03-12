@@ -83,8 +83,8 @@ module PlantDisturbsMod
     ZEROQ    =>  plt_rbgc%ZEROQ   , &
     ZEROP    =>  plt_biom%ZEROP   , &
     ZEROL    =>  plt_biom%ZEROL   , &
-    StandingDeadKCompChemElmnts_pft   =>  plt_biom%StandingDeadKCompChemElmnts_pft  , &
-    StandingDeadChemElmnts_pft   =>  plt_biom%StandingDeadChemElmnts_pft    &
+    StandingDeadKCompChemElms_pft   =>  plt_biom%StandingDeadKCompChemElms_pft  , &
+    StandingDeadChemElms_pft   =>  plt_biom%StandingDeadChemElms_pft    &
   )
 !  write(102,*)'iHarvstType_pft',I,iHarvstType_pft(NZ),plt_distb%jHarvst_pft(NZ),NZ
   NonstructElmntRemoval(ielmc)=0._r8;NonstructElmntRemoval(ielmn)=0._r8;NonstructElmntRemoval(ielmp)=0._r8
@@ -128,9 +128,9 @@ module PlantDisturbsMod
         ENDIF
       ENDIF
     ELSEIF(iHarvstType_pft(NZ).EQ.iharvtyp_grazing.OR.iHarvstType_pft(NZ).EQ.iharvtyp_herbivo)THEN
-      IF(StandingDeadChemElmnts_pft(ielmc,NZ).GT.ZEROP(NZ))THEN
+      IF(StandingDeadChemElms_pft(ielmc,NZ).GT.ZEROP(NZ))THEN
         WHVSTD=HVST(NZ)*THIN_pft(NZ)*0.45_r8/24.0_r8*AREA3(NU)*EHVST(1,4,NZ)
-        FHVSE(ielmc)=AZMAX1(1._r8-WHVSTD/StandingDeadChemElmnts_pft(ielmc,NZ))
+        FHVSE(ielmc)=AZMAX1(1._r8-WHVSTD/StandingDeadChemElms_pft(ielmc,NZ))
         FHVSH=FHVSE(ielmc)
       ELSE
         FHVSE(ielmc)=1.0_r8
@@ -141,15 +141,15 @@ module PlantDisturbsMod
       FHVSH=1.0_r8
     ENDIF
     D6475: DO M=1,jsken
-      StandeadElmntRemoval(ielmc)=StandeadElmntRemoval(ielmc)+(1._r8-FHVSH)*StandingDeadKCompChemElmnts_pft(ielmc,M,NZ)
-      StandeadElmntRemoval(ielmn)=StandeadElmntRemoval(ielmn)+(1._r8-FHVSH)*StandingDeadKCompChemElmnts_pft(ielmn,M,NZ)
-      StandeadElmntRemoval(ielmp)=StandeadElmntRemoval(ielmp)+(1._r8-FHVSH)*StandingDeadKCompChemElmnts_pft(ielmp,M,NZ)
-      StandeadElmntHarv2Litr(ielmc)=StandeadElmntHarv2Litr(ielmc)+(FHVSH-FHVSE(ielmc))*StandingDeadKCompChemElmnts_pft(ielmc,M,NZ)
-      StandeadElmntHarv2Litr(ielmn)=StandeadElmntHarv2Litr(ielmn)+(FHVSH-FHVSE(ielmc))*StandingDeadKCompChemElmnts_pft(ielmn,M,NZ)
-      StandeadElmntHarv2Litr(ielmp)=StandeadElmntHarv2Litr(ielmp)+(FHVSH-FHVSE(ielmc))*StandingDeadKCompChemElmnts_pft(ielmp,M,NZ)
-      StandingDeadKCompChemElmnts_pft(ielmc,M,NZ)=FHVSE(ielmc)*StandingDeadKCompChemElmnts_pft(ielmc,M,NZ)
-      StandingDeadKCompChemElmnts_pft(ielmn,M,NZ)=FHVSE(ielmc)*StandingDeadKCompChemElmnts_pft(ielmn,M,NZ)
-      StandingDeadKCompChemElmnts_pft(ielmp,M,NZ)=FHVSE(ielmc)*StandingDeadKCompChemElmnts_pft(ielmp,M,NZ)
+      StandeadElmntRemoval(ielmc)=StandeadElmntRemoval(ielmc)+(1._r8-FHVSH)*StandingDeadKCompChemElms_pft(ielmc,M,NZ)
+      StandeadElmntRemoval(ielmn)=StandeadElmntRemoval(ielmn)+(1._r8-FHVSH)*StandingDeadKCompChemElms_pft(ielmn,M,NZ)
+      StandeadElmntRemoval(ielmp)=StandeadElmntRemoval(ielmp)+(1._r8-FHVSH)*StandingDeadKCompChemElms_pft(ielmp,M,NZ)
+      StandeadElmntHarv2Litr(ielmc)=StandeadElmntHarv2Litr(ielmc)+(FHVSH-FHVSE(ielmc))*StandingDeadKCompChemElms_pft(ielmc,M,NZ)
+      StandeadElmntHarv2Litr(ielmn)=StandeadElmntHarv2Litr(ielmn)+(FHVSH-FHVSE(ielmc))*StandingDeadKCompChemElms_pft(ielmn,M,NZ)
+      StandeadElmntHarv2Litr(ielmp)=StandeadElmntHarv2Litr(ielmp)+(FHVSH-FHVSE(ielmc))*StandingDeadKCompChemElms_pft(ielmp,M,NZ)
+      StandingDeadKCompChemElms_pft(ielmc,M,NZ)=FHVSE(ielmc)*StandingDeadKCompChemElms_pft(ielmc,M,NZ)
+      StandingDeadKCompChemElms_pft(ielmn,M,NZ)=FHVSE(ielmc)*StandingDeadKCompChemElms_pft(ielmn,M,NZ)
+      StandingDeadKCompChemElms_pft(ielmp,M,NZ)=FHVSE(ielmc)*StandingDeadKCompChemElms_pft(ielmp,M,NZ)
     ENDDO D6475
 !
     call PlantDisturbance(I,J,NZ)
@@ -222,13 +222,13 @@ module PlantDisturbsMod
     istalk   =>  pltpar%istalk    , &
     iroot    =>  pltpar%iroot     , &
     icwood   =>  pltpar%icwood    , &
-    StandingDeadKCompChemElmnts_pft   =>  plt_biom%StandingDeadKCompChemElmnts_pft  , &
+    StandingDeadKCompChemElms_pft   =>  plt_biom%StandingDeadKCompChemElms_pft  , &
     iHarvstType_pft    =>  plt_distb%iHarvstType_pft  , &
     FWOODE   =>  plt_allom%FWOODE , &
     CFOPE    =>  plt_soilchem%CFOPE, &
     LitterFallChemElmnt_pftvr     =>  plt_bgcr%LitterFallChemElmnt_pftvr    , &
-    LitrfallChemElmnts_pft    =>  plt_bgcr%LitrfallChemElmnts_pft   , &
-    SurfLitrfallChemElmnts_pft    =>  plt_bgcr%SurfLitrfallChemElmnts_pft   , &
+    LitrfallChemElms_pft    =>  plt_bgcr%LitrfallChemElms_pft   , &
+    SurfLitrfallChemElms_pft    =>  plt_bgcr%SurfLitrfallChemElms_pft   , &
     iPlantTurnoverPattern_pft   =>  plt_pheno%iPlantTurnoverPattern_pft , &
     iPlantMorphologyType_pft   =>  plt_pheno%iPlantMorphologyType_pft   &
   )
@@ -253,7 +253,7 @@ module PlantDisturbsMod
               +CFOPE(NE,istalk,M,NZ)*(WoodyElmnt2Litr(NE)+WoodyElmntHarv2Litr(NE)+StandeadElmnt2Litr(NE)&
               +StandeadElmntHarv2Litr(NE))
           ELSE
-            StandingDeadKCompChemElmnts_pft(NE,M,NZ)=StandingDeadKCompChemElmnts_pft(NE,M,NZ) &
+            StandingDeadKCompChemElms_pft(NE,M,NZ)=StandingDeadKCompChemElms_pft(NE,M,NZ) &
               +CFOPE(NE,icwood,M,NZ)*(WoodyElmntHarv2Litr(NE)+StandeadElmntHarv2Litr(NE))
 
             LitterFallChemElmnt_pftvr(NE,M,k_woody_litr,0,NZ)=LitterFallChemElmnt_pftvr(NE,M,k_woody_litr,0,NZ) &
@@ -314,11 +314,11 @@ module PlantDisturbsMod
             WoodyElmntOffEcosystem(ielmp)+StandeadElmnt2Litr(ielmp)+StandeadElmntHarv2Litr(ielmp)-&
             StandeadElmntOffEcosystem(ielmp))
         ELSE
-          StandingDeadKCompChemElmnts_pft(ielmc,M,NZ)=StandingDeadKCompChemElmnts_pft(ielmc,M,NZ)+CFOPE(ielmc,icwood,M,NZ) &
+          StandingDeadKCompChemElms_pft(ielmc,M,NZ)=StandingDeadKCompChemElms_pft(ielmc,M,NZ)+CFOPE(ielmc,icwood,M,NZ) &
             *(WoodyElmnt2Litr(ielmc)+WoodyElmntHarv2Litr(ielmc))
-          StandingDeadKCompChemElmnts_pft(ielmn,M,NZ)=StandingDeadKCompChemElmnts_pft(ielmn,M,NZ)+CFOPE(ielmn,icwood,M,NZ) &
+          StandingDeadKCompChemElms_pft(ielmn,M,NZ)=StandingDeadKCompChemElms_pft(ielmn,M,NZ)+CFOPE(ielmn,icwood,M,NZ) &
             *WoodyElmntOffEcosystem(ielmn)
-          StandingDeadKCompChemElmnts_pft(ielmp,M,NZ)=StandingDeadKCompChemElmnts_pft(ielmp,M,NZ)+CFOPE(ielmp,icwood,M,NZ) &
+          StandingDeadKCompChemElms_pft(ielmp,M,NZ)=StandingDeadKCompChemElms_pft(ielmp,M,NZ)+CFOPE(ielmp,icwood,M,NZ) &
             *WoodyElmntOffEcosystem(ielmp)
           LitterFallChemElmnt_pftvr(ielmc,M,k_woody_litr,0,NZ)=LitterFallChemElmnt_pftvr(ielmc,M,k_woody_litr,0,NZ) &
             *CFOPE(ielmc,istalk,M,NZ)&
@@ -360,8 +360,8 @@ module PlantDisturbsMod
 !     TCSN0,TZSN0,TPSN0=cumulative above-ground C,N,P litterfall
 !
     DO NE=1,NumPlantChemElms
-      LitrfallChemElmnts_pft(NE,NZ)=LitrfallChemElmnts_pft(NE,NZ)+TotalElmnt2Litr(NE)+HarvestElmnt2Litr(NE)
-      SurfLitrfallChemElmnts_pft(NE,NZ)=SurfLitrfallChemElmnts_pft(NE,NZ)+TotalElmnt2Litr(NE)+HarvestElmnt2Litr(NE)
+      LitrfallChemElms_pft(NE,NZ)=LitrfallChemElms_pft(NE,NZ)+TotalElmnt2Litr(NE)+HarvestElmnt2Litr(NE)
+      SurfLitrfallChemElms_pft(NE,NZ)=SurfLitrfallChemElms_pft(NE,NZ)+TotalElmnt2Litr(NE)+HarvestElmnt2Litr(NE)
     ENDDO
   ENDIF
   end associate
@@ -669,21 +669,21 @@ module PlantDisturbsMod
     RootProteinC_pvr    =>  plt_biom%RootProteinC_pvr      , &
      PopuPlantRootC_vr    =>  plt_biom% PopuPlantRootC_vr      , &
     RootStructBiomC_vr   =>  plt_biom%RootStructBiomC_vr     , &
-    LeafChemElmnts_brch  =>  plt_biom%LeafChemElmnts_brch    , &
-    GrainChemElmnts_brch   =>  plt_biom%GrainChemElmnts_brch     , &
-    EarChemElmnts_brch  =>  plt_biom%EarChemElmnts_brch    , &
+    LeafChemElms_brch  =>  plt_biom%LeafChemElms_brch    , &
+    GrainChemElms_brch   =>  plt_biom%GrainChemElms_brch     , &
+    EarChemElms_brch  =>  plt_biom%EarChemElms_brch    , &
     NoduleNonstructElmnt_brch   =>  plt_biom%NoduleNonstructElmnt_brch     , &
     NonstructElmnt_brch   =>  plt_biom%NonstructElmnt_brch     , &
-    HuskChemElmnts_brch  =>  plt_biom%HuskChemElmnts_brch    , &
+    HuskChemElms_brch  =>  plt_biom%HuskChemElms_brch    , &
     ReserveElmnts_brch  =>  plt_biom%ReserveElmnts_brch    , &
     CanopyNoduleChemElmnt_brch   =>  plt_biom%CanopyNoduleChemElmnt_brch     , &
     ShootChemElmnt_brch  =>  plt_biom%ShootChemElmnt_brch    , &
-    StalkChemElmnts_brch  =>  plt_biom%StalkChemElmnts_brch    , &
+    StalkChemElms_brch  =>  plt_biom%StalkChemElms_brch    , &
     LeafChemElmntByLayer_pft   =>  plt_biom%LeafChemElmntByLayer_pft     , &
     PetoleChemElmnt_brch =>  plt_biom%PetoleChemElmnt_brch   , &
     LeafElmntNode_brch    =>  plt_biom%LeafElmntNode_brch      , &
     LeafPetolBiomassC_brch    =>  plt_biom%LeafPetolBiomassC_brch      , &
-    BranchStalkChemElmnts_pft  =>  plt_biom%BranchStalkChemElmnts_pft    , &
+    BranchStalkChemElms_pft  =>  plt_biom%BranchStalkChemElms_pft    , &
     StalkBiomassC_brch   =>  plt_biom%StalkBiomassC_brch     , &
     PetioleProteinCNode_brch   =>  plt_biom%PetioleProteinCNode_brch     , &
     PetioleElmntNode_brch   =>  plt_biom%PetioleElmntNode_brch     , &
@@ -819,39 +819,39 @@ module PlantDisturbsMod
                 +XHVST1*(CFOPE(ielmc,inonstruct,M,NZ)*(NonstructElmnt_brch(ielmc,NB,NZ) &
                 +NoduleNonstructElmnt_brch(ielmc,NB,NZ) &
                 +ShootNonstructC_brch(NB,NZ)+ReserveElmnts_brch(ielmc,NB,NZ)) &
-                +CFOPE(ielmc,ifoliar,M,NZ)*(LeafChemElmnts_brch(ielmc,NB,NZ)*FWODLE(ielmc,k_fine_litr) &
+                +CFOPE(ielmc,ifoliar,M,NZ)*(LeafChemElms_brch(ielmc,NB,NZ)*FWODLE(ielmc,k_fine_litr) &
                 +CanopyNoduleChemElmnt_brch(ielmc,NB,NZ)) &
                 +CFOPE(ielmc,inonfoliar,M,NZ)*(PetoleChemElmnt_brch(ielmc,NB,NZ)*FWODBE(ielmc,k_fine_litr) &
-                +HuskChemElmnts_brch(ielmc,NB,NZ)+EarChemElmnts_brch(ielmc,NB,NZ)))
+                +HuskChemElms_brch(ielmc,NB,NZ)+EarChemElms_brch(ielmc,NB,NZ)))
 
               DO NE=2,NumPlantChemElms
                 LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,0,NZ)=LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,0,NZ)+XHVST1 &
                   *(CFOPE(NE,inonstruct,M,NZ)*(NonstructElmnt_brch(NE,NB,NZ)+NoduleNonstructElmnt_brch(NE,NB,NZ)&
                   +ReserveElmnts_brch(NE,NB,NZ)) &
-                  +CFOPE(NE,ifoliar,M,NZ)*(LeafChemElmnts_brch(NE,NB,NZ)*FWODLE(NE,k_fine_litr) &
+                  +CFOPE(NE,ifoliar,M,NZ)*(LeafChemElms_brch(NE,NB,NZ)*FWODLE(NE,k_fine_litr) &
                   +CanopyNoduleChemElmnt_brch(NE,NB,NZ)) &
                   +CFOPE(NE,inonfoliar,M,NZ)*(PetoleChemElmnt_brch(NE,NB,NZ)*FWODBE(NE,k_fine_litr) &
-                  +HuskChemElmnts_brch(NE,NB,NZ)+EarChemElmnts_brch(NE,NB,NZ)))
+                  +HuskChemElms_brch(NE,NB,NZ)+EarChemElms_brch(NE,NB,NZ)))
               ENDDO
             ENDDO D6380
 
             DO M=1,jsken
               DO NE=1,NumPlantChemElms
                 LitterFallChemElmnt_pftvr(NE,M,k_woody_litr,0,NZ)=LitterFallChemElmnt_pftvr(NE,M,k_woody_litr,0,NZ)+XHVST1 &
-                  *CFOPE(NE,icwood,M,NZ)*(LeafChemElmnts_brch(NE,NB,NZ)*FWODLE(NE,k_woody_litr) &
+                  *CFOPE(NE,icwood,M,NZ)*(LeafChemElms_brch(NE,NB,NZ)*FWODLE(NE,k_woody_litr) &
                   +PetoleChemElmnt_brch(NE,NB,NZ)*FWODBE(NE,k_woody_litr))
 
                 IF(iPlantPhenologyPattern_pft(NZ).EQ.iplt_annual.AND.iPlantPhenologyType_pft(NZ).NE.0)THEN
-                  NonstructalElmnts_pft(NE,NZ)=NonstructalElmnts_pft(NE,NZ)+XHVST1*CFOPE(NE,inonfoliar,M,NZ)*GrainChemElmnts_brch(NE,NB,NZ)
+                  NonstructalElmnts_pft(NE,NZ)=NonstructalElmnts_pft(NE,NZ)+XHVST1*CFOPE(NE,inonfoliar,M,NZ)*GrainChemElms_brch(NE,NB,NZ)
                 ELSE
                   LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,0,NZ)=LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,0,NZ)+XHVST1 &
-                    *CFOPE(NE,inonfoliar,M,NZ)*GrainChemElmnts_brch(NE,NB,NZ)
+                    *CFOPE(NE,inonfoliar,M,NZ)*GrainChemElms_brch(NE,NB,NZ)
                 ENDIF
                 LitterFallChemElmnt_pftvr(NE,M,k_woody_litr,0,NZ)=LitterFallChemElmnt_pftvr(NE,M,k_woody_litr,0,NZ)+XHVST1 &
-                  *CFOPE(NE,icwood,M,NZ)*StalkChemElmnts_brch(NE,NB,NZ)*FWOODE(NE,k_woody_litr)
+                  *CFOPE(NE,icwood,M,NZ)*StalkChemElms_brch(NE,NB,NZ)*FWOODE(NE,k_woody_litr)
 
                 LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,0,NZ)=LitterFallChemElmnt_pftvr(NE,M,k_fine_litr,0,NZ)+XHVST1 &
-                  *CFOPE(NE,istalk,M,NZ)*StalkChemElmnts_brch(NE,NB,NZ)*FWOODE(NE,k_fine_litr)
+                  *CFOPE(NE,istalk,M,NZ)*StalkChemElms_brch(NE,NB,NZ)*FWOODE(NE,k_fine_litr)
               ENDDO
             ENDDO
 !
@@ -865,21 +865,21 @@ module PlantDisturbsMod
               NoduleNonstructElmnt_brch(NE,NB,NZ)=NoduleNonstructElmnt_brch(NE,NB,NZ)*XHVST
               ShootChemElmnt_brch(NE,NB,NZ)=ShootChemElmnt_brch(NE,NB,NZ)*XHVST
               ReserveElmnts_brch(NE,NB,NZ)=ReserveElmnts_brch(NE,NB,NZ)*XHVST
-              HuskChemElmnts_brch(NE,NB,NZ)=HuskChemElmnts_brch(NE,NB,NZ)*XHVST
-              EarChemElmnts_brch(NE,NB,NZ)=EarChemElmnts_brch(NE,NB,NZ)*XHVST
-              GrainChemElmnts_brch(NE,NB,NZ)=GrainChemElmnts_brch(NE,NB,NZ)*XHVST
-              LeafChemElmnts_brch(NE,NB,NZ)=LeafChemElmnts_brch(NE,NB,NZ)*XHVST
+              HuskChemElms_brch(NE,NB,NZ)=HuskChemElms_brch(NE,NB,NZ)*XHVST
+              EarChemElms_brch(NE,NB,NZ)=EarChemElms_brch(NE,NB,NZ)*XHVST
+              GrainChemElms_brch(NE,NB,NZ)=GrainChemElms_brch(NE,NB,NZ)*XHVST
+              LeafChemElms_brch(NE,NB,NZ)=LeafChemElms_brch(NE,NB,NZ)*XHVST
               CanopyNoduleChemElmnt_brch(NE,NB,NZ)=CanopyNoduleChemElmnt_brch(NE,NB,NZ)*XHVST
               PetoleChemElmnt_brch(NE,NB,NZ)=PetoleChemElmnt_brch(NE,NB,NZ)*XHVST
-              StalkChemElmnts_brch(NE,NB,NZ)=StalkChemElmnts_brch(NE,NB,NZ)*XHVST
-              BranchStalkChemElmnts_pft(NE,NB,NZ)=BranchStalkChemElmnts_pft(NE,NB,NZ)*XHVST
+              StalkChemElms_brch(NE,NB,NZ)=StalkChemElms_brch(NE,NB,NZ)*XHVST
+              BranchStalkChemElms_pft(NE,NB,NZ)=BranchStalkChemElms_pft(NE,NB,NZ)*XHVST
             ENDDO
 
             PotentialSeedSites_brch(NB,NZ)=PotentialSeedSites_brch(NB,NZ)*XHVST
             SeedNumberSet_brch(NB,NZ)=SeedNumberSet_brch(NB,NZ)*XHVST
             GrainSeedBiomCMean_brch(NB,NZ)=GrainSeedBiomCMean_brch(NB,NZ)*XHVST
             LeafAreaLive_brch(NB,NZ)=LeafAreaLive_brch(NB,NZ)*XHVST
-            LeafPetolBiomassC_brch(NB,NZ)=AZMAX1(LeafChemElmnts_brch(ielmc,NB,NZ)+PetoleChemElmnt_brch(ielmc,NB,NZ))
+            LeafPetolBiomassC_brch(NB,NZ)=AZMAX1(LeafChemElms_brch(ielmc,NB,NZ)+PetoleChemElmnt_brch(ielmc,NB,NZ))
             CanopyLeafShethC_pft(NZ)=CanopyLeafShethC_pft(NZ)+LeafPetolBiomassC_brch(NB,NZ)
 
             CanopyStalkC_pft(NZ)=CanopyStalkC_pft(NZ)+StalkBiomassC_brch(NB,NZ)
@@ -1175,16 +1175,16 @@ module PlantDisturbsMod
     CanopyLeafShethC_pft     => plt_biom%CanopyLeafShethC_pft      , &
     StalkBiomassC_brch   => plt_biom%StalkBiomassC_brch    , &
     CanopyNoduleChemElmnt_brch   => plt_biom%CanopyNoduleChemElmnt_brch    , &
-    ReserveChemElmnts_pft   => plt_biom%ReserveChemElmnts_pft    , &
-    GrainChemElmnts_brch   => plt_biom%GrainChemElmnts_brch    , &
-    StalkChemElmnts_brch  => plt_biom%StalkChemElmnts_brch   , &
+    ReserveChemElms_pft   => plt_biom%ReserveChemElms_pft    , &
+    GrainChemElms_brch   => plt_biom%GrainChemElms_brch    , &
+    StalkChemElms_brch  => plt_biom%StalkChemElms_brch   , &
     ShootChemElmnt_brch  => plt_biom%ShootChemElmnt_brch   , &
-    HuskChemElmnts_brch  => plt_biom%HuskChemElmnts_brch   , &
-    EarChemElmnts_brch  => plt_biom%EarChemElmnts_brch   , &
+    HuskChemElms_brch  => plt_biom%HuskChemElms_brch   , &
+    EarChemElms_brch  => plt_biom%EarChemElms_brch   , &
     InternodeChemElmnt_brch   => plt_biom%InternodeChemElmnt_brch    , &
     LeafPetolBiomassC_brch  => plt_biom%LeafPetolBiomassC_brch     , &
     ReserveElmnts_brch  => plt_biom%ReserveElmnts_brch   , &
-    BranchStalkChemElmnts_pft  => plt_biom%BranchStalkChemElmnts_pft   , &
+    BranchStalkChemElms_pft  => plt_biom%BranchStalkChemElms_pft   , &
     NoduleNonstructElmnt_brch   => plt_biom%NoduleNonstructElmnt_brch     , &
     LeafChemElmntByLayer_pft   => plt_biom%LeafChemElmntByLayer_pft    , &
     PetoleChemElmnt_brch => plt_biom%PetoleChemElmnt_brch  , &
@@ -1192,17 +1192,17 @@ module PlantDisturbsMod
     PetioleElmntNode_brch   => plt_biom%PetioleElmntNode_brch    , &
     LeafProteinCNode_brch     => plt_biom%LeafProteinCNode_brch      , &
     LeafElmntNode_brch    => plt_biom%LeafElmntNode_brch     , &
-    LeafChemElmnts_brch  => plt_biom%LeafChemElmnts_brch   , &
+    LeafChemElms_brch  => plt_biom%LeafChemElms_brch   , &
     PetioleProteinCNode_brch   => plt_biom%PetioleProteinCNode_brch    , &
-    StalkChemElmnts_pft   => plt_biom%StalkChemElmnts_pft    , &
+    StalkChemElms_pft   => plt_biom%StalkChemElms_pft    , &
     CanopyNonstructElementConc_pft   => plt_biom%CanopyNonstructElementConc_pft    , &
     NoduleNonstructCconc_pft   => plt_biom%NoduleNonstructCconc_pft    , &
-    LeafChemElmnts_pft    => plt_biom%LeafChemElmnts_pft     , &
-    GrainChemElmnts_pft    => plt_biom%GrainChemElmnts_pft     , &
-    ShootChemElmnts_pft   => plt_biom%ShootChemElmnts_pft     , &
-    HuskChemElmnts_pft   => plt_biom%HuskChemElmnts_pft    , &
-    EarChemElmnts_pft   => plt_biom%EarChemElmnts_pft    , &
-    PetioleChemElmnts_pft   => plt_biom%PetioleChemElmnts_pft    , &
+    LeafChemElms_pft    => plt_biom%LeafChemElms_pft     , &
+    GrainChemElms_pft    => plt_biom%GrainChemElms_pft     , &
+    ShootChemElms_pft   => plt_biom%ShootChemElms_pft     , &
+    HuskChemElms_pft   => plt_biom%HuskChemElms_pft    , &
+    EarChemElms_pft   => plt_biom%EarChemElms_pft    , &
+    PetioleChemElms_pft   => plt_biom%PetioleChemElms_pft    , &
     AvgCanopyBiomC2Graze_pft   => plt_biom%AvgCanopyBiomC2Graze_pft    , &
     Root1stStructChemElmnt_pvr   => plt_biom%Root1stStructChemElmnt_pvr    , &
     Root1stChemElmnt   => plt_biom%Root1stChemElmnt    , &
@@ -1369,7 +1369,7 @@ module PlantDisturbsMod
 !
       IF(AvgCanopyBiomC2Graze_pft(NZ).GT.ZEROP(NZ))THEN
         TotPhytomassRemoval=HVST(NZ)*THIN_pft(NZ)*0.45_r8/24.0_r8 &
-          *AREA3(NU)*ShootChemElmnts_pft(ielmc,NZ)/AvgCanopyBiomC2Graze_pft(NZ)
+          *AREA3(NU)*ShootChemElms_pft(ielmc,NZ)/AvgCanopyBiomC2Graze_pft(NZ)
       ELSE
         TotPhytomassRemoval=0._r8
       ENDIF
@@ -1390,7 +1390,7 @@ module PlantDisturbsMod
 !     WHVXXX=grazing requirement unmet by leaf
 !
       WHVSLX=TotPhytomassRemoval*EHVST(1,iplthvst_leaf,NZ)
-      WHVSLY=AMIN1(LeafChemElmnts_pft(ielmc,NZ),WHVSLX)
+      WHVSLY=AMIN1(LeafChemElms_pft(ielmc,NZ),WHVSLX)
       WHVSLF=WHVSLY*(1._r8-CCPOLX)
       WHVSCL=WHVSLY*CCPOLX
       WHVSNL=WHVSLY*CCPLNX
@@ -1404,25 +1404,25 @@ module PlantDisturbsMod
 !            petiole,husk,ear,grain,nonstructural C removed
 !     WHVXXX=grazing requirement unmet by non-foliar removal
 !
-      WTSHTT=PetioleChemElmnts_pft(ielmc,NZ)+HuskChemElmnts_pft(ielmc,NZ)+EarChemElmnts_pft(ielmc,NZ)+&
-        GrainChemElmnts_pft(ielmc,NZ)
+      WTSHTT=PetioleChemElms_pft(ielmc,NZ)+HuskChemElms_pft(ielmc,NZ)+EarChemElms_pft(ielmc,NZ)+&
+        GrainChemElms_pft(ielmc,NZ)
       IF(WTSHTT.GT.ZEROP(NZ))THEN
-        WHVSHX=WHVSSX*PetioleChemElmnts_pft(ielmc,NZ)/WTSHTT+WHVXXX
-        WHVSHY=AMIN1(PetioleChemElmnts_pft(ielmc,NZ),WHVSHX)
+        WHVSHX=WHVSSX*PetioleChemElms_pft(ielmc,NZ)/WTSHTT+WHVXXX
+        WHVSHY=AMIN1(PetioleChemElms_pft(ielmc,NZ),WHVSHX)
         WHVSHH=WHVSHY*(1._r8-CCPOLX)
         WHVSCS=WHVSHY*CCPOLX
         WHVSNS=WHVSHY*CCPLNX
         WHVXXX=AZMAX1(WHVSHX-WHVSHY)
-        WHVHSX=WHVSSX*HuskChemElmnts_pft(ielmc,NZ)/WTSHTT+WHVXXX
-        WHVHSY=AMIN1(HuskChemElmnts_pft(ielmc,NZ),WHVHSX)
+        WHVHSX=WHVSSX*HuskChemElms_pft(ielmc,NZ)/WTSHTT+WHVXXX
+        WHVHSY=AMIN1(HuskChemElms_pft(ielmc,NZ),WHVHSX)
         WHVHSH=WHVHSY
         WHVXXX=AZMAX1(WHVHSX-WHVHSY)
-        WHVEAX=WHVSSX*EarChemElmnts_pft(ielmc,NZ)/WTSHTT+WHVXXX
-        WHVEAY=AMIN1(EarChemElmnts_pft(ielmc,NZ),WHVEAX)
+        WHVEAX=WHVSSX*EarChemElms_pft(ielmc,NZ)/WTSHTT+WHVXXX
+        WHVEAY=AMIN1(EarChemElms_pft(ielmc,NZ),WHVEAX)
         WHVEAH=WHVEAY
         WHVXXX=AZMAX1(WHVEAX-WHVEAY)
-        WHVGRX=WHVSSX*GrainChemElmnts_pft(ielmc,NZ)/WTSHTT+WHVXXX
-        WHVGRY=AMIN1(GrainChemElmnts_pft(ielmc,NZ),WHVGRX)
+        WHVGRX=WHVSSX*GrainChemElms_pft(ielmc,NZ)/WTSHTT+WHVXXX
+        WHVGRY=AMIN1(GrainChemElms_pft(ielmc,NZ),WHVGRX)
         WHVGRH=WHVGRY
         WHVXXX=AZMAX1(WHVGRX-WHVGRY)
       ELSE
@@ -1444,14 +1444,14 @@ module PlantDisturbsMod
 !     WHVST*,WHVRV*=stalk,reserve C removed
 !     WHVXXX=grazing requirement unmet by stalk,reserve
 !
-      WTSTKT=StalkChemElmnts_pft(ielmc,NZ)+ReserveChemElmnts_pft(ielmc,NZ)
+      WTSTKT=StalkChemElms_pft(ielmc,NZ)+ReserveChemElms_pft(ielmc,NZ)
       IF(WTSTKT.GT.WHVSKX+WHVXXX)THEN
-        WHVSTX=WHVSKX*StalkChemElmnts_pft(ielmc,NZ)/WTSTKT+WHVXXX
-        WHVSTY=AMIN1(StalkChemElmnts_pft(ielmc,NZ),WHVSTX)
+        WHVSTX=WHVSKX*StalkChemElms_pft(ielmc,NZ)/WTSTKT+WHVXXX
+        WHVSTY=AMIN1(StalkChemElms_pft(ielmc,NZ),WHVSTX)
         WHVSTH=WHVSTY
         WHVXXX=AZMAX1(WHVSTX-WHVSTY)
-        WHVRVX=WHVSKX*ReserveChemElmnts_pft(ielmc,NZ)/WTSTKT+WHVXXX
-        WHVRVY=AMIN1(ReserveChemElmnts_pft(ielmc,NZ),WHVRVX)
+        WHVRVX=WHVSKX*ReserveChemElms_pft(ielmc,NZ)/WTSTKT+WHVXXX
+        WHVRVY=AMIN1(ReserveChemElms_pft(ielmc,NZ),WHVRVX)
         WHVRVH=WHVRVY
         WHVXXX=AZMAX1(WHVRVX-WHVRVY)
       ELSE
@@ -1467,28 +1467,28 @@ module PlantDisturbsMod
 !            petiole,husk,ear,grain,nonstructural C removed
 !
         IF(WHVXXX.GT.0.0_r8)THEN
-          WHVSLY=AMIN1(LeafChemElmnts_pft(ielmc,NZ)-WHVSLF-WHVSCL,WHVXXX)
+          WHVSLY=AMIN1(LeafChemElms_pft(ielmc,NZ)-WHVSLF-WHVSCL,WHVXXX)
           WHVSLF=WHVSLF+WHVSLY*(1._r8-CCPOLX)
           WHVSCL=WHVSCL+WHVSLY*CCPOLX
           WHVSNL=WHVSNL+WHVSLY*CCPLNX
           WHVXXX=AZMAX1(WHVXXX-WHVSLY)
           IF(WTSHTT.GT.ZEROP(NZ))THEN
-            WHVSHX=WHVXXX*PetioleChemElmnts_pft(ielmc,NZ)/WTSHTT
-            WHVSHY=AMIN1(PetioleChemElmnts_pft(ielmc,NZ),WHVSHX)
+            WHVSHX=WHVXXX*PetioleChemElms_pft(ielmc,NZ)/WTSHTT
+            WHVSHY=AMIN1(PetioleChemElms_pft(ielmc,NZ),WHVSHX)
             WHVSHH=WHVSHH+WHVSHY*(1._r8-CCPOLX)
             WHVSCS=WHVSCS+WHVSHY*CCPOLX
             WHVSNS=WHVSNS+WHVSHY*CCPLNX
             WHVXXX=AZMAX1(WHVXXX-WHVSHY)
-            WHVHSX=WHVXXX*HuskChemElmnts_pft(ielmc,NZ)/WTSHTT
-            WHVHSY=AMIN1(HuskChemElmnts_pft(ielmc,NZ),WHVHSX)
+            WHVHSX=WHVXXX*HuskChemElms_pft(ielmc,NZ)/WTSHTT
+            WHVHSY=AMIN1(HuskChemElms_pft(ielmc,NZ),WHVHSX)
             WHVHSH=WHVHSH+WHVHSY
             WHVXXX=AZMAX1(WHVXXX-WHVHSY)
-            WHVEAX=WHVXXX*EarChemElmnts_pft(ielmc,NZ)/WTSHTT
-            WHVEAY=AMIN1(EarChemElmnts_pft(ielmc,NZ),WHVEAX)
+            WHVEAX=WHVXXX*EarChemElms_pft(ielmc,NZ)/WTSHTT
+            WHVEAY=AMIN1(EarChemElms_pft(ielmc,NZ),WHVEAX)
             WHVEAH=WHVEAH+WHVEAY
             WHVXXX=AZMAX1(WHVEAX-WHVEAY)
-            WHVGRX=WHVXXX*GrainChemElmnts_pft(ielmc,NZ)/WTSHTT
-            WHVGRY=AMIN1(GrainChemElmnts_pft(ielmc,NZ),WHVGRX)
+            WHVGRX=WHVXXX*GrainChemElms_pft(ielmc,NZ)/WTSHTT
+            WHVGRY=AMIN1(GrainChemElms_pft(ielmc,NZ),WHVGRX)
             WHVGRH=WHVGRH+WHVGRY
             WHVXXX=AZMAX1(WHVGRX-WHVGRY)
           ENDIF
@@ -1567,8 +1567,8 @@ module PlantDisturbsMod
 !
       D9855: DO NB=1,NumOfBranches_pft(NZ)
         IF((iHarvstType_pft(NZ).EQ.iharvtyp_grazing.OR.iHarvstType_pft(NZ).EQ.iharvtyp_herbivo) &
-          .AND.LeafChemElmnts_pft(ielmc,NZ).GT.ZEROL(NZ))THEN
-          WHVSBL=WHVSLF*AZMAX1(WGLFBL(L,NB,NZ))/LeafChemElmnts_pft(ielmc,NZ)
+          .AND.LeafChemElms_pft(ielmc,NZ).GT.ZEROL(NZ))THEN
+          WHVSBL=WHVSLF*AZMAX1(WGLFBL(L,NB,NZ))/LeafChemElms_pft(ielmc,NZ)
         ELSE
           WHVSBL=0._r8
         ENDIF
@@ -1698,7 +1698,7 @@ module PlantDisturbsMod
 !
       WGLFGY=WGLFGY+LeafElmntNode_brch(ielmc,K,NB,NZ)
       DO NE=1,NumPlantChemElms
-        LeafChemElmnts_brch(NE,NB,NZ)=LeafChemElmnts_brch(NE,NB,NZ)-LeafElmntNode_brch(NE,K,NB,NZ)+WGLFGE(NE)
+        LeafChemElms_brch(NE,NB,NZ)=LeafChemElms_brch(NE,NB,NZ)-LeafElmntNode_brch(NE,K,NB,NZ)+WGLFGE(NE)
       ENDDO
       LeafAreaLive_brch(NB,NZ)=LeafAreaLive_brch(NB,NZ)-LeafAreaNode_brch(K,NB,NZ)+ARLFG
       IF(LeafAreaNode_brch(K,NB,NZ).GT.ZEROP(NZ))THEN
@@ -1724,8 +1724,8 @@ module PlantDisturbsMod
 !
       HTSTKX=0._r8
       IF((iHarvstType_pft(NZ).EQ.iharvtyp_grazing.OR.iHarvstType_pft(NZ).EQ.iharvtyp_herbivo) &
-        .AND.PetioleChemElmnts_pft(ielmc,NZ).GT.ZEROP(NZ))THEN
-        WHVSBS=WHVSHH*PetoleChemElmnt_brch(ielmc,NB,NZ)/PetioleChemElmnts_pft(ielmc,NZ)
+        .AND.PetioleChemElms_pft(ielmc,NZ).GT.ZEROP(NZ))THEN
+        WHVSBS=WHVSHH*PetoleChemElmnt_brch(ielmc,NB,NZ)/PetioleChemElms_pft(ielmc,NZ)
       ELSE
         WHVSBS=0._r8
       ENDIF
@@ -1981,8 +1981,8 @@ module PlantDisturbsMod
             FHVSH=1.0_r8
           ENDIF
         ELSE
-          IF(StalkChemElmnts_pft(ielmc,NZ).GT.ZEROL(NZ))THEN
-            FHVSE(ielmc)=AZMAX1(AMIN1(1.0_r8,1._r8-WHVSTH/StalkChemElmnts_pft(ielmc,NZ)))
+          IF(StalkChemElms_pft(ielmc,NZ).GT.ZEROL(NZ))THEN
+            FHVSE(ielmc)=AZMAX1(AMIN1(1.0_r8,1._r8-WHVSTH/StalkChemElms_pft(ielmc,NZ)))
             FHVSH=FHVSE(ielmc)
           ELSE
             FHVSE(ielmc)=1.0_r8
@@ -1997,15 +1997,15 @@ module PlantDisturbsMod
 !     WTSTKB,WTSTBN,WTSTBP=C,N,P mass remaining in harvested stalk
 !
         DO NE=1,NumPlantChemElms
-          WoodyElmntRemoval(NE)=WoodyElmntRemoval(NE)+(1._r8-FHVSH)*StalkChemElmnts_brch(NE,NB,NZ)
-          WoodyElmntHarv2Litr(NE)=WoodyElmntHarv2Litr(NE)+(FHVSH-FHVSE(ielmc))*StalkChemElmnts_brch(NE,NB,NZ)
+          WoodyElmntRemoval(NE)=WoodyElmntRemoval(NE)+(1._r8-FHVSH)*StalkChemElms_brch(NE,NB,NZ)
+          WoodyElmntHarv2Litr(NE)=WoodyElmntHarv2Litr(NE)+(FHVSH-FHVSE(ielmc))*StalkChemElms_brch(NE,NB,NZ)
 !
 !     REMAINING STALK C,N,P
 !
 !     WTSTXB,WTSTXN,WTSTXP=residual C,N,P mass in harvested stalk
 !
-          StalkChemElmnts_brch(NE,NB,NZ)=FHVSE(ielmc)*StalkChemElmnts_brch(NE,NB,NZ)
-          BranchStalkChemElmnts_pft(NE,NB,NZ)=FHVSE(ielmc)*BranchStalkChemElmnts_pft(NE,NB,NZ)
+          StalkChemElms_brch(NE,NB,NZ)=FHVSE(ielmc)*StalkChemElms_brch(NE,NB,NZ)
+          BranchStalkChemElms_pft(NE,NB,NZ)=FHVSE(ielmc)*BranchStalkChemElms_pft(NE,NB,NZ)
         ENDDO
 
         StalkBiomassC_brch(NB,NZ)=FHVSE(ielmc)*StalkBiomassC_brch(NB,NZ)
@@ -2041,8 +2041,8 @@ module PlantDisturbsMod
               FHVSETS=1.0_r8
             ENDIF
           ELSE
-            IF(StalkChemElmnts_pft(ielmc,NZ).GT.ZEROP(NZ))THEN
-              FHVSETS=AZMAX1(AMIN1(1.0_r8,1._r8-WHVSTH/StalkChemElmnts_pft(ielmc,NZ)))
+            IF(StalkChemElms_pft(ielmc,NZ).GT.ZEROP(NZ))THEN
+              FHVSETS=AZMAX1(AMIN1(1.0_r8,1._r8-WHVSTH/StalkChemElms_pft(ielmc,NZ)))
             ELSE
               FHVSETS=1.0_r8
             ENDIF
@@ -2067,7 +2067,7 @@ module PlantDisturbsMod
 !     FHVSE(ielmc)=fraction of reserve mass not harvested
 !
         IF(iHarvstType_pft(NZ).NE.iharvtyp_grazing.AND.iHarvstType_pft(NZ).NE.iharvtyp_herbivo)THEN
-          IF(StalkChemElmnts_brch(ielmc,NB,NZ).GT.ZEROP(NZ))THEN
+          IF(StalkChemElms_brch(ielmc,NB,NZ).GT.ZEROP(NZ))THEN
             FHVSE(ielmc)=FHVSE(ielmc)
             FHVSH=FHVSH
           ELSE
@@ -2075,8 +2075,8 @@ module PlantDisturbsMod
             FHVSH=0._r8
           ENDIF
         ELSE
-          IF(ReserveChemElmnts_pft(ielmc,NZ).GT.ZEROP(NZ))THEN
-            FHVSE(ielmc)=AZMAX1(AMIN1(1.0_r8,1._r8-WHVRVH/ReserveChemElmnts_pft(ielmc,NZ)))
+          IF(ReserveChemElms_pft(ielmc,NZ).GT.ZEROP(NZ))THEN
+            FHVSE(ielmc)=AZMAX1(AMIN1(1.0_r8,1._r8-WHVRVH/ReserveChemElms_pft(ielmc,NZ)))
             FHVSH=FHVSE(ielmc)
           ELSE
             FHVSE(ielmc)=0._r8
@@ -2131,22 +2131,22 @@ module PlantDisturbsMod
           FHVSHH=FHVSHG
           FHVSHE=FHVSHG
         ELSE
-          IF(HuskChemElmnts_pft(ielmc,NZ).GT.ZEROP(NZ))THEN
-            FHVSETH=AZMAX1(AMIN1(1.0_r8,1._r8-WHVHSH/HuskChemElmnts_pft(ielmc,NZ)))
+          IF(HuskChemElms_pft(ielmc,NZ).GT.ZEROP(NZ))THEN
+            FHVSETH=AZMAX1(AMIN1(1.0_r8,1._r8-WHVHSH/HuskChemElms_pft(ielmc,NZ)))
             FHVSHH=FHVSETH
           ELSE
             FHVSETH=1.0_r8
             FHVSHH=1.0_r8
           ENDIF
-          IF(EarChemElmnts_pft(ielmc,NZ).GT.ZEROP(NZ))THEN
-            FHVSETE=AZMAX1(AMIN1(1.0_r8,1._r8-WHVEAH/EarChemElmnts_pft(ielmc,NZ)))
+          IF(EarChemElms_pft(ielmc,NZ).GT.ZEROP(NZ))THEN
+            FHVSETE=AZMAX1(AMIN1(1.0_r8,1._r8-WHVEAH/EarChemElms_pft(ielmc,NZ)))
             FHVSHE=FHVSETE
           ELSE
             FHVSETE=1.0_r8
             FHVSHE=1.0_r8
           ENDIF
-          IF(GrainChemElmnts_pft(ielmc,NZ).GT.ZEROP(NZ))THEN
-            FHVSETG=AZMAX1(AMIN1(1.0_r8,1._r8-WHVGRH/GrainChemElmnts_pft(ielmc,NZ)))
+          IF(GrainChemElms_pft(ielmc,NZ).GT.ZEROP(NZ))THEN
+            FHVSETG=AZMAX1(AMIN1(1.0_r8,1._r8-WHVGRH/GrainChemElms_pft(ielmc,NZ)))
             FHVSHG=FHVSETG
           ELSE
             FHVSETG=1.0_r8
@@ -2163,11 +2163,11 @@ module PlantDisturbsMod
 !     WTHTGE(ielmc),WTHTGE(ielmn),WTHTGE(ielmp)=grain harvested
 !
         DO NE=1,NumPlantChemElms
-          FineNonleafElmntRemoval(NE)=FineNonleafElmntRemoval(NE)+(1._r8-FHVSHH)*HuskChemElmnts_brch(NE,NB,NZ)+(1._r8-FHVSHE) &
-            *EarChemElmnts_brch(NE,NB,NZ)+(1._r8-FHVSHG)*GrainChemElmnts_brch(NE,NB,NZ)
-          PetioleElmntHarv2Litr(NE)=PetioleElmntHarv2Litr(NE)+(FHVSHH-FHVSETH)*HuskChemElmnts_brch(NE,NB,NZ)+(FHVSHE-FHVSETE) &
-            *EarChemElmnts_brch(NE,NB,NZ)+(FHVSHG-FHVSETG)*GrainChemElmnts_brch(NE,NB,NZ)
-          WTHTGE(NE)=WTHTGE(NE)+(1._r8-FHVSETG)*GrainChemElmnts_brch(NE,NB,NZ)
+          FineNonleafElmntRemoval(NE)=FineNonleafElmntRemoval(NE)+(1._r8-FHVSHH)*HuskChemElms_brch(NE,NB,NZ)+(1._r8-FHVSHE) &
+            *EarChemElms_brch(NE,NB,NZ)+(1._r8-FHVSHG)*GrainChemElms_brch(NE,NB,NZ)
+          PetioleElmntHarv2Litr(NE)=PetioleElmntHarv2Litr(NE)+(FHVSHH-FHVSETH)*HuskChemElms_brch(NE,NB,NZ)+(FHVSHE-FHVSETE) &
+            *EarChemElms_brch(NE,NB,NZ)+(FHVSHG-FHVSETG)*GrainChemElms_brch(NE,NB,NZ)
+          WTHTGE(NE)=WTHTGE(NE)+(1._r8-FHVSETG)*GrainChemElms_brch(NE,NB,NZ)
 
 !
 !     REMAINING REPRODUCTIVE C,N,P
@@ -2176,9 +2176,9 @@ module PlantDisturbsMod
 !     WTHSBN,WTEABN,WTGRBN=branch husk,ear,grain N mass
 !     WTHSBP,WTEABP,WTGRBP=branch husk,ear,grain P mass
 !
-          HuskChemElmnts_brch(NE,NB,NZ)=FHVSETH*HuskChemElmnts_brch(NE,NB,NZ)
-          EarChemElmnts_brch(NE,NB,NZ)=FHVSETE*EarChemElmnts_brch(NE,NB,NZ)
-          GrainChemElmnts_brch(NE,NB,NZ)=FHVSETG*GrainChemElmnts_brch(NE,NB,NZ)
+          HuskChemElms_brch(NE,NB,NZ)=FHVSETH*HuskChemElms_brch(NE,NB,NZ)
+          EarChemElms_brch(NE,NB,NZ)=FHVSETE*EarChemElms_brch(NE,NB,NZ)
+          GrainChemElms_brch(NE,NB,NZ)=FHVSETG*GrainChemElms_brch(NE,NB,NZ)
 
         ENDDO
         PotentialSeedSites_brch(NB,NZ)=FHVSETG*PotentialSeedSites_brch(NB,NZ)
@@ -2210,14 +2210,14 @@ module PlantDisturbsMod
             +CMassCO2BundleSheath_node(K,NB,NZ)+CMassHCO3BundleSheath_node(K,NB,NZ)
         ENDDO D1325
 
-        LeafPetolBiomassC_brch(NB,NZ)=AZMAX1(LeafChemElmnts_brch(ielmc,NB,NZ) &
+        LeafPetolBiomassC_brch(NB,NZ)=AZMAX1(LeafChemElms_brch(ielmc,NB,NZ) &
           +PetoleChemElmnt_brch(ielmc,NB,NZ))
 
         ShootChemElmnt_brch(ielmc,NB,NZ)=ShootChemElmnt_brch(ielmc,NB,NZ)+ShootNonstructC_brch(NB,NZ)
         DO NE=1,NumPlantChemElms
-          ShootChemElmnt_brch(NE,NB,NZ)=AZMAX1(ShootChemElmnt_brch(ielmc,NB,NZ)+LeafChemElmnts_brch(NE,NB,NZ) &
-            +PetoleChemElmnt_brch(NE,NB,NZ)+StalkChemElmnts_brch(NE,NB,NZ)+ReserveElmnts_brch(NE,NB,NZ) &
-            +HuskChemElmnts_brch(NE,NB,NZ)+EarChemElmnts_brch(NE,NB,NZ)+GrainChemElmnts_brch(NE,NB,NZ) &
+          ShootChemElmnt_brch(NE,NB,NZ)=AZMAX1(ShootChemElmnt_brch(ielmc,NB,NZ)+LeafChemElms_brch(NE,NB,NZ) &
+            +PetoleChemElmnt_brch(NE,NB,NZ)+StalkChemElms_brch(NE,NB,NZ)+ReserveElmnts_brch(NE,NB,NZ) &
+            +HuskChemElms_brch(NE,NB,NZ)+EarChemElms_brch(NE,NB,NZ)+GrainChemElms_brch(NE,NB,NZ) &
             +NonstructElmnt_brch(NE,NB,NZ))
         ENDDO
         VOLWPX=CanopyWater_pft(NZ)
@@ -2311,12 +2311,12 @@ module PlantDisturbsMod
         endif
       ENDDO D9835
       CanopyLeafShethC_pft(NZ)=0._r8
-      StalkChemElmnts_pft(ielmc,NZ)=0._r8
+      StalkChemElms_pft(ielmc,NZ)=0._r8
       CanopyStalkC_pft(NZ)=0._r8
       CanopyStemA_pft(NZ)=0._r8
       D9840: DO NB=1,NumOfBranches_pft(NZ)
         CanopyLeafShethC_pft(NZ)=CanopyLeafShethC_pft(NZ)+LeafPetolBiomassC_brch(NB,NZ)
-        StalkChemElmnts_pft(ielmc,NZ)=StalkChemElmnts_pft(ielmc,NZ)+StalkChemElmnts_brch(ielmc,NB,NZ)
+        StalkChemElms_pft(ielmc,NZ)=StalkChemElms_pft(ielmc,NZ)+StalkChemElms_brch(ielmc,NB,NZ)
         CanopyStalkC_pft(NZ)=CanopyStalkC_pft(NZ)+StalkBiomassC_brch(NB,NZ)
         D9830: DO L=1,NumOfCanopyLayers1
           CanopyStemA_pft(NZ)=CanopyStemA_pft(NZ)+CanopyBranchStemApft_lyr(L,NB,NZ)

@@ -105,15 +105,15 @@ module CanopyDataType
   real(r8),target,allocatable ::  NetCumElmntFlx2Plant_pft(:,:,:,:)                     !effect of canopy element status on seed set , []
   real(r8),target,allocatable ::  WGLFT(:,:,:)                       !total leaf mass, [g d-2]
   real(r8),target,allocatable ::  CFOPE(:,:,:,:,:,:)                 !litter kinetic fraction, [-]
-  real(r8),target,allocatable ::  ShootChemElmnts_pft(:,:,:,:)                    !canopy shoot element, [g d-2]
-  real(r8),target,allocatable ::  LeafChemElmnts_pft(:,:,:,:)                     !canopy leaf element, [g d-2]
-  real(r8),target,allocatable ::  PetioleChemElmnts_pft(:,:,:,:)                    !canopy sheath element , [g d-2]
-  real(r8),target,allocatable ::  StalkChemElmnts_pft(:,:,:,:)                    !canopy stalk element, [g d-2]
+  real(r8),target,allocatable ::  ShootChemElms_pft(:,:,:,:)                    !canopy shoot element, [g d-2]
+  real(r8),target,allocatable ::  LeafChemElms_pft(:,:,:,:)                     !canopy leaf element, [g d-2]
+  real(r8),target,allocatable ::  PetioleChemElms_pft(:,:,:,:)                    !canopy sheath element , [g d-2]
+  real(r8),target,allocatable ::  StalkChemElms_pft(:,:,:,:)                    !canopy stalk element, [g d-2]
   real(r8),target,allocatable ::  CanopyStalkC_pft(:,:,:)                       !canopy active stalk C, [g d-2]
-  real(r8),target,allocatable ::  ReserveChemElmnts_pft(:,:,:,:)                    !canopy reserve element, [g d-2]
-  real(r8),target,allocatable ::  HuskChemElmnts_pft(:,:,:,:)                    !canopy husk element, [g d-2]
-  real(r8),target,allocatable ::  EarChemElmnts_pft(:,:,:,:)                    !canopy ear element, [g d-2]
-  real(r8),target,allocatable ::  GrainChemElmnts_pft(:,:,:,:)                     !canopy grain element, [g d-2]
+  real(r8),target,allocatable ::  ReserveChemElms_pft(:,:,:,:)                    !canopy reserve element, [g d-2]
+  real(r8),target,allocatable ::  HuskChemElms_pft(:,:,:,:)                    !canopy husk element, [g d-2]
+  real(r8),target,allocatable ::  EarChemElms_pft(:,:,:,:)                    !canopy ear element, [g d-2]
+  real(r8),target,allocatable ::  GrainChemElms_pft(:,:,:,:)                     !canopy grain element, [g d-2]
   real(r8),target,allocatable ::  CanopyLeafShethC_pft(:,:,:)              !plant canopy leaf + sheath C, [gC d-2]
   real(r8),target,allocatable ::  CanopyLeafApft_lyr(:,:,:,:)                     !canopy layer leaf area, [m2 d-2]
   real(r8),target,allocatable ::  CO2NetFix_pft(:,:,:)                        !canopy net CO2 exchange, [g d-2 h-1]
@@ -126,18 +126,18 @@ module CanopyDataType
   real(r8),target,allocatable ::  NonstructElmnt_brch(:,:,:,:,:)                   !branch nonstructural element, [g d-2]
   real(r8),target,allocatable ::  LeafPetolBiomassC_brch(:,:,:,:)           !plant branch leaf + sheath C, [g d-2]
   real(r8),target,allocatable ::  ShootChemElmnt_brch(:,:,:,:,:)                 !branch shoot C, [g d-2]
-  real(r8),target,allocatable ::  LeafChemElmnts_brch(:,:,:,:,:)                  !branch leaf element, [g d-2]
+  real(r8),target,allocatable ::  LeafChemElms_brch(:,:,:,:,:)                  !branch leaf element, [g d-2]
   real(r8),target,allocatable ::  PetoleChemElmnt_brch(:,:,:,:,:)                 !branch sheath element , [g d-2]
-  real(r8),target,allocatable ::  StalkChemElmnts_brch(:,:,:,:,:)                  !branch stalk element, [g d-2]
+  real(r8),target,allocatable ::  StalkChemElms_brch(:,:,:,:,:)                  !branch stalk element, [g d-2]
   real(r8),target,allocatable ::  ReserveElmnts_brch(:,:,:,:,:)                  !branch reserve element, [g d-2]
-  real(r8),target,allocatable ::  HuskChemElmnts_brch(:,:,:,:,:)                  !branch husk element, [g d-2]
-  real(r8),target,allocatable ::  EarChemElmnts_brch(:,:,:,:,:)                 !branch ear element, [g d-2]
-  real(r8),target,allocatable ::  GrainChemElmnts_brch(:,:,:,:,:)                  !branch grain element, [g d-2]
+  real(r8),target,allocatable ::  HuskChemElms_brch(:,:,:,:,:)                  !branch husk element, [g d-2]
+  real(r8),target,allocatable ::  EarChemElms_brch(:,:,:,:,:)                 !branch ear element, [g d-2]
+  real(r8),target,allocatable ::  GrainChemElms_brch(:,:,:,:,:)                  !branch grain element, [g d-2]
   real(r8),target,allocatable ::  LeafPetoNonstructElmntConc_brch(:,:,:,:,:)                    !branch nonstructural C concentration, [g d-2]
   real(r8),target,allocatable ::  NoduleNonstructElmnt_brch(:,:,:,:,:)                  !branch nodule nonstructural C, [g d-2]
   real(r8),target,allocatable ::  CanopyNoduleChemElmnt_brch(:,:,:,:,:)                  !branch nodule element, [g d-2]
   real(r8),target,allocatable ::  PetioleChemElmntRemob_brch(:,:,:,:,:)                  !branch sheath structural element, [g d-2]
-  real(r8),target,allocatable ::  BranchStalkChemElmnts_pft(:,:,:,:,:)                    !branch stalk structural C, [g d-2]
+  real(r8),target,allocatable ::  BranchStalkChemElms_pft(:,:,:,:,:)                    !branch stalk structural C, [g d-2]
   real(r8),target,allocatable ::  LeafChemElmntRemob_brch(:,:,:,:,:)                     !branch leaf structural element, [g d-2]
   real(r8),target,allocatable ::  LeafElmntNode_brch(:,:,:,:,:,:)                    !leaf element, [g d-2]
   real(r8),target,allocatable ::  PetioleElmntNode_brch(:,:,:,:,:,:)                 !sheath element , [g d-2]
@@ -148,8 +148,8 @@ module CanopyDataType
   real(r8),target,allocatable ::  PetioleProteinCNode_brch(:,:,:,:,:)                   !layer sheath protein C, [g d-2]
   real(r8),target,allocatable ::  NoduleNonstructCconc_pft(:,:,:)                      !nodule nonstructural C, [g d-2]
   real(r8),target,allocatable ::  GrainSeedBiomCMean_brch(:,:,:,:)                     !maximum grain C during grain fill, [g d-2]
-  real(r8),target,allocatable ::  StandingDeadKCompChemElmnts_pft(:,:,:,:,:)                  !standing dead element fraction, [g d-2]
-  real(r8),target,allocatable ::  StandingDeadChemElmnts_pft(:,:,:,:)                    !standing dead element, [g d-2]
+  real(r8),target,allocatable ::  StandingDeadKCompChemElms_pft(:,:,:,:,:)                  !standing dead element fraction, [g d-2]
+  real(r8),target,allocatable ::  StandingDeadChemElms_pft(:,:,:,:)                    !standing dead element, [g d-2]
   real(r8),target,allocatable ::  NonstructalElmnts_pft(:,:,:,:)                     !plant stored nonstructural element, [g d-2]
   real(r8),target,allocatable ::  SeedCPlanted_pft(:,:,:)                       !plant stored nonstructural C at planting, [g d-2]
   REAL(R8),target,allocatable ::  AvgCanopyBiomC2Graze_pft(:,:,:)                      !landscape average canopy shoot C, [g d-2]
@@ -254,15 +254,15 @@ module CanopyDataType
   allocate(NetCumElmntFlx2Plant_pft(NumPlantChemElms,JP,JY,JX));    NetCumElmntFlx2Plant_pft=0._r8
   allocate(WGLFT(NumOfCanopyLayers,JY,JX));    WGLFT=0._r8
   allocate(CFOPE(NumPlantChemElms,0:NumLitterGroups,jsken,JP,JY,JX));CFOPE=0._r8
-  allocate(ShootChemElmnts_pft(NumPlantChemElms,JP,JY,JX)); ShootChemElmnts_pft=0._r8
-  allocate(LeafChemElmnts_pft(NumPlantChemElms,JP,JY,JX));  LeafChemElmnts_pft=0._r8
-  allocate(PetioleChemElmnts_pft(NumPlantChemElms,JP,JY,JX)); PetioleChemElmnts_pft=0._r8
-  allocate(StalkChemElmnts_pft(NumPlantChemElms,JP,JY,JX)); StalkChemElmnts_pft=0._r8
+  allocate(ShootChemElms_pft(NumPlantChemElms,JP,JY,JX)); ShootChemElms_pft=0._r8
+  allocate(LeafChemElms_pft(NumPlantChemElms,JP,JY,JX));  LeafChemElms_pft=0._r8
+  allocate(PetioleChemElms_pft(NumPlantChemElms,JP,JY,JX)); PetioleChemElms_pft=0._r8
+  allocate(StalkChemElms_pft(NumPlantChemElms,JP,JY,JX)); StalkChemElms_pft=0._r8
   allocate(CanopyStalkC_pft(JP,JY,JX));    CanopyStalkC_pft=0._r8
-  allocate(ReserveChemElmnts_pft(NumPlantChemElms,JP,JY,JX));    ReserveChemElmnts_pft=0._r8
-  allocate(HuskChemElmnts_pft(NumPlantChemElms,JP,JY,JX));    HuskChemElmnts_pft=0._r8
-  allocate(EarChemElmnts_pft(NumPlantChemElms,JP,JY,JX));    EarChemElmnts_pft=0._r8
-  allocate(GrainChemElmnts_pft(NumPlantChemElms,JP,JY,JX));     GrainChemElmnts_pft=0._r8
+  allocate(ReserveChemElms_pft(NumPlantChemElms,JP,JY,JX));    ReserveChemElms_pft=0._r8
+  allocate(HuskChemElms_pft(NumPlantChemElms,JP,JY,JX));    HuskChemElms_pft=0._r8
+  allocate(EarChemElms_pft(NumPlantChemElms,JP,JY,JX));    EarChemElms_pft=0._r8
+  allocate(GrainChemElms_pft(NumPlantChemElms,JP,JY,JX));     GrainChemElms_pft=0._r8
   allocate(CanopyLeafShethC_pft(JP,JY,JX));     CanopyLeafShethC_pft=0._r8
   allocate(CanopyLeafApft_lyr(NumOfCanopyLayers,JP,JY,JX)); CanopyLeafApft_lyr=0._r8
   allocate(CO2NetFix_pft(JP,JY,JX));     CO2NetFix_pft=0._r8
@@ -275,18 +275,18 @@ module CanopyDataType
   allocate(NonstructElmnt_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX)); NonstructElmnt_brch=0._r8
   allocate(LeafPetolBiomassC_brch(MaxNumBranches,JP,JY,JX)); LeafPetolBiomassC_brch=0._r8
   allocate(ShootChemElmnt_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX));ShootChemElmnt_brch=0._r8
-  allocate(LeafChemElmnts_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX)); LeafChemElmnts_brch=0._r8
+  allocate(LeafChemElms_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX)); LeafChemElms_brch=0._r8
   allocate(PetoleChemElmnt_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX));PetoleChemElmnt_brch=0._r8
-  allocate(StalkChemElmnts_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX));StalkChemElmnts_brch=0._r8
+  allocate(StalkChemElms_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX));StalkChemElms_brch=0._r8
   allocate(ReserveElmnts_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX));ReserveElmnts_brch=0._r8
-  allocate(HuskChemElmnts_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX));HuskChemElmnts_brch=0._r8
-  allocate(EarChemElmnts_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX));EarChemElmnts_brch=0._r8
-  allocate(GrainChemElmnts_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX)); GrainChemElmnts_brch=0._r8
+  allocate(HuskChemElms_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX));HuskChemElms_brch=0._r8
+  allocate(EarChemElms_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX));EarChemElms_brch=0._r8
+  allocate(GrainChemElms_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX)); GrainChemElms_brch=0._r8
   allocate(LeafPetoNonstructElmntConc_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX));LeafPetoNonstructElmntConc_brch=0._r8
   allocate(NoduleNonstructElmnt_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX));NoduleNonstructElmnt_brch=0._r8
   allocate(CanopyNoduleChemElmnt_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX)); CanopyNoduleChemElmnt_brch=0._r8
   allocate(PetioleChemElmntRemob_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX));PetioleChemElmntRemob_brch=0._r8
-  allocate(BranchStalkChemElmnts_pft(NumPlantChemElms,MaxNumBranches,JP,JY,JX));BranchStalkChemElmnts_pft=0._r8
+  allocate(BranchStalkChemElms_pft(NumPlantChemElms,MaxNumBranches,JP,JY,JX));BranchStalkChemElms_pft=0._r8
   allocate(LeafChemElmntRemob_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX)); LeafChemElmntRemob_brch=0._r8
   allocate(LeafElmntNode_brch(NumPlantChemElms,0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));LeafElmntNode_brch=0._r8
   allocate(PetioleElmntNode_brch(NumPlantChemElms,0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));PetioleElmntNode_brch=0._r8
@@ -297,8 +297,8 @@ module CanopyDataType
   allocate(PetioleProteinCNode_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));PetioleProteinCNode_brch=0._r8
   allocate(NoduleNonstructCconc_pft(JP,JY,JX));   NoduleNonstructCconc_pft=0._r8
   allocate(GrainSeedBiomCMean_brch(MaxNumBranches,JP,JY,JX)); GrainSeedBiomCMean_brch=0._r8
-  allocate(StandingDeadKCompChemElmnts_pft(NumPlantChemElms,jsken,JP,JY,JX)); StandingDeadKCompChemElmnts_pft=0._r8
-  allocate(StandingDeadChemElmnts_pft(NumPlantChemElms,JP,JY,JX));    StandingDeadChemElmnts_pft=0._r8
+  allocate(StandingDeadKCompChemElms_pft(NumPlantChemElms,jsken,JP,JY,JX)); StandingDeadKCompChemElms_pft=0._r8
+  allocate(StandingDeadChemElms_pft(NumPlantChemElms,JP,JY,JX));    StandingDeadChemElms_pft=0._r8
   allocate(NonstructalElmnts_pft(NumPlantChemElms,JP,JY,JX));  NonstructalElmnts_pft=0._r8
   allocate(SeedCPlanted_pft(JP,JY,JX));    SeedCPlanted_pft=0._r8
   allocate(AvgCanopyBiomC2Graze_pft(JP,JY,JX));   AvgCanopyBiomC2Graze_pft=0._r8
@@ -404,15 +404,15 @@ module CanopyDataType
   call destroy(NetCumElmntFlx2Plant_pft)
   call destroy(WGLFT)
   call destroy(CFOPE)
-  call destroy(ShootChemElmnts_pft)
-  call destroy(LeafChemElmnts_pft)
-  call destroy(PetioleChemElmnts_pft)
-  call destroy(StalkChemElmnts_pft)
+  call destroy(ShootChemElms_pft)
+  call destroy(LeafChemElms_pft)
+  call destroy(PetioleChemElms_pft)
+  call destroy(StalkChemElms_pft)
   call destroy(CanopyStalkC_pft)
-  call destroy(ReserveChemElmnts_pft)
-  call destroy(HuskChemElmnts_pft)
-  call destroy(EarChemElmnts_pft)
-  call destroy(GrainChemElmnts_pft)
+  call destroy(ReserveChemElms_pft)
+  call destroy(HuskChemElms_pft)
+  call destroy(EarChemElms_pft)
+  call destroy(GrainChemElms_pft)
   call destroy(CanopyLeafShethC_pft)
   call destroy(CanopyLeafApft_lyr)
   call destroy(CO2NetFix_pft)
@@ -425,18 +425,18 @@ module CanopyDataType
   call destroy(NonstructElmnt_brch)
   call destroy(LeafPetolBiomassC_brch)
   call destroy(ShootChemElmnt_brch)
-  call destroy(LeafChemElmnts_brch)
+  call destroy(LeafChemElms_brch)
   call destroy(PetoleChemElmnt_brch)
-  call destroy(StalkChemElmnts_brch)
+  call destroy(StalkChemElms_brch)
   call destroy(ReserveElmnts_brch)
-  call destroy(HuskChemElmnts_brch)
-  call destroy(EarChemElmnts_brch)
-  call destroy(GrainChemElmnts_brch)
+  call destroy(HuskChemElms_brch)
+  call destroy(EarChemElms_brch)
+  call destroy(GrainChemElms_brch)
   call destroy(LeafPetoNonstructElmntConc_brch)
   call destroy(NoduleNonstructElmnt_brch)
   call destroy(CanopyNoduleChemElmnt_brch)
   call destroy(PetioleChemElmntRemob_brch)
-  call destroy(BranchStalkChemElmnts_pft)
+  call destroy(BranchStalkChemElms_pft)
   call destroy(LeafChemElmntRemob_brch)
   call destroy(LeafElmntNode_brch)
   call destroy(PetioleElmntNode_brch)
@@ -447,8 +447,8 @@ module CanopyDataType
   call destroy(PetioleProteinCNode_brch)
   call destroy(NoduleNonstructCconc_pft)
   call destroy(GrainSeedBiomCMean_brch)
-  call destroy(StandingDeadKCompChemElmnts_pft)
-  call destroy(StandingDeadChemElmnts_pft)
+  call destroy(StandingDeadKCompChemElms_pft)
+  call destroy(StandingDeadChemElms_pft)
   call destroy(NonstructalElmnts_pft)
   call destroy(SeedCPlanted_pft)
   call destroy(AvgCanopyBiomC2Graze_pft)
