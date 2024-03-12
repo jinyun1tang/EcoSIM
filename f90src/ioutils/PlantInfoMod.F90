@@ -735,6 +735,12 @@ implicit none
   call writefixl(nu_plt,'hour requirement for autumn leafoff VRNXI',VRNXI,70)
   call writefixl(nu_plt,'leaf length:width ratio WDLF',WDLF(NZ,NY,NX),70)
   call writefixl(nu_plt,'nonstructural C concentration needed for branching PB',MinNonstructalC4InitBranch(NZ,NY,NX),70)
+  call writefixl(nu_plt,'Maturity group, node number required for floral initiation, GROUPX',GROUPX(NZ,NY,NX),70)
+  call writefixl(nu_plt,'Node number at planting XTLI',XTLI(NZ,NY,NX),70)
+  call writefixl(nu_plt,'critical photoperiod (h) <= maximum daylength XDL',CriticalPhotoPeriod_pft(NZ,NY,NX),70)
+  call writefixl(nu_plt,'photoperiod sensitivity (node h-1) XPPD',PhotoPeriodSens_pft(NZ,NY,NX),70)
+
+
   end subroutine Phenology_trait_disp
 
 !------------------------------------------------------------------------------------------
