@@ -92,7 +92,7 @@ module StartqsMod
         plt_biom%StandingDeadChemElms_pft(1:NumPlantChemElms,NZ)=0._r8
         D6401: DO L=1,NL
           DO  K=1,pltpar%NumOfPlantLitrCmplxs
-            plt_bgcr%LitterFallChemElmnt_pftvr(1:NumPlantChemElms,1:jsken,K,L,NZ)=0._r8
+            plt_bgcr%LitterFallChemElmnt_pvr(1:NumPlantChemElms,1:jsken,K,L,NZ)=0._r8
           enddo
         ENDDO D6401
       ENDDO D9986
@@ -900,7 +900,7 @@ module StartqsMod
     ATCA                         =>  plt_site%ATCA     , &
     CCO2EI                       =>  plt_site%CCO2EI   , &
     RootFracRemobilizableBiom    =>  plt_allom%RootFracRemobilizableBiom   , &
-    RootProteinConc_pftvr        =>  plt_biom%RootProteinConc_pftvr   , &
+    RootProteinConc_pvr        =>  plt_biom%RootProteinConc_pvr   , &
     RootProteinC_pvr             =>  plt_biom%RootProteinC_pvr    , &
     SeedDepth_pft                =>  plt_morph%SeedDepth_pft   , &
     RootVH2O_vr                  =>  plt_morph%RootVH2O_vr  , &
@@ -932,7 +932,7 @@ module StartqsMod
       PSIRootTurg_vr(N,L,NZ)=AZMAX1(PSIRoot_vr(N,L,NZ)-PSIRootOSMO_vr(N,L,NZ))
       plt_biom%RootMycoNonstructElmnt_vr(1:NumPlantChemElms,N,L,NZ)=0._r8
       plt_biom%RootNonstructElementConcpft_vr(1:NumPlantChemElms,N,L,NZ)=0._r8
-      RootProteinConc_pftvr(N,L,NZ)=RootFracRemobilizableBiom(NZ)
+      RootProteinConc_pvr(N,L,NZ)=RootFracRemobilizableBiom(NZ)
       plt_biom%RootStructBiomC_vr(N,L,NZ)=0._r8
       plt_biom% PopuPlantRootC_vr(N,L,NZ)=0._r8
       RootProteinC_pvr(N,L,NZ)=0._r8
@@ -989,7 +989,7 @@ module StartqsMod
       ENDDO D30
       IF(N.EQ.1)THEN
         D6400: DO K=1,pltpar%NumOfPlantLitrCmplxs
-          plt_bgcr%LitterFallChemElmnt_pftvr(1:NumPlantChemElms,1:jsken,K,L,NZ)=0._r8
+          plt_bgcr%LitterFallChemElmnt_pvr(1:NumPlantChemElms,1:jsken,K,L,NZ)=0._r8
         ENDDO D6400
         plt_biom%RootNoduleNonstructElmnt_vr(1:NumPlantChemElms,L,NZ)=0._r8
         plt_biom%RootNodueChemElmnt_pvr(1:NumPlantChemElms,L,NZ)=0._r8

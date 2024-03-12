@@ -305,7 +305,7 @@ implicit none
     DO L=0,JZ
       DO K=1,micpar%NumOfPlantLitrCmplxs
         DO M=1,jsken
-          LitterFallChemElmnt_pftvr(1:NumPlantChemElms,M,K,L,NZ,NY,NX)=plt_bgcr%LitterFallChemElmnt_pftvr(1:NumPlantChemElms,M,K,L,NZ)
+          LitterFallChemElmnt_pvr(1:NumPlantChemElms,M,K,L,NZ,NY,NX)=plt_bgcr%LitterFallChemElmnt_pvr(1:NumPlantChemElms,M,K,L,NZ)
         ENDDO
       ENDDO
     ENDDO
@@ -444,7 +444,7 @@ implicit none
       DO N=1,pltpar%jroots
          RootMycoNonstructElmnt_vr(1:NumPlantChemElms,N,L,NZ,NY,NX)=plt_biom%RootMycoNonstructElmnt_vr(1:NumPlantChemElms,N,L,NZ)
         RootNonstructElementConcpft_vr(1:NumPlantChemElms,N,L,NZ,NY,NX)=plt_biom%RootNonstructElementConcpft_vr(1:NumPlantChemElms,N,L,NZ)
-        RootProteinConc_pftvr(N,L,NZ,NY,NX)=plt_biom%RootProteinConc_pftvr(N,L,NZ)
+        RootProteinConc_pvr(N,L,NZ,NY,NX)=plt_biom%RootProteinConc_pvr(N,L,NZ)
         trcg_rootml_vr(idg_beg:idg_end-1,N,L,NZ,NY,NX)  =plt_rbgc%trcg_rootml_vr(idg_beg:idg_end-1,N,L,NZ)
         trcs_rootml_vr(idg_beg:idg_end-1,N,L,NZ,NY,NX)  =plt_rbgc%trcs_rootml_vr(idg_beg:idg_end-1,N,L,NZ)
         PSIRoot_vr(N,L,NZ,NY,NX) =plt_ew%PSIRoot_vr(N,L,NZ)
@@ -1261,7 +1261,7 @@ implicit none
         plt_rbgc%trcg_rootml_vr(idg_beg:idg_end-1,N,L,NZ)=trcg_rootml_vr(idg_beg:idg_end-1,N,L,NZ,NY,NX)
 
         plt_biom%RootNonstructElementConcpft_vr(1:NumPlantChemElms,N,L,NZ)=RootNonstructElementConcpft_vr(1:NumPlantChemElms,N,L,NZ,NY,NX)
-        plt_biom%RootProteinConc_pftvr(N,L,NZ)=RootProteinConc_pftvr(N,L,NZ,NY,NX)
+        plt_biom%RootProteinConc_pvr(N,L,NZ)=RootProteinConc_pvr(N,L,NZ,NY,NX)
 
         plt_ew%PSIRoot_vr(N,L,NZ)=PSIRoot_vr(N,L,NZ,NY,NX)
         plt_ew%PSIRootOSMO_vr(N,L,NZ)=PSIRootOSMO_vr(N,L,NZ,NY,NX)
@@ -1374,7 +1374,7 @@ implicit none
     DO L=0,MaxNumRootLays(NY,NX)
       DO K=1,micpar%NumOfPlantLitrCmplxs
         DO M=1,jsken
-          plt_bgcr%LitterFallChemElmnt_pftvr(1:NumPlantChemElms,M,K,L,NZ)=LitterFallChemElmnt_pftvr(1:NumPlantChemElms,M,K,L,NZ,NY,NX)
+          plt_bgcr%LitterFallChemElmnt_pvr(1:NumPlantChemElms,M,K,L,NZ)=LitterFallChemElmnt_pvr(1:NumPlantChemElms,M,K,L,NZ,NY,NX)
         enddo
       enddo
     ENDDO

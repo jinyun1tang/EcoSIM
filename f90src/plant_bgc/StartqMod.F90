@@ -90,7 +90,7 @@ module StartqMod
         D6401: DO L=1,NL(NY,NX)
           DO  K=1,pltpar%NumOfPlantLitrCmplxs
             DO  M=1,jskenc
-              LitterFallChemElmnt_pftvr(1:NumPlantChemElms,M,K,L,NZ,NY,NX)=0._r8
+              LitterFallChemElmnt_pvr(1:NumPlantChemElms,M,K,L,NZ,NY,NX)=0._r8
             enddo
           enddo
         ENDDO D6401
@@ -721,7 +721,7 @@ module StartqMod
       PSIRootTurg_vr(N,L,NZ,NY,NX)=AZMAX1(PSIRoot_vr(N,L,NZ,NY,NX)-PSIRootOSMO_vr(N,L,NZ,NY,NX))
        RootMycoNonstructElmnt_vr(1:NumPlantChemElms,N,L,NZ,NY,NX)=0._r8
       RootNonstructElementConcpft_vr(1:NumPlantChemElms,N,L,NZ,NY,NX)=0._r8
-      RootProteinConc_pftvr(N,L,NZ,NY,NX)=RootFracRemobilizableBiom(NZ,NY,NX)
+      RootProteinConc_pvr(N,L,NZ,NY,NX)=RootFracRemobilizableBiom(NZ,NY,NX)
       RootStructBiomC_vr(N,L,NZ,NY,NX)=0._r8
       PopuPlantRootC_vr(N,L,NZ,NY,NX)=0._r8
       RootProteinC_pvr(N,L,NZ,NY,NX)=0._r8
@@ -780,7 +780,7 @@ module StartqMod
       IF(N.EQ.1)THEN
         D6400: DO K=1,pltpar%NumOfPlantLitrCmplxs
           DO  M=1,jskenc
-            LitterFallChemElmnt_pftvr(1:NumPlantChemElms,M,K,L,NZ,NY,NX)=0._r8
+            LitterFallChemElmnt_pvr(1:NumPlantChemElms,M,K,L,NZ,NY,NX)=0._r8
           enddo
         ENDDO D6400
         RootNoduleNonstructElmnt_vr(1:NumPlantChemElms,L,NZ,NY,NX)=0._r8
