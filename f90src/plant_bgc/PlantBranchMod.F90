@@ -490,7 +490,7 @@ module PlantBranchMod
     iPlantPhenologyPattern_pft  =>  plt_pheno%iPlantPhenologyPattern_pft    , &
     iPlantPhenologyType_pft  =>  plt_pheno%iPlantPhenologyType_pft    , &
     TCelciusChill4Seed    =>  plt_pheno%TCelciusChill4Seed      , &
-    RNH3B   =>  plt_rbgc%RNH3B      , &
+    NH3Dep2_brch   =>  plt_rbgc%NH3Dep2_brch      , &
     CO2NetFix_pft    =>  plt_bgcr%CO2NetFix_pft       , &
     SNL1    =>  plt_morph%SNL1      , &
     CanopyLeafArea_pft   =>  plt_morph%CanopyLeafArea_pft     , &
@@ -720,7 +720,7 @@ module PlantBranchMod
   real(r8) :: CO2F,ZADDB,PADDB,CH2O
   integer :: K
   associate(                        &
-    RNH3B    =>  plt_rbgc%RNH3B   , &
+    NH3Dep2_brch    =>  plt_rbgc%NH3Dep2_brch   , &
     NonstructElmnt_brch   =>  plt_biom%NonstructElmnt_brch  , &
     iPlantCalendar_brch   =>  plt_pheno%iPlantCalendar_brch   &
   )
@@ -760,13 +760,13 @@ module PlantBranchMod
 !   NonStructalC4Growth_brch=total non-structural C used in growth and respiration
 !   CNRDA=respiration for N assimilation
 !   ZADDB,PADDB=nonstructural N,P used in growth
-!   RNH3B=NH3 flux between atmosphere and branch from uptake.f
+!   NH3Dep2_brch=NH3 flux between atmosphere and branch from uptake.f
 !   XFRE(ielmc),XFRE(ielmn),XFRE(ielmp)=branch-root layer C,N,P transfer
 !
   NonstructElmnt_brch(ielmc,NB,NZ)=NonstructElmnt_brch(ielmc,NB,NZ)+CH2O-AMIN1(RMNCS,RCO2C)-NonStructalC4Growth_brch-CNRDA
 !  write(101,*)'NonstructElmnt_brch ch2o',NonstructElmnt_brch(ielmc,NB,NZ),CH2O,&
 !    AMIN1(RMNCS,RCO2C),NonStructalC4Growth_brch,CNRDA
-  NonstructElmnt_brch(ielmn,NB,NZ)=NonstructElmnt_brch(ielmn,NB,NZ)-ZADDB+RNH3B(NB,NZ)
+  NonstructElmnt_brch(ielmn,NB,NZ)=NonstructElmnt_brch(ielmn,NB,NZ)-ZADDB+NH3Dep2_brch(NB,NZ)
   NonstructElmnt_brch(ielmp,NB,NZ)=NonstructElmnt_brch(ielmp,NB,NZ)-PADDB
   end associate
   end subroutine UpdatePhotosynthates

@@ -709,7 +709,7 @@ implicit none
   real(r8), pointer :: RootAutoRO2Limiter_pvr(:,:,:)       => null()  !O2 constraint to root respiration, []
   real(r8), pointer :: trcg_rootml_vr(:,:,:,:)=> null() !root gas content, [g d-2]
   real(r8), pointer :: trcs_rootml_vr(:,:,:,:)=> null() !root aqueous content, [g d-2]
-  real(r8), pointer :: RNH3B(:,:)       => null()  !gaseous NH3 flux fron root disturbance band, [g d-2 h-1]
+  real(r8), pointer :: NH3Dep2_brch(:,:)       => null()  !gaseous NH3 flux fron root disturbance band, [g d-2 h-1]
   real(r8), pointer :: RootNutUptake_pvr(:,:,:,:)    => null()  !root uptake of Nutrient band, [g d-2 h-1]
   real(r8), pointer :: RUONHB(:,:,:)    => null()  !root uptake of NH4 band unconstrained by O2, [g d-2 h-1]
   real(r8), pointer :: RUONH4(:,:,:)    => null()  !root uptake of NH4 non-band unconstrained by O2, [g d-2 h-1]
@@ -794,7 +794,7 @@ implicit none
   allocate(this%RUCH1B(jroots,JZ1,JP1));this%RUCH1B=spval
   allocate(this%RUCH1P(jroots,JZ1,JP1));this%RUCH1P=spval
   allocate(this%RUCH2B(jroots,JZ1,JP1));this%RUCH2B=spval
-  allocate(this%RNH3B(MaxNumBranches,JP1));this%RNH3B=spval
+  allocate(this%NH3Dep2_brch(MaxNumBranches,JP1));this%NH3Dep2_brch=spval
 
   allocate(this%trcg_air2root_flx_vr(idg_beg:idg_end-1,JZ1));this%trcg_air2root_flx_vr=spval
   allocate(this%trcg_TLP(idg_beg:idg_end-1,JZ1));this%trcg_TLP=spval
@@ -851,7 +851,7 @@ implicit none
 !  if(allocated(RootNH4Uptake_pft))deallocate(RootNH4Uptake_pft)
 !  if(allocated(RootHPO4Uptake_pft))deallocate(RootHPO4Uptake_pft)
 !  if(allocated(RootH2PO4Uptake_pft))deallocate(RootH2PO4Uptake_pft)
-!  if(allocated(RNH3B))deallocate(RNH3B)
+!  if(allocated(NH3Dep2_brch))deallocate(NH3Dep2_brch)
 !  if(allocated(ZEROQ))deallocate(ZEROQ)
 !  if(allocated(RootRespPotential_vr))deallocate(RootRespPotential_vr)
 !  if(allocated(RCO2N))deallocate(RCO2N)

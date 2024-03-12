@@ -692,7 +692,7 @@ module StartqsMod
     SeedNumberSet_brch(NB,NZ)=0._r8
     plt_allom%GrainSeedBiomCMean_brch(NB,NZ)=0._r8
     LeafAreaLive_brch(NB,NZ)=0._r8
-    plt_rbgc%RNH3B(NB,NZ)=0._r8
+    plt_rbgc%NH3Dep2_brch(NB,NZ)=0._r8
     LeafAreaDying_brch(NB,NZ)=0._r8
     CanPBranchHeight(NB,NZ)=0._r8
     D5: DO L=1,NumOfCanopyLayers1

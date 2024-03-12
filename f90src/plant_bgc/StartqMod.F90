@@ -548,7 +548,7 @@ module StartqMod
     SeedNumberSet_brch(NB,NZ,NY,NX)=0._r8
     GrainSeedBiomCMean_brch(NB,NZ,NY,NX)=0._r8
     LeafAreaLive_brch(NB,NZ,NY,NX)=0._r8
-    RNH3B(NB,NZ,NY,NX)=0._r8
+    NH3Dep2_brch(NB,NZ,NY,NX)=0._r8
     LeafAreaDying_brch(NB,NZ,NY,NX)=0._r8
     CanPBranchHeight(NB,NZ,NY,NX)=0._r8
     
