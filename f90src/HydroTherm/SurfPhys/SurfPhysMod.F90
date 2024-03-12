@@ -220,17 +220,17 @@ contains
   !VPQ=vapor pressure in canopy air, 
   !TKQ=temperature in canopy air, Kelvin
 
-  write(*,*) "For VPQ and TKQ calc:"
-  write(*,*) "VPA(NY,NX) = ", VPA(NY,NX)
-  write(*,*) "TLEX(NY,NX) = ", TLEX(NY,NX)
-  write(*,*) "EvapLHTC = ", EvapLHTC
-  write(*,*) "NY = ", NY
-  write(*,*) "NX = ", NX
-  write(*,*) "NUM(NY,NX) = ", NUM(NY,NX)
-  write(*,*) "AREA(3,NUM(NY,NX),NY,NX) = ", AREA(3,NUM(NY,NX),NY,NX)
-  write(*,*) "TairK(NY,NX) = ", TairK(NY,NX)
-  write(*,*) "TSHX(NY,NX) = ", TSHX(NY,NX)
-  write(*,*) "SensHeatCondctance = ", SensHeatCondctance
+  !write(*,*) "For VPQ and TKQ calc:"
+  !write(*,*) "VPA(NY,NX) = ", VPA(NY,NX)
+  !write(*,*) "TLEX(NY,NX) = ", TLEX(NY,NX)
+  !write(*,*) "EvapLHTC = ", EvapLHTC
+  !write(*,*) "NY = ", NY
+  !write(*,*) "NX = ", NX
+  !write(*,*) "NUM(NY,NX) = ", NUM(NY,NX)
+  !write(*,*) "AREA(3,NUM(NY,NX),NY,NX) = ", AREA(3,NUM(NY,NX),NY,NX)
+  !write(*,*) "TairK(NY,NX) = ", TairK(NY,NX)
+  !write(*,*) "TSHX(NY,NX) = ", TSHX(NY,NX)
+  !write(*,*) "SensHeatCondctance = ", SensHeatCondctance
 
   VPQ(NY,NX)=VPA(NY,NX)-TLEX(NY,NX)/(EvapLHTC*AREA(3,NUM(NY,NX),NY,NX))
   TKQ(NY,NX)=TairK(NY,NX)-TSHX(NY,NX)/(SensHeatCondctance*AREA(3,NUM(NY,NX),NY,NX))
@@ -440,35 +440,35 @@ contains
   IF((VLWatGrnd+VLIceGrnd).GT.ZEROS2(NY,NX))THEN
     !top soil has water or ice
     !ice albedo seems too low.
-    write(*,*) "Albedo recomputed"
+    !write(*,*) "Albedo recomputed"
     AlbedoGrnd=(SoilAlbedo(NY,NX)*SoilMicPMassLayer(NUM(NY,NX),NY,NX)+0.06_r8*VLWatGrnd &
       +0.30_r8*VLIceGrnd)/(SoilMicPMassLayer(NUM(NY,NX),NY,NX)+VLWatGrnd+VLIceGrnd)
   ELSE
-    write(*,*) "Albedo from soil"
+    !write(*,*) "Albedo from soil"
     AlbedoGrnd=SoilAlbedo(NY,NX)
   ENDIF
   !absorbed radiation
   !Radnet2LitGrnd=net radiation, after taking out outgoing surface layer radiation  
   !LWRadGrnd=emitted longwave radiation  
   RFLX0=(1.0_r8-AlbedoGrnd)*RadSWonSoi(NY,NX)+LWRad2Grnd(NY,NX)
-  write(*,*) "Printing RFLX0 and constituents: "
-  write(*,*) "RFLX0: ", RFLX0
-  write(*,*) "AlbedoGrnd: ", AlbedoGrnd
-  write(*,*) "RadSWonSoi(NY,NX): ", RadSWonSoi(NY,NX)
-  write(*,*) "LWRad2Grnd(NY,NX): ", LWRad2Grnd(NY,NX)
+  !write(*,*) "Printing RFLX0 and constituents: "
+  !write(*,*) "RFLX0: ", RFLX0
+  !write(*,*) "AlbedoGrnd: ", AlbedoGrnd
+  !write(*,*) "RadSWonSoi(NY,NX): ", RadSWonSoi(NY,NX)
+  !write(*,*) "LWRad2Grnd(NY,NX): ", LWRad2Grnd(NY,NX)
   LWRadGrnd=LWEmscefSoil(NY,NX)*TKSoi1(NUM(NY,NX),NY,NX)**4._r8
-  write(*,*) "Printing LWRadGrnd and constituents: "
-  write(*,*) "LWRadGrnd: ", LWRadGrnd
-  write(*,*) "LWEmscefSoil(NY,NX): ", LWEmscefSoil(NY,NX)
-  write(*,*) "TKSoi1(NUM(NY,NX),NY,NX): ", TKSoi1(NUM(NY,NX),NY,NX)
-  write(*,*) "NUM(NY,NX): ", NUM(NY,NX)
-  write(*,*) "NY: ", NY
-  write(*,*) "NX: ", NX
+  !write(*,*) "Printing LWRadGrnd and constituents: "
+  !write(*,*) "LWRadGrnd: ", LWRadGrnd
+  !write(*,*) "LWEmscefSoil(NY,NX): ", LWEmscefSoil(NY,NX)
+  !write(*,*) "TKSoi1(NUM(NY,NX),NY,NX): ", TKSoi1(NUM(NY,NX),NY,NX)
+  !write(*,*) "NUM(NY,NX): ", NUM(NY,NX)
+  !write(*,*) "NY: ", NY
+  !write(*,*) "NX: ", NX
   Radnet2LitGrnd=RFLX0-LWRadGrnd
-  write(*,*) "Printing Radnet2LitGrnd and constituents: "
-  write(*,*) "Radnet2LitGrnd: ", Radnet2LitGrnd
-  write(*,*) "RFLX0: ", RFLX0
-  write(*,*) "LWRadGrnd: ", LWRadGrnd
+  !write(*,*) "Printing Radnet2LitGrnd and constituents: "
+  !write(*,*) "Radnet2LitGrnd: ", Radnet2LitGrnd
+  !write(*,*) "RFLX0: ", RFLX0
+  !write(*,*) "LWRadGrnd: ", LWRadGrnd
 !
 ! AERODYNAMIC RESISTANCE ABOVE SOIL SURFACE INCLUDING
 ! RESISTANCE IMPOSED BY PLANT CANOPY
@@ -507,10 +507,10 @@ contains
   RAGX=AMAX1(RAM,0.8_r8*RAGS(NY,NX),AMIN1(1.2_r8*RAGS(NY,NX),ResistanceLitRLay(NY,NX)/(1.0_r8-10.0_r8*RI)))
   RAGS(NY,NX)=RAGX
   RAa=RAGR(NY,NX)+RAGS(NY,NX)
-  write(*,*) "Value of RAa: "
-  write(*,*) "RAa = ", RAa
-  write(*,*) "RAGR(NY,NX) = ", RAGR(NY,NX)
-  write(*,*) "RAGS(NY,NX) = ", RAGS(NY,NX)
+  !write(*,*) "Value of RAa: "
+  !write(*,*) "RAa = ", RAa
+  !write(*,*) "RAGR(NY,NX) = ", RAGR(NY,NX)
+  !write(*,*) "RAGS(NY,NX) = ", RAGS(NY,NX)
   !write(*,*) "ResistanceLitRLay(NY,NX) = ", ResistanceLitRLay(NY,NX)
   !write(*,*) "RI = ", RI
   !write(*,*) "RAM = ", RAM
@@ -544,21 +544,21 @@ contains
 ! HeatSensVapAir2Soi=convective heat of evaporation flux
 !
   CdSoiEvap=PAREG(NY,NX)/(RAa+RZ)
-  write(*,*) "Writing for CdSoiEvap: "
-  write(*,*) "CdSoiEvap: ", CdSoiEvap
-  write(*,*) "PAREG(NY,NX): ", PAREG(NY,NX)
-  write(*,*) "RAa: ", RAa
-  write(*,*) "RZ: ", RZ
+  !write(*,*) "Writing for CdSoiEvap: "
+  !write(*,*) "CdSoiEvap: ", CdSoiEvap
+  !write(*,*) "PAREG(NY,NX): ", PAREG(NY,NX)
+  !write(*,*) "RAa: ", RAa
+  !write(*,*) "RZ: ", RZ
   CdSoiHSens=PARSG(NY,NX)/RAa
-  write(*,*) "Writing for CdSoiHSens: "
-  write(*,*) "CdSoiHSens: ", CdSoiHSens
-  write(*,*) "PARSG(NY,NX): ", PARSG(NY,NX)
-  write(*,*) "RAa: ", RAa
-  write(*,*) "RZ: ", RZ
+  !write(*,*) "Writing for CdSoiHSens: "
+  !write(*,*) "CdSoiHSens: ", CdSoiHSens
+  !write(*,*) "PARSG(NY,NX): ", PARSG(NY,NX)
+  !write(*,*) "RAa: ", RAa
+  !write(*,*) "RZ: ", RZ
   TKX1=TKSoi1(NUM(NY,NX),NY,NX)
 
   IF(TKX1.LE.0.0_r8)THEN
-    write(*,*) "TKX1 is zero, resetting"
+    !write(*,*) "TKX1 is zero, resetting"
     TKX1 = 273.15_r8
   ENDIF
 

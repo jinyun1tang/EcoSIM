@@ -156,10 +156,7 @@ module StartsMod
 !     DISTRIBUTION OF OM AMONG FRACTIONS OF DIFFERING
 !     BIOLOGICAL ACTIVITY
 !
-      write(*,*) "calling InitHGrid"
       call InitHGrid(NY,NX)
-      write(*,*) "DH(NY, NX) = ", DH(NY,NX)
-      write(*,*) "DV(NY, NX) = ", DV(NY,NX)
 
       call InitLayerDepths(NY,NX)
     ! ActiveLayDepth=active layer depth (m)
@@ -411,21 +408,16 @@ module StartsMod
     RCH4F(L,NY,NX)=0.0_r8
     RCH4L(L,NY,NX)=0.0_r8
 
-    write(*,*) "In init soil profile: "
-    write(*,*) "   Before if:"
-    write(*,*) "POROS(L,NY,NX) = ", POROS(L,NY,NX)
     IF(L.GT.0)THEN
       IF(SoiBulkDensity(L,NY,NX).GT.ZERO)THEN
         !it is a soil layer
         !compute particle density
         PTDS=ppmc*(1.30_r8*CORGCM+2.66_r8*(1.0E+06_r8-CORGCM))
         POROS(L,NY,NX)=1.0_r8-(SoiBulkDensity(L,NY,NX)/PTDS) 
-        write(*,*) "BKDSI GT zero POROS(L,NY,NX) = ", POROS(L,NY,NX)
       ELSE
         !for ponding water
         PTDS=0.0_r8
         POROS(L,NY,NX)=1.0_r8
-        write(*,*) "ponded water - POROS(L,NY,NX) = ", POROS(L,NY,NX)
       ENDIF
       POROSI(L,NY,NX)=POROS(L,NY,NX)*FracSoiAsMicP(L,NY,NX)
       VLMicP(L,NY,NX)=POROS(L,NY,NX)*VLSoilPoreMicP(L,NY,NX)
@@ -840,9 +832,6 @@ module StartsMod
   integer, intent(in) :: NY,NX
   integer :: L
 
-  write(*,*) "DH(NY,NX) = ", DH(NY,NX)
-  write(*,*) "DV(NY,NX) = ", DV(NY,NX)
-
   DO  L=0,NL(NY,NX)
     DLYRI(1,L,NY,NX)=DH(NY,NX)    !east-west direction
     DLYRI(2,L,NY,NX)=DV(NY,NX)    !north-south direction
@@ -907,8 +896,6 @@ module StartsMod
 !     VOLX=total micropore volume
       IF(SoiBulkDensityt0(L,NY,NX).LE.ZERO)SoilFracAsMacP(L,NY,NX)=0.0_r8
 !     thickness:=bottom depth-upper depth
-      write(*,*) "Soil thickness calc at L = ", L
-      write(*,*) "Depth: ", CumDepth2LayerBottom(L,NY,NX) ," - " , CumDepth2LayerBottom(L-1,NY,NX)  
       DLYRI(3,L,NY,NX)=(CumDepth2LayerBottom(L,NY,NX)-CumDepth2LayerBottom(L-1,NY,NX))
       call check_bool(DLYRI(3,L,NY,NX)<0._r8,'negative soil layer thickness',&
         __LINE__,mod_filename)
@@ -931,10 +918,6 @@ module StartsMod
   CumDepth2LayerBottom(0,NY,NX)=CumDepth2LayerBottom(NU(NY,NX),NY,NX)-DLYR(3,NU(NY,NX),NY,NX)
   CumSoilDeptht0(NY,NX)=CumDepth2LayerBottom(0,NY,NX)
   AREA(3,NL(NY,NX)+1:JZ,NY,NX)=DLYR(1,NL(NY,NX),NY,NX)*DLYR(2,NL(NY,NX),NY,NX)
-
-  do j = NL(NY, NX) + 1, JZ
-     write(*,*) "AREA(3,j,NY,NX)", AREA(3, j, NY, NX)
-  end do
 
   end associate
   end subroutine InitLayerDepths
@@ -991,7 +974,6 @@ module StartsMod
 
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
-      write(*,*) "NY, NX = ", NY, ", ", NX 
       NM=MaxNumRootLays(NY,NX)+1
       !NM=2
       call ComputeSoilHydroPars(NY,NX,NU(NY,NX),NM)
