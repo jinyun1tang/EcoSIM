@@ -75,7 +75,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  CanH2OHeldVg(:,:)                  !grid canopy held water content, [m3 d-2]
   real(r8),target,allocatable ::  TFLWCI(:,:)                        !net ice transfer to canopy, [MJ d-2 t-1]
   real(r8),target,allocatable ::  PrecIntcptByCanG(:,:)              !grid net precipitation water interception to canopy, [MJ d-2 t-1]
-  real(r8),target,allocatable ::  EvapTransHeatP(:,:,:)                       !canopy latent heat flux, [MJ d-2 h-1]
+  real(r8),target,allocatable ::  EvapTransHeat_pft(:,:,:)                       !canopy latent heat flux, [MJ d-2 h-1]
   real(r8),target,allocatable ::  HeatXAir2PCan(:,:,:)               !air to canopy sensible heat flux, [MJ d-2 h-1]
   real(r8),target,allocatable ::  HeatStorCanP(:,:,:)                       !canopy storage heat flux, [MJ d-2 h-1]
   real(r8),target,allocatable ::  ENGYX(:,:,:)                       !canopy heat storage from previous time step, [MJ d-2]
@@ -224,7 +224,7 @@ module CanopyDataType
   allocate(CanH2OHeldVg(JY,JX));      CanH2OHeldVg=0._r8
   allocate(TFLWCI(JY,JX));      TFLWCI=0._r8
   allocate(PrecIntcptByCanG(JY,JX));       PrecIntcptByCanG=0._r8
-  allocate(EvapTransHeatP(JP,JY,JX));    EvapTransHeatP=0._r8
+  allocate(EvapTransHeat_pft(JP,JY,JX));    EvapTransHeat_pft=0._r8
   allocate(HeatXAir2PCan(JP,JY,JX));    HeatXAir2PCan=0._r8
   allocate(HeatStorCanP(JP,JY,JX));    HeatStorCanP=0._r8
   allocate(ENGYX(JP,JY,JX));    ENGYX=0._r8
@@ -374,7 +374,7 @@ module CanopyDataType
   call destroy(CanH2OHeldVg)
   call destroy(TFLWCI)
   call destroy(PrecIntcptByCanG)
-  call destroy(EvapTransHeatP)
+  call destroy(EvapTransHeat_pft)
   call destroy(HeatXAir2PCan)
   call destroy(HeatStorCanP)
   call destroy(ENGYX)

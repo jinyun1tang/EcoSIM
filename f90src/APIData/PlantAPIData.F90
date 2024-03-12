@@ -551,7 +551,7 @@ implicit none
   real(r8), pointer :: PSICanopy_pft(:)  => null()    !canopy total water potential , [Mpa]
   real(r8), pointer :: VapXAir2Canopy_pft(:)  => null()    !canopy evaporation, [m2 d-2 h-1]
   real(r8), pointer :: HeatStorCanP(:)  => null()    !canopy storage heat flux, [MJ d-2 h-1]
-  real(r8), pointer :: EvapTransHeatP(:)  => null()    !canopy latent heat flux, [MJ d-2 h-1]
+  real(r8), pointer :: EvapTransHeat_pft(:)  => null()    !canopy latent heat flux, [MJ d-2 h-1]
   real(r8), pointer :: RAZ(:)    => null()    !canopy roughness height, [m]
   real(r8), pointer :: TKS(:)    => null()    !mean annual soil temperature, [K]
   real(r8), pointer :: PSICanPDailyMin(:)  => null()    !minimum daily canopy water potential, [MPa]
@@ -1126,7 +1126,7 @@ implicit none
   allocate(this%PSICanopy_pft(JP1));this%PSICanopy_pft=spval
   allocate(this%VapXAir2Canopy_pft(JP1));this%VapXAir2Canopy_pft=spval
   allocate(this%HeatStorCanP(JP1));this%HeatStorCanP=spval
-  allocate(this%EvapTransHeatP(JP1));this%EvapTransHeatP=spval
+  allocate(this%EvapTransHeat_pft(JP1));this%EvapTransHeat_pft=spval
   allocate(this%WatByPCanopy(JP1));this%WatByPCanopy=spval
   allocate(this%VHeatCapCanP(JP1));this%VHeatCapCanP=spval
   allocate(this%CanopyWater_pft(JP1));this%CanopyWater_pft=spval
@@ -1163,7 +1163,7 @@ implicit none
 !  if(allocated(PSICanopy_pft))deallocate(PSICanopy_pft)
 !  if(allocated(VapXAir2Canopy_pft))deallocate(VapXAir2Canopy_pft)
 !  if(allocated(HeatStorCanP))deallocate(HeatStorCanP)
-!  if(allocated(EvapTransHeatP))deallocate(EvapTransHeatP)
+!  if(allocated(EvapTransHeat_pft))deallocate(EvapTransHeat_pft)
 !  if(allocated(VHeatCapCanP))deallocate(VHeatCapCanP)
 !  if(allocated(WatByPCanopy))deallocate(WatByPCanopy)
 !  if(allocated(CanopyWater_pft))deallocate(CanopyWater_pft)
