@@ -30,7 +30,7 @@ module PlantDataRateType
   real(r8),target,allocatable ::  PlantN2FixCum_pft(:,:,:)                      !total plant N2 fixation, [g d-2 ]
   real(r8),target,allocatable ::  GrossResp_pft(:,:,:)                       !total plant respiration, [g d-2 ]
   real(r8),target,allocatable ::  ElmntBalanceCum_pft(:,:,:,:)                      !plant element balance, [g d-2]
-  real(r8),target,allocatable ::  LitterFallChemElm_pft(:,:,:,:)                     !plant element litterfall, [g d-2 h-1]
+  real(r8),target,allocatable ::  LitterFallChemElmnt_pft(:,:,:,:)                     !plant element litterfall, [g d-2 h-1]
   real(r8),target,allocatable ::  LitterFallChemElm_pvr(:,:,:,:,:,:,:)                !plant litterfall element, [g d-2 h-1]
   real(r8),target,allocatable ::  NetPrimaryProductvity_pft(:,:,:)                        !total net primary productivity, [g d-2]
   real(r8),target,allocatable ::  ETCanopy_pft(:,:,:)                       !total transpiration, [m d-2], <0 into atmosphere
@@ -50,7 +50,7 @@ module PlantDataRateType
   real(r8),target,allocatable ::  RUPOXP(:,:,:,:,:)                  !aqueous O2 flux from roots to root water , [g d-2 h-1]
   real(r8),target,allocatable ::  RootRespPotential_vr(:,:,:,:,:)                   !root respiration unconstrained by O2, [g d-2 h-1]
   real(r8),target,allocatable ::  RCO2A(:,:,:,:,:)                   !root respiration constrained by O2, [g d-2 h-1]
-  real(r8),target,allocatable ::  RootExudChemElm_pft(:,:,:,:)                     !total root uptake (+ve) - exudation (-ve) of dissovled element, [g d-2 h-1]
+  real(r8),target,allocatable ::  RootExudChemElmnt_pft(:,:,:,:)                     !total root uptake (+ve) - exudation (-ve) of dissovled element, [g d-2 h-1]
   real(r8),target,allocatable ::  RootNH4Uptake_pft(:,:,:)                       !total root uptake of NH4, [g d-2 h-1]
   real(r8),target,allocatable ::  RootNO3Uptake_pft(:,:,:)                       !total root uptake of NO3, [g d-2 h-1]
   real(r8),target,allocatable ::  RootH2PO4Uptake_pft(:,:,:)                       !total root uptake of PO4, [g d-2 h-1]
@@ -154,7 +154,7 @@ module PlantDataRateType
   allocate(PlantN2FixCum_pft(JP,JY,JX));   PlantN2FixCum_pft=0._r8
   allocate(GrossResp_pft(JP,JY,JX));    GrossResp_pft=0._r8
   allocate(ElmntBalanceCum_pft(NumPlantChemElms,JP,JY,JX));     ElmntBalanceCum_pft=0._r8
-  allocate(LitterFallChemElm_pft(NumPlantChemElms,JP,JY,JX));    LitterFallChemElm_pft=0._r8
+  allocate(LitterFallChemElmnt_pft(NumPlantChemElms,JP,JY,JX));    LitterFallChemElmnt_pft=0._r8
   allocate(LitterFallChemElm_pvr(NumPlantChemElms,jsken,1:NumOfPlantLitrCmplxs,0:JZ,JP,JY,JX));LitterFallChemElm_pvr=0._r8
   allocate(NetPrimaryProductvity_pft(JP,JY,JX));     NetPrimaryProductvity_pft=0._r8
   allocate(ETCanopy_pft(JP,JY,JX));    ETCanopy_pft=0._r8
@@ -175,7 +175,7 @@ module PlantDataRateType
   allocate(RUPOXP(jroots,JZ,JP,JY,JX));RUPOXP=0._r8
   allocate(RootRespPotential_vr(jroots,JZ,JP,JY,JX));RootRespPotential_vr=0._r8
   allocate(RCO2A(jroots,JZ,JP,JY,JX));RCO2A=0._r8
-  allocate(RootExudChemElm_pft(1:NumPlantChemElms,JP,JY,JX));    RootExudChemElm_pft=0._r8
+  allocate(RootExudChemElmnt_pft(1:NumPlantChemElms,JP,JY,JX));    RootExudChemElmnt_pft=0._r8
   allocate(RootNH4Uptake_pft(JP,JY,JX));    RootNH4Uptake_pft=0._r8
   allocate(RootNO3Uptake_pft(JP,JY,JX));    RootNO3Uptake_pft=0._r8
   allocate(RootH2PO4Uptake_pft(JP,JY,JX));    RootH2PO4Uptake_pft=0._r8
@@ -268,7 +268,7 @@ module PlantDataRateType
   call destroy(PlantN2FixCum_pft)
   call destroy(GrossResp_pft)
   call destroy(ElmntBalanceCum_pft)
-  call destroy(LitterFallChemElm_pft)
+  call destroy(LitterFallChemElmnt_pft)
   call destroy(LitterFallChemElm_pvr)
   call destroy(NetPrimaryProductvity_pft)
   call destroy(ETCanopy_pft)
@@ -286,7 +286,7 @@ module PlantDataRateType
   call destroy(RUPOXP)
   call destroy(RootRespPotential_vr)
   call destroy(RCO2A)
-  call destroy(RootExudChemElm_pft)
+  call destroy(RootExudChemElmnt_pft)
   call destroy(RootNH4Uptake_pft)
   call destroy(RootNO3Uptake_pft)
   call destroy(RootH2PO4Uptake_pft)

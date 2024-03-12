@@ -268,7 +268,7 @@ module UptakesMod
     LWRadCanP(NZ)=0.0_r8
     plt_ew%Transpiration_pft(NZ)=0.0_r8
     plt_ew%VapXAir2Canopy_pft(NZ)=0.0_r8
-    plt_rbgc%RootExudChemElm_pft(1:NumPlantChemElms,NZ)=0.0_r8
+    plt_rbgc%RootExudChemElmnt_pft(1:NumPlantChemElms,NZ)=0.0_r8
     plt_rbgc%RootNH4Uptake_pft(NZ)=0.0_r8
     plt_rbgc%RootNO3Uptake_pft(NZ)=0.0_r8
     plt_rbgc%RootH2PO4Uptake_pft(NZ)=0.0_r8

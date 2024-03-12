@@ -52,7 +52,7 @@ module ExtractsMod
    WGLFT    => plt_biom%WGLFT      , &
    StandingDeadChemElmnt_col  => plt_biom%StandingDeadChemElmnt_col   , &
    StandingDeadChemElms_pft   => plt_biom%StandingDeadChemElms_pft     , &
-   LitterFallChemElm_pft    => plt_bgcr%LitterFallChemElm_pft      , &
+   LitterFallChemElmnt_pft    => plt_bgcr%LitterFallChemElmnt_pft      , &
    LitterFallChemElm_col    => plt_bgcr%LitterFallChemElm_col      , &
    LitrfalChemElemnts_vr     => plt_bgcr%LitrfalChemElemnts_vr       , &
    LitterFallChemElm_pvr     => plt_bgcr%LitterFallChemElm_pvr       , &
@@ -74,7 +74,7 @@ module ExtractsMod
 !   LitrfalChemElemnts_vr,=cumulative total C,N,P litterfall
 !
     DO NE=1,NumPlantChemElms
-      LitterFallChemElm_col(NE)=LitterFallChemElm_col(NE)+LitterFallChemElm_pft(NE,NZ)
+      LitterFallChemElm_col(NE)=LitterFallChemElm_col(NE)+LitterFallChemElmnt_pft(NE,NZ)
       StandingDeadChemElmnt_col(NE)=StandingDeadChemElmnt_col(NE)+StandingDeadChemElms_pft(NE,NZ)
     ENDDO
 
