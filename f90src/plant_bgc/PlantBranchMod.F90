@@ -116,7 +116,7 @@ module PlantBranchMod
     LeafChemElms_brch    =>  plt_biom%LeafChemElms_brch   , &
     LeafProteinCNode_brch       =>  plt_biom%LeafProteinCNode_brch      , &
     LeafElmntNode_brch      =>  plt_biom%LeafElmntNode_brch     , &
-    LeafPetoNonstructElmntConc_brch     =>  plt_biom%LeafPetoNonstructElmntConc_brch    , &
+    LeafPetoNonstElmConc_brch     =>  plt_biom%LeafPetoNonstElmConc_brch    , &
     PetioleProteinCNode_brch     =>  plt_biom%PetioleProteinCNode_brch    , &
     GrainChemElms_brch     =>  plt_biom%GrainChemElms_brch    , &
     ZEROP      =>  plt_biom%ZEROP     , &
@@ -300,8 +300,8 @@ module PlantBranchMod
 !   CNKI,CPKI=nonstruct N,P inhibition constant on growth (g N,P g-1 C)
 !   ETOL=coefficient for etoliation effects on expansion,extension
 !
-    CCE=AMIN1(safe_adb(LeafPetoNonstructElmntConc_brch(ielmn,NB,NZ),LeafPetoNonstructElmntConc_brch(ielmn,NB,NZ)+LeafPetoNonstructElmntConc_brch(ielmc,NB,NZ)*CNKI) &
-      ,safe_adb(LeafPetoNonstructElmntConc_brch(ielmp,NB,NZ),LeafPetoNonstructElmntConc_brch(ielmp,NB,NZ)+LeafPetoNonstructElmntConc_brch(ielmc,NB,NZ)*CPKI))
+    CCE=AMIN1(safe_adb(LeafPetoNonstElmConc_brch(ielmn,NB,NZ),LeafPetoNonstElmConc_brch(ielmn,NB,NZ)+LeafPetoNonstElmConc_brch(ielmc,NB,NZ)*CNKI) &
+      ,safe_adb(LeafPetoNonstElmConc_brch(ielmp,NB,NZ),LeafPetoNonstElmConc_brch(ielmp,NB,NZ)+LeafPetoNonstElmConc_brch(ielmc,NB,NZ)*CPKI))
 
     ETOL=1.0_r8+CCE
 !
@@ -340,18 +340,18 @@ module PlantBranchMod
     !   RCCX,RCCQ=max fractions for shoot N,P recycling
     !   iPlantMorphologyType_pft=growth type:0=bryophyte,1=graminoid,2=shrub,tree
 !
-    IF(iPlantCalendar_brch(ipltcal_Emerge,NB,NZ).NE.0.AND.LeafPetoNonstructElmntConc_brch(ielmc,NB,NZ).GT.ZERO)THEN
+    IF(iPlantCalendar_brch(ipltcal_Emerge,NB,NZ).NE.0.AND.LeafPetoNonstElmConc_brch(ielmc,NB,NZ).GT.ZERO)THEN
       CCC=AZMAX1(AMIN1(1.0_r8 &
-        ,safe_adb(LeafPetoNonstructElmntConc_brch(ielmn,NB,NZ),LeafPetoNonstructElmntConc_brch(ielmn,NB,NZ) &
-        +LeafPetoNonstructElmntConc_brch(ielmc,NB,NZ)*CNKI) &
-        ,safe_adb(LeafPetoNonstructElmntConc_brch(ielmp,NB,NZ),LeafPetoNonstructElmntConc_brch(ielmp,NB,NZ) &
-        +LeafPetoNonstructElmntConc_brch(ielmc,NB,NZ)*CPKI)))
+        ,safe_adb(LeafPetoNonstElmConc_brch(ielmn,NB,NZ),LeafPetoNonstElmConc_brch(ielmn,NB,NZ) &
+        +LeafPetoNonstElmConc_brch(ielmc,NB,NZ)*CNKI) &
+        ,safe_adb(LeafPetoNonstElmConc_brch(ielmp,NB,NZ),LeafPetoNonstElmConc_brch(ielmp,NB,NZ) &
+        +LeafPetoNonstElmConc_brch(ielmc,NB,NZ)*CPKI)))
       CNC=AZMAX1(AMIN1(1.0_r8 &
-        ,safe_adb(LeafPetoNonstructElmntConc_brch(ielmc,NB,NZ),LeafPetoNonstructElmntConc_brch(ielmc,NB,NZ) &
-        +LeafPetoNonstructElmntConc_brch(ielmn,NB,NZ)/CNKI)))
+        ,safe_adb(LeafPetoNonstElmConc_brch(ielmc,NB,NZ),LeafPetoNonstElmConc_brch(ielmc,NB,NZ) &
+        +LeafPetoNonstElmConc_brch(ielmn,NB,NZ)/CNKI)))
       CPC=AZMAX1(AMIN1(1.0_r8 &
-        ,safe_adb(LeafPetoNonstructElmntConc_brch(ielmc,NB,NZ),LeafPetoNonstructElmntConc_brch(ielmc,NB,NZ) &
-        +LeafPetoNonstructElmntConc_brch(ielmp,NB,NZ)/CPKI)))
+        ,safe_adb(LeafPetoNonstElmConc_brch(ielmc,NB,NZ),LeafPetoNonstElmConc_brch(ielmc,NB,NZ) &
+        +LeafPetoNonstElmConc_brch(ielmp,NB,NZ)/CPKI)))
     ELSE
       CCC=0._r8
       CNC=0._r8
@@ -1804,7 +1804,7 @@ module PlantBranchMod
 ! begin_execution
   associate(                              &
     TCelciusCanopy_pft                    =>  plt_ew%TCelciusCanopy_pft        , &
-    LeafPetoNonstructElmntConc_brch       =>  plt_biom%LeafPetoNonstructElmntConc_brch    , &
+    LeafPetoNonstElmConc_brch       =>  plt_biom%LeafPetoNonstElmConc_brch    , &
     GrainChemElms_brch                  =>  plt_biom%GrainChemElms_brch    , &
     ReserveElmnts_brch                    =>  plt_biom%ReserveElmnts_brch   , &
     ZEROP                                 =>  plt_biom%ZEROP     , &
@@ -1865,9 +1865,9 @@ module PlantBranchMod
 !   HourReprodNodeNumNormByMatrgrp_brch=change in reproductive node number normalized for maturity group
 !
   IF(iPlantCalendar_brch(ipltcal_Anthesis,NB,NZ).NE.0.AND.iPlantCalendar_brch(ipltcal_SetSeedMass,NB,NZ).EQ.0)THEN
-    SeedSET=AMIN1(LeafPetoNonstructElmntConc_brch(ielmc,NB,NZ)/(LeafPetoNonstructElmntConc_brch(ielmc,NB,NZ)+SETC) &
-      ,LeafPetoNonstructElmntConc_brch(ielmn,NB,NZ)/(LeafPetoNonstructElmntConc_brch(ielmn,NB,NZ)+SETN) &
-      ,LeafPetoNonstructElmntConc_brch(ielmp,NB,NZ)/(LeafPetoNonstructElmntConc_brch(ielmp,NB,NZ)+SETP))
+    SeedSET=AMIN1(LeafPetoNonstElmConc_brch(ielmc,NB,NZ)/(LeafPetoNonstElmConc_brch(ielmc,NB,NZ)+SETC) &
+      ,LeafPetoNonstElmConc_brch(ielmn,NB,NZ)/(LeafPetoNonstElmConc_brch(ielmn,NB,NZ)+SETN) &
+      ,LeafPetoNonstElmConc_brch(ielmp,NB,NZ)/(LeafPetoNonstElmConc_brch(ielmp,NB,NZ)+SETP))
 
     IF(TCelciusCanopy_pft(NZ).LT.TCelciusChill4Seed(NZ))THEN
       IF(iPlantCalendar_brch(ipltcal_BeginSeedFill,NB,NZ).EQ.0)THEN
@@ -2444,7 +2444,7 @@ module PlantBranchMod
     NonstructElmnt_brch             =>  plt_biom%NonstructElmnt_brch  , &
      RootMycoNonstructElmnt_vr      =>  plt_biom%RootMycoNonstructElmnt_vr  , &
     NonstructalElmnts_pft           =>  plt_biom%NonstructalElmnts_pft   , &
-    LeafPetoNonstructElmntConc_brch =>  plt_biom%LeafPetoNonstructElmntConc_brch  , &
+    LeafPetoNonstElmConc_brch =>  plt_biom%LeafPetoNonstElmConc_brch  , &
     LeafPetolBiomassC_brch          =>  plt_biom%LeafPetolBiomassC_brch   , &
     ZEROP                           =>  plt_biom%ZEROP   , &
     ReserveElmnts_brch              =>  plt_biom%ReserveElmnts_brch , &
@@ -2726,11 +2726,11 @@ module PlantBranchMod
       ReserveElmnts_brch(NE,NB,NZ)=ReserveElmnts_brch(NE,NB,NZ)-XFRE(NE)
       NonstructalElmnts_pft(NE,NZ)=NonstructalElmnts_pft(NE,NZ)+XFRE(NE)
     ENDDO
-    IF(LeafPetoNonstructElmntConc_brch(ielmc,NB,NZ).GT.ZEROP(NZ))THEN
-      CNL=LeafPetoNonstructElmntConc_brch(ielmc,NB,NZ)/(LeafPetoNonstructElmntConc_brch(ielmc,NB,NZ) &
-        +LeafPetoNonstructElmntConc_brch(ielmn,NB,NZ)/CNKI)
-      CPL=LeafPetoNonstructElmntConc_brch(ielmc,NB,NZ)/(LeafPetoNonstructElmntConc_brch(ielmc,NB,NZ) &
-        +LeafPetoNonstructElmntConc_brch(ielmp,NB,NZ)/CPKI)
+    IF(LeafPetoNonstElmConc_brch(ielmc,NB,NZ).GT.ZEROP(NZ))THEN
+      CNL=LeafPetoNonstElmConc_brch(ielmc,NB,NZ)/(LeafPetoNonstElmConc_brch(ielmc,NB,NZ) &
+        +LeafPetoNonstElmConc_brch(ielmn,NB,NZ)/CNKI)
+      CPL=LeafPetoNonstElmConc_brch(ielmc,NB,NZ)/(LeafPetoNonstElmConc_brch(ielmc,NB,NZ) &
+        +LeafPetoNonstElmConc_brch(ielmp,NB,NZ)/CPKI)
     ELSE
       CNL=0._r8
       CPL=0._r8
@@ -2871,7 +2871,7 @@ module PlantBranchMod
     GrossCO2Fix_pft                    =>  plt_bgcr%GrossCO2Fix_pft   , &
     CanopyPlusNoduRespC_pft            =>  plt_bgcr%CanopyPlusNoduRespC_pft   , &
     NonstructElmnt_brch                =>  plt_biom%NonstructElmnt_brch  , &
-    LeafPetoNonstructElmntConc_brch    =>  plt_biom%LeafPetoNonstructElmntConc_brch  , &
+    LeafPetoNonstElmConc_brch    =>  plt_biom%LeafPetoNonstElmConc_brch  , &
     ZERO                               => plt_site%ZERO     , &
     iPlantMorphologyType_pft           =>  plt_pheno%iPlantMorphologyType_pft , &
     fTgrowCanP                         =>  plt_pheno%fTgrowCanP   , &
@@ -2884,11 +2884,11 @@ module PlantBranchMod
 ! CCPOLB,CZPOLB,CPPOLB=nonstructural C,N,P concn in branch(g g-1)
 ! CNKI,CPKI=nonstruct N,P inhibn constant on growth(g N,P g-1 C)
 !
-  IF(LeafPetoNonstructElmntConc_brch(ielmc,NB,NZ).GT.ZERO)THEN
-    CNPG=AMIN1(LeafPetoNonstructElmntConc_brch(ielmn,NB,NZ)/(LeafPetoNonstructElmntConc_brch(ielmn,NB,NZ) &
-      +LeafPetoNonstructElmntConc_brch(ielmc,NB,NZ)*CNKI),LeafPetoNonstructElmntConc_brch(ielmp,NB,NZ) &
-      /(LeafPetoNonstructElmntConc_brch(ielmp,NB,NZ) &
-      +LeafPetoNonstructElmntConc_brch(ielmc,NB,NZ)*CPKI))
+  IF(LeafPetoNonstElmConc_brch(ielmc,NB,NZ).GT.ZERO)THEN
+    CNPG=AMIN1(LeafPetoNonstElmConc_brch(ielmn,NB,NZ)/(LeafPetoNonstElmConc_brch(ielmn,NB,NZ) &
+      +LeafPetoNonstElmConc_brch(ielmc,NB,NZ)*CNKI),LeafPetoNonstElmConc_brch(ielmp,NB,NZ) &
+      /(LeafPetoNonstElmConc_brch(ielmp,NB,NZ) &
+      +LeafPetoNonstElmConc_brch(ielmc,NB,NZ)*CPKI))
   ELSE
     CNPG=1.0_r8
   ENDIF
@@ -3030,7 +3030,7 @@ module PlantBranchMod
   real(r8) :: SNCRM
 ! begin_execution
   associate(                                                                            &
-    LeafPetoNonstructElmntConc_brch    =>  plt_biom%LeafPetoNonstructElmntConc_brch   , &
+    LeafPetoNonstElmConc_brch    =>  plt_biom%LeafPetoNonstElmConc_brch   , &
     NonstructElmnt_brch                =>  plt_biom%NonstructElmnt_brch   , &
     iPlantMorphologyType_pft           =>  plt_pheno%iPlantMorphologyType_pft  , &
     fTgrowRootP                        =>  plt_pheno%fTgrowRootP    , &
@@ -3052,11 +3052,11 @@ module PlantBranchMod
 ! CCPOLB,CZPOLB,CPPOLB=nonstructural C,N,P concn in branch
 ! CNKI,CPKI=nonstructural N,P inhibition constant on growth
 !
-  IF(LeafPetoNonstructElmntConc_brch(ielmc,NB,NZ).GT.ZERO)THEN
-    CNPG=AMIN1(LeafPetoNonstructElmntConc_brch(ielmn,NB,NZ)/(LeafPetoNonstructElmntConc_brch(ielmn,NB,NZ) &
-      +LeafPetoNonstructElmntConc_brch(ielmc,NB,NZ)*CNKI), &
-      LeafPetoNonstructElmntConc_brch(ielmp,NB,NZ)/(LeafPetoNonstructElmntConc_brch(ielmp,NB,NZ) &
-      +LeafPetoNonstructElmntConc_brch(ielmc,NB,NZ)*CPKI))
+  IF(LeafPetoNonstElmConc_brch(ielmc,NB,NZ).GT.ZERO)THEN
+    CNPG=AMIN1(LeafPetoNonstElmConc_brch(ielmn,NB,NZ)/(LeafPetoNonstElmConc_brch(ielmn,NB,NZ) &
+      +LeafPetoNonstElmConc_brch(ielmc,NB,NZ)*CNKI), &
+      LeafPetoNonstElmConc_brch(ielmp,NB,NZ)/(LeafPetoNonstElmConc_brch(ielmp,NB,NZ) &
+      +LeafPetoNonstElmConc_brch(ielmc,NB,NZ)*CPKI))
   ELSE
     CNPG=1.0_r8
   ENDIF

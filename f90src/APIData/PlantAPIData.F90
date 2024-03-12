@@ -470,7 +470,7 @@ implicit none
   real(r8), pointer :: RootProteinConc_pvr(:,:,:)  => null()    !root layer protein C concentration, [g g-1]
   real(r8), pointer ::  RootMycoNonstructElmnt_vr(:,:,:,:)=> null()    !root  layer nonstructural element, [g d-2]
   real(r8), pointer :: RootNonstructElementConcpft_vr(:,:,:,:)  => null()    !root  layer nonstructural C concentration, [g g-1]
-  real(r8), pointer :: LeafPetoNonstructElmntConc_brch(:,:,:)    => null()    !branch nonstructural C concentration, [g d-2]
+  real(r8), pointer :: LeafPetoNonstElmConc_brch(:,:,:)    => null()    !branch nonstructural C concentration, [g d-2]
   real(r8), pointer :: InternodeChemElm_brch(:,:,:,:)  => null()    !internode C, [g d-2]
   real(r8), pointer :: LeafElmntNode_brch(:,:,:,:)    => null()    !leaf element, [g d-2]
   real(r8), pointer :: LeafProteinCNode_brch(:,:,:)    => null()    !layer leaf protein C, [g d-2]
@@ -1317,7 +1317,7 @@ implicit none
   this%LeafChemElmByLayer_pft=spval
   allocate(this%StalkBiomassC_brch(MaxNumBranches,JP1));this%StalkBiomassC_brch=spval
   allocate(this%NoduleNonstructElmnt_brch(NumPlantChemElms,MaxNumBranches,JP1));this%NoduleNonstructElmnt_brch=spval
-  allocate(this%LeafPetoNonstructElmntConc_brch(NumPlantChemElms,MaxNumBranches,JP1));this%LeafPetoNonstructElmntConc_brch=spval
+  allocate(this%LeafPetoNonstElmConc_brch(NumPlantChemElms,MaxNumBranches,JP1));this%LeafPetoNonstElmConc_brch=spval
   allocate(this%RootStructElmnt_pft(NumPlantChemElms,JP1));this%RootStructElmnt_pft=spval
   allocate(this%WGLFT(NumOfCanopyLayers1));this%WGLFT=spval
   allocate(this%RootElmnts_pft(NumPlantChemElms,JP1));this%RootElmnts_pft=spval
@@ -1388,7 +1388,7 @@ implicit none
 !  if(allocated(StalkBiomassC_brch))deallocate(StalkBiomassC_brch)
 !  if(allocated(PPOOL))deallocate(PPOOL)
 !  if(allocated(NoduleNonstructElmnt_brch))deallocate(NoduleNonstructElmnt_brch)
-!  if(allocated(LeafPetoNonstructElmntConc_brch))deallocate(LeafPetoNonstructElmntConc_brch)
+!  if(allocated(LeafPetoNonstElmConc_brch))deallocate(LeafPetoNonstElmConc_brch)
 !  if(allocated(RootStructElmnt_pft))deallocate(RootStructElmnt_pft)
 !  if(allocated(WGLFT))deallocate(WGLFT)
 !  if(allocated(NonstructElmnt_brch))deallocate(NonstructElmnt_brch)
