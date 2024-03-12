@@ -107,7 +107,7 @@ implicit none
     ENDDO
   ENDDO
 
-  DO L=0,JZ
+  DO L=0,NL(NY,NX)
     RPOBX(L,NY,NX) =plt_bgcr%RPOBX(L)
     RP1BX(L,NY,NX) =plt_bgcr%RP1BX(L)
     RN3BX(L,NY,NX) =plt_bgcr%RN3BX(L)
@@ -128,7 +128,7 @@ implicit none
     ENDDO
   ENDDO
 
-  DO L=1,JZ
+  DO L=1,NL(NY,NX)
     RTDNT(L,NY,NX) =plt_morph%RTDNT(L)
     trcg_TLP(idg_beg:idg_end-1,L,NY,NX)=plt_rbgc%trcg_TLP(idg_beg:idg_end-1,L)
     trcg_air2root_flx_vr(idg_beg:idg_end-1,L,NY,NX)=plt_rbgc%trcg_air2root_flx_vr(idg_beg:idg_end-1,L)
@@ -290,7 +290,7 @@ implicit none
     iHarvstType_pft(NZ,I,NY,NX)=plt_distb%iHarvstType_pft(NZ)
     jHarvst_pft(NZ,I,NY,NX)=plt_distb%jHarvst_pft(NZ)
     THIN_pft(NZ,I,NY,NX) =plt_distb%THIN_pft(NZ)
-    DO L=1,JZ
+    DO L=1,NL(NY,NX)
       RootNodueChemElm_pvr(1:NumPlantChemElms,L,NZ,NY,NX) =plt_biom%RootNodueChemElm_pvr(1:NumPlantChemElms,L,NZ)
       RootNoduleNonstructElmnt_vr(1:NumPlantChemElms,L,NZ,NY,NX)=plt_biom%RootNoduleNonstructElmnt_vr(1:NumPlantChemElms,L,NZ)
       RootN2Fix_pvr(L,NZ,NY,NX) =plt_bgcr%RootN2Fix_pvr(L,NZ)
@@ -302,7 +302,7 @@ implicit none
       CanopyStemApft_lyr(L,NZ,NY,NX)=plt_morph%CanopyStemApft_lyr(L,NZ)
     ENDDO
 
-    DO L=0,JZ
+    DO L=0,NL(NY,NX)
       DO K=1,micpar%NumOfPlantLitrCmplxs
         DO M=1,jsken
           LitterFallChemElm_pvr(1:NumPlantChemElms,M,K,L,NZ,NY,NX)=plt_bgcr%LitterFallChemElm_pvr(1:NumPlantChemElms,M,K,L,NZ)
@@ -440,7 +440,7 @@ implicit none
       StandingDeadKCompChemElms_pft(1:NumPlantChemElms,M,NZ,NY,NX)=plt_biom%StandingDeadKCompChemElms_pft(1:NumPlantChemElms,M,NZ)
     ENDDO
 
-    DO  L=1,JZ
+    DO  L=1,NL(NY,NX)
       DO N=1,pltpar%jroots
          RootMycoNonstructElmnt_vr(1:NumPlantChemElms,N,L,NZ,NY,NX)=plt_biom%RootMycoNonstructElmnt_vr(1:NumPlantChemElms,N,L,NZ)
         RootNonstructElementConcpft_vr(1:NumPlantChemElms,N,L,NZ,NY,NX)=plt_biom%RootNonstructElementConcpft_vr(1:NumPlantChemElms,N,L,NZ)
@@ -531,8 +531,8 @@ implicit none
         Root1stChemElm(1:NumPlantChemElms,N,NR,NZ,NY,NX) =plt_biom%Root1stChemElm(1:NumPlantChemElms,N,NR,NZ)
         PrimRootDepth(N,NR,NZ,NY,NX) =plt_morph%PrimRootDepth(N,NR,NZ)
       ENDDO
-      DO L=1,JZ
-        DO N=1,2
+      DO L=1,NL(NY,NX)
+        DO N=1,MY(NZ,NY,NX)
           Root1stStructChemElm_pvr(1:NumPlantChemElms,N,L,NR,NZ,NY,NX) =plt_biom%Root1stStructChemElm_pvr(1:NumPlantChemElms,N,L,NR,NZ)
           Root2ndStructChemElm_pvr(1:NumPlantChemElms,N,L,NR,NZ,NY,NX) =plt_biom%Root2ndStructChemElm_pvr(1:NumPlantChemElms,N,L,NR,NZ)
           PrimRootLen(N,L,NR,NZ,NY,NX) =plt_morph%PrimRootLen(N,L,NR,NZ)
@@ -782,7 +782,7 @@ implicit none
     plt_pheno%GrainFillRateat25C_pft(NZ)=GrainFillRateat25C_pft(NZ,NY,NX)
     plt_biom%StandingDeadInitC_pft(NZ)=StandingDeadInitC_pft(NZ,NY,NX)
 
-!initial root values
+    !initial root values
     DO N=1,MY(NZ,NY,NX)
       plt_morph%Max1stRootRadius(N,NZ)=Max1stRootRadius(N,NZ,NY,NX)
       plt_morph%Max2ndRootRadius(N,NZ)=Max2ndRootRadius(N,NZ,NY,NX)
@@ -926,7 +926,7 @@ implicit none
     ENDDO
   ENDDO
 
-  DO L=0,JZ
+  DO L=0,NL(NY,NX)
     plt_bgcr%RPOBX(L)=RPOBX(L,NY,NX)
     plt_bgcr%RP1BX(L)=RP1BX(L,NY,NX)
     plt_bgcr%RN3BX(L)=RN3BX(L,NY,NX)
@@ -946,7 +946,7 @@ implicit none
       ENDDO
     ENDDO
   ENDDO
-  DO L=1,JZ
+  DO L=1,NL(NY,NX)
     plt_rbgc%trcs_plant_uptake_vr(ids_beg:ids_end,L)=trcs_plant_uptake_vr(ids_beg:ids_end,L,NY,NX)
     plt_morph%RTDNT(L)=RTDNT(L,NY,NX)
     plt_rbgc%trcg_TLP(idg_beg:idg_end-1,L)=trcg_TLP(idg_beg:idg_end-1,L,NY,NX)
@@ -1045,7 +1045,6 @@ implicit none
     plt_distb%iDayPlantHarvest_pft(NZ)=iDayPlantHarvest_pft(NZ,NY,NX)
     plt_distb%iYearPlantHarvest_pft(NZ)=iYearPlantHarvest_pft(NZ,NY,NX)
 
-
     plt_distb%HVST(NZ) =HVST(NZ,I,NY,NX)
     plt_distb%iHarvstType_pft(NZ)=iHarvstType_pft(NZ,I,NY,NX)
     plt_distb%jHarvst_pft(NZ)=jHarvst_pft(NZ,I,NY,NX)
@@ -1130,7 +1129,7 @@ implicit none
 
     DO L=1,NL(NY,NX)
       DO K=1,jcplx
-        DO N=1,2
+        DO N=1,MY(NZ,NY,NX)
           DO NE=1,NumPlantChemElms
             plt_rbgc%RDFOME(NE,N,K,L,NZ)=RDFOME(NE,N,K,L,NZ,NY,NX)
           ENDDO
