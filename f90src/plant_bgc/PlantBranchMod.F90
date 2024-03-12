@@ -2468,7 +2468,7 @@ module PlantBranchMod
     HourCounter4LeafOut_brch        =>   plt_pheno%HourCounter4LeafOut_brch  , &
     NGTopRootLayer_pft              =>   plt_morph%NGTopRootLayer_pft   , &
     NumOfMainBranch_pft             =>  plt_morph%NumOfMainBranch_pft    , &
-    NI                              =>  plt_morph%NI       &
+    MaxSoiL4Root                    =>  plt_morph%MaxSoiL4Root      &
   )
 !   TRANSFER C,N,P FROM SEASONAL STORAGE TO SHOOT AND ROOT
 !   NON-STRUCTURAL C DURING SEED GERMINATION OR LEAFOUT
@@ -2481,7 +2481,7 @@ module PlantBranchMod
     .AND.Hours4LeafOff_brch(NB,NZ).LT.FracHour4LeafoffRemob(iPlantPhenologyType_pft(NZ))*HourThreshold4LeafOff_brch(NB,NZ)))THEN
     TotPopuPlantRootC=0._r8
     TotPopuPlantRootNonstructElmnt(ielmc)=0._r8
-    D4: DO L=NU,NI(NZ)
+    D4: DO L=NU,MaxSoiL4Root(NZ)
       TotPopuPlantRootC=TotPopuPlantRootC+AZMAX1(PopuPlantRootC_vr(ipltroot,L,NZ))
       TotPopuPlantRootNonstructElmnt(ielmc)=TotPopuPlantRootNonstructElmnt(ielmc)+&
         AZMAX1(RootMycoNonstructElmnt_vr(ielmc,ipltroot,L,NZ))
@@ -2548,7 +2548,7 @@ module PlantBranchMod
             *FXSH(iPlantPhenologyPattern_pft(NZ))
 !          write(101,*)'LEAFOUTNonstructElmnt_brch',NonstructElmnt_brch(ielmc,NB,NZ),NB,NZ
           IF(TotPopuPlantRootC.GT.ZEROP(NZ).AND.TotPopuPlantRootNonstructElmnt(ielmc).GT.ZEROP(NZ))THEN
-            D50: DO L=NU,NI(NZ)
+            D50: DO L=NU,MaxSoiL4Root(NZ)
               FXFC=AZMAX1( PopuPlantRootC_vr(ipltroot,L,NZ))/TotPopuPlantRootC
                RootMycoNonstructElmnt_vr(ielmc,ipltroot,L,NZ)=RootMycoNonstructElmnt_vr(ielmc,ipltroot,L,NZ)&
                  +FXFC*CH2OH*FXRT(iPlantPhenologyPattern_pft(NZ))
@@ -2608,7 +2608,7 @@ module PlantBranchMod
 
       DO NE=1,NumPlantChemElms
         TotPopuPlantRootNonstructElmnt(NE)=0._r8
-        D3: DO L=NU,NI(NZ)
+        D3: DO L=NU,MaxSoiL4Root(NZ)
           TotPopuPlantRootNonstructElmnt(NE)=TotPopuPlantRootNonstructElmnt(NE)+ &
             AZMAX1(RootMycoNonstructElmnt_vr(NE,ipltroot,L,NZ))
         ENDDO D3
@@ -2648,7 +2648,7 @@ module PlantBranchMod
       NonstructElmnt_brch(ielmn,NB,NZ)=NonstructElmnt_brch(ielmn,NB,NZ)+NXferStore2Shoot
       NonstructElmnt_brch(ielmp,NB,NZ)=NonstructElmnt_brch(ielmp,NB,NZ)+PXferStore2Shoot
       IF(TotPopuPlantRootC.GT.ZEROP(NZ).AND.TotPopuPlantRootNonstructElmnt(ielmc).GT.ZEROP(NZ))THEN
-        D51: DO L=NU,NI(NZ)
+        D51: DO L=NU,MaxSoiL4Root(NZ)
           FXFN=AZMAX1(RootMycoNonstructElmnt_vr(ielmc,ipltroot,L,NZ))/TotPopuPlantRootNonstructElmnt(ielmc)
           RootMycoNonstructElmnt_vr(ielmn,ipltroot,L,NZ)=RootMycoNonstructElmnt_vr(ielmn,ipltroot,L,NZ)&
             +FXFN*UPNH4R
@@ -2791,7 +2791,7 @@ module PlantBranchMod
     IF(iPlantPhenologyPattern_pft(NZ).EQ.iplt_annual.AND.&
       iPlantCalendar_brch(ipltcal_SetSeedNumber,NB,NZ).NE.0)THEN
       !stalk-root transfer
-      D2050: DO L=NU,NI(NZ)
+      D2050: DO L=NU,MaxSoiL4Root(NZ)
         IF(VLSoilPoreMicP(L).GT.ZEROS2)THEN
           WTRTRX=AMAX1(ZEROP(NZ),RootStructBiomC_vr(ipltroot,L,NZ)*FWODRE(ielmc,k_woody_litr))
           WTPLTX=WTRTRX+StalkBiomassC_brch(NB,NZ)

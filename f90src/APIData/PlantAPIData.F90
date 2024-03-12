@@ -221,7 +221,7 @@ implicit none
   real(r8), pointer :: CanopyStemA_pft(:)        => null() !plant stem area, [m2 d-2]
   real(r8), pointer :: CanopyLeafArea_pft(:)        => null() !plant canopy leaf area, [m2 d-2]
   integer,  pointer :: NumOfMainBranch_pft(:)          => null() !number of main branch
-  integer,  pointer :: NI(:)           => null() !maximum soil layer number for all root axes
+  integer,  pointer :: MaxSoiL4Root(:)           => null() !maximum soil layer number for all root axes
   integer,  pointer :: NIXBotRootLayer_pft(:)          => null() !maximum soil layer number for all root axes, [-]
   integer,  pointer :: NumRootAxes_pft(:)          => null() !root primary axis number
   integer,  pointer :: NumConCurrentGrowinNode(:)         => null() !number of concurrently growing nodes
@@ -1888,7 +1888,7 @@ implicit none
   allocate(this%StemAreaZsec_brch(NumOfLeafZenithSectors1,NumOfCanopyLayers1,MaxNumBranches,JP1));this%StemAreaZsec_brch=spval
   allocate(this%CanopyLeafAreaByLayer_pft(NumOfCanopyLayers1,0:MaxNodesPerBranch1,MaxNumBranches,JP1));this%CanopyLeafAreaByLayer_pft=spval
   allocate(this%CanopyBranchStemApft_lyr(NumOfCanopyLayers1,MaxNumBranches,JP1));this%CanopyBranchStemApft_lyr=spval
-  allocate(this%NI(JP1));this%NI=0
+  allocate(this%MaxSoiL4Root(JP1));this%MaxSoiL4Root=0
   allocate(this%SeedNumberSet_brch(MaxNumBranches,JP1));this%SeedNumberSet_brch=spval
   allocate(this%ClumpFactor(JP1));this%ClumpFactor=spval
   allocate(this%RootVolPerMassC_pft(jroots,JP1));this%RootVolPerMassC_pft=spval

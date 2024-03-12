@@ -212,7 +212,7 @@ implicit none
     BranchNumber_pft(NZ,NY,NX)   =plt_morph%BranchNumber_pft(NZ)
     NumOfBranches_pft(NZ,NY,NX)   =plt_morph%NumOfBranches_pft(NZ)
     NumRootAxes_pft(NZ,NY,NX)   =plt_morph%NumRootAxes_pft(NZ)
-    NI(NZ,NY,NX)    =plt_morph%NI(NZ)
+    MaxSoiL4Root(NZ,NY,NX)    =plt_morph%MaxSoiL4Root(NZ)
     NGTopRootLayer_pft(NZ,NY,NX)    =plt_morph%NGTopRootLayer_pft(NZ)
     NumOfMainBranch_pft(NZ,NY,NX)   =plt_morph%NumOfMainBranch_pft(NZ)
     NumConCurrentGrowinNode(NZ,NY,NX)  =plt_morph%NumConCurrentGrowinNode(NZ)
@@ -545,7 +545,7 @@ implicit none
     EHVST(1:2,1:4,NZ,I,NY,NX)=plt_distb%EHVST(1:2,1:4,NZ)
 
 
-    DO L=NU(NY,NX),NI(NZ,NY,NX)
+    DO L=NU(NY,NX),MaxSoiL4Root(NZ,NY,NX)
 
       DO K=1,jcplx
         DO N=1,2
@@ -1070,7 +1070,7 @@ implicit none
     plt_morph%HypoctoHeight_pft(NZ)=HypoctoHeight_pft(NZ,NY,NX)
     plt_rbgc%PlantRootSoilChemNetX_pft(1:NumPlantChemElms,NZ)=PlantRootSoilChemNetX_pft(1:NumPlantChemElms,NZ,NY,NX)
     plt_morph%CanPHeight4WatUptake(NZ)=CanPHeight4WatUptake(NZ,NY,NX)
-    plt_morph%NI(NZ)   =NI(NZ,NY,NX)
+    plt_morph%MaxSoiL4Root(NZ)   =MaxSoiL4Root(NZ,NY,NX)
     plt_photo%CanopyBndlResist_pft(NZ)   =CanopyBndlResist_pft(NZ,NY,NX)
     plt_photo%CanPStomaResistH2O_pft(NZ)   =CanPStomaResistH2O_pft(NZ,NY,NX)
     plt_ew%TKC(NZ)     =TKC(NZ,NY,NX)
