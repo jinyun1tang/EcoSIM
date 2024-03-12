@@ -492,7 +492,7 @@ module PlantBranchMod
     TCelciusChill4Seed    =>  plt_pheno%TCelciusChill4Seed      , &
     NH3Dep2_brch   =>  plt_rbgc%NH3Dep2_brch      , &
     CO2NetFix_pft    =>  plt_bgcr%CO2NetFix_pft       , &
-    SNL1    =>  plt_morph%SNL1      , &
+    NodeLenPergC    =>  plt_morph%NodeLenPergC      , &
     CanopyLeafArea_pft   =>  plt_morph%CanopyLeafArea_pft     , &
     NumOfMainBranch_pft     =>  plt_morph%NumOfMainBranch_pft         &
   )
@@ -679,7 +679,7 @@ module PlantBranchMod
 !     CHECK PARTITIONING COEFFICIENTS
 !
   D1000: DO N=1,NumOfPlantMorphUnits
-    IF(N.EQ.ibrch_stalk.AND.isclose(SNL1(NZ),0._r8))THEN
+    IF(N.EQ.ibrch_stalk.AND.isclose(NodeLenPergC(NZ),0._r8))THEN
       PART(N)=0._r8
     ELSE
       PART(N)=AZMAX1(PART(N))
@@ -3374,7 +3374,7 @@ module PlantBranchMod
 
   associate(                                                       &
     NumConCurrentGrowinNode      =>   plt_morph%NumConCurrentGrowinNode,    &  
-    SNL1                         =>   plt_morph%SNL1    , &      
+    NodeLenPergC                         =>   plt_morph%NodeLenPergC    , &      
     SineBranchAngle_pft          =>   plt_morph%SineBranchAngle_pft   , &    
     InternodeHeightDying_brch    =>   plt_morph%InternodeHeightDying_brch  , &
     InternodeHeightLive_brch     =>   plt_morph%InternodeHeightLive_brch  , &    
@@ -3408,13 +3408,13 @@ module PlantBranchMod
 !
 !     SpecLenStalkGrowth=specific length of stalk growth
 !     ETOL=coefficient for etoliation effects on expansion,extension
-!     SNL1=growth in stalk length vs mass from PFT file
+!     NodeLenPergC=growth in stalk length vs mass from PFT file
 !     SNL2=parameter for calculating stalk extension
 !     WTSKB=stalk C mass
 !     PP=PFT population
 !     StalkLenGrowth,GRO=stalk length,mass growth
 !
-    SpecLenStalkGrowth=ETOL*SNL1(NZ)*(StalkChemElms_brch(ielmc,NB,NZ)/PlantPopulation_pft(NZ))**SNL2
+    SpecLenStalkGrowth=ETOL*NodeLenPergC(NZ)*(StalkChemElms_brch(ielmc,NB,NZ)/PlantPopulation_pft(NZ))**SNL2
     StalkLenGrowth=GrowthChemElmt(ielmc)/PlantPopulation_pft(NZ)*SpecLenStalkGrowth
     KX=pMOD(MNNOD-1,MaxNodesPerBranch1)
 
