@@ -55,7 +55,7 @@ implicit none
   real(r8),target,allocatable ::  HydroSubsDINFlx_col(:,:)                         !total subsurface DIN flux, [g d-2]
   real(r8),target,allocatable ::  HydroSufDIPFlx_col(:,:)                         !total surface DIP flux, [g d-2]
   real(r8),target,allocatable ::  HydroSubsDIPFlx_col(:,:)                         !total subsurface DIP flux, [g d-2]
-  real(r8),target,allocatable ::  StandingDeadChemElmnt_col(:,:,:)                        !total standing dead C, [g d-2]
+  real(r8),target,allocatable ::  StandingDeadChemElm_col(:,:,:)                        !total standing dead C, [g d-2]
   real(r8),target,allocatable ::  ZDRAIN(:,:)                        !total N drainage below root zone, [g d-2]
   real(r8),target,allocatable ::  PDRAIN(:,:)                        !total P drainage below root zone, [g d-2]
   real(r8),target,allocatable ::  UION(:,:)                          !total soil ion content, [mol d-2]
@@ -158,7 +158,7 @@ implicit none
   allocate(HydroSubsDINFlx_col(JY,JX));       HydroSubsDINFlx_col=0._r8
   allocate(HydroSufDIPFlx_col(JY,JX));       HydroSufDIPFlx_col=0._r8
   allocate(HydroSubsDIPFlx_col(JY,JX));       HydroSubsDIPFlx_col=0._r8
-  allocate(StandingDeadChemElmnt_col(NumPlantChemElms,JY,JX));      StandingDeadChemElmnt_col=0._r8
+  allocate(StandingDeadChemElm_col(NumPlantChemElms,JY,JX));      StandingDeadChemElm_col=0._r8
   allocate(ZDRAIN(JY,JX));      ZDRAIN=0._r8
   allocate(PDRAIN(JY,JX));      PDRAIN=0._r8
   allocate(UION(JY,JX));        UION=0._r8
@@ -251,7 +251,7 @@ implicit none
   call destroy(HydroSubsDINFlx_col)
   call destroy(HydroSufDIPFlx_col)
   call destroy(HydroSubsDIPFlx_col)
-  call destroy(StandingDeadChemElmnt_col)
+  call destroy(StandingDeadChemElm_col)
   call destroy(ZDRAIN)
   call destroy(PDRAIN)
   call destroy(UION)

@@ -1297,7 +1297,7 @@ module NutUptakeMod
   associate(                              &
     RDOM_micb_flx    =>  plt_bgcr%RDOM_micb_flx     , &
     RDFOME   =>  plt_rbgc%RDFOME    , &
-    RootExudChemElmnt_pft    =>  plt_rbgc%RootExudChemElmnt_pft     , &
+    RootExudChemElm_pft    =>  plt_rbgc%RootExudChemElm_pft     , &
     RootHPO4Uptake_pft    =>  plt_rbgc%RootHPO4Uptake_pft     , &
     RootH2PO4Uptake_pft    =>  plt_rbgc%RootH2PO4Uptake_pft     , &
     RootNH4Uptake_pft    =>  plt_rbgc%RootNH4Uptake_pft     , &
@@ -1314,9 +1314,9 @@ module NutUptakeMod
   !     RootNH4Uptake_pft,RootNO3Uptake_pft,RootH2PO4Uptake_pft,RootHPO4Uptake_pft=PFT uptake of NH4,NO3,H2PO4,HPO4
   !
   D295: DO K=1,jcplx
-    RootExudChemElmnt_pft(ielmc,NZ)=RootExudChemElmnt_pft(ielmc,NZ)+RDFOME(ielmc,N,K,L,NZ)
-    RootExudChemElmnt_pft(ielmn,NZ)=RootExudChemElmnt_pft(ielmn,NZ)+RDFOME(ielmn,N,K,L,NZ)
-    RootExudChemElmnt_pft(ielmp,NZ)=RootExudChemElmnt_pft(ielmp,NZ)+RDFOME(ielmp,N,K,L,NZ)
+    RootExudChemElm_pft(ielmc,NZ)=RootExudChemElm_pft(ielmc,NZ)+RDFOME(ielmc,N,K,L,NZ)
+    RootExudChemElm_pft(ielmn,NZ)=RootExudChemElm_pft(ielmn,NZ)+RDFOME(ielmn,N,K,L,NZ)
+    RootExudChemElm_pft(ielmp,NZ)=RootExudChemElm_pft(ielmp,NZ)+RDFOME(ielmp,N,K,L,NZ)
     RDOM_micb_flx(idom_doc,K,L)=RDOM_micb_flx(idom_doc,K,L)-RDFOME(ielmc,N,K,L,NZ)
     RDOM_micb_flx(idom_don,K,L)=RDOM_micb_flx(idom_don,K,L)-RDFOME(ielmn,N,K,L,NZ)
     RDOM_micb_flx(idom_dop,K,L)=RDOM_micb_flx(idom_dop,K,L)-RDFOME(ielmp,N,K,L,NZ)

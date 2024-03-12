@@ -74,10 +74,10 @@ module RootDataType
   real(r8),target,allocatable ::  RootElmnts_pft(:,:,:,:)                     !plant root element, [g d-2]
   real(r8),target,allocatable ::  RootStructElmnt_pft(:,:,:,:)                    !plant root structural element, [g d-2]
   real(r8),target,allocatable ::  RootProteinC_pvr(:,:,:,:,:)                   !root layer protein C, [g d-2]
-  real(r8),target,allocatable ::  Root1stStructChemElmnt_pvr(:,:,:,:,:,:,:)              !root layer element primary axes, [g d-2]
-  real(r8),target,allocatable ::  Root2ndStructChemElmnt_pvr(:,:,:,:,:,:,:)              !root layer element secondary axes, [g d-2]
+  real(r8),target,allocatable ::  Root1stStructChemElm_pvr(:,:,:,:,:,:,:)              !root layer element primary axes, [g d-2]
+  real(r8),target,allocatable ::  Root2ndStructChemElm_pvr(:,:,:,:,:,:,:)              !root layer element secondary axes, [g d-2]
   real(r8),target,allocatable ::   PopuPlantRootC_vr(:,:,:,:,:)                   !root layer C, [g d-2]
-  real(r8),target,allocatable ::  RootNodueChemElmnt_pvr(:,:,:,:,:)                  !root layer nodule element, [g d-2]
+  real(r8),target,allocatable ::  RootNodueChemElm_pvr(:,:,:,:,:)                  !root layer nodule element, [g d-2]
   real(r8),target,allocatable ::  NoduleChemElms_pft(:,:,:,:)                     !root total nodule mass, [g d-2]
   real(r8),target,allocatable ::  RootStructBiomC_vr(:,:,:,:,:)                   !root layer structural C, [g d-2]
   real(r8),target,allocatable ::   RootMycoNonstructElmnt_vr(:,:,:,:,:,:)                !root  layer nonstructural element, [g d-2]
@@ -156,10 +156,10 @@ contains
   allocate(RootElmnts_pft(NumPlantChemElms,JP,JY,JX)); RootElmnts_pft=0._r8
   allocate(RootStructElmnt_pft(NumPlantChemElms,JP,JY,JX));   RootStructElmnt_pft=0._r8
   allocate(RootProteinC_pvr(jroots,JZ,JP,JY,JX));RootProteinC_pvr=0._r8
-  allocate(Root1stStructChemElmnt_pvr(NumPlantChemElms,jroots,JZ,NumOfCanopyLayers,JP,JY,JX));Root1stStructChemElmnt_pvr=0._r8
-  allocate(Root2ndStructChemElmnt_pvr(NumPlantChemElms,jroots,JZ,NumOfCanopyLayers,JP,JY,JX));Root2ndStructChemElmnt_pvr=0._r8
+  allocate(Root1stStructChemElm_pvr(NumPlantChemElms,jroots,JZ,NumOfCanopyLayers,JP,JY,JX));Root1stStructChemElm_pvr=0._r8
+  allocate(Root2ndStructChemElm_pvr(NumPlantChemElms,jroots,JZ,NumOfCanopyLayers,JP,JY,JX));Root2ndStructChemElm_pvr=0._r8
   allocate( PopuPlantRootC_vr(jroots,JZ,JP,JY,JX)); PopuPlantRootC_vr=0._r8
-  allocate(RootNodueChemElmnt_pvr(NumPlantChemElms,JZ,JP,JY,JX)); RootNodueChemElmnt_pvr=0._r8
+  allocate(RootNodueChemElm_pvr(NumPlantChemElms,JZ,JP,JY,JX)); RootNodueChemElm_pvr=0._r8
   allocate(NoduleChemElms_pft(NumPlantChemElms,JP,JY,JX));  NoduleChemElms_pft=0._r8
   allocate(RootStructBiomC_vr(jroots,JZ,JP,JY,JX));RootStructBiomC_vr=0._r8
   allocate(RootMycoNonstructElmnt_vr(NumPlantChemElms,jroots,JZ,JP,JY,JX)); RootMycoNonstructElmnt_vr=0._r8
@@ -236,10 +236,10 @@ contains
   call destroy(RootElmnts_pft)
   call destroy(RootStructElmnt_pft)
   call destroy(RootProteinC_pvr)
-  call destroy(Root1stStructChemElmnt_pvr)
-  call destroy(Root2ndStructChemElmnt_pvr)
+  call destroy(Root1stStructChemElm_pvr)
+  call destroy(Root2ndStructChemElm_pvr)
   call destroy( PopuPlantRootC_vr)
-  call destroy(RootNodueChemElmnt_pvr)
+  call destroy(RootNodueChemElm_pvr)
   call destroy(NoduleChemElms_pft)
   call destroy(RootStructBiomC_vr)
   call destroy(RootMycoNonstructElmnt_vr)
