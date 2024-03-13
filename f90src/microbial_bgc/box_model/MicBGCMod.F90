@@ -467,6 +467,11 @@ module MicBGCMod
   ENDDO D690
 
   K=jcplx+1
+  TOMK(K)=0.0_r8
+  TONK(K)=0.0_r8
+  TOPK(K)=0.0_r8
+  TONX(K)=0.0_r8
+  TOPX(K)=0.0_r8  
   DO N=1,NumMicbFunGroups
     DO NGL=JGniA(N),JGnfA(N)
       if(OMAff(NGL)>ZEROS)then
