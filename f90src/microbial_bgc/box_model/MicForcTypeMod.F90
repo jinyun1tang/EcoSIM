@@ -1,6 +1,7 @@
 module MicForcTypeMod
 
   use data_kind_mod, only : r8 => DAT_KIND_R8
+  use data_const_mod, only : spval => DAT_CONST_SPVAL   
   use EcoSiMParDataMod, only : micpar
   use EcoSIMSolverPar, only : NPH
   use abortutils, only : destroy
@@ -95,16 +96,16 @@ module MicForcTypeMod
   class(micforctype) :: this
   integer :: jcplx
   jcplx=micpar%jcplx
-  allocate(this%CFOMC(1:micpar%ndbiomcp))
-  allocate(this%CFOMCU(1:micpar%ndbiomcp))
-  allocate(this%ROQCY(1:jcplx))
-  allocate(this%ROQAY(1:jcplx))
-  allocate(this%VLWatMicPM(NPH))
-  allocate(this%THETPM(NPH))
-  allocate(this%FILM(NPH))
-  allocate(this%TortMicPM(NPH))
-  allocate(this%VLsoiAirPM(NPH))
-  allocate(this%DiffusivitySolutEff(NPH))
+  allocate(this%CFOMC(1:micpar%ndbiomcp));this%CFOMC=spval
+  allocate(this%CFOMCU(1:micpar%ndbiomcp));this%CFOMCU=spval
+  allocate(this%ROQCY(1:jcplx));this%ROQCY=spval
+  allocate(this%ROQAY(1:jcplx));this%ROQAY=spval
+  allocate(this%VLWatMicPM(NPH));this%VLWatMicPM=spval
+  allocate(this%THETPM(NPH));this%THETPM=spval
+  allocate(this%FILM(NPH));this%FILM=spval
+  allocate(this%TortMicPM(NPH));this%TortMicPM=spval
+  allocate(this%VLsoiAirPM(NPH));this%VLsoiAirPM=spval
+  allocate(this%DiffusivitySolutEff(NPH));this%DiffusivitySolutEff=spval
   end subroutine Init
 !------------------------------------------------------------------------------------------
 

@@ -454,11 +454,13 @@ module MicBGCMod
     TOPX(K)=0.0_r8
     D685: DO N=1,NumMicbFunGroups
       DO NGL=JGnio(N),JGnfo(N)
-        TOMK(K)=TOMK(K)+OMA(NGL,K)
-        TONK(K)=TONK(K)+OMA(NGL,K)*CNOMA(NGL,K)
-        TOPK(K)=TOPK(K)+OMA(NGL,K)*CPOMA(NGL,K)
-        TONX(K)=TONX(K)+OMA(NGL,K)*rNCOMC(1,NGL,K)   !maximum total N in active micb
-        TOPX(K)=TOPX(K)+OMA(NGL,K)*rPCOMC(1,NGL,K)   !maximum total P in active micb
+        if(OMA(NGL,K)>ZEROS)THEN
+          TOMK(K)=TOMK(K)+OMA(NGL,K)
+          TONK(K)=TONK(K)+OMA(NGL,K)*CNOMA(NGL,K)
+          TOPK(K)=TOPK(K)+OMA(NGL,K)*CPOMA(NGL,K)
+          TONX(K)=TONX(K)+OMA(NGL,K)*rNCOMC(1,NGL,K)   !maximum total N in active micb
+          TOPX(K)=TOPX(K)+OMA(NGL,K)*rPCOMC(1,NGL,K)   !maximum total P in active micb
+        ENDIF
       ENDDO
     ENDDO D685
   ENDDO D690
@@ -466,11 +468,13 @@ module MicBGCMod
   K=jcplx+1
   DO N=1,NumMicbFunGroups
     DO NGL=JGniA(N),JGnfA(N)
-      TOMK(K)=TOMK(K)+OMAff(NGL)
-      TONK(K)=TONK(K)+OMAff(NGL)*CNOMAff(NGL)
-      TOPK(K)=TOPK(K)+OMAff(NGL)*CPOMAff(NGL)
-      TONX(K)=TONX(K)+OMAff(NGL)*rNCOMCff(1,NGL)   !maximum total N in active micb
-      TOPX(K)=TOPX(K)+OMAff(NGL)*rPCOMCff(1,NGL)   !maximum total P in active micb
+      if(OMAff(NGL)>ZEROS)then
+        TOMK(K)=TOMK(K)+OMAff(NGL)      
+        TONK(K)=TONK(K)+OMAff(NGL)*CNOMAff(NGL)
+        TOPK(K)=TOPK(K)+OMAff(NGL)*CPOMAff(NGL)
+        TONX(K)=TONX(K)+OMAff(NGL)*rNCOMCff(1,NGL)   !maximum total N in active micb
+        TOPX(K)=TOPX(K)+OMAff(NGL)*rPCOMCff(1,NGL)   !maximum total P in active micb
+      endif
     ENDDO
   ENDDO
 
