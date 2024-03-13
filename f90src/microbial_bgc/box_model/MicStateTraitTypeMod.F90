@@ -1,6 +1,7 @@
 module MicStateTraitTypeMod
 
   use data_kind_mod, only : r8 => DAT_KIND_R8
+  use data_const_mod, only : spval => DAT_CONST_SPVAL     
   use EcoSiMParDataMod, only : micpar
   use TracerIDMod
   use abortutils, only : destroy
@@ -103,16 +104,16 @@ implicit none
   NumMicrbHetetrophCmplx=>micpar%NumMicrbHetetrophCmplx
   NumLiveHeterBioms => micpar%NumLiveHeterBioms
 
-  allocate(this%FOSRH(1:jcplx))
-  allocate(this%DOM(idom_beg:idom_end,1:jcplx))
-  allocate(this%OHM(idom_beg:idom_end,1:jcplx))
-  allocate(this%OSA(jsken,1:jcplx))
-  allocate(this%OSM(NumPlantChemElms,jsken,1:jcplx))
-  allocate(this%ORM(1:NumPlantChemElms,ndbiomcp,1:jcplx))
-  allocate(this%CNOSC(jsken,1:jcplx))
-  allocate(this%CPOSC(jsken,1:jcplx))
-  allocate(this%OMEhetr(NumPlantChemElms,NumLiveHeterBioms,1:jcplx))
-  allocate(this%OMEauto(NumPlantChemElms,NumLiveAutoBioms))
+  allocate(this%FOSRH(1:jcplx));this%FOSRH=spval
+  allocate(this%DOM(idom_beg:idom_end,1:jcplx));this%DOM=spval
+  allocate(this%OHM(idom_beg:idom_end,1:jcplx));this%OHM=spval
+  allocate(this%OSA(jsken,1:jcplx));this%OSA=spval
+  allocate(this%OSM(NumPlantChemElms,jsken,1:jcplx));this%OSM=spval
+  allocate(this%ORM(1:NumPlantChemElms,ndbiomcp,1:jcplx));this%ORM=spval
+  allocate(this%CNOSC(jsken,1:jcplx));this%CNOSC=spval
+  allocate(this%CPOSC(jsken,1:jcplx));this%CPOSC=spval
+  allocate(this%OMEhetr(NumPlantChemElms,NumLiveHeterBioms,1:jcplx));this%OMEhetr=spval
+  allocate(this%OMEauto(NumPlantChemElms,NumLiveAutoBioms));this%OMEauto=spval
 
   end subroutine Init
 
