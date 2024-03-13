@@ -269,14 +269,12 @@ module RootGasMod
         RTARRX=RootAreaDivRadius_vr(N,L)/RRADS
         do NTG=idg_beg,idg_end-1
           DIFLGas(NTG)=THETM*SolDifc_loc(NTG)*RTARRX
+          if(NTG/=idg_O2 .and. NTG/=idg_CO2)then
+            trc_gasml_loc(NTG)=trc_gascl_vr(NTG,L)*VLsoiAirPMM
+          endif          
         enddo
         DIFLGas(idg_NH3)=DIFLGas(idg_NH3)*trcs_VLN_vr(ids_NH4,L)
         DIFLGas(idg_NH3B)=DIFLGas(idg_NH3)*trcs_VLN_vr(ids_NH4B,L)
-
-        trc_gasml_loc(idg_CH4)=trc_gascl_vr(idg_CH4,L)*VLsoiAirPMM
-        trc_gasml_loc(idg_N2O)=trc_gascl_vr(idg_N2O,L)*VLsoiAirPMM
-        trc_gasml_loc(idg_NH3)=trc_gascl_vr(idg_NH3,L)*VLsoiAirPMM
-        trc_gasml_loc(idg_H2)=trc_gascl_vr(idg_H2,L)*VLsoiAirPMM
 
         DO NTG=idg_beg,idg_end
           VOLWSolute(NTG)=VLWatMicPMM*GasSolbility_vr(NTG,L)

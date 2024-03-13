@@ -1,6 +1,7 @@
 module MicFluxTypeMod
 
   use data_kind_mod, only : r8 => DAT_KIND_R8
+  use data_const_mod, only : spval => DAT_CONST_SPVAL     
   use EcoSiMParDataMod, only : micpar
   use EcoSIMSolverPar, only : NPH
   use abortutils, only : destroy
@@ -95,47 +96,48 @@ implicit none
   NumMicbFunGroups=micpar%NumMicbFunGroups
   NumMicrbHetetrophCmplx=micpar%NumMicrbHetetrophCmplx
   NumMicrobAutotrophCmplx=micpar%NumMicrobAutotrophCmplx
-  allocate(this%ROXSK(NPH));this%ROXSK = 0._r8
-  allocate(this%RDOM_micb_flx(idom_beg:idom_end,1:jcplx));this%RDOM_micb_flx=0._r8
-  allocate(this%ROXYS(NumMicrbHetetrophCmplx,1:jcplx));this%ROXYS=0._r8
-  allocate(this%ROQCS(NumMicrbHetetrophCmplx,1:jcplx));this%ROQCS=0._r8
-  allocate(this%ROQAS(NumMicrbHetetrophCmplx,1:jcplx));this%ROQAS=0._r8
-  allocate(this%RVMX3(NumMicrbHetetrophCmplx,1:jcplx));this%RVMX3=0._r8
-  allocate(this%RVMB3(NumMicrbHetetrophCmplx,1:jcplx));this%RVMB3=0._r8
-  allocate(this%RVMX2(NumMicrbHetetrophCmplx,1:jcplx));this%RVMX2=0._r8
-  allocate(this%RVMB2(NumMicrbHetetrophCmplx,1:jcplx));this%RVMB2=0._r8
-  allocate(this%RVMX1(NumMicrbHetetrophCmplx,1:jcplx));this%RVMX1=0._r8
-  allocate(this%RVMX4(NumMicrbHetetrophCmplx,1:jcplx));this%RVMX4=0._r8
-  allocate(this%RVMB4(NumMicrbHetetrophCmplx,1:jcplx));this%RVMB4=0._r8
-  allocate(this%RINHO(NumMicrbHetetrophCmplx,1:jcplx));this%RINHO=0._r8
-  allocate(this%RINHB(NumMicrbHetetrophCmplx,1:jcplx));this%RINHB=0._r8
-  allocate(this%RINOO(NumMicrbHetetrophCmplx,1:jcplx));this%RINOO=0._r8
-  allocate(this%RINOB(NumMicrbHetetrophCmplx,1:jcplx));this%RINOB=0._r8
-  allocate(this%RIPOO(NumMicrbHetetrophCmplx,1:jcplx));this%RIPOO=0._r8
-  allocate(this%RIPBO(NumMicrbHetetrophCmplx,1:jcplx));this%RIPBO=0._r8
-  allocate(this%RIPO1(NumMicrbHetetrophCmplx,1:jcplx));this%RIPO1=0._r8
-  allocate(this%RIPB1(NumMicrbHetetrophCmplx,1:jcplx));this%RIPB1=0._r8
-  allocate(this%RINHOR(NumMicrbHetetrophCmplx,1:jcplx));this%RINHOR=0._r8
-  allocate(this%RINOOR(NumMicrbHetetrophCmplx,1:jcplx));this%RINOOR=0._r8
-  allocate(this%RIPOOR(NumMicrbHetetrophCmplx,1:jcplx));this%RIPOOR=0._r8
-  allocate(this%RIPO1R(NumMicrbHetetrophCmplx,1:jcplx));this%RIPO1R=0._r8
-  allocate(this%ROXYSff(NumMicrobAutotrophCmplx));this%ROXYSff=0._r8
-  allocate(this%RINHOff(NumMicrobAutotrophCmplx));this%RINHOff=0._r8
-  allocate(this%RINHBff(NumMicrobAutotrophCmplx));this%RINHBff=0._r8
-  allocate(this%RINOOff(NumMicrobAutotrophCmplx));this%RINOOff=0._r8
-  allocate(this%RINOBff(NumMicrobAutotrophCmplx));this%RINOBff=0._r8
-  allocate(this%RIPOOff(NumMicrobAutotrophCmplx));this%RIPOOff=0._r8
-  allocate(this%RIPBOff(NumMicrobAutotrophCmplx));this%RIPBOff=0._r8
-  allocate(this%RIPO1ff(NumMicrobAutotrophCmplx));this%RIPO1ff=0._r8
-  allocate(this%RIPB1ff(NumMicrobAutotrophCmplx));this%RIPB1ff=0._r8
-  allocate(this%RINHORff(NumMicrobAutotrophCmplx));this%RINHORff=0._r8
-  allocate(this%RINOORff(NumMicrobAutotrophCmplx));this%RINOORff=0._r8
-  allocate(this%RIPOORff(NumMicrobAutotrophCmplx));this%RIPOORff=0._r8
-  allocate(this%RIPO1Rff(NumMicrobAutotrophCmplx));this%RIPO1Rff=0._r8
-  allocate(this%RVMX4ff(NumMicrobAutotrophCmplx));this%RVMX4ff=0._r8
-  allocate(this%RVMB4ff(NumMicrobAutotrophCmplx));this%RVMB4ff=0._r8
-  allocate(this%RVMX2ff(NumMicrobAutotrophCmplx));this%RVMX2ff=0._r8
-  allocate(this%RVMB2ff(NumMicrobAutotrophCmplx));this%RVMB2ff=0._r8
+
+  allocate(this%ROXSK(NPH));this%ROXSK = spval
+  allocate(this%RDOM_micb_flx(idom_beg:idom_end,1:jcplx));this%RDOM_micb_flx=spval
+  allocate(this%ROXYS(NumMicrbHetetrophCmplx,1:jcplx));this%ROXYS=spval
+  allocate(this%ROQCS(NumMicrbHetetrophCmplx,1:jcplx));this%ROQCS=spval
+  allocate(this%ROQAS(NumMicrbHetetrophCmplx,1:jcplx));this%ROQAS=spval
+  allocate(this%RVMX3(NumMicrbHetetrophCmplx,1:jcplx));this%RVMX3=spval
+  allocate(this%RVMB3(NumMicrbHetetrophCmplx,1:jcplx));this%RVMB3=spval
+  allocate(this%RVMX2(NumMicrbHetetrophCmplx,1:jcplx));this%RVMX2=spval
+  allocate(this%RVMB2(NumMicrbHetetrophCmplx,1:jcplx));this%RVMB2=spval
+  allocate(this%RVMX1(NumMicrbHetetrophCmplx,1:jcplx));this%RVMX1=spval
+  allocate(this%RVMX4(NumMicrbHetetrophCmplx,1:jcplx));this%RVMX4=spval
+  allocate(this%RVMB4(NumMicrbHetetrophCmplx,1:jcplx));this%RVMB4=spval
+  allocate(this%RINHO(NumMicrbHetetrophCmplx,1:jcplx));this%RINHO=spval
+  allocate(this%RINHB(NumMicrbHetetrophCmplx,1:jcplx));this%RINHB=spval
+  allocate(this%RINOO(NumMicrbHetetrophCmplx,1:jcplx));this%RINOO=spval
+  allocate(this%RINOB(NumMicrbHetetrophCmplx,1:jcplx));this%RINOB=spval
+  allocate(this%RIPOO(NumMicrbHetetrophCmplx,1:jcplx));this%RIPOO=spval
+  allocate(this%RIPBO(NumMicrbHetetrophCmplx,1:jcplx));this%RIPBO=spval
+  allocate(this%RIPO1(NumMicrbHetetrophCmplx,1:jcplx));this%RIPO1=spval
+  allocate(this%RIPB1(NumMicrbHetetrophCmplx,1:jcplx));this%RIPB1=spval
+  allocate(this%RINHOR(NumMicrbHetetrophCmplx,1:jcplx));this%RINHOR=spval
+  allocate(this%RINOOR(NumMicrbHetetrophCmplx,1:jcplx));this%RINOOR=spval
+  allocate(this%RIPOOR(NumMicrbHetetrophCmplx,1:jcplx));this%RIPOOR=spval
+  allocate(this%RIPO1R(NumMicrbHetetrophCmplx,1:jcplx));this%RIPO1R=spval
+  allocate(this%ROXYSff(NumMicrobAutotrophCmplx));this%ROXYSff=spval
+  allocate(this%RINHOff(NumMicrobAutotrophCmplx));this%RINHOff=spval
+  allocate(this%RINHBff(NumMicrobAutotrophCmplx));this%RINHBff=spval
+  allocate(this%RINOOff(NumMicrobAutotrophCmplx));this%RINOOff=spval
+  allocate(this%RINOBff(NumMicrobAutotrophCmplx));this%RINOBff=spval
+  allocate(this%RIPOOff(NumMicrobAutotrophCmplx));this%RIPOOff=spval
+  allocate(this%RIPBOff(NumMicrobAutotrophCmplx));this%RIPBOff=spval
+  allocate(this%RIPO1ff(NumMicrobAutotrophCmplx));this%RIPO1ff=spval
+  allocate(this%RIPB1ff(NumMicrobAutotrophCmplx));this%RIPB1ff=spval
+  allocate(this%RINHORff(NumMicrobAutotrophCmplx));this%RINHORff=spval
+  allocate(this%RINOORff(NumMicrobAutotrophCmplx));this%RINOORff=spval
+  allocate(this%RIPOORff(NumMicrobAutotrophCmplx));this%RIPOORff=spval
+  allocate(this%RIPO1Rff(NumMicrobAutotrophCmplx));this%RIPO1Rff=spval
+  allocate(this%RVMX4ff(NumMicrobAutotrophCmplx));this%RVMX4ff=spval
+  allocate(this%RVMB4ff(NumMicrobAutotrophCmplx));this%RVMB4ff=spval
+  allocate(this%RVMX2ff(NumMicrobAutotrophCmplx));this%RVMX2ff=spval
+  allocate(this%RVMB2ff(NumMicrobAutotrophCmplx));this%RVMB2ff=spval
 
   end subroutine Init
 !------------------------------------------------------------------------------------------
