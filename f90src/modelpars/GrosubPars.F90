@@ -201,29 +201,32 @@ module GrosubPars
   integer :: npft
   integer :: nkopenclms
 
-  if(.not. file_exists(pft_file_in))then
-    !call endrun(msg='Fail to locate plant trait file specified by pft_file_in in ' &
-    !  //mod_filename,line=__LINE__)
+  if (len_trim(pft_file_in) == 0)then
     write(*,*) "Setting PFTs to one"
     npfts=1
   else
-    npfts=get_dim_len(pft_file_in, 'npfts')
-    npft=get_dim_len(pft_file_in, 'npft')
-    nkopenclms=get_dim_len(pft_file_in,'nkopenclms')
-    allocate(pftss(npfts))
-    allocate(pft_long(npft))
-    allocate(pft_short(npft))
-    allocate(koppen_clim_no(nkopenclms))
-    allocate(koppen_clim_short(nkopenclms))
-    allocate(koppen_clim_long(nkopenclms))
-    call ncd_pio_openfile(pft_nfid, pft_file_in, ncd_nowrite)
-    call ncd_getvar(pft_nfid, 'pfts', pftss)
-    call ncd_getvar(pft_nfid,'pfts_long',pft_long)
-    call ncd_getvar(pft_nfid,'pfts_short',pft_short)
-    call ncd_getvar(pft_nfid,'koppen_clim_no',koppen_clim_no)
-    call ncd_getvar(pft_nfid,'koppen_clim_short',koppen_clim_short)
-    call ncd_getvar(pft_nfid,'koppen_clim_long',koppen_clim_long)
-  endif
+    if(.not. file_exists(pft_file_in))then
+      call endrun(msg='Fail to locate plant trait file specified by pft_file_in in ' &
+        //mod_filename,line=__LINE__)
+    else
+      npfts=get_dim_len(pft_file_in, 'npfts')
+      npft=get_dim_len(pft_file_in, 'npft')
+      nkopenclms=get_dim_len(pft_file_in,'nkopenclms')
+      allocate(pftss(npfts))
+      allocate(pft_long(npft))
+      allocate(pft_short(npft))
+      allocate(koppen_clim_no(nkopenclms))
+      allocate(koppen_clim_short(nkopenclms))
+      allocate(koppen_clim_long(nkopenclms))
+      call ncd_pio_openfile(pft_nfid, pft_file_in, ncd_nowrite)
+      call ncd_getvar(pft_nfid, 'pfts', pftss)
+      call ncd_getvar(pft_nfid,'pfts_long',pft_long)
+      call ncd_getvar(pft_nfid,'pfts_short',pft_short)
+      call ncd_getvar(pft_nfid,'koppen_clim_no',koppen_clim_no)
+      call ncd_getvar(pft_nfid,'koppen_clim_short',koppen_clim_short)
+      call ncd_getvar(pft_nfid,'koppen_clim_long',koppen_clim_long)
+    endif
+  endif  
   pltpar%inonstruct=0
   pltpar%ifoliar=1
   pltpar%inonfoliar=2
