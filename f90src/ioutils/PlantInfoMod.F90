@@ -523,6 +523,7 @@ implicit none
   character(len=*),intent(in) :: koppen_climl
   character(len=*),intent(in) :: koppen_clims
   integer :: j
+  character(len=60) :: strval
 
 !   iPlantPhotosynthesisType=photosynthesis type:3=C3,4=C4
 !   iPlantMorphologyType_pft=root profile:0=shallow (eg bryophytes),1=intermediate(eg herbs),2=deep (eg trees)
@@ -540,146 +541,158 @@ implicit none
 !   3=warm temperate,4=subtropical,5=tropical
   write(nu_plt,*)('=',j=1,100)
   write(nu_plt,*)'PLANT traits for FUNCTIONAL TYPE (NZ,NY,NX)=',NZ,NY,NX,DATAP(NZ,NY,NX)(1:6)
-  write(nu_plt,*)'Plant name: ',pft_lname
-  write(nu_plt,*)'koppen climate info:',koppen_clims//','//koppen_climl
+  call writefixsl(nu_plt,'Plant name: ',pft_lname,40)
+  strval=koppen_clims//','//koppen_climl
+  call writefixsl(nu_plt,'Koppen climate info',strval,40)
+
   select CASE (iPlantPhotosynthesisType(NZ,NY,NX))
   case (3)
-    write(nu_plt,*)'C3 photosynthesis'
+    strval='C3'
   case (4)
-    write(nu_plt,*)'C4 photosynthesis'
+    strval='C4'
   case default
-    write(nu_plt,*)'photosynthesis type not defined'
+    strval='Not defined'
   end select
+  call writefixsl(nu_plt,'Photosynthesis pathway',strval,40)
 
   select case(iPlantMorphologyType_pft(NZ,NY,NX))
   case (0)
-    write(nu_plt,*)'shallow root profile, like bryophytes'
+    strval='Shallow root profile, like bryophytes'
   case (1)
-    write(nu_plt,*)'intermediate root profile, like herbs'
+    strval='Intermediate root profile, like herbs'
   case (2)
-    write(nu_plt,*)'deep root profile, like trees'
+    strval='Deep root profile, like trees'
   case default
-    write(nu_plt,*)'root profile not defined'
+    strval='Not defined'
   end select
+  call writefixsl(nu_plt,'Root profile pattern',strval,40)
 
   select case (iPlantPhenologyPattern_pft(NZ,NY,NX))
   case (0)
-    write(nu_plt,*)'Annual plant'
+    strval='Annual'
   case (1)
-    write(nu_plt,*)'perennial plant'
+    strval='Perennial'
   case default
-    write(nu_plt,*)'growth habit not defined'
+    strval='Not defined'
   end select
+  call writefixsl(nu_plt,'Life cycle',strval,40)
 
   select case (iPlantDevelopPattern_pft(NZ,NY,NX))
   case (0)
-    write(nu_plt,*)'determinate growth pattern'
+    strval='Determinate'
   case (1)
-    write(nu_plt,*)'indetermimate growth pattern'
+    strval='Indetermimate'
   case default
-    write(nu_plt,*)'growth pattern not defined'
+    strval='Not defined'
   end select
+  call writefixsl(nu_plt,'Growth pattern',strval,40)
 
   select case (iPlantNfixType(NZ,NY,NX))
 ! 1,2, 3, e.g. legumes
   case (in2fixtyp_root_fast)
-    write(nu_plt,*)'Rapid root N2 fixation symbiosis'
+    strval='Rapid root N-fixation'
   case (in2fixtyp_root_medium)
-    write(nu_plt,*)'Intermediate root N2 fixation symbiosis'
+    strval='Intermediate root N-fixation'
   case (in2fixtyp_root_slow)
-    write(nu_plt,*)'Slow root N2 fixation symbiosis'
+    strval='Slow root N-fixation'
 !4,5,6, e.g. cyanobacteria
   case (in2fixtyp_canopy_fast)
-    write(nu_plt,*)'Rapid canopy N2 fixation symbiosis'
+    strval='Rapid canopy N-fixation'
   case (in2fixtyp_canopy_medium)
-    write(nu_plt,*)'Intermediate canopy N2 fixation symbiosis'
+    strval='Intermediate canopy N-fixation'
   case (in2fixtyp_canopy_slow)
-    write(nu_plt,*)'Slow canopy N2 fixation symbiosis'
+    strval='Slow canopy N-fixation'
   case default
-    write(nu_plt,*)'No N2 fixation symbiosis defined'
+    strval='Not defined'
   end select
+  call writefixsl(nu_plt,'N-fixation symbiosis',strval,40)
 
   select case(iPlantPhenologyType_pft(NZ,NY,NX))
   case (iphenotyp_evgreen)
-    write(nu_plt,*)'phenology type: evergreen'
+    strval='Evergreen'
   case (iphenotyp_coldecidu)
-    write(nu_plt,*)'phenology type: cold deciduous'
+    strval='Cold deciduous'
   case (iphenotyp_drouhtdecidu)
-    write(nu_plt,*)'phenology type: drought deciduous'
+    strval='Drought deciduous'
   case (iphenotyp_coldroutdecidu)
-    write(nu_plt,*)'phenology type: cold+drought deciduous'
+    strval='Cold&drought-tolerant deciduous'
   case default
-    write(nu_plt,*)'phenology type not defined'
+    strval='Not defined'
   end select
+  call writefixsl(nu_plt,'Phenology type',strval,40)
 
   select case(iPlantPhotoperiodType_pft(NZ,NY,NX))
   case (iphotop_neutral)
-    write(nu_plt,*)'day neutral photoperiod'
+    strval='Neutral day'
   case (iphotop_short)
-    write(nu_plt,*)'short day photoperiod'
+    strval='Short day'
   case (iphotop_long)
-    write(nu_plt,*)'long day photoperiod'
+    strval='Long day'
   case default
-    write(nu_plt,*)'photoperiod not defined'
+    strval='Not defined'
   end select
+  call writefixsl(nu_plt,'Photoperiod',strval,40)
 
   if(is_plant_treelike(iPlantMorphologyType_pft(NZ,NY,NX)))then
     select case(iPlantTurnoverPattern_pft(NZ,NY,NX))
     case (0, 1)
-      write(nu_plt,*)'Rapid tree biome turnover (deciduous)'
+      strval='Rapid, like deciduous tree'
     case (2)
-      write(nu_plt,*)'Very slow tree biome turnover (needleleaf evergreen)'
+      strval='Very slow, like evergreen needleleaf tree'
     case (3)
-      write(nu_plt,*)'Slow tree biome turnover (Broadleaf evergreen)'
+      strval='Slow, like evergreen broadleaf'
     case (4)
-      write(nu_plt,*)'Tree biome turnover semi-deciduous'
+      strval='Like semi-deciduous tree'
     case (5)
-      write(nu_plt,*)'Tree biome turnover semi-evergreen'
+      strval='Like semi-evergreen tree'
     case default
-      write(nu_plt,*)'Tree biome turnover not defined'
+      strval='Undefined tree-like pattern'
     end select
   else
     select case(iPlantTurnoverPattern_pft(NZ,NY,NX))
     case (0, 1)
-      write(nu_plt,*)'Rapid all aboveground plant biome turnover (herbaceous)'
+      strval='Rapid all aboveground biome, herbaceous'
     case default
-      write(nu_plt,*)'Plant biome turnover not defined'
+      strval='Undefined herbaceous pattern'
     end select
   endif
+  call writefixsl(nu_plt,'Biome turnover pattern',strval,40)
 
   select case(iPlantGrainType_pft(NZ,NY,NX))
   case (igraintyp_abvgrnd)
-    write(nu_plt,*)'Above ground storage organ'
+    strval='Aboveground'
   case (igraintyp_blwgrnd)
-    write(nu_plt,*)'Belowground storage organ'
+    strval='Belowground'
   case default
-    write(nu_plt,*)'Storage organ not defined'
+    strval='Not defined'
   end select
+  call writefixsl(nu_plt,'Storage organ',strval,40)
 
   select case(MY(NZ,NY,NX))
   case (1)
-    write(nu_plt,*)'No mycorrhizal'
+    strval='No'
   case (2)
-    write(nu_plt,*)'Mycorrhizal'
+    strval='YES'
   case default
-    write(nu_plt,*)'Wrong option for mycorrhizae'
+    strval='Wrong option'
   end select
+  call writefixsl(nu_plt,'Mycorrhizal association',strval,40)
 
   select case(INT(PlantInitThermoAdaptZone(NZ,NY,NX)+0.50005_r8))
   case (ithermozone_arcboreal)
-    write(nu_plt,*)'thermal adaptation zone: arctic, boreal'
+    strval='Arctic, boreal'
   case (ithermozone_cooltempr)
-    write(nu_plt,*)'thermal adaptation zone: cool temperate'
+    strval='Cool temperate'
   case (ithermozone_warmtempr)
-    write(nu_plt,*)'thermal adaptation zone: warm temperate'
+    strval='Warm temperate'
   case (ithermozone_subtropic)
-    write(nu_plt,*)'thermal adaptation zone: subtropical'
+    strval='Subtropical'
   case (ithermozone_tropical)
-    write(nu_plt,*)'thermal adaptation zone: tropical'
+    strval='Tropical'
   case default
-    write(nu_plt,*)'Not thermal adaptation zone defined'
+    strval='Not defined'
   end select
-
+  call writefixsl(nu_plt,'Thermal adaptation zone',strval,40)
   end subroutine pft_display
 
 !------------------------------------------------------------------------------------------
@@ -1223,6 +1236,21 @@ implicit none
   line(width:width)=':'
   write(nu_plt,*)line,value
   end subroutine writefixl
+!------------------------------------------------------------------------------------------
+
+  subroutine writefixsl(nu_plt,desc,value,width)
+  implicit none
+  integer,intent(in)  :: nu_plt
+  character(len=*), intent(in) :: desc
+  integer, intent(in) :: width
+  character(len=*),intent(in) :: value
+
+  character(len=width) :: line
+  line=desc
+  line(width:width)=':'
+  write(nu_plt,*)line,' ',value
+  end subroutine writefixsl
+
 !------------------------------------------------------------------------------------------
 
   subroutine writeafixl(nu_plt,desc,values,width)
