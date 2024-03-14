@@ -167,7 +167,6 @@ implicit none
   real(r8),pointer   :: h1D_STOM_RSC_H2O_ptc(:)  !CanPStomaResistH2O_pft(NZ,NY,NX)*3600.0_r8, s m-1, for H2O
   real(r8),pointer   :: h1D_BLYR_RSC_H2O_ptc(:)  !CanopyBndlResist_pft(NZ,NY,NX)*3600.0_r8, s m-1, for H2O
   real(r8),pointer   :: h1D_TRANSPN_ptc(:)       !Transpiration_pft(NZ,NY,NX)*1000.0_r8/AREA(3,NU(NY,NX),NY,NX), canopy transpiration mm H2O/m2/h
-  real(r8),pointer   :: h1D_O2_STRESS_ptc(:)     !OSTR(NZ,NY,NX), plant O2 stress indicator
   real(r8),pointer   :: h1D_NH4_UPTK_FLX_ptc(:)      !RootNH4Uptake_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_NO3_UPTK_FLX_ptc(:)      !RootNO3Uptake_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_N2_FIXN_FLX_ptc(:)       !RootN2Fix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -424,7 +423,6 @@ implicit none
   allocate(this%h1D_STOM_RSC_H2O_ptc(beg_ptc:end_ptc)) 
   allocate(this%h1D_BLYR_RSC_H2O_ptc(beg_ptc:end_ptc)) 
   allocate(this%h1D_TRANSPN_ptc(beg_ptc:end_ptc))      
-  allocate(this%h1D_O2_STRESS_ptc(beg_ptc:end_ptc))    
   allocate(this%h1D_NH4_UPTK_FLX_ptc(beg_ptc:end_ptc)) 
   allocate(this%h1D_NO3_UPTK_FLX_ptc(beg_ptc:end_ptc)) 
   allocate(this%h1D_N2_FIXN_FLX_ptc(beg_ptc:end_ptc))  
@@ -1054,10 +1052,6 @@ implicit none
   call hist_addfld1d(fname='TRANSPN',units='mmH2O/m2/h',avgflag='A',&
     long_name='canopy transpiration',ptr_patch=data1d_ptr)      
 
-  data1d_ptr => this%h1D_O2_STRESS_ptc(beg_ptc:end_ptc)   
-  call hist_addfld1d(fname='O2_STRESS',units='none',avgflag='A',&
-    long_name='plant O2 stress indicator [0-1]',ptr_patch=data1d_ptr)      
-
   data1d_ptr => this%h1D_NH4_UPTK_FLX_ptc(beg_ptc:end_ptc)     
   call hist_addfld1d(fname='NH4_UPTK_FLX',units='gN/m2/hr',&
     avgflag='A',long_name='total root uptake of NH4',ptr_patch=data1d_ptr)      
@@ -1658,7 +1652,6 @@ implicit none
         this%h1D_STOM_RSC_H2O_ptc(nptc) = CanPStomaResistH2O_pft(NZ,NY,NX)*3600.0_r8
         this%h1D_BLYR_RSC_H2O_ptc(nptc) = CanopyBndlResist_pft(NZ,NY,NX)*3600.0_r8
         this%h1D_TRANSPN_ptc(nptc)      = Transpiration_pft(NZ,NY,NX)*1000.0_r8/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_O2_STRESS_ptc(nptc)    = PlantO2Stress(NZ,NY,NX)
         this%h1D_NH4_UPTK_FLX_ptc(nptc)     = RootNH4Uptake_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_NO3_UPTK_FLX_ptc(nptc)     = RootNO3Uptake_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_N2_FIXN_FLX_ptc(nptc)      = RootN2Fix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
