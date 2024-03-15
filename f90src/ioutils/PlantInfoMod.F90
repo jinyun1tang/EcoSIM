@@ -356,7 +356,7 @@ implicit none
       CriticalPhotoPeriod_pft(NZ,NY,NX)=DayLenthMax(NY,NX)
     ENDIF
     D5: DO NB=1,NumOfCanopyLayers
-      IF(iPlantPhenologyType_pft(NZ,NY,NX).EQ.iphenotyp_evgreen.AND.iPlantPhenologyPattern_pft(NZ,NY,NX).NE.iplt_annual)THEN
+      IF(iPlantPhenolType_pft(NZ,NY,NX).EQ.iphenotyp_evgreen.AND.iPlantPhenologyPattern_pft(NZ,NY,NX).NE.iplt_annual)THEN
         HourThreshold4LeafOut_brch(NB,NZ,NY,NX)=AMIN1(4380.0_r8,VRNLI+144.0_r8*PlantInitThermoAdaptZone(NZ,NY,NX)*(NB-1))
         HourThreshold4LeafOff_brch(NB,NZ,NY,NX)=AMIN1(4380.0_r8,VRNXI+144.0_r8*PlantInitThermoAdaptZone(NZ,NY,NX)*(NB-1))
       ELSE
@@ -390,7 +390,7 @@ implicit none
   call ncd_getvar(pft_nfid, 'ISTYP', loc, iPlantPhenologyPattern_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'IDTYP', loc, iPlantDevelopPattern_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'INTYP', loc, iPlantNfixType(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'IWTYP', loc, iPlantPhenologyType_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'IWTYP', loc, iPlantPhenolType_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'IPTYP', loc, iPlantPhotoperiodType_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'IBTYP', loc, iPlantTurnoverPattern_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'IRTYP', loc, iPlantGrainType_pft(NZ,NY,NX))
@@ -531,7 +531,7 @@ implicit none
 !   iPlantDevelopPattern_pft=growth habit:0=determinate,1=indetermimate
 !   iPlantNfixType=N2 fixation:1,2,3=rapid to slow root symbiosis (e.g.legumes),
 !   4,5,6=rapid to slow canopy symbiosis (e.g. cyanobacteria)
-!   iPlantPhenologyType_pft=phenology type:0=evergreen,1=cold deciduous,2=drought deciduous,3=1+2
+!   iPlantPhenolType_pft=phenology type:0=evergreen,1=cold deciduous,2=drought deciduous,3=1+2
 !   iPlantPhotoperiodType_pft=photoperiod type:0=day neutral,1=short day,2=long day
 !   iPlantTurnoverPattern_pft=turnover:if iPlantMorphologyType_pft=0 or 1:all above-ground:0,1=rapid(deciduous),2=very slow(evergreen),3=slow(semi-deciduous)
 !                   :if iPlantMorphologyType_pft=2:trees:1=rapid(deciduous),2=very slow(coniferous),3=slow(semi-deciduous)
@@ -607,7 +607,7 @@ implicit none
   end select
   call writefixsl(nu_plt,'N-fixation symbiosis',strval,40)
 
-  select case(iPlantPhenologyType_pft(NZ,NY,NX))
+  select case(iPlantPhenolType_pft(NZ,NY,NX))
   case (iphenotyp_evgreen)
     strval='Evergreen'
   case (iphenotyp_coldecidu)

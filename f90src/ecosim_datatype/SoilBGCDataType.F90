@@ -41,7 +41,7 @@ implicit none
   real(r8),target,allocatable ::  FerPFlx_col(:,:)                        !total fertilizer P amendment, [g d-2]
   real(r8),target,allocatable ::  HydroSufDOCFlx_col(:,:)                         !total surface DOC flux, [g d-2]
   real(r8),target,allocatable ::  HydroSubsDOCFlx_col(:,:)                         !total subsurface DOC flux, [g d-2]
-  real(r8),target,allocatable ::  LiterfalOrgM_col(:,:,:)                         !total litterfall C, [g d-2]
+  real(r8),target,allocatable ::  LiterfalOrgM_col(:,:,:)                         !total LitrFall C, [g d-2]
   real(r8),target,allocatable ::  HydroSufDONFlx_col(:,:)                         !total surface DON flux, [g d-2]
   real(r8),target,allocatable ::  HydroSubsDONFlx_col(:,:)                         !total subsurface DON flux, [g d-2]
   real(r8),target,allocatable ::  HydroSufDOPFlx_col(:,:)                         !total surface DOP flux, [g d-2]
@@ -67,7 +67,7 @@ implicit none
   real(r8),target,allocatable ::  TOQCK(:,:,:)                       !total respiration of DOC+DOA in soil layer
   real(r8),target,allocatable ::  VOLQ(:,:,:)                        !soil water volume occupied by microial biomass, [m3 m-3]
   real(r8),target,allocatable ::  TFNQ(:,:,:)                        !constraints of temperature and water potential on microbial activity, []
-  real(r8),target,allocatable ::  LitrfalChemElemnts_vr(:,:,:,:,:,:)                    !total litterfall C, [g d-2 h-1]
+  real(r8),target,allocatable ::  LitrfalChemElemnts_vr(:,:,:,:,:,:)                    !total LitrFall C, [g d-2 h-1]
   real(r8),target,allocatable :: trcs_VLN_vr(:,:,:,:)
 
   real(r8),target,allocatable ::  VLNHB(:,:,:)                       !NH4 band volume fracrion, []

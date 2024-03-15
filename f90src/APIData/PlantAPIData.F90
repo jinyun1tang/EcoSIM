@@ -330,7 +330,7 @@ implicit none
   integer,  pointer :: Prep4Literfall_brch(:,:)  => null()  !branch phenology flag, [-]
   integer,  pointer :: Hours4LiterfalAftMature_brch(:,:)  => null()  !branch phenology flag, [h]
   integer,  pointer :: KLeafNodeNumber(:,:)  => null()  !leaf growth stage counter, [-]
-  integer,  pointer :: iPlantPhenologyType_pft(:)    => null()  !climate signal for phenological progress: none, temperature, water stress
+  integer,  pointer :: iPlantPhenolType_pft(:)    => null()  !climate signal for phenological progress: none, temperature, water stress
   integer,  pointer :: iPlantTurnoverPattern_pft(:)    => null()  !phenologically-driven above-ground turnover: all, foliar only, none
   integer,  pointer :: iPlantShootState_pft(:)    => null()  !flag to detect canopy death
   integer,  pointer :: iPlantPhenologyPattern_pft(:)    => null()  !plant growth habit: annual or perennial
@@ -622,13 +622,13 @@ implicit none
   real(r8) :: Eco_AutoR_col      !ecosystem autotrophic respiration, [g d-2 h-1]
   real(r8) :: TH2GZ     !total root H2 flux, [g d-2]
   real(r8) :: Canopy_NEE_col     !total net CO2 fixation, [gC d-2]
-  real(r8), pointer :: LitterFallChemElm_col(:) => null() !total litterfall element, [g d-2 h-1]
+  real(r8), pointer :: LitrFallChemElm_col(:) => null() !total LitrFall element, [g d-2 h-1]
   real(r8), pointer :: NetPrimaryProductvity_pft(:)       => null()   !total net primary productivity, [gC d-2]
   real(r8), pointer :: NH3Dep2Can_pft(:)      => null()   !canopy NH3 flux, [g d-2 h-1]
   real(r8), pointer :: TDFOME(:,:,:)   =>  null()  !total root element exchange, [g d-2 h-1]
   real(r8), pointer :: RootN2Fix_pvr(:,:)    =>  null()  !root N2 fixation, [gN d-2 h-1]
   real(r8), pointer :: CanopyPlusNoduRespC_pft(:)      =>  null()  !total autotrophic respiration, [gC d-2 ]
-  real(r8), pointer :: LitterFallChemElm_pvr(:,:,:,:,:) =>  null()  !plant litterfall element, [g d-2 h-1]
+  real(r8), pointer :: LitrFallChemElm_pvr(:,:,:,:,:) =>  null()  !plant LitrFall element, [g d-2 h-1]
   real(r8), pointer :: ROXYX(:)      =>  null()  !total root + microbial O2 uptake, [g d-2 h-1]
   real(r8), pointer :: RNHBX(:)      => null()   !total root + microbial NH4 uptake band, [gN d-2 h-1]
   real(r8), pointer :: RP14X(:)      => null()   !HPO4 demand in non-band by all microbial,root,myco populations, [gP d-2 h-1]
@@ -652,14 +652,14 @@ implicit none
   real(r8), pointer :: ROXYY(:)      => null()   !total root + microbial O2 uptake, [g d-2 h-1]
   real(r8), pointer :: TCO2P(:)      => null()   !total root CO2 flux, [gC d-2 h-1]
   real(r8), pointer :: TUPOXP(:)     => null()   !total root internal O2 flux, [g d-2 h-1]
-  real(r8), pointer :: LitrfalChemElemnts_vr(:,:,:,:)   => null() !total litterfall element, [g d-2 h-1]
+  real(r8), pointer :: LitrfalChemElemnts_vr(:,:,:,:)   => null() !total LitrFall element, [g d-2 h-1]
   real(r8), pointer :: RDOM_micb_flx(:,:,:)    => null()  !net microbial DOC flux, [gC d-2 h-1]
   real(r8), pointer :: CO2NetFix_pft(:)       => null()  !canopy net CO2 exchange, [gC d-2 h-1]
   real(r8), pointer :: GrossCO2Fix_pft(:)      => null()  !total gross CO2 fixation, [gC d-2 ]
-  real(r8), pointer :: LitterFallChemElm_pft(:,:)    => null()  !plant element litterfall, [g d-2 h-1]
+  real(r8), pointer :: LitrFallChemElm_pft(:,:)    => null()  !plant element LitrFall, [g d-2 h-1]
   real(r8), pointer :: RootGasLossDisturb_pft(:,:)=> null() !gaseous flux fron root disturbance, [g d-2 h-1]
-  real(r8), pointer :: SurfLitrfallChemElms_pft(:,:)    => null()  !total surface litterfall element, [g d-2]
-  real(r8), pointer :: LitrfallChemElms_pft(:,:)    => null()  !total plant element litterfall , [g d-2 ]
+  real(r8), pointer :: SurfLitrfallChemElms_pft(:,:)    => null()  !total surface LitrFall element, [g d-2]
+  real(r8), pointer :: LitrfallChemElms_pft(:,:)    => null()  !total plant element LitrFall , [g d-2 ]
   real(r8), pointer :: GrossResp_pft(:)      => null()  !total plant respiration, [gC d-2 ]
 
   real(r8), pointer :: NH3EmiCum_pft(:)      => null()  !total canopy NH3 flux, [gN d-2 ]
@@ -1017,7 +1017,7 @@ implicit none
   allocate(this%PlantN2FixCum_pft(JP1));this%PlantN2FixCum_pft=spval
   allocate(this%NH3EmiCum_pft(JP1));this%NH3EmiCum_pft=spval
   allocate(this%SurfLitrfallChemElms_pft(NumPlantChemElms,JP1));this%SurfLitrfallChemElms_pft=spval
-  allocate(this%LitterFallChemElm_col(NumPlantChemElms));this%LitterFallChemElm_col=spval
+  allocate(this%LitrFallChemElm_col(NumPlantChemElms));this%LitrFallChemElm_col=spval
   allocate(this%NetPrimaryProductvity_pft(JP1));this%NetPrimaryProductvity_pft=spval
   allocate(this%NH3Dep2Can_pft(JP1));this%NH3Dep2Can_pft=spval
   allocate(this%TDFOME(NumPlantChemElms,1:jcplx,JZ1));this%TDFOME=spval
@@ -1033,10 +1033,10 @@ implicit none
   allocate(this%RNHBX(0:JZ1));this%RNHBX=spval
   allocate(this%RP14X(0:JZ1));this%RP14X=spval
 
-  allocate(this%LitterFallChemElm_pft(NumPlantChemElms,JP1));this%LitterFallChemElm_pft=spval
+  allocate(this%LitrFallChemElm_pft(NumPlantChemElms,JP1));this%LitrFallChemElm_pft=spval
   allocate(this%LitrfallChemElms_pft(NumPlantChemElms,JP1));this%LitrfallChemElms_pft=spval
-  allocate(this%LitterFallChemElm_pvr(NumPlantChemElms,jsken,1:NumOfPlantLitrCmplxs,0:JZ1,JP1))
-  this%LitterFallChemElm_pvr=spval
+  allocate(this%LitrFallChemElm_pvr(NumPlantChemElms,jsken,1:NumOfPlantLitrCmplxs,0:JZ1,JP1))
+  this%LitrFallChemElm_pvr=spval
 
   end subroutine plt_bgcrate_init
 !----------------------------------------------------------------------
@@ -1753,7 +1753,7 @@ implicit none
   allocate(this%NodeNumNormByMatgrp_brch(MaxNumBranches,JP1));this%NodeNumNormByMatgrp_brch=spval
   allocate(this%ReprodNodeNumNormByMatrgrp_brch(MaxNumBranches,JP1));this%ReprodNodeNumNormByMatrgrp_brch=spval
   allocate(this%HourFailGrainFill_brch(MaxNumBranches,JP1));this%HourFailGrainFill_brch=spval
-  allocate(this%iPlantPhenologyType_pft(JP1));this%iPlantPhenologyType_pft=0
+  allocate(this%iPlantPhenolType_pft(JP1));this%iPlantPhenolType_pft=0
   allocate(this%iPlantPhenologyPattern_pft(JP1));this%iPlantPhenologyPattern_pft=0
   allocate(this%iPlantTurnoverPattern_pft(JP1));this%iPlantTurnoverPattern_pft=0
   allocate(this%iPlantRootState_pft(JP1));this%iPlantRootState_pft=0

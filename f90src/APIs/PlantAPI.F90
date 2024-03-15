@@ -62,7 +62,7 @@ implicit none
   Canopy_Heat_Latent_col(NY,NX)=plt_ew%Canopy_Heat_Latent_col
   Canopy_Heat_Sens_col(NY,NX)=plt_ew%Canopy_Heat_Sens_col
   Eco_AutoR_col(NY,NX)=plt_bgcr%Eco_AutoR_col
-  LitterFallChemElm_col(1:NumPlantChemElms,NY,NX) =plt_bgcr%LitterFallChemElm_col(1:NumPlantChemElms)
+  LitrFallChemElm_col(1:NumPlantChemElms,NY,NX) =plt_bgcr%LitrFallChemElm_col(1:NumPlantChemElms)
   EcoHavstElmnt_col(1:NumPlantChemElms,NY,NX)=plt_distb%EcoHavstElmnt_col(1:NumPlantChemElms)
   CanH2OHeldVg(NY,NX)=plt_ew%CanH2OHeldVg
   Eco_Heat_Sens_col(NY,NX)   =plt_ew%Eco_Heat_Sens_col
@@ -148,7 +148,7 @@ implicit none
     CanopyNonstructElements_pft(1:NumPlantChemElms,NZ,NY,NX)=plt_biom%CanopyNonstructElements_pft(1:NumPlantChemElms,NZ)
     NoduleNonstructElmnt_pft(1:NumPlantChemElms,NZ,NY,NX)=plt_biom%NoduleNonstructElmnt_pft(1:NumPlantChemElms,NZ)
     CanopyNonstructElementConc_pft(1:NumPlantChemElms,NZ,NY,NX)=plt_biom%CanopyNonstructElementConc_pft(1:NumPlantChemElms,NZ)
-    LitterFallChemElm_pft(1:NumPlantChemElms,NZ,NY,NX) =plt_bgcr%LitterFallChemElm_pft(1:NumPlantChemElms,NZ)
+    LitrFallChemElm_pft(1:NumPlantChemElms,NZ,NY,NX) =plt_bgcr%LitrFallChemElm_pft(1:NumPlantChemElms,NZ)
     EcoHavstElmnt_pft(1:NumPlantChemElms,NZ,NY,NX) =plt_distb%EcoHavstElmnt_pft(1:NumPlantChemElms,NZ)
     NetCumElmntFlx2Plant_pft(1:NumPlantChemElms,NZ,NY,NX) =plt_pheno%NetCumElmntFlx2Plant_pft(1:NumPlantChemElms,NZ)
     SurfLitrfallChemElms_pft(1:NumPlantChemElms,NZ,NY,NX) =plt_bgcr%SurfLitrfallChemElms_pft(1:NumPlantChemElms,NZ)
@@ -305,7 +305,7 @@ implicit none
     DO L=0,NL(NY,NX)
       DO K=1,micpar%NumOfPlantLitrCmplxs
         DO M=1,jsken
-          LitterFallChemElm_pvr(1:NumPlantChemElms,M,K,L,NZ,NY,NX)=plt_bgcr%LitterFallChemElm_pvr(1:NumPlantChemElms,M,K,L,NZ)
+          LitrFallChemElm_pvr(1:NumPlantChemElms,M,K,L,NZ,NY,NX)=plt_bgcr%LitrFallChemElm_pvr(1:NumPlantChemElms,M,K,L,NZ)
         ENDDO
       ENDDO
     ENDDO
@@ -738,7 +738,7 @@ implicit none
     plt_pheno%iPlantMorphologyType_pft(NZ)=iPlantMorphologyType_pft(NZ,NY,NX)
     plt_pheno%iPlantPhenologyPattern_pft(NZ)=iPlantPhenologyPattern_pft(NZ,NY,NX)
     plt_pheno%iPlantDevelopPattern_pft(NZ)=iPlantDevelopPattern_pft(NZ,NY,NX)
-    plt_pheno%iPlantPhenologyType_pft(NZ)=iPlantPhenologyType_pft(NZ,NY,NX)
+    plt_pheno%iPlantPhenolType_pft(NZ)=iPlantPhenolType_pft(NZ,NY,NX)
     plt_pheno%iPlantPhotoperiodType_pft(NZ)=iPlantPhotoperiodType_pft(NZ,NY,NX)
     plt_pheno%iPlantTurnoverPattern_pft(NZ)=iPlantTurnoverPattern_pft(NZ,NY,NX)
     plt_pheno%PlantInitThermoAdaptZone(NZ)=PlantInitThermoAdaptZone(NZ,NY,NX)
@@ -883,7 +883,7 @@ implicit none
   plt_site%PPT=PPT(NY,NX)
   plt_bgcr%ECO_ER_col=ECO_ER_col(NY,NX)
   plt_biom%StandingDeadChemElm_col(1:NumPlantChemElms)=StandingDeadChemElm_col(1:NumPlantChemElms,NY,NX)
-  plt_bgcr%LitterFallChemElm_col(1:NumPlantChemElms)=LitterFallChemElm_col(1:NumPlantChemElms,NY,NX)
+  plt_bgcr%LitrFallChemElm_col(1:NumPlantChemElms)=LitrFallChemElm_col(1:NumPlantChemElms,NY,NX)
   plt_morph%StemArea_grd=StemArea_grd(NY,NX)
   plt_ew%Eco_Heat_Sens_col=Eco_Heat_Sens_col(NY,NX)
   plt_ew%CanH2OHeldVg=CanH2OHeldVg(NY,NX)
@@ -973,7 +973,7 @@ implicit none
     plt_biom%CanopyNonstructElementConc_pft(1:NumPlantChemElms,NZ)=CanopyNonstructElementConc_pft(1:NumPlantChemElms,NZ,NY,NX)
     plt_biom%CanopyNonstructElements_pft(1:NumPlantChemElms,NZ)=CanopyNonstructElements_pft(1:NumPlantChemElms,NZ,NY,NX)
     plt_biom%NoduleNonstructElmnt_pft(1:NumPlantChemElms,NZ)=NoduleNonstructElmnt_pft(1:NumPlantChemElms,NZ,NY,NX)
-    plt_bgcr%LitterFallChemElm_pft(1:NumPlantChemElms,NZ) =LitterFallChemElm_pft(1:NumPlantChemElms,NZ,NY,NX)
+    plt_bgcr%LitrFallChemElm_pft(1:NumPlantChemElms,NZ) =LitrFallChemElm_pft(1:NumPlantChemElms,NZ,NY,NX)
     plt_distb%EcoHavstElmnt_pft(1:NumPlantChemElms,NZ)=EcoHavstElmnt_pft(1:NumPlantChemElms,NZ,NY,NX)
     plt_pheno%NetCumElmntFlx2Plant_pft(1:NumPlantChemElms,NZ)=NetCumElmntFlx2Plant_pft(1:NumPlantChemElms,NZ,NY,NX)
     plt_bgcr%SurfLitrfallChemElms_pft(1:NumPlantChemElms,NZ)  =SurfLitrfallChemElms_pft(1:NumPlantChemElms,NZ,NY,NX)
@@ -1373,7 +1373,7 @@ implicit none
     DO L=0,MaxNumRootLays(NY,NX)
       DO K=1,micpar%NumOfPlantLitrCmplxs
         DO M=1,jsken
-          plt_bgcr%LitterFallChemElm_pvr(1:NumPlantChemElms,M,K,L,NZ)=LitterFallChemElm_pvr(1:NumPlantChemElms,M,K,L,NZ,NY,NX)
+          plt_bgcr%LitrFallChemElm_pvr(1:NumPlantChemElms,M,K,L,NZ)=LitrFallChemElm_pvr(1:NumPlantChemElms,M,K,L,NZ,NY,NX)
         enddo
       enddo
     ENDDO

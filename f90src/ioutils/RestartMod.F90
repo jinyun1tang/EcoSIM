@@ -504,7 +504,7 @@ implicit none
   if(flag=='read')then
     datpr2 => datrp_2d(1:npfts,1:NumPlantChemElms)    
     call restartvar(ncid, flag, varname='LitrfallChemElms_pft', dim1name='pft',dim2name='elmnts',&
-     long_name='total plant element litterfall', units='g d-2', &
+     long_name='total plant element LitrFall', units='g d-2', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)   
     call cppft(flag,NHW,NHE,NVN,NVS,NP,LitrfallChemElms_pft,datrp_2d,NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft)  
   else
@@ -513,7 +513,7 @@ implicit none
       IsPlantActive_pft=IsPlantActive_pft)    
     datpr2 => datrp_2d(1:npfts,1:NumPlantChemElms)    
     call restartvar(ncid, flag, varname='LitrfallChemElms_pft', dim1name='pft',dim2name='elmnts',&
-     long_name='total plant element litterfall', units='g d-2', &
+     long_name='total plant element LitrFall', units='g d-2', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)   
 
   endif
@@ -901,7 +901,7 @@ implicit none
   if(flag=='read')then
     datpr2 => datrp_2d(1:npfts,1:NumPlantChemElms)
     call restartvar(ncid, flag, varname='SurfLitrfallChemElms_pft', dim1name='pft',dim2name='elmnts',&
-     long_name='total surface litterfall element', units='g d-2', &
+     long_name='total surface LitrFall element', units='g d-2', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)  
     call cppft(flag,NHW,NHE,NVN,NVS,NP,SurfLitrfallChemElms_pft,datrp_2d,NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft)  
   else
@@ -910,7 +910,7 @@ implicit none
       IsPlantActive_pft=IsPlantActive_pft)    
     datpr2 => datrp_2d(1:npfts,1:NumPlantChemElms)
     call restartvar(ncid, flag, varname='SurfLitrfallChemElms_pft', dim1name='pft',dim2name='elmnts',&
-     long_name='total surface litterfall element', units='g d-2', &
+     long_name='total surface LitrFall element', units='g d-2', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)  
   endif  
 
@@ -3456,18 +3456,18 @@ implicit none
        fill_value=spval)
 
   call restartvar(ncid, flag, varname='XCSN', &
-       long_name='total litterfall C', units='g d-2', &
+       long_name='total LitrFall C', units='g d-2', &
        interpinic_flag='skip', data=XESN(ielmc), missing_value=spval, &
        fill_value=spval)
 
   call restartvar(ncid, flag, varname='XZSN', &
-       long_name='total litterfall N', units='g d-2', &
+       long_name='total LitrFall N', units='g d-2', &
        interpinic_flag='skip', data=XESN(ielmn), missing_value=spval, &
        fill_value=spval)
 
   
   call restartvar(ncid, flag, varname='XPSN', &
-       long_name='total litterfall P', units='g d-2', &
+       long_name='total LitrFall P', units='g d-2', &
        interpinic_flag='skip', data=XESN(ielmp), missing_value=spval, &
        fill_value=spval)
   
@@ -4244,7 +4244,7 @@ implicit none
   if(flag=='read')then
     datpr2 => datrc_2d(1:ncols,1:NumPlantChemElms)            
     call restartvar(ncid, flag, varname='LiterfalOrgM_col', dim1name='column',&
-       dim2name='elements',long_name='total litterfall C', units='g d-2', &
+       dim2name='elements',long_name='total LitrFall C', units='g d-2', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
     call cpcol(flag,NHW,NHE,NVN,NVS,LiterfalOrgM_col,datrc_2d) 
@@ -4252,7 +4252,7 @@ implicit none
     !print*,'LiterfalOrgC_col'
     if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,LiterfalOrgM_col,datrc_2d)   
     call restartvar(ncid, flag, varname='LiterfalOrgM_col', dim1name='column',&
-       dim2name='elements',long_name='total litterfall C', units='g d-2', &
+       dim2name='elements',long_name='total LitrFall C', units='g d-2', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
   endif  

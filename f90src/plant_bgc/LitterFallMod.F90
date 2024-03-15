@@ -1,4 +1,4 @@
-module LitterFallMod
+module LitrFallMod
 
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use EcosimConst
@@ -66,7 +66,7 @@ implicit none
 !     RubiscoActivity_brch,C4PhotosynDowreg_brch=N,P feedback inhibition on C3 CO2 fixation
 !     doInitLeafOut_brch,doPlantLeafOut_brch=flag for initializing,enabling leafout
 !     doPlantLeaveOff_brch=flag for enabling leafoff:0=enable,1=disable
-!     Hours4LiterfalAftMature_brch=current hours after physl maturity until start of litterfall
+!     Hours4LiterfalAftMature_brch=current hours after physl maturity until start of LitrFall
 !
   IF(J.EQ.INT(SolarNoonHour_col).AND.iPlantCalendar_brch(ipltcal_Emerge,NumOfMainBranch_pft(NZ),NZ).NE.0 &
     .AND.(iPlantPhenologyPattern_pft(NZ).NE.iplt_annual.OR.(I.GE.iDayPlantHarvest_pft(NZ) &
@@ -120,7 +120,7 @@ implicit none
 !     DEAD ROOTS
 !
 !
-!     LITTERFALL FROM DEAD ROOTS
+!     LitrFall FROM DEAD ROOTS
 !
     call LiterfallFromDeadRoots(I,J,NZ)
 !
@@ -163,7 +163,7 @@ implicit none
     FWODRE                           =>   plt_allom%FWODRE  , &
     doInitPlant_pft                  =>   plt_pheno%doInitPlant_pft   , &
     iPlantPhenologyPattern_pft       =>   plt_pheno%iPlantPhenologyPattern_pft  , &
-    iPlantPhenologyType_pft          =>   plt_pheno%iPlantPhenologyType_pft  , &
+    iPlantPhenolType_pft          =>   plt_pheno%iPlantPhenolType_pft  , &
     iPlantRootState_pft              =>   plt_pheno%iPlantRootState_pft  , &
     iPlantMorphologyType_pft         =>   plt_pheno%iPlantMorphologyType_pft  , &
     iPlantTurnoverPattern_pft        =>   plt_pheno%iPlantTurnoverPattern_pft  , &
@@ -172,7 +172,7 @@ implicit none
     ifoliar                          =>   pltpar%ifoliar    , &
     k_fine_litr                      =>   pltpar%k_fine_litr, &
     k_woody_litr                     =>  pltpar%k_woody_litr, &
-    LitterFallChemElm_pvr        =>   plt_bgcr%LitterFallChemElm_pvr     , &
+    LitrFallChemElm_pvr        =>   plt_bgcr%LitrFallChemElm_pvr     , &
     inonfoliar                       =>   pltpar%inonfoliar   , &
     istalk                           =>   pltpar%istalk     , &
     iroot                            =>   pltpar%iroot      , &
@@ -186,13 +186,13 @@ implicit none
     NumOfBranches_pft                =>   plt_morph%NumOfBranches_pft     , &
     NumRootAxes_pft                  =>   plt_morph%NumRootAxes_pft      &
   )
-!     LITTERFALL AND STATE VARIABLES FOR SEASONAL STORAGE
+!     LitrFall AND STATE VARIABLES FOR SEASONAL STORAGE
 !     RESERVES FROM SHOOT AT DEATH
 !
 !     iPlantShootState_pft,IDTHR=PFT shoot,root living flag: 0=alive,1=dead
 !     doInitPlant_pft=PFT initialization flag:0=no,1=yes
-!     CSNC,ZSNC,PSNC=C,N,P litterfall from senescence
-!     CFOPC,CFOPN,CFOPC=fraction of litterfall C,N,P allocated to litter components
+!     CSNC,ZSNC,PSNC=C,N,P LitrFall from senescence
+!     CFOPC,CFOPN,CFOPC=fraction of LitrFall C,N,P allocated to litter components
 !     CPOOL,ZPOOL,PPOOL=non-structural C,N,P in branch
 !     CPOLNB,ZPOLNB,PPOLNB=nonstructural C,N,P in bacteria
 !     ShootNonstructC_brch=total C4 nonstructural C in branch
@@ -205,7 +205,7 @@ implicit none
 !     WTHSBN,WTEABN,WTGRBN=branch husk,ear,grain N mass
 !     WTHSBP,WTEABP,WTGRBP=branch husk,ear,grain P mass
 !     iPlantPhenologyPattern_pft=growth habit:0=annual,1=perennial from PFT file
-!     iPlantPhenologyType_pft=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
+!     iPlantPhenolType_pft=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
 !     WTRVC,WTRVN,WTRVP=storage C,N,P
 !     WTSTG,WTSTDN,WTSTDP=standing dead C,N,P mass
 !
@@ -215,15 +215,15 @@ implicit none
       D6425: DO M=1,jsken
         D8825: DO NB=1,NumOfBranches_pft(NZ)
 
-          LitterFallChemElm_pvr(ielmc,M,k_fine_litr,0,NZ)=LitterFallChemElm_pvr(ielmc,M,k_fine_litr,0,NZ) &
+          LitrFallChemElm_pvr(ielmc,M,k_fine_litr,0,NZ)=LitrFallChemElm_pvr(ielmc,M,k_fine_litr,0,NZ) &
             +CFOPE(ielmc,inonstruct,M,NZ)*ShootNonstructC_brch(NB,NZ)
 
           DO NE=1,NumPlantChemElms
-            LitterFallChemElm_pvr(NE,M,k_woody_litr,0,NZ)=LitterFallChemElm_pvr(NE,M,k_woody_litr,0,NZ) &
+            LitrFallChemElm_pvr(NE,M,k_woody_litr,0,NZ)=LitrFallChemElm_pvr(NE,M,k_woody_litr,0,NZ) &
               +CFOPE(NE,icwood,M,NZ)*(LeafChemElms_brch(NE,NB,NZ)*FWODLE(NE,k_woody_litr) &
               +PetoleChemElm_brch(NE,NB,NZ)*FWODBE(NE,k_woody_litr))
 
-            LitterFallChemElm_pvr(NE,M,k_fine_litr,0,NZ)=LitterFallChemElm_pvr(NE,M,k_fine_litr,0,NZ) &
+            LitrFallChemElm_pvr(NE,M,k_fine_litr,0,NZ)=LitrFallChemElm_pvr(NE,M,k_fine_litr,0,NZ) &
               +CFOPE(NE,inonstruct,M,NZ)*(NonstructElmnt_brch(NE,NB,NZ)+NoduleNonstructElmnt_brch(NE,NB,NZ) &
               +ReserveElmnts_brch(NE,NB,NZ)) &
               +CFOPE(NE,ifoliar,M,NZ)*(LeafChemElms_brch(NE,NB,NZ)*FWODLE(NE,k_fine_litr) &
@@ -231,16 +231,16 @@ implicit none
               +CFOPE(NE,inonfoliar,M,NZ)*(PetoleChemElm_brch(NE,NB,NZ)*FWODBE(NE,k_fine_litr) &
               +HuskChemElms_brch(NE,NB,NZ)+EarChemElms_brch(NE,NB,NZ))
 
-            IF(iPlantPhenologyPattern_pft(NZ).EQ.iplt_annual.AND.iPlantPhenologyType_pft(NZ).NE.0)THEN
+            IF(iPlantPhenologyPattern_pft(NZ).EQ.iplt_annual.AND.iPlantPhenolType_pft(NZ).NE.0)THEN
               NonstructalElmnts_pft(NE,NZ)=NonstructalElmnts_pft(NE,NZ)+CFOPE(NE,inonfoliar,M,NZ) &
                 *GrainChemElms_brch(NE,NB,NZ)
             ELSE
-              LitterFallChemElm_pvr(NE,M,k_fine_litr,0,NZ)=LitterFallChemElm_pvr(NE,M,k_fine_litr,0,NZ) &
+              LitrFallChemElm_pvr(NE,M,k_fine_litr,0,NZ)=LitrFallChemElm_pvr(NE,M,k_fine_litr,0,NZ) &
                 +CFOPE(NE,inonfoliar,M,NZ)*GrainChemElms_brch(NE,NB,NZ)
             ENDIF
             IF(iPlantTurnoverPattern_pft(NZ).EQ.0.OR.iPlantMorphologyType_pft(NZ).LE.1)THEN
               !all above ground
-              LitterFallChemElm_pvr(NE,M,k_fine_litr,0,NZ)=LitterFallChemElm_pvr(NE,M,k_fine_litr,0,NZ)&
+              LitrFallChemElm_pvr(NE,M,k_fine_litr,0,NZ)=LitrFallChemElm_pvr(NE,M,k_fine_litr,0,NZ)&
                 +CFOPE(NE,istalk,M,NZ)*StalkChemElms_brch(NE,NB,NZ)
             ELSE
               StandingDeadKCompChemElms_pft(NE,M,NZ)=StandingDeadKCompChemElms_pft(NE,M,NZ)&
@@ -249,11 +249,11 @@ implicit none
           ENDDO
         ENDDO D8825
 !
-!     LITTERFALL AND STATE VARIABLES FOR SEASONAL STORAGE
+!     LitrFall AND STATE VARIABLES FOR SEASONAL STORAGE
 !     RESERVES FROM ROOT AND STORGE AT DEATH
 !
-!     CSNC,ZSNC,PSNC=C,N,P litterfall from senescence
-!     CFOPC,CFOPN,CFOPC=fraction of litterfall C,N,P allocated to litter components
+!     CSNC,ZSNC,PSNC=C,N,P LitrFall from senescence
+!     CFOPC,CFOPN,CFOPC=fraction of LitrFall C,N,P allocated to litter components
 !     CPOOLR,ZPOOLR,PPOOLR=non-structural C,N,P mass in root
 !     WTRT1,WTRT1N,WTRT1P=primary root C,N,P mass in soil layer
 !     WTRT2,WTRT2N,WTRT2P=secondary root C,N,P mass in soil layer
@@ -263,22 +263,22 @@ implicit none
         DO NE=1,NumPlantChemElms
           D6415: DO L=NU,MaxNumRootLays
             DO N=1,MY(NZ)
-              LitterFallChemElm_pvr(NE,M,k_fine_litr,L,NZ)=LitterFallChemElm_pvr(NE,M,k_fine_litr,L,NZ) &
+              LitrFallChemElm_pvr(NE,M,k_fine_litr,L,NZ)=LitrFallChemElm_pvr(NE,M,k_fine_litr,L,NZ) &
                 +CFOPE(NE,inonstruct,M,NZ)* RootMycoNonstructElmnt_vr(NE,N,L,NZ)
               DO NR=1,NumRootAxes_pft(NZ)
-                LitterFallChemElm_pvr(NE,M,k_woody_litr,L,NZ)=LitterFallChemElm_pvr(NE,M,k_woody_litr,L,NZ)&
+                LitrFallChemElm_pvr(NE,M,k_woody_litr,L,NZ)=LitrFallChemElm_pvr(NE,M,k_woody_litr,L,NZ)&
                   +CFOPE(NE,icwood,M,NZ) &
                   *(Root1stStructChemElm_pvr(NE,N,L,NR,NZ)+Root2ndStructChemElm_pvr(NE,N,L,NR,NZ))*FWODRE(NE,k_woody_litr)
 
-                LitterFallChemElm_pvr(NE,M,k_fine_litr,L,NZ)=LitterFallChemElm_pvr(NE,M,k_fine_litr,L,NZ)+CFOPE(NE,iroot,M,NZ) &
+                LitrFallChemElm_pvr(NE,M,k_fine_litr,L,NZ)=LitrFallChemElm_pvr(NE,M,k_fine_litr,L,NZ)+CFOPE(NE,iroot,M,NZ) &
                   *(Root1stStructChemElm_pvr(NE,N,L,NR,NZ)+Root2ndStructChemElm_pvr(NE,N,L,NR,NZ))*FWODRE(NE,k_fine_litr)
               ENDDO
             ENDDO
           ENDDO D6415
-          LitterFallChemElm_pvr(NE,M,k_woody_litr,NGTopRootLayer_pft(NZ),NZ)=LitterFallChemElm_pvr(NE,M,k_woody_litr,NGTopRootLayer_pft(NZ),NZ) &
+          LitrFallChemElm_pvr(NE,M,k_woody_litr,NGTopRootLayer_pft(NZ),NZ)=LitrFallChemElm_pvr(NE,M,k_woody_litr,NGTopRootLayer_pft(NZ),NZ) &
             +CFOPE(NE,inonstruct,M,NZ)*NonstructalElmnts_pft(NE,NZ)*FWOODE(NE,k_woody_litr)
 
-          LitterFallChemElm_pvr(NE,M,k_fine_litr,NGTopRootLayer_pft(NZ),NZ)=LitterFallChemElm_pvr(NE,M,k_fine_litr,NGTopRootLayer_pft(NZ),NZ) &
+          LitrFallChemElm_pvr(NE,M,k_fine_litr,NGTopRootLayer_pft(NZ),NZ)=LitrFallChemElm_pvr(NE,M,k_fine_litr,NGTopRootLayer_pft(NZ),NZ) &
             +CFOPE(NE,inonstruct,M,NZ)*NonstructalElmnts_pft(NE,NZ)*FWOODE(NE,k_fine_litr)
         ENDDO
       ENDDO D6425
@@ -330,7 +330,7 @@ implicit none
     MaxNumRootLays                =>   plt_site%MaxNumRootLays        , &
     NU                            =>   plt_site%NU        , &
     RootGasLossDisturb_pft        =>   plt_bgcr%RootGasLossDisturb_pft     , &
-    LitterFallChemElm_pvr     =>   plt_bgcr%LitterFallChemElm_pvr      , &
+    LitrFallChemElm_pvr     =>   plt_bgcr%LitrFallChemElm_pvr      , &
     icwood                        =>   pltpar%icwood      , &
     iroot                         =>   pltpar%iroot       , &
     inonstruct                    =>   pltpar%inonstruct   , &
@@ -361,8 +361,8 @@ implicit none
     NumRootAxes_pft               =>   plt_morph%NumRootAxes_pft       &
   )
 !     IDTHR=PFT root living flag: 0=alive,1=dead
-!     CSNC,ZSNC,PSNC=C,N,P litterfall from senescence
-!     CFOPC,CFOPN,CFOPC=fraction of litterfall C,N,P allocated to litter components
+!     CSNC,ZSNC,PSNC=C,N,P LitrFall from senescence
+!     CFOPC,CFOPN,CFOPC=fraction of LitrFall C,N,P allocated to litter components
 !     CPOOLR,ZPOOLR,PPOOLR=non-structural C,N,P mass in root
 !     WTRT1,WTRT1N,WTRT1P=primary root C,N,P mass in soil layer
 !     WTRT2,WTRT2N,WTRT2P=secondary root C,N,P mass in soil layer
@@ -373,18 +373,18 @@ implicit none
 !
 
   IF(iPlantRootState_pft(NZ).EQ.iDead)THEN
-    !add root to litterfall
+    !add root to LitrFall
     D8900: DO N=1,MY(NZ)
       D8895: DO L=NU,MaxNumRootLays
         DO NE=1,NumPlantChemElms
           D6410: DO M=1,jsken
-            LitterFallChemElm_pvr(NE,M,k_fine_litr,L,NZ)=LitterFallChemElm_pvr(NE,M,k_fine_litr,L,NZ) &
+            LitrFallChemElm_pvr(NE,M,k_fine_litr,L,NZ)=LitrFallChemElm_pvr(NE,M,k_fine_litr,L,NZ) &
               +CFOPE(NE,inonstruct,M,NZ)* RootMycoNonstructElmnt_vr(NE,N,L,NZ)
             DO  NR=1,NumRootAxes_pft(NZ)
-              LitterFallChemElm_pvr(NE,M,k_woody_litr,L,NZ)=LitterFallChemElm_pvr(NE,M,k_woody_litr,L,NZ)+CFOPE(NE,icwood,M,NZ) &
+              LitrFallChemElm_pvr(NE,M,k_woody_litr,L,NZ)=LitrFallChemElm_pvr(NE,M,k_woody_litr,L,NZ)+CFOPE(NE,icwood,M,NZ) &
                 *(Root1stStructChemElm_pvr(NE,N,L,NR,NZ)+Root2ndStructChemElm_pvr(NE,N,L,NR,NZ))*FWODRE(NE,k_woody_litr)
 
-              LitterFallChemElm_pvr(NE,M,k_fine_litr,L,NZ)=LitterFallChemElm_pvr(NE,M,k_fine_litr,L,NZ)+CFOPE(NE,iroot,M,NZ) &
+              LitrFallChemElm_pvr(NE,M,k_fine_litr,L,NZ)=LitrFallChemElm_pvr(NE,M,k_fine_litr,L,NZ)+CFOPE(NE,iroot,M,NZ) &
                 *(Root1stStructChemElm_pvr(NE,N,L,NR,NZ)+Root2ndStructChemElm_pvr(NE,N,L,NR,NZ))*FWODRE(NE,k_fine_litr)
             enddo
           ENDDO D6410
@@ -438,18 +438,18 @@ implicit none
         RootAreaPerPlant_vr(N,L,NZ)=0._r8
         AveSecndRootLen(N,L,NZ)=MinAve2ndRootLen
 !
-!     LITTERFALL AND STATE VARIABLES FROM DEAD NODULES
+!     LitrFall AND STATE VARIABLES FROM DEAD NODULES
 !
 !     iPlantNfixType=N2 fixation: 1,2,3=rapid to slow root symbiosis
-!     CSNC,ZSNC,PSNC=C,N,P litterfall from decomposition and senescence
-!     CFOPC,CFOPN,CFOPC=fraction of litterfall C,N,P allocated to litter components
+!     CSNC,ZSNC,PSNC=C,N,P LitrFall from decomposition and senescence
+!     CFOPC,CFOPN,CFOPC=fraction of LitrFall C,N,P allocated to litter components
 !     WTNDL,WTNDLN,WTNDLP=bacterial C,N,P mass
 !     CPOOLN,ZPOOLN,PPOOLN=nonstructural C,N,P in bacteria
 !
         IF(is_plant_N2fix(iPlantNfixType(NZ)).AND.N.EQ.ipltroot)THEN
           D6420: DO M=1,jsken
             DO NE=1,NumPlantChemElms            
-              LitterFallChemElm_pvr(NE,M,k_fine_litr,L,NZ)=LitterFallChemElm_pvr(NE,M,k_fine_litr,L,NZ)+&
+              LitrFallChemElm_pvr(NE,M,k_fine_litr,L,NZ)=LitrFallChemElm_pvr(NE,M,k_fine_litr,L,NZ)+&
                 CFOPE(NE,iroot,M,NZ)*RootNodueChemElm_pvr(NE,L,NZ)+&
                 CFOPE(NE,inonstruct,M,NZ)*RootNoduleNonstructElmnt_vr(NE,L,NZ)
             ENDDO
@@ -526,9 +526,9 @@ implicit none
     iPlantCalendar_brch    =>  plt_pheno%iPlantCalendar_brch    , &
     iPlantTurnoverPattern_pft    =>  plt_pheno%iPlantTurnoverPattern_pft    , &
     iPlantMorphologyType_pft    =>  plt_pheno%iPlantMorphologyType_pft    , &
-    iPlantPhenologyType_pft    =>  plt_pheno%iPlantPhenologyType_pft    , &
+    iPlantPhenolType_pft    =>  plt_pheno%iPlantPhenolType_pft    , &
     iPlantPhenologyPattern_pft    =>  plt_pheno%iPlantPhenologyPattern_pft    , &
-    LitterFallChemElm_pvr      =>  plt_bgcr%LitterFallChemElm_pvr       , &
+    LitrFallChemElm_pvr      =>  plt_bgcr%LitrFallChemElm_pvr       , &
     NumOfBranches_pft       =>  plt_morph%NumOfBranches_pft       , &
     NodeNumberToInitFloral_brch     =>  plt_morph%NodeNumberToInitFloral_brch     , &
     ShootNodeNumber_brch     =>  plt_morph%ShootNodeNumber_brch     , &
@@ -577,10 +577,10 @@ implicit none
         iPlantCalendar_brch(M,NB,NZ)=0
       ENDDO D8850
 !
-!     LITTERFALL FROM DEAD BRANCHES
+!     LitrFall FROM DEAD BRANCHES
 !
-!     CSNC,ZSNC,PSNC=C,N,P litterfall from senescence
-!     CFOPC,CFOPN,CFOPC=fraction of litterfall C,N,P allocated to litter components
+!     CSNC,ZSNC,PSNC=C,N,P LitrFall from senescence
+!     CFOPC,CFOPN,CFOPC=fraction of LitrFall C,N,P allocated to litter components
 !     CPOOL,ZPOOL,PPOOL=non-structural C,N,P in branch
 !     CPOLNB,ZPOLNB,PPOLNB=nonstructural C,N,P in bacteria
 !     WTNDB,WTNDBN,WTNDBP=bacterial C,N,P mass
@@ -594,31 +594,31 @@ implicit none
 !     WTRVC,WTRVN,WTRVP=storage C,N,P
 !     WTSTG,WTSTDN,WTSTDP=standing dead C,N,P mass
 !     iPlantPhenologyPattern_pft=growth habit:0=annual,1=perennial from PFT file
-!     iPlantPhenologyType_pft=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
+!     iPlantPhenolType_pft=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
 !     iPlantTurnoverPattern_pft=turnover:0=all abve-grd,1=all leaf+petiole,2=none,3=between 1,2
 !     iPlantMorphologyType_pft=growth type:0=bryophyte,1=graminoid,2=shrub,tree
 !
       D6405: DO M=1,jsken
         DO NE=1,NumPlantChemElms        
-          LitterFallChemElm_pvr(NE,M,k_fine_litr,0,NZ)=LitterFallChemElm_pvr(NE,M,k_fine_litr,0,NZ) &
+          LitrFallChemElm_pvr(NE,M,k_fine_litr,0,NZ)=LitrFallChemElm_pvr(NE,M,k_fine_litr,0,NZ) &
             +CFOPE(NE,inonstruct,M,NZ)*NoduleNonstructElmnt_brch(NE,NB,NZ) &
             +CFOPE(NE,ifoliar,M,NZ)*(LeafChemElms_brch(NE,NB,NZ)*FWODLE(NE,k_fine_litr) &
             +CanopyNoduleChemElm_brch(NE,NB,NZ)) &
             +CFOPE(NE,inonfoliar,M,NZ)*(PetoleChemElm_brch(NE,NB,NZ)*FWODBE(NE,k_fine_litr) &
             +HuskChemElms_brch(NE,NB,NZ)+EarChemElms_brch(NE,NB,NZ))
 
-          LitterFallChemElm_pvr(NE,M,k_woody_litr,0,NZ)=LitterFallChemElm_pvr(NE,M,k_woody_litr,0,NZ) &
+          LitrFallChemElm_pvr(NE,M,k_woody_litr,0,NZ)=LitrFallChemElm_pvr(NE,M,k_woody_litr,0,NZ) &
             +CFOPE(NE,icwood,M,NZ)*(LeafChemElms_brch(NE,NB,NZ)*FWODBE(NE,k_woody_litr) &
             +PetoleChemElm_brch(NE,NB,NZ)*FWODBE(NE,k_woody_litr))
 
-          IF(iPlantPhenologyPattern_pft(NZ).EQ.iplt_annual.AND.iPlantPhenologyType_pft(NZ).NE.0)THEN
+          IF(iPlantPhenologyPattern_pft(NZ).EQ.iplt_annual.AND.iPlantPhenolType_pft(NZ).NE.0)THEN
             NonstructalElmnts_pft(NE,NZ)=NonstructalElmnts_pft(NE,NZ)+CFOPE(NE,inonfoliar,M,NZ)*GrainChemElms_brch(NE,NB,NZ)
           ELSE
-            LitterFallChemElm_pvr(NE,M,k_fine_litr,0,NZ)=LitterFallChemElm_pvr(NE,M,k_fine_litr,0,NZ) &
+            LitrFallChemElm_pvr(NE,M,k_fine_litr,0,NZ)=LitrFallChemElm_pvr(NE,M,k_fine_litr,0,NZ) &
               +CFOPE(NE,inonfoliar,M,NZ)*GrainChemElms_brch(NE,NB,NZ)
           ENDIF
           IF(iPlantTurnoverPattern_pft(NZ).EQ.0.OR.iPlantMorphologyType_pft(NZ).LE.1)THEN
-            LitterFallChemElm_pvr(NE,M,k_fine_litr,0,NZ)=LitterFallChemElm_pvr(NE,M,k_fine_litr,0,NZ) &
+            LitrFallChemElm_pvr(NE,M,k_fine_litr,0,NZ)=LitrFallChemElm_pvr(NE,M,k_fine_litr,0,NZ) &
               +CFOPE(NE,istalk,M,NZ)*StalkChemElms_brch(NE,NB,NZ)
           ELSE
             StandingDeadKCompChemElms_pft(NE,M,NZ)=StandingDeadKCompChemElms_pft(NE,M,NZ)+CFOPE(NE,icwood,M,NZ)*StalkChemElms_brch(NE,NB,NZ)
@@ -642,7 +642,7 @@ implicit none
         NonstructalElmnts_pft(NE,NZ)=NonstructalElmnts_pft(NE,NZ)+NonstructElmnt_brch(NE,NB,NZ)
         IF(iHarvstType_pft(NZ).NE.4.AND.iHarvstType_pft(NZ).NE.6)THEN
           D6406: DO M=1,jsken
-            LitterFallChemElm_pvr(NE,M,k_fine_litr,0,NZ)=LitterFallChemElm_pvr(NE,M,k_fine_litr,0,NZ) &
+            LitrFallChemElm_pvr(NE,M,k_fine_litr,0,NZ)=LitrFallChemElm_pvr(NE,M,k_fine_litr,0,NZ) &
               +CFOPE(NE,inonstruct,M,NZ)*ReserveElmnts_brch(NE,NB,NZ)
           ENDDO D6406
         ELSE
@@ -873,4 +873,4 @@ implicit none
   end subroutine ResetDeadRootStates
 
 
-end module LitterFallMod
+end module LitrFallMod

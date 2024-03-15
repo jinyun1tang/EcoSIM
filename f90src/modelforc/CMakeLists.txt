@@ -1,4 +1,5 @@
 set(MODELFORC_MOD_SOURCES
+  YearMod.F90
 	DayMod.F90
 	Hour1Mod.F90
 	WthrMod.F90

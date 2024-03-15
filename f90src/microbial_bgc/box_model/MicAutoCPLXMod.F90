@@ -541,7 +541,7 @@ module MicAutoCPLXMod
 !     SPOMC=basal decomposition rate
 !     SPOMK=effect of low microbial C concentration on microbial decay
 !     RXOMC,RXOMN,RXOMP=microbial C,N,P decomposition
-!     RDOMC,RDOMN,RDOMP=microbial C,N,P litterfall
+!     RDOMC,RDOMN,RDOMP=microbial C,N,P LitrFall
 !     R3OMC,R3OMN,R3OMP=microbial C,N,P recycling
 !
     MID=micpar%get_micb_id(M,NGL)
@@ -559,9 +559,9 @@ module MicAutoCPLXMod
 !     HUMIFICATION OF MICROBIAL DECOMPOSITION PRODUCTS FROM
 !     DECOMPOSITION RATE, SOIL CLAY AND OC 'EHUM' FROM 'HOUR1'
 !
-!     RHOMC,RHOMN,RHOMP=transfer of microbial C,N,P litterfall to humus
+!     RHOMC,RHOMN,RHOMP=transfer of microbial C,N,P LitrFall to humus
 !     EHUM=humus transfer fraction from hour1.f
-!     RCOMC,RCOMN,RCOMP=transfer of microbial C,N,P litterfall to residue
+!     RCOMC,RCOMN,RCOMP=transfer of microbial C,N,P LitrFall to residue
 !
       RHOMEautor(NE,M,NGL)=AZMAX1(RDOMEautor(NE,M,NGL)*EHUM)
   !
@@ -581,7 +581,7 @@ module MicAutoCPLXMod
 !     RXMMC,RXMMN,RXMMP=microbial C,N,P loss from senescence
 !     RMOMC=maintenance respiration
 !     CNOMA,CPOMA=N:C,P:C ratios of active biomass
-!     RDMMC,RDMMN,RDMMP=microbial C,N,P litterfall from senescence
+!     RDMMC,RDMMN,RDMMP=microbial C,N,P LitrFall from senescence
 !     R3MMC,R3MMN,R3MMP=microbial C,N,P recycling from senescence
 !
   IF(RXOMT.GT.ZEROS.AND.RMOMT.GT.ZEROS.AND.RCCC.GT.ZERO)THEN
@@ -601,9 +601,9 @@ module MicAutoCPLXMod
 !     HUMIFICATION AND RECYCLING OF RESPIRATION DECOMPOSITION
 !     PRODUCTS
 !
-!     RHMMC,RHMMN,RHMMC=transfer of senesence litterfall C,N,P to humus
+!     RHMMC,RHMMN,RHMMC=transfer of senesence LitrFall C,N,P to humus
 !     EHUM=humus transfer fraction
-!     RCMMC,RCMMN,RCMMC=transfer of senesence litterfall C,N,P to residue
+!     RCMMC,RCMMN,RCMMC=transfer of senesence LitrFall C,N,P to residue
 !
       DO NE=1,NumPlantChemElms
         RHMMEautor(NE,M,NGL)=AZMAX1(RDMMEautor(NE,M,NGL)*EHUM)
@@ -1951,8 +1951,8 @@ module MicAutoCPLXMod
 !     HUMIFICATION PRODUCTS
 !
 !     CFOMC=fractions allocated to humic vs fulvic humus
-!     RHOMC,RHOMN,RHOMP=transfer of microbial C,N,P litterfall to humus
-!     RHMMC,RHMMN,RHMMC=transfer of senesence litterfall C,N,P to humus
+!     RHOMC,RHOMN,RHOMP=transfer of microbial C,N,P LitrFall to humus
+!     RHMMC,RHMMN,RHMMC=transfer of senesence LitrFall C,N,P to humus
 !
           IF(.not.litrm)THEN
             DO NE=1,NumPlantChemElms

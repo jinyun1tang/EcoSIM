@@ -65,7 +65,7 @@ module NoduleBGCMod
     CanopyPlusNoduRespC_pft    =>  plt_bgcr%CanopyPlusNoduRespC_pft    , &
     Eco_AutoR_col     =>  plt_bgcr%Eco_AutoR_col     , &
     CO2NetFix_pft     =>  plt_bgcr%CO2NetFix_pft     , &
-    LitterFallChemElm_pvr     =>  plt_bgcr%LitterFallChemElm_pvr     , &
+    LitrFallChemElm_pvr     =>  plt_bgcr%LitrFallChemElm_pvr     , &
     ifoliar  =>  pltpar%ifoliar    , &
     NoduGrowthYield_pft    =>  plt_allom%NoduGrowthYield_pft   , &
     NodulerNC_pft    =>  plt_allom%NodulerNC_pft   , &
@@ -204,7 +204,7 @@ module NoduleBGCMod
 !     SPNDL=specific decomposition rate by bacterial N2 fixers
 !     WTNDB,WTNDBN,WTNDBP=bacterial C,N,P mass
 !     NoduleElmntLoss2decay(ielmc),NoduleElmntLoss2decay(ielmn),NoduleElmntLoss2decay(ielmp)=bacterial C,N,P loss from decomposition
-!     NoduleElmntDecay2Litr(ielmc),NoduleElmntDecay2Litr(ielmn),NoduleElmntDecay2Litr(ielmp)=bacterial C,N,P decomposition to litterfall
+!     NoduleElmntDecay2Litr(ielmc),NoduleElmntDecay2Litr(ielmn),NoduleElmntDecay2Litr(ielmp)=bacterial C,N,P decomposition to LitrFall
 !     NoduleElmntDecay2Recycle(ielmc),NoduleElmntDecay2Recycle(ielmn),NoduleElmntDecay2Recycle(ielmp)=bacterial C,N,P decomposition to recycling
 !
     RCCC=RCCZN+CCC*RCCYN
@@ -255,7 +255,7 @@ module NoduleBGCMod
 !     WTNDB,WTNDBN,WTNDBP=bacterial C,N,P mass
 !     RCCC,RCCN,RCCP=remobilization coefficient for C,N,P
 !     NoduleELmntLoss2Senes(ielmc),NoduleELmntLoss2Senes(ielmc),NoduleELmntLoss2Senes(ielmp)=bacterial C,N,P loss from senescence
-!     NoduleELmntSenes2Litr(ielmc),NoduleELmntSenes2Litr(ielmc),NoduleELmntSenes2Litr(ielmp)=bacterial C,N,P senescence to litterfall
+!     NoduleELmntSenes2Litr(ielmc),NoduleELmntSenes2Litr(ielmc),NoduleELmntSenes2Litr(ielmp)=bacterial C,N,P senescence to LitrFall
 !     NoduleELmntSenes2Recycle(ielmc),NoduleELmntSenes2Recycle(ielmc),NoduleELmntSenes2Recycle(ielmp)=bacterial C,N,P senescence to recycling
 !
     IF(RSNDL.GT.0.0.AND.CanopyNoduleChemElm_brch(ielmc,NB,NZ).GT.ZEROP(NZ).AND.RCCC.GT.ZERO)THEN
@@ -294,16 +294,16 @@ module NoduleBGCMod
     ECO_ER_col=ECO_ER_col-RCO2T
     Eco_AutoR_col=Eco_AutoR_col-RCO2T
 !
-!     NODULE LITTERFALL CAUSED BY REMOBILIZATION
+!     NODULE LitrFall CAUSED BY REMOBILIZATION
 !
-!     CSNC,ZSNC,PSNC=C,N,P litterfall from decomposition and senescence
-!     CFOPC,CFOPN,CFOPC=fraction of litterfall C,N,P allocated to litter components
-!     NoduleElmntDecay2Litr(ielmc),NoduleElmntDecay2Litr(ielmn),NoduleElmntDecay2Litr(ielmp)=bacterial C,N,P decomposition to litterfall
-!     NoduleELmntSenes2Litr(ielmc),NoduleELmntSenes2Litr(ielmc),NoduleELmntSenes2Litr(ielmp)=bacterial C,N,P senescence to litterfall
+!     CSNC,ZSNC,PSNC=C,N,P LitrFall from decomposition and senescence
+!     CFOPC,CFOPN,CFOPC=fraction of LitrFall C,N,P allocated to litter components
+!     NoduleElmntDecay2Litr(ielmc),NoduleElmntDecay2Litr(ielmn),NoduleElmntDecay2Litr(ielmp)=bacterial C,N,P decomposition to LitrFall
+!     NoduleELmntSenes2Litr(ielmc),NoduleELmntSenes2Litr(ielmc),NoduleELmntSenes2Litr(ielmp)=bacterial C,N,P senescence to LitrFall
 !
     D6470: DO M=1,jsken
       DO NE=1,NumPlantChemElms
-        LitterFallChemElm_pvr(NE,M,k_fine_litr,0,NZ)=LitterFallChemElm_pvr(NE,M,k_fine_litr,0,NZ) &
+        LitrFallChemElm_pvr(NE,M,k_fine_litr,0,NZ)=LitrFallChemElm_pvr(NE,M,k_fine_litr,0,NZ) &
           +CFOPE(NE,ifoliar,M,NZ)*(NoduleElmntDecay2Litr(NE)+NoduleELmntSenes2Litr(NE))
       ENDDO
     ENDDO D6470
@@ -435,7 +435,7 @@ module NoduleBGCMod
     RCO2N    =>   plt_rbgc%RCO2N     , &
     RootAutoRO2Limiter_pvr     =>   plt_rbgc%RootAutoRO2Limiter_pvr      , &
     RCO2A    =>   plt_rbgc%RCO2A     , &
-    LitterFallChemElm_pvr     =>   plt_bgcr%LitterFallChemElm_pvr      , &
+    LitrFallChemElm_pvr     =>   plt_bgcr%LitrFallChemElm_pvr      , &
     RootN2Fix_pft     =>   plt_rbgc%RootN2Fix_pft      , &
     RootN2Fix_pvr    =>   plt_bgcr%RootN2Fix_pvr     , &
     PopuPlantRootC_vr   =>   plt_biom% PopuPlantRootC_vr    , &
@@ -585,7 +585,7 @@ module NoduleBGCMod
 !     SPNDX=specific bacterial decomposition rate at current CCNDLR
 !     WTNDL,WTNDLN,WTNDLP=bacterial C,N,P mass
 !     NoduleElmntLoss2decay(ielmc),NoduleElmntLoss2decay(ielmn),NoduleElmntLoss2decay(ielmp)=bacterial C,N,P loss from decomposition
-!     NoduleElmntDecay2Litr(ielmc),NoduleElmntDecay2Litr(ielmn),NoduleElmntDecay2Litr(ielmp)=bacterial C,N,P decomposition to litterfall
+!     NoduleElmntDecay2Litr(ielmc),NoduleElmntDecay2Litr(ielmn),NoduleElmntDecay2Litr(ielmp)=bacterial C,N,P decomposition to LitrFall
 !     NoduleElmntDecay2Recycle(ielmc),NoduleElmntDecay2Recycle(ielmn),NoduleElmntDecay2Recycle(ielmp)=bacterial C,N,P decomposition to recycling
 !
         RCCC=RCCZN+CCC*RCCYN
@@ -635,7 +635,7 @@ module NoduleBGCMod
 !     WTNDL,WTNDLN,WTNDLP=bacterial C,N,P mass
 !     RCCC,RCCN,RCCP=remobilization coefficient for C,N,P
 !     NoduleELmntLoss2Senes(ielmc),NoduleELmntLoss2Senes(ielmc),NoduleELmntLoss2Senes(ielmp)=bacterial C,N,P loss from senescence
-!     NoduleELmntSenes2Litr(ielmc),NoduleELmntSenes2Litr(ielmc),NoduleELmntSenes2Litr(ielmp)=bacterial C,N,P senescence to litterfall
+!     NoduleELmntSenes2Litr(ielmc),NoduleELmntSenes2Litr(ielmc),NoduleELmntSenes2Litr(ielmp)=bacterial C,N,P senescence to LitrFall
 !     NoduleELmntSenes2Recycle(ielmc),NoduleELmntSenes2Recycle(ielmc),NoduleELmntSenes2Recycle(ielmp)=bacterial C,N,P senescence to recycling
 !
         IF(RSNDL.GT.0.0_r8.AND.RootNodueChemElm_pvr(ielmc,L,NZ).GT.ZEROP(NZ).AND.RCCC.GT.ZERO)THEN
@@ -671,16 +671,16 @@ module NoduleBGCMod
         RCO2N(ipltroot,L,NZ)=RCO2N(ipltroot,L,NZ)+RCO2T
         RCO2A(ipltroot,L,NZ)=RCO2A(ipltroot,L,NZ)-RCO2T
 !
-!     NODULE LITTERFALL CAUSED BY REMOBILIZATION
+!     NODULE LitrFall CAUSED BY REMOBILIZATION
 !
-!     CSNC,ZSNC,PSNC=C,N,P litterfall from decomposition and senescence
-!     CFOPC,CFOPN,CFOPC=fraction of litterfall C,N,P allocated to litter components
-!     NoduleElmntDecay2Litr(ielmc),NoduleElmntDecay2Litr(ielmn),NoduleElmntDecay2Litr(ielmp)=bacterial C,N,P decomposition to litterfall
-!     NoduleELmntSenes2Litr(ielmc),NoduleELmntSenes2Litr(ielmc),NoduleELmntSenes2Litr(ielmp)=bacterial C,N,P senescence to litterfall
+!     CSNC,ZSNC,PSNC=C,N,P LitrFall from decomposition and senescence
+!     CFOPC,CFOPN,CFOPC=fraction of LitrFall C,N,P allocated to litter components
+!     NoduleElmntDecay2Litr(ielmc),NoduleElmntDecay2Litr(ielmn),NoduleElmntDecay2Litr(ielmp)=bacterial C,N,P decomposition to LitrFall
+!     NoduleELmntSenes2Litr(ielmc),NoduleELmntSenes2Litr(ielmc),NoduleELmntSenes2Litr(ielmp)=bacterial C,N,P senescence to LitrFall
 !
         D6370: DO M=1,jsken
           DO NE=1,NumPlantChemElms
-            LitterFallChemElm_pvr(NE,M,k_fine_litr,L,NZ)=LitterFallChemElm_pvr(NE,M,k_fine_litr,L,NZ)&
+            LitrFallChemElm_pvr(NE,M,k_fine_litr,L,NZ)=LitrFallChemElm_pvr(NE,M,k_fine_litr,L,NZ)&
               +CFOPE(NE,iroot,M,NZ)*(NoduleElmntDecay2Litr(NE)+NoduleELmntSenes2Litr(NE))
           ENDDO
         ENDDO D6370
