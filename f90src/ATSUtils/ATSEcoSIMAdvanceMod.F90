@@ -44,7 +44,6 @@ implicit none
 
   NX=1
 
-  write(*,*) "In Advance:"
 
   do NY=1,NYS
     NU(NY,NX)=a_NU(NY)
@@ -54,7 +53,6 @@ implicit none
     AREA(3,NU(NY,NX),NY,NX)=a_AREA3(0,NY)
     AREA(3,2,NY,NX)=a_AREA3(0,NY)
 
-    write(*,*) "a_AREA3(NY) = ", a_AREA3(0,NY)
 
     ASP(NY,NX)=a_ASP(NY)
     !TairKClimMean(NY,NX)=a_ATKA(NY)
@@ -73,7 +71,6 @@ implicit none
     LWRadSky(NY,NX) = sunrad(NY)*0.0036_r8
     !RainH(NY,NX) = prec
     DO L=NU(NY,NX),NL(NY,NX)
-      write(*,*) "L = ", L, "POROS(L,NY,NX) = ", POROS(L,NY,NX), " POROS(L,NY,NX) = ", POROS(L,NY,NX)
       CumDepth2LayerBottom(L,NY,NX)=a_CumDepth2LayerBottom(L,NY)
       SoiBulkDensityt0(L,NY,NX)=a_BKDSI(L,NY)
       CORGC(L,NY,NX)=a_CORGC(L,NY)

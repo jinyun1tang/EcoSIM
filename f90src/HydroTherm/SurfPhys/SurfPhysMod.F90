@@ -80,11 +80,13 @@ contains
 
   watflw =0._r8;waticefl=0._r8
 
-  DO NX=NHW,NHE
-    DO NY=NVN,NVS
-    NUM(NY,NX)=2 
-    ENDDO
-  ENDDO
+  if(ATS_cpl_mode) then 
+    DO NX=NHW,NHE
+      DO NY=NVN,NHE  
+         NUM(NY,NX)=1 
+      enddo
+    enddo
+  endif
 
   D9995: DO NX=NHW,NHE
     D9990: DO NY=NVN,NVS

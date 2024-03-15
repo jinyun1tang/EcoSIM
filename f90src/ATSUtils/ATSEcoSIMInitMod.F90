@@ -6,6 +6,7 @@ module ATSEcoSIMInitMod
   use SOMDataType
   USE SoilPhysDataType
   use LandSurfDataType
+  use EcoSIMCtrlMod
   use HydroThermData, only : PSISM1, TKSoi1, VLHeatCapacity, &
       SoilFracAsMicP, VLWatMicP1, VLiceMicP1 !need the only as some vars
   use CanopyDataType, only: SWRadOnGrnd
@@ -39,8 +40,7 @@ implicit none
   FlowDirIndicator = 3 !Basically a switch, setting to 3 removes lateral flow
   MaxNumRootLays = 1 !Is the number of layers down the roots go
   NX=1
-
-  write(*,*) "In init"
+  ATS_cpl_mode=.true.
 
   do NY=1,NYS
     NU(NY,NX)=a_NU(NY)
@@ -72,7 +72,6 @@ implicit none
 
   PSIAtFldCapacity = pressure_at_field_capacity
   PSIAtWiltPoint = pressure_at_wilting_point
-  write(*,*) "Calling Startsim"
 
   call startsim(NHW,NHE,NVN,NVS)
 
