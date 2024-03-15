@@ -144,7 +144,7 @@ module fileUtil
      read(unit=nml_unit, iostat=nml_error, iomsg=ioerror_msg) namelist_buffer
 
      ! we should always reach the EOF to capture the entire file...
-     if (.not. is_iostat_end(nml_error)) then
+     if (nml_error/=0) then
         write(stdout, '(a, a, i8)') subname, &
              ": IO ERROR reading namelist file into buffer: ", nml_error
         write(stdout, '(a)') ioerror_msg

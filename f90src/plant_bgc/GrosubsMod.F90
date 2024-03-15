@@ -11,7 +11,7 @@ module grosubsMod
   use PhotoSynsMod
   use PlantMathFuncMod
   use RootMod, only : RootBGCModel
-  use LitterFallMod
+  use LitrFallMod
   use PlantBranchMod
   implicit none
 
@@ -76,8 +76,8 @@ module grosubsMod
     NP0      => plt_site%NP0      , &
     MaxNumRootLays       => plt_site%MaxNumRootLays       , &
     CO2NetFix_pft     => plt_bgcr%CO2NetFix_pft     , &
-    LitterFallChemElm_pft    => plt_bgcr%LitterFallChemElm_pft    , &
-    LitterFallChemElm_pvr     => plt_bgcr%LitterFallChemElm_pvr     , &
+    LitrFallChemElm_pft    => plt_bgcr%LitrFallChemElm_pft    , &
+    LitrFallChemElm_pvr     => plt_bgcr%LitrFallChemElm_pvr     , &
     CanopyHeight_pft      => plt_morph%CanopyHeight_pft       &
   )
 !     TOTAL AGB FOR GRAZING IN LANDSCAPE SECTION
@@ -91,12 +91,12 @@ module grosubsMod
       DO K=1,pltpar%NumOfPlantLitrCmplxs
         DO M=1,jsken
           DO NE=1,NumPlantChemElms
-            LitterFallChemElm_pvr(NE,M,K,L,NZ)=0._r8
+            LitrFallChemElm_pvr(NE,M,K,L,NZ)=0._r8
           ENDDO
         ENDDO
       ENDDO
     ENDDO D1
-    LitterFallChemElm_pft(1:NumPlantChemElms,NZ)=0._r8
+    LitrFallChemElm_pft(1:NumPlantChemElms,NZ)=0._r8
     CO2NetFix_pft(NZ)=0._r8
     CanopyHeight_copy(NZ)=CanopyHeight_pft(NZ)
     CanopyHeight_pft(NZ)=0._r8
@@ -161,10 +161,10 @@ module grosubsMod
     NP0     => plt_site%NP0      , &
     MaxNumRootLays      => plt_site%MaxNumRootLays       , &
     iYearCurrent    => plt_site%iYearCurrent     , &
-    LitterFallChemElm_pvr    => plt_bgcr%LitterFallChemElm_pvr     , &
+    LitrFallChemElm_pvr    => plt_bgcr%LitrFallChemElm_pvr     , &
     NetPrimaryProductvity_pft    => plt_bgcr%NetPrimaryProductvity_pft     , &
     PlantN2FixCum_pft  => plt_bgcr%PlantN2FixCum_pft   , &
-    LitterFallChemElm_pft   => plt_bgcr%LitterFallChemElm_pft    , &
+    LitrFallChemElm_pft   => plt_bgcr%LitrFallChemElm_pft    , &
     NH3EmiCum_pft   => plt_bgcr%NH3EmiCum_pft    , &
     LitrfallChemElms_pft   => plt_bgcr%LitrfallChemElms_pft    , &
     SurfLitrfallChemElms_pft   => plt_bgcr%SurfLitrfallChemElms_pft    , &
@@ -191,38 +191,38 @@ module grosubsMod
       ENDIF
     ENDDO D205
 !
-!     LITTERFALL FROM STANDING DEAD
+!     LitrFall FROM STANDING DEAD
 !
-!     XFRC,XFRN,XFRP=litterfall from standing dead
+!     XFRC,XFRN,XFRP=LitrFall from standing dead
 !     fTgrowCanP=temperature function for canopy growth
 !     WTSTG,WTSTDN,WTSTDP=standing dead C,N,P mass
-!     CSNC,ZSNC,PSNC=C,N,P litterfall
+!     CSNC,ZSNC,PSNC=C,N,P LitrFall
 !
     DO NE=1,NumPlantChemElms
       D6235: DO M=1,jsken
         XFRE=1.5814E-05_r8*fTgrowCanP(NZ)*StandingDeadKCompChemElms_pft(NE,M,NZ)
         IF(iPlantTurnoverPattern_pft(NZ).EQ.0.OR.iPlantMorphologyType_pft(NZ).LE.1)THEN
-          LitterFallChemElm_pvr(NE,M,k_fine_litr,0,NZ)=LitterFallChemElm_pvr(NE,M,k_fine_litr,0,NZ)+XFRE
+          LitrFallChemElm_pvr(NE,M,k_fine_litr,0,NZ)=LitrFallChemElm_pvr(NE,M,k_fine_litr,0,NZ)+XFRE
         ELSE
-          LitterFallChemElm_pvr(NE,M,k_woody_litr,0,NZ)=LitterFallChemElm_pvr(NE,M,k_woody_litr,0,NZ)+XFRE
+          LitrFallChemElm_pvr(NE,M,k_woody_litr,0,NZ)=LitrFallChemElm_pvr(NE,M,k_woody_litr,0,NZ)+XFRE
         ENDIF
         StandingDeadKCompChemElms_pft(NE,M,NZ)=StandingDeadKCompChemElms_pft(NE,M,NZ)-XFRE
       ENDDO D6235
     ENDDO
 !
-!     ACCUMULATE TOTAL SURFACE, SUBSURFACE LITTERFALL
+!     ACCUMULATE TOTAL SURFACE, SUBSURFACE LitrFall
 !
-!     TCSN0,TZSN0,TPSN0=cumulative above-ground C,N,P litterfall
-!     TCSNC,TZSNC,TPSNC=cumulative C,N,P litterfall
-!     HCSNC,HZSNC,HPSNC=hourly C,N,P litterfall
+!     TCSN0,TZSN0,TPSN0=cumulative above-ground C,N,P LitrFall
+!     TCSNC,TZSNC,TPSNC=cumulative C,N,P LitrFall
+!     HCSNC,HZSNC,HPSNC=hourly C,N,P LitrFall
 !
     DO K=1,pltpar%NumOfPlantLitrCmplxs
       DO NE=1,NumPlantChemElms
         D6430: DO M=1,jsken
-          SurfLitrfallChemElms_pft(NE,NZ)=SurfLitrfallChemElms_pft(NE,NZ)+LitterFallChemElm_pvr(NE,M,K,0,NZ)
+          SurfLitrfallChemElms_pft(NE,NZ)=SurfLitrfallChemElms_pft(NE,NZ)+LitrFallChemElm_pvr(NE,M,K,0,NZ)
           D8955: DO L=0,MaxNumRootLays
-            LitterFallChemElm_pft(NE,NZ)=LitterFallChemElm_pft(NE,NZ)+LitterFallChemElm_pvr(NE,M,K,L,NZ)
-            LitrfallChemElms_pft(NE,NZ)=LitrfallChemElms_pft(NE,NZ)+LitterFallChemElm_pvr(NE,M,K,L,NZ)
+            LitrFallChemElm_pft(NE,NZ)=LitrFallChemElm_pft(NE,NZ)+LitrFallChemElm_pvr(NE,M,K,L,NZ)
+            LitrfallChemElms_pft(NE,NZ)=LitrfallChemElms_pft(NE,NZ)+LitrFallChemElm_pvr(NE,M,K,L,NZ)
           ENDDO D8955
         ENDDO D6430
       enddo
@@ -238,13 +238,13 @@ module grosubsMod
 
 !
 !     PLANT C BALANCE = TOTAL C STATE VARIABLES + TOTAL
-!     AUTOTROPHIC RESPIRATION + TOTAL LITTERFALL - TOTAL EXUDATION
+!     AUTOTROPHIC RESPIRATION + TOTAL LitrFall - TOTAL EXUDATION
 !     - TOTAL CO2 FIXATION
 !
 !     BALC=PFT C balance
 !     WTSHT,WTRT,WTND,WTRVC,WTSTG=PFT shoot,root,bacteria,storage,standing dead C
 !     NetPrimaryProductvity_pft=cumulative PFT NPP
-!     TCSNC=cumulative PFT C litterfall
+!     TCSNC=cumulative PFT C LitrFall
 !     TCUPTK=cumulative PFT root-soil C exchange
 !     RSETC=cumulative C balance from previous year
 !     THVSTC=cumulative PFT C removed from ecosystem from previous year
@@ -262,12 +262,12 @@ module grosubsMod
       ENDDO
       ElmntBalanceCum_pft(ielmc,NZ)=ElmntBalanceCum_pft(ielmc,NZ)-NetPrimaryProductvity_pft(NZ)-CO2ByFire_pft(NZ)-CH4ByFire_pft(NZ)
 !
-!     PLANT N BALANCE = TOTAL N STATE VARIABLES + TOTAL N LITTERFALL
+!     PLANT N BALANCE = TOTAL N STATE VARIABLES + TOTAL N LitrFall
 !     - TOTAL N UPTAKE FROM SOIL - TOTAL N ABSORPTION FROM ATMOSPHERE
 !
 !     BALN=PFT N balance
 !     WTSHN,WTRTN,WTNDN,WTRVN,WTSTGN=PFT shoot,root,bacteria,storage,standing dead N
-!     TZSNC=cumulative PFT N litterfall
+!     TZSNC=cumulative PFT N LitrFall
 !     TZUPTK=cumulative PFT root-soil N exchange
 !     NH3EmiCum_pft=cumulative NH3 exchange
 !     RSETN=cumulative N balance from previous year
@@ -279,12 +279,12 @@ module grosubsMod
       ElmntBalanceCum_pft(ielmn,NZ)=ElmntBalanceCum_pft(ielmn,NZ)-NH3EmiCum_pft(NZ) &
         -NH3byFire_pft(NZ)-N2ObyFire_pft(NZ)-PlantN2FixCum_pft(NZ)
 !
-!     PLANT P BALANCE = TOTAL P STATE VARIABLES + TOTAL P LITTERFALL
+!     PLANT P BALANCE = TOTAL P STATE VARIABLES + TOTAL P LitrFall
 !     - TOTAL P UPTAKE FROM SOIL
 !
 !     BALP=PFT N balance
 !     WTSHP,WTRTP,WTNDP,WTRVP,WTSTGP=PFT shoot,root,bacteria,storage,standing dead P
-!     TPSNC=cumulative PFT P litterfall
+!     TPSNC=cumulative PFT P LitrFall
 !     TPUPTK=cumulative PFT root-soil P exchange
 !     RSETP=cumulative P balance from previous year
 !     THVSTP=cumulative PFT P removed from ecosystem from previous year
@@ -604,7 +604,7 @@ module grosubsMod
 !     WTHSBN,WTEABN,WTGRBN=branch husk,ear,grain N mass
 !     WTHSBP,WTEABP,WTGRBP=branch husk,ear,grain P mass
 !     iPlantPhenologyPattern_pft=growth habit:0=annual,1=perennial from PFT file
-!     iPlantPhenologyType_pft=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
+!     iPlantPhenolType_pft=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
 !     WTRVC,WTRVN,WTRVP=storage C,N,P
 !
   DO NE=1,NumPlantChemElms

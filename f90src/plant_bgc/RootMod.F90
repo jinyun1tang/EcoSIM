@@ -393,7 +393,7 @@ implicit none
     RCO2N   =>  plt_rbgc%RCO2N      , &
     RootRespPotential_vr   =>  plt_rbgc%RootRespPotential_vr      , &
     RootAutoRO2Limiter_pvr    =>  plt_rbgc%RootAutoRO2Limiter_pvr       , &
-    LitterFallChemElm_pvr    =>  plt_bgcr%LitterFallChemElm_pvr       , &
+    LitrFallChemElm_pvr    =>  plt_bgcr%LitrFallChemElm_pvr       , &
     rCNNonstructRemob_pft   =>  plt_allom%rCNNonstructRemob_pft     , &
     rCPNonstructRemob_pft    =>  plt_allom%rCPNonstructRemob_pft      , &
     FWODRE  =>  plt_allom%FWODRE    , &
@@ -406,7 +406,7 @@ implicit none
     iroot   =>  pltpar%iroot        , &
     inonstruct=>  pltpar%inonstruct     , &
     iPlantMorphologyType_pft  =>  plt_pheno%iPlantMorphologyType_pft    , &
-    iPlantPhenologyType_pft  =>  plt_pheno%iPlantPhenologyType_pft    , &
+    iPlantPhenolType_pft  =>  plt_pheno%iPlantPhenolType_pft    , &
     fTgrowRootP    =>  plt_pheno%fTgrowRootP      , &
     iPlantCalendar_brch  =>  plt_pheno%iPlantCalendar_brch    , &
     SoiBulkDensity    =>  plt_soilchem%SoiBulkDensity   , &
@@ -480,12 +480,12 @@ implicit none
 !     WTRT2N=secondary root N mass
 !     TFN6=temperature function for root maintenance respiration
 !     iPlantMorphologyType_pft=growth type:0=bryophyte,1=graminoid,2=shrub,tree
-!     iPlantPhenologyType_pft=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
+!     iPlantPhenolType_pft=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
 !     fRootGrowPsiSense=growth function of root water potential
 !
       RMNCR=AZMAX1(RmSpecPlant*Root2ndStructChemElm_pvr(ielmn,N,L,NR,NZ))*TFN6(L)
       IF(is_plant_bryophyte(iPlantMorphologyType_pft(NZ)).OR. &
-        iPlantPhenologyType_pft(NZ).EQ.iphenotyp_drouhtdecidu)THEN
+        iPlantPhenolType_pft(NZ).EQ.iphenotyp_drouhtdecidu)THEN
         RMNCR=RMNCR*fRootGrowPsiSense(N,L)
       ENDIF
 !
@@ -564,7 +564,7 @@ implicit none
 !
 !     SECONDARY ROOT GROWTH RESPIRATION FROM TOTAL - MAINTENANCE
 !     IF > 0 DRIVES GROWTH, IF < 0 DRIVES REMOBILIZATION, ALSO
-!     SECONDARY ROOT C LOSS FROM REMOBILIZATION AND CONSEQUENT LITTERFALL
+!     SECONDARY ROOT C LOSS FROM REMOBILIZATION AND CONSEQUENT LitrFall
 !
 !     iPlantCalendar_brch(ipltcal_Emerge,=emergence date
 !     CCPOLR,CZPOLR,CPPOLR=root non-structural C,N,P concentration
@@ -639,7 +639,7 @@ implicit none
         FSNC2=0._r8
       ENDIF
 !
-!     SECONDARY ROOT LITTERFALL CAUSED BY REMOBILIZATION
+!     SECONDARY ROOT LitrFall CAUSED BY REMOBILIZATION
 !
 !     CSNC,ZSNC,PSNC=literfall C,N,P
 !     CFOPC=fraction of plant litter allocated in nonstructural(0,*),
@@ -651,10 +651,10 @@ implicit none
 !
       DO NE=1,NumPlantChemElms
         D6350: DO M=1,jsken
-          LitterFallChemElm_pvr(NE,M,k_woody_litr,L,NZ)=LitterFallChemElm_pvr(NE,M,k_woody_litr,L,NZ)+CFOPE(NE,icwood,M,NZ) &
+          LitrFallChemElm_pvr(NE,M,k_woody_litr,L,NZ)=LitrFallChemElm_pvr(NE,M,k_woody_litr,L,NZ)+CFOPE(NE,icwood,M,NZ) &
             *FSNC2*(Root2ndStructChemElm_pvr(NE,N,L,NR,NZ)-RootChemElmRemob(NE))*FWODRE(NE,k_woody_litr)
 
-          LitterFallChemElm_pvr(NE,M,k_fine_litr,L,NZ)=LitterFallChemElm_pvr(NE,M,k_fine_litr,L,NZ)+CFOPE(NE,iroot,M,NZ) &
+          LitrFallChemElm_pvr(NE,M,k_fine_litr,L,NZ)=LitrFallChemElm_pvr(NE,M,k_fine_litr,L,NZ)+CFOPE(NE,iroot,M,NZ) &
             *FSNC2*(Root2ndStructChemElm_pvr(NE,N,L,NR,NZ)-RootChemElmRemob(NE))*FWODRE(NE,k_fine_litr)
         ENDDO D6350
       ENDDO
@@ -809,12 +809,12 @@ implicit none
 !     WTRT1N=primary root N mass
 !     TFN6=temperature function for root maintenance respiration
 !     iPlantMorphologyType_pft=growth type:0=bryophyte,1=graminoid,2=shrub,tree
-!     iPlantPhenologyType_pft=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
+!     iPlantPhenolType_pft=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
 !     fRootGrowPsiSense=growth function of root water potential
 !
               RMNCR=AZMAX1(RmSpecPlant*Root1stChemElm(ielmn,N,NR,NZ))*TFN6(L)
               IF(is_plant_bryophyte(iPlantMorphologyType_pft(NZ)).OR.&
-                iPlantPhenologyType_pft(NZ).EQ.iphenotyp_drouhtdecidu)THEN
+                iPlantPhenolType_pft(NZ).EQ.iphenotyp_drouhtdecidu)THEN
                 RMNCR=RMNCR*fRootGrowPsiSense(N,L)
               ENDIF
 !
@@ -1000,8 +1000,8 @@ implicit none
 !     WTRT2,WTRT2N,WTRT2P=secondary root C,N,P mass
 !     FSNCM,FSNCP=fraction of mycorrhizal structural,nonstructural C to be remobilized
 !     WTRTL=active root C mass
-!     CSNC,ZSNC,PSNC=C,N,P litterfall from senescence
-!     CFOPC,CFOPN,CFOPC=fraction of litterfall C,N,P allocated to litter components
+!     CSNC,ZSNC,PSNC=C,N,P LitrFall from senescence
+!     CFOPC,CFOPN,CFOPC=fraction of LitrFall C,N,P allocated to litter components
 !     WTRT2,WTRT2N,WTRT2P=mycorrhizal C,N,P mass
 !     FWOOD,FWOODN,FWOODP=C,N,P woody fraction in root:0=woody,1=non-woody
 !     SecndRootLen=mycorrhizal length
@@ -1021,13 +1021,13 @@ implicit none
 
                     DO NE=1,NumPlantChemElms
                       D6450: DO M=1,jsken
-                        LitterFallChemElm_pvr(NE,M,k_woody_litr,LL,NZ)=LitterFallChemElm_pvr(NE,M,k_woody_litr,LL,NZ)+CFOPE(NE,icwood,M,NZ) &
+                        LitrFallChemElm_pvr(NE,M,k_woody_litr,LL,NZ)=LitrFallChemElm_pvr(NE,M,k_woody_litr,LL,NZ)+CFOPE(NE,icwood,M,NZ) &
                           *FSNCM*AZMAX1(Root2ndStructChemElm_pvr(NE,imycorrhz,LL,NR,NZ))*FWODRE(NE,k_woody_litr)
 
-                        LitterFallChemElm_pvr(NE,M,k_fine_litr,LL,NZ)=LitterFallChemElm_pvr(NE,M,k_fine_litr,LL,NZ)+CFOPE(NE,iroot,M,NZ) &
+                        LitrFallChemElm_pvr(NE,M,k_fine_litr,LL,NZ)=LitrFallChemElm_pvr(NE,M,k_fine_litr,LL,NZ)+CFOPE(NE,iroot,M,NZ) &
                           *FSNCM*AZMAX1(Root2ndStructChemElm_pvr(NE,imycorrhz,LL,NR,NZ))*FWODRE(NE,k_fine_litr)
 
-                        LitterFallChemElm_pvr(NE,M,k_fine_litr,LL,NZ)=LitterFallChemElm_pvr(NE,M,k_fine_litr,LL,NZ)+CFOPE(NE,inonstruct,M,NZ) &
+                        LitrFallChemElm_pvr(NE,M,k_fine_litr,LL,NZ)=LitrFallChemElm_pvr(NE,M,k_fine_litr,LL,NZ)+CFOPE(NE,inonstruct,M,NZ) &
                           *FSNCP*AZMAX1(RootMycoNonstructElmnt_vr(NE,imycorrhz,LL,NZ))
                       ENDDO D6450
                       Root2ndStructChemElm_pvr(NE,imycorrhz,LL,NR,NZ)=AZMAX1(Root2ndStructChemElm_pvr(NE,imycorrhz,LL,NR,NZ))*(1.0_r8-FSNCM)
@@ -1110,14 +1110,14 @@ implicit none
     FWODRE  =>  plt_allom%FWODRE    , &
     CFOPE   =>  plt_soilchem%CFOPE  , &
     RootAutoRO2Limiter_pvr    =>  plt_rbgc%RootAutoRO2Limiter_pvr       , &
-    LitterFallChemElm_pvr    =>  plt_bgcr%LitterFallChemElm_pvr       , &
+    LitrFallChemElm_pvr    =>  plt_bgcr%LitrFallChemElm_pvr       , &
     iPlantCalendar_brch  =>  plt_pheno%iPlantCalendar_brch    , &
     NumOfMainBranch_pft     =>  plt_morph%NumOfMainBranch_pft         &
   )
 !
 !     PRIMARY ROOT GROWTH RESPIRATION FROM TOTAL - MAINTENANCE
 !     IF > 0 DRIVES GROWTH, IF < 0 DRIVES REMOBILIZATION, ALSO
-!     PRIMARY ROOT C LOSS FROM REMOBILIZATION AND CONSEQUENT LITTERFALL
+!     PRIMARY ROOT C LOSS FROM REMOBILIZATION AND CONSEQUENT LitrFall
 !
 !     iPlantCalendar_brch(ipltcal_Emerge,=emergence date
 !     CCPOLR,CZPOLR,CPPOLR=root non-structural C,N,P concentration
@@ -1186,7 +1186,7 @@ implicit none
     FSNC1=0._r8
   ENDIF
 !
-!     PRIMARY ROOT LITTERFALL CAUSED BY REMOBILIZATION
+!     PRIMARY ROOT LitrFall CAUSED BY REMOBILIZATION
 !
 !     CSNC,ZSNC,PSNC=literfall C,N,P
 !     CFOPC=fraction of plant litter allocated in nonstructural(0,*),
@@ -1198,10 +1198,10 @@ implicit none
 !
   D6355: DO M=1,jsken
     DO NE=1,NumPlantChemElms    
-      LitterFallChemElm_pvr(NE,M,k_woody_litr,L,NZ)=LitterFallChemElm_pvr(NE,M,k_woody_litr,L,NZ) &
+      LitrFallChemElm_pvr(NE,M,k_woody_litr,L,NZ)=LitrFallChemElm_pvr(NE,M,k_woody_litr,L,NZ) &
         +CFOPE(NE,icwood,M,NZ)*FSNC1*(Root1stChemElm(NE,N,NR,NZ)-RootChemElmRemob(NE))*FWODRE(NE,k_woody_litr)
 
-      LitterFallChemElm_pvr(NE,M,k_fine_litr,L,NZ)=LitterFallChemElm_pvr(NE,M,k_fine_litr,L,NZ) &
+      LitrFallChemElm_pvr(NE,M,k_fine_litr,L,NZ)=LitrFallChemElm_pvr(NE,M,k_fine_litr,L,NZ) &
         +CFOPE(NE,iroot,M,NZ)*FSNC1*(Root1stChemElm(NE,N,NR,NZ)-RootChemElmRemob(NE))*FWODRE(NE,k_fine_litr)
     ENDDO
   ENDDO D6355

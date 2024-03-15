@@ -1494,9 +1494,9 @@ module MicBGCMod
 !
 !     FORC=fraction of total microbial residue
 !     ORCT=microbial residue
-!     RCCMEheter,RCCMN,RCCMP=transfer of auto litterfall C,N,P to each hetero K
-!     RCOMEheter,RCOMEheter,RCOMP=transfer of microbial C,N,P litterfall to residue
-!     RCMMEheter,RCMMN,RCMMEheter=transfer of senesence litterfall C,N,P to residue
+!     RCCMEheter,RCCMN,RCCMP=transfer of auto LitrFall C,N,P to each hetero K
+!     RCOMEheter,RCOMEheter,RCOMP=transfer of microbial C,N,P LitrFall to residue
+!     RCMMEheter,RCMMN,RCMMEheter=transfer of senesence LitrFall C,N,P to residue
 !
   D1690: DO K=1,KL
     IF(TORC.GT.ZEROS)THEN
@@ -1594,9 +1594,9 @@ module MicBGCMod
 !     MICROBIAL DECOMPOSITION PRODUCTS
 !
 !     ORC,ORN,ORP=microbial residue C,N,P
-!     RCOMEheter,RCOMEheter,RCOMP=transfer of microbial C,N,P litterfall to residue
-!     RCCMEheter,RCCMN,RCCMP=transfer of auto litterfall C,N,P to each hetero K
-!     RCMMEheter,RCMMN,RCMMEheter=transfer of senesence litterfall C,N,P to residue
+!     RCOMEheter,RCOMEheter,RCOMP=transfer of microbial C,N,P LitrFall to residue
+!     RCCMEheter,RCCMN,RCCMP=transfer of auto LitrFall C,N,P to each hetero K
+!     RCMMEheter,RCMMN,RCMMEheter=transfer of senesence LitrFall C,N,P to residue
 !
         D565: DO M=1,ndbiomcp
           DO NE=1,NumPlantChemElms
@@ -1695,8 +1695,8 @@ module MicBGCMod
 !     HUMIFICATION PRODUCTS
 !
 !     CFOMC=fractions allocated to humic vs fulvic humus
-!     RHOMC,RHOMN,RHOMEheter=transfer of microbial C,N,P litterfall to humus
-!     RHMMEheter,RHMMN,RHMMEheter=transfer of senesence litterfall C,N,P to humus
+!     RHOMC,RHOMN,RHOMEheter=transfer of microbial C,N,P LitrFall to humus
+!     RHMMEheter,RHMMN,RHMMEheter=transfer of senesence LitrFall C,N,P to humus
 !
             IF(.not.litrm)THEN
 !add as protein
@@ -3680,7 +3680,7 @@ module MicBGCMod
 !     SPOMC=basal decomposition rate
 !     SPOMK=effect of low microbial C concentration on microbial decay
 !     RXOMC,RXOMN,RXOMEheter=microbial C,N,P decomposition
-!     RDOMEheter,RDOMN,RDOMP=microbial C,N,P litterfall
+!     RDOMEheter,RDOMN,RDOMP=microbial C,N,P LitrFall
 !     R3OMC,R3OMN,R3OMEheter=microbial C,N,P recycling
 !
     MID=micpar%get_micb_id(M,NGL)
@@ -3697,9 +3697,9 @@ module MicBGCMod
 !     HUMIFICATION OF MICROBIAL DECOMPOSITION PRODUCTS FROM
 !     DECOMPOSITION RATE, SOIL CLAY AND OC 'EHUM' FROM 'HOUR1'
 !
-!     RHOMC,RHOMN,RHOMEheter=transfer of microbial C,N,P litterfall to humus
+!     RHOMC,RHOMN,RHOMEheter=transfer of microbial C,N,P LitrFall to humus
 !     EHUM=humus transfer fraction from hour1.f
-!     RCOMEheter,RCOMEheter,RCOMP=transfer of microbial C,N,P litterfall to residue
+!     RCOMEheter,RCOMEheter,RCOMP=transfer of microbial C,N,P LitrFall to residue
 !
 
       RHOMEheter(NE,M,NGL,K)=AZMAX1(RDOMEheter(NE,M,NGL,K)*EHUM)
@@ -3720,7 +3720,7 @@ module MicBGCMod
 !     RXMMEheter,RXMMN,RXMMP=microbial C,N,P loss from senescence
 !     RMOMC=maintenance respiration
 !     CNOMA,CPOMA=N:C,P:C ratios of active biomass
-!     RDMMC,RDMMEheter,RDMMP=microbial C,N,P litterfall from senescence
+!     RDMMC,RDMMEheter,RDMMP=microbial C,N,P LitrFall from senescence
 !     R3MMEheter,R3MMN,R3MMP=microbial C,N,P recycling from senescence
 !
   IF(RXOMT.GT.ZEROS.AND.RMOMT.GT.ZEROS.AND.RCCC.GT.ZERO)THEN
@@ -3739,9 +3739,9 @@ module MicBGCMod
 !     HUMIFICATION AND RECYCLING OF RESPIRATION DECOMPOSITION
 !     PRODUCTS
 !
-!     RHMMEheter,RHMMN,RHMMEheter=transfer of senesence litterfall C,N,P to humus
+!     RHMMEheter,RHMMN,RHMMEheter=transfer of senesence LitrFall C,N,P to humus
 !     EHUM=humus transfer fraction
-!     RCMMEheter,RCMMN,RCMMEheter=transfer of senesence litterfall C,N,P to residue
+!     RCMMEheter,RCMMN,RCMMEheter=transfer of senesence LitrFall C,N,P to residue
 !
 
         RHMMEheter(NE,M,NGL,K)=AZMAX1(RDMMEheter(NE,M,NGL,K)*EHUM)

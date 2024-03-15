@@ -9,12 +9,12 @@ module GrosubPars
   __FILE__
 ! PART1X,PART2X=modifiers to organ partitioning coefficients
 ! VMXC=rate constant for nonstructural C oxidation in respiration (h-1)
-! FSNR=rate constant for litterfall at end of growing season (h-1)
+! FSNR=rate constant for LitrFall at end of growing season (h-1)
 ! Hours4PhyslMature=number of hours with no grain filling required for physilogical maturity
 ! Hours4FullSenescence=number of hours until full senescence after physl maturity
 ! XFRX=maximum storage C content for remobiln from stalk,root reserves
 ! XFRY=rate const for remobiln to storage from stalk,root reserves (h-1)
-! Hours4LiterfalAftMature_brch,HoursReq4LiterfalAftMature=current,required hours after physl maturity until start of litterfall
+! Hours4LiterfalAftMature_brch,HoursReq4LiterfalAftMature=current,required hours after physl maturity until start of LitrFall
 ! FSNK=min ratio of branch or mycorrhizae to root for calculating C transfer
 ! FXFS=rate constant for remobilization of stalk C,N,P (h-1)
 ! FMYC=rate constant for root-mycorrhizal C,N,P exchange (h-1)

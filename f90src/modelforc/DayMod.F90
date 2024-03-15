@@ -86,87 +86,12 @@
   RETURN
 
   END subroutine day
-!------------------------------------------------------------------------------------------
 
-  subroutine SetAnnualAccumlators(NY,NX)
-  
-  !set accumulators at the beginning of year
-  implicit none
-  integer, intent(in) :: NY,NX
-
-  integer :: NZ,NE
-
-  AmendCFlx_col(NY,NX)=0._r8
-  LiterfalOrgM_col(ielmc,NY,NX)=0._r8
-  UCOP(NY,NX)=0._r8
-  Eco_NBP_col(NY,NX)=0._r8
-  URAIN(NY,NX)=0._r8
-  UEVAP(NY,NX)=0._r8
-  URUN(NY,NX)=0._r8
-  USEDOU(NY,NX)=0._r8
-  UVOLO(NY,NX)=0._r8
-  HydroIonFlx_col(NY,NX)=0._r8
-  FertNFlx_col(NY,NX)=0._r8
-  LiterfalOrgM_col(ielmn,NY,NX)=0._r8
-  HydroSufDONFlx_col(NY,NX)=0._r8
-  HydroSufDINFlx_col(NY,NX)=0._r8
-  FerPFlx_col(NY,NX)=0._r8
-  LiterfalOrgM_col(ielmp,NY,NX)=0._r8
-  HydroSufDOPFlx_col(NY,NX)=0._r8
-  HydroSufDIPFlx_col(NY,NX)=0._r8
-  CO2byFire_col(NY,NX)=0._r8
-  CH4byFire_col(NY,NX)=0._r8
-  O2byFire_col(NY,NX)=0._r8
-  N2ObyFire_col(NY,NX)=0._r8
-  NH3byFire_col(NY,NX)=0._r8
-  PO4byFire_col(NY,NX)=0._r8
-  Eco_HR_col(NY,NX)=0._r8
-  Eco_GPP_col(NY,NX)=0._r8
-  Eco_NPP_col(NY,NX)=0._r8
-  Eco_AutoR_col(NY,NX)=0._r8
-  EcoHavstElmnt_col(:,NY,NX)=0._r8
-  NetNH4Mineralize_col(NY,NX)=0._r8
-  NetPO4Mineralize_col(NY,NX)=0._r8
-
-  D960: DO NZ=1,NP0(NY,NX)
-  !NetCumElmntFlx2Plant_pft: effect of canopy element status on seed set
-    DO NE=1,NumPlantChemElms
-      NetCumElmntFlx2Plant_pft(NE,NZ,NY,NX)=NetCumElmntFlx2Plant_pft(NE,NZ,NY,NX)+PlantExudChemElmCum_pft(NE,NZ,NY,NX)-LitrfallChemElms_pft(NE,NZ,NY,NX)
-      EcoHavstElmntCum_pft(NE,NZ,NY,NX)=EcoHavstElmntCum_pft(NE,NZ,NY,NX)+EcoHavstElmnt_pft(NE,NZ,NY,NX)
-    enddo
-    NetCumElmntFlx2Plant_pft(ielmc,NZ,NY,NX)=NetCumElmntFlx2Plant_pft(ielmc,NZ,NY,NX)+GrossCO2Fix_pft(NZ,NY,NX)+GrossResp_pft(NZ,NY,NX) &
-      -CO2ByFire_pft(NZ,NY,NX)-CH4ByFire_pft(NZ,NY,NX)
-    NetCumElmntFlx2Plant_pft(ielmn,NZ,NY,NX)=NetCumElmntFlx2Plant_pft(ielmn,NZ,NY,NX)+NH3EmiCum_pft(NZ,NY,NX)+PlantN2FixCum_pft(NZ,NY,NX) &
-      -NH3byFire_pft(NZ,NY,NX)-N2ObyFire_pft(NZ,NY,NX)
-    NetCumElmntFlx2Plant_pft(ielmp,NZ,NY,NX)=NetCumElmntFlx2Plant_pft(ielmp,NZ,NY,NX)-PO4byFire_pft(NZ,NY,NX)
-
-! the following variables are accumulated daily
-    GrossCO2Fix_pft(NZ,NY,NX)=0._r8
-    PlantExudChemElmCum_pft(:,NZ,NY,NX)=0._r8
-    GrossResp_pft(NZ,NY,NX)=0._r8
-    CanopyPlusNoduRespC_pft(NZ,NY,NX)=0._r8
-    ETCanopy_pft(NZ,NY,NX)=0._r8
-    PlantN2FixCum_pft(NZ,NY,NX)=0._r8
-    NH3EmiCum_pft(NZ,NY,NX)=0._r8
-    CO2ByFire_pft(NZ,NY,NX)=0._r8
-    CH4ByFire_pft(NZ,NY,NX)=0._r8
-    VOXYF(NZ,NY,NX)=0._r8
-    NH3byFire_pft(NZ,NY,NX)=0._r8
-    N2ObyFire_pft(NZ,NY,NX)=0._r8
-    PO4byFire_pft(NZ,NY,NX)=0._r8
-
-    EcoHavstElmnt_pft(:,NZ,NY,NX)=0._r8
-    SurfLitrfallChemElms_pft(:,NZ,NY,NX)=0._r8
-    LitrfallChemElms_pft(:,NZ,NY,NX)=0._r8
-  ENDDO D960
-  IF(iErosionMode.EQ.ieros_frzthaweros.OR.iErosionMode.EQ.ieros_frzthawsomeros)THEN
-    TSED(NY,NX)=0._r8
-  ENDIF
-  end subroutine SetAnnualAccumlators        
 !------------------------------------------------------------------------------------------     
   subroutine UpdateDailyAccumulators(I, NHW, NHE, NVN, NVS)
 !     WRITE DAILY MAX MIN ACCUMULATORS FOR WEATHER VARIABLES
 
+  use YearMod, only : SetAnnualAccumlators
   implicit none
   integer, intent(in) :: I, NHW, NHE, NVN, NVS
 
@@ -176,6 +101,13 @@
 
   D955: DO NX=NHW,NHE
     D950: DO NY=NVN,NVS
+!     RESET ANNUAL FLUX ACCUMULATORS AT START OF ANNUAL CYCLE
+!     ALAT=latitude +ve=N,-ve=S
+!
+      IF((ALAT(NY,NX).GE.0.0_r8.AND.I.EQ.1).OR.(ALAT(NY,NX).LT.0.0_r8.AND.I.EQ.1))THEN        
+        call SetAnnualAccumlators(NY,NX)
+      ENDIF
+
       TRAD(NY,NX)=0._r8
       TAMX(NY,NX)=-100.0_r8
       TAMN(NY,NX)=100.0_r8
@@ -184,12 +116,6 @@
       TWIND(NY,NX)=0._r8
       TRAI(NY,NX)=0._r8
 !
-!     RESET ANNUAL FLUX ACCUMULATORS AT START OF ANNUAL CYCLE
-!     ALAT=latitude +ve=N,-ve=S
-!
-      IF((ALAT(NY,NX).GE.0.0.AND.I.EQ.1).OR.(ALAT(NY,NX).LT.0.0.AND.I.EQ.1))THEN        
-        call SetAnnualAccumlators(NY,NX)
-      ENDIF
 !
 !     CALCULATE DAYLENGTH FROM SOLAR ANGLE
 !

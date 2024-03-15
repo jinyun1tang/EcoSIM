@@ -472,15 +472,15 @@ module RedistMod
       -2.0_r8*Micb_N2Fixation_vr(0,NY,NX))/natomw
   SPM0=(2.0_r8*RNutMicbTransf_vr(ids_H1PO4,0,NY,NX)+3.0_r8*RNutMicbTransf_vr(ids_H2PO4,0,NY,NX))/patomw
   !
-  !     ACCUMULATE PLANT LITTERFALL FLUXES
+  !     ACCUMULATE PLANT LitrFall FLUXES
   !
-  XESN(ielmc)=XESN(ielmc)+LitterFallChemElm_col(ielmc,NY,NX)
-  XESN(ielmn)=XESN(ielmn)+LitterFallChemElm_col(ielmn,NY,NX)
-  XESN(ielmp)=XESN(ielmp)+LitterFallChemElm_col(ielmp,NY,NX)
+  XESN(ielmc)=XESN(ielmc)+LitrFallChemElm_col(ielmc,NY,NX)
+  XESN(ielmn)=XESN(ielmn)+LitrFallChemElm_col(ielmn,NY,NX)
+  XESN(ielmp)=XESN(ielmp)+LitrFallChemElm_col(ielmp,NY,NX)
 
-  LiterfalOrgM_col(ielmc,NY,NX)=LiterfalOrgM_col(ielmc,NY,NX)+LitterFallChemElm_col(ielmc,NY,NX)
-  LiterfalOrgM_col(ielmn,NY,NX)=LiterfalOrgM_col(ielmn,NY,NX)+LitterFallChemElm_col(ielmn,NY,NX)
-  LiterfalOrgM_col(ielmp,NY,NX)=LiterfalOrgM_col(ielmp,NY,NX)+LitterFallChemElm_col(ielmp,NY,NX)
+  LiterfalOrgM_col(ielmc,NY,NX)=LiterfalOrgM_col(ielmc,NY,NX)+LitrFallChemElm_col(ielmc,NY,NX)
+  LiterfalOrgM_col(ielmn,NY,NX)=LiterfalOrgM_col(ielmn,NY,NX)+LitrFallChemElm_col(ielmn,NY,NX)
+  LiterfalOrgM_col(ielmp,NY,NX)=LiterfalOrgM_col(ielmp,NY,NX)+LitrFallChemElm_col(ielmp,NY,NX)
   !
   !     SURFACE BOUNDARY SALT FLUXES FROM RAINFALL AND SURFACE IRRIGATION
   !
@@ -1008,7 +1008,7 @@ module RedistMod
     SurfGasFlx(idg_H2,NY,NX)=SurfGasFlx(idg_H2,NY,NX)+Micb_N2Fixation_vr(L,NY,NX)
 
     !
-    !     RESIDUE FROM PLANT LITTERFALL
+    !     RESIDUE FROM PLANT LitrFall
 !
     D8565: DO K=1,micpar%NumOfPlantLitrCmplxs
       DO  M=1,jsken
@@ -1534,12 +1534,12 @@ module RedistMod
   real(r8) :: HRAINR,RAINR
 
 !     begin_execution
-!     ADD ABOVE-GROUND LITTERFALL FROM EXTRACT.F TO SURFACE RESIDUE
+!     ADD ABOVE-GROUND LitrFall FROM EXTRACT.F TO SURFACE RESIDUE
 !
 !     OSC,OSN,OSP=SOC,SON,SOP
-!     CSNT,ZSNT,PSNT=total C,N,P litterfall
+!     CSNT,ZSNT,PSNT=total C,N,P LitrFall
 !     ORGC=total SOC
-!     RAINR,HRAINR=water,heat in litterfall
+!     RAINR,HRAINR=water,heat in LitrFall
 !     FLWR,HFLWR=water,heat flux into litter
 !     HEATIN=cumulative net surface heat transfer
 !

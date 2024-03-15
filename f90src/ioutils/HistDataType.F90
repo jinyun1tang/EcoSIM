@@ -212,7 +212,7 @@ implicit none
   real(r8),pointer   :: h1D_NODULE_N_ptc(:)         !NoduleChemElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_STORED_N_ptc(:)      !NonstructalElmnts_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_EXUD_N_FLX_ptc(:)        !PlantExudChemElmCum_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_LITRf_N_FLX_ptc(:)       !LitrfallChemElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total plant litterfall N
+  real(r8),pointer   :: h1D_LITRf_N_FLX_ptc(:)       !LitrfallChemElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total plant LitrFall N
   real(r8),pointer   :: h1D_TL_N_FIXED_FLX_ptc(:)    !PlantN2FixCum_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total plant N2 fixation
   real(r8),pointer   :: h1D_HVST_N_FLX_ptc(:)        !EcoHavstElmnt_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_NH3can_FLX_ptc(:)    !NH3EmiCum_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -603,15 +603,15 @@ implicit none
 
   data1d_ptr => this%h1D_tLITRf_C_FLX_col(beg_col:end_col)  
   call hist_addfld1d(fname='tLITRf_C',units='gC/m2/hr',avgflag='A',&
-    long_name='total litterfall C',ptr_col=data1d_ptr)      
+    long_name='total LitrFall C',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_tLITRf_N_FLX_col(beg_col:end_col)  
   call hist_addfld1d(fname='tLITRf_N_FLX',units='gN/m2/hr',avgflag='A',&
-    long_name='total litterfall N',ptr_col=data1d_ptr)      
+    long_name='total LitrFall N',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_tLITRf_P_FLX_col(beg_col:end_col) 
   call hist_addfld1d(fname='tLITRf_P',units='gP/m2/hr',avgflag='A',&
-    long_name='total litterfall P',ptr_col=data1d_ptr)      
+    long_name='total LitrFall P',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_tEXCH_PO4_col(beg_col:end_col)      
   call hist_addfld1d(fname='tEXCH_PO4',units='gP/m2',avgflag='A',&
@@ -1138,11 +1138,11 @@ implicit none
 
   data1d_ptr => this%h1D_LITRf_C_FLX_ptc(beg_ptc:end_ptc)      
   call hist_addfld1d(fname='LITRf_C',units='gC/m2/hr',avgflag='A',&
-    long_name='total plant litterfall C',ptr_patch=data1d_ptr)      
+    long_name='total plant LitrFall C',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_SURF_LITRf_C_FLX_ptc(beg_ptc:end_ptc) 
   call hist_addfld1d(fname='SURF_LITRf_C_FLX',units='gC/m2/hr',avgflag='A',&
-    long_name='plant litterfall C to the soil surface',ptr_patch=data1d_ptr)      
+    long_name='plant LitrFall C to the soil surface',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_AUTO_RESP_FLX_ptc(beg_ptc:end_ptc)    
   call hist_addfld1d(fname='AUTO_RESP',units='gC/m2',avgflag='A',&
@@ -1194,7 +1194,7 @@ implicit none
 
   data1d_ptr => this%h1D_OXY_STRESS_ptc(beg_ptc:end_ptc)    !OSTR(NZ,NY,NX)
   call hist_addfld1d(fname='OXY_STRESS',units='none',avgflag='A',&
-    long_name='plant O2 stress indicator',ptr_patch=data1d_ptr)      
+    long_name='plant O2 stress indicator [0-1]',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_SHOOT_N_ptc(beg_ptc:end_ptc)       
   call hist_addfld1d(fname='SHOOT_N',units='gN/m2',avgflag='A',&
@@ -1246,7 +1246,7 @@ implicit none
 
   data1d_ptr => this%h1D_LITRf_N_FLX_ptc(beg_ptc:end_ptc)    
   call hist_addfld1d(fname='LITRf_N_FLX',units='gN/m2/hr',avgflag='A',&
-    long_name='total plant litterfall N',ptr_patch=data1d_ptr)      
+    long_name='total plant LitrFall N',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_TL_N_FIXED_FLX_ptc(beg_ptc:end_ptc)   
   call hist_addfld1d(fname='TL_N_FIXED_FLX',units='gN/m2/hr',avgflag='A',&
@@ -1274,7 +1274,7 @@ implicit none
 
   data1d_ptr => this%h1D_SURF_LITRf_N_FLX_ptc(beg_ptc:end_ptc)  
   call hist_addfld1d(fname='SURF_LITRf_N_FLX',units='gN/m2/hr',avgflag='A',&
-    long_name='total surface litterfall N',ptr_patch=data1d_ptr)      
+    long_name='total surface LitrFall N',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_SHOOT_P_ptc(beg_ptc:end_ptc)    
   call hist_addfld1d(fname='SHOOT_P',units='gP/m2',avgflag='A',&
@@ -1326,7 +1326,7 @@ implicit none
 
   data1d_ptr => this%h1D_LITRf_P_FLX_ptc(beg_ptc:end_ptc)     
   call hist_addfld1d(fname='LITRf_P_FLX',units='gP/m2/hr',avgflag='A',&
-    long_name='total plant litterfall P',ptr_patch=data1d_ptr)      
+    long_name='total plant LitrFall P',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_HVST_P_FLX_ptc(beg_ptc:end_ptc)   
   call hist_addfld1d(fname='HVST_P_FLX',units='gP/m2/hr',avgflag='A',&
@@ -1346,7 +1346,7 @@ implicit none
 
   data1d_ptr => this%h1D_SURF_LITRf_P_FLX_ptc(beg_ptc:end_ptc)         !SurfLitrfallChemElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   call hist_addfld1d(fname='SURF_LITRf_P_FLX',units='gP/m2/hr',avgflag='A',&
-    long_name='plant litterfall P to the soil surface',ptr_patch=data1d_ptr)      
+    long_name='plant LitrFall P to the soil surface',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_BRANCH_NO_ptc(beg_ptc:end_ptc)            !NumOfBranches_pft(NZ,NY,NX)
   call hist_addfld1d(fname='BRANCH_NO',units='none',avgflag='I',&

@@ -31,7 +31,7 @@ implicit none
   integer,target,allocatable ::  iPlantPhenologyPattern_pft(:,:,:)                        !plant growth habit (annual or perennial)
   integer,target,allocatable ::  iPlantDevelopPattern_pft(:,:,:)                        !plant growth habit (determinate or indeterminate)
   integer,target,allocatable ::  iPlantNfixType(:,:,:)                        !N2 fixation type
-  integer,target,allocatable ::  iPlantPhenologyType_pft(:,:,:)                        !climate signal for phenological progress none, temperature, water stress)
+  integer,target,allocatable ::  iPlantPhenolType_pft(:,:,:)                        !climate signal for phenological progress none, temperature, water stress)
   integer,target,allocatable ::  iPlantPhotoperiodType_pft(:,:,:)                        !photoperiod type (neutral, long day, short day)
   integer,target,allocatable ::  iPlantTurnoverPattern_pft(:,:,:)                        !phenologically-driven above-ground turnover (all, foliar only, none)
   integer,target,allocatable ::  iPlantGrainType_pft(:,:,:)                        !grain type (below or above-ground), e.g. potato and onion are below
@@ -62,7 +62,7 @@ contains
   allocate(iPlantPhenologyPattern_pft(JP,JY,JX));    iPlantPhenologyPattern_pft=0
   allocate(iPlantDevelopPattern_pft(JP,JY,JX));    iPlantDevelopPattern_pft=0
   allocate(iPlantNfixType(JP,JY,JX));    iPlantNfixType=0
-  allocate(iPlantPhenologyType_pft(JP,JY,JX));    iPlantPhenologyType_pft=0
+  allocate(iPlantPhenolType_pft(JP,JY,JX));    iPlantPhenolType_pft=0
   allocate(iPlantPhotoperiodType_pft(JP,JY,JX));    iPlantPhotoperiodType_pft=0
   allocate(iPlantTurnoverPattern_pft(JP,JY,JX));    iPlantTurnoverPattern_pft=0
   allocate(iPlantGrainType_pft(JP,JY,JX));    iPlantGrainType_pft=0
@@ -93,7 +93,7 @@ contains
   call destroy(iPlantPhenologyPattern_pft)
   call destroy(iPlantDevelopPattern_pft)
   call destroy(iPlantNfixType)
-  call destroy(iPlantPhenologyType_pft)
+  call destroy(iPlantPhenolType_pft)
   call destroy(iPlantPhotoperiodType_pft)
   call destroy(iPlantTurnoverPattern_pft)
   call destroy(iPlantGrainType_pft)

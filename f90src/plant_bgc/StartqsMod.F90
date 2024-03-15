@@ -92,7 +92,7 @@ module StartqsMod
         plt_biom%StandingDeadChemElms_pft(1:NumPlantChemElms,NZ)=0._r8
         D6401: DO L=1,NL
           DO  K=1,pltpar%NumOfPlantLitrCmplxs
-            plt_bgcr%LitterFallChemElm_pvr(1:NumPlantChemElms,1:jsken,K,L,NZ)=0._r8
+            plt_bgcr%LitrFallChemElm_pvr(1:NumPlantChemElms,1:jsken,K,L,NZ)=0._r8
           enddo
         ENDDO D6401
       ENDDO D9986
@@ -989,7 +989,7 @@ module StartqsMod
       ENDDO D30
       IF(N.EQ.1)THEN
         D6400: DO K=1,pltpar%NumOfPlantLitrCmplxs
-          plt_bgcr%LitterFallChemElm_pvr(1:NumPlantChemElms,1:jsken,K,L,NZ)=0._r8
+          plt_bgcr%LitrFallChemElm_pvr(1:NumPlantChemElms,1:jsken,K,L,NZ)=0._r8
         ENDDO D6400
         plt_biom%RootNoduleNonstructElmnt_vr(1:NumPlantChemElms,L,NZ)=0._r8
         plt_biom%RootNodueChemElm_pvr(1:NumPlantChemElms,L,NZ)=0._r8
