@@ -64,15 +64,18 @@ implicit none
     !ZNH3E(NY,NX)=atm_nh3
     !H2GE(NY,NX)=atm_H2
     TairK(NY,NX)=tairc(NY)
-    VPA(NY,NX) = vpair(NY)
-    WindSpeedAtm(NY,NX) = uwind(NY)
+    !convert VPA from ATS units (Pa) to EcoSIM (MPa)
+    VPA(NY,NX) = vpair(NY)/1.0e6_r8
+    !convert WindSpeedAtm from ATS units (m s^-1) to EcoSIM (m h^-1)
+    WindSpeedAtm(NY,NX) = uwind(NY)*3600.0_r8
     !converting radiation units from ATS (W m^-2) to EcoSIM (MJ m^-2 h^-1)
     SWRadOnGrnd(NY,NX) = swrad(NY)*0.0036_r8
     LWRadSky(NY,NX) = sunrad(NY)*0.0036_r8
     !RainH(NY,NX) = prec
     DO L=NU(NY,NX),NL(NY,NX)
       CumDepth2LayerBottom(L,NY,NX)=a_CumDepth2LayerBottom(L,NY)
-      SoiBulkDensityt0(L,NY,NX)=a_BKDSI(L,NY)
+      !Convert Bulk Density from ATS (kg m^-3) to EcoSIM (Mg m^-3)
+      SoiBulkDensityt0(L,NY,NX)=a_BKDSI(L,NY)/1.0e3_r8
       CORGC(L,NY,NX)=a_CORGC(L,NY)
       CORGN(L,NY,NX)=a_CORGN(L,NY)
       CORGP(L,NY,NX)=a_CORGP(L,NY)

@@ -130,6 +130,9 @@ contains
   call c_f_pointer(props%precipitation%data, data, (/num_cols/))
   prec = data(:)
 
+  call c_f_pointer(props%aspect%data, data, (/num_cols/))
+  a_ASP = data(:)
+
   atm_n2 = props%atm_n2
   atm_o2 = props%atm_o2
   atm_co2 = props%atm_co2

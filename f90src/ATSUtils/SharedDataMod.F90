@@ -87,7 +87,7 @@ Module SharedDataMod
     !allocate(a_AREA3(ncells_per_col_))
     allocate(a_NU(ncells_per_col_))
     allocate(a_NL(ncells_per_col_))
-    allocate(a_ASP(ncells_per_col_))
+    !allocate(a_ASP(ncells_per_col_))
     allocate(a_ALT(ncells_per_col_))
     !allocate(tairc(1:ncells_per_col_))
     !allocate(uwind(1:ncells_per_col_))
