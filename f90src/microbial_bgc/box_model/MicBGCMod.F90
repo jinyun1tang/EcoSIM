@@ -592,8 +592,6 @@ module MicBGCMod
   )
   RH2GZ=0.0_r8
 
-  TCGOMEheter(ielmc,:)=0.0_r8
-  TCGOMEheter(idom_acetate,:)=0.0_r8
   TCGOMEheter(:,:)=0.0_r8
 
   D760: DO K=1,jcplx
