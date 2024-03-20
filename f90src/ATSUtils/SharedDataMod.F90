@@ -6,11 +6,14 @@ Module SharedDataMod
   character(len=*), private, parameter :: mod_filename= &
   __FILE__
 !figure out the grid for ATS
-!  integer, intent(in) :: jzsoi   !number of soil layers
-!  integer, intent(in) :: js    !number of snow layers
+!  integer, intent(in) :: jzsoi            !number of soil layers
+!  integer, intent(in) :: js               !number of snow layers
+!  integer, intent(in) :: jzsoi            !number of soil layers
+!  integer, intent(in) :: js               !number of snow layers
 
 ! temporary data holder in ecosim
   real(r8) :: atm_n2, atm_o2,atm_co2,atm_ch4,atm_N2o,atm_H2,atm_NH3
+  real(r8) :: heat_capacity, pressure_at_field_capacity, pressure_at_wilting_point
   real(r8), allocatable :: a_csand(:,:)   !sand mass fraction
   real(r8), allocatable :: a_CSILT(:,:)   !silt mass fraction
   real(r8), allocatable :: a_BKDSI(:,:)   !bulk density
@@ -22,70 +25,78 @@ Module SharedDataMod
   real(r8), allocatable :: a_CORGC(:,:)   !organic carbon content
   real(r8), allocatable :: a_CORGN(:,:)   !organic nitrogen content
   real(r8), allocatable :: a_CORGP(:,:)   !organic phosphorus content
-  real(r8), allocatable :: a_PORO(:,:)
-!  real(r8), allocatable ::a_CORGR(:,:)  !organic nitrogen  content
-  real(r8), allocatable :: a_ASP(:)
-  real(r8), allocatable :: a_ALT(:)
+  real(r8), allocatable :: a_PORO(:,:)    !Porosity
+  real(r8), allocatable :: a_MATP(:,:)    !Matric Pressure
+!  real(r8), allocatable ::a_CORGR(:,:)   !organic nitrogen  content
+  real(r8), allocatable :: a_ASP(:)       !Aspect
+  real(r8), allocatable :: a_ALT(:)       !Altitude
   real(r8), allocatable :: a_ATKA(:)
-  real(r8), allocatable :: a_WC(:,:) !Soil water content
-  real(r8), allocatable :: a_LSAT(:,:) !liquid saturation
+  real(r8), allocatable :: a_WC(:,:)      !Soil water content
+  real(r8), allocatable :: a_LSAT(:,:)    !liquid saturation
   real(r8), allocatable :: a_RELPERM(:,:) !relative_permeability
-  real(r8), allocatable :: a_HCOND(:,:) !hydraulic conductivity
-  real(r8), allocatable :: a_TEMP(:,:) !temperature
+  real(r8), allocatable :: a_HCOND(:,:)   !hydraulic conductivity
+  real(r8), allocatable :: a_TEMP(:,:)    !temperature
+  real(r8), allocatable :: a_SSES(:,:)    !subsurface energy source
+  real(r8), allocatable :: a_SSWS(:,:)    !subsurface water source
+  real(r8), allocatable :: a_AREA3(:,:) 
 
-  real(r8), allocatable :: tairc(:)  !air temperature oC
-  real(r8), allocatable :: uwind(:)  !wind speed, m/s
-  real(r8), allocatable :: prec(:)   !precipitation, mm H2O/hr
-  real(r8), allocatable :: sunrad(:)   !solar radiation,
-  real(r8), allocatable :: vpair(:)    !vapor pressure deficit
-  real(r8), allocatable :: a_AREA3(:)
-  integer,  allocatable :: a_NU(:)
-  integer,  allocatable :: a_NL(:)
+  real(r8), allocatable :: tairc(:)       !air temperature oC
+  real(r8), allocatable :: uwind(:)       !wind speed, m/s
+  real(r8), allocatable :: prec(:)        !precipitation, mm H2O/hr
+  real(r8), allocatable :: sunrad(:)      !solar radiation,
+  real(r8), allocatable :: swrad(:)       !shortwave radiation,
+  real(r8), allocatable :: vpair(:)       !vapor pressure deficit
+  real(r8), allocatable :: surf_e_source(:) !surface energy source
+  real(r8), allocatable :: surf_w_source(:) !surface water source
+  !real(r8), allocatable :: a_AREA3(:)
+  integer,  allocatable :: a_NU(:)        !upper soil layer index
+  integer,  allocatable :: a_NL(:)        !lower soil layer index
+  integer,  allocatable :: a_NJ(:)
   integer,  allocatable :: a_MaxNumRootLays(:)
-  integer :: NYS, I                     !total number of columns
+  integer :: NYS, I                       !total number of columns
   contains
 
   subroutine InitSharedData(ncells_per_col_,ncol)
-  use GridConsts, only : JX,JY,JZ
-  implicit none
-  integer, intent(in) :: ncells_per_col_   !number of vertical layers
-  integer, intent(in) :: ncol  !NUMBER of cols
-  !set # of soil layers
-  !JZSOI=JZs
-  !JX=1;JY=ncol;jz=jzs
+    use GridConsts, only : JX,JY,JZ
+    implicit none
+    integer, intent(in) :: ncells_per_col_   !number of vertical layers
+    integer, intent(in) :: ncol  !NUMBER of cols
+    !set # of soil layers
+    !JZSOI=JZs
+    write(*,*) "In Shared data before setting: "
+    write(*,*) "JX=", JX, ", JY=", JY, ", JZ=", JZ
+    
+    JX=1;JY=ncol
+    JZ = ncells_per_col_
+   
+    write(*,*) "In Shared data after setting: "
+    write(*,*) "JX=", JX, ", JY=", JY, ", JZ=", JZ
 
-  allocate(a_csand(ncells_per_col_,ncol))
-  allocate(a_CSILT(ncells_per_col_,ncol))   !silt mass fraction
-  !allocate(a_BKDSI(ncells_per_col_,ncol))   !bulk density
-  allocate(a_CumDepth2LayerBottom(ncells_per_col_,ncol))   !dpeth (from surfce to bottom)
-  !allocate(a_FC(ncells_per_col_,ncol))      !field capacity
-  !allocate(a_WP(ncells_per_col_,ncol))      !wilting point
-  allocate(a_FHOL(ncells_per_col_,ncol))    !macropore fraction
-  allocate(a_ROCK(ncells_per_col_,ncol))    !mass fraction as rock
-  allocate(a_CORGC(ncells_per_col_,ncol))   !organic carbon content
-  allocate(a_CORGN(ncells_per_col_,ncol))   !organic nitrogen content
-  allocate(a_CORGP(ncells_per_col_,ncol))   !organic phosphorus content
-  !allocate(a_PORO(ncells_per_col_,ncol))
-  allocate(a_AREA3(ncells_per_col_))
-  allocate(a_NU(ncells_per_col_))
-  allocate(a_NL(ncells_per_col_))
-  allocate(a_ASP(ncells_per_col_))
-  allocate(a_ALT(ncells_per_col_))
-  !allocate(tairc(1:ncells_per_col_))
-  !allocate(uwind(1:ncells_per_col_))
-  !allocate(prec(1:ncells_per_col_))
-  !allocate(sunrad(1:ncells_per_col_))
-  !allocate(vpair(1:ncells_per_col_))
-  allocate(a_ATKA(1:ncells_per_col_))
-  
-  a_NU=0
-  a_NL=0
-
-  do I=1, ncells_per_col_
-    write(*,*) "I = ", I, " of ", ncells_per_col_
-    write(*,*) "a_NU(", I ,") = ", a_NU(I)
-    write(*,*) "a_NL(", I ,") = ", a_NL(I)
-  end do
+    allocate(a_csand(ncells_per_col_,ncol))
+    allocate(a_CSILT(ncells_per_col_,ncol))   !silt mass fraction
+    !allocate(a_BKDSI(ncells_per_col_,ncol))   !bulk density
+    !allocate(a_CumDepth2LayerBottom(ncells_per_col_,ncol))   !dpeth (from surfce to bottom)
+    !allocate(a_FC(ncells_per_col_,ncol))      !field capacity
+    !allocate(a_WP(ncells_per_col_,ncol))      !wilting point
+    allocate(a_FHOL(ncells_per_col_,ncol))    !macropore fraction
+    allocate(a_ROCK(ncells_per_col_,ncol))    !mass fraction as rock
+    allocate(a_CORGC(ncells_per_col_,ncol))   !organic carbon content
+    allocate(a_CORGN(ncells_per_col_,ncol))   !organic nitrogen content
+    allocate(a_CORGP(ncells_per_col_,ncol))   !organic phosphorus content
+    !allocate(a_PORO(ncells_per_col_,ncol))
+    !allocate(a_AREA3(ncells_per_col_))
+    allocate(a_NU(ncells_per_col_))
+    allocate(a_NL(ncells_per_col_))
+    !allocate(a_ASP(ncells_per_col_))
+    allocate(a_ALT(ncells_per_col_))
+    !allocate(tairc(1:ncells_per_col_))
+    !allocate(uwind(1:ncells_per_col_))
+    !allocate(prec(1:ncells_per_col_))
+    !allocate(sunrad(1:ncells_per_col_))
+    !allocate(vpair(1:ncells_per_col_))
+    allocate(a_ATKA(1:ncells_per_col_))
+    a_NU=1
+    a_NL=ncells_per_col_
 
   end subroutine InitSharedData
 
@@ -97,6 +108,7 @@ Module SharedDataMod
   call destroy(a_csand)
   call destroy(a_CSILT)
   call destroy(a_BKDSI)
+  call destroy(a_MATP)
   call destroy(a_CumDepth2LayerBottom)
   call destroy(a_FC)
   call destroy(a_WP)
@@ -113,6 +125,7 @@ Module SharedDataMod
   call destroy(uwind)
   call destroy(prec)
   call destroy(sunrad)
+  call destroy(swrad)
   call destroy(vpair)
   call destroy(a_ATKA)
   end subroutine DestroySharedData

@@ -25,8 +25,6 @@ module InitVegBGC
 
   integer :: L,M,N
 
-!  write(*,*) "In InitIrradianceGeometry"
-
   !     begin_execution
   !     SineLeafAngle,CosineLeafAngle=sine,cosine of leaf inclination class
   !     ZAZI=leaf azimuth class, it is pi because only on one side of the leaf

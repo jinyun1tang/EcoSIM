@@ -525,6 +525,7 @@ module Hour1Mod
   integer :: L,K,N,M
 
   !     begin_execution
+  !write(*,*) "In SetSoilPropertyAftDisturbance: "
   D9975: DO L=NUI(NY,NX),NLI(NY,NX)
     !
     !     AREA,DLYR=lateral(1,2), vertical(3) area,thickness of soil layer
@@ -578,17 +579,21 @@ module Hour1Mod
       IF(L.EQ.NU(NY,NX))THEN
 !surface layer
         POROS(L,NY,NX)=AMAX1(POROS(L,NY,NX),1.0_r8-(SoiBulkDensity(L,NY,NX)/ParticleDens))
+        !write(*,*) "l eq NU - POROS(L,NY,NX) = ", POROS(L,NY,NX)
       ELSE
 !  avoid float exception
         if(SoiBulkDensity(L,NY,NX)>=ParticleDens)then
           POROS(L,NY,NX)=1.0_r8
+          !write(*,*) "BKDSI gt particledens - POROS(L,NY,NX) = ", POROS(L,NY,NX)
         else
           POROS(L,NY,NX)=1.0_r8-(SoiBulkDensity(L,NY,NX)/ParticleDens)
+          !write(*,*) "BKDSI else - POROS(L,NY,NX) = ", POROS(L,NY,NX)
         endif
       ENDIF
     ELSE
       ParticleDens=0.0_r8
       POROS(L,NY,NX)=1.0_r8
+      !write(*,*) "final else - POROS(L,NY,NX) = ", POROS(L,NY,NX)
     ENDIF
     !     VLMicP(L,NY,NX)=AMAX1(POROS(L,NY,NX)*VLSoilMicP(L,NY,NX)
     !    2,VLWatMicP(L,NY,NX)+VLiceMicP(L,NY,NX))
@@ -1197,6 +1202,9 @@ module Hour1Mod
   WGSGA(NY,NX)=WGSG*TFACA
   TFACR=TEFGASDIF(TKS(0,NY,NX))
   VaporDiffusivityLitR(NY,NX)=WGSG*TFACR
+  !write(*,*) "VaporDiffusivityLitR(NY,NX) = ", VaporDiffusivityLitR(NY,NX)
+  !write(*,*) "WGSG = ", WGSG
+  !write(*,*) "TFACR = ", TFACR
   D5060: DO  L=1,JS
     TFACW=TEFGASDIF(TKSnow(L,NY,NX))
     H2OVapDifscSno(L,NY,NX)=WGSG*TFACW
@@ -1487,6 +1495,7 @@ module Hour1Mod
 ! DLYR=litter thickness
 ! PSISM,PSISE=litter matric,saturation water potential
 !
+  !write(*,*) "In GetSurfResidualProperties: "
   VxcessWatLitR=AZMAX1(VLWatMicP(0,NY,NX)+VLiceMicP(0,NY,NX)-VWatLitRHoldCapcity(NY,NX))
   VGeomLayer(0,NY,NX)=VxcessWatLitR+VLitR(NY,NX)
   IF(VGeomLayer(0,NY,NX).GT.ZEROS2(NY,NX))THEN
@@ -1496,11 +1505,13 @@ module Hour1Mod
     VLsoiAirP(0,NY,NX)=AZMAX1(VLMicP(0,NY,NX)-VLWatMicP(0,NY,NX)-VLiceMicP(0,NY,NX))
     IF(VLitR(NY,NX).GT.ZEROS(NY,NX))THEN
       POROS(0,NY,NX)=VLMicP(0,NY,NX)/VLitR(NY,NX)
+      !write(*,*) "VLitR gt 0 - POROS(0,NY,NX) = ", POROS(0,NY,NX)
       THETW(0,NY,NX)=AZMAX1(AMIN1(1.0_r8,VLWatMicP(0,NY,NX)/VLitR(NY,NX)))
       THETI(0,NY,NX)=AZMAX1(AMIN1(1.0_r8,VLiceMicP(0,NY,NX)/VLitR(NY,NX)))
       THETP(0,NY,NX)=AZMAX1(AMIN1(1.0_r8,VLsoiAirP(0,NY,NX)/VLitR(NY,NX)))
     ELSE
       POROS(0,NY,NX)=1.0_r8
+      !write(*,*) "VLitR else - POROS(0,NY,NX) = ", POROS(0,NY,NX)
       THETW(0,NY,NX)=0.0_r8
       THETI(0,NY,NX)=0.0_r8
       THETP(0,NY,NX)=0.0_r8

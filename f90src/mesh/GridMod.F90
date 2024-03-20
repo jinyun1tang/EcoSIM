@@ -91,7 +91,7 @@ contains
   bounds%begt=1;bounds%endt=bounds%ntopou
   nextra_grid=1
   JX=(NHE-NHW)+1;JX0=JX
-  JY=(NVS-NVN)+1;JY0=JY
+  JY=(NVS-NVN)+1;JY0=JY     
 
   bounds%ncols=JX*JY
   bounds%npfts=bounds%ncols*JP
@@ -104,7 +104,7 @@ contains
   if(column_mode)nextra_grid=0
   JX=JX+nextra_grid
   JY=JY+nextra_grid
-
+  
   ic=0;ip=0
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
@@ -121,8 +121,8 @@ contains
   JH=JX+nextra_grid
   JV=JY+nextra_grid
   JD=JZ+1
-  write(iulog,*)'grid size'
-  write(iulog,*)'JX0=',JX0,'JY0=',JY0,'JZ=',JZ
+  !write(iulog,*)'grid size'
+  !write(iulog,*)'JX0=',JX0,'JY0=',JY0,'JZ=',JZ
   end subroutine SetMesh
 
 !------------------------------------------------------------------------
@@ -170,7 +170,7 @@ contains
   
   nextra_grid=1
   JX=(NHE-NHW)+1;JX0=JX
-  JY=(NVS-NVN)+1;JY0=JY
+  JY=(NVS-NVN)+1;JY0=JY 
 
   bounds%ncols=JX*JY
   bounds%npfts=bounds%ncols*JP
@@ -196,12 +196,12 @@ contains
     ENDDO
   ENDDO
   !read JZ from input data?
-  JZ=14
+  JZ=100
   JH=JX+nextra_grid
   JV=JY+nextra_grid
   JD=JZ+1
-  write(iulog,*)'grid size'
-  write(iulog,*)'JX0=',JX0,'JY0=',JY0,'JZ=',JZ
+  !write(iulog,*)'grid size'
+  !write(iulog,*)'JX0=',JX0,'JY0=',JY0,'JZ=',JZ
   end subroutine SetMeshATS
 
 !------------------------------------------------------------------------

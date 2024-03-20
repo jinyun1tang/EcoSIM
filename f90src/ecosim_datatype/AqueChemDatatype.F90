@@ -298,6 +298,7 @@ module AqueChemDatatype
   call destroy(GKCK)
 
   call destroy(trcSalt_TR)
+  call destroy(trcSalt_TR)
   call destroy(trcx_solml)
   call destroy(trcSalt_solml)
   call destroy(trcsalt_rain_conc)

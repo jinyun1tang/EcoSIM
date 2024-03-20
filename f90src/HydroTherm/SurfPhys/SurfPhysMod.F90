@@ -14,7 +14,7 @@ module SurfPhysMod
   use MiniFuncMod
   use minimathmod
   use SurfPhysData
-  use EcoSIMCtrlDataType
+  use EcoSIMCtrlDataType 
   use SnowDataType
   use SOMDataType
   USE ChemTranspDataType
@@ -80,6 +80,14 @@ contains
 
   watflw =0._r8;waticefl=0._r8
 
+  if(ATS_cpl_mode) then 
+    DO NX=NHW,NHE
+      DO NY=NVN,NHE  
+         NUM(NY,NX)=1 
+      enddo
+    enddo
+  endif
+
   D9995: DO NX=NHW,NHE
     D9990: DO NY=NVN,NVS
     !make a local copy of the upper boundary index
@@ -88,7 +96,7 @@ contains
 !     AND SOC
 !
 !     Altitude_grid,ALT=current,initial elevation of ground surface
-!     CumDepth2LayerBottom(NUM(NY,NX)-1,=depth of ground surface
+!     CumDepth2LayerBottom(NUM(NY,NX)-1),=depth of ground surface
 !     EnergyImpact4Erosion=cumulative rainfall energy impact on soil surface
 !
       Altitude_grid(NY,NX)=ALT(NY,NX)-CumDepth2LayerBottom(NUM(NY,NX)-1,NY,NX)
@@ -97,7 +105,7 @@ contains
       call CopySnowStates(NY,NX)
 
       call CopySurfaceVars(NY,NX)
-!
+
       call PartionSurfaceFraction(NY,NX)
 
       call PartitionPrecip(NY,NX)
@@ -214,6 +222,18 @@ contains
   !VPQ=vapor pressure in canopy air, 
   !TKQ=temperature in canopy air, Kelvin
 
+  !write(*,*) "For VPQ and TKQ calc:"
+  !write(*,*) "VPA(NY,NX) = ", VPA(NY,NX)
+  !write(*,*) "TLEX(NY,NX) = ", TLEX(NY,NX)
+  !write(*,*) "EvapLHTC = ", EvapLHTC
+  !write(*,*) "NY = ", NY
+  !write(*,*) "NX = ", NX
+  !write(*,*) "NUM(NY,NX) = ", NUM(NY,NX)
+  !write(*,*) "AREA(3,NUM(NY,NX),NY,NX) = ", AREA(3,NUM(NY,NX),NY,NX)
+  !write(*,*) "TairK(NY,NX) = ", TairK(NY,NX)
+  !write(*,*) "TSHX(NY,NX) = ", TSHX(NY,NX)
+  !write(*,*) "SensHeatCondctance = ", SensHeatCondctance
+
   VPQ(NY,NX)=VPA(NY,NX)-TLEX(NY,NX)/(EvapLHTC*AREA(3,NUM(NY,NX),NY,NX))
   TKQ(NY,NX)=TairK(NY,NX)-TSHX(NY,NX)/(SensHeatCondctance*AREA(3,NUM(NY,NX),NY,NX))
 
@@ -260,13 +280,14 @@ contains
     FracSurfByLitR(NY,NX)*dts_litrhtwtp
 !  print*,'frac',FracSurfByLitR(NY,NX),FracSurfSnoFree(NY,NX)
 !
+
   end subroutine SurfaceRadiation
 !------------------------------------------------------------------------------------------
   subroutine SurfaceResistances(NY,NX,ResistanceLitRLay)
   implicit none
   integer, intent(in) :: NY,NX
   real(r8), dimension(:,:), intent(out):: ResistanceLitRLay
-  real(r8) :: FracSoiPAsAir0,DFVR  
+  real(r8) :: FracSoiPAsAir0,DFVR,TFACR  
   real(r8) :: PAREX,PARSX,RAS
   real(r8) :: ALFZ,WindSpeedGrnd
 !
@@ -319,7 +340,16 @@ contains
 !     PAREG,PARSG=conductances for soil latent,sensible heat fluxes
 !     PARER,PARSR=conductances for litter latent,sensible heat fluxes
 !     XNPR=internal time step for fluxes through litter
-!
+
+! Note: VaporDiffusivityLitR is computed in Hour1 which is not used in the
+!       ATS coupler. However the calculation is simple so I'm just reproducing it
+!       here. This depends on the temperature of the liter (TKS) which is the same
+!       as TKSoi1 at the surface
+  TFACR = TEFGASDIF(TKS(0,NY,NX))
+  VaporDiffusivityLitR(NY,NX) = TFACR*7.70E-02_r8
+  !write(*,*) "for VapDiffusResistanceLitR(NY,NX): "
+  !write(*,*) "DLYRR(NY,NX) = ", DLYRR(NY,NX)
+  !write(*,*) "VaporDiffusivityLitR(NY,NX) = ", VaporDiffusivityLitR(NY,NX)
   VapDiffusResistanceLitR(NY,NX)=DLYRR(NY,NX)/VaporDiffusivityLitR(NY,NX)
   RAG(NY,NX)=BndlResistCanG(NY,NX)+BndlResistAboveCanG(NY,NX)
   RAGW(NY,NX)=RAG(NY,NX)
@@ -412,17 +442,35 @@ contains
   IF((VLWatGrnd+VLIceGrnd).GT.ZEROS2(NY,NX))THEN
     !top soil has water or ice
     !ice albedo seems too low.
+    !write(*,*) "Albedo recomputed"
     AlbedoGrnd=(SoilAlbedo(NY,NX)*SoilMicPMassLayer(NUM(NY,NX),NY,NX)+0.06_r8*VLWatGrnd &
       +0.30_r8*VLIceGrnd)/(SoilMicPMassLayer(NUM(NY,NX),NY,NX)+VLWatGrnd+VLIceGrnd)
   ELSE
+    !write(*,*) "Albedo from soil"
     AlbedoGrnd=SoilAlbedo(NY,NX)
   ENDIF
   !absorbed radiation
   !Radnet2LitGrnd=net radiation, after taking out outgoing surface layer radiation  
   !LWRadGrnd=emitted longwave radiation  
   RFLX0=(1.0_r8-AlbedoGrnd)*RadSWonSoi(NY,NX)+LWRad2Grnd(NY,NX)
+  !write(*,*) "Printing RFLX0 and constituents: "
+  !write(*,*) "RFLX0: ", RFLX0
+  !write(*,*) "AlbedoGrnd: ", AlbedoGrnd
+  !write(*,*) "RadSWonSoi(NY,NX): ", RadSWonSoi(NY,NX)
+  !write(*,*) "LWRad2Grnd(NY,NX): ", LWRad2Grnd(NY,NX)
   LWRadGrnd=LWEmscefSoil(NY,NX)*TKSoi1(NUM(NY,NX),NY,NX)**4._r8
+  !write(*,*) "Printing LWRadGrnd and constituents: "
+  !write(*,*) "LWRadGrnd: ", LWRadGrnd
+  !write(*,*) "LWEmscefSoil(NY,NX): ", LWEmscefSoil(NY,NX)
+  !write(*,*) "TKSoi1(NUM(NY,NX),NY,NX): ", TKSoi1(NUM(NY,NX),NY,NX)
+  !write(*,*) "NUM(NY,NX): ", NUM(NY,NX)
+  !write(*,*) "NY: ", NY
+  !write(*,*) "NX: ", NX
   Radnet2LitGrnd=RFLX0-LWRadGrnd
+  !write(*,*) "Printing Radnet2LitGrnd and constituents: "
+  !write(*,*) "Radnet2LitGrnd: ", Radnet2LitGrnd
+  !write(*,*) "RFLX0: ", RFLX0
+  !write(*,*) "LWRadGrnd: ", LWRadGrnd
 !
 ! AERODYNAMIC RESISTANCE ABOVE SOIL SURFACE INCLUDING
 ! RESISTANCE IMPOSED BY PLANT CANOPY
@@ -438,13 +486,43 @@ contains
 ! RAGZ,RAa=soil+litter blr
 ! RAGS=isothermal blr at ground surface
 !
+! POROS(0,NY,NX) = 0.5_r8
+!  write(*,*) "At FracSoiPAsAir0: "
+!  write(*,*) "FracSoiPAsAir(0,NY,NX) = ", FracSoiPAsAir(0,NY,NX)
   FracSoiPAsAir0=AMAX1(ZERO,FracSoiPAsAir(0,NY,NX))
+!  write(*,*) "At DFVR: "
+!  write(*,*) "FracSoiPAsAir0 = ", FracSoiPAsAir0
+!  write(*,*) "POROQ = ", POROQ
+!  write(*,*) "POROS(0,NY,NX) = ", POROS(0,NY,NX)
   DFVR=FracSoiPAsAir0*POROQ*FracSoiPAsAir0/POROS(0,NY,NX)
+!  write(*,*) "At ResistanceLitRLay: "
+!  write(*,*) "RAG(NY,NX) = ", RAG(NY,NX)
+!  write(*,*) "VapDiffusResistanceLitR(NY,NX) = ", VapDiffusResistanceLitR(NY,NX)
+!  write(*,*) "DFVR = ", DFVR  
   ResistanceLitRLay(NY,NX)=RAG(NY,NX)+VapDiffusResistanceLitR(NY,NX)/DFVR
   RI=RichardsonNumber(RIB(NY,NX),TKQ(NY,NX),TKSoi1(NUM(NY,NX),NY,NX))
+!  write(*,*) "At RagX: "
+!  write(*,*) "RAM = ", RAM
+!  write(*,*) "RAGS(NY,NX) = ", RAGS(NY,NX)
+!  write(*,*) "ResistanceLitRLay(NY,NX) = ", ResistanceLitRLay(NY,NX)
+!  write(*,*) "RI = ", RI
   RAGX=AMAX1(RAM,0.8_r8*RAGS(NY,NX),AMIN1(1.2_r8*RAGS(NY,NX),ResistanceLitRLay(NY,NX)/(1.0_r8-10.0_r8*RI)))
   RAGS(NY,NX)=RAGX
   RAa=RAGR(NY,NX)+RAGS(NY,NX)
+  !write(*,*) "Value of RAa: "
+  !write(*,*) "RAa = ", RAa
+  !write(*,*) "RAGR(NY,NX) = ", RAGR(NY,NX)
+  !write(*,*) "RAGS(NY,NX) = ", RAGS(NY,NX)
+  !write(*,*) "ResistanceLitRLay(NY,NX) = ", ResistanceLitRLay(NY,NX)
+  !write(*,*) "RI = ", RI
+  !write(*,*) "RAM = ", RAM
+  !write(*,*) "RAGX = ", RAGX
+  !write(*,*) "RAG(NY,NX) = ", RAG(NY,NX)
+  !write(*,*) "VapDiffusResistanceLitR(NY,NX) = ", VapDiffusResistanceLitR(NY,NX)
+  !write(*,*) "FracSoiPAsAir(0,NY,NX) = ", FracSoiPAsAir(0,NY,NX)
+  !write(*,*) "POROS(0,NY,NX) = ", POROS(0,NY,NX)
+  !write(*,*) "POROQ = ", POROQ
+
 ! IF(I.EQ.63.AND.NX.EQ.1)THEN
 !     WRITE(*,7776)'RAGX',I,J,M,NX,NY,RAGZ,FracSurfAsBareSoi(NY,NX),RAG(NY,NX)
 !    2,CVRDW(NY,NX),ResistanceLitRLay,RI,RIB(NY,NX),TKQ(NY,NX),TKSoi1(NUM(NY,NX),NY,NX)
@@ -468,9 +546,24 @@ contains
 ! HeatSensVapAir2Soi=convective heat of evaporation flux
 !
   CdSoiEvap=PAREG(NY,NX)/(RAa+RZ)
+  !write(*,*) "Writing for CdSoiEvap: "
+  !write(*,*) "CdSoiEvap: ", CdSoiEvap
+  !write(*,*) "PAREG(NY,NX): ", PAREG(NY,NX)
+  !write(*,*) "RAa: ", RAa
+  !write(*,*) "RZ: ", RZ
   CdSoiHSens=PARSG(NY,NX)/RAa
-
+  !write(*,*) "Writing for CdSoiHSens: "
+  !write(*,*) "CdSoiHSens: ", CdSoiHSens
+  !write(*,*) "PARSG(NY,NX): ", PARSG(NY,NX)
+  !write(*,*) "RAa: ", RAa
+  !write(*,*) "RZ: ", RZ
   TKX1=TKSoi1(NUM(NY,NX),NY,NX)
+
+  IF(TKX1.LE.0.0_r8)THEN
+    !write(*,*) "TKX1 is zero, resetting"
+    TKX1 = 273.15_r8
+  ENDIF
+
   VaporSoi1=vapsat(TKX1)*EXP(18.0_r8*PSISV1/(RGAS*TKX1))
 
   !evaporation, no more than what is available, g H2O
@@ -499,7 +592,33 @@ contains
   HFLX0=Radnet2LitGrnd+LatentHeatEvapAir2Grnd+HeatSensAir2Grnd
   !total heat plus convective heat 
   HeatFluxAir2Soi=HFLX0+HeatSensVapAir2Soi
-!  write(*,*)'tks',TKQ(NY,NX),TKX1
+
+  !write(*,*) "printing heat flux vars: "
+  !write(*,*) "CdSoiEvap:", CdSoiEvap
+  !write(*,*) "CdSoiHSens:", CdSoiHSens
+  !write(*,*) "TKX1:", TKX1
+  !write(*,*) "VaporSoi1:", VaporSoi1
+  !write(*,*) "VapXAir2TopLay:", VapXAir2TopLay
+  !write(*,*) "LatentHeatEvapAir2Grnd:", LatentHeatEvapAir2Grnd
+  !write(*,*) "HeatSensVapAir2Soi:", HeatSensVapAir2Soi
+  !write(*,*) "TopLayWatVol(NY,NX):", TopLayWatVol(NY,NX)
+  !write(*,*) "HeatSensAir2Grnd:", HeatSensAir2Grnd
+  !write(*,*) "HFLX0:", HFLX0
+  !write(*,*) "HeatFluxAir2Soi:", HeatFluxAir2Soi 
+  !write(*,*) "PAREG(NY,NX):", PAREG(NY,NX)
+  !write(*,*) "RAa:", RAa
+  !write(*,*) "RZ:", RZ
+  !write(*,*) "PARSG(NY,NX):", PARSG(NY,NX)
+  !write(*,*) "VPQ(NY,NX):", VPQ(NY,NX)
+  !write(*,*) "PSISV1:", PSISV1
+  !write(*,*) "RGAS:", RGAS
+  !write(*,*) "EvapLHTC:", EvapLHTC
+  !write(*,*) "cpw:", cpw
+  !write(*,*) "TKQ(NY,NX):", TKQ(NY,NX)
+  !write(*,*) "Radnet2LitGrnd:", Radnet2LitGrnd
+  !write(*,*) "dts_wat:", dts_wat
+  !write(*,*) "NUM(NY,NX):", NUM(NY,NX)
+
   end subroutine SoilSRFEnerbyBalance
 
 !------------------------------------------------------------------------------------------
@@ -1516,8 +1635,6 @@ contains
       call SurfaceEnergyModel(M,NX,NY,ResistanceLitRLay,KSatReductByRainKineticEnergy(NY,NX),&
         HeatFluxAir2Soi(NY,NX),LatentHeatAir2Sno,HeatSensEvap,HeatSensAir2Snow,Radnet2Snow,&
         TopLayWatVol,VapXAir2TopLay)
-
-!      write(*,*)'TXKR SurfaceEnergyModel MM=',M,TKSoi1(0,NY,NX)
 
     ! CAPILLARY EXCHANGE OF WATER BETWEEN SOIL SURFACE AND RESIDUE
       call SurfLitrSoilWaterExchange(M,NY,NX,KSatReductByRainKineticEnergy(NY,NX))

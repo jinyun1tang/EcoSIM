@@ -41,6 +41,7 @@ implicit none
   use PlantTraitDataType   , only : InitPlantTraits
   use SoilPropertyDataType, only : InitSoilProperty
   use SurfLitterDataType  , only : InitSurfLitter
+  use SurfPhysData        , only : InitSurfPhysData
   use IrrigationDataType  , only : InitIrrigation
   use SoilBGCDataType     , only : InitSoilBGCData
   use SedimentDataType    , only : InitSedimentData
@@ -54,6 +55,7 @@ implicit none
   use SnowPhysData        , only : InitSnowPhysData
   use HydroThermData      , only : InitHydroThermData
   use GridConsts
+  use WatsubMod           , only : InitWatsub
 
   implicit none
   integer                 , intent(in) :: NOMicrobeGuilds   !number of microbial guilds per group
@@ -65,6 +67,11 @@ implicit none
 
   call InitGrosub(NumGrowthStages,MaxNumRootAxes)
 
+  write(*,*) "JX = ", JX, "  JY = ", JY, "JZ = ", JZ
+  write(*,*) "Just explixitly setting"
+!  JX=1
+!  JY=1
+!  JZ=100
   call InitGridData
 
   call InitTracerIDs(salt_model)
@@ -84,6 +91,8 @@ implicit none
   call InitPlantRates(micpar%NumOfPlantLitrCmplxs,pltpar%jroots)
 
   call InitSoilProperty
+
+  call InitWatsub
 
   call InitSurfLitter(micpar%NumOfLitrCmplxs)
 
