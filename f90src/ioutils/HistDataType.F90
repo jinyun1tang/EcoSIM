@@ -251,10 +251,11 @@ implicit none
   real(r8),pointer   :: h2D_NH3_vr_col(:,:)         !trc_solcl_vr(idg_NH3,1:JZ,NY,NX)
   real(r8),pointer   :: h2D_TEMP_vr_col(:,:)        !TCS(1:JZ,NY,NX)
   real(r8),pointer   :: h2D_vWATER_vr_col(:,:)       !THETWZ(1:JZ,NY,NX)
-  real(r8),pointer   :: h2D_vICE_vr_col(:,:)         !THETIZ(1:JZ,NY,NX)
+  real(r8),pointer   :: h2D_vICE_vr_col(:,:)         !THETIZ(1:JZ,NY,NX)  
   real(r8),pointer   :: h2D_PSI_vr_col(:,:)         !PSISM(1:JZ,NY,NX)+PSISO(1:JZ,NY,NX)
   real(r8),pointer   :: h2D_cNH4t_vr_col(:,:)       !(trc_solml_vr(ids_NH4,1:JZ,NY,NX)+trc_solml_vr(ids_NH4B,1:JZ,NY,NX) &
                                                                   !+14.0*(trcx_solml(idx_NH4,1:JZ,NY,NX)+trcx_solml(idx_NH4B,1:JZ,NY,NX)))/SoilMicPMassLayer(1:JZ,NY,NX)
+  real(r8),pointer   :: h2D_RootH2OUP_vr_col(:,:)   !root water uptake flux                                 
   real(r8),pointer   :: h2D_cNO3t_vr_col(:,:)       !(trc_solml_vr(ids_NO3,1:JZ,NY,NX)+trc_solml_vr(ids_NO3B,1:JZ,NY,NX) &
                                                                   !+trc_solml_vr(ids_NO2,1,NY,NX)+trc_solml_vr(ids_NO2B,1,NY,NX))/SoilMicPMassLayer(1,NY,NX)
   real(r8),pointer   :: h2D_cPO4_vr_col(:,:)        !(trc_solml_vr(ids_H1PO4,1:JZ,NY,NX)+trc_solml_vr(ids_H1PO4B,1,NY,NX)+trc_solml_vr(ids_H2PO4,1,NY,NX)+trc_solml_vr(ids_H2PO4B,1,NY,NX))/VLWatMicP(1,NY,NX)
@@ -513,6 +514,7 @@ implicit none
   allocate(this%h2D_vWATER_vr_col(beg_col:end_col,1:JZ))     
   allocate(this%h2D_vICE_vr_col(beg_col:end_col,1:JZ))       
   allocate(this%h2D_PSI_vr_col(beg_col:end_col,1:JZ))        
+  allocate(this%h2D_RootH2OUP_vr_col(beg_col:end_col,1:JZ))
   allocate(this%h2D_cNH4t_vr_col(beg_col:end_col,1:JZ))      
                                                              
   allocate(this%h2D_cNO3t_vr_col(beg_col:end_col,1:JZ))      
@@ -1411,6 +1413,10 @@ implicit none
   call hist_addfld2d(fname='PSI_vr',units='MPa',type2d='levsoi',avgflag='A',&
     long_name='soil matric pressure+osmotic pressure',ptr_col=data2d_ptr)      
 
+  data2d_ptr => this%h2D_RootH2OUP_vr_col(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='RootH2OUptake_vr',units='mmH2O/hr',type2d='levsoi',avgflag='A',&
+    long_name='soil water taken up by root',ptr_col=data2d_ptr)      
+  
   data2d_ptr => this%h2D_cNH4t_vr_col(beg_col:end_col,1:JZ)       
   call hist_addfld2d(fname='cNH4t_vr',units='gN/Mg soil',type2d='levsoi',avgflag='A',&
     long_name='soil NH4x concentration',ptr_col=data2d_ptr)      
@@ -1611,6 +1617,7 @@ implicit none
         this%h2D_vWATER_vr_col(ncol,L)=  THETWZ(L,NY,NX)
         this%h2D_vICE_vr_col(ncol,L)  =  THETIZ(L,NY,NX)
         this%h2D_PSI_vr_col(ncol,L)  =  PSISoilMatricP(L,NY,NX)+PSISoilOsmotic(L,NY,NX)     
+        this%h2D_RootH2OUP_vr_col(ncol,L)=GridPlantRootH2OUptake_vr(L,NY,NX)
         this%h2D_cNH4t_vr_col(ncol,L)=  safe_adb(trc_solml_vr(ids_NH4,L,NY,NX)+trc_solml_vr(ids_NH4B,L,NY,NX) &
                                                +natomw*(trcx_solml(idx_NH4,L,NY,NX)+trcx_solml(idx_NH4B,L,NY,NX)),&
                                                SoilMicPMassLayer(L,NY,NX))
@@ -1661,12 +1668,14 @@ implicit none
         this%h1D_PARbyCanopy_ptc(nptc)   = RadPARbyCanopy_pft(NZ,NY,NX)   !umol /m2/s        
 
         this%h1D_SHOOT_C_ptc(nptc)      = ShootChemElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_Plant_C_ptc(nptc)      = (ShootChemElms_pft(ielmc,NZ,NY,NX)+RootElmnts_pft(ielmc,NZ,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_Plant_C_ptc(nptc)      = (ShootChemElms_pft(ielmc,NZ,NY,NX) &
+          +RootElmnts_pft(ielmc,NZ,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_LEAF_C_ptc(nptc)       = LeafChemElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_Petiole_C_ptc(nptc)       = PetioleChemElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_STALK_C_ptc(nptc)      = StalkChemElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_RESERVE_C_ptc(nptc)    = ReserveChemElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_HUSK_C_ptc(nptc)       = (HuskChemElms_pft(ielmc,NZ,NY,NX)+EarChemElms_pft(ielmc,NZ,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_HUSK_C_ptc(nptc)       = (HuskChemElms_pft(ielmc,NZ,NY,NX) &
+          +EarChemElms_pft(ielmc,NZ,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_GRAIN_C_ptc(nptc)      = GrainChemElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_ROOT_C_ptc(nptc)       = RootElmnts_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_NODULE_C_ptc(nptc)        = NoduleChemElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)

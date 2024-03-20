@@ -78,7 +78,7 @@ module StartqMod
         ENDIF
         ZEROP(NZ,NY,NX)=ZERO*PlantPopulation_pft(NZ,NY,NX)
         ZEROQ(NZ,NY,NX)=ZERO*PlantPopulation_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        ZEROL(NZ,NY,NX)=ZERO*PlantPopulation_pft(NZ,NY,NX)*1.0E+06
+        ZEROL(NZ,NY,NX)=ZERO*PlantPopulation_pft(NZ,NY,NX)*1.0E+06_r8
       ENDDO D9985
 !
 !     FILL OUT UNUSED ARRAYS
@@ -118,7 +118,8 @@ module StartqMod
   CO2CuticleResist_pft(NZ,NY,NX)=RSMX(NZ,NY,NX)*1.56_r8
   rCNNonstructRemob_pft(NZ,NY,NX)=2.5_r8
   rCPNonstructRemob_pft(NZ,NY,NX)=25.0_r8
- RootFracRemobilizableBiom(NZ,NY,NX)=AMIN1(RootrNC_pft(NZ,NY,NX)*rCNNonstructRemob_pft(NZ,NY,NX),RootrPC_pft(NZ,NY,NX)*rCPNonstructRemob_pft(NZ,NY,NX))
+  RootFracRemobilizableBiom(NZ,NY,NX)=AMIN1(RootrNC_pft(NZ,NY,NX)*rCNNonstructRemob_pft(NZ,NY,NX)&
+    ,RootrPC_pft(NZ,NY,NX)*rCPNonstructRemob_pft(NZ,NY,NX))
   IF(iPlantPhotosynthesisType(NZ,NY,NX).EQ.ic3_photo)THEN
     O2I(NZ,NY,NX)=2.10E+05_r8
   ELSE
@@ -190,7 +191,7 @@ module StartqMod
 !
 !     ANNUALS, GRASSES, SHRUBS
 !
-  ELSEIF(iPlantTurnoverPattern_pft(NZ,NY,NX).EQ.0.OR. &
+  ELSEIF(iPlantTurnoverPattern_pft(NZ,NY,NX).EQ.0 .OR. &
     (.not.is_plant_treelike(iPlantMorphologyType_pft(NZ,NY,NX))))THEN
     CFOPE(ielmc,ifoliar,iprotein,NZ,NY,NX)=0.08_r8
     CFOPE(ielmc,ifoliar,icarbhyro,NZ,NY,NX)=0.41_r8
@@ -204,7 +205,7 @@ module StartqMod
 !
 !     DECIDUOUS TREES
 !
-  ELSEIF(iPlantTurnoverPattern_pft(NZ,NY,NX).EQ.1.OR.iPlantTurnoverPattern_pft(NZ,NY,NX).GE.3)THEN
+  ELSEIF(iPlantTurnoverPattern_pft(NZ,NY,NX).EQ.1 .OR. iPlantTurnoverPattern_pft(NZ,NY,NX).GE.3)THEN
     CFOPE(ielmc,ifoliar,iprotein,NZ,NY,NX)=0.07_r8
     CFOPE(ielmc,ifoliar,icarbhyro,NZ,NY,NX)=0.34_r8
     CFOPE(ielmc,ifoliar,icellulos,NZ,NY,NX)=0.36_r8
@@ -242,7 +243,7 @@ module StartqMod
 !
 !     ANNUALS, GRASSES, SHRUBS
 !
-  ELSEIF(iPlantTurnoverPattern_pft(NZ,NY,NX).EQ.0.OR. &
+  ELSEIF(iPlantTurnoverPattern_pft(NZ,NY,NX).EQ.0 .OR. &
     (.not.is_plant_treelike(iPlantMorphologyType_pft(NZ,NY,NX))))THEN
     CFOPE(ielmc,istalk,iprotein,NZ,NY,NX)=0.03_r8
     CFOPE(ielmc,istalk,icarbhyro,NZ,NY,NX)=0.25_r8
@@ -271,7 +272,7 @@ module StartqMod
 !
 !     ANNUALS, GRASSES, SHRUBS
 !
-  ELSEIF(iPlantTurnoverPattern_pft(NZ,NY,NX).EQ.0.OR. &
+  ELSEIF(iPlantTurnoverPattern_pft(NZ,NY,NX).EQ.0 .OR. &
     (.not.is_plant_treelike(iPlantMorphologyType_pft(NZ,NY,NX))))THEN
     CFOPE(ielmc,iroot,iprotein,NZ,NY,NX)=0.057_r8
     CFOPE(ielmc,iroot,icarbhyro,NZ,NY,NX)=0.263_r8
@@ -280,7 +281,7 @@ module StartqMod
 !
 !     DECIDUOUS TREES
 !
-  ELSEIF(iPlantTurnoverPattern_pft(NZ,NY,NX).EQ.1.OR.iPlantTurnoverPattern_pft(NZ,NY,NX).GE.3)THEN
+  ELSEIF(iPlantTurnoverPattern_pft(NZ,NY,NX).EQ.1 .OR. iPlantTurnoverPattern_pft(NZ,NY,NX).GE.3)THEN
     CFOPE(ielmc,iroot,iprotein,NZ,NY,NX)=0.059_r8
     CFOPE(ielmc,iroot,icarbhyro,NZ,NY,NX)=0.308_r8
     CFOPE(ielmc,iroot,icellulos,NZ,NY,NX)=0.464_r8
@@ -335,7 +336,7 @@ module StartqMod
 !     FNOD=scales node number for perennial vegetation (e.g. trees)
 !     NumConCurrentGrowinNode=number of concurrently growing nodes
 !
-  IF(iPlantTurnoverPattern_pft(NZ,NY,NX).EQ.0.OR. &
+  IF(iPlantTurnoverPattern_pft(NZ,NY,NX).EQ.0 .OR. &
     (.not.is_plant_treelike(iPlantMorphologyType_pft(NZ,NY,NX))))THEN
     ! deciduous or shallow root
     FNOD(NZ,NY,NX)=1.0_r8
@@ -683,8 +684,8 @@ module StartqMod
   TKC(NZ,NY,NX)=units%Celcius2Kelvin(TCelciusCanopy_pft(NZ,NY,NX))
   TCG(NZ,NY,NX)=TCelciusCanopy_pft(NZ,NY,NX)
   TKG(NZ,NY,NX)=units%Celcius2Kelvin(TCG(NZ,NY,NX))
-  fTgrowCanP(NZ,NY,NX)=1.0
-  PSICanopy_pft(NZ,NY,NX)=-1.0E-03
+  fTgrowCanP(NZ,NY,NX)=1.0_r8
+  PSICanopy_pft(NZ,NY,NX)=-1.0E-03_r8
   PSICanopyOsmo_pft(NZ,NY,NX)=OSMO(NZ,NY,NX)+PSICanopy_pft(NZ,NY,NX)
   PSICanopyTurg_pft(NZ,NY,NX)=AZMAX1(PSICanopy_pft(NZ,NY,NX)-PSICanopyOsmo_pft(NZ,NY,NX))
   Transpiration_pft(NZ,NY,NX)=0._r8
@@ -826,20 +827,29 @@ module StartqMod
   LeafChemElms_brch(ielmp,1,NZ,NY,NX)=CPGR(NZ,NY,NX)*LeafChemElms_brch(ielmc,1,NZ,NY,NX)
   LeafPetolBiomassC_brch(1,NZ,NY,NX)=LeafChemElms_brch(ielmc,1,NZ,NY,NX)+PetoleChemElm_brch(ielmc,1,NZ,NY,NX)
   CanopyLeafShethC_pft(NZ,NY,NX)=CanopyLeafShethC_pft(NZ,NY,NX)+LeafPetolBiomassC_brch(1,NZ,NY,NX)  
+    
   FDM=AMIN1(1.0_r8,0.16_r8-0.045_r8*PSICanopy_pft(NZ,NY,NX))
   CanopyWater_pft(NZ,NY,NX)=ppmc*CanopyLeafShethC_pft(NZ,NY,NX)/FDM
   WatByPCanopy(NZ,NY,NX)=0._r8
   NonstructElmnt_brch(ielmn,1,NZ,NY,NX)=CNGR(NZ,NY,NX)*NonstructElmnt_brch(ielmc,1,NZ,NY,NX)
   NonstructElmnt_brch(ielmp,1,NZ,NY,NX)=CPGR(NZ,NY,NX)*NonstructElmnt_brch(ielmc,1,NZ,NY,NX)
-  Root1stStructChemElm_pvr(ielmn,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)=CNGR(NZ,NY,NX)*Root1stStructChemElm_pvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)
-  Root1stStructChemElm_pvr(ielmp,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)=CPGR(NZ,NY,NX)*Root1stStructChemElm_pvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)
+  
+  Root1stStructChemElm_pvr(ielmn,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)= &
+    CNGR(NZ,NY,NX)*Root1stStructChemElm_pvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)
+  Root1stStructChemElm_pvr(ielmp,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)= &
+    CPGR(NZ,NY,NX)*Root1stStructChemElm_pvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)
   Root1stChemElm(ielmn,1,1,NZ,NY,NX)=CNGR(NZ,NY,NX)*Root1stChemElm(ielmc,1,1,NZ,NY,NX)
   Root1stChemElm(ielmp,1,1,NZ,NY,NX)=CPGR(NZ,NY,NX)*Root1stChemElm(ielmc,1,1,NZ,NY,NX)
-  RootStructBiomC_vr(ipltroot,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)=Root1stStructChemElm_pvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)
-  PopuPlantRootC_vr(ipltroot,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)=Root1stStructChemElm_pvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)
-  RootProteinC_pvr(1,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)=RootStructBiomC_vr(ipltroot,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)*RootFracRemobilizableBiom(NZ,NY,NX)
-  RootMycoNonstructElmnt_vr(ielmn,1,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)=CNGR(NZ,NY,NX)* RootMycoNonstructElmnt_vr(ielmc,1,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)
-  RootMycoNonstructElmnt_vr(ielmp,1,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)=CPGR(NZ,NY,NX)* RootMycoNonstructElmnt_vr(ielmc,1,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)
+  RootStructBiomC_vr(ipltroot,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)= &
+    Root1stStructChemElm_pvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)
+  PopuPlantRootC_vr(ipltroot,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)= &
+    Root1stStructChemElm_pvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)
+  RootProteinC_pvr(1,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)= &
+    RootStructBiomC_vr(ipltroot,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)*RootFracRemobilizableBiom(NZ,NY,NX)
+  RootMycoNonstructElmnt_vr(ielmn,1,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)= CNGR(NZ,NY,NX)&
+    *RootMycoNonstructElmnt_vr(ielmc,1,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)
+  RootMycoNonstructElmnt_vr(ielmp,1,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)=CPGR(NZ,NY,NX) &
+    *RootMycoNonstructElmnt_vr(ielmc,1,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)
   end subroutine InitSeedMorphoBio
 
   end module StartqMod

@@ -48,19 +48,19 @@ module ExtractsMod
   integer :: NZ,L,K,M
   integer :: NE
   associate(                             &
-   NP0      => plt_site%NP0        , &
-   WGLFT    => plt_biom%WGLFT      , &
+   NP0                      => plt_site%NP0        , &
+   WGLFT                    => plt_biom%WGLFT      , &
    StandingDeadChemElm_col  => plt_biom%StandingDeadChemElm_col   , &
-   StandingDeadChemElms_pft   => plt_biom%StandingDeadChemElms_pft     , &
-   LitrFallChemElm_pft    => plt_bgcr%LitrFallChemElm_pft      , &
-   LitrFallChemElm_col    => plt_bgcr%LitrFallChemElm_col      , &
-   LitrfalChemElemnts_vr     => plt_bgcr%LitrfalChemElemnts_vr       , &
-   LitrFallChemElm_pvr     => plt_bgcr%LitrFallChemElm_pvr       , &
-   MaxSoiL4Root      => plt_morph%MaxSoiL4Root       , &
-   CanopyStemA_lyr    => plt_morph%CanopyStemA_lyr     , &
-   CanopyLAgrid_lyr    =>  plt_morph%CanopyLAgrid_lyr    , &
-   StemArea_grd    =>  plt_morph%StemArea_grd    , &
-   CanopyLeafArea_grd    =>  plt_morph%CanopyLeafArea_grd      &
+   StandingDeadChemElms_pft => plt_biom%StandingDeadChemElms_pft     , &
+   LitrFallChemElm_pft      => plt_bgcr%LitrFallChemElm_pft      , &
+   LitrFallChemElm_col      => plt_bgcr%LitrFallChemElm_col      , &
+   LitrfalChemElemnts_vr    => plt_bgcr%LitrfalChemElemnts_vr       , &
+   LitrFallChemElm_pvr      => plt_bgcr%LitrFallChemElm_pvr       , &
+   MaxSoiL4Root             => plt_morph%MaxSoiL4Root       , &
+   CanopyStemA_lyr          => plt_morph%CanopyStemA_lyr     , &
+   CanopyLAgrid_lyr         =>  plt_morph%CanopyLAgrid_lyr    , &
+   StemArea_grd             =>  plt_morph%StemArea_grd    , &
+   CanopyLeafArea_grd       =>  plt_morph%CanopyLeafArea_grd      &
   )
   DO NZ=1,NP0
 !
@@ -113,10 +113,10 @@ module ExtractsMod
   integer :: L
   associate(                              &
     CanopyLeafCpft_lyr    => plt_biom%CanopyLeafCpft_lyr      , &
-    WGLFT    => plt_biom%WGLFT      , &
-    CanopyLAgrid_lyr    =>  plt_morph%CanopyLAgrid_lyr    , &
+    WGLFT                 => plt_biom%WGLFT      , &
+    CanopyLAgrid_lyr      =>  plt_morph%CanopyLAgrid_lyr    , &
     CanopyStemApft_lyr    =>  plt_morph%CanopyStemApft_lyr    , &
-    CanopyStemA_lyr    => plt_morph%CanopyStemA_lyr     , &
+    CanopyStemA_lyr       => plt_morph%CanopyStemA_lyr     , &
     CanopyLeafApft_lyr    => plt_morph%CanopyLeafApft_lyr       &
   )
   DO L=1,NumOfCanopyLayers1
@@ -139,50 +139,50 @@ module ExtractsMod
   integer :: N,L,K,NTG,NE
 
   associate(                       &
-    NU    => plt_site%NU     , &
-    AREA3 => plt_site%AREA3  , &
-    PlantPopulation_pft    => plt_site%PlantPopulation_pft     , &
-    RUPP1B=> plt_rbgc%RUPP1B , &
-    RUPP2B=> plt_rbgc%RUPP2B , &
-    RUNNXP=> plt_rbgc%RUNNXP , &
-    RUPOXP=> plt_rbgc%RUPOXP , &
-    trcg_Root_DisEvap_flx_vr=> plt_rbgc%trcg_Root_DisEvap_flx_vr , &
-    trcg_air2root_flx_pft_vr=> plt_rbgc%trcg_air2root_flx_pft_vr , &
-    RCO2P => plt_rbgc%RCO2P  , &
-    RUPGasSol_vr=> plt_rbgc%RUPGasSol_vr , &
-    RootNutUptake_pvr=> plt_rbgc%RootNutUptake_pvr , &
-    trcg_air2root_flx_vr=> plt_rbgc%trcg_air2root_flx_vr , &
-    trcg_TLP=> plt_rbgc%trcg_TLP , &
-    ROXYP => plt_rbgc%ROXYP  , &
-    RDFOME=> plt_rbgc%RDFOME , &
-    RUNNHP=> plt_rbgc%RUNNHP , &
-    RUNNOP=> plt_rbgc%RUNNOP , &
-    RUPP2P=> plt_rbgc%RUPP2P , &
-    RUNNBP=> plt_rbgc%RUNNBP , &
-    RUPP1P=> plt_rbgc%RUPP1P , &
-    trcs_plant_uptake_vr=> plt_rbgc%trcs_plant_uptake_vr , &
-    RNO3X => plt_bgcr%RNO3X  , &
-    RNH4X => plt_bgcr%RNH4X  , &
-    RPO4X => plt_bgcr%RPO4X  , &
-    RN3BX => plt_bgcr%RN3BX  , &
-    RP14X => plt_bgcr%RP14X  , &
-    RNHBX => plt_bgcr%RNHBX  , &
-    ROXYX => plt_bgcr%ROXYX  , &
-    TDFOME=> plt_bgcr%TDFOME , &
-    TUPOXP=> plt_bgcr%TUPOXP , &
-    TCO2P => plt_bgcr%TCO2P  , &
-    RPOBX => plt_bgcr%RPOBX  , &
-    RP1BX => plt_bgcr%RP1BX  , &
-    TKS   => plt_ew%TKS      , &
-    THeatRootUptake => plt_ew%THeatRootUptake    , &
+    NU                       => plt_site%NU     , &
+    AREA3                    => plt_site%AREA3  , &
+    PlantPopulation_pft      => plt_site%PlantPopulation_pft     , &
+    RUPP1B                   => plt_rbgc%RUPP1B , &
+    RUPP2B                   => plt_rbgc%RUPP2B , &
+    RUNNXP                   => plt_rbgc%RUNNXP , &
+    RUPOXP                   => plt_rbgc%RUPOXP , &
+    trcg_Root_DisEvap_flx_vr => plt_rbgc%trcg_Root_DisEvap_flx_vr , &
+    trcg_air2root_flx_pft_vr => plt_rbgc%trcg_air2root_flx_pft_vr , &
+    RCO2P                    => plt_rbgc%RCO2P  , &
+    RUPGasSol_vr             => plt_rbgc%RUPGasSol_vr , &
+    RootNutUptake_pvr        => plt_rbgc%RootNutUptake_pvr , &
+    trcg_air2root_flx_vr     => plt_rbgc%trcg_air2root_flx_vr , &
+    trcg_TLP                 => plt_rbgc%trcg_TLP , &
+    ROXYP                    => plt_rbgc%ROXYP  , &
+    RDFOME                   => plt_rbgc%RDFOME , &
+    RUNNHP                   => plt_rbgc%RUNNHP , &
+    RUNNOP                   => plt_rbgc%RUNNOP , &
+    RUPP2P                   => plt_rbgc%RUPP2P , &
+    RUNNBP                   => plt_rbgc%RUNNBP , &
+    RUPP1P                   => plt_rbgc%RUPP1P , &
+    trcs_plant_uptake_vr     => plt_rbgc%trcs_plant_uptake_vr , &
+    RNO3X                    => plt_bgcr%RNO3X  , &
+    RNH4X                    => plt_bgcr%RNH4X  , &
+    RPO4X                    => plt_bgcr%RPO4X  , &
+    RN3BX                    => plt_bgcr%RN3BX  , &
+    RP14X                    => plt_bgcr%RP14X  , &
+    RNHBX                    => plt_bgcr%RNHBX  , &
+    ROXYX                    => plt_bgcr%ROXYX  , &
+    TDFOME                   => plt_bgcr%TDFOME , &
+    TUPOXP                   => plt_bgcr%TUPOXP , &
+    TCO2P                    => plt_bgcr%TCO2P  , &
+    RPOBX                    => plt_bgcr%RPOBX  , &
+    RP1BX                    => plt_bgcr%RP1BX  , &
+    TKS                      => plt_ew%TKS      , &
+    THeatRootUptake          => plt_ew%THeatRootUptake    , &
     GridPlantRootH2OUptake_vr=> plt_ew%GridPlantRootH2OUptake_vr   , &
     AllPlantRootH2OUptake_vr => plt_ew%AllPlantRootH2OUptake_vr    , &
-    trcg_rootml_vr  => plt_rbgc%trcg_rootml_vr,&
-    trcs_rootml_vr => plt_rbgc%trcs_rootml_vr, &
-    RootLenDensPerPlant_pvr => plt_morph%RootLenDensPerPlant_pvr , &
-    RTDNT => plt_morph%RTDNT , &
-    MY    => plt_morph%MY    , &
-    MaxSoiL4Root   => plt_morph%MaxSoiL4Root     &
+    trcg_rootml_vr           => plt_rbgc%trcg_rootml_vr,&
+    trcs_rootml_vr           => plt_rbgc%trcs_rootml_vr, &
+    RootLenDensPerPlant_pvr  => plt_morph%RootLenDensPerPlant_pvr , &
+    RTDNT                    => plt_morph%RTDNT , &
+    MY                       => plt_morph%MY    , &
+    MaxSoiL4Root             => plt_morph%MaxSoiL4Root     &
   )
 
   DO N=1,MY(NZ)
@@ -215,15 +215,20 @@ module ExtractsMod
 !     R*DFA=root aqueous-gaseous CO2 exchange
 !
       DO NTG=idg_beg,idg_NH3
-        trcg_rootml_vr(NTG,N,L,NZ)=trcg_rootml_vr(NTG,N,L,NZ)+trcg_air2root_flx_pft_vr(NTG,N,L,NZ)-trcg_Root_DisEvap_flx_vr(NTG,N,L,NZ)
+        trcg_rootml_vr(NTG,N,L,NZ)=trcg_rootml_vr(NTG,N,L,NZ) &
+          +trcg_air2root_flx_pft_vr(NTG,N,L,NZ)-trcg_Root_DisEvap_flx_vr(NTG,N,L,NZ)
       ENDDO
 
       trcs_rootml_vr(idg_CO2,N,L,NZ)=trcs_rootml_vr(idg_CO2,N,L,NZ)+trcg_Root_DisEvap_flx_vr(idg_CO2,N,L,NZ)+RCO2P(N,L,NZ)
       trcs_rootml_vr(idg_O2,N,L,NZ)=trcs_rootml_vr(idg_O2,N,L,NZ)+trcg_Root_DisEvap_flx_vr(idg_O2,N,L,NZ)-RUPOXP(N,L,NZ)
-      trcs_rootml_vr(idg_CH4,N,L,NZ)=trcs_rootml_vr(idg_CH4,N,L,NZ)+trcg_Root_DisEvap_flx_vr(idg_CH4,N,L,NZ)+RUPGasSol_vr(idg_CH4,N,L,NZ)
-      trcs_rootml_vr(idg_N2O,N,L,NZ)=trcs_rootml_vr(idg_N2O,N,L,NZ)+trcg_Root_DisEvap_flx_vr(idg_N2O,N,L,NZ)+RUPGasSol_vr(idg_N2O,N,L,NZ)
-      trcs_rootml_vr(idg_NH3,N,L,NZ)=trcs_rootml_vr(idg_NH3,N,L,NZ)+trcg_Root_DisEvap_flx_vr(idg_NH3,N,L,NZ)+RUPGasSol_vr(idg_NH3,N,L,NZ)+RUPGasSol_vr(idg_NH3B,N,L,NZ)
-      trcs_rootml_vr(idg_H2,N,L,NZ)=trcs_rootml_vr(idg_H2,N,L,NZ)+trcg_Root_DisEvap_flx_vr(idg_H2,N,L,NZ)+RUPGasSol_vr(idg_H2,N,L,NZ)
+      trcs_rootml_vr(idg_CH4,N,L,NZ)=trcs_rootml_vr(idg_CH4,N,L,NZ) &
+        +trcg_Root_DisEvap_flx_vr(idg_CH4,N,L,NZ)+RUPGasSol_vr(idg_CH4,N,L,NZ)
+      trcs_rootml_vr(idg_N2O,N,L,NZ)=trcs_rootml_vr(idg_N2O,N,L,NZ) &
+        +trcg_Root_DisEvap_flx_vr(idg_N2O,N,L,NZ)+RUPGasSol_vr(idg_N2O,N,L,NZ)
+      trcs_rootml_vr(idg_NH3,N,L,NZ)=trcs_rootml_vr(idg_NH3,N,L,NZ) &
+        +trcg_Root_DisEvap_flx_vr(idg_NH3,N,L,NZ)+RUPGasSol_vr(idg_NH3,N,L,NZ)+RUPGasSol_vr(idg_NH3B,N,L,NZ)
+      trcs_rootml_vr(idg_H2,N,L,NZ)=trcs_rootml_vr(idg_H2,N,L,NZ) &
+        +trcg_Root_DisEvap_flx_vr(idg_H2,N,L,NZ)+RUPGasSol_vr(idg_H2,N,L,NZ)
 !
 !     TOTAL ROOT GAS CONTENTS
 !
@@ -332,53 +337,53 @@ module ExtractsMod
   real(r8) :: ENGYC
 
   associate(                       &
-    PlantElemntStoreLandscape => plt_site%PlantElemntStoreLandscape  , &
-    ElmntBalanceCum_pft  => plt_site%ElmntBalanceCum_pft   , &
-    NH3EmiCum_pft => plt_bgcr%NH3EmiCum_pft  , &
-    NH3Dep2Can_pft => plt_bgcr%NH3Dep2Can_pft  , &
-    Canopy_NEE_col => plt_bgcr%Canopy_NEE_col  , &
-    LitrFallChemElm_col => plt_bgcr%LitrFallChemElm_col  , &
-    RootGasLossDisturb_pft => plt_bgcr%RootGasLossDisturb_pft, &
-    RootN2Fix_pvr => plt_bgcr%RootN2Fix_pvr  , &
-    CO2NetFix_pft  => plt_bgcr%CO2NetFix_pft   , &
-    ETCanopy_pft => plt_ew%ETCanopy_pft    , &
-    TH2GZ => plt_bgcr%TH2GZ  , &
-    trcs_plant_uptake_vr => plt_rbgc%trcs_plant_uptake_vr, &    
-    NH3Dep2_brch => plt_rbgc%NH3Dep2_brch  , &
-    PlantRootSoilChemNetX_pft=> plt_rbgc%PlantRootSoilChemNetX_pft , &
-    TRootGasLossDisturb_pft => plt_rbgc%TRootGasLossDisturb_pft  , &
-    Transpiration_pft   => plt_ew%Transpiration_pft      , &
-    PrecIntcptByCanopy_pft  => plt_ew%PrecIntcptByCanopy_pft     , &
-    VapXAir2Canopy_pft=> plt_ew%VapXAir2Canopy_pft   , &
-    WatByPCanopy => plt_ew%WatByPCanopy    , &
-    CanopyWater_pft => plt_ew%CanopyWater_pft    , &
-    Eco_Heat_Grnd_col   => plt_ew%Eco_Heat_Grnd_col      , &
-    HeatXAir2PCan => plt_ew%HeatXAir2PCan    , &
-    EvapTransHeat_pft => plt_ew%EvapTransHeat_pft    , &
-    CanWatg=> plt_ew%CanWatg   , &
-    TKC   => plt_ew%TKC      , &
-    TKS   => plt_ew%TKS      , &
-    ENGYX => plt_ew%ENGYX    , &
-    Eco_Heat_Sens_col   => plt_ew%Eco_Heat_Sens_col      , &
-    VapXAir2CanG=> plt_ew%VapXAir2CanG   , &
-    TENGYC=> plt_ew%TENGYC   , &
-    TEVAPP=> plt_ew%TEVAPP   , &
-    THFLXC=> plt_ew%THFLXC   , &
-    LWRadCanG => plt_ew%LWRadCanG    , &
-    TairK   => plt_ew%TairK      , &
-    HeatStorCanP => plt_ew%HeatStorCanP    , &
-    Eco_Heat_Latent_col   => plt_ew%Eco_Heat_Latent_col      , &
-    CanH2OHeldVg=> plt_ew%CanH2OHeldVg   , &
-    NU                 => plt_site%NU     , &
-    StemArea_grd       => plt_morph%StemArea_grd , &
-    CanopyLeafArea_grd => plt_morph%CanopyLeafArea_grd , &
-    MaxSoiL4Root        => plt_morph%MaxSoiL4Root   , &
-    NumOfBranches_pft   => plt_morph%NumOfBranches_pft   , &
-    CanopyStemA_pft     => plt_morph%CanopyStemA_pft , &
-    CanopyLeafArea_pft  => plt_morph%CanopyLeafArea_pft , &
-    RadNet2CanP         => plt_rad%RadNet2CanP    , &
-    LWRadCanP           => plt_rad%LWRadCanP   , &
-    Eco_NetRad_col      => plt_rad%Eco_NetRad_col       &
+    PlantElemntStoreLandscape  => plt_site%PlantElemntStoreLandscape  , &
+    ElmntBalanceCum_pft        => plt_site%ElmntBalanceCum_pft   , &
+    NH3EmiCum_pft              => plt_bgcr%NH3EmiCum_pft  , &
+    NH3Dep2Can_pft             => plt_bgcr%NH3Dep2Can_pft  , &
+    Canopy_NEE_col             => plt_bgcr%Canopy_NEE_col  , &
+    LitrFallChemElm_col        => plt_bgcr%LitrFallChemElm_col  , &
+    RootGasLossDisturb_pft     => plt_bgcr%RootGasLossDisturb_pft, &
+    RootN2Fix_pvr              => plt_bgcr%RootN2Fix_pvr  , &
+    CO2NetFix_pft              => plt_bgcr%CO2NetFix_pft   , &
+    ETCanopy_pft               => plt_ew%ETCanopy_pft    , &
+    TH2GZ                      => plt_bgcr%TH2GZ  , &
+    trcs_plant_uptake_vr       => plt_rbgc%trcs_plant_uptake_vr, &    
+    NH3Dep2_brch               => plt_rbgc%NH3Dep2_brch  , &
+    PlantRootSoilChemNetX_pft  => plt_rbgc%PlantRootSoilChemNetX_pft , &
+    TRootGasLossDisturb_pft    => plt_rbgc%TRootGasLossDisturb_pft  , &
+    Transpiration_pft          => plt_ew%Transpiration_pft      , &
+    PrecIntcptByCanopy_pft     => plt_ew%PrecIntcptByCanopy_pft     , &
+    VapXAir2Canopy_pft         => plt_ew%VapXAir2Canopy_pft   , &
+    WatByPCanopy               => plt_ew%WatByPCanopy    , &
+    CanopyWater_pft            => plt_ew%CanopyWater_pft    , &
+    Eco_Heat_Grnd_col          => plt_ew%Eco_Heat_Grnd_col      , &
+    HeatXAir2PCan              => plt_ew%HeatXAir2PCan    , &
+    EvapTransHeat_pft          => plt_ew%EvapTransHeat_pft    , &
+    CanWatg                    => plt_ew%CanWatg   , &
+    TKC                        => plt_ew%TKC      , &
+    TKS                        => plt_ew%TKS      , &
+    ENGYX                      => plt_ew%ENGYX    , &
+    Eco_Heat_Sens_col          => plt_ew%Eco_Heat_Sens_col      , &
+    VapXAir2CanG               => plt_ew%VapXAir2CanG   , &
+    TENGYC                     => plt_ew%TENGYC   , &
+    TEVAPP                     => plt_ew%TEVAPP   , &
+    THFLXC                     => plt_ew%THFLXC   , &
+    LWRadCanG                  => plt_ew%LWRadCanG    , &
+    TairK                      => plt_ew%TairK      , &
+    HeatStorCanP               => plt_ew%HeatStorCanP    , &
+    Eco_Heat_Latent_col        => plt_ew%Eco_Heat_Latent_col      , &
+    CanH2OHeldVg               => plt_ew%CanH2OHeldVg   , &
+    NU                         => plt_site%NU     , &
+    StemArea_grd               => plt_morph%StemArea_grd , &
+    CanopyLeafArea_grd         => plt_morph%CanopyLeafArea_grd , &
+    MaxSoiL4Root               => plt_morph%MaxSoiL4Root   , &
+    NumOfBranches_pft          => plt_morph%NumOfBranches_pft   , &
+    CanopyStemA_pft            => plt_morph%CanopyStemA_pft , &
+    CanopyLeafArea_pft         => plt_morph%CanopyLeafArea_pft , &
+    RadNet2CanP                => plt_rad%RadNet2CanP    , &
+    LWRadCanP                  => plt_rad%LWRadCanP   , &
+    Eco_NetRad_col             => plt_rad%Eco_NetRad_col       &
   )
   DO L=NU,MaxSoiL4Root(NZ)
     trcs_plant_uptake_vr(idg_N2,L)=trcs_plant_uptake_vr(idg_N2,L)+RootN2Fix_pvr(L,NZ)

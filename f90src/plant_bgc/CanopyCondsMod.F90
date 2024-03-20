@@ -344,7 +344,9 @@ module CanopyCondsMod
 !    write(181,*)'canopyarea',I,J,NZ,CanopyArea_pft(NZ), &
 !      'canht=',MAXval(CanopyHeightz_col),SnowDepth-ZERO,DepthSurfWatIce-ZERO
   ENDDO D1135
-
+!  write(141,'(F13.6,6(X,F13.6))')I+J/24.,RadSWDirect_col,RadSWDiffus_col,PARDirect_col,PARDiffus_col,&
+!    SineSolarIncliAngle,TotSineSkyAngles_grd
+    
   IF(SineSolarIncliAngle.GT.ZERO)THEN
     RadSWSolarBeam_col=RadSWDirect_col*SineSolarIncliAngle+RadSWDiffus_col*TotSineSkyAngles_grd
     RadPARSolarBeam_col=PARDirect_col*SineSolarIncliAngle+PARDiffus_col*TotSineSkyAngles_grd
@@ -830,6 +832,9 @@ module CanopyCondsMod
           baksRadPAR2NextL(L)=baksRadPAR2NextL(L-1)
         ENDIF
       ENDDO D2800
+!      write(140,'(F13.6,4(X,F16.6))')I+J/24.,RadSWbyCanopy_pft(1),RadSWbyCanopy_pft(2),&
+!        RadPARbyCanopy_pft(1),RadPARbyCanopy_pft(2)
+        
 !
       !     RADIATION AT GROUND SURFACE IF NO CANOPY
 !
