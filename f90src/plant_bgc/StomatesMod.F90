@@ -3,6 +3,7 @@
   use EcosimConst
   use minimathmod
   use PlantAPIData
+  use EcoSIMCtrlMod , only : etimer 
   implicit none
 
   private
@@ -27,6 +28,7 @@
   real(r8), parameter :: Hours2KillAnuals(0:5)=real((/336.0,672.0,672.0,672.0,672.0,672.0/),r8)  !number of hours with no grain fill to terminate annuals
 
   public :: stomates
+  integer :: ii,jj
   contains
 
   subroutine stomates(I,J,NZ)
@@ -59,6 +61,7 @@
     MaxCanPStomaResistH2O_pft  =>  plt_photo%MaxCanPStomaResistH2O_pft   , &
     LeafIntracellularCO2_pft   =>  plt_photo%LeafIntracellularCO2_pft    &
   )
+  ii=i;jj=j
 !
 !     CANOPY TEMPERATURE + OFFSET FOR THERMAL ADAPTATION FROM 'READQ'
 !
@@ -591,6 +594,7 @@
   integer, intent(in) :: NB,NZ
   real(r8), intent(inout) :: CH2O
   real(r8), intent(in) :: TFN_Carboxy,TFN_Oxy,TFN_eTransp,Km4RubOxy
+  integer :: NE
 !     begin_execution
   associate(                          &
     LeafPetoNonstElmConc_brch  =>  plt_biom%LeafPetoNonstElmConc_brch  , &
@@ -611,12 +615,21 @@
 !     RubiscoActivity_brch=N,P feedback inhibition on C3 CO2 fixation
 !     CNKI,CPKI=nonstructural N,P inhibition constant on rubisco
 !
+  IF(nz==1)then
+  write(193,'(I4,4(X,F13.6))')NB,ii+jj/24.,(LeafPetoNonstElmConc_brch(NE,NB,NZ),NE=1,3)
+  else
+  write(194,'(I4,4(X,F13.6))')NB,ii+jj/24.,(LeafPetoNonstElmConc_brch(NE,NB,NZ),NE=1,3)
+  endif
   IF(LeafPetoNonstElmConc_brch(ielmc,NB,NZ).GT.ZERO)THEN
     RubiscoActivity_brch(NB,NZ)=AMIN1(LeafPetoNonstElmConc_brch(ielmn,NB,NZ)/(LeafPetoNonstElmConc_brch(ielmn,NB,NZ)&
       +LeafPetoNonstElmConc_brch(ielmc,NB,NZ)/CNKI) &
       ,LeafPetoNonstElmConc_brch(ielmp,NB,NZ)/(LeafPetoNonstElmConc_brch(ielmp,NB,NZ)&
       +LeafPetoNonstElmConc_brch(ielmc,NB,NZ)/CPKI))
-!    write(185,*)NZ,NB,RubiscoActivity_brch(NB,NZ),CNKI,CPKI  
+    if(NZ==1)then  
+    write(187,*)etimer%get_curr_doy(),NB,RubiscoActivity_brch(NB,NZ)
+    else
+    write(188,*)etimer%get_curr_doy(),NB,RubiscoActivity_brch(NB,NZ)
+    endif
   ELSE
     RubiscoActivity_brch(NB,NZ)=1.0_r8
   ENDIF

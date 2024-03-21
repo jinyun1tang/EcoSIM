@@ -1295,14 +1295,14 @@ module NutUptakeMod
   integer :: K
   !     begin_execution
   associate(                              &
-    RDOM_micb_flx    =>  plt_bgcr%RDOM_micb_flx     , &
-    RDFOME   =>  plt_rbgc%RDFOME    , &
+    RDOM_micb_flx          =>  plt_bgcr%RDOM_micb_flx     , &
+    RDFOME                 =>  plt_rbgc%RDFOME    , &
     RootExudChemElm_pft    =>  plt_rbgc%RootExudChemElm_pft     , &
-    RootHPO4Uptake_pft    =>  plt_rbgc%RootHPO4Uptake_pft     , &
+    RootHPO4Uptake_pft     =>  plt_rbgc%RootHPO4Uptake_pft     , &
     RootH2PO4Uptake_pft    =>  plt_rbgc%RootH2PO4Uptake_pft     , &
-    RootNH4Uptake_pft    =>  plt_rbgc%RootNH4Uptake_pft     , &
-    RootNO3Uptake_pft    =>  plt_rbgc%RootNO3Uptake_pft     , &
-    RootNutUptake_pvr  =>  plt_rbgc%RootNutUptake_pvr     &
+    RootNH4Uptake_pft      =>  plt_rbgc%RootNH4Uptake_pft     , &
+    RootNO3Uptake_pft      =>  plt_rbgc%RootNO3Uptake_pft     , &
+    RootNutUptake_pvr      =>  plt_rbgc%RootNutUptake_pvr     &
   )
   !
   !     TOTAL C,N,P EXCHANGE BETWEEN ROOTS AND SOIL
@@ -1321,10 +1321,14 @@ module NutUptakeMod
     RDOM_micb_flx(idom_don,K,L)=RDOM_micb_flx(idom_don,K,L)-RDFOME(ielmn,N,K,L,NZ)
     RDOM_micb_flx(idom_dop,K,L)=RDOM_micb_flx(idom_dop,K,L)-RDFOME(ielmp,N,K,L,NZ)
   ENDDO D295
-  RootNH4Uptake_pft(NZ)=RootNH4Uptake_pft(NZ)+RootNutUptake_pvr(ids_NH4,N,L,NZ)+RootNutUptake_pvr(ids_NH4B,N,L,NZ)
-  RootNO3Uptake_pft(NZ)=RootNO3Uptake_pft(NZ)+RootNutUptake_pvr(ids_NO3,N,L,NZ)+RootNutUptake_pvr(ids_NO3B,N,L,NZ)
-  RootH2PO4Uptake_pft(NZ)=RootH2PO4Uptake_pft(NZ)+RootNutUptake_pvr(ids_H2PO4,N,L,NZ)+RootNutUptake_pvr(ids_H2PO4B,N,L,NZ)
-  RootHPO4Uptake_pft(NZ)=RootHPO4Uptake_pft(NZ)+RootNutUptake_pvr(ids_H1PO4,N,L,NZ)+RootNutUptake_pvr(ids_H1PO4B,N,L,NZ)
+  RootNH4Uptake_pft(NZ)=RootNH4Uptake_pft(NZ) &
+    +(RootNutUptake_pvr(ids_NH4,N,L,NZ)+RootNutUptake_pvr(ids_NH4B,N,L,NZ))*1.e6
+  RootNO3Uptake_pft(NZ)=RootNO3Uptake_pft(NZ) &
+    +(RootNutUptake_pvr(ids_NO3,N,L,NZ)+RootNutUptake_pvr(ids_NO3B,N,L,NZ))*1.e6
+  RootH2PO4Uptake_pft(NZ)=RootH2PO4Uptake_pft(NZ) &
+    +(RootNutUptake_pvr(ids_H2PO4,N,L,NZ)+RootNutUptake_pvr(ids_H2PO4B,N,L,NZ))*1.e6
+  RootHPO4Uptake_pft(NZ)=RootHPO4Uptake_pft(NZ) &
+    +(RootNutUptake_pvr(ids_H1PO4,N,L,NZ)+RootNutUptake_pvr(ids_H1PO4B,N,L,NZ))*1.e6
   end associate
   end subroutine SumupNutrientUptake
 

@@ -4,12 +4,13 @@ module PlantBranchMod
 ! module for plant biological transformations
   use minimathmod, only : isclose,safe_adb,AZMAX1
   use data_kind_mod, only : r8 => DAT_KIND_R8
+  use EcoSIMCtrlMod , only : etimer 
   use EcosimConst
   use GrosubPars
   use PlantAPIData
   use PhotoSynsMod
   use PlantMathFuncMod
-  use NoduleBGCMod
+  use NoduleBGCMod  
   use LitrFallMod
   implicit none
   private
@@ -150,7 +151,9 @@ module PlantBranchMod
   IF(iPlantBranchState_brch(NB,NZ).EQ.iLive)THEN
 
     call CalcPartitionCoeff(I,J,NB,NZ,PART,PTRT,IFLGY,BegRemoblize)
-
+    if(etimer%get_curr_year()==0 .and. NZ==1)then
+    PART=0._r8;PART(1)=0.75;PART(2)=0.25
+    endif
     PARTS_brch(:,NB,NZ)=PART
 !
 !   SHOOT COEFFICIENTS FOR GROWTH RESPIRATION AND N,P CONTENTS
@@ -285,14 +288,17 @@ module PlantBranchMod
     GrowthGrain(ielmp)=GrowthGrain(ielmc)*rPCReserve_pft(NZ)
 
 !    if(NZ==1)THEN
-!      write(185,'(I3,23(X,F13.6))')NB,I+J/24.,NonStructalC4Growth_brch,(GrowthLeaf(NE),GrowthPetiole(NE),&
+!      write(185,'(I3,X,I4,4(X,F13.6))')NB,etimer%get_curr_year(),I+J/24.&
+!       ,NonStructalC4Growth_brch,GrowthLeaf(1),PART(ibrch_leaf)
 !      GrowthStalk(NE),GrowthReserve(NE),GrowthHusk(NE),GrowthEar(NE),GrowthGrain(NE),NE=1,NumPlantChemElms)
 !      WRITE(187,'(I3,8(X,F13.6))')NB,I+J/24.,(PART(NE),NE=1,7)
 !    else
-!      write(186,'(I3,23(X,F13.6))')NB,I+J/24.,NonStructalC4Growth_brch,(GrowthLeaf(NE),GrowthPetiole(NE),&
+!      write(186,'(I3,X,I4,4(X,F13.6))')NB,etimer%get_curr_year(),I+J/24.&
+!        ,NonStructalC4Growth_brch,GrowthLeaf(1),PART(ibrch_leaf)
 !      GrowthStalk(NE),GrowthReserve(NE),GrowthHusk(NE),GrowthEar(NE),GrowthGrain(NE),NE=1,NumPlantChemElms)
 !      WRITE(188,'(I3,8(X,F13.6))')NB,I+J/24.,(PART(NE),NE=1,7)
 !    endif
+    
     DO NE=1,NumPlantChemElms
       LeafChemElms_brch(NE,NB,NZ)=LeafChemElms_brch(NE,NB,NZ)+GrowthLeaf(NE)
       PetoleChemElm_brch(NE,NB,NZ)=PetoleChemElm_brch(NE,NB,NZ)+GrowthPetiole(NE)
@@ -604,7 +610,7 @@ module PlantBranchMod
 !     iPlantTurnoverPattern_pft=turnover:0=all aboveground,1=all leaf+petiole,2=none,3=between 1,2
 !     iPlantCalendar_brch(ipltcal_EndSeedFill,=physiological maturity date
 !
-  IF(iPlantTurnoverPattern_pft(NZ).EQ.0.AND.iPlantCalendar_brch(ipltcal_EndSeedFill,NB,NZ).NE.0)THEN
+  IF(iPlantTurnoverPattern_pft(NZ).EQ.0 .AND. iPlantCalendar_brch(ipltcal_EndSeedFill,NB,NZ).NE.0)THEN
     IF(iPlantPhenologyPattern_pft(NZ).EQ.iplt_annual)THEN
       PART(ibrch_reserve)=0._r8
       PART(ibrch_stalk)=0._r8
@@ -644,7 +650,7 @@ module PlantBranchMod
 !     CanopyLeafArea_pft=PFT leaf area
 !
   ARLFI=CanopyLeafArea_pft(NZ)/AREA3(NU)
-  IF(ARLFI.GT.5.0)THEN
+  IF(ARLFI.GT.5.0_r8)THEN
     FPARTL=AZMAX1((10.0_r8-ARLFI)/5.0_r8)
     PART(ibrch_stalk)=PART(ibrch_stalk)+(1.0_r8-FPARTL)*(PART(ibrch_leaf)+PART(ibrch_petiole))
     PART(ibrch_leaf)=FPARTL*PART(ibrch_leaf)
@@ -665,7 +671,7 @@ module PlantBranchMod
 !     IFLGY,BegRemoblize=remobilization flags
 !     FLGZ=control rate of remobilization
 !
-  IF((iPlantPhenologyPattern_pft(NZ).NE.iplt_annual.AND. &
+  IF((iPlantPhenologyPattern_pft(NZ).NE.iplt_annual .AND. &
      Hours4LeafOff_brch(NB,NZ).GE.FracHour4LeafoffRemob(iPlantPhenolType_pft(NZ))*HourThreshold4LeafOff_brch(NB,NZ)) &
     .OR.(iPlantPhenologyPattern_pft(NZ).EQ.iplt_annual.AND.iPlantCalendar_brch(ipltcal_SetSeedNumber,NB,NZ).NE.0))THEN
     !set remobilization true
@@ -679,7 +685,7 @@ module PlantBranchMod
       TCelciusCanopy_pft(NZ).LT.TCelciusChill4Seed(NZ))THEN
       IFLGY=1
       HoursDoingRemob_brch(NB,NZ)=HoursDoingRemob_brch(NB,NZ)+1.0_r8
-    ELSEIF(iPlantPhenolType_pft(NZ).GE.2.AND.PSICanopy_pft(NZ).LT.PSILY(iPlantMorphologyType_pft(NZ)))THEN
+    ELSEIF(iPlantPhenolType_pft(NZ).GE.2 .AND. PSICanopy_pft(NZ).LT.PSILY(iPlantMorphologyType_pft(NZ)))THEN
       IFLGY=1
       HoursDoingRemob_brch(NB,NZ)=HoursDoingRemob_brch(NB,NZ)+1.0_r8
     ENDIF
@@ -758,7 +764,7 @@ module PlantBranchMod
     else
     write(102,'(I4,5(X,F13.6))')NB,I+J/24.,CO2F,CH2O,CH2OClm,CH2OLlm
     endif
-    CH2O=CH2OClm
+!    CH2O=max(CH2OClm,CH2OLlm);CO2F=CH2O
 !
 !   SHOOT AUTOTROPHIC RESPIRATION AFTER EMERGENCE
 !
@@ -1599,8 +1605,7 @@ module PlantBranchMod
 !
       HTSTK=HeightBranchBase+InternodeHeightLive_brch(K,NB,NZ)
       HTLF=HTSTK+PetioleLengthNode_brch(K,NB,NZ)
-      LeafLength=AZMAX1(SQRT(WDLF(NZ)*AMAX1(0.0 &
-        ,LeafAreaNode_brch(K,NB,NZ))/(PlantPopulation_pft(NZ)*FNOD(NZ))))
+      LeafLength=AZMAX1(SQRT(WDLF(NZ)*AZMAX1(LeafAreaNode_brch(K,NB,NZ))/(PlantPopulation_pft(NZ)*FNOD(NZ))))
       TLGLF=0._r8
       !
       !   ALLOCATE FRACTIONS OF LEAF IN EACH INCLINATION CLASS
@@ -1617,12 +1622,12 @@ module PlantBranchMod
 !
       D555: DO N=NumOfLeafZenithSectors1,1,-1
         YLGLF=SineLeafAngle(N)*CLASS(N,NZ)*LeafLength
-        HTLFL=AMIN1(CanopyHeight_copy(NZ)+0.01-YLGLF,HTLF+TLGLF)
-        HTLFU=AMIN1(CanopyHeight_copy(NZ)+0.01,HTLFL+YLGLF)
+        HTLFL=AMIN1(CanopyHeight_copy(NZ)+0.01_r8-YLGLF,HTLF+TLGLF)
+        HTLFU=AMIN1(CanopyHeight_copy(NZ)+0.01_r8,HTLFL+YLGLF)
         LU=0
         LL=0
         D550: DO L=NumOfCanopyLayers1,1,-1
-          IF(LU.EQ.1.AND.LL.EQ.1)exit
+          IF(LU.EQ.1 .AND. LL.EQ.1)exit
           IF((HTLFU.GT.CanopyHeightz_col(L-1).OR.CanopyHeightz_col(L-1).LE.ZERO).AND.LU.EQ.0)THEN
             LHTLFU=MAX(1,L)
             LU=1
@@ -1663,7 +1668,7 @@ module PlantBranchMod
         TLGLF=TLGLF+YLGLF
         CanopyHeight_pft(NZ)=AMAX1(CanopyHeight_pft(NZ),HTLFU)
       ENDDO D555
-      IF(PetioleProteinCNode_brch(K,NB,NZ).GT.0.0)THEN
+      IF(PetioleProteinCNode_brch(K,NB,NZ).GT.0.0_r8)THEN
         IF(KLeafNumLowestGrowing_pft(NB,NZ).EQ.0)KLeafNumLowestGrowing_pft(NB,NZ)=MIN(KK,KLeafNodeNumber(NB,NZ))
       ENDIF
     ENDDO D560
@@ -1699,7 +1704,7 @@ module PlantBranchMod
       LU=0
       LL=0
       D545: DO L=NumOfCanopyLayers1,1,-1
-        IF(LU.EQ.1.AND.LL.EQ.1)exit
+        IF(LU.EQ.1 .AND. LL.EQ.1)exit
         IF((HeightLeafBase.GT.CanopyHeightz_col(L-1).OR.CanopyHeightz_col(L-1).LE.ZERO).AND.LU.EQ.0)THEN
           LHTBRU=MAX(1,L)
           LU=1
@@ -1717,7 +1722,7 @@ module PlantBranchMod
         StalkBiomassC_brch(NB,NZ)=StalkChemElms_brch(ielmc,NB,NZ)
       ELSE
         ZSTK=AMIN1(ZSTX,FSTK*RSTK)
-        ASTV=PICON*(2.0_r8*RSTK*ZSTK-ZSTK**2)
+        ASTV=PICON*(2.0_r8*RSTK*ZSTK-ZSTK*ZSTK)
         StalkBiomassC_brch(NB,NZ)=ASTV/VSTK*InternodeHeightLive_brch(K1,NB,NZ)*PlantPopulation_pft(NZ)
       ENDIF
     !     IF(NZ.EQ.1)THEN
@@ -1781,7 +1786,7 @@ module PlantBranchMod
 ! SURFXX=0._r8
   D500: DO K=1,MaxNodesPerBranch1
 !     ARLFXB=ARLFXB+LeafAreaNode_brch(K,NB,NZ)
-    IF(LeafAreaNode_brch(K,NB,NZ).GT.0.0)THEN
+    IF(LeafAreaNode_brch(K,NB,NZ).GT.0.0_r8)THEN
       D700: DO L=NumOfCanopyLayers1,1,-1
 !       ARLFXL=ARLFXL+CanopyLeafAreaByLayer_pft(L,K,NB,NZ)
         D800: DO N=1,NumOfLeafZenithSectors1
@@ -1872,7 +1877,7 @@ module PlantBranchMod
 !   MaxPotentSeedNumber_pft=maximum potential seed number from PFT file
 !     GROSTKC=stalk growth rate
 !
-  IF(iPlantCalendar_brch(ipltcal_Jointing,NB,NZ).NE.0.AND.iPlantCalendar_brch(ipltcal_Anthesis,NB,NZ).EQ.0)THEN
+  IF(iPlantCalendar_brch(ipltcal_Jointing,NB,NZ).NE.0 .AND. iPlantCalendar_brch(ipltcal_Anthesis,NB,NZ).EQ.0)THEN
     PotentialSeedSites_brch(NB,NZ)=PotentialSeedSites_brch(NB,NZ)+MaxPotentSeedNumber_pft(NZ)*AZMAX1(GROSTKC)
   ENDIF
 !
