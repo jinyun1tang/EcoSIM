@@ -410,14 +410,15 @@ module HfuncsMod
 ! CPOLN*,ZPOLN*,PPOLN*=non-structl C,N,P in branch,canopy nodules (g)
 ! NumOfMainBranch_pft=main branch number
 !
-  DO NE=1,NumPlantChemElms
-    D140: DO NB=1,NumOfBranches_pft(NZ)
+  
+  D140: DO NB=1,NumOfBranches_pft(NZ)
+    DO NE=1,NumPlantChemElms
       IF(iPlantBranchState_brch(NB,NZ).EQ.iLive)THEN
         CanopyNonstructElements_pft(NE,NZ)=CanopyNonstructElements_pft(NE,NZ)+NonstructElmnt_brch(NE,NB,NZ)
         NoduleNonstructElmnt_pft(NE,NZ)=NoduleNonstructElmnt_pft(NE,NZ)+NoduleNonstructElmnt_brch(NE,NB,NZ)
       ENDIF
-    ENDDO D140
-  ENDDO
+    ENDDO     
+  ENDDO D140
 
   !find main branch number, which is the most recent live branch
   DO NB=1,NumOfBranches_pft(NZ)
@@ -464,15 +465,21 @@ module HfuncsMod
     CanopyNonstructElementConc_pft(1:NumPlantChemElms,NZ)=1.0_r8
     NoduleNonstructCconc_pft(NZ)=1.0_r8
   ENDIF
-  DO NE=1,NumPlantChemElms
-    D190: DO NB=1,NumOfBranches_pft(NZ)
+  
+  D190: DO NB=1,NumOfBranches_pft(NZ)
+    if(NZ==1)then
+    write(195,'(I4,5(X,F14.6))')NB,I+J/24.,LeafPetolBiomassC_brch(NB,NZ),(NonstructElmnt_brch(NE,NB,NZ),NE=1,3)
+    else
+    write(196,'(I4,5(X,F14.6))')NB,I+J/24.,LeafPetolBiomassC_brch(NB,NZ),(NonstructElmnt_brch(NE,NB,NZ),NE=1,3)
+    endif
+    DO NE=1,NumPlantChemElms
       IF(LeafPetolBiomassC_brch(NB,NZ).GT.ZEROP(NZ))THEN
         LeafPetoNonstElmConc_brch(NE,NB,NZ)=AZMAX1(NonstructElmnt_brch(NE,NB,NZ)/LeafPetolBiomassC_brch(NB,NZ))
       ELSE
         LeafPetoNonstElmConc_brch(NE,NB,NZ)=1.0_r8
       ENDIF
-    ENDDO D190
-  ENDDO
+    ENDDO
+  ENDDO D190
 !
 ! EMERGENCE DATE FROM COTYLEDON HEIGHT, LEAF AREA, ROOT DEPTH
 !
