@@ -80,8 +80,8 @@ module RootDataType
   real(r8),target,allocatable ::  RootNodueChemElm_pvr(:,:,:,:,:)                  !root layer nodule element, [g d-2]
   real(r8),target,allocatable ::  NoduleChemElms_pft(:,:,:,:)                     !root total nodule mass, [g d-2]
   real(r8),target,allocatable ::  RootStructBiomC_vr(:,:,:,:,:)                   !root layer structural C, [g d-2]
-  real(r8),target,allocatable ::   RootMycoNonstructElmnt_vr(:,:,:,:,:,:)                !root  layer nonstructural element, [g d-2]
-  real(r8),target,allocatable ::  RootNonstructElementConcpft_vr(:,:,:,:,:,:)                !root  layer nonstructural element concentration, [g g-1]
+  real(r8),target,allocatable ::   RootMycoNonstructElm_vr(:,:,:,:,:,:)                !root  layer nonstructural element, [g d-2]
+  real(r8),target,allocatable ::  RootNonstructElmConc_pvr(:,:,:,:,:,:)                !root  layer nonstructural element concentration, [g g-1]
   real(r8),target,allocatable ::  Root1stChemElm(:,:,:,:,:,:)                   !root C primary axes, [g d-2]
   real(r8),target,allocatable ::  RootProteinConc_pvr(:,:,:,:,:)                  !root layer protein C concentration, [g g-1]
 !----------------------------------------------------------------------
@@ -162,8 +162,8 @@ contains
   allocate(RootNodueChemElm_pvr(NumPlantChemElms,JZ,JP,JY,JX)); RootNodueChemElm_pvr=0._r8
   allocate(NoduleChemElms_pft(NumPlantChemElms,JP,JY,JX));  NoduleChemElms_pft=0._r8
   allocate(RootStructBiomC_vr(jroots,JZ,JP,JY,JX));RootStructBiomC_vr=0._r8
-  allocate(RootMycoNonstructElmnt_vr(NumPlantChemElms,jroots,JZ,JP,JY,JX)); RootMycoNonstructElmnt_vr=0._r8
-  allocate(RootNonstructElementConcpft_vr(NumPlantChemElms,jroots,JZ,JP,JY,JX));RootNonstructElementConcpft_vr=0._r8
+  allocate(RootMycoNonstructElm_vr(NumPlantChemElms,jroots,JZ,JP,JY,JX)); RootMycoNonstructElm_vr=0._r8
+  allocate(RootNonstructElmConc_pvr(NumPlantChemElms,jroots,JZ,JP,JY,JX));RootNonstructElmConc_pvr=0._r8
   allocate(Root1stChemElm(NumPlantChemElms,jroots,MaxNumRootAxes,JP,JY,JX));Root1stChemElm=0._r8
   allocate(RootProteinConc_pvr(jroots,JZ,JP,JY,JX));RootProteinConc_pvr=0._r8
   end subroutine InitRootData
@@ -242,8 +242,8 @@ contains
   call destroy(RootNodueChemElm_pvr)
   call destroy(NoduleChemElms_pft)
   call destroy(RootStructBiomC_vr)
-  call destroy(RootMycoNonstructElmnt_vr)
-  call destroy(RootNonstructElementConcpft_vr)
+  call destroy(RootMycoNonstructElm_vr)
+  call destroy(RootNonstructElmConc_pvr)
   call destroy(Root1stChemElm)
   call destroy(RootProteinConc_pvr)
   end subroutine DestructRootData

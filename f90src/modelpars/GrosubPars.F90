@@ -144,7 +144,7 @@ module GrosubPars
   REAL(R8) :: RCCX(0:3),RCCQ(0:3)
   REAL(R8) :: RCCZ(0:3),RCCY(0:3)
   real(r8) :: Hours4SenesAftMature(0:3)
-  real(r8) :: ATRPX(0:1)
+  real(r8) :: HourReq2InitSStor4LeafOut(0:1)
   real(r8) :: GVMX(0:1)
   real(r8) :: RTSK(0:3)
   character(len=6), allocatable :: pftss(:)
@@ -323,7 +323,7 @@ module GrosubPars
   FRSV=real((/0.025,0.025,0.001,0.001/),r8)
   FXFY=real((/0.025,0.005/),r8);FXFZ=real((/0.25,0.05/),r8)
   Hours4SenesAftMature=real((/360.0,1440.0,720.0,720.0/),r8)
-  ATRPX=real((/68.96,276.9/),r8);GVMX=real((/0.010,0.0025/),r8)
+  HourReq2InitSStor4LeafOut=real((/68.96,276.9/),r8);GVMX=real((/0.010,0.0025/),r8)
   
   end subroutine InitVegPars
 !------------------------------------------------------------------------------------------

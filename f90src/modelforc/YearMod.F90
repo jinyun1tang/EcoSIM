@@ -101,7 +101,7 @@
     NH3EmiCum_pft(NZ,NY,NX)=0._r8
     CO2ByFire_pft(NZ,NY,NX)=0._r8
     CH4ByFire_pft(NZ,NY,NX)=0._r8
-    VOXYF(NZ,NY,NX)=0._r8
+    O2ByFire_pft(NZ,NY,NX)=0._r8
     NH3byFire_pft(NZ,NY,NX)=0._r8
     N2ObyFire_pft(NZ,NY,NX)=0._r8
     PO4byFire_pft(NZ,NY,NX)=0._r8

@@ -39,17 +39,17 @@ module PlantDataRateType
   real(r8),target,allocatable ::  EcoHavstElmntCum_pft(:,:,:,:)                    !total plant harvest, [g d-2 ]
   real(r8),target,allocatable ::  CO2ByFire_pft(:,:,:)                       !plant CO2 emission from fire, [g d-2 ]
   real(r8),target,allocatable ::  CH4ByFire_pft(:,:,:)                       !plant CH4 emission from fire, [g d-2 ]
-  real(r8),target,allocatable ::  VOXYF(:,:,:)                       !plant O2 uptake from fire, [g d-2 ]
+  real(r8),target,allocatable ::  O2ByFire_pft(:,:,:)                       !plant O2 uptake from fire, [g d-2 ]
   real(r8),target,allocatable ::  NH3byFire_pft(:,:,:)                       !plant NH3 emission from fire, [g d-2 ]
   real(r8),target,allocatable ::  N2ObyFire_pft(:,:,:)                       !plant N2O emission from fire, [g d-2 ]
   real(r8),target,allocatable ::  PO4byFire_pft(:,:,:)                       !plant PO4 emission from fire, [g d-2 ]
   real(r8),target,allocatable ::  ROXYP(:,:,:,:,:)                   !root  O2 demand from respiration, [g d-2 h-1]
-  real(r8),target,allocatable ::  trcg_air2root_flx_pft_vr(:,:,:,:,:,:)                  !gaseous tracer flux through roots, [g d-2 h-1]
+  real(r8),target,allocatable ::  trcg_air2root_flx__pvr(:,:,:,:,:,:)                  !gaseous tracer flux through roots, [g d-2 h-1]
   real(r8),target,allocatable ::  trcg_Root_DisEvap_flx_vr(:,:,:,:,:,:)                  !dissolution (+ve) - volatilization (-ve) gas flux in roots, [g d-2 h-1]
   real(r8),target,allocatable ::  RCO2P(:,:,:,:,:)                   !aqueous CO2 flux from roots to root water , [g d-2 h-1]
   real(r8),target,allocatable ::  RUPOXP(:,:,:,:,:)                  !aqueous O2 flux from roots to root water , [g d-2 h-1]
   real(r8),target,allocatable ::  RootRespPotential_vr(:,:,:,:,:)                   !root respiration unconstrained by O2, [g d-2 h-1]
-  real(r8),target,allocatable ::  RCO2A(:,:,:,:,:)                   !root respiration constrained by O2, [g d-2 h-1]
+  real(r8),target,allocatable ::  RCO2A_pvr(:,:,:,:,:)                   !root respiration constrained by O2, [g d-2 h-1]
   real(r8),target,allocatable ::  RootExudChemElm_pft(:,:,:,:)                     !total root uptake (+ve) - exudation (-ve) of dissovled element, [g d-2 h-1]
   real(r8),target,allocatable ::  RootNH4Uptake_pft(:,:,:)                       !total root uptake of NH4, [g d-2 h-1]
   real(r8),target,allocatable ::  RootNO3Uptake_pft(:,:,:)                       !total root uptake of NO3, [g d-2 h-1]
@@ -73,7 +73,7 @@ module PlantDataRateType
   real(r8),target,allocatable ::  RUCH1P(:,:,:,:,:)                  !root HPO4 uptake in non-band unlimited by nonstructural C
   real(r8),target,allocatable ::  RUOH1B(:,:,:,:,:)                  !root HPO4 uptake in band unlimited by O2
   real(r8),target,allocatable ::  RUCH1B(:,:,:,:,:)                  !root HPO4 uptake in band unlimited by nonstructural C
-  real(r8),target,allocatable ::  RCO2N(:,:,:,:,:)                   !root CO2 efflux unconstrained by root nonstructural C, [g d-2 h-1]
+  real(r8),target,allocatable ::  RCO2N_pvr(:,:,:,:,:)                   !root CO2 efflux unconstrained by root nonstructural C, [g d-2 h-1]
   real(r8),target,allocatable ::  RUNNHP(:,:,:,:,:)                  !root uptake of NH4 non-band unconstrained by NH4, [g d-2 h-1]
   real(r8),target,allocatable ::  RUNNOP(:,:,:,:,:)                  !root uptake of NH4 band unconstrained by NH4, [g d-2 h-1]
   real(r8),target,allocatable ::  RUNNBP(:,:,:,:,:)                  !root uptake of NO3 band unconstrained by NO3, [g d-2 h-1]
@@ -163,18 +163,18 @@ module PlantDataRateType
   allocate(EcoHavstElmntCum_pft(NumPlantChemElms,JP,JY,JX));   EcoHavstElmntCum_pft=0._r8
   allocate(CO2ByFire_pft(JP,JY,JX));    CO2ByFire_pft=0._r8
   allocate(CH4ByFire_pft(JP,JY,JX));    CH4ByFire_pft=0._r8
-  allocate(VOXYF(JP,JY,JX));    VOXYF=0._r8
+  allocate(O2ByFire_pft(JP,JY,JX));    O2ByFire_pft=0._r8
   allocate(NH3byFire_pft(JP,JY,JX));    NH3byFire_pft=0._r8
   allocate(N2ObyFire_pft(JP,JY,JX));    N2ObyFire_pft=0._r8
   allocate(PO4byFire_pft(JP,JY,JX));    PO4byFire_pft=0._r8
   allocate(ROXYP(jroots,JZ,JP,JY,JX));ROXYP=0._r8
-  allocate(trcg_air2root_flx_pft_vr(idg_beg:idg_end-1,2,JZ,JP,JY,JX));trcg_air2root_flx_pft_vr=0._r8
+  allocate(trcg_air2root_flx__pvr(idg_beg:idg_end-1,2,JZ,JP,JY,JX));trcg_air2root_flx__pvr=0._r8
   allocate(trcg_Root_DisEvap_flx_vr(idg_beg:idg_end-1,2,JZ,JP,JY,JX));trcg_Root_DisEvap_flx_vr=0._r8
   allocate(RUPGasSol_vr(idg_beg:idg_end,jroots,JZ,JP,JY,JX));RUPGasSol_vr=0._r8
   allocate(RCO2P(jroots,JZ,JP,JY,JX));RCO2P=0._r8
   allocate(RUPOXP(jroots,JZ,JP,JY,JX));RUPOXP=0._r8
   allocate(RootRespPotential_vr(jroots,JZ,JP,JY,JX));RootRespPotential_vr=0._r8
-  allocate(RCO2A(jroots,JZ,JP,JY,JX));RCO2A=0._r8
+  allocate(RCO2A_pvr(jroots,JZ,JP,JY,JX));RCO2A_pvr=0._r8
   allocate(RootExudChemElm_pft(1:NumPlantChemElms,JP,JY,JX));    RootExudChemElm_pft=0._r8
   allocate(RootNH4Uptake_pft(JP,JY,JX));    RootNH4Uptake_pft=0._r8
   allocate(RootNO3Uptake_pft(JP,JY,JX));    RootNO3Uptake_pft=0._r8
@@ -198,7 +198,7 @@ module PlantDataRateType
   allocate(RUCH1P(jroots,JZ,JP,JY,JX));RUCH1P=0._r8
   allocate(RUOH1B(jroots,JZ,JP,JY,JX));RUOH1B=0._r8
   allocate(RUCH1B(jroots,JZ,JP,JY,JX));RUCH1B=0._r8
-  allocate(RCO2N(jroots,JZ,JP,JY,JX));RCO2N=0._r8
+  allocate(RCO2N_pvr(jroots,JZ,JP,JY,JX));RCO2N_pvr=0._r8
   allocate(RUNNHP(jroots,JZ,JP,JY,JX));RUNNHP=0._r8
   allocate(RUNNOP(jroots,JZ,JP,JY,JX));RUNNOP=0._r8
   allocate(RUNNBP(jroots,JZ,JP,JY,JX));RUNNBP=0._r8
@@ -277,7 +277,7 @@ module PlantDataRateType
   call destroy(EcoHavstElmntCum_pft)
   call destroy(CO2ByFire_pft)
   call destroy(CH4ByFire_pft)
-  call destroy(VOXYF)
+  call destroy(O2ByFire_pft)
   call destroy(NH3byFire_pft)
   call destroy(N2ObyFire_pft)
   call destroy(PO4byFire_pft)
@@ -285,7 +285,7 @@ module PlantDataRateType
   call destroy(RCO2P)
   call destroy(RUPOXP)
   call destroy(RootRespPotential_vr)
-  call destroy(RCO2A)
+  call destroy(RCO2A_pvr)
   call destroy(RootExudChemElm_pft)
   call destroy(RootNH4Uptake_pft)
   call destroy(RootNO3Uptake_pft)
@@ -308,7 +308,7 @@ module PlantDataRateType
   call destroy(RUCH1P)
   call destroy(RUOH1B)
   call destroy(RUCH1B)
-  call destroy(RCO2N)
+  call destroy(RCO2N_pvr)
   call destroy(RUNNHP)
   call destroy(RUNNOP)
   call destroy(RUNNBP)
