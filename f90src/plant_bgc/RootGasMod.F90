@@ -81,10 +81,10 @@ module RootGasMod
     ROXYP                      =>  plt_rbgc%ROXYP    , &
     ROXSK                      =>  plt_rbgc%ROXSK    , &
     RCO2P                      =>  plt_rbgc%RCO2P    , &
-    trcg_air2root_flx_pft_vr   =>  plt_rbgc%trcg_air2root_flx_pft_vr   , &
+    trcg_air2root_flx__pvr   =>  plt_rbgc%trcg_air2root_flx__pvr   , &
     trcg_Root_DisEvap_flx_vr   =>  plt_rbgc%trcg_Root_DisEvap_flx_vr   , &
     RUPGasSol_vr               =>  plt_rbgc%RUPGasSol_vr   , &
-    RCO2A                      =>  plt_rbgc%RCO2A    , &
+    RCO2A_pvr                      =>  plt_rbgc%RCO2A_pvr    , &
     trcg_rootml_vr             =>  plt_rbgc%trcg_rootml_vr     , &
     trcs_rootml_vr             =>  plt_rbgc%trcs_rootml_vr     , &
     TFND                       =>  plt_soilchem%TFND , &
@@ -113,7 +113,7 @@ module RootGasMod
     RootPorosity               =>  plt_morph%RootPorosity   , &
     PrimRootXNumL_pvr          =>  plt_morph%PrimRootXNumL_pvr    , &
     NGTopRootLayer_pft         =>  plt_morph%NGTopRootLayer_pft      , &
-    NumOfMainBranch_pft        =>  plt_morph%NumOfMainBranch_pft       &
+    MainBranchNum_pft        =>  plt_morph%MainBranchNum_pft       &
   )
   
   IF(RootRespPotential_vr(N,L,NZ).GT.ZEROP(NZ).AND.RootVH2O_vr(N,L,NZ).GT.ZEROP(NZ) &
@@ -208,10 +208,10 @@ module RootGasMod
 !     DF*A=root-atmosphere gas conductance
 !     DFGP=rate const for equilibrn of gas concn in gaseous-aqueous phases
 !     RCO2PX=root CO2 gas flux at time step for gas flux calculations
-!     RCO2A=root CO2 flux from grosub.f
+!     RCO2A_pvr=root CO2 flux from grosub.f
 !
 
-    IF(N.EQ.ipltroot.AND.iPlantCalendar_brch(ipltcal_Emerge,NumOfMainBranch_pft(NZ),NZ).GT.0 &
+    IF(N.EQ.ipltroot.AND.iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).GT.0 &
       .AND.RootLenPerPlant_pvr(N,L,NZ).GT.ZEROP(NZ))THEN
       RTARRX=RootAreaDivRadius_vr(N,L)/RootRaidus_rpft(N,NZ)
       DIFOP=OLSGLP*RTARRX
@@ -227,7 +227,7 @@ module RootGasMod
     ENDIF
 
     DFGP=AMIN1(1.0,XNPD*SQRT(RootPorosity(N,NZ))*TFND(L))
-    RCO2PX=-RCO2A(N,L,NZ)*dts_gas
+    RCO2PX=-RCO2A_pvr(N,L,NZ)*dts_gas
 !
 !     SOLVE FOR GAS EXCHANGE IN SOIL AND ROOTS DURING ROOT UPTAKE
 !     AT SMALLER TIME STEP NPH
@@ -594,7 +594,7 @@ module RootGasMod
           DO NTG=idg_beg,idg_end-1
             trcg_Root_DisEvap_flx_vr(NTG,N,L,NZ)=trcg_Root_DisEvap_flx_vr(NTG,N,L,NZ) &
               +trcg_Root2Soil_flx(NTG)
-            trcg_air2root_flx_pft_vr(NTG,N,L,NZ)=trcg_air2root_flx_pft_vr(NTG,N,L,NZ) &
+            trcg_air2root_flx__pvr(NTG,N,L,NZ)=trcg_air2root_flx__pvr(NTG,N,L,NZ) &
               +trcg_air2root_flx1(NTG)
           ENDDO
 !

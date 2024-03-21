@@ -147,7 +147,7 @@ module ExtractsMod
     RUNNXP                   => plt_rbgc%RUNNXP , &
     RUPOXP                   => plt_rbgc%RUPOXP , &
     trcg_Root_DisEvap_flx_vr => plt_rbgc%trcg_Root_DisEvap_flx_vr , &
-    trcg_air2root_flx_pft_vr => plt_rbgc%trcg_air2root_flx_pft_vr , &
+    trcg_air2root_flx__pvr => plt_rbgc%trcg_air2root_flx__pvr , &
     RCO2P                    => plt_rbgc%RCO2P  , &
     RUPGasSol_vr             => plt_rbgc%RUPGasSol_vr , &
     RootNutUptake_pvr        => plt_rbgc%RootNutUptake_pvr , &
@@ -216,7 +216,7 @@ module ExtractsMod
 !
       DO NTG=idg_beg,idg_NH3
         trcg_rootml_vr(NTG,N,L,NZ)=trcg_rootml_vr(NTG,N,L,NZ) &
-          +trcg_air2root_flx_pft_vr(NTG,N,L,NZ)-trcg_Root_DisEvap_flx_vr(NTG,N,L,NZ)
+          +trcg_air2root_flx__pvr(NTG,N,L,NZ)-trcg_Root_DisEvap_flx_vr(NTG,N,L,NZ)
       ENDDO
 
       trcs_rootml_vr(idg_CO2,N,L,NZ)=trcs_rootml_vr(idg_CO2,N,L,NZ)+trcg_Root_DisEvap_flx_vr(idg_CO2,N,L,NZ)+RCO2P(N,L,NZ)
@@ -251,7 +251,7 @@ module ExtractsMod
 !                :NHB=NH4,NOB=NO3,H2B=H2PO4,H1B=H1PO4 in band
 !
       DO NTG=idg_beg,idg_end-1
-        trcg_air2root_flx_vr(NTG,L)=trcg_air2root_flx_vr(NTG,L)+trcg_air2root_flx_pft_vr(NTG,N,L,NZ)
+        trcg_air2root_flx_vr(NTG,L)=trcg_air2root_flx_vr(NTG,L)+trcg_air2root_flx__pvr(NTG,N,L,NZ)
       ENDDO
 
       TCO2P(L)=TCO2P(L)-RCO2P(N,L,NZ)

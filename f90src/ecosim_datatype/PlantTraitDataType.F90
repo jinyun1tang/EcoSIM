@@ -108,9 +108,9 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  Hours4Leafout_brch(:,:,:,:)                      !heat requirement for spring leafout/dehardening, [h]
   real(r8),target,allocatable ::  Hours4LeafOff_brch(:,:,:,:)                      !cold requirement for autumn leafoff/hardening, [h]
   integer,target,allocatable ::  KLeafNumber_brch(:,:,:,:)                      !leaf number, [-]
-  integer,target,allocatable ::  KLeafNumLowestGrowing_pft(:,:,:,:)                     !leaf growth stage counter, [-]
+  integer,target,allocatable ::  KLowestGroLeafNode_brch(:,:,:,:)                     !leaf growth stage counter, [-]
   integer,target,allocatable ::  KLEAFX(:,:,:,:)                     !NUMBER OF MINIMUM LEAFED NODE USED IN GROWTH ALLOCATION
-  integer,target,allocatable ::  KLeafNodeNumber(:,:,:,:)                      !leaf growth stage counter, [-]
+  integer,target,allocatable ::  KHiestGroLeafNode_brch(:,:,:,:)                      !leaf growth stage counter, [-]
   real(r8),target,allocatable ::  RefLeafAppearRate_pft(:,:,:)                        !rate of leaf initiation, [h-1 at 25 oC]
   real(r8),target,allocatable ::  WDLF(:,:,:)                        !leaf length:width ratio, [-]
   real(r8),target,allocatable ::  SLA1(:,:,:)                        !leaf area:mass during growth, [m2 g-1]
@@ -120,7 +120,7 @@ module PlantTraitDataType
   integer,target,allocatable ::  NumOfBranches_pft(:,:,:)                          !branch number, [-]
   integer,target,allocatable ::  BranchNumber_pft(:,:,:)                          !branch number, [-]
   integer,target,allocatable ::  BranchNumber_brch(:,:,:,:)                       !branch number, [-]
-  integer,target,allocatable ::  NumOfMainBranch_pft(:,:,:)                          !number of main branch, [-]
+  integer,target,allocatable ::  MainBranchNum_pft(:,:,:)                          !number of main branch, [-]
   integer,target,allocatable ::  Prep4Literfall_brch(:,:,:,:)                      !branch phenology flag, [-]
   integer,target,allocatable ::  Hours4LiterfalAftMature_brch(:,:,:,:)                      !branch phenology flag, [h]
   integer,target,allocatable ::  doSenescence_brch(:,:,:,:)                      !branch phenology flag, [-]
@@ -142,7 +142,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  RefNodeInitRate_pft(:,:,:)                        !rate of node initiation, [h-1 at 25 oC]
   real(r8),target,allocatable ::  NodeLenPergC(:,:,:)                        !internode length:mass during growth, [m g-1]
   real(r8),target,allocatable ::  FNOD(:,:,:)                        !parameter for allocation of growth to nodes, [-]
-  integer,target,allocatable ::  NumConCurrentGrowinNode(:,:,:)                         !number of concurrently growing nodes
+  integer,target,allocatable ::  NumCogrowNode(:,:,:)                         !number of concurrently growing nodes
   real(r8),target,allocatable ::  PSICanPDailyMin(:,:,:)                       !minimum daily canopy water potential, [MPa]
   real(r8),target,allocatable ::  ClumpFactorCurrent_pft(:,:,:)                         !clumping factor for self-shading in canopy layer at current LAI, [-]
   real(r8),target,allocatable ::  ClumpFactor(:,:,:)                          !clumping factor for self-shading in canopy layer, [-]
@@ -268,9 +268,9 @@ contains
   allocate(Hours4Leafout_brch(MaxNumBranches,JP,JY,JX));  Hours4Leafout_brch=0._r8
   allocate(Hours4LeafOff_brch(MaxNumBranches,JP,JY,JX));  Hours4LeafOff_brch=0._r8
   allocate(KLeafNumber_brch(MaxNumBranches,JP,JY,JX)); KLeafNumber_brch=0
-  allocate(KLeafNumLowestGrowing_pft(MaxNumBranches,JP,JY,JX));KLeafNumLowestGrowing_pft=0
+  allocate(KLowestGroLeafNode_brch(MaxNumBranches,JP,JY,JX));KLowestGroLeafNode_brch=0
   allocate(KLEAFX(MaxNumBranches,JP,JY,JX));KLEAFX=0
-  allocate(KLeafNodeNumber(MaxNumBranches,JP,JY,JX)); KLeafNodeNumber=0
+  allocate(KHiestGroLeafNode_brch(MaxNumBranches,JP,JY,JX)); KHiestGroLeafNode_brch=0
   allocate(RefLeafAppearRate_pft(JP,JY,JX));     RefLeafAppearRate_pft=0._r8
   allocate(WDLF(JP,JY,JX));     WDLF=0._r8
   allocate(SLA1(JP,JY,JX));     SLA1=0._r8
@@ -280,7 +280,7 @@ contains
   allocate(NumOfBranches_pft(JP,JY,JX));      NumOfBranches_pft=0
   allocate(BranchNumber_pft(JP,JY,JX));      BranchNumber_pft=0
   allocate(BranchNumber_brch(MaxNumBranches,JP,JY,JX));  BranchNumber_brch=0
-  allocate(NumOfMainBranch_pft(JP,JY,JX));      NumOfMainBranch_pft=0
+  allocate(MainBranchNum_pft(JP,JY,JX));      MainBranchNum_pft=0
   allocate(Prep4Literfall_brch(MaxNumBranches,JP,JY,JX)); Prep4Literfall_brch=ifalse
   allocate(Hours4LiterfalAftMature_brch(MaxNumBranches,JP,JY,JX)); Hours4LiterfalAftMature_brch=0
   allocate(doSenescence_brch(MaxNumBranches,JP,JY,JX)); doSenescence_brch=0
@@ -302,7 +302,7 @@ contains
   allocate(RefNodeInitRate_pft(JP,JY,JX));     RefNodeInitRate_pft=0._r8
   allocate(NodeLenPergC(JP,JY,JX));     NodeLenPergC=0._r8
   allocate(FNOD(JP,JY,JX));     FNOD=0._r8
-  allocate(NumConCurrentGrowinNode(JP,JY,JX));     NumConCurrentGrowinNode=0
+  allocate(NumCogrowNode(JP,JY,JX));     NumCogrowNode=0
   allocate(PSICanPDailyMin(JP,JY,JX));    PSICanPDailyMin=0._r8
   allocate(ClumpFactorCurrent_pft(JP,JY,JX));      ClumpFactorCurrent_pft=0._r8
   allocate(ClumpFactor(JP,JY,JX));       ClumpFactor=0._r8
@@ -425,9 +425,9 @@ contains
   call destroy(Hours4Leafout_brch)
   call destroy(Hours4LeafOff_brch)
   call destroy(KLeafNumber_brch)
-  call destroy(KLeafNumLowestGrowing_pft)
+  call destroy(KLowestGroLeafNode_brch)
   call destroy(KLEAFX)
-  call destroy(KLeafNodeNumber)
+  call destroy(KHiestGroLeafNode_brch)
   call destroy(RefLeafAppearRate_pft)
   call destroy(WDLF)
   call destroy(SLA1)
@@ -437,7 +437,7 @@ contains
   call destroy(NumOfBranches_pft)
   call destroy(BranchNumber_pft)
   call destroy(BranchNumber_brch)
-  call destroy(NumOfMainBranch_pft)
+  call destroy(MainBranchNum_pft)
   call destroy(Prep4Literfall_brch)
   call destroy(Hours4LiterfalAftMature_brch)
   call destroy(doSenescence_brch)
@@ -459,7 +459,7 @@ contains
   call destroy(RefNodeInitRate_pft)
   call destroy(NodeLenPergC)
   call destroy(FNOD)
-  call destroy(NumConCurrentGrowinNode)
+  call destroy(NumCogrowNode)
   call destroy(PSICanPDailyMin)
   call destroy(ClumpFactorCurrent_pft)
   call destroy(ClumpFactor)

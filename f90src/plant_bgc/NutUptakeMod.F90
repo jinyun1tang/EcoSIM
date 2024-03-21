@@ -62,7 +62,7 @@ module NutUptakeMod
     ZEROP   =>  plt_biom%ZEROP    , &
     AtmGasc=>  plt_site%AtmGasc  , &    
     LeafPetolBiomassC_brch   =>  plt_biom%LeafPetolBiomassC_brch    , &
-    NonstructElmnt_brch  =>  plt_biom%NonstructElmnt_brch   , &
+    NonstructElm_brch  =>  plt_biom%NonstructElm_brch   , &
     LeafPetoNonstElmConc_brch  =>  plt_biom%LeafPetoNonstElmConc_brch   , &
     CanPStomaResistH2O_pft      =>  plt_photo%CanPStomaResistH2O_pft      , &
     CanopyBndlResist_pft     =>  plt_photo%CanopyBndlResist_pft     , &
@@ -93,7 +93,7 @@ module NutUptakeMod
       IF(LeafPetolBiomassC_brch(NB,NZ).GT.ZEROP(NZ).AND.LeafAreaLive_brch(NB,NZ).GT.ZEROP(NZ) &
         .AND.CanopyLeafArea_pft(NZ).GT.ZEROP(NZ))THEN
         CNH3P=AZMAX1(FNH3P*LeafPetoNonstElmConc_brch(ielmn,NB,NZ)/SNH3P)
-        ZPOOLB=AZMAX1(NonstructElmnt_brch(ielmn,NB,NZ))
+        ZPOOLB=AZMAX1(NonstructElm_brch(ielmn,NB,NZ))
         NH3Dep2_brch(NB,NZ)=AMIN1(0.1_r8*ZPOOLB,AMAX1((AtmGasc(idg_NH3)-CNH3P)/(CanopyBndlResist_pft(NZ)+CanPStomaResistH2O_pft(NZ)) &
           *FracRadPARbyCanopy_pft(NZ)*AREA3(NU)*LeafAreaLive_brch(NB,NZ)/CanopyLeafArea_pft(NZ),-0.1_r8*ZPOOLB))
       ELSE
@@ -208,7 +208,7 @@ module NutUptakeMod
 
   L1=plt_site%NU;L2=plt_morph%MaxSoiL4Root(NZ);NN=plt_morph%MY(NZ)
 
-  plt_rbgc%trcg_air2root_flx_pft_vr(idg_beg:idg_end-1,1:NN,L1:L2,NZ)=0.0_r8
+  plt_rbgc%trcg_air2root_flx__pvr(idg_beg:idg_end-1,1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%trcg_Root_DisEvap_flx_vr(idg_beg:idg_end-1,1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%RUPGasSol_vr(idg_beg:idg_end,1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%RCO2P(1:NN,L1:L2,NZ)=0.0_r8
@@ -1105,7 +1105,7 @@ module NutUptakeMod
 
   associate(                          &
     ROXYY                           => plt_bgcr%ROXYY   , &
-    RCO2N                           => plt_rbgc%RCO2N   , &
+    RCO2N_pvr                           => plt_rbgc%RCO2N_pvr   , &
     ROXYP                           => plt_rbgc%ROXYP   , &
     PlantPopulation_pft             => plt_site%PlantPopulation_pft      , &
     ZEROS                           => plt_site%ZEROS   , &
@@ -1115,8 +1115,8 @@ module NutUptakeMod
     ZEROP                           => plt_biom%ZEROP   , &
     RootProteinConc_pvr             => plt_biom%RootProteinConc_pvr  , &
     RootProteinC_pvr                => plt_biom%RootProteinC_pvr   , &
-     RootMycoNonstructElmnt_vr      => plt_biom%RootMycoNonstructElmnt_vr  , &
-    RootNonstructElementConcpft_vr  => plt_biom%RootNonstructElementConcpft_vr  , &
+     RootMycoNonstructElm_vr      => plt_biom%RootMycoNonstructElm_vr  , &
+    RootNonstructElmConc_pvr  => plt_biom%RootNonstructElmConc_pvr  , &
     RootStructBiomC_vr              => plt_biom%RootStructBiomC_vr    &
   )
   !
@@ -1138,12 +1138,12 @@ module NutUptakeMod
   !
   !     RESPIRATION CONSTRAINT ON UPTAKE FROM NON-STRUCTURAL C
   !
-  !     RCO2N=total respiration from CPOOLR
+  !     RCO2N_pvr=total respiration from CPOOLR
   !     FCUP=limitation to active uptake respiration from CPOOLR
   !     CPOOLR=nonstructural C content
   !
-  IF(RCO2N(N,L,NZ).GT.ZEROP(NZ))THEN
-    FCUP=AZMAX1(AMIN1(1.0_r8,0.25_r8*safe_adb(RootMycoNonstructElmnt_vr(ielmc,N,L,NZ),RCO2N(N,L,NZ))))
+  IF(RCO2N_pvr(N,L,NZ).GT.ZEROP(NZ))THEN
+    FCUP=AZMAX1(AMIN1(1.0_r8,0.25_r8*safe_adb(RootMycoNonstructElm_vr(ielmc,N,L,NZ),RCO2N_pvr(N,L,NZ))))
   ELSE
     FCUP=0.0_r8
   ENDIF
@@ -1155,15 +1155,15 @@ module NutUptakeMod
   !     ZCKI,PCKI,ZPKI,PZKI=N,P inhibition effect on N,P uptake
   !     dtPerPlantRootH2OUptake=water uptake at time step for gas flux calculations
   !
-  IF(RootNonstructElementConcpft_vr(ielmc,N,L,NZ).GT.ZERO)THEN
-    FZUP=AMIN1(safe_adb(RootNonstructElementConcpft_vr(ielmc,N,L,NZ),RootNonstructElementConcpft_vr(ielmc,N,L,NZ) &
-      +RootNonstructElementConcpft_vr(ielmn,N,L,NZ)/ZCKI) &
-      ,safe_adb(RootNonstructElementConcpft_vr(ielmp,N,L,NZ),RootNonstructElementConcpft_vr(ielmp,N,L,NZ) &
-       +RootNonstructElementConcpft_vr(ielmn,N,L,NZ)/ZPKI))
-    FPUP=AMIN1(safe_adb(RootNonstructElementConcpft_vr(ielmc,N,L,NZ),RootNonstructElementConcpft_vr(ielmc,N,L,NZ) &
-      +RootNonstructElementConcpft_vr(ielmp,N,L,NZ)/PCKI) &
-      ,safe_adb(RootNonstructElementConcpft_vr(ielmn,N,L,NZ),RootNonstructElementConcpft_vr(ielmn,N,L,NZ) &
-      +RootNonstructElementConcpft_vr(ielmp,N,L,NZ)/PZKI))
+  IF(RootNonstructElmConc_pvr(ielmc,N,L,NZ).GT.ZERO)THEN
+    FZUP=AMIN1(safe_adb(RootNonstructElmConc_pvr(ielmc,N,L,NZ),RootNonstructElmConc_pvr(ielmc,N,L,NZ) &
+      +RootNonstructElmConc_pvr(ielmn,N,L,NZ)/ZCKI) &
+      ,safe_adb(RootNonstructElmConc_pvr(ielmp,N,L,NZ),RootNonstructElmConc_pvr(ielmp,N,L,NZ) &
+       +RootNonstructElmConc_pvr(ielmn,N,L,NZ)/ZPKI))
+    FPUP=AMIN1(safe_adb(RootNonstructElmConc_pvr(ielmc,N,L,NZ),RootNonstructElmConc_pvr(ielmc,N,L,NZ) &
+      +RootNonstructElmConc_pvr(ielmp,N,L,NZ)/PCKI) &
+      ,safe_adb(RootNonstructElmConc_pvr(ielmn,N,L,NZ),RootNonstructElmConc_pvr(ielmn,N,L,NZ) &
+      +RootNonstructElmConc_pvr(ielmp,N,L,NZ)/PZKI))
   ELSE
     FZUP=0.0_r8
     FPUP=0.0_r8
@@ -1229,7 +1229,7 @@ module NutUptakeMod
   integer :: K
   !     begin_execution
   associate(                       &
-    RootMycoNonstructElmnt_vr =>  plt_biom%RootMycoNonstructElmnt_vr    , &
+    RootMycoNonstructElm_vr =>  plt_biom%RootMycoNonstructElm_vr    , &
     ZEROP                     =>  plt_biom%ZEROP     , &
     ZEROS                     =>  plt_site%ZEROS     , &
     ZEROS2                    =>  plt_site%ZEROS2    , &
@@ -1261,16 +1261,16 @@ module NutUptakeMod
     VLWatMicPK=VLWatMicPM(NPH,L)*FOSRH(K,L)
     IF(VLWatMicPK.GT.ZEROS2.AND.RootVH2O_vr(N,L,NZ).GT.ZEROP(NZ))THEN
       VLWatMicPT=VLWatMicPK+RootVH2O_vr(N,L,NZ)
-      CPOOLX=AMIN1(1.25E+03_r8*RootVH2O_vr(N,L,NZ), RootMycoNonstructElmnt_vr(ielmc,N,L,NZ))
+      CPOOLX=AMIN1(1.25E+03_r8*RootVH2O_vr(N,L,NZ), RootMycoNonstructElm_vr(ielmc,N,L,NZ))
       XFRC=(DOM(idom_doc,K,L)*RootVH2O_vr(N,L,NZ)-CPOOLX*VLWatMicPK)/VLWatMicPT
       !XFRC, positive into plants
       RDFOME(ielmc,N,K,L,NZ)=FEXUC*XFRC
-      IF(DOM(idom_doc,K,L).GT.ZEROS.AND. RootMycoNonstructElmnt_vr(ielmc,N,L,NZ).GT.ZEROP(NZ))THEN
-        CPOOLT=DOM(idom_doc,K,L)+ RootMycoNonstructElmnt_vr(ielmc,N,L,NZ)
-        ZPOOLX=0.1_r8* RootMycoNonstructElmnt_vr(ielmn,N,L,NZ)
-        PPOOLX=0.1_r8* RootMycoNonstructElmnt_vr(ielmp,N,L,NZ)
-        XFRN=(DOM(idom_don,K,L)* RootMycoNonstructElmnt_vr(ielmc,N,L,NZ)-ZPOOLX*DOM(idom_doc,K,L))/CPOOLT
-        XFRP=(DOM(idom_dop,K,L)* RootMycoNonstructElmnt_vr(ielmc,N,L,NZ)-PPOOLX*DOM(idom_doc,K,L))/CPOOLT
+      IF(DOM(idom_doc,K,L).GT.ZEROS.AND. RootMycoNonstructElm_vr(ielmc,N,L,NZ).GT.ZEROP(NZ))THEN
+        CPOOLT=DOM(idom_doc,K,L)+ RootMycoNonstructElm_vr(ielmc,N,L,NZ)
+        ZPOOLX=0.1_r8* RootMycoNonstructElm_vr(ielmn,N,L,NZ)
+        PPOOLX=0.1_r8* RootMycoNonstructElm_vr(ielmp,N,L,NZ)
+        XFRN=(DOM(idom_don,K,L)* RootMycoNonstructElm_vr(ielmc,N,L,NZ)-ZPOOLX*DOM(idom_doc,K,L))/CPOOLT
+        XFRP=(DOM(idom_dop,K,L)* RootMycoNonstructElm_vr(ielmc,N,L,NZ)-PPOOLX*DOM(idom_doc,K,L))/CPOOLT
         RDFOME(ielmn,N,K,L,NZ)=FEXUN*XFRN
         RDFOME(ielmp,N,K,L,NZ)=FEXUP*XFRP
       ELSE

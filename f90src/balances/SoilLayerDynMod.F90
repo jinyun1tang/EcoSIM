@@ -864,7 +864,7 @@ implicit none
             SecndRootXNum_rpvr(N,L1,NR,NZ,NY,NX)=SecndRootXNum_rpvr(N,L1,NR,NZ,NY,NX)+FX*SecndRootXNum_rpvr(N,L0,NR,NZ,NY,NX)
           ENDDO
           DO NE=1,NumPlantChemElms
-             RootMycoNonstructElmnt_vr(NE,N,L1,NZ,NY,NX)= RootMycoNonstructElmnt_vr(NE,N,L1,NZ,NY,NX)+FX* RootMycoNonstructElmnt_vr(NE,N,L0,NZ,NY,NX)
+             RootMycoNonstructElm_vr(NE,N,L1,NZ,NY,NX)= RootMycoNonstructElm_vr(NE,N,L1,NZ,NY,NX)+FX* RootMycoNonstructElm_vr(NE,N,L0,NZ,NY,NX)
           ENDDO
           RootStructBiomC_vr(N,L1,NZ,NY,NX)=RootStructBiomC_vr(N,L1,NZ,NY,NX)+FX*RootStructBiomC_vr(N,L0,NZ,NY,NX)
           PopuPlantRootC_vr(N,L1,NZ,NY,NX)= PopuPlantRootC_vr(N,L1,NZ,NY,NX)+FX* PopuPlantRootC_vr(N,L0,NZ,NY,NX)
@@ -1045,7 +1045,7 @@ implicit none
             SecndRootXNum_rpvr(N,L0,NR,NZ,NY,NX)=FY*SecndRootXNum_rpvr(N,L0,NR,NZ,NY,NX)
           ENDDO
           DO NE=1,NumPlantChemElms
-             RootMycoNonstructElmnt_vr(NE,N,L0,NZ,NY,NX)=FY* RootMycoNonstructElmnt_vr(NE,N,L0,NZ,NY,NX)
+             RootMycoNonstructElm_vr(NE,N,L0,NZ,NY,NX)=FY* RootMycoNonstructElm_vr(NE,N,L0,NZ,NY,NX)
           ENDDO
           RootStructBiomC_vr(N,L0,NZ,NY,NX)=FY*RootStructBiomC_vr(N,L0,NZ,NY,NX)
            PopuPlantRootC_vr(N,L0,NZ,NY,NX)=FY* PopuPlantRootC_vr(N,L0,NZ,NY,NX)
@@ -1258,9 +1258,9 @@ implicit none
             SecndRootXNum_rpvr(N,L0,NR,NZ,NY,NX)=SecndRootXNum_rpvr(N,L0,NR,NZ,NY,NX)-FXRTN2
           ENDDO
           DO NE=1,NumPlantChemElms
-             FXEPOOLR=FRO*RootMycoNonstructElmnt_vr(NE,N,L0,NZ,NY,NX)
-             RootMycoNonstructElmnt_vr(NE,N,L1,NZ,NY,NX)= RootMycoNonstructElmnt_vr(NE,N,L1,NZ,NY,NX)+FXEPOOLR
-             RootMycoNonstructElmnt_vr(NE,N,L0,NZ,NY,NX)= RootMycoNonstructElmnt_vr(NE,N,L0,NZ,NY,NX)-FXEPOOLR
+             FXEPOOLR=FRO*RootMycoNonstructElm_vr(NE,N,L0,NZ,NY,NX)
+             RootMycoNonstructElm_vr(NE,N,L1,NZ,NY,NX)= RootMycoNonstructElm_vr(NE,N,L1,NZ,NY,NX)+FXEPOOLR
+             RootMycoNonstructElm_vr(NE,N,L0,NZ,NY,NX)= RootMycoNonstructElm_vr(NE,N,L0,NZ,NY,NX)-FXEPOOLR
           ENDDO
 
           FXWTRTL=FRO*RootStructBiomC_vr(N,L0,NZ,NY,NX)

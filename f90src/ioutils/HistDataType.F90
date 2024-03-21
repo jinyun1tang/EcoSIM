@@ -144,7 +144,7 @@ implicit none
   real(r8),pointer   :: h1D_Plant_C_ptc(:)        !whole plant C  
   real(r8),pointer   :: h1D_Plant_N_ptc(:)        !whole plant N  
   real(r8),pointer   :: h1D_Plant_P_ptc(:)        !whole plant P  
-  real(r8),pointer   :: h1D_LEAF_PC_ptc(:)       !(LeafChemElms_pft(ielmp,NZ,NY,NX)+CanopyNonstructElements_pft(ielmp,NZ,NY,NX))/(LeafChemElms_pft(ielmc,NZ,NY,NX)+CanopyNonstructElements_pft(ielmc,NZ,NY,NX)),mass based CP ratio of leaf
+  real(r8),pointer   :: h1D_LEAF_PC_ptc(:)       !(LeafChemElms_pft(ielmp,NZ,NY,NX)+CanopyNonstructElms_pft(ielmp,NZ,NY,NX))/(LeafChemElms_pft(ielmc,NZ,NY,NX)+CanopyNonstructElms_pft(ielmc,NZ,NY,NX)),mass based CP ratio of leaf
   real(r8),pointer   :: h2D_tSOC_vr_col(:,:)        !ORGC(1:JZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total soil C
   real(r8),pointer   :: h1D_CAN_RN_ptc(:)        !277.8*RadNet2CanP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), W m-2
   real(r8),pointer   :: h1D_CAN_LE_ptc(:)        !277.8*EvapTransHeat_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -155,9 +155,9 @@ implicit none
   real(r8),pointer   :: h1D_CAN_CO2_FLX_ptc(:)   !CO2NetFix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.148, umol m-2 s-1
   real(r8),pointer   :: h1D_CAN_GPP_ptc(:)       !GrossCO2Fix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total gross CO2 fixation, gC m-2
   real(r8),pointer   :: h1D_CAN_RA_ptc(:)        !CanopyPlusNoduRespC_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total autotrophic respiration
-  real(r8),pointer   :: h1D_cTNC_ptc(:)          !CanopyNonstructElementConc_pft(ielmc,NZ,NY,NX), canopy nonstructural C concentration, 
-  real(r8),pointer   :: h1D_cTNN_ptc(:)          !CanopyNonstructElementConc_pft(ielmn,NZ,NY,NX)
-  real(r8),pointer   :: h1D_cTNP_ptc(:)          !CanopyNonstructElementConc_pft(ielmp,NZ,NY,NX)
+  real(r8),pointer   :: h1D_cTNC_ptc(:)          !CanopyNonstructElmConc_pft(ielmc,NZ,NY,NX), canopy nonstructural C concentration, 
+  real(r8),pointer   :: h1D_cTNN_ptc(:)          !CanopyNonstructElmConc_pft(ielmn,NZ,NY,NX)
+  real(r8),pointer   :: h1D_cTNP_ptc(:)          !CanopyNonstructElmConc_pft(ielmp,NZ,NY,NX)
   real(r8),pointer   :: h1D_STOML_RSC_CO2_ptc(:) !CanPStomaResistH2O_pft(NZ,NY,NX)*1.56*3600.0_r8, s m-1, for CO2
   real(r8),pointer   :: h1D_BLYR_RSC_CO2_ptc(:)  !CanopyBndlResist_pft(NZ,NY,NX)*1.34*3600.0_r8, s m-1, for CO2
   real(r8),pointer   :: h1D_CAN_CO2_ptc(:)       !CanopyGasCO2_pft(NZ,NY,NX), umol mol-1
@@ -181,7 +181,7 @@ implicit none
   real(r8),pointer   :: h1D_GRAIN_C_ptc(:)       !GrainChemElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_ROOT_C_ptc(:)        !RootElmnts_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_NODULE_C_ptc(:)      !NoduleChemElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), nodule
-  real(r8),pointer   :: h1D_STORED_C_ptc(:)      !NonstructalElmnts_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_STORED_C_ptc(:)      !NonstructalElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_GRAIN_NO_ptc(:)      !CanopySeedNumber_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_LAIb_ptc(:)          !CanopyLeafArea_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total branch leaf area
   real(r8),pointer   :: h1D_EXUD_C_FLX_ptc(:)        !PlantExudChemElmCum_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -210,7 +210,7 @@ implicit none
   real(r8),pointer   :: h1D_GRAIN_N_ptc(:)       !GrainChemElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_ROOT_N_ptc(:)        !RootElmnts_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_NODULE_N_ptc(:)         !NoduleChemElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_STORED_N_ptc(:)      !NonstructalElmnts_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_STORED_N_ptc(:)      !NonstructalElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_EXUD_N_FLX_ptc(:)        !PlantExudChemElmCum_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_LITRf_N_FLX_ptc(:)       !LitrfallChemElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total plant LitrFall N
   real(r8),pointer   :: h1D_TL_N_FIXED_FLX_ptc(:)    !PlantN2FixCum_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total plant N2 fixation
@@ -229,7 +229,7 @@ implicit none
   real(r8),pointer   :: h1D_GRAIN_P_ptc(:)       !GrainChemElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_ROOT_P_ptc(:)        !RootElmnts_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_NODULE_P_ptc(:)         !NoduleChemElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_STORED_P_ptc(:)      !NonstructalElmnts_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_STORED_P_ptc(:)      !NonstructalElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_EXUD_P_FLX_ptc(:)        !PlantExudChemElmCum_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_LITTERf_P_ptc(:)     !LitrfallChemElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_HVST_P_FLX_ptc(:)        !EcoHavstElmnt_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -238,11 +238,11 @@ implicit none
   real(r8),pointer   :: h1D_FIREp_P_FLX_ptc(:)        !PO4byFire_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_SURF_LITRf_P_FLX_ptc(:)  !SurfLitrfallChemElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_BRANCH_NO_ptc(:)     !NumOfBranches_pft(NZ,NY,NX)
-  real(r8),pointer   :: h1D_LEAF_NC_ptc(:)       !(LeafChemElms_pft(ielmn,NZ,NY,NX)+CanopyNonstructElements_pft(ielmn,NZ,NY,NX))/(LeafChemElms_pft(ielmc,NZ,NY,NX)+CanopyNonstructElements_pft(ielmc,NZ,NY,NX)),mass based CN ratio of leaf  
+  real(r8),pointer   :: h1D_LEAF_NC_ptc(:)       !(LeafChemElms_pft(ielmn,NZ,NY,NX)+CanopyNonstructElms_pft(ielmn,NZ,NY,NX))/(LeafChemElms_pft(ielmc,NZ,NY,NX)+CanopyNonstructElms_pft(ielmc,NZ,NY,NX)),mass based CN ratio of leaf  
   real(r8),pointer   :: h1D_Growth_Stage_ptc(:)    !plant development stage, integer, 0-10, planting, emergence, floral_init, jointing, 
                                       !elongation, heading, anthesis, seed_fill, see_no_set, seed_mass_set, end_seed_fill
-  real(r8),pointer   :: h2D_LEAF_NODE_NO_ptc(:,:)       !NumOfLeaves_brch(NumOfMainBranch_pft(NZ,NY,NX),NZ,NY,NX), leaf NO
-  real(r8),pointer   :: h2D_RUB_ACTVN_ptc(:,:)     !RubiscoActivity_brch(NumOfMainBranch_pft(NZ,NY,NX),NZ,NY,NX), branch down-regulation of CO2 fixation
+  real(r8),pointer   :: h2D_LEAF_NODE_NO_ptc(:,:)       !NumOfLeaves_brch(MainBranchNum_pft(NZ,NY,NX),NZ,NY,NX), leaf NO
+  real(r8),pointer   :: h2D_RUB_ACTVN_ptc(:,:)     !RubiscoActivity_brch(MainBranchNum_pft(NZ,NY,NX),NZ,NY,NX), branch down-regulation of CO2 fixation
   real(r8),pointer   :: h3D_PARTS_ptc(:,:,:)       !
   real(r8),pointer   :: h2D_CO2_vr_col(:,:)        !trc_solcl_vr(idg_CO2,1:JZ,NY,NX)
   real(r8),pointer   :: h2D_CH4_vr_col(:,:)        !trc_solcl_vr(idg_CH4,1:JZ,NY,NX)
@@ -1369,11 +1369,11 @@ implicit none
   call hist_addfld2d(fname='tSOC_vr',units='gC/m3',type2d='levsoi',avgflag='A',&
     long_name='*Vertically resolved total soil organic C',ptr_col=data2d_ptr)      
 
-  data2d_ptr => this%h2D_LEAF_NODE_NO_ptc(beg_ptc:end_ptc,1:MaxNumBranches)        !NumOfLeaves_brch(NumOfMainBranch_pft(NZ,NY,NX),NZ,NY,NX), leaf NO
+  data2d_ptr => this%h2D_LEAF_NODE_NO_ptc(beg_ptc:end_ptc,1:MaxNumBranches)        !NumOfLeaves_brch(MainBranchNum_pft(NZ,NY,NX),NZ,NY,NX), leaf NO
   call hist_addfld2d(fname='LEAF_NODE_NO',units='none',type2d='nbranches',avgflag='I',&
     long_name='Leaf number',ptr_patch=data2d_ptr)      
 
-  data2d_ptr => this%h2D_RUB_ACTVN_ptc(beg_ptc:end_ptc,1:MaxNumBranches)      !RubiscoActivity_brch(NumOfMainBranch_pft(NZ,NY,NX),NZ,NY,NX), branch down-regulation of CO2 fixation
+  data2d_ptr => this%h2D_RUB_ACTVN_ptc(beg_ptc:end_ptc,1:MaxNumBranches)      !RubiscoActivity_brch(MainBranchNum_pft(NZ,NY,NX),NZ,NY,NX), branch down-regulation of CO2 fixation
   call hist_addfld2d(fname='RUB_ACTVN',units='none',type2d='nbranches',avgflag='A',&
     long_name='branch rubisco activity for CO2 fixation, 0-1',ptr_patch=data2d_ptr)      
 
@@ -1636,8 +1636,8 @@ implicit none
       DO NZ=1,NP0(NY,NX)
         nptc=get_pft(NZ,NY,NX)
         this%h1D_MIN_LWP_ptc(nptc)      = PSICanPDailyMin(NZ,NY,NX)
-        this%h1D_LEAF_PC_ptc(nptc)      = safe_adb(LeafChemElms_pft(ielmp,NZ,NY,NX)+CanopyNonstructElements_pft(ielmp,NZ,NY,NX), &
-                                                 LeafChemElms_pft(ielmc,NZ,NY,NX)+CanopyNonstructElements_pft(ielmc,NZ,NY,NX))
+        this%h1D_LEAF_PC_ptc(nptc)      = safe_adb(LeafChemElms_pft(ielmp,NZ,NY,NX)+CanopyNonstructElms_pft(ielmp,NZ,NY,NX), &
+                                                 LeafChemElms_pft(ielmc,NZ,NY,NX)+CanopyNonstructElms_pft(ielmc,NZ,NY,NX))
         this%h1D_CAN_RN_ptc(nptc)       = MJ2W*RadNet2CanP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_CAN_LE_ptc(nptc)       = MJ2W*EvapTransHeat_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_CAN_H_ptc(nptc)        = MJ2W*HeatXAir2PCan(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -1647,9 +1647,9 @@ implicit none
         this%h1D_CAN_CO2_FLX_ptc(nptc)  = CO2NetFix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.148_r8
         this%h1D_CAN_GPP_ptc(nptc)      = GrossCO2Fix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_CAN_RA_ptc(nptc)       = CanopyPlusNoduRespC_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_cTNC_ptc(nptc)         = CanopyNonstructElementConc_pft(ielmc,NZ,NY,NX)
-        this%h1D_cTNN_ptc(nptc)         = CanopyNonstructElementConc_pft(ielmn,NZ,NY,NX)
-        this%h1D_cTNP_ptc(nptc)         = CanopyNonstructElementConc_pft(ielmp,NZ,NY,NX)
+        this%h1D_cTNC_ptc(nptc)         = CanopyNonstructElmConc_pft(ielmc,NZ,NY,NX)
+        this%h1D_cTNN_ptc(nptc)         = CanopyNonstructElmConc_pft(ielmn,NZ,NY,NX)
+        this%h1D_cTNP_ptc(nptc)         = CanopyNonstructElmConc_pft(ielmp,NZ,NY,NX)
         this%h1D_STOML_RSC_CO2_ptc(nptc)= CanPStomaResistH2O_pft(NZ,NY,NX)*1.56_r8*3600.0_r8
         this%h1D_BLYR_RSC_CO2_ptc(nptc) = CanopyBndlResist_pft(NZ,NY,NX)*1.34_r8*3600.0_r8
         this%h1D_CAN_CO2_ptc(nptc)      = CanopyGasCO2_pft(NZ,NY,NX)
@@ -1679,7 +1679,7 @@ implicit none
         this%h1D_GRAIN_C_ptc(nptc)      = GrainChemElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_ROOT_C_ptc(nptc)       = RootElmnts_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_NODULE_C_ptc(nptc)        = NoduleChemElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_STORED_C_ptc(nptc)     = NonstructalElmnts_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_STORED_C_ptc(nptc)     = NonstructalElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_GRAIN_NO_ptc(nptc)     = CanopySeedNumber_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_LAIb_ptc(nptc)         = CanopyLeafArea_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_EXUD_C_FLX_ptc(nptc)       = PlantExudChemElmCum_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -1712,7 +1712,7 @@ implicit none
         this%h1D_GRAIN_N_ptc(nptc)      = GrainChemElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_ROOT_N_ptc(nptc)       = RootElmnts_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_NODULE_N_ptc(nptc)     = NoduleChemElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_STORED_N_ptc(nptc)     = NonstructalElmnts_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_STORED_N_ptc(nptc)     = NonstructalElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_EXUD_N_FLX_ptc(nptc)       = PlantExudChemElmCum_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_LITRf_N_FLX_ptc(nptc)      = LitrfallChemElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_TL_N_FIXED_FLX_ptc(nptc)   = PlantN2FixCum_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -1730,27 +1730,27 @@ implicit none
         this%h1D_GRAIN_P_ptc(nptc)      = GrainChemElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_ROOT_P_ptc(nptc)       = RootElmnts_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_NODULE_P_ptc(nptc)     = NoduleChemElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_STORED_P_ptc(nptc)     = NonstructalElmnts_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_STORED_P_ptc(nptc)     = NonstructalElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_EXUD_P_FLX_ptc(nptc)       = PlantExudChemElmCum_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_LITRf_P_FLX_ptc(nptc)      = LitrfallChemElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_STANDING_DEAD_P_ptc(nptc)   = StandingDeadChemElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_FIREp_P_FLX_ptc(nptc)       = PO4byFire_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_SURF_LITRf_P_FLX_ptc(nptc) = SurfLitrfallChemElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_BRANCH_NO_ptc(nptc)    = NumOfBranches_pft(NZ,NY,NX)
-        this%h1D_LEAF_NC_ptc(nptc)      = safe_adb(LeafChemElms_pft(ielmn,NZ,NY,NX)+CanopyNonstructElements_pft(ielmn,NZ,NY,NX),&
-                                                 LeafChemElms_pft(ielmc,NZ,NY,NX)+CanopyNonstructElements_pft(ielmc,NZ,NY,NX))
-        if(NumOfMainBranch_pft(NZ,NY,NX)> 0)then
+        this%h1D_LEAF_NC_ptc(nptc)      = safe_adb(LeafChemElms_pft(ielmn,NZ,NY,NX)+CanopyNonstructElms_pft(ielmn,NZ,NY,NX),&
+                                                 LeafChemElms_pft(ielmc,NZ,NY,NX)+CanopyNonstructElms_pft(ielmc,NZ,NY,NX))
+        if(MainBranchNum_pft(NZ,NY,NX)> 0)then
           DO KN=10,0,-1
             IF(KN==0)THEN
               this%h1D_Growth_Stage_ptc(nptc)   =KN
             ELSE
-              if(iPlantCalendar_brch(KN,NumOfMainBranch_pft(NZ,NY,NX),NZ,NY,NX)>0)then
+              if(iPlantCalendar_brch(KN,MainBranchNum_pft(NZ,NY,NX),NZ,NY,NX)>0)then
                 this%h1D_Growth_Stage_ptc(nptc) =KN
                 exit    
               endif  
             ENDIF  
           ENDDO
-          DO NB=1,NumOfMainBranch_pft(NZ,NY,NX)
+          DO NB=1,MainBranchNum_pft(NZ,NY,NX)
             this%h2D_LEAF_NODE_NO_ptc(nptc,NB) = NumOfLeaves_brch(NB,NZ,NY,NX)
             this%h2D_RUB_ACTVN_ptc(nptc,NB)  = RubiscoActivity_brch(NB,NZ,NY,NX)
             this%h3D_PARTS_ptc(nptc,1:NumOfPlantMorphUnits,NB)=PARTS_brch(1:NumOfPlantMorphUnits,NB,NZ,NY,NX)
