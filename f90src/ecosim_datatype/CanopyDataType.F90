@@ -115,9 +115,9 @@ module CanopyDataType
   real(r8),target,allocatable ::  EarChemElms_pft(:,:,:,:)                    !canopy ear element, [g d-2]
   real(r8),target,allocatable ::  GrainChemElms_pft(:,:,:,:)                     !canopy grain element, [g d-2]
   real(r8),target,allocatable ::  CanopyLeafShethC_pft(:,:,:)              !plant canopy leaf + sheath C, [gC d-2]
-  real(r8),target,allocatable ::  CanopyLeafApft_lyr(:,:,:,:)                     !canopy layer leaf area, [m2 d-2]
+  real(r8),target,allocatable ::  CanopyLeafALyr_pft(:,:,:,:)                     !canopy layer leaf area, [m2 d-2]
   real(r8),target,allocatable ::  CO2NetFix_pft(:,:,:)                        !canopy net CO2 exchange, [g d-2 h-1]
-  real(r8),target,allocatable ::  CanopyLeafCpft_lyr(:,:,:,:)                     !canopy layer leaf C, [g d-2]
+  real(r8),target,allocatable ::  CanopyLeafCLyr_pft(:,:,:,:)                     !canopy layer leaf C, [g d-2]
   real(r8),target,allocatable ::  CanopyNonstructElms_pft(:,:,:,:)   !canopy nonstructural element, [g d-2]
   real(r8),target,allocatable ::  CanopyNonstructElmConc_pft(:,:,:,:)                    !canopy nonstructural element concentration, [g d-2]
   real(r8),target,allocatable ::  CanopyStemApft_lyr(:,:,:,:)                   !plant canopy layer stem area, [m2 d-2]
@@ -142,7 +142,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  LeafElmntNode_brch(:,:,:,:,:,:)                    !leaf element, [g d-2]
   real(r8),target,allocatable ::  PetioleElmntNode_brch(:,:,:,:,:,:)                 !sheath element , [g d-2]
   real(r8),target,allocatable ::  InternodeChemElm_brch(:,:,:,:,:,:)                  !internode element, [g d-2]
-  real(r8),target,allocatable ::  LeafChemElmByLayer_pft(:,:,:,:,:,:,:)                 !layer leaf element, [g d-2]
+  real(r8),target,allocatable ::  LeafChemElmByLayerNode_brch(:,:,:,:,:,:,:)                 !layer leaf element, [g d-2]
   real(r8),target,allocatable ::  CanopyLeafAreaByLayer_pft(:,:,:,:,:,:)                 !layer leaf area, [m2 d-2]
   real(r8),target,allocatable ::  LeafProteinCNode_brch(:,:,:,:,:)                    !layer leaf protein C, [g d-2]
   real(r8),target,allocatable ::  PetioleProteinCNode_brch(:,:,:,:,:)                   !layer sheath protein C, [g d-2]
@@ -264,9 +264,9 @@ module CanopyDataType
   allocate(EarChemElms_pft(NumPlantChemElms,JP,JY,JX));    EarChemElms_pft=0._r8
   allocate(GrainChemElms_pft(NumPlantChemElms,JP,JY,JX));     GrainChemElms_pft=0._r8
   allocate(CanopyLeafShethC_pft(JP,JY,JX));     CanopyLeafShethC_pft=0._r8
-  allocate(CanopyLeafApft_lyr(NumOfCanopyLayers,JP,JY,JX)); CanopyLeafApft_lyr=0._r8
+  allocate(CanopyLeafALyr_pft(NumOfCanopyLayers,JP,JY,JX)); CanopyLeafALyr_pft=0._r8
   allocate(CO2NetFix_pft(JP,JY,JX));     CO2NetFix_pft=0._r8
-  allocate(CanopyLeafCpft_lyr(NumOfCanopyLayers,JP,JY,JX)); CanopyLeafCpft_lyr=0._r8
+  allocate(CanopyLeafCLyr_pft(NumOfCanopyLayers,JP,JY,JX)); CanopyLeafCLyr_pft=0._r8
   allocate(CanopyNonstructElms_pft(NumPlantChemElms,JP,JY,JX));   CanopyNonstructElms_pft=0._r8
   allocate(CanopyNonstructElmConc_pft(NumPlantChemElms,JP,JY,JX));   CanopyNonstructElmConc_pft=0._r8
   allocate(CanopyStemApft_lyr(NumOfCanopyLayers,JP,JY,JX)); CanopyStemApft_lyr=0._r8
@@ -291,7 +291,7 @@ module CanopyDataType
   allocate(LeafElmntNode_brch(NumPlantChemElms,0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));LeafElmntNode_brch=0._r8
   allocate(PetioleElmntNode_brch(NumPlantChemElms,0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));PetioleElmntNode_brch=0._r8
   allocate(InternodeChemElm_brch(NumPlantChemElms,0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));InternodeChemElm_brch=0._r8
-  allocate(LeafChemElmByLayer_pft(NumPlantChemElms,NumOfCanopyLayers,0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));LeafChemElmByLayer_pft=0._r8
+  allocate(LeafChemElmByLayerNode_brch(NumPlantChemElms,NumOfCanopyLayers,0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));LeafChemElmByLayerNode_brch=0._r8
   allocate(CanopyLeafAreaByLayer_pft(NumOfCanopyLayers,0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));CanopyLeafAreaByLayer_pft=0._r8
   allocate(LeafProteinCNode_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));LeafProteinCNode_brch=0._r8
   allocate(PetioleProteinCNode_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));PetioleProteinCNode_brch=0._r8
@@ -414,9 +414,9 @@ module CanopyDataType
   call destroy(EarChemElms_pft)
   call destroy(GrainChemElms_pft)
   call destroy(CanopyLeafShethC_pft)
-  call destroy(CanopyLeafApft_lyr)
+  call destroy(CanopyLeafALyr_pft)
   call destroy(CO2NetFix_pft)
-  call destroy(CanopyLeafCpft_lyr)
+  call destroy(CanopyLeafCLyr_pft)
   call destroy(CanopyNonstructElms_pft)
   call destroy(CanopyNonstructElmConc_pft)
   call destroy(CanopyStemApft_lyr)
@@ -441,7 +441,7 @@ module CanopyDataType
   call destroy(LeafElmntNode_brch)
   call destroy(PetioleElmntNode_brch)
   call destroy(InternodeChemElm_brch)
-  call destroy(LeafChemElmByLayer_pft)
+  call destroy(LeafChemElmByLayerNode_brch)
   call destroy(CanopyLeafAreaByLayer_pft)
   call destroy(LeafProteinCNode_brch)
   call destroy(PetioleProteinCNode_brch)

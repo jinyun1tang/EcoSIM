@@ -175,7 +175,7 @@ module StartqsMod
     NumLitterGroups           => pltpar%NumLitterGroups , &
     RefLeafAppearRate_pft     =>  plt_pheno%RefLeafAppearRate_pft      , &
     iPlantTurnoverPattern_pft =>  plt_pheno%iPlantTurnoverPattern_pft    , &
-    iPlantMorphologyType_pft  =>  plt_pheno%iPlantMorphologyType_pft    , &
+    iPlantRootProfile_pft  =>  plt_pheno%iPlantRootProfile_pft    , &
     MatureGroup_pft           =>  plt_pheno%MatureGroup_pft   , &
     CFOPE                     =>  plt_soilchem%CFOPE  , &
     FNOD                      =>  plt_allom%FNOD      , &
@@ -198,7 +198,7 @@ module StartqsMod
 !
 !     NON-VASCULAR (E.G. MOSSES)
 !
-  IF(is_plant_bryophyte(iPlantMorphologyType_pft(NZ)))THEN
+  IF(is_plant_bryophyte(iPlantRootProfile_pft(NZ)))THEN
     CFOPE(ielmc,ifoliar,iprotein,NZ)=0.07_r8
     CFOPE(ielmc,ifoliar,icarbhyro,NZ)=0.25_r8
     CFOPE(ielmc,ifoliar,icellulos,NZ)=0.30_r8
@@ -225,7 +225,7 @@ module StartqsMod
 !     ANNUALS, GRASSES, SHRUBS
 !
   ELSEIF(iPlantTurnoverPattern_pft(NZ).EQ.0 &
-    .OR.(.not.is_plant_treelike(iPlantMorphologyType_pft(NZ))))THEN
+    .OR.(.not.is_plant_treelike(iPlantRootProfile_pft(NZ))))THEN
     CFOPE(ielmc,ifoliar,iprotein,NZ)=0.08_r8
     CFOPE(ielmc,ifoliar,icarbhyro,NZ)=0.41_r8
     CFOPE(ielmc,ifoliar,icellulos,NZ)=0.36_r8
@@ -269,7 +269,7 @@ module StartqsMod
 !
 !     NON-VASCULAR
 !
-  IF(is_plant_bryophyte(iPlantMorphologyType_pft(NZ)))THEN
+  IF(is_plant_bryophyte(iPlantRootProfile_pft(NZ)))THEN
     CFOPE(ielmc,istalk,iprotein,NZ)=0.07_r8
     CFOPE(ielmc,istalk,icarbhyro,NZ)=0.25_r8
     CFOPE(ielmc,istalk,icellulos,NZ)=0.30_r8
@@ -278,7 +278,7 @@ module StartqsMod
 !     ANNUALS, GRASSES, SHRUBS
 !
   ELSEIF(iPlantTurnoverPattern_pft(NZ).EQ.0 &
-    .OR.(.not.is_plant_treelike(iPlantMorphologyType_pft(NZ))))THEN
+    .OR.(.not.is_plant_treelike(iPlantRootProfile_pft(NZ))))THEN
     CFOPE(ielmc,istalk,iprotein,NZ)=0.03_r8
     CFOPE(ielmc,istalk,icarbhyro,NZ)=0.25_r8
     CFOPE(ielmc,istalk,icellulos,NZ)=0.57_r8
@@ -298,7 +298,7 @@ module StartqsMod
 !
 !     NON-VASCULAR
 !
-  IF(is_plant_bryophyte(iPlantMorphologyType_pft(NZ)))THEN
+  IF(is_plant_bryophyte(iPlantRootProfile_pft(NZ)))THEN
     CFOPE(ielmc,iroot,iprotein,NZ)=0.07_r8
     CFOPE(ielmc,iroot,icarbhyro,NZ)=0.25_r8
     CFOPE(ielmc,iroot,icellulos,NZ)=0.30_r8
@@ -307,7 +307,7 @@ module StartqsMod
 !     ANNUALS, GRASSES, SHRUBS
 !
   ELSEIF(iPlantTurnoverPattern_pft(NZ).EQ.0 &
-    .OR.(.not.is_plant_treelike(iPlantMorphologyType_pft(NZ))))THEN
+    .OR.(.not.is_plant_treelike(iPlantRootProfile_pft(NZ))))THEN
     CFOPE(ielmc,iroot,iprotein,NZ)=0.057_r8
     CFOPE(ielmc,iroot,icarbhyro,NZ)=0.263_r8
     CFOPE(ielmc,iroot,icellulos,NZ)=0.542_r8
@@ -372,7 +372,7 @@ module StartqsMod
 !     NumCogrowNode=number of concurrently growing nodes
 !
   IF(iPlantTurnoverPattern_pft(NZ).EQ.0 &
-    .OR.(.not.is_plant_treelike(iPlantMorphologyType_pft(NZ))))THEN
+    .OR.(.not.is_plant_treelike(iPlantRootProfile_pft(NZ))))THEN
     FNOD(NZ)=1.0_r8
     IF(MatureGroup_pft(NZ).LE.10)THEN
       NumCogrowNode(NZ)=3
@@ -566,7 +566,7 @@ module StartqsMod
     PlantPopulation_pft               =>  plt_site%PlantPopulation_pft      , &
     ALAT                              =>  plt_site%ALAT    , &
     AREA3                             =>  plt_site%AREA3   , &
-    iPlantMorphologyType_pft          =>  plt_pheno%iPlantMorphologyType_pft , &
+    iPlantRootProfile_pft          =>  plt_pheno%iPlantRootProfile_pft , &
     LeafNumberAtFloralInit_brch       =>  plt_pheno%LeafNumberAtFloralInit_brch , &
     MatureGroup_brch                  =>  plt_pheno%MatureGroup_brch , &
     KHiestGroLeafNode_brch                   =>  plt_pheno%KHiestGroLeafNode_brch , &
@@ -601,7 +601,7 @@ module StartqsMod
     BranchNumber_pft                  =>  plt_morph%BranchNumber_pft    , &
     ShootNodeNumber_brch              =>  plt_morph%ShootNodeNumber_brch  , &
     CanopyLeafArea_pft                =>  plt_morph%CanopyLeafArea_pft  , &
-    CanopyBranchStemApft_lyr          =>  plt_morph%CanopyBranchStemApft_lyr  , &
+    CanopyStemALyr_brch          =>  plt_morph%CanopyStemALyr_brch  , &
     StemAreaZsec_brch                 =>  plt_morph%StemAreaZsec_brch  , &
     CanopyStemA_pft                   =>  plt_morph%CanopyStemA_pft  , &
     NodeNumberAtAnthesis_brch         =>  plt_morph%NodeNumberAtAnthesis_brch  , &
@@ -611,14 +611,14 @@ module StartqsMod
     LeafAreaLive_brch                 =>  plt_morph%LeafAreaLive_brch  , &
     LeafAreaDying_brch                =>  plt_morph%LeafAreaDying_brch  , &
     CanopyLeafAreaByLayer_pft         =>  plt_morph%CanopyLeafAreaByLayer_pft  , &
-    CanopyLeafApft_lyr                =>  plt_morph%CanopyLeafApft_lyr  , &
+    CanopyLeafALyr_pft                =>  plt_morph%CanopyLeafALyr_pft  , &
     CanopyStemApft_lyr                =>  plt_morph%CanopyStemApft_lyr  , &
     LeafAreaZsec_brch                 =>  plt_morph%LeafAreaZsec_brch   , &
     LeafAreaNode_brch                 =>  plt_morph%LeafAreaNode_brch  , &
     CanPBranchHeight                  =>  plt_morph%CanPBranchHeight , &
     HypoctoHeight_pft                 =>  plt_morph%HypoctoHeight_pft  , &
     BranchNumber_brch                 =>  plt_morph%BranchNumber_brch   , &
-    NodeNumberToInitFloral_brch       =>  plt_morph%NodeNumberToInitFloral_brch  , &
+    NodeNum2InitFloral_brch       =>  plt_morph%NodeNum2InitFloral_brch  , &
     KLEAFX                            =>  plt_morph%KLEAFX , &
     NumOfBranches_pft                 =>  plt_morph%NumOfBranches_pft      &
   )
@@ -643,7 +643,7 @@ module StartqsMod
     plt_pheno%Hours4LiterfalAftMature_brch(NB,NZ)=0
     MatureGroup_brch(NB,NZ)=MatureGroup_pft(NZ)
     ShootNodeNumber_brch(NB,NZ)=XTLI(NZ)
-    NodeNumberToInitFloral_brch(NB,NZ)=ShootNodeNumber_brch(NB,NZ)
+    NodeNum2InitFloral_brch(NB,NZ)=ShootNodeNumber_brch(NB,NZ)
     NodeNumberAtAnthesis_brch(NB,NZ)=0._r8
     NumOfLeaves_brch(NB,NZ)=0._r8
     LeafNumberAtFloralInit_brch(NB,NZ)=0._r8
@@ -703,7 +703,7 @@ module StartqsMod
     LeafAreaDying_brch(NB,NZ)=0._r8
     CanPBranchHeight(NB,NZ)=0._r8
     D5: DO L=1,NumOfCanopyLayers1
-      CanopyBranchStemApft_lyr(L,NB,NZ)=0._r8
+      CanopyStemALyr_brch(L,NB,NZ)=0._r8
       DO N=1,NumOfLeafZenithSectors1
         StemAreaZsec_brch(N,L,NB,NZ)=0._r8
       enddo
@@ -722,7 +722,7 @@ module StartqsMod
 
       D55: DO L=1,NumOfCanopyLayers1
         CanopyLeafAreaByLayer_pft(L,K,NB,NZ)=0._r8
-        plt_biom%LeafChemElmByLayer_pft(1:NumPlantChemElms,L,K,NB,NZ)=0._r8
+        plt_biom%LeafChemElmByLayerNode_brch(1:NumPlantChemElms,L,K,NB,NZ)=0._r8
       ENDDO D55
       IF(K.NE.0)THEN
         CPOOL3(K,NB,NZ)=0._r8
@@ -738,8 +738,8 @@ module StartqsMod
     enddo
   ENDDO D25
   D35: DO L=1,NumOfCanopyLayers1
-    CanopyLeafApft_lyr(L,NZ)=0._r8
-    plt_biom%CanopyLeafCpft_lyr(L,NZ)=0._r8
+    CanopyLeafALyr_pft(L,NZ)=0._r8
+    plt_biom%CanopyLeafCLyr_pft(L,NZ)=0._r8
     CanopyStemApft_lyr(L,NZ)=0._r8
   ENDDO D35
   plt_biom%CanopyNonstructElms_pft(1:NumPlantChemElms,NZ)=0._r8

@@ -59,7 +59,7 @@ module HfuncsMod
     iPlantCalendar_brch              =>  plt_pheno%iPlantCalendar_brch , &
     HoursCanopyPSITooLow             =>  plt_pheno%HoursCanopyPSITooLow   , &
     KHiestGroLeafNode_brch                  =>  plt_pheno%KHiestGroLeafNode_brch , &
-    iPlantMorphologyType_pft         =>  plt_pheno%iPlantMorphologyType_pft , &
+    iPlantRootProfile_pft         =>  plt_pheno%iPlantRootProfile_pft , &
     DayLenthCurrent                  =>  plt_site%DayLenthCurrent    , &
     DATAP                            =>  plt_site%DATAP   , &
     PPT                              =>  plt_site%PPT     , &
@@ -148,7 +148,7 @@ module HfuncsMod
 !             PSIMin4LeafOff=minimum canopy water potential for leafoff
 !             HoursCanopyPSITooLow=number of hours PSICanopy_pft(< PSIMin4LeafOff (for output only)
 !
-          IF(PSICanopy_pft(NZ).LT.PSIMin4LeafOff(iPlantMorphologyType_pft(NZ)))THEN
+          IF(PSICanopy_pft(NZ).LT.PSIMin4LeafOff(iPlantRootProfile_pft(NZ)))THEN
             HoursCanopyPSITooLow(NZ)=HoursCanopyPSITooLow(NZ)+1.0_r8
           ENDIF
         ENDIF
@@ -524,10 +524,10 @@ module HfuncsMod
     ALAT                            =>  plt_site%ALAT    , &
     doPlantLeafOut_brch             =>  plt_pheno%doPlantLeafOut_brch  , &
     iPlantCalendar_brch             =>  plt_pheno%iPlantCalendar_brch , &
-    iPlantMorphologyType_pft        =>  plt_pheno%iPlantMorphologyType_pft , &
+    iPlantRootProfile_pft        =>  plt_pheno%iPlantRootProfile_pft , &
     Hours4ShortenPhotoPeriod_brch   =>  plt_pheno%Hours4ShortenPhotoPeriod_brch   , &
     Hours4Leafout_brch              =>  plt_pheno%Hours4Leafout_brch   , &
-    HourThreshold4LeafOut_brch      =>  plt_pheno%HourThreshold4LeafOut_brch  , &
+    HourReq4LeafOut_brch      =>  plt_pheno%HourReq4LeafOut_brch  , &
     iPlantPhenolType_pft            =>  plt_pheno%iPlantPhenolType_pft , &
     TCelsChill4Leaf_pft             =>  plt_pheno%TCelsChill4Leaf_pft   , &
     Hours4LenthenPhotoPeriod_brch   =>  plt_pheno%Hours4LenthenPhotoPeriod_brch   , &
@@ -535,7 +535,7 @@ module HfuncsMod
     TCelciusChill4Seed              =>  plt_pheno%TCelciusChill4Seed   , &
     TCelcius4LeafOffHarden_pft      =>  plt_pheno%TCelcius4LeafOffHarden_pft    , &
     Hours4LeafOff_brch              =>  plt_pheno%Hours4LeafOff_brch   , &
-    HourThreshold4LeafOff_brch      =>  plt_pheno%HourThreshold4LeafOff_brch  , &
+    HourReq4LeafOff_brch      =>  plt_pheno%HourReq4LeafOff_brch  , &
     doPlantLeaveOff_brch            =>  plt_pheno%doPlantLeaveOff_brch    &
   )
 !
@@ -551,7 +551,7 @@ module HfuncsMod
   IF(iPlantPhenolType_pft(NZ).EQ.iphenotyp_evgreen)THEN
     IF(DayLenthCurrent.GE.DayLenthPrev)THEN
       Hours4Leafout_brch(NB,NZ)=Hours4LenthenPhotoPeriod_brch(NB,NZ)
-      IF(Hours4Leafout_brch(NB,NZ).GE.HourThreshold4LeafOut_brch(NB,NZ) &
+      IF(Hours4Leafout_brch(NB,NZ).GE.HourReq4LeafOut_brch(NB,NZ) &
         .OR.(ALAT.GT.0.0_r8 .AND. I.EQ.173) &     !northern hemisphere
         .OR.(ALAT.LT.0.0_r8 .AND. I.EQ.355))THEN  !southern hemisphere
         Hours4LeafOff_brch(NB,NZ)=0.0_r8
@@ -568,7 +568,7 @@ module HfuncsMod
 !
     IF(DayLenthCurrent.LT.DayLenthPrev)THEN
       Hours4LeafOff_brch(NB,NZ)=Hours4ShortenPhotoPeriod_brch(NB,NZ)
-      IF(Hours4LeafOff_brch(NB,NZ).GE.HourThreshold4LeafOff_brch(NB,NZ) &
+      IF(Hours4LeafOff_brch(NB,NZ).GE.HourReq4LeafOff_brch(NB,NZ) &
         .OR.(ALAT.GT.0.0_r8 .AND. I.EQ.355) &
         .OR.(ALAT.LT.0.0_r8 .AND. I.EQ.173))THEN
         Hours4Leafout_brch(NB,NZ)=0.0_r8
@@ -592,20 +592,20 @@ module HfuncsMod
 !    write(193,*)'doPlantLeafOut_brch(NB,NZ)',doPlantLeafOut_brch(NB,NZ),DayLenthCurrent,DayLenthPrev
     IF((DayLenthCurrent.GE.DayLenthPrev .OR. &
       (DayLenthCurrent.LT.DayLenthPrev .AND. &
-       Hours4LeafOff_brch(NB,NZ).LT.HourThreshold4LeafOff_brch(NB,NZ))) &
+       Hours4LeafOff_brch(NB,NZ).LT.HourReq4LeafOff_brch(NB,NZ))) &
       .AND.doPlantLeafOut_brch(NB,NZ).EQ.iEnable)THEN
       !favorable temperature for leafout
       IF(TCG(NZ).GE.TCelsChill4Leaf_pft(NZ))THEN
         Hours4Leafout_brch(NB,NZ)=Hours4Leafout_brch(NB,NZ)+1.0_r8
       ENDIF
       !not sufficient leafout hour
-      IF(Hours4Leafout_brch(NB,NZ).LT.HourThreshold4LeafOut_brch(NB,NZ))THEN
+      IF(Hours4Leafout_brch(NB,NZ).LT.HourReq4LeafOut_brch(NB,NZ))THEN
         !unfavorable temperature
         IF(TCG(NZ).LT.TCelciusChill4Seed(NZ))THEN
           Hours4Leafout_brch(NB,NZ)=AZMAX1(Hours4Leafout_brch(NB,NZ)-1.0)
         ENDIF
       ENDIF
-      IF(Hours4Leafout_brch(NB,NZ).GE.HourThreshold4LeafOut_brch(NB,NZ) &
+      IF(Hours4Leafout_brch(NB,NZ).GE.HourReq4LeafOut_brch(NB,NZ) &
         .OR.(ALAT.GT.0.0_r8 .AND.I.EQ.173) &
         .OR.(ALAT.LT.0.0_r8 .AND.I.EQ.355))THEN
         Hours4LeafOff_brch(NB,NZ)=0.0_r8
@@ -633,7 +633,7 @@ module HfuncsMod
       IF(TCG(NZ).LE.TCelcius4LeafOffHarden_pft(NZ))THEN
         Hours4LeafOff_brch(NB,NZ)=Hours4LeafOff_brch(NB,NZ)+1.0_r8
       ENDIF
-      IF(Hours4LeafOff_brch(NB,NZ).GE.HourThreshold4LeafOff_brch(NB,NZ).AND.&
+      IF(Hours4LeafOff_brch(NB,NZ).GE.HourReq4LeafOff_brch(NB,NZ).AND.&
         doPlantLeafOut_brch(NB,NZ).EQ.iDisable)THEN
         Hours4Leafout_brch(NB,NZ)=0.0_r8
         doPlantLeafOut_brch(NB,NZ)=iEnable
@@ -662,12 +662,12 @@ module HfuncsMod
       IF(PSICanopy_pft(NZ).GE.PSIMin4LeafOut)THEN
         Hours4Leafout_brch(NB,NZ)=Hours4Leafout_brch(NB,NZ)+1.0_r8
       ENDIF
-      IF(Hours4Leafout_brch(NB,NZ).LT.HourThreshold4LeafOut_brch(NB,NZ))THEN
-        IF(PSICanopy_pft(NZ).LT.PSIMin4LeafOff(iPlantMorphologyType_pft(NZ)))THEN
+      IF(Hours4Leafout_brch(NB,NZ).LT.HourReq4LeafOut_brch(NB,NZ))THEN
+        IF(PSICanopy_pft(NZ).LT.PSIMin4LeafOff(iPlantRootProfile_pft(NZ)))THEN
           Hours4Leafout_brch(NB,NZ)=AZMAX1(Hours4Leafout_brch(NB,NZ)-12.0_r8)
         ENDIF
       ENDIF
-      IF(Hours4Leafout_brch(NB,NZ).GE.HourThreshold4LeafOut_brch(NB,NZ))THEN
+      IF(Hours4Leafout_brch(NB,NZ).GE.HourReq4LeafOut_brch(NB,NZ))THEN
         Hours4LeafOff_brch(NB,NZ)=0.0_r8
         IF(iPlantCalendar_brch(ipltcal_InitFloral,NB,NZ).NE.0)doPlantLeaveOff_brch(NB,NZ)=iEnable
       ENDIF
@@ -688,7 +688,7 @@ module HfuncsMod
 !     MaxHour4LeafOutOff=maximum hours for leafout,leafoff
 !
       IF(doPlantLeafOut_brch(NB,NZ).EQ.iDisable.AND.doPlantLeaveOff_brch(NB,NZ).EQ.iEnable)THEN
-        IF(PSICanopy_pft(NZ).LT.PSIMin4LeafOff(iPlantMorphologyType_pft(NZ)))THEN
+        IF(PSICanopy_pft(NZ).LT.PSIMin4LeafOff(iPlantRootProfile_pft(NZ)))THEN
           Hours4LeafOff_brch(NB,NZ)=Hours4LeafOff_brch(NB,NZ)+1.0_r8
         ENDIF
         IF(iPlantPhenolType_pft(NZ).EQ.4)THEN
@@ -700,7 +700,7 @@ module HfuncsMod
             Hours4LeafOff_brch(NB,NZ)=Hours4LenthenPhotoPeriod_brch(NB,NZ)
           ENDIF
         ENDIF
-        IF(Hours4LeafOff_brch(NB,NZ).GE.HourThreshold4LeafOff_brch(NB,NZ).AND. &
+        IF(Hours4LeafOff_brch(NB,NZ).GE.HourReq4LeafOff_brch(NB,NZ).AND. &
           doPlantLeafOut_brch(NB,NZ).EQ.iDisable)THEN
           Hours4Leafout_brch(NB,NZ)=0.0_r8
           doPlantLeafOut_brch(NB,NZ)=iEnable
@@ -728,12 +728,12 @@ module HfuncsMod
         IF(TCG(NZ).GE.TCelsChill4Leaf_pft(NZ).AND.PSICanopyTurg_pft(NZ).GT.PSIMin4LeafExpansion)THEN
           Hours4Leafout_brch(NB,NZ)=Hours4Leafout_brch(NB,NZ)+1.0_r8
         ENDIF
-        IF(Hours4Leafout_brch(NB,NZ).LT.HourThreshold4LeafOut_brch(NB,NZ))THEN
+        IF(Hours4Leafout_brch(NB,NZ).LT.HourReq4LeafOut_brch(NB,NZ))THEN
           IF(TCG(NZ).LT.TCelciusChill4Seed(NZ).OR.PSICanopyTurg_pft(NZ).LT.PSIMin4LeafExpansion)THEN
             Hours4Leafout_brch(NB,NZ)=AZMAX1(Hours4Leafout_brch(NB,NZ)-1.5_r8)
           ENDIF
         ENDIF
-        IF(Hours4Leafout_brch(NB,NZ).GE.HourThreshold4LeafOut_brch(NB,NZ))THEN
+        IF(Hours4Leafout_brch(NB,NZ).GE.HourReq4LeafOut_brch(NB,NZ))THEN
           Hours4LeafOff_brch(NB,NZ)=0.0_r8
           IF(iPlantCalendar_brch(ipltcal_InitFloral,NB,NZ).NE.0)doPlantLeaveOff_brch(NB,NZ)=iEnable
         ENDIF
@@ -757,10 +757,10 @@ module HfuncsMod
       IF((DayLenthCurrent.LT.DayLenthPrev.OR.DayLenthCurrent.LT.24.0_r8-DayLenthMax+2.0_r8) &
         .AND.doPlantLeaveOff_brch(NB,NZ).EQ.iEnable)THEN
         IF(TCG(NZ).LE.TCelcius4LeafOffHarden_pft(NZ) &
-          .OR.PSICanopy_pft(NZ).LT.PSIMin4LeafOff(iPlantMorphologyType_pft(NZ)))THEN
+          .OR.PSICanopy_pft(NZ).LT.PSIMin4LeafOff(iPlantRootProfile_pft(NZ)))THEN
           Hours4LeafOff_brch(NB,NZ)=Hours4LeafOff_brch(NB,NZ)+1.0_r8
         ENDIF
-        IF(Hours4LeafOff_brch(NB,NZ).GE.HourThreshold4LeafOff_brch(NB,NZ) &
+        IF(Hours4LeafOff_brch(NB,NZ).GE.HourReq4LeafOff_brch(NB,NZ) &
           .AND.doPlantLeafOut_brch(NB,NZ).EQ.iDisable)THEN
           Hours4Leafout_brch(NB,NZ)=0.0_r8
           doPlantLeafOut_brch(NB,NZ)=iEnable
@@ -804,7 +804,7 @@ module HfuncsMod
     doPlantLeafOut_brch                  =>  plt_pheno%doPlantLeafOut_brch   , &
     NumOfLeaves_brch                     =>  plt_morph%NumOfLeaves_brch   , &
     NodeNumNormByMatgrp_brch             =>  plt_pheno%NodeNumNormByMatgrp_brch   , &
-    HourReprodNodeNumNormByMatrgrp_brch  =>  plt_pheno%HourReprodNodeNumNormByMatrgrp_brch  , &
+    dReproNodeNumNormByMatG_brch  =>  plt_pheno%dReproNodeNumNormByMatG_brch  , &
     doSenescence_brch                    =>  plt_pheno%doSenescence_brch   , &
     LeafNumberAtFloralInit_brch          =>  plt_pheno%LeafNumberAtFloralInit_brch  , &
     iPlantDevelopPattern_pft             =>  plt_pheno%iPlantDevelopPattern_pft  , &
@@ -815,18 +815,18 @@ module HfuncsMod
     TotalNodeNumNormByMatgrp_brch        =>  plt_pheno%TotalNodeNumNormByMatgrp_brch  , &
     MatureGroup_brch                     =>  plt_pheno%MatureGroup_brch  , &
     iPlantPhenolType_pft                 =>  plt_pheno%iPlantPhenolType_pft  , &
-    HourThreshold4LeafOut_brch           =>  plt_pheno%HourThreshold4LeafOut_brch   , &
+    HourReq4LeafOut_brch           =>  plt_pheno%HourReq4LeafOut_brch   , &
     iPlantPhotoperiodType_pft            =>  plt_pheno%iPlantPhotoperiodType_pft  , &
     doInitLeafOut_brch                   =>  plt_pheno%doInitLeafOut_brch   , &
     MatureGroup_pft                      =>  plt_pheno%MatureGroup_pft , &
     PlantO2Stress                        =>  plt_pheno%PlantO2Stress    , &
     Hours4Leafout_brch                   =>  plt_pheno%Hours4Leafout_brch    , &
     Hours4LeafOff_brch                   =>  plt_pheno%Hours4LeafOff_brch    , &
-    HourThreshold4LeafOff_brch           =>  plt_pheno%HourThreshold4LeafOff_brch   , &
+    HourReq4LeafOff_brch           =>  plt_pheno%HourReq4LeafOff_brch   , &
     RefNodeInitRate_pft                  =>  plt_pheno%RefNodeInitRate_pft   , &
     CanopyHeight_pft                     =>  plt_morph%CanopyHeight_pft     , &
     ShootNodeNumber_brch                 =>  plt_morph%ShootNodeNumber_brch  , &
-    NodeNumberToInitFloral_brch          =>  plt_morph%NodeNumberToInitFloral_brch  , &
+    NodeNum2InitFloral_brch          =>  plt_morph%NodeNum2InitFloral_brch  , &
     NodeNumberAtAnthesis_brch            =>  plt_morph%NodeNumberAtAnthesis_brch  , &
     MainBranchNum_pft                  =>  plt_morph%MainBranchNum_pft      &
   )
@@ -852,7 +852,7 @@ module HfuncsMod
 ! NodeInitRate,LeafAppearRate=rates of node initiation,leaf appearance
 ! XRNI,XRLA=rate of node initiation,leaf appearance at 25 oC (h-1)
 !
-  IF(iPlantPhenolType_pft(NZ).EQ.iphenotyp_evgreen.OR.Hours4LeafOff_brch(NB,NZ).LT.HourThreshold4LeafOff_brch(NB,NZ))THEN
+  IF(iPlantPhenolType_pft(NZ).EQ.iphenotyp_evgreen.OR.Hours4LeafOff_brch(NB,NZ).LT.HourReq4LeafOff_brch(NB,NZ))THEN
     TKCO=TKG(NZ)+OFFST(NZ)
     TFNP=calc_leave_grow_tempf(TKCO)    
     NodeInitRate=AZMAX1(RefNodeInitRate_pft(NZ)*TFNP)
@@ -893,20 +893,20 @@ module HfuncsMod
 !   HourlyNodeNumNormByMatgrp_brch,TotalNodeNumNormByMatgrp_brch=hourly,total change in NodeNumNormByMatgrp_brch
 !   ReprodNodeNumNormByMatrgrp_brch=reproductive node number normalized for maturity group
 !   NodeNumberAtAnthesis_brch=node number at flowering
-!   HourReprodNodeNumNormByMatrgrp_brch,TotReproNodeNumNormByMatrgrp_brch=hourly,total change in ReprodNodeNumNormByMatrgrp_brch
+!   dReproNodeNumNormByMatG_brch,TotReproNodeNumNormByMatrgrp_brch=hourly,total change in ReprodNodeNumNormByMatrgrp_brch
 !   doSenescence_brch=PFT senescence flag
 !
     IF(iPlantCalendar_brch(ipltcal_InitFloral,NB,NZ).NE.0)THEN
-      NodeNumNormByMatgrp_brch(NB,NZ)=(ShootNodeNumber_brch(NB,NZ)-NodeNumberToInitFloral_brch(NB,NZ))/MatureGroup_pft(NZ)
+      NodeNumNormByMatgrp_brch(NB,NZ)=(ShootNodeNumber_brch(NB,NZ)-NodeNum2InitFloral_brch(NB,NZ))/MatureGroup_pft(NZ)
       HourlyNodeNumNormByMatgrp_brch(NB,NZ)=NodeInitRate/(MatureGroup_pft(NZ)*GrowStageNorm4VegetaPheno)
       TotalNodeNumNormByMatgrp_brch(NB,NZ)=TotalNodeNumNormByMatgrp_brch(NB,NZ)+HourlyNodeNumNormByMatgrp_brch(NB,NZ)
     ENDIF
     IF(iPlantCalendar_brch(ipltcal_Anthesis,NB,NZ).NE.0)THEN
       ReprodNodeNumNormByMatrgrp_brch(NB,NZ)=(ShootNodeNumber_brch(NB,NZ) &
         -NodeNumberAtAnthesis_brch(NB,NZ))/MatureGroup_pft(NZ)
-      HourReprodNodeNumNormByMatrgrp_brch(NB,NZ)=NodeInitRate/(MatureGroup_pft(NZ)*GrowStageNorm4ReprodPheno)
+      dReproNodeNumNormByMatG_brch(NB,NZ)=NodeInitRate/(MatureGroup_pft(NZ)*GrowStageNorm4ReprodPheno)
       TotReproNodeNumNormByMatrgrp_brch(NB,NZ)=TotReproNodeNumNormByMatrgrp_brch(NB,NZ) &
-        +HourReprodNodeNumNormByMatrgrp_brch(NB,NZ)
+        +dReproNodeNumNormByMatG_brch(NB,NZ)
     ENDIF
     doSenescence_brch(NB,NZ)=itrue
   ELSE
@@ -919,7 +919,7 @@ module HfuncsMod
 ! NUMBER OF INITIATED NODES
 !
 ! PSTG=number of nodes initiated
-! NodeNumberToInitFloral_brch=node number at floral initiation
+! NodeNum2InitFloral_brch=node number at floral initiation
 ! GROUP=node number required for floral initiation
 ! Hours4Leafout_brch,VRNL=leafout hours,hours required for leafout
 ! DayLenthPrev,DLYN=daylength of previous,current day
@@ -930,8 +930,8 @@ module HfuncsMod
   DayLenChk=DayLenthCurrent.LT.DayLenthPrev
   IF(iPlantCalendar_brch(ipltcal_InitFloral,NB,NZ).EQ.0)THEN
     
-    NodeNumChk=ShootNodeNumber_brch(NB,NZ).GT.MatureGroup_brch(NB,NZ)+NodeNumberToInitFloral_brch(NB,NZ)
-    LeafOutChk=Hours4Leafout_brch(NB,NZ).GE.HourThreshold4LeafOut_brch(NB,NZ)
+    NodeNumChk=ShootNodeNumber_brch(NB,NZ).GT.MatureGroup_brch(NB,NZ)+NodeNum2InitFloral_brch(NB,NZ)
+    LeafOutChk=Hours4Leafout_brch(NB,NZ).GE.HourReq4LeafOut_brch(NB,NZ)
     PlantDayChk=I.GE.iDayPlanting_pft(NZ).AND.iYearCurrent.EQ.iYearPlanting_pft(NZ).AND.DayLenthCurrent.GT.DayLenthPrev
     CanHeightChk=CanopyHeight_pft(NZ).GE.SnowDepth-ZERO
     PhenoChk1=iPlantPhenologyPattern_pft(NZ).EQ.iplt_perennial .AND. &
@@ -940,7 +940,7 @@ module HfuncsMod
     
 !    if(NZ==1)then
 !    write(102,*)NB,I+J/24.,ShootNodeNumber_brch(NB,NZ),MatureGroup_brch(NB,NZ),&
-!      NodeNumberToInitFloral_brch(NB,NZ),NodeNumChk, (LeafOutChk.OR.PlantDayChk),&
+!      NodeNum2InitFloral_brch(NB,NZ),NodeNumChk, (LeafOutChk.OR.PlantDayChk),&
 !      ((PhenoChk1.OR.PhenoChk2) .AND. CanHeightChk .AND. DayLenChk)
 !    endif
     IF((NodeNumChk .AND. (LeafOutChk.OR.PlantDayChk)) .OR. &
@@ -973,7 +973,7 @@ module HfuncsMod
       IF( PhotoPrdChk .OR. ((PhenoChk1.OR.PhenoChk2).AND.CanHeightChk.AND.DayLenChk))THEN
 
         iPlantCalendar_brch(ipltcal_InitFloral,NB,NZ)=I
-        NodeNumberToInitFloral_brch(NB,NZ)=ShootNodeNumber_brch(NB,NZ)
+        NodeNum2InitFloral_brch(NB,NZ)=ShootNodeNumber_brch(NB,NZ)
         IF(iPlantPhenologyPattern_pft(NZ).EQ.iplt_annual.AND.iPlantDevelopPattern_pft(NZ).EQ.ideterminate)THEN
           LeafNumberAtFloralInit_brch(NB,NZ)=ShootNodeNumber_brch(NB,NZ)
         ENDIF
@@ -991,7 +991,7 @@ module HfuncsMod
     PhenoChk1=(iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldecidu.OR.iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldroutdecidu) &
       .AND.iPlantPhenologyPattern_pft(NZ).NE.iplt_annual.AND.iPlantPhotoperiodType_pft(NZ).NE.iphotop_short.AND.DayLenChk     
     PhenoChk2=iPlantPhenolType_pft(NZ).EQ.iphenotyp_drouhtdecidu.AND.iPlantPhenologyPattern_pft(NZ).EQ.iplt_annual
-    LeafOffChk=Hours4LeafOff_brch(NB,NZ).GT.HourThreshold4LeafOff_brch(NB,NZ)
+    LeafOffChk=Hours4LeafOff_brch(NB,NZ).GT.HourReq4LeafOff_brch(NB,NZ)
     
     IF(NodeNumChk .OR.(PhenoChk1 .AND. doPlantLeafOut_brch(NB,NZ).EQ.iDisable .AND. LeafOffChk) &
                   .OR. PhenoChk2 .AND. doPlantLeafOut_brch(NB,NZ).EQ.iDisable .AND. LeafOffChk)THEN
@@ -1004,7 +1004,7 @@ module HfuncsMod
 !
   ELSEIF(iPlantCalendar_brch(ipltcal_Elongation,NB,NZ).EQ.0)THEN
     NodeNumChk=NodeNumNormByMatgrp_brch(NB,NZ).GT.0.50_r8*GrowStageNorm4VegetaPheno    
-    LeafOffChk=Hours4LeafOff_brch(NB,NZ).GT.HourThreshold4LeafOff_brch(NB,NZ)
+    LeafOffChk=Hours4LeafOff_brch(NB,NZ).GT.HourReq4LeafOff_brch(NB,NZ)
     PhenoChk1=(iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldecidu.OR.iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldroutdecidu) &
       .AND.iPlantPhenologyPattern_pft(NZ).NE.iplt_annual.AND.iPlantPhotoperiodType_pft(NZ).NE.iphotop_short.AND.DayLenChk
     PhenoChk2=iPlantPhenolType_pft(NZ).EQ.iphenotyp_drouhtdecidu.AND.iPlantPhenologyPattern_pft(NZ).EQ.iplt_annual
@@ -1022,7 +1022,7 @@ module HfuncsMod
 !
   ELSEIF(iPlantCalendar_brch(ipltcal_Heading,NB,NZ).EQ.0)THEN
     NodeNumChk=NodeNumNormByMatgrp_brch(NB,NZ).GT.1.00_r8*GrowStageNorm4VegetaPheno 
-    LeafOffChk=Hours4LeafOff_brch(NB,NZ).GT.HourThreshold4LeafOff_brch(NB,NZ)
+    LeafOffChk=Hours4LeafOff_brch(NB,NZ).GT.HourReq4LeafOff_brch(NB,NZ)
     PhenoChk1=(iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldecidu.OR.iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldroutdecidu) &
       .AND.iPlantPhenologyPattern_pft(NZ).NE.iplt_annual.AND.iPlantPhotoperiodType_pft(NZ).NE.iphotop_short.AND.DayLenChk
     PhenoChk2=iPlantPhenolType_pft(NZ).EQ.iphenotyp_drouhtdecidu.AND.iPlantPhenologyPattern_pft(NZ).EQ.iplt_annual  
@@ -1039,7 +1039,7 @@ module HfuncsMod
 !
 !   iPlantCalendar_brch(ipltcal_Anthesis,=start of anthesis and setting final seed number
 !   NumOfLeaves_brch=number of leaves appeared
-!   NodeNumberToInitFloral_brch=node number at floral initiation
+!   NodeNum2InitFloral_brch=node number at floral initiation
 !   ISTYP,IWTYP,iPlantPhotoperiodType_pft=growth habit,phenology,photoperiod type from PFT file
 !   doPlantLeafOut_brch=flag for enabling leafout:0=enable,1=disable
 !   Hours4LeafOff_brch,VRNX=leafoff hours,hours required for leafoff
@@ -1047,8 +1047,8 @@ module HfuncsMod
 !   NodeNumberAtAnthesis_brch=number of nodes at anthesis
 !
   ELSEIF(iPlantCalendar_brch(ipltcal_Anthesis,NB,NZ).EQ.0)THEN
-    NodeNumChk=NumOfLeaves_brch(NB,NZ).GT.NodeNumberToInitFloral_brch(NB,NZ)
-    LeafOffChk=Hours4LeafOff_brch(NB,NZ).GT.HourThreshold4LeafOff_brch(NB,NZ)
+    NodeNumChk=NumOfLeaves_brch(NB,NZ).GT.NodeNum2InitFloral_brch(NB,NZ)
+    LeafOffChk=Hours4LeafOff_brch(NB,NZ).GT.HourReq4LeafOff_brch(NB,NZ)
     PhenoChk1=(iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldecidu.OR.iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldroutdecidu) &
       .AND.iPlantPhenologyPattern_pft(NZ).NE.iplt_annual.AND.iPlantPhotoperiodType_pft(NZ).NE.iphotop_short.AND.DayLenChk
     PhenoChk2=iPlantPhenolType_pft(NZ).EQ.iphenotyp_drouhtdecidu.AND.iPlantPhenologyPattern_pft(NZ).EQ.iplt_annual
@@ -1073,7 +1073,7 @@ module HfuncsMod
 !
   ELSEIF(iPlantCalendar_brch(ipltcal_BeginSeedFill,NB,NZ).EQ.0)THEN
     NodeNumChk=ReprodNodeNumNormByMatrgrp_brch(NB,NZ).GT.0.50_r8*GrowStageNorm4ReprodPheno
-    LeafOffChk=Hours4LeafOff_brch(NB,NZ).GT.HourThreshold4LeafOff_brch(NB,NZ)
+    LeafOffChk=Hours4LeafOff_brch(NB,NZ).GT.HourReq4LeafOff_brch(NB,NZ)
     PhenoChk1=(iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldecidu.OR.iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldroutdecidu) &
       .AND.iPlantPhenologyPattern_pft(NZ).NE.iplt_annual.AND.iPlantPhotoperiodType_pft(NZ).NE.iphotop_short.AND.DayLenChk
     PhenoChk2=iPlantPhenolType_pft(NZ).EQ.iphenotyp_drouhtdecidu.AND.iPlantPhenologyPattern_pft(NZ).EQ.iplt_annual

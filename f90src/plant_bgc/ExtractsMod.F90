@@ -104,24 +104,24 @@ module ExtractsMod
 !     TOTAL LEAF AREA OF ALL PLANT SPECIES
 !
 !     CanopyLAgrid_lyr,CanopyStemA_lyr=total leaf,stalk area of combined canopy layer
-!     CanopyLeafApft_lyr,CanopyStemApft_lyr=PFT leaf,stalk area in canopy layer
+!     CanopyLeafALyr_pft,CanopyStemApft_lyr=PFT leaf,stalk area in canopy layer
 !     WGLFT=total leaf C of combined canopy layer
-!     CanopyLeafCpft_lyr=PFT leaf C in canopy layer
+!     CanopyLeafCLyr_pft=PFT leaf C in canopy layer
 !
   implicit none
   integer, intent(in) :: NZ
   integer :: L
   associate(                              &
-    CanopyLeafCpft_lyr    => plt_biom%CanopyLeafCpft_lyr      , &
+    CanopyLeafCLyr_pft    => plt_biom%CanopyLeafCLyr_pft      , &
     WGLFT                 => plt_biom%WGLFT      , &
     CanopyLAgrid_lyr      =>  plt_morph%CanopyLAgrid_lyr    , &
     CanopyStemApft_lyr    =>  plt_morph%CanopyStemApft_lyr    , &
     CanopyStemA_lyr       => plt_morph%CanopyStemA_lyr     , &
-    CanopyLeafApft_lyr    => plt_morph%CanopyLeafApft_lyr       &
+    CanopyLeafALyr_pft    => plt_morph%CanopyLeafALyr_pft       &
   )
   DO L=1,NumOfCanopyLayers1
-    CanopyLAgrid_lyr(L)=CanopyLAgrid_lyr(L)+CanopyLeafApft_lyr(L,NZ)
-    WGLFT(L)=WGLFT(L)+CanopyLeafCpft_lyr(L,NZ)
+    CanopyLAgrid_lyr(L)=CanopyLAgrid_lyr(L)+CanopyLeafALyr_pft(L,NZ)
+    WGLFT(L)=WGLFT(L)+CanopyLeafCLyr_pft(L,NZ)
     CanopyStemA_lyr(L)=CanopyStemA_lyr(L)+CanopyStemApft_lyr(L,NZ)
   ENDDO
   end associate

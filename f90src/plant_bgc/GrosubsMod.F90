@@ -156,11 +156,11 @@ module grosubsMod
     fTgrowCanP                     => plt_pheno%fTgrowCanP    , &
     NetCumElmntFlx2Plant_pft       => plt_pheno%NetCumElmntFlx2Plant_pft   , &
     IsPlantActive_pft              => plt_pheno%IsPlantActive_pft   , &
-    iPlantMorphologyType_pft       => plt_pheno%iPlantMorphologyType_pft  , &
+    iPlantRootProfile_pft       => plt_pheno%iPlantRootProfile_pft  , &
     doInitPlant_pft                => plt_pheno%doInitPlant_pft   , &
     doPlantLeafOut_brch            => plt_pheno%doPlantLeafOut_brch   , &
     iPlantTurnoverPattern_pft      => plt_pheno%iPlantTurnoverPattern_pft  , &
-    HourThreshold4LeafOut_brch     => plt_pheno%HourThreshold4LeafOut_brch   , &
+    HourReq4LeafOut_brch     => plt_pheno%HourReq4LeafOut_brch   , &
     Hours4Leafout_brch             => plt_pheno%Hours4Leafout_brch    , &
     ElmntBalanceCum_pft            => plt_site%ElmntBalanceCum_pft     , &
     NP0                            => plt_site%NP0      , &
@@ -186,7 +186,7 @@ module grosubsMod
 !
     D205: DO NB=1,NumOfBranches_pft(NZ)
       IF(doInitPlant_pft(NZ).EQ.itrue)THEN
-        IF(doPlantLeafOut_brch(NB,NZ).EQ.iEnable.AND.Hours4Leafout_brch(NB,NZ).GE.HourThreshold4LeafOut_brch(NB,NZ))THEN
+        IF(doPlantLeafOut_brch(NB,NZ).EQ.iEnable.AND.Hours4Leafout_brch(NB,NZ).GE.HourReq4LeafOut_brch(NB,NZ))THEN
           iDayPlanting_pft(NZ)=I
           iYearPlanting_pft(NZ)=iYearCurrent
           PlantinDepth(NZ)=0.005_r8+CumSoilThickness(0)
@@ -206,7 +206,7 @@ module grosubsMod
     DO NE=1,NumPlantChemElms
       D6235: DO M=1,jsken
         XFRE=1.5814E-05_r8*fTgrowCanP(NZ)*StandingDeadKCompChemElms_pft(NE,M,NZ)
-        IF(iPlantTurnoverPattern_pft(NZ).EQ.0.OR.iPlantMorphologyType_pft(NZ).LE.1)THEN
+        IF(iPlantTurnoverPattern_pft(NZ).EQ.0.OR.iPlantRootProfile_pft(NZ).LE.1)THEN
           LitrFallChemElm_pvr(NE,M,k_fine_litr,0,NZ)=LitrFallChemElm_pvr(NE,M,k_fine_litr,0,NZ)+XFRE
         ELSE
           LitrFallChemElm_pvr(NE,M,k_woody_litr,0,NZ)=LitrFallChemElm_pvr(NE,M,k_woody_litr,0,NZ)+XFRE
@@ -324,7 +324,7 @@ module grosubsMod
   real(r8) :: WFNS,WFNSG
 ! begin_execution
   associate(                              &
-    iPlantMorphologyType_pft => plt_pheno%iPlantMorphologyType_pft      , &
+    iPlantRootProfile_pft => plt_pheno%iPlantRootProfile_pft      , &
     iPlantRootState_pft      => plt_pheno%iPlantRootState_pft      , &
     iPlantShootState_pft  => plt_pheno%iPlantShootState_pft       , &
     RootN2Fix_pft   => plt_rbgc%RootN2Fix_pft         , &
@@ -400,9 +400,9 @@ module grosubsMod
     RootBiomCPerPlant_pft   =>  plt_biom%RootBiomCPerPlant_pft     , &
     StalkChemElms_pft       =>  plt_biom%StalkChemElms_pft    , &
     RootElmnts_pft  =>  plt_biom%RootElmnts_pft     , &
-    CanopyLeafCpft_lyr  =>  plt_biom%CanopyLeafCpft_lyr     , &
+    CanopyLeafCLyr_pft  =>  plt_biom%CanopyLeafCLyr_pft     , &
     iPlantTurnoverPattern_pft =>  plt_pheno%iPlantTurnoverPattern_pft   , &
-    iPlantMorphologyType_pft =>  plt_pheno%iPlantMorphologyType_pft   , &
+    iPlantRootProfile_pft =>  plt_pheno%iPlantRootProfile_pft   , &
     RCO2A_pvr  =>  plt_rbgc%RCO2A_pvr     , &
     RootRespPotential_vr  =>  plt_rbgc%RootRespPotential_vr     , &
     RCO2N_pvr  =>  plt_rbgc%RCO2N_pvr     , &
@@ -425,13 +425,13 @@ module grosubsMod
     PrimRootXNumL_pvr  =>  plt_morph%PrimRootXNumL_pvr    , &
     SecndRootXNum_pvr   =>  plt_morph%SecndRootXNum_pvr     , &
     MY                  =>  plt_morph%MY       , &
-    CanopyLeafApft_lyr  =>  plt_morph%CanopyLeafApft_lyr    , &
+    CanopyLeafALyr_pft  =>  plt_morph%CanopyLeafALyr_pft    , &
     CanopyStemApft_lyr  =>  plt_morph%CanopyStemApft_lyr    , &
     NumRootAxes_pft     =>  plt_morph%NumRootAxes_pft       &
   )
   D2: DO L=1,NumOfCanopyLayers1
-    CanopyLeafApft_lyr(L,NZ)=0._r8
-    CanopyLeafCpft_lyr(L,NZ)=0._r8
+    CanopyLeafALyr_pft(L,NZ)=0._r8
+    CanopyLeafCLyr_pft(L,NZ)=0._r8
     CanopyStemApft_lyr(L,NZ)=0._r8
   ENDDO D2
   D5: DO NR=1,NumRootAxes_pft(NZ)
@@ -462,7 +462,7 @@ module grosubsMod
 !     FWOODN,FWOODP=N,P woody fraction in stalk:0=woody,1=non-woody
 !
   IF(iPlantTurnoverPattern_pft(NZ).EQ.0 &
-    .OR.(.not.is_plant_treelike(iPlantMorphologyType_pft(NZ)))&
+    .OR.(.not.is_plant_treelike(iPlantRootProfile_pft(NZ)))&
     .OR.StalkChemElms_pft(ielmc,NZ).LE.ZEROP(NZ))THEN
     FWODBE(ielmc,k_fine_litr)=1.0_r8
     FWOODE(ielmc,k_fine_litr)=1.0_r8
@@ -549,7 +549,7 @@ module grosubsMod
 !
   WFNS=AMIN1(1.0_r8,AZMAX1(PSICanopyTurg_pft(NZ)-PSIMin4OrganExtension))
 
-  IF(is_plant_bryophyte(iPlantMorphologyType_pft(NZ)))THEN
+  IF(is_plant_bryophyte(iPlantRootProfile_pft(NZ)))THEN
     !bryophyte, no turgor
     Stomata_Activity=1.0_r8
     WFNG=EXP(0.05_r8*PSICanopy_pft(NZ))
@@ -707,7 +707,7 @@ module grosubsMod
     NumRootAxes_pft              =>  plt_morph%NumRootAxes_pft   , &
     LeafAreaLive_brch            =>  plt_morph%LeafAreaLive_brch  , &
     CanopyStemA_pft              =>  plt_morph%CanopyStemA_pft  , &
-    CanopyBranchStemApft_lyr     =>  plt_morph%CanopyBranchStemApft_lyr  , &
+    CanopyStemALyr_brch     =>  plt_morph%CanopyStemALyr_brch  , &
     SeedNumberSet_brch           =>  plt_morph%SeedNumberSet_brch  , &
     CanopyLeafArea_pft           =>  plt_morph%CanopyLeafArea_pft  , &
     CanopyStemApft_lyr           =>  plt_morph%CanopyStemApft_lyr  , &
@@ -728,7 +728,7 @@ module grosubsMod
 !     WTHSBP,WTEABP,WTGRBP=branch husk,ear,grain P mass
 !     WTRVC,WTRVN,WTRVP=storage C,N,P
 !     LeafAreaLive_brch=branch leaf area
-!     CanopyBranchStemApft_lyr=total branch stalk surface area in each layer
+!     CanopyStemALyr_brch=total branch stalk surface area in each layer
 !     SeedNumberSet_brch=seed set number
 !
   DO NE=1,NumPlantChemElms
@@ -753,12 +753,12 @@ module grosubsMod
   CanopyLeafShethC_pft(NZ) =sum(LeafPetolBiomassC_brch(1:NumOfBranches_pft(NZ),NZ))
   CanopySeedNumber_pft(NZ) =sum(SeedNumberSet_brch(1:NumOfBranches_pft(NZ),NZ))
   CanopyLeafArea_pft(NZ)=sum(LeafAreaLive_brch(1:NumOfBranches_pft(NZ),NZ))
-  CanopyStemA_pft(NZ)=sum(CanopyBranchStemApft_lyr(1:NumOfCanopyLayers1,1:NumOfBranches_pft(NZ),NZ))
+  CanopyStemA_pft(NZ)=sum(CanopyStemALyr_brch(1:NumOfCanopyLayers1,1:NumOfBranches_pft(NZ),NZ))
   CanopyStemApft_lyr(1:NumOfCanopyLayers1,1:NumOfBranches_pft(NZ))=0._r8
 
   DO NB=1,NumOfBranches_pft(NZ)
     DO L=1,NumOfCanopyLayers1
-      CanopyStemApft_lyr(L,NZ)=CanopyStemApft_lyr(L,NZ)+CanopyBranchStemApft_lyr(L,NB,NZ)
+      CanopyStemApft_lyr(L,NZ)=CanopyStemApft_lyr(L,NZ)+CanopyStemALyr_brch(L,NB,NZ)
     ENDDO
   ENDDO
 
