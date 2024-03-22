@@ -124,9 +124,9 @@ module PlantBranchMod
     ZEROL                        =>  plt_biom%ZEROL     , &
     iPlantPhotosynthesisType     =>  plt_photo%iPlantPhotosynthesisType   , &
     iPlantBranchState_brch       =>  plt_pheno%iPlantBranchState_brch    , &
-    KLowestGroLeafNode_brch    =>  plt_pheno%KLowestGroLeafNode_brch   , &    
-    KHiestGroLeafNode_brch                 =>  plt_pheno%KHiestGroLeafNode_brch   , &
-    iPlantRootProfile_pft     =>  plt_pheno%iPlantRootProfile_pft   , &
+    KLowestGroLeafNode_brch      =>  plt_pheno%KLowestGroLeafNode_brch   , &    
+    KHiestGroLeafNode_brch       =>  plt_pheno%KHiestGroLeafNode_brch   , &
+    iPlantRootProfile_pft        =>  plt_pheno%iPlantRootProfile_pft   , &
     fTgrowCanP                   =>  plt_pheno%fTgrowCanP     , &
     HoursDoingRemob_brch         =>  plt_pheno%HoursDoingRemob_brch    , &
     iPlantCalendar_brch          =>  plt_pheno%iPlantCalendar_brch   , &
@@ -151,9 +151,7 @@ module PlantBranchMod
   IF(iPlantBranchState_brch(NB,NZ).EQ.iLive)THEN
 
     call CalcPartitionCoeff(I,J,NB,NZ,PART,PTRT,IFLGY,BegRemoblize)
-    if(etimer%get_curr_year()==0 .and. NZ==1)then
-    PART=0._r8;PART(1)=0.75;PART(2)=0.25
-    endif
+
     PARTS_brch(:,NB,NZ)=PART
 !
 !   SHOOT COEFFICIENTS FOR GROWTH RESPIRATION AND N,P CONTENTS
@@ -287,17 +285,17 @@ module PlantBranchMod
     GrowthEar(ielmp)=GrowthEar(ielmc)*rPCEar_pft(NZ)
     GrowthGrain(ielmp)=GrowthGrain(ielmc)*rPCReserve_pft(NZ)
 
-!    if(NZ==1)THEN
-!      write(185,'(I3,X,I4,4(X,F13.6))')NB,etimer%get_curr_year(),I+J/24.&
-!       ,NonStructalC4Growth_brch,GrowthLeaf(1),PART(ibrch_leaf)
+    if(NZ==1)THEN
+      write(185,'(I3,X,I4,9(X,F13.6))')NB,etimer%get_curr_year(),I+J/24.&
+       ,NonStructalC4Growth_brch,PART(1:7)
 !      GrowthStalk(NE),GrowthReserve(NE),GrowthHusk(NE),GrowthEar(NE),GrowthGrain(NE),NE=1,NumPlantChemElms)
 !      WRITE(187,'(I3,8(X,F13.6))')NB,I+J/24.,(PART(NE),NE=1,7)
-!    else
-!      write(186,'(I3,X,I4,4(X,F13.6))')NB,etimer%get_curr_year(),I+J/24.&
-!        ,NonStructalC4Growth_brch,GrowthLeaf(1),PART(ibrch_leaf)
+    else
+      write(186,'(I3,X,I4,9(X,F13.6))')NB,etimer%get_curr_year(),I+J/24.&
+       ,NonStructalC4Growth_brch,PART(1:7)
 !      GrowthStalk(NE),GrowthReserve(NE),GrowthHusk(NE),GrowthEar(NE),GrowthGrain(NE),NE=1,NumPlantChemElms)
 !      WRITE(188,'(I3,8(X,F13.6))')NB,I+J/24.,(PART(NE),NE=1,7)
-!    endif
+    endif
     
     DO NE=1,NumPlantChemElms
       LeafChemElms_brch(NE,NB,NZ)=LeafChemElms_brch(NE,NB,NZ)+GrowthLeaf(NE)
@@ -492,14 +490,14 @@ module PlantBranchMod
     TCelciusCanopy_pft                 =>  plt_ew%TCelciusCanopy_pft         , &
     PSICanopy_pft                      =>  plt_ew%PSICanopy_pft       , &
     StalkBiomassC_brch                 =>  plt_biom%StalkBiomassC_brch     , &
-    StalkRsrveElms_brch                 =>  plt_biom%StalkRsrveElms_brch    , &
+    StalkRsrveElms_brch                =>  plt_biom%StalkRsrveElms_brch    , &
     ZERO                               =>  plt_site%ZERO       , &
     NU                                 =>  plt_site%NU         , &
     AREA3                              =>  plt_site%AREA3      , &
     FracHour4LeafoffRemob              =>  plt_allom%FracHour4LeafoffRemob      , &
-    HourReq4LeafOff_brch         =>  plt_pheno%HourReq4LeafOff_brch     , &
+    HourReq4LeafOff_brch               =>  plt_pheno%HourReq4LeafOff_brch     , &
     iPlantCalendar_brch                =>  plt_pheno%iPlantCalendar_brch    , &
-    iPlantRootProfile_pft           =>  plt_pheno%iPlantRootProfile_pft    , &
+    iPlantRootProfile_pft              =>  plt_pheno%iPlantRootProfile_pft    , &
     TotReproNodeNumNormByMatrgrp_brch  =>  plt_pheno%TotReproNodeNumNormByMatrgrp_brch    , &
     iPlantDevelopPattern_pft           =>  plt_pheno%iPlantDevelopPattern_pft    , &
     HoursDoingRemob_brch               =>  plt_pheno%HoursDoingRemob_brch     , &
@@ -513,7 +511,7 @@ module PlantBranchMod
     CO2NetFix_pft                      =>  plt_bgcr%CO2NetFix_pft       , &
     NodeLenPergC                       =>  plt_morph%NodeLenPergC      , &
     CanopyLeafArea_pft                 =>  plt_morph%CanopyLeafArea_pft     , &
-    MainBranchNum_pft                =>  plt_morph%MainBranchNum_pft         &
+    MainBranchNum_pft                  =>  plt_morph%MainBranchNum_pft         &
   )
 
   PSILY=real((/-200.0_r8,-2.0,-2.0,-2.0/),r8)
@@ -746,7 +744,7 @@ module PlantBranchMod
   integer :: K
   associate(                        &
     NH3Dep2_brch          =>  plt_rbgc%NH3Dep2_brch   , &
-    NonstructElm_brch   =>  plt_biom%NonstructElm_brch  , &
+    NonstructElm_brch     =>  plt_biom%NonstructElm_brch  , &
     iPlantCalendar_brch   =>  plt_pheno%iPlantCalendar_brch   &
   )
 ! begin_execution
@@ -897,9 +895,8 @@ module PlantBranchMod
   end associate
   end subroutine C4PhotoProductTransfer
 !------------------------------------------------------------------------------------------
-  subroutine RemobilizeLeafLayers(KN,NumRemobLeafNodes,NB,NZ,XKSNC,SNCX,RCCC,RCCN,RCCP,SNCF)
+  subroutine RemobilizeLeafLayers(NumRemobLeafNodes,NB,NZ,XKSNC,SNCX,RCCC,RCCN,RCCP,SNCF)
   implicit none
-  integer, intent(inout) :: KN
   INTEGER, intent(in)    :: NB,NZ,NumRemobLeafNodes
   real(r8), intent(in)   :: XKSNC,SNCX
   REAL(R8), INTENT(IN) :: RCCC,RCCN,RCCP
@@ -956,6 +953,7 @@ module PlantBranchMod
     LitrFallChemElm_pvr             =>  plt_bgcr%LitrFallChemElm_pvr       , &
     CFOPE                           =>  plt_soilchem%CFOPE  , &
     icarbhyro                       =>  pltpar%icarbhyro    , &
+    KLowestGroLeafNode_brch         =>  plt_pheno%KLowestGroLeafNode_brch, &
     KHiestGroLeafNode_brch          =>   plt_pheno%KHiestGroLeafNode_brch   , &
     iPlantBranchState_brch          =>   plt_pheno%iPlantBranchState_brch    , &
     iPlantPhenologyPattern_pft      =>   plt_pheno%iPlantPhenologyPattern_pft   , &
@@ -1160,7 +1158,7 @@ module PlantBranchMod
       !     FWODB=C woody fraction in other organs:0=woody,1=non-woody
       !     FWODSN,FWODSP=N,P woody fraction in petiole:0=woody,1=non-woody
       !
-        DO NE=1,NumPlantChemElms
+        
         D6320: DO M=1,jsken
           DO NE=1,NumPlantChemElms
             LitrFallChemElm_pvr(NE,M,k_woody_litr,0,NZ)=LitrFallChemElm_pvr(NE,M,k_woody_litr,0,NZ)+CFOPE(NE,icwood,M,NZ) &
@@ -1277,7 +1275,7 @@ module PlantBranchMod
       RCSN=RCCN*FRCC
       RCSP=RCCP*FRCC
       MXNOD=KHiestGroLeafNode_brch(NB,NZ)
-      MNNOD=MAX(MIN(0,MAX(0,MXNOD-NumCogrowNode(NZ))),KHiestGroLeafNode_brch(NB,NZ)-MaxNodesPerBranch+2)
+      MNNOD=MAX(MIN(0,MAX(0,MXNOD-NumCogrowNode(NZ))),KHiestGroLeafNode_brch(NB,NZ)-MaxNodesPerBranch1+2)
       MXNOD=MAX(MXNOD,MNNOD)
       D1650: DO KK=MXNOD,MNNOD,-1
         K=pMOD(KK,MaxNodesPerBranch1)
@@ -1319,6 +1317,7 @@ module PlantBranchMod
 
               LitrFallChemElm_pvr(NE,M,k_fine_litr,0,NZ)=LitrFallChemElm_pvr(NE,M,k_woody_litr,0,NZ)+CFOPE(NE,istalk,M,NZ) &
                 *FSNCK*(InternodeChemElm_brch(NE,K,NB,NZ)-RCEK(NE))*FWOODE(NE,k_fine_litr)
+            ENDDO    
           ENDDO D7310
 
 !
@@ -1516,41 +1515,41 @@ module PlantBranchMod
   real(r8) :: FRACL
   real(r8) :: HeightBranchBase
   real(r8) :: HeightStalk
-  real(r8) :: HeightLeafNode,HeightLeafBase,HeightLeafTip
+  real(r8) :: HeightLeafNode,HeightLeafLow,HeightLeafTip
   real(r8) :: HeightLeafBase
   real(r8) :: RSTK
   real(r8) :: TLGLF
 ! begin_execution
   associate(                            &
-    LeafChemElmByLayerNode_brch       =>  plt_biom%LeafChemElmByLayerNode_brch  , &
+    LeafChemElmByLayerNode_brch  =>  plt_biom%LeafChemElmByLayerNode_brch  , &
     LeafElmntNode_brch           =>  plt_biom%LeafElmntNode_brch   , &
     CanopyLeafCLyr_pft           =>  plt_biom%CanopyLeafCLyr_pft   , &
     StalkBiomassC_brch           =>  plt_biom%StalkBiomassC_brch  , &
     StalkChemElms_brch           =>  plt_biom%StalkChemElms_brch , &
     PetioleProteinCNode_brch     =>  plt_biom%PetioleProteinCNode_brch  , &
     FNOD                         =>  plt_allom%FNOD   , &
-    iPlantRootProfile_pft     =>  plt_pheno%iPlantRootProfile_pft , &
+    iPlantRootProfile_pft        =>  plt_pheno%iPlantRootProfile_pft , &
     iPlantPhenologyPattern_pft   =>  plt_pheno%iPlantPhenologyPattern_pft , &
     KHiestGroLeafNode_brch       =>  plt_pheno%KHiestGroLeafNode_brch , &
     iPlantTurnoverPattern_pft    =>  plt_pheno%iPlantTurnoverPattern_pft , &
     KLowestGroLeafNode_brch      =>  plt_pheno%KLowestGroLeafNode_brch , &
-    WDLF                         => plt_morph%WDLF    , &
-    SeedDepth_pft                => plt_morph%SeedDepth_pft   , &
-    MainBranchNum_pft            => plt_morph%MainBranchNum_pft     , &
-    CanopyLeafAreaByLayer_pft    => plt_morph%CanopyLeafAreaByLayer_pft   , &
-    PetioleLengthNode_brch       => plt_morph%PetioleLengthNode_brch   , &
-    CanopyStemALyr_brch     => plt_morph%CanopyStemALyr_brch   , &
-    BranchNumber_brch            => plt_morph%BranchNumber_brch    , &
-    InternodeHeightLive_brch     => plt_morph%InternodeHeightLive_brch  , &
-    CanopyHeightz_col            => plt_morph%CanopyHeightz_col      , &
-    CanopyHeight_pft             => plt_morph%CanopyHeight_pft     , &
-    HypoctoHeight_pft            => plt_morph%HypoctoHeight_pft   , &
-    CLASS                        => plt_morph%CLASS   , &
-    LeafAreaNode_brch            => plt_morph%LeafAreaNode_brch   , &
-    CanopyLeafALyr_pft           => plt_morph%CanopyLeafALyr_pft   , &
-    PlantPopulation_pft          => plt_site%PlantPopulation_pft       , &
-    ZERO                         => plt_site%ZERO     , &
-    SineLeafAngle                => plt_rad%SineLeafAngle        &
+    WDLF                         =>  plt_morph%WDLF    , &
+    SeedDepth_pft                =>  plt_morph%SeedDepth_pft   , &
+    MainBranchNum_pft            =>  plt_morph%MainBranchNum_pft     , &
+    CanopyLeafAreaByLayer_pft    =>  plt_morph%CanopyLeafAreaByLayer_pft   , &
+    PetioleLengthNode_brch       =>  plt_morph%PetioleLengthNode_brch   , &
+    CanopyStemALyr_brch          =>  plt_morph%CanopyStemALyr_brch   , &
+    BranchNumber_brch            =>  plt_morph%BranchNumber_brch    , &
+    InternodeHeightLive_brch     =>  plt_morph%InternodeHeightLive_brch  , &
+    CanopyHeightz_col            =>  plt_morph%CanopyHeightz_col      , &
+    CanopyHeight_pft             =>  plt_morph%CanopyHeight_pft     , &
+    HypoctoHeight_pft            =>  plt_morph%HypoctoHeight_pft   , &
+    CLASS                        =>  plt_morph%CLASS   , &
+    LeafAreaNode_brch            =>  plt_morph%LeafAreaNode_brch   , &
+    CanopyLeafALyr_pft           =>  plt_morph%CanopyLeafALyr_pft   , &
+    PlantPopulation_pft          =>  plt_site%PlantPopulation_pft       , &
+    ZERO                         =>  plt_site%ZERO     , &
+    SineLeafAngle                =>  plt_rad%SineLeafAngle        &
   )
 !   ALLOCATION OF LEAF AREA TO CANOPY LAYERS
 !
@@ -1640,8 +1639,8 @@ module PlantBranchMod
 !
       D555: DO N=NumOfLeafZenithSectors1,1,-1
         LeafElevation=SineLeafAngle(N)*CLASS(N,NZ)*LeafLength
-        HeightLeafBase=AMIN1(CanopyHeight_copy(NZ)+0.01_r8-LeafElevation,HeightLeafNode+TLGLF)
-        HeightLeafTip=AMIN1(CanopyHeight_copy(NZ)+0.01_r8,HeightLeafBase+LeafElevation)
+        HeightLeafLow=AMIN1(CanopyHeight_copy(NZ)+0.01_r8-LeafElevation,HeightLeafNode+TLGLF)
+        HeightLeafTip=AMIN1(CanopyHeight_copy(NZ)+0.01_r8,HeightLeafLow+LeafElevation)
         LU=0
         LL=0
         D550: DO L=NumOfCanopyLayers1,1,-1
@@ -1650,7 +1649,7 @@ module PlantBranchMod
             LNumHeightLeafTip=MAX(1,L)
             LU=1
           ENDIF
-          IF((HeightLeafBase.GT.CanopyHeightz_col(L-1).OR.CanopyHeightz_col(L-1).LE.ZERO).AND.LL.EQ.0)THEN
+          IF((HeightLeafLow.GT.CanopyHeightz_col(L-1).OR.CanopyHeightz_col(L-1).LE.ZERO).AND.LL.EQ.0)THEN
             LNumHeightLeafBase=MAX(1,L)
             LL=1
           ENDIF
@@ -1658,9 +1657,9 @@ module PlantBranchMod
         D570: DO L=LNumHeightLeafBase,LNumHeightLeafTip
           IF(LNumHeightLeafTip.EQ.LNumHeightLeafBase)THEN
             FRACL=CLASS(N,NZ)
-          ELSEIF(HeightLeafTip.GT.HeightLeafBase.AND.CanopyHeightz_col(L).GT.HeightLeafBase)THEN
+          ELSEIF(HeightLeafTip.GT.HeightLeafLow.AND.CanopyHeightz_col(L).GT.HeightLeafLow)THEN
             FRACL=CLASS(N,NZ)*(AMIN1(HeightLeafTip,CanopyHeightz_col(L)) &
-              -AMAX1(HeightLeafBase,CanopyHeightz_col(L-1)))/(HeightLeafTip-HeightLeafBase)
+              -AMAX1(HeightLeafLow,CanopyHeightz_col(L-1)))/(HeightLeafTip-HeightLeafLow)
           ELSE
             FRACL=CLASS(N,NZ)
           ENDIF
@@ -1859,7 +1858,7 @@ module PlantBranchMod
     TCelciusCanopy_pft                    =>  plt_ew%TCelciusCanopy_pft        , &
     LeafPetoNonstElmConc_brch             =>  plt_biom%LeafPetoNonstElmConc_brch    , &
     GrainChemElms_brch                    =>  plt_biom%GrainChemElms_brch    , &
-    StalkRsrveElms_brch                    =>  plt_biom%StalkRsrveElms_brch   , &
+    StalkRsrveElms_brch                   =>  plt_biom%StalkRsrveElms_brch   , &
     ZEROP                                 =>  plt_biom%ZEROP     , &
     GrainSeedBiomCMean_brch               =>  plt_allom%GrainSeedBiomCMean_brch    , &
     CNGR                                  =>  plt_allom%CNGR     , &
@@ -1869,12 +1868,12 @@ module PlantBranchMod
     iPlantPhenolType_pft                  =>  plt_pheno%iPlantPhenolType_pft   , &
     Hours4LeafOff_brch                    =>  plt_pheno%Hours4LeafOff_brch     , &
     HourFailGrainFill_brch                =>  plt_pheno%HourFailGrainFill_brch     , &
-    HourReq4LeafOff_brch            =>  plt_pheno%HourReq4LeafOff_brch    , &
-    GrainFillRate25C_pft                =>  plt_pheno%GrainFillRate25C_pft    , &
+    HourReq4LeafOff_brch                  =>  plt_pheno%HourReq4LeafOff_brch    , &
+    GrainFillRate25C_pft                  =>  plt_pheno%GrainFillRate25C_pft    , &
     SSTX                                  =>  plt_pheno%SSTX     , &
     iPlantPhenologyPattern_pft            =>  plt_pheno%iPlantPhenologyPattern_pft   , &
     HighTCLimtSeed_pft                    =>  plt_pheno%HighTCLimtSeed_pft     , &
-    dReproNodeNumNormByMatG_brch   =>  plt_pheno%dReproNodeNumNormByMatG_brch   , &
+    dReproNodeNumNormByMatG_brch          =>  plt_pheno%dReproNodeNumNormByMatG_brch   , &
     iPlantCalendar_brch                   =>  plt_pheno%iPlantCalendar_brch   , &
     TCelciusChill4Seed                    =>  plt_pheno%TCelciusChill4Seed     , &
     PlantPopulation_pft                   =>  plt_site%PlantPopulation_pft        , &
@@ -2135,11 +2134,11 @@ module PlantBranchMod
     FWODLE                                 =>  plt_allom%FWODLE    , &
     FWODBE                                 =>  plt_allom%FWODBE    , &
     GrainSeedBiomCMean_brch                =>  plt_allom%GrainSeedBiomCMean_brch      , &
-    HourReq4LeafOff_brch             =>  plt_pheno%HourReq4LeafOff_brch     , &
+    HourReq4LeafOff_brch                   =>  plt_pheno%HourReq4LeafOff_brch     , &
     iPlantPhenolType_pft                   =>  plt_pheno%iPlantPhenolType_pft    , &
-    iPlantRootProfile_pft               =>  plt_pheno%iPlantRootProfile_pft    , &
+    iPlantRootProfile_pft                  =>  plt_pheno%iPlantRootProfile_pft    , &
     Hours4LeafOff_brch                     =>  plt_pheno%Hours4LeafOff_brch      , &
-    HourReq4LeafOut_brch             =>  plt_pheno%HourReq4LeafOut_brch     , &
+    HourReq4LeafOut_brch                   =>  plt_pheno%HourReq4LeafOut_brch     , &
     iPlantPhenologyPattern_pft             =>  plt_pheno%iPlantPhenologyPattern_pft    , &
     doPlantLeaveOff_brch                   =>  plt_pheno%doPlantLeaveOff_brch     , &
     doInitPlant_pft                        =>  plt_pheno%doInitPlant_pft     , &
@@ -2175,7 +2174,7 @@ module PlantBranchMod
     LeafAreaLive_brch                      =>  plt_morph%LeafAreaLive_brch     , &
     LeafAreaNode_brch                      =>  plt_morph%LeafAreaNode_brch     , &
     ShootNodeNumber_brch                   =>  plt_morph%ShootNodeNumber_brch     , &
-    NodeNum2InitFloral_brch            =>  plt_morph%NodeNum2InitFloral_brch     , &
+    NodeNum2InitFloral_brch                =>  plt_morph%NodeNum2InitFloral_brch     , &
     SeedNumberSet_brch                     =>  plt_morph%SeedNumberSet_brch       &
   )
 !   RESET PHENOLOGY AT EMERGENCE ('Hours4Leafout_brch' > 'VRNL')
@@ -2485,9 +2484,9 @@ module PlantBranchMod
     iDayPlanting_pft                =>  plt_distb%iDayPlanting_pft  , &
     iYearPlanting_pft               =>  plt_distb%iYearPlanting_pft   , &
     iYearCurrent                    =>  plt_site%iYearCurrent    , &
-    ZEROS2                          => plt_site%ZEROS2   , &
+    ZEROS2                          =>  plt_site%ZEROS2   , &
     DayLenthCurrent                 =>  plt_site%DayLenthCurrent    , &
-    k_woody_litr                    => pltpar%k_woody_litr, &    
+    k_woody_litr                    =>  pltpar%k_woody_litr, &    
     NU                              =>  plt_site%NU      , &
     FracHour4LeafoffRemob           =>  plt_allom%FracHour4LeafoffRemob   , &
     FWODRE                          =>  plt_allom%FWODRE , &
@@ -2519,8 +2518,8 @@ module PlantBranchMod
     iPlantRootProfile_pft           =>  plt_pheno%iPlantRootProfile_pft , &
     iPlantPhenolType_pft            =>  plt_pheno%iPlantPhenolType_pft , &
     doInitLeafOut_brch              =>  plt_pheno%doInitLeafOut_brch  , &
-    HourCounter4LeafOut_brch        =>   plt_pheno%HourCounter4LeafOut_brch  , &
-    NGTopRootLayer_pft              =>   plt_morph%NGTopRootLayer_pft   , &
+    HourCounter4LeafOut_brch        =>  plt_pheno%HourCounter4LeafOut_brch  , &
+    NGTopRootLayer_pft              =>  plt_morph%NGTopRootLayer_pft   , &
     MainBranchNum_pft               =>  plt_morph%MainBranchNum_pft    , &
     MaxSoiL4Root                    =>  plt_morph%MaxSoiL4Root      &
   )
@@ -2906,7 +2905,8 @@ module PlantBranchMod
 !------------------------------------------------------------------------------------------
 
   subroutine ComputRAutoAfEmergence(NB,NZ,DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX,CO2F,&
-    CH2O,TFN5,WFNG,WFNSG,ShootStructN,ZADDB,CNPG,PADDB,RCO2C,RMNCS,RMxess_brch,NonStructalC4Growth_brch,Rauto4Nassim_brch)
+    CH2O,TFN5,WFNG,WFNSG,ShootStructN,ZADDB,CNPG,PADDB,RCO2C,RMNCS,RMxess_brch,&
+    NonStructalC4Growth_brch,Rauto4Nassim_brch)
   implicit none
   integer, intent(in) :: NB,NZ
   real(r8), intent(out) :: ZADDB
@@ -2928,10 +2928,10 @@ module PlantBranchMod
     Eco_GPP_col                        =>  plt_bgcr%Eco_GPP_col    , &
     GrossCO2Fix_pft                    =>  plt_bgcr%GrossCO2Fix_pft   , &
     CanopyPlusNoduRespC_pft            =>  plt_bgcr%CanopyPlusNoduRespC_pft   , &
-    NonstructElm_brch                =>  plt_biom%NonstructElm_brch  , &
+    NonstructElm_brch                  =>  plt_biom%NonstructElm_brch  , &
     LeafPetoNonstElmConc_brch          =>  plt_biom%LeafPetoNonstElmConc_brch  , &
     ZERO                               =>  plt_site%ZERO     , &
-    iPlantRootProfile_pft           =>  plt_pheno%iPlantRootProfile_pft , &
+    iPlantRootProfile_pft              =>  plt_pheno%iPlantRootProfile_pft , &
     fTgrowCanP                         =>  plt_pheno%fTgrowCanP   , &
     iPlantPhenolType_pft               =>  plt_pheno%iPlantPhenolType_pft , &
     C4PhotosynDowreg_brch              =>  plt_photo%C4PhotosynDowreg_brch    &
@@ -3107,14 +3107,14 @@ module PlantBranchMod
   associate(                                                                            &
     LeafPetoNonstElmConc_brch          =>  plt_biom%LeafPetoNonstElmConc_brch   , &
     NonstructElm_brch                  =>  plt_biom%NonstructElm_brch   , &
-    iPlantRootProfile_pft           =>  plt_pheno%iPlantRootProfile_pft  , &
+    iPlantRootProfile_pft              =>  plt_pheno%iPlantRootProfile_pft  , &
     fTgrowRootP                        =>  plt_pheno%fTgrowRootP    , &
     RootAutoRO2Limiter_pvr             =>  plt_rbgc%RootAutoRO2Limiter_pvr     , &
     iPlantPhenolType_pft               =>  plt_pheno%iPlantPhenolType_pft  , &
     CO2NetFix_pft                      =>  plt_bgcr%CO2NetFix_pft     , &
     RootRespPotential_vr               =>  plt_rbgc%RootRespPotential_vr    , &
-    RCO2N_pvr                              =>  plt_rbgc%RCO2N_pvr    , &
-    RCO2A_pvr                              =>  plt_rbgc%RCO2A_pvr    , &
+    RCO2N_pvr                          =>  plt_rbgc%RCO2N_pvr    , &
+    RCO2A_pvr                          =>  plt_rbgc%RCO2A_pvr    , &
     ZERO                               =>  plt_site%ZERO      , &
     NGTopRootLayer_pft                 =>  plt_morph%NGTopRootLayer_pft     , &
     C4PhotosynDowreg_brch              =>  plt_photo%C4PhotosynDowreg_brch     &
@@ -3286,13 +3286,13 @@ module PlantBranchMod
   REAL(R8) :: GrowthChemElmt(NumPlantChemElms)
 
   associate(                                                                &
-    NumCogrowNode      =>   plt_morph%NumCogrowNode ,   &        
+    NumCogrowNode                =>   plt_morph%NumCogrowNode ,   &        
     LeafAreaNode_brch            =>   plt_morph%LeafAreaNode_brch    , &    
     LeafAreaLive_brch            =>   plt_morph%LeafAreaLive_brch   , &    
     SLA1                         =>   plt_morph%SLA1    , &
     LeafElmntNode_brch           =>   plt_biom%LeafElmntNode_brch     , &    
     LeafProteinCNode_brch        =>   plt_biom%LeafProteinCNode_brch      , &    
-    KHiestGroLeafNode_brch              =>   plt_pheno%KHiestGroLeafNode_brch   , &        
+    KHiestGroLeafNode_brch       =>   plt_pheno%KHiestGroLeafNode_brch   , &        
     ZEROL                        =>   plt_biom%ZEROL     , &    
     rCNNonstructRemob_pft        =>   plt_allom%rCNNonstructRemob_pft    , &
     rCPNonstructRemob_pft        =>   plt_allom%rCPNonstructRemob_pft     , &    
@@ -3369,7 +3369,7 @@ module PlantBranchMod
   REAL(R8) :: SSL
   
   associate(                           &
-    NumCogrowNode      =>   plt_morph%NumCogrowNode ,   &      
+    NumCogrowNode                =>   plt_morph%NumCogrowNode ,   &      
     PetioleLengthNode_brch       =>   plt_morph%PetioleLengthNode_brch   , &    
     PetoLen2Mass_pft             =>   plt_morph%PetoLen2Mass_pft    , &    
     SinePetioleAngle_pft         =>   plt_morph%SinePetioleAngle_pft   , &
@@ -3381,7 +3381,7 @@ module PlantBranchMod
     rCPNonstructRemob_pft        =>  plt_allom%rCPNonstructRemob_pft     , &    
     FNOD                         =>  plt_allom%FNOD     , &
     PlantPopulation_pft          =>  plt_site%PlantPopulation_pft        , &    
-    KHiestGroLeafNode_brch              =>  plt_pheno%KHiestGroLeafNode_brch     &        
+    KHiestGroLeafNode_brch       =>  plt_pheno%KHiestGroLeafNode_brch     &        
   )
 
   IF(GrowthPetiole(ielmc).GT.0.0_r8)THEN
@@ -3448,7 +3448,7 @@ module PlantBranchMod
   real(r8) :: StalkLenGrowth
 
   associate(                                                       &
-    NumCogrowNode      =>   plt_morph%NumCogrowNode,    &  
+    NumCogrowNode                =>   plt_morph%NumCogrowNode,    &  
     NodeLenPergC                 =>   plt_morph%NodeLenPergC    , &      
     SineBranchAngle_pft          =>   plt_morph%SineBranchAngle_pft   , &    
     InternodeHeightDying_brch    =>   plt_morph%InternodeHeightDying_brch  , &
@@ -3457,7 +3457,7 @@ module PlantBranchMod
     StalkChemElms_brch           =>   plt_biom%StalkChemElms_brch   , &
     PlantPopulation_pft          =>   plt_site%PlantPopulation_pft        , &          
     iPlantCalendar_brch          =>   plt_pheno%iPlantCalendar_brch   , &              
-    KHiestGroLeafNode_brch              =>   plt_pheno%KHiestGroLeafNode_brch     &        
+    KHiestGroLeafNode_brch       =>   plt_pheno%KHiestGroLeafNode_brch     &        
   )
 
   IF(iPlantCalendar_brch(ipltcal_Emerge,NB,NZ).EQ.0)THEN
@@ -3542,11 +3542,11 @@ module PlantBranchMod
     fTgrowCanP                =>  plt_pheno%fTgrowCanP              , &  
     iPlantTurnoverPattern_pft =>  plt_pheno%iPlantTurnoverPattern_pft   , &    
     HoursDoingRemob_brch      =>  plt_pheno%HoursDoingRemob_brch    , &
-    KHiestGroLeafNode_brch              =>  plt_pheno%KHiestGroLeafNode_brch   , &    
+    KHiestGroLeafNode_brch    =>  plt_pheno%KHiestGroLeafNode_brch   , &    
     iPlantPhenologyPattern_pft=>  plt_pheno%iPlantPhenologyPattern_pft   , &   
-    iPlantRootProfile_pft  =>  plt_pheno%iPlantRootProfile_pft   , &     
+    iPlantRootProfile_pft     =>  plt_pheno%iPlantRootProfile_pft   , &     
     iPlantBranchState_brch    =>  plt_pheno%iPlantBranchState_brch    , &
-    KLowestGroLeafNode_brch =>  plt_pheno%KLowestGroLeafNode_brch   , &    
+    KLowestGroLeafNode_brch   =>  plt_pheno%KLowestGroLeafNode_brch   , &    
     NumOfBranches_pft         =>  plt_morph%NumOfBranches_pft     , &    
     MainBranchNum_pft         =>  plt_morph%MainBranchNum_pft      , &         
     BranchNumber_brch         =>  plt_morph%BranchNumber_brch    , &        
@@ -3690,7 +3690,7 @@ module PlantBranchMod
     ZEROP                        =>  plt_biom%ZEROP     , &    
     PetioleElmntNode_brch        =>  plt_biom%PetioleElmntNode_brch    , &    
     LeafProteinCNode_brch        =>  plt_biom%LeafProteinCNode_brch      , &    
-    NonstructElm_brch          =>  plt_biom%NonstructElm_brch    , &    
+    NonstructElm_brch            =>  plt_biom%NonstructElm_brch    , &    
     LeafChemElms_brch            =>  plt_biom%LeafChemElms_brch   , &    
     PetioleProteinCNode_brch     =>  plt_biom%PetioleProteinCNode_brch    , &
     PetioleChemElmRemob_brch     =>  plt_biom%PetioleChemElmRemob_brch   , &    
@@ -3708,7 +3708,7 @@ module PlantBranchMod
     doRemobilization_brch        =>  plt_pheno%doRemobilization_brch    , &    
     PetioleChemElmRemobFlx_brch  =>  plt_pheno%PetioleChemElmRemobFlx_brch    , &    
     RefLeafAppearRate_pft        =>  plt_pheno%RefLeafAppearRate_pft    , &    
-    KHiestGroLeafNode_brch              =>  plt_pheno%KHiestGroLeafNode_brch      , &    
+    KHiestGroLeafNode_brch       =>  plt_pheno%KHiestGroLeafNode_brch      , &    
     LeafElmntRemobFlx_brch       =>  plt_pheno%LeafElmntRemobFlx_brch    , &    
     fTgrowCanP                   =>  plt_pheno%fTgrowCanP                &  
   )    

@@ -16,8 +16,8 @@
   real(r8), PARAMETER :: CURV4=4.0_r8*CURV
   real(r8), PARAMETER :: ELEC3=4.5_r8       !e- requirement for CO2 fixed by rubisco (umol e- umol CO2)
   real(r8), PARAMETER :: ELEC4=3.0_r8       !e- requirement for CO2 fixed by PEP carboxylase (umol e- umol CO2)
-  real(r8), PARAMETER :: CNKI=1.0E+02_r8    !nonstruct N inhibition constant on rubisco (g N g-1 C),1.0E+02_r8
-  real(r8), PARAMETER :: CPKI=1.0E+03_r8    !nonstruct P inhibition constant on rubisco (g P g-1 C),1.0E+03_r8
+  real(r8), PARAMETER :: CNKI=1.0E+03_r8    !nonstruct N inhibition constant on rubisco (g N g-1 C),1.0E+02_r8
+  real(r8), PARAMETER :: CPKI=1.0E+04_r8    !nonstruct P inhibition constant on rubisco (g P g-1 C),1.0E+03_r8
   real(r8), PARAMETER :: RSMY=2.78E-03_r8   !minimum stomatal resistance for CO2 uptake (h m-1)
   real(r8), PARAMETER :: ATRPZ=276.9_r8     !hours to full dehardening of conifers in spring (h)
   real(r8), PARAMETER :: COMP4=0.5_r8       !C4 CO2 compensation point (uM)
@@ -625,11 +625,6 @@
       +LeafPetoNonstElmConc_brch(ielmc,NB,NZ)/CNKI) &
       ,LeafPetoNonstElmConc_brch(ielmp,NB,NZ)/(LeafPetoNonstElmConc_brch(ielmp,NB,NZ)&
       +LeafPetoNonstElmConc_brch(ielmc,NB,NZ)/CPKI))
-    if(NZ==1)then  
-    write(187,*)etimer%get_curr_doy(),NB,RubiscoActivity_brch(NB,NZ)
-    else
-    write(188,*)etimer%get_curr_doy(),NB,RubiscoActivity_brch(NB,NZ)
-    endif
   ELSE
     RubiscoActivity_brch(NB,NZ)=1.0_r8
   ENDIF
@@ -671,6 +666,12 @@
 !     LeafAreaNode_brch,WGLF,LeafProteinCNode_brch=leaf area,C mass,protein mass
 !     ProteinPerLeafArea=leaf protein surficial density
 !
+  if(NZ==1)then  
+    write(187,*)etimer%get_curr_doy(),NB,RubiscoActivity_brch(NB,NZ)
+  else
+    write(188,*)etimer%get_curr_doy(),NB,RubiscoActivity_brch(NB,NZ)
+  endif
+
   IF(iPlantBranchState_brch(NB,NZ).EQ.iLive)THEN
     call PhotosisOnLiveBranch(NB,NZ,CH2O,TFN_Carboxy,TFN_Oxy,TFN_eTransp,Km4RubOxy)
   ENDIF

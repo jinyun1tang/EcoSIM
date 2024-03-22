@@ -58,8 +58,8 @@ module HfuncsMod
     iPlantBranchState_brch           =>  plt_pheno%iPlantBranchState_brch  , &
     iPlantCalendar_brch              =>  plt_pheno%iPlantCalendar_brch , &
     HoursCanopyPSITooLow             =>  plt_pheno%HoursCanopyPSITooLow   , &
-    KHiestGroLeafNode_brch                  =>  plt_pheno%KHiestGroLeafNode_brch , &
-    iPlantRootProfile_pft         =>  plt_pheno%iPlantRootProfile_pft , &
+    KHiestGroLeafNode_brch           =>  plt_pheno%KHiestGroLeafNode_brch , &
+    iPlantRootProfile_pft            =>  plt_pheno%iPlantRootProfile_pft , &
     DayLenthCurrent                  =>  plt_site%DayLenthCurrent    , &
     DATAP                            =>  plt_site%DATAP   , &
     PPT                              =>  plt_site%PPT     , &
@@ -69,7 +69,7 @@ module HfuncsMod
     KLeafNumber_brch                 =>  plt_morph%KLeafNumber_brch , &
     NumOfLeaves_brch                 =>  plt_morph%NumOfLeaves_brch  , &
     NumOfBranches_pft                =>  plt_morph%NumOfBranches_pft    , &
-    MainBranchNum_pft              =>  plt_morph%MainBranchNum_pft      &
+    MainBranchNum_pft                =>  plt_morph%MainBranchNum_pft      &
   )
   D9985: DO NZ=1,NP
 
@@ -369,12 +369,12 @@ module HfuncsMod
     ShootChemElms_pft               =>  plt_biom%ShootChemElms_pft   , &
     NoduleNonstructCconc_pft        =>  plt_biom%NoduleNonstructCconc_pft   , &
     LeafPetoNonstElmConc_brch       =>  plt_biom%LeafPetoNonstElmConc_brch   , &
-    CanopyNonstructElmConc_pft  =>  plt_biom%CanopyNonstructElmConc_pft   , &
-    CanopyNonstructElms_pft     =>  plt_biom%CanopyNonstructElms_pft   , &
-    NoduleNonstructElm_brch       =>  plt_biom%NoduleNonstructElm_brch   , &
-    RootMycoNonstructElm_vr       =>  plt_biom%RootMycoNonstructElm_vr   , &
-    NonstructElm_brch             =>  plt_biom%NonstructElm_brch   , &
-    RootNonstructElmConc_pvr  =>  plt_biom%RootNonstructElmConc_pvr   , &
+    CanopyNonstructElmConc_pft      =>  plt_biom%CanopyNonstructElmConc_pft   , &
+    CanopyNonstructElms_pft         =>  plt_biom%CanopyNonstructElms_pft   , &
+    NoduleNonstructElm_brch         =>  plt_biom%NoduleNonstructElm_brch   , &
+    RootMycoNonstructElm_vr         =>  plt_biom%RootMycoNonstructElm_vr   , &
+    NonstructElm_brch               =>  plt_biom%NonstructElm_brch   , &
+    RootNonstructElmConc_pvr        =>  plt_biom%RootNonstructElmConc_pvr   , &
     ZEROL                           =>  plt_biom%ZEROL    , &
     ZEROP                           =>  plt_biom%ZEROP    , &
     RootStructBiomC_vr              =>  plt_biom%RootStructBiomC_vr   , &
@@ -384,7 +384,7 @@ module HfuncsMod
     NU                              =>  plt_site%NU       , &
     iPlantBranchState_brch          =>  plt_pheno%iPlantBranchState_brch   , &
     iPlantCalendar_brch             =>  plt_pheno%iPlantCalendar_brch  , &
-    MainBranchNum_pft             =>  plt_morph%MainBranchNum_pft     , &
+    MainBranchNum_pft               =>  plt_morph%MainBranchNum_pft     , &
     PrimRootDepth                   =>  plt_morph%PrimRootDepth   , &
     MY                              =>  plt_morph%MY      , &
     CanopyLeafArea_pft              =>  plt_morph%CanopyLeafArea_pft   , &
@@ -524,10 +524,10 @@ module HfuncsMod
     ALAT                            =>  plt_site%ALAT    , &
     doPlantLeafOut_brch             =>  plt_pheno%doPlantLeafOut_brch  , &
     iPlantCalendar_brch             =>  plt_pheno%iPlantCalendar_brch , &
-    iPlantRootProfile_pft        =>  plt_pheno%iPlantRootProfile_pft , &
+    iPlantRootProfile_pft           =>  plt_pheno%iPlantRootProfile_pft , &
     Hours4ShortenPhotoPeriod_brch   =>  plt_pheno%Hours4ShortenPhotoPeriod_brch   , &
     Hours4Leafout_brch              =>  plt_pheno%Hours4Leafout_brch   , &
-    HourReq4LeafOut_brch      =>  plt_pheno%HourReq4LeafOut_brch  , &
+    HourReq4LeafOut_brch            =>  plt_pheno%HourReq4LeafOut_brch  , &
     iPlantPhenolType_pft            =>  plt_pheno%iPlantPhenolType_pft , &
     TCelsChill4Leaf_pft             =>  plt_pheno%TCelsChill4Leaf_pft   , &
     Hours4LenthenPhotoPeriod_brch   =>  plt_pheno%Hours4LenthenPhotoPeriod_brch   , &
@@ -535,7 +535,7 @@ module HfuncsMod
     TCelciusChill4Seed              =>  plt_pheno%TCelciusChill4Seed   , &
     TCelcius4LeafOffHarden_pft      =>  plt_pheno%TCelcius4LeafOffHarden_pft    , &
     Hours4LeafOff_brch              =>  plt_pheno%Hours4LeafOff_brch   , &
-    HourReq4LeafOff_brch      =>  plt_pheno%HourReq4LeafOff_brch  , &
+    HourReq4LeafOff_brch            =>  plt_pheno%HourReq4LeafOff_brch  , &
     doPlantLeaveOff_brch            =>  plt_pheno%doPlantLeaveOff_brch    &
   )
 !
@@ -804,7 +804,7 @@ module HfuncsMod
     doPlantLeafOut_brch                  =>  plt_pheno%doPlantLeafOut_brch   , &
     NumOfLeaves_brch                     =>  plt_morph%NumOfLeaves_brch   , &
     NodeNumNormByMatgrp_brch             =>  plt_pheno%NodeNumNormByMatgrp_brch   , &
-    dReproNodeNumNormByMatG_brch  =>  plt_pheno%dReproNodeNumNormByMatG_brch  , &
+    dReproNodeNumNormByMatG_brch         =>  plt_pheno%dReproNodeNumNormByMatG_brch  , &
     doSenescence_brch                    =>  plt_pheno%doSenescence_brch   , &
     LeafNumberAtFloralInit_brch          =>  plt_pheno%LeafNumberAtFloralInit_brch  , &
     iPlantDevelopPattern_pft             =>  plt_pheno%iPlantDevelopPattern_pft  , &
@@ -815,20 +815,20 @@ module HfuncsMod
     TotalNodeNumNormByMatgrp_brch        =>  plt_pheno%TotalNodeNumNormByMatgrp_brch  , &
     MatureGroup_brch                     =>  plt_pheno%MatureGroup_brch  , &
     iPlantPhenolType_pft                 =>  plt_pheno%iPlantPhenolType_pft  , &
-    HourReq4LeafOut_brch           =>  plt_pheno%HourReq4LeafOut_brch   , &
+    HourReq4LeafOut_brch                 =>  plt_pheno%HourReq4LeafOut_brch   , &
     iPlantPhotoperiodType_pft            =>  plt_pheno%iPlantPhotoperiodType_pft  , &
     doInitLeafOut_brch                   =>  plt_pheno%doInitLeafOut_brch   , &
     MatureGroup_pft                      =>  plt_pheno%MatureGroup_pft , &
     PlantO2Stress                        =>  plt_pheno%PlantO2Stress    , &
     Hours4Leafout_brch                   =>  plt_pheno%Hours4Leafout_brch    , &
     Hours4LeafOff_brch                   =>  plt_pheno%Hours4LeafOff_brch    , &
-    HourReq4LeafOff_brch           =>  plt_pheno%HourReq4LeafOff_brch   , &
+    HourReq4LeafOff_brch                 =>  plt_pheno%HourReq4LeafOff_brch   , &
     RefNodeInitRate_pft                  =>  plt_pheno%RefNodeInitRate_pft   , &
     CanopyHeight_pft                     =>  plt_morph%CanopyHeight_pft     , &
     ShootNodeNumber_brch                 =>  plt_morph%ShootNodeNumber_brch  , &
-    NodeNum2InitFloral_brch          =>  plt_morph%NodeNum2InitFloral_brch  , &
+    NodeNum2InitFloral_brch              =>  plt_morph%NodeNum2InitFloral_brch  , &
     NodeNumberAtAnthesis_brch            =>  plt_morph%NodeNumberAtAnthesis_brch  , &
-    MainBranchNum_pft                  =>  plt_morph%MainBranchNum_pft      &
+    MainBranchNum_pft                    =>  plt_morph%MainBranchNum_pft      &
   )
   IF(iPlantCalendar_brch(ipltcal_Emerge,NB,NZ).EQ.0)THEN
     !plant emergence
