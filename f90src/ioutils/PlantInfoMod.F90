@@ -356,7 +356,7 @@ implicit none
       CriticalPhotoPeriod_pft(NZ,NY,NX)=DayLenthMax(NY,NX)
     ENDIF
     D5: DO NB=1,NumOfCanopyLayers
-      IF(iPlantPhenolType_pft(NZ,NY,NX).EQ.iphenotyp_evgreen.AND.iPlantPhenologyPattern_pft(NZ,NY,NX).NE.iplt_annual)THEN
+      IF(iPlantPhenolType_pft(NZ,NY,NX).EQ.iphenotyp_evgreen.AND.iPlantPhenolPattern_pft(NZ,NY,NX).NE.iplt_annual)THEN
         HourReq4LeafOut_brch(NB,NZ,NY,NX)=AMIN1(4380.0_r8,VRNLI+144.0_r8*PlantInitThermoAdaptZone(NZ,NY,NX)*(NB-1))
         HourReq4LeafOff_brch(NB,NZ,NY,NX)=AMIN1(4380.0_r8,VRNXI+144.0_r8*PlantInitThermoAdaptZone(NZ,NY,NX)*(NB-1))
       ELSE
@@ -387,7 +387,7 @@ implicit none
   DATAPI(NZ,NY,NX)=loc
   call ncd_getvar(pft_nfid, 'ICTYP', loc, iPlantPhotosynthesisType(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'IGTYP', loc, iPlantRootProfile_pft(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'ISTYP', loc, iPlantPhenologyPattern_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'ISTYP', loc, iPlantPhenolPattern_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'IDTYP', loc, iPlantDevelopPattern_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'INTYP', loc, iPlantNfixType(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'IWTYP', loc, iPlantPhenolType_pft(NZ,NY,NX))
@@ -527,7 +527,7 @@ implicit none
 
 !   iPlantPhotosynthesisType=photosynthesis type:3=C3,4=C4
 !   iPlantRootProfile_pft=root profile:0=shallow (eg bryophytes),1=intermediate(eg herbs),2=deep (eg trees)
-!   iPlantPhenologyPattern_pft=growth habit:0=annual,1=perennial
+!   iPlantPhenolPattern_pft=growth habit:0=annual,1=perennial
 !   iPlantDevelopPattern_pft=growth habit:0=determinate,1=indetermimate
 !   iPlantNfixType=N2 fixation:1,2,3=rapid to slow root symbiosis (e.g.legumes),
 !   4,5,6=rapid to slow canopy symbiosis (e.g. cyanobacteria)
@@ -567,7 +567,7 @@ implicit none
   end select
   call writefixsl(nu_plt,'Root profile pattern',strval,40)
 
-  select case (iPlantPhenologyPattern_pft(NZ,NY,NX))
+  select case (iPlantPhenolPattern_pft(NZ,NY,NX))
   case (0)
     strval='Annual'
   case (1)
@@ -610,11 +610,11 @@ implicit none
   select case(iPlantPhenolType_pft(NZ,NY,NX))
   case (iphenotyp_evgreen)
     strval='Evergreen'
-  case (iphenotyp_coldecidu)
+  case (iphenotyp_coldecid)
     strval='Cold deciduous'
   case (iphenotyp_drouhtdecidu)
     strval='Drought deciduous'
-  case (iphenotyp_coldroutdecidu)
+  case (iphenotyp_coldroutdecid)
     strval='Cold&drought-tolerant deciduous'
   case default
     strval='Not defined'

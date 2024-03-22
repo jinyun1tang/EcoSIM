@@ -864,7 +864,7 @@ implicit none
             SecndRootXNum_rpvr(N,L1,NR,NZ,NY,NX)=SecndRootXNum_rpvr(N,L1,NR,NZ,NY,NX)+FX*SecndRootXNum_rpvr(N,L0,NR,NZ,NY,NX)
           ENDDO
           DO NE=1,NumPlantChemElms
-             RootMycoNonstructElm_vr(NE,N,L1,NZ,NY,NX)= RootMycoNonstructElm_vr(NE,N,L1,NZ,NY,NX)+FX* RootMycoNonstructElm_vr(NE,N,L0,NZ,NY,NX)
+             RootMycoNonstElm_pvr(NE,N,L1,NZ,NY,NX)= RootMycoNonstElm_pvr(NE,N,L1,NZ,NY,NX)+FX* RootMycoNonstElm_pvr(NE,N,L0,NZ,NY,NX)
           ENDDO
           RootStructBiomC_vr(N,L1,NZ,NY,NX)=RootStructBiomC_vr(N,L1,NZ,NY,NX)+FX*RootStructBiomC_vr(N,L0,NZ,NY,NX)
           PopuPlantRootC_vr(N,L1,NZ,NY,NX)= PopuPlantRootC_vr(N,L1,NZ,NY,NX)+FX* PopuPlantRootC_vr(N,L0,NZ,NY,NX)
@@ -876,9 +876,9 @@ implicit none
           RootVolume_vr(N,L1,NZ,NY,NX)=RootVolume_vr(N,L1,NZ,NY,NX)+FX*RootVolume_vr(N,L0,NZ,NY,NX)
           RootVH2O_vr(N,L1,NZ,NY,NX)=RootVH2O_vr(N,L1,NZ,NY,NX)+FX*RootVH2O_vr(N,L0,NZ,NY,NX)
           PrimRootRadius_pvr(N,L1,NZ,NY,NX)=PrimRootRadius_pvr(N,L1,NZ,NY,NX)+FX*PrimRootRadius_pvr(N,L0,NZ,NY,NX)
-          SecndRootRadius_pvr(N,L1,NZ,NY,NX)=SecndRootRadius_pvr(N,L1,NZ,NY,NX)+FX*SecndRootRadius_pvr(N,L0,NZ,NY,NX)
+          Radius2ndRoot_pvr(N,L1,NZ,NY,NX)=Radius2ndRoot_pvr(N,L1,NZ,NY,NX)+FX*Radius2ndRoot_pvr(N,L0,NZ,NY,NX)
           RootAreaPerPlant_vr(N,L1,NZ,NY,NX)=RootAreaPerPlant_vr(N,L1,NZ,NY,NX)+FX*RootAreaPerPlant_vr(N,L0,NZ,NY,NX)
-          AveSecndRootLen(N,L1,NZ,NY,NX)=AveSecndRootLen(N,L1,NZ,NY,NX)+FX*AveSecndRootLen(N,L0,NZ,NY,NX)
+          AveLen2ndRoot_pvr(N,L1,NZ,NY,NX)=AveLen2ndRoot_pvr(N,L1,NZ,NY,NX)+FX*AveLen2ndRoot_pvr(N,L0,NZ,NY,NX)
         ENDDO
         DO NE=1,NumPlantChemElms
           RootNodueChemElm_pvr(NE,L1,NZ,NY,NX)=RootNodueChemElm_pvr(NE,L1,NZ,NY,NX)+FX*RootNodueChemElm_pvr(NE,L0,NZ,NY,NX)
@@ -1045,7 +1045,7 @@ implicit none
             SecndRootXNum_rpvr(N,L0,NR,NZ,NY,NX)=FY*SecndRootXNum_rpvr(N,L0,NR,NZ,NY,NX)
           ENDDO
           DO NE=1,NumPlantChemElms
-             RootMycoNonstructElm_vr(NE,N,L0,NZ,NY,NX)=FY* RootMycoNonstructElm_vr(NE,N,L0,NZ,NY,NX)
+             RootMycoNonstElm_pvr(NE,N,L0,NZ,NY,NX)=FY* RootMycoNonstElm_pvr(NE,N,L0,NZ,NY,NX)
           ENDDO
           RootStructBiomC_vr(N,L0,NZ,NY,NX)=FY*RootStructBiomC_vr(N,L0,NZ,NY,NX)
            PopuPlantRootC_vr(N,L0,NZ,NY,NX)=FY* PopuPlantRootC_vr(N,L0,NZ,NY,NX)
@@ -1057,9 +1057,9 @@ implicit none
           RootVolume_vr(N,L0,NZ,NY,NX)=FY*RootVolume_vr(N,L0,NZ,NY,NX)
           RootVH2O_vr(N,L0,NZ,NY,NX)=FY*RootVH2O_vr(N,L0,NZ,NY,NX)
           PrimRootRadius_pvr(N,L0,NZ,NY,NX)=FY*PrimRootRadius_pvr(N,L0,NZ,NY,NX)
-          SecndRootRadius_pvr(N,L0,NZ,NY,NX)=FY*SecndRootRadius_pvr(N,L0,NZ,NY,NX)
+          Radius2ndRoot_pvr(N,L0,NZ,NY,NX)=FY*Radius2ndRoot_pvr(N,L0,NZ,NY,NX)
           RootAreaPerPlant_vr(N,L0,NZ,NY,NX)=FY*RootAreaPerPlant_vr(N,L0,NZ,NY,NX)
-          AveSecndRootLen(N,L0,NZ,NY,NX)=FY*AveSecndRootLen(N,L0,NZ,NY,NX)
+          AveLen2ndRoot_pvr(N,L0,NZ,NY,NX)=FY*AveLen2ndRoot_pvr(N,L0,NZ,NY,NX)
         ENDDO
         DO NE=1,NumPlantChemElms
           RootNodueChemElm_pvr(NE,L0,NZ,NY,NX)=FY*RootNodueChemElm_pvr(NE,L0,NZ,NY,NX)
@@ -1258,9 +1258,9 @@ implicit none
             SecndRootXNum_rpvr(N,L0,NR,NZ,NY,NX)=SecndRootXNum_rpvr(N,L0,NR,NZ,NY,NX)-FXRTN2
           ENDDO
           DO NE=1,NumPlantChemElms
-             FXEPOOLR=FRO*RootMycoNonstructElm_vr(NE,N,L0,NZ,NY,NX)
-             RootMycoNonstructElm_vr(NE,N,L1,NZ,NY,NX)= RootMycoNonstructElm_vr(NE,N,L1,NZ,NY,NX)+FXEPOOLR
-             RootMycoNonstructElm_vr(NE,N,L0,NZ,NY,NX)= RootMycoNonstructElm_vr(NE,N,L0,NZ,NY,NX)-FXEPOOLR
+             FXEPOOLR=FRO*RootMycoNonstElm_pvr(NE,N,L0,NZ,NY,NX)
+             RootMycoNonstElm_pvr(NE,N,L1,NZ,NY,NX)= RootMycoNonstElm_pvr(NE,N,L1,NZ,NY,NX)+FXEPOOLR
+             RootMycoNonstElm_pvr(NE,N,L0,NZ,NY,NX)= RootMycoNonstElm_pvr(NE,N,L0,NZ,NY,NX)-FXEPOOLR
           ENDDO
 
           FXWTRTL=FRO*RootStructBiomC_vr(N,L0,NZ,NY,NX)
@@ -1293,15 +1293,15 @@ implicit none
           FXRRAD1=FRO*PrimRootRadius_pvr(N,L0,NZ,NY,NX)
           PrimRootRadius_pvr(N,L1,NZ,NY,NX)=PrimRootRadius_pvr(N,L1,NZ,NY,NX)+FXRRAD1
           PrimRootRadius_pvr(N,L0,NZ,NY,NX)=PrimRootRadius_pvr(N,L0,NZ,NY,NX)-FXRRAD1
-          FXRRAD2=FRO*SecndRootRadius_pvr(N,L0,NZ,NY,NX)
-          SecndRootRadius_pvr(N,L1,NZ,NY,NX)=SecndRootRadius_pvr(N,L1,NZ,NY,NX)+FXRRAD2
-          SecndRootRadius_pvr(N,L0,NZ,NY,NX)=SecndRootRadius_pvr(N,L0,NZ,NY,NX)-FXRRAD2
+          FXRRAD2=FRO*Radius2ndRoot_pvr(N,L0,NZ,NY,NX)
+          Radius2ndRoot_pvr(N,L1,NZ,NY,NX)=Radius2ndRoot_pvr(N,L1,NZ,NY,NX)+FXRRAD2
+          Radius2ndRoot_pvr(N,L0,NZ,NY,NX)=Radius2ndRoot_pvr(N,L0,NZ,NY,NX)-FXRRAD2
           FXRootAreaPerPlant_vr=FRO*RootAreaPerPlant_vr(N,L0,NZ,NY,NX)
           RootAreaPerPlant_vr(N,L1,NZ,NY,NX)=RootAreaPerPlant_vr(N,L1,NZ,NY,NX)+FXRootAreaPerPlant_vr
           RootAreaPerPlant_vr(N,L0,NZ,NY,NX)=RootAreaPerPlant_vr(N,L0,NZ,NY,NX)-FXRootAreaPerPlant_vr
-          FXRTLGA=FRO*AveSecndRootLen(N,L0,NZ,NY,NX)
-          AveSecndRootLen(N,L1,NZ,NY,NX)=AveSecndRootLen(N,L1,NZ,NY,NX)+FXRTLGA
-          AveSecndRootLen(N,L0,NZ,NY,NX)=AveSecndRootLen(N,L0,NZ,NY,NX)-FXRTLGA
+          FXRTLGA=FRO*AveLen2ndRoot_pvr(N,L0,NZ,NY,NX)
+          AveLen2ndRoot_pvr(N,L1,NZ,NY,NX)=AveLen2ndRoot_pvr(N,L1,NZ,NY,NX)+FXRTLGA
+          AveLen2ndRoot_pvr(N,L0,NZ,NY,NX)=AveLen2ndRoot_pvr(N,L0,NZ,NY,NX)-FXRTLGA
         ENDDO
 !
 !     ROOT NODULES

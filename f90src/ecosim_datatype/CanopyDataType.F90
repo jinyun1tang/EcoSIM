@@ -134,8 +134,8 @@ module CanopyDataType
   real(r8),target,allocatable ::  EarChemElms_brch(:,:,:,:,:)                 !branch ear element, [g d-2]
   real(r8),target,allocatable ::  GrainChemElms_brch(:,:,:,:,:)                  !branch grain element, [g d-2]
   real(r8),target,allocatable ::  LeafPetoNonstElmConc_brch(:,:,:,:,:)                    !branch nonstructural C concentration, [g d-2]
-  real(r8),target,allocatable ::  NoduleNonstructElm_brch(:,:,:,:,:)                  !branch nodule nonstructural C, [g d-2]
-  real(r8),target,allocatable ::  CanopyNoduleChemElm_brch(:,:,:,:,:)                  !branch nodule element, [g d-2]
+  real(r8),target,allocatable ::  NodulNonstElm_brch(:,:,:,:,:)                  !branch nodule nonstructural C, [g d-2]
+  real(r8),target,allocatable ::  CanopyNodulChemElm_brch(:,:,:,:,:)                  !branch nodule element, [g d-2]
   real(r8),target,allocatable ::  PetioleChemElmRemob_brch(:,:,:,:,:)                  !branch sheath structural element, [g d-2]
   real(r8),target,allocatable ::  SenecStalkChemElms_brch(:,:,:,:,:)                    !branch stalk structural C, [g d-2]
   real(r8),target,allocatable ::  LeafChemElmRemob_brch(:,:,:,:,:)                     !branch leaf structural element, [g d-2]
@@ -283,8 +283,8 @@ module CanopyDataType
   allocate(EarChemElms_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX));EarChemElms_brch=0._r8
   allocate(GrainChemElms_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX)); GrainChemElms_brch=0._r8
   allocate(LeafPetoNonstElmConc_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX));LeafPetoNonstElmConc_brch=0._r8
-  allocate(NoduleNonstructElm_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX));NoduleNonstructElm_brch=0._r8
-  allocate(CanopyNoduleChemElm_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX)); CanopyNoduleChemElm_brch=0._r8
+  allocate(NodulNonstElm_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX));NodulNonstElm_brch=0._r8
+  allocate(CanopyNodulChemElm_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX)); CanopyNodulChemElm_brch=0._r8
   allocate(PetioleChemElmRemob_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX));PetioleChemElmRemob_brch=0._r8
   allocate(SenecStalkChemElms_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX));SenecStalkChemElms_brch=0._r8
   allocate(LeafChemElmRemob_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX)); LeafChemElmRemob_brch=0._r8
@@ -433,8 +433,8 @@ module CanopyDataType
   call destroy(EarChemElms_brch)
   call destroy(GrainChemElms_brch)
   call destroy(LeafPetoNonstElmConc_brch)
-  call destroy(NoduleNonstructElm_brch)
-  call destroy(CanopyNoduleChemElm_brch)
+  call destroy(NodulNonstElm_brch)
+  call destroy(CanopyNodulChemElm_brch)
   call destroy(PetioleChemElmRemob_brch)
   call destroy(SenecStalkChemElms_brch)
   call destroy(LeafChemElmRemob_brch)

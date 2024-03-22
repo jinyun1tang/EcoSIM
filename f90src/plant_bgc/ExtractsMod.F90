@@ -55,7 +55,7 @@ module ExtractsMod
    LitrFallChemElm_pft      => plt_bgcr%LitrFallChemElm_pft      , &
    LitrFallChemElm_col      => plt_bgcr%LitrFallChemElm_col      , &
    LitrfalChemElemnts_vr    => plt_bgcr%LitrfalChemElemnts_vr       , &
-   LitrFallChemElm_pvr      => plt_bgcr%LitrFallChemElm_pvr       , &
+   LitfalChemElm_pvr      => plt_bgcr%LitfalChemElm_pvr       , &
    MaxSoiL4Root             => plt_morph%MaxSoiL4Root       , &
    CanopyStemA_lyr          => plt_morph%CanopyStemA_lyr     , &
    CanopyLAgrid_lyr         =>  plt_morph%CanopyLAgrid_lyr    , &
@@ -70,7 +70,7 @@ module ExtractsMod
 !   HCSNC,HZSNC,HPSNC=hourly PFT C,N,P LitrFall from grosub.f
 !   StandingDeadChemElm_col=total standing dead C,N,P mass
 !   WTSTG=PFT standing dead C,N,P mass
-!   LitrFallChemElm_pvr,=cumulative PFT C,N,P LitrFall from grosub.f
+!   LitfalChemElm_pvr,=cumulative PFT C,N,P LitrFall from grosub.f
 !   LitrfalChemElemnts_vr,=cumulative total C,N,P LitrFall
 !
     DO NE=1,NumPlantChemElms
@@ -82,7 +82,7 @@ module ExtractsMod
       DO K=1,pltpar%NumOfPlantLitrCmplxs
         DO NE=1,NumPlantChemElms
           DO  M=1,pltpar%jsken
-            LitrfalChemElemnts_vr(NE,M,K,L)=LitrfalChemElemnts_vr(NE,M,K,L)+LitrFallChemElm_pvr(NE,M,K,L,NZ)
+            LitrfalChemElemnts_vr(NE,M,K,L)=LitrfalChemElemnts_vr(NE,M,K,L)+LitfalChemElm_pvr(NE,M,K,L,NZ)
           enddo
         ENDDO
       ENDDO
@@ -154,7 +154,7 @@ module ExtractsMod
     trcg_air2root_flx_vr     => plt_rbgc%trcg_air2root_flx_vr , &
     trcg_TLP                 => plt_rbgc%trcg_TLP , &
     ROXYP                    => plt_rbgc%ROXYP  , &
-    RDFOME                   => plt_rbgc%RDFOME , &
+    RootMycoExudElm_pvr                   => plt_rbgc%RootMycoExudElm_pvr , &
     RUNNHP                   => plt_rbgc%RUNNHP , &
     RUNNOP                   => plt_rbgc%RUNNOP , &
     RUPP2P                   => plt_rbgc%RUPP2P , &
@@ -281,7 +281,7 @@ module ExtractsMod
 !
       DO K=1,jcplx
         DO NE=1,NumPlantChemElms
-          TDFOME(NE,K,L)=TDFOME(NE,K,L)-RDFOME(ielmc,N,K,L,NZ)
+          TDFOME(NE,K,L)=TDFOME(NE,K,L)-RootMycoExudElm_pvr(ielmc,N,K,L,NZ)
         ENDDO
       ENDDO
 !

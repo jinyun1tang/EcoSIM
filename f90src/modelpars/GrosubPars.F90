@@ -58,7 +58,7 @@ module GrosubPars
 !     VMXO=specific respiration rate by bacterial N2 fixers (g g-1 h-1)
 !     SPNDL=specific decomposition rate by canopy,root bacterial N2 fixers (g g-1 h-1)
 !     CCNGB,CCNGR=parameters to calculate nonstructural C,N,P exchange between bacteria and branch,root
-!     NoduleBiomCatInfection=initial bacterial mass at infection (g C m-2)
+!     NodulBiomCatInfection=initial bacterial mass at infection (g C m-2)
 !     CZKM,CPKM=Km for nonstructural N,P uptake by bacteria (g N,P g-1 C)
 !     RCCZR,RCCYR=min,max fractions for root C recycling
 !     RCCXR,RCCQR=max fractions for root N,P recycling
@@ -126,7 +126,7 @@ module GrosubPars
   real(r8) :: SPNDL
   real(r8) :: CCNGR
   real(r8) :: CCNGB
-  real(r8) :: NoduleBiomCatInfection
+  real(r8) :: NodulBiomCatInfection
   real(r8) :: CZKM
   real(r8) :: CPKM
   real(r8) :: RCCZR
@@ -295,7 +295,7 @@ module GrosubPars
   SPNDL=5.0E-04_r8
   CCNGR=2.5E-01_r8
   CCNGB=6.0E-04_r8
-  NoduleBiomCatInfection=1.0E-03_r8
+  NodulBiomCatInfection=1.0E-03_r8
   CZKM=2.5E-03_r8
   CPKM=2.5E-04_r8
   RCCZR=0.056_r8

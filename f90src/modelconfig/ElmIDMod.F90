@@ -119,9 +119,9 @@ implicit none
   integer, parameter :: iphotop_long   =2
 
   integer, parameter :: iphenotyp_evgreen=0
-  integer, parameter :: iphenotyp_coldecidu=1
+  integer, parameter :: iphenotyp_coldecid=1
   integer, parameter :: iphenotyp_drouhtdecidu=2
-  integer, parameter :: iphenotyp_coldroutdecidu=3
+  integer, parameter :: iphenotyp_coldroutdecid=3
 
   integer, parameter :: in2fixtyp_none=0
   integer, parameter :: in2fixtyp_root_fast=1
