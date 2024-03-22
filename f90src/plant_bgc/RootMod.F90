@@ -130,14 +130,14 @@ implicit none
 
 !     begin_execution
   associate(                            &
-    RootMycoNonstructElm_vr     =>   plt_biom%RootMycoNonstructElm_vr     , &
+    RootMycoNonstructElm_vr       =>   plt_biom%RootMycoNonstructElm_vr     , &
     RootStructBiomC_vr            =>   plt_biom%RootStructBiomC_vr     , &
     RootElmnts_pft                =>   plt_biom%RootElmnts_pft      , &
     ZEROP                         =>   plt_biom%ZEROP      , &
-    NonstructalElms_pft         =>   plt_biom%NonstructalElms_pft      , &
+    NonstructalElms_pft           =>   plt_biom%NonstructalElms_pft      , &
     FWODRE                        =>   plt_allom%FWODRE    , &
     RootBiomGrowthYield           =>   plt_allom%RootBiomGrowthYield     , &
-    iPlantRootProfile_pft      =>   plt_pheno%iPlantRootProfile_pft    , &
+    iPlantRootProfile_pft         =>   plt_pheno%iPlantRootProfile_pft    , &
     PSIRoot_vr                    =>   plt_ew%PSIRoot_vr       , &
     PSIRootTurg_vr                =>   plt_ew%PSIRootTurg_vr        , &
     RootGasLossDisturb_pft        =>   plt_bgcr%RootGasLossDisturb_pft    , &
@@ -1117,7 +1117,7 @@ implicit none
 ! begin_execution
   associate(                          &
     Root1stChemElm                  =>  plt_biom%Root1stChemElm     , &
-    RootNonstructElmConc_pvr  =>  plt_biom%RootNonstructElmConc_pvr     , &
+    RootNonstructElmConc_pvr        =>  plt_biom%RootNonstructElmConc_pvr     , &
     ZEROP                           =>  plt_biom%ZEROP      , &
     ZERO                            =>  plt_site%ZERO       , &
     icwood                          =>  pltpar%icwood       , &
@@ -1129,7 +1129,7 @@ implicit none
     RootAutoRO2Limiter_pvr          =>  plt_rbgc%RootAutoRO2Limiter_pvr       , &
     LitrFallChemElm_pvr             =>  plt_bgcr%LitrFallChemElm_pvr       , &
     iPlantCalendar_brch             =>  plt_pheno%iPlantCalendar_brch    , &
-    MainBranchNum_pft             =>  plt_morph%MainBranchNum_pft         &
+    MainBranchNum_pft               =>  plt_morph%MainBranchNum_pft         &
   )
 !
 !     PRIMARY ROOT GROWTH RESPIRATION FROM TOTAL - MAINTENANCE
@@ -1248,7 +1248,7 @@ implicit none
     Root1stChemElm               =>  plt_biom%Root1stChemElm      , &
     RootProteinC_pvr             =>  plt_biom%RootProteinC_pvr       , &
     PopuPlantRootC_vr            =>  plt_biom% PopuPlantRootC_vr      , &
-    RootMycoNonstructElm_vr    =>  plt_biom%RootMycoNonstructElm_vr      , &
+    RootMycoNonstructElm_vr      =>  plt_biom%RootMycoNonstructElm_vr      , &
     ZEROP                        =>  plt_biom%ZEROP       , &
     rCNNonstructRemob_pft        =>  plt_allom%rCNNonstructRemob_pft      , &
     rCPNonstructRemob_pft        =>  plt_allom%rCPNonstructRemob_pft       , &
@@ -1397,7 +1397,7 @@ implicit none
   associate(                             &
     Root1stStructChemElm_pvr      =>  plt_biom%Root1stStructChemElm_pvr   , &
     Root2ndStructChemElm_pvr      =>  plt_biom%Root2ndStructChemElm_pvr   , &
-    RootMycoNonstructElm_vr     =>  plt_biom%RootMycoNonstructElm_vr   , &
+    RootMycoNonstructElm_vr       =>  plt_biom%RootMycoNonstructElm_vr   , &
     RootProteinC_pvr              =>  plt_biom%RootProteinC_pvr    , &
     PopuPlantRootC_vr             =>  plt_biom% PopuPlantRootC_vr   , &
     RootNodueChemElm_pvr          =>  plt_biom%RootNodueChemElm_pvr   , &
@@ -1452,16 +1452,11 @@ implicit none
         DO NE=1,NumPlantChemElms
           Root1stStructChemElm_pvr(NE,NN,LL-1,NR,NZ)=Root1stStructChemElm_pvr(NE,NN,LL-1,NR,NZ)&
             +Root1stStructChemElm_pvr(NE,NN,LL,NR,NZ)
-
           Root2ndStructChemElm_pvr(NE,NN,LL-1,NR,NZ)=Root2ndStructChemElm_pvr(NE,NN,LL-1,NR,NZ)&
             +Root2ndStructChemElm_pvr(NE,NN,LL,NR,NZ)
-
           Root1stStructChemElm_pvr(NE,NN,LL,NR,NZ)=0._r8
-
           Root2ndStructChemElm_pvr(NE,NN,LL,NR,NZ)=0._r8
-
-          XFRE(NE)=FRTN* RootMycoNonstructElm_vr(NE,NN,LL,NZ)
-
+          XFRE(NE)=FRTN*RootMycoNonstructElm_vr(NE,NN,LL,NZ)
           RootMycoNonstructElm_vr(NE,NN,LL,NZ)= RootMycoNonstructElm_vr(NE,NN,LL,NZ)-XFRE(NE)
           RootMycoNonstructElm_vr(NE,NN,LL-1,NZ)= RootMycoNonstructElm_vr(NE,NN,LL-1,NZ)+XFRE(NE)
         ENDDO
@@ -1576,25 +1571,25 @@ implicit none
     Root1stStructChemElm_pvr           =>   plt_biom%Root1stStructChemElm_pvr   , &
     Root2ndStructChemElm_pvr           =>   plt_biom%Root2ndStructChemElm_pvr   , &
     RootStructBiomC_vr                 =>   plt_biom%RootStructBiomC_vr   , &
-    RootMycoNonstructElm_vr          =>   plt_biom%RootMycoNonstructElm_vr   , &
+    RootMycoNonstructElm_vr            =>   plt_biom%RootMycoNonstructElm_vr   , &
     LeafPetolBiomassC_brch             =>   plt_biom%LeafPetolBiomassC_brch   , &
-    NonstructElm_brch                =>   plt_biom%NonstructElm_brch   , &
+    NonstructElm_brch                  =>   plt_biom%NonstructElm_brch   , &
     PopuPlantRootC_vr                  =>   plt_biom% PopuPlantRootC_vr   , &
     StalkBiomassC_brch                 =>   plt_biom%StalkBiomassC_brch   , &
-    StalkRsrveElms_brch                 =>   plt_biom%StalkRsrveElms_brch  , &
+    StalkRsrveElms_brch                =>   plt_biom%StalkRsrveElms_brch  , &
     NonstructalElms_pft                =>   plt_biom%NonstructalElms_pft    , &
     CanopyLeafShethC_pft               =>   plt_biom%CanopyLeafShethC_pft     , &
     RootElmnts_pft                     =>   plt_biom%RootElmnts_pft    , &
     ZEROL                              =>   plt_biom%ZEROL    , &
     ZEROP                              =>   plt_biom%ZEROP    , &
     iPlantTurnoverPattern_pft          =>   plt_pheno%iPlantTurnoverPattern_pft  , &
-    iPlantRootProfile_pft           =>   plt_pheno%iPlantRootProfile_pft  , &
+    iPlantRootProfile_pft              =>   plt_pheno%iPlantRootProfile_pft  , &
     iPlantBranchState_brch             =>   plt_pheno%iPlantBranchState_brch   , &
     iPlantPhenologyPattern_pft         =>   plt_pheno%iPlantPhenologyPattern_pft  , &
     ShutRutNonstructElmntConducts_pft  =>   plt_pheno%ShutRutNonstructElmntConducts_pft  , &
     iPlantCalendar_brch                =>   plt_pheno%iPlantCalendar_brch  , &
     HourCounter4LeafOut_brch           =>   plt_pheno%HourCounter4LeafOut_brch    , &
-    RCO2A_pvr                              =>   plt_rbgc%RCO2A_pvr    , &
+    RCO2A_pvr                          =>   plt_rbgc%RCO2A_pvr    , &
     GrossResp_pft                      =>   plt_bgcr%GrossResp_pft    , &
     ECO_ER_col                         =>   plt_bgcr%ECO_ER_col     , &
     Eco_AutoR_col                      =>   plt_bgcr%Eco_AutoR_col     , &
@@ -1931,9 +1926,9 @@ implicit none
   real(r8) :: RTSKS
 
   associate(                              &
-    RootMycoNonstructElm_vr =>   plt_biom%RootMycoNonstructElm_vr    , &
+    RootMycoNonstructElm_vr   =>   plt_biom%RootMycoNonstructElm_vr    , &
     ZEROP                     =>   plt_biom%ZEROP     , &
-    iPlantRootProfile_pft  =>   plt_pheno%iPlantRootProfile_pft   , &
+    iPlantRootProfile_pft     =>   plt_pheno%iPlantRootProfile_pft   , &
     VLSoilPoreMicP            =>   plt_soilchem%VLSoilPoreMicP  , &
     ZEROS2                    =>   plt_site%ZEROS2    , &
     NU                        =>   plt_site%NU        , &
@@ -1956,11 +1951,11 @@ implicit none
     RUONHB                    =>   plt_rbgc%RUONHB    , &
     RUONO3                    =>   plt_rbgc%RUONO3    , &
     RUCNHB                    =>   plt_rbgc%RUCNHB    , &
-    RCO2N_pvr                     =>   plt_rbgc%RCO2N_pvr     , &
+    RCO2N_pvr                 =>   plt_rbgc%RCO2N_pvr     , &
     RUCNH4                    =>   plt_rbgc%RUCNH4    , &
     RUOH1B                    =>   plt_rbgc%RUOH1B    , &
     RootRespPotential_vr      =>   plt_rbgc%RootRespPotential_vr     , &
-    RCO2A_pvr                     =>   plt_rbgc%RCO2A_pvr     , &
+    RCO2A_pvr                 =>   plt_rbgc%RCO2A_pvr     , &
     CanPHeight4WatUptake      =>   plt_morph%CanPHeight4WatUptake    , &
     MY                        =>   plt_morph%MY       , &
     PrimRootRadius_pvr        =>   plt_morph%PrimRootRadius_pvr   , &
@@ -2036,11 +2031,11 @@ implicit none
         RootMycoNonstructElm_vr(ielmn,N,L,NZ)= RootMycoNonstructElm_vr(ielmn,N,L,NZ)+&
           (RootNutUptake_pvr(ids_NH4,N,L,NZ) &
            +RootNutUptake_pvr(ids_NH4B,N,L,NZ) &
-           +RootNutUptake_pvr(ids_NO3,N,L,NZ)+RootNutUptake_pvr(ids_NO3B,N,L,NZ))*1.e6
+           +RootNutUptake_pvr(ids_NO3,N,L,NZ)+RootNutUptake_pvr(ids_NO3B,N,L,NZ))
          RootMycoNonstructElm_vr(ielmp,N,L,NZ)= RootMycoNonstructElm_vr(ielmp,N,L,NZ) &
            +(RootNutUptake_pvr(ids_H2PO4,N,L,NZ)&
            +RootNutUptake_pvr(ids_H2PO4B,N,L,NZ) &
-           +RootNutUptake_pvr(ids_H1PO4,N,L,NZ)+RootNutUptake_pvr(ids_H1PO4B,N,L,NZ))*1.e6
+           +RootNutUptake_pvr(ids_H1PO4,N,L,NZ)+RootNutUptake_pvr(ids_H1PO4B,N,L,NZ))
 !
 !     GROWTH OF EACH ROOT AXIS
 !
