@@ -402,19 +402,17 @@ module NoduleBGCMod
   real(r8), intent(in) :: TFN6(JZ1)
   real(r8), intent(in) :: fRootGrowPsiSense(2,JZ1)
   integer :: L,M
-  real(r8) :: NodulUseNonstElm_brch(ielmn)
   real(r8) :: ZPOOLD
   real(r8) :: CCC,CNC,CPC
   real(r8) :: CPOOLT
   real(r8) :: CPOOLD
   real(r8) :: NodulNonstElmConc(NumPlantChemElms)
-  real(r8) :: NodulUseNonstElm_brch(ielmc),CPOOLNX
+  real(r8) :: NodulUseNonstElm_brch(NumPlantChemElms),CPOOLNX
   real(r8) :: CCNDLR
   real(r8) :: FCNPF
   real(r8) :: FXRNX
   real(r8) :: NoduleBiomCGrowth
   real(r8) :: PPOOLD
-  real(r8) :: NodulUseNonstElm_brch(ielmp)
   real(r8) :: RCO2T
   real(r8) :: RCO2TM
   real(r8) :: RCNDL,RMNDL,RXNDL
@@ -444,9 +442,9 @@ module NoduleBGCMod
     NoduGrowthYield_pft          =>   plt_allom%NoduGrowthYield_pft    , &
     NodulerNC_pft                =>   plt_allom%NodulerNC_pft    , &
     NodulerPC_pft                =>   plt_allom%NodulerPC_pft    , &
-    k_fine_litr                  => pltpar%k_fine_litr , &
+    k_fine_litr                  =>   pltpar%k_fine_litr , &
     iroot                        =>   pltpar%iroot       , &
-    RootRespPotent_pvr         =>   plt_rbgc%RootRespPotent_pvr     , &
+    RootRespPotent_pvr           =>   plt_rbgc%RootRespPotent_pvr     , &
     RCO2N_pvr                    =>   plt_rbgc%RCO2N_pvr     , &
     RootAutoRO2Limiter_pvr       =>   plt_rbgc%RootAutoRO2Limiter_pvr      , &
     RCO2A_pvr                    =>   plt_rbgc%RCO2A_pvr     , &
@@ -458,7 +456,7 @@ module NoduleBGCMod
     ZEROP                        =>   plt_biom%ZEROP     , &
     RootNoduleNonstructElmnt_vr  =>   plt_biom%RootNoduleNonstructElmnt_vr   , &
     ZEROL                        =>   plt_biom%ZEROL     , &
-    RootMycoNonstElm_pvr      =>   plt_biom%RootMycoNonstElm_pvr    , &
+    RootMycoNonstElm_pvr         =>   plt_biom%RootMycoNonstElm_pvr    , &
     CFOPE                        =>   plt_soilchem%CFOPE , &
     iPlantNfixType               =>   plt_morph%iPlantNfixType   , &
     NIXBotRootLayer_pft          =>   plt_morph%NIXBotRootLayer_pft       &
