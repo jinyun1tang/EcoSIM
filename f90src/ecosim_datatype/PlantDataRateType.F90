@@ -170,7 +170,6 @@ module PlantDataRateType
   allocate(RootGasLossDisturb_pft(idg_beg:idg_end-1,JP,JY,JX)); RootGasLossDisturb_pft=0._r8
   allocate(RootCUlmNutUptake_pvr(ids_nutb_beg+1:ids_nuts_end,jroots,JZ,JP,JY,JX));RootCUlmNutUptake_pvr=0._r8
   allocate(RootOUlmNutUptake_pvr(ids_nutb_beg+1:ids_nuts_end,jroots,JZ,JP,JY,JX));RootOUlmNutUptake_pvr=0._r8
-  allocate(RootCUlmNutUptake_pvr(ids_H1PO4B,jroots,JZ,JP,JY,JX));RootCUlmNutUptake_pvr=0._r8
   allocate(RCO2N_pvr(jroots,JZ,JP,JY,JX));RCO2N_pvr=0._r8
   allocate(RUNNHP(jroots,JZ,JP,JY,JX));RUNNHP=0._r8
   allocate(RUNNOP(jroots,JZ,JP,JY,JX));RUNNOP=0._r8
