@@ -227,7 +227,7 @@ contains
 
 !--------------------------------------------------------------------------------
 
-  pure function is_plant_bryophyte(iPlantRootProfile_pft)result(ans)
+  pure function is_root_shallow(iPlantRootProfile_pft)result(ans)
 !
 ! currently, there are three plant growth types defined as
 ! iplt_bryophyte=0
@@ -239,7 +239,7 @@ contains
   logical :: ans
 
   ans=(iPlantRootProfile_pft == iplt_bryophyte)
-  end function is_plant_bryophyte
+  end function is_root_shallow
 !--------------------------------------------------------------------------------
   pure function pMOD(a,b)result(c)
   !

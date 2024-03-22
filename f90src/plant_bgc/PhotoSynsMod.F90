@@ -131,7 +131,7 @@ implicit none
 !               iPlantRootProfile_pft=growth type:0=bryophyte,1=graminoid,2=shrub,tree
 !               WFNB=non-stomatal effects of water stress on CO2 fixation
 !
-                  IF(.not.is_plant_bryophyte(iPlantRootProfile_pft(NZ)))THEN
+                  IF(.not.is_root_shallow(iPlantRootProfile_pft(NZ)))THEN
                     WFNB=SQRT(RS/RSL)
                   ELSE
                     WFNB=WFNG
@@ -320,7 +320,7 @@ implicit none
 !               iPlantRootProfile_pft=growth type:0=bryophyte,1=graminoid,2=shrub,tree
 !               WFNB=non-stomatal effects of water stress on C4,C3 CO2 fixation
 !
-                  IF(.not.is_plant_bryophyte(iPlantRootProfile_pft(NZ)))THEN
+                  IF(.not.is_root_shallow(iPlantRootProfile_pft(NZ)))THEN
                     WFN4=RS/RSL
                     WFNB=SQRT(RS/RSL)
                   ELSE
@@ -444,7 +444,7 @@ implicit none
     IF(SineSolarIncliAngle.GT.0.0_r8 .AND. RadPARbyCanopy_pft(NZ).GT.0.0_r8 &
       .AND.CanopyGasCO2_pft(NZ).GT.0.0_r8)THEN
       CO2F=0._r8;CH2O=0._r8
-      IF(.not.is_plant_bryophyte(iPlantRootProfile_pft(NZ)).OR.Stomata_Activity.GT.0.0_r8)THEN
+      IF(.not.is_root_shallow(iPlantRootProfile_pft(NZ)).OR.Stomata_Activity.GT.0.0_r8)THEN
 !
 !         FOR EACH NODE
 !

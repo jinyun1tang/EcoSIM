@@ -92,7 +92,7 @@ module StartqsMod
         plt_biom%StandingDeadChemElms_pft(1:NumPlantChemElms,NZ)=0._r8
         D6401: DO L=1,NL
           DO  K=1,pltpar%NumOfPlantLitrCmplxs
-            plt_bgcr%LitrFallChemElm_pvr(1:NumPlantChemElms,1:jsken,K,L,NZ)=0._r8
+            plt_bgcr%LitfalChemElm_pvr(1:NumPlantChemElms,1:jsken,K,L,NZ)=0._r8
           enddo
         ENDDO D6401
       ENDDO D9986
@@ -198,7 +198,7 @@ module StartqsMod
 !
 !     NON-VASCULAR (E.G. MOSSES)
 !
-  IF(is_plant_bryophyte(iPlantRootProfile_pft(NZ)))THEN
+  IF(is_root_shallow(iPlantRootProfile_pft(NZ)))THEN
     CFOPE(ielmc,ifoliar,iprotein,NZ)=0.07_r8
     CFOPE(ielmc,ifoliar,icarbhyro,NZ)=0.25_r8
     CFOPE(ielmc,ifoliar,icellulos,NZ)=0.30_r8
@@ -269,7 +269,7 @@ module StartqsMod
 !
 !     NON-VASCULAR
 !
-  IF(is_plant_bryophyte(iPlantRootProfile_pft(NZ)))THEN
+  IF(is_root_shallow(iPlantRootProfile_pft(NZ)))THEN
     CFOPE(ielmc,istalk,iprotein,NZ)=0.07_r8
     CFOPE(ielmc,istalk,icarbhyro,NZ)=0.25_r8
     CFOPE(ielmc,istalk,icellulos,NZ)=0.30_r8
@@ -298,7 +298,7 @@ module StartqsMod
 !
 !     NON-VASCULAR
 !
-  IF(is_plant_bryophyte(iPlantRootProfile_pft(NZ)))THEN
+  IF(is_root_shallow(iPlantRootProfile_pft(NZ)))THEN
     CFOPE(ielmc,iroot,iprotein,NZ)=0.07_r8
     CFOPE(ielmc,iroot,icarbhyro,NZ)=0.25_r8
     CFOPE(ielmc,iroot,icellulos,NZ)=0.30_r8
@@ -581,7 +581,7 @@ module StartqsMod
     Hours4ShortenPhotoPeriod_brch     =>  plt_pheno%Hours4ShortenPhotoPeriod_brch   , &
     iPlantCalendar_brch               =>  plt_pheno%iPlantCalendar_brch , &
     Hours4Leafout_brch                =>  plt_pheno%Hours4Leafout_brch   , &
-    HourCounter4LeafOut_brch          =>  plt_pheno%HourCounter4LeafOut_brch   , &
+    HourCount2LeafOut_brch          =>  plt_pheno%HourCount2LeafOut_brch   , &
     HoursCanopyPSITooLow              =>  plt_pheno%HoursCanopyPSITooLow   , &
     MatureGroup_pft                   =>  plt_pheno%MatureGroup_pft, &
     PetioleChemElmRemobFlx_brch       =>  plt_pheno%PetioleChemElmRemobFlx_brch  , &
@@ -636,7 +636,7 @@ module StartqsMod
   HypoctoHeight_pft(NZ)=0._r8
   CanopyHeight_pft(NZ)=0._r8
   D10: DO NB=1,MaxNumBranches
-    plt_pheno%doInitLeafOut_brch(NB,NZ)=0
+    plt_pheno%doInitLeafOut_brch(NB,NZ)=iEnable
     plt_pheno%doPlantLeafOut_brch(NB,NZ)=iDisable
     plt_pheno%doPlantLeaveOff_brch(NB,NZ)=iDisable
     plt_pheno%Prep4Literfall_brch(NB,NZ)=ifalse
@@ -659,7 +659,7 @@ module StartqsMod
     Hours4ShortenPhotoPeriod_brch(NB,NZ)=0._r8
     Hours4Leafout_brch(NB,NZ)=Hours4LenthenPhotoPeriod_brch(NB,NZ)
     Hours4LeafOff_brch(NB,NZ)=Hours4ShortenPhotoPeriod_brch(NB,NZ)
-    HourCounter4LeafOut_brch(NB,NZ)=0._r8
+    HourCount2LeafOut_brch(NB,NZ)=0._r8
     RubiscoActivity_brch(NB,NZ)=1.0
     C4PhotosynDowreg_brch(NB,NZ)=1.0
     HourFailGrainFill_brch(NB,NZ)=0
@@ -676,7 +676,7 @@ module StartqsMod
   HoursCanopyPSITooLow(NZ)=0._r8
   CHILL(NZ)=0._r8
   plt_biom%NonstructElm_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ)=0._r8
-  plt_biom%NoduleNonstructElm_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ)=0._r8
+  plt_biom%NodulNonstElm_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ)=0._r8
   plt_biom%PetoleChemElm_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ)=0._r8
   plt_biom%ShootChemElm_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ)=0._r8
   plt_biom%StalkChemElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ)=0._r8
@@ -685,7 +685,7 @@ module StartqsMod
   plt_biom%HuskChemElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ)=0._r8
   plt_biom%GrainChemElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ)=0._r8
   plt_biom%EarChemElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ)=0._r8
-  plt_biom%CanopyNoduleChemElm_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ)=0._r8
+  plt_biom%CanopyNodulChemElm_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ)=0._r8
   plt_pheno%LeafElmntRemobFlx_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ)=0._r8
   plt_biom%LeafChemElmRemob_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ)=0._r8
   plt_pheno%PetioleChemElmRemobFlx_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ)=0._r8
@@ -912,7 +912,7 @@ module StartqsMod
     SeedDepth_pft                =>  plt_morph%SeedDepth_pft   , &
     RootVH2O_vr                  =>  plt_morph%RootVH2O_vr  , &
     RootVolume_vr                =>  plt_morph%RootVolume_vr   , &
-    SecndRootRadius_pvr          =>  plt_morph%SecndRootRadius_pvr   , &
+    Radius2ndRoot_pvr          =>  plt_morph%Radius2ndRoot_pvr   , &
     PrimRootRadius_pvr           =>  plt_morph%PrimRootRadius_pvr   , &
     Max1stRootRadius             =>  plt_morph%Max1stRootRadius  , &
     Max2ndRootRadius             =>  plt_morph%Max2ndRootRadius  , &
@@ -937,7 +937,7 @@ module StartqsMod
       PSIRoot_vr(N,L,NZ)=-0.01_r8
       PSIRootOSMO_vr(N,L,NZ)=OSMO(NZ)+PSIRoot_vr(N,L,NZ)
       PSIRootTurg_vr(N,L,NZ)=AZMAX1(PSIRoot_vr(N,L,NZ)-PSIRootOSMO_vr(N,L,NZ))
-      plt_biom%RootMycoNonstructElm_vr(1:NumPlantChemElms,N,L,NZ)=0._r8
+      plt_biom%RootMycoNonstElm_pvr(1:NumPlantChemElms,N,L,NZ)=0._r8
       plt_biom%RootNonstructElmConc_pvr(1:NumPlantChemElms,N,L,NZ)=0._r8
       RootProteinConc_pvr(N,L,NZ)=RootFracRemobilizableBiom(NZ)
       plt_biom%RootStructBiomC_vr(N,L,NZ)=0._r8
@@ -950,9 +950,9 @@ module StartqsMod
       RootVolume_vr(N,L,NZ)=0._r8
       RootVH2O_vr(N,L,NZ)=0._r8
       PrimRootRadius_pvr(N,L,NZ)=Max1stRootRadius(N,NZ)
-      SecndRootRadius_pvr(N,L,NZ)=Max2ndRootRadius(N,NZ)
+      Radius2ndRoot_pvr(N,L,NZ)=Max2ndRootRadius(N,NZ)
       plt_morph%RootAreaPerPlant_vr(N,L,NZ)=0._r8
-      plt_morph%AveSecndRootLen(N,L,NZ)=1.0E-03
+      plt_morph%AveLen2ndRoot_pvr(N,L,NZ)=1.0E-03
       plt_rbgc%RootNutUptake_pvr(ids_NH4,N,L,NZ)=0._r8
       plt_rbgc%RootNutUptake_pvr(ids_NO3,N,L,NZ)=0._r8
       plt_rbgc%RootNutUptake_pvr(ids_H2PO4,N,L,NZ)=0._r8
@@ -996,7 +996,7 @@ module StartqsMod
       ENDDO D30
       IF(N.EQ.1)THEN
         D6400: DO K=1,pltpar%NumOfPlantLitrCmplxs
-          plt_bgcr%LitrFallChemElm_pvr(1:NumPlantChemElms,1:jsken,K,L,NZ)=0._r8
+          plt_bgcr%LitfalChemElm_pvr(1:NumPlantChemElms,1:jsken,K,L,NZ)=0._r8
         ENDDO D6400
         plt_biom%RootNoduleNonstructElmnt_vr(1:NumPlantChemElms,L,NZ)=0._r8
         plt_biom%RootNodueChemElm_pvr(1:NumPlantChemElms,L,NZ)=0._r8
@@ -1037,7 +1037,7 @@ module StartqsMod
     PetoleChemElm_brch           =>   plt_biom%PetoleChemElm_brch, &
     RootStructBiomC_vr           =>   plt_biom%RootStructBiomC_vr  , &
     RootProteinC_pvr             =>   plt_biom%RootProteinC_pvr   , &
-     RootMycoNonstructElm_vr   =>   plt_biom%RootMycoNonstructElm_vr  , &
+     RootMycoNonstElm_pvr   =>   plt_biom%RootMycoNonstElm_pvr  , &
     NonstructElm_brch          =>   plt_biom%NonstructElm_brch  , &
     LeafChemElms_brch            =>   plt_biom%LeafChemElms_brch , &
     NonstructalElms_pft        =>   plt_biom%NonstructalElms_pft   , &
@@ -1085,10 +1085,10 @@ module StartqsMod
     Root1stStructChemElm_pvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ),1,NZ)
   RootProteinC_pvr(1,NGTopRootLayer_pft(NZ),NZ)=RootStructBiomC_vr(ipltroot,NGTopRootLayer_pft(NZ),NZ)&
     *RootFracRemobilizableBiom(NZ)
-  RootMycoNonstructElm_vr(ielmn,1,NGTopRootLayer_pft(NZ),NZ)=CNGR(NZ)&
-    *RootMycoNonstructElm_vr(ielmc,1,NGTopRootLayer_pft(NZ),NZ)
-  RootMycoNonstructElm_vr(ielmp,1,NGTopRootLayer_pft(NZ),NZ)=CPGR(NZ) &
-    *RootMycoNonstructElm_vr(ielmc,1,NGTopRootLayer_pft(NZ),NZ)
+  RootMycoNonstElm_pvr(ielmn,1,NGTopRootLayer_pft(NZ),NZ)=CNGR(NZ)&
+    *RootMycoNonstElm_pvr(ielmc,1,NGTopRootLayer_pft(NZ),NZ)
+  RootMycoNonstElm_pvr(ielmp,1,NGTopRootLayer_pft(NZ),NZ)=CPGR(NZ) &
+    *RootMycoNonstElm_pvr(ielmc,1,NGTopRootLayer_pft(NZ),NZ)
 
   end associate
   end subroutine InitSeedMorphoBio

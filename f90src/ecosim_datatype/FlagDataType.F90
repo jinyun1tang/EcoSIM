@@ -28,7 +28,7 @@ implicit none
   integer,target,allocatable ::  doInitPlant_pft(:,:,:)                        !PFT initialization flag:0=no,1=yes
   integer,target,allocatable ::  iPlantPhotosynthesisType(:,:,:)                        !plant photosynthetic type (C3 or C4)
   integer,target,allocatable ::  iPlantRootProfile_pft(:,:,:)                        !plant growth type (vascular, non-vascular)
-  integer,target,allocatable ::  iPlantPhenologyPattern_pft(:,:,:)                        !plant growth habit (annual or perennial)
+  integer,target,allocatable ::  iPlantPhenolPattern_pft(:,:,:)                        !plant growth habit (annual or perennial)
   integer,target,allocatable ::  iPlantDevelopPattern_pft(:,:,:)                        !plant growth habit (determinate or indeterminate)
   integer,target,allocatable ::  iPlantNfixType(:,:,:)                        !N2 fixation type
   integer,target,allocatable ::  iPlantPhenolType_pft(:,:,:)                        !climate signal for phenological progress none, temperature, water stress)
@@ -59,7 +59,7 @@ contains
   allocate(doInitPlant_pft(JP,JY,JX));    doInitPlant_pft=ifalse
   allocate(iPlantPhotosynthesisType(JP,JY,JX));    iPlantPhotosynthesisType=0
   allocate(iPlantRootProfile_pft(JP,JY,JX));    iPlantRootProfile_pft=0
-  allocate(iPlantPhenologyPattern_pft(JP,JY,JX));    iPlantPhenologyPattern_pft=0
+  allocate(iPlantPhenolPattern_pft(JP,JY,JX));    iPlantPhenolPattern_pft=0
   allocate(iPlantDevelopPattern_pft(JP,JY,JX));    iPlantDevelopPattern_pft=0
   allocate(iPlantNfixType(JP,JY,JX));    iPlantNfixType=0
   allocate(iPlantPhenolType_pft(JP,JY,JX));    iPlantPhenolType_pft=0
@@ -90,7 +90,7 @@ contains
   call destroy(doInitPlant_pft)
   call destroy(iPlantPhotosynthesisType)
   call destroy(iPlantRootProfile_pft)
-  call destroy(iPlantPhenologyPattern_pft)
+  call destroy(iPlantPhenolPattern_pft)
   call destroy(iPlantDevelopPattern_pft)
   call destroy(iPlantNfixType)
   call destroy(iPlantPhenolType_pft)

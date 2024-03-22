@@ -247,7 +247,7 @@ module HfuncsMod
     iPlantCalendar_brch             =>   plt_pheno%iPlantCalendar_brch , &
     doInitPlant_pft                 =>   plt_pheno%doInitPlant_pft  , &
     iPlantRootState_pft             =>   plt_pheno%iPlantRootState_pft  , &
-    iPlantPhenologyPattern_pft      =>   plt_pheno%iPlantPhenologyPattern_pft , &
+    iPlantPhenolPattern_pft      =>   plt_pheno%iPlantPhenolPattern_pft , &
     iPlantBranchState_brch          =>   plt_pheno%iPlantBranchState_brch  , &
     iPlantShootState_pft            =>   plt_pheno%iPlantShootState_pft  , &
     iPlantTurnoverPattern_pft       =>   plt_pheno%iPlantTurnoverPattern_pft , &
@@ -275,7 +275,7 @@ module HfuncsMod
 !
 ! doInitPlant_pft=PFT initialization flag:0=no,1=yes
 ! PSIRootTurg_vr=root turgor potential
-! iPlantPhenologyPattern_pft=growth habit from PFT file
+! iPlantPhenolPattern_pft=growth habit from PFT file
 ! iPlantCalendar_brch(ipltcal_InitFloral,=floral initiation date
 ! NumOfBranches_pft=primary root axis number
 ! WTRVC=nonstructural C storage
@@ -294,7 +294,7 @@ module HfuncsMod
       !first hour of the day, population > 0
       IF(PSIRootTurg_vr(ipltroot,NGTopRootLayer_pft(NZ),NZ).GT.PSIMin4LeafExpansion)THEN
 !        WRITE(101,*)'root is hydraulically active for expansion',NZ
-        IF(iPlantPhenologyPattern_pft(NZ).NE.iplt_annual.OR. &
+        IF(iPlantPhenolPattern_pft(NZ).NE.iplt_annual.OR. &
           iPlantCalendar_brch(ipltcal_InitFloral,MainBranchNum_pft(NZ),NZ).EQ.0)THEN
           !perennial plant or flower not initiated for annual plant 
           IF((NumOfBranches_pft(NZ).EQ.0 .AND. NonstructalElms_pft(ielmc,NZ).GT.0.0_r8) &
@@ -313,7 +313,7 @@ module HfuncsMod
                   iPlantBranchState_brch(NB,NZ)=iLive
                   Hours4Leafout_brch(NB,NZ)=0.0_r8
 !                  write(101,*)'plant shoot is alive',NB,NZ
-                  IF(iPlantPhenologyPattern_pft(NZ).EQ.iplt_annual)THEN
+                  IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual)THEN
                     MatureGroup_brch(NB,NZ)=AZMAX1(MatureGroup_pft(NZ)-BranchNumber_brch(NB,NZ))
                   ELSE
                     MatureGroup_brch(NB,NZ)=MatureGroup_pft(NZ)
@@ -371,8 +371,8 @@ module HfuncsMod
     LeafPetoNonstElmConc_brch       =>  plt_biom%LeafPetoNonstElmConc_brch   , &
     CanopyNonstructElmConc_pft      =>  plt_biom%CanopyNonstructElmConc_pft   , &
     CanopyNonstructElms_pft         =>  plt_biom%CanopyNonstructElms_pft   , &
-    NoduleNonstructElm_brch         =>  plt_biom%NoduleNonstructElm_brch   , &
-    RootMycoNonstructElm_vr         =>  plt_biom%RootMycoNonstructElm_vr   , &
+    NodulNonstElm_brch         =>  plt_biom%NodulNonstElm_brch   , &
+    RootMycoNonstElm_pvr         =>  plt_biom%RootMycoNonstElm_pvr   , &
     NonstructElm_brch               =>  plt_biom%NonstructElm_brch   , &
     RootNonstructElmConc_pvr        =>  plt_biom%RootNonstructElmConc_pvr   , &
     ZEROL                           =>  plt_biom%ZEROL    , &
@@ -415,7 +415,7 @@ module HfuncsMod
     DO NE=1,NumPlantChemElms
       IF(iPlantBranchState_brch(NB,NZ).EQ.iLive)THEN
         CanopyNonstructElms_pft(NE,NZ)=CanopyNonstructElms_pft(NE,NZ)+NonstructElm_brch(NE,NB,NZ)
-        NoduleNonstructElmnt_pft(NE,NZ)=NoduleNonstructElmnt_pft(NE,NZ)+NoduleNonstructElm_brch(NE,NB,NZ)
+        NoduleNonstructElmnt_pft(NE,NZ)=NoduleNonstructElmnt_pft(NE,NZ)+NodulNonstElm_brch(NE,NB,NZ)
       ENDIF
     ENDDO     
   ENDDO D140
@@ -440,7 +440,7 @@ module HfuncsMod
     D160: DO L=NU,MaxSoiL4Root(NZ)
       IF(RootStructBiomC_vr(N,L,NZ).GT.ZEROL(NZ))THEN
         DO NE=1,NumPlantChemElms
-          RootNonstructElmConc_pvr(NE,N,L,NZ)=AZMAX1(RootMycoNonstructElm_vr(NE,N,L,NZ)/RootStructBiomC_vr(N,L,NZ))
+          RootNonstructElmConc_pvr(NE,N,L,NZ)=AZMAX1(RootMycoNonstElm_pvr(NE,N,L,NZ)/RootStructBiomC_vr(N,L,NZ))
         ENDDO
       ELSE
         DO NE=1,NumPlantChemElms
@@ -588,7 +588,7 @@ module HfuncsMod
 !   ALAT=latitude
 !   iPlantCalendar_brch(ipltcal_InitFloral,=date of floral initiation
 !
-  ELSEIF(iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldecidu)THEN
+  ELSEIF(iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldecid)THEN
 !    write(193,*)'doPlantLeafOut_brch(NB,NZ)',doPlantLeafOut_brch(NB,NZ),DayLenthCurrent,DayLenthPrev
     IF((DayLenthCurrent.GE.DayLenthPrev .OR. &
       (DayLenthCurrent.LT.DayLenthPrev .AND. &
@@ -722,7 +722,7 @@ module HfuncsMod
 !     ALAT=latitude
 !     iPlantCalendar_brch(ipltcal_InitFloral,=date of floral initiation
 !
-    ELSEIF(iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldroutdecidu)THEN
+    ELSEIF(iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldroutdecid)THEN
       IF((DayLenthCurrent.GE.DayLenthPrev.OR.DayLenthCurrent.GE.DayLenthMax-2.0_r8) &
         .AND.doPlantLeafOut_brch(NB,NZ).EQ.iEnable)THEN
         IF(TCG(NZ).GE.TCelsChill4Leaf_pft(NZ).AND.PSICanopyTurg_pft(NZ).GT.PSIMin4LeafExpansion)THEN
@@ -800,7 +800,7 @@ module HfuncsMod
     RefLeafAppearRate_pft                =>  plt_pheno%RefLeafAppearRate_pft    , &
     ReprodNodeNumNormByMatrgrp_brch      =>  plt_pheno%ReprodNodeNumNormByMatrgrp_brch   , &
     OFFST                                =>  plt_pheno%OFFST   , &
-    iPlantPhenologyPattern_pft           =>  plt_pheno%iPlantPhenologyPattern_pft  , &
+    iPlantPhenolPattern_pft           =>  plt_pheno%iPlantPhenolPattern_pft  , &
     doPlantLeafOut_brch                  =>  plt_pheno%doPlantLeafOut_brch   , &
     NumOfLeaves_brch                     =>  plt_morph%NumOfLeaves_brch   , &
     NodeNumNormByMatgrp_brch             =>  plt_pheno%NodeNumNormByMatgrp_brch   , &
@@ -863,7 +863,7 @@ module HfuncsMod
 !   PSICanopyTurg_pft=leaf turgor potential
 !   WFNG=water stress effect on phenology
 !   only annual plants depends on moisture
-    IF(iPlantPhenologyPattern_pft(NZ).EQ.iplt_annual)THEN
+    IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual)THEN
       IF(iPlantCalendar_brch(ipltcal_Anthesis,NB,NZ).EQ.0)THEN
         WFNG=EXP(0.025_r8*PSICanopy_pft(NZ))
         NodeInitRate=NodeInitRate*WFNG
@@ -923,7 +923,7 @@ module HfuncsMod
 ! GROUP=node number required for floral initiation
 ! Hours4Leafout_brch,VRNL=leafout hours,hours required for leafout
 ! DayLenthPrev,DLYN=daylength of previous,current day
-! iPlantPhenologyPattern_pft=growth habit from PFT file
+! iPlantPhenolPattern_pft=growth habit from PFT file
 ! iPlantPhenolType_pft=phenology type from PFT file
 ! ZC,SnowDepth=canopy height,snowpack depth
 !
@@ -934,9 +934,9 @@ module HfuncsMod
     LeafOutChk=Hours4Leafout_brch(NB,NZ).GE.HourReq4LeafOut_brch(NB,NZ)
     PlantDayChk=I.GE.iDayPlanting_pft(NZ).AND.iYearCurrent.EQ.iYearPlanting_pft(NZ).AND.DayLenthCurrent.GT.DayLenthPrev
     CanHeightChk=CanopyHeight_pft(NZ).GE.SnowDepth-ZERO
-    PhenoChk1=iPlantPhenologyPattern_pft(NZ).EQ.iplt_perennial .AND. &
-      (iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldecidu.OR.iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldroutdecidu)
-    PhenoChk2=iPlantPhenologyPattern_pft(NZ).EQ.iplt_annual.AND.iPlantPhenolType_pft(NZ).EQ.iphenotyp_evgreen
+    PhenoChk1=iPlantPhenolPattern_pft(NZ).EQ.iplt_perennial .AND. &
+      (iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldecid.OR.iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldroutdecid)
+    PhenoChk2=iPlantPhenolPattern_pft(NZ).EQ.iplt_annual.AND.iPlantPhenolType_pft(NZ).EQ.iphenotyp_evgreen
     
 !    if(NZ==1)then
 !    write(102,*)NB,I+J/24.,ShootNodeNumber_brch(NB,NZ),MatureGroup_brch(NB,NZ),&
@@ -974,7 +974,7 @@ module HfuncsMod
 
         iPlantCalendar_brch(ipltcal_InitFloral,NB,NZ)=I
         NodeNum2InitFloral_brch(NB,NZ)=ShootNodeNumber_brch(NB,NZ)
-        IF(iPlantPhenologyPattern_pft(NZ).EQ.iplt_annual.AND.iPlantDevelopPattern_pft(NZ).EQ.ideterminate)THEN
+        IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual.AND.iPlantDevelopPattern_pft(NZ).EQ.ideterminate)THEN
           LeafNumberAtFloralInit_brch(NB,NZ)=ShootNodeNumber_brch(NB,NZ)
         ENDIF
       ENDIF
@@ -988,9 +988,9 @@ module HfuncsMod
 !
   ELSEIF(iPlantCalendar_brch(ipltcal_Jointing,NB,NZ).EQ.0)THEN
     NodeNumChk=NodeNumNormByMatgrp_brch(NB,NZ).GT.0.25_r8*GrowStageNorm4VegetaPheno    
-    PhenoChk1=(iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldecidu.OR.iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldroutdecidu) &
-      .AND.iPlantPhenologyPattern_pft(NZ).NE.iplt_annual.AND.iPlantPhotoperiodType_pft(NZ).NE.iphotop_short.AND.DayLenChk     
-    PhenoChk2=iPlantPhenolType_pft(NZ).EQ.iphenotyp_drouhtdecidu.AND.iPlantPhenologyPattern_pft(NZ).EQ.iplt_annual
+    PhenoChk1=(iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldecid.OR.iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldroutdecid) &
+      .AND.iPlantPhenolPattern_pft(NZ).NE.iplt_annual.AND.iPlantPhotoperiodType_pft(NZ).NE.iphotop_short.AND.DayLenChk     
+    PhenoChk2=iPlantPhenolType_pft(NZ).EQ.iphenotyp_drouhtdecidu.AND.iPlantPhenolPattern_pft(NZ).EQ.iplt_annual
     LeafOffChk=Hours4LeafOff_brch(NB,NZ).GT.HourReq4LeafOff_brch(NB,NZ)
     
     IF(NodeNumChk .OR.(PhenoChk1 .AND. doPlantLeafOut_brch(NB,NZ).EQ.iDisable .AND. LeafOffChk) &
@@ -1005,15 +1005,15 @@ module HfuncsMod
   ELSEIF(iPlantCalendar_brch(ipltcal_Elongation,NB,NZ).EQ.0)THEN
     NodeNumChk=NodeNumNormByMatgrp_brch(NB,NZ).GT.0.50_r8*GrowStageNorm4VegetaPheno    
     LeafOffChk=Hours4LeafOff_brch(NB,NZ).GT.HourReq4LeafOff_brch(NB,NZ)
-    PhenoChk1=(iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldecidu.OR.iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldroutdecidu) &
-      .AND.iPlantPhenologyPattern_pft(NZ).NE.iplt_annual.AND.iPlantPhotoperiodType_pft(NZ).NE.iphotop_short.AND.DayLenChk
-    PhenoChk2=iPlantPhenolType_pft(NZ).EQ.iphenotyp_drouhtdecidu.AND.iPlantPhenologyPattern_pft(NZ).EQ.iplt_annual
+    PhenoChk1=(iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldecid.OR.iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldroutdecid) &
+      .AND.iPlantPhenolPattern_pft(NZ).NE.iplt_annual.AND.iPlantPhotoperiodType_pft(NZ).NE.iphotop_short.AND.DayLenChk
+    PhenoChk2=iPlantPhenolType_pft(NZ).EQ.iphenotyp_drouhtdecidu.AND.iPlantPhenolPattern_pft(NZ).EQ.iplt_annual
     
     IF(NodeNumChk .OR.(PhenoChk1 .AND. doPlantLeafOut_brch(NB,NZ).EQ.iDisable .AND. LeafOffChk) &
                   .OR. PhenoChk2 .AND. doPlantLeafOut_brch(NB,NZ).EQ.iDisable .AND. LeafOffChk)THEN
       iPlantCalendar_brch(ipltcal_Elongation,NB,NZ)=I
 !      write(101,*)'plant elongation, year, I, NB,NZ',etimer%get_curr_yearAD(),I,NB,NZ
-      IF(iPlantPhenologyPattern_pft(NZ).EQ.iplt_annual.AND.iPlantDevelopPattern_pft(NZ).NE.ideterminate)THEN
+      IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual.AND.iPlantDevelopPattern_pft(NZ).NE.ideterminate)THEN
         LeafNumberAtFloralInit_brch(NB,NZ)=ShootNodeNumber_brch(NB,NZ)
       ENDIF
     ENDIF
@@ -1023,9 +1023,9 @@ module HfuncsMod
   ELSEIF(iPlantCalendar_brch(ipltcal_Heading,NB,NZ).EQ.0)THEN
     NodeNumChk=NodeNumNormByMatgrp_brch(NB,NZ).GT.1.00_r8*GrowStageNorm4VegetaPheno 
     LeafOffChk=Hours4LeafOff_brch(NB,NZ).GT.HourReq4LeafOff_brch(NB,NZ)
-    PhenoChk1=(iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldecidu.OR.iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldroutdecidu) &
-      .AND.iPlantPhenologyPattern_pft(NZ).NE.iplt_annual.AND.iPlantPhotoperiodType_pft(NZ).NE.iphotop_short.AND.DayLenChk
-    PhenoChk2=iPlantPhenolType_pft(NZ).EQ.iphenotyp_drouhtdecidu.AND.iPlantPhenologyPattern_pft(NZ).EQ.iplt_annual  
+    PhenoChk1=(iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldecid.OR.iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldroutdecid) &
+      .AND.iPlantPhenolPattern_pft(NZ).NE.iplt_annual.AND.iPlantPhotoperiodType_pft(NZ).NE.iphotop_short.AND.DayLenChk
+    PhenoChk2=iPlantPhenolType_pft(NZ).EQ.iphenotyp_drouhtdecidu.AND.iPlantPhenolPattern_pft(NZ).EQ.iplt_annual  
     
     IF(NodeNumChk .OR.(PhenoChk1.AND.doPlantLeafOut_brch(NB,NZ).EQ.iDisable .AND.LeafOffChk) &
                   .OR. PhenoChk2 .AND.doPlantLeafOut_brch(NB,NZ).EQ.iDisable.AND.LeafOffChk)THEN
@@ -1049,10 +1049,10 @@ module HfuncsMod
   ELSEIF(iPlantCalendar_brch(ipltcal_Anthesis,NB,NZ).EQ.0)THEN
     NodeNumChk=NumOfLeaves_brch(NB,NZ).GT.NodeNum2InitFloral_brch(NB,NZ)
     LeafOffChk=Hours4LeafOff_brch(NB,NZ).GT.HourReq4LeafOff_brch(NB,NZ)
-    PhenoChk1=(iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldecidu.OR.iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldroutdecidu) &
-      .AND.iPlantPhenologyPattern_pft(NZ).NE.iplt_annual.AND.iPlantPhotoperiodType_pft(NZ).NE.iphotop_short.AND.DayLenChk
-    PhenoChk2=iPlantPhenolType_pft(NZ).EQ.iphenotyp_drouhtdecidu.AND.iPlantPhenologyPattern_pft(NZ).EQ.iplt_annual
-    CalChk=iPlantPhenologyPattern_pft(NZ).NE.iplt_annual.AND.iPlantCalendar_brch(ipltcal_Heading,NB,NZ).NE.0
+    PhenoChk1=(iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldecid.OR.iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldroutdecid) &
+      .AND.iPlantPhenolPattern_pft(NZ).NE.iplt_annual.AND.iPlantPhotoperiodType_pft(NZ).NE.iphotop_short.AND.DayLenChk
+    PhenoChk2=iPlantPhenolType_pft(NZ).EQ.iphenotyp_drouhtdecidu.AND.iPlantPhenolPattern_pft(NZ).EQ.iplt_annual
+    CalChk=iPlantPhenolPattern_pft(NZ).NE.iplt_annual.AND.iPlantCalendar_brch(ipltcal_Heading,NB,NZ).NE.0
     
     IF(NodeNumChk.OR.CalChk &
       .OR.(PhenoChk1.AND.doPlantLeafOut_brch(NB,NZ).EQ.iDisable.AND.LeafOffChk) &
@@ -1074,9 +1074,9 @@ module HfuncsMod
   ELSEIF(iPlantCalendar_brch(ipltcal_BeginSeedFill,NB,NZ).EQ.0)THEN
     NodeNumChk=ReprodNodeNumNormByMatrgrp_brch(NB,NZ).GT.0.50_r8*GrowStageNorm4ReprodPheno
     LeafOffChk=Hours4LeafOff_brch(NB,NZ).GT.HourReq4LeafOff_brch(NB,NZ)
-    PhenoChk1=(iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldecidu.OR.iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldroutdecidu) &
-      .AND.iPlantPhenologyPattern_pft(NZ).NE.iplt_annual.AND.iPlantPhotoperiodType_pft(NZ).NE.iphotop_short.AND.DayLenChk
-    PhenoChk2=iPlantPhenolType_pft(NZ).EQ.iphenotyp_drouhtdecidu.AND.iPlantPhenologyPattern_pft(NZ).EQ.iplt_annual
+    PhenoChk1=(iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldecid.OR.iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldroutdecid) &
+      .AND.iPlantPhenolPattern_pft(NZ).NE.iplt_annual.AND.iPlantPhotoperiodType_pft(NZ).NE.iphotop_short.AND.DayLenChk
+    PhenoChk2=iPlantPhenolType_pft(NZ).EQ.iphenotyp_drouhtdecidu.AND.iPlantPhenolPattern_pft(NZ).EQ.iplt_annual
     
     IF(NodeNumChk .OR.(PhenoChk1.AND.doPlantLeafOut_brch(NB,NZ).EQ.iDisable.AND.LeafOffChk) &
                   .OR. PhenoChk2.AND.doPlantLeafOut_brch(NB,NZ).EQ.iDisable.AND.LeafOffChk)THEN

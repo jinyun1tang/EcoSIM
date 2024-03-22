@@ -601,8 +601,8 @@
     iPlantPhenolType_pft       =>  plt_pheno%iPlantPhenolType_pft , &
     iPlantTurnoverPattern_pft  =>  plt_pheno%iPlantTurnoverPattern_pft , &
     HourFailGrainFill_brch     =>  plt_pheno%HourFailGrainFill_brch   , &
-    HourCounter4LeafOut_brch   =>  plt_pheno%HourCounter4LeafOut_brch   , &
-    iPlantPhenologyPattern_pft =>  plt_pheno%iPlantPhenologyPattern_pft , &
+    HourCount2LeafOut_brch   =>  plt_pheno%HourCount2LeafOut_brch   , &
+    iPlantPhenolPattern_pft =>  plt_pheno%iPlantPhenolPattern_pft , &
     iPlantBranchState_brch     =>  plt_pheno%iPlantBranchState_brch  , &
     ZERO                       =>  plt_site%ZERO    , &
     C4PhotosynDowreg_brch      =>  plt_photo%C4PhotosynDowreg_brch   , &
@@ -644,16 +644,16 @@
     .AND.iPlantTurnoverPattern_pft(NZ).GE.2)THEN
     !conifer modification
     RubiscoActivity_brch(NB,NZ)=RubiscoActivity_brch(NB,NZ)*AZMAX1(AMIN1(1.0_r8 &
-      ,HourCounter4LeafOut_brch(NB,NZ)/(0.9_r8*ATRPZ)))
+      ,HourCount2LeafOut_brch(NB,NZ)/(0.9_r8*ATRPZ)))
   ENDIF
 !
 !     TERMINATION OF ANNUALS
 !
-!     iPlantPhenologyPattern_pft=growth habit:0=annual,1=perennial from PFT file
+!     iPlantPhenolPattern_pft=growth habit:0=annual,1=perennial from PFT file
 !     HourFailGrainFill_brch=number of hours with no grain fill after start of grain fill
 !     Hours2KillAnuals=number of hours with no grain fill to terminate annuals
 !
-  IF(iPlantPhenologyPattern_pft(NZ).EQ.iplt_annual.AND.HourFailGrainFill_brch(NB,NZ).GT.0.0_r8)THEN
+  IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual.AND.HourFailGrainFill_brch(NB,NZ).GT.0.0_r8)THEN
     C4PhotosynDowreg_brch(NB,NZ)=AZMAX1(1.0_r8-HourFailGrainFill_brch(NB,NZ)/Hours2KillAnuals(iPlantPhenolType_pft(NZ)))
   ELSE
     C4PhotosynDowreg_brch(NB,NZ)=1.0_r8

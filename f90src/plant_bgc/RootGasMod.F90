@@ -77,7 +77,7 @@ module RootGasMod
     RUPOXP                     =>  plt_rbgc%RUPOXP   , &
     RootAutoRO2Limiter_pvr     =>  plt_rbgc%RootAutoRO2Limiter_pvr     , &
     ZEROQ                      =>  plt_rbgc%ZEROQ    , &
-    RootRespPotential_vr       =>  plt_rbgc%RootRespPotential_vr    , &
+    RootRespPotent_pvr       =>  plt_rbgc%RootRespPotent_pvr    , &
     ROXYP                      =>  plt_rbgc%ROXYP    , &
     ROXSK                      =>  plt_rbgc%ROXSK    , &
     RCO2P                      =>  plt_rbgc%RCO2P    , &
@@ -103,11 +103,11 @@ module RootGasMod
     iPlantCalendar_brch        =>  plt_pheno%iPlantCalendar_brch  , &
     RootPoreTortu4Gas          =>  plt_morph%RootPoreTortu4Gas   , &
     PrimRootRadius_pvr         =>  plt_morph%PrimRootRadius_pvr   , &
-    AveSecndRootLen            =>  plt_morph%AveSecndRootLen   , &
+    AveLen2ndRoot_pvr            =>  plt_morph%AveLen2ndRoot_pvr   , &
     RootVolume_vr              =>  plt_morph%RootVolume_vr   , &
     RootLenPerPlant_pvr        =>  plt_morph%RootLenPerPlant_pvr   , &
     SecndRootXNum_pvr          =>  plt_morph%SecndRootXNum_pvr    , &
-    SecndRootRadius_pvr        =>  plt_morph%SecndRootRadius_pvr   , &
+    Radius2ndRoot_pvr        =>  plt_morph%Radius2ndRoot_pvr   , &
     RootRaidus_rpft            =>  plt_morph%RootRaidus_rpft   , &
     RootVH2O_vr                =>  plt_morph%RootVH2O_vr  , &
     RootPorosity               =>  plt_morph%RootPorosity   , &
@@ -116,7 +116,7 @@ module RootGasMod
     MainBranchNum_pft        =>  plt_morph%MainBranchNum_pft       &
   )
   
-  IF(RootRespPotential_vr(N,L,NZ).GT.ZEROP(NZ).AND.RootVH2O_vr(N,L,NZ).GT.ZEROP(NZ) &
+  IF(RootRespPotent_pvr(N,L,NZ).GT.ZEROP(NZ).AND.RootVH2O_vr(N,L,NZ).GT.ZEROP(NZ) &
     .AND.FOXYX.GT.ZEROQ(NZ))THEN
 !
 !     INITIALIZE VARIABLES USED IN ROOT GAS EXCHANGE
@@ -176,15 +176,15 @@ module RootGasMod
 !     RTCR1,RTCR2,RTCRA=cross-sectional area/length of
 !     primary,secondary,total root,myco system
 !     PrimRootXNumL_pvr,SecndRootXNum_pvr=number of root,myco primary,secondary axes
-!     PrimRootRadius_pvr,SecndRootRadius_pvr=primary,secondary root radius
+!     PrimRootRadius_pvr,Radius2ndRoot_pvr=primary,secondary root radius
 !     DPTHZ=depth of primary root from surface
-!     AveSecndRootLen=average secondary root length
+!     AveLen2ndRoot_pvr=average secondary root length
 !
     IF(RootStructElmnt_pft(ielmc,NZ).GT.ZEROP(NZ).AND.FracSoiLayByPrimRoot(L,NZ).GT.ZERO)THEN
       RTCR1=AMAX1(PlantPopulation_pft(NZ),PrimRootXNumL_pvr(N,L,NZ)) &
         *PICON*PrimRootRadius_pvr(N,L,NZ)**2/DPTHZ(L)
-      RTCR2=(SecndRootXNum_pvr(N,L,NZ)*PICON*SecndRootRadius_pvr(N,L,NZ)**2 &
-        /AveSecndRootLen(N,L,NZ))/FracSoiLayByPrimRoot(L,NZ)
+      RTCR2=(SecndRootXNum_pvr(N,L,NZ)*PICON*Radius2ndRoot_pvr(N,L,NZ)**2 &
+        /AveLen2ndRoot_pvr(N,L,NZ))/FracSoiLayByPrimRoot(L,NZ)
       IF(RTCR2.GT.RTCR1)THEN
         RTCRA=RTCR1*RTCR2/(RTCR1+RTCR2)
       ELSE

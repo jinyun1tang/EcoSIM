@@ -1088,11 +1088,11 @@ module UptakesMod
     PrimRootXNumL_pvr              => plt_morph%PrimRootXNumL_pvr   , &
     Max2ndRootRadius               => plt_morph%Max2ndRootRadius  , &
     RSRA                           => plt_morph%RSRA    , &
-    SecndRootRadius_pvr            => plt_morph%SecndRootRadius_pvr   , &
+    Radius2ndRoot_pvr            => plt_morph%Radius2ndRoot_pvr   , &
     RootLenDensPerPlant_pvr        => plt_morph%RootLenDensPerPlant_pvr   , &
     CanPHeight4WatUptake           => plt_morph%CanPHeight4WatUptake   , &
     RootLenPerPlant_pvr            => plt_morph%RootLenPerPlant_pvr   , &
-    AveSecndRootLen                => plt_morph%AveSecndRootLen   , &
+    AveLen2ndRoot_pvr                => plt_morph%AveLen2ndRoot_pvr   , &
     PrimRootRadius_pvr             => plt_morph%PrimRootRadius_pvr   , &
     MY                             => plt_morph%MY      , &
     RSRR                           => plt_morph%RSRR    , &
@@ -1148,13 +1148,13 @@ module UptakesMod
         !     RADIAL ROOT RESISTANCE FROM ROOT AREA AND RADIAL RESISTIVITY
         !     ENTERED IN 'READQ'
         !
-        !     SecndRootRadius_pvr=secondary root radius
+        !     Radius2ndRoot_pvr=secondary root radius
         !     RootLenPerPlant_pvr=root length per plant
         !     RootResistSoi=radial resistance
         !     RSRR=radial resistivity from PFT file
         !     VLMicP,VLWatMicPM=soil micropore,water volume
         !
-        RTAR2=TwoPiCON*SecndRootRadius_pvr(N,L,NZ)*RootLenPerPlant_pvr(N,L,NZ)*PlantPopulation_pft(NZ)
+        RTAR2=TwoPiCON*Radius2ndRoot_pvr(N,L,NZ)*RootLenPerPlant_pvr(N,L,NZ)*PlantPopulation_pft(NZ)
         RootResistSoi(N,L)=RSRR(N,NZ)/RTAR2*VLMicP(L)/VLWatMicPM(NPH,L)
 !
         !     ROOT AXIAL RESISTANCE FROM RADII AND LENGTHS OF PRIMARY AND
@@ -1162,18 +1162,18 @@ module UptakesMod
         !
         !     FRAD1,FRAD2=primary,secondary root radius relative to maximum
         !     secondary radius from PFT file Max2ndRootRadius at which RSRA is defined
-        !     PrimRootRadius_pvr,SecndRootRadius_pvr=primary,secondary root radius
+        !     PrimRootRadius_pvr,Radius2ndRoot_pvr=primary,secondary root radius
         !     RSRA=axial resistivity from PFT file
         !     DPTHZ=depth of primary root from surface
         !     RootResistRadial,RootResistAxial=axial resistance of primary,secondary roots
-        !     AveSecndRootLen=average secondary root length
+        !     AveLen2ndRoot_pvr=average secondary root length
         !     PrimRootXNumL_pvr,SecndRootXNum_pvr=number of primary,secondary axes
 !
         FRAD1=(PrimRootRadius_pvr(N,L,NZ)/Max2ndRootRadius(N,NZ))**4._r8
         RootResistRadial(N,L)=RSRA(N,NZ)*DPTHZ(L)/(FRAD1*PrimRootXNumL_pvr(ipltroot,L,NZ)) &
           +RSRA(ipltroot,NZ)*CanPHeight4WatUptake(NZ)/(FRADW*PrimRootXNumL_pvr(ipltroot,L,NZ))
-        FRAD2=(SecndRootRadius_pvr(N,L,NZ)/Max2ndRootRadius(N,NZ))**4._r8
-        RootResistAxial(N,L)=RSRA(N,NZ)*AveSecndRootLen(N,L,NZ)/(FRAD2*SecndRootXNum_pvr(N,L,NZ))
+        FRAD2=(Radius2ndRoot_pvr(N,L,NZ)/Max2ndRootRadius(N,NZ))**4._r8
+        RootResistAxial(N,L)=RSRA(N,NZ)*AveLen2ndRoot_pvr(N,L,NZ)/(FRAD2*SecndRootXNum_pvr(N,L,NZ))
         !
         !     TOTAL ROOT RESISTANCE = SOIL + RADIAL + AXIAL
         !

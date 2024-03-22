@@ -77,7 +77,7 @@ module grosubsMod
     MaxNumRootLays          => plt_site%MaxNumRootLays       , &
     CO2NetFix_pft           => plt_bgcr%CO2NetFix_pft     , &
     LitrFallChemElm_pft     => plt_bgcr%LitrFallChemElm_pft    , &
-    LitrFallChemElm_pvr     => plt_bgcr%LitrFallChemElm_pvr     , &
+    LitfalChemElm_pvr     => plt_bgcr%LitfalChemElm_pvr     , &
     CanopyHeight_pft        => plt_morph%CanopyHeight_pft       &
   )
 !     TOTAL AGB FOR GRAZING IN LANDSCAPE SECTION
@@ -96,7 +96,7 @@ module grosubsMod
       DO K=1,pltpar%NumOfPlantLitrCmplxs
         DO M=1,jsken
           DO NE=1,NumPlantChemElms
-            LitrFallChemElm_pvr(NE,M,K,L,NZ)=0._r8
+            LitfalChemElm_pvr(NE,M,K,L,NZ)=0._r8
           ENDDO
         ENDDO
       ENDDO
@@ -166,7 +166,7 @@ module grosubsMod
     NP0                            => plt_site%NP0      , &
     MaxNumRootLays                 => plt_site%MaxNumRootLays       , &
     iYearCurrent                   => plt_site%iYearCurrent     , &
-    LitrFallChemElm_pvr            => plt_bgcr%LitrFallChemElm_pvr     , &
+    LitfalChemElm_pvr            => plt_bgcr%LitfalChemElm_pvr     , &
     NetPrimaryProductvity_pft      => plt_bgcr%NetPrimaryProductvity_pft     , &
     PlantN2FixCum_pft              => plt_bgcr%PlantN2FixCum_pft   , &
     LitrFallChemElm_pft            => plt_bgcr%LitrFallChemElm_pft    , &
@@ -207,9 +207,9 @@ module grosubsMod
       D6235: DO M=1,jsken
         XFRE=1.5814E-05_r8*fTgrowCanP(NZ)*StandingDeadKCompChemElms_pft(NE,M,NZ)
         IF(iPlantTurnoverPattern_pft(NZ).EQ.0.OR.iPlantRootProfile_pft(NZ).LE.1)THEN
-          LitrFallChemElm_pvr(NE,M,k_fine_litr,0,NZ)=LitrFallChemElm_pvr(NE,M,k_fine_litr,0,NZ)+XFRE
+          LitfalChemElm_pvr(NE,M,k_fine_litr,0,NZ)=LitfalChemElm_pvr(NE,M,k_fine_litr,0,NZ)+XFRE
         ELSE
-          LitrFallChemElm_pvr(NE,M,k_woody_litr,0,NZ)=LitrFallChemElm_pvr(NE,M,k_woody_litr,0,NZ)+XFRE
+          LitfalChemElm_pvr(NE,M,k_woody_litr,0,NZ)=LitfalChemElm_pvr(NE,M,k_woody_litr,0,NZ)+XFRE
         ENDIF
         StandingDeadKCompChemElms_pft(NE,M,NZ)=StandingDeadKCompChemElms_pft(NE,M,NZ)-XFRE
       ENDDO D6235
@@ -224,10 +224,10 @@ module grosubsMod
     DO K=1,pltpar%NumOfPlantLitrCmplxs
       DO NE=1,NumPlantChemElms
         D6430: DO M=1,jsken
-          SurfLitrfallChemElms_pft(NE,NZ)=SurfLitrfallChemElms_pft(NE,NZ)+LitrFallChemElm_pvr(NE,M,K,0,NZ)
+          SurfLitrfallChemElms_pft(NE,NZ)=SurfLitrfallChemElms_pft(NE,NZ)+LitfalChemElm_pvr(NE,M,K,0,NZ)
           D8955: DO L=0,MaxNumRootLays
-            LitrFallChemElm_pft(NE,NZ)=LitrFallChemElm_pft(NE,NZ)+LitrFallChemElm_pvr(NE,M,K,L,NZ)
-            LitrfallChemElms_pft(NE,NZ)=LitrfallChemElms_pft(NE,NZ)+LitrFallChemElm_pvr(NE,M,K,L,NZ)
+            LitrFallChemElm_pft(NE,NZ)=LitrFallChemElm_pft(NE,NZ)+LitfalChemElm_pvr(NE,M,K,L,NZ)
+            LitrfallChemElms_pft(NE,NZ)=LitrfallChemElms_pft(NE,NZ)+LitfalChemElm_pvr(NE,M,K,L,NZ)
           ENDDO D8955
         ENDDO D6430
       enddo
@@ -406,7 +406,7 @@ module grosubsMod
     iPlantTurnoverPattern_pft =>  plt_pheno%iPlantTurnoverPattern_pft   , &
     iPlantRootProfile_pft     =>  plt_pheno%iPlantRootProfile_pft   , &
     RCO2A_pvr                 =>  plt_rbgc%RCO2A_pvr     , &
-    RootRespPotential_vr      =>  plt_rbgc%RootRespPotential_vr     , &
+    RootRespPotent_pvr      =>  plt_rbgc%RootRespPotent_pvr     , &
     RCO2N_pvr                 =>  plt_rbgc%RCO2N_pvr     , &
     RootrNC_pft               =>  plt_allom%RootrNC_pft    , &
     RootrPC_pft               =>  plt_allom%RootrPC_pft    , &
@@ -447,7 +447,7 @@ module grosubsMod
       RootProteinC_pvr(N,L,NZ)=0._r8
       PrimRootXNumL_pvr(N,L,NZ)=0._r8
       SecndRootXNum_pvr(N,L,NZ)=0._r8
-      RootRespPotential_vr(N,L,NZ)=0._r8
+      RootRespPotent_pvr(N,L,NZ)=0._r8
       RCO2N_pvr(N,L,NZ)=0._r8
       RCO2A_pvr(N,L,NZ)=0._r8
     ENDDO D6
@@ -551,7 +551,7 @@ module grosubsMod
 !
   WFNS=AMIN1(1.0_r8,AZMAX1(PSICanopyTurg_pft(NZ)-PSIMin4OrganExtension))
 
-  IF(is_plant_bryophyte(iPlantRootProfile_pft(NZ)))THEN
+  IF(is_root_shallow(iPlantRootProfile_pft(NZ)))THEN
     !bryophyte, no turgor
     Stomata_Activity=1.0_r8
     WFNG=EXP(0.05_r8*PSICanopy_pft(NZ))
@@ -575,7 +575,7 @@ module grosubsMod
   associate(                                 &
     LeafChemElms_brch           =>  plt_biom%LeafChemElms_brch    , &
     GrainChemElms_brch          =>  plt_biom%GrainChemElms_brch     , &
-    RootMycoNonstructElm_vr     =>  plt_biom%RootMycoNonstructElm_vr     , &
+    RootMycoNonstElm_pvr     =>  plt_biom%RootMycoNonstElm_pvr     , &
     PopuPlantRootC_vr           =>  plt_biom% PopuPlantRootC_vr     , &
     ShootChemElm_brch           =>  plt_biom%ShootChemElm_brch    , &
     EarChemElms_brch            =>  plt_biom%EarChemElms_brch    , &
@@ -611,7 +611,7 @@ module grosubsMod
 !     WTHSKB,WTEARB,WTGRB=branch husk,ear,grain C mass
 !     WTHSBN,WTEABN,WTGRBN=branch husk,ear,grain N mass
 !     WTHSBP,WTEABP,WTGRBP=branch husk,ear,grain P mass
-!     iPlantPhenologyPattern_pft=growth habit:0=annual,1=perennial from PFT file
+!     iPlantPhenolPattern_pft=growth habit:0=annual,1=perennial from PFT file
 !     iPlantPhenolType_pft=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
 !     WTRVC,WTRVN,WTRVP=storage C,N,P
 !
@@ -645,7 +645,7 @@ module grosubsMod
 !
   D345: DO N=1,MY(NZ)
     DO  L=NU,MaxSoiL4Root(NZ)
-      PopuPlantRootC_vr(N,L,NZ)= PopuPlantRootC_vr(N,L,NZ)+RootMycoNonstructElm_vr(ielmc,N,L,NZ)
+      PopuPlantRootC_vr(N,L,NZ)= PopuPlantRootC_vr(N,L,NZ)+RootMycoNonstElm_pvr(ielmc,N,L,NZ)
     enddo
   ENDDO D345
   end associate
@@ -660,12 +660,12 @@ module grosubsMod
 !     begin_execution
   associate(                            &
     NonstructElm_brch            =>  plt_biom%NonstructElm_brch  , &
-    RootMycoNonstructElm_vr      =>  plt_biom%RootMycoNonstructElm_vr  , &
-    NoduleNonstructElm_brch      =>  plt_biom%NoduleNonstructElm_brch  , &
+    RootMycoNonstElm_pvr      =>  plt_biom%RootMycoNonstElm_pvr  , &
+    NodulNonstElm_brch      =>  plt_biom%NodulNonstElm_brch  , &
     NoduleChemElms_pft           =>  plt_biom%NoduleChemElms_pft   , &
     RootStructElmnt_pft          =>  plt_biom%RootStructElmnt_pft  , &
     RootElmnts_pft               =>  plt_biom%RootElmnts_pft   , &
-    CanopyNoduleChemElm_brch     =>  plt_biom%CanopyNoduleChemElm_brch  , &
+    CanopyNodulChemElm_brch     =>  plt_biom%CanopyNodulChemElm_brch  , &
     ShootChemElm_brch            =>  plt_biom%ShootChemElm_brch , &
     StalkChemElms_brch           =>  plt_biom%StalkChemElms_brch , &
     HuskChemElms_brch            =>  plt_biom%HuskChemElms_brch , &
@@ -745,7 +745,7 @@ module grosubsMod
     GrainChemElms_pft(NE,NZ)=sum(GrainChemElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
     EarChemElms_pft(NE,NZ)=sum(EarChemElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
     !root state variables
-    RootElmnts_pft(NE,NZ)=sum(RootMycoNonstructElm_vr(NE,1:MY(NZ),NU:MaxNumRootLays,NZ))
+    RootElmnts_pft(NE,NZ)=sum(RootMycoNonstElm_pvr(NE,1:MY(NZ),NU:MaxNumRootLays,NZ))
     RootStructElmnt_pft(NE,NZ)=sum(Root1stStructChemElm_pvr(NE,1:MY(NZ),NU:MaxNumRootLays,1:NumRootAxes_pft(NZ),NZ)) &
       +sum(Root2ndStructChemElm_pvr(NE,1:MY(NZ),NU:MaxNumRootLays,1:NumRootAxes_pft(NZ),NZ))
     RootElmnts_pft(NE,NZ)=RootElmnts_pft(NE,NZ)+RootStructElmnt_pft(NE,NZ)
@@ -775,10 +775,10 @@ module grosubsMod
     IF(is_canopy_N2fix(iPlantNfixType(NZ)))THEN
       DO NE=1,NumPlantChemElms
         D7950: DO NB=1,NumOfBranches_pft(NZ)
-          NoduleNonstructElmnt_pft(NE,NZ)=NoduleNonstructElmnt_pft(NE,NZ)+NoduleNonstructElm_brch(NE,NB,NZ)
+          NoduleNonstructElmnt_pft(NE,NZ)=NoduleNonstructElmnt_pft(NE,NZ)+NodulNonstElm_brch(NE,NB,NZ)
         ENDDO D7950
-        NoduleChemElms_pft(NE,NZ)=sum(CanopyNoduleChemElm_brch(NE,1:NumOfBranches_pft(NZ),NZ))+ &
-          sum(NoduleNonstructElm_brch(NE,1:NumOfBranches_pft(NZ),NZ))
+        NoduleChemElms_pft(NE,NZ)=sum(CanopyNodulChemElm_brch(NE,1:NumOfBranches_pft(NZ),NZ))+ &
+          sum(NodulNonstElm_brch(NE,1:NumOfBranches_pft(NZ),NZ))
       ENDDO
     ELSEIF(is_root_N2fix(iPlantNfixType(NZ)))THEN
       DO NE=1,NumPlantChemElms

@@ -54,13 +54,13 @@ module RootDataType
   real(r8),target,allocatable ::  PrimRootXNumL_pvr(:,:,:,:,:)                    !root layer number primary axes, [d-2]
   real(r8),target,allocatable ::  SecndRootXNum_pvr(:,:,:,:,:)                    !root layer number axes, [d-2]
   real(r8),target,allocatable ::  SecndRootXNum_rpvr(:,:,:,:,:,:)                  !root layer number secondary axes, [d-2]
-  real(r8),target,allocatable ::  AveSecndRootLen(:,:,:,:,:)                   !root layer average length, [m]
+  real(r8),target,allocatable ::  AveLen2ndRoot_pvr(:,:,:,:,:)                   !root layer average length, [m]
   real(r8),target,allocatable ::  RootAreaPerPlant_vr(:,:,:,:,:)                   !root layer area per plant, [m p-1]
   real(r8),target,allocatable ::  RootVH2O_vr(:,:,:,:,:)                   !root layer volume water, [m2 d-2]
   real(r8),target,allocatable ::  PrimRootRadius_pvr(:,:,:,:,:)                   !root layer diameter primary axes, [m ]
   real(r8),target,allocatable ::  RootVolume_vr(:,:,:,:,:)                   !root layer volume air, [m2 d-2]
   real(r8),target,allocatable ::  PrimRootDepth(:,:,:,:,:)                   !root layer depth, [m]
-  real(r8),target,allocatable ::  SecndRootRadius_pvr(:,:,:,:,:)                   !root layer diameter secondary axes, [m ]
+  real(r8),target,allocatable ::  Radius2ndRoot_pvr(:,:,:,:,:)                   !root layer diameter secondary axes, [m ]
   real(r8),target,allocatable ::  PrimRootSpecLen(:,:,:,:)                    !specific root length primary axes, [m g-1]
   real(r8),target,allocatable ::  SecndRootSpecLen(:,:,:,:)                    !specific root length secondary axes, [m g-1]
   real(r8),target,allocatable ::  AllPlantRootH2OUptake_vr(:,:,:,:,:)                   !root water uptake, [m2 d-2 h-1]
@@ -80,7 +80,7 @@ module RootDataType
   real(r8),target,allocatable ::  RootNodueChemElm_pvr(:,:,:,:,:)                  !root layer nodule element, [g d-2]
   real(r8),target,allocatable ::  NoduleChemElms_pft(:,:,:,:)                     !root total nodule mass, [g d-2]
   real(r8),target,allocatable ::  RootStructBiomC_vr(:,:,:,:,:)                   !root layer structural C, [g d-2]
-  real(r8),target,allocatable ::   RootMycoNonstructElm_vr(:,:,:,:,:,:)                !root  layer nonstructural element, [g d-2]
+  real(r8),target,allocatable ::   RootMycoNonstElm_pvr(:,:,:,:,:,:)                !root  layer nonstructural element, [g d-2]
   real(r8),target,allocatable ::  RootNonstructElmConc_pvr(:,:,:,:,:,:)                !root  layer nonstructural element concentration, [g g-1]
   real(r8),target,allocatable ::  Root1stChemElm(:,:,:,:,:,:)                   !root C primary axes, [g d-2]
   real(r8),target,allocatable ::  RootProteinConc_pvr(:,:,:,:,:)                  !root layer protein C concentration, [g g-1]
@@ -136,13 +136,13 @@ contains
   allocate(PrimRootXNumL_pvr(jroots,JZ,JP,JY,JX));PrimRootXNumL_pvr=0._r8
   allocate(SecndRootXNum_pvr(jroots,JZ,JP,JY,JX));SecndRootXNum_pvr=0._r8
   allocate(SecndRootXNum_rpvr(jroots,JZ,NumOfCanopyLayers,JP,JY,JX));SecndRootXNum_rpvr=0._r8
-  allocate(AveSecndRootLen(jroots,JZ,JP,JY,JX));AveSecndRootLen=0._r8
+  allocate(AveLen2ndRoot_pvr(jroots,JZ,JP,JY,JX));AveLen2ndRoot_pvr=0._r8
   allocate(RootAreaPerPlant_vr(jroots,JZ,JP,JY,JX));RootAreaPerPlant_vr=0._r8
   allocate(RootVH2O_vr(jroots,JZ,JP,JY,JX));RootVH2O_vr=0._r8
   allocate(PrimRootRadius_pvr(jroots,JZ,JP,JY,JX));PrimRootRadius_pvr=0._r8
   allocate(RootVolume_vr(jroots,JZ,JP,JY,JX));RootVolume_vr=0._r8
   allocate(PrimRootDepth(jroots,NumOfCanopyLayers,JP,JY,JX));PrimRootDepth=0._r8
-  allocate(SecndRootRadius_pvr(jroots,JZ,JP,JY,JX));SecndRootRadius_pvr=0._r8
+  allocate(Radius2ndRoot_pvr(jroots,JZ,JP,JY,JX));Radius2ndRoot_pvr=0._r8
   allocate(PrimRootSpecLen(jroots,JP,JY,JX)); PrimRootSpecLen=0._r8
   allocate(SecndRootSpecLen(jroots,JP,JY,JX)); SecndRootSpecLen=0._r8
   allocate(AllPlantRootH2OUptake_vr(jroots,JZ,JP,JY,JX));AllPlantRootH2OUptake_vr=0._r8
@@ -162,7 +162,7 @@ contains
   allocate(RootNodueChemElm_pvr(NumPlantChemElms,JZ,JP,JY,JX)); RootNodueChemElm_pvr=0._r8
   allocate(NoduleChemElms_pft(NumPlantChemElms,JP,JY,JX));  NoduleChemElms_pft=0._r8
   allocate(RootStructBiomC_vr(jroots,JZ,JP,JY,JX));RootStructBiomC_vr=0._r8
-  allocate(RootMycoNonstructElm_vr(NumPlantChemElms,jroots,JZ,JP,JY,JX)); RootMycoNonstructElm_vr=0._r8
+  allocate(RootMycoNonstElm_pvr(NumPlantChemElms,jroots,JZ,JP,JY,JX)); RootMycoNonstElm_pvr=0._r8
   allocate(RootNonstructElmConc_pvr(NumPlantChemElms,jroots,JZ,JP,JY,JX));RootNonstructElmConc_pvr=0._r8
   allocate(Root1stChemElm(NumPlantChemElms,jroots,MaxNumRootAxes,JP,JY,JX));Root1stChemElm=0._r8
   allocate(RootProteinConc_pvr(jroots,JZ,JP,JY,JX));RootProteinConc_pvr=0._r8
@@ -216,13 +216,13 @@ contains
   call destroy(PrimRootXNumL_pvr)
   call destroy(SecndRootXNum_pvr)
   call destroy(SecndRootXNum_rpvr)
-  call destroy(AveSecndRootLen)
+  call destroy(AveLen2ndRoot_pvr)
   call destroy(RootAreaPerPlant_vr)
   call destroy(RootVH2O_vr)
   call destroy(PrimRootRadius_pvr)
   call destroy(RootVolume_vr)
   call destroy(PrimRootDepth)
-  call destroy(SecndRootRadius_pvr)
+  call destroy(Radius2ndRoot_pvr)
   call destroy(PrimRootSpecLen)
   call destroy(SecndRootSpecLen)
   call destroy(AllPlantRootH2OUptake_vr)
@@ -242,7 +242,7 @@ contains
   call destroy(RootNodueChemElm_pvr)
   call destroy(NoduleChemElms_pft)
   call destroy(RootStructBiomC_vr)
-  call destroy(RootMycoNonstructElm_vr)
+  call destroy(RootMycoNonstElm_pvr)
   call destroy(RootNonstructElmConc_pvr)
   call destroy(Root1stChemElm)
   call destroy(RootProteinConc_pvr)

@@ -154,7 +154,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  SeedCMass(:,:,:)                        !grain size at seeding, [g]
   real(r8),target,allocatable ::  GrainFillRate25C_pft(:,:,:)                       !maximum rate of fill per grain, [g h-1]
   real(r8),target,allocatable ::  HourFailGrainFill_brch(:,:,:,:)                      !flag to detect physiological maturity from  grain fill , [-]
-  real(r8),target,allocatable ::  HourCounter4LeafOut_brch(:,:,:,:)                      !counter for mobilizing nonstructural C during spring leafout/dehardening, [h]
+  real(r8),target,allocatable ::  HourCount2LeafOut_brch(:,:,:,:)                      !counter for mobilizing nonstructural C during spring leafout/dehardening, [h]
   real(r8),target,allocatable ::  HoursDoingRemob_brch(:,:,:,:)                      !counter for mobilizing nonstructural C during autumn leafoff/hardening, [h]
   integer,target,allocatable ::  iPlantCalendar_brch(:,:,:,:,:)                     !plant growth stage, [-]
   real(r8),target,allocatable ::  TCelciusChill4Seed(:,:,:)                         !temperature below which seed set is adversely affected, [oC]
@@ -314,7 +314,7 @@ contains
   allocate(SeedCMass(JP,JY,JX));     SeedCMass=0._r8
   allocate(GrainFillRate25C_pft(JP,JY,JX));    GrainFillRate25C_pft=0._r8
   allocate(HourFailGrainFill_brch(MaxNumBranches,JP,JY,JX));  HourFailGrainFill_brch=0._r8
-  allocate(HourCounter4LeafOut_brch(MaxNumBranches,JP,JY,JX));  HourCounter4LeafOut_brch=0._r8
+  allocate(HourCount2LeafOut_brch(MaxNumBranches,JP,JY,JX));  HourCount2LeafOut_brch=0._r8
   allocate(HoursDoingRemob_brch(MaxNumBranches,JP,JY,JX));  HoursDoingRemob_brch=0._r8
   allocate(iPlantCalendar_brch(NumGrowthStages,MaxNumBranches,JP,JY,JX));iPlantCalendar_brch=0
   allocate(TCelciusChill4Seed(JP,JY,JX));      TCelciusChill4Seed=0._r8
@@ -471,7 +471,7 @@ contains
   call destroy(SeedCMass)
   call destroy(GrainFillRate25C_pft)
   call destroy(HourFailGrainFill_brch)
-  call destroy(HourCounter4LeafOut_brch)
+  call destroy(HourCount2LeafOut_brch)
   call destroy(HoursDoingRemob_brch)
   call destroy(iPlantCalendar_brch)
   call destroy(TCelciusChill4Seed)
