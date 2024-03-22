@@ -766,9 +766,9 @@
 
 !     begin_execution
   associate(                          &
-    HourThreshold4LeafOff_brch  =>  plt_pheno%HourThreshold4LeafOff_brch  , &
+    HourReq4LeafOff_brch  =>  plt_pheno%HourReq4LeafOff_brch  , &
     Hours4LeafOff_brch          =>  plt_pheno%Hours4LeafOff_brch   , &
-    HourThreshold4LeafOut_brch  =>  plt_pheno%HourThreshold4LeafOut_brch  , &
+    HourReq4LeafOut_brch  =>  plt_pheno%HourReq4LeafOut_brch  , &
     Hours4Leafout_brch          =>  plt_pheno%Hours4Leafout_brch   , &
     iPlantPhenolType_pft        =>  plt_pheno%iPlantPhenolType_pft , &
     ZEROP                       =>  plt_biom%ZEROP   , &
@@ -799,8 +799,8 @@
 !     Hours4LeafOff_brch,VRNX=leafoff hours,hours required for leafoff
 !
     IF(iPlantPhenolType_pft(NZ).EQ.iphenotyp_evgreen &
-      .OR.Hours4Leafout_brch(NB,NZ).GE.HourThreshold4LeafOut_brch(NB,NZ) &
-      .OR.Hours4LeafOff_brch(NB,NZ).LT.HourThreshold4LeafOff_brch(NB,NZ))THEN
+      .OR.Hours4Leafout_brch(NB,NZ).GE.HourReq4LeafOut_brch(NB,NZ) &
+      .OR.Hours4LeafOff_brch(NB,NZ).LT.HourReq4LeafOff_brch(NB,NZ))THEN
       !there are photosynthetically active leaves 
       call PhenoActiveBranch(NB,NZ,CH2O,TFN_Carboxy,TFN_Oxy,TFN_eTransp,Km4RubOxy)
     ELSE

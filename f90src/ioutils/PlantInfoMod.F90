@@ -357,11 +357,11 @@ implicit none
     ENDIF
     D5: DO NB=1,NumOfCanopyLayers
       IF(iPlantPhenolType_pft(NZ,NY,NX).EQ.iphenotyp_evgreen.AND.iPlantPhenologyPattern_pft(NZ,NY,NX).NE.iplt_annual)THEN
-        HourThreshold4LeafOut_brch(NB,NZ,NY,NX)=AMIN1(4380.0_r8,VRNLI+144.0_r8*PlantInitThermoAdaptZone(NZ,NY,NX)*(NB-1))
-        HourThreshold4LeafOff_brch(NB,NZ,NY,NX)=AMIN1(4380.0_r8,VRNXI+144.0_r8*PlantInitThermoAdaptZone(NZ,NY,NX)*(NB-1))
+        HourReq4LeafOut_brch(NB,NZ,NY,NX)=AMIN1(4380.0_r8,VRNLI+144.0_r8*PlantInitThermoAdaptZone(NZ,NY,NX)*(NB-1))
+        HourReq4LeafOff_brch(NB,NZ,NY,NX)=AMIN1(4380.0_r8,VRNXI+144.0_r8*PlantInitThermoAdaptZone(NZ,NY,NX)*(NB-1))
       ELSE
-        HourThreshold4LeafOut_brch(NB,NZ,NY,NX)=VRNLI
-        HourThreshold4LeafOff_brch(NB,NZ,NY,NX)=VRNXI
+        HourReq4LeafOut_brch(NB,NZ,NY,NX)=VRNLI
+        HourReq4LeafOff_brch(NB,NZ,NY,NX)=VRNXI
       ENDIF
     ENDDO D5
   ENDIF
@@ -386,7 +386,7 @@ implicit none
   loc=get_pft_loc(DATAP(NZ,NY,NX)(1:6),pft_lname,koppen_climl,koppen_clims)
   DATAPI(NZ,NY,NX)=loc
   call ncd_getvar(pft_nfid, 'ICTYP', loc, iPlantPhotosynthesisType(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'IGTYP', loc, iPlantMorphologyType_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'IGTYP', loc, iPlantRootProfile_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'ISTYP', loc, iPlantPhenologyPattern_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'IDTYP', loc, iPlantDevelopPattern_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'INTYP', loc, iPlantNfixType(NZ,NY,NX))
@@ -441,7 +441,7 @@ implicit none
   call ncd_getvar(pft_nfid, 'SDMX', loc,MaxSeedNumPerSite_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'GRMX', loc,MaxSeedCMass(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'GRDM', loc,SeedCMass(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'GFILL', loc,GrainFillRateat25C_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'GFILL', loc,GrainFillRate25C_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'WTSTDI', loc,StandingDeadInitC_pft(NZ,NY,NX))
 
   call ncd_getvar(pft_nfid, 'RRAD1M', loc,Max1stRootRadius(1,NZ,NY,NX))
@@ -526,15 +526,15 @@ implicit none
   character(len=60) :: strval
 
 !   iPlantPhotosynthesisType=photosynthesis type:3=C3,4=C4
-!   iPlantMorphologyType_pft=root profile:0=shallow (eg bryophytes),1=intermediate(eg herbs),2=deep (eg trees)
+!   iPlantRootProfile_pft=root profile:0=shallow (eg bryophytes),1=intermediate(eg herbs),2=deep (eg trees)
 !   iPlantPhenologyPattern_pft=growth habit:0=annual,1=perennial
 !   iPlantDevelopPattern_pft=growth habit:0=determinate,1=indetermimate
 !   iPlantNfixType=N2 fixation:1,2,3=rapid to slow root symbiosis (e.g.legumes),
 !   4,5,6=rapid to slow canopy symbiosis (e.g. cyanobacteria)
 !   iPlantPhenolType_pft=phenology type:0=evergreen,1=cold deciduous,2=drought deciduous,3=1+2
 !   iPlantPhotoperiodType_pft=photoperiod type:0=day neutral,1=short day,2=long day
-!   iPlantTurnoverPattern_pft=turnover:if iPlantMorphologyType_pft=0 or 1:all above-ground:0,1=rapid(deciduous),2=very slow(evergreen),3=slow(semi-deciduous)
-!                   :if iPlantMorphologyType_pft=2:trees:1=rapid(deciduous),2=very slow(coniferous),3=slow(semi-deciduous)
+!   iPlantTurnoverPattern_pft=turnover:if iPlantRootProfile_pft=0 or 1:all above-ground:0,1=rapid(deciduous),2=very slow(evergreen),3=slow(semi-deciduous)
+!                   :if iPlantRootProfile_pft=2:trees:1=rapid(deciduous),2=very slow(coniferous),3=slow(semi-deciduous)
 !   iPlantGrainType_pft=storage organ:0=above ground,1=below ground
 !   MY=mycorrhizal:1=no,2=yes
 !   PlantInitThermoAdaptZone=thermal adaptation zone:1=arctic,boreal,2=cool temperate,
@@ -555,7 +555,7 @@ implicit none
   end select
   call writefixsl(nu_plt,'Photosynthesis pathway',strval,40)
 
-  select case(iPlantMorphologyType_pft(NZ,NY,NX))
+  select case(iPlantRootProfile_pft(NZ,NY,NX))
   case (0)
     strval='Shallow root profile, like bryophytes'
   case (1)
@@ -633,7 +633,7 @@ implicit none
   end select
   call writefixsl(nu_plt,'Photoperiod',strval,40)
 
-  if(is_plant_treelike(iPlantMorphologyType_pft(NZ,NY,NX)))then
+  if(is_plant_treelike(iPlantRootProfile_pft(NZ,NY,NX)))then
     select case(iPlantTurnoverPattern_pft(NZ,NY,NX))
     case (0, 1)
       strval='Rapid, like deciduous tree'
@@ -778,7 +778,7 @@ implicit none
   call writefixl(nu_plt,'maximum seed number per STMX (none) SDMX',MaxSeedNumPerSite_pft(NZ,NY,NX),70)
   call writefixl(nu_plt,'maximum seed size per SDMX (g) GRMX',MaxSeedCMass(NZ,NY,NX),70)
   call writefixl(nu_plt,'seed size at planting (gC) GRDM',SeedCMass(NZ,NY,NX),70)    !could be greater than MaxSeedCMass, accouting for seedling
-  call writefixl(nu_plt,'grain filling rate at 25 oC (g seed-1 h-1) GFILL',GrainFillRateat25C_pft(NZ,NY,NX),70)
+  call writefixl(nu_plt,'grain filling rate at 25 oC (g seed-1 h-1) GFILL',GrainFillRate25C_pft(NZ,NY,NX),70)
   call writefixl(nu_plt,'mass of dead standing biomass at planting (gC m-2) WTSTDI',StandingDeadInitC_pft(NZ,NY,NX),70)
   end subroutine morphology_trait_disp
 

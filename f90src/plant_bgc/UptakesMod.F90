@@ -1406,7 +1406,7 @@ module UptakesMod
   !
   IF(iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).EQ.0)THEN
     TKG(NZ)=TKS(NU)
-    !     ELSEIF((iPlantTurnoverPattern_pft(NZ).EQ.0.OR.iPlantMorphologyType_pft(NZ).LE.1)
+    !     ELSEIF((iPlantTurnoverPattern_pft(NZ).EQ.0.OR.iPlantRootProfile_pft(NZ).LE.1)
     !    2.AND.iPlantCalendar_brch(ipltcal_InitFloral,MainBranchNum_pft(NZ),NZ).EQ.0)THEN
     !     TKG(NZ)=TKS(NU)
   ELSE

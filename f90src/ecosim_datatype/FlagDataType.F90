@@ -27,7 +27,7 @@ implicit none
   integer,target,allocatable ::  IsPlantActive_pft(:,:,:)                        ! flag for living pft
   integer,target,allocatable ::  doInitPlant_pft(:,:,:)                        !PFT initialization flag:0=no,1=yes
   integer,target,allocatable ::  iPlantPhotosynthesisType(:,:,:)                        !plant photosynthetic type (C3 or C4)
-  integer,target,allocatable ::  iPlantMorphologyType_pft(:,:,:)                        !plant growth type (vascular, non-vascular)
+  integer,target,allocatable ::  iPlantRootProfile_pft(:,:,:)                        !plant growth type (vascular, non-vascular)
   integer,target,allocatable ::  iPlantPhenologyPattern_pft(:,:,:)                        !plant growth habit (annual or perennial)
   integer,target,allocatable ::  iPlantDevelopPattern_pft(:,:,:)                        !plant growth habit (determinate or indeterminate)
   integer,target,allocatable ::  iPlantNfixType(:,:,:)                        !N2 fixation type
@@ -58,7 +58,7 @@ contains
   allocate(IsPlantActive_pft(JP,JY,JX));    IsPlantActive_pft=0
   allocate(doInitPlant_pft(JP,JY,JX));    doInitPlant_pft=ifalse
   allocate(iPlantPhotosynthesisType(JP,JY,JX));    iPlantPhotosynthesisType=0
-  allocate(iPlantMorphologyType_pft(JP,JY,JX));    iPlantMorphologyType_pft=0
+  allocate(iPlantRootProfile_pft(JP,JY,JX));    iPlantRootProfile_pft=0
   allocate(iPlantPhenologyPattern_pft(JP,JY,JX));    iPlantPhenologyPattern_pft=0
   allocate(iPlantDevelopPattern_pft(JP,JY,JX));    iPlantDevelopPattern_pft=0
   allocate(iPlantNfixType(JP,JY,JX));    iPlantNfixType=0
@@ -89,7 +89,7 @@ contains
   call destroy(IsPlantActive_pft)
   call destroy(doInitPlant_pft)
   call destroy(iPlantPhotosynthesisType)
-  call destroy(iPlantMorphologyType_pft)
+  call destroy(iPlantRootProfile_pft)
   call destroy(iPlantPhenologyPattern_pft)
   call destroy(iPlantDevelopPattern_pft)
   call destroy(iPlantNfixType)

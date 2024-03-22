@@ -51,7 +51,7 @@ implicit none
 !     iYearCurrent=current year
 !     iPlantBranchState_brch=branch living flag: 0=alive,1=dead
 !     GROUP=node number required for floral initiation
-!     NodeNumberToInitFloral_brch=node number at floral initiation
+!     NodeNum2InitFloral_brch=node number at floral initiation
 !     NodeNumberAtAnthesis_brch=node number at flowering
 !     NumOfLeaves_brch=number of leaves appeared
 !     KHiestGroLeafNode_brch=integer of most recent leaf number currently growing
@@ -165,7 +165,7 @@ implicit none
     iPlantPhenologyPattern_pft       =>   plt_pheno%iPlantPhenologyPattern_pft  , &
     iPlantPhenolType_pft          =>   plt_pheno%iPlantPhenolType_pft  , &
     iPlantRootState_pft              =>   plt_pheno%iPlantRootState_pft  , &
-    iPlantMorphologyType_pft         =>   plt_pheno%iPlantMorphologyType_pft  , &
+    iPlantRootProfile_pft         =>   plt_pheno%iPlantRootProfile_pft  , &
     iPlantTurnoverPattern_pft        =>   plt_pheno%iPlantTurnoverPattern_pft  , &
     iPlantShootState_pft             =>   plt_pheno%iPlantShootState_pft   , &
     icwood                           =>   pltpar%icwood     , &
@@ -238,7 +238,7 @@ implicit none
               LitrFallChemElm_pvr(NE,M,k_fine_litr,0,NZ)=LitrFallChemElm_pvr(NE,M,k_fine_litr,0,NZ) &
                 +CFOPE(NE,inonfoliar,M,NZ)*GrainChemElms_brch(NE,NB,NZ)
             ENDIF
-            IF(iPlantTurnoverPattern_pft(NZ).EQ.0.OR.iPlantMorphologyType_pft(NZ).LE.1)THEN
+            IF(iPlantTurnoverPattern_pft(NZ).EQ.0.OR.iPlantRootProfile_pft(NZ).LE.1)THEN
               !all above ground
               LitrFallChemElm_pvr(NE,M,k_fine_litr,0,NZ)=LitrFallChemElm_pvr(NE,M,k_fine_litr,0,NZ)&
                 +CFOPE(NE,istalk,M,NZ)*StalkChemElms_brch(NE,NB,NZ)
@@ -525,12 +525,12 @@ implicit none
     doPlantLeaveOff_brch     =>  plt_pheno%doPlantLeaveOff_brch     , &
     iPlantCalendar_brch    =>  plt_pheno%iPlantCalendar_brch    , &
     iPlantTurnoverPattern_pft    =>  plt_pheno%iPlantTurnoverPattern_pft    , &
-    iPlantMorphologyType_pft    =>  plt_pheno%iPlantMorphologyType_pft    , &
+    iPlantRootProfile_pft    =>  plt_pheno%iPlantRootProfile_pft    , &
     iPlantPhenolType_pft    =>  plt_pheno%iPlantPhenolType_pft    , &
     iPlantPhenologyPattern_pft    =>  plt_pheno%iPlantPhenologyPattern_pft    , &
     LitrFallChemElm_pvr      =>  plt_bgcr%LitrFallChemElm_pvr       , &
     NumOfBranches_pft       =>  plt_morph%NumOfBranches_pft       , &
-    NodeNumberToInitFloral_brch     =>  plt_morph%NodeNumberToInitFloral_brch     , &
+    NodeNum2InitFloral_brch     =>  plt_morph%NodeNum2InitFloral_brch     , &
     ShootNodeNumber_brch     =>  plt_morph%ShootNodeNumber_brch     , &
     BranchNumber_brch      =>  plt_morph%BranchNumber_brch      , &
     NodeNumberAtAnthesis_brch     =>  plt_morph%NodeNumberAtAnthesis_brch     , &
@@ -551,7 +551,7 @@ implicit none
     IF(iPlantBranchState_brch(NB,NZ).EQ.iDead)THEN
       MatureGroup_brch(NB,NZ)=MatureGroup_pft(NZ)
       ShootNodeNumber_brch(NB,NZ)=XTLI(NZ)
-      NodeNumberToInitFloral_brch(NB,NZ)=ShootNodeNumber_brch(NB,NZ)
+      NodeNum2InitFloral_brch(NB,NZ)=ShootNodeNumber_brch(NB,NZ)
       NodeNumberAtAnthesis_brch(NB,NZ)=0._r8
       NumOfLeaves_brch(NB,NZ)=0._r8
       LeafNumberAtFloralInit_brch(NB,NZ)=0._r8
@@ -596,7 +596,7 @@ implicit none
 !     iPlantPhenologyPattern_pft=growth habit:0=annual,1=perennial from PFT file
 !     iPlantPhenolType_pft=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
 !     iPlantTurnoverPattern_pft=turnover:0=all abve-grd,1=all leaf+petiole,2=none,3=between 1,2
-!     iPlantMorphologyType_pft=growth type:0=bryophyte,1=graminoid,2=shrub,tree
+!     iPlantRootProfile_pft=growth type:0=bryophyte,1=graminoid,2=shrub,tree
 !
       D6405: DO M=1,jsken
         DO NE=1,NumPlantChemElms        
@@ -617,7 +617,7 @@ implicit none
             LitrFallChemElm_pvr(NE,M,k_fine_litr,0,NZ)=LitrFallChemElm_pvr(NE,M,k_fine_litr,0,NZ) &
               +CFOPE(NE,inonfoliar,M,NZ)*GrainChemElms_brch(NE,NB,NZ)
           ENDIF
-          IF(iPlantTurnoverPattern_pft(NZ).EQ.0.OR.iPlantMorphologyType_pft(NZ).LE.1)THEN
+          IF(iPlantTurnoverPattern_pft(NZ).EQ.0.OR.iPlantRootProfile_pft(NZ).LE.1)THEN
             LitrFallChemElm_pvr(NE,M,k_fine_litr,0,NZ)=LitrFallChemElm_pvr(NE,M,k_fine_litr,0,NZ) &
               +CFOPE(NE,istalk,M,NZ)*StalkChemElms_brch(NE,NB,NZ)
           ELSE
@@ -768,8 +768,8 @@ implicit none
     LeafProteinCNode_brch     => plt_biom%LeafProteinCNode_brch       , &
     InternodeChemElm_brch   => plt_biom%InternodeChemElm_brch     , &
     PetioleElmntNode_brch   => plt_biom%PetioleElmntNode_brch     , &
-    LeafChemElmByLayer_pft   => plt_biom%LeafChemElmByLayer_pft     , &
-    CanopyLeafCpft_lyr    => plt_biom%CanopyLeafCpft_lyr      , &
+    LeafChemElmByLayerNode_brch   => plt_biom%LeafChemElmByLayerNode_brch     , &
+    CanopyLeafCLyr_pft    => plt_biom%CanopyLeafCLyr_pft      , &
     PetoleChemElm_brch => plt_biom%PetoleChemElm_brch   , &
     CPOOL3   => plt_photo%CPOOL3    , &
     CPOOL4   => plt_photo%CPOOL4    , &
@@ -779,14 +779,14 @@ implicit none
     PotentialSeedSites_brch    => plt_morph%PotentialSeedSites_brch     , &
     SeedNumberSet_brch    => plt_morph%SeedNumberSet_brch     , &
     LeafAreaLive_brch    => plt_morph%LeafAreaLive_brch     , &
-    CanopyBranchStemApft_lyr    => plt_morph%CanopyBranchStemApft_lyr     , &
+    CanopyStemALyr_brch    => plt_morph%CanopyStemALyr_brch     , &
     NumOfBranches_pft      => plt_morph%NumOfBranches_pft       , &
     LeafAreaNode_brch    => plt_morph%LeafAreaNode_brch     , &
     PetioleLengthNode_brch    => plt_morph%PetioleLengthNode_brch     , &
     InternodeHeightDying_brch   => plt_morph%InternodeHeightDying_brch    , &
     LeafAreaZsec_brch     => plt_morph%LeafAreaZsec_brch      , &
     InternodeHeightLive_brch   => plt_morph%InternodeHeightLive_brch    , &
-    CanopyLeafApft_lyr    => plt_morph%CanopyLeafApft_lyr     , &
+    CanopyLeafALyr_pft    => plt_morph%CanopyLeafALyr_pft     , &
     StemAreaZsec_brch    => plt_morph%StemAreaZsec_brch     , &
     CanopyLeafAreaByLayer_pft    => plt_morph%CanopyLeafAreaByLayer_pft       &
   )
@@ -852,10 +852,10 @@ implicit none
     PetioleElmntNode_brch(1:NumPlantChemElms,K,NB,NZ)=0._r8
     InternodeChemElm_brch(1:NumPlantChemElms,K,NB,NZ)=0._r8
     D8865: DO L=1,NumOfCanopyLayers1
-      CanopyLeafApft_lyr(L,NZ)=CanopyLeafApft_lyr(L,NZ)-CanopyLeafAreaByLayer_pft(L,K,NB,NZ)
-      CanopyLeafCpft_lyr(L,NZ)=CanopyLeafCpft_lyr(L,NZ)-LeafChemElmByLayer_pft(ielmc,L,K,NB,NZ)
+      CanopyLeafALyr_pft(L,NZ)=CanopyLeafALyr_pft(L,NZ)-CanopyLeafAreaByLayer_pft(L,K,NB,NZ)
+      CanopyLeafCLyr_pft(L,NZ)=CanopyLeafCLyr_pft(L,NZ)-LeafChemElmByLayerNode_brch(ielmc,L,K,NB,NZ)
       CanopyLeafAreaByLayer_pft(L,K,NB,NZ)=0._r8
-      LeafChemElmByLayer_pft(1:NumPlantChemElms,L,K,NB,NZ)=0._r8
+      LeafChemElmByLayerNode_brch(1:NumPlantChemElms,L,K,NB,NZ)=0._r8
       IF(K.NE.0)THEN
         D8860: DO N=1,NumOfLeafZenithSectors1
           LeafAreaZsec_brch(N,L,K,NB,NZ)=0._r8
@@ -864,7 +864,7 @@ implicit none
     ENDDO D8865
   ENDDO D8855
   D8875: DO L=1,NumOfCanopyLayers1
-    CanopyBranchStemApft_lyr(L,NB,NZ)=0._r8
+    CanopyStemALyr_brch(L,NB,NZ)=0._r8
     DO  N=1,NumOfLeafZenithSectors1
       StemAreaZsec_brch(N,L,NB,NZ)=0._r8
     enddo

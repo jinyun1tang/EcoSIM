@@ -137,7 +137,7 @@ implicit none
     NonstructalElms_pft         =>   plt_biom%NonstructalElms_pft      , &
     FWODRE                        =>   plt_allom%FWODRE    , &
     RootBiomGrowthYield           =>   plt_allom%RootBiomGrowthYield     , &
-    iPlantMorphologyType_pft      =>   plt_pheno%iPlantMorphologyType_pft    , &
+    iPlantRootProfile_pft      =>   plt_pheno%iPlantRootProfile_pft    , &
     PSIRoot_vr                    =>   plt_ew%PSIRoot_vr       , &
     PSIRootTurg_vr                =>   plt_ew%PSIRootTurg_vr        , &
     RootGasLossDisturb_pft        =>   plt_bgcr%RootGasLossDisturb_pft    , &
@@ -204,14 +204,14 @@ implicit none
 !     SoilResit4RootPentration,SoilResit4SecndRootPentration=soil resistance to secondary root penetration (MPa)
 !     SecndRootRadius_pvr=secondary root radius
 !     WFNR=water function for root extension
-!     iPlantMorphologyType_pft=growth type:0=bryophyte,1=graminoid,2=shrub,tree
+!     iPlantRootProfile_pft=growth type:0=bryophyte,1=graminoid,2=shrub,tree
 !     fRootGrowPsiSense,WFNRG=growth,respiration function of root water potential
 !     PSIRoot_vr,PSIRootTurg_vr=root total,turgor water potential
 !     DMRT=root growth yield
 !
         SoilResit4SecndRootPentration=SoilResit4RootPentration(L)*SecndRootRadius_pvr(N,L,NZ)/1.0E-03_r8
         WFNR=AMIN1(1.0_r8,AZMAX1(PSIRootTurg_vr(N,L,NZ)-PSIMin4OrganExtension-SoilResit4SecndRootPentration))
-        IF(is_plant_bryophyte(iPlantMorphologyType_pft(NZ)))THEN
+        IF(is_plant_bryophyte(iPlantRootProfile_pft(NZ)))THEN
           fRootGrowPsiSense(N,L)=EXP(0.05_r8*PSIRoot_vr(N,L,NZ))
           WFNRG=WFNR**0.10_r8
         ELSE
@@ -406,7 +406,7 @@ implicit none
     icwood                          =>  pltpar%icwood       , &
     iroot                           =>  pltpar%iroot        , &
     inonstruct                      =>  pltpar%inonstruct     , &
-    iPlantMorphologyType_pft        =>  plt_pheno%iPlantMorphologyType_pft    , &
+    iPlantRootProfile_pft        =>  plt_pheno%iPlantRootProfile_pft    , &
     iPlantPhenolType_pft            =>  plt_pheno%iPlantPhenolType_pft    , &
     fTgrowRootP                     =>  plt_pheno%fTgrowRootP      , &
     iPlantCalendar_brch             =>  plt_pheno%iPlantCalendar_brch    , &
@@ -480,12 +480,12 @@ implicit none
 !     RmSpecPlant=specific maintenance respiration rate (g C g-1 N h-1)
 !     WTRT2N=secondary root N mass
 !     TFN6=temperature function for root maintenance respiration
-!     iPlantMorphologyType_pft=growth type:0=bryophyte,1=graminoid,2=shrub,tree
+!     iPlantRootProfile_pft=growth type:0=bryophyte,1=graminoid,2=shrub,tree
 !     iPlantPhenolType_pft=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
 !     fRootGrowPsiSense=growth function of root water potential
 !
       RMNCR=AZMAX1(RmSpecPlant*Root2ndStructChemElm_pvr(ielmn,N,L,NR,NZ))*TFN6(L)
-      IF(is_plant_bryophyte(iPlantMorphologyType_pft(NZ)).OR. &
+      IF(is_plant_bryophyte(iPlantRootProfile_pft(NZ)).OR. &
         iPlantPhenolType_pft(NZ).EQ.iphenotyp_drouhtdecidu)THEN
         RMNCR=RMNCR*fRootGrowPsiSense(N,L)
       ENDIF
@@ -784,7 +784,7 @@ implicit none
 !
               SoilResit4PrimRootPentration=SoilResit4RootPentration(L)*PrimRootRadius_pvr(N,L,NZ)/1.0E-03_r8
               WFNR=AMIN1(1.0_r8,AZMAX1(PSIRootTurg_vr(N,L,NZ)-PSIMin4OrganExtension-SoilResit4PrimRootPentration))
-              IF(is_plant_bryophyte(iPlantMorphologyType_pft(NZ)))THEN
+              IF(is_plant_bryophyte(iPlantRootProfile_pft(NZ)))THEN
                 WFNRG=WFNR**0.10_r8
               ELSE
                 WFNRG=WFNR**0.25_r8
@@ -812,12 +812,12 @@ implicit none
 !     RmSpecPlant=specific maintenance respiration rate (g C g-1 N h-1)
 !     WTRT1N=primary root N mass
 !     TFN6=temperature function for root maintenance respiration
-!     iPlantMorphologyType_pft=growth type:0=bryophyte,1=graminoid,2=shrub,tree
+!     iPlantRootProfile_pft=growth type:0=bryophyte,1=graminoid,2=shrub,tree
 !     iPlantPhenolType_pft=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
 !     fRootGrowPsiSense=growth function of root water potential
 !
               RMNCR=AZMAX1(RmSpecPlant*Root1stChemElm(ielmn,N,NR,NZ))*TFN6(L)
-              IF(is_plant_bryophyte(iPlantMorphologyType_pft(NZ)).OR.&
+              IF(is_plant_bryophyte(iPlantRootProfile_pft(NZ)).OR.&
                 iPlantPhenolType_pft(NZ).EQ.iphenotyp_drouhtdecidu)THEN
                 RMNCR=RMNCR*fRootGrowPsiSense(N,L)
               ENDIF
@@ -1588,7 +1588,7 @@ implicit none
     ZEROL                              =>   plt_biom%ZEROL    , &
     ZEROP                              =>   plt_biom%ZEROP    , &
     iPlantTurnoverPattern_pft          =>   plt_pheno%iPlantTurnoverPattern_pft  , &
-    iPlantMorphologyType_pft           =>   plt_pheno%iPlantMorphologyType_pft  , &
+    iPlantRootProfile_pft           =>   plt_pheno%iPlantRootProfile_pft  , &
     iPlantBranchState_brch             =>   plt_pheno%iPlantBranchState_brch   , &
     iPlantPhenologyPattern_pft         =>   plt_pheno%iPlantPhenologyPattern_pft  , &
     ShutRutNonstructElmntConducts_pft  =>   plt_pheno%ShutRutNonstructElmntConducts_pft  , &
@@ -1933,7 +1933,7 @@ implicit none
   associate(                              &
     RootMycoNonstructElm_vr =>   plt_biom%RootMycoNonstructElm_vr    , &
     ZEROP                     =>   plt_biom%ZEROP     , &
-    iPlantMorphologyType_pft  =>   plt_pheno%iPlantMorphologyType_pft   , &
+    iPlantRootProfile_pft  =>   plt_pheno%iPlantRootProfile_pft   , &
     VLSoilPoreMicP            =>   plt_soilchem%VLSoilPoreMicP  , &
     ZEROS2                    =>   plt_site%ZEROS2    , &
     NU                        =>   plt_site%NU        , &
@@ -2062,7 +2062,7 @@ implicit none
             IF(PrimRootDepth(N,NR,NZ).GT.CumSoilThickness(L-1))THEN
               IF(PrimRootDepth(N,NR,NZ).LE.CumSoilThickness(L))THEN
                 RTDPP=PrimRootDepth(N,NR,NZ)+CanPHeight4WatUptake(NZ)
-                Root1stSink_pvr(N,L,NR)=RTSK(iPlantMorphologyType_pft(NZ))&
+                Root1stSink_pvr(N,L,NR)=RTSK(iPlantRootProfile_pft(NZ))&
                   *RootAreaPopu*PrimRootRadius_pvr(N,L,NZ)**2._r8/RTDPP
                 RootSinkC(N)=RootSinkC(N)+Root1stSink_pvr(N,L,NR)
                 RootSinkC_vr(N,L)=RootSinkC_vr(N,L)+Root1stSink_pvr(N,L,NR)

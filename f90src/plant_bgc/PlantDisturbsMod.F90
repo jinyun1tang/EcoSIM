@@ -230,14 +230,14 @@ module PlantDisturbsMod
     LitrfallChemElms_pft    =>  plt_bgcr%LitrfallChemElms_pft   , &
     SurfLitrfallChemElms_pft    =>  plt_bgcr%SurfLitrfallChemElms_pft   , &
     iPlantTurnoverPattern_pft   =>  plt_pheno%iPlantTurnoverPattern_pft , &
-    iPlantMorphologyType_pft   =>  plt_pheno%iPlantMorphologyType_pft   &
+    iPlantRootProfile_pft   =>  plt_pheno%iPlantRootProfile_pft   &
   )
 !     iHarvstType_pft=harvest type:0=none,1=grain,2=all above-ground
 !                       ,3=pruning,4=grazing,5=fire,6=herbivory
 !     CSNC,ZSNC,PSNC=C,N,P LitrFall from disturbance
 !     CFOPC,CFOPN,CFOPC=fraction of LitrFall C,N,P allocated to litter components
 !     iPlantTurnoverPattern_pft=turnover:0=all abve-grd,1=all leaf+petiole,2=none,3=between 1,2
-!     iPlantMorphologyType_pft=growth type:0=bryophyte,1=graminoid,2=shrub,tree
+!     iPlantRootProfile_pft=growth type:0=bryophyte,1=graminoid,2=shrub,tree
 !
   IF(iHarvstType_pft(NZ).NE.iharvtyp_grazing.AND.iHarvstType_pft(NZ).NE.iharvtyp_herbivo)THEN
     IF(iHarvstType_pft(NZ).NE.iharvtyp_fire)THEN
@@ -248,7 +248,7 @@ module PlantDisturbsMod
             +CFOPE(NE,ifoliar,M,NZ)*(LeafElmnt2Litr(NE)+LeafElmntHarv2Litr(NE)) &
             +CFOPE(NE,inonfoliar,M,NZ)*(FineNonleafElmnt2Litr(NE)+PetioleElmntHarv2Litr(NE))
 
-          IF(iPlantTurnoverPattern_pft(NZ).EQ.0.OR.(.not.is_plant_treelike(iPlantMorphologyType_pft(NZ))))THEN
+          IF(iPlantTurnoverPattern_pft(NZ).EQ.0.OR.(.not.is_plant_treelike(iPlantRootProfile_pft(NZ))))THEN
             LitrFallChemElm_pvr(NE,M,k_fine_litr,0,NZ)=LitrFallChemElm_pvr(NE,M,k_fine_litr,0,NZ) &
               +CFOPE(NE,istalk,M,NZ)*(WoodyElmnt2Litr(NE)+WoodyElmntHarv2Litr(NE)+StandeadElmnt2Litr(NE)&
               +StandeadElmntHarv2Litr(NE))
@@ -269,7 +269,7 @@ module PlantDisturbsMod
 !     ABOVE-GROUND LitrFall FROM FIRE
 !
 !     iPlantTurnoverPattern_pft=turnover:0=all abve-grd,1=all leaf+petiole,2=none,3=between 1,2
-!     iPlantMorphologyType_pft=growth type:0=bryophyte,1=graminoid,2=shrub,tree
+!     iPlantRootProfile_pft=growth type:0=bryophyte,1=graminoid,2=shrub,tree
 !
     ELSE
       D6485: DO M=1,jsken
@@ -297,7 +297,7 @@ module PlantDisturbsMod
           +CFOPE(ielmp,inonfoliar,M,NZ)*(FineNonleafElmnt2Litr(ielmp)+PetioleElmntHarv2Litr(ielmp)&
           -FineNonleafElmntOffEcosystem(ielmp))
 
-        IF(iPlantTurnoverPattern_pft(NZ).EQ.0.OR.(.not.is_plant_treelike(iPlantMorphologyType_pft(NZ))))THEN
+        IF(iPlantTurnoverPattern_pft(NZ).EQ.0.OR.(.not.is_plant_treelike(iPlantRootProfile_pft(NZ))))THEN
           LitrFallChemElm_pvr(ielmc,M,k_fine_litr,0,NZ)=LitrFallChemElm_pvr(ielmc,M,k_fine_litr,0,NZ)+&
             CFOPE(ielmc,istalk,M,NZ)*(WoodyElmnt2Litr(ielmc)+WoodyElmntHarv2Litr(ielmc)+StandeadElmnt2Litr(ielmc)+&
             StandeadElmntHarv2Litr(ielmc))
@@ -679,7 +679,7 @@ module PlantDisturbsMod
     CanopyNoduleChemElm_brch   =>  plt_biom%CanopyNoduleChemElm_brch     , &
     ShootChemElm_brch  =>  plt_biom%ShootChemElm_brch    , &
     StalkChemElms_brch  =>  plt_biom%StalkChemElms_brch    , &
-    LeafChemElmByLayer_pft   =>  plt_biom%LeafChemElmByLayer_pft     , &
+    LeafChemElmByLayerNode_brch   =>  plt_biom%LeafChemElmByLayerNode_brch     , &
     PetoleChemElm_brch =>  plt_biom%PetoleChemElm_brch   , &
     LeafElmntNode_brch    =>  plt_biom%LeafElmntNode_brch      , &
     LeafPetolBiomassC_brch    =>  plt_biom%LeafPetolBiomassC_brch      , &
@@ -705,7 +705,7 @@ module PlantDisturbsMod
     iPlantBranchState_brch    =>  plt_pheno%iPlantBranchState_brch     , &
     iPlantPhenologyPattern_pft   =>  plt_pheno%iPlantPhenologyPattern_pft    , &
     iPlantState_pft    =>  plt_pheno%iPlantState_pft     , &
-    iPlantMorphologyType_pft   =>  plt_pheno%iPlantMorphologyType_pft    , &
+    iPlantRootProfile_pft   =>  plt_pheno%iPlantRootProfile_pft    , &
     iPlantTurnoverPattern_pft   =>  plt_pheno%iPlantTurnoverPattern_pft    , &
     iPlantPhenolType_pft   =>  plt_pheno%iPlantPhenolType_pft    , &
     iPlantRootState_pft   =>  plt_pheno%iPlantRootState_pft    , &
@@ -757,7 +757,7 @@ module PlantDisturbsMod
   )
 !     SolarNoonHour_col=hour of solar noon
 !     iPlantTurnoverPattern_pft=turnover:0=all abve-grd,1=all leaf+petiole,2=none,3=between 1,2
-!     iPlantMorphologyType_pft=growth type:0=bryophyte,1=graminoid,2=shrub,tree
+!     iPlantRootProfile_pft=growth type:0=bryophyte,1=graminoid,2=shrub,tree
 !     iDayPlanting_pft,iYearPlanting_pft=day,year of planting
 !     iYearCurrent=current year
 !     ITILL=soil disturbance type 1-20:tillage,21=litter removal,22=fire,23-24=drainage
@@ -767,7 +767,7 @@ module PlantDisturbsMod
 !     VHeatCapCanP=canopy heat capacity
 !
   IF(J.EQ.INT(SolarNoonHour_col).AND.(iPlantTurnoverPattern_pft(NZ).EQ.0 &
-    .OR.(.not.is_plant_treelike(iPlantMorphologyType_pft(NZ)))) &
+    .OR.(.not.is_plant_treelike(iPlantRootProfile_pft(NZ)))) &
     .AND.(I.NE.iDayPlanting_pft(NZ) &
     .OR.iYearCurrent.NE.iYearPlanting_pft(NZ)))THEN
     IF(ITILL.LE.10.OR.NZ.NE.1)THEN
@@ -811,7 +811,7 @@ module PlantDisturbsMod
 !     iPlantPhenolType_pft=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
 !     WTRVC,WTRVN,WTRVP=storage C,N,P
 !     iPlantTurnoverPattern_pft=turnover:0=all abve-grd,1=all leaf+petiole,2=none,3=between 1,2
-!     iPlantMorphologyType_pft=growth type:0=bryophyte,1=graminoid,2=shrub,tree
+!     iPlantRootProfile_pft=growth type:0=bryophyte,1=graminoid,2=shrub,tree
 !
             XHVST1=1._r8-XHVST
             D6380: DO M=1,jsken
@@ -903,7 +903,7 @@ module PlantDisturbsMod
                 LeafElmntNode_brch(NE,K,NB,NZ)=LeafElmntNode_brch(NE,K,NB,NZ)*XHVST
                 PetioleElmntNode_brch(NE,K,NB,NZ)=PetioleElmntNode_brch(NE,K,NB,NZ)*XHVST
                 DO L=1,NumOfCanopyLayers1
-                  LeafChemElmByLayer_pft(NE,L,K,NB,NZ)=LeafChemElmByLayer_pft(NE,L,K,NB,NZ)*XHVST
+                  LeafChemElmByLayerNode_brch(NE,L,K,NB,NZ)=LeafChemElmByLayerNode_brch(NE,L,K,NB,NZ)*XHVST
                 ENDDO
               ENDDO
               D8965: DO L=1,NumOfCanopyLayers1
@@ -1186,7 +1186,7 @@ module PlantDisturbsMod
     StalkRsrveElms_brch  => plt_biom%StalkRsrveElms_brch   , &
     SenecStalkChemElms_brch  => plt_biom%SenecStalkChemElms_brch   , &
     NoduleNonstructElm_brch   => plt_biom%NoduleNonstructElm_brch     , &
-    LeafChemElmByLayer_pft   => plt_biom%LeafChemElmByLayer_pft    , &
+    LeafChemElmByLayerNode_brch   => plt_biom%LeafChemElmByLayerNode_brch    , &
     PetoleChemElm_brch => plt_biom%PetoleChemElm_brch  , &
     NonstructElm_brch   => plt_biom%NonstructElm_brch    , &
     PetioleElmntNode_brch   => plt_biom%PetioleElmntNode_brch    , &
@@ -1211,7 +1211,7 @@ module PlantDisturbsMod
     RootNoduleNonstructElmnt_vr  => plt_biom%RootNoduleNonstructElmnt_vr   , &
     ZEROP    => plt_biom%ZEROP     , &
     ZEROL    => plt_biom%ZEROL     , &
-    CanopyLeafCpft_lyr    => plt_biom%CanopyLeafCpft_lyr     , &
+    CanopyLeafCLyr_pft    => plt_biom%CanopyLeafCLyr_pft     , &
     FracHour4LeafoffRemob     => plt_allom%FracHour4LeafoffRemob     , &
     FWODRE   => plt_allom%FWODRE   , &
     FWOODE   => plt_allom%FWOODE   , &
@@ -1223,11 +1223,11 @@ module PlantDisturbsMod
     iPlantCalendar_brch   =>  plt_pheno%iPlantCalendar_brch  , &
     MatureGroup_brch   =>  plt_pheno%MatureGroup_brch  , &
     LeafNumberAtFloralInit_brch   =>  plt_pheno%LeafNumberAtFloralInit_brch  , &
-    iPlantMorphologyType_pft   =>  plt_pheno%iPlantMorphologyType_pft  , &
+    iPlantRootProfile_pft   =>  plt_pheno%iPlantRootProfile_pft  , &
     iPlantTurnoverPattern_pft   =>  plt_pheno%iPlantTurnoverPattern_pft  , &
     doInitLeafOut_brch    =>  plt_pheno%doInitLeafOut_brch   , &
     iPlantPhenologyPattern_pft   =>  plt_pheno%iPlantPhenologyPattern_pft  , &
-    HourThreshold4LeafOff_brch    =>  plt_pheno%HourThreshold4LeafOff_brch   , &
+    HourReq4LeafOff_brch    =>  plt_pheno%HourReq4LeafOff_brch   , &
     Hours4LeafOff_brch     =>  plt_pheno%Hours4LeafOff_brch    , &
     iPlantPhenolType_pft   =>  plt_pheno%iPlantPhenolType_pft  , &
     TotalNodeNumNormByMatgrp_brch   =>  plt_pheno%TotalNodeNumNormByMatgrp_brch  , &
@@ -1279,14 +1279,14 @@ module PlantDisturbsMod
     SeedNumberSet_brch    =>  plt_morph%SeedNumberSet_brch   , &
     PetioleLengthNode_brch    =>  plt_morph%PetioleLengthNode_brch   , &
     LeafAreaNode_brch    =>  plt_morph%LeafAreaNode_brch   , &
-    CanopyLeafApft_lyr    =>  plt_morph%CanopyLeafApft_lyr   , &
+    CanopyLeafALyr_pft    =>  plt_morph%CanopyLeafALyr_pft   , &
     CanopyStemApft_lyr    =>  plt_morph%CanopyStemApft_lyr   , &
     CanopyLeafAreaByLayer_pft    =>  plt_morph%CanopyLeafAreaByLayer_pft   , &
-    CanopyBranchStemApft_lyr    =>  plt_morph%CanopyBranchStemApft_lyr   , &
+    CanopyStemALyr_brch    =>  plt_morph%CanopyStemALyr_brch   , &
     NumRootAxes_pft     =>  plt_morph%NumRootAxes_pft    , &
     NodeNumberAtAnthesis_brch    =>  plt_morph%NodeNumberAtAnthesis_brch   , &
     MainBranchNum_pft      =>  plt_morph%MainBranchNum_pft     , &
-    NodeNumberToInitFloral_brch    =>  plt_morph%NodeNumberToInitFloral_brch   , &
+    NodeNum2InitFloral_brch    =>  plt_morph%NodeNum2InitFloral_brch   , &
     ShootNodeNumber_brch    =>  plt_morph%ShootNodeNumber_brch   , &
     ClumpFactor      =>  plt_morph%ClumpFactor     , &
     CanopyLeafArea_grd    =>  plt_morph%CanopyLeafArea_grd   , &
@@ -1509,7 +1509,7 @@ module PlantDisturbsMod
       D9870: DO NB=1,NumOfBranches_pft(NZ)
         DO  L=1,NumOfCanopyLayers1
           DO  K=0,MaxNodesPerBranch1
-            WGLFBL(L,NB,NZ)=WGLFBL(L,NB,NZ)+LeafChemElmByLayer_pft(ielmc,L,K,NB,NZ)
+            WGLFBL(L,NB,NZ)=WGLFBL(L,NB,NZ)+LeafChemElmByLayerNode_brch(ielmc,L,K,NB,NZ)
           enddo
         enddo
       ENDDO D9870
@@ -1575,8 +1575,8 @@ module PlantDisturbsMod
         D9845: DO K=MaxNodesPerBranch1,0,-1
           IF((iHarvstType_pft(NZ).NE.iharvtyp_grazing.AND.iHarvstType_pft(NZ).NE.iharvtyp_herbivo).OR.WHVSBL.GT.0.0_r8)THEN
             IF(iHarvstType_pft(NZ).EQ.iharvtyp_grazing.OR.iHarvstType_pft(NZ).EQ.iharvtyp_herbivo)THEN
-              IF(LeafChemElmByLayer_pft(ielmc,L,K,NB,NZ).GT.WHVSBL)THEN
-                FHVSE(ielmc)=AZMAX1(AMIN1(1.0_r8,(LeafChemElmByLayer_pft(ielmc,L,K,NB,NZ)-WHVSBL)/LeafChemElmByLayer_pft(ielmc,L,K,NB,NZ)))
+              IF(LeafChemElmByLayerNode_brch(ielmc,L,K,NB,NZ).GT.WHVSBL)THEN
+                FHVSE(ielmc)=AZMAX1(AMIN1(1.0_r8,(LeafChemElmByLayerNode_brch(ielmc,L,K,NB,NZ)-WHVSBL)/LeafChemElmByLayerNode_brch(ielmc,L,K,NB,NZ)))
                 FHVSH=FHVSE(ielmc)
               ELSE
                 FHVSE(ielmc)=1.0_r8
@@ -1588,7 +1588,7 @@ module PlantDisturbsMod
 !
 !     FHVSE(ielmc)=fraction of leaf node mass not harvested
 !     WGLFL,WGLFLN,WGLFLP=leaf node C,N,P in canopy layer
-!     CanopyLeafAreaByLayer_pft,CanopyBranchStemApft_lyr=leaf,stalk node area in canopy layer
+!     CanopyLeafAreaByLayer_pft,CanopyStemALyr_brch=leaf,stalk node area in canopy layer
 !     LeafElmntRemoval(ielmc),LeafElmntRemoval(ielmn),LeafElmntRemoval(ielmp)=harvested leaf C,N,P
 !     LeafElmntHarv2Litr(ielmc),LeafElmntHarv2Litr(ielmn),LeafElmntHarv2Litr(ielmp)=harvested leaf C,N,P to litter
 !     WoodyElmntRemoval(ielmc),WoodyElmntRemoval(ielmn),WoodyElmntRemoval(ielmp)=harvested woody C,N,P
@@ -1597,29 +1597,29 @@ module PlantDisturbsMod
 !     FWODLN,FWODLP=N,P woody fraction in leaf:0=woody,1=non-woody
 !
 
-            WHVSBL=WHVSBL-(1._r8-FHVSE(ielmc))*LeafChemElmByLayer_pft(ielmc,L,K,NB,NZ)
+            WHVSBL=WHVSBL-(1._r8-FHVSE(ielmc))*LeafChemElmByLayerNode_brch(ielmc,L,K,NB,NZ)
             FHVSH1=1._r8-FHVSH
             FHVSHT=FHVSH-FHVSE(ielmc)
             DO NE=1,NumPlantChemElms
-              LeafElmntRemoval(NE)=LeafElmntRemoval(NE)+FHVSH1*LeafChemElmByLayer_pft(NE,L,K,NB,NZ)*FWODLE(NE,k_fine_litr)
-              LeafElmntHarv2Litr(NE)=LeafElmntHarv2Litr(NE)+FHVSHT*LeafChemElmByLayer_pft(NE,L,K,NB,NZ)*FWODLE(NE,k_fine_litr)
-              WoodyElmntRemoval(NE)=WoodyElmntRemoval(NE)+FHVSH1*LeafChemElmByLayer_pft(NE,L,K,NB,NZ)*FWODLE(NE,k_woody_litr)
-              WoodyElmntHarv2Litr(NE)=WoodyElmntHarv2Litr(NE)+FHVSHT*LeafChemElmByLayer_pft(NE,L,K,NB,NZ)*FWODLE(NE,k_woody_litr)
-              LeafChemElmByLayer_pft(NE,L,K,NB,NZ)=FHVSE(ielmc)*LeafChemElmByLayer_pft(NE,L,K,NB,NZ)
+              LeafElmntRemoval(NE)=LeafElmntRemoval(NE)+FHVSH1*LeafChemElmByLayerNode_brch(NE,L,K,NB,NZ)*FWODLE(NE,k_fine_litr)
+              LeafElmntHarv2Litr(NE)=LeafElmntHarv2Litr(NE)+FHVSHT*LeafChemElmByLayerNode_brch(NE,L,K,NB,NZ)*FWODLE(NE,k_fine_litr)
+              WoodyElmntRemoval(NE)=WoodyElmntRemoval(NE)+FHVSH1*LeafChemElmByLayerNode_brch(NE,L,K,NB,NZ)*FWODLE(NE,k_woody_litr)
+              WoodyElmntHarv2Litr(NE)=WoodyElmntHarv2Litr(NE)+FHVSHT*LeafChemElmByLayerNode_brch(NE,L,K,NB,NZ)*FWODLE(NE,k_woody_litr)
+              LeafChemElmByLayerNode_brch(NE,L,K,NB,NZ)=FHVSE(ielmc)*LeafChemElmByLayerNode_brch(NE,L,K,NB,NZ)
             ENDDO
 !
 !     REMAINING LEAF C,N,P AND AREA
 !
             CanopyLeafAreaByLayer_pft(L,K,NB,NZ)=FHVSE(ielmc)*CanopyLeafAreaByLayer_pft(L,K,NB,NZ)
             IF(K.EQ.1)THEN
-              CanopyBranchStemApft_lyr(L,NB,NZ)=FHVSE(ielmc)*CanopyBranchStemApft_lyr(L,NB,NZ)
+              CanopyStemALyr_brch(L,NB,NZ)=FHVSE(ielmc)*CanopyStemALyr_brch(L,NB,NZ)
             ENDIF
           ENDIF
 
         ENDDO D9845
       ENDDO D9855
-      CanopyLeafApft_lyr(L,NZ)=0._r8
-      CanopyLeafCpft_lyr(L,NZ)=0._r8
+      CanopyLeafALyr_pft(L,NZ)=0._r8
+      CanopyLeafCLyr_pft(L,NZ)=0._r8
       CanopyStemApft_lyr(L,NZ)=CanopyStemApft_lyr(L,NZ)*FHVSE(ielmc)
     ENDDO D9865
 
@@ -1644,15 +1644,15 @@ module PlantDisturbsMod
 !     ACCUMULATE REMAINING LEAF AREA, C, N, P
 !
 !     WGLFL,WGLFLN,WGLFLP=leaf node C,N,P in canopy layer
-!     CanopyLeafAreaByLayer_pft,CanopyLeafApft_lyr=leaf node,total area in canopy layer
+!     CanopyLeafAreaByLayer_pft,CanopyLeafALyr_pft=leaf node,total area in canopy layer
 !
         D9815: DO L=1,NumOfCanopyLayers1
           ARLFG=ARLFG+CanopyLeafAreaByLayer_pft(L,K,NB,NZ)
           DO NE=1,NumPlantChemElms
-            WGLFGE(NE)=WGLFGE(NE)+LeafChemElmByLayer_pft(NE,L,K,NB,NZ)
+            WGLFGE(NE)=WGLFGE(NE)+LeafChemElmByLayerNode_brch(NE,L,K,NB,NZ)
           ENDDO
-          CanopyLeafApft_lyr(L,NZ)=CanopyLeafApft_lyr(L,NZ)+CanopyLeafAreaByLayer_pft(L,K,NB,NZ)
-          CanopyLeafCpft_lyr(L,NZ)=CanopyLeafCpft_lyr(L,NZ)+LeafChemElmByLayer_pft(ielmc,L,K,NB,NZ)
+          CanopyLeafALyr_pft(L,NZ)=CanopyLeafALyr_pft(L,NZ)+CanopyLeafAreaByLayer_pft(L,K,NB,NZ)
+          CanopyLeafCLyr_pft(L,NZ)=CanopyLeafCLyr_pft(L,NZ)+LeafChemElmByLayerNode_brch(ielmc,L,K,NB,NZ)
         ENDDO D9815
 !
 !     CUT STALK AT HARVESTED NODES AND LAYERS
@@ -1795,7 +1795,7 @@ module PlantDisturbsMod
 !     IF(InternodeHeightLive_brch(K,NB,NZ).GT.HVST(NZ)
 !    2.OR.iHarvstType_pft(NZ).EQ.iharvtyp_pruning)THEN
 !     IF(isclose(FHVSETK(K),0._r8).AND.K.GT.0)THEN
-!     IF(iPlantTurnoverPattern_pft(NZ).EQ.0.OR.(.not.is_plant_treelike(iPlantMorphologyType_pft(NZ)))THEN
+!     IF(iPlantTurnoverPattern_pft(NZ).EQ.0.OR.(.not.is_plant_treelike(iPlantRootProfile_pft(NZ)))THEN
 !     NumOfLeaves_brch(NB,NZ)=AZMAX1(NumOfLeaves_brch(NB,NZ)-1.0)
 !     ELSE
 !     NumOfLeaves_brch(NB,NZ)=AZMAX1(NumOfLeaves_brch(NB,NZ)-0.04)
@@ -2234,7 +2234,7 @@ module PlantDisturbsMod
 !     RESET PHENOLOGY, GROWTH STAGE IF STALKS ARE CUT
 !
 !     iPlantTurnoverPattern_pft=turnover:0=all abve-grd,1=all leaf+petiole,2=none,3=between 1,2
-!     iPlantMorphologyType_pft=growth type:0=bryophyte,1=graminoid,2=shrub,tree
+!     iPlantRootProfile_pft=growth type:0=bryophyte,1=graminoid,2=shrub,tree
 !     iHarvstType_pft=harvest type:0=none,1=grain,2=all above-ground
 !                       ,3=pruning,4=grazing,5=fire,6=herbivory
 !     HVST=iHarvstType_pft=0-2:>0=cutting height,<0=fraction of LAI removed
@@ -2245,7 +2245,7 @@ module PlantDisturbsMod
 !     Hours4LeafOff_brch,VRNX=leafoff hours,hours required for leafoff
 !     iPlantCalendar_brch(ipltcal_Emerge,=emergence date
 !     GROUP=node number required for floral initiation
-!     NodeNumberToInitFloral_brch=node number at floral initiation
+!     NodeNum2InitFloral_brch=node number at floral initiation
 !     NodeNumberAtAnthesis_brch=node number at flowering
 !     VSTGX=leaf number on date of floral initiation
 !     TotalNodeNumNormByMatgrp_brch=total change in vegve node number normalized for maturity group
@@ -2253,15 +2253,15 @@ module PlantDisturbsMod
 !     HourFailGrainFill_brch=number of hours with no grain fill
 !     doInitLeafOut_brch=flag for initializing leafout
 !
-        IF((iPlantTurnoverPattern_pft(NZ).EQ.0.OR.(.not.is_plant_treelike(iPlantMorphologyType_pft(NZ)))) &
+        IF((iPlantTurnoverPattern_pft(NZ).EQ.0.OR.(.not.is_plant_treelike(iPlantRootProfile_pft(NZ)))) &
           .AND.(iHarvstType_pft(NZ).NE.iharvtyp_grazing.AND.iHarvstType_pft(NZ).NE.iharvtyp_herbivo) &
           .AND.CanopyHeight_pft(NZ).GT.HVST(NZ))THEN
           IF((iPlantPhenolType_pft(NZ).NE.0.AND.Hours4LeafOff_brch(NB,NZ) &
-            .LE.FracHour4LeafoffRemob(iPlantPhenolType_pft(NZ))*HourThreshold4LeafOff_brch(NB,NZ)) &
+            .LE.FracHour4LeafoffRemob(iPlantPhenolType_pft(NZ))*HourReq4LeafOff_brch(NB,NZ)) &
             .OR.(iPlantPhenolType_pft(NZ).EQ.iphenotyp_evgreen.AND.&
             iPlantCalendar_brch(ipltcal_Emerge,NB,NZ).NE.0))THEN
             MatureGroup_brch(NB,NZ)=MatureGroup_pft(NZ)
-            NodeNumberToInitFloral_brch(NB,NZ)=ShootNodeNumber_brch(NB,NZ)
+            NodeNum2InitFloral_brch(NB,NZ)=ShootNodeNumber_brch(NB,NZ)
             NodeNumberAtAnthesis_brch(NB,NZ)=0._r8
             LeafNumberAtFloralInit_brch(NB,NZ)=0._r8
             TotalNodeNumNormByMatgrp_brch(NB,NZ)=0._r8
@@ -2276,7 +2276,7 @@ module PlantDisturbsMod
               D3010: DO NBX=1,NumOfBranches_pft(NZ)
                 IF(NBX.NE.MainBranchNum_pft(NZ))THEN
                   MatureGroup_brch(NBX,NZ)=MatureGroup_pft(NZ)
-                  NodeNumberToInitFloral_brch(NBX,NZ)=ShootNodeNumber_brch(NBX,NZ)
+                  NodeNum2InitFloral_brch(NBX,NZ)=ShootNodeNumber_brch(NBX,NZ)
                   NodeNumberAtAnthesis_brch(NBX,NZ)=0._r8
                   LeafNumberAtFloralInit_brch(NBX,NZ)=0._r8
                   TotalNodeNumNormByMatgrp_brch(NBX,NZ)=0._r8
@@ -2301,7 +2301,7 @@ module PlantDisturbsMod
 !     WTLS=total PFT leaf+petiole C mass
 !     WTSTK=total PFT stalk C mass
 !     WVSTK=total PFT sapwood C mass
-!     CanopyBranchStemApft_lyr=total PFT stalk surface area
+!     CanopyStemALyr_brch=total PFT stalk surface area
 !
         IF(jHarvst_pft(NZ).NE.jharvtyp_noaction)then
           iPlantBranchState_brch(NB,NZ)=iDead
@@ -2319,7 +2319,7 @@ module PlantDisturbsMod
         StalkChemElms_pft(ielmc,NZ)=StalkChemElms_pft(ielmc,NZ)+StalkChemElms_brch(ielmc,NB,NZ)
         CanopyStalkC_pft(NZ)=CanopyStalkC_pft(NZ)+StalkBiomassC_brch(NB,NZ)
         D9830: DO L=1,NumOfCanopyLayers1
-          CanopyStemA_pft(NZ)=CanopyStemA_pft(NZ)+CanopyBranchStemApft_lyr(L,NB,NZ)
+          CanopyStemA_pft(NZ)=CanopyStemA_pft(NZ)+CanopyStemALyr_brch(L,NB,NZ)
         ENDDO D9830
       ENDDO D9840
 !

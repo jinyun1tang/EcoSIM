@@ -19,7 +19,7 @@ module PlantTraitDataType
   real(r8),target,allocatable :: FWODRE(:,:)
   real(r8),target,allocatable :: FWOODE(:,:)             !woody C allocation
   real(r8),target,allocatable :: PARTS_brch(:,:,:,:,:)       !C partitioning coefficient
-  real(r8),target,allocatable ::  CanopyBranchStemApft_lyr(:,:,:,:,:)              !stem layer area, [m2 d-2]
+  real(r8),target,allocatable ::  CanopyStemALyr_brch(:,:,:,:,:)              !stem layer area, [m2 d-2]
   real(r8),target,allocatable ::  CanopyLeafArea_pft(:,:,:)                       !plant leaf area, [m2 d-2]
   real(r8),target,allocatable ::  CanopyArea_pft(:,:,:)                       !plant canopy leaf+stem/stalk area, [m2 d-2]
   real(r8),target,allocatable ::  ARLFX(:,:)                         !total canopy leaf area, [m2 d-2]
@@ -116,7 +116,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  SLA1(:,:,:)                        !leaf area:mass during growth, [m2 g-1]
   real(r8),target,allocatable ::  TCelsChill4Leaf_pft(:,:,:)                         !threshold temperature for spring leafout/dehardening, [oC]
   real(r8),target,allocatable ::  PetoLen2Mass_pft(:,:,:)                        !petiole length:mass during growth, [m g-1]
-  real(r8),target,allocatable ::  HourThreshold4LeafOut_brch(:,:,:,:)                      !hours above threshold temperature required for spring leafout/dehardening, [-]
+  real(r8),target,allocatable ::  HourReq4LeafOut_brch(:,:,:,:)                      !hours above threshold temperature required for spring leafout/dehardening, [-]
   integer,target,allocatable ::  NumOfBranches_pft(:,:,:)                          !branch number, [-]
   integer,target,allocatable ::  BranchNumber_pft(:,:,:)                          !branch number, [-]
   integer,target,allocatable ::  BranchNumber_brch(:,:,:,:)                       !branch number, [-]
@@ -132,9 +132,9 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  MinNonstructalC4InitBranch(:,:,:)                          !branch nonstructural C content required for new branch, [g g-1]
   real(r8),target,allocatable ::  NodeNumNormByMatgrp_brch(:,:,:,:)                     !normalized node number during vegetative growth stages , [-]
   real(r8),target,allocatable ::  HourlyNodeNumNormByMatgrp_brch(:,:,:,:)                    !gain in normalized node number during vegetative growth stages , [h-1]
-  real(r8),target,allocatable ::  HourReprodNodeNumNormByMatrgrp_brch(:,:,:,:)                    !gain in normalized node number during reproductive growth stages, [h-1]
+  real(r8),target,allocatable ::  dReproNodeNumNormByMatG_brch(:,:,:,:)                    !gain in normalized node number during reproductive growth stages, [h-1]
   real(r8),target,allocatable ::  ShootNodeNumber_brch(:,:,:,:)                      !node number, [-]
-  real(r8),target,allocatable ::  NodeNumberToInitFloral_brch(:,:,:,:)                     !node number at floral initiation, [-]
+  real(r8),target,allocatable ::  NodeNum2InitFloral_brch(:,:,:,:)                     !node number at floral initiation, [-]
   real(r8),target,allocatable ::  ReprodNodeNumNormByMatrgrp_brch(:,:,:,:)                     !normalized node number during reproductive growth stages, [-]
   real(r8),target,allocatable ::  NodeNumberAtAnthesis_brch(:,:,:,:)                     !node number at anthesis, [-]
   real(r8),target,allocatable ::  TotalNodeNumNormByMatgrp_brch(:,:,:,:)                    !normalized node number during vegetative growth stages , [-]
@@ -152,7 +152,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  MaxSeedCMass(:,:,:)                        !maximum grain size   , [g]
   real(r8),target,allocatable ::  XTLI(:,:,:)                        !number of nodes in seed, [-]
   real(r8),target,allocatable ::  SeedCMass(:,:,:)                        !grain size at seeding, [g]
-  real(r8),target,allocatable ::  GrainFillRateat25C_pft(:,:,:)                       !maximum rate of fill per grain, [g h-1]
+  real(r8),target,allocatable ::  GrainFillRate25C_pft(:,:,:)                       !maximum rate of fill per grain, [g h-1]
   real(r8),target,allocatable ::  HourFailGrainFill_brch(:,:,:,:)                      !flag to detect physiological maturity from  grain fill , [-]
   real(r8),target,allocatable ::  HourCounter4LeafOut_brch(:,:,:,:)                      !counter for mobilizing nonstructural C during spring leafout/dehardening, [h]
   real(r8),target,allocatable ::  HoursDoingRemob_brch(:,:,:,:)                      !counter for mobilizing nonstructural C during autumn leafoff/hardening, [h]
@@ -163,7 +163,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  CriticalPhotoPeriod_pft(:,:,:)                         !critical daylength for phenological progress, [h]
   real(r8),target,allocatable ::  PhotoPeriodSens_pft(:,:,:)                        !difference between current and critical daylengths used to calculate  phenological progress, [h]
   real(r8),target,allocatable ::  ClumpFactorInit_pft(:,:,:)                         !initial clumping factor for self-shading in canopy layer, [-]
-  real(r8),target,allocatable ::  HourThreshold4LeafOff_brch(:,:,:,:)                      !number of hours below set temperature required for autumn leafoff/hardening, [-]
+  real(r8),target,allocatable ::  HourReq4LeafOff_brch(:,:,:,:)                      !number of hours below set temperature required for autumn leafoff/hardening, [-]
   real(r8),target,allocatable ::  OFFST(:,:,:)                       !adjustment of Arhhenius curves for plant thermal acclimation, [oC]
 !----------------------------------------------------------------------
 
@@ -178,7 +178,7 @@ contains
   allocate(FWODBE(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FWODBE=0._r8
   allocate(FWODRE(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FWODRE=0._r8         !
   allocate(FWOODE(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FWOODE=0._r8         !woody element allocation
-  allocate(CanopyBranchStemApft_lyr(NumOfCanopyLayers,MaxNumBranches,JP,JY,JX));CanopyBranchStemApft_lyr=0._r8
+  allocate(CanopyStemALyr_brch(NumOfCanopyLayers,MaxNumBranches,JP,JY,JX));CanopyStemALyr_brch=0._r8
   allocate(CanopyLeafArea_pft(JP,JY,JX));    CanopyLeafArea_pft=0._r8
   allocate(CanopyArea_pft(JP,JY,JX));    CanopyArea_pft=0._r8
   allocate(ARLFX(JY,JX));       ARLFX=0._r8
@@ -276,7 +276,7 @@ contains
   allocate(SLA1(JP,JY,JX));     SLA1=0._r8
   allocate(TCelsChill4Leaf_pft(JP,JY,JX));      TCelsChill4Leaf_pft=0._r8
   allocate(PetoLen2Mass_pft(JP,JY,JX));     PetoLen2Mass_pft=0._r8
-  allocate(HourThreshold4LeafOut_brch(NumOfCanopyLayers,JP,JY,JX));  HourThreshold4LeafOut_brch=0._r8
+  allocate(HourReq4LeafOut_brch(NumOfCanopyLayers,JP,JY,JX));  HourReq4LeafOut_brch=0._r8
   allocate(NumOfBranches_pft(JP,JY,JX));      NumOfBranches_pft=0
   allocate(BranchNumber_pft(JP,JY,JX));      BranchNumber_pft=0
   allocate(BranchNumber_brch(MaxNumBranches,JP,JY,JX));  BranchNumber_brch=0
@@ -292,9 +292,9 @@ contains
   allocate(MinNonstructalC4InitBranch(JP,JY,JX));       MinNonstructalC4InitBranch=0._r8
   allocate(NodeNumNormByMatgrp_brch(MaxNumBranches,JP,JY,JX)); NodeNumNormByMatgrp_brch=0._r8
   allocate(HourlyNodeNumNormByMatgrp_brch(MaxNumBranches,JP,JY,JX));HourlyNodeNumNormByMatgrp_brch=0._r8
-  allocate(HourReprodNodeNumNormByMatrgrp_brch(MaxNumBranches,JP,JY,JX));HourReprodNodeNumNormByMatrgrp_brch=0._r8
+  allocate(dReproNodeNumNormByMatG_brch(MaxNumBranches,JP,JY,JX));dReproNodeNumNormByMatG_brch=0._r8
   allocate(ShootNodeNumber_brch(MaxNumBranches,JP,JY,JX));  ShootNodeNumber_brch=0._r8
-  allocate(NodeNumberToInitFloral_brch(MaxNumBranches,JP,JY,JX)); NodeNumberToInitFloral_brch=0._r8
+  allocate(NodeNum2InitFloral_brch(MaxNumBranches,JP,JY,JX)); NodeNum2InitFloral_brch=0._r8
   allocate(ReprodNodeNumNormByMatrgrp_brch(MaxNumBranches,JP,JY,JX)); ReprodNodeNumNormByMatrgrp_brch=0._r8
   allocate(NodeNumberAtAnthesis_brch(MaxNumBranches,JP,JY,JX)); NodeNumberAtAnthesis_brch=0._r8
   allocate(TotalNodeNumNormByMatgrp_brch(MaxNumBranches,JP,JY,JX));TotalNodeNumNormByMatgrp_brch=0._r8
@@ -312,7 +312,7 @@ contains
   allocate(MaxSeedCMass(JP,JY,JX));     MaxSeedCMass=0._r8
   allocate(XTLI(JP,JY,JX));     XTLI=0._r8
   allocate(SeedCMass(JP,JY,JX));     SeedCMass=0._r8
-  allocate(GrainFillRateat25C_pft(JP,JY,JX));    GrainFillRateat25C_pft=0._r8
+  allocate(GrainFillRate25C_pft(JP,JY,JX));    GrainFillRate25C_pft=0._r8
   allocate(HourFailGrainFill_brch(MaxNumBranches,JP,JY,JX));  HourFailGrainFill_brch=0._r8
   allocate(HourCounter4LeafOut_brch(MaxNumBranches,JP,JY,JX));  HourCounter4LeafOut_brch=0._r8
   allocate(HoursDoingRemob_brch(MaxNumBranches,JP,JY,JX));  HoursDoingRemob_brch=0._r8
@@ -323,7 +323,7 @@ contains
   allocate(CriticalPhotoPeriod_pft(JP,JY,JX));      CriticalPhotoPeriod_pft=0._r8
   allocate(PhotoPeriodSens_pft(JP,JY,JX));     PhotoPeriodSens_pft=0._r8
   allocate(ClumpFactorInit_pft(JP,JY,JX));      ClumpFactorInit_pft=0._r8
-  allocate(HourThreshold4LeafOff_brch(NumOfCanopyLayers,JP,JY,JX));  HourThreshold4LeafOff_brch=0._r8
+  allocate(HourReq4LeafOff_brch(NumOfCanopyLayers,JP,JY,JX));  HourReq4LeafOff_brch=0._r8
   allocate(OFFST(JP,JY,JX));    OFFST=0._r8
   end subroutine InitPlantTraits
 
@@ -335,7 +335,7 @@ contains
   call destroy(FWODBE)
   call destroy(FWODRE)
   call destroy(FWOODE)
-  call destroy(CanopyBranchStemApft_lyr)
+  call destroy(CanopyStemALyr_brch)
   call destroy(CanopyLeafArea_pft)
   call destroy(CanopyArea_pft)
   call destroy(ARLFX)
@@ -433,7 +433,7 @@ contains
   call destroy(SLA1)
   call destroy(TCelsChill4Leaf_pft)
   call destroy(PetoLen2Mass_pft)
-  call destroy(HourThreshold4LeafOut_brch)
+  call destroy(HourReq4LeafOut_brch)
   call destroy(NumOfBranches_pft)
   call destroy(BranchNumber_pft)
   call destroy(BranchNumber_brch)
@@ -449,9 +449,9 @@ contains
   call destroy(MinNonstructalC4InitBranch)
   call destroy(NodeNumNormByMatgrp_brch)
   call destroy(HourlyNodeNumNormByMatgrp_brch)
-  call destroy(HourReprodNodeNumNormByMatrgrp_brch)
+  call destroy(dReproNodeNumNormByMatG_brch)
   call destroy(ShootNodeNumber_brch)
-  call destroy(NodeNumberToInitFloral_brch)
+  call destroy(NodeNum2InitFloral_brch)
   call destroy(ReprodNodeNumNormByMatrgrp_brch)
   call destroy(NodeNumberAtAnthesis_brch)
   call destroy(TotalNodeNumNormByMatgrp_brch)
@@ -469,7 +469,7 @@ contains
   call destroy(MaxSeedCMass)
   call destroy(XTLI)
   call destroy(SeedCMass)
-  call destroy(GrainFillRateat25C_pft)
+  call destroy(GrainFillRate25C_pft)
   call destroy(HourFailGrainFill_brch)
   call destroy(HourCounter4LeafOut_brch)
   call destroy(HoursDoingRemob_brch)
@@ -480,7 +480,7 @@ contains
   call destroy(CriticalPhotoPeriod_pft)
   call destroy(PhotoPeriodSens_pft)
   call destroy(ClumpFactorInit_pft)
-  call destroy(HourThreshold4LeafOff_brch)
+  call destroy(HourReq4LeafOff_brch)
   call destroy(OFFST)
   end subroutine DestructPlantTraits
 
