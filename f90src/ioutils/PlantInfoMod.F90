@@ -444,9 +444,9 @@ implicit none
   call ncd_getvar(pft_nfid, 'GFILL', loc,GrainFillRate25C_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'WTSTDI', loc,StandingDeadInitC_pft(NZ,NY,NX))
 
-  call ncd_getvar(pft_nfid, 'RRAD1M', loc,Max1stRootRadius(1,NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'RRAD2M', loc,Max2ndRootRadius(1,NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'PORT', loc,RootPorosity(1,NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'RRAD1M', loc,Max1stRootRadius_pft(1,NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'RRAD2M', loc,Max2ndRootRadius_pft(1,NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'PORT', loc,RootPorosity_pft(1,NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'PR', loc,MinNonstructuralC4InitRoot_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'RSRR', loc,RSRR(1,NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'RSRA', loc,RSRA(1,NZ,NY,NX))
@@ -791,9 +791,9 @@ implicit none
 
   write(nu_plt,*)('-',j=1,100)
   write(nu_plt,*)'ROOT CHARACTERISTICS'
-  call writefixl(nu_plt,'radius of primary roots (m) RRAD1M',Max1stRootRadius(1,NZ,NY,NX),73)
-  call writefixl(nu_plt,'radius of secondary roots (m) RRAD2M',Max2ndRootRadius(1,NZ,NY,NX),73)
-  call writefixl(nu_plt,'primary/fine root porosity (m3 m-3) PORT',RootPorosity(1,NZ,NY,NX),73)
+  call writefixl(nu_plt,'radius of primary roots (m) RRAD1M',Max1stRootRadius_pft(1,NZ,NY,NX),73)
+  call writefixl(nu_plt,'radius of secondary roots (m) RRAD2M',Max2ndRootRadius_pft(1,NZ,NY,NX),73)
+  call writefixl(nu_plt,'primary/fine root porosity (m3 m-3) PORT',RootPorosity_pft(1,NZ,NY,NX),73)
   call writefixl(nu_plt,'nonstructural C concentration needed for root'// &
     ' branching (gC/gC) PR',MinNonstructuralC4InitRoot_pft(NZ,NY,NX),70)
   call writefixl(nu_plt,'radial root resistivity for water uptake (m2 MPa-1 h-1) RSRR',RSRR(1,NZ,NY,NX),73)

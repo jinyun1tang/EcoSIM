@@ -464,32 +464,32 @@ module StartqsMod
     SeedAreaMean_pft          =>  plt_morph%SeedAreaMean_pft    , &
     SeedCMass                 =>  plt_morph%SeedCMass    , &
     PlantinDepth              =>  plt_morph%PlantinDepth  , &
-    Max2ndRootRadius1         =>  plt_morph%Max2ndRootRadius1  , &
-    SecndRootXSecArea         =>  plt_morph%SecndRootXSecArea  , &
-    Max1stRootRadius1         =>  plt_morph%Max1stRootRadius1  , &
-    PrimRootXSecArea          =>  plt_morph%PrimRootXSecArea  , &
-    Max2ndRootRadius          =>  plt_morph%Max2ndRootRadius  , &
-    Max1stRootRadius          =>  plt_morph%Max1stRootRadius  , &
-    SecndRootSpecLen          =>  plt_morph%SecndRootSpecLen  , &
+    Max2ndRootRadius_pft1         =>  plt_morph%Max2ndRootRadius_pft1  , &
+    Root2ndXSecArea_pft         =>  plt_morph%Root2ndXSecArea_pft  , &
+    Max1stRootRadius_pft1         =>  plt_morph%Max1stRootRadius_pft1  , &
+    Root1stXSecArea_pft          =>  plt_morph%Root1stXSecArea_pft  , &
+    Max2ndRootRadius_pft          =>  plt_morph%Max2ndRootRadius_pft  , &
+    Max1stRootRadius_pft          =>  plt_morph%Max1stRootRadius_pft  , &
+    Root2ndSpecLen_pft          =>  plt_morph%Root2ndSpecLen_pft  , &
     NIXBotRootLayer_pft       =>  plt_morph%NIXBotRootLayer_pft    , &
     RSRR                      =>  plt_morph%RSRR    , &
-    PrimRootSpecLen           =>  plt_morph%PrimRootSpecLen  , &
-    RootPorosity              =>  plt_morph%RootPorosity   , &
+    Root1stSpecLen_pft           =>  plt_morph%Root1stSpecLen_pft  , &
+    RootPorosity_pft              =>  plt_morph%RootPorosity_pft   , &
     RootPoreTortu4Gas         =>  plt_morph%RootPoreTortu4Gas   , &
     RootRaidus_rpft           =>  plt_morph%RootRaidus_rpft   , &
     RootVolPerMassC_pft       =>  plt_morph%RootVolPerMassC_pft    , &
     RSRA                      =>  plt_morph%RSRA    , &
     NIXBotRootLayer_rpft      =>  plt_morph%NIXBotRootLayer_rpft    , &
     SeedVolumeMean_pft        =>  plt_morph%SeedVolumeMean_pft    , &
-    SeedLengthMean_pft        =>  plt_morph%SeedLengthMean_pft      &
+    SeedMeanLen_pft        =>  plt_morph%SeedMeanLen_pft      &
   )
 !
 !     SEED CHARACTERISTICS
 !
-!     SeedVolumeMean_pft,SeedLengthMean_pft,SeedAreaMean_pft=seed volume(m3),length(m),AREA3(NU)(m2)
+!     SeedVolumeMean_pft,SeedMeanLen_pft,SeedAreaMean_pft=seed volume(m3),length(m),AREA3(NU)(m2)
 !     SeedCMass=seed C mass (g) from PFT file
 !
-  call calc_seed_geometry(SeedCMass(NZ),SeedVolumeMean_pft(NZ),SeedLengthMean_pft(NZ),SeedAreaMean_pft(NZ))
+  call calc_seed_geometry(SeedCMass(NZ),SeedVolumeMean_pft(NZ),SeedMeanLen_pft(NZ),SeedAreaMean_pft(NZ))
 !
 !     INITIALIZE ROOT(N=1),MYCORRHIZAL(N=2) DIMENSIONS, UPTAKE PARAMETERS
 !
@@ -497,7 +497,7 @@ module StartqsMod
 !     CumSoilThickness=depth to soil layer bottom from surface(m)
 !     NG,NIX,NIXBotRootLayer_rpft=seeding,upper,lower rooting layer
 !     CNRTS,CPRTS=N,P root growth yield
-!     Max1stRootRadius,Max2ndRootRadius=maximum primary,secondary mycorrhizal radius (m)
+!     Max1stRootRadius_pft,Max2ndRootRadius_pft=maximum primary,secondary mycorrhizal radius (m)
 !     PORT=mycorrhizal porosity
 !     VmaxNH4Root_pft,KmNH4Root_pft,CMinNH4Root_pft=NH4 max uptake(g m-2 h-1),Km(uM),min concn (uM)
 !     VmaxNO3Root_pft,KmNO3Root_pft,CminNO3Root_pft=NO3 max uptake(g m-2 h-1),Km(uM), min concn (uM)
@@ -517,9 +517,9 @@ module StartqsMod
   ENDDO D9795
   CNRTS(NZ)=RootrNC_pft(NZ)*RootBiomGrowthYield(NZ)
   CPRTS(NZ)=RootrPC_pft(NZ)*RootBiomGrowthYield(NZ)
-  Max1stRootRadius(2,NZ)=5.0E-06_r8
-  Max2ndRootRadius(2,NZ)=5.0E-06_r8
-  RootPorosity(2,NZ)=RootPorosity(1,NZ)
+  Max1stRootRadius_pft(2,NZ)=5.0E-06_r8
+  Max2ndRootRadius_pft(2,NZ)=5.0E-06_r8
+  RootPorosity_pft(2,NZ)=RootPorosity_pft(1,NZ)
   VmaxNH4Root_pft(2,NZ)=VmaxNH4Root_pft(1,NZ)
   KmNH4Root_pft(2,NZ)=KmNH4Root_pft(1,NZ)
   CMinNH4Root_pft(2,NZ)=CMinNH4Root_pft(1,NZ)
@@ -535,21 +535,21 @@ module StartqsMod
 !     RootPoreTortu4Gas=tortuosity for gas transport
 !     RootRaidus_rpft=path length for radial diffusion within root (m)
 !     RootVolPerMassC_pft=volume:C ratio (m3 g-1)
-!     PrimRootSpecLen,SecndRootSpecLen=specific primary,secondary root length (m g-1)
-!     PrimRootXSecArea,SecndRootXSecArea=specific primary,secondary root area (m2 g-1)
+!     Root1stSpecLen_pft,Root2ndSpecLen_pft=specific primary,secondary root length (m g-1)
+!     Root1stXSecArea_pft,Root2ndXSecArea_pft=specific primary,secondary root area (m2 g-1)
 !
   D500: DO N=1,2
-    RootPoreTortu4Gas(N,NZ)=RootPorosity(N,NZ)**1.33_r8
-    RootRaidus_rpft(N,NZ)=LOG(1.0_r8/SQRT(AMAX1(0.01_r8,RootPorosity(N,NZ))))
-    RootVolPerMassC_pft(N,NZ)=ppmc/(0.05_r8*(1.0_r8-RootPorosity(N,NZ)))
-    PrimRootSpecLen(N,NZ)=RootVolPerMassC_pft(N,NZ)/(PICON*Max1stRootRadius(N,NZ)**2._r8)
-    SecndRootSpecLen(N,NZ)=RootVolPerMassC_pft(N,NZ)/(PICON*Max2ndRootRadius(N,NZ)**2._r8)
-    Max1stRootRadius1(N,NZ)=Max1stRootRadius(N,NZ)
-!    2*SQRT(0.25*(1.0-RootPorosity(N,NZ)))
-    Max2ndRootRadius1(N,NZ)=Max2ndRootRadius(N,NZ)
-!    2*SQRT(0.25*(1.0-RootPorosity(N,NZ)))
-    PrimRootXSecArea(N,NZ)=PICON*Max1stRootRadius1(N,NZ)**2
-    SecndRootXSecArea(N,NZ)=PICON*Max2ndRootRadius1(N,NZ)**2
+    RootPoreTortu4Gas(N,NZ)=RootPorosity_pft(N,NZ)**1.33_r8
+    RootRaidus_rpft(N,NZ)=LOG(1.0_r8/SQRT(AMAX1(0.01_r8,RootPorosity_pft(N,NZ))))
+    RootVolPerMassC_pft(N,NZ)=ppmc/(0.05_r8*(1.0_r8-RootPorosity_pft(N,NZ)))
+    Root1stSpecLen_pft(N,NZ)=RootVolPerMassC_pft(N,NZ)/(PICON*Max1stRootRadius_pft(N,NZ)**2._r8)
+    Root2ndSpecLen_pft(N,NZ)=RootVolPerMassC_pft(N,NZ)/(PICON*Max2ndRootRadius_pft(N,NZ)**2._r8)
+    Max1stRootRadius_pft1(N,NZ)=Max1stRootRadius_pft(N,NZ)
+!    2*SQRT(0.25*(1.0-RootPorosity_pft(N,NZ)))
+    Max2ndRootRadius_pft1(N,NZ)=Max2ndRootRadius_pft(N,NZ)
+!    2*SQRT(0.25*(1.0-RootPorosity_pft(N,NZ)))
+    Root1stXSecArea_pft(N,NZ)=PICON*Max1stRootRadius_pft1(N,NZ)**2
+    Root2ndXSecArea_pft(N,NZ)=PICON*Max2ndRootRadius_pft1(N,NZ)**2
   ENDDO D500
   end associate
   end subroutine InitDimensionsandUptake
@@ -894,12 +894,12 @@ module StartqsMod
   associate(                             &
     OSMO                         =>  plt_ew%OSMO       , &
     PSICanopy_pft                =>  plt_ew%PSICanopy_pft     , &
-    PSIRoot_vr                   =>  plt_ew%PSIRoot_vr     , &
+    PSIRoot_pvr                   =>  plt_ew%PSIRoot_pvr     , &
     PSIRootTurg_vr               =>  plt_ew%PSIRootTurg_vr      , &
     PSIRootOSMO_vr               =>  plt_ew%PSIRootOSMO_vr      , &
     RootN2Fix_pvr                =>  plt_bgcr%RootN2Fix_pvr    , &
-    trcg_rootml_vr               =>  plt_rbgc%trcg_rootml_vr     , &
-    trcs_rootml_vr               =>  plt_rbgc%trcs_rootml_vr     , &
+    trcg_rootml_pvr               =>  plt_rbgc%trcg_rootml_pvr     , &
+    trcs_rootml_pvr               =>  plt_rbgc%trcs_rootml_pvr     , &
     OXYE                         =>  plt_site%OXYE     , &
     COXYE                        =>  plt_site%COXYE    , &
     CO2EI                        =>  plt_site%CO2EI    , &
@@ -910,18 +910,18 @@ module StartqsMod
     RootProteinConc_pvr          =>  plt_biom%RootProteinConc_pvr   , &
     RootProteinC_pvr             =>  plt_biom%RootProteinC_pvr    , &
     SeedDepth_pft                =>  plt_morph%SeedDepth_pft   , &
-    RootVH2O_vr                  =>  plt_morph%RootVH2O_vr  , &
-    RootVolume_vr                =>  plt_morph%RootVolume_vr   , &
+    RootVH2O_pvr                  =>  plt_morph%RootVH2O_pvr  , &
+    RootPoreVol_pvr                =>  plt_morph%RootPoreVol_pvr   , &
     Radius2ndRoot_pvr          =>  plt_morph%Radius2ndRoot_pvr   , &
-    PrimRootRadius_pvr           =>  plt_morph%PrimRootRadius_pvr   , &
-    Max1stRootRadius             =>  plt_morph%Max1stRootRadius  , &
-    Max2ndRootRadius             =>  plt_morph%Max2ndRootRadius  , &
+    Root1stRadius_pvr           =>  plt_morph%Root1stRadius_pvr   , &
+    Max1stRootRadius_pft             =>  plt_morph%Max1stRootRadius_pft  , &
+    Max2ndRootRadius_pft             =>  plt_morph%Max2ndRootRadius_pft  , &
     NumRootAxes_pft              =>  plt_morph%NumRootAxes_pft      &
   )
 !
 !     INITIALIZE ROOT(N=1),MYCORRHIZAL(N=2) MORPHOLOGY AND BIOMASS
 !
-!     PSIRoot_vr,PSIRootOSMO_vr,PSIRootTurg_vr=root,myco total,osmotic,turgor water potl(MPa)
+!     PSIRoot_pvr,PSIRootOSMO_vr,PSIRootTurg_vr=root,myco total,osmotic,turgor water potl(MPa)
 !     CO2A,CO2P=root,myco gaseous,aqueous CO2 content (g)
 !     OXYA,OXYP=root,myco gaseous,aqueous O2 content (g)
 !
@@ -934,24 +934,24 @@ module StartqsMod
   D40: DO N=1,pltpar%jroots
     D20: DO L=1,NL
       plt_ew%AllPlantRootH2OUptake_vr(N,L,NZ)=0._r8
-      PSIRoot_vr(N,L,NZ)=-0.01_r8
-      PSIRootOSMO_vr(N,L,NZ)=OSMO(NZ)+PSIRoot_vr(N,L,NZ)
-      PSIRootTurg_vr(N,L,NZ)=AZMAX1(PSIRoot_vr(N,L,NZ)-PSIRootOSMO_vr(N,L,NZ))
+      PSIRoot_pvr(N,L,NZ)=-0.01_r8
+      PSIRootOSMO_vr(N,L,NZ)=OSMO(NZ)+PSIRoot_pvr(N,L,NZ)
+      PSIRootTurg_vr(N,L,NZ)=AZMAX1(PSIRoot_pvr(N,L,NZ)-PSIRootOSMO_vr(N,L,NZ))
       plt_biom%RootMycoNonstElm_pvr(1:NumPlantChemElms,N,L,NZ)=0._r8
       plt_biom%RootNonstructElmConc_pvr(1:NumPlantChemElms,N,L,NZ)=0._r8
       RootProteinConc_pvr(N,L,NZ)=RootFracRemobilizableBiom(NZ)
-      plt_biom%RootStructBiomC_vr(N,L,NZ)=0._r8
+      plt_biom%RootMycoActiveBiomC_pvr(N,L,NZ)=0._r8
       plt_biom% PopuPlantRootC_vr(N,L,NZ)=0._r8
       RootProteinC_pvr(N,L,NZ)=0._r8
-      plt_morph%PrimRootXNumL_pvr(N,L,NZ)=0._r8
-      plt_morph%SecndRootXNum_pvr(N,L,NZ)=0._r8
+      plt_morph%Root1stXNumL_pvr(N,L,NZ)=0._r8
+      plt_morph%Root2ndXNum_pvr(N,L,NZ)=0._r8
       plt_morph%RootLenPerPlant_pvr(N,L,NZ)=0._r8
       plt_morph%RootLenDensPerPlant_pvr(N,L,NZ)=0._r8
-      RootVolume_vr(N,L,NZ)=0._r8
-      RootVH2O_vr(N,L,NZ)=0._r8
-      PrimRootRadius_pvr(N,L,NZ)=Max1stRootRadius(N,NZ)
-      Radius2ndRoot_pvr(N,L,NZ)=Max2ndRootRadius(N,NZ)
-      plt_morph%RootAreaPerPlant_vr(N,L,NZ)=0._r8
+      RootPoreVol_pvr(N,L,NZ)=0._r8
+      RootVH2O_pvr(N,L,NZ)=0._r8
+      Root1stRadius_pvr(N,L,NZ)=Max1stRootRadius_pft(N,NZ)
+      Radius2ndRoot_pvr(N,L,NZ)=Max2ndRootRadius_pft(N,NZ)
+      plt_morph%RootAreaPerPlant_pvr(N,L,NZ)=0._r8
       plt_morph%AveLen2ndRoot_pvr(N,L,NZ)=1.0E-03
       plt_rbgc%RootNutUptake_pvr(ids_NH4,N,L,NZ)=0._r8
       plt_rbgc%RootNutUptake_pvr(ids_NO3,N,L,NZ)=0._r8
@@ -972,34 +972,34 @@ module StartqsMod
       plt_rbgc%RUPP1B(N,L,NZ)=0._r8
       CCO2A=CCO2EI
       CCO2P=0.030*EXP(-2.621_r8-0.0317_r8*ATCA)*CO2EI
-      trcg_rootml_vr(idg_CO2,N,L,NZ)=CCO2A*RootVolume_vr(N,L,NZ)
-      trcs_rootml_vr(idg_CO2,N,L,NZ)=CCO2P*RootVH2O_vr(N,L,NZ)
+      trcg_rootml_pvr(idg_CO2,N,L,NZ)=CCO2A*RootPoreVol_pvr(N,L,NZ)
+      trcs_rootml_pvr(idg_CO2,N,L,NZ)=CCO2P*RootVH2O_pvr(N,L,NZ)
       plt_rbgc%trcg_air2root_flx__pvr(idg_CO2,N,L,NZ)=0._r8
       plt_rbgc%trcg_Root_DisEvap_flx_vr(idg_CO2,N,L,NZ)=0._r8
       plt_rbgc%RUPGasSol_vr(idg_CO2,N,L,NZ)=0._r8
       plt_rbgc%RCO2P(N,L,NZ)=0._r8
       COXYA=COXYE
       COXYP=0.032_r8*EXP(-6.175_r8-0.0211_r8*ATCA)*OXYE
-      plt_rbgc%trcg_rootml_vr(idg_O2,N,L,NZ)=COXYA*RootVolume_vr(N,L,NZ)
-      plt_rbgc%trcs_rootml_vr(idg_O2,N,L,NZ)=COXYP*RootVH2O_vr(N,L,NZ)
-      plt_rbgc%trcg_rootml_vr(idg_beg:idg_end-1,N,L,NZ)=0._r8
-      plt_rbgc%trcs_rootml_vr(idg_beg:idg_end-1,N,L,NZ)=0._r8
+      plt_rbgc%trcg_rootml_pvr(idg_O2,N,L,NZ)=COXYA*RootPoreVol_pvr(N,L,NZ)
+      plt_rbgc%trcs_rootml_pvr(idg_O2,N,L,NZ)=COXYP*RootVH2O_pvr(N,L,NZ)
+      plt_rbgc%trcg_rootml_pvr(idg_beg:idg_end-1,N,L,NZ)=0._r8
+      plt_rbgc%trcs_rootml_pvr(idg_beg:idg_end-1,N,L,NZ)=0._r8
       plt_rbgc%RootAutoRO2Limiter_pvr(N,L,NZ)=1.0
       D30: DO NR=1,MaxNumRootAxes
-        plt_morph%SecndRootXNum_rpvr(N,L,NR,NZ)=0._r8
-        plt_morph%PrimRootLen(N,L,NR,NZ)=0._r8
-        plt_morph%SecndRootLen_pvr(N,L,NR,NZ)=0._r8
-        plt_morph%PrimRootDepth(N,NR,NZ)=SeedDepth_pft(NZ)
-        plt_biom%Root1stStructChemElm_pvr(1:NumPlantChemElms,N,L,NR,NZ)=0._r8
-        plt_biom%Root2ndStructChemElm_pvr(1:NumPlantChemElms,N,L,NR,NZ)=0._r8
-        plt_biom%Root1stChemElm(1:NumPlantChemElms,N,NR,NZ)=0._r8
+        plt_morph%Root2ndXNum_rpvr(N,L,NR,NZ)=0._r8
+        plt_morph%Root1stLen_rpvr(N,L,NR,NZ)=0._r8
+        plt_morph%Root2ndLen_pvr(N,L,NR,NZ)=0._r8
+        plt_morph%Root1stDepz_pft(N,NR,NZ)=SeedDepth_pft(NZ)
+        plt_biom%Root1stStructElm_rpvr(1:NumPlantChemElms,N,L,NR,NZ)=0._r8
+        plt_biom%Root2ndStructElm_pvr(1:NumPlantChemElms,N,L,NR,NZ)=0._r8
+        plt_biom%Root1stElm_raxs(1:NumPlantChemElms,N,NR,NZ)=0._r8
       ENDDO D30
       IF(N.EQ.1)THEN
         D6400: DO K=1,pltpar%NumOfPlantLitrCmplxs
           plt_bgcr%LitfalChemElm_pvr(1:NumPlantChemElms,1:jsken,K,L,NZ)=0._r8
         ENDDO D6400
-        plt_biom%RootNoduleNonstructElmnt_vr(1:NumPlantChemElms,L,NZ)=0._r8
-        plt_biom%RootNodueChemElm_pvr(1:NumPlantChemElms,L,NZ)=0._r8
+        plt_biom%RootNodulNonstElm_pvr(1:NumPlantChemElms,L,NZ)=0._r8
+        plt_biom%RootNodulElm_pvr(1:NumPlantChemElms,L,NZ)=0._r8
         RootN2Fix_pvr(L,NZ)=0._r8
       ENDIF
     ENDDO D20
@@ -1028,21 +1028,21 @@ module StartqsMod
     RootFracRemobilizableBiom    =>   plt_allom%RootFracRemobilizableBiom  , &
     CNGR                         =>   plt_allom%CNGR   , &
     CPGR                         =>   plt_allom%CPGR   , &
-    Root1stChemElm               =>   plt_biom%Root1stChemElm  , &
+    Root1stElm_raxs              =>   plt_biom%Root1stElm_raxs  , &
     SeedCPlanted_pft             =>   plt_biom%SeedCPlanted_pft   , &
-    Root1stStructChemElm_pvr     =>   plt_biom%Root1stStructChemElm_pvr  , &
+    Root1stStructElm_rpvr        =>   plt_biom%Root1stStructElm_rpvr  , &
     LeafPetolBiomassC_brch       =>   plt_biom%LeafPetolBiomassC_brch   , &
     CanopyLeafShethC_pft         =>   plt_biom%CanopyLeafShethC_pft    , &
      PopuPlantRootC_vr           =>   plt_biom% PopuPlantRootC_vr   , &
     PetoleChemElm_brch           =>   plt_biom%PetoleChemElm_brch, &
-    RootStructBiomC_vr           =>   plt_biom%RootStructBiomC_vr  , &
+    RootMycoActiveBiomC_pvr          =>   plt_biom%RootMycoActiveBiomC_pvr  , &
     RootProteinC_pvr             =>   plt_biom%RootProteinC_pvr   , &
-     RootMycoNonstElm_pvr   =>   plt_biom%RootMycoNonstElm_pvr  , &
-    NonstructElm_brch          =>   plt_biom%NonstructElm_brch  , &
+     RootMycoNonstElm_pvr        =>   plt_biom%RootMycoNonstElm_pvr  , &
+    NonstructElm_brch            =>   plt_biom%NonstructElm_brch  , &
     LeafChemElms_brch            =>   plt_biom%LeafChemElms_brch , &
-    NonstructalElms_pft        =>   plt_biom%NonstructalElms_pft   , &
+    NonstructElms_pft            =>   plt_biom%NonstructElms_pft   , &
     SeedCMass                    =>   plt_morph%SeedCMass   , &
-    PrimRootDepth                =>   plt_morph%PrimRootDepth  , &
+    Root1stDepz_pft              =>   plt_morph%Root1stDepz_pft  , &
     NGTopRootLayer_pft           =>   plt_morph%NGTopRootLayer_pft      &
   )
 !
@@ -1056,14 +1056,14 @@ module StartqsMod
 !     CPOOL,ZPOOL,PPOOL=C,N,P in canopy nonstructural pools (g)
 !     WTRT1,WTRT1N,WTRT1P=C,N,P in primary root layer (g)
 !     RTWT1,RTWT1N,RTWT1P=total C,N,P in primary root (g)
-!     RootStructBiomC_vr, PopuPlantRootC_vr=total root C mass (g)
+!     RootMycoActiveBiomC_pvr, PopuPlantRootC_vr=total root C mass (g)
 !     RootProteinC_pvr=total root protein C mass (g)
 !     CPOOLR,ZPOOLR,PPOOLR=C,N,P in root,myco nonstructural pools (g)
 !
   SeedCPlanted_pft(NZ)=SeedCMass(NZ)*PlantPopulation_pft(NZ)
-  NonstructalElms_pft(ielmc,NZ)=SeedCPlanted_pft(NZ)
-  NonstructalElms_pft(ielmn,NZ)=CNGR(NZ)*NonstructalElms_pft(ielmc,NZ)
-  NonstructalElms_pft(ielmp,NZ)=CPGR(NZ)*NonstructalElms_pft(ielmc,NZ)
+  NonstructElms_pft(ielmc,NZ)=SeedCPlanted_pft(NZ)
+  NonstructElms_pft(ielmn,NZ)=CNGR(NZ)*NonstructElms_pft(ielmc,NZ)
+  NonstructElms_pft(ielmp,NZ)=CPGR(NZ)*NonstructElms_pft(ielmc,NZ)
   LeafChemElms_brch(ielmn,1,NZ)=CNGR(NZ)*LeafChemElms_brch(ielmc,1,NZ)
   LeafChemElms_brch(ielmp,1,NZ)=CPGR(NZ)*LeafChemElms_brch(ielmc,1,NZ)
   LeafPetolBiomassC_brch(1,NZ)=LeafChemElms_brch(ielmc,1,NZ)+PetoleChemElm_brch(ielmc,1,NZ)
@@ -1073,17 +1073,17 @@ module StartqsMod
   WatByPCanopy(NZ)=0._r8
   NonstructElm_brch(ielmn,1,NZ)=CNGR(NZ)*NonstructElm_brch(ielmc,1,NZ)
   NonstructElm_brch(ielmp,1,NZ)=CPGR(NZ)*NonstructElm_brch(ielmc,1,NZ)
-  Root1stStructChemElm_pvr(ielmn,ipltroot,NGTopRootLayer_pft(NZ),1,NZ)=CNGR(NZ) &
-    *Root1stStructChemElm_pvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ),1,NZ)
-  Root1stStructChemElm_pvr(ielmp,ipltroot,NGTopRootLayer_pft(NZ),1,NZ)=CPGR(NZ) &
-    *Root1stStructChemElm_pvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ),1,NZ)
-  Root1stChemElm(ielmn,1,1,NZ)=CNGR(NZ)*Root1stChemElm(ielmc,1,1,NZ)
-  Root1stChemElm(ielmp,1,1,NZ)=CPGR(NZ)*Root1stChemElm(ielmc,1,1,NZ)
-  RootStructBiomC_vr(ipltroot,NGTopRootLayer_pft(NZ),NZ)=&
-    Root1stStructChemElm_pvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ),1,NZ)
+  Root1stStructElm_rpvr(ielmn,ipltroot,NGTopRootLayer_pft(NZ),1,NZ)=CNGR(NZ) &
+    *Root1stStructElm_rpvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ),1,NZ)
+  Root1stStructElm_rpvr(ielmp,ipltroot,NGTopRootLayer_pft(NZ),1,NZ)=CPGR(NZ) &
+    *Root1stStructElm_rpvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ),1,NZ)
+  Root1stElm_raxs(ielmn,1,1,NZ)=CNGR(NZ)*Root1stElm_raxs(ielmc,1,1,NZ)
+  Root1stElm_raxs(ielmp,1,1,NZ)=CPGR(NZ)*Root1stElm_raxs(ielmc,1,1,NZ)
+  RootMycoActiveBiomC_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)=&
+    Root1stStructElm_rpvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ),1,NZ)
   PopuPlantRootC_vr(ipltroot,NGTopRootLayer_pft(NZ),NZ)= &
-    Root1stStructChemElm_pvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ),1,NZ)
-  RootProteinC_pvr(1,NGTopRootLayer_pft(NZ),NZ)=RootStructBiomC_vr(ipltroot,NGTopRootLayer_pft(NZ),NZ)&
+    Root1stStructElm_rpvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ),1,NZ)
+  RootProteinC_pvr(1,NGTopRootLayer_pft(NZ),NZ)=RootMycoActiveBiomC_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)&
     *RootFracRemobilizableBiom(NZ)
   RootMycoNonstElm_pvr(ielmn,1,NGTopRootLayer_pft(NZ),NZ)=CNGR(NZ)&
     *RootMycoNonstElm_pvr(ielmc,1,NGTopRootLayer_pft(NZ),NZ)

@@ -150,7 +150,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  GrainSeedBiomCMean_brch(:,:,:,:)                     !maximum grain C during grain fill, [g d-2]
   real(r8),target,allocatable ::  StandingDeadKCompChemElms_pft(:,:,:,:,:)                  !standing dead element fraction, [g d-2]
   real(r8),target,allocatable ::  StandingDeadChemElms_pft(:,:,:,:)                    !standing dead element, [g d-2]
-  real(r8),target,allocatable ::  NonstructalElms_pft(:,:,:,:)                     !plant stored nonstructural element, [g d-2]
+  real(r8),target,allocatable ::  NonstructElms_pft(:,:,:,:)                     !plant stored nonstructural element, [g d-2]
   real(r8),target,allocatable ::  SeedCPlanted_pft(:,:,:)                       !plant stored nonstructural C at planting, [g d-2]
   REAL(R8),target,allocatable ::  AvgCanopyBiomC2Graze_pft(:,:,:)                      !landscape average canopy shoot C, [g d-2]
   contains
@@ -299,7 +299,7 @@ module CanopyDataType
   allocate(GrainSeedBiomCMean_brch(MaxNumBranches,JP,JY,JX)); GrainSeedBiomCMean_brch=0._r8
   allocate(StandingDeadKCompChemElms_pft(NumPlantChemElms,jsken,JP,JY,JX)); StandingDeadKCompChemElms_pft=0._r8
   allocate(StandingDeadChemElms_pft(NumPlantChemElms,JP,JY,JX));    StandingDeadChemElms_pft=0._r8
-  allocate(NonstructalElms_pft(NumPlantChemElms,JP,JY,JX));  NonstructalElms_pft=0._r8
+  allocate(NonstructElms_pft(NumPlantChemElms,JP,JY,JX));  NonstructElms_pft=0._r8
   allocate(SeedCPlanted_pft(JP,JY,JX));    SeedCPlanted_pft=0._r8
   allocate(AvgCanopyBiomC2Graze_pft(JP,JY,JX));   AvgCanopyBiomC2Graze_pft=0._r8
   end subroutine InitCanopyData
@@ -449,7 +449,7 @@ module CanopyDataType
   call destroy(GrainSeedBiomCMean_brch)
   call destroy(StandingDeadKCompChemElms_pft)
   call destroy(StandingDeadChemElms_pft)
-  call destroy(NonstructalElms_pft)
+  call destroy(NonstructElms_pft)
   call destroy(SeedCPlanted_pft)
   call destroy(AvgCanopyBiomC2Graze_pft)
   end subroutine DestructCanopyData
