@@ -29,11 +29,11 @@ module PlantBranchMod
   contains
 !------------------------------------------------------------------------------------------
 
-  subroutine GrowOneBranch(I,J,NB,NZ,TFN6,CanopyHeight_copy,CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW,TFN5,WFNG,&
+  subroutine GrowOneBranch(I,J,NB,NZ,TFN6_vr,CanopyHeight_copy,CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW,TFN5,WFNG,&
     Stomata_Activity,WFNS,WFNSG,PTRT,CanopyN2Fix_pft,BegRemoblize)
   implicit none
   integer, intent(in)  :: I,J,NB,NZ
-  REAL(R8), INTENT(IN) :: TFN6(JZ1)
+  REAL(R8), INTENT(IN) :: TFN6_vr(JZ1)
   real(r8), intent(in) :: CanopyHeight_copy(JP1)
   real(r8), intent(in) :: CNLFW,CPLFW
   real(r8), intent(in) :: CNSHW,CPSHW
@@ -225,7 +225,7 @@ module PlantBranchMod
 !
 !   GROSS PRIMARY PRODUCTIVITY
 !
-    call UpdatePhotosynthates(I,J,NB,NZ,TFN6,DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,&
+    call UpdatePhotosynthates(I,J,NB,NZ,TFN6_vr,DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,&
       CNLFX,CPLFX,ShootStructN,TFN5,WFNG,Stomata_Activity,WFNSG,CH2O3,CH2O4,CNPG,rco2c,RMNCS,&
       RMxess_brch,NonStructalC4Growth_brch,CNRDM,Rauto4Nassim_brch)
 !    if(nz==1)then
@@ -724,12 +724,12 @@ module PlantBranchMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine UpdatePhotosynthates(I,J,NB,NZ,TFN6,DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX,&
+  subroutine UpdatePhotosynthates(I,J,NB,NZ,TFN6_vr,DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX,&
     ShootStructN,TFN5,WFNG,Stomata_Activity,WFNSG,CH2O3,CH2O4,CNPG,rco2c,RMNCS,&
     RMxess_brch,NonStructalC4Growth_brch,CNRDM,Rauto4Nassim_brch)
   implicit none
   integer, intent(in) :: I,J,NB,NZ
-  real(r8), intent(in) :: TFN6(JZ1)
+  real(r8), intent(in) :: TFN6_vr(JZ1)
   real(r8), intent(in) :: DMSHD
   real(r8), intent(in) :: CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX,ShootStructN,TFN5,WFNG
   real(r8), intent(in) :: Stomata_Activity,WFNSG
@@ -774,7 +774,7 @@ module PlantBranchMod
 !
   ELSE
     CH2O=0._r8
-    call ComputRAutoB4Emergence(I,NB,NZ,TFN6,DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX,ShootStructN,&
+    call ComputRAutoB4Emergence(I,NB,NZ,TFN6_vr,DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX,ShootStructN,&
       WFNG,WFNSG,ZADDB,CNPG,PADDB,RCO2C,RMNCS,RMxess_brch,NonStructalC4Growth_brch,CNRDM,Rauto4Nassim_brch)
 !    write(101,*)'ComputRAutoB4Emergence',NonStructalC4Growth_brch  
   ENDIF
@@ -1863,7 +1863,7 @@ module PlantBranchMod
     GrainSeedBiomCMean_brch               =>  plt_allom%GrainSeedBiomCMean_brch    , &
     CNGR                                  =>  plt_allom%CNGR     , &
     CPGR                                  =>  plt_allom%CPGR     , &
-    fTgrowRootP                           =>  plt_pheno%fTgrowRootP     , &
+    fTgrowRootP_vr                           =>  plt_pheno%fTgrowRootP_vr     , &
     fTgrowCanP                            =>  plt_pheno%fTgrowCanP     , &
     iPlantPhenolType_pft                  =>  plt_pheno%iPlantPhenolType_pft   , &
     Hours4LeafOff_brch                    =>  plt_pheno%Hours4LeafOff_brch     , &
@@ -1974,7 +1974,7 @@ module PlantBranchMod
 !   GROLM=maximum grain fill rate
 !   GrainFillRate25C_pft=grain filling rate at 25 oC from PFT file
 !   fTgrowCanP=temperature function for canopy growth
-!   fTgrowRootP=temperature function for root growth
+!   fTgrowRootP_vr=temperature function for root growth
 !
   IF(iPlantCalendar_brch(ipltcal_BeginSeedFill,NB,NZ).NE.0)THEN
     IF(GrainChemElms_brch(ielmc,NB,NZ).GE.GrainSeedBiomCMean_brch(NB,NZ)*SeedNumberSet_brch(NB,NZ))THEN
@@ -1982,7 +1982,7 @@ module PlantBranchMod
     ELSEIF(iPlantGrainType_pft(NZ).EQ.igraintyp_abvgrnd)THEN
       GROLM=AZMAX1(GrainFillRate25C_pft(NZ)*SeedNumberSet_brch(NB,NZ)*SQRT(fTgrowCanP(NZ)))
     ELSE
-      GROLM=AZMAX1(GrainFillRate25C_pft(NZ)*SeedNumberSet_brch(NB,NZ)*SQRT(fTgrowRootP(NGTopRootLayer_pft(NZ),NZ)))
+      GROLM=AZMAX1(GrainFillRate25C_pft(NZ)*SeedNumberSet_brch(NB,NZ)*SQRT(fTgrowRootP_vr(NGTopRootLayer_pft(NZ),NZ)))
     ENDIF
 !
 !     GRAIN FILL RATE MAY BE CONSTRAINED BY HIGH GRAIN C:N OR C:P
@@ -3084,12 +3084,12 @@ module PlantBranchMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine ComputRAutoB4Emergence(I,NB,NZ,TFN6,DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,&
+  subroutine ComputRAutoB4Emergence(I,NB,NZ,TFN6_vr,DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,&
     CNLFX,CPLFX,ShootStructN,WFNG,WFNSG,ZADDB,CNPG,PADDB,RCO2C,RMNCS,RMxess_brch,&
     NonStructalC4Growth_brch,CNRDM,Rauto4Nassim_brch)
   implicit none
   integer, intent(in) :: I,NB,NZ
-  real(r8),intent(in) :: TFN6(JZ1)
+  real(r8),intent(in) :: TFN6_vr(JZ1)
   real(r8), intent(in) :: DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX,ShootStructN,WFNG
   real(r8), intent(in) :: WFNSG
   real(r8), intent(out) :: ZADDB,rco2c
@@ -3109,7 +3109,7 @@ module PlantBranchMod
     LeafPetoNonstElmConc_brch          =>  plt_biom%LeafPetoNonstElmConc_brch   , &
     NonstructElm_brch                  =>  plt_biom%NonstructElm_brch   , &
     iPlantRootProfile_pft              =>  plt_pheno%iPlantRootProfile_pft  , &
-    fTgrowRootP                        =>  plt_pheno%fTgrowRootP    , &
+    fTgrowRootP_vr                        =>  plt_pheno%fTgrowRootP_vr    , &
     RootAutoRO2Limiter_pvr             =>  plt_rbgc%RootAutoRO2Limiter_pvr     , &
     iPlantPhenolType_pft               =>  plt_pheno%iPlantPhenolType_pft  , &
     CO2NetFix_pft                      =>  plt_bgcr%CO2NetFix_pft     , &
@@ -3143,27 +3143,27 @@ module PlantBranchMod
 ! RCO2CM,RCO2C=respiration from non-structural C unlimited,limited by O2
 ! VMXC=rate constant for nonstructural C oxidation in respiration (h-1)
 ! CPOOL=non-structural C mass
-! fTgrowRootP=temperature function for root growth
+! fTgrowRootP_vr=temperature function for root growth
 ! WFNG=growth function of canopy water potential
 ! CNPG=N,P constraint on respiration
 ! C4PhotosynDowreg_brch=termination feedback inhibition on C3 CO2
 ! RootAutoRO2Limiter_pvr=constraint by O2 consumption on all root processes
 !
   RCO2CM=AZMAX1(VMXC*NonstructElm_brch(ielmc,NB,NZ) &
-    *fTgrowRootP(NGTopRootLayer_pft(NZ),NZ))*CNPG*WFNG*C4PhotosynDowreg_brch(NB,NZ)
+    *fTgrowRootP_vr(NGTopRootLayer_pft(NZ),NZ))*CNPG*WFNG*C4PhotosynDowreg_brch(NB,NZ)
 !  write(104,*)'RCO2CM',iter,RCO2CM,NonstructElm_brch(ielmc,NB,NZ),NB,NZ,NGTopRootLayer_pft(NZ)  
   RCO2C=RCO2CM*RootAutoRO2Limiter_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)
 !
 ! MAINTENANCE RESPIRATION FROM TEMPERATURE, PLANT STRUCTURAL N
 !
 ! RMNCS=maintenance respiration
-! TFN6=temperature function for root maintenance respiration
+! TFN6_vr=temperature function for root maintenance respiration
 ! ShootStructN=shoot structural N mass
 ! iPlantRootProfile_pft=growth type:0=bryophyte,1=graminoid,2=shrub,tree
 ! iPlantPhenolType_pft=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
 ! WFNG=growth function of canopy water potential
 !
-  RMNCS=AZMAX1(RmSpecPlant*TFN6(NGTopRootLayer_pft(NZ))*ShootStructN)
+  RMNCS=AZMAX1(RmSpecPlant*TFN6_vr(NGTopRootLayer_pft(NZ))*ShootStructN)
   IF(is_root_shallow(iPlantRootProfile_pft(NZ)).OR.&
     iPlantPhenolType_pft(NZ).EQ.iphenotyp_drouhtdecidu)THEN
     RMNCS=RMNCS*WFNG

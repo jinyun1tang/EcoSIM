@@ -23,7 +23,7 @@ module RootDataType
   real(r8),target,allocatable ::  Max2ndRootRadius1(:,:,:,:)                    !root diameter secondary axes, [m]
   real(r8),target,allocatable ::  PrimRootXSecArea(:,:,:,:)          !root cross-sectional area primary axes, [m2]
   real(r8),target,allocatable ::  SecndRootXSecArea(:,:,:,:)                    !root  cross-sectional area  secondary axes, [m2]
-  real(r8),target,allocatable ::  fTgrowRootP(:,:,:,:)                      !root layer temperature growth functiom, [-]
+  real(r8),target,allocatable ::  fTgrowRootP_vr(:,:,:,:)                      !root layer temperature growth functiom, [-]
   real(r8),target,allocatable ::  RootrNC_pft(:,:,:)                        !root N:C ratio, [g g-1]
   real(r8),target,allocatable ::  RootrPC_pft(:,:,:)                        !root P:C ratio, [g g-1]
   real(r8),target,allocatable ::  RootPorosity(:,:,:,:)                      !root porosity, [m3 m-3]
@@ -49,7 +49,7 @@ module RootDataType
   real(r8),target,allocatable ::  RootNoduleNonstructElmnt_vr(:,:,:,:,:)                  !root  layer nonstructural element, [g d-2]
   real(r8),target,allocatable ::  RootLenPerPlant_pvr(:,:,:,:,:)                   !root layer length per plant, [m p-1]
   real(r8),target,allocatable ::  PrimRootLen(:,:,:,:,:,:)                 !root layer length primary axes, [m d-2]
-  real(r8),target,allocatable ::  SecndRootLen(:,:,:,:,:,:)                 !root layer length secondary axes, [m d-2]
+  real(r8),target,allocatable ::  SecndRootLen_pvr(:,:,:,:,:,:)                 !root layer length secondary axes, [m d-2]
   real(r8),target,allocatable ::  RootLenDensPerPlant_pvr(:,:,:,:,:)          !root length density in soil layers, [m m-3]
   real(r8),target,allocatable ::  PrimRootXNumL_pvr(:,:,:,:,:)                    !root layer number primary axes, [d-2]
   real(r8),target,allocatable ::  SecndRootXNum_pvr(:,:,:,:,:)                    !root layer number axes, [d-2]
@@ -105,7 +105,7 @@ contains
   allocate(Max2ndRootRadius1(jroots,JP,JY,JX)); Max2ndRootRadius1=0._r8
   allocate(PrimRootXSecArea(jroots,JP,JY,JX)); PrimRootXSecArea=0._r8
   allocate(SecndRootXSecArea(jroots,JP,JY,JX)); SecndRootXSecArea=0._r8
-  allocate(fTgrowRootP(JZ,JP,JY,JX));  fTgrowRootP=0._r8
+  allocate(fTgrowRootP_vr(JZ,JP,JY,JX));  fTgrowRootP_vr=0._r8
   allocate(RootrNC_pft(JP,JY,JX));     RootrNC_pft=0._r8
   allocate(RootrPC_pft(JP,JY,JX));     RootrPC_pft=0._r8
   allocate(RootPorosity(jroots,JP,JY,JX));   RootPorosity=0._r8
@@ -131,7 +131,7 @@ contains
   allocate(RootNoduleNonstructElmnt_vr(NumPlantChemElms,JZ,JP,JY,JX));RootNoduleNonstructElmnt_vr=0._r8
   allocate(RootLenPerPlant_pvr(jroots,JZ,JP,JY,JX));RootLenPerPlant_pvr=0._r8
   allocate(PrimRootLen(jroots,JZ,NumOfCanopyLayers,JP,JY,JX));PrimRootLen=0._r8
-  allocate(SecndRootLen(jroots,JZ,NumOfCanopyLayers,JP,JY,JX));SecndRootLen=0._r8
+  allocate(SecndRootLen_pvr(jroots,JZ,NumOfCanopyLayers,JP,JY,JX));SecndRootLen_pvr=0._r8
   allocate(RootLenDensPerPlant_pvr(jroots,JZ,JP,JY,JX));RootLenDensPerPlant_pvr=0._r8
   allocate(PrimRootXNumL_pvr(jroots,JZ,JP,JY,JX));PrimRootXNumL_pvr=0._r8
   allocate(SecndRootXNum_pvr(jroots,JZ,JP,JY,JX));SecndRootXNum_pvr=0._r8
@@ -185,7 +185,7 @@ contains
   call destroy(Max2ndRootRadius1)
   call destroy(PrimRootXSecArea)
   call destroy(SecndRootXSecArea)
-  call destroy(fTgrowRootP)
+  call destroy(fTgrowRootP_vr)
   call destroy(RootrNC_pft)
   call destroy(RootrPC_pft)
   call destroy(RootPorosity)
@@ -211,7 +211,7 @@ contains
   call destroy(RootNoduleNonstructElmnt_vr)
   call destroy(RootLenPerPlant_pvr)
   call destroy(PrimRootLen)
-  call destroy(SecndRootLen)
+  call destroy(SecndRootLen_pvr)
   call destroy(RootLenDensPerPlant_pvr)
   call destroy(PrimRootXNumL_pvr)
   call destroy(SecndRootXNum_pvr)

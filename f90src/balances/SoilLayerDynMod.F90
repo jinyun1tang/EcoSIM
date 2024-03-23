@@ -860,7 +860,7 @@ implicit none
               Root2ndStructChemElm_pvr(NE,N,L1,NR,NZ,NY,NX)=Root2ndStructChemElm_pvr(NE,N,L1,NR,NZ,NY,NX)+FX*Root2ndStructChemElm_pvr(NE,N,L0,NR,NZ,NY,NX)
             ENDDO
             PrimRootLen(N,L1,NR,NZ,NY,NX)=PrimRootLen(N,L1,NR,NZ,NY,NX)+FX*PrimRootLen(N,L0,NR,NZ,NY,NX)
-            SecndRootLen(N,L1,NR,NZ,NY,NX)=SecndRootLen(N,L1,NR,NZ,NY,NX)+FX*SecndRootLen(N,L0,NR,NZ,NY,NX)
+            SecndRootLen_pvr(N,L1,NR,NZ,NY,NX)=SecndRootLen_pvr(N,L1,NR,NZ,NY,NX)+FX*SecndRootLen_pvr(N,L0,NR,NZ,NY,NX)
             SecndRootXNum_rpvr(N,L1,NR,NZ,NY,NX)=SecndRootXNum_rpvr(N,L1,NR,NZ,NY,NX)+FX*SecndRootXNum_rpvr(N,L0,NR,NZ,NY,NX)
           ENDDO
           DO NE=1,NumPlantChemElms
@@ -1041,7 +1041,7 @@ implicit none
               Root2ndStructChemElm_pvr(NE,N,L0,NR,NZ,NY,NX)=FY*Root2ndStructChemElm_pvr(NE,N,L0,NR,NZ,NY,NX)
             ENDDO
             PrimRootLen(N,L0,NR,NZ,NY,NX)=FY*PrimRootLen(N,L0,NR,NZ,NY,NX)
-            SecndRootLen(N,L0,NR,NZ,NY,NX)=FY*SecndRootLen(N,L0,NR,NZ,NY,NX)
+            SecndRootLen_pvr(N,L0,NR,NZ,NY,NX)=FY*SecndRootLen_pvr(N,L0,NR,NZ,NY,NX)
             SecndRootXNum_rpvr(N,L0,NR,NZ,NY,NX)=FY*SecndRootXNum_rpvr(N,L0,NR,NZ,NY,NX)
           ENDDO
           DO NE=1,NumPlantChemElms
@@ -1250,9 +1250,9 @@ implicit none
             FXRTLG1=FRO*PrimRootLen(N,L0,NR,NZ,NY,NX)
             PrimRootLen(N,L1,NR,NZ,NY,NX)=PrimRootLen(N,L1,NR,NZ,NY,NX)+FXRTLG1
             PrimRootLen(N,L0,NR,NZ,NY,NX)=PrimRootLen(N,L0,NR,NZ,NY,NX)-FXRTLG1
-            FXRTLG2=FRO*SecndRootLen(N,L0,NR,NZ,NY,NX)
-            SecndRootLen(N,L1,NR,NZ,NY,NX)=SecndRootLen(N,L1,NR,NZ,NY,NX)+FXRTLG2
-            SecndRootLen(N,L0,NR,NZ,NY,NX)=SecndRootLen(N,L0,NR,NZ,NY,NX)-FXRTLG2
+            FXRTLG2=FRO*SecndRootLen_pvr(N,L0,NR,NZ,NY,NX)
+            SecndRootLen_pvr(N,L1,NR,NZ,NY,NX)=SecndRootLen_pvr(N,L1,NR,NZ,NY,NX)+FXRTLG2
+            SecndRootLen_pvr(N,L0,NR,NZ,NY,NX)=SecndRootLen_pvr(N,L0,NR,NZ,NY,NX)-FXRTLG2
             FXRTN2=FRO*SecndRootXNum_rpvr(N,L0,NR,NZ,NY,NX)
             SecndRootXNum_rpvr(N,L1,NR,NZ,NY,NX)=SecndRootXNum_rpvr(N,L1,NR,NZ,NY,NX)+FXRTN2
             SecndRootXNum_rpvr(N,L0,NR,NZ,NY,NX)=SecndRootXNum_rpvr(N,L0,NR,NZ,NY,NX)-FXRTN2

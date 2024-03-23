@@ -988,7 +988,7 @@ module StartqsMod
       D30: DO NR=1,MaxNumRootAxes
         plt_morph%SecndRootXNum_rpvr(N,L,NR,NZ)=0._r8
         plt_morph%PrimRootLen(N,L,NR,NZ)=0._r8
-        plt_morph%SecndRootLen(N,L,NR,NZ)=0._r8
+        plt_morph%SecndRootLen_pvr(N,L,NR,NZ)=0._r8
         plt_morph%PrimRootDepth(N,NR,NZ)=SeedDepth_pft(NZ)
         plt_biom%Root1stStructChemElm_pvr(1:NumPlantChemElms,N,L,NR,NZ)=0._r8
         plt_biom%Root2ndStructChemElm_pvr(1:NumPlantChemElms,N,L,NR,NZ)=0._r8

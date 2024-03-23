@@ -350,7 +350,7 @@ implicit none
     Max2ndRootRadius              =>   plt_morph%Max2ndRootRadius   , &
     RootLenPerPlant_pvr           =>   plt_morph%RootLenPerPlant_pvr    , &
     PrimRootLen                   =>   plt_morph%PrimRootLen    , &
-    SecndRootLen                  =>   plt_morph%SecndRootLen    , &
+    SecndRootLen_pvr                  =>   plt_morph%SecndRootLen_pvr    , &
     iPlantNfixType                =>   plt_morph%iPlantNfixType   , &
     SecndRootXNum_rpvr            =>   plt_morph%SecndRootXNum_rpvr    , &
     MY                            =>   plt_morph%MY       , &
@@ -404,7 +404,7 @@ implicit none
 !     WTRT1,WTRT1N,WTRT1P=primary root C,N,P mass in soil layer
 !     WTRT2,WTRT2N,WTRT2P=secondary root C,N,P mass in soil layer
 !     RTWT1,RTWT1N,RTWT1P=primary root C,N,P mass
-!     PrimRootLen,SecndRootLen=primary,secondary root length
+!     PrimRootLen,SecndRootLen_pvr=primary,secondary root length
 !     RTN2=number of secondary root axes
 !     CPOOLR,ZPOOLR,PPOOLR=non-structural C,N,P mass in root
 !     RootStructBiomC_vr,WTRTD=active,actual root C mass
@@ -420,7 +420,7 @@ implicit none
           Root2ndStructChemElm_pvr(1:NumPlantChemElms,N,L,NR,NZ)=0._r8
           Root1stChemElm(1:NumPlantChemElms,N,NR,NZ)=0._r8
           PrimRootLen(N,L,NR,NZ)=0._r8
-          SecndRootLen(N,L,NR,NZ)=0._r8
+          SecndRootLen_pvr(N,L,NR,NZ)=0._r8
           SecndRootXNum_rpvr(N,L,NR,NZ)=0._r8
         ENDDO D8870
          RootMycoNonstElm_pvr(:,N,L,NZ)=0._r8
@@ -689,7 +689,7 @@ implicit none
     MaxNumRootLays     => plt_site%MaxNumRootLays            , &
     NU     => plt_site%NU            , &
     iPlantState_pft  => plt_pheno%iPlantState_pft        , &
-    SecndRootLen  => plt_morph%SecndRootLen        , &
+    SecndRootLen_pvr  => plt_morph%SecndRootLen_pvr        , &
     SecndRootXNum_rpvr  => plt_morph%SecndRootXNum_rpvr        , &
     PrimRootLen  => plt_morph%PrimRootLen        , &
     MY     => plt_morph%MY           , &
@@ -730,7 +730,7 @@ implicit none
         Root2ndStructChemElm_pvr(1:NumPlantChemElms,N,L,NR,NZ)=0._r8
         Root1stChemElm(1:NumPlantChemElms,N,NR,NZ)=0._r8
         PrimRootLen(N,L,NR,NZ)=0._r8
-        SecndRootLen(N,L,NR,NZ)=0._r8
+        SecndRootLen_pvr(N,L,NR,NZ)=0._r8
         SecndRootXNum_rpvr(N,L,NR,NZ)=0._r8
       enddo
     enddo

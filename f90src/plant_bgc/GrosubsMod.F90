@@ -314,7 +314,7 @@ module grosubsMod
   real(r8)  :: CanopyN2Fix_pft(JP1)
   integer  :: ICHK1(2,JZ1),IDTHRN,NB
   integer  :: NRX(2,JZ1),BegRemoblize
-  real(r8) :: TFN6(JZ1)
+  real(r8) :: TFN6_vr(JZ1)
   real(r8) :: CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW
   real(r8) :: PTRT
   real(r8) :: RootAreaPopu
@@ -340,7 +340,7 @@ module grosubsMod
   IF(iPlantShootState_pft(NZ).EQ.iLive.OR.iPlantRootState_pft(NZ).EQ.iLive)THEN
     CanopyN2Fix_pft(NZ)=0._r8
     BegRemoblize = 0
-    call StagePlantForGrowth(I,J,NZ,ICHK1,NRX,TFN6,CNLFW,CPLFW,&
+    call StagePlantForGrowth(I,J,NZ,ICHK1,NRX,TFN6_vr,CNLFW,CPLFW,&
       CNSHW,CPSHW,CNRTW,CPRTW,RootAreaPopu,TFN5,WFNG,Stomata_Activity,WFNS,WFNSG)
 !
 !     CALCULATE GROWTH OF EACH BRANCH
@@ -349,11 +349,11 @@ module grosubsMod
 !     iPlantBranchState_brch=branch living flag: 0=alive,1=dead
 !
     DO  NB=1,NumOfBranches_pft(NZ)
-      call GrowOneBranch(I,J,NB,NZ,TFN6,CanopyHeight_copy,CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW,&
+      call GrowOneBranch(I,J,NB,NZ,TFN6_vr,CanopyHeight_copy,CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW,&
         TFN5,WFNG,Stomata_Activity,WFNS,WFNSG,PTRT,CanopyN2Fix_pft,BegRemoblize)
     ENDDO
 !
-    call RootBGCModel(I,J,NZ,BegRemoblize,ICHK1,IDTHRN,NRX,PTRT,TFN6,CNRTW,CPRTW,RootAreaPopu)
+    call RootBGCModel(I,J,NZ,BegRemoblize,ICHK1,IDTHRN,NRX,PTRT,TFN6_vr,CNRTW,CPRTW,RootAreaPopu)
 !
     call ComputeTotalBiom(NZ,ShootNonstructC_brch)
   ELSE
@@ -374,12 +374,12 @@ module grosubsMod
   end subroutine GrowPlant
 
 !------------------------------------------------------------------------------------------
-  subroutine StagePlantForGrowth(I,J,NZ,ICHK1,NRX,TFN6,CNLFW,CPLFW,CNSHW,&
+  subroutine StagePlantForGrowth(I,J,NZ,ICHK1,NRX,TFN6_vr,CNLFW,CPLFW,CNSHW,&
     CPSHW,CNRTW,CPRTW,RootAreaPopu,TFN5,WFNG,Stomata_Activity,WFNS,WFNSG)
   integer, intent(in) :: I,J,NZ
   integer, intent(out):: ICHK1(jroots,JZ1)
   integer, intent(out):: NRX(jroots,JZ1)
-  REAL(R8), INTENT(OUT):: TFN6(JZ1)
+  REAL(R8), INTENT(OUT):: TFN6_vr(JZ1)
   REAL(R8), INTENT(OUT) :: CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW
   real(r8), intent(out) :: RootAreaPopu,TFN5,WFNG,Stomata_Activity
   real(r8), intent(out) :: WFNS,WFNSG
@@ -517,7 +517,7 @@ module grosubsMod
 !     TKC,TKCM=canopy temperature,canopy temp used in Arrhenius eqn
 !     TKS,TKSM=soil temperature,soil temp used in Arrhenius eqn
 !     OFFST=shift in Arrhenius curve for thermal adaptation
-!     TFN5,TFN6=temperature function for canopy,root mntc respn (25 oC =1)
+!     TFN5,TFN6_vr=temperature function for canopy,root mntc respn (25 oC =1)
 !     8.3143,710.0=gas constant,enthalpy
 !     62500,195000,232500=energy of activn,high,low temp inactivn(KJ mol-1)
 !
@@ -526,7 +526,7 @@ module grosubsMod
   TFN5=calc_plant_maint_tempf(TKCM)  
   D7: DO L=NU,MaxNumRootLays
     TKSM=TKS(L)+OFFST(NZ)
-    TFN6(L)=calc_plant_maint_tempf(TKSM)  
+    TFN6_vr(L)=calc_plant_maint_tempf(TKSM)  
   ENDDO D7
 !
 !     PRIMARY ROOT NUMBER
@@ -543,13 +543,13 @@ module grosubsMod
 !     FROM CANOPY TURGOR
 !
 !     WFNS=turgor expansion,extension function
-!     PSICanopyTurg_pft,PSIMin4OrganExtension=current,minimum canopy turgor potl for expansion,extension
+!     PSICanopyTurg_pft,PSIMin4OrganExtens=current,minimum canopy turgor potl for expansion,extension
 !     Stomata_Activity=stomatal resistance function of canopy turgor
 !     PSICanopy_pft=canopy water potential
 !     WFNG=growth function of canopy water potential
 !     WFNSG=expansion,extension function of canopy water potential
 !
-  WFNS=AMIN1(1.0_r8,AZMAX1(PSICanopyTurg_pft(NZ)-PSIMin4OrganExtension))
+  WFNS=AMIN1(1.0_r8,AZMAX1(PSICanopyTurg_pft(NZ)-PSIMin4OrganExtens))
 
   IF(is_root_shallow(iPlantRootProfile_pft(NZ)))THEN
     !bryophyte, no turgor

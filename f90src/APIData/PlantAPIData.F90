@@ -203,7 +203,7 @@ implicit none
   real(r8), pointer :: SeedCMass(:)         => null() !grain size at seeding, [g]
   real(r8), pointer :: RootPoreTortu4Gas(:,:)      => null() !power function of root porosity used to calculate root gaseous diffusivity, [-]
   real(r8), pointer :: PrimRootLen(:,:,:,:)  => null() !root layer length primary axes, [m d-2]
-  real(r8), pointer :: SecndRootLen(:,:,:,:)  => null() !root layer length secondary axes, [m d-2]
+  real(r8), pointer :: SecndRootLen_pvr(:,:,:,:)  => null() !root layer length secondary axes, [m d-2]
   real(r8), pointer :: RootLenPerPlant_pvr(:,:,:)    => null() !root layer length per plant, [m p-1]
   real(r8), pointer :: AveLen2ndRoot_pvr(:,:,:)    => null() !root layer average length, [m]
   real(r8), pointer :: PrimRootSpecLen(:,:)     => null() !specific root length primary axes, [m g-1]
@@ -294,7 +294,7 @@ implicit none
   end type plant_morph_type
 
   type, public :: plant_pheno_type
-  real(r8), pointer :: fTgrowRootP(:,:)   => null()     !root layer temperature growth functiom, [-]
+  real(r8), pointer :: fTgrowRootP_vr(:,:)   => null()     !root layer temperature growth functiom, [-]
   real(r8), pointer :: ShutRutNonstructElmntConducts_pft(:)    => null()     !shoot-root rate constant for nonstructural C exchange, [h-1]
   real(r8), pointer :: GrainFillRate25C_pft(:)    => null()     !maximum rate of fill per grain, [g h-1]
   real(r8), pointer :: OFFST(:)    => null()     !adjustment of Arhhenius curves for plant thermal acclimation, [oC]
@@ -370,7 +370,7 @@ implicit none
   real(r8), pointer :: TFND(:)     => null()  !temperature effect on diffusivity
   real(r8), pointer :: THETPM(:,:) => null()  !soil air-filled porosity, [m3 m-3]
   real(r8), pointer :: DiffusivitySolutEff(:,:)   => null()  !coefficient for dissolution - volatilization, []
-  real(r8), pointer :: SoilResit4RootPentration(:)     => null()  !soil hydraulic resistance, [MPa h m-2]
+  real(r8), pointer :: SoilResit4RootPentrate_vr(:)     => null()  !soil hydraulic resistance, [MPa h m-2]
   real(r8), pointer :: SoiBulkDensity(:)     => null()  !soil bulk density, [Mg m-3]
   real(r8), pointer :: trc_solcl_vr(:,:) => null() !aqueous tracer concentration [g m-3]
   real(r8), pointer :: trc_gascl_vr(:,:) => null() !gaseous tracer concentration [g m-3]
@@ -1417,7 +1417,7 @@ implicit none
   allocate(this%GasSolbility_vr(idg_beg:idg_end,0:JZ1));this%GasSolbility_vr=spval
   allocate(this%GasDifc_vr(idg_beg:idg_end,0:JZ1));this%GasDifc_vr=spval
   allocate(this%SolDifc_vr(ids_beg:ids_end,0:JZ1));this%SolDifc_vr=spval
-  allocate(this%SoilResit4RootPentration(JZ1));this%SoilResit4RootPentration=spval
+  allocate(this%SoilResit4RootPentrate_vr(JZ1));this%SoilResit4RootPentrate_vr=spval
   allocate(this%SoiBulkDensity(0:JZ1));this%SoiBulkDensity=spval
   allocate(this%HydroCondMicP4RootUptake(JZ1));this%HydroCondMicP4RootUptake=spval
 
@@ -1442,7 +1442,7 @@ implicit none
 !  if(allocated(CHSGL))deallocate(CHSGL)
 !  if(allocated(HGSGL))deallocate(HGSGL)
 !  if(allocated(OGSGL))deallocate(OGSGL)
-!  if(allocated(SoilResit4RootPentration))deallocate(SoilResit4RootPentration)
+!  if(allocated(SoilResit4RootPentrate_vr))deallocate(SoilResit4RootPentrate_vr)
 
 !   call destroy(this%GasSolbility_vr)
 !  if(allocated(THETW))deallocate(THETW)
@@ -1692,7 +1692,7 @@ implicit none
   allocate(this%LeafElmntRemobFlx_brch(NumPlantChemElms,MaxNumBranches,JP1));this%LeafElmntRemobFlx_brch=spval
   allocate(this%PetioleChemElmRemobFlx_brch(NumPlantChemElms,MaxNumBranches,JP1));this%PetioleChemElmRemobFlx_brch=spval
 
-  allocate(this%fTgrowRootP(JZ1,JP1));this%fTgrowRootP=spval
+  allocate(this%fTgrowRootP_vr(JZ1,JP1));this%fTgrowRootP_vr=spval
   allocate(this%GrainFillRate25C_pft(JP1));this%GrainFillRate25C_pft=spval
   allocate(this%ShutRutNonstructElmntConducts_pft(JP1));this%ShutRutNonstructElmntConducts_pft=spval
   allocate(this%SSTX(JP1));this%SSTX=spval
@@ -1790,7 +1790,7 @@ implicit none
   allocate(this%PrimRootSpecLen(jroots,JP1));this%PrimRootSpecLen=spval
   allocate(this%SecndRootSpecLen(jroots,JP1));this%SecndRootSpecLen=spval
   allocate(this%PrimRootLen(jroots,JZ1,NumOfCanopyLayers1,JP1));this%PrimRootLen=spval
-  allocate(this%SecndRootLen(jroots,JZ1,NumOfCanopyLayers1,JP1));this%SecndRootLen=spval
+  allocate(this%SecndRootLen_pvr(jroots,JZ1,NumOfCanopyLayers1,JP1));this%SecndRootLen_pvr=spval
   allocate(this%SecndRootXNum_rpvr(jroots,JZ1,NumOfCanopyLayers1,JP1));this%SecndRootXNum_rpvr=spval
   allocate(this%iPlantNfixType(JP1));this%iPlantNfixType=0
   allocate(this%MY(JP1));this%MY=0
