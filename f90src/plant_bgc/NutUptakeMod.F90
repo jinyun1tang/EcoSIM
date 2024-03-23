@@ -362,7 +362,7 @@ module NutUptakeMod
     TortMicPM                 =>  plt_site%TortMicPM       , &
     ZERO                      =>  plt_site%ZERO       , &
     RootAreaPerPlant_vr       =>  plt_morph%RootAreaPerPlant_vr     , &
-    fTgrowRootP               =>  plt_pheno%fTgrowRootP      , &
+    fTgrowRootP_vr               =>  plt_pheno%fTgrowRootP_vr      , &
     RootAutoRO2Limiter_pvr    =>  plt_rbgc%RootAutoRO2Limiter_pvr       , &
     VmaxNO3Root_pft           =>  plt_rbgc%VmaxNO3Root_pft     , &
     CminNO3Root_pft           =>  plt_rbgc%CminNO3Root_pft     , &
@@ -411,12 +411,12 @@ module NutUptakeMod
     !     UPMXP,UPMX=max NO3 uptake in non-band unlimited,limited by O2
     !     RootAreaPerPlant_vr=root surface area per plant from grosub.f
     !     FWSRT=protein concentration relative to 5%
-    !     fTgrowRootP=temperature function for root growth
+    !     fTgrowRootP_vr=temperature function for root growth
     !     FCUP,FZUP=limitn to active uptake respiration from CCPOLR,CZPOLR
     !     RootAutoRO2Limiter_pvr=constraint by O2 consumption on all biological processes
     !
     UPMXP=VmaxNO3Root_pft(N,NZ)*RootAreaPerPlant_vr(N,L,NZ) &
-      *FWSRT*fTgrowRootP(L,NZ)*trcs_VLN_vr(ids_NO3,L)*AMIN1(FCUP,FZUP)
+      *FWSRT*fTgrowRootP_vr(L,NZ)*trcs_VLN_vr(ids_NO3,L)*AMIN1(FCUP,FZUP)
 
     !
     !     SOLUTION FOR MASS FLOW + DIFFUSION OF NO3 IN AQUEOUS PHASE OF
@@ -473,12 +473,12 @@ module NutUptakeMod
     !     UPMXP,UPMX=maximum NO3 uptake in band unlimited,limited by O2
     !     RootAreaPerPlant_vr=root surface area per plant from grosub.f
     !     FWSRT=protein concentration relative to 5%
-    !     fTgrowRootP=temperature function for root growth
+    !     fTgrowRootP_vr=temperature function for root growth
     !     FCUP,FZUP=limitn to active uptake respiration from CCPOLR,CZPOLR
     !     RootAutoRO2Limiter_pvr=constraint by O2 consumption on all biological processes
     !
     UPMXP=VmaxNO3Root_pft(N,NZ)*RootAreaPerPlant_vr(N,L,NZ) &
-      *FWSRT*fTgrowRootP(L,NZ)*trcs_VLN_vr(ids_NO3B,L)*AMIN1(FCUP,FZUP)
+      *FWSRT*fTgrowRootP_vr(L,NZ)*trcs_VLN_vr(ids_NO3B,L)*AMIN1(FCUP,FZUP)
     !
     !     SOLUTION FOR MASS FLOW + DIFFUSION OF NO3 IN AQUEOUS PHASE OF
     !     SOIL = ACTIVE UPTAKE OF NO3 BY ROOT, CONSTRAINED BY COMPETITION
@@ -537,7 +537,7 @@ module NutUptakeMod
     PlantPopulation_pft         =>  plt_site%PlantPopulation_pft         , &
     ZERO                        =>  plt_site%ZERO       , &
     TortMicPM                   =>  plt_site%TortMicPM       , &
-    fTgrowRootP                 =>  plt_pheno%fTgrowRootP      , &
+    fTgrowRootP_vr                 =>  plt_pheno%fTgrowRootP_vr      , &
     RootAutoRO2Limiter_pvr      =>  plt_rbgc%RootAutoRO2Limiter_pvr       , &
     CMinNH4Root_pft             =>  plt_rbgc%CMinNH4Root_pft     , &
     VmaxNH4Root_pft             =>  plt_rbgc%VmaxNH4Root_pft     , &
@@ -583,12 +583,12 @@ module NutUptakeMod
 !   UPMXP,UPMX=max NH4 uptake in non-band unlimited,limited by O2
 !   RootAreaPerPlant_vr=root surface area per plant from grosub.f
 !   FWSRT=protein concentration relative to 5%
-!   fTgrowRootP=temperature function for root growth
+!   fTgrowRootP_vr=temperature function for root growth
 !   FCUP,FZUP=limitn to active uptake respiration from CCPOLR,CZPOLR
 !   RootAutoRO2Limiter_pvr=constraint by O2 consumption on all biological processes
 !
     UPMXP=VmaxNH4Root_pft(N,NZ)*RootAreaPerPlant_vr(N,L,NZ) &
-      *FWSRT*fTgrowRootP(L,NZ)*trcs_VLN_vr(ids_NH4,L)*AMIN1(FCUP,FZUP)
+      *FWSRT*fTgrowRootP_vr(L,NZ)*trcs_VLN_vr(ids_NH4,L)*AMIN1(FCUP,FZUP)
 !
 !   SOLUTION FOR MASS FLOW + DIFFUSION OF NH4 IN AQUEOUS PHASE OF
 !   SOIL = ACTIVE UPTAKE OF NH4 BY ROOT, CONSTRAINED BY COMPETITION
@@ -644,12 +644,12 @@ module NutUptakeMod
 !   UPMXP,UPMX=maximum NH4 uptake in band unlimited,limited by O2
 !   RootAreaPerPlant_vr=root surface area per plant from grosub.f
 !   FWSRT=protein concentration relative to 5%
-!   fTgrowRootP=temperature function for root growth
+!   fTgrowRootP_vr=temperature function for root growth
 !   FCUP,FZUP=limitn to active uptake respiration from CCPOLR,CZPOLR
 !   RootAutoRO2Limiter_pvr=constraint by O2 consumption on all biological processes
 !
     UPMXP=VmaxNH4Root_pft(N,NZ)*RootAreaPerPlant_vr(N,L,NZ) &
-      *FWSRT*fTgrowRootP(L,NZ)*trcs_VLN_vr(ids_NH4B,L)*AMIN1(FCUP,FZUP)
+      *FWSRT*fTgrowRootP_vr(L,NZ)*trcs_VLN_vr(ids_NH4B,L)*AMIN1(FCUP,FZUP)
 !
 !   SOLUTION FOR MASS FLOW + DIFFUSION OF NH4 IN AQUEOUS PHASE OF
 !   SOIL = ACTIVE UPTAKE OF NH4 BY ROOT, CONSTRAINED BY COMPETITION
@@ -711,7 +711,7 @@ module NutUptakeMod
   associate(                             &
     PlantPopulation_pft         => plt_site%PlantPopulation_pft         , &
     ZERO                        => plt_site%ZERO       , &
-    fTgrowRootP                 => plt_pheno%fTgrowRootP      , &
+    fTgrowRootP_vr                 => plt_pheno%fTgrowRootP_vr      , &
     RootAutoRO2Limiter_pvr      => plt_rbgc%RootAutoRO2Limiter_pvr       , &
     CMinPO4Root_pft             => plt_rbgc%CMinPO4Root_pft     , &
     KmPO4Root_pft               => plt_rbgc%KmPO4Root_pft     , &
@@ -748,12 +748,12 @@ module NutUptakeMod
     !     UPMXP,UPMX=max HPO4 uptake in non-band unlimited,limited by O2
     !     RootAreaPerPlant_vr=root surface area per plant from grosub.f
     !     FWSRT=protein concentration relative to 5%
-    !     fTgrowRootP=temperature function for root growth
+    !     fTgrowRootP_vr=temperature function for root growth
     !     FCUP,FPUP=limitn to active uptake respiration from CCPOLR,CPPOLR
     !     RootAutoRO2Limiter_pvr=constraint by O2 consumption on all biological processes
     !
     UPMXP=0.1_r8*VmaxPO4Root_pft(N,NZ)*RootAreaPerPlant_vr(N,L,NZ) &
-      *FWSRT*fTgrowRootP(L,NZ)*trcs_VLN_vr(ids_H1PO4,L)*AMIN1(FCUP,FPUP)
+      *FWSRT*fTgrowRootP_vr(L,NZ)*trcs_VLN_vr(ids_H1PO4,L)*AMIN1(FCUP,FPUP)
     !
     !     SOLUTION FOR MASS FLOW + DIFFUSION OF HPO4 IN AQUEOUS PHASE OF
     !     SOIL = ACTIVE UPTAKE OF HPO4 BY ROOT, CONSTRAINED BY COMPETITION
@@ -808,12 +808,12 @@ module NutUptakeMod
     !     UPMXP,UPMX=maximum HPO4 uptake in band unlimited,limited by O2
     !     RootAreaPerPlant_vr=root surface area per plant from grosub.f
     !     FWSRT=protein concentration relative to 5%
-    !     fTgrowRootP=temperature function for root growth
+    !     fTgrowRootP_vr=temperature function for root growth
     !     FCUP,FPUP=limitn to active uptake respiration from CCPOLR,CPPOLR
     !     RootAutoRO2Limiter_pvr=constraint by O2 consumption on all biological processes
     !
     UPMXP=0.1_r8*VmaxPO4Root_pft(N,NZ)*RootAreaPerPlant_vr(N,L,NZ) &
-      *FWSRT*fTgrowRootP(L,NZ)*trcs_VLN_vr(ids_H1PO4B,L)*AMIN1(FCUP,FPUP)
+      *FWSRT*fTgrowRootP_vr(L,NZ)*trcs_VLN_vr(ids_H1PO4B,L)*AMIN1(FCUP,FPUP)
     !
     !     SOLUTION FOR MASS FLOW + DIFFUSION OF HPO4 IN AQUEOUS PHASE OF
     !     SOIL = ACTIVE UPTAKE OF HPO4 BY ROOT, CONSTRAINED BY COMPETITION
@@ -879,7 +879,7 @@ module NutUptakeMod
     RootOUlmNutUptake_pvr       => plt_rbgc%RootOUlmNutUptake_pvr     , &
     RUPP2B                      => plt_rbgc%RUPP2B     , &
     RUPP2P                      => plt_rbgc%RUPP2P     , &
-    fTgrowRootP                 => plt_pheno%fTgrowRootP      , &
+    fTgrowRootP_vr                 => plt_pheno%fTgrowRootP_vr      , &
     RootAreaPerPlant_vr         => plt_morph%RootAreaPerPlant_vr     , &
     trc_solml_vr                => plt_soilchem%trc_solml_vr  , &
     VLWatMicP                   => plt_soilchem%VLWatMicP   , &
@@ -905,12 +905,12 @@ module NutUptakeMod
       !     UPMXP,UPMX=max H2PO4 uptake in non-band unlimited,limited by O2
       !     RootAreaPerPlant_vr=root surface area per plant from grosub.f
       !     FWSRT=protein concentration relative to 5%
-      !     fTgrowRootP=temperature function for root growth
+      !     fTgrowRootP_vr=temperature function for root growth
       !     FCUP,FPUP=limitn to active uptake respiration from CCPOLR,CPPOLR
       !     RootAutoRO2Limiter_pvr=constraint by O2 consumption on all biological processes
 !
       UPMXP=VmaxPO4Root_pft(N,NZ)*RootAreaPerPlant_vr(N,L,NZ) &
-        *FWSRT*fTgrowRootP(L,NZ)*trcs_VLN_vr(ids_H1PO4,L)*AMIN1(FCUP,FPUP)
+        *FWSRT*fTgrowRootP_vr(L,NZ)*trcs_VLN_vr(ids_H1PO4,L)*AMIN1(FCUP,FPUP)
       !
       !     SOLUTION FOR MASS FLOW + DIFFUSION OF H2PO4 IN AQUEOUS PHASE OF
       !     SOIL = ACTIVE UPTAKE OF H2PO4 BY ROOT, CONSTRAINED BY
@@ -966,12 +966,12 @@ module NutUptakeMod
     !     UPMXP,UPMX=maximum H2PO4 uptake in band unlimited,limited by O2
     !     RootAreaPerPlant_vr=root surface area per plant from grosub.f
     !     FWSRT=protein concentration relative to 5%
-    !     fTgrowRootP=temperature function for root growth
+    !     fTgrowRootP_vr=temperature function for root growth
     !     FCUP,FPUP=limitn to active uptake respiration from CCPOLR,CPPOLR
     !     RootAutoRO2Limiter_pvr=constraint by O2 consumption on all biological processes
     !
     UPMXP=VmaxPO4Root_pft(N,NZ)*RootAreaPerPlant_vr(N,L,NZ) &
-      *FWSRT*fTgrowRootP(L,NZ)*trcs_VLN_vr(ids_H1PO4B,L)*AMIN1(FCUP,FPUP)
+      *FWSRT*fTgrowRootP_vr(L,NZ)*trcs_VLN_vr(ids_H1PO4B,L)*AMIN1(FCUP,FPUP)
 
     !
     !     SOLUTION FOR MASS FLOW + DIFFUSION OF PO4 IN AQUEOUS PHASE OF

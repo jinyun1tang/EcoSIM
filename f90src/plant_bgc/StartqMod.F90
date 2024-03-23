@@ -775,7 +775,7 @@ module StartqMod
         SecndRootXNum_rpvr(N,L,NR,NZ,NY,NX)=0._r8
         PrimRootLen(N,L,NR,NZ,NY,NX)=0._r8
         Root1stStructChemElm_pvr(1:NumPlantChemElms,N,L,NR,NZ,NY,NX)=0._r8
-        SecndRootLen(N,L,NR,NZ,NY,NX)=0._r8
+        SecndRootLen_pvr(N,L,NR,NZ,NY,NX)=0._r8
         Root2ndStructChemElm_pvr(1:NumPlantChemElms,N,L,NR,NZ,NY,NX)=0._r8
         PrimRootDepth(N,NR,NZ,NY,NX)=SeedDepth_pft(NZ,NY,NX)
         Root1stChemElm(1:NumPlantChemElms,N,NR,NZ,NY,NX)=0._r8

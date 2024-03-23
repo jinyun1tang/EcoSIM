@@ -69,7 +69,7 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  TortMicPM(:,:,:,:)                     !soil tortuosity, []
   real(r8),target,allocatable ::  TortMacPM(:,:,:,:)                    !macropore tortuosity, []
   real(r8),target,allocatable ::  DiffusivitySolutEff(:,:,:,:)                     !coefficient for dissolution - volatilization, []
-  real(r8),target,allocatable ::  SoilResit4RootPentration(:,:,:)                       !soil hydraulic resistance, [MPa h m-2]
+  real(r8),target,allocatable ::  SoilResit4RootPentrate_vr(:,:,:)                       !soil hydraulic resistance, [MPa h m-2]
   real(r8),target,allocatable ::  PSISE(:,:,:)                      !soil water potential at saturation, [Mpa]
   real(r8),target,allocatable ::  PSISoilAirEntry(:,:,:)                      !soil water potential at air entry, [Mpa]
   real(r8),target,allocatable ::  PSISoilOsmotic(:,:,:)                      !osmotic soil water potential , [Mpa]
@@ -165,7 +165,7 @@ module SoilWaterDataType
   allocate(TortMicPM(60,0:JZ,JY,JX));TortMicPM=0._r8
   allocate(TortMacPM(60,JZ,JY,JX)); TortMacPM=0._r8
   allocate(DiffusivitySolutEff(60,0:JZ,JY,JX));DiffusivitySolutEff=0._r8
-  allocate(SoilResit4RootPentration(JZ,JY,JX));     SoilResit4RootPentration=0._r8
+  allocate(SoilResit4RootPentrate_vr(JZ,JY,JX));     SoilResit4RootPentrate_vr=0._r8
   allocate(PSISE(0:JZ,JY,JX));  PSISE=0._r8
   allocate(PSISoilAirEntry(0:JZ,JY,JX));  PSISoilAirEntry=0._r8
   allocate(PSISoilOsmotic(0:JZ,JY,JX));  PSISoilOsmotic=0._r8
@@ -251,7 +251,7 @@ module SoilWaterDataType
   call destroy(TortMicPM)
   call destroy(TortMacPM)
   call destroy(DiffusivitySolutEff)
-  call destroy(SoilResit4RootPentration)
+  call destroy(SoilResit4RootPentrate_vr)
   call destroy(PSISE)
   call destroy(PSISoilAirEntry)
   call destroy(PSISoilOsmotic)

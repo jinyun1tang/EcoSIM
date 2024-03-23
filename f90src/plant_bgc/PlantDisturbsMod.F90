@@ -743,7 +743,7 @@ module PlantDisturbsMod
     iPlantNfixType   =>  plt_morph%iPlantNfixType    , &
     RootLenPerPlant_pvr    =>  plt_morph%RootLenPerPlant_pvr     , &
     SecndRootXNum_rpvr    =>  plt_morph%SecndRootXNum_rpvr     , &
-    SecndRootLen    =>  plt_morph%SecndRootLen     , &
+    SecndRootLen_pvr    =>  plt_morph%SecndRootLen_pvr     , &
     SecndRootXNum_pvr     =>  plt_morph%SecndRootXNum_pvr      , &
     NGTopRootLayer_pft      =>  plt_morph%NGTopRootLayer_pft       , &
     MY       =>  plt_morph%MY        , &
@@ -996,7 +996,7 @@ module PlantDisturbsMod
 !     WTRT1,WTRT1N,WTRT1P=primary root C,N,P mass in soil layer
 !     WTRT2,WTRT2N,WTRT2P=secondary root C,N,P mass in soil layer
 !     RTWT1,RTWT1N,RTWT1P=primary root C,N,P mass
-!     PrimRootLen,SecndRootLen=primary,secondary root length
+!     PrimRootLen,SecndRootLen_pvr=primary,secondary root length
 !     RTN2=number of secondary root axes
 !     CPOOLR,ZPOOLR,PPOOLR=non-structural C,N,P mass in root
 !     RootStructBiomC_vr, PopuPlantRootC_vr=active,actual root C mass
@@ -1014,7 +1014,7 @@ module PlantDisturbsMod
                 Root1stChemElm(NE,N,NR,NZ)=Root1stChemElm(NE,N,NR,NZ)*XHVST
               ENDDO
               PrimRootLen(N,L,NR,NZ)=PrimRootLen(N,L,NR,NZ)*XHVST
-              SecndRootLen(N,L,NR,NZ)=SecndRootLen(N,L,NR,NZ)*XHVST
+              SecndRootLen_pvr(N,L,NR,NZ)=SecndRootLen_pvr(N,L,NR,NZ)*XHVST
               SecndRootXNum_rpvr(N,L,NR,NZ)=SecndRootXNum_rpvr(N,L,NR,NZ)*XHVST
             ENDDO D8960
             DO NE=1,NumPlantChemElms
@@ -1272,7 +1272,7 @@ module PlantDisturbsMod
     CanopyStemA_pft    =>  plt_morph%CanopyStemA_pft   , &
     InternodeHeightDying_brch   =>  plt_morph%InternodeHeightDying_brch  , &
     PrimRootXNumL_pvr    =>  plt_morph%PrimRootXNumL_pvr   , &
-    SecndRootLen    =>  plt_morph%SecndRootLen   , &
+    SecndRootLen_pvr    =>  plt_morph%SecndRootLen_pvr   , &
     PrimRootLen    =>  plt_morph%PrimRootLen   , &
     InternodeHeightLive_brch   =>  plt_morph%InternodeHeightLive_brch  , &
     PotentialSeedSites_brch    =>  plt_morph%PotentialSeedSites_brch   , &
@@ -2437,7 +2437,7 @@ module PlantDisturbsMod
 !     WTRT1,WTRT1N,WTRT1P=primary root C,N,P mass in soil layer
 !     WTRT2,WTRT2N,WTRT2P=secondary root C,N,P mass in soil layer
 !     RTWT1,RTWT1N,RTWT1P=primary root C,N,P mass
-!     PrimRootLen,SecndRootLen=primary,secondary root length
+!     PrimRootLen,SecndRootLen_pvr=primary,secondary root length
 !     RTN2=number of secondary root axes
 !     CPOOLR,ZPOOLR,PPOOLR=non-structural C,N,P mass in root
 !     RootStructBiomC_vr, PopuPlantRootC_vr=active,actual root C mass
@@ -2455,7 +2455,7 @@ module PlantDisturbsMod
                 Root1stChemElm(NE,N,NR,NZ)=Root1stChemElm(NE,N,NR,NZ)*XHVST(NE)
               ENDDO
               PrimRootLen(N,L,NR,NZ)=PrimRootLen(N,L,NR,NZ)*XHVST(ielmc)
-              SecndRootLen(N,L,NR,NZ)=SecndRootLen(N,L,NR,NZ)*XHVST(ielmc)
+              SecndRootLen_pvr(N,L,NR,NZ)=SecndRootLen_pvr(N,L,NR,NZ)*XHVST(ielmc)
               SecndRootXNum_rpvr(N,L,NR,NZ)=SecndRootXNum_rpvr(N,L,NR,NZ)*XHVST(ielmc)
             ENDDO D3960
             DO NE=1,NumPlantChemElms

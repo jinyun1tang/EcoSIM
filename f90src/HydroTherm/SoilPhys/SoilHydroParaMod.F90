@@ -102,7 +102,7 @@ contains
 !
 !     SOIL RESISTANCE TO ROOT PENETRATION
 !
-!     SoilResit4RootPentration=soil resistance to root penetration (MPa)
+!     SoilResit4RootPentrate_vr=soil resistance to root penetration (MPa)
 !
 !     IF(SoiBulkDensity(L,NY,NX).GT.ZERO)THEN
 !     CCLAYT=CCLAY(L,NY,NX)*1.0E+02
@@ -110,9 +110,9 @@ contains
 !     CC=EXP(-3.6733-0.1447*CCLAYT+0.7653*CORGCT)
 !     DD=-0.4805-0.1239*CCLAYT+0.2080*CORGCT
 !     EE=3.8521+0.0963*CCLAYT
-!     SoilResit4RootPentration(L,NY,NX)=CC*THETW(L,NY,NX)**DD*SoiBulkDensity(L,NY,NX)**EE
+!     SoilResit4RootPentrate_vr(L,NY,NX)=CC*THETW(L,NY,NX)**DD*SoiBulkDensity(L,NY,NX)**EE
 !     ELSE
-    SoilResit4RootPentration(L,NY,NX)=0.0_r8
+    SoilResit4RootPentrate_vr(L,NY,NX)=0.0_r8
 !     ENDIF
 !
 !     SOIL HYDRAULIC CONDUCTIVITIES FROM AMBIENT SOIL WATER CONTENTS

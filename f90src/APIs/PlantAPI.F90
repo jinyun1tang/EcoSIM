@@ -294,7 +294,7 @@ implicit none
       RootNodueChemElm_pvr(1:NumPlantChemElms,L,NZ,NY,NX) =plt_biom%RootNodueChemElm_pvr(1:NumPlantChemElms,L,NZ)
       RootNoduleNonstructElmnt_vr(1:NumPlantChemElms,L,NZ,NY,NX)=plt_biom%RootNoduleNonstructElmnt_vr(1:NumPlantChemElms,L,NZ)
       RootN2Fix_pvr(L,NZ,NY,NX) =plt_bgcr%RootN2Fix_pvr(L,NZ)
-      fTgrowRootP(L,NZ,NY,NX)  =plt_pheno%fTgrowRootP(L,NZ)
+      fTgrowRootP_vr(L,NZ,NY,NX)  =plt_pheno%fTgrowRootP_vr(L,NZ)
     ENDDO
     DO L=1,NumOfCanopyLayers
       CanopyLeafALyr_pft(L,NZ,NY,NX)=plt_morph%CanopyLeafALyr_pft(L,NZ)
@@ -536,7 +536,7 @@ implicit none
           Root1stStructChemElm_pvr(1:NumPlantChemElms,N,L,NR,NZ,NY,NX) =plt_biom%Root1stStructChemElm_pvr(1:NumPlantChemElms,N,L,NR,NZ)
           Root2ndStructChemElm_pvr(1:NumPlantChemElms,N,L,NR,NZ,NY,NX) =plt_biom%Root2ndStructChemElm_pvr(1:NumPlantChemElms,N,L,NR,NZ)
           PrimRootLen(N,L,NR,NZ,NY,NX) =plt_morph%PrimRootLen(N,L,NR,NZ)
-          SecndRootLen(N,L,NR,NZ,NY,NX) =plt_morph%SecndRootLen(N,L,NR,NZ)
+          SecndRootLen_pvr(N,L,NR,NZ,NY,NX) =plt_morph%SecndRootLen_pvr(N,L,NR,NZ)
           SecndRootXNum_rpvr(N,L,NR,NZ,NY,NX)  =plt_morph%SecndRootXNum_rpvr(N,L,NR,NZ)
         ENDDO
       ENDDO
@@ -666,7 +666,7 @@ implicit none
   DO L=1,NL(NY,NX)
     plt_soilchem%HydroCondMicP4RootUptake(L)=HydroCondMicP4RootUptake(L,NY,NX)
     plt_soilchem%GasDifc_vr(idg_beg:idg_end,L)=GasDifc_vr(idg_beg:idg_end,L,NY,NX)
-    plt_soilchem%SoilResit4RootPentration(L)=SoilResit4RootPentration(L,NY,NX)
+    plt_soilchem%SoilResit4RootPentrate_vr(L)=SoilResit4RootPentrate_vr(L,NY,NX)
     plt_site%DPTHZ(L)=DPTHZ(L,NY,NX)
   ENDDO
   plt_allom%FracHour4LeafoffRemob(:) = FracHour4LeafoffRemob(:)
@@ -1330,7 +1330,7 @@ implicit none
 
       enddo
       plt_bgcr%RootN2Fix_pvr(L,NZ) =RootN2Fix_pvr(L,NZ,NY,NX)
-      plt_pheno%fTgrowRootP(L,NZ) =fTgrowRootP(L,NZ,NY,NX)
+      plt_pheno%fTgrowRootP_vr(L,NZ) =fTgrowRootP_vr(L,NZ,NY,NX)
       plt_biom%RootNoduleNonstructElmnt_vr(1:NumPlantChemElms,L,NZ)=RootNoduleNonstructElmnt_vr(1:NumPlantChemElms,L,NZ,NY,NX)
     ENDDO
     DO L=1,NumOfCanopyLayers
@@ -1354,7 +1354,7 @@ implicit none
       DO L=1,MaxNumRootLays(NY,NX)
         DO N=1,MY(NZ,NY,NX)
           plt_morph%PrimRootLen(N,L,NR,NZ)=PrimRootLen(N,L,NR,NZ,NY,NX)
-          plt_morph%SecndRootLen(N,L,NR,NZ)=SecndRootLen(N,L,NR,NZ,NY,NX)
+          plt_morph%SecndRootLen_pvr(N,L,NR,NZ)=SecndRootLen_pvr(N,L,NR,NZ,NY,NX)
           plt_morph%SecndRootXNum_rpvr(N,L,NR,NZ) =SecndRootXNum_rpvr(N,L,NR,NZ,NY,NX)
           plt_biom%Root2ndStructChemElm_pvr(1:NumPlantChemElms,N,L,NR,NZ) =Root2ndStructChemElm_pvr(1:NumPlantChemElms,N,L,NR,NZ,NY,NX)
           plt_biom%Root1stStructChemElm_pvr(1:NumPlantChemElms,N,L,NR,NZ) =Root1stStructChemElm_pvr(1:NumPlantChemElms,N,L,NR,NZ,NY,NX)

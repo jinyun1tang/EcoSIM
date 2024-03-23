@@ -396,11 +396,11 @@ module NoduleBGCMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine RootNoduleBiomchemistry(I,J,NZ,TFN6,fRootGrowPsiSense)
+  subroutine RootNoduleBiomchemistry(I,J,NZ,TFN6_vr,fRootGrowPSISense)
   implicit none
   integer , intent(in) :: I,J,NZ
-  real(r8), intent(in) :: TFN6(JZ1)
-  real(r8), intent(in) :: fRootGrowPsiSense(2,JZ1)
+  real(r8), intent(in) :: TFN6_vr(JZ1)
+  real(r8), intent(in) :: fRootGrowPSISense(2,JZ1)
   integer :: L,M
   real(r8) :: ZPOOLD
   real(r8) :: CCC,CNC,CPC
@@ -438,7 +438,7 @@ module NoduleBGCMod
     NU                           =>   plt_site%NU        , &
     AREA3                        =>   plt_site%AREA3     , &
     ZERO                         =>   plt_site%ZERO      , &
-    fTgrowRootP                  =>   plt_pheno%fTgrowRootP     , &
+    fTgrowRootP_vr                  =>   plt_pheno%fTgrowRootP_vr     , &
     NoduGrowthYield_pft          =>   plt_allom%NoduGrowthYield_pft    , &
     NodulerNC_pft                =>   plt_allom%NodulerNC_pft    , &
     NodulerPC_pft                =>   plt_allom%NodulerPC_pft    , &
@@ -526,12 +526,12 @@ module NoduleBGCMod
 !     CPOOLN,ZPOOLN,PPOOLN=nonstructural C,N,P in bacteria
 !     VMXO=specific respiration rate by bacterial N2 fixers
 !     WTNDL=bacterial C mass
-!     fTgrowRootP=temperature function for root growth
+!     fTgrowRootP_vr=temperature function for root growth
 !     FCNPF=N,P constraint to bacterial activity
-!     fRootGrowPsiSense=growth function of root water potential
+!     fRootGrowPSISense=growth function of root water potential
 !
         RCNDLM=AZMAX1(AMIN1(RootNoduleNonstructElmnt_vr(ielmc,L,NZ) &
-          ,VMXO*RootNodueChemElm_pvr(ielmc,L,NZ))*FCNPF*fTgrowRootP(L,NZ)*fRootGrowPsiSense(1,L))
+          ,VMXO*RootNodueChemElm_pvr(ielmc,L,NZ))*FCNPF*fTgrowRootP_vr(L,NZ)*fRootGrowPSISense(1,L))
         CPOOLNX=RootNoduleNonstructElmnt_vr(ielmc,L,NZ)
 !
 !     O2-LIMITED NODULE RESPIRATION FROM 'WFR' IN 'UPTAKE'
@@ -546,10 +546,10 @@ module NoduleBGCMod
 !
 !     RMNDL=bacterial maintenance respiration
 !     RmSpecPlant=specific maintenance respiration rate (g C g-1 N h-1)
-!     TFN6=temperature function for root maintenance respiration
+!     TFN6_vr=temperature function for root maintenance respiration
 !     WTNDLN=bacterial N mass
 !
-        RMNDL=AZMAX1(RmSpecPlant*TFN6(L)*RootNodueChemElm_pvr(ielmn,L,NZ))*SPNDLI
+        RMNDL=AZMAX1(RmSpecPlant*TFN6_vr(L)*RootNodueChemElm_pvr(ielmn,L,NZ))*SPNDLI
 !
 !     NODULE GROWTH RESPIRATION FROM TOTAL - MAINTENANCE
 !     IF > 0 DRIVES GROWTH, IF < 0 DRIVES REMOBILIZATION
@@ -604,7 +604,7 @@ module NoduleBGCMod
         RCCC=RCCZN+CCC*RCCYN
         RCCN=CNC*RCCXN
         RCCP=CPC*RCCQN
-        SPNDX=SPNDL*SQRT(fTgrowRootP(L,NZ)*fRootGrowPsiSense(1,L))
+        SPNDX=SPNDL*SQRT(fTgrowRootP_vr(L,NZ)*fRootGrowPSISense(1,L))
         DO NE=1,NumPlantChemElms
           NoduleElmDecayLoss(NE)=SPNDX*RootNodueChemElm_pvr(NE,L,NZ)
         ENDDO
