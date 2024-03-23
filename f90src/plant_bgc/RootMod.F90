@@ -352,7 +352,7 @@ implicit none
   real(r8) :: CNRDA,CNRDM
   real(r8) :: CNPG
   real(r8) :: CCC,CNC,CPC
-  real(r8) :: FSNC1,FSNC2
+  real(r8) :: FSNC2
   real(r8) :: ZADD1,ZADD1M,ZADD2,ZADD2M
   real(r8) :: ZPOOLB
   real(r8) :: CGRORM
@@ -367,7 +367,6 @@ implicit none
   real(r8) :: Root2ndExtension
   real(r8) :: RootCYieldO2ltd
   real(r8) :: RootNetGrowthElms(NumPlantChemElms)
-  real(r8) :: GRTWTM
   real(r8) :: PPOOLB
   real(r8) :: PADD2,PADD1
   real(r8) :: RCO2X,RCO2Y
@@ -382,7 +381,7 @@ implicit none
   REAL(R8) :: SNCR,SNCRM
   real(r8) :: TFRCO2
   real(r8) :: RCCC,RCCN,RCCP
-  integer :: NR,M,LL,LX,NE
+  integer :: NR,M,NE
 
 !begin_execution
   associate(                          &
@@ -413,7 +412,6 @@ implicit none
     iPlantPhenolType_pft            =>  plt_pheno%iPlantPhenolType_pft    , &
     fTgrowRootP_vr                  =>  plt_pheno%fTgrowRootP_vr      , &
     iPlantCalendar_brch             =>  plt_pheno%iPlantCalendar_brch    , &
-    SoiBulkDensity                  =>  plt_soilchem%SoiBulkDensity   , &
     CFOPE                           =>  plt_soilchem%CFOPE  , &
     SoilResit4RootPentrate_vr       =>  plt_soilchem%SoilResit4RootPentrate_vr   , &
     DLYR3                           =>  plt_site%DLYR3      , &
@@ -755,8 +753,9 @@ implicit none
 !     RootAreaPopu=multiplier for number of primary root axes
 !
       IF(N.EQ.ipltroot)THEN
-        call GrowRootAxes(N,NR,L,NZ,RootAreaPopu,RootSinkC_vr,fRootGrowPSISense_vr,&
-          SNCRM,SNCR,Tot1stRootLen,Root1stC,ICHK1,NRX)
+        call GrowRootAxes(N,NR,L,L1,NZ,RootAreaPopu,Root1stSink_pvr,&
+          Root2ndSink_pvr,RootSinkC_vr,RootChemElmRemob,fRootGrowPSISense_vr,TFN6_vr,&
+          SNCRM,SNCR,DMRTD,CNRTW,CPRTW,Tot1stRootLen,Root1stC,ICHK1,NRX)
       ENDIF
       Tot1stRootLen=Tot1stRootLen+PrimRootLen(N,L,NR,NZ)
       Root1stC=Root1stC+Root1stStructChemElm_pvr(ielmc,N,L,NR,NZ)
@@ -769,53 +768,84 @@ implicit none
 
 !------------------------------------------------------------------------------------------
 
-  subroutine GrowRootAxes(N,NR,L,NZ,RootAreaPopu,RootSinkC_vr,fRootGrowPSISense_vr,&
-    SNCRM,SNCR,Tot1stRootLen,Root1stC,ICHK1,NRX)
+  subroutine GrowRootAxes(N,NR,L,L1,NZ,RootAreaPopu,Root1stSink_pvr,&
+    Root2ndSink_pvr,RootSinkC_vr,RootChemElmRemob,fRootGrowPSISense_vr,TFN6_vr,&
+    SNCRM,SNCR,DMRTD,CNRTW,CPRTW,Tot1stRootLen,Root1stC,ICHK1,NRX)
   !
   !grow root axes
   implicit none
-  integer,  intent(in) :: N,NR,L,NZ
+  integer,  intent(in) :: N,NR,L,L1,NZ
   real(r8), intent(in) :: RootAreaPopu
   REAL(R8), INTENT(IN) :: RootSinkC_vr(jroots,JZ1)  
-  real(r8), intent(in) :: fRootGrowPSISense_vr(jroots,JZ1)  
+  real(r8), intent(in) :: fRootGrowPSISense_vr(jroots,JZ1)    
+  real(r8), intent(in) :: TFN6_vr(JZ1)  
+  real(r8), intent(in) :: RootChemElmRemob(NumPlantChemElms)  
+  real(r8), intent(in) :: Root1stSink_pvr(jroots,JZ1,pltpar%MaxNumRootAxes)  
+  real(r8), intent(in) :: Root2ndSink_pvr(jroots,JZ1,pltpar%MaxNumRootAxes)  
   real(r8), intent(in) :: SNCRM,SNCR  
-  integer,  intent(inout) :: ICHK1
-  integer,  intent(inout) :: NRX  
+  real(r8), intent(in) :: CNRTW,CPRTW  
+  real(r8), intent(in) :: DMRTD  
+  integer,  intent(inout) :: ICHK1(jroots,JZ1)
+  integer,  intent(inout) :: NRX(jroots,JZ1)  
   real(r8), intent(inout) :: Tot1stRootLen
   real(r8), intent(inout) :: Root1stC
   real(r8) :: RTDP1X
   real(r8) :: FRTN
+  real(r8) :: FSNC1  
+  real(r8) :: GRTWTM  
   real(r8) :: WFNR,WFNRG
   real(r8) :: SoilResit4PrimRootPentration  
   real(r8) :: CNPG,TFRCO2,FRCO2  
   real(r8) :: RMNCR,RootCYieldO2ltd
-  real(r8) :: RCO2RM
+  real(r8) :: RCO2RM,RCO2G,RCO2GM
   real(r8) :: RCO2R,RCO2XM,RCO2X,RCO2YM,RCO2Y
   real(r8) :: DMRTR,ZPOOLB,PPOOLB,FNP
   real(r8) :: CGRORM,CGROR,GRTWGM,ZADD1M,ZADD1,PADD1,CNRDM,CNRDA
   real(r8) :: RCO2TM,RCO2T
   real(r8) :: FSNCM,FSNCP  
   real(r8) :: RootNetGrowthElms(NumPlantChemElms)
-
+  integer  :: NE,LL,LX,M
+  
   associate(                                                            &
     ZERO                            =>  plt_site%ZERO       , &  
     RCO2A_pvr                       =>  plt_rbgc%RCO2A_pvr      , &
     RCO2N_pvr                       =>  plt_rbgc%RCO2N_pvr      , &    
-    RootRespPotent_pvr              =>  plt_rbgc%RootRespPotent_pvr      , &    
+    RootRespPotent_pvr              =>  plt_rbgc%RootRespPotent_pvr      , &        
+    LitfalChemElm_pvr               =>  plt_bgcr%LitfalChemElm_pvr       , &    
     iPlantRootProfile_pft           =>  plt_pheno%iPlantRootProfile_pft    , &   
-    iPlantPhenolType_pft            =>  plt_pheno%iPlantPhenolType_pft    , &   
+    iPlantPhenolType_pft            =>  plt_pheno%iPlantPhenolType_pft    , & 
+    fTgrowRootP_vr                  =>  plt_pheno%fTgrowRootP_vr      , &    
     RootAutoRO2Limiter_pvr          =>  plt_rbgc%RootAutoRO2Limiter_pvr       , &     
     MaxNumRootLays                  =>  plt_site%MaxNumRootLays         , &
     CumSoilThickness                =>  plt_site%CumSoilThickness     , &         
     RootMycoNonstElm_pvr            =>  plt_biom%RootMycoNonstElm_pvr     , &    
     Root1stChemElm                  =>  plt_biom%Root1stChemElm     , &    
+    ZEROP                           =>  plt_biom%ZEROP      , &        
+    RootStructBiomC_vr              =>  plt_biom%RootStructBiomC_vr     , &    
     RootNonstructElmConc_pvr        =>  plt_biom%RootNonstructElmConc_pvr     , &        
+    Root2ndStructChemElm_pvr        =>  plt_biom%Root2ndStructChemElm_pvr     , &  
+    Root1stStructChemElm_pvr        =>  plt_biom%Root1stStructChemElm_pvr      , &    
+    icwood                          =>  pltpar%icwood       , &
+    iroot                           =>  pltpar%iroot        , &    
+    inonstruct                      =>  pltpar%inonstruct     , &    
+    k_woody_litr                    =>  pltpar%k_woody_litr,&
+    k_fine_litr                     =>  pltpar%k_fine_litr, &      
+    CNRTS                           =>  plt_allom%CNRTS     , &
+    CPRTS                           =>  plt_allom%CPRTS     , &    
+    FWODRE                          =>  plt_allom%FWODRE    , &    
+    RootBiomGrowthYield             =>  plt_allom%RootBiomGrowthYield      , &    
+    PrimRootLen                     =>  plt_morph%PrimRootLen     , &    
+    SeedDepth_pft                   =>  plt_morph%SeedDepth_pft     , &    
+    NGTopRootLayer_pft              =>  plt_morph%NGTopRootLayer_pft       , &    
+    SecndRootLen_pvr                =>  plt_morph%SecndRootLen_pvr     , &    
     PrimRootXNumL_pvr               =>  plt_morph%PrimRootXNumL_pvr     , &    
     PrimRootRadius_pvr              =>  plt_morph%PrimRootRadius_pvr    , &    
     PrimRootDepth                   =>  plt_morph%PrimRootDepth    , &    
     MainBranchNum_pft               =>  plt_morph%MainBranchNum_pft       , &
     NIXBotRootLayer_rpft            =>  plt_morph%NIXBotRootLayer_rpft      , &     
     PSIRootTurg_vr                  =>  plt_ew%PSIRootTurg_vr        , &       
+    CFOPE                           =>  plt_soilchem%CFOPE  , &    
+    SoiBulkDensity                  =>  plt_soilchem%SoiBulkDensity   , &    
     SoilResit4RootPentrate_vr       =>  plt_soilchem%SoilResit4RootPentrate_vr   , &    
     C4PhotosynDowreg_brch           =>  plt_photo%C4PhotosynDowreg_brch       &
   )  
@@ -1125,7 +1155,7 @@ implicit none
       ENDIF
 !
       call PrimRootExtension(L,L1,N,NR,NZ,WFNR,FRTN,RootCYieldO2ltd,RootNetGrowthElms,&
-        Root2ndExtension,Tot1stRootLen,Root1stC)
+        Tot1stRootLen,Root1stC)
     ENDIF
 !
 !
@@ -1160,6 +1190,7 @@ implicit none
     NIXBotRootLayer_rpft(NR,NZ)=MIN(NIXBotRootLayer_rpft(NR,NZ),MaxNumRootLays)
     IF(L.EQ.NIXBotRootLayer_rpft(NR,NZ))NRX(N,NR)=1
   ENDIF
+  end associate
   end subroutine GrowRootAxes
 
 !------------------------------------------------------------------------------------------
@@ -1292,13 +1323,13 @@ implicit none
 
 !------------------------------------------------------------------------------------------
   subroutine PrimRootExtension(L,L1,N,NR,NZ,WFNR,FRTN,RootCYieldO2ltd,RootNetGrowthElms,&
-    Root2ndExtension,Tot1stRootLen,Root1stC)
+    Tot1stRootLen,Root1stC)
   implicit none
   integer, intent(in) :: L,L1,N,NR,NZ
   real(r8), intent(in):: WFNR,FRTN,RootCYieldO2ltd
   real(r8), intent(in) :: RootNetGrowthElms(NumPlantChemElms)
   real(r8), intent(inout) :: Tot1stRootLen,Root1stC
-  real(r8), intent(out):: Root2ndExtension
+  real(r8) :: Root2ndExtension
   real(r8) :: FGROL,FGROZ
   integer :: NE
   REAL(R8) :: XFRE(NumPlantChemElms)
