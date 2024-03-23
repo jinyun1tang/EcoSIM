@@ -35,7 +35,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  PlantinDepth(:,:,:)                      !planting depth, [m]
   real(r8),target,allocatable ::  SeedDepth_pft(:,:,:)                       !seeding depth, [m]
   real(r8),target,allocatable ::  SeedVolumeMean_pft(:,:,:)                        !seed volume, [m3 ]
-  real(r8),target,allocatable ::  SeedLengthMean_pft(:,:,:)                        !seed length, [m]
+  real(r8),target,allocatable ::  SeedMeanLen_pft(:,:,:)                        !seed length, [m]
   real(r8),target,allocatable ::  SeedAreaMean_pft(:,:,:)                        !seed surface area, [m2]
   real(r8),target,allocatable ::  HypoctoHeight_pft(:,:,:)                       !cotyledon height, [m]
   real(r8),target,allocatable ::  MaxCanopyHeight_grd(:,:)                            !canopy height , [m]
@@ -194,7 +194,7 @@ contains
   allocate(PlantinDepth(JP,JY,JX));   PlantinDepth=0._r8
   allocate(SeedDepth_pft(JP,JY,JX));    SeedDepth_pft=0._r8
   allocate(SeedVolumeMean_pft(JP,JY,JX));     SeedVolumeMean_pft=0._r8
-  allocate(SeedLengthMean_pft(JP,JY,JX));     SeedLengthMean_pft=0._r8
+  allocate(SeedMeanLen_pft(JP,JY,JX));     SeedMeanLen_pft=0._r8
   allocate(SeedAreaMean_pft(JP,JY,JX));     SeedAreaMean_pft=0._r8
   allocate(HypoctoHeight_pft(JP,JY,JX));    HypoctoHeight_pft=0._r8
   allocate(MaxCanopyHeight_grd(JY,JX));          MaxCanopyHeight_grd=0._r8
@@ -351,7 +351,7 @@ contains
   call destroy(PlantinDepth)
   call destroy(SeedDepth_pft)
   call destroy(SeedVolumeMean_pft)
-  call destroy(SeedLengthMean_pft)
+  call destroy(SeedMeanLen_pft)
   call destroy(SeedAreaMean_pft)
   call destroy(HypoctoHeight_pft)
   call destroy(MaxCanopyHeight_grd)

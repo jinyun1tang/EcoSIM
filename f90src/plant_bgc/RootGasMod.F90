@@ -85,8 +85,8 @@ module RootGasMod
     trcg_Root_DisEvap_flx_vr   =>  plt_rbgc%trcg_Root_DisEvap_flx_vr   , &
     RUPGasSol_vr               =>  plt_rbgc%RUPGasSol_vr   , &
     RCO2A_pvr                      =>  plt_rbgc%RCO2A_pvr    , &
-    trcg_rootml_vr             =>  plt_rbgc%trcg_rootml_vr     , &
-    trcs_rootml_vr             =>  plt_rbgc%trcs_rootml_vr     , &
+    trcg_rootml_pvr             =>  plt_rbgc%trcg_rootml_pvr     , &
+    trcs_rootml_pvr             =>  plt_rbgc%trcs_rootml_pvr     , &
     TFND                       =>  plt_soilchem%TFND , &
     trcs_VLN_vr                =>  plt_soilchem%trcs_VLN_vr, &
     trc_solml_vr               =>  plt_soilchem%trc_solml_vr, &
@@ -102,21 +102,21 @@ module RootGasMod
     DiffusivitySolutEff        =>  plt_soilchem%DiffusivitySolutEff , &
     iPlantCalendar_brch        =>  plt_pheno%iPlantCalendar_brch  , &
     RootPoreTortu4Gas          =>  plt_morph%RootPoreTortu4Gas   , &
-    PrimRootRadius_pvr         =>  plt_morph%PrimRootRadius_pvr   , &
+    Root1stRadius_pvr         =>  plt_morph%Root1stRadius_pvr   , &
     AveLen2ndRoot_pvr            =>  plt_morph%AveLen2ndRoot_pvr   , &
-    RootVolume_vr              =>  plt_morph%RootVolume_vr   , &
+    RootPoreVol_pvr              =>  plt_morph%RootPoreVol_pvr   , &
     RootLenPerPlant_pvr        =>  plt_morph%RootLenPerPlant_pvr   , &
-    SecndRootXNum_pvr          =>  plt_morph%SecndRootXNum_pvr    , &
+    Root2ndXNum_pvr          =>  plt_morph%Root2ndXNum_pvr    , &
     Radius2ndRoot_pvr        =>  plt_morph%Radius2ndRoot_pvr   , &
     RootRaidus_rpft            =>  plt_morph%RootRaidus_rpft   , &
-    RootVH2O_vr                =>  plt_morph%RootVH2O_vr  , &
-    RootPorosity               =>  plt_morph%RootPorosity   , &
-    PrimRootXNumL_pvr          =>  plt_morph%PrimRootXNumL_pvr    , &
+    RootVH2O_pvr                =>  plt_morph%RootVH2O_pvr  , &
+    RootPorosity_pft               =>  plt_morph%RootPorosity_pft   , &
+    Root1stXNumL_pvr          =>  plt_morph%Root1stXNumL_pvr    , &
     NGTopRootLayer_pft         =>  plt_morph%NGTopRootLayer_pft      , &
     MainBranchNum_pft        =>  plt_morph%MainBranchNum_pft       &
   )
   
-  IF(RootRespPotent_pvr(N,L,NZ).GT.ZEROP(NZ).AND.RootVH2O_vr(N,L,NZ).GT.ZEROP(NZ) &
+  IF(RootRespPotent_pvr(N,L,NZ).GT.ZEROP(NZ).AND.RootVH2O_pvr(N,L,NZ).GT.ZEROP(NZ) &
     .AND.FOXYX.GT.ZEROQ(NZ))THEN
 !
 !     INITIALIZE VARIABLES USED IN ROOT GAS EXCHANGE
@@ -133,8 +133,8 @@ module RootGasMod
 !
 
     DO NTG=idg_beg,idg_end-1
-      trcg_gmas_loc(NTG)=AMAX1(ZEROP(NZ),trcg_rootml_vr(NTG,N,L,NZ))
-      trcs_rootml_loc(NTG)=AMAX1(ZEROP(NZ),trcs_rootml_vr(NTG,N,L,NZ))
+      trcg_gmas_loc(NTG)=AMAX1(ZEROP(NZ),trcg_rootml_pvr(NTG,N,L,NZ))
+      trcs_rootml_loc(NTG)=AMAX1(ZEROP(NZ),trcs_rootml_pvr(NTG,N,L,NZ))
     ENDDO
 
     DO NTG=idg_beg,idg_end
@@ -146,8 +146,8 @@ module RootGasMod
 !    trc_gasml_loc(idg_CO2)=AMAX1(ZEROP(NZ),trc_gasml_vr(idg_CO2,L)*FracPRoot4Uptake(N,L,NZ))
 !    trc_gasml_loc(idg_O2)=AMAX1(ZEROP(NZ),trc_gasml_vr(idg_O2,L)*FOXYX)
 
-    RTVLWA=RootVH2O_vr(N,L,NZ)*trcs_VLN_vr(ids_NH4,L)
-    RTVLWB=RootVH2O_vr(N,L,NZ)*trcs_VLN_vr(ids_NH4B,L)
+    RTVLWA=RootVH2O_pvr(N,L,NZ)*trcs_VLN_vr(ids_NH4,L)
+    RTVLWB=RootVH2O_pvr(N,L,NZ)*trcs_VLN_vr(ids_NH4B,L)
     RootOxyDemandPerPlant=ROXYP(N,L,NZ)*dts_gas/PlantPopulation_pft(NZ)
     ROXYFX=ROXYF(L)*FOXYX*dts_gas
     RCO2FX=RCO2F(L)*FOXYX*dts_gas
@@ -175,15 +175,15 @@ module RootGasMod
 !     FracSoiLayByPrimRoot=fraction of each soil layer with primary root
 !     RTCR1,RTCR2,RTCRA=cross-sectional area/length of
 !     primary,secondary,total root,myco system
-!     PrimRootXNumL_pvr,SecndRootXNum_pvr=number of root,myco primary,secondary axes
-!     PrimRootRadius_pvr,Radius2ndRoot_pvr=primary,secondary root radius
+!     Root1stXNumL_pvr,Root2ndXNum_pvr=number of root,myco primary,secondary axes
+!     Root1stRadius_pvr,Radius2ndRoot_pvr=primary,secondary root radius
 !     DPTHZ=depth of primary root from surface
 !     AveLen2ndRoot_pvr=average secondary root length
 !
     IF(RootStructElmnt_pft(ielmc,NZ).GT.ZEROP(NZ).AND.FracSoiLayByPrimRoot(L,NZ).GT.ZERO)THEN
-      RTCR1=AMAX1(PlantPopulation_pft(NZ),PrimRootXNumL_pvr(N,L,NZ)) &
-        *PICON*PrimRootRadius_pvr(N,L,NZ)**2/DPTHZ(L)
-      RTCR2=(SecndRootXNum_pvr(N,L,NZ)*PICON*Radius2ndRoot_pvr(N,L,NZ)**2 &
+      RTCR1=AMAX1(PlantPopulation_pft(NZ),Root1stXNumL_pvr(N,L,NZ)) &
+        *PICON*Root1stRadius_pvr(N,L,NZ)**2/DPTHZ(L)
+      RTCR2=(Root2ndXNum_pvr(N,L,NZ)*PICON*Radius2ndRoot_pvr(N,L,NZ)**2 &
         /AveLen2ndRoot_pvr(N,L,NZ))/FracSoiLayByPrimRoot(L,NZ)
       IF(RTCR2.GT.RTCR1)THEN
         RTCRA=RTCR1*RTCR2/(RTCR1+RTCR2)
@@ -202,7 +202,7 @@ module RootGasMod
 !     RTARR=root surface area/radius for uptake
 !     RootRaidus_rpft=path length for radial diffusion within root
 !     DIFOP=aqueous diffusivity of O2 within root
-!     RootVH2O_vr=root,myco aqueous volume
+!     RootVH2O_pvr=root,myco aqueous volume
 !     S*L=solubility of gas in water from hour1.f:
 !     CO2=CO2,OXY=O2,CH4=CH4,N2O=N2O,NH3=NH3,H2G=H2
 !     DF*A=root-atmosphere gas conductance
@@ -216,7 +216,7 @@ module RootGasMod
       RTARRX=RootAreaDivRadius_vr(N,L)/RootRaidus_rpft(N,NZ)
       DIFOP=OLSGLP*RTARRX
       DO NTG=idg_beg,idg_end-1
-        DisolvedGasVolume(NTG)=RootVH2O_vr(N,L,NZ)*GasSolbility_vr(NTG,L)
+        DisolvedGasVolume(NTG)=RootVH2O_pvr(N,L,NZ)*GasSolbility_vr(NTG,L)
         DFAGas(NTG)=GasDifc_loc(NTG)*RTCRA
       ENDDO
     ELSE
@@ -226,7 +226,7 @@ module RootGasMod
       DFAGas(idg_beg:idg_end-1)=0.0_r8
     ENDIF
 
-    DFGP=AMIN1(1.0,XNPD*SQRT(RootPorosity(N,NZ))*TFND(L))
+    DFGP=AMIN1(1.0,XNPD*SQRT(RootPorosity_pft(N,NZ))*TFND(L))
     RCO2PX=-RCO2A_pvr(N,L,NZ)*dts_gas
 !
 !     SOLVE FOR GAS EXCHANGE IN SOIL AND ROOTS DURING ROOT UPTAKE
@@ -256,7 +256,7 @@ module RootGasMod
       VLWatMicPMO=VLWatMicPM(M,L)*FOXYX
       VLWatMicPMM=VLWatMicPM(M,L)*FracPRoot4Uptake(N,L,NZ)
       VLsoiAirPMM=VLsoiAirPM(M,L)*FracPRoot4Uptake(N,L,NZ)
-      VOLWSP=RootVH2O_vr(N,L,NZ)+VLWatMicPMM
+      VOLWSP=RootVH2O_pvr(N,L,NZ)+VLWatMicPMM
       VLWatMicPMA=VLWatMicPMM*trcs_VLN_vr(ids_NH4,L)
       VLWatMicPMB=VLWatMicPMM*trcs_VLN_vr(ids_NH4B,L)
       VOLWSA=RTVLWA+VLWatMicPMA
@@ -293,7 +293,7 @@ module RootGasMod
 !     C*P1=root aqueous concentration
 !     ROXYLX=soil net O2 aqueous flux
 !     VLWatMicPMM=micropore water volume
-!     RootVH2O_vr,RootVolume_vr=root aqueous,gaseous volume
+!     RootVH2O_pvr,RootPoreVol_pvr=root aqueous,gaseous volume
 !     RMF*=soil convective solute flux:COS=CO2,OXS=O2,CHS=CH4,
 !     N2S=N2O,NHS=NH3 non-band,NHB=NH3 band,HGS=H2
 !     dtPerPlantRootH2OUptake=water uptake
@@ -304,16 +304,16 @@ module RootGasMod
             if(NTG/=idg_O2)trcaqu_conc_soi_loc(NTG)=AZMAX1(trc_solml_loc(NTG)/VLWatMicPMM)
           enddo
           trcaqu_conc_soi_loc(idg_O2)=AMIN1(AtmGasc(idg_O2)*GasSolbility_vr(idg_O2,L),AZMAX1(trc_solml_loc(idg_O2)/VLWatMicPMO))
-          IF(RootVolume_vr(N,L,NZ).GT.ZERO)THEN
+          IF(RootPoreVol_pvr(N,L,NZ).GT.ZERO)THEN
             DO NTG=idg_beg,idg_end-1
-              trcg_gcon_loc(NTG)=AZMAX1(trcg_gmas_loc(NTG)/RootVolume_vr(N,L,NZ))
+              trcg_gcon_loc(NTG)=AZMAX1(trcg_gmas_loc(NTG)/RootPoreVol_pvr(N,L,NZ))
             ENDDO
           ELSE
             trcg_gcon_loc(idg_beg:idg_end-1)=0.0_r8
           ENDIF
 
           do NTG=idg_beg,idg_end-1
-            trcrootconc_loc(NTG)=AZMAX1(trcs_rootml_loc(NTG)/RootVH2O_vr(N,L,NZ))
+            trcrootconc_loc(NTG)=AZMAX1(trcs_rootml_loc(NTG)/RootVH2O_pvr(N,L,NZ))
           enddo
           trcrootconc_loc(idg_O2)=AMIN1(AtmGasc(idg_O2)*GasSolbility_vr(idg_O2,L),trcrootconc_loc(idg_O2))
 
@@ -386,7 +386,7 @@ module RootGasMod
           RUPSolute(idg_O2)=-RDFOXP*PlantPopulation_pft(NZ)
           RDFSolute(idg_CO2)=RMFGas(idg_CO2)+DIFLGas(idg_CO2)*&
             (trcaqu_conc_soi_loc(idg_CO2)-trcrootconc_loc(idg_CO2))
-          RDXSolute(idg_CO2)=(RootVH2O_vr(N,L,NZ)*AMAX1(ZEROP(NZ),trc_solml_loc(idg_CO2)) &
+          RDXSolute(idg_CO2)=(RootVH2O_pvr(N,L,NZ)*AMAX1(ZEROP(NZ),trc_solml_loc(idg_CO2)) &
             -VLWatMicPMM*AMAX1(ZEROP(NZ),trcs_rootml_loc(idg_CO2)))/VOLWSP
 
           IF(RDFSolute(idg_CO2).GT.0.0_r8)THEN
@@ -401,7 +401,7 @@ module RootGasMod
             DO NTG=idg_beg,idg_end-1
               if(NTG/=idg_CO2.and.NTG/=idg_NH3.and.NTG/=idg_O2)then
                 RDFSolute(NTG)=RMFGas(NTG)+DIFLGas(NTG)*(trcaqu_conc_soi_loc(NTG)-trcrootconc_loc(NTG))
-                RDXSolute(NTG)=(RootVH2O_vr(N,L,NZ)*AMAX1(ZEROP(NZ),trc_solml_loc(NTG)) &
+                RDXSolute(NTG)=(RootVH2O_pvr(N,L,NZ)*AMAX1(ZEROP(NZ),trc_solml_loc(NTG)) &
                   -VLWatMicPMM*AMAX1(ZEROP(NZ),trcs_rootml_loc(NTG)))/VOLWSP
                 IF(RDFSolute(NTG).GT.0.0_r8)THEN
                   RUPSolute(NTG)=AMIN1(AZMAX1(RDXSolute(NTG)),RDFSolute(NTG)*PlantPopulation_pft(NZ))
@@ -524,7 +524,7 @@ module RootGasMod
 !
 !     GAS TRANSFER THROUGH ROOTS
 !
-          IF(N.EQ.ipltroot.AND.RootVolume_vr(N,L,NZ).GT.ZEROP(NZ))THEN
+          IF(N.EQ.ipltroot.AND.RootPoreVol_pvr(N,L,NZ).GT.ZEROP(NZ))THEN
             RUPNTX=RUPSolute(idg_NH3)+RUPSolute(idg_NH3B)
 !
 !     GAS EXCHANGE BETWEEN GASEOUS AND AQUEOUS PHASES IN ROOTS
@@ -535,7 +535,7 @@ module RootGasMod
 !     R*FL1=root gas exchange with atmosphere
 !     gas code:CO=CO2,OX=O2,CH=CH4,N2=N2O,NH=NH3,H2=H2
 !     trcg_gmas_loc(:),trcs_rootml_loc(:)=gaseous,aqueous gas in root
-!     RootVH2O_vr,RootVolume_vr=root aqueous,gaseous volume
+!     RootVH2O_pvr,RootPoreVol_pvr=root aqueous,gaseous volume
 !     VOLW*=RTVLW*gas solubility
 !     C*E,C*A1=atmosphere,root gas concentration
 !     DF*A=root-atmosphere gas conductance
@@ -546,10 +546,10 @@ module RootGasMod
             DO NTG=idg_beg,idg_end-1
               if(NTG/=idg_CO2.and.NTG/=idg_NH3)GasPX(NTG)=trcs_rootml_loc(NTG)+RUPSolute(NTG)
               trcg_Root2Soil_flx(NTG)=AMAX1(-GasPX(NTG),DFGP*(AMAX1(ZEROP(NZ),trcg_gmas_loc(NTG)) &
-                *DisolvedGasVolume(NTG)-GasPX(NTG)*RootVolume_vr(N,L,NZ)) &
-                /(DisolvedGasVolume(NTG)+RootVolume_vr(N,L,NZ)))
+                *DisolvedGasVolume(NTG)-GasPX(NTG)*RootPoreVol_pvr(N,L,NZ)) &
+                /(DisolvedGasVolume(NTG)+RootPoreVol_pvr(N,L,NZ)))
               !positive into root
-              trcg_air2root_flx1(NTG)=AMIN1(DFAGas(NTG),RootVolume_vr(N,L,NZ)) &
+              trcg_air2root_flx1(NTG)=AMIN1(DFAGas(NTG),RootPoreVol_pvr(N,L,NZ)) &
                 *(AtmGasc(NTG)-trcg_gcon_loc(NTG))
             enddo
           ELSE

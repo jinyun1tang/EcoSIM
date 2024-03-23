@@ -177,8 +177,8 @@ module ExtractsMod
     THeatRootUptake          => plt_ew%THeatRootUptake    , &
     GridPlantRootH2OUptake_vr=> plt_ew%GridPlantRootH2OUptake_vr   , &
     AllPlantRootH2OUptake_vr => plt_ew%AllPlantRootH2OUptake_vr    , &
-    trcg_rootml_vr           => plt_rbgc%trcg_rootml_vr,&
-    trcs_rootml_vr           => plt_rbgc%trcs_rootml_vr, &
+    trcg_rootml_pvr           => plt_rbgc%trcg_rootml_pvr,&
+    trcs_rootml_pvr           => plt_rbgc%trcs_rootml_pvr, &
     RootLenDensPerPlant_pvr  => plt_morph%RootLenDensPerPlant_pvr , &
     RTDNT                    => plt_morph%RTDNT , &
     MY                       => plt_morph%MY    , &
@@ -215,19 +215,19 @@ module ExtractsMod
 !     R*DFA=root aqueous-gaseous CO2 exchange
 !
       DO NTG=idg_beg,idg_NH3
-        trcg_rootml_vr(NTG,N,L,NZ)=trcg_rootml_vr(NTG,N,L,NZ) &
+        trcg_rootml_pvr(NTG,N,L,NZ)=trcg_rootml_pvr(NTG,N,L,NZ) &
           +trcg_air2root_flx__pvr(NTG,N,L,NZ)-trcg_Root_DisEvap_flx_vr(NTG,N,L,NZ)
       ENDDO
 
-      trcs_rootml_vr(idg_CO2,N,L,NZ)=trcs_rootml_vr(idg_CO2,N,L,NZ)+trcg_Root_DisEvap_flx_vr(idg_CO2,N,L,NZ)+RCO2P(N,L,NZ)
-      trcs_rootml_vr(idg_O2,N,L,NZ)=trcs_rootml_vr(idg_O2,N,L,NZ)+trcg_Root_DisEvap_flx_vr(idg_O2,N,L,NZ)-RUPOXP(N,L,NZ)
-      trcs_rootml_vr(idg_CH4,N,L,NZ)=trcs_rootml_vr(idg_CH4,N,L,NZ) &
+      trcs_rootml_pvr(idg_CO2,N,L,NZ)=trcs_rootml_pvr(idg_CO2,N,L,NZ)+trcg_Root_DisEvap_flx_vr(idg_CO2,N,L,NZ)+RCO2P(N,L,NZ)
+      trcs_rootml_pvr(idg_O2,N,L,NZ)=trcs_rootml_pvr(idg_O2,N,L,NZ)+trcg_Root_DisEvap_flx_vr(idg_O2,N,L,NZ)-RUPOXP(N,L,NZ)
+      trcs_rootml_pvr(idg_CH4,N,L,NZ)=trcs_rootml_pvr(idg_CH4,N,L,NZ) &
         +trcg_Root_DisEvap_flx_vr(idg_CH4,N,L,NZ)+RUPGasSol_vr(idg_CH4,N,L,NZ)
-      trcs_rootml_vr(idg_N2O,N,L,NZ)=trcs_rootml_vr(idg_N2O,N,L,NZ) &
+      trcs_rootml_pvr(idg_N2O,N,L,NZ)=trcs_rootml_pvr(idg_N2O,N,L,NZ) &
         +trcg_Root_DisEvap_flx_vr(idg_N2O,N,L,NZ)+RUPGasSol_vr(idg_N2O,N,L,NZ)
-      trcs_rootml_vr(idg_NH3,N,L,NZ)=trcs_rootml_vr(idg_NH3,N,L,NZ) &
+      trcs_rootml_pvr(idg_NH3,N,L,NZ)=trcs_rootml_pvr(idg_NH3,N,L,NZ) &
         +trcg_Root_DisEvap_flx_vr(idg_NH3,N,L,NZ)+RUPGasSol_vr(idg_NH3,N,L,NZ)+RUPGasSol_vr(idg_NH3B,N,L,NZ)
-      trcs_rootml_vr(idg_H2,N,L,NZ)=trcs_rootml_vr(idg_H2,N,L,NZ) &
+      trcs_rootml_pvr(idg_H2,N,L,NZ)=trcs_rootml_pvr(idg_H2,N,L,NZ) &
         +trcg_Root_DisEvap_flx_vr(idg_H2,N,L,NZ)+RUPGasSol_vr(idg_H2,N,L,NZ)
 !
 !     TOTAL ROOT GAS CONTENTS
@@ -236,7 +236,7 @@ module ExtractsMod
 !     *A,*P=PFT root gaseous, aqueous gas content
 !
       DO NTG=idg_beg,idg_end-1
-        trcg_TLP(NTG,L)=trcg_TLP(NTG,L)+trcs_rootml_vr(NTG,N,L,NZ)+trcg_rootml_vr(NTG,N,L,NZ)
+        trcg_TLP(NTG,L)=trcg_TLP(NTG,L)+trcs_rootml_pvr(NTG,N,L,NZ)+trcg_rootml_pvr(NTG,N,L,NZ)
       ENDDO
 !
 !     TOTAL ROOT BOUNDARY GAS FLUXES
