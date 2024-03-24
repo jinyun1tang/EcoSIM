@@ -52,9 +52,9 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  LeafAreaLive_brch(:,:,:,:)                     !branch leaf area, [m2 d-2]
   real(r8),target,allocatable ::  LeafAreaDying_brch(:,:,:,:)                     !branch leaf area, [m2 d-2]
   real(r8),target,allocatable ::  CanPBranchHeight(:,:,:,:)                    !branch height, [m]
-  real(r8),target,allocatable ::  SeedNumberSet_brch(:,:,:,:)                     !branch grain number, [d-2]
+  real(r8),target,allocatable ::  SeedNumSet_brch(:,:,:,:)                     !branch grain number, [d-2]
   real(r8),target,allocatable ::  PotentialSeedSites_brch(:,:,:,:)                     !branch potential grain number, [d-2]
-  real(r8),target,allocatable ::  CanopySeedNumber_pft(:,:,:)                        !canopy grain number, [d-2]
+  real(r8),target,allocatable ::  CanopySeedNum_pft(:,:,:)                        !canopy grain number, [d-2]
   real(r8),target,allocatable ::  PlantPopulation_pft(:,:,:)             !plant population, [d-2]
   real(r8),target,allocatable ::  InternodeHeightDying_brch(:,:,:,:,:)                  !internode height, [m]
   real(r8),target,allocatable ::  CNLF(:,:,:)                        !maximum leaf N:C ratio, [g g-1]
@@ -212,9 +212,9 @@ contains
   allocate(LeafAreaLive_brch(MaxNumBranches,JP,JY,JX)); LeafAreaLive_brch=0._r8
   allocate(LeafAreaDying_brch(MaxNumBranches,JP,JY,JX)); LeafAreaDying_brch=0._r8
   allocate(CanPBranchHeight(MaxNumBranches,JP,JY,JX));CanPBranchHeight=0._r8
-  allocate(SeedNumberSet_brch(MaxNumBranches,JP,JY,JX)); SeedNumberSet_brch=0._r8
+  allocate(SeedNumSet_brch(MaxNumBranches,JP,JY,JX)); SeedNumSet_brch=0._r8
   allocate(PotentialSeedSites_brch(MaxNumBranches,JP,JY,JX)); PotentialSeedSites_brch=0._r8
-  allocate(CanopySeedNumber_pft(JP,JY,JX));     CanopySeedNumber_pft=0._r8
+  allocate(CanopySeedNum_pft(JP,JY,JX));     CanopySeedNum_pft=0._r8
   allocate(PlantPopulation_pft(JP,JY,JX));       PlantPopulation_pft=0._r8
   allocate(InternodeHeightDying_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));InternodeHeightDying_brch=0._r8
   allocate(CNLF(JP,JY,JX));     CNLF=0._r8
@@ -368,9 +368,9 @@ contains
   call destroy(LeafAreaLive_brch)
   call destroy(LeafAreaDying_brch)
   call destroy(CanPBranchHeight)
-  call destroy(SeedNumberSet_brch)
+  call destroy(SeedNumSet_brch)
   call destroy(PotentialSeedSites_brch)
-  call destroy(CanopySeedNumber_pft)
+  call destroy(CanopySeedNum_pft)
   call destroy(PlantPopulation_pft)
   call destroy(InternodeHeightDying_brch)
   call destroy(PARTS_brch)

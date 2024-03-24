@@ -607,7 +607,7 @@ module StartqsMod
     NodeNumberAtAnthesis_brch         =>  plt_morph%NodeNumberAtAnthesis_brch  , &
     PotentialSeedSites_brch           =>  plt_morph%PotentialSeedSites_brch  , &
     InternodeHeightLive_brch          =>  plt_morph%InternodeHeightLive_brch , &
-    SeedNumberSet_brch                =>  plt_morph%SeedNumberSet_brch  , &
+    SeedNumSet_brch                =>  plt_morph%SeedNumSet_brch  , &
     LeafAreaLive_brch                 =>  plt_morph%LeafAreaLive_brch  , &
     LeafAreaDying_brch                =>  plt_morph%LeafAreaDying_brch  , &
     CanopyLeafAreaByLayer_pft         =>  plt_morph%CanopyLeafAreaByLayer_pft  , &
@@ -681,7 +681,7 @@ module StartqsMod
   plt_biom%ShootChemElm_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ)=0._r8
   plt_biom%StalkChemElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ)=0._r8
   plt_biom%LeafChemElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ)=0._r8
-  plt_biom%StalkRsrveElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ)=0._r8
+  plt_biom%StalkRsrvElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ)=0._r8
   plt_biom%HuskChemElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ)=0._r8
   plt_biom%GrainChemElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ)=0._r8
   plt_biom%EarChemElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ)=0._r8
@@ -696,7 +696,7 @@ module StartqsMod
     plt_biom%StalkBiomassC_brch(NB,NZ)=0._r8
     plt_biom%LeafPetolBiomassC_brch(NB,NZ)=0._r8
     PotentialSeedSites_brch(NB,NZ)=0._r8
-    SeedNumberSet_brch(NB,NZ)=0._r8
+    SeedNumSet_brch(NB,NZ)=0._r8
     plt_allom%GrainSeedBiomCMean_brch(NB,NZ)=0._r8
     LeafAreaLive_brch(NB,NZ)=0._r8
     plt_rbgc%NH3Dep2_brch(NB,NZ)=0._r8
@@ -750,11 +750,11 @@ module StartqsMod
   plt_biom%PetioleChemElms_pft(1:NumPlantChemElms,NZ)=0._r8
   plt_biom%StalkChemElms_pft(1:NumPlantChemElms,NZ)=0._r8
   plt_biom%CanopyStalkC_pft(NZ)=0._r8
-  plt_biom%ReserveChemElms_pft(1:NumPlantChemElms,NZ)=0._r8
+  plt_biom%StalkRsrvElms_pft(1:NumPlantChemElms,NZ)=0._r8
   plt_biom%HuskChemElms_pft(1:NumPlantChemElms,NZ)=0._r8
   plt_biom%EarChemElms_pft(1:NumPlantChemElms,NZ)=0._r8
   plt_biom%GrainChemElms_pft(1:NumPlantChemElms,NZ)=0._r8
-  plt_biom%RootStructElmnt_pft(1:NumPlantChemElms,NZ)=0._r8
+  plt_biom%RootStructElms_pft(1:NumPlantChemElms,NZ)=0._r8
   plt_biom%NoduleChemElms_pft(1:NumPlantChemElms,NZ)=0._r8
   plt_biom%CanopyLeafShethC_pft(NZ)=0._r8
   CanopyLeafArea_pft(NZ)=0._r8
@@ -776,7 +776,7 @@ module StartqsMod
     AREA3                         => plt_site%AREA3     , &
     CFOPE                         => plt_soilchem%CFOPE , &
     ETCanopy_pft                  => plt_ew%ETCanopy_pft       , &
-    StandingDeadKCompChemElms_pft => plt_biom%StandingDeadKCompChemElms_pft    , &
+    StandDeadKCompElms_pft => plt_biom%StandDeadKCompElms_pft    , &
     StandingDeadChemElms_pft      => plt_biom%StandingDeadChemElms_pft    , &
     StandingDeadInitC_pft         => plt_biom%StandingDeadInitC_pft    , &
     RootBiomCPerPlant_pft         => plt_biom%RootBiomCPerPlant_pft     , &
@@ -823,13 +823,13 @@ module StartqsMod
     StandingDeadChemElms_pft(1:NumPlantChemElms,NZ)=0._r8
     WTSTDX=StandingDeadInitC_pft(NZ)*AREA3(NU)
     D155: DO M=1,jsken
-      StandingDeadKCompChemElms_pft(ielmc,M,NZ)=WTSTDX*CFOPE(ielmc,icwood,M,NZ)
-      StandingDeadKCompChemElms_pft(ielmn,M,NZ)=WTSTDX*rNCStalk_pft(NZ)*CFOPE(ielmn,icwood,M,NZ)
-      StandingDeadKCompChemElms_pft(ielmp,M,NZ)=WTSTDX*rPCStalk_pft(NZ)*CFOPE(ielmp,icwood,M,NZ)
+      StandDeadKCompElms_pft(ielmc,M,NZ)=WTSTDX*CFOPE(ielmc,icwood,M,NZ)
+      StandDeadKCompElms_pft(ielmn,M,NZ)=WTSTDX*rNCStalk_pft(NZ)*CFOPE(ielmn,icwood,M,NZ)
+      StandDeadKCompElms_pft(ielmp,M,NZ)=WTSTDX*rPCStalk_pft(NZ)*CFOPE(ielmp,icwood,M,NZ)
     ENDDO D155
     DO NE=1,NumPlantChemElms
       StandingDeadChemElms_pft(NE,NZ)=StandingDeadChemElms_pft(NE,NZ)+&
-        sum(StandingDeadKCompChemElms_pft(NE,1:jsken,NZ))
+        sum(StandDeadKCompElms_pft(NE,1:jsken,NZ))
     ENDDO
   ENDIF
   end associate

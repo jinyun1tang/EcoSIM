@@ -72,7 +72,7 @@ module RootDataType
   real(r8),target,allocatable ::  TRootGasLossDisturb_pft(:,:,:)                 !total root gas content, [g d-2]
   real(r8),target,allocatable ::  RootBiomCPerPlant_pft(:,:,:)                       !root C per plant, [g p-1]
   real(r8),target,allocatable ::  RootElms_pft(:,:,:,:)                     !plant root element, [g d-2]
-  real(r8),target,allocatable ::  RootStructElmnt_pft(:,:,:,:)                    !plant root structural element, [g d-2]
+  real(r8),target,allocatable ::  RootStructElms_pft(:,:,:,:)                    !plant root structural element, [g d-2]
   real(r8),target,allocatable ::  RootProteinC_pvr(:,:,:,:,:)                   !root layer protein C, [g d-2]
   real(r8),target,allocatable ::  Root1stStructElm_rpvr(:,:,:,:,:,:,:)              !root layer element primary axes, [g d-2]
   real(r8),target,allocatable ::  Root2ndStructElm_pvr(:,:,:,:,:,:,:)              !root layer element secondary axes, [g d-2]
@@ -154,7 +154,7 @@ contains
   allocate(TRootGasLossDisturb_pft(idg_beg:idg_end-1,JY,JX));TRootGasLossDisturb_pft=0._r8
   allocate(RootBiomCPerPlant_pft(JP,JY,JX));    RootBiomCPerPlant_pft=0._r8
   allocate(RootElms_pft(NumPlantChemElms,JP,JY,JX)); RootElms_pft=0._r8
-  allocate(RootStructElmnt_pft(NumPlantChemElms,JP,JY,JX));   RootStructElmnt_pft=0._r8
+  allocate(RootStructElms_pft(NumPlantChemElms,JP,JY,JX));   RootStructElms_pft=0._r8
   allocate(RootProteinC_pvr(jroots,JZ,JP,JY,JX));RootProteinC_pvr=0._r8
   allocate(Root1stStructElm_rpvr(NumPlantChemElms,jroots,JZ,NumOfCanopyLayers,JP,JY,JX));Root1stStructElm_rpvr=0._r8
   allocate(Root2ndStructElm_pvr(NumPlantChemElms,jroots,JZ,NumOfCanopyLayers,JP,JY,JX));Root2ndStructElm_pvr=0._r8
@@ -234,7 +234,7 @@ contains
   call destroy(TRootGasLossDisturb_pft)
   call destroy(RootBiomCPerPlant_pft)
   call destroy(RootElms_pft)
-  call destroy(RootStructElmnt_pft)
+  call destroy(RootStructElms_pft)
   call destroy(RootProteinC_pvr)
   call destroy(Root1stStructElm_rpvr)
   call destroy(Root2ndStructElm_pvr)

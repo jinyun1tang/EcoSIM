@@ -338,7 +338,7 @@ module ExtractsMod
 
   associate(                       &
     PlantElemntStoreLandscape  => plt_site%PlantElemntStoreLandscape  , &
-    ElmntBalanceCum_pft        => plt_site%ElmntBalanceCum_pft   , &
+    ElmBalanceCum_pft        => plt_site%ElmBalanceCum_pft   , &
     NH3EmiCum_pft              => plt_bgcr%NH3EmiCum_pft  , &
     NH3Dep2Can_pft             => plt_bgcr%NH3Dep2Can_pft  , &
     Canopy_NEE_col             => plt_bgcr%Canopy_NEE_col  , &
@@ -435,7 +435,7 @@ module ExtractsMod
   StemArea_grd=StemArea_grd+CanopyStemA_pft(NZ)
   DO NE=1,NumPlantChemElms
     LitrFallChemElm_col(NE)=LitrFallChemElm_col(NE)-PlantRootSoilChemNetX_pft(NE,NZ)
-    PlantElemntStoreLandscape(NE)=PlantElemntStoreLandscape(NE)+ElmntBalanceCum_pft(NE,NZ)
+    PlantElemntStoreLandscape(NE)=PlantElemntStoreLandscape(NE)+ElmBalanceCum_pft(NE,NZ)
   ENDDO
 
   DO NTG=idg_beg,idg_end-1

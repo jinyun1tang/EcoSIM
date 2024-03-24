@@ -1681,7 +1681,7 @@ implicit none
     NonstructElm_brch                  =>   plt_biom%NonstructElm_brch   , &
     PopuPlantRootC_vr                  =>   plt_biom% PopuPlantRootC_vr   , &
     StalkBiomassC_brch                 =>   plt_biom%StalkBiomassC_brch   , &
-    StalkRsrveElms_brch                =>   plt_biom%StalkRsrveElms_brch  , &
+    StalkRsrvElms_brch                =>   plt_biom%StalkRsrvElms_brch  , &
     NonstructElms_pft                  =>   plt_biom%NonstructElms_pft    , &
     CanopyLeafShethC_pft               =>   plt_biom%CanopyLeafShethC_pft     , &
     RootElms_pft                       =>   plt_biom%RootElms_pft    , &
@@ -1777,7 +1777,7 @@ implicit none
         IF(iPlantCalendar_brch(ipltcal_BeginSeedFill,NB,NZ).NE.0)THEN
           WTSTKT=WTSTKT+StalkBiomassC_brch(NB,NZ)
           DO NE=1,NumPlantChemElms
-            TotStalkRsrv_loc(NE)=TotStalkRsrv_loc(NE)+StalkRsrveElms_brch(NE,NB,NZ)
+            TotStalkRsrv_loc(NE)=TotStalkRsrv_loc(NE)+StalkRsrvElms_brch(NE,NB,NZ)
           ENDDO
         ENDIF
       ENDIF
@@ -1786,15 +1786,15 @@ implicit none
       D335: DO NB=1,NumOfBranches_pft(NZ)
         IF(iPlantBranchState_brch(NB,NZ).EQ.iLive)THEN
           IF(iPlantCalendar_brch(ipltcal_BeginSeedFill,NB,NZ).NE.0)THEN
-            StalkRsrvGradt=TotStalkRsrv_loc(ielmc)*StalkBiomassC_brch(NB,NZ)-StalkRsrveElms_brch(ielmc,NB,NZ)*WTSTKT
+            StalkRsrvGradt=TotStalkRsrv_loc(ielmc)*StalkBiomassC_brch(NB,NZ)-StalkRsrvElms_brch(ielmc,NB,NZ)*WTSTKT
             XFRE(ielmc)=0.1_r8*StalkRsrvGradt/WTSTKT            
-            StalkRsrveElms_brch(ielmc,NB,NZ)=StalkRsrveElms_brch(ielmc,NB,NZ)+XFRE(ielmc)
+            StalkRsrvElms_brch(ielmc,NB,NZ)=StalkRsrvElms_brch(ielmc,NB,NZ)+XFRE(ielmc)
             !based on stoichiometry gradient
             DO NE=2,NumPlantChemElms
-              StalkRsrvGradt=TotStalkRsrv_loc(NE)*StalkRsrveElms_brch(ielmc,NB,NZ) &
-                -StalkRsrveElms_brch(NE,NB,NZ)*TotStalkRsrv_loc(ielmc)
+              StalkRsrvGradt=TotStalkRsrv_loc(NE)*StalkRsrvElms_brch(ielmc,NB,NZ) &
+                -StalkRsrvElms_brch(NE,NB,NZ)*TotStalkRsrv_loc(ielmc)
               XFRE(NE)=0.1_r8*StalkRsrvGradt/TotStalkRsrv_loc(ielmc)
-              StalkRsrveElms_brch(NE,NB,NZ)=StalkRsrveElms_brch(NE,NB,NZ)+XFRE(NE)
+              StalkRsrvElms_brch(NE,NB,NZ)=StalkRsrvElms_brch(NE,NB,NZ)+XFRE(NE)
             ENDDO
           ENDIF
         ENDIF
