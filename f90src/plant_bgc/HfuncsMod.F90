@@ -241,13 +241,13 @@ module HfuncsMod
   integer :: NB
 ! begin_execution
   associate(                                                                        &
-    CanopyNonstructElmConc_pft  =>   plt_biom%CanopyNonstructElmConc_pft  , &
-    NonstructElms_pft           =>   plt_biom%NonstructElms_pft   , &
+    CanopyNonstructElmConc_pft      =>   plt_biom%CanopyNonstructElmConc_pft  , &
+    NonstructElms_pft               =>   plt_biom%NonstructElms_pft   , &
     MatureGroup_brch                =>   plt_pheno%MatureGroup_brch , &
     iPlantCalendar_brch             =>   plt_pheno%iPlantCalendar_brch , &
     doInitPlant_pft                 =>   plt_pheno%doInitPlant_pft  , &
     iPlantRootState_pft             =>   plt_pheno%iPlantRootState_pft  , &
-    iPlantPhenolPattern_pft      =>   plt_pheno%iPlantPhenolPattern_pft , &
+    iPlantPhenolPattern_pft         =>   plt_pheno%iPlantPhenolPattern_pft , &
     iPlantBranchState_brch          =>   plt_pheno%iPlantBranchState_brch  , &
     iPlantShootState_pft            =>   plt_pheno%iPlantShootState_pft  , &
     iPlantTurnoverPattern_pft       =>   plt_pheno%iPlantTurnoverPattern_pft , &
@@ -259,9 +259,9 @@ module HfuncsMod
     PSIRootTurg_vr                  =>   plt_ew%PSIRootTurg_vr     , &
     FNOD                            =>   plt_allom%FNOD   , &
     NumRootAxes_pft                 =>   plt_morph%NumRootAxes_pft   , &
-    MainBranchNum_pft             =>   plt_morph%MainBranchNum_pft    , &
+    MainBranchNum_pft               =>   plt_morph%MainBranchNum_pft    , &
     NumOfBranches_pft               =>   plt_morph%NumOfBranches_pft    , &
-    NumCogrowNode         =>   plt_morph%NumCogrowNode  , &
+    NumCogrowNode                   =>   plt_morph%NumCogrowNode  , &
     BranchNumber_pft                =>   plt_morph%BranchNumber_pft    , &
     BranchNumber_brch               =>   plt_morph%BranchNumber_brch   , &
     NGTopRootLayer_pft              =>   plt_morph%NGTopRootLayer_pft    , &
@@ -371,13 +371,13 @@ module HfuncsMod
     LeafPetoNonstElmConc_brch       =>  plt_biom%LeafPetoNonstElmConc_brch   , &
     CanopyNonstructElmConc_pft      =>  plt_biom%CanopyNonstructElmConc_pft   , &
     CanopyNonstructElms_pft         =>  plt_biom%CanopyNonstructElms_pft   , &
-    NodulNonstElm_brch         =>  plt_biom%NodulNonstElm_brch   , &
-    RootMycoNonstElm_pvr         =>  plt_biom%RootMycoNonstElm_pvr   , &
+    NodulNonstElm_brch              =>  plt_biom%NodulNonstElm_brch   , &
+    RootMycoNonstElm_pvr            =>  plt_biom%RootMycoNonstElm_pvr   , &
     NonstructElm_brch               =>  plt_biom%NonstructElm_brch   , &
     RootNonstructElmConc_pvr        =>  plt_biom%RootNonstructElmConc_pvr   , &
     ZEROL                           =>  plt_biom%ZEROL    , &
     ZEROP                           =>  plt_biom%ZEROP    , &
-    RootMycoActiveBiomC_pvr              =>  plt_biom%RootMycoActiveBiomC_pvr   , &
+    RootMycoActiveBiomC_pvr         =>  plt_biom%RootMycoActiveBiomC_pvr   , &
     NoduleNonstructElmnt_pft        =>  plt_biom%NoduleNonstructElmnt_pft   , &
     WatByPCanopy                    =>  plt_ew%WatByPCanopy      , &
     VHeatCapCanP                    =>  plt_ew%VHeatCapCanP      , &
@@ -385,7 +385,7 @@ module HfuncsMod
     iPlantBranchState_brch          =>  plt_pheno%iPlantBranchState_brch   , &
     iPlantCalendar_brch             =>  plt_pheno%iPlantCalendar_brch  , &
     MainBranchNum_pft               =>  plt_morph%MainBranchNum_pft     , &
-    Root1stDepz_pft                   =>  plt_morph%Root1stDepz_pft   , &
+    Root1stDepz_pft                 =>  plt_morph%Root1stDepz_pft   , &
     MY                              =>  plt_morph%MY      , &
     CanopyLeafArea_pft              =>  plt_morph%CanopyLeafArea_pft   , &
     NGTopRootLayer_pft              =>  plt_morph%NGTopRootLayer_pft     , &
