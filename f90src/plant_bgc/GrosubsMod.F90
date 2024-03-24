@@ -77,7 +77,7 @@ module grosubsMod
     MaxNumRootLays          => plt_site%MaxNumRootLays       , &
     CO2NetFix_pft           => plt_bgcr%CO2NetFix_pft     , &
     LitrFallChemElm_pft     => plt_bgcr%LitrFallChemElm_pft    , &
-    LitfalChemElm_pvr     => plt_bgcr%LitfalChemElm_pvr     , &
+    LitfalChemElm_pvr       => plt_bgcr%LitfalChemElm_pvr     , &
     CanopyHeight_pft        => plt_morph%CanopyHeight_pft       &
   )
 !     TOTAL AGB FOR GRAZING IN LANDSCAPE SECTION
@@ -357,13 +357,16 @@ module grosubsMod
 !     WTLFB,WTSHEB,LeafPetolBiomassC_brch=leaf,petiole,leaf+petiole mass
 !     iPlantBranchState_brch=branch living flag: 0=alive,1=dead
 !
+    if(NZ==2)write(233,*)'grwobranchbf',I+J/24.,NZ,plt_biom%StalkRsrveElms_brch(1,1,NZ)
     DO  NB=1,NumOfBranches_pft(NZ)
       call GrowOneBranch(I,J,NB,NZ,TFN6_vr,CanopyHeight_copy,CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW,&
         TFN5,WFNG,Stomata_Activity,WFNS,WFNSG,PTRT,CanopyN2Fix_pft,BegRemoblize)
     ENDDO
 !
+    if(NZ==2)write(233,*)'rootbgcbf',I+J/24.,NZ,plt_biom%StalkRsrveElms_brch(1,1,NZ)
     call RootBGCModel(I,J,NZ,BegRemoblize,ICHK1,NRX,PTRT,TFN6_vr,CNRTW,CPRTW,RootAreaPopu)
 !
+    if(NZ==2)write(233,*)'totbiombf',I+J/24.,NZ,plt_biom%StalkRsrveElms_brch(1,1,NZ)
     call ComputeTotalBiom(NZ,ShootNonstructC_brch)
   ELSE
     PlantRootSoilChemNetX_pft(1:NumPlantChemElms,NZ)=RootExudChemElm_pft(1:NumPlantChemElms,NZ)
@@ -373,11 +376,14 @@ module grosubsMod
       +RootHPO4Uptake_pft(NZ)
   ENDIF
 !
+  if(NZ==2)write(233,*)'rmbymgmtebf',I+J/24.,NZ,plt_biom%StalkRsrveElms_brch(1,1,NZ)
   call RemoveBiomByManagement(I,J,NZ,ShootNonstructC_brch)
 !
 !     RESET DEAD BRANCHES
+  if(NZ==2)write(233,*)'deadresetbf',I+J/24.,NZ,plt_biom%StalkRsrveElms_brch(1,1,NZ)
   call ResetDeadBranch(I,J,NZ,ShootNonstructC_brch)
 !
+  if(NZ==2)write(233,*)'accumbf',I+J/24.,NZ,plt_biom%StalkRsrveElms_brch(1,1,NZ)
   call AccumulateStates(I,J,NZ,CanopyN2Fix_pft)
   end associate
   end subroutine GrowPlant
@@ -585,7 +591,7 @@ module grosubsMod
     LeafChemElms_brch           =>  plt_biom%LeafChemElms_brch    , &
     GrainChemElms_brch          =>  plt_biom%GrainChemElms_brch     , &
     RootMycoNonstElm_pvr        =>  plt_biom%RootMycoNonstElm_pvr     , &
-    PopuPlantRootC_vr           =>  plt_biom% PopuPlantRootC_vr     , &
+    PopuPlantRootC_vr           =>  plt_biom%PopuPlantRootC_vr     , &
     ShootChemElm_brch           =>  plt_biom%ShootChemElm_brch    , &
     EarChemElms_brch            =>  plt_biom%EarChemElms_brch    , &
     StalkChemElms_brch          =>  plt_biom%StalkChemElms_brch    , &
@@ -752,7 +758,7 @@ module grosubsMod
     ReserveChemElms_pft(NE,NZ)=sum(StalkRsrveElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
     if(ReserveChemElms_pft(NE,NZ)>1.e20)then
       print*,I+J/24.,NE,NZ,ReserveChemElms_pft(NE,NZ),NumOfBranches_pft(NZ)
-      print*,StalkRsrveElms_brch(NE,1:NumOfBranches_pft(NZ),NZ)
+      print*,'755',StalkRsrveElms_brch(NE,1,NZ)
       stop
     endif
     HuskChemElms_pft(NE,NZ)=sum(HuskChemElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))

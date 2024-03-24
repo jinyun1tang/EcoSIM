@@ -1789,7 +1789,6 @@ implicit none
             StalkRsrvGradt=TotStalkRsrv_loc(ielmc)*StalkBiomassC_brch(NB,NZ)-StalkRsrveElms_brch(ielmc,NB,NZ)*WTSTKT
             XFRE(ielmc)=0.1_r8*StalkRsrvGradt/WTSTKT            
             StalkRsrveElms_brch(ielmc,NB,NZ)=StalkRsrveElms_brch(ielmc,NB,NZ)+XFRE(ielmc)
-            write(*,*)'1792xStalkRsrveElms_brch(ielmc,NB,NZ)',NB,NZ,StalkRsrveElms_brch(ielmc,NB,NZ),XFRE(ielmc)
             !based on stoichiometry gradient
             DO NE=2,NumPlantChemElms
               StalkRsrvGradt=TotStalkRsrv_loc(NE)*StalkRsrveElms_brch(ielmc,NB,NZ) &
