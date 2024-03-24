@@ -148,10 +148,10 @@ module grosubsMod
     CO2ByFire_pft                  => plt_distb%CO2ByFire_pft   , &
     NH3byFire_pft                  => plt_distb%NH3byFire_pft   , &
     StandingDeadKCompChemElms_pft  => plt_biom%StandingDeadKCompChemElms_pft   , &
-    RootElms_pft                 => plt_biom%RootElms_pft    , &
+    RootElms_pft                   => plt_biom%RootElms_pft    , &
     ShootChemElms_pft              => plt_biom%ShootChemElms_pft  , &
     NoduleChemElms_pft             => plt_biom%NoduleChemElms_pft    , &
-    NonstructElms_pft            => plt_biom%NonstructElms_pft    , &
+    NonstructElms_pft              => plt_biom%NonstructElms_pft    , &
     StandingDeadChemElms_pft       => plt_biom%StandingDeadChemElms_pft   , &
     fTgrowCanP                     => plt_pheno%fTgrowCanP    , &
     NetCumElmntFlx2Plant_pft       => plt_pheno%NetCumElmntFlx2Plant_pft   , &
@@ -166,7 +166,7 @@ module grosubsMod
     NP0                            => plt_site%NP0      , &
     MaxNumRootLays                 => plt_site%MaxNumRootLays       , &
     iYearCurrent                   => plt_site%iYearCurrent     , &
-    LitfalChemElm_pvr            => plt_bgcr%LitfalChemElm_pvr     , &
+    LitfalChemElm_pvr              => plt_bgcr%LitfalChemElm_pvr     , &
     NetPrimaryProductvity_pft      => plt_bgcr%NetPrimaryProductvity_pft     , &
     PlantN2FixCum_pft              => plt_bgcr%PlantN2FixCum_pft   , &
     LitrFallChemElm_pft            => plt_bgcr%LitrFallChemElm_pft    , &
@@ -203,8 +203,9 @@ module grosubsMod
 !     WTSTG,WTSTDN,WTSTDP=standing dead C,N,P mass
 !     CSNC,ZSNC,PSNC=C,N,P LitrFall
 !
-    DO NE=1,NumPlantChemElms
-      D6235: DO M=1,jsken
+    
+    D6235: DO M=1,jsken
+      DO NE=1,NumPlantChemElms
         XFRE=1.5814E-05_r8*fTgrowCanP(NZ)*StandingDeadKCompChemElms_pft(NE,M,NZ)
         IF(iPlantTurnoverPattern_pft(NZ).EQ.0.OR.iPlantRootProfile_pft(NZ).LE.1)THEN
           LitfalChemElm_pvr(NE,M,k_fine_litr,0,NZ)=LitfalChemElm_pvr(NE,M,k_fine_litr,0,NZ)+XFRE
@@ -212,8 +213,8 @@ module grosubsMod
           LitfalChemElm_pvr(NE,M,k_woody_litr,0,NZ)=LitfalChemElm_pvr(NE,M,k_woody_litr,0,NZ)+XFRE
         ENDIF
         StandingDeadKCompChemElms_pft(NE,M,NZ)=StandingDeadKCompChemElms_pft(NE,M,NZ)-XFRE
-      ENDDO D6235
-    ENDDO
+      ENDDO
+    ENDDO D6235
 !
 !     ACCUMULATE TOTAL SURFACE, SUBSURFACE LitrFall
 !
@@ -221,17 +222,24 @@ module grosubsMod
 !     TCSNC,TZSNC,TPSNC=cumulative C,N,P LitrFall
 !     HCSNC,HZSNC,HPSNC=hourly C,N,P LitrFall
 !
-    DO K=1,pltpar%NumOfPlantLitrCmplxs
-      DO NE=1,NumPlantChemElms
-        D6430: DO M=1,jsken
+    DO K=1,pltpar%NumOfPlantLitrCmplxs      
+      D6431: DO M=1,jsken
+        DO NE=1,NumPlantChemElms
           SurfLitrfallChemElms_pft(NE,NZ)=SurfLitrfallChemElms_pft(NE,NZ)+LitfalChemElm_pvr(NE,M,K,0,NZ)
-          D8955: DO L=0,MaxNumRootLays
+        ENDDO
+      ENDDO D6431  
+    ENDDO
+
+    D8955: DO L=0,MaxNumRootLays
+      DO K=1,pltpar%NumOfPlantLitrCmplxs      
+        D6430: DO M=1,jsken
+          DO NE=1,NumPlantChemElms
             LitrFallChemElm_pft(NE,NZ)=LitrFallChemElm_pft(NE,NZ)+LitfalChemElm_pvr(NE,M,K,L,NZ)
             LitrfallChemElms_pft(NE,NZ)=LitrfallChemElms_pft(NE,NZ)+LitfalChemElm_pvr(NE,M,K,L,NZ)
-          ENDDO D8955
-        ENDDO D6430
-      enddo
-    ENDDO
+          enddo         
+        ENDDO D6430      
+      ENDDO
+    ENDDO D8955    
 !
 !     TOTAL STANDING DEAD
 !
@@ -337,9 +345,10 @@ module grosubsMod
     NumOfBranches_pft         => plt_morph%NumOfBranches_pft         , &
     NumRootAxes_pft           => plt_morph%NumRootAxes_pft          &
   )
-  IF(iPlantShootState_pft(NZ).EQ.iLive.OR.iPlantRootState_pft(NZ).EQ.iLive)THEN
+  IF(iPlantShootState_pft(NZ).EQ.iLive .OR. iPlantRootState_pft(NZ).EQ.iLive)THEN
     CanopyN2Fix_pft(NZ)=0._r8
     BegRemoblize = 0
+    
     call StagePlantForGrowth(I,J,NZ,ICHK1,NRX,TFN6_vr,CNLFW,CPLFW,&
       CNSHW,CPSHW,CNRTW,CPRTW,RootAreaPopu,TFN5,WFNG,Stomata_Activity,WFNS,WFNSG)
 !
@@ -401,12 +410,12 @@ module grosubsMod
     RootProteinC_pvr          =>  plt_biom%RootProteinC_pvr     , &
     RootBiomCPerPlant_pft     =>  plt_biom%RootBiomCPerPlant_pft     , &
     StalkChemElms_pft         =>  plt_biom%StalkChemElms_pft    , &
-    RootElms_pft            =>  plt_biom%RootElms_pft     , &
+    RootElms_pft              =>  plt_biom%RootElms_pft     , &
     CanopyLeafCLyr_pft        =>  plt_biom%CanopyLeafCLyr_pft     , &
     iPlantTurnoverPattern_pft =>  plt_pheno%iPlantTurnoverPattern_pft   , &
     iPlantRootProfile_pft     =>  plt_pheno%iPlantRootProfile_pft   , &
     RCO2A_pvr                 =>  plt_rbgc%RCO2A_pvr     , &
-    RootRespPotent_pvr      =>  plt_rbgc%RootRespPotent_pvr     , &
+    RootRespPotent_pvr        =>  plt_rbgc%RootRespPotent_pvr     , &
     RCO2N_pvr                 =>  plt_rbgc%RCO2N_pvr     , &
     RootrNC_pft               =>  plt_allom%RootrNC_pft    , &
     RootrPC_pft               =>  plt_allom%RootrPC_pft    , &
@@ -424,8 +433,8 @@ module grosubsMod
     k_fine_litr               =>  pltpar%k_fine_litr,&
     k_woody_litr              =>  pltpar%k_woody_litr,&
     RCS                       =>  plt_photo%RCS      , &
-    Root1stXNumL_pvr         =>  plt_morph%Root1stXNumL_pvr    , &
-    Root2ndXNum_pvr         =>  plt_morph%Root2ndXNum_pvr     , &
+    Root1stXNumL_pvr          =>  plt_morph%Root1stXNumL_pvr    , &
+    Root2ndXNum_pvr           =>  plt_morph%Root2ndXNum_pvr     , &
     MY                        =>  plt_morph%MY       , &
     CanopyLeafALyr_pft        =>  plt_morph%CanopyLeafALyr_pft    , &
     CanopyStemApft_lyr        =>  plt_morph%CanopyStemApft_lyr    , &
@@ -575,7 +584,7 @@ module grosubsMod
   associate(                                 &
     LeafChemElms_brch           =>  plt_biom%LeafChemElms_brch    , &
     GrainChemElms_brch          =>  plt_biom%GrainChemElms_brch     , &
-    RootMycoNonstElm_pvr     =>  plt_biom%RootMycoNonstElm_pvr     , &
+    RootMycoNonstElm_pvr        =>  plt_biom%RootMycoNonstElm_pvr     , &
     PopuPlantRootC_vr           =>  plt_biom% PopuPlantRootC_vr     , &
     ShootChemElm_brch           =>  plt_biom%ShootChemElm_brch    , &
     EarChemElms_brch            =>  plt_biom%EarChemElms_brch    , &
@@ -660,12 +669,12 @@ module grosubsMod
 !     begin_execution
   associate(                            &
     NonstructElm_brch            =>  plt_biom%NonstructElm_brch  , &
-    RootMycoNonstElm_pvr      =>  plt_biom%RootMycoNonstElm_pvr  , &
-    NodulNonstElm_brch      =>  plt_biom%NodulNonstElm_brch  , &
+    RootMycoNonstElm_pvr         =>  plt_biom%RootMycoNonstElm_pvr  , &
+    NodulNonstElm_brch           =>  plt_biom%NodulNonstElm_brch  , &
     NoduleChemElms_pft           =>  plt_biom%NoduleChemElms_pft   , &
     RootStructElmnt_pft          =>  plt_biom%RootStructElmnt_pft  , &
-    RootElms_pft               =>  plt_biom%RootElms_pft   , &
-    CanopyNodulChemElm_brch     =>  plt_biom%CanopyNodulChemElm_brch  , &
+    RootElms_pft                 =>  plt_biom%RootElms_pft   , &
+    CanopyNodulChemElm_brch      =>  plt_biom%CanopyNodulChemElm_brch  , &
     ShootChemElm_brch            =>  plt_biom%ShootChemElm_brch , &
     StalkChemElms_brch           =>  plt_biom%StalkChemElms_brch , &
     HuskChemElms_brch            =>  plt_biom%HuskChemElms_brch , &
@@ -686,12 +695,12 @@ module grosubsMod
     EarChemElms_pft              =>  plt_biom%EarChemElms_pft  , &
     GrainChemElms_pft            =>  plt_biom%GrainChemElms_pft   , &
     CanopyLeafShethC_pft         =>  plt_biom%CanopyLeafShethC_pft    , &
-    RootNodulElm_pvr         =>  plt_biom%RootNodulElm_pvr  , &
+    RootNodulElm_pvr             =>  plt_biom%RootNodulElm_pvr  , &
     CanopyNonstructElms_pft      =>  plt_biom%CanopyNonstructElms_pft  , &
     NoduleNonstructElmnt_pft     =>  plt_biom%NoduleNonstructElmnt_pft  , &
-    Root1stStructElm_rpvr     =>  plt_biom%Root1stStructElm_rpvr  , &
-    Root2ndStructElm_pvr     =>  plt_biom%Root2ndStructElm_pvr  , &
-    RootNodulNonstElm_pvr  =>  plt_biom%RootNodulNonstElm_pvr , &
+    Root1stStructElm_rpvr        =>  plt_biom%Root1stStructElm_rpvr  , &
+    Root2ndStructElm_pvr         =>  plt_biom%Root2ndStructElm_pvr  , &
+    RootNodulNonstElm_pvr        =>  plt_biom%RootNodulNonstElm_pvr , &
     PlantN2FixCum_pft            =>  plt_bgcr%PlantN2FixCum_pft  , &
     PlantExudChemElmCum_pft      =>  plt_rbgc%PlantExudChemElmCum_pft  , &
     RootHPO4Uptake_pft           =>  plt_rbgc%RootHPO4Uptake_pft   , &
@@ -741,6 +750,11 @@ module grosubsMod
     StalkChemElms_pft(NE,NZ)=sum(StalkChemElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
     LeafChemElms_pft(NE,NZ)=sum(LeafChemElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
     ReserveChemElms_pft(NE,NZ)=sum(StalkRsrveElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
+    if(ReserveChemElms_pft(NE,NZ)>1.e20)then
+      print*,I+J/24.,NE,NZ,ReserveChemElms_pft(NE,NZ),NumOfBranches_pft(NZ)
+      print*,StalkRsrveElms_brch(NE,1:NumOfBranches_pft(NZ),NZ)
+      stop
+    endif
     HuskChemElms_pft(NE,NZ)=sum(HuskChemElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
     GrainChemElms_pft(NE,NZ)=sum(GrainChemElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
     EarChemElms_pft(NE,NZ)=sum(EarChemElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))

@@ -637,11 +637,13 @@ module NoduleBGCMod
 !     CZKM,CPKM=Km for nonstructural N,P uptake by bacteria
 !
         NodulUseNonstElm_rvr(ielmc)=AMIN1(RootNodulNonstElm_pvr(ielmc,L,NZ)-AMIN1(Rmaint,RespNonst_Oltd) &
-          -Rauto4Nfix_brch+NodulElmDecayRecyc(ielmc),(RGNDL-Rauto4Nfix_brch)/(1.0_r8-NoduGrowthYield_pft(NZ)))
+          -Rauto4Nfix_rvr+NodulElmDecayRecyc(ielmc),(RGNDL-Rauto4Nfix_rvr)/(1.0_r8-NoduGrowthYield_pft(NZ)))
         NoduleBiomCGrowth=NodulUseNonstElm_rvr(ielmc)*NoduGrowthYield_pft(NZ)
-        NoduleCResp=Rauto4Nfix_brch+NodulUseNonstElm_rvr(ielmc)*(1.0_r8-NoduGrowthYield_pft(NZ))
-        NodulUseNonstElm_rvr(ielmn)=AZMAX1(AMIN1(RootNodulNonstElm_pvr(ielmn,L,NZ),NoduleBiomCGrowth*NodulerNC_pft(NZ)))*NodulNonstElmConc(ielmn)/(NodulNonstElmConc(ielmn)+CZKM)
-        NodulUseNonstElm_rvr(ielmp)=AZMAX1(AMIN1(RootNodulNonstElm_pvr(ielmp,L,NZ),NoduleBiomCGrowth*NodulerPC_pft(NZ)))*NodulNonstElmConc(ielmp)/(NodulNonstElmConc(ielmp)+CPKM)
+        NoduleCResp=Rauto4Nfix_rvr+NodulUseNonstElm_rvr(ielmc)*(1.0_r8-NoduGrowthYield_pft(NZ))
+        NodulUseNonstElm_rvr(ielmn)=AZMAX1(AMIN1(RootNodulNonstElm_pvr(ielmn,L,NZ),NoduleBiomCGrowth*NodulerNC_pft(NZ)))&
+          *NodulNonstElmConc(ielmn)/(NodulNonstElmConc(ielmn)+CZKM)
+        NodulUseNonstElm_rvr(ielmp)=AZMAX1(AMIN1(RootNodulNonstElm_pvr(ielmp,L,NZ),NoduleBiomCGrowth*NodulerPC_pft(NZ)))&
+          *NodulNonstElmConc(ielmp)/(NodulNonstElmConc(ielmp)+CPKM)
 !
 !     NODULE SENESCENCE
 !
@@ -652,7 +654,7 @@ module NoduleBGCMod
 !     NodulELmSenes2Litr(ielmc),NodulELmSenes2Litr(ielmc),NodulELmSenes2Litr(ielmp)=bacterial C,N,P senescence to LitrFall
 !     NodulELmSenes2Recyc(ielmc),NodulELmSenes2Recyc(ielmc),NodulELmSenes2Recyc(ielmp)=bacterial C,N,P senescence to recycling
 !
-        IF(RSNDL.GT.0.0_r8.AND.RootNodulElm_pvr(ielmc,L,NZ).GT.ZEROP(NZ).AND.RCCC.GT.ZERO)THEN
+        IF(RSNDL.GT.0.0_r8 .AND. RootNodulElm_pvr(ielmc,L,NZ).GT.ZEROP(NZ) .AND. RCCC.GT.ZERO)THEN
           NodulELmLoss2Senes(ielmc)=RSNDL/RCCC
           NodulELmLoss2Senes(ielmn)=NodulELmLoss2Senes(ielmc)*RootNodulElm_pvr(ielmn,L,NZ)/RootNodulElm_pvr(ielmc,L,NZ)
           NodulELmLoss2Senes(ielmp)=NodulELmLoss2Senes(ielmc)*RootNodulElm_pvr(ielmp,L,NZ)/RootNodulElm_pvr(ielmc,L,NZ)

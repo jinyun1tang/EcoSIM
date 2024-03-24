@@ -372,7 +372,8 @@ implicit none
       NodeNum2InitFloral_brch(NB,NZ,NY,NX) =plt_morph%NodeNum2InitFloral_brch(NB,NZ)
       NodeNumberAtAnthesis_brch(NB,NZ,NY,NX) =plt_morph%NodeNumberAtAnthesis_brch(NB,NZ)
       LeafElmntRemobFlx_brch(1:NumPlantChemElms,NB,NZ,NY,NX) =plt_pheno%LeafElmntRemobFlx_brch(1:NumPlantChemElms,NB,NZ)
-      PetioleChemElmRemobFlx_brch(1:NumPlantChemElms,NB,NZ,NY,NX) =plt_pheno%PetioleChemElmRemobFlx_brch(1:NumPlantChemElms,NB,NZ)
+      PetioleChemElmRemobFlx_brch(1:NumPlantChemElms,NB,NZ,NY,NX) =&
+        plt_pheno%PetioleChemElmRemobFlx_brch(1:NumPlantChemElms,NB,NZ)
       NH3Dep2_brch(NB,NZ,NY,NX) =plt_rbgc%NH3Dep2_brch(NB,NZ)
       TotalNodeNumNormByMatgrp_brch(NB,NZ,NY,NX)=plt_pheno%TotalNodeNumNormByMatgrp_brch(NB,NZ)
       TotReproNodeNumNormByMatrgrp_brch(NB,NZ,NY,NX)=plt_pheno%TotReproNodeNumNormByMatrgrp_brch(NB,NZ)
@@ -407,7 +408,8 @@ implicit none
       DO K=0,MaxNodesPerBranch
         DO  L=1,NumOfCanopyLayers
           CanopyLeafAreaByLayer_pft(L,K,NB,NZ,NY,NX) =plt_morph%CanopyLeafAreaByLayer_pft(L,K,NB,NZ)
-          LeafChemElmByLayerNode_brch(1:NumPlantChemElms,L,K,NB,NZ,NY,NX) =plt_biom%LeafChemElmByLayerNode_brch(1:NumPlantChemElms,L,K,NB,NZ)
+          LeafChemElmByLayerNode_brch(1:NumPlantChemElms,L,K,NB,NZ,NY,NX) =&
+            plt_biom%LeafChemElmByLayerNode_brch(1:NumPlantChemElms,L,K,NB,NZ)
         ENDDO
       ENDDO
       DO M=1,pltpar%NumGrowthStages
@@ -437,7 +439,8 @@ implicit none
       ENDDO
     ENDDO
     DO M=1,jsken
-      StandingDeadKCompChemElms_pft(1:NumPlantChemElms,M,NZ,NY,NX)=plt_biom%StandingDeadKCompChemElms_pft(1:NumPlantChemElms,M,NZ)
+      StandingDeadKCompChemElms_pft(1:NumPlantChemElms,M,NZ,NY,NX)=&
+        plt_biom%StandingDeadKCompChemElms_pft(1:NumPlantChemElms,M,NZ)
     ENDDO
 
     DO  L=1,NL(NY,NX)
@@ -533,8 +536,10 @@ implicit none
       ENDDO
       DO L=1,NL(NY,NX)
         DO N=1,MY(NZ,NY,NX)
-          Root1stStructElm_rpvr(1:NumPlantChemElms,N,L,NR,NZ,NY,NX) =plt_biom%Root1stStructElm_rpvr(1:NumPlantChemElms,N,L,NR,NZ)
-          Root2ndStructElm_pvr(1:NumPlantChemElms,N,L,NR,NZ,NY,NX) =plt_biom%Root2ndStructElm_pvr(1:NumPlantChemElms,N,L,NR,NZ)
+          Root1stStructElm_rpvr(1:NumPlantChemElms,N,L,NR,NZ,NY,NX) =&
+            plt_biom%Root1stStructElm_rpvr(1:NumPlantChemElms,N,L,NR,NZ)
+          Root2ndStructElm_pvr(1:NumPlantChemElms,N,L,NR,NZ,NY,NX) =&
+            plt_biom%Root2ndStructElm_pvr(1:NumPlantChemElms,N,L,NR,NZ)
           Root1stLen_rpvr(N,L,NR,NZ,NY,NX) =plt_morph%Root1stLen_rpvr(N,L,NR,NZ)
           Root2ndLen_pvr(N,L,NR,NZ,NY,NX) =plt_morph%Root2ndLen_pvr(N,L,NR,NZ)
           Root2ndXNum_rpvr(N,L,NR,NZ,NY,NX)  =plt_morph%Root2ndXNum_rpvr(N,L,NR,NZ)
@@ -1241,7 +1246,8 @@ implicit none
       DO K=0,MaxNodesPerBranch
         DO  L=1,NumOfCanopyLayers
           plt_morph%CanopyLeafAreaByLayer_pft(L,K,NB,NZ)=CanopyLeafAreaByLayer_pft(L,K,NB,NZ,NY,NX)
-          plt_biom%LeafChemElmByLayerNode_brch(1:NumPlantChemElms,L,K,NB,NZ) =LeafChemElmByLayerNode_brch(1:NumPlantChemElms,L,K,NB,NZ,NY,NX)
+          plt_biom%LeafChemElmByLayerNode_brch(1:NumPlantChemElms,L,K,NB,NZ) =&
+            LeafChemElmByLayerNode_brch(1:NumPlantChemElms,L,K,NB,NZ,NY,NX)
         ENDDO
       ENDDO
       DO  L=1,NumOfCanopyLayers
@@ -1356,8 +1362,10 @@ implicit none
           plt_morph%Root1stLen_rpvr(N,L,NR,NZ)=Root1stLen_rpvr(N,L,NR,NZ,NY,NX)
           plt_morph%Root2ndLen_pvr(N,L,NR,NZ)=Root2ndLen_pvr(N,L,NR,NZ,NY,NX)
           plt_morph%Root2ndXNum_rpvr(N,L,NR,NZ) =Root2ndXNum_rpvr(N,L,NR,NZ,NY,NX)
-          plt_biom%Root2ndStructElm_pvr(1:NumPlantChemElms,N,L,NR,NZ) =Root2ndStructElm_pvr(1:NumPlantChemElms,N,L,NR,NZ,NY,NX)
-          plt_biom%Root1stStructElm_rpvr(1:NumPlantChemElms,N,L,NR,NZ) =Root1stStructElm_rpvr(1:NumPlantChemElms,N,L,NR,NZ,NY,NX)
+          plt_biom%Root2ndStructElm_pvr(1:NumPlantChemElms,N,L,NR,NZ) =&
+            Root2ndStructElm_pvr(1:NumPlantChemElms,N,L,NR,NZ,NY,NX)
+          plt_biom%Root1stStructElm_rpvr(1:NumPlantChemElms,N,L,NR,NZ) =&
+            Root1stStructElm_rpvr(1:NumPlantChemElms,N,L,NR,NZ,NY,NX)
         enddo
       enddo
       DO N=1,MY(NZ,NY,NX)

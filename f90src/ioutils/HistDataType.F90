@@ -1674,6 +1674,10 @@ implicit none
         this%h1D_Petiole_C_ptc(nptc)       = PetioleChemElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_STALK_C_ptc(nptc)      = StalkChemElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_RESERVE_C_ptc(nptc)    = ReserveChemElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        if(abs(this%h1D_RESERVE_C_ptc(nptc))>1.e20)then
+          print*,this%h1D_RESERVE_C_ptc(nptc)
+          stop
+        endif
         this%h1D_HUSK_C_ptc(nptc)       = (HuskChemElms_pft(ielmc,NZ,NY,NX) &
           +EarChemElms_pft(ielmc,NZ,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_GRAIN_C_ptc(nptc)      = GrainChemElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -1703,12 +1707,14 @@ implicit none
         this%h1D_WTR_STRESS_ptc(nptc)   = HoursCanopyPSITooLow(NZ,NY,NX)
         this%h1D_OXY_STRESS_ptc(nptc)   = PlantO2Stress(NZ,NY,NX)
         this%h1D_SHOOT_N_ptc(nptc)      = ShootChemElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_Plant_N_ptc(nptc)      = (ShootChemElms_pft(ielmn,NZ,NY,NX)+RootElms_pft(ielmn,NZ,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_Plant_N_ptc(nptc)      = (ShootChemElms_pft(ielmn,NZ,NY,NX)&
+          +RootElms_pft(ielmn,NZ,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_LEAF_N_ptc(nptc)       = LeafChemElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_Petiole_N_ptc(nptc)   = PetioleChemElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_STALK_N_ptc(nptc)      = StalkChemElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_RESERVE_N_ptc(nptc)    = ReserveChemElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_HUSK_N_ptc(nptc)       = (HuskChemElms_pft(ielmn,NZ,NY,NX)+EarChemElms_pft(ielmn,NZ,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_HUSK_N_ptc(nptc)       = (HuskChemElms_pft(ielmn,NZ,NY,NX) &
+          +EarChemElms_pft(ielmn,NZ,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_GRAIN_N_ptc(nptc)      = GrainChemElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_ROOT_N_ptc(nptc)       = RootElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_NODULE_N_ptc(nptc)     = NoduleChemElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -1721,12 +1727,14 @@ implicit none
         this%h1D_FIREp_N_FLX_ptc(nptc)       = NH3byFire_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_SURF_LITRf_N_FLX_ptc(nptc)  = SurfLitrfallChemElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_SHOOT_P_ptc(nptc)      = ShootChemElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_Plant_P_ptc(nptc)      = (ShootChemElms_pft(ielmp,NZ,NY,NX)+RootElms_pft(ielmp,NZ,NY,NX))/AREA(3,NU(NY,NX),NY,NX)        
+        this%h1D_Plant_P_ptc(nptc)      = (ShootChemElms_pft(ielmp,NZ,NY,NX) &
+          +RootElms_pft(ielmp,NZ,NY,NX))/AREA(3,NU(NY,NX),NY,NX)        
         this%h1D_LEAF_P_ptc(nptc)       = LeafChemElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_Petiole_P_ptc(nptc)    = PetioleChemElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_STALK_P_ptc(nptc)      = StalkChemElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_RESERVE_P_ptc(nptc)    = ReserveChemElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_HUSK_P_ptc(nptc)       = (HuskChemElms_pft(ielmp,NZ,NY,NX)+EarChemElms_pft(ielmp,NZ,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_HUSK_P_ptc(nptc)       = (HuskChemElms_pft(ielmp,NZ,NY,NX) &
+          +EarChemElms_pft(ielmp,NZ,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_GRAIN_P_ptc(nptc)      = GrainChemElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_ROOT_P_ptc(nptc)       = RootElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_NODULE_P_ptc(nptc)     = NoduleChemElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
