@@ -531,7 +531,7 @@ module StartqMod
   PetoleChemElm_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)=0._r8
   StalkChemElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)=0._r8
   LeafChemElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)=0._r8
-  StalkRsrveElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)=0._r8
+  StalkRsrvElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)=0._r8
   HuskChemElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)=0._r8
   GrainChemElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)=0._r8
   EarChemElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)=0._r8
@@ -546,7 +546,7 @@ module StartqMod
     StalkBiomassC_brch(NB,NZ,NY,NX)=0._r8
     LeafPetolBiomassC_brch(NB,NZ,NY,NX)=0._r8
     PotentialSeedSites_brch(NB,NZ,NY,NX)=0._r8
-    SeedNumberSet_brch(NB,NZ,NY,NX)=0._r8
+    SeedNumSet_brch(NB,NZ,NY,NX)=0._r8
     GrainSeedBiomCMean_brch(NB,NZ,NY,NX)=0._r8
     LeafAreaLive_brch(NB,NZ,NY,NX)=0._r8
     NH3Dep2_brch(NB,NZ,NY,NX)=0._r8
@@ -602,12 +602,12 @@ module StartqMod
   PetioleChemElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
   StalkChemElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
   CanopyStalkC_pft(NZ,NY,NX)=0._r8
-  ReserveChemElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
+  StalkRsrvElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
   HuskChemElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
   EarChemElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
   GrainChemElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
   RootElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
-  RootStructElmnt_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
+  RootStructElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
   NoduleChemElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
   CanopyLeafShethC_pft(NZ,NY,NX)=0._r8
 
@@ -652,15 +652,15 @@ module StartqMod
     StandingDeadChemElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
     WTSTDX=StandingDeadInitC_pft(NZ,NY,NX)*AREA(3,NU(NY,NX),NY,NX)
     D155: DO M=1,jskenc
-      StandingDeadKCompChemElms_pft(ielmc,M,NZ,NY,NX)=WTSTDX*CFOPE(ielmc,icwood,M,NZ,NY,NX)
-      StandingDeadKCompChemElms_pft(ielmn,M,NZ,NY,NX)=WTSTDX*rNCStalk_pft(NZ,NY,NX)*CFOPE(ielmn,icwood,M,NZ,NY,NX)
-      StandingDeadKCompChemElms_pft(ielmp,M,NZ,NY,NX)=WTSTDX*rPCStalk_pft(NZ,NY,NX)*CFOPE(ielmp,icwood,M,NZ,NY,NX)
+      StandDeadKCompElms_pft(ielmc,M,NZ,NY,NX)=WTSTDX*CFOPE(ielmc,icwood,M,NZ,NY,NX)
+      StandDeadKCompElms_pft(ielmn,M,NZ,NY,NX)=WTSTDX*rNCStalk_pft(NZ,NY,NX)*CFOPE(ielmn,icwood,M,NZ,NY,NX)
+      StandDeadKCompElms_pft(ielmp,M,NZ,NY,NX)=WTSTDX*rPCStalk_pft(NZ,NY,NX)*CFOPE(ielmp,icwood,M,NZ,NY,NX)
       StandingDeadChemElms_pft(ielmc,NZ,NY,NX)=StandingDeadChemElms_pft(ielmc,NZ,NY,NX) &
-        +StandingDeadKCompChemElms_pft(ielmc,M,NZ,NY,NX)
+        +StandDeadKCompElms_pft(ielmc,M,NZ,NY,NX)
       StandingDeadChemElms_pft(ielmn,NZ,NY,NX)=StandingDeadChemElms_pft(ielmn,NZ,NY,NX) &
-        +StandingDeadKCompChemElms_pft(ielmn,M,NZ,NY,NX)
+        +StandDeadKCompElms_pft(ielmn,M,NZ,NY,NX)
       StandingDeadChemElms_pft(ielmp,NZ,NY,NX)=StandingDeadChemElms_pft(ielmp,NZ,NY,NX) &
-        +StandingDeadKCompChemElms_pft(ielmp,M,NZ,NY,NX)
+        +StandDeadKCompElms_pft(ielmp,M,NZ,NY,NX)
     ENDDO D155
   ENDIF
   end associate

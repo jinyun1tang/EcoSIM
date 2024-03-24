@@ -110,7 +110,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  PetioleChemElms_pft(:,:,:,:)                    !canopy sheath element , [g d-2]
   real(r8),target,allocatable ::  StalkChemElms_pft(:,:,:,:)                    !canopy stalk element, [g d-2]
   real(r8),target,allocatable ::  CanopyStalkC_pft(:,:,:)                       !canopy active stalk C, [g d-2]
-  real(r8),target,allocatable ::  ReserveChemElms_pft(:,:,:,:)                    !canopy reserve element, [g d-2]
+  real(r8),target,allocatable ::  StalkRsrvElms_pft(:,:,:,:)                    !canopy reserve element, [g d-2]
   real(r8),target,allocatable ::  HuskChemElms_pft(:,:,:,:)                    !canopy husk element, [g d-2]
   real(r8),target,allocatable ::  EarChemElms_pft(:,:,:,:)                    !canopy ear element, [g d-2]
   real(r8),target,allocatable ::  GrainChemElms_pft(:,:,:,:)                     !canopy grain element, [g d-2]
@@ -129,7 +129,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  LeafChemElms_brch(:,:,:,:,:)                  !branch leaf element, [g d-2]
   real(r8),target,allocatable ::  PetoleChemElm_brch(:,:,:,:,:)                 !branch sheath element , [g d-2]
   real(r8),target,allocatable ::  StalkChemElms_brch(:,:,:,:,:)                  !branch stalk element, [g d-2]
-  real(r8),target,allocatable ::  StalkRsrveElms_brch(:,:,:,:,:)                  !branch reserve element, [g d-2]
+  real(r8),target,allocatable ::  StalkRsrvElms_brch(:,:,:,:,:)                  !branch reserve element, [g d-2]
   real(r8),target,allocatable ::  HuskChemElms_brch(:,:,:,:,:)                  !branch husk element, [g d-2]
   real(r8),target,allocatable ::  EarChemElms_brch(:,:,:,:,:)                 !branch ear element, [g d-2]
   real(r8),target,allocatable ::  GrainChemElms_brch(:,:,:,:,:)                  !branch grain element, [g d-2]
@@ -148,7 +148,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  PetioleProteinCNode_brch(:,:,:,:,:)                   !layer sheath protein C, [g d-2]
   real(r8),target,allocatable ::  NoduleNonstructCconc_pft(:,:,:)                      !nodule nonstructural C, [g d-2]
   real(r8),target,allocatable ::  GrainSeedBiomCMean_brch(:,:,:,:)                     !maximum grain C during grain fill, [g d-2]
-  real(r8),target,allocatable ::  StandingDeadKCompChemElms_pft(:,:,:,:,:)                  !standing dead element fraction, [g d-2]
+  real(r8),target,allocatable ::  StandDeadKCompElms_pft(:,:,:,:,:)                  !standing dead element fraction, [g d-2]
   real(r8),target,allocatable ::  StandingDeadChemElms_pft(:,:,:,:)                    !standing dead element, [g d-2]
   real(r8),target,allocatable ::  NonstructElms_pft(:,:,:,:)                     !plant stored nonstructural element, [g d-2]
   real(r8),target,allocatable ::  SeedCPlanted_pft(:,:,:)                       !plant stored nonstructural C at planting, [g d-2]
@@ -259,7 +259,7 @@ module CanopyDataType
   allocate(PetioleChemElms_pft(NumPlantChemElms,JP,JY,JX)); PetioleChemElms_pft=0._r8
   allocate(StalkChemElms_pft(NumPlantChemElms,JP,JY,JX)); StalkChemElms_pft=0._r8
   allocate(CanopyStalkC_pft(JP,JY,JX));    CanopyStalkC_pft=0._r8
-  allocate(ReserveChemElms_pft(NumPlantChemElms,JP,JY,JX));    ReserveChemElms_pft=0._r8
+  allocate(StalkRsrvElms_pft(NumPlantChemElms,JP,JY,JX));    StalkRsrvElms_pft=0._r8
   allocate(HuskChemElms_pft(NumPlantChemElms,JP,JY,JX));    HuskChemElms_pft=0._r8
   allocate(EarChemElms_pft(NumPlantChemElms,JP,JY,JX));    EarChemElms_pft=0._r8
   allocate(GrainChemElms_pft(NumPlantChemElms,JP,JY,JX));     GrainChemElms_pft=0._r8
@@ -278,7 +278,7 @@ module CanopyDataType
   allocate(LeafChemElms_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX)); LeafChemElms_brch=0._r8
   allocate(PetoleChemElm_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX));PetoleChemElm_brch=0._r8
   allocate(StalkChemElms_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX));StalkChemElms_brch=0._r8
-  allocate(StalkRsrveElms_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX));StalkRsrveElms_brch=0._r8
+  allocate(StalkRsrvElms_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX));StalkRsrvElms_brch=0._r8
   allocate(HuskChemElms_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX));HuskChemElms_brch=0._r8
   allocate(EarChemElms_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX));EarChemElms_brch=0._r8
   allocate(GrainChemElms_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX)); GrainChemElms_brch=0._r8
@@ -297,7 +297,7 @@ module CanopyDataType
   allocate(PetioleProteinCNode_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));PetioleProteinCNode_brch=0._r8
   allocate(NoduleNonstructCconc_pft(JP,JY,JX));   NoduleNonstructCconc_pft=0._r8
   allocate(GrainSeedBiomCMean_brch(MaxNumBranches,JP,JY,JX)); GrainSeedBiomCMean_brch=0._r8
-  allocate(StandingDeadKCompChemElms_pft(NumPlantChemElms,jsken,JP,JY,JX)); StandingDeadKCompChemElms_pft=0._r8
+  allocate(StandDeadKCompElms_pft(NumPlantChemElms,jsken,JP,JY,JX)); StandDeadKCompElms_pft=0._r8
   allocate(StandingDeadChemElms_pft(NumPlantChemElms,JP,JY,JX));    StandingDeadChemElms_pft=0._r8
   allocate(NonstructElms_pft(NumPlantChemElms,JP,JY,JX));  NonstructElms_pft=0._r8
   allocate(SeedCPlanted_pft(JP,JY,JX));    SeedCPlanted_pft=0._r8
@@ -409,7 +409,7 @@ module CanopyDataType
   call destroy(PetioleChemElms_pft)
   call destroy(StalkChemElms_pft)
   call destroy(CanopyStalkC_pft)
-  call destroy(ReserveChemElms_pft)
+  call destroy(StalkRsrvElms_pft)
   call destroy(HuskChemElms_pft)
   call destroy(EarChemElms_pft)
   call destroy(GrainChemElms_pft)
@@ -428,7 +428,7 @@ module CanopyDataType
   call destroy(LeafChemElms_brch)
   call destroy(PetoleChemElm_brch)
   call destroy(StalkChemElms_brch)
-  call destroy(StalkRsrveElms_brch)
+  call destroy(StalkRsrvElms_brch)
   call destroy(HuskChemElms_brch)
   call destroy(EarChemElms_brch)
   call destroy(GrainChemElms_brch)
@@ -447,7 +447,7 @@ module CanopyDataType
   call destroy(PetioleProteinCNode_brch)
   call destroy(NoduleNonstructCconc_pft)
   call destroy(GrainSeedBiomCMean_brch)
-  call destroy(StandingDeadKCompChemElms_pft)
+  call destroy(StandDeadKCompElms_pft)
   call destroy(StandingDeadChemElms_pft)
   call destroy(NonstructElms_pft)
   call destroy(SeedCPlanted_pft)

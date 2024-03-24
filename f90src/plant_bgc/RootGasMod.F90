@@ -60,7 +60,7 @@ module RootGasMod
   integer  :: NTG
 !     begin_execution
   associate(                       &
-    RootStructElmnt_pft        =>  plt_biom%RootStructElmnt_pft   , &
+    RootStructElms_pft        =>  plt_biom%RootStructElms_pft   , &
     ZEROP                      =>  plt_biom%ZEROP    , &
     PlantPopulation_pft        =>  plt_site%PlantPopulation_pft       , &
     DPTHZ                      =>  plt_site%DPTHZ    , &
@@ -180,7 +180,7 @@ module RootGasMod
 !     DPTHZ=depth of primary root from surface
 !     AveLen2ndRoot_pvr=average secondary root length
 !
-    IF(RootStructElmnt_pft(ielmc,NZ).GT.ZEROP(NZ).AND.FracSoiLayByPrimRoot(L,NZ).GT.ZERO)THEN
+    IF(RootStructElms_pft(ielmc,NZ).GT.ZEROP(NZ).AND.FracSoiLayByPrimRoot(L,NZ).GT.ZERO)THEN
       RTCR1=AMAX1(PlantPopulation_pft(NZ),Root1stXNumL_pvr(N,L,NZ)) &
         *PICON*Root1stRadius_pvr(N,L,NZ)**2/DPTHZ(L)
       RTCR2=(Root2ndXNum_pvr(N,L,NZ)*PICON*Radius2ndRoot_pvr(N,L,NZ)**2 &
