@@ -358,16 +358,31 @@ module grosubsMod
 !     WTLFB,WTSHEB,LeafPetolBiomassC_brch=leaf,petiole,leaf+petiole mass
 !     iPlantBranchState_brch=branch living flag: 0=alive,1=dead
 !
-    if(NZ==2)write(233,*)'grwobranchbf',I+J/24.,NZ,plt_biom%StalkRsrvElms_brch(1,1,NZ)
+    if(NZ==2)then
+      write(233,*)'grwobranchbf',I+J/24.,NZ,plt_biom%StalkRsrvElms_brch(1,1,NZ)
+      write(234,*)'grwobranchbf',I+J/24.,sum(plt_biom%RootMycoNonstElm_pvr(NE,1:plt_morph%MYMY(NZ),&
+        plt_site%NU:plt_site%MaxNumRootLays,NZ))
+    endif
+
     DO  NB=1,NumOfBranches_pft(NZ)
       call GrowOneBranch(I,J,NB,NZ,TFN6_vr,CanopyHeight_copy,CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW,&
         TFN5,WFNG,Stomata_Activity,WFNS,WFNSG,PTRT,CanopyN2Fix_pft,BegRemoblize)
     ENDDO
 !
-    if(NZ==2)write(233,*)'rootbgcbf',I+J/24.,NZ,plt_biom%StalkRsrvElms_brch(1,1,NZ)
+    if(NZ==2)then
+      write(233,*)'rootbgcbf',I+J/24.,NZ,plt_biom%StalkRsrvElms_brch(1,1,NZ)
+      write(234,*)'rootbgcbf',I+J/24.,sum(plt_biom%RootMycoNonstElm_pvr(NE,1:plt_morph%MYMY(NZ),&
+        plt_site%NU:plt_site%MaxNumRootLays,NZ))
+    endif
+
     call RootBGCModel(I,J,NZ,BegRemoblize,ICHK1,NRX,PTRT,TFN6_vr,CNRTW,CPRTW,RootAreaPopu)
 !
-    if(NZ==2)write(233,*)'totbiombf',I+J/24.,NZ,plt_biom%StalkRsrvElms_brch(1,1,NZ)
+    if(NZ==2)then
+      write(233,*)'totbiombf',I+J/24.,NZ,plt_biom%StalkRsrvElms_brch(1,1,NZ)
+      write(234,*)'totbiombf',I+J/24.,sum(plt_biom%RootMycoNonstElm_pvr(NE,1:plt_morph%MYMY(NZ),&
+        plt_site%NU:plt_site%MaxNumRootLays,NZ))
+    endif
+
     call ComputeTotalBiom(NZ,ShootNonstructC_brch)
   ELSE
     PlantRootSoilChemNetX_pft(1:NumPlantChemElms,NZ)=RootExudChemElm_pft(1:NumPlantChemElms,NZ)
@@ -377,14 +392,26 @@ module grosubsMod
       +RootHPO4Uptake_pft(NZ)
   ENDIF
 !
-  if(NZ==2)write(233,*)'rmbymgmtebf',I+J/24.,NZ,plt_biom%StalkRsrvElms_brch(1,1,NZ)
+  if(NZ==2)then
+    write(233,*)'rmbymgmtebf',I+J/24.,NZ,plt_biom%StalkRsrvElms_brch(1,1,NZ)
+    write(234,*)'rmbymgmtebf',I+J/24.,sum(plt_biom%RootMycoNonstElm_pvr(NE,1:plt_morph%MYMY(NZ),&
+      plt_site%NU:plt_site%MaxNumRootLays,NZ))
+  endif
   call RemoveBiomByManagement(I,J,NZ,ShootNonstructC_brch)
 !
 !     RESET DEAD BRANCHES
-  if(NZ==2)write(233,*)'deadresetbf',I+J/24.,NZ,plt_biom%StalkRsrvElms_brch(1,1,NZ)
+  if(NZ==2)then
+    write(233,*)'deadresetbf',I+J/24.,NZ,plt_biom%StalkRsrvElms_brch(1,1,NZ)
+    write(234,*)'deadresetbf',I+J/24.,sum(plt_biom%RootMycoNonstElm_pvr(NE,1:plt_morph%MYMY(NZ),&
+      plt_site%NU:plt_site%MaxNumRootLays,NZ))
+  endif    
   call ResetDeadBranch(I,J,NZ,ShootNonstructC_brch)
 !
-  if(NZ==2)write(233,*)'accumbf',I+J/24.,NZ,plt_biom%StalkRsrvElms_brch(1,1,NZ)
+  if(NZ==2)then
+    write(233,*)'accumbf',I+J/24.,NZ,plt_biom%StalkRsrvElms_brch(1,1,NZ)
+    write(234,*)'accumbf',sum(plt_biom%RootMycoNonstElm_pvr(NE,1:plt_morph%MYMY(NZ),&
+      plt_site%NU:plt_site%MaxNumRootLays,NZ))
+  endif  
   call AccumulateStates(I,J,NZ,CanopyN2Fix_pft)
   end associate
   end subroutine GrowPlant
