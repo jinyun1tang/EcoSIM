@@ -351,7 +351,7 @@ implicit none
   real(r8) :: CNPG
   real(r8) :: CCC,CNC,CPC
   real(r8) :: FSNC2
-  real(r8) :: RootMycoNonst4Grow(ielmn),ZADD1M,RootMycoNonst4Grow(NumPlantChemElms),ZADD2M
+  real(r8) :: ZADD1M,RootMycoNonst4Grow(NumPlantChemElms),ZADD2M
   real(r8) :: ZPOOLB
   real(r8) :: RootMycoNonst4Grow_Oulm
   real(r8) :: DMRTR
@@ -365,7 +365,6 @@ implicit none
   real(r8) :: RootCYldO2ltd
   real(r8) :: RootNetGrowthElms(NumPlantChemElms)
   real(r8) :: PPOOLB
-  real(r8) :: RootMycoNonst4Grow(ielmp)
   real(r8) :: RCO2X,RCO2Y
   real(r8) :: RGrowCO2_Oltd,RCO2T_Oltd
   real(r8) :: RCO2XM
