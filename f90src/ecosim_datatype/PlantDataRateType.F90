@@ -66,7 +66,7 @@ module PlantDataRateType
   real(r8),target,allocatable ::  RUNNXP(:,:,:,:,:)                  !root uptake of NO3 non-band unconstrained by NO3, [g d-2 h-1]
   real(r8),target,allocatable ::  RNH3Z(:,:,:)                       !gaseous NH3 flux fron root disturbance non-band, [g d-2 h-1]
   real(r8),target,allocatable ::  NH3Dep2_brch(:,:,:,:)                     !gaseous NH3 flux fron root disturbance band, [g d-2 h-1]
-  real(r8),target,allocatable ::  RootAutoRO2Limiter_pvr(:,:,:,:,:)                     !O2 constraint to root respiration, []
+  real(r8),target,allocatable ::  RAutoRootO2Limter_pvr(:,:,:,:,:)                     !O2 constraint to root respiration, []
   real(r8),target,allocatable ::  RH2GZ(:,:,:)                       !gaseous H2 flux fron root disturbance, [g d-2 h-1]
   real(r8),target,allocatable ::  PlantRootSoilChemNetX_pft(:,:,:,:)                    !net root element uptake (+ve) - exudation (-ve), [g d-2 h-1]
   real(r8),target,allocatable ::  PlantExudChemElmCum_pft(:,:,:,:)                    !total net root element uptake (+ve) - exudation (-ve), [g d-2 ]
@@ -177,7 +177,7 @@ module PlantDataRateType
   allocate(RUNNXP(jroots,JZ,JP,JY,JX));RUNNXP=0._r8
   allocate(RNH3Z(JP,JY,JX));    RNH3Z=0._r8
   allocate(NH3Dep2_brch(MaxNumBranches,JP,JY,JX)); NH3Dep2_brch=0._r8
-  allocate(RootAutoRO2Limiter_pvr(jroots,JZ,JP,JY,JX)); RootAutoRO2Limiter_pvr=0._r8
+  allocate(RAutoRootO2Limter_pvr(jroots,JZ,JP,JY,JX)); RAutoRootO2Limter_pvr=0._r8
   allocate(RH2GZ(JP,JY,JX));    RH2GZ=0._r8
   allocate(PlantRootSoilChemNetX_pft(NumPlantChemElms,JP,JY,JX));   PlantRootSoilChemNetX_pft=0._r8
   allocate(PlantExudChemElmCum_pft(NumPlantChemElms,JP,JY,JX));   PlantExudChemElmCum_pft=0._r8
@@ -273,7 +273,7 @@ module PlantDataRateType
   call destroy(RUNNXP)
   call destroy(RNH3Z)
   call destroy(NH3Dep2_brch)
-  call destroy(RootAutoRO2Limiter_pvr)
+  call destroy(RAutoRootO2Limter_pvr)
   call destroy(RH2GZ)
   call destroy(PlantRootSoilChemNetX_pft)
   call destroy(PlantExudChemElmCum_pft)

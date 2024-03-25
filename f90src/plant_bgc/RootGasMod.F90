@@ -75,7 +75,7 @@ module RootGasMod
     RCO2F                      =>  plt_bgcr%RCO2F    , &
     ROXYL                      =>  plt_bgcr%ROXYL    , &
     RUPOXP                     =>  plt_rbgc%RUPOXP   , &
-    RootAutoRO2Limiter_pvr     =>  plt_rbgc%RootAutoRO2Limiter_pvr     , &
+    RAutoRootO2Limter_pvr     =>  plt_rbgc%RAutoRootO2Limter_pvr     , &
     ZEROQ                      =>  plt_rbgc%ZEROQ    , &
     RootRespPotent_pvr       =>  plt_rbgc%RootRespPotent_pvr    , &
     ROXYP                      =>  plt_rbgc%ROXYP    , &
@@ -621,24 +621,24 @@ module RootGasMod
 !
 !     RUPOXT=O2 uptake from soil+root by each root,myco population
 !     ROXYP=O2 demand by each root,myco population
-!     RootAutoRO2Limiter_pvr=constraint by O2 consumption on all root processes
+!     RAutoRootO2Limter_pvr=constraint by O2 consumption on all root processes
 !     imposed by O2 uptake
 !
     PopPlantO2Uptake_vr=RUPOXP(N,L,NZ)+RUPGasSol_vr(idg_O2,N,L,NZ)
-    RootAutoRO2Limiter_pvr(N,L,NZ)=AMIN1(1.0_r8,AZMAX1(PopPlantO2Uptake_vr/ROXYP(N,L,NZ)))
+    RAutoRootO2Limter_pvr(N,L,NZ)=AMIN1(1.0_r8,AZMAX1(PopPlantO2Uptake_vr/ROXYP(N,L,NZ)))
 !    if(NZ==1)THEN
-!      write(135,*)'PopPlantO2Uptake_vr=',I,RootAutoRO2Limiter_pvr(N,L,NZ),&
+!      write(135,*)'PopPlantO2Uptake_vr=',I,RAutoRootO2Limter_pvr(N,L,NZ),&
 !        RUPOXP(N,L,NZ),RUPGasSol_vr(idg_O2,N,L,NZ)
 !    ELSE
-!      write(136,*)'PopPlantO2Uptake_vr=',I,RootAutoRO2Limiter_pvr(N,L,NZ),&
+!      write(136,*)'PopPlantO2Uptake_vr=',I,RAutoRootO2Limter_pvr(N,L,NZ),&
 !        RUPOXP(N,L,NZ),RUPGasSol_vr(idg_O2,N,L,NZ)
 !    ENDIF  
   ELSE
     PopPlantO2Uptake_vr=0.0_r8
     IF(L.GT.NGTopRootLayer_pft(NZ))THEN
-      RootAutoRO2Limiter_pvr(N,L,NZ)=RootAutoRO2Limiter_pvr(N,L-1,NZ)
+      RAutoRootO2Limter_pvr(N,L,NZ)=RAutoRootO2Limter_pvr(N,L-1,NZ)
     ELSE
-      RootAutoRO2Limiter_pvr(N,L,NZ)=1.0
+      RAutoRootO2Limter_pvr(N,L,NZ)=1.0
     ENDIF
   ENDIF
   end associate

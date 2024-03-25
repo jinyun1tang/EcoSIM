@@ -601,7 +601,7 @@
     iPlantPhenolType_pft       =>  plt_pheno%iPlantPhenolType_pft , &
     iPlantTurnoverPattern_pft  =>  plt_pheno%iPlantTurnoverPattern_pft , &
     HourFailGrainFill_brch     =>  plt_pheno%HourFailGrainFill_brch   , &
-    HourCount2LeafOut_brch   =>  plt_pheno%HourCount2LeafOut_brch   , &
+    Hours2LeafOut_brch   =>  plt_pheno%Hours2LeafOut_brch   , &
     iPlantPhenolPattern_pft =>  plt_pheno%iPlantPhenolPattern_pft , &
     iPlantBranchState_brch     =>  plt_pheno%iPlantBranchState_brch  , &
     ZERO                       =>  plt_site%ZERO    , &
@@ -644,7 +644,7 @@
     .AND.iPlantTurnoverPattern_pft(NZ).GE.2)THEN
     !conifer modification
     RubiscoActivity_brch(NB,NZ)=RubiscoActivity_brch(NB,NZ)*AZMAX1(AMIN1(1.0_r8 &
-      ,HourCount2LeafOut_brch(NB,NZ)/(0.9_r8*ATRPZ)))
+      ,Hours2LeafOut_brch(NB,NZ)/(0.9_r8*ATRPZ)))
   ENDIF
 !
 !     TERMINATION OF ANNUALS

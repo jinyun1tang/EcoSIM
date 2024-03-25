@@ -1018,7 +1018,7 @@ module PlantDisturbsMod
               Root2ndXNum_rpvr(N,L,NR,NZ)=Root2ndXNum_rpvr(N,L,NR,NZ)*XHVST
             ENDDO D8960
             DO NE=1,NumPlantChemElms
-               RootMycoNonstElm_pvr(NE,N,L,NZ)= RootMycoNonstElm_pvr(NE,N,L,NZ)*XHVST
+               RootMycoNonstElm_pvr(NE,N,L,NZ)=RootMycoNonstElm_pvr(NE,N,L,NZ)*XHVST
             ENDDO
             RootMycoActiveBiomC_pvr(N,L,NZ)=RootMycoActiveBiomC_pvr(N,L,NZ)*XHVST
              PopuPlantRootC_vr(N,L,NZ)= PopuPlantRootC_vr(N,L,NZ)*XHVST
@@ -2459,7 +2459,7 @@ module PlantDisturbsMod
               Root2ndXNum_rpvr(N,L,NR,NZ)=Root2ndXNum_rpvr(N,L,NR,NZ)*XHVST(ielmc)
             ENDDO D3960
             DO NE=1,NumPlantChemElms
-               RootMycoNonstElm_pvr(NE,N,L,NZ)= RootMycoNonstElm_pvr(NE,N,L,NZ)*XHVST(NE)
+               RootMycoNonstElm_pvr(NE,N,L,NZ)=RootMycoNonstElm_pvr(NE,N,L,NZ)*XHVST(NE)
             ENDDO
             RootMycoActiveBiomC_pvr(N,L,NZ)=RootMycoActiveBiomC_pvr(N,L,NZ)*XHVST(ielmc)
              PopuPlantRootC_vr(N,L,NZ)= PopuPlantRootC_vr(N,L,NZ)*XHVST(ielmc)

@@ -62,7 +62,7 @@ implicit none
 !     doInitLeafOut_brch=flag for initializing leafout
 !     Hours4Leafout_brch,VRNL=leafout hours,hours required for leafout
 !     Hours4LeafOff_brch,VRNX=leafoff hours,hours required for leafoff
-!     HourCount2LeafOut_brch=hourly leafout counter
+!     Hours2LeafOut_brch=hourly leafout counter
 !     RubiscoActivity_brch,C4PhotosynDowreg_brch=N,P feedback inhibition on C3 CO2 fixation
 !     doInitLeafOut_brch,doPlantLeafOut_brch=flag for initializing,enabling leafout
 !     doPlantLeaveOff_brch=flag for enabling leafoff:0=enable,1=disable
@@ -515,7 +515,7 @@ implicit none
     Hours4LeafOff_brch      =>  plt_pheno%Hours4LeafOff_brch      , &
     Hours4LenthenPhotoPeriod_brch      =>  plt_pheno%Hours4LenthenPhotoPeriod_brch      , &
     Hours4ShortenPhotoPeriod_brch      =>  plt_pheno%Hours4ShortenPhotoPeriod_brch      , &
-    HourCount2LeafOut_brch      =>  plt_pheno%HourCount2LeafOut_brch      , &
+    Hours2LeafOut_brch      =>  plt_pheno%Hours2LeafOut_brch      , &
     HourFailGrainFill_brch      =>  plt_pheno%HourFailGrainFill_brch      , &
     doInitLeafOut_brch     =>  plt_pheno%doInitLeafOut_brch     , &
     doPlantLeafOut_brch     =>  plt_pheno%doPlantLeafOut_brch     , &
@@ -563,7 +563,7 @@ implicit none
       Hours4LeafOff_brch(NB,NZ)=0._r8
       Hours4LenthenPhotoPeriod_brch(NB,NZ)=0._r8
       Hours4ShortenPhotoPeriod_brch(NB,NZ)=0._r8
-      HourCount2LeafOut_brch(NB,NZ)=0._r8
+      Hours2LeafOut_brch(NB,NZ)=0._r8
       HourFailGrainFill_brch(NB,NZ)=0._r8
       RubiscoActivity_brch(NB,NZ)=1.0_r8
       C4PhotosynDowreg_brch(NB,NZ)=1.0_r8

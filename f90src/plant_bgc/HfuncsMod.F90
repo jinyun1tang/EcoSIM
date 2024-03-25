@@ -809,7 +809,7 @@ module HfuncsMod
     LeafNumberAtFloralInit_brch          =>  plt_pheno%LeafNumberAtFloralInit_brch  , &
     iPlantDevelopPattern_pft             =>  plt_pheno%iPlantDevelopPattern_pft  , &
     TotReproNodeNumNormByMatrgrp_brch    =>  plt_pheno%TotReproNodeNumNormByMatrgrp_brch  , &
-    CriticalPhotoPeriod_pft              =>  plt_pheno%CriticalPhotoPeriod_pft    , &
+    CriticPhotoPeriod_pft              =>  plt_pheno%CriticPhotoPeriod_pft    , &
     HourlyNodeNumNormByMatgrp_brch       =>  plt_pheno%HourlyNodeNumNormByMatgrp_brch  , &
     PhotoPeriodSens_pft                  =>  plt_pheno%PhotoPeriodSens_pft   , &
     TotalNodeNumNormByMatgrp_brch        =>  plt_pheno%TotalNodeNumNormByMatgrp_brch  , &
@@ -952,14 +952,14 @@ module HfuncsMod
 !
 !     iPlantPhotoperiodType_pft=photoperiod type from PFT file
 !     PPD=photoperiod sensitivity
-!     CriticalPhotoPeriod_pft=critical photoperiod from PFT file
+!     CriticPhotoPeriod_pft=critical photoperiod from PFT file
 !     iPlantCalendar_brch(ipltcal_InitFloral,=date of floral initiation
 !     VSTGX=node number on date of floral initiation
 !
       IF(iPlantPhotoperiodType_pft(NZ).EQ.iphotop_neutral)THEN
         PPD=0.0_r8
       ELSE
-        PPD=AZMAX1(CriticalPhotoPeriod_pft(NZ)-DayLenthCurrent)
+        PPD=AZMAX1(CriticPhotoPeriod_pft(NZ)-DayLenthCurrent)
         IF(iPlantPhotoperiodType_pft(NZ).EQ.iphotop_short.AND.DayLenthCurrent.GE.DayLenthPrev)PPD=0.0_r8
       ENDIF
       
@@ -968,7 +968,7 @@ module HfuncsMod
         .OR.(iPlantPhotoperiodType_pft(NZ).EQ.iphotop_long .AND.PPD.LT.PhotoPeriodSens_pft(NZ))
 
 !      IF(NZ==1)write(102,*)'ppd',NB,I+J/24.,PPD,PhotoPeriodSens_pft(NZ),&
-!        CriticalPhotoPeriod_pft(NZ),DayLenthCurrent,iPlantPhotoperiodType_pft(NZ),&
+!        CriticPhotoPeriod_pft(NZ),DayLenthCurrent,iPlantPhotoperiodType_pft(NZ),&
 !        PhotoPrdChk,(PhenoChk1.OR.PhenoChk2).AND.CanHeightChk.AND.DayLenChk
       IF( PhotoPrdChk .OR. ((PhenoChk1.OR.PhenoChk2).AND.CanHeightChk.AND.DayLenChk))THEN
 
