@@ -338,7 +338,7 @@ implicit none
       DO L=1,NumOfCanopyLayers
         CanopyStemALyr_brch(L,NB,NZ,NY,NX)=plt_morph%CanopyStemALyr_brch(L,NB,NZ)
       ENDDO
-      HourCount2LeafOut_brch(NB,NZ,NY,NX)  =plt_pheno%HourCount2LeafOut_brch(NB,NZ)
+      Hours2LeafOut_brch(NB,NZ,NY,NX)  =plt_pheno%Hours2LeafOut_brch(NB,NZ)
       LeafAreaLive_brch(NB,NZ,NY,NX) =plt_morph%LeafAreaLive_brch(NB,NZ)
       LeafAreaDying_brch(NB,NZ,NY,NX) =plt_morph%LeafAreaDying_brch(NB,NZ)
 
@@ -524,7 +524,7 @@ implicit none
         RootMycoActiveBiomC_pvr(N,L,NZ,NY,NX) =plt_biom%RootMycoActiveBiomC_pvr(N,L,NZ)
          PopuPlantRootC_vr(N,L,NZ,NY,NX) =plt_biom% PopuPlantRootC_vr(N,L,NZ)
         RootProteinC_pvr(N,L,NZ,NY,NX) =plt_biom%RootProteinC_pvr(N,L,NZ)
-        RootAutoRO2Limiter_pvr(N,L,NZ,NY,NX)   =plt_rbgc%RootAutoRO2Limiter_pvr(N,L,NZ)
+        RAutoRootO2Limter_pvr(N,L,NZ,NY,NX)   =plt_rbgc%RAutoRootO2Limter_pvr(N,L,NZ)
       ENDDO
     ENDDO
 
@@ -769,7 +769,7 @@ implicit none
     plt_morph%WDLF(NZ)=WDLF(NZ,NY,NX)
     plt_pheno%MinNonstructalC4InitBranch(NZ)=MinNonstructalC4InitBranch(NZ,NY,NX)
     plt_morph%XTLI(NZ)=XTLI(NZ,NY,NX)
-    plt_pheno%CriticalPhotoPeriod_pft(NZ)=CriticalPhotoPeriod_pft(NZ,NY,NX)
+    plt_pheno%CriticPhotoPeriod_pft(NZ)=CriticPhotoPeriod_pft(NZ,NY,NX)
     plt_pheno%PhotoPeriodSens_pft(NZ)=PhotoPeriodSens_pft(NZ,NY,NX)
     plt_morph%SLA1(NZ)=SLA1(NZ,NY,NX)
     plt_morph%PetoLen2Mass_pft(NZ)=PetoLen2Mass_pft(NZ,NY,NX)
@@ -1162,7 +1162,7 @@ implicit none
     DO NB=1,NumOfBranches_pft(NZ,NY,NX)
       plt_photo%RubiscoActivity_brch(NB,NZ)=RubiscoActivity_brch(NB,NZ,NY,NX)
       plt_photo%C4PhotosynDowreg_brch(NB,NZ)=C4PhotosynDowreg_brch(NB,NZ,NY,NX)
-      plt_pheno%HourCount2LeafOut_brch(NB,NZ)=HourCount2LeafOut_brch(NB,NZ,NY,NX)
+      plt_pheno%Hours2LeafOut_brch(NB,NZ)=Hours2LeafOut_brch(NB,NZ,NY,NX)
       plt_morph%LeafAreaDying_brch(NB,NZ)=LeafAreaDying_brch(NB,NZ,NY,NX)
       plt_morph%LeafAreaLive_brch(NB,NZ)=LeafAreaLive_brch(NB,NZ,NY,NX)
 
@@ -1261,7 +1261,7 @@ implicit none
     ENDDO
     DO L=1,NL(NY,NX)
       DO N=1,MY(NZ,NY,NX)
-        plt_biom%RootMycoNonstElm_pvr(1:NumPlantChemElms,N,L,NZ)= RootMycoNonstElm_pvr(1:NumPlantChemElms,N,L,NZ,NY,NX)
+        plt_biom%RootMycoNonstElm_pvr(1:NumPlantChemElms,N,L,NZ)=RootMycoNonstElm_pvr(1:NumPlantChemElms,N,L,NZ,NY,NX)
         plt_rbgc%trcs_rootml_pvr(idg_beg:idg_end-1,N,L,NZ)=trcs_rootml_pvr(idg_beg:idg_end-1,N,L,NZ,NY,NX)
         plt_rbgc%trcg_rootml_pvr(idg_beg:idg_end-1,N,L,NZ)=trcg_rootml_pvr(idg_beg:idg_end-1,N,L,NZ,NY,NX)
 
@@ -1329,7 +1329,7 @@ implicit none
         plt_rbgc%RUPP1P(N,L,NZ)=RUPP1P(N,L,NZ,NY,NX)
         plt_rbgc%RUPP1B(N,L,NZ)=RUPP1B(N,L,NZ,NY,NX)
         plt_ew%AllPlantRootH2OUptake_vr(N,L,NZ)   =AllPlantRootH2OUptake_vr(N,L,NZ,NY,NX)
-        plt_rbgc%RootAutoRO2Limiter_pvr(N,L,NZ)   =RootAutoRO2Limiter_pvr(N,L,NZ,NY,NX)
+        plt_rbgc%RAutoRootO2Limter_pvr(N,L,NZ)   =RAutoRootO2Limter_pvr(N,L,NZ,NY,NX)
         plt_biom%RootMycoActiveBiomC_pvr(N,L,NZ) =RootMycoActiveBiomC_pvr(N,L,NZ,NY,NX)
         plt_biom% PopuPlantRootC_vr(N,L,NZ) = PopuPlantRootC_vr(N,L,NZ,NY,NX)
         plt_biom%RootProteinC_pvr(N,L,NZ) =RootProteinC_pvr(N,L,NZ,NY,NX)

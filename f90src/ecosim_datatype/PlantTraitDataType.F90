@@ -154,13 +154,13 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  SeedCMass(:,:,:)                        !grain size at seeding, [g]
   real(r8),target,allocatable ::  GrainFillRate25C_pft(:,:,:)                       !maximum rate of fill per grain, [g h-1]
   real(r8),target,allocatable ::  HourFailGrainFill_brch(:,:,:,:)                      !flag to detect physiological maturity from  grain fill , [-]
-  real(r8),target,allocatable ::  HourCount2LeafOut_brch(:,:,:,:)                      !counter for mobilizing nonstructural C during spring leafout/dehardening, [h]
+  real(r8),target,allocatable ::  Hours2LeafOut_brch(:,:,:,:)                      !counter for mobilizing nonstructural C during spring leafout/dehardening, [h]
   real(r8),target,allocatable ::  HoursDoingRemob_brch(:,:,:,:)                      !counter for mobilizing nonstructural C during autumn leafoff/hardening, [h]
   integer,target,allocatable ::  iPlantCalendar_brch(:,:,:,:,:)                     !plant growth stage, [-]
   real(r8),target,allocatable ::  TCelciusChill4Seed(:,:,:)                         !temperature below which seed set is adversely affected, [oC]
   real(r8),target,allocatable ::  HighTCLimtSeed_pft(:,:,:)                         !temperature above which seed set is adversely affected, [oC]
   real(r8),target,allocatable ::  SSTX(:,:,:)                        !sensitivity to HTC (seeds oC-1 above HTC)
-  real(r8),target,allocatable ::  CriticalPhotoPeriod_pft(:,:,:)                         !critical daylength for phenological progress, [h]
+  real(r8),target,allocatable ::  CriticPhotoPeriod_pft(:,:,:)                         !critical daylength for phenological progress, [h]
   real(r8),target,allocatable ::  PhotoPeriodSens_pft(:,:,:)                        !difference between current and critical daylengths used to calculate  phenological progress, [h]
   real(r8),target,allocatable ::  ClumpFactorInit_pft(:,:,:)                         !initial clumping factor for self-shading in canopy layer, [-]
   real(r8),target,allocatable ::  HourReq4LeafOff_brch(:,:,:,:)                      !number of hours below set temperature required for autumn leafoff/hardening, [-]
@@ -314,13 +314,13 @@ contains
   allocate(SeedCMass(JP,JY,JX));     SeedCMass=0._r8
   allocate(GrainFillRate25C_pft(JP,JY,JX));    GrainFillRate25C_pft=0._r8
   allocate(HourFailGrainFill_brch(MaxNumBranches,JP,JY,JX));  HourFailGrainFill_brch=0._r8
-  allocate(HourCount2LeafOut_brch(MaxNumBranches,JP,JY,JX));  HourCount2LeafOut_brch=0._r8
+  allocate(Hours2LeafOut_brch(MaxNumBranches,JP,JY,JX));  Hours2LeafOut_brch=0._r8
   allocate(HoursDoingRemob_brch(MaxNumBranches,JP,JY,JX));  HoursDoingRemob_brch=0._r8
   allocate(iPlantCalendar_brch(NumGrowthStages,MaxNumBranches,JP,JY,JX));iPlantCalendar_brch=0
   allocate(TCelciusChill4Seed(JP,JY,JX));      TCelciusChill4Seed=0._r8
   allocate(HighTCLimtSeed_pft(JP,JY,JX));      HighTCLimtSeed_pft=0._r8
   allocate(SSTX(JP,JY,JX));     SSTX=0._r8
-  allocate(CriticalPhotoPeriod_pft(JP,JY,JX));      CriticalPhotoPeriod_pft=0._r8
+  allocate(CriticPhotoPeriod_pft(JP,JY,JX));      CriticPhotoPeriod_pft=0._r8
   allocate(PhotoPeriodSens_pft(JP,JY,JX));     PhotoPeriodSens_pft=0._r8
   allocate(ClumpFactorInit_pft(JP,JY,JX));      ClumpFactorInit_pft=0._r8
   allocate(HourReq4LeafOff_brch(NumOfCanopyLayers,JP,JY,JX));  HourReq4LeafOff_brch=0._r8
@@ -471,13 +471,13 @@ contains
   call destroy(SeedCMass)
   call destroy(GrainFillRate25C_pft)
   call destroy(HourFailGrainFill_brch)
-  call destroy(HourCount2LeafOut_brch)
+  call destroy(Hours2LeafOut_brch)
   call destroy(HoursDoingRemob_brch)
   call destroy(iPlantCalendar_brch)
   call destroy(TCelciusChill4Seed)
   call destroy(HighTCLimtSeed_pft)
   call destroy(SSTX)
-  call destroy(CriticalPhotoPeriod_pft)
+  call destroy(CriticPhotoPeriod_pft)
   call destroy(PhotoPeriodSens_pft)
   call destroy(ClumpFactorInit_pft)
   call destroy(HourReq4LeafOff_brch)

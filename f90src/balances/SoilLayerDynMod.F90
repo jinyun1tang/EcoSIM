@@ -864,7 +864,7 @@ implicit none
             Root2ndXNum_rpvr(N,L1,NR,NZ,NY,NX)=Root2ndXNum_rpvr(N,L1,NR,NZ,NY,NX)+FX*Root2ndXNum_rpvr(N,L0,NR,NZ,NY,NX)
           ENDDO
           DO NE=1,NumPlantChemElms
-             RootMycoNonstElm_pvr(NE,N,L1,NZ,NY,NX)= RootMycoNonstElm_pvr(NE,N,L1,NZ,NY,NX)+FX* RootMycoNonstElm_pvr(NE,N,L0,NZ,NY,NX)
+             RootMycoNonstElm_pvr(NE,N,L1,NZ,NY,NX)=RootMycoNonstElm_pvr(NE,N,L1,NZ,NY,NX)+FX* RootMycoNonstElm_pvr(NE,N,L0,NZ,NY,NX)
           ENDDO
           RootMycoActiveBiomC_pvr(N,L1,NZ,NY,NX)=RootMycoActiveBiomC_pvr(N,L1,NZ,NY,NX)+FX*RootMycoActiveBiomC_pvr(N,L0,NZ,NY,NX)
           PopuPlantRootC_vr(N,L1,NZ,NY,NX)= PopuPlantRootC_vr(N,L1,NZ,NY,NX)+FX* PopuPlantRootC_vr(N,L0,NZ,NY,NX)
@@ -1259,8 +1259,8 @@ implicit none
           ENDDO
           DO NE=1,NumPlantChemElms
              FXEPOOLR=FRO*RootMycoNonstElm_pvr(NE,N,L0,NZ,NY,NX)
-             RootMycoNonstElm_pvr(NE,N,L1,NZ,NY,NX)= RootMycoNonstElm_pvr(NE,N,L1,NZ,NY,NX)+FXEPOOLR
-             RootMycoNonstElm_pvr(NE,N,L0,NZ,NY,NX)= RootMycoNonstElm_pvr(NE,N,L0,NZ,NY,NX)-FXEPOOLR
+             RootMycoNonstElm_pvr(NE,N,L1,NZ,NY,NX)=RootMycoNonstElm_pvr(NE,N,L1,NZ,NY,NX)+FXEPOOLR
+             RootMycoNonstElm_pvr(NE,N,L0,NZ,NY,NX)=RootMycoNonstElm_pvr(NE,N,L0,NZ,NY,NX)-FXEPOOLR
           ENDDO
 
           FXWTRTL=FRO*RootMycoActiveBiomC_pvr(N,L0,NZ,NY,NX)

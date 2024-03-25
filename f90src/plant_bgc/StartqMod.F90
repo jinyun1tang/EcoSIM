@@ -509,7 +509,7 @@ module StartqMod
     Hours4ShortenPhotoPeriod_brch(NB,NZ,NY,NX)=0._r8
     Hours4Leafout_brch(NB,NZ,NY,NX)=Hours4LenthenPhotoPeriod_brch(NB,NZ,NY,NX)
     Hours4LeafOff_brch(NB,NZ,NY,NX)=Hours4ShortenPhotoPeriod_brch(NB,NZ,NY,NX)
-    HourCount2LeafOut_brch(NB,NZ,NY,NX)=0._r8
+    Hours2LeafOut_brch(NB,NZ,NY,NX)=0._r8
     RubiscoActivity_brch(NB,NZ,NY,NX)=1.0_r8
     C4PhotosynDowreg_brch(NB,NZ,NY,NX)=1.0_r8
     HourFailGrainFill_brch(NB,NZ,NY,NX)=0
@@ -769,7 +769,7 @@ module StartqMod
       trcs_rootml_pvr(idg_beg:idg_end-1,N,L,NZ,NY,NX)=0._r8
       trcg_rootml_pvr(idg_O2,N,L,NZ,NY,NX)=COXYA*RootPoreVol_pvr(N,L,NZ,NY,NX)
       trcs_rootml_pvr(idg_O2,N,L,NZ,NY,NX)=COXYP*RootVH2O_pvr(N,L,NZ,NY,NX)
-      RootAutoRO2Limiter_pvr(N,L,NZ,NY,NX)=1.0_r8
+      RAutoRootO2Limter_pvr(N,L,NZ,NY,NX)=1.0_r8
 
       D30: DO NR=1,MaxNumRootAxes
         Root2ndXNum_rpvr(N,L,NR,NZ,NY,NX)=0._r8

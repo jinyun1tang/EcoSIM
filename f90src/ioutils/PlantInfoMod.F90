@@ -352,8 +352,8 @@ implicit none
       XTLI(NZ,NY,NX)=XTLI(NZ,NY,NX)/MaxNodesPerBranch
     ENDIF
     MatureGroup_pft(NZ,NY,NX)=MatureGroup_pft(NZ,NY,NX)-XTLI(NZ,NY,NX)
-    IF(CriticalPhotoPeriod_pft(NZ,NY,NX).LT.0.0_r8)THEN
-      CriticalPhotoPeriod_pft(NZ,NY,NX)=DayLenthMax(NY,NX)
+    IF(CriticPhotoPeriod_pft(NZ,NY,NX).LT.0.0_r8)THEN
+      CriticPhotoPeriod_pft(NZ,NY,NX)=DayLenthMax(NY,NX)
     ENDIF
     D5: DO NB=1,NumOfCanopyLayers
       IF(iPlantPhenolType_pft(NZ,NY,NX).EQ.iphenotyp_evgreen.AND.iPlantPhenolPattern_pft(NZ,NY,NX).NE.iplt_annual)THEN
@@ -365,7 +365,7 @@ implicit none
       ENDIF
     ENDDO D5
   ENDIF
-! WRITE(*,1111)'CRITICAL DAYLENGTH',IGO,NZ,CriticalPhotoPeriod_pft(NZ,NY,NX)
+! WRITE(*,1111)'CRITICAL DAYLENGTH',IGO,NZ,CriticPhotoPeriod_pft(NZ,NY,NX)
 !1111    FORMAT(A20,2I8,E12.4)
   end subroutine ReadPlantProperties
 
@@ -425,7 +425,7 @@ implicit none
 
   call ncd_getvar(pft_nfid, 'GROUPX', loc,GROUPX(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'XTLI', loc,XTLI(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'XDL', loc,CriticalPhotoPeriod_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'XDL', loc,CriticPhotoPeriod_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'XPPD', loc,PhotoPeriodSens_pft(NZ,NY,NX))
 
   call ncd_getvar(pft_nfid, 'SLA1', loc,SLA1(NZ,NY,NX))
@@ -750,7 +750,7 @@ implicit none
   call writefixl(nu_plt,'nonstructural C concentration needed for branching PB',MinNonstructalC4InitBranch(NZ,NY,NX),70)
   call writefixl(nu_plt,'Maturity group, node number required for floral initiation, GROUPX',GROUPX(NZ,NY,NX),70)
   call writefixl(nu_plt,'Node number at planting XTLI',XTLI(NZ,NY,NX),70)
-  call writefixl(nu_plt,'critical photoperiod (h) <= maximum daylength XDL',CriticalPhotoPeriod_pft(NZ,NY,NX),70)
+  call writefixl(nu_plt,'critical photoperiod (h) <= maximum daylength XDL',CriticPhotoPeriod_pft(NZ,NY,NX),70)
   call writefixl(nu_plt,'photoperiod sensitivity (node h-1) XPPD',PhotoPeriodSens_pft(NZ,NY,NX),70)
 
 

@@ -446,7 +446,7 @@ module NoduleBGCMod
     iroot                        =>   pltpar%iroot       , &
     RootRespPotent_pvr           =>   plt_rbgc%RootRespPotent_pvr     , &
     RCO2N_pvr                    =>   plt_rbgc%RCO2N_pvr     , &
-    RootAutoRO2Limiter_pvr       =>   plt_rbgc%RootAutoRO2Limiter_pvr      , &
+    RAutoRootO2Limter_pvr       =>   plt_rbgc%RAutoRootO2Limter_pvr      , &
     RCO2A_pvr                    =>   plt_rbgc%RCO2A_pvr     , &
     LitfalChemElm_pvr            =>   plt_bgcr%LitfalChemElm_pvr      , &
     RootN2Fix_pft                =>   plt_rbgc%RootN2Fix_pft      , &
@@ -538,9 +538,9 @@ module NoduleBGCMod
 !     O2-LIMITED NODULE RESPIRATION FROM 'WFR' IN 'UPTAKE'
 !
 !     RespNonst_Oltd=respiration from non-structural C ltd by O2
-!     RootAutoRO2Limiter_pvr=constraint by O2 consumption on all root processes
+!     RAutoRootO2Limter_pvr=constraint by O2 consumption on all root processes
 !
-        RespNonst_Oltd=RespNonst_OUltd*RootAutoRO2Limiter_pvr(1,L,NZ)
+        RespNonst_Oltd=RespNonst_OUltd*RAutoRootO2Limter_pvr(1,L,NZ)
 !
 !     NODULE MAINTENANCE RESPIRATION FROM SOIL TEMPERATURE,
 !     NODULE STRUCTURAL N
@@ -759,9 +759,9 @@ module NoduleBGCMod
 !    2/(1.0+CCNDLR/(CCNGR*FXRN(iPlantNfixType(NZ))))
             CPOOLD=(RootMycoNonstElm_pvr(ielmc,ipltroot,L,NZ)*WTNDL1-RootNodulNonstElm_pvr(ielmc,L,NZ)*WTRTD1)/WTRTDT
             XFRE(ielmc)=FXRNX*CPOOLD
-            RootMycoNonstElm_pvr(ielmc,ipltroot,L,NZ)= RootMycoNonstElm_pvr(ielmc,ipltroot,L,NZ)-XFRE(ielmc)
+            RootMycoNonstElm_pvr(ielmc,ipltroot,L,NZ)=RootMycoNonstElm_pvr(ielmc,ipltroot,L,NZ)-XFRE(ielmc)
             RootNodulNonstElm_pvr(ielmc,L,NZ)=RootNodulNonstElm_pvr(ielmc,L,NZ)+XFRE(ielmc)
-            CPOOLT= RootMycoNonstElm_pvr(ielmc,ipltroot,L,NZ)+RootNodulNonstElm_pvr(ielmc,L,NZ)
+            CPOOLT=RootMycoNonstElm_pvr(ielmc,ipltroot,L,NZ)+RootNodulNonstElm_pvr(ielmc,L,NZ)
             IF(CPOOLT.GT.ZEROP(NZ))THEN
               ZPOOLD=(RootMycoNonstElm_pvr(ielmn,ipltroot,L,NZ)*RootNodulNonstElm_pvr(ielmc,L,NZ) &
                 -RootNodulNonstElm_pvr(ielmn,L,NZ)* RootMycoNonstElm_pvr(ielmc,ipltroot,L,NZ))/CPOOLT

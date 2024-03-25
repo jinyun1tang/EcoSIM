@@ -319,7 +319,7 @@ implicit none
   real(r8), pointer :: NetCumElmntFlx2Plant_pft(:,:) => null()     !effect of canopy element status on seed set , []
   real(r8), pointer :: RefNodeInitRate_pft(:)    => null()     !rate of node initiation, [h-1 at 25 oC]
   real(r8), pointer :: RefLeafAppearRate_pft(:)    => null()     !rate of leaf initiation, [h-1 at 25 oC]
-  real(r8), pointer :: CriticalPhotoPeriod_pft(:)     => null()     !critical daylength for phenological progress, [h]
+  real(r8), pointer :: CriticPhotoPeriod_pft(:)     => null()     !critical daylength for phenological progress, [h]
   real(r8), pointer :: PhotoPeriodSens_pft(:)    => null()     !difference between current and critical daylengths used to calculate  phenological progress [h]
   integer,  pointer :: iPlantBranchState_brch(:,:)  => null()  !flag to detect branch death , [-]
   integer,  pointer :: doRemobilization_brch(:,:)  => null()  !branch phenology flag, [-]
@@ -350,7 +350,7 @@ implicit none
   real(r8), pointer :: HourReq4LeafOut_brch(:,:)   => null()  !hours above threshold temperature required for spring leafout/dehardening, [-]
   real(r8), pointer :: Hours4LeafOff_brch(:,:)   => null()  !cold requirement for autumn leafoff/hardening, [h]
   real(r8), pointer :: HourReq4LeafOff_brch(:,:)   => null()  !number of hours below set temperature required for autumn leafoff/hardening, [-]
-  real(r8), pointer :: HourCount2LeafOut_brch(:,:)   => null()  !counter for mobilizing nonstructural C during spring leafout/dehardening, [h]
+  real(r8), pointer :: Hours2LeafOut_brch(:,:)   => null()  !counter for mobilizing nonstructural C during spring leafout/dehardening, [h]
   real(r8), pointer :: HoursDoingRemob_brch(:,:)   => null()  !counter for mobilizing nonstructural C during autumn leafoff/hardening, [h]
   real(r8), pointer :: HourlyNodeNumNormByMatgrp_brch(:,:) => null()  !gain in normalized node number during vegetative growth stages , [h-1]
   real(r8), pointer :: dReproNodeNumNormByMatG_brch(:,:) => null()  !gain in normalized node number during reproductive growth stages, [h-1]
@@ -706,7 +706,7 @@ implicit none
   real(r8), pointer :: RUPP2B(:,:,:)    => null()  !root uptake of H2PO4 band
   real(r8), pointer :: RUPP1P(:,:,:)    => null()  !HPO4 demand in non-band by each root population
   real(r8), pointer :: RUPP1B(:,:,:)    => null()  !HPO4 demand in band by each root population
-  real(r8), pointer :: RootAutoRO2Limiter_pvr(:,:,:)       => null()  !O2 constraint to root respiration, []
+  real(r8), pointer :: RAutoRootO2Limter_pvr(:,:,:)       => null()  !O2 constraint to root respiration, []
   real(r8), pointer :: trcg_rootml_pvr(:,:,:,:)=> null() !root gas content, [g d-2]
   real(r8), pointer :: trcs_rootml_pvr(:,:,:,:)=> null() !root aqueous content, [g d-2]
   real(r8), pointer :: NH3Dep2_brch(:,:)       => null()  !gaseous NH3 flux fron root disturbance band, [g d-2 h-1]
@@ -783,7 +783,7 @@ implicit none
   allocate(this%RUPP1P(jroots,JZ1,JP1));this%RUPP1P=spval
   allocate(this%RUPP1B(jroots,JZ1,JP1));this%RUPP1B=spval
 
-  allocate(this%RootAutoRO2Limiter_pvr(jroots,JZ1,JP1));this%RootAutoRO2Limiter_pvr=spval
+  allocate(this%RAutoRootO2Limter_pvr(jroots,JZ1,JP1));this%RAutoRootO2Limter_pvr=spval
   allocate(this%CMinPO4Root_pft(jroots,JP1));this%CMinPO4Root_pft=spval
   allocate(this%VmaxPO4Root_pft(jroots,JP1));this%VmaxPO4Root_pft=spval
   allocate(this%KmPO4Root_pft(jroots,JP1));this%KmPO4Root_pft=spval
@@ -885,7 +885,7 @@ implicit none
 !  if(allocated(RUPP2B))deallocate(RUPP2B)
 !  if(allocated(RUPP1P))deallocate(RUPP1P)
 !  if(allocated(RUPP1B))deallocate(RUPP1B)
-!  if(allocated(RootAutoRO2Limiter_pvr))deallocate(RootAutoRO2Limiter_pvr)
+!  if(allocated(RAutoRootO2Limter_pvr))deallocate(RAutoRootO2Limter_pvr)
 !  if(allocated(CMinPO4Root_pft))deallocate(CMinPO4Root_pft)
 !  if(allocated(VmaxPO4Root_pft))deallocate(VmaxPO4Root_pft)
 !  if(allocated(KmPO4Root_pft))deallocate(KmPO4Root_pft)
@@ -1704,7 +1704,7 @@ implicit none
   allocate(this%NetCumElmntFlx2Plant_pft(NumPlantChemElms,JP1));this%NetCumElmntFlx2Plant_pft=spval
   allocate(this%MatureGroup_brch(MaxNumBranches,JP1));this%MatureGroup_brch=spval
   allocate(this%iPlantShootState_pft(JP1));this%iPlantShootState_pft=0
-  allocate(this%HourCount2LeafOut_brch(MaxNumBranches,JP1));this%HourCount2LeafOut_brch=spval
+  allocate(this%Hours2LeafOut_brch(MaxNumBranches,JP1));this%Hours2LeafOut_brch=spval
   allocate(this%HoursDoingRemob_brch(MaxNumBranches,JP1));this%HoursDoingRemob_brch=spval
   allocate(this%HourlyNodeNumNormByMatgrp_brch(MaxNumBranches,JP1));this%HourlyNodeNumNormByMatgrp_brch=spval
   allocate(this%dReproNodeNumNormByMatG_brch(MaxNumBranches,JP1));this%dReproNodeNumNormByMatG_brch=spval
@@ -1727,7 +1727,7 @@ implicit none
   allocate(this%LeafNumberAtFloralInit_brch(MaxNumBranches,JP1));this%LeafNumberAtFloralInit_brch=spval
   allocate(this%RefLeafAppearRate_pft(JP1));this%RefLeafAppearRate_pft=spval
   allocate(this%RefNodeInitRate_pft(JP1));this%RefNodeInitRate_pft=spval
-  allocate(this%CriticalPhotoPeriod_pft(JP1));this%CriticalPhotoPeriod_pft=spval
+  allocate(this%CriticPhotoPeriod_pft(JP1));this%CriticPhotoPeriod_pft=spval
   allocate(this%PhotoPeriodSens_pft(JP1));this%PhotoPeriodSens_pft=spval
   allocate(this%iPlantBranchState_brch(MaxNumBranches,JP1));this%iPlantBranchState_brch=0
   allocate(this%doRemobilization_brch(MaxNumBranches,JP1));this%doRemobilization_brch=0

@@ -130,7 +130,7 @@ module NutUptakeMod
     ZERO                    =>  plt_site%ZERO        , &
     ZEROP                   =>  plt_biom%ZEROP       , &
     ROXYP                   =>  plt_rbgc%ROXYP       , &
-    RootAutoRO2Limiter_pvr  =>  plt_rbgc%RootAutoRO2Limiter_pvr        , &
+    RAutoRootO2Limter_pvr  =>  plt_rbgc%RAutoRootO2Limter_pvr        , &
     RootRespPotent_pvr      =>  plt_rbgc%RootRespPotent_pvr       , &
     RootLenPerPlant_pvr     =>  plt_morph%RootLenPerPlant_pvr      , &
     MY                      =>  plt_morph%MY         , &
@@ -170,12 +170,12 @@ module NutUptakeMod
 !
 !     NUTRIENT UPTAKE
 !
-!     RootAutoRO2Limiter_pvr=constraint by O2 consumption on all biological processes
+!     RAutoRootO2Limter_pvr=constraint by O2 consumption on all biological processes
 !     FCUP=limitation to active uptake respiration from CPOOLR
 !     FWSRT=protein concentration relative to 5%
 !     RootLenPerPlant_pvr=root,myco length per plant
 !
-        IF(RootAutoRO2Limiter_pvr(N,L,NZ).GT.ZERO.AND.FCUP.GT.ZERO.AND.FWSRT.GT.ZERO &
+        IF(RAutoRootO2Limter_pvr(N,L,NZ).GT.ZERO.AND.FCUP.GT.ZERO.AND.FWSRT.GT.ZERO &
           .AND.RootLenPerPlant_pvr(N,L,NZ).GT.ZEROP(NZ))THEN
 !
 !     FZUP=limitn to active uptake respiration from CZPOLR
@@ -215,7 +215,7 @@ module NutUptakeMod
   plt_rbgc%RCO2P(1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%RUPOXP(1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%RootMycoExudElm_pvr(1:NumPlantChemElms,1:NN,1:jcplx,L1:L2,NZ)=0.0_r8
-  plt_rbgc%RootAutoRO2Limiter_pvr(1:NN,L1:L2,NZ)=1.0
+  plt_rbgc%RAutoRootO2Limter_pvr(1:NN,L1:L2,NZ)=1.0
   plt_rbgc%RUNNHP(1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%RootNutUptake_pvr(ids_NH4,1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%RootOUlmNutUptake_pvr(ids_NH4,1:NN,L1:L2,NZ)=0.0_r8
@@ -363,7 +363,7 @@ module NutUptakeMod
     ZERO                      =>  plt_site%ZERO       , &
     RootAreaPerPlant_pvr       =>  plt_morph%RootAreaPerPlant_pvr     , &
     fTgrowRootP_vr               =>  plt_pheno%fTgrowRootP_vr      , &
-    RootAutoRO2Limiter_pvr    =>  plt_rbgc%RootAutoRO2Limiter_pvr       , &
+    RAutoRootO2Limter_pvr    =>  plt_rbgc%RAutoRootO2Limter_pvr       , &
     VmaxNO3Root_pft           =>  plt_rbgc%VmaxNO3Root_pft     , &
     CminNO3Root_pft           =>  plt_rbgc%CminNO3Root_pft     , &
     KmNO3Root_pft             =>  plt_rbgc%KmNO3Root_pft     , &
@@ -413,7 +413,7 @@ module NutUptakeMod
     !     FWSRT=protein concentration relative to 5%
     !     fTgrowRootP_vr=temperature function for root growth
     !     FCUP,FZUP=limitn to active uptake respiration from CCPOLR,CZPOLR
-    !     RootAutoRO2Limiter_pvr=constraint by O2 consumption on all biological processes
+    !     RAutoRootO2Limter_pvr=constraint by O2 consumption on all biological processes
     !
     UPMXP=VmaxNO3Root_pft(N,NZ)*RootAreaPerPlant_pvr(N,L,NZ) &
       *FWSRT*fTgrowRootP_vr(L,NZ)*trcs_VLN_vr(ids_NO3,L)*AMIN1(FCUP,FZUP)
@@ -441,7 +441,7 @@ module NutUptakeMod
     PlantSoluteUptakeConfig%SolAdvFlx = RMFNO3
     PlantSoluteUptakeConfig%SolDifusFlx = DIFNO3
     PlantSoluteUptakeConfig%UptakeRateMax = UPMXP
-    PlantSoluteUptakeConfig%O2Stress  = RootAutoRO2Limiter_pvr(N,L,NZ)
+    PlantSoluteUptakeConfig%O2Stress  = RAutoRootO2Limter_pvr(N,L,NZ)
     PlantSoluteUptakeConfig%SoluteConc =trc_solml_vr(ids_NO3,L)
     PlantSoluteUptakeConfig%SoluteMassMax=ZNO3X
     PlantSoluteUptakeConfig%CAvailStress=FCUP
@@ -475,7 +475,7 @@ module NutUptakeMod
     !     FWSRT=protein concentration relative to 5%
     !     fTgrowRootP_vr=temperature function for root growth
     !     FCUP,FZUP=limitn to active uptake respiration from CCPOLR,CZPOLR
-    !     RootAutoRO2Limiter_pvr=constraint by O2 consumption on all biological processes
+    !     RAutoRootO2Limter_pvr=constraint by O2 consumption on all biological processes
     !
     UPMXP=VmaxNO3Root_pft(N,NZ)*RootAreaPerPlant_pvr(N,L,NZ) &
       *FWSRT*fTgrowRootP_vr(L,NZ)*trcs_VLN_vr(ids_NO3B,L)*AMIN1(FCUP,FZUP)
@@ -502,7 +502,7 @@ module NutUptakeMod
     PlantSoluteUptakeConfig%SolAdvFlx = RMFNOB
     PlantSoluteUptakeConfig%SolDifusFlx = DIFNOB
     PlantSoluteUptakeConfig%UptakeRateMax = UPMXP
-    PlantSoluteUptakeConfig%O2Stress  = RootAutoRO2Limiter_pvr(N,L,NZ)
+    PlantSoluteUptakeConfig%O2Stress  = RAutoRootO2Limter_pvr(N,L,NZ)
     PlantSoluteUptakeConfig%SoluteConc =trc_solcl_vr(ids_NO3B,L)
     PlantSoluteUptakeConfig%SoluteMassMax=ZNOBX
     PlantSoluteUptakeConfig%CAvailStress=FCUP
@@ -538,7 +538,7 @@ module NutUptakeMod
     ZERO                        =>  plt_site%ZERO       , &
     TortMicPM                   =>  plt_site%TortMicPM       , &
     fTgrowRootP_vr              =>  plt_pheno%fTgrowRootP_vr      , &
-    RootAutoRO2Limiter_pvr      =>  plt_rbgc%RootAutoRO2Limiter_pvr       , &
+    RAutoRootO2Limter_pvr      =>  plt_rbgc%RAutoRootO2Limter_pvr       , &
     CMinNH4Root_pft             =>  plt_rbgc%CMinNH4Root_pft     , &
     VmaxNH4Root_pft             =>  plt_rbgc%VmaxNH4Root_pft     , &
     KmNH4Root_pft               =>  plt_rbgc%KmNH4Root_pft     , &
@@ -585,7 +585,7 @@ module NutUptakeMod
 !   FWSRT=protein concentration relative to 5%
 !   fTgrowRootP_vr=temperature function for root growth
 !   FCUP,FZUP=limitn to active uptake respiration from CCPOLR,CZPOLR
-!   RootAutoRO2Limiter_pvr=constraint by O2 consumption on all biological processes
+!   RAutoRootO2Limter_pvr=constraint by O2 consumption on all biological processes
 !
     UPMXP=VmaxNH4Root_pft(N,NZ)*RootAreaPerPlant_pvr(N,L,NZ) &
       *FWSRT*fTgrowRootP_vr(L,NZ)*trcs_VLN_vr(ids_NH4,L)*AMIN1(FCUP,FZUP)
@@ -612,7 +612,7 @@ module NutUptakeMod
     PlantSoluteUptakeConfig%SolAdvFlx = RMFNH4
     PlantSoluteUptakeConfig%SolDifusFlx = DIFNH4
     PlantSoluteUptakeConfig%UptakeRateMax = UPMXP
-    PlantSoluteUptakeConfig%O2Stress  = RootAutoRO2Limiter_pvr(N,L,NZ)
+    PlantSoluteUptakeConfig%O2Stress  = RAutoRootO2Limter_pvr(N,L,NZ)
     PlantSoluteUptakeConfig%SoluteConc =trc_solcl_vr(ids_NH4,L)
     PlantSoluteUptakeConfig%SoluteMassMax=ZNH4X
     PlantSoluteUptakeConfig%CAvailStress=FCUP
@@ -646,7 +646,7 @@ module NutUptakeMod
 !   FWSRT=protein concentration relative to 5%
 !   fTgrowRootP_vr=temperature function for root growth
 !   FCUP,FZUP=limitn to active uptake respiration from CCPOLR,CZPOLR
-!   RootAutoRO2Limiter_pvr=constraint by O2 consumption on all biological processes
+!   RAutoRootO2Limter_pvr=constraint by O2 consumption on all biological processes
 !
     UPMXP=VmaxNH4Root_pft(N,NZ)*RootAreaPerPlant_pvr(N,L,NZ) &
       *FWSRT*fTgrowRootP_vr(L,NZ)*trcs_VLN_vr(ids_NH4B,L)*AMIN1(FCUP,FZUP)
@@ -674,7 +674,7 @@ module NutUptakeMod
     PlantSoluteUptakeConfig%SolAdvFlx = RMFNHB
     PlantSoluteUptakeConfig%SolDifusFlx = DIFNHB
     PlantSoluteUptakeConfig%UptakeRateMax = UPMXP
-    PlantSoluteUptakeConfig%O2Stress  = RootAutoRO2Limiter_pvr(N,L,NZ)
+    PlantSoluteUptakeConfig%O2Stress  = RAutoRootO2Limter_pvr(N,L,NZ)
     PlantSoluteUptakeConfig%SoluteConc =trc_solcl_vr(ids_NH4B,L)
     PlantSoluteUptakeConfig%SoluteMassMax=ZNHBX
     PlantSoluteUptakeConfig%CAvailStress=FCUP
@@ -712,7 +712,7 @@ module NutUptakeMod
     PlantPopulation_pft         => plt_site%PlantPopulation_pft         , &
     ZERO                        => plt_site%ZERO       , &
     fTgrowRootP_vr                 => plt_pheno%fTgrowRootP_vr      , &
-    RootAutoRO2Limiter_pvr      => plt_rbgc%RootAutoRO2Limiter_pvr       , &
+    RAutoRootO2Limter_pvr      => plt_rbgc%RAutoRootO2Limter_pvr       , &
     CMinPO4Root_pft             => plt_rbgc%CMinPO4Root_pft     , &
     KmPO4Root_pft               => plt_rbgc%KmPO4Root_pft     , &
     VmaxPO4Root_pft             => plt_rbgc%VmaxPO4Root_pft     , &
@@ -750,7 +750,7 @@ module NutUptakeMod
     !     FWSRT=protein concentration relative to 5%
     !     fTgrowRootP_vr=temperature function for root growth
     !     FCUP,FPUP=limitn to active uptake respiration from CCPOLR,CPPOLR
-    !     RootAutoRO2Limiter_pvr=constraint by O2 consumption on all biological processes
+    !     RAutoRootO2Limter_pvr=constraint by O2 consumption on all biological processes
     !
     UPMXP=0.1_r8*VmaxPO4Root_pft(N,NZ)*RootAreaPerPlant_pvr(N,L,NZ) &
       *FWSRT*fTgrowRootP_vr(L,NZ)*trcs_VLN_vr(ids_H1PO4,L)*AMIN1(FCUP,FPUP)
@@ -777,7 +777,7 @@ module NutUptakeMod
     PlantSoluteUptakeConfig%SolAdvFlx = RMFH1P
     PlantSoluteUptakeConfig%SolDifusFlx = DIFH1P
     PlantSoluteUptakeConfig%UptakeRateMax = UPMXP
-    PlantSoluteUptakeConfig%O2Stress  = RootAutoRO2Limiter_pvr(N,L,NZ)
+    PlantSoluteUptakeConfig%O2Stress  = RAutoRootO2Limter_pvr(N,L,NZ)
     PlantSoluteUptakeConfig%SoluteConc =trc_solcl_vr(ids_H1PO4,L)
     PlantSoluteUptakeConfig%SoluteMassMax=H1POX
     PlantSoluteUptakeConfig%CAvailStress=FCUP
@@ -810,7 +810,7 @@ module NutUptakeMod
     !     FWSRT=protein concentration relative to 5%
     !     fTgrowRootP_vr=temperature function for root growth
     !     FCUP,FPUP=limitn to active uptake respiration from CCPOLR,CPPOLR
-    !     RootAutoRO2Limiter_pvr=constraint by O2 consumption on all biological processes
+    !     RAutoRootO2Limter_pvr=constraint by O2 consumption on all biological processes
     !
     UPMXP=0.1_r8*VmaxPO4Root_pft(N,NZ)*RootAreaPerPlant_pvr(N,L,NZ) &
       *FWSRT*fTgrowRootP_vr(L,NZ)*trcs_VLN_vr(ids_H1PO4B,L)*AMIN1(FCUP,FPUP)
@@ -837,7 +837,7 @@ module NutUptakeMod
     PlantSoluteUptakeConfig%SolAdvFlx = RMFH2B
     PlantSoluteUptakeConfig%SolDifusFlx = DIFH1B
     PlantSoluteUptakeConfig%UptakeRateMax = UPMXP
-    PlantSoluteUptakeConfig%O2Stress  = RootAutoRO2Limiter_pvr(N,L,NZ)
+    PlantSoluteUptakeConfig%O2Stress  = RAutoRootO2Limter_pvr(N,L,NZ)
     PlantSoluteUptakeConfig%SoluteConc =trc_solcl_vr(ids_H1PO4B,L)
     PlantSoluteUptakeConfig%SoluteMassMax=H1PXB
     PlantSoluteUptakeConfig%CAvailStress=FCUP
@@ -870,7 +870,7 @@ module NutUptakeMod
   associate(                             &
     PlantPopulation_pft         => plt_site%PlantPopulation_pft         , &
     ZERO                        => plt_site%ZERO       , &
-    RootAutoRO2Limiter_pvr      => plt_rbgc%RootAutoRO2Limiter_pvr       , &
+    RAutoRootO2Limter_pvr      => plt_rbgc%RAutoRootO2Limter_pvr       , &
     KmPO4Root_pft               => plt_rbgc%KmPO4Root_pft     , &
     VmaxPO4Root_pft             => plt_rbgc%VmaxPO4Root_pft     , &
     CMinPO4Root_pft             => plt_rbgc%CMinPO4Root_pft     , &
@@ -907,7 +907,7 @@ module NutUptakeMod
       !     FWSRT=protein concentration relative to 5%
       !     fTgrowRootP_vr=temperature function for root growth
       !     FCUP,FPUP=limitn to active uptake respiration from CCPOLR,CPPOLR
-      !     RootAutoRO2Limiter_pvr=constraint by O2 consumption on all biological processes
+      !     RAutoRootO2Limter_pvr=constraint by O2 consumption on all biological processes
 !
       UPMXP=VmaxPO4Root_pft(N,NZ)*RootAreaPerPlant_pvr(N,L,NZ) &
         *FWSRT*fTgrowRootP_vr(L,NZ)*trcs_VLN_vr(ids_H1PO4,L)*AMIN1(FCUP,FPUP)
@@ -934,7 +934,7 @@ module NutUptakeMod
       PlantSoluteUptakeConfig%SolAdvFlx = RMFH2P
       PlantSoluteUptakeConfig%SolDifusFlx = DIFH2P
       PlantSoluteUptakeConfig%UptakeRateMax = UPMXP
-      PlantSoluteUptakeConfig%O2Stress  = RootAutoRO2Limiter_pvr(N,L,NZ)
+      PlantSoluteUptakeConfig%O2Stress  = RAutoRootO2Limter_pvr(N,L,NZ)
       PlantSoluteUptakeConfig%SoluteConc =trc_solcl_vr(ids_H2PO4,L)
       PlantSoluteUptakeConfig%SoluteMassMax=H2POX
       PlantSoluteUptakeConfig%CAvailStress=FCUP
@@ -968,7 +968,7 @@ module NutUptakeMod
     !     FWSRT=protein concentration relative to 5%
     !     fTgrowRootP_vr=temperature function for root growth
     !     FCUP,FPUP=limitn to active uptake respiration from CCPOLR,CPPOLR
-    !     RootAutoRO2Limiter_pvr=constraint by O2 consumption on all biological processes
+    !     RAutoRootO2Limter_pvr=constraint by O2 consumption on all biological processes
     !
     UPMXP=VmaxPO4Root_pft(N,NZ)*RootAreaPerPlant_pvr(N,L,NZ) &
       *FWSRT*fTgrowRootP_vr(L,NZ)*trcs_VLN_vr(ids_H1PO4B,L)*AMIN1(FCUP,FPUP)
@@ -996,7 +996,7 @@ module NutUptakeMod
     PlantSoluteUptakeConfig%SolAdvFlx = RMFH2B
     PlantSoluteUptakeConfig%SolDifusFlx = DIFH2B
     PlantSoluteUptakeConfig%UptakeRateMax = UPMXP
-    PlantSoluteUptakeConfig%O2Stress  = RootAutoRO2Limiter_pvr(N,L,NZ)
+    PlantSoluteUptakeConfig%O2Stress  = RAutoRootO2Limter_pvr(N,L,NZ)
     PlantSoluteUptakeConfig%SoluteConc =trc_solcl_vr(ids_H2PO4B,L)
     PlantSoluteUptakeConfig%SoluteMassMax=H2PXB
     PlantSoluteUptakeConfig%CAvailStress=FCUP

@@ -581,7 +581,7 @@ module StartqsMod
     Hours4ShortenPhotoPeriod_brch     =>  plt_pheno%Hours4ShortenPhotoPeriod_brch   , &
     iPlantCalendar_brch               =>  plt_pheno%iPlantCalendar_brch , &
     Hours4Leafout_brch                =>  plt_pheno%Hours4Leafout_brch   , &
-    HourCount2LeafOut_brch          =>  plt_pheno%HourCount2LeafOut_brch   , &
+    Hours2LeafOut_brch          =>  plt_pheno%Hours2LeafOut_brch   , &
     HoursCanopyPSITooLow              =>  plt_pheno%HoursCanopyPSITooLow   , &
     MatureGroup_pft                   =>  plt_pheno%MatureGroup_pft, &
     PetioleChemElmRemobFlx_brch       =>  plt_pheno%PetioleChemElmRemobFlx_brch  , &
@@ -659,7 +659,7 @@ module StartqsMod
     Hours4ShortenPhotoPeriod_brch(NB,NZ)=0._r8
     Hours4Leafout_brch(NB,NZ)=Hours4LenthenPhotoPeriod_brch(NB,NZ)
     Hours4LeafOff_brch(NB,NZ)=Hours4ShortenPhotoPeriod_brch(NB,NZ)
-    HourCount2LeafOut_brch(NB,NZ)=0._r8
+    Hours2LeafOut_brch(NB,NZ)=0._r8
     RubiscoActivity_brch(NB,NZ)=1.0
     C4PhotosynDowreg_brch(NB,NZ)=1.0
     HourFailGrainFill_brch(NB,NZ)=0
@@ -984,7 +984,7 @@ module StartqsMod
       plt_rbgc%trcs_rootml_pvr(idg_O2,N,L,NZ)=COXYP*RootVH2O_pvr(N,L,NZ)
       plt_rbgc%trcg_rootml_pvr(idg_beg:idg_end-1,N,L,NZ)=0._r8
       plt_rbgc%trcs_rootml_pvr(idg_beg:idg_end-1,N,L,NZ)=0._r8
-      plt_rbgc%RootAutoRO2Limiter_pvr(N,L,NZ)=1.0
+      plt_rbgc%RAutoRootO2Limter_pvr(N,L,NZ)=1.0
       D30: DO NR=1,MaxNumRootAxes
         plt_morph%Root2ndXNum_rpvr(N,L,NR,NZ)=0._r8
         plt_morph%Root1stLen_rpvr(N,L,NR,NZ)=0._r8
