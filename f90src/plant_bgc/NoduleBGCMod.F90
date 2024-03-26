@@ -73,7 +73,7 @@ module NoduleBGCMod
     NodulerNC_pft            =>  plt_allom%NodulerNC_pft   , &
     NodulerPC_pft            =>  plt_allom%NodulerPC_pft   , &
     LeafPetolBiomassC_brch   =>  plt_biom%LeafPetolBiomassC_brch    , &
-    NonStrutElms_brch        =>  plt_biom%NonStrutElms_brch   , &
+    CanopyNonstElms_brch        =>  plt_biom%CanopyNonstElms_brch   , &
     CanopyNodulNonstElms_brch       =>  plt_biom%CanopyNodulNonstElms_brch   , &
     ZEROP                    =>  plt_biom%ZEROP    , &
     ZEROL                    =>  plt_biom%ZEROL    , &
@@ -360,7 +360,7 @@ module NoduleBGCMod
 !     XFRE(ielmc),XFRE(ielmn),XFRE(ielmp)=nonstructural C,N,P transfer
 !     CPOLNB,ZPOLNB,PPOLNB=nonstructural C,N,P in bacteria
 !
-    IF(NonStrutElms_brch(ielmc,NB,NZ).GT.ZEROP(NZ).AND.LeafPetolBiomassC_brch(NB,NZ).GT.ZEROL(NZ))THEN
+    IF(CanopyNonstElms_brch(ielmc,NB,NZ).GT.ZEROP(NZ).AND.LeafPetolBiomassC_brch(NB,NZ).GT.ZEROL(NZ))THEN
       CCNDLB=CanopyNodulStrutElms_brch(ielmc,NB,NZ)/LeafPetolBiomassC_brch(NB,NZ)
       WTLSB1=LeafPetolBiomassC_brch(NB,NZ)
       WTNDB1=AMIN1(LeafPetolBiomassC_brch(NB,NZ),AMAX1(NodulBiomCatInfection*AREA3(NU) &
@@ -369,19 +369,19 @@ module NoduleBGCMod
       IF(WTLSBT.GT.ZEROP(NZ))THEN
         FXRNX=FXRN(iPlantNfixType(NZ))/(1.0_r8+CCNDLB/CCNGB)
 !    2/(1.0+CCNDLB/(CCNGB*FXRN(iPlantNfixType(NZ))))
-        CPOOLD=(NonStrutElms_brch(ielmc,NB,NZ)*WTNDB1-CanopyNodulNonstElms_brch(ielmc,NB,NZ)*WTLSB1)/WTLSBT
+        CPOOLD=(CanopyNonstElms_brch(ielmc,NB,NZ)*WTNDB1-CanopyNodulNonstElms_brch(ielmc,NB,NZ)*WTLSB1)/WTLSBT
         XFRE(ielmc)=FXRNX*CPOOLD
-        NonStrutElms_brch(ielmc,NB,NZ)=NonStrutElms_brch(ielmc,NB,NZ)-XFRE(ielmc)
+        CanopyNonstElms_brch(ielmc,NB,NZ)=CanopyNonstElms_brch(ielmc,NB,NZ)-XFRE(ielmc)
         CanopyNodulNonstElms_brch(ielmc,NB,NZ)=CanopyNodulNonstElms_brch(ielmc,NB,NZ)+XFRE(ielmc)
 
-        CPOOLT=NonStrutElms_brch(ielmc,NB,NZ)+CanopyNodulNonstElms_brch(ielmc,NB,NZ)
+        CPOOLT=CanopyNonstElms_brch(ielmc,NB,NZ)+CanopyNodulNonstElms_brch(ielmc,NB,NZ)
         IF(CPOOLT.GT.ZEROP(NZ))THEN
-          ZPOOLD=(NonStrutElms_brch(ielmn,NB,NZ)*CanopyNodulNonstElms_brch(ielmc,NB,NZ)-CanopyNodulNonstElms_brch(ielmn,NB,NZ)*NonStrutElms_brch(ielmc,NB,NZ))/CPOOLT
+          ZPOOLD=(CanopyNonstElms_brch(ielmn,NB,NZ)*CanopyNodulNonstElms_brch(ielmc,NB,NZ)-CanopyNodulNonstElms_brch(ielmn,NB,NZ)*CanopyNonstElms_brch(ielmc,NB,NZ))/CPOOLT
           XFRE(ielmn)=FXRNX*ZPOOLD
-          PPOOLD=(NonStrutElms_brch(ielmp,NB,NZ)*CanopyNodulNonstElms_brch(ielmc,NB,NZ)-CanopyNodulNonstElms_brch(ielmp,NB,NZ)*NonStrutElms_brch(ielmc,NB,NZ))/CPOOLT
+          PPOOLD=(CanopyNonstElms_brch(ielmp,NB,NZ)*CanopyNodulNonstElms_brch(ielmc,NB,NZ)-CanopyNodulNonstElms_brch(ielmp,NB,NZ)*CanopyNonstElms_brch(ielmc,NB,NZ))/CPOOLT
           XFRE(ielmp)=FXRNX*PPOOLD
           DO NE=2,NumPlantChemElms
-            NonStrutElms_brch(NE,NB,NZ)=NonStrutElms_brch(NE,NB,NZ)-XFRE(NE)
+            CanopyNonstElms_brch(NE,NB,NZ)=CanopyNonstElms_brch(NE,NB,NZ)-XFRE(NE)
             CanopyNodulNonstElms_brch(NE,NB,NZ)=CanopyNodulNonstElms_brch(NE,NB,NZ)+XFRE(NE)
           ENDDO
         ENDIF

@@ -15,6 +15,7 @@ module RootDataType
   integer,target,allocatable ::  iPlantRootState_pft(:,:,:)                      !flag to detect root system death , [-]
   integer,target,allocatable ::  NIXBotRootLayer_pft(:,:,:)              !maximum soil layer number for all root axes, [-]
   integer,target,allocatable ::  MaxSoiL4Root(:,:,:)                           !maximum soil layer number for all root axes, [-]
+  real(r8),target,allocatable :: RootElmsbeg_pft(:,:,:,:)            !root biomass per pft
   real(r8),target,allocatable ::  RootBiomGrowthYield(:,:,:)                        !root growth yield, [g g-1]
   real(r8),target,allocatable ::  MinNonstructuralC4InitRoot_pft(:,:,:)                          !threshold root nonstructural C content for initiating new root axis, [g g-1]
   real(r8),target,allocatable ::  RootFracRemobilizableBiom(:,:,:)                       !fraction of remobilizable nonstructural biomass in root, [-]
@@ -97,6 +98,7 @@ contains
   allocate(iPlantRootState_pft(JP,JY,JX));    iPlantRootState_pft=iDead
   allocate(NIXBotRootLayer_pft(JP,JY,JX));      NIXBotRootLayer_pft=0
   allocate(MaxSoiL4Root(JP,JY,JX));       MaxSoiL4Root=0
+  allocate(RootElmsbeg_pft(NumPlantChemElms,JP,JY,JX)); RootElmsbeg_pft=0._r8
   allocate(RootBiomGrowthYield(JP,JY,JX));     RootBiomGrowthYield=0._r8
   allocate(MinNonstructuralC4InitRoot_pft(JP,JY,JX));       MinNonstructuralC4InitRoot_pft=0._r8
   allocate(RootFracRemobilizableBiom(JP,JY,JX));    RootFracRemobilizableBiom=0._r8
@@ -177,6 +179,7 @@ contains
   call destroy(iPlantRootState_pft)
   call destroy(NIXBotRootLayer_pft)
   call destroy(MaxSoiL4Root)
+  call destroy(RootElmsbeg_pft)
   call destroy(RootBiomGrowthYield)
   call destroy(MinNonstructuralC4InitRoot_pft)
   call destroy(RootFracRemobilizableBiom)

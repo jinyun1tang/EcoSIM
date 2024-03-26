@@ -525,7 +525,7 @@ module StartqMod
 !
   HoursCanopyPSITooLow(NZ,NY,NX)=0._r8
   CHILL(NZ,NY,NX)=0._r8
-  NonStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)=0._r8
+  CanopyNonstElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)=0._r8
   CanopyNodulNonstElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)=0._r8
   ShootStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)=0._r8
   PetoleStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)=0._r8
@@ -577,10 +577,10 @@ module StartqMod
       ENDDO D55
 
       IF(K.NE.0)THEN
-        CPOOL3(K,NB,NZ,NY,NX)=0._r8
+        CPOOL3_node(K,NB,NZ,NY,NX)=0._r8
         CMassCO2BundleSheath_node(K,NB,NZ,NY,NX)=0._r8
         CMassHCO3BundleSheath_node(K,NB,NZ,NY,NX)=0._r8
-        CPOOL4(K,NB,NZ,NY,NX)=0._r8
+        CPOOL4_node(K,NB,NZ,NY,NX)=0._r8
         D45: DO L=1,NumOfCanopyLayers
           DO N=1,NumOfLeafZenithSectors
             LeafAreaZsec_brch(N,L,K,NB,NZ,NY,NX)=0._r8
@@ -594,7 +594,7 @@ module StartqMod
     CanopyLeafCLyr_pft(L,NZ,NY,NX)=0._r8
     CanopyStemArea_lpft(L,NZ,NY,NX)=0._r8
   ENDDO D35
-  CanopyNonStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
+  CanopyNonstElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
   CanopyNonstructElmConc_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
   NoduleNonstructCconc_pft(NZ,NY,NX)=0._r8
   ShootStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
@@ -834,8 +834,8 @@ module StartqMod
   FDM=AMIN1(1.0_r8,0.16_r8-0.045_r8*PSICanopy_pft(NZ,NY,NX))
   CanopyWater_pft(NZ,NY,NX)=ppmc*CanopyLeafShethC_pft(NZ,NY,NX)/FDM
   WatByPCanopy(NZ,NY,NX)=0._r8
-  NonStrutElms_brch(ielmn,1,NZ,NY,NX)=CNGR(NZ,NY,NX)*NonStrutElms_brch(ielmc,1,NZ,NY,NX)
-  NonStrutElms_brch(ielmp,1,NZ,NY,NX)=CPGR(NZ,NY,NX)*NonStrutElms_brch(ielmc,1,NZ,NY,NX)
+  CanopyNonstElms_brch(ielmn,1,NZ,NY,NX)=CNGR(NZ,NY,NX)*CanopyNonstElms_brch(ielmc,1,NZ,NY,NX)
+  CanopyNonstElms_brch(ielmp,1,NZ,NY,NX)=CPGR(NZ,NY,NX)*CanopyNonstElms_brch(ielmc,1,NZ,NY,NX)
   
   RootMyco1stStrutElms_rpvr(ielmn,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)= &
     CNGR(NZ,NY,NX)*RootMyco1stStrutElms_rpvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)

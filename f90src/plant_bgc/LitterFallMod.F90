@@ -13,10 +13,10 @@ implicit none
   contains
 !------------------------------------------------------------------------------------------
 
-  subroutine ResetDeadBranch(I,J,NZ,ShootNonstructC_brch)
+  subroutine ResetDeadBranch(I,J,NZ,ShootC4NonstC_brch)
   implicit none
   integer, intent(in) :: I,J,NZ
-  real(r8),intent(inout) :: ShootNonstructC_brch(NumOfCanopyLayers1,JP1)
+  real(r8),intent(inout) :: ShootC4NonstC_brch(NumOfCanopyLayers1,JP1)
   integer :: IDTHY
 
 !     begin_execution
@@ -75,7 +75,7 @@ implicit none
 !
 !     RESET PHENOLOGY AND GROWTH STAGE OF DEAD BRANCHES
 !
-    call LiterfallFromDeadBranches(I,J,NZ,IDTHY,ShootNonstructC_brch)
+    call LiterfallFromDeadBranches(I,J,NZ,IDTHY,ShootC4NonstC_brch)
 
     IF(IDTHY.EQ.NumOfBranches_pft(NZ))THEN
       iPlantShootState_pft(NZ)=iDead
@@ -124,18 +124,18 @@ implicit none
 !
     call LiterfallFromDeadRoots(I,J,NZ)
 !
-    call LiterfallFromRootShootStorage(I,J,NZ,ShootNonstructC_brch)
+    call LiterfallFromRootShootStorage(I,J,NZ,ShootC4NonstC_brch)
   ENDIF
   end associate
   end subroutine ResetDeadBranch
 !------------------------------------------------------------------------------------------
 
-  subroutine LiterfallFromRootShootStorage(I,J,NZ,ShootNonstructC_brch)
+  subroutine LiterfallFromRootShootStorage(I,J,NZ,ShootC4NonstC_brch)
 
   use EcoSIMCtrlDataType, only : iYearCurrent
   implicit none
   integer, intent(in) :: I,J,NZ
-  REAL(R8),INTENT(INOUT) :: ShootNonstructC_brch(NumOfCanopyLayers1,JP1)
+  REAL(R8),INTENT(INOUT) :: ShootC4NonstC_brch(NumOfCanopyLayers1,JP1)
   integer :: L,M,NR,NB,N,NE
 !     begin_execution
   associate(                            &
@@ -143,7 +143,7 @@ implicit none
     iYearPlanting_pft                =>   plt_distb%iYearPlanting_pft    , &
     iDayPlanting_pft                 =>   plt_distb%iDayPlanting_pft   , &
     EarStrutElms_brch                =>   plt_biom%EarStrutElms_brch  , &
-    NonStrutElms_brch                =>   plt_biom%NonStrutElms_brch   , &
+    CanopyNonstElms_brch                =>   plt_biom%CanopyNonstElms_brch   , &
     StalkStrutElms_brch              =>   plt_biom%StalkStrutElms_brch  , &
     HuskStrutElms_brch               =>   plt_biom%HuskStrutElms_brch  , &
     PetoleStrutElms_brch             =>   plt_biom%PetoleStrutElms_brch , &
@@ -195,7 +195,7 @@ implicit none
 !     CFOPC,CFOPN,CFOPC=fraction of LitrFall C,N,P allocated to litter components
 !     CPOOL,ZPOOL,PPOOL=non-structural C,N,P in branch
 !     CPOLNB,ZPOLNB,PPOLNB=nonstructural C,N,P in bacteria
-!     ShootNonstructC_brch=total C4 nonstructural C in branch
+!     ShootC4NonstC_brch=total C4 nonstructural C in branch
 !     WTRSVB,WTRSBN,WTRSBP=stalk reserve C,N,P mass
 !     WTLFB,WTLFBN,WTLFBP=branch leaf C,N,P mass
 !     FWODB=C woody fraction in other organs:0=woody,1=non-woody
@@ -216,7 +216,7 @@ implicit none
         D8825: DO NB=1,NumOfBranches_pft(NZ)
 
           LitfalStrutElms_pvr(ielmc,M,k_fine_litr,0,NZ)=LitfalStrutElms_pvr(ielmc,M,k_fine_litr,0,NZ) &
-            +CFOPE(ielmc,inonstruct,M,NZ)*ShootNonstructC_brch(NB,NZ)
+            +CFOPE(ielmc,inonstruct,M,NZ)*ShootC4NonstC_brch(NB,NZ)
 
           DO NE=1,NumPlantChemElms
             LitfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)=LitfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ) &
@@ -224,7 +224,7 @@ implicit none
               +PetoleStrutElms_brch(NE,NB,NZ)*FWODBE(NE,k_woody_litr))
 
             LitfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ) &
-              +CFOPE(NE,inonstruct,M,NZ)*(NonStrutElms_brch(NE,NB,NZ)+CanopyNodulNonstElms_brch(NE,NB,NZ) &
+              +CFOPE(NE,inonstruct,M,NZ)*(CanopyNonstElms_brch(NE,NB,NZ)+CanopyNodulNonstElms_brch(NE,NB,NZ) &
               +StalkRsrvElms_brch(NE,NB,NZ)) &
               +CFOPE(NE,ifoliar,M,NZ)*(LeafStrutElms_brch(NE,NB,NZ)*FWODLE(NE,k_fine_litr) &
               +CanopyNodulStrutElms_brch(NE,NB,NZ)) &
@@ -283,7 +283,7 @@ implicit none
         ENDDO
       ENDDO D6425
 !
-      call ResetBranchRootStates(NZ,ShootNonstructC_brch)
+      call ResetBranchRootStates(NZ,ShootC4NonstC_brch)
     ENDIF
 !
 !     RESEED DEAD PERENNIALS
@@ -480,11 +480,11 @@ implicit none
   end subroutine LiterfallFromDeadRoots
 !------------------------------------------------------------------------------------------
 
-  subroutine LiterfallFromDeadBranches(I,J,NZ,IDTHY,ShootNonstructC_brch)
+  subroutine LiterfallFromDeadBranches(I,J,NZ,IDTHY,ShootC4NonstC_brch)
   implicit none
   integer, intent(in) :: I,J,NZ
   integer, intent(inout) :: IDTHY
-  real(r8), intent(inout) :: ShootNonstructC_brch(NumOfCanopyLayers1,JP1)
+  real(r8), intent(inout) :: ShootC4NonstC_brch(NumOfCanopyLayers1,JP1)
   integer :: M,NE,NB
 !     begin_execution
   associate(                                &
@@ -499,7 +499,7 @@ implicit none
     LeafStrutElms_brch   =>  plt_biom%LeafStrutElms_brch    , &
     ZEROP     =>  plt_biom%ZEROP      , &
     EarStrutElms_brch   =>  plt_biom%EarStrutElms_brch    , &
-    NonStrutElms_brch    =>  plt_biom%NonStrutElms_brch     , &
+    CanopyNonstElms_brch    =>  plt_biom%CanopyNonstElms_brch     , &
     GrainStrutElms_brch    =>  plt_biom%GrainStrutElms_brch     , &
     StalkRsrvElms_brch   =>  plt_biom%StalkRsrvElms_brch    , &
     StandDeadKCompElms_pft    =>  plt_biom%StandDeadKCompElms_pft     , &
@@ -632,14 +632,14 @@ implicit none
 !
 !     WTRVC,WTRVN,WTRVP=storage C,N,P
 !     CPOOL,ZPOOL,PPOOL=non-structural C,N,P in branch
-!     ShootNonstructC_brch=total C4 nonstructural C in branch
+!     ShootC4NonstC_brch=total C4 nonstructural C in branch
 !     WTRSVB,WTRSBN,WTRSBP=stalk reserve C,N,P mass
 !     iHarvstType_pft=harvest type:0=none,1=grain,2=all above-ground
 !                       ,3=pruning,4=grazing,5=fire,6=herbivory
 !
-      NonStrutElms_pft(ielmc,NZ)=NonStrutElms_pft(ielmc,NZ)+ShootNonstructC_brch(NB,NZ)
+      NonStrutElms_pft(ielmc,NZ)=NonStrutElms_pft(ielmc,NZ)+ShootC4NonstC_brch(NB,NZ)
       DO NE=1,NumPlantChemElms
-        NonStrutElms_pft(NE,NZ)=NonStrutElms_pft(NE,NZ)+NonStrutElms_brch(NE,NB,NZ)
+        NonStrutElms_pft(NE,NZ)=NonStrutElms_pft(NE,NZ)+CanopyNonstElms_brch(NE,NB,NZ)
         IF(iHarvstType_pft(NZ).NE.4.AND.iHarvstType_pft(NZ).NE.6)THEN
           D6406: DO M=1,jsken
             LitfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ) &
@@ -650,7 +650,7 @@ implicit none
         ENDIF
       ENDDO
 !
-      call ResetDeadRootStates(NB,NZ,ShootNonstructC_brch)
+      call ResetDeadRootStates(NB,NZ,ShootC4NonstC_brch)
 
       IDTHY=IDTHY+1
     ENDIF
@@ -660,14 +660,14 @@ implicit none
 
 !------------------------------------------------------------------------------------------
 
-  subroutine ResetBranchRootStates(NZ,ShootNonstructC_brch)
+  subroutine ResetBranchRootStates(NZ,ShootC4NonstC_brch)
   implicit none
   integer, intent(in) :: NZ
-  real(r8),INTENT(OUT) :: ShootNonstructC_brch(NumOfCanopyLayers1,JP1)
+  real(r8),INTENT(OUT) :: ShootC4NonstC_brch(NumOfCanopyLayers1,JP1)
   integer :: L,NR,N,NE,NB
 !     begin_execution
   associate(                           &
-    NonStrutElms_brch => plt_biom%NonStrutElms_brch        , &
+    CanopyNonstElms_brch => plt_biom%CanopyNonstElms_brch        , &
     CanopyNodulNonstElms_brch => plt_biom%CanopyNodulNonstElms_brch        , &
     ShootStrutElms_brch=> plt_biom%ShootStrutElms_brch       , &
     LeafStrutElms_brch=> plt_biom%LeafStrutElms_brch       , &
@@ -700,7 +700,7 @@ implicit none
 !
   DO NE=1,NumPlantChemElms
     DO NB=1,NumOfBranches_pft(NZ)
-      NonStrutElms_brch(NE,NB,NZ)=0._r8
+      CanopyNonstElms_brch(NE,NB,NZ)=0._r8
       CanopyNodulNonstElms_brch(NE,NB,NZ)=0._r8
       ShootStrutElms_brch(NE,NB,NZ)=0._r8
       LeafStrutElms_brch(NE,NB,NZ)=0._r8
@@ -710,7 +710,7 @@ implicit none
     ENDDO
   ENDDO
   D8835: DO NB=1,NumOfBranches_pft(NZ)
-    ShootNonstructC_brch(NB,NZ)=0._r8
+    ShootC4NonstC_brch(NB,NZ)=0._r8
     StalkBiomassC_brch(NB,NZ)=0._r8
     CanopyNodulStrutElms_brch(1:NumPlantChemElms,NB,NZ)=0._r8
     HuskStrutElms_brch(1:NumPlantChemElms,NB,NZ)=0._r8
@@ -742,15 +742,15 @@ implicit none
 
 !------------------------------------------------------------------------------------------
 
-  subroutine ResetDeadRootStates(NB,NZ,ShootNonstructC_brch)
+  subroutine ResetDeadRootStates(NB,NZ,ShootC4NonstC_brch)
 !     RESET STATE VARIABLES FROM DEAD BRANCHES
   implicit none
   integer, intent(in) :: NB,NZ
-  real(r8),intent(inout) :: ShootNonstructC_brch(NumOfCanopyLayers1,JP1)
+  real(r8),intent(inout) :: ShootC4NonstC_brch(NumOfCanopyLayers1,JP1)
   integer :: L,K,N
 !     begin_execution
   associate(                          &
-    NonStrutElms_brch   => plt_biom%NonStrutElms_brch     , &
+    CanopyNonstElms_brch   => plt_biom%CanopyNonstElms_brch     , &
     CanopyNodulNonstElms_brch   => plt_biom%CanopyNodulNonstElms_brch     , &
     ShootStrutElms_brch  => plt_biom%ShootStrutElms_brch    , &
     LeafStrutElms_brch  => plt_biom%LeafStrutElms_brch    , &
@@ -771,8 +771,8 @@ implicit none
     LeafChemElmByLayerNode_brch   => plt_biom%LeafChemElmByLayerNode_brch     , &
     CanopyLeafCLyr_pft    => plt_biom%CanopyLeafCLyr_pft      , &
     PetoleStrutElms_brch => plt_biom%PetoleStrutElms_brch   , &
-    CPOOL3   => plt_photo%CPOOL3    , &
-    CPOOL4   => plt_photo%CPOOL4    , &
+    CPOOL3_node   => plt_photo%CPOOL3_node    , &
+    CPOOL4_node   => plt_photo%CPOOL4_node    , &
     CMassCO2BundleSheath_node     => plt_photo%CMassCO2BundleSheath_node      , &
     CMassHCO3BundleSheath_node     => plt_photo%CMassHCO3BundleSheath_node      , &
     GrainSeedBiomCMean_brch    => plt_allom%GrainSeedBiomCMean_brch     , &
@@ -807,7 +807,7 @@ implicit none
 !     SeedNumSet_brch=seed set number
 !     PotentialSeedSites_brch=potential number of seed set sites
 !     GrainSeedBiomCMean_brch=individual seed size
-!     CPOOL3,CPOOL4=C4 nonstructural C mass in bundle sheath,mesophyll
+!     CPOOL3_node,CPOOL4_node=C4 nonstructural C mass in bundle sheath,mesophyll
 !     CMassCO2BundleSheath_node,CMassHCO3BundleSheath_node=aqueous CO2,HCO3-C mass in bundle sheath
 !     LeafProteinCNode_brch=leaf protein mass
 !     LeafAreaLive_brch=branch leaf area
@@ -815,8 +815,8 @@ implicit none
 !     PetioleElmntNode_brch,WGSHN,WGSHP,PetioleProteinCNode_brch=node petiole C,N,P,protein mass
 !     InternodeStrutElms_brch,WGNODN,WGNODP=node stalk C,N,P mass
 !
-  ShootNonstructC_brch(NB,NZ)=0._r8
-  NonStrutElms_brch(1:NumPlantChemElms,NB,NZ)=0._r8
+  ShootC4NonstC_brch(NB,NZ)=0._r8
+  CanopyNonstElms_brch(1:NumPlantChemElms,NB,NZ)=0._r8
   CanopyNodulNonstElms_brch(1:NumPlantChemElms,NB,NZ)=0._r8
   ShootStrutElms_brch(1:NumPlantChemElms,NB,NZ)=0._r8
   LeafStrutElms_brch(1:NumPlantChemElms,NB,NZ)=0._r8
@@ -837,8 +837,8 @@ implicit none
 
   D8855: DO K=0,MaxNodesPerBranch1
     IF(K.NE.0)THEN
-      CPOOL3(K,NB,NZ)=0._r8
-      CPOOL4(K,NB,NZ)=0._r8
+      CPOOL3_node(K,NB,NZ)=0._r8
+      CPOOL4_node(K,NB,NZ)=0._r8
       CMassCO2BundleSheath_node(K,NB,NZ)=0._r8
       CMassHCO3BundleSheath_node(K,NB,NZ)=0._r8
     ENDIF
