@@ -242,7 +242,7 @@ module HfuncsMod
 ! begin_execution
   associate(                                                                        &
     CanopyNonstructElmConc_pft      =>   plt_biom%CanopyNonstructElmConc_pft  , &
-    NonstructElms_pft               =>   plt_biom%NonstructElms_pft   , &
+    NonStrutElms_pft               =>   plt_biom%NonStrutElms_pft   , &
     MatureGroup_brch                =>   plt_pheno%MatureGroup_brch , &
     iPlantCalendar_brch             =>   plt_pheno%iPlantCalendar_brch , &
     doInitPlant_pft                 =>   plt_pheno%doInitPlant_pft  , &
@@ -297,7 +297,7 @@ module HfuncsMod
         IF(iPlantPhenolPattern_pft(NZ).NE.iplt_annual.OR. &
           iPlantCalendar_brch(ipltcal_InitFloral,MainBranchNum_pft(NZ),NZ).EQ.0)THEN
           !perennial plant or flower not initiated for annual plant 
-          IF((NumOfBranches_pft(NZ).EQ.0 .AND. NonstructElms_pft(ielmc,NZ).GT.0.0_r8) &
+          IF((NumOfBranches_pft(NZ).EQ.0 .AND. NonStrutElms_pft(ielmc,NZ).GT.0.0_r8) &
             .OR.(CanopyNonstructElmConc_pft(ielmc,NZ).GT.MinNonstructalC4InitBranch(NZ) &
             .AND.MinNonstructalC4InitBranch(NZ).GT.0.0_r8))THEN
 
@@ -336,13 +336,13 @@ module HfuncsMod
 !     MainBranchNum_pft: number of main branch
 !     CanopyNonstructElmConc_pft: canopy nonstructural element concentration
 !     PSIRootTurg_vr: root turgor pressure
-!     NonstructElms_pft: non-structural carbon
+!     NonStrutElms_pft: non-structural carbon
 
       IF(PSIRootTurg_vr(ipltroot,NGTopRootLayer_pft(NZ),NZ).GT.PSIMin4LeafExpansion)THEN
 !        write(101,*)'root OK for leaf expansion',NZ
         IF(NumRootAxes_pft(NZ).EQ.0.OR.ShootNodeNumber_brch(MainBranchNum_pft(NZ),NZ) &
           .GT.NumRootAxes_pft(NZ)/FNOD(NZ)+XTLI(NZ))THEN
-          IF((NumRootAxes_pft(NZ).EQ.0 .AND. NonstructElms_pft(ielmc,NZ).GT.0.0_r8) &
+          IF((NumRootAxes_pft(NZ).EQ.0 .AND. NonStrutElms_pft(ielmc,NZ).GT.0.0_r8) &
             .OR.(CanopyNonstructElmConc_pft(ielmc,NZ).GT.MinNonstructuralC4InitRoot_pft(NZ) & 
             .AND.MinNonstructuralC4InitRoot_pft(NZ).GT.0.0_r8))THEN
             NumRootAxes_pft(NZ)=MIN(NumOfCanopyLayers1,NumRootAxes_pft(NZ)+1)
@@ -366,14 +366,14 @@ module HfuncsMod
   associate(                           &
     CanopyLeafShethC_pft            =>  plt_biom%CanopyLeafShethC_pft     , &
     LeafPetolBiomassC_brch          =>  plt_biom%LeafPetolBiomassC_brch    , &
-    ShootChemElms_pft               =>  plt_biom%ShootChemElms_pft   , &
+    ShootStrutElms_pft               =>  plt_biom%ShootStrutElms_pft   , &
     NoduleNonstructCconc_pft        =>  plt_biom%NoduleNonstructCconc_pft   , &
     LeafPetoNonstElmConc_brch       =>  plt_biom%LeafPetoNonstElmConc_brch   , &
     CanopyNonstructElmConc_pft      =>  plt_biom%CanopyNonstructElmConc_pft   , &
-    CanopyNonstructElms_pft         =>  plt_biom%CanopyNonstructElms_pft   , &
-    NodulNonstElm_brch              =>  plt_biom%NodulNonstElm_brch   , &
-    RootMycoNonstElm_pvr            =>  plt_biom%RootMycoNonstElm_pvr   , &
-    NonstructElm_brch               =>  plt_biom%NonstructElm_brch   , &
+    CanopyNonStrutElms_pft         =>  plt_biom%CanopyNonStrutElms_pft   , &
+    CanopyNodulNonstElms_brch              =>  plt_biom%CanopyNodulNonstElms_brch   , &
+    RootMycoNonstElms_rpvr            =>  plt_biom%RootMycoNonstElms_rpvr   , &
+    NonStrutElms_brch               =>  plt_biom%NonStrutElms_brch   , &
     RootNonstructElmConc_pvr        =>  plt_biom%RootNonstructElmConc_pvr   , &
     ZEROL                           =>  plt_biom%ZEROL    , &
     ZEROP                           =>  plt_biom%ZEROP    , &
@@ -394,11 +394,11 @@ module HfuncsMod
     BranchNumber_brch               =>  plt_morph%BranchNumber_brch    , &
     HypoctoHeight_pft               =>  plt_morph%HypoctoHeight_pft   , &
     SeedDepth_pft                   =>  plt_morph%SeedDepth_pft   , &
-    CanopyStemA_pft                 =>  plt_morph%CanopyStemA_pft   , &
+    CanopyStemArea_pft                 =>  plt_morph%CanopyStemArea_pft   , &
     MaxSoiL4Root                    =>  plt_morph%MaxSoiL4Root        &
   )
   plt_bgcr%RootGasLossDisturb_pft(idg_beg:idg_end-1,NZ)=0.0_r8
-  CanopyNonstructElms_pft(1:NumPlantChemElms,NZ)=0.0_r8
+  CanopyNonStrutElms_pft(1:NumPlantChemElms,NZ)=0.0_r8
   MaxSoiL4Root(NZ)=NIXBotRootLayer_pft(NZ)
   NGTopRootLayer_pft(NZ)=MIN(MaxSoiL4Root(NZ),MAX(NGTopRootLayer_pft(NZ),NU))
   MainBranchNum_pft(NZ)=1
@@ -414,8 +414,8 @@ module HfuncsMod
   D140: DO NB=1,NumOfBranches_pft(NZ)
     DO NE=1,NumPlantChemElms
       IF(iPlantBranchState_brch(NB,NZ).EQ.iLive)THEN
-        CanopyNonstructElms_pft(NE,NZ)=CanopyNonstructElms_pft(NE,NZ)+NonstructElm_brch(NE,NB,NZ)
-        NoduleNonstructElmnt_pft(NE,NZ)=NoduleNonstructElmnt_pft(NE,NZ)+NodulNonstElm_brch(NE,NB,NZ)
+        CanopyNonStrutElms_pft(NE,NZ)=CanopyNonStrutElms_pft(NE,NZ)+NonStrutElms_brch(NE,NB,NZ)
+        NoduleNonstructElmnt_pft(NE,NZ)=NoduleNonstructElmnt_pft(NE,NZ)+CanopyNodulNonstElms_brch(NE,NB,NZ)
       ENDIF
     ENDDO     
   ENDDO D140
@@ -440,7 +440,7 @@ module HfuncsMod
     D160: DO L=NU,MaxSoiL4Root(NZ)
       IF(RootMycoActiveBiomC_pvr(N,L,NZ).GT.ZEROL(NZ))THEN
         DO NE=1,NumPlantChemElms
-          RootNonstructElmConc_pvr(NE,N,L,NZ)=AZMAX1(RootMycoNonstElm_pvr(NE,N,L,NZ)/RootMycoActiveBiomC_pvr(N,L,NZ))
+          RootNonstructElmConc_pvr(NE,N,L,NZ)=AZMAX1(RootMycoNonstElms_rpvr(NE,N,L,NZ)/RootMycoActiveBiomC_pvr(N,L,NZ))
         ENDDO
       ELSE
         DO NE=1,NumPlantChemElms
@@ -458,7 +458,7 @@ module HfuncsMod
 !
   IF(CanopyLeafShethC_pft(NZ).GT.ZEROL(NZ))THEN
     DO NE=1,NumPlantChemElms
-      CanopyNonstructElmConc_pft(NE,NZ)=AZMAX1(AMIN1(1.0_r8,CanopyNonstructElms_pft(NE,NZ)/CanopyLeafShethC_pft(NZ)))
+      CanopyNonstructElmConc_pft(NE,NZ)=AZMAX1(AMIN1(1.0_r8,CanopyNonStrutElms_pft(NE,NZ)/CanopyLeafShethC_pft(NZ)))
     ENDDO
     NoduleNonstructCconc_pft(NZ)=AZMAX1(AMIN1(1.0_r8,NoduleNonstructElmnt_pft(ielmc,NZ)/CanopyLeafShethC_pft(NZ)))
   ELSE
@@ -468,13 +468,13 @@ module HfuncsMod
   
   D190: DO NB=1,NumOfBranches_pft(NZ)
     if(NZ==1)then
-    write(195,'(I4,5(X,F14.6))')NB,I+J/24.,LeafPetolBiomassC_brch(NB,NZ),(NonstructElm_brch(NE,NB,NZ),NE=1,3)
+    write(195,'(I4,5(X,F14.6))')NB,I+J/24.,LeafPetolBiomassC_brch(NB,NZ),(NonStrutElms_brch(NE,NB,NZ),NE=1,3)
     else
-    write(196,'(I4,5(X,F14.6))')NB,I+J/24.,LeafPetolBiomassC_brch(NB,NZ),(NonstructElm_brch(NE,NB,NZ),NE=1,3)
+    write(196,'(I4,5(X,F14.6))')NB,I+J/24.,LeafPetolBiomassC_brch(NB,NZ),(NonStrutElms_brch(NE,NB,NZ),NE=1,3)
     endif
     DO NE=1,NumPlantChemElms
       IF(LeafPetolBiomassC_brch(NB,NZ).GT.ZEROP(NZ))THEN
-        LeafPetoNonstElmConc_brch(NE,NB,NZ)=AZMAX1(NonstructElm_brch(NE,NB,NZ)/LeafPetolBiomassC_brch(NB,NZ))
+        LeafPetoNonstElmConc_brch(NE,NB,NZ)=AZMAX1(NonStrutElms_brch(NE,NB,NZ)/LeafPetolBiomassC_brch(NB,NZ))
       ELSE
         LeafPetoNonstElmConc_brch(NE,NB,NZ)=1.0_r8
       ENDIF
@@ -484,14 +484,14 @@ module HfuncsMod
 ! EMERGENCE DATE FROM COTYLEDON HEIGHT, LEAF AREA, ROOT DEPTH
 !
 ! iPlantCalendar_brch(ipltcal_Emerge,=emergence date
-! CanopyLeafArea_pft,CanopyStemA_pft=leaf,stalk areas
+! CanopyLeafArea_pft,CanopyStemArea_pft=leaf,stalk areas
 ! HypoctoHeight_pft=hypocotyledon height
 ! SeedDepth_pft=seeding depth
 ! Root1stDepz_pft=primary root depth
 ! VHeatCapCanP,WTSHT,WatByPCanopy=canopy heat capacity,mass,water content
 !
   IF(iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).EQ.0)THEN
-    ShootArea=CanopyLeafArea_pft(NZ)+CanopyStemA_pft(NZ)
+    ShootArea=CanopyLeafArea_pft(NZ)+CanopyStemArea_pft(NZ)
 !    if(NZ==1)then
 !      write(193,*)'ShootArea',NZ,I,ShootArea,HypoctoHeight_pft(NZ),SeedDepth_pft(NZ),&
 !        Root1stDepz_pft(ipltroot,1,NZ),SeedDepth_pft(NZ)+ppmc
@@ -503,7 +503,7 @@ module HfuncsMod
     IF((HypoctoHeight_pft(NZ).GT.SeedDepth_pft(NZ)).AND.(ShootArea.GT.ZEROL(NZ)) &
       .AND.(Root1stDepz_pft(ipltroot,1,NZ).GT.SeedDepth_pft(NZ)+ppmc))THEN
       iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ)=I
-      VHeatCapCanP(NZ)=cpw*(ShootChemElms_pft(ielmc,NZ)*10.0E-06_r8+WatByPCanopy(NZ))
+      VHeatCapCanP(NZ)=cpw*(ShootStrutElms_pft(ielmc,NZ)*10.0E-06_r8+WatByPCanopy(NZ))
 !      write(101,*)'emergence',etimer%get_curr_yearAD(),I,MainBranchNum_pft(NZ),NZ
     ENDIF
   ENDIF

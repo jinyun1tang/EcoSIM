@@ -252,7 +252,7 @@ module CanopyCondsMod
   !     CanopyArea_pft,CanopyArea_grd=leaf+stalk area of combined,each PFT canopy
   !     ZL=height to bottom of canopy layer
   !     SnowDepth,DepthSurfWatIce=snowpack,surface water depths
-  !     CanopyLeafAreaByLayer_pft,CanopyStemALyr_brch=leaf,stalk areas of PFT
+  !     CanopyLeafAreaByLayer_pft,CanopyStemArea_lbrch=leaf,stalk areas of PFT
   !     RAD,RadPARSolarBeam_col=vertical direct+diffuse SW,PAR
   !     RADS,RADY,RAPS,PARDiffus_col=solar beam direct,diffuse SW,PAR
   !     SineSolarIncliAngle,TotSineSkyAngles_grd=sine of solar,sky angles
@@ -318,7 +318,7 @@ module CanopyCondsMod
     StemAreaZsec_brch        => plt_morph%StemAreaZsec_brch  , &
     CanopyLeafArea_pft       => plt_morph%CanopyLeafArea_pft  , &
     CanopyLeafAreaByLayer_pft=> plt_morph%CanopyLeafAreaByLayer_pft  , &
-    CanopyStemALyr_brch => plt_morph%CanopyStemALyr_brch  , &
+    CanopyStemArea_lbrch => plt_morph%CanopyStemArea_lbrch  , &
     CanopyArea_pft           => plt_morph%CanopyArea_pft  , &
     ClumpFactor              => plt_morph%ClumpFactor    , &
     CanopyArea_grd           => plt_morph%CanopyArea_grd    &
@@ -336,8 +336,8 @@ module CanopyCondsMod
             CanopyArea_grd=CanopyArea_grd+CanopyLeafAreaByLayer_pft(L,K,NB,NZ)
           ENDDO D1130
           !add stem/stalk area
-          CanopyArea_pft(NZ)=CanopyArea_pft(NZ)+CanopyStemALyr_brch(L,NB,NZ)
-          CanopyArea_grd=CanopyArea_grd+CanopyStemALyr_brch(L,NB,NZ)
+          CanopyArea_pft(NZ)=CanopyArea_pft(NZ)+CanopyStemArea_lbrch(L,NB,NZ)
+          CanopyArea_grd=CanopyArea_grd+CanopyStemArea_lbrch(L,NB,NZ)
         ENDIF
       enddo
     enddo

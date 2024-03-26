@@ -19,11 +19,11 @@ module PlantTraitDataType
   real(r8),target,allocatable :: FWODRE(:,:)
   real(r8),target,allocatable :: FWOODE(:,:)             !woody C allocation
   real(r8),target,allocatable :: PARTS_brch(:,:,:,:,:)       !C partitioning coefficient
-  real(r8),target,allocatable ::  CanopyStemALyr_brch(:,:,:,:,:)              !stem layer area, [m2 d-2]
+  real(r8),target,allocatable ::  CanopyStemArea_lbrch(:,:,:,:,:)              !stem layer area, [m2 d-2]
   real(r8),target,allocatable ::  CanopyLeafArea_pft(:,:,:)                       !plant leaf area, [m2 d-2]
   real(r8),target,allocatable ::  CanopyArea_pft(:,:,:)                       !plant canopy leaf+stem/stalk area, [m2 d-2]
   real(r8),target,allocatable ::  ARLFX(:,:)                         !total canopy leaf area, [m2 d-2]
-  real(r8),target,allocatable ::  CanopyStemA_pft(:,:,:)                      !plant stem area, [m2 d-2]
+  real(r8),target,allocatable ::  CanopyStemArea_pft(:,:,:)                      !plant stem area, [m2 d-2]
   real(r8),target,allocatable ::  CanopyHeight_pft(:,:,:)                          !canopy height, [m]
   real(r8),target,allocatable ::  ARSTX(:,:)                         !total canopy stem area, [m2 d-2]
   real(r8),target,allocatable ::  CanopyLAgrid_lyr(:,:,:)                       !total leaf area, [m2 d-2]
@@ -178,11 +178,11 @@ contains
   allocate(FWODBE(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FWODBE=0._r8
   allocate(FWODRE(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FWODRE=0._r8         !
   allocate(FWOODE(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FWOODE=0._r8         !woody element allocation
-  allocate(CanopyStemALyr_brch(NumOfCanopyLayers,MaxNumBranches,JP,JY,JX));CanopyStemALyr_brch=0._r8
+  allocate(CanopyStemArea_lbrch(NumOfCanopyLayers,MaxNumBranches,JP,JY,JX));CanopyStemArea_lbrch=0._r8
   allocate(CanopyLeafArea_pft(JP,JY,JX));    CanopyLeafArea_pft=0._r8
   allocate(CanopyArea_pft(JP,JY,JX));    CanopyArea_pft=0._r8
   allocate(ARLFX(JY,JX));       ARLFX=0._r8
-  allocate(CanopyStemA_pft(JP,JY,JX));    CanopyStemA_pft=0._r8
+  allocate(CanopyStemArea_pft(JP,JY,JX));    CanopyStemArea_pft=0._r8
   allocate(CanopyHeight_pft(JP,JY,JX));       CanopyHeight_pft=0._r8
   allocate(ARSTX(JY,JX));       ARSTX=0._r8
   allocate(CanopyLAgrid_lyr(NumOfCanopyLayers,JY,JX));    CanopyLAgrid_lyr=0._r8
@@ -335,11 +335,11 @@ contains
   call destroy(FWODBE)
   call destroy(FWODRE)
   call destroy(FWOODE)
-  call destroy(CanopyStemALyr_brch)
+  call destroy(CanopyStemArea_lbrch)
   call destroy(CanopyLeafArea_pft)
   call destroy(CanopyArea_pft)
   call destroy(ARLFX)
-  call destroy(CanopyStemA_pft)
+  call destroy(CanopyStemArea_pft)
   call destroy(CanopyHeight_pft)
   call destroy(ARSTX)
   call destroy(CanopyLAgrid_lyr)

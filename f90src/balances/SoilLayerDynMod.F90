@@ -856,18 +856,18 @@ implicit none
           ENDDO
           DO  NR=1,NumRootAxes_pft(NZ,NY,NX)
             DO NE=1,NumPlantChemElms
-              Root1stStructElm_rpvr(NE,N,L1,NR,NZ,NY,NX)=Root1stStructElm_rpvr(NE,N,L1,NR,NZ,NY,NX)+FX*Root1stStructElm_rpvr(NE,N,L0,NR,NZ,NY,NX)
-              Root2ndStructElm_pvr(NE,N,L1,NR,NZ,NY,NX)=Root2ndStructElm_pvr(NE,N,L1,NR,NZ,NY,NX)+FX*Root2ndStructElm_pvr(NE,N,L0,NR,NZ,NY,NX)
+              RootMyco1stStrutElms_rpvr(NE,N,L1,NR,NZ,NY,NX)=RootMyco1stStrutElms_rpvr(NE,N,L1,NR,NZ,NY,NX)+FX*RootMyco1stStrutElms_rpvr(NE,N,L0,NR,NZ,NY,NX)
+              RootMyco2ndStrutElms_rpvr(NE,N,L1,NR,NZ,NY,NX)=RootMyco2ndStrutElms_rpvr(NE,N,L1,NR,NZ,NY,NX)+FX*RootMyco2ndStrutElms_rpvr(NE,N,L0,NR,NZ,NY,NX)
             ENDDO
             Root1stLen_rpvr(N,L1,NR,NZ,NY,NX)=Root1stLen_rpvr(N,L1,NR,NZ,NY,NX)+FX*Root1stLen_rpvr(N,L0,NR,NZ,NY,NX)
             Root2ndLen_pvr(N,L1,NR,NZ,NY,NX)=Root2ndLen_pvr(N,L1,NR,NZ,NY,NX)+FX*Root2ndLen_pvr(N,L0,NR,NZ,NY,NX)
             Root2ndXNum_rpvr(N,L1,NR,NZ,NY,NX)=Root2ndXNum_rpvr(N,L1,NR,NZ,NY,NX)+FX*Root2ndXNum_rpvr(N,L0,NR,NZ,NY,NX)
           ENDDO
           DO NE=1,NumPlantChemElms
-             RootMycoNonstElm_pvr(NE,N,L1,NZ,NY,NX)=RootMycoNonstElm_pvr(NE,N,L1,NZ,NY,NX)+FX* RootMycoNonstElm_pvr(NE,N,L0,NZ,NY,NX)
+             RootMycoNonstElms_rpvr(NE,N,L1,NZ,NY,NX)=RootMycoNonstElms_rpvr(NE,N,L1,NZ,NY,NX)+FX* RootMycoNonstElms_rpvr(NE,N,L0,NZ,NY,NX)
           ENDDO
           RootMycoActiveBiomC_pvr(N,L1,NZ,NY,NX)=RootMycoActiveBiomC_pvr(N,L1,NZ,NY,NX)+FX*RootMycoActiveBiomC_pvr(N,L0,NZ,NY,NX)
-          PopuPlantRootC_vr(N,L1,NZ,NY,NX)= PopuPlantRootC_vr(N,L1,NZ,NY,NX)+FX* PopuPlantRootC_vr(N,L0,NZ,NY,NX)
+          PopuRootMycoC_pvr(N,L1,NZ,NY,NX)= PopuRootMycoC_pvr(N,L1,NZ,NY,NX)+FX* PopuRootMycoC_pvr(N,L0,NZ,NY,NX)
           RootProteinC_pvr(N,L1,NZ,NY,NX)=RootProteinC_pvr(N,L1,NZ,NY,NX)+FX*RootProteinC_pvr(N,L0,NZ,NY,NX)
           Root1stXNumL_pvr(N,L1,NZ,NY,NX)=Root1stXNumL_pvr(N,L1,NZ,NY,NX)+FX*Root1stXNumL_pvr(N,L0,NZ,NY,NX)
           Root2ndXNum_pvr(N,L1,NZ,NY,NX)=Root2ndXNum_pvr(N,L1,NZ,NY,NX)+FX*Root2ndXNum_pvr(N,L0,NZ,NY,NX)
@@ -881,8 +881,8 @@ implicit none
           AveLen2ndRoot_pvr(N,L1,NZ,NY,NX)=AveLen2ndRoot_pvr(N,L1,NZ,NY,NX)+FX*AveLen2ndRoot_pvr(N,L0,NZ,NY,NX)
         ENDDO
         DO NE=1,NumPlantChemElms
-          RootNodulElm_pvr(NE,L1,NZ,NY,NX)=RootNodulElm_pvr(NE,L1,NZ,NY,NX)+FX*RootNodulElm_pvr(NE,L0,NZ,NY,NX)
-          RootNodulNonstElm_pvr(NE,L1,NZ,NY,NX)=RootNodulNonstElm_pvr(NE,L1,NZ,NY,NX)+FX*RootNodulNonstElm_pvr(NE,L0,NZ,NY,NX)
+          RootNodulStrutElms_pvr(NE,L1,NZ,NY,NX)=RootNodulStrutElms_pvr(NE,L1,NZ,NY,NX)+FX*RootNodulStrutElms_pvr(NE,L0,NZ,NY,NX)
+          RootNodulNonstElms_pvr(NE,L1,NZ,NY,NX)=RootNodulNonstElms_pvr(NE,L1,NZ,NY,NX)+FX*RootNodulNonstElms_pvr(NE,L0,NZ,NY,NX)
         ENDDO
       ENDIF
     ENDDO
@@ -1037,18 +1037,18 @@ implicit none
           ENDDO
           DO NR=1,NumRootAxes_pft(NZ,NY,NX)
             DO NE=1,NumPlantChemElms
-              Root1stStructElm_rpvr(NE,N,L0,NR,NZ,NY,NX)=FY*Root1stStructElm_rpvr(NE,N,L0,NR,NZ,NY,NX)
-              Root2ndStructElm_pvr(NE,N,L0,NR,NZ,NY,NX)=FY*Root2ndStructElm_pvr(NE,N,L0,NR,NZ,NY,NX)
+              RootMyco1stStrutElms_rpvr(NE,N,L0,NR,NZ,NY,NX)=FY*RootMyco1stStrutElms_rpvr(NE,N,L0,NR,NZ,NY,NX)
+              RootMyco2ndStrutElms_rpvr(NE,N,L0,NR,NZ,NY,NX)=FY*RootMyco2ndStrutElms_rpvr(NE,N,L0,NR,NZ,NY,NX)
             ENDDO
             Root1stLen_rpvr(N,L0,NR,NZ,NY,NX)=FY*Root1stLen_rpvr(N,L0,NR,NZ,NY,NX)
             Root2ndLen_pvr(N,L0,NR,NZ,NY,NX)=FY*Root2ndLen_pvr(N,L0,NR,NZ,NY,NX)
             Root2ndXNum_rpvr(N,L0,NR,NZ,NY,NX)=FY*Root2ndXNum_rpvr(N,L0,NR,NZ,NY,NX)
           ENDDO
           DO NE=1,NumPlantChemElms
-             RootMycoNonstElm_pvr(NE,N,L0,NZ,NY,NX)=FY* RootMycoNonstElm_pvr(NE,N,L0,NZ,NY,NX)
+             RootMycoNonstElms_rpvr(NE,N,L0,NZ,NY,NX)=FY* RootMycoNonstElms_rpvr(NE,N,L0,NZ,NY,NX)
           ENDDO
           RootMycoActiveBiomC_pvr(N,L0,NZ,NY,NX)=FY*RootMycoActiveBiomC_pvr(N,L0,NZ,NY,NX)
-           PopuPlantRootC_vr(N,L0,NZ,NY,NX)=FY* PopuPlantRootC_vr(N,L0,NZ,NY,NX)
+           PopuRootMycoC_pvr(N,L0,NZ,NY,NX)=FY* PopuRootMycoC_pvr(N,L0,NZ,NY,NX)
           RootProteinC_pvr(N,L0,NZ,NY,NX)=FY*RootProteinC_pvr(N,L0,NZ,NY,NX)
           Root1stXNumL_pvr(N,L0,NZ,NY,NX)=FY*Root1stXNumL_pvr(N,L0,NZ,NY,NX)
           Root2ndXNum_pvr(N,L0,NZ,NY,NX)=FY*Root2ndXNum_pvr(N,L0,NZ,NY,NX)
@@ -1062,9 +1062,9 @@ implicit none
           AveLen2ndRoot_pvr(N,L0,NZ,NY,NX)=FY*AveLen2ndRoot_pvr(N,L0,NZ,NY,NX)
         ENDDO
         DO NE=1,NumPlantChemElms
-          RootNodulElm_pvr(NE,L0,NZ,NY,NX)=FY*RootNodulElm_pvr(NE,L0,NZ,NY,NX)
+          RootNodulStrutElms_pvr(NE,L0,NZ,NY,NX)=FY*RootNodulStrutElms_pvr(NE,L0,NZ,NY,NX)
 
-          RootNodulNonstElm_pvr(NE,L0,NZ,NY,NX)=FY*RootNodulNonstElm_pvr(NE,L0,NZ,NY,NX)
+          RootNodulNonstElms_pvr(NE,L0,NZ,NY,NX)=FY*RootNodulNonstElms_pvr(NE,L0,NZ,NY,NX)
         ENDDO
       ENDIF
     ENDDO
@@ -1239,13 +1239,13 @@ implicit none
 
           DO  NR=1,NumRootAxes_pft(NZ,NY,NX)
             DO NE=1,NumPlantChemElms
-              FXWTRT1E=FRO*Root1stStructElm_rpvr(NE,N,L0,NR,NZ,NY,NX)
-              Root1stStructElm_rpvr(NE,N,L1,NR,NZ,NY,NX)=Root1stStructElm_rpvr(NE,N,L1,NR,NZ,NY,NX)+FXWTRT1E
-              Root1stStructElm_rpvr(NE,N,L0,NR,NZ,NY,NX)=Root1stStructElm_rpvr(NE,N,L0,NR,NZ,NY,NX)-FXWTRT1E
+              FXWTRT1E=FRO*RootMyco1stStrutElms_rpvr(NE,N,L0,NR,NZ,NY,NX)
+              RootMyco1stStrutElms_rpvr(NE,N,L1,NR,NZ,NY,NX)=RootMyco1stStrutElms_rpvr(NE,N,L1,NR,NZ,NY,NX)+FXWTRT1E
+              RootMyco1stStrutElms_rpvr(NE,N,L0,NR,NZ,NY,NX)=RootMyco1stStrutElms_rpvr(NE,N,L0,NR,NZ,NY,NX)-FXWTRT1E
 
-              FXWTRT2E=FRO*Root2ndStructElm_pvr(NE,N,L0,NR,NZ,NY,NX)
-              Root2ndStructElm_pvr(NE,N,L1,NR,NZ,NY,NX)=Root2ndStructElm_pvr(NE,N,L1,NR,NZ,NY,NX)+FXWTRT2E
-              Root2ndStructElm_pvr(NE,N,L0,NR,NZ,NY,NX)=Root2ndStructElm_pvr(NE,N,L0,NR,NZ,NY,NX)-FXWTRT2E
+              FXWTRT2E=FRO*RootMyco2ndStrutElms_rpvr(NE,N,L0,NR,NZ,NY,NX)
+              RootMyco2ndStrutElms_rpvr(NE,N,L1,NR,NZ,NY,NX)=RootMyco2ndStrutElms_rpvr(NE,N,L1,NR,NZ,NY,NX)+FXWTRT2E
+              RootMyco2ndStrutElms_rpvr(NE,N,L0,NR,NZ,NY,NX)=RootMyco2ndStrutElms_rpvr(NE,N,L0,NR,NZ,NY,NX)-FXWTRT2E
             ENDDO
             FXRTLG1=FRO*Root1stLen_rpvr(N,L0,NR,NZ,NY,NX)
             Root1stLen_rpvr(N,L1,NR,NZ,NY,NX)=Root1stLen_rpvr(N,L1,NR,NZ,NY,NX)+FXRTLG1
@@ -1258,17 +1258,17 @@ implicit none
             Root2ndXNum_rpvr(N,L0,NR,NZ,NY,NX)=Root2ndXNum_rpvr(N,L0,NR,NZ,NY,NX)-FXRTN2
           ENDDO
           DO NE=1,NumPlantChemElms
-             FXEPOOLR=FRO*RootMycoNonstElm_pvr(NE,N,L0,NZ,NY,NX)
-             RootMycoNonstElm_pvr(NE,N,L1,NZ,NY,NX)=RootMycoNonstElm_pvr(NE,N,L1,NZ,NY,NX)+FXEPOOLR
-             RootMycoNonstElm_pvr(NE,N,L0,NZ,NY,NX)=RootMycoNonstElm_pvr(NE,N,L0,NZ,NY,NX)-FXEPOOLR
+             FXEPOOLR=FRO*RootMycoNonstElms_rpvr(NE,N,L0,NZ,NY,NX)
+             RootMycoNonstElms_rpvr(NE,N,L1,NZ,NY,NX)=RootMycoNonstElms_rpvr(NE,N,L1,NZ,NY,NX)+FXEPOOLR
+             RootMycoNonstElms_rpvr(NE,N,L0,NZ,NY,NX)=RootMycoNonstElms_rpvr(NE,N,L0,NZ,NY,NX)-FXEPOOLR
           ENDDO
 
           FXWTRTL=FRO*RootMycoActiveBiomC_pvr(N,L0,NZ,NY,NX)
           RootMycoActiveBiomC_pvr(N,L1,NZ,NY,NX)=RootMycoActiveBiomC_pvr(N,L1,NZ,NY,NX)+FXWTRTL
           RootMycoActiveBiomC_pvr(N,L0,NZ,NY,NX)=RootMycoActiveBiomC_pvr(N,L0,NZ,NY,NX)-FXWTRTL
-          FXWTRTD=FRO* PopuPlantRootC_vr(N,L0,NZ,NY,NX)
-           PopuPlantRootC_vr(N,L1,NZ,NY,NX)= PopuPlantRootC_vr(N,L1,NZ,NY,NX)+FXWTRTD
-           PopuPlantRootC_vr(N,L0,NZ,NY,NX)= PopuPlantRootC_vr(N,L0,NZ,NY,NX)-FXWTRTD
+          FXWTRTD=FRO* PopuRootMycoC_pvr(N,L0,NZ,NY,NX)
+           PopuRootMycoC_pvr(N,L1,NZ,NY,NX)= PopuRootMycoC_pvr(N,L1,NZ,NY,NX)+FXWTRTD
+           PopuRootMycoC_pvr(N,L0,NZ,NY,NX)= PopuRootMycoC_pvr(N,L0,NZ,NY,NX)-FXWTRTD
           FXWSRTL=FRO*RootProteinC_pvr(N,L0,NZ,NY,NX)
           RootProteinC_pvr(N,L1,NZ,NY,NX)=RootProteinC_pvr(N,L1,NZ,NY,NX)+FXWSRTL
           RootProteinC_pvr(N,L0,NZ,NY,NX)=RootProteinC_pvr(N,L0,NZ,NY,NX)-FXWSRTL
@@ -1307,13 +1307,13 @@ implicit none
 !     ROOT NODULES
 !
         DO NE=1,NumPlantChemElms
-          WTNDLE=FRO*RootNodulElm_pvr(NE,L0,NZ,NY,NX)
-          RootNodulElm_pvr(NE,L1,NZ,NY,NX)=RootNodulElm_pvr(NE,L1,NZ,NY,NX)+WTNDLE
-          RootNodulElm_pvr(NE,L0,NZ,NY,NX)=RootNodulElm_pvr(NE,L0,NZ,NY,NX)-WTNDLE
+          WTNDLE=FRO*RootNodulStrutElms_pvr(NE,L0,NZ,NY,NX)
+          RootNodulStrutElms_pvr(NE,L1,NZ,NY,NX)=RootNodulStrutElms_pvr(NE,L1,NZ,NY,NX)+WTNDLE
+          RootNodulStrutElms_pvr(NE,L0,NZ,NY,NX)=RootNodulStrutElms_pvr(NE,L0,NZ,NY,NX)-WTNDLE
 
-          FXEPOOLN=FRO*RootNodulNonstElm_pvr(NE,L0,NZ,NY,NX)
-          RootNodulNonstElm_pvr(NE,L1,NZ,NY,NX)=RootNodulNonstElm_pvr(NE,L1,NZ,NY,NX)+FXEPOOLN
-          RootNodulNonstElm_pvr(NE,L0,NZ,NY,NX)=RootNodulNonstElm_pvr(NE,L0,NZ,NY,NX)-FXEPOOLN
+          FXEPOOLN=FRO*RootNodulNonstElms_pvr(NE,L0,NZ,NY,NX)
+          RootNodulNonstElms_pvr(NE,L1,NZ,NY,NX)=RootNodulNonstElms_pvr(NE,L1,NZ,NY,NX)+FXEPOOLN
+          RootNodulNonstElms_pvr(NE,L0,NZ,NY,NX)=RootNodulNonstElms_pvr(NE,L0,NZ,NY,NX)-FXEPOOLN
 
         ENDDO
       ENDIF

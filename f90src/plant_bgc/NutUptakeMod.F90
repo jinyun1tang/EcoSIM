@@ -62,7 +62,7 @@ module NutUptakeMod
     ZEROP                      =>  plt_biom%ZEROP    , &
     AtmGasc                    =>  plt_site%AtmGasc  , &    
     LeafPetolBiomassC_brch     =>  plt_biom%LeafPetolBiomassC_brch    , &
-    NonstructElm_brch          =>  plt_biom%NonstructElm_brch   , &
+    NonStrutElms_brch          =>  plt_biom%NonStrutElms_brch   , &
     LeafPetoNonstElmConc_brch  =>  plt_biom%LeafPetoNonstElmConc_brch   , &
     CanPStomaResistH2O_pft     =>  plt_photo%CanPStomaResistH2O_pft      , &
     CanopyBndlResist_pft       =>  plt_photo%CanopyBndlResist_pft     , &
@@ -93,7 +93,7 @@ module NutUptakeMod
       IF(LeafPetolBiomassC_brch(NB,NZ).GT.ZEROP(NZ).AND.LeafAreaLive_brch(NB,NZ).GT.ZEROP(NZ) &
         .AND.CanopyLeafArea_pft(NZ).GT.ZEROP(NZ))THEN
         CNH3P=AZMAX1(FNH3P*LeafPetoNonstElmConc_brch(ielmn,NB,NZ)/SNH3P)
-        ZPOOLB=AZMAX1(NonstructElm_brch(ielmn,NB,NZ))
+        ZPOOLB=AZMAX1(NonStrutElms_brch(ielmn,NB,NZ))
         NH3Dep2_brch(NB,NZ)=AMIN1(0.1_r8*ZPOOLB &
           ,AMAX1((AtmGasc(idg_NH3)-CNH3P)/(CanopyBndlResist_pft(NZ)+CanPStomaResistH2O_pft(NZ)) &
           *FracRadPARbyCanopy_pft(NZ)*AREA3(NU)*LeafAreaLive_brch(NB,NZ)/CanopyLeafArea_pft(NZ),-0.1_r8*ZPOOLB))
@@ -1108,7 +1108,7 @@ module NutUptakeMod
     ZEROP                           => plt_biom%ZEROP   , &
     RootProteinConc_pvr             => plt_biom%RootProteinConc_pvr  , &
     RootProteinC_pvr                => plt_biom%RootProteinC_pvr   , &
-    RootMycoNonstElm_pvr            => plt_biom%RootMycoNonstElm_pvr  , &
+    RootMycoNonstElms_rpvr            => plt_biom%RootMycoNonstElms_rpvr  , &
     RootNonstructElmConc_pvr        => plt_biom%RootNonstructElmConc_pvr  , &
     RootMycoActiveBiomC_pvr              => plt_biom%RootMycoActiveBiomC_pvr    &
   )
@@ -1136,7 +1136,7 @@ module NutUptakeMod
   !     CPOOLR=nonstructural C content
   !
   IF(RCO2N_pvr(N,L,NZ).GT.ZEROP(NZ))THEN
-    FCUP=AZMAX1(AMIN1(1.0_r8,0.25_r8*safe_adb(RootMycoNonstElm_pvr(ielmc,N,L,NZ),RCO2N_pvr(N,L,NZ))))
+    FCUP=AZMAX1(AMIN1(1.0_r8,0.25_r8*safe_adb(RootMycoNonstElms_rpvr(ielmc,N,L,NZ),RCO2N_pvr(N,L,NZ))))
   ELSE
     FCUP=0.0_r8
   ENDIF
@@ -1223,7 +1223,7 @@ module NutUptakeMod
   integer :: K,NE
   !     begin_execution
   associate(                       &
-    RootMycoNonstElm_pvr      =>  plt_biom%RootMycoNonstElm_pvr    , &
+    RootMycoNonstElms_rpvr      =>  plt_biom%RootMycoNonstElms_rpvr    , &
     ZEROP                     =>  plt_biom%ZEROP     , &
     ZEROS                     =>  plt_site%ZEROS     , &
     ZEROS2                    =>  plt_site%ZEROS2    , &
@@ -1255,16 +1255,16 @@ module NutUptakeMod
     VLWatMicPK=VLWatMicPM(NPH,L)*FOSRH(K,L)
     IF(VLWatMicPK.GT.ZEROS2.AND.RootVH2O_pvr(N,L,NZ).GT.ZEROP(NZ))THEN
       VLWatMicPT=VLWatMicPK+RootVH2O_pvr(N,L,NZ)
-      CPOOLX=AMIN1(1.25E+03_r8*RootVH2O_pvr(N,L,NZ), RootMycoNonstElm_pvr(ielmc,N,L,NZ))
+      CPOOLX=AMIN1(1.25E+03_r8*RootVH2O_pvr(N,L,NZ),RootMycoNonstElms_rpvr(ielmc,N,L,NZ))
       XFRE(ielmc)=(DOM(idom_doc,K,L)*RootVH2O_pvr(N,L,NZ)-CPOOLX*VLWatMicPK)/VLWatMicPT
       !XFRC, positive into plants
       RootMycoExudElm_pvr(ielmc,N,K,L,NZ)=FEXUC*XFRE(ielmc)
-      IF(DOM(idom_doc,K,L).GT.ZEROS.AND. RootMycoNonstElm_pvr(ielmc,N,L,NZ).GT.ZEROP(NZ))THEN
-        CPOOLT=DOM(idom_doc,K,L)+RootMycoNonstElm_pvr(ielmc,N,L,NZ)
-        ZPOOLX=0.1_r8*RootMycoNonstElm_pvr(ielmn,N,L,NZ)
-        PPOOLX=0.1_r8*RootMycoNonstElm_pvr(ielmp,N,L,NZ)
-        XFRE(ielmn)=(DOM(idom_don,K,L)*RootMycoNonstElm_pvr(ielmc,N,L,NZ)-ZPOOLX*DOM(idom_doc,K,L))/CPOOLT
-        XFRE(ielmp)=(DOM(idom_dop,K,L)*RootMycoNonstElm_pvr(ielmc,N,L,NZ)-PPOOLX*DOM(idom_doc,K,L))/CPOOLT
+      IF(DOM(idom_doc,K,L).GT.ZEROS.AND. RootMycoNonstElms_rpvr(ielmc,N,L,NZ).GT.ZEROP(NZ))THEN
+        CPOOLT=DOM(idom_doc,K,L)+RootMycoNonstElms_rpvr(ielmc,N,L,NZ)
+        ZPOOLX=0.1_r8*RootMycoNonstElms_rpvr(ielmn,N,L,NZ)
+        PPOOLX=0.1_r8*RootMycoNonstElms_rpvr(ielmp,N,L,NZ)
+        XFRE(ielmn)=(DOM(idom_don,K,L)*RootMycoNonstElms_rpvr(ielmc,N,L,NZ)-ZPOOLX*DOM(idom_doc,K,L))/CPOOLT
+        XFRE(ielmp)=(DOM(idom_dop,K,L)*RootMycoNonstElms_rpvr(ielmc,N,L,NZ)-PPOOLX*DOM(idom_doc,K,L))/CPOOLT
         RootMycoExudElm_pvr(ielmn,N,K,L,NZ)=FEXUN*XFRE(ielmn)
         RootMycoExudElm_pvr(ielmp,N,K,L,NZ)=FEXUP*XFRE(ielmp)
       ELSE
@@ -1285,8 +1285,8 @@ module NutUptakeMod
     ENDDO
 
     if(RootExudE<0._r8)then
-       if(RootMycoNonstElm_pvr(NE,N,L,NZ)+RootExudE<0._r8)then
-         scal=RootMycoNonstElm_pvr(NE,N,L,NZ)/(-RootExudE)*0.999999_r8
+       if(RootMycoNonstElms_rpvr(NE,N,L,NZ)+RootExudE<0._r8)then
+         scal=RootMycoNonstElms_rpvr(NE,N,L,NZ)/(-RootExudE)*0.999999_r8
          DO K=1,jcplx
            RootMycoExudElm_pvr(NE,N,K,L,NZ)=RootMycoExudElm_pvr(NE,N,K,L,NZ)*scal
          ENDDO
@@ -1309,7 +1309,7 @@ module NutUptakeMod
   associate(                              &
     RDOM_micb_flx          =>  plt_bgcr%RDOM_micb_flx     , &
     RootMycoExudElm_pvr    =>  plt_rbgc%RootMycoExudElm_pvr    , &
-    RootExudChemElm_pft    =>  plt_rbgc%RootExudChemElm_pft     , &
+    RootMycoExudElms_pft    =>  plt_rbgc%RootMycoExudElms_pft     , &
     RootHPO4Uptake_pft     =>  plt_rbgc%RootHPO4Uptake_pft     , &
     RootH2PO4Uptake_pft    =>  plt_rbgc%RootH2PO4Uptake_pft     , &
     RootNH4Uptake_pft      =>  plt_rbgc%RootNH4Uptake_pft     , &
@@ -1326,9 +1326,9 @@ module NutUptakeMod
   !     RootNH4Uptake_pft,RootNO3Uptake_pft,RootH2PO4Uptake_pft,RootHPO4Uptake_pft=PFT uptake of NH4,NO3,H2PO4,HPO4
   !
   D295: DO K=1,jcplx
-    RootExudChemElm_pft(ielmc,NZ)=RootExudChemElm_pft(ielmc,NZ)+RootMycoExudElm_pvr(ielmc,N,K,L,NZ)
-    RootExudChemElm_pft(ielmn,NZ)=RootExudChemElm_pft(ielmn,NZ)+RootMycoExudElm_pvr(ielmn,N,K,L,NZ)
-    RootExudChemElm_pft(ielmp,NZ)=RootExudChemElm_pft(ielmp,NZ)+RootMycoExudElm_pvr(ielmp,N,K,L,NZ)
+    RootMycoExudElms_pft(ielmc,NZ)=RootMycoExudElms_pft(ielmc,NZ)+RootMycoExudElm_pvr(ielmc,N,K,L,NZ)
+    RootMycoExudElms_pft(ielmn,NZ)=RootMycoExudElms_pft(ielmn,NZ)+RootMycoExudElm_pvr(ielmn,N,K,L,NZ)
+    RootMycoExudElms_pft(ielmp,NZ)=RootMycoExudElms_pft(ielmp,NZ)+RootMycoExudElm_pvr(ielmp,N,K,L,NZ)
     RDOM_micb_flx(idom_doc,K,L)=RDOM_micb_flx(idom_doc,K,L)-RootMycoExudElm_pvr(ielmc,N,K,L,NZ)
     RDOM_micb_flx(idom_don,K,L)=RDOM_micb_flx(idom_don,K,L)-RootMycoExudElm_pvr(ielmn,N,K,L,NZ)
     RDOM_micb_flx(idom_dop,K,L)=RDOM_micb_flx(idom_dop,K,L)-RootMycoExudElm_pvr(ielmp,N,K,L,NZ)
