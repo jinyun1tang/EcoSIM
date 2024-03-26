@@ -84,7 +84,7 @@ module UptakesMod
     NU                             => plt_site%NU      , &
     AREA3                          => plt_site%AREA3   , &
     ZEROS                          => plt_site%ZEROS   , &
-    PopuPlantRootC_vr              => plt_biom% PopuPlantRootC_vr   , &
+    PopuRootMycoC_pvr              => plt_biom% PopuRootMycoC_pvr   , &
     ZEROL                          => plt_biom%ZEROL   , &
     ZEROP                          => plt_biom%ZEROP   , &
     CanopyLeafShethC_pft           => plt_biom%CanopyLeafShethC_pft    , &
@@ -259,14 +259,14 @@ module UptakesMod
     NU                              => plt_site%NU       , &
     NP0                             => plt_site%NP0      , &
     TotalSoilH2OPSIMPa              => plt_ew%TotalSoilH2OPSIMPa      , &
-    PopuPlantRootC_vr               => plt_biom% PopuPlantRootC_vr    , &
+    PopuRootMycoC_pvr               => plt_biom% PopuRootMycoC_pvr    , &
     VLMicP                          => plt_soilchem%VLMicP   , &
     VLiceMicP                       => plt_soilchem%VLiceMicP , &
     THETY                           => plt_soilchem%THETY, &
     SoiBulkDensity                  => plt_soilchem%SoiBulkDensity , &
     VLWatMicP                       => plt_soilchem%VLWatMicP , &
     VLSoilMicP                      => plt_soilchem%VLSoilMicP , &
-    CanopyStemA_pft                 => plt_morph%CanopyStemA_pft   , &
+    CanopyStemArea_pft                 => plt_morph%CanopyStemArea_pft   , &
     MY                              => plt_morph%MY      , &
     CanopyLeafArea_pft              => plt_morph%CanopyLeafArea_pft   , &
     RadNet2CanP                     => plt_rad%RadNet2CanP      , &
@@ -275,14 +275,14 @@ module UptakesMod
 !
 !     RESET TOTAL UPTAKE ARRAYS
 !
-!     CanopyLeafArea_pft,CanopyStemA_pft=leaf,stalk areas
+!     CanopyLeafArea_pft,CanopyStemArea_pft=leaf,stalk areas
 !
 
   ARLSC=0.0_r8
   D9984: DO NZ=1,NP0
 !     TKC(NZ)=TairK+DTKC(NZ)
 !     TCelciusCanopy_pft(NZ)=TKC(NZ)-TC2K
-    ARLSC=ARLSC+CanopyLeafArea_pft(NZ)+CanopyStemA_pft(NZ)
+    ARLSC=ARLSC+CanopyLeafArea_pft(NZ)+CanopyStemArea_pft(NZ)
     RadNet2CanP(NZ)=0.0_r8
     plt_ew%EvapTransHeat_pft(NZ)=0.0_r8
     plt_ew%HeatXAir2PCan(NZ)=0.0_r8
@@ -290,7 +290,7 @@ module UptakesMod
     LWRadCanP(NZ)=0.0_r8
     plt_ew%Transpiration_pft(NZ)=0.0_r8
     plt_ew%VapXAir2Canopy_pft(NZ)=0.0_r8
-    plt_rbgc%RootExudChemElm_pft(1:NumPlantChemElms,NZ)=0.0_r8
+    plt_rbgc%RootMycoExudElms_pft(1:NumPlantChemElms,NZ)=0.0_r8
     plt_rbgc%RootNH4Uptake_pft(NZ)=0.0_r8
     plt_rbgc%RootNO3Uptake_pft(NZ)=0.0_r8
     plt_rbgc%RootH2PO4Uptake_pft(NZ)=0.0_r8
@@ -337,7 +337,7 @@ module UptakesMod
     D9005: DO NZ=1,NP
       DO  N=1,MY(NZ)
 !     IF(IsPlantActive_pft(NZ).EQ.iPlantIsActive.AND.PlantPopulation_pft(NZ).GT.0.0)THEN
-      AllRootC_vr(L)=AllRootC_vr(L)+AZMAX1( PopuPlantRootC_vr(N,L,NZ))
+      AllRootC_vr(L)=AllRootC_vr(L)+AZMAX1( PopuRootMycoC_pvr(N,L,NZ))
 !     ENDIF
       enddo
     ENDDO D9005
@@ -471,7 +471,7 @@ module UptakesMod
   integer :: N,L,NR
 
   associate(                           &
-     PopuPlantRootC_vr       =>  plt_biom% PopuPlantRootC_vr    , &
+     PopuRootMycoC_pvr       =>  plt_biom% PopuRootMycoC_pvr    , &
     FracSoiAsMicP            =>  plt_site%FracSoiAsMicP     , &
     CumSoilThickness         =>  plt_site%CumSoilThickness   , &
     DLYR3                    =>  plt_site%DLYR3    , &
@@ -529,7 +529,7 @@ module UptakesMod
 
       ENDIF
       IF(AllRootC_vr(L).GT.ZEROS)THEN
-        FracPRoot4Uptake(N,L,NZ)=AZMAX1( PopuPlantRootC_vr(N,L,NZ))/AllRootC_vr(L)
+        FracPRoot4Uptake(N,L,NZ)=AZMAX1( PopuRootMycoC_pvr(N,L,NZ))/AllRootC_vr(L)
       ELSE
         FracPRoot4Uptake(N,L,NZ)=1.0_r8
       ENDIF
@@ -589,7 +589,7 @@ module UptakesMod
    MY                              => plt_morph%MY     , &
    RootNonstructElmConc_pvr  => plt_biom%RootNonstructElmConc_pvr  , &
    CanopyNonstructElmConc_pft  => plt_biom%CanopyNonstructElmConc_pft  , &
-   ShootChemElms_pft               => plt_biom%ShootChemElms_pft  , &
+   ShootStrutElms_pft               => plt_biom%ShootStrutElms_pft  , &
    CanopyBndlResist_pft            => plt_photo%CanopyBndlResist_pft    , &
    MinCanPStomaResistH2O_pft       => plt_photo%MinCanPStomaResistH2O_pft   , &
    CanPStomaResistH2O_pft          => plt_photo%CanPStomaResistH2O_pft    , &
@@ -625,7 +625,7 @@ module UptakesMod
       CanPStomaResistH2O_pft(NZ)=MinCanPStomaResistH2O_pft(NZ) &
         +(MaxCanPStomaResistH2O_pft(NZ)-MinCanPStomaResistH2O_pft(NZ))*Stomata_Activity
       CanopyBndlResist_pft(NZ)=RAZ(NZ)
-      VHeatCapCanP(NZ)=cpw*(ShootChemElms_pft(ielmc,NZ)*10.0E-06_r8)
+      VHeatCapCanP(NZ)=cpw*(ShootStrutElms_pft(ielmc,NZ)*10.0E-06_r8)
       DTKC(NZ)=0.0_r8
       D4290: DO N=1,MY(NZ)
         DO  L=NU,MaxSoiL4Root(NZ)
@@ -1238,7 +1238,7 @@ module UptakesMod
     AREA3                          =>  plt_site%AREA3   , &
     CanopyNonstructElmConc_pft =>  plt_biom%CanopyNonstructElmConc_pft  , &
     RootNonstructElmConc_pvr =>  plt_biom%RootNonstructElmConc_pvr  , &
-    ShootChemElms_pft              =>  plt_biom%ShootChemElms_pft  , &
+    ShootStrutElms_pft              =>  plt_biom%ShootStrutElms_pft  , &
     MaxSoiL4Root                   =>  plt_morph%MaxSoiL4Root     , &
     CanopyHeight_pft               =>  plt_morph%CanopyHeight_pft    , &
     NGTopRootLayer_pft             =>  plt_morph%NGTopRootLayer_pft    , &
@@ -1277,7 +1277,7 @@ module UptakesMod
   CanPStomaResistH2O_pft(NZ)=MinCanPStomaResistH2O_pft(NZ) &
     +(MaxCanPStomaResistH2O_pft(NZ)-MinCanPStomaResistH2O_pft(NZ))*Stomata_Activity
   CanopyBndlResist_pft(NZ)=RAZ(NZ)
-  VHeatCapCanP(NZ)=cpw*(ShootChemElms_pft(ielmc,NZ)*10.0E-06_r8)
+  VHeatCapCanP(NZ)=cpw*(ShootStrutElms_pft(ielmc,NZ)*10.0E-06_r8)
   DTKC(NZ)=0.0_r8
 
   DO N=1,MY(NZ)

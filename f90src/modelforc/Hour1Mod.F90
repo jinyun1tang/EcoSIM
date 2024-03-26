@@ -264,14 +264,14 @@ module Hour1Mod
 !     CANOPY RETENTION OF PRECIPITATION
 !
 !     XVOLWC=foliar surface water retention capacity
-!     CanopyLeafArea_pft,CanopyStemA_pft=leaf,stalk area of PFT
+!     CanopyLeafArea_pft,CanopyStemArea_pft=leaf,stalk area of PFT
 !     FLWC,TFLWC=water retention of PFT,combined canopy
 !     PRECA=precipitation+irrigation
 !     FracRadPARbyCanopy_pft=fraction of radiation received by each PFT canopy
 !     VOLWC=canopy surface water retention
 !
   DO  NZ=1,NP(NY,NX)
-    VOLWCX=XVOLWC(iPlantRootProfile_pft(NZ,NY,NX))*(CanopyLeafArea_pft(NZ,NY,NX)+CanopyStemA_pft(NZ,NY,NX))
+    VOLWCX=XVOLWC(iPlantRootProfile_pft(NZ,NY,NX))*(CanopyLeafArea_pft(NZ,NY,NX)+CanopyStemArea_pft(NZ,NY,NX))
     PrecIntcptByCanopy_pft(NZ,NY,NX)=AZMAX1(AMIN1(PrecRainAndSurfirrig(NY,NX)*FracRadPARbyCanopy_pft(NZ,NY,NX),VOLWCX-WatByPCanopy(NZ,NY,NX)))
     TFLWCI(NY,NX)=TFLWCI(NY,NX)+PrecRainAndSurfirrig(NY,NX)*FracRadPARbyCanopy_pft(NZ,NY,NX)
     PrecIntcptByCanG(NY,NX)=PrecIntcptByCanG(NY,NX)+PrecIntcptByCanopy_pft(NZ,NY,NX)
@@ -789,8 +789,8 @@ module Hour1Mod
   TENGYC(NY,NX)=0.0_r8
 
   TRootGasLossDisturb_pft(idg_beg:idg_end-1,NY,NX)=0.0_r8
-  LitrFallChemElm_col(:,NY,NX)=0.0_r8
-  StandingDeadChemElm_col(1:NumPlantChemElms,NY,NX)=0.0_r8
+  LitrFallStrutElms_col(:,NY,NX)=0.0_r8
+  StandingDeadStrutElms_col(1:NumPlantChemElms,NY,NX)=0.0_r8
   PPT(NY,NX)=0.0_r8
 ! zero arrays in the snow layers
   WatConvSno2MicP(1:JS,NY,NX)=0.0_r8
@@ -820,7 +820,7 @@ module Hour1Mod
 
 !     begin_execution
 
-  LitrfalChemElemnts_vr(1:NumPlantChemElms,1:jsken,1:pltpar%NumOfPlantLitrCmplxs,&
+  LitrfalStrutElms_vr(1:NumPlantChemElms,1:jsken,1:pltpar%NumOfPlantLitrCmplxs,&
     0:NL(NY,NX),NY,NX)=0.0_r8
 
   RDOM_micb_flx(idom_doc,1:jcplx,0:NL(NY,NX),NY,NX)=0.0_r8

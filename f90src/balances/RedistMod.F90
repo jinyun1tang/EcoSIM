@@ -474,13 +474,13 @@ module RedistMod
   !
   !     ACCUMULATE PLANT LitrFall FLUXES
   !
-  XESN(ielmc)=XESN(ielmc)+LitrFallChemElm_col(ielmc,NY,NX)
-  XESN(ielmn)=XESN(ielmn)+LitrFallChemElm_col(ielmn,NY,NX)
-  XESN(ielmp)=XESN(ielmp)+LitrFallChemElm_col(ielmp,NY,NX)
+  XESN(ielmc)=XESN(ielmc)+LitrFallStrutElms_col(ielmc,NY,NX)
+  XESN(ielmn)=XESN(ielmn)+LitrFallStrutElms_col(ielmn,NY,NX)
+  XESN(ielmp)=XESN(ielmp)+LitrFallStrutElms_col(ielmp,NY,NX)
 
-  LiterfalOrgM_col(ielmc,NY,NX)=LiterfalOrgM_col(ielmc,NY,NX)+LitrFallChemElm_col(ielmc,NY,NX)
-  LiterfalOrgM_col(ielmn,NY,NX)=LiterfalOrgM_col(ielmn,NY,NX)+LitrFallChemElm_col(ielmn,NY,NX)
-  LiterfalOrgM_col(ielmp,NY,NX)=LiterfalOrgM_col(ielmp,NY,NX)+LitrFallChemElm_col(ielmp,NY,NX)
+  LiterfalOrgM_col(ielmc,NY,NX)=LiterfalOrgM_col(ielmc,NY,NX)+LitrFallStrutElms_col(ielmc,NY,NX)
+  LiterfalOrgM_col(ielmn,NY,NX)=LiterfalOrgM_col(ielmn,NY,NX)+LitrFallStrutElms_col(ielmn,NY,NX)
+  LiterfalOrgM_col(ielmp,NY,NX)=LiterfalOrgM_col(ielmp,NY,NX)+LitrFallStrutElms_col(ielmp,NY,NX)
   !
   !     SURFACE BOUNDARY SALT FLUXES FROM RAINFALL AND SURFACE IRRIGATION
   !
@@ -1012,9 +1012,9 @@ module RedistMod
 !
     D8565: DO K=1,micpar%NumOfPlantLitrCmplxs
       DO  M=1,jsken
-        OSA(M,K,L,NY,NX)=OSA(M,K,L,NY,NX)+LitrfalChemElemnts_vr(ielmc,M,K,L,NY,NX)*micpar%OMCI(1,K)
+        OSA(M,K,L,NY,NX)=OSA(M,K,L,NY,NX)+LitrfalStrutElms_vr(ielmc,M,K,L,NY,NX)*micpar%OMCI(1,K)
         DO NE=1,NumPlantChemElms
-          OSM(NE,M,K,L,NY,NX)=OSM(NE,M,K,L,NY,NX)+LitrfalChemElemnts_vr(NE,M,K,L,NY,NX)
+          OSM(NE,M,K,L,NY,NX)=OSM(NE,M,K,L,NY,NX)+LitrfalStrutElms_vr(NE,M,K,L,NY,NX)
         ENDDO
       enddo
     ENDDO D8565
@@ -1545,13 +1545,13 @@ module RedistMod
 !
   DO   K=1,micpar%NumOfPlantLitrCmplxs
     DO  M=1,jsken
-      OSA(M,K,0,NY,NX)=OSA(M,K,0,NY,NX)+LitrfalChemElemnts_vr(ielmc,M,K,0,NY,NX)*micpar%OMCI(1,K)
+      OSA(M,K,0,NY,NX)=OSA(M,K,0,NY,NX)+LitrfalStrutElms_vr(ielmc,M,K,0,NY,NX)*micpar%OMCI(1,K)
       DO NE=1,NumPlantChemElms
-        OSM(NE,M,K,0,NY,NX)=OSM(NE,M,K,0,NY,NX)+LitrfalChemElemnts_vr(NE,M,K,0,NY,NX)
+        OSM(NE,M,K,0,NY,NX)=OSM(NE,M,K,0,NY,NX)+LitrfalStrutElms_vr(NE,M,K,0,NY,NX)
       ENDDO
 
-      ORGC(0,NY,NX)=ORGC(0,NY,NX)+LitrfalChemElemnts_vr(ielmc,M,K,0,NY,NX)
-      RAINR=LitrfalChemElemnts_vr(ielmc,M,K,0,NY,NX)*ThetaCX(K)
+      ORGC(0,NY,NX)=ORGC(0,NY,NX)+LitrfalStrutElms_vr(ielmc,M,K,0,NY,NX)
+      RAINR=LitrfalStrutElms_vr(ielmc,M,K,0,NY,NX)*ThetaCX(K)
       HRAINR=RAINR*cpw*TairK(NY,NX)
       WatFLo2Litr(NY,NX)=WatFLo2Litr(NY,NX)+RAINR
       HeatFLo2LitrByWat(NY,NX)=HeatFLo2LitrByWat(NY,NX)+HRAINR

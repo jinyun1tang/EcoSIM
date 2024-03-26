@@ -48,19 +48,19 @@ module ExtractsMod
   integer :: NZ,L,K,M
   integer :: NE
   associate(                             &
-   NP0                      => plt_site%NP0        , &
-   WGLFT                    => plt_biom%WGLFT      , &
-   StandingDeadChemElm_col  => plt_biom%StandingDeadChemElm_col   , &
-   StandingDeadChemElms_pft => plt_biom%StandingDeadChemElms_pft     , &
-   LitrFallChemElm_pft      => plt_bgcr%LitrFallChemElm_pft      , &
-   LitrFallChemElm_col      => plt_bgcr%LitrFallChemElm_col      , &
-   LitrfalChemElemnts_vr    => plt_bgcr%LitrfalChemElemnts_vr       , &
-   LitfalChemElm_pvr      => plt_bgcr%LitfalChemElm_pvr       , &
-   MaxSoiL4Root             => plt_morph%MaxSoiL4Root       , &
-   CanopyStemA_lyr          => plt_morph%CanopyStemA_lyr     , &
-   CanopyLAgrid_lyr         =>  plt_morph%CanopyLAgrid_lyr    , &
-   StemArea_grd             =>  plt_morph%StemArea_grd    , &
-   CanopyLeafArea_grd       =>  plt_morph%CanopyLeafArea_grd      &
+   NP0                       => plt_site%NP0        , &
+   WGLFT                     => plt_biom%WGLFT      , &
+   StandingDeadStrutElms_col => plt_biom%StandingDeadStrutElms_col   , &
+   StandDeadStrutElms_pft    => plt_biom%StandDeadStrutElms_pft     , &
+   LitrfalStrutElms_pft      => plt_bgcr%LitrfalStrutElms_pft      , &
+   LitrFallStrutElms_col     => plt_bgcr%LitrFallStrutElms_col      , &
+   LitrfalStrutElms_vr       => plt_bgcr%LitrfalStrutElms_vr       , &
+   LitfalStrutElms_pvr       => plt_bgcr%LitfalStrutElms_pvr       , &
+   MaxSoiL4Root              => plt_morph%MaxSoiL4Root       , &
+   CanopyStemA_lyr           => plt_morph%CanopyStemA_lyr     , &
+   CanopyLAgrid_lyr          =>  plt_morph%CanopyLAgrid_lyr    , &
+   StemArea_grd              =>  plt_morph%StemArea_grd    , &
+   CanopyLeafArea_grd        =>  plt_morph%CanopyLeafArea_grd      &
   )
   DO NZ=1,NP0
 !
@@ -68,21 +68,21 @@ module ExtractsMod
 !
 !   ZCSNC,ZZSNC,ZPSNC=total C,N,P LitrFall
 !   HCSNC,HZSNC,HPSNC=hourly PFT C,N,P LitrFall from grosub.f
-!   StandingDeadChemElm_col=total standing dead C,N,P mass
+!   StandingDeadStrutElms_col=total standing dead C,N,P mass
 !   WTSTG=PFT standing dead C,N,P mass
-!   LitfalChemElm_pvr,=cumulative PFT C,N,P LitrFall from grosub.f
-!   LitrfalChemElemnts_vr,=cumulative total C,N,P LitrFall
+!   LitfalStrutElms_pvr,=cumulative PFT C,N,P LitrFall from grosub.f
+!   LitrfalStrutElms_vr,=cumulative total C,N,P LitrFall
 !
     DO NE=1,NumPlantChemElms
-      LitrFallChemElm_col(NE)=LitrFallChemElm_col(NE)+LitrFallChemElm_pft(NE,NZ)
-      StandingDeadChemElm_col(NE)=StandingDeadChemElm_col(NE)+StandingDeadChemElms_pft(NE,NZ)
+      LitrFallStrutElms_col(NE)=LitrFallStrutElms_col(NE)+LitrfalStrutElms_pft(NE,NZ)
+      StandingDeadStrutElms_col(NE)=StandingDeadStrutElms_col(NE)+StandDeadStrutElms_pft(NE,NZ)
     ENDDO
 
     DO  L=0,MaxSoiL4Root(NZ)
       DO K=1,pltpar%NumOfPlantLitrCmplxs
         DO NE=1,NumPlantChemElms
           DO  M=1,pltpar%jsken
-            LitrfalChemElemnts_vr(NE,M,K,L)=LitrfalChemElemnts_vr(NE,M,K,L)+LitfalChemElm_pvr(NE,M,K,L,NZ)
+            LitrfalStrutElms_vr(NE,M,K,L)=LitrfalStrutElms_vr(NE,M,K,L)+LitfalStrutElms_pvr(NE,M,K,L,NZ)
           enddo
         ENDDO
       ENDDO
@@ -104,7 +104,7 @@ module ExtractsMod
 !     TOTAL LEAF AREA OF ALL PLANT SPECIES
 !
 !     CanopyLAgrid_lyr,CanopyStemA_lyr=total leaf,stalk area of combined canopy layer
-!     CanopyLeafALyr_pft,CanopyStemApft_lyr=PFT leaf,stalk area in canopy layer
+!     CanopyLeafALyr_pft,CanopyStemArea_lpft=PFT leaf,stalk area in canopy layer
 !     WGLFT=total leaf C of combined canopy layer
 !     CanopyLeafCLyr_pft=PFT leaf C in canopy layer
 !
@@ -115,14 +115,14 @@ module ExtractsMod
     CanopyLeafCLyr_pft    => plt_biom%CanopyLeafCLyr_pft      , &
     WGLFT                 => plt_biom%WGLFT      , &
     CanopyLAgrid_lyr      =>  plt_morph%CanopyLAgrid_lyr    , &
-    CanopyStemApft_lyr    =>  plt_morph%CanopyStemApft_lyr    , &
+    CanopyStemArea_lpft    =>  plt_morph%CanopyStemArea_lpft    , &
     CanopyStemA_lyr       => plt_morph%CanopyStemA_lyr     , &
     CanopyLeafALyr_pft    => plt_morph%CanopyLeafALyr_pft       &
   )
   DO L=1,NumOfCanopyLayers1
     CanopyLAgrid_lyr(L)=CanopyLAgrid_lyr(L)+CanopyLeafALyr_pft(L,NZ)
     WGLFT(L)=WGLFT(L)+CanopyLeafCLyr_pft(L,NZ)
-    CanopyStemA_lyr(L)=CanopyStemA_lyr(L)+CanopyStemApft_lyr(L,NZ)
+    CanopyStemA_lyr(L)=CanopyStemA_lyr(L)+CanopyStemArea_lpft(L,NZ)
   ENDDO
   end associate
   end subroutine TotalLeafArea
@@ -342,7 +342,7 @@ module ExtractsMod
     NH3EmiCum_pft              => plt_bgcr%NH3EmiCum_pft  , &
     NH3Dep2Can_pft             => plt_bgcr%NH3Dep2Can_pft  , &
     Canopy_NEE_col             => plt_bgcr%Canopy_NEE_col  , &
-    LitrFallChemElm_col        => plt_bgcr%LitrFallChemElm_col  , &
+    LitrFallStrutElms_col        => plt_bgcr%LitrFallStrutElms_col  , &
     RootGasLossDisturb_pft     => plt_bgcr%RootGasLossDisturb_pft, &
     RootN2Fix_pvr              => plt_bgcr%RootN2Fix_pvr  , &
     CO2NetFix_pft              => plt_bgcr%CO2NetFix_pft   , &
@@ -350,7 +350,7 @@ module ExtractsMod
     TH2GZ                      => plt_bgcr%TH2GZ  , &
     trcs_plant_uptake_vr       => plt_rbgc%trcs_plant_uptake_vr, &    
     NH3Dep2_brch               => plt_rbgc%NH3Dep2_brch  , &
-    PlantRootSoilChemNetX_pft  => plt_rbgc%PlantRootSoilChemNetX_pft , &
+    PlantRootSoilElmNetX_pft  => plt_rbgc%PlantRootSoilElmNetX_pft , &
     TRootGasLossDisturb_pft    => plt_rbgc%TRootGasLossDisturb_pft  , &
     Transpiration_pft          => plt_ew%Transpiration_pft      , &
     PrecIntcptByCanopy_pft     => plt_ew%PrecIntcptByCanopy_pft     , &
@@ -379,7 +379,7 @@ module ExtractsMod
     CanopyLeafArea_grd         => plt_morph%CanopyLeafArea_grd , &
     MaxSoiL4Root               => plt_morph%MaxSoiL4Root   , &
     NumOfBranches_pft          => plt_morph%NumOfBranches_pft   , &
-    CanopyStemA_pft            => plt_morph%CanopyStemA_pft , &
+    CanopyStemArea_pft            => plt_morph%CanopyStemArea_pft , &
     CanopyLeafArea_pft         => plt_morph%CanopyLeafArea_pft , &
     RadNet2CanP                => plt_rad%RadNet2CanP    , &
     LWRadCanP                  => plt_rad%LWRadCanP   , &
@@ -408,7 +408,7 @@ module ExtractsMod
 !     TENGYC=total canopy water heat content
 !     ENGYC=PFT canopy water heat content
 !     CanopyLeafArea_grd,StemArea_grd=total leaf,stalk area
-!     CanopyLeafArea_pft,CanopyStemA_pft=PFT leaf,stalk area
+!     CanopyLeafArea_pft,CanopyStemArea_pft=PFT leaf,stalk area
 !     ZCSNC,ZZSNC,ZPSNC=total net root-soil C,N,P exchange
 !     HCUPTK,HZUPTK,HPUPTK=PFT net root-soil C,N,P exchange
 !     TBALC,TBALN,TBALP=total C,N,P balance
@@ -432,9 +432,9 @@ module ExtractsMod
   ENGYX(NZ)=ENGYC
   LWRadCanG=LWRadCanG+LWRadCanP(NZ)
   CanopyLeafArea_grd=CanopyLeafArea_grd+CanopyLeafArea_pft(NZ)
-  StemArea_grd=StemArea_grd+CanopyStemA_pft(NZ)
+  StemArea_grd=StemArea_grd+CanopyStemArea_pft(NZ)
   DO NE=1,NumPlantChemElms
-    LitrFallChemElm_col(NE)=LitrFallChemElm_col(NE)-PlantRootSoilChemNetX_pft(NE,NZ)
+    LitrFallStrutElms_col(NE)=LitrFallStrutElms_col(NE)-PlantRootSoilElmNetX_pft(NE,NZ)
     PlantElemntStoreLandscape(NE)=PlantElemntStoreLandscape(NE)+ElmBalanceCum_pft(NE,NZ)
   ENDDO
 

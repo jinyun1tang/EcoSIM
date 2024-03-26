@@ -107,20 +107,20 @@ module PlantBranchMod
     rNCReserve_pft               =>  plt_allom%rNCReserve_pft    , &
     RootBiomGrowthYield          =>  plt_allom%RootBiomGrowthYield     , &
     FNOD                         =>  plt_allom%FNOD     , &
-    StalkChemElms_brch           =>  plt_biom%StalkChemElms_brch   , &
+    StalkStrutElms_brch           =>  plt_biom%StalkStrutElms_brch   , &
     StalkRsrvElms_brch          =>  plt_biom%StalkRsrvElms_brch   , &
-    HuskChemElms_brch            =>  plt_biom%HuskChemElms_brch   , &
-    EarChemElms_brch             =>  plt_biom%EarChemElms_brch   , &
+    HuskStrutElms_brch            =>  plt_biom%HuskStrutElms_brch   , &
+    EarStrutElms_brch             =>  plt_biom%EarStrutElms_brch   , &
     StalkBiomassC_brch           =>  plt_biom%StalkBiomassC_brch    , &
-    NonstructElm_brch            =>  plt_biom%NonstructElm_brch    , &
+    NonStrutElms_brch            =>  plt_biom%NonStrutElms_brch    , &
     LeafPetolBiomassC_brch       =>  plt_biom%LeafPetolBiomassC_brch     , &
-    PetoleChemElm_brch           =>  plt_biom%PetoleChemElm_brch  , &
-    LeafChemElms_brch            =>  plt_biom%LeafChemElms_brch   , &
+    PetoleStrutElms_brch           =>  plt_biom%PetoleStrutElms_brch  , &
+    LeafStrutElms_brch            =>  plt_biom%LeafStrutElms_brch   , &
     LeafProteinCNode_brch        =>  plt_biom%LeafProteinCNode_brch      , &
     LeafElmntNode_brch           =>  plt_biom%LeafElmntNode_brch     , &
     LeafPetoNonstElmConc_brch    =>  plt_biom%LeafPetoNonstElmConc_brch    , &
     PetioleProteinCNode_brch     =>  plt_biom%PetioleProteinCNode_brch    , &
-    GrainChemElms_brch           =>  plt_biom%GrainChemElms_brch    , &
+    GrainStrutElms_brch           =>  plt_biom%GrainStrutElms_brch    , &
     ZEROP                        =>  plt_biom%ZEROP     , &
     ZEROL                        =>  plt_biom%ZEROL     , &
     iPlantPhotosynthesisType     =>  plt_photo%iPlantPhotosynthesisType   , &
@@ -147,7 +147,7 @@ module PlantBranchMod
   )
 
   II=I;JJ=J
-  LeafPetolBiomassC_brch(NB,NZ)=AZMAX1(LeafChemElms_brch(ielmc,NB,NZ)+PetoleChemElm_brch(ielmc,NB,NZ))
+  LeafPetolBiomassC_brch(NB,NZ)=AZMAX1(LeafStrutElms_brch(ielmc,NB,NZ)+PetoleStrutElms_brch(ielmc,NB,NZ))
 !  write(101,*)'grow branch',NB,NZ,LeafPetolBiomassC_brch(NB,NZ)
   IF(iPlantBranchState_brch(NB,NZ).EQ.iLive)THEN
 
@@ -216,12 +216,12 @@ module PlantBranchMod
 !   rNCStalk_pft,StalkBiomassC_brch=stalk N:C,sapwood mass
 !   iPlantCalendar_brch(10=date of physiological maturity
 !
-    ShootStructN=AZMAX1(LeafChemElms_brch(ielmn,NB,NZ)+PetoleChemElm_brch(ielmn,NB,NZ) &
+    ShootStructN=AZMAX1(LeafStrutElms_brch(ielmn,NB,NZ)+PetoleStrutElms_brch(ielmn,NB,NZ) &
       +rNCStalk_pft(NZ)*StalkBiomassC_brch(NB,NZ))
     
     IF(iPlantCalendar_brch(ipltcal_EndSeedFill,NB,NZ).EQ.0)THEN
-      ShootStructN=ShootStructN+AZMAX1(HuskChemElms_brch(ielmn,NB,NZ) &
-        +EarChemElms_brch(ielmn,NB,NZ)+GrainChemElms_brch(ielmn,NB,NZ))
+      ShootStructN=ShootStructN+AZMAX1(HuskStrutElms_brch(ielmn,NB,NZ) &
+        +EarStrutElms_brch(ielmn,NB,NZ)+GrainStrutElms_brch(ielmn,NB,NZ))
     ENDIF
 !
 !   GROSS PRIMARY PRODUCTIVITY
@@ -299,12 +299,12 @@ module PlantBranchMod
     endif
     
     DO NE=1,NumPlantChemElms
-      LeafChemElms_brch(NE,NB,NZ)=LeafChemElms_brch(NE,NB,NZ)+GrowthLeaf(NE)
-      PetoleChemElm_brch(NE,NB,NZ)=PetoleChemElm_brch(NE,NB,NZ)+GrowthPetiole(NE)
-      StalkChemElms_brch(NE,NB,NZ)=StalkChemElms_brch(NE,NB,NZ)+GrowthStalk(NE)
+      LeafStrutElms_brch(NE,NB,NZ)=LeafStrutElms_brch(NE,NB,NZ)+GrowthLeaf(NE)
+      PetoleStrutElms_brch(NE,NB,NZ)=PetoleStrutElms_brch(NE,NB,NZ)+GrowthPetiole(NE)
+      StalkStrutElms_brch(NE,NB,NZ)=StalkStrutElms_brch(NE,NB,NZ)+GrowthStalk(NE)
       StalkRsrvElms_brch(NE,NB,NZ)=StalkRsrvElms_brch(NE,NB,NZ)+GrowthReserve(NE)
-      HuskChemElms_brch(NE,NB,NZ)=HuskChemElms_brch(NE,NB,NZ)+GrowthHusk(NE)
-      EarChemElms_brch(NE,NB,NZ)=EarChemElms_brch(NE,NB,NZ)+GrowthEar(NE)
+      HuskStrutElms_brch(NE,NB,NZ)=HuskStrutElms_brch(NE,NB,NZ)+GrowthHusk(NE)
+      EarStrutElms_brch(NE,NB,NZ)=EarStrutElms_brch(NE,NB,NZ)+GrowthEar(NE)
     ENDDO
     if(NZ==1)THEN
       WRITE(203,'(I3,7(X,F16.6))')NB,I+J/24.,(StalkRsrvElms_brch(NE,NB,NZ),GrowthReserve(NE),NE=1,NumPlantChemElms)
@@ -419,12 +419,12 @@ module PlantBranchMod
     D495: DO KK=KMinGroingLeafNodeNum,KHiestGroLeafNode_brch(NB,NZ)
       K=pMOD(KK,MaxNodesPerBranch1)
       IF(LeafElmntNode_brch(ielmc,K,NB,NZ).GT.0.0_r8)THEN
-        CPOOLT=LeafElmntNode_brch(ielmc,K,NB,NZ)+NonstructElm_brch(ielmc,NB,NZ)
+        CPOOLT=LeafElmntNode_brch(ielmc,K,NB,NZ)+NonStrutElms_brch(ielmc,NB,NZ)
         IF(CPOOLT.GT.ZEROP(NZ))THEN
-          ZPOOLD=LeafElmntNode_brch(ielmn,K,NB,NZ)*NonstructElm_brch(ielmc,NB,NZ) &
-            -NonstructElm_brch(ielmn,NB,NZ)*LeafElmntNode_brch(ielmc,K,NB,NZ)
-          PPOOLD=LeafElmntNode_brch(ielmp,K,NB,NZ)*NonstructElm_brch(ielmc,NB,NZ) &
-            -NonstructElm_brch(ielmp,NB,NZ)*LeafElmntNode_brch(ielmc,K,NB,NZ)
+          ZPOOLD=LeafElmntNode_brch(ielmn,K,NB,NZ)*NonStrutElms_brch(ielmc,NB,NZ) &
+            -NonStrutElms_brch(ielmn,NB,NZ)*LeafElmntNode_brch(ielmc,K,NB,NZ)
+          PPOOLD=LeafElmntNode_brch(ielmp,K,NB,NZ)*NonStrutElms_brch(ielmc,NB,NZ) &
+            -NonStrutElms_brch(ielmp,NB,NZ)*LeafElmntNode_brch(ielmc,K,NB,NZ)
             
           XFRN1=AZMAX1(AMIN1(1.0E-03_r8*ZPOOLD/CPOOLT,LeafElmntNode_brch(ielmn,K,NB,NZ) &
             -ZPLFM*CNLFB*LeafElmntNode_brch(ielmc,K,NB,NZ)))            
@@ -435,10 +435,10 @@ module PlantBranchMod
           XFRE(ielmp)=AMAX1(XFRP1,0.10_r8*XFRN1)
           DO NE=2,NumPlantChemElms
             LeafElmntNode_brch(NE,K,NB,NZ)=LeafElmntNode_brch(NE,K,NB,NZ)-XFRE(NE)
-            LeafChemElms_brch(NE,NB,NZ)=LeafChemElms_brch(NE,NB,NZ)-XFRE(NE)
-            NonstructElm_brch(NE,NB,NZ)=NonstructElm_brch(NE,NB,NZ)+XFRE(NE)
-            if(NonstructElm_brch(NE,NB,NZ)<0._r8)then
-              write(*,*)'435negative NonstructElm_brch',NE,NB,NZ,NonstructElm_brch(NE,NB,NZ)-XFRE(NE),XFRE(NE)
+            LeafStrutElms_brch(NE,NB,NZ)=LeafStrutElms_brch(NE,NB,NZ)-XFRE(NE)
+            NonStrutElms_brch(NE,NB,NZ)=NonStrutElms_brch(NE,NB,NZ)+XFRE(NE)
+            if(NonStrutElms_brch(NE,NB,NZ)<0._r8)then
+              write(*,*)'435negative NonStrutElms_brch',NE,NB,NZ,NonStrutElms_brch(NE,NB,NZ)-XFRE(NE),XFRE(NE)
               stop
             endif
           ENDDO
@@ -756,7 +756,7 @@ module PlantBranchMod
   integer :: K
   associate(                        &
     NH3Dep2_brch          =>  plt_rbgc%NH3Dep2_brch   , &
-    NonstructElm_brch     =>  plt_biom%NonstructElm_brch  , &
+    NonStrutElms_brch     =>  plt_biom%NonStrutElms_brch  , &
     iPlantCalendar_brch   =>  plt_pheno%iPlantCalendar_brch   &
   )
 ! begin_execution
@@ -804,14 +804,14 @@ module PlantBranchMod
 !   NH3Dep2_brch=NH3 flux between atmosphere and branch from uptake.f
 !   XFRE(ielmc),XFRE(ielmn),XFRE(ielmp)=branch-root layer C,N,P transfer
 !
-  NonstructElm_brch(ielmc,NB,NZ)=NonstructElm_brch(ielmc,NB,NZ)+CH2O-&
+  NonStrutElms_brch(ielmc,NB,NZ)=NonStrutElms_brch(ielmc,NB,NZ)+CH2O-&
     AMIN1(RMNCS,RCO2C)-NonStructalC4Growth_brch-Rauto4Nassim_brch
-!  write(101,*)'NonstructElm_brch ch2o',NonstructElm_brch(ielmc,NB,NZ),CH2O,&
+!  write(101,*)'NonStrutElms_brch ch2o',NonStrutElms_brch(ielmc,NB,NZ),CH2O,&
 !    AMIN1(RMNCS,RCO2C),NonStructalC4Growth_brch,Rauto4Nassim_brch
-  NonstructElm_brch(ielmn,NB,NZ)=NonstructElm_brch(ielmn,NB,NZ)-ZADDB+NH3Dep2_brch(NB,NZ)
-  NonstructElm_brch(ielmp,NB,NZ)=NonstructElm_brch(ielmp,NB,NZ)-PADDB
-  if(NonstructElm_brch(ielmp,NB,NZ)<0._r8)then
-    write(*,*)'806NonstructElm_brch(ielmp,NB,NZ)',NB,NonstructElm_brch(ielmp,NB,NZ)+PADDB,PADDB
+  NonStrutElms_brch(ielmn,NB,NZ)=NonStrutElms_brch(ielmn,NB,NZ)-ZADDB+NH3Dep2_brch(NB,NZ)
+  NonStrutElms_brch(ielmp,NB,NZ)=NonStrutElms_brch(ielmp,NB,NZ)-PADDB
+  if(NonStrutElms_brch(ielmp,NB,NZ)<0._r8)then
+    write(*,*)'806NonStrutElms_brch(ielmp,NB,NZ)',NB,NonStrutElms_brch(ielmp,NB,NZ)+PADDB,PADDB
     stop
   endif
   end associate
@@ -945,20 +945,20 @@ module PlantBranchMod
     k_fine_litr                     =>  pltpar%k_fine_litr  , &
     k_woody_litr                    =>  pltpar%k_woody_litr , &
     StalkRsrvElms_brch             =>  plt_biom%StalkRsrvElms_brch    , &
-    StalkChemElms_brch              =>  plt_biom%StalkChemElms_brch    , &
-    InternodeChemElm_brch           =>  plt_biom%InternodeChemElm_brch     , &
+    StalkStrutElms_brch              =>  plt_biom%StalkStrutElms_brch    , &
+    InternodeStrutElms_brch           =>  plt_biom%InternodeStrutElms_brch     , &
     StalkBiomassC_brch              =>  plt_biom%StalkBiomassC_brch     , &
     PetioleElmntNode_brch           =>  plt_biom%PetioleElmntNode_brch     , &
     LeafElmntNode_brch              =>  plt_biom%LeafElmntNode_brch      , &
     LeafProteinCNode_brch           =>  plt_biom%LeafProteinCNode_brch       , &
-    NonstructElms_pft               =>  plt_biom%NonstructElms_pft      , &
-    LeafChemElms_brch               =>  plt_biom%LeafChemElms_brch    , &
-    PetoleChemElm_brch              =>  plt_biom%PetoleChemElm_brch   , &
-    SenecStalkChemElms_brch         =>  plt_biom%SenecStalkChemElms_brch    , &
+    NonStrutElms_pft               =>  plt_biom%NonStrutElms_pft      , &
+    LeafStrutElms_brch               =>  plt_biom%LeafStrutElms_brch    , &
+    PetoleStrutElms_brch              =>  plt_biom%PetoleStrutElms_brch   , &
+    SenecStalkStrutElms_brch         =>  plt_biom%SenecStalkStrutElms_brch    , &
     PetioleProteinCNode_brch        =>  plt_biom%PetioleProteinCNode_brch     , &
     ZEROP                           =>  plt_biom%ZEROP      , &
     ZEROL                           =>  plt_biom%ZEROL      , &
-    NonstructElm_brch               =>  plt_biom%NonstructElm_brch     , &
+    NonStrutElms_brch               =>  plt_biom%NonStrutElms_brch     , &
     PlantPopulation_pft             =>  plt_site%PlantPopulation_pft        , &
     CPOOL3                          =>  plt_photo%CPOOL3    , &
     CPOOL4                          =>  plt_photo%CPOOL4    , &
@@ -967,7 +967,7 @@ module PlantBranchMod
     FWODLE                          =>  plt_allom%FWODLE    , &
     rCNNonstructRemob_pft           =>  plt_allom%rCNNonstructRemob_pft     , &
     rCPNonstructRemob_pft           =>  plt_allom%rCPNonstructRemob_pft      , &
-    LitfalChemElm_pvr               =>  plt_bgcr%LitfalChemElm_pvr       , &
+    LitfalStrutElms_pvr               =>  plt_bgcr%LitfalStrutElms_pvr       , &
     CFOPE                           =>  plt_soilchem%CFOPE  , &
     icarbhyro                       =>  pltpar%icarbhyro    , &
     KLowestGroLeafNode_brch         =>  plt_pheno%KLowestGroLeafNode_brch, &
@@ -1039,17 +1039,17 @@ module PlantBranchMod
         
         D6310: DO M=1,jsken
           DO NE=1,NumPlantChemElms
-            LitfalChemElm_pvr(NE,M,k_woody_litr,0,NZ)=LitfalChemElm_pvr(NE,M,k_woody_litr,0,NZ)&
+            LitfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)=LitfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)&
               +CFOPE(NE,icwood,M,NZ)*FSNCL*(LeafElmntNode_brch(NE,K,NB,NZ) &
               -ElmntRemobFallingLeaf(NE))*FWODLE(NE,k_woody_litr)
 
-            LitfalChemElm_pvr(NE,M,k_fine_litr,0,NZ)=LitfalChemElm_pvr(NE,M,k_fine_litr,0,NZ) &
+            LitfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ) &
               +CFOPE(NE,ifoliar,M,NZ)*FSNCL*(LeafElmntNode_brch(NE,K,NB,NZ) &
               -ElmntRemobFallingLeaf(NE))*FWODLE(NE,k_fine_litr)
           ENDDO
         ENDDO D6310
         IF(K.NE.0)THEN
-          LitfalChemElm_pvr(ielmc,icarbhyro,k_fine_litr,0,NZ)=LitfalChemElm_pvr(ielmc,icarbhyro,k_fine_litr,0,NZ) &
+          LitfalStrutElms_pvr(ielmc,icarbhyro,k_fine_litr,0,NZ)=LitfalStrutElms_pvr(ielmc,icarbhyro,k_fine_litr,0,NZ) &
             +FSNCL*(CPOOL3(K,NB,NZ)+CPOOL4(K,NB,NZ))
           CPOOL3(K,NB,NZ)=CPOOL3(K,NB,NZ)-FSNCL*CPOOL3(K,NB,NZ)
           CPOOL4(K,NB,NZ)=CPOOL4(K,NB,NZ)-FSNCL*CPOOL4(K,NB,NZ)
@@ -1067,7 +1067,7 @@ module PlantBranchMod
         LeafAreaNode_brch(K,NB,NZ)=LeafAreaNode_brch(K,NB,NZ)-FSNAL*LeafAreaNode_brch(K,NB,NZ)
 
         DO NE=1,NumPlantChemElms
-          LeafChemElms_brch(NE,NB,NZ)=AZMAX1(LeafChemElms_brch(NE,NB,NZ)-FSNCL*LeafElmntNode_brch(NE,K,NB,NZ))
+          LeafStrutElms_brch(NE,NB,NZ)=AZMAX1(LeafStrutElms_brch(NE,NB,NZ)-FSNCL*LeafElmntNode_brch(NE,K,NB,NZ))
           LeafElmntNode_brch(NE,K,NB,NZ)=LeafElmntNode_brch(NE,K,NB,NZ)-FSNCL*LeafElmntNode_brch(NE,K,NB,NZ)
         ENDDO
         LeafProteinCNode_brch(K,NB,NZ)=AZMAX1(LeafProteinCNode_brch(K,NB,NZ) &
@@ -1082,19 +1082,19 @@ module PlantBranchMod
 !     ElmntRemobFallingLeaf(ielmc),ElmntRemobFallingLeaf(ielmn),ElmntRemobFallingLeaf(ielmp)=remobilization of C,N,P from senescing leaf
 !     SNCLF,SNCT=remaining senescence respiration carried to next node
 !
-        NonstructElm_brch(ielmc,NB,NZ)=NonstructElm_brch(ielmc,NB,NZ)+FSNCL*ElmntRemobFallingLeaf(ielmc)*SNCF
+        NonStrutElms_brch(ielmc,NB,NZ)=NonStrutElms_brch(ielmc,NB,NZ)+FSNCL*ElmntRemobFallingLeaf(ielmc)*SNCF
         DO NE=2,NumPlantChemElms
-          NonstructElm_brch(NE,NB,NZ)=NonstructElm_brch(NE,NB,NZ)+FSNCL*ElmntRemobFallingLeaf(NE)
-          if(NonstructElm_brch(NE,NB,NZ)<0._r8)then
-            write(*,*)'1077NonstructElm_brch(NE,NB,NZ)',NE,NB,NonstructElm_brch(NE,NB,NZ)&
+          NonStrutElms_brch(NE,NB,NZ)=NonStrutElms_brch(NE,NB,NZ)+FSNCL*ElmntRemobFallingLeaf(NE)
+          if(NonStrutElms_brch(NE,NB,NZ)<0._r8)then
+            write(*,*)'1077NonStrutElms_brch(NE,NB,NZ)',NE,NB,NonStrutElms_brch(NE,NB,NZ)&
               -FSNCL*ElmntRemobFallingLeaf(NE),FSNCL*ElmntRemobFallingLeaf(NE)
             stop
           endif
         ENDDO
         SNCLF=SNCLF-FSNCL*ElmntRemobFallingLeaf(ielmc)
         SNCT=SNCT-FSNCL*ElmntRemobFallingLeaf(ielmc)
-        IF(LeafChemElms_brch(ielmc,NB,NZ).LE.ZEROL(NZ))THEN
-          LeafChemElms_brch(ielmc,NB,NZ)=0._r8
+        IF(LeafStrutElms_brch(ielmc,NB,NZ).LE.ZEROL(NZ))THEN
+          LeafStrutElms_brch(ielmc,NB,NZ)=0._r8
           LeafAreaLive_brch(NB,NZ)=0._r8
         ENDIF
       !
@@ -1117,28 +1117,28 @@ module PlantBranchMod
       ELSE        
         D6315: DO M=1,jsken
           DO NE=1,NumPlantChemElms
-            LitfalChemElm_pvr(NE,M,k_woody_litr,0,NZ)=LitfalChemElm_pvr(NE,M,k_woody_litr,0,NZ)+CFOPE(NE,icwood,M,NZ) &
+            LitfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)=LitfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)+CFOPE(NE,icwood,M,NZ) &
               *LeafElmntNode_brch(NE,K,NB,NZ)*FWODLE(NE,k_woody_litr)
 
-            LitfalChemElm_pvr(NE,M,k_fine_litr,0,NZ)=LitfalChemElm_pvr(NE,M,k_fine_litr,0,NZ)+CFOPE(NE,ifoliar,M,NZ) &
+            LitfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)+CFOPE(NE,ifoliar,M,NZ) &
               *LeafElmntNode_brch(NE,K,NB,NZ)*FWODLE(NE,k_fine_litr)
           ENDDO
         ENDDO D6315
         IF(K.NE.0)THEN
-          LitfalChemElm_pvr(ielmc,icarbhyro,k_fine_litr,0,NZ)=LitfalChemElm_pvr(ielmc,icarbhyro,k_fine_litr,0,NZ)&
+          LitfalStrutElms_pvr(ielmc,icarbhyro,k_fine_litr,0,NZ)=LitfalStrutElms_pvr(ielmc,icarbhyro,k_fine_litr,0,NZ)&
             +CPOOL3(K,NB,NZ)+CPOOL4(K,NB,NZ)
           CPOOL3(K,NB,NZ)=0._r8
           CPOOL4(K,NB,NZ)=0._r8
         ENDIF
         LeafAreaLive_brch(NB,NZ)=AZMAX1(LeafAreaLive_brch(NB,NZ)-LeafAreaNode_brch(K,NB,NZ))
         DO NE=1,NumPlantChemElms
-          LeafChemElms_brch(NE,NB,NZ)=AZMAX1(LeafChemElms_brch(NE,NB,NZ)-LeafElmntNode_brch(NE,K,NB,NZ))
+          LeafStrutElms_brch(NE,NB,NZ)=AZMAX1(LeafStrutElms_brch(NE,NB,NZ)-LeafElmntNode_brch(NE,K,NB,NZ))
           LeafElmntNode_brch(NE,K,NB,NZ)=0._r8
         ENDDO
         LeafAreaNode_brch(K,NB,NZ)=0._r8
         LeafProteinCNode_brch(K,NB,NZ)=0._r8
-        IF(LeafChemElms_brch(ielmc,NB,NZ).LE.ZEROL(NZ))THEN
-          LeafChemElms_brch(ielmc,NB,NZ)=0._r8
+        IF(LeafStrutElms_brch(ielmc,NB,NZ).LE.ZEROL(NZ))THEN
+          LeafStrutElms_brch(ielmc,NB,NZ)=0._r8
           LeafAreaLive_brch(NB,NZ)=0._r8
         ENDIF
       ENDIF
@@ -1183,14 +1183,14 @@ module PlantBranchMod
         
         D6320: DO M=1,jsken
           DO NE=1,NumPlantChemElms
-            LitfalChemElm_pvr(NE,M,k_woody_litr,0,NZ)=LitfalChemElm_pvr(NE,M,k_woody_litr,0,NZ)+CFOPE(NE,icwood,M,NZ) &
+            LitfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)=LitfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)+CFOPE(NE,icwood,M,NZ) &
               *FSNCS*(PetioleElmntNode_brch(NE,K,NB,NZ)-RCES(NE))*FWODBE(NE,k_woody_litr)
-            LitfalChemElm_pvr(NE,M,k_fine_litr,0,NZ)=LitfalChemElm_pvr(NE,M,k_fine_litr,0,NZ)+CFOPE(NE,inonfoliar,M,NZ) &
+            LitfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)+CFOPE(NE,inonfoliar,M,NZ) &
               *FSNCS*(PetioleElmntNode_brch(NE,K,NB,NZ)-RCES(NE))*FWODBE(NE,k_fine_litr)
           ENDDO    
         ENDDO D6320
         DO NE=1,NumPlantChemElms
-          PetoleChemElm_brch(NE,NB,NZ)=AZMAX1(PetoleChemElm_brch(NE,NB,NZ)-FSNCS*PetioleElmntNode_brch(NE,K,NB,NZ))
+          PetoleStrutElms_brch(NE,NB,NZ)=AZMAX1(PetoleStrutElms_brch(NE,NB,NZ)-FSNCS*PetioleElmntNode_brch(NE,K,NB,NZ))
           PetioleElmntNode_brch(NE,K,NB,NZ)=PetioleElmntNode_brch(NE,K,NB,NZ)-FSNCS*PetioleElmntNode_brch(NE,K,NB,NZ)
         ENDDO
 !
@@ -1216,14 +1216,14 @@ module PlantBranchMod
   !     RCES(ielmc),RCES(ielmn),RCES(ielmp)=remobilization of C,N,P from senescing petiole
   !     SNCSH,SNCT=remaining senescence respiration carried to next node
   !
-        NonstructElm_brch(ielmc,NB,NZ)=NonstructElm_brch(ielmc,NB,NZ)+FSNCS*RCES(ielmc)*SNCF
+        NonStrutElms_brch(ielmc,NB,NZ)=NonStrutElms_brch(ielmc,NB,NZ)+FSNCS*RCES(ielmc)*SNCF
         DO NE=2,NumPlantChemElms
-          NonstructElm_brch(NE,NB,NZ)=NonstructElm_brch(NE,NB,NZ)+FSNCS*RCES(NE)
+          NonStrutElms_brch(NE,NB,NZ)=NonStrutElms_brch(NE,NB,NZ)+FSNCS*RCES(NE)
         ENDDO
         SNCSH=SNCSH-FSNCS*RCES(ielmc)
         SNCT=SNCT-FSNCS*RCES(ielmc)
-        IF(PetoleChemElm_brch(ielmc,NB,NZ).LE.ZEROL(NZ))THEN
-          PetoleChemElm_brch(ielmc,NB,NZ)=0._r8
+        IF(PetoleStrutElms_brch(ielmc,NB,NZ).LE.ZEROL(NZ))THEN
+          PetoleStrutElms_brch(ielmc,NB,NZ)=0._r8
         ENDIF
 !
   !     EXIT LOOP IF REMOBILIZATION REQUIREMENT HAS BEEN MET
@@ -1245,20 +1245,20 @@ module PlantBranchMod
         
         D6325: DO M=1,jsken
           DO NE=1,NumPlantChemElms
-            LitfalChemElm_pvr(NE,M,k_woody_litr,0,NZ)=LitfalChemElm_pvr(NE,M,k_woody_litr,0,NZ)+CFOPE(NE,icwood,M,NZ) &
+            LitfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)=LitfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)+CFOPE(NE,icwood,M,NZ) &
               *PetioleElmntNode_brch(NE,K,NB,NZ)*FWODBE(NE,k_woody_litr)
-            LitfalChemElm_pvr(NE,M,k_fine_litr,0,NZ)=LitfalChemElm_pvr(NE,M,k_fine_litr,0,NZ)+CFOPE(NE,inonfoliar,M,NZ) &
+            LitfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)+CFOPE(NE,inonfoliar,M,NZ) &
               *PetioleElmntNode_brch(NE,K,NB,NZ)*FWODBE(NE,k_fine_litr)
           ENDDO    
         ENDDO D6325
         DO NE=1,NumPlantChemElms
-          PetoleChemElm_brch(NE,NB,NZ)=AZMAX1(PetoleChemElm_brch(NE,NB,NZ)-PetioleElmntNode_brch(NE,K,NB,NZ))
+          PetoleStrutElms_brch(NE,NB,NZ)=AZMAX1(PetoleStrutElms_brch(NE,NB,NZ)-PetioleElmntNode_brch(NE,K,NB,NZ))
           PetioleElmntNode_brch(NE,K,NB,NZ)=0._r8
         ENDDO
         PetioleLengthNode_brch(K,NB,NZ)=0._r8
         PetioleProteinCNode_brch(K,NB,NZ)=0._r8
-        IF(PetoleChemElm_brch(ielmc,NB,NZ).LE.ZEROL(NZ))THEN
-          PetoleChemElm_brch(ielmc,NB,NZ)=0._r8
+        IF(PetoleStrutElms_brch(ielmc,NB,NZ).LE.ZEROL(NZ))THEN
+          PetoleStrutElms_brch(ielmc,NB,NZ)=0._r8
         ENDIF
       ENDIF
     ENDDO D650
@@ -1291,9 +1291,9 @@ module PlantBranchMod
     SNCZ=FXFS*RMxess_brch
     SNCT=RMxess_brch+SNCZ
     IF(iPlantPhenolPattern_pft(NZ).NE.iplt_annual .AND. SNCT.GT.ZEROP(NZ) &
-      .AND.StalkChemElms_brch(ielmc,NB,NZ).GT.ZEROP(NZ))THEN
+      .AND.StalkStrutElms_brch(ielmc,NB,NZ).GT.ZEROP(NZ))THEN
       SNCF=SNCZ/SNCT
-      FRCC=StalkBiomassC_brch(NB,NZ)/StalkChemElms_brch(ielmc,NB,NZ)
+      FRCC=StalkBiomassC_brch(NB,NZ)/StalkStrutElms_brch(ielmc,NB,NZ)
       RCSC=RCCC*FRCC
       RCSN=RCCN*FRCC
       RCSP=RCCP*FRCC
@@ -1306,12 +1306,12 @@ module PlantBranchMod
     !     REMOBILIZATION OF STALK C,N,P DEPENDS ON NON-STRUCTURAL C:N:P
     !
     !     RCEK(ielmc),RCEK(ielmn),RCEK(ielmp)=remobilization of C,N,P from senescing internode
-    !     InternodeChemElm_brch,WGNODN,WGNODP=node stalk C,N,P mass
+    !     InternodeStrutElms_brch,WGNODN,WGNODP=node stalk C,N,P mass
     !
-        IF(InternodeChemElm_brch(ielmc,K,NB,NZ).GT.ZEROP(NZ))THEN
-          RCEK(ielmc)=InternodeChemElm_brch(ielmc,K,NB,NZ)*RCSC
-          RCEK(ielmn)=InternodeChemElm_brch(ielmn,K,NB,NZ)*(RCSN+(1.0_r8-RCSN)*RCSC)
-          RCEK(ielmp)=InternodeChemElm_brch(ielmp,K,NB,NZ)*(RCSP+(1.0_r8-RCSP)*RCSC)
+        IF(InternodeStrutElms_brch(ielmc,K,NB,NZ).GT.ZEROP(NZ))THEN
+          RCEK(ielmc)=InternodeStrutElms_brch(ielmc,K,NB,NZ)*RCSC
+          RCEK(ielmn)=InternodeStrutElms_brch(ielmn,K,NB,NZ)*(RCSN+(1.0_r8-RCSN)*RCSC)
+          RCEK(ielmp)=InternodeStrutElms_brch(ielmp,K,NB,NZ)*(RCSP+(1.0_r8-RCSP)*RCSC)
     !
       !     FRACTION OF CURRENT NODE TO BE REMOBILIZED
       !
@@ -1330,16 +1330,16 @@ module PlantBranchMod
       !     CFOPC,CFOPN,CFOPC=fraction of LitrFall C,N,P allocated to litter components
       !     FSNCK=fraction of lowest internode to be remobilized
       !     RCEK(ielmc),RCEK(ielmn),RCEK(ielmp)=remobilization of C,N,P from senescing internode
-      !     InternodeChemElm_brch,WGNODN,WGNODP=senescing internode C,N,P mass
+      !     InternodeStrutElms_brch,WGNODN,WGNODP=senescing internode C,N,P mass
 !
           
           D7310: DO M=1,jsken
             DO NE=1,NumPlantChemElms
-              LitfalChemElm_pvr(NE,M,k_woody_litr,0,NZ)=LitfalChemElm_pvr(NE,M,k_woody_litr,0,NZ)+CFOPE(NE,istalk,M,NZ) &
-                *FSNCK*(InternodeChemElm_brch(NE,K,NB,NZ)-RCEK(NE))*FWOODE(NE,k_woody_litr)
+              LitfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)=LitfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)+CFOPE(NE,istalk,M,NZ) &
+                *FSNCK*(InternodeStrutElms_brch(NE,K,NB,NZ)-RCEK(NE))*FWOODE(NE,k_woody_litr)
 
-              LitfalChemElm_pvr(NE,M,k_fine_litr,0,NZ)=LitfalChemElm_pvr(NE,M,k_woody_litr,0,NZ)+CFOPE(NE,istalk,M,NZ) &
-                *FSNCK*(InternodeChemElm_brch(NE,K,NB,NZ)-RCEK(NE))*FWOODE(NE,k_fine_litr)
+              LitfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)+CFOPE(NE,istalk,M,NZ) &
+                *FSNCK*(InternodeStrutElms_brch(NE,K,NB,NZ)-RCEK(NE))*FWOODE(NE,k_fine_litr)
             ENDDO    
           ENDDO D7310
 
@@ -1348,11 +1348,11 @@ module PlantBranchMod
       !
       !     FSNCK=fraction of lowest internode to be remobilized
       !     InternodeHeightLive_brch,InternodeHeightDying_brch=living,senescing internode length
-      !     WTSTKB,WTSTBN,WTSTBP,InternodeChemElm_brch,WGNODN,WGNODP=C,N,P mass in senescing internode
+      !     WTSTKB,WTSTBN,WTSTBP,InternodeStrutElms_brch,WGNODN,WGNODP=C,N,P mass in senescing internode
       !
           DO NE=1,NumPlantChemElms
-            StalkChemElms_brch(NE,NB,NZ)=AZMAX1(StalkChemElms_brch(NE,NB,NZ)-FSNCK*InternodeChemElm_brch(NE,K,NB,NZ))
-            InternodeChemElm_brch(NE,K,NB,NZ)=InternodeChemElm_brch(NE,K,NB,NZ)-FSNCK*InternodeChemElm_brch(NE,K,NB,NZ)
+            StalkStrutElms_brch(NE,NB,NZ)=AZMAX1(StalkStrutElms_brch(NE,NB,NZ)-FSNCK*InternodeStrutElms_brch(NE,K,NB,NZ))
+            InternodeStrutElms_brch(NE,K,NB,NZ)=InternodeStrutElms_brch(NE,K,NB,NZ)-FSNCK*InternodeStrutElms_brch(NE,K,NB,NZ)
           ENDDO
           InternodeHeightLive_brch(K,NB,NZ)=InternodeHeightLive_brch(K,NB,NZ)-FSNCK*InternodeHeightDying_brch(K,NB,NZ)
           InternodeHeightDying_brch(K,NB,NZ)=InternodeHeightDying_brch(K,NB,NZ)-FSNCK*InternodeHeightDying_brch(K,NB,NZ)
@@ -1380,23 +1380,23 @@ module PlantBranchMod
     !
     !       CSNC,ZSNC,PSNC=literfall C,N,P
     !       CFOPC=fraction of plant litter allocated in nonstructural(0,*),
-    !       WTSTKB,WTSTBN,WTSTBP,InternodeChemElm_brch,WGNODN,WGNODP=C,N,P mass in senescing internode
+    !       WTSTKB,WTSTBN,WTSTBP,InternodeStrutElms_brch,WGNODN,WGNODP=C,N,P mass in senescing internode
     !       InternodeHeightLive_brch,InternodeHeightDying_brch=living,senescing internode length
     !
         ELSE
           
           D7315: DO M=1,jsken
             DO NE=1,NumPlantChemElms
-              LitfalChemElm_pvr(NE,M,k_woody_litr,0,NZ)=LitfalChemElm_pvr(NE,M,k_woody_litr,0,NZ)&
-                +CFOPE(NE,istalk,M,NZ)*InternodeChemElm_brch(NE,K,NB,NZ)*FWOODE(NE,k_woody_litr)
+              LitfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)=LitfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)&
+                +CFOPE(NE,istalk,M,NZ)*InternodeStrutElms_brch(NE,K,NB,NZ)*FWOODE(NE,k_woody_litr)
 
-              LitfalChemElm_pvr(NE,M,k_fine_litr,0,NZ)=LitfalChemElm_pvr(NE,M,k_woody_litr,0,NZ) &
-                +CFOPE(NE,istalk,M,NZ)*InternodeChemElm_brch(NE,K,NB,NZ)*FWOODE(NE,k_fine_litr)
+              LitfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ) &
+                +CFOPE(NE,istalk,M,NZ)*InternodeStrutElms_brch(NE,K,NB,NZ)*FWOODE(NE,k_fine_litr)
             ENDDO    
           ENDDO D7315
           DO NE=1,NumPlantChemElms
-            StalkChemElms_brch(NE,NB,NZ)=AZMAX1(StalkChemElms_brch(NE,NB,NZ)-InternodeChemElm_brch(NE,K,NB,NZ))
-            InternodeChemElm_brch(NE,K,NB,NZ)=0._r8
+            StalkStrutElms_brch(NE,NB,NZ)=AZMAX1(StalkStrutElms_brch(NE,NB,NZ)-InternodeStrutElms_brch(NE,K,NB,NZ))
+            InternodeStrutElms_brch(NE,K,NB,NZ)=0._r8
           ENDDO
           InternodeHeightLive_brch(K,NB,NZ)=InternodeHeightLive_brch(K,NB,NZ)-InternodeHeightDying_brch(K,NB,NZ)
           InternodeHeightDying_brch(K,NB,NZ)=0._r8
@@ -1408,10 +1408,10 @@ module PlantBranchMod
     !   RCEK(ielmc),RCEK(ielmn),RCEK(ielmp)=remobilization of C,N,P from senescing internode
     !   WTSTXB,WTSTXN,WTSTXP=residual C,N,P mass in senescing stalk
     !
-      IF(SenecStalkChemElms_brch(ielmc,NB,NZ).GT.ZEROP(NZ))THEN
-        RCEK(ielmc)=SenecStalkChemElms_brch(ielmc,NB,NZ)*RCSC
-        RCEK(ielmn)=SenecStalkChemElms_brch(ielmn,NB,NZ)*(RCSN+(1.0_r8-RCSN)*RCSC)
-        RCEK(ielmp)=SenecStalkChemElms_brch(ielmp,NB,NZ)*(RCSP+(1.0_r8-RCSP)*RCSC)
+      IF(SenecStalkStrutElms_brch(ielmc,NB,NZ).GT.ZEROP(NZ))THEN
+        RCEK(ielmc)=SenecStalkStrutElms_brch(ielmc,NB,NZ)*RCSC
+        RCEK(ielmn)=SenecStalkStrutElms_brch(ielmn,NB,NZ)*(RCSN+(1.0_r8-RCSN)*RCSC)
+        RCEK(ielmp)=SenecStalkStrutElms_brch(ielmp,NB,NZ)*(RCSP+(1.0_r8-RCSP)*RCSC)
     !
     !     FRACTION OF RESIDUAL STALK TO BE REMOBILIZED
     !
@@ -1431,11 +1431,11 @@ module PlantBranchMod
     !
         D8310: DO M=1,jsken
           DO NE=1,NumPlantChemElms
-            LitfalChemElm_pvr(NE,M,k_woody_litr,0,NZ)=LitfalChemElm_pvr(NE,M,k_woody_litr,0,NZ)&
-              +CFOPE(NE,istalk,M,NZ)*FSNCR*(SenecStalkChemElms_brch(NE,NB,NZ)-RCEK(NE))*FWOODE(NE,k_woody_litr)
+            LitfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)=LitfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)&
+              +CFOPE(NE,istalk,M,NZ)*FSNCR*(SenecStalkStrutElms_brch(NE,NB,NZ)-RCEK(NE))*FWOODE(NE,k_woody_litr)
 
-            LitfalChemElm_pvr(NE,M,k_fine_litr,0,NZ)=LitfalChemElm_pvr(NE,M,k_woody_litr,0,NZ)&
-              +CFOPE(NE,istalk,M,NZ)*FSNCR*(SenecStalkChemElms_brch(NE,NB,NZ)-RCEK(NE))*FWOODE(NE,k_fine_litr)
+            LitfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)&
+              +CFOPE(NE,istalk,M,NZ)*FSNCR*(SenecStalkStrutElms_brch(NE,NB,NZ)-RCEK(NE))*FWOODE(NE,k_fine_litr)
           ENDDO    
         ENDDO D8310
 
@@ -1448,10 +1448,10 @@ module PlantBranchMod
     !     InternodeHeightLive_brch,InternodeHeightDying_brch=living,senescing internode length
     !
         DO NE=1,NumPlantChemElms
-          FStalkSenes=FSNCR*SenecStalkChemElms_brch(NE,NB,NZ)
-          StalkChemElms_brch(NE,NB,NZ)=AZMAX1(StalkChemElms_brch(NE,NB,NZ)-FStalkSenes)
+          FStalkSenes=FSNCR*SenecStalkStrutElms_brch(NE,NB,NZ)
+          StalkStrutElms_brch(NE,NB,NZ)=AZMAX1(StalkStrutElms_brch(NE,NB,NZ)-FStalkSenes)
 
-          SenecStalkChemElms_brch(NE,NB,NZ)=AZMAX1(SenecStalkChemElms_brch(NE,NB,NZ)-FStalkSenes)
+          SenecStalkStrutElms_brch(NE,NB,NZ)=AZMAX1(SenecStalkStrutElms_brch(NE,NB,NZ)-FStalkSenes)
         ENDDO
         HTNODZ=0._r8
         D8320: DO K=0,MaxNodesPerBranch1
@@ -1491,16 +1491,16 @@ module PlantBranchMod
     ELSE      
       D8315: DO M=1,jsken
         DO NE=1,NumPlantChemElms
-          LitfalChemElm_pvr(NE,M,k_woody_litr,0,NZ)=LitfalChemElm_pvr(NE,M,k_woody_litr,0,NZ)&
-            +CFOPE(NE,istalk,M,NZ)*SenecStalkChemElms_brch(NE,NB,NZ)*FWOODE(NE,k_woody_litr)
+          LitfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)=LitfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)&
+            +CFOPE(NE,istalk,M,NZ)*SenecStalkStrutElms_brch(NE,NB,NZ)*FWOODE(NE,k_woody_litr)
 
-          LitfalChemElm_pvr(NE,M,k_fine_litr,0,NZ)=LitfalChemElm_pvr(NE,M,k_woody_litr,0,NZ) &
-            +CFOPE(NE,istalk,M,NZ)*SenecStalkChemElms_brch(NE,NB,NZ)*FWOODE(NE,k_fine_litr)
+          LitfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ) &
+            +CFOPE(NE,istalk,M,NZ)*SenecStalkStrutElms_brch(NE,NB,NZ)*FWOODE(NE,k_fine_litr)
         ENDDO    
       ENDDO D8315
       DO NE=1,NumPlantChemElms
-        StalkChemElms_brch(NE,NB,NZ)=AZMAX1(StalkChemElms_brch(NE,NB,NZ)-SenecStalkChemElms_brch(NE,NB,NZ))
-        SenecStalkChemElms_brch(NE,NB,NZ)=0._r8
+        StalkStrutElms_brch(NE,NB,NZ)=AZMAX1(StalkStrutElms_brch(NE,NB,NZ)-SenecStalkStrutElms_brch(NE,NB,NZ))
+        SenecStalkStrutElms_brch(NE,NB,NZ)=0._r8
       ENDDO
     ENDIF
 !
@@ -1511,9 +1511,9 @@ module PlantBranchMod
 !     RMxess_brch=remaining excess maintenance respiration
 !
     RMxess_brch=SNCT/(1.0_r8+FXFS)
-    write(*,*)'remob1503NonstructElms_pft(ielmc,NZ)',NZ,NonstructElms_pft(ielmc,NZ)
-    IF(NonstructElms_pft(ielmc,NZ).GT.RMxess_brch)THEN
-      NonstructElms_pft(ielmc,NZ)=NonstructElms_pft(ielmc,NZ)-RMxess_brch
+    write(*,*)'remob1503NonStrutElms_pft(ielmc,NZ)',NZ,NonStrutElms_pft(ielmc,NZ)
+    IF(NonStrutElms_pft(ielmc,NZ).GT.RMxess_brch)THEN
+      NonStrutElms_pft(ielmc,NZ)=NonStrutElms_pft(ielmc,NZ)-RMxess_brch
       RMxess_brch=0._r8
     ELSEIF(iPlantPhenolPattern_pft(NZ).NE.iplt_annual)THEN
       iPlantBranchState_brch(NB,NZ)=iDead
@@ -1551,7 +1551,7 @@ module PlantBranchMod
     LeafElmntNode_brch           =>  plt_biom%LeafElmntNode_brch   , &
     CanopyLeafCLyr_pft           =>  plt_biom%CanopyLeafCLyr_pft   , &
     StalkBiomassC_brch           =>  plt_biom%StalkBiomassC_brch  , &
-    StalkChemElms_brch           =>  plt_biom%StalkChemElms_brch , &
+    StalkStrutElms_brch           =>  plt_biom%StalkStrutElms_brch , &
     PetioleProteinCNode_brch     =>  plt_biom%PetioleProteinCNode_brch  , &
     FNOD                         =>  plt_allom%FNOD   , &
     iPlantRootProfile_pft        =>  plt_pheno%iPlantRootProfile_pft , &
@@ -1564,7 +1564,7 @@ module PlantBranchMod
     MainBranchNum_pft            =>  plt_morph%MainBranchNum_pft     , &
     CanopyLeafAreaByLayer_pft    =>  plt_morph%CanopyLeafAreaByLayer_pft   , &
     PetioleLengthNode_brch       =>  plt_morph%PetioleLengthNode_brch   , &
-    CanopyStemALyr_brch          =>  plt_morph%CanopyStemALyr_brch   , &
+    CanopyStemArea_lbrch          =>  plt_morph%CanopyStemArea_lbrch   , &
     BranchNumber_brch            =>  plt_morph%BranchNumber_brch    , &
     InternodeHeightLive_brch     =>  plt_morph%InternodeHeightLive_brch  , &
     CanopyHeightz_col            =>  plt_morph%CanopyHeightz_col      , &
@@ -1602,7 +1602,7 @@ module PlantBranchMod
       enddo
     ENDDO D540
     D535: DO L=1,NumOfCanopyLayers1
-      CanopyStemALyr_brch(L,NB,NZ)=0._r8
+      CanopyStemArea_lbrch(L,NB,NZ)=0._r8
     ENDDO D535
 !
 !   BRANCH HEIGHT
@@ -1735,7 +1735,7 @@ module PlantBranchMod
   !     DSTK,VSTK=stalk density (Mg m-3),specific volume (m3 g-1)
   !     StalkBiomassC_brch=stalk sapwood mass
   !     FRACL=stalk fraction in each layer
-  !     CanopyStemALyr_brch=total branch stalk surface area in each layer
+  !     CanopyStemArea_lbrch=total branch stalk surface area in each layer
   !
   !     IF(NZ.EQ.1)THEN
   !     WRITE(*,6679)'K1',I,J,NZ,NB,K1,KHiestGroLeafNode_brch(NB,NZ)
@@ -1758,11 +1758,11 @@ module PlantBranchMod
         ENDIF
       ENDDO D545
       
-      RSTK=SQRT(VSTK*(AZMAX1(StalkChemElms_brch(ielmc,NB,NZ))/PlantPopulation_pft(NZ)) &
+      RSTK=SQRT(VSTK*(AZMAX1(StalkStrutElms_brch(ielmc,NB,NZ))/PlantPopulation_pft(NZ)) &
         /(PICON*InternodeHeightLive_brch(K1,NB,NZ)))
       ARSTKB=PICON*InternodeHeightLive_brch(K1,NB,NZ)*PlantPopulation_pft(NZ)*RSTK
       IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual)THEN
-        StalkBiomassC_brch(NB,NZ)=StalkChemElms_brch(ielmc,NB,NZ)
+        StalkBiomassC_brch(NB,NZ)=StalkStrutElms_brch(ielmc,NB,NZ)
       ELSE
         ZSTK=AMIN1(ZSTX,FSTK*RSTK)
         ASTV=PICON*(2.0_r8*RSTK*ZSTK-ZSTK*ZSTK)
@@ -1784,18 +1784,18 @@ module PlantBranchMod
         ELSE
           FRACL=1.0_r8
         ENDIF
-        CanopyStemALyr_brch(L,NB,NZ)=FRACL*ARSTKB
+        CanopyStemArea_lbrch(L,NB,NZ)=FRACL*ARSTKB
       ENDDO D445
     ELSE
       StalkBiomassC_brch(NB,NZ)=0._r8
       D450: DO L=1,NumOfCanopyLayers1
-        CanopyStemALyr_brch(L,NB,NZ)=0._r8
+        CanopyStemArea_lbrch(L,NB,NZ)=0._r8
       ENDDO D450
     ENDIF
   ELSE
     StalkBiomassC_brch(NB,NZ)=0._r8
     D455: DO L=1,NumOfCanopyLayers1
-      CanopyStemALyr_brch(L,NB,NZ)=0._r8
+      CanopyStemArea_lbrch(L,NB,NZ)=0._r8
     ENDDO D455
   ENDIF
   end associate
@@ -1810,7 +1810,7 @@ module PlantBranchMod
   associate(                             &
     SineBranchAngle_pft         =>  plt_morph%SineBranchAngle_pft    , &
     LeafAreaNode_brch           =>  plt_morph%LeafAreaNode_brch    , &
-    CanopyStemALyr_brch         =>  plt_morph%CanopyStemALyr_brch    , &
+    CanopyStemArea_lbrch         =>  plt_morph%CanopyStemArea_lbrch    , &
     CLASS                       =>  plt_morph%CLASS    , &
     CanopyLeafAreaByLayer_pft   =>  plt_morph%CanopyLeafAreaByLayer_pft    , &
     StemAreaZsec_brch           =>  plt_morph%StemAreaZsec_brch    , &
@@ -1845,7 +1845,7 @@ module PlantBranchMod
 !
 ! StemAreaZsec_brch=stalk surface area in canopy layer
 ! SineBranchAngle_pft=stem angle from horizontal
-! CanopyStemALyr_brch=total branch stalk surface area in each layer
+! CanopyStemArea_lbrch=total branch stalk surface area in each layer
 !
   D910: DO L=1,NumOfCanopyLayers1
     DO  N=1,NumOfLeafZenithSectors1
@@ -1860,7 +1860,7 @@ module PlantBranchMod
     N=MIN(NumOfLeafZenithSectors1,INT(ASIN(SineBranchAngle_pft(NZ))/dangle)+1)
   ENDIF
   D710: DO L=NumOfCanopyLayers1,1,-1
-    StemAreaZsec_brch(N,L,NB,NZ)=CanopyStemALyr_brch(L,NB,NZ)/real(NumOfLeafZenithSectors1,r8)
+    StemAreaZsec_brch(N,L,NB,NZ)=CanopyStemArea_lbrch(L,NB,NZ)/real(NumOfLeafZenithSectors1,r8)
   ENDDO D710
   end associate
   end subroutine LeafClassAllocation
@@ -1883,7 +1883,7 @@ module PlantBranchMod
   associate(                              &
     TCelciusCanopy_pft                    =>  plt_ew%TCelciusCanopy_pft        , &
     LeafPetoNonstElmConc_brch             =>  plt_biom%LeafPetoNonstElmConc_brch    , &
-    GrainChemElms_brch                    =>  plt_biom%GrainChemElms_brch    , &
+    GrainStrutElms_brch                    =>  plt_biom%GrainStrutElms_brch    , &
     StalkRsrvElms_brch                   =>  plt_biom%StalkRsrvElms_brch   , &
     ZEROP                                 =>  plt_biom%ZEROP     , &
     GrainSeedBiomCMean_brch               =>  plt_allom%GrainSeedBiomCMean_brch    , &
@@ -2003,7 +2003,7 @@ module PlantBranchMod
 !   fTgrowRootP_vr=temperature function for root growth
 !
   IF(iPlantCalendar_brch(ipltcal_BeginSeedFill,NB,NZ).NE.0)THEN
-    IF(GrainChemElms_brch(ielmc,NB,NZ).GE.GrainSeedBiomCMean_brch(NB,NZ)*SeedNumSet_brch(NB,NZ))THEN
+    IF(GrainStrutElms_brch(ielmc,NB,NZ).GE.GrainSeedBiomCMean_brch(NB,NZ)*SeedNumSet_brch(NB,NZ))THEN
       GROLM=0._r8
     ELSEIF(iPlantGrainType_pft(NZ).EQ.igraintyp_abvgrnd)THEN
       GROLM=AZMAX1(GrainFillRate25C_pft(NZ)*SeedNumSet_brch(NB,NZ)*SQRT(fTgrowCanP(NZ)))
@@ -2019,9 +2019,9 @@ module PlantBranchMod
 !     GROLM,GROLC=maximum,actual grain fill rate
 !     MaxChemElmRsrv2Grain,ChemElmRsrv2Grain(ielmc)=maximum,actual C translocation rate from reserve to grain
 !
-    IF(GrainChemElms_brch(ielmn,NB,NZ).LT.ZPGRM*CNGR(NZ) &
-      *GrainChemElms_brch(ielmc,NB,NZ).OR.GrainChemElms_brch(ielmp,NB,NZ).LT.ZPGRM &
-      *CPGR(NZ)*GrainChemElms_brch(ielmc,NB,NZ))THEN
+    IF(GrainStrutElms_brch(ielmn,NB,NZ).LT.ZPGRM*CNGR(NZ) &
+      *GrainStrutElms_brch(ielmc,NB,NZ).OR.GrainStrutElms_brch(ielmp,NB,NZ).LT.ZPGRM &
+      *CPGR(NZ)*GrainStrutElms_brch(ielmc,NB,NZ))THEN
       GROLC=0._r8
     ELSE
       GROLC=GROLM
@@ -2051,12 +2051,12 @@ module PlantBranchMod
       ZPGRP=ZPGRM+ZPGRD*AZMAX1(AMIN1(1.0_r8,ZNPGP))
       ChemElmRsrv2Grain(ielmn)=AMIN1(MaxChemElmRsrv2Grain*CNGR(NZ) &
         ,AZMAX1(StalkRsrvElms_brch(ielmn,NB,NZ)*ZPGRN) &
-        ,(GrainChemElms_brch(ielmc,NB,NZ)+ChemElmRsrv2Grain(ielmc))*CNGR(NZ) &
-        -GrainChemElms_brch(ielmn,NB,NZ))
+        ,(GrainStrutElms_brch(ielmc,NB,NZ)+ChemElmRsrv2Grain(ielmc))*CNGR(NZ) &
+        -GrainStrutElms_brch(ielmn,NB,NZ))
       ChemElmRsrv2Grain(ielmp)=AMIN1(MaxChemElmRsrv2Grain*CPGR(NZ) &
         ,AZMAX1(StalkRsrvElms_brch(ielmp,NB,NZ)*ZPGRP) &
-        ,(GrainChemElms_brch(ielmc,NB,NZ)+ChemElmRsrv2Grain(ielmc))*CPGR(NZ) &
-        -GrainChemElms_brch(ielmp,NB,NZ))
+        ,(GrainStrutElms_brch(ielmc,NB,NZ)+ChemElmRsrv2Grain(ielmc))*CPGR(NZ) &
+        -GrainStrutElms_brch(ielmp,NB,NZ))
     ELSE
       ChemElmRsrv2Grain(ielmn)=0._r8
       ChemElmRsrv2Grain(ielmp)=0._r8
@@ -2071,7 +2071,7 @@ module PlantBranchMod
     DO NE=1,NumPlantChemElms
       StalkRsrvElms_brch(NE,NB,NZ)=StalkRsrvElms_brch(NE,NB,NZ)+GrowthGrain(NE) &
         -ChemElmRsrv2Grain(NE)
-      GrainChemElms_brch(NE,NB,NZ)=GrainChemElms_brch(NE,NB,NZ)+ChemElmRsrv2Grain(NE)
+      GrainStrutElms_brch(NE,NB,NZ)=GrainStrutElms_brch(NE,NB,NZ)+ChemElmRsrv2Grain(NE)
     ENDDO
   ELSE
     ChemElmRsrv2Grain(1:NumPlantChemElms)=0._r8
@@ -2142,21 +2142,21 @@ module PlantBranchMod
     iDayPlanting_pft                       =>  plt_distb%iDayPlanting_pft     , &
     iDayPlantHarvest_pft                   =>  plt_distb%iDayPlantHarvest_pft     , &
     iYearPlanting_pft                      =>  plt_distb%iYearPlanting_pft      , &
-    GrainChemElms_brch                     =>  plt_biom%GrainChemElms_brch     , &
+    GrainStrutElms_brch                     =>  plt_biom%GrainStrutElms_brch     , &
     LeafElmntNode_brch                     =>  plt_biom%LeafElmntNode_brch      , &
-    PopuPlantRootC_vr                      =>  plt_biom% PopuPlantRootC_vr     , &
-    SenecStalkChemElms_brch                =>  plt_biom%SenecStalkChemElms_brch    , &
-    StalkChemElms_brch                     =>  plt_biom%StalkChemElms_brch    , &
-    RootMycoNonstElm_pvr                   =>  plt_biom%RootMycoNonstElm_pvr     , &
-    PetoleChemElm_brch                     =>  plt_biom%PetoleChemElm_brch   , &
-    EarChemElms_brch                       =>  plt_biom%EarChemElms_brch    , &
+    PopuRootMycoC_pvr                      =>  plt_biom% PopuRootMycoC_pvr     , &
+    SenecStalkStrutElms_brch                =>  plt_biom%SenecStalkStrutElms_brch    , &
+    StalkStrutElms_brch                     =>  plt_biom%StalkStrutElms_brch    , &
+    RootMycoNonstElms_rpvr                   =>  plt_biom%RootMycoNonstElms_rpvr     , &
+    PetoleStrutElms_brch                     =>  plt_biom%PetoleStrutElms_brch   , &
+    EarStrutElms_brch                       =>  plt_biom%EarStrutElms_brch    , &
     LeafProteinCNode_brch                  =>  plt_biom%LeafProteinCNode_brch       , &
     PetioleProteinCNode_brch               =>  plt_biom%PetioleProteinCNode_brch     , &
-    HuskChemElms_brch                      =>  plt_biom%HuskChemElms_brch    , &
+    HuskStrutElms_brch                      =>  plt_biom%HuskStrutElms_brch    , &
     PetioleElmntNode_brch                  =>  plt_biom%PetioleElmntNode_brch     , &
-    LeafChemElms_brch                      =>  plt_biom%LeafChemElms_brch    , &
-    NonstructElms_pft                      =>  plt_biom%NonstructElms_pft      , &
-    InternodeChemElm_brch                  =>  plt_biom%InternodeChemElm_brch     , &
+    LeafStrutElms_brch                      =>  plt_biom%LeafStrutElms_brch    , &
+    NonStrutElms_pft                      =>  plt_biom%NonStrutElms_pft      , &
+    InternodeStrutElms_brch                  =>  plt_biom%InternodeStrutElms_brch     , &
     FWODLE                                 =>  plt_allom%FWODLE    , &
     FWODBE                                 =>  plt_allom%FWODBE    , &
     GrainSeedBiomCMean_brch                =>  plt_allom%GrainSeedBiomCMean_brch      , &
@@ -2185,7 +2185,7 @@ module PlantBranchMod
     KHiestGroLeafNode_brch                 =>  plt_pheno%KHiestGroLeafNode_brch    , &
     CFOPE                                  =>  plt_soilchem%CFOPE  , &
     iYearCurrent                           =>  plt_site%iYearCurrent       , &
-    LitfalChemElm_pvr                      =>  plt_bgcr%LitfalChemElm_pvr       , &
+    LitfalStrutElms_pvr                      =>  plt_bgcr%LitfalStrutElms_pvr       , &
     MY                                     =>  plt_morph%MY        , &
     NumOfLeaves_brch                       =>  plt_morph%NumOfLeaves_brch     , &
     XTLI                                   =>  plt_morph%XTLI      , &
@@ -2265,7 +2265,7 @@ module PlantBranchMod
     !     organ key:LF=leaf,SHE=petiole,STK=stalk,RSV=reserve
     !     HSK=husk,EAR=ear,GR=grain,SHT=shoot
     !     LeafAreaLive_brch,LeafAreaNode_brch=branch,node leaf area
-    !     InternodeChemElm_brch,WGNODN,WGNODP=node stalk C,N,P mass
+    !     InternodeStrutElms_brch,WGNODN,WGNODP=node stalk C,N,P mass
     !     InternodeHeightDying_brch,InternodeHeightLive_brch=stalk height,stalk internode length
     !     SeedNumSet_brch=seed set number
     !     PotentialSeedSites_brch=potential number of seed set sites
@@ -2281,18 +2281,18 @@ module PlantBranchMod
             HourFailGrainFill_brch(NB,NZ)=0._r8
             D5330: DO M=1,jsken
               DO NE=1,NumPlantChemElms
-                LitfalChemElm_pvr(NE,M,k_woody_litr,0,NZ)=LitfalChemElm_pvr(NE,M,k_woody_litr,0,NZ) &
-                  +CFOPE(NE,icwood,M,NZ)*LeafChemElms_brch(NE,NB,NZ)*FWODLE(NE,k_woody_litr) &
-                  +CFOPE(NE,icwood,M,NZ)*PetoleChemElm_brch(NE,NB,NZ)*FWODBE(NE,k_woody_litr)
+                LitfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)=LitfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ) &
+                  +CFOPE(NE,icwood,M,NZ)*LeafStrutElms_brch(NE,NB,NZ)*FWODLE(NE,k_woody_litr) &
+                  +CFOPE(NE,icwood,M,NZ)*PetoleStrutElms_brch(NE,NB,NZ)*FWODBE(NE,k_woody_litr)
 
-                LitfalChemElm_pvr(NE,M,k_fine_litr,0,NZ)=LitfalChemElm_pvr(NE,M,k_fine_litr,0,NZ) &
-                  +CFOPE(NE,ifoliar,M,NZ)*LeafChemElms_brch(NE,NB,NZ)*FWODLE(NE,k_fine_litr) &
-                  +CFOPE(NE,inonfoliar,M,NZ)*PetoleChemElm_brch(NE,NB,NZ)*FWODBE(NE,k_fine_litr)
+                LitfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ) &
+                  +CFOPE(NE,ifoliar,M,NZ)*LeafStrutElms_brch(NE,NB,NZ)*FWODLE(NE,k_fine_litr) &
+                  +CFOPE(NE,inonfoliar,M,NZ)*PetoleStrutElms_brch(NE,NB,NZ)*FWODBE(NE,k_fine_litr)
               ENDDO  
             ENDDO D5330
             LeafAreaLive_brch(NB,NZ)=0._r8
-            LeafChemElms_brch(1:NumPlantChemElms,NB,NZ)=0._r8
-            PetoleChemElm_brch(1:NumPlantChemElms,NB,NZ)=0._r8
+            LeafStrutElms_brch(1:NumPlantChemElms,NB,NZ)=0._r8
+            PetoleStrutElms_brch(1:NumPlantChemElms,NB,NZ)=0._r8
             D5335: DO K=0,MaxNodesPerBranch1
               LeafAreaNode_brch(K,NB,NZ)=0._r8
               PetioleLengthNode_brch(K,NB,NZ)=0._r8
@@ -2312,15 +2312,15 @@ module PlantBranchMod
 
           D6245: DO M=1,jsken
             DO NE=1,NumPlantChemElms
-              LitfalChemElm_pvr(NE,M,k_fine_litr,0,NZ)=LitfalChemElm_pvr(NE,M,k_fine_litr,0,NZ) &
+              LitfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ) &
                 +CFOPE(NE,inonfoliar,M,NZ) &
-                *(HuskChemElms_brch(NE,NB,NZ)+EarChemElms_brch(NE,NB,NZ)+GrainChemElms_brch(NE,NB,NZ))
+                *(HuskStrutElms_brch(NE,NB,NZ)+EarStrutElms_brch(NE,NB,NZ)+GrainStrutElms_brch(NE,NB,NZ))
             ENDDO
           ENDDO D6245
             
-          HuskChemElms_brch(1:NumPlantChemElms,NB,NZ)=0._r8
-          EarChemElms_brch(1:NumPlantChemElms,NB,NZ)=0._r8
-          GrainChemElms_brch(1:NumPlantChemElms,NB,NZ)=0._r8
+          HuskStrutElms_brch(1:NumPlantChemElms,NB,NZ)=0._r8
+          EarStrutElms_brch(1:NumPlantChemElms,NB,NZ)=0._r8
+          GrainStrutElms_brch(1:NumPlantChemElms,NB,NZ)=0._r8
           
           PotentialSeedSites_brch(NB,NZ)=0._r8
           SeedNumSet_brch(NB,NZ)=0._r8
@@ -2328,15 +2328,15 @@ module PlantBranchMod
           IF(iPlantTurnoverPattern_pft(NZ).EQ.0.OR.(.not.is_plant_treelike(iPlantRootProfile_pft(NZ))))THEN
             D6345: DO M=1,jsken
               DO NE=1,NumPlantChemElms
-                LitfalChemElm_pvr(NE,M,k_fine_litr,0,NZ)=LitfalChemElm_pvr(NE,M,k_fine_litr,0,NZ)&
-                  +CFOPE(NE,istalk,M,NZ)*StalkChemElms_brch(NE,NB,NZ)
+                LitfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)&
+                  +CFOPE(NE,istalk,M,NZ)*StalkStrutElms_brch(NE,NB,NZ)
               ENDDO
             ENDDO D6345
-            StalkChemElms_brch(1:NumPlantChemElms,NB,NZ)=0._r8
-            SenecStalkChemElms_brch(1:NumPlantChemElms,NB,NZ)=0._r8
+            StalkStrutElms_brch(1:NumPlantChemElms,NB,NZ)=0._r8
+            SenecStalkStrutElms_brch(1:NumPlantChemElms,NB,NZ)=0._r8
             DO K=0,MaxNodesPerBranch1
               DO NE=1,NumPlantChemElms
-                InternodeChemElm_brch(NE,K,NB,NZ)=0._r8
+                InternodeStrutElms_brch(NE,K,NB,NZ)=0._r8
               ENDDO
             ENDDO
             D6340: DO K=0,MaxNodesPerBranch1
@@ -2378,23 +2378,23 @@ module PlantBranchMod
 
     D6330: DO M=1,jsken
       DO NE=1,NumPlantChemElms
-        LitfalChemElm_pvr(NE,M,k_fine_litr,0,NZ)=LitfalChemElm_pvr(NE,M,k_fine_litr,0,NZ)+ &
-          FSNR*CFOPE(NE,inonfoliar,M,NZ)*(HuskChemElms_brch(NE,NB,NZ)+EarChemElms_brch(NE,NB,NZ))
+        LitfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)+ &
+          FSNR*CFOPE(NE,inonfoliar,M,NZ)*(HuskStrutElms_brch(NE,NB,NZ)+EarStrutElms_brch(NE,NB,NZ))
         IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual.AND.iPlantPhenolType_pft(NZ).NE.0)THEN
-          NonstructElms_pft(NE,NZ)=NonstructElms_pft(NE,NZ)+ &
-            FSNR*CFOPE(NE,inonfoliar,M,NZ)*GrainChemElms_brch(NE,NB,NZ)
-          print*,'plantbranch2375NonstructElms_pft(NE,NZ)',NZ,NE,NonstructElms_pft(NE,NZ)  
+          NonStrutElms_pft(NE,NZ)=NonStrutElms_pft(NE,NZ)+ &
+            FSNR*CFOPE(NE,inonfoliar,M,NZ)*GrainStrutElms_brch(NE,NB,NZ)
+          print*,'plantbranch2375NonStrutElms_pft(NE,NZ)',NZ,NE,NonStrutElms_pft(NE,NZ)  
         ELSE
-          LitfalChemElm_pvr(NE,M,k_fine_litr,0,NZ)=LitfalChemElm_pvr(NE,M,k_fine_litr,0,NZ)+ &
-            FSNR*CFOPE(NE,inonfoliar,M,NZ)*GrainChemElms_brch(NE,NB,NZ)
+          LitfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)+ &
+            FSNR*CFOPE(NE,inonfoliar,M,NZ)*GrainStrutElms_brch(NE,NB,NZ)
         ENDIF
       ENDDO
     ENDDO D6330
 
     DO NE=1,NumPlantChemElms  
-      HuskChemElms_brch(NE,NB,NZ)=FSNR1*HuskChemElms_brch(NE,NB,NZ)
-      EarChemElms_brch(NE,NB,NZ)=FSNR1*EarChemElms_brch(NE,NB,NZ)
-      GrainChemElms_brch(NE,NB,NZ)=FSNR1*GrainChemElms_brch(NE,NB,NZ)
+      HuskStrutElms_brch(NE,NB,NZ)=FSNR1*HuskStrutElms_brch(NE,NB,NZ)
+      EarStrutElms_brch(NE,NB,NZ)=FSNR1*EarStrutElms_brch(NE,NB,NZ)
+      GrainStrutElms_brch(NE,NB,NZ)=FSNR1*GrainStrutElms_brch(NE,NB,NZ)
     ENDDO
     PotentialSeedSites_brch(NB,NZ)=FSNR1*PotentialSeedSites_brch(NB,NZ)
     SeedNumSet_brch(NB,NZ)=FSNR1*SeedNumSet_brch(NB,NZ)
@@ -2407,17 +2407,17 @@ module PlantBranchMod
 
       D6335: DO M=1,jsken
         DO NE=1,NumPlantChemElms
-          LitfalChemElm_pvr(NE,M,k_fine_litr,0,NZ)=LitfalChemElm_pvr(NE,M,k_fine_litr,0,NZ)&
-            +FSNR*CFOPE(NE,istalk,M,NZ)*StalkChemElms_brch(NE,NB,NZ)
+          LitfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)&
+            +FSNR*CFOPE(NE,istalk,M,NZ)*StalkStrutElms_brch(NE,NB,NZ)
         ENDDO
       ENDDO D6335
       DO NE=1,NumPlantChemElms  
-        StalkChemElms_brch(NE,NB,NZ)=FSNR1*StalkChemElms_brch(NE,NB,NZ)
-        SenecStalkChemElms_brch(NE,NB,NZ)=FSNR1*SenecStalkChemElms_brch(NE,NB,NZ)
+        StalkStrutElms_brch(NE,NB,NZ)=FSNR1*StalkStrutElms_brch(NE,NB,NZ)
+        SenecStalkStrutElms_brch(NE,NB,NZ)=FSNR1*SenecStalkStrutElms_brch(NE,NB,NZ)
       ENDDO
       DO K=0,MaxNodesPerBranch1
         DO NE=1,NumPlantChemElms
-          InternodeChemElm_brch(NE,K,NB,NZ)=FSNR1*InternodeChemElm_brch(NE,K,NB,NZ)
+          InternodeStrutElms_brch(NE,K,NB,NZ)=FSNR1*InternodeStrutElms_brch(NE,K,NB,NZ)
         ENDDO
       ENDDO
       D2010: DO K=0,MaxNodesPerBranch1
@@ -2518,12 +2518,12 @@ module PlantBranchMod
     FracHour4LeafoffRemob           =>  plt_allom%FracHour4LeafoffRemob   , &
     FWODRE                          =>  plt_allom%FWODRE , &
     RootElms_pft                    =>  plt_biom%RootElms_pft   , &
-     PopuPlantRootC_vr              =>  plt_biom% PopuPlantRootC_vr  , &
+     PopuRootMycoC_pvr              =>  plt_biom% PopuRootMycoC_pvr  , &
     RootMycoActiveBiomC_pvr         =>  plt_biom%RootMycoActiveBiomC_pvr  , &
     CanopyStalkC_pft                =>  plt_biom%CanopyStalkC_pft   , &
-    NonstructElm_brch               =>  plt_biom%NonstructElm_brch  , &
-     RootMycoNonstElm_pvr           =>  plt_biom%RootMycoNonstElm_pvr  , &
-    NonstructElms_pft               =>  plt_biom%NonstructElms_pft   , &
+    NonStrutElms_brch               =>  plt_biom%NonStrutElms_brch  , &
+     RootMycoNonstElms_rpvr           =>  plt_biom%RootMycoNonstElms_rpvr  , &
+    NonStrutElms_pft               =>  plt_biom%NonStrutElms_pft   , &
     LeafPetoNonstElmConc_brch       =>  plt_biom%LeafPetoNonstElmConc_brch  , &
     LeafPetolBiomassC_brch          =>  plt_biom%LeafPetolBiomassC_brch   , &
     ZEROP                           =>  plt_biom%ZEROP   , &
@@ -2562,9 +2562,9 @@ module PlantBranchMod
     TotPopuPlantRootC=0._r8
     TotalRootNonstElms(ielmc)=0._r8
     D4: DO L=NU,MaxSoiL4Root(NZ)
-      TotPopuPlantRootC=TotPopuPlantRootC+AZMAX1(PopuPlantRootC_vr(ipltroot,L,NZ))
+      TotPopuPlantRootC=TotPopuPlantRootC+AZMAX1(PopuRootMycoC_pvr(ipltroot,L,NZ))
       TotalRootNonstElms(ielmc)=TotalRootNonstElms(ielmc)+&
-        AZMAX1(RootMycoNonstElm_pvr(ielmc,ipltroot,L,NZ))
+        AZMAX1(RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ))
     ENDDO D4
 !
   ! RESET TIME COUNTER
@@ -2606,10 +2606,10 @@ module PlantBranchMod
       Hours2LeafOut_brch(NB,NZ)=Hours2LeafOut_brch(NB,NZ)+DATRP
       PlantChk=iPlantPhenolPattern_pft(NZ).EQ.iplt_annual .AND.iPlantPhenolType_pft(NZ).EQ.iphenotyp_evgreen
       IF(Hours2LeafOut_brch(NB,NZ).LE.HourReq2InitSStor4LeafOut(iPlantPhenolPattern_pft(NZ)).OR.(plantChk))THEN
-!        write(101,*)'NonstructElms_pft LEAFOUT',NonstructElms_pft(ielmc,NZ),NZ
-        IF(NonstructElms_pft(ielmc,NZ).GT.ZEROP(NZ))THEN
+!        write(101,*)'NonStrutElms_pft LEAFOUT',NonStrutElms_pft(ielmc,NZ),NZ
+        IF(NonStrutElms_pft(ielmc,NZ).GT.ZEROP(NZ))THEN
           !CPOOLT:=total root nonst + branch nonst
-          CPOOLT=TotalRootNonstElms(ielmc)+NonstructElm_brch(ielmc,NB,NZ)
+          CPOOLT=TotalRootNonstElms(ielmc)+NonStrutElms_brch(ielmc,NB,NZ)
   !
   !       REMOBILIZE C FROM SEASONAL STORAGE AT FIRST-ORDER RATE
   !       MODIFIED BY SOIL TEMPERATURE AT SEED DEPTH
@@ -2622,23 +2622,23 @@ module PlantBranchMod
     !     WTRTD=root C mass
 !
           GFNX=GVMX(iPlantPhenolPattern_pft(NZ))*DATRP
-          CH2OH=AZMAX1(GFNX*NonstructElms_pft(ielmc,NZ))
-          NonstructElms_pft(ielmc,NZ)=NonstructElms_pft(ielmc,NZ)-CH2OH
-          NonstructElm_brch(ielmc,NB,NZ)=NonstructElm_brch(ielmc,NB,NZ)+CH2OH &
+          CH2OH=AZMAX1(GFNX*NonStrutElms_pft(ielmc,NZ))
+          NonStrutElms_pft(ielmc,NZ)=NonStrutElms_pft(ielmc,NZ)-CH2OH
+          NonStrutElms_brch(ielmc,NB,NZ)=NonStrutElms_brch(ielmc,NB,NZ)+CH2OH &
             *FXSH(iPlantPhenolPattern_pft(NZ))
-          write(*,*)'2618NonstructElms_pft(ielmc,NZ)',NZ,NonstructElms_pft(ielmc,NZ)  
-          IF(ABS(NonstructElms_pft(ielmc,NZ))>1.E10)STOP
-!          write(101,*)'LEAFOUTNonstructElm_brch',NonstructElm_brch(ielmc,NB,NZ),NB,NZ
+          write(*,*)'2618NonStrutElms_pft(ielmc,NZ)',NZ,NonStrutElms_pft(ielmc,NZ)  
+          IF(ABS(NonStrutElms_pft(ielmc,NZ))>1.E10)STOP
+!          write(101,*)'LEAFOUTNonStrutElms_brch',NonStrutElms_brch(ielmc,NB,NZ),NB,NZ
 !         if root condition met
           IF(TotPopuPlantRootC.GT.ZEROP(NZ).AND.TotalRootNonstElms(ielmc).GT.ZEROP(NZ))THEN
             D50: DO L=NU,MaxSoiL4Root(NZ)
-              FXFC=AZMAX1(PopuPlantRootC_vr(ipltroot,L,NZ))/TotPopuPlantRootC
-              RootMycoNonstElm_pvr(ielmc,ipltroot,L,NZ)=RootMycoNonstElm_pvr(ielmc,ipltroot,L,NZ)&
+              FXFC=AZMAX1(PopuRootMycoC_pvr(ipltroot,L,NZ))/TotPopuPlantRootC
+              RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ)=RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ)&
                  +FXFC*CH2OH*FXRT(iPlantPhenolPattern_pft(NZ))
             ENDDO D50
           ELSE
-             RootMycoNonstElm_pvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ),NZ)=&
-               RootMycoNonstElm_pvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ),NZ)+CH2OH &
+             RootMycoNonstElms_rpvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ),NZ)=&
+               RootMycoNonstElms_rpvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ),NZ)+CH2OH &
                *FXRT(iPlantPhenolPattern_pft(NZ))
           ENDIF
         ELSE
@@ -2659,25 +2659,25 @@ module PlantBranchMod
       !     FRSV=rate constant for remobiln of storage C,N,P during leafout C
       !     FXSH=shoot partitioning of storage C during leafout
       !
-      IF(NonstructElms_pft(ielmc,NZ).GT.ZEROP(NZ))THEN
+      IF(NonStrutElms_pft(ielmc,NZ).GT.ZEROP(NZ))THEN
         IF(iPlantPhenolPattern_pft(NZ).NE.iplt_annual)THEN
-          CPOOLT=AZMAX1(NonstructElms_pft(ielmc,NZ)+NonstructElm_brch(ielmc,NB,NZ))          
+          CPOOLT=AZMAX1(NonStrutElms_pft(ielmc,NZ)+NonStrutElms_brch(ielmc,NB,NZ))          
           DO NE=2,NumPlantChemElms
-            NonstGradt=(NonstructElms_pft(NE,NZ)*NonstructElm_brch(ielmc,NB,NZ)- &
-              NonstructElm_brch(NE,NB,NZ)*NonstructElms_pft(ielmc,NZ))/CPOOLT            
+            NonstGradt=(NonStrutElms_pft(NE,NZ)*NonStrutElms_brch(ielmc,NB,NZ)- &
+              NonStrutElms_brch(NE,NB,NZ)*NonStrutElms_pft(ielmc,NZ))/CPOOLT            
             ElmXferStore2Shoot(NE)=AZMAX1(FRSV(iPlantTurnoverPattern_pft(NZ))*NonstGradt)
           ENDDO
 
         ELSE
           DO NE=2,NumPlantChemElms
-            ElmXferStore2Shoot(NE)=AZMAX1(FXSH(iPlantPhenolPattern_pft(NZ))*CH2OH*NonstructElms_pft(NE,NZ) &
-              /NonstructElms_pft(ielmc,NZ))
+            ElmXferStore2Shoot(NE)=AZMAX1(FXSH(iPlantPhenolPattern_pft(NZ))*CH2OH*NonStrutElms_pft(NE,NZ) &
+              /NonStrutElms_pft(ielmc,NZ))
           ENDDO  
         ENDIF
       ELSE
         !when there is no seasonal storage C
         DO NE=2,NumPlantChemElms
-          ElmXferStore2Shoot(NE)=AZMAX1(FXSH(iPlantPhenolPattern_pft(NZ))*NonstructElms_pft(NE,NZ))
+          ElmXferStore2Shoot(NE)=AZMAX1(FXSH(iPlantPhenolPattern_pft(NZ))*NonStrutElms_pft(NE,NZ))
         ENDDO
       ENDIF
     !
@@ -2695,28 +2695,28 @@ module PlantBranchMod
         TotalRootNonstElms(NE)=0._r8
         D3: DO L=NU,MaxSoiL4Root(NZ)
           TotalRootNonstElms(NE)=TotalRootNonstElms(NE)+ &
-            AZMAX1(RootMycoNonstElm_pvr(NE,ipltroot,L,NZ))
+            AZMAX1(RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ))
         ENDDO D3
       ENDDO
 
-      IF(NonstructElms_pft(ielmc,NZ).GT.ZEROP(NZ))THEN
+      IF(NonStrutElms_pft(ielmc,NZ).GT.ZEROP(NZ))THEN
         IF(iPlantPhenolPattern_pft(NZ).NE.iplt_annual)THEN
-          CPOOLT=AMAX1(ZEROP(NZ),NonstructElms_pft(ielmc,NZ)+TotalRootNonstElms(ielmc))
+          CPOOLT=AMAX1(ZEROP(NZ),NonStrutElms_pft(ielmc,NZ)+TotalRootNonstElms(ielmc))
           DO NE=2,NumPlantChemElms
-            NonstGradt=(NonstructElms_pft(NE,NZ)*TotalRootNonstElms(ielmc)-&
-              TotalRootNonstElms(NE)*NonstructElms_pft(ielmc,NZ))/CPOOLT            
+            NonstGradt=(NonStrutElms_pft(NE,NZ)*TotalRootNonstElms(ielmc)-&
+              TotalRootNonstElms(NE)*NonStrutElms_pft(ielmc,NZ))/CPOOLT            
             NonstElm2RootMyco(NE)=AZMAX1(FRSV(iPlantTurnoverPattern_pft(NZ))*NonstGradt)
           ENDDO
 
         ELSE
           DO NE=2,NumPlantChemElms
             NonstElm2RootMyco(NE)=AZMAX1(FXRT(iPlantPhenolPattern_pft(NZ))*CH2OH*&
-              NonstructElms_pft(NE,NZ)/NonstructElms_pft(ielmc,NZ))
+              NonStrutElms_pft(NE,NZ)/NonStrutElms_pft(ielmc,NZ))
           ENDDO    
         ENDIF
       ELSE
         DO NE=2,NumPlantChemElms
-          NonstElm2RootMyco(NE)=AZMAX1(FXRT(iPlantPhenolPattern_pft(NZ))*NonstructElms_pft(NE,NZ))
+          NonstElm2RootMyco(NE)=AZMAX1(FXRT(iPlantPhenolPattern_pft(NZ))*NonStrutElms_pft(NE,NZ))
         ENDDO  
       ENDIF
 !
@@ -2730,23 +2730,23 @@ module PlantBranchMod
 !     FXFN=root layer allocation
 !
       DO NE=2,NumPlantChemElms
-        NonstructElms_pft(NE,NZ)=NonstructElms_pft(NE,NZ)-ElmXferStore2Shoot(NE)-NonstElm2RootMyco(NE)
-        NonstructElm_brch(NE,NB,NZ)=NonstructElm_brch(NE,NB,NZ)+ElmXferStore2Shoot(NE)
+        NonStrutElms_pft(NE,NZ)=NonStrutElms_pft(NE,NZ)-ElmXferStore2Shoot(NE)-NonstElm2RootMyco(NE)
+        NonStrutElms_brch(NE,NB,NZ)=NonStrutElms_brch(NE,NB,NZ)+ElmXferStore2Shoot(NE)
       ENDDO
       
       IF(TotPopuPlantRootC.GT.ZEROP(NZ).AND.TotalRootNonstElms(ielmc).GT.ZEROP(NZ))THEN
         D51: DO L=NU,MaxSoiL4Root(NZ)
-          FXFN=AZMAX1(RootMycoNonstElm_pvr(ielmc,ipltroot,L,NZ))/TotalRootNonstElms(ielmc)
+          FXFN=AZMAX1(RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ))/TotalRootNonstElms(ielmc)
           DO NE=2,NumPlantChemElms
-            RootMycoNonstElm_pvr(NE,ipltroot,L,NZ)=RootMycoNonstElm_pvr(NE,ipltroot,L,NZ)&
+            RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ)=RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ)&
               +FXFN*NonstElm2RootMyco(NE)
-            if(RootMycoNonstElm_pvr(NE,ipltroot,L,NZ)<0._r8)stop            
+            if(RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ)<0._r8)stop            
           ENDDO  
         ENDDO D51
       ELSE
         DO NE=2,NumPlantChemElms
-          RootMycoNonstElm_pvr(NE,ipltroot,NGTopRootLayer_pft(NZ),NZ)=&
-            RootMycoNonstElm_pvr(NE,ipltroot,NGTopRootLayer_pft(NZ),NZ)+NonstElm2RootMyco(NE)
+          RootMycoNonstElms_rpvr(NE,ipltroot,NGTopRootLayer_pft(NZ),NZ)=&
+            RootMycoNonstElms_rpvr(NE,ipltroot,NGTopRootLayer_pft(NZ),NZ)+NonstElm2RootMyco(NE)
         ENDDO            
       ENDIF
     ENDIF
@@ -2767,12 +2767,12 @@ module PlantBranchMod
 !      write(101,*)'Hours2LeafOut_brch',Hours2LeafOut_brch(NB,NZ),NB,NZ
       DO NE=1,NumPlantChemElms
         XFRE(NE)=AZMAX1(0.05_r8*fTgrowCanP(NZ) &
-          *(0.5_r8*(NonstructElm_brch(NE,MainBranchNum_pft(NZ),NZ)+NonstructElm_brch(NE,NB,NZ)) &
-          -NonstructElm_brch(NE,NB,NZ)))
-        NonstructElm_brch(NE,NB,NZ)=NonstructElm_brch(NE,NB,NZ)+XFRE(NE)
-        NonstructElm_brch(NE,MainBranchNum_pft(NZ),NZ)=NonstructElm_brch(NE,MainBranchNum_pft(NZ),NZ)-XFRE(NE)
-        if(NonstructElm_brch(NE,NB,NZ)<0._r8)then
-          write(*,*)'2755NonstructElm_brch(NE,NB,NZ)',NE,NB,NonstructElm_brch(NE,NB,NZ)-XFRE(NE),XFRE(NE)          
+          *(0.5_r8*(NonStrutElms_brch(NE,MainBranchNum_pft(NZ),NZ)+NonStrutElms_brch(NE,NB,NZ)) &
+          -NonStrutElms_brch(NE,NB,NZ)))
+        NonStrutElms_brch(NE,NB,NZ)=NonStrutElms_brch(NE,NB,NZ)+XFRE(NE)
+        NonStrutElms_brch(NE,MainBranchNum_pft(NZ),NZ)=NonStrutElms_brch(NE,MainBranchNum_pft(NZ),NZ)-XFRE(NE)
+        if(NonStrutElms_brch(NE,NB,NZ)<0._r8)then
+          write(*,*)'2755NonStrutElms_brch(NE,NB,NZ)',NE,NB,NonStrutElms_brch(NE,NB,NZ)-XFRE(NE),XFRE(NE)          
           stop
         endif
       ENDDO
@@ -2819,7 +2819,7 @@ module PlantBranchMod
     XFRE(ielmp)=AMIN1(XFRPX,XFRE(ielmc)*CPMX,XFRNX*CPMX/CNMN*0.5_r8)
     DO NE=1,NumPlantChemElms
       StalkRsrvElms_brch(NE,NB,NZ)=StalkRsrvElms_brch(NE,NB,NZ)-XFRE(NE)
-      NonstructElms_pft(NE,NZ)=NonstructElms_pft(NE,NZ)+XFRE(NE)
+      NonStrutElms_pft(NE,NZ)=NonStrutElms_pft(NE,NZ)+XFRE(NE)
       if(NE==1)print*,'2809StalkRsrvElms_brch(NE,NB,NZ)',II+JJ/24.,NE,StalkRsrvElms_brch(NE,NB,NZ),XFRE(NE)
     ENDDO
     IF(LeafPetoNonstElmConc_brch(ielmc,NB,NZ).GT.ZEROP(NZ))THEN
@@ -2831,17 +2831,17 @@ module PlantBranchMod
       CNL=0._r8
       CPL=0._r8
     ENDIF
-    XFRCX=FXFB(iPlantTurnoverPattern_pft(NZ))*AZMAX1(NonstructElm_brch(ielmc,NB,NZ))
-    XFRNX=FXFB(iPlantTurnoverPattern_pft(NZ))*AZMAX1(NonstructElm_brch(ielmn,NB,NZ))*(1.0_r8+CNL)
-    XFRPX=FXFB(iPlantTurnoverPattern_pft(NZ))*AZMAX1(NonstructElm_brch(ielmp,NB,NZ))*(1.0_r8+CPL)
+    XFRCX=FXFB(iPlantTurnoverPattern_pft(NZ))*AZMAX1(NonStrutElms_brch(ielmc,NB,NZ))
+    XFRNX=FXFB(iPlantTurnoverPattern_pft(NZ))*AZMAX1(NonStrutElms_brch(ielmn,NB,NZ))*(1.0_r8+CNL)
+    XFRPX=FXFB(iPlantTurnoverPattern_pft(NZ))*AZMAX1(NonStrutElms_brch(ielmp,NB,NZ))*(1.0_r8+CPL)
     XFRE(ielmc)=AMIN1(XFRCX,XFRNX/CNMN,XFRPX/CPMN)
     XFRE(ielmn)=AMIN1(XFRNX,XFRE(ielmc)*CNMX,XFRPX*CNMX/CPMN*0.5_r8)
     XFRE(ielmp)=AMIN1(XFRPX,XFRE(ielmc)*CPMX,XFRNX*CPMX/CNMN*0.5_r8)
     DO NE=1,NumPlantChemElms
-      NonstructElm_brch(NE,NB,NZ)=NonstructElm_brch(NE,NB,NZ)-XFRE(NE)
-      NonstructElms_pft(NE,NZ)=NonstructElms_pft(NE,NZ)+XFRE(NE)
-      if(NonstructElm_brch(NE,NB,NZ)<0._r8)then
-        write(*,*)'2821NonstructElm_brch(NE,NB,NZ)',NE,NB,NonstructElm_brch(NE,NB,NZ)+XFRE(NE),XFRE(NE)
+      NonStrutElms_brch(NE,NB,NZ)=NonStrutElms_brch(NE,NB,NZ)-XFRE(NE)
+      NonStrutElms_pft(NE,NZ)=NonStrutElms_pft(NE,NZ)+XFRE(NE)
+      if(NonStrutElms_brch(NE,NB,NZ)<0._r8)then
+        write(*,*)'2821NonStrutElms_brch(NE,NB,NZ)',NE,NB,NonStrutElms_brch(NE,NB,NZ)+XFRE(NE),XFRE(NE)
         stop
       endif
     ENDDO
@@ -2867,23 +2867,23 @@ module PlantBranchMod
     .OR.(iPlantPhenolPattern_pft(NZ).EQ.iplt_perennial.AND.&
     iPlantCalendar_brch(ipltcal_Jointing,NB,NZ).NE.0))THEN
     ShootBiomC_brch=LeafPetolBiomassC_brch(NB,NZ)+StalkBiomassC_brch(NB,NZ)
-    CPOOLT=NonstructElm_brch(ielmc,NB,NZ)+StalkRsrvElms_brch(ielmc,NB,NZ)
+    CPOOLT=NonStrutElms_brch(ielmc,NB,NZ)+StalkRsrvElms_brch(ielmc,NB,NZ)
     IF(ShootBiomC_brch.GT.ZEROP(NZ))THEN
-      CPOOLD=(NonstructElm_brch(ielmc,NB,NZ)*StalkBiomassC_brch(NB,NZ) &
+      CPOOLD=(NonStrutElms_brch(ielmc,NB,NZ)*StalkBiomassC_brch(NB,NZ) &
         -StalkRsrvElms_brch(ielmc,NB,NZ)*LeafPetolBiomassC_brch(NB,NZ))/ShootBiomC_brch
       XFRE(ielmc)=FXFY(iPlantPhenolPattern_pft(NZ))*CPOOLD
-      NonstructElm_brch(ielmc,NB,NZ)=NonstructElm_brch(ielmc,NB,NZ)-XFRE(ielmc)
+      NonStrutElms_brch(ielmc,NB,NZ)=NonStrutElms_brch(ielmc,NB,NZ)-XFRE(ielmc)
       StalkRsrvElms_brch(ielmc,NB,NZ)=StalkRsrvElms_brch(ielmc,NB,NZ)+XFRE(ielmc)
     ENDIF
     IF(CPOOLT.GT.ZEROP(NZ))THEN
       DO NE=2,NumPlantChemElms
-        NonstGradt=(NonstructElm_brch(NE,NB,NZ)*StalkRsrvElms_brch(ielmc,NB,NZ) &
-          -StalkRsrvElms_brch(NE,NB,NZ)*NonstructElm_brch(ielmc,NB,NZ))/CPOOLT
+        NonstGradt=(NonStrutElms_brch(NE,NB,NZ)*StalkRsrvElms_brch(ielmc,NB,NZ) &
+          -StalkRsrvElms_brch(NE,NB,NZ)*NonStrutElms_brch(ielmc,NB,NZ))/CPOOLT
         XFRE(NE)=FXFZ(iPlantPhenolPattern_pft(NZ))*NonstGradt
-        NonstructElm_brch(NE,NB,NZ)=NonstructElm_brch(NE,NB,NZ)-XFRE(NE)
+        NonStrutElms_brch(NE,NB,NZ)=NonStrutElms_brch(NE,NB,NZ)-XFRE(NE)
         StalkRsrvElms_brch(NE,NB,NZ)=StalkRsrvElms_brch(NE,NB,NZ)+XFRE(NE)
-        if(NonstructElm_brch(NE,NB,NZ)<0._r8)then
-          write(*,*)'2869NonstructElm_brch(NE,NB,NZ)',NE,NB,NonstructElm_brch(NE,NB,NZ)+XFRE(NE),XFRE(NE)
+        if(NonStrutElms_brch(NE,NB,NZ)<0._r8)then
+          write(*,*)'2869NonStrutElms_brch(NE,NB,NZ)',NE,NB,NonStrutElms_brch(NE,NB,NZ)+XFRE(NE),XFRE(NE)
           stop
         endif
       ENDDO
@@ -2897,23 +2897,23 @@ module PlantBranchMod
           WTRTRX=AMAX1(ZEROP(NZ),RootMycoActiveBiomC_pvr(ipltroot,L,NZ)*FWODRE(ielmc,k_woody_litr))
           WTPLTX=WTRTRX+StalkBiomassC_brch(NB,NZ)
           IF(WTPLTX.GT.ZEROP(NZ))THEN
-            CPOOLD=(RootMycoNonstElm_pvr(ielmc,ipltroot,L,NZ)*StalkBiomassC_brch(NB,NZ) &
+            CPOOLD=(RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ)*StalkBiomassC_brch(NB,NZ) &
               -StalkRsrvElms_brch(ielmc,NB,NZ)*WTRTRX)/WTPLTX
             XFRE(ielmc)=AZMAX1(FXFY(iPlantPhenolPattern_pft(NZ))*CPOOLD)
-            RootMycoNonstElm_pvr(ielmc,ipltroot,L,NZ)=RootMycoNonstElm_pvr(ielmc,ipltroot,L,NZ)-XFRE(ielmc)
+            RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ)=RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ)-XFRE(ielmc)
             StalkRsrvElms_brch(ielmc,NB,NZ)=StalkRsrvElms_brch(ielmc,NB,NZ)+XFRE(ielmc)
-            CPOOLT=RootMycoNonstElm_pvr(ielmc,ipltroot,L,NZ)+StalkRsrvElms_brch(ielmc,NB,NZ)
+            CPOOLT=RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ)+StalkRsrvElms_brch(ielmc,NB,NZ)
             write(*,*)'2904StalkRsrvElms_brch(ielmc,NB,NZ)',II+JJ/24.,StalkRsrvElms_brch(ielmc,NB,NZ),XFRE(ielmc)
             IF(CPOOLT.GT.ZEROP(NZ))THEN
               DO NE=2,NumPlantChemElms
-                NonstGradt=(RootMycoNonstElm_pvr(NE,ipltroot,L,NZ)*StalkRsrvElms_brch(ielmc,NB,NZ)-&
-                StalkRsrvElms_brch(NE,NB,NZ)*RootMycoNonstElm_pvr(ielmc,ipltroot,L,NZ))/CPOOLT
+                NonstGradt=(RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ)*StalkRsrvElms_brch(ielmc,NB,NZ)-&
+                StalkRsrvElms_brch(NE,NB,NZ)*RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ))/CPOOLT
                 XFRE(NE)=AZMAX1(FXFZ(iPlantPhenolPattern_pft(NZ))*NonstGradt)              
-                RootMycoNonstElm_pvr(NE,ipltroot,L,NZ)=RootMycoNonstElm_pvr(NE,ipltroot,L,NZ)-XFRE(NE)
+                RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ)=RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ)-XFRE(NE)
                 StalkRsrvElms_brch(NE,NB,NZ)=StalkRsrvElms_brch(NE,NB,NZ)+XFRE(NE)
-                if(RootMycoNonstElm_pvr(NE,ipltroot,L,NZ)<0._r8)then
-                  write(*,*)'2898RootMycoNonstElm_pvr(NE,ipltroot,L,NZ)',NE,&
-                    RootMycoNonstElm_pvr(NE,ipltroot,L,NZ)+XFRE(NE),XFRE(NE)
+                if(RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ)<0._r8)then
+                  write(*,*)'2898RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ)',NE,&
+                    RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ)+XFRE(NE),XFRE(NE)
                   stop
                 endif
               ENDDO
@@ -2941,13 +2941,13 @@ module PlantBranchMod
     WTRTTX=RootElms_pft(ielmc,NZ)*FracCanopyCinStalk
     ShootBiomC_brch=WVSTBX+WTRTTX
     WTRSBX=AZMAX1(StalkRsrvElms_brch(ielmc,NB,NZ))
-    WTRVCX=AZMAX1(NonstructElms_pft(ielmc,NZ)*FracCanopyCinStalk)
+    WTRVCX=AZMAX1(NonStrutElms_pft(ielmc,NZ)*FracCanopyCinStalk)
     CPOOLD=(WTRVCX*WVSTBX-WTRSBX*WTRTTX)/ShootBiomC_brch
     XFRE(ielmc)=AZMAX1(XFRY*CPOOLD)
     StalkRsrvElms_brch(ielmc,NB,NZ)=StalkRsrvElms_brch(ielmc,NB,NZ)+XFRE(ielmc)
-    NonstructElms_pft(ielmc,NZ)=NonstructElms_pft(ielmc,NZ)-XFRE(ielmc)
-    write(*,*)'plantbranch2934NonstructElms_pft(ielmc,NZ)',NZ,NonstructElms_pft(ielmc,NZ)
-    if(abs(NonstructElms_pft(ielmc,NZ))>1.e15)stop
+    NonStrutElms_pft(ielmc,NZ)=NonStrutElms_pft(ielmc,NZ)-XFRE(ielmc)
+    write(*,*)'plantbranch2934NonStrutElms_pft(ielmc,NZ)',NZ,NonStrutElms_pft(ielmc,NZ)
+    if(abs(NonStrutElms_pft(ielmc,NZ))>1.e15)stop
   ENDIF
   end associate
   end subroutine BranchElmntTransfer
@@ -2977,7 +2977,7 @@ module PlantBranchMod
     Eco_GPP_col                        =>  plt_bgcr%Eco_GPP_col    , &
     GrossCO2Fix_pft                    =>  plt_bgcr%GrossCO2Fix_pft   , &
     CanopyPlusNoduRespC_pft            =>  plt_bgcr%CanopyPlusNoduRespC_pft   , &
-    NonstructElm_brch                  =>  plt_biom%NonstructElm_brch  , &
+    NonStrutElms_brch                  =>  plt_biom%NonStrutElms_brch  , &
     LeafPetoNonstElmConc_brch          =>  plt_biom%LeafPetoNonstElmConc_brch  , &
     ZERO                               =>  plt_site%ZERO     , &
     iPlantRootProfile_pft              =>  plt_pheno%iPlantRootProfile_pft , &
@@ -3011,12 +3011,12 @@ module PlantBranchMod
 ! CNPG=N,P constraint on respiration
 ! C4PhotosynDowreg_brch=termination feedback inhibition on C3 CO2
 !
-  RCO2C=AZMAX1(VMXC*NonstructElm_brch(ielmc,NB,NZ) &
+  RCO2C=AZMAX1(VMXC*NonStrutElms_brch(ielmc,NB,NZ) &
     *fTgrowCanP(NZ))*CNPG*C4PhotosynDowreg_brch(NB,NZ)*WFNG
 !  if(NZ==1)THEN  
-!  write(199,*)NB,safe_adb(RCO2C,NonstructElm_brch(ielmc,NB,NZ)),NonstructElm_brch(ielmc,NB,NZ)    
+!  write(199,*)NB,safe_adb(RCO2C,NonStrutElms_brch(ielmc,NB,NZ)),NonStrutElms_brch(ielmc,NB,NZ)    
 !  ELSE
-!  write(200,*)NB,safe_adb(RCO2C,NonstructElm_brch(ielmc,NB,NZ)),NonstructElm_brch(ielmc,NB,NZ)    
+!  write(200,*)NB,safe_adb(RCO2C,NonStrutElms_brch(ielmc,NB,NZ)),NonStrutElms_brch(ielmc,NB,NZ)    
 !  ENDIF
 !
 ! MAINTENANCE RESPIRATION FROM TEMPERATURE, PLANT STRUCTURAL N
@@ -3059,8 +3059,8 @@ module PlantBranchMod
 ! CNPG=N,P constraint on growth respiration
 !
   IF(RCO2Y.GT.0.0_r8.AND.(CNSHX.GT.0.0_r8.OR.CNLFX.GT.0.0_r8))THEN
-    ZPOOLB=AZMAX1(NonstructElm_brch(ielmn,NB,NZ))
-    PPOOLB=AZMAX1(NonstructElm_brch(ielmp,NB,NZ))
+    ZPOOLB=AZMAX1(NonStrutElms_brch(ielmn,NB,NZ))
+    PPOOLB=AZMAX1(NonStrutElms_brch(ielmp,NB,NZ))
     RCO2G=AMIN1(RCO2Y,ZPOOLB*DMSHD/(CNSHX+CNLFM+CNLFX*CNPG) &
       ,PPOOLB*DMSHD/(CPSHX+CPLFM+CPLFX*CNPG))
   ELSE
@@ -3087,8 +3087,8 @@ module PlantBranchMod
   
 !  write(101,*)'RCO2G',RCO2G,RCO2Y
   NonStructalC4Growth_brch=RCO2G/DMSHD
-  ZADDB=AZMAX1(AMIN1(NonstructElm_brch(ielmn,NB,NZ),NonStructalC4Growth_brch*(CNSHX+CNLFM+CNLFX*CNPG)))
-  PADDB=AZMAX1(AMIN1(NonstructElm_brch(ielmp,NB,NZ),NonStructalC4Growth_brch*(CPSHX+CPLFM+CPLFX*CNPG)))  
+  ZADDB=AZMAX1(AMIN1(NonStrutElms_brch(ielmn,NB,NZ),NonStructalC4Growth_brch*(CNSHX+CNLFM+CNLFX*CNPG)))
+  PADDB=AZMAX1(AMIN1(NonStrutElms_brch(ielmp,NB,NZ),NonStructalC4Growth_brch*(CPSHX+CPLFM+CPLFX*CNPG)))  
   Rauto4Nassim_brch=AZMAX1(1.70_r8*ZADDB-0.025_r8*CH2O)
   
 !  if(NonStructalC4Growth_brch>0._r8)then
@@ -3155,7 +3155,7 @@ module PlantBranchMod
 ! begin_execution
   associate(                                                                            &
     LeafPetoNonstElmConc_brch          =>  plt_biom%LeafPetoNonstElmConc_brch   , &
-    NonstructElm_brch                  =>  plt_biom%NonstructElm_brch   , &
+    NonStrutElms_brch                  =>  plt_biom%NonStrutElms_brch   , &
     iPlantRootProfile_pft              =>  plt_pheno%iPlantRootProfile_pft  , &
     fTgrowRootP_vr                     =>  plt_pheno%fTgrowRootP_vr    , &
     RAutoRootO2Limter_pvr             =>  plt_rbgc%RAutoRootO2Limter_pvr     , &
@@ -3197,9 +3197,9 @@ module PlantBranchMod
 ! C4PhotosynDowreg_brch=termination feedback inhibition on C3 CO2
 ! RAutoRootO2Limter_pvr=constraint by O2 consumption on all root processes
 !
-  RCO2CM=AZMAX1(VMXC*NonstructElm_brch(ielmc,NB,NZ) &
+  RCO2CM=AZMAX1(VMXC*NonStrutElms_brch(ielmc,NB,NZ) &
     *fTgrowRootP_vr(NGTopRootLayer_pft(NZ),NZ))*CNPG*WFNG*C4PhotosynDowreg_brch(NB,NZ)
-!  write(104,*)'RCO2CM',iter,RCO2CM,NonstructElm_brch(ielmc,NB,NZ),NB,NZ,NGTopRootLayer_pft(NZ)  
+!  write(104,*)'RCO2CM',iter,RCO2CM,NonStrutElms_brch(ielmc,NB,NZ),NB,NZ,NGTopRootLayer_pft(NZ)  
   RCO2C=RCO2CM*RAutoRootO2Limter_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)
 !
 ! MAINTENANCE RESPIRATION FROM TEMPERATURE, PLANT STRUCTURAL N
@@ -3248,8 +3248,8 @@ module PlantBranchMod
 ! RAutoRootO2Limter_pvr=constraint by O2 consumption on all root processes
 !
   IF(CNSHX.GT.0.0_r8.OR.CNLFX.GT.0.0_r8)THEN
-    ZPOOLB=AZMAX1(NonstructElm_brch(ielmn,NB,NZ))
-    PPOOLB=AZMAX1(NonstructElm_brch(ielmp,NB,NZ))
+    ZPOOLB=AZMAX1(NonStrutElms_brch(ielmn,NB,NZ))
+    PPOOLB=AZMAX1(NonStrutElms_brch(ielmp,NB,NZ))
     FNP=AMIN1(ZPOOLB*DMSHD/(CNSHX+CNLFM+CNLFX*CNPG),PPOOLB*DMSHD/(CPSHX+CPLFM+CPLFX*CNPG))
     IF(RCO2YM.GT.0.0_r8)THEN
       RCO2GM=AMIN1(RCO2YM,FNP)
@@ -3502,8 +3502,8 @@ module PlantBranchMod
     SineBranchAngle_pft          =>   plt_morph%SineBranchAngle_pft   , &    
     InternodeHeightDying_brch    =>   plt_morph%InternodeHeightDying_brch  , &
     InternodeHeightLive_brch     =>   plt_morph%InternodeHeightLive_brch  , &    
-    InternodeChemElm_brch        =>   plt_biom%InternodeChemElm_brch     , &    
-    StalkChemElms_brch           =>   plt_biom%StalkChemElms_brch   , &
+    InternodeStrutElms_brch        =>   plt_biom%InternodeStrutElms_brch     , &    
+    StalkStrutElms_brch           =>   plt_biom%StalkStrutElms_brch   , &
     PlantPopulation_pft          =>   plt_site%PlantPopulation_pft        , &          
     iPlantCalendar_brch          =>   plt_pheno%iPlantCalendar_brch   , &              
     KHiestGroLeafNode_brch       =>   plt_pheno%KHiestGroLeafNode_brch     &        
@@ -3538,14 +3538,14 @@ module PlantBranchMod
 !     PP=PFT population
 !     StalkLenGrowth,GRO=stalk length,mass growth
 !
-    SpecLenStalkGrowth=ETOL*NodeLenPergC(NZ)*(StalkChemElms_brch(ielmc,NB,NZ)/PlantPopulation_pft(NZ))**SNL2
+    SpecLenStalkGrowth=ETOL*NodeLenPergC(NZ)*(StalkStrutElms_brch(ielmc,NB,NZ)/PlantPopulation_pft(NZ))**SNL2
     StalkLenGrowth=GrowthChemElmt(ielmc)/PlantPopulation_pft(NZ)*SpecLenStalkGrowth
     KX=pMOD(MNNOD-1,MaxNodesPerBranch1)
 
 !
 !     GROWTH AT EACH CURRENT NODE
 !
-!     InternodeChemElm_brch,WGNODN,WGNODP=node stalk C,N,P mass
+!     InternodeStrutElms_brch,WGNODN,WGNODP=node stalk C,N,P mass
 !     GRO,GrowthChemElmt(ielmn),GrowthChemElmt(ielmp)=stalk C,N,P growth at each node
 !     InternodeHeightDying_brch,InternodeHeightLive_brch=stalk height,stalk internode length
 !     SineBranchAngle_pft=sine of stalk angle from horizontal from PFT file
@@ -3554,7 +3554,7 @@ module PlantBranchMod
       K1=pMOD(KK,MaxNodesPerBranch1)            
       K2=pMOD(KK-1,MaxNodesPerBranch1)
       DO NE=1,NumPlantChemElms
-        InternodeChemElm_brch(NE,K1,NB,NZ)=InternodeChemElm_brch(NE,K1,NB,NZ)+GrowthChemElmt(NE)
+        InternodeStrutElms_brch(NE,K1,NB,NZ)=InternodeStrutElms_brch(NE,K1,NB,NZ)+GrowthChemElmt(NE)
       ENDDO
       InternodeHeightDying_brch(K1,NB,NZ)=InternodeHeightDying_brch(K1,NB,NZ) &
         +StalkLenGrowth*SineBranchAngle_pft(NZ)
@@ -3599,7 +3599,7 @@ module PlantBranchMod
     NumOfBranches_pft         =>  plt_morph%NumOfBranches_pft     , &    
     MainBranchNum_pft         =>  plt_morph%MainBranchNum_pft      , &         
     BranchNumber_brch         =>  plt_morph%BranchNumber_brch    , &        
-    NonstructElm_brch         =>  plt_biom%NonstructElm_brch    , &   
+    NonStrutElms_brch         =>  plt_biom%NonStrutElms_brch    , &   
     LeafPetolBiomassC_brch    =>  plt_biom%LeafPetolBiomassC_brch     , &        
     StalkRsrvElms_brch       =>  plt_biom%StalkRsrvElms_brch   , &      
     ZEROP                     =>  plt_biom%ZEROP       &  
@@ -3683,32 +3683,32 @@ module PlantBranchMod
         IF(NBZ(NBL).NE.0)THEN
           !should KK be NBX?
           IF(BranchNumber_brch(NBZ(NBL),NZ).NE.MainBranchNum_pft(NZ))THEN
-            IF(NonstructElm_brch(ielmc,NBZ(NBL),NZ).GT.0._r8)THEN
-              XFRE(ielmc)=1.0E-02_r8*AMIN1(SNCX,NonstructElm_brch(ielmc,NBZ(NBL),NZ))
+            IF(NonStrutElms_brch(ielmc,NBZ(NBL),NZ).GT.0._r8)THEN
+              XFRE(ielmc)=1.0E-02_r8*AMIN1(SNCX,NonStrutElms_brch(ielmc,NBZ(NBL),NZ))
               DO NE=2,NumPlantChemElms
-                XFRE(NE)=XFRE(ielmc)*NonstructElm_brch(NE,NBZ(NBL),NZ)/NonstructElm_brch(ielmc,NBZ(NBL),NZ)
+                XFRE(NE)=XFRE(ielmc)*NonStrutElms_brch(NE,NBZ(NBL),NZ)/NonStrutElms_brch(ielmc,NBZ(NBL),NZ)
               ENDDO
             ELSE
               XFRE(ielmc)=0._r8
               DO NE=2,NumPlantChemElms
-                XFRE(NE)=1.0E-02_r8*NonstructElm_brch(NE,NBZ(NBL),NZ)
+                XFRE(NE)=1.0E-02_r8*NonStrutElms_brch(NE,NBZ(NBL),NZ)
               ENDDO
             ENDIF
             DO NE=1,NumPlantChemElms
-              NonstructElm_brch(NE,NBZ(NBL),NZ)=NonstructElm_brch(NE,NBZ(NBL),NZ)-XFRE(NE)
-              if(NonstructElm_brch(NE,NBZ(NBL),NZ)<0._r8)then
-                write(*,*)'3677NonstructElm_brch(NE,NBZ(NBL),NZ)',NE,NBZ(NBL),NonstructElm_brch(NE,NBZ(NBL),NZ)+XFRE(NE)&
+              NonStrutElms_brch(NE,NBZ(NBL),NZ)=NonStrutElms_brch(NE,NBZ(NBL),NZ)-XFRE(NE)
+              if(NonStrutElms_brch(NE,NBZ(NBL),NZ)<0._r8)then
+                write(*,*)'3677NonStrutElms_brch(NE,NBZ(NBL),NZ)',NE,NBZ(NBL),NonStrutElms_brch(NE,NBZ(NBL),NZ)+XFRE(NE)&
                   ,XFRE(NE)
                 stop
               endif
             ENDDO
-            NonstructElm_brch(ielmc,MainBranchNum_pft(NZ),NZ)=NonstructElm_brch(ielmc,MainBranchNum_pft(NZ),NZ) &
+            NonStrutElms_brch(ielmc,MainBranchNum_pft(NZ),NZ)=NonStrutElms_brch(ielmc,MainBranchNum_pft(NZ),NZ) &
               +XFRE(ielmc)*SNCF
             DO NE=2,NumPlantChemElms
-              NonstructElm_brch(NE,MainBranchNum_pft(NZ),NZ)=NonstructElm_brch(NE,MainBranchNum_pft(NZ),NZ)+XFRE(NE)
-              if(NonstructElm_brch(NE,MainBranchNum_pft(NZ),NZ)<0._r8)then
-                write(*,*)'3688NonstructElm_brch(NE,MainBranchNum_pft(NZ),NZ)',NE &
-                  ,NonstructElm_brch(NE,MainBranchNum_pft(NZ),NZ)-XFRE(NE),XFRE(NE)
+              NonStrutElms_brch(NE,MainBranchNum_pft(NZ),NZ)=NonStrutElms_brch(NE,MainBranchNum_pft(NZ),NZ)+XFRE(NE)
+              if(NonStrutElms_brch(NE,MainBranchNum_pft(NZ),NZ)<0._r8)then
+                write(*,*)'3688NonStrutElms_brch(NE,MainBranchNum_pft(NZ),NZ)',NE &
+                  ,NonStrutElms_brch(NE,MainBranchNum_pft(NZ),NZ)-XFRE(NE),XFRE(NE)
                 stop
               endif
             ENDDO
@@ -3744,19 +3744,19 @@ module PlantBranchMod
     FWODBE                       =>  plt_allom%FWODBE   , &    
     rCNNonstructRemob_pft        =>  plt_allom%rCNNonstructRemob_pft    , &
     rCPNonstructRemob_pft        =>  plt_allom%rCPNonstructRemob_pft     , &    
-    LitfalChemElm_pvr          =>  plt_bgcr%LitfalChemElm_pvr      , &            
-    SenecStalkChemElms_brch      =>  plt_biom%SenecStalkChemElms_brch   , &    
+    LitfalStrutElms_pvr          =>  plt_bgcr%LitfalStrutElms_pvr      , &            
+    SenecStalkStrutElms_brch      =>  plt_biom%SenecStalkStrutElms_brch   , &    
     ZEROP                        =>  plt_biom%ZEROP     , &    
     PetioleElmntNode_brch        =>  plt_biom%PetioleElmntNode_brch    , &    
     LeafProteinCNode_brch        =>  plt_biom%LeafProteinCNode_brch      , &    
-    NonstructElm_brch            =>  plt_biom%NonstructElm_brch    , &    
-    LeafChemElms_brch            =>  plt_biom%LeafChemElms_brch   , &    
+    NonStrutElms_brch            =>  plt_biom%NonStrutElms_brch    , &    
+    LeafStrutElms_brch            =>  plt_biom%LeafStrutElms_brch   , &    
     PetioleProteinCNode_brch     =>  plt_biom%PetioleProteinCNode_brch    , &
     PetioleChemElmRemob_brch     =>  plt_biom%PetioleChemElmRemob_brch   , &    
-    InternodeChemElm_brch        =>  plt_biom%InternodeChemElm_brch    , &    
+    InternodeStrutElms_brch        =>  plt_biom%InternodeStrutElms_brch    , &    
     LeafChemElmRemob_brch        =>  plt_biom%LeafChemElmRemob_brch    , & 
     LeafElmntNode_brch           =>  plt_biom%LeafElmntNode_brch     , & 
-    PetoleChemElm_brch           =>  plt_biom%PetoleChemElm_brch  , &         
+    PetoleStrutElms_brch           =>  plt_biom%PetoleStrutElms_brch  , &         
     CanPBranchHeight             =>  plt_morph%CanPBranchHeight  , &         
     InternodeHeightDying_brch    =>  plt_morph%InternodeHeightDying_brch  , &    
     LeafAreaNode_brch            =>  plt_morph%LeafAreaNode_brch   , &    
@@ -3822,11 +3822,11 @@ module PlantBranchMod
 !
       DO NE=1,NumPlantChemElms
         D6300: DO M=1,jsken
-          LitfalChemElm_pvr(NE,M,k_woody_litr,0,NZ)=LitfalChemElm_pvr(NE,M,k_woody_litr,0,NZ) &
+          LitfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)=LitfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ) &
             +CFOPE(NE,icwood,M,NZ)*FSNCL*(LeafChemElmRemob_brch(NE,NB,NZ)-LeafElmntRemobFlx_brch(NE,NB,NZ)) &
             *FWODLE(NE,k_woody_litr)
             
-          LitfalChemElm_pvr(NE,M,k_fine_litr,0,NZ)=LitfalChemElm_pvr(NE,M,k_fine_litr,0,NZ) &
+          LitfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ) &
             +CFOPE(NE,ifoliar,M,NZ)*FSNCL*(LeafChemElmRemob_brch(NE,NB,NZ)-LeafElmntRemobFlx_brch(NE,NB,NZ)) &
             *FWODLE(NE,k_fine_litr)
         ENDDO D6300
@@ -3844,11 +3844,11 @@ module PlantBranchMod
 !
       LeafAreaLive_brch(NB,NZ)=LeafAreaLive_brch(NB,NZ)-FSNCL*LeafAreaDying_brch(NB,NZ)
       DO NE=1,NumPlantChemElms
-        LeafChemElms_brch(NE,NB,NZ)=LeafChemElms_brch(NE,NB,NZ)-FSNCL*LeafChemElmRemob_brch(NE,NB,NZ)
+        LeafStrutElms_brch(NE,NB,NZ)=LeafStrutElms_brch(NE,NB,NZ)-FSNCL*LeafChemElmRemob_brch(NE,NB,NZ)
         LeafElmntNode_brch(NE,K,NB,NZ)=LeafElmntNode_brch(NE,K,NB,NZ)-FSNCL*LeafChemElmRemob_brch(NE,NB,NZ)
-        NonstructElm_brch(NE,NB,NZ)=NonstructElm_brch(NE,NB,NZ)+FSNCL*LeafElmntRemobFlx_brch(NE,NB,NZ)
-        if(NonstructElm_brch(NE,NB,NZ)<0._r8)then
-          write(*,*)'3829NonstructElm_brch(NE,NB,NZ)',NE,NB,NonstructElm_brch(NE,NB,NZ),FSNCL*LeafElmntRemobFlx_brch(NE,NB,NZ)
+        NonStrutElms_brch(NE,NB,NZ)=NonStrutElms_brch(NE,NB,NZ)+FSNCL*LeafElmntRemobFlx_brch(NE,NB,NZ)
+        if(NonStrutElms_brch(NE,NB,NZ)<0._r8)then
+          write(*,*)'3829NonStrutElms_brch(NE,NB,NZ)',NE,NB,NonStrutElms_brch(NE,NB,NZ),FSNCL*LeafElmntRemobFlx_brch(NE,NB,NZ)
           stop
         endif
       ENDDO
@@ -3881,10 +3881,10 @@ module PlantBranchMod
         ENDIF
         
         DO NE=1,NumPlantChemElms
-          SenecStalkChemElms_brch(NE,NB,NZ)=SenecStalkChemElms_brch(NE,NB,NZ)+&
-            InternodeChemElm_brch(NE,K,NB,NZ)
+          SenecStalkStrutElms_brch(NE,NB,NZ)=SenecStalkStrutElms_brch(NE,NB,NZ)+&
+            InternodeStrutElms_brch(NE,K,NB,NZ)
         ENDDO
-        InternodeChemElm_brch(1:NumPlantChemElms,K,NB,NZ)=0._r8
+        InternodeStrutElms_brch(1:NumPlantChemElms,K,NB,NZ)=0._r8
         InternodeHeightDying_brch(K,NB,NZ)=0._r8
       ENDIF
 !
@@ -3912,11 +3912,11 @@ module PlantBranchMod
 !
       DO NE=1,NumPlantChemElms
         D6305: DO M=1,jsken
-          LitfalChemElm_pvr(NE,M,k_woody_litr,0,NZ)=LitfalChemElm_pvr(NE,M,k_woody_litr,0,NZ) &
+          LitfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)=LitfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ) &
             +CFOPE(NE,icwood,M,NZ)*FSNCS*(PetioleChemElmRemob_brch(NE,NB,NZ)&
             -PetioleChemElmRemobFlx_brch(NE,NB,NZ))*FWODBE(NE,k_woody_litr)
 
-          LitfalChemElm_pvr(NE,M,k_fine_litr,0,NZ)=LitfalChemElm_pvr(NE,M,k_fine_litr,0,NZ) &
+          LitfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ) &
             +CFOPE(NE,inonfoliar,M,NZ)*FSNCS*(PetioleChemElmRemob_brch(NE,NB,NZ)&
             -PetioleChemElmRemobFlx_brch(NE,NB,NZ))*FWODBE(NE,k_fine_litr)
         ENDDO D6305
@@ -3933,11 +3933,11 @@ module PlantBranchMod
 !       RCES(ielmc)X,RCES(ielmn)X,RCES(ielmp)X=remobilization of C,N,P from senescing petiole
 !
       DO NE=1,NumPlantChemElms
-        PetoleChemElm_brch(NE,NB,NZ)=PetoleChemElm_brch(NE,NB,NZ)-FSNCS &
+        PetoleStrutElms_brch(NE,NB,NZ)=PetoleStrutElms_brch(NE,NB,NZ)-FSNCS &
           *PetioleChemElmRemob_brch(NE,NB,NZ)
         PetioleElmntNode_brch(NE,K,NB,NZ)=PetioleElmntNode_brch(NE,K,NB,NZ)-FSNCS &
           *PetioleChemElmRemob_brch(NE,NB,NZ)
-        NonstructElm_brch(NE,NB,NZ)=NonstructElm_brch(NE,NB,NZ)+FSNCS*PetioleChemElmRemobFlx_brch(NE,NB,NZ)
+        NonStrutElms_brch(NE,NB,NZ)=NonStrutElms_brch(NE,NB,NZ)+FSNCS*PetioleChemElmRemobFlx_brch(NE,NB,NZ)
       ENDDO
       PetioleLengthNode_brch(K,NB,NZ)=PetioleLengthNode_brch(K,NB,NZ)-FSNCS*CanPBranchHeight(NB,NZ)
 

@@ -195,9 +195,9 @@ module VisualMod
 !     IF(I.EQ.1)THEN
 !     TCSNY=0.0
 !     ENDIF
-!     DTCSN=SurfLitrfallChemElms_pft(ielmc,NZ,NY,NX)-TCSNY
+!     DTCSN=SurfLitrfalStrutElms_pft(ielmc,NZ,NY,NX)-TCSNY
 !     TCSNX=TCSNX+DTCSN
-!     TCSNY=SurfLitrfallChemElms_pft(ielmc,NZ,NY,NX)
+!     TCSNY=SurfLitrfalStrutElms_pft(ielmc,NZ,NY,NX)
 !     IF(I.EQ.iDayPlanting_pft(NZ,NY,NX).OR.I.EQ.iDayPlantHarvest_pft(NZ,NY,NX))THEN
 !     ICHKA=0
 !     ICHKM=0
@@ -240,12 +240,12 @@ module VisualMod
           OUT(46)=-(DepthInternalWTBL(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX))
           OUT(47)=SnowDepth(NY,NX)
           OUT(48)=CanopyLeafArea_grd(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(49)=0.001_r8*LeafChemElms_pft(ielmc,1,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(50)=0.001_r8*LeafChemElms_pft(ielmc,3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(51)=0.001_r8*LeafChemElms_pft(ielmc,2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(52)=0.001_r8*StalkChemElms_pft(ielmc,1,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(53)=0.001_r8*StalkChemElms_pft(ielmc,3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(54)=0.001_r8*StalkChemElms_pft(ielmc,2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(49)=0.001_r8*LeafStrutElms_pft(ielmc,1,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(50)=0.001_r8*LeafStrutElms_pft(ielmc,3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(51)=0.001_r8*LeafStrutElms_pft(ielmc,2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(52)=0.001_r8*StalkStrutElms_pft(ielmc,1,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(53)=0.001_r8*StalkStrutElms_pft(ielmc,3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(54)=0.001_r8*StalkStrutElms_pft(ielmc,2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
           OUT(55)=0.001_r8*RootElms_pft(ielmc,1,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
           OUT(56)=0.001_r8*RootElms_pft(ielmc,3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
           OUT(57)=0.001_r8*RootElms_pft(ielmc,2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
