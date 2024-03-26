@@ -121,8 +121,8 @@ implicit none
   real(r8), pointer :: CO2CuticleResist_pft(:)   => null()   !maximum stomatal resistance to CO2, [s h-1]
   real(r8), pointer :: DiffCO2Atmos2Intracel_pft(:)   => null()   !gaesous CO2 concentration difference across stomates, [umol m-3]
   real(r8), pointer :: LeafAUnshaded_zsec(:,:,:,:,:)  => null()   !leaf irradiated surface area, [m2 d-2]
-  real(r8), pointer :: CPOOL3(:,:,:)     => null()   !minimum sink strength for nonstructural C transfer, [g d-2]
-  real(r8), pointer :: CPOOL4(:,:,:)     => null()   !leaf nonstructural C4 content in C4 photosynthesis, [g d-2]
+  real(r8), pointer :: CPOOL3_node(:,:,:)     => null()   !minimum sink strength for nonstructural C transfer, [g d-2]
+  real(r8), pointer :: CPOOL4_node(:,:,:)     => null()   !leaf nonstructural C4 content in C4 photosynthesis, [g d-2]
   real(r8), pointer :: CMassCO2BundleSheath_node(:,:,:)       => null()   !bundle sheath nonstructural C3 content in C4 photosynthesis, [g d-2]
   real(r8), pointer :: CO2CompenPoint_node(:,:,:)      => null()   !CO2 compensation point, [uM]
   real(r8), pointer :: RubiscoCarboxyEff_node(:,:,:)       => null()   !carboxylation efficiency, [umol umol-1]
@@ -461,8 +461,8 @@ implicit none
   real(r8), pointer :: Root1stElm_raxs(:,:,:,:)   => null()    !root C primary axes, [g d-2]
   real(r8), pointer :: StandDeadKCompElms_pft(:,:,:)  => null()    !standing dead element fraction, [g d-2]
   real(r8), pointer :: CanopyNonstructElmConc_pft(:,:)    => null()    !canopy nonstructural element concentration, [g d-2]
-  real(r8), pointer :: CanopyNonStrutElms_pft(:,:)    => null()    !canopy nonstructural element concentration, [g d-2]
-  real(r8), pointer :: NoduleNonstructElmnt_pft(:,:)    => null()    !canopy nodule nonstructural element, [g d-2]
+  real(r8), pointer :: CanopyNonstElms_pft(:,:)    => null()    !canopy nonstructural element concentration, [g d-2]
+  real(r8), pointer :: CanopyNodulNonstElms_pft(:,:)    => null()    !canopy nodule nonstructural element, [g d-2]
   real(r8), pointer :: NoduleNonstructCconc_pft(:)      => null()    !nodule nonstructural C, [gC d-2]
   real(r8), pointer :: RootMycoActiveBiomC_pvr(:,:,:)   => null()    !root layer structural C, [g d-2]
   real(r8), pointer ::  PopuRootMycoC_pvr(:,:,:)   => null()    !root layer C, [g d-2]
@@ -480,6 +480,7 @@ implicit none
   real(r8), pointer :: WGLFT(:)       => null()  !total leaf mass, [gC d-2]
   real(r8), pointer :: StandingDeadInitC_pft(:)      => null()  !initial standing dead C, [g C m-2]
   real(r8), pointer :: RootElms_pft(:,:)     => null()  !plant root element, [gC d-2]
+  real(r8), pointer :: CanopyNodulElms_pft(:,:) => null() 
   real(r8), pointer :: RootStrutElms_pft(:,:)    => null()  !plant root structural element, [gC d-2]
   real(r8), pointer :: SeedCPlanted_pft(:)       => null()  !plant stored nonstructural C at planting, [gC d-2]
   real(r8), pointer :: NonStrutElms_pft(:,:)     => null()  !plant stored nonstructural element, [gC d-2]
@@ -488,7 +489,9 @@ implicit none
   real(r8), pointer :: AvgCanopyBiomC2Graze_pft(:)      => null()  !landscape average canopy shoot C, [g d-2]
   real(r8), pointer :: StandDeadStrutElms_pft(:,:)    => null()  !standing dead element, [g d-2]
   real(r8), pointer :: NodulStrutElms_pft(:,:)     => null()  !root total nodule mass, element [g d-2]
-  real(r8), pointer :: NonStrutElms_brch(:,:,:)   => null()  !branch nonstructural element, [g d-2]
+  real(r8), pointer :: CanopyNonstElms_brch(:,:,:)   => null()  !branch nonstructural element, [g d-2]
+  real(r8), pointer :: ShootElms_brch(:,:,:)  => null()      !branch shoot elemental biomass, [g d-2]
+  real(r8), pointer :: ShootC4NonstC_brch(:,:) => null()  !branch shoot nonstrucal elelment [g d-2]
   real(r8), pointer :: CanopyNodulNonstElms_brch(:,:,:)  => null()  !branch nodule nonstructural element, [g d-2]
   real(r8), pointer :: LeafPetolBiomassC_brch(:,:)     => null()  !plant branch leaf + sheath C, [g d-2]
   real(r8), pointer :: StalkRsrvElms_brch(:,:,:) => null()  !branch reserve element, [g d-2]
@@ -1255,8 +1258,8 @@ implicit none
   allocate(this%RootMyco2ndStrutElms_rpvr(NumPlantChemElms,jroots,JZ1,NumOfCanopyLayers1,JP1));this%RootMyco2ndStrutElms_rpvr=spval
   allocate(this%RootMyco1stStrutElms_rpvr(NumPlantChemElms,jroots,JZ1,NumOfCanopyLayers1,JP1));this%RootMyco1stStrutElms_rpvr=spval
   allocate(this%CanopyNonstructElmConc_pft(NumPlantChemElms,JP1));this%CanopyNonstructElmConc_pft=spval
-  allocate(this%CanopyNonStrutElms_pft(NumPlantChemElms,JP1));this%CanopyNonStrutElms_pft=spval
-  allocate(this%NoduleNonstructElmnt_pft(NumPlantChemElms,JP1));this%NoduleNonstructElmnt_pft=spval
+  allocate(this%CanopyNonstElms_pft(NumPlantChemElms,JP1));this%CanopyNonstElms_pft=spval
+  allocate(this%CanopyNodulNonstElms_pft(NumPlantChemElms,JP1));this%CanopyNodulNonstElms_pft=spval
   allocate(this%NoduleNonstructCconc_pft(JP1));this%NoduleNonstructCconc_pft=spval
   allocate(this%RootProteinConc_pvr(jroots,JZ1,JP1));this%RootProteinConc_pvr=spval
   allocate(this%RootProteinC_pvr(jroots,JZ1,JP1));this%RootProteinC_pvr=spval
@@ -1264,7 +1267,9 @@ implicit none
   allocate(this%PopuRootMycoC_pvr(jroots,JZ1,JP1));this%PopuRootMycoC_pvr=spval
   allocate(this%RootMycoNonstElms_rpvr(NumPlantChemElms,jroots,JZ1,JP1));this%RootMycoNonstElms_rpvr=spval
   allocate(this%RootNonstructElmConc_pvr(NumPlantChemElms,jroots,JZ1,JP1));this%RootNonstructElmConc_pvr=spval
-  allocate(this%NonStrutElms_brch(NumPlantChemElms,MaxNumBranches,JP1));this%NonStrutElms_brch=spval
+  allocate(this%CanopyNonstElms_brch(NumPlantChemElms,MaxNumBranches,JP1));this%CanopyNonstElms_brch=spval
+  allocate(this%ShootElms_brch(NumPlantChemElms,MaxNumBranches,JP1));this%ShootElms_brch=spval
+  allocate(this%ShootC4NonstC_brch(MaxNumBranches,JP1));this%ShootC4NonstC_brch=spval
   allocate(this%CanopyStalkC_pft(JP1));this%CanopyStalkC_pft=spval
   allocate(this%LeafProteinCNode_brch(0:MaxNodesPerBranch1,MaxNumBranches,JP1));this%LeafProteinCNode_brch=spval
   allocate(this%PetioleProteinCNode_brch(0:MaxNodesPerBranch1,MaxNumBranches,JP1));this%PetioleProteinCNode_brch=spval
@@ -1277,6 +1282,7 @@ implicit none
   allocate(this%CanopyNodulNonstElms_brch(NumPlantChemElms,MaxNumBranches,JP1));this%CanopyNodulNonstElms_brch=spval
   allocate(this%LeafPetoNonstElmConc_brch(NumPlantChemElms,MaxNumBranches,JP1));this%LeafPetoNonstElmConc_brch=spval
   allocate(this%RootStrutElms_pft(NumPlantChemElms,JP1));this%RootStrutElms_pft=spval
+  allocate(this%CanopyNodulElms_pft(NumPlantChemElms,JP1));this%CanopyNodulElms_pft=spval
   allocate(this%WGLFT(NumOfCanopyLayers1));this%WGLFT=spval
   allocate(this%RootElms_pft(NumPlantChemElms,JP1));this%RootElms_pft=spval
   allocate(this%SeedCPlanted_pft(JP1));this%SeedCPlanted_pft=spval
@@ -1328,8 +1334,8 @@ implicit none
 !  if(allocated(StandDeadKCompElms_pft))deallocate(StandDeadKCompElms_pft)
 !  if(allocated(RootMyco2ndStrutElms_rpvr))deallocate(RootMyco2ndStrutElms_rpvr)
 !  if(allocated(CanopyNonstructElmConc_pft))deallocate(CanopyNonstructElmConc_pft)
-!  if(allocated(CanopyNonStrutElms_pft))deallocate(CanopyNonStrutElms_pft)
-!  if(allocated(NoduleNonstructElmnt_pft))deallocate(NoduleNonstructElmnt_pft)
+!  if(allocated(CanopyNonstElms_pft))deallocate(CanopyNonstElms_pft)
+!  if(allocated(CanopyNodulNonstElms_pft))deallocate(CanopyNodulNonstElms_pft)
 !  if(allocated(NoduleNonstructCconc_pft))deallocate(NoduleNonstructCconc_pft)
 !  if(allocated(RootProteinConc_pvr))deallocate(RootProteinConc_pvr)
 !  if(allocated(RootProteinC_pvr))deallocate(RootProteinC_pvr)
@@ -1349,7 +1355,7 @@ implicit none
 !  if(allocated(LeafPetoNonstElmConc_brch))deallocate(LeafPetoNonstElmConc_brch)
 !  if(allocated(RootStrutElms_pft))deallocate(RootStrutElms_pft)
 !  if(allocated(WGLFT))deallocate(WGLFT)
-!  if(allocated(NonStrutElms_brch))deallocate(NonStrutElms_brch)
+!  if(allocated(CanopyNonstElms_brch))deallocate(CanopyNonstElms_brch)
 !  if(allocated(RootBiomCPerPlant_pft))deallocate(RootBiomCPerPlant_pft)
 !  if(allocated(WTLF))deallocate(WTLF)
 !  if(allocated(WTSHE))deallocate(WTSHE)
@@ -1620,8 +1626,8 @@ implicit none
   allocate(this%CO2CuticleResist_pft(JP1));this%CO2CuticleResist_pft=spval
   allocate(this%LeafAUnshaded_zsec(NumOfLeafZenithSectors1,NumOfCanopyLayers1,MaxNodesPerBranch1,MaxNumBranches,JP1))
   this%LeafAUnshaded_zsec=spval
-  allocate(this%CPOOL3(MaxNodesPerBranch1,MaxNumBranches,JP1));this%CPOOL3=spval
-  allocate(this%CPOOL4(MaxNodesPerBranch1,MaxNumBranches,JP1));this%CPOOL4=spval
+  allocate(this%CPOOL3_node(MaxNodesPerBranch1,MaxNumBranches,JP1));this%CPOOL3_node=spval
+  allocate(this%CPOOL4_node(MaxNodesPerBranch1,MaxNumBranches,JP1));this%CPOOL4_node=spval
   allocate(this%CMassCO2BundleSheath_node(MaxNodesPerBranch1,MaxNumBranches,JP1));this%CMassCO2BundleSheath_node=spval
   allocate(this%CO2CompenPoint_node(MaxNodesPerBranch1,MaxNumBranches,JP1));this%CO2CompenPoint_node=spval
   allocate(this%RubiscoCarboxyEff_node(MaxNodesPerBranch1,MaxNumBranches,JP1));this%RubiscoCarboxyEff_node=spval

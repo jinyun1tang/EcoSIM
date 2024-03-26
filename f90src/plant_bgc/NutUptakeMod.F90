@@ -62,7 +62,7 @@ module NutUptakeMod
     ZEROP                      =>  plt_biom%ZEROP    , &
     AtmGasc                    =>  plt_site%AtmGasc  , &    
     LeafPetolBiomassC_brch     =>  plt_biom%LeafPetolBiomassC_brch    , &
-    NonStrutElms_brch          =>  plt_biom%NonStrutElms_brch   , &
+    CanopyNonstElms_brch          =>  plt_biom%CanopyNonstElms_brch   , &
     LeafPetoNonstElmConc_brch  =>  plt_biom%LeafPetoNonstElmConc_brch   , &
     CanPStomaResistH2O_pft     =>  plt_photo%CanPStomaResistH2O_pft      , &
     CanopyBndlResist_pft       =>  plt_photo%CanopyBndlResist_pft     , &
@@ -93,7 +93,7 @@ module NutUptakeMod
       IF(LeafPetolBiomassC_brch(NB,NZ).GT.ZEROP(NZ).AND.LeafAreaLive_brch(NB,NZ).GT.ZEROP(NZ) &
         .AND.CanopyLeafArea_pft(NZ).GT.ZEROP(NZ))THEN
         CNH3P=AZMAX1(FNH3P*LeafPetoNonstElmConc_brch(ielmn,NB,NZ)/SNH3P)
-        ZPOOLB=AZMAX1(NonStrutElms_brch(ielmn,NB,NZ))
+        ZPOOLB=AZMAX1(CanopyNonstElms_brch(ielmn,NB,NZ))
         NH3Dep2_brch(NB,NZ)=AMIN1(0.1_r8*ZPOOLB &
           ,AMAX1((AtmGasc(idg_NH3)-CNH3P)/(CanopyBndlResist_pft(NZ)+CanPStomaResistH2O_pft(NZ)) &
           *FracRadPARbyCanopy_pft(NZ)*AREA3(NU)*LeafAreaLive_brch(NB,NZ)/CanopyLeafArea_pft(NZ),-0.1_r8*ZPOOLB))

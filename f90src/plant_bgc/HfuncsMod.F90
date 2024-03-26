@@ -370,15 +370,15 @@ module HfuncsMod
     NoduleNonstructCconc_pft        =>  plt_biom%NoduleNonstructCconc_pft   , &
     LeafPetoNonstElmConc_brch       =>  plt_biom%LeafPetoNonstElmConc_brch   , &
     CanopyNonstructElmConc_pft      =>  plt_biom%CanopyNonstructElmConc_pft   , &
-    CanopyNonStrutElms_pft         =>  plt_biom%CanopyNonStrutElms_pft   , &
+    CanopyNonstElms_pft         =>  plt_biom%CanopyNonstElms_pft   , &
     CanopyNodulNonstElms_brch              =>  plt_biom%CanopyNodulNonstElms_brch   , &
     RootMycoNonstElms_rpvr            =>  plt_biom%RootMycoNonstElms_rpvr   , &
-    NonStrutElms_brch               =>  plt_biom%NonStrutElms_brch   , &
+    CanopyNonstElms_brch               =>  plt_biom%CanopyNonstElms_brch   , &
     RootNonstructElmConc_pvr        =>  plt_biom%RootNonstructElmConc_pvr   , &
     ZEROL                           =>  plt_biom%ZEROL    , &
     ZEROP                           =>  plt_biom%ZEROP    , &
     RootMycoActiveBiomC_pvr         =>  plt_biom%RootMycoActiveBiomC_pvr   , &
-    NoduleNonstructElmnt_pft        =>  plt_biom%NoduleNonstructElmnt_pft   , &
+    CanopyNodulNonstElms_pft        =>  plt_biom%CanopyNodulNonstElms_pft   , &
     WatByPCanopy                    =>  plt_ew%WatByPCanopy      , &
     VHeatCapCanP                    =>  plt_ew%VHeatCapCanP      , &
     NU                              =>  plt_site%NU       , &
@@ -398,7 +398,7 @@ module HfuncsMod
     MaxSoiL4Root                    =>  plt_morph%MaxSoiL4Root        &
   )
   plt_bgcr%RootGasLossDisturb_pft(idg_beg:idg_end-1,NZ)=0.0_r8
-  CanopyNonStrutElms_pft(1:NumPlantChemElms,NZ)=0.0_r8
+  CanopyNonstElms_pft(1:NumPlantChemElms,NZ)=0.0_r8
   MaxSoiL4Root(NZ)=NIXBotRootLayer_pft(NZ)
   NGTopRootLayer_pft(NZ)=MIN(MaxSoiL4Root(NZ),MAX(NGTopRootLayer_pft(NZ),NU))
   MainBranchNum_pft(NZ)=1
@@ -414,8 +414,8 @@ module HfuncsMod
   D140: DO NB=1,NumOfBranches_pft(NZ)
     DO NE=1,NumPlantChemElms
       IF(iPlantBranchState_brch(NB,NZ).EQ.iLive)THEN
-        CanopyNonStrutElms_pft(NE,NZ)=CanopyNonStrutElms_pft(NE,NZ)+NonStrutElms_brch(NE,NB,NZ)
-        NoduleNonstructElmnt_pft(NE,NZ)=NoduleNonstructElmnt_pft(NE,NZ)+CanopyNodulNonstElms_brch(NE,NB,NZ)
+        CanopyNonstElms_pft(NE,NZ)=CanopyNonstElms_pft(NE,NZ)+CanopyNonstElms_brch(NE,NB,NZ)
+        CanopyNodulNonstElms_pft(NE,NZ)=CanopyNodulNonstElms_pft(NE,NZ)+CanopyNodulNonstElms_brch(NE,NB,NZ)
       ENDIF
     ENDDO     
   ENDDO D140
@@ -458,9 +458,9 @@ module HfuncsMod
 !
   IF(CanopyLeafShethC_pft(NZ).GT.ZEROL(NZ))THEN
     DO NE=1,NumPlantChemElms
-      CanopyNonstructElmConc_pft(NE,NZ)=AZMAX1(AMIN1(1.0_r8,CanopyNonStrutElms_pft(NE,NZ)/CanopyLeafShethC_pft(NZ)))
+      CanopyNonstructElmConc_pft(NE,NZ)=AZMAX1(AMIN1(1.0_r8,CanopyNonstElms_pft(NE,NZ)/CanopyLeafShethC_pft(NZ)))
     ENDDO
-    NoduleNonstructCconc_pft(NZ)=AZMAX1(AMIN1(1.0_r8,NoduleNonstructElmnt_pft(ielmc,NZ)/CanopyLeafShethC_pft(NZ)))
+    NoduleNonstructCconc_pft(NZ)=AZMAX1(AMIN1(1.0_r8,CanopyNodulNonstElms_pft(ielmc,NZ)/CanopyLeafShethC_pft(NZ)))
   ELSE
     CanopyNonstructElmConc_pft(1:NumPlantChemElms,NZ)=1.0_r8
     NoduleNonstructCconc_pft(NZ)=1.0_r8
@@ -468,13 +468,13 @@ module HfuncsMod
   
   D190: DO NB=1,NumOfBranches_pft(NZ)
     if(NZ==1)then
-    write(195,'(I4,5(X,F14.6))')NB,I+J/24.,LeafPetolBiomassC_brch(NB,NZ),(NonStrutElms_brch(NE,NB,NZ),NE=1,3)
+    write(195,'(I4,5(X,F14.6))')NB,I+J/24.,LeafPetolBiomassC_brch(NB,NZ),(CanopyNonstElms_brch(NE,NB,NZ),NE=1,3)
     else
-    write(196,'(I4,5(X,F14.6))')NB,I+J/24.,LeafPetolBiomassC_brch(NB,NZ),(NonStrutElms_brch(NE,NB,NZ),NE=1,3)
+    write(196,'(I4,5(X,F14.6))')NB,I+J/24.,LeafPetolBiomassC_brch(NB,NZ),(CanopyNonstElms_brch(NE,NB,NZ),NE=1,3)
     endif
     DO NE=1,NumPlantChemElms
       IF(LeafPetolBiomassC_brch(NB,NZ).GT.ZEROP(NZ))THEN
-        LeafPetoNonstElmConc_brch(NE,NB,NZ)=AZMAX1(NonStrutElms_brch(NE,NB,NZ)/LeafPetolBiomassC_brch(NB,NZ))
+        LeafPetoNonstElmConc_brch(NE,NB,NZ)=AZMAX1(CanopyNonstElms_brch(NE,NB,NZ)/LeafPetolBiomassC_brch(NB,NZ))
       ELSE
         LeafPetoNonstElmConc_brch(NE,NB,NZ)=1.0_r8
       ENDIF

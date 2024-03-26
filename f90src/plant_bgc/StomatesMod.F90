@@ -314,7 +314,7 @@
     LeafRuBPConc_pft               =>  plt_photo%LeafRuBPConc_pft  , &
     Km4PEPCarboxy_pft              =>  plt_photo%Km4PEPCarboxy_pft, &
     CMassCO2BundleSheath_node      =>  plt_photo%CMassCO2BundleSheath_node  , &
-    CPOOL4                         =>  plt_photo%CPOOL4, &
+    CPOOL4_node                         =>  plt_photo%CPOOL4_node, &
     Km4LeafaqCO2_pft               =>  plt_photo%Km4LeafaqCO2_pft, &
     NutrientCtrlonC4Carboxy_node   =>  plt_photo%NutrientCtrlonC4Carboxy_node , &
     Km4RubiscoCarboxy_pft          =>  plt_photo%Km4RubiscoCarboxy_pft, &
@@ -336,12 +336,12 @@
 !     FEEDBACK ON C4 CARBOXYLATION FROM C4 NON-STRUCTURAL C
 !
 !     CC4M,CCBS=C4 nonstruct C concn in mesophyll,bundle sheath (uM)
-!     CPOOL4,CMassCO2BundleSheath_node=C4 nonstructural C mass in mesophyll,bundle sheath
+!     CPOOL4_node,CMassCO2BundleSheath_node=C4 nonstructural C mass in mesophyll,bundle sheath
 !     WGLF=leaf C mass
 !     FBS,FMP=leaf water content in bundle sheath, mesophyll
 !     NutrientCtrlonC4Carboxy_node=N,P feedback inhibition on C4 CO2 fixation
 !
-  CC4M=AZMAX1(0.021E+09_r8*CPOOL4(K,NB,NZ)/(LeafElmntNode_brch(ielmc,K,NB,NZ)*FMP))
+  CC4M=AZMAX1(0.021E+09_r8*CPOOL4_node(K,NB,NZ)/(LeafElmntNode_brch(ielmc,K,NB,NZ)*FMP))
   CCBS=AZMAX1(0.083E+09_r8*CMassCO2BundleSheath_node(K,NB,NZ)/(LeafElmntNode_brch(ielmc,K,NB,NZ)*FBS))
   NutrientCtrlonC4Carboxy_node(K,NB,NZ)=1.0_r8/(1.0_r8+CC4M/C4KI)
   NutrientCtrlonC4Carboxy_node(K,NB,NZ)=NutrientCtrlonC4Carboxy_node(K,NB,NZ)*C4PhotosynDowreg_brch(NB,NZ)

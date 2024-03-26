@@ -144,7 +144,7 @@ implicit none
   real(r8),pointer   :: h1D_Plant_C_ptc(:)        !whole plant C  
   real(r8),pointer   :: h1D_Plant_N_ptc(:)        !whole plant N  
   real(r8),pointer   :: h1D_Plant_P_ptc(:)        !whole plant P  
-  real(r8),pointer   :: h1D_LEAF_PC_ptc(:)       !(LeafStrutElms_pft(ielmp,NZ,NY,NX)+CanopyNonStrutElms_pft(ielmp,NZ,NY,NX))/(LeafStrutElms_pft(ielmc,NZ,NY,NX)+CanopyNonStrutElms_pft(ielmc,NZ,NY,NX)),mass based CP ratio of leaf
+  real(r8),pointer   :: h1D_LEAF_PC_ptc(:)       !(LeafStrutElms_pft(ielmp,NZ,NY,NX)+CanopyNonstElms_pft(ielmp,NZ,NY,NX))/(LeafStrutElms_pft(ielmc,NZ,NY,NX)+CanopyNonstElms_pft(ielmc,NZ,NY,NX)),mass based CP ratio of leaf
   real(r8),pointer   :: h2D_tSOC_vr_col(:,:)        !ORGC(1:JZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total soil C
   real(r8),pointer   :: h1D_CAN_RN_ptc(:)        !277.8*RadNet2CanP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), W m-2
   real(r8),pointer   :: h1D_CAN_LE_ptc(:)        !277.8*EvapTransHeat_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -238,7 +238,7 @@ implicit none
   real(r8),pointer   :: h1D_FIREp_P_FLX_ptc(:)        !PO4byFire_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_SURF_LITRf_P_FLX_ptc(:)  !SurfLitrfalStrutElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_BRANCH_NO_ptc(:)     !NumOfBranches_pft(NZ,NY,NX)
-  real(r8),pointer   :: h1D_LEAF_NC_ptc(:)       !(LeafStrutElms_pft(ielmn,NZ,NY,NX)+CanopyNonStrutElms_pft(ielmn,NZ,NY,NX))/(LeafStrutElms_pft(ielmc,NZ,NY,NX)+CanopyNonStrutElms_pft(ielmc,NZ,NY,NX)),mass based CN ratio of leaf  
+  real(r8),pointer   :: h1D_LEAF_NC_ptc(:)       !(LeafStrutElms_pft(ielmn,NZ,NY,NX)+CanopyNonstElms_pft(ielmn,NZ,NY,NX))/(LeafStrutElms_pft(ielmc,NZ,NY,NX)+CanopyNonstElms_pft(ielmc,NZ,NY,NX)),mass based CN ratio of leaf  
   real(r8),pointer   :: h1D_Growth_Stage_ptc(:)    !plant development stage, integer, 0-10, planting, emergence, floral_init, jointing, 
                                       !elongation, heading, anthesis, seed_fill, see_no_set, seed_mass_set, end_seed_fill
   real(r8),pointer   :: h2D_LEAF_NODE_NO_ptc(:,:)       !NumOfLeaves_brch(MainBranchNum_pft(NZ,NY,NX),NZ,NY,NX), leaf NO
@@ -1636,8 +1636,8 @@ implicit none
       DO NZ=1,NP0(NY,NX)
         nptc=get_pft(NZ,NY,NX)
         this%h1D_MIN_LWP_ptc(nptc)      = PSICanPDailyMin(NZ,NY,NX)
-        this%h1D_LEAF_PC_ptc(nptc)      = safe_adb(LeafStrutElms_pft(ielmp,NZ,NY,NX)+CanopyNonStrutElms_pft(ielmp,NZ,NY,NX), &
-                                                 LeafStrutElms_pft(ielmc,NZ,NY,NX)+CanopyNonStrutElms_pft(ielmc,NZ,NY,NX))
+        this%h1D_LEAF_PC_ptc(nptc)      = safe_adb(LeafStrutElms_pft(ielmp,NZ,NY,NX)+CanopyNonstElms_pft(ielmp,NZ,NY,NX), &
+                                                 LeafStrutElms_pft(ielmc,NZ,NY,NX)+CanopyNonstElms_pft(ielmc,NZ,NY,NX))
         this%h1D_CAN_RN_ptc(nptc)       = MJ2W*RadNet2CanP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_CAN_LE_ptc(nptc)       = MJ2W*EvapTransHeat_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_CAN_H_ptc(nptc)        = MJ2W*HeatXAir2PCan(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -1745,8 +1745,8 @@ implicit none
         this%h1D_FIREp_P_FLX_ptc(nptc)       = PO4byFire_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_SURF_LITRf_P_FLX_ptc(nptc) = SurfLitrfalStrutElmsCum_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_BRANCH_NO_ptc(nptc)    = NumOfBranches_pft(NZ,NY,NX)
-        this%h1D_LEAF_NC_ptc(nptc)      = safe_adb(LeafStrutElms_pft(ielmn,NZ,NY,NX)+CanopyNonStrutElms_pft(ielmn,NZ,NY,NX),&
-                                                 LeafStrutElms_pft(ielmc,NZ,NY,NX)+CanopyNonStrutElms_pft(ielmc,NZ,NY,NX))
+        this%h1D_LEAF_NC_ptc(nptc)      = safe_adb(LeafStrutElms_pft(ielmn,NZ,NY,NX)+CanopyNonstElms_pft(ielmn,NZ,NY,NX),&
+                                                 LeafStrutElms_pft(ielmc,NZ,NY,NX)+CanopyNonstElms_pft(ielmc,NZ,NY,NX))
         if(MainBranchNum_pft(NZ,NY,NX)> 0)then
           DO KN=10,0,-1
             IF(KN==0)THEN

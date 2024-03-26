@@ -1685,7 +1685,7 @@ implicit none
     RootMycoActiveBiomC_pvr            =>   plt_biom%RootMycoActiveBiomC_pvr   , &
     RootMycoNonstElms_rpvr               =>   plt_biom%RootMycoNonstElms_rpvr   , &
     LeafPetolBiomassC_brch             =>   plt_biom%LeafPetolBiomassC_brch   , &
-    NonStrutElms_brch                  =>   plt_biom%NonStrutElms_brch   , &
+    CanopyNonstElms_brch                  =>   plt_biom%CanopyNonstElms_brch   , &
     PopuRootMycoC_pvr                  =>   plt_biom% PopuRootMycoC_pvr   , &
     StalkBiomassC_brch                 =>   plt_biom%StalkBiomassC_brch   , &
     StalkRsrvElms_brch                 =>   plt_biom%StalkRsrvElms_brch  , &
@@ -1736,7 +1736,7 @@ implicit none
         IF(Hours2LeafOut_brch(NB,NZ).GT.HourReq2InitSStor4LeafOut(iPlantPhenolPattern_pft(NZ)))THEN
           WTLSBZ(NB)=AZMAX1(LeafPetolBiomassC_brch(NB,NZ))
           DO NE=1,NumPlantChemElms
-            NonstElm_loc(NE,NB)=AZMAX1(NonStrutElms_brch(NE,NB,NZ))
+            NonstElm_loc(NE,NB)=AZMAX1(CanopyNonstElms_brch(NE,NB,NZ))
             TotNonstElm_loc(ielmc)=TotNonstElm_loc(ielmc)+NonstElm_loc(ielmc,NB)
           ENDDO
           WTPLTT=WTPLTT+WTLSBZ(NB)
@@ -1759,9 +1759,9 @@ implicit none
               XFRE(NE)=0.01_r8*NonstElmGradt/TotNonstElm_loc(ielmc)
             ENDDO
             DO NE=1,NumPlantChemElms
-              NonStrutElms_brch(NE,NB,NZ)=NonStrutElms_brch(NE,NB,NZ)+XFRE(NE)
-              if(NonStrutElms_brch(NE,NB,NZ)<0._r8)then
-                write(*,*)'1750NonStrutElms_brch(NE,NB,NZ)',NE,NB,NonStrutElms_brch(NE,NB,NZ)-XFRE(NE),XFRE(NE)
+              CanopyNonstElms_brch(NE,NB,NZ)=CanopyNonstElms_brch(NE,NB,NZ)+XFRE(NE)
+              if(CanopyNonstElms_brch(NE,NB,NZ)<0._r8)then
+                write(*,*)'1750CanopyNonstElms_brch(NE,NB,NZ)',NE,NB,CanopyNonstElms_brch(NE,NB,NZ)-XFRE(NE),XFRE(NE)
                 stop
               endif
             ENDDO
@@ -2011,30 +2011,30 @@ implicit none
         WTRTLR=AZMAX1(WTRTLX,FSNK*WTLSBX)
         WTPLTT=WTLSBB+WTRTLR
         IF(WTPLTT.GT.ZEROP(NZ))THEN
-          CPOOLB=AZMAX1(NonStrutElms_brch(ielmc,NB,NZ)*FWTR(L))
+          CPOOLB=AZMAX1(CanopyNonstElms_brch(ielmc,NB,NZ)*FWTR(L))
           CPOOLS=AZMAX1(RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ)*FWTB(NB))
           NonstElmGradt=(CPOOLB*WTRTLR-CPOOLS*WTLSBB)/WTPLTT
           XFRE(ielmc)=PTSHTR*NonstElmGradt
           CPOOLT=CPOOLS+CPOOLB
-          NonStrutElms_brch(ielmc,NB,NZ)=NonStrutElms_brch(ielmc,NB,NZ)-XFRE(ielmc)
+          CanopyNonstElms_brch(ielmc,NB,NZ)=CanopyNonstElms_brch(ielmc,NB,NZ)-XFRE(ielmc)
           RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ)=RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ)+XFRE(ielmc)
 
           !N & P tranfer based on stoichiometry ratio
           IF(CPOOLT.GT.ZEROP(NZ))THEN
             DO NE=2,NumPlantChemElms
-              NonstElmBrchE=AZMAX1(NonStrutElms_brch(ielmn,NB,NZ)*FWTR(L))
+              NonstElmBrchE=AZMAX1(CanopyNonstElms_brch(ielmn,NB,NZ)*FWTR(L))
               NonstElmRootE=AZMAX1(RootMycoNonstElms_rpvr(ielmn,ipltroot,L,NZ)*FWTB(NB))
               NonstElmGradt=(NonstElmBrchE*CPOOLS-NonstElmRootE*CPOOLB)/CPOOLT
               XFRE(NE)=PTSHTR*NonstElmGradt
               IF(XFRE(NE)>0._r8)then
-                XFRE(NE)=AMIN1(NonStrutElms_brch(NE,NB,NZ),XFRE(NE))
+                XFRE(NE)=AMIN1(CanopyNonstElms_brch(NE,NB,NZ),XFRE(NE))
               ELSE  
                 XFRE(NE)=AMAX1(-RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ),XFRE(NE))
               ENDIF
-              NonStrutElms_brch(NE,NB,NZ)=NonStrutElms_brch(NE,NB,NZ)-XFRE(NE)
+              CanopyNonstElms_brch(NE,NB,NZ)=CanopyNonstElms_brch(NE,NB,NZ)-XFRE(NE)
               RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ)=RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ)+XFRE(NE)              
-              if(NonStrutElms_brch(NE,NB,NZ)<0._r8 .or. RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ)<0._r8)then
-                write(*,*)'2012NonStrutElms_brch(NE,NB,NZ)',NE,NB,NZ,NonStrutElms_brch(NE,NB,NZ)+XFRE(NE)&
+              if(CanopyNonstElms_brch(NE,NB,NZ)<0._r8 .or. RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ)<0._r8)then
+                write(*,*)'2012CanopyNonstElms_brch(NE,NB,NZ)',NE,NB,NZ,CanopyNonstElms_brch(NE,NB,NZ)+XFRE(NE)&
                   ,RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ)-XFRE(NE) &
                   ,XFRE(NE),NonstElmBrchE,NonstElmRootE,NonstElmGradt,FWTR(L),FWTB(NB),PTSHTR
                 stop

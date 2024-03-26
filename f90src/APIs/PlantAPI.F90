@@ -120,8 +120,8 @@ implicit none
     THeatRootUptake(L,NY,NX) =plt_ew%THeatRootUptake(L)
     GridPlantRootH2OUptake_vr(L,NY,NX)=plt_ew%GridPlantRootH2OUptake_vr(L)
     DO  K=1,micpar%NumOfPlantLitrCmplxs
-      DO NE=1,NumPlantChemElms
-        DO  M=1,jsken
+      DO  M=1,jsken
+        DO NE=1,NumPlantChemElms        
           LitrfalStrutElms_vr(NE,M,K,L,NY,NX)=plt_bgcr%LitrfalStrutElms_vr(NE,M,K,L)
         ENDDO
       ENDDO
@@ -145,8 +145,9 @@ implicit none
       plt_morph%PARTS_brch(1:pltpar%NumOfPlantMorphUnits,1:pltpar%MaxNumBranches,NZ)
     RootElms_pft(1:NumPlantChemElms,NZ,NY,NX) =plt_biom%RootElms_pft(1:NumPlantChemElms,NZ)
     ElmBalanceCum_pft(1:NumPlantChemElms,NZ,NY,NX)  =plt_site%ElmBalanceCum_pft(1:NumPlantChemElms,NZ)
-    CanopyNonStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)=plt_biom%CanopyNonStrutElms_pft(1:NumPlantChemElms,NZ)
-    NoduleNonstructElmnt_pft(1:NumPlantChemElms,NZ,NY,NX)=plt_biom%NoduleNonstructElmnt_pft(1:NumPlantChemElms,NZ)
+    CanopyNonstElms_pft(1:NumPlantChemElms,NZ,NY,NX)=plt_biom%CanopyNonstElms_pft(1:NumPlantChemElms,NZ)
+    CanopyNodulElms_pft(1:NumPlantChemElms,NZ,NY,NX)=plt_biom%CanopyNodulElms_pft(1:NumPlantChemElms,NZ)
+    CanopyNodulNonstElms_pft(1:NumPlantChemElms,NZ,NY,NX)=plt_biom%CanopyNodulNonstElms_pft(1:NumPlantChemElms,NZ)
     CanopyNonstructElmConc_pft(1:NumPlantChemElms,NZ,NY,NX)=plt_biom%CanopyNonstructElmConc_pft(1:NumPlantChemElms,NZ)
     LitrfalStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX) =plt_bgcr%LitrfalStrutElms_pft(1:NumPlantChemElms,NZ)
     EcoHavstElmnt_pft(1:NumPlantChemElms,NZ,NY,NX) =plt_distb%EcoHavstElmnt_pft(1:NumPlantChemElms,NZ)
@@ -313,9 +314,11 @@ implicit none
     
     DO NB=1,NumOfBranches_pft(NZ,NY,NX)
       DO NE=1,NumPlantChemElms
-        NonStrutElms_brch(NE,NB,NZ,NY,NX) =plt_biom%NonStrutElms_brch(NE,NB,NZ)
+        CanopyNonstElms_brch(NE,NB,NZ,NY,NX) =plt_biom%CanopyNonstElms_brch(NE,NB,NZ)
         EarStrutElms_brch(NE,NB,NZ,NY,NX)=plt_biom%EarStrutElms_brch(NE,NB,NZ)
+        ShootElms_brch(NE,NB,NZ,NY,NX)=plt_biom%ShootElms_brch(NE,NB,NZ)
       ENDDO
+      ShootC4NonstC_brch(NB,NZ,NY,NX)=plt_biom%ShootC4NonstC_brch(NB,NZ)      
     ENDDO
 
 
@@ -422,8 +425,8 @@ implicit none
             LeafAUnshaded_zsec(N,L,K,NB,NZ,NY,NX)=plt_photo%LeafAUnshaded_zsec(N,L,K,NB,NZ)
           ENDDO
         ENDDO
-        CPOOL3(K,NB,NZ,NY,NX)=plt_photo%CPOOL3(K,NB,NZ)
-        CPOOL4(K,NB,NZ,NY,NX)=plt_photo%CPOOL4(K,NB,NZ)
+        CPOOL3_node(K,NB,NZ,NY,NX)=plt_photo%CPOOL3_node(K,NB,NZ)
+        CPOOL4_node(K,NB,NZ,NY,NX)=plt_photo%CPOOL4_node(K,NB,NZ)
         CMassCO2BundleSheath_node(K,NB,NZ,NY,NX)  =plt_photo%CMassCO2BundleSheath_node(K,NB,NZ)
         CO2CompenPoint_node(K,NB,NZ,NY,NX) =plt_photo%CO2CompenPoint_node(K,NB,NZ)
         RubiscoCarboxyEff_node(K,NB,NZ,NY,NX)  =plt_photo%RubiscoCarboxyEff_node(K,NB,NZ)
@@ -530,7 +533,7 @@ implicit none
 
     DO NR=1,NumOfCanopyLayers
       NIXBotRootLayer_rpft(NR,NZ,NY,NX)=plt_morph%NIXBotRootLayer_rpft(NR,NZ)
-      DO N=1,jroots
+      DO N=1,MY(NZ,NY,NX)
         Root1stElm_raxs(1:NumPlantChemElms,N,NR,NZ,NY,NX) =plt_biom%Root1stElm_raxs(1:NumPlantChemElms,N,NR,NZ)
         Root1stDepz_pft(N,NR,NZ,NY,NX) =plt_morph%Root1stDepz_pft(N,NR,NZ)
       ENDDO
@@ -551,9 +554,8 @@ implicit none
 
 
     DO L=NU(NY,NX),MaxSoiL4Root(NZ,NY,NX)
-
       DO K=1,jcplx
-        DO N=1,2
+        DO N=1,MY(NZ,NY,NX)
           DO NE=1,NumPlantChemElms
             RootMycoExudElm_pvr(NE,N,K,L,NZ,NY,NX)=plt_rbgc%RootMycoExudElm_pvr(NE,N,K,L,NZ)
           ENDDO
@@ -561,13 +563,15 @@ implicit none
       ENDDO
     ENDDO
 
-    DO NE=1,NumPlantChemElms
-      DO M=1,jsken
-        DO N=0,JP
+
+    DO M=1,jsken
+      DO N=0,NumLitterGroups
+        DO NE=1,NumPlantChemElms        
           CFOPE(NE,N,M,NZ,NY,NX)=plt_soilchem%CFOPE(NE,N,M,NZ)
         enddo
       enddo
     ENDDO
+    !the following needs to be updated 
     Max1stRootRadius_pft(2,NZ,NY,NX)=plt_morph%Max1stRootRadius_pft(2,NZ)
     Max2ndRootRadius_pft(2,NZ,NY,NX)=plt_morph%Max2ndRootRadius_pft(2,NZ)
     RootPorosity_pft(2,NZ,NY,NX)  =plt_morph%RootPorosity_pft(2,NZ)
@@ -582,7 +586,8 @@ implicit none
     CMinPO4Root_pft(2,NZ,NY,NX)=plt_rbgc%CMinPO4Root_pft(2,NZ)
     RSRR(2,NZ,NY,NX)  =plt_morph%RSRR(2,NZ)
     RSRA(2,NZ,NY,NX)  =plt_morph%RSRA(2,NZ)
-    DO N=1,2
+
+    DO N=1,MY(NZ,NY,NX)
       RootPoreTortu4Gas(N,NZ,NY,NX)=plt_morph%RootPoreTortu4Gas(N,NZ)
       RootRaidus_rpft(N,NZ,NY,NX)=plt_morph%RootRaidus_rpft(N,NZ)
       RootVolPerMassC_pft(N,NZ,NY,NX) =plt_morph%RootVolPerMassC_pft(N,NZ)
@@ -944,8 +949,8 @@ implicit none
     plt_ew%THeatRootUptake(L)  =THeatRootUptake(L,NY,NX)
     plt_ew%GridPlantRootH2OUptake_vr(L) =GridPlantRootH2OUptake_vr(L,NY,NX)
     DO  K=1,micpar%NumOfPlantLitrCmplxs
-      DO NE=1,NumPlantChemElms
-        DO  M=1,jsken
+      DO  M=1,jsken
+        DO NE=1,NumPlantChemElms        
           plt_bgcr%LitrfalStrutElms_vr(NE,M,K,L)=LitrfalStrutElms_vr(NE,M,K,L,NY,NX)
         ENDDO
       ENDDO
@@ -976,8 +981,9 @@ implicit none
     plt_biom%GrainStrutElms_pft(1:NumPlantChemElms,NZ)=GrainStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)
     plt_site%ElmBalanceCum_pft(1:NumPlantChemElms,NZ)  =ElmBalanceCum_pft(1:NumPlantChemElms,NZ,NY,NX)
     plt_biom%CanopyNonstructElmConc_pft(1:NumPlantChemElms,NZ)=CanopyNonstructElmConc_pft(1:NumPlantChemElms,NZ,NY,NX)
-    plt_biom%CanopyNonStrutElms_pft(1:NumPlantChemElms,NZ)=CanopyNonStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)
-    plt_biom%NoduleNonstructElmnt_pft(1:NumPlantChemElms,NZ)=NoduleNonstructElmnt_pft(1:NumPlantChemElms,NZ,NY,NX)
+    plt_biom%CanopyNonstElms_pft(1:NumPlantChemElms,NZ)=CanopyNonstElms_pft(1:NumPlantChemElms,NZ,NY,NX)
+    plt_biom%CanopyNodulElms_pft(1:NumPlantChemElms,NZ)=CanopyNodulElms_pft(1:NumPlantChemElms,NZ,NY,NX)
+    plt_biom%CanopyNodulNonstElms_pft(1:NumPlantChemElms,NZ)=CanopyNodulNonstElms_pft(1:NumPlantChemElms,NZ,NY,NX)
     plt_bgcr%LitrfalStrutElms_pft(1:NumPlantChemElms,NZ) =LitrfalStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)
     plt_distb%EcoHavstElmnt_pft(1:NumPlantChemElms,NZ)=EcoHavstElmnt_pft(1:NumPlantChemElms,NZ,NY,NX)
     plt_pheno%NetCumElmntFlx2Plant_pft(1:NumPlantChemElms,NZ)=NetCumElmntFlx2Plant_pft(1:NumPlantChemElms,NZ,NY,NX)
@@ -1141,9 +1147,11 @@ implicit none
         ENDDO
       ENDDO
     ENDDO
-    DO NE=1,NumPlantChemElms
-      DO NB=1,NumOfBranches_pft(NZ,NY,NX)
-        plt_biom%NonStrutElms_brch(NE,NB,NZ)=NonStrutElms_brch(NE,NB,NZ,NY,NX)
+    
+    DO NB=1,NumOfBranches_pft(NZ,NY,NX)
+      DO NE=1,NumPlantChemElms
+        plt_biom%CanopyNonstElms_brch(NE,NB,NZ)=CanopyNonstElms_brch(NE,NB,NZ,NY,NX)
+        plt_biom%ShootElms_brch(NE,NB,NZ)=ShootElms_brch(NE,NB,NZ,NY,NX)
         plt_biom%CanopyNodulNonstElms_brch(NE,NB,NZ)=CanopyNodulNonstElms_brch(NE,NB,NZ,NY,NX)
         plt_biom%ShootStrutElms_brch(NE,NB,NZ)=ShootStrutElms_brch(NE,NB,NZ,NY,NX)
         plt_biom%LeafPetoNonstElmConc_brch(NE,NB,NZ)=LeafPetoNonstElmConc_brch(NE,NB,NZ,NY,NX)
@@ -1157,6 +1165,7 @@ implicit none
         plt_biom%CanopyNodulStrutElms_brch(NE,NB,NZ)=CanopyNodulStrutElms_brch(NE,NB,NZ,NY,NX)
         plt_biom%PetioleChemElmRemob_brch(NE,NB,NZ)=PetioleChemElmRemob_brch(NE,NB,NZ,NY,NX)
       ENDDO
+      plt_biom%ShootC4NonstC_brch(NB,NZ)=ShootC4NonstC_brch(NB,NZ,NY,NX)              
     ENDDO
 
     DO NB=1,NumOfBranches_pft(NZ,NY,NX)
@@ -1216,8 +1225,8 @@ implicit none
             plt_photo%LeafAUnshaded_zsec(N,L,K,NB,NZ)=LeafAUnshaded_zsec(N,L,K,NB,NZ,NY,NX)
           ENDDO
         ENDDO
-        plt_photo%CPOOL3(K,NB,NZ)=CPOOL3(K,NB,NZ,NY,NX)
-        plt_photo%CPOOL4(K,NB,NZ)=CPOOL4(K,NB,NZ,NY,NX)
+        plt_photo%CPOOL3_node(K,NB,NZ)=CPOOL3_node(K,NB,NZ,NY,NX)
+        plt_photo%CPOOL4_node(K,NB,NZ)=CPOOL4_node(K,NB,NZ,NY,NX)
         plt_photo%CMassCO2BundleSheath_node(K,NB,NZ)  =CMassCO2BundleSheath_node(K,NB,NZ,NY,NX)
         plt_photo%CO2CompenPoint_node(K,NB,NZ) =CO2CompenPoint_node(K,NB,NZ,NY,NX)
         plt_photo%RubiscoCarboxyEff_node(K,NB,NZ)  =RubiscoCarboxyEff_node(K,NB,NZ,NY,NX)
@@ -1254,8 +1263,9 @@ implicit none
         plt_morph%CanopyStemArea_lbrch(L,NB,NZ)=CanopyStemArea_lbrch(L,NB,NZ,NY,NX)
       ENDDO
     enddo
-    DO NE=1,NumPlantChemElms
-      DO L=1,NL(NY,NX)
+
+    DO L=1,NL(NY,NX)
+      DO NE=1,NumPlantChemElms
         plt_biom%RootNodulStrutElms_pvr(NE,L,NZ) =RootNodulStrutElms_pvr(NE,L,NZ,NY,NX)
       ENDDO
     ENDDO
@@ -1373,8 +1383,9 @@ implicit none
         plt_biom%Root1stElm_raxs(1:NumPlantChemElms,N,NR,NZ)=Root1stElm_raxs(1:NumPlantChemElms,N,NR,NZ,NY,NX)
       enddo
     enddo
-    DO NE=1,NumPlantChemElms
-      DO M=1,jsken
+    
+    DO M=1,jsken
+      DO NE=1,NumPlantChemElms
         plt_biom%StandDeadKCompElms_pft(NE,M,NZ)=StandDeadKCompElms_pft(NE,M,NZ,NY,NX)
       ENDDO
     ENDDO
@@ -1385,9 +1396,10 @@ implicit none
         enddo
       enddo
     ENDDO
-    DO NE=1,NumPlantChemElms
-      DO M=1,jsken
-        DO N=0,JP
+
+    DO M=1,jsken
+      DO N=0,NumLitterGroups
+        DO NE=1,NumPlantChemElms        
           plt_soilchem%CFOPE(NE,N,M,NZ)=CFOPE(NE,N,M,NZ,NY,NX)
         enddo
       enddo
