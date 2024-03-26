@@ -565,7 +565,7 @@ implicit none
 
 
     DO M=1,jsken
-      DO N=0,NumLitterGroups
+      DO N=0,pltpar%NumLitterGroups
         DO NE=1,NumPlantChemElms        
           CFOPE(NE,N,M,NZ,NY,NX)=plt_soilchem%CFOPE(NE,N,M,NZ)
         enddo
@@ -1398,7 +1398,7 @@ implicit none
     ENDDO
 
     DO M=1,jsken
-      DO N=0,NumLitterGroups
+      DO N=0,pltpar%NumLitterGroups
         DO NE=1,NumPlantChemElms        
           plt_soilchem%CFOPE(NE,N,M,NZ)=CFOPE(NE,N,M,NZ,NY,NX)
         enddo
