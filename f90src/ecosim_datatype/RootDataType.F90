@@ -46,6 +46,7 @@ module RootDataType
   real(r8),target,allocatable ::  Max1stRootRadius_pft(:,:,:,:)                    !maximum radius of primary roots, [m]
   real(r8),target,allocatable ::  Max2ndRootRadius_pft(:,:,:,:)                    !maximum radius of secondary roots, [m]
   real(r8),target,allocatable ::  RootBranchFreq_pft(:,:,:)                        !root brancing frequency, [m-1]
+  real(r8),target,allocatable ::  RootNodulElms_pft(:,:,:,:)            
   real(r8),target,allocatable ::  RootPoreTortu4Gas(:,:,:,:)                     !power function of root porosity used to calculate root gaseous diffusivity, [-]
   real(r8),target,allocatable ::  RootNodulNonstElms_pvr(:,:,:,:,:)                  !root  layer nonstructural element, [g d-2]
   real(r8),target,allocatable ::  RootLenPerPlant_pvr(:,:,:,:,:)                   !root layer length per plant, [m p-1]
@@ -126,6 +127,7 @@ contains
   allocate(RootRaidus_rpft(jroots,JP,JY,JX));  RootRaidus_rpft=0._r8
   allocate(CNRTS(JP,JY,JX));    CNRTS=0._r8
   allocate(CPRTS(JP,JY,JX));    CPRTS=0._r8
+  allocate(RootNodulElms_pft(NumPlantChemElms,JP,JY,JX));RootNodulElms_pft=0._r8
   allocate(Max1stRootRadius_pft(jroots,JP,JY,JX)); Max1stRootRadius_pft=0._r8
   allocate(Max2ndRootRadius_pft(jroots,JP,JY,JX)); Max2ndRootRadius_pft=0._r8
   allocate(RootBranchFreq_pft(JP,JY,JX));     RootBranchFreq_pft=0._r8
@@ -228,6 +230,7 @@ contains
   call destroy(Radius2ndRoot_pvr)
   call destroy(Root1stSpecLen_pft)
   call destroy(Root2ndSpecLen_pft)
+  call destroy(RootNodulElms_pft)
   call destroy(AllPlantRootH2OUptake_vr)
   call destroy(PSIRoot_pvr)
   call destroy(PSIRootOSMO_vr)

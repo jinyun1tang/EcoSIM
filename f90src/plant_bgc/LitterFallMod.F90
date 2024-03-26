@@ -13,10 +13,10 @@ implicit none
   contains
 !------------------------------------------------------------------------------------------
 
-  subroutine ResetDeadBranch(I,J,NZ,ShootC4NonstC_brch)
+  subroutine ResetDeadBranch(I,J,NZ)
   implicit none
   integer, intent(in) :: I,J,NZ
-  real(r8),intent(inout) :: ShootC4NonstC_brch(NumOfCanopyLayers1,JP1)
+
   integer :: IDTHY
 
 !     begin_execution
@@ -26,9 +26,10 @@ implicit none
     iDayPlantHarvest_pft        =>   plt_distb%iDayPlantHarvest_pft    , &
     UVOLO                       =>   plt_ew%UVOLO       , &
     CanopyWater_pft             =>   plt_ew%CanopyWater_pft       , &
-    RootElms_pft              =>   plt_biom%RootElms_pft     , &
-    NonStrutElms_pft       =>   plt_biom%NonStrutElms_pft     , &
-    iPlantPhenolPattern_pft  =>   plt_pheno%iPlantPhenolPattern_pft   , &
+    ShootC4NonstC_brch          =>   plt_biom%ShootC4NonstC_brch, &
+    RootElms_pft                =>   plt_biom%RootElms_pft     , &
+    NonStrutElms_pft            =>   plt_biom%NonStrutElms_pft     , &
+    iPlantPhenolPattern_pft     =>   plt_pheno%iPlantPhenolPattern_pft   , &
     iPlantRootState_pft         =>   plt_pheno%iPlantRootState_pft   , &
     iPlantShootState_pft        =>   plt_pheno%iPlantShootState_pft    , &
     doInitPlant_pft             =>   plt_pheno%doInitPlant_pft    , &
@@ -40,7 +41,7 @@ implicit none
     SolarNoonHour_col           =>   plt_site%SolarNoonHour_col    , &
     HypoctoHeight_pft           =>   plt_morph%HypoctoHeight_pft    , &
     NumOfBranches_pft           =>   plt_morph%NumOfBranches_pft      , &
-    MainBranchNum_pft         =>   plt_morph%MainBranchNum_pft      , &
+    MainBranchNum_pft           =>   plt_morph%MainBranchNum_pft      , &
     BranchNumber_pft            =>   plt_morph%BranchNumber_pft        &
   )
 !
