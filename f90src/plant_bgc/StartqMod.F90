@@ -84,8 +84,8 @@ module StartqMod
 !     FILL OUT UNUSED ARRAYS
 !
       D9986: DO NZ=NP(NY,NX)+1,JP
-        SurfLitrfalStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
-        LitrfalStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
+        SurfLitrfalStrutElmsCum_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
+        LitrfalStrutElmsCum_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
         StandDeadStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
         D6401: DO L=1,NL(NY,NX)
           DO  K=1,pltpar%NumOfPlantLitrCmplxs
@@ -631,11 +631,11 @@ module StartqMod
 !
   IF(.not.is_restart().AND.is_first_year)THEN
     GrossCO2Fix_pft(NZ,NY,NX)=0._r8
-    SurfLitrfalStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
+    SurfLitrfalStrutElmsCum_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
     GrossResp_pft(NZ,NY,NX)=0._r8
     CanopyPlusNoduRespC_pft(NZ,NY,NX)=0._r8
     PlantExudChemElmCum_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
-    LitrfalStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
+    LitrfalStrutElmsCum_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
     PlantN2FixCum_pft(NZ,NY,NX)=0._r8
     NH3Dep2Can_pft(NZ,NY,NX)=0._r8
     NH3EmiCum_pft(NZ,NY,NX)=0._r8

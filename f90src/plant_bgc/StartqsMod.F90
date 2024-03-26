@@ -87,8 +87,8 @@ module StartqsMod
 !     FILL OUT UNUSED ARRAYS
 !
       D9986: DO NZ=NP+1,JP1
-        plt_bgcr%SurfLitrfalStrutElms_pft(1:NumPlantChemElms,NZ)=0._r8
-        plt_bgcr%LitrfalStrutElms_pft(1:NumPlantChemElms,NZ)=0._r8
+        plt_bgcr%SurfLitrfalStrutElmsCum_pft(1:NumPlantChemElms,NZ)=0._r8
+        plt_bgcr%LitrfalStrutElmsCum_pft(1:NumPlantChemElms,NZ)=0._r8
         plt_biom%StandDeadStrutElms_pft(1:NumPlantChemElms,NZ)=0._r8
         D6401: DO L=1,NL
           DO  K=1,pltpar%NumOfPlantLitrCmplxs
@@ -785,12 +785,12 @@ module StartqsMod
     PlantExudChemElmCum_pft       => plt_rbgc%PlantExudChemElmCum_pft    , &
     NH3EmiCum_pft                 => plt_bgcr%NH3EmiCum_pft     , &
     NH3Dep2Can_pft                => plt_bgcr%NH3Dep2Can_pft     , &
-    SurfLitrfalStrutElms_pft      => plt_bgcr%SurfLitrfalStrutElms_pft     , &
+    SurfLitrfalStrutElmsCum_pft   => plt_bgcr%SurfLitrfalStrutElmsCum_pft     , &
     GrossCO2Fix_pft               => plt_bgcr%GrossCO2Fix_pft     , &
     CanopyPlusNoduRespC_pft       => plt_bgcr%CanopyPlusNoduRespC_pft     , &
     GrossResp_pft                 => plt_bgcr%GrossResp_pft     , &
     PlantN2FixCum_pft             => plt_bgcr%PlantN2FixCum_pft    , &
-    LitrfalStrutElms_pft          => plt_bgcr%LitrfalStrutElms_pft     , &
+    LitrfalStrutElmsCum_pft       => plt_bgcr%LitrfalStrutElmsCum_pft     , &
     CanopyStemArea_pft               => plt_morph%CanopyStemArea_pft    , &
     icwood                        => pltpar%icwood      , &
     NetCumElmntFlx2Plant_pft      => plt_pheno%NetCumElmntFlx2Plant_pft      &
@@ -801,11 +801,11 @@ module StartqsMod
 !
   IF(.not.is_restart().AND.is_first_year)THEN
     GrossCO2Fix_pft(NZ)=0._r8
-    SurfLitrfalStrutElms_pft(1:NumPlantChemElms,NZ)=0._r8
+    SurfLitrfalStrutElmsCum_pft(1:NumPlantChemElms,NZ)=0._r8
     GrossResp_pft(NZ)=0._r8
     CanopyPlusNoduRespC_pft(NZ)=0._r8
     PlantExudChemElmCum_pft(1:NumPlantChemElms,NZ)=0._r8
-    LitrfalStrutElms_pft(1:NumPlantChemElms,NZ)=0._r8
+    LitrfalStrutElmsCum_pft(1:NumPlantChemElms,NZ)=0._r8
 
     PlantN2FixCum_pft(NZ)=0._r8
     NH3Dep2Can_pft(NZ)=0._r8

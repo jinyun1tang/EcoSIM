@@ -79,7 +79,7 @@
   !NetCumElmntFlx2Plant_pft: effect of canopy element status on seed set
     DO NE=1,NumPlantChemElms
       NetCumElmntFlx2Plant_pft(NE,NZ,NY,NX)=NetCumElmntFlx2Plant_pft(NE,NZ,NY,NX) &
-        +PlantExudChemElmCum_pft(NE,NZ,NY,NX)-LitrfalStrutElms_pft(NE,NZ,NY,NX)
+        +PlantExudChemElmCum_pft(NE,NZ,NY,NX)-LitrfalStrutElmsCum_pft(NE,NZ,NY,NX)
       EcoHavstElmntCum_pft(NE,NZ,NY,NX)=EcoHavstElmntCum_pft(NE,NZ,NY,NX)+EcoHavstElmnt_pft(NE,NZ,NY,NX)
     enddo
     NetCumElmntFlx2Plant_pft(ielmc,NZ,NY,NX)=NetCumElmntFlx2Plant_pft(ielmc,NZ,NY,NX) &
@@ -107,8 +107,8 @@
     PO4byFire_pft(NZ,NY,NX)=0._r8
 
     EcoHavstElmnt_pft(:,NZ,NY,NX)=0._r8
-    SurfLitrfalStrutElms_pft(:,NZ,NY,NX)=0._r8
-    LitrfalStrutElms_pft(:,NZ,NY,NX)=0._r8
+    SurfLitrfalStrutElmsCum_pft(:,NZ,NY,NX)=0._r8
+    LitrfalStrutElmsCum_pft(:,NZ,NY,NX)=0._r8
   ENDDO D960
   IF(iErosionMode.EQ.ieros_frzthaweros.OR.iErosionMode.EQ.ieros_frzthawsomeros)THEN
     TSED(NY,NX)=0._r8

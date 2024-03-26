@@ -64,10 +64,10 @@ module PlantDisturbsMod
   implicit none
   integer , intent(in) :: I,J,NZ
   real(r8), INTENT(INOUT) :: ShootNonstructC_brch(NumOfCanopyLayers1,JP1)
-  real(r8) :: FHVSE(ielmc)
+  real(r8) :: FHVSE
   real(r8) :: FHVSH
   real(r8) :: WHVSTD
-  integer :: M
+  integer :: M,NE
 
 !     begin_execution
   associate(                            &
@@ -87,20 +87,20 @@ module PlantDisturbsMod
     StandDeadStrutElms_pft      =>  plt_biom%StandDeadStrutElms_pft    &
   )
 !  write(102,*)'iHarvstType_pft',I,iHarvstType_pft(NZ),plt_distb%jHarvst_pft(NZ),NZ
-  NonstructElmntRemoval(ielmc)=0._r8;NonstructElmntRemoval(ielmn)=0._r8;NonstructElmntRemoval(ielmp)=0._r8
-  LeafElmntRemoval(ielmc)=0._r8;LeafElmntRemoval(ielmn)=0._r8;LeafElmntRemoval(ielmp)=0._r8
-  FineNonleafElmntRemoval(ielmc)=0._r8;FineNonleafElmntRemoval(ielmn)=0._r8;FineNonleafElmntRemoval(ielmp)=0._r8
-  WoodyElmntRemoval(ielmc)=0._r8;WoodyElmntRemoval(ielmn)=0._r8;WoodyElmntRemoval(ielmp)=0._r8
-  StandeadElmntRemoval(ielmc)=0._r8;StandeadElmntRemoval(ielmn)=0._r8;StandeadElmntRemoval(ielmp)=0._r8
-  LeafElmnt2Litr(ielmc)=0._r8;LeafElmnt2Litr(ielmn)=0._r8;LeafElmnt2Litr(ielmp)=0._r8
-  FineNonleafElmnt2Litr(ielmc)=0._r8;FineNonleafElmnt2Litr(ielmn)=0._r8;FineNonleafElmnt2Litr(ielmp)=0._r8
-  WoodyElmnt2Litr(ielmc)=0._r8;WoodyElmnt2Litr(ielmn)=0._r8;WoodyElmnt2Litr(ielmp)=0._r8
-  StandeadElmnt2Litr(ielmc)=0._r8;StandeadElmnt2Litr(ielmn)=0._r8;StandeadElmnt2Litr(ielmp)=0._r8
-  LeafElmntHarv2Litr(ielmc)=0._r8;LeafElmntHarv2Litr(ielmn)=0._r8;LeafElmntHarv2Litr(ielmp)=0._r8
-  PetioleElmntHarv2Litr(ielmc)=0._r8;PetioleElmntHarv2Litr(ielmn)=0._r8;PetioleElmntHarv2Litr(ielmp)=0._r8
-  WoodyElmntHarv2Litr(ielmc)=0._r8;WoodyElmntHarv2Litr(ielmn)=0._r8;WoodyElmntHarv2Litr(ielmp)=0._r8
-  StandeadElmntHarv2Litr(ielmc)=0._r8;StandeadElmntHarv2Litr(ielmn)=0._r8;StandeadElmntHarv2Litr(ielmp)=0._r8
-  WTHTGE(ielmc)=0._r8;WTHTGE(ielmn)=0._r8;WTHTGE(ielmp)=0._r8
+  NonstructElmntRemoval(1:NumPlantChemElms)=0._r8
+  LeafElmntRemoval(1:NumPlantChemElms)=0._r8
+  FineNonleafElmntRemoval(1:NumPlantChemElms)=0._r8
+  WoodyElmntRemoval(1:NumPlantChemElms)=0._r8
+  StandeadElmntRemoval(1:NumPlantChemElms)=0._r8
+  LeafElmnt2Litr(1:NumPlantChemElms)=0._r8
+  FineNonleafElmnt2Litr(1:NumPlantChemElms)=0._r8
+  WoodyElmnt2Litr(1:NumPlantChemElms)=0._r8
+  StandeadElmnt2Litr(1:NumPlantChemElms)=0._r8
+  LeafElmntHarv2Litr(1:NumPlantChemElms)=0._r8
+  PetioleElmntHarv2Litr(1:NumPlantChemElms)=0._r8
+  WoodyElmntHarv2Litr(1:NumPlantChemElms)=0._r8
+  StandeadElmntHarv2Litr(1:NumPlantChemElms)=0._r8
+  WTHTGE(1:NumPlantChemElms)=0._r8
 !     ENDIF
 
 !     iHarvstType_pft=harvest type:0=none,1=grain,2=all above-ground
@@ -117,34 +117,34 @@ module PlantDisturbsMod
     IF(J.EQ.INT(SolarNoonHour_col).AND.iHarvstType_pft(NZ).NE.iharvtyp_grazing.AND.&
       iHarvstType_pft(NZ).NE.iharvtyp_herbivo)THEN
       IF(isclose(THIN_pft(NZ),0._r8))THEN
-        FHVSE(ielmc)=AZMAX1(1._r8-EHVST(1,4,NZ))
-        FHVSH=FHVSE(ielmc)
+        FHVSE=AZMAX1(1._r8-EHVST(1,4,NZ))
+        FHVSH=FHVSE
       ELSE
-        FHVSE(ielmc)=AZMAX1(1._r8-THIN_pft(NZ))
+        FHVSE=AZMAX1(1._r8-THIN_pft(NZ))
         IF(iHarvstType_pft(NZ).EQ.iharvtyp_none)THEN
           FHVSH=AZMAX1(1._r8-EHVST(1,4,NZ)*THIN_pft(NZ))
         ELSE
-          FHVSH=FHVSE(ielmc)
+          FHVSH=FHVSE
         ENDIF
       ENDIF
     ELSEIF(iHarvstType_pft(NZ).EQ.iharvtyp_grazing.OR.iHarvstType_pft(NZ).EQ.iharvtyp_herbivo)THEN
       IF(StandDeadStrutElms_pft(ielmc,NZ).GT.ZEROP(NZ))THEN
         WHVSTD=HVST(NZ)*THIN_pft(NZ)*0.45_r8/24.0_r8*AREA3(NU)*EHVST(1,4,NZ)
-        FHVSE(ielmc)=AZMAX1(1._r8-WHVSTD/StandDeadStrutElms_pft(ielmc,NZ))
-        FHVSH=FHVSE(ielmc)
+        FHVSE=AZMAX1(1._r8-WHVSTD/StandDeadStrutElms_pft(ielmc,NZ))
+        FHVSH=FHVSE
       ELSE
-        FHVSE(ielmc)=1.0_r8
+        FHVSE=1.0_r8
         FHVSH=1.0_r8
       ENDIF
     ELSE
-      FHVSE(ielmc)=1.0_r8
+      FHVSE=1.0_r8
       FHVSH=1.0_r8
     ENDIF
     D6475: DO M=1,jsken
       DO NE=1,NumPlantChemElms
         StandeadElmntRemoval(NE)=StandeadElmntRemoval(NE)+(1._r8-FHVSH)*StandDeadKCompElms_pft(NE,M,NZ)
-        StandeadElmntHarv2Litr(NE)=StandeadElmntHarv2Litr(NE)+(FHVSH-FHVSE(ielmc))*StandDeadKCompElms_pft(NE,M,NZ)
-        StandDeadKCompElms_pft(NE,M,NZ)=FHVSE(ielmc)*StandDeadKCompElms_pft(NE,M,NZ)
+        StandeadElmntHarv2Litr(NE)=StandeadElmntHarv2Litr(NE)+(FHVSH-FHVSE)*StandDeadKCompElms_pft(NE,M,NZ)
+        StandDeadKCompElms_pft(NE,M,NZ)=FHVSE*StandDeadKCompElms_pft(NE,M,NZ)
       ENDDO
     ENDDO D6475
 !
@@ -223,8 +223,8 @@ module PlantDisturbsMod
     FWOODE                      =>  plt_allom%FWOODE , &
     CFOPE                       =>  plt_soilchem%CFOPE, &
     LitfalStrutElms_pvr         =>  plt_bgcr%LitfalStrutElms_pvr    , &
-    LitrfalStrutElms_pft        =>  plt_bgcr%LitrfalStrutElms_pft   , &
-    SurfLitrfalStrutElms_pft    =>  plt_bgcr%SurfLitrfalStrutElms_pft   , &
+    LitrfalStrutElmsCum_pft        =>  plt_bgcr%LitrfalStrutElmsCum_pft   , &
+    SurfLitrfalStrutElmsCum_pft    =>  plt_bgcr%SurfLitrfalStrutElmsCum_pft   , &
     iPlantTurnoverPattern_pft   =>  plt_pheno%iPlantTurnoverPattern_pft , &
     iPlantRootProfile_pft       =>  plt_pheno%iPlantRootProfile_pft   &
   )
@@ -361,8 +361,8 @@ module PlantDisturbsMod
 !     TCSN0,TZSN0,TPSN0=cumulative above-ground C,N,P LitrFall
 !
     DO NE=1,NumPlantChemElms
-      LitrfalStrutElms_pft(NE,NZ)=LitrfalStrutElms_pft(NE,NZ)+TotalElmnt2Litr(NE)+HarvestElmnt2Litr(NE)
-      SurfLitrfalStrutElms_pft(NE,NZ)=SurfLitrfalStrutElms_pft(NE,NZ)+TotalElmnt2Litr(NE)+HarvestElmnt2Litr(NE)
+      LitrfalStrutElmsCum_pft(NE,NZ)=LitrfalStrutElmsCum_pft(NE,NZ)+TotalElmnt2Litr(NE)+HarvestElmnt2Litr(NE)
+      SurfLitrfalStrutElmsCum_pft(NE,NZ)=SurfLitrfalStrutElmsCum_pft(NE,NZ)+TotalElmnt2Litr(NE)+HarvestElmnt2Litr(NE)
     ENDDO
   ENDIF
   end associate

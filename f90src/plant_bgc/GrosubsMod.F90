@@ -171,8 +171,8 @@ module grosubsMod
     PlantN2FixCum_pft              => plt_bgcr%PlantN2FixCum_pft   , &
     LitrfalStrutElms_pft          => plt_bgcr%LitrfalStrutElms_pft    , &
     NH3EmiCum_pft                  => plt_bgcr%NH3EmiCum_pft    , &
-    LitrfalStrutElms_pft          => plt_bgcr%LitrfalStrutElms_pft    , &
-    SurfLitrfalStrutElms_pft      => plt_bgcr%SurfLitrfalStrutElms_pft    , &
+    LitrfalStrutElmsCum_pft          => plt_bgcr%LitrfalStrutElmsCum_pft    , &
+    SurfLitrfalStrutElmsCum_pft      => plt_bgcr%SurfLitrfalStrutElmsCum_pft    , &
     GrossResp_pft                  => plt_bgcr%GrossResp_pft    , &
     GrossCO2Fix_pft                => plt_bgcr%GrossCO2Fix_pft    , &
     PlantExudChemElmCum_pft        => plt_rbgc%PlantExudChemElmCum_pft   , &
@@ -225,7 +225,7 @@ module grosubsMod
     DO K=1,pltpar%NumOfPlantLitrCmplxs      
       D6431: DO M=1,jsken
         DO NE=1,NumPlantChemElms
-          SurfLitrfalStrutElms_pft(NE,NZ)=SurfLitrfalStrutElms_pft(NE,NZ)+LitfalStrutElms_pvr(NE,M,K,0,NZ)
+          SurfLitrfalStrutElmsCum_pft(NE,NZ)=SurfLitrfalStrutElmsCum_pft(NE,NZ)+LitfalStrutElms_pvr(NE,M,K,0,NZ)
         ENDDO
       ENDDO D6431  
     ENDDO
@@ -235,7 +235,7 @@ module grosubsMod
         D6430: DO M=1,jsken
           DO NE=1,NumPlantChemElms
             LitrfalStrutElms_pft(NE,NZ)=LitrfalStrutElms_pft(NE,NZ)+LitfalStrutElms_pvr(NE,M,K,L,NZ)
-            LitrfalStrutElms_pft(NE,NZ)=LitrfalStrutElms_pft(NE,NZ)+LitfalStrutElms_pvr(NE,M,K,L,NZ)
+            LitrfalStrutElmsCum_pft(NE,NZ)=LitrfalStrutElmsCum_pft(NE,NZ)+LitfalStrutElms_pvr(NE,M,K,L,NZ)
           enddo         
         ENDDO D6430      
       ENDDO
@@ -270,7 +270,7 @@ module grosubsMod
       !check for living plant
       DO NE=1,NumPlantChemElms
         ElmBalanceCum_pft(NE,NZ)=ShootStrutElms_pft(NE,NZ)+RootElms_pft(NE,NZ)+NodulStrutElms_pft(NE,NZ) &
-          +NonStrutElms_pft(NE,NZ)+LitrfalStrutElms_pft(NE,NZ)-PlantExudChemElmCum_pft(NE,NZ) &
+          +NonStrutElms_pft(NE,NZ)+LitrfalStrutElmsCum_pft(NE,NZ)-PlantExudChemElmCum_pft(NE,NZ) &
           -NetCumElmntFlx2Plant_pft(NE,NZ)+StandDeadStrutElms_pft(NE,NZ)&
           +EcoHavstElmnt_pft(NE,NZ)+EcoHavstElmntCum_pft(NE,NZ)
       ENDDO
@@ -360,7 +360,7 @@ module grosubsMod
 !
     if(NZ==2)then
       write(233,*)'grwobranchbf',I+J/24.,NZ,plt_biom%StalkRsrvElms_brch(1,1,NZ)
-      write(234,*)'grwobranchbf',I+J/24.,sum(plt_biom%RootMycoNonstElms_rpvr(NE,1:plt_morph%MY(NZ),&
+      write(234,*)'grwobranchbf',I+J/24.,sum(plt_biom%RootMycoNonstElms_rpvr(ielmc,1:plt_morph%MY(NZ),&
         plt_site%NU:plt_site%MaxNumRootLays,NZ))
     endif
 
@@ -371,7 +371,7 @@ module grosubsMod
 !
     if(NZ==2)then
       write(233,*)'rootbgcbf',I+J/24.,NZ,plt_biom%StalkRsrvElms_brch(1,1,NZ)
-      write(234,*)'rootbgcbf',I+J/24.,sum(plt_biom%RootMycoNonstElms_rpvr(NE,1:plt_morph%MY(NZ),&
+      write(234,*)'rootbgcbf',I+J/24.,sum(plt_biom%RootMycoNonstElms_rpvr(ielmc,1:plt_morph%MY(NZ),&
         plt_site%NU:plt_site%MaxNumRootLays,NZ))
     endif
 
@@ -379,7 +379,7 @@ module grosubsMod
 !
     if(NZ==2)then
       write(233,*)'totbiombf',I+J/24.,NZ,plt_biom%StalkRsrvElms_brch(1,1,NZ)
-      write(234,*)'totbiombf',I+J/24.,sum(plt_biom%RootMycoNonstElms_rpvr(NE,1:plt_morph%MY(NZ),&
+      write(234,*)'totbiombf',I+J/24.,sum(plt_biom%RootMycoNonstElms_rpvr(ielmc,1:plt_morph%MY(NZ),&
         plt_site%NU:plt_site%MaxNumRootLays,NZ))
     endif
 
@@ -394,7 +394,7 @@ module grosubsMod
 !
   if(NZ==2)then
     write(233,*)'rmbymgmtebf',I+J/24.,NZ,plt_biom%StalkRsrvElms_brch(1,1,NZ)
-    write(234,*)'rmbymgmtebf',I+J/24.,sum(plt_biom%RootMycoNonstElms_rpvr(NE,1:plt_morph%MY(NZ),&
+    write(234,*)'rmbymgmtebf',I+J/24.,sum(plt_biom%RootMycoNonstElms_rpvr(ielmc,1:plt_morph%MY(NZ),&
       plt_site%NU:plt_site%MaxNumRootLays,NZ))
   endif
   call RemoveBiomByManagement(I,J,NZ,ShootNonstructC_brch)
@@ -402,14 +402,14 @@ module grosubsMod
 !     RESET DEAD BRANCHES
   if(NZ==2)then
     write(233,*)'deadresetbf',I+J/24.,NZ,plt_biom%StalkRsrvElms_brch(1,1,NZ)
-    write(234,*)'deadresetbf',I+J/24.,sum(plt_biom%RootMycoNonstElms_rpvr(NE,1:plt_morph%MY(NZ),&
+    write(234,*)'deadresetbf',I+J/24.,sum(plt_biom%RootMycoNonstElms_rpvr(ielmc,1:plt_morph%MY(NZ),&
       plt_site%NU:plt_site%MaxNumRootLays,NZ))
   endif    
   call ResetDeadBranch(I,J,NZ,ShootNonstructC_brch)
 !
   if(NZ==2)then
     write(233,*)'accumbf',I+J/24.,NZ,plt_biom%StalkRsrvElms_brch(1,1,NZ)
-    write(234,*)'accumbf',sum(plt_biom%RootMycoNonstElms_rpvr(NE,1:plt_morph%MY(NZ),&
+    write(234,*)'accumbf',sum(plt_biom%RootMycoNonstElms_rpvr(ielmc,1:plt_morph%MY(NZ),&
       plt_site%NU:plt_site%MaxNumRootLays,NZ))
   endif  
   call AccumulateStates(I,J,NZ,CanopyN2Fix_pft)
@@ -426,7 +426,7 @@ module grosubsMod
   REAL(R8), INTENT(OUT) :: CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW
   real(r8), intent(out) :: RootAreaPopu,TFN5,WFNG,Stomata_Activity
   real(r8), intent(out) :: WFNS,WFNSG
-  integer :: L,NR,N
+  integer :: L,NR,N,NE
   real(r8) :: ACTVM,RTK,STK,TKCM,TKSM
 !     begin_execution
 
