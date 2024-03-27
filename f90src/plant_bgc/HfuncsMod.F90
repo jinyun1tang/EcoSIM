@@ -242,7 +242,7 @@ module HfuncsMod
 ! begin_execution
   associate(                                                                        &
     CanopyNonstructElmConc_pft      =>   plt_biom%CanopyNonstructElmConc_pft  , &
-    NonStrutElms_pft               =>   plt_biom%NonStrutElms_pft   , &
+    SeasonNonStrutElms_pft               =>   plt_biom%SeasonNonStrutElms_pft   , &
     MatureGroup_brch                =>   plt_pheno%MatureGroup_brch , &
     iPlantCalendar_brch             =>   plt_pheno%iPlantCalendar_brch , &
     doInitPlant_pft                 =>   plt_pheno%doInitPlant_pft  , &
@@ -297,7 +297,7 @@ module HfuncsMod
         IF(iPlantPhenolPattern_pft(NZ).NE.iplt_annual.OR. &
           iPlantCalendar_brch(ipltcal_InitFloral,MainBranchNum_pft(NZ),NZ).EQ.0)THEN
           !perennial plant or flower not initiated for annual plant 
-          IF((NumOfBranches_pft(NZ).EQ.0 .AND. NonStrutElms_pft(ielmc,NZ).GT.0.0_r8) &
+          IF((NumOfBranches_pft(NZ).EQ.0 .AND. SeasonNonStrutElms_pft(ielmc,NZ).GT.0.0_r8) &
             .OR.(CanopyNonstructElmConc_pft(ielmc,NZ).GT.MinNonstructalC4InitBranch(NZ) &
             .AND.MinNonstructalC4InitBranch(NZ).GT.0.0_r8))THEN
 
@@ -336,13 +336,13 @@ module HfuncsMod
 !     MainBranchNum_pft: number of main branch
 !     CanopyNonstructElmConc_pft: canopy nonstructural element concentration
 !     PSIRootTurg_vr: root turgor pressure
-!     NonStrutElms_pft: non-structural carbon
+!     SeasonNonStrutElms_pft: non-structural carbon
 
       IF(PSIRootTurg_vr(ipltroot,NGTopRootLayer_pft(NZ),NZ).GT.PSIMin4LeafExpansion)THEN
 !        write(101,*)'root OK for leaf expansion',NZ
         IF(NumRootAxes_pft(NZ).EQ.0.OR.ShootNodeNumber_brch(MainBranchNum_pft(NZ),NZ) &
           .GT.NumRootAxes_pft(NZ)/FNOD(NZ)+XTLI(NZ))THEN
-          IF((NumRootAxes_pft(NZ).EQ.0 .AND. NonStrutElms_pft(ielmc,NZ).GT.0.0_r8) &
+          IF((NumRootAxes_pft(NZ).EQ.0 .AND. SeasonNonStrutElms_pft(ielmc,NZ).GT.0.0_r8) &
             .OR.(CanopyNonstructElmConc_pft(ielmc,NZ).GT.MinNonstructuralC4InitRoot_pft(NZ) & 
             .AND.MinNonstructuralC4InitRoot_pft(NZ).GT.0.0_r8))THEN
             NumRootAxes_pft(NZ)=MIN(NumOfCanopyLayers1,NumRootAxes_pft(NZ)+1)
