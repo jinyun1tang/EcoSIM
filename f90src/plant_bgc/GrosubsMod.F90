@@ -40,7 +40,7 @@ module grosubsMod
 !
 
   integer  :: curday,curhour
-  logical,save  :: lfile=.true.
+  logical,save  :: lfile(2)=.true.
   public :: grosubs
   public :: InitGrosub
   contains
@@ -153,7 +153,7 @@ module grosubsMod
     ShootStrutElms_pft             => plt_biom%ShootStrutElms_pft  , &
     NodulStrutElms_pft             => plt_biom%NodulStrutElms_pft    , &
     NonStrutElms_pft               => plt_biom%NonStrutElms_pft    , &
-    StandDeadStrutElms_pft      => plt_biom%StandDeadStrutElms_pft   , &
+    StandDeadStrutElms_pft         => plt_biom%StandDeadStrutElms_pft   , &
     fTgrowCanP                     => plt_pheno%fTgrowCanP    , &
     NetCumElmntFlx2Plant_pft       => plt_pheno%NetCumElmntFlx2Plant_pft   , &
     IsPlantActive_pft              => plt_pheno%IsPlantActive_pft   , &
@@ -170,10 +170,10 @@ module grosubsMod
     LitfalStrutElms_pvr            => plt_bgcr%LitfalStrutElms_pvr     , &
     NetPrimProduct_pft             => plt_bgcr%NetPrimProduct_pft     , &
     PlantN2FixCum_pft              => plt_bgcr%PlantN2FixCum_pft   , &
-    LitrfalStrutElms_pft          => plt_bgcr%LitrfalStrutElms_pft    , &
+    LitrfalStrutElms_pft           => plt_bgcr%LitrfalStrutElms_pft    , &
     NH3EmiCum_pft                  => plt_bgcr%NH3EmiCum_pft    , &
-    LitrfalStrutElmsCum_pft          => plt_bgcr%LitrfalStrutElmsCum_pft    , &
-    SurfLitrfalStrutElmsCum_pft      => plt_bgcr%SurfLitrfalStrutElmsCum_pft    , &
+    LitrfalStrutElmsCum_pft        => plt_bgcr%LitrfalStrutElmsCum_pft    , &
+    SurfLitrfalStrutElmsCum_pft    => plt_bgcr%SurfLitrfalStrutElmsCum_pft    , &
     GrossResp_pft                  => plt_bgcr%GrossResp_pft    , &
     GrossCO2Fix_pft                => plt_bgcr%GrossCO2Fix_pft    , &
     PlantExudChemElmCum_pft        => plt_rbgc%PlantExudChemElmCum_pft   , &
@@ -361,31 +361,16 @@ module grosubsMod
 !     WTLFB,WTSHEB,LeafPetolBiomassC_brch=leaf,petiole,leaf+petiole mass
 !     iPlantBranchState_brch=branch living flag: 0=alive,1=dead
 !
-    if(NZ==2)then
-      write(233,*)'grwobranchbf',I+J/24.,NZ,plt_biom%StalkRsrvElms_brch(1,1,NZ)
-      write(234,*)'grwobranchbf',I+J/24.,sum(plt_biom%RootMycoNonstElms_rpvr(ielmc,1:plt_morph%MY(NZ),&
-        plt_site%NU:plt_site%MaxNumRootLays,NZ))
-    endif
-
+    call SumPlantBiom(I,J,NZ,'bfgrowpbrch')
+    
     DO  NB=1,NumOfBranches_pft(NZ)
       call GrowOneBranch(I,J,NB,NZ,TFN6_vr,CanopyHeight_copy,CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW,&
         TFN5,WFNG,Stomata_Activity,WFNS,WFNSG,PTRT,CanopyN2Fix_pft,BegRemoblize)
     ENDDO
 !
-    if(NZ==2)then
-      write(233,*)'rootbgcbf',I+J/24.,NZ,plt_biom%StalkRsrvElms_brch(1,1,NZ)
-      write(234,*)'rootbgcbf',I+J/24.,sum(plt_biom%RootMycoNonstElms_rpvr(ielmc,1:plt_morph%MY(NZ),&
-        plt_site%NU:plt_site%MaxNumRootLays,NZ))
-    endif
-
+    call SumPlantBiom(I,J,NZ,'bfRootBGCM')
     call RootBGCModel(I,J,NZ,BegRemoblize,ICHK1,NRX,PTRT,TFN6_vr,CNRTW,CPRTW,RootAreaPopu)
 !
-    if(NZ==2)then
-      write(233,*)'totbiombf',I+J/24.,NZ,plt_biom%StalkRsrvElms_brch(1,1,NZ)
-      write(234,*)'totbiombf',I+J/24.,sum(plt_biom%RootMycoNonstElms_rpvr(ielmc,1:plt_morph%MY(NZ),&
-        plt_site%NU:plt_site%MaxNumRootLays,NZ))
-    endif
-
     call ComputeTotalBiom(I,J,NZ)
   ELSE
     PlantRootSoilElmNetX_pft(1:NumPlantChemElms,NZ)=RootMycoExudElms_pft(1:NumPlantChemElms,NZ)
@@ -395,26 +380,13 @@ module grosubsMod
       +RootHPO4Uptake_pft(NZ)
   ENDIF
 !
-  if(NZ==2)then
-    write(233,*)'rmbymgmtebf',I+J/24.,NZ,plt_biom%StalkRsrvElms_brch(1,1,NZ)
-    write(234,*)'rmbymgmtebf',I+J/24.,sum(plt_biom%RootMycoNonstElms_rpvr(ielmc,1:plt_morph%MY(NZ),&
-      plt_site%NU:plt_site%MaxNumRootLays,NZ))
-  endif
+  call SumPlantBiom(I,J,NZ,'bfrmbiom')
   call RemoveBiomByManagement(I,J,NZ)
 !
 !     RESET DEAD BRANCHES
-  if(NZ==2)then
-    write(233,*)'deadresetbf',I+J/24.,NZ,plt_biom%StalkRsrvElms_brch(1,1,NZ)
-    write(234,*)'deadresetbf',I+J/24.,sum(plt_biom%RootMycoNonstElms_rpvr(ielmc,1:plt_morph%MY(NZ),&
-      plt_site%NU:plt_site%MaxNumRootLays,NZ))
-  endif    
+  call SumPlantBiom(I,J,NZ,'bfresetdead')
   call ResetDeadBranch(I,J,NZ)
 !
-  if(NZ==2)then
-    write(233,*)'accumbf',I+J/24.,NZ,plt_biom%StalkRsrvElms_brch(1,1,NZ)
-    write(234,*)'accumbf',sum(plt_biom%RootMycoNonstElms_rpvr(ielmc,1:plt_morph%MY(NZ),&
-      plt_site%NU:plt_site%MaxNumRootLays,NZ))
-  endif  
   call AccumulateStates(I,J,NZ,CanopyN2Fix_pft)
   end associate
   end subroutine GrowPlant
@@ -446,7 +418,7 @@ module grosubsMod
     CanopyStalkC_pft          =>  plt_biom%CanopyStalkC_pft     , &
     RootProteinC_pvr          =>  plt_biom%RootProteinC_pvr     , &
     RootBiomCPerPlant_pft     =>  plt_biom%RootBiomCPerPlant_pft     , &
-    StalkStrutElms_pft         =>  plt_biom%StalkStrutElms_pft    , &
+    StalkStrutElms_pft        =>  plt_biom%StalkStrutElms_pft    , &
     RootElms_pft              =>  plt_biom%RootElms_pft     , &
     CanopyLeafCLyr_pft        =>  plt_biom%CanopyLeafCLyr_pft     , &
     iPlantTurnoverPattern_pft =>  plt_pheno%iPlantTurnoverPattern_pft   , &
@@ -474,7 +446,7 @@ module grosubsMod
     Root2ndXNum_pvr           =>  plt_morph%Root2ndXNum_pvr     , &
     MY                        =>  plt_morph%MY       , &
     CanopyLeafALyr_pft        =>  plt_morph%CanopyLeafALyr_pft    , &
-    CanopyStemArea_lpft        =>  plt_morph%CanopyStemArea_lpft    , &
+    CanopyStemArea_lpft       =>  plt_morph%CanopyStemArea_lpft    , &
     NumRootAxes_pft           =>  plt_morph%NumRootAxes_pft       &
   )
   D2: DO L=1,NumOfCanopyLayers1
@@ -626,7 +598,7 @@ module grosubsMod
     PopuRootMycoC_pvr              =>  plt_biom% PopuRootMycoC_pvr       &    
   )
 
-  call SumPlantBiom(I,J,NZ)
+  call SumPlantBiom(I,J,NZ,'computotb')
 ! add the nonstrucal components
   D3451: DO N=1,MY(NZ)
     DO  L=NU,MaxSoiL4Root(NZ)
@@ -723,7 +695,7 @@ module grosubsMod
 !     CanopyStemArea_lbrch=total branch stalk surface area in each layer
 !     SeedNumSet_brch=seed set number
 !
-  call SumPlantBiom(I,J,NZ)
+  call SumPlantBiom(I,J,NZ,'Accumstates')
   
   DO NE=1,NumPlantChemElms
     CanopyNonstElms_pft(NE,NZ)=sum(CanopyNonstElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
@@ -810,10 +782,11 @@ module grosubsMod
   end subroutine AccumulateStates
 !------------------------------------------------------------------------------------------
 
-  subroutine SumPlantBiom(I,J,NZ)
+  subroutine SumPlantBiom(I,J,NZ,header)
 
   implicit none
   integer, intent(in) :: I,J,NZ
+  character(len=*), intent(in) :: header
   integer :: L,K,N,NE,NB
   real(r8) :: root1st,root2nd
 
@@ -864,7 +837,7 @@ module grosubsMod
         
       ShootElms_brch(NE,NB,NZ)=ShootStrutElms_brch(NE,NB,NZ)+CanopyNodulNonstElms_brch(NE,NB,NZ) &
         +CanopyNodulStrutElms_brch(NE,NB,NZ)+CanopyNonstElms_brch(NE,NB,NZ)
-      write(*,*)'NZ',NZ,NB,ShootElms_brch(NE,NB,NZ)  
+
     ENDDO
   ENDDO
   DO NE=1,NumPlantChemElms
@@ -908,20 +881,20 @@ module grosubsMod
   ENDIF
   
   if(NZ==1)then
-    if(lfile)then
-      write(243,'(A13,6(X,A16))')'doy','rootC','shootC','rootN','shootN','rootP','shootP'
+    if(lfile(NZ))then
+      write(243,'(A14,X,A13,6(X,A14))')'header','doy','rootC','shootC','rootN','shootN','rootP','shootP'
     endif
-    write(243,'(F13.6,6(X,F16.6))')I+J/24.,(RootElms_pft(NE,NZ),ShootElms_pft(NE,NZ),NE=1,NumPlantChemElms)    
-    write(*,*)I+J/24.,(RootElms_pft(NE,NZ),ShootElms_pft(NE,NZ),NE=1,NumPlantChemElms)    
+    write(243,'(A14,X,F13.6,6(X,F14.6))')trim(header),I+J/24.,&
+      (RootElms_pft(NE,NZ),ShootElms_pft(NE,NZ),NE=1,NumPlantChemElms)
   else
-    if(lfile)then
-      write(244,'(A13,6(X,A16))')'doy','rootC','shootC','rootN','shootN','rootP','shootP'
+    if(lfile(NZ))then
+      write(244,'(A14,X,A13,6(X,A14))')'header','doy','rootC','shootC','rootN','shootN','rootP','shootP'
     endif  
-    write(244,'(F13.6,6(X,F16.6))')I+J/24.,(RootElms_pft(NE,NZ),ShootElms_pft(NE,NZ),NE=1,NumPlantChemElms)
-    write(*,*)I+J/24.,(RootElms_pft(NE,NZ),ShootElms_pft(NE,NZ),NE=1,NumPlantChemElms)
+    write(244,'(A14,X,F13.6,6(X,F14.6))')trim(header),I+J/24.,&
+      (RootElms_pft(NE,NZ),ShootElms_pft(NE,NZ),NE=1,NumPlantChemElms)
   endif
   if(RootElms_pft(ielmc,NZ)>1.e16 .or. ShootElms_pft(ielmc,NZ)>1.e16)stop
-  lfile=.false.
+  lfile(NZ)=.false.
   end associate
   end subroutine SumPlantBiom
 end module grosubsMod
