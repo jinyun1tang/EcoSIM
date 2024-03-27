@@ -106,7 +106,7 @@ module grosubsMod
     CO2NetFix_pft(NZ)=0._r8
     CanopyHeight_copy(NZ)=CanopyHeight_pft(NZ)
     CanopyHeight_pft(NZ)=0._r8
-    NodulInfectElms_pft(NZ)=0._r8
+    NodulInfectElms_pft(1:NumPlantChemElms,NZ)=0._r8
   ENDDO D9980
 !
 !     TRANSFORMATIONS IN LIVING PLANT POPULATIONS
@@ -802,14 +802,18 @@ module grosubsMod
     CPOOL4_node                    =>  plt_photo%CPOOL4_node    , &
     iPlantPhotosynthesisType       =>  plt_photo%iPlantPhotosynthesisType   , &    
     NH3Dep2Can_pft                 =>  plt_bgcr%NH3Dep2Can_pft  , &             
-    NH3Dep2Can_brch                =>  plt_rbgc%NH3Dep2Can_brch  , &    
-    LitrfalStrutElms_pft           => plt_bgcr%LitrfalStrutElms_pft    , &
-    LitrfalStrutElms_pvr           => plt_bgcr%LitrfalStrutElms_pvr  , &    
-    NumOfBranches_pft              =>  plt_morph%NumOfBranches_pft    , &    
+    NH3Dep2Can_brch                =>  plt_rbgc%NH3Dep2Can_brch  , &    !
+    GrossResp_pft                  =>  plt_bgcr%GrossResp_pft , &
+    GrossCO2Fix_pft                =>  plt_bgcr%GrossCO2Fix_pft   , &
+    NodulInfectElms_pft            =>  plt_bgcr%NodulInfectElms_pft, &    
+    LitrfalStrutElms_pft           =>  plt_bgcr%LitrfalStrutElms_pft    , &
+    LitfalStrutElms_pvr            =>  plt_bgcr%LitfalStrutElms_pvr  , &    
+    NumOfBranches_pft              =>  plt_morph%NumOfBranches_pft    , &   
     MY                             =>  plt_morph%MY     , &        
     MaxSoiL4Root                   =>  plt_morph%MaxSoiL4Root     , &    
     NumRootAxes_pft                =>  plt_morph%NumRootAxes_pft   , &
-    MaxNumRootLays                 =>  plt_site%MaxNumRootLays      , &   
+    MaxNumRootLays                 =>  plt_site%MaxNumRootLays      , &  
+    NonStrutElms_pft               =>  plt_biom%NonStrutElms_pft     , &    
     RootElmsBeg_pft                =>  plt_biom%RootElmsBeg_pft     , &
     ShootElmsBeg_pft               =>  plt_biom%ShootElmsBeg_pft    , &
     RootMyco1stStrutElms_rpvr      =>  plt_biom%RootMyco1stStrutElms_rpvr  , &
@@ -842,13 +846,12 @@ module grosubsMod
         +PetoleStrutElms_brch(NE,NB,NZ)+StalkStrutElms_brch(NE,NB,NZ)+StalkRsrvElms_brch(NE,NB,NZ) &
         +HuskStrutElms_brch(NE,NB,NZ)+EarStrutElms_brch(NE,NB,NZ)+GrainStrutElms_brch(NE,NB,NZ) 
         
-      ShootElms_brch(NE,NB,NZ)=ShootStrutElms_brch(NE,NB,NZ)+CanopyNodulNonstElms_brch(NE,NB,NZ) &
-        +CanopyNodulStrutElms_brch(NE,NB,NZ)+CanopyNonstElms_brch(NE,NB,NZ)
+      ShootElms_brch(NE,NB,NZ)=ShootStrutElms_brch(NE,NB,NZ)+CanopyNonstElms_brch(NE,NB,NZ)
 
     ENDDO
   ENDDO
   DO NE=1,NumPlantChemElms
-    ShootElms_pft(NE,NZ)=sum(ShootElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
+    ShootElms_pft(NE,NZ)=sum(ShootElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))+NonStrutElms_pft(NE,NZ)
   ENDDO
   !add C4 specific reserve carbon
   IF(iPlantPhotosynthesisType(NZ).EQ.ic4_photo)THEN  
@@ -871,7 +874,7 @@ module grosubsMod
     RootElms_pft(NE,NZ)=RootStrutElms_pft(NE,NZ)+sum(RootMycoNonstElms_rpvr(NE,1:MY(NZ),NU:MaxNumRootLays,NZ))
   ENDDO
 
-  !add nodule
+  !add nodule, currently, a plant either has canopy or root N-fixing symbiosis, not both
   IF(is_plant_N2fix(iPlantNfixType(NZ)))THEN
     IF(is_canopy_N2fix(iPlantNfixType(NZ)))THEN
       DO NE=1,NumPlantChemElms
@@ -910,7 +913,7 @@ module grosubsMod
     NH3Dep2Can_pft(NZ)=NH3Dep2Can_pft(NZ)+NH3Dep2Can_brch(NB,NZ)
   ENDDO    
 
-  LitrfalStrutElms_pft(1:NumPlantChemElms,NZ)=0._r8
+!  LitrfalStrutElms_pft(1:NumPlantChemElms,NZ)=0._r8
   DO L=0,MaxNumRootLays
     DO K=1,pltpar%NumOfPlantLitrCmplxs      
       DO M=1,jsken
@@ -923,7 +926,7 @@ module grosubsMod
   balc=RootElms_pft(ielmc,NZ)+ShootElms_pft(ielmc,NZ)-GrossCO2Fix_pft(NZ)-GrossResp_pft(NZ) &
     +LitrfalStrutElms_pft(ielmc,NZ)-RootElmsBeg_pft(ielmc,NZ)-ShootElmsBeg_pft(ielmc,NZ)-NodulInfectElms_pft(ielmc,NZ)
 
-  WRITE(*,*)'BALC',NZ,BALC
+  WRITE(*,*)'BALC: '//trim(header),NZ,BALC
   end associate
   end subroutine SumPlantBiom
 
