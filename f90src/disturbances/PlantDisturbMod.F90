@@ -55,7 +55,7 @@ module PlantDisturbMod
           D1995: DO NX1=NHW,NHE
             D1990: DO NY1=NVN,NVS
               IF(LSG(NZ,NY1,NX1).EQ.LSG(NZ,NY,NX))THEN
-                IF(IsPlantActive_pft(NZ,NY1,NX1).EQ.iPlantIsActive)THEN
+                IF(IsPlantActive_pft(NZ,NY1,NX1).EQ.iActive)THEN
                   WTSHTZ=WTSHTZ+ShootStrutElms_pft(ielmc,NZ,NY1,NX1)
                   NN=NN+1
                 ENDIF

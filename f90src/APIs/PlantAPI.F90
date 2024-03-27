@@ -377,7 +377,7 @@ implicit none
       LeafElmntRemobFlx_brch(1:NumPlantChemElms,NB,NZ,NY,NX) =plt_pheno%LeafElmntRemobFlx_brch(1:NumPlantChemElms,NB,NZ)
       PetioleChemElmRemobFlx_brch(1:NumPlantChemElms,NB,NZ,NY,NX) =&
         plt_pheno%PetioleChemElmRemobFlx_brch(1:NumPlantChemElms,NB,NZ)
-      NH3Dep2_brch(NB,NZ,NY,NX) =plt_rbgc%NH3Dep2_brch(NB,NZ)
+      NH3Dep2Can_brch(NB,NZ,NY,NX) =plt_rbgc%NH3Dep2Can_brch(NB,NZ)
       TotalNodeNumNormByMatgrp_brch(NB,NZ,NY,NX)=plt_pheno%TotalNodeNumNormByMatgrp_brch(NB,NZ)
       TotReproNodeNumNormByMatrgrp_brch(NB,NZ,NY,NX)=plt_pheno%TotReproNodeNumNormByMatrgrp_brch(NB,NZ)
       Hours4LenthenPhotoPeriod_brch(NB,NZ,NY,NX)  =plt_pheno%Hours4LenthenPhotoPeriod_brch(NB,NZ)
@@ -1202,7 +1202,7 @@ implicit none
       plt_morph%NodeNumberAtAnthesis_brch(NB,NZ)=NodeNumberAtAnthesis_brch(NB,NZ,NY,NX)
       plt_pheno%LeafElmntRemobFlx_brch(1:NumPlantChemElms,NB,NZ)=LeafElmntRemobFlx_brch(1:NumPlantChemElms,NB,NZ,NY,NX)
       plt_pheno%PetioleChemElmRemobFlx_brch(1:NumPlantChemElms,NB,NZ)=PetioleChemElmRemobFlx_brch(1:NumPlantChemElms,NB,NZ,NY,NX)
-      plt_rbgc%NH3Dep2_brch(NB,NZ)=NH3Dep2_brch(NB,NZ,NY,NX)
+      plt_rbgc%NH3Dep2Can_brch(NB,NZ)=NH3Dep2Can_brch(NB,NZ,NY,NX)
       plt_pheno%TotalNodeNumNormByMatgrp_brch(NB,NZ)=TotalNodeNumNormByMatgrp_brch(NB,NZ,NY,NX)
       plt_pheno%TotReproNodeNumNormByMatrgrp_brch(NB,NZ)=TotReproNodeNumNormByMatrgrp_brch(NB,NZ,NY,NX)
       plt_pheno%LeafNumberAtFloralInit_brch(NB,NZ)=LeafNumberAtFloralInit_brch(NB,NZ,NY,NX)

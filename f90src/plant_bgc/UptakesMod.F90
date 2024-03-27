@@ -48,9 +48,12 @@ module UptakesMod
   real(r8) :: CanPMassC
   real(r8) :: ElvAdjstedtSoiPSIMPa(JZ1)
   real(r8) :: PATH(jroots,JZ1)
-  real(r8) :: FineRootRadius(jroots,JZ1),RootResist(jroots,JZ1)
-  real(r8) :: RootResistSoi(jroots,JZ1),RootResistRadial(jroots,JZ1)
-  real(r8) :: RootResistAxial(jroots,JZ1),SoiH2OResist(jroots,JZ1)
+  real(r8) :: FineRootRadius(jroots,JZ1)
+  real(r8) :: RootResist(jroots,JZ1)
+  real(r8) :: RootResistSoi(jroots,JZ1)
+  real(r8) :: RootResistRadial(jroots,JZ1)
+  real(r8) :: RootResistAxial(jroots,JZ1)
+  real(r8) :: SoiH2OResist(jroots,JZ1)
   real(r8) :: SoiAddRootResist(jroots,JZ1),AllRootC_vr(JZ1)
   real(r8) :: FracPRoot4Uptake(jroots,JZ1,JP1),MinFracPRoot4Uptake(jroots,JZ1,JP1)
   real(r8) :: FracSoiLayByPrimRoot(JZ1,JP1),RootAreaDivRadius_vr(jroots,JZ1)
@@ -58,19 +61,19 @@ module UptakesMod
   real(r8) :: TKCX,CNDT,PrecHeatIntcptByCanP1,VHCPX
   real(r8) :: DIFF,PSILH,cumPRootH2OUptake,VFLXC
   real(r8) :: FDMP
-  integer :: LayrHasRoot(2,JZ1)
+  integer :: LayrHasRoot(jroots,JZ1)
 !     begin_execution
-  associate(                         &
+  associate(                                                              &
     CanopyBndlResist_pft           => plt_photo%CanopyBndlResist_pft    , &
-    CanopyWater_pft                => plt_ew%CanopyWater_pft     , &
-    TCelciusCanopy_pft             => plt_ew%TCelciusCanopy_pft      , &
-    TKCanopy_pft                   => plt_ew%TKCanopy_pft      , &
-    PrecIntcptByCanopy_pft         => plt_ew%PrecIntcptByCanopy_pft      , &
-    EvapTransHeat_pft              => plt_ew%EvapTransHeat_pft     , &
-    TKC                            => plt_ew%TKC       , &
-    PSICanopy_pft                  => plt_ew%PSICanopy_pft    , &
-    HeatXAir2PCan                  => plt_ew%HeatXAir2PCan     , &
-    Canopy_Heat_Sens_col           => plt_ew%Canopy_Heat_Sens_col      , &
+    CanopyWater_pft                => plt_ew%CanopyWater_pft            , &
+    TCelciusCanopy_pft             => plt_ew%TCelciusCanopy_pft         , &
+    TKCanopy_pft                   => plt_ew%TKCanopy_pft               , &
+    PrecIntcptByCanopy_pft         => plt_ew%PrecIntcptByCanopy_pft     , &
+    EvapTransHeat_pft              => plt_ew%EvapTransHeat_pft          , &
+    TKC                            => plt_ew%TKC                        , &
+    PSICanopy_pft                  => plt_ew%PSICanopy_pft              , &
+    HeatXAir2PCan                  => plt_ew%HeatXAir2PCan              , &
+    Canopy_Heat_Sens_col           => plt_ew%Canopy_Heat_Sens_col       , &
     DTKC                           => plt_ew%DTKC      , &
     VapXAir2Canopy_pft             => plt_ew%VapXAir2Canopy_pft    , &
     TairK                          => plt_ew%TairK       , &
@@ -121,7 +124,7 @@ module UptakesMod
     PopPlantO2Uptake=0.0_r8
     PopPlantO2Demand=0.0_r8
 
-    IF(IsPlantActive_pft(NZ).EQ.iPlantIsActive.AND.PlantPopulation_pft(NZ).GT.0.0_r8)THEN
+    IF(IsPlantActive_pft(NZ).EQ.iActive.AND.PlantPopulation_pft(NZ).GT.0.0_r8)THEN
 
       call UpdateCanopyProperty(NZ)
 
@@ -222,7 +225,7 @@ module UptakesMod
 
       call SetCanopyGrowthFuncs(NZ)
 
-      call PopPlantNutientO2Uptake(I,NZ,FDMP,PopPlantO2Uptake,PopPlantO2Demand,&
+      call PlantNutientO2Uptake(I,NZ,FDMP,PopPlantO2Uptake,PopPlantO2Demand,&
         PATH,FineRootRadius,FracPRoot4Uptake,MinFracPRoot4Uptake,FracSoiLayByPrimRoot,RootAreaDivRadius_vr)
 
       Canopy_Heat_Latent_col=Canopy_Heat_Latent_col+EvapTransHeat_pft(NZ)*CanopyBndlResist_pft(NZ)
@@ -336,7 +339,7 @@ module UptakesMod
     AllRootC_vr(L)=0.0_r8
     D9005: DO NZ=1,NP
       DO  N=1,MY(NZ)
-!     IF(IsPlantActive_pft(NZ).EQ.iPlantIsActive.AND.PlantPopulation_pft(NZ).GT.0.0)THEN
+!     IF(IsPlantActive_pft(NZ).EQ.iActive.AND.PlantPopulation_pft(NZ).GT.0.0)THEN
       AllRootC_vr(L)=AllRootC_vr(L)+AZMAX1( PopuRootMycoC_pvr(N,L,NZ))
 !     ENDIF
       enddo
@@ -464,9 +467,12 @@ module UptakesMod
   implicit none
   integer , intent(in) :: NZ
   real(r8), intent(in) :: AllRootC_vr(JZ1)
-  real(r8), intent(out) :: PATH(2,JZ1),FineRootRadius(2,JZ1)
-  real(r8), intent(out) :: FracPRoot4Uptake(2,JZ1,JP1),MinFracPRoot4Uptake(2,JZ1,JP1)
-  real(r8), intent(out) :: FracSoiLayByPrimRoot(JZ1,JP1),RootAreaDivRadius_vr(2,JZ1)
+  real(r8), intent(out) :: PATH(jroots,JZ1)
+  real(r8), intent(out) :: FineRootRadius(jroots,JZ1)
+  real(r8), intent(out) :: FracPRoot4Uptake(jroots,JZ1,JP1)
+  real(r8), intent(out) :: MinFracPRoot4Uptake(jroots,JZ1,JP1)
+  real(r8), intent(out) :: FracSoiLayByPrimRoot(JZ1,JP1)
+  real(r8), intent(out) :: RootAreaDivRadius_vr(jroots,JZ1)
   real(r8) :: RootDepZ,RTDPX
   integer :: N,L,NR
 
@@ -482,13 +488,13 @@ module UptakesMod
     NumRootAxes_pft          =>  plt_morph%NumRootAxes_pft    , &
     MY                       =>  plt_morph%MY      , &
     RootLenDensPerPlant_pvr  =>  plt_morph%RootLenDensPerPlant_pvr   , &
-    Max2ndRootRadius_pft1        =>  plt_morph%Max2ndRootRadius_pft1  , &
+    Max2ndRootRadius_pft1    =>  plt_morph%Max2ndRootRadius_pft1  , &
     HypoctoHeight_pft        =>  plt_morph%HypoctoHeight_pft   , &
     RootLenPerPlant_pvr      =>  plt_morph%RootLenPerPlant_pvr   , &
-    Root1stDepz_pft            =>  plt_morph%Root1stDepz_pft   , &
-    RootPorosity_pft             =>  plt_morph%RootPorosity_pft    , &
-    RootVH2O_pvr              =>  plt_morph%RootVH2O_pvr  , &
-    Max2ndRootRadius_pft         =>  plt_morph%Max2ndRootRadius_pft  , &
+    Root1stDepz_pft          =>  plt_morph%Root1stDepz_pft   , &
+    RootPorosity_pft         =>  plt_morph%RootPorosity_pft    , &
+    RootVH2O_pvr             =>  plt_morph%RootVH2O_pvr  , &
+    Max2ndRootRadius_pft     =>  plt_morph%Max2ndRootRadius_pft  , &
     SeedDepth_pft            =>  plt_morph%SeedDepth_pft   , &
     MaxSoiL4Root             =>  plt_morph%MaxSoiL4Root        &
   )
@@ -650,10 +656,11 @@ module UptakesMod
   integer  , intent(in) :: I, J
   integer  , intent(in) :: NZ
   real(r8) , intent(in) :: FracGrndByPFT,CanPMassC,ElvAdjstedtSoiPSIMPa(JZ1)
-  real(r8) , intent(in) :: SoiAddRootResist(2,JZ1),FracPRoot4Uptake(2,JZ1,JP1)
+  real(r8) , intent(in) :: SoiAddRootResist(jroots,JZ1)
+  real(r8) , intent(in) :: FracPRoot4Uptake(jroots,JZ1,JP1)
   real(r8) , intent(in) :: AirPoreAvail4Fill(JZ1),WatAvail4Uptake(JZ1)
   real(r8) , intent(in) :: TKCX,CNDT,VHCPX,PrecHeatIntcptByCanP1,PSILH
-  integer  , intent(in) :: LayrHasRoot(2,JZ1)
+  integer  , intent(in) :: LayrHasRoot(jroots,JZ1)
   real(r8) , intent(out):: HeatSensConductCanP,DIFF,cumPRootH2OUptake,VFLXC,FDMP
   real(r8) :: APSILT
   real(r8) :: CCPOLT
@@ -1061,13 +1068,14 @@ module UptakesMod
 
   implicit none
   integer, intent(in)   :: NZ
-  real(r8), intent(in)  :: PATH(2,JZ1),FineRootRadius(2,JZ1),RootAreaDivRadius_vr(2,JZ1)
-  real(r8), intent(out) :: RootResist(2,JZ1),RootResistSoi(2,JZ1)
-  real(r8), intent(out) :: RootResistRadial(2,JZ1),RootResistAxial(2,JZ1)
-  real(r8), intent(out) :: SoiH2OResist(2,JZ1),SoiAddRootResist(2,JZ1)
+  real(r8), intent(in)  :: PATH(jroots,JZ1),FineRootRadius(jroots,JZ1)
+  real(r8), intent(in)  :: RootAreaDivRadius_vr(jroots,JZ1)
+  real(r8), intent(out) :: RootResist(jroots,JZ1),RootResistSoi(jroots,JZ1)
+  real(r8), intent(out) :: RootResistRadial(jroots,JZ1),RootResistAxial(jroots,JZ1)
+  real(r8), intent(out) :: SoiH2OResist(jroots,JZ1),SoiAddRootResist(jroots,JZ1)
   real(r8), intent(out) :: CNDT  !total root conductance
   real(r8), intent(out) :: PSILH
-  integer, intent(out) :: LayrHasRoot(2,JZ1)
+  integer, intent(out) :: LayrHasRoot(jroots,JZ1)
   real(r8) :: FRADW,FRAD1,FRAD2
   real(r8) :: RSSL,RTAR2
   integer :: N, L
@@ -1300,10 +1308,13 @@ module UptakesMod
 
   implicit none
   integer, intent(in) :: NZ
-  real(r8), intent(in) :: HeatSensConductCanP,ElvAdjstedtSoiPSIMPa(JZ1),RootResist(2,JZ1)
-  real(r8), intent(in) :: SoiH2OResist(2,JZ1),SoiAddRootResist(2,JZ1)
+  real(r8), intent(in) :: HeatSensConductCanP
+  real(r8), intent(in) :: ElvAdjstedtSoiPSIMPa(JZ1)
+  real(r8), intent(in) :: RootResist(jroots,JZ1)
+  real(r8), intent(in) :: SoiH2OResist(jroots,JZ1)
+  real(r8), intent(in) :: SoiAddRootResist(jroots,JZ1)
   real(r8), intent(in) :: TKCX,VHCPX,PrecHeatIntcptByCanP1,cumPRootH2OUptake,VFLXC
-  integer , intent(in) :: LayrHasRoot(2,JZ1)
+  integer , intent(in) :: LayrHasRoot(jroots,JZ1)
   real(r8) :: CCPOLT
   real(r8) :: FDMR
   real(r8) :: OSWT

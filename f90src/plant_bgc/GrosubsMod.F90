@@ -77,8 +77,8 @@ module grosubsMod
     NP0                     => plt_site%NP0      , &
     MaxNumRootLays          => plt_site%MaxNumRootLays       , &
     CO2NetFix_pft           => plt_bgcr%CO2NetFix_pft     , &
-    LitrfalStrutElms_pft     => plt_bgcr%LitrfalStrutElms_pft    , &
-    LitfalStrutElms_pvr       => plt_bgcr%LitfalStrutElms_pvr     , &
+    LitrfalStrutElms_pft    => plt_bgcr%LitrfalStrutElms_pft    , &
+    LitfalStrutElms_pvr     => plt_bgcr%LitfalStrutElms_pvr     , &
     CanopyHeight_pft        => plt_morph%CanopyHeight_pft       &
   )
 !     TOTAL AGB FOR GRAZING IN LANDSCAPE SECTION
@@ -113,7 +113,7 @@ module grosubsMod
   D9985: DO NZ=1,NP
 
 ! IsPlantActive_pft= flag for living pft
-    IF(IsPlantActive_pft(NZ).EQ.iPlantIsActive)THEN
+    IF(IsPlantActive_pft(NZ).EQ.iActive)THEN
       call GrowPlant(I,J,NZ,CanopyHeight_copy)
     ENDIF
 
@@ -267,7 +267,7 @@ module grosubsMod
 !
     NetPrimProduct_pft(NZ)=GrossCO2Fix_pft(NZ)+GrossResp_pft(NZ)
 
-    IF(IsPlantActive_pft(NZ).EQ.iPlantIsActive)THEN
+    IF(IsPlantActive_pft(NZ).EQ.iActive)THEN
       !check for living plant
       DO NE=1,NumPlantChemElms
         ElmBalanceCum_pft(NE,NZ)=ShootStrutElms_pft(NE,NZ)+RootElms_pft(NE,NZ)+NodulStrutElms_pft(NE,NZ) &
@@ -344,8 +344,8 @@ module grosubsMod
     RootNH4Uptake_pft         => plt_rbgc%RootNH4Uptake_pft        , &
     RootHPO4Uptake_pft        => plt_rbgc%RootHPO4Uptake_pft        , &
     RootNO3Uptake_pft         => plt_rbgc%RootNO3Uptake_pft        , &
-    PlantRootSoilElmNetX_pft => plt_rbgc%PlantRootSoilElmNetX_pft       , &
-    RootMycoExudElms_pft       => plt_rbgc%RootMycoExudElms_pft        , &
+    PlantRootSoilElmNetX_pft  => plt_rbgc%PlantRootSoilElmNetX_pft       , &
+    RootMycoExudElms_pft      => plt_rbgc%RootMycoExudElms_pft        , &
     NumOfBranches_pft         => plt_morph%NumOfBranches_pft         , &
     NumRootAxes_pft           => plt_morph%NumRootAxes_pft          &
   )
@@ -372,12 +372,6 @@ module grosubsMod
     call RootBGCModel(I,J,NZ,BegRemoblize,ICHK1,NRX,PTRT,TFN6_vr,CNRTW,CPRTW,RootAreaPopu)
 !
     call ComputeTotalBiom(I,J,NZ)
-  ELSE
-    PlantRootSoilElmNetX_pft(1:NumPlantChemElms,NZ)=RootMycoExudElms_pft(1:NumPlantChemElms,NZ)
-    PlantRootSoilElmNetX_pft(ielmn,NZ)=PlantRootSoilElmNetX_pft(ielmn,NZ)+RootNH4Uptake_pft(NZ)&
-      +RootNO3Uptake_pft(NZ)+RootN2Fix_pft(NZ)
-    PlantRootSoilElmNetX_pft(ielmp,NZ)=PlantRootSoilElmNetX_pft(ielmp,NZ)+RootH2PO4Uptake_pft(NZ)&
-      +RootHPO4Uptake_pft(NZ)
   ENDIF
 !
   call SumPlantBiom(I,J,NZ,'bfrmbiom')
@@ -772,7 +766,6 @@ module grosubsMod
 
   PlantExudChemElmCum_pft(1:NumPlantChemElms,NZ)=PlantExudChemElmCum_pft(1:NumPlantChemElms,NZ)+&
     RootMycoExudElms_pft(1:NumPlantChemElms,NZ)
-
   PlantExudChemElmCum_pft(ielmn,NZ)=PlantExudChemElmCum_pft(ielmn,NZ)+ &
     RootNH4Uptake_pft(NZ)+RootNO3Uptake_pft(NZ)
   PlantExudChemElmCum_pft(ielmp,NZ)=PlantExudChemElmCum_pft(ielmp,NZ)+ &
@@ -800,11 +793,13 @@ module grosubsMod
     CPOOL3_node                    =>  plt_photo%CPOOL3_node    , &
     CPOOL4_node                    =>  plt_photo%CPOOL4_node    , &
     iPlantPhotosynthesisType       =>  plt_photo%iPlantPhotosynthesisType   , &    
+    NH3Dep2Can_pft                 =>  plt_bgcr%NH3Dep2Can_pft  , &             
+    NH3Dep2Can_brch                => plt_rbgc%NH3Dep2Can_brch  , &    
     NumOfBranches_pft              =>  plt_morph%NumOfBranches_pft    , &    
     MY                             =>  plt_morph%MY     , &        
     MaxSoiL4Root                   =>  plt_morph%MaxSoiL4Root     , &    
     NumRootAxes_pft                =>  plt_morph%NumRootAxes_pft   , &
-    MaxNumRootLays                 =>  plt_site%MaxNumRootLays      , &        
+    MaxNumRootLays                 =>  plt_site%MaxNumRootLays      , &   
     RootMyco1stStrutElms_rpvr      =>  plt_biom%RootMyco1stStrutElms_rpvr  , &
     RootMyco2ndStrutElms_rpvr      =>  plt_biom%RootMyco2ndStrutElms_rpvr  , &    
     RootMycoNonstElms_rpvr         =>  plt_biom%RootMycoNonstElms_rpvr , &
@@ -824,7 +819,7 @@ module grosubsMod
     RootElms_pft                   =>  plt_biom%RootElms_pft    , &    
     ShootElms_brch                 =>  plt_biom%ShootElms_brch  , &
     RootStrutElms_pft              =>  plt_biom%RootStrutElms_pft, &
-    ShootC4NonstC_brch             =>  plt_biom%ShootC4NonstC_brch, &        
+    ShootC4NonstC_brch             =>  plt_biom%ShootC4NonstC_brch, &            
     ShootElms_pft                  =>  plt_biom%ShootElms_pft     &
   )
 
@@ -895,6 +890,13 @@ module grosubsMod
   endif
   if(RootElms_pft(ielmc,NZ)>1.e16 .or. ShootElms_pft(ielmc,NZ)>1.e16)stop
   lfile(NZ)=.false.
+
+  !sum fluxes
+!     NH3Dep2Can_brch,NH3Dep2Can_pft=PFT NH3 flux between atmosphere and branch,canopy
+  NH3Dep2Can_pft(NZ)=0._r8
+  DO NB=1,NumOfBranches_pft(NZ)
+    NH3Dep2Can_pft(NZ)=NH3Dep2Can_pft(NZ)+NH3Dep2Can_brch(NB,NZ)
+  ENDDO    
   end associate
   end subroutine SumPlantBiom
 end module grosubsMod

@@ -75,8 +75,8 @@ implicit none
   integer, parameter :: iLive=0  !plant organ alive
   integer, parameter :: iDead=1  !plant organ dead
 
-  integer, parameter :: iPlantIsActive=1  !plant active
-  integer, parameter :: iPlantIsDormant =0  !plant dormant/dead
+  integer, parameter :: iActive=1  !plant active
+  integer, parameter :: iDormant =0  !plant dormant/dead
 
   integer, parameter :: jharvtyp_noaction=0
   integer, parameter :: jharvtyp_terminate=1

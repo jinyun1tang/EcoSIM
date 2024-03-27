@@ -419,7 +419,7 @@ implicit none
   real(r8), intent(in) :: WFNG
   real(r8), intent(in) :: Stomata_Activity    !between 0. and 1., a function of canopy turgor
   real(r8), intent(out) :: CH2O3(MaxNodesPerBranch1),CH2O4(MaxNodesPerBranch1)
-  real(r8), intent(out) :: CO2F,CH2O
+  real(r8), intent(out) :: CO2F,CH2O   !CO2 fixation
   real(r8), intent(out) :: CH2OClm,CH2OLlm
   real(r8) :: ZADDB,PADDB
   real(r8) :: CH2OClmK,CH2OLlmK

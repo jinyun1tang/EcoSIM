@@ -15,12 +15,12 @@ module NutUptakeMod
 
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
-  public :: PopPlantNutientO2Uptake
+  public :: PlantNutientO2Uptake
   contains
 
 !------------------------------------------------------------------------
 
-  subroutine PopPlantNutientO2Uptake(I,NZ,FDMP,PopPlantO2Uptake,PopPlantO2Demand,&
+  subroutine PlantNutientO2Uptake(I,NZ,FDMP,PopPlantO2Uptake,PopPlantO2Demand,&
     PATH,FineRootRadius,FracPRoot4Uptake,MinFracPRoot4Uptake,FracSoiLayByPrimRoot,RootAreaDivRadius_vr)
   !
   !DESCRIPTION
@@ -40,7 +40,7 @@ module NutUptakeMod
   call RootMycoO2NutrientUptake(I,NZ,PopPlantO2Uptake,PopPlantO2Demand,PATH,FineRootRadius,&
     FracPRoot4Uptake,MinFracPRoot4Uptake,FracSoiLayByPrimRoot,RootAreaDivRadius_vr)
 
-  end subroutine PopPlantNutientO2Uptake
+  end subroutine PlantNutientO2Uptake
 !------------------------------------------------------------------------
 
   subroutine CanopyNH3Flux(NZ,FDMP)
@@ -58,7 +58,7 @@ module NutUptakeMod
     TCelciusCanopy_pft         =>  plt_ew%TCelciusCanopy_pft       , &
     NU                         =>  plt_site%NU       , &
     AREA3                      =>  plt_site%AREA3    , &
-    NH3Dep2_brch               =>  plt_rbgc%NH3Dep2_brch    , &
+    NH3Dep2Can_brch               =>  plt_rbgc%NH3Dep2Can_brch    , &
     ZEROP                      =>  plt_biom%ZEROP    , &
     AtmGasc                    =>  plt_site%AtmGasc  , &    
     LeafPetolBiomassC_brch     =>  plt_biom%LeafPetolBiomassC_brch    , &
@@ -82,7 +82,7 @@ module NutUptakeMod
   !     LeafAreaLive_brch,CanopyLeafArea_pft=branch,canopy leaf area
   !     CNH3P,AtmGasc(idg_NH3)=gaseous NH3 concentration in branch,atmosphere
   !     CZPOLB,ZPOOLB=nonstplt_rbgc%RUCtural N concentration,content in branch
-  !     NH3Dep2_brch=NH3 flux between atmosphere and branch
+  !     NH3Dep2Can_brch=NH3 flux between atmosphere and branch
   !     RA,CanPStomaResistH2O_pft=canopy boundary layer,stomatal resistance
   !     FracRadPARbyCanopy_pft=fraction of radiation received by each PFT canopy
   !
@@ -94,15 +94,15 @@ module NutUptakeMod
         .AND.CanopyLeafArea_pft(NZ).GT.ZEROP(NZ))THEN
         CNH3P=AZMAX1(FNH3P*LeafPetoNonstElmConc_brch(ielmn,NB,NZ)/SNH3P)
         ZPOOLB=AZMAX1(CanopyNonstElms_brch(ielmn,NB,NZ))
-        NH3Dep2_brch(NB,NZ)=AMIN1(0.1_r8*ZPOOLB &
+        NH3Dep2Can_brch(NB,NZ)=AMIN1(0.1_r8*ZPOOLB &
           ,AMAX1((AtmGasc(idg_NH3)-CNH3P)/(CanopyBndlResist_pft(NZ)+CanPStomaResistH2O_pft(NZ)) &
           *FracRadPARbyCanopy_pft(NZ)*AREA3(NU)*LeafAreaLive_brch(NB,NZ)/CanopyLeafArea_pft(NZ),-0.1_r8*ZPOOLB))
       ELSE
-        NH3Dep2_brch(NB,NZ)=0.0_r8
+        NH3Dep2Can_brch(NB,NZ)=0.0_r8
       ENDIF
     ENDDO D105
   ELSE
-    NH3Dep2_brch(1:NumOfBranches_pft(NZ),NZ)=0.0_r8
+    NH3Dep2Can_brch(1:NumOfBranches_pft(NZ),NZ)=0.0_r8
   ENDIF
   end associate
   end subroutine CanopyNH3Flux
@@ -192,7 +192,7 @@ module NutUptakeMod
 
       ENDIF
 
-      call SumupNutrientUptake(N,L,NZ)
+      call SumNutrientUptake(N,L,NZ)
 
     ENDDO D950
   ENDDO D955
@@ -1298,7 +1298,7 @@ module NutUptakeMod
   end subroutine RootExudates
 !------------------------------------------------------------------------
 
-  subroutine SumupNutrientUptake(N,L,NZ)
+  subroutine SumNutrientUptake(N,L,NZ)
 
   implicit none
   integer, intent(in) :: N, L
@@ -1309,7 +1309,7 @@ module NutUptakeMod
   associate(                              &
     RDOM_micb_flx          =>  plt_bgcr%RDOM_micb_flx     , &
     RootMycoExudElm_pvr    =>  plt_rbgc%RootMycoExudElm_pvr    , &
-    RootMycoExudElms_pft    =>  plt_rbgc%RootMycoExudElms_pft     , &
+    RootMycoExudElms_pft   =>  plt_rbgc%RootMycoExudElms_pft     , &
     RootHPO4Uptake_pft     =>  plt_rbgc%RootHPO4Uptake_pft     , &
     RootH2PO4Uptake_pft    =>  plt_rbgc%RootH2PO4Uptake_pft     , &
     RootNH4Uptake_pft      =>  plt_rbgc%RootNH4Uptake_pft     , &
@@ -1343,6 +1343,6 @@ module NutUptakeMod
   RootHPO4Uptake_pft(NZ)=RootHPO4Uptake_pft(NZ) &
     +(RootNutUptake_pvr(ids_H1PO4,N,L,NZ)+RootNutUptake_pvr(ids_H1PO4B,N,L,NZ))
   end associate
-  end subroutine SumupNutrientUptake
+  end subroutine SumNutrientUptake
 
 end module NutUptakeMod

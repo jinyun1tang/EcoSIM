@@ -151,7 +151,7 @@ module VisualMod
 !
 !     HOURLY AGGREGATION
 !
-!     IF(IsPlantActive_pft(NZ,NY,NX).EQ.iPlantIsActive)THEN
+!     IF(IsPlantActive_pft(NZ,NY,NX).EQ.iActive)THEN
 !     IF(I.EQ.iDayPlanting_pft(NZ,NY,NX))THEN
 !     ND=0
 !     TCCTX=0.0
