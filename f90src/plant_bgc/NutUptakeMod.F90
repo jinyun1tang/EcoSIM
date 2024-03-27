@@ -130,12 +130,12 @@ module NutUptakeMod
     ZERO                    =>  plt_site%ZERO        , &
     ZEROP                   =>  plt_biom%ZEROP       , &
     ROXYP                   =>  plt_rbgc%ROXYP       , &
-    RAutoRootO2Limter_pvr  =>  plt_rbgc%RAutoRootO2Limter_pvr        , &
+    RAutoRootO2Limter_pvr   =>  plt_rbgc%RAutoRootO2Limter_pvr        , &
     RootRespPotent_pvr      =>  plt_rbgc%RootRespPotent_pvr       , &
     RootLenPerPlant_pvr     =>  plt_morph%RootLenPerPlant_pvr      , &
     MY                      =>  plt_morph%MY         , &
     RootLenDensPerPlant_pvr =>  plt_morph%RootLenDensPerPlant_pvr      , &
-    RootVH2O_pvr             =>  plt_morph%RootVH2O_pvr     , &
+    RootVH2O_pvr            =>  plt_morph%RootVH2O_pvr     , &
     MaxSoiL4Root            =>  plt_morph%MaxSoiL4Root           &
   )
 
@@ -212,7 +212,7 @@ module NutUptakeMod
   plt_rbgc%trcg_air2root_flx__pvr(idg_beg:idg_end-1,1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%trcg_Root_DisEvap_flx_vr(idg_beg:idg_end-1,1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%RUPGasSol_vr(idg_beg:idg_end,1:NN,L1:L2,NZ)=0.0_r8
-  plt_rbgc%RCO2P(1:NN,L1:L2,NZ)=0.0_r8
+  plt_rbgc%RCO2P_pvr(1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%RUPOXP(1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%RootMycoExudElm_pvr(1:NumPlantChemElms,1:NN,1:jcplx,L1:L2,NZ)=0.0_r8
   plt_rbgc%RAutoRootO2Limter_pvr(1:NN,L1:L2,NZ)=1.0
@@ -361,9 +361,9 @@ module NutUptakeMod
     PlantPopulation_pft       =>  plt_site%PlantPopulation_pft         , &
     TortMicPM                 =>  plt_site%TortMicPM       , &
     ZERO                      =>  plt_site%ZERO       , &
-    RootAreaPerPlant_pvr       =>  plt_morph%RootAreaPerPlant_pvr     , &
-    fTgrowRootP_vr               =>  plt_pheno%fTgrowRootP_vr      , &
-    RAutoRootO2Limter_pvr    =>  plt_rbgc%RAutoRootO2Limter_pvr       , &
+    RootAreaPerPlant_pvr      =>  plt_morph%RootAreaPerPlant_pvr     , &
+    fTgrowRootP_vr            =>  plt_pheno%fTgrowRootP_vr      , &
+    RAutoRootO2Limter_pvr     =>  plt_rbgc%RAutoRootO2Limter_pvr       , &
     VmaxNO3Root_pft           =>  plt_rbgc%VmaxNO3Root_pft     , &
     CminNO3Root_pft           =>  plt_rbgc%CminNO3Root_pft     , &
     KmNO3Root_pft             =>  plt_rbgc%KmNO3Root_pft     , &
@@ -721,7 +721,7 @@ module NutUptakeMod
     RootNutUptake_pvr           => plt_rbgc%RootNutUptake_pvr     , &
     RootOUlmNutUptake_pvr       => plt_rbgc%RootOUlmNutUptake_pvr     , &
     RUPP1B                      => plt_rbgc%RUPP1B     , &
-    RootAreaPerPlant_pvr         => plt_morph%RootAreaPerPlant_pvr     , &
+    RootAreaPerPlant_pvr        => plt_morph%RootAreaPerPlant_pvr     , &
     VLWatMicP                   => plt_soilchem%VLWatMicP   , &
     trcs_VLN_vr                 => plt_soilchem%trcs_VLN_vr  , &
     trc_solcl_vr                => plt_soilchem%trc_solcl_vr  , &
@@ -870,7 +870,7 @@ module NutUptakeMod
   associate(                             &
     PlantPopulation_pft         => plt_site%PlantPopulation_pft         , &
     ZERO                        => plt_site%ZERO       , &
-    RAutoRootO2Limter_pvr      => plt_rbgc%RAutoRootO2Limter_pvr       , &
+    RAutoRootO2Limter_pvr       => plt_rbgc%RAutoRootO2Limter_pvr       , &
     KmPO4Root_pft               => plt_rbgc%KmPO4Root_pft     , &
     VmaxPO4Root_pft             => plt_rbgc%VmaxPO4Root_pft     , &
     CMinPO4Root_pft             => plt_rbgc%CMinPO4Root_pft     , &
@@ -1108,9 +1108,9 @@ module NutUptakeMod
     ZEROP                           => plt_biom%ZEROP   , &
     RootProteinConc_pvr             => plt_biom%RootProteinConc_pvr  , &
     RootProteinC_pvr                => plt_biom%RootProteinC_pvr   , &
-    RootMycoNonstElms_rpvr            => plt_biom%RootMycoNonstElms_rpvr  , &
+    RootMycoNonstElms_rpvr          => plt_biom%RootMycoNonstElms_rpvr  , &
     RootNonstructElmConc_pvr        => plt_biom%RootNonstructElmConc_pvr  , &
-    RootMycoActiveBiomC_pvr              => plt_biom%RootMycoActiveBiomC_pvr    &
+    RootMycoActiveBiomC_pvr         => plt_biom%RootMycoActiveBiomC_pvr    &
   )
   !
   !     UPTAKE CAPACITY 'FWSRT' DEPENDS ON ROOT,MYCORRHIZAL
@@ -1326,9 +1326,10 @@ module NutUptakeMod
   !     RootNH4Uptake_pft,RootNO3Uptake_pft,RootH2PO4Uptake_pft,RootHPO4Uptake_pft=PFT uptake of NH4,NO3,H2PO4,HPO4
   !
   D295: DO K=1,jcplx
-    RootMycoExudElms_pft(ielmc,NZ)=RootMycoExudElms_pft(ielmc,NZ)+RootMycoExudElm_pvr(ielmc,N,K,L,NZ)
-    RootMycoExudElms_pft(ielmn,NZ)=RootMycoExudElms_pft(ielmn,NZ)+RootMycoExudElm_pvr(ielmn,N,K,L,NZ)
-    RootMycoExudElms_pft(ielmp,NZ)=RootMycoExudElms_pft(ielmp,NZ)+RootMycoExudElm_pvr(ielmp,N,K,L,NZ)
+    DO NE=1,NumPlantChemElms
+      RootMycoExudElms_pft(NE,NZ)=RootMycoExudElms_pft(NE,NZ)+RootMycoExudElm_pvr(NE,N,K,L,NZ)
+    ENDDO
+
     RDOM_micb_flx(idom_doc,K,L)=RDOM_micb_flx(idom_doc,K,L)-RootMycoExudElm_pvr(ielmc,N,K,L,NZ)
     RDOM_micb_flx(idom_don,K,L)=RDOM_micb_flx(idom_don,K,L)-RootMycoExudElm_pvr(ielmn,N,K,L,NZ)
     RDOM_micb_flx(idom_dop,K,L)=RDOM_micb_flx(idom_dop,K,L)-RootMycoExudElm_pvr(ielmp,N,K,L,NZ)

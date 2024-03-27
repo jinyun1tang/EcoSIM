@@ -3884,8 +3884,9 @@ module PlantBranchMod
 !       FWODB=C woody fraction in other organs:0=woody,1=non-woody
 !       FWODSN,FWODSP=N,P woody fraction in petiole:0=woody,1=non-woody
 !
-      DO NE=1,NumPlantChemElms
-        D6305: DO M=1,jsken
+      
+      D6305: DO M=1,jsken
+        DO NE=1,NumPlantChemElms
           LitfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)=LitfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ) &
             +CFOPE(NE,icwood,M,NZ)*FSNCS*(PetioleChemElmRemob_brch(NE,NB,NZ)&
             -PetioleChemElmRemobFlx_brch(NE,NB,NZ))*FWODBE(NE,k_woody_litr)
@@ -3893,8 +3894,8 @@ module PlantBranchMod
           LitfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ) &
             +CFOPE(NE,inonfoliar,M,NZ)*FSNCS*(PetioleChemElmRemob_brch(NE,NB,NZ)&
             -PetioleChemElmRemobFlx_brch(NE,NB,NZ))*FWODBE(NE,k_fine_litr)
-        ENDDO D6305
-      ENDDO
+        ENDDO    
+      ENDDO D6305      
 !
 !       UPDATE STATE VARIABLES FOR REMOBILIZATION AND LitrFall
 !

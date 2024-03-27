@@ -38,7 +38,7 @@ implicit none
 !begin_execution
   associate(                          &
   ZERO                          => plt_site%ZERO   , &
-  iPlantRootProfile_pft      => plt_pheno%iPlantRootProfile_pft, &
+  iPlantRootProfile_pft         => plt_pheno%iPlantRootProfile_pft, &
   RubiscoActivity_brch          => plt_photo%RubiscoActivity_brch  , &
   CanopyGasCO2_pft              => plt_photo%CanopyGasCO2_pft  , &
   LeafAUnshaded_zsec            => plt_photo%LeafAUnshaded_zsec , &
@@ -228,7 +228,7 @@ implicit none
   real(r8) :: PAR_zsec,Tau_rad
 ! begin_execution
   associate(                                                               &
-  iPlantRootProfile_pft          => plt_pheno%iPlantRootProfile_pft, &
+  iPlantRootProfile_pft             => plt_pheno%iPlantRootProfile_pft, &
   ZEROP                             => plt_biom%ZEROP  , &
   Km4PEPCarboxy_pft                 => plt_photo%Km4PEPCarboxy_pft, &
   NutrientCtrlonC4Carboxy_node      => plt_photo%NutrientCtrlonC4Carboxy_node , &

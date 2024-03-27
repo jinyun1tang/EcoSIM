@@ -46,7 +46,7 @@ module PlantDataRateType
   real(r8),target,allocatable ::  ROXYP(:,:,:,:,:)                   !root  O2 demand from respiration, [g d-2 h-1]
   real(r8),target,allocatable ::  trcg_air2root_flx__pvr(:,:,:,:,:,:)                  !gaseous tracer flux through roots, [g d-2 h-1]
   real(r8),target,allocatable ::  trcg_Root_DisEvap_flx_vr(:,:,:,:,:,:)                  !dissolution (+ve) - volatilization (-ve) gas flux in roots, [g d-2 h-1]
-  real(r8),target,allocatable ::  RCO2P(:,:,:,:,:)                   !aqueous CO2 flux from roots to root water , [g d-2 h-1]
+  real(r8),target,allocatable ::  RCO2P_pvr(:,:,:,:,:)                   !aqueous CO2 flux from roots to root water , [g d-2 h-1]
   real(r8),target,allocatable ::  RUPOXP(:,:,:,:,:)                  !aqueous O2 flux from roots to root water , [g d-2 h-1]
   real(r8),target,allocatable ::  RootRespPotent_pvr(:,:,:,:,:)                   !root respiration unconstrained by O2, [g d-2 h-1]
   real(r8),target,allocatable ::  RCO2A_pvr(:,:,:,:,:)                   !root respiration constrained by O2, [g d-2 h-1]
@@ -157,7 +157,7 @@ module PlantDataRateType
   allocate(trcg_air2root_flx__pvr(idg_beg:idg_end-1,2,JZ,JP,JY,JX));trcg_air2root_flx__pvr=0._r8
   allocate(trcg_Root_DisEvap_flx_vr(idg_beg:idg_end-1,2,JZ,JP,JY,JX));trcg_Root_DisEvap_flx_vr=0._r8
   allocate(RUPGasSol_vr(idg_beg:idg_end,jroots,JZ,JP,JY,JX));RUPGasSol_vr=0._r8
-  allocate(RCO2P(jroots,JZ,JP,JY,JX));RCO2P=0._r8
+  allocate(RCO2P_pvr(jroots,JZ,JP,JY,JX));RCO2P_pvr=0._r8
   allocate(RUPOXP(jroots,JZ,JP,JY,JX));RUPOXP=0._r8
   allocate(RootRespPotent_pvr(jroots,JZ,JP,JY,JX));RootRespPotent_pvr=0._r8
   allocate(RCO2A_pvr(jroots,JZ,JP,JY,JX));RCO2A_pvr=0._r8
@@ -254,7 +254,7 @@ module PlantDataRateType
   call destroy(N2ObyFire_pft)
   call destroy(PO4byFire_pft)
   call destroy(ROXYP)  
-  call destroy(RCO2P)
+  call destroy(RCO2P_pvr)
   call destroy(RUPOXP)
   call destroy(RootRespPotent_pvr)
   call destroy(RCO2A_pvr)

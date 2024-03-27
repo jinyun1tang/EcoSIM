@@ -61,8 +61,8 @@ module CanopyDataType
   real(r8),target,allocatable ::  LeafC3ChlorofilConc_pft(:,:,:)                         !leaf C3 chlorophyll content, [g g-1]
   real(r8),target,allocatable ::  LeafC4ChlorofilConc_pft(:,:,:)                        !leaf C4 chlorophyll content, [g g-1]
   real(r8),target,allocatable ::  CanPCi2CaRatio(:,:,:)                        !Ci:Ca ratio, [-]
-  real(r8),target,allocatable ::  RadNet2CanP(:,:,:)                 !canopy net radiation , [MJ d-2 h-1] >0
-  real(r8),target,allocatable ::  LWRadCanP(:,:,:)                   !canopy longwave radiation , [MJ d-2 h-1]
+  real(r8),target,allocatable ::  RadNet2Canopy_pft(:,:,:)                 !canopy net radiation , [MJ d-2 h-1] >0
+  real(r8),target,allocatable ::  LWRadCanopy_pft(:,:,:)                   !canopy longwave radiation , [MJ d-2 h-1]
   real(r8),target,allocatable ::  RadSWbyCanopy_pft(:,:,:)                 !canopy absorbed shortwave radiation , [MJ d-2 h-1]
   real(r8),target,allocatable ::  RadPARbyCanopy_pft(:,:,:)                   !canopy absorbed PAR , [umol m-2 s-1]
   real(r8),target,allocatable ::  FracRadPARbyCanopy_pft(:,:,:)                       !fraction of incoming PAR absorbed by canopy, [-]
@@ -215,8 +215,8 @@ module CanopyDataType
   allocate(LeafC3ChlorofilConc_pft(JP,JY,JX));      LeafC3ChlorofilConc_pft=0._r8
   allocate(LeafC4ChlorofilConc_pft(JP,JY,JX));     LeafC4ChlorofilConc_pft=0._r8
   allocate(CanPCi2CaRatio(JP,JY,JX));     CanPCi2CaRatio=0._r8
-  allocate(RadNet2CanP(JP,JY,JX));     RadNet2CanP=0._r8
-  allocate(LWRadCanP(JP,JY,JX));    LWRadCanP=0._r8
+  allocate(RadNet2Canopy_pft(JP,JY,JX));     RadNet2Canopy_pft=0._r8
+  allocate(LWRadCanopy_pft(JP,JY,JX));    LWRadCanopy_pft=0._r8
   allocate(RadSWbyCanopy_pft(JP,JY,JX));     RadSWbyCanopy_pft=0._r8
   allocate(RadPARbyCanopy_pft(JP,JY,JX));     RadPARbyCanopy_pft=0._r8
   allocate(FracRadPARbyCanopy_pft(JP,JY,JX));    FracRadPARbyCanopy_pft=0._r8
@@ -372,8 +372,8 @@ module CanopyDataType
   call destroy(LeafC3ChlorofilConc_pft)
   call destroy(LeafC4ChlorofilConc_pft)
   call destroy(CanPCi2CaRatio)
-  call destroy(RadNet2CanP)
-  call destroy(LWRadCanP)
+  call destroy(RadNet2Canopy_pft)
+  call destroy(LWRadCanopy_pft)
   call destroy(RadSWbyCanopy_pft)
   call destroy(RadPARbyCanopy_pft)
   call destroy(FracRadPARbyCanopy_pft)

@@ -166,7 +166,7 @@ implicit none
   real(r8), pointer :: CanopyPARalbedo_pft(:)     => null() !canopy PAR albedo , [-]
   real(r8), pointer :: TAU_RadCapt(:)     => null() !fraction of radiation intercepted by canopy layer, [-]
   real(r8), pointer :: TAU_RadThru(:)     => null() !fraction of radiation transmitted by canopy layer, [-]
-  real(r8), pointer :: LWRadCanP(:)    => null() !canopy longwave radiation , [MJ d-2 h-1]
+  real(r8), pointer :: LWRadCanopy_pft(:)    => null() !canopy longwave radiation , [MJ d-2 h-1]
   real(r8), pointer :: RadSWbyCanopy_pft(:)     => null() !canopy absorbed shortwave radiation , [MJ d-2 h-1]
   real(r8), pointer :: OMEGX(:,:,:)=> null() !sine of indirect sky radiation on leaf surface/sine of indirect sky radiation
   real(r8), pointer :: OMEGAG(:)   => null() !sine of solar beam on leaf surface, [-]
@@ -174,7 +174,7 @@ implicit none
   real(r8), pointer :: SineLeafAngle(:)     => null() !sine of leaf angle
   real(r8), pointer :: CosineLeafAngle(:)     => null() !cosine of leaf angle
   integer,  pointer :: IALBY(:,:,:)=> null() !flag for calculating backscattering of radiation in canopy
-  real(r8), pointer :: RadNet2CanP(:)     => null() !canopy net radiation , [MJ d-2 h-1]
+  real(r8), pointer :: RadNet2Canopy_pft(:)     => null() !canopy net radiation , [MJ d-2 h-1]
   real(r8), pointer :: CanopySWabsorpty_pft(:)     => null() !canopy shortwave absorptivity , [-]
   real(r8), pointer :: CanopyPARabsorpty_pft(:)     => null() !canopy PAR absorptivity
   real(r8), pointer :: TAUR(:)     => null() !canopy shortwave transmissivity , [-]
@@ -697,7 +697,7 @@ implicit none
   real(r8), pointer :: CMinNH4Root_pft(:,:)      => null()  !minimum NH4 concentration for root NH4 uptake, [g m-3]
   real(r8), pointer :: VmaxNH4Root_pft(:,:)      => null()  !maximum root NH4 uptake rate, [g m-2 h-1]
   real(r8), pointer :: KmNH4Root_pft(:,:)      => null()  !Km for root NH4 uptake, [g m-3]
-  real(r8), pointer :: RCO2P(:,:,:)     => null()  !aqueous CO2 flux from roots to root water , [g d-2 h-1]
+  real(r8), pointer :: RCO2P_pvr(:,:,:)     => null()  !aqueous CO2 flux from roots to root water , [g d-2 h-1]
   real(r8), pointer :: RUPOXP(:,:,:)    => null()  !aqueous O2 flux from roots to root water , [g d-2 h-1]
   real(r8), pointer :: RUPGasSol_vr(:,:,:,:)     => null()  !aqueous CO2 flux from roots to soil water, [g d-2 h-1]
   real(r8), pointer :: trcg_air2root_flx__pvr(:,:,:,:)    => null()  !gaseous tracer flux through roots, [g d-2 h-1]
@@ -798,7 +798,7 @@ implicit none
   allocate(this%CMinNH4Root_pft(jroots,JP1));this%CMinNH4Root_pft=spval
   allocate(this%VmaxNH4Root_pft(jroots,JP1));this%VmaxNH4Root_pft=spval
   allocate(this%KmNH4Root_pft(jroots,JP1));this%KmNH4Root_pft=spval
-  allocate(this%RCO2P(jroots,JZ1,JP1));this%RCO2P=spval
+  allocate(this%RCO2P_pvr(jroots,JZ1,JP1));this%RCO2P_pvr=spval
   allocate(this%RUPOXP(jroots,JZ1,JP1));this%RUPOXP=spval
   allocate(this%RUPGasSol_vr(idg_beg:idg_end,jroots,JZ1,JP1));this%RUPGasSol_vr=spval
   end subroutine plt_rootbgc_init
@@ -1594,7 +1594,7 @@ implicit none
   allocate(this%CanopyPARalbedo_pft(JP1))
   allocate(this%TAU_RadCapt(NumOfCanopyLayers1+1))
   allocate(this%TAU_RadThru(NumOfCanopyLayers1+1))
-  allocate(this%LWRadCanP(JP1))
+  allocate(this%LWRadCanopy_pft(JP1))
   allocate(this%RadSWbyCanopy_pft(JP1))
   allocate(this%OMEGX(NumOfSkyAzimuSects1,NumOfLeafZenithSectors1,NumOfLeafAzimuthSectors1))
   allocate(this%OMEGAG(NumOfSkyAzimuSects1))
@@ -1602,7 +1602,7 @@ implicit none
   allocate(this%SineLeafAngle(NumOfLeafZenithSectors1))
   allocate(this%CosineLeafAngle(NumOfLeafZenithSectors1))
   allocate(this%IALBY(NumOfSkyAzimuSects1,NumOfLeafZenithSectors1,NumOfLeafAzimuthSectors1))
-  allocate(this%RadNet2CanP(JP1))
+  allocate(this%RadNet2Canopy_pft(JP1))
   allocate(this%CanopySWabsorpty_pft(JP1))
   allocate(this%CanopyPARabsorpty_pft(JP1))
   allocate(this%TAUP(JP1))
