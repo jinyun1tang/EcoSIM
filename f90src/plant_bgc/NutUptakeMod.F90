@@ -1304,7 +1304,7 @@ module NutUptakeMod
   integer, intent(in) :: N, L
   integer, intent(in) :: NZ
 
-  integer :: K
+  integer :: K,NE
   !     begin_execution
   associate(                              &
     RDOM_micb_flx          =>  plt_bgcr%RDOM_micb_flx     , &

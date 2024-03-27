@@ -38,13 +38,16 @@ implicit none
 !   UPDATE PLANT PHENOLOGY IN 'HFUNC'
 !
     !if(lverb)WRITE(*,333)'HFUNC'
-
+      !phenological update, determine living/active branches
       CALL HFUNCs(I,J)
 
+      !predict uptake fluxes of nutrients and O2
       CALL UPTAKES(I,J)
 
+      !do growth of active branches
       CALL GROSUBs(I,J)
 
+      !aggregate varaibles
       CALL EXTRACTs(I,J)
 
       call PlantAPIRecv(I,J,NY,NX)

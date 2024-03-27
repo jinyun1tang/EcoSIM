@@ -71,15 +71,16 @@ module grosubsMod
   integer :: NZ,NE
   real(r8) :: ShootC4NonstC_brch(NumOfCanopyLayers1,JP1)
 ! begin_execution
-  associate(                            &
-    IsPlantActive_pft       => plt_pheno%IsPlantActive_pft   , &
-    NP                      => plt_site%NP       , &
-    NP0                     => plt_site%NP0      , &
-    MaxNumRootLays          => plt_site%MaxNumRootLays       , &
-    CO2NetFix_pft           => plt_bgcr%CO2NetFix_pft     , &
+  associate(                                                      &
+    IsPlantActive_pft       => plt_pheno%IsPlantActive_pft      , &
+    NP                      => plt_site%NP                      , &
+    NP0                     => plt_site%NP0                     , &
+    MaxNumRootLays          => plt_site%MaxNumRootLays          , &
+    CO2NetFix_pft           => plt_bgcr%CO2NetFix_pft           , &
     LitrfalStrutElms_pft    => plt_bgcr%LitrfalStrutElms_pft    , &
     LitfalStrutElms_pvr     => plt_bgcr%LitfalStrutElms_pvr     , &
-    CanopyHeight_pft        => plt_morph%CanopyHeight_pft       &
+    NodulInfectElms_pft     => plt_bgcr%NodulInfectElms_pft     , &
+    CanopyHeight_pft        => plt_morph%CanopyHeight_pft         &
   )
 !     TOTAL AGB FOR GRAZING IN LANDSCAPE SECTION
 !
@@ -102,10 +103,10 @@ module grosubsMod
         ENDDO
       ENDDO
     ENDDO D1
-    LitrfalStrutElms_pft(1:NumPlantChemElms,NZ)=0._r8
     CO2NetFix_pft(NZ)=0._r8
     CanopyHeight_copy(NZ)=CanopyHeight_pft(NZ)
     CanopyHeight_pft(NZ)=0._r8
+    NodulInfectElms_pft(NZ)=0._r8
   ENDDO D9980
 !
 !     TRANSFORMATIONS IN LIVING PLANT POPULATIONS
@@ -231,16 +232,20 @@ module grosubsMod
       ENDDO D6431  
     ENDDO
 !   the following purposely starts from layer 0.
+    LitrfalStrutElms_pft(1:NumPlantChemElms,NZ)=0._r8
     D8955: DO L=0,MaxNumRootLays
       DO K=1,pltpar%NumOfPlantLitrCmplxs      
         D6430: DO M=1,jsken
           DO NE=1,NumPlantChemElms
             LitrfalStrutElms_pft(NE,NZ)=LitrfalStrutElms_pft(NE,NZ)+LitfalStrutElms_pvr(NE,M,K,L,NZ)
-            LitrfalStrutElmsCum_pft(NE,NZ)=LitrfalStrutElmsCum_pft(NE,NZ)+LitfalStrutElms_pvr(NE,M,K,L,NZ)
           enddo         
         ENDDO D6430      
       ENDDO
     ENDDO D8955    
+
+    DO NE=1,NumPlantChemElms
+      LitrfalStrutElmsCum_pft(NE,NZ)=LitrfalStrutElmsCum_pft(NE,NZ)+LitrfalStrutElms_pft(NE,NZ)
+    ENDDO
 !
 !     TOTAL STANDING DEAD
 !
@@ -381,6 +386,7 @@ module grosubsMod
   call SumPlantBiom(I,J,NZ,'bfresetdead')
   call ResetDeadBranch(I,J,NZ)
 !
+  call SumPlantBiom(I,J,NZ,'ACCUMState')
   call AccumulateStates(I,J,NZ,CanopyN2Fix_pft)
   end associate
   end subroutine GrowPlant
@@ -770,7 +776,7 @@ module grosubsMod
     RootNH4Uptake_pft(NZ)+RootNO3Uptake_pft(NZ)
   PlantExudChemElmCum_pft(ielmp,NZ)=PlantExudChemElmCum_pft(ielmp,NZ)+ &
     RootH2PO4Uptake_pft(NZ)+RootHPO4Uptake_pft(NZ)
-    
+
   PlantN2FixCum_pft(NZ)=PlantN2FixCum_pft(NZ)+RootN2Fix_pft(NZ)+CanopyN2Fix_pft(NZ)
   end associate
   end subroutine AccumulateStates
@@ -781,8 +787,9 @@ module grosubsMod
   implicit none
   integer, intent(in) :: I,J,NZ
   character(len=*), intent(in) :: header
-  integer :: L,K,N,NE,NB
+  integer :: L,K,N,NE,NB,M
   real(r8) :: root1st,root2nd
+  real(r8) :: balc
 
 !     begin_execution
   associate(                                                     &
@@ -795,12 +802,16 @@ module grosubsMod
     CPOOL4_node                    =>  plt_photo%CPOOL4_node    , &
     iPlantPhotosynthesisType       =>  plt_photo%iPlantPhotosynthesisType   , &    
     NH3Dep2Can_pft                 =>  plt_bgcr%NH3Dep2Can_pft  , &             
-    NH3Dep2Can_brch                => plt_rbgc%NH3Dep2Can_brch  , &    
+    NH3Dep2Can_brch                =>  plt_rbgc%NH3Dep2Can_brch  , &    
+    LitrfalStrutElms_pft           => plt_bgcr%LitrfalStrutElms_pft    , &
+    LitrfalStrutElms_pvr           => plt_bgcr%LitrfalStrutElms_pvr  , &    
     NumOfBranches_pft              =>  plt_morph%NumOfBranches_pft    , &    
     MY                             =>  plt_morph%MY     , &        
     MaxSoiL4Root                   =>  plt_morph%MaxSoiL4Root     , &    
     NumRootAxes_pft                =>  plt_morph%NumRootAxes_pft   , &
     MaxNumRootLays                 =>  plt_site%MaxNumRootLays      , &   
+    RootElmsBeg_pft                =>  plt_biom%RootElmsBeg_pft     , &
+    ShootElmsBeg_pft               =>  plt_biom%ShootElmsBeg_pft    , &
     RootMyco1stStrutElms_rpvr      =>  plt_biom%RootMyco1stStrutElms_rpvr  , &
     RootMyco2ndStrutElms_rpvr      =>  plt_biom%RootMyco2ndStrutElms_rpvr  , &    
     RootMycoNonstElms_rpvr         =>  plt_biom%RootMycoNonstElms_rpvr , &
@@ -898,6 +909,23 @@ module grosubsMod
   DO NB=1,NumOfBranches_pft(NZ)
     NH3Dep2Can_pft(NZ)=NH3Dep2Can_pft(NZ)+NH3Dep2Can_brch(NB,NZ)
   ENDDO    
+
+  LitrfalStrutElms_pft(1:NumPlantChemElms,NZ)=0._r8
+  DO L=0,MaxNumRootLays
+    DO K=1,pltpar%NumOfPlantLitrCmplxs      
+      DO M=1,jsken
+        DO NE=1,NumPlantChemElms
+          LitrfalStrutElms_pft(NE,NZ)=LitrfalStrutElms_pft(NE,NZ)+LitfalStrutElms_pvr(NE,M,K,L,NZ)
+        ENDDO
+      ENDDO
+    ENDDO      
+  ENDDO
+  balc=RootElms_pft(ielmc,NZ)+ShootElms_pft(ielmc,NZ)-GrossCO2Fix_pft(NZ)-GrossResp_pft(NZ) &
+    +LitrfalStrutElms_pft(ielmc,NZ)-RootElmsBeg_pft(ielmc,NZ)-ShootElmsBeg_pft(ielmc,NZ)-NodulInfectElms_pft(ielmc,NZ)
+
+  WRITE(*,*)'BALC',NZ,BALC
   end associate
   end subroutine SumPlantBiom
+
+
 end module grosubsMod
