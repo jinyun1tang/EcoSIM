@@ -28,7 +28,7 @@ module ExtractsMod
   call TotalLitrFall()
 
   DO NZ=1,plt_site%NP
-    IF(plt_pheno%IsPlantActive_pft(NZ).EQ.iPlantIsActive)THEN
+    IF(plt_pheno%IsPlantActive_pft(NZ).EQ.iActive)THEN
 
       call TotalLeafArea(NZ)
 
@@ -338,19 +338,17 @@ module ExtractsMod
 
   associate(                       &
     PlantElemntStoreLandscape  => plt_site%PlantElemntStoreLandscape  , &
-    ElmBalanceCum_pft        => plt_site%ElmBalanceCum_pft   , &
+    ElmBalanceCum_pft          => plt_site%ElmBalanceCum_pft   , &
     NH3EmiCum_pft              => plt_bgcr%NH3EmiCum_pft  , &
-    NH3Dep2Can_pft             => plt_bgcr%NH3Dep2Can_pft  , &
     Canopy_NEE_col             => plt_bgcr%Canopy_NEE_col  , &
-    LitrFallStrutElms_col        => plt_bgcr%LitrFallStrutElms_col  , &
+    LitrFallStrutElms_col      => plt_bgcr%LitrFallStrutElms_col  , &
     RootGasLossDisturb_pft     => plt_bgcr%RootGasLossDisturb_pft, &
     RootN2Fix_pvr              => plt_bgcr%RootN2Fix_pvr  , &
     CO2NetFix_pft              => plt_bgcr%CO2NetFix_pft   , &
     ETCanopy_pft               => plt_ew%ETCanopy_pft    , &
     TH2GZ                      => plt_bgcr%TH2GZ  , &
     trcs_plant_uptake_vr       => plt_rbgc%trcs_plant_uptake_vr, &    
-    NH3Dep2_brch               => plt_rbgc%NH3Dep2_brch  , &
-    PlantRootSoilElmNetX_pft  => plt_rbgc%PlantRootSoilElmNetX_pft , &
+    PlantRootSoilElmNetX_pft   => plt_rbgc%PlantRootSoilElmNetX_pft , &
     TRootGasLossDisturb_pft    => plt_rbgc%TRootGasLossDisturb_pft  , &
     Transpiration_pft          => plt_ew%Transpiration_pft      , &
     PrecIntcptByCanopy_pft     => plt_ew%PrecIntcptByCanopy_pft     , &
@@ -375,11 +373,12 @@ module ExtractsMod
     Eco_Heat_Latent_col        => plt_ew%Eco_Heat_Latent_col      , &
     CanH2OHeldVg               => plt_ew%CanH2OHeldVg   , &
     NU                         => plt_site%NU     , &
+    NH3Dep2Can_pft             =>  plt_bgcr%NH3Dep2Can_pft  , &     
     StemArea_grd               => plt_morph%StemArea_grd , &
     CanopyLeafArea_grd         => plt_morph%CanopyLeafArea_grd , &
     MaxSoiL4Root               => plt_morph%MaxSoiL4Root   , &
     NumOfBranches_pft          => plt_morph%NumOfBranches_pft   , &
-    CanopyStemArea_pft            => plt_morph%CanopyStemArea_pft , &
+    CanopyStemArea_pft         => plt_morph%CanopyStemArea_pft , &
     CanopyLeafArea_pft         => plt_morph%CanopyLeafArea_pft , &
     RadNet2CanP                => plt_rad%RadNet2CanP    , &
     LWRadCanP                  => plt_rad%LWRadCanP   , &
@@ -416,23 +415,24 @@ module ExtractsMod
 !     TRootGasLossDisturb_pft=total loss of root CO2, O2, CH4, N2O, NH3, H2
 !     RootGasLossDisturb_pft=PFT loss of root CO2, O2, CH4, N2O, NH3, H2
 !
-  Eco_NetRad_col=Eco_NetRad_col+RadNet2CanP(NZ)
-  Eco_Heat_Latent_col=Eco_Heat_Latent_col+EvapTransHeat_pft(NZ)
-  Eco_Heat_Sens_col=Eco_Heat_Sens_col+HeatXAir2PCan(NZ)
-  Eco_Heat_Grnd_col=Eco_Heat_Grnd_col+HeatStorCanP(NZ)
-  Canopy_NEE_col=Canopy_NEE_col+CO2NetFix_pft(NZ)
-  ETCanopy_pft(NZ)=ETCanopy_pft(NZ)+Transpiration_pft(NZ)+VapXAir2Canopy_pft(NZ)
-  CanWatg=CanWatg+CanopyWater_pft(NZ)
-  CanH2OHeldVg=CanH2OHeldVg+WatByPCanopy(NZ)
-  TEVAPP=TEVAPP+Transpiration_pft(NZ)+VapXAir2Canopy_pft(NZ)
-  VapXAir2CanG=VapXAir2CanG+VapXAir2Canopy_pft(NZ)
-  ENGYC=cpw*(WatByPCanopy(NZ)+PrecIntcptByCanopy_pft(NZ)+VapXAir2Canopy_pft(NZ))*TKC(NZ)
-  TENGYC=TENGYC+ENGYC
-  THFLXC=THFLXC+ENGYC-ENGYX(NZ)-(PrecIntcptByCanopy_pft(NZ)*cpw*TairK)
-  ENGYX(NZ)=ENGYC
-  LWRadCanG=LWRadCanG+LWRadCanP(NZ)
-  CanopyLeafArea_grd=CanopyLeafArea_grd+CanopyLeafArea_pft(NZ)
-  StemArea_grd=StemArea_grd+CanopyStemArea_pft(NZ)
+  Eco_NetRad_col     = Eco_NetRad_col+RadNet2CanP(NZ)
+  Eco_Heat_Latent_col= Eco_Heat_Latent_col+EvapTransHeat_pft(NZ)
+  Eco_Heat_Sens_col  = Eco_Heat_Sens_col+HeatXAir2PCan(NZ)
+  Eco_Heat_Grnd_col  = Eco_Heat_Grnd_col+HeatStorCanP(NZ)
+  Canopy_NEE_col     = Canopy_NEE_col+CO2NetFix_pft(NZ)
+  ETCanopy_pft(NZ)   = ETCanopy_pft(NZ)+Transpiration_pft(NZ)+VapXAir2Canopy_pft(NZ)
+  CanWatg            = CanWatg+CanopyWater_pft(NZ)
+  CanH2OHeldVg       = CanH2OHeldVg+WatByPCanopy(NZ)
+  TEVAPP             = TEVAPP+Transpiration_pft(NZ)+VapXAir2Canopy_pft(NZ)
+  VapXAir2CanG       = VapXAir2CanG+VapXAir2Canopy_pft(NZ)
+  ENGYC              = cpw*(WatByPCanopy(NZ)+PrecIntcptByCanopy_pft(NZ)+VapXAir2Canopy_pft(NZ))*TKC(NZ)
+  TENGYC             = TENGYC+ENGYC
+  THFLXC             = THFLXC+ENGYC-ENGYX(NZ)-(PrecIntcptByCanopy_pft(NZ)*cpw*TairK)
+  ENGYX(NZ)          = ENGYC
+  LWRadCanG          = LWRadCanG+LWRadCanP(NZ)
+  CanopyLeafArea_grd = CanopyLeafArea_grd+CanopyLeafArea_pft(NZ)
+  StemArea_grd       = StemArea_grd+CanopyStemArea_pft(NZ)
+
   DO NE=1,NumPlantChemElms
     LitrFallStrutElms_col(NE)=LitrFallStrutElms_col(NE)-PlantRootSoilElmNetX_pft(NE,NZ)
     PlantElemntStoreLandscape(NE)=PlantElemntStoreLandscape(NE)+ElmBalanceCum_pft(NE,NZ)
@@ -444,14 +444,11 @@ module ExtractsMod
 !
 !     TOTAL CANOPY NH3 EXCHANGE AND EXUDATION
 !
-!     NH3Dep2_brch,NH3Dep2Can_pft=PFT NH3 flux between atmosphere and branch,canopy
 !     NH3EmiCum_pft=total NH3 flux between atmosphere and canopy
 !
-  NH3Dep2Can_pft(NZ)=0._r8
-  DO NB=1,NumOfBranches_pft(NZ)
-    NH3Dep2Can_pft(NZ)=NH3Dep2Can_pft(NZ)+NH3Dep2_brch(NB,NZ)
-    NH3EmiCum_pft(NZ)=NH3EmiCum_pft(NZ)+NH3Dep2_brch(NB,NZ)
-  ENDDO
+    
+  NH3EmiCum_pft(NZ)=NH3EmiCum_pft(NZ)+NH3Dep2Can_pft(NZ)
+
   end associate
   end subroutine CanopyFluxesandFixation
 

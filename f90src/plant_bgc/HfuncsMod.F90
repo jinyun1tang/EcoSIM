@@ -87,7 +87,7 @@ module HfuncsMod
 !
 !         INITIALIZE VARIABLES IN ACTIVE PFT
 !
-      IF(IsPlantActive_pft(NZ).EQ.iPlantIsActive)THEN
+      IF(IsPlantActive_pft(NZ).EQ.iActive)THEN
         
         call stage_phenology_vars(I,J,NZ)
 
@@ -192,38 +192,38 @@ module HfuncsMod
         IF(I.GT.iDayPlantHarvest_pft(NZ).AND.iYearCurrent.GE.iYearPlantHarvest_pft(NZ) &
           .AND.iPlantState_pft(NZ).EQ.iDead)THEN
           !post harvest
-          IsPlantActive_pft(NZ)=iPlantIsDormant
+          IsPlantActive_pft(NZ)=iDormant
         ELSE
           IF(I.EQ.iDayPlanting_pft(NZ).AND.iYearCurrent.EQ.iYearPlanting_pft(NZ))THEN
             !planting day
-            IsPlantActive_pft(NZ)=iPlantIsDormant
+            IsPlantActive_pft(NZ)=iDormant
             iPlantState_pft(NZ)=iLive
             CALL StartPlants(NZ,NZ)
             Eco_NBP_col=Eco_NBP_col+SeedCPlanted_pft(NZ)
           ENDIF
           !the living plant has actual properties set
           IF(DATAP(NZ).NE.'NO'.AND.iPlantState_pft(NZ).EQ.iLive)then
-            IsPlantActive_pft(NZ)=iPlantIsActive
+            IsPlantActive_pft(NZ)=iActive
           endif
         ENDIF
       ELSE
-        IsPlantActive_pft(NZ)=iPlantIsDormant
+        IsPlantActive_pft(NZ)=iDormant
       ENDIF
     ELSE
       IF((I.LT.iDayPlanting_pft(NZ).AND.I.GT.iDayPlantHarvest_pft(NZ) &
         .AND.iYearCurrent.GE.iYearPlantHarvest_pft(NZ).AND.iPlantState_pft(NZ).EQ.iDead) &
         .OR.(I.LT.iDayPlanting_pft(NZ).AND.iYearPlanting_pft(NZ) &
         .GT.iYearPlantHarvest_pft(NZ)))THEN
-        IsPlantActive_pft(NZ)=iPlantIsDormant
+        IsPlantActive_pft(NZ)=iDormant
       ELSE
         IF(I.EQ.iDayPlanting_pft(NZ).AND.iYearCurrent.EQ.iYearPlanting_pft(NZ))THEN
-          IsPlantActive_pft(NZ)=iPlantIsDormant
+          IsPlantActive_pft(NZ)=iDormant
           iPlantState_pft(NZ)=iLive
           CALL StartPlants(NZ,NZ)
           Eco_NBP_col=Eco_NBP_col+SeedCPlanted_pft(NZ)
         ENDIF
         IF(DATAP(NZ).NE.'NO'.AND.iPlantState_pft(NZ).EQ.iLive)then
-          IsPlantActive_pft(NZ)=iPlantIsActive
+          IsPlantActive_pft(NZ)=iActive
         endif
       ENDIF
     ENDIF

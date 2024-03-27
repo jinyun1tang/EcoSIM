@@ -1148,7 +1148,7 @@ implicit none
 ! the check point file has non-zero pft
           D200: DO NN=1,NPP(NY,NX)
             D205: DO NZ=1,NS
-              IF(DATAZ(NN,NY,NX).EQ.DATAX(NZ).AND.IsPlantActive_pft(NN,NY,NX).EQ.iPlantIsActive)THEN
+              IF(DATAZ(NN,NY,NX).EQ.DATAX(NZ).AND.IsPlantActive_pft(NN,NY,NX).EQ.iActive)THEN
                 DATAP(NN,NY,NX)=DATAX(NZ)
                 DATAM(NN,NY,NX)=DATAY(NZ)
                 DATAA(NZ,NY,NX)='NO'

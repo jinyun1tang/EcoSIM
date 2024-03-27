@@ -56,7 +56,7 @@ module StartqMod
     D9990: DO NY=NVNQ,NVSQ
       NZ2X=MIN(NZ2Q,NP(NY,NX))
       D9985: DO NZ=NZ1Q,NZ2X
-        IF(IsPlantActive_pft(NZ,NY,NX).EQ.iPlantIsDormant)THEN
+        IF(IsPlantActive_pft(NZ,NY,NX).EQ.iDormant)THEN
 
           call InitShootGrowth(NZ,NY,NX)
 
@@ -549,7 +549,7 @@ module StartqMod
     SeedNumSet_brch(NB,NZ,NY,NX)=0._r8
     GrainSeedBiomCMean_brch(NB,NZ,NY,NX)=0._r8
     LeafAreaLive_brch(NB,NZ,NY,NX)=0._r8
-    NH3Dep2_brch(NB,NZ,NY,NX)=0._r8
+    NH3Dep2Can_brch(NB,NZ,NY,NX)=0._r8
     LeafAreaDying_brch(NB,NZ,NY,NX)=0._r8
     CanPBranchHeight(NB,NZ,NY,NX)=0._r8
     
