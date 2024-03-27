@@ -614,6 +614,8 @@ module StartqMod
   CanopyLeafArea_pft(NZ,NY,NX)=0._r8
   RootBiomCPerPlant_pft(NZ,NY,NX)=0._r8
   CanopyStemArea_pft(NZ,NY,NX)=0._r8
+  ShootElmsbeg_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
+  RootElmsBeg_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
   end subroutine InitPlantPhenoMorphoBio
 !------------------------------------------------------------------------------------------
 

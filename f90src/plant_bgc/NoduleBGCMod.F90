@@ -55,28 +55,29 @@ module NoduleBGCMod
   integer :: NE
 !     begin_execution
   associate(                        &
-    NU                       =>  plt_site%NU       , &
-    ZERO                     =>  plt_site%ZERO     , &
-    AREA3                    =>  plt_site%AREA3    , &
-    k_fine_litr              => pltpar%k_fine_litr,&
-    CFOPE                    =>  plt_soilchem%CFOPE, &
-    iPlantNfixType           =>  plt_morph%iPlantNfixType  , &
-    fTgrowCanP               =>  plt_pheno%fTgrowCanP    , &
-    GrossResp_pft            =>  plt_bgcr%GrossResp_pft    , &
-    ECO_ER_col               =>  plt_bgcr%ECO_ER_col     , &
-    CanopyPlusNoduRespC_pft  =>  plt_bgcr%CanopyPlusNoduRespC_pft    , &
-    Eco_AutoR_col            =>  plt_bgcr%Eco_AutoR_col     , &
-    CO2NetFix_pft            =>  plt_bgcr%CO2NetFix_pft     , &
-    LitfalStrutElms_pvr       =>  plt_bgcr%LitfalStrutElms_pvr     , &
-    ifoliar                  =>  pltpar%ifoliar    , &
-    NoduGrowthYield_pft      =>  plt_allom%NoduGrowthYield_pft   , &
-    NodulerNC_pft            =>  plt_allom%NodulerNC_pft   , &
-    NodulerPC_pft            =>  plt_allom%NodulerPC_pft   , &
-    LeafPetolBiomassC_brch   =>  plt_biom%LeafPetolBiomassC_brch    , &
-    CanopyNonstElms_brch        =>  plt_biom%CanopyNonstElms_brch   , &
-    CanopyNodulNonstElms_brch       =>  plt_biom%CanopyNodulNonstElms_brch   , &
-    ZEROP                    =>  plt_biom%ZEROP    , &
-    ZEROL                    =>  plt_biom%ZEROL    , &
+    NU                        =>  plt_site%NU       , &
+    ZERO                      =>  plt_site%ZERO     , &
+    AREA3                     =>  plt_site%AREA3    , &
+    k_fine_litr               => pltpar%k_fine_litr,&
+    CFOPE                     =>  plt_soilchem%CFOPE, &
+    iPlantNfixType            =>  plt_morph%iPlantNfixType  , &
+    fTgrowCanP                =>  plt_pheno%fTgrowCanP    , &
+    GrossResp_pft             =>  plt_bgcr%GrossResp_pft    , &
+    ECO_ER_col                =>  plt_bgcr%ECO_ER_col     , &
+    CanopyPlusNoduRespC_pft   =>  plt_bgcr%CanopyPlusNoduRespC_pft    , &
+    Eco_AutoR_col             =>  plt_bgcr%Eco_AutoR_col        , &
+    CO2NetFix_pft             =>  plt_bgcr%CO2NetFix_pft        , &
+    LitfalStrutElms_pvr       =>  plt_bgcr%LitfalStrutElms_pvr  , &
+    NodulInfectElms_pft       =>  plt_bgcr%NodulInfectElms_pft  , &    
+    ifoliar                   =>  pltpar%ifoliar                , &
+    NoduGrowthYield_pft       =>  plt_allom%NoduGrowthYield_pft   , &
+    NodulerNC_pft             =>  plt_allom%NodulerNC_pft   , &
+    NodulerPC_pft             =>  plt_allom%NodulerPC_pft   , &
+    LeafPetolBiomassC_brch    =>  plt_biom%LeafPetolBiomassC_brch    , &
+    CanopyNonstElms_brch      =>  plt_biom%CanopyNonstElms_brch   , &
+    CanopyNodulNonstElms_brch =>  plt_biom%CanopyNodulNonstElms_brch   , &
+    ZEROP                     =>  plt_biom%ZEROP    , &
+    ZEROL                     =>  plt_biom%ZEROL    , &
     CanopyNodulStrutElms_brch =>  plt_biom%CanopyNodulStrutElms_brch     &
   )
 !     iPlantNfixType=N2 fixation: 4,5,6=rapid to slow canopy symbiosis
@@ -90,10 +91,15 @@ module NoduleBGCMod
 !     AREA=grid cell area
 !     CNND,NodulerPC_pft=bacterial N:C,P:C ratio from PFT file
 !
-    IF(CanopyNodulStrutElms_brch(ielmc,NB,NZ).LE.0.0_r8)THEN
+    
+    IF(CanopyNodulStrutElms_brch(ielmc,NB,NZ).LE.0.0_r8)THEN      
       CanopyNodulStrutElms_brch(ielmc,NB,NZ)=CanopyNodulStrutElms_brch(ielmc,NB,NZ)+NodulBiomCatInfection*AREA3(NU)
       CanopyNodulStrutElms_brch(ielmn,NB,NZ)=CanopyNodulStrutElms_brch(ielmn,NB,NZ)+NodulBiomCatInfection*AREA3(NU)*NodulerNC_pft(NZ)
       CanopyNodulStrutElms_brch(ielmp,NB,NZ)=CanopyNodulStrutElms_brch(ielmp,NB,NZ)+NodulBiomCatInfection*AREA3(NU)*NodulerPC_pft(NZ)
+
+      DO NE=1,NumPlantChemElms
+        NodulInfectElms_pft(NE,NZ)=NodulInfectElms_pft(NE,NZ)+CanopyNodulStrutElms_brch(NE,NB,NZ)
+      ENDDO
     ENDIF
 !
 !     O2-UNCONSTRAINED RESPIRATION RATES BY HETEROTROPHIC AEROBES
@@ -446,6 +452,7 @@ module NoduleBGCMod
     RCO2N_pvr                    =>   plt_rbgc%RCO2N_pvr     , &
     RAutoRootO2Limter_pvr        =>   plt_rbgc%RAutoRootO2Limter_pvr      , &
     RCO2A_pvr                    =>   plt_rbgc%RCO2A_pvr     , &
+    NodulInfectElms_pft          =>   plt_bgcr%NodulInfectElms_pft  , &        
     LitfalStrutElms_pvr          =>   plt_bgcr%LitfalStrutElms_pvr      , &
     RootN2Fix_pft                =>   plt_rbgc%RootN2Fix_pft      , &
     RootN2Fix_pvr                =>   plt_bgcr%RootN2Fix_pvr     , &
@@ -475,6 +482,10 @@ module NoduleBGCMod
           RootNodulStrutElms_pvr(ielmc,L,NZ)=RootNodulStrutElms_pvr(ielmc,L,NZ)+NodulBiomCatInfection*AREA3(NU)
           RootNodulStrutElms_pvr(ielmn,L,NZ)=RootNodulStrutElms_pvr(ielmn,L,NZ)+NodulBiomCatInfection*AREA3(NU)*NodulerNC_pft(NZ)
           RootNodulStrutElms_pvr(ielmp,L,NZ)=RootNodulStrutElms_pvr(ielmp,L,NZ)+NodulBiomCatInfection*AREA3(NU)*NodulerPC_pft(NZ)
+
+          DO NE=1,NumPlantChemElms
+            NodulInfectElms_pft(NE,NZ)=NodulInfectElms_pft(NE,NZ)+RootNodulStrutElms_pvr(NE,L,NZ)
+          ENDDO
         ENDIF
 !
 !     O2-UNCONSTRAINED RESPIRATION RATES BY HETEROTROPHIC AEROBES

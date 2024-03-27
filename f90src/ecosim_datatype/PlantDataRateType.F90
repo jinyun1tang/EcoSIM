@@ -11,6 +11,8 @@ module PlantDataRateType
 
   real(r8),target,allocatable ::  Eco_NEE_col(:,:)                         !total canopy net CO2 exchange, [g d-2 h-1]
   real(r8),target,allocatable ::  NH3Dep2Can_pft(:,:,:)                       !canopy NH3 flux, [g d-2 h-1]
+  real(r8),target,allocatable ::  NodulInfectElms_pft(:,:,:)             
+  real(r8),target,allocatable ::  NodulInfectElmsCum_pft(:,:,:)             
   real(r8),target,allocatable ::  NH3EmiCum_pft(:,:,:)                       !total canopy NH3 flux, [g d-2 ]
   real(r8),target,allocatable ::  SurfLitrfalStrutElmsCum_pft(:,:,:,:)                     !total surface LitrFall element, [g d-2]
   real(r8),target,allocatable ::  RootMycoExudElm_pvr(:,:,:,:,:,:,:)              !root uptake (+ve) - exudation (-ve) of DOC, [g d-2 h-1]
@@ -124,7 +126,9 @@ module PlantDataRateType
   integer, intent(in) :: jroots    !number of root types, root,mycos
   allocate(Eco_NEE_col(JY,JX));       Eco_NEE_col=0._r8
   allocate(NH3Dep2Can_pft(JP,JY,JX));    NH3Dep2Can_pft=0._r8
-  allocate(NH3EmiCum_pft(JP,JY,JX));    NH3EmiCum_pft=0._r8
+  allocate(NH3EmiCum_pft(JP,JY,JX));    NH3EmiCum_pft=0._r8  
+  allocate(NodulInfectElms_pft(JP,JY,JX));NodulInfectElms_pft=0._r8
+  allocate(NodulInfectElmsCum_pft(JP,JY,JX));NodulInfectElmsCum_pft=0._r8  
   allocate(SurfLitrfalStrutElmsCum_pft(NumPlantChemElms,JP,JY,JX));    SurfLitrfalStrutElmsCum_pft=0._r8
   allocate(RootMycoExudElm_pvr(NumPlantChemElms,2,1:jcplx,JZ,JP,JY,JX));RootMycoExudElm_pvr=0._r8
   allocate(RootNutUptake_pvr(ids_nutb_beg+1:ids_nuts_end,jroots,JZ,JP,JY,JX));RootNutUptake_pvr=0._r8
@@ -247,6 +251,8 @@ module PlantDataRateType
   call destroy(CanopyPlusNoduRespC_pft)
   call destroy(EcoHavstElmnt_pft)
   call destroy(EcoHavstElmntCum_pft)
+  call destroy(NodulInfectElms_pft)
+  call destroy(NodulInfectElmsCum_pft)
   call destroy(CO2ByFire_pft)
   call destroy(CH4ByFire_pft)
   call destroy(O2ByFire_pft)

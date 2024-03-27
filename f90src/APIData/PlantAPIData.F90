@@ -481,6 +481,7 @@ implicit none
   real(r8), pointer :: StandingDeadInitC_pft(:)      => null()  !initial standing dead C, [g C m-2]
   real(r8), pointer :: RootNodulElms_pft(:,:)  => null()  
   real(r8), pointer :: RootElms_pft(:,:)     => null()  !plant root element, [gC d-2]
+  real(r8), pointer :: RootElmsBeg_pft(:,:)     => null()  !plant root element, [gC d-2]
   real(r8), pointer :: CanopyNodulElms_pft(:,:) => null() 
   real(r8), pointer :: RootStrutElms_pft(:,:)    => null()  !plant root structural element, [gC d-2]
   real(r8), pointer :: SeedCPlanted_pft(:)       => null()  !plant stored nonstructural C at planting, [gC d-2]
@@ -510,6 +511,7 @@ implicit none
   real(r8), pointer :: StalkBiomassC_brch(:,:)    => null()   !branch active stalk C, [g d-2]
   real(r8), pointer :: StalkStrutElms_pft(:,:)    => null()   !canopy stalk element, [g d-2]
   real(r8), pointer :: ShootElms_pft(:,:)         => null()
+  real(r8), pointer :: ShootElmsBeg_pft(:,:)         => null()
   real(r8), pointer :: CanopyStalkC_pft(:)       => null()   !canopy active stalk C, [g d-2
   real(r8), pointer :: LeafStrutElms_pft(:,:)     => null()   !canopy leaf elements, [g d-2]
   real(r8), pointer :: PetioleStrutElms_pft(:,:)    => null()   !canopy sheath element , [g d-2]
@@ -666,7 +668,8 @@ implicit none
   real(r8), pointer :: SurfLitrfalStrutElmsCum_pft(:,:)    => null()  !total surface LitrFall element, [g d-2]
   real(r8), pointer :: LitrfalStrutElmsCum_pft(:,:)    => null()  !total plant element LitrFall , [g d-2 ]
   real(r8), pointer :: GrossResp_pft(:)      => null()  !total plant respiration, [gC d-2 ]
-
+  real(r8), pointer :: NodulInfectElms_pft(:,:) => null()
+  real(r8), pointer :: NodulInfectElmsCum_pft(:,:) => null()
   real(r8), pointer :: NH3EmiCum_pft(:)      => null()  !total canopy NH3 flux, [gN d-2 ]
   real(r8), pointer :: PlantN2FixCum_pft(:)     => null()  !total plant N2 fixation, [g d-2 ]
 
@@ -979,6 +982,8 @@ implicit none
   allocate(this%GrossResp_pft(JP1));this%GrossResp_pft=spval
   allocate(this%PlantN2FixCum_pft(JP1));this%PlantN2FixCum_pft=spval
   allocate(this%NH3EmiCum_pft(JP1));this%NH3EmiCum_pft=spval
+  allocate(this%NodulInfectElms_pft(NumPlantChemElms,JP1));this%NodulInfectElms_pft=spval
+  allocate(this%NodulInfectElmsCum_pft(NumPlantChemElms,JP1));this%NodulInfectElmsCum_pft=spval
   allocate(this%SurfLitrfalStrutElmsCum_pft(NumPlantChemElms,JP1));this%SurfLitrfalStrutElmsCum_pft=spval
   allocate(this%LitrFallStrutElms_col(NumPlantChemElms));this%LitrFallStrutElms_col=spval
   allocate(this%NetPrimProduct_pft(JP1));this%NetPrimProduct_pft=spval
@@ -1277,6 +1282,7 @@ implicit none
   allocate(this%ShootC4NonstC_brch(MaxNumBranches,JP1));this%ShootC4NonstC_brch=spval
   allocate(this%CanopyStalkC_pft(JP1));this%CanopyStalkC_pft=spval
   allocate(this%ShootElms_pft(NumPlantChemElms,JP1));this%ShootElms_pft=spval
+  allocate(this%ShootElmsBeg_pft(NumPlantChemElms,JP1));this%ShootElmsBeg_pft=spval
   allocate(this%LeafProteinCNode_brch(0:MaxNodesPerBranch1,MaxNumBranches,JP1));this%LeafProteinCNode_brch=spval
   allocate(this%PetioleProteinCNode_brch(0:MaxNodesPerBranch1,MaxNumBranches,JP1));this%PetioleProteinCNode_brch=spval
   allocate(this%InternodeStrutElms_brch(NumPlantChemElms,0:MaxNodesPerBranch1,MaxNumBranches,JP1))
@@ -1294,6 +1300,7 @@ implicit none
   allocate(this%CanopyNodulElms_pft(NumPlantChemElms,JP1));this%CanopyNodulElms_pft=spval
   allocate(this%WGLFT(NumOfCanopyLayers1));this%WGLFT=spval
   allocate(this%RootElms_pft(NumPlantChemElms,JP1));this%RootElms_pft=spval
+  allocate(this%RootElmsBeg_pft(NumPlantChemElms,JP1));this%RootElmsBeg_pft=spval
   allocate(this%SeedCPlanted_pft(JP1));this%SeedCPlanted_pft=spval
   allocate(this%NonStrutElms_pft(NumPlantChemElms,JP1));this%NonStrutElms_pft=spval
   allocate(this%CanopyLeafShethC_pft(JP1));this%CanopyLeafShethC_pft=spval
