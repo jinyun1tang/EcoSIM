@@ -826,9 +826,9 @@ module StartqMod
 !     CPOOLR,ZPOOLR,PPOOLR=C,N,P in root,myco nonstructural pools (g)
 !
   SeedCPlanted_pft(NZ,NY,NX)=SeedCMass(NZ,NY,NX)*PlantPopulation_pft(NZ,NY,NX)
-  SeasonNonStrutElms_pft(ielmc,NZ,NY,NX)=SeedCPlanted_pft(NZ,NY,NX)
-  SeasonNonStrutElms_pft(ielmn,NZ,NY,NX)=CNGR(NZ,NY,NX)*SeasonNonStrutElms_pft(ielmc,NZ,NY,NX)
-  SeasonNonStrutElms_pft(ielmp,NZ,NY,NX)=CPGR(NZ,NY,NX)*SeasonNonStrutElms_pft(ielmc,NZ,NY,NX)
+  SeasonalNonstElms_pft(ielmc,NZ,NY,NX)=SeedCPlanted_pft(NZ,NY,NX)
+  SeasonalNonstElms_pft(ielmn,NZ,NY,NX)=CNGR(NZ,NY,NX)*SeasonalNonstElms_pft(ielmc,NZ,NY,NX)
+  SeasonalNonstElms_pft(ielmp,NZ,NY,NX)=CPGR(NZ,NY,NX)*SeasonalNonstElms_pft(ielmc,NZ,NY,NX)
   LeafStrutElms_brch(ielmn,1,NZ,NY,NX)=CNGR(NZ,NY,NX)*LeafStrutElms_brch(ielmc,1,NZ,NY,NX)
   LeafStrutElms_brch(ielmp,1,NZ,NY,NX)=CPGR(NZ,NY,NX)*LeafStrutElms_brch(ielmc,1,NZ,NY,NX)
   LeafPetolBiomassC_brch(1,NZ,NY,NX)=LeafStrutElms_brch(ielmc,1,NZ,NY,NX)+PetoleStrutElms_brch(ielmc,1,NZ,NY,NX)
@@ -871,7 +871,7 @@ module StartqMod
   
   
   DO NE=1,NumPlantChemElms
-    ShootElms_pft(NE,NZ,NY,NX)=ShootElms_brch(NE,1,NZ,NY,NX)+SeasonNonStrutElms_pft(NE,NZ,NY,NX)
+    ShootElms_pft(NE,NZ,NY,NX)=ShootElms_brch(NE,1,NZ,NY,NX)+SeasonalNonstElms_pft(NE,NZ,NY,NX)
   ENDDO
   
   RootElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
