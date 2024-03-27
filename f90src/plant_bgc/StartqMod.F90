@@ -90,7 +90,7 @@ module StartqMod
         D6401: DO L=1,NL(NY,NX)
           DO  K=1,pltpar%NumOfPlantLitrCmplxs
             DO  M=1,jskenc
-              LitfalStrutElms_pvr(1:NumPlantChemElms,M,K,L,NZ,NY,NX)=0._r8
+              LitrfalStrutElms_pvr(1:NumPlantChemElms,M,K,L,NZ,NY,NX)=0._r8
             enddo
           enddo
         ENDDO D6401
@@ -786,7 +786,7 @@ module StartqMod
       IF(N.EQ.1)THEN
         D6400: DO K=1,pltpar%NumOfPlantLitrCmplxs
           DO  M=1,jskenc
-            LitfalStrutElms_pvr(1:NumPlantChemElms,M,K,L,NZ,NY,NX)=0._r8
+            LitrfalStrutElms_pvr(1:NumPlantChemElms,M,K,L,NZ,NY,NX)=0._r8
           enddo
         ENDDO D6400
         RootNodulNonstElms_pvr(1:NumPlantChemElms,L,NZ,NY,NX)=0._r8

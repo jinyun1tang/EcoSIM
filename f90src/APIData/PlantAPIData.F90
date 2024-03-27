@@ -635,7 +635,7 @@ implicit none
   real(r8), pointer :: TDFOME(:,:,:)   =>  null()  !total root element exchange, [g d-2 h-1]
   real(r8), pointer :: RootN2Fix_pvr(:,:)    =>  null()  !root N2 fixation, [gN d-2 h-1]
   real(r8), pointer :: CanopyPlusNoduRespC_pft(:)      =>  null()  !total autotrophic respiration, [gC d-2 ]
-  real(r8), pointer :: LitfalStrutElms_pvr(:,:,:,:,:) =>  null()  !plant LitrFall element, [g d-2 h-1]
+  real(r8), pointer :: LitrfalStrutElms_pvr(:,:,:,:,:) =>  null()  !plant LitrFall element, [g d-2 h-1]
   real(r8), pointer :: ROXYX(:)      =>  null()  !total root + microbial O2 uptake, [g d-2 h-1]
   real(r8), pointer :: RNHBX(:)      => null()   !total root + microbial NH4 uptake band, [gN d-2 h-1]
   real(r8), pointer :: RP14X(:)      => null()   !HPO4 demand in non-band by all microbial,root,myco populations, [gP d-2 h-1]
@@ -1003,8 +1003,8 @@ implicit none
 
   allocate(this%LitrfalStrutElmsCum_pft(NumPlantChemElms,JP1));this%LitrfalStrutElmsCum_pft=spval
   allocate(this%LitrfalStrutElms_pft(NumPlantChemElms,JP1));this%LitrfalStrutElms_pft=spval
-  allocate(this%LitfalStrutElms_pvr(NumPlantChemElms,jsken,1:NumOfPlantLitrCmplxs,0:JZ1,JP1))
-  this%LitfalStrutElms_pvr=spval
+  allocate(this%LitrfalStrutElms_pvr(NumPlantChemElms,jsken,1:NumOfPlantLitrCmplxs,0:JZ1,JP1))
+  this%LitrfalStrutElms_pvr=spval
 
   end subroutine plt_bgcrate_init
 !----------------------------------------------------------------------

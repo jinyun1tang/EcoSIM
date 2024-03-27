@@ -78,7 +78,7 @@ module grosubsMod
     MaxNumRootLays          => plt_site%MaxNumRootLays          , &
     CO2NetFix_pft           => plt_bgcr%CO2NetFix_pft           , &
     LitrfalStrutElms_pft    => plt_bgcr%LitrfalStrutElms_pft    , &
-    LitfalStrutElms_pvr     => plt_bgcr%LitfalStrutElms_pvr     , &
+    LitrfalStrutElms_pvr     => plt_bgcr%LitrfalStrutElms_pvr     , &
     NodulInfectElms_pft     => plt_bgcr%NodulInfectElms_pft     , &
     CanopyHeight_pft        => plt_morph%CanopyHeight_pft         &
   )
@@ -98,7 +98,7 @@ module grosubsMod
       DO K=1,pltpar%NumOfPlantLitrCmplxs
         DO M=1,jsken
           DO NE=1,NumPlantChemElms
-            LitfalStrutElms_pvr(NE,M,K,L,NZ)=0._r8
+            LitrfalStrutElms_pvr(NE,M,K,L,NZ)=0._r8
           ENDDO
         ENDDO
       ENDDO
@@ -168,7 +168,7 @@ module grosubsMod
     NP0                            => plt_site%NP0      , &
     MaxNumRootLays                 => plt_site%MaxNumRootLays       , &
     iYearCurrent                   => plt_site%iYearCurrent     , &
-    LitfalStrutElms_pvr            => plt_bgcr%LitfalStrutElms_pvr     , &
+    LitrfalStrutElms_pvr            => plt_bgcr%LitrfalStrutElms_pvr     , &
     NetPrimProduct_pft             => plt_bgcr%NetPrimProduct_pft     , &
     PlantN2FixCum_pft              => plt_bgcr%PlantN2FixCum_pft   , &
     LitrfalStrutElms_pft           => plt_bgcr%LitrfalStrutElms_pft    , &
@@ -210,9 +210,9 @@ module grosubsMod
       DO NE=1,NumPlantChemElms
         XFRE=1.5814E-05_r8*fTgrowCanP(NZ)*StandDeadKCompElms_pft(NE,M,NZ)
         IF(iPlantTurnoverPattern_pft(NZ).EQ.0.OR.iPlantRootProfile_pft(NZ).LE.1)THEN
-          LitfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)+XFRE
+          LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)+XFRE
         ELSE
-          LitfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)=LitfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)+XFRE
+          LitrfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)=LitrfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)+XFRE
         ENDIF
         StandDeadKCompElms_pft(NE,M,NZ)=StandDeadKCompElms_pft(NE,M,NZ)-XFRE
       ENDDO
@@ -227,7 +227,7 @@ module grosubsMod
     DO K=1,pltpar%NumOfPlantLitrCmplxs      
       D6431: DO M=1,jsken
         DO NE=1,NumPlantChemElms
-          SurfLitrfalStrutElmsCum_pft(NE,NZ)=SurfLitrfalStrutElmsCum_pft(NE,NZ)+LitfalStrutElms_pvr(NE,M,K,0,NZ)
+          SurfLitrfalStrutElmsCum_pft(NE,NZ)=SurfLitrfalStrutElmsCum_pft(NE,NZ)+LitrfalStrutElms_pvr(NE,M,K,0,NZ)
         ENDDO
       ENDDO D6431  
     ENDDO
@@ -237,7 +237,7 @@ module grosubsMod
       DO K=1,pltpar%NumOfPlantLitrCmplxs      
         D6430: DO M=1,jsken
           DO NE=1,NumPlantChemElms
-            LitrfalStrutElms_pft(NE,NZ)=LitrfalStrutElms_pft(NE,NZ)+LitfalStrutElms_pvr(NE,M,K,L,NZ)
+            LitrfalStrutElms_pft(NE,NZ)=LitrfalStrutElms_pft(NE,NZ)+LitrfalStrutElms_pvr(NE,M,K,L,NZ)
           enddo         
         ENDDO D6430      
       ENDDO
@@ -807,7 +807,7 @@ module grosubsMod
     GrossCO2Fix_pft                =>  plt_bgcr%GrossCO2Fix_pft   , &
     NodulInfectElms_pft            =>  plt_bgcr%NodulInfectElms_pft, &    
     LitrfalStrutElms_pft           =>  plt_bgcr%LitrfalStrutElms_pft    , &
-    LitfalStrutElms_pvr            =>  plt_bgcr%LitfalStrutElms_pvr  , &    
+    LitrfalStrutElms_pvr            =>  plt_bgcr%LitrfalStrutElms_pvr  , &    
     NumOfBranches_pft              =>  plt_morph%NumOfBranches_pft    , &   
     MY                             =>  plt_morph%MY     , &        
     MaxSoiL4Root                   =>  plt_morph%MaxSoiL4Root     , &    
@@ -918,7 +918,7 @@ module grosubsMod
     DO K=1,pltpar%NumOfPlantLitrCmplxs      
       DO M=1,jsken
         DO NE=1,NumPlantChemElms
-          LitrfalStrutElms_pft(NE,NZ)=LitrfalStrutElms_pft(NE,NZ)+LitfalStrutElms_pvr(NE,M,K,L,NZ)
+          LitrfalStrutElms_pft(NE,NZ)=LitrfalStrutElms_pft(NE,NZ)+LitrfalStrutElms_pvr(NE,M,K,L,NZ)
         ENDDO
       ENDDO
     ENDDO      

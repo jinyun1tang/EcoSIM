@@ -67,7 +67,7 @@ module NoduleBGCMod
     CanopyPlusNoduRespC_pft   =>  plt_bgcr%CanopyPlusNoduRespC_pft    , &
     Eco_AutoR_col             =>  plt_bgcr%Eco_AutoR_col        , &
     CO2NetFix_pft             =>  plt_bgcr%CO2NetFix_pft        , &
-    LitfalStrutElms_pvr       =>  plt_bgcr%LitfalStrutElms_pvr  , &
+    LitrfalStrutElms_pvr       =>  plt_bgcr%LitrfalStrutElms_pvr  , &
     NodulInfectElms_pft       =>  plt_bgcr%NodulInfectElms_pft  , &    
     ifoliar                   =>  pltpar%ifoliar                , &
     NoduGrowthYield_pft       =>  plt_allom%NoduGrowthYield_pft   , &
@@ -314,7 +314,7 @@ module NoduleBGCMod
 !
     D6470: DO M=1,jsken
       DO NE=1,NumPlantChemElms
-        LitfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ) &
+        LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ) &
           +CFOPE(NE,ifoliar,M,NZ)*(NoduleElmntDecay2Litr(NE)+NodulELmSenes2Litr(NE))
       ENDDO
     ENDDO D6470
@@ -453,7 +453,7 @@ module NoduleBGCMod
     RAutoRootO2Limter_pvr        =>   plt_rbgc%RAutoRootO2Limter_pvr      , &
     RCO2A_pvr                    =>   plt_rbgc%RCO2A_pvr     , &
     NodulInfectElms_pft          =>   plt_bgcr%NodulInfectElms_pft  , &        
-    LitfalStrutElms_pvr          =>   plt_bgcr%LitfalStrutElms_pvr      , &
+    LitrfalStrutElms_pvr          =>   plt_bgcr%LitrfalStrutElms_pvr      , &
     RootN2Fix_pft                =>   plt_rbgc%RootN2Fix_pft      , &
     RootN2Fix_pvr                =>   plt_bgcr%RootN2Fix_pvr     , &
     PopuRootMycoC_pvr            =>   plt_biom% PopuRootMycoC_pvr    , &
@@ -703,7 +703,7 @@ module NoduleBGCMod
 !
         D6370: DO M=1,jsken
           DO NE=1,NumPlantChemElms
-            LitfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)&
+            LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)&
               +CFOPE(NE,iroot,M,NZ)*(NoduleElmntDecay2Litr(NE)+NodulELmSenes2Litr(NE))
           ENDDO
         ENDDO D6370
