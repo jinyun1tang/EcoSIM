@@ -81,7 +81,8 @@
       NetCumElmntFlx2Plant_pft(NE,NZ,NY,NX)=NetCumElmntFlx2Plant_pft(NE,NZ,NY,NX) &
         +PlantExudChemElmCum_pft(NE,NZ,NY,NX)-LitrfalStrutElmsCum_pft(NE,NZ,NY,NX)
       EcoHavstElmntCum_pft(NE,NZ,NY,NX)=EcoHavstElmntCum_pft(NE,NZ,NY,NX)+EcoHavstElmnt_pft(NE,NZ,NY,NX)
-    enddo
+      NodulInfectElmsCum_pft(NE,NZ,NY,NX)=0._r8
+    ENDDO
     NetCumElmntFlx2Plant_pft(ielmc,NZ,NY,NX)=NetCumElmntFlx2Plant_pft(ielmc,NZ,NY,NX) &
       +GrossCO2Fix_pft(NZ,NY,NX)+GrossResp_pft(NZ,NY,NX) &
       -CO2ByFire_pft(NZ,NY,NX)-CH4ByFire_pft(NZ,NY,NX)
@@ -105,7 +106,6 @@
     NH3byFire_pft(NZ,NY,NX)=0._r8
     N2ObyFire_pft(NZ,NY,NX)=0._r8
     PO4byFire_pft(NZ,NY,NX)=0._r8
-
     EcoHavstElmnt_pft(:,NZ,NY,NX)=0._r8
     SurfLitrfalStrutElmsCum_pft(:,NZ,NY,NX)=0._r8
     LitrfalStrutElmsCum_pft(:,NZ,NY,NX)=0._r8
