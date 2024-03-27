@@ -463,7 +463,7 @@ subroutine regressiontest(nmfile,case_name, NX, NY)
     call regression%OpenOutput()
 
     do NZ=1,NP(NY,NX)
-      IF(IsPlantActive_pft(NZ,NY,NX).EQ.iPlantIsActive)THEN
+      IF(IsPlantActive_pft(NZ,NY,NX).EQ.iActive)THEN
 
         category = 'flux'
         name = 'NH4_UPTK (g m^-3 h^-1)'
