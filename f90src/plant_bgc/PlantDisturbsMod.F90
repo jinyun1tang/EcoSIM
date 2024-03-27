@@ -222,7 +222,7 @@ module PlantDisturbsMod
     iHarvstType_pft             =>  plt_distb%iHarvstType_pft  , &
     FWOODE                      =>  plt_allom%FWOODE , &
     CFOPE                       =>  plt_soilchem%CFOPE, &
-    LitfalStrutElms_pvr         =>  plt_bgcr%LitfalStrutElms_pvr    , &
+    LitrfalStrutElms_pvr         =>  plt_bgcr%LitrfalStrutElms_pvr    , &
     LitrfalStrutElmsCum_pft        =>  plt_bgcr%LitrfalStrutElmsCum_pft   , &
     SurfLitrfalStrutElmsCum_pft    =>  plt_bgcr%SurfLitrfalStrutElmsCum_pft   , &
     iPlantTurnoverPattern_pft   =>  plt_pheno%iPlantTurnoverPattern_pft , &
@@ -239,23 +239,23 @@ module PlantDisturbsMod
     IF(iHarvstType_pft(NZ).NE.iharvtyp_fire)THEN
       D6375: DO M=1,jsken
         DO NE=1,NumPlantChemElms        
-          LitfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ) &
+          LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ) &
             +CFOPE(NE,inonstruct,M,NZ)*(NonstructElmnt2Litr(NE)) &
             +CFOPE(NE,ifoliar,M,NZ)*(LeafElmnt2Litr(NE)+LeafElmntHarv2Litr(NE)) &
             +CFOPE(NE,inonfoliar,M,NZ)*(FineNonleafElmnt2Litr(NE)+PetioleElmntHarv2Litr(NE))
 
           IF(iPlantTurnoverPattern_pft(NZ).EQ.0.OR.(.not.is_plant_treelike(iPlantRootProfile_pft(NZ))))THEN
-            LitfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ) &
+            LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ) &
               +CFOPE(NE,istalk,M,NZ)*(WoodyElmnt2Litr(NE)+WoodyElmntHarv2Litr(NE)+StandeadElmnt2Litr(NE)&
               +StandeadElmntHarv2Litr(NE))
           ELSE
             StandDeadKCompElms_pft(NE,M,NZ)=StandDeadKCompElms_pft(NE,M,NZ) &
               +CFOPE(NE,icwood,M,NZ)*(WoodyElmntHarv2Litr(NE)+StandeadElmntHarv2Litr(NE))
 
-            LitfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)=LitfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ) &
+            LitrfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)=LitrfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ) &
               +CFOPE(NE,icwood,M,NZ)*(WoodyElmnt2Litr(NE)+StandeadElmnt2Litr(NE))*FWOODE(NE,k_woody_litr)
 
-            LitfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ) &
+            LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ) &
               +CFOPE(NE,icwood,M,NZ)*(WoodyElmnt2Litr(NE)+StandeadElmnt2Litr(NE))*FWOODE(NE,k_fine_litr)
           ENDIF
         ENDDO
@@ -269,44 +269,44 @@ module PlantDisturbsMod
 !
     ELSE
       D6485: DO M=1,jsken
-        LitfalStrutElms_pvr(ielmc,M,k_fine_litr,0,NZ)=LitfalStrutElms_pvr(ielmc,M,k_fine_litr,0,NZ) &
+        LitrfalStrutElms_pvr(ielmc,M,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(ielmc,M,k_fine_litr,0,NZ) &
           +CFOPE(ielmc,inonstruct,M,NZ)*(NonstructElmnt2Litr(ielmc)) &
           +CFOPE(ielmc,ifoliar,M,NZ)*(LeafElmnt2Litr(ielmc)+LeafElmntHarv2Litr(ielmc)) &
           +CFOPE(ielmc,inonfoliar,M,NZ)*(FineNonleafElmnt2Litr(ielmc)+PetioleElmntHarv2Litr(ielmc))
-        LitfalStrutElms_pvr(ielmn,M,k_fine_litr,0,NZ)=LitfalStrutElms_pvr(ielmn,M,k_fine_litr,0,NZ) &
+        LitrfalStrutElms_pvr(ielmn,M,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(ielmn,M,k_fine_litr,0,NZ) &
           +CFOPE(ielmn,inonstruct,M,NZ)*NonstructElmntOffEcosystem(ielmn) &
           +CFOPE(ielmn,ifoliar,M,NZ)*LeafElmntOffEcosystem(ielmn) &
           +CFOPE(ielmn,inonfoliar,M,NZ)*FineNonleafElmntOffEcosystem(ielmn)
-        LitfalStrutElms_pvr(ielmp,M,k_fine_litr,0,NZ)=LitfalStrutElms_pvr(ielmp,M,k_fine_litr,0,NZ) &
+        LitrfalStrutElms_pvr(ielmp,M,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(ielmp,M,k_fine_litr,0,NZ) &
           +CFOPE(ielmp,inonstruct,M,NZ)*NonstructElmntOffEcosystem(ielmp) &
           +CFOPE(ielmp,ifoliar,M,NZ)*LeafElmntOffEcosystem(ielmp) &
           +CFOPE(ielmp,inonfoliar,M,NZ)*FineNonleafElmntOffEcosystem(ielmp)
 
-        LitfalStrutElms_pvr(ielmn,ilignin,k_fine_litr,0,NZ)=LitfalStrutElms_pvr(ielmn,ilignin,k_fine_litr,0,NZ) &
+        LitrfalStrutElms_pvr(ielmn,ilignin,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(ielmn,ilignin,k_fine_litr,0,NZ) &
           +CFOPE(ielmn,inonstruct,M,NZ)*(NonstructElmnt2Litr(ielmn)-NonstructElmntOffEcosystem(ielmn)) &
           +CFOPE(ielmn,ifoliar,M,NZ)*(LeafElmnt2Litr(ielmn)+LeafElmntHarv2Litr(ielmn)-LeafElmntOffEcosystem(ielmn)) &
           +CFOPE(ielmn,inonfoliar,M,NZ)*(FineNonleafElmnt2Litr(ielmn)+PetioleElmntHarv2Litr(ielmn)&
           -FineNonleafElmntOffEcosystem(ielmn))
-        LitfalStrutElms_pvr(ielmp,ilignin,k_fine_litr,0,NZ)=LitfalStrutElms_pvr(ielmp,ilignin,k_fine_litr,0,NZ) &
+        LitrfalStrutElms_pvr(ielmp,ilignin,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(ielmp,ilignin,k_fine_litr,0,NZ) &
           +CFOPE(ielmp,inonstruct,M,NZ)*(NonstructElmnt2Litr(ielmp)-NonstructElmntOffEcosystem(ielmp)) &
           +CFOPE(ielmp,ifoliar,M,NZ)*(LeafElmnt2Litr(ielmp)+LeafElmntHarv2Litr(ielmp)-LeafElmntOffEcosystem(ielmp)) &
           +CFOPE(ielmp,inonfoliar,M,NZ)*(FineNonleafElmnt2Litr(ielmp)+PetioleElmntHarv2Litr(ielmp)&
           -FineNonleafElmntOffEcosystem(ielmp))
 
         IF(iPlantTurnoverPattern_pft(NZ).EQ.0.OR.(.not.is_plant_treelike(iPlantRootProfile_pft(NZ))))THEN
-          LitfalStrutElms_pvr(ielmc,M,k_fine_litr,0,NZ)=LitfalStrutElms_pvr(ielmc,M,k_fine_litr,0,NZ)+&
+          LitrfalStrutElms_pvr(ielmc,M,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(ielmc,M,k_fine_litr,0,NZ)+&
             CFOPE(ielmc,istalk,M,NZ)*(WoodyElmnt2Litr(ielmc)+WoodyElmntHarv2Litr(ielmc)+StandeadElmnt2Litr(ielmc)+&
             StandeadElmntHarv2Litr(ielmc))
-          LitfalStrutElms_pvr(ielmn,M,k_fine_litr,0,NZ)=LitfalStrutElms_pvr(ielmn,M,k_fine_litr,0,NZ)+&
+          LitrfalStrutElms_pvr(ielmn,M,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(ielmn,M,k_fine_litr,0,NZ)+&
             CFOPE(ielmn,istalk,M,NZ)*(WoodyElmntOffEcosystem(ielmn)+StandeadElmntOffEcosystem(ielmn))
-          LitfalStrutElms_pvr(ielmp,M,k_fine_litr,0,NZ)=LitfalStrutElms_pvr(ielmp,M,k_fine_litr,0,NZ)+&
+          LitrfalStrutElms_pvr(ielmp,M,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(ielmp,M,k_fine_litr,0,NZ)+&
             CFOPE(ielmp,istalk,M,NZ)*(WoodyElmntOffEcosystem(ielmp)+StandeadElmntOffEcosystem(ielmp))
 
-          LitfalStrutElms_pvr(ielmn,ilignin,k_fine_litr,0,NZ)=LitfalStrutElms_pvr(ielmn,ilignin,k_fine_litr,0,NZ) &
+          LitrfalStrutElms_pvr(ielmn,ilignin,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(ielmn,ilignin,k_fine_litr,0,NZ) &
             +CFOPE(ielmn,istalk,M,NZ)*(WoodyElmnt2Litr(ielmn)+WoodyElmntHarv2Litr(ielmn) &
             -WoodyElmntOffEcosystem(ielmn)+StandeadElmnt2Litr(ielmn)+StandeadElmntHarv2Litr(ielmn)&
             -StandeadElmntOffEcosystem(ielmn))
-          LitfalStrutElms_pvr(ielmp,ilignin,k_fine_litr,0,NZ)=LitfalStrutElms_pvr(ielmp,ilignin,k_fine_litr,0,NZ)+&
+          LitrfalStrutElms_pvr(ielmp,ilignin,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(ielmp,ilignin,k_fine_litr,0,NZ)+&
             CFOPE(ielmp,istalk,M,NZ)*(WoodyElmnt2Litr(ielmp)+WoodyElmntHarv2Litr(ielmp)- &
             WoodyElmntOffEcosystem(ielmp)+StandeadElmnt2Litr(ielmp)+StandeadElmntHarv2Litr(ielmp)-&
             StandeadElmntOffEcosystem(ielmp))
@@ -318,36 +318,36 @@ module PlantDisturbsMod
           StandDeadKCompElms_pft(ielmp,M,NZ)=StandDeadKCompElms_pft(ielmp,M,NZ)+CFOPE(ielmp,icwood,M,NZ) &
             *WoodyElmntOffEcosystem(ielmp)
             
-          LitfalStrutElms_pvr(ielmc,M,k_woody_litr,0,NZ)=LitfalStrutElms_pvr(ielmc,M,k_woody_litr,0,NZ) &
+          LitrfalStrutElms_pvr(ielmc,M,k_woody_litr,0,NZ)=LitrfalStrutElms_pvr(ielmc,M,k_woody_litr,0,NZ) &
             *CFOPE(ielmc,istalk,M,NZ)&
             *(StandeadElmnt2Litr(ielmc)+StandeadElmntHarv2Litr(ielmc))*FWOODE(ielmc,k_woody_litr)
-          LitfalStrutElms_pvr(ielmn,M,k_woody_litr,0,NZ)=LitfalStrutElms_pvr(ielmn,M,k_woody_litr,0,NZ) &
+          LitrfalStrutElms_pvr(ielmn,M,k_woody_litr,0,NZ)=LitrfalStrutElms_pvr(ielmn,M,k_woody_litr,0,NZ) &
             +CFOPE(ielmn,istalk,M,NZ)*StandeadElmntOffEcosystem(ielmn)*FWOODE(ielmn,k_woody_litr)
-          LitfalStrutElms_pvr(ielmp,M,k_woody_litr,0,NZ)=LitfalStrutElms_pvr(ielmp,M,k_woody_litr,0,NZ) &
+          LitrfalStrutElms_pvr(ielmp,M,k_woody_litr,0,NZ)=LitrfalStrutElms_pvr(ielmp,M,k_woody_litr,0,NZ) &
             +CFOPE(ielmp,istalk,M,NZ)*StandeadElmntOffEcosystem(ielmp)*FWOODE(ielmp,k_woody_litr)
 
-          LitfalStrutElms_pvr(ielmn,ilignin,k_woody_litr,0,NZ)=LitfalStrutElms_pvr(ielmn,ilignin,k_woody_litr,0,NZ) &
+          LitrfalStrutElms_pvr(ielmn,ilignin,k_woody_litr,0,NZ)=LitrfalStrutElms_pvr(ielmn,ilignin,k_woody_litr,0,NZ) &
             +CFOPE(ielmn,icwood,M,NZ) &
             *(WoodyElmnt2Litr(ielmn)+WoodyElmntHarv2Litr(ielmn)-WoodyElmntOffEcosystem(ielmn) &
             +StandeadElmnt2Litr(ielmn)+StandeadElmntHarv2Litr(ielmn)-StandeadElmntOffEcosystem(ielmn))*FWOODE(ielmn,k_woody_litr)
-          LitfalStrutElms_pvr(ielmp,ilignin,k_woody_litr,0,NZ)=LitfalStrutElms_pvr(ielmp,ilignin,k_woody_litr,0,NZ) &
+          LitrfalStrutElms_pvr(ielmp,ilignin,k_woody_litr,0,NZ)=LitrfalStrutElms_pvr(ielmp,ilignin,k_woody_litr,0,NZ) &
             +CFOPE(ielmp,icwood,M,NZ) &
             *(WoodyElmnt2Litr(ielmp)+WoodyElmntHarv2Litr(ielmp)-WoodyElmntOffEcosystem(ielmp) &
             +StandeadElmnt2Litr(ielmp)+StandeadElmntHarv2Litr(ielmp)-StandeadElmntOffEcosystem(ielmp)) &
             *FWOODE(ielmp,k_woody_litr)
 
-          LitfalStrutElms_pvr(ielmc,M,k_fine_litr,0,NZ)=LitfalStrutElms_pvr(ielmc,M,k_fine_litr,0,NZ) &
+          LitrfalStrutElms_pvr(ielmc,M,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(ielmc,M,k_fine_litr,0,NZ) &
             +CFOPE(ielmc,istalk,M,NZ) &
             *(StandeadElmnt2Litr(ielmc)+StandeadElmntHarv2Litr(ielmc))*FWOODE(ielmc,k_fine_litr)
-          LitfalStrutElms_pvr(ielmn,M,k_fine_litr,0,NZ)=LitfalStrutElms_pvr(ielmn,M,k_fine_litr,0,NZ) &
+          LitrfalStrutElms_pvr(ielmn,M,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(ielmn,M,k_fine_litr,0,NZ) &
             +CFOPE(ielmn,istalk,M,NZ)*StandeadElmntOffEcosystem(ielmn)*FWOODE(ielmn,k_fine_litr)
-          LitfalStrutElms_pvr(ielmp,M,k_fine_litr,0,NZ)=LitfalStrutElms_pvr(ielmp,M,k_fine_litr,0,NZ) &
+          LitrfalStrutElms_pvr(ielmp,M,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(ielmp,M,k_fine_litr,0,NZ) &
             +CFOPE(ielmp,istalk,M,NZ)*StandeadElmntOffEcosystem(ielmp)*FWOODE(ielmp,k_fine_litr)
             
-          LitfalStrutElms_pvr(ielmn,ilignin,k_fine_litr,0,NZ)=LitfalStrutElms_pvr(ielmn,ilignin,k_fine_litr,0,NZ) &
+          LitrfalStrutElms_pvr(ielmn,ilignin,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(ielmn,ilignin,k_fine_litr,0,NZ) &
             +CFOPE(ielmn,icwood,M,NZ)*(WoodyElmnt2Litr(ielmn)+WoodyElmntHarv2Litr(ielmn)-WoodyElmntOffEcosystem(ielmn) &
             +StandeadElmnt2Litr(ielmn)+StandeadElmntHarv2Litr(ielmn)-StandeadElmntOffEcosystem(ielmn))*FWOODE(ielmn,k_fine_litr)
-          LitfalStrutElms_pvr(ielmp,ilignin,k_fine_litr,0,NZ)=LitfalStrutElms_pvr(ielmp,ilignin,k_fine_litr,0,NZ) &
+          LitrfalStrutElms_pvr(ielmp,ilignin,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(ielmp,ilignin,k_fine_litr,0,NZ) &
             +CFOPE(ielmp,icwood,M,NZ)*(WoodyElmnt2Litr(ielmp)+WoodyElmntHarv2Litr(ielmp)-WoodyElmntOffEcosystem(ielmp) &
             +StandeadElmnt2Litr(ielmp)+StandeadElmntHarv2Litr(ielmp)-StandeadElmntOffEcosystem(ielmp))*FWOODE(ielmp,k_fine_litr)
         ENDIF
@@ -730,7 +730,7 @@ module PlantDisturbsMod
     inonfoliar                  =>  pltpar%inonfoliar     , &
     icwood                      =>  pltpar%icwood       , &
     RootGasLossDisturb_pft      =>   plt_bgcr%RootGasLossDisturb_pft    , &
-    LitfalStrutElms_pvr         =>  plt_bgcr%LitfalStrutElms_pvr       , &
+    LitrfalStrutElms_pvr         =>  plt_bgcr%LitrfalStrutElms_pvr       , &
     RCO2A_pvr                   =>  plt_rbgc%RCO2A_pvr      , &
     RootRespPotent_pvr          =>  plt_rbgc%RootRespPotent_pvr      , &
     RCO2N_pvr                   =>  plt_rbgc%RCO2N_pvr      , &
@@ -816,7 +816,7 @@ module PlantDisturbsMod
 !
             XHVST1=1._r8-XHVST
             D6380: DO M=1,jsken
-              LitfalStrutElms_pvr(ielmc,M,k_fine_litr,0,NZ)=LitfalStrutElms_pvr(ielmc,M,k_fine_litr,0,NZ) &
+              LitrfalStrutElms_pvr(ielmc,M,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(ielmc,M,k_fine_litr,0,NZ) &
                 +XHVST1*(CFOPE(ielmc,inonstruct,M,NZ)*(CanopyNonstElms_brch(ielmc,NB,NZ) &
                 +CanopyNodulNonstElms_brch(ielmc,NB,NZ) &
                 +ShootC4NonstC_brch(NB,NZ)+StalkRsrvElms_brch(ielmc,NB,NZ)) &
@@ -826,7 +826,7 @@ module PlantDisturbsMod
                 +HuskStrutElms_brch(ielmc,NB,NZ)+EarStrutElms_brch(ielmc,NB,NZ)))
 
               DO NE=2,NumPlantChemElms
-                LitfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)+XHVST1 &
+                LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)+XHVST1 &
                   *(CFOPE(NE,inonstruct,M,NZ)*(CanopyNonstElms_brch(NE,NB,NZ)+CanopyNodulNonstElms_brch(NE,NB,NZ)&
                   +StalkRsrvElms_brch(NE,NB,NZ)) &
                   +CFOPE(NE,ifoliar,M,NZ)*(LeafStrutElms_brch(NE,NB,NZ)*FWODLE(NE,k_fine_litr) &
@@ -838,20 +838,20 @@ module PlantDisturbsMod
 
             DO M=1,jsken
               DO NE=1,NumPlantChemElms
-                LitfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)=LitfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)+XHVST1 &
+                LitrfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)=LitrfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)+XHVST1 &
                   *CFOPE(NE,icwood,M,NZ)*(LeafStrutElms_brch(NE,NB,NZ)*FWODLE(NE,k_woody_litr) &
                   +PetoleStrutElms_brch(NE,NB,NZ)*FWODBE(NE,k_woody_litr))
 
                 IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual.AND.iPlantPhenolType_pft(NZ).NE.0)THEN
                   SeasonalNonstElms_pft(NE,NZ)=SeasonalNonstElms_pft(NE,NZ)+XHVST1*CFOPE(NE,inonfoliar,M,NZ)*GrainStrutElms_brch(NE,NB,NZ)
                 ELSE
-                  LitfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)+XHVST1 &
+                  LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)+XHVST1 &
                     *CFOPE(NE,inonfoliar,M,NZ)*GrainStrutElms_brch(NE,NB,NZ)
                 ENDIF
-                LitfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)=LitfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)+XHVST1 &
+                LitrfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)=LitrfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)+XHVST1 &
                   *CFOPE(NE,icwood,M,NZ)*StalkStrutElms_brch(NE,NB,NZ)*FWOODE(NE,k_woody_litr)
 
-                LitfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)+XHVST1 &
+                LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)+XHVST1 &
                   *CFOPE(NE,istalk,M,NZ)*StalkStrutElms_brch(NE,NB,NZ)*FWOODE(NE,k_fine_litr)
               ENDDO
             ENDDO
@@ -961,17 +961,17 @@ module PlantDisturbsMod
 
             D6385: DO M=1,jsken
                 DO NE=1,NumPlantChemElms
-                  LitfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)+XHVST1 &
+                  LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)+XHVST1 &
                     *CFOPE(NE,inonstruct,M,NZ)* RootMycoNonstElms_rpvr(NE,N,L,NZ)
                 ENDDO
 
               DO NR=1,NumRootAxes_pft(NZ)
                 DO NE=1,NumPlantChemElms
-                  LitfalStrutElms_pvr(NE,M,k_woody_litr,L,NZ)=LitfalStrutElms_pvr(NE,M,k_woody_litr,L,NZ)+XHVST1 &
+                  LitrfalStrutElms_pvr(NE,M,k_woody_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_woody_litr,L,NZ)+XHVST1 &
                     *CFOPE(NE,icwood,M,NZ)*(RootMyco1stStrutElms_rpvr(NE,N,L,NR,NZ) &
                     +RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ))*FWODRE(NE,k_woody_litr)
 
-                  LitfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)+XHVST1 &
+                  LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)+XHVST1 &
                     *CFOPE(NE,iroot,M,NZ)*(RootMyco1stStrutElms_rpvr(NE,N,L,NR,NZ) &
                     +RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ))*FWODRE(NE,k_fine_litr)
                 ENDDO
@@ -1046,7 +1046,7 @@ module PlantDisturbsMod
             IF(is_plant_N2fix(iPlantNfixType(NZ)).AND.N.EQ.ipltroot)THEN
               DO NE=1,NumPlantChemElms
                 D6395: DO M=1,jsken
-                  LitfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)+&
+                  LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)+&
                     XHVST1*(CFOPE(NE,iroot,M,NZ)*RootNodulStrutElms_pvr(NE,L,NZ) &
                     +CFOPE(NE,inonstruct,M,NZ)*RootNodulNonstElms_pvr(NE,L,NZ))
                 ENDDO D6395
@@ -1068,12 +1068,12 @@ module PlantDisturbsMod
 !
         DO NE=1,NumPlantChemElms
           D6400: DO M=1,jsken
-            LitfalStrutElms_pvr(NE,M,k_woody_litr,NGTopRootLayer_pft(NZ),NZ)=&
-              LitfalStrutElms_pvr(NE,M,k_woody_litr,NGTopRootLayer_pft(NZ),NZ) &
+            LitrfalStrutElms_pvr(NE,M,k_woody_litr,NGTopRootLayer_pft(NZ),NZ)=&
+              LitrfalStrutElms_pvr(NE,M,k_woody_litr,NGTopRootLayer_pft(NZ),NZ) &
               +(XHVST1*CFOPE(NE,inonstruct,M,NZ)*SeasonalNonstElms_pft(NE,NZ))*FWOODE(NE,k_woody_litr)
 
-            LitfalStrutElms_pvr(NE,M,k_fine_litr,NGTopRootLayer_pft(NZ),NZ)=&
-              LitfalStrutElms_pvr(NE,M,k_fine_litr,NGTopRootLayer_pft(NZ),NZ) &
+            LitrfalStrutElms_pvr(NE,M,k_fine_litr,NGTopRootLayer_pft(NZ),NZ)=&
+              LitrfalStrutElms_pvr(NE,M,k_fine_litr,NGTopRootLayer_pft(NZ),NZ) &
               +(XHVST1*CFOPE(NE,inonstruct,M,NZ)*SeasonalNonstElms_pft(NE,NZ))*FWOODE(NE,k_fine_litr)
           ENDDO D6400
           SeasonalNonstElms_pft(NE,NZ)=SeasonalNonstElms_pft(NE,NZ)*XHVST
@@ -1249,7 +1249,7 @@ module PlantDisturbsMod
     trcg_rootml_pvr                     =>  plt_rbgc%trcg_rootml_pvr , &
     trcs_rootml_pvr                     =>  plt_rbgc%trcs_rootml_pvr , &
     RootGasLossDisturb_pft              =>   plt_bgcr%RootGasLossDisturb_pft    , &
-    LitfalStrutElms_pvr                 =>  plt_bgcr%LitfalStrutElms_pvr     , &
+    LitrfalStrutElms_pvr                 =>  plt_bgcr%LitrfalStrutElms_pvr     , &
     Eco_NBP_col                         =>  plt_bgcr%Eco_NBP_col     , &
     CO2NetFix_pft                       =>  plt_bgcr%CO2NetFix_pft     , &
     RCO2A_pvr                           =>  plt_rbgc%RCO2A_pvr    , &
@@ -2378,7 +2378,7 @@ module PlantDisturbsMod
             D3385: DO M=1,jsken
               DO NE=1,NumPlantChemElms
                 FHVSE(NE)=XHVST1(NE)*CFOPE(NE,inonstruct,M,NZ)* RootMycoNonstElms_rpvr(NE,N,L,NZ)
-                LitfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)+(1._r8-FFIRE(NE))*FHVSE(NE)
+                LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)+(1._r8-FFIRE(NE))*FHVSE(NE)
               ENDDO
               CO2ByFire_pft(NZ)=CO2ByFire_pft(NZ)-(1._r8-FCH4F)*FFIRE(ielmc)*FHVSE(ielmc)
               CH4ByFire_pft(NZ)=CH4ByFire_pft(NZ)-FCH4F*FFIRE(ielmc)*FHVSE(ielmc)
@@ -2392,7 +2392,7 @@ module PlantDisturbsMod
                 DO NE=1,NumPlantChemElms
                   FHVSE(NE)=XHVST1(NE)*CFOPE(NE,icwood,M,NZ)*(RootMyco1stStrutElms_rpvr(NE,N,L,NR,NZ) &
                     +RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ))*FWODRE(NE,k_woody_litr)
-                  LitfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)+&
+                  LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)+&
                     (1._r8-FFIRE(NE))*FHVSE(NE)
                 ENDDO
                 CO2ByFire_pft(NZ)=CO2ByFire_pft(NZ)-(1._r8-FCH4F)*FFIRE(ielmc)*FHVSE(ielmc)
@@ -2407,7 +2407,7 @@ module PlantDisturbsMod
                 DO NE=1,NumPlantChemElms
                   FHVSE(NE)=XHVST1(NE)*CFOPE(NE,iroot,M,NZ)*(RootMyco1stStrutElms_rpvr(NE,N,L,NR,NZ) &
                     +RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ))*FWODRE(NE,k_fine_litr)
-                  LitfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ) &
+                  LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ) &
                     +(1._r8-FFIRE(NE))*FHVSE(NE)
                 ENDDO
                 CO2ByFire_pft(NZ)=CO2ByFire_pft(NZ)-(1._r8-FCH4F)*FFIRE(ielmc)*FHVSE(ielmc)
@@ -2490,7 +2490,7 @@ module PlantDisturbsMod
             IF(is_plant_N2fix(iPlantNfixType(NZ)).AND.N.EQ.ipltroot)THEN
               DO NE=1,NumPlantChemElms
                 D3395: DO M=1,jsken
-                  LitfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)+ &
+                  LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)+ &
                     XHVST1(NE)*(CFOPE(NE,iroot,M,NZ)*RootNodulStrutElms_pvr(NE,L,NZ) &
                     +CFOPE(NE,inonstruct,M,NZ)*RootNodulNonstElms_pvr(NE,L,NZ))
                 ENDDO D3395
@@ -2512,10 +2512,10 @@ module PlantDisturbsMod
         IF(iPlantPhenolPattern_pft(NZ).NE.iplt_annual)THEN
           DO NE=1,NumPlantChemElms
             D3400: DO M=1,jsken
-              LitfalStrutElms_pvr(NE,M,k_woody_litr,NGTopRootLayer_pft(NZ),NZ)=LitfalStrutElms_pvr(NE,M,k_woody_litr,NGTopRootLayer_pft(NZ),NZ) &
+              LitrfalStrutElms_pvr(NE,M,k_woody_litr,NGTopRootLayer_pft(NZ),NZ)=LitrfalStrutElms_pvr(NE,M,k_woody_litr,NGTopRootLayer_pft(NZ),NZ) &
                 +(XHVST1(NE)*CFOPE(NE,inonstruct,M,NZ)*SeasonalNonstElms_pft(NE,NZ))*FWOODE(NE,k_woody_litr)
 
-              LitfalStrutElms_pvr(NE,M,k_fine_litr,NGTopRootLayer_pft(NZ),NZ)=LitfalStrutElms_pvr(NE,M,k_fine_litr,NGTopRootLayer_pft(NZ),NZ) &
+              LitrfalStrutElms_pvr(NE,M,k_fine_litr,NGTopRootLayer_pft(NZ),NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,NGTopRootLayer_pft(NZ),NZ) &
                 +(XHVST1(NE)*CFOPE(NE,inonstruct,M,NZ)*SeasonalNonstElms_pft(NE,NZ))*FWOODE(NE,k_fine_litr)
             ENDDO D3400
             SeasonalNonstElms_pft(NE,NZ)=SeasonalNonstElms_pft(NE,NZ)*XHVST(NE)

@@ -310,7 +310,7 @@ implicit none
     DO L=0,NL(NY,NX)
       DO K=1,micpar%NumOfPlantLitrCmplxs
         DO M=1,jsken
-          LitfalStrutElms_pvr(1:NumPlantChemElms,M,K,L,NZ,NY,NX)=plt_bgcr%LitfalStrutElms_pvr(1:NumPlantChemElms,M,K,L,NZ)
+          LitrfalStrutElms_pvr(1:NumPlantChemElms,M,K,L,NZ,NY,NX)=plt_bgcr%LitrfalStrutElms_pvr(1:NumPlantChemElms,M,K,L,NZ)
         ENDDO
       ENDDO
     ENDDO
@@ -1400,7 +1400,7 @@ implicit none
     DO L=0,MaxNumRootLays(NY,NX)
       DO K=1,micpar%NumOfPlantLitrCmplxs
         DO M=1,jsken
-          plt_bgcr%LitfalStrutElms_pvr(1:NumPlantChemElms,M,K,L,NZ)=LitfalStrutElms_pvr(1:NumPlantChemElms,M,K,L,NZ,NY,NX)
+          plt_bgcr%LitrfalStrutElms_pvr(1:NumPlantChemElms,M,K,L,NZ)=LitrfalStrutElms_pvr(1:NumPlantChemElms,M,K,L,NZ,NY,NX)
         enddo
       enddo
     ENDDO

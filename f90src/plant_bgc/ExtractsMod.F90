@@ -55,7 +55,7 @@ module ExtractsMod
    LitrfalStrutElms_pft      => plt_bgcr%LitrfalStrutElms_pft      , &
    LitrFallStrutElms_col     => plt_bgcr%LitrFallStrutElms_col      , &
    LitrfalStrutElms_vr       => plt_bgcr%LitrfalStrutElms_vr       , &
-   LitfalStrutElms_pvr       => plt_bgcr%LitfalStrutElms_pvr       , &
+   LitrfalStrutElms_pvr       => plt_bgcr%LitrfalStrutElms_pvr       , &
    MaxSoiL4Root              => plt_morph%MaxSoiL4Root       , &
    CanopyStemA_lyr           => plt_morph%CanopyStemA_lyr     , &
    CanopyLAgrid_lyr          =>  plt_morph%CanopyLAgrid_lyr    , &
@@ -70,7 +70,7 @@ module ExtractsMod
 !   HCSNC,HZSNC,HPSNC=hourly PFT C,N,P LitrFall from grosub.f
 !   StandingDeadStrutElms_col=total standing dead C,N,P mass
 !   WTSTG=PFT standing dead C,N,P mass
-!   LitfalStrutElms_pvr,=cumulative PFT C,N,P LitrFall from grosub.f
+!   LitrfalStrutElms_pvr,=cumulative PFT C,N,P LitrFall from grosub.f
 !   LitrfalStrutElms_vr,=cumulative total C,N,P LitrFall
 !
     DO NE=1,NumPlantChemElms
@@ -82,7 +82,7 @@ module ExtractsMod
       DO K=1,pltpar%NumOfPlantLitrCmplxs
         DO NE=1,NumPlantChemElms
           DO  M=1,pltpar%jsken
-            LitrfalStrutElms_vr(NE,M,K,L)=LitrfalStrutElms_vr(NE,M,K,L)+LitfalStrutElms_pvr(NE,M,K,L,NZ)
+            LitrfalStrutElms_vr(NE,M,K,L)=LitrfalStrutElms_vr(NE,M,K,L)+LitrfalStrutElms_pvr(NE,M,K,L,NZ)
           enddo
         ENDDO
       ENDDO

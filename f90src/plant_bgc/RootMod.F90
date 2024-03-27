@@ -392,7 +392,7 @@ implicit none
     RCO2N_pvr                       =>  plt_rbgc%RCO2N_pvr      , &
     RootRespPotent_pvr              =>  plt_rbgc%RootRespPotent_pvr      , &
     RAutoRootO2Limter_pvr          =>  plt_rbgc%RAutoRootO2Limter_pvr       , &
-    LitfalStrutElms_pvr               =>  plt_bgcr%LitfalStrutElms_pvr       , &
+    LitrfalStrutElms_pvr               =>  plt_bgcr%LitrfalStrutElms_pvr       , &
     rCNNonstructRemob_pft           =>  plt_allom%rCNNonstructRemob_pft     , &
     rCPNonstructRemob_pft           =>  plt_allom%rCPNonstructRemob_pft      , &
     FWODRE                          =>  plt_allom%FWODRE    , &
@@ -648,11 +648,11 @@ implicit none
 !      
       D6350: DO M=1,jsken
         DO NE=1,NumPlantChemElms
-          LitfalStrutElms_pvr(NE,M,k_woody_litr,L,NZ)=LitfalStrutElms_pvr(NE,M,k_woody_litr,L,NZ) &
+          LitrfalStrutElms_pvr(NE,M,k_woody_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_woody_litr,L,NZ) &
             +CFOPE(NE,icwood,M,NZ) &
             *FSNC2*(RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ)-RootChemElmRemob(NE))*FWODRE(NE,k_woody_litr)
 
-          LitfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ) &
+          LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ) &
             +CFOPE(NE,iroot,M,NZ) &
             *FSNC2*(RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ)-RootChemElmRemob(NE))*FWODRE(NE,k_fine_litr)
         ENDDO    
@@ -812,7 +812,7 @@ implicit none
     RCO2A_pvr                       =>  plt_rbgc%RCO2A_pvr      , &
     RCO2N_pvr                       =>  plt_rbgc%RCO2N_pvr      , &    
     RootRespPotent_pvr              =>  plt_rbgc%RootRespPotent_pvr      , &        
-    LitfalStrutElms_pvr               =>  plt_bgcr%LitfalStrutElms_pvr       , &    
+    LitrfalStrutElms_pvr               =>  plt_bgcr%LitrfalStrutElms_pvr       , &    
     iPlantRootProfile_pft           =>  plt_pheno%iPlantRootProfile_pft    , &   
     iPlantPhenolType_pft            =>  plt_pheno%iPlantPhenolType_pft    , & 
     fTgrowRootP_vr                  =>  plt_pheno%fTgrowRootP_vr      , &    
@@ -1133,15 +1133,15 @@ implicit none
             
             D6450: DO M=1,jsken
               DO NE=1,NumPlantChemElms
-                LitfalStrutElms_pvr(NE,M,k_woody_litr,LL,NZ)=LitfalStrutElms_pvr(NE,M,k_woody_litr,LL,NZ) &
+                LitrfalStrutElms_pvr(NE,M,k_woody_litr,LL,NZ)=LitrfalStrutElms_pvr(NE,M,k_woody_litr,LL,NZ) &
                   +CFOPE(NE,icwood,M,NZ) &
                   *FSNCM*AZMAX1(RootMyco2ndStrutElms_rpvr(NE,imycorrhz,LL,NR,NZ))*FWODRE(NE,k_woody_litr)
 
-                LitfalStrutElms_pvr(NE,M,k_fine_litr,LL,NZ)=LitfalStrutElms_pvr(NE,M,k_fine_litr,LL,NZ) &
+                LitrfalStrutElms_pvr(NE,M,k_fine_litr,LL,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,LL,NZ) &
                   +CFOPE(NE,iroot,M,NZ) &
                   *FSNCM*AZMAX1(RootMyco2ndStrutElms_rpvr(NE,imycorrhz,LL,NR,NZ))*FWODRE(NE,k_fine_litr)
 
-                LitfalStrutElms_pvr(NE,M,k_fine_litr,LL,NZ)=LitfalStrutElms_pvr(NE,M,k_fine_litr,LL,NZ) &
+                LitrfalStrutElms_pvr(NE,M,k_fine_litr,LL,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,LL,NZ) &
                   +CFOPE(NE,inonstruct,M,NZ) &
                   *FSNCP*AZMAX1(RootMycoNonstElms_rpvr(NE,imycorrhz,LL,NZ))
               ENDDO    
@@ -1224,7 +1224,7 @@ implicit none
     FWODRE                          =>  plt_allom%FWODRE    , &
     CFOPE                           =>  plt_soilchem%CFOPE  , &
     RAutoRootO2Limter_pvr          =>  plt_rbgc%RAutoRootO2Limter_pvr       , &
-    LitfalStrutElms_pvr               =>  plt_bgcr%LitfalStrutElms_pvr       , &
+    LitrfalStrutElms_pvr               =>  plt_bgcr%LitrfalStrutElms_pvr       , &
     iPlantCalendar_brch             =>  plt_pheno%iPlantCalendar_brch    , &
     MainBranchNum_pft               =>  plt_morph%MainBranchNum_pft         &
   )
@@ -1316,10 +1316,10 @@ implicit none
 !
   D6355: DO M=1,jsken
     DO NE=1,NumPlantChemElms    
-      LitfalStrutElms_pvr(NE,M,k_woody_litr,L,NZ)=LitfalStrutElms_pvr(NE,M,k_woody_litr,L,NZ) &
+      LitrfalStrutElms_pvr(NE,M,k_woody_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_woody_litr,L,NZ) &
         +CFOPE(NE,icwood,M,NZ)*FSNC1*(Root1stElm_raxs(NE,N,NR,NZ)-RootChemElmRemob(NE))*FWODRE(NE,k_woody_litr)
 
-      LitfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ) &
+      LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ) &
         +CFOPE(NE,iroot,M,NZ)*FSNC1*(Root1stElm_raxs(NE,N,NR,NZ)-RootChemElmRemob(NE))*FWODRE(NE,k_fine_litr)
     ENDDO
   ENDDO D6355
