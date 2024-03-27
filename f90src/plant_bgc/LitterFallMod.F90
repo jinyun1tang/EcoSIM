@@ -28,7 +28,7 @@ implicit none
     CanopyWater_pft             =>   plt_ew%CanopyWater_pft       , &
     ShootC4NonstC_brch          =>   plt_biom%ShootC4NonstC_brch, &
     RootElms_pft                =>   plt_biom%RootElms_pft     , &
-    SeasonNonStrutElms_pft            =>   plt_biom%SeasonNonStrutElms_pft     , &
+    SeasonalNonstElms_pft            =>   plt_biom%SeasonalNonstElms_pft     , &
     iPlantPhenolPattern_pft     =>   plt_pheno%iPlantPhenolPattern_pft   , &
     iPlantRootState_pft         =>   plt_pheno%iPlantRootState_pft   , &
     iPlantShootState_pft        =>   plt_pheno%iPlantShootState_pft    , &
@@ -100,7 +100,7 @@ implicit none
 !     PP=PFT population
 !     iPlantShootState_pft,IDTHR=PFT shoot,root living flag: 0=alive,1=dead
 !
-      IF(SeasonNonStrutElms_pft(ielmc,NZ).LT.1.0E-04_r8*RootElms_pft(ielmc,NZ).AND.&
+      IF(SeasonalNonstElms_pft(ielmc,NZ).LT.1.0E-04_r8*RootElms_pft(ielmc,NZ).AND.&
         iPlantPhenolPattern_pft(NZ).NE.iplt_annual)then
         iPlantRootState_pft(NZ)=iDead
       endif
@@ -151,7 +151,7 @@ implicit none
     CanopyNodulStrutElms_brch        =>   plt_biom%CanopyNodulStrutElms_brch   , &
     StalkRsrvElms_brch               =>   plt_biom%StalkRsrvElms_brch  , &
     CanopyNodulNonstElms_brch        =>   plt_biom%CanopyNodulNonstElms_brch   , &
-    SeasonNonStrutElms_pft                 =>   plt_biom%SeasonNonStrutElms_pft    , &
+    SeasonalNonstElms_pft                 =>   plt_biom%SeasonalNonstElms_pft    , &
     GrainStrutElms_brch              =>   plt_biom%GrainStrutElms_brch   , &
     RootMyco1stStrutElms_rpvr        =>   plt_biom%RootMyco1stStrutElms_rpvr   , &
     LeafStrutElms_brch               =>   plt_biom%LeafStrutElms_brch  , &
@@ -232,7 +232,7 @@ implicit none
               +HuskStrutElms_brch(NE,NB,NZ)+EarStrutElms_brch(NE,NB,NZ))
 
             IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual.AND.iPlantPhenolType_pft(NZ).NE.0)THEN
-              SeasonNonStrutElms_pft(NE,NZ)=SeasonNonStrutElms_pft(NE,NZ)+CFOPE(NE,inonfoliar,M,NZ) &
+              SeasonalNonstElms_pft(NE,NZ)=SeasonalNonstElms_pft(NE,NZ)+CFOPE(NE,inonfoliar,M,NZ) &
                 *GrainStrutElms_brch(NE,NB,NZ)
             ELSE
               LitfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ) &
@@ -289,10 +289,10 @@ implicit none
       DO M=1,jsken
         DO NE=1,NumPlantChemElms  
           LitfalStrutElms_pvr(NE,M,k_woody_litr,NGTopRootLayer_pft(NZ),NZ)=LitfalStrutElms_pvr(NE,M,k_woody_litr,NGTopRootLayer_pft(NZ),NZ) &
-            +CFOPE(NE,inonstruct,M,NZ)*SeasonNonStrutElms_pft(NE,NZ)*FWOODE(NE,k_woody_litr)
+            +CFOPE(NE,inonstruct,M,NZ)*SeasonalNonstElms_pft(NE,NZ)*FWOODE(NE,k_woody_litr)
 
           LitfalStrutElms_pvr(NE,M,k_fine_litr,NGTopRootLayer_pft(NZ),NZ)=LitfalStrutElms_pvr(NE,M,k_fine_litr,NGTopRootLayer_pft(NZ),NZ) &
-            +CFOPE(NE,inonstruct,M,NZ)*SeasonNonStrutElms_pft(NE,NZ)*FWOODE(NE,k_fine_litr)
+            +CFOPE(NE,inonstruct,M,NZ)*SeasonalNonstElms_pft(NE,NZ)*FWOODE(NE,k_fine_litr)
         ENDDO
       ENDDO
 !
@@ -545,7 +545,7 @@ implicit none
     GrainStrutElms_brch                =>  plt_biom%GrainStrutElms_brch     , &
     StalkRsrvElms_brch                 =>  plt_biom%StalkRsrvElms_brch    , &
     StandDeadKCompElms_pft             =>  plt_biom%StandDeadKCompElms_pft     , &
-    SeasonNonStrutElms_pft                   =>  plt_biom%SeasonNonStrutElms_pft      , &
+    SeasonalNonstElms_pft                   =>  plt_biom%SeasonalNonstElms_pft      , &
     CFOPE                              =>  plt_soilchem%CFOPE  , &
     iPlantBranchState_brch             =>  plt_pheno%iPlantBranchState_brch     , &
     MatureGroup_brch                   =>  plt_pheno%MatureGroup_brch    , &
@@ -654,7 +654,7 @@ implicit none
             +PetoleStrutElms_brch(NE,NB,NZ)*FWODBE(NE,k_woody_litr))
 
           IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual.AND.iPlantPhenolType_pft(NZ).NE.0)THEN
-            SeasonNonStrutElms_pft(NE,NZ)=SeasonNonStrutElms_pft(NE,NZ)+CFOPE(NE,inonfoliar,M,NZ)*GrainStrutElms_brch(NE,NB,NZ)
+            SeasonalNonstElms_pft(NE,NZ)=SeasonalNonstElms_pft(NE,NZ)+CFOPE(NE,inonfoliar,M,NZ)*GrainStrutElms_brch(NE,NB,NZ)
           ELSE
             LitfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ) &
               +CFOPE(NE,inonfoliar,M,NZ)*GrainStrutElms_brch(NE,NB,NZ)
@@ -679,9 +679,9 @@ implicit none
 !     iHarvstType_pft=harvest type:0=none,1=grain,2=all above-ground
 !                       ,3=pruning,4=grazing,5=fire,6=herbivory
 !
-      SeasonNonStrutElms_pft(ielmc,NZ)=SeasonNonStrutElms_pft(ielmc,NZ)+ShootC4NonstC_brch(NB,NZ)
+      SeasonalNonstElms_pft(ielmc,NZ)=SeasonalNonstElms_pft(ielmc,NZ)+ShootC4NonstC_brch(NB,NZ)
       DO NE=1,NumPlantChemElms
-        SeasonNonStrutElms_pft(NE,NZ)=SeasonNonStrutElms_pft(NE,NZ)+CanopyNonstElms_brch(NE,NB,NZ)
+        SeasonalNonstElms_pft(NE,NZ)=SeasonalNonstElms_pft(NE,NZ)+CanopyNonstElms_brch(NE,NB,NZ)
       ENDDO  
       IF(iHarvstType_pft(NZ).NE.4.AND.iHarvstType_pft(NZ).NE.6)THEN
         D6406: DO M=1,jsken
@@ -692,7 +692,7 @@ implicit none
         ENDDO D6406
       ELSE
         DO NE=1,NumPlantChemElms
-          SeasonNonStrutElms_pft(NE,NZ)=SeasonNonStrutElms_pft(NE,NZ)+StalkRsrvElms_brch(NE,NB,NZ)
+          SeasonalNonstElms_pft(NE,NZ)=SeasonalNonstElms_pft(NE,NZ)+StalkRsrvElms_brch(NE,NB,NZ)
         ENDDO  
       ENDIF
       
@@ -726,7 +726,7 @@ implicit none
      RootMycoNonstElms_rpvr       => plt_biom%RootMycoNonstElms_rpvr        , &
     SenecStalkStrutElms_brch      => plt_biom%SenecStalkStrutElms_brch       , &
     LeafPetolBiomassC_brch        => plt_biom%LeafPetolBiomassC_brch         , &
-    SeasonNonStrutElms_pft              => plt_biom%SeasonNonStrutElms_pft         , &
+    SeasonalNonstElms_pft              => plt_biom%SeasonalNonstElms_pft         , &
     RootMyco1stStrutElms_rpvr     => plt_biom%RootMyco1stStrutElms_rpvr        , &
     RootMyco2ndStrutElms_rpvr     => plt_biom%RootMyco2ndStrutElms_rpvr        , &
     CanopyNodulStrutElms_brch     => plt_biom%CanopyNodulStrutElms_brch        , &
@@ -783,7 +783,7 @@ implicit none
       enddo
     enddo
   ENDDO D6416
-  SeasonNonStrutElms_pft(1:NumPlantChemElms,NZ)=0._r8
+  SeasonalNonstElms_pft(1:NumPlantChemElms,NZ)=0._r8
   iPlantState_pft(NZ)=1
   end associate
   end subroutine ResetBranchRootStates

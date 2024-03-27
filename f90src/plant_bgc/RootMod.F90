@@ -31,7 +31,7 @@ implicit none
   real(r8) :: RootSinkC(jroots)
 
   associate(                                &
-    SeasonNonStrutElms_pft            =>   plt_biom%SeasonNonStrutElms_pft      , &
+    SeasonalNonstElms_pft            =>   plt_biom%SeasonalNonstElms_pft      , &
     ZEROL                        =>   plt_biom%ZEROL      , &
     DLYR3                        =>   plt_site%DLYR3      , &
     PlantPopulation_pft          =>   plt_site%PlantPopulation_pft         , &
@@ -82,7 +82,7 @@ implicit none
   RootAreaPerPlant_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)=RootAreaPerPlant_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)+&
     SeedAreaMean_pft(NZ)
 
-  IF(NumRootAxes4DeadPlant.EQ.NumRootAxes_pft(NZ) .OR. (SeasonNonStrutElms_pft(ielmc,NZ).LE.ZEROL(NZ).AND. &
+  IF(NumRootAxes4DeadPlant.EQ.NumRootAxes_pft(NZ) .OR. (SeasonalNonstElms_pft(ielmc,NZ).LE.ZEROL(NZ).AND. &
     iPlantPhenolPattern_pft(NZ).NE.iplt_annual))THEN
     iPlantRootState_pft(NZ)=iDead
     iPlantShootState_pft(NZ)=iDead
@@ -137,7 +137,7 @@ implicit none
     RootMycoActiveBiomC_pvr       =>   plt_biom%RootMycoActiveBiomC_pvr     , &
     RootElms_pft                  =>   plt_biom%RootElms_pft      , &
     ZEROP                         =>   plt_biom%ZEROP      , &
-    SeasonNonStrutElms_pft             =>   plt_biom%SeasonNonStrutElms_pft      , &
+    SeasonalNonstElms_pft             =>   plt_biom%SeasonalNonstElms_pft      , &
     FWODRE                        =>   plt_allom%FWODRE    , &
     RootBiomGrowthYield           =>   plt_allom%RootBiomGrowthYield     , &
     iPlantRootProfile_pft         =>   plt_pheno%iPlantRootProfile_pft    , &
@@ -240,17 +240,17 @@ implicit none
         IF(L.LE.NIXBotRootLayer_pft(NZ))THEN
           IF(RootMycoActiveBiomC_pvr(N,L,NZ).GT.ZEROP(NZ).AND. &
             RootElms_pft(ielmc,NZ).GT.ZEROP(NZ) &
-            .AND.SeasonNonStrutElms_pft(ielmc,NZ).LT.XFRX*RootElms_pft(ielmc,NZ))THEN
+            .AND.SeasonalNonstElms_pft(ielmc,NZ).LT.XFRX*RootElms_pft(ielmc,NZ))THEN
             FWTRT=RootMycoActiveBiomC_pvr(N,L,NZ)/RootElms_pft(ielmc,NZ)
             WTRTLX=RootMycoActiveBiomC_pvr(N,L,NZ)
             WTRTTX=RootElms_pft(ielmc,NZ)*FWTRT
             WTRTTT=WTRTLX+WTRTTX
             CPOOLX=AZMAX1(RootMycoNonstElms_rpvr(ielmc,N,L,NZ))
-            WTRVCX=AZMAX1(SeasonNonStrutElms_pft(ielmc,NZ)*FWTRT)
+            WTRVCX=AZMAX1(SeasonalNonstElms_pft(ielmc,NZ)*FWTRT)
             NonstElmGradt=(WTRVCX*WTRTLX-CPOOLX*WTRTTX)/WTRTTT
             XFRC=AZMIN1(XFRY*NonstElmGradt)
             RootMycoNonstElms_rpvr(ielmc,N,L,NZ)=RootMycoNonstElms_rpvr(ielmc,N,L,NZ)+XFRC
-            SeasonNonStrutElms_pft(ielmc,NZ)=SeasonNonStrutElms_pft(ielmc,NZ)-XFRC
+            SeasonalNonstElms_pft(ielmc,NZ)=SeasonalNonstElms_pft(ielmc,NZ)-XFRC
           ENDIF
         ENDIF
 !
@@ -1689,7 +1689,7 @@ implicit none
     PopuRootMycoC_pvr                  =>   plt_biom% PopuRootMycoC_pvr   , &
     StalkBiomassC_brch                 =>   plt_biom%StalkBiomassC_brch   , &
     StalkRsrvElms_brch                 =>   plt_biom%StalkRsrvElms_brch  , &
-    SeasonNonStrutElms_pft                  =>   plt_biom%SeasonNonStrutElms_pft    , &
+    SeasonalNonstElms_pft                  =>   plt_biom%SeasonalNonstElms_pft    , &
     CanopyLeafShethC_pft               =>   plt_biom%CanopyLeafShethC_pft     , &
     RootElms_pft                       =>   plt_biom%RootElms_pft    , &
     ZEROL                              =>   plt_biom%ZEROL    , &
@@ -1884,10 +1884,10 @@ implicit none
         XFRE(ielmp)=AMIN1(XFREX(ielmp),XFRE(ielmc)*CPMX,XFREX(ielmn)*CPMX/CNMN*0.5_r8)
         DO NE=1,NumPlantChemElms
           RootMycoNonstElms_rpvr(NE,N,L,NZ)=RootMycoNonstElms_rpvr(NE,N,L,NZ)-XFRE(NE)
-          SeasonNonStrutElms_pft(NE,NZ)=SeasonNonStrutElms_pft(NE,NZ)+XFRE(NE)
-          if(RootMycoNonstElms_rpvr(NE,N,L,NZ)<0._r8 .or. SeasonNonStrutElms_pft(NE,NZ)<0._r8)then
+          SeasonalNonstElms_pft(NE,NZ)=SeasonalNonstElms_pft(NE,NZ)+XFRE(NE)
+          if(RootMycoNonstElms_rpvr(NE,N,L,NZ)<0._r8 .or. SeasonalNonstElms_pft(NE,NZ)<0._r8)then
             write(*,*)'1871RootMycoNonstElms_rpvr(NE,N,L,NZ)',NE,N,RootMycoNonstElms_rpvr(NE,N,L,NZ)+XFRE(NE),&
-              SeasonNonStrutElms_pft(NE,NZ)-XFRE(NE),XFRE(NE)
+              SeasonalNonstElms_pft(NE,NZ)-XFRE(NE),XFRE(NE)
             stop
           endif
         ENDDO

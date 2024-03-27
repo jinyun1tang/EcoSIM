@@ -155,7 +155,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  GrainSeedBiomCMean_brch(:,:,:,:)                     !maximum grain C during grain fill, [g d-2]
   real(r8),target,allocatable ::  StandDeadKCompElms_pft(:,:,:,:,:)                  !standing dead element fraction, [g d-2]
   real(r8),target,allocatable ::  StandDeadStrutElms_pft(:,:,:,:)                    !standing dead element, [g d-2]
-  real(r8),target,allocatable ::  SeasonNonStrutElms_pft(:,:,:,:)                     !plant stored nonstructural element, [g d-2]
+  real(r8),target,allocatable ::  SeasonalNonstElms_pft(:,:,:,:)                     !plant stored nonstructural element, [g d-2]
   real(r8),target,allocatable ::  SeedCPlanted_pft(:,:,:)                       !plant stored nonstructural C at planting, [g d-2]
   REAL(R8),target,allocatable ::  AvgCanopyBiomC2Graze_pft(:,:,:)                      !landscape average canopy shoot C, [g d-2]
   contains
@@ -311,7 +311,7 @@ module CanopyDataType
   allocate(GrainSeedBiomCMean_brch(MaxNumBranches,JP,JY,JX)); GrainSeedBiomCMean_brch=0._r8
   allocate(StandDeadKCompElms_pft(NumPlantChemElms,jsken,JP,JY,JX)); StandDeadKCompElms_pft=0._r8
   allocate(StandDeadStrutElms_pft(NumPlantChemElms,JP,JY,JX));    StandDeadStrutElms_pft=0._r8
-  allocate(SeasonNonStrutElms_pft(NumPlantChemElms,JP,JY,JX));  SeasonNonStrutElms_pft=0._r8
+  allocate(SeasonalNonstElms_pft(NumPlantChemElms,JP,JY,JX));  SeasonalNonstElms_pft=0._r8
   allocate(SeedCPlanted_pft(JP,JY,JX));    SeedCPlanted_pft=0._r8
   allocate(AvgCanopyBiomC2Graze_pft(JP,JY,JX));   AvgCanopyBiomC2Graze_pft=0._r8
   end subroutine InitCanopyData
@@ -466,7 +466,7 @@ module CanopyDataType
   call destroy(GrainSeedBiomCMean_brch)
   call destroy(StandDeadKCompElms_pft)
   call destroy(StandDeadStrutElms_pft)
-  call destroy(SeasonNonStrutElms_pft)
+  call destroy(SeasonalNonstElms_pft)
   call destroy(SeedCPlanted_pft)
   call destroy(AvgCanopyBiomC2Graze_pft)
   end subroutine DestructCanopyData
