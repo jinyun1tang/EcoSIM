@@ -1819,16 +1819,17 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrp_2d(1:npfts,1:NumPlantChemElms)
-    call restartvar(ncid, flag, varname='NonStrutElms_pft', dim1name='pft',dim2name='elmnts',&
+    call restartvar(ncid, flag, varname='SeasonNonStrutElms_pft', dim1name='pft',dim2name='elmnts',&
      long_name='plant stored nonstructural element', units='g d-2', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)     
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,NonStrutElms_pft,datrp_2d,NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft)   
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,SeasonNonStrutElms_pft,datrp_2d,NumActivePlants=NumActivePlants &
+      ,IsPlantActive_pft=IsPlantActive_pft)   
   else
     !print*,'NonStrutElms_pft'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,NonStrutElms_pft,datrp_2d,NumActivePlants=NumActivePlants,&
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,SeasonNonStrutElms_pft,datrp_2d,NumActivePlants=NumActivePlants,&
       IsPlantActive_pft=IsPlantActive_pft)     
     datpr2 => datrp_2d(1:npfts,1:NumPlantChemElms)
-    call restartvar(ncid, flag, varname='NonStrutElms_pft', dim1name='pft',dim2name='elmnts',&
+    call restartvar(ncid, flag, varname='SeasonNonStrutElms_pft', dim1name='pft',dim2name='elmnts',&
      long_name='plant stored nonstructural element', units='g d-2', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)     
   endif  
