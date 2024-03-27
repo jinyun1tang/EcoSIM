@@ -147,14 +147,14 @@ module ExtractsMod
     RUNNXP                   => plt_rbgc%RUNNXP , &
     RUPOXP                   => plt_rbgc%RUPOXP , &
     trcg_Root_DisEvap_flx_vr => plt_rbgc%trcg_Root_DisEvap_flx_vr , &
-    trcg_air2root_flx__pvr => plt_rbgc%trcg_air2root_flx__pvr , &
-    RCO2P                    => plt_rbgc%RCO2P  , &
+    trcg_air2root_flx__pvr   => plt_rbgc%trcg_air2root_flx__pvr , &
+    RCO2P_pvr                => plt_rbgc%RCO2P_pvr , &
     RUPGasSol_vr             => plt_rbgc%RUPGasSol_vr , &
     RootNutUptake_pvr        => plt_rbgc%RootNutUptake_pvr , &
     trcg_air2root_flx_vr     => plt_rbgc%trcg_air2root_flx_vr , &
     trcg_TLP                 => plt_rbgc%trcg_TLP , &
     ROXYP                    => plt_rbgc%ROXYP  , &
-    RootMycoExudElm_pvr                   => plt_rbgc%RootMycoExudElm_pvr , &
+    RootMycoExudElm_pvr      => plt_rbgc%RootMycoExudElm_pvr , &
     RUNNHP                   => plt_rbgc%RUNNHP , &
     RUNNOP                   => plt_rbgc%RUNNOP , &
     RUPP2P                   => plt_rbgc%RUPP2P , &
@@ -219,7 +219,7 @@ module ExtractsMod
           +trcg_air2root_flx__pvr(NTG,N,L,NZ)-trcg_Root_DisEvap_flx_vr(NTG,N,L,NZ)
       ENDDO
 
-      trcs_rootml_pvr(idg_CO2,N,L,NZ)=trcs_rootml_pvr(idg_CO2,N,L,NZ)+trcg_Root_DisEvap_flx_vr(idg_CO2,N,L,NZ)+RCO2P(N,L,NZ)
+      trcs_rootml_pvr(idg_CO2,N,L,NZ)=trcs_rootml_pvr(idg_CO2,N,L,NZ)+trcg_Root_DisEvap_flx_vr(idg_CO2,N,L,NZ)+RCO2P_pvr(N,L,NZ)
       trcs_rootml_pvr(idg_O2,N,L,NZ)=trcs_rootml_pvr(idg_O2,N,L,NZ)+trcg_Root_DisEvap_flx_vr(idg_O2,N,L,NZ)-RUPOXP(N,L,NZ)
       trcs_rootml_pvr(idg_CH4,N,L,NZ)=trcs_rootml_pvr(idg_CH4,N,L,NZ) &
         +trcg_Root_DisEvap_flx_vr(idg_CH4,N,L,NZ)+RUPGasSol_vr(idg_CH4,N,L,NZ)
@@ -254,7 +254,7 @@ module ExtractsMod
         trcg_air2root_flx_vr(NTG,L)=trcg_air2root_flx_vr(NTG,L)+trcg_air2root_flx__pvr(NTG,N,L,NZ)
       ENDDO
 
-      TCO2P(L)=TCO2P(L)-RCO2P(N,L,NZ)
+      TCO2P(L)=TCO2P(L)-RCO2P_pvr(N,L,NZ)
       TUPOXP(L)=TUPOXP(L)+RUPOXP(N,L,NZ)
       trcs_plant_uptake_vr(idg_CO2,L)=trcs_plant_uptake_vr(idg_CO2,L)+RUPGasSol_vr(idg_CO2,N,L,NZ)
       trcs_plant_uptake_vr(idg_O2,L)=trcs_plant_uptake_vr(idg_O2,L)+RUPGasSol_vr(idg_O2,N,L,NZ)
@@ -380,8 +380,8 @@ module ExtractsMod
     NumOfBranches_pft          => plt_morph%NumOfBranches_pft   , &
     CanopyStemArea_pft         => plt_morph%CanopyStemArea_pft , &
     CanopyLeafArea_pft         => plt_morph%CanopyLeafArea_pft , &
-    RadNet2CanP                => plt_rad%RadNet2CanP    , &
-    LWRadCanP                  => plt_rad%LWRadCanP   , &
+    RadNet2Canopy_pft                => plt_rad%RadNet2Canopy_pft    , &
+    LWRadCanopy_pft                  => plt_rad%LWRadCanopy_pft   , &
     Eco_NetRad_col             => plt_rad%Eco_NetRad_col       &
   )
   DO L=NU,MaxSoiL4Root(NZ)
@@ -391,7 +391,7 @@ module ExtractsMod
 !     TOTAL ENERGY, WATER, CO2 FLUXES
 !
 !     Eco_NetRad_col=total net SW+LW absorbed by canopy
-!     RadNet2CanP=PFT net SW+LW absorbed by canopy
+!     RadNet2Canopy_pft=PFT net SW+LW absorbed by canopy
 !     Eco_Heat_Latent_col=total canopy latent heat flux
 !     EvapTransHeat_pft=PFT canopy latent heat flux
 !     Eco_Heat_Sens_col=total canopy sensible heat flux
@@ -415,7 +415,7 @@ module ExtractsMod
 !     TRootGasLossDisturb_pft=total loss of root CO2, O2, CH4, N2O, NH3, H2
 !     RootGasLossDisturb_pft=PFT loss of root CO2, O2, CH4, N2O, NH3, H2
 !
-  Eco_NetRad_col     = Eco_NetRad_col+RadNet2CanP(NZ)
+  Eco_NetRad_col     = Eco_NetRad_col+RadNet2Canopy_pft(NZ)
   Eco_Heat_Latent_col= Eco_Heat_Latent_col+EvapTransHeat_pft(NZ)
   Eco_Heat_Sens_col  = Eco_Heat_Sens_col+HeatXAir2PCan(NZ)
   Eco_Heat_Grnd_col  = Eco_Heat_Grnd_col+HeatStorCanP(NZ)
@@ -429,7 +429,7 @@ module ExtractsMod
   TENGYC             = TENGYC+ENGYC
   THFLXC             = THFLXC+ENGYC-ENGYX(NZ)-(PrecIntcptByCanopy_pft(NZ)*cpw*TairK)
   ENGYX(NZ)          = ENGYC
-  LWRadCanG          = LWRadCanG+LWRadCanP(NZ)
+  LWRadCanG          = LWRadCanG+LWRadCanopy_pft(NZ)
   CanopyLeafArea_grd = CanopyLeafArea_grd+CanopyLeafArea_pft(NZ)
   StemArea_grd       = StemArea_grd+CanopyStemArea_pft(NZ)
 

@@ -762,7 +762,7 @@ module StartqMod
       trcg_air2root_flx__pvr(idg_CO2,N,L,NZ,NY,NX)=0._r8
       trcg_Root_DisEvap_flx_vr(idg_CO2,N,L,NZ,NY,NX)=0._r8
       RUPGasSol_vr(idg_CO2,N,L,NZ,NY,NX)=0._r8
-      RCO2P(N,L,NZ,NY,NX)=0._r8
+      RCO2P_pvr(N,L,NZ,NY,NX)=0._r8
       COXYA=AtmGasCgperm3(idg_O2,NY,NX)
       COXYP=0.032_r8*EXP(-6.175_r8-0.0211_r8*ATCA(NY,NX))*OXYE(NY,NX)
       trcg_rootml_pvr(idg_beg:idg_end-1,N,L,NZ,NY,NX)=0._r8

@@ -17,7 +17,7 @@ implicit none
   implicit none
   integer, intent(in) :: I,J,NZ
 
-  integer :: IDTHY
+  integer :: NumDeadBranches
 
 !     begin_execution
   associate(                                 &
@@ -72,13 +72,13 @@ implicit none
   IF(J.EQ.INT(SolarNoonHour_col).AND.iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).NE.0 &
     .AND.(iPlantPhenolPattern_pft(NZ).NE.iplt_annual.OR.(I.GE.iDayPlantHarvest_pft(NZ) &
     .AND.iYearCurrent.GE.iYearPlantHarvest_pft(NZ))))THEN
-    IDTHY=0
+    NumDeadBranches=0
 !
 !     RESET PHENOLOGY AND GROWTH STAGE OF DEAD BRANCHES
 !
-    call LiterfallFromDeadBranches(I,J,NZ,IDTHY,ShootC4NonstC_brch)
+    call LiterfallFromDeadBranches(I,J,NZ,NumDeadBranches,ShootC4NonstC_brch)
 
-    IF(IDTHY.EQ.NumOfBranches_pft(NZ))THEN
+    IF(NumDeadBranches.EQ.NumOfBranches_pft(NZ))THEN
       iPlantShootState_pft(NZ)=iDead
       BranchNumber_pft(NZ)=0
       HoursCanopyPSITooLow(NZ)=0._r8
@@ -144,7 +144,7 @@ implicit none
     iYearPlanting_pft                =>   plt_distb%iYearPlanting_pft    , &
     iDayPlanting_pft                 =>   plt_distb%iDayPlanting_pft   , &
     EarStrutElms_brch                =>   plt_biom%EarStrutElms_brch  , &
-    CanopyNonstElms_brch                =>   plt_biom%CanopyNonstElms_brch   , &
+    CanopyNonstElms_brch             =>   plt_biom%CanopyNonstElms_brch   , &
     StalkStrutElms_brch              =>   plt_biom%StalkStrutElms_brch  , &
     HuskStrutElms_brch               =>   plt_biom%HuskStrutElms_brch  , &
     PetoleStrutElms_brch             =>   plt_biom%PetoleStrutElms_brch , &
@@ -172,7 +172,7 @@ implicit none
     icwood                           =>   pltpar%icwood     , &
     ifoliar                          =>   pltpar%ifoliar    , &
     k_fine_litr                      =>   pltpar%k_fine_litr, &
-    k_woody_litr                     =>  pltpar%k_woody_litr, &
+    k_woody_litr                     =>   pltpar%k_woody_litr, &
     LitfalStrutElms_pvr              =>   plt_bgcr%LitfalStrutElms_pvr     , &
     inonfoliar                       =>   pltpar%inonfoliar   , &
     istalk                           =>   pltpar%istalk     , &
@@ -212,10 +212,9 @@ implicit none
 !
   IF(iPlantShootState_pft(NZ).EQ.iDead.AND.iPlantRootState_pft(NZ).EQ.iDead)THEN
     !both plant shoots and roots are dead
-    IF(doInitPlant_pft(NZ).EQ.ifalse)THEN
-      D6425: DO M=1,jsken
-        D8825: DO NB=1,NumOfBranches_pft(NZ)
-
+    IF(doInitPlant_pft(NZ).EQ.ifalse)THEN      
+      D8825: DO NB=1,NumOfBranches_pft(NZ)
+        D6425: DO M=1,jsken
           LitfalStrutElms_pvr(ielmc,M,k_fine_litr,0,NZ)=LitfalStrutElms_pvr(ielmc,M,k_fine_litr,0,NZ) &
             +CFOPE(ielmc,inonstruct,M,NZ)*ShootC4NonstC_brch(NB,NZ)
 
@@ -248,7 +247,9 @@ implicit none
                 +CFOPE(NE,icwood,M,NZ)*StalkStrutElms_brch(NE,NB,NZ)
             ENDIF
           ENDDO
-        ENDDO D8825
+        ENDDO D6425  
+      ENDDO D8825
+      
 !
 !     LitrFall AND STATE VARIABLES FOR SEASONAL STORAGE
 !     RESERVES FROM ROOT AND STORGE AT DEATH
@@ -261,12 +262,17 @@ implicit none
 !     FWOOD,FWOODN,FWOODP=C,N,P woody fraction in root:0=woody,1=non-woody
 !     WTRVC,WTRVN,WTRVP=storage C,N,P
 !
-        DO NE=1,NumPlantChemElms
-          D6415: DO L=NU,MaxNumRootLays
-            DO N=1,MY(NZ)
+        
+      D6415: DO L=NU,MaxNumRootLays
+        DO N=1,MY(NZ)
+          DO M=1,jsken
+            DO NE=1,NumPlantChemElms
               LitfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ) &
-                +CFOPE(NE,inonstruct,M,NZ)* RootMycoNonstElms_rpvr(NE,N,L,NZ)
-              DO NR=1,NumRootAxes_pft(NZ)
+                +CFOPE(NE,inonstruct,M,NZ)*RootMycoNonstElms_rpvr(NE,N,L,NZ)
+            ENDDO    
+
+            DO NR=1,NumRootAxes_pft(NZ)
+              DO NE=1,NumPlantChemElms
                 LitfalStrutElms_pvr(NE,M,k_woody_litr,L,NZ)=LitfalStrutElms_pvr(NE,M,k_woody_litr,L,NZ)&
                   +CFOPE(NE,icwood,M,NZ) &
                   *(RootMyco1stStrutElms_rpvr(NE,N,L,NR,NZ)+RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ))*FWODRE(NE,k_woody_litr)
@@ -274,15 +280,20 @@ implicit none
                 LitfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)+CFOPE(NE,iroot,M,NZ) &
                   *(RootMyco1stStrutElms_rpvr(NE,N,L,NR,NZ)+RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ))*FWODRE(NE,k_fine_litr)
               ENDDO
-            ENDDO
-          ENDDO D6415
+            ENDDO  
+          ENDDO  
+        ENDDO
+      ENDDO D6415
+
+      DO M=1,jsken
+        DO NE=1,NumPlantChemElms  
           LitfalStrutElms_pvr(NE,M,k_woody_litr,NGTopRootLayer_pft(NZ),NZ)=LitfalStrutElms_pvr(NE,M,k_woody_litr,NGTopRootLayer_pft(NZ),NZ) &
             +CFOPE(NE,inonstruct,M,NZ)*NonStrutElms_pft(NE,NZ)*FWOODE(NE,k_woody_litr)
 
           LitfalStrutElms_pvr(NE,M,k_fine_litr,NGTopRootLayer_pft(NZ),NZ)=LitfalStrutElms_pvr(NE,M,k_fine_litr,NGTopRootLayer_pft(NZ),NZ) &
             +CFOPE(NE,inonstruct,M,NZ)*NonStrutElms_pft(NE,NZ)*FWOODE(NE,k_fine_litr)
         ENDDO
-      ENDDO D6425
+      ENDDO
 !
       call ResetBranchRootStates(NZ,ShootC4NonstC_brch)
     ENDIF
@@ -317,49 +328,49 @@ implicit none
     RootMyco2ndStrutElms_rpvr    =>   plt_biom%RootMyco2ndStrutElms_rpvr    , &
     Root1stElm_raxs              =>   plt_biom%Root1stElm_raxs    , &
     RootMyco1stStrutElms_rpvr    =>   plt_biom%RootMyco1stStrutElms_rpvr    , &
-     RootMycoNonstElms_rpvr    =>   plt_biom%RootMycoNonstElms_rpvr    , &
-     PopuRootMycoC_pvr            =>   plt_biom% PopuRootMycoC_pvr    , &
-    RootMycoActiveBiomC_pvr            =>   plt_biom%RootMycoActiveBiomC_pvr    , &
-    RootProteinC_pvr              =>   plt_biom%RootProteinC_pvr     , &
-    RootNodulNonstElms_pvr   =>   plt_biom%RootNodulNonstElms_pvr   , &
-    RootNodulStrutElms_pvr        =>   plt_biom%RootNodulStrutElms_pvr    , &
-    FWODRE                        =>   plt_allom%FWODRE   , &
-    iPlantRootState_pft           =>   plt_pheno%iPlantRootState_pft   , &
-    CFOPE                         =>   plt_soilchem%CFOPE , &
-    trcg_rootml_pvr                =>   plt_rbgc%trcg_rootml_pvr  , &
-    trcs_rootml_pvr                => plt_rbgc%trcs_rootml_pvr, &
-    MaxNumRootLays                =>   plt_site%MaxNumRootLays        , &
-    NU                            =>   plt_site%NU        , &
-    RootGasLossDisturb_pft        =>   plt_bgcr%RootGasLossDisturb_pft     , &
-    LitfalStrutElms_pvr     =>   plt_bgcr%LitfalStrutElms_pvr      , &
-    icwood                        =>   pltpar%icwood      , &
-    iroot                         =>   pltpar%iroot       , &
-    inonstruct                    =>   pltpar%inonstruct   , &
-    k_fine_litr                   =>  pltpar%k_fine_litr , &
-    k_woody_litr                  => pltpar%k_woody_litr, &
-    RootLenDensPerPlant_pvr       =>   plt_morph%RootLenDensPerPlant_pvr    , &
-    RootVH2O_pvr                   =>   plt_morph%RootVH2O_pvr   , &
-    RootAreaPerPlant_pvr           =>   plt_morph%RootAreaPerPlant_pvr    , &
-    RootPoreVol_pvr                 =>   plt_morph%RootPoreVol_pvr    , &
-    Root2ndXNum_pvr             =>   plt_morph%Root2ndXNum_pvr     , &
+     RootMycoNonstElms_rpvr      =>   plt_biom%RootMycoNonstElms_rpvr    , &
+     PopuRootMycoC_pvr           =>   plt_biom% PopuRootMycoC_pvr    , &
+    RootMycoActiveBiomC_pvr      =>   plt_biom%RootMycoActiveBiomC_pvr    , &
+    RootProteinC_pvr             =>   plt_biom%RootProteinC_pvr     , &
+    RootNodulNonstElms_pvr       =>   plt_biom%RootNodulNonstElms_pvr   , &
+    RootNodulStrutElms_pvr       =>   plt_biom%RootNodulStrutElms_pvr    , &
+    FWODRE                       =>   plt_allom%FWODRE   , &
+    iPlantRootState_pft          =>   plt_pheno%iPlantRootState_pft   , &
+    CFOPE                        =>   plt_soilchem%CFOPE , &
+    trcg_rootml_pvr              =>   plt_rbgc%trcg_rootml_pvr  , &
+    trcs_rootml_pvr              =>   plt_rbgc%trcs_rootml_pvr, &
+    MaxNumRootLays               =>   plt_site%MaxNumRootLays        , &
+    NU                           =>   plt_site%NU        , &
+    RootGasLossDisturb_pft       =>   plt_bgcr%RootGasLossDisturb_pft     , &
+    LitfalStrutElms_pvr          =>   plt_bgcr%LitfalStrutElms_pvr      , &
+    icwood                       =>   pltpar%icwood      , &
+    iroot                        =>   pltpar%iroot       , &
+    inonstruct                   =>   pltpar%inonstruct   , &
+    k_fine_litr                  =>   pltpar%k_fine_litr , &
+    k_woody_litr                 =>   pltpar%k_woody_litr, &
+    RootLenDensPerPlant_pvr      =>   plt_morph%RootLenDensPerPlant_pvr    , &
+    RootVH2O_pvr                 =>   plt_morph%RootVH2O_pvr   , &
+    RootAreaPerPlant_pvr         =>   plt_morph%RootAreaPerPlant_pvr    , &
+    RootPoreVol_pvr              =>   plt_morph%RootPoreVol_pvr    , &
+    Root2ndXNum_pvr              =>   plt_morph%Root2ndXNum_pvr     , &
     Root1stXNumL_pvr             =>   plt_morph%Root1stXNumL_pvr    , &
-    Root1stDepz_pft                 =>   plt_morph%Root1stDepz_pft   , &
-    AveLen2ndRoot_pvr               =>   plt_morph%AveLen2ndRoot_pvr    , &
+    Root1stDepz_pft              =>   plt_morph%Root1stDepz_pft   , &
+    AveLen2ndRoot_pvr            =>   plt_morph%AveLen2ndRoot_pvr    , &
     Root1stRadius_pvr            =>   plt_morph%Root1stRadius_pvr    , &
-    Radius2ndRoot_pvr           =>   plt_morph%Radius2ndRoot_pvr    , &
-    Max1stRootRadius_pft              =>   plt_morph%Max1stRootRadius_pft   , &
-    Max2ndRootRadius_pft              =>   plt_morph%Max2ndRootRadius_pft   , &
-    RootLenPerPlant_pvr           =>   plt_morph%RootLenPerPlant_pvr    , &
-    Root1stLen_rpvr                   =>   plt_morph%Root1stLen_rpvr    , &
-    Root2ndLen_pvr                  =>   plt_morph%Root2ndLen_pvr    , &
-    iPlantNfixType                =>   plt_morph%iPlantNfixType   , &
-    Root2ndXNum_rpvr            =>   plt_morph%Root2ndXNum_rpvr    , &
-    MY                            =>   plt_morph%MY       , &
-    NIXBotRootLayer_pft           =>   plt_morph%NIXBotRootLayer_pft     , &
-    NIXBotRootLayer_rpft          =>   plt_morph%NIXBotRootLayer_rpft     , &
-    SeedDepth_pft                 =>   plt_morph%SeedDepth_pft    , &
-    NGTopRootLayer_pft            =>   plt_morph%NGTopRootLayer_pft       , &
-    NumRootAxes_pft               =>   plt_morph%NumRootAxes_pft       &
+    Radius2ndRoot_pvr            =>   plt_morph%Radius2ndRoot_pvr    , &
+    Max1stRootRadius_pft         =>   plt_morph%Max1stRootRadius_pft   , &
+    Max2ndRootRadius_pft         =>   plt_morph%Max2ndRootRadius_pft   , &
+    RootLenPerPlant_pvr          =>   plt_morph%RootLenPerPlant_pvr    , &
+    Root1stLen_rpvr              =>   plt_morph%Root1stLen_rpvr    , &
+    Root2ndLen_pvr               =>   plt_morph%Root2ndLen_pvr    , &
+    iPlantNfixType               =>   plt_morph%iPlantNfixType   , &
+    Root2ndXNum_rpvr             =>   plt_morph%Root2ndXNum_rpvr    , &
+    MY                           =>   plt_morph%MY       , &
+    NIXBotRootLayer_pft          =>   plt_morph%NIXBotRootLayer_pft     , &
+    NIXBotRootLayer_rpft         =>   plt_morph%NIXBotRootLayer_rpft     , &
+    SeedDepth_pft                =>   plt_morph%SeedDepth_pft    , &
+    NGTopRootLayer_pft           =>   plt_morph%NGTopRootLayer_pft       , &
+    NumRootAxes_pft              =>   plt_morph%NumRootAxes_pft       &
   )
 !     IDTHR=PFT root living flag: 0=alive,1=dead
 !     CSNC,ZSNC,PSNC=C,N,P LitrFall from senescence
@@ -376,20 +387,24 @@ implicit none
   IF(iPlantRootState_pft(NZ).EQ.iDead)THEN
     !add root to LitrFall
     D8900: DO N=1,MY(NZ)
-      D8895: DO L=NU,MaxNumRootLays
-        DO NE=1,NumPlantChemElms
-          D6410: DO M=1,jsken
+      D8895: DO L=NU,MaxNumRootLays        
+        D6410: DO M=1,jsken
+          DO NE=1,NumPlantChemElms
             LitfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ) &
               +CFOPE(NE,inonstruct,M,NZ)* RootMycoNonstElms_rpvr(NE,N,L,NZ)
-            DO  NR=1,NumRootAxes_pft(NZ)
+          ENDDO 
+
+          DO  NR=1,NumRootAxes_pft(NZ)
+            DO NE=1,NumPlantChemElms
               LitfalStrutElms_pvr(NE,M,k_woody_litr,L,NZ)=LitfalStrutElms_pvr(NE,M,k_woody_litr,L,NZ)+CFOPE(NE,icwood,M,NZ) &
                 *(RootMyco1stStrutElms_rpvr(NE,N,L,NR,NZ)+RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ))*FWODRE(NE,k_woody_litr)
 
               LitfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)+CFOPE(NE,iroot,M,NZ) &
                 *(RootMyco1stStrutElms_rpvr(NE,N,L,NR,NZ)+RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ))*FWODRE(NE,k_fine_litr)
             enddo
-          ENDDO D6410
-        ENDDO
+          ENDDO
+        ENDDO D6410
+        
 !
 !     RELEASE GAS CONTENTS OF DEAD ROOTS
 !
@@ -424,9 +439,9 @@ implicit none
           Root2ndLen_pvr(N,L,NR,NZ)=0._r8
           Root2ndXNum_rpvr(N,L,NR,NZ)=0._r8
         ENDDO D8870
-         RootMycoNonstElms_rpvr(:,N,L,NZ)=0._r8
+        RootMycoNonstElms_rpvr(:,N,L,NZ)=0._r8
         RootMycoActiveBiomC_pvr(N,L,NZ)=0._r8
-         PopuRootMycoC_pvr(N,L,NZ)=0._r8
+        PopuRootMycoC_pvr(N,L,NZ)=0._r8
         RootProteinC_pvr(N,L,NZ)=0._r8
         Root1stXNumL_pvr(N,L,NZ)=0._r8
         Root2ndXNum_pvr(N,L,NZ)=0._r8
@@ -481,72 +496,72 @@ implicit none
   end subroutine LiterfallFromDeadRoots
 !------------------------------------------------------------------------------------------
 
-  subroutine LiterfallFromDeadBranches(I,J,NZ,IDTHY,ShootC4NonstC_brch)
+  subroutine LiterfallFromDeadBranches(I,J,NZ,NumDeadBranches,ShootC4NonstC_brch)
   implicit none
   integer, intent(in) :: I,J,NZ
-  integer, intent(inout) :: IDTHY
+  integer, intent(inout) :: NumDeadBranches
   real(r8), intent(inout) :: ShootC4NonstC_brch(NumOfCanopyLayers1,JP1)
   integer :: M,NE,NB
 !     begin_execution
   associate(                                &
-    iHarvstType_pft              =>  plt_distb%iHarvstType_pft     , &
-    FWODBE                       =>  plt_allom%FWODBE    , &
-    FWODLE                       =>  plt_allom%FWODLE    , &
-    CanopyNodulNonstElms_brch    =>  plt_biom%CanopyNodulNonstElms_brch     , &
-    StalkStrutElms_brch         =>  plt_biom%StalkStrutElms_brch    , &
-    HuskStrutElms_brch          =>  plt_biom%HuskStrutElms_brch    , &
-    PetoleStrutElms_brch         =>  plt_biom%PetoleStrutElms_brch   , &
-    CanopyNodulStrutElms_brch   =>  plt_biom%CanopyNodulStrutElms_brch     , &
-    LeafStrutElms_brch   =>  plt_biom%LeafStrutElms_brch    , &
-    ZEROP     =>  plt_biom%ZEROP      , &
-    EarStrutElms_brch   =>  plt_biom%EarStrutElms_brch    , &
-    CanopyNonstElms_brch    =>  plt_biom%CanopyNonstElms_brch     , &
-    GrainStrutElms_brch    =>  plt_biom%GrainStrutElms_brch     , &
-    StalkRsrvElms_brch   =>  plt_biom%StalkRsrvElms_brch    , &
-    StandDeadKCompElms_pft    =>  plt_biom%StandDeadKCompElms_pft     , &
-    NonStrutElms_pft     =>  plt_biom%NonStrutElms_pft      , &
-    CFOPE     =>  plt_soilchem%CFOPE  , &
-    iPlantBranchState_brch     =>  plt_pheno%iPlantBranchState_brch     , &
-    MatureGroup_brch    =>  plt_pheno%MatureGroup_brch    , &
-    LeafNumberAtFloralInit_brch    =>  plt_pheno%LeafNumberAtFloralInit_brch    , &
-    KHiestGroLeafNode_brch    =>  plt_pheno%KHiestGroLeafNode_brch    , &
-    TotalNodeNumNormByMatgrp_brch    =>  plt_pheno%TotalNodeNumNormByMatgrp_brch    , &
-    TotReproNodeNumNormByMatrgrp_brch    =>  plt_pheno%TotReproNodeNumNormByMatrgrp_brch    , &
-    Hours4Leafout_brch      =>  plt_pheno%Hours4Leafout_brch      , &
-    Hours4LeafOff_brch      =>  plt_pheno%Hours4LeafOff_brch      , &
+    iHarvstType_pft                    =>  plt_distb%iHarvstType_pft     , &
+    FWODBE                             =>  plt_allom%FWODBE    , &
+    FWODLE                             =>  plt_allom%FWODLE    , &
+    CanopyNodulNonstElms_brch          =>  plt_biom%CanopyNodulNonstElms_brch     , &
+    StalkStrutElms_brch                =>  plt_biom%StalkStrutElms_brch    , &
+    HuskStrutElms_brch                 =>  plt_biom%HuskStrutElms_brch    , &
+    PetoleStrutElms_brch               =>  plt_biom%PetoleStrutElms_brch   , &
+    CanopyNodulStrutElms_brch          =>  plt_biom%CanopyNodulStrutElms_brch     , &
+    LeafStrutElms_brch                 =>  plt_biom%LeafStrutElms_brch    , &
+    ZEROP                              =>  plt_biom%ZEROP      , &
+    EarStrutElms_brch                  =>  plt_biom%EarStrutElms_brch    , &
+    CanopyNonstElms_brch               =>  plt_biom%CanopyNonstElms_brch     , &
+    GrainStrutElms_brch                =>  plt_biom%GrainStrutElms_brch     , &
+    StalkRsrvElms_brch                 =>  plt_biom%StalkRsrvElms_brch    , &
+    StandDeadKCompElms_pft             =>  plt_biom%StandDeadKCompElms_pft     , &
+    NonStrutElms_pft                   =>  plt_biom%NonStrutElms_pft      , &
+    CFOPE                              =>  plt_soilchem%CFOPE  , &
+    iPlantBranchState_brch             =>  plt_pheno%iPlantBranchState_brch     , &
+    MatureGroup_brch                   =>  plt_pheno%MatureGroup_brch    , &
+    LeafNumberAtFloralInit_brch        =>  plt_pheno%LeafNumberAtFloralInit_brch    , &
+    KHiestGroLeafNode_brch             =>  plt_pheno%KHiestGroLeafNode_brch    , &
+    TotalNodeNumNormByMatgrp_brch      =>  plt_pheno%TotalNodeNumNormByMatgrp_brch    , &
+    TotReproNodeNumNormByMatrgrp_brch  =>  plt_pheno%TotReproNodeNumNormByMatrgrp_brch    , &
+    Hours4Leafout_brch                 =>  plt_pheno%Hours4Leafout_brch      , &
+    Hours4LeafOff_brch                 =>  plt_pheno%Hours4LeafOff_brch      , &
     Hours4LenthenPhotoPeriod_brch      =>  plt_pheno%Hours4LenthenPhotoPeriod_brch      , &
     Hours4ShortenPhotoPeriod_brch      =>  plt_pheno%Hours4ShortenPhotoPeriod_brch      , &
-    Hours2LeafOut_brch      =>  plt_pheno%Hours2LeafOut_brch      , &
-    HourFailGrainFill_brch      =>  plt_pheno%HourFailGrainFill_brch      , &
-    doInitLeafOut_brch     =>  plt_pheno%doInitLeafOut_brch     , &
-    doPlantLeafOut_brch     =>  plt_pheno%doPlantLeafOut_brch     , &
-    Prep4Literfall_brch     =>  plt_pheno%Prep4Literfall_brch     , &
-    Hours4LiterfalAftMature_brch     =>  plt_pheno%Hours4LiterfalAftMature_brch     , &
-    MatureGroup_pft   =>  plt_pheno%MatureGroup_pft   , &
-    doPlantLeaveOff_brch     =>  plt_pheno%doPlantLeaveOff_brch     , &
-    iPlantCalendar_brch    =>  plt_pheno%iPlantCalendar_brch    , &
-    iPlantTurnoverPattern_pft    =>  plt_pheno%iPlantTurnoverPattern_pft    , &
-    iPlantRootProfile_pft    =>  plt_pheno%iPlantRootProfile_pft    , &
-    iPlantPhenolType_pft    =>  plt_pheno%iPlantPhenolType_pft    , &
-    iPlantPhenolPattern_pft    =>  plt_pheno%iPlantPhenolPattern_pft    , &
-    LitfalStrutElms_pvr      =>  plt_bgcr%LitfalStrutElms_pvr       , &
-    NumOfBranches_pft       =>  plt_morph%NumOfBranches_pft       , &
-    NodeNum2InitFloral_brch     =>  plt_morph%NodeNum2InitFloral_brch     , &
-    ShootNodeNumber_brch     =>  plt_morph%ShootNodeNumber_brch     , &
-    BranchNumber_brch      =>  plt_morph%BranchNumber_brch      , &
-    NodeNumberAtAnthesis_brch     =>  plt_morph%NodeNumberAtAnthesis_brch     , &
-    XTLI      =>  plt_morph%XTLI      , &
-    NumOfLeaves_brch     =>  plt_morph%NumOfLeaves_brch     , &
-    KLeafNumber_brch    =>  plt_morph%KLeafNumber_brch    , &
-    istalk    =>  pltpar%istalk       , &
-    k_fine_litr=>   pltpar%k_fine_litr, &
-    k_woody_litr=> pltpar%k_woody_litr, &
-    inonstruct   =>   pltpar%inonstruct   , &
-    icwood     =>   pltpar%icwood     , &
-    inonfoliar   =>  pltpar%inonfoliar    , &
-    ifoliar    => pltpar%ifoliar      , &
-    RubiscoActivity_brch      =>  plt_photo%RubiscoActivity_brch      , &
-    C4PhotosynDowreg_brch     =>  plt_photo%C4PhotosynDowreg_brch       &
+    Hours2LeafOut_brch                 =>  plt_pheno%Hours2LeafOut_brch      , &
+    HourFailGrainFill_brch             =>  plt_pheno%HourFailGrainFill_brch      , &
+    doInitLeafOut_brch                 =>  plt_pheno%doInitLeafOut_brch     , &
+    doPlantLeafOut_brch                =>  plt_pheno%doPlantLeafOut_brch     , &
+    Prep4Literfall_brch                =>  plt_pheno%Prep4Literfall_brch     , &
+    Hours4LiterfalAftMature_brch       =>  plt_pheno%Hours4LiterfalAftMature_brch     , &
+    MatureGroup_pft                    =>  plt_pheno%MatureGroup_pft   , &
+    doPlantLeaveOff_brch               =>  plt_pheno%doPlantLeaveOff_brch     , &
+    iPlantCalendar_brch                =>  plt_pheno%iPlantCalendar_brch    , &
+    iPlantTurnoverPattern_pft          =>  plt_pheno%iPlantTurnoverPattern_pft    , &
+    iPlantRootProfile_pft              =>  plt_pheno%iPlantRootProfile_pft    , &
+    iPlantPhenolType_pft               =>  plt_pheno%iPlantPhenolType_pft    , &
+    iPlantPhenolPattern_pft            =>  plt_pheno%iPlantPhenolPattern_pft    , &
+    LitfalStrutElms_pvr                =>  plt_bgcr%LitfalStrutElms_pvr       , &
+    NumOfBranches_pft                  =>  plt_morph%NumOfBranches_pft       , &
+    NodeNum2InitFloral_brch            =>  plt_morph%NodeNum2InitFloral_brch     , &
+    ShootNodeNumber_brch               =>  plt_morph%ShootNodeNumber_brch     , &
+    BranchNumber_brch                  =>  plt_morph%BranchNumber_brch      , &
+    NodeNumberAtAnthesis_brch          =>  plt_morph%NodeNumberAtAnthesis_brch     , &
+    XTLI                               =>  plt_morph%XTLI      , &
+    NumOfLeaves_brch                   =>  plt_morph%NumOfLeaves_brch     , &
+    KLeafNumber_brch                   =>  plt_morph%KLeafNumber_brch    , &
+    istalk                             =>  pltpar%istalk       , &
+    k_fine_litr                        =>   pltpar%k_fine_litr, &
+    k_woody_litr                       => pltpar%k_woody_litr, &
+    inonstruct                         =>   pltpar%inonstruct   , &
+    icwood                             =>   pltpar%icwood     , &
+    inonfoliar                         =>  pltpar%inonfoliar    , &
+    ifoliar                            => pltpar%ifoliar      , &
+    RubiscoActivity_brch               =>  plt_photo%RubiscoActivity_brch      , &
+    C4PhotosynDowreg_brch              =>  plt_photo%C4PhotosynDowreg_brch       &
   )
   D8845: DO NB=1,NumOfBranches_pft(NZ)
     IF(iPlantBranchState_brch(NB,NZ).EQ.iDead)THEN
@@ -641,19 +656,23 @@ implicit none
       NonStrutElms_pft(ielmc,NZ)=NonStrutElms_pft(ielmc,NZ)+ShootC4NonstC_brch(NB,NZ)
       DO NE=1,NumPlantChemElms
         NonStrutElms_pft(NE,NZ)=NonStrutElms_pft(NE,NZ)+CanopyNonstElms_brch(NE,NB,NZ)
-        IF(iHarvstType_pft(NZ).NE.4.AND.iHarvstType_pft(NZ).NE.6)THEN
-          D6406: DO M=1,jsken
+      ENDDO  
+      IF(iHarvstType_pft(NZ).NE.4.AND.iHarvstType_pft(NZ).NE.6)THEN
+        D6406: DO M=1,jsken
+          DO NE=1,NumPlantChemElms
             LitfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ) &
               +CFOPE(NE,inonstruct,M,NZ)*StalkRsrvElms_brch(NE,NB,NZ)
-          ENDDO D6406
-        ELSE
+          ENDDO    
+        ENDDO D6406
+      ELSE
+        DO NE=1,NumPlantChemElms
           NonStrutElms_pft(NE,NZ)=NonStrutElms_pft(NE,NZ)+StalkRsrvElms_brch(NE,NB,NZ)
-        ENDIF
-      ENDDO
-!
+        ENDDO  
+      ENDIF
+      
       call ResetDeadRootStates(NB,NZ,ShootC4NonstC_brch)
 
-      IDTHY=IDTHY+1
+      NumDeadBranches=NumDeadBranches+1
     ENDIF
   ENDDO D8845
   end associate
@@ -668,39 +687,40 @@ implicit none
   integer :: L,NR,N,NE,NB
 !     begin_execution
   associate(                           &
-    CanopyNonstElms_brch => plt_biom%CanopyNonstElms_brch        , &
-    CanopyNodulNonstElms_brch => plt_biom%CanopyNodulNonstElms_brch        , &
-    ShootStrutElms_brch=> plt_biom%ShootStrutElms_brch       , &
-    LeafStrutElms_brch=> plt_biom%LeafStrutElms_brch       , &
-    StalkRsrvElms_brch=> plt_biom%StalkRsrvElms_brch       , &
-    PetoleStrutElms_brch=> plt_biom%PetoleStrutElms_brch      , &
-    HuskStrutElms_brch=> plt_biom%HuskStrutElms_brch       , &
-    EarStrutElms_brch=> plt_biom%EarStrutElms_brch       , &
-    GrainStrutElms_brch => plt_biom%GrainStrutElms_brch        , &
-    StalkBiomassC_brch => plt_biom%StalkBiomassC_brch        , &
-     RootMycoNonstElms_rpvr => plt_biom%RootMycoNonstElms_rpvr        , &
-    SenecStalkStrutElms_brch=> plt_biom%SenecStalkStrutElms_brch       , &
-    LeafPetolBiomassC_brch  => plt_biom%LeafPetolBiomassC_brch         , &
-    NonStrutElms_pft  => plt_biom%NonStrutElms_pft         , &
-    RootMyco1stStrutElms_rpvr => plt_biom%RootMyco1stStrutElms_rpvr        , &
-    RootMyco2ndStrutElms_rpvr => plt_biom%RootMyco2ndStrutElms_rpvr        , &
-    CanopyNodulStrutElms_brch => plt_biom%CanopyNodulStrutElms_brch        , &
-    StalkStrutElms_brch=> plt_biom%StalkStrutElms_brch       , &
-    Root1stElm_raxs => plt_biom%Root1stElm_raxs        , &
-    MaxNumRootLays     => plt_site%MaxNumRootLays            , &
-    NU     => plt_site%NU            , &
-    iPlantState_pft  => plt_pheno%iPlantState_pft        , &
-    Root2ndLen_pvr  => plt_morph%Root2ndLen_pvr        , &
-    Root2ndXNum_rpvr  => plt_morph%Root2ndXNum_rpvr        , &
-    Root1stLen_rpvr  => plt_morph%Root1stLen_rpvr        , &
-    MY     => plt_morph%MY           , &
-    NumOfBranches_pft    => plt_morph%NumOfBranches_pft          , &
-    NumRootAxes_pft   => plt_morph%NumRootAxes_pft           &
+    CanopyNonstElms_brch          => plt_biom%CanopyNonstElms_brch        , &
+    CanopyNodulNonstElms_brch     => plt_biom%CanopyNodulNonstElms_brch        , &
+    ShootStrutElms_brch           => plt_biom%ShootStrutElms_brch       , &
+    LeafStrutElms_brch            => plt_biom%LeafStrutElms_brch       , &
+    StalkRsrvElms_brch            => plt_biom%StalkRsrvElms_brch       , &
+    PetoleStrutElms_brch          => plt_biom%PetoleStrutElms_brch      , &
+    HuskStrutElms_brch            => plt_biom%HuskStrutElms_brch       , &
+    EarStrutElms_brch             => plt_biom%EarStrutElms_brch       , &
+    GrainStrutElms_brch           => plt_biom%GrainStrutElms_brch        , &
+    StalkBiomassC_brch            => plt_biom%StalkBiomassC_brch        , &
+     RootMycoNonstElms_rpvr       => plt_biom%RootMycoNonstElms_rpvr        , &
+    SenecStalkStrutElms_brch      => plt_biom%SenecStalkStrutElms_brch       , &
+    LeafPetolBiomassC_brch        => plt_biom%LeafPetolBiomassC_brch         , &
+    NonStrutElms_pft              => plt_biom%NonStrutElms_pft         , &
+    RootMyco1stStrutElms_rpvr     => plt_biom%RootMyco1stStrutElms_rpvr        , &
+    RootMyco2ndStrutElms_rpvr     => plt_biom%RootMyco2ndStrutElms_rpvr        , &
+    CanopyNodulStrutElms_brch     => plt_biom%CanopyNodulStrutElms_brch        , &
+    StalkStrutElms_brch           => plt_biom%StalkStrutElms_brch       , &
+    Root1stElm_raxs               => plt_biom%Root1stElm_raxs        , &
+    MaxNumRootLays                => plt_site%MaxNumRootLays            , &
+    NU                            => plt_site%NU            , &
+    iPlantState_pft               => plt_pheno%iPlantState_pft        , &
+    Root2ndLen_pvr                => plt_morph%Root2ndLen_pvr        , &
+    Root2ndXNum_rpvr              => plt_morph%Root2ndXNum_rpvr        , &
+    Root1stLen_rpvr               => plt_morph%Root1stLen_rpvr        , &
+    MY                            => plt_morph%MY           , &
+    NumOfBranches_pft             => plt_morph%NumOfBranches_pft          , &
+    NumRootAxes_pft               => plt_morph%NumRootAxes_pft           &
   )
 !     RESET BRANCH STATE VARIABLES
 !
-  DO NE=1,NumPlantChemElms
-    DO NB=1,NumOfBranches_pft(NZ)
+  
+  DO NB=1,NumOfBranches_pft(NZ)
+    DO NE=1,NumPlantChemElms
       CanopyNonstElms_brch(NE,NB,NZ)=0._r8
       CanopyNodulNonstElms_brch(NE,NB,NZ)=0._r8
       ShootStrutElms_brch(NE,NB,NZ)=0._r8
@@ -710,6 +730,7 @@ implicit none
       StalkRsrvElms_brch(NE,NB,NZ)=0._r8
     ENDDO
   ENDDO
+  
   D8835: DO NB=1,NumOfBranches_pft(NZ)
     ShootC4NonstC_brch(NB,NZ)=0._r8
     StalkBiomassC_brch(NB,NZ)=0._r8
@@ -751,45 +772,45 @@ implicit none
   integer :: L,K,N
 !     begin_execution
   associate(                          &
-    CanopyNonstElms_brch   => plt_biom%CanopyNonstElms_brch     , &
-    CanopyNodulNonstElms_brch   => plt_biom%CanopyNodulNonstElms_brch     , &
-    ShootStrutElms_brch  => plt_biom%ShootStrutElms_brch    , &
-    LeafStrutElms_brch  => plt_biom%LeafStrutElms_brch    , &
-    CanopyNodulStrutElms_brch   => plt_biom%CanopyNodulStrutElms_brch     , &
-    StalkStrutElms_brch  => plt_biom%StalkStrutElms_brch    , &
-    LeafElmntNode_brch    => plt_biom%LeafElmntNode_brch      , &
-    StalkRsrvElms_brch  => plt_biom%StalkRsrvElms_brch    , &
-    SenecStalkStrutElms_brch  => plt_biom%SenecStalkStrutElms_brch    , &
-    StalkBiomassC_brch   => plt_biom%StalkBiomassC_brch     , &
-    GrainStrutElms_brch   => plt_biom%GrainStrutElms_brch     , &
-    LeafPetolBiomassC_brch    => plt_biom%LeafPetolBiomassC_brch      , &
-    HuskStrutElms_brch  => plt_biom%HuskStrutElms_brch    , &
-    EarStrutElms_brch  => plt_biom%EarStrutElms_brch    , &
-    PetioleProteinCNode_brch   => plt_biom%PetioleProteinCNode_brch     , &
-    LeafProteinCNode_brch     => plt_biom%LeafProteinCNode_brch       , &
-    InternodeStrutElms_brch   => plt_biom%InternodeStrutElms_brch     , &
-    PetioleElmntNode_brch   => plt_biom%PetioleElmntNode_brch     , &
+    CanopyNonstElms_brch          => plt_biom%CanopyNonstElms_brch     , &
+    CanopyNodulNonstElms_brch     => plt_biom%CanopyNodulNonstElms_brch     , &
+    ShootStrutElms_brch           => plt_biom%ShootStrutElms_brch    , &
+    LeafStrutElms_brch            => plt_biom%LeafStrutElms_brch    , &
+    CanopyNodulStrutElms_brch     => plt_biom%CanopyNodulStrutElms_brch     , &
+    StalkStrutElms_brch           => plt_biom%StalkStrutElms_brch    , &
+    LeafElmntNode_brch            => plt_biom%LeafElmntNode_brch      , &
+    StalkRsrvElms_brch            => plt_biom%StalkRsrvElms_brch    , &
+    SenecStalkStrutElms_brch      => plt_biom%SenecStalkStrutElms_brch    , &
+    StalkBiomassC_brch            => plt_biom%StalkBiomassC_brch     , &
+    GrainStrutElms_brch           => plt_biom%GrainStrutElms_brch     , &
+    LeafPetolBiomassC_brch        => plt_biom%LeafPetolBiomassC_brch      , &
+    HuskStrutElms_brch            => plt_biom%HuskStrutElms_brch    , &
+    EarStrutElms_brch             => plt_biom%EarStrutElms_brch    , &
+    PetioleProteinCNode_brch      => plt_biom%PetioleProteinCNode_brch     , &
+    LeafProteinCNode_brch         => plt_biom%LeafProteinCNode_brch       , &
+    InternodeStrutElms_brch       => plt_biom%InternodeStrutElms_brch     , &
+    PetioleElmntNode_brch         => plt_biom%PetioleElmntNode_brch     , &
     LeafChemElmByLayerNode_brch   => plt_biom%LeafChemElmByLayerNode_brch     , &
-    CanopyLeafCLyr_pft    => plt_biom%CanopyLeafCLyr_pft      , &
-    PetoleStrutElms_brch => plt_biom%PetoleStrutElms_brch   , &
-    CPOOL3_node   => plt_photo%CPOOL3_node    , &
-    CPOOL4_node   => plt_photo%CPOOL4_node    , &
+    CanopyLeafCLyr_pft            => plt_biom%CanopyLeafCLyr_pft      , &
+    PetoleStrutElms_brch          => plt_biom%PetoleStrutElms_brch   , &
+    CPOOL3_node                   => plt_photo%CPOOL3_node    , &
+    CPOOL4_node                   => plt_photo%CPOOL4_node    , &
     CMassCO2BundleSheath_node     => plt_photo%CMassCO2BundleSheath_node      , &
-    CMassHCO3BundleSheath_node     => plt_photo%CMassHCO3BundleSheath_node      , &
-    GrainSeedBiomCMean_brch    => plt_allom%GrainSeedBiomCMean_brch     , &
-    PotentialSeedSites_brch    => plt_morph%PotentialSeedSites_brch     , &
-    SeedNumSet_brch    => plt_morph%SeedNumSet_brch     , &
-    LeafAreaLive_brch    => plt_morph%LeafAreaLive_brch     , &
-    CanopyStemArea_lbrch    => plt_morph%CanopyStemArea_lbrch     , &
-    NumOfBranches_pft      => plt_morph%NumOfBranches_pft       , &
-    LeafAreaNode_brch    => plt_morph%LeafAreaNode_brch     , &
-    PetioleLengthNode_brch    => plt_morph%PetioleLengthNode_brch     , &
-    InternodeHeightDying_brch   => plt_morph%InternodeHeightDying_brch    , &
-    LeafAreaZsec_brch     => plt_morph%LeafAreaZsec_brch      , &
-    InternodeHeightLive_brch   => plt_morph%InternodeHeightLive_brch    , &
-    CanopyLeafALyr_pft    => plt_morph%CanopyLeafALyr_pft     , &
-    StemAreaZsec_brch    => plt_morph%StemAreaZsec_brch     , &
-    CanopyLeafAreaByLayer_pft    => plt_morph%CanopyLeafAreaByLayer_pft       &
+    CMassHCO3BundleSheath_node    => plt_photo%CMassHCO3BundleSheath_node      , &
+    GrainSeedBiomCMean_brch       => plt_allom%GrainSeedBiomCMean_brch     , &
+    PotentialSeedSites_brch       => plt_morph%PotentialSeedSites_brch     , &
+    SeedNumSet_brch               => plt_morph%SeedNumSet_brch     , &
+    LeafAreaLive_brch             => plt_morph%LeafAreaLive_brch     , &
+    CanopyStemArea_lbrch          => plt_morph%CanopyStemArea_lbrch     , &
+    NumOfBranches_pft             => plt_morph%NumOfBranches_pft       , &
+    LeafAreaNode_brch             => plt_morph%LeafAreaNode_brch     , &
+    PetioleLengthNode_brch        => plt_morph%PetioleLengthNode_brch     , &
+    InternodeHeightDying_brch     => plt_morph%InternodeHeightDying_brch    , &
+    LeafAreaZsec_brch             => plt_morph%LeafAreaZsec_brch      , &
+    InternodeHeightLive_brch      => plt_morph%InternodeHeightLive_brch    , &
+    CanopyLeafALyr_pft            => plt_morph%CanopyLeafALyr_pft     , &
+    StemAreaZsec_brch             => plt_morph%StemAreaZsec_brch     , &
+    CanopyLeafAreaByLayer_pft     => plt_morph%CanopyLeafAreaByLayer_pft       &
   )
 !
 !     CPOOL,ZPOOL,PPOOL=non-structural C,N,P in branch

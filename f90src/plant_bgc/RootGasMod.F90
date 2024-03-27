@@ -75,18 +75,18 @@ module RootGasMod
     RCO2F                      =>  plt_bgcr%RCO2F    , &
     ROXYL                      =>  plt_bgcr%ROXYL    , &
     RUPOXP                     =>  plt_rbgc%RUPOXP   , &
-    RAutoRootO2Limter_pvr     =>  plt_rbgc%RAutoRootO2Limter_pvr     , &
+    RAutoRootO2Limter_pvr      =>  plt_rbgc%RAutoRootO2Limter_pvr     , &
     ZEROQ                      =>  plt_rbgc%ZEROQ    , &
-    RootRespPotent_pvr       =>  plt_rbgc%RootRespPotent_pvr    , &
+    RootRespPotent_pvr         =>  plt_rbgc%RootRespPotent_pvr    , &
     ROXYP                      =>  plt_rbgc%ROXYP    , &
     ROXSK                      =>  plt_rbgc%ROXSK    , &
-    RCO2P                      =>  plt_rbgc%RCO2P    , &
-    trcg_air2root_flx__pvr   =>  plt_rbgc%trcg_air2root_flx__pvr   , &
+    RCO2P_pvr                  =>  plt_rbgc%RCO2P_pvr   , &
+    trcg_air2root_flx__pvr     =>  plt_rbgc%trcg_air2root_flx__pvr   , &
     trcg_Root_DisEvap_flx_vr   =>  plt_rbgc%trcg_Root_DisEvap_flx_vr   , &
     RUPGasSol_vr               =>  plt_rbgc%RUPGasSol_vr   , &
-    RCO2A_pvr                      =>  plt_rbgc%RCO2A_pvr    , &
-    trcg_rootml_pvr             =>  plt_rbgc%trcg_rootml_pvr     , &
-    trcs_rootml_pvr             =>  plt_rbgc%trcs_rootml_pvr     , &
+    RCO2A_pvr                  =>  plt_rbgc%RCO2A_pvr    , &
+    trcg_rootml_pvr            =>  plt_rbgc%trcg_rootml_pvr     , &
+    trcs_rootml_pvr            =>  plt_rbgc%trcs_rootml_pvr     , &
     TFND                       =>  plt_soilchem%TFND , &
     trcs_VLN_vr                =>  plt_soilchem%trcs_VLN_vr, &
     trc_solml_vr               =>  plt_soilchem%trc_solml_vr, &
@@ -604,7 +604,7 @@ module RootGasMod
 !     RUPOXP=root O2 uptake from root
 !     ROXSK=total O2 uptake from soil by all microbial,root popns
 !
-          RCO2P(N,L,NZ)=RCO2P(N,L,NZ)+RCO2PX+RUPSolute(idg_CO2)
+          RCO2P_pvr(N,L,NZ)=RCO2P_pvr(N,L,NZ)+RCO2PX+RUPSolute(idg_CO2)
           RUPOXP(N,L,NZ)=RUPOXP(N,L,NZ)-RUPSolute(idg_O2)
           ROXSK(M,L)=ROXSK(M,L)+RUPOSX
 !          if(NZ==1)then

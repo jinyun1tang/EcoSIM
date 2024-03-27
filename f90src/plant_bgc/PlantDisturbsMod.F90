@@ -1836,6 +1836,7 @@ module PlantDisturbsMod
             CPOLNG=CPOLNX*FHVSE(ielmc)
             ZPOLNG=ZPOLNX*FHVSE(ielmc)
             PPOLNG=PPOLNX*FHVSE(ielmc)
+            
             WTNDG=CanopyNodulStrutElms_brch(ielmc,NB,NZ)*FHVSE(ielmc)
             WTNDNG=CanopyNodulStrutElms_brch(ielmn,NB,NZ)*FHVSE(ielmc)
             WTNDPG=CanopyNodulStrutElms_brch(ielmp,NB,NZ)*FHVSE(ielmc)
@@ -1868,6 +1869,7 @@ module PlantDisturbsMod
               CPOLNG=AZMAX1(CPOLNX-WHVSNX)
               ZPOLNG=AZMAX1(ZPOLNX-WHVSNX*ZPOLNX/CanopyNodulNonstElms_brch(ielmc,NB,NZ))
               PPOLNG=AZMAX1(PPOLNX-WHVSNX*PPOLNX/CanopyNodulNonstElms_brch(ielmc,NB,NZ))
+
               WTNDG=CanopyNodulStrutElms_brch(ielmc,NB,NZ)*(1._r8-WHVSNX/CPOLNX)
               WTNDNG=CanopyNodulStrutElms_brch(ielmn,NB,NZ)*(1._r8-WHVSNX/CPOLNX)
               WTNDPG=CanopyNodulStrutElms_brch(ielmp,NB,NZ)*(1._r8-WHVSNX/CPOLNX)
@@ -1875,6 +1877,7 @@ module PlantDisturbsMod
               CPOLNG=0._r8
               ZPOLNG=0._r8
               PPOLNG=0._r8
+
               WTNDG=0._r8
               WTNDNG=0._r8
               WTNDPG=0._r8
