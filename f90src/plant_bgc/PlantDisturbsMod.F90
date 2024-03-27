@@ -394,7 +394,7 @@ module PlantDisturbsMod
     ECO_ER_col     =>  plt_bgcr%ECO_ER_col    , &
     CanopyPlusNoduRespC_pft    =>  plt_bgcr%CanopyPlusNoduRespC_pft   , &
     GrossResp_pft    =>  plt_bgcr%GrossResp_pft   , &
-    NonStrutElms_pft    =>  plt_biom%NonStrutElms_pft     &
+    SeasonNonStrutElms_pft    =>  plt_biom%SeasonNonStrutElms_pft     &
   )
 !
 !     TotalElmntRemoval(ielmc),TotalElmntRemoval(ielmn),TotalElmntRemoval(ielmp)=total C,N,P removed
@@ -423,7 +423,7 @@ module PlantDisturbsMod
         Eco_NBP_col=Eco_NBP_col+TotalElmnt2Litr(ielmc)-TotalElmntRemoval(ielmc)
       ELSE
         DO NE=1,NumPlantChemElms
-          NonStrutElms_pft(NE,NZ)=NonStrutElms_pft(NE,NZ)+TotalElmntRemoval(NE)-TotalElmnt2Litr(NE)
+          SeasonNonStrutElms_pft(NE,NZ)=SeasonNonStrutElms_pft(NE,NZ)+TotalElmntRemoval(NE)-TotalElmnt2Litr(NE)
         ENDDO
       ENDIF
 !
@@ -693,7 +693,7 @@ module PlantDisturbsMod
     InternodeStrutElms_brch     =>  plt_biom%InternodeStrutElms_brch     , &
     CanopyStalkC_pft            =>  plt_biom%CanopyStalkC_pft      , &
     Root1stElm_raxs             =>  plt_biom%Root1stElm_raxs     , &
-    NonStrutElms_pft            =>  plt_biom%NonStrutElms_pft      , &
+    SeasonNonStrutElms_pft            =>  plt_biom%SeasonNonStrutElms_pft      , &
     CanopyLeafShethC_pft        =>  plt_biom%CanopyLeafShethC_pft       , &
     RootMyco2ndStrutElms_rpvr   =>  plt_biom%RootMyco2ndStrutElms_rpvr     , &
     RootNodulNonstElms_pvr      =>  plt_biom%RootNodulNonstElms_pvr    , &
@@ -843,7 +843,7 @@ module PlantDisturbsMod
                   +PetoleStrutElms_brch(NE,NB,NZ)*FWODBE(NE,k_woody_litr))
 
                 IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual.AND.iPlantPhenolType_pft(NZ).NE.0)THEN
-                  NonStrutElms_pft(NE,NZ)=NonStrutElms_pft(NE,NZ)+XHVST1*CFOPE(NE,inonfoliar,M,NZ)*GrainStrutElms_brch(NE,NB,NZ)
+                  SeasonNonStrutElms_pft(NE,NZ)=SeasonNonStrutElms_pft(NE,NZ)+XHVST1*CFOPE(NE,inonfoliar,M,NZ)*GrainStrutElms_brch(NE,NB,NZ)
                 ELSE
                   LitfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)+XHVST1 &
                     *CFOPE(NE,inonfoliar,M,NZ)*GrainStrutElms_brch(NE,NB,NZ)
@@ -1070,13 +1070,13 @@ module PlantDisturbsMod
           D6400: DO M=1,jsken
             LitfalStrutElms_pvr(NE,M,k_woody_litr,NGTopRootLayer_pft(NZ),NZ)=&
               LitfalStrutElms_pvr(NE,M,k_woody_litr,NGTopRootLayer_pft(NZ),NZ) &
-              +(XHVST1*CFOPE(NE,inonstruct,M,NZ)*NonStrutElms_pft(NE,NZ))*FWOODE(NE,k_woody_litr)
+              +(XHVST1*CFOPE(NE,inonstruct,M,NZ)*SeasonNonStrutElms_pft(NE,NZ))*FWOODE(NE,k_woody_litr)
 
             LitfalStrutElms_pvr(NE,M,k_fine_litr,NGTopRootLayer_pft(NZ),NZ)=&
               LitfalStrutElms_pvr(NE,M,k_fine_litr,NGTopRootLayer_pft(NZ),NZ) &
-              +(XHVST1*CFOPE(NE,inonstruct,M,NZ)*NonStrutElms_pft(NE,NZ))*FWOODE(NE,k_fine_litr)
+              +(XHVST1*CFOPE(NE,inonstruct,M,NZ)*SeasonNonStrutElms_pft(NE,NZ))*FWOODE(NE,k_fine_litr)
           ENDDO D6400
-          NonStrutElms_pft(NE,NZ)=NonStrutElms_pft(NE,NZ)*XHVST
+          SeasonNonStrutElms_pft(NE,NZ)=SeasonNonStrutElms_pft(NE,NZ)*XHVST
         ENDDO
       ENDIF
     ENDIF
@@ -1171,7 +1171,7 @@ module PlantDisturbsMod
     PopuRootMycoC_pvr                   => plt_biom% PopuRootMycoC_pvr     , &
     RootMycoActiveBiomC_pvr             => plt_biom%RootMycoActiveBiomC_pvr    , &
     ShootC4NonstC_brch                  =>  plt_biom%ShootC4NonstC_brch, &    
-    NonStrutElms_pft                    => plt_biom%NonStrutElms_pft     , &
+    SeasonNonStrutElms_pft                    => plt_biom%SeasonNonStrutElms_pft     , &
     CanopyStalkC_pft                    => plt_biom%CanopyStalkC_pft     , &
     CanopyLeafShethC_pft                => plt_biom%CanopyLeafShethC_pft      , &
     StalkBiomassC_brch                  => plt_biom%StalkBiomassC_brch    , &
@@ -2513,12 +2513,12 @@ module PlantDisturbsMod
           DO NE=1,NumPlantChemElms
             D3400: DO M=1,jsken
               LitfalStrutElms_pvr(NE,M,k_woody_litr,NGTopRootLayer_pft(NZ),NZ)=LitfalStrutElms_pvr(NE,M,k_woody_litr,NGTopRootLayer_pft(NZ),NZ) &
-                +(XHVST1(NE)*CFOPE(NE,inonstruct,M,NZ)*NonStrutElms_pft(NE,NZ))*FWOODE(NE,k_woody_litr)
+                +(XHVST1(NE)*CFOPE(NE,inonstruct,M,NZ)*SeasonNonStrutElms_pft(NE,NZ))*FWOODE(NE,k_woody_litr)
 
               LitfalStrutElms_pvr(NE,M,k_fine_litr,NGTopRootLayer_pft(NZ),NZ)=LitfalStrutElms_pvr(NE,M,k_fine_litr,NGTopRootLayer_pft(NZ),NZ) &
-                +(XHVST1(NE)*CFOPE(NE,inonstruct,M,NZ)*NonStrutElms_pft(NE,NZ))*FWOODE(NE,k_fine_litr)
+                +(XHVST1(NE)*CFOPE(NE,inonstruct,M,NZ)*SeasonNonStrutElms_pft(NE,NZ))*FWOODE(NE,k_fine_litr)
             ENDDO D3400
-            NonStrutElms_pft(NE,NZ)=NonStrutElms_pft(NE,NZ)*XHVST(NE)
+            SeasonNonStrutElms_pft(NE,NZ)=SeasonNonStrutElms_pft(NE,NZ)*XHVST(NE)
           ENDDO
         ENDIF
     ENDIF

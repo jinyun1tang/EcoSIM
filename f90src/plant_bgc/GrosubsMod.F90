@@ -90,9 +90,9 @@ module grosubsMod
 
   D9980: DO NZ=1,NP0
     if(NZ==1)THEN
-    WRITE(201,*)I+J/24.,(plt_biom%NonStrutElms_pft(NE,NZ),NE=1,3)
+    WRITE(201,*)I+J/24.,(plt_biom%SeasonNonStrutElms_pft(NE,NZ),NE=1,3)
     ELSE
-    WRITE(202,*)I+J/24.,(plt_biom%NonStrutElms_pft(NE,NZ),NE=1,3)
+    WRITE(202,*)I+J/24.,(plt_biom%SeasonNonStrutElms_pft(NE,NZ),NE=1,3)
     ENDIF  
     D1: DO L=0,MaxNumRootLays
       DO K=1,pltpar%NumOfPlantLitrCmplxs
@@ -153,7 +153,7 @@ module grosubsMod
     RootElms_pft                   => plt_biom%RootElms_pft    , &
     ShootStrutElms_pft             => plt_biom%ShootStrutElms_pft  , &
     NodulStrutElms_pft             => plt_biom%NodulStrutElms_pft    , &
-    NonStrutElms_pft               => plt_biom%NonStrutElms_pft    , &
+    SeasonNonStrutElms_pft               => plt_biom%SeasonNonStrutElms_pft    , &
     StandDeadStrutElms_pft         => plt_biom%StandDeadStrutElms_pft   , &
     fTgrowCanP                     => plt_pheno%fTgrowCanP    , &
     NetCumElmntFlx2Plant_pft       => plt_pheno%NetCumElmntFlx2Plant_pft   , &
@@ -276,7 +276,7 @@ module grosubsMod
       !check for living plant
       DO NE=1,NumPlantChemElms
         ElmBalanceCum_pft(NE,NZ)=ShootStrutElms_pft(NE,NZ)+RootElms_pft(NE,NZ)+NodulStrutElms_pft(NE,NZ) &
-          +NonStrutElms_pft(NE,NZ)+LitrfalStrutElmsCum_pft(NE,NZ)-PlantExudChemElmCum_pft(NE,NZ) &
+          +SeasonNonStrutElms_pft(NE,NZ)+LitrfalStrutElmsCum_pft(NE,NZ)-PlantExudChemElmCum_pft(NE,NZ) &
           -NetCumElmntFlx2Plant_pft(NE,NZ)+StandDeadStrutElms_pft(NE,NZ)&
           +EcoHavstElmnt_pft(NE,NZ)+EcoHavstElmntCum_pft(NE,NZ)
       ENDDO
@@ -813,7 +813,7 @@ module grosubsMod
     MaxSoiL4Root                   =>  plt_morph%MaxSoiL4Root     , &    
     NumRootAxes_pft                =>  plt_morph%NumRootAxes_pft   , &
     MaxNumRootLays                 =>  plt_site%MaxNumRootLays      , &  
-    NonStrutElms_pft               =>  plt_biom%NonStrutElms_pft     , &    
+    SeasonNonStrutElms_pft               =>  plt_biom%SeasonNonStrutElms_pft     , &    
     RootElmsBeg_pft                =>  plt_biom%RootElmsBeg_pft     , &
     ShootElmsBeg_pft               =>  plt_biom%ShootElmsBeg_pft    , &
     RootMyco1stStrutElms_rpvr      =>  plt_biom%RootMyco1stStrutElms_rpvr  , &
@@ -851,7 +851,7 @@ module grosubsMod
     ENDDO
   ENDDO
   DO NE=1,NumPlantChemElms
-    ShootElms_pft(NE,NZ)=sum(ShootElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))+NonStrutElms_pft(NE,NZ)
+    ShootElms_pft(NE,NZ)=sum(ShootElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))+SeasonNonStrutElms_pft(NE,NZ)
   ENDDO
   !add C4 specific reserve carbon
   IF(iPlantPhotosynthesisType(NZ).EQ.ic4_photo)THEN  

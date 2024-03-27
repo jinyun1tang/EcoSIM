@@ -1040,7 +1040,7 @@ module StartqsMod
      RootMycoNonstElms_rpvr        =>   plt_biom%RootMycoNonstElms_rpvr  , &
     CanopyNonstElms_brch            =>   plt_biom%CanopyNonstElms_brch  , &
     LeafStrutElms_brch            =>   plt_biom%LeafStrutElms_brch , &
-    NonStrutElms_pft            =>   plt_biom%NonStrutElms_pft   , &
+    SeasonNonStrutElms_pft            =>   plt_biom%SeasonNonStrutElms_pft   , &
     SeedCMass                    =>   plt_morph%SeedCMass   , &
     Root1stDepz_pft              =>   plt_morph%Root1stDepz_pft  , &
     NGTopRootLayer_pft           =>   plt_morph%NGTopRootLayer_pft      &
@@ -1061,9 +1061,9 @@ module StartqsMod
 !     CPOOLR,ZPOOLR,PPOOLR=C,N,P in root,myco nonstructural pools (g)
 !
   SeedCPlanted_pft(NZ)=SeedCMass(NZ)*PlantPopulation_pft(NZ)
-  NonStrutElms_pft(ielmc,NZ)=SeedCPlanted_pft(NZ)
-  NonStrutElms_pft(ielmn,NZ)=CNGR(NZ)*NonStrutElms_pft(ielmc,NZ)
-  NonStrutElms_pft(ielmp,NZ)=CPGR(NZ)*NonStrutElms_pft(ielmc,NZ)
+  SeasonNonStrutElms_pft(ielmc,NZ)=SeedCPlanted_pft(NZ)
+  SeasonNonStrutElms_pft(ielmn,NZ)=CNGR(NZ)*SeasonNonStrutElms_pft(ielmc,NZ)
+  SeasonNonStrutElms_pft(ielmp,NZ)=CPGR(NZ)*SeasonNonStrutElms_pft(ielmc,NZ)
   LeafStrutElms_brch(ielmn,1,NZ)=CNGR(NZ)*LeafStrutElms_brch(ielmc,1,NZ)
   LeafStrutElms_brch(ielmp,1,NZ)=CPGR(NZ)*LeafStrutElms_brch(ielmc,1,NZ)
   LeafPetolBiomassC_brch(1,NZ)=LeafStrutElms_brch(ielmc,1,NZ)+PetoleStrutElms_brch(ielmc,1,NZ)
