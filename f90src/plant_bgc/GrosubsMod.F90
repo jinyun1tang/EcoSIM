@@ -78,8 +78,9 @@ module grosubsMod
     MaxNumRootLays          => plt_site%MaxNumRootLays          , &
     CO2NetFix_pft           => plt_bgcr%CO2NetFix_pft           , &
     LitrfalStrutElms_pft    => plt_bgcr%LitrfalStrutElms_pft    , &
-    LitrfalStrutElms_pvr     => plt_bgcr%LitrfalStrutElms_pvr     , &
+    LitrfalStrutElms_pvr    => plt_bgcr%LitrfalStrutElms_pvr    , &
     NodulInfectElms_pft     => plt_bgcr%NodulInfectElms_pft     , &
+    RootMycoExudElms_pft    => plt_rbgc%RootMycoExudElms_pft    , &
     CanopyHeight_pft        => plt_morph%CanopyHeight_pft         &
   )
 !     TOTAL AGB FOR GRAZING IN LANDSCAPE SECTION
@@ -118,12 +119,23 @@ module grosubsMod
       call GrowPlant(I,J,NZ,CanopyHeight_copy)
     ENDIF
 
+    call SumPlantBiom(I,J,NZ,'bfdistb')
 !   HARVEST STANDING DEAD
     call RemoveBiomassByDisturbance(I,J,NZ)
+    
+    call SumPlantBiom(I,J,NZ,'bflvdeadtrns')
   ENDDO D9985
 !
 ! TRANSFORMATIONS IN LIVING OR DEAD PLANT POPULATIONS
+  
   call LiveDeadTransformation(I,J)
+  DO NZ=1,NP
+    call SumPlantBiom(I,J,NZ,'exgrosubs')
+  ENDDO
+  DO NZ=1,2
+    write(111,*)''
+    write(112,*)''
+  ENDDO
   end associate
   END subroutine grosubs
 
@@ -137,13 +149,13 @@ module grosubsMod
   real(r8) :: XFRC,XFRN,XFRP,XFRE
 !     begin_execution
 
-  associate(                       &
-    k_fine_litr                    => pltpar%k_fine_litr ,&
-    k_woody_litr                   => pltpar%k_woody_litr,&
-    iDayPlanting_pft               => plt_distb%iDayPlanting_pft   , &
+  associate(                                                           &
+    k_fine_litr                    => pltpar%k_fine_litr             , &
+    k_woody_litr                   => pltpar%k_woody_litr            , &
+    iDayPlanting_pft               => plt_distb%iDayPlanting_pft     , &
     iYearPlanting_pft              => plt_distb%iYearPlanting_pft    , &
-    EcoHavstElmntCum_pft           => plt_distb%EcoHavstElmntCum_pft  , &
-    EcoHavstElmnt_pft              => plt_distb%EcoHavstElmnt_pft   , &
+    EcoHavstElmntCum_pft           => plt_distb%EcoHavstElmntCum_pft , &
+    EcoHavstElmnt_pft              => plt_distb%EcoHavstElmnt_pft    , &
     PO4byFire_pft                  => plt_distb%PO4byFire_pft   , &
     N2ObyFire_pft                  => plt_distb%N2ObyFire_pft   , &
     CH4ByFire_pft                  => plt_distb%CH4ByFire_pft   , &
@@ -153,7 +165,7 @@ module grosubsMod
     RootElms_pft                   => plt_biom%RootElms_pft    , &
     ShootStrutElms_pft             => plt_biom%ShootStrutElms_pft  , &
     NodulStrutElms_pft             => plt_biom%NodulStrutElms_pft    , &
-    SeasonalNonstElms_pft               => plt_biom%SeasonalNonstElms_pft    , &
+    SeasonalNonstElms_pft          => plt_biom%SeasonalNonstElms_pft    , &
     StandDeadStrutElms_pft         => plt_biom%StandDeadStrutElms_pft   , &
     fTgrowCanP                     => plt_pheno%fTgrowCanP    , &
     NetCumElmntFlx2Plant_pft       => plt_pheno%NetCumElmntFlx2Plant_pft   , &
@@ -168,7 +180,7 @@ module grosubsMod
     NP0                            => plt_site%NP0      , &
     MaxNumRootLays                 => plt_site%MaxNumRootLays       , &
     iYearCurrent                   => plt_site%iYearCurrent     , &
-    LitrfalStrutElms_pvr            => plt_bgcr%LitrfalStrutElms_pvr     , &
+    LitrfalStrutElms_pvr           => plt_bgcr%LitrfalStrutElms_pvr     , &
     NetPrimProduct_pft             => plt_bgcr%NetPrimProduct_pft     , &
     PlantN2FixCum_pft              => plt_bgcr%PlantN2FixCum_pft   , &
     LitrfalStrutElms_pft           => plt_bgcr%LitrfalStrutElms_pft    , &
@@ -340,23 +352,25 @@ module grosubsMod
   real(r8) :: Stomata_Activity
   real(r8) :: WFNS,WFNSG
 ! begin_execution
-  associate(                              &
+  associate(                                                            &
     iPlantRootProfile_pft     => plt_pheno%iPlantRootProfile_pft      , &
-    iPlantRootState_pft       => plt_pheno%iPlantRootState_pft      , &
+    iPlantRootState_pft       => plt_pheno%iPlantRootState_pft        , &
     iPlantShootState_pft      => plt_pheno%iPlantShootState_pft       , &
-    RootN2Fix_pft             => plt_rbgc%RootN2Fix_pft         , &
-    RootH2PO4Uptake_pft       => plt_rbgc%RootH2PO4Uptake_pft        , &
-    RootNH4Uptake_pft         => plt_rbgc%RootNH4Uptake_pft        , &
-    RootHPO4Uptake_pft        => plt_rbgc%RootHPO4Uptake_pft        , &
-    RootNO3Uptake_pft         => plt_rbgc%RootNO3Uptake_pft        , &
-    PlantRootSoilElmNetX_pft  => plt_rbgc%PlantRootSoilElmNetX_pft       , &
+    RootN2Fix_pft             => plt_rbgc%RootN2Fix_pft               , &
+    RootH2PO4Uptake_pft       => plt_rbgc%RootH2PO4Uptake_pft         , &
+    RootNH4Uptake_pft         => plt_rbgc%RootNH4Uptake_pft           , &
+    RootHPO4Uptake_pft        => plt_rbgc%RootHPO4Uptake_pft          , &
+    RootNO3Uptake_pft         => plt_rbgc%RootNO3Uptake_pft           , &
+    PlantRootSoilElmNetX_pft  => plt_rbgc%PlantRootSoilElmNetX_pft    , &
     RootMycoExudElms_pft      => plt_rbgc%RootMycoExudElms_pft        , &
-    NumOfBranches_pft         => plt_morph%NumOfBranches_pft         , &
-    NumRootAxes_pft           => plt_morph%NumRootAxes_pft          &
+    NumOfBranches_pft         => plt_morph%NumOfBranches_pft          , &
+    NumRootAxes_pft           => plt_morph%NumRootAxes_pft              &
   )
   IF(iPlantShootState_pft(NZ).EQ.iLive .OR. iPlantRootState_pft(NZ).EQ.iLive)THEN
     CanopyN2Fix_pft(NZ)=0._r8
     BegRemoblize = 0
+
+    call SumPlantBiom(I,J,NZ,'bfstageplant')
     
     call StagePlantForGrowth(I,J,NZ,ICHK1,NRX,TFN6_vr,CNLFW,CPLFW,&
       CNSHW,CPSHW,CNRTW,CPRTW,RootAreaPopu,TFN5,WFNG,Stomata_Activity,WFNS,WFNSG)
@@ -385,8 +399,7 @@ module grosubsMod
 !     RESET DEAD BRANCHES
   call SumPlantBiom(I,J,NZ,'bfresetdead')
   call ResetDeadBranch(I,J,NZ)
-!
-  call SumPlantBiom(I,J,NZ,'ACCUMState')
+!  
   call AccumulateStates(I,J,NZ,CanopyN2Fix_pft)
   end associate
   end subroutine GrowPlant
@@ -807,13 +820,14 @@ module grosubsMod
     GrossCO2Fix_pft                =>  plt_bgcr%GrossCO2Fix_pft   , &
     NodulInfectElms_pft            =>  plt_bgcr%NodulInfectElms_pft, &    
     LitrfalStrutElms_pft           =>  plt_bgcr%LitrfalStrutElms_pft    , &
-    LitrfalStrutElms_pvr            =>  plt_bgcr%LitrfalStrutElms_pvr  , &    
+    LitrfalStrutElms_pvr           =>  plt_bgcr%LitrfalStrutElms_pvr  , &    
+    RootMycoExudElms_pft           =>  plt_rbgc%RootMycoExudElms_pft    , &    
     NumOfBranches_pft              =>  plt_morph%NumOfBranches_pft    , &   
     MY                             =>  plt_morph%MY     , &        
     MaxSoiL4Root                   =>  plt_morph%MaxSoiL4Root     , &    
     NumRootAxes_pft                =>  plt_morph%NumRootAxes_pft   , &
     MaxNumRootLays                 =>  plt_site%MaxNumRootLays      , &  
-    SeasonalNonstElms_pft               =>  plt_biom%SeasonalNonstElms_pft     , &    
+    SeasonalNonstElms_pft          =>  plt_biom%SeasonalNonstElms_pft     , &    
     RootElmsBeg_pft                =>  plt_biom%RootElmsBeg_pft     , &
     ShootElmsBeg_pft               =>  plt_biom%ShootElmsBeg_pft    , &
     RootMyco1stStrutElms_rpvr      =>  plt_biom%RootMyco1stStrutElms_rpvr  , &
@@ -923,10 +937,20 @@ module grosubsMod
       ENDDO
     ENDDO      
   ENDDO
-  balc=RootElms_pft(ielmc,NZ)+ShootElms_pft(ielmc,NZ)-GrossCO2Fix_pft(NZ)-GrossResp_pft(NZ) &
-    +LitrfalStrutElms_pft(ielmc,NZ)-RootElmsBeg_pft(ielmc,NZ)-ShootElmsBeg_pft(ielmc,NZ)-NodulInfectElms_pft(ielmc,NZ)
-
-  WRITE(*,*)'BALC: '//trim(header),NZ,BALC
+  balc=RootElms_pft(ielmc,NZ)+ShootElms_pft(ielmc,NZ)-RootElmsBeg_pft(ielmc,NZ)-ShootElmsBeg_pft(ielmc,NZ)&
+    -GrossCO2Fix_pft(NZ)-GrossResp_pft(NZ)+LitrfalStrutElms_pft(ielmc,NZ)-NodulInfectElms_pft(ielmc,NZ) &
+    -RootMycoExudElms_pft(ielmc,NZ)
+  if(NZ==1)THEN
+    WRITE(111,*)'BALC: '//trim(header),I+J/24.,BALC,SeasonalNonstElms_pft(ielmc,NZ)
+    WRITE(111,*)'cfix=',GrossCO2Fix_pft(NZ),'Rauto=',GrossResp_pft(NZ),'exud=',RootMycoExudElms_pft(ielmc,NZ) 
+    WRITE(111,*)'litrf=',LitrfalStrutElms_pft(ielmc,NZ),'infec=',NodulInfectElms_pft(ielmc,NZ)
+    write(111,*)RootElms_pft(ielmc,NZ),ShootElms_pft(ielmc,NZ),RootElmsBeg_pft(ielmc,NZ),ShootElmsBeg_pft(ielmc,NZ),'|'
+  else
+    WRITE(112,*)'BALC: '//trim(header),I+J/24.,BALC,SeasonalNonstElms_pft(ielmc,NZ) 
+    WRITE(112,*)'cfix=',GrossCO2Fix_pft(NZ),'Rauto=',GrossResp_pft(NZ),'exud=',RootMycoExudElms_pft(ielmc,NZ) 
+    WRITE(112,*)'litrf=',LitrfalStrutElms_pft(ielmc,NZ),'infec=',NodulInfectElms_pft(ielmc,NZ)
+    write(112,*)RootElms_pft(ielmc,NZ),ShootElms_pft(ielmc,NZ),RootElmsBeg_pft(ielmc,NZ),ShootElmsBeg_pft(ielmc,NZ),'|'
+  ENDIF  
   end associate
   end subroutine SumPlantBiom
 

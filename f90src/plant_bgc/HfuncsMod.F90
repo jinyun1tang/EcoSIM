@@ -47,15 +47,15 @@ module HfuncsMod
   INTEGER :: NB, NZ, LeafNumberGrowing
 
 ! begin_execution
-  associate(                           &
-    PSICanopy_pft                    =>  plt_ew%PSICanopy_pft    , &
+  associate(                                                                         &
+    PSICanopy_pft                    =>  plt_ew%PSICanopy_pft                      , &
     Hours4ShortenPhotoPeriod_brch    =>  plt_pheno%Hours4ShortenPhotoPeriod_brch   , &
-    doInitPlant_pft                  =>  plt_pheno%doInitPlant_pft  , &
-    doRemobilization_brch            =>  plt_pheno%doRemobilization_brch  , &
-    LeafNumberAtFloralInit_brch      =>  plt_pheno%LeafNumberAtFloralInit_brch , &
+    doInitPlant_pft                  =>  plt_pheno%doInitPlant_pft                 , &
+    doRemobilization_brch            =>  plt_pheno%doRemobilization_brch           , &
+    LeafNumberAtFloralInit_brch      =>  plt_pheno%LeafNumberAtFloralInit_brch     , &
     Hours4LenthenPhotoPeriod_brch    =>  plt_pheno%Hours4LenthenPhotoPeriod_brch   , &
-    IsPlantActive_pft                =>  plt_pheno%IsPlantActive_pft  , &
-    iPlantBranchState_brch           =>  plt_pheno%iPlantBranchState_brch  , &
+    IsPlantActive_pft                =>  plt_pheno%IsPlantActive_pft               , &
+    iPlantBranchState_brch           =>  plt_pheno%iPlantBranchState_brch          , &
     iPlantCalendar_brch              =>  plt_pheno%iPlantCalendar_brch , &
     HoursCanopyPSITooLow             =>  plt_pheno%HoursCanopyPSITooLow   , &
     KHiestGroLeafNode_brch           =>  plt_pheno%KHiestGroLeafNode_brch , &
@@ -170,13 +170,13 @@ module HfuncsMod
 
 ! begin_execution
   associate(                        &
-    iYearPlanting_pft        =>  plt_distb%iYearPlanting_pft    , &
-    iYearPlantHarvest_pft    =>  plt_distb%iYearPlantHarvest_pft    , &  !year of harvest
-    iDayPlanting_pft         =>  plt_distb%iDayPlanting_pft   , &  !day of planting
+    iYearPlanting_pft        =>  plt_distb%iYearPlanting_pft      , &
+    iYearPlantHarvest_pft    =>  plt_distb%iYearPlantHarvest_pft  , &  !year of harvest
+    iDayPlanting_pft         =>  plt_distb%iDayPlanting_pft       , &  !day of planting
     iDayPlantHarvest_pft     =>  plt_distb%iDayPlantHarvest_pft   , &  !day of harvest
-    DATAP                    =>  plt_site%DATAP    , &
-    iYearCurrent             =>  plt_site%iYearCurrent     , &
-    NumActivePlants          =>  plt_site%NumActivePlants    , &
+    DATAP                    =>  plt_site%DATAP                   , &
+    iYearCurrent             =>  plt_site%iYearCurrent            , &
+    NumActivePlants          =>  plt_site%NumActivePlants         , &
     Eco_NBP_col              =>  plt_bgcr%Eco_NBP_col     , &
     SeedCPlanted_pft         =>  plt_biom%SeedCPlanted_pft    , &
     iPlantState_pft          =>  plt_pheno%iPlantState_pft   , &
@@ -242,7 +242,7 @@ module HfuncsMod
 ! begin_execution
   associate(                                                                        &
     CanopyNonstructElmConc_pft      =>   plt_biom%CanopyNonstructElmConc_pft  , &
-    SeasonalNonstElms_pft               =>   plt_biom%SeasonalNonstElms_pft   , &
+    SeasonalNonstElms_pft           =>   plt_biom%SeasonalNonstElms_pft   , &
     MatureGroup_brch                =>   plt_pheno%MatureGroup_brch , &
     iPlantCalendar_brch             =>   plt_pheno%iPlantCalendar_brch , &
     doInitPlant_pft                 =>   plt_pheno%doInitPlant_pft  , &
@@ -366,14 +366,14 @@ module HfuncsMod
   associate(                           &
     CanopyLeafShethC_pft            =>  plt_biom%CanopyLeafShethC_pft     , &
     LeafPetolBiomassC_brch          =>  plt_biom%LeafPetolBiomassC_brch    , &
-    ShootStrutElms_pft               =>  plt_biom%ShootStrutElms_pft   , &
+    ShootStrutElms_pft              =>  plt_biom%ShootStrutElms_pft   , &
     NoduleNonstructCconc_pft        =>  plt_biom%NoduleNonstructCconc_pft   , &
     LeafPetoNonstElmConc_brch       =>  plt_biom%LeafPetoNonstElmConc_brch   , &
     CanopyNonstructElmConc_pft      =>  plt_biom%CanopyNonstructElmConc_pft   , &
-    CanopyNonstElms_pft         =>  plt_biom%CanopyNonstElms_pft   , &
-    CanopyNodulNonstElms_brch              =>  plt_biom%CanopyNodulNonstElms_brch   , &
-    RootMycoNonstElms_rpvr            =>  plt_biom%RootMycoNonstElms_rpvr   , &
-    CanopyNonstElms_brch               =>  plt_biom%CanopyNonstElms_brch   , &
+    CanopyNonstElms_pft             =>  plt_biom%CanopyNonstElms_pft   , &
+    CanopyNodulNonstElms_brch       =>  plt_biom%CanopyNodulNonstElms_brch   , &
+    RootMycoNonstElms_rpvr          =>  plt_biom%RootMycoNonstElms_rpvr   , &
+    CanopyNonstElms_brch            =>  plt_biom%CanopyNonstElms_brch   , &
     RootNonstructElmConc_pvr        =>  plt_biom%RootNonstructElmConc_pvr   , &
     ZEROL                           =>  plt_biom%ZEROL    , &
     ZEROP                           =>  plt_biom%ZEROP    , &
@@ -394,7 +394,7 @@ module HfuncsMod
     BranchNumber_brch               =>  plt_morph%BranchNumber_brch    , &
     HypoctoHeight_pft               =>  plt_morph%HypoctoHeight_pft   , &
     SeedDepth_pft                   =>  plt_morph%SeedDepth_pft   , &
-    CanopyStemArea_pft                 =>  plt_morph%CanopyStemArea_pft   , &
+    CanopyStemArea_pft              =>  plt_morph%CanopyStemArea_pft   , &
     MaxSoiL4Root                    =>  plt_morph%MaxSoiL4Root        &
   )
   plt_bgcr%RootGasLossDisturb_pft(idg_beg:idg_end-1,NZ)=0.0_r8
@@ -515,11 +515,11 @@ module HfuncsMod
   implicit none
   integer, intent(in) :: I,J,NB,NZ
 
-  associate(                           &
-    PSICanopy_pft                   =>  plt_ew%PSICanopy_pft    , &
+  associate(                                                           &
+    PSICanopy_pft                   =>  plt_ew%PSICanopy_pft         , &
     PSICanopyTurg_pft               =>  plt_ew%PSICanopyTurg_pft     , &
-    DayLenthCurrent                 =>  plt_site%DayLenthCurrent    , &
-    DayLenthPrev                    =>  plt_site%DayLenthPrev    , &
+    DayLenthCurrent                 =>  plt_site%DayLenthCurrent     , &
+    DayLenthPrev                    =>  plt_site%DayLenthPrev        , &
     DayLenthMax                     =>  plt_site%DayLenthMax    , &
     ALAT                            =>  plt_site%ALAT    , &
     doPlantLeafOut_brch             =>  plt_pheno%doPlantLeafOut_brch  , &
@@ -800,7 +800,7 @@ module HfuncsMod
     RefLeafAppearRate_pft                =>  plt_pheno%RefLeafAppearRate_pft    , &
     ReprodNodeNumNormByMatrgrp_brch      =>  plt_pheno%ReprodNodeNumNormByMatrgrp_brch   , &
     OFFST                                =>  plt_pheno%OFFST   , &
-    iPlantPhenolPattern_pft           =>  plt_pheno%iPlantPhenolPattern_pft  , &
+    iPlantPhenolPattern_pft              =>  plt_pheno%iPlantPhenolPattern_pft  , &
     doPlantLeafOut_brch                  =>  plt_pheno%doPlantLeafOut_brch   , &
     NumOfLeaves_brch                     =>  plt_morph%NumOfLeaves_brch   , &
     NodeNumNormByMatgrp_brch             =>  plt_pheno%NodeNumNormByMatgrp_brch   , &
@@ -809,7 +809,7 @@ module HfuncsMod
     LeafNumberAtFloralInit_brch          =>  plt_pheno%LeafNumberAtFloralInit_brch  , &
     iPlantDevelopPattern_pft             =>  plt_pheno%iPlantDevelopPattern_pft  , &
     TotReproNodeNumNormByMatrgrp_brch    =>  plt_pheno%TotReproNodeNumNormByMatrgrp_brch  , &
-    CriticPhotoPeriod_pft              =>  plt_pheno%CriticPhotoPeriod_pft    , &
+    CriticPhotoPeriod_pft                =>  plt_pheno%CriticPhotoPeriod_pft    , &
     HourlyNodeNumNormByMatgrp_brch       =>  plt_pheno%HourlyNodeNumNormByMatgrp_brch  , &
     PhotoPeriodSens_pft                  =>  plt_pheno%PhotoPeriodSens_pft   , &
     TotalNodeNumNormByMatgrp_brch        =>  plt_pheno%TotalNodeNumNormByMatgrp_brch  , &
