@@ -58,11 +58,11 @@ module NutUptakeMod
     TCelciusCanopy_pft         =>  plt_ew%TCelciusCanopy_pft       , &
     NU                         =>  plt_site%NU       , &
     AREA3                      =>  plt_site%AREA3    , &
-    NH3Dep2Can_brch               =>  plt_rbgc%NH3Dep2Can_brch    , &
+    NH3Dep2Can_brch            =>  plt_rbgc%NH3Dep2Can_brch    , &
     ZEROP                      =>  plt_biom%ZEROP    , &
     AtmGasc                    =>  plt_site%AtmGasc  , &    
     LeafPetolBiomassC_brch     =>  plt_biom%LeafPetolBiomassC_brch    , &
-    CanopyNonstElms_brch          =>  plt_biom%CanopyNonstElms_brch   , &
+    CanopyNonstElms_brch       =>  plt_biom%CanopyNonstElms_brch   , &
     LeafPetoNonstElmConc_brch  =>  plt_biom%LeafPetoNonstElmConc_brch   , &
     CanPStomaResistH2O_pft     =>  plt_photo%CanPStomaResistH2O_pft      , &
     CanopyBndlResist_pft       =>  plt_photo%CanopyBndlResist_pft     , &
@@ -538,7 +538,7 @@ module NutUptakeMod
     ZERO                        =>  plt_site%ZERO       , &
     TortMicPM                   =>  plt_site%TortMicPM       , &
     fTgrowRootP_vr              =>  plt_pheno%fTgrowRootP_vr      , &
-    RAutoRootO2Limter_pvr      =>  plt_rbgc%RAutoRootO2Limter_pvr       , &
+    RAutoRootO2Limter_pvr       =>  plt_rbgc%RAutoRootO2Limter_pvr       , &
     CMinNH4Root_pft             =>  plt_rbgc%CMinNH4Root_pft     , &
     VmaxNH4Root_pft             =>  plt_rbgc%VmaxNH4Root_pft     , &
     KmNH4Root_pft               =>  plt_rbgc%KmNH4Root_pft     , &
@@ -670,14 +670,14 @@ module NutUptakeMod
     ZNHBM=CMinNH4Root_pft(N,NZ)*VLWatMicP(L)*trcs_VLN_vr(ids_NH4B,L)
     ZNHBX=AZMAX1(FNHBX*(trc_solml_vr(ids_NH4B,L)-ZNHBM))
 
-    PlantSoluteUptakeConfig%SoluteConcMin=CMinNH4Root_pft(N,NZ)
-    PlantSoluteUptakeConfig%SolAdvFlx = RMFNHB
-    PlantSoluteUptakeConfig%SolDifusFlx = DIFNHB
-    PlantSoluteUptakeConfig%UptakeRateMax = UPMXP
-    PlantSoluteUptakeConfig%O2Stress  = RAutoRootO2Limter_pvr(N,L,NZ)
-    PlantSoluteUptakeConfig%SoluteConc =trc_solcl_vr(ids_NH4B,L)
-    PlantSoluteUptakeConfig%SoluteMassMax=ZNHBX
-    PlantSoluteUptakeConfig%CAvailStress=FCUP
+    PlantSoluteUptakeConfig%SoluteConcMin  = CMinNH4Root_pft(N,NZ)
+    PlantSoluteUptakeConfig%SolAdvFlx      = RMFNHB
+    PlantSoluteUptakeConfig%SolDifusFlx    = DIFNHB
+    PlantSoluteUptakeConfig%UptakeRateMax  = UPMXP
+    PlantSoluteUptakeConfig%O2Stress       = RAutoRootO2Limter_pvr(N,L,NZ)
+    PlantSoluteUptakeConfig%SoluteConc     = trc_solcl_vr(ids_NH4B,L)
+    PlantSoluteUptakeConfig%SoluteMassMax  = ZNHBX
+    PlantSoluteUptakeConfig%CAvailStress   = FCUP
     PlantSoluteUptakeConfig%PlantPopulation= PlantPopulation_pft(NZ)
     PlantSoluteUptakeConfig%SoluteKM=KmNH4Root_pft(N,NZ)
 
@@ -711,8 +711,8 @@ module NutUptakeMod
   associate(                             &
     PlantPopulation_pft         => plt_site%PlantPopulation_pft         , &
     ZERO                        => plt_site%ZERO       , &
-    fTgrowRootP_vr                 => plt_pheno%fTgrowRootP_vr      , &
-    RAutoRootO2Limter_pvr      => plt_rbgc%RAutoRootO2Limter_pvr       , &
+    fTgrowRootP_vr              => plt_pheno%fTgrowRootP_vr      , &
+    RAutoRootO2Limter_pvr       => plt_rbgc%RAutoRootO2Limter_pvr       , &
     CMinPO4Root_pft             => plt_rbgc%CMinPO4Root_pft     , &
     KmPO4Root_pft               => plt_rbgc%KmPO4Root_pft     , &
     VmaxPO4Root_pft             => plt_rbgc%VmaxPO4Root_pft     , &
@@ -1223,7 +1223,7 @@ module NutUptakeMod
   integer :: K,NE
   !     begin_execution
   associate(                       &
-    RootMycoNonstElms_rpvr      =>  plt_biom%RootMycoNonstElms_rpvr    , &
+    RootMycoNonstElms_rpvr    =>  plt_biom%RootMycoNonstElms_rpvr    , &
     ZEROP                     =>  plt_biom%ZEROP     , &
     ZEROS                     =>  plt_site%ZEROS     , &
     ZEROS2                    =>  plt_site%ZEROS2    , &
@@ -1258,15 +1258,15 @@ module NutUptakeMod
       CPOOLX=AMIN1(1.25E+03_r8*RootVH2O_pvr(N,L,NZ),RootMycoNonstElms_rpvr(ielmc,N,L,NZ))
       XFRE(ielmc)=(DOM(idom_doc,K,L)*RootVH2O_pvr(N,L,NZ)-CPOOLX*VLWatMicPK)/VLWatMicPT
       !XFRC, positive into plants
-      RootMycoExudElm_pvr(ielmc,N,K,L,NZ)=FEXUC*XFRE(ielmc)
+      RootMycoExudElm_pvr(ielmc,N,K,L,NZ)=FEXUDE(ielmc)*XFRE(ielmc)
       IF(DOM(idom_doc,K,L).GT.ZEROS.AND. RootMycoNonstElms_rpvr(ielmc,N,L,NZ).GT.ZEROP(NZ))THEN
         CPOOLT=DOM(idom_doc,K,L)+RootMycoNonstElms_rpvr(ielmc,N,L,NZ)
         ZPOOLX=0.1_r8*RootMycoNonstElms_rpvr(ielmn,N,L,NZ)
         PPOOLX=0.1_r8*RootMycoNonstElms_rpvr(ielmp,N,L,NZ)
         XFRE(ielmn)=(DOM(idom_don,K,L)*RootMycoNonstElms_rpvr(ielmc,N,L,NZ)-ZPOOLX*DOM(idom_doc,K,L))/CPOOLT
         XFRE(ielmp)=(DOM(idom_dop,K,L)*RootMycoNonstElms_rpvr(ielmc,N,L,NZ)-PPOOLX*DOM(idom_doc,K,L))/CPOOLT
-        RootMycoExudElm_pvr(ielmn,N,K,L,NZ)=FEXUN*XFRE(ielmn)
-        RootMycoExudElm_pvr(ielmp,N,K,L,NZ)=FEXUP*XFRE(ielmp)
+        RootMycoExudElm_pvr(ielmn,N,K,L,NZ)=FEXUDE(ielmn)*XFRE(ielmn)
+        RootMycoExudElm_pvr(ielmp,N,K,L,NZ)=FEXUDE(ielmp)*XFRE(ielmp)
       ELSE
         RootMycoExudElm_pvr(ielmn,N,K,L,NZ)=0.0_r8
         RootMycoExudElm_pvr(ielmp,N,K,L,NZ)=0.0_r8
