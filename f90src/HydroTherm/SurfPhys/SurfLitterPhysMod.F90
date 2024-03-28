@@ -23,7 +23,8 @@ module SurfLitterPhysMod
   USE ClimForcDataType
   use SnowPhysData
 implicit none
-  character(len=*), parameter, private :: mod_filename='SurfLitterPhysMod'
+  character(len=*), parameter, private :: mod_filename=&
+  __FILE__
   public :: SRFLitterEnergyBalance
   public :: UpdateLitRPhys
   public :: UpdateLitRB4RunoffM

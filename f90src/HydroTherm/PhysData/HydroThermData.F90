@@ -2,7 +2,8 @@ module HydroThermData
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use GridConsts
 implicit none
-  character(len=*), private, parameter :: mod_filename = __FILE__
+  character(len=*), private, parameter :: mod_filename = &
+  __FILE__
   real(r8),allocatable ::  FracSoiPAsWat(:,:,:)                      !
   real(r8),allocatable ::  PSISM1(:,:,:)                      !  
   real(r8),allocatable ::  TKSoi1(:,:,:)                         !  

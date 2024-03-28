@@ -13,7 +13,9 @@ module ForcWriterMod
   use EcoSIMConfig, only : jcplx => jcplxc
   use data_const_mod, only : spval  => DAT_CONST_SPVAL
 implicit none
-
+  private
+  character(len=*), parameter :: mod_filename = &
+  __FILE__
   type, public :: bgc_forc_config_type
     logical :: laddband
     integer :: year

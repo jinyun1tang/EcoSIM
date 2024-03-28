@@ -96,7 +96,7 @@
     GrossCO2Fix_pft(NZ,NY,NX)=0._r8
     PlantExudChemElmCum_pft(:,NZ,NY,NX)=0._r8
     GrossResp_pft(NZ,NY,NX)=0._r8
-    CanopyPlusNoduRespC_pft(NZ,NY,NX)=0._r8
+    CanopyPlusNodulRespC_pft(NZ,NY,NX)=0._r8
     ETCanopy_pft(NZ,NY,NX)=0._r8
     PlantN2FixCum_pft(NZ,NY,NX)=0._r8
     NH3EmiCum_pft(NZ,NY,NX)=0._r8

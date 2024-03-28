@@ -11,7 +11,8 @@ module abortutils
   implicit none
   private
   save
-
+  character(len=*),private, parameter :: mod_filename =&
+   __FILE__
   public :: endrun
   public :: check_bool
   interface endrun

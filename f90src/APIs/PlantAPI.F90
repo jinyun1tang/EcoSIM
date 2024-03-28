@@ -248,7 +248,7 @@ implicit none
     SeedDepth_pft(NZ,NY,NX) =plt_morph%SeedDepth_pft(NZ)
     HeatXAir2PCan(NZ,NY,NX) =plt_ew%HeatXAir2PCan(NZ)
     GrossResp_pft(NZ,NY,NX) =plt_bgcr%GrossResp_pft(NZ)
-    CanopyPlusNoduRespC_pft(NZ,NY,NX) =plt_bgcr%CanopyPlusNoduRespC_pft(NZ)
+    CanopyPlusNodulRespC_pft(NZ,NY,NX) =plt_bgcr%CanopyPlusNodulRespC_pft(NZ)
     TCelsChill4Leaf_pft(NZ,NY,NX)   =plt_pheno%TCelsChill4Leaf_pft(NZ)
     TCelcius4LeafOffHarden_pft(NZ,NY,NX)   =plt_pheno%TCelcius4LeafOffHarden_pft(NZ)
     NH3EmiCum_pft(NZ,NY,NX)  =plt_bgcr%NH3EmiCum_pft(NZ)
@@ -1044,7 +1044,7 @@ implicit none
     plt_site%PPX(NZ)=PPX(NZ,NY,NX)
     plt_distb%O2ByFire_pft(NZ)=O2ByFire_pft(NZ,NY,NX)
     plt_ew%ENGYX(NZ)=ENGYX(NZ,NY,NX)
-    plt_bgcr%CanopyPlusNoduRespC_pft(NZ)=CanopyPlusNoduRespC_pft(NZ,NY,NX)
+    plt_bgcr%CanopyPlusNodulRespC_pft(NZ)=CanopyPlusNodulRespC_pft(NZ,NY,NX)
     plt_ew%ETCanopy_pft(NZ)=ETCanopy_pft(NZ,NY,NX)
 
     plt_morph%BranchNumber_pft(NZ)=BranchNumber_pft(NZ,NY,NX)

@@ -19,6 +19,8 @@ module InitSOMBGCMOD
 
   private
 
+  character(len=*), parameter :: mod_filename = &
+  __FILE__
   real(r8), allocatable :: CORGCX(:)  !C concentations from OM complexes
   real(r8), allocatable :: CORGNX(:)  !N concentations from OM complexes
   real(r8), allocatable :: CORGPX(:)  !P concentations from OM complexes

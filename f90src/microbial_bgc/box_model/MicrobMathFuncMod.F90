@@ -3,7 +3,8 @@ module MicrobMathFuncMod
   use data_kind_mod, only : r8 => DAT_KIND_R8  
 implicit none
 
-  character(len=*), parameter, private :: mod_filename='MicrobMathFuncMod'
+  character(len=*), parameter, private :: mod_filename=&
+  __FILE__
 
   real(r8), parameter, private :: ZERO=1.0E-15_r8
   contains

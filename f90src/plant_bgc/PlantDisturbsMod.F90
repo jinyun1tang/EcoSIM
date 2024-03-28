@@ -222,9 +222,9 @@ module PlantDisturbsMod
     iHarvstType_pft             =>  plt_distb%iHarvstType_pft  , &
     FWOODE                      =>  plt_allom%FWOODE , &
     CFOPE                       =>  plt_soilchem%CFOPE, &
-    LitrfalStrutElms_pvr         =>  plt_bgcr%LitrfalStrutElms_pvr    , &
-    LitrfalStrutElmsCum_pft        =>  plt_bgcr%LitrfalStrutElmsCum_pft   , &
-    SurfLitrfalStrutElmsCum_pft    =>  plt_bgcr%SurfLitrfalStrutElmsCum_pft   , &
+    LitrfalStrutElms_pvr        =>  plt_bgcr%LitrfalStrutElms_pvr    , &
+    LitrfalStrutElmsCum_pft     =>  plt_bgcr%LitrfalStrutElmsCum_pft   , &
+    SurfLitrfalStrutElmsCum_pft =>  plt_bgcr%SurfLitrfalStrutElmsCum_pft   , &
     iPlantTurnoverPattern_pft   =>  plt_pheno%iPlantTurnoverPattern_pft , &
     iPlantRootProfile_pft       =>  plt_pheno%iPlantRootProfile_pft   &
   )
@@ -371,30 +371,31 @@ module PlantDisturbsMod
 
   subroutine TotalBiomRemovalByDisturbance(I,J,NZ,NonstructElmnt2Litr,HarvestElmnt2Litr,TotalElmnt2Litr)
   implicit none
-  integer , intent(in) :: I,J,NZ
-  real(r8), intent(in) :: NonstructElmnt2Litr(NumPlantChemElms)
-  real(r8), intent(out):: HarvestElmnt2Litr(NumPlantChemElms),TotalElmnt2Litr(NumPlantChemElms)
+  integer , intent(in)  :: I,J,NZ
+  real(r8), intent(in)  :: NonstructElmnt2Litr(NumPlantChemElms)
+  real(r8), intent(out) :: HarvestElmnt2Litr(NumPlantChemElms)
+  real(r8), intent(out) :: TotalElmnt2Litr(NumPlantChemElms)
   real(r8) :: TotalElmntRemoval(NumPlantChemElms)
   integer :: NE
 !     begin_execution
   associate(                            &
-    iHarvstType_pft    =>  plt_distb%iHarvstType_pft  , &
-    jHarvst_pft    =>  plt_distb%jHarvst_pft  , &
-    EcoHavstElmnt_pft    =>  plt_distb%EcoHavstElmnt_pft  , &
-    EcoHavstElmnt_col   =>  plt_distb%EcoHavstElmnt_col , &
-    NH3byFire_pft    =>  plt_distb%NH3byFire_pft  , &
-    PO4byFire_pft    =>  plt_distb%PO4byFire_pft  , &
-    CH4ByFire_pft    =>  plt_distb%CH4ByFire_pft  , &
-    O2ByFire_pft    =>  plt_distb%O2ByFire_pft  , &
-    N2ObyFire_pft    =>  plt_distb%N2ObyFire_pft  , &
-    CO2ByFire_pft    =>  plt_distb%CO2ByFire_pft  , &
-    CO2NetFix_pft     =>  plt_bgcr%CO2NetFix_pft    , &
-    Eco_NBP_col     =>  plt_bgcr%Eco_NBP_col    , &
-    Eco_AutoR_col     =>  plt_bgcr%Eco_AutoR_col    , &
-    ECO_ER_col     =>  plt_bgcr%ECO_ER_col    , &
-    CanopyPlusNoduRespC_pft    =>  plt_bgcr%CanopyPlusNoduRespC_pft   , &
-    GrossResp_pft    =>  plt_bgcr%GrossResp_pft   , &
-    SeasonalNonstElms_pft    =>  plt_biom%SeasonalNonstElms_pft     &
+    iHarvstType_pft            =>  plt_distb%iHarvstType_pft  , &
+    jHarvst_pft                =>  plt_distb%jHarvst_pft  , &
+    EcoHavstElmnt_pft          =>  plt_distb%EcoHavstElmnt_pft  , &
+    EcoHavstElmnt_col          =>  plt_distb%EcoHavstElmnt_col , &
+    NH3byFire_pft              =>  plt_distb%NH3byFire_pft  , &
+    PO4byFire_pft              =>  plt_distb%PO4byFire_pft  , &
+    CH4ByFire_pft              =>  plt_distb%CH4ByFire_pft  , &
+    O2ByFire_pft               =>  plt_distb%O2ByFire_pft  , &
+    N2ObyFire_pft              =>  plt_distb%N2ObyFire_pft  , &
+    CO2ByFire_pft              =>  plt_distb%CO2ByFire_pft  , &
+    CO2NetFix_pft              =>  plt_bgcr%CO2NetFix_pft    , &
+    Eco_NBP_col                =>  plt_bgcr%Eco_NBP_col    , &
+    Eco_AutoR_col              =>  plt_bgcr%Eco_AutoR_col    , &
+    ECO_ER_col                 =>  plt_bgcr%ECO_ER_col    , &
+    CanopyPlusNodulRespC_pft   =>  plt_bgcr%CanopyPlusNodulRespC_pft   , &
+    GrossResp_pft              =>  plt_bgcr%GrossResp_pft   , &
+    SeasonalNonstElms_pft      =>  plt_biom%SeasonalNonstElms_pft     &
   )
 !
 !     TotalElmntRemoval(ielmc),TotalElmntRemoval(ielmn),TotalElmntRemoval(ielmp)=total C,N,P removed
@@ -413,7 +414,8 @@ module PlantDisturbsMod
       WoodyElmnt2Litr(NE)+StandeadElmnt2Litr(NE)
     HarvestElmnt2Litr(NE)=LeafElmntHarv2Litr(NE)+PetioleElmntHarv2Litr(NE)+WoodyElmntHarv2Litr(NE)+StandeadElmntHarv2Litr(NE)
   ENDDO
-  IF(iHarvstType_pft(NZ).NE.iharvtyp_grazing.AND.iHarvstType_pft(NZ).NE.iharvtyp_herbivo)THEN
+
+  IF(iHarvstType_pft(NZ).NE.iharvtyp_grazing .AND. iHarvstType_pft(NZ).NE.iharvtyp_herbivo)THEN
     IF(iHarvstType_pft(NZ).NE.iharvtyp_fire)THEN
       IF(jHarvst_pft(NZ).NE.jharvtyp_tmareseed)THEN
         DO NE=1,NumPlantChemElms
@@ -463,7 +465,7 @@ module PlantDisturbsMod
       EcoHavstElmnt_col(NE)=EcoHavstElmnt_col(NE)+TotalElmntRemoval(NE)-TotalElmnt2Litr(NE)
     ENDDO
     GrossResp_pft(NZ)=GrossResp_pft(NZ)-GZ*(TotalElmntRemoval(ielmc)-TotalElmnt2Litr(ielmc))
-    CanopyPlusNoduRespC_pft(NZ)=CanopyPlusNoduRespC_pft(NZ)-GZ*(TotalElmntRemoval(ielmc)-TotalElmnt2Litr(ielmc))
+    CanopyPlusNodulRespC_pft(NZ)=CanopyPlusNodulRespC_pft(NZ)-GZ*(TotalElmntRemoval(ielmc)-TotalElmnt2Litr(ielmc))
 !     Eco_NBP_col=Eco_NBP_col+GY*(TotalElmnt2Litr(ielmc)-TotalElmntRemoval(ielmc))
 !     CO2NetFix_pft(NZ)=CO2NetFix_pft(NZ)+GZ*(TotalElmnt2Litr(ielmc)-TotalElmntRemoval(ielmc))
     ECO_ER_col=ECO_ER_col-GZ*(TotalElmntRemoval(ielmc)-TotalElmnt2Litr(ielmc))

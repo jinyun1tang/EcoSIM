@@ -21,7 +21,8 @@ module TillageMixMod
   use EcoSIMConfig , only : ndbiomcp => NumDeadMicrbCompts
   use UnitMod, only : units
   implicit none
-  character(len=*),private, parameter :: mod_filename = __FILE__
+  character(len=*),private, parameter :: mod_filename =&
+     __FILE__
   public :: ApplyTillageMixing
   contains
 

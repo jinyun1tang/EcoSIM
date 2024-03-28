@@ -3,6 +3,8 @@ module ElmIDMod
 ! DESCRIPTION:
 !  Chemical element ids
 implicit none
+  character(len=*),private, parameter :: mod_filename =&
+   __FILE__
   integer, parameter :: ielmc=1    !carbon element
   integer, parameter :: ielmn=2    !nitrogen element
   integer, parameter :: ielmp=3    !phosphorus element

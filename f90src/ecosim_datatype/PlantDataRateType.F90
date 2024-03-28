@@ -36,7 +36,7 @@ module PlantDataRateType
   real(r8),target,allocatable ::  LitrfalStrutElms_pvr(:,:,:,:,:,:,:)                !plant LitrFall element, [g d-2 h-1]
   real(r8),target,allocatable ::  NetPrimProduct_pft(:,:,:)                        !total net primary productivity, [g d-2]
   real(r8),target,allocatable ::  ETCanopy_pft(:,:,:)                       !total transpiration, [m d-2], <0 into atmosphere
-  real(r8),target,allocatable ::  CanopyPlusNoduRespC_pft(:,:,:)                       !total autotrophic respiration, [g d-2 ]
+  real(r8),target,allocatable ::  CanopyPlusNodulRespC_pft(:,:,:)                       !total autotrophic respiration, [g d-2 ]
   real(r8),target,allocatable ::  EcoHavstElmnt_pft(:,:,:,:)                     !plant element harvest, [g d-2 ]
   real(r8),target,allocatable ::  EcoHavstElmntCum_pft(:,:,:,:)                    !total plant harvest, [g d-2 ]
   real(r8),target,allocatable ::  CO2ByFire_pft(:,:,:)                       !plant CO2 emission from fire, [g d-2 ]
@@ -148,7 +148,7 @@ module PlantDataRateType
   allocate(LitrfalStrutElms_pvr(NumPlantChemElms,jsken,1:NumOfPlantLitrCmplxs,0:JZ,JP,JY,JX));LitrfalStrutElms_pvr=0._r8
   allocate(NetPrimProduct_pft(JP,JY,JX));     NetPrimProduct_pft=0._r8
   allocate(ETCanopy_pft(JP,JY,JX));    ETCanopy_pft=0._r8
-  allocate(CanopyPlusNoduRespC_pft(JP,JY,JX));    CanopyPlusNoduRespC_pft=0._r8
+  allocate(CanopyPlusNodulRespC_pft(JP,JY,JX));    CanopyPlusNodulRespC_pft=0._r8
   allocate(EcoHavstElmnt_pft(NumPlantChemElms,JP,JY,JX));    EcoHavstElmnt_pft=0._r8
   allocate(EcoHavstElmntCum_pft(NumPlantChemElms,JP,JY,JX));   EcoHavstElmntCum_pft=0._r8
   allocate(CO2ByFire_pft(JP,JY,JX));    CO2ByFire_pft=0._r8
@@ -248,7 +248,7 @@ module PlantDataRateType
   call destroy(LitrfalStrutElms_pvr)
   call destroy(NetPrimProduct_pft)
   call destroy(ETCanopy_pft)
-  call destroy(CanopyPlusNoduRespC_pft)
+  call destroy(CanopyPlusNodulRespC_pft)
   call destroy(EcoHavstElmnt_pft)
   call destroy(EcoHavstElmntCum_pft)
   call destroy(NodulInfectElms_pft)

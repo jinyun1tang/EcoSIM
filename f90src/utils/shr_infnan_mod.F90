@@ -65,7 +65,8 @@ use data_kind_mod, only: i4 => DAT_Kind_i4, i8 => DAT_Kind_i8
 implicit none
 private
 save
-
+  character(len=*),private, parameter :: mod_filename =&
+   __FILE__
 ! Test functions for NaN/Inf values.
 public :: shr_infnan_isnan
 public :: shr_infnan_isinf

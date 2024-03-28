@@ -8,6 +8,8 @@ module timings
   implicit none
   private
   save
+  character(len=*),private, parameter :: mod_filename =&
+   __FILE__  
   integer,parameter :: varlen=30
   integer, parameter :: maxprocs=200
   integer :: timer_number
