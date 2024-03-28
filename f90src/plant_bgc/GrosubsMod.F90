@@ -125,50 +125,50 @@ module grosubsMod
   real(r8) :: XFRC,XFRN,XFRP,XFRE
 !     begin_execution
 
-  associate(                                                           &
-    k_fine_litr                    => pltpar%k_fine_litr             , &
-    k_woody_litr                   => pltpar%k_woody_litr            , &
-    iDayPlanting_pft               => plt_distb%iDayPlanting_pft     , &
-    iYearPlanting_pft              => plt_distb%iYearPlanting_pft    , &
-    EcoHavstElmntCum_pft           => plt_distb%EcoHavstElmntCum_pft , &
-    EcoHavstElmnt_pft              => plt_distb%EcoHavstElmnt_pft    , &
-    PO4byFire_pft                  => plt_distb%PO4byFire_pft   , &
-    N2ObyFire_pft                  => plt_distb%N2ObyFire_pft   , &
-    CH4ByFire_pft                  => plt_distb%CH4ByFire_pft   , &
-    CO2ByFire_pft                  => plt_distb%CO2ByFire_pft   , &
-    NH3byFire_pft                  => plt_distb%NH3byFire_pft   , &
-    StandDeadKCompElms_pft         => plt_biom%StandDeadKCompElms_pft   , &
-    RootElms_pft                   => plt_biom%RootElms_pft    , &
-    ShootStrutElms_pft             => plt_biom%ShootStrutElms_pft  , &
-    NodulStrutElms_pft             => plt_biom%NodulStrutElms_pft    , &
-    SeasonalNonstElms_pft          => plt_biom%SeasonalNonstElms_pft    , &
-    StandDeadStrutElms_pft         => plt_biom%StandDeadStrutElms_pft   , &
-    fTgrowCanP                     => plt_pheno%fTgrowCanP    , &
-    NetCumElmntFlx2Plant_pft       => plt_pheno%NetCumElmntFlx2Plant_pft   , &
-    IsPlantActive_pft              => plt_pheno%IsPlantActive_pft   , &
-    iPlantRootProfile_pft          => plt_pheno%iPlantRootProfile_pft  , &
-    doInitPlant_pft                => plt_pheno%doInitPlant_pft   , &
-    doPlantLeafOut_brch            => plt_pheno%doPlantLeafOut_brch   , &
-    iPlantTurnoverPattern_pft      => plt_pheno%iPlantTurnoverPattern_pft  , &
-    HourReq4LeafOut_brch           => plt_pheno%HourReq4LeafOut_brch   , &
-    Hours4Leafout_brch             => plt_pheno%Hours4Leafout_brch    , &
-    ElmBalanceCum_pft              => plt_site%ElmBalanceCum_pft     , &
-    NP0                            => plt_site%NP0      , &
-    MaxNumRootLays                 => plt_site%MaxNumRootLays       , &
-    iYearCurrent                   => plt_site%iYearCurrent     , &
-    LitrfalStrutElms_pvr           => plt_bgcr%LitrfalStrutElms_pvr     , &
-    NetPrimProduct_pft             => plt_bgcr%NetPrimProduct_pft     , &
-    PlantN2FixCum_pft              => plt_bgcr%PlantN2FixCum_pft   , &
-    LitrfalStrutElms_pft           => plt_bgcr%LitrfalStrutElms_pft    , &
-    NH3EmiCum_pft                  => plt_bgcr%NH3EmiCum_pft    , &
-    LitrfalStrutElmsCum_pft        => plt_bgcr%LitrfalStrutElmsCum_pft    , &
-    SurfLitrfalStrutElmsCum_pft    => plt_bgcr%SurfLitrfalStrutElmsCum_pft    , &
-    GrossResp_pft                  => plt_bgcr%GrossResp_pft    , &
-    GrossCO2Fix_pft                => plt_bgcr%GrossCO2Fix_pft    , &
-    PlantExudChemElmCum_pft        => plt_rbgc%PlantExudChemElmCum_pft   , &
-    CumSoilThickness               => plt_site%CumSoilThickness   , &
-    PlantinDepth                   => plt_morph%PlantinDepth  , &
-    NumOfBranches_pft              => plt_morph%NumOfBranches_pft       &
+  associate(                                                               &
+    k_fine_litr                    => pltpar%k_fine_litr                 , &
+    k_woody_litr                   => pltpar%k_woody_litr                , &
+    iDayPlanting_pft               => plt_distb%iDayPlanting_pft         , &
+    iYearPlanting_pft              => plt_distb%iYearPlanting_pft        , &
+    EcoHavstElmntCum_pft           => plt_distb%EcoHavstElmntCum_pft     , &
+    EcoHavstElmnt_pft              => plt_distb%EcoHavstElmnt_pft        , &
+    PO4byFire_pft                  => plt_distb%PO4byFire_pft            , &
+    N2ObyFire_pft                  => plt_distb%N2ObyFire_pft            , &
+    CH4ByFire_pft                  => plt_distb%CH4ByFire_pft            , &
+    CO2ByFire_pft                  => plt_distb%CO2ByFire_pft            , &
+    NH3byFire_pft                  => plt_distb%NH3byFire_pft            , &
+    StandDeadKCompElms_pft         => plt_biom%StandDeadKCompElms_pft    , &
+    RootElms_pft                   => plt_biom%RootElms_pft              , &
+    ShootStrutElms_pft             => plt_biom%ShootStrutElms_pft        , &
+    NodulStrutElms_pft             => plt_biom%NodulStrutElms_pft        , &
+    SeasonalNonstElms_pft          => plt_biom%SeasonalNonstElms_pft     , &
+    StandDeadStrutElms_pft         => plt_biom%StandDeadStrutElms_pft    , &
+    fTgrowCanP                     => plt_pheno%fTgrowCanP               , &
+    NetCumElmntFlx2Plant_pft       => plt_pheno%NetCumElmntFlx2Plant_pft , &
+    IsPlantActive_pft              => plt_pheno%IsPlantActive_pft        , &
+    iPlantRootProfile_pft          => plt_pheno%iPlantRootProfile_pft    , &
+    doInitPlant_pft                => plt_pheno%doInitPlant_pft          , &
+    doPlantLeafOut_brch            => plt_pheno%doPlantLeafOut_brch      , &
+    iPlantTurnoverPattern_pft      => plt_pheno%iPlantTurnoverPattern_pft, &
+    HourReq4LeafOut_brch           => plt_pheno%HourReq4LeafOut_brch     , &
+    Hours4Leafout_brch             => plt_pheno%Hours4Leafout_brch       , &
+    ElmBalanceCum_pft              => plt_site%ElmBalanceCum_pft         , &
+    NP0                            => plt_site%NP0                       , &
+    MaxNumRootLays                 => plt_site%MaxNumRootLays            , &
+    iYearCurrent                   => plt_site%iYearCurrent              , &
+    LitrfalStrutElms_pvr           => plt_bgcr%LitrfalStrutElms_pvr      , &
+    NetPrimProduct_pft             => plt_bgcr%NetPrimProduct_pft        , &
+    PlantN2FixCum_pft              => plt_bgcr%PlantN2FixCum_pft         , &
+    LitrfalStrutElms_pft           => plt_bgcr%LitrfalStrutElms_pft      , &
+    NH3EmiCum_pft                  => plt_bgcr%NH3EmiCum_pft             , &
+    LitrfalStrutElmsCum_pft        => plt_bgcr%LitrfalStrutElmsCum_pft     , &
+    SurfLitrfalStrutElmsCum_pft    => plt_bgcr%SurfLitrfalStrutElmsCum_pft , &
+    GrossResp_pft                  => plt_bgcr%GrossResp_pft               , &
+    GrossCO2Fix_pft                => plt_bgcr%GrossCO2Fix_pft             , &
+    PlantExudChemElmCum_pft        => plt_rbgc%PlantExudChemElmCum_pft     , &
+    CumSoilThickness               => plt_site%CumSoilThickness            , &
+    PlantinDepth                   => plt_morph%PlantinDepth               , &
+    NumOfBranches_pft              => plt_morph%NumOfBranches_pft            &
   )
   D9975: DO NZ=1,NP0
 !
@@ -338,7 +338,7 @@ module grosubsMod
     CanopyN2Fix_pft(NZ)=0._r8
     BegRemoblize = 0
 
-    call SumPlantBiom(I,J,NZ,'bfstageplant')
+!    call SumPlantBiom(I,J,NZ,'bfstageplant')
     
     call StagePlantForGrowth(I,J,NZ,ICHK1,NRX,TFN6_vr,CNLFW,CPLFW,&
       CNSHW,CPSHW,CNRTW,CPRTW,RootAreaPopu,TFN5,WFNG,Stomata_Activity,WFNS,WFNSG)

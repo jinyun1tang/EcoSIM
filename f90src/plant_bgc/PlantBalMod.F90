@@ -95,13 +95,13 @@ implicit none
     -GrossCO2Fix_pft(NZ)-GrossResp_pft(NZ)+LitrfalStrutElms_pft(ielmc,NZ)-NodulInfectElms_pft(ielmc,NZ) &
     -RootMycoExudElms_pft(ielmc,NZ)
   if(NZ==1)THEN
-    WRITE(111,*)'BALC: '//trim(header),I+J/24.,BALC,SeasonalNonstElms_pft(ielmc,NZ)&
+    WRITE(111,*)I+J/24.,trim(header)//' BALC=',BALC,SeasonalNonstElms_pft(ielmc,NZ)&
       ,RootElmsbeg_pft(ielmc,NZ),ShootElmsbeg_pft(ielmc,NZ)
     WRITE(111,*)'cfix=',GrossCO2Fix_pft(NZ),'Rauto=',GrossResp_pft(NZ),'exud=',RootMycoExudElms_pft(ielmc,NZ) 
     WRITE(111,*)'litrf=',LitrfalStrutElms_pft(ielmc,NZ),'infec=',NodulInfectElms_pft(ielmc,NZ)
     write(111,*)RootElms_pft(ielmc,NZ),ShootElms_pft(ielmc,NZ),RootElmsBeg_pft(ielmc,NZ),ShootElmsBeg_pft(ielmc,NZ),'|'
   else
-    WRITE(112,*)'BALC: '//trim(header),I+J/24.,BALC,SeasonalNonstElms_pft(ielmc,NZ)&
+    WRITE(112,*)I+J/24.,trim(header)//' BALC=',BALC,SeasonalNonstElms_pft(ielmc,NZ)&
       ,RootElmsbeg_pft(ielmc,NZ),ShootElmsbeg_pft(ielmc,NZ)
     WRITE(112,*)'cfix=',GrossCO2Fix_pft(NZ),'Rauto=',GrossResp_pft(NZ),'exud=',RootMycoExudElms_pft(ielmc,NZ) 
     WRITE(112,*)'litrf=',LitrfalStrutElms_pft(ielmc,NZ),'infec=',NodulInfectElms_pft(ielmc,NZ)
@@ -261,6 +261,9 @@ implicit none
 
   associate(                                                       &
     NP0                     =>  plt_site%NP0                     , &  
+    MY                      =>  plt_morph%MY                     , &     
+    NU                      =>  plt_site%NU                      , &      
+    MaxSoiL4Root            =>  plt_morph%MaxSoiL4Root           , &        
     MaxNumRootLays          =>  plt_site%MaxNumRootLays          , &
     CO2NetFix_pft           =>  plt_bgcr%CO2NetFix_pft           , &
     LitrfalStrutElms_pft    =>  plt_bgcr%LitrfalStrutElms_pft    , &
@@ -269,6 +272,8 @@ implicit none
     NH3Dep2Can_pft          =>  plt_bgcr%NH3Dep2Can_pft          , &             
     GrossResp_pft           =>  plt_bgcr%GrossResp_pft           , &
     GrossCO2Fix_pft         =>  plt_bgcr%GrossCO2Fix_pft         , &    
+    CanopyGrosRCO2_pft      =>  plt_bgcr%CanopyGrosRCO2_pft      , &               
+    RCO2A_pvr               =>  plt_rbgc%RCO2A_pvr               , &     
     LitrfalStrutElms_pvr    =>  plt_bgcr%LitrfalStrutElms_pvr      &
   )  
   
@@ -282,10 +287,12 @@ implicit none
         ENDDO
       ENDDO
     ENDDO D1
+    RCO2A_pvr(1:MY(NZ),NU:MaxSoiL4Root(NZ),NZ)=0._r8
     NH3Dep2Can_pft(NZ)=0._r8
     GrossResp_pft(NZ)=0._r8
     GrossCO2Fix_pft(NZ)=0._r8    
     CO2NetFix_pft(NZ)=0._r8
+    CanopyGrosRCO2_pft(NZ)=0._r8
     RootMycoExudElms_pft(1:NumPlantChemElms,NZ)=0._r8
     NodulInfectElms_pft(1:NumPlantChemElms,NZ)=0._r8
   ENDDO D9980
