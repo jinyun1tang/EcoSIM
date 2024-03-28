@@ -668,6 +668,8 @@ implicit none
   real(r8), pointer :: SurfLitrfalStrutElmsCum_pft(:,:)    => null()  !total surface LitrFall element, [g d-2]
   real(r8), pointer :: LitrfalStrutElmsCum_pft(:,:)    => null()  !total plant element LitrFall , [g d-2 ]
   real(r8), pointer :: GrossResp_pft(:)      => null()  !total plant respiration, [gC d-2 ]
+  real(r8), pointer :: CanopyGrosRCO2_pft(:) => null()
+  real(r8), pointer :: RootGrosRCO2_pft(:)
   real(r8), pointer :: NodulInfectElms_pft(:,:) => null()
   real(r8), pointer :: NodulInfectElmsCum_pft(:,:) => null()
   real(r8), pointer :: NH3EmiCum_pft(:)      => null()  !total canopy NH3 flux, [gN d-2 ]
@@ -980,6 +982,8 @@ implicit none
   allocate(this%CO2NetFix_pft(JP1));this%CO2NetFix_pft=spval
   allocate(this%RootGasLossDisturb_pft(idg_beg:idg_end-1,JP1));this%RootGasLossDisturb_pft=spval
   allocate(this%GrossResp_pft(JP1));this%GrossResp_pft=spval
+  allocate(this%CanopyGrosRCO2_pft(JP1));this%CanopyGrosRCO2_pft=spval
+  allocate(this%RootGrosRCO2_pft(JP1));this%RootGrosRCO2_pft=spval
   allocate(this%PlantN2FixCum_pft(JP1));this%PlantN2FixCum_pft=spval
   allocate(this%NH3EmiCum_pft(JP1));this%NH3EmiCum_pft=spval
   allocate(this%NodulInfectElms_pft(NumPlantChemElms,JP1));this%NodulInfectElms_pft=spval

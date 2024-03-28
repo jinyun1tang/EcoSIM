@@ -54,31 +54,31 @@ module NoduleBGCMod
   REAL(R8) :: RCCC,RCCN,RCCP
   integer :: NE
 !     begin_execution
-  associate(                        &
-    NU                        =>  plt_site%NU       , &
-    ZERO                      =>  plt_site%ZERO     , &
-    AREA3                     =>  plt_site%AREA3    , &
-    k_fine_litr               => pltpar%k_fine_litr,&
-    CFOPE                     =>  plt_soilchem%CFOPE, &
-    iPlantNfixType            =>  plt_morph%iPlantNfixType  , &
-    fTgrowCanP                =>  plt_pheno%fTgrowCanP    , &
-    GrossResp_pft             =>  plt_bgcr%GrossResp_pft    , &
-    ECO_ER_col                =>  plt_bgcr%ECO_ER_col     , &
-    CanopyPlusNodulRespC_pft   =>  plt_bgcr%CanopyPlusNodulRespC_pft    , &
-    Eco_AutoR_col             =>  plt_bgcr%Eco_AutoR_col        , &
-    CO2NetFix_pft             =>  plt_bgcr%CO2NetFix_pft        , &
-    LitrfalStrutElms_pvr       =>  plt_bgcr%LitrfalStrutElms_pvr  , &
-    NodulInfectElms_pft       =>  plt_bgcr%NodulInfectElms_pft  , &    
-    ifoliar                   =>  pltpar%ifoliar                , &
-    NoduGrowthYield_pft       =>  plt_allom%NoduGrowthYield_pft   , &
-    NodulerNC_pft             =>  plt_allom%NodulerNC_pft   , &
-    NodulerPC_pft             =>  plt_allom%NodulerPC_pft   , &
-    LeafPetolBiomassC_brch    =>  plt_biom%LeafPetolBiomassC_brch    , &
-    CanopyNonstElms_brch      =>  plt_biom%CanopyNonstElms_brch   , &
-    CanopyNodulNonstElms_brch =>  plt_biom%CanopyNodulNonstElms_brch   , &
-    ZEROP                     =>  plt_biom%ZEROP    , &
-    ZEROL                     =>  plt_biom%ZEROL    , &
-    CanopyNodulStrutElms_brch =>  plt_biom%CanopyNodulStrutElms_brch     &
+  associate(                                                          &
+    NU                        =>  plt_site%NU                       , &
+    ZERO                      =>  plt_site%ZERO                     , &
+    AREA3                     =>  plt_site%AREA3                    , &
+    k_fine_litr               => pltpar%k_fine_litr                 , &
+    CFOPE                     =>  plt_soilchem%CFOPE                , &
+    iPlantNfixType            =>  plt_morph%iPlantNfixType          , &
+    fTgrowCanP                =>  plt_pheno%fTgrowCanP              , &
+    CanopyGrosRCO2_pft        =>  plt_bgcr%CanopyGrosRCO2_pft       , &
+    ECO_ER_col                =>  plt_bgcr%ECO_ER_col               , &
+    CanopyPlusNodulRespC_pft  =>  plt_bgcr%CanopyPlusNodulRespC_pft , &
+    Eco_AutoR_col             =>  plt_bgcr%Eco_AutoR_col            , &
+    CO2NetFix_pft             =>  plt_bgcr%CO2NetFix_pft            , &
+    LitrfalStrutElms_pvr      =>  plt_bgcr%LitrfalStrutElms_pvr     , &
+    NodulInfectElms_pft       =>  plt_bgcr%NodulInfectElms_pft      , &    
+    ifoliar                   =>  pltpar%ifoliar                    , &
+    NoduGrowthYield_pft       =>  plt_allom%NoduGrowthYield_pft     , &
+    NodulerNC_pft             =>  plt_allom%NodulerNC_pft           , &
+    NodulerPC_pft             =>  plt_allom%NodulerPC_pft           , &
+    LeafPetolBiomassC_brch    =>  plt_biom%LeafPetolBiomassC_brch   , &
+    CanopyNonstElms_brch      =>  plt_biom%CanopyNonstElms_brch     , &
+    CanopyNodulNonstElms_brch =>  plt_biom%CanopyNodulNonstElms_brch, &
+    ZEROP                     =>  plt_biom%ZEROP                    , &
+    ZEROL                     =>  plt_biom%ZEROL                    , &
+    CanopyNodulStrutElms_brch =>  plt_biom%CanopyNodulStrutElms_brch  &
   )
 !     iPlantNfixType=N2 fixation: 4,5,6=rapid to slow canopy symbiosis
 !
@@ -293,13 +293,13 @@ module NoduleBGCMod
 !     RespNonst_Oltd=respiration from non-structural C
 !     NoduleCResp=bacterial respiration for growth and N2 fixation
 !     NodulELmSenes2Recyc(ielmc)=bacterial C senescence to recycling
-!     GrossResp_pft,CanopyPlusNodulRespC_pft=total,above-ground PFT respiration
+!     CanopyGrosRCO2_pft,CanopyPlusNodulRespC_pft=total,above-ground PFT respiration
 !     CO2NetFix_pft=PFT net CO2 fixation
 !     ECO_ER_col=ecosystem respiration
 !     Eco_AutoR_col=total autotrophic respiration
 !
     RCO2T=AMIN1(Rmaint,RespNonst_Oltd)+NoduleCResp+NodulELmSenes2Recyc(ielmc)
-    GrossResp_pft(NZ)=GrossResp_pft(NZ)-RCO2T
+    CanopyGrosRCO2_pft(NZ)=CanopyGrosRCO2_pft(NZ)-RCO2T
     CanopyPlusNodulRespC_pft(NZ)=CanopyPlusNodulRespC_pft(NZ)-RCO2T
     CO2NetFix_pft(NZ)=CO2NetFix_pft(NZ)-RCO2T
     ECO_ER_col=ECO_ER_col-RCO2T
@@ -453,7 +453,7 @@ module NoduleBGCMod
     RAutoRootO2Limter_pvr        =>   plt_rbgc%RAutoRootO2Limter_pvr      , &
     RCO2A_pvr                    =>   plt_rbgc%RCO2A_pvr     , &
     NodulInfectElms_pft          =>   plt_bgcr%NodulInfectElms_pft  , &        
-    LitrfalStrutElms_pvr          =>   plt_bgcr%LitrfalStrutElms_pvr      , &
+    LitrfalStrutElms_pvr         =>   plt_bgcr%LitrfalStrutElms_pvr      , &
     RootN2Fix_pft                =>   plt_rbgc%RootN2Fix_pft      , &
     RootN2Fix_pvr                =>   plt_bgcr%RootN2Fix_pvr     , &
     PopuRootMycoC_pvr            =>   plt_biom% PopuRootMycoC_pvr    , &

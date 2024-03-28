@@ -1702,7 +1702,6 @@ implicit none
     iPlantCalendar_brch                =>   plt_pheno%iPlantCalendar_brch  , &
     Hours2LeafOut_brch                 =>   plt_pheno%Hours2LeafOut_brch    , &
     RCO2A_pvr                          =>   plt_rbgc%RCO2A_pvr    , &
-    GrossResp_pft                      =>   plt_bgcr%GrossResp_pft    , &
     ECO_ER_col                         =>   plt_bgcr%ECO_ER_col     , &
     Eco_AutoR_col                      =>   plt_bgcr%Eco_AutoR_col     , &
     NU                                 =>   plt_site%NU       , &
@@ -1914,7 +1913,6 @@ implicit none
         PopuRootMycoC_pvr(N,L,NZ)=PopuRootMycoC_pvr(N,L,NZ)+RootMyco2ndStrutElms_rpvr(ielmc,N,L,NR,NZ) &
           +RootMyco1stStrutElms_rpvr(ielmc,N,L,NR,NZ)
       ENDDO D5460
-      GrossResp_pft(NZ)=GrossResp_pft(NZ)+RCO2A_pvr(N,L,NZ)
       ECO_ER_col=ECO_ER_col+RCO2A_pvr(N,L,NZ)
       Eco_AutoR_col=Eco_AutoR_col+RCO2A_pvr(N,L,NZ)
     ENDDO D5450
