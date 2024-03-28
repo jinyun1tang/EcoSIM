@@ -381,18 +381,18 @@ implicit none
 
 !begin_execution
   associate(                          &
-    RootMyco2ndStrutElms_rpvr            =>  plt_biom%RootMyco2ndStrutElms_rpvr     , &
+    RootMyco2ndStrutElms_rpvr       =>  plt_biom%RootMyco2ndStrutElms_rpvr     , &
     RootNonstructElmConc_pvr        =>  plt_biom%RootNonstructElmConc_pvr     , &
-    RootMyco1stStrutElms_rpvr           =>  plt_biom%RootMyco1stStrutElms_rpvr     , &
-    RootMycoNonstElms_rpvr            =>  plt_biom%RootMycoNonstElms_rpvr     , &
+    RootMyco1stStrutElms_rpvr       =>  plt_biom%RootMyco1stStrutElms_rpvr     , &
+    RootMycoNonstElms_rpvr          =>  plt_biom%RootMycoNonstElms_rpvr     , &
     RootProteinC_pvr                =>  plt_biom%RootProteinC_pvr      , &
     RootMycoActiveBiomC_pvr         =>  plt_biom%RootMycoActiveBiomC_pvr     , &
     ZEROP                           =>  plt_biom%ZEROP      , &
     RCO2A_pvr                       =>  plt_rbgc%RCO2A_pvr      , &
     RCO2N_pvr                       =>  plt_rbgc%RCO2N_pvr      , &
     RootRespPotent_pvr              =>  plt_rbgc%RootRespPotent_pvr      , &
-    RAutoRootO2Limter_pvr          =>  plt_rbgc%RAutoRootO2Limter_pvr       , &
-    LitrfalStrutElms_pvr               =>  plt_bgcr%LitrfalStrutElms_pvr       , &
+    RAutoRootO2Limter_pvr           =>  plt_rbgc%RAutoRootO2Limter_pvr       , &
+    LitrfalStrutElms_pvr            =>  plt_bgcr%LitrfalStrutElms_pvr       , &
     rCNNonstructRemob_pft           =>  plt_allom%rCNNonstructRemob_pft     , &
     rCPNonstructRemob_pft           =>  plt_allom%rCPNonstructRemob_pft      , &
     FWODRE                          =>  plt_allom%FWODRE    , &
@@ -2152,11 +2152,6 @@ implicit none
 !     RootNH4Uptake_pvr,RootNH4BUptake_pvr,RUPN03,RootNO3BUptake_pvr=uptake from non-band,band of NH4,NO3
 !     RootH2PO4Uptake_pvr,RootH2PO4BUptake_pvr,RootHPO4Uptake_pvr,RootNutUptake_pvr=uptake from non-band,band of H2PO4,HPO4
 !
-        D195: DO K=1,jcplx
-          DO NE=1,NumPlantChemElms
-             RootMycoNonstElms_rpvr(NE,N,L,NZ)=RootMycoNonstElms_rpvr(NE,N,L,NZ)+RootMycoExudElm_pvr(NE,N,K,L,NZ)
-          ENDDO
-        ENDDO D195
  
         if(RootMycoNonstElms_rpvr(ielmn,N,L,NZ)<0._r8 .or. RootMycoNonstElms_rpvr(ielmp,N,L,NZ)<0._r8)stop 
         RootMycoNonstElms_rpvr(ielmn,N,L,NZ)=RootMycoNonstElms_rpvr(ielmn,N,L,NZ)+&

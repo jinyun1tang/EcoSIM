@@ -1306,15 +1306,16 @@ module NutUptakeMod
 
   integer :: K,NE
   !     begin_execution
-  associate(                              &
-    RDOM_micb_flx          =>  plt_bgcr%RDOM_micb_flx     , &
-    RootMycoExudElm_pvr    =>  plt_rbgc%RootMycoExudElm_pvr    , &
-    RootMycoExudElms_pft   =>  plt_rbgc%RootMycoExudElms_pft     , &
-    RootHPO4Uptake_pft     =>  plt_rbgc%RootHPO4Uptake_pft     , &
-    RootH2PO4Uptake_pft    =>  plt_rbgc%RootH2PO4Uptake_pft     , &
-    RootNH4Uptake_pft      =>  plt_rbgc%RootNH4Uptake_pft     , &
-    RootNO3Uptake_pft      =>  plt_rbgc%RootNO3Uptake_pft     , &
-    RootNutUptake_pvr      =>  plt_rbgc%RootNutUptake_pvr     &
+  associate(                                                      &
+    RDOM_micb_flx           =>  plt_bgcr%RDOM_micb_flx          , &
+    RootMycoNonstElms_rpvr  => plt_biom%RootMycoNonstElms_rpvr  , &    
+    RootMycoExudElm_pvr     =>  plt_rbgc%RootMycoExudElm_pvr    , &
+    RootMycoExudElms_pft    =>  plt_rbgc%RootMycoExudElms_pft   , &
+    RootHPO4Uptake_pft      =>  plt_rbgc%RootHPO4Uptake_pft     , &
+    RootH2PO4Uptake_pft     =>  plt_rbgc%RootH2PO4Uptake_pft    , &
+    RootNH4Uptake_pft       =>  plt_rbgc%RootNH4Uptake_pft      , &
+    RootNO3Uptake_pft       =>  plt_rbgc%RootNO3Uptake_pft      , &
+    RootNutUptake_pvr       =>  plt_rbgc%RootNutUptake_pvr        &
   )
   !
   !     TOTAL C,N,P EXCHANGE BETWEEN ROOTS AND SOIL
@@ -1343,6 +1344,13 @@ module NutUptakeMod
     +(RootNutUptake_pvr(ids_H2PO4,N,L,NZ)+RootNutUptake_pvr(ids_H2PO4B,N,L,NZ))
   RootHPO4Uptake_pft(NZ)=RootHPO4Uptake_pft(NZ) &
     +(RootNutUptake_pvr(ids_H1PO4,N,L,NZ)+RootNutUptake_pvr(ids_H1PO4B,N,L,NZ))
+    
+  D195: DO K=1,jcplx
+    DO NE=1,NumPlantChemElms
+      RootMycoNonstElms_rpvr(NE,N,L,NZ)=RootMycoNonstElms_rpvr(NE,N,L,NZ)+RootMycoExudElm_pvr(NE,N,K,L,NZ)
+    ENDDO
+  ENDDO D195
+    
   end associate
   end subroutine SumNutrientUptake
 

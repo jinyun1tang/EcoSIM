@@ -2,12 +2,14 @@ module PlantMod
   use data_kind_mod   , only : r8 => DAT_KIND_R8
   use grosubsMod      , only : grosubs
   use HfuncsMod       , only : hfuncs
-  use UptakesMod      , only : uptakes
+  use UptakesMod      , only : uptakes  
   use PlantDisturbMod , only : PrepLandscapeGrazing
   use EcoSimSumDataType
   use PlantAPIData  
   use PlantAPI
   use ExtractsMod
+  use GridDataType, only : NP
+  use PlantBalMod
 implicit none
   private
   character(len=*),private, parameter :: mod_filename = &
@@ -24,7 +26,7 @@ implicit none
   integer, intent(in) :: I,J
   integer, intent(in) :: NHW,NHE,NVN,NVS
   real(r8) :: t1
-  integer :: NY,NX
+  integer :: NY,NX,NZ
 
 333   FORMAT(A8)
 
@@ -37,13 +39,22 @@ implicit none
       call  PlantAPISend(I,J,NY,NX)
 !   UPDATE PLANT PHENOLOGY IN 'HFUNC'
 !
+      call ZeroGrosub()  
     !if(lverb)WRITE(*,333)'HFUNC'
       !phenological update, determine living/active branches
+      DO NZ=1,NP(NY,NX)
+        call SumPlantBiom(I,J,NZ,'bfHFUNCS')
+      ENDDO
       CALL HFUNCs(I,J)
 
+      DO NZ=1,NP(NY,NX)
+        call SumPlantBiom(I,J,NZ,'bfUPTAKES')
+      ENDDO
       !predict uptake fluxes of nutrients and O2
       CALL UPTAKES(I,J)
-
+      DO NZ=1,NP(NY,NX)
+        call SumPlantBiom(I,J,NZ,'bfGROSUBS')
+      ENDDO
       !do growth of active branches
       CALL GROSUBs(I,J)
 

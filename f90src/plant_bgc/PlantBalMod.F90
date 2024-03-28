@@ -13,7 +13,9 @@ implicit none
   __FILE__
 
   public :: SumPlantBiom
-
+  public :: SumPlantBiomStates
+  public :: ZeroGrosub  
+  logical,save  :: lfile(2)=.true.
   contains
 
 !------------------------------------------------------------------------------------------
@@ -30,6 +32,87 @@ implicit none
 !     begin_execution
   associate(                                                     &
     NU                             =>  plt_site%NU      , &  
+    MaxNodesPerBranch1             =>  pltpar%MaxNodesPerBranch1    , &
+    iPlantPhotosynthesisType       =>  plt_photo%iPlantPhotosynthesisType   , &    
+    NH3Dep2Can_pft                 =>  plt_bgcr%NH3Dep2Can_pft  , &             
+    NH3Dep2Can_brch                =>  plt_rbgc%NH3Dep2Can_brch  , &    !
+    GrossResp_pft                  =>  plt_bgcr%GrossResp_pft , &
+    GrossCO2Fix_pft                =>  plt_bgcr%GrossCO2Fix_pft   , &
+    NumOfBranches_pft              =>  plt_morph%NumOfBranches_pft    , &       
+    NodulInfectElms_pft            =>  plt_bgcr%NodulInfectElms_pft, &    
+    LitrfalStrutElms_pft           =>  plt_bgcr%LitrfalStrutElms_pft    , &
+    LitrfalStrutElms_pvr           =>  plt_bgcr%LitrfalStrutElms_pvr  , &    
+    RootMycoExudElms_pft           =>  plt_rbgc%RootMycoExudElms_pft    , &    
+    MY                             =>  plt_morph%MY     , &        
+    MaxSoiL4Root                   =>  plt_morph%MaxSoiL4Root     , &    
+    NumRootAxes_pft                =>  plt_morph%NumRootAxes_pft   , &
+    MaxNumRootLays                 =>  plt_site%MaxNumRootLays      , &  
+    SeasonalNonstElms_pft          =>  plt_biom%SeasonalNonstElms_pft     , &    
+    RootElmsBeg_pft                =>  plt_biom%RootElmsBeg_pft     , &
+    ShootElmsBeg_pft               =>  plt_biom%ShootElmsBeg_pft    , &
+    RootElms_pft                   =>  plt_biom%RootElms_pft    , &    
+    ShootElms_brch                 =>  plt_biom%ShootElms_brch  , &
+    RootStrutElms_pft              =>  plt_biom%RootStrutElms_pft, &
+    ShootC4NonstC_brch             =>  plt_biom%ShootC4NonstC_brch, &            
+    ShootElms_pft                  =>  plt_biom%ShootElms_pft     &
+  )
+
+  CALL SumPlantBiomStates(I,J,NZ,header)
+  
+  if(RootElms_pft(ielmc,NZ)>1.e16 .or. ShootElms_pft(ielmc,NZ)>1.e16)stop
+
+  !sum fluxes
+!     NH3Dep2Can_brch,NH3Dep2Can_pft=PFT NH3 flux between atmosphere and branch,canopy
+  NH3Dep2Can_pft(NZ)=0._r8
+  DO NB=1,NumOfBranches_pft(NZ)
+    NH3Dep2Can_pft(NZ)=NH3Dep2Can_pft(NZ)+NH3Dep2Can_brch(NB,NZ)
+  ENDDO    
+
+  LitrfalStrutElms_pft(1:NumPlantChemElms,NZ)=0._r8
+  DO L=0,MaxNumRootLays
+    DO K=1,pltpar%NumOfPlantLitrCmplxs      
+      DO M=1,jsken
+        DO NE=1,NumPlantChemElms
+          LitrfalStrutElms_pft(NE,NZ)=LitrfalStrutElms_pft(NE,NZ)+LitrfalStrutElms_pvr(NE,M,K,L,NZ)
+        ENDDO
+      ENDDO
+    ENDDO      
+  ENDDO
+
+  balc=RootElms_pft(ielmc,NZ)+ShootElms_pft(ielmc,NZ)-RootElmsBeg_pft(ielmc,NZ)-ShootElmsBeg_pft(ielmc,NZ)&
+    -GrossCO2Fix_pft(NZ)-GrossResp_pft(NZ)+LitrfalStrutElms_pft(ielmc,NZ)-NodulInfectElms_pft(ielmc,NZ) &
+    -RootMycoExudElms_pft(ielmc,NZ)
+  if(NZ==1)THEN
+    WRITE(111,*)'BALC: '//trim(header),I+J/24.,BALC,SeasonalNonstElms_pft(ielmc,NZ)&
+      ,RootElmsbeg_pft(ielmc,NZ),ShootElmsbeg_pft(ielmc,NZ)
+    WRITE(111,*)'cfix=',GrossCO2Fix_pft(NZ),'Rauto=',GrossResp_pft(NZ),'exud=',RootMycoExudElms_pft(ielmc,NZ) 
+    WRITE(111,*)'litrf=',LitrfalStrutElms_pft(ielmc,NZ),'infec=',NodulInfectElms_pft(ielmc,NZ)
+    write(111,*)RootElms_pft(ielmc,NZ),ShootElms_pft(ielmc,NZ),RootElmsBeg_pft(ielmc,NZ),ShootElmsBeg_pft(ielmc,NZ),'|'
+  else
+    WRITE(112,*)'BALC: '//trim(header),I+J/24.,BALC,SeasonalNonstElms_pft(ielmc,NZ)&
+      ,RootElmsbeg_pft(ielmc,NZ),ShootElmsbeg_pft(ielmc,NZ)
+    WRITE(112,*)'cfix=',GrossCO2Fix_pft(NZ),'Rauto=',GrossResp_pft(NZ),'exud=',RootMycoExudElms_pft(ielmc,NZ) 
+    WRITE(112,*)'litrf=',LitrfalStrutElms_pft(ielmc,NZ),'infec=',NodulInfectElms_pft(ielmc,NZ)
+    write(112,*)RootElms_pft(ielmc,NZ),ShootElms_pft(ielmc,NZ),RootElmsBeg_pft(ielmc,NZ),ShootElmsBeg_pft(ielmc,NZ),'|'
+  ENDIF  
+  end associate
+  end subroutine SumPlantBiom
+
+!------------------------------------------------------------------------------------------
+
+
+  subroutine SumPlantBiomStates(I,J,NZ,header)
+  implicit none
+  integer, intent(in) :: I,J
+  integer, intent(in) :: NZ
+  character(len=*),intent(in) :: header
+  integer :: NB,NE,K
+  real(r8) :: root1st,root2nd
+  real(r8) :: balc
+
+!     begin_execution
+  associate(                                                     &
+    NU                             =>  plt_site%NU      , &  
     iPlantNfixType                 =>  plt_morph%iPlantNfixType  , &
     MaxNodesPerBranch1             =>  pltpar%MaxNodesPerBranch1    , &
     CMassHCO3BundleSheath_node     =>  plt_photo%CMassHCO3BundleSheath_node      , &
@@ -37,14 +120,7 @@ implicit none
     CPOOL3_node                    =>  plt_photo%CPOOL3_node    , &
     CPOOL4_node                    =>  plt_photo%CPOOL4_node    , &
     iPlantPhotosynthesisType       =>  plt_photo%iPlantPhotosynthesisType   , &    
-    NH3Dep2Can_pft                 =>  plt_bgcr%NH3Dep2Can_pft  , &             
-    NH3Dep2Can_brch                =>  plt_rbgc%NH3Dep2Can_brch  , &    !
-    GrossResp_pft                  =>  plt_bgcr%GrossResp_pft , &
-    GrossCO2Fix_pft                =>  plt_bgcr%GrossCO2Fix_pft   , &
     NodulInfectElms_pft            =>  plt_bgcr%NodulInfectElms_pft, &    
-    LitrfalStrutElms_pft           =>  plt_bgcr%LitrfalStrutElms_pft    , &
-    LitrfalStrutElms_pvr           =>  plt_bgcr%LitrfalStrutElms_pvr  , &    
-    RootMycoExudElms_pft           =>  plt_rbgc%RootMycoExudElms_pft    , &    
     NumOfBranches_pft              =>  plt_morph%NumOfBranches_pft    , &   
     MY                             =>  plt_morph%MY     , &        
     MaxSoiL4Root                   =>  plt_morph%MaxSoiL4Root     , &    
@@ -69,15 +145,15 @@ implicit none
     LeafStrutElms_brch             =>  plt_biom%LeafStrutElms_brch , &    
     CanopyNodulNonstElms_brch      =>  plt_biom%CanopyNodulNonstElms_brch, &
     CanopyNodulStrutElms_brch      =>  plt_biom%CanopyNodulStrutElms_brch, &
-    StandDeadStrutElms_pft         => plt_biom%StandDeadStrutElms_pft   , & 
-    StandDeadKCompElms_pft         => plt_biom%StandDeadKCompElms_pft   , &       
+    StandDeadStrutElms_pft         =>  plt_biom%StandDeadStrutElms_pft   , & 
+    StandDeadKCompElms_pft         =>  plt_biom%StandDeadKCompElms_pft   , &       
     RootElms_pft                   =>  plt_biom%RootElms_pft    , &    
     ShootElms_brch                 =>  plt_biom%ShootElms_brch  , &
     RootStrutElms_pft              =>  plt_biom%RootStrutElms_pft, &
     ShootC4NonstC_brch             =>  plt_biom%ShootC4NonstC_brch, &            
     ShootElms_pft                  =>  plt_biom%ShootElms_pft     &
   )
-
+  
   !shoots
   DO NB=1,NumOfBranches_pft(NZ)
     DO NE=1,NumPlantChemElms
@@ -143,54 +219,64 @@ implicit none
 
   if(NZ==1)then
     if(lfile(NZ))then
-      write(243,'(A14,X,A13,6(X,A14))')'header','doy','rootC','shootC','rootN','shootN','rootP','shootP'
+      write(243,'(A14,X,A13,6(X,A16))')'header','doy','rootC','shootC','rootN','shootN','rootP','shootP'
     endif
-    write(243,'(A14,X,F13.6,6(X,F14.6))')trim(header),I+J/24.,&
+    write(243,'(A14,X,F13.6,6(X,F16.6))')trim(header),I+J/24.,&
       (RootElms_pft(NE,NZ),ShootElms_pft(NE,NZ),NE=1,NumPlantChemElms)
+    write(243,'(A14,X,F13.6,6(X,F16.6))')'x',I+J/24.,&
+      (RootElmsbeg_pft(NE,NZ),ShootElmsbeg_pft(NE,NZ),NE=1,NumPlantChemElms)      
   else
     if(lfile(NZ))then
       write(244,'(A14,X,A13,6(X,A14))')'header','doy','rootC','shootC','rootN','shootN','rootP','shootP'
     endif  
     write(244,'(A14,X,F13.6,6(X,F14.6))')trim(header),I+J/24.,&
       (RootElms_pft(NE,NZ),ShootElms_pft(NE,NZ),NE=1,NumPlantChemElms)
+    write(244,'(A14,X,F13.6,6(X,F14.6))')'x',I+J/24.,&
+      (RootElmsbeg_pft(NE,NZ),ShootElmsbeg_pft(NE,NZ),NE=1,NumPlantChemElms)            
   endif
-  if(RootElms_pft(ielmc,NZ)>1.e16 .or. ShootElms_pft(ielmc,NZ)>1.e16)stop
   lfile(NZ)=.false.
 
-  !sum fluxes
-!     NH3Dep2Can_brch,NH3Dep2Can_pft=PFT NH3 flux between atmosphere and branch,canopy
-  NH3Dep2Can_pft(NZ)=0._r8
-  DO NB=1,NumOfBranches_pft(NZ)
-    NH3Dep2Can_pft(NZ)=NH3Dep2Can_pft(NZ)+NH3Dep2Can_brch(NB,NZ)
-  ENDDO    
+  end associate
+  END subroutine SumPlantBiomStates
 
-!  LitrfalStrutElms_pft(1:NumPlantChemElms,NZ)=0._r8
-  DO L=0,MaxNumRootLays
-    DO K=1,pltpar%NumOfPlantLitrCmplxs      
-      DO M=1,jsken
-        DO NE=1,NumPlantChemElms
-          LitrfalStrutElms_pft(NE,NZ)=LitrfalStrutElms_pft(NE,NZ)+LitrfalStrutElms_pvr(NE,M,K,L,NZ)
+!------------------------------------------------------------------------------------------
+
+
+  subroutine ZeroGrosub()
+  
+  implicit none
+  integer :: NZ,K,L,M,NE
+
+  associate(                                                       &
+    NP0                     =>  plt_site%NP0                     , &  
+    MaxNumRootLays          =>  plt_site%MaxNumRootLays          , &
+    CO2NetFix_pft           =>  plt_bgcr%CO2NetFix_pft           , &
+    LitrfalStrutElms_pft    =>  plt_bgcr%LitrfalStrutElms_pft    , &
+    NodulInfectElms_pft     =>  plt_bgcr%NodulInfectElms_pft     , &
+    RootMycoExudElms_pft    =>  plt_rbgc%RootMycoExudElms_pft    , &
+    NH3Dep2Can_pft          =>  plt_bgcr%NH3Dep2Can_pft          , &             
+    GrossResp_pft           =>  plt_bgcr%GrossResp_pft           , &
+    GrossCO2Fix_pft         =>  plt_bgcr%GrossCO2Fix_pft         , &    
+    LitrfalStrutElms_pvr    =>  plt_bgcr%LitrfalStrutElms_pvr      &
+  )  
+  
+  D9980: DO NZ=1,NP0
+    D1: DO L=0,MaxNumRootLays
+      DO K=1,pltpar%NumOfPlantLitrCmplxs
+        DO M=1,jsken
+          DO NE=1,NumPlantChemElms
+            LitrfalStrutElms_pvr(NE,M,K,L,NZ)=0._r8
+          ENDDO
         ENDDO
       ENDDO
-    ENDDO      
-  ENDDO
-
-  balc=RootElms_pft(ielmc,NZ)+ShootElms_pft(ielmc,NZ)-RootElmsBeg_pft(ielmc,NZ)-ShootElmsBeg_pft(ielmc,NZ)&
-    -GrossCO2Fix_pft(NZ)-GrossResp_pft(NZ)+LitrfalStrutElms_pft(ielmc,NZ)-NodulInfectElms_pft(ielmc,NZ) &
-    -RootMycoExudElms_pft(ielmc,NZ)
-  if(NZ==1)THEN
-    WRITE(111,*)'BALC: '//trim(header),I+J/24.,BALC,SeasonalNonstElms_pft(ielmc,NZ)
-    WRITE(111,*)'cfix=',GrossCO2Fix_pft(NZ),'Rauto=',GrossResp_pft(NZ),'exud=',RootMycoExudElms_pft(ielmc,NZ) 
-    WRITE(111,*)'litrf=',LitrfalStrutElms_pft(ielmc,NZ),'infec=',NodulInfectElms_pft(ielmc,NZ)
-    write(111,*)RootElms_pft(ielmc,NZ),ShootElms_pft(ielmc,NZ),RootElmsBeg_pft(ielmc,NZ),ShootElmsBeg_pft(ielmc,NZ),'|'
-  else
-    WRITE(112,*)'BALC: '//trim(header),I+J/24.,BALC,SeasonalNonstElms_pft(ielmc,NZ) 
-    WRITE(112,*)'cfix=',GrossCO2Fix_pft(NZ),'Rauto=',GrossResp_pft(NZ),'exud=',RootMycoExudElms_pft(ielmc,NZ) 
-    WRITE(112,*)'litrf=',LitrfalStrutElms_pft(ielmc,NZ),'infec=',NodulInfectElms_pft(ielmc,NZ)
-    write(112,*)RootElms_pft(ielmc,NZ),ShootElms_pft(ielmc,NZ),RootElmsBeg_pft(ielmc,NZ),ShootElmsBeg_pft(ielmc,NZ),'|'
-  ENDIF  
+    ENDDO D1
+    NH3Dep2Can_pft(NZ)=0._r8
+    GrossResp_pft(NZ)=0._r8
+    GrossCO2Fix_pft(NZ)=0._r8    
+    CO2NetFix_pft(NZ)=0._r8
+    RootMycoExudElms_pft(1:NumPlantChemElms,NZ)=0._r8
+    NodulInfectElms_pft(1:NumPlantChemElms,NZ)=0._r8
+  ENDDO D9980
   end associate
-  end subroutine SumPlantBiom
-  
-
+  end subroutine ZeroGrosub  
 end module PlantBalMod

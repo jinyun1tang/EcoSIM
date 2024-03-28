@@ -23,7 +23,7 @@ implicit none
     integer :: layer
     character(len=64) :: bgc_fname
   end type bgc_forc_config_type
-  type(bgc_forc_config_type) :: bgc_forc_conf
+  type(bgc_forc_config_type),public :: bgc_forc_conf
 
   logical, public :: do_bgcforc_write
   public :: WriteBBGCForc

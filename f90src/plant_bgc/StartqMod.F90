@@ -138,17 +138,17 @@ module StartqMod
   REAL(R8) :: CNOPCT,CPOPCT
 
   associate(                       &
-    iprotein  => pltpar%iprotein  ,&
-    icarbhyro => pltpar%icarbhyro ,&
-    icellulos => pltpar%icellulos ,&
-    ilignin  =>  pltpar%ilignin   , &
+    iprotein         => pltpar%iprotein  ,&
+    icarbhyro        => pltpar%icarbhyro ,&
+    icellulos        => pltpar%icellulos ,&
+    ilignin          =>  pltpar%ilignin   , &
     NumLitterGroups  => pltpar%NumLitterGroups , &
-    inonstruct => pltpar%inonstruct, &
-    ifoliar  => pltpar%ifoliar , &
-    inonfoliar => pltpar%inonfoliar, &
-    istalk   => pltpar%istalk  , &
-    iroot    => pltpar%iroot   , &
-    icwood   => pltpar%icwood    &
+    inonstruct       => pltpar%inonstruct, &
+    ifoliar          => pltpar%ifoliar , &
+    inonfoliar       => pltpar%inonfoliar, &
+    istalk           => pltpar%istalk  , &
+    iroot            => pltpar%iroot   , &
+    icwood           => pltpar%icwood    &
   )
 !
 !     FRACTIONS OF PLANT LITTER ALLOCATED TO KINETIC COMPONENTS
@@ -624,7 +624,7 @@ module StartqMod
 
   implicit none
   integer, intent(in) :: NZ, NY, NX
-  integer :: M
+  integer :: M,NE
   real(r8) :: WTSTDX
   associate(                 &
     icwood => pltpar%icwood  &
@@ -658,12 +658,11 @@ module StartqMod
       StandDeadKCompElms_pft(ielmc,M,NZ,NY,NX)=WTSTDX*CFOPE(ielmc,icwood,M,NZ,NY,NX)
       StandDeadKCompElms_pft(ielmn,M,NZ,NY,NX)=WTSTDX*rNCStalk_pft(NZ,NY,NX)*CFOPE(ielmn,icwood,M,NZ,NY,NX)
       StandDeadKCompElms_pft(ielmp,M,NZ,NY,NX)=WTSTDX*rPCStalk_pft(NZ,NY,NX)*CFOPE(ielmp,icwood,M,NZ,NY,NX)
-      StandDeadStrutElms_pft(ielmc,NZ,NY,NX)=StandDeadStrutElms_pft(ielmc,NZ,NY,NX) &
-        +StandDeadKCompElms_pft(ielmc,M,NZ,NY,NX)
-      StandDeadStrutElms_pft(ielmn,NZ,NY,NX)=StandDeadStrutElms_pft(ielmn,NZ,NY,NX) &
-        +StandDeadKCompElms_pft(ielmn,M,NZ,NY,NX)
-      StandDeadStrutElms_pft(ielmp,NZ,NY,NX)=StandDeadStrutElms_pft(ielmp,NZ,NY,NX) &
-        +StandDeadKCompElms_pft(ielmp,M,NZ,NY,NX)
+      
+      DO NE=1,NumPlantChemElms
+      StandDeadStrutElms_pft(NE,NZ,NY,NX)=StandDeadStrutElms_pft(NE,NZ,NY,NX) &
+        +StandDeadKCompElms_pft(NE,M,NZ,NY,NX)
+      ENDDO  
     ENDDO D155
   ENDIF
   end associate
@@ -872,7 +871,8 @@ module StartqMod
   
   
   DO NE=1,NumPlantChemElms
-    ShootElms_pft(NE,NZ,NY,NX)=ShootElms_brch(NE,1,NZ,NY,NX)+SeasonalNonstElms_pft(NE,NZ,NY,NX)
+    ShootElms_pft(NE,NZ,NY,NX)=ShootElms_brch(NE,1,NZ,NY,NX)+SeasonalNonstElms_pft(NE,NZ,NY,NX) &
+      +StandDeadStrutElms_pft(NE,NZ,NY,NX)
   ENDDO
   
   RootElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8

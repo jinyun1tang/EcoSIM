@@ -41,7 +41,6 @@ module grosubsMod
 !
 
   integer  :: curday,curhour
-  logical,save  :: lfile(2)=.true.
   public :: grosubs
   public :: InitGrosub
   contains
@@ -73,43 +72,19 @@ module grosubsMod
   real(r8) :: ShootC4NonstC_brch(NumOfCanopyLayers1,JP1)
 ! begin_execution
   associate(                                                      &
-    IsPlantActive_pft       => plt_pheno%IsPlantActive_pft      , &
-    NP                      => plt_site%NP                      , &
-    NP0                     => plt_site%NP0                     , &
-    MaxNumRootLays          => plt_site%MaxNumRootLays          , &
-    CO2NetFix_pft           => plt_bgcr%CO2NetFix_pft           , &
-    LitrfalStrutElms_pft    => plt_bgcr%LitrfalStrutElms_pft    , &
-    LitrfalStrutElms_pvr    => plt_bgcr%LitrfalStrutElms_pvr    , &
-    NodulInfectElms_pft     => plt_bgcr%NodulInfectElms_pft     , &
-    RootMycoExudElms_pft    => plt_rbgc%RootMycoExudElms_pft    , &
-    CanopyHeight_pft        => plt_morph%CanopyHeight_pft         &
+    NP0                     =>  plt_site%NP0                    , &  
+    IsPlantActive_pft       =>  plt_pheno%IsPlantActive_pft     , &
+    CanopyHeight_pft        =>  plt_morph%CanopyHeight_pft      , &        
+    NP                      =>  plt_site%NP                       &
   )
 !     TOTAL AGB FOR GRAZING IN LANDSCAPE SECTION
 !
 !
 !     INITIALIZE SENESCENCE ARRAYS
-!
-
-  D9980: DO NZ=1,NP0
-    if(NZ==1)THEN
-    WRITE(201,*)I+J/24.,(plt_biom%SeasonalNonstElms_pft(NE,NZ),NE=1,3)
-    ELSE
-    WRITE(202,*)I+J/24.,(plt_biom%SeasonalNonstElms_pft(NE,NZ),NE=1,3)
-    ENDIF  
-    D1: DO L=0,MaxNumRootLays
-      DO K=1,pltpar%NumOfPlantLitrCmplxs
-        DO M=1,jsken
-          DO NE=1,NumPlantChemElms
-            LitrfalStrutElms_pvr(NE,M,K,L,NZ)=0._r8
-          ENDDO
-        ENDDO
-      ENDDO
-    ENDDO D1
-    CO2NetFix_pft(NZ)=0._r8
+  DO NZ=1,NP0
     CanopyHeight_copy(NZ)=CanopyHeight_pft(NZ)
     CanopyHeight_pft(NZ)=0._r8
-    NodulInfectElms_pft(1:NumPlantChemElms,NZ)=0._r8
-  ENDDO D9980
+  ENDDO  
 !
 !     TRANSFORMATIONS IN LIVING PLANT POPULATIONS
 !
