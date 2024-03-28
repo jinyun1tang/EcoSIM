@@ -7,7 +7,8 @@ module PlantMathFuncMod
   use MiniMathMod
   use ElmIDMod
 implicit none
-  character(len=*), parameter, private :: mod_filename='PlantMathFuncMod'
+  character(len=*), parameter, private :: mod_filename=&
+  __FILE__
 
   type, public  :: PlantSoluteUptakeConfig_type
     real(r8) :: SolAdvFlx  

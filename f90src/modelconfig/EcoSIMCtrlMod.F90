@@ -5,6 +5,8 @@ module EcoSIMCtrlMod
   use fileUtil, only :   datestrlen  
 implicit none
   save
+  character(len=*),private, parameter :: mod_filename =&
+   __FILE__  
   logical :: salt_model   =.false.    !toggle for salt model
   logical :: erosion_model=.false.
   logical :: first_topou   = .false.

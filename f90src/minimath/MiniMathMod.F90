@@ -6,9 +6,10 @@ module minimathmod
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use EcoSimConst
   implicit none
-  character(len=*),private, parameter :: mod_filename = &
-  __FILE__
   private
+  character(len=*), parameter :: mod_filename = &
+  __FILE__
+
   public :: safe_adb
   public :: p_adb
   public :: isclose         !test if two values a and b are close in magnitude
