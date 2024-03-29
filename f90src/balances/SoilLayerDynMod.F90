@@ -1094,7 +1094,7 @@ implicit none
   real(r8) :: WTNDLE,FXEPOOLN
   real(r8) :: FXWTRT1E
   real(r8) :: FXWTRT2E,FXRTLG1
-  real(r8) :: FXWTRTD,FXWSRTL,FRootAreaPopu,FXRTNL,FXRTLGP,FXRTDNP
+  real(r8) :: FXWTRTD,FXWSRTL,FRootPrimeAxsNum,FXRTNL,FXRTLGP,FXRTDNP
   real(r8) :: FXRTVLP,FXRTVLW,FXRRAD1,FXRRAD2,FXRootAreaPerPlant_pvr,FXRTLGA
   real(r8) :: FXOQN,FXOQP,FXOQA,FXOQCH,FXOQNH,FXOQPH,FXOQAH
   real(r8) :: FXOHC,FXOHN,FXOHP,FXOHA,FXOSC,FXOSA,FXOSN,FXOSP
@@ -1272,9 +1272,9 @@ implicit none
           FXWSRTL=FRO*RootProteinC_pvr(N,L0,NZ,NY,NX)
           RootProteinC_pvr(N,L1,NZ,NY,NX)=RootProteinC_pvr(N,L1,NZ,NY,NX)+FXWSRTL
           RootProteinC_pvr(N,L0,NZ,NY,NX)=RootProteinC_pvr(N,L0,NZ,NY,NX)-FXWSRTL
-          FRootAreaPopu=FRO*Root1stXNumL_pvr(N,L0,NZ,NY,NX)
-          Root1stXNumL_pvr(N,L1,NZ,NY,NX)=Root1stXNumL_pvr(N,L1,NZ,NY,NX)+FRootAreaPopu
-          Root1stXNumL_pvr(N,L0,NZ,NY,NX)=Root1stXNumL_pvr(N,L0,NZ,NY,NX)-FRootAreaPopu
+          FRootPrimeAxsNum=FRO*Root1stXNumL_pvr(N,L0,NZ,NY,NX)
+          Root1stXNumL_pvr(N,L1,NZ,NY,NX)=Root1stXNumL_pvr(N,L1,NZ,NY,NX)+FRootPrimeAxsNum
+          Root1stXNumL_pvr(N,L0,NZ,NY,NX)=Root1stXNumL_pvr(N,L0,NZ,NY,NX)-FRootPrimeAxsNum
           FXRTNL=FRO*Root2ndXNum_pvr(N,L0,NZ,NY,NX)
           Root2ndXNum_pvr(N,L1,NZ,NY,NX)=Root2ndXNum_pvr(N,L1,NZ,NY,NX)+FXRTNL
           Root2ndXNum_pvr(N,L0,NZ,NY,NX)=Root2ndXNum_pvr(N,L0,NZ,NY,NX)-FXRTNL

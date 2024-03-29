@@ -14,14 +14,14 @@ implicit none
   public :: RootBGCModel
   contains
 
-  subroutine RootBGCModel(I,J,NZ,BegRemoblize,PTRT,TFN6_vr,CNRTW,CPRTW,RootAreaPopu)
+  subroutine RootBGCModel(I,J,NZ,BegRemoblize,PTRT,TFN6_vr,CNRTW,CPRTW,RootPrimeAxsNum)
 
   implicit none
   integer , intent(in) :: I,J,NZ
   integer , intent(in) :: BegRemoblize  !remobilization flag
   real(r8), intent(in) :: TFN6_vr(JZ1)
   real(r8), intent(in) :: CNRTW,CPRTW
-  real(r8), intent(in) :: RootAreaPopu
+  real(r8), intent(in) :: RootPrimeAxsNum
   real(r8), intent(in) :: PTRT      !shoot-root nonstrucal C/N exchange modifier
 
   integer, parameter  :: NumRootAxes4DeadPlant =0    !
@@ -57,10 +57,10 @@ implicit none
   )
 !     ROOT GROWTH
 !
-  call SummarizeRootSink(NZ,RootAreaPopu,RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,RootSinkC)
+  call SummarizeRootSink(I,J,NZ,RootPrimeAxsNum,RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,RootSinkC)
 
   call RootBiochemistry(I,J,NZ,TFN6_vr,CNRTW,CPRTW,&
-      RootAreaPopu,RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,RootSinkC,fRootGrowPSISense_vr)
+      RootPrimeAxsNum,RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,RootSinkC,fRootGrowPSISense_vr)
 !
 !     ADD SEED DIMENSIONS TO ROOT DIMENSIONS (ONLY IMPORTANT DURING
 !     GERMINATION)
@@ -109,12 +109,12 @@ implicit none
 
 !------------------------------------------------------------------------------------------
 
-  subroutine RootBiochemistry(I,J,NZ,TFN6_vr,CNRTW,CPRTW,RootAreaPopu,&
+  subroutine RootBiochemistry(I,J,NZ,TFN6_vr,CNRTW,CPRTW,RootPrimeAxsNum,&
     RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,RootSinkC,fRootGrowPSISense_vr)
   implicit none
   integer, intent(in) :: I,J,NZ
   real(r8), intent(in) :: TFN6_vr(JZ1),CNRTW,CPRTW
-  real(r8), intent(in) :: RootAreaPopu
+  real(r8), intent(in) :: RootPrimeAxsNum
   REAL(R8), INTENT(in) :: RootSinkC_vr(jroots,JZ1)
   real(r8), INTENT(in) :: RootSinkC(jroots)
   real(r8), INTENT(in) :: Root1stSink_pvr(jroots,JZ1,pltpar%MaxNumRootAxes)
@@ -220,7 +220,7 @@ implicit none
 !     FOR EACH ROOT AXIS
 !
         call GrowRootMycoAxes(N,L,L1,NZ,NRX,iRootXsUpdateFlag,TFN6_vr,&
-          RootAreaPopu,RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,CNRTW,CPRTW,&
+          RootPrimeAxsNum,RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,CNRTW,CPRTW,&
           fRootGrowPSISense_vr,TotRoot2ndLen,TotRoot1stLen,Root2ndC,Root1stC,litrflx,RCO2flx)
 
 !====================================================================================
@@ -336,7 +336,7 @@ implicit none
 !------------------------------------------------------------------------------------------
 
   subroutine GrowRootMycoAxes(N,L,L1,NZ,NRX,iRootXsUpdateFlag,TFN6_vr,&
-    RootAreaPopu,RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,CNRTW,CPRTW,&
+    RootPrimeAxsNum,RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,CNRTW,CPRTW,&
     fRootGrowPSISense_vr,TotRoot2ndLen,TotRoot1stLen,Root2ndC,Root1stC,litrflx,RCO2flx)
   implicit none
   INTEGER , INTENT(IN) :: N     !root type id
@@ -344,7 +344,7 @@ implicit none
   integer , intent(in) :: L1    !next root growable layer, soil porosity >0 
   integer , intent(in) :: NZ     !pft id
   real(r8), intent(in) :: TFN6_vr(JZ1)
-  real(r8), intent(in) :: RootAreaPopu
+  real(r8), intent(in) :: RootPrimeAxsNum
   REAL(R8), INTENT(IN) :: RootSinkC_vr(jroots,JZ1)
   real(r8), intent(in) :: Root1stSink_pvr(jroots,JZ1,pltpar%MaxNumRootAxes)
   real(r8), intent(in) :: Root2ndSink_pvr(jroots,JZ1,pltpar%MaxNumRootAxes)
@@ -781,7 +781,7 @@ implicit none
       Root2ndC=Root2ndC+RootMyco2ndStrutElms_rpvr(ielmc,N,L,NR,NZ)
 
       !secondary root axes addition is a quadratic function of branching frequency
-      RTN2X=RootBranchFreq_pft(NZ)*RootAreaPopu
+      RTN2X=RootBranchFreq_pft(NZ)*RootPrimeAxsNum
       RTN2Y=RootBranchFreq_pft(NZ)*RTN2X
       Root2ndXNum_rpvr(N,L,NR,NZ)=(RTN2X+RTN2Y)*DLYR3(L)
       Root2ndXNum_pvr(N,L,NZ)=Root2ndXNum_pvr(N,L,NZ)+Root2ndXNum_rpvr(N,L,NR,NZ)
@@ -793,10 +793,10 @@ implicit none
 !     CumSoilThickness=depth from soil surface to layer bottom
 !     ICHKL=flag for identifying layer with primary root tip
 !     RTN1=number of primary root axes
-!     RootAreaPopu=multiplier for number of primary root axes
+!     RootPrimeAxsNum=multiplier for number of primary root axes
 !
       IF(N.EQ.ipltroot)THEN
-        call GrowRootAxes(N,NR,L,L1,NZ,RootAreaPopu,Root1stSink_pvr,&
+        call GrowRootAxes(N,NR,L,L1,NZ,RootPrimeAxsNum,Root1stSink_pvr,&
           Root2ndSink_pvr,RootSinkC_vr,RootChemElmRemob,fRootGrowPSISense_vr,TFN6_vr,&
           SNCRM,RCO2Nonst4Xmaint,DMRTD,CNRTW,CPRTW,TotRoot1stLen,Root1stC,iRootXsUpdateFlag,&
           NRX,litrflx,RCO2flx)
@@ -812,7 +812,7 @@ implicit none
 
 !------------------------------------------------------------------------------------------
 
-  subroutine GrowRootAxes(N,NR,L,L1,NZ,RootAreaPopu,Root1stSink_pvr,&
+  subroutine GrowRootAxes(N,NR,L,L1,NZ,RootPrimeAxsNum,Root1stSink_pvr,&
     Root2ndSink_pvr,RootSinkC_vr,RootChemElmRemob,fRootGrowPSISense_vr,TFN6_vr,&
     SNCRM,RCO2Nonst4Xmaint,DMRTD,CNRTW,CPRTW,TotRoot1stLen,Root1stC,iRootXsUpdateFlag,&
     NRX,litrflx,RCO2flx)
@@ -820,7 +820,7 @@ implicit none
   !grow root axes
   implicit none
   integer,  intent(in) :: N,NR,L,L1,NZ
-  real(r8), intent(in) :: RootAreaPopu
+  real(r8), intent(in) :: RootPrimeAxsNum
   REAL(R8), INTENT(IN) :: RootSinkC_vr(jroots,JZ1)  
   real(r8), intent(in) :: fRootGrowPSISense_vr(jroots,JZ1)    
   real(r8), intent(in) :: TFN6_vr(JZ1)  
@@ -908,7 +908,7 @@ implicit none
   !root pass the top surface of layer L, and the given root referenced by (N,NR) has not been updated
   !identify root tip
   IF(Root1stDepz2Surf.GT.CumSoilThickness(L-1) .AND. iRootXsUpdateFlag(N,NR).EQ.ifalse)THEN
-    Root1stXNumL_pvr(N,L,NZ)=Root1stXNumL_pvr(N,L,NZ)+RootAreaPopu
+    Root1stXNumL_pvr(N,L,NZ)=Root1stXNumL_pvr(N,L,NZ)+RootPrimeAxsNum
     !primary roots
     IF(Root1stDepz2Surf.LE.CumSoilThickness(L) .OR. L.EQ.MaxNumRootLays)THEN
       iRootXsUpdateFlag(N,NR)=itrue
@@ -1225,7 +1225,7 @@ implicit none
     IF(L.EQ.NIXBotRootLayer_rpft(NR,NZ))THEN
       !bottom root layer
       call WithdrawPrimeRoots(L,NR,NZ,N,Root1stDepz2Surf,RootSinkC_vr,Root1stSink_pvr &
-        ,Root2ndSink_pvr,RootAreaPopu)
+        ,Root2ndSink_pvr,RootPrimeAxsNum)
     ENDIF
 
 !
@@ -1556,14 +1556,14 @@ implicit none
 !------------------------------------------------------------------------------------------
 
   subroutine WithdrawPrimeRoots(L,NR,NZ,N,Root1stDepz2Surf,RootSinkC_vr &
-    ,Root1stSink_pvr,Root2ndSink_pvr,RootAreaPopu)
+    ,Root1stSink_pvr,Root2ndSink_pvr,RootPrimeAxsNum)
   implicit none
   integer, intent(in) :: L,NR,NZ,N
   real(r8), intent(in):: Root1stDepz2Surf
   real(r8), INTENT(IN) :: RootSinkC_vr(jroots,JZ1)
   real(r8), intent(in) :: Root1stSink_pvr(jroots,JZ1,pltpar%MaxNumRootAxes)
   real(r8), intent(in) :: Root2ndSink_pvr(jroots,JZ1,pltpar%MaxNumRootAxes)
-  real(r8), intent(in) :: RootAreaPopu
+  real(r8), intent(in) :: RootPrimeAxsNum
   integer :: LL,NN,NE,NTG
   real(r8) :: XFRD,XFRW,FRTN
   real(r8) :: XFRE(NumPlantChemElms)
@@ -1671,7 +1671,7 @@ implicit none
       Root2ndXNum_pvr(N,LL,NZ)=Root2ndXNum_pvr(N,LL,NZ)-Root2ndXNum_rpvr(N,LL,NR,NZ)
       Root2ndXNum_pvr(N,LL-1,NZ)=Root2ndXNum_pvr(N,LL-1,NZ)+Root2ndXNum_rpvr(N,LL,NR,NZ)
       Root2ndXNum_rpvr(N,LL,NR,NZ)=0._r8
-      Root1stXNumL_pvr(N,LL,NZ)=Root1stXNumL_pvr(N,LL,NZ)-RootAreaPopu
+      Root1stXNumL_pvr(N,LL,NZ)=Root1stXNumL_pvr(N,LL,NZ)-RootPrimeAxsNum
       IF(LL-1.GT.NGTopRootLayer_pft(NZ))THEN
         Root1stLen_rpvr(N,LL-1,NR,NZ)=DLYR3(LL-1)-(CumSoilThickness(LL-1)-Root1stDepz_pft(N,NR,NZ))
       ELSE
@@ -2172,11 +2172,11 @@ implicit none
   end subroutine NonstructlBiomTransfer
 
 !------------------------------------------------------------------------------------------
-  subroutine SummarizeRootSink(NZ,RootAreaPopu,RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,RootSinkC)
+  subroutine SummarizeRootSink(I,J,NZ,RootPrimeAxsNum,RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,RootSinkC)
 
   implicit none
-  integer, intent(in) :: NZ
-  real(r8), intent(in):: RootAreaPopu
+  integer, intent(in) :: I,J,NZ
+  real(r8), intent(in):: RootPrimeAxsNum
   real(r8),INTENT(OUT) :: RootSinkC_vr(jroots,JZ1)
   real(r8),intent(out) :: Root1stSink_pvr(jroots,JZ1,NumOfCanopyLayers1)
   real(r8),intent(out) :: Root2ndSink_pvr(jroots,JZ1,NumOfCanopyLayers1)
@@ -2186,8 +2186,11 @@ implicit none
   real(r8) :: RecoRootMycoC4Nup,CUPRO,CUPRC
   real(r8) :: RTDPP,RTDPS,RTSKP
   real(r8) :: RTSKS
+  real(r8) :: mass_inital(NumPlantChemElms)
+  real(r8) :: mass_finale(NumPlantChemElms)
+  real(r8) :: RCO2flx
 
-  associate(                              &
+  associate(                                                            &
     RootMycoNonstElms_rpvr    =>   plt_biom%RootMycoNonstElms_rpvr    , &
     ZEROP                     =>   plt_biom%ZEROP                     , &
     iPlantRootProfile_pft     =>   plt_pheno%iPlantRootProfile_pft    , &
@@ -2195,26 +2198,26 @@ implicit none
     ZEROS2                    =>   plt_site%ZEROS2                    , &
     NU                        =>   plt_site%NU                        , &
     CumSoilThickness          =>   plt_site%CumSoilThickness          , &
-    ZERO                      =>   plt_site%ZERO      , &
-    DLYR3                     =>   plt_site%DLYR3     , &
-    RootNutUptake_pvr         =>   plt_rbgc%RootNutUptake_pvr    , &
-    RootOUlmNutUptake_pvr     =>   plt_rbgc%RootOUlmNutUptake_pvr    , &
-    RootCUlmNutUptake_pvr     =>   plt_rbgc%RootCUlmNutUptake_pvr    , &
-    RootMycoExudElm_pvr       =>   plt_rbgc%RootMycoExudElm_pvr    , &
-    RCO2N_pvr                 =>   plt_rbgc%RCO2N_pvr     , &
-    RootRespPotent_pvr        =>   plt_rbgc%RootRespPotent_pvr     , &
-    RCO2A_pvr                 =>   plt_rbgc%RCO2A_pvr     , &
-    CanPHeight4WatUptake      =>   plt_morph%CanPHeight4WatUptake    , &
-    MY                        =>   plt_morph%MY       , &
-    Root1stRadius_pvr         =>   plt_morph%Root1stRadius_pvr   , &
-    Root1stDepz_pft           =>   plt_morph%Root1stDepz_pft   , &
-    HypoctoHeight_pft         =>   plt_morph%HypoctoHeight_pft    , &
-    Root2ndRadius_pvr         =>   plt_morph%Root2ndRadius_pvr    , &
-    Root2ndXNum_rpvr          =>   plt_morph%Root2ndXNum_rpvr    , &
-    Root2ndAveLen_pvr         =>   plt_morph%Root2ndAveLen_pvr    , &
-    SeedDepth_pft             =>   plt_morph%SeedDepth_pft    , &
-    MaxSoiL4Root              =>   plt_morph%MaxSoiL4Root       , &
-    NumRootAxes_pft           =>   plt_morph%NumRootAxes_pft       &
+    ZERO                      =>   plt_site%ZERO                      , &
+    DLYR3                     =>   plt_site%DLYR3                     , &
+    RootNutUptake_pvr         =>   plt_rbgc%RootNutUptake_pvr         , &
+    RootOUlmNutUptake_pvr     =>   plt_rbgc%RootOUlmNutUptake_pvr     , &
+    RootCUlmNutUptake_pvr     =>   plt_rbgc%RootCUlmNutUptake_pvr     , &
+    RootMycoExudElm_pvr       =>   plt_rbgc%RootMycoExudElm_pvr       , &
+    RCO2N_pvr                 =>   plt_rbgc%RCO2N_pvr                 , &
+    RootRespPotent_pvr        =>   plt_rbgc%RootRespPotent_pvr        , &
+    RCO2A_pvr                 =>   plt_rbgc%RCO2A_pvr                 , &
+    CanPHeight4WatUptake      =>   plt_morph%CanPHeight4WatUptake     , &
+    MY                        =>   plt_morph%MY                       , &
+    Root1stRadius_pvr         =>   plt_morph%Root1stRadius_pvr        , &
+    Root1stDepz_pft           =>   plt_morph%Root1stDepz_pft          , &
+    HypoctoHeight_pft         =>   plt_morph%HypoctoHeight_pft        , &
+    Root2ndRadius_pvr         =>   plt_morph%Root2ndRadius_pvr        , &
+    Root2ndXNum_rpvr          =>   plt_morph%Root2ndXNum_rpvr         , &
+    Root2ndAveLen_pvr         =>   plt_morph%Root2ndAveLen_pvr        , &
+    SeedDepth_pft             =>   plt_morph%SeedDepth_pft            , &
+    MaxSoiL4Root              =>   plt_morph%MaxSoiL4Root             , &
+    NumRootAxes_pft           =>   plt_morph%NumRootAxes_pft            &
   )
 
 !     FOR ROOTS (N=1) AND MYCORRHIZAE (N=2) IN EACH SOIL LAYER
@@ -2223,7 +2226,8 @@ implicit none
   Root1stSink_pvr=0._r8
   Root2ndSink_pvr=0._r8
   RootSinkC=0._r8
-
+  RCO2flx=0._r8
+  call SumRootBiome(NZ,mass_inital)
   D4995: DO N=1,MY(NZ)
     D4990: DO L=NU,MaxSoiL4Root(NZ)
 !
@@ -2240,6 +2244,7 @@ implicit none
 !     RootCUlmNutUptake_pvr,RootCUlmNutUptake_pvr,RUCN03,RootCUlmNutUptake_pvr=uptake from non-band,band of NH4,NO3 unlimited by nonstructural C
 !     RootCUlmNutUptake_pvr,RootCUlmNutUptake_pvr,RootCUlmNutUptake_pvr,RootCUlmNutUptake_pvr=uptake from non-band,band of H2PO4,HPO4 unlimited by nonstructural C
 !     why is 0.86? it refers to C cost for N asimilation
+
       IF(VLSoilPoreMicP(L).GT.ZEROS2)THEN
         RecoRootMycoC4Nup=0.86_r8*(RootNutUptake_pvr(ids_NH4,N,L,NZ)+RootNutUptake_pvr(ids_NH4B,N,L,NZ) &
           +RootNutUptake_pvr(ids_NO3,N,L,NZ)+RootNutUptake_pvr(ids_NO3B,N,L,NZ) &
@@ -2266,7 +2271,8 @@ implicit none
         RCO2N_pvr(N,L,NZ)=RCO2N_pvr(N,L,NZ)+CUPRC
         RCO2A_pvr(N,L,NZ)=RCO2A_pvr(N,L,NZ)-RecoRootMycoC4Nup
         RootMycoNonstElms_rpvr(ielmc,N,L,NZ)=RootMycoNonstElms_rpvr(ielmc,N,L,NZ)-RecoRootMycoC4Nup
-        print*,'2136RecoRootMycoC4Nup',RecoRootMycoC4Nup
+        RCO2flx=RCO2flx-RecoRootMycoC4Nup
+
 !
 !     EXUDATION AND UPTAKE OF C, N AND P TO/FROM SOIL AND ROOT
 !     OR MYCORRHIZAL NON-STRUCTURAL C,N,P POOLS
@@ -2300,7 +2306,7 @@ implicit none
 !     CanPHeight4WatUptake=canopy height for water uptake
 !     RTSK=relative primary root sink strength
 !     Root1stSink_pvr=primary root sink strength
-!     RootAreaPopu=number of primary root axes
+!     RootPrimeAxsNum=number of primary root axes
 !     RRAD1,Root2ndRadius_pvr=primary, secondary root radius
 !     RootSinkC,RootSinkC_vr=total root sink strength
 !
@@ -2309,7 +2315,7 @@ implicit none
               IF(Root1stDepz_pft(N,NR,NZ).LE.CumSoilThickness(L))THEN
                 RTDPP=Root1stDepz_pft(N,NR,NZ)+CanPHeight4WatUptake(NZ)
                 Root1stSink_pvr(N,L,NR)=RTSK(iPlantRootProfile_pft(NZ))&
-                  *RootAreaPopu*Root1stRadius_pvr(N,L,NZ)**2._r8/RTDPP
+                  *RootPrimeAxsNum*Root1stRadius_pvr(N,L,NZ)**2._r8/RTDPP
                 RootSinkC(N)=RootSinkC(N)+Root1stSink_pvr(N,L,NR)
                 RootSinkC_vr(N,L)=RootSinkC_vr(N,L)+Root1stSink_pvr(N,L,NR)
               ENDIF
@@ -2340,7 +2346,7 @@ implicit none
             RTDPS=AMAX1(SeedDepth_pft(NZ),CumSoilThickness(L-1))+0.5_r8*Root1stLocDepz_vr(NR,L) &
               +CanPHeight4WatUptake(NZ)
             IF(RTDPS.GT.ZERO)THEN
-              RTSKP=RootAreaPopu*Root1stRadius_pvr(N,L,NZ)**2._r8/RTDPS
+              RTSKP=RootPrimeAxsNum*Root1stRadius_pvr(N,L,NZ)**2._r8/RTDPS
               RTSKS=safe_adb(Root2ndXNum_rpvr(N,L,NR,NZ)*Root2ndRadius_pvr(N,L,NZ)**2._r8,Root2ndAveLen_pvr(N,L,NZ))
               IF(RTSKP+RTSKS.GT.ZEROP(NZ))THEN
                 Root2ndSink_pvr(N,L,NR)=RTSKP*RTSKS/(RTSKP+RTSKS)
@@ -2360,6 +2366,11 @@ implicit none
       ENDIF
     ENDDO D4990
   ENDDO D4995
+
+  call SumRootBiome(NZ,mass_finale)
+  if(I>=125 .and. NZ==2)then
+  write(124,*)'SummarizeRootSink',I+J/24.,mass_finale(ielmc)-mass_inital(ielmc)-RCO2flx
+  endif
   end associate
   end subroutine SummarizeRootSink
 

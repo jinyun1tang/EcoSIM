@@ -316,7 +316,7 @@ module grosubsMod
   real(r8) :: TFN6_vr(JZ1)
   real(r8) :: CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW
   real(r8) :: PTRT
-  real(r8) :: RootAreaPopu
+  real(r8) :: RootPrimeAxsNum
   real(r8) :: TFN5
   real(r8) :: WFNG
   real(r8) :: Stomata_Activity
@@ -343,7 +343,7 @@ module grosubsMod
 !    call SumPlantBiom(I,J,NZ,'bfstageplant')
     
     call StagePlantForGrowth(I,J,NZ,TFN6_vr,CNLFW,CPLFW,&
-      CNSHW,CPSHW,CNRTW,CPRTW,RootAreaPopu,TFN5,WFNG,Stomata_Activity,WFNS,WFNSG)
+      CNSHW,CPSHW,CNRTW,CPRTW,RootPrimeAxsNum,TFN5,WFNG,Stomata_Activity,WFNS,WFNSG)
 !
 !     CALCULATE GROWTH OF EACH BRANCH
 !
@@ -358,7 +358,7 @@ module grosubsMod
     ENDDO
 !
     call SumPlantBiom(I,J,NZ,'bfRootBGCM')
-    call RootBGCModel(I,J,NZ,BegRemoblize,PTRT,TFN6_vr,CNRTW,CPRTW,RootAreaPopu)
+    call RootBGCModel(I,J,NZ,BegRemoblize,PTRT,TFN6_vr,CNRTW,CPRTW,RootPrimeAxsNum)
 !
     call ComputeTotalBiom(I,J,NZ)
   ENDIF
@@ -376,11 +376,11 @@ module grosubsMod
 
 !------------------------------------------------------------------------------------------
   subroutine StagePlantForGrowth(I,J,NZ,TFN6_vr,CNLFW,CPLFW,CNSHW,&
-    CPSHW,CNRTW,CPRTW,RootAreaPopu,TFN5,WFNG,Stomata_Activity,WFNS,WFNSG)
+    CPSHW,CNRTW,CPRTW,RootPrimeAxsNum,TFN5,WFNG,Stomata_Activity,WFNS,WFNSG)
   integer, intent(in) :: I,J,NZ
   REAL(R8), INTENT(OUT):: TFN6_vr(JZ1)
   REAL(R8), INTENT(OUT) :: CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW
-  real(r8), intent(out) :: RootAreaPopu,TFN5,WFNG,Stomata_Activity
+  real(r8), intent(out) :: RootPrimeAxsNum,TFN5,WFNG,Stomata_Activity
   real(r8), intent(out) :: WFNS,WFNSG
   integer :: L,NR,N,NE
   real(r8) :: ACTVM,RTK,STK,TKCM,TKSM
@@ -525,11 +525,11 @@ module grosubsMod
 !
 !     RootBiomCPerPlant_pft=root mass per plant used to calculate primary root number
 !     WTRT,PP=root mass,PFT population
-!     RootAreaPopu=multiplier for number of primary root axes
+!     RootPrimeAxsNum=multiplier for number of primary root axes
 !
   RootBiomCPerPlant_pft(NZ)=AMAX1(0.999992087_r8*RootBiomCPerPlant_pft(NZ),&
     RootElms_pft(ielmc,NZ)/PlantPopulation_pft(NZ))
-  RootAreaPopu=AMAX1(1.0_r8,RootBiomCPerPlant_pft(NZ)**0.667_r8)*PlantPopulation_pft(NZ)
+  RootPrimeAxsNum=AMAX1(1.0_r8,RootBiomCPerPlant_pft(NZ)**0.667_r8)*PlantPopulation_pft(NZ)
 !
 !     WATER STRESS FUNCTIONS FOR EXPANSION AND GROWTH RESPIRATION
 !     FROM CANOPY TURGOR
