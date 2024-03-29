@@ -31,6 +31,8 @@ implicit none
   real(r8) :: Root1stSink_pvr(jroots,JZ1,pltpar%MaxNumRootAxes)
   real(r8) :: Root2ndSink_pvr(jroots,JZ1,pltpar%MaxNumRootAxes)
   real(r8) :: RootSinkC(jroots)
+  real(r8) :: mass_inital(NumPlantChemElms)
+  real(r8) :: mass_finale(NumPlantChemElms)
 
   associate(                                                                &
     SeasonalNonstElms_pft        =>   plt_biom%SeasonalNonstElms_pft      , &
@@ -91,8 +93,15 @@ implicit none
     iPlantShootState_pft(NZ)=iDead
   ENDIF
 !
+  call SumRootBiome(NZ,mass_inital)
 !     ROOT N2 FIXATION (RHIZOBIA)
   call RootNodulBiochemistry(I,J,NZ,TFN6_vr,fRootGrowPSISense_vr)
+
+  call SumRootBiome(NZ,mass_finale)
+  
+  if(I>=125 .and. NZ==2)then
+  write(124,*)'rootbgc',I+J/24.,mass_finale(ielmc)-mass_inital(ielmc)
+  endif
 
   call NonstructlBiomTransfer(I,J,NZ,PTRT,RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,RootSinkC,BegRemoblize)
   end associate
@@ -132,6 +141,8 @@ implicit none
   INTEGER :: NRX(jroots,JZ1)
   real(r8) :: mass_inital(NumPlantChemElms)
   real(r8) :: mass_finale(NumPlantChemElms)
+  real(r8) :: litrflx(NumPlantChemElms)
+  real(r8) :: RCO2flx
 
 !     begin_execution
   associate(                                                                    &
@@ -188,7 +199,8 @@ implicit none
 !     RESPIRATION AND GROWTH OF ROOT, MYCORRHIZAE IN EACH LAYER
 !
   call SumRootBiome(NZ,mass_inital)
-
+  mass_inital(ielmc)=mass_inital(ielmc)+SeasonalNonstElms_pft(ielmc,NZ)
+  litrflx=0._r8;RCO2flx=0._r8
   D5010: DO N=1,MY(NZ)
     D5000: DO L=NU,MaxSoiL4Root(NZ)
 !
@@ -209,7 +221,7 @@ implicit none
 !
         call GrowRootMycoAxes(N,L,L1,NZ,NRX,iRootXsUpdateFlag,TFN6_vr,&
           RootAreaPopu,RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,CNRTW,CPRTW,&
-          fRootGrowPSISense_vr,TotRoot2ndLen,TotRoot1stLen,Root2ndC,Root1stC)
+          fRootGrowPSISense_vr,TotRoot2ndLen,TotRoot1stLen,Root2ndC,Root1stC,litrflx,RCO2flx)
 
 !====================================================================================
 !     DRAW FROM ROOT NON-STRUCTURAL POOL WHEN
@@ -312,7 +324,12 @@ implicit none
   ENDDO D5010
 
   call SumRootBiome(NZ,mass_finale)
-
+  mass_finale(ielmc)=mass_finale(ielmc)+SeasonalNonstElms_pft(ielmc,NZ)
+  if(I>=125)then
+  if(NZ==2)THEN  
+    WRITE(124,*)'rootmodel',I+J/24.,mass_finale(ielmc)-mass_inital(ielmc)+litrflx(ielmc)-RCO2flx
+  ENDIF
+  endif
   end associate
   end subroutine RootBiochemistry
 
@@ -320,22 +337,24 @@ implicit none
 
   subroutine GrowRootMycoAxes(N,L,L1,NZ,NRX,iRootXsUpdateFlag,TFN6_vr,&
     RootAreaPopu,RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,CNRTW,CPRTW,&
-    fRootGrowPSISense_vr,TotRoot2ndLen,TotRoot1stLen,Root2ndC,Root1stC)
+    fRootGrowPSISense_vr,TotRoot2ndLen,TotRoot1stLen,Root2ndC,Root1stC,litrflx,RCO2flx)
   implicit none
-  INTEGER, INTENT(IN) :: N     !root type id
-  integer, intent(in) :: L     !current root layer
-  integer, intent(in) :: L1    !next root growable layer, soil porosity >0 
-  integer, intent(in) :: NZ     !pft id
+  INTEGER , INTENT(IN) :: N     !root type id
+  integer , intent(in) :: L     !current root layer
+  integer , intent(in) :: L1    !next root growable layer, soil porosity >0 
+  integer , intent(in) :: NZ     !pft id
   real(r8), intent(in) :: TFN6_vr(JZ1)
   real(r8), intent(in) :: RootAreaPopu
   REAL(R8), INTENT(IN) :: RootSinkC_vr(jroots,JZ1)
   real(r8), intent(in) :: Root1stSink_pvr(jroots,JZ1,pltpar%MaxNumRootAxes)
   real(r8), intent(in) :: Root2ndSink_pvr(jroots,JZ1,pltpar%MaxNumRootAxes)
   real(r8), intent(in) :: CNRTW,CPRTW
-  integer , intent(inout) :: NRX(jroots,JZ1)  
-  integer , intent(inout) :: iRootXsUpdateFlag(jroots,JZ1)
   real(r8), intent(out) :: fRootGrowPSISense_vr(jroots,JZ1)  
   real(r8), intent(out) :: TotRoot2ndLen,TotRoot1stLen,Root2ndC,Root1stC
+  integer , intent(inout) :: NRX(jroots,JZ1)  
+  integer , intent(inout) :: iRootXsUpdateFlag(jroots,JZ1)  
+  real(r8), intent(inout) :: litrflx(NumPlantChemElms)
+  real(r8), intent(inout) :: RCO2flx
   real(r8) :: RCO2Nonst4Nassim,CNRDM
   real(r8) :: DMRTD  
   real(r8) :: WFNR,WFNRG  
@@ -717,6 +736,7 @@ implicit none
       RootRespPotent_pvr(N,L,NZ)=RootRespPotent_pvr(N,L,NZ)+RCO2T_OUltd
       RCO2N_pvr(N,L,NZ)=RCO2N_pvr(N,L,NZ)+RCO2T_Oltd
       RCO2A_pvr(N,L,NZ)=RCO2A_pvr(N,L,NZ)-RCO2T_Oltd
+      RCO2flx=RCO2flx-RCO2T_Oltd
 !
 !     SECONDARY ROOT EXTENSION FROM ROOT GROWTH AND ROOT TURGOR
 !
@@ -778,7 +798,8 @@ implicit none
       IF(N.EQ.ipltroot)THEN
         call GrowRootAxes(N,NR,L,L1,NZ,RootAreaPopu,Root1stSink_pvr,&
           Root2ndSink_pvr,RootSinkC_vr,RootChemElmRemob,fRootGrowPSISense_vr,TFN6_vr,&
-          SNCRM,RCO2Nonst4Xmaint,DMRTD,CNRTW,CPRTW,TotRoot1stLen,Root1stC,iRootXsUpdateFlag,NRX)
+          SNCRM,RCO2Nonst4Xmaint,DMRTD,CNRTW,CPRTW,TotRoot1stLen,Root1stC,iRootXsUpdateFlag,&
+          NRX,litrflx,RCO2flx)
       ENDIF
       TotRoot1stLen=TotRoot1stLen+Root1stLen_rpvr(N,L,NR,NZ)
       Root1stC=Root1stC+RootMyco1stStrutElms_rpvr(ielmc,N,L,NR,NZ)
@@ -793,7 +814,8 @@ implicit none
 
   subroutine GrowRootAxes(N,NR,L,L1,NZ,RootAreaPopu,Root1stSink_pvr,&
     Root2ndSink_pvr,RootSinkC_vr,RootChemElmRemob,fRootGrowPSISense_vr,TFN6_vr,&
-    SNCRM,RCO2Nonst4Xmaint,DMRTD,CNRTW,CPRTW,TotRoot1stLen,Root1stC,iRootXsUpdateFlag,NRX)
+    SNCRM,RCO2Nonst4Xmaint,DMRTD,CNRTW,CPRTW,TotRoot1stLen,Root1stC,iRootXsUpdateFlag,&
+    NRX,litrflx,RCO2flx)
   !
   !grow root axes
   implicit none
@@ -812,6 +834,8 @@ implicit none
   integer,  intent(inout) :: NRX(jroots,JZ1)  
   real(r8), intent(inout) :: TotRoot1stLen
   real(r8), intent(inout) :: Root1stC
+  real(r8), intent(inout) :: litrflx(NumPlantChemElms)
+  real(r8), intent(inout) :: RCO2flx
   real(r8) :: Root1stDepz2Surf
   real(r8) :: FRTN
   real(r8) :: FSNC1  
@@ -873,8 +897,9 @@ implicit none
     CFOPE                           =>  plt_soilchem%CFOPE                 , &    
     SoiBulkDensity                  =>  plt_soilchem%SoiBulkDensity        , &    
     SoilResit4RootPentrate_vr       =>  plt_soilchem%SoilResit4RootPentrate_vr   , &    
-    C4PhotosynDowreg_brch           =>  plt_photo%C4PhotosynDowreg_brch       &
+    C4PhotosynDowreg_brch           =>  plt_photo%C4PhotosynDowreg_brch            &
   )  
+  
   IF(SoiBulkDensity(L).GT.ZERO)THEN
     Root1stDepz2Surf=Root1stDepz_pft(N,NR,NZ)-CumSoilThickness(0)
   ELSE
@@ -1026,7 +1051,7 @@ implicit none
       CNRDM=AZMAX1(1.70_r8*ZADD1M)
       RCO2Nonst4Nassim=AZMAX1(1.70_r8*RootMycoNonst4Grow(ielmn))
 
-      call RemobilizePrimeRoots(N,L,NZ,NR,FSNC1,RCO2Xmaint_Oltd,RCO2XM)
+      call RemobilizePrimeRoots(N,L,NZ,NR,FSNC1,RCO2Xmaint_Oltd,RCO2XM,litrflx)
 
 !
 !     CONSUMPTION OF NON-STRUCTURAL C,N,P BY PRIMARY ROOTS
@@ -1087,11 +1112,13 @@ implicit none
           RootRespPotent_pvr(N,LL,NZ)=RootRespPotent_pvr(N,LL,NZ)+RCO2T_OUltd*FRCO2
           RCO2N_pvr(N,LL,NZ)=RCO2N_pvr(N,LL,NZ)+RCO2T_Oltd*FRCO2
           RCO2A_pvr(N,LL,NZ)=RCO2A_pvr(N,LL,NZ)-RCO2T_Oltd*FRCO2
+          RCO2flx=RCO2flx-RCO2T_Oltd*FRCO2
         ENDDO D5100
       ELSE
         RootRespPotent_pvr(N,L,NZ)=RootRespPotent_pvr(N,L,NZ)+RCO2T_OUltd
         RCO2N_pvr(N,L,NZ)=RCO2N_pvr(N,L,NZ)+RCO2T_Oltd
         RCO2A_pvr(N,L,NZ)=RCO2A_pvr(N,L,NZ)-RCO2T_Oltd
+        RCO2flx=RCO2flx-RCO2T_Oltd
       ENDIF
 !
 !     ALLOCATE ANY NEGATIVE PRIMARY ROOT C,N,P GROWTH TO SECONDARY
@@ -1169,6 +1196,12 @@ implicit none
 
                 LitrfalStrutElms_pvr(NE,M,k_fine_litr,LL,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,LL,NZ) &
                   +CFOPE(NE,inonstruct,M,NZ)*FSNCP*AZMAX1(RootMycoNonstElms_rpvr(NE,imycorrhz,LL,NZ))
+                  
+                litrflx(NE)=litrflx(NE)+CFOPE(NE,icwood,M,NZ)*dsenecE*FWODRE(NE,k_woody_litr) &
+                  +CFOPE(NE,iroot,M,NZ)*dsenecE*FWODRE(NE,k_fine_litr) &
+                  +CFOPE(NE,inonstruct,M,NZ)*FSNCP*AZMAX1(RootMycoNonstElms_rpvr(NE,imycorrhz,LL,NZ))
+                  
+                
               ENDDO    
             ENDDO D6450
             DO NE=1,NumPlantChemElms  
@@ -1226,13 +1259,14 @@ implicit none
   end subroutine GrowRootAxes
 
 !------------------------------------------------------------------------------------------
-  subroutine RemobilizePrimeRoots(N,L,NZ,NR,FSNC1,RCO2Xmaint_Oltd,RCO2XM)
+  subroutine RemobilizePrimeRoots(N,L,NZ,NR,FSNC1,RCO2Xmaint_Oltd,RCO2XM,litrflx)
 
   implicit none
   integer, intent(in) :: N,L,NZ,NR
   real(r8), intent(in) :: RCO2Xmaint_Oltd
   real(r8), intent(in) :: RCO2XM
   real(r8), intent(out) :: FSNC1
+  real(r8), intent(inout) :: litrflx(NumPlantChemElms)
   integer :: M,NE
   real(r8) :: CCC,CNC,CPC
   real(r8) :: RootChemElmRemob(NumPlantChemElms)
@@ -1319,7 +1353,7 @@ implicit none
     RCO2Nonst4Xmaint=0._r8
   ENDIF
 
-  IF(RCO2Nonst4Xmaint.GT.0.0_r8. AND. Root1stElm_raxs(ielmc,N,NR,NZ).GT.ZEROP(NZ))THEN
+  IF(RCO2Nonst4Xmaint.GT.0.0_r8 .AND. Root1stElm_raxs(ielmc,N,NR,NZ).GT.ZEROP(NZ))THEN
     RootChemElmRemob(ielmc)=RCCC*Root1stElm_raxs(ielmc,N,NR,NZ)
     RootChemElmRemob(ielmn)=Root1stElm_raxs(ielmn,N,NR,NZ)*(RCCN+(1.0_r8-RCCN) &
       *RootChemElmRemob(ielmc)/Root1stElm_raxs(ielmc,N,NR,NZ))
@@ -1347,12 +1381,14 @@ implicit none
 !
   D6355: DO M=1,jsken
     DO NE=1,NumPlantChemElms    
-      dsenecE=Root1stElm_raxs(NE,N,NR,NZ)-RootChemElmRemob(NE)
+      dsenecE=FSNC1*(Root1stElm_raxs(NE,N,NR,NZ)-RootChemElmRemob(NE))
       LitrfalStrutElms_pvr(NE,M,k_woody_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_woody_litr,L,NZ) &
-        +CFOPE(NE,icwood,M,NZ)*FSNC1*dsenecE*FWODRE(NE,k_woody_litr)
-
+        +CFOPE(NE,icwood,M,NZ)*dsenecE*FWODRE(NE,k_woody_litr)
+      litrflx(NE)=litrflx(NE)+CFOPE(NE,icwood,M,NZ)*dsenecE*FWODRE(NE,k_woody_litr)
+      
       LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ) &
-        +CFOPE(NE,iroot,M,NZ)*FSNC1*dsenecE*FWODRE(NE,k_fine_litr)
+        +CFOPE(NE,iroot,M,NZ)*dsenecE*FWODRE(NE,k_fine_litr)
+      litrflx(NE)=litrflx(NE)+CFOPE(NE,iroot,M,NZ)*dsenecE*FWODRE(NE,k_fine_litr)  
     ENDDO
   ENDDO D6355
 
@@ -1714,19 +1750,19 @@ implicit none
   real(r8) :: mass_inital(NumPlantChemElms)
   real(r8) :: mass_finale(NumPlantChemElms)
 !     begin_execution
-  associate(                                &
-    FWODBE                             =>   plt_allom%FWODBE                     , &
-    FWODRE                             =>   plt_allom%FWODRE                     , &
-    RootNonstructElmConc_pvr           =>   plt_biom%RootNonstructElmConc_pvr    , &
-    Root1stElm_raxs                    =>   plt_biom%Root1stElm_raxs             , &
-    RootMyco1stStrutElms_rpvr          =>   plt_biom%RootMyco1stStrutElms_rpvr   , &
-    RootMyco2ndStrutElms_rpvr          =>   plt_biom%RootMyco2ndStrutElms_rpvr   , &
-    RootMycoActiveBiomC_pvr            =>   plt_biom%RootMycoActiveBiomC_pvr     , &
-    RootMycoNonstElms_rpvr             =>   plt_biom%RootMycoNonstElms_rpvr      , &
-    LeafPetolBiomassC_brch             =>   plt_biom%LeafPetolBiomassC_brch      , &
-    CanopyNonstElms_brch               =>   plt_biom%CanopyNonstElms_brch        , &
-    PopuRootMycoC_pvr                  =>   plt_biom% PopuRootMycoC_pvr          , &
-    StalkBiomassC_brch                 =>   plt_biom%StalkBiomassC_brch          , &
+  associate(                                                                               &
+    FWODBE                             =>   plt_allom%FWODBE                             , &
+    FWODRE                             =>   plt_allom%FWODRE                             , &
+    RootNonstructElmConc_pvr           =>   plt_biom%RootNonstructElmConc_pvr            , &
+    Root1stElm_raxs                    =>   plt_biom%Root1stElm_raxs                     , &
+    RootMyco1stStrutElms_rpvr          =>   plt_biom%RootMyco1stStrutElms_rpvr           , &
+    RootMyco2ndStrutElms_rpvr          =>   plt_biom%RootMyco2ndStrutElms_rpvr           , &
+    RootMycoActiveBiomC_pvr            =>   plt_biom%RootMycoActiveBiomC_pvr             , &
+    RootMycoNonstElms_rpvr             =>   plt_biom%RootMycoNonstElms_rpvr              , &
+    LeafPetolBiomassC_brch             =>   plt_biom%LeafPetolBiomassC_brch              , &
+    CanopyNonstElms_brch               =>   plt_biom%CanopyNonstElms_brch                , &
+    PopuRootMycoC_pvr                  =>   plt_biom% PopuRootMycoC_pvr                  , &
+    StalkBiomassC_brch                 =>   plt_biom%StalkBiomassC_brch                  , &
     StalkRsrvElms_brch                 =>   plt_biom%StalkRsrvElms_brch                  , &
     SeasonalNonstElms_pft              =>   plt_biom%SeasonalNonstElms_pft               , &
     CanopyLeafShethC_pft               =>   plt_biom%CanopyLeafShethC_pft                , &
@@ -1740,20 +1776,20 @@ implicit none
     ShutRutNonstructElmntConducts_pft  =>   plt_pheno%ShutRutNonstructElmntConducts_pft  , &
     iPlantCalendar_brch                =>   plt_pheno%iPlantCalendar_brch                , &
     Hours2LeafOut_brch                 =>   plt_pheno%Hours2LeafOut_brch                 , &
-    RCO2A_pvr                          =>   plt_rbgc%RCO2A_pvr    , &
-    ECO_ER_col                         =>   plt_bgcr%ECO_ER_col     , &
-    Eco_AutoR_col                      =>   plt_bgcr%Eco_AutoR_col     , &
-    NU                                 =>   plt_site%NU       , &
-    ZERO                               =>   plt_site%ZERO     , &
-    k_woody_litr                       =>   pltpar%k_woody_litr,&
-    k_fine_litr                        =>   pltpar%k_fine_litr, &
-    NIXBotRootLayer_pft                =>   plt_morph%NIXBotRootLayer_pft    , &
-    NIXBotRootLayer_rpft               =>   plt_morph%NIXBotRootLayer_rpft    , &
-    Root2ndRadius_pvr                  =>   plt_morph%Root2ndRadius_pvr   , &
-    MaxSoiL4Root                       =>   plt_morph%MaxSoiL4Root      , &
-    MY                                 =>   plt_morph%MY      , &
-    NumRootAxes_pft                    =>   plt_morph%NumRootAxes_pft    , &
-    NumOfBranches_pft                  =>   plt_morph%NumOfBranches_pft       &
+    RCO2A_pvr                          =>   plt_rbgc%RCO2A_pvr                           , &
+    ECO_ER_col                         =>   plt_bgcr%ECO_ER_col                          , &
+    Eco_AutoR_col                      =>   plt_bgcr%Eco_AutoR_col                       , &
+    NU                                 =>   plt_site%NU                                  , &
+    ZERO                               =>   plt_site%ZERO                                , &
+    k_woody_litr                       =>   pltpar%k_woody_litr                          , &
+    k_fine_litr                        =>   pltpar%k_fine_litr                           , &
+    NIXBotRootLayer_pft                =>   plt_morph%NIXBotRootLayer_pft                , &
+    NIXBotRootLayer_rpft               =>   plt_morph%NIXBotRootLayer_rpft               , &
+    Root2ndRadius_pvr                  =>   plt_morph%Root2ndRadius_pvr                  , &
+    MaxSoiL4Root                       =>   plt_morph%MaxSoiL4Root                       , &
+    MY                                 =>   plt_morph%MY                                 , &
+    NumRootAxes_pft                    =>   plt_morph%NumRootAxes_pft                    , &
+    NumOfBranches_pft                  =>   plt_morph%NumOfBranches_pft                    &
   )
 !=============================================================================
 !     TRANSFER NON-STRUCTURAL C,N,P AMONG BRANCH LEAVES
@@ -1813,7 +1849,9 @@ implicit none
     DO NE=1,NumPlantChemElms
       mass_finale(NE)=SUM(CanopyNonstElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
     enddo
-    !write(*,*)I+J/24.,NZ,'canpnostxfer',(mass_finale(NE)-mass_inital(NE),NE=1,NumPlantChemElms)
+    if(I>=125 .and. NZ==2)then
+    write(124,*)'canpnostxfer',I+J/24.,(mass_finale(NE)-mass_inital(NE),NE=1,NumPlantChemElms)
+    endif
   ENDIF
 !=============================================================================
 !     TRANSFER NON-STRUCTURAL C,N,P AMONG BRANCH STALK RESERVES
@@ -1866,7 +1904,9 @@ implicit none
     DO NE=1,NumPlantChemElms
       mass_finale(NE)=sum(StalkRsrvElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
     ENDDO
-    !write(*,*)I+J/24.,NZ,'stalkrsvxfer',(mass_finale(NE)-mass_inital(NE),NE=1,NumPlantChemElms)    
+    if(I>=125 .and. NZ==2)then
+    write(124,*)'stalkrsvxfer',I+J/24.,(mass_finale(NE)-mass_inital(NE),NE=1,NumPlantChemElms)    
+    endif
   ENDIF
 !=============================================================================
 !     TRANSFER NON-STRUCTURAL C,N,P BWTWEEN ROOT AND MYCORRHIZAE
@@ -1918,7 +1958,9 @@ implicit none
     DO NE=1,NumPlantChemElms
       mass_finale(NE)=sum(RootMycoNonstElms_rpvr(NE,1:MY(NZ),NU:NIXBotRootLayer_pft(NZ),NZ))
     ENDDO
-    !write(*,*)I+J/24.,NZ,'rootmycoxfer',(mass_finale(NE)-mass_inital(NE),NE=1,NumPlantChemElms)    
+    if(I>=125 .and. NZ==2)then
+    write(124,*)'rootmycoxfer',I+J/24.,(mass_finale(NE)-mass_inital(NE),NE=1,NumPlantChemElms)    
+    endif
   ENDIF
 !=============================================================================
 !     TRANSFER ROOT NON-STRUCTURAL C,N,P TO SEASONAL STORAGE
@@ -1960,7 +2002,9 @@ implicit none
     DO NE=1,NumPlantChemElms
       mass_finale(NE)=sum(RootMycoNonstElms_rpvr(NE,1:MY(NZ),NU:MaxSoiL4Root(NZ),NZ))+SeasonalNonstElms_pft(NE,NZ)
     ENDDO
-    !write(*,*)I+J/24.,NZ,'rootmycossnxfer',(mass_finale(NE)-mass_inital(NE),NE=1,NumPlantChemElms)    
+    if(I>=125 .and. NZ==2)then
+    write(124,*)'rootmycossnxfer',I+J/24.,(mass_finale(NE)-mass_inital(NE),NE=1,NumPlantChemElms)    
+    endif
   ENDIF
 !!=============================================================================
 !     ROOT AND NODULE TOTALS
@@ -2121,7 +2165,9 @@ implicit none
     mass_finale(NE)=sum(RootMycoNonstElms_rpvr(NE,1:MY(NZ),NU:MaxSoiL4Root(NZ),NZ)) &
       +SUM(CanopyNonstElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
   ENDDO
-!  write(*,*)I+J/24.,NZ,'rootshootxfer',(mass_finale(NE)-mass_inital(NE),NE=1,NumPlantChemElms)    
+  if(I>=125 .and. NZ==2)then
+  write(124,*)'rootshootxfer',I+J/24.,(mass_finale(NE)-mass_inital(NE),NE=1,NumPlantChemElms)    
+  endif
   end associate
   end subroutine NonstructlBiomTransfer
 

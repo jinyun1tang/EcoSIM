@@ -306,9 +306,11 @@ implicit none
     NU                            =>  plt_site%NU                            , &  
     MY                            =>  plt_morph%MY                           , &                  
     MaxNumRootLays                =>  plt_site%MaxNumRootLays                , &  
+    MaxSoiL4Root                  =>  plt_morph%MaxSoiL4Root                 , &        
     iPlantNfixType                =>  plt_morph%iPlantNfixType               , &    
     NumRootAxes_pft               =>  plt_morph%NumRootAxes_pft              , &  
-    RootNodulStrutElms_pvr        =>  plt_biom%RootNodulStrutElms_pvr        , &    
+    RootNodulStrutElms_pvr        =>  plt_biom%RootNodulStrutElms_pvr        , &   
+    RootNodulNonstElms_pvr        =>  plt_biom%RootNodulNonstElms_pvr        , &
     RootMyco1stStrutElms_rpvr     =>  plt_biom%RootMyco1stStrutElms_rpvr     , &
     RootMyco2ndStrutElms_rpvr     =>  plt_biom%RootMyco2ndStrutElms_rpvr     , &    
     RootMycoNonstElms_rpvr        =>  plt_biom%RootMycoNonstElms_rpvr          &
