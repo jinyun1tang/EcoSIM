@@ -1242,6 +1242,8 @@ implicit none
     call SumRootBiome(NZ,mass_finale)  
 
     if(I>=125.and.NZ==2)then
+    write(124,*)'rootbiom',sum(Root1stElm_raxs(ielmc,N,1,1:NumRootAxes_pft(NZ),NZ)) &
+      -sum(RootMyco1stStrutElms_rpvr(ielmc,N,NU:MaxNumRootLays,1:NumRootAxes_pft(NZ),NZ))
     write(124,*)'withinGrowRootAxes',I+J/24.,mass_finale(ielmc)-mass_inital(ielmc)+litrflx(ielmc)-RCO2flx,litrflx(ielmc),RCO2flx
     endif
 !
@@ -1488,6 +1490,7 @@ implicit none
 !
   Root1stExtension=RootCYldO2ltd*Root1stSpecLen_pft(N,NZ)/PlantPopulation_pft(NZ)*WFNR*FWODRE(ielmc,k_fine_litr)
   IF(RootNetGrowthElms(ielmc).LT.0.0_r8 .AND. Root1stElm_raxs(ielmc,N,NR,NZ).GT.ZEROP(NZ))THEN
+    !primary roots withdraw
     Root1stExtension=Root1stExtension+RootNetGrowthElms(ielmc) &
       *(Root1stDepz_pft(N,NR,NZ)-SeedDepth_pft(NZ))/Root1stElm_raxs(ielmc,N,NR,NZ)
   ENDIF
@@ -1502,7 +1505,7 @@ implicit none
 !
 !     Root1stExtension=primary root length extension
 !     FGROL,FGROZ=fraction of Root1stExtension in current,next lower soil layer
-! the following calculation seems problematic
+! Question, 03/29/2024, Jinyun Tang: needs double check the following calculation 
 ! if FGROL < 1.0, then the extension is all in current layer, meaning FGROZ=0.0
 !  
   IF(Root1stExtension.GT.ZEROP(NZ) .AND. L.LT.MaxNumRootLays)THEN
@@ -1533,9 +1536,10 @@ implicit none
     RootMyco1stStrutElms_rpvr(NE,N,L,NR,NZ)=RootMyco1stStrutElms_rpvr(NE,N,L,NR,NZ) &
       +RootNetGrowthElms(NE)*FGROL
   ENDDO
-  RootProteinC_pvr(N,L,NZ)=RootProteinC_pvr(N,L,NZ)+AMIN1(rCNNonstructRemob_pft(NZ)&
-    *RootMyco1stStrutElms_rpvr(ielmn,N,L,NR,NZ) &
-    ,rCPNonstructRemob_pft(NZ)*RootMyco1stStrutElms_rpvr(ielmp,N,L,NR,NZ))
+
+  RootProteinC_pvr(N,L,NZ)=RootProteinC_pvr(N,L,NZ)+ &
+    AMIN1(rCNNonstructRemob_pft(NZ)*RootMyco1stStrutElms_rpvr(ielmn,N,L,NR,NZ) &
+         ,rCPNonstructRemob_pft(NZ)*RootMyco1stStrutElms_rpvr(ielmp,N,L,NR,NZ))
   Root1stLen_rpvr(N,L,NR,NZ)=Root1stLen_rpvr(N,L,NR,NZ)+Root1stExtension*FGROL
 !
 !     TRANSFER STRUCTURAL, NONSTRUCTURAL C,N,P INTO NEXT SOIL LAYER
