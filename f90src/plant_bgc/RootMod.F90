@@ -141,8 +141,12 @@ implicit none
   INTEGER :: NRX(jroots,JZ1)
   real(r8) :: mass_inital(NumPlantChemElms)
   real(r8) :: mass_finale(NumPlantChemElms)
+  real(r8) :: masst_inital(NumPlantChemElms)
+  real(r8) :: masst_finale(NumPlantChemElms)  
   real(r8) :: litrflx(NumPlantChemElms)
   real(r8) :: RCO2flx
+  real(r8) :: litrflxt(NumPlantChemElms)
+  real(r8) :: RCO2flxt
 
 !     begin_execution
   associate(                                                                    &
@@ -219,10 +223,15 @@ implicit none
 !
 !     FOR EACH ROOT AXIS
 !
+        litrflxt=0._r8;RCO2flxt=0._r8
+        call SumRootBiome(NZ,masst_inital)
         call GrowRootMycoAxes(N,L,L1,NZ,NRX,iRootXsUpdateFlag,TFN6_vr,&
           RootPrimeAxsNum,RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,CNRTW,CPRTW,&
-          fRootGrowPSISense_vr,TotRoot2ndLen,TotRoot1stLen,Root2ndC,Root1stC,litrflx,RCO2flx)
-
+          fRootGrowPSISense_vr,TotRoot2ndLen,TotRoot1stLen,Root2ndC,Root1stC,litrflxt,RCO2flxt)
+        call SumRootBiome(NZ,masst_finale)
+        if(I>=125 .and. NZ==2)then
+        write(124,*)'GrowRootMycoAxes',I+J/24.,L,masst_finale(ielmc)-masst_inital(ielmc)+litrflxt(ielmc)-RCO2flxt
+        endif
 !====================================================================================
 !     DRAW FROM ROOT NON-STRUCTURAL POOL WHEN
 !     SEASONAL STORAGE POOL IS DEPLETED
