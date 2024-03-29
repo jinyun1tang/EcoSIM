@@ -1640,6 +1640,7 @@ implicit none
   !
   !DESCRIPTION
   !transfer of nonstructural C/N/P 
+  !
   implicit none
   integer,  intent(in) :: I,J,NZ,BegRemoblize
   real(r8), intent(in):: PTRT
@@ -1669,13 +1670,15 @@ implicit none
   real(r8) :: TwoCompMassC
   real(r8) :: WTRTLX
   real(r8) :: WTRTD1
-  real(r8) :: WTSTKT
+  real(r8) :: TotStalkMassC
   real(r8) :: TotStalkRsrv_loc(NumPlantChemElms)
   real(r8) :: StalkRsrvGradt
   real(r8) :: WTRTD2,WTLSBX,WTLSBB
   real(r8) :: WTRTLR
   real(r8) :: XFRE(NumPlantChemElms)
   real(r8) :: sumchk1,sumchk2
+  real(r8) :: mass_inital(NumPlantChemElms)
+  real(r8) :: mass_finale(NumPlantChemElms)
 !     begin_execution
   associate(                                &
     FWODBE                             =>   plt_allom%FWODBE                     , &
@@ -1718,7 +1721,7 @@ implicit none
     NumRootAxes_pft                    =>   plt_morph%NumRootAxes_pft    , &
     NumOfBranches_pft                  =>   plt_morph%NumOfBranches_pft       &
   )
-!
+!=============================================================================
 !     TRANSFER NON-STRUCTURAL C,N,P AMONG BRANCH LEAVES
 !     FROM NON-STRUCTURAL C,N,P CONCENTRATION DIFFERENCES
 !     WHEN SEASONAL STORAGE C IS NOT BEING MOBILIZED
@@ -1730,6 +1733,9 @@ implicit none
 !     CPOOL,ZPOOL,PPOOL=non-structural C,N,P mass in branch
 !
   IF(NumOfBranches_pft(NZ).GT.1)THEN
+    DO NE=1,NumPlantChemElms
+      mass_inital(NE)=SUM(CanopyNonstElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
+    enddo
     TwoCompMassC=0._r8
     TotNonstElm_loc(1:NumPlantChemElms)=0._r8
     D300: DO NB=1,NumOfBranches_pft(NZ)
@@ -1770,8 +1776,12 @@ implicit none
         ENDIF
       ENDIF
     ENDDO D305
+    DO NE=1,NumPlantChemElms
+      mass_finale(NE)=SUM(CanopyNonstElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
+    enddo
+    write(*,*)I+J/24.,NZ,'canpnostxfer',(mass_finale(NE)-mass_inital(NE),NE=1,NumPlantChemElms)
   ENDIF
-!
+!=============================================================================
 !     TRANSFER NON-STRUCTURAL C,N,P AMONG BRANCH STALK RESERVES
 !     FROM NON-STRUCTURAL C,N,P CONCENTRATION DIFFERENCES
 !
@@ -1782,12 +1792,16 @@ implicit none
 ! the algorithm below is different from that for within canopy transfer between different branches
 ! why?
   IF(NumOfBranches_pft(NZ).GT.1)THEN
-    WTSTKT=0._r8
+    DO NE=1,NumPlantChemElms
+      mass_inital(NE)=sum(StalkRsrvElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
+    ENDDO
+
+    TotStalkMassC=0._r8
     TotStalkRsrv_loc(1:NumPlantChemElms)=0._r8
     D330: DO NB=1,NumOfBranches_pft(NZ)
       IF(iPlantBranchState_brch(NB,NZ).EQ.iLive)THEN
         IF(iPlantCalendar_brch(ipltcal_BeginSeedFill,NB,NZ).NE.0)THEN
-          WTSTKT=WTSTKT+StalkBiomassC_brch(NB,NZ)
+          TotStalkMassC=TotStalkMassC+StalkBiomassC_brch(NB,NZ)
           DO NE=1,NumPlantChemElms
             TotStalkRsrv_loc(NE)=TotStalkRsrv_loc(NE)+StalkRsrvElms_brch(NE,NB,NZ)
           ENDDO
@@ -1796,12 +1810,12 @@ implicit none
     ENDDO D330
     sumchk1=TotStalkRsrv_loc(ielmc)
     sumchk2=0._r8
-    IF(WTSTKT.GT.ZEROP(NZ).AND.TotStalkRsrv_loc(ielmc).GT.ZEROP(NZ))THEN
+    IF(TotStalkMassC.GT.ZEROP(NZ).AND.TotStalkRsrv_loc(ielmc).GT.ZEROP(NZ))THEN
       D335: DO NB=1,NumOfBranches_pft(NZ)
         IF(iPlantBranchState_brch(NB,NZ).EQ.iLive)THEN
           IF(iPlantCalendar_brch(ipltcal_BeginSeedFill,NB,NZ).NE.0)THEN
-            StalkRsrvGradt=TotStalkRsrv_loc(ielmc)*StalkBiomassC_brch(NB,NZ)-StalkRsrvElms_brch(ielmc,NB,NZ)*WTSTKT
-            XFRE(ielmc)=0.1_r8*StalkRsrvGradt/WTSTKT            
+            StalkRsrvGradt=TotStalkRsrv_loc(ielmc)*StalkBiomassC_brch(NB,NZ)-StalkRsrvElms_brch(ielmc,NB,NZ)*TotStalkMassC
+            XFRE(ielmc)=0.1_r8*StalkRsrvGradt/TotStalkMassC            
             StalkRsrvElms_brch(ielmc,NB,NZ)=StalkRsrvElms_brch(ielmc,NB,NZ)+XFRE(ielmc)
             sumchk2=sumchk2+StalkRsrvElms_brch(ielmc,NB,NZ)
             !based on stoichiometry gradient
@@ -1815,9 +1829,12 @@ implicit none
         ENDIF
       ENDDO D335
     ENDIF
-    print*,'1818sumchk stalkrsrv',sumchk1,sumchk2
+    DO NE=1,NumPlantChemElms
+      mass_finale(NE)=sum(StalkRsrvElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
+    ENDDO
+    write(*,*)I+J/24.,NZ,'stalkrsvxfer',(mass_finale(NE)-mass_inital(NE),NE=1,NumPlantChemElms)    
   ENDIF
-!
+!=============================================================================
 !     TRANSFER NON-STRUCTURAL C,N,P BWTWEEN ROOT AND MYCORRHIZAE
 !     IN EACH ROOTED SOIL LAYER FROM NON-STRUCTURAL C,N,P
 !     CONCENTRATION DIFFERENCES
@@ -1830,6 +1847,10 @@ implicit none
 !
   !this enables extension to other mycorrhizae
   IF(MY(NZ).GT.ipltroot)THEN
+    DO NE=1,NumPlantChemElms
+      mass_inital(NE)=sum(RootMycoNonstElms_rpvr(NE,1:MY(NZ),NU:NIXBotRootLayer_pft(NZ),NZ))
+    ENDDO
+
     DO N=2,MY(NZ)
       D425: DO L=NU,NIXBotRootLayer_pft(NZ)
         IF(RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ).GT.ZEROP(NZ).AND. PopuRootMycoC_pvr(ipltroot,L,NZ).GT.ZEROL(NZ))THEN
@@ -1860,12 +1881,20 @@ implicit none
         ENDIF
       ENDDO D425
     ENDDO
+    DO NE=1,NumPlantChemElms
+      mass_finale(NE)=sum(RootMycoNonstElms_rpvr(NE,1:MY(NZ),NU:NIXBotRootLayer_pft(NZ),NZ))
+    ENDDO
+    write(*,*)I+J/24.,NZ,'rootmycoxfer',(mass_finale(NE)-mass_inital(NE),NE=1,NumPlantChemElms)    
   ENDIF
-!
+!=============================================================================
 !     TRANSFER ROOT NON-STRUCTURAL C,N,P TO SEASONAL STORAGE
 !     IN PERENNIALS
 !
   IF(BegRemoblize.EQ.itrue .AND. iPlantPhenolPattern_pft(NZ).NE.iplt_annual)THEN
+    DO NE=1,NumPlantChemElms
+      mass_inital(NE)=sum(RootMycoNonstElms_rpvr(NE,1:MY(NZ),NU:MaxSoiL4Root(NZ),NZ))+SeasonalNonstElms_pft(NE,NZ)
+    ENDDO
+
     D5545: DO N=1,MY(NZ)
       D5550: DO L=NU,MaxSoiL4Root(NZ)
         IF(RootNonstructElmConc_pvr(ielmc,N,L,NZ).GT.ZERO)THEN
@@ -1892,11 +1921,14 @@ implicit none
             stop
           endif
         ENDDO
-
-      ENDDO D5550
+      ENDDO D5550      
     ENDDO D5545
+    DO NE=1,NumPlantChemElms
+      mass_finale(NE)=sum(RootMycoNonstElms_rpvr(NE,1:MY(NZ),NU:MaxSoiL4Root(NZ),NZ))+SeasonalNonstElms_pft(NE,NZ)
+    ENDDO
+    write(*,*)I+J/24.,NZ,'rootmycossnxfer',(mass_finale(NE)-mass_inital(NE),NE=1,NumPlantChemElms)    
   ENDIF
-!
+!!=============================================================================
 !     ROOT AND NODULE TOTALS
 !
 !     RootMycoActiveBiomC_pvr,WTRTD=active,actual root C mass
@@ -1924,7 +1956,8 @@ implicit none
         +Root1stElm_raxs(ielmc,N,NR,NZ)
     ENDDO
   ENDDO D5445
-!
+
+!=============================================================================
 !     TRANSFER NON-STRUCTURAL C,N,P BETWEEN ROOT AND SHOOT
 !
 !     SINK STRENGTH OF ROOTS IN EACH SOIL LAYER AS A FRACTION
@@ -1991,6 +2024,11 @@ implicit none
 !     CPOOL,ZPOOL,PPOOL=non-structural C,N,P mass in branch
 !     CPOOLR,ZPOOLR,PPOOLR=non-structural C,N,P mass in root
 !
+    DO NE=1,NumPlantChemElms
+      mass_inital(NE)=sum(RootMycoNonstElms_rpvr(NE,1:MY(NZ),NU:MaxSoiL4Root(NZ),NZ)) &
+        +SUM(CanopyNonstElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
+    ENDDO
+
   D310: DO NB=1,NumOfBranches_pft(NZ)
     IF(iPlantBranchState_brch(NB,NZ).EQ.iLive)THEN
       IF(CanopyLeafShethC_pft(NZ).GT.ZEROP(NZ))THEN
@@ -2045,6 +2083,11 @@ implicit none
       ENDDO D415
     ENDIF
   ENDDO D310
+  DO NE=1,NumPlantChemElms
+    mass_finale(NE)=sum(RootMycoNonstElms_rpvr(NE,1:MY(NZ),NU:MaxSoiL4Root(NZ),NZ)) &
+      +SUM(CanopyNonstElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
+  ENDDO
+  write(*,*)I+J/24.,NZ,'rootshootxfer',(mass_finale(NE)-mass_inital(NE),NE=1,NumPlantChemElms)    
   end associate
   end subroutine NonstructlBiomTransfer
 
