@@ -103,11 +103,11 @@ module RootGasMod
     iPlantCalendar_brch        =>  plt_pheno%iPlantCalendar_brch  , &
     RootPoreTortu4Gas          =>  plt_morph%RootPoreTortu4Gas   , &
     Root1stRadius_pvr         =>  plt_morph%Root1stRadius_pvr   , &
-    AveLen2ndRoot_pvr            =>  plt_morph%AveLen2ndRoot_pvr   , &
+    Root2ndAveLen_pvr            =>  plt_morph%Root2ndAveLen_pvr   , &
     RootPoreVol_pvr              =>  plt_morph%RootPoreVol_pvr   , &
     RootLenPerPlant_pvr        =>  plt_morph%RootLenPerPlant_pvr   , &
     Root2ndXNum_pvr          =>  plt_morph%Root2ndXNum_pvr    , &
-    Radius2ndRoot_pvr        =>  plt_morph%Radius2ndRoot_pvr   , &
+    Root2ndRadius_pvr        =>  plt_morph%Root2ndRadius_pvr   , &
     RootRaidus_rpft            =>  plt_morph%RootRaidus_rpft   , &
     RootVH2O_pvr                =>  plt_morph%RootVH2O_pvr  , &
     RootPorosity_pft               =>  plt_morph%RootPorosity_pft   , &
@@ -176,15 +176,15 @@ module RootGasMod
 !     RTCR1,RTCR2,RTCRA=cross-sectional area/length of
 !     primary,secondary,total root,myco system
 !     Root1stXNumL_pvr,Root2ndXNum_pvr=number of root,myco primary,secondary axes
-!     Root1stRadius_pvr,Radius2ndRoot_pvr=primary,secondary root radius
+!     Root1stRadius_pvr,Root2ndRadius_pvr=primary,secondary root radius
 !     DPTHZ=depth of primary root from surface
-!     AveLen2ndRoot_pvr=average secondary root length
+!     Root2ndAveLen_pvr=average secondary root length
 !
     IF(RootStrutElms_pft(ielmc,NZ).GT.ZEROP(NZ).AND.FracSoiLayByPrimRoot(L,NZ).GT.ZERO)THEN
       RTCR1=AMAX1(PlantPopulation_pft(NZ),Root1stXNumL_pvr(N,L,NZ)) &
         *PICON*Root1stRadius_pvr(N,L,NZ)**2/DPTHZ(L)
-      RTCR2=(Root2ndXNum_pvr(N,L,NZ)*PICON*Radius2ndRoot_pvr(N,L,NZ)**2 &
-        /AveLen2ndRoot_pvr(N,L,NZ))/FracSoiLayByPrimRoot(L,NZ)
+      RTCR2=(Root2ndXNum_pvr(N,L,NZ)*PICON*Root2ndRadius_pvr(N,L,NZ)**2 &
+        /Root2ndAveLen_pvr(N,L,NZ))/FracSoiLayByPrimRoot(L,NZ)
       IF(RTCR2.GT.RTCR1)THEN
         RTCRA=RTCR1*RTCR2/(RTCR1+RTCR2)
       ELSE

@@ -356,11 +356,11 @@ implicit none
     Root2ndXNum_pvr              =>   plt_morph%Root2ndXNum_pvr     , &
     Root1stXNumL_pvr             =>   plt_morph%Root1stXNumL_pvr    , &
     Root1stDepz_pft              =>   plt_morph%Root1stDepz_pft   , &
-    AveLen2ndRoot_pvr            =>   plt_morph%AveLen2ndRoot_pvr    , &
+    Root2ndAveLen_pvr            =>   plt_morph%Root2ndAveLen_pvr    , &
     Root1stRadius_pvr            =>   plt_morph%Root1stRadius_pvr    , &
-    Radius2ndRoot_pvr            =>   plt_morph%Radius2ndRoot_pvr    , &
-    Max1stRootRadius_pft         =>   plt_morph%Max1stRootRadius_pft   , &
-    Max2ndRootRadius_pft         =>   plt_morph%Max2ndRootRadius_pft   , &
+    Root2ndRadius_pvr            =>   plt_morph%Root2ndRadius_pvr    , &
+    Root1stMaxRadius_pft         =>   plt_morph%Root1stMaxRadius_pft   , &
+    Root2ndMaxRadius_pft         =>   plt_morph%Root2ndMaxRadius_pft   , &
     RootLenPerPlant_pvr          =>   plt_morph%RootLenPerPlant_pvr    , &
     Root1stLen_rpvr              =>   plt_morph%Root1stLen_rpvr    , &
     Root2ndLen_pvr               =>   plt_morph%Root2ndLen_pvr    , &
@@ -444,7 +444,7 @@ implicit none
 !     RootLenDensPerPlant_pvr,RootLenPerPlant_pvr=root length density,root length per plant
 !     RootVH2O_pvr,RootPoreVol_pvr=root or myco aqueous,gaseous volume
 !     RootAreaPerPlant_pvr=root surface area per plant
-!     AveLen2ndRoot_pvr=average secondary root length
+!     Root2ndAveLen_pvr=average secondary root length
 !
     D8870: DO NR=1,NumRootAxes_pft(NZ)
       DO L=NU,MaxNumRootLays             
@@ -471,10 +471,10 @@ implicit none
         RootLenDensPerPlant_pvr(N,L,NZ)=0._r8
         RootPoreVol_pvr(N,L,NZ)=0._r8
         RootVH2O_pvr(N,L,NZ)=0._r8
-        Root1stRadius_pvr(N,L,NZ)=Max1stRootRadius_pft(N,NZ)
-        Radius2ndRoot_pvr(N,L,NZ)=Max2ndRootRadius_pft(N,NZ)
+        Root1stRadius_pvr(N,L,NZ)=Root1stMaxRadius_pft(N,NZ)
+        Root2ndRadius_pvr(N,L,NZ)=Root2ndMaxRadius_pft(N,NZ)
         RootAreaPerPlant_pvr(N,L,NZ)=0._r8
-        AveLen2ndRoot_pvr(N,L,NZ)=MinAve2ndRootLen
+        Root2ndAveLen_pvr(N,L,NZ)=Root2ndAveLenMin
       ENDDO
     ENDDO    
 !

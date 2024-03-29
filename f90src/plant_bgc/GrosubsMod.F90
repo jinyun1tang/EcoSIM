@@ -309,8 +309,8 @@ module grosubsMod
   real(r8), intent(in) :: CanopyHeight_copy(JP1)
 
   real(r8)  :: CanopyN2Fix_pft(JP1)
-  integer  :: ICHK1(2,JZ1),NB
-  integer  :: NRX(2,JZ1),BegRemoblize
+  integer  :: NB
+  integer  :: BegRemoblize
   real(r8) :: TFN6_vr(JZ1)
   real(r8) :: CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW
   real(r8) :: PTRT
@@ -340,7 +340,7 @@ module grosubsMod
 
 !    call SumPlantBiom(I,J,NZ,'bfstageplant')
     
-    call StagePlantForGrowth(I,J,NZ,ICHK1,NRX,TFN6_vr,CNLFW,CPLFW,&
+    call StagePlantForGrowth(I,J,NZ,TFN6_vr,CNLFW,CPLFW,&
       CNSHW,CPSHW,CNRTW,CPRTW,RootAreaPopu,TFN5,WFNG,Stomata_Activity,WFNS,WFNSG)
 !
 !     CALCULATE GROWTH OF EACH BRANCH
@@ -356,7 +356,7 @@ module grosubsMod
     ENDDO
 !
     call SumPlantBiom(I,J,NZ,'bfRootBGCM')
-    call RootBGCModel(I,J,NZ,BegRemoblize,ICHK1,NRX,PTRT,TFN6_vr,CNRTW,CPRTW,RootAreaPopu)
+    call RootBGCModel(I,J,NZ,BegRemoblize,PTRT,TFN6_vr,CNRTW,CPRTW,RootAreaPopu)
 !
     call ComputeTotalBiom(I,J,NZ)
   ENDIF
@@ -373,11 +373,9 @@ module grosubsMod
   end subroutine GrowPlant
 
 !------------------------------------------------------------------------------------------
-  subroutine StagePlantForGrowth(I,J,NZ,ICHK1,NRX,TFN6_vr,CNLFW,CPLFW,CNSHW,&
+  subroutine StagePlantForGrowth(I,J,NZ,TFN6_vr,CNLFW,CPLFW,CNSHW,&
     CPSHW,CNRTW,CPRTW,RootAreaPopu,TFN5,WFNG,Stomata_Activity,WFNS,WFNSG)
   integer, intent(in) :: I,J,NZ
-  integer, intent(out):: ICHK1(jroots,JZ1)
-  integer, intent(out):: NRX(jroots,JZ1)
   REAL(R8), INTENT(OUT):: TFN6_vr(JZ1)
   REAL(R8), INTENT(OUT) :: CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW
   real(r8), intent(out) :: RootAreaPopu,TFN5,WFNG,Stomata_Activity
@@ -435,12 +433,7 @@ module grosubsMod
     CanopyLeafCLyr_pft(L,NZ)=0._r8
     CanopyStemArea_lpft(L,NZ)=0._r8
   ENDDO D2
-  D5: DO NR=1,NumRootAxes_pft(NZ)
-    DO  N=1,MY(NZ)
-      NRX(N,NR)=0
-      ICHK1(N,NR)=0
-    enddo
-  ENDDO D5
+
   D9: DO N=1,MY(NZ)
     D6: DO L=NU,MaxNumRootLays
       RootProteinC_pvr(N,L,NZ)=0._r8

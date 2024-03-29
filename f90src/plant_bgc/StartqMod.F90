@@ -410,7 +410,7 @@ module StartqMod
 !     CumSoilThickness=depth to soil layer bottom from surface(m)
 !     NG,NIX,NIXBotRootLayer_rpft=seeding,upper,lower rooting layer
 !     CNRTS,CPRTS=N,P root growth yield
-!     Max1stRootRadius_pft,Max2ndRootRadius_pft=maximum primary,secondary mycorrhizal radius (m)
+!     Root1stMaxRadius_pft,Root2ndMaxRadius_pft=maximum primary,secondary mycorrhizal radius (m)
 !     PORT=mycorrhizal porosity
 !     VmaxNH4Root_pft,KmNH4Root_pft,CMinNH4Root_pft=NH4 max uptake(g m-2 h-1),Km(uM),min concn (uM)
 !     VmaxNO3Root_pft,KmNO3Root_pft,CminNO3Root_pft=NO3 max uptake(g m-2 h-1),Km(uM), min concn (uM)
@@ -431,8 +431,8 @@ module StartqMod
   ENDDO D9795  
   CNRTS(NZ,NY,NX)=RootrNC_pft(NZ,NY,NX)*RootBiomGrowthYield(NZ,NY,NX)
   CPRTS(NZ,NY,NX)=RootrPC_pft(NZ,NY,NX)*RootBiomGrowthYield(NZ,NY,NX)
-  Max1stRootRadius_pft(imycorrhz,NZ,NY,NX)=5.0E-06
-  Max2ndRootRadius_pft(imycorrhz,NZ,NY,NX)=5.0E-06
+  Root1stMaxRadius_pft(imycorrhz,NZ,NY,NX)=5.0E-06
+  Root2ndMaxRadius_pft(imycorrhz,NZ,NY,NX)=5.0E-06
   RootPorosity_pft(imycorrhz,NZ,NY,NX)=RootPorosity_pft(1,NZ,NY,NX)
   VmaxNH4Root_pft(imycorrhz,NZ,NY,NX)=VmaxNH4Root_pft(1,NZ,NY,NX)
   KmNH4Root_pft(imycorrhz,NZ,NY,NX)=KmNH4Root_pft(1,NZ,NY,NX)
@@ -456,14 +456,14 @@ module StartqMod
     RootPoreTortu4Gas(N,NZ,NY,NX)=RootPorosity_pft(N,NZ,NY,NX)**1.33_r8
     RootRaidus_rpft(N,NZ,NY,NX)=LOG(1.0_r8/SQRT(AMAX1(0.01_r8,RootPorosity_pft(N,NZ,NY,NX))))
     RootVolPerMassC_pft(N,NZ,NY,NX)=ppmc/(0.05_r8*(1.0-RootPorosity_pft(N,NZ,NY,NX)))
-    Root1stSpecLen_pft(N,NZ,NY,NX)=RootVolPerMassC_pft(N,NZ,NY,NX)/(PICON*Max1stRootRadius_pft(N,NZ,NY,NX)**2)
-    Root2ndSpecLen_pft(N,NZ,NY,NX)=RootVolPerMassC_pft(N,NZ,NY,NX)/(PICON*Max2ndRootRadius_pft(N,NZ,NY,NX)**2)
-    Max1stRootRadius_pft1(N,NZ,NY,NX)=Max1stRootRadius_pft(N,NZ,NY,NX)
+    Root1stSpecLen_pft(N,NZ,NY,NX)=RootVolPerMassC_pft(N,NZ,NY,NX)/(PICON*Root1stMaxRadius_pft(N,NZ,NY,NX)**2)
+    Root2ndSpecLen_pft(N,NZ,NY,NX)=RootVolPerMassC_pft(N,NZ,NY,NX)/(PICON*Root2ndMaxRadius_pft(N,NZ,NY,NX)**2)
+    Root1stMaxRadius1_pft(N,NZ,NY,NX)=Root1stMaxRadius_pft(N,NZ,NY,NX)
 !    2*SQRT(0.25*(1.0-RootPorosity_pft(N,NZ,NY,NX)))
-    Max2ndRootRadius_pft1(N,NZ,NY,NX)=Max2ndRootRadius_pft(N,NZ,NY,NX)
+    Root2ndMaxRadius1_pft(N,NZ,NY,NX)=Root2ndMaxRadius_pft(N,NZ,NY,NX)
 !    2*SQRT(0.25*(1.0-RootPorosity_pft(N,NZ,NY,NX)))
-    Root1stXSecArea_pft(N,NZ,NY,NX)=PICON*Max1stRootRadius_pft1(N,NZ,NY,NX)**2._r8
-    Root2ndXSecArea_pft(N,NZ,NY,NX)=PICON*Max2ndRootRadius_pft1(N,NZ,NY,NX)**2._r8
+    Root1stXSecArea_pft(N,NZ,NY,NX)=PICON*Root1stMaxRadius1_pft(N,NZ,NY,NX)**2._r8
+    Root2ndXSecArea_pft(N,NZ,NY,NX)=PICON*Root2ndMaxRadius1_pft(N,NZ,NY,NX)**2._r8
   ENDDO D500 
   end subroutine InitDimensionsandUptake
 !------------------------------------------------------------------------------------------
@@ -736,10 +736,10 @@ module StartqMod
       RootLenDensPerPlant_pvr(N,L,NZ,NY,NX)=0._r8
       RootPoreVol_pvr(N,L,NZ,NY,NX)=0._r8
       RootVH2O_pvr(N,L,NZ,NY,NX)=0._r8
-      Root1stRadius_pvr(N,L,NZ,NY,NX)=Max1stRootRadius_pft(N,NZ,NY,NX)
-      Radius2ndRoot_pvr(N,L,NZ,NY,NX)=Max2ndRootRadius_pft(N,NZ,NY,NX)
+      Root1stRadius_pvr(N,L,NZ,NY,NX)=Root1stMaxRadius_pft(N,NZ,NY,NX)
+      Root2ndRadius_pvr(N,L,NZ,NY,NX)=Root2ndMaxRadius_pft(N,NZ,NY,NX)
       RootAreaPerPlant_pvr(N,L,NZ,NY,NX)=0._r8
-      AveLen2ndRoot_pvr(N,L,NZ,NY,NX)=1.0E-03
+      Root2ndAveLen_pvr(N,L,NZ,NY,NX)=1.0E-03
       RootNutUptake_pvr(ids_NH4,N,L,NZ,NY,NX)=0._r8
       RootNutUptake_pvr(ids_NO3,N,L,NZ,NY,NX)=0._r8
       RootNutUptake_pvr(ids_H2PO4,N,L,NZ,NY,NX)=0._r8

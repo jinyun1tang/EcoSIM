@@ -2811,16 +2811,16 @@ implicit none
 
   if(flag=='read')then
     datpr3 => datrp_3d(1:npfts,1:pltpar%jroots,1:JZ)
-    call restartvar(ncid, flag, varname='Radius2ndRoot_pvr', dim1name='pft',dim2name='rootyps',&
+    call restartvar(ncid, flag, varname='Root2ndRadius_pvr', dim1name='pft',dim2name='rootyps',&
      dim3name='levsoi',long_name='soil layer secondary root radius', units='m', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval) 
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,Radius2ndRoot_pvr,datrp_3d,NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft) 
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,Root2ndRadius_pvr,datrp_3d,NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft) 
   else
-    !print*,'Radius2ndRoot_pvr'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,Radius2ndRoot_pvr,datrp_3d,NumActivePlants=NumActivePlants,&
+    !print*,'Root2ndRadius_pvr'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,Root2ndRadius_pvr,datrp_3d,NumActivePlants=NumActivePlants,&
       IsPlantActive_pft=IsPlantActive_pft)   
     datpr3 => datrp_3d(1:npfts,1:pltpar%jroots,1:JZ)
-    call restartvar(ncid, flag, varname='Radius2ndRoot_pvr', dim1name='pft',dim2name='rootyps',&
+    call restartvar(ncid, flag, varname='Root2ndRadius_pvr', dim1name='pft',dim2name='rootyps',&
      dim3name='levsoi',long_name='soil layer secondary root radius', units='m', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval) 
   endif  
@@ -2844,16 +2844,16 @@ implicit none
 
   if(flag=='read')then
     datpr3 => datrp_3d(1:npfts,1:pltpar%jroots,1:JZ)
-    call restartvar(ncid, flag, varname='AveLen2ndRoot_pvr', dim1name='pft',dim2name='rootyps',&
+    call restartvar(ncid, flag, varname='Root2ndAveLen_pvr', dim1name='pft',dim2name='rootyps',&
      dim3name='levsoi',long_name='Mean 2nd root length', units='m', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval) 
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,AveLen2ndRoot_pvr,datrp_3d,NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft) 
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,Root2ndAveLen_pvr,datrp_3d,NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft) 
   else
-    !print*,'AveLen2ndRoot_pvr'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,AveLen2ndRoot_pvr,datrp_3d,&
+    !print*,'Root2ndAveLen_pvr'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,Root2ndAveLen_pvr,datrp_3d,&
       NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft)   
     datpr3 => datrp_3d(1:npfts,1:pltpar%jroots,1:JZ)
-    call restartvar(ncid, flag, varname='AveLen2ndRoot_pvr', dim1name='pft',dim2name='rootyps',&
+    call restartvar(ncid, flag, varname='Root2ndAveLen_pvr', dim1name='pft',dim2name='rootyps',&
      dim3name='levsoi',long_name='Mean 2nd root length', units='m', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval) 
   endif  

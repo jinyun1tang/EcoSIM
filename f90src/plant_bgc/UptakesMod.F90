@@ -488,13 +488,13 @@ module UptakesMod
     NumRootAxes_pft          =>  plt_morph%NumRootAxes_pft    , &
     MY                       =>  plt_morph%MY      , &
     RootLenDensPerPlant_pvr  =>  plt_morph%RootLenDensPerPlant_pvr   , &
-    Max2ndRootRadius_pft1    =>  plt_morph%Max2ndRootRadius_pft1  , &
+    Root2ndMaxRadius1_pft    =>  plt_morph%Root2ndMaxRadius1_pft  , &
     HypoctoHeight_pft        =>  plt_morph%HypoctoHeight_pft   , &
     RootLenPerPlant_pvr      =>  plt_morph%RootLenPerPlant_pvr   , &
     Root1stDepz_pft          =>  plt_morph%Root1stDepz_pft   , &
     RootPorosity_pft         =>  plt_morph%RootPorosity_pft    , &
     RootVH2O_pvr             =>  plt_morph%RootVH2O_pvr  , &
-    Max2ndRootRadius_pft     =>  plt_morph%Max2ndRootRadius_pft  , &
+    Root2ndMaxRadius_pft     =>  plt_morph%Root2ndMaxRadius_pft  , &
     SeedDepth_pft            =>  plt_morph%SeedDepth_pft   , &
     MaxSoiL4Root             =>  plt_morph%MaxSoiL4Root        &
   )
@@ -541,13 +541,13 @@ module UptakesMod
       ENDIF
       MinFracPRoot4Uptake(N,L,NZ)=FMN*FracPRoot4Uptake(N,L,NZ)
       IF(RootLenDensPerPlant_pvr(N,L,NZ).GT.ZERO.AND.FracSoiLayByPrimRoot(L,NZ).GT.ZERO)THEN
-        FineRootRadius(N,L)=AMAX1(Max2ndRootRadius_pft1(N,NZ),SQRT((RootVH2O_pvr(N,L,NZ) &
+        FineRootRadius(N,L)=AMAX1(Root2ndMaxRadius1_pft(N,NZ),SQRT((RootVH2O_pvr(N,L,NZ) &
           /(1.0_r8-RootPorosity_pft(N,NZ)))/(PICON*PlantPopulation_pft(NZ)*RootLenPerPlant_pvr(N,L,NZ))))
         PATH(N,L)=AMAX1(1.001_r8*FineRootRadius(N,L) &
           ,1.0_r8/(SQRT(PICON*(RootLenDensPerPlant_pvr(N,L,NZ)/FracSoiLayByPrimRoot(L,NZ))/FracSoiAsMicP(L))))
         RootAreaDivRadius_vr(N,L)=TwoPiCON*RootLenPerPlant_pvr(N,L,NZ)/FracSoiLayByPrimRoot(L,NZ)
       ELSE
-        FineRootRadius(N,L)=Max2ndRootRadius_pft(N,NZ)
+        FineRootRadius(N,L)=Root2ndMaxRadius_pft(N,NZ)
         PATH(N,L)=1.001_r8*FineRootRadius(N,L)
         RootAreaDivRadius_vr(N,L)=TwoPiCON*RootLenPerPlant_pvr(N,L,NZ)
       ENDIF
@@ -1094,13 +1094,13 @@ module UptakesMod
     VLSoilPoreMicP                 => plt_soilchem%VLSoilPoreMicP , &
     Root2ndXNum_pvr                => plt_morph%Root2ndXNum_pvr    , &
     Root1stXNumL_pvr               => plt_morph%Root1stXNumL_pvr   , &
-    Max2ndRootRadius_pft           => plt_morph%Max2ndRootRadius_pft  , &
+    Root2ndMaxRadius_pft           => plt_morph%Root2ndMaxRadius_pft  , &
     RSRA                           => plt_morph%RSRA    , &
-    Radius2ndRoot_pvr              => plt_morph%Radius2ndRoot_pvr   , &
+    Root2ndRadius_pvr              => plt_morph%Root2ndRadius_pvr   , &
     RootLenDensPerPlant_pvr        => plt_morph%RootLenDensPerPlant_pvr   , &
     CanPHeight4WatUptake           => plt_morph%CanPHeight4WatUptake   , &
     RootLenPerPlant_pvr            => plt_morph%RootLenPerPlant_pvr   , &
-    AveLen2ndRoot_pvr              => plt_morph%AveLen2ndRoot_pvr   , &
+    Root2ndAveLen_pvr              => plt_morph%Root2ndAveLen_pvr   , &
     Root1stRadius_pvr              => plt_morph%Root1stRadius_pvr   , &
     MY                             => plt_morph%MY      , &
     RSRR                           => plt_morph%RSRR    , &
@@ -1156,32 +1156,32 @@ module UptakesMod
         !     RADIAL ROOT RESISTANCE FROM ROOT AREA AND RADIAL RESISTIVITY
         !     ENTERED IN 'READQ'
         !
-        !     Radius2ndRoot_pvr=secondary root radius
+        !     Root2ndRadius_pvr=secondary root radius
         !     RootLenPerPlant_pvr=root length per plant
         !     RootResistSoi=radial resistance
         !     RSRR=radial resistivity from PFT file
         !     VLMicP,VLWatMicPM=soil micropore,water volume
         !
-        RTAR2=TwoPiCON*Radius2ndRoot_pvr(N,L,NZ)*RootLenPerPlant_pvr(N,L,NZ)*PlantPopulation_pft(NZ)
+        RTAR2=TwoPiCON*Root2ndRadius_pvr(N,L,NZ)*RootLenPerPlant_pvr(N,L,NZ)*PlantPopulation_pft(NZ)
         RootResistSoi(N,L)=RSRR(N,NZ)/RTAR2*VLMicP(L)/VLWatMicPM(NPH,L)
 !
         !     ROOT AXIAL RESISTANCE FROM RADII AND LENGTHS OF PRIMARY AND
         !     SECONDARY ROOTS AND FROM AXIAL RESISTIVITY ENTERED IN 'READQ'
         !
         !     FRAD1,FRAD2=primary,secondary root radius relative to maximum
-        !     secondary radius from PFT file Max2ndRootRadius_pft at which RSRA is defined
-        !     Root1stRadius_pvr,Radius2ndRoot_pvr=primary,secondary root radius
+        !     secondary radius from PFT file Root2ndMaxRadius_pft at which RSRA is defined
+        !     Root1stRadius_pvr,Root2ndRadius_pvr=primary,secondary root radius
         !     RSRA=axial resistivity from PFT file
         !     DPTHZ=depth of primary root from surface
         !     RootResistRadial,RootResistAxial=axial resistance of primary,secondary roots
-        !     AveLen2ndRoot_pvr=average secondary root length
+        !     Root2ndAveLen_pvr=average secondary root length
         !     Root1stXNumL_pvr,Root2ndXNum_pvr=number of primary,secondary axes
 !
-        FRAD1=(Root1stRadius_pvr(N,L,NZ)/Max2ndRootRadius_pft(N,NZ))**4._r8
+        FRAD1=(Root1stRadius_pvr(N,L,NZ)/Root2ndMaxRadius_pft(N,NZ))**4._r8
         RootResistRadial(N,L)=RSRA(N,NZ)*DPTHZ(L)/(FRAD1*Root1stXNumL_pvr(ipltroot,L,NZ)) &
           +RSRA(ipltroot,NZ)*CanPHeight4WatUptake(NZ)/(FRADW*Root1stXNumL_pvr(ipltroot,L,NZ))
-        FRAD2=(Radius2ndRoot_pvr(N,L,NZ)/Max2ndRootRadius_pft(N,NZ))**4._r8
-        RootResistAxial(N,L)=RSRA(N,NZ)*AveLen2ndRoot_pvr(N,L,NZ)/(FRAD2*Root2ndXNum_pvr(N,L,NZ))
+        FRAD2=(Root2ndRadius_pvr(N,L,NZ)/Root2ndMaxRadius_pft(N,NZ))**4._r8
+        RootResistAxial(N,L)=RSRA(N,NZ)*Root2ndAveLen_pvr(N,L,NZ)/(FRAD2*Root2ndXNum_pvr(N,L,NZ))
         !
         !     TOTAL ROOT RESISTANCE = SOIL + RADIAL + AXIAL
         !
