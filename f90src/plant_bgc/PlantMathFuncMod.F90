@@ -280,7 +280,7 @@ contains
 
   logical :: yesno
 
-  yesno=iPlantNfixType.NE.in2fixtyp_none
+  yesno=iPlantNfixType.NE.iN2fixtyp_none
 
   end function is_plant_N2fix
 

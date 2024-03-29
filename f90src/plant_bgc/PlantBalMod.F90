@@ -15,6 +15,7 @@ implicit none
   public :: SumPlantBiom
   public :: SumPlantBiomStates
   public :: ZeroGrosub  
+  public :: SumRootBiome
   logical,save  :: lfile(2)=.true.
   contains
 
@@ -94,6 +95,7 @@ implicit none
   balc=RootElms_pft(ielmc,NZ)+ShootElms_pft(ielmc,NZ)-RootElmsBeg_pft(ielmc,NZ)-ShootElmsBeg_pft(ielmc,NZ)&
     -GrossCO2Fix_pft(NZ)-GrossResp_pft(NZ)+LitrfalStrutElms_pft(ielmc,NZ)-NodulInfectElms_pft(ielmc,NZ) &
     -RootMycoExudElms_pft(ielmc,NZ)
+  if(I>=125)then
   if(NZ==1)THEN
     WRITE(111,*)I+J/24.,trim(header)//' BALC=',BALC,SeasonalNonstElms_pft(ielmc,NZ)&
       ,RootElmsbeg_pft(ielmc,NZ),ShootElmsbeg_pft(ielmc,NZ)
@@ -107,6 +109,7 @@ implicit none
     WRITE(112,*)'litrf=',LitrfalStrutElms_pft(ielmc,NZ),'infec=',NodulInfectElms_pft(ielmc,NZ)
     write(112,*)RootElms_pft(ielmc,NZ),ShootElms_pft(ielmc,NZ),RootElmsBeg_pft(ielmc,NZ),ShootElmsBeg_pft(ielmc,NZ),'|'
   ENDIF  
+  endif
   end associate
   end subroutine SumPlantBiom
 
@@ -134,7 +137,6 @@ implicit none
     iPlantPhotosynthesisType       =>  plt_photo%iPlantPhotosynthesisType   , &    
     NodulInfectElms_pft            =>  plt_bgcr%NodulInfectElms_pft, &    
     NumOfBranches_pft              =>  plt_morph%NumOfBranches_pft    , &   
-    MY                             =>  plt_morph%MY     , &        
     MaxSoiL4Root                   =>  plt_morph%MaxSoiL4Root     , &    
     NumRootAxes_pft                =>  plt_morph%NumRootAxes_pft   , &
     MaxNumRootLays                 =>  plt_site%MaxNumRootLays      , &  
@@ -167,6 +169,7 @@ implicit none
   )
   
   !shoots
+
   DO NB=1,NumOfBranches_pft(NZ)
     DO NE=1,NumPlantChemElms
       ShootStrutElms_brch(NE,NB,NZ)=LeafStrutElms_brch(NE,NB,NZ) &
@@ -194,14 +197,6 @@ implicit none
     ShootElms_pft(NE,NZ)=sum(ShootElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))+SeasonalNonstElms_pft(NE,NZ)
   ENDDO
 
-  !roots
-  DO NE=1,NumPlantChemElms
-    root1st=sum(RootMyco1stStrutElms_rpvr(NE,1:MY(NZ),NU:MaxNumRootLays,1:NumRootAxes_pft(NZ),NZ))
-    root2nd=sum(RootMyco2ndStrutElms_rpvr(NE,1:MY(NZ),NU:MaxNumRootLays,1:NumRootAxes_pft(NZ),NZ))
-    RootStrutElms_pft(NE,NZ)=root1st+root2nd
-    !add reserve to struct
-    RootElms_pft(NE,NZ)=RootStrutElms_pft(NE,NZ)+sum(RootMycoNonstElms_rpvr(NE,1:MY(NZ),NU:MaxNumRootLays,NZ))
-  ENDDO
 
   !add nodule, currently, a plant either has canopy or root N-fixing symbiosis, not both
   IF(is_plant_N2fix(iPlantNfixType(NZ)))THEN
@@ -211,14 +206,8 @@ implicit none
           +sum(CanopyNodulStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ)) &
           +sum(CanopyNodulNonstElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
       ENDDO
-    ELSEIF(is_root_N2fix(iPlantNfixType(NZ)))THEN
-      DO NE=1,NumPlantChemElms
-        RootElms_pft(NE,NZ)=RootElms_pft(NE,NZ)+sum(RootNodulStrutElms_pvr(NE,NU:MaxSoiL4Root(NZ),NZ))+&
-          sum(RootNodulNonstElms_pvr(NE,NU:MaxSoiL4Root(NZ),NZ))
-      ENDDO
     ENDIF
   ENDIF
-
 !
 !     TOTAL STANDING DEAD
 !
@@ -229,6 +218,9 @@ implicit none
     ShootElms_pft(NE,NZ)=ShootElms_pft(NE,NZ)+StandDeadStrutElms_pft(NE,NZ)
   ENDDO
 
+  call SumRootBiome(NZ,RootElms_pft(:,NZ))
+
+  if(I>=125)then
   if(NZ==1)then
     if(lfile(NZ))then
       write(243,'(A14,X,A13,6(X,A16))')'header','doy','rootC','shootC','rootN','shootN','rootP','shootP'
@@ -247,7 +239,7 @@ implicit none
       (RootElmsbeg_pft(NE,NZ),ShootElmsbeg_pft(NE,NZ),NE=1,NumPlantChemElms)            
   endif
   lfile(NZ)=.false.
-
+  endif
   end associate
   END subroutine SumPlantBiomStates
 
@@ -298,4 +290,41 @@ implicit none
   ENDDO D9980
   end associate
   end subroutine ZeroGrosub  
+
+!------------------------------------------------------------------------------------------
+
+  subroutine SumRootBiome(NZ,mass_roots)
+
+  implicit none
+  integer, intent(in) :: NZ
+  real(r8), intent(out) :: mass_roots(NumPlantChemElms)
+
+  integer :: NE
+  real(r8) :: root1st,root2nd
+
+  associate(                                                                   &
+    NU                            =>  plt_site%NU                            , &  
+    MY                            =>  plt_morph%MY                           , &                  
+    MaxNumRootLays                =>  plt_site%MaxNumRootLays                , &  
+    iPlantNfixType                =>  plt_morph%iPlantNfixType               , &    
+    NumRootAxes_pft               =>  plt_morph%NumRootAxes_pft              , &  
+    RootNodulStrutElms_pvr        =>  plt_biom%RootNodulStrutElms_pvr        , &    
+    RootMyco1stStrutElms_rpvr     =>  plt_biom%RootMyco1stStrutElms_rpvr     , &
+    RootMyco2ndStrutElms_rpvr     =>  plt_biom%RootMyco2ndStrutElms_rpvr     , &    
+    RootMycoNonstElms_rpvr        =>  plt_biom%RootMycoNonstElms_rpvr          &
+  )
+
+  mass_roots=0._r8
+  DO NE=1,NumPlantChemElms
+    root1st=sum(RootMyco1stStrutElms_rpvr(NE,1:MY(NZ),NU:MaxNumRootLays,1:NumRootAxes_pft(NZ),NZ))
+    root2nd=sum(RootMyco2ndStrutElms_rpvr(NE,1:MY(NZ),NU:MaxNumRootLays,1:NumRootAxes_pft(NZ),NZ))
+    mass_roots(NE)=root1st+root2nd+sum(RootMycoNonstElms_rpvr(NE,1:MY(NZ),NU:MaxNumRootLays,NZ))
+    !add reserve to struct
+    if(is_plant_N2fix(iPlantNfixType(NZ)) .and. is_root_N2fix(iPlantNfixType(NZ)))THEN
+      mass_roots(NE)=mass_roots(NE)+sum(RootNodulStrutElms_pvr(NE,NU:MaxSoiL4Root(NZ),NZ))+&
+          sum(RootNodulNonstElms_pvr(NE,NU:MaxSoiL4Root(NZ),NZ))
+    endif      
+  ENDDO
+  end associate
+  end subroutine SumRootBiome
 end module PlantBalMod
