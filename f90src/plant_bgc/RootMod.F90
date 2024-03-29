@@ -1163,16 +1163,16 @@ implicit none
           DO NE=1,NumPlantChemElms
             IF(RootNetGrowthElms(NE).LT.0.0_r8)THEN
               IF(RootNetGrowthElms(NE).GT.-RootMyco2ndStrutElms_rpvr(NE,N,LL,NR,NZ))THEN
-                if(NE==ielmc)Root2ndLen_pvr(N,LL,NR,NZ)=Root2ndLen_pvr(N,LL,NR,NZ)&
-                  +RootNetGrowthElms(NE) &
-                  *Root2ndLen_pvr(N,LL,NR,NZ)/RootMyco2ndStrutElms_rpvr(NE,N,LL,NR,NZ)
+                if(NE==ielmc)then
+                  Root2ndLen_pvr(N,LL,NR,NZ)=Root2ndLen_pvr(N,LL,NR,NZ)&
+                    +RootNetGrowthElms(NE)*Root2ndLen_pvr(N,LL,NR,NZ)/RootMyco2ndStrutElms_rpvr(NE,N,LL,NR,NZ)
+                endif   
                 RootMyco2ndStrutElms_rpvr(NE,N,LL,NR,NZ)=RootMyco2ndStrutElms_rpvr(NE,N,LL,NR,NZ)&
                   +RootNetGrowthElms(NE)
                   RootNetGrowthElms(NE)=0._r8
               ELSE
                 if(NE==ielmc)Root2ndLen_pvr(N,LL,NR,NZ)=0._r8
-                RootNetGrowthElms(NE)=RootNetGrowthElms(NE)&
-                  +RootMyco2ndStrutElms_rpvr(NE,N,LL,NR,NZ)
+                RootNetGrowthElms(NE)=RootNetGrowthElms(NE)+RootMyco2ndStrutElms_rpvr(NE,N,LL,NR,NZ)
                 RootMyco2ndStrutElms_rpvr(NE,N,LL,NR,NZ)=0._r8
               ENDIF
             ENDIF
@@ -1206,7 +1206,7 @@ implicit none
             
             D6450: DO M=1,jsken
               DO NE=1,NumPlantChemElms
-                dsenecE=FSNCM*AZMAX1(RootMyco2ndStrutElms_rpvr(NE,imycorrhz,LL,NR,NZ))
+                dsenecE=FSNCM*(RootMyco2ndStrutElms_rpvr(NE,imycorrhz,LL,NR,NZ))
                 LitrfalStrutElms_pvr(NE,M,k_woody_litr,LL,NZ)=LitrfalStrutElms_pvr(NE,M,k_woody_litr,LL,NZ) &
                   +CFOPE(NE,icwood,M,NZ)*dsenecE*FWODRE(NE,k_woody_litr)
 
@@ -1214,21 +1214,20 @@ implicit none
                   +CFOPE(NE,iroot,M,NZ)*dsenecE*FWODRE(NE,k_fine_litr)
 
                 LitrfalStrutElms_pvr(NE,M,k_fine_litr,LL,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,LL,NZ) &
-                  +CFOPE(NE,inonstruct,M,NZ)*FSNCP*AZMAX1(RootMycoNonstElms_rpvr(NE,imycorrhz,LL,NZ))
+                  +CFOPE(NE,inonstruct,M,NZ)*FSNCP*(RootMycoNonstElms_rpvr(NE,imycorrhz,LL,NZ))
                   
                 litrflx(NE)=litrflx(NE)+CFOPE(NE,icwood,M,NZ)*dsenecE*FWODRE(NE,k_woody_litr) &
                   +CFOPE(NE,iroot,M,NZ)*dsenecE*FWODRE(NE,k_fine_litr) &
-                  +CFOPE(NE,inonstruct,M,NZ)*FSNCP*AZMAX1(RootMycoNonstElms_rpvr(NE,imycorrhz,LL,NZ))
-                  
-                
+                  +CFOPE(NE,inonstruct,M,NZ)*FSNCP*(RootMycoNonstElms_rpvr(NE,imycorrhz,LL,NZ))
+                                  
               ENDDO    
             ENDDO D6450
             DO NE=1,NumPlantChemElms  
-              RootMyco2ndStrutElms_rpvr(NE,imycorrhz,LL,NR,NZ)= &
-                AZMAX1(RootMyco2ndStrutElms_rpvr(NE,imycorrhz,LL,NR,NZ))*(1.0_r8-FSNCM)
+              RootMyco2ndStrutElms_rpvr(NE,imycorrhz,LL,NR,NZ)= (1.0_r8-FSNCM) &
+                *(RootMyco2ndStrutElms_rpvr(NE,imycorrhz,LL,NR,NZ))
 
-              RootMycoNonstElms_rpvr(NE,imycorrhz,LL,NZ)=&
-                AZMAX1(RootMycoNonstElms_rpvr(NE,imycorrhz,LL,NZ))*(1.0_r8-FSNCP)
+              RootMycoNonstElms_rpvr(NE,imycorrhz,LL,NZ)=(1.0_r8-FSNCP) &
+                *(RootMycoNonstElms_rpvr(NE,imycorrhz,LL,NZ))
 
             ENDDO
             Root2ndLen_pvr(imycorrhz,LL,NR,NZ)=AZMAX1(Root2ndLen_pvr(imycorrhz,LL,NR,NZ))*(1.0_r8-FSNCM)
@@ -1243,7 +1242,7 @@ implicit none
     call SumRootBiome(NZ,mass_finale)  
 
     if(I>=125.and.NZ==2)then
-    write(124,*)'withinGrowRootAxes',I+J/24.,mass_finale(ielmc)-mass_inital(ielmc)+litrflx(ielmc)-RCO2flx
+    write(124,*)'withinGrowRootAxes',I+J/24.,mass_finale(ielmc)-mass_inital(ielmc)+litrflx(ielmc)-RCO2flx,litrflx(ielmc),RCO2flx
     endif
 !
 !
