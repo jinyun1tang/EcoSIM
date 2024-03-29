@@ -232,6 +232,8 @@ implicit none
         if(I>=125 .and. NZ==2)then
         write(124,*)'GrowRootMycoAxes',I+J/24.,L,masst_finale(ielmc)-masst_inital(ielmc)+litrflxt(ielmc)-RCO2flxt
         endif
+        litrflx=litrflx+litrflxt
+        RCO2flx=RCO2flx+RCO2flxt
 !====================================================================================
 !     DRAW FROM ROOT NON-STRUCTURAL POOL WHEN
 !     SEASONAL STORAGE POOL IS DEPLETED
