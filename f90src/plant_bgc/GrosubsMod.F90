@@ -95,11 +95,11 @@ module grosubsMod
       call GrowPlant(I,J,NZ,CanopyHeight_copy)
     ENDIF
 
-    call SumPlantBiom(I,J,NZ,'bfdistb')
+!    call SumPlantBiom(I,J,NZ,'bfdistb')
 !   HARVEST STANDING DEAD
     call RemoveBiomassByDisturbance(I,J,NZ)
     
-    call SumPlantBiom(I,J,NZ,'bflvdeadtrns')
+!    call SumPlantBiom(I,J,NZ,'bflvdeadtrns')
   ENDDO D9985
 !
 ! TRANSFORMATIONS IN LIVING OR DEAD PLANT POPULATIONS
@@ -108,12 +108,6 @@ module grosubsMod
   DO NZ=1,NP
     call SumPlantBiom(I,J,NZ,'exgrosubs')
   ENDDO
-  if(I>=125)then
-  DO NZ=1,2
-    write(111,*)''
-    write(112,*)''
-  ENDDO
-  endif
   end associate
   END subroutine grosubs
 
@@ -350,24 +344,24 @@ module grosubsMod
 !     WTLFB,WTSHEB,LeafPetolBiomassC_brch=leaf,petiole,leaf+petiole mass
 !     iPlantBranchState_brch=branch living flag: 0=alive,1=dead
 !
-    call SumPlantBiom(I,J,NZ,'bfgrowpbrch')
+!    call SumPlantBiom(I,J,NZ,'bfgrowpbrch')
     
     DO  NB=1,NumOfBranches_pft(NZ)
       call GrowOneBranch(I,J,NB,NZ,TFN6_vr,CanopyHeight_copy,CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW,&
         TFN5,WFNG,Stomata_Activity,WFNS,WFNSG,PTRT,CanopyN2Fix_pft,BegRemoblize)
     ENDDO
 !
-    call SumPlantBiom(I,J,NZ,'bfRootBGCM')
+!    call SumPlantBiom(I,J,NZ,'bfRootBGCM')
     call RootBGCModel(I,J,NZ,BegRemoblize,PTRT,TFN6_vr,CNRTW,CPRTW,RootPrimeAxsNum)
 !
     call ComputeTotalBiom(I,J,NZ)
   ENDIF
 !
-  call SumPlantBiom(I,J,NZ,'bfrmbiom')
+!  call SumPlantBiom(I,J,NZ,'bfrmbiom')
   call RemoveBiomByManagement(I,J,NZ)
 !
 !     RESET DEAD BRANCHES
-  call SumPlantBiom(I,J,NZ,'bfresetdead')
+!  call SumPlantBiom(I,J,NZ,'bfresetdead')
   call ResetDeadBranch(I,J,NZ)
 !  
   call AccumulateStates(I,J,NZ,CanopyN2Fix_pft)
