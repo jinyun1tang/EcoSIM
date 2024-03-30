@@ -383,7 +383,7 @@ implicit none
   real(r8) :: CNPG
   real(r8) :: CCC,CNC,CPC
   real(r8) :: Frac2Senes2
-  real(r8) :: RootMycoNonst4Grow_Oltd(NumPlantChemElms),RootMycoNonst4Grow_OUltd(ielmn)
+  real(r8) :: RootMycoNonst4Grow_Oltd(NumPlantChemElms)
   real(r8) :: RootMycoNonst4GrowC_OUltd
   real(r8) :: RootMycoNonst4GrowC_Oltd  
   real(r8) :: DMRTR
@@ -395,7 +395,7 @@ implicit none
   real(r8) :: RootMycoNonst4Grow_OUltd(NumPlantChemElms)
   real(r8) :: Root2ndExtension
   real(r8) :: Root2ndNetGrowthElms(NumPlantChemElms)
-  real(r8) :: PPOOLB
+  real(r8) :: PPOOLB,ZPOOLB
   real(r8) :: RCO2XMaint2nd_Oltd
   real(r8) :: RGrowCO2_Oltd,RCO2T2nd_Oltd
   real(r8) :: RCO2XMaint2nd_OUltd
@@ -411,6 +411,8 @@ implicit none
   integer  :: NR,M,NE
   real(r8) :: litrflxt(NumPlantChemElms)
   real(r8) :: RCO2flxt,dfineE,dwoodyE
+  real(r8) :: mass_inital(NumPlantChemElms)
+  real(r8) :: mass_finale(NumPlantChemElms)
 
 !begin_execution
   associate(                                                                     &
@@ -475,6 +477,8 @@ implicit none
 !     PSIRoot_pvr,PSIRootTurg_vr=root total,turgor water potential
 !     DMRT=root growth yield
 !
+  call SumRootBiome(NZ,mass_inital)
+
   SoilResit4Root2ndPentrate=SoilResit4RootPentrate_vr(L)*Root2ndRadius_pvr(N,L,NZ)/1.0E-03_r8
   WFNR=AMIN1(1.0_r8,AZMAX1(PSIRootTurg_vr(N,L,NZ)-PSIMin4OrganExtens-SoilResit4Root2ndPentrate))
   IF(is_root_shallow(iPlantRootProfile_pft(NZ)))THEN
@@ -483,10 +487,9 @@ implicit none
   ELSE
     fRootGrowPSISense_vr(N,L)=EXP(0.10_r8*PSIRoot_pvr(N,L,NZ))
     WFNRG=WFNR**0.25_r8
-  ENDIF
+  ENDIF  
   !respiration fraction
   DMRTD=1.0_r8-RootBiomGrosYld_pft(NZ)
-
   TotRoot2ndLen=0._r8
   TotRoot1stLen=0._r8
   Root2ndC=0._r8
@@ -790,7 +793,7 @@ implicit none
       DO NE=1,NumPlantChemElms
         Root2ndNetGrowthElms(NE)=Root2ndNetGrowthElms(NE)-Frac2Senes2*RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ)
       ENDDO
-      write(124,*)I+J/24.,'Frac2Senes2=',Frac2Senes2
+!      write(124,*)I+J/24.,'Frac2Senes2=',Frac2Senes2
 !
 !     UPDATE STATE VARIABLES FOR SECONDARY ROOT LENGTH, C, N, P
 !     AND AXIS NUMBER
@@ -843,6 +846,10 @@ implicit none
     ENDIF
     NIXBotRootLayer_pft(NZ)=MAX(NIXBotRootLayer_pft(NZ),NIXBotRootLayer_rpft(NR,NZ))
   ENDDO D5050
+  call SumRootBiome(NZ,mass_finale)
+  if(I>=125 .and. NZ==2)then
+  write(124,*)I+J/24.,'xRootMycoAxes',L,mass_finale(ielmc)-mass_inital(ielmc)+litrflx(ielmc)-RCO2flx
+  endif
   end associate
   end subroutine GrowRootMycoAxes
 
@@ -1089,8 +1096,11 @@ implicit none
       RootMycoNonst4Grow_OUltd(ielmc)=RootMycoNonst4GrowC_OUltd*RootBiomGrosYld_pft(NZ)
       RootMycoNonst4Grow_Oltd(ielmc)=RootMycoNonst4GrowC_Oltd*RootBiomGrosYld_pft(NZ)
       RootMycoNonst4Grow_OUltd(ielmn)=AZMAX1(RootMycoNonst4Grow_OUltd(ielmc)*CNRTW)
-      RootMycoNonst4Grow_Oltd(ielmn)=AZMAX1(AMIN1(FRTN*RootMycoNonstElms_rpvr(ielmn,N,L,NZ),RootMycoNonst4Grow_Oltd(ielmc)*CNRTW))
-      RootMycoNonst4Grow_Oltd(ielmp)=AZMAX1(AMIN1(FRTN*RootMycoNonstElms_rpvr(ielmp,N,L,NZ),RootMycoNonst4Grow_Oltd(ielmc)*CPRTW))
+      RootMycoNonst4Grow_OUltd(ielmp)=AZMAX1(RootMycoNonst4Grow_OUltd(ielmc)*CPRTW)
+      RootMycoNonst4Grow_Oltd(ielmn)=AZMAX1(AMIN1(FRTN*RootMycoNonstElms_rpvr(ielmn,N,L,NZ) &
+        ,RootMycoNonst4Grow_Oltd(ielmc)*CNRTW))
+      RootMycoNonst4Grow_Oltd(ielmp)=AZMAX1(AMIN1(FRTN*RootMycoNonstElms_rpvr(ielmp,N,L,NZ) &
+        ,RootMycoNonst4Grow_Oltd(ielmc)*CPRTW))
       RCO2Nonst4Nassim_OUltd=AZMAX1(1.70_r8*RootMycoNonst4Grow_OUltd(ielmn))
       RCO2Nonst4Nassim_Oltd=AZMAX1(1.70_r8*RootMycoNonst4Grow_Oltd(ielmn))
 
@@ -1188,8 +1198,7 @@ implicit none
     call SumRootBiome(NZ,mass_finale)  
 
     if(I>=125.and.NZ==2)then
-    write(124,*)'withinGrowRootAxes',I+J/24.,mass_finale(ielmc)-mass_inital(ielmc)+litrflx(ielmc)-RCO2flx &
-      ,litrflx(ielmc),RCO2flx
+    write(124,*)'withinGrowRootAxes',I+J/24.,mass_finale(ielmc)-mass_inital(ielmc)+litrflx(ielmc)-RCO2flx
     endif
 !
     IF(L.EQ.NIXBotRootLayer_rpft(NR,NZ))THEN
