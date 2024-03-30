@@ -181,8 +181,8 @@ implicit none
     rCNNonstructRemob_pft(NZ,NY,NX)  =plt_allom%rCNNonstructRemob_pft(NZ)
     rCPNonstructRemob_pft(NZ,NY,NX)  =plt_allom%rCPNonstructRemob_pft(NZ)
     RootFracRemobilizableBiom(NZ,NY,NX) =plt_allom%RootFracRemobilizableBiom(NZ)
-    CNRTS(NZ,NY,NX) =plt_allom%CNRTS(NZ)
-    CPRTS(NZ,NY,NX) =plt_allom%CPRTS(NZ)
+    CNRTS_pft(NZ,NY,NX) =plt_allom%CNRTS_pft(NZ)
+    CPRTS_pft(NZ,NY,NX) =plt_allom%CPRTS_pft(NZ)
     ETCanopy_pft(NZ,NY,NX) =plt_ew%ETCanopy_pft(NZ)
     GrossCO2Fix_pft(NZ,NY,NX) =plt_bgcr%GrossCO2Fix_pft(NZ)
     CHILL(NZ,NY,NX) =plt_photo%CHILL(NZ)
@@ -1017,8 +1017,8 @@ implicit none
 
     plt_pheno%iPlantShootState_pft(NZ)=iPlantShootState_pft(NZ,NY,NX)
     plt_pheno%iPlantRootState_pft(NZ)=iPlantRootState_pft(NZ,NY,NX)
-    plt_allom%CNRTS(NZ)=CNRTS(NZ,NY,NX)
-    plt_allom%CPRTS(NZ)=CPRTS(NZ,NY,NX)
+    plt_allom%CNRTS_pft(NZ)=CNRTS_pft(NZ,NY,NX)
+    plt_allom%CPRTS_pft(NZ)=CPRTS_pft(NZ,NY,NX)
 
     plt_rbgc%ZEROQ(NZ)=ZEROQ(NZ,NY,NX)
     plt_pheno%SSTX(NZ)=SSTX(NZ,NY,NX)

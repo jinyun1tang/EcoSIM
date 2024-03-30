@@ -404,8 +404,8 @@ implicit none
   end type plant_soilchem_type
 
   type, public :: plant_allometry_type
-  real(r8), pointer :: CPRTS(:)    => null()  !root P:C ratio x root growth yield, [-]
-  real(r8), pointer :: CNRTS(:)    => null()  !root N:C ratio x root growth yield, [-]
+  real(r8), pointer :: CPRTS_pft(:)    => null()  !root P:C ratio x root growth yield, [-]
+  real(r8), pointer :: CNRTS_pft(:)    => null()  !root N:C ratio x root growth yield, [-]
   real(r8), pointer :: NodulerNC_pft(:)     => null()  !nodule N:C ratio, [gN gC-1]
   real(r8), pointer :: NodulerPC_pft(:)     => null()  !nodule P:C ratio, [gP gC-1]
   real(r8), pointer :: RootrNC_pft(:)     => null()  !root N:C ratio, [gN gC-1]
@@ -1172,8 +1172,8 @@ implicit none
   allocate(this%RootrPC_pft(JP1));this%RootrPC_pft=spval
   allocate(this%rCNNonstructRemob_pft(JP1));this%rCNNonstructRemob_pft=spval
   allocate(this%rCPNonstructRemob_pft(JP1));this%rCPNonstructRemob_pft=spval
-  allocate(this%CPRTS(JP1));this%CPRTS=spval
-  allocate(this%CNRTS(JP1));this%CNRTS=spval
+  allocate(this%CPRTS_pft(JP1));this%CPRTS_pft=spval
+  allocate(this%CNRTS_pft(JP1));this%CNRTS_pft=spval
   allocate(this%NodulerNC_pft(JP1));this%NodulerNC_pft=spval
   allocate(this%NodulerPC_pft(JP1));this%NodulerPC_pft=spval
   allocate(this%RootrNC_pft(JP1));this%RootrNC_pft=spval
@@ -1220,8 +1220,8 @@ implicit none
 !  if(allocated(RootrPC_pft))deallocate(RootrPC_pft)
 !  if(allocated(rCNNonstructRemob_pft))deallocate(rCNNonstructRemob_pft)
 !  if(allocated(rCPNonstructRemob_pft))deallocate(rCPNonstructRemob_pft)
-!  if(allocated(CPRTS))deallocate(CPRTS)
-!  if(allocated(CNRTS))deallocate(CNRTS)
+!  if(allocated(CPRTS_pft))deallocate(CPRTS_pft)
+!  if(allocated(CNRTS_pft))deallocate(CNRTS_pft)
 !  if(allocated(NodulerNC_pft))deallocate(NodulerNC_pft)
 !  if(allocated(NodulerPC_pft))deallocate(NodulerPC_pft)
 !  if(allocated(RootrNC_pft))deallocate(RootrNC_pft)

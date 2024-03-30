@@ -41,8 +41,8 @@ module RootDataType
   real(r8),target,allocatable ::  KmPO4Root_pft(:,:,:,:)                    !Km for root PO4 uptake, [g m-3]
   real(r8),target,allocatable ::  CMinPO4Root_pft(:,:,:,:)                    !minimum PO4 concentration for root NH4 uptake, [g m-3]
   real(r8),target,allocatable ::  RootRaidus_rpft(:,:,:,:)                     !root internal radius, [m]
-  real(r8),target,allocatable ::  CNRTS(:,:,:)                       !root N:C ratio x root growth yield, [-]
-  real(r8),target,allocatable ::  CPRTS(:,:,:)                       !root P:C ratio x root growth yield, [-]
+  real(r8),target,allocatable ::  CNRTS_pft(:,:,:)                       !root N:C ratio x root growth yield, [-]
+  real(r8),target,allocatable ::  CPRTS_pft(:,:,:)                       !root P:C ratio x root growth yield, [-]
   real(r8),target,allocatable ::  Root1stMaxRadius_pft(:,:,:,:)                    !maximum radius of primary roots, [m]
   real(r8),target,allocatable ::  Root2ndMaxRadius_pft(:,:,:,:)                    !maximum radius of secondary roots, [m]
   real(r8),target,allocatable ::  RootBranchFreq_pft(:,:,:)                        !root brancing frequency, [m-1]
@@ -125,8 +125,8 @@ contains
   allocate(KmPO4Root_pft(jroots,JP,JY,JX)); KmPO4Root_pft=0._r8
   allocate(CMinPO4Root_pft(jroots,JP,JY,JX)); CMinPO4Root_pft=0._r8
   allocate(RootRaidus_rpft(jroots,JP,JY,JX));  RootRaidus_rpft=0._r8
-  allocate(CNRTS(JP,JY,JX));    CNRTS=0._r8
-  allocate(CPRTS(JP,JY,JX));    CPRTS=0._r8
+  allocate(CNRTS_pft(JP,JY,JX));    CNRTS_pft=0._r8
+  allocate(CPRTS_pft(JP,JY,JX));    CPRTS_pft=0._r8
   allocate(RootNodulElms_pft(NumPlantChemElms,JP,JY,JX));RootNodulElms_pft=0._r8
   allocate(Root1stMaxRadius_pft(jroots,JP,JY,JX)); Root1stMaxRadius_pft=0._r8
   allocate(Root2ndMaxRadius_pft(jroots,JP,JY,JX)); Root2ndMaxRadius_pft=0._r8
@@ -207,8 +207,8 @@ contains
   call destroy(KmPO4Root_pft)
   call destroy(CMinPO4Root_pft)
   call destroy(RootRaidus_rpft)
-  call destroy(CNRTS)
-  call destroy(CPRTS)
+  call destroy(CNRTS_pft)
+  call destroy(CPRTS_pft)
   call destroy(Root1stMaxRadius_pft)
   call destroy(Root2ndMaxRadius_pft)
   call destroy(RootBranchFreq_pft)

@@ -409,7 +409,7 @@ module StartqMod
 !     SeedDepth_pft=seeding depth(m) from PFT management file
 !     CumSoilThickness=depth to soil layer bottom from surface(m)
 !     NG,NIX,NIXBotRootLayer_rpft=seeding,upper,lower rooting layer
-!     CNRTS,CPRTS=N,P root growth yield
+!     CNRTS_pft,CPRTS_pft=N,P root growth yield
 !     Root1stMaxRadius_pft,Root2ndMaxRadius_pft=maximum primary,secondary mycorrhizal radius (m)
 !     PORT=mycorrhizal porosity
 !     VmaxNH4Root_pft,KmNH4Root_pft,CMinNH4Root_pft=NH4 max uptake(g m-2 h-1),Km(uM),min concn (uM)
@@ -429,8 +429,8 @@ module StartqMod
       ENDDO D9790
     ENDIF
   ENDDO D9795  
-  CNRTS(NZ,NY,NX)=RootrNC_pft(NZ,NY,NX)*RootBiomGrosYld_pft(NZ,NY,NX)
-  CPRTS(NZ,NY,NX)=RootrPC_pft(NZ,NY,NX)*RootBiomGrosYld_pft(NZ,NY,NX)
+  CNRTS_pft(NZ,NY,NX)=RootrNC_pft(NZ,NY,NX)*RootBiomGrosYld_pft(NZ,NY,NX)
+  CPRTS_pft(NZ,NY,NX)=RootrPC_pft(NZ,NY,NX)*RootBiomGrosYld_pft(NZ,NY,NX)
   Root1stMaxRadius_pft(imycorrhz,NZ,NY,NX)=5.0E-06
   Root2ndMaxRadius_pft(imycorrhz,NZ,NY,NX)=5.0E-06
   RootPorosity_pft(imycorrhz,NZ,NY,NX)=RootPorosity_pft(1,NZ,NY,NX)
