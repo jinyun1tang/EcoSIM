@@ -1993,6 +1993,9 @@ implicit none
     enddo
     if(I>=154 .and. NZ==2)then
     write(124,*)'canpnostxfer',I+J/24.,(mass_finale(NE)-mass_inital(NE),NE=1,NumPlantChemElms)
+    if(mass_finale(ielmc)-mass_inital(ielmc)>7._r8)then
+    write(131,*)'canpnostxfer',CanopyNonstElms_brch(ielmc,1:NumOfBranches_pft(NZ),NZ)
+    endif
     endif
   ENDIF
 !=============================================================================
