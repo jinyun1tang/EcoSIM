@@ -355,6 +355,9 @@ implicit none
   subroutine GrowRootMycoAxes(I,J,N,L,L1,NZ,NRX,iRootXsUpdateFlag,TFN6_vr,&
     RootPrimeAxsNum,RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,CNRTW,CPRTW,&
     fRootGrowPSISense_vr,TotRoot2ndLen,TotRoot1stLen,Root2ndC,Root1stC,litrflx,RCO2flx)
+  !
+  !Description
+  !Grow root axes in laye L  
   implicit none
   integer , intent(in) :: I,J
   INTEGER , INTENT(IN) :: N     !root type id
@@ -380,16 +383,16 @@ implicit none
   real(r8) :: CNPG
   real(r8) :: CCC,CNC,CPC
   real(r8) :: Frac2Senes2
-  real(r8) :: ZADD1M,RootMycoNonst4Grow(NumPlantChemElms),ZADD2M
-  real(r8) :: ZPOOLB
-  real(r8) :: RootMycoNonst4Grow_OUltd
+  real(r8) :: RootMycoNonst4Grow_Oltd(NumPlantChemElms),RootMycoNonst4Grow_OUltd(ielmn)
+  real(r8) :: RootMycoNonst4GrowC_OUltd
+  real(r8) :: RootMycoNonst4GrowC_Oltd  
   real(r8) :: DMRTR
   real(r8) :: FNP
   real(r8) :: FRTN
   real(r8) :: FRCO2
   real(r8) :: FSNCM
   real(r8) :: FSNCP
-  real(r8) :: RootCYldOUltd
+  real(r8) :: RootMycoNonst4Grow_OUltd(NumPlantChemElms)
   real(r8) :: Root2ndExtension
   real(r8) :: Root2ndNetGrowthElms(NumPlantChemElms)
   real(r8) :: PPOOLB
@@ -407,7 +410,6 @@ implicit none
   real(r8) :: RCCC,RCCN,RCCP,FracRemobl
   integer  :: NR,M,NE
   real(r8) :: litrflxt(NumPlantChemElms)
-  real(r8) :: RootMycoNonst4GrowC
   real(r8) :: RCO2flxt,dfineE,dwoodyE
 
 !begin_execution
@@ -490,6 +492,7 @@ implicit none
   Root2ndC=0._r8
   Root1stC=0._r8
   litrflx=0._r8;RCO2flx=0._r8
+  !=================================================================================
   !loop through all axes 
   D5050: DO NR=1,NumRootAxes_pft(NZ)
 !
@@ -589,6 +592,7 @@ implicit none
       ELSE
         RGrowCO2_OUltd=0._r8
       ENDIF
+      !active growth
       IF(RGrowCO2_Oltd.GT.0.0)THEN
         RGrowCO2_Oltd=AMIN1(RGrowCO2_Oltd,FNP*RAutoRootO2Limter_pvr(N,L,NZ))
       ELSE
@@ -598,23 +602,26 @@ implicit none
 !     TOTAL NON-STRUCTURAL C,N,P USED IN SECONDARY ROOT GROWTH
 !     AND GROWTH RESPIRATION DEPENDS ON GROWTH YIELD ENTERED IN 'READQ'
 !
-!     RootMycoNonst4Grow_OUltd,RootMycoNonst4GrowC=total non-structural C used in growth and respn unltd,ltd by O2
+!     RootMycoNonst4GrowC_OUltd,RootMycoNonst4GrowC_Oltd=total non-structural C used in growth and respn unltd,ltd by O2
 !     RGrowCO2_OUltd,RGrowCO2_Oltd=growth respiration limited by N,P unltd,ltd by O2
 !     DMRTD=root C respiration vs nonstructural C consumption, i.e. respiration quotient
-!     RootCYldOUltd,RootMycoNonst4Grow(ielmc)=root C growth unltd,ltd by O2
+!     RootMycoNonst4Grow_OUltd(ielmc),RootMycoNonst4Grow_Oltd(ielmc)=root C growth unltd,ltd by O2
 !     RootBiomGrosYld_pft=root growth yield
-!     ZADD2M,RootMycoNonst4Grow(ielmn),RootMycoNonst4Grow(ielmp)=nonstructural N,P unlimited,limited by O2 used in growth
+!     RootMycoNonst4Grow_OUltd(ielmn),RootMycoNonst4Grow_Oltd(ielmn),RootMycoNonst4Grow_Oltd(ielmp)=nonstructural N,P unlimited,limited by O2 used in growth
 !     RCO2Nonst4Nassim_OUltd,RCO2Nonst4Nassim_Oltd=respiration for N assimilation unltd,ltd by O2
 !
-      RootMycoNonst4Grow_OUltd=RGrowCO2_OUltd/DMRTD
-      RootMycoNonst4GrowC=RGrowCO2_Oltd/DMRTD
-      RootCYldOUltd=RootMycoNonst4Grow_OUltd*RootBiomGrosYld_pft(NZ)
-      RootMycoNonst4Grow(ielmc)=RootMycoNonst4GrowC*RootBiomGrosYld_pft(NZ)
-      ZADD2M=AZMAX1(RootCYldOUltd*CNRTW)
-      RootMycoNonst4Grow(ielmn)=AZMAX1(AMIN1(FRTN*RootMycoNonstElms_rpvr(ielmn,N,L,NZ),RootMycoNonst4Grow(ielmc)*CNRTW))
-      RootMycoNonst4Grow(ielmp)=AZMAX1(AMIN1(FRTN*RootMycoNonstElms_rpvr(ielmp,N,L,NZ),RootMycoNonst4Grow(ielmc)*CPRTW))
-      RCO2Nonst4Nassim_OUltd=AZMAX1(1.70_r8*ZADD2M)
-      RCO2Nonst4Nassim_Oltd=AZMAX1(1.70_r8*RootMycoNonst4Grow(ielmn))
+      RootMycoNonst4GrowC_OUltd=RGrowCO2_OUltd/DMRTD
+      RootMycoNonst4GrowC_Oltd=RGrowCO2_Oltd/DMRTD
+      RootMycoNonst4Grow_OUltd(ielmc)=RootMycoNonst4GrowC_OUltd*RootBiomGrosYld_pft(NZ)
+      RootMycoNonst4Grow_Oltd(ielmc)=RootMycoNonst4GrowC_Oltd*RootBiomGrosYld_pft(NZ)
+      RootMycoNonst4Grow_OUltd(ielmn)=AZMAX1(RootMycoNonst4Grow_OUltd(ielmc)*CNRTW)
+      RootMycoNonst4Grow_OUltd(ielmp)=AZMAX1(RootMycoNonst4Grow_OUltd(ielmc)*CPRTW)
+      RootMycoNonst4Grow_Oltd(ielmn)=AZMAX1(AMIN1(FRTN*RootMycoNonstElms_rpvr(ielmn,N,L,NZ) &
+        ,RootMycoNonst4Grow_Oltd(ielmc)*CNRTW))
+      RootMycoNonst4Grow_Oltd(ielmp)=AZMAX1(AMIN1(FRTN*RootMycoNonstElms_rpvr(ielmp,N,L,NZ) &
+        ,RootMycoNonst4Grow_Oltd(ielmc)*CPRTW))
+      RCO2Nonst4Nassim_OUltd=AZMAX1(1.70_r8*RootMycoNonst4Grow_OUltd(ielmn))
+      RCO2Nonst4Nassim_Oltd=AZMAX1(1.70_r8*RootMycoNonst4Grow_Oltd(ielmn))
 !
 !     SECONDARY ROOT GROWTH RESPIRATION FROM TOTAL - MAINTENANCE
 !     IF > 0 DRIVES GROWTH, IF < 0 DRIVES REMOBILIZATION, ALSO
@@ -725,18 +732,18 @@ implicit none
 !     CPOOLR,ZPOOLR,PPOOLR=non-structural C,N,P mass in root
 !     Rmaint2nd_CO2=root maintenance respiration
 !     RNonstCO2_Oltd=respiration from non-structural C limited by O2
-!     RootMycoNonst4GrowC=total non-structural C used in growth and respn ltd by O2
+!     RootMycoNonst4GrowC_Oltd=total non-structural C used in growth and respn ltd by O2
 !     RCO2Nonst4Nassim_Oltd=respiration for N assimilation unltd,ltd by O2
 !     RCO2Nonst4Xmaint2nd=excess maintenance respiration ltd by O2
 !     Frac2Senes2=fraction of secondary root C to be remobilized
 !     Root2ndStrutRemob(ielmc),Root2ndStrutRemob(ielmn),Root2ndStrutRemob(ielmp)=remobilization of C,N,P from senescing root
-!     RootMycoNonst4Grow(ielmn),RootMycoNonst4Grow(ielmp)=nonstructural N,P ltd by O2 used in growth
+!     RootMycoNonst4Grow_Oltd(ielmn),RootMycoNonst4Grow_Oltd(ielmp)=nonstructural N,P ltd by O2 used in growth
 !
        if(Frac2Senes2>0._r8)then
 !      Remobilization is added to nonstrucal metabolites       
         DO NE=1,NumPlantChemElms
           RootMycoNonstElms_rpvr(NE,N,L,NZ)=RootMycoNonstElms_rpvr(NE,N,L,NZ) &
-            -RootMycoNonst4Grow(NE)+Frac2Senes2*Root2ndStrutRemob(NE)
+            -RootMycoNonst4Grow_Oltd(NE)+Frac2Senes2*Root2ndStrutRemob(NE)
         ENDDO
        endif
 
@@ -764,7 +771,7 @@ implicit none
 !     SECONDARY ROOT EXTENSION FROM ROOT GROWTH AND ROOT TURGOR
 !
 !     Root2ndExtension=secondary root length extension
-!     RootMycoNonst4Grow(ielmc)=secondary root C growth ltd by O2
+!     RootMycoNonst4Grow_Oltd(ielmc)=secondary root C growth ltd by O2
 !     Root2ndSpecLen_pft=specific secondary root length from startq.f
 !     WFNR=water function for root extension
 !     FWOOD=C,N,P woody fraction in root:0=woody,1=non-woody
@@ -772,18 +779,18 @@ implicit none
 !     Root2ndLen_pvr=secondary root length
 !     Root2ndNetGrowthElms(ielmc),Root2ndNetGrowthElms(ielmn),Root2ndNetGrowthElms(ielmp)=net root C,N,P growth
 !     WTRT2,WTRT2N,WTRT2P=secondary root C,N,P mass
-!     RootMycoNonst4Grow(ielmn),RootMycoNonst4Grow(ielmp)=nonstructural N,P ltd by O2 used in growth
+!     RootMycoNonst4Grow_Oltd(ielmn),RootMycoNonst4Grow_Oltd(ielmp)=nonstructural N,P ltd by O2 used in growth
 !
-      Root2ndExtension=RootMycoNonst4Grow(ielmc)*Root2ndSpecLen_pft(N,NZ)*WFNR*FWODRE(ielmc,k_fine_litr) &
+      Root2ndExtension=RootMycoNonst4Grow_Oltd(ielmc)*Root2ndSpecLen_pft(N,NZ)*WFNR*FWODRE(ielmc,k_fine_litr) &
         -Frac2Senes2*Root2ndLen_pvr(N,L,NR,NZ)
-      Root2ndNetGrowthElms(ielmc)=RootMycoNonst4Grow(ielmc)
-      Root2ndNetGrowthElms(ielmn)=RootMycoNonst4Grow(ielmn)
-      Root2ndNetGrowthElms(ielmp)=RootMycoNonst4Grow(ielmp)
+      Root2ndNetGrowthElms(ielmc)=RootMycoNonst4Grow_Oltd(ielmc)
+      Root2ndNetGrowthElms(ielmn)=RootMycoNonst4Grow_Oltd(ielmn)
+      Root2ndNetGrowthElms(ielmp)=RootMycoNonst4Grow_Oltd(ielmp)
 
       DO NE=1,NumPlantChemElms
         Root2ndNetGrowthElms(NE)=Root2ndNetGrowthElms(NE)-Frac2Senes2*RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ)
       ENDDO
-
+      write(124,*)I+J/24.,'Frac2Senes2=',Frac2Senes2
 !
 !     UPDATE STATE VARIABLES FOR SECONDARY ROOT LENGTH, C, N, P
 !     AND AXIS NUMBER
@@ -875,13 +882,13 @@ implicit none
   real(r8) :: RNonstCO2_OUltd,RGrowCO2_Oltd,RGrowCO2_OUltd
   real(r8) :: RNonstCO2_Oltd,RCO2XMaint1st_OUltd,RCO2XMaint1st_Oltd
   real(r8) :: DMRTR,ZPOOLB,PPOOLB,FNP
-  real(r8) :: RootMycoNonst4Grow_OUltd
-  real(r8) :: RootMycoNonst4Grow(NumPlantChemElms)
-  real(r8) :: RootCYldOUltd,ZADD1M,RCO2Nonst4Nassim_OUltd,RCO2Nonst4Nassim_Oltd
+  real(r8) :: RootMycoNonst4GrowC_OUltd
+  real(r8) :: RootMycoNonst4Grow_Oltd(NumPlantChemElms)
+  real(r8) :: RootMycoNonst4Grow_OUltd(NumPlantChemElms),RCO2Nonst4Nassim_OUltd,RCO2Nonst4Nassim_Oltd
   real(r8) :: RCO2T1st_OUltd,RCO2T1st_Oltd
   real(r8) :: FSNCM,FSNCP  
   real(r8) :: dsenecE
-  real(r8) :: RootMycoNonst4GrowC
+  real(r8) :: RootMycoNonst4GrowC_Oltd
   real(r8) :: dRootMycoElms(NumPlantChemElms)  
   real(r8) :: Root1stNetGrowthElms(NumPlantChemElms)
   real(r8) :: mass_inital(NumPlantChemElms)
@@ -1069,23 +1076,23 @@ implicit none
 !     AND GROWTH RESPIRATION DEPENDS ON GROWTH YIELD
 !     ENTERED IN 'READQ'
 !
-!     RootMycoNonst4Grow_OUltd,RootMycoNonst4GrowC=total non-structural C used in growth and respn unltd,ltd by O2
+!     RootMycoNonst4GrowC_OUltd,RootMycoNonst4GrowC_Oltd=total non-structural C used in growth and respn unltd,ltd by O2
 !     RGrowCO2_OUltd,RGrowCO2_Oltd=growth respiration limited by N,P unltd,ltd by O2
 !     DMRTD=root C respiration vs nonstructural C consumption
-!     RootCYldOUltd,RootMycoNonst4Grow(ielmc)=root C growth unltd,ltd by O2
+!     RootMycoNonst4Grow_OUltd(ielmc),RootMycoNonst4Grow_Oltd(ielmc)=root C growth unltd,ltd by O2
 !     DMRT=root growth yield
-!     ZADD1M,RootMycoNonst4Grow(ielmn),RootMycoNonst4Grow(ielmp)=nonstructural N,P unltd,ltd by O2 used in growth
+!     RootMycoNonst4Grow_OUltd(ielmn),RootMycoNonst4Grow_Oltd(ielmn),RootMycoNonst4Grow_Oltd(ielmp)=nonstructural N,P unltd,ltd by O2 used in growth
 !     RCO2Nonst4Nassim_OUltd,RCO2Nonst4Nassim_Oltd=respiration for N assimilation unltd,ltd by O2
 !
-      RootMycoNonst4Grow_OUltd=RGrowCO2_OUltd/DMRTD
-      RootMycoNonst4GrowC=RGrowCO2_Oltd/DMRTD
-      RootCYldOUltd=RootMycoNonst4Grow_OUltd*RootBiomGrosYld_pft(NZ)
-      RootMycoNonst4Grow(ielmc)=RootMycoNonst4GrowC*RootBiomGrosYld_pft(NZ)
-      ZADD1M=AZMAX1(RootCYldOUltd*CNRTW)
-      RootMycoNonst4Grow(ielmn)=AZMAX1(AMIN1(FRTN*RootMycoNonstElms_rpvr(ielmn,N,L,NZ),RootMycoNonst4Grow(ielmc)*CNRTW))
-      RootMycoNonst4Grow(ielmp)=AZMAX1(AMIN1(FRTN*RootMycoNonstElms_rpvr(ielmp,N,L,NZ),RootMycoNonst4Grow(ielmc)*CPRTW))
-      RCO2Nonst4Nassim_OUltd=AZMAX1(1.70_r8*ZADD1M)
-      RCO2Nonst4Nassim_Oltd=AZMAX1(1.70_r8*RootMycoNonst4Grow(ielmn))
+      RootMycoNonst4GrowC_OUltd=RGrowCO2_OUltd/DMRTD
+      RootMycoNonst4GrowC_Oltd=RGrowCO2_Oltd/DMRTD
+      RootMycoNonst4Grow_OUltd(ielmc)=RootMycoNonst4GrowC_OUltd*RootBiomGrosYld_pft(NZ)
+      RootMycoNonst4Grow_Oltd(ielmc)=RootMycoNonst4GrowC_Oltd*RootBiomGrosYld_pft(NZ)
+      RootMycoNonst4Grow_OUltd(ielmn)=AZMAX1(RootMycoNonst4Grow_OUltd(ielmc)*CNRTW)
+      RootMycoNonst4Grow_Oltd(ielmn)=AZMAX1(AMIN1(FRTN*RootMycoNonstElms_rpvr(ielmn,N,L,NZ),RootMycoNonst4Grow_Oltd(ielmc)*CNRTW))
+      RootMycoNonst4Grow_Oltd(ielmp)=AZMAX1(AMIN1(FRTN*RootMycoNonstElms_rpvr(ielmp,N,L,NZ),RootMycoNonst4Grow_Oltd(ielmc)*CPRTW))
+      RCO2Nonst4Nassim_OUltd=AZMAX1(1.70_r8*RootMycoNonst4Grow_OUltd(ielmn))
+      RCO2Nonst4Nassim_Oltd=AZMAX1(1.70_r8*RootMycoNonst4Grow_Oltd(ielmn))
 
 !
 !     TOTAL PRIMARY ROOT RESPIRATION
@@ -1109,7 +1116,7 @@ implicit none
       dRootMycoElms(ielmc)=dRootMycoElms(ielmc)-RCO2T1st_Oltd
 
       DO NE=1,NumPlantChemElms
-        dRootMycoElms(NE)=dRootMycoElms(NE)-RootMycoNonst4Grow(NE)
+        dRootMycoElms(NE)=dRootMycoElms(NE)-RootMycoNonst4Grow_Oltd(NE)
         RootMycoNonstElms_rpvr(NE,N,L,NZ)=RootMycoNonstElms_rpvr(NE,N,L,NZ)+dRootMycoElms(NE)
       ENDDO         
 !
@@ -1150,17 +1157,17 @@ implicit none
 !     ROOTS ON THE SAME AXIS IN THE SAME LAYER UNTIL SECONDARY ROOTS
 !     HAVE DISAPPEARED
 !
-!     RootMycoNonst4Grow(ielmc)=primary root C growth ltd by O2
+!     RootMycoNonst4Grow_Oltd(ielmc)=primary root C growth ltd by O2
 !     Root1stNetGrowthElms(ielmc),Root1stNetGrowthElms(ielmn),Root1stNetGrowthElms(ielmp)=net primary root C,N,P growth
 !     Frac2Senes1=fraction of primary root C to be remobilized
 !     RTWT1,RTWT1N,RTWT1P=primary root C,N,P mass
-!     RootMycoNonst4Grow(ielmn),RootMycoNonst4Grow(ielmp)=nonstructural N,P ltd by O2 used in growth
+!     RootMycoNonst4Grow_Oltd(ielmn),RootMycoNonst4Grow_Oltd(ielmp)=nonstructural N,P ltd by O2 used in growth
 !     WTRT2,WTRT2N,WTRT2P=secondary root C,N,P mass
 !     Root2ndLen_pvr=secondary root length
 !
-      Root1stNetGrowthElms(ielmc)=RootMycoNonst4Grow(ielmc)
-      Root1stNetGrowthElms(ielmn)=RootMycoNonst4Grow(ielmn)
-      Root1stNetGrowthElms(ielmp)=RootMycoNonst4Grow(ielmp)
+      Root1stNetGrowthElms(ielmc)=RootMycoNonst4Grow_Oltd(ielmc)
+      Root1stNetGrowthElms(ielmn)=RootMycoNonst4Grow_Oltd(ielmn)
+      Root1stNetGrowthElms(ielmp)=RootMycoNonst4Grow_Oltd(ielmp)
 
       if(Frac2Senes1>0._r8)then
       !remobilization nonzero
@@ -1174,7 +1181,7 @@ implicit none
         call Withdraw2ndRoots(N,NZ,L,NR,Root1stNetGrowthElms,litrflx)
       ENDIF
 !
-      call ExtendPrimeRoots(L,L1,N,NR,NZ,WFNR,FRTN,RootMycoNonst4Grow(ielmc),Root1stNetGrowthElms,&
+      call ExtendPrimeRoots(L,L1,N,NR,NZ,WFNR,FRTN,RootMycoNonst4Grow_Oltd(ielmc),Root1stNetGrowthElms,&
         TotRoot1stLen,Root1stC)
     ENDIF  
 
@@ -1486,12 +1493,12 @@ implicit none
 !     CPOOLR,ZPOOLR,PPOOLR=non-structural C,N,P mass in root
 !     Rmaint1st_CO2=root maintenance respiration
 !     RNonstCO2_Oltd=respiration from non-structural C limited by O2
-!     RootMycoNonst4GrowC=total non-structural C used in growth and respn ltd by O2
+!     RootMycoNonst4GrowC_Oltd=total non-structural C used in growth and respn ltd by O2
 !     RCO2Nonst4Nassim_Oltd=respiration for N assimilation unltd,ltd by O2
 !     RCO2Nonst4Xmaint1st=excess maintenance respiration ltd by O2
 !     Frac2Senes1=fraction of primary root C to be remobilized
 !     Root2ndStrutRemob(ielmc),Root2ndStrutRemob(ielmn),Root2ndStrutRemob(ielmp)=remobilization of C,N,P from senescing root
-!     RootMycoNonst4Grow(ielmn),RootMycoNonst4Grow(ielmp)=nonstructural N,P ltd by O2 used in growth
+!     RootMycoNonst4Grow_Oltd(ielmn),RootMycoNonst4Grow_Oltd(ielmp)=nonstructural N,P ltd by O2 used in growth
 !
   
   RCO2T1st_Oltd=RCO2T1st_Oltd+RCO2Nonst4Xmaint1st
@@ -1513,7 +1520,7 @@ implicit none
   integer, intent(in) :: NR   !root axis 
   integer, intent(in) :: NZ   !pft number
   real(r8), intent(in):: WFNR,FRTN
-  real(r8), intent(in) :: RootMycoNonst4Grow(NumPlantChemElms) !oxygen limited root C yield for growth
+  real(r8), intent(in) :: RootMycoNonst4Grow_Oltd(NumPlantChemElms) !oxygen limited root C yield for growth
   real(r8), intent(in) :: RootNetGrowthElms(NumPlantChemElms)
   real(r8), intent(inout) :: TotRoot1stLen,Root1stC
   real(r8) :: Root1stExtension
@@ -1551,7 +1558,7 @@ implicit none
 !     PRIMARY ROOT EXTENSION FROM ROOT GROWTH AND ROOT TURGOR
 !
 !     Root1stExtension=primary root length extension
-!     RootMycoNonst4Grow(ielmc)=primary root C growth ltd by O2
+!     RootMycoNonst4Grow_Oltd(ielmc)=primary root C growth ltd by O2
 !     Root1stSpecLen_pft=specific primary root length from startq.f
 !     PP=PFT population
 !     WFNR=water function for root extension
@@ -1565,7 +1572,7 @@ implicit none
 !     RTWT1,RTWT1N,RTWT1P=primary root C,N,P mass
 !     DLYR=soil layer thickness
 !
-  Root1stExtension=RootMycoNonst4Grow(ielmc)*Root1stSpecLen_pft(N,NZ)/PlantPopulation_pft(NZ)*WFNR*FWODRE(ielmc,k_fine_litr)
+  Root1stExtension=RootMycoNonst4Grow_Oltd(ielmc)*Root1stSpecLen_pft(N,NZ)/PlantPopulation_pft(NZ)*WFNR*FWODRE(ielmc,k_fine_litr)
   IF(RootNetGrowthElms(ielmc).LT.0.0_r8 .AND. Root1stElm_raxs(ielmc,N,NR,NZ).GT.ZEROP(NZ))THEN
     !primary roots withdraw
     Root1stExtension=Root1stExtension+RootNetGrowthElms(ielmc) &

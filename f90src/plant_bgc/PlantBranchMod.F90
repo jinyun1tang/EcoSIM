@@ -930,24 +930,24 @@ module PlantBranchMod
   real(r8) :: SNCSH
   integer :: KN  
 ! begin_execution
-  associate(                             &
-    ifoliar                         =>  pltpar%ifoliar      , &
-    istalk                          =>  pltpar%istalk       , &
-    iroot                           =>  pltpar%iroot        , &
-    inonfoliar                      =>  pltpar%inonfoliar     , &
-    icwood                          =>  pltpar%icwood       , &
-    k_fine_litr                     =>  pltpar%k_fine_litr  , &
-    k_woody_litr                    =>  pltpar%k_woody_litr , &
-    StalkRsrvElms_brch              =>  plt_biom%StalkRsrvElms_brch    , &
-    StalkStrutElms_brch             =>  plt_biom%StalkStrutElms_brch    , &
-    InternodeStrutElms_brch         =>  plt_biom%InternodeStrutElms_brch     , &
-    StalkBiomassC_brch              =>  plt_biom%StalkBiomassC_brch     , &
-    PetioleElmntNode_brch           =>  plt_biom%PetioleElmntNode_brch     , &
-    LeafElmntNode_brch              =>  plt_biom%LeafElmntNode_brch      , &
-    LeafProteinCNode_brch           =>  plt_biom%LeafProteinCNode_brch       , &
-    SeasonalNonstElms_pft                =>  plt_biom%SeasonalNonstElms_pft      , &
-    LeafStrutElms_brch              =>  plt_biom%LeafStrutElms_brch    , &
-    PetoleStrutElms_brch            =>  plt_biom%PetoleStrutElms_brch   , &
+  associate(                                                                  &
+    ifoliar                         =>  pltpar%ifoliar                      , &
+    istalk                          =>  pltpar%istalk                       , &
+    iroot                           =>  pltpar%iroot                        , &
+    inonfoliar                      =>  pltpar%inonfoliar                   , &
+    icwood                          =>  pltpar%icwood                       , &
+    k_fine_litr                     =>  pltpar%k_fine_litr                  , &
+    k_woody_litr                    =>  pltpar%k_woody_litr                 , &
+    StalkRsrvElms_brch              =>  plt_biom%StalkRsrvElms_brch         , &
+    StalkStrutElms_brch             =>  plt_biom%StalkStrutElms_brch        , &
+    InternodeStrutElms_brch         =>  plt_biom%InternodeStrutElms_brch    , &
+    StalkBiomassC_brch              =>  plt_biom%StalkBiomassC_brch         , &
+    PetioleElmntNode_brch           =>  plt_biom%PetioleElmntNode_brch      , &
+    LeafElmntNode_brch              =>  plt_biom%LeafElmntNode_brch         , &
+    LeafProteinCNode_brch           =>  plt_biom%LeafProteinCNode_brch      , &
+    SeasonalNonstElms_pft           =>  plt_biom%SeasonalNonstElms_pft      , &
+    LeafStrutElms_brch              =>  plt_biom%LeafStrutElms_brch         , &
+    PetoleStrutElms_brch            =>  plt_biom%PetoleStrutElms_brch       , &
     SenecStalkStrutElms_brch        =>  plt_biom%SenecStalkStrutElms_brch    , &
     PetioleProteinCNode_brch        =>  plt_biom%PetioleProteinCNode_brch     , &
     ZEROP                           =>  plt_biom%ZEROP      , &
@@ -3564,22 +3564,22 @@ module PlantBranchMod
   integer :: NBY,NBX,NBL
   integer  :: NBK,NE
 
-  associate(                                                          &
-    fTgrowCanP                =>  plt_pheno%fTgrowCanP              , &  
+  associate(                                                              &
+    fTgrowCanP                =>  plt_pheno%fTgrowCanP                  , &  
     iPlantTurnoverPattern_pft =>  plt_pheno%iPlantTurnoverPattern_pft   , &    
-    HoursDoingRemob_brch      =>  plt_pheno%HoursDoingRemob_brch    , &
-    KHiestGroLeafNode_brch    =>  plt_pheno%KHiestGroLeafNode_brch   , &    
-    iPlantPhenolPattern_pft=>  plt_pheno%iPlantPhenolPattern_pft   , &   
-    iPlantRootProfile_pft     =>  plt_pheno%iPlantRootProfile_pft   , &     
-    iPlantBranchState_brch    =>  plt_pheno%iPlantBranchState_brch    , &
-    KLowestGroLeafNode_brch   =>  plt_pheno%KLowestGroLeafNode_brch   , &    
-    NumOfBranches_pft         =>  plt_morph%NumOfBranches_pft     , &    
-    MainBranchNum_pft         =>  plt_morph%MainBranchNum_pft      , &         
-    BranchNumber_brch         =>  plt_morph%BranchNumber_brch    , &        
-    CanopyNonstElms_brch         =>  plt_biom%CanopyNonstElms_brch    , &   
-    LeafPetolBiomassC_brch    =>  plt_biom%LeafPetolBiomassC_brch     , &        
-    StalkRsrvElms_brch       =>  plt_biom%StalkRsrvElms_brch   , &      
-    ZEROP                     =>  plt_biom%ZEROP       &  
+    HoursDoingRemob_brch      =>  plt_pheno%HoursDoingRemob_brch        , &
+    KHiestGroLeafNode_brch    =>  plt_pheno%KHiestGroLeafNode_brch      , &    
+    iPlantPhenolPattern_pft   =>  plt_pheno%iPlantPhenolPattern_pft     , &   
+    iPlantRootProfile_pft     =>  plt_pheno%iPlantRootProfile_pft       , &     
+    iPlantBranchState_brch    =>  plt_pheno%iPlantBranchState_brch      , &
+    KLowestGroLeafNode_brch   =>  plt_pheno%KLowestGroLeafNode_brch     , &    
+    NumOfBranches_pft         =>  plt_morph%NumOfBranches_pft           , &    
+    MainBranchNum_pft         =>  plt_morph%MainBranchNum_pft           , &         
+    BranchNumber_brch         =>  plt_morph%BranchNumber_brch           , &        
+    CanopyNonstElms_brch      =>  plt_biom%CanopyNonstElms_brch         , &   
+    LeafPetolBiomassC_brch    =>  plt_biom%LeafPetolBiomassC_brch       , &        
+    StalkRsrvElms_brch        =>  plt_biom%StalkRsrvElms_brch           , &      
+    ZEROP                     =>  plt_biom%ZEROP                          &  
   ) 
   !     REMOBILIZATION OF STALK RESERVE C,N,P IF GROWTH RESPIRATION < 0
 
