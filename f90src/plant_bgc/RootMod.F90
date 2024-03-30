@@ -863,7 +863,7 @@ implicit none
     NIXBotRootLayer_pft(NZ)=MAX(NIXBotRootLayer_pft(NZ),NIXBotRootLayer_rpft(NR,NZ))
     call SumRootBiome(NZ,mass_finale,massr1st,massr2nd,massnonst,massnodul)
     if(I>=154 .and. NZ==2)then
-    write(124,*)I+J/24.,'xRootMycoAxes',L,NR,N,mass_finale(ielmc)-mass_inital(ielmc)+litrflx(ielmc)-RCO2flx
+    write(124,*)I+J/24.,'xRootMycoAxes0',L,NR,N,mass_finale(ielmc)-mass_inital(ielmc)+litrflx(ielmc)-RCO2flx
     write(125,*)I+J/24.,'xRootMycoAxes1',L,NR,N,massr1st(ielmc)-massr1st1(ielmc) &
       ,massr2nd(ielmc)-massr2nd1(ielmc),massnonst(ielmc)-massnonst1(ielmc)
     write(125,*)I+J/24.,'xRootMycoAxes2',L,NR,N,litrflx(ielmc),Root2ndNetGrowthElms(ielmc),RCO2flx
