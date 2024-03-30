@@ -16,7 +16,7 @@ module RootDataType
   integer,target,allocatable ::  NIXBotRootLayer_pft(:,:,:)              !maximum soil layer number for all root axes, [-]
   integer,target,allocatable ::  MaxSoiL4Root(:,:,:)                           !maximum soil layer number for all root axes, [-]
   real(r8),target,allocatable :: RootElmsbeg_pft(:,:,:,:)            !root biomass per pft
-  real(r8),target,allocatable ::  RootBiomGrowthYield(:,:,:)                        !root growth yield, [g g-1]
+  real(r8),target,allocatable ::  RootBiomGrosYld_pft(:,:,:)                        !root growth yield, [g g-1]
   real(r8),target,allocatable ::  MinNonstructuralC4InitRoot_pft(:,:,:)                          !threshold root nonstructural C content for initiating new root axis, [g g-1]
   real(r8),target,allocatable ::  RootFracRemobilizableBiom(:,:,:)                       !fraction of remobilizable nonstructural biomass in root, [-]
   real(r8),target,allocatable ::  RootVolPerMassC_pft(:,:,:,:)                      !root volume:mass ratio, [m3 g-1]
@@ -100,7 +100,7 @@ contains
   allocate(NIXBotRootLayer_pft(JP,JY,JX));      NIXBotRootLayer_pft=0
   allocate(MaxSoiL4Root(JP,JY,JX));       MaxSoiL4Root=0
   allocate(RootElmsbeg_pft(NumPlantChemElms,JP,JY,JX)); RootElmsbeg_pft=0._r8
-  allocate(RootBiomGrowthYield(JP,JY,JX));     RootBiomGrowthYield=0._r8
+  allocate(RootBiomGrosYld_pft(JP,JY,JX));     RootBiomGrosYld_pft=0._r8
   allocate(MinNonstructuralC4InitRoot_pft(JP,JY,JX));       MinNonstructuralC4InitRoot_pft=0._r8
   allocate(RootFracRemobilizableBiom(JP,JY,JX));    RootFracRemobilizableBiom=0._r8
   allocate(RootVolPerMassC_pft(jroots,JP,JY,JX));   RootVolPerMassC_pft=0._r8
@@ -182,7 +182,7 @@ contains
   call destroy(NIXBotRootLayer_pft)
   call destroy(MaxSoiL4Root)
   call destroy(RootElmsbeg_pft)
-  call destroy(RootBiomGrowthYield)
+  call destroy(RootBiomGrosYld_pft)
   call destroy(MinNonstructuralC4InitRoot_pft)
   call destroy(RootFracRemobilizableBiom)
   call destroy(RootVolPerMassC_pft)

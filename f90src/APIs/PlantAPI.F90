@@ -827,7 +827,7 @@ implicit none
     plt_allom%HuskBiomGrowthYield(NZ)=HuskBiomGrowthYield(NZ,NY,NX)
     plt_allom%EarBiomGrowthYield(NZ)=EarBiomGrowthYield(NZ,NY,NX)
     plt_allom%GrainBiomGrowthYield(NZ) =GrainBiomGrowthYield(NZ,NY,NX)
-    plt_allom%RootBiomGrowthYield(NZ) =RootBiomGrowthYield(NZ,NY,NX)
+    plt_allom%RootBiomGrosYld_pft(NZ) =RootBiomGrosYld_pft(NZ,NY,NX)
     plt_allom%NoduGrowthYield_pft(NZ) =NoduGrowthYield_pft(NZ,NY,NX)
     plt_allom%CNLF(NZ) =CNLF(NZ,NY,NX)
     plt_allom%CNSHE(NZ)=CNSHE(NZ,NY,NX)

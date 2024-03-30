@@ -105,7 +105,7 @@ module PlantBranchMod
     rCNNonstructRemob_pft        =>  plt_allom%rCNNonstructRemob_pft    , &
     rCPNonstructRemob_pft        =>  plt_allom%rCPNonstructRemob_pft     , &
     rNCReserve_pft               =>  plt_allom%rNCReserve_pft    , &
-    RootBiomGrowthYield          =>  plt_allom%RootBiomGrowthYield     , &
+    RootBiomGrosYld_pft          =>  plt_allom%RootBiomGrosYld_pft     , &
     FNOD                         =>  plt_allom%FNOD     , &
     StalkStrutElms_brch          =>  plt_biom%StalkStrutElms_brch   , &
     StalkRsrvElms_brch           =>  plt_biom%StalkRsrvElms_brch   , &
@@ -179,8 +179,8 @@ module PlantBranchMod
       CPLFB=CPLFW
       CPSHB=CPSHW
     ELSE
-      DMLFB=RootBiomGrowthYield(NZ)
-      DMSHB=RootBiomGrowthYield(NZ)
+      DMLFB=RootBiomGrosYld_pft(NZ)
+      DMSHB=RootBiomGrosYld_pft(NZ)
       CNLFB=CNRTW
       CNSHB=CNRTW
       CPLFB=CPRTW

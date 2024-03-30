@@ -444,7 +444,7 @@ module StartqsMod
   associate(                             &
     CNRTS                     =>  plt_allom%CNRTS   , &
     CPRTS                     =>  plt_allom%CPRTS   , &
-    RootBiomGrowthYield       =>  plt_allom%RootBiomGrowthYield    , &
+    RootBiomGrosYld_pft       =>  plt_allom%RootBiomGrosYld_pft    , &
     RootrNC_pft               =>  plt_allom%RootrNC_pft   , &
     RootrPC_pft               =>  plt_allom%RootrPC_pft   , &
     CMinPO4Root_pft           =>  plt_rbgc%CMinPO4Root_pft   , &
@@ -515,8 +515,8 @@ module StartqsMod
       ENDDO D9790
     ENDIF
   ENDDO D9795
-  CNRTS(NZ)=RootrNC_pft(NZ)*RootBiomGrowthYield(NZ)
-  CPRTS(NZ)=RootrPC_pft(NZ)*RootBiomGrowthYield(NZ)
+  CNRTS(NZ)=RootrNC_pft(NZ)*RootBiomGrosYld_pft(NZ)
+  CPRTS(NZ)=RootrPC_pft(NZ)*RootBiomGrosYld_pft(NZ)
   Root1stMaxRadius_pft(2,NZ)=5.0E-06_r8
   Root2ndMaxRadius_pft(2,NZ)=5.0E-06_r8
   RootPorosity_pft(2,NZ)=RootPorosity_pft(1,NZ)

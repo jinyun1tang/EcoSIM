@@ -413,7 +413,7 @@ implicit none
   real(r8), pointer :: rCNNonstructRemob_pft(:)     => null()  !C:N ratio in remobilizable nonstructural biomass, [-]
   real(r8), pointer :: rCPNonstructRemob_pft(:)     => null()  !C:P ratio in remobilizable nonstructural biomass, [-]
   real(r8), pointer :: NoduGrowthYield_pft(:)     => null()  !nodule growth yield, [g g-1]
-  real(r8), pointer :: RootBiomGrowthYield(:)     => null()  !root growth yield, [g g-1]
+  real(r8), pointer :: RootBiomGrosYld_pft(:)     => null()  !root growth yield, [g g-1]
   real(r8), pointer :: rPCEar_pft(:)    => null()  !ear P:C ratio, [gP gC-1]
   real(r8), pointer :: PetioleBiomGrowthYield(:)    => null()  !sheath growth yield, [g g-1]
   real(r8), pointer :: rPCHusk_pft(:)    => null()  !husk P:C ratio, [gP gC-1]
@@ -1168,7 +1168,7 @@ implicit none
   allocate(this%FNOD(JP1));this%FNOD=spval
   allocate(this%GrainSeedBiomCMean_brch(MaxNumBranches,JP1));this%GrainSeedBiomCMean_brch=spval
   allocate(this%NoduGrowthYield_pft(JP1));this%NoduGrowthYield_pft=spval
-  allocate(this%RootBiomGrowthYield(JP1));this%RootBiomGrowthYield=spval
+  allocate(this%RootBiomGrosYld_pft(JP1));this%RootBiomGrosYld_pft=spval
   allocate(this%RootrPC_pft(JP1));this%RootrPC_pft=spval
   allocate(this%rCNNonstructRemob_pft(JP1));this%rCNNonstructRemob_pft=spval
   allocate(this%rCPNonstructRemob_pft(JP1));this%rCPNonstructRemob_pft=spval
@@ -1216,7 +1216,7 @@ implicit none
 !  if(allocated(FNOD))deallocate(FNOD)
 !  if(allocated(GrainSeedBiomCMean_brch))deallocate(GrainSeedBiomCMean_brch)
 !  if(allocated(NoduGrowthYield_pft))deallocate(NoduGrowthYield_pft)
-!  if(allocated(RootBiomGrowthYield))deallocate(RootBiomGrowthYield)
+!  if(allocated(RootBiomGrosYld_pft))deallocate(RootBiomGrosYld_pft)
 !  if(allocated(RootrPC_pft))deallocate(RootrPC_pft)
 !  if(allocated(rCNNonstructRemob_pft))deallocate(rCNNonstructRemob_pft)
 !  if(allocated(rCPNonstructRemob_pft))deallocate(rCPNonstructRemob_pft)

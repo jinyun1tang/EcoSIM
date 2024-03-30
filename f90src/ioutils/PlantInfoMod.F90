@@ -476,7 +476,7 @@ implicit none
   call ncd_getvar(pft_nfid, 'DMHSK', loc,HuskBiomGrowthYield(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'DMEAR', loc,EarBiomGrowthYield(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'DMGR', loc,GrainBiomGrowthYield(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'DMRT', loc,RootBiomGrowthYield(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'DMRT', loc,RootBiomGrosYld_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'DMND', loc,NoduGrowthYield_pft(NZ,NY,NX))
 
   call ncd_getvar(pft_nfid, 'CNLF', loc,CNLF(NZ,NY,NX))
@@ -864,7 +864,7 @@ implicit none
   call writefixl(nu_plt,'grain C production vs nonstructural C'// &
     ' consumption (g g-1) DMGR',GrainBiomGrowthYield(NZ,NY,NX),101)
   call writefixl(nu_plt,'root dry matter C production vs nonstructural C'// &
-    ' consumption (g g-1) DMRT',RootBiomGrowthYield(NZ,NY,NX),101)
+    ' consumption (g g-1) DMRT',RootBiomGrosYld_pft(NZ,NY,NX),101)
   call writefixl(nu_plt,'nodule bacteria in root, canopy dry matter '// &
     'C production vs nonstructural C consumption (g g-1) DMND' &
     ,NoduGrowthYield_pft(NZ,NY,NX),101)
