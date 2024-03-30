@@ -65,6 +65,8 @@ implicit none
 !     ADD SEED DIMENSIONS TO ROOT DIMENSIONS (ONLY IMPORTANT DURING
 !     GERMINATION)
 !
+  call SumRootBiome(NZ,mass_inital)
+
 !  if(NZ==1)THEN
 !    WRITE(33,*)'ROOTL',RootLenPerPlant_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ),SeedMeanLen_pft(NZ)
 !  ELSE
@@ -93,7 +95,6 @@ implicit none
     iPlantShootState_pft(NZ)=iDead
   ENDIF
 !
-  call SumRootBiome(NZ,mass_inital)
 !     ROOT N2 FIXATION (RHIZOBIA)
   call RootNodulBiochemistry(I,J,NZ,TFN6_vr,fRootGrowPSISense_vr)
 
@@ -235,6 +236,7 @@ implicit none
         litrflx=litrflx+litrflxt
         RCO2flx=RCO2flx+RCO2flxt
 !====================================================================================
+        masst_inital=masst_finale
 !     DRAW FROM ROOT NON-STRUCTURAL POOL WHEN
 !     SEASONAL STORAGE POOL IS DEPLETED
 !
@@ -330,6 +332,10 @@ implicit none
           trcg_rootml_pvr(idg_beg:idg_end-1,N,L,NZ)=0._r8
           trcs_rootml_pvr(idg_beg:idg_end-1,N,L,NZ)=0._r8
         ENDIF
+        call SumRootBiome(NZ,masst_finale)
+        if(I>=125 .and. NZ==2)then
+          write(124,*)'GrowRootMycoAxes2',I+J/24.,L,masst_finale(ielmc)-masst_inital(ielmc)
+        endif
       ENDIF
     ENDDO D5000
   ENDDO D5010
@@ -865,7 +871,7 @@ implicit none
   real(r8) :: WFNR,WFNRG
   real(r8) :: SoilResit4PrimRootPentration  
   real(r8) :: CNPG,TFRCO2,FRCO2  
-  real(r8) :: Rmaint1st_CO2,RootMycoNonst4Grow(ielmc)
+  real(r8) :: Rmaint1st_CO2
   real(r8) :: RNonstCO2_OUltd,RGrowCO2_Oltd,RGrowCO2_OUltd
   real(r8) :: RNonstCO2_Oltd,RCO2XMaint1st_OUltd,RCO2XMaint1st_Oltd
   real(r8) :: DMRTR,ZPOOLB,PPOOLB,FNP
@@ -1497,7 +1503,7 @@ implicit none
   end subroutine RemobilizePrimeRoots
 
 !------------------------------------------------------------------------------------------
-  subroutine ExtendPrimeRoots(L,L1,N,NR,NZ,WFNR,FRTN,RootMycoNonst4Grow(ielmc),RootNetGrowthElms,&
+  subroutine ExtendPrimeRoots(L,L1,N,NR,NZ,WFNR,FRTN,RootMycoNonst4Grow,RootNetGrowthElms,&
     TotRoot1stLen,Root1stC)
   !
   !
@@ -1507,7 +1513,7 @@ implicit none
   integer, intent(in) :: NR   !root axis 
   integer, intent(in) :: NZ   !pft number
   real(r8), intent(in):: WFNR,FRTN
-  real(r8), intent(in) :: RootMycoNonst4Grow(ielmc) !oxygen limited root C yield for growth
+  real(r8), intent(in) :: RootMycoNonst4Grow(NumPlantChemElms) !oxygen limited root C yield for growth
   real(r8), intent(in) :: RootNetGrowthElms(NumPlantChemElms)
   real(r8), intent(inout) :: TotRoot1stLen,Root1stC
   real(r8) :: Root1stExtension
