@@ -1945,9 +1945,7 @@ implicit none
 !     CPOOL,ZPOOL,PPOOL=non-structural C,N,P mass in branch
 !
   IF(NumOfBranches_pft(NZ).GT.1)THEN
-    DO NE=1,NumPlantChemElms
-      mass_inital(NE)=SUM(CanopyNonstElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
-    enddo
+
     TwoCompMassC=0._r8
     TotNonstElm_loc(1:NumPlantChemElms)=0._r8
     D300: DO NB=1,NumOfBranches_pft(NZ)
@@ -1964,7 +1962,9 @@ implicit none
     ENDDO D300
 
     !!Nonst check
-
+    DO NE=1,NumPlantChemElms
+      mass_inital(NE)=SUM(CanopyNonstElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
+    enddo
     !
     D305: DO NB=1,NumOfBranches_pft(NZ)
       IF(iPlantBranchState_brch(NB,NZ).EQ.iLive)THEN
