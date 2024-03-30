@@ -799,7 +799,7 @@ implicit none
         Root2ndExtension=Root2ndExtension-Frac2Senes2*Root2ndLen_pvr(N,L,NR,NZ)
         DO NE=1,NumPlantChemElms
           Root2ndNetGrowthElms(NE)=Root2ndNetGrowthElms(NE)-Remobl2ndelm(NE)
-          dmass(E)=dmass(E)+Remobl2ndelm(NE)
+          dmass(NE)=dmass(NE)+Remobl2ndelm(NE)
         ENDDO
       endif
 !      write(124,*)I+J/24.,'Frac2Senes2=',Frac2Senes2
@@ -854,14 +854,11 @@ implicit none
       Root1stC=Root1stC+RootMyco1stStrutElms_rpvr(ielmc,N,L,NR,NZ)
     ENDIF
     NIXBotRootLayer_pft(NZ)=MAX(NIXBotRootLayer_pft(NZ),NIXBotRootLayer_rpft(NR,NZ))
+    call SumRootBiome(NZ,mass_finale)
     if(I>=125 .and. NZ==2)then
-    write(124,*)I+J/24.,'dmass=',dmass
+    write(124,*)I+J/24.,'xRootMycoAxes',L,NR,mass_finale(ielmc)-mass_inital(ielmc)+litrflx(ielmc)-RCO2flx
     endif
   ENDDO D5050
-  call SumRootBiome(NZ,mass_finale)
-  if(I>=125 .and. NZ==2)then
-  write(124,*)I+J/24.,'xRootMycoAxes',L,mass_finale(ielmc)-mass_inital(ielmc)+litrflx(ielmc)-RCO2flx
-  endif
   end associate
   end subroutine GrowRootMycoAxes
 
