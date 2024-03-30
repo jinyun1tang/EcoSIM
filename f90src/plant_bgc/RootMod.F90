@@ -754,12 +754,16 @@ implicit none
 !     Root2ndStrutRemob(ielmc),Root2ndStrutRemob(ielmn),Root2ndStrutRemob(ielmp)=remobilization of C,N,P from senescing root
 !     RootMycoNonst4Grow_Oltd(ielmn),RootMycoNonst4Grow_Oltd(ielmp)=nonstructural N,P ltd by O2 used in growth
 !
+        DO NE=1,NumPlantChemElms
+          RootMycoNonstElms_rpvr(NE,N,L,NZ)=RootMycoNonstElms_rpvr(NE,N,L,NZ)-RootMycoNonst4Grow_Oltd(NE)
+          dmass(NE)=dmass(NE)+RootMycoNonst4Grow_Oltd(NE)
+        ENDDO
+
        if(Frac2Senes2>0._r8)then
 !      Remobilization is added to nonstrucal metabolites       
         DO NE=1,NumPlantChemElms
-          RootMycoNonstElms_rpvr(NE,N,L,NZ)=RootMycoNonstElms_rpvr(NE,N,L,NZ) &
-            -RootMycoNonst4Grow_Oltd(NE)+Remobl2ndcycl(NE)
-          dmass(NE)=dmass(NE)+RootMycoNonst4Grow_Oltd(NE)-Remobl2ndcycl(NE)
+          RootMycoNonstElms_rpvr(NE,N,L,NZ)=RootMycoNonstElms_rpvr(NE,N,L,NZ)+Remobl2ndcycl(NE)
+          dmass(NE)=dmass(NE)-Remobl2ndcycl(NE)
         ENDDO
        endif
 
@@ -860,9 +864,9 @@ implicit none
     call SumRootBiome(NZ,mass_finale,massr1st,massr2nd,massnonst,massnodul)
     if(I>=125 .and. NZ==2)then
     write(124,*)I+J/24.,'xRootMycoAxes',L,NR,N,mass_finale(ielmc)-mass_inital(ielmc)+litrflx(ielmc)-RCO2flx
-    write(125,*)I+J/24.,'xRootMycoAxes',L,NR,N,massr1st(ielmc)-massr1st1(ielmc) &
+    write(125,*)I+J/24.,'xRootMycoAxes1',L,NR,N,massr1st(ielmc)-massr1st1(ielmc) &
       ,massr2nd(ielmc)-massr2nd1(ielmc),massnonst(ielmc)-massnonst1(ielmc)
-    write(125,*)I+J/24.,'xRootMycoAxes',L,NR,N,litrflx(ielmc),Root2ndNetGrowthElms(ielmc),RCO2flx
+    write(125,*)I+J/24.,'xRootMycoAxes2',L,NR,N,litrflx(ielmc),Root2ndNetGrowthElms(ielmc),RCO2flx
     endif
   ENDDO D5050
   end associate
