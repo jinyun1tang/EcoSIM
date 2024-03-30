@@ -95,7 +95,7 @@ implicit none
   balc=RootElms_pft(ielmc,NZ)+ShootElms_pft(ielmc,NZ)-RootElmsBeg_pft(ielmc,NZ)-ShootElmsBeg_pft(ielmc,NZ)&
     -GrossCO2Fix_pft(NZ)-GrossResp_pft(NZ)+LitrfalStrutElms_pft(ielmc,NZ)-NodulInfectElms_pft(ielmc,NZ) &
     -RootMycoExudElms_pft(ielmc,NZ)
-  if(I>=125)then
+  if(I>=154)then
   if(NZ==1)THEN
     WRITE(111,*)I+J/24.,trim(header)//' BALC=',BALC,SeasonalNonstElms_pft(ielmc,NZ)&
       ,RootElmsbeg_pft(ielmc,NZ),ShootElmsbeg_pft(ielmc,NZ)
@@ -220,7 +220,7 @@ implicit none
 
   call SumRootBiome(NZ,RootElms_pft(:,NZ))
 
-  if(I>=125)then
+  if(I>=154)then
   if(NZ==1)then
     if(lfile(NZ))then
       write(243,'(A14,X,A13,6(X,A16))')'header','doy','rootC','shootC','rootN','shootN','rootP','shootP'

@@ -100,7 +100,7 @@ implicit none
 
   call SumRootBiome(NZ,mass_finale)
   
-  if(I>=125 .and. NZ==2)then
+  if(I>=154 .and. NZ==2)then
   write(124,*)'rootbgc',I+J/24.,mass_finale(ielmc)-mass_inital(ielmc)
   endif
 
@@ -230,7 +230,7 @@ implicit none
           RootPrimeAxsNum,RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,CNRTW,CPRTW,&
           fRootGrowPSISense_vr,TotRoot2ndLen,TotRoot1stLen,Root2ndC,Root1stC,litrflxt,RCO2flxt)
         call SumRootBiome(NZ,masst_finale)
-        if(I>=125 .and. NZ==2)then
+        if(I>=154 .and. NZ==2)then
         write(124,*)'GrowRootMycoAxes',I+J/24.,L,masst_finale(ielmc)-masst_inital(ielmc)+litrflxt(ielmc)-RCO2flxt
         endif
         litrflx=litrflx+litrflxt
@@ -333,7 +333,7 @@ implicit none
           trcs_rootml_pvr(idg_beg:idg_end-1,N,L,NZ)=0._r8
         ENDIF
         call SumRootBiome(NZ,masst_finale)
-        if(I>=125 .and. NZ==2)then
+        if(I>=154 .and. NZ==2)then
           write(124,*)'GrowRootMycoAxes2',I+J/24.,L,masst_finale(ielmc)-masst_inital(ielmc)
         endif
       ENDIF
@@ -342,7 +342,7 @@ implicit none
 
   call SumRootBiome(NZ,mass_finale)
   mass_finale(ielmc)=mass_finale(ielmc)+SeasonalNonstElms_pft(ielmc,NZ)
-  if(I>=125)then
+  if(I>=154)then
   if(NZ==2)THEN  
     WRITE(124,*)'rootmodel',I+J/24.,mass_finale(ielmc)-mass_inital(ielmc)+litrflx(ielmc)-RCO2flx
   ENDIF
@@ -862,7 +862,7 @@ implicit none
     ENDIF
     NIXBotRootLayer_pft(NZ)=MAX(NIXBotRootLayer_pft(NZ),NIXBotRootLayer_rpft(NR,NZ))
     call SumRootBiome(NZ,mass_finale,massr1st,massr2nd,massnonst,massnodul)
-    if(I>=125 .and. NZ==2)then
+    if(I>=154 .and. NZ==2)then
     write(124,*)I+J/24.,'xRootMycoAxes',L,NR,N,mass_finale(ielmc)-mass_inital(ielmc)+litrflx(ielmc)-RCO2flx
     write(125,*)I+J/24.,'xRootMycoAxes1',L,NR,N,massr1st(ielmc)-massr1st1(ielmc) &
       ,massr2nd(ielmc)-massr2nd1(ielmc),massnonst(ielmc)-massnonst1(ielmc)
@@ -1214,7 +1214,7 @@ implicit none
 
     call SumRootBiome(NZ,mass_finale)  
 
-    if(I>=125.and.NZ==2)then
+    if(I>=154.and.NZ==2)then
     write(124,*)'withinGrowRootAxes',I+J/24.,mass_finale(ielmc)-mass_inital(ielmc)+litrflx(ielmc)-RCO2flx
     endif
 !
@@ -1250,7 +1250,7 @@ implicit none
     NIXBotRootLayer_rpft(NR,NZ)=MIN(NIXBotRootLayer_rpft(NR,NZ),MaxNumRootLays)
     IF(L.EQ.NIXBotRootLayer_rpft(NR,NZ))NRX(N,NR)=itrue
     call SumRootBiome(NZ,mass_finale)  
-    if(I>=125.and.NZ==2)then
+    if(I>=154.and.NZ==2)then
     write(124,*)'endGrowRootAxes',I+J/24.,mass_finale(ielmc)-mass_inital(ielmc)+litrflx(ielmc)-RCO2flx
     endif
   ENDIF
@@ -1991,7 +1991,7 @@ implicit none
     DO NE=1,NumPlantChemElms
       mass_finale(NE)=SUM(CanopyNonstElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
     enddo
-    if(I>=125 .and. NZ==2)then
+    if(I>=154 .and. NZ==2)then
     write(124,*)'canpnostxfer',I+J/24.,(mass_finale(NE)-mass_inital(NE),NE=1,NumPlantChemElms)
     endif
   ENDIF
@@ -2046,7 +2046,7 @@ implicit none
     DO NE=1,NumPlantChemElms
       mass_finale(NE)=sum(StalkRsrvElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
     ENDDO
-    if(I>=125 .and. NZ==2)then
+    if(I>=154 .and. NZ==2)then
     write(124,*)'stalkrsvxfer',I+J/24.,(mass_finale(NE)-mass_inital(NE),NE=1,NumPlantChemElms)    
     endif
   ENDIF
@@ -2100,7 +2100,7 @@ implicit none
     DO NE=1,NumPlantChemElms
       mass_finale(NE)=sum(RootMycoNonstElms_rpvr(NE,1:MY(NZ),NU:NIXBotRootLayer_pft(NZ),NZ))
     ENDDO
-    if(I>=125 .and. NZ==2)then
+    if(I>=154 .and. NZ==2)then
     write(124,*)'rootmycoxfer',I+J/24.,(mass_finale(NE)-mass_inital(NE),NE=1,NumPlantChemElms)    
     endif
   ENDIF
@@ -2144,7 +2144,7 @@ implicit none
     DO NE=1,NumPlantChemElms
       mass_finale(NE)=sum(RootMycoNonstElms_rpvr(NE,1:MY(NZ),NU:MaxSoiL4Root(NZ),NZ))+SeasonalNonstElms_pft(NE,NZ)
     ENDDO
-    if(I>=125 .and. NZ==2)then
+    if(I>=154 .and. NZ==2)then
     write(124,*)'rootmycossnxfer',I+J/24.,(mass_finale(NE)-mass_inital(NE),NE=1,NumPlantChemElms)    
     endif
   ENDIF
@@ -2307,7 +2307,7 @@ implicit none
     mass_finale(NE)=sum(RootMycoNonstElms_rpvr(NE,1:MY(NZ),NU:MaxSoiL4Root(NZ),NZ)) &
       +SUM(CanopyNonstElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
   ENDDO
-  if(I>=125 .and. NZ==2)then
+  if(I>=154 .and. NZ==2)then
   write(124,*)'rootshootxfer',I+J/24.,(mass_finale(NE)-mass_inital(NE),NE=1,NumPlantChemElms)    
   endif
   end associate
@@ -2510,7 +2510,7 @@ implicit none
   ENDDO D4995
 
   call SumRootBiome(NZ,mass_finale)
-  if(I>=125 .and. NZ==2)then
+  if(I>=154 .and. NZ==2)then
   write(124,*)'SummarizeRootSink',I+J/24.,mass_finale(ielmc)-mass_inital(ielmc)-RCO2flx
   endif
   end associate
