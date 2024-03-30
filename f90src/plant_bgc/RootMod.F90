@@ -416,6 +416,10 @@ implicit none
   real(r8) :: Remobl2ndcycl(NumPlantChemElms)
   real(r8) :: Remobl2ndelm(NumPlantChemElms)
   real(r8) :: dmass(NumPlantChemElms)
+  real(r8) :: massr1st(NumPlantChemElms)
+  real(r8) :: massr2nd(NumPlantChemElms)
+  real(r8) :: massnonst(NumPlantChemElms)
+  real(r8) :: massnodul(NumPlantChemElms)  
 !begin_execution
   associate(                                                                     &
     RootMyco2ndStrutElms_rpvr       =>  plt_biom%RootMyco2ndStrutElms_rpvr     , &
@@ -818,8 +822,7 @@ implicit none
 !
       Root2ndLen_pvr(N,L,NR,NZ)=Root2ndLen_pvr(N,L,NR,NZ)+Root2ndExtension
       DO NE=1,NumPlantChemElms
-        RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ)=RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ) &
-          +Root2ndNetGrowthElms(NE)
+        RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ)=RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ)+Root2ndNetGrowthElms(NE)
       ENDDO
       RootProteinC_pvr(N,L,NZ)=RootProteinC_pvr(N,L,NZ)+AMIN1(rCNNonstructRemob_pft(NZ) &
         *RootMyco2ndStrutElms_rpvr(ielmn,N,L,NR,NZ) &
@@ -854,9 +857,10 @@ implicit none
       Root1stC=Root1stC+RootMyco1stStrutElms_rpvr(ielmc,N,L,NR,NZ)
     ENDIF
     NIXBotRootLayer_pft(NZ)=MAX(NIXBotRootLayer_pft(NZ),NIXBotRootLayer_rpft(NR,NZ))
-    call SumRootBiome(NZ,mass_finale)
+    call SumRootBiome(NZ,mass_finale,massr1st,massr2nd,massnonst,massnodul)
     if(I>=125 .and. NZ==2)then
-    write(124,*)I+J/24.,'xRootMycoAxes',L,NR,mass_finale(ielmc)-mass_inital(ielmc)+litrflx(ielmc)-RCO2flx
+    write(124,*)I+J/24.,'xRootMycoAxes',L,NR,N,mass_finale(ielmc)-mass_inital(ielmc)+litrflx(ielmc)-RCO2flx
+    write(125,*)I+J/24.,'xRootMycoAxes',L,NR,N,massr1st(ielmc),massr2nd(ielmc),massnonst(ielmc)
     endif
   ENDDO D5050
   end associate

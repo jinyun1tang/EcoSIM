@@ -293,14 +293,20 @@ implicit none
 
 !------------------------------------------------------------------------------------------
 
-  subroutine SumRootBiome(NZ,mass_roots)
+  subroutine SumRootBiome(NZ,mass_roots,massr1st,massr2nd,massnonst,massnodul)
 
   implicit none
   integer, intent(in) :: NZ
   real(r8), intent(out) :: mass_roots(NumPlantChemElms)
-
+  real(r8), optional, intent(out) :: massr1st(NumPlantChemElms)
+  real(r8), optional, intent(out) :: massr2nd(NumPlantChemElms)
+  real(r8), optional, intent(out) :: massnonst(NumPlantChemElms)
+  real(r8), optional, intent(out) :: massnodul(NumPlantChemElms)
   integer :: NE
-  real(r8) :: root1st,root2nd
+  real(r8) :: massr1st1(NumPlantChemElms)
+  real(r8) :: massr2nd1(NumPlantChemElms)
+  real(r8) :: massnonst1(NumPlantChemElms)
+  real(r8) :: massnodul1(NumPlantChemElms)
 
   associate(                                                                   &
     NU                            =>  plt_site%NU                            , &  
@@ -315,18 +321,24 @@ implicit none
     RootMyco2ndStrutElms_rpvr     =>  plt_biom%RootMyco2ndStrutElms_rpvr     , &    
     RootMycoNonstElms_rpvr        =>  plt_biom%RootMycoNonstElms_rpvr          &
   )
-
+  massr1st1=0._r8;massr2nd1=0._r8;massnonst1=0._r8;massnodul1=0._r8
   mass_roots=0._r8
   DO NE=1,NumPlantChemElms
-    root1st=sum(RootMyco1stStrutElms_rpvr(NE,1:MY(NZ),NU:MaxNumRootLays,1:NumRootAxes_pft(NZ),NZ))
-    root2nd=sum(RootMyco2ndStrutElms_rpvr(NE,1:MY(NZ),NU:MaxNumRootLays,1:NumRootAxes_pft(NZ),NZ))
-    mass_roots(NE)=root1st+root2nd+sum(RootMycoNonstElms_rpvr(NE,1:MY(NZ),NU:MaxNumRootLays,NZ))
+    massr1st1(NE)=sum(RootMyco1stStrutElms_rpvr(NE,1:MY(NZ),NU:MaxNumRootLays,1:NumRootAxes_pft(NZ),NZ))
+    massr2nd1(NE)=sum(RootMyco2ndStrutElms_rpvr(NE,1:MY(NZ),NU:MaxNumRootLays,1:NumRootAxes_pft(NZ),NZ))
+    massnonst1(NE)=sum(RootMycoNonstElms_rpvr(NE,1:MY(NZ),NU:MaxNumRootLays,NZ))
+    mass_roots(NE)=massr1st1(NE)+massr2nd1(NE)+massnonst1(NE)
     !add reserve to struct
     if(is_plant_N2fix(iPlantNfixType(NZ)) .and. is_root_N2fix(iPlantNfixType(NZ)))THEN
-      mass_roots(NE)=mass_roots(NE)+sum(RootNodulStrutElms_pvr(NE,NU:MaxSoiL4Root(NZ),NZ))+&
+      massnodul1(NE)=sum(RootNodulStrutElms_pvr(NE,NU:MaxSoiL4Root(NZ),NZ))+&
           sum(RootNodulNonstElms_pvr(NE,NU:MaxSoiL4Root(NZ),NZ))
+      mass_roots(NE)=mass_roots(NE)+massnodul1(NE)    
     endif      
   ENDDO
+  if(present(massr1st))massr1st=massr1st1
+  if(present(massr2nd))massr2nd=massr2nd1
+  if(present(massnonst))massnonst=massnonst1
+  if(present(massnodul))massnodul=massnodul1
   end associate
   end subroutine SumRootBiome
 end module PlantBalMod
