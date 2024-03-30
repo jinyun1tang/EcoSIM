@@ -416,10 +416,11 @@ implicit none
   real(r8) :: Remobl2ndcycl(NumPlantChemElms)
   real(r8) :: Remobl2ndelm(NumPlantChemElms)
   real(r8) :: dmass(NumPlantChemElms)
-  real(r8) :: massr1st(NumPlantChemElms)
-  real(r8) :: massr2nd(NumPlantChemElms)
-  real(r8) :: massnonst(NumPlantChemElms)
-  real(r8) :: massnodul(NumPlantChemElms)  
+  real(r8) :: massr1st(NumPlantChemElms),massr1st1(NumPlantChemElms)
+  real(r8) :: massr2nd(NumPlantChemElms),massr2nd1(NumPlantChemElms)
+  real(r8) :: massnonst(NumPlantChemElms),massnonst1(NumPlantChemElms)
+  real(r8) :: massnodul(NumPlantChemElms),massnodul1(NumPlantChemElms)
+
 !begin_execution
   associate(                                                                     &
     RootMyco2ndStrutElms_rpvr       =>  plt_biom%RootMyco2ndStrutElms_rpvr     , &
@@ -483,8 +484,7 @@ implicit none
 !     PSIRoot_pvr,PSIRootTurg_vr=root total,turgor water potential
 !     DMRT=root growth yield
 !
-  call SumRootBiome(NZ,mass_inital)
-
+  call SumRootBiome(NZ,mass_inital,massr1st1,massr2nd1,massnonst1,massnodul1)
   SoilResit4Root2ndPentrate=SoilResit4RootPentrate_vr(L)*Root2ndRadius_pvr(N,L,NZ)/1.0E-03_r8
   WFNR=AMIN1(1.0_r8,AZMAX1(PSIRootTurg_vr(N,L,NZ)-PSIMin4OrganExtens-SoilResit4Root2ndPentrate))
   IF(is_root_shallow(iPlantRootProfile_pft(NZ)))THEN
@@ -860,7 +860,9 @@ implicit none
     call SumRootBiome(NZ,mass_finale,massr1st,massr2nd,massnonst,massnodul)
     if(I>=125 .and. NZ==2)then
     write(124,*)I+J/24.,'xRootMycoAxes',L,NR,N,mass_finale(ielmc)-mass_inital(ielmc)+litrflx(ielmc)-RCO2flx
-    write(125,*)I+J/24.,'xRootMycoAxes',L,NR,N,massr1st(ielmc),massr2nd(ielmc),massnonst(ielmc)
+    write(125,*)I+J/24.,'xRootMycoAxes',L,NR,N,massr1st(ielmc)-massr1st1(ielmc) &
+      ,massr2nd(ielmc)-massr2nd1(ielmc),massnonst(ielmc)-massnonst1(ielmc)
+    write(125,*)I+J/24.,'xRootMycoAxes',L,NR,N,litrflx(ielmc),Root2ndNetGrowthElms(ielmc),RCO2flx
     endif
   ENDDO D5050
   end associate
@@ -938,8 +940,8 @@ implicit none
     inonstruct                      =>  pltpar%inonstruct                        , &    
     k_woody_litr                    =>  pltpar%k_woody_litr                      , &
     k_fine_litr                     =>  pltpar%k_fine_litr                       , &      
-    CNRTS_pft                           =>  plt_allom%CNRTS_pft                          , &
-    CPRTS_pft                           =>  plt_allom%CPRTS_pft                          , &    
+    CNRTS_pft                       =>  plt_allom%CNRTS_pft                      , &
+    CPRTS_pft                       =>  plt_allom%CPRTS_pft                      , &    
     FWODRE                          =>  plt_allom%FWODRE                         , &    
     RootBiomGrosYld_pft             =>  plt_allom%RootBiomGrosYld_pft            , &    
     Root1stLen_rpvr                 =>  plt_morph%Root1stLen_rpvr                , &    
