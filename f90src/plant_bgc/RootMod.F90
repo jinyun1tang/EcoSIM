@@ -1960,7 +1960,9 @@ implicit none
         ENDIF
       ENDIF
     ENDDO D300
-
+    if(I>=154 .and. NZ==2)then
+    write(131,*)'canpnostxfer1',I+J/24.,CanopyNonstElms_brch(ielmc,1:NumOfBranches_pft(NZ),NZ)    
+    endif
     !!Nonst check
     DO NE=1,NumPlantChemElms
       mass_inital(NE)=SUM(CanopyNonstElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
@@ -1992,10 +1994,8 @@ implicit none
       mass_finale(NE)=SUM(CanopyNonstElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
     enddo
     if(I>=154 .and. NZ==2)then
-    write(124,*)'canpnostxfer',I+J/24.,(mass_finale(NE)-mass_inital(NE),NE=1,NumPlantChemElms)
-    if(mass_finale(ielmc)-mass_inital(ielmc)>7._r8)then
-    write(131,*)'canpnostxfer',CanopyNonstElms_brch(ielmc,1:NumOfBranches_pft(NZ),NZ)
-    endif
+    write(124,*)'canpnostxfer',I+J/24.,(mass_finale(NE)-mass_inital(NE),NE=1,NumPlantChemElms)    
+    write(131,*)'canpnostxfer2',I+J/24.,CanopyNonstElms_brch(ielmc,1:NumOfBranches_pft(NZ),NZ)    
     endif
   ENDIF
 !=============================================================================
