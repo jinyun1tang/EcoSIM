@@ -1158,13 +1158,17 @@ implicit none
 !     WTRT2,WTRT2N,WTRT2P=secondary root C,N,P mass
 !     Root2ndLen_pvr=secondary root length
 !
-      RootNetGrowthElms(ielmc)=RootCYldO2ltd-FSNC1*Root1stElm_raxs(ielmc,N,NR,NZ)
-      RootNetGrowthElms(ielmn)=RootMycoNonst4Grow(ielmn)-FSNC1*Root1stElm_raxs(ielmn,N,NR,NZ)
-      RootNetGrowthElms(ielmp)=RootMycoNonst4Grow(ielmp)-FSNC1*Root1stElm_raxs(ielmp,N,NR,NZ)
+      RootNetGrowthElms(ielmc)=RootCYldO2ltd
+      RootNetGrowthElms(ielmn)=RootMycoNonst4Grow(ielmn)
+      RootNetGrowthElms(ielmp)=RootMycoNonst4Grow(ielmp)
 
+      DO NE=1,NumPlantChemElms
+        RootNetGrowthElms(NE)=RootNetGrowthElms(NE)-FSNC1*Root1stElm_raxs(NE,N,NR,NZ)
+      ENDDO
       !negative growth
       IF(RootNetGrowthElms(ielmc).LT.0.0_r8)THEN
         LX=MAX(1,L-1)
+        
         D5105: DO LL=L,LX,-1
           GRTWTM=RootNetGrowthElms(ielmc)
           DO NE=1,NumPlantChemElms
@@ -1220,7 +1224,7 @@ implicit none
                 dfineE1=CFOPE(NE,iroot,M,NZ)*dsenecE*FWODRE(NE,k_fine_litr)
                 LitrfalStrutElms_pvr(NE,M,k_woody_litr,LL,NZ)=LitrfalStrutElms_pvr(NE,M,k_woody_litr,LL,NZ)+dwoodyE
                 LitrfalStrutElms_pvr(NE,M,k_fine_litr,LL,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,LL,NZ)+dfineE1
-                dRootMyco2ndst2Litr(NE)=dRootMyco2ndst2Litr(NE)+dwoody+dfineE1
+                dRootMyco2ndst2Litr(NE)=dRootMyco2ndst2Litr(NE)+dwoodyE+dfineE1
 
                 dfineE2=CFOPE(NE,inonstruct,M,NZ)*FSNCP*(RootMycoNonstElms_rpvr(NE,imycorrhz,LL,NZ))
                 LitrfalStrutElms_pvr(NE,M,k_fine_litr,LL,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,LL,NZ)+dfineE2
@@ -1231,7 +1235,7 @@ implicit none
               ENDDO    
             ENDDO D6450
             DO NE=1,NumPlantChemElms  
-              RootMyco2ndStrutElms_rpvr(NE,imycorrhz,LL,NR,NZ)= RootMyco2ndStrutElms_rpvr(NE,imycorrhz,LL,NR,NZ) &
+              RootMyco2ndStrutElms_rpvr(NE,imycorrhz,LL,NR,NZ)=RootMyco2ndStrutElms_rpvr(NE,imycorrhz,LL,NR,NZ) &
                 -dRootMyco2ndst2Litr(NE)
 
               RootMycoNonstElms_rpvr(NE,imycorrhz,LL,NZ)=RootMycoNonstElms_rpvr(NE,imycorrhz,LL,NZ) &
@@ -1250,7 +1254,8 @@ implicit none
     call SumRootBiome(NZ,mass_finale)  
 
     if(I>=125.and.NZ==2)then
-    write(124,*)'withinGrowRootAxes',I+J/24.,mass_finale(ielmc)-mass_inital(ielmc)+litrflx(ielmc)-RCO2flx,litrflx(ielmc),RCO2flx
+    write(124,*)'withinGrowRootAxes',I+J/24.,mass_finale(ielmc)-mass_inital(ielmc)+litrflx(ielmc)-RCO2flx &
+      ,litrflx(ielmc),RCO2flx
     endif
 !
 !
