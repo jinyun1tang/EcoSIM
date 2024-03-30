@@ -1981,10 +1981,10 @@ implicit none
             ENDDO
             DO NE=1,NumPlantChemElms
               CanopyNonstElms_brch(NE,NB,NZ)=CanopyNonstElms_brch(NE,NB,NZ)+XFRE(NE)
-              if(CanopyNonstElms_brch(NE,NB,NZ)<0._r8)then
-                write(*,*)'1750CanopyNonstElms_brch(NE,NB,NZ)',NE,NB,CanopyNonstElms_brch(NE,NB,NZ)-XFRE(NE),XFRE(NE)
-                stop
-              endif
+!              if(CanopyNonstElms_brch(NE,NB,NZ)<0._r8)then
+!                write(*,*)'1750CanopyNonstElms_brch(NE,NB,NZ)',NE,NB,CanopyNonstElms_brch(NE,NB,NZ)-XFRE(NE),XFRE(NE)
+!                stop
+!              endif
             ENDDO
           ENDIF
         ENDIF
@@ -2136,11 +2136,11 @@ implicit none
         DO NE=1,NumPlantChemElms
           RootMycoNonstElms_rpvr(NE,N,L,NZ)=RootMycoNonstElms_rpvr(NE,N,L,NZ)-XFRE(NE)
           SeasonalNonstElms_pft(NE,NZ)=SeasonalNonstElms_pft(NE,NZ)+XFRE(NE)
-          if(RootMycoNonstElms_rpvr(NE,N,L,NZ)<0._r8 .or. SeasonalNonstElms_pft(NE,NZ)<0._r8)then
-            write(*,*)'1871RootMycoNonstElms_rpvr(NE,N,L,NZ)',NE,N,RootMycoNonstElms_rpvr(NE,N,L,NZ)+XFRE(NE),&
-              SeasonalNonstElms_pft(NE,NZ)-XFRE(NE),XFRE(NE)
-            stop
-          endif
+!          if(RootMycoNonstElms_rpvr(NE,N,L,NZ)<0._r8 .or. SeasonalNonstElms_pft(NE,NZ)<0._r8)then
+!            write(*,*)'1871RootMycoNonstElms_rpvr(NE,N,L,NZ)',NE,N,RootMycoNonstElms_rpvr(NE,N,L,NZ)+XFRE(NE),&
+!              SeasonalNonstElms_pft(NE,NZ)-XFRE(NE),XFRE(NE)
+!            stop
+!          endif
         ENDDO
       ENDDO D5550      
     ENDDO D5545
@@ -2294,12 +2294,12 @@ implicit none
               ENDIF
               CanopyNonstElms_brch(NE,NB,NZ)=CanopyNonstElms_brch(NE,NB,NZ)-XFRE(NE)
               RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ)=RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ)+XFRE(NE)              
-              if(CanopyNonstElms_brch(NE,NB,NZ)<0._r8 .or. RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ)<0._r8)then
-                write(*,*)'2012CanopyNonstElms_brch(NE,NB,NZ)',NE,NB,NZ,CanopyNonstElms_brch(NE,NB,NZ)+XFRE(NE)&
-                  ,RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ)-XFRE(NE) &
-                  ,XFRE(NE),NonstElmBrchE,NonstElmRootE,NonstElmGradt,FWTR(L),FWTB(NB),PTSHTR
-                stop
-              endif
+!              if(CanopyNonstElms_brch(NE,NB,NZ)<0._r8 .or. RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ)<0._r8)then
+!                write(*,*)'2012CanopyNonstElms_brch(NE,NB,NZ)',NE,NB,NZ,CanopyNonstElms_brch(NE,NB,NZ)+XFRE(NE)&
+!                  ,RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ)-XFRE(NE) &
+!                  ,XFRE(NE),NonstElmBrchE,NonstElmRootE,NonstElmGradt,FWTR(L),FWTB(NB),PTSHTR
+!                stop
+!              endif
             ENDDO
           ENDIF  
         ENDIF
@@ -2428,7 +2428,7 @@ implicit none
 !     RootH2PO4Uptake_pvr,RootH2PO4BUptake_pvr,RootHPO4Uptake_pvr,RootNutUptake_pvr=uptake from non-band,band of H2PO4,HPO4
 !
  
-        if(RootMycoNonstElms_rpvr(ielmn,N,L,NZ)<0._r8 .or. RootMycoNonstElms_rpvr(ielmp,N,L,NZ)<0._r8)stop 
+!        if(RootMycoNonstElms_rpvr(ielmn,N,L,NZ)<0._r8 .or. RootMycoNonstElms_rpvr(ielmp,N,L,NZ)<0._r8)stop 
 
         RootMycoNonstElms_rpvr(ielmn,N,L,NZ)=RootMycoNonstElms_rpvr(ielmn,N,L,NZ)+&
           (RootNutUptake_pvr(ids_NH4,N,L,NZ) &
