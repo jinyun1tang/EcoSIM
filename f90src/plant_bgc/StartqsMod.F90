@@ -560,17 +560,17 @@ module StartqsMod
   implicit none
   integer, intent(in) :: NZ
   integer :: K,L,M,N,NB
-  associate(                           &
-    NU                                =>  plt_site%NU      , &
-    PPX                               =>  plt_site%PPX     , &
-    PlantPopulation_pft               =>  plt_site%PlantPopulation_pft      , &
-    ALAT                              =>  plt_site%ALAT    , &
-    AREA3                             =>  plt_site%AREA3   , &
-    iPlantRootProfile_pft          =>  plt_pheno%iPlantRootProfile_pft , &
-    LeafNumberAtFloralInit_brch       =>  plt_pheno%LeafNumberAtFloralInit_brch , &
+  associate(                                                                        &
+    NU                                =>  plt_site%NU                             , &
+    PPX                               =>  plt_site%PPX                            , &
+    PlantPopulation_pft               =>  plt_site%PlantPopulation_pft            , &
+    ALAT                              =>  plt_site%ALAT                           , &
+    AREA3                             =>  plt_site%AREA3                          , &
+    iPlantRootProfile_pft             =>  plt_pheno%iPlantRootProfile_pft         , &
+    LeafNumberAtFloralInit_brch       =>  plt_pheno%LeafNumberAtFloralInit_brch   , &
     MatureGroup_brch                  =>  plt_pheno%MatureGroup_brch , &
-    KHiestGroLeafNode_brch                   =>  plt_pheno%KHiestGroLeafNode_brch , &
-    KLowestGroLeafNode_brch         =>  plt_pheno%KLowestGroLeafNode_brch , &
+    KHiestGroLeafNode_brch            =>  plt_pheno%KHiestGroLeafNode_brch , &
+    KLowestGroLeafNode_brch           =>  plt_pheno%KLowestGroLeafNode_brch , &
     NodeNumNormByMatgrp_brch          =>  plt_pheno%NodeNumNormByMatgrp_brch  , &
     ReprodNodeNumNormByMatrgrp_brch   =>  plt_pheno%ReprodNodeNumNormByMatrgrp_brch  , &
     HourFailGrainFill_brch            =>  plt_pheno%HourFailGrainFill_brch   , &
@@ -581,15 +581,15 @@ module StartqsMod
     Hours4ShortenPhotoPeriod_brch     =>  plt_pheno%Hours4ShortenPhotoPeriod_brch   , &
     iPlantCalendar_brch               =>  plt_pheno%iPlantCalendar_brch , &
     Hours4Leafout_brch                =>  plt_pheno%Hours4Leafout_brch   , &
-    Hours2LeafOut_brch          =>  plt_pheno%Hours2LeafOut_brch   , &
-    HoursCanopyPSITooLow              =>  plt_pheno%HoursCanopyPSITooLow   , &
+    Hours2LeafOut_brch                =>  plt_pheno%Hours2LeafOut_brch   , &
+    HoursCanopyPSITooLow_pft          =>  plt_pheno%HoursCanopyPSITooLow_pft   , &
     MatureGroup_pft                   =>  plt_pheno%MatureGroup_pft, &
     PetioleChemElmRemobFlx_brch       =>  plt_pheno%PetioleChemElmRemobFlx_brch  , &
     TotReproNodeNumNormByMatrgrp_brch =>  plt_pheno%TotReproNodeNumNormByMatrgrp_brch , &
     TotalNodeNumNormByMatgrp_brch     =>  plt_pheno%TotalNodeNumNormByMatgrp_brch , &
     C4PhotosynDowreg_brch             =>  plt_photo%C4PhotosynDowreg_brch  , &
-    CPOOL3_node                            =>  plt_photo%CPOOL3_node , &
-    CPOOL4_node                            =>  plt_photo%CPOOL4_node , &
+    CPOOL3_node                       =>  plt_photo%CPOOL3_node , &
+    CPOOL4_node                       =>  plt_photo%CPOOL4_node , &
     CHILL                             =>  plt_photo%CHILL  , &
     RubiscoActivity_brch              =>  plt_photo%RubiscoActivity_brch   , &
     CMassHCO3BundleSheath_node        =>  plt_photo%CMassHCO3BundleSheath_node   , &
@@ -599,11 +599,11 @@ module StartqsMod
     KLeafNumber_brch                  =>  plt_morph%KLeafNumber_brch , &
     ShootNodeNumAtPlanting_pft        =>  plt_morph%ShootNodeNumAtPlanting_pft   , &
     BranchNumber_pft                  =>  plt_morph%BranchNumber_pft    , &
-    ShootNodeNum_brch              =>  plt_morph%ShootNodeNum_brch  , &
+    ShootNodeNum_brch                 =>  plt_morph%ShootNodeNum_brch  , &
     CanopyLeafArea_pft                =>  plt_morph%CanopyLeafArea_pft  , &
-    CanopyStemArea_lbrch          =>  plt_morph%CanopyStemArea_lbrch  , &
+    CanopyStemArea_lbrch              =>  plt_morph%CanopyStemArea_lbrch  , &
     StemAreaZsec_brch                 =>  plt_morph%StemAreaZsec_brch  , &
-    CanopyStemArea_pft                   =>  plt_morph%CanopyStemArea_pft  , &
+    CanopyStemArea_pft                =>  plt_morph%CanopyStemArea_pft  , &
     NodeNumberAtAnthesis_brch         =>  plt_morph%NodeNumberAtAnthesis_brch  , &
     PotentialSeedSites_brch           =>  plt_morph%PotentialSeedSites_brch  , &
     InternodeHeightLive_brch          =>  plt_morph%InternodeHeightLive_brch , &
@@ -618,7 +618,7 @@ module StartqsMod
     CanPBranchHeight                  =>  plt_morph%CanPBranchHeight , &
     HypoctoHeight_pft                 =>  plt_morph%HypoctoHeight_pft  , &
     BranchNumber_brch                 =>  plt_morph%BranchNumber_brch   , &
-    NodeNum2InitFloral_brch       =>  plt_morph%NodeNum2InitFloral_brch  , &
+    NodeNum2InitFloral_brch           =>  plt_morph%NodeNum2InitFloral_brch  , &
     KLEAFX                            =>  plt_morph%KLEAFX , &
     NumOfBranches_pft                 =>  plt_morph%NumOfBranches_pft      &
   )
@@ -673,7 +673,7 @@ module StartqsMod
 !
 !     INITIALIZE PLANT MORPHOLOGY AND BIOMASS
 !
-  HoursCanopyPSITooLow(NZ)=0._r8
+  HoursCanopyPSITooLow_pft(NZ)=0._r8
   CHILL(NZ)=0._r8
   plt_biom%CanopyNonstElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ)=0._r8
   plt_biom%CanopyNodulNonstElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ)=0._r8

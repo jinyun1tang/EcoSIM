@@ -524,7 +524,7 @@ module StartqMod
 !
 !     INITIALIZE PLANT MORPHOLOGY AND BIOMASS
 !
-  HoursCanopyPSITooLow(NZ,NY,NX)=0._r8
+  HoursCanopyPSITooLow_pft(NZ,NY,NX)=0._r8
   CHILL(NZ,NY,NX)=0._r8
   CanopyNonstElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)=0._r8
   CanopyNodulNonstElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)=0._r8

@@ -88,7 +88,7 @@ module PlantTraitDataType
   integer,target,allocatable ::  NumActivePlants(:,:)                          !number of active PFT
   real(r8),target,allocatable ::  PPT(:,:)                           !total plant population, [d-2]
   real(r8),target,allocatable ::  PPZ(:,:,:)                         !plant population at seeding, [m-2]
-  real(r8),target,allocatable ::  HoursCanopyPSITooLow(:,:,:)                        !canopy plant water stress indicator, number of hours PSILT < PSILY, []
+  real(r8),target,allocatable ::  HoursCanopyPSITooLow_pft(:,:,:)                        !canopy plant water stress indicator, number of hours PSILT < PSILY, []
   real(r8),target,allocatable ::  PlantO2Stress(:,:,:)                        !plant O2 stress indicator, []
   real(r8),target,allocatable ::  fTgrowCanP(:,:,:)                  !canopy temperature growth function, [-]
   real(r8),target,allocatable ::  TCG(:,:,:)                         !canopy growth temperature, [oC]
@@ -248,7 +248,7 @@ contains
   allocate(NumActivePlants(JY,JX));       NumActivePlants=0
   allocate(PPT(JY,JX));         PPT=0._r8
   allocate(PPZ(JP,JY,JX));      PPZ=0._r8
-  allocate(HoursCanopyPSITooLow(JP,JY,JX));     HoursCanopyPSITooLow=0._r8
+  allocate(HoursCanopyPSITooLow_pft(JP,JY,JX));     HoursCanopyPSITooLow_pft=0._r8
   allocate(PlantO2Stress(JP,JY,JX));     PlantO2Stress=0._r8
   allocate(fTgrowCanP(JP,JY,JX));     fTgrowCanP=0._r8
   allocate(TCG(JP,JY,JX));      TCG=0._r8
@@ -405,7 +405,7 @@ contains
   call destroy(NumActivePlants)
   call destroy(PPT)
   call destroy(PPZ)
-  call destroy(HoursCanopyPSITooLow)
+  call destroy(HoursCanopyPSITooLow_pft)
   call destroy(PlantO2Stress)
   call destroy(fTgrowCanP)
   call destroy(TCG)

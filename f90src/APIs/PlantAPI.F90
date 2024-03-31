@@ -276,7 +276,7 @@ implicit none
     N2ObyFire_pft(NZ,NY,NX)  =plt_distb%N2ObyFire_pft(NZ)
     PO4byFire_pft(NZ,NY,NX)  =plt_distb%PO4byFire_pft(NZ)
     WatByPCanopy(NZ,NY,NX)  =plt_ew%WatByPCanopy(NZ)
-    HoursCanopyPSITooLow(NZ,NY,NX)   =plt_pheno%HoursCanopyPSITooLow(NZ)
+    HoursCanopyPSITooLow_pft(NZ,NY,NX)   =plt_pheno%HoursCanopyPSITooLow_pft(NZ)
     SeedCPlanted_pft(NZ,NY,NX)  =plt_biom%SeedCPlanted_pft(NZ)
     CanopyStalkC_pft(NZ,NY,NX)  =plt_biom%CanopyStalkC_pft(NZ)
     CanopyLeafShethC_pft(NZ,NY,NX)   =plt_biom%CanopyLeafShethC_pft(NZ)
@@ -1138,7 +1138,7 @@ implicit none
     plt_distb%NH3byFire_pft(NZ)=NH3byFire_pft(NZ,NY,NX)
     plt_distb%PO4byFire_pft(NZ)=PO4byFire_pft(NZ,NY,NX)
     plt_ew%CanopyWater_pft(NZ) =CanopyWater_pft(NZ,NY,NX)
-    plt_pheno%HoursCanopyPSITooLow(NZ) =HoursCanopyPSITooLow(NZ,NY,NX)
+    plt_pheno%HoursCanopyPSITooLow_pft(NZ) =HoursCanopyPSITooLow_pft(NZ,NY,NX)
     plt_biom%SeedCPlanted_pft(NZ) =SeedCPlanted_pft(NZ,NY,NX)
     plt_biom%CanopyLeafShethC_pft(NZ)  =CanopyLeafShethC_pft(NZ,NY,NX)
 

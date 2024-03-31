@@ -44,32 +44,23 @@ module HfuncsMod
   implicit none
 
   integer, intent(in) :: I,J
-  INTEGER :: NB, NZ, LeafNumberGrowing
+  INTEGER :: NB, NZ
 
 ! begin_execution
   associate(                                                                         &
-    PSICanopy_pft                    =>  plt_ew%PSICanopy_pft                      , &
     Hours4ShortenPhotoPeriod_brch    =>  plt_pheno%Hours4ShortenPhotoPeriod_brch   , &
     doInitPlant_pft                  =>  plt_pheno%doInitPlant_pft                 , &
-    doRemobilization_brch            =>  plt_pheno%doRemobilization_brch           , &
-    LeafNumberAtFloralInit_brch      =>  plt_pheno%LeafNumberAtFloralInit_brch     , &
     Hours4LenthenPhotoPeriod_brch    =>  plt_pheno%Hours4LenthenPhotoPeriod_brch   , &
     IsPlantActive_pft                =>  plt_pheno%IsPlantActive_pft               , &
-    iPlantBranchState_brch           =>  plt_pheno%iPlantBranchState_brch          , &
-    iPlantCalendar_brch              =>  plt_pheno%iPlantCalendar_brch , &
-    HoursCanopyPSITooLow             =>  plt_pheno%HoursCanopyPSITooLow   , &
-    KHiestGroLeafNode_brch           =>  plt_pheno%KHiestGroLeafNode_brch , &
-    iPlantRootProfile_pft            =>  plt_pheno%iPlantRootProfile_pft , &
-    DayLenthCurrent                  =>  plt_site%DayLenthCurrent    , &
-    DATAP                            =>  plt_site%DATAP   , &
-    PPT                              =>  plt_site%PPT     , &
-    DayLenthPrev                     =>  plt_site%DayLenthPrev    , &
-    NP                               =>  plt_site%NP      , &
-    PlantPopulation_pft              =>  plt_site%PlantPopulation_pft      , &
-    KLeafNumber_brch                 =>  plt_morph%KLeafNumber_brch , &
-    NumOfLeaves_brch                 =>  plt_morph%NumOfLeaves_brch  , &
-    NumOfBranches_pft                =>  plt_morph%NumOfBranches_pft    , &
-    MainBranchNum_pft                =>  plt_morph%MainBranchNum_pft      &
+    iPlantCalendar_brch              =>  plt_pheno%iPlantCalendar_brch             , &
+    DayLenthCurrent                  =>  plt_site%DayLenthCurrent                  , &
+    DATAP                            =>  plt_site%DATAP                            , &
+    PPT                              =>  plt_site%PPT                              , &
+    DayLenthPrev                     =>  plt_site%DayLenthPrev                     , &
+    NP                               =>  plt_site%NP                               , &
+    PlantPopulation_pft              =>  plt_site%PlantPopulation_pft              , &
+    KLeafNumber_brch                 =>  plt_morph%KLeafNumber_brch                , &
+    MainBranchNum_pft                =>  plt_morph%MainBranchNum_pft                 &
   )
   D9985: DO NZ=1,NP
 
@@ -98,43 +89,8 @@ module HfuncsMod
 !           doInitLeafOut_brch,doPlantLeafOut_brch=flags for initializing leafout,leafoff
 !           Hours4Leafout_brch=leafout hours
 !
-!        write(101,*)'plant active',I,NZ,doInitPlant_pft(NZ)==itrue
         IF(iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).NE.0 .OR.doInitPlant_pft(NZ).EQ.itrue)THEN
-          
-          D2010: DO NB=1,NumOfBranches_pft(NZ)
-
-            IF(iPlantBranchState_brch(NB,NZ).EQ.iLive)THEN
-              call live_branch_phenology(I,J,NB,nz)
-            ENDIF
-!
-!           KHiestGroLeafNode_brch=integer of most recent leaf number currently growing
-!
-            LeafNumberGrowing=KHiestGroLeafNode_brch(NB,NZ)
-            IF(LeafNumberAtFloralInit_brch(NB,NZ).LE.ppmc)THEN
-              KHiestGroLeafNode_brch(NB,NZ)=INT(NumOfLeaves_brch(NB,NZ))+1
-            ELSE
-              KHiestGroLeafNode_brch(NB,NZ)=INT(AMIN1(NumOfLeaves_brch(NB,NZ),LeafNumberAtFloralInit_brch(NB,NZ)))+1
-            ENDIF
-            KLeafNumber_brch(NB,NZ)=MIN(MaxNodesPerBranch1-1,KHiestGroLeafNode_brch(NB,NZ))
-            IF(KHiestGroLeafNode_brch(NB,NZ).GT.LeafNumberGrowing)THEN
-              doRemobilization_brch(NB,NZ)=itrue
-            ELSE
-              doRemobilization_brch(NB,NZ)=ifalse
-            ENDIF
-!
-            call branch_specific_phenology(I,J,NB,NZ)
-
-          ENDDO D2010
-!
-!             WATER STRESS INDICATOR
-!
-!             PSICanopy_pft=canopy total water potential
-!             PSIMin4LeafOff=minimum canopy water potential for leafoff
-!             HoursCanopyPSITooLow=number of hours PSICanopy_pft(< PSIMin4LeafOff (for output only)
-!
-          IF(PSICanopy_pft(NZ).LT.PSIMin4LeafOff(iPlantRootProfile_pft(NZ)))THEN
-            HoursCanopyPSITooLow(NZ)=HoursCanopyPSITooLow(NZ)+1.0_r8
-          ENDIF
+          call Emerged_plant_Phenology(I,J,NZ)
         ENDIF
       ENDIF
     ENDIF
@@ -143,7 +99,60 @@ module HfuncsMod
   end associate
   END subroutine hfuncs
 !------------------------------------------------------------------------------------------
+  subroutine Emerged_plant_Phenology(I,J,NZ)
+  implicit none
+  integer, intent(in) :: I,J,NZ
+  integer :: NB
+  integer :: LeafNumberGrowing
+  associate(                                                                       &
+    iPlantBranchState_brch           =>  plt_pheno%iPlantBranchState_brch        , &
+    LeafNumberAtFloralInit_brch      =>  plt_pheno%LeafNumberAtFloralInit_brch   , &    
+    HoursCanopyPSITooLow_pft         =>  plt_pheno%HoursCanopyPSITooLow_pft      , &    
+    PSICanopy_pft                    =>  plt_ew%PSICanopy_pft                    , &    
+    NumOfLeaves_brch                 =>  plt_morph%NumOfLeaves_brch              , &    
+    doRemobilization_brch            =>  plt_pheno%doRemobilization_brch         , &    
+    NumOfBranches_pft                =>  plt_morph%NumOfBranches_pft             , &    
+    iPlantRootProfile_pft            =>  plt_pheno%iPlantRootProfile_pft         , &    
+    KHiestGroLeafNode_brch           =>  plt_pheno%KHiestGroLeafNode_brch          &    
+  )
 
+  D2010: DO NB=1,NumOfBranches_pft(NZ)
+
+    IF(iPlantBranchState_brch(NB,NZ).EQ.iLive)THEN
+      call live_branch_phenology(I,J,NB,nz)
+    ENDIF
+!
+!           KHiestGroLeafNode_brch=integer of most recent leaf number currently growing
+!
+    LeafNumberGrowing=KHiestGroLeafNode_brch(NB,NZ)
+    IF(LeafNumberAtFloralInit_brch(NB,NZ).LE.ppmc)THEN
+      KHiestGroLeafNode_brch(NB,NZ)=INT(NumOfLeaves_brch(NB,NZ))+1
+    ELSE
+      KHiestGroLeafNode_brch(NB,NZ)=INT(AMIN1(NumOfLeaves_brch(NB,NZ),LeafNumberAtFloralInit_brch(NB,NZ)))+1
+    ENDIF
+    KLeafNumber_brch(NB,NZ)=MIN(MaxNodesPerBranch1-1,KHiestGroLeafNode_brch(NB,NZ))
+    IF(KHiestGroLeafNode_brch(NB,NZ).GT.LeafNumberGrowing)THEN
+      doRemobilization_brch(NB,NZ)=itrue
+    ELSE
+      doRemobilization_brch(NB,NZ)=ifalse
+    ENDIF
+!
+    call branch_specific_phenology(I,J,NB,NZ)
+
+  ENDDO D2010
+!
+!             WATER STRESS INDICATOR
+!
+!             PSICanopy_pft=canopy total water potential
+!             PSIMin4LeafOff=minimum canopy water potential for leafoff
+!             HoursCanopyPSITooLow_pft=number of hours PSICanopy_pft(< PSIMin4LeafOff (for output only)
+!
+  IF(PSICanopy_pft(NZ).LT.PSIMin4LeafOff(iPlantRootProfile_pft(NZ)))THEN
+    HoursCanopyPSITooLow_pft(NZ)=HoursCanopyPSITooLow_pft(NZ)+1.0_r8
+  ENDIF
+  end associate
+  end subroutine Emerged_plant_Phenology          
+!------------------------------------------------------------------------------------------  
   subroutine set_plant_flags(I,J,NZ)
   use EcoSIMCtrlDataType, only : iYearCurrent
 

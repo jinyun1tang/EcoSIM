@@ -33,7 +33,7 @@ implicit none
     iPlantRootState_pft         =>   plt_pheno%iPlantRootState_pft   , &
     iPlantShootState_pft        =>   plt_pheno%iPlantShootState_pft    , &
     doInitPlant_pft             =>   plt_pheno%doInitPlant_pft    , &
-    HoursCanopyPSITooLow        =>   plt_pheno%HoursCanopyPSITooLow     , &
+    HoursCanopyPSITooLow_pft        =>   plt_pheno%HoursCanopyPSITooLow_pft     , &
     iPlantCalendar_brch         =>   plt_pheno%iPlantCalendar_brch   , &
     PlantPopulation_pft         =>   plt_site%PlantPopulation_pft        , &
     iYearCurrent                =>   plt_site%iYearCurrent      , &
@@ -81,7 +81,7 @@ implicit none
     IF(NumDeadBranches.EQ.NumOfBranches_pft(NZ))THEN
       iPlantShootState_pft(NZ)=iDead
       BranchNumber_pft(NZ)=0
-      HoursCanopyPSITooLow(NZ)=0._r8
+      HoursCanopyPSITooLow_pft(NZ)=0._r8
       IF(doInitPlant_pft(NZ).EQ.itrue)THEN
         NumOfBranches_pft(NZ)=1
       ELSE

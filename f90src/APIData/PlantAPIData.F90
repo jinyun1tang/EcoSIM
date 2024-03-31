@@ -308,7 +308,7 @@ implicit none
   real(r8), pointer :: TC4LeafOff_pft(:)     => null()     !threshold temperature for autumn leafoff/hardening, [oC]
   real(r8), pointer :: TKG(:)     => null()     !canopy growth temperature, [K]
   real(r8), pointer :: fTgrowCanP(:)    => null()     !canopy temperature growth function, [-]
-  real(r8), pointer :: HoursCanopyPSITooLow(:)    => null()     !canopy plant water stress indicator, number of hours PSICanopy_pft(< PSILY, []
+  real(r8), pointer :: HoursCanopyPSITooLow_pft(:)    => null()     !canopy plant water stress indicator, number of hours PSICanopy_pft(< PSILY, []
   real(r8), pointer :: TCChill4Seed_pft(:)     => null()     !temperature below which seed set is adversely affected, [oC]
   real(r8), pointer :: iPlantThermoAdaptZone(:)    => null()     !plant thermal adaptation zone, [-]
   real(r8), pointer :: PlantInitThermoAdaptZone(:)   => null()     !initial plant thermal adaptation zone, [-]
@@ -1714,7 +1714,7 @@ implicit none
   allocate(this%TCG(JP1));this%TCG=spval
   allocate(this%TKG(JP1));this%TKG=spval
   allocate(this%TC4LeafOff_pft(JP1));this%TC4LeafOff_pft=spval
-  allocate(this%HoursCanopyPSITooLow(JP1));this%HoursCanopyPSITooLow=spval
+  allocate(this%HoursCanopyPSITooLow_pft(JP1));this%HoursCanopyPSITooLow_pft=spval
   allocate(this%LeafElmntRemobFlx_brch(NumPlantChemElms,MaxNumBranches,JP1));this%LeafElmntRemobFlx_brch=spval
   allocate(this%PetioleChemElmRemobFlx_brch(NumPlantChemElms,MaxNumBranches,JP1));this%PetioleChemElmRemobFlx_brch=spval
 

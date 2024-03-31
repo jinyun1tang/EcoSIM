@@ -1870,16 +1870,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='HoursCanopyPSITooLow', dim1name='pft',&
+    call restartvar(ncid, flag, varname='HoursCanopyPSITooLow_pft', dim1name='pft',&
      long_name='canopy plant water stress indicator, number of hours PSICanopy_pft(< PSILY', units='h', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)  
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,HoursCanopyPSITooLow,datrp_1d,NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft)     
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,HoursCanopyPSITooLow_pft,datrp_1d,NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft)     
   else
-    !print*,'HoursCanopyPSITooLow'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,HoursCanopyPSITooLow,datrp_1d,NumActivePlants=NumActivePlants,&
+    !print*,'HoursCanopyPSITooLow_pft'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,HoursCanopyPSITooLow_pft,datrp_1d,NumActivePlants=NumActivePlants,&
       IsPlantActive_pft=IsPlantActive_pft)       
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='HoursCanopyPSITooLow', dim1name='pft',&
+    call restartvar(ncid, flag, varname='HoursCanopyPSITooLow_pft', dim1name='pft',&
      long_name='canopy plant water stress indicator, number of hours PSICanopy_pft(< PSILY', units='h', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)  
   endif  
