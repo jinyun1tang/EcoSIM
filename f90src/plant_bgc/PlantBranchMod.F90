@@ -46,8 +46,7 @@ module PlantBranchMod
   real(r8), intent(out) :: PTRT
   integer, intent(out) :: BegRemoblize
   real(r8) :: DMSHD
-  integer  :: K,KNOD,K1,K2,KMinGroingLeafNodeNum
-  integer  :: NN,M,N,MinNodeNum  
+  integer  :: MinNodeNum  
   REAL(R8) :: CH2O3(pltpar%MaxNodesPerBranch1),CH2O4(pltpar%MaxNodesPerBranch1)
   integer  :: LRemob_brch
   REAL(R8) :: PART(pltpar%NumOfPlantMorphUnits)
@@ -57,7 +56,6 @@ module PlantBranchMod
   real(r8) :: CCC,CNC,CPC
   real(r8) :: ETOL
   real(r8) :: Growth_brch(NumPlantChemElms,pltpar%NumOfPlantMorphUnits)
-  real(r8) :: GNOD
   real(r8) :: RCO2NonstC_brch
   REAL(R8) :: RMNCS
   real(r8) :: RMxess_brch
@@ -80,6 +78,7 @@ module PlantBranchMod
     LeafProteinCNode_brch        =>  plt_biom%LeafProteinCNode_brch       , &
     LeafPetoNonstElmConc_brch    =>  plt_biom%LeafPetoNonstElmConc_brch   , &
     LeafStrutElms_brch           =>  plt_biom%LeafStrutElms_brch          , &      
+    PetoleStrutElms_brch         =>  plt_biom%PetoleStrutElms_brch        , &    
     iPlantPhotosynthesisType     =>  plt_photo%iPlantPhotosynthesisType   , &
     iPlantBranchState_brch       =>  plt_pheno%iPlantBranchState_brch     , &
     iPlantRootProfile_pft        =>  plt_pheno%iPlantRootProfile_pft      , &
@@ -89,9 +88,7 @@ module PlantBranchMod
     SineSolarIncliAngleNextHour  =>  plt_rad%SineSolarIncliAngleNextHour  , &
     PlantPopulation_pft          =>  plt_site%PlantPopulation_pft         , &
     ZERO                         =>  plt_site%ZERO                        , &
-    MainBranchNum_pft            =>  plt_morph%MainBranchNum_pft          , &
-    HypoctoHeight_pft            =>  plt_morph%HypoctoHeight_pft          , &
-    SeedDepth_pft                =>  plt_morph%SeedDepth_pft                &
+    MainBranchNum_pft            =>  plt_morph%MainBranchNum_pft            &
   )
 
   II=I;JJ=J
@@ -135,7 +132,7 @@ module PlantBranchMod
 !
 !   DISTRIBUTE STALK GROWTH AMONG CURRENTLY GROWING NODES
 !
-    call GrowStalkOnBranch(NZ,NB,GrowthStalk,ETOL)
+    call GrowStalkOnBranch(NZ,NB,Growth_brch(:,ibrch_stalk),ETOL)
 
 !
     !   RECOVERY OF REMOBILIZABLE N,P DURING REMOBILIZATION DEPENDS
@@ -237,7 +234,7 @@ module PlantBranchMod
   implicit none
   integer, intent(in) :: I,J,NB,NZ
   real(r8), intent(in):: CNLFB,CPLFB
-  integer :: KK,NE
+  integer :: KK,NE,K
   integer :: KMinGroingLeafNodeNum
   real(r8) :: ZPOOLD,XFRN1,XFRP1
   real(r8) :: CPOOLT
@@ -297,7 +294,8 @@ module PlantBranchMod
   integer , intent(out) :: MinNodeNum
   real(r8), intent(out) :: ETOL
   real(r8) :: CCE
-
+  integer  :: NE
+  
   associate(                                                              &
     StalkStrutElms_brch          =>  plt_biom%StalkStrutElms_brch       , &
     StalkRsrvElms_brch           =>  plt_biom%StalkRsrvElms_brch        , &
@@ -305,6 +303,7 @@ module PlantBranchMod
     EarStrutElms_brch            =>  plt_biom%EarStrutElms_brch         , &
     PetoleStrutElms_brch         =>  plt_biom%PetoleStrutElms_brch      , &
     LeafStrutElms_brch           =>  plt_biom%LeafStrutElms_brch        , &  
+    LeafPetoNonstElmConc_brch    =>  plt_biom%LeafPetoNonstElmConc_brch , &    
     LeafBiomGrowthYield          =>  plt_allom%LeafBiomGrowthYield      , &
     PetioleBiomGrowthYield       =>  plt_allom%PetioleBiomGrowthYield   , &
     EarBiomGrowthYield           =>  plt_allom%EarBiomGrowthYield       , &
@@ -321,6 +320,9 @@ module PlantBranchMod
     GrainBiomGrowthYield         =>  plt_allom%GrainBiomGrowthYield     , &
     rCNNonstructRemob_pft        =>  plt_allom%rCNNonstructRemob_pft    , &
     rCPNonstructRemob_pft        =>  plt_allom%rCPNonstructRemob_pft    , &
+    SeedDepth_pft                =>  plt_morph%SeedDepth_pft            , &    
+    HypoctoHeight_pft            =>  plt_morph%HypoctoHeight_pft        , &    
+    MainBranchNum_pft            =>  plt_morph%MainBranchNum_pft        , &    
     rNCReserve_pft               =>  plt_allom%rNCReserve_pft             &
   )
 !
@@ -3376,7 +3378,7 @@ module PlantBranchMod
     PlantPopulation_pft          =>   plt_site%PlantPopulation_pft          &
   )
 !  write(101,*)'grow leave',NB,NZ,Growth_brch(ielmc,ibrch_leaf)
-  IF(Growth_brch(ielmc,ibrch_leaf).GT.0.0_r8)THEN
+  IF(GrowthLeaf(ielmc).GT.0.0_r8)THEN
     MXNOD=KHiestGroLeafNode_brch(NB,NZ)
     MNNOD=MAX(MinNodeNum,MXNOD-NumCogrowNode(NZ)+1)
     MXNOD=MAX(MXNOD,MNNOD)
@@ -3384,7 +3386,7 @@ module PlantBranchMod
     GNOD=KNOD
     ALLOCL=1.0_r8/GNOD
     DO NE=1,NumPlantChemElms
-      GrowthChemElmt(NE)=ALLOCL*Growth_brch(NE,ibrch_leaf)
+      GrowthChemElmt(NE)=ALLOCL*GrowthLeaf(NE)
     ENDDO
     GrowthSLA=ALLOCL*FNOD(NZ)*NumCogrowNode(NZ)
 !
@@ -3455,14 +3457,14 @@ module PlantBranchMod
     KHiestGroLeafNode_brch       =>  plt_pheno%KHiestGroLeafNode_brch     &        
   )
 
-  IF(Growth_brch(ielmc,ibrch_petole).GT.0.0_r8)THEN
+  IF(GrowthPetiole(ielmc).GT.0.0_r8)THEN
     MXNOD=KHiestGroLeafNode_brch(NB,NZ)
     MNNOD=MAX(MinNodeNum,MXNOD-NumCogrowNode(NZ)+1)
     MXNOD=MAX(MXNOD,MNNOD)
     GNOD=MXNOD-MNNOD+1
     ALLOCS=1.0_r8/GNOD
     DO NE=1,NumPlantChemElms
-      GrowthChemElmt(NE)=ALLOCS*Growth_brch(NE,ibrch_petole)
+      GrowthChemElmt(NE)=ALLOCS*GrowthPetiole(NE)
     ENDDO
     GSSL=ALLOCL*FNOD(NZ)*NumCogrowNode(NZ)
 !
@@ -3542,11 +3544,11 @@ module PlantBranchMod
     KHiestGroLeafNode_brch(NB,NZ)-MaxNodesPerBranch1+2)
   MXNOD=MAX(MXNOD,MNNOD)
 
-  IF(Growth_brch(ielmc,ibrch_stalk).GT.0.0_r8)THEN
+  IF(GrowthStalk(ielmc).GT.0.0_r8)THEN
     GNOD=MXNOD-MNNOD+1
     ALLOCN=1.0_r8/GNOD
     DO NE=1,NumPlantChemElms
-      GrowthChemElmt(NE)=ALLOCN*Growth_brch(NE,ibrch_stalk)
+      GrowthChemElmt(NE)=ALLOCN*GrowthStalk(NE)
     ENDDO
 !
 !     SPECIFIC INTERNODE LENGTH FUNCTION OF CURRENT STALK MASS
