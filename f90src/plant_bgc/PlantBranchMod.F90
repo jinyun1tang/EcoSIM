@@ -118,7 +118,6 @@ module PlantBranchMod
     LeafElmntNode_brch           =>  plt_biom%LeafElmntNode_brch     , &
     LeafPetoNonstElmConc_brch    =>  plt_biom%LeafPetoNonstElmConc_brch    , &
     PetioleProteinCNode_brch     =>  plt_biom%PetioleProteinCNode_brch    , &
-    GrainStrutElms_brch          =>  plt_biom%GrainStrutElms_brch    , &
     ZEROP                        =>  plt_biom%ZEROP     , &
     ZEROL                        =>  plt_biom%ZEROL     , &
     iPlantPhotosynthesisType     =>  plt_photo%iPlantPhotosynthesisType   , &
@@ -150,8 +149,9 @@ module PlantBranchMod
 
     call CalcPartitionCoeff(I,J,NB,NZ,PART,PTRT,LRemob_brch,BegRemoblize)
 
-    call UpdateBranchAllometry((I,J,NZ,NB,PART,ShootStructN,DMSHD,CNLFM,CPLFM,&
-    CNSHX,CPSHX,CNLFX,CPLFX,DMLFB,DMSHB,CNLFB,CPLFB,CNSHB,CPSHB)
+    call UpdateBranchAllometry(I,J,NZ,NB,PART,CNLFW,CNRTW,CNSHW,CPLFW,&
+    CPRTW,CPSHW,ShootStructN,DMSHD,CNLFM,CPLFM,&
+      CNSHX,CPSHX,CNLFX,CPLFX,DMLFB,DMSHB,CNLFB,CPLFB,CNSHB,CPSHB)
 !
 !   GROSS PRIMARY PRODUCTIVITY
 !
@@ -405,10 +405,12 @@ module PlantBranchMod
   end subroutine GrowOneBranch
 
 !------------------------------------------------------------------------------------------
-  subroutine UpdateBranchAllometry(I,J,NZ,NB,PART,ShootStructN,DMSHD,CNLFM,CPLFM,&
+  subroutine UpdateBranchAllometry(I,J,NZ,NB,PART,CNLFW,CNRTW,CNSHW,CPLFW,&
+    CPRTW,CPSHW,ShootStructN,DMSHD,CNLFM,CPLFM,&
     CNSHX,CPSHX,CNLFX,CPLFX,DMLFB,DMSHB,CNLFB,CPLFB,CNSHB,CPSHB)
   implicit none
   integer, intent(in) :: I,J,NB,NZ
+  real(r8), intent(in) :: CNLFW,CNRTW,CNSHW,CPLFW,CPRTW,CPSHW
   real(r8), intent(in) :: PART(pltpar%NumOfPlantMorphUnits)
   real(r8), intent(out) :: ShootStructN    
   real(r8), intent(out) :: DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX
@@ -424,6 +426,7 @@ module PlantBranchMod
     rPCHusk_pft                  =>  plt_allom%rPCHusk_pft            , &
     rPCStalk_pft                 =>  plt_allom%rPCStalk_pft           , &
     rNCStalk_pft                 =>  plt_allom%rNCStalk_pft           , &
+    rNCReserve_pft               =>  plt_allom%rNCReserve_pft         , &    
     StalkBiomGrowthYield         =>  plt_allom%StalkBiomGrowthYield   , &
     HuskBiomGrowthYield          =>  plt_allom%HuskBiomGrowthYield    , &
     rNCHusk_pft                  =>  plt_allom%rNCHusk_pft            , &
@@ -432,6 +435,9 @@ module PlantBranchMod
     GrainBiomGrowthYield         =>  plt_allom%GrainBiomGrowthYield   , &
     iPlantCalendar_brch          =>  plt_pheno%iPlantCalendar_brch    , &
     PetoleStrutElms_brch         =>  plt_biom%PetoleStrutElms_brch    , &
+    GrainStrutElms_brch          =>  plt_biom%GrainStrutElms_brch     , &    
+    EarStrutElms_brch            =>  plt_biom%EarStrutElms_brch       , &    
+    HuskStrutElms_brch           =>  plt_biom%HuskStrutElms_brch      , &    
     LeafStrutElms_brch           =>  plt_biom%LeafStrutElms_brch      , &        
     StalkBiomassC_brch           =>  plt_biom%StalkBiomassC_brch      , &    
     RootBiomGrosYld_pft          =>  plt_allom%RootBiomGrosYld_pft      &    
@@ -505,7 +511,7 @@ module PlantBranchMod
     ShootStructN=ShootStructN+AZMAX1(HuskStrutElms_brch(ielmn,NB,NZ) &
       +EarStrutElms_brch(ielmn,NB,NZ)+GrainStrutElms_brch(ielmn,NB,NZ))
   ENDIF
-
+  end associate
   end subroutine UpdateBranchAllometry  
 !------------------------------------------------------------------------------------------
   subroutine CalcPartitionCoeff(I,J,NB,NZ,part,PTRT,BegRemoblize,LRemob_brch)

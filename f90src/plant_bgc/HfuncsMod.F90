@@ -59,7 +59,6 @@ module HfuncsMod
     DayLenthPrev                     =>  plt_site%DayLenthPrev                     , &
     NP                               =>  plt_site%NP                               , &
     PlantPopulation_pft              =>  plt_site%PlantPopulation_pft              , &
-    KLeafNumber_brch                 =>  plt_morph%KLeafNumber_brch                , &
     MainBranchNum_pft                =>  plt_morph%MainBranchNum_pft                 &
   )
   D9985: DO NZ=1,NP
@@ -113,6 +112,7 @@ module HfuncsMod
     doRemobilization_brch            =>  plt_pheno%doRemobilization_brch         , &    
     NumOfBranches_pft                =>  plt_morph%NumOfBranches_pft             , &    
     iPlantRootProfile_pft            =>  plt_pheno%iPlantRootProfile_pft         , &    
+    KLeafNumber_brch                 =>  plt_morph%KLeafNumber_brch              , &    
     KHiestGroLeafNode_brch           =>  plt_pheno%KHiestGroLeafNode_brch          &    
   )
 
