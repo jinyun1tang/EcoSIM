@@ -299,7 +299,7 @@ module grosubsMod
   !
   !Description
   !plant growth
-  use PlantDisturbsMod, only : RemoveBiomByManagement
+  use PlantDisturbsMod, only : RemoveBiomByMgmt
   implicit none
   integer, intent(in) :: I,J,NZ
   real(r8), intent(in) :: CanopyHeight_copy(JP1)
@@ -358,7 +358,7 @@ module grosubsMod
   ENDIF
 !
 !  call SumPlantBiom(I,J,NZ,'bfrmbiom')
-  call RemoveBiomByManagement(I,J,NZ)
+  call RemoveBiomByMgmt(I,J,NZ)
 !
 !     RESET DEAD BRANCHES
 !  call SumPlantBiom(I,J,NZ,'bfresetdead')
@@ -674,11 +674,11 @@ module grosubsMod
     StalkStrutElms_pft(NE,NZ)=sum(StalkStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
     LeafStrutElms_pft(NE,NZ)=sum(LeafStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
     StalkRsrvElms_pft(NE,NZ)=sum(StalkRsrvElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
-    if(StalkRsrvElms_pft(NE,NZ)>1.e20)then
-      print*,NZ,NE,I+J/24.,StalkRsrvElms_pft(NE,NZ),NumOfBranches_pft(NZ)
-      print*,'755',StalkRsrvElms_brch(NE,1,NZ)
-      stop
-    endif
+!    if(StalkRsrvElms_pft(NE,NZ)>1.e20)then
+!      print*,NZ,NE,I+J/24.,StalkRsrvElms_pft(NE,NZ),NumOfBranches_pft(NZ)
+!      print*,'755',StalkRsrvElms_brch(NE,1,NZ)
+!      stop
+!    endif
     HuskStrutElms_pft(NE,NZ)=sum(HuskStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
     GrainStrutElms_pft(NE,NZ)=sum(GrainStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
     EarStrutElms_pft(NE,NZ)=sum(EarStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))

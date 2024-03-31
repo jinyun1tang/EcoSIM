@@ -52,9 +52,9 @@ implicit none
 !      ENDDO
       !predict uptake fluxes of nutrients and O2
       CALL UPTAKES(I,J)
-      DO NZ=1,NP(NY,NX)
-        call SumPlantBiom(I,J,NZ,'bfGROSUBS')
-      ENDDO
+!      DO NZ=1,NP(NY,NX)
+!        call SumPlantBiom(I,J,NZ,'bfGROSUBS')
+!      ENDDO
       !do growth of active branches
       CALL GROSUBs(I,J)
 

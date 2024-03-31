@@ -301,11 +301,11 @@ module PlantBranchMod
       HuskStrutElms_brch(NE,NB,NZ)=HuskStrutElms_brch(NE,NB,NZ)+GrowthHusk(NE)
       EarStrutElms_brch(NE,NB,NZ)=EarStrutElms_brch(NE,NB,NZ)+GrowthEar(NE)
     ENDDO
-    if(NZ==1)THEN
-      WRITE(203,'(I3,7(X,F16.6))')NB,I+J/24.,(StalkRsrvElms_brch(NE,NB,NZ),GrowthReserve(NE),NE=1,NumPlantChemElms)
-    ELSE
-      WRITE(204,'(I3,7(X,F16.6))')NB,I+J/24.,(StalkRsrvElms_brch(NE,NB,NZ),GrowthReserve(NE),NE=1,NumPlantChemElms)
-    ENDIF
+!    if(NZ==1)THEN
+!      WRITE(203,'(I3,7(X,F16.6))')NB,I+J/24.,(StalkRsrvElms_brch(NE,NB,NZ),GrowthReserve(NE),NE=1,NumPlantChemElms)
+!    ELSE
+!      WRITE(204,'(I3,7(X,F16.6))')NB,I+J/24.,(StalkRsrvElms_brch(NE,NB,NZ),GrowthReserve(NE),NE=1,NumPlantChemElms)
+!    ENDIF
 
 !
 !   ETOLIATION
@@ -765,12 +765,11 @@ module PlantBranchMod
   IF(iPlantCalendar_brch(ipltcal_Emerge,NB,NZ).NE.0)THEN
 !    write(101,*)'computegpp branch',NB,NZ
     call ComputeGPP(NB,NZ,WFNG,Stomata_Activity,CH2O3,CH2O4,CH2O,CO2F,CH2OClm,CH2OLlm)
-!    if(NZ==1)then
-!    write(101,'(I4,5(X,F13.6))')NB,I+J/24.,CO2F,CH2O,CH2OClm,CH2OLlm
-!    else
-!    write(102,'(I4,5(X,F13.6))')NB,I+J/24.,CO2F,CH2O,CH2OClm,CH2OLlm
-!    endif
-!    CH2O=max(CH2OClm,CH2OLlm);CO2F=CH2O
+    if(NZ==1)then
+    write(101,'(I4,5(X,F13.6))')NB,I+J/24.,CO2F,CH2O,CH2OClm,CH2OLlm
+    else
+    write(102,'(I4,5(X,F13.6))')NB,I+J/24.,CO2F,CH2O,CH2OClm,CH2OLlm
+    endif
 !
 !   SHOOT AUTOTROPHIC RESPIRATION AFTER EMERGENCE
 !
@@ -784,7 +783,7 @@ module PlantBranchMod
     CH2O=0._r8
     call ComputRAutoB4Emergence(I,NB,NZ,TFN6_vr,DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX,ShootStructN,&
       WFNG,WFNSG,CanopyNonstElm4Gros,CNPG,RCO2NonstC_brch,RMNCS,RMxess_brch,NonStructalC4Growth_brch,CNRDM,RCO2NonstC4Nassim_brch)
-!    write(101,*)'ComputRAutoB4Emergence',NonStructalC4Growth_brch  
+    write(101,*)NB,I+J/24.,'ComputRAutoB4Emergence',NonStructalC4Growth_brch,CanopyNonstElms_brch(ielmc,NB,NZ)  
   ENDIF
 
 !   REMOVE C,N,P USED IN MAINTENANCE + GROWTH REPIRATION AND GROWTH
@@ -3153,7 +3152,7 @@ module PlantBranchMod
     NGTopRootLayer_pft                 =>  plt_morph%NGTopRootLayer_pft     , &
     C4PhotosynDowreg_brch              =>  plt_photo%C4PhotosynDowreg_brch     &
   )
-  iter=iter+1
+!  iter=iter+1
 !
 ! N,P CONSTRAINT ON RESPIRATION FROM NON-STRUCTURAL C:N:P
 !

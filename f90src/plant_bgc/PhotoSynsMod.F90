@@ -36,30 +36,30 @@ implicit none
   real(r8) :: VA,VG
   real(r8) :: Tau_rad,PAR_zsec
 !begin_execution
-  associate(                          &
-  ZERO                          => plt_site%ZERO   , &
-  iPlantRootProfile_pft         => plt_pheno%iPlantRootProfile_pft, &
-  RubiscoActivity_brch          => plt_photo%RubiscoActivity_brch  , &
-  CanopyGasCO2_pft              => plt_photo%CanopyGasCO2_pft  , &
-  LeafAUnshaded_zsec            => plt_photo%LeafAUnshaded_zsec , &
-  Km4RubiscoCarboxy_pft         => plt_photo%Km4RubiscoCarboxy_pft, &
-  CO2Solubility_pft             => plt_photo%CO2Solubility_pft , &
-  RubiscoCarboxyEff_node        => plt_photo%RubiscoCarboxyEff_node , &
-  LigthSatCarboxyRate_node      => plt_photo%LigthSatCarboxyRate_node , &
+  associate(                                                                 &
+  ZERO                          => plt_site%ZERO                           , &
+  iPlantRootProfile_pft         => plt_pheno%iPlantRootProfile_pft         , &
+  RubiscoActivity_brch          => plt_photo%RubiscoActivity_brch          , &
+  CanopyGasCO2_pft              => plt_photo%CanopyGasCO2_pft              , &
+  LeafAUnshaded_zsec            => plt_photo%LeafAUnshaded_zsec            , &
+  Km4RubiscoCarboxy_pft         => plt_photo%Km4RubiscoCarboxy_pft         , &
+  CO2Solubility_pft             => plt_photo%CO2Solubility_pft             , &
+  RubiscoCarboxyEff_node        => plt_photo%RubiscoCarboxyEff_node        , &
+  LigthSatCarboxyRate_node      => plt_photo%LigthSatCarboxyRate_node      , &
   CO2lmtRubiscoCarboxyRate_node => plt_photo%CO2lmtRubiscoCarboxyRate_node , &
-  LeafIntracellularCO2_pft      => plt_photo%LeafIntracellularCO2_pft , &
-  CO2CuticleResist_pft          => plt_photo%CO2CuticleResist_pft  , &
-  Km4PEPCarboxy_pft             => plt_photo%Km4PEPCarboxy_pft, &
-  Vmax4RubiscoCarboxy_pft       => plt_photo%Vmax4RubiscoCarboxy_pft , &
-  CO2CompenPoint_node           => plt_photo%CO2CompenPoint_node , &
-  AirConc_pft                   => plt_photo%AirConc_pft  , &
-  DiffCO2Atmos2Intracel_pft     => plt_photo%DiffCO2Atmos2Intracel_pft , &
-  ZEROP                         => plt_biom%ZEROP  , &
-  CanopyLeafAreaByLayer_pft     => plt_morph%CanopyLeafAreaByLayer_pft , &
-  PARDiffus_zsec                => plt_rad%PARDiffus_zsec  , &
-  PARDirect_zsec                => plt_rad%PARDirect_zsec    , &
-  TAU_RadThru                   => plt_rad%TAU_RadThru    , &
-  TAU_RadCapt                   => plt_rad%TAU_RadCapt      &
+  LeafIntracellularCO2_pft      => plt_photo%LeafIntracellularCO2_pft      , &
+  CO2CuticleResist_pft          => plt_photo%CO2CuticleResist_pft          , &
+  Km4PEPCarboxy_pft             => plt_photo%Km4PEPCarboxy_pft             , &
+  Vmax4RubiscoCarboxy_pft       => plt_photo%Vmax4RubiscoCarboxy_pft       , &
+  CO2CompenPoint_node           => plt_photo%CO2CompenPoint_node           , &
+  AirConc_pft                   => plt_photo%AirConc_pft                   , &
+  DiffCO2Atmos2Intracel_pft     => plt_photo%DiffCO2Atmos2Intracel_pft     , &
+  ZEROP                         => plt_biom%ZEROP                          , &
+  CanopyLeafAreaByLayer_pft     => plt_morph%CanopyLeafAreaByLayer_pft     , &
+  PARDiffus_zsec                => plt_rad%PARDiffus_zsec                  , &
+  PARDirect_zsec                => plt_rad%PARDirect_zsec                  , &
+  TAU_RadThru                   => plt_rad%TAU_RadThru                     , &
+  TAU_RadCapt                   => plt_rad%TAU_RadCapt                       &
   )
 
   CH2O3K=0._r8
@@ -227,32 +227,32 @@ implicit none
   real(r8) :: VA,VG
   real(r8) :: PAR_zsec,Tau_rad
 ! begin_execution
-  associate(                                                               &
-  iPlantRootProfile_pft             => plt_pheno%iPlantRootProfile_pft, &
-  ZEROP                             => plt_biom%ZEROP  , &
-  Km4PEPCarboxy_pft                 => plt_photo%Km4PEPCarboxy_pft, &
+  associate(                                                                    &
+  iPlantRootProfile_pft             => plt_pheno%iPlantRootProfile_pft        , &
+  ZEROP                             => plt_biom%ZEROP                         , &
+  Km4PEPCarboxy_pft                 => plt_photo%Km4PEPCarboxy_pft            , &
   NutrientCtrlonC4Carboxy_node      => plt_photo%NutrientCtrlonC4Carboxy_node , &
-  CO2Solubility_pft                 => plt_photo%CO2Solubility_pft , &
-  C4CarboxyEff_node                 => plt_photo%C4CarboxyEff_node , &
-  LeafAUnshaded_zsec                => plt_photo%LeafAUnshaded_zsec , &
-  CO2lmtPEPCarboxyRate_node         => plt_photo%CO2lmtPEPCarboxyRate_node, &
-  CO2CuticleResist_pft              => plt_photo%CO2CuticleResist_pft  , &
-  DiffCO2Atmos2Intracel_pft         => plt_photo%DiffCO2Atmos2Intracel_pft , &
-  AirConc_pft                       => plt_photo%AirConc_pft  , &
-  LigthSatCarboxyRate_node          => plt_photo%LigthSatCarboxyRate_node , &
-  CO2lmtRubiscoCarboxyRate_node     => plt_photo%CO2lmtRubiscoCarboxyRate_node , &
-  LigthSatC4CarboxyRate_node        => plt_photo%LigthSatC4CarboxyRate_node , &
-  CanopyGasCO2_pft                  => plt_photo%CanopyGasCO2_pft  , &
-  RubiscoActivity_brch              => plt_photo%RubiscoActivity_brch  , &
-  LeafIntracellularCO2_pft          => plt_photo%LeafIntracellularCO2_pft , &
-  RubiscoCarboxyEff_node            => plt_photo%RubiscoCarboxyEff_node , &
-  Vmax4PEPCarboxy_pft               => plt_photo%Vmax4PEPCarboxy_pft , &
-  CanopyLeafAreaByLayer_pft         => plt_morph%CanopyLeafAreaByLayer_pft , &
-  ZERO                              => plt_site%ZERO   , &
-  PARDiffus_zsec                    => plt_rad%PARDiffus_zsec  , &
-  PARDirect_zsec                    => plt_rad%PARDirect_zsec    , &
-  TAU_RadThru                       => plt_rad%TAU_RadThru    , &
-  TAU_RadCapt                       => plt_rad%TAU_RadCapt      &
+  CO2Solubility_pft                 => plt_photo%CO2Solubility_pft            , &
+  C4CarboxyEff_node                 => plt_photo%C4CarboxyEff_node            , &
+  LeafAUnshaded_zsec                => plt_photo%LeafAUnshaded_zsec           , &
+  CO2lmtPEPCarboxyRate_node         => plt_photo%CO2lmtPEPCarboxyRate_node    , &
+  CO2CuticleResist_pft              => plt_photo%CO2CuticleResist_pft         , &
+  DiffCO2Atmos2Intracel_pft         => plt_photo%DiffCO2Atmos2Intracel_pft    , &
+  AirConc_pft                       => plt_photo%AirConc_pft                  , &
+  LigthSatCarboxyRate_node          => plt_photo%LigthSatCarboxyRate_node     , &
+  CO2lmtRubiscoCarboxyRate_node     => plt_photo%CO2lmtRubiscoCarboxyRate_node, &
+  LigthSatC4CarboxyRate_node        => plt_photo%LigthSatC4CarboxyRate_node   , &
+  CanopyGasCO2_pft                  => plt_photo%CanopyGasCO2_pft             , &
+  RubiscoActivity_brch              => plt_photo%RubiscoActivity_brch         , &
+  LeafIntracellularCO2_pft          => plt_photo%LeafIntracellularCO2_pft     , &
+  RubiscoCarboxyEff_node            => plt_photo%RubiscoCarboxyEff_node       , &
+  Vmax4PEPCarboxy_pft               => plt_photo%Vmax4PEPCarboxy_pft          , &
+  CanopyLeafAreaByLayer_pft         => plt_morph%CanopyLeafAreaByLayer_pft    , &
+  ZERO                              => plt_site%ZERO                          , &
+  PARDiffus_zsec                    => plt_rad%PARDiffus_zsec                 , &
+  PARDirect_zsec                    => plt_rad%PARDirect_zsec                 , &
+  TAU_RadThru                       => plt_rad%TAU_RadThru                    , &
+  TAU_RadCapt                       => plt_rad%TAU_RadCapt                      &
   )
 
   CH2O3K=0._r8;CH2O4K=0._r8
@@ -426,17 +426,17 @@ implicit none
   integer  :: K
 
 ! begin_execution
-  associate(                                                     &
-    CanopyGasCO2_pft          =>  plt_photo%CanopyGasCO2_pft   , &
+  associate(                                                           &
+    CanopyGasCO2_pft          =>  plt_photo%CanopyGasCO2_pft         , &
     iPlantPhotosynthesisType  =>  plt_photo%iPlantPhotosynthesisType , &
-    Vmax4PEPCarboxy_pft       =>  plt_photo%Vmax4PEPCarboxy_pft  , &
+    Vmax4PEPCarboxy_pft       =>  plt_photo%Vmax4PEPCarboxy_pft      , &
     Vmax4RubiscoCarboxy_pft   =>  plt_photo%Vmax4RubiscoCarboxy_pft  , &
-    iPlantRootProfile_pft  =>  plt_pheno%iPlantRootProfile_pft , &
-    SineSolarIncliAngle       =>  plt_rad%SineSolarIncliAngle     , &
-    RadPARbyCanopy_pft        =>  plt_rad%RadPARbyCanopy_pft     , &
-    ZEROP                     =>  plt_biom%ZEROP   , &
-    LeafAreaNode_brch         =>  plt_morph%LeafAreaNode_brch  , &
-    RubiscoActivity_brch      =>  plt_photo%RubiscoActivity_brch     &
+    iPlantRootProfile_pft     =>  plt_pheno%iPlantRootProfile_pft    , &
+    SineSolarIncliAngle       =>  plt_rad%SineSolarIncliAngle        , &
+    RadPARbyCanopy_pft        =>  plt_rad%RadPARbyCanopy_pft         , &
+    ZEROP                     =>  plt_biom%ZEROP                     , &
+    LeafAreaNode_brch         =>  plt_morph%LeafAreaNode_brch        , &
+    RubiscoActivity_brch      =>  plt_photo%RubiscoActivity_brch       &
   )
 !  write(193,*)'rubisco',NB,NZ,RubiscoActivity_brch(NB,NZ)
   CH2OClm=0._r8;CH2OLlm=0._r8

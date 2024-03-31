@@ -44,22 +44,22 @@
   REAL(R8):: CanopyBndlResist_pft4CO2
   real(r8):: RI
 !     begin_execution
-  associate(                            &
-    RIB                        =>  plt_ew%RIB       , &
-    RAZ                        =>  plt_ew%RAZ       , &
-    TairK                      =>  plt_ew%TairK       , &
-    TKCanopy_pft               =>  plt_ew%TKCanopy_pft      , &
-    CO2E                       =>  plt_site%CO2E    , &
-    CanopyGasCO2_pft           =>  plt_photo%CanopyGasCO2_pft   , &
-    CanopyLeafArea_pft         =>  plt_morph%CanopyLeafArea_pft  , &
-    ZEROP                      =>  plt_biom%ZEROP   , &
-    CNETX                      =>  plt_bgcr%CNETX   , &
-    SineSolarIncliAngle        =>  plt_rad%SineSolarIncliAngle     , &
-    AirConc_pft                =>  plt_photo%AirConc_pft   , &
-    MinCanPStomaResistH2O_pft  =>  plt_photo%MinCanPStomaResistH2O_pft   , &
-    CanPCi2CaRatio             =>  plt_photo%CanPCi2CaRatio   , &
-    MaxCanPStomaResistH2O_pft  =>  plt_photo%MaxCanPStomaResistH2O_pft   , &
-    LeafIntracellularCO2_pft   =>  plt_photo%LeafIntracellularCO2_pft    &
+  associate(                                                              &
+    RIB                        =>  plt_ew%RIB                           , &
+    RAZ                        =>  plt_ew%RAZ                           , &
+    TairK                      =>  plt_ew%TairK                         , &
+    TKCanopy_pft               =>  plt_ew%TKCanopy_pft                  , &
+    CO2E                       =>  plt_site%CO2E                        , &
+    CanopyGasCO2_pft           =>  plt_photo%CanopyGasCO2_pft           , &
+    CanopyLeafArea_pft         =>  plt_morph%CanopyLeafArea_pft         , &
+    ZEROP                      =>  plt_biom%ZEROP                       , &
+    CNETX                      =>  plt_bgcr%CNETX                       , &
+    SineSolarIncliAngle        =>  plt_rad%SineSolarIncliAngle          , &
+    AirConc_pft                =>  plt_photo%AirConc_pft                , &
+    MinCanPStomaResistH2O_pft  =>  plt_photo%MinCanPStomaResistH2O_pft  , &
+    CanPCi2CaRatio             =>  plt_photo%CanPCi2CaRatio             , &
+    MaxCanPStomaResistH2O_pft  =>  plt_photo%MaxCanPStomaResistH2O_pft  , &
+    LeafIntracellularCO2_pft   =>  plt_photo%LeafIntracellularCO2_pft     &
   )
   ii=i;jj=j
 !
@@ -121,12 +121,12 @@
   real(r8) :: ETLF,EGRO,PARX,PARJ
   real(r8) :: VL
 !     begin_execution
-  associate(                            &
+  associate(                                                                        &
     CO2lmtRubiscoCarboxyRate_node   => plt_photo%CO2lmtRubiscoCarboxyRate_node    , &
-    RubiscoCarboxyEff_node          => plt_photo%RubiscoCarboxyEff_node    , &
-    LigthSatCarboxyRate_node        => plt_photo%LigthSatCarboxyRate_node    , &
-    LeafAUnshaded_zsec              => plt_photo%LeafAUnshaded_zsec    , &
-    RubiscoActivity_brch            => plt_photo%RubiscoActivity_brch       &
+    RubiscoCarboxyEff_node          => plt_photo%RubiscoCarboxyEff_node           , &
+    LigthSatCarboxyRate_node        => plt_photo%LigthSatCarboxyRate_node         , &
+    LeafAUnshaded_zsec              => plt_photo%LeafAUnshaded_zsec               , &
+    RubiscoActivity_brch            => plt_photo%RubiscoActivity_brch               &
   )
 !
 !     LIGHT-LIMITED CARBOXYLATION RATES
@@ -166,13 +166,13 @@
   integer :: N,M,LP
   real(r8) :: PAR_zsec,Tau_rad
 !     begin_execution
-  associate(                           &
-    ZEROP               => plt_biom%ZEROP     , &
+  associate(                                                 &
+    ZEROP               => plt_biom%ZEROP                  , &
     LeafAUnshaded_zsec  => plt_photo%LeafAUnshaded_zsec    , &
-    PARDirect_zsec      => plt_rad%PARDirect_zsec       , &
-    PARDiffus_zsec      => plt_rad%PARDiffus_zsec       , &
-    TAU_RadCapt         => plt_rad%TAU_RadCapt          , &
-    TAU_RadThru         => plt_rad%TAU_RadThru            &
+    PARDirect_zsec      => plt_rad%PARDirect_zsec          , &
+    PARDiffus_zsec      => plt_rad%PARDiffus_zsec          , &
+    TAU_RadCapt         => plt_rad%TAU_RadCapt             , &
+    TAU_RadThru         => plt_rad%TAU_RadThru               &
   )
 !     FOR EACH INCLINATION AND AZIMUTH CLASS
 !

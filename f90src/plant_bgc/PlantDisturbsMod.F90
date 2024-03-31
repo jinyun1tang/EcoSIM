@@ -33,7 +33,7 @@ module PlantDisturbsMod
   real(r8) :: EFIRE(2,5:5)
 
   public :: RemoveBiomassByDisturbance
-  public :: RemoveBiomByManagement
+  public :: RemoveBiomByMgmt
   public :: InitPlantDisturbance
   contains
 
@@ -45,7 +45,7 @@ module PlantDisturbsMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine RemoveBiomByManagement(I,J,NZ)
+  subroutine RemoveBiomByMgmt(I,J,NZ)
   implicit none
   integer, intent(in) :: I,J,NZ
 
@@ -57,7 +57,7 @@ module PlantDisturbsMod
 !     REDUCE OR REMOVE PLANT POPULATIONS DURING TILLAGE
 !
   call RemoveBiomByTillage(I,J,NZ)
-  end subroutine RemoveBiomByManagement
+  end subroutine RemoveBiomByMgmt
 !------------------------------------------------------------------------------------------
 
   subroutine RemoveBiomassByDisturbance(I,J,NZ)
