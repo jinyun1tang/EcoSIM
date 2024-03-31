@@ -400,8 +400,8 @@ module StartqsMod
     DATAP                      =>  plt_site%DATAP   , &
     iPlantPhotosynthesisType   =>  plt_photo%iPlantPhotosynthesisType , &
     HighTCLimtSeed_pft         =>  plt_pheno%HighTCLimtSeed_pft   , &
-    TCelcius4LeafOffHarden_pft =>  plt_pheno%TCelcius4LeafOffHarden_pft    , &
-    TCelsChill4Leaf_pft        =>  plt_pheno%TCelsChill4Leaf_pft   , &
+    TC4LeafOff_pft =>  plt_pheno%TC4LeafOff_pft    , &
+    TC4LeafOut_pft        =>  plt_pheno%TC4LeafOut_pft   , &
     OFFST                      =>  plt_pheno%OFFST  , &
     PlantInitThermoAdaptZone   =>  plt_pheno%PlantInitThermoAdaptZone , &
     iPlantThermoAdaptZone      =>  plt_pheno%iPlantThermoAdaptZone  , &
@@ -412,14 +412,14 @@ module StartqsMod
 !
 !     ZTYP,PlantInitThermoAdaptZone=dynamic,initial thermal adaptation zone from PFT file
 !     OFFST=shift in Arrhenius curve for thermal adaptation (oC)
-!     TCZ,TCelcius4LeafOffHarden_pft=threshold temperature for leafout,leafoff
+!     TCZ,TC4LeafOff_pft=threshold temperature for leafout,leafoff
 !     HTC=high temperature threshold for grain number loss (oC)
 !     SSTX=sensitivity to HTC (seeds oC-1 above HTC)
 !
   iPlantThermoAdaptZone(NZ)=PlantInitThermoAdaptZone(NZ)
   OFFST(NZ)=2.667_r8*(2.5_r8-iPlantThermoAdaptZone(NZ))
-  TCelsChill4Leaf_pft(NZ)=TCZD-OFFST(NZ)
-  TCelcius4LeafOffHarden_pft(NZ)=AMIN1(15.0_r8,TCXD-OFFST(NZ))
+  TC4LeafOut_pft(NZ)=TCZD-OFFST(NZ)
+  TC4LeafOff_pft(NZ)=AMIN1(15.0_r8,TCXD-OFFST(NZ))
   IF(iPlantPhotosynthesisType(NZ).EQ.ic3_photo)THEN
     IF(DATAP(NZ)(1:4).EQ.'soyb')THEN
       HighTCLimtSeed_pft(NZ)=30.0_r8+3.0_r8*iPlantThermoAdaptZone(NZ)
@@ -597,7 +597,7 @@ module StartqsMod
     NumOfLeaves_brch                  =>  plt_morph%NumOfLeaves_brch  , &
     CanopyHeight_pft                  =>  plt_morph%CanopyHeight_pft    , &
     KLeafNumber_brch                  =>  plt_morph%KLeafNumber_brch , &
-    XTLI                              =>  plt_morph%XTLI   , &
+    ShootNodeNumAtPlanting_pft        =>  plt_morph%ShootNodeNumAtPlanting_pft   , &
     BranchNumber_pft                  =>  plt_morph%BranchNumber_pft    , &
     ShootNodeNum_brch              =>  plt_morph%ShootNodeNum_brch  , &
     CanopyLeafArea_pft                =>  plt_morph%CanopyLeafArea_pft  , &
@@ -642,7 +642,7 @@ module StartqsMod
     plt_pheno%Prep4Literfall_brch(NB,NZ)=ifalse
     plt_pheno%Hours4LiterfalAftMature_brch(NB,NZ)=0
     MatureGroup_brch(NB,NZ)=MatureGroup_pft(NZ)
-    ShootNodeNum_brch(NB,NZ)=XTLI(NZ)
+    ShootNodeNum_brch(NB,NZ)=ShootNodeNumAtPlanting_pft(NZ)
     NodeNum2InitFloral_brch(NB,NZ)=ShootNodeNum_brch(NB,NZ)
     NodeNumberAtAnthesis_brch(NB,NZ)=0._r8
     NumOfLeaves_brch(NB,NZ)=0._r8

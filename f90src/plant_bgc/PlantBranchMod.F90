@@ -133,7 +133,7 @@ module PlantBranchMod
     iPlantCalendar_brch          =>  plt_pheno%iPlantCalendar_brch   , &
     iPlantTurnoverPattern_pft    =>  plt_pheno%iPlantTurnoverPattern_pft   , &
     iPlantPhenolPattern_pft      =>  plt_pheno%iPlantPhenolPattern_pft   , &
-    TCelciusChill4Seed           =>  plt_pheno%TCelciusChill4Seed     , &
+    TCChill4Seed_pft           =>  plt_pheno%TCChill4Seed_pft     , &
     SineSolarIncliAngleNextHour  =>  plt_rad%SineSolarIncliAngleNextHour      , &
     PlantPopulation_pft          =>  plt_site%PlantPopulation_pft        , &
     ZERO                         =>  plt_site%ZERO      , &
@@ -513,7 +513,7 @@ module PlantBranchMod
     TotalNodeNumNormByMatgrp_brch      =>  plt_pheno%TotalNodeNumNormByMatgrp_brch    , &
     iPlantPhenolPattern_pft         =>  plt_pheno%iPlantPhenolPattern_pft    , &
     iPlantPhenolType_pft               =>  plt_pheno%iPlantPhenolType_pft    , &
-    TCelciusChill4Seed                 =>  plt_pheno%TCelciusChill4Seed      , &
+    TCChill4Seed_pft                 =>  plt_pheno%TCChill4Seed_pft      , &
     NH3Dep2Can_brch                       =>  plt_rbgc%NH3Dep2Can_brch      , &
     CO2NetFix_pft                      =>  plt_bgcr%CO2NetFix_pft       , &
     NodeLenPergC                       =>  plt_morph%NodeLenPergC      , &
@@ -687,7 +687,7 @@ module PlantBranchMod
       HoursDoingRemob_brch(NB,NZ)=HoursDoingRemob_brch(NB,NZ)+1.0_r8
     ELSEIF((iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldecid.OR.&
       iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldroutdecid).AND.&
-      TCelciusCanopy_pft(NZ).LT.TCelciusChill4Seed(NZ))THEN
+      TCelciusCanopy_pft(NZ).LT.TCChill4Seed_pft(NZ))THEN
       IFLGY=itrue
       HoursDoingRemob_brch(NB,NZ)=HoursDoingRemob_brch(NB,NZ)+1.0_r8
     ELSEIF(iPlantPhenolType_pft(NZ).GE.2 .AND. PSICanopy_pft(NZ).LT.PSILY(iPlantRootProfile_pft(NZ)))THEN
@@ -1907,7 +1907,7 @@ module PlantBranchMod
     HighTCLimtSeed_pft                    =>  plt_pheno%HighTCLimtSeed_pft     , &
     dReproNodeNumNormByMatG_brch          =>  plt_pheno%dReproNodeNumNormByMatG_brch   , &
     iPlantCalendar_brch                   =>  plt_pheno%iPlantCalendar_brch   , &
-    TCelciusChill4Seed                    =>  plt_pheno%TCelciusChill4Seed     , &
+    TCChill4Seed_pft                    =>  plt_pheno%TCChill4Seed_pft     , &
     PlantPopulation_pft                   =>  plt_site%PlantPopulation_pft        , &
     MaxSeedNumPerSite_pft                 =>  plt_morph%MaxSeedNumPerSite_pft     , &
     MaxSeedCMass                          =>  plt_morph%MaxSeedCMass    , &
@@ -1939,10 +1939,10 @@ module PlantBranchMod
 !   SET=seed set limited by nonstructural C,N,P
 !   CCPOLB,CZPOLB,CPPOLB=nonstructural C,N,P concn in branch(g g-1)
 !   TCelciusCanopy_pft=canopy temperature
-!   TCelciusChill4Seed=chilling temperature for CO2 fixation, seed loss (oC)
+!   TCChill4Seed_pft=chilling temperature for CO2 fixation, seed loss (oC)
 !   HTC=high temperature threshold for grain number loss
 !   FGRNX=loss of seed set
-!   SSTX=sensitivity to TCelciusCanopy_pft> HTC,TCelciusCanopy_pft< TCelciusChill4Seedfrom startq.f (seeds oC-1)
+!   SSTX=sensitivity to TCelciusCanopy_pft> HTC,TCelciusCanopy_pft< TCChill4Seed_pftfrom startq.f (seeds oC-1)
 !   SeedNumSet_brch=seed set number
 !   PotentialSeedSites_brch=potential number of seed set sites
 !   MaxSeedNumPerSite_pft=maximum seed number per MaxPotentSeedNumber_pft from PFT file
@@ -1953,11 +1953,11 @@ module PlantBranchMod
       ,LeafPetoNonstElmConc_brch(ielmn,NB,NZ)/(LeafPetoNonstElmConc_brch(ielmn,NB,NZ)+SETN) &
       ,LeafPetoNonstElmConc_brch(ielmp,NB,NZ)/(LeafPetoNonstElmConc_brch(ielmp,NB,NZ)+SETP))
 
-    IF(TCelciusCanopy_pft(NZ).LT.TCelciusChill4Seed(NZ))THEN
+    IF(TCelciusCanopy_pft(NZ).LT.TCChill4Seed_pft(NZ))THEN
       IF(iPlantCalendar_brch(ipltcal_BeginSeedFill,NB,NZ).EQ.0)THEN
-        FGRNX=SSTX(NZ)*(TCelciusChill4Seed(NZ)-TCelciusCanopy_pft(NZ))
+        FGRNX=SSTX(NZ)*(TCChill4Seed_pft(NZ)-TCelciusCanopy_pft(NZ))
       ELSEIF(iPlantCalendar_brch(ipltcal_SetSeedNumber,NB,NZ).EQ.0)THEN
-        FGRNX=SSTX(NZ)*(TCelciusChill4Seed(NZ)-TCelciusCanopy_pft(NZ))
+        FGRNX=SSTX(NZ)*(TCChill4Seed_pft(NZ)-TCelciusCanopy_pft(NZ))
       ELSE
         FGRNX=0._r8
       ENDIF
@@ -2194,7 +2194,7 @@ module PlantBranchMod
     LitrfalStrutElms_pvr                      =>  plt_bgcr%LitrfalStrutElms_pvr       , &
     MY                                     =>  plt_morph%MY        , &
     NumOfLeaves_brch                       =>  plt_morph%NumOfLeaves_brch     , &
-    XTLI                                   =>  plt_morph%XTLI      , &
+    ShootNodeNumAtPlanting_pft             =>  plt_morph%ShootNodeNumAtPlanting_pft      , &
     PetioleLengthNode_brch                 =>  plt_morph%PetioleLengthNode_brch     , &
     KLeafNumber_brch                       =>  plt_morph%KLeafNumber_brch    , &
     InternodeHeightDying_brch              =>  plt_morph%InternodeHeightDying_brch    , &
@@ -2280,7 +2280,7 @@ module PlantBranchMod
         IF(doPlantLeafOut_brch(NB,NZ).EQ.iEnable.AND.iPlantPhenolPattern_pft(NZ).NE.iplt_annual &
           .AND.Hours4Leafout_brch(NB,NZ).GE.HourReq4LeafOut_brch(NB,NZ))THEN
           IF(iPlantTurnoverPattern_pft(NZ).EQ.0)THEN
-            ShootNodeNum_brch(NB,NZ)=XTLI(NZ)
+            ShootNodeNum_brch(NB,NZ)=ShootNodeNumAtPlanting_pft(NZ)
             NumOfLeaves_brch(NB,NZ)=0._r8
             KLeafNumber_brch(NB,NZ)=1
             KHiestGroLeafNode_brch(NB,NZ)=1

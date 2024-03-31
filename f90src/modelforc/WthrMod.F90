@@ -465,7 +465,7 @@ module WthrMod
         !     OFFST=shift in Arrhenius curve for PFT activity in uptake.f
         !     iPlantThermoAdaptZone=PFT thermal adaptation zone
         !     HTC=high temperature threshold for grain number loss (oC)
-        !     GROUPI,XTLI=node number at floral initiation,planting (maturity group)
+        !     GROUPI,ShootNodeNumAtPlanting_pft=node number at floral initiation,planting (maturity group)
 !
         IF(ICLM.EQ.2.AND.J.EQ.1)THEN
           DTS=0.5_r8*DTA
@@ -475,8 +475,8 @@ module WthrMod
           DO NZ=1,NP(NY,NX)
             iPlantThermoAdaptZone(NZ,NY,NX)=PlantInitThermoAdaptZone(NZ,NY,NX)+0.30_r8/2.667_r8*DTA
             OFFST(NZ,NY,NX)=2.667*(2.5-iPlantThermoAdaptZone(NZ,NY,NX))
-            !     TCelsChill4Leaf_pft(NZ,NY,NX)=TCZD-OFFST(NZ,NY,NX)
-            !     TCelcius4LeafOffHarden_pft(NZ,NY,NX)=AMIN1(15.0,TCelsChill4Leaf_pft(NZ,NY,NX)+TCXD)
+            !     TC4LeafOut_pft(NZ,NY,NX)=TCZD-OFFST(NZ,NY,NX)
+            !     TC4LeafOff_pft(NZ,NY,NX)=AMIN1(15.0,TC4LeafOut_pft(NZ,NY,NX)+TCXD)
             IF(iPlantPhotosynthesisType(NZ,NY,NX).EQ.3)THEN
               HighTCLimtSeed_pft(NZ,NY,NX)=27.0+3.0*iPlantThermoAdaptZone(NZ,NY,NX)
             ELSE
@@ -486,7 +486,7 @@ module WthrMod
             IF(iPlantTurnoverPattern_pft(NZ,NY,NX).NE.0)THEN
               MatureGroup_pft(NZ,NY,NX)=MatureGroup_pft(NZ,NY,NX)/25.0_r8
             ENDIF
-            MatureGroup_pft(NZ,NY,NX)=MatureGroup_pft(NZ,NY,NX)-XTLI(NZ,NY,NX)
+            MatureGroup_pft(NZ,NY,NX)=MatureGroup_pft(NZ,NY,NX)-ShootNodeNumAtPlanting_pft(NZ,NY,NX)
 
           ENDDO
         ENDIF

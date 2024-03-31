@@ -574,10 +574,10 @@ implicit none
     LitrfalStrutElms_pvr                =>  plt_bgcr%LitrfalStrutElms_pvr       , &
     NumOfBranches_pft                  =>  plt_morph%NumOfBranches_pft       , &
     NodeNum2InitFloral_brch            =>  plt_morph%NodeNum2InitFloral_brch     , &
-    ShootNodeNum_brch               =>  plt_morph%ShootNodeNum_brch     , &
+    ShootNodeNum_brch                  =>  plt_morph%ShootNodeNum_brch     , &
     BranchNumber_brch                  =>  plt_morph%BranchNumber_brch      , &
     NodeNumberAtAnthesis_brch          =>  plt_morph%NodeNumberAtAnthesis_brch     , &
-    XTLI                               =>  plt_morph%XTLI      , &
+    ShootNodeNumAtPlanting_pft         =>  plt_morph%ShootNodeNumAtPlanting_pft      , &
     NumOfLeaves_brch                   =>  plt_morph%NumOfLeaves_brch     , &
     KLeafNumber_brch                   =>  plt_morph%KLeafNumber_brch    , &
     istalk                             =>  pltpar%istalk       , &
@@ -593,7 +593,7 @@ implicit none
   D8845: DO NB=1,NumOfBranches_pft(NZ)
     IF(iPlantBranchState_brch(NB,NZ).EQ.iDead)THEN
       MatureGroup_brch(NB,NZ)=MatureGroup_pft(NZ)
-      ShootNodeNum_brch(NB,NZ)=XTLI(NZ)
+      ShootNodeNum_brch(NB,NZ)=ShootNodeNumAtPlanting_pft(NZ)
       NodeNum2InitFloral_brch(NB,NZ)=ShootNodeNum_brch(NB,NZ)
       NodeNumberAtAnthesis_brch(NB,NZ)=0._r8
       NumOfLeaves_brch(NB,NZ)=0._r8

@@ -264,7 +264,7 @@ implicit none
   real(r8), pointer :: CanopyLeafAreaByLayer_pft(:,:,:,:)  => null() !layer/node/branch leaf area, [m2 d-2]
   real(r8), pointer :: CanopyStemArea_lbrch(:,:,:)    => null() !plant canopy layer branch stem area, [m2 d-2]
   real(r8), pointer :: ClumpFactor(:)           => null() !clumping factor for self-shading in canopy layer, [-]
-  real(r8), pointer :: XTLI(:)         => null() !number of nodes in seed, [-]
+  real(r8), pointer :: ShootNodeNumAtPlanting_pft(:)         => null() !number of nodes in seed, [-]
   real(r8), pointer :: CanopyHeight_pft(:)           => null() !canopy height, [m]
   integer,  pointer :: NGTopRootLayer_pft(:)           => null() !soil layer at planting depth, [-]
   integer,  pointer :: KLeafNumber_brch(:,:)      => null() !leaf number, [-]
@@ -299,17 +299,17 @@ implicit none
   real(r8), pointer :: GrainFillRate25C_pft(:)    => null()     !maximum rate of fill per grain, [g h-1]
   real(r8), pointer :: OFFST(:)    => null()     !adjustment of Arhhenius curves for plant thermal acclimation, [oC]
   real(r8), pointer :: PlantO2Stress(:)     => null()     !plant O2 stress indicator, []
-  real(r8), pointer :: MinNonstructalC4InitBranch(:)       => null()     !branch nonstructural C content required for new branch, [gC gC-1]
+  real(r8), pointer :: MinNonstC2InitBranch_pft(:)       => null()     !branch nonstructural C content required for new branch, [gC gC-1]
   real(r8), pointer :: MinNonstC2InitRoot_pft(:)       => null()     !threshold root nonstructural C content for initiating new root axis, [gC gC-1]
   real(r8), pointer :: LeafElmntRemobFlx_brch(:,:,:) => null()    !element translocated from leaf during senescence, [g d-2 h-1]
   real(r8), pointer :: PetioleChemElmRemobFlx_brch(:,:,:) => null()    !element translocated from sheath during senescence, [g d-2 h-1]
-  real(r8), pointer :: TCelsChill4Leaf_pft(:)     => null()     !threshold temperature for spring leafout/dehardening, [oC]
+  real(r8), pointer :: TC4LeafOut_pft(:)     => null()     !threshold temperature for spring leafout/dehardening, [oC]
   real(r8), pointer :: TCG(:)     => null()     !canopy growth temperature, [oC]
-  real(r8), pointer :: TCelcius4LeafOffHarden_pft(:)     => null()     !threshold temperature for autumn leafoff/hardening, [oC]
+  real(r8), pointer :: TC4LeafOff_pft(:)     => null()     !threshold temperature for autumn leafoff/hardening, [oC]
   real(r8), pointer :: TKG(:)     => null()     !canopy growth temperature, [K]
   real(r8), pointer :: fTgrowCanP(:)    => null()     !canopy temperature growth function, [-]
   real(r8), pointer :: HoursCanopyPSITooLow(:)    => null()     !canopy plant water stress indicator, number of hours PSICanopy_pft(< PSILY, []
-  real(r8), pointer :: TCelciusChill4Seed(:)     => null()     !temperature below which seed set is adversely affected, [oC]
+  real(r8), pointer :: TCChill4Seed_pft(:)     => null()     !temperature below which seed set is adversely affected, [oC]
   real(r8), pointer :: iPlantThermoAdaptZone(:)    => null()     !plant thermal adaptation zone, [-]
   real(r8), pointer :: PlantInitThermoAdaptZone(:)   => null()     !initial plant thermal adaptation zone, [-]
   real(r8), pointer :: HighTCLimtSeed_pft(:)     => null()     !temperature above which seed set is adversely affected, [oC]
@@ -1703,17 +1703,17 @@ implicit none
   class(plant_pheno_type) :: this
 
 
-  allocate(this%TCelciusChill4Seed(JP1));this%TCelciusChill4Seed=spval
+  allocate(this%TCChill4Seed_pft(JP1));this%TCChill4Seed_pft=spval
   allocate(this%OFFST(JP1));this%OFFST=spval
   allocate(this%MatureGroup_pft(JP1));this%MatureGroup_pft=spval
   allocate(this%PlantO2Stress(JP1));this%PlantO2Stress=spval
-  allocate(this%MinNonstructalC4InitBranch(JP1));this%MinNonstructalC4InitBranch=spval
+  allocate(this%MinNonstC2InitBranch_pft(JP1));this%MinNonstC2InitBranch_pft=spval
   allocate(this%MinNonstC2InitRoot_pft(JP1));this%MinNonstC2InitRoot_pft=spval
   allocate(this%fTgrowCanP(JP1));this%fTgrowCanP=spval
-  allocate(this%TCelsChill4Leaf_pft(JP1));this%TCelsChill4Leaf_pft=spval
+  allocate(this%TC4LeafOut_pft(JP1));this%TC4LeafOut_pft=spval
   allocate(this%TCG(JP1));this%TCG=spval
   allocate(this%TKG(JP1));this%TKG=spval
-  allocate(this%TCelcius4LeafOffHarden_pft(JP1));this%TCelcius4LeafOffHarden_pft=spval
+  allocate(this%TC4LeafOff_pft(JP1));this%TC4LeafOff_pft=spval
   allocate(this%HoursCanopyPSITooLow(JP1));this%HoursCanopyPSITooLow=spval
   allocate(this%LeafElmntRemobFlx_brch(NumPlantChemElms,MaxNumBranches,JP1));this%LeafElmntRemobFlx_brch=spval
   allocate(this%PetioleChemElmRemobFlx_brch(NumPlantChemElms,MaxNumBranches,JP1));this%PetioleChemElmRemobFlx_brch=spval
@@ -1825,7 +1825,7 @@ implicit none
   allocate(this%NumOfLeaves_brch(MaxNumBranches,JP1));this%NumOfLeaves_brch=spval
   allocate(this%NGTopRootLayer_pft(JP1));this%NGTopRootLayer_pft=0;
   allocate(this%CanopyHeight_pft(JP1));this%CanopyHeight_pft=spval
-  allocate(this%XTLI(JP1));this%XTLI=spval
+  allocate(this%ShootNodeNumAtPlanting_pft(JP1));this%ShootNodeNumAtPlanting_pft=spval
   allocate(this%CanopyHeightz_col(0:NumOfCanopyLayers1));this%CanopyHeightz_col=spval
   allocate(this%CanopyStemArea_pft(JP1));this%CanopyStemArea_pft=spval
   allocate(this%CanopyLeafArea_pft(JP1));this%CanopyLeafArea_pft=spval

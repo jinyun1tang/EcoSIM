@@ -76,7 +76,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  rCNNonstructRemob_pft(:,:,:)                        !C:N ratio in remobilizable nonstructural biomass, [-]
   real(r8),target,allocatable ::  rCPNonstructRemob_pft(:,:,:)                        !C:P ratio in remobilizable nonstructural biomass, [-]
   real(r8),target,allocatable ::  OSMO(:,:,:)                        !canopy osmotic potential when canopy water potential = 0 MPa, [MPa]
-  real(r8),target,allocatable ::  TCelcius4LeafOffHarden_pft(:,:,:)                         !threshold temperature for autumn leafoff/hardening, [oC]
+  real(r8),target,allocatable ::  TC4LeafOff_pft(:,:,:)                         !threshold temperature for autumn leafoff/hardening, [oC]
   real(r8),target,allocatable ::  PlantInitThermoAdaptZone(:,:,:)                       !initial plant thermal adaptation zone, [-]
   real(r8),target,allocatable ::  iPlantThermoAdaptZone(:,:,:)                        !plant thermal adaptation zone, [-]
   real(r8),target,allocatable ::  MatureGroup_brch(:,:,:,:)                     !plant maturity group, [-]
@@ -114,7 +114,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  RefLeafAppearRate_pft(:,:,:)                        !rate of leaf initiation, [h-1 at 25 oC]
   real(r8),target,allocatable ::  WDLF(:,:,:)                        !leaf length:width ratio, [-]
   real(r8),target,allocatable ::  SLA1(:,:,:)                        !leaf area:mass during growth, [m2 g-1]
-  real(r8),target,allocatable ::  TCelsChill4Leaf_pft(:,:,:)                         !threshold temperature for spring leafout/dehardening, [oC]
+  real(r8),target,allocatable ::  TC4LeafOut_pft(:,:,:)                         !threshold temperature for spring leafout/dehardening, [oC]
   real(r8),target,allocatable ::  PetoLen2Mass_pft(:,:,:)                        !petiole length:mass during growth, [m g-1]
   real(r8),target,allocatable ::  HourReq4LeafOut_brch(:,:,:,:)                      !hours above threshold temperature required for spring leafout/dehardening, [-]
   integer,target,allocatable ::  NumOfBranches_pft(:,:,:)                          !branch number, [-]
@@ -129,7 +129,7 @@ module PlantTraitDataType
   integer,target,allocatable ::  doPlantLeafOut_brch(:,:,:,:)                      !branch phenology flag, [-]
   integer,target,allocatable ::  doPlantLeaveOff_brch(:,:,:,:)                      !branch phenology flag, [-]
   integer,target,allocatable ::  iPlantBranchState_brch(:,:,:,:)                      !flag to detect branch death , [-]
-  real(r8),target,allocatable ::  MinNonstructalC4InitBranch(:,:,:)                          !branch nonstructural C content required for new branch, [g g-1]
+  real(r8),target,allocatable ::  MinNonstC2InitBranch_pft(:,:,:)                          !branch nonstructural C content required for new branch, [g g-1]
   real(r8),target,allocatable ::  NodeNumNormByMatgrp_brch(:,:,:,:)                     !normalized node number during vegetative growth stages , [-]
   real(r8),target,allocatable ::  HourlyNodeNumNormByMatgrp_brch(:,:,:,:)                    !gain in normalized node number during vegetative growth stages , [h-1]
   real(r8),target,allocatable ::  dReproNodeNumNormByMatG_brch(:,:,:,:)                    !gain in normalized node number during reproductive growth stages, [h-1]
@@ -150,14 +150,14 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  MaxPotentSeedNumber_pft(:,:,:)                        !maximum grain node number per branch, [-]
   real(r8),target,allocatable ::  MaxSeedNumPerSite_pft(:,:,:)                        !maximum grain number per node , [-]
   real(r8),target,allocatable ::  MaxSeedCMass(:,:,:)                        !maximum grain size   , [g]
-  real(r8),target,allocatable ::  XTLI(:,:,:)                        !number of nodes in seed, [-]
+  real(r8),target,allocatable ::  ShootNodeNumAtPlanting_pft(:,:,:)                        !number of nodes in seed, [-]
   real(r8),target,allocatable ::  SeedCMass(:,:,:)                        !grain size at seeding, [g]
   real(r8),target,allocatable ::  GrainFillRate25C_pft(:,:,:)                       !maximum rate of fill per grain, [g h-1]
   real(r8),target,allocatable ::  HourFailGrainFill_brch(:,:,:,:)                      !flag to detect physiological maturity from  grain fill , [-]
   real(r8),target,allocatable ::  Hours2LeafOut_brch(:,:,:,:)                      !counter for mobilizing nonstructural C during spring leafout/dehardening, [h]
   real(r8),target,allocatable ::  HoursDoingRemob_brch(:,:,:,:)                      !counter for mobilizing nonstructural C during autumn leafoff/hardening, [h]
   integer,target,allocatable ::  iPlantCalendar_brch(:,:,:,:,:)                     !plant growth stage, [-]
-  real(r8),target,allocatable ::  TCelciusChill4Seed(:,:,:)                         !temperature below which seed set is adversely affected, [oC]
+  real(r8),target,allocatable ::  TCChill4Seed_pft(:,:,:)                         !temperature below which seed set is adversely affected, [oC]
   real(r8),target,allocatable ::  HighTCLimtSeed_pft(:,:,:)                         !temperature above which seed set is adversely affected, [oC]
   real(r8),target,allocatable ::  SSTX(:,:,:)                        !sensitivity to HTC (seeds oC-1 above HTC)
   real(r8),target,allocatable ::  CriticPhotoPeriod_pft(:,:,:)                         !critical daylength for phenological progress, [h]
@@ -236,7 +236,7 @@ contains
   allocate(rCNNonstructRemob_pft(JP,JY,JX));     rCNNonstructRemob_pft=0._r8
   allocate(rCPNonstructRemob_pft(JP,JY,JX));     rCPNonstructRemob_pft=0._r8
   allocate(OSMO(JP,JY,JX));     OSMO=0._r8
-  allocate(TCelcius4LeafOffHarden_pft(JP,JY,JX));      TCelcius4LeafOffHarden_pft=0._r8
+  allocate(TC4LeafOff_pft(JP,JY,JX));      TC4LeafOff_pft=0._r8
   allocate(PlantInitThermoAdaptZone(JP,JY,JX));    PlantInitThermoAdaptZone=0._r8
   allocate(iPlantThermoAdaptZone(JP,JY,JX));     iPlantThermoAdaptZone=0._r8
   allocate(MatureGroup_brch(MaxNumBranches,JP,JY,JX)); MatureGroup_brch=0._r8
@@ -274,7 +274,7 @@ contains
   allocate(RefLeafAppearRate_pft(JP,JY,JX));     RefLeafAppearRate_pft=0._r8
   allocate(WDLF(JP,JY,JX));     WDLF=0._r8
   allocate(SLA1(JP,JY,JX));     SLA1=0._r8
-  allocate(TCelsChill4Leaf_pft(JP,JY,JX));      TCelsChill4Leaf_pft=0._r8
+  allocate(TC4LeafOut_pft(JP,JY,JX));      TC4LeafOut_pft=0._r8
   allocate(PetoLen2Mass_pft(JP,JY,JX));     PetoLen2Mass_pft=0._r8
   allocate(HourReq4LeafOut_brch(NumOfCanopyLayers,JP,JY,JX));  HourReq4LeafOut_brch=0._r8
   allocate(NumOfBranches_pft(JP,JY,JX));      NumOfBranches_pft=0
@@ -289,7 +289,7 @@ contains
   allocate(doPlantLeafOut_brch(MaxNumBranches,JP,JY,JX)); doPlantLeafOut_brch=0
   allocate(doPlantLeaveOff_brch(MaxNumBranches,JP,JY,JX)); doPlantLeaveOff_brch=0
   allocate(iPlantBranchState_brch(MaxNumBranches,JP,JY,JX)); iPlantBranchState_brch=0
-  allocate(MinNonstructalC4InitBranch(JP,JY,JX));       MinNonstructalC4InitBranch=0._r8
+  allocate(MinNonstC2InitBranch_pft(JP,JY,JX));       MinNonstC2InitBranch_pft=0._r8
   allocate(NodeNumNormByMatgrp_brch(MaxNumBranches,JP,JY,JX)); NodeNumNormByMatgrp_brch=0._r8
   allocate(HourlyNodeNumNormByMatgrp_brch(MaxNumBranches,JP,JY,JX));HourlyNodeNumNormByMatgrp_brch=0._r8
   allocate(dReproNodeNumNormByMatG_brch(MaxNumBranches,JP,JY,JX));dReproNodeNumNormByMatG_brch=0._r8
@@ -310,14 +310,14 @@ contains
   allocate(MaxPotentSeedNumber_pft(JP,JY,JX));     MaxPotentSeedNumber_pft=0._r8
   allocate(MaxSeedNumPerSite_pft(JP,JY,JX));     MaxSeedNumPerSite_pft=0._r8
   allocate(MaxSeedCMass(JP,JY,JX));     MaxSeedCMass=0._r8
-  allocate(XTLI(JP,JY,JX));     XTLI=0._r8
+  allocate(ShootNodeNumAtPlanting_pft(JP,JY,JX));     ShootNodeNumAtPlanting_pft=0._r8
   allocate(SeedCMass(JP,JY,JX));     SeedCMass=0._r8
   allocate(GrainFillRate25C_pft(JP,JY,JX));    GrainFillRate25C_pft=0._r8
   allocate(HourFailGrainFill_brch(MaxNumBranches,JP,JY,JX));  HourFailGrainFill_brch=0._r8
   allocate(Hours2LeafOut_brch(MaxNumBranches,JP,JY,JX));  Hours2LeafOut_brch=0._r8
   allocate(HoursDoingRemob_brch(MaxNumBranches,JP,JY,JX));  HoursDoingRemob_brch=0._r8
   allocate(iPlantCalendar_brch(NumGrowthStages,MaxNumBranches,JP,JY,JX));iPlantCalendar_brch=0
-  allocate(TCelciusChill4Seed(JP,JY,JX));      TCelciusChill4Seed=0._r8
+  allocate(TCChill4Seed_pft(JP,JY,JX));      TCChill4Seed_pft=0._r8
   allocate(HighTCLimtSeed_pft(JP,JY,JX));      HighTCLimtSeed_pft=0._r8
   allocate(SSTX(JP,JY,JX));     SSTX=0._r8
   allocate(CriticPhotoPeriod_pft(JP,JY,JX));      CriticPhotoPeriod_pft=0._r8
@@ -393,7 +393,7 @@ contains
   call destroy(rCNNonstructRemob_pft)
   call destroy(rCPNonstructRemob_pft)
   call destroy(OSMO)
-  call destroy(TCelcius4LeafOffHarden_pft)
+  call destroy(TC4LeafOff_pft)
   call destroy(PlantInitThermoAdaptZone)
   call destroy(iPlantThermoAdaptZone)
   call destroy(MatureGroup_brch)
@@ -431,7 +431,7 @@ contains
   call destroy(RefLeafAppearRate_pft)
   call destroy(WDLF)
   call destroy(SLA1)
-  call destroy(TCelsChill4Leaf_pft)
+  call destroy(TC4LeafOut_pft)
   call destroy(PetoLen2Mass_pft)
   call destroy(HourReq4LeafOut_brch)
   call destroy(NumOfBranches_pft)
@@ -446,7 +446,7 @@ contains
   call destroy(doPlantLeafOut_brch)
   call destroy(doPlantLeaveOff_brch)
   call destroy(iPlantBranchState_brch)
-  call destroy(MinNonstructalC4InitBranch)
+  call destroy(MinNonstC2InitBranch_pft)
   call destroy(NodeNumNormByMatgrp_brch)
   call destroy(HourlyNodeNumNormByMatgrp_brch)
   call destroy(dReproNodeNumNormByMatG_brch)
@@ -467,14 +467,14 @@ contains
   call destroy(MaxPotentSeedNumber_pft)
   call destroy(MaxSeedNumPerSite_pft)
   call destroy(MaxSeedCMass)
-  call destroy(XTLI)
+  call destroy(ShootNodeNumAtPlanting_pft)
   call destroy(SeedCMass)
   call destroy(GrainFillRate25C_pft)
   call destroy(HourFailGrainFill_brch)
   call destroy(Hours2LeafOut_brch)
   call destroy(HoursDoingRemob_brch)
   call destroy(iPlantCalendar_brch)
-  call destroy(TCelciusChill4Seed)
+  call destroy(TCChill4Seed_pft)
   call destroy(HighTCLimtSeed_pft)
   call destroy(SSTX)
   call destroy(CriticPhotoPeriod_pft)

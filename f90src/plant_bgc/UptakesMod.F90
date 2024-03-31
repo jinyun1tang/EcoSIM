@@ -1402,7 +1402,7 @@ module UptakesMod
     NU                         =>  plt_site%NU      , &
     CHILL                      =>  plt_photo%CHILL  , &
     OFFST                      =>  plt_pheno%OFFST  , &
-    TCelciusChill4Seed         =>  plt_pheno%TCelciusChill4Seed   , &
+    TCChill4Seed_pft         =>  plt_pheno%TCChill4Seed_pft   , &
     fTgrowRootP_vr                =>  plt_pheno%fTgrowRootP_vr   , &
     TCG                        =>  plt_pheno%TCG    , &
     TKG                        =>  plt_pheno%TKG    , &
@@ -1447,10 +1447,10 @@ module UptakesMod
   !
   !     DIURNAL CHILLING
   !
-  !     TCelciusChill4Seed=chilling temperature from PFT file
+  !     TCChill4Seed_pft=chilling temperature from PFT file
   !     CHILL=accumulated chilling hours used to limit CO2 fixn in stomate.f
   !
-  IF(TCelciusCanopy_pft(NZ).LT.TCelciusChill4Seed(NZ))THEN
+  IF(TCelciusCanopy_pft(NZ).LT.TCChill4Seed_pft(NZ))THEN
     CHILL(NZ)=AMIN1(24.0_r8,CHILL(NZ)+1.0_r8)
   ELSE
     CHILL(NZ)=AZMAX1(CHILL(NZ)-1.0_r8)

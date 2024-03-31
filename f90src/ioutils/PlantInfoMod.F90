@@ -349,9 +349,9 @@ implicit none
       RefNodeInitRate_pft(NZ,NY,NX)=RefNodeInitRate_pft(NZ,NY,NX)/MaxNodesPerBranch
       RefLeafAppearRate_pft(NZ,NY,NX)=RefLeafAppearRate_pft(NZ,NY,NX)/MaxNodesPerBranch
       MatureGroup_pft(NZ,NY,NX)=MatureGroup_pft(NZ,NY,NX)/MaxNodesPerBranch
-      XTLI(NZ,NY,NX)=XTLI(NZ,NY,NX)/MaxNodesPerBranch
+      ShootNodeNumAtPlanting_pft(NZ,NY,NX)=ShootNodeNumAtPlanting_pft(NZ,NY,NX)/MaxNodesPerBranch
     ENDIF
-    MatureGroup_pft(NZ,NY,NX)=MatureGroup_pft(NZ,NY,NX)-XTLI(NZ,NY,NX)
+    MatureGroup_pft(NZ,NY,NX)=MatureGroup_pft(NZ,NY,NX)-ShootNodeNumAtPlanting_pft(NZ,NY,NX)
     IF(CriticPhotoPeriod_pft(NZ,NY,NX).LT.0.0_r8)THEN
       CriticPhotoPeriod_pft(NZ,NY,NX)=DayLenthMax(NY,NX)
     ENDIF
@@ -417,14 +417,14 @@ implicit none
 
   call ncd_getvar(pft_nfid, 'XRNI', loc, RefNodeInitRate_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'XRLA', loc, RefLeafAppearRate_pft(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'CTC', loc, TCelciusChill4Seed(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'CTC', loc, TCChill4Seed_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'VRNLI', loc,VRNLI)
   call ncd_getvar(pft_nfid, 'VRNXI', loc,VRNXI)
   call ncd_getvar(pft_nfid, 'WDLF', loc,WDLF(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'PB', loc,MinNonstructalC4InitBranch(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'PB', loc,MinNonstC2InitBranch_pft(NZ,NY,NX))
 
   call ncd_getvar(pft_nfid, 'GROUPX', loc,GROUPX(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'XTLI', loc,XTLI(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'XTLI', loc,ShootNodeNumAtPlanting_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'XDL', loc,CriticPhotoPeriod_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'XPPD', loc,PhotoPeriodSens_pft(NZ,NY,NX))
 
@@ -741,17 +741,17 @@ implicit none
   write(nu_plt,*)('-',j=1,100)
 
   write(nu_plt,*)'PHENOLOGICAL PROPERTIES'
-  call writefixl(nu_plt,'rate of node initiation at 25oC (h-1) XRNI',RefNodeInitRate_pft(NZ,NY,NX),70)
-  call writefixl(nu_plt,'rate of leaf appearance at 25oC (h-1) XRLA',RefLeafAppearRate_pft(NZ,NY,NX),70)
-  call writefixl(nu_plt,'chilling temperature for CO2 fixation, seed loss (oC) CTC',TCelciusChill4Seed(NZ,NY,NX),70)
-  call writefixl(nu_plt,'hour requirement for spring leafout VRNLI',VRNLI,70)
-  call writefixl(nu_plt,'hour requirement for autumn leafoff VRNXI',VRNXI,70)
-  call writefixl(nu_plt,'leaf length:width ratio WDLF',WDLF(NZ,NY,NX),70)
-  call writefixl(nu_plt,'nonstructural C concentration needed for branching PB',MinNonstructalC4InitBranch(NZ,NY,NX),70)
+  call writefixl(nu_plt,'Rate of node initiation at 25oC (h-1) XRNI',RefNodeInitRate_pft(NZ,NY,NX),70)
+  call writefixl(nu_plt,'Rate of leaf appearance at 25oC (h-1) XRLA',RefLeafAppearRate_pft(NZ,NY,NX),70)
+  call writefixl(nu_plt,'Chilling temperature for CO2 fixation, seed loss (oC) CTC',TCChill4Seed_pft(NZ,NY,NX),70)
+  call writefixl(nu_plt,'Hour requirement for spring leafout VRNLI',VRNLI,70)
+  call writefixl(nu_plt,'Hour requirement for autumn leafoff VRNXI',VRNXI,70)
+  call writefixl(nu_plt,'Leaf length:width ratio WDLF',WDLF(NZ,NY,NX),70)
+  call writefixl(nu_plt,'Nonstructural C concentration needed for branching PB',MinNonstC2InitBranch_pft(NZ,NY,NX),70)
   call writefixl(nu_plt,'Maturity group, node number required for floral initiation, GROUPX',GROUPX(NZ,NY,NX),70)
-  call writefixl(nu_plt,'Node number at planting XTLI',XTLI(NZ,NY,NX),70)
-  call writefixl(nu_plt,'critical photoperiod (h) <= maximum daylength XDL',CriticPhotoPeriod_pft(NZ,NY,NX),70)
-  call writefixl(nu_plt,'photoperiod sensitivity (node h-1) XPPD',PhotoPeriodSens_pft(NZ,NY,NX),70)
+  call writefixl(nu_plt,'Node number at planting XTLI',ShootNodeNumAtPlanting_pft(NZ,NY,NX),70)
+  call writefixl(nu_plt,'Critical photoperiod (h) <= maximum daylength XDL',CriticPhotoPeriod_pft(NZ,NY,NX),70)
+  call writefixl(nu_plt,'Photoperiod sensitivity (node h-1) XPPD',PhotoPeriodSens_pft(NZ,NY,NX),70)
 
 
   end subroutine Phenology_trait_disp

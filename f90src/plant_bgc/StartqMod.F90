@@ -369,14 +369,14 @@ module StartqMod
 !
 !     ZTYP,PlantInitThermoAdaptZone=dynamic,initial thermal adaptation zone from PFT file
 !     OFFST=shift in Arrhenius curve for thermal adaptation (oC)
-!     TCZ,TCelcius4LeafOffHarden_pft=threshold temperature for leafout,leafoff
+!     TCZ,TC4LeafOff_pft=threshold temperature for leafout,leafoff
 !     HTC=high temperature threshold for grain number loss (oC)
 !     SSTX=sensitivity to HTC (seeds oC-1 above HTC)
 !
   iPlantThermoAdaptZone(NZ,NY,NX)=PlantInitThermoAdaptZone(NZ,NY,NX)
   OFFST(NZ,NY,NX)=2.667*(2.5-iPlantThermoAdaptZone(NZ,NY,NX))
-  TCelsChill4Leaf_pft(NZ,NY,NX)=TCZD-OFFST(NZ,NY,NX)
-  TCelcius4LeafOffHarden_pft(NZ,NY,NX)=AMIN1(15.0,TCXD-OFFST(NZ,NY,NX))
+  TC4LeafOut_pft(NZ,NY,NX)=TCZD-OFFST(NZ,NY,NX)
+  TC4LeafOff_pft(NZ,NY,NX)=AMIN1(15.0,TCXD-OFFST(NZ,NY,NX))
   IF(iPlantPhotosynthesisType(NZ,NY,NX).EQ.3)THEN
     IF(DATAP(NZ,NY,NX)(1:4).EQ.'soyb')THEN
       HighTCLimtSeed_pft(NZ,NY,NX)=30.0_r8+3.0_r8*iPlantThermoAdaptZone(NZ,NY,NX)
@@ -493,7 +493,7 @@ module StartqMod
     Prep4Literfall_brch(NB,NZ,NY,NX)=ifalse
     Hours4LiterfalAftMature_brch(NB,NZ,NY,NX)=0
     MatureGroup_brch(NB,NZ,NY,NX)=MatureGroup_pft(NZ,NY,NX)
-    ShootNodeNum_brch(NB,NZ,NY,NX)=XTLI(NZ,NY,NX)
+    ShootNodeNum_brch(NB,NZ,NY,NX)=ShootNodeNumAtPlanting_pft(NZ,NY,NX)
     NodeNum2InitFloral_brch(NB,NZ,NY,NX)=ShootNodeNum_brch(NB,NZ,NY,NX)
     NodeNumberAtAnthesis_brch(NB,NZ,NY,NX)=0._r8
     NumOfLeaves_brch(NB,NZ,NY,NX)=0._r8
