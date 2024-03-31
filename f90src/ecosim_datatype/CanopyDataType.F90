@@ -123,7 +123,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  CO2NetFix_pft(:,:,:)                        !canopy net CO2 exchange, [g d-2 h-1]
   real(r8),target,allocatable ::  CanopyLeafCLyr_pft(:,:,:,:)                     !canopy layer leaf C, [g d-2]
   real(r8),target,allocatable ::  CanopyNonstElms_pft(:,:,:,:)   !canopy nonstructural element, [g d-2]
-  real(r8),target,allocatable ::  CanopyNonstructElmConc_pft(:,:,:,:)                    !canopy nonstructural element concentration, [g d-2]
+  real(r8),target,allocatable ::  CanopyNonstElmConc_pft(:,:,:,:)                    !canopy nonstructural element concentration, [g d-2]
   real(r8),target,allocatable ::  CanopyStemArea_lpft(:,:,:,:)                   !plant canopy layer stem area, [m2 d-2]
   real(r8),target,allocatable ::  CanopyNodulNonstElms_pft(:,:,:,:)                    !canopy nodule nonstructural element, [g d-2]
   real(r8),target,allocatable ::  CanopyNodulElms_pft(:,:,:,:)                  !canopy nodule elemental biomass [g d-2]
@@ -274,7 +274,7 @@ module CanopyDataType
   allocate(CO2NetFix_pft(JP,JY,JX));     CO2NetFix_pft=0._r8
   allocate(CanopyLeafCLyr_pft(NumOfCanopyLayers,JP,JY,JX)); CanopyLeafCLyr_pft=0._r8
   allocate(CanopyNonstElms_pft(NumPlantChemElms,JP,JY,JX));   CanopyNonstElms_pft=0._r8
-  allocate(CanopyNonstructElmConc_pft(NumPlantChemElms,JP,JY,JX));   CanopyNonstructElmConc_pft=0._r8
+  allocate(CanopyNonstElmConc_pft(NumPlantChemElms,JP,JY,JX));   CanopyNonstElmConc_pft=0._r8
   allocate(CanopyStemArea_lpft(NumOfCanopyLayers,JP,JY,JX)); CanopyStemArea_lpft=0._r8
   allocate(CanopyNodulElms_pft(NumPlantChemElms,JP,JY,JX));CanopyNodulElms_pft=0._r8
   allocate(CanopyNodulNonstElms_pft(NumPlantChemElms,JP,JY,JX));   CanopyNodulNonstElms_pft=0._r8
@@ -432,7 +432,7 @@ module CanopyDataType
   call destroy(CO2NetFix_pft)
   call destroy(CanopyLeafCLyr_pft)
   call destroy(CanopyNonstElms_pft)
-  call destroy(CanopyNonstructElmConc_pft)
+  call destroy(CanopyNonstElmConc_pft)
   call destroy(CanopyStemArea_lpft)
   call destroy(CanopyNodulNonstElms_pft)
   call destroy(CanopyNodulElms_pft)

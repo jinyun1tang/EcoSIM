@@ -1130,16 +1130,16 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrp_2d(1:npfts,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='ShootNodeNumber_brch', dim1name='pft',dim2name='nbranches',&
+    call restartvar(ncid, flag, varname='ShootNodeNum_brch', dim1name='pft',dim2name='nbranches',&
      long_name='node number', units='none', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,ShootNodeNumber_brch,datrp_2d,NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft)      
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,ShootNodeNum_brch,datrp_2d,NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft)      
   else
-    !print*,'ShootNodeNumber_brch'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,ShootNodeNumber_brch,datrp_2d,NumActivePlants=NumActivePlants,&
+    !print*,'ShootNodeNum_brch'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,ShootNodeNum_brch,datrp_2d,NumActivePlants=NumActivePlants,&
       IsPlantActive_pft=IsPlantActive_pft)        
     datpr2 => datrp_2d(1:npfts,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='ShootNodeNumber_brch', dim1name='pft',dim2name='nbranches',&
+    call restartvar(ncid, flag, varname='ShootNodeNum_brch', dim1name='pft',dim2name='nbranches',&
      long_name='node number', units='none', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
   endif  

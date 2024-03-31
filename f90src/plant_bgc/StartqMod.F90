@@ -493,8 +493,8 @@ module StartqMod
     Prep4Literfall_brch(NB,NZ,NY,NX)=ifalse
     Hours4LiterfalAftMature_brch(NB,NZ,NY,NX)=0
     MatureGroup_brch(NB,NZ,NY,NX)=MatureGroup_pft(NZ,NY,NX)
-    ShootNodeNumber_brch(NB,NZ,NY,NX)=XTLI(NZ,NY,NX)
-    NodeNum2InitFloral_brch(NB,NZ,NY,NX)=ShootNodeNumber_brch(NB,NZ,NY,NX)
+    ShootNodeNum_brch(NB,NZ,NY,NX)=XTLI(NZ,NY,NX)
+    NodeNum2InitFloral_brch(NB,NZ,NY,NX)=ShootNodeNum_brch(NB,NZ,NY,NX)
     NodeNumberAtAnthesis_brch(NB,NZ,NY,NX)=0._r8
     NumOfLeaves_brch(NB,NZ,NY,NX)=0._r8
     LeafNumberAtFloralInit_brch(NB,NZ,NY,NX)=0._r8
@@ -596,7 +596,7 @@ module StartqMod
     CanopyStemArea_lpft(L,NZ,NY,NX)=0._r8
   ENDDO D35
   CanopyNonstElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
-  CanopyNonstructElmConc_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
+  CanopyNonstElmConc_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
   NoduleNonstructCconc_pft(NZ,NY,NX)=0._r8
   ShootStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
   LeafStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8

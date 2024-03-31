@@ -766,9 +766,9 @@ module PlantBranchMod
 !    write(101,*)'computegpp branch',NB,NZ
     call ComputeGPP(NB,NZ,WFNG,Stomata_Activity,CH2O3,CH2O4,CH2O,CO2F,CH2OClm,CH2OLlm)
     if(NZ==1)then
-    write(101,'(I4,5(X,F13.6))')NB,I+J/24.,CO2F,CH2O
+    write(101,'(A,I4,5(X,F13.6))')'computegpp ',NB,I+J/24.,CO2F,CH2O,CH2OClm,CH2OLlm
     else
-    write(102,'(I4,5(X,F13.6))')NB,I+J/24.,CO2F,CH2O
+    write(102,'(A,I4,5(X,F13.6))')'computegpp ',NB,I+J/24.,CO2F,CH2O,CH2OClm,CH2OLlm
     endif
 !
 !   SHOOT AUTOTROPHIC RESPIRATION AFTER EMERGENCE
@@ -2205,7 +2205,7 @@ module PlantBranchMod
     BranchNumber_brch                      =>  plt_morph%BranchNumber_brch      , &
     LeafAreaLive_brch                      =>  plt_morph%LeafAreaLive_brch     , &
     LeafAreaNode_brch                      =>  plt_morph%LeafAreaNode_brch     , &
-    ShootNodeNumber_brch                   =>  plt_morph%ShootNodeNumber_brch     , &
+    ShootNodeNum_brch                   =>  plt_morph%ShootNodeNum_brch     , &
     NodeNum2InitFloral_brch                =>  plt_morph%NodeNum2InitFloral_brch     , &
     SeedNumSet_brch                     =>  plt_morph%SeedNumSet_brch       &
   )
@@ -2243,7 +2243,7 @@ module PlantBranchMod
         ELSE
           MatureGroup_brch(NB,NZ)=MatureGroup_pft(NZ)
         ENDIF
-        NodeNum2InitFloral_brch(NB,NZ)=ShootNodeNumber_brch(NB,NZ)
+        NodeNum2InitFloral_brch(NB,NZ)=ShootNodeNum_brch(NB,NZ)
         NodeNumberAtAnthesis_brch(NB,NZ)=0._r8
         LeafNumberAtFloralInit_brch(NB,NZ)=0._r8
         TotalNodeNumNormByMatgrp_brch(NB,NZ)=0._r8
@@ -2280,7 +2280,7 @@ module PlantBranchMod
         IF(doPlantLeafOut_brch(NB,NZ).EQ.iEnable.AND.iPlantPhenolPattern_pft(NZ).NE.iplt_annual &
           .AND.Hours4Leafout_brch(NB,NZ).GE.HourReq4LeafOut_brch(NB,NZ))THEN
           IF(iPlantTurnoverPattern_pft(NZ).EQ.0)THEN
-            ShootNodeNumber_brch(NB,NZ)=XTLI(NZ)
+            ShootNodeNum_brch(NB,NZ)=XTLI(NZ)
             NumOfLeaves_brch(NB,NZ)=0._r8
             KLeafNumber_brch(NB,NZ)=1
             KHiestGroLeafNode_brch(NB,NZ)=1

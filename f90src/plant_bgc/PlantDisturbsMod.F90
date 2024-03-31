@@ -1198,7 +1198,7 @@ module PlantDisturbsMod
     LeafStrutElms_brch                  => plt_biom%LeafStrutElms_brch   , &
     PetioleProteinCNode_brch            => plt_biom%PetioleProteinCNode_brch    , &
     StalkStrutElms_pft                  => plt_biom%StalkStrutElms_pft    , &
-    CanopyNonstructElmConc_pft          => plt_biom%CanopyNonstructElmConc_pft    , &
+    CanopyNonstElmConc_pft          => plt_biom%CanopyNonstElmConc_pft    , &
     NoduleNonstructCconc_pft            => plt_biom%NoduleNonstructCconc_pft    , &
     LeafStrutElms_pft                   => plt_biom%LeafStrutElms_pft     , &
     GrainStrutElms_pft                  => plt_biom%GrainStrutElms_pft     , &
@@ -1290,7 +1290,7 @@ module PlantDisturbsMod
     NodeNumberAtAnthesis_brch           =>  plt_morph%NodeNumberAtAnthesis_brch   , &
     MainBranchNum_pft                   =>  plt_morph%MainBranchNum_pft     , &
     NodeNum2InitFloral_brch             =>  plt_morph%NodeNum2InitFloral_brch   , &
-    ShootNodeNumber_brch                =>  plt_morph%ShootNodeNumber_brch   , &
+    ShootNodeNum_brch                =>  plt_morph%ShootNodeNum_brch   , &
     ClumpFactor                         =>  plt_morph%ClumpFactor     , &
     CanopyLeafArea_grd                  =>  plt_morph%CanopyLeafArea_grd   , &
     iPlantPhotosynthesisType            =>  plt_photo%iPlantPhotosynthesisType    &
@@ -1379,7 +1379,7 @@ module PlantDisturbsMod
       IF(iHarvstType_pft(NZ).EQ.iharvtyp_herbivo)THEN
         TotPhytomassRemoval=TotPhytomassRemoval*fTgrowCanP(NZ)
       ENDIF
-      CCPOLX=CanopyNonstructElmConc_pft(ielmc,NZ)/(1.0_r8+CanopyNonstructElmConc_pft(ielmc,NZ))
+      CCPOLX=CanopyNonstElmConc_pft(ielmc,NZ)/(1.0_r8+CanopyNonstElmConc_pft(ielmc,NZ))
       CCPLNX=NoduleNonstructCconc_pft(NZ)/(1.0_r8+NoduleNonstructCconc_pft(NZ))
 !
 !     LEAF,BACTERIA GRAZED,REMOVED
@@ -2267,7 +2267,7 @@ module PlantDisturbsMod
             .OR.(iPlantPhenolType_pft(NZ).EQ.iphenotyp_evgreen.AND.&
             iPlantCalendar_brch(ipltcal_Emerge,NB,NZ).NE.0))THEN
             MatureGroup_brch(NB,NZ)=MatureGroup_pft(NZ)
-            NodeNum2InitFloral_brch(NB,NZ)=ShootNodeNumber_brch(NB,NZ)
+            NodeNum2InitFloral_brch(NB,NZ)=ShootNodeNum_brch(NB,NZ)
             NodeNumberAtAnthesis_brch(NB,NZ)=0._r8
             LeafNumberAtFloralInit_brch(NB,NZ)=0._r8
             TotalNodeNumNormByMatgrp_brch(NB,NZ)=0._r8
@@ -2282,7 +2282,7 @@ module PlantDisturbsMod
               D3010: DO NBX=1,NumOfBranches_pft(NZ)
                 IF(NBX.NE.MainBranchNum_pft(NZ))THEN
                   MatureGroup_brch(NBX,NZ)=MatureGroup_pft(NZ)
-                  NodeNum2InitFloral_brch(NBX,NZ)=ShootNodeNumber_brch(NBX,NZ)
+                  NodeNum2InitFloral_brch(NBX,NZ)=ShootNodeNum_brch(NBX,NZ)
                   NodeNumberAtAnthesis_brch(NBX,NZ)=0._r8
                   LeafNumberAtFloralInit_brch(NBX,NZ)=0._r8
                   TotalNodeNumNormByMatgrp_brch(NBX,NZ)=0._r8

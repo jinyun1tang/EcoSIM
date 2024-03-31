@@ -594,7 +594,7 @@ module UptakesMod
    NGTopRootLayer_pft              => plt_morph%NGTopRootLayer_pft    , &
    MY                              => plt_morph%MY     , &
    RootNonstructElmConc_pvr        => plt_biom%RootNonstructElmConc_pvr  , &
-   CanopyNonstructElmConc_pft      => plt_biom%CanopyNonstructElmConc_pft  , &
+   CanopyNonstElmConc_pft      => plt_biom%CanopyNonstElmConc_pft  , &
    ShootStrutElms_pft              => plt_biom%ShootStrutElms_pft  , &
    CanopyBndlResist_pft            => plt_photo%CanopyBndlResist_pft    , &
    MinCanPStomaResistH2O_pft       => plt_photo%MinCanPStomaResistH2O_pft   , &
@@ -621,8 +621,8 @@ module UptakesMod
       LWRadCanopy_pft(NZ)=FTHRM*TKC(NZ)**4._r8
       PSICanopy_pft(NZ)=ElvAdjstedtSoiPSIMPa(NGTopRootLayer_pft(NZ))     
 !      write(124,*)'pscandiv',etimer%get_curr_doy(),NZ,PSICanopy_pft(NZ)
-      CCPOLT=CanopyNonstructElmConc_pft(ielmc,NZ)+CanopyNonstructElmConc_pft(ielmn,NZ)&
-        +CanopyNonstructElmConc_pft(ielmp,NZ)
+      CCPOLT=CanopyNonstElmConc_pft(ielmc,NZ)+CanopyNonstElmConc_pft(ielmn,NZ)&
+        +CanopyNonstElmConc_pft(ielmp,NZ)
 
       CALL update_osmo_turg_pressure(PSICanopy_pft(NZ),CCPOLT,OSMO(NZ),TKC(NZ) &
         ,PSICanopyOsmo_pft(NZ),PSICanopyTurg_pft(NZ),FDMP)
@@ -713,7 +713,7 @@ module UptakesMod
     EvapTransHeat_pft               => plt_ew%EvapTransHeat_pft     , &
     ZEROL                           => plt_biom%ZEROL   , &
     ZEROP                           => plt_biom%ZEROP   , &
-    CanopyNonstructElmConc_pft      => plt_biom%CanopyNonstructElmConc_pft  , &
+    CanopyNonstElmConc_pft      => plt_biom%CanopyNonstElmConc_pft  , &
     MaxSoiL4Root                    => plt_morph%MaxSoiL4Root     , &
     MY                              => plt_morph%MY     , &
     MinCanPStomaResistH2O_pft       => plt_photo%MinCanPStomaResistH2O_pft   , &
@@ -730,8 +730,8 @@ module UptakesMod
   )
   
   !total nonstructural canopy C,N,P concentration
-  CCPOLT=CanopyNonstructElmConc_pft(ielmc,NZ)+CanopyNonstructElmConc_pft(ielmn,NZ) &
-    +CanopyNonstructElmConc_pft(ielmp,NZ)
+  CCPOLT=CanopyNonstElmConc_pft(ielmc,NZ)+CanopyNonstElmConc_pft(ielmn,NZ) &
+    +CanopyNonstElmConc_pft(ielmp,NZ)
   !coefficient for LW emitted by canopy  
   FTHRM=EMMC*stefboltz_const*FracRadPARbyCanopy_pft(NZ)*AREA3(NU)
   !long-wave absorbed by canopy
@@ -1244,7 +1244,7 @@ module UptakesMod
     NU                             =>  plt_site%NU      , &
     ZERO                           =>  plt_site%ZERO    , &
     AREA3                          =>  plt_site%AREA3   , &
-    CanopyNonstructElmConc_pft =>  plt_biom%CanopyNonstructElmConc_pft  , &
+    CanopyNonstElmConc_pft =>  plt_biom%CanopyNonstElmConc_pft  , &
     RootNonstructElmConc_pvr =>  plt_biom%RootNonstructElmConc_pvr  , &
     ShootStrutElms_pft              =>  plt_biom%ShootStrutElms_pft  , &
     MaxSoiL4Root                   =>  plt_morph%MaxSoiL4Root     , &
@@ -1276,7 +1276,7 @@ module UptakesMod
   LWRadCanopy_pft(NZ)=FTHRM*TKC(NZ)**4._r8
   PSICanopy_pft(NZ)=ElvAdjstedtSoiPSIMPa(NGTopRootLayer_pft(NZ))
   !WRITE(121,*)'PSICANELV',etimer%get_curr_doy(),NZ,PSICanopy_pft(NZ)
-  CCPOLT=sum(CanopyNonstructElmConc_pft(1:NumPlantChemElms,NZ))
+  CCPOLT=sum(CanopyNonstElmConc_pft(1:NumPlantChemElms,NZ))
 
   call update_osmo_turg_pressure(PSICanopy_pft(NZ),CCPOLT,OSMO(NZ),TKC(NZ)&
     ,PSICanopyOsmo_pft(NZ),PSICanopyTurg_pft(NZ),FDMP)

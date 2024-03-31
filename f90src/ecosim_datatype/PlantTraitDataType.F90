@@ -133,7 +133,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  NodeNumNormByMatgrp_brch(:,:,:,:)                     !normalized node number during vegetative growth stages , [-]
   real(r8),target,allocatable ::  HourlyNodeNumNormByMatgrp_brch(:,:,:,:)                    !gain in normalized node number during vegetative growth stages , [h-1]
   real(r8),target,allocatable ::  dReproNodeNumNormByMatG_brch(:,:,:,:)                    !gain in normalized node number during reproductive growth stages, [h-1]
-  real(r8),target,allocatable ::  ShootNodeNumber_brch(:,:,:,:)                      !node number, [-]
+  real(r8),target,allocatable ::  ShootNodeNum_brch(:,:,:,:)                      !node number, [-]
   real(r8),target,allocatable ::  NodeNum2InitFloral_brch(:,:,:,:)                     !node number at floral initiation, [-]
   real(r8),target,allocatable ::  ReprodNodeNumNormByMatrgrp_brch(:,:,:,:)                     !normalized node number during reproductive growth stages, [-]
   real(r8),target,allocatable ::  NodeNumberAtAnthesis_brch(:,:,:,:)                     !node number at anthesis, [-]
@@ -293,7 +293,7 @@ contains
   allocate(NodeNumNormByMatgrp_brch(MaxNumBranches,JP,JY,JX)); NodeNumNormByMatgrp_brch=0._r8
   allocate(HourlyNodeNumNormByMatgrp_brch(MaxNumBranches,JP,JY,JX));HourlyNodeNumNormByMatgrp_brch=0._r8
   allocate(dReproNodeNumNormByMatG_brch(MaxNumBranches,JP,JY,JX));dReproNodeNumNormByMatG_brch=0._r8
-  allocate(ShootNodeNumber_brch(MaxNumBranches,JP,JY,JX));  ShootNodeNumber_brch=0._r8
+  allocate(ShootNodeNum_brch(MaxNumBranches,JP,JY,JX));  ShootNodeNum_brch=0._r8
   allocate(NodeNum2InitFloral_brch(MaxNumBranches,JP,JY,JX)); NodeNum2InitFloral_brch=0._r8
   allocate(ReprodNodeNumNormByMatrgrp_brch(MaxNumBranches,JP,JY,JX)); ReprodNodeNumNormByMatrgrp_brch=0._r8
   allocate(NodeNumberAtAnthesis_brch(MaxNumBranches,JP,JY,JX)); NodeNumberAtAnthesis_brch=0._r8
@@ -450,7 +450,7 @@ contains
   call destroy(NodeNumNormByMatgrp_brch)
   call destroy(HourlyNodeNumNormByMatgrp_brch)
   call destroy(dReproNodeNumNormByMatG_brch)
-  call destroy(ShootNodeNumber_brch)
+  call destroy(ShootNodeNum_brch)
   call destroy(NodeNum2InitFloral_brch)
   call destroy(ReprodNodeNumNormByMatrgrp_brch)
   call destroy(NodeNumberAtAnthesis_brch)

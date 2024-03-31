@@ -157,9 +157,9 @@ implicit none
   real(r8),pointer   :: h1D_CAN_CO2_FLX_ptc(:)   !CO2NetFix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.148, umol m-2 s-1
   real(r8),pointer   :: h1D_CAN_GPP_ptc(:)       !GrossCO2Fix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total gross CO2 fixation, gC m-2
   real(r8),pointer   :: h1D_CAN_RA_ptc(:)        !CanopyPlusNodulRespC_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total autotrophic respiration
-  real(r8),pointer   :: h1D_cTNC_ptc(:)          !CanopyNonstructElmConc_pft(ielmc,NZ,NY,NX), canopy nonstructural C concentration, 
-  real(r8),pointer   :: h1D_cTNN_ptc(:)          !CanopyNonstructElmConc_pft(ielmn,NZ,NY,NX)
-  real(r8),pointer   :: h1D_cTNP_ptc(:)          !CanopyNonstructElmConc_pft(ielmp,NZ,NY,NX)
+  real(r8),pointer   :: h1D_cTNC_ptc(:)          !CanopyNonstElmConc_pft(ielmc,NZ,NY,NX), canopy nonstructural C concentration, 
+  real(r8),pointer   :: h1D_cTNN_ptc(:)          !CanopyNonstElmConc_pft(ielmn,NZ,NY,NX)
+  real(r8),pointer   :: h1D_cTNP_ptc(:)          !CanopyNonstElmConc_pft(ielmp,NZ,NY,NX)
   real(r8),pointer   :: h1D_STOML_RSC_CO2_ptc(:) !CanPStomaResistH2O_pft(NZ,NY,NX)*1.56*3600.0_r8, s m-1, for CO2
   real(r8),pointer   :: h1D_BLYR_RSC_CO2_ptc(:)  !CanopyBndlResist_pft(NZ,NY,NX)*1.34*3600.0_r8, s m-1, for CO2
   real(r8),pointer   :: h1D_CAN_CO2_ptc(:)       !CanopyGasCO2_pft(NZ,NY,NX), umol mol-1
@@ -1649,9 +1649,9 @@ implicit none
         this%h1D_CAN_CO2_FLX_ptc(nptc)  = CO2NetFix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.148_r8
         this%h1D_CAN_GPP_ptc(nptc)      = GrossCO2Fix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_CAN_RA_ptc(nptc)       = CanopyPlusNodulRespC_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_cTNC_ptc(nptc)         = CanopyNonstructElmConc_pft(ielmc,NZ,NY,NX)
-        this%h1D_cTNN_ptc(nptc)         = CanopyNonstructElmConc_pft(ielmn,NZ,NY,NX)
-        this%h1D_cTNP_ptc(nptc)         = CanopyNonstructElmConc_pft(ielmp,NZ,NY,NX)
+        this%h1D_cTNC_ptc(nptc)         = CanopyNonstElmConc_pft(ielmc,NZ,NY,NX)
+        this%h1D_cTNN_ptc(nptc)         = CanopyNonstElmConc_pft(ielmn,NZ,NY,NX)
+        this%h1D_cTNP_ptc(nptc)         = CanopyNonstElmConc_pft(ielmp,NZ,NY,NX)
         this%h1D_STOML_RSC_CO2_ptc(nptc)= CanPStomaResistH2O_pft(NZ,NY,NX)*1.56_r8*3600.0_r8
         this%h1D_BLYR_RSC_CO2_ptc(nptc) = CanopyBndlResist_pft(NZ,NY,NX)*1.34_r8*3600.0_r8
         this%h1D_CAN_CO2_ptc(nptc)      = CanopyGasCO2_pft(NZ,NY,NX)

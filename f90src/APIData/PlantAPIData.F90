@@ -228,7 +228,7 @@ implicit none
   integer,  pointer :: BranchNumber_pft(:)          => null() !branch number
   integer,  pointer :: NumOfBranches_pft(:)          => null() !branch number
   integer,  pointer :: NIXBotRootLayer_rpft(:,:)       => null() !maximum soil layer number for root axes, [-]
-  real(r8), pointer :: ShootNodeNumber_brch(:,:)       => null() !shoot node number, [-]
+  real(r8), pointer :: ShootNodeNum_brch(:,:)       => null() !shoot node number, [-]
   real(r8), pointer :: NodeNum2InitFloral_brch(:,:)      => null() !shoot node number at floral initiation, [-]
   real(r8), pointer :: NodeNumberAtAnthesis_brch(:,:)      => null() !shoot node number at anthesis, [-]
   real(r8), pointer :: SineBranchAngle_pft(:)        => null() !branching angle, [degree from horizontal]
@@ -300,7 +300,7 @@ implicit none
   real(r8), pointer :: OFFST(:)    => null()     !adjustment of Arhhenius curves for plant thermal acclimation, [oC]
   real(r8), pointer :: PlantO2Stress(:)     => null()     !plant O2 stress indicator, []
   real(r8), pointer :: MinNonstructalC4InitBranch(:)       => null()     !branch nonstructural C content required for new branch, [gC gC-1]
-  real(r8), pointer :: MinNonstructuralC4InitRoot_pft(:)       => null()     !threshold root nonstructural C content for initiating new root axis, [gC gC-1]
+  real(r8), pointer :: MinNonstC2InitRoot_pft(:)       => null()     !threshold root nonstructural C content for initiating new root axis, [gC gC-1]
   real(r8), pointer :: LeafElmntRemobFlx_brch(:,:,:) => null()    !element translocated from leaf during senescence, [g d-2 h-1]
   real(r8), pointer :: PetioleChemElmRemobFlx_brch(:,:,:) => null()    !element translocated from sheath during senescence, [g d-2 h-1]
   real(r8), pointer :: TCelsChill4Leaf_pft(:)     => null()     !threshold temperature for spring leafout/dehardening, [oC]
@@ -460,7 +460,7 @@ implicit none
   real(r8), pointer :: RootMyco1stStrutElms_rpvr(:,:,:,:,:) => null()    !root layer element primary axes, [g d-2]
   real(r8), pointer :: Root1stElm_raxs(:,:,:,:)   => null()    !root C primary axes, [g d-2]
   real(r8), pointer :: StandDeadKCompElms_pft(:,:,:)  => null()    !standing dead element fraction, [g d-2]
-  real(r8), pointer :: CanopyNonstructElmConc_pft(:,:)    => null()    !canopy nonstructural element concentration, [g d-2]
+  real(r8), pointer :: CanopyNonstElmConc_pft(:,:)    => null()    !canopy nonstructural element concentration, [g d-2]
   real(r8), pointer :: CanopyNonstElms_pft(:,:)    => null()    !canopy nonstructural element concentration, [g d-2]
   real(r8), pointer :: CanopyNodulNonstElms_pft(:,:)    => null()    !canopy nodule nonstructural element, [g d-2]
   real(r8), pointer :: NoduleNonstructCconc_pft(:)      => null()    !nodule nonstructural C, [gC d-2]
@@ -1271,7 +1271,7 @@ implicit none
   allocate(this%RootMyco1stStrutElms_rpvr(NumPlantChemElms,jroots,JZ1,NumOfCanopyLayers1,JP1))
   this%RootMyco1stStrutElms_rpvr=spval
   allocate(this%RootNodulElms_pft(NumPlantChemElms,JP1));this%RootNodulElms_pft=spval
-  allocate(this%CanopyNonstructElmConc_pft(NumPlantChemElms,JP1));this%CanopyNonstructElmConc_pft=spval
+  allocate(this%CanopyNonstElmConc_pft(NumPlantChemElms,JP1));this%CanopyNonstElmConc_pft=spval
   allocate(this%CanopyNonstElms_pft(NumPlantChemElms,JP1));this%CanopyNonstElms_pft=spval
   allocate(this%CanopyNodulNonstElms_pft(NumPlantChemElms,JP1));this%CanopyNodulNonstElms_pft=spval
   allocate(this%NoduleNonstructCconc_pft(JP1));this%NoduleNonstructCconc_pft=spval
@@ -1353,7 +1353,7 @@ implicit none
 !  if(allocated(RootMyco1stStrutElms_rpvr))deallocate(RootMyco1stStrutElms_rpvr)
 !  if(allocated(StandDeadKCompElms_pft))deallocate(StandDeadKCompElms_pft)
 !  if(allocated(RootMyco2ndStrutElms_rpvr))deallocate(RootMyco2ndStrutElms_rpvr)
-!  if(allocated(CanopyNonstructElmConc_pft))deallocate(CanopyNonstructElmConc_pft)
+!  if(allocated(CanopyNonstElmConc_pft))deallocate(CanopyNonstElmConc_pft)
 !  if(allocated(CanopyNonstElms_pft))deallocate(CanopyNonstElms_pft)
 !  if(allocated(CanopyNodulNonstElms_pft))deallocate(CanopyNodulNonstElms_pft)
 !  if(allocated(NoduleNonstructCconc_pft))deallocate(NoduleNonstructCconc_pft)
@@ -1708,7 +1708,7 @@ implicit none
   allocate(this%MatureGroup_pft(JP1));this%MatureGroup_pft=spval
   allocate(this%PlantO2Stress(JP1));this%PlantO2Stress=spval
   allocate(this%MinNonstructalC4InitBranch(JP1));this%MinNonstructalC4InitBranch=spval
-  allocate(this%MinNonstructuralC4InitRoot_pft(JP1));this%MinNonstructuralC4InitRoot_pft=spval
+  allocate(this%MinNonstC2InitRoot_pft(JP1));this%MinNonstC2InitRoot_pft=spval
   allocate(this%fTgrowCanP(JP1));this%fTgrowCanP=spval
   allocate(this%TCelsChill4Leaf_pft(JP1));this%TCelsChill4Leaf_pft=spval
   allocate(this%TCG(JP1));this%TCG=spval
@@ -1837,7 +1837,7 @@ implicit none
   allocate(this%NumOfBranches_pft(JP1));this%NumOfBranches_pft=0
   allocate(this%NIXBotRootLayer_rpft(NumOfCanopyLayers1,JP1));this%NIXBotRootLayer_rpft=0
   allocate(this%PARTS_brch(NumOfPlantMorphUnits,MaxNumBranches,JP1));this%PARTS_brch=spval
-  allocate(this%ShootNodeNumber_brch(MaxNumBranches,JP1));this%ShootNodeNumber_brch=spval
+  allocate(this%ShootNodeNum_brch(MaxNumBranches,JP1));this%ShootNodeNum_brch=spval
   allocate(this%NodeNum2InitFloral_brch(MaxNumBranches,JP1));this%NodeNum2InitFloral_brch=spval
   allocate(this%NodeNumberAtAnthesis_brch(MaxNumBranches,JP1));this%NodeNumberAtAnthesis_brch=spval
   allocate(this%SineBranchAngle_pft(JP1));this%SineBranchAngle_pft=spval

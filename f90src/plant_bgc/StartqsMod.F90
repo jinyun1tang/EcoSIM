@@ -599,7 +599,7 @@ module StartqsMod
     KLeafNumber_brch                  =>  plt_morph%KLeafNumber_brch , &
     XTLI                              =>  plt_morph%XTLI   , &
     BranchNumber_pft                  =>  plt_morph%BranchNumber_pft    , &
-    ShootNodeNumber_brch              =>  plt_morph%ShootNodeNumber_brch  , &
+    ShootNodeNum_brch              =>  plt_morph%ShootNodeNum_brch  , &
     CanopyLeafArea_pft                =>  plt_morph%CanopyLeafArea_pft  , &
     CanopyStemArea_lbrch          =>  plt_morph%CanopyStemArea_lbrch  , &
     StemAreaZsec_brch                 =>  plt_morph%StemAreaZsec_brch  , &
@@ -642,8 +642,8 @@ module StartqsMod
     plt_pheno%Prep4Literfall_brch(NB,NZ)=ifalse
     plt_pheno%Hours4LiterfalAftMature_brch(NB,NZ)=0
     MatureGroup_brch(NB,NZ)=MatureGroup_pft(NZ)
-    ShootNodeNumber_brch(NB,NZ)=XTLI(NZ)
-    NodeNum2InitFloral_brch(NB,NZ)=ShootNodeNumber_brch(NB,NZ)
+    ShootNodeNum_brch(NB,NZ)=XTLI(NZ)
+    NodeNum2InitFloral_brch(NB,NZ)=ShootNodeNum_brch(NB,NZ)
     NodeNumberAtAnthesis_brch(NB,NZ)=0._r8
     NumOfLeaves_brch(NB,NZ)=0._r8
     LeafNumberAtFloralInit_brch(NB,NZ)=0._r8
@@ -743,7 +743,7 @@ module StartqsMod
     CanopyStemArea_lpft(L,NZ)=0._r8
   ENDDO D35
   plt_biom%CanopyNonstElms_pft(1:NumPlantChemElms,NZ)=0._r8
-  plt_biom%CanopyNonstructElmConc_pft(1:NumPlantChemElms,NZ)=0._r8
+  plt_biom%CanopyNonstElmConc_pft(1:NumPlantChemElms,NZ)=0._r8
   plt_biom%NoduleNonstructCconc_pft(NZ)=0._r8
   plt_biom%ShootStrutElms_pft(1:NumPlantChemElms,NZ)=0._r8
   plt_biom%LeafStrutElms_pft(1:NumPlantChemElms,NZ)=0._r8
