@@ -329,7 +329,7 @@ module CanopyCondsMod
     CanopyArea_pft(NZ)=0.0_r8
     DO  NB=1,NumOfBranches_pft(NZ)
       DO  L=1,NumOfCanopyLayers1        
-        IF(CanopyHeightz_col(L-1).GE.SnowDepth-ZERO.AND.CanopyHeightz_col(L-1)+0.05_r8.GE.DepthSurfWatIce-ZERO)THEN
+        IF(CanopyHeightz_col(L-1).GE.SnowDepth-ZERO.AND.CanopyHeightz_col(L-1)+0.005_r8.GE.DepthSurfWatIce-ZERO)THEN
           !above snow depth and above water/ice surface
           D1130: DO K=1,MaxNodesPerBranch1
             CanopyArea_pft(NZ)=CanopyArea_pft(NZ)+CanopyLeafAreaByLayer_pft(L,K,NB,NZ)
