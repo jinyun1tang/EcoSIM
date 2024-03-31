@@ -23,7 +23,7 @@ module HfuncsMod
 ! PSIMin4LeafOut=minimum canopy water potential for leafout of drought-deciduous PFT (MPa)
 ! PSIMin4LeafOff=minimum canopy water potential for leafoff of drought-deciduous PFT (MPa)
 ! GrowStageNorm4VegetaPheno,GrowStageNorm4ReprodPheno=normalized growth stage durations for vegetative,reproductive phenology
-! NBX=maximum branch number for PFT defined by iPlantTurnoverPattern_pftin PFT file
+! BranchNumMax=maximum branch number for PFT defined by iPlantTurnoverPattern_pftin PFT file
 ! MaxHour4LeafOutOff=maximum hours for leafout,leafoff
 !
   real(r8), PARAMETER :: PSIMin4LeafExpansion=0.1_r8
@@ -32,7 +32,7 @@ module HfuncsMod
   real(r8), PARAMETER :: GrowStageNorm4ReprodPheno=0.667_r8
   real(r8), PARAMETER :: MaxHour4LeafOutOff=3600.0_r8
   real(r8), parameter :: PSIMin4LeafOff(0:3)=real((/-200.0,-2.0,-2.0,-2.0/),r8)
-  integer , parameter :: NBX(0:3)=(/5,1,1,1/)
+  integer , parameter :: BranchNumMax(0:3)=(/5,1,1,1/)
 
   public :: hfuncs
   contains
@@ -307,12 +307,11 @@ module HfuncsMod
                   .GT.BranchNumber_pft(NZ)+NumCogrowNode(NZ)/FNOD(NZ)+XTLI(NZ))THEN
                   !initiate a new branch
                   BranchNumber_pft(NZ)=BranchNumber_pft(NZ)+1
-                  NumOfBranches_pft(NZ)=MIN(NBX(iPlantTurnoverPattern_pft(NZ)),MAX(NB,NumOfBranches_pft(NZ)))
+                  NumOfBranches_pft(NZ)=MIN(BranchNumMax(iPlantTurnoverPattern_pft(NZ)),MAX(NB,NumOfBranches_pft(NZ)))
                   BranchNumber_brch(NB,NZ)=BranchNumber_pft(NZ)-1
                   iPlantShootState_pft(NZ)=iLive
                   iPlantBranchState_brch(NB,NZ)=iLive
                   Hours4Leafout_brch(NB,NZ)=0.0_r8
-!                  write(101,*)'plant shoot is alive',NB,NZ
                   IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual)THEN
                     MatureGroup_brch(NB,NZ)=AZMAX1(MatureGroup_pft(NZ)-BranchNumber_brch(NB,NZ))
                   ELSE
@@ -321,9 +320,14 @@ module HfuncsMod
                   exit
                 ENDIF
               ENDIF
-            ENDDO D120
+            ENDDO D120            
           ENDIF
         ENDIF
+      ENDIF
+      IF(NZ==1)THEN
+      write(301,*)I+J/24.,BranchNumber_pft(NZ),NumOfBranches_pft(NZ)
+      ELSE
+      write(302,*)I+J/24.,BranchNumber_pft(NZ),NumOfBranches_pft(NZ)
       ENDIF
 !
 !     ADD AXIS TO ROOT IF PLANT GROWTH STAGE, ROOT NON-STRUCTURAL C

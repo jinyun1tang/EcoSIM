@@ -101,7 +101,7 @@
 
   IF(SineSolarIncliAngle.GT.0.0_r8 .AND. CanopyLeafArea_pft(NZ).GT.ZEROP(NZ))THEN
 !
-    call PhotoActivePFT(NZ)
+    call PhotoActivePFT(I,J,NZ)
   ELSE
 !
     MinCanPStomaResistH2O_pft(NZ)=MaxCanPStomaResistH2O_pft(NZ)
@@ -536,23 +536,23 @@
   end subroutine C4FixCO2
 !------------------------------------------------------------------------------------------
 
-  subroutine PhotosisOnLiveBranch(NB,NZ,CH2O,TFN_Carboxy,TFN_Oxy,TFN_eTransp,Km4RubOxy)
+  subroutine PhotosisOnLiveBranch(I,J,NB,NZ,CH2O,TFN_Carboxy,TFN_Oxy,TFN_eTransp,Km4RubOxy)
   implicit none
-  integer, intent(in):: NB,NZ
+  integer, intent(in):: I,J,NB,NZ
+  real(r8), intent(in) :: TFN_Carboxy,TFN_Oxy,TFN_eTransp,Km4RubOxy  
   real(r8),intent(inout) :: CH2O
-  real(r8), intent(in) :: TFN_Carboxy,TFN_Oxy,TFN_eTransp,Km4RubOxy
   integer :: K
   real(r8) :: ProteinPerLeafArea   !protein area density, gC/m2 LA
 !     begin_execution
-  associate(                            &
+  associate(                                                            &
     iPlantPhotosynthesisType   => plt_photo%iPlantPhotosynthesisType  , &
-    Vmax4PEPCarboxy_pft        => plt_photo%Vmax4PEPCarboxy_pft   , &
+    Vmax4PEPCarboxy_pft        => plt_photo%Vmax4PEPCarboxy_pft       , &
     Vmax4RubiscoCarboxy_pft    => plt_photo%Vmax4RubiscoCarboxy_pft   , &
-    ZERO                       => plt_site%ZERO     , &
-    LeafElmntNode_brch         => plt_biom%LeafElmntNode_brch    , &
-    ZEROP                      => plt_biom%ZEROP    , &
-    LeafProteinCNode_brch      => plt_biom%LeafProteinCNode_brch     , &
-    LeafAreaNode_brch          => plt_morph%LeafAreaNode_brch     &
+    ZERO                       => plt_site%ZERO                       , &
+    LeafElmntNode_brch         => plt_biom%LeafElmntNode_brch         , &
+    ZEROP                      => plt_biom%ZEROP                      , &
+    LeafProteinCNode_brch      => plt_biom%LeafProteinCNode_brch      , &
+    LeafAreaNode_brch          => plt_morph%LeafAreaNode_brch           &
   )
   DO K=1,MaxNodesPerBranch1
     IF(LeafAreaNode_brch(K,NB,NZ).GT.ZEROP(NZ)&
@@ -589,24 +589,24 @@
   end subroutine PhotosisOnLiveBranch
 !------------------------------------------------------------------------------------------
 
-  subroutine PhenoActiveBranch(NB,NZ,CH2O,TFN_Carboxy,TFN_Oxy,TFN_eTransp,Km4RubOxy)
+  subroutine PhenoActiveBranch(I,J,NB,NZ,CH2O,TFN_Carboxy,TFN_Oxy,TFN_eTransp,Km4RubOxy)
   implicit none
-  integer, intent(in) :: NB,NZ
-  real(r8), intent(inout) :: CH2O
+  integer , intent(in) :: I,J,NB,NZ
   real(r8), intent(in) :: TFN_Carboxy,TFN_Oxy,TFN_eTransp,Km4RubOxy
+  real(r8), intent(inout) :: CH2O  
   integer :: NE
 !     begin_execution
-  associate(                          &
+  associate(                                                             &
     LeafPetoNonstElmConc_brch  =>  plt_biom%LeafPetoNonstElmConc_brch  , &
-    iPlantPhenolType_pft       =>  plt_pheno%iPlantPhenolType_pft , &
+    iPlantPhenolType_pft       =>  plt_pheno%iPlantPhenolType_pft      , &
     iPlantTurnoverPattern_pft  =>  plt_pheno%iPlantTurnoverPattern_pft , &
-    HourFailGrainFill_brch     =>  plt_pheno%HourFailGrainFill_brch   , &
-    Hours2LeafOut_brch   =>  plt_pheno%Hours2LeafOut_brch   , &
-    iPlantPhenolPattern_pft =>  plt_pheno%iPlantPhenolPattern_pft , &
-    iPlantBranchState_brch     =>  plt_pheno%iPlantBranchState_brch  , &
-    ZERO                       =>  plt_site%ZERO    , &
-    C4PhotosynDowreg_brch      =>  plt_photo%C4PhotosynDowreg_brch   , &
-    RubiscoActivity_brch       =>  plt_photo%RubiscoActivity_brch      &
+    HourFailGrainFill_brch     =>  plt_pheno%HourFailGrainFill_brch    , &
+    Hours2LeafOut_brch         =>  plt_pheno%Hours2LeafOut_brch        , &
+    iPlantPhenolPattern_pft    =>  plt_pheno%iPlantPhenolPattern_pft   , &
+    iPlantBranchState_brch     =>  plt_pheno%iPlantBranchState_brch    , &
+    ZERO                       =>  plt_site%ZERO                       , &
+    C4PhotosynDowreg_brch      =>  plt_photo%C4PhotosynDowreg_brch     , &
+    RubiscoActivity_brch       =>  plt_photo%RubiscoActivity_brch        &
   )
 !
 !     FEEDBACK ON C3 CARBOXYLATION FROM NON-STRUCTURAL C:N:P
@@ -615,11 +615,6 @@
 !     RubiscoActivity_brch=N,P feedback inhibition on C3 CO2 fixation
 !     CNKI,CPKI=nonstructural N,P inhibition constant on rubisco
 !
-  IF(nz==1)then
-  write(193,'(I4,4(X,F13.6))')NB,ii+jj/24.,(LeafPetoNonstElmConc_brch(NE,NB,NZ),NE=1,3)
-  else
-  write(194,'(I4,4(X,F13.6))')NB,ii+jj/24.,(LeafPetoNonstElmConc_brch(NE,NB,NZ),NE=1,3)
-  endif
   IF(LeafPetoNonstElmConc_brch(ielmc,NB,NZ).GT.ZERO)THEN
     RubiscoActivity_brch(NB,NZ)=AMIN1(LeafPetoNonstElmConc_brch(ielmn,NB,NZ)/(LeafPetoNonstElmConc_brch(ielmn,NB,NZ)&
       +LeafPetoNonstElmConc_brch(ielmc,NB,NZ)/CNKI) &
@@ -640,8 +635,7 @@
 !     ATRP=hours above threshold temperature for dehardening since leafout
 !     ATRPZ=hours to full dehardening of conifers in spring
 ! deciduous
-  IF(iPlantPhenolType_pft(NZ).NE.iphenotyp_evgreen &
-    .AND.iPlantTurnoverPattern_pft(NZ).GE.2)THEN
+  IF(iPlantPhenolType_pft(NZ).NE.iphenotyp_evgreen .AND. iPlantTurnoverPattern_pft(NZ).GE.2)THEN
     !conifer modification
     RubiscoActivity_brch(NB,NZ)=RubiscoActivity_brch(NB,NZ)*AZMAX1(AMIN1(1.0_r8 &
       ,Hours2LeafOut_brch(NB,NZ)/(0.9_r8*ATRPZ)))
@@ -667,9 +661,9 @@
 !     ProteinPerLeafArea=leaf protein surficial density
 !
   if(NZ==1)then  
-    write(187,*)etimer%get_curr_doy(),NB,RubiscoActivity_brch(NB,NZ)
+    write(187,*)I+J/24.,NB,RubiscoActivity_brch(NB,NZ)
   else
-    write(188,*)etimer%get_curr_doy(),NB,RubiscoActivity_brch(NB,NZ)
+    write(188,*)I+J/24.,NB,RubiscoActivity_brch(NB,NZ)
   endif
 
   IF(iPlantBranchState_brch(NB,NZ).EQ.iLive)THEN
@@ -755,8 +749,9 @@
   end subroutine PrepPhotosynthesis
 !------------------------------------------------------------------------------------------
 
-  subroutine PhotoActivePFT(NZ)
+  subroutine PhotoActivePFT(I,J,NZ)
   implicit none
+  integer, intent(in) :: I,J
   integer, intent(in) :: NZ
 
   integer :: NB,K
@@ -766,25 +761,25 @@
   real(r8), parameter :: secsperhour=3600.0_r8
 
 !     begin_execution
-  associate(                          &
-    HourReq4LeafOff_brch  =>  plt_pheno%HourReq4LeafOff_brch  , &
-    Hours4LeafOff_brch          =>  plt_pheno%Hours4LeafOff_brch   , &
-    HourReq4LeafOut_brch  =>  plt_pheno%HourReq4LeafOut_brch  , &
-    Hours4Leafout_brch          =>  plt_pheno%Hours4Leafout_brch   , &
-    iPlantPhenolType_pft        =>  plt_pheno%iPlantPhenolType_pft , &
-    ZEROP                       =>  plt_biom%ZEROP   , &
-    NU                          =>  plt_site%NU      , &
-    AREA3                       =>  plt_site%AREA3   , &
-    Vmax4RubiscoCarboxy_pft     =>  plt_photo%Vmax4RubiscoCarboxy_pft  , &
-    RubiscoActivity_brch        =>  plt_photo%RubiscoActivity_brch   , &
-    C4PhotosynDowreg_brch       =>  plt_photo%C4PhotosynDowreg_brch  , &
-    Km4RubiscoCarboxy_pft       =>  plt_photo%Km4RubiscoCarboxy_pft , &
-    Vmax4PEPCarboxy_pft         =>  plt_photo%Vmax4PEPCarboxy_pft  , &
-    MinCanPStomaResistH2O_pft   =>  plt_photo%MinCanPStomaResistH2O_pft   , &
+  associate(                                                               &
+    HourReq4LeafOff_brch        =>  plt_pheno%HourReq4LeafOff_brch       , &
+    Hours4LeafOff_brch          =>  plt_pheno%Hours4LeafOff_brch         , &
+    HourReq4LeafOut_brch        =>  plt_pheno%HourReq4LeafOut_brch       , &
+    Hours4Leafout_brch          =>  plt_pheno%Hours4Leafout_brch         , &
+    iPlantPhenolType_pft        =>  plt_pheno%iPlantPhenolType_pft       , &
+    ZEROP                       =>  plt_biom%ZEROP                       , &
+    NU                          =>  plt_site%NU                          , &
+    AREA3                       =>  plt_site%AREA3                       , &
+    Vmax4RubiscoCarboxy_pft     =>  plt_photo%Vmax4RubiscoCarboxy_pft    , &
+    RubiscoActivity_brch        =>  plt_photo%RubiscoActivity_brch       , &
+    C4PhotosynDowreg_brch       =>  plt_photo%C4PhotosynDowreg_brch      , &
+    Km4RubiscoCarboxy_pft       =>  plt_photo%Km4RubiscoCarboxy_pft      , &
+    Vmax4PEPCarboxy_pft         =>  plt_photo%Vmax4PEPCarboxy_pft        , &
+    MinCanPStomaResistH2O_pft   =>  plt_photo%MinCanPStomaResistH2O_pft  , &
     DiffCO2Atmos2Intracel_pft   =>  plt_photo%DiffCO2Atmos2Intracel_pft  , &
-    MaxCanPStomaResistH2O_pft   =>  plt_photo%MaxCanPStomaResistH2O_pft   , &
-    FracRadPARbyCanopy_pft      =>  plt_rad%FracRadPARbyCanopy_pft    , &
-    NumOfBranches_pft           =>  plt_morph%NumOfBranches_pft      &
+    MaxCanPStomaResistH2O_pft   =>  plt_photo%MaxCanPStomaResistH2O_pft  , &
+    FracRadPARbyCanopy_pft      =>  plt_rad%FracRadPARbyCanopy_pft       , &
+    NumOfBranches_pft           =>  plt_morph%NumOfBranches_pft            &
   )
 
   call PrepPhotosynthesis(NZ,CH2O,TFN_Carboxy,TFN_Oxy,TFN_eTransp,Km4RubOxy)
@@ -803,7 +798,7 @@
       .OR.Hours4Leafout_brch(NB,NZ).GE.HourReq4LeafOut_brch(NB,NZ) &
       .OR.Hours4LeafOff_brch(NB,NZ).LT.HourReq4LeafOff_brch(NB,NZ))THEN
       !there are photosynthetically active leaves 
-      call PhenoActiveBranch(NB,NZ,CH2O,TFN_Carboxy,TFN_Oxy,TFN_eTransp,Km4RubOxy)
+      call PhenoActiveBranch(I,J,NB,NZ,CH2O,TFN_Carboxy,TFN_Oxy,TFN_eTransp,Km4RubOxy)
     ELSE
       RubiscoActivity_brch(NB,NZ)=0.0_r8
       C4PhotosynDowreg_brch(NB,NZ)=1.0_r8
