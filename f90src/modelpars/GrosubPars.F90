@@ -11,7 +11,7 @@ module GrosubPars
 ! VMXC=rate constant for nonstructural C oxidation in respiration (h-1)
 ! FSNR=rate constant for LitrFall at end of growing season (h-1)
 ! Hours4PhyslMature=number of hours with no grain filling required for physilogical maturity
-! Hours4FullSenescence=number of hours until full senescence after physl maturity
+! Hours4FullSenes=number of hours until full senescence after physl maturity
 ! XFRX=maximum storage C content for remobiln from stalk,root reserves
 ! XFRY=rate const for remobiln to storage from stalk,root reserves (h-1)
 ! Hours4LiterfalAftMature_brch,HoursReq4LiterfalAftMature=current,required hours after physl maturity until start of LitrFall
@@ -72,7 +72,7 @@ module GrosubPars
   real(r8) :: VMXC
   real(r8) :: FSNR
   real(r8) :: Hours4PhyslMature
-  real(r8) :: Hours4FullSenescence
+  real(r8) :: Hours4FullSenes
   real(r8) :: XFRX
   real(r8) :: XFRY
   real(r8) :: FSNK
@@ -241,7 +241,7 @@ module GrosubPars
   VMXC=0.015_r8
   FSNR=2.884E-03_r8
   Hours4PhyslMature=168.0_r8
-  Hours4FullSenescence=240.0_r8
+  Hours4FullSenes=240.0_r8
   XFRX=2.5E-02_r8
   XFRY=2.5E-03_r8
   FSNK=0.05_r8
