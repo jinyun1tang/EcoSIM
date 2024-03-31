@@ -766,9 +766,9 @@ module PlantBranchMod
 !    write(101,*)'computegpp branch',NB,NZ
     call ComputeGPP(NB,NZ,WFNG,Stomata_Activity,CH2O3,CH2O4,CH2O,CO2F,CH2OClm,CH2OLlm)
     if(NZ==1)then
-    write(101,'(I4,5(X,F13.6))')NB,I+J/24.,CO2F,CH2O,CH2OClm,CH2OLlm
+    write(101,'(I4,5(X,F13.6))')NB,I+J/24.,CO2F,CH2O
     else
-    write(102,'(I4,5(X,F13.6))')NB,I+J/24.,CO2F,CH2O,CH2OClm,CH2OLlm
+    write(102,'(I4,5(X,F13.6))')NB,I+J/24.,CO2F,CH2O
     endif
 !
 !   SHOOT AUTOTROPHIC RESPIRATION AFTER EMERGENCE
@@ -782,8 +782,15 @@ module PlantBranchMod
   ELSE
     CH2O=0._r8
     call ComputRAutoB4Emergence(I,NB,NZ,TFN6_vr,DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX,ShootStructN,&
-      WFNG,WFNSG,CanopyNonstElm4Gros,CNPG,RCO2NonstC_brch,RMNCS,RMxess_brch,NonStructalC4Growth_brch,CNRDM,RCO2NonstC4Nassim_brch)
-    write(101,*)NB,I+J/24.,'ComputRAutoB4Emergence',NonStructalC4Growth_brch,CanopyNonstElms_brch(ielmc,NB,NZ)  
+      WFNG,WFNSG,CanopyNonstElm4Gros,CNPG,RCO2NonstC_brch,RMNCS,RMxess_brch,NonStructalC4Growth_brch,&
+      CNRDM,RCO2NonstC4Nassim_brch)
+    IF(NZ==1)THEN  
+    write(101,*)NB,I+J/24.,'ComputRAutoB4Emergence',NonStructalC4Growth_brch,CanopyNonstElms_brch(ielmc,NB,NZ)&
+    ,iPlantCalendar_brch(ipltcal_Emerge,NB,NZ)
+    ELSE
+    write(102,*)NB,I+J/24.,'ComputRAutoB4Emergence',NonStructalC4Growth_brch,CanopyNonstElms_brch(ielmc,NB,NZ)&
+    ,iPlantCalendar_brch(ipltcal_Emerge,NB,NZ)
+    ENDIF
   ENDIF
 
 !   REMOVE C,N,P USED IN MAINTENANCE + GROWTH REPIRATION AND GROWTH
@@ -1176,10 +1183,12 @@ module PlantBranchMod
         
         D6320: DO M=1,jsken
           DO NE=1,NumPlantChemElms
-            LitrfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)=LitrfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)+CFOPE(NE,icwood,M,NZ) &
-              *FSNCS*(PetioleElmntNode_brch(NE,K,NB,NZ)-RCES(NE))*FWODBE(NE,k_woody_litr)
-            LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)+CFOPE(NE,inonfoliar,M,NZ) &
-              *FSNCS*(PetioleElmntNode_brch(NE,K,NB,NZ)-RCES(NE))*FWODBE(NE,k_fine_litr)
+            LitrfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)=LitrfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)&
+              +CFOPE(NE,icwood,M,NZ)*FSNCS &
+              *(PetioleElmntNode_brch(NE,K,NB,NZ)-RCES(NE))*FWODBE(NE,k_woody_litr)
+            LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)&
+              +CFOPE(NE,inonfoliar,M,NZ)*FSNCS &
+              *(PetioleElmntNode_brch(NE,K,NB,NZ)-RCES(NE))*FWODBE(NE,k_fine_litr)
           ENDDO    
         ENDDO D6320
         DO NE=1,NumPlantChemElms
@@ -1238,9 +1247,11 @@ module PlantBranchMod
         
         D6325: DO M=1,jsken
           DO NE=1,NumPlantChemElms
-            LitrfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)=LitrfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)+CFOPE(NE,icwood,M,NZ) &
+            LitrfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)=LitrfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ) &
+              +CFOPE(NE,icwood,M,NZ) &
               *PetioleElmntNode_brch(NE,K,NB,NZ)*FWODBE(NE,k_woody_litr)
-            LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)+CFOPE(NE,inonfoliar,M,NZ) &
+            LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ) &
+              +CFOPE(NE,inonfoliar,M,NZ) &
               *PetioleElmntNode_brch(NE,K,NB,NZ)*FWODBE(NE,k_fine_litr)
           ENDDO    
         ENDDO D6325
@@ -1328,11 +1339,13 @@ module PlantBranchMod
           
           D7310: DO M=1,jsken
             DO NE=1,NumPlantChemElms
-              LitrfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)=LitrfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)+CFOPE(NE,istalk,M,NZ) &
-                *FSNCK*(InternodeStrutElms_brch(NE,K,NB,NZ)-RCEK(NE))*FWOODE(NE,k_woody_litr)
+              LitrfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)=LitrfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)&
+                +CFOPE(NE,istalk,M,NZ)*FSNCK &
+                *(InternodeStrutElms_brch(NE,K,NB,NZ)-RCEK(NE))*FWOODE(NE,k_woody_litr)
 
-              LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)+CFOPE(NE,istalk,M,NZ) &
-                *FSNCK*(InternodeStrutElms_brch(NE,K,NB,NZ)-RCEK(NE))*FWOODE(NE,k_fine_litr)
+              LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)&
+                +CFOPE(NE,istalk,M,NZ)*FSNCK &
+                *(InternodeStrutElms_brch(NE,K,NB,NZ)-RCEK(NE))*FWOODE(NE,k_fine_litr)
             ENDDO    
           ENDDO D7310
 

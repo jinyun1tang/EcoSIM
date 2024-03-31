@@ -412,23 +412,19 @@ module HfuncsMod
 !
   
   D140: DO NB=1,NumOfBranches_pft(NZ)
-    DO NE=1,NumPlantChemElms
-      IF(iPlantBranchState_brch(NB,NZ).EQ.iLive)THEN
-        CanopyNonstElms_pft(NE,NZ)=CanopyNonstElms_pft(NE,NZ)+CanopyNonstElms_brch(NE,NB,NZ)
-        CanopyNodulNonstElms_pft(NE,NZ)=CanopyNodulNonstElms_pft(NE,NZ)+CanopyNodulNonstElms_brch(NE,NB,NZ)
-      ENDIF
-    ENDDO     
-  ENDDO D140
-
-  !find main branch number, which is the most recent live branch
-  DO NB=1,NumOfBranches_pft(NZ)
     IF(iPlantBranchState_brch(NB,NZ).EQ.iLive)THEN
+      DO NE=1,NumPlantChemElms      
+        CanopyNonstElms_pft(NE,NZ)=CanopyNonstElms_pft(NE,NZ)+CanopyNonstElms_brch(NE,NB,NZ)
+        CanopyNodulNonstElms_pft(NE,NZ)=CanopyNodulNonstElms_pft(NE,NZ)+CanopyNodulNonstElms_brch(NE,NB,NZ)    
+      ENDDO     
+      !find main branch number, which is the most recent live branch      
       IF(BranchNumber_brch(NB,NZ).LT.BranchNumber_pftX)THEN
         MainBranchNum_pft(NZ)=NB
         BranchNumber_pftX=BranchNumber_brch(NB,NZ)
-      ENDIF
+      ENDIF      
     ENDIF
-  ENDDO
+  ENDDO D140
+
 !
 ! NON-STRUCTURAL C, N, P CONCENTRATIONS IN ROOT
 !
@@ -467,11 +463,6 @@ module HfuncsMod
   ENDIF
   
   D190: DO NB=1,NumOfBranches_pft(NZ)
-    if(NZ==1)then
-    write(195,'(I4,5(X,F14.6))')NB,I+J/24.,LeafPetolBiomassC_brch(NB,NZ),(CanopyNonstElms_brch(NE,NB,NZ),NE=1,3)
-    else
-    write(196,'(I4,5(X,F14.6))')NB,I+J/24.,LeafPetolBiomassC_brch(NB,NZ),(CanopyNonstElms_brch(NE,NB,NZ),NE=1,3)
-    endif
     DO NE=1,NumPlantChemElms
       IF(LeafPetolBiomassC_brch(NB,NZ).GT.ZEROP(NZ))THEN
         LeafPetoNonstElmConc_brch(NE,NB,NZ)=AZMAX1(CanopyNonstElms_brch(NE,NB,NZ)/LeafPetolBiomassC_brch(NB,NZ))
@@ -490,22 +481,22 @@ module HfuncsMod
 ! Root1stDepz_pft=primary root depth
 ! VHeatCapCanP,WTSHT,WatByPCanopy=canopy heat capacity,mass,water content
 !
+  ShootArea=0._r8
   IF(iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).EQ.0)THEN
     ShootArea=CanopyLeafArea_pft(NZ)+CanopyStemArea_pft(NZ)
-!    if(NZ==1)then
-!      write(193,*)'ShootArea',NZ,I,ShootArea,HypoctoHeight_pft(NZ),SeedDepth_pft(NZ),&
-!        Root1stDepz_pft(ipltroot,1,NZ),SeedDepth_pft(NZ)+ppmc
-!    else
-!      write(194,*)'ShootArea',NZ,I,ShootArea,HypoctoHeight_pft(NZ),SeedDepth_pft(NZ),&
-!        Root1stDepz_pft(ipltroot,1,NZ),SeedDepth_pft(NZ)+ppmc
-!    endif  
-!    if(I>=148)stop  
     IF((HypoctoHeight_pft(NZ).GT.SeedDepth_pft(NZ)).AND.(ShootArea.GT.ZEROL(NZ)) &
       .AND.(Root1stDepz_pft(ipltroot,1,NZ).GT.SeedDepth_pft(NZ)+ppmc))THEN
       iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ)=I
       VHeatCapCanP(NZ)=cpw*(ShootStrutElms_pft(ielmc,NZ)*10.0E-06_r8+WatByPCanopy(NZ))
 !      write(101,*)'emergence',etimer%get_curr_yearAD(),I,MainBranchNum_pft(NZ),NZ
     ENDIF
+  ENDIF
+  if(NZ==1)THEN
+    WRITE(213,'(I3,4(X,F14.6),X,I6)')NB,I+J/24.,ShootArea,Root1stDepz_pft(ipltroot,1,NZ),SeedDepth_pft(NZ)+ppmc &
+      ,iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ)
+  ELSE
+    WRITE(214,'(I3,4(X,F14.6),X,I6)')NB,I+J/24.,ShootArea,Root1stDepz_pft(ipltroot,1,NZ),SeedDepth_pft(NZ)+ppmc &
+      ,iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ)  
   ENDIF
   end associate
   end subroutine stage_phenology_vars
@@ -836,6 +827,13 @@ module HfuncsMod
     doInitLeafOut_brch(NB,NZ)=iDisable
     doPlantLeafOut_brch(NB,NZ)=iEnable
     Hours4Leafout_brch(NB,NZ)=0.5_r8*Hours4Leafout_brch(MainBranchNum_pft(NZ),NZ)
+  ENDIF
+  IF(NZ==1)THEN
+  WRITE(303,*)NB,I+J/24.,iPlantCalendar_brch(ipltcal_Emerge,NB,NZ) &
+    ,iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ)
+  ELSE
+  WRITE(304,*)NB,I+J/24.,iPlantCalendar_brch(ipltcal_Emerge,NB,NZ) &
+    ,iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ)  
   ENDIF
 !
 ! CALCULATE NODE INITIATION AND LEAF APPEARANCE RATES
