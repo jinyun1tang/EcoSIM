@@ -240,33 +240,33 @@ module HfuncsMod
   integer, intent(in) :: I,J,NZ
   integer :: NB
 ! begin_execution
-  associate(                                                                        &
-    CanopyNonstElmConc_pft      =>   plt_biom%CanopyNonstElmConc_pft  , &
-    SeasonalNonstElms_pft           =>   plt_biom%SeasonalNonstElms_pft   , &
-    MatureGroup_brch                =>   plt_pheno%MatureGroup_brch , &
-    iPlantCalendar_brch             =>   plt_pheno%iPlantCalendar_brch , &
-    doInitPlant_pft                 =>   plt_pheno%doInitPlant_pft  , &
-    iPlantRootState_pft             =>   plt_pheno%iPlantRootState_pft  , &
-    iPlantPhenolPattern_pft         =>   plt_pheno%iPlantPhenolPattern_pft , &
-    iPlantBranchState_brch          =>   plt_pheno%iPlantBranchState_brch  , &
-    iPlantShootState_pft            =>   plt_pheno%iPlantShootState_pft  , &
-    iPlantTurnoverPattern_pft       =>   plt_pheno%iPlantTurnoverPattern_pft , &
-    MinNonstC2InitRoot_pft  =>   plt_pheno%MinNonstC2InitRoot_pft    , &
-    MatureGroup_pft                 =>   plt_pheno%MatureGroup_pft, &
-    MinNonstructalC4InitBranch      =>   plt_pheno%MinNonstructalC4InitBranch    , &
-    PlantPopulation_pft             =>   plt_site%PlantPopulation_pft      , &
-    Hours4Leafout_brch              =>   plt_pheno%Hours4Leafout_brch   , &
-    PSIRootTurg_vr                  =>   plt_ew%PSIRootTurg_vr     , &
-    FNOD                            =>   plt_allom%FNOD   , &
-    NumRootAxes_pft                 =>   plt_morph%NumRootAxes_pft   , &
-    MainBranchNum_pft               =>   plt_morph%MainBranchNum_pft    , &
-    NumOfBranches_pft               =>   plt_morph%NumOfBranches_pft    , &
-    NumCogrowNode                   =>   plt_morph%NumCogrowNode  , &
-    BranchNumber_pft                =>   plt_morph%BranchNumber_pft    , &
-    BranchNumber_brch               =>   plt_morph%BranchNumber_brch   , &
-    NGTopRootLayer_pft              =>   plt_morph%NGTopRootLayer_pft    , &
-    XTLI                            =>   plt_morph%XTLI   , &
-    ShootNodeNum_brch            =>   plt_morph%ShootNodeNum_brch    &
+  associate(                                                                     &
+    CanopyNonstElmConc_pft          =>   plt_biom%CanopyNonstElmConc_pft       , &
+    SeasonalNonstElms_pft           =>   plt_biom%SeasonalNonstElms_pft        , &
+    MatureGroup_brch                =>   plt_pheno%MatureGroup_brch            , &
+    iPlantCalendar_brch             =>   plt_pheno%iPlantCalendar_brch         , &
+    doInitPlant_pft                 =>   plt_pheno%doInitPlant_pft             , &
+    iPlantRootState_pft             =>   plt_pheno%iPlantRootState_pft         , &
+    iPlantPhenolPattern_pft         =>   plt_pheno%iPlantPhenolPattern_pft     , &
+    iPlantBranchState_brch          =>   plt_pheno%iPlantBranchState_brch      , &
+    iPlantShootState_pft            =>   plt_pheno%iPlantShootState_pft        , &
+    iPlantTurnoverPattern_pft       =>   plt_pheno%iPlantTurnoverPattern_pft   , &
+    MinNonstC2InitRoot_pft          =>   plt_pheno%MinNonstC2InitRoot_pft      , &
+    MatureGroup_pft                 =>   plt_pheno%MatureGroup_pft             , &
+    MinNonstructalC4InitBranch      =>   plt_pheno%MinNonstructalC4InitBranch  , &
+    PlantPopulation_pft             =>   plt_site%PlantPopulation_pft          , &
+    Hours4Leafout_brch              =>   plt_pheno%Hours4Leafout_brch          , &
+    PSIRootTurg_vr                  =>   plt_ew%PSIRootTurg_vr                 , &
+    FNOD                            =>   plt_allom%FNOD                        , &
+    NumRootAxes_pft                 =>   plt_morph%NumRootAxes_pft             , &
+    MainBranchNum_pft               =>   plt_morph%MainBranchNum_pft           , &
+    NumOfBranches_pft               =>   plt_morph%NumOfBranches_pft           , &
+    NumCogrowNode                   =>   plt_morph%NumCogrowNode               , &
+    BranchNumber_pft                =>   plt_morph%BranchNumber_pft            , &
+    BranchNumber_brch               =>   plt_morph%BranchNumber_brch           , &
+    NGTopRootLayer_pft              =>   plt_morph%NGTopRootLayer_pft          , &
+    XTLI                            =>   plt_morph%XTLI                        , &
+    ShootNodeNum_brch               =>   plt_morph%ShootNodeNum_brch             &
   )
 
 !
@@ -325,9 +325,9 @@ module HfuncsMod
         ENDIF
       ENDIF
       IF(NZ==1)THEN
-      write(301,*)I+J/24.,BranchNumber_pft(NZ),NumOfBranches_pft(NZ)
+      write(301,*)'root_shoot_branching',I+J/24.,BranchNumber_pft(NZ),NumOfBranches_pft(NZ)
       ELSE
-      write(302,*)I+J/24.,BranchNumber_pft(NZ),NumOfBranches_pft(NZ)
+      write(302,*)'root_shoot_branching',I+J/24.,BranchNumber_pft(NZ),NumOfBranches_pft(NZ)
       ENDIF
 !
 !     ADD AXIS TO ROOT IF PLANT GROWTH STAGE, ROOT NON-STRUCTURAL C
@@ -367,39 +367,39 @@ module HfuncsMod
 
   integer :: NB,N,L,NE,BranchNumber_pftX
   real(r8):: ShootArea
-  associate(                           &
-    CanopyLeafShethC_pft            =>  plt_biom%CanopyLeafShethC_pft     , &
-    LeafPetolBiomassC_brch          =>  plt_biom%LeafPetolBiomassC_brch    , &
-    ShootStrutElms_pft              =>  plt_biom%ShootStrutElms_pft   , &
+  associate(                                                                  &
+    CanopyLeafShethC_pft            =>  plt_biom%CanopyLeafShethC_pft       , &
+    LeafPetolBiomassC_brch          =>  plt_biom%LeafPetolBiomassC_brch     , &
+    ShootStrutElms_pft              =>  plt_biom%ShootStrutElms_pft         , &
     NoduleNonstructCconc_pft        =>  plt_biom%NoduleNonstructCconc_pft   , &
-    LeafPetoNonstElmConc_brch       =>  plt_biom%LeafPetoNonstElmConc_brch   , &
-    CanopyNonstElmConc_pft      =>  plt_biom%CanopyNonstElmConc_pft   , &
-    CanopyNonstElms_pft             =>  plt_biom%CanopyNonstElms_pft   , &
-    CanopyNodulNonstElms_brch       =>  plt_biom%CanopyNodulNonstElms_brch   , &
-    RootMycoNonstElms_rpvr          =>  plt_biom%RootMycoNonstElms_rpvr   , &
-    CanopyNonstElms_brch            =>  plt_biom%CanopyNonstElms_brch   , &
+    LeafPetoNonstElmConc_brch       =>  plt_biom%LeafPetoNonstElmConc_brch  , &
+    CanopyNonstElmConc_pft          =>  plt_biom%CanopyNonstElmConc_pft     , &
+    CanopyNonstElms_pft             =>  plt_biom%CanopyNonstElms_pft        , &
+    CanopyNodulNonstElms_brch       =>  plt_biom%CanopyNodulNonstElms_brch  , &
+    RootMycoNonstElms_rpvr          =>  plt_biom%RootMycoNonstElms_rpvr     , &
+    CanopyNonstElms_brch            =>  plt_biom%CanopyNonstElms_brch       , &
     RootNonstructElmConc_pvr        =>  plt_biom%RootNonstructElmConc_pvr   , &
-    ZEROL                           =>  plt_biom%ZEROL    , &
-    ZEROP                           =>  plt_biom%ZEROP    , &
-    RootMycoActiveBiomC_pvr         =>  plt_biom%RootMycoActiveBiomC_pvr   , &
+    ZEROL                           =>  plt_biom%ZEROL                      , &
+    ZEROP                           =>  plt_biom%ZEROP                      , &
+    RootMycoActiveBiomC_pvr         =>  plt_biom%RootMycoActiveBiomC_pvr    , &
     CanopyNodulNonstElms_pft        =>  plt_biom%CanopyNodulNonstElms_pft   , &
-    WatByPCanopy                    =>  plt_ew%WatByPCanopy      , &
-    VHeatCapCanP                    =>  plt_ew%VHeatCapCanP      , &
-    NU                              =>  plt_site%NU       , &
-    iPlantBranchState_brch          =>  plt_pheno%iPlantBranchState_brch   , &
-    iPlantCalendar_brch             =>  plt_pheno%iPlantCalendar_brch  , &
-    MainBranchNum_pft               =>  plt_morph%MainBranchNum_pft     , &
-    Root1stDepz_pft                 =>  plt_morph%Root1stDepz_pft   , &
-    MY                              =>  plt_morph%MY      , &
-    CanopyLeafArea_pft              =>  plt_morph%CanopyLeafArea_pft   , &
-    NGTopRootLayer_pft              =>  plt_morph%NGTopRootLayer_pft     , &
-    NIXBotRootLayer_pft             =>  plt_morph%NIXBotRootLayer_pft     , &
-    NumOfBranches_pft               =>  plt_morph%NumOfBranches_pft     , &
-    BranchNumber_brch               =>  plt_morph%BranchNumber_brch    , &
-    HypoctoHeight_pft               =>  plt_morph%HypoctoHeight_pft   , &
-    SeedDepth_pft                   =>  plt_morph%SeedDepth_pft   , &
-    CanopyStemArea_pft              =>  plt_morph%CanopyStemArea_pft   , &
-    MaxSoiL4Root                    =>  plt_morph%MaxSoiL4Root        &
+    WatByPCanopy                    =>  plt_ew%WatByPCanopy                 , &
+    VHeatCapCanP                    =>  plt_ew%VHeatCapCanP                 , &
+    NU                              =>  plt_site%NU                         , &
+    iPlantBranchState_brch          =>  plt_pheno%iPlantBranchState_brch    , &
+    iPlantCalendar_brch             =>  plt_pheno%iPlantCalendar_brch       , &
+    MainBranchNum_pft               =>  plt_morph%MainBranchNum_pft         , &
+    Root1stDepz_pft                 =>  plt_morph%Root1stDepz_pft           , &
+    MY                              =>  plt_morph%MY                        , &
+    CanopyLeafArea_pft              =>  plt_morph%CanopyLeafArea_pft        , &
+    NGTopRootLayer_pft              =>  plt_morph%NGTopRootLayer_pft        , &
+    NIXBotRootLayer_pft             =>  plt_morph%NIXBotRootLayer_pft       , &
+    NumOfBranches_pft               =>  plt_morph%NumOfBranches_pft         , &
+    BranchNumber_brch               =>  plt_morph%BranchNumber_brch         , &
+    HypoctoHeight_pft               =>  plt_morph%HypoctoHeight_pft         , &
+    SeedDepth_pft                   =>  plt_morph%SeedDepth_pft             , &
+    CanopyStemArea_pft              =>  plt_morph%CanopyStemArea_pft        , &
+    MaxSoiL4Root                    =>  plt_morph%MaxSoiL4Root                &
   )
   plt_bgcr%RootGasLossDisturb_pft(idg_beg:idg_end-1,NZ)=0.0_r8
   CanopyNonstElms_pft(1:NumPlantChemElms,NZ)=0.0_r8

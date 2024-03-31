@@ -498,12 +498,12 @@
   real(r8) :: ETLF4,EGRO4,PARX,PARJ
   real(r8) :: VL
 !     begin_execution
-  associate(                          &
-    LeafAUnshaded_zsec            => plt_photo%LeafAUnshaded_zsec   , &
-    NutrientCtrlonC4Carboxy_node  => plt_photo%NutrientCtrlonC4Carboxy_node   , &
-    C4CarboxyEff_node             => plt_photo%C4CarboxyEff_node   , &
-    CO2lmtPEPCarboxyRate_node     => plt_photo%CO2lmtPEPCarboxyRate_node  , &
-    LigthSatC4CarboxyRate_node    => plt_photo%LigthSatC4CarboxyRate_node     &
+  associate(                                                                   &
+    LeafAUnshaded_zsec            => plt_photo%LeafAUnshaded_zsec            , &
+    NutrientCtrlonC4Carboxy_node  => plt_photo%NutrientCtrlonC4Carboxy_node  , &
+    C4CarboxyEff_node             => plt_photo%C4CarboxyEff_node             , &
+    CO2lmtPEPCarboxyRate_node     => plt_photo%CO2lmtPEPCarboxyRate_node     , &
+    LigthSatC4CarboxyRate_node    => plt_photo%LigthSatC4CarboxyRate_node      &
   )
 !
 !     LIGHT-LIMITED CARBOXYLATION RATES
@@ -667,7 +667,7 @@
   endif
 
   IF(iPlantBranchState_brch(NB,NZ).EQ.iLive)THEN
-    call PhotosisOnLiveBranch(NB,NZ,CH2O,TFN_Carboxy,TFN_Oxy,TFN_eTransp,Km4RubOxy)
+    call PhotosisOnLiveBranch(I,J,NB,NZ,CH2O,TFN_Carboxy,TFN_Oxy,TFN_eTransp,Km4RubOxy)
   ENDIF
   end associate
   end subroutine PhenoActiveBranch

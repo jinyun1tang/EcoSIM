@@ -82,7 +82,7 @@ module PlantBranchMod
   real(r8) :: CNSHB,CPSHB
   real(r8) :: CNLFM,CPLFM
   real(r8) :: CNLFX,CPLFX,CNSHX,CPSHX
-  real(r8) :: NonStructalC4Growth_brch
+  real(r8) :: NonstC4Groth_brch
   real(r8) :: CNRDM,RCO2NonstC4Nassim_brch
   real(r8) :: ShootStructN
   real(r8) :: XFRE(1:NumPlantChemElms)
@@ -228,7 +228,7 @@ module PlantBranchMod
 !
     call UpdatePhotosynthates(I,J,NB,NZ,TFN6_vr,DMSHD,CNLFM,CPLFM,CNSHX,CPSHX &
       ,CNLFX,CPLFX,ShootStructN,TFN5,WFNG,Stomata_Activity,WFNSG,CH2O3,CH2O4,CNPG &
-      ,RCO2NonstC_brch,RMNCS,RMxess_brch,NonStructalC4Growth_brch,CNRDM,RCO2NonstC4Nassim_brch)
+      ,RCO2NonstC_brch,RMNCS,RMxess_brch,NonstC4Groth_brch,CNRDM,RCO2NonstC4Nassim_brch)
 !
 !
 !   TRANSFER OF C4 FIXATION PRODUCTS FROM NON-STRUCTURAL POOLS
@@ -250,20 +250,20 @@ module PlantBranchMod
 !   organ key:LF=leaf,SHE=petiole,STK=stalk,RSV=reserve
 !   HSK=husk,EAR=ear,GR=grain,SHT=shoot
 !   PART=organ partitioning fraction
-!   NonStructalC4Growth_brch=total non-structural C used in growth and growth respiration
+!   NonstC4Groth_brch=total non-structural C used in growth and growth respiration
 !   CN*,CP*=N:C,P:C ratios in plant organs
 !   ZPLFM=min N:C,P:C in leaves relative to max values from PFT file
 !   ZPLFD=1.0_r8-ZPLFM
 !   CNPG=N,P constraint on growth respiration
 !   WT*,WT*N,WT*P=organ C,N,P mass
 !
-    GrowthLeaf(ielmc)   =NonStructalC4Growth_brch*PART(ibrch_leaf)*DMLFB       !leaf
-    GrowthPetiole(ielmc)=NonStructalC4Growth_brch*PART(ibrch_petiole)*DMSHB       !petiole
-    GrowthStalk(ielmc)  =NonStructalC4Growth_brch*PART(ibrch_stalk)*StalkBiomGrowthYield(NZ)  !stalk
-    GrowthReserve(ielmc)=NonStructalC4Growth_brch*PART(ibrch_reserve)*ReserveBiomGrowthYield(NZ)  !reserve
-    GrowthHusk(ielmc)   =NonStructalC4Growth_brch*PART(ibrch_husk)*HuskBiomGrowthYield(NZ)  !husk
-    GrowthEar(ielmc)    =NonStructalC4Growth_brch*PART(ibrch_ear)*EarBiomGrowthYield(NZ)  !ear
-    GrowthGrain(ielmc)  =NonStructalC4Growth_brch*PART(ibrch_grain)*GrainBiomGrowthYield(NZ)    !grain
+    GrowthLeaf(ielmc)   =NonstC4Groth_brch*PART(ibrch_leaf)*DMLFB       !leaf
+    GrowthPetiole(ielmc)=NonstC4Groth_brch*PART(ibrch_petiole)*DMSHB       !petiole
+    GrowthStalk(ielmc)  =NonstC4Groth_brch*PART(ibrch_stalk)*StalkBiomGrowthYield(NZ)  !stalk
+    GrowthReserve(ielmc)=NonstC4Groth_brch*PART(ibrch_reserve)*ReserveBiomGrowthYield(NZ)  !reserve
+    GrowthHusk(ielmc)   =NonstC4Groth_brch*PART(ibrch_husk)*HuskBiomGrowthYield(NZ)  !husk
+    GrowthEar(ielmc)    =NonstC4Groth_brch*PART(ibrch_ear)*EarBiomGrowthYield(NZ)  !ear
+    GrowthGrain(ielmc)  =NonstC4Groth_brch*PART(ibrch_grain)*GrainBiomGrowthYield(NZ)    !grain
 
     GrowthLeaf(ielmn)   =GrowthLeaf(ielmc)*CNLFB*(ZPLFM+ZPLFD*CNPG)
     GrowthPetiole(ielmn)=GrowthPetiole(ielmc)*CNSHB
@@ -283,12 +283,12 @@ module PlantBranchMod
 
     if(NZ==1)THEN
       write(185,'(I3,X,I4,9(X,F13.6))')NB,etimer%get_curr_year(),I+J/24.&
-       ,NonStructalC4Growth_brch,PART(1:7)
+       ,NonstC4Groth_brch,PART(1:7)
 !      GrowthStalk(NE),GrowthReserve(NE),GrowthHusk(NE),GrowthEar(NE),GrowthGrain(NE),NE=1,NumPlantChemElms)
 !      WRITE(187,'(I3,8(X,F13.6))')NB,I+J/24.,(PART(NE),NE=1,7)
     else
       write(186,'(I3,X,I4,9(X,F13.6))')NB,etimer%get_curr_year(),I+J/24.&
-       ,NonStructalC4Growth_brch,PART(1:7)
+       ,NonstC4Groth_brch,PART(1:7)
 !      GrowthStalk(NE),GrowthReserve(NE),GrowthHusk(NE),GrowthEar(NE),GrowthGrain(NE),NE=1,NumPlantChemElms)
 !      WRITE(188,'(I3,8(X,F13.6))')NB,I+J/24.,(PART(NE),NE=1,7)
     endif
@@ -733,7 +733,7 @@ module PlantBranchMod
 
   subroutine UpdatePhotosynthates(I,J,NB,NZ,TFN6_vr,DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX,&
     ShootStructN,TFN5,WFNG,Stomata_Activity,WFNSG,CH2O3,CH2O4,CNPG,RCO2NonstC_brch,RMNCS,&
-    RMxess_brch,NonStructalC4Growth_brch,CNRDM,RCO2NonstC4Nassim_brch)
+    RMxess_brch,NonstC4Groth_brch,CNRDM,RCO2NonstC4Nassim_brch)
   implicit none
   integer, intent(in) :: I,J,NB,NZ
   real(r8), intent(in) :: TFN6_vr(JZ1)
@@ -746,7 +746,7 @@ module PlantBranchMod
   real(r8), intent(out) :: CH2O4(pltpar%MaxNodesPerBranch1)
   REAL(R8), INTENT(OUT) :: CNPG
   real(r8), intent(out) :: RMxess_brch
-  real(r8), intent(out) :: NonStructalC4Growth_brch
+  real(r8), intent(out) :: NonstC4Groth_brch
   real(r8), intent(out) :: CNRDM,RCO2NonstC4Nassim_brch
   real(r8) :: CO2F,CanopyNonstElm4Gros(NumPlantChemElms),CH2O,CH2OClm,CH2OLlm
   integer :: K
@@ -775,20 +775,20 @@ module PlantBranchMod
 !
     call ComputRAutoAfEmergence(NB,NZ,DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX,&
       CO2F,CH2O,TFN5,WFNG,WFNSG,ShootStructN,CanopyNonstElm4Gros,CNPG,RCO2NonstC_brch,RMNCS,RMxess_brch,&
-      NonStructalC4Growth_brch,RCO2NonstC4Nassim_brch)
+      NonstC4Groth_brch,RCO2NonstC4Nassim_brch)
 
 !   SHOOT AUTOTROPHIC RESPIRATION BEFORE EMERGENCE
 !
   ELSE
     CH2O=0._r8
     call ComputRAutoB4Emergence(I,NB,NZ,TFN6_vr,DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX,ShootStructN,&
-      WFNG,WFNSG,CanopyNonstElm4Gros,CNPG,RCO2NonstC_brch,RMNCS,RMxess_brch,NonStructalC4Growth_brch,&
+      WFNG,WFNSG,CanopyNonstElm4Gros,CNPG,RCO2NonstC_brch,RMNCS,RMxess_brch,NonstC4Groth_brch,&
       CNRDM,RCO2NonstC4Nassim_brch)
     IF(NZ==1)THEN  
-    write(101,*)NB,I+J/24.,'ComputRAutoB4Emergence',NonStructalC4Growth_brch,CanopyNonstElms_brch(ielmc,NB,NZ)&
+    write(101,*)NB,I+J/24.,'ComputRAutoB4Emergence',NonstC4Groth_brch,CanopyNonstElms_brch(ielmc,NB,NZ)&
     ,iPlantCalendar_brch(ipltcal_Emerge,NB,NZ)
     ELSE
-    write(102,*)NB,I+J/24.,'ComputRAutoB4Emergence',NonStructalC4Growth_brch,CanopyNonstElms_brch(ielmc,NB,NZ)&
+    write(102,*)NB,I+J/24.,'ComputRAutoB4Emergence',NonstC4Groth_brch,CanopyNonstElms_brch(ielmc,NB,NZ)&
     ,iPlantCalendar_brch(ipltcal_Emerge,NB,NZ)
     ENDIF
   ENDIF
@@ -800,14 +800,14 @@ module PlantBranchMod
 !   CH2O=total CH2O production
 !   RMNCS=maintenance respiration
 !   RCO2NonstC_brch=respiration from non-structural C
-!   NonStructalC4Growth_brch=total non-structural C used in growth and respiration
+!   NonstC4Groth_brch=total non-structural C used in growth and respiration
 !   RCO2NonstC4Nassim_brch=respiration for N assimilation
 !   CanopyNonstElm4Gros(ielmn),CanopyNonstElm4Gros(ielmp)=nonstructural N,P used in growth
 !   NH3Dep2Can_brch=NH3 flux between atmosphere and branch from uptake.f
 !   XFRE(ielmc),XFRE(ielmn),XFRE(ielmp)=branch-root layer C,N,P transfer
 !
   CanopyNonstElms_brch(ielmc,NB,NZ)=CanopyNonstElms_brch(ielmc,NB,NZ)+CH2O-&
-    AMIN1(RMNCS,RCO2NonstC_brch)-NonStructalC4Growth_brch-RCO2NonstC4Nassim_brch
+    AMIN1(RMNCS,RCO2NonstC_brch)-NonstC4Groth_brch-RCO2NonstC4Nassim_brch
   CanopyNonstElms_brch(ielmn,NB,NZ)=CanopyNonstElms_brch(ielmn,NB,NZ)-CanopyNonstElm4Gros(ielmn)+NH3Dep2Can_brch(NB,NZ)
   CanopyNonstElms_brch(ielmp,NB,NZ)=CanopyNonstElms_brch(ielmp,NB,NZ)-CanopyNonstElm4Gros(ielmp)
 !  if(CanopyNonstElms_brch(ielmp,NB,NZ)<0._r8)then
@@ -2961,13 +2961,13 @@ module PlantBranchMod
 
   subroutine ComputRAutoAfEmergence(NB,NZ,DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX,CO2F,&
     CH2O,TFN5,WFNG,WFNSG,ShootStructN,CanopyNonstElm4Gros,CNPG,RCO2NonstC_brch,RMNCS,RMxess_brch,&
-    NonStructalC4Growth_brch,RCO2NonstC4Nassim_brch)
+    NonstC4Groth_brch,RCO2NonstC4Nassim_brch)
   implicit none
   integer, intent(in) :: NB,NZ
   real(r8), intent(out) :: CanopyNonstElm4Gros(NumPlantChemElms)
   real(r8), INTENT(OUT) :: CNPG
   real(r8), intent(out) :: RCO2NonstC_brch
-  real(r8), intent(out) :: RMNCS,RMxess_brch,NonStructalC4Growth_brch,RCO2NonstC4Nassim_brch
+  real(r8), intent(out) :: RMNCS,RMxess_brch,NonstC4Groth_brch,RCO2NonstC4Nassim_brch
   real(r8), intent(in) :: DMSHD
   real(r8), intent(in) :: CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX
   real(r8), intent(in) :: ShootStructN,CO2F,CH2O,TFN5
@@ -3076,7 +3076,7 @@ module PlantBranchMod
 ! AND GROWTH RESPIRATION DEPENDS ON GROWTH YIELDS
 ! ENTERED IN 'READQ'
 !
-! NonStructalC4Growth_brch=total non-structural C used in growth and growth respiration
+! NonstC4Groth_brch=total non-structural C used in growth and growth respiration
 ! RgroCO2_ltd=growth respiration limited by N,P
 ! DMSHD=branch C respiration vs nonstructural C consumption
 ! CanopyNonstElm4Gros(ielmn),CanopyNonstElm4Gros(ielmp)=nonstructural N,P used in growth
@@ -3089,9 +3089,9 @@ module PlantBranchMod
 ! CH2O=total CH2O production, 1/4 newly fixed C is used for N-assimilation (where is this number from?)
 !
   
-  NonStructalC4Growth_brch=RgroCO2_ltd/DMSHD
-  CanopyNonstElm4Gros(ielmn)=AZMAX1(AMIN1(CanopyNonstElms_brch(ielmn,NB,NZ),NonStructalC4Growth_brch*(CNSHX+CNLFM+CNLFX*CNPG)))
-  CanopyNonstElm4Gros(ielmp)=AZMAX1(AMIN1(CanopyNonstElms_brch(ielmp,NB,NZ),NonStructalC4Growth_brch*(CPSHX+CPLFM+CPLFX*CNPG)))  
+  NonstC4Groth_brch=RgroCO2_ltd/DMSHD
+  CanopyNonstElm4Gros(ielmn)=AZMAX1(AMIN1(CanopyNonstElms_brch(ielmn,NB,NZ),NonstC4Groth_brch*(CNSHX+CNLFM+CNLFX*CNPG)))
+  CanopyNonstElm4Gros(ielmp)=AZMAX1(AMIN1(CanopyNonstElms_brch(ielmp,NB,NZ),NonstC4Groth_brch*(CPSHX+CPLFM+CPLFX*CNPG)))  
   RCO2NonstC4Nassim_brch=AZMAX1(1.70_r8*CanopyNonstElm4Gros(ielmn)-0.025_r8*CH2O)
   
 !
@@ -3128,7 +3128,7 @@ module PlantBranchMod
 
   subroutine ComputRAutoB4Emergence(I,NB,NZ,TFN6_vr,DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,&
     CNLFX,CPLFX,ShootStructN,WFNG,WFNSG,CanopyNonstElm4Gros,CNPG,RCO2NonstC_brch,RMNCS,RMxess_brch,&
-    NonStructalC4Growth_brch,CNRDM,RCO2NonstC4Nassim_brch)
+    NonstC4Groth_brch,CNRDM,RCO2NonstC4Nassim_brch)
   implicit none
   integer, intent(in) :: I,NB,NZ
   real(r8),intent(in) :: TFN6_vr(JZ1)
@@ -3137,7 +3137,7 @@ module PlantBranchMod
   real(r8), intent(out) :: CanopyNonstElm4Gros(NumPlantChemElms)
   real(r8), intent(out) :: RCO2NonstC_brch
   real(r8), INTENT(OUT) :: CNPG,RMNCS,RMxess_brch
-  real(r8), intent(out) :: NonStructalC4Growth_brch,CNRDM
+  real(r8), intent(out) :: NonstC4Groth_brch,CNRDM
   real(r8), intent(out) :: RCO2NonstC4Nassim_brch
   real(r8) :: ZPOOLB,ZADDBM,CGROSM
   real(r8) :: FNP
@@ -3150,22 +3150,21 @@ module PlantBranchMod
   real(r8) :: RCO2TM
   real(r8) :: SNCRM
 ! begin_execution
-  associate(                                                                            &
+  associate(                                                                      &
     LeafPetoNonstElmConc_brch          =>  plt_biom%LeafPetoNonstElmConc_brch   , &
-    CanopyNonstElms_brch                =>  plt_biom%CanopyNonstElms_brch   , &
-    iPlantRootProfile_pft              =>  plt_pheno%iPlantRootProfile_pft  , &
-    fTgrowRootP_vr                     =>  plt_pheno%fTgrowRootP_vr    , &
-    RAutoRootO2Limter_pvr              =>  plt_rbgc%RAutoRootO2Limter_pvr     , &
-    iPlantPhenolType_pft               =>  plt_pheno%iPlantPhenolType_pft  , &
-    CO2NetFix_pft                      =>  plt_bgcr%CO2NetFix_pft     , &
-    RootRespPotent_pvr                 =>  plt_rbgc%RootRespPotent_pvr    , &
-    RCO2N_pvr                          =>  plt_rbgc%RCO2N_pvr    , &
-    RCO2A_pvr                          =>  plt_rbgc%RCO2A_pvr    , &
-    ZERO                               =>  plt_site%ZERO      , &
-    NGTopRootLayer_pft                 =>  plt_morph%NGTopRootLayer_pft     , &
-    C4PhotosynDowreg_brch              =>  plt_photo%C4PhotosynDowreg_brch     &
+    CanopyNonstElms_brch               =>  plt_biom%CanopyNonstElms_brch        , &
+    iPlantRootProfile_pft              =>  plt_pheno%iPlantRootProfile_pft      , &
+    fTgrowRootP_vr                     =>  plt_pheno%fTgrowRootP_vr             , &
+    RAutoRootO2Limter_pvr              =>  plt_rbgc%RAutoRootO2Limter_pvr       , &
+    iPlantPhenolType_pft               =>  plt_pheno%iPlantPhenolType_pft       , &
+    CO2NetFix_pft                      =>  plt_bgcr%CO2NetFix_pft               , &
+    RootRespPotent_pvr                 =>  plt_rbgc%RootRespPotent_pvr          , &
+    RCO2N_pvr                          =>  plt_rbgc%RCO2N_pvr                   , &
+    RCO2A_pvr                          =>  plt_rbgc%RCO2A_pvr                   , &
+    ZERO                               =>  plt_site%ZERO                        , &
+    NGTopRootLayer_pft                 =>  plt_morph%NGTopRootLayer_pft         , &
+    C4PhotosynDowreg_brch              =>  plt_photo%C4PhotosynDowreg_brch        &
   )
-!  iter=iter+1
 !
 ! N,P CONSTRAINT ON RESPIRATION FROM NON-STRUCTURAL C:N:P
 !
@@ -3268,7 +3267,7 @@ module PlantBranchMod
 ! AND GROWTH RESPIRATION DEPENDS ON GROWTH YIELDS
 ! ENTERED IN 'READQ'
 !
-! CGROSM,NonStructalC4Growth_brch=total non-structural C used in growth and respn unltd,ltd by O2
+! CGROSM,NonstC4Groth_brch=total non-structural C used in growth and respn unltd,ltd by O2
 ! RCO2GM,RgroCO2_ltd=growth respiration unltd,ltd by O2 and limited by N,P
 ! DMSHD=branch C respiration vs nonstructural C consumption
 ! ZADDBM,CanopyNonstElm4Gros(ielmn),CanopyNonstElm4Gros(ielmp)=nonstructural N,P unltd,ltd by O2 used in growth
@@ -3280,10 +3279,10 @@ module PlantBranchMod
 ! CNRDM,RCO2NonstC4Nassim_brch=respiration for N assimilation unltd,ltd by O2
 !
   CGROSM=RCO2GM/DMSHD
-  NonStructalC4Growth_brch=RgroCO2_ltd/DMSHD
+  NonstC4Groth_brch=RgroCO2_ltd/DMSHD
   ZADDBM=AZMAX1(CGROSM*(CNSHX+CNLFM+CNLFX*CNPG))
-  CanopyNonstElm4Gros(ielmn)=AZMAX1(NonStructalC4Growth_brch*(CNSHX+CNLFM+CNLFX*CNPG))
-  CanopyNonstElm4Gros(ielmp)=AZMAX1(NonStructalC4Growth_brch*(CPSHX+CPLFM+CPLFX*CNPG))
+  CanopyNonstElm4Gros(ielmn)=AZMAX1(NonstC4Groth_brch*(CNSHX+CNLFM+CNLFX*CNPG))
+  CanopyNonstElm4Gros(ielmp)=AZMAX1(NonstC4Groth_brch*(CPSHX+CPLFM+CPLFX*CNPG))
   CNRDM=AZMAX1(1.70_r8*ZADDBM)
   RCO2NonstC4Nassim_brch=AZMAX1(1.70_r8*CanopyNonstElm4Gros(ielmn))
 !
