@@ -26,6 +26,7 @@ module PlantBranchMod
   integer, parameter :: ibrch_ear=6
   integer, parameter :: ibrch_grain=7
   logical, save :: ffirst(2)=.true.
+  logical, save :: F2FIRST(2)=.true.
   integer :: II,JJ
   contains
 !------------------------------------------------------------------------------------------
@@ -226,6 +227,7 @@ module PlantBranchMod
 !
 !    print*,'nodulebf',NZ,StalkRsrvElms_brch(1,1,NZ)
     call CanopyNoduleBiochemistry(I,J,NZ,NB,TFN5,WFNG,CanopyN2Fix_pft)
+    ffirst(NZ)=.false.
   ENDIF
   end associate
   end subroutine GrowOneBranch
@@ -366,12 +368,12 @@ module PlantBranchMod
   Growth_brch(ielmp,ibrch_grain) =Growth_brch(ielmc,ibrch_grain) *rPCReserve_pft(NZ)
 
   if(NZ==1)THEN
-    write(185,'(I3,X,I4,9(X,F13.6))')NB,etimer%get_curr_year(),I+J/24.&
+    write(185,'(I3,9(X,F13.6))')NB,I+J/24.&
       ,NonstC4Groth_brch,PART(1:7)
 !      Growth_brch(NE,ibrch_stalk),Growth_brch(NE,ibrch_resrv),Growth_brch(NE,ibrch_husk),Growth_brch(NE,ibrch_ear),Growth_brch(NE),NE=1,NumPlantChemElms)
 !      WRITE(187,'(I3,8(X,F13.6))')NB,I+J/24.,(PART(NE),NE=1,7)
   else
-    write(186,'(I3,X,I4,9(X,F13.6))')NB,etimer%get_curr_year(),I+J/24.&
+    write(186,'(I3,9(X,F13.6))')NB,I+J/24.&
       ,NonstC4Groth_brch,PART(1:7)
 !      Growth_brch(NE,ibrch_stalk),Growth_brch(NE,ibrch_resrv),Growth_brch(NE,ibrch_husk),Growth_brch(NE,ibrch_ear),Growth_brch(NE),NE=1,NumPlantChemElms)
 !      WRITE(188,'(I3,8(X,F13.6))')NB,I+J/24.,(PART(NE),NE=1,7)
@@ -789,7 +791,7 @@ module PlantBranchMod
   real(r8), intent(out) :: RMxess_brch
   real(r8), intent(out) :: NonstC4Groth_brch
   real(r8), intent(out) :: CNRDM,RCO2NonstC4Nassim_brch
-  real(r8) :: CO2F,CanopyNonstElm4Gros(NumPlantChemElms),CH2O,CH2OClm,CH2OLlm
+  real(r8) :: CO2F,CanopyNonstElm4Gros(NumPlantChemElms),CH2O,CH2OClm,CH2OLlm,dNonstCX
   integer :: K
   associate(                                                    &
     NH3Dep2Can_brch        =>  plt_rbgc%NH3Dep2Can_brch       , &
@@ -809,7 +811,7 @@ module PlantBranchMod
 
 !   SHOOT AUTOTROPHIC RESPIRATION AFTER EMERGENCE
 !
-    call ComputRAutoAfEmergence(NB,NZ,DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX,&
+    call ComputRAutoAfEmergence(I,J,NB,NZ,DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX,&
       CO2F,CH2O,TFN5,WFNG,WFNSG,ShootStructN,CanopyNonstElm4Gros,CNPG,RCO2NonstC_brch,RCO2Maint_brch,RMxess_brch,&
       NonstC4Groth_brch,RCO2NonstC4Nassim_brch)
 
@@ -835,27 +837,28 @@ module PlantBranchMod
 !   NH3Dep2Can_brch=NH3 flux between atmosphere and branch from uptake.f
 !   XFRE(ielmc),XFRE(ielmn),XFRE(ielmp)=branch-root layer C,N,P transfer
 !
-  CanopyNonstElms_brch(ielmc,NB,NZ)=CanopyNonstElms_brch(ielmc,NB,NZ)+CH2O-&
-    AMIN1(RCO2Maint_brch,RCO2NonstC_brch)-NonstC4Groth_brch-RCO2NonstC4Nassim_brch
+  dNonstCX=AMIN1(RCO2Maint_brch,RCO2NonstC_brch)+NonstC4Groth_brch+RCO2NonstC4Nassim_brch
+  CanopyNonstElms_brch(ielmc,NB,NZ)=CanopyNonstElms_brch(ielmc,NB,NZ)+CH2O-dNonstCX
+  
   CanopyNonstElms_brch(ielmn,NB,NZ)=CanopyNonstElms_brch(ielmn,NB,NZ)-CanopyNonstElm4Gros(ielmn)+NH3Dep2Can_brch(NB,NZ)
   CanopyNonstElms_brch(ielmp,NB,NZ)=CanopyNonstElms_brch(ielmp,NB,NZ)-CanopyNonstElm4Gros(ielmp)
 
   IF(NZ==1)THEN  
     if(ffirst(1))then
-    write(101,'(A10,X,A3,7(X,A16))')'doy','brc','nonst4gro','canopynonst','RCO2Maint','RCO2Nonst'&
+    write(101,'(A10,X,A3,6(X,A16))')'doy','brc','nonst4gro','canopynonst','NonstCX'&
       ,'CH2O','rubisco','stomactivty'
     endif
-    write(101,'(F10.4,X,I3,7(X,F16.6))')I+J/24.,NB,NonstC4Groth_brch,CanopyNonstElms_brch(ielmc,NB,NZ)&
-      ,RCO2Maint_brch,RCO2NonstC_brch,CH2O, RubiscoActivity_brch(NB,NZ),Stomata_Activity
-    ffirst(1)=.false.
+    write(101,'(F10.4,X,I3,6(X,F16.6))')I+J/24.,NB,NonstC4Groth_brch,CanopyNonstElms_brch(ielmc,NB,NZ)&
+      ,dNonstCX, CH2O, RubiscoActivity_brch(NB,NZ),Stomata_Activity
+    
   ELSE
     if(ffirst(1))then
-    write(102,'(A10,X,A3,7(X,A16))')'doy','brc','nonst4gro','canopynonst','RCO2Maint','RCO2Nonst'&
+    write(102,'(A10,X,A3,6(X,A16))')'doy','brc','nonst4gro','canopynonst','NonstCX'&
       ,'CH2O','rubisco','stomactivty'
     endif  
-    write(102,*)'(F10.4,X,I3,7(X,F16.6))')I+J/24.,NB,NonstC4Groth_brch,CanopyNonstElms_brch(ielmc,NB,NZ)&
-      ,RCO2Maint_brch,RCO2NonstC_brch,CH2O, RubiscoActivity_brch(NB,NZ),Stomata_Activity
-    ffirst(2)=.false.
+    write(102,'(F10.4,X,I3,6(X,F16.6))')I+J/24.,NB,NonstC4Groth_brch,CanopyNonstElms_brch(ielmc,NB,NZ)&
+      ,dNonstCX, CH2O, RubiscoActivity_brch(NB,NZ),Stomata_Activity
+    
   ENDIF
   end associate
   end subroutine UpdatePhotosynthates
@@ -3002,11 +3005,11 @@ module PlantBranchMod
   end subroutine BranchElmntTransfer
 !------------------------------------------------------------------------------------------
 
-  subroutine ComputRAutoAfEmergence(NB,NZ,DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX,CO2F,&
+  subroutine ComputRAutoAfEmergence(I,J,NB,NZ,DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX,CO2F,&
     CH2O,TFN5,WFNG,WFNSG,ShootStructN,CanopyNonstElm4Gros,CNPG,RCO2NonstC_brch,RCO2Maint_brch,RMxess_brch,&
     NonstC4Groth_brch,RCO2NonstC4Nassim_brch)
   implicit none
-  integer, intent(in) :: NB,NZ
+  integer, intent(in) :: I,J,NB,NZ
   real(r8), intent(out) :: CanopyNonstElm4Gros(NumPlantChemElms)
   real(r8), INTENT(OUT) :: CNPG
   real(r8), intent(out) :: RCO2NonstC_brch
@@ -3021,21 +3024,22 @@ module PlantBranchMod
   real(r8) :: RgroCO2_ltd  !Nutient limited growth respiration
   real(r8) :: Rauto_brch,RCO2CM
 ! begin_execution
-  associate(                             &
-    CO2NetFix_pft                      =>  plt_bgcr%CO2NetFix_pft    , &
-    CanopyGrosRCO2_pft                      =>  plt_bgcr%CanopyGrosRCO2_pft   , &
-    Eco_AutoR_col                      =>  plt_bgcr%Eco_AutoR_col    , &
-    ECO_ER_col                         =>  plt_bgcr%ECO_ER_col    , &
-    Eco_GPP_col                        =>  plt_bgcr%Eco_GPP_col    , &
-    GrossCO2Fix_pft                    =>  plt_bgcr%GrossCO2Fix_pft   , &
-    CanopyPlusNodulRespC_pft           =>  plt_bgcr%CanopyPlusNodulRespC_pft   , &
-    CanopyNonstElms_brch               =>  plt_biom%CanopyNonstElms_brch  , &
-    LeafPetoNonstElmConc_brch          =>  plt_biom%LeafPetoNonstElmConc_brch  , &
-    ZERO                               =>  plt_site%ZERO     , &
-    iPlantRootProfile_pft              =>  plt_pheno%iPlantRootProfile_pft , &
-    fTgrowCanP                         =>  plt_pheno%fTgrowCanP   , &
-    iPlantPhenolType_pft               =>  plt_pheno%iPlantPhenolType_pft , &
-    C4PhotosynDowreg_brch              =>  plt_photo%C4PhotosynDowreg_brch    &
+  associate(                                                                    &
+    CO2NetFix_pft                      =>  plt_bgcr%CO2NetFix_pft             , &
+    CanopyGrosRCO2_pft                 =>  plt_bgcr%CanopyGrosRCO2_pft        , &
+    Eco_AutoR_col                      =>  plt_bgcr%Eco_AutoR_col             , &
+    ECO_ER_col                         =>  plt_bgcr%ECO_ER_col                , &
+    Eco_GPP_col                        =>  plt_bgcr%Eco_GPP_col               , &
+    GrossCO2Fix_pft                    =>  plt_bgcr%GrossCO2Fix_pft           , &
+    CanopyPlusNodulRespC_pft           =>  plt_bgcr%CanopyPlusNodulRespC_pft  , &
+    CanopyNonstElms_brch               =>  plt_biom%CanopyNonstElms_brch      , &
+    LeafPetoNonstElmConc_brch          =>  plt_biom%LeafPetoNonstElmConc_brch , &
+    LeafAreaLive_brch                  =>  plt_morph%LeafAreaLive_brch        , &        
+    ZERO                               =>  plt_site%ZERO                      , &
+    iPlantRootProfile_pft              =>  plt_pheno%iPlantRootProfile_pft    , &
+    fTgrowCanP                         =>  plt_pheno%fTgrowCanP               , &
+    iPlantPhenolType_pft               =>  plt_pheno%iPlantPhenolType_pft     , &
+    C4PhotosynDowreg_brch              =>  plt_photo%C4PhotosynDowreg_brch      &
   )
 ! N,P CONSTRAINT ON RESPIRATION FROM NON-STRUCTURAL C:N:P
 !
@@ -3136,7 +3140,21 @@ module PlantBranchMod
   CanopyNonstElm4Gros(ielmn)=AZMAX1(AMIN1(CanopyNonstElms_brch(ielmn,NB,NZ),NonstC4Groth_brch*(CNSHX+CNLFM+CNLFX*CNPG)))
   CanopyNonstElm4Gros(ielmp)=AZMAX1(AMIN1(CanopyNonstElms_brch(ielmp,NB,NZ),NonstC4Groth_brch*(CPSHX+CPLFM+CPLFX*CNPG)))  
   RCO2NonstC4Nassim_brch=AZMAX1(1.70_r8*CanopyNonstElm4Gros(ielmn)-0.025_r8*CH2O)
-  
+  if(NZ==1)THEN
+  IF(F2FIRST(1))THEN
+  WRITE(313,'(A10,X,A3,6(X,A16))')'DOY','NB','ShootStructN','RGCO2','LAI','NONSTC','NONSTN','NONSTP'
+  ENDIF
+  F2FIRST(1)=.FALSE.
+  WRITE(313,'(F10.6,X,I3,6(X,F16.6))')I+J/24.,NB,ShootStructN,RgroCO2_ltd,LeafAreaLive_brch(NB,NZ),&
+    CanopyNonstElms_brch(ielmc,NB,NZ),CanopyNonstElms_brch(ielmn,NB,NZ),CanopyNonstElms_brch(ielmp,NB,NZ)
+  ELSE
+  IF(F2FIRST(2))THEN
+  WRITE(314,'(A10,X,A3,6(X,A16))')'DOY','NB','ShootStructN','RGCO2','LAI','NONSTC','NONSTN','NONSTP'
+  ENDIF
+  F2FIRST(2)=.FALSE.
+  WRITE(314,'(F10.6,X,I3,6(X,F16.6))')I+J/24.,NB,ShootStructN,RgroCO2_ltd,LeafAreaLive_brch(NB,NZ),&
+    CanopyNonstElms_brch(ielmc,NB,NZ),CanopyNonstElms_brch(ielmn,NB,NZ),CanopyNonstElms_brch(ielmp,NB,NZ)
+  ENDIF
 !
 ! TOTAL ABOVE-GROUND AUTOTROPHIC RESPIRATION BY BRANCH
 ! ACCUMULATE GPP, SHOOT AUTOTROPHIC RESPIRATION, NET C EXCHANGE
