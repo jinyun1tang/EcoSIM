@@ -846,18 +846,18 @@ module PlantBranchMod
   IF(NZ==1)THEN  
     if(ffirst(1))then
     write(101,'(A10,X,A3,6(X,A16))')'doy','brc','nonst4gro','canopynonst','NonstCX'&
-      ,'CH2O','rubisco','stomactivty'
+      ,'CH2OF','rubisco','stomactivty'
     endif
     write(101,'(F10.4,X,I3,6(X,F16.6))')I+J/24.,NB,NonstC4Groth_brch,CanopyNonstElms_brch(ielmc,NB,NZ)&
-      ,dNonstCX, CH2O, RubiscoActivity_brch(NB,NZ),Stomata_Activity
+      ,dNonstCX, CO2F, RubiscoActivity_brch(NB,NZ),Stomata_Activity
     
   ELSE
     if(ffirst(1))then
     write(102,'(A10,X,A3,6(X,A16))')'doy','brc','nonst4gro','canopynonst','NonstCX'&
-      ,'CH2O','rubisco','stomactivty'
+      ,'CH2OF','rubisco','stomactivty'
     endif  
     write(102,'(F10.4,X,I3,6(X,F16.6))')I+J/24.,NB,NonstC4Groth_brch,CanopyNonstElms_brch(ielmc,NB,NZ)&
-      ,dNonstCX, CH2O, RubiscoActivity_brch(NB,NZ),Stomata_Activity
+      ,dNonstCX, CO2F, RubiscoActivity_brch(NB,NZ),Stomata_Activity
     
   ENDIF
   end associate
@@ -3084,6 +3084,7 @@ module PlantBranchMod
     iPlantPhenolType_pft(NZ).EQ.iphenotyp_drouhtdecidu)THEN
     RCO2Maint_brch=RCO2Maint_brch*WFNG
   ENDIF
+  
 !
 ! GROWTH RESPIRATION FROM TOTAL - MAINTENANCE
 ! IF > 0 DRIVES GROWTH, IF < 0 DRIVES REMOBILIZATION
@@ -3096,6 +3097,20 @@ module PlantBranchMod
   RCO2X=RCO2NonstC_brch-RCO2Maint_brch
   RCO2Y=AZMAX1(RCO2X)*WFNSG
   RMxess_brch=AZMAX1(-RCO2X)
+  if(NZ==1)then
+  IF(F2FIRST(1))THEN
+  WRITE(325,'(A3,7(X,A13))')'NB','DOY','CANNONSTC','FTG','CNPG','C4DOWNREG','WFNG','RCO2X'
+  endif
+  write(325,'(I3,7(X,F13.6))')NB,I+J/24.,CanopyNonstElms_brch(ielmc,NB,NZ),fTgrowCanP(NZ),CNPG &
+    ,C4PhotosynDowreg_brch(NB,NZ),WFNG,RCO2X
+  else
+  IF(F2FIRST(2))THEN
+  WRITE(326,'(A3,7(X,A13))')'NB','DOY','CANNONSTC','FTG','CNPG','C4DOWNREG','WFNG','RCO2X'
+  endif
+  write(326,'(I3,7(X,F13.6))')NB,I+J/24.,CanopyNonstElms_brch(ielmc,NB,NZ),fTgrowCanP(NZ),CNPG &
+    ,C4PhotosynDowreg_brch(NB,NZ),WFNG,RCO2X
+  endif
+  
 !
 ! GROWTH RESPIRATION MAY BE LIMITED BY NON-STRUCTURAL N,P
 ! AVAILABLE FOR GROWTH
