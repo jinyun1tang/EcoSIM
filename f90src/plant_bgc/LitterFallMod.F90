@@ -834,7 +834,7 @@ implicit none
     PetioleLengthNode_brch        => plt_morph%PetioleLengthNode_brch       , &
     InternodeHeightDying_brch     => plt_morph%InternodeHeightDying_brch    , &
     LeafAreaZsec_brch             => plt_morph%LeafAreaZsec_brch            , &
-    InternodeHeightLive_brch      => plt_morph%InternodeHeightLive_brch     , &
+    LiveInterNodeHight_brch      => plt_morph%LiveInterNodeHight_brch     , &
     CanopyLeafALyr_pft            => plt_morph%CanopyLeafALyr_pft           , &
     StemAreaZsec_brch             => plt_morph%StemAreaZsec_brch            , &
     CanopyLeafAreaByLayer_pft     => plt_morph%CanopyLeafAreaByLayer_pft      &
@@ -892,7 +892,7 @@ implicit none
       CMassHCO3BundleSheath_node(K,NB,NZ)=0._r8
     ENDIF
     LeafAreaNode_brch(K,NB,NZ)=0._r8
-    InternodeHeightLive_brch(K,NB,NZ)=0._r8
+    LiveInterNodeHight_brch(K,NB,NZ)=0._r8
     InternodeHeightDying_brch(K,NB,NZ)=0._r8
     PetioleLengthNode_brch(K,NB,NZ)=0._r8
     LeafProteinCNode_brch(K,NB,NZ)=0._r8

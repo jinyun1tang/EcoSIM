@@ -399,7 +399,7 @@ implicit none
       DO K=0,MaxNodesPerBranch
         LeafAreaNode_brch(K,NB,NZ,NY,NX)=plt_morph%LeafAreaNode_brch(K,NB,NZ)
         InternodeHeightDying_brch(K,NB,NZ,NY,NX)=plt_morph%InternodeHeightDying_brch(K,NB,NZ)
-        InternodeHeightLive_brch(K,NB,NZ,NY,NX)=plt_morph%InternodeHeightLive_brch(K,NB,NZ)
+        LiveInterNodeHight_brch(K,NB,NZ,NY,NX)=plt_morph%LiveInterNodeHight_brch(K,NB,NZ)
         PetioleLengthNode_brch(K,NB,NZ,NY,NX) =plt_morph%PetioleLengthNode_brch(K,NB,NZ)
         InternodeStrutElms_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX)=plt_biom%InternodeStrutElms_brch(1:NumPlantChemElms,K,NB,NZ)
         LeafElmntNode_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX)  =plt_biom%LeafElmntNode_brch(1:NumPlantChemElms,K,NB,NZ)
@@ -1254,7 +1254,7 @@ implicit none
         plt_morph%LeafAreaNode_brch(K,NB,NZ) =LeafAreaNode_brch(K,NB,NZ,NY,NX)
         plt_morph%InternodeHeightDying_brch(K,NB,NZ)=InternodeHeightDying_brch(K,NB,NZ,NY,NX)
         plt_morph%PetioleLengthNode_brch(K,NB,NZ) =PetioleLengthNode_brch(K,NB,NZ,NY,NX)
-        plt_morph%InternodeHeightLive_brch(K,NB,NZ)=InternodeHeightLive_brch(K,NB,NZ,NY,NX)
+        plt_morph%LiveInterNodeHight_brch(K,NB,NZ)=LiveInterNodeHight_brch(K,NB,NZ,NY,NX)
         plt_biom%InternodeStrutElms_brch(1:NumPlantChemElms,K,NB,NZ) =InternodeStrutElms_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX)
         plt_biom%LeafElmntNode_brch(1:NumPlantChemElms,K,NB,NZ)   =LeafElmntNode_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX)
         plt_biom%LeafProteinCNode_brch(K,NB,NZ)   =LeafProteinCNode_brch(K,NB,NZ,NY,NX)

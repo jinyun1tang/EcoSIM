@@ -38,7 +38,7 @@ implicit none
 !
       call  PlantAPISend(I,J,NY,NX)
 !   UPDATE PLANT PHENOLOGY IN 'HFUNC'
-!
+!     zero out plant hourly fluxes
       call ZeroGrosub()  
     !if(lverb)WRITE(*,333)'HFUNC'
       !phenological update, determine living/active branches

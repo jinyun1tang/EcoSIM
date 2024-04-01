@@ -606,7 +606,7 @@ module StartqsMod
     CanopyStemArea_pft                =>  plt_morph%CanopyStemArea_pft  , &
     NodeNumberAtAnthesis_brch         =>  plt_morph%NodeNumberAtAnthesis_brch  , &
     PotentialSeedSites_brch           =>  plt_morph%PotentialSeedSites_brch  , &
-    InternodeHeightLive_brch          =>  plt_morph%InternodeHeightLive_brch , &
+    LiveInterNodeHight_brch          =>  plt_morph%LiveInterNodeHight_brch , &
     SeedNumSet_brch                =>  plt_morph%SeedNumSet_brch  , &
     LeafAreaLive_brch                 =>  plt_morph%LeafAreaLive_brch  , &
     LeafAreaDying_brch                =>  plt_morph%LeafAreaDying_brch  , &
@@ -710,7 +710,7 @@ module StartqsMod
     ENDDO D5
     DO K=0,MaxNodesPerBranch1
       LeafAreaNode_brch(K,NB,NZ)=0._r8
-      InternodeHeightLive_brch(K,NB,NZ)=0._r8
+      LiveInterNodeHight_brch(K,NB,NZ)=0._r8
       plt_morph%InternodeHeightDying_brch(K,NB,NZ)=0._r8
       plt_morph%PetioleLengthNode_brch(K,NB,NZ)=0._r8
       plt_biom%LeafProteinCNode_brch(K,NB,NZ)=0._r8

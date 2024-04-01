@@ -259,7 +259,7 @@ implicit none
   real(r8), pointer :: CanopyArea_pft(:)        => null() !plant leaf+stem/stalk area, [m2 d-2]
   real(r8), pointer :: InternodeHeightDying_brch(:,:,:)   => null() !internode height, [m]
   real(r8), pointer :: PetioleLengthNode_brch(:,:,:)    => null() !sheath height, [m]
-  real(r8), pointer :: InternodeHeightLive_brch(:,:,:)   => null() !internode height, [m]
+  real(r8), pointer :: LiveInterNodeHight_brch(:,:,:)   => null() !internode height, [m]
   real(r8), pointer :: StemAreaZsec_brch(:,:,:,:)  => null() !stem surface area, [m2 d-2]
   real(r8), pointer :: CanopyLeafAreaByLayer_pft(:,:,:,:)  => null() !layer/node/branch leaf area, [m2 d-2]
   real(r8), pointer :: CanopyStemArea_lbrch(:,:,:)    => null() !plant canopy layer branch stem area, [m2 d-2]
@@ -1868,7 +1868,7 @@ implicit none
   allocate(this%CanopyArea_pft(JP1));this%CanopyArea_pft=spval
   allocate(this%InternodeHeightDying_brch(0:MaxNodesPerBranch1,MaxNumBranches,JP1));this%InternodeHeightDying_brch=spval
   allocate(this%PetioleLengthNode_brch(0:MaxNodesPerBranch1,MaxNumBranches,JP1));this%PetioleLengthNode_brch=spval
-  allocate(this%InternodeHeightLive_brch(0:MaxNodesPerBranch1,MaxNumBranches,JP1));this%InternodeHeightLive_brch=spval
+  allocate(this%LiveInterNodeHight_brch(0:MaxNodesPerBranch1,MaxNumBranches,JP1));this%LiveInterNodeHight_brch=spval
   allocate(this%StemAreaZsec_brch(NumOfLeafZenithSectors1,NumOfCanopyLayers1,MaxNumBranches,JP1));this%StemAreaZsec_brch=spval
   allocate(this%CanopyLeafAreaByLayer_pft(NumOfCanopyLayers1,0:MaxNodesPerBranch1,MaxNumBranches,JP1));this%CanopyLeafAreaByLayer_pft=spval
   allocate(this%CanopyStemArea_lbrch(NumOfCanopyLayers1,MaxNumBranches,JP1));this%CanopyStemArea_lbrch=spval

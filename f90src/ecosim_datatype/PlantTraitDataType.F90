@@ -48,7 +48,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  CanPHeight4WatUptake(:,:,:)                       !canopy height, [m]
   real(r8),target,allocatable ::  LeafAreaNode_brch(:,:,:,:,:)                    !leaf area, [m2 d-2]
   real(r8),target,allocatable ::  PetioleLengthNode_brch(:,:,:,:,:)                   !sheath height, [m]
-  real(r8),target,allocatable ::  InternodeHeightLive_brch(:,:,:,:,:)                  !internode height, [m]
+  real(r8),target,allocatable ::  LiveInterNodeHight_brch(:,:,:,:,:)                  !internode height, [m]
   real(r8),target,allocatable ::  LeafAreaLive_brch(:,:,:,:)                     !branch leaf area, [m2 d-2]
   real(r8),target,allocatable ::  LeafAreaDying_brch(:,:,:,:)                     !branch leaf area, [m2 d-2]
   real(r8),target,allocatable ::  CanPBranchHeight(:,:,:,:)                    !branch height, [m]
@@ -208,7 +208,7 @@ contains
   allocate(PARTS_brch(NumOfPlantMorphUnits,MaxNumBranches,JP,JY,JX));PARTS_brch=0._r8
   allocate(LeafAreaNode_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));LeafAreaNode_brch=0._r8
   allocate(PetioleLengthNode_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));PetioleLengthNode_brch=0._r8
-  allocate(InternodeHeightLive_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));InternodeHeightLive_brch=0._r8
+  allocate(LiveInterNodeHight_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));LiveInterNodeHight_brch=0._r8
   allocate(LeafAreaLive_brch(MaxNumBranches,JP,JY,JX)); LeafAreaLive_brch=0._r8
   allocate(LeafAreaDying_brch(MaxNumBranches,JP,JY,JX)); LeafAreaDying_brch=0._r8
   allocate(CanPBranchHeight(MaxNumBranches,JP,JY,JX));CanPBranchHeight=0._r8
@@ -364,7 +364,7 @@ contains
   call destroy(CanPHeight4WatUptake)
   call destroy(LeafAreaNode_brch)
   call destroy(PetioleLengthNode_brch)
-  call destroy(InternodeHeightLive_brch)
+  call destroy(LiveInterNodeHight_brch)
   call destroy(LeafAreaLive_brch)
   call destroy(LeafAreaDying_brch)
   call destroy(CanPBranchHeight)

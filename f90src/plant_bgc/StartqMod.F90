@@ -563,7 +563,7 @@ module StartqMod
 
     DO K=0,MaxNodesPerBranch
       LeafAreaNode_brch(K,NB,NZ,NY,NX)=0._r8
-      InternodeHeightLive_brch(K,NB,NZ,NY,NX)=0._r8
+      LiveInterNodeHight_brch(K,NB,NZ,NY,NX)=0._r8
       InternodeHeightDying_brch(K,NB,NZ,NY,NX)=0._r8
       PetioleLengthNode_brch(K,NB,NZ,NY,NX)=0._r8
       LeafElmntNode_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX)=0._r8
