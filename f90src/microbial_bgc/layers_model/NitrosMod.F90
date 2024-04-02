@@ -62,7 +62,7 @@ module nitrosMod
 !     FOSCXS=mixing fraction for surface litter
 !     TOQCK=total active biomass respiration activity
 !     TFNX=temperature function
-!     VLSoilPoreMicP=soil layer volume
+!     VLSoilPoreMicP_vr=soil layer volume
 !     OSCXD=mixing required for equilibrating litter concentration
 !     FOSCXD=mixing fraction for equilibrating subsurface litter
 !     FOSCXS=mixing fraction for subsurface litter
@@ -78,7 +78,7 @@ module nitrosMod
         ENDIF
       ELSE
         D1100: DO LN=L+1,NL(NY,NX)
-          IF(VLSoilPoreMicP(LN,NY,NX).GT.ZEROS2(NY,NX))THEN
+          IF(VLSoilPoreMicP_vr(LN,NY,NX).GT.ZEROS2(NY,NX))THEN
             LL=LN
             exit
           ENDIF

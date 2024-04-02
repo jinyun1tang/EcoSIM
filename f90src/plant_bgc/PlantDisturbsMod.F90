@@ -761,7 +761,7 @@ module PlantDisturbsMod
     LeafAreaLive_brch           =>  plt_morph%LeafAreaLive_brch          , &
     PotentialSeedSites_brch     =>  plt_morph%PotentialSeedSites_brch    , &
     SeedNumSet_brch             =>  plt_morph%SeedNumSet_brch            , &
-    CanopyLeafAreaByLayer_pft   =>  plt_morph%CanopyLeafAreaByLayer_pft    &
+    CanopyLeafArea_lpft   =>  plt_morph%CanopyLeafArea_lpft    &
   )
 !     SolarNoonHour_col=hour of solar noon
 !     iPlantTurnoverPattern_pft=turnover:0=all abve-grd,1=all leaf+petiole,2=none,3=between 1,2
@@ -915,7 +915,7 @@ module PlantDisturbsMod
                 ENDDO
               ENDDO
               D8965: DO L=1,NumOfCanopyLayers1
-                CanopyLeafAreaByLayer_pft(L,K,NB,NZ)=CanopyLeafAreaByLayer_pft(L,K,NB,NZ)*XHVST
+                CanopyLeafArea_lpft(L,K,NB,NZ)=CanopyLeafArea_lpft(L,K,NB,NZ)*XHVST
               ENDDO D8965
             ENDDO D8970
           ENDIF
@@ -1273,8 +1273,8 @@ module PlantDisturbsMod
     RootVH2O_pvr                        =>  plt_morph%RootVH2O_pvr                       , &
     RootLenDensPerPlant_pvr             =>  plt_morph%RootLenDensPerPlant_pvr            , &
     iPlantNfixType                      =>  plt_morph%iPlantNfixType                     , &
-    CanopyLAgrid_lyr                    =>  plt_morph%CanopyLAgrid_lyr                   , &
-    CanopyHeightz_col                   =>  plt_morph%CanopyHeightz_col                  , &
+    CanopyLeafAareZ_col                    =>  plt_morph%CanopyLeafAareZ_col                   , &
+    CanopyHeightZ_col                   =>  plt_morph%CanopyHeightZ_col                  , &
     LeafAreaLive_brch                   =>  plt_morph%LeafAreaLive_brch                  , &
     NumOfBranches_pft                   =>  plt_morph%NumOfBranches_pft                  , &
     CanopyStemArea_pft                  =>  plt_morph%CanopyStemArea_pft                 , &
@@ -1282,22 +1282,22 @@ module PlantDisturbsMod
     Root1stXNumL_pvr                    =>  plt_morph%Root1stXNumL_pvr                   , &
     Root2ndLen_pvr                      =>  plt_morph%Root2ndLen_pvr                     , &
     Root1stLen_rpvr                     =>  plt_morph%Root1stLen_rpvr                    , &
-    LiveInterNodeHight_brch            =>  plt_morph%LiveInterNodeHight_brch           , &
+    LiveInterNodeHight_brch             =>  plt_morph%LiveInterNodeHight_brch            , &
     PotentialSeedSites_brch             =>  plt_morph%PotentialSeedSites_brch            , &
     SeedNumSet_brch                     =>  plt_morph%SeedNumSet_brch                    , &
     PetioleLengthNode_brch              =>  plt_morph%PetioleLengthNode_brch             , &
     LeafAreaNode_brch                   =>  plt_morph%LeafAreaNode_brch                  , &
-    CanopyLeafALyr_pft                  =>  plt_morph%CanopyLeafALyr_pft                 , &
-    CanopyStemArea_lpft                 =>  plt_morph%CanopyStemArea_lpft                , &
-    CanopyLeafAreaByLayer_pft           =>  plt_morph%CanopyLeafAreaByLayer_pft          , &
-    CanopyStemArea_lbrch                =>  plt_morph%CanopyStemArea_lbrch               , &
+    CanopyLeafAreaZ_pft                 =>  plt_morph%CanopyLeafAreaZ_pft                , &
+    CanopyStemAreaZ_pft                 =>  plt_morph%CanopyStemAreaZ_pft                , &
+    CanopyLeafArea_lpft                 =>  plt_morph%CanopyLeafArea_lpft                , &
+    CanopyStalkArea_lbrch               =>  plt_morph%CanopyStalkArea_lbrch              , &
     NumRootAxes_pft                     =>  plt_morph%NumRootAxes_pft                    , &
     NodeNumberAtAnthesis_brch           =>  plt_morph%NodeNumberAtAnthesis_brch          , &
     MainBranchNum_pft                   =>  plt_morph%MainBranchNum_pft                  , &
     NodeNum2InitFloral_brch             =>  plt_morph%NodeNum2InitFloral_brch            , &
     ShootNodeNum_brch                   =>  plt_morph%ShootNodeNum_brch                  , &
-    ClumpFactor                         =>  plt_morph%ClumpFactor                        , &
-    CanopyLeafArea_grd                  =>  plt_morph%CanopyLeafArea_grd                 , &
+    ClumpFactor_pft                     =>  plt_morph%ClumpFactor_pft                    , &
+    CanopyLeafArea_col                  =>  plt_morph%CanopyLeafArea_col                 , &
     iPlantPhotosynthesisType            =>  plt_photo%iPlantPhotosynthesisType             &
   )
 !     iHarvstType_pft=harvest type:0=none,1=grain,2=all above-ground
@@ -1319,7 +1319,7 @@ module PlantDisturbsMod
 !          iHarvstType_pft=4 or 6:animal or insect biomass(g LM m-2),iHarvstType_pft=5:fire
 !     THIN_pft=iHarvstType_pft=0-3,5: fraction of population removed,
 !          iHarvstType_pft=4 or 6:specific herbivory rate (g DM g-1 LM d-1)
-!     CanopyLeafArea_grd,CanopyLAgrid_lyr=leaf area of combined canopy, canopy layer
+!     CanopyLeafArea_col,CanopyLeafAareZ_col=leaf area of combined canopy, canopy layer
 !     ARLFR,ARLFY=leaf area harvested,remaining
 !     ZL=height to bottom of each canopy layer
 !
@@ -1334,22 +1334,22 @@ module PlantDisturbsMod
         PlantPopulation_pft(NZ)=PPX(NZ)*AREA3(NU)
       ENDIF
       IF(iHarvstType_pft(NZ).EQ.iharvtyp_pruning)THEN
-        ClumpFactor(NZ)=ClumpFactor(NZ)*HVST(NZ)
+        ClumpFactor_pft(NZ)=ClumpFactor_pft(NZ)*HVST(NZ)
       ENDIF
       IF(iHarvstType_pft(NZ).LE.iharvtyp_allabv.AND.HVST(NZ).LT.0.0)THEN
-        ARLFY=(1._r8-ABS(HVST(NZ)))*CanopyLeafArea_grd
+        ARLFY=(1._r8-ABS(HVST(NZ)))*CanopyLeafArea_col
         ARLFR=0._r8
         D9875: DO L=1,NumOfCanopyLayers1
-          IF(CanopyHeightz_col(L).GT.CanopyHeightz_col(L-1).AND.&
-            CanopyLAgrid_lyr(L).GT.ZEROS.AND.ARLFR.LT.ARLFY)THEN
-            IF(ARLFR+CanopyLAgrid_lyr(L).GT.ARLFY)THEN
-              HVST(NZ)=CanopyHeightz_col(L-1)+((ARLFY-ARLFR)/CanopyLAgrid_lyr(L))&
-                *(CanopyHeightz_col(L)-CanopyHeightz_col(L-1))
+          IF(CanopyHeightZ_col(L).GT.CanopyHeightZ_col(L-1).AND.&
+            CanopyLeafAareZ_col(L).GT.ZEROS.AND.ARLFR.LT.ARLFY)THEN
+            IF(ARLFR+CanopyLeafAareZ_col(L).GT.ARLFY)THEN
+              HVST(NZ)=CanopyHeightZ_col(L-1)+((ARLFY-ARLFR)/CanopyLeafAareZ_col(L))&
+                *(CanopyHeightZ_col(L)-CanopyHeightZ_col(L-1))
             ENDIF
           ELSE
             HVST(NZ)=0._r8
           ENDIF
-          ARLFR=ARLFR+CanopyLAgrid_lyr(L)
+          ARLFR=ARLFR+CanopyLeafAareZ_col(L)
         ENDDO D9875
       ENDIF
       TotPhytomassRemoval=0._r8
@@ -1538,9 +1538,9 @@ module PlantDisturbsMod
     D9865: DO L=NumOfCanopyLayers1,1,-1
       IF(iHarvstType_pft(NZ).NE.iharvtyp_grazing.AND.iHarvstType_pft(NZ).NE.iharvtyp_herbivo)THEN
         IF(iHarvstType_pft(NZ).NE.iharvtyp_pruning)THEN
-          IF(CanopyHeightz_col(L).GT.CanopyHeightz_col(L-1))THEN
-            FHGT=AZMAX1(AMIN1(1.0_r8,1._r8-((CanopyHeightz_col(L))-HVST(NZ))/ &
-              (CanopyHeightz_col(L)-CanopyHeightz_col(L-1))))
+          IF(CanopyHeightZ_col(L).GT.CanopyHeightZ_col(L-1))THEN
+            FHGT=AZMAX1(AMIN1(1.0_r8,1._r8-((CanopyHeightZ_col(L))-HVST(NZ))/ &
+              (CanopyHeightZ_col(L)-CanopyHeightZ_col(L-1))))
           ELSE
             FHGT=1.0_r8
           ENDIF
@@ -1598,7 +1598,7 @@ module PlantDisturbsMod
 !
 !     FHVSE(ielmc)=fraction of leaf node mass not harvested
 !     WGLFL,WGLFLN,WGLFLP=leaf node C,N,P in canopy layer
-!     CanopyLeafAreaByLayer_pft,CanopyStemArea_lbrch=leaf,stalk node area in canopy layer
+!     CanopyLeafArea_lpft,CanopyStalkArea_lbrch=leaf,stalk node area in canopy layer
 !     LeafElmntRemoval(ielmc),LeafElmntRemoval(ielmn),LeafElmntRemoval(ielmp)=harvested leaf C,N,P
 !     LeafElmntHarv2Litr(ielmc),LeafElmntHarv2Litr(ielmn),LeafElmntHarv2Litr(ielmp)=harvested leaf C,N,P to litter
 !     WoodyElmntRemoval(ielmc),WoodyElmntRemoval(ielmn),WoodyElmntRemoval(ielmp)=harvested woody C,N,P
@@ -1624,17 +1624,17 @@ module PlantDisturbsMod
 !
 !     REMAINING LEAF C,N,P AND AREA
 !
-            CanopyLeafAreaByLayer_pft(L,K,NB,NZ)=FHVSE(ielmc)*CanopyLeafAreaByLayer_pft(L,K,NB,NZ)
+            CanopyLeafArea_lpft(L,K,NB,NZ)=FHVSE(ielmc)*CanopyLeafArea_lpft(L,K,NB,NZ)
             IF(K.EQ.1)THEN
-              CanopyStemArea_lbrch(L,NB,NZ)=FHVSE(ielmc)*CanopyStemArea_lbrch(L,NB,NZ)
+              CanopyStalkArea_lbrch(L,NB,NZ)=FHVSE(ielmc)*CanopyStalkArea_lbrch(L,NB,NZ)
             ENDIF
           ENDIF
 
         ENDDO D9845
       ENDDO D9855
-      CanopyLeafALyr_pft(L,NZ)=0._r8
+      CanopyLeafAreaZ_pft(L,NZ)=0._r8
       CanopyLeafCLyr_pft(L,NZ)=0._r8
-      CanopyStemArea_lpft(L,NZ)=CanopyStemArea_lpft(L,NZ)*FHVSE(ielmc)
+      CanopyStemAreaZ_pft(L,NZ)=CanopyStemAreaZ_pft(L,NZ)*FHVSE(ielmc)
     ENDDO D9865
 
     D9835: DO NB=1,NumOfBranches_pft(NZ)
@@ -1658,14 +1658,14 @@ module PlantDisturbsMod
 !     ACCUMULATE REMAINING LEAF AREA, C, N, P
 !
 !     WGLFL,WGLFLN,WGLFLP=leaf node C,N,P in canopy layer
-!     CanopyLeafAreaByLayer_pft,CanopyLeafALyr_pft=leaf node,total area in canopy layer
+!     CanopyLeafArea_lpft,CanopyLeafAreaZ_pft=leaf node,total area in canopy layer
 !
         D9815: DO L=1,NumOfCanopyLayers1
-          ARLFG=ARLFG+CanopyLeafAreaByLayer_pft(L,K,NB,NZ)
+          ARLFG=ARLFG+CanopyLeafArea_lpft(L,K,NB,NZ)
           DO NE=1,NumPlantChemElms
             WGLFGE(NE)=WGLFGE(NE)+LeafChemElmByLayerNode_brch(NE,L,K,NB,NZ)
           ENDDO
-          CanopyLeafALyr_pft(L,NZ)=CanopyLeafALyr_pft(L,NZ)+CanopyLeafAreaByLayer_pft(L,K,NB,NZ)
+          CanopyLeafAreaZ_pft(L,NZ)=CanopyLeafAreaZ_pft(L,NZ)+CanopyLeafArea_lpft(L,K,NB,NZ)
           CanopyLeafCLyr_pft(L,NZ)=CanopyLeafCLyr_pft(L,NZ)+LeafChemElmByLayerNode_brch(ielmc,L,K,NB,NZ)
         ENDDO D9815
 !
@@ -2311,7 +2311,7 @@ module PlantDisturbsMod
 !     WTLS=total PFT leaf+petiole C mass
 !     WTSTK=total PFT stalk C mass
 !     WVSTK=total PFT sapwood C mass
-!     CanopyStemArea_lbrch=total PFT stalk surface area
+!     CanopyStalkArea_lbrch=total PFT stalk surface area
 !
         IF(jHarvst_pft(NZ).NE.jharvtyp_noaction)then
           iPlantBranchState_brch(NB,NZ)=iDead
@@ -2329,7 +2329,7 @@ module PlantDisturbsMod
         StalkStrutElms_pft(ielmc,NZ)=StalkStrutElms_pft(ielmc,NZ)+StalkStrutElms_brch(ielmc,NB,NZ)
         CanopyStalkC_pft(NZ)=CanopyStalkC_pft(NZ)+StalkBiomassC_brch(NB,NZ)
         D9830: DO L=1,NumOfCanopyLayers1
-          CanopyStemArea_pft(NZ)=CanopyStemArea_pft(NZ)+CanopyStemArea_lbrch(L,NB,NZ)
+          CanopyStemArea_pft(NZ)=CanopyStemArea_pft(NZ)+CanopyStalkArea_lbrch(L,NB,NZ)
         ENDDO D9830
       ENDDO D9840
 !

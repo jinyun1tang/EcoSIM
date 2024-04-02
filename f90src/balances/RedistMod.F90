@@ -158,7 +158,7 @@ module RedistMod
   implicit none
   integer, intent(in) :: I,J,NY,NX
   real(r8), intent(in) :: TXCO2(JY,JX)   !what does TXCO2 mean, be careful?
-  real(r8) :: VLSoilPoreMicPX,VOLTX
+  real(r8) :: VLSoilPoreMicP_vrX,VOLTX
   integer  :: L
 
   Eco_NetRad_col(NY,NX)=Eco_NetRad_col(NY,NX)+HeatByRadiation(NY,NX)
@@ -176,7 +176,7 @@ module RedistMod
     
   IF(NU(NY,NX).GT.NUI(NY,NX))THEN  !the surface is lowered
     DO L=NUI(NY,NX),NU(NY,NX)-1
-      IF(VLSoilPoreMicP(L,NY,NX).LE.ZEROS2(NY,NX))THEN
+      IF(VLSoilPoreMicP_vr(L,NY,NX).LE.ZEROS2(NY,NX))THEN
         TKS(L,NY,NX)=TKS(NU(NY,NX),NY,NX)
         TCS(L,NY,NX)=units%Kelvin2Celcius(TKS(L,NY,NX))
       ENDIF
@@ -198,8 +198,8 @@ module RedistMod
   !THETIZ(0,NY,NX)=AZMAX1(AMIN1(1.0,VLiceMicP(0,NY,NX)/VLitR(NY,NX)))
   
   D9945: DO L=NUI(NY,NX),NL(NY,NX)
-    VLSoilPoreMicPX=AREA(3,L,NY,NX)*DLYR(3,L,NY,NX)*FracSoiAsMicP(L,NY,NX)
-    VOLTX=VLSoilPoreMicPX+VLMacP(L,NY,NX)
+    VLSoilPoreMicP_vrX=AREA(3,L,NY,NX)*DLYR(3,L,NY,NX)*FracSoiAsMicP(L,NY,NX)
+    VOLTX=VLSoilPoreMicP_vrX+VLMacP(L,NY,NX)
     THETWZ(L,NY,NX)=safe_adb(VLWatMicP(L,NY,NX)+AMIN1(VLMacP(L,NY,NX),&
       VLWatMacP(L,NY,NX)),VOLTX)
     THETIZ(L,NY,NX)=safe_adb(VLiceMicP(L,NY,NX)+AMIN1(VLMacP(L,NY,NX) &
@@ -914,7 +914,7 @@ module RedistMod
       VLsoiAirP(L,NY,NX)=0.0_r8
 !     VLMicP(L,NY,NX)=VLWatMicP(L,NY,NX)+VLiceMicP(L,NY,NX)
 !    2+DVLWatMicP(L,NY,NX)+DVLiceMicP(L,NY,NX)
-!     VLSoilPoreMicP(L,NY,NX)=VLMicP(L,NY,NX)
+!     VLSoilPoreMicP_vr(L,NY,NX)=VLMicP(L,NY,NX)
 !     VGeomLayer(L,NY,NX)=VLMicP(L,NY,NX)
     ENDIF
     ENGY=VHeatCapacityX*TKSX
@@ -973,7 +973,7 @@ module RedistMod
     WaterStoreLandscape=WaterStoreLandscape+WS
     VOLISO=VOLISO+VLiceMicP(L,NY,NX)+VLiceMacP(L,NY,NX)
     UVLWatMicP(NY,NX)=UVLWatMicP(NY,NX)+WS
-!    2-WiltPoint(L,NY,NX)*VLSoilPoreMicP(L,NY,NX)
+!    2-WiltPoint(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
     HeatStoreLandscape=HeatStoreLandscape+VHeatCapacity(L,NY,NX)*TKS(L,NY,NX)
   ENDDO
   end subroutine update_physVar_Profile

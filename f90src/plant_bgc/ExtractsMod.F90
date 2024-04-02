@@ -57,10 +57,10 @@ module ExtractsMod
    LitrfalStrutElms_vr       => plt_bgcr%LitrfalStrutElms_vr       , &
    LitrfalStrutElms_pvr       => plt_bgcr%LitrfalStrutElms_pvr       , &
    MaxSoiL4Root              => plt_morph%MaxSoiL4Root       , &
-   CanopyStemA_lyr           => plt_morph%CanopyStemA_lyr     , &
-   CanopyLAgrid_lyr          =>  plt_morph%CanopyLAgrid_lyr    , &
-   StemArea_grd              =>  plt_morph%StemArea_grd    , &
-   CanopyLeafArea_grd        =>  plt_morph%CanopyLeafArea_grd      &
+   CanopyStemAareZ_col           => plt_morph%CanopyStemAareZ_col     , &
+   CanopyLeafAareZ_col          =>  plt_morph%CanopyLeafAareZ_col    , &
+   StemArea_col              =>  plt_morph%StemArea_col    , &
+   CanopyLeafArea_col        =>  plt_morph%CanopyLeafArea_col      &
   )
   DO NZ=1,NP0
 !
@@ -88,12 +88,12 @@ module ExtractsMod
       ENDDO
     ENDDO
   ENDDO
-  CanopyLeafArea_grd=0._r8
-  StemArea_grd=0._r8
+  CanopyLeafArea_col=0._r8
+  StemArea_col=0._r8
   DO  L=1,NumOfCanopyLayers1
-    CanopyLAgrid_lyr(L)=0._r8
+    CanopyLeafAareZ_col(L)=0._r8
     WGLFT(L)=0._r8
-    CanopyStemA_lyr(L)=0._r8
+    CanopyStemAareZ_col(L)=0._r8
   ENDDO
   end associate
   end subroutine TotalLitrFall
@@ -103,8 +103,8 @@ module ExtractsMod
 !
 !     TOTAL LEAF AREA OF ALL PLANT SPECIES
 !
-!     CanopyLAgrid_lyr,CanopyStemA_lyr=total leaf,stalk area of combined canopy layer
-!     CanopyLeafALyr_pft,CanopyStemArea_lpft=PFT leaf,stalk area in canopy layer
+!     CanopyLeafAareZ_col,CanopyStemAareZ_col=total leaf,stalk area of combined canopy layer
+!     CanopyLeafAreaZ_pft,CanopyStemAreaZ_pft=PFT leaf,stalk area in canopy layer
 !     WGLFT=total leaf C of combined canopy layer
 !     CanopyLeafCLyr_pft=PFT leaf C in canopy layer
 !
@@ -114,15 +114,15 @@ module ExtractsMod
   associate(                              &
     CanopyLeafCLyr_pft    => plt_biom%CanopyLeafCLyr_pft      , &
     WGLFT                 => plt_biom%WGLFT      , &
-    CanopyLAgrid_lyr      =>  plt_morph%CanopyLAgrid_lyr    , &
-    CanopyStemArea_lpft    =>  plt_morph%CanopyStemArea_lpft    , &
-    CanopyStemA_lyr       => plt_morph%CanopyStemA_lyr     , &
-    CanopyLeafALyr_pft    => plt_morph%CanopyLeafALyr_pft       &
+    CanopyLeafAareZ_col      =>  plt_morph%CanopyLeafAareZ_col    , &
+    CanopyStemAreaZ_pft    =>  plt_morph%CanopyStemAreaZ_pft    , &
+    CanopyStemAareZ_col       => plt_morph%CanopyStemAareZ_col     , &
+    CanopyLeafAreaZ_pft    => plt_morph%CanopyLeafAreaZ_pft       &
   )
   DO L=1,NumOfCanopyLayers1
-    CanopyLAgrid_lyr(L)=CanopyLAgrid_lyr(L)+CanopyLeafALyr_pft(L,NZ)
+    CanopyLeafAareZ_col(L)=CanopyLeafAareZ_col(L)+CanopyLeafAreaZ_pft(L,NZ)
     WGLFT(L)=WGLFT(L)+CanopyLeafCLyr_pft(L,NZ)
-    CanopyStemA_lyr(L)=CanopyStemA_lyr(L)+CanopyStemArea_lpft(L,NZ)
+    CanopyStemAareZ_col(L)=CanopyStemAareZ_col(L)+CanopyStemAreaZ_pft(L,NZ)
   ENDDO
   end associate
   end subroutine TotalLeafArea
@@ -374,8 +374,8 @@ module ExtractsMod
     CanH2OHeldVg               => plt_ew%CanH2OHeldVg   , &
     NU                         => plt_site%NU     , &
     NH3Dep2Can_pft             =>  plt_bgcr%NH3Dep2Can_pft  , &     
-    StemArea_grd               => plt_morph%StemArea_grd , &
-    CanopyLeafArea_grd         => plt_morph%CanopyLeafArea_grd , &
+    StemArea_col               => plt_morph%StemArea_col , &
+    CanopyLeafArea_col         => plt_morph%CanopyLeafArea_col , &
     MaxSoiL4Root               => plt_morph%MaxSoiL4Root   , &
     NumOfBranches_pft          => plt_morph%NumOfBranches_pft   , &
     CanopyStemArea_pft         => plt_morph%CanopyStemArea_pft , &
@@ -406,7 +406,7 @@ module ExtractsMod
 !     VapXAir2PCan,Transpiration_pft=water flux to,from canopy surfaces, inside canopy
 !     TENGYC=total canopy water heat content
 !     ENGYC=PFT canopy water heat content
-!     CanopyLeafArea_grd,StemArea_grd=total leaf,stalk area
+!     CanopyLeafArea_col,StemArea_col=total leaf,stalk area
 !     CanopyLeafArea_pft,CanopyStemArea_pft=PFT leaf,stalk area
 !     ZCSNC,ZZSNC,ZPSNC=total net root-soil C,N,P exchange
 !     HCUPTK,HZUPTK,HPUPTK=PFT net root-soil C,N,P exchange
@@ -430,8 +430,8 @@ module ExtractsMod
   THFLXC             = THFLXC+ENGYC-ENGYX(NZ)-(PrecIntcptByCanopy_pft(NZ)*cpw*TairK)
   ENGYX(NZ)          = ENGYC
   LWRadCanG          = LWRadCanG+LWRadCanopy_pft(NZ)
-  CanopyLeafArea_grd = CanopyLeafArea_grd+CanopyLeafArea_pft(NZ)
-  StemArea_grd       = StemArea_grd+CanopyStemArea_pft(NZ)
+  CanopyLeafArea_col = CanopyLeafArea_col+CanopyLeafArea_pft(NZ)
+  StemArea_col       = StemArea_col+CanopyStemArea_pft(NZ)
 
   DO NE=1,NumPlantChemElms
     LitrFallStrutElms_col(NE)=LitrFallStrutElms_col(NE)-PlantRootSoilElmNetX_pft(NE,NZ)

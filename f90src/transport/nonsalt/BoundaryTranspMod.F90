@@ -441,7 +441,7 @@ module BoundaryTranspMod
 !             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
 !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
 !
-    IF(VLSoilPoreMicP(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
+    IF(VLSoilPoreMicP_vr(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
       IF(FlowDirIndicator(M2,M1).NE.3.OR.N.EQ.3)THEN
 
         call BoundaryRunoffandSnowZ(M,N,NN,M1,M2,M3,M4,M5,M6)
@@ -580,7 +580,7 @@ module BoundaryTranspMod
 !
 !     NET SOLUTE FLUX IN SNOWPACK
 !
-!     VLSnowHeatCapM,VLHeatCapSnowMin=current,minimum volumetric heat capacity of snowpack
+!     VLSnowHeatCapM,VLHeatCapSnowMin_col=current,minimum volumetric heat capacity of snowpack
 !     T*BLS=net solute flux in snowpack
 !     R*BLS=solute flux in snowpack
 !
@@ -601,12 +601,12 @@ module BoundaryTranspMod
   integer :: idg,NTN
 
   DO  LS=1,JS
-    IF(VLSnowHeatCapM(M,LS,NY,NX).GT.VLHeatCapSnowMin(NY,NX))THEN
+    IF(VLSnowHeatCapM(M,LS,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
       LS2=MIN(JS,LS+1)
 !
 !     IF LOWER LAYER IS IN THE SNOWPACK
 !
-      IF(LS.LT.JS.AND.VLSnowHeatCapM(M,LS2,N2,N1).GT.VLHeatCapSnowMin(N2,N1))THEN
+      IF(LS.LT.JS.AND.VLSnowHeatCapM(M,LS2,N2,N1).GT.VLHeatCapSnowMin_col(N2,N1))THEN
         DO idg=idg_beg,idg_NH3
           trcg_TBLS(idg,LS,N2,N1)=trcg_TBLS(idg,LS,N2,N1) &
             +trcg_RBLS(idg,LS,N2,N1)-trcg_RBLS(idg,LS2,N2,N1)
@@ -655,14 +655,14 @@ module BoundaryTranspMod
   integer :: K,LL,ids,idg,idom
 
   DO LL=N6,NL(NY,NX)
-    IF(VLSoilPoreMicP(LL,N2,N1).GT.ZEROS2(N2,N1))THEN
+    IF(VLSoilPoreMicP_vr(LL,N2,N1).GT.ZEROS2(N2,N1))THEN
       N6=LL
       exit
     ENDIF
   ENDDO
 
   IF(M.NE.MX)THEN
-    IF(VLSoilPoreMicP(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
+    IF(VLSoilPoreMicP_vr(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
       DO  K=1,jcplx
         do idom=idom_beg,idom_end
           DOM_Transp2Micp_flx(idom,K,N3,N2,N1)=DOM_Transp2Micp_flx(idom,K,N3,N2,N1) &
@@ -695,7 +695,7 @@ module BoundaryTranspMod
 !     R*FLG=convective+diffusive gas flux
 !     gas code:*CO*=CO2,*OX*=O2,*CH*=CH4,*NG*=N2,*N2*=N2O,*NH*=NH3,*HG*=H2
 !
-  IF(VLSoilPoreMicP(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
+  IF(VLSoilPoreMicP_vr(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
     DO idg=idg_beg,idg_NH3
       Gas_AdvDif_Flx_vr(idg,N3,N2,N1)=Gas_AdvDif_Flx_vr(idg,N3,N2,N1) &
         +R3GasADFlx(idg,N,N3,N2,N1)-R3GasADFlx(idg,N,N6,N5,N4)

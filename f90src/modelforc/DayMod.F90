@@ -263,7 +263,7 @@
 !     CIRRA= fraction of FC to which irrigation will raise SWC
 !     FW=fraction of soil layer in irrigation zone
 !     FZ=SWC at which irrigation is triggered
-!     VLSoilPoreMicP,VOLW,VOLI=total,water,ice volume
+!     VLSoilPoreMicP_vr,VOLW,VOLI=total,water,ice volume
 !     IFLGV=flag for irrigation criterion,0=SWC,1=canopy water potential
 !     FIRRA=depletion of SWC from CIRRA to WP(IFLGV=0),or minimum canopy
 !     water potential(IFLGV=1), to trigger irrigation
@@ -284,8 +284,8 @@
               FW=AMIN1(1.0_r8,(DIRRA1-CumDepth2LayerBottom(L-1,NY,NX)) &
                 /(CumDepth2LayerBottom(L,NY,NX)-CumDepth2LayerBottom(L-1,NY,NX)))
               FZ=AMIN1(POROS(L,NY,NX),WiltPoint(L,NY,NX)+CIRRA(NY,NX)*(FieldCapacity(L,NY,NX)-WiltPoint(L,NY,NX)))
-              TFZ=TFZ+FW*FZ*VLSoilPoreMicP(L,NY,NX)
-              TWP=TWP+FW*WiltPoint(L,NY,NX)*VLSoilPoreMicP(L,NY,NX)
+              TFZ=TFZ+FW*FZ*VLSoilPoreMicP_vr(L,NY,NX)
+              TWP=TWP+FW*WiltPoint(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
               TVW=TVW+FW*(VLWatMicP(L,NY,NX)+VLiceMicP(L,NY,NX))
             ENDIF
           ENDDO D165

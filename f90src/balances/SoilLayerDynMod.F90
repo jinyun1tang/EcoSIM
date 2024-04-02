@@ -312,7 +312,7 @@ implicit none
         IF(LX.EQ.NL(NY,NX))THEN
 !  5: due to sediment erosion
 !         total soil layer reduction due to erosion
-          DDLEqv_Erosion=-tErosionSedmLoss(NY,NX)/(SoilMicPMassLayerMX(NY,NX)/VLSoilPoreMicP(NU(NY,NX),NY,NX))
+          DDLEqv_Erosion=-tErosionSedmLoss(NY,NX)/(SoilMicPMassLayerMX(NY,NX)/VLSoilPoreMicP_vr(NU(NY,NX),NY,NX))
           DDLYX(LX,ich_erosion)=DDLEqv_Erosion
           DDLYR(LX,ich_erosion)=DDLEqv_Erosion
           IFLGL(LX,ich_erosion)=1
@@ -465,7 +465,7 @@ implicit none
         ENDIF
       ENDIF
     ENDDO D200
-    VLSoilMicP(LX,NY,NX)=VLSoilPoreMicP(LX,NY,NX)
+    VLSoilMicP(LX,NY,NX)=VLSoilPoreMicP_vr(LX,NY,NX)
   ENDDO D225
   VLSoilMicP(0,NY,NX)=VLWatMicP(0,NY,NX)+VLiceMicP(0,NY,NX)
   end subroutine SoilRelayering
@@ -629,14 +629,14 @@ implicit none
       
       NUX=NU(NY,NX)
       DO LL=NUX+1,NL(NY,NX)
-        IF(VLSoilPoreMicP(LL,NY,NX).GT.ZEROS2(NY,NX))THEN
+        IF(VLSoilPoreMicP_vr(LL,NY,NX).GT.ZEROS2(NY,NX))THEN
           NU(NY,NX)=LL
           DDLYRX(NN)=DLYR(3,NUX,NY,NX)
           IFLGL(L,NN)=1
           DLYR(3,NUX,NY,NX)=0.0_r8
           IF(SoiBulkDensity(NUX,NY,NX).LE.ZERO)THEN
             VGeomLayer(NUX,NY,NX)=AREA(3,NUX,NY,NX)*DLYR(3,NUX,NY,NX)
-            VLSoilPoreMicP(NUX,NY,NX)=VGeomLayer(NUX,NY,NX)*FracSoiAsMicP(NUX,NY,NX)
+            VLSoilPoreMicP_vr(NUX,NY,NX)=VGeomLayer(NUX,NY,NX)*FracSoiAsMicP(NUX,NY,NX)
           ENDIF
           exit
         ENDIF
@@ -899,7 +899,7 @@ implicit none
   ENDIF
 !     IF(SoiBulkDensity(L0,NY,NX).LE.ZERO)THEN
 !     VGeomLayer(L0,NY,NX)=FY*VGeomLayer(L0,NY,NX)
-!     VLSoilPoreMicP(L0,NY,NX)=FY*VLSoilPoreMicP(L0,NY,NX)
+!     VLSoilPoreMicP_vr(L0,NY,NX)=FY*VLSoilPoreMicP_vr(L0,NY,NX)
 !     ENDIF
   VLWatMicP(L0,NY,NX)=FY*VLWatMicP(L0,NY,NX)
   VLiceMicP(L0,NY,NX)=FY*VLiceMicP(L0,NY,NX)
@@ -1103,8 +1103,8 @@ implicit none
 
 ! begin_execution
   IF(IFLGL(L,3).EQ.0.AND.L0.NE.0 &
-    .AND.VLSoilPoreMicP(L0,NY,NX).GT.ZEROS(NY,NX) &
-    .AND.VLSoilPoreMicP(L1,NY,NX).GT.ZEROS(NY,NX))THEN
+    .AND.VLSoilPoreMicP_vr(L0,NY,NX).GT.ZEROS(NY,NX) &
+    .AND.VLSoilPoreMicP_vr(L1,NY,NX).GT.ZEROS(NY,NX))THEN
     IF(L0.EQ.L.OR.CORGCI(L0,NY,NX).LE.ZERO)THEN
       FXO=FO
     ELSE

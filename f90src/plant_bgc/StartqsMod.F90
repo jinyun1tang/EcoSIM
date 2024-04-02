@@ -128,7 +128,7 @@ module StartqsMod
     iPlantPhotosynthesisType   =>  plt_photo%iPlantPhotosynthesisType, &
     MaxCanPStomaResistH2O_pft  =>  plt_photo%MaxCanPStomaResistH2O_pft  , &
     ClumpFactorInit_pft        =>  plt_morph%ClumpFactorInit_pft   , &
-    ClumpFactor                =>  plt_morph%ClumpFactor   , &
+    ClumpFactor_pft                =>  plt_morph%ClumpFactor_pft   , &
     NumRootAxes_pft            =>  plt_morph%NumRootAxes_pft    &
   )
   iYearPlanting_pft(NZ)=IYRX(NZ)
@@ -137,7 +137,7 @@ module StartqsMod
   iDayPlantHarvest_pft(NZ)=IDAYY(NZ)
   PPI(NZ)=PPZ(NZ)
   PPX(NZ)=PPI(NZ)
-  ClumpFactor(NZ)=ClumpFactorInit_pft(NZ)
+  ClumpFactor_pft(NZ)=ClumpFactorInit_pft(NZ)
 
   MaxCanPStomaResistH2O_pft(NZ)=RSMX(NZ)/3600.0_r8
   CO2CuticleResist_pft(NZ)=RSMX(NZ)*1.56_r8
@@ -601,7 +601,7 @@ module StartqsMod
     BranchNumber_pft                  =>  plt_morph%BranchNumber_pft    , &
     ShootNodeNum_brch                 =>  plt_morph%ShootNodeNum_brch  , &
     CanopyLeafArea_pft                =>  plt_morph%CanopyLeafArea_pft  , &
-    CanopyStemArea_lbrch              =>  plt_morph%CanopyStemArea_lbrch  , &
+    CanopyStalkArea_lbrch              =>  plt_morph%CanopyStalkArea_lbrch  , &
     StemAreaZsec_brch                 =>  plt_morph%StemAreaZsec_brch  , &
     CanopyStemArea_pft                =>  plt_morph%CanopyStemArea_pft  , &
     NodeNumberAtAnthesis_brch         =>  plt_morph%NodeNumberAtAnthesis_brch  , &
@@ -610,9 +610,9 @@ module StartqsMod
     SeedNumSet_brch                =>  plt_morph%SeedNumSet_brch  , &
     LeafAreaLive_brch                 =>  plt_morph%LeafAreaLive_brch  , &
     LeafAreaDying_brch                =>  plt_morph%LeafAreaDying_brch  , &
-    CanopyLeafAreaByLayer_pft         =>  plt_morph%CanopyLeafAreaByLayer_pft  , &
-    CanopyLeafALyr_pft                =>  plt_morph%CanopyLeafALyr_pft  , &
-    CanopyStemArea_lpft                =>  plt_morph%CanopyStemArea_lpft  , &
+    CanopyLeafArea_lpft         =>  plt_morph%CanopyLeafArea_lpft  , &
+    CanopyLeafAreaZ_pft                =>  plt_morph%CanopyLeafAreaZ_pft  , &
+    CanopyStemAreaZ_pft                =>  plt_morph%CanopyStemAreaZ_pft  , &
     LeafAreaZsec_brch                 =>  plt_morph%LeafAreaZsec_brch   , &
     LeafAreaNode_brch                 =>  plt_morph%LeafAreaNode_brch  , &
     CanPBranchHeight                  =>  plt_morph%CanPBranchHeight , &
@@ -703,7 +703,7 @@ module StartqsMod
     LeafAreaDying_brch(NB,NZ)=0._r8
     CanPBranchHeight(NB,NZ)=0._r8
     D5: DO L=1,NumOfCanopyLayers1
-      CanopyStemArea_lbrch(L,NB,NZ)=0._r8
+      CanopyStalkArea_lbrch(L,NB,NZ)=0._r8
       DO N=1,NumOfLeafZenithSectors1
         StemAreaZsec_brch(N,L,NB,NZ)=0._r8
       enddo
@@ -721,7 +721,7 @@ module StartqsMod
 
 
       D55: DO L=1,NumOfCanopyLayers1
-        CanopyLeafAreaByLayer_pft(L,K,NB,NZ)=0._r8
+        CanopyLeafArea_lpft(L,K,NB,NZ)=0._r8
         plt_biom%LeafChemElmByLayerNode_brch(1:NumPlantChemElms,L,K,NB,NZ)=0._r8
       ENDDO D55
       IF(K.NE.0)THEN
@@ -738,9 +738,9 @@ module StartqsMod
     enddo
   ENDDO D25
   D35: DO L=1,NumOfCanopyLayers1
-    CanopyLeafALyr_pft(L,NZ)=0._r8
+    CanopyLeafAreaZ_pft(L,NZ)=0._r8
     plt_biom%CanopyLeafCLyr_pft(L,NZ)=0._r8
-    CanopyStemArea_lpft(L,NZ)=0._r8
+    CanopyStemAreaZ_pft(L,NZ)=0._r8
   ENDDO D35
   plt_biom%CanopyNonstElms_pft(1:NumPlantChemElms,NZ)=0._r8
   plt_biom%CanopyNonstElmConc_pft(1:NumPlantChemElms,NZ)=0._r8

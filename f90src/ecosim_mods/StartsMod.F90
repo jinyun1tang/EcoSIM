@@ -190,10 +190,10 @@ module StartsMod
 !
 !     INITIALIZE COMMUNITY CANOPY
 !
-  MaxCanopyHeight_grd(:,:)=0.0_r8
-  CanopyHeightz_col(0:NumOfCanopyLayers,:,:)=0.0_r8
-  CanopyLAgrid_lyr(1:NumOfCanopyLayers,:,:)=0.0_r8
-  CanopyStemA_lyr(1:NumOfCanopyLayers,:,:)=0.0_r8
+  CanopyHeight_col(:,:)=0.0_r8
+  CanopyHeightZ_col(0:NumOfCanopyLayers,:,:)=0.0_r8
+  CanopyLeafAareZ_col(1:NumOfCanopyLayers,:,:)=0.0_r8
+  CanopyStemAareZ_col(1:NumOfCanopyLayers,:,:)=0.0_r8
   WGLFT(1:NumOfCanopyLayers,:,:)=0.0_r8
 
 !
@@ -421,7 +421,7 @@ module StartsMod
         POROS(L,NY,NX)=1.0_r8
       ENDIF
       POROSI(L,NY,NX)=POROS(L,NY,NX)*FracSoiAsMicP(L,NY,NX)
-      VLMicP(L,NY,NX)=POROS(L,NY,NX)*VLSoilPoreMicP(L,NY,NX)
+      VLMicP(L,NY,NX)=POROS(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
       VLMicPt0(L,NY,NX)=VLMicP(L,NY,NX)
       VLMacP(L,NY,NX)=SoilFracAsMacP(L,NY,NX)*VGeomLayert0(L,NY,NX)
       !
@@ -474,10 +474,10 @@ module StartsMod
         ELSE
           THETI(L,NY,NX)=THI(L,NY,NX)
         ENDIF
-        VLWatMicP(L,NY,NX)=THETW(L,NY,NX)*VLSoilPoreMicP(L,NY,NX)
+        VLWatMicP(L,NY,NX)=THETW(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
         VLWatMicPX(L,NY,NX)=VLWatMicP(L,NY,NX)
         VLWatMacP(L,NY,NX)=THETW(L,NY,NX)*VLMacP(L,NY,NX)
-        VLiceMicP(L,NY,NX)=THETI(L,NY,NX)*VLSoilPoreMicP(L,NY,NX)
+        VLiceMicP(L,NY,NX)=THETI(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
         VLiceMacP(L,NY,NX)=THETI(L,NY,NX)*VLMacP(L,NY,NX)
 !       total air-filled porosity, micropores + macropores
         VLsoiAirP(L,NY,NX)=AZMAX1(VLMicP(L,NY,NX)-VLWatMicP(L,NY,NX)-VLiceMicP(L,NY,NX)) &
@@ -817,8 +817,8 @@ module StartsMod
   TSHX(:,:)=0.0_r8
   Eco_NEE_col(:,:)=0.0_r8
   CanH2OHeldVg(:,:)=0.0_r8
-  CanopyLeafArea_grd(:,:)=0.0_r8
-  StemArea_grd(:,:)=0.0_r8
+  CanopyLeafArea_col(:,:)=0.0_r8
+  StemArea_col(:,:)=0.0_r8
   PrecIntcptByCanG(:,:)=0.0_r8
   PPT(:,:)=0.0_r8
   DayLenthCurrent(:,:)=12.0_r8
@@ -880,12 +880,12 @@ module StartsMod
       !volume of litter layer
       VLitR(NY,NX)=VLitR0*ppmc*AREA(3,L,NY,NX)
       VGeomLayer(L,NY,NX)=VLitR(NY,NX)
-      VLSoilPoreMicP(L,NY,NX)=VGeomLayer(L,NY,NX)
-      VLSoilMicP(L,NY,NX)=VLSoilPoreMicP(L,NY,NX)
+      VLSoilPoreMicP_vr(L,NY,NX)=VGeomLayer(L,NY,NX)
+      VLSoilMicP(L,NY,NX)=VLSoilPoreMicP_vr(L,NY,NX)
       VGeomLayert0(L,NY,NX)=VGeomLayer(L,NY,NX)
       SoilMicPMassLayer(L,NY,NX)=MWC2Soil*ORGC(L,NY,NX)  !mass of soil layer, Mg/d2
       !thickness of litter layer 
-      DLYRI(3,L,NY,NX)=VLSoilPoreMicP(L,NY,NX)/AREA(3,L,NY,NX)  
+      DLYRI(3,L,NY,NX)=VLSoilPoreMicP_vr(L,NY,NX)/AREA(3,L,NY,NX)  
       DLYR(3,L,NY,NX)=DLYRI(3,L,NY,NX)
     ELSE
 !     if it is a standing water, no macropore fraction
@@ -905,12 +905,12 @@ module StartsMod
       CumSoilThickness(L,NY,NX)=CumDepth2LayerBottom(L,NY,NX)-CumDepth2LayerBottom(NU(NY,NX),NY,NX)+DLYR(3,NU(NY,NX),NY,NX)
       DPTHZ(L,NY,NX)=0.5_r8*(CumSoilThickness(L,NY,NX)+CumSoilThickness(L-1,NY,NX))
       VGeomLayer(L,NY,NX)=amax1(AREA(3,L,NY,NX)*DLYR(3,L,NY,NX),1.e-8_r8)
-      VLSoilPoreMicP(L,NY,NX)=VGeomLayer(L,NY,NX)*FracSoiAsMicP(L,NY,NX)
-      VLSoilMicP(L,NY,NX)=VLSoilPoreMicP(L,NY,NX)
+      VLSoilPoreMicP_vr(L,NY,NX)=VGeomLayer(L,NY,NX)*FracSoiAsMicP(L,NY,NX)
+      VLSoilMicP(L,NY,NX)=VLSoilPoreMicP_vr(L,NY,NX)
       VGeomLayert0(L,NY,NX)=VGeomLayer(L,NY,NX)
 !     bulk density is defined only for soil with micropores
 !     bulk soil mass evaluated as micropore volume
-      SoilMicPMassLayer(L,NY,NX)=SoiBulkDensity(L,NY,NX)*VLSoilPoreMicP(L,NY,NX)
+      SoilMicPMassLayer(L,NY,NX)=SoiBulkDensity(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
       RTDNT(L,NY,NX)=0.0_r8
     ENDIF
     AREA(1,L,NY,NX)=DLYR(3,L,NY,NX)*DLYR(2,L,NY,NX)
@@ -1085,10 +1085,10 @@ module StartsMod
 !
 !     INITIALIZE COMMUNITY CANOPY
 !
-  MaxCanopyHeight_grd(:,:)=0.0_r8
-  CanopyHeightz_col(0:NumOfCanopyLayers,:,:)=0.0_r8
-  CanopyLAgrid_lyr(1:NumOfCanopyLayers,:,:)=0.0_r8
-  CanopyStemA_lyr(1:NumOfCanopyLayers,:,:)=0.0_r8
+  CanopyHeight_col(:,:)=0.0_r8
+  CanopyHeightZ_col(0:NumOfCanopyLayers,:,:)=0.0_r8
+  CanopyLeafAareZ_col(1:NumOfCanopyLayers,:,:)=0.0_r8
+  CanopyStemAareZ_col(1:NumOfCanopyLayers,:,:)=0.0_r8
   WGLFT(1:NumOfCanopyLayers,:,:)=0.0_r8
 
 !

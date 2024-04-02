@@ -828,16 +828,16 @@ implicit none
     PotentialSeedSites_brch       => plt_morph%PotentialSeedSites_brch      , &
     SeedNumSet_brch               => plt_morph%SeedNumSet_brch              , &
     LeafAreaLive_brch             => plt_morph%LeafAreaLive_brch            , &
-    CanopyStemArea_lbrch          => plt_morph%CanopyStemArea_lbrch         , &
+    CanopyStalkArea_lbrch          => plt_morph%CanopyStalkArea_lbrch         , &
     NumOfBranches_pft             => plt_morph%NumOfBranches_pft            , &
     LeafAreaNode_brch             => plt_morph%LeafAreaNode_brch            , &
     PetioleLengthNode_brch        => plt_morph%PetioleLengthNode_brch       , &
     InternodeHeightDying_brch     => plt_morph%InternodeHeightDying_brch    , &
     LeafAreaZsec_brch             => plt_morph%LeafAreaZsec_brch            , &
     LiveInterNodeHight_brch      => plt_morph%LiveInterNodeHight_brch     , &
-    CanopyLeafALyr_pft            => plt_morph%CanopyLeafALyr_pft           , &
+    CanopyLeafAreaZ_pft            => plt_morph%CanopyLeafAreaZ_pft           , &
     StemAreaZsec_brch             => plt_morph%StemAreaZsec_brch            , &
-    CanopyLeafAreaByLayer_pft     => plt_morph%CanopyLeafAreaByLayer_pft      &
+    CanopyLeafArea_lpft     => plt_morph%CanopyLeafArea_lpft      &
   )
 !
 !     CPOOL,ZPOOL,PPOOL=non-structural C,N,P in branch
@@ -901,9 +901,9 @@ implicit none
     PetioleElmntNode_brch(1:NumPlantChemElms,K,NB,NZ)=0._r8
     InternodeStrutElms_brch(1:NumPlantChemElms,K,NB,NZ)=0._r8
     D8865: DO L=1,NumOfCanopyLayers1
-      CanopyLeafALyr_pft(L,NZ)=CanopyLeafALyr_pft(L,NZ)-CanopyLeafAreaByLayer_pft(L,K,NB,NZ)
+      CanopyLeafAreaZ_pft(L,NZ)=CanopyLeafAreaZ_pft(L,NZ)-CanopyLeafArea_lpft(L,K,NB,NZ)
       CanopyLeafCLyr_pft(L,NZ)=CanopyLeafCLyr_pft(L,NZ)-LeafChemElmByLayerNode_brch(ielmc,L,K,NB,NZ)
-      CanopyLeafAreaByLayer_pft(L,K,NB,NZ)=0._r8
+      CanopyLeafArea_lpft(L,K,NB,NZ)=0._r8
       LeafChemElmByLayerNode_brch(1:NumPlantChemElms,L,K,NB,NZ)=0._r8
       IF(K.NE.0)THEN
         D8860: DO N=1,NumOfLeafZenithSectors1
@@ -913,7 +913,7 @@ implicit none
     ENDDO D8865
   ENDDO D8855
   D8875: DO L=1,NumOfCanopyLayers1
-    CanopyStemArea_lbrch(L,NB,NZ)=0._r8
+    CanopyStalkArea_lbrch(L,NB,NZ)=0._r8
     DO  N=1,NumOfLeafZenithSectors1
       StemAreaZsec_brch(N,L,NB,NZ)=0._r8
     enddo

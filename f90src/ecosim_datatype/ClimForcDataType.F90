@@ -95,10 +95,10 @@ implicit none
   real(r8),target,allocatable ::  SolarNoonHour_col(:,:)                         !time of solar noon, [h]
   real(r8),target,allocatable ::  RadSWDirect_col(:,:)                          !direct shortwave radiation, [W m-2]
   real(r8),target,allocatable ::  RadSWDiffus_col(:,:)                          !diffuse shortwave radiation, [W m-2]
-  real(r8),target,allocatable ::  PARDirect_col(:,:)                          !direct PAR, [umol m-2 s-1]
-  real(r8),target,allocatable ::  PARDiffus_col(:,:)                          !diffuse PAR, [umol m-2 s-1]
-  real(r8),target,allocatable ::  SineSolarIncliAngle(:,:)                          !sine of solar angle, [-]
-  real(r8),target,allocatable ::  SineSolarIncliAngleNextHour(:,:)                         !sine of solar angle next hour, [-]
+  real(r8),target,allocatable ::  RadPARDirect_col(:,:)                          !direct PAR, [umol m-2 s-1]
+  real(r8),target,allocatable ::  RadPARDiffus_col(:,:)                          !diffuse PAR, [umol m-2 s-1]
+  real(r8),target,allocatable ::  SineSunInclAngle_col(:,:)                          !sine of solar angle, [-]
+  real(r8),target,allocatable ::  SineSunInclAnglNxtHour_col(:,:)                         !sine of solar angle next hour, [-]
   real(r8),target,allocatable ::  TLEX(:,:)                          !total latent heat flux x boundary layer resistance, [MJ m-1]
   real(r8),target,allocatable ::  TSHX(:,:)                          !total sensible heat flux x boundary layer resistance, [MJ m-1]
   real(r8),target,allocatable ::  Canopy_Heat_Latent_col(:,:)                          !total latent heat flux x boundary layer resistance, [MJ m-1]
@@ -225,10 +225,10 @@ implicit none
   allocate(SolarNoonHour_col(JY,JX));       SolarNoonHour_col=0._r8
   allocate(RadSWDirect_col(JY,JX));        RadSWDirect_col=0._r8
   allocate(RadSWDiffus_col(JY,JX));        RadSWDiffus_col=0._r8
-  allocate(PARDirect_col(JY,JX));        PARDirect_col=0._r8
-  allocate(PARDiffus_col(JY,JX));        PARDiffus_col=0._r8
-  allocate(SineSolarIncliAngle(JY,JX));        SineSolarIncliAngle=0._r8
-  allocate(SineSolarIncliAngleNextHour(JY,JX));       SineSolarIncliAngleNextHour=0._r8
+  allocate(RadPARDirect_col(JY,JX));        RadPARDirect_col=0._r8
+  allocate(RadPARDiffus_col(JY,JX));        RadPARDiffus_col=0._r8
+  allocate(SineSunInclAngle_col(JY,JX));        SineSunInclAngle_col=0._r8
+  allocate(SineSunInclAnglNxtHour_col(JY,JX));       SineSunInclAnglNxtHour_col=0._r8
   allocate(TLEX(JY,JX));        TLEX=0._r8
   allocate(TSHX(JY,JX));        TSHX=0._r8
   allocate(Canopy_Heat_Latent_col(JY,JX));        Canopy_Heat_Latent_col=0._r8
@@ -355,10 +355,10 @@ implicit none
   call destroy(CO2E)
   call destroy(RadSWDirect_col)
   call destroy(RadSWDiffus_col)
-  call destroy(PARDirect_col)
-  call destroy(PARDiffus_col)
-  call destroy(SineSolarIncliAngle)
-  call destroy(SineSolarIncliAngleNextHour)
+  call destroy(RadPARDirect_col)
+  call destroy(RadPARDiffus_col)
+  call destroy(SineSunInclAngle_col)
+  call destroy(SineSunInclAnglNxtHour_col)
   call destroy(TLEX)
   call destroy(TSHX)
   call destroy(Canopy_Heat_Latent_col)

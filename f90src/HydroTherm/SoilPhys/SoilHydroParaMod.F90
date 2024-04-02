@@ -60,7 +60,7 @@ contains
   ! FCI,WPI=FC,WP of ice
   ! THETIX=ice concentration
 !
-    IF(SoilMicPMassLayer(L,NY,NX).GT.ZEROS(NY,NX).AND.VLSoilPoreMicP(L,NY,NX).GT.ZEROS(NY,NX))THEN
+    IF(SoilMicPMassLayer(L,NY,NX).GT.ZEROS(NY,NX).AND.VLSoilPoreMicP_vr(L,NY,NX).GT.ZEROS(NY,NX))THEN
       THETW1=AZMAX1(AMIN1(POROS(L,NY,NX),VLWatMicP(L,NY,NX)/VLSoilMicP(L,NY,NX)),1.e-6_r8)
       IF(THETW1.LT.FieldCapacity(L,NY,NX))THEN
         PSISoilMatricP(L,NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIFLD(NY,NX) &
@@ -71,7 +71,7 @@ contains
       ELSE
         PSISoilMatricP(L,NY,NX)=PSISE(L,NY,NX)
       ENDIF
-    ELSE IF(VLSoilPoreMicP(L,NY,NX).GT.ZEROS2(NY,NX).and.THETI(L,NY,NX)>ZEROS2(NY,NX))THEN
+    ELSE IF(VLSoilPoreMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX).and.THETI(L,NY,NX)>ZEROS2(NY,NX))THEN
       FCX=FCI*THETI(L,NY,NX)
       WPX=WPI*THETI(L,NY,NX)
       FCLX=LOG(FCX)
@@ -234,10 +234,10 @@ contains
 
       IF(cold_run())THEN
       !in a cold run, set it
-        VLWatMicP(L,NY,NX)=THETW(L,NY,NX)*VLSoilPoreMicP(L,NY,NX)
+        VLWatMicP(L,NY,NX)=THETW(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
         VLWatMicPX(L,NY,NX)=VLWatMicP(L,NY,NX)
         VLWatMacP(L,NY,NX)=THETW(L,NY,NX)*VLMacP(L,NY,NX)
-        VLiceMicP(L,NY,NX)=THETI(L,NY,NX)*VLSoilPoreMicP(L,NY,NX)
+        VLiceMicP(L,NY,NX)=THETI(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
         VLiceMacP(L,NY,NX)=THETI(L,NY,NX)*VLMacP(L,NY,NX)
         VHeatCapacity(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+Cpw*(VLWatMicP(L,NY,NX) &
           +VLWatMacP(L,NY,NX))+Cpi*(VLiceMicP(L,NY,NX)+VLiceMacP(L,NY,NX))

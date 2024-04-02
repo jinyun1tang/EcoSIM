@@ -86,7 +86,7 @@ module PlantBranchMod
     iPlantCalendar_brch          =>  plt_pheno%iPlantCalendar_brch        , &
     iPlantTurnoverPattern_pft    =>  plt_pheno%iPlantTurnoverPattern_pft  , &
     iPlantPhenolPattern_pft      =>  plt_pheno%iPlantPhenolPattern_pft    , &
-    SineSolarIncliAngleNextHour  =>  plt_rad%SineSolarIncliAngleNextHour  , &
+    SineSunInclAnglNxtHour_col  =>  plt_rad%SineSunInclAnglNxtHour_col  , &
     PlantPopulation_pft          =>  plt_site%PlantPopulation_pft         , &
     ZERO                         =>  plt_site%ZERO                        , &
     MainBranchNum_pft            =>  plt_morph%MainBranchNum_pft            &
@@ -206,13 +206,13 @@ module PlantBranchMod
     !     ALLOCATE LEAF AREA TO INCLINATION CLASSES ACCORDING TO
     !     DISTRIBUTION ENTERED IN 'READQ' ASSUMING AZIMUTH IS UNIFORM
     !
-    !     SineSolarIncliAngle=sine of solar angle
+    !     SineSunInclAngle_col=sine of solar angle
     !     LeafAreaZsec_brch=leaf node surface area in canopy layer
-    !     LeafAreaNode_brch,CanopyLeafAreaByLayer_pft=leaf node surface area in canopy layer
+    !     LeafAreaNode_brch,CanopyLeafArea_lpft=leaf node surface area in canopy layer
     !     ZC,DPTHS=canopy,snowpack height
     !     CLASS=leaf inclination class
     !
-    IF(SineSolarIncliAngleNextHour.GT.0.0_r8)THEN
+    IF(SineSunInclAnglNxtHour_col.GT.0.0_r8)THEN
       call LeafClassAllocation(NB,NZ)
     ENDIF
 
@@ -811,7 +811,7 @@ module PlantBranchMod
   )
 ! begin_execution
 ! FDBK=N,P feedback inhibition on C3 CO2 fixation
-! SineSolarIncliAngle=sine of solar angle
+! SineSunInclAngle_col=sine of solar angle
 ! RADP=total PAR absorbed by canopy
 ! CanopyGasCO2_pft=canopy air CO2 concentration
 !
@@ -1625,17 +1625,17 @@ module PlantBranchMod
     WDLF                         =>  plt_morph%WDLF                        , &
     SeedDepth_pft                =>  plt_morph%SeedDepth_pft               , &
     MainBranchNum_pft            =>  plt_morph%MainBranchNum_pft           , &
-    CanopyLeafAreaByLayer_pft    =>  plt_morph%CanopyLeafAreaByLayer_pft   , &
+    CanopyLeafArea_lpft    =>  plt_morph%CanopyLeafArea_lpft   , &
     PetioleLengthNode_brch       =>  plt_morph%PetioleLengthNode_brch      , &
-    CanopyStemArea_lbrch         =>  plt_morph%CanopyStemArea_lbrch        , &
+    CanopyStalkArea_lbrch         =>  plt_morph%CanopyStalkArea_lbrch        , &
     BranchNumber_brch            =>  plt_morph%BranchNumber_brch           , &
     LiveInterNodeHight_brch      =>  plt_morph%LiveInterNodeHight_brch     , &
-    CanopyHeightz_col            =>  plt_morph%CanopyHeightz_col           , &
+    CanopyHeightZ_col            =>  plt_morph%CanopyHeightZ_col           , &
     CanopyHeight_pft             =>  plt_morph%CanopyHeight_pft            , &
     HypoctoHeight_pft            =>  plt_morph%HypoctoHeight_pft           , &
     CLASS                        =>  plt_morph%CLASS                       , &
     LeafAreaNode_brch            =>  plt_morph%LeafAreaNode_brch           , &
-    CanopyLeafALyr_pft           =>  plt_morph%CanopyLeafALyr_pft          , &
+    CanopyLeafAreaZ_pft           =>  plt_morph%CanopyLeafAreaZ_pft          , &
     PlantPopulation_pft          =>  plt_site%PlantPopulation_pft          , &
     ZERO                         =>  plt_site%ZERO                         , &
     SineLeafAngle                =>  plt_rad%SineLeafAngle                   &
@@ -1660,12 +1660,12 @@ module PlantBranchMod
   IF(HypoctoHeight_pft(NZ).GT.SeedDepth_pft(NZ))THEN
     D540: DO K=0,MaxNodesPerBranch1
       DO  L=1,NumOfCanopyLayers1
-        CanopyLeafAreaByLayer_pft(L,K,NB,NZ)=0._r8
+        CanopyLeafArea_lpft(L,K,NB,NZ)=0._r8
         LeafChemElmByLayerNode_brch(1:NumPlantChemElms,L,K,NB,NZ)=0._r8
       enddo
     ENDDO D540
     D535: DO L=1,NumOfCanopyLayers1
-      CanopyStemArea_lbrch(L,NB,NZ)=0._r8
+      CanopyStalkArea_lbrch(L,NB,NZ)=0._r8
     ENDDO D535
 !
 !   BRANCH HEIGHT
@@ -1734,11 +1734,11 @@ module PlantBranchMod
         LL=0
         D550: DO L=NumOfCanopyLayers1,1,-1
           IF(LU.EQ.1 .AND. LL.EQ.1)exit
-          IF((HeightLeafTip.GT.CanopyHeightz_col(L-1).OR.CanopyHeightz_col(L-1).LE.ZERO).AND.LU.EQ.0)THEN
+          IF((HeightLeafTip.GT.CanopyHeightZ_col(L-1).OR.CanopyHeightZ_col(L-1).LE.ZERO).AND.LU.EQ.0)THEN
             LNumHeightLeafTip=MAX(1,L)
             LU=1
           ENDIF
-          IF((HeightLeafLow.GT.CanopyHeightz_col(L-1).OR.CanopyHeightz_col(L-1).LE.ZERO).AND.LL.EQ.0)THEN
+          IF((HeightLeafLow.GT.CanopyHeightZ_col(L-1).OR.CanopyHeightZ_col(L-1).LE.ZERO).AND.LL.EQ.0)THEN
             LNumHeightLeafBase=MAX(1,L)
             LL=1
           ENDIF
@@ -1746,9 +1746,9 @@ module PlantBranchMod
         D570: DO L=LNumHeightLeafBase,LNumHeightLeafTip
           IF(LNumHeightLeafTip.EQ.LNumHeightLeafBase)THEN
             FRACL=CLASS(N,NZ)
-          ELSEIF(HeightLeafTip.GT.HeightLeafLow.AND.CanopyHeightz_col(L).GT.HeightLeafLow)THEN
-            FRACL=CLASS(N,NZ)*(AMIN1(HeightLeafTip,CanopyHeightz_col(L)) &
-              -AMAX1(HeightLeafLow,CanopyHeightz_col(L-1)))/(HeightLeafTip-HeightLeafLow)
+          ELSEIF(HeightLeafTip.GT.HeightLeafLow.AND.CanopyHeightZ_col(L).GT.HeightLeafLow)THEN
+            FRACL=CLASS(N,NZ)*(AMIN1(HeightLeafTip,CanopyHeightZ_col(L)) &
+              -AMAX1(HeightLeafLow,CanopyHeightZ_col(L-1)))/(HeightLeafTip-HeightLeafLow)
           ELSE
             FRACL=CLASS(N,NZ)
           ENDIF
@@ -1759,16 +1759,16 @@ module PlantBranchMod
 !
     !     ACCUMULATE LAYER LEAF AREAS, C, N AND P CONTENTS
     !
-    !     CanopyLeafAreaByLayer_pft=leaf node area in canopy layer
+    !     CanopyLeafArea_lpft=leaf node area in canopy layer
     !     WGLFL,WGLFLN,WGLFLP=leaf node C,N,P in canopy layer
-    !     CanopyLeafALyr_pft,CanopyLeafCLyr_pft=total leaf area,C in canopy layer
+    !     CanopyLeafAreaZ_pft,CanopyLeafCLyr_pft=total leaf area,C in canopy layer
     !     LiveInterNodeHight_brch=internode length
     !
-          CanopyLeafAreaByLayer_pft(L,K,NB,NZ)=CanopyLeafAreaByLayer_pft(L,K,NB,NZ)+YLeafArea_brch
+          CanopyLeafArea_lpft(L,K,NB,NZ)=CanopyLeafArea_lpft(L,K,NB,NZ)+YLeafArea_brch
           DO NE=1,NumPlantChemElms
             LeafChemElmByLayerNode_brch(NE,L,K,NB,NZ)=LeafChemElmByLayerNode_brch(NE,L,K,NB,NZ)+YLeafElmntNode_brch(NE)
           ENDDO
-          CanopyLeafALyr_pft(L,NZ)=CanopyLeafALyr_pft(L,NZ)+YLeafArea_brch
+          CanopyLeafAreaZ_pft(L,NZ)=CanopyLeafAreaZ_pft(L,NZ)+YLeafArea_brch
           CanopyLeafCLyr_pft(L,NZ)=CanopyLeafCLyr_pft(L,NZ)+YLeafElmntNode_brch(ielmc)
         ENDDO D570
         TLGLF=TLGLF+LeafElevation
@@ -1798,7 +1798,7 @@ module PlantBranchMod
   !     DSTK,VSTK=stalk density (Mg m-3),specific volume (m3 g-1)
   !     StalkBiomassC_brch=stalk sapwood mass
   !     FRACL=stalk fraction in each layer
-  !     CanopyStemArea_lbrch=total branch stalk surface area in each layer
+  !     CanopyStalkArea_lbrch=total branch stalk surface area in each layer
   !
   !     IF(NZ.EQ.1)THEN
   !     WRITE(*,6679)'K1',I,J,NZ,NB,K1,KHiestGroLeafNode_brch(NB,NZ)
@@ -1811,11 +1811,11 @@ module PlantBranchMod
       LL=0
       D545: DO L=NumOfCanopyLayers1,1,-1
         IF(LU.EQ.1 .AND. LL.EQ.1)exit
-        IF((HeightLeafBase.GT.CanopyHeightz_col(L-1).OR.CanopyHeightz_col(L-1).LE.ZERO).AND.LU.EQ.0)THEN
+        IF((HeightLeafBase.GT.CanopyHeightZ_col(L-1).OR.CanopyHeightZ_col(L-1).LE.ZERO).AND.LU.EQ.0)THEN
           LHTBRU=MAX(1,L)
           LU=1
         ENDIF
-        IF((HeightBranchBase.GT.CanopyHeightz_col(L-1).OR.CanopyHeightz_col(L-1).LE.ZERO).AND.LL.EQ.0)THEN
+        IF((HeightBranchBase.GT.CanopyHeightZ_col(L-1).OR.CanopyHeightZ_col(L-1).LE.ZERO).AND.LL.EQ.0)THEN
           LHTBRL=MAX(1,L)
           LL=1
         ENDIF
@@ -1838,27 +1838,27 @@ module PlantBranchMod
         !     ENDIF
       D445: DO L=LHTBRL,LHTBRU
         IF(HeightLeafBase.GT.HeightBranchBase)THEN
-          IF(HeightLeafBase.GT.CanopyHeightz_col(L-1))THEN
-            FRACL=(AMIN1(HeightLeafBase,CanopyHeightz_col(L))-AMAX1(HeightBranchBase &
-              ,CanopyHeightz_col(L-1)))/(HeightLeafBase-HeightBranchBase)
+          IF(HeightLeafBase.GT.CanopyHeightZ_col(L-1))THEN
+            FRACL=(AMIN1(HeightLeafBase,CanopyHeightZ_col(L))-AMAX1(HeightBranchBase &
+              ,CanopyHeightZ_col(L-1)))/(HeightLeafBase-HeightBranchBase)
           ELSE
             FRACL=0._r8
           ENDIF
         ELSE
           FRACL=1.0_r8
         ENDIF
-        CanopyStemArea_lbrch(L,NB,NZ)=FRACL*ARSTKB
+        CanopyStalkArea_lbrch(L,NB,NZ)=FRACL*ARSTKB
       ENDDO D445
     ELSE
       StalkBiomassC_brch(NB,NZ)=0._r8
       D450: DO L=1,NumOfCanopyLayers1
-        CanopyStemArea_lbrch(L,NB,NZ)=0._r8
+        CanopyStalkArea_lbrch(L,NB,NZ)=0._r8
       ENDDO D450
     ENDIF
   ELSE
     StalkBiomassC_brch(NB,NZ)=0._r8
     D455: DO L=1,NumOfCanopyLayers1
-      CanopyStemArea_lbrch(L,NB,NZ)=0._r8
+      CanopyStalkArea_lbrch(L,NB,NZ)=0._r8
     ENDDO D455
   ENDIF
   end associate
@@ -1873,9 +1873,9 @@ module PlantBranchMod
   associate(                             &
     SineBranchAngle_pft         =>  plt_morph%SineBranchAngle_pft    , &
     LeafAreaNode_brch           =>  plt_morph%LeafAreaNode_brch    , &
-    CanopyStemArea_lbrch         =>  plt_morph%CanopyStemArea_lbrch    , &
+    CanopyStalkArea_lbrch         =>  plt_morph%CanopyStalkArea_lbrch    , &
     CLASS                       =>  plt_morph%CLASS    , &
-    CanopyLeafAreaByLayer_pft   =>  plt_morph%CanopyLeafAreaByLayer_pft    , &
+    CanopyLeafArea_lpft   =>  plt_morph%CanopyLeafArea_lpft    , &
     StemAreaZsec_brch           =>  plt_morph%StemAreaZsec_brch    , &
     MainBranchNum_pft           =>  plt_morph%MainBranchNum_pft      , &
     LeafAreaZsec_brch           =>  plt_morph%LeafAreaZsec_brch       &
@@ -1894,9 +1894,9 @@ module PlantBranchMod
 !     ARLFXB=ARLFXB+LeafAreaNode_brch(K,NB,NZ)
     IF(LeafAreaNode_brch(K,NB,NZ).GT.0.0_r8)THEN
       D700: DO L=NumOfCanopyLayers1,1,-1
-!       ARLFXL=ARLFXL+CanopyLeafAreaByLayer_pft(L,K,NB,NZ)
+!       ARLFXL=ARLFXL+CanopyLeafArea_lpft(L,K,NB,NZ)
         D800: DO N=1,NumOfLeafZenithSectors1
-          LeafAreaZsec_brch(N,L,K,NB,NZ)=AZMAX1(CLASS(N,NZ)*0.25_r8*CanopyLeafAreaByLayer_pft(L,K,NB,NZ))
+          LeafAreaZsec_brch(N,L,K,NB,NZ)=AZMAX1(CLASS(N,NZ)*0.25_r8*CanopyLeafArea_lpft(L,K,NB,NZ))
   !       SURFXX=SURFXX+LeafAreaZsec_brch(N,L,K,NB,NZ)
         ENDDO D800
       ENDDO D700
@@ -1908,7 +1908,7 @@ module PlantBranchMod
 !
 ! StemAreaZsec_brch=stalk surface area in canopy layer
 ! SineBranchAngle_pft=stem angle from horizontal
-! CanopyStemArea_lbrch=total branch stalk surface area in each layer
+! CanopyStalkArea_lbrch=total branch stalk surface area in each layer
 !
   D910: DO L=1,NumOfCanopyLayers1
     DO  N=1,NumOfLeafZenithSectors1
@@ -1923,7 +1923,7 @@ module PlantBranchMod
     N=MIN(NumOfLeafZenithSectors1,INT(ASIN(SineBranchAngle_pft(NZ))/dangle)+1)
   ENDIF
   D710: DO L=NumOfCanopyLayers1,1,-1
-    StemAreaZsec_brch(N,L,NB,NZ)=CanopyStemArea_lbrch(L,NB,NZ)/real(NumOfLeafZenithSectors1,r8)
+    StemAreaZsec_brch(N,L,NB,NZ)=CanopyStalkArea_lbrch(L,NB,NZ)/real(NumOfLeafZenithSectors1,r8)
   ENDDO D710
   end associate
   end subroutine LeafClassAllocation
@@ -2592,7 +2592,7 @@ module PlantBranchMod
     ZEROP                           =>  plt_biom%ZEROP   , &
     StalkRsrvElms_brch              =>  plt_biom%StalkRsrvElms_brch , &
     StalkBiomassC_brch              =>  plt_biom%StalkBiomassC_brch  , &
-    VLSoilPoreMicP                  =>  plt_soilchem%VLSoilPoreMicP, &
+    VLSoilPoreMicP_vr                  =>  plt_soilchem%VLSoilPoreMicP_vr, &
     iPlantCalendar_brch             =>  plt_pheno%iPlantCalendar_brch , &
     fTgrowCanP                      =>  plt_pheno%fTgrowCanP   , &
     HourReq4LeafOff_brch            =>  plt_pheno%HourReq4LeafOff_brch  , &
@@ -2956,7 +2956,7 @@ module PlantBranchMod
       iPlantCalendar_brch(ipltcal_SetSeedNumber,NB,NZ).NE.0)THEN
       !stalk-root transfer
       D2050: DO L=NU,MaxSoiL4Root(NZ)
-        IF(VLSoilPoreMicP(L).GT.ZEROS2)THEN
+        IF(VLSoilPoreMicP_vr(L).GT.ZEROS2)THEN
           WTRTRX=AMAX1(ZEROP(NZ),RootMycoActiveBiomC_pvr(ipltroot,L,NZ)*FWODRE(ielmc,k_woody_litr))
           WTPLTX=WTRTRX+StalkBiomassC_brch(NB,NZ)
           IF(WTPLTX.GT.ZEROP(NZ))THEN

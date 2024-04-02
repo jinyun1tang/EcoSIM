@@ -149,22 +149,22 @@ implicit none
   real(r8) :: RadPARSolarBeam_col      !PAR radiation in solar beam, [umol m-2 s-1]
   real(r8) :: RadSWDiffus_col     !diffuse shortwave radiation, [W m-2]
   real(r8) :: RadSWDirect_col      !direct shortwave radiation, [W m-2]
-  real(r8) :: PARDiffus_col      !diffuse PAR, [umol m-2 s-1]
-  real(r8) :: PARDirect_col     !direct PAR, [umol m-2 s-1]
+  real(r8) :: RadPARDiffus_col      !diffuse PAR, [umol m-2 s-1]
+  real(r8) :: RadPARDirect_col     !direct PAR, [umol m-2 s-1]
   real(r8) :: Eco_NetRad_col       !ecosystem net radiation, [MJ d-2 h-1]
   real(r8) :: RadSWSolarBeam_col      !shortwave radiation in solar beam, [MJ m-2 h-1]
   real(r8) :: FracSWRad2Grnd     !fraction of radiation intercepted by ground surface, [-]
-  real(r8) :: SWRadOnGrnd      !radiation intercepted by ground surface, [MJ m-2 h-1]
+  real(r8) :: RadSWGrnd_col      !radiation intercepted by ground surface, [MJ m-2 h-1]
   real(r8) :: SineGrndSlope_col      !sine of slope, [-]
   real(r8) :: GroundSurfAzimuth_col     !azimuth of slope, [-]
   real(r8) :: CosineGrndSlope_col      !cosine of slope, [-]
   real(r8) :: LWRadGrnd    !longwave radiation emitted by ground surface, [MJ m-2 h-1]
   real(r8) :: LWRadSky       !sky longwave radiation , [MJ d-2 h-1]
-  real(r8) :: SineSolarIncliAngleNextHour     !sine of solar angle next hour, [-]
-  real(r8) :: SineSolarIncliAngle      !sine of solar angle, [-]
-  real(r8), pointer :: CanopySWAlbedo_pft(:)     => null() !canopy shortwave albedo , [-]
+  real(r8) :: SineSunInclAnglNxtHour_col     !sine of solar angle next hour, [-]
+  real(r8) :: SineSunInclAngle_col      !sine of solar angle, [-]
+  real(r8), pointer :: RadSWLeafAlbedo_pft(:)     => null() !canopy shortwave albedo , [-]
   real(r8), pointer :: CanopyPARalbedo_pft(:)     => null() !canopy PAR albedo , [-]
-  real(r8), pointer :: TAU_RadCapt(:)     => null() !fraction of radiation intercepted by canopy layer, [-]
+  real(r8), pointer :: TAU_DirRadTransm(:)     => null() !fraction of radiation intercepted by canopy layer, [-]
   real(r8), pointer :: TAU_RadThru(:)     => null() !fraction of radiation transmitted by canopy layer, [-]
   real(r8), pointer :: LWRadCanopy_pft(:)    => null() !canopy longwave radiation , [MJ d-2 h-1]
   real(r8), pointer :: RadSWbyCanopy_pft(:)     => null() !canopy absorbed shortwave radiation , [MJ d-2 h-1]
@@ -175,24 +175,24 @@ implicit none
   real(r8), pointer :: CosineLeafAngle(:)     => null() !cosine of leaf angle
   integer,  pointer :: IALBY(:,:,:)=> null() !flag for calculating backscattering of radiation in canopy
   real(r8), pointer :: RadNet2Canopy_pft(:)     => null() !canopy net radiation , [MJ d-2 h-1]
-  real(r8), pointer :: CanopySWabsorpty_pft(:)     => null() !canopy shortwave absorptivity , [-]
-  real(r8), pointer :: CanopyPARabsorpty_pft(:)     => null() !canopy PAR absorptivity
-  real(r8), pointer :: TAUR(:)     => null() !canopy shortwave transmissivity , [-]
-  real(r8), pointer :: TAUP(:)     => null() !canopy PAR transmissivity , [-]
+  real(r8), pointer :: LeafSWabsorpty_pft(:)     => null() !canopy shortwave absorptivity , [-]
+  real(r8), pointer :: LeafPARabsorpty_pft(:)     => null() !canopy PAR absorptivity
+  real(r8), pointer :: RadSWLeafTransmis_pft(:)     => null() !canopy shortwave transmissivity , [-]
+  real(r8), pointer :: RadPARLeafTransmis_pft(:)     => null() !canopy PAR transmissivity , [-]
   real(r8), pointer :: RadPARbyCanopy_pft(:)     => null() !canopy absorbed PAR , [umol m-2 s-1]
   real(r8), pointer :: FracRadPARbyCanopy_pft(:)    => null() !fraction of incoming PAR absorbed by canopy, [-]
-  real(r8), pointer :: PARDirect_zsec(:,:,:,:)=> null()     !direct incoming PAR, [umol m-2 s-1]
-  real(r8), pointer :: PARDiffus_zsec(:,:,:,:)=> null()  !diffuse incoming PAR, [umol m-2 s-1]
+  real(r8), pointer :: RadPAR_zsec(:,:,:,:)=> null()     !direct incoming PAR, [umol m-2 s-1]
+  real(r8), pointer :: RadDifPAR_zsec(:,:,:,:)=> null()  !diffuse incoming PAR, [umol m-2 s-1]
   contains
     procedure, public :: Init    => plt_rad_init
     procedure, public :: Destroy => plt_rad_destroy
   end type plant_radiation_type
 
   type, public :: plant_morph_type
-  real(r8) :: CanopyArea_grd                     !stalk area of combined, each PFT canopy
-  real(r8) :: CanopyLeafArea_grd                     !grid canopy leaf area, [m2 d-2]
-  real(r8) :: StemArea_grd                 !grid canopy stem area, [m2 d-2]
-  real(r8) :: MaxCanopyHeight_grd                        !canopy height , [m]
+  real(r8) :: LeafStalkArea_col                     !stalk area of combined, each PFT canopy
+  real(r8) :: CanopyLeafArea_col                     !grid canopy leaf area, [m2 d-2]
+  real(r8) :: StemArea_col                 !grid canopy stem area, [m2 d-2]
+  real(r8) :: CanopyHeight_col                        !canopy height , [m]
   REAL(R8), pointer :: PARTS_brch(:,:,:)         => null()  !fraction of C allocated to each morph unit
   real(r8), pointer :: RootVolPerMassC_pft(:,:)       => null() !root volume:mass ratio, [m3 g-1]
   real(r8), pointer :: RootPorosity_pft(:,:)       => null() !root porosity, [m3 m-3]
@@ -211,13 +211,13 @@ implicit none
   real(r8), pointer :: Root2ndXNum_rpvr(:,:,:,:)   => null() !root layer number secondary axes, [d-2]
   real(r8), pointer :: Root1stDepz_pft(:,:,:)    => null() !root layer depth, [m]
   real(r8), pointer :: ClumpFactorInit_pft(:)          => null() !initial clumping factor for self-shading in canopy layer, [-]
-  real(r8), pointer :: ClumpFactorCurrent_pft(:)          => null() !clumping factor for self-shading in canopy layer at current LAI, [-]
+  real(r8), pointer :: ClumpFactorNow_pft(:)          => null() !clumping factor for self-shading in canopy layer at current LAI, [-]
   real(r8), pointer :: RootBranchFreq_pft(:)         => null() !root brancing frequency, [m-1]
   real(r8), pointer :: HypoctoHeight_pft(:)        => null() !cotyledon height, [m]
   integer,  pointer :: iPlantNfixType(:)        => null() !N2 fixation type
   integer,  pointer :: MY(:)           => null() !mycorrhizal type (no or yes)
   real(r8), pointer :: CanPHeight4WatUptake(:)        => null() !canopy height, [m]
-  real(r8), pointer :: CanopyHeightz_col(:)  => null() !canopy layer height , [m]
+  real(r8), pointer :: CanopyHeightZ_col(:)  => null() !canopy layer height , [m]
   real(r8), pointer :: CanopyStemArea_pft(:)        => null() !plant stem area, [m2 d-2]
   real(r8), pointer :: CanopyLeafArea_pft(:)        => null() !plant canopy leaf area, [m2 d-2]
   integer,  pointer :: MainBranchNum_pft(:)          => null() !number of main branch
@@ -242,8 +242,8 @@ implicit none
   real(r8), pointer :: LeafAreaLive_brch(:,:)      => null() !branch leaf area, [m2 d-2]
   real(r8), pointer :: SinePetioleAngle_pft(:)        => null() !sheath angle, [degree from horizontal]
   real(r8), pointer :: CLASS(:,:)      => null() !fractionction of leaves in different angle classes, [-]
-  real(r8), pointer :: CanopyStemArea_lpft(:,:)      => null() !plant canopy layer stem area, [m2 d-2]
-  real(r8), pointer :: CanopyLeafALyr_pft(:,:)      => null() !canopy layer leaf area, [m2 d-2]
+  real(r8), pointer :: CanopyStemAreaZ_pft(:,:)      => null() !plant canopy layer stem area, [m2 d-2]
+  real(r8), pointer :: CanopyLeafAreaZ_pft(:,:)      => null() !canopy layer leaf area, [m2 d-2]
   real(r8), pointer :: LeafAreaNode_brch(:,:,:)    => null() !leaf area, [m2 d-2]
   real(r8), pointer :: CanopySeedNum_pft(:)         => null() !canopy grain number, [d-2]
   real(r8), pointer :: SeedDepth_pft(:)        => null() !seeding depth, [m]
@@ -251,19 +251,19 @@ implicit none
   real(r8), pointer :: SeedMeanLen_pft(:)         => null() !seed length, [m]
   real(r8), pointer :: SeedVolumeMean_pft(:)         => null() !seed volume, [m3 ]
   real(r8), pointer :: SeedAreaMean_pft(:)         => null() !seed surface area, [m2]
-  real(r8), pointer :: CanopyStemA_lyr(:)        => null() !total stem area, [m2 d-2]
+  real(r8), pointer :: CanopyStemAareZ_col(:)        => null() !total stem area, [m2 d-2]
   real(r8), pointer :: PetoLen2Mass_pft(:)         => null() !petiole length:mass during growth, [m gC-1]
   real(r8), pointer :: NodeLenPergC(:)         => null() !internode length:mass during growth, [m gC-1]
   real(r8), pointer :: SLA1(:)         => null() !leaf area:mass during growth, [m2 gC-1]
-  real(r8), pointer :: CanopyLAgrid_lyr(:)        => null() !total leaf area, [m2 d-2]
-  real(r8), pointer :: CanopyArea_pft(:)        => null() !plant leaf+stem/stalk area, [m2 d-2]
+  real(r8), pointer :: CanopyLeafAareZ_col(:)        => null() !total leaf area, [m2 d-2]
+  real(r8), pointer :: LeafStalkArea_pft(:)        => null() !plant leaf+stem/stalk area, [m2 d-2]
   real(r8), pointer :: InternodeHeightDying_brch(:,:,:)   => null() !internode height, [m]
   real(r8), pointer :: PetioleLengthNode_brch(:,:,:)    => null() !sheath height, [m]
   real(r8), pointer :: LiveInterNodeHight_brch(:,:,:)   => null() !internode height, [m]
   real(r8), pointer :: StemAreaZsec_brch(:,:,:,:)  => null() !stem surface area, [m2 d-2]
-  real(r8), pointer :: CanopyLeafAreaByLayer_pft(:,:,:,:)  => null() !layer/node/branch leaf area, [m2 d-2]
-  real(r8), pointer :: CanopyStemArea_lbrch(:,:,:)    => null() !plant canopy layer branch stem area, [m2 d-2]
-  real(r8), pointer :: ClumpFactor(:)           => null() !clumping factor for self-shading in canopy layer, [-]
+  real(r8), pointer :: CanopyLeafArea_lpft(:,:,:,:)  => null() !layer/node/branch leaf area, [m2 d-2]
+  real(r8), pointer :: CanopyStalkArea_lbrch(:,:,:)    => null() !plant canopy layer branch stem area, [m2 d-2]
+  real(r8), pointer :: ClumpFactor_pft(:)           => null() !clumping factor for self-shading in canopy layer, [-]
   real(r8), pointer :: ShootNodeNumAtPlanting_pft(:)         => null() !number of nodes in seed, [-]
   real(r8), pointer :: CanopyHeight_pft(:)           => null() !canopy height, [m]
   integer,  pointer :: NGTopRootLayer_pft(:)           => null() !soil layer at planting depth, [-]
@@ -388,7 +388,7 @@ implicit none
 
   real(r8), pointer :: THETW(:)    => null()  !volumetric water content [m3 m-3]
   real(r8), pointer :: THETY(:)    => null()  !air-dry water content, [m3 m-3]
-  real(r8), pointer :: VLSoilPoreMicP(:)     => null()  !volume of soil layer	m3 d-2
+  real(r8), pointer :: VLSoilPoreMicP_vr(:)     => null()  !volume of soil layer	m3 d-2
   real(r8), pointer :: trcs_VLN_vr(:,:)=> null()
 
   real(r8), pointer :: VLSoilMicP(:)     => null()  !total micropore volume in layer [m3 d-2]
@@ -527,11 +527,11 @@ implicit none
 
   type, public :: plant_ew_type
   real(r8) :: SnowDepth          !snowpack depth, [m]
-  real(r8) :: VcumWatSnow        !water volume in snowpack, [m3 d-2]
-  real(r8) :: VcumDrySnoWE       !snow volume in snowpack (water equivalent), [m3 d-2]
+  real(r8) :: VcumWatSnow_col        !water volume in snowpack, [m3 d-2]
+  real(r8) :: VcumDrySnoWE_col       !snow volume in snowpack (water equivalent), [m3 d-2]
   real(r8) :: Canopy_Heat_Sens_col               !total sensible heat flux x boundary layer resistance, [MJ m-1]
-  real(r8) :: VLHeatCapSnowMin    !minimum snowpack heat capacity [MJ d-2 K-1]
-  real(r8) :: VLHeatCapSurfSnow    !snowpack heat capacity, [MJ m-3 K-1]
+  real(r8) :: VLHeatCapSnowMin_col    !minimum snowpack heat capacity [MJ d-2 K-1]
+  real(r8) :: VLHeatCapSurfSnow_col    !snowpack heat capacity, [MJ m-3 K-1]
   real(r8) :: TENGYC    !total canopy heat content, [MJ  d-2]
   real(r8) :: LWRadCanG     !grid total canopy LW emission, [MJ d-2 h-1]
   real(r8) :: TEVAPP    !total canopy evaporation + transpiration, [m3 d-2]
@@ -543,7 +543,7 @@ implicit none
   real(r8) :: CanWatg    !total canopy water content stored with dry matter, [m3 d-2]
   real(r8) :: Eco_Heat_Latent_col       !ecosystem latent heat flux, [MJ d-2 h-1]
   real(r8) :: Canopy_Heat_Latent_col      !total latent heat flux x boundary layer resistance, [MJ m-1]
-  real(r8) :: VcumIceSnow     !ice volume in snowpack, [m3 d-2]
+  real(r8) :: VcumIceSnow_col     !ice volume in snowpack, [m3 d-2]
   real(r8) :: TKSnow       !snow temperature, [K]
   real(r8) :: CanH2OHeldVg    !canopy surface water content, [m3 d-2]
   real(r8) :: Eco_Heat_Sens_col       !ecosystem sensible heat flux, [MJ d-2 h-1]
@@ -624,7 +624,7 @@ implicit none
   real(r8) :: Eco_NBP_col      !total NBP, [g d-2]
   real(r8) :: Eco_GPP_col      !ecosystem GPP, [g d-2 h-1]
 
-  real(r8) :: CNETX     !total net canopy CO2 exchange, [g d-2 h-1]
+  real(r8) :: NetCO2Flx2Canopy_col     !total net canopy CO2 exchange, [g d-2 h-1]
   real(r8) :: ECO_ER_col      !ecosystem respiration, [g d-2 h-1]
   real(r8) :: Eco_AutoR_col      !ecosystem autotrophic respiration, [g d-2 h-1]
   real(r8) :: TH2GZ     !total root H2 flux, [g d-2]
@@ -1436,7 +1436,7 @@ implicit none
 
   allocate(this%trc_solcl_vr(ids_beg:ids_end,0:jZ1));this%trc_solcl_vr=spval
 
-  allocate(this%VLSoilPoreMicP(0:JZ1));this%VLSoilPoreMicP=spval
+  allocate(this%VLSoilPoreMicP_vr(0:JZ1));this%VLSoilPoreMicP_vr=spval
   allocate(this%THETW(0:JZ1));this%THETW=spval
   allocate(this%THETY(0:JZ1));this%THETY=spval
 
@@ -1473,7 +1473,7 @@ implicit none
 !   call destroy(this%GasSolbility_vr)
 !  if(allocated(THETW))deallocate(THETW)
 !  if(allocated(THETY))deallocate(THETY)
-!  if(allocated(VLSoilPoreMicP))deallocate(VLSoilPoreMicP)
+!  if(allocated(VLSoilPoreMicP_vr))deallocate(VLSoilPoreMicP_vr)
 !  if(allocated(CCH4G))deallocate(CCH4G)
 !  if(allocated(CZ2OG))deallocate(CZ2OG)
 !  if(allocated(CNH3G))deallocate(CNH3G)
@@ -1599,11 +1599,11 @@ implicit none
   implicit none
   class(plant_radiation_type) :: this
 
-  allocate(this%PARDirect_zsec(NumOfLeafZenithSectors1,NumOfSkyAzimuSects1,NumOfCanopyLayers1,JP1))
-  allocate(this%PARDiffus_zsec(NumOfLeafZenithSectors1,NumOfSkyAzimuSects1,NumOfCanopyLayers1,JP1))
-  allocate(this%CanopySWAlbedo_pft(JP1))
+  allocate(this%RadPAR_zsec(NumOfLeafZenithSectors1,NumOfSkyAzimuSects1,NumOfCanopyLayers1,JP1))
+  allocate(this%RadDifPAR_zsec(NumOfLeafZenithSectors1,NumOfSkyAzimuSects1,NumOfCanopyLayers1,JP1))
+  allocate(this%RadSWLeafAlbedo_pft(JP1))
   allocate(this%CanopyPARalbedo_pft(JP1))
-  allocate(this%TAU_RadCapt(NumOfCanopyLayers1+1))
+  allocate(this%TAU_DirRadTransm(NumOfCanopyLayers1+1))
   allocate(this%TAU_RadThru(NumOfCanopyLayers1+1))
   allocate(this%LWRadCanopy_pft(JP1))
   allocate(this%RadSWbyCanopy_pft(JP1))
@@ -1614,10 +1614,10 @@ implicit none
   allocate(this%CosineLeafAngle(NumOfLeafZenithSectors1))
   allocate(this%IALBY(NumOfSkyAzimuSects1,NumOfLeafZenithSectors1,NumOfLeafAzimuthSectors1))
   allocate(this%RadNet2Canopy_pft(JP1))
-  allocate(this%CanopySWabsorpty_pft(JP1))
-  allocate(this%CanopyPARabsorpty_pft(JP1))
-  allocate(this%TAUP(JP1))
-  allocate(this%TAUR(JP1))
+  allocate(this%LeafSWabsorpty_pft(JP1))
+  allocate(this%LeafPARabsorpty_pft(JP1))
+  allocate(this%RadPARLeafTransmis_pft(JP1))
+  allocate(this%RadSWLeafTransmis_pft(JP1))
   allocate(this%RadPARbyCanopy_pft(JP1))
   allocate(this%FracRadPARbyCanopy_pft(JP1))
   end subroutine plt_rad_init
@@ -1795,7 +1795,7 @@ implicit none
   allocate(this%RTDNT(JZ1));this%RTDNT=spval
   allocate(this%RootBranchFreq_pft(JP1));this%RootBranchFreq_pft=spval
   allocate(this%ClumpFactorInit_pft(JP1));this%ClumpFactorInit_pft=spval
-  allocate(this%ClumpFactorCurrent_pft(JP1));this%ClumpFactorCurrent_pft=spval
+  allocate(this%ClumpFactorNow_pft(JP1));this%ClumpFactorNow_pft=spval
   allocate(this%HypoctoHeight_pft(JP1));this%HypoctoHeight_pft=spval
   allocate(this%RootPoreTortu4Gas(jroots,JP1));this%RootPoreTortu4Gas=spval
   allocate(this%WDLF(JP1));this%WDLF=spval
@@ -1826,7 +1826,7 @@ implicit none
   allocate(this%NGTopRootLayer_pft(JP1));this%NGTopRootLayer_pft=0;
   allocate(this%CanopyHeight_pft(JP1));this%CanopyHeight_pft=spval
   allocate(this%ShootNodeNumAtPlanting_pft(JP1));this%ShootNodeNumAtPlanting_pft=spval
-  allocate(this%CanopyHeightz_col(0:NumOfCanopyLayers1));this%CanopyHeightz_col=spval
+  allocate(this%CanopyHeightZ_col(0:NumOfCanopyLayers1));this%CanopyHeightZ_col=spval
   allocate(this%CanopyStemArea_pft(JP1));this%CanopyStemArea_pft=spval
   allocate(this%CanopyLeafArea_pft(JP1));this%CanopyLeafArea_pft=spval
   allocate(this%MainBranchNum_pft(JP1));this%MainBranchNum_pft=0
@@ -1851,8 +1851,8 @@ implicit none
   allocate(this%LeafAreaLive_brch(MaxNumBranches,JP1));this%LeafAreaLive_brch=spval
   allocate(this%SinePetioleAngle_pft(JP1));this%SinePetioleAngle_pft=spval
   allocate(this%CLASS(NumOfLeafZenithSectors1,JP1));this%CLASS=spval
-  allocate(this%CanopyStemArea_lpft(NumOfCanopyLayers1,JP1));this%CanopyStemArea_lpft=spval
-  allocate(this%CanopyLeafALyr_pft(NumOfCanopyLayers1,JP1));this%CanopyLeafALyr_pft=spval
+  allocate(this%CanopyStemAreaZ_pft(NumOfCanopyLayers1,JP1));this%CanopyStemAreaZ_pft=spval
+  allocate(this%CanopyLeafAreaZ_pft(NumOfCanopyLayers1,JP1));this%CanopyLeafAreaZ_pft=spval
   allocate(this%LeafAreaNode_brch(0:MaxNodesPerBranch1,MaxNumBranches,JP1));this%LeafAreaNode_brch=spval
   allocate(this%CanopySeedNum_pft(JP1));this%CanopySeedNum_pft=spval
   allocate(this%SeedDepth_pft(JP1));this%SeedDepth_pft=spval
@@ -1860,21 +1860,21 @@ implicit none
   allocate(this%SeedMeanLen_pft(JP1));this%SeedMeanLen_pft=spval
   allocate(this%SeedVolumeMean_pft(JP1));this%SeedVolumeMean_pft=spval
   allocate(this%SeedAreaMean_pft(JP1));this%SeedAreaMean_pft=spval
-  allocate(this%CanopyStemA_lyr(NumOfCanopyLayers1));this%CanopyStemA_lyr=spval
+  allocate(this%CanopyStemAareZ_col(NumOfCanopyLayers1));this%CanopyStemAareZ_col=spval
   allocate(this%PetoLen2Mass_pft(JP1));this%PetoLen2Mass_pft=spval
   allocate(this%NodeLenPergC(JP1));this%NodeLenPergC=spval
   allocate(this%SLA1(JP1));this%SLA1=spval
-  allocate(this%CanopyLAgrid_lyr(NumOfCanopyLayers1));this%CanopyLAgrid_lyr=spval
-  allocate(this%CanopyArea_pft(JP1));this%CanopyArea_pft=spval
+  allocate(this%CanopyLeafAareZ_col(NumOfCanopyLayers1));this%CanopyLeafAareZ_col=spval
+  allocate(this%LeafStalkArea_pft(JP1));this%LeafStalkArea_pft=spval
   allocate(this%InternodeHeightDying_brch(0:MaxNodesPerBranch1,MaxNumBranches,JP1));this%InternodeHeightDying_brch=spval
   allocate(this%PetioleLengthNode_brch(0:MaxNodesPerBranch1,MaxNumBranches,JP1));this%PetioleLengthNode_brch=spval
   allocate(this%LiveInterNodeHight_brch(0:MaxNodesPerBranch1,MaxNumBranches,JP1));this%LiveInterNodeHight_brch=spval
   allocate(this%StemAreaZsec_brch(NumOfLeafZenithSectors1,NumOfCanopyLayers1,MaxNumBranches,JP1));this%StemAreaZsec_brch=spval
-  allocate(this%CanopyLeafAreaByLayer_pft(NumOfCanopyLayers1,0:MaxNodesPerBranch1,MaxNumBranches,JP1));this%CanopyLeafAreaByLayer_pft=spval
-  allocate(this%CanopyStemArea_lbrch(NumOfCanopyLayers1,MaxNumBranches,JP1));this%CanopyStemArea_lbrch=spval
+  allocate(this%CanopyLeafArea_lpft(NumOfCanopyLayers1,0:MaxNodesPerBranch1,MaxNumBranches,JP1));this%CanopyLeafArea_lpft=spval
+  allocate(this%CanopyStalkArea_lbrch(NumOfCanopyLayers1,MaxNumBranches,JP1));this%CanopyStalkArea_lbrch=spval
   allocate(this%MaxSoiL4Root(JP1));this%MaxSoiL4Root=0
   allocate(this%SeedNumSet_brch(MaxNumBranches,JP1));this%SeedNumSet_brch=spval
-  allocate(this%ClumpFactor(JP1));this%ClumpFactor=spval
+  allocate(this%ClumpFactor_pft(JP1));this%ClumpFactor_pft=spval
   allocate(this%RootVolPerMassC_pft(jroots,JP1));this%RootVolPerMassC_pft=spval
   allocate(this%RootPorosity_pft(jroots,JP1));this%RootPorosity_pft=spval
   allocate(this%Root2ndXSecArea_pft(jroots,JP1));this%Root2ndXSecArea_pft=spval

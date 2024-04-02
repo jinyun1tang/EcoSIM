@@ -213,7 +213,7 @@ module WatsubMod
     !   BKDS=bulk density
     !   CCLAY=clay concentration
     !   FVOLAH=parameter for clay effect on macropore volume
-    !   VLSoilPoreMicP,VOLT=soil,total volumes
+    !   VLSoilPoreMicP_vr,VOLT=soil,total volumes
     !   WP=wilting point
     !   THETW*,THETI*,THETP*=water,ice,air-filled porosity
     !   VLHeatCapacity,VHCM=volumetric heat capacities of total volume, solid
@@ -510,7 +510,7 @@ module WatsubMod
 !     SKIP NON-EXISTENT DESTINATION SOIL LAYERS
 !     identified by soil volume
           D1100: DO LL=N6,NL(NY,NX)
-            IF(VLSoilPoreMicP(LL,N5,N4).GT.ZEROS2(N5,N4))THEN
+            IF(VLSoilPoreMicP_vr(LL,N5,N4).GT.ZEROS2(N5,N4))THEN
               N6=LL
               exit
             ENDIF
@@ -524,9 +524,9 @@ module WatsubMod
       !     THETA1,THETAL=micropore water concn in source,destination cells
       !     THETY=hygroscopic water concentration
       !     POROS=soil porosity
-      !     VLSoilPoreMicPI=soil volume excluding rock, macropore
+      !     VLSoilPoreMicP_vrI=soil volume excluding rock, macropore
       !
-          IF(VLSoilPoreMicP(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
+          IF(VLSoilPoreMicP_vr(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
             IF(N3.GE.NUM(N2,N1).AND.N6.GE.NUM(N5,N4).AND.N3.LE.NL(N2,N1).AND.N6.LE.NL(N5,N4))THEN
               !within the calculation domain
               ! source layer
@@ -824,7 +824,7 @@ module WatsubMod
           ! BOUNDARY SUBSURFACE WATER AND HEAT TRANSFER DEPENDING
           ! ON LEVEL OF WATER TABLE
 !
-            IF(VLSoilPoreMicP(N3,N2,N1).GT.ZEROS2(NY,NX))THEN
+            IF(VLSoilPoreMicP_vr(N3,N2,N1).GT.ZEROS2(NY,NX))THEN
               IF(FlowDirIndicator(N2,N1).NE.ivertdir.OR.N.EQ.ivertdir)THEN
               !including lateral connection or woking on vertical direction
 !
@@ -937,13 +937,13 @@ module WatsubMod
 !
           IF(FlowDirIndicator(N2,N1).NE.ivertdir.OR.N.EQ.ivertdir)THEN
             D1200: DO LL=N6,NL(N5,N4)
-              IF(VLSoilPoreMicP(LL,N2,N1).GT.ZEROS2(N2,N1))THEN
+              IF(VLSoilPoreMicP_vr(LL,N2,N1).GT.ZEROS2(N2,N1))THEN
                 N6=LL
                 exit
               ENDIF
             ENDDO D1200
           !exchange with water table if micropore is non-zero
-            IF(VLSoilPoreMicP(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
+            IF(VLSoilPoreMicP_vr(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
               TWatCharge2MicP(N3,N2,N1)=TWatCharge2MicP(N3,N2,N1)+WatXChange2WatTable(N,N3,N2,N1) &
                 -WatXChange2WatTable(N,N6,N5,N4)
               TWatXChange2WatTableX(N3,N2,N1)=TWatXChange2WatTableX(N3,N2,N1)+WatXChange2WatTableX(N,N3,N2,N1)&
@@ -1196,7 +1196,7 @@ module WatsubMod
         !the soil/water profile moves down        
         NUX=NUM(NY,NX)
         DO  LL=NUX+1,NL(NY,NX)
-          IF(VLSoilPoreMicP(LL,NY,NX).GT.ZEROS2(NY,NX))THEN
+          IF(VLSoilPoreMicP_vr(LL,NY,NX).GT.ZEROS2(NY,NX))THEN
             NUM(NY,NX)=LL
             FLWNX(NY,NX) =WaterFlowSoiMicP(3,NUM(NY,NX),NY,NX)
             FLWXNX(NY,NX)=WaterFlowSoiMicPX(3,NUM(NY,NX),NY,NX)
@@ -1807,7 +1807,7 @@ module WatsubMod
   !
 
   IF(VLHeatCapacity(N3,N2,N1).GT.VHCPNX(NY,NX))THEN
-    IF(N3.EQ.NUM(NY,NX).AND.VLHeatCapSnow(1,N2,N1).LE.VLHeatCapSnowMin(N2,N1))THEN
+    IF(N3.EQ.NUM(NY,NX).AND.VLHeatCapSnow(1,N2,N1).LE.VLHeatCapSnowMin_col(N2,N1))THEN
       !surface layer, not significant snowpack
       TK1X=TKSoi1(N3,N2,N1)-(ConvectHeatFluxMicP-HeatFluxAir2Soi)/VLHeatCapacity(N3,N2,N1)
       if(abs(TK1X)>1.e5_r8)then

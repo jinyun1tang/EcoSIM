@@ -62,7 +62,7 @@ implicit none
     call ncd_defdim(ncf,'ndoms',trc_confs%NDOMS,recordDimID)
     call ncd_defvar(ncf, 'pH', ncd_float, long_name='soil pH',  &
             units='none', missing_value=spval, fill_value=spval)
-    call ncd_defvar(ncf, 'VLSoilPoreMicP', ncd_float, long_name='volume of soil layer',  &
+    call ncd_defvar(ncf, 'VLSoilPoreMicP_vr', ncd_float, long_name='volume of soil layer',  &
             units='m3 d-2', missing_value=spval, fill_value=spval)
     call ncd_defvar(ncf, 'ORGC', ncd_float, long_name='total soil organic C',  &
             units='gC d-2', missing_value=spval, fill_value=spval)
@@ -209,7 +209,7 @@ implicit none
     call ncd_enddef(ncf)
 
     call ncd_putvar(ncf,'pH',PH(L,NY,NX))
-    call ncd_putvar(ncf,'VLSoilPoreMicP',VLSoilPoreMicP(L,NY,NX))
+    call ncd_putvar(ncf,'VLSoilPoreMicP_vr',VLSoilPoreMicP_vr(L,NY,NX))
     call ncd_putvar(ncf,'ORGC',ORGC(L,NY,NX))
     call ncd_putvar(ncf,'CFOMC',CFOMC(:,L,NY,NX))
     call ncd_putvar(ncf,'VLSoilMicP',VLSoilMicP(L,NY,NX))

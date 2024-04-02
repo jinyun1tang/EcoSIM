@@ -94,7 +94,7 @@ implicit none
   real(r8),pointer   :: h1D_ATM_CH4_col(:)        !CH4E
   real(r8),pointer   :: h1D_NBP_col(:)            !Eco_NBP_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_ECO_HVST_C_col(:)     !EcoHavstElmnt_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_ECO_LAI_col(:)        !CanopyLeafArea_grd(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_ECO_LAI_col(:)        !CanopyLeafArea_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_ECO_GPP_col(:)        !Eco_GPP_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_ECO_RA_col(:)         !Eco_AutoR_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_ECO_NPP_col(:)        !Eco_NPP_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -132,7 +132,7 @@ implicit none
   real(r8),pointer   :: h1D_SEDIMENT_FLX_col(:)       !USEDOU(NY,NX)*1000.0/TAREA, soil mass 
   real(r8),pointer   :: h1D_tSWC_col(:)        !UVLWatMicP(NY,NX)*1000.0/AREA(3,NU(NY,NX),NY,NX), volumetric soil water content
   real(r8),pointer   :: h1D_DISCHG_FLX_col(:)         !FWatDischarge(NY,NX)*1000.0/TAREA
-  real(r8),pointer   :: h1D_SNOWPACK_col(:)       !AZMAX1((VOLSS(NY,NX)+VcumIceSnow(NY,NX)*DENSICE+VOLWS(NY,NX))*1000.0/AREA(3,NU(NY,NX),NY,NX))
+  real(r8),pointer   :: h1D_SNOWPACK_col(:)       !AZMAX1((VOLSS(NY,NX)+VcumIceSnow_col(NY,NX)*DENSICE+VOLWS(NY,NX))*1000.0/AREA(3,NU(NY,NX),NY,NX))
   real(r8),pointer   :: h1D_SURF_WTR_col(:)       !THETWZ(0,NY,NX)
   real(r8),pointer   :: h1D_SURF_ICE_col(:)       !THETIZ(0,NY,NX)
   real(r8),pointer   :: h1D_ACTV_LYR_col(:)       !-(ActiveLayDepth(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX))
@@ -163,7 +163,7 @@ implicit none
   real(r8),pointer   :: h1D_STOML_RSC_CO2_ptc(:) !CanPStomaResistH2O_pft(NZ,NY,NX)*1.56*3600.0_r8, s m-1, for CO2
   real(r8),pointer   :: h1D_BLYR_RSC_CO2_ptc(:)  !CanopyBndlResist_pft(NZ,NY,NX)*1.34*3600.0_r8, s m-1, for CO2
   real(r8),pointer   :: h1D_CAN_CO2_ptc(:)       !CanopyGasCO2_pft(NZ,NY,NX), umol mol-1
-  real(r8),pointer   :: h1D_LAI_ptc(:)           !CanopyArea_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), plant leaf area, include stalk
+  real(r8),pointer   :: h1D_LAI_ptc(:)           !LeafStalkArea_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), plant leaf area, include stalk
   real(r8),pointer   :: h1D_PSI_CAN_ptc(:)       !PSICanopy_pft(NZ,NY,NX), canopy total water potential , MPa
   real(r8),pointer   :: h1D_TURG_CAN_ptc(:)      !PSICanopyTurg_pft(NZ,NY,NX), canopy turgor water potential, MPa
   real(r8),pointer   :: h1D_STOM_RSC_H2O_ptc(:)  !CanPStomaResistH2O_pft(NZ,NY,NX)*3600.0_r8, s m-1, for H2O
@@ -1567,7 +1567,7 @@ implicit none
       this%h1D_ATM_CH4_col(ncol)     = CH4E(NY,NX)
       this%h1D_NBP_col(ncol)         = Eco_NBP_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_ECO_HVST_C_col(ncol)  = EcoHavstElmnt_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_ECO_LAI_col(ncol)     = CanopyLeafArea_grd(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_ECO_LAI_col(ncol)     = CanopyLeafArea_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_ECO_GPP_col(ncol)     = Eco_GPP_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_ECO_RA_col(ncol)      = Eco_AutoR_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_ECO_NPP_col(ncol)     = Eco_NPP_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -1612,7 +1612,7 @@ implicit none
       this%h1D_sN2O_FLX_col(ncol)     =  SurfGasFlx(idg_N2O,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_sN2G_FLX_col(ncol)     =  SurfGasFlx(idg_N2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_sNH3_FLX_col(ncol)     =  SurfGasFlx(idg_NH3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_PAR_col(ncol)          = PARDirect_col(NY,NX)+PARDiffus_col(NY,NX)
+      this%h1D_PAR_col(ncol)          = RadPARDirect_col(NY,NX)+RadPARDiffus_col(NY,NX)
 
       DO L=1,JZ
         this%h2D_tSOC_vr_col(ncol,L) =  ORGC(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -1662,7 +1662,7 @@ implicit none
         this%h1D_STOML_RSC_CO2_ptc(nptc)= CanPStomaResistH2O_pft(NZ,NY,NX)*1.56_r8*3600.0_r8
         this%h1D_BLYR_RSC_CO2_ptc(nptc) = CanopyBndlResist_pft(NZ,NY,NX)*1.34_r8*3600.0_r8
         this%h1D_CAN_CO2_ptc(nptc)      = CanopyGasCO2_pft(NZ,NY,NX)
-        this%h1D_LAI_ptc(nptc)          = CanopyArea_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_LAI_ptc(nptc)          = LeafStalkArea_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_PSI_CAN_ptc(nptc)      = PSICanopy_pft(NZ,NY,NX)
         this%h1D_TURG_CAN_ptc(nptc)     = PSICanopyTurg_pft(NZ,NY,NX)
         this%h1D_STOM_RSC_H2O_ptc(nptc) = CanPStomaResistH2O_pft(NZ,NY,NX)*3600.0_r8

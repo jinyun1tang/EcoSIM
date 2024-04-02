@@ -124,7 +124,7 @@ module NutUptakeMod
 !     begin_execution
   associate(                             &
     THETW                   =>  plt_soilchem%THETW   , &
-    VLSoilPoreMicP          =>  plt_soilchem%VLSoilPoreMicP    , &
+    VLSoilPoreMicP_vr          =>  plt_soilchem%VLSoilPoreMicP_vr    , &
     ZEROS2                  =>  plt_site%ZEROS2      , &
     NU                      =>  plt_site%NU          , &
     ZERO                    =>  plt_site%ZERO        , &
@@ -143,7 +143,7 @@ module NutUptakeMod
 
   D955: DO N=1,MY(NZ)
     D950: DO L=NU,MaxSoiL4Root(NZ)
-      IF(VLSoilPoreMicP(L).GT.ZEROS2.AND.RootLenDensPerPlant_pvr(N,L,NZ).GT.ZERO &
+      IF(VLSoilPoreMicP_vr(L).GT.ZEROS2.AND.RootLenDensPerPlant_pvr(N,L,NZ).GT.ZERO &
         .AND.RootVH2O_pvr(N,L,NZ).GT.ZEROP(NZ).AND.THETW(L).GT.ZERO)THEN
         TFOXYX=0.0_r8
         call GetUptakeCapcity(N,L,NZ,FracPRoot4Uptake,MinFracPRoot4Uptake,FCUP,FZUP,FPUP,&

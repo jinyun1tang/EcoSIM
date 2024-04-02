@@ -242,7 +242,7 @@ contains
 !     THS=sky longwave radiation
 !     LWRadCanGPrev=longwave radiation emitted by canopy
 
-  RADGX=SWRadOnGrnd(NY,NX)*dts_HeatWatTP
+  RADGX=RadSWGrnd_col(NY,NX)*dts_HeatWatTP
   RadSWonSno(NY,NX)=RADGX*FracSurfAsSnow(NY,NX)*XNPS
   RadSWonSoi(NY,NX)=RADGX*FracSurfSnoFree(NY,NX)*FracSurfAsBareSoi(NY,NX)      
   RadSWonLitR(NY,NX)=RADGX*FracSurfSnoFree(NY,NX)*FracSurfByLitR(NY,NX)*XNPR
@@ -289,12 +289,12 @@ contains
 !     AREA=surface area of grid cell
 !
   ALFZ=2.0_r8*(1.0_r8-FracSWRad2Grnd(NY,NX))
-  IF(BndlResistAboveCanG(NY,NX).GT.ZERO.AND.MaxCanopyHeight_grd(NY,NX).GT.SoiSurfRoughnesst0(NY,NX)&
+  IF(BndlResistAboveCanG(NY,NX).GT.ZERO.AND.CanopyHeight_col(NY,NX).GT.SoiSurfRoughnesst0(NY,NX)&
     .AND.ALFZ.GT.ZERO)THEN
     !if there is plant
-    BndlResistCanG(NY,NX)=AMIN1(RACX,AZMAX1(MaxCanopyHeight_grd(NY,NX)*EXP(ALFZ) &
-      /(ALFZ/BndlResistAboveCanG(NY,NX))*AZMAX1(EXP(-ALFZ*SoiSurfRoughnesst0(NY,NX)/MaxCanopyHeight_grd(NY,NX)) &
-      -EXP(-ALFZ*(ZeroPlanDisp(NY,NX)+RoughHeight(NY,NX))/MaxCanopyHeight_grd(NY,NX)))))
+    BndlResistCanG(NY,NX)=AMIN1(RACX,AZMAX1(CanopyHeight_col(NY,NX)*EXP(ALFZ) &
+      /(ALFZ/BndlResistAboveCanG(NY,NX))*AZMAX1(EXP(-ALFZ*SoiSurfRoughnesst0(NY,NX)/CanopyHeight_col(NY,NX)) &
+      -EXP(-ALFZ*(ZeroPlanDisp(NY,NX)+RoughHeight(NY,NX))/CanopyHeight_col(NY,NX)))))
     WindSpeedGrnd=WindSpeedAtm(NY,NX)*EXP(-ALFZ)
   ELSE
     BndlResistCanG(NY,NX)=0.0_r8
@@ -368,8 +368,8 @@ contains
 !
 ! THETY=current,hygroscopic water concentration
 ! POROS=porosity
-! VLWatMicP1,VLSoilPoreMicPI=volume of micropore water
-! VLSoilPoreMicPI=soil volume less macropore,rock
+! VLWatMicP1,VLSoilPoreMicP_vrI=volume of micropore water
+! VLSoilPoreMicP_vrI=soil volume less macropore,rock
 ! FC,WP=water contents at field capacity,wilting point
 ! FCL,WPL=log FC,WP
 ! FCD,PSD=FCL-WPL,log(POROS)-FCL
@@ -391,7 +391,7 @@ contains
 !    3,FracSoiPAsWat(NUM(NY,NX),NY,NX),THETW1,POROS(NUM(NY,NX),NY,NX)
 !    4,PSL(NUM(NY,NX),NY,NX),LOG(THETW1),PSD(NUM(NY,NX),NY,NX)
 !    5,VLWatMicP1(NUM(NY,NX),NY,NX),VLSoilMicP(NUM(NY,NX),NY,NX)
-!    5,VLSoilPoreMicP(NUM(NY,NX),NY,NX)
+!    5,VLSoilPoreMicP_vr(NUM(NY,NX),NY,NX)
 !    5,SRP(NUM(NY,NX),NY,NX)
 !3232  FORMAT(A8,6I4,20E14.6)
 ! ENDIF
@@ -560,9 +560,9 @@ contains
   cumHeatFlowSno2Soi=0._r8
   HeatFluxAir2Soi1=0._r8
   !solve if there is significant snow layer 
-  IF(VLSnowHeatCapM(M,1,NY,NX).GT.VLHeatCapSnowMin(NY,NX))THEN
+  IF(VLSnowHeatCapM(M,1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
 !    print*,'SolveSnowpack'
-!   VHCPW,VLHeatCapSnowMin=current, minimum snowpack heat capacities
+!   VHCPW,VLHeatCapSnowMin_col=current, minimum snowpack heat capacities
     call SolveSnowpack(M,NY,NX,LatentHeatAir2Sno,Radnet2Snow,HeatSensEvap,HeatSensAir2Snow,&
       HeatNetFlx2Snow,CumWatFlx2SoiMacP,CumWatFlx2SoiMicP,CumWatXFlx2SoiMicP,CumWatFlow2LitR,&
       CumHeatFlow2LitR,cumHeatFlowSno2Soi)
@@ -1178,7 +1178,7 @@ contains
     ENGYD=0.0_r8
   ENDIF
   IF(PRECB(NY,NX).GT.ZERO)THEN
-    ENGYB=AZMAX1(15.8_r8*SQRT(AMIN1(2.5_r8,MaxCanopyHeight_grd(NY,NX)))-5.87_r8)
+    ENGYB=AZMAX1(15.8_r8*SQRT(AMIN1(2.5_r8,CanopyHeight_col(NY,NX)))-5.87_r8)
   ELSE
     ENGYB=0.0_r8
   ENDIF
@@ -1356,19 +1356,19 @@ contains
 !     FOR SOLUTE FLUX CALCULATIONS
 !
 !     SnoFalPrec,RainFalPrec,PrecAtm,PRECI=snow,rain,snow+rain,irrigation
-!     VHCPW,VLHeatCapSnowMin=current, minimum snowpack heat capacities
+!     VHCPW,VLHeatCapSnowMin_col=current, minimum snowpack heat capacities
 !     Rain2LitRSurf,Irrig2LitRSurf=water flux to surface litter from rain,irrigation
 !     FLQGQ,FLQGI=water flux to snowpack from rain,irrigation
 !
   IF(SnoFalPrec(NY,NX).GT.0.0_r8.OR.(RainFalPrec(NY,NX).GT.0.0_r8 &
-    .AND.VLHeatCapSnow(1,NY,NX).GT.VLHeatCapSnowMin(NY,NX)))THEN
+    .AND.VLHeatCapSnow(1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX)))THEN
     !there is precipitation, there is significant snow layer
     Rain2LitRSurf(NY,NX)=0.0_r8
     Irrig2LitRSurf(NY,NX)=0.0_r8
     Rain2SoilSurf(NY,NX)=PrecAtm(NY,NX)
     Irrig2SoilSurf(NY,NX)=IrrigSurface(NY,NX)
   ELSEIF((PrecAtm(NY,NX).GT.0.0.OR.IrrigSurface(NY,NX).GT.0.0_r8) &
-    .AND.VLHeatCapSnow(1,NY,NX).LE.VLHeatCapSnowMin(NY,NX))THEN
+    .AND.VLHeatCapSnow(1,NY,NX).LE.VLHeatCapSnowMin_col(NY,NX))THEN
     !there is insignificant snow layer
     Rain2LitRSurf(NY,NX)=PrecThrufall2LitR*PrecAtm(NY,NX)/(PrecAtm(NY,NX)+IrrigSurface(NY,NX))
     Irrig2LitRSurf(NY,NX)=PrecThrufall2LitR*IrrigSurface(NY,NX)/(PrecAtm(NY,NX)+IrrigSurface(NY,NX))
@@ -1477,7 +1477,7 @@ contains
 ! HeatXfer2SnoLay=hourly convective heat flux from snow,water,ice transfer
 ! HeatFall2Snowt=convective heat flux from snow,water,ice to snowpack
 !
-  IF(VLHeatCapSnow(1,NY,NX).LE.VLHeatCapSnowMin(NY,NX).AND.SnowFallt(NY,NX).GT.ZEROS(NY,NX))THEN
+  IF(VLHeatCapSnow(1,NY,NX).LE.VLHeatCapSnowMin_col(NY,NX).AND.SnowFallt(NY,NX).GT.ZEROS(NY,NX))THEN
     SnoXfer2SnoLay(1,NY,NX)=SnoXfer2SnoLay(1,NY,NX)+SnowFallt(NY,NX)
     WatXfer2SnoLay(1,NY,NX)=WatXfer2SnoLay(1,NY,NX)+Rain2Snowt(NY,NX)
     IceXfer2SnoLay(1,NY,NX)=IceXfer2SnoLay(1,NY,NX)+Ice2Snowt(NY,NX)

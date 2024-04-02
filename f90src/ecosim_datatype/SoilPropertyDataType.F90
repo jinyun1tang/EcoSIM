@@ -22,7 +22,7 @@ implicit none
    real(r8) ,target,allocatable ::  SoiBulkDensity(:,:,:)                      !soil bulk density, [Mg m-3]
    integer  ,target,allocatable ::  MacPNumLayer(:,:,:)                 !number of macropores
    real(r8) ,target,allocatable ::  POROS(:,:,:)                     !soil porosity
-   real(r8) ,target,allocatable ::  VLSoilPoreMicP(:,:,:)            !micropore volume of soil layer	m3 d-2
+   real(r8) ,target,allocatable ::  VLSoilPoreMicP_vr(:,:,:)            !micropore volume of soil layer	m3 d-2
    real(r8) ,target,allocatable ::  VLSoilMicP(:,:,:)                      !micropore volume
    real(r8) ,target,allocatable ::  SoilMicPMassLayer(:,:,:)                      !mass of soil layer	Mg d-2
    real(r8) ,target,allocatable ::  SoilMicPMassLayerMn(:,:)                      !minimum soil layer mass
@@ -67,7 +67,7 @@ contains
   allocate(SoiBulkDensity(0:JZ,JY,JX));    SoiBulkDensity=0._r8
   allocate(MacPNumLayer(JZ,JY,JX));      MacPNumLayer=0
   allocate(POROS(0:JZ,JY,JX));   POROS=0._r8
-  allocate(VLSoilPoreMicP(0:JZ,JY,JX));    VLSoilPoreMicP=0._r8
+  allocate(VLSoilPoreMicP_vr(0:JZ,JY,JX));    VLSoilPoreMicP_vr=0._r8
   allocate(VLSoilMicP(0:JZ,JY,JX));    VLSoilMicP=0._r8
   allocate(SoilMicPMassLayer(0:JZ,JY,JX));    SoilMicPMassLayer=0._r8
   allocate(SoilMicPMassLayerMn(JY,JX));       SoilMicPMassLayerMn=0._r8
@@ -101,7 +101,7 @@ contains
   call destroy(SoiBulkDensity)
   call destroy(MacPNumLayer)
   call destroy(POROS)
-  call destroy(VLSoilPoreMicP)
+  call destroy(VLSoilPoreMicP_vr)
   call destroy(VLSoilMicP)
   call destroy(SoilMicPMassLayer)
   call destroy(SoilMicPMassLayerMn)

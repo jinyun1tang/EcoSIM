@@ -165,7 +165,7 @@ implicit none
     trcg_rootml_pvr               =>   plt_rbgc%trcg_rootml_pvr               , &
     trcs_rootml_pvr               =>   plt_rbgc%trcs_rootml_pvr               , &
     SoilResit4RootPentrate_vr     =>   plt_soilchem%SoilResit4RootPentrate_vr , &
-    VLSoilPoreMicP                =>   plt_soilchem%VLSoilPoreMicP            , &    
+    VLSoilPoreMicP_vr                =>   plt_soilchem%VLSoilPoreMicP_vr            , &    
     NU                            =>   plt_site%NU                            , &
     ZERO                          =>   plt_site%ZERO                          , &
     PlantPopulation_pft           =>   plt_site%PlantPopulation_pft           , &
@@ -211,12 +211,12 @@ implicit none
 !
 !     IDENTIFY NEXT LOWER ROOT LAYER
 !
-!     VLSoilPoreMicP=soil layer volume excluding macropore, rocks
+!     VLSoilPoreMicP_vr=soil layer volume excluding macropore, rocks
 !
-      IF(VLSoilPoreMicP(L).GT.ZEROS2)THEN
+      IF(VLSoilPoreMicP_vr(L).GT.ZEROS2)THEN
         !why not using MaxSoiL4Root(NZ)
         D5003: DO LZ=L+1,NL
-          IF(VLSoilPoreMicP(LZ).GT.ZEROS2.OR.LZ.EQ.NL)THEN
+          IF(VLSoilPoreMicP_vr(LZ).GT.ZEROS2.OR.LZ.EQ.NL)THEN
             L1=LZ
             EXIT
           ENDIF
@@ -1727,7 +1727,7 @@ implicit none
     DLYR3                         =>  plt_site%DLYR3                       , &
     trcg_rootml_pvr               =>  plt_rbgc%trcg_rootml_pvr             , &
     trcs_rootml_pvr               =>  plt_rbgc%trcs_rootml_pvr             , &
-    VLSoilPoreMicP                =>  plt_soilchem%VLSoilPoreMicP          , &
+    VLSoilPoreMicP_vr                =>  plt_soilchem%VLSoilPoreMicP_vr          , &
     Root1stXNumL_pvr              =>  plt_morph%Root1stXNumL_pvr           , &
     Root2ndXNum_pvr               =>  plt_morph%Root2ndXNum_pvr            , &
     Root1stLen_rpvr               =>  plt_morph%Root1stLen_rpvr            , &
@@ -1745,7 +1745,7 @@ implicit none
 !     IN THE CURRENT SOIL LAYER HAVE BEEN LOST
 !
 !     NIXBotRootLayer_rpft=deepest root layer
-!     VLSoilPoreMicP=soil layer volume excluding macropore, rocks
+!     VLSoilPoreMicP_vr=soil layer volume excluding macropore, rocks
 !     Root1stDepz2Surf=primary root depth from soil surface
 !     CumSoilThickness=depth from soil surface to layer bottom
 !     SeedDepth_pft=seeding depth
@@ -1759,7 +1759,7 @@ implicit none
 
   D5115: DO LL=L,NGTopRootLayer_pft(NZ)+1,-1
     RootDepzChk=Root1stDepz2Surf.LT.CumSoilThickness(LL-1) .OR. Root1stDepz2Surf.LT.SeedDepth_pft(NZ)
-    IF(VLSoilPoreMicP(LL-1).GT.ZEROS2 .AND. RootDepzChk)THEN
+    IF(VLSoilPoreMicP_vr(LL-1).GT.ZEROS2 .AND. RootDepzChk)THEN
       IF(RootSinkC_vr(N,LL).GT.ZEROP(NZ))THEN
         FRTN=(Root1stSink_pvr(N,LL,NR)+Root2ndSink_pvr(N,LL,NR))/RootSinkC_vr(N,LL)
       ELSE
@@ -2339,7 +2339,7 @@ implicit none
     RootMycoNonstElms_rpvr    =>   plt_biom%RootMycoNonstElms_rpvr    , &
     ZEROP                     =>   plt_biom%ZEROP                     , &
     iPlantRootProfile_pft     =>   plt_pheno%iPlantRootProfile_pft    , &
-    VLSoilPoreMicP            =>   plt_soilchem%VLSoilPoreMicP        , &
+    VLSoilPoreMicP_vr            =>   plt_soilchem%VLSoilPoreMicP_vr        , &
     ZEROS2                    =>   plt_site%ZEROS2                    , &
     NU                        =>   plt_site%NU                        , &
     CumSoilThickness          =>   plt_site%CumSoilThickness          , &
@@ -2379,7 +2379,7 @@ implicit none
 !     RESPIRATION FROM NUTRIENT UPTAKE CALCULATED IN 'UPTAKE':
 !     ACTUAL, O2-UNLIMITED AND C-UNLIMITED
 !
-!     VLSoilPoreMicP=soil layer volume excluding macropore, rocks
+!     VLSoilPoreMicP_vr=soil layer volume excluding macropore, rocks
 !     RecoRootMycoC4Nup=C respiration for nutrient uptake
 !     CUPRO,CUPRC=RecoRootMycoC4Nup unlimited by O2,root nonstructural C
 !     RootNH4Uptake_pvr,RootNH4BUptake_pvr,RUPN03,RootNO3BUptake_pvr=uptake from non-band,band of NH4,NO3
@@ -2390,7 +2390,7 @@ implicit none
 !     RootCUlmNutUptake_pvr,RootCUlmNutUptake_pvr,RootCUlmNutUptake_pvr,RootCUlmNutUptake_pvr=uptake from non-band,band of H2PO4,HPO4 unlimited by nonstructural C
 !     why is 0.86? it refers to C cost for N asimilation
 
-      IF(VLSoilPoreMicP(L).GT.ZEROS2)THEN
+      IF(VLSoilPoreMicP_vr(L).GT.ZEROS2)THEN
         RecoRootMycoC4Nup=0.86_r8*(RootNutUptake_pvr(ids_NH4,N,L,NZ)+RootNutUptake_pvr(ids_NH4B,N,L,NZ) &
           +RootNutUptake_pvr(ids_NO3,N,L,NZ)+RootNutUptake_pvr(ids_NO3B,N,L,NZ) &
           +RootNutUptake_pvr(ids_H2PO4,N,L,NZ)+RootNutUptake_pvr(ids_H2PO4B,N,L,NZ) &

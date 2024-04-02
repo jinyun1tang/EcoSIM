@@ -95,10 +95,10 @@ module UptakesMod
     iPlantCalendar_brch            => plt_pheno%iPlantCalendar_brch , &
     PlantO2Stress                  => plt_pheno%PlantO2Stress   , &
     IsPlantActive_pft              => plt_pheno%IsPlantActive_pft  , &
-    CanopyLeafArea_grd             => plt_morph%CanopyLeafArea_grd  , &
+    CanopyLeafArea_col             => plt_morph%CanopyLeafArea_col  , &
     Root1stDepz_pft                  => plt_morph%Root1stDepz_pft  , &
-    CanopyArea_grd                 => plt_morph%CanopyArea_grd  , &
-    CanopyArea_pft                 => plt_morph%CanopyArea_pft  , &
+    LeafStalkArea_col                 => plt_morph%LeafStalkArea_col  , &
+    LeafStalkArea_pft                 => plt_morph%LeafStalkArea_pft  , &
     SeedDepth_pft                  => plt_morph%SeedDepth_pft  , &
     MainBranchNum_pft            => plt_morph%MainBranchNum_pft    , &
     FracRadPARbyCanopy_pft         => plt_rad%FracRadPARbyCanopy_pft      &
@@ -140,7 +140,7 @@ module UptakesMod
 !
 !     (AG: - originally this line had a N0B1 here )
       IF((iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).NE.0)&
-        .AND.(CanopyArea_pft(NZ).GT.ZEROL(NZ) &
+        .AND.(LeafStalkArea_pft(NZ).GT.ZEROL(NZ) &
         .AND.FracRadPARbyCanopy_pft(NZ).GT.0.0_r8)&
         .AND.(Root1stDepz_pft(ipltroot,1,NZ).GT.SeedDepth_pft(NZ)+CumSoilThickness(0)))THEN
         !shoot area > 0, absorped par>0, and rooting depth > seeding depth
@@ -170,9 +170,9 @@ module UptakesMod
         VapXAir2Canopy_pft(NZ)=0.0_r8
         PrecHeatIntcptByCanP1=PrecIntcptByCanopy_pft(NZ)*cpw*TairK
 
-        IF(CanopyArea_grd.GT.ZEROS)THEN
+        IF(LeafStalkArea_col.GT.ZEROS)THEN
           !the grid has significant canopy (leaf+steam) area
-          FracGrndByPFT=CanopyArea_pft(NZ)/CanopyArea_grd*AMIN1(1.0_r8,0.5_r8*CanopyLeafArea_grd/AREA3(NU))
+          FracGrndByPFT=LeafStalkArea_pft(NZ)/LeafStalkArea_col*AMIN1(1.0_r8,0.5_r8*CanopyLeafArea_col/AREA3(NU))
         ELSEIF(PPT.GT.ZEROS)THEN
           !total population is > 0
           FracGrndByPFT=PlantPopulation_pft(NZ)/PPT
@@ -323,7 +323,7 @@ module UptakesMod
 !     ElvAdjstedtSoiPSIMPa=total soil water potential PSIST adjusted for surf elevn
 !     ALT=surface elevation
 !     WatAvail4Uptake,VLWatMicPM=water volume available for uptake,total water volume
-!     THETY,VLSoilPoreMicP=hygroscopic SWC,soil volume
+!     THETY,VLSoilPoreMicP_vr=hygroscopic SWC,soil volume
 !     AirPoreAvail4Fill=air volume, used to fill by water coming out from plant root/mycorrhizae
 !     AllRootC_vr=total biome root mass
 !
@@ -375,11 +375,11 @@ module UptakesMod
     LeafAreaNode_brch         =>  plt_morph%LeafAreaNode_brch  , &
     KLEAFX                    =>  plt_morph%KLEAFX , &
     CanopyHeight_pft          =>  plt_morph%CanopyHeight_pft    , &
-    ClumpFactorCurrent_pft    =>  plt_morph%ClumpFactorCurrent_pft    , &
-    CanopyArea_pft            =>  plt_morph%CanopyArea_pft  , &
+    ClumpFactorNow_pft    =>  plt_morph%ClumpFactorNow_pft    , &
+    LeafStalkArea_pft            =>  plt_morph%LeafStalkArea_pft  , &
     NumOfBranches_pft         =>  plt_morph%NumOfBranches_pft    , &
     LeafAreaZsec_brch         =>  plt_morph%LeafAreaZsec_brch   , &
-    MaxCanopyHeight_grd       =>  plt_morph%MaxCanopyHeight_grd       &
+    CanopyHeight_col       =>  plt_morph%CanopyHeight_col       &
   )
 !
 !     APPLY CLUMPING FACTOR TO LEAF SURFACE AREA DEFINED BY
@@ -394,14 +394,14 @@ module UptakesMod
 !     LeafAreaNode_brch=leaf area
 !     LeafProteinCNode_brch=leaf protein content
 !     LeafAUnshaded_zsec,LeafAreaZsec_brch=unself-shaded,total leaf surface area
-!     ClumpFactorCurrent_pft=clumping factor from PFT file
+!     ClumpFactorNow_pft=clumping factor from PFT file
 !
       IF(LeafAreaNode_brch(K,NB,NZ).GT.ZEROP(NZ).AND.LeafProteinCNode_brch(K,NB,NZ).GT.ZEROP(NZ))THEN
         KLEAFX(NB,NZ)=K
       ENDIF
       D600: DO L=NumOfCanopyLayers1,1,-1
         D650: DO N=1,NumOfLeafZenithSectors1
-          LeafAUnshaded_zsec(N,L,K,NB,NZ)=LeafAreaZsec_brch(N,L,K,NB,NZ)*ClumpFactorCurrent_pft(NZ)
+          LeafAUnshaded_zsec(N,L,K,NB,NZ)=LeafAreaZsec_brch(N,L,K,NB,NZ)*ClumpFactorNow_pft(NZ)
         ENDDO D650
       ENDDO D600
     ENDDO D550
@@ -420,7 +420,7 @@ module UptakesMod
 !     BndlResistAboveCanG=biome canopy isothermal boundary layer resistance
 !     RACZ,RAZ=additional,total PFT canopy isothermal blr
 !
-  IF(CanopyArea_pft(NZ).GT.0.0_r8)THEN
+  IF(LeafStalkArea_pft(NZ).GT.0.0_r8)THEN
     IF(KoppenClimZone.GE.0)THEN
       TFRADP=0.0_r8
       D700: DO NZZ=1,NP
@@ -430,11 +430,11 @@ module UptakesMod
       ENDDO D700
       ALFZ=2.0_r8*TFRADP
       IF(BndlResistAboveCanG.GT.ZERO &
-        .AND.MaxCanopyHeight_grd.GT.ZERO &
+        .AND.CanopyHeight_col.GT.ZERO &
         .AND.ALFZ.GT.ZERO)THEN
-        RACZ(NZ)=AMIN1(RACX,AZMAX1(MaxCanopyHeight_grd*EXP(ALFZ) &
-          /(ALFZ/BndlResistAboveCanG)*(EXP(-ALFZ*CanopyHeight_pft(NZ)/MaxCanopyHeight_grd) &
-          -EXP(-ALFZ*(ZeroPlanDisp+RoughHeight)/MaxCanopyHeight_grd))))
+        RACZ(NZ)=AMIN1(RACX,AZMAX1(CanopyHeight_col*EXP(ALFZ) &
+          /(ALFZ/BndlResistAboveCanG)*(EXP(-ALFZ*CanopyHeight_pft(NZ)/CanopyHeight_col) &
+          -EXP(-ALFZ*(ZeroPlanDisp+RoughHeight)/CanopyHeight_col))))
       ELSE
         RACZ(NZ)=0.0_r8
       ENDIF
@@ -535,12 +535,12 @@ module UptakesMod
 
       ENDIF
       IF(AllRootC_vr(L).GT.ZEROS)THEN
-        FracPRoot4Uptake(N,L,NZ)=AZMAX1( PopuRootMycoC_pvr(N,L,NZ))/AllRootC_vr(L)
+        FracPRoot4Uptake(N,L,NZ)=AZMAX1(PopuRootMycoC_pvr(N,L,NZ))/AllRootC_vr(L)
       ELSE
         FracPRoot4Uptake(N,L,NZ)=1.0_r8
       ENDIF
       MinFracPRoot4Uptake(N,L,NZ)=FMN*FracPRoot4Uptake(N,L,NZ)
-      IF(RootLenDensPerPlant_pvr(N,L,NZ).GT.ZERO.AND.FracSoiLayByPrimRoot(L,NZ).GT.ZERO)THEN
+      IF(RootLenDensPerPlant_pvr(N,L,NZ).GT.ZERO .AND. FracSoiLayByPrimRoot(L,NZ).GT.ZERO)THEN
         FineRootRadius(N,L)=AMAX1(Root2ndMaxRadius1_pft(N,NZ),SQRT((RootVH2O_pvr(N,L,NZ) &
           /(1.0_r8-RootPorosity_pft(N,NZ)))/(PICON*PlantPopulation_pft(NZ)*RootLenPerPlant_pvr(N,L,NZ))))
         PATH(N,L)=AMAX1(1.001_r8*FineRootRadius(N,L) &
@@ -1091,7 +1091,7 @@ module UptakesMod
     THETW                          => plt_soilchem%THETW, &
     VLMicP                         => plt_soilchem%VLMicP , &
     HydroCondMicP4RootUptake       => plt_soilchem%HydroCondMicP4RootUptake , &
-    VLSoilPoreMicP                 => plt_soilchem%VLSoilPoreMicP , &
+    VLSoilPoreMicP_vr                 => plt_soilchem%VLSoilPoreMicP_vr , &
     Root2ndXNum_pvr                => plt_morph%Root2ndXNum_pvr    , &
     Root1stXNumL_pvr               => plt_morph%Root1stXNumL_pvr   , &
     Root2ndMaxRadius_pft           => plt_morph%Root2ndMaxRadius_pft  , &
@@ -1124,7 +1124,7 @@ module UptakesMod
 !
   !     SOIL AND ROOT HYDRAULIC RESISTANCES TO ROOT WATER UPTAKE
   !
-  !      VLSoilPoreMicP,VLWatMicPM,THETW=soil,water volume,content
+  !      VLSoilPoreMicP_vr,VLWatMicPM,THETW=soil,water volume,content
   !     RootLenDensPerPlant_pvr,RootLenPerPlant_pvr=root length density,root length per plant
   !     HydroCondMicP4RootUptake=soil hydraulic conductivity for root uptake
   !     Root1stXNumL_pvr,Root2ndXNum_pvr=number of root,myco primary,secondary axes
@@ -1133,7 +1133,7 @@ module UptakesMod
 !
   D3880: DO N=1,MY(NZ)
     DO  L=NU,MaxSoiL4Root(NZ)
-      IF(VLSoilPoreMicP(L).GT.ZEROS2 &
+      IF(VLSoilPoreMicP_vr(L).GT.ZEROS2 &
         .AND.VLWatMicPM(NPH,L).GT.ZEROS2 &
         .AND.RootLenDensPerPlant_pvr(N,L,NZ).GT.ZERO &
         .AND.HydroCondMicP4RootUptake(L).GT.ZERO &

@@ -55,11 +55,11 @@ implicit none
   AirConc_pft                   => plt_photo%AirConc_pft                   , &
   DiffCO2Atmos2Intracel_pft     => plt_photo%DiffCO2Atmos2Intracel_pft     , &
   ZEROP                         => plt_biom%ZEROP                          , &
-  CanopyLeafAreaByLayer_pft     => plt_morph%CanopyLeafAreaByLayer_pft     , &
-  PARDiffus_zsec                => plt_rad%PARDiffus_zsec                  , &
-  PARDirect_zsec                => plt_rad%PARDirect_zsec                  , &
+  CanopyLeafArea_lpft     => plt_morph%CanopyLeafArea_lpft     , &
+  RadDifPAR_zsec                => plt_rad%RadDifPAR_zsec                  , &
+  RadPAR_zsec                => plt_rad%RadPAR_zsec                  , &
   TAU_RadThru                   => plt_rad%TAU_RadThru                     , &
-  TAU_RadCapt                   => plt_rad%TAU_RadCapt                       &
+  TAU_DirRadTransm                   => plt_rad%TAU_DirRadTransm                       &
   )
 
   CH2O3K=0._r8
@@ -67,7 +67,7 @@ implicit none
   CH2OClmK=0._r8
   CH2OLlmK=0._r8
   D210: DO L=NumOfCanopyLayers1,1,-1
-    IF(CanopyLeafAreaByLayer_pft(L,K,NB,NZ).GT.ZEROP(NZ))THEN
+    IF(CanopyLeafArea_lpft(L,K,NB,NZ).GT.ZEROP(NZ))THEN
 !
 !     FOR EACH LEAF AZIMUTH AND INCLINATION
 !
@@ -81,10 +81,10 @@ implicit none
           IF(LeafAUnshaded_zsec(N,L,K,NB,NZ).GT.ZEROP(NZ))THEN
             DO LP=1,2
               if (LP==1)then
-                PAR_zsec=PARDirect_zsec(N,M,L,NZ)
-                Tau_rad=TAU_RadCapt(L+1)
+                PAR_zsec=RadPAR_zsec(N,M,L,NZ)
+                Tau_rad=TAU_DirRadTransm(L+1)
               else
-                PAR_zsec=PARDiffus_zsec(N,M,L,NZ)
+                PAR_zsec=RadDifPAR_zsec(N,M,L,NZ)
                 Tau_rad=TAU_RadThru(L+1)
               endif
               
@@ -181,19 +181,19 @@ implicit none
                     ENDIF
                   ENDDO D225
                   
-!                write(177,*)NZ,PARDirect_zsec(N,M,L,NZ),VL,VL*LeafAUnshaded_zsec(N,L,K,NB,NZ),TAU_RadCapt(L+1)
+!                write(177,*)NZ,RadPAR_zsec(N,M,L,NZ),VL,VL*LeafAUnshaded_zsec(N,L,K,NB,NZ),TAU_DirRadTransm(L+1)
 
 !
 !               ACCUMULATE C3 FIXATION PRODUCT IN MESOPHYLL
 !
 !               CH2O3=total C3 CO2 fixation
 !               LeafAUnshaded_zsec=unself-shaded leaf surface area
-!               TAU_RadCapt=fraction of direct radiation transmitted from layer above
+!               TAU_DirRadTransm=fraction of direct radiation transmitted from layer above
 !
                   CH2O3K=CH2O3K+VL*LeafAUnshaded_zsec(N,L,K,NB,NZ)*TAU_Rad
 !               ICO2I=MAX(1,MIN(400,INT(CO2X)))
 !               VCO2(ICO2I,I,NZ)=VCO2(ICO2I,I,NZ)
-!              2+(VL*LeafAUnshaded_zsec(N,L,K,NB,NZ)*TAU_RadCapt(L+1))*0.0432
+!              2+(VL*LeafAUnshaded_zsec(N,L,K,NB,NZ)*TAU_DirRadTransm(L+1))*0.0432
 
                 ENDIF
               ENDIF
@@ -252,19 +252,19 @@ implicit none
   LeafIntracellularCO2_pft          => plt_photo%LeafIntracellularCO2_pft     , &
   RubiscoCarboxyEff_node            => plt_photo%RubiscoCarboxyEff_node       , &
   Vmax4PEPCarboxy_pft               => plt_photo%Vmax4PEPCarboxy_pft          , &
-  CanopyLeafAreaByLayer_pft         => plt_morph%CanopyLeafAreaByLayer_pft    , &
+  CanopyLeafArea_lpft         => plt_morph%CanopyLeafArea_lpft    , &
   ZERO                              => plt_site%ZERO                          , &
-  PARDiffus_zsec                    => plt_rad%PARDiffus_zsec                 , &
-  PARDirect_zsec                    => plt_rad%PARDirect_zsec                 , &
+  RadDifPAR_zsec                    => plt_rad%RadDifPAR_zsec                 , &
+  RadPAR_zsec                    => plt_rad%RadPAR_zsec                 , &
   TAU_RadThru                       => plt_rad%TAU_RadThru                    , &
-  TAU_RadCapt                       => plt_rad%TAU_RadCapt                      &
+  TAU_DirRadTransm                       => plt_rad%TAU_DirRadTransm                      &
   )
 
   CH2O3K=0._r8;CH2O4K=0._r8
 ! FOR EACH CANOPY LAYER
 !
   D110: DO L=NumOfCanopyLayers1,1,-1
-    IF(CanopyLeafAreaByLayer_pft(L,K,NB,NZ).GT.ZEROP(NZ))THEN
+    IF(CanopyLeafArea_lpft(L,K,NB,NZ).GT.ZEROP(NZ))THEN
 !
 !     FOR EACH LEAF AZIMUTH AND INCLINATION
 !
@@ -278,10 +278,10 @@ implicit none
           IF(LeafAUnshaded_zsec(N,L,K,NB,NZ).GT.ZEROP(NZ))THEN
             DO LP=1,2
               if(LP==1)then
-                PAR_zsec=PARDirect_zsec(N,M,L,NZ)
-                Tau_rad=TAU_RadCapt(L+1)
+                PAR_zsec=RadPAR_zsec(N,M,L,NZ)
+                Tau_rad=TAU_DirRadTransm(L+1)
               else
-                PAR_zsec=PARDiffus_zsec(N,M,L,NZ)
+                PAR_zsec=RadDifPAR_zsec(N,M,L,NZ)
                 Tau_rad=TAU_RadThru(L+1)
               endif
               IF(PAR_zsec.GT.0.0_r8)THEN
@@ -374,12 +374,12 @@ implicit none
 !
 !               CH2O4=total C4 CO2 fixation
 !               LeafAUnshaded_zsec=unself-shaded leaf surface area
-!               TAU_RadCapt=fraction of direct radiation transmitted from layer above
+!               TAU_DirRadTransm=fraction of direct radiation transmitted from layer above
 !
                   CH2O4K=CH2O4K+VL*LeafAUnshaded_zsec(N,L,K,NB,NZ)*TAU_Rad
 !               ICO2I=MAX(1,MIN(400,INT(CO2X)))
 !               VCO2(ICO2I,I,NZ)=VCO2(ICO2I,I,NZ)
-!              2+(VL*LeafAUnshaded_zsec(N,L,K,NB,NZ)*TAU_RadCapt(L+1))*0.0432
+!              2+(VL*LeafAUnshaded_zsec(N,L,K,NB,NZ)*TAU_DirRadTransm(L+1))*0.0432
 !
 !               C3 CARBOXYLATION REACTIONS IN BUNDLE SHEATH OF C4 PLANTS
 !
@@ -401,7 +401,7 @@ implicit none
 !
 !               CH2O3=total C3 CO2 fixation
 !               LeafAUnshaded_zsec=unself-shaded leaf surface area
-!               TAU_RadCapt=fraction of direct radiation transmitted from layer above
+!               TAU_DirRadTransm=fraction of direct radiation transmitted from layer above
 !
                   CH2O3K=CH2O3K+VL*LeafAUnshaded_zsec(N,L,K,NB,NZ)*TAU_Rad
                 ENDIF  
@@ -437,7 +437,7 @@ implicit none
     Vmax4PEPCarboxy_pft       =>  plt_photo%Vmax4PEPCarboxy_pft      , &
     Vmax4RubiscoCarboxy_pft   =>  plt_photo%Vmax4RubiscoCarboxy_pft  , &
     iPlantRootProfile_pft     =>  plt_pheno%iPlantRootProfile_pft    , &
-    SineSolarIncliAngle       =>  plt_rad%SineSolarIncliAngle        , &
+    SineSunInclAngle_col       =>  plt_rad%SineSunInclAngle_col        , &
     RadPARbyCanopy_pft        =>  plt_rad%RadPARbyCanopy_pft         , &
     ZEROP                     =>  plt_biom%ZEROP                     , &
     LeafAreaNode_brch         =>  plt_morph%LeafAreaNode_brch        , &
@@ -446,7 +446,7 @@ implicit none
 !  write(193,*)'rubisco',NB,NZ,RubiscoActivity_brch(NB,NZ)
   CH2OClm=0._r8;CH2OLlm=0._r8
   IF(abs(RubiscoActivity_brch(NB,NZ)).GT.0._r8)THEN    
-    IF(SineSolarIncliAngle.GT.0.0_r8 .AND. RadPARbyCanopy_pft(NZ).GT.0.0_r8 &
+    IF(SineSunInclAngle_col.GT.0.0_r8 .AND. RadPARbyCanopy_pft(NZ).GT.0.0_r8 &
       .AND.CanopyGasCO2_pft(NZ).GT.0.0_r8)THEN
       CO2F=0._r8;CH2O=0._r8
       IF(.not.is_root_shallow(iPlantRootProfile_pft(NZ)).OR.Stomata_Activity.GT.0.0_r8)THEN
@@ -461,7 +461,7 @@ implicit none
 !
 !             C4 PHOTOSYNTHESIS
 !
-!             LeafAreaNode_brch,CanopyLeafAreaByLayer_pft=leaf area
+!             LeafAreaNode_brch,CanopyLeafArea_lpft=leaf area
 !             iPlantPhotosynthesisType=photosynthesis type:3=C3,4=C4 from PFT file
 !             Vmax4PEPCarboxy_pft=PEP carboxylation rate unlimited by CO2
 !

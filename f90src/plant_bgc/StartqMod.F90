@@ -113,7 +113,7 @@ module StartqMod
   iDayPlantHarvest_pft(NZ,NY,NX)=IDAYY(NZ,NY,NX)
   PPI(NZ,NY,NX)=PPZ(NZ,NY,NX)
   PPX(NZ,NY,NX)=PPI(NZ,NY,NX)
-  ClumpFactor(NZ,NY,NX)=ClumpFactorInit_pft(NZ,NY,NX)       !clumping factor
+  ClumpFactor_pft(NZ,NY,NX)=ClumpFactorInit_pft(NZ,NY,NX)       !clumping factor
   
   MaxCanPStomaResistH2O_pft(NZ,NY,NX)=RSMX(NZ,NY,NX)/3600.0_r8
   CO2CuticleResist_pft(NZ,NY,NX)=RSMX(NZ,NY,NX)*1.56_r8
@@ -555,7 +555,7 @@ module StartqMod
     CanPBranchHeight(NB,NZ,NY,NX)=0._r8
     
     D5: DO L=1,NumOfCanopyLayers
-      CanopyStemArea_lbrch(L,NB,NZ,NY,NX)=0._r8
+      CanopyStalkArea_lbrch(L,NB,NZ,NY,NX)=0._r8
       DO N=1,NumOfLeafZenithSectors
         StemAreaZsec_brch(N,L,NB,NZ,NY,NX)=0._r8
       enddo
@@ -573,7 +573,7 @@ module StartqMod
       PetioleProteinCNode_brch(K,NB,NZ,NY,NX)=0._r8
 
       D55: DO L=1,NumOfCanopyLayers
-        CanopyLeafAreaByLayer_pft(L,K,NB,NZ,NY,NX)=0._r8
+        CanopyLeafArea_lpft(L,K,NB,NZ,NY,NX)=0._r8
         LeafChemElmByLayerNode_brch(1:NumPlantChemElms,L,K,NB,NZ,NY,NX)=0._r8
       ENDDO D55
 
@@ -591,9 +591,9 @@ module StartqMod
     enddo
   ENDDO D25
   D35: DO L=1,NumOfCanopyLayers
-    CanopyLeafALyr_pft(L,NZ,NY,NX)=0._r8
+    CanopyLeafAreaZ_pft(L,NZ,NY,NX)=0._r8
     CanopyLeafCLyr_pft(L,NZ,NY,NX)=0._r8
-    CanopyStemArea_lpft(L,NZ,NY,NX)=0._r8
+    CanopyStemAreaZ_pft(L,NZ,NY,NX)=0._r8
   ENDDO D35
   CanopyNonstElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
   CanopyNonstElmConc_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8

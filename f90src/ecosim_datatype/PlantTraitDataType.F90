@@ -19,18 +19,18 @@ module PlantTraitDataType
   real(r8),target,allocatable :: FWODRE(:,:)
   real(r8),target,allocatable :: FWOODE(:,:)             !woody C allocation
   real(r8),target,allocatable :: PARTS_brch(:,:,:,:,:)       !C partitioning coefficient
-  real(r8),target,allocatable ::  CanopyStemArea_lbrch(:,:,:,:,:)              !stem layer area, [m2 d-2]
+  real(r8),target,allocatable ::  CanopyStalkArea_lbrch(:,:,:,:,:)              !stem layer area, [m2 d-2]
   real(r8),target,allocatable ::  CanopyLeafArea_pft(:,:,:)                       !plant leaf area, [m2 d-2]
-  real(r8),target,allocatable ::  CanopyArea_pft(:,:,:)                       !plant canopy leaf+stem/stalk area, [m2 d-2]
+  real(r8),target,allocatable ::  LeafStalkArea_pft(:,:,:)                       !plant canopy leaf+stem/stalk area, [m2 d-2]
   real(r8),target,allocatable ::  ARLFX(:,:)                         !total canopy leaf area, [m2 d-2]
   real(r8),target,allocatable ::  CanopyStemArea_pft(:,:,:)                      !plant stem area, [m2 d-2]
   real(r8),target,allocatable ::  CanopyHeight_pft(:,:,:)                          !canopy height, [m]
   real(r8),target,allocatable ::  ARSTX(:,:)                         !total canopy stem area, [m2 d-2]
-  real(r8),target,allocatable ::  CanopyLAgrid_lyr(:,:,:)                       !total leaf area, [m2 d-2]
-  real(r8),target,allocatable ::  CanopyStemA_lyr(:,:,:)                       !total stem area, [m2 d-2]
-  real(r8),target,allocatable ::  CanopyLeafArea_grd(:,:)                         !grid level plant canopy leaf area, [m2 d-2]
-  real(r8),target,allocatable ::  StemArea_grd(:,:)                     !total canopy stem area, [m2 d-2]
-  real(r8),target,allocatable ::  CanopyArea_grd(:,:)                         !canopy area of combined over the grid [m2 d-2]
+  real(r8),target,allocatable ::  CanopyLeafAareZ_col(:,:,:)                       !total leaf area, [m2 d-2]
+  real(r8),target,allocatable ::  CanopyStemAareZ_col(:,:,:)                       !total stem area, [m2 d-2]
+  real(r8),target,allocatable ::  CanopyLeafArea_col(:,:)                         !grid level plant canopy leaf area, [m2 d-2]
+  real(r8),target,allocatable ::  StemArea_col(:,:)                     !total canopy stem area, [m2 d-2]
+  real(r8),target,allocatable ::  LeafStalkArea_col(:,:)                         !canopy area of combined over the grid [m2 d-2]
   integer ,target,allocatable ::  NGTopRootLayer_pft(:,:,:)                           !soil layer at planting depth, [-]
   real(r8),target,allocatable ::  PlantinDepth(:,:,:)                      !planting depth, [m]
   real(r8),target,allocatable ::  SeedDepth_pft(:,:,:)                       !seeding depth, [m]
@@ -38,8 +38,8 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  SeedMeanLen_pft(:,:,:)                        !seed length, [m]
   real(r8),target,allocatable ::  SeedAreaMean_pft(:,:,:)                        !seed surface area, [m2]
   real(r8),target,allocatable ::  HypoctoHeight_pft(:,:,:)                       !cotyledon height, [m]
-  real(r8),target,allocatable ::  MaxCanopyHeight_grd(:,:)                            !canopy height , [m]
-  real(r8),target,allocatable ::  CanopyHeightz_col(:,:,:)                          !canopy layer height , [m]
+  real(r8),target,allocatable ::  CanopyHeight_col(:,:)                            !canopy height , [m]
+  real(r8),target,allocatable ::  CanopyHeightZ_col(:,:,:)                          !canopy layer height , [m]
   real(r8),target,allocatable ::  BranchAngle_pft(:,:,:)                       !branching angle, [degree from horizontal]
   real(r8),target,allocatable ::  PetioleAngle_pft(:,:,:)                       !sheath angle, [degree from horizontal]
   real(r8),target,allocatable ::  SineBranchAngle_pft(:,:,:)                       !branching angle, [degree from horizontal]
@@ -144,8 +144,8 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  FNOD(:,:,:)                        !parameter for allocation of growth to nodes, [-]
   integer,target,allocatable ::  NumCogrowNode(:,:,:)                         !number of concurrently growing nodes
   real(r8),target,allocatable ::  PSICanPDailyMin(:,:,:)                       !minimum daily canopy water potential, [MPa]
-  real(r8),target,allocatable ::  ClumpFactorCurrent_pft(:,:,:)                         !clumping factor for self-shading in canopy layer at current LAI, [-]
-  real(r8),target,allocatable ::  ClumpFactor(:,:,:)                          !clumping factor for self-shading in canopy layer, [-]
+  real(r8),target,allocatable ::  ClumpFactorNow_pft(:,:,:)                         !clumping factor for self-shading in canopy layer at current LAI, [-]
+  real(r8),target,allocatable ::  ClumpFactor_pft(:,:,:)                          !clumping factor for self-shading in canopy layer, [-]
   integer,target,allocatable ::  iPlantShootState_pft(:,:,:)                        !flag to detect canopy death , [-]
   real(r8),target,allocatable ::  MaxPotentSeedNumber_pft(:,:,:)                        !maximum grain node number per branch, [-]
   real(r8),target,allocatable ::  MaxSeedNumPerSite_pft(:,:,:)                        !maximum grain number per node , [-]
@@ -178,18 +178,18 @@ contains
   allocate(FWODBE(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FWODBE=0._r8
   allocate(FWODRE(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FWODRE=0._r8         !
   allocate(FWOODE(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FWOODE=0._r8         !woody element allocation
-  allocate(CanopyStemArea_lbrch(NumOfCanopyLayers,MaxNumBranches,JP,JY,JX));CanopyStemArea_lbrch=0._r8
+  allocate(CanopyStalkArea_lbrch(NumOfCanopyLayers,MaxNumBranches,JP,JY,JX));CanopyStalkArea_lbrch=0._r8
   allocate(CanopyLeafArea_pft(JP,JY,JX));    CanopyLeafArea_pft=0._r8
-  allocate(CanopyArea_pft(JP,JY,JX));    CanopyArea_pft=0._r8
+  allocate(LeafStalkArea_pft(JP,JY,JX));    LeafStalkArea_pft=0._r8
   allocate(ARLFX(JY,JX));       ARLFX=0._r8
   allocate(CanopyStemArea_pft(JP,JY,JX));    CanopyStemArea_pft=0._r8
   allocate(CanopyHeight_pft(JP,JY,JX));       CanopyHeight_pft=0._r8
   allocate(ARSTX(JY,JX));       ARSTX=0._r8
-  allocate(CanopyLAgrid_lyr(NumOfCanopyLayers,JY,JX));    CanopyLAgrid_lyr=0._r8
-  allocate(CanopyStemA_lyr(NumOfCanopyLayers,JY,JX));    CanopyStemA_lyr=0._r8
-  allocate(CanopyLeafArea_grd(JY,JX));       CanopyLeafArea_grd=0._r8
-  allocate(StemArea_grd(JY,JX));       StemArea_grd=0._r8
-  allocate(CanopyArea_grd(JY,JX));       CanopyArea_grd=0._r8
+  allocate(CanopyLeafAareZ_col(NumOfCanopyLayers,JY,JX));    CanopyLeafAareZ_col=0._r8
+  allocate(CanopyStemAareZ_col(NumOfCanopyLayers,JY,JX));    CanopyStemAareZ_col=0._r8
+  allocate(CanopyLeafArea_col(JY,JX));       CanopyLeafArea_col=0._r8
+  allocate(StemArea_col(JY,JX));       StemArea_col=0._r8
+  allocate(LeafStalkArea_col(JY,JX));       LeafStalkArea_col=0._r8
   allocate(NGTopRootLayer_pft(JP,JY,JX));       NGTopRootLayer_pft=0
   allocate(PlantinDepth(JP,JY,JX));   PlantinDepth=0._r8
   allocate(SeedDepth_pft(JP,JY,JX));    SeedDepth_pft=0._r8
@@ -197,8 +197,8 @@ contains
   allocate(SeedMeanLen_pft(JP,JY,JX));     SeedMeanLen_pft=0._r8
   allocate(SeedAreaMean_pft(JP,JY,JX));     SeedAreaMean_pft=0._r8
   allocate(HypoctoHeight_pft(JP,JY,JX));    HypoctoHeight_pft=0._r8
-  allocate(MaxCanopyHeight_grd(JY,JX));          MaxCanopyHeight_grd=0._r8
-  allocate(CanopyHeightz_col(0:NumOfCanopyLayers,JY,JX));     CanopyHeightz_col=0._r8
+  allocate(CanopyHeight_col(JY,JX));          CanopyHeight_col=0._r8
+  allocate(CanopyHeightZ_col(0:NumOfCanopyLayers,JY,JX));     CanopyHeightZ_col=0._r8
   allocate(BranchAngle_pft(JP,JY,JX));    BranchAngle_pft=0._r8
   allocate(PetioleAngle_pft(JP,JY,JX));    PetioleAngle_pft=0._r8
   allocate(SineBranchAngle_pft(JP,JY,JX));    SineBranchAngle_pft=0._r8
@@ -304,8 +304,8 @@ contains
   allocate(FNOD(JP,JY,JX));     FNOD=0._r8
   allocate(NumCogrowNode(JP,JY,JX));     NumCogrowNode=0
   allocate(PSICanPDailyMin(JP,JY,JX));    PSICanPDailyMin=0._r8
-  allocate(ClumpFactorCurrent_pft(JP,JY,JX));      ClumpFactorCurrent_pft=0._r8
-  allocate(ClumpFactor(JP,JY,JX));       ClumpFactor=0._r8
+  allocate(ClumpFactorNow_pft(JP,JY,JX));      ClumpFactorNow_pft=0._r8
+  allocate(ClumpFactor_pft(JP,JY,JX));       ClumpFactor_pft=0._r8
   allocate(iPlantShootState_pft(JP,JY,JX));    iPlantShootState_pft=0
   allocate(MaxPotentSeedNumber_pft(JP,JY,JX));     MaxPotentSeedNumber_pft=0._r8
   allocate(MaxSeedNumPerSite_pft(JP,JY,JX));     MaxSeedNumPerSite_pft=0._r8
@@ -335,18 +335,18 @@ contains
   call destroy(FWODBE)
   call destroy(FWODRE)
   call destroy(FWOODE)
-  call destroy(CanopyStemArea_lbrch)
+  call destroy(CanopyStalkArea_lbrch)
   call destroy(CanopyLeafArea_pft)
-  call destroy(CanopyArea_pft)
+  call destroy(LeafStalkArea_pft)
   call destroy(ARLFX)
   call destroy(CanopyStemArea_pft)
   call destroy(CanopyHeight_pft)
   call destroy(ARSTX)
-  call destroy(CanopyLAgrid_lyr)
-  call destroy(CanopyStemA_lyr)
-  call destroy(CanopyLeafArea_grd)
-  call destroy(StemArea_grd)
-  call destroy(CanopyArea_grd)
+  call destroy(CanopyLeafAareZ_col)
+  call destroy(CanopyStemAareZ_col)
+  call destroy(CanopyLeafArea_col)
+  call destroy(StemArea_col)
+  call destroy(LeafStalkArea_col)
   call destroy(NGTopRootLayer_pft)
   call destroy(PlantinDepth)
   call destroy(SeedDepth_pft)
@@ -354,8 +354,8 @@ contains
   call destroy(SeedMeanLen_pft)
   call destroy(SeedAreaMean_pft)
   call destroy(HypoctoHeight_pft)
-  call destroy(MaxCanopyHeight_grd)
-  call destroy(CanopyHeightz_col)
+  call destroy(CanopyHeight_col)
+  call destroy(CanopyHeightZ_col)
   call destroy(BranchAngle_pft)
   call destroy(PetioleAngle_pft)
   call destroy(SineBranchAngle_pft)
@@ -461,7 +461,7 @@ contains
   call destroy(FNOD)
   call destroy(NumCogrowNode)
   call destroy(PSICanPDailyMin)
-  call destroy(ClumpFactorCurrent_pft)
+  call destroy(ClumpFactorNow_pft)
   call destroy(ClumpFactor)
   call destroy(iPlantShootState_pft)
   call destroy(MaxPotentSeedNumber_pft)

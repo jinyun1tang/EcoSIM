@@ -420,14 +420,14 @@ module grosubsMod
     Root1stXNumL_pvr          =>  plt_morph%Root1stXNumL_pvr          , &
     Root2ndXNum_pvr           =>  plt_morph%Root2ndXNum_pvr           , &
     MY                        =>  plt_morph%MY                        , &
-    CanopyLeafALyr_pft        =>  plt_morph%CanopyLeafALyr_pft        , &
-    CanopyStemArea_lpft       =>  plt_morph%CanopyStemArea_lpft       , &
+    CanopyLeafAreaZ_pft        =>  plt_morph%CanopyLeafAreaZ_pft        , &
+    CanopyStemAreaZ_pft       =>  plt_morph%CanopyStemAreaZ_pft       , &
     NumRootAxes_pft           =>  plt_morph%NumRootAxes_pft             &
   )
   D2: DO L=1,NumOfCanopyLayers1
-    CanopyLeafALyr_pft(L,NZ)=0._r8
+    CanopyLeafAreaZ_pft(L,NZ)=0._r8
     CanopyLeafCLyr_pft(L,NZ)=0._r8
-    CanopyStemArea_lpft(L,NZ)=0._r8
+    CanopyStemAreaZ_pft(L,NZ)=0._r8
   ENDDO D2
 
   D9: DO N=1,MY(NZ)
@@ -646,10 +646,10 @@ module grosubsMod
     NumRootAxes_pft               =>  plt_morph%NumRootAxes_pft          , &
     LeafAreaLive_brch             =>  plt_morph%LeafAreaLive_brch        , &
     CanopyStemArea_pft            =>  plt_morph%CanopyStemArea_pft       , &
-    CanopyStemArea_lbrch          =>  plt_morph%CanopyStemArea_lbrch     , &
+    CanopyStalkArea_lbrch          =>  plt_morph%CanopyStalkArea_lbrch     , &
     SeedNumSet_brch               =>  plt_morph%SeedNumSet_brch          , &
     CanopyLeafArea_pft            =>  plt_morph%CanopyLeafArea_pft       , &
-    CanopyStemArea_lpft           =>  plt_morph%CanopyStemArea_lpft      , &
+    CanopyStemAreaZ_pft           =>  plt_morph%CanopyStemAreaZ_pft      , &
     iPlantNfixType                =>  plt_morph%iPlantNfixType           , &
     CanopySeedNum_pft             =>  plt_morph%CanopySeedNum_pft          &
   )
@@ -667,7 +667,7 @@ module grosubsMod
 !     WTHSBP,WTEABP,WTGRBP=branch husk,ear,grain P mass
 !     WTRVC,WTRVN,WTRVP=storage C,N,P
 !     LeafAreaLive_brch=branch leaf area
-!     CanopyStemArea_lbrch=total branch stalk surface area in each layer
+!     CanopyStalkArea_lbrch=total branch stalk surface area in each layer
 !     SeedNumSet_brch=seed set number
 !
   call SumPlantBiom(I,J,NZ,'Accumstates')
@@ -696,12 +696,12 @@ module grosubsMod
   CanopyLeafShethC_pft(NZ) =sum(LeafPetolBiomassC_brch(1:NumOfBranches_pft(NZ),NZ))
   CanopySeedNum_pft(NZ) =sum(SeedNumSet_brch(1:NumOfBranches_pft(NZ),NZ))
   CanopyLeafArea_pft(NZ)=sum(LeafAreaLive_brch(1:NumOfBranches_pft(NZ),NZ))
-  CanopyStemArea_pft(NZ)=sum(CanopyStemArea_lbrch(1:NumOfCanopyLayers1,1:NumOfBranches_pft(NZ),NZ))
-  CanopyStemArea_lpft(1:NumOfCanopyLayers1,1:NZ)=0._r8
+  CanopyStemArea_pft(NZ)=sum(CanopyStalkArea_lbrch(1:NumOfCanopyLayers1,1:NumOfBranches_pft(NZ),NZ))
+  CanopyStemAreaZ_pft(1:NumOfCanopyLayers1,1:NZ)=0._r8
 
   DO NB=1,NumOfBranches_pft(NZ)
     DO L=1,NumOfCanopyLayers1
-      CanopyStemArea_lpft(L,NZ)=CanopyStemArea_lpft(L,NZ)+CanopyStemArea_lbrch(L,NB,NZ)
+      CanopyStemAreaZ_pft(L,NZ)=CanopyStemAreaZ_pft(L,NZ)+CanopyStalkArea_lbrch(L,NB,NZ)
     ENDDO
   ENDDO
 

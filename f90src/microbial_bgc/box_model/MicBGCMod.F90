@@ -717,7 +717,7 @@ module MicBGCMod
     litrm => micfor%litrm, &
     ORGC=> micfor%ORGC, &
     ZEROS => micfor%ZEROS, &
-    VLSoilPoreMicP => micfor%VLSoilPoreMicP, &
+    VLSoilPoreMicP_vr => micfor%VLSoilPoreMicP_vr, &
     RNO2Y  => micfor%RNO2Y    &
 
   )
@@ -857,7 +857,7 @@ module MicBGCMod
 !  write(*,*)'HETEROTROPHIC DENITRIFICATION'
 !
   IF(N.EQ.micpar%n_anero_faculb.AND.ROXYM(NGL,K).GT.0.0_r8 &
-    .AND.(.not.litrm.OR.VLSoilPoreMicP.GT.ZEROS))THEN
+    .AND.(.not.litrm.OR.VLSoilPoreMicP_vr.GT.ZEROS))THEN
 
     call HeteroDenitrificCatabolism(NGL,N,K,FOQC,RGOCP,&
       VOLWZ,micfor,micstt,naqfdiag,nmicf,nmics,ncplxs,micflx)
@@ -1100,8 +1100,8 @@ module MicBGCMod
   real(r8) :: OQEX(idom_beg:idom_end)
   real(r8) :: OHEX(idom_beg:idom_end)
   integer :: idom
-  real(r8) :: VLSoilPoreMicPX
-  real(r8) :: VLSoilPoreMicPW,VOLCX,VOLCW,VOLAX,VOLAW
+  real(r8) :: VLSoilPoreMicP_vrX
+  real(r8) :: VLSoilPoreMicP_vrW,VOLCX,VOLCW,VOLAX,VOLAW
 !     begin_execution
   associate(                   &
     CGOMEheter  => nmicf%CGOMEheter,     &
@@ -1143,25 +1143,25 @@ module MicBGCMod
       OHEX(idom)=AMAX1(ZEROS,OHM(idom,K))
     ENDDO
 
-    VLSoilPoreMicPX=SoilMicPMassLayer*AECX*HSORP*FOSRH(K)
-    VLSoilPoreMicPW=VLWatMicPM(NPH)*FOSRH(K)
+    VLSoilPoreMicP_vrX=SoilMicPMassLayer*AECX*HSORP*FOSRH(K)
+    VLSoilPoreMicP_vrW=VLWatMicPM(NPH)*FOSRH(K)
     IF(FOCA(K).GT.ZERO)THEN
-      VOLCX=FOCA(K)*VLSoilPoreMicPX
-      VOLCW=FOCA(K)*VLSoilPoreMicPW
+      VOLCX=FOCA(K)*VLSoilPoreMicP_vrX
+      VOLCW=FOCA(K)*VLSoilPoreMicP_vrW
       OMSORP(idom_doc,K)=TSORP*(OQEX(idom_doc)*VOLCX-OHEX(idom_doc)*VOLCW)/(VOLCX+VOLCW)
     ELSE
-      OMSORP(idom_doc,K)=TSORP*(OQEX(idom_doc)*VLSoilPoreMicPX-OHEX(idom_doc)*VLSoilPoreMicPW)/(VLSoilPoreMicPX+VLSoilPoreMicPW)
+      OMSORP(idom_doc,K)=TSORP*(OQEX(idom_doc)*VLSoilPoreMicP_vrX-OHEX(idom_doc)*VLSoilPoreMicP_vrW)/(VLSoilPoreMicP_vrX+VLSoilPoreMicP_vrW)
     ENDIF
 
     IF(FOAA(K).GT.ZERO)THEN
-      VOLAX=FOAA(K)*VLSoilPoreMicPX
-      VOLAW=FOAA(K)*VLSoilPoreMicPW
+      VOLAX=FOAA(K)*VLSoilPoreMicP_vrX
+      VOLAW=FOAA(K)*VLSoilPoreMicP_vrW
       OMSORP(idom_acetate,K)=TSORP*(OQEX(idom_acetate)*VOLAX-OHEX(idom_acetate)*VOLAW)/(VOLAX+VOLAW)
     ELSE
-      OMSORP(idom_acetate,K)=TSORP*(OQEX(idom_acetate)*VLSoilPoreMicPX-OHEX(idom_acetate)*VLSoilPoreMicPW)/(VLSoilPoreMicPX+VLSoilPoreMicPW)
+      OMSORP(idom_acetate,K)=TSORP*(OQEX(idom_acetate)*VLSoilPoreMicP_vrX-OHEX(idom_acetate)*VLSoilPoreMicP_vrW)/(VLSoilPoreMicP_vrX+VLSoilPoreMicP_vrW)
     ENDIF
-    OMSORP(idom_don,K)=TSORP*(OQEX(idom_don)*VLSoilPoreMicPX-OHEX(idom_don)*VLSoilPoreMicPW)/(VLSoilPoreMicPX+VLSoilPoreMicPW)
-    OMSORP(idom_dop,K)=TSORP*(OQEX(idom_dop)*VLSoilPoreMicPX-OHEX(idom_dop)*VLSoilPoreMicPW)/(VLSoilPoreMicPX+VLSoilPoreMicPW)
+    OMSORP(idom_don,K)=TSORP*(OQEX(idom_don)*VLSoilPoreMicP_vrX-OHEX(idom_don)*VLSoilPoreMicP_vrW)/(VLSoilPoreMicP_vrX+VLSoilPoreMicP_vrW)
+    OMSORP(idom_dop,K)=TSORP*(OQEX(idom_dop)*VLSoilPoreMicP_vrX-OHEX(idom_dop)*VLSoilPoreMicP_vrW)/(VLSoilPoreMicP_vrX+VLSoilPoreMicP_vrW)
   ELSE
     DO idom=idom_beg,idom_end
       OMSORP(idom,K)=0.0_r8
@@ -1240,7 +1240,7 @@ module MicBGCMod
 !     DCKI=inhibition of decomposition by microbial concentration
 !     OSRH=total SOC
 !     COSC=concentration of total SOC
-!     SoilMicPMassLayer,VLSoilPoreMicP=mass, volume of soil layer
+!     SoilMicPMassLayer,VLSoilPoreMicP_vr=mass, volume of soil layer
 !     DFNS=effect of microbial concentration on decomposition
 !     OQCI=DOC product inhibition for decomposition
 !     OQKI=DOC product inhibition constant for decomposition
@@ -2888,7 +2888,7 @@ module MicBGCMod
     Rain2LitRSurf => micfor%Rain2LitRSurf , &
     litrm => micfor%litrm , &
     OLSGL  => micfor%OLSGL, &
-    VLSoilPoreMicP => micfor%VLSoilPoreMicP, &
+    VLSoilPoreMicP_vr => micfor%VLSoilPoreMicP_vr, &
     VLSoilMicP  => micfor%VLSoilMicP, &
     ZERO => micfor%ZERO, &
     ZEROS  => micfor%ZEROS, &
@@ -2911,7 +2911,7 @@ module MicBGCMod
     ROXSK => micflx%ROXSK &
   )
   IF(ROXYP(NGL,K).GT.ZEROS.AND.FOXYX.GT.ZERO)THEN
-    IF(.not.litrm.OR.VLSoilPoreMicP.GT.ZEROS)THEN
+    IF(.not.litrm.OR.VLSoilPoreMicP_vr.GT.ZEROS)THEN
       !
       !write(*,*)'MAXIMUM O2 UPAKE FROM POTENTIAL RESPIRATION OF EACH AEROBIC'
       !     POPULATION
@@ -2939,7 +2939,7 @@ module MicBGCMod
         !     OF AQUEOUS O2 FROM DISSOLUTION RATE CONSTANT 'DiffusivitySolutEff'
         !     CALCULATED IN 'WATSUB'
         !
-        !     VLWatMicPM,VLsoiAirPM,VLSoilPoreMicP=water, air and total volumes
+        !     VLWatMicPM,VLsoiAirPM,VLSoilPoreMicP_vr=water, air and total volumes
         !     ORAD=microbial radius,FILM=water film thickness
         !     DIFOX=aqueous O2 diffusion, TortMicPM=tortuosity
         !     BIOS=microbial number, OMA=active biomass

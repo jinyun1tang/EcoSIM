@@ -91,7 +91,7 @@ module MicAutoCPLXMod
     ZEROS  => micfor%ZEROS  ,    &
     SoilMicPMassLayer  => micfor%SoilMicPMassLayer    ,    &
     litrm => micfor%litrm  , &
-    VLSoilPoreMicP  => micfor%VLSoilPoreMicP, &
+    VLSoilPoreMicP_vr  => micfor%VLSoilPoreMicP_vr, &
     ORGC   => micfor%ORGC  ,     &
     ROXYSff => micflx%ROXYSff  &
   )
@@ -209,7 +209,7 @@ module MicAutoCPLXMod
 !
 !     AUTOTROPHIC DENITRIFICATION
 !
-  IF(N.EQ.AmmoniaOxidizeBacteria.AND.ROXYMff(NGL).GT.0.0_r8.AND.(.not.litrm.OR.VLSoilPoreMicP.GT.ZEROS))THEN
+  IF(N.EQ.AmmoniaOxidizeBacteria.AND.ROXYMff(NGL).GT.0.0_r8.AND.(.not.litrm.OR.VLSoilPoreMicP_vr.GT.ZEROS))THEN
     call AutotrophDenitrificCatabolism(NGL,N,XCO2,VOLWZ,micfor,micstt,&
       naqfdiag,nmicf,nmics,micflx)
   ELSE
@@ -678,7 +678,7 @@ module MicAutoCPLXMod
     litrm  => micfor%litrm  , &
     OLSGL => micfor%OLSGL , &
     ROXYL => micfor%ROXYL  , &
-    VLSoilPoreMicP  => micfor%VLSoilPoreMicP   , &
+    VLSoilPoreMicP_vr  => micfor%VLSoilPoreMicP_vr   , &
     VLSoilMicP  => micfor%VLSoilMicP  , &
     VLsoiAirPM  => micfor%VLsoiAirPM , &
     VLWatMicPM  => micfor%VLWatMicPM , &
@@ -700,7 +700,7 @@ module MicAutoCPLXMod
   )
 
   IF(ROXYPff(NGL).GT.ZEROS.AND.FOXYX.GT.ZERO)THEN
-    IF(.not.litrm.OR.VLSoilPoreMicP.GT.ZEROS)THEN
+    IF(.not.litrm.OR.VLSoilPoreMicP_vr.GT.ZEROS)THEN
       !
       !write(*,*)'MAXIMUM O2 UPAKE FROM POTENTIAL RESPIRATION OF EACH AEROBIC'
       !     POPULATION
@@ -729,7 +729,7 @@ module MicAutoCPLXMod
         !     OF AQUEOUS O2 FROM DISSOLUTION RATE CONSTANT 'DiffusivitySolutEff'
         !     CALCULATED IN 'WATSUB'
         !
-        !     VLWatMicPM,VLsoiAirPM,VLSoilPoreMicP=water, air and total volumes
+        !     VLWatMicPM,VLsoiAirPM,VLSoilPoreMicP_vr=water, air and total volumes
         !     ORAD=microbial radius,FILM=water film thickness
         !     DIFOX=aqueous O2 diffusion, TortMicPM=tortuosity
         !     BIOS=microbial number, OMA=active biomass

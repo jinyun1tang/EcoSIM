@@ -583,13 +583,13 @@ implicit none
       !modify the dest grid vertical location if needed
       !by matching the vertical layer number between source and dest, if N/=3
       !if N==3, skip insignificant layers
-      IF(VLSoilPoreMicP(LL,N2,N1).GT.ZEROS2(N2,N1))THEN
+      IF(VLSoilPoreMicP_vr(LL,N2,N1).GT.ZEROS2(N2,N1))THEN
         N6=LL
         exit
       ENDIF
     ENDDO D1200
 
-    IF(VLSoilPoreMicP(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
+    IF(VLSoilPoreMicP_vr(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
       IF(N3.EQ.NU(N2,N1).AND.N.EQ.3)THEN
         !vertical direction, source is at soil surface
         TWatFlowCellMicP(N3,N2,N1)=TWatFlowCellMicP(N3,N2,N1)+WaterFlowSoiMicP(N,N3,N2,N1)-LakeSurfFlowMicP(N5,N4)

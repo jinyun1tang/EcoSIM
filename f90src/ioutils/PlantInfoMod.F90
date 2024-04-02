@@ -328,18 +328,18 @@ implicit none
 !
 !   RE-CALCULATE PLANT INPUTS IN MODEL UNITS
 !
-!   CanopySWabsorpty_pft,CanopyPARabsorpty_pft=leaf SW,PAR absorbtivity
+!   LeafSWabsorpty_pft,LeafPARabsorpty_pft=leaf SW,PAR absorbtivity
 !
     VmaxRubCarboxyRef_pft(NZ,NY,NX)=2.5_r8*VmaxRubCarboxyRef_pft(NZ,NY,NX)
     VmaxRubOxyRef_pft(NZ,NY,NX)=2.5_r8*VmaxRubOxyRef_pft(NZ,NY,NX)
     VmaxPEPCarboxyRef_pft(NZ,NY,NX)=2.5_r8*VmaxPEPCarboxyRef_pft(NZ,NY,NX)
     SpecChloryfilAct_pft(NZ,NY,NX)=2.5_r8*SpecChloryfilAct_pft(NZ,NY,NX)
-    CanopySWabsorpty_pft(NZ,NY,NX)=1.0_r8-CanopySWAlbedo_pft(NZ,NY,NX)-TAUR(NZ,NY,NX)
-    CanopyPARabsorpty_pft(NZ,NY,NX)=1.0_r8-CanopyPARalbedo_pft(NZ,NY,NX)-TAUP(NZ,NY,NX)
-    CanopySWAlbedo_pft(NZ,NY,NX)=CanopySWAlbedo_pft(NZ,NY,NX)/CanopySWabsorpty_pft(NZ,NY,NX)
-    CanopyPARalbedo_pft(NZ,NY,NX)=CanopyPARalbedo_pft(NZ,NY,NX)/CanopyPARabsorpty_pft(NZ,NY,NX)
-    TAUR(NZ,NY,NX)=TAUR(NZ,NY,NX)/CanopySWabsorpty_pft(NZ,NY,NX)
-    TAUP(NZ,NY,NX)=TAUP(NZ,NY,NX)/CanopyPARabsorpty_pft(NZ,NY,NX)
+    LeafSWabsorpty_pft(NZ,NY,NX)=1.0_r8-RadSWLeafAlbedo_pft(NZ,NY,NX)-RadSWLeafTransmis_pft(NZ,NY,NX)
+    LeafPARabsorpty_pft(NZ,NY,NX)=1.0_r8-CanopyPARalbedo_pft(NZ,NY,NX)-RadPARLeafTransmis_pft(NZ,NY,NX)
+    RadSWLeafAlbedo_pft(NZ,NY,NX)=RadSWLeafAlbedo_pft(NZ,NY,NX)/LeafSWabsorpty_pft(NZ,NY,NX)
+    CanopyPARalbedo_pft(NZ,NY,NX)=CanopyPARalbedo_pft(NZ,NY,NX)/LeafPARabsorpty_pft(NZ,NY,NX)
+    RadSWLeafTransmis_pft(NZ,NY,NX)=RadSWLeafTransmis_pft(NZ,NY,NX)/LeafSWabsorpty_pft(NZ,NY,NX)
+    RadPARLeafTransmis_pft(NZ,NY,NX)=RadPARLeafTransmis_pft(NZ,NY,NX)/LeafPARabsorpty_pft(NZ,NY,NX)
     SineBranchAngle_pft(NZ,NY,NX)=SIN(BranchAngle_pft(NZ,NY,NX)*RadianPerDegree)
     SinePetioleAngle_pft(NZ,NY,NX)=SIN(PetioleAngle_pft(NZ,NY,NX)*RadianPerDegree)
     MatureGroup_pft(NZ,NY,NX)=GROUPX(NZ,NY,NX)
@@ -410,10 +410,10 @@ implicit none
   call ncd_getvar(pft_nfid, 'CHL4', loc, LeafC4ChlorofilConc_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'FCO2', loc, CanPCi2CaRatio(NZ,NY,NX))
 
-  call ncd_getvar(pft_nfid, 'ALBR', loc, CanopySWAlbedo_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'ALBR', loc, RadSWLeafAlbedo_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'ALBP', loc, CanopyPARalbedo_pft(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'TAUR', loc, TAUR(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'TAUP', loc, TAUP(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'TAUR', loc, RadSWLeafTransmis_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'TAUP', loc, RadPARLeafTransmis_pft(NZ,NY,NX))
 
   call ncd_getvar(pft_nfid, 'XRNI', loc, RefNodeInitRate_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'XRLA', loc, RefLeafAppearRate_pft(NZ,NY,NX))
@@ -909,10 +909,10 @@ implicit none
 
   write(nu_plt,*)('-',j=1,100)
   write(nu_plt,*)'OPTICAL PROPERTIES'
-  call writefixl(nu_plt,'leaf SW albedo ALBR',CanopySWAlbedo_pft(NZ,NY,NX),50)
+  call writefixl(nu_plt,'leaf SW albedo ALBR',RadSWLeafAlbedo_pft(NZ,NY,NX),50)
   call writefixl(nu_plt,'leaf PAR albedo ALBP',CanopyPARalbedo_pft(NZ,NY,NX),50)
-  call writefixl(nu_plt,'leaf SW transmission TAUR',TAUR(NZ,NY,NX),50)
-  call writefixl(nu_plt,'leaf PAR transmission TAUP',TAUP(NZ,NY,NX),50)
+  call writefixl(nu_plt,'leaf SW transmission TAUR',RadSWLeafTransmis_pft(NZ,NY,NX),50)
+  call writefixl(nu_plt,'leaf PAR transmission TAUP',RadPARLeafTransmis_pft(NZ,NY,NX),50)
   end subroutine plant_optic_trait_disp
 !------------------------------------------------------------------------------------------
 

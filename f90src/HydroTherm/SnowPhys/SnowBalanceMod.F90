@@ -63,19 +63,19 @@ implicit none
   ENGYW=VLHeatCapSnow(1,NY,NX)*TKSnow(1,NY,NX)
   VLHeatCapSnow(1,NY,NX)=cps*VLDrySnoWE(1,NY,NX)+cpw*VLWatSnow(1,NY,NX)+cpi*VLIceSnow(1,NY,NX)
 
-  IF(VLHeatCapSnow(1,NY,NX).GT.VLHeatCapSnowMin(NY,NX))THEN
+  IF(VLHeatCapSnow(1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
     TKSnow(1,NY,NX)=(ENGYW+THeatBySnowRedist(NY,NX))/VLHeatCapSnow(1,NY,NX)
   ELSE
     TKSnow(1,NY,NX)=TairK(NY,NX)
     if(VcumSnowWE(NY,NX)<ZEROS(NY,NX))TKSnow(1,NY,NX)=spval
   ENDIF
 
-  VcumDrySnoWE(NY,NX)=sum(VLDrySnoWE(1:JS,NY,NX))
-  VcumWatSnow(NY,NX)=sum(VLWatSnow(1:JS,NY,NX))
-  VcumIceSnow(NY,NX)=sum(VLIceSnow(1:JS,NY,NX))
+  VcumDrySnoWE_col(NY,NX)=sum(VLDrySnoWE(1:JS,NY,NX))
+  VcumWatSnow_col(NY,NX)=sum(VLWatSnow(1:JS,NY,NX))
+  VcumIceSnow_col(NY,NX)=sum(VLIceSnow(1:JS,NY,NX))
   VcumSnoDWI(NY,NX)=sum(VLSnoDWI(1:JS,NY,NX))
   SnowDepth(NY,NX)=sum(SnowLayerThick(1:JS,NY,NX))
-  VcumSnowWE(NY,NX)=VcumDrySnoWE(NY,NX)+VcumIceSnow(NY,NX)*DENSICE+VcumWatSnow(NY,NX) 
+  VcumSnowWE(NY,NX)=VcumDrySnoWE_col(NY,NX)+VcumIceSnow_col(NY,NX)*DENSICE+VcumWatSnow_col(NY,NX) 
 !
 ! IF SNOWPACK DISAPPEARS
   call SnowpackDisapper(NY,NX)
@@ -95,7 +95,7 @@ implicit none
   real(r8) :: HeatFlo2Surface,ENGYS,ENGY1,ENGY
 !     begin_execution
 !
-  IF(VLHeatCapSnow(1,NY,NX).GT.0.0_r8.AND.VLHeatCapSnow(1,NY,NX).LE.VLHeatCapSnowMin(NY,NX) &
+  IF(VLHeatCapSnow(1,NY,NX).GT.0.0_r8.AND.VLHeatCapSnow(1,NY,NX).LE.VLHeatCapSnowMin_col(NY,NX) &
     .AND.TairK(NY,NX).GT.TFICE)THEN
     !air temperature above freezing, surface snow layer heat insignificant, so it is merged
     !to the surface layer, and all varaibles are reset
@@ -111,9 +111,9 @@ implicit none
     VLWatSnow(1,NY,NX)=0.0_r8
     VLIceSnow(1,NY,NX)=0.0_r8
     VLHeatCapSnow(1,NY,NX)=0.0_r8
-    VcumDrySnoWE(NY,NX)=0.0_r8
-    VcumWatSnow(NY,NX)=0.0_r8
-    VcumIceSnow(NY,NX)=0.0_r8
+    VcumDrySnoWE_col(NY,NX)=0.0_r8
+    VcumWatSnow_col(NY,NX)=0.0_r8
+    VcumIceSnow_col(NY,NX)=0.0_r8
     VcumSnoDWI(NY,NX)=0.0_r8
     SnowDepth(NY,NX)=0.0_r8    
     VcumSnowWE(NY,NX)=0._r8
@@ -287,7 +287,7 @@ implicit none
     TKWX=TKSnow(L,NY,NX)
     ENGYW=VLHeatCapSnow(L,NY,NX)*TKSnow(L,NY,NX)
     VLHeatCapSnow(L,NY,NX)=cps*VLDrySnoWE(L,NY,NX)+cpw*VLWatSnow(L,NY,NX)+cpi*VLIceSnow(L,NY,NX)
-    IF(VHCPWZ(L,NY,NX).GT.VLHeatCapSnowMin(NY,NX).AND.VLHeatCapSnow(L,NY,NX).GT.ZEROS(NY,NX))THEN
+    IF(VHCPWZ(L,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX).AND.VLHeatCapSnow(L,NY,NX).GT.ZEROS(NY,NX))THEN
       TKSnow(L,NY,NX)=(ENGYW+CumHeat2SnowLay(L,NY,NX)+XPhaseChangeHeatL(L,NY,NX))/VLHeatCapSnow(L,NY,NX)
     ELSE
       IF(L.EQ.1)THEN
@@ -371,7 +371,7 @@ implicit none
 
 !     begin_execution
 ! from surface to bottom, and modify the bottom layer
-  IF(VLHeatCapSnow(1,NY,NX).GT.VLHeatCapSnowMin(NY,NX))THEN
+  IF(VLHeatCapSnow(1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
     D325: DO L=1,JS-1
 !      VOLSLX=VLSnoDWI(L,NY,NX)
       IF(VLSnoDWI(L,NY,NX).GT.ZEROS2(NY,NX))THEN
@@ -508,7 +508,7 @@ implicit none
 !     begin_execution
 !     NET WATER AND HEAT FLUXES THROUGH SNOWPACK
 !
-!     VHCPW,VLHeatCapSnowMin=current, minimum snowpack heat capacities
+!     VHCPW,VLHeatCapSnowMin_col=current, minimum snowpack heat capacities
 !     CumSno2SnowLay,CumWat2SnowLay,CumIce2SnowLay=net fluxes of snow,water,ice in snowpack
 !     CumHeat2SnowLay=convective heat fluxes of snow,water,ice in snowpack
 !     XFLWS,WatXfer2SnoLay,IceXfer2SnoLay=snow,water,ice transfer from watsub.f
@@ -517,13 +517,13 @@ implicit none
 !     HeatConvSno2Soi,HeatConvSno2LitR=heat flux from lowest snow layer to soil,litter
 
   D1205: DO LS=1,JS
-    IF(VLHeatCapSnow(LS,NY,NX).GT.VLHeatCapSnowMin(NY,NX))THEN
+    IF(VLHeatCapSnow(LS,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
       !id of next snow layer
       LS2=MIN(JS,LS+1)
 !
 !     IF LOWER LAYER IS IN THE SNOWPACK
 !
-      IF(LS.LT.JS.AND.VLHeatCapSnow(LS2,N2,N1).GT.VLHeatCapSnowMin(N2,N1))THEN
+      IF(LS.LT.JS.AND.VLHeatCapSnow(LS2,N2,N1).GT.VLHeatCapSnowMin_col(N2,N1))THEN
         !not surface layer, and is heat significant
         CumSno2SnowLay(LS,N2,N1)=CumSno2SnowLay(LS,N2,N1)+SnoXfer2SnoLay(LS,N2,N1)-SnoXfer2SnoLay(LS2,N2,N1)
         CumWat2SnowLay(LS,N2,N1)=CumWat2SnowLay(LS,N2,N1)+WatXfer2SnoLay(LS,N2,N1)-WatXfer2SnoLay(LS2,N2,N1) &
