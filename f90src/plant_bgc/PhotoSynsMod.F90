@@ -108,6 +108,9 @@ implicit none
                 ETLF=(PARJ-SQRT(PARJ*PARJ-CURV4*PARX*LigthSatCarboxyRate_node(K,NB,NZ)))/CURV2
                 EGRO=ETLF*RubiscoCarboxyEff_node(K,NB,NZ)
                 VL=AMIN1(CO2lmtRubiscoCarboxyRate_node(K,NB,NZ),EGRO)*RubiscoActivity_brch(NB,NZ)
+                !turn off the limiter of rubisco acitivity
+                VL=AMIN1(CO2lmtRubiscoCarboxyRate_node(K,NB,NZ),EGRO)
+                !the tow lines below are for diagnostics
                 CH2OClmK=CH2OClmK+CO2lmtRubiscoCarboxyRate_node(K,NB,NZ)
                 CH2OLlmK=CH2OLlmK+EGRO
 !
@@ -120,9 +123,11 @@ implicit none
 !             GSL=leaf stomatal conductance (mol m-2 s-1)
 !             Stomata_Activity=stomatal resistance function of canopy turgor
 !             AirConc_pft=number of moles of air per m3
-!
+!                
                 IF(VL.GT.ZERO)THEN
                   RS=AMIN1(CO2CuticleResist_pft(NZ),AMAX1(RCMN,DiffCO2Atmos2Intracel_pft(NZ)/VL))
+!                  RSL=RS+(CO2CuticleResist_pft(NZ)-RS)*Stomata_Activity
+! the following is temporary test
                   RSL=RS+(CO2CuticleResist_pft(NZ)-RS)*Stomata_Activity
                   GSL=1.0_r8/RSL*AirConc_pft(NZ)
 !

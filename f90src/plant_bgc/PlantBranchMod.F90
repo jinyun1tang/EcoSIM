@@ -100,13 +100,13 @@ module PlantBranchMod
     call CalcPartitionCoeff(I,J,NB,NZ,PART,PTRT,LRemob_brch,BegRemoblize)
 
     call UpdateBranchAllometry(I,J,NZ,NB,PART,CNLFW,CNRTW,CNSHW,CPLFW,&
-    CPRTW,CPSHW,ShootStructE(ielmn),DMSHD,CNLFM,CPLFM,&
+    CPRTW,CPSHW,ShootStructE,DMSHD,CNLFM,CPLFM,&
       CNSHX,CPSHX,CNLFX,CPLFX,DMLFB,DMSHB,CNLFB,CPLFB,CNSHB,CPSHB)
 !
 !   GROSS PRIMARY PRODUCTIVITY
 !
     call UpdatePhotosynthates(I,J,NB,NZ,TFN6_vr,DMSHD,CNLFM,CPLFM,CNSHX,CPSHX &
-      ,CNLFX,CPLFX,ShootStructE(ielmn),TFN5,WFNG,Stomata_Activity,WFNSG,CH2O3,CH2O4,CNPG &
+      ,CNLFX,CPLFX,ShootStructE,TFN5,WFNG,Stomata_Activity,WFNSG,CH2O3,CH2O4,CNPG &
       ,RCO2NonstC_brch,RCO2Maint_brch,RMxess_brch,NonstC4Groth_brch,CNRDM,RCO2NonstC4Nassim_brch)
 !
 !
@@ -414,13 +414,13 @@ module PlantBranchMod
 
 !------------------------------------------------------------------------------------------
   subroutine UpdateBranchAllometry(I,J,NZ,NB,PART,CNLFW,CNRTW,CNSHW,CPLFW,&
-    CPRTW,CPSHW,ShootStructE(ielmn),DMSHD,CNLFM,CPLFM,&
+    CPRTW,CPSHW,ShootStructE,DMSHD,CNLFM,CPLFM,&
     CNSHX,CPSHX,CNLFX,CPLFX,DMLFB,DMSHB,CNLFB,CPLFB,CNSHB,CPSHB)
   implicit none
   integer, intent(in) :: I,J,NB,NZ
   real(r8), intent(in) :: CNLFW,CNRTW,CNSHW,CPLFW,CPRTW,CPSHW
   real(r8), intent(in) :: PART(pltpar%NumOfPlantMorphUnits)
-  real(r8), intent(out) :: ShootStructE(ielmn)    
+  real(r8), intent(out) :: ShootStructE(NumPlantChemElms)    
   real(r8), intent(out) :: DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX
   real(r8), intent(out) :: DMLFB,DMSHB,CNLFB,CPLFB,CNSHB,CPSHB
 
@@ -784,13 +784,14 @@ module PlantBranchMod
 !------------------------------------------------------------------------------------------
 
   subroutine UpdatePhotosynthates(I,J,NB,NZ,TFN6_vr,DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX,&
-    ShootStructE(ielmn),TFN5,WFNG,Stomata_Activity,WFNSG,CH2O3,CH2O4,CNPG,RCO2NonstC_brch,RCO2Maint_brch,&
+    ShootStructE,TFN5,WFNG,Stomata_Activity,WFNSG,CH2O3,CH2O4,CNPG,RCO2NonstC_brch,RCO2Maint_brch,&
     RMxess_brch,NonstC4Groth_brch,CNRDM,RCO2NonstC4Nassim_brch)
   implicit none
   integer, intent(in) :: I,J,NB,NZ
   real(r8), intent(in) :: TFN6_vr(JZ1)
   real(r8), intent(in) :: DMSHD
-  real(r8), intent(in) :: CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX,ShootStructE(ielmn),TFN5,WFNG
+  real(r8), intent(in) :: CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX
+  real(r8), intent(in) :: ShootStructE(NumPlantChemElms),TFN5,WFNG
   real(r8), intent(in) :: Stomata_Activity,WFNSG
   real(r8), intent(out) :: RCO2NonstC_brch
   real(r8), intent(out) :: RCO2Maint_brch
@@ -818,6 +819,7 @@ module PlantBranchMod
 !  
     call ComputeGPP(NB,NZ,WFNG,Stomata_Activity,CH2O3,CH2O4,CH2O,CO2F,CH2OClm,CH2OLlm)
 
+    CH2O=CH2O*50._r8;CO2F=CO2F*50._r8
 !   SHOOT AUTOTROPHIC RESPIRATION AFTER EMERGENCE
 !
     call ComputRAutoAfEmergence(I,J,NB,NZ,DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX,&
@@ -881,19 +883,19 @@ module PlantBranchMod
   real(r8) :: CPL4M,CCBS,CPL3K,aquCO2IntraLeafLeakFromBndsheth
 
 !     begin_execution
-  associate(                              &
-    CO2NetFix_pft                =>  plt_bgcr%CO2NetFix_pft       , &
-    CanopyGrosRCO2_pft           =>  plt_bgcr%CanopyGrosRCO2_pft      , &
-    CanopyPlusNodulRespC_pft     =>  plt_bgcr%CanopyPlusNodulRespC_pft      , &
-    Eco_AutoR_col                =>  plt_bgcr%Eco_AutoR_col       , &
-    ECO_ER_col                   =>  plt_bgcr%ECO_ER_col       , &
-    LeafElmntNode_brch           =>  plt_biom%LeafElmntNode_brch      , &
-    ZEROP                        =>  plt_biom%ZEROP      , &
-    CMassHCO3BundleSheath_node   =>  plt_photo%CMassHCO3BundleSheath_node      , &
-    CMassCO2BundleSheath_node    =>  plt_photo%CMassCO2BundleSheath_node      , &
-    CPOOL3_node                  =>  plt_photo%CPOOL3_node    , &
-    CPOOL4_node                  =>  plt_photo%CPOOL4_node    , &
-    aquCO2Intraleaf_pft          =>  plt_photo%aquCO2Intraleaf_pft        &
+  associate(                                                                 &
+    CO2NetFix_pft                =>  plt_bgcr%CO2NetFix_pft                , &
+    CanopyGrosRCO2_pft           =>  plt_bgcr%CanopyGrosRCO2_pft           , &
+    CanopyPlusNodulRespC_pft     =>  plt_bgcr%CanopyPlusNodulRespC_pft     , &
+    Eco_AutoR_col                =>  plt_bgcr%Eco_AutoR_col                , &
+    ECO_ER_col                   =>  plt_bgcr%ECO_ER_col                   , &
+    LeafElmntNode_brch           =>  plt_biom%LeafElmntNode_brch           , &
+    ZEROP                        =>  plt_biom%ZEROP                        , &
+    CMassHCO3BundleSheath_node   =>  plt_photo%CMassHCO3BundleSheath_node  , &
+    CMassCO2BundleSheath_node    =>  plt_photo%CMassCO2BundleSheath_node   , &
+    CPOOL3_node                  =>  plt_photo%CPOOL3_node                 , &
+    CPOOL4_node                  =>  plt_photo%CPOOL4_node                 , &
+    aquCO2Intraleaf_pft          =>  plt_photo%aquCO2Intraleaf_pft           &
   )
   D170: DO K=1,MaxNodesPerBranch1
     IF(LeafElmntNode_brch(ielmc,K,NB,NZ).GT.ZEROP(NZ))THEN
@@ -3015,7 +3017,7 @@ module PlantBranchMod
 !------------------------------------------------------------------------------------------
 
   subroutine ComputRAutoAfEmergence(I,J,NB,NZ,DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX,CO2F,&
-    CH2O,TFN5,WFNG,WFNSG,ShootStructE(ielmn),CanopyNonstElm4Gros,CNPG,RCO2NonstC_brch,RCO2Maint_brch,RMxess_brch,&
+    CH2O,TFN5,WFNG,WFNSG,ShootStructE,CanopyNonstElm4Gros,CNPG,RCO2NonstC_brch,RCO2Maint_brch,RMxess_brch,&
     NonstC4Groth_brch,RCO2NonstC4Nassim_brch)
   implicit none
   integer, intent(in) :: I,J,NB,NZ
@@ -3025,7 +3027,7 @@ module PlantBranchMod
   real(r8), intent(out) :: RCO2Maint_brch,RMxess_brch,NonstC4Groth_brch,RCO2NonstC4Nassim_brch
   real(r8), intent(in) :: DMSHD
   real(r8), intent(in) :: CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX
-  real(r8), intent(in) :: ShootStructE(ielmn),CO2F,CH2O,TFN5
+  real(r8), intent(in) :: ShootStructE(NumPlantChemElms),CO2F,CH2O,TFN5
   real(r8), intent(in) :: WFNG,WFNSG
   real(r8) :: ZPOOLB
   real(r8) :: PPOOLB
@@ -3212,12 +3214,13 @@ module PlantBranchMod
 !------------------------------------------------------------------------------------------
 
   subroutine ComputRAutoB4Emergence(I,NB,NZ,TFN6_vr,DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,&
-    CNLFX,CPLFX,ShootStructE(ielmn),WFNG,WFNSG,CanopyNonstElm4Gros,CNPG,RCO2NonstC_brch,&
+    CNLFX,CPLFX,ShootStructE,WFNG,WFNSG,CanopyNonstElm4Gros,CNPG,RCO2NonstC_brch,&
     RCO2Maint_brch,RMxess_brch,NonstC4Groth_brch,CNRDM,RCO2NonstC4Nassim_brch)
   implicit none
   integer, intent(in) :: I,NB,NZ
   real(r8),intent(in) :: TFN6_vr(JZ1)
-  real(r8), intent(in) :: DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX,ShootStructE(ielmn),WFNG
+  real(r8), intent(in) :: DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX
+  real(r8), intent(in) :: ShootStructE(NumPlantChemElms),WFNG
   real(r8), intent(in) :: WFNSG
   real(r8), intent(out) :: CanopyNonstElm4Gros(NumPlantChemElms)
   real(r8), intent(out) :: RCO2NonstC_brch

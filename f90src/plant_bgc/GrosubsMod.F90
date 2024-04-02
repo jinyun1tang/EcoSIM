@@ -380,49 +380,49 @@ module grosubsMod
   real(r8) :: ACTVM,RTK,STK,TKCM,TKSM
 !     begin_execution
 
-  associate(                            &
-    TKC                       =>  plt_ew%TKC         , &
-    TKS                       =>  plt_ew%TKS         , &
-    PSICanopy_pft             =>  plt_ew%PSICanopy_pft      , &
-    PSICanopyTurg_pft         =>  plt_ew%PSICanopyTurg_pft       , &
+  associate(                                                            &
+    TKC                       =>  plt_ew%TKC                          , &
+    TKS                       =>  plt_ew%TKS                          , &
+    PSICanopy_pft             =>  plt_ew%PSICanopy_pft                , &
+    PSICanopyTurg_pft         =>  plt_ew%PSICanopyTurg_pft            , &
     PlantPopulation_pft       =>  plt_site%PlantPopulation_pft        , &
-    NU                        =>  plt_site%NU        , &
-    MaxNumRootLays            =>  plt_site%MaxNumRootLays        , &
-    OFFST                     =>  plt_pheno%OFFST    , &
-    ZEROP                     =>  plt_biom%ZEROP     , &
-    CanopyStalkC_pft          =>  plt_biom%CanopyStalkC_pft     , &
-    RootProteinC_pvr          =>  plt_biom%RootProteinC_pvr     , &
-    RootBiomCPerPlant_pft     =>  plt_biom%RootBiomCPerPlant_pft     , &
-    StalkStrutElms_pft        =>  plt_biom%StalkStrutElms_pft    , &
-    RootElms_pft              =>  plt_biom%RootElms_pft     , &
-    CanopyLeafCLyr_pft        =>  plt_biom%CanopyLeafCLyr_pft     , &
-    iPlantTurnoverPattern_pft =>  plt_pheno%iPlantTurnoverPattern_pft   , &
-    iPlantRootProfile_pft     =>  plt_pheno%iPlantRootProfile_pft   , &
-    RCO2A_pvr                 =>  plt_rbgc%RCO2A_pvr     , &
-    RootRespPotent_pvr        =>  plt_rbgc%RootRespPotent_pvr     , &
-    RCO2N_pvr                 =>  plt_rbgc%RCO2N_pvr     , &
-    RootrNC_pft               =>  plt_allom%RootrNC_pft    , &
-    RootrPC_pft               =>  plt_allom%RootrPC_pft    , &
+    NU                        =>  plt_site%NU                         , &
+    MaxNumRootLays            =>  plt_site%MaxNumRootLays             , &
+    OFFST                     =>  plt_pheno%OFFST                     , &
+    ZEROP                     =>  plt_biom%ZEROP                      , &
+    CanopyStalkC_pft          =>  plt_biom%CanopyStalkC_pft           , &
+    RootProteinC_pvr          =>  plt_biom%RootProteinC_pvr           , &
+    RootBiomCPerPlant_pft     =>  plt_biom%RootBiomCPerPlant_pft      , &
+    StalkStrutElms_pft        =>  plt_biom%StalkStrutElms_pft         , &
+    RootElms_pft              =>  plt_biom%RootElms_pft               , &
+    CanopyLeafCLyr_pft        =>  plt_biom%CanopyLeafCLyr_pft         , &
+    iPlantTurnoverPattern_pft =>  plt_pheno%iPlantTurnoverPattern_pft , &
+    iPlantRootProfile_pft     =>  plt_pheno%iPlantRootProfile_pft     , &
+    RCO2A_pvr                 =>  plt_rbgc%RCO2A_pvr                  , &
+    RootRespPotent_pvr        =>  plt_rbgc%RootRespPotent_pvr         , &
+    RCO2N_pvr                 =>  plt_rbgc%RCO2N_pvr                  , &
+    RootrNC_pft               =>  plt_allom%RootrNC_pft               , &
+    RootrPC_pft               =>  plt_allom%RootrPC_pft               , &
     FracHour4LeafoffRemob     =>  plt_allom%FracHour4LeafoffRemob     , &
-    FWODLE                    =>  plt_allom%FWODLE   , &
-    FWODBE                    =>  plt_allom%FWODBE   , &
-    FWOODE                    =>  plt_allom%FWOODE   , &
-    FWODRE                    =>  plt_allom%FWODRE   , &
-    CNLF                      =>  plt_allom%CNLF     , &
-    CPLF                      =>  plt_allom%CPLF     , &
-    CNSHE                     =>  plt_allom%CNSHE    , &
-    CPSHE                     =>  plt_allom%CPSHE    , &
-    rNCStalk_pft              =>  plt_allom%rNCStalk_pft   , &
-    rPCStalk_pft              =>  plt_allom%rPCStalk_pft    , &
-    k_fine_litr               =>  pltpar%k_fine_litr,&
-    k_woody_litr              =>  pltpar%k_woody_litr,&
-    RCS                       =>  plt_photo%RCS      , &
-    Root1stXNumL_pvr          =>  plt_morph%Root1stXNumL_pvr    , &
-    Root2ndXNum_pvr           =>  plt_morph%Root2ndXNum_pvr     , &
-    MY                        =>  plt_morph%MY       , &
-    CanopyLeafALyr_pft        =>  plt_morph%CanopyLeafALyr_pft    , &
-    CanopyStemArea_lpft       =>  plt_morph%CanopyStemArea_lpft    , &
-    NumRootAxes_pft           =>  plt_morph%NumRootAxes_pft       &
+    FWODLE                    =>  plt_allom%FWODLE                    , &
+    FWODBE                    =>  plt_allom%FWODBE                    , &
+    FWOODE                    =>  plt_allom%FWOODE                    , &
+    FWODRE                    =>  plt_allom%FWODRE                    , &
+    CNLF                      =>  plt_allom%CNLF                      , &
+    CPLF                      =>  plt_allom%CPLF                      , &
+    CNSHE                     =>  plt_allom%CNSHE                     , &
+    CPSHE                     =>  plt_allom%CPSHE                     , &
+    rNCStalk_pft              =>  plt_allom%rNCStalk_pft              , &
+    rPCStalk_pft              =>  plt_allom%rPCStalk_pft              , &
+    k_fine_litr               =>  pltpar%k_fine_litr                  , &
+    k_woody_litr              =>  pltpar%k_woody_litr                 , &
+    RCS                       =>  plt_photo%RCS                       , &
+    Root1stXNumL_pvr          =>  plt_morph%Root1stXNumL_pvr          , &
+    Root2ndXNum_pvr           =>  plt_morph%Root2ndXNum_pvr           , &
+    MY                        =>  plt_morph%MY                        , &
+    CanopyLeafALyr_pft        =>  plt_morph%CanopyLeafALyr_pft        , &
+    CanopyStemArea_lpft       =>  plt_morph%CanopyStemArea_lpft       , &
+    NumRootAxes_pft           =>  plt_morph%NumRootAxes_pft             &
   )
   D2: DO L=1,NumOfCanopyLayers1
     CanopyLeafALyr_pft(L,NZ)=0._r8
@@ -545,6 +545,11 @@ module grosubsMod
   ELSE
     !others
     Stomata_Activity=EXP(RCS(NZ)*PSICanopyTurg_pft(NZ))
+    if(NZ==1)THEN
+    WRITE(401,*)I+J/24.,Stomata_Activity,RCS(NZ),PSICanopyTurg_pft(NZ)
+    ELSE
+    WRITE(402,*)I+J/24.,Stomata_Activity,RCS(NZ),PSICanopyTurg_pft(NZ)
+    ENDIF
     WFNG=EXP(0.10_r8*PSICanopy_pft(NZ))
     WFNSG=WFNS**0.25_r8
   ENDIF

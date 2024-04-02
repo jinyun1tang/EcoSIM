@@ -1138,7 +1138,7 @@ module PlantDisturbsMod
   real(r8) :: WHVSKX,WHVSTX,WHVSTY,WHVRVX,WHVRVY,WTNDG,WTNDNG
   real(r8) :: WTNDPG,WGLFGX,WGSHGX,WGLFGY,WGSHGY
   real(r8) :: WHVSBS,WHVSCX,WHVSNX,WVPLT
-  real(r8) :: FHVSH1,FHVSHT
+  real(r8) :: FHVSH1,FHVSHT,dFHVST4
   real(r8) :: WGLFGE(NumPlantChemElms)
   integer :: NTG
 !     begin_execution

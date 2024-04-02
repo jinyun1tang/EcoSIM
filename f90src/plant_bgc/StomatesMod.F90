@@ -113,9 +113,9 @@
 
 !------------------------------------------------------------------------------------------
 
-  subroutine C3FixCO2(K,N,M,L,NB,NZ,PAR_zsec,Tau_rad,CH2O)
+  subroutine C3FixCO2(I,J,K,N,M,L,NB,NZ,PAR_zsec,Tau_rad,CH2O)
   implicit none
-  integer, intent(in) :: K,N,M,L,NB,NZ
+  integer, intent(in) :: I,J,K,N,M,L,NB,NZ
   real(r8),intent(in) :: PAR_zsec,Tau_rad
   real(r8), intent(inout) :: CH2O
   real(r8) :: ETLF,EGRO,PARX,PARJ
@@ -159,9 +159,9 @@
   end subroutine C3FixCO2
 !------------------------------------------------------------------------------------------
 
-  subroutine C3PhotosynsCanopyLayerL(L,K,NB,NZ,CH2O)
+  subroutine C3PhotosynsCanopyLayerL(I,J,L,K,NB,NZ,CH2O)
   implicit none
-  integer, intent(in) :: L,K,NB,NZ
+  integer, intent(in) :: I,J,L,K,NB,NZ
   real(r8), intent(inout) :: CH2O
   integer :: N,M,LP
   real(r8) :: PAR_zsec,Tau_rad
@@ -191,7 +191,7 @@
             Tau_rad=TAU_RadThru(L+1)        
           ENDIF
     !
-          if(PAR_zsec>0._r8)call C3FixCO2(K,N,M,L,NB,NZ,PAR_zsec,Tau_rad,CH2O)          
+          if(PAR_zsec>0._r8)call C3FixCO2(I,J,K,N,M,L,NB,NZ,PAR_zsec,Tau_rad,CH2O)          
         ENDDO
       ENDIF
     ENDDO
@@ -200,32 +200,32 @@
   end subroutine C3PhotosynsCanopyLayerL
 !------------------------------------------------------------------------------------------
 
-  subroutine C3Photosynthesis(K,NB,NZ,CH2O,TFN_Carboxy,TFN_Oxy,TFN_eTransp,Km4RubOxy,ProteinPerLeafArea)
+  subroutine C3Photosynthesis(I,J,K,NB,NZ,CH2O,TFN_Carboxy,TFN_Oxy,TFN_eTransp,Km4RubOxy,ProteinPerLeafArea)
   implicit none
-  integer, intent(in) :: K,NB,NZ
+  integer, intent(in) :: I,J,K,NB,NZ
   real(r8), intent(inout) :: CH2O
   real(r8), intent(in) :: TFN_Carboxy,TFN_Oxy,TFN_eTransp,ProteinPerLeafArea,Km4RubOxy
   integer :: L
   real(r8) :: ETDN,VCDN
   real(r8) :: VOGRO
 !     begin_execution
-  associate(                          &
-    CanopyLeafAreaByLayer_pft       =>  plt_morph%CanopyLeafAreaByLayer_pft , &
-    ZEROP                           =>  plt_biom%ZEROP  , &
-    O2L                             =>  plt_photo%O2L   , &
-    aquCO2Intraleaf_pft             =>  plt_photo%aquCO2Intraleaf_pft  , &
-    LeafC3ChlorofilConc_pft         =>  plt_photo%LeafC3ChlorofilConc_pft   , &
-    Vmax4RubiscoCarboxy_pft         =>  plt_photo%Vmax4RubiscoCarboxy_pft , &
-    Km4LeafaqCO2_pft                =>  plt_photo%Km4LeafaqCO2_pft, &
-    Km4RubiscoCarboxy_pft           =>  plt_photo%Km4RubiscoCarboxy_pft, &
-    SpecChloryfilAct_pft            =>  plt_photo%SpecChloryfilAct_pft  , &
-    LigthSatCarboxyRate_node        =>  plt_photo%LigthSatCarboxyRate_node , &
+  associate(                                                                      & 
+    CanopyLeafAreaByLayer_pft       =>  plt_morph%CanopyLeafAreaByLayer_pft     , &
+    ZEROP                           =>  plt_biom%ZEROP                          , &
+    O2L                             =>  plt_photo%O2L                           , &
+    aquCO2Intraleaf_pft             =>  plt_photo%aquCO2Intraleaf_pft           , &
+    LeafC3ChlorofilConc_pft         =>  plt_photo%LeafC3ChlorofilConc_pft       , &
+    Vmax4RubiscoCarboxy_pft         =>  plt_photo%Vmax4RubiscoCarboxy_pft       , &
+    Km4LeafaqCO2_pft                =>  plt_photo%Km4LeafaqCO2_pft              , &
+    Km4RubiscoCarboxy_pft           =>  plt_photo%Km4RubiscoCarboxy_pft         , &
+    SpecChloryfilAct_pft            =>  plt_photo%SpecChloryfilAct_pft          , &
+    LigthSatCarboxyRate_node        =>  plt_photo%LigthSatCarboxyRate_node      , &
     CO2lmtRubiscoCarboxyRate_node   =>  plt_photo%CO2lmtRubiscoCarboxyRate_node , &
-    VmaxRubCarboxyRef_pft           =>  plt_photo%VmaxRubCarboxyRef_pft , &
-    RubiscoCarboxyEff_node          =>  plt_photo%RubiscoCarboxyEff_node , &
-    VmaxRubOxyRef_pft               =>  plt_photo%VmaxRubOxyRef_pft  , &
-    CO2CompenPoint_node             =>  plt_photo%CO2CompenPoint_node , &
-    LeafRuBPConc_pft                =>  plt_photo%LeafRuBPConc_pft    &
+    VmaxRubCarboxyRef_pft           =>  plt_photo%VmaxRubCarboxyRef_pft         , &
+    RubiscoCarboxyEff_node          =>  plt_photo%RubiscoCarboxyEff_node        , &
+    VmaxRubOxyRef_pft               =>  plt_photo%VmaxRubOxyRef_pft             , &
+    CO2CompenPoint_node             =>  plt_photo%CO2CompenPoint_node           , &
+    LeafRuBPConc_pft                =>  plt_photo%LeafRuBPConc_pft                &
   )
 !
 !     SURFICIAL DENSITY OF RUBISCO AND ITS LeafC3ChlorofilConc_pftOROPHYLL
@@ -282,16 +282,16 @@
 !
   DO L=NumOfCanopyLayers1,1,-1
     IF(CanopyLeafAreaByLayer_pft(L,K,NB,NZ).GT.ZEROP(NZ))THEN
-      call C3PhotosynsCanopyLayerL(L,K,NB,NZ,CH2O)
+      call C3PhotosynsCanopyLayerL(I,J,L,K,NB,NZ,CH2O)
     ENDIF
   ENDDO
   end associate
   end subroutine C3Photosynthesis
 !------------------------------------------------------------------------------------------
 
-  subroutine C4Photosynthesis(K,NB,NZ,CH2O,TFN_Carboxy,TFN_Oxy,TFN_eTransp,Km4RubOxy,ProteinPerLeafArea)
+  subroutine C4Photosynthesis(I,J,K,NB,NZ,CH2O,TFN_Carboxy,TFN_Oxy,TFN_eTransp,Km4RubOxy,ProteinPerLeafArea)
   implicit none
-  integer, intent(in) :: K,NB,NZ
+  integer, intent(in) :: I,J,K,NB,NZ
   real(r8), intent(inout) :: CH2O
   real(r8), intent(in) :: TFN_Carboxy,TFN_Oxy,TFN_eTransp,Km4RubOxy,ProteinPerLeafArea
   integer :: L
@@ -301,35 +301,35 @@
   real(r8) :: VCDN4,VCDN
   real(r8) :: VOGRO
 !     begin_execution
-  associate(                                    &
-    LeafElmntNode_brch             =>  plt_biom%LeafElmntNode_brch  , &
-    ZEROP                          =>  plt_biom%ZEROP  , &
-    CanopyLeafAreaByLayer_pft      =>  plt_morph%CanopyLeafAreaByLayer_pft , &
-    C4PhotosynDowreg_brch          =>  plt_photo%C4PhotosynDowreg_brch , &
-    LeafC4ChlorofilConc_pft        =>  plt_photo%LeafC4ChlorofilConc_pft  , &
-    O2L                            =>  plt_photo%O2L   , &
-    aquCO2Intraleaf_pft            =>  plt_photo%aquCO2Intraleaf_pft  , &
-    SpecChloryfilAct_pft           =>  plt_photo%SpecChloryfilAct_pft  , &
-    VmaxPEPCarboxyRef_pft          =>  plt_photo%VmaxPEPCarboxyRef_pft , &
-    LeafRuBPConc_pft               =>  plt_photo%LeafRuBPConc_pft  , &
-    Km4PEPCarboxy_pft              =>  plt_photo%Km4PEPCarboxy_pft, &
-    CMassCO2BundleSheath_node      =>  plt_photo%CMassCO2BundleSheath_node  , &
-    CPOOL4_node                         =>  plt_photo%CPOOL4_node, &
-    Km4LeafaqCO2_pft               =>  plt_photo%Km4LeafaqCO2_pft, &
-    NutrientCtrlonC4Carboxy_node   =>  plt_photo%NutrientCtrlonC4Carboxy_node , &
-    Km4RubiscoCarboxy_pft          =>  plt_photo%Km4RubiscoCarboxy_pft, &
-    LeafC3ChlorofilConc_pft        =>  plt_photo%LeafC3ChlorofilConc_pft   , &
-    RubiscoCarboxyEff_node         =>  plt_photo%RubiscoCarboxyEff_node , &
-    VmaxRubCarboxyRef_pft          =>  plt_photo%VmaxRubCarboxyRef_pft , &
-    LigthSatCarboxyRate_node       =>  plt_photo%LigthSatCarboxyRate_node , &
-    CO2lmtRubiscoCarboxyRate_node  =>  plt_photo%CO2lmtRubiscoCarboxyRate_node , &
-    Vmax4RubiscoCarboxy_pft        =>  plt_photo%Vmax4RubiscoCarboxy_pft , &
-    CO2CompenPoint_node            =>  plt_photo%CO2CompenPoint_node , &
-    Vmax4PEPCarboxy_pft            =>  plt_photo%Vmax4PEPCarboxy_pft , &
-    CO2lmtPEPCarboxyRate_node      =>  plt_photo%CO2lmtPEPCarboxyRate_node, &
-    VmaxRubOxyRef_pft              =>  plt_photo%VmaxRubOxyRef_pft  , &
-    C4CarboxyEff_node              =>  plt_photo%C4CarboxyEff_node , &
-    LigthSatC4CarboxyRate_node     =>  plt_photo%LigthSatC4CarboxyRate_node , &
+  associate(                                                                       &
+    LeafElmntNode_brch             =>  plt_biom%LeafElmntNode_brch               , &
+    ZEROP                          =>  plt_biom%ZEROP                            , &
+    CanopyLeafAreaByLayer_pft      =>  plt_morph%CanopyLeafAreaByLayer_pft       , &
+    C4PhotosynDowreg_brch          =>  plt_photo%C4PhotosynDowreg_brch           , &
+    LeafC4ChlorofilConc_pft        =>  plt_photo%LeafC4ChlorofilConc_pft         , &
+    O2L                            =>  plt_photo%O2L                             , &
+    aquCO2Intraleaf_pft            =>  plt_photo%aquCO2Intraleaf_pft             , &
+    SpecChloryfilAct_pft           =>  plt_photo%SpecChloryfilAct_pft            , &
+    VmaxPEPCarboxyRef_pft          =>  plt_photo%VmaxPEPCarboxyRef_pft           , &
+    LeafRuBPConc_pft               =>  plt_photo%LeafRuBPConc_pft                , &
+    Km4PEPCarboxy_pft              =>  plt_photo%Km4PEPCarboxy_pft               , &
+    CMassCO2BundleSheath_node      =>  plt_photo%CMassCO2BundleSheath_node       , &
+    CPOOL4_node                    =>  plt_photo%CPOOL4_node                     , &
+    Km4LeafaqCO2_pft               =>  plt_photo%Km4LeafaqCO2_pft                , &
+    NutrientCtrlonC4Carboxy_node   =>  plt_photo%NutrientCtrlonC4Carboxy_node    , &
+    Km4RubiscoCarboxy_pft          =>  plt_photo%Km4RubiscoCarboxy_pft           , &
+    LeafC3ChlorofilConc_pft        =>  plt_photo%LeafC3ChlorofilConc_pft         , &
+    RubiscoCarboxyEff_node         =>  plt_photo%RubiscoCarboxyEff_node          , &
+    VmaxRubCarboxyRef_pft          =>  plt_photo%VmaxRubCarboxyRef_pft           , &
+    LigthSatCarboxyRate_node       =>  plt_photo%LigthSatCarboxyRate_node        , &
+    CO2lmtRubiscoCarboxyRate_node  =>  plt_photo%CO2lmtRubiscoCarboxyRate_node   , &
+    Vmax4RubiscoCarboxy_pft        =>  plt_photo%Vmax4RubiscoCarboxy_pft         , &
+    CO2CompenPoint_node            =>  plt_photo%CO2CompenPoint_node             , &
+    Vmax4PEPCarboxy_pft            =>  plt_photo%Vmax4PEPCarboxy_pft             , &
+    CO2lmtPEPCarboxyRate_node      =>  plt_photo%CO2lmtPEPCarboxyRate_node       , &
+    VmaxRubOxyRef_pft              =>  plt_photo%VmaxRubOxyRef_pft               , &
+    C4CarboxyEff_node              =>  plt_photo%C4CarboxyEff_node               , &
+    LigthSatC4CarboxyRate_node     =>  plt_photo%LigthSatC4CarboxyRate_node      , &
     FracLeafProtinAsPEPCarboxyl_pft=>  plt_photo%FracLeafProtinAsPEPCarboxyl_pft   &
   )
 !
@@ -383,7 +383,8 @@
 !     ELEC4=e- requirement for CO2 fixn by PEP carboxylase
 !
   LigthSatC4CarboxyRate_node(K,NB,NZ)=SpecChloryfilAct_pft(NZ)*TFN_eTransp*ETDN4
-  C4CarboxyEff_node(K,NB,NZ)=AZMAX1((aquCO2Intraleaf_pft(NZ)-COMP4)/(ELEC4*aquCO2Intraleaf_pft(NZ)+10.5_r8*COMP4))
+  C4CarboxyEff_node(K,NB,NZ)=AZMAX1((aquCO2Intraleaf_pft(NZ)-COMP4) &
+    /(ELEC4*aquCO2Intraleaf_pft(NZ)+10.5_r8*COMP4))
 !
 !     FOR EACH CANOPY LAYER
 !
@@ -392,7 +393,7 @@
 !
   DO L=NumOfCanopyLayers1,1,-1
     IF(CanopyLeafAreaByLayer_pft(L,K,NB,NZ).GT.ZEROP(NZ))THEN
-      call C4PhotosynsCanopyLayerL(L,K,NB,NZ,CH2O)
+      call C4PhotosynsCanopyLayerL(I,J,L,K,NB,NZ,CH2O)
     ENDIF
   ENDDO
 !
@@ -447,20 +448,20 @@
   end subroutine C4Photosynthesis
 !------------------------------------------------------------------------------------------
 
-  subroutine C4PhotosynsCanopyLayerL(L,K,NB,NZ,CH2O)
+  subroutine C4PhotosynsCanopyLayerL(I,J,L,K,NB,NZ,CH2O)
   implicit none
-  integer, intent(in) :: L,K,NB,NZ
+  integer, intent(in) :: I,J,L,K,NB,NZ
   real(r8), intent(inout) :: CH2O
   integer :: M,N,LP
   real(r8) :: PAR_zsec,TAU_rad
 !     begin_execution
-  associate(                        &
-    LeafAUnshaded_zsec  => plt_photo%LeafAUnshaded_zsec , &
-    ZEROP               => plt_biom%ZEROP , &
-    PARDirect_zsec      => plt_rad%PARDirect_zsec    , &
-    PARDiffus_zsec      => plt_rad%PARDiffus_zsec   , &
-    TAU_RadThru         => plt_rad%TAU_RadThru      ,  &
-    TAU_RadCapt         => plt_rad%TAU_RadCapt        &
+  associate(                                               &
+    LeafAUnshaded_zsec  => plt_photo%LeafAUnshaded_zsec  , &
+    ZEROP               => plt_biom%ZEROP                , &
+    PARDirect_zsec      => plt_rad%PARDirect_zsec        , &
+    PARDiffus_zsec      => plt_rad%PARDiffus_zsec        , &
+    TAU_RadThru         => plt_rad%TAU_RadThru           , &
+    TAU_RadCapt         => plt_rad%TAU_RadCapt             &
     
   )
 !
@@ -480,7 +481,7 @@
             PAR_zsec=PARDiffus_zsec(N,M,L,NZ)
             TAU_rad=TAU_RadThru(L+1)        
           ENDIF
-          if(PAR_zsec>0._r8)call C4FixCO2(K,N,M,L,NB,NZ,PAR_zsec,TAU_rad,CH2O)
+          if(PAR_zsec>0._r8)call C4FixCO2(I,J,K,N,M,L,NB,NZ,PAR_zsec,TAU_rad,CH2O)
         ENDDO  
       ENDIF
     ENDDO
@@ -489,10 +490,10 @@
   end subroutine C4PhotosynsCanopyLayerL
 !------------------------------------------------------------------------------------------
 
-  subroutine C4FixCO2(K,N,M,L,NB,NZ,PAR_zsec,TAU_rad,CH2O)
+  subroutine C4FixCO2(I,J,K,N,M,L,NB,NZ,PAR_zsec,TAU_rad,CH2O)
 
   implicit none
-  integer, intent(in) :: K,N,M,L,NB,NZ
+  integer, intent(in) :: I,J,K,N,M,L,NB,NZ
   real(r8),INTENT(IN) :: PAR_zsec,TAU_rad  
   real(r8), intent(inout) :: CH2O  
   real(r8) :: ETLF4,EGRO4,PARX,PARJ
@@ -574,10 +575,10 @@
 !
       IF(iPlantPhotosynthesisType(NZ).EQ.ic4_photo)THEN
 !     C4 PHOTOSYNTHESIS
-        call C4Photosynthesis(K,NB,NZ,CH2O,TFN_Carboxy,TFN_Oxy,TFN_eTransp,Km4RubOxy,ProteinPerLeafArea)
+        call C4Photosynthesis(I,J,K,NB,NZ,CH2O,TFN_Carboxy,TFN_Oxy,TFN_eTransp,Km4RubOxy,ProteinPerLeafArea)
       ELSE IF(iPlantPhotosynthesisType(NZ).EQ.ic3_photo)then
 !     C3 PHOTOSYNTHESIS
-        call C3Photosynthesis(K,NB,NZ,CH2O,TFN_Carboxy,TFN_Oxy,TFN_eTransp,Km4RubOxy,ProteinPerLeafArea)
+        call C3Photosynthesis(I,J,K,NB,NZ,CH2O,TFN_Carboxy,TFN_Oxy,TFN_eTransp,Km4RubOxy,ProteinPerLeafArea)
       ENDIF
 !
     ELSE
@@ -616,7 +617,8 @@
 !     CNKI,CPKI=nonstructural N,P inhibition constant on rubisco
 !
   IF(LeafPetoNonstElmConc_brch(ielmc,NB,NZ).GT.ZERO)THEN
-    RubiscoActivity_brch(NB,NZ)=AMIN1(LeafPetoNonstElmConc_brch(ielmn,NB,NZ)/(LeafPetoNonstElmConc_brch(ielmn,NB,NZ)&
+    RubiscoActivity_brch(NB,NZ)=AMIN1(LeafPetoNonstElmConc_brch(ielmn,NB,NZ) &
+      /(LeafPetoNonstElmConc_brch(ielmn,NB,NZ)&
       +LeafPetoNonstElmConc_brch(ielmc,NB,NZ)/CNKI) &
       ,LeafPetoNonstElmConc_brch(ielmp,NB,NZ)/(LeafPetoNonstElmConc_brch(ielmp,NB,NZ)&
       +LeafPetoNonstElmConc_brch(ielmc,NB,NZ)/CPKI))
@@ -648,7 +650,8 @@
 !     Hours2KillAnuals=number of hours with no grain fill to terminate annuals
 !
   IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual.AND.HourFailGrainFill_brch(NB,NZ).GT.0.0_r8)THEN
-    C4PhotosynDowreg_brch(NB,NZ)=AZMAX1(1.0_r8-HourFailGrainFill_brch(NB,NZ)/Hours2KillAnuals(iPlantPhenolType_pft(NZ)))
+    C4PhotosynDowreg_brch(NB,NZ)=AZMAX1(1.0_r8-HourFailGrainFill_brch(NB,NZ) &
+      /Hours2KillAnuals(iPlantPhenolType_pft(NZ)))
   ELSE
     C4PhotosynDowreg_brch(NB,NZ)=1.0_r8
   ENDIF
@@ -660,11 +663,6 @@
 !     LeafAreaNode_brch,WGLF,LeafProteinCNode_brch=leaf area,C mass,protein mass
 !     ProteinPerLeafArea=leaf protein surficial density
 !
-  if(NZ==1)then  
-    write(187,*)I+J/24.,NB,RubiscoActivity_brch(NB,NZ)
-  else
-    write(188,*)I+J/24.,NB,RubiscoActivity_brch(NB,NZ)
-  endif
 
   IF(iPlantBranchState_brch(NB,NZ).EQ.iLive)THEN
     call PhotosisOnLiveBranch(I,J,NB,NZ,CH2O,TFN_Carboxy,TFN_Oxy,TFN_eTransp,Km4RubOxy)
@@ -673,33 +671,33 @@
   end subroutine PhenoActiveBranch
 !------------------------------------------------------------------------------------------
 
-  subroutine PrepPhotosynthesis(NZ,CH2O,TFN_Carboxy,TFN_Oxy,TFN_eTransp,Km4RubOxy)
+  subroutine PrepPhotosynthesis(I,J,NZ,CH2O,TFN_Carboxy,TFN_Oxy,TFN_eTransp,Km4RubOxy)
   implicit none
-  integer, intent(in) :: NZ
+  integer, intent(in) :: I,J,NZ
   real(r8), intent(out) :: CH2O
   real(r8), intent(out) :: TFN_Carboxy,TFN_Oxy,TFN_eTransp,Km4RubOxy
   real(r8) :: ACTV,RTK
   real(r8) :: STK,TCCZ
   real(r8) :: TKCO
 !     begin_execution
-  associate(                          &
+  associate(                                                                  &
     LeafPetoNonstElmConc_brch       =>  plt_biom%LeafPetoNonstElmConc_brch  , &
-    TKCanopy_pft                    =>  plt_ew%TKCanopy_pft      , &
-    OFFST                           =>  plt_pheno%OFFST  , &
-    XKO2                            =>  plt_photo%XKO2   , &
-    CO2Solubility_pft               =>  plt_photo%CO2Solubility_pft  , &
-    CanopyGasCO2_pft                =>  plt_photo%CanopyGasCO2_pft   , &
-    O2L                             =>  plt_photo%O2L    , &
-    AirConc_pft                     =>  plt_photo%AirConc_pft   , &
-    DiffCO2Atmos2Intracel_pft       =>  plt_photo%DiffCO2Atmos2Intracel_pft  , &
-    aquCO2Intraleaf_pft             =>  plt_photo%aquCO2Intraleaf_pft   , &
-    LeafO2Solubility_pft            =>  plt_photo%LeafO2Solubility_pft    , &
+    TKCanopy_pft                    =>  plt_ew%TKCanopy_pft                 , &
+    OFFST                           =>  plt_pheno%OFFST                     , &
+    XKO2                            =>  plt_photo%XKO2                      , &
+    CO2Solubility_pft               =>  plt_photo%CO2Solubility_pft         , &
+    CanopyGasCO2_pft                =>  plt_photo%CanopyGasCO2_pft          , &
+    O2L                             =>  plt_photo%O2L                       , &
+    AirConc_pft                     =>  plt_photo%AirConc_pft               , &
+    DiffCO2Atmos2Intracel_pft       =>  plt_photo%DiffCO2Atmos2Intracel_pft , &
+    aquCO2Intraleaf_pft             =>  plt_photo%aquCO2Intraleaf_pft       , &
+    LeafO2Solubility_pft            =>  plt_photo%LeafO2Solubility_pft      , &
     LeafIntracellularCO2_pft        =>  plt_photo%LeafIntracellularCO2_pft  , &
-    O2I                             =>  plt_photo%O2I    , &
-    MaxCanPStomaResistH2O_pft       =>  plt_photo%MaxCanPStomaResistH2O_pft   , &
-    Km4RubiscoCarboxy_pft           =>  plt_photo%Km4RubiscoCarboxy_pft , &
-    Km4LeafaqCO2_pft                =>  plt_photo%Km4LeafaqCO2_pft , &
-    XKCO2                           =>  plt_photo%XKCO2    &
+    O2I                             =>  plt_photo%O2I                       , &
+    MaxCanPStomaResistH2O_pft       =>  plt_photo%MaxCanPStomaResistH2O_pft , &
+    Km4RubiscoCarboxy_pft           =>  plt_photo%Km4RubiscoCarboxy_pft     , &
+    Km4LeafaqCO2_pft                =>  plt_photo%Km4LeafaqCO2_pft          , &
+    XKCO2                           =>  plt_photo%XKCO2                       &
 
   )
 !
@@ -782,7 +780,7 @@
     NumOfBranches_pft           =>  plt_morph%NumOfBranches_pft            &
   )
 
-  call PrepPhotosynthesis(NZ,CH2O,TFN_Carboxy,TFN_Oxy,TFN_eTransp,Km4RubOxy)
+  call PrepPhotosynthesis(I,J,NZ,CH2O,TFN_Carboxy,TFN_Oxy,TFN_eTransp,Km4RubOxy)
 !
 !     FOR EACH BRANCH
 !

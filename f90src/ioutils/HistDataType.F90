@@ -180,6 +180,7 @@ implicit none
   real(r8),pointer   :: h1D_STALK_C_ptc(:)       !StalkStrutElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_RESERVE_C_ptc(:)     !StalkRsrvElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_HUSK_C_ptc(:)        !(HuskStrutElms_pft(ielmc,NZ,NY,NX)+EarStrutElms_pft(ielmc,NZ,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_TK_Canopy_ptc(:)     !canopy temperature Kelvin
   real(r8),pointer   :: h1D_GRAIN_C_ptc(:)       !GrainStrutElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_ROOT_C_ptc(:)        !RootElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_NODULE_C_ptc(:)      !NodulStrutElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), nodule
@@ -419,6 +420,7 @@ implicit none
   allocate(this%h1D_cTNP_ptc(beg_ptc:end_ptc))        
   allocate(this%h1D_STOML_RSC_CO2_ptc(beg_ptc:end_ptc))
   allocate(this%h1D_BLYR_RSC_CO2_ptc(beg_ptc:end_ptc)) 
+  allocate(this%h1D_TK_Canopy_ptc(beg_ptc:end_ptc))
   allocate(this%h1D_CAN_CO2_ptc(beg_ptc:end_ptc))      
   allocate(this%h1D_LAI_ptc(beg_ptc:end_ptc))          
   allocate(this%h1D_PSI_CAN_ptc(beg_ptc:end_ptc))      
@@ -1027,6 +1029,10 @@ implicit none
   data1d_ptr => this%h1D_BLYR_RSC_CO2_ptc(beg_ptc:end_ptc) 
   call hist_addfld1d(fname='BLYR_RSC_CO2',units='s/m',avgflag='A',&
     long_name='canopy boundary layer resistance for CO2',ptr_patch=data1d_ptr)      
+
+  data1d_ptr => this%h1D_TK_Canopy_ptc(beg_ptc:end_ptc)    
+  call hist_addfld1d(fname='TK_CAN',units='K',avgflag='A',&
+    long_name='canopy temperature',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_CAN_CO2_ptc(beg_ptc:end_ptc)     
   call hist_addfld1d(fname='CAN_CO2',units='umol/mol',avgflag='A',&
@@ -1637,6 +1643,7 @@ implicit none
 
       DO NZ=1,NP0(NY,NX)
         nptc=get_pft(NZ,NY,NX)
+        this%h1D_TK_Canopy_ptc(nptc)    = TKCanopy_pft(NZ,NY,NX)
         this%h1D_MIN_LWP_ptc(nptc)      = PSICanPDailyMin(NZ,NY,NX)
         this%h1D_LEAF_PC_ptc(nptc)      = safe_adb(LeafStrutElms_pft(ielmp,NZ,NY,NX)+CanopyNonstElms_pft(ielmp,NZ,NY,NX), &
                                                  LeafStrutElms_pft(ielmc,NZ,NY,NX)+CanopyNonstElms_pft(ielmc,NZ,NY,NX))
