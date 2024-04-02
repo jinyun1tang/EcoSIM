@@ -1612,7 +1612,7 @@ implicit none
       this%h1D_sN2O_FLX_col(ncol)     =  SurfGasFlx(idg_N2O,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_sN2G_FLX_col(ncol)     =  SurfGasFlx(idg_N2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_sNH3_FLX_col(ncol)     =  SurfGasFlx(idg_NH3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_PAR_col(ncol)          = RadPARDirect_col(NY,NX)+RadPARDiffus_col(NY,NX)
+      this%h1D_PAR_col(ncol)          =  RadPARSolarBeam_col(NY,NX)
 
       DO L=1,JZ
         this%h2D_tSOC_vr_col(ncol,L) =  ORGC(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
