@@ -1094,7 +1094,7 @@ implicit none
 !          call read_checkpt(NS,NH1,NH2,NV1,NV2,NHW,NHE,NVN,NVS)
 !        ENDIF
       ENDDO
-    ENDIF
+    ENDIF 
     call ncd_pio_closefile(pftinfo_nfid)
   endif
   end subroutine ReadPlantInfoNC

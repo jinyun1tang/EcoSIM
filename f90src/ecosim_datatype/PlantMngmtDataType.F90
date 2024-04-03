@@ -44,7 +44,7 @@ module PlantMngmtDataType
   subroutine InitAllocate
 
   implicit none
-  allocate(flag_pft_active(JP,JY,JX));  flag_pft_active=.false
+  allocate(flag_pft_active(JP,JY,JX));  flag_pft_active=.false.
   allocate(THIN_pft(JP,366,JY,JX)); THIN_pft=0._r8
   allocate(EHVST(2,4,JP,366,JY,JX));EHVST=0._r8
   allocate(HVST(JP,366,JY,JX)); HVST=0._r8

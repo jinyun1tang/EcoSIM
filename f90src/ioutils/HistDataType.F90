@@ -110,7 +110,7 @@ implicit none
   real(r8),pointer   :: h1D_SOL_RADN_col(:)       !RAD(NY,NX)*277.8, W m-2
   real(r8),pointer   :: h1D_AIR_TEMP_col(:)       !TCA(NY,NX)
   real(r8),pointer   :: h1D_HUM_col(:)            !VPK(NY,NX)
-  real(r8),pointer   :: h1D_WIND_col(:)           !WindSpeedAtm(NY,NX)/3600.0
+  real(r8),pointer   :: h1D_WIND_col(:)           !WindSpeedAtm(NY,NX)/secs1hour
   real(r8),pointer   :: h1D_PREC_col(:)           !(RainFalPrec(NY,NX)+SnoFalPrec(NY,NX))*1000.0/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_SOIL_RN_col(:)        !HeatByRadiation(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX) 
   real(r8),pointer   :: h1D_SOIL_LE_col(:)        !HeatEvapAir2Surf(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
@@ -160,14 +160,14 @@ implicit none
   real(r8),pointer   :: h1D_cTNC_ptc(:)          !CanopyNonstElmConc_pft(ielmc,NZ,NY,NX), canopy nonstructural C concentration, 
   real(r8),pointer   :: h1D_cTNN_ptc(:)          !CanopyNonstElmConc_pft(ielmn,NZ,NY,NX)
   real(r8),pointer   :: h1D_cTNP_ptc(:)          !CanopyNonstElmConc_pft(ielmp,NZ,NY,NX)
-  real(r8),pointer   :: h1D_STOML_RSC_CO2_ptc(:) !CanPStomaResistH2O_pft(NZ,NY,NX)*1.56*3600.0_r8, s m-1, for CO2
-  real(r8),pointer   :: h1D_BLYR_RSC_CO2_ptc(:)  !CanopyBndlResist_pft(NZ,NY,NX)*1.34*3600.0_r8, s m-1, for CO2
+  real(r8),pointer   :: h1D_STOML_RSC_CO2_ptc(:) !CanPStomaResistH2O_pft(NZ,NY,NX)*1.56*secs1hour, s m-1, for CO2
+  real(r8),pointer   :: h1D_BLYR_RSC_CO2_ptc(:)  !CanopyBndlResist_pft(NZ,NY,NX)*1.34*secs1hour, s m-1, for CO2
   real(r8),pointer   :: h1D_CAN_CO2_ptc(:)       !CanopyGasCO2_pft(NZ,NY,NX), umol mol-1
   real(r8),pointer   :: h1D_LAI_ptc(:)           !LeafStalkArea_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), plant leaf area, include stalk
   real(r8),pointer   :: h1D_PSI_CAN_ptc(:)       !PSICanopy_pft(NZ,NY,NX), canopy total water potential , MPa
   real(r8),pointer   :: h1D_TURG_CAN_ptc(:)      !PSICanopyTurg_pft(NZ,NY,NX), canopy turgor water potential, MPa
-  real(r8),pointer   :: h1D_STOM_RSC_H2O_ptc(:)  !CanPStomaResistH2O_pft(NZ,NY,NX)*3600.0_r8, s m-1, for H2O
-  real(r8),pointer   :: h1D_BLYR_RSC_H2O_ptc(:)  !CanopyBndlResist_pft(NZ,NY,NX)*3600.0_r8, s m-1, for H2O
+  real(r8),pointer   :: h1D_STOM_RSC_H2O_ptc(:)  !CanPStomaResistH2O_pft(NZ,NY,NX)*secs1hour, s m-1, for H2O
+  real(r8),pointer   :: h1D_BLYR_RSC_H2O_ptc(:)  !CanopyBndlResist_pft(NZ,NY,NX)*secs1hour, s m-1, for H2O
   real(r8),pointer   :: h1D_TRANSPN_ptc(:)       !Transpiration_pft(NZ,NY,NX)*1000.0_r8/AREA(3,NU(NY,NX),NY,NX), canopy transpiration mm H2O/m2/h
   real(r8),pointer   :: h1D_NH4_UPTK_FLX_ptc(:)      !RootNH4Uptake_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_NO3_UPTK_FLX_ptc(:)      !RootNO3Uptake_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -822,7 +822,7 @@ implicit none
     long_name='total precipitation, including irrigation',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_ET_col(beg_col:end_col)  
-  call hist_addfld1d(fname='ET',units='mm/m2',avgflag='A',&
+  call hist_addfld1d(fname='ET',units='mm H2O/m2/hr',avgflag='A',&
     long_name='total evapotranspiration',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_N2O_LITR_col(beg_col:end_col)      
@@ -894,23 +894,23 @@ implicit none
     long_name='minimum daily canopy water potential',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_SOIL_CO2_FLX_col(beg_col:end_col)
-  call hist_addfld1d(fname='SOIL_CO2_FLX',units='umol/m2/s',avgflag='A',&
+  call hist_addfld1d(fname='SOIL_CO2_FLX',units='umol C/m2/s',avgflag='A',&
     long_name='soil CO2 flux',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_ECO_CO2_FLX_col(beg_col:end_col)  
-  call hist_addfld1d(fname='ECO_NEE_CO2',units='umol/m2/s',avgflag='A',&
+  call hist_addfld1d(fname='ECO_NEE_CO2',units='umol C/m2/s',avgflag='A',&
     long_name='ecosystem net CO2 exchange',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_CH4_FLX_col(beg_col:end_col)     
-  call hist_addfld1d(fname='CH4_FLX',units='umol/m2/s',avgflag='A',&
+  call hist_addfld1d(fname='CH4_FLX',units='umol C/m2/s',avgflag='A',&
     long_name='soil CH4 flux',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_O2_FLX_col(beg_col:end_col)      
-  call hist_addfld1d(fname='O2_FLX',units='umol/m2/s',avgflag='A',&
+  call hist_addfld1d(fname='O2_FLX',units='umol O2/m2/s',avgflag='A',&
     long_name='soil O2 flux',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_CO2_LITR_col(beg_col:end_col)      
-  call hist_addfld1d(fname='CO2_LITR',units='g/m3',avgflag='A',&
+  call hist_addfld1d(fname='CO2_LITR',units='gC/m3',avgflag='A',&
     long_name='CO2 solute concentration in litter',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_EVAPN_col(beg_col:end_col)      
@@ -999,7 +999,7 @@ implicit none
     long_name='canopy temperature growth function/stress,[0-1]',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_CAN_CO2_FLX_ptc(beg_ptc:end_ptc)
-  call hist_addfld1d(fname='CAN_CO2_FLX',units='umol/m2/hr',avgflag='A',&
+  call hist_addfld1d(fname='CAN_CO2_FLX',units='umol C/m2/s',avgflag='A',&
     long_name='canopy net CO2 exchange',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_CAN_GPP_ptc(beg_ptc:end_ptc)    
@@ -1497,19 +1497,22 @@ implicit none
   type(bounds_type), intent(in) :: bounds
   integer :: ncol,nptc
   integer :: L,NZ,NY,NX,KN,NB
-  real(r8),parameter ::   MJ2W=1.e6_r8/3600._r8
-
+  real(r8),parameter :: secs1hour=3600._r8
+  real(r8),parameter :: MJ2W=1.e6_r8/secs1hour
+  real(r8),parameter :: m2mm=1000._r8
+  real(r8),parameter :: gC1hour2umol1sec=1.e6_r8/(12._r8*3600._r8)
+  real(r8),parameter :: gO1hour2umol1sec=1.e6_r8/(32._r8*3600._r8)
   DO NX=bounds%NHW,bounds%NHE   
     DO NY=bounds%NVN,bounds%NVS
       ncol=get_col(NY,NX)
-      this%h1D_tFIRE_CO2_col(ncol) =  CO2byFire_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_tFIRE_CH4_col(ncol) =  CH4byFire_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_cNH4_LITR_col(ncol) =  safe_adb(trc_solml_vr(ids_NH4,0,NY,NX)+&
+      this%h1D_tFIRE_CO2_col(ncol)     =  CO2byFire_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_tFIRE_CH4_col(ncol)     =  CH4byFire_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_cNH4_LITR_col(ncol)     =  safe_adb(trc_solml_vr(ids_NH4,0,NY,NX)+&
         natomw*trcx_solml(idx_NH4,0,NY,NX),SoilMicPMassLayer(0,NY,NX))
-      this%h1D_cNO3_LITR_col(ncol) =  safe_adb(trc_solml_vr(ids_NO3,0,NY,NX)+&
+      this%h1D_cNO3_LITR_col(ncol)     =  safe_adb(trc_solml_vr(ids_NO3,0,NY,NX)+&
         trc_solml_vr(ids_NO2,0,NY,NX),SoilMicPMassLayer(0,NY,NX))
-      this%h1D_ECO_HVST_N_col(ncol)=  EcoHavstElmnt_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_NET_N_MIN_col(ncol) = -NetNH4Mineralize_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_ECO_HVST_N_col(ncol)    =  EcoHavstElmnt_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_NET_N_MIN_col(ncol)     = -NetNH4Mineralize_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_SURF_tLITR_P_FLX_col(ncol) =  URSDM(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_HUMUS_C_col(ncol)     = UORGM(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_HUMUS_N_col(ncol)     = UORGM(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -1524,7 +1527,7 @@ implicit none
       this%h1D_SUR_DIP_FLX_col(ncol)= HydroSufDIPFlx_col(NY,NX)/TAREA
       this%h1D_SUB_DIP_FLX_col(ncol)= HydroSubsDIPFlx_col(NY,NX)/TAREA  
       this%h1D_HeatFlx2G_col(ncol)  = HeatFlx2G_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_Qinfl2soi_col(ncol)  = 1000._r8*Qinflx2Soil_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_Qinfl2soi_col(ncol)  = m2mm*Qinflx2Soil_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_SUR_DON_FLX_col(ncol) = HydroSufDONFlx_col(NY,NX)/TAREA
       this%h1D_SUB_DON_FLX_col(ncol) = HydroSubsDONFlx_col(NY,NX)/TAREA
       this%h1D_tSALT_DISCHG_FLX_col(ncol)= HydroIonFlx_col(NY,NX)/TAREA
@@ -1576,15 +1579,15 @@ implicit none
       this%h1D_tSTANDING_DEAD_C_col(ncol)    = StandingDeadStrutElms_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tSTANDING_DEAD_N_col(ncol)    = StandingDeadStrutElms_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tSTANDING_DEAD_P_col(ncol)    = StandingDeadStrutElms_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)            
-      this%h1D_tPRECN_col(ncol)       = 1000.0_r8*URAIN(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_ET_col(ncol)          = 1000.0_r8*UEVAP(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_tPRECN_col(ncol)       = m2mm*URAIN(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_ET_col(ncol)          = m2mm*EvapoTransp_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_N2O_LITR_col(ncol)    = trc_solcl_vr(idg_N2O,0,NY,NX)
       this%h1D_NH3_LITR_col(ncol)    = trc_solcl_vr(idg_NH3,0,NY,NX)
       this%h1D_SOL_RADN_col(ncol)    = RadSWSolarBeam_col(NY,NX)*MJ2W
       this%h1D_AIR_TEMP_col(ncol)    = TCA(NY,NX)
       this%h1D_HUM_col(ncol)         = VPK(NY,NX)
-      this%h1D_WIND_col(ncol)        = WindSpeedAtm(NY,NX)/3600.0_r8
-      this%h1D_PREC_col(ncol)        = (RainFalPrec(NY,NX)+SnoFalPrec(NY,NX))*1000.0_r8/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_WIND_col(ncol)        = WindSpeedAtm(NY,NX)/secs1hour
+      this%h1D_PREC_col(ncol)        = (RainFalPrec(NY,NX)+SnoFalPrec(NY,NX))*m2mm/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_SOIL_RN_col(ncol)     = HeatByRadiation(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_SOIL_LE_col(ncol)     = HeatEvapAir2Surf(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_SOIL_H_col(ncol)      = HeatSensAir2Surf(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
@@ -1594,17 +1597,17 @@ implicit none
       this%h1D_Eco_Heat_col(ncol)    = Eco_Heat_Sens_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_ECO_G_col(ncol)       = Eco_Heat_Grnd_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_O2_LITR_col(ncol)     = trc_solcl_vr(idg_O2,0,NY,NX)
-      this%h1D_SOIL_CO2_FLX_col(ncol)= SurfGasFlx(idg_CO2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.14815_r8
-      this%h1D_ECO_CO2_FLX_col(ncol) = Eco_NEE_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.14815_r8
-      this%h1D_CH4_FLX_col(ncol)     = SurfGasFlx(idg_CH4,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.14815_r8
-      this%h1D_O2_FLX_col(ncol)      = SurfGasFlx(idg_O2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*8.68056_r8
+      this%h1D_SOIL_CO2_FLX_col(ncol)= SurfGasFlx(idg_CO2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*gC1hour2umol1sec
+      this%h1D_ECO_CO2_FLX_col(ncol) = Eco_NEE_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)*gC1hour2umol1sec
+      this%h1D_CH4_FLX_col(ncol)     = SurfGasFlx(idg_CH4,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*gC1hour2umol1sec
+      this%h1D_O2_FLX_col(ncol)      = SurfGasFlx(idg_O2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*gO1hour2umol1sec
       this%h1D_CO2_LITR_col(ncol)    = trc_solcl_vr(idg_CO2,0,NY,NX)
-      this%h1D_EVAPN_col(ncol)       = VapXAir2GSurf(NY,NX)*1000.0_r8/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_RUNOFF_FLX_col(ncol)  = -WQRH(NY,NX)*1000.0_r8/TAREA 
-      this%h1D_SEDIMENT_FLX_col(ncol)    = USEDOU(NY,NX)*1000.0_r8/TAREA
-      this%h1D_tSWC_col(ncol)     = UVLWatMicP(NY,NX)*1000.0_r8/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_DISCHG_FLX_col(ncol)      = FWatDischarge(NY,NX)*1000.0_r8/TAREA
-      this%h1D_SNOWPACK_col(ncol)    = AZMAX1((VcumSnowWE(NY,NX))*1000.0_r8/AREA(3,NU(NY,NX),NY,NX))
+      this%h1D_EVAPN_col(ncol)        = VapXAir2GSurf(NY,NX)*m2mm/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_RUNOFF_FLX_col(ncol)   = -WQRH(NY,NX)*m2mm/TAREA 
+      this%h1D_SEDIMENT_FLX_col(ncol) = USEDOU(NY,NX)*m2mm/TAREA
+      this%h1D_tSWC_col(ncol)         = UVLWatMicP(NY,NX)*m2mm/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_DISCHG_FLX_col(ncol)   = FWatDischarge(NY,NX)*m2mm/TAREA
+      this%h1D_SNOWPACK_col(ncol)     = AZMAX1((VcumSnowWE(NY,NX))*m2mm/AREA(3,NU(NY,NX),NY,NX))
       this%h1D_SURF_WTR_col(ncol)    = THETWZ(0,NY,NX)
       this%h1D_SURF_ICE_col(ncol)    = THETIZ(0,NY,NX)
       this%h1D_ACTV_LYR_col(ncol)    = -(ActiveLayDepth(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX))
@@ -1653,21 +1656,21 @@ implicit none
         this%h1D_CAN_G_ptc(nptc)        = MJ2W*HeatStorCanP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_CAN_TEMP_ptc(nptc)     = TCelciusCanopy_pft(NZ,NY,NX)
         this%h1D_TEMP_FN_ptc(nptc)      = fTgrowCanP(NZ,NY,NX)
-        this%h1D_CAN_CO2_FLX_ptc(nptc)  = CO2NetFix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.148_r8
+        this%h1D_CAN_CO2_FLX_ptc(nptc)  = CO2NetFix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*gC1hour2umol1sec
         this%h1D_CAN_GPP_ptc(nptc)      = GrossCO2Fix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_CAN_RA_ptc(nptc)       = CanopyPlusNodulRespC_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_cTNC_ptc(nptc)         = CanopyNonstElmConc_pft(ielmc,NZ,NY,NX)
         this%h1D_cTNN_ptc(nptc)         = CanopyNonstElmConc_pft(ielmn,NZ,NY,NX)
         this%h1D_cTNP_ptc(nptc)         = CanopyNonstElmConc_pft(ielmp,NZ,NY,NX)
-        this%h1D_STOML_RSC_CO2_ptc(nptc)= CanPStomaResistH2O_pft(NZ,NY,NX)*1.56_r8*3600.0_r8
-        this%h1D_BLYR_RSC_CO2_ptc(nptc) = CanopyBndlResist_pft(NZ,NY,NX)*1.34_r8*3600.0_r8
+        this%h1D_STOML_RSC_CO2_ptc(nptc)= CanPStomaResistH2O_pft(NZ,NY,NX)*1.56_r8*secs1hour
+        this%h1D_BLYR_RSC_CO2_ptc(nptc) = CanopyBndlResist_pft(NZ,NY,NX)*1.34_r8*secs1hour
         this%h1D_CAN_CO2_ptc(nptc)      = CanopyGasCO2_pft(NZ,NY,NX)
         this%h1D_LAI_ptc(nptc)          = LeafStalkArea_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_PSI_CAN_ptc(nptc)      = PSICanopy_pft(NZ,NY,NX)
         this%h1D_TURG_CAN_ptc(nptc)     = PSICanopyTurg_pft(NZ,NY,NX)
-        this%h1D_STOM_RSC_H2O_ptc(nptc) = CanPStomaResistH2O_pft(NZ,NY,NX)*3600.0_r8
-        this%h1D_BLYR_RSC_H2O_ptc(nptc) = CanopyBndlResist_pft(NZ,NY,NX)*3600.0_r8
-        this%h1D_TRANSPN_ptc(nptc)      = Transpiration_pft(NZ,NY,NX)*1000.0_r8/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_STOM_RSC_H2O_ptc(nptc) = CanPStomaResistH2O_pft(NZ,NY,NX)*secs1hour
+        this%h1D_BLYR_RSC_H2O_ptc(nptc) = CanopyBndlResist_pft(NZ,NY,NX)*secs1hour
+        this%h1D_TRANSPN_ptc(nptc)      = Transpiration_pft(NZ,NY,NX)*m2mm/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_NH4_UPTK_FLX_ptc(nptc) = RootNH4Uptake_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_NO3_UPTK_FLX_ptc(nptc) = RootNO3Uptake_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_N2_FIXN_FLX_ptc(nptc)  = RootN2Fix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)

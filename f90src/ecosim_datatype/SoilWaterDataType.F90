@@ -77,6 +77,7 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  THETY(:,:,:)                      !air-dry water content, [m3 m-3]
   real(r8),target,allocatable ::  Theta_sat(:,:,:)                      !micropore class water content
   real(r8),target,allocatable ::  WaterFlowSoiMicPX(:,:,:,:)                     !unsaturated water flux , [m3 d-2 h-1]
+  real(r8),target,allocatable ::  EvapoTransp_col(:,:)              !evapotranspiration
   real(r8),target,allocatable ::  UEVAP(:,:)                        !total evaporation, [m3 d-2]
   real(r8),target,allocatable ::  URAIN(:,:)                        !total precipitation, [m3 d-2]
   real(r8),target,allocatable ::  URUN(:,:)                         !total surface runoff, [m3 d-2]
@@ -103,6 +104,7 @@ module SoilWaterDataType
   subroutine InitAllocate
 
   implicit none
+  allocate(EvapoTransp_col(JY,JX)); EvapoTransp_col=0._r8
   allocate(Qinflx2Soil_col(JY,JX)); Qinflx2Soil_col=0._r8
   allocate(THETP(0:JZ,JY,JX));  THETP=0._r8
   allocate(VLsoiAirP(0:JZ,JY,JX));   VLsoiAirP=0._r8
@@ -260,6 +262,7 @@ module SoilWaterDataType
   call destroy(Theta_sat)
   call destroy(WaterFlowSoiMicPX)
   call destroy(UEVAP)
+  call destroy(EvapoTransp_col)
   call destroy(URAIN)
   call destroy(URUN)
   call destroy(UVLWatMicP)

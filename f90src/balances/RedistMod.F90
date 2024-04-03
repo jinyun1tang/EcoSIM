@@ -338,6 +338,7 @@ module RedistMod
   WO=VapXAir2GSurf(NY,NX)+TEVAPP(NY,NX) !total outgoing water flux
   CEVAP=CEVAP-WO
   UEVAP(NY,NX)=UEVAP(NY,NX)-WO
+  EvapoTransp_col(NY,NX)=-WO
   VOLWOU=VOLWOU-IrrigSubsurf(NY,NX)
   FWatDischarge(NY,NX)=FWatDischarge(NY,NX)-IrrigSubsurf(NY,NX)
   UVOLO(NY,NX)=UVOLO(NY,NX)-IrrigSubsurf(NY,NX)
