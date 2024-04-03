@@ -10,7 +10,7 @@ module CanopyRadDataType
   real(r8),target,allocatable :: CosineLeafAngle(:)                        !cosine of leaf angle	-
   real(r8),target,allocatable :: OMEGA(:,:,:)                   !sine of indirect sky radiation on leaf surface
   real(r8),target,allocatable :: OMEGX(:,:,:)                   !sine of indirect sky radiation on leaf surface/sine of indirect sky radiation
-  integer,target,allocatable :: IALBY(:,:,:)                    !flag for calculating backscattering of radiation in canopy
+  integer,target,allocatable :: iScatteringDiffus(:,:,:)        !flag for calculating backscattering of radiation in canopy
   real(r8),target,allocatable :: RadDifPAR_zsec(:,:,:,:,:,:)           !diffuse incoming PAR, [umol m-2 s-1]
   real(r8),target,allocatable :: RadPAR_zsec(:,:,:,:,:,:)              !direct incoming PAR, [umol m-2 s-1]
   real(r8),target,allocatable :: CLASS(:,:,:,:)                !fractionction of leaves in different angle classes, [-]
@@ -58,7 +58,7 @@ module CanopyRadDataType
   allocate(CosineLeafAngle(NumOfLeafZenithSectors))
   allocate(OMEGA(NumOfSkyAzimuSects,NumOfLeafZenithSectors,NumOfLeafAzimuthSectors))
   allocate(OMEGX(NumOfSkyAzimuSects,NumOfLeafZenithSectors,NumOfLeafAzimuthSectors))
-  allocate(IALBY(NumOfSkyAzimuSects,NumOfLeafZenithSectors,NumOfLeafAzimuthSectors))
+  allocate(iScatteringDiffus(NumOfSkyAzimuSects,NumOfLeafZenithSectors,NumOfLeafAzimuthSectors))
   allocate(CLASS(NumOfLeafZenithSectors,JP,JY,JX))
   allocate(LeafAreaZsec_brch(NumOfLeafZenithSectors,NumOfCanopyLayers,MaxNodesPerBranch,MaxNumBranches,JP,JY,JX))
   allocate(LeafAUnshaded_zsec(NumOfLeafZenithSectors,NumOfCanopyLayers,MaxNodesPerBranch,MaxNumBranches,JP,JY,JX))
@@ -77,7 +77,7 @@ module CanopyRadDataType
   call destroy(CosineLeafAngle)
   call destroy(OMEGA)
   call destroy(OMEGX)
-  call destroy(IALBY)
+  call destroy(iScatteringDiffus)
   call destroy(CLASS)
   call destroy(LeafAreaZsec_brch)
   call destroy(LeafAUnshaded_zsec)

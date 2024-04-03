@@ -5,6 +5,7 @@ module CanopyCondsMod
   use EcoSIMConfig
   use PlantAPIData
   use minimathmod, only : AZMAX1,isnan
+  use GrosubPars, only : iforward,ibackward
   implicit none
   private
   CHARACTER(LEN=*), PARAMETER :: MOD_FILENAME=&
@@ -17,7 +18,7 @@ module CanopyCondsMod
   real(r8), parameter :: StalkAlbedo4PARRad=0.1_r8                      !stalk albedo for PAR
   real(r8), parameter :: StalkSWAbsorpty=1.0_r8-RadSWStalkAlbedo   !stalk absorpt for 
   real(r8), parameter :: StalkPARAbsorpty=1.0_r8-StalkAlbedo4PARRad
-  real(r8), parameter :: StalkClumpFactor=0.5_r8                                     !stalk clumping factor,FORGW=minimum SOC or organic soil (g Mg-1)
+  real(r8), parameter :: StalkClumpFactor=0.5_r8           !stalk clumping factor,FORGW=minimum SOC or organic soil (g Mg-1)
 
   integer :: curday
 
@@ -47,26 +48,26 @@ module CanopyCondsMod
   real(r8) :: ZX,ZY,ZE
   REAL(R8) :: ZZ
 !     begin_execution
-  associate(                          &
-    WindSpeedAtm            => plt_site%WindSpeedAtm      , &
-    ZERO                    => plt_site%ZERO    , &
-    AREA3                   => plt_site%AREA3   , &
-    KoppenClimZone          => plt_site%KoppenClimZone  , &
-    SoiSurfRoughnesst0      => plt_site%SoiSurfRoughnesst0      , &
-    WindMesHeight           => plt_site%WindMesHeight      , &
-    ZEROS                   => plt_site%ZEROS   , &
-    NU                      => plt_site%NU      , &
-    BndlResistAboveCanG     => plt_ew%BndlResistAboveCanG       , &
-    ZeroPlanDisp            => plt_ew%ZeroPlanDisp        , &
-    RoughHeight             => plt_ew%RoughHeight        , &
-    RIB                     => plt_ew%RIB       , &
-    TairK                   => plt_ew%TairK       , &
-    VLHeatCapSnowMin_col        => plt_ew%VLHeatCapSnowMin_col    , &
-    SnowDepth               => plt_ew%SnowDepth     , &
-    VLHeatCapSurfSnow_col       => plt_ew%VLHeatCapSurfSnow_col    , &
-    CanopyHeight_col     => plt_morph%CanopyHeight_col     , &
-    StemArea_col            => plt_morph%StemArea_col  , &
-    CanopyLeafArea_col      => plt_morph%CanopyLeafArea_col    &
+  associate(                                                    &
+    WindSpeedAtm            => plt_site%WindSpeedAtm          , &
+    ZERO                    => plt_site%ZERO                  , &
+    AREA3                   => plt_site%AREA3                 , &
+    KoppenClimZone          => plt_site%KoppenClimZone        , &
+    SoiSurfRoughnesst0      => plt_site%SoiSurfRoughnesst0    , &
+    WindMesHeight           => plt_site%WindMesHeight         , &
+    ZEROS                   => plt_site%ZEROS                 , &
+    NU                      => plt_site%NU                    , &
+    BndlResistAboveCanG     => plt_ew%BndlResistAboveCanG     , &
+    ZeroPlanDisp            => plt_ew%ZeroPlanDisp            , &
+    RoughHeight             => plt_ew%RoughHeight             , &
+    RIB                     => plt_ew%RIB                     , &
+    TairK                   => plt_ew%TairK                   , &
+    VLHeatCapSnowMin_col    => plt_ew%VLHeatCapSnowMin_col    , &
+    SnowDepth               => plt_ew%SnowDepth               , &
+    VLHeatCapSurfSnow_col   => plt_ew%VLHeatCapSurfSnow_col   , &
+    CanopyHeight_col        => plt_morph%CanopyHeight_col     , &
+    StemArea_col            => plt_morph%StemArea_col         , &
+    CanopyLeafArea_col      => plt_morph%CanopyLeafArea_col     &
   )
 !     CANOPY ZERO PLANE AND ROUGHNESS HEIGHTS
 !
@@ -128,11 +129,11 @@ module CanopyCondsMod
   associate(                                                        &
     NP                       => plt_site%NP                       , &
     ZEROS                    => plt_site%ZEROS                    , &
-    CanopyHeight_col         => plt_morph%CanopyHeight_col     , &
+    CanopyHeight_col         => plt_morph%CanopyHeight_col        , &
     CanopyHeightZ_col        => plt_morph%CanopyHeightZ_col       , &
     CanopyHeight_pft         => plt_morph%CanopyHeight_pft        , &
-    CanopyStemAareZ_col          => plt_morph%CanopyStemAareZ_col         , &
-    CanopyLeafAareZ_col         => plt_morph%CanopyLeafAareZ_col        , &
+    CanopyStemAareZ_col      => plt_morph%CanopyStemAareZ_col     , &
+    CanopyLeafAareZ_col      => plt_morph%CanopyLeafAareZ_col     , &
     StemArea_col             => plt_morph%StemArea_col            , &
     CanopyLeafArea_col       => plt_morph%CanopyLeafArea_col        &
   )
@@ -242,8 +243,7 @@ module CanopyCondsMod
   real(r8) :: YAREA
   REAL(R8) :: LeafAzimuthAngle,ZAGL
   real(r8) :: SolarAzimuthAngle,CoSineSunInclAngle_col
-  integer, parameter :: ibackward=1
-  integer, parameter :: iforward=2
+
   !     begin_execution
   !     MULTILAYER CANOPY INTERECEPTION OF DIRECT AND DIFFUSE RADIATION
   !     IN SW AND VISIBLE BANDS BY INCLINATION N, AZIMUTH M, LAYER L,
@@ -308,7 +308,7 @@ module CanopyCondsMod
     ZEROS2                   => plt_site%ZEROS2                      , &
     POROS1                   => plt_site%POROS1                      , &
     SolarNoonHour_col        => plt_site%SolarNoonHour_col           , &
-    VLSoilPoreMicP_vr           => plt_soilchem%VLSoilPoreMicP_vr    , &
+    VLSoilPoreMicP_vr        => plt_soilchem%VLSoilPoreMicP_vr    , &
     VLSoilMicP               => plt_soilchem%VLSoilMicP              , &
     VLWatMicP                => plt_soilchem%VLWatMicP               , &
     ClumpFactorNow_pft       => plt_morph%ClumpFactorNow_pft         , &

@@ -1529,7 +1529,7 @@ implicit none
       DO N=1,NumOfSkyAzimuSects
         plt_rad%OMEGA(N,M,NN)=OMEGA(N,M,NN)
         plt_rad%OMEGX(N,M,NN)=OMEGX(N,M,NN)
-        plt_rad%IALBY(N,M,NN)=IALBY(N,M,NN)
+        plt_rad%iScatteringDiffus(N,M,NN)=iScatteringDiffus(N,M,NN)
       ENDDO
     ENDDO
   ENDDO

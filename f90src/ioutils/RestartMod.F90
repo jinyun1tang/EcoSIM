@@ -1002,11 +1002,12 @@ implicit none
     call restartvar(ncid, flag, varname='ClumpFactor', dim1name='pft',&
      long_name='clumping factor for self-shading in canopy layer', units='none', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)              
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,ClumpFactor,datrp_1d,NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft)  
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,ClumpFactor_pft,datrp_1d,NumActivePlants=NumActivePlants &
+      ,IsPlantActive_pft=IsPlantActive_pft)  
   else
     !print*,'ClumpFactor'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,ClumpFactor,datrp_1d,NumActivePlants=NumActivePlants,&
-      IsPlantActive_pft=IsPlantActive_pft)    
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,ClumpFactor_pft,datrp_1d,&
+      NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft)    
     datpr1 => datrp_1d
     call restartvar(ncid, flag, varname='ClumpFactor', dim1name='pft',&
      long_name='clumping factor for self-shading in canopy layer', units='none', &

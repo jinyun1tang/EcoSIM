@@ -248,7 +248,7 @@ module CanopyDataType
   allocate(CanWatg(JY,JX));      CanWatg=0._r8
   allocate(LWRadCanG(JY,JX));       LWRadCanG=0._r8
   allocate(RadSWLeafAlbedo_pft(JP,JY,JX));     RadSWLeafAlbedo_pft=0._r8
-  allocate(RadSWLeafTransmis_pft(JP,JY,JX));     fwdScatRadPARbyStalkT=0._r8
+  allocate(RadSWLeafTransmis_pft(JP,JY,JX));     RadSWLeafTransmis_pft=0._r8
   allocate(PrecIntcptByCanopy_pft(JP,JY,JX));     PrecIntcptByCanopy_pft=0._r8
   allocate(WatByPCanopy(JP,JY,JX));    WatByPCanopy=0._r8
   allocate(TKC(JP,JY,JX));      TKC=0._r8

@@ -462,7 +462,7 @@ contains
   call destroy(NumCogrowNode)
   call destroy(PSICanPDailyMin)
   call destroy(ClumpFactorNow_pft)
-  call destroy(ClumpFactor)
+  call destroy(ClumpFactor_pft)
   call destroy(iPlantShootState_pft)
   call destroy(MaxPotentSeedNumber_pft)
   call destroy(MaxSeedNumPerSite_pft)

@@ -173,7 +173,7 @@ implicit none
   real(r8), pointer :: OMEGA(:,:,:)=> null() !sine of indirect sky radiation on leaf surface
   real(r8), pointer :: SineLeafAngle(:)     => null() !sine of leaf angle
   real(r8), pointer :: CosineLeafAngle(:)     => null() !cosine of leaf angle
-  integer,  pointer :: IALBY(:,:,:)=> null() !flag for calculating backscattering of radiation in canopy
+  integer,  pointer :: iScatteringDiffus(:,:,:)=> null() !flag for calculating backscattering of radiation in canopy
   real(r8), pointer :: RadNet2Canopy_pft(:)     => null() !canopy net radiation , [MJ d-2 h-1]
   real(r8), pointer :: LeafSWabsorpty_pft(:)     => null() !canopy shortwave absorptivity , [-]
   real(r8), pointer :: LeafPARabsorpty_pft(:)     => null() !canopy PAR absorptivity
@@ -1612,7 +1612,7 @@ implicit none
   allocate(this%OMEGA(NumOfSkyAzimuSects1,NumOfLeafZenithSectors1,NumOfLeafAzimuthSectors1))
   allocate(this%SineLeafAngle(NumOfLeafZenithSectors1))
   allocate(this%CosineLeafAngle(NumOfLeafZenithSectors1))
-  allocate(this%IALBY(NumOfSkyAzimuSects1,NumOfLeafZenithSectors1,NumOfLeafAzimuthSectors1))
+  allocate(this%iScatteringDiffus(NumOfSkyAzimuSects1,NumOfLeafZenithSectors1,NumOfLeafAzimuthSectors1))
   allocate(this%RadNet2Canopy_pft(JP1))
   allocate(this%LeafSWabsorpty_pft(JP1))
   allocate(this%LeafPARabsorpty_pft(JP1))

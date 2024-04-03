@@ -2,6 +2,7 @@ module InitVegBGC
 
   use EcosimConst
   use GridConsts
+  use GrosubPars, only : ibackward,iforward
   implicit none
   character(len=*),private, parameter :: mod_filename = &
   __FILE__
@@ -32,7 +33,7 @@ module InitVegBGC
   !     ZAZI=leaf azimuth class, it is pi because only on one side of the leaf
   !     SkyAzimuthAngle,YSIN,YCOS=sky azimuth,sine,cosine of sky azimuth
   !     OMEGA,OMEGX=incident aNGLe of diffuse radn at leaf,horizontal surface
-  !     IALBY:1=backscattering,2=forward scattering of sky radiation
+  !     iScatteringDiffus:1=backscattering,2=forward scattering of sky radiation
   !
 
 !  write(*,*) "First do loop over leaf azimuth sectors"
@@ -73,9 +74,9 @@ module InitVegBGC
           ZAGL=YAGL-2.0_r8*(PICON+OMEGZ)
         ENDIF
         IF(ZAGL.GT.0.0_r8.AND.ZAGL.LT.PICON)THEN
-          IALBY(N,M,L)=1
+          iScatteringDiffus(N,M,L)=ibackward
         ELSE
-          IALBY(N,M,L)=2
+          iScatteringDiffus(N,M,L)=iforward
         ENDIF
       ENDDO
     ENDDO D225

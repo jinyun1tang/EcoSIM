@@ -67,6 +67,8 @@ module GrosubPars
 !     RCCZ,RCCY=min,max fractions for shoot,bacteria C recycling
 !     RCCX,RCCQ=max fractions for shoot,bacteria N,P recycling
 !
+  integer, parameter :: ibackward=1
+  integer, parameter :: iforward=2
   real(r8) :: PART1X
   real(r8) :: PART2X
   real(r8) :: VMXC
