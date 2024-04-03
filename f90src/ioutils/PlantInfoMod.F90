@@ -1057,13 +1057,18 @@ implicit none
           D4975: DO NX=NH1,NH2
             D4970: DO NY=NV1,NV2
               D4965: DO NZ=1,NS
+                flag_pft_active(NZ,NY,NX)=.true.
                 IF(KoppenClimZone(NY,NX).GT.0)THEN
                   WRITE(CLIMATE,'(I2)')KoppenClimZone(NY,NX)
                   !the type of pft is specified by genra+Koppen climate zone
                   DATAX(NZ)=pft_gtype(NZ)(1:4)//CLIMATE
                 ENDIF
-
               ENDDO D4965
+              if(first_pft)then
+                flag_pft_active(2:NS,NY,NX)=.false.
+                NP0(NY,NX)=1
+                NS=1
+              endif  
             ENDDO D4970
           ENDDO D4975
         ENDIF

@@ -68,11 +68,12 @@ implicit none
   character(len=16), pointer :: DATAP(:) => null()   !parameter file name
   CHARACTER(len=16), pointer :: DATA(:)  => null()   !pft file
   real(r8), pointer :: AREA3(:)   => null()    !soil cross section area (vertical plan defined by its normal direction)
-  real(r8), pointer :: ElmBalanceCum_pft(:,:)  => null()    !plant element balance, [g d-2]
-  real(r8), pointer :: CumSoilThickness(:)  => null()    !depth to bottom of soil layer from  surface of grid cell [m]
-  real(r8), pointer :: PPI(:)     => null()    !initial plant population, [m-2]
-  real(r8), pointer :: PPZ(:)     => null()    !plant population at seeding, [m-2]
-  real(r8), pointer :: PPX(:)     => null()    !plant population, [m-2]
+  real(r8), pointer :: ElmBalanceCum_pft(:,:)      => null()    !plant element balance, [g d-2]
+  real(r8), pointer :: CumSoilThickness(:)         => null()    !depth to bottom of soil layer from  surface of grid cell [m]
+  real(r8), pointer :: PPI(:)                      => null()    !initial plant population, [m-2]
+  real(r8), pointer :: PPZ(:)                      => null()    !plant population at seeding, [m-2]
+  real(r8), pointer :: PPX(:)                      => null()    !plant population, [m-2]
+  logical , pointer :: flag_pft_active(:)          => null()
   real(r8), pointer :: PlantPopulation_pft(:)      => null()    !plant population, [d-2]
   real(r8), pointer :: DPTHZ(:)   => null()    !depth to middle of soil layer from  surface of grid cell [m]
   real(r8), pointer :: FracSoiAsMicP(:)    => null()    !micropore fraction
@@ -925,6 +926,7 @@ implicit none
   allocate(this%PPZ(JP1));this%PPZ=spval
   allocate(this%PPX(JP1));this%PPX=spval
   allocate(this%PlantPopulation_pft(JP1));this%PlantPopulation_pft=spval
+  allocate(this%flag_pft_active(JP1));  this%flag_pft_active=.false.
   allocate(this%VLWatMicPM(60,0:JZ1));this%VLWatMicPM=spval
   allocate(this%VLsoiAirPM(60,0:JZ1));this%VLsoiAirPM=spval
   allocate(this%TortMicPM(60,0:JZ1));this%TortMicPM=spval

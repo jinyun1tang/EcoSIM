@@ -9,7 +9,8 @@ implicit none
    __FILE__  
   logical :: salt_model   =.false.    !toggle for salt model
   logical :: erosion_model=.false.
-  logical :: first_topou   = .false.
+  logical :: first_topou   = .false.  !only simulate first topo unit
+  logical :: first_pft     = .false.  !only simulate first pft
   integer :: iErosionMode =-1         !erosion option  
   logical :: plant_model  =.true.
   logical :: microbial_model   =.true.
