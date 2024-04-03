@@ -44,7 +44,6 @@ implicit none
 
   NX=1
 
-
   do NY=1,NYS
     NU(NY,NX)=a_NU(NY)
     NL(NY,NX)=a_NL(NY)

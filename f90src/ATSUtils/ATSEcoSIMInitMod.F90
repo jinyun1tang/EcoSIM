@@ -57,8 +57,10 @@ implicit none
     !ZNH3E(NY,NX)=atm_nh3
     !H2GE(NY,NX)=atm_H2
     TairK(NY,NX)=tairc(NY) !it's already in K??
-    VPA(NY,NX) = vpair(NY)
-    WindSpeedAtm(NY,NX) = uwind(NY)  
+    !convert VPA from ATS units (Pa) to EcoSIM (MPa)
+    VPA(NY,NX) = vpair(NY)/1.0e6_r8
+    !convert WindSpeedAtm from ATS units (m s^-1) to EcoSIM (m h^-1)
+    WindSpeedAtm(NY,NX) = uwind(NY)*3600.0_r8
     DO L=NU(NY,NX),NL(NY,NX)
       TKSoi1(L,NY,NX) = a_TEMP(L,NY)
       CumDepth2LayerBottom(L,NY,NX)=a_CumDepth2LayerBottom(L,NY)
