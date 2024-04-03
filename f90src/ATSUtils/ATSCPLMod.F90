@@ -48,17 +48,29 @@ contains
   call c_f_pointer(cptr_temp,data2D,[(/size_col/),(/num_cols/)])
   a_CumDepth2LayerBottom=data2D(:,:)
 
+  call c_f_pointer(props%dz%data, cptr_temp)
+  call c_f_pointer(cptr_temp,data2D,[(/size_col/),(/num_cols/)])
+  a_dz=data2D(:,:)
+
+  call c_f_pointer(props%volume%data, cptr_temp)
+  call c_f_pointer(cptr_temp,data2D,[(/size_col/),(/num_cols/)])
+  a_Volume=data2D(:,:)
+
+  call c_f_pointer(props%volume%data, cptr_temp)
+  call c_f_pointer(cptr_temp,data2D,[(/size_col/),(/num_cols/)])
+  a_AREA3=data2D(:,:) 
+
   call c_f_pointer(state%water_content%data, cptr_temp)
   call c_f_pointer(cptr_temp,data2D,[(/size_col/),(/num_cols/)])
   a_WC=data2D(:,:)
 
   call c_f_pointer(props%volume%data, cptr_temp)
   call c_f_pointer(cptr_temp,data2D,[(/size_col/),(/num_cols/)])
-  a_AREA3=data2D(:,:)
+  a_AreaZ=data2D(:,:)
 
-  !do i = 1, size_col
-  !   write(*,*) "a_WC = ", a_WC(i, 1) 
-  !end do
+  do i = 1, size_col
+     a_AreaZ(i,1) = a_Volume(i,1)/a_dz(i,1)
+  end do
 
   call c_f_pointer(state%temperature%data, cptr_temp)
   call c_f_pointer(cptr_temp,data2D,[(/size_col/),(/num_cols/)])
@@ -81,7 +93,8 @@ contains
   a_MATP=data2D(:,:)
 
   do i = 1, size_col
-     a_MATP(i, 1) = 100.0  
+     a_MATP(i, 1) = 100.0 
+     !a_AreaZ(i,1) = 1.0 
   end do
 
   call c_f_pointer(state%porosity%data, cptr_temp)

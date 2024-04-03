@@ -44,7 +44,6 @@ implicit none
 
   NX=1
 
-
   do NY=1,NYS
     NU(NY,NX)=a_NU(NY)
     NL(NY,NX)=a_NL(NY)
@@ -79,10 +78,13 @@ implicit none
       CORGC(L,NY,NX)=a_CORGC(L,NY)
       CORGN(L,NY,NX)=a_CORGN(L,NY)
       CORGP(L,NY,NX)=a_CORGP(L,NY)
-      VLWatMicP1(L,NY,NX)=a_WC(L,NY)
+      !We get volume of water via Porosity*saturation*volume
+      VLWatMicP1(L,NY,NX)=a_PORO(L,NY)*a_LSAT(L,NY)*a_Volume(L,NY)
       VLiceMicP1(L,NY,NX)=0.0
       TKSoi1(L,NY,NX) = a_TEMP(L,NY)
-      VLHeatCapacity(L,NY,NX) = heat_capacity
+      !Units are MJ K^-1 d^-2 so we take the molar heat capacity
+      !multiply by water content (in mol) and the Area as computed in ATSCPL 
+      VLHeatCapacity(L,NY,NX) = heat_capacity*a_WC(L,NY)/a_AreaZ(L,NY)
       SoilFracAsMicP(L,NY,NX) = 1.0
       PSISM1(L,NY,NX) = a_MATP(L,NY)
       POROS(L,NY,NX) = a_PORO(L,NY)

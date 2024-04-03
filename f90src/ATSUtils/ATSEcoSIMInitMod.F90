@@ -57,16 +57,19 @@ implicit none
     !ZNH3E(NY,NX)=atm_nh3
     !H2GE(NY,NX)=atm_H2
     TairK(NY,NX)=tairc(NY) !it's already in K??
-    VPA(NY,NX) = vpair(NY)
-    WindSpeedAtm(NY,NX) = uwind(NY)  
+    !convert VPA from ATS units (Pa) to EcoSIM (MPa)
+    VPA(NY,NX) = vpair(NY)/1.0e6_r8
+    !convert WindSpeedAtm from ATS units (m s^-1) to EcoSIM (m h^-1)
+    WindSpeedAtm(NY,NX) = uwind(NY)*3600.0_r8
     DO L=NU(NY,NX),NL(NY,NX)
       TKSoi1(L,NY,NX) = a_TEMP(L,NY)
       CumDepth2LayerBottom(L,NY,NX)=a_CumDepth2LayerBottom(L,NY)
       POROS(L,NY,NX)=a_PORO(L,NY)
-      SoiBulkDensityt0(L,NY,NX)=a_BKDSI(L,NY)
       CORGC(L,NY,NX)=a_CORGC(L,NY)
       CORGN(L,NY,NX)=a_CORGN(L,NY)
       CORGP(L,NY,NX)=a_CORGP(L,NY)
+      !Convert Bulk Density from ATS (kg m^-3) to EcoSIM (Mg m^-3)
+      SoiBulkDensityt0(L,NY,NX)=a_BKDSI(L,NY)/1.0e3_r8
     ENDDO
   ENDDO
 
