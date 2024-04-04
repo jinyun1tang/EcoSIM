@@ -251,7 +251,7 @@ module GrosubPars
   FMYC=0.1_r8
   CNKI=5.0E-03_r8
   CPKI=5.0E-04_r8
-  RmSpecPlant=0.010_r8*0.01_r8
+  RmSpecPlant=0.010_r8
   PSIMin4OrganExtens=0.1_r8
   RCMN=1.560E+01_r8
   RTDPX=0.00_r8
