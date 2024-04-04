@@ -397,13 +397,15 @@ subroutine soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
       call hist_ecosim%hist_update(bounds)
 
       call hist_update_hbuf(bounds)
+
+      call hist_htapes_wrapup( rstwr, nlend, bounds, lnyr )
+
       call etimer%update_time_stamp()
 
       nlend=etimer%its_time_to_exit()
       rstwr=etimer%its_time_to_write_restart()
       lnyr=etimer%its_a_new_year().and.hist_yrclose
 
-      call hist_htapes_wrapup( rstwr, nlend, bounds, lnyr )
       if(rstwr)then
         call restFile(flag='write')
       endif

@@ -53,8 +53,8 @@
     CanopyGasCO2_pft           =>  plt_photo%CanopyGasCO2_pft           , &
     CanopyLeafArea_pft         =>  plt_morph%CanopyLeafArea_pft         , &
     ZEROP                      =>  plt_biom%ZEROP                       , &
-    NetCO2Flx2Canopy_col                      =>  plt_bgcr%NetCO2Flx2Canopy_col                       , &
-    SineSunInclAngle_col        =>  plt_rad%SineSunInclAngle_col          , &
+    NetCO2Flx2Canopy_col       =>  plt_bgcr%NetCO2Flx2Canopy_col        , &
+    SineSunInclAngle_col       =>  plt_rad%SineSunInclAngle_col         , &
     AirConc_pft                =>  plt_photo%AirConc_pft                , &
     MinCanPStomaResistH2O_pft  =>  plt_photo%MinCanPStomaResistH2O_pft  , &
     CanPCi2CaRatio             =>  plt_photo%CanPCi2CaRatio             , &
