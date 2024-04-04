@@ -12,7 +12,7 @@ module PlantInfoMod
   use CanopyDataType
   use PlantTraitDataType
   use PlantMathFuncMod
-  use PlantMngmtDataType
+  use PlantMgmtDataType
   use EcosimConst
   use RootDataType
   use EcoSIMHistMod

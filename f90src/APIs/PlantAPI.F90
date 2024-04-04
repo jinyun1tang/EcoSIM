@@ -28,7 +28,7 @@ module PlantAPI
   use EcosimBGCFluxType
   use FertilizerDataType
   use SoilBGCDataType
-  use PlantMngmtDataType
+  use PlantMgmtDataType
   use PlantAPIData
 implicit none
 
@@ -452,7 +452,7 @@ implicit none
 
     DO  L=1,NL(NY,NX)
       DO N=1,pltpar%jroots
-         RootMycoNonstElms_rpvr(1:NumPlantChemElms,N,L,NZ,NY,NX)=plt_biom%RootMycoNonstElms_rpvr(1:NumPlantChemElms,N,L,NZ)
+        RootMycoNonstElms_rpvr(1:NumPlantChemElms,N,L,NZ,NY,NX)=plt_biom%RootMycoNonstElms_rpvr(1:NumPlantChemElms,N,L,NZ)
         RootNonstructElmConc_pvr(1:NumPlantChemElms,N,L,NZ,NY,NX)=plt_biom%RootNonstructElmConc_pvr(1:NumPlantChemElms,N,L,NZ)
         RootProteinConc_pvr(N,L,NZ,NY,NX)=plt_biom%RootProteinConc_pvr(N,L,NZ)
         trcg_rootml_pvr(idg_beg:idg_end-1,N,L,NZ,NY,NX)  =plt_rbgc%trcg_rootml_pvr(idg_beg:idg_end-1,N,L,NZ)
@@ -592,6 +592,7 @@ implicit none
     RSRA(2,NZ,NY,NX)  =plt_morph%RSRA(2,NZ)
 
     DO N=1,MY(NZ,NY,NX)
+      RootMycoNonstElms_pft(1:NumPlantChemElms,N,NZ,NY,NX)=RootMycoNonstElms_pft(1:NumPlantChemElms,N,NZ)
       RootPoreTortu4Gas(N,NZ,NY,NX)=plt_morph%RootPoreTortu4Gas(N,NZ)
       RootRaidus_rpft(N,NZ,NY,NX)=plt_morph%RootRaidus_rpft(N,NZ)
       RootVolPerMassC_pft(N,NZ,NY,NX) =plt_morph%RootVolPerMassC_pft(N,NZ)

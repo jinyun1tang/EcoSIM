@@ -451,32 +451,33 @@ implicit none
   end type plant_allometry_type
 
   type, public :: plant_biom_type
-  real(r8), pointer :: StandingDeadStrutElms_col(:)     => null()    !total standing dead element, [g d-2]
-  real(r8), pointer :: ZEROL(:)       => null()    !threshold zero for leaf calculation
-  real(r8), pointer :: ZEROP(:)       => null()    !threshold zero for p calculation
-  real(r8), pointer :: RootNodulNonstElms_pvr(:,:,:)  => null()    !root  layer nonstructural element, [g d-2]
-  real(r8), pointer :: RootNodulStrutElms_pvr(:,:,:)  => null()    !root layer nodule element, [g d-2]
-  real(r8), pointer :: CanopyLeafCLyr_pft(:,:)     => null()    !canopy layer leaf C, [g d-2]
-  real(r8), pointer :: RootMyco2ndStrutElms_rpvr(:,:,:,:,:) => null()    !root layer element secondary axes, [g d-2]
-  real(r8), pointer :: RootMyco1stStrutElms_rpvr(:,:,:,:,:) => null()    !root layer element primary axes, [g d-2]
-  real(r8), pointer :: Root1stElm_raxs(:,:,:,:)   => null()    !root C primary axes, [g d-2]
-  real(r8), pointer :: StandDeadKCompElms_pft(:,:,:)  => null()    !standing dead element fraction, [g d-2]
-  real(r8), pointer :: CanopyNonstElmConc_pft(:,:)    => null()    !canopy nonstructural element concentration, [g d-2]
-  real(r8), pointer :: CanopyNonstElms_pft(:,:)    => null()    !canopy nonstructural element concentration, [g d-2]
-  real(r8), pointer :: CanopyNodulNonstElms_pft(:,:)    => null()    !canopy nodule nonstructural element, [g d-2]
-  real(r8), pointer :: NoduleNonstructCconc_pft(:)      => null()    !nodule nonstructural C, [gC d-2]
-  real(r8), pointer :: RootMycoActiveBiomC_pvr(:,:,:)   => null()    !root layer structural C, [g d-2]
-  real(r8), pointer ::  PopuRootMycoC_pvr(:,:,:)   => null()    !root layer C, [g d-2]
-  real(r8), pointer :: RootProteinC_pvr(:,:,:)   => null()    !root layer protein C, [g d-2]
-  real(r8), pointer :: RootProteinConc_pvr(:,:,:)  => null()    !root layer protein C concentration, [g g-1]
-  real(r8), pointer :: RootMycoNonstElms_rpvr(:,:,:,:)=> null()    !root  layer nonstructural element, [g d-2]
-  real(r8), pointer :: RootNonstructElmConc_pvr(:,:,:,:)  => null()    !root  layer nonstructural C concentration, [g g-1]
-  real(r8), pointer :: LeafPetoNonstElmConc_brch(:,:,:)    => null()    !branch nonstructural C concentration, [g d-2]
-  real(r8), pointer :: InternodeStrutElms_brch(:,:,:,:)  => null()    !internode C, [g d-2]
-  real(r8), pointer :: LeafElmntNode_brch(:,:,:,:)    => null()    !leaf element, [g d-2]
-  real(r8), pointer :: LeafProteinCNode_brch(:,:,:)    => null()    !layer leaf protein C, [g d-2]
-  real(r8), pointer :: PetioleElmntNode_brch(:,:,:,:)   => null()  !sheath element , [g d-2]
-  real(r8), pointer :: PetioleProteinCNode_brch(:,:,:)   => null()    !layer sheath protein C, [g d-2]
+  real(r8), pointer :: StandingDeadStrutElms_col(:)           => null()    !total standing dead element, [g d-2]
+  real(r8), pointer :: ZEROL(:)                               => null()    !threshold zero for leaf calculation
+  real(r8), pointer :: ZEROP(:)                               => null()    !threshold zero for p calculation
+  real(r8), pointer :: RootNodulNonstElms_pvr(:,:,:)          => null()    !root  layer nonstructural element, [g d-2]
+  real(r8), pointer :: RootNodulStrutElms_pvr(:,:,:)          => null()    !root layer nodule element, [g d-2]
+  real(r8), pointer :: CanopyLeafCLyr_pft(:,:)                => null()    !canopy layer leaf C, [g d-2]
+  real(r8), pointer :: RootMycoNonstElms_pft(:,:,:)           => null()  
+  real(r8), pointer :: RootMyco2ndStrutElms_rpvr(:,:,:,:,:)   => null()    !root layer element secondary axes, [g d-2]
+  real(r8), pointer :: RootMyco1stStrutElms_rpvr(:,:,:,:,:)   => null()    !root layer element primary axes, [g d-2]
+  real(r8), pointer :: Root1stElm_raxs(:,:,:,:)               => null()    !root C primary axes, [g d-2]
+  real(r8), pointer :: StandDeadKCompElms_pft(:,:,:)          => null()    !standing dead element fraction, [g d-2]
+  real(r8), pointer :: CanopyNonstElmConc_pft(:,:)            => null()    !canopy nonstructural element concentration, [g d-2]
+  real(r8), pointer :: CanopyNonstElms_pft(:,:)               => null()    !canopy nonstructural element concentration, [g d-2]
+  real(r8), pointer :: CanopyNodulNonstElms_pft(:,:)          => null()    !canopy nodule nonstructural element, [g d-2]
+  real(r8), pointer :: NoduleNonstructCconc_pft(:)            => null()    !nodule nonstructural C, [gC d-2]
+  real(r8), pointer :: RootMycoActiveBiomC_pvr(:,:,:)         => null()    !root layer structural C, [g d-2]
+  real(r8), pointer ::  PopuRootMycoC_pvr(:,:,:)              => null()    !root layer C, [g d-2]
+  real(r8), pointer :: RootProteinC_pvr(:,:,:)                => null()    !root layer protein C, [g d-2]
+  real(r8), pointer :: RootProteinConc_pvr(:,:,:)             => null()    !root layer protein C concentration, [g g-1]
+  real(r8), pointer :: RootMycoNonstElms_rpvr(:,:,:,:)        => null()    !root  layer nonstructural element, [g d-2]
+  real(r8), pointer :: RootNonstructElmConc_pvr(:,:,:,:)      => null()    !root  layer nonstructural C concentration, [g g-1]
+  real(r8), pointer :: LeafPetoNonstElmConc_brch(:,:,:)       => null()    !branch nonstructural C concentration, [g d-2]
+  real(r8), pointer :: InternodeStrutElms_brch(:,:,:,:)       => null()    !internode C, [g d-2]
+  real(r8), pointer :: LeafElmntNode_brch(:,:,:,:)            => null()    !leaf element, [g d-2]
+  real(r8), pointer :: LeafProteinCNode_brch(:,:,:)           => null()    !layer leaf protein C, [g d-2]
+  real(r8), pointer :: PetioleElmntNode_brch(:,:,:,:)         => null()  !sheath element , [g d-2]
+  real(r8), pointer :: PetioleProteinCNode_brch(:,:,:)        => null()    !layer sheath protein C, [g d-2]
   real(r8), pointer :: LeafChemElmByLayerNode_brch(:,:,:,:,:) => null()    !layer leaf element, [g d-2]
   real(r8), pointer :: WGLFT(:)       => null()  !total leaf mass, [gC d-2]
   real(r8), pointer :: StandingDeadInitC_pft(:)      => null()  !initial standing dead C, [g C m-2]
@@ -682,12 +683,12 @@ implicit none
   end type plant_bgcrate_type
 
   type, public :: plant_rootbgc_type
-  real(r8), pointer :: TRootGasLossDisturb_pft(:)   => null()  !total root gas content [g d-2]
+  real(r8), pointer :: TRootGasLossDisturb_pft(:)    => null()  !total root gas content [g d-2]
   real(r8), pointer :: trcs_plant_uptake_vr(:,:)     => null()   !total root-soil solute flux non-band, [g d-2 h-1]  
-  real(r8), pointer :: RootMycoExudElms_pft(:,:)       => null()  !total root uptake (+ve) - exudation (-ve) of dissolved element, [g d-2 h-1]
-  real(r8), pointer :: RootN2Fix_pft(:)          => null()  !total root N2 fixation, [g d-2 h-1]
-  real(r8), pointer :: RootNO3Uptake_pft(:)         => null()  !total root uptake of NO3, [g d-2 h-1]
-  real(r8), pointer :: RootNH4Uptake_pft(:)         => null()  !total root uptake of NH4, [g d-2 h-1]
+  real(r8), pointer :: RootMycoExudElms_pft(:,:)     => null()  !total root uptake (+ve) - exudation (-ve) of dissolved element, [g d-2 h-1]
+  real(r8), pointer :: RootN2Fix_pft(:)              => null()  !total root N2 fixation, [g d-2 h-1]
+  real(r8), pointer :: RootNO3Uptake_pft(:)          => null()  !total root uptake of NO3, [g d-2 h-1]
+  real(r8), pointer :: RootNH4Uptake_pft(:)          => null()  !total root uptake of NH4, [g d-2 h-1]
   real(r8), pointer :: RootHPO4Uptake_pft(:)         => null()  !total root uptake of HPO4, [g d-2 h-1]
   real(r8), pointer :: RootH2PO4Uptake_pft(:)         => null()  !total root uptake of PO4, [g d-2 h-1]
   real(r8), pointer :: RootMycoExudElm_pvr(:,:,:,:,:)  => null()  !root uptake (+ve) - exudation (-ve) of DOE, [g d-2 h-1]
@@ -1270,6 +1271,7 @@ implicit none
   allocate(this%StandDeadKCompElms_pft(NumPlantChemElms,jsken,JP1));this%StandDeadKCompElms_pft=spval
   allocate(this%RootMyco2ndStrutElms_rpvr(NumPlantChemElms,jroots,JZ1,NumOfCanopyLayers1,JP1))
   this%RootMyco2ndStrutElms_rpvr=spval
+  allocate(this%RootMycoNonstElms_pft(NumPlantChemElms,jroots,JP1));this%RootMycoNonstElms_pft=spval
   allocate(this%RootMyco1stStrutElms_rpvr(NumPlantChemElms,jroots,JZ1,NumOfCanopyLayers1,JP1))
   this%RootMyco1stStrutElms_rpvr=spval
   allocate(this%RootNodulElms_pft(NumPlantChemElms,JP1));this%RootNodulElms_pft=spval

@@ -26,7 +26,7 @@ module HistDataType
   use SoilWaterDataType
   use SnowDataType
   use ChemTranspDataType
-  use PlantMngmtDataType
+  use PlantMgmtDataType
   use EcosimBGCFluxType
   use SoilPropertyDataType
   use SoilBGCDataType
@@ -141,7 +141,7 @@ implicit none
   real(r8),pointer   :: h1D_sN2G_FLX_col(:)        !SurfGasFlx(idg_N2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_sNH3_FLX_col(:)        !SurfGasFlx(idg_NH3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_frcPARabs_ptc(:)      !fraction of PAR absorbed
-  real(r8),pointer   :: h1D_PARbyCanopy_ptc(:)    !PAR absorbed by Canopy, umol /m2/s
+  real(r8),pointer   :: h1D_PAR_CAN_ptc(:)    !PAR absorbed by Canopy, umol /m2/s
   real(r8),pointer   :: h1D_PAR_col(:)            !incoming PAR, umol/s
   real(r8),pointer   :: h1D_Plant_C_ptc(:)        !whole plant C  
   real(r8),pointer   :: h1D_Plant_N_ptc(:)        !whole plant N  
@@ -152,8 +152,8 @@ implicit none
   real(r8),pointer   :: h1D_CAN_LE_ptc(:)        !277.8*EvapTransHeat_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_CAN_H_ptc(:)         !277.8*HeatXAir2PCan(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_CAN_G_ptc(:)         !277.8*HeatStorCanP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_CAN_TEMP_ptc(:)      !TCelciusCanopy_pft(NZ,NY,NX)
-  real(r8),pointer   :: h1D_TEMP_FN_ptc(:)       !fTgrowCanP(NZ,NY,NX), canopy temperature growth function/stress
+  real(r8),pointer   :: h1D_CAN_TEMPC_ptc(:)      !TCelciusCanopy_pft(NZ,NY,NX)
+  real(r8),pointer   :: h1D_CAN_TEMPFN_ptc(:)       !fTgrowCanP(NZ,NY,NX), canopy temperature growth function/stress
   real(r8),pointer   :: h1D_CAN_CO2_FLX_ptc(:)   !CO2NetFix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.148, umol m-2 s-1
   real(r8),pointer   :: h1D_CAN_GPP_ptc(:)       !GrossCO2Fix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total gross CO2 fixation, gC m-2
   real(r8),pointer   :: h1D_CAN_RA_ptc(:)        !CanopyPlusNodulRespC_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total autotrophic respiration
@@ -176,12 +176,15 @@ implicit none
   real(r8),pointer   :: h1D_PO4_UPTK_FLX_ptc(:)      !RootH2PO4Uptake_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_SHOOT_C_ptc(:)       !ShootStrutElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_LEAF_C_ptc(:)        !LeafStrutElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_Petiole_C_ptc(:)        !PetioleStrutElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), canopy sheath element
+  real(r8),pointer   :: h1D_Petole_C_ptc(:)        !PetioleStrutElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), canopy sheath element
   real(r8),pointer   :: h1D_STALK_C_ptc(:)       !StalkStrutElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_RESERVE_C_ptc(:)     !StalkRsrvElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_HUSK_C_ptc(:)        !(HuskStrutElms_pft(ielmc,NZ,NY,NX)+EarStrutElms_pft(ielmc,NZ,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_TK_Canopy_ptc(:)     !canopy temperature Kelvin
+  real(r8),pointer   :: h1D_CAN_TEMPK_ptc(:)     !canopy temperature Kelvin
   real(r8),pointer   :: h1D_GRAIN_C_ptc(:)       !GrainStrutElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_ROOT_NONSTC_ptc(:)
+  real(r8),pointer   :: h1D_ROOT_NONSTN_ptc(:)
+  real(r8),pointer   :: h1D_ROOT_NONSTP_ptc(:)
   real(r8),pointer   :: h1D_ROOT_C_ptc(:)        !RootElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_NODULE_C_ptc(:)      !NodulStrutElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), nodule
   real(r8),pointer   :: h1D_STORED_C_ptc(:)      !NonStrutElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -206,7 +209,7 @@ implicit none
   real(r8),pointer   :: h1D_OXY_STRESS_ptc(:)    !OSTR(NZ,NY,NX)
   real(r8),pointer   :: h1D_SHOOT_N_ptc(:)       !ShootStrutElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_LEAF_N_ptc(:)        !LeafStrutElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_Petiole_N_ptc(:)        !PetioleStrutElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_Petole_N_ptc(:)        !PetioleStrutElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_STALK_N_ptc(:)       !StalkStrutElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_RESERVE_N_ptc(:)     !StalkRsrvElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_HUSK_N_ptc(:)        !(HuskStrutElms_pft(ielmn,NZ,NY,NX)+EarStrutElms_pft(ielmn,NZ,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
@@ -225,7 +228,7 @@ implicit none
   real(r8),pointer   :: h1D_SURF_LITRf_N_FLX_ptc(:)   !SurfLitrfalStrutElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), surface litter fall
   real(r8),pointer   :: h1D_SHOOT_P_ptc(:)       !ShootStrutElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_LEAF_P_ptc(:)        !LeafStrutElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_Petiole_P_ptc(:)        !PetioleStrutElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_Petole_P_ptc(:)        !PetioleStrutElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_STALK_P_ptc(:)       !StalkStrutElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_RESERVE_P_ptc(:)     !StalkRsrvElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_HUSK_P_ptc(:)        !(HuskStrutElms_pft(ielmp,NZ,NY,NX)+EarStrutElms_pft(ielmp,NZ,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
@@ -241,6 +244,9 @@ implicit none
   real(r8),pointer   :: h1D_FIREp_P_FLX_ptc(:)        !PO4byFire_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_SURF_LITRf_P_FLX_ptc(:)  !SurfLitrfalStrutElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_BRANCH_NO_ptc(:)     !NumOfBranches_pft(NZ,NY,NX)
+  real(r8),pointer   :: h1D_LEAF_NONSTC_ptc(:)   !CanopyNonstElms_pft(ielmc,NY,NX)
+  real(r8),pointer   :: h1D_LEAF_NONSTN_ptc(:)   !
+  real(r8),pointer   :: h1D_LEAF_NONSTP_ptc(:)   !
   real(r8),pointer   :: h1D_LEAF_NC_ptc(:)       !(LeafStrutElms_pft(ielmn,NZ,NY,NX)+CanopyNonstElms_pft(ielmn,NZ,NY,NX))/(LeafStrutElms_pft(ielmc,NZ,NY,NX)+CanopyNonstElms_pft(ielmc,NZ,NY,NX)),mass based CN ratio of leaf  
   real(r8),pointer   :: h1D_Growth_Stage_ptc(:)    !plant development stage, integer, 0-10, planting, emergence, floral_init, jointing, 
                                       !elongation, heading, anthesis, seed_fill, see_no_set, seed_mass_set, end_seed_fill
@@ -329,211 +335,211 @@ implicit none
   allocate(this%h1D_SUB_DIC_FLX_col(beg_col:end_col))    ;this%h1D_SUB_DIC_FLX_col(:)=spval 
 
   allocate(this%h1D_tPRECIP_P_col(beg_col:end_col))      ;this%h1D_tPRECIP_P_col(:)=spval 
-  allocate(this%h1D_tMICRO_P_col(beg_col:end_col))        
-  allocate(this%h1D_PO4_FIRE_col(beg_col:end_col))        
-  allocate(this%h1D_cPO4_LITR_col(beg_col:end_col))       
-  allocate(this%h1D_cEXCH_P_LITR_col(beg_col:end_col))    
-  allocate(this%h1D_NET_P_MIN_col(beg_col:end_col))       
-  allocate(this%h1D_RADN_col(beg_col:end_col))            
+  allocate(this%h1D_tMICRO_P_col(beg_col:end_col))       ;this%h1D_tMICRO_P_col(:)=spval
+  allocate(this%h1D_PO4_FIRE_col(beg_col:end_col))       ;this%h1D_PO4_FIRE_col(:)=spval
+  allocate(this%h1D_cPO4_LITR_col(beg_col:end_col))      ;this%h1D_cPO4_LITR_col(:)=spval
+  allocate(this%h1D_cEXCH_P_LITR_col(beg_col:end_col))   ;this%h1D_cEXCH_P_LITR_col(:)=spval
+  allocate(this%h1D_NET_P_MIN_col(beg_col:end_col))      ;this%h1D_NET_P_MIN_col(:)=spval
+  allocate(this%h1D_RADN_col(beg_col:end_col))           ;this%h1D_RADN_col(:)=spval
 
-  allocate(this%h1D_PSI_SURF_col(beg_col:end_col))        
-  allocate(this%h1D_SURF_ELEV_col(beg_col:end_col))       
-  allocate(this%h1D_SURF_tLITR_C_FLX_col(beg_col:end_col)) 
-  allocate(this%h1D_SURF_tLITR_N_FLX_col(beg_col:end_col)) 
+  allocate(this%h1D_PSI_SURF_col(beg_col:end_col))       ;this%h1D_PSI_SURF_col(:)=spval
+  allocate(this%h1D_SURF_ELEV_col(beg_col:end_col))      ;this%h1D_SURF_ELEV_col(:)=spval
+  allocate(this%h1D_SURF_tLITR_C_FLX_col(beg_col:end_col));this%h1D_SURF_tLITR_C_FLX_col(:)=spval
+  allocate(this%h1D_SURF_tLITR_N_FLX_col(beg_col:end_col));this%h1D_SURF_tLITR_N_FLX_col(:)=spval
+  allocate(this%h1D_AMENDED_N_col(beg_col:end_col))       ;this%h1D_AMENDED_N_col(:)=spval
+  allocate(this%h1D_tNH4X_col(beg_col:end_col))           ;this%h1D_tNH4X_col(:)=spval
+  allocate(this%h1D_tNO3_col(beg_col:end_col))            ;this%h1D_tNO3_col(:)=spval
+  allocate(this%h1D_tMICRO_N_col(beg_col:end_col))        ;this%h1D_tMICRO_N_col(:)=spval
+  allocate(this%h1D_TEMP_LITR_col(beg_col:end_col))       ;this%h1D_TEMP_LITR_col(:)=spval
+  allocate(this%h1D_TEMP_SNOW_col(beg_col:end_col))       ;this%h1D_TEMP_SNOW_col(:)=spval
 
-  allocate(this%h1D_AMENDED_N_col(beg_col:end_col))        
+  allocate(this%h1D_AMENDED_C_col(beg_col:end_col))       ;this%h1D_AMENDED_C_col(:)=spval
+  allocate(this%h1D_CO2_FLX_col(beg_col:end_col))         ;this%h1D_CO2_FLX_col(:)=spval
+  allocate(this%h1D_tMICRO_C_col(beg_col:end_col))        ;this%h1D_tMICRO_C_col(:)=spval
+  allocate(this%h1D_OMC_LITR_col(beg_col:end_col))        ;this%h1D_OMC_LITR_col(:)=spval
+  allocate(this%h1D_ATM_CO2_col(beg_col:end_col))         ;this%h1D_ATM_CO2_col(:)=spval
+  allocate(this%h1D_ATM_CH4_col(beg_col:end_col))         ;this%h1D_ATM_CH4_col(:)=spval
+  allocate(this%h1D_NBP_col(beg_col:end_col))             ;this%h1D_NBP_col(:)=spval
 
-  allocate(this%h1D_tNH4X_col(beg_col:end_col))          
-  allocate(this%h1D_tNO3_col(beg_col:end_col))          
-  allocate(this%h1D_tMICRO_N_col(beg_col:end_col))      
-  allocate(this%h1D_TEMP_LITR_col(beg_col:end_col))     
-  allocate(this%h1D_TEMP_SNOW_col(beg_col:end_col))     
+  allocate(this%h1D_ECO_LAI_col(beg_col:end_col))         ;this%h1D_ECO_LAI_col(:)=spval
+  allocate(this%h1D_ECO_GPP_col(beg_col:end_col))         ;this%h1D_ECO_GPP_col(:)=spval
+  allocate(this%h1D_ECO_RA_col(beg_col:end_col))          ;this%h1D_ECO_RA_col(:)=spval
+  allocate(this%h1D_ECO_NPP_col(beg_col:end_col))         ;this%h1D_ECO_NPP_col(:)=spval
+  allocate(this%h1D_ECO_HR_col(beg_col:end_col))          ;this%h1D_ECO_HR_col(:)=spval
+  allocate(this%h1D_tDIC_col(beg_col:end_col))            ;this%h1D_tDIC_col=spval
+  allocate(this%h1D_tSTANDING_DEAD_C_col(beg_col:end_col));this%h1D_tSTANDING_DEAD_C_col=spval 
+  allocate(this%h1D_tSTANDING_DEAD_N_col(beg_col:end_col));this%h1D_tSTANDING_DEAD_N_col=spval  
+  allocate(this%h1D_tSTANDING_DEAD_P_col(beg_col:end_col));this%h1D_tSTANDING_DEAD_P_col=spval  
+  allocate(this%h1D_tPRECN_col(beg_col:end_col))          ;this%h1D_tPRECN_col(:)=spval
+  allocate(this%h1D_ET_col(beg_col:end_col))              ;this%h1D_ET_col(:)=spval
+  allocate(this%h1D_N2O_LITR_col(beg_col:end_col))        ;this%h1D_N2O_LITR_col(:)=spval
+  allocate(this%h1D_NH3_LITR_col(beg_col:end_col))        ;this%h1D_NH3_LITR_col(:)=spval
+  allocate(this%h1D_SOL_RADN_col(beg_col:end_col))        ;this%h1D_SOL_RADN_col(:)=spval
+  allocate(this%h1D_AIR_TEMP_col(beg_col:end_col))        ;this%h1D_AIR_TEMP_col(:)=spval
+  allocate(this%h1D_HUM_col(beg_col:end_col))             ;this%h1D_HUM_col(:)=spval
+  allocate(this%h1D_WIND_col(beg_col:end_col))            ;this%h1D_WIND_col(:)=spval
+  allocate(this%h1D_PREC_col(beg_col:end_col))            ;this%h1D_PREC_col(:)=spval
+  allocate(this%h1D_SOIL_RN_col(beg_col:end_col))         ;this%h1D_SOIL_RN_col(:)=spval
+  allocate(this%h1D_SOIL_LE_col(beg_col:end_col))         ;this%h1D_SOIL_LE_col(:)=spval
+  allocate(this%h1D_SOIL_H_col(beg_col:end_col))          ;this%h1D_SOIL_H_col(:)=spval
+  allocate(this%h1D_SOIL_G_col(beg_col:end_col))          ;this%h1D_SOIL_G_col(:)=spval
+  allocate(this%h1D_ECO_RN_col(beg_col:end_col))          ;this%h1D_ECO_RN_col(:)=spval
+  allocate(this%h1D_ECO_LE_col(beg_col:end_col))          ;this%h1D_ECO_LE_col(:)=spval
+  allocate(this%h1D_Eco_Heat_col(beg_col:end_col))        ;this%h1D_Eco_Heat_col(:)=spval
+  allocate(this%h1D_ECO_G_col(beg_col:end_col))           ;this%h1D_ECO_G_col(:)=spval
+  allocate(this%h1D_O2_LITR_col(beg_col:end_col))         ;this%h1D_O2_LITR_col(:)=spval
+  allocate(this%h1D_MIN_LWP_ptc(beg_ptc:end_ptc))         ;this%h1D_MIN_LWP_ptc(:)=spval
+  allocate(this%h1D_SOIL_CO2_FLX_col(beg_col:end_col))    ;this%h1D_SOIL_CO2_FLX_col(:)=spval
+  allocate(this%h1D_ECO_CO2_FLX_col(beg_col:end_col))     ;this%h1D_ECO_CO2_FLX_col(:)=spval
+  allocate(this%h1D_CH4_FLX_col(beg_col:end_col))         ;this%h1D_CH4_FLX_col(:)=spval
+  allocate(this%h1D_O2_FLX_col(beg_col:end_col))          ;this%h1D_O2_FLX_col(:)=spval
+  allocate(this%h1D_CO2_LITR_col(beg_col:end_col))        ;this%h1D_CO2_LITR_col(:)=spval
+  allocate(this%h1D_EVAPN_col(beg_col:end_col))           ;this%h1D_EVAPN_col(:)=spval
 
-  allocate(this%h1D_AMENDED_C_col(beg_col:end_col))     
-  allocate(this%h1D_CO2_FLX_col(beg_col:end_col))       
-  allocate(this%h1D_tMICRO_C_col(beg_col:end_col))      
-  allocate(this%h1D_OMC_LITR_col(beg_col:end_col))      
-  allocate(this%h1D_ATM_CO2_col(beg_col:end_col))       
-  allocate(this%h1D_ATM_CH4_col(beg_col:end_col))
-  allocate(this%h1D_NBP_col(beg_col:end_col))           
-
-  allocate(this%h1D_ECO_LAI_col(beg_col:end_col))       
-  allocate(this%h1D_ECO_GPP_col(beg_col:end_col))       
-  allocate(this%h1D_ECO_RA_col(beg_col:end_col))        
-  allocate(this%h1D_ECO_NPP_col(beg_col:end_col))       
-  allocate(this%h1D_ECO_HR_col(beg_col:end_col))        
-  allocate(this%h1D_tDIC_col(beg_col:end_col))       ;  this%h1D_tDIC_col=spval
-  allocate(this%h1D_tSTANDING_DEAD_C_col(beg_col:end_col));  this%h1D_tSTANDING_DEAD_C_col=spval 
-  allocate(this%h1D_tSTANDING_DEAD_N_col(beg_col:end_col));  this%h1D_tSTANDING_DEAD_N_col=spval  
-  allocate(this%h1D_tSTANDING_DEAD_P_col(beg_col:end_col));  this%h1D_tSTANDING_DEAD_P_col=spval  
-  allocate(this%h1D_tPRECN_col(beg_col:end_col))      
-  allocate(this%h1D_ET_col(beg_col:end_col))          
-  allocate(this%h1D_N2O_LITR_col(beg_col:end_col))    
-  allocate(this%h1D_NH3_LITR_col(beg_col:end_col))    
-  allocate(this%h1D_SOL_RADN_col(beg_col:end_col))    
-  allocate(this%h1D_AIR_TEMP_col(beg_col:end_col))    
-  allocate(this%h1D_HUM_col(beg_col:end_col))         
-  allocate(this%h1D_WIND_col(beg_col:end_col))        
-  allocate(this%h1D_PREC_col(beg_col:end_col))        
-  allocate(this%h1D_SOIL_RN_col(beg_col:end_col))     
-  allocate(this%h1D_SOIL_LE_col(beg_col:end_col))     
-  allocate(this%h1D_SOIL_H_col(beg_col:end_col))      
-  allocate(this%h1D_SOIL_G_col(beg_col:end_col))      
-  allocate(this%h1D_ECO_RN_col(beg_col:end_col))      
-  allocate(this%h1D_ECO_LE_col(beg_col:end_col))      
-  allocate(this%h1D_Eco_Heat_col(beg_col:end_col))    
-  allocate(this%h1D_ECO_G_col(beg_col:end_col))       
-  allocate(this%h1D_O2_LITR_col(beg_col:end_col))     
-  allocate(this%h1D_MIN_LWP_ptc(beg_ptc:end_ptc))     
-  allocate(this%h1D_SOIL_CO2_FLX_col(beg_col:end_col)) 
-  allocate(this%h1D_ECO_CO2_FLX_col(beg_col:end_col))  
-  allocate(this%h1D_CH4_FLX_col(beg_col:end_col))      
-  allocate(this%h1D_O2_FLX_col(beg_col:end_col))       
-  allocate(this%h1D_CO2_LITR_col(beg_col:end_col))     
-  allocate(this%h1D_EVAPN_col(beg_col:end_col))        
-
-  allocate(this%h1D_PAR_col(beg_col:end_col))
-  allocate(this%h1D_tSWC_col(beg_col:end_col))       
-  allocate(this%h1D_SNOWPACK_col(beg_col:end_col))   
-  allocate(this%h1D_SURF_WTR_col(beg_col:end_col))   
-  allocate(this%h1D_SURF_ICE_col(beg_col:end_col))   
-  allocate(this%h1D_ACTV_LYR_col(beg_col:end_col))   
-  allocate(this%h1D_WTR_TBL_col(beg_col:end_col))    
-  allocate(this%h1D_sN2O_FLX_col(beg_col:end_col))   
-  allocate(this%h1D_sN2G_FLX_col(beg_col:end_col))   
-  allocate(this%h1D_sNH3_FLX_col(beg_col:end_col))   
-  allocate(this%h1D_RUNOFF_FLX_col(beg_col:end_col)) 
-  allocate(this%h1D_SEDIMENT_FLX_col(beg_col:end_col))  
-  allocate(this%h1D_DISCHG_FLX_col(beg_col:end_col))    
-  allocate(this%h1D_LEAF_PC_ptc(beg_ptc:end_ptc))       
-  allocate(this%h1D_CAN_RN_ptc(beg_ptc:end_ptc))    
-  allocate(this%h1D_CAN_LE_ptc(beg_ptc:end_ptc))    
-  allocate(this%h1D_CAN_H_ptc(beg_ptc:end_ptc))     
-  allocate(this%h1D_CAN_G_ptc(beg_ptc:end_ptc))     
-  allocate(this%h1D_CAN_TEMP_ptc(beg_ptc:end_ptc))  
-  allocate(this%h1D_TEMP_FN_ptc(beg_ptc:end_ptc))     
-  allocate(this%h1D_CAN_CO2_FLX_ptc(beg_ptc:end_ptc)) 
-  allocate(this%h1D_CAN_GPP_ptc(beg_ptc:end_ptc))     
-  allocate(this%h1D_CAN_RA_ptc(beg_ptc:end_ptc))      
-  allocate(this%h1D_cTNC_ptc(beg_ptc:end_ptc))        
-  allocate(this%h1D_cTNN_ptc(beg_ptc:end_ptc))        
-  allocate(this%h1D_cTNP_ptc(beg_ptc:end_ptc))        
-  allocate(this%h1D_STOML_RSC_CO2_ptc(beg_ptc:end_ptc))
-  allocate(this%h1D_BLYR_RSC_CO2_ptc(beg_ptc:end_ptc)) 
-  allocate(this%h1D_TK_Canopy_ptc(beg_ptc:end_ptc))
-  allocate(this%h1D_CAN_CO2_ptc(beg_ptc:end_ptc))      
-  allocate(this%h1D_LAI_ptc(beg_ptc:end_ptc))          
-  allocate(this%h1D_PSI_CAN_ptc(beg_ptc:end_ptc))      
-  allocate(this%h1D_TURG_CAN_ptc(beg_ptc:end_ptc))     
-  allocate(this%h1D_STOM_RSC_H2O_ptc(beg_ptc:end_ptc)) 
-  allocate(this%h1D_BLYR_RSC_H2O_ptc(beg_ptc:end_ptc)) 
-  allocate(this%h1D_TRANSPN_ptc(beg_ptc:end_ptc))      
-  allocate(this%h1D_NH4_UPTK_FLX_ptc(beg_ptc:end_ptc)) 
-  allocate(this%h1D_NO3_UPTK_FLX_ptc(beg_ptc:end_ptc)) 
-  allocate(this%h1D_N2_FIXN_FLX_ptc(beg_ptc:end_ptc))  
-  allocate(this%h1D_cNH3_FLX_ptc(beg_ptc:end_ptc))     
-  allocate(this%h1D_PO4_UPTK_FLX_ptc(beg_ptc:end_ptc))  
-  allocate(this%h1D_SHOOT_C_ptc(beg_ptc:end_ptc))      
-  allocate(this%h1D_Plant_C_ptc(beg_ptc:end_ptc))
-  allocate(this%h1D_frcPARabs_ptc(beg_ptc:end_ptc))
-  allocate(this%h1D_PARbyCanopy_ptc(beg_ptc:end_ptc))
-  allocate(this%h1D_LEAF_C_ptc(beg_ptc:end_ptc))     
-  allocate(this%h1D_Petiole_C_ptc(beg_ptc:end_ptc))  
-  allocate(this%h1D_STALK_C_ptc(beg_ptc:end_ptc))    
-  allocate(this%h1D_RESERVE_C_ptc(beg_ptc:end_ptc))  
-  allocate(this%h1D_HUSK_C_ptc(beg_ptc:end_ptc))     
-  allocate(this%h1D_GRAIN_C_ptc(beg_ptc:end_ptc))    
-  allocate(this%h1D_ROOT_C_ptc(beg_ptc:end_ptc))     
-  allocate(this%h1D_NODULE_C_ptc(beg_ptc:end_ptc))   
-  allocate(this%h1D_STORED_C_ptc(beg_ptc:end_ptc))   
-  allocate(this%h1D_GRAIN_NO_ptc(beg_ptc:end_ptc))   
-  allocate(this%h1D_LAIb_ptc(beg_ptc:end_ptc))       
-  allocate(this%h1D_EXUD_C_FLX_ptc(beg_ptc:end_ptc))  
-  allocate(this%h1D_LITRf_C_FLX_ptc(beg_ptc:end_ptc));  this%h1D_LITRf_C_FLX_ptc=spval
-  allocate(this%h1D_LITRf_P_FLX_ptc(beg_ptc:end_ptc));  this%h1D_LITRf_P_FLX_ptc=spval
-  allocate(this%h1D_SURF_LITRf_C_FLX_ptc(beg_ptc:end_ptc)) 
-  allocate(this%h1D_AUTO_RESP_FLX_ptc(beg_ptc:end_ptc))    
-  allocate(this%h1D_ABV_GRD_RESP_FLX_ptc(beg_ptc:end_ptc)) 
-  allocate(this%h1D_HVST_C_FLX_ptc(beg_ptc:end_ptc))       
-  allocate(this%h1D_STANDING_DEAD_C_ptc(beg_ptc:end_ptc))  
-  allocate(this%h1D_FIREp_CO2_FLX_ptc(beg_ptc:end_ptc))    
-  allocate(this%h1D_FIREp_CH4_FLX_ptc(beg_ptc:end_ptc))    
-  allocate(this%h1D_NPP_ptc(beg_ptc:end_ptc))           
-  allocate(this%h1D_CAN_HT_ptc(beg_ptc:end_ptc))       
-  allocate(this%h1D_POPN_ptc(beg_ptc:end_ptc))         
-  allocate(this%h1D_tTRANSPN_ptc(beg_ptc:end_ptc))     
-  allocate(this%h1D_WTR_STRESS_ptc(beg_ptc:end_ptc))   
-  allocate(this%h1D_OXY_STRESS_ptc(beg_ptc:end_ptc))   
-  allocate(this%h1D_SHOOT_N_ptc(beg_ptc:end_ptc))      
-  allocate(this%h1D_Plant_N_ptc(beg_ptc:end_ptc))  
-  allocate(this%h1D_LEAF_N_ptc(beg_ptc:end_ptc))       
-  allocate(this%h1D_Petiole_N_ptc(beg_ptc:end_ptc))    
-  allocate(this%h1D_STALK_N_ptc(beg_ptc:end_ptc))      
-  allocate(this%h1D_RESERVE_N_ptc(beg_ptc:end_ptc))    
-  allocate(this%h1D_HUSK_N_ptc(beg_ptc:end_ptc))       
-  allocate(this%h1D_GRAIN_N_ptc(beg_ptc:end_ptc))      
-  allocate(this%h1D_ROOT_N_ptc(beg_ptc:end_ptc))       
-  allocate(this%h1D_NODULE_N_ptc(beg_ptc:end_ptc))     
-  allocate(this%h1D_STORED_N_ptc(beg_ptc:end_ptc))     
-  allocate(this%h1D_EXUD_N_FLX_ptc(beg_ptc:end_ptc))   
-  allocate(this%h1D_LITRf_N_FLX_ptc(beg_ptc:end_ptc))  
-  allocate(this%h1D_TL_N_FIXED_FLX_ptc(beg_ptc:end_ptc))  
-  allocate(this%h1D_HVST_N_FLX_ptc(beg_ptc:end_ptc))      
-  allocate(this%h1D_NH3can_FLX_ptc(beg_ptc:end_ptc))    
-  allocate(this%h1D_PLANT_BALANCE_C_ptc(beg_ptc:end_ptc)); this%h1D_PLANT_BALANCE_C_ptc=spval
-  allocate(this%h1D_PLANT_BALANCE_N_ptc(beg_ptc:end_ptc)); this%h1D_PLANT_BALANCE_N_ptc=spval
-  allocate(this%h1D_PLANT_BALANCE_P_ptc(beg_ptc:end_ptc)); this%h1D_PLANT_BALANCE_P_ptc=spval
-  allocate(this%h1D_STANDING_DEAD_N_ptc(beg_ptc:end_ptc))  
-  allocate(this%h1D_FIREp_N_FLX_ptc(beg_ptc:end_ptc))      
-  allocate(this%h1D_SURF_LITRf_N_FLX_ptc(beg_ptc:end_ptc)) 
-  allocate(this%h1D_SHOOT_P_ptc(beg_ptc:end_ptc))      
-  allocate(this%h1D_Plant_P_ptc(beg_ptc:end_ptc))
-  allocate(this%h1D_LEAF_P_ptc(beg_ptc:end_ptc))       
-  allocate(this%h1D_Petiole_P_ptc(beg_ptc:end_ptc))    
-  allocate(this%h1D_STALK_P_ptc(beg_ptc:end_ptc))      
-  allocate(this%h1D_RESERVE_P_ptc(beg_ptc:end_ptc))    
-  allocate(this%h1D_HUSK_P_ptc(beg_ptc:end_ptc))       
-  allocate(this%h1D_GRAIN_P_ptc(beg_ptc:end_ptc))      
-  allocate(this%h1D_ROOT_P_ptc(beg_ptc:end_ptc))       
-  allocate(this%h1D_NODULE_P_ptc(beg_ptc:end_ptc))     
-  allocate(this%h1D_STORED_P_ptc(beg_ptc:end_ptc))     
-  allocate(this%h1D_EXUD_P_FLX_ptc(beg_ptc:end_ptc))   
-  allocate(this%h1D_LITTERf_P_ptc(beg_ptc:end_ptc))    
-  allocate(this%h1D_HVST_P_FLX_ptc(beg_ptc:end_ptc))   
-  allocate(this%h1D_STANDING_DEAD_P_ptc(beg_ptc:end_ptc))  
-  allocate(this%h1D_FIREp_P_FLX_ptc(beg_ptc:end_ptc))      
-  allocate(this%h1D_SURF_LITRf_P_FLX_ptc(beg_ptc:end_ptc))  
-  allocate(this%h1D_BRANCH_NO_ptc(beg_ptc:end_ptc))         
-  allocate(this%h1D_Growth_Stage_ptc(beg_ptc:end_ptc));      this%h1D_Growth_Stage_ptc=spval
-  allocate(this%h1D_LEAF_NC_ptc(beg_ptc:end_ptc))           
-  allocate(this%h2D_tSOC_vr_col(beg_col:end_col,1:JZ))      
-  allocate(this%h2D_LEAF_NODE_NO_ptc(beg_ptc:end_ptc,1:MaxNumBranches))  
-  allocate(this%h2D_RUB_ACTVN_ptc(beg_ptc:end_ptc,1:MaxNumBranches));  this%h2D_RUB_ACTVN_ptc=spval
-  allocate(this%h2D_CO2_vr_col(beg_col:end_col,1:JZ))        
-  allocate(this%h2D_CH4_vr_col(beg_col:end_col,1:JZ));       this%h2D_CH4_vr_col=spval
-  allocate(this%h2D_O2_vr_col(beg_col:end_col,1:JZ))         
-  allocate(this%h2D_N2O_vr_col(beg_col:end_col,1:JZ))        
-  allocate(this%h2D_NH3_vr_col(beg_col:end_col,1:JZ))        
-  allocate(this%h2D_TEMP_vr_col(beg_col:end_col,1:JZ))       
-  allocate(this%h2D_vWATER_vr_col(beg_col:end_col,1:JZ))     
-  allocate(this%h2D_vICE_vr_col(beg_col:end_col,1:JZ))       
-  allocate(this%h2D_PSI_vr_col(beg_col:end_col,1:JZ))        
-  allocate(this%h2D_RootH2OUP_vr_col(beg_col:end_col,1:JZ))
-  allocate(this%h2D_cNH4t_vr_col(beg_col:end_col,1:JZ))      
+  allocate(this%h1D_PAR_col(beg_col:end_col))             ;this%h1D_PAR_col(:)=spval
+  allocate(this%h1D_tSWC_col(beg_col:end_col))            ;this%h1D_tSWC_col(:)=spval
+  allocate(this%h1D_SNOWPACK_col(beg_col:end_col))        ;this%h1D_SNOWPACK_col(:)=spval
+  allocate(this%h1D_SURF_WTR_col(beg_col:end_col))        ;this%h1D_SURF_WTR_col(:)=spval
+  allocate(this%h1D_SURF_ICE_col(beg_col:end_col))        ;this%h1D_SURF_ICE_col(:)=spval
+  allocate(this%h1D_ACTV_LYR_col(beg_col:end_col))        ;this%h1D_ACTV_LYR_col(:)=spval
+  allocate(this%h1D_WTR_TBL_col(beg_col:end_col))         ;this%h1D_WTR_TBL_col(:)=spval
+  allocate(this%h1D_sN2O_FLX_col(beg_col:end_col))        ;this%h1D_sN2O_FLX_col(:)=spval
+  allocate(this%h1D_sN2G_FLX_col(beg_col:end_col))        ;this%h1D_sN2G_FLX_col(:)=spval
+  allocate(this%h1D_sNH3_FLX_col(beg_col:end_col))        ;this%h1D_sNH3_FLX_col(:)=spval
+  allocate(this%h1D_RUNOFF_FLX_col(beg_col:end_col))      ;this%h1D_RUNOFF_FLX_col(:)=spval
+  allocate(this%h1D_SEDIMENT_FLX_col(beg_col:end_col))    ;this%h1D_SEDIMENT_FLX_col(:)=spval
+  allocate(this%h1D_DISCHG_FLX_col(beg_col:end_col))      ;this%h1D_DISCHG_FLX_col(:)=spval
+  allocate(this%h1D_LEAF_PC_ptc(beg_ptc:end_ptc))         ;this%h1D_LEAF_PC_ptc(:)=spval
+  allocate(this%h1D_CAN_RN_ptc(beg_ptc:end_ptc))          ;this%h1D_CAN_RN_ptc(:)=spval
+  allocate(this%h1D_CAN_LE_ptc(beg_ptc:end_ptc))          ;this%h1D_CAN_LE_ptc(:)=spval
+  allocate(this%h1D_CAN_H_ptc(beg_ptc:end_ptc))           ;this%h1D_CAN_H_ptc(:)=spval
+  allocate(this%h1D_CAN_G_ptc(beg_ptc:end_ptc))           ;this%h1D_CAN_G_ptc(:)=spval
+  allocate(this%h1D_CAN_TEMPC_ptc(beg_ptc:end_ptc))        ;this%h1D_CAN_TEMPC_ptc(:)=spval
+  allocate(this%h1D_CAN_TEMPFN_ptc(beg_ptc:end_ptc))      ;this%h1D_CAN_TEMPFN_ptc(:)=spval
+  allocate(this%h1D_CAN_CO2_FLX_ptc(beg_ptc:end_ptc))     ;this%h1D_CAN_CO2_FLX_ptc(:)=spval
+  allocate(this%h1D_CAN_GPP_ptc(beg_ptc:end_ptc))         ;this%h1D_CAN_GPP_ptc(:)=spval
+  allocate(this%h1D_CAN_RA_ptc(beg_ptc:end_ptc))          ;this%h1D_CAN_RA_ptc(:)=spval
+  allocate(this%h1D_cTNC_ptc(beg_ptc:end_ptc))            ;this%h1D_cTNC_ptc(:)=spval
+  allocate(this%h1D_cTNN_ptc(beg_ptc:end_ptc))            ;this%h1D_cTNN_ptc(:)=spval
+  allocate(this%h1D_cTNP_ptc(beg_ptc:end_ptc))            ;this%h1D_cTNP_ptc(:)=spval
+  allocate(this%h1D_STOML_RSC_CO2_ptc(beg_ptc:end_ptc))   ;this%h1D_STOML_RSC_CO2_ptc(:)=spval
+  allocate(this%h1D_BLYR_RSC_CO2_ptc(beg_ptc:end_ptc))    ;this%h1D_BLYR_RSC_CO2_ptc(:)=spval
+  allocate(this%h1D_CAN_TEMPK_ptc(beg_ptc:end_ptc))       ;this%h1D_CAN_TEMPK_ptc(:)=spval
+  allocate(this%h1D_CAN_CO2_ptc(beg_ptc:end_ptc))         ;this%h1D_CAN_CO2_ptc(:)=spval
+  allocate(this%h1D_LAI_ptc(beg_ptc:end_ptc))             ;this%h1D_LAI_ptc(:)=spval
+  allocate(this%h1D_PSI_CAN_ptc(beg_ptc:end_ptc))         ;this%h1D_PSI_CAN_ptc(:)=spval
+  allocate(this%h1D_TURG_CAN_ptc(beg_ptc:end_ptc))        ;this%h1D_TURG_CAN_ptc(:)=spval
+  allocate(this%h1D_STOM_RSC_H2O_ptc(beg_ptc:end_ptc))    ;this%h1D_STOM_RSC_H2O_ptc(:)=spval
+  allocate(this%h1D_BLYR_RSC_H2O_ptc(beg_ptc:end_ptc))    ;this%h1D_BLYR_RSC_H2O_ptc(:)=spval
+  allocate(this%h1D_TRANSPN_ptc(beg_ptc:end_ptc))         ;this%h1D_TRANSPN_ptc(:)=spval
+  allocate(this%h1D_NH4_UPTK_FLX_ptc(beg_ptc:end_ptc))    ;this%h1D_NH4_UPTK_FLX_ptc(:)=spval
+  allocate(this%h1D_NO3_UPTK_FLX_ptc(beg_ptc:end_ptc))    ;this%h1D_NO3_UPTK_FLX_ptc(:)=spval
+  allocate(this%h1D_N2_FIXN_FLX_ptc(beg_ptc:end_ptc))     ;this%h1D_N2_FIXN_FLX_ptc(:)=spval
+  allocate(this%h1D_cNH3_FLX_ptc(beg_ptc:end_ptc))        ;this%h1D_cNH3_FLX_ptc(:)=spval
+  allocate(this%h1D_PO4_UPTK_FLX_ptc(beg_ptc:end_ptc))    ;this%h1D_PO4_UPTK_FLX_ptc(:)=spval
+  allocate(this%h1D_SHOOT_C_ptc(beg_ptc:end_ptc))         ;this%h1D_SHOOT_C_ptc(:)=spval
+  allocate(this%h1D_Plant_C_ptc(beg_ptc:end_ptc))         ;this%h1D_Plant_C_ptc(:)=spval
+  allocate(this%h1D_frcPARabs_ptc(beg_ptc:end_ptc))       ;this%h1D_frcPARabs_ptc(:)=spval
+  allocate(this%h1D_PAR_CAN_ptc(beg_ptc:end_ptc))         ;this%h1D_PAR_CAN_ptc(:)=spval
+  allocate(this%h1D_LEAF_C_ptc(beg_ptc:end_ptc))          ;this%h1D_LEAF_C_ptc(:)=spval
+  allocate(this%h1D_Petole_C_ptc(beg_ptc:end_ptc))        ;this%h1D_Petole_C_ptc(:)=spval
+  allocate(this%h1D_STALK_C_ptc(beg_ptc:end_ptc))         ;this%h1D_STALK_C_ptc(:)=spval
+  allocate(this%h1D_RESERVE_C_ptc(beg_ptc:end_ptc))       ;this%h1D_RESERVE_C_ptc(:)=spval
+  allocate(this%h1D_HUSK_C_ptc(beg_ptc:end_ptc))          ;this%h1D_HUSK_C_ptc(:)=spval
+  allocate(this%h1D_GRAIN_C_ptc(beg_ptc:end_ptc))         ;this%h1D_GRAIN_C_ptc(:)=spval
+  allocate(this%h1D_ROOT_C_ptc(beg_ptc:end_ptc))          ;this%h1D_ROOT_C_ptc(:)=spval
+  allocate(this%h1D_NODULE_C_ptc(beg_ptc:end_ptc))        ;this%h1D_NODULE_C_ptc(:)=spval
+  allocate(this%h1D_STORED_C_ptc(beg_ptc:end_ptc))        ;this%h1D_STORED_C_ptc(:)=spval
+  allocate(this%h1D_GRAIN_NO_ptc(beg_ptc:end_ptc))        ;this%h1D_GRAIN_NO_ptc(:)=spval
+  allocate(this%h1D_LAIb_ptc(beg_ptc:end_ptc))            ;this%h1D_LAIb_ptc(:)=spval
+  allocate(this%h1D_EXUD_C_FLX_ptc(beg_ptc:end_ptc))      ;this%h1D_EXUD_C_FLX_ptc(:)=spval
+  allocate(this%h1D_LITRf_C_FLX_ptc(beg_ptc:end_ptc))     ;this%h1D_LITRf_C_FLX_ptc=spval
+  allocate(this%h1D_LITRf_P_FLX_ptc(beg_ptc:end_ptc))     ;this%h1D_LITRf_P_FLX_ptc=spval
+  allocate(this%h1D_SURF_LITRf_C_FLX_ptc(beg_ptc:end_ptc));this%h1D_SURF_LITRf_C_FLX_ptc(:)=spval
+  allocate(this%h1D_AUTO_RESP_FLX_ptc(beg_ptc:end_ptc))   ;this%h1D_AUTO_RESP_FLX_ptc(:)=spval
+  allocate(this%h1D_ABV_GRD_RESP_FLX_ptc(beg_ptc:end_ptc));this%h1D_ABV_GRD_RESP_FLX_ptc(:)=spval
+  allocate(this%h1D_HVST_C_FLX_ptc(beg_ptc:end_ptc))      ;this%h1D_HVST_C_FLX_ptc(:)=spval
+  allocate(this%h1D_STANDING_DEAD_C_ptc(beg_ptc:end_ptc)) ;this%h1D_STANDING_DEAD_C_ptc(:)=spval
+  allocate(this%h1D_FIREp_CO2_FLX_ptc(beg_ptc:end_ptc))   ;this%h1D_FIREp_CO2_FLX_ptc(:)=spval
+  allocate(this%h1D_FIREp_CH4_FLX_ptc(beg_ptc:end_ptc))   ;this%h1D_FIREp_CH4_FLX_ptc(:)=spval
+  allocate(this%h1D_NPP_ptc(beg_ptc:end_ptc))             ;this%h1D_NPP_ptc(:)=spval
+  allocate(this%h1D_CAN_HT_ptc(beg_ptc:end_ptc))          ;this%h1D_CAN_HT_ptc(:)=spval
+  allocate(this%h1D_POPN_ptc(beg_ptc:end_ptc))            ;this%h1D_POPN_ptc(:)=spval
+  allocate(this%h1D_tTRANSPN_ptc(beg_ptc:end_ptc))        ;this%h1D_tTRANSPN_ptc(:)=spval
+  allocate(this%h1D_WTR_STRESS_ptc(beg_ptc:end_ptc))      ;this%h1D_WTR_STRESS_ptc(:)=spval
+  allocate(this%h1D_OXY_STRESS_ptc(beg_ptc:end_ptc))      ;this%h1D_OXY_STRESS_ptc(:)=spval
+  allocate(this%h1D_SHOOT_N_ptc(beg_ptc:end_ptc))         ;this%h1D_SHOOT_N_ptc(:)=spval
+  allocate(this%h1D_Plant_N_ptc(beg_ptc:end_ptc))         ;this%h1D_Plant_N_ptc(:)=spval
+  allocate(this%h1D_LEAF_N_ptc(beg_ptc:end_ptc))          ;this%h1D_LEAF_N_ptc(:)=spval
+  allocate(this%h1D_Petole_N_ptc(beg_ptc:end_ptc))       ;this%h1D_Petole_N_ptc(:)=spval
+  allocate(this%h1D_STALK_N_ptc(beg_ptc:end_ptc))         ;this%h1D_STALK_N_ptc(:)=spval
+  allocate(this%h1D_RESERVE_N_ptc(beg_ptc:end_ptc))       ;this%h1D_RESERVE_N_ptc(:)=spval
+  allocate(this%h1D_HUSK_N_ptc(beg_ptc:end_ptc))          ;this%h1D_HUSK_N_ptc(:)=spval
+  allocate(this%h1D_GRAIN_N_ptc(beg_ptc:end_ptc))         ;this%h1D_GRAIN_N_ptc(:)=spval
+  allocate(this%h1D_ROOT_N_ptc(beg_ptc:end_ptc))          ;this%h1D_ROOT_N_ptc(:)=spval
+  allocate(this%h1D_NODULE_N_ptc(beg_ptc:end_ptc))        ;this%h1D_NODULE_N_ptc(:)=spval
+  allocate(this%h1D_STORED_N_ptc(beg_ptc:end_ptc))        ;this%h1D_STORED_N_ptc(:)=spval
+  allocate(this%h1D_EXUD_N_FLX_ptc(beg_ptc:end_ptc))      ;this%h1D_EXUD_N_FLX_ptc(:)=spval
+  allocate(this%h1D_LITRf_N_FLX_ptc(beg_ptc:end_ptc))     ;this%h1D_LITRf_N_FLX_ptc(:)=spval
+  allocate(this%h1D_TL_N_FIXED_FLX_ptc(beg_ptc:end_ptc))  ;this%h1D_TL_N_FIXED_FLX_ptc(:)=spval
+  allocate(this%h1D_HVST_N_FLX_ptc(beg_ptc:end_ptc))      ;this%h1D_HVST_N_FLX_ptc(:)=spval
+  allocate(this%h1D_NH3can_FLX_ptc(beg_ptc:end_ptc))      ;this%h1D_NH3can_FLX_ptc(:)=spval
+  allocate(this%h1D_PLANT_BALANCE_C_ptc(beg_ptc:end_ptc)) ;this%h1D_PLANT_BALANCE_C_ptc(:)=spval
+  allocate(this%h1D_PLANT_BALANCE_N_ptc(beg_ptc:end_ptc)) ;this%h1D_PLANT_BALANCE_N_ptc(:)=spval
+  allocate(this%h1D_PLANT_BALANCE_P_ptc(beg_ptc:end_ptc)) ;this%h1D_PLANT_BALANCE_P_ptc(:)=spval
+  allocate(this%h1D_STANDING_DEAD_N_ptc(beg_ptc:end_ptc)) ;this%h1D_STANDING_DEAD_N_ptc(:)=spval
+  allocate(this%h1D_FIREp_N_FLX_ptc(beg_ptc:end_ptc))     ;this%h1D_FIREp_N_FLX_ptc(:)=spval
+  allocate(this%h1D_SURF_LITRf_N_FLX_ptc(beg_ptc:end_ptc));this%h1D_SURF_LITRf_N_FLX_ptc(:)=spval
+  allocate(this%h1D_SHOOT_P_ptc(beg_ptc:end_ptc))         ;this%h1D_SHOOT_P_ptc(:)=spval
+  allocate(this%h1D_Plant_P_ptc(beg_ptc:end_ptc))         ;this%h1D_Plant_P_ptc(:)=spval
+  allocate(this%h1D_LEAF_P_ptc(beg_ptc:end_ptc))          ;this%h1D_LEAF_P_ptc(:)=spval
+  allocate(this%h1D_Petole_P_ptc(beg_ptc:end_ptc))        ;this%h1D_Petole_P_ptc(:)=spval
+  allocate(this%h1D_STALK_P_ptc(beg_ptc:end_ptc))         ;this%h1D_STALK_P_ptc(:)=spval
+  allocate(this%h1D_RESERVE_P_ptc(beg_ptc:end_ptc))       ;this%h1D_RESERVE_P_ptc(:)=spval
+  allocate(this%h1D_HUSK_P_ptc(beg_ptc:end_ptc))          ;this%h1D_HUSK_P_ptc(:)=spval
+  allocate(this%h1D_GRAIN_P_ptc(beg_ptc:end_ptc))         ;this%h1D_GRAIN_P_ptc(:)=spval
+  allocate(this%h1D_ROOT_P_ptc(beg_ptc:end_ptc))          ;this%h1D_ROOT_P_ptc(:)=spval
+  allocate(this%h1D_NODULE_P_ptc(beg_ptc:end_ptc))        ;this%h1D_NODULE_P_ptc(:)=spval
+  allocate(this%h1D_STORED_P_ptc(beg_ptc:end_ptc))        ;this%h1D_STORED_P_ptc(:)=spval
+  allocate(this%h1D_EXUD_P_FLX_ptc(beg_ptc:end_ptc))      ;this%h1D_EXUD_P_FLX_ptc(:)=spval
+  allocate(this%h1D_LITTERf_P_ptc(beg_ptc:end_ptc))       ;this%h1D_LITTERf_P_ptc(:)=spval
+  allocate(this%h1D_HVST_P_FLX_ptc(beg_ptc:end_ptc))      ;this%h1D_HVST_P_FLX_ptc(:)=spval
+  allocate(this%h1D_STANDING_DEAD_P_ptc(beg_ptc:end_ptc)) ;this%h1D_STANDING_DEAD_P_ptc(:)=spval
+  allocate(this%h1D_FIREp_P_FLX_ptc(beg_ptc:end_ptc))     ;this%h1D_FIREp_P_FLX_ptc(:)=spval
+  allocate(this%h1D_SURF_LITRf_P_FLX_ptc(beg_ptc:end_ptc));this%h1D_SURF_LITRf_P_FLX_ptc(:)=spval
+  allocate(this%h1D_BRANCH_NO_ptc(beg_ptc:end_ptc))       ;this%h1D_BRANCH_NO_ptc(:)=spval
+  allocate(this%h1D_Growth_Stage_ptc(beg_ptc:end_ptc))    ;this%h1D_Growth_Stage_ptc(:)=spval
+  allocate(this%h1D_LEAF_NC_ptc(beg_ptc:end_ptc));        ;this%h1D_LEAF_NC_ptc(:)=spval
+  allocate(this%h1D_LEAF_NONSTC_ptc(beg_ptc:end_ptc))     ;this%h1D_LEAF_NONSTC_ptc(:)=spval
+  allocate(this%h1D_LEAF_NONSTN_ptc(beg_ptc:end_ptc))     ;this%h1D_LEAF_NONSTN_ptc(:)=spval
+  allocate(this%h1D_LEAF_NONSTP_ptc(beg_ptc:end_ptc))     ;this%h1D_LEAF_NONSTP_ptc(:)=spval
+  allocate(this%h1D_ROOT_NONSTC_ptc(beg_ptc:end_ptc))     ;this%h1D_ROOT_NONSTC_ptc(:)=spval
+  allocate(this%h1D_ROOT_NONSTN_ptc(beg_ptc:end_ptc))     ;this%h1D_ROOT_NONSTN_ptc(:)=spval
+  allocate(this%h1D_ROOT_NONSTP_ptc(beg_ptc:end_ptc))     ;this%h1D_ROOT_NONSTP_ptc(:)=spval
+  allocate(this%h2D_tSOC_vr_col(beg_col:end_col,1:JZ))    ;this%h2D_tSOC_vr_col(:,:)=spval
+  allocate(this%h2D_LEAF_NODE_NO_ptc(beg_ptc:end_ptc,1:MaxNumBranches));this%h2D_LEAF_NODE_NO_ptc(:,:)=spval
+  allocate(this%h2D_RUB_ACTVN_ptc(beg_ptc:end_ptc,1:MaxNumBranches));  this%h2D_RUB_ACTVN_ptc(:,:)=spval
+  allocate(this%h2D_CO2_vr_col(beg_col:end_col,1:JZ))        ;this%h2D_CO2_vr_col(:,:)=spval
+  allocate(this%h2D_CH4_vr_col(beg_col:end_col,1:JZ))        ;this%h2D_CH4_vr_col(:,:)=spval
+  allocate(this%h2D_O2_vr_col(beg_col:end_col,1:JZ))         ;this%h2D_O2_vr_col(:,:)=spval
+  allocate(this%h2D_N2O_vr_col(beg_col:end_col,1:JZ))        ;this%h2D_N2O_vr_col(:,:)=spval
+  allocate(this%h2D_NH3_vr_col(beg_col:end_col,1:JZ))        ;this%h2D_NH3_vr_col(:,:)=spval
+  allocate(this%h2D_TEMP_vr_col(beg_col:end_col,1:JZ))       ;this%h2D_TEMP_vr_col(:,:)=spval
+  allocate(this%h2D_vWATER_vr_col(beg_col:end_col,1:JZ))     ;this%h2D_vWATER_vr_col(:,:)=spval
+  allocate(this%h2D_vICE_vr_col(beg_col:end_col,1:JZ))       ;this%h2D_vICE_vr_col(:,:)=spval
+  allocate(this%h2D_PSI_vr_col(beg_col:end_col,1:JZ))        ;this%h2D_PSI_vr_col(:,:)=spval
+  allocate(this%h2D_RootH2OUP_vr_col(beg_col:end_col,1:JZ))  ;this%h2D_RootH2OUP_vr_col(:,:)=spval
+  allocate(this%h2D_cNH4t_vr_col(beg_col:end_col,1:JZ))      ;this%h2D_cNH4t_vr_col(:,:)=spval
+  allocate(this%h2D_cNO3t_vr_col(beg_col:end_col,1:JZ))      ;this%h2D_cNO3t_vr_col(:,:)=spval
                                                              
-  allocate(this%h2D_cNO3t_vr_col(beg_col:end_col,1:JZ))      
-                                                             
-  allocate(this%h2D_cPO4_vr_col(beg_col:end_col,1:JZ))       
-  allocate(this%h2D_cEXCH_P_vr_col(beg_col:end_col,1:JZ))    
-  allocate(this%h2D_ECND_vr_col(beg_col:end_col,1:JZ))       
-  allocate(this%h2D_PSI_RT_vr_ptc(beg_ptc:end_ptc,1:JZ))     
-  allocate(this%h2D_prtUP_NH4_vr_ptc(beg_ptc:end_ptc,1:JZ))   
-                                                              
-  allocate(this%h2D_prtUP_NO3_vr_ptc(beg_ptc:end_ptc,1:JZ))   
-                                                              
-  allocate(this%h2D_prtUP_PO4_vr_ptc(beg_ptc:end_ptc,1:JZ))   
-                                                              
-  allocate(this%h2D_DNS_RT_vr_ptc(beg_ptc:end_ptc,1:JZ))      
+  allocate(this%h2D_cPO4_vr_col(beg_col:end_col,1:JZ))       ;this%h2D_cPO4_vr_col(:,:)=spval
+  allocate(this%h2D_cEXCH_P_vr_col(beg_col:end_col,1:JZ))    ;this%h2D_cEXCH_P_vr_col(:,:)=spval
+  allocate(this%h2D_ECND_vr_col(beg_col:end_col,1:JZ))       ;this%h2D_ECND_vr_col(:,:)=spval
+  allocate(this%h2D_PSI_RT_vr_ptc(beg_ptc:end_ptc,1:JZ))     ;this%h2D_PSI_RT_vr_ptc(:,:)=spval
+  allocate(this%h2D_prtUP_NH4_vr_ptc(beg_ptc:end_ptc,1:JZ))  ;this%h2D_prtUP_NH4_vr_ptc(:,:)=spval                                                              
+  allocate(this%h2D_prtUP_NO3_vr_ptc(beg_ptc:end_ptc,1:JZ))  ;this%h2D_prtUP_NO3_vr_ptc(:,:)=spval                                                              
+  allocate(this%h2D_prtUP_PO4_vr_ptc(beg_ptc:end_ptc,1:JZ))  ;this%h2D_prtUP_PO4_vr_ptc(:,:)=spval                                                              
+  allocate(this%h2D_DNS_RT_vr_ptc(beg_ptc:end_ptc,1:JZ))     ;this%h2D_DNS_RT_vr_ptc(:,:)=spval
 
   allocate(this%h3D_PARTS_ptc(beg_ptc:end_ptc,1:NumOfPlantMorphUnits,1:MaxNumBranches));this%h3D_PARTS_ptc(:,:,:)=spval
   !-----------------------------------------------------------------------
@@ -990,11 +996,11 @@ implicit none
   call hist_addfld1d(fname='CAN_G',units='W/m2',avgflag='A',&
     long_name='canopy storage heat flux',ptr_patch=data1d_ptr)      
 
-  data1d_ptr => this%h1D_CAN_TEMP_ptc(beg_ptc:end_ptc)    
-  call hist_addfld1d(fname='CAN_TEMP',units='oC',avgflag='A',&
+  data1d_ptr => this%h1D_CAN_TEMPC_ptc(beg_ptc:end_ptc)    
+  call hist_addfld1d(fname='CAN_TEMPC',units='oC',avgflag='A',&
     long_name='canopy temperature',ptr_patch=data1d_ptr)      
 
-  data1d_ptr => this%h1D_TEMP_FN_ptc(beg_ptc:end_ptc)     
+  data1d_ptr => this%h1D_CAN_TEMPFN_ptc(beg_ptc:end_ptc)     
   call hist_addfld1d(fname='TEMP_FN',units='none',avgflag='A',&
     long_name='canopy temperature growth function/stress,[0-1]',ptr_patch=data1d_ptr)      
 
@@ -1030,17 +1036,17 @@ implicit none
   call hist_addfld1d(fname='BLYR_RSC_CO2',units='s/m',avgflag='A',&
     long_name='canopy boundary layer resistance for CO2',ptr_patch=data1d_ptr)      
 
-  data1d_ptr => this%h1D_TK_Canopy_ptc(beg_ptc:end_ptc)    
-  call hist_addfld1d(fname='TK_CAN',units='K',avgflag='A',&
-    long_name='canopy temperature',ptr_patch=data1d_ptr)      
+  data1d_ptr => this%h1D_CAN_TEMPK_ptc(beg_ptc:end_ptc)    
+  call hist_addfld1d(fname='CAN_TEMPK',units='K',avgflag='A',&
+    long_name='canopy Kelvin temperature',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_CAN_CO2_ptc(beg_ptc:end_ptc)     
   call hist_addfld1d(fname='CAN_CO2',units='umol/mol',avgflag='A',&
     long_name='canopy gaesous CO2 concentration',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_LAI_ptc(beg_ptc:end_ptc)    
-  call hist_addfld1d(fname='LAI',units='m2/m2',avgflag='A',&
-    long_name='plant leaf area, including stalk',ptr_patch=data1d_ptr)      
+  call hist_addfld1d(fname='LAIstk',units='m2/m2',avgflag='A',&
+    long_name='whole plant leaf area, including stalk',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_PSI_CAN_ptc(beg_ptc:end_ptc)   
   call hist_addfld1d(fname='PSI_CAN',units='MPa',avgflag='A',&
@@ -1090,7 +1096,7 @@ implicit none
   call hist_addfld1d(fname='frcPARabs',units='none',avgflag='A',&
     long_name='fraction of PAR absorbed by plant',ptr_patch=data1d_ptr)      
 
-  data1d_ptr => this%h1D_PARbyCanopy_ptc(beg_ptc:end_ptc)
+  data1d_ptr => this%h1D_PAR_CAN_ptc(beg_ptc:end_ptc)
   call hist_addfld1d(fname='Canopy_PAR',units='umol m-2 s-1',avgflag='A',&
     long_name='PAR absorbed by plant canopy',ptr_patch=data1d_ptr)      
 
@@ -1102,7 +1108,7 @@ implicit none
   call hist_addfld1d(fname='LEAF_C',units='gC/m2',avgflag='A',&
     long_name='canopy leaf C',ptr_patch=data1d_ptr)      
 
-  data1d_ptr => this%h1D_Petiole_C_ptc(beg_ptc:end_ptc)   
+  data1d_ptr => this%h1D_Petole_C_ptc(beg_ptc:end_ptc)   
   call hist_addfld1d(fname='PETIOLE_C',units='gC/m2',avgflag='A',&
     long_name='canopy sheath C',ptr_patch=data1d_ptr)      
 
@@ -1131,16 +1137,16 @@ implicit none
     long_name='root total nodule C',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_STORED_C_ptc(beg_ptc:end_ptc)  
-  call hist_addfld1d(fname='STORED_C',units='gC/m2',avgflag='A',&
-    long_name='plant stored nonstructural C',ptr_patch=data1d_ptr)      
+  call hist_addfld1d(fname='SSTORED_C',units='gC/m2',avgflag='A',&
+    long_name='plant seasonal storage of nonstructural C',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_GRAIN_NO_ptc(beg_ptc:end_ptc) 
   call hist_addfld1d(fname='GRAIN_NO',units='1/m2',avgflag='A',&
     long_name='canopy grain number',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_LAIb_ptc(beg_ptc:end_ptc)   
-  call hist_addfld1d(fname='LAIb',units='m2/m2',avgflag='A',&
-    long_name=' total plant leaf area, exclude stalk',ptr_patch=data1d_ptr)      
+  call hist_addfld1d(fname='LAI_xstk',units='m2/m2',avgflag='A',&
+    long_name='whole plant leaf area, exclude stalk',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_EXUD_C_FLX_ptc(beg_ptc:end_ptc)       
   call hist_addfld1d(fname='EXUD_C_FLX',units='gC/m2',avgflag='A',&
@@ -1218,7 +1224,7 @@ implicit none
   call hist_addfld1d(fname='LEAF_N',units='gN/m2',avgflag='A',&
     long_name='Canopy leaf N',ptr_patch=data1d_ptr)      
 
-  data1d_ptr => this%h1D_Petiole_N_ptc(beg_ptc:end_ptc)      
+  data1d_ptr => this%h1D_Petole_N_ptc(beg_ptc:end_ptc)      
   call hist_addfld1d(fname='Petiole_N',units='gN/m2',avgflag='A',&
     long_name='canopy sheath N',ptr_patch=data1d_ptr)      
 
@@ -1247,8 +1253,8 @@ implicit none
     long_name='root total nodule N',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_STORED_N_ptc(beg_ptc:end_ptc)  
-  call hist_addfld1d(fname='STORED_N',units='gN/m2',avgflag='A',&
-    long_name='plant stored nonstructural N',ptr_patch=data1d_ptr)      
+  call hist_addfld1d(fname='SSTORED_N',units='gN/m2',avgflag='A',&
+    long_name='plant seasonal storage of nonstructural N',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_EXUD_N_FLX_ptc(beg_ptc:end_ptc)   
   call hist_addfld1d(fname='EXUD_N_FLX',units='gN/m2/hr',avgflag='A',&
@@ -1298,7 +1304,7 @@ implicit none
   call hist_addfld1d(fname='LEAF_P',units='gP/m2',avgflag='A',&
     long_name='Canopy leaf P',ptr_patch=data1d_ptr)      
 
-  data1d_ptr => this%h1D_Petiole_P_ptc(beg_ptc:end_ptc)  
+  data1d_ptr => this%h1D_Petole_P_ptc(beg_ptc:end_ptc)  
   call hist_addfld1d(fname='Petiole_P',units='gP/m2',avgflag='A',&
     long_name='canopy sheath P',ptr_patch=data1d_ptr)      
 
@@ -1327,8 +1333,8 @@ implicit none
     long_name='root total nodule P',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_STORED_P_ptc(beg_ptc:end_ptc)     
-  call hist_addfld1d(fname='STORED_P',units='gP/m2',avgflag='A',&
-    long_name='plant stored nonstructural P',ptr_patch=data1d_ptr)      
+  call hist_addfld1d(fname='SSTORED_P',units='gP/m2',avgflag='A',&
+    long_name='plant seasonal storage of nonstructural P',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_EXUD_P_FLX_ptc(beg_ptc:end_ptc)     
   call hist_addfld1d(fname='EXUD_P_FLX',units='gP/m2/hr',avgflag='A',&
@@ -1646,7 +1652,13 @@ implicit none
 
       DO NZ=1,NP0(NY,NX)
         nptc=get_pft(NZ,NY,NX)
-        this%h1D_TK_Canopy_ptc(nptc)    = TKCanopy_pft(NZ,NY,NX)
+        this%h1D_ROOT_NONSTC_ptc(nptc)  = RootMycoNonstElms_pft(ielmc,ipltroot,NZ,NY,NX)
+        this%h1D_ROOT_NONSTN_ptc(nptc)  = RootMycoNonstElms_pft(ielmn,ipltroot,NZ,NY,NX)
+        this%h1D_ROOT_NONSTP_ptc(nptc)  = RootMycoNonstElms_pft(ielmp,ipltroot,NZ,NY,NX)                
+        this%h1D_LEAF_NONSTC_ptc(nptc)  =CanopyNonstElms_pft(ielmc,NY,NX)
+        this%h1D_LEAF_NONSTN_ptc(nptc)  =CanopyNonstElms_pft(ielmn,NY,NX)
+        this%h1D_LEAF_NONSTP_ptc(nptc)  =CanopyNonstElms_pft(ielmp,NY,NX)
+        this%h1D_CAN_TEMPK_ptc(nptc)    = TKCanopy_pft(NZ,NY,NX)
         this%h1D_MIN_LWP_ptc(nptc)      = PSICanPDailyMin(NZ,NY,NX)
         this%h1D_LEAF_PC_ptc(nptc)      = safe_adb(LeafStrutElms_pft(ielmp,NZ,NY,NX)+CanopyNonstElms_pft(ielmp,NZ,NY,NX), &
                                                  LeafStrutElms_pft(ielmc,NZ,NY,NX)+CanopyNonstElms_pft(ielmc,NZ,NY,NX))
@@ -1654,8 +1666,8 @@ implicit none
         this%h1D_CAN_LE_ptc(nptc)       = MJ2W*EvapTransHeat_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_CAN_H_ptc(nptc)        = MJ2W*HeatXAir2PCan(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_CAN_G_ptc(nptc)        = MJ2W*HeatStorCanP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_CAN_TEMP_ptc(nptc)     = TCelciusCanopy_pft(NZ,NY,NX)
-        this%h1D_TEMP_FN_ptc(nptc)      = fTgrowCanP(NZ,NY,NX)
+        this%h1D_CAN_TEMPC_ptc(nptc)     = TCelciusCanopy_pft(NZ,NY,NX)
+        this%h1D_CAN_TEMPFN_ptc(nptc)   = fTgrowCanP(NZ,NY,NX)
         this%h1D_CAN_CO2_FLX_ptc(nptc)  = CO2NetFix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*gC1hour2umol1sec
         this%h1D_CAN_GPP_ptc(nptc)      = GrossCO2Fix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_CAN_RA_ptc(nptc)       = CanopyPlusNodulRespC_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -1677,19 +1689,16 @@ implicit none
         this%h1D_cNH3_FLX_ptc(nptc)      = NH3Dep2Can_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_PO4_UPTK_FLX_ptc(nptc)  = RootH2PO4Uptake_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_frcPARabs_ptc(nptc)     = FracRadPARbyCanopy_pft(NZ,NY,NX)
-        this%h1D_PARbyCanopy_ptc(nptc)   = RadPARbyCanopy_pft(NZ,NY,NX)   !umol /m2/s        
+        this%h1D_PAR_CAN_ptc(nptc)   = RadPARbyCanopy_pft(NZ,NY,NX)   !umol /m2/s        
 
         this%h1D_SHOOT_C_ptc(nptc)      = ShootStrutElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_Plant_C_ptc(nptc)      = (ShootStrutElms_pft(ielmc,NZ,NY,NX) &
           +RootElms_pft(ielmc,NZ,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_LEAF_C_ptc(nptc)       = LeafStrutElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_Petiole_C_ptc(nptc)       = PetioleStrutElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_Petole_C_ptc(nptc)       = PetioleStrutElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_STALK_C_ptc(nptc)      = StalkStrutElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_RESERVE_C_ptc(nptc)    = StalkRsrvElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        if(abs(this%h1D_RESERVE_C_ptc(nptc))>1.e20)then
-          print*,this%h1D_RESERVE_C_ptc(nptc)
-          stop
-        endif
+
         this%h1D_HUSK_C_ptc(nptc)       = (HuskStrutElms_pft(ielmc,NZ,NY,NX) &
           +EarStrutElms_pft(ielmc,NZ,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_GRAIN_C_ptc(nptc)      = GrainStrutElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -1722,7 +1731,7 @@ implicit none
         this%h1D_Plant_N_ptc(nptc)      = (ShootStrutElms_pft(ielmn,NZ,NY,NX)&
           +RootElms_pft(ielmn,NZ,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_LEAF_N_ptc(nptc)       = LeafStrutElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_Petiole_N_ptc(nptc)   = PetioleStrutElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_Petole_N_ptc(nptc)   = PetioleStrutElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_STALK_N_ptc(nptc)      = StalkStrutElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_RESERVE_N_ptc(nptc)    = StalkRsrvElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_HUSK_N_ptc(nptc)       = (HuskStrutElms_pft(ielmn,NZ,NY,NX) &
@@ -1742,15 +1751,15 @@ implicit none
         this%h1D_Plant_P_ptc(nptc)      = (ShootStrutElms_pft(ielmp,NZ,NY,NX) &
           +RootElms_pft(ielmp,NZ,NY,NX))/AREA(3,NU(NY,NX),NY,NX)        
         this%h1D_LEAF_P_ptc(nptc)       = LeafStrutElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_Petiole_P_ptc(nptc)    = PetioleStrutElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_Petole_P_ptc(nptc)    = PetioleStrutElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_STALK_P_ptc(nptc)      = StalkStrutElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_RESERVE_P_ptc(nptc)    = StalkRsrvElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_HUSK_P_ptc(nptc)       = (HuskStrutElms_pft(ielmp,NZ,NY,NX) &
           +EarStrutElms_pft(ielmp,NZ,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_GRAIN_P_ptc(nptc)      = GrainStrutElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_ROOT_P_ptc(nptc)       = RootElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_NODULE_P_ptc(nptc)     = NodulStrutElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_STORED_P_ptc(nptc)     = SeasonalNonstElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_GRAIN_P_ptc(nptc)          = GrainStrutElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_ROOT_P_ptc(nptc)           = RootElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_NODULE_P_ptc(nptc)         = NodulStrutElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_STORED_P_ptc(nptc)         = SeasonalNonstElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_EXUD_P_FLX_ptc(nptc)       = PlantExudChemElmCum_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_LITRf_P_FLX_ptc(nptc)      = LitrfalStrutElmsCum_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_STANDING_DEAD_P_ptc(nptc)   = StandDeadStrutElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -1760,7 +1769,7 @@ implicit none
         this%h1D_LEAF_NC_ptc(nptc)      = safe_adb(LeafStrutElms_pft(ielmn,NZ,NY,NX)+CanopyNonstElms_pft(ielmn,NZ,NY,NX),&
                                                  LeafStrutElms_pft(ielmc,NZ,NY,NX)+CanopyNonstElms_pft(ielmc,NZ,NY,NX))
         if(MainBranchNum_pft(NZ,NY,NX)> 0)then
-          DO KN=10,0,-1
+          DO KN=NumGrowthStages,0,-1
             IF(KN==0)THEN
               this%h1D_Growth_Stage_ptc(nptc)   =KN
             ELSE

@@ -254,7 +254,7 @@ module HfuncsMod
     iPlantTurnoverPattern_pft       =>   plt_pheno%iPlantTurnoverPattern_pft   , &
     MinNonstC2InitRoot_pft          =>   plt_pheno%MinNonstC2InitRoot_pft      , &
     MatureGroup_pft                 =>   plt_pheno%MatureGroup_pft             , &
-    MinNonstC2InitBranch_pft      =>   plt_pheno%MinNonstC2InitBranch_pft  , &
+    MinNonstC2InitBranch_pft        =>   plt_pheno%MinNonstC2InitBranch_pft    , &
     PlantPopulation_pft             =>   plt_site%PlantPopulation_pft          , &
     Hours4Leafout_brch              =>   plt_pheno%Hours4Leafout_brch          , &
     PSIRootTurg_vr                  =>   plt_ew%PSIRootTurg_vr                 , &
@@ -266,7 +266,7 @@ module HfuncsMod
     BranchNumber_pft                =>   plt_morph%BranchNumber_pft            , &
     BranchNumber_brch               =>   plt_morph%BranchNumber_brch           , &
     NGTopRootLayer_pft              =>   plt_morph%NGTopRootLayer_pft          , &
-    ShootNodeNumAtPlanting_pft                            =>   plt_morph%ShootNodeNumAtPlanting_pft                        , &
+    ShootNodeNumAtPlanting_pft      =>   plt_morph%ShootNodeNumAtPlanting_pft  , &
     ShootNodeNum_brch               =>   plt_morph%ShootNodeNum_brch             &
   )
 

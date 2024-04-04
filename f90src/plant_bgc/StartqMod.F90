@@ -10,7 +10,7 @@ module StartqMod
   use PlantDataRateType
   use ClimForcDataType
   use PlantTraitDataType
-  use PlantMngmtDataType
+  use PlantMgmtDataType
   use CanopyDataType
   use CanopyRadDataType
   use RootDataType

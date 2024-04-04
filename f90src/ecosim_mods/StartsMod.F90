@@ -33,7 +33,7 @@ module StartsMod
   use CanopyDataType
   use SurfSoilDataType
   use SoilBGCDataType
-  use PlantMngmtDataType
+  use PlantMgmtDataType
   use EcoSimSumDataType
   use RootDataType
   use EcosimBGCFluxType

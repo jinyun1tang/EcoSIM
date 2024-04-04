@@ -1,4 +1,4 @@
-module PlantMngmtDataType
+module PlantMgmtDataType
 
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use GridConsts
@@ -97,4 +97,4 @@ module PlantMngmtDataType
   call destroy(PO4byFire_col)
   end subroutine DestructPlantMngmtData
 
-end module PlantMngmtDataType
+end module PlantMgmtDataType

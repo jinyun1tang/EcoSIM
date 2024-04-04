@@ -14,7 +14,7 @@ module PlantDisturbMod
   use FertilizerDataType
   use ClimForcDataType
   use EcosimConst
-  use PlantMngmtDataType
+  use PlantMgmtDataType
   use RootDataType
   use CanopyDataType
   use EcoSimSumDataType

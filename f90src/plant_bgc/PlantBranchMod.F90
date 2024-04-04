@@ -819,7 +819,7 @@ module PlantBranchMod
 !  
     call ComputeGPP(NB,NZ,WFNG,Stomata_Activity,CH2O3,CH2O4,CH2O,CO2F,CH2OClm,CH2OLlm)
 
-    CH2O=CH2O*50._r8;CO2F=CO2F*50._r8
+!    CH2O=CH2O*50._r8;CO2F=CO2F*50._r8
 !   SHOOT AUTOTROPHIC RESPIRATION AFTER EMERGENCE
 !
     call ComputRAutoAfEmergence(I,J,NB,NZ,DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX,&
@@ -2570,48 +2570,48 @@ module PlantBranchMod
   real(r8) :: NonstElm2RootMyco(NumPlantChemElms)
   logical :: PlantingChk,RemobChk,LeafOutChk,PlantChk
   ! begin_execution
-  associate(                          &
-    iDayPlanting_pft                =>  plt_distb%iDayPlanting_pft  , &
-    iYearPlanting_pft               =>  plt_distb%iYearPlanting_pft   , &
-    iYearCurrent                    =>  plt_site%iYearCurrent    , &
-    ZEROS2                          =>  plt_site%ZEROS2   , &
-    DayLenthCurrent                 =>  plt_site%DayLenthCurrent    , &
-    k_woody_litr                    =>  pltpar%k_woody_litr, &    
-    NU                              =>  plt_site%NU      , &
-    FracHour4LeafoffRemob           =>  plt_allom%FracHour4LeafoffRemob   , &
-    FWODRE                          =>  plt_allom%FWODRE , &
-    RootElms_pft                    =>  plt_biom%RootElms_pft   , &
-     PopuRootMycoC_pvr              =>  plt_biom% PopuRootMycoC_pvr  , &
-    RootMycoActiveBiomC_pvr         =>  plt_biom%RootMycoActiveBiomC_pvr  , &
-    CanopyStalkC_pft                =>  plt_biom%CanopyStalkC_pft   , &
-    CanopyNonstElms_brch            =>  plt_biom%CanopyNonstElms_brch  , &
-     RootMycoNonstElms_rpvr         =>  plt_biom%RootMycoNonstElms_rpvr  , &
-    SeasonalNonstElms_pft                =>  plt_biom%SeasonalNonstElms_pft   , &
+  associate(                                                                  &
+    iDayPlanting_pft                =>  plt_distb%iDayPlanting_pft          , &
+    iYearPlanting_pft               =>  plt_distb%iYearPlanting_pft         , &
+    iYearCurrent                    =>  plt_site%iYearCurrent               , &
+    ZEROS2                          =>  plt_site%ZEROS2                     , &
+    DayLenthCurrent                 =>  plt_site%DayLenthCurrent            , &
+    k_woody_litr                    =>  pltpar%k_woody_litr                 , &    
+    NU                              =>  plt_site%NU                         , &
+    FracHour4LeafoffRemob           =>  plt_allom%FracHour4LeafoffRemob     , &
+    FWODRE                          =>  plt_allom%FWODRE                    , &
+    RootElms_pft                    =>  plt_biom%RootElms_pft               , &
+     PopuRootMycoC_pvr              =>  plt_biom% PopuRootMycoC_pvr         , &
+    RootMycoActiveBiomC_pvr         =>  plt_biom%RootMycoActiveBiomC_pvr    , &
+    CanopyStalkC_pft                =>  plt_biom%CanopyStalkC_pft           , &
+    CanopyNonstElms_brch            =>  plt_biom%CanopyNonstElms_brch       , &
+    RootMycoNonstElms_rpvr          =>  plt_biom%RootMycoNonstElms_rpvr     , &
+    SeasonalNonstElms_pft           =>  plt_biom%SeasonalNonstElms_pft      , &
     LeafPetoNonstElmConc_brch       =>  plt_biom%LeafPetoNonstElmConc_brch  , &
-    LeafPetolBiomassC_brch          =>  plt_biom%LeafPetolBiomassC_brch   , &
-    ZEROP                           =>  plt_biom%ZEROP   , &
-    StalkRsrvElms_brch              =>  plt_biom%StalkRsrvElms_brch , &
-    StalkBiomassC_brch              =>  plt_biom%StalkBiomassC_brch  , &
-    VLSoilPoreMicP_vr                  =>  plt_soilchem%VLSoilPoreMicP_vr, &
-    iPlantCalendar_brch             =>  plt_pheno%iPlantCalendar_brch , &
-    fTgrowCanP                      =>  plt_pheno%fTgrowCanP   , &
-    HourReq4LeafOff_brch            =>  plt_pheno%HourReq4LeafOff_brch  , &
-    Hours4Leafout_brch              =>  plt_pheno%Hours4Leafout_brch   , &
-    HourReq4LeafOut_brch            =>  plt_pheno%HourReq4LeafOut_brch  , &
-    doInitPlant_pft                 =>  plt_pheno%doInitPlant_pft  , &
-    PhotoPeriodSens_pft             =>  plt_pheno%PhotoPeriodSens_pft  , &
-    iPlantPhenolPattern_pft         =>  plt_pheno%iPlantPhenolPattern_pft , &
+    LeafPetolBiomassC_brch          =>  plt_biom%LeafPetolBiomassC_brch     , &
+    ZEROP                           =>  plt_biom%ZEROP                      , &
+    StalkRsrvElms_brch              =>  plt_biom%StalkRsrvElms_brch         , &
+    StalkBiomassC_brch              =>  plt_biom%StalkBiomassC_brch         , &
+    VLSoilPoreMicP_vr               =>  plt_soilchem%VLSoilPoreMicP_vr      , &
+    iPlantCalendar_brch             =>  plt_pheno%iPlantCalendar_brch       , &
+    fTgrowCanP                      =>  plt_pheno%fTgrowCanP                , &
+    HourReq4LeafOff_brch            =>  plt_pheno%HourReq4LeafOff_brch      , &
+    Hours4Leafout_brch              =>  plt_pheno%Hours4Leafout_brch        , &
+    HourReq4LeafOut_brch            =>  plt_pheno%HourReq4LeafOut_brch      , &
+    doInitPlant_pft                 =>  plt_pheno%doInitPlant_pft           , &
+    PhotoPeriodSens_pft             =>  plt_pheno%PhotoPeriodSens_pft       , &
+    iPlantPhenolPattern_pft         =>  plt_pheno%iPlantPhenolPattern_pft   , &
     iPlantPhotoperiodType_pft       =>  plt_pheno%iPlantPhotoperiodType_pft , &
-    CriticPhotoPeriod_pft           =>  plt_pheno%CriticPhotoPeriod_pft   , &
-    Hours4LeafOff_brch              =>  plt_pheno%Hours4LeafOff_brch   , &
+    CriticPhotoPeriod_pft           =>  plt_pheno%CriticPhotoPeriod_pft     , &
+    Hours4LeafOff_brch              =>  plt_pheno%Hours4LeafOff_brch        , &
     iPlantTurnoverPattern_pft       =>  plt_pheno%iPlantTurnoverPattern_pft , &
-    iPlantRootProfile_pft           =>  plt_pheno%iPlantRootProfile_pft , &
-    iPlantPhenolType_pft            =>  plt_pheno%iPlantPhenolType_pft , &
-    doInitLeafOut_brch              =>  plt_pheno%doInitLeafOut_brch  , &
-    Hours2LeafOut_brch              =>  plt_pheno%Hours2LeafOut_brch  , &
-    NGTopRootLayer_pft              =>  plt_morph%NGTopRootLayer_pft   , &
-    MainBranchNum_pft               =>  plt_morph%MainBranchNum_pft    , &
-    MaxSoiL4Root                    =>  plt_morph%MaxSoiL4Root      &
+    iPlantRootProfile_pft           =>  plt_pheno%iPlantRootProfile_pft     , &
+    iPlantPhenolType_pft            =>  plt_pheno%iPlantPhenolType_pft      , &
+    doInitLeafOut_brch              =>  plt_pheno%doInitLeafOut_brch        , &
+    Hours2LeafOut_brch              =>  plt_pheno%Hours2LeafOut_brch        , &
+    NGTopRootLayer_pft              =>  plt_morph%NGTopRootLayer_pft        , &
+    MainBranchNum_pft               =>  plt_morph%MainBranchNum_pft         , &
+    MaxSoiL4Root                    =>  plt_morph%MaxSoiL4Root                &
   )
 !   TRANSFER C,N,P FROM SEASONAL STORAGE TO SHOOT AND ROOT
 !   NON-STRUCTURAL C DURING SEED GERMINATION OR LEAFOUT
@@ -2620,7 +2620,7 @@ module PlantBranchMod
   RemobChk=Hours4LeafOff_brch(NB,NZ).LT.FracHour4LeafoffRemob(iPlantPhenolType_pft(NZ))*HourReq4LeafOff_brch(NB,NZ)  
   LeafOutChk=Hours4Leafout_brch(MainBranchNum_pft(NZ),NZ).GE.HourReq4LeafOut_brch(NB,NZ)
 
-  IF((iPlantPhenolPattern_pft(NZ).EQ.iplt_annual.AND.doInitPlant_pft(NZ).EQ.ifalse) &
+  IF((iPlantPhenolPattern_pft(NZ).EQ.iplt_annual .AND. doInitPlant_pft(NZ).EQ.ifalse) &
     .OR.(PlantingChk.AND.RemobChk) .OR. (LeafOutChk.AND.RemobChk))THEN
     TotPopuPlantRootC=0._r8
     TotalRootNonstElms(ielmc)=0._r8

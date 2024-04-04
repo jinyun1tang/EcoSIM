@@ -16,7 +16,7 @@ set(ECOSIM_DATATYPE_SOURCES
   ClimForcDataType.F90
   LandSurfDataType.F90
   SnowDataType.F90
-  PlantMngmtDataType.F90
+  PlantMgmtDataType.F90
   SurfLitterDataType.F90
   SurfSoilDataType.F90
   CanopyDataType.F90

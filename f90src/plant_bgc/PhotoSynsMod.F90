@@ -55,11 +55,11 @@ implicit none
   AirConc_pft                   => plt_photo%AirConc_pft                   , &
   DiffCO2Atmos2Intracel_pft     => plt_photo%DiffCO2Atmos2Intracel_pft     , &
   ZEROP                         => plt_biom%ZEROP                          , &
-  CanopyLeafArea_lpft     => plt_morph%CanopyLeafArea_lpft     , &
+  CanopyLeafArea_lpft           => plt_morph%CanopyLeafArea_lpft           , &
   RadDifPAR_zsec                => plt_rad%RadDifPAR_zsec                  , &
-  RadPAR_zsec                => plt_rad%RadPAR_zsec                  , &
+  RadPAR_zsec                   => plt_rad%RadPAR_zsec                     , &
   TAU_RadThru                   => plt_rad%TAU_RadThru                     , &
-  TAU_DirRadTransm                   => plt_rad%TAU_DirRadTransm                       &
+  TAU_DirRadTransm              => plt_rad%TAU_DirRadTransm                  &
   )
 
   CH2O3K=0._r8
@@ -126,8 +126,6 @@ implicit none
 !                
                 IF(VL.GT.ZERO)THEN
                   RS=AMIN1(CO2CuticleResist_pft(NZ),AMAX1(RCMN,DiffCO2Atmos2Intracel_pft(NZ)/VL))
-!                  RSL=RS+(CO2CuticleResist_pft(NZ)-RS)*Stomata_Activity
-! the following is temporary test
                   RSL=RS+(CO2CuticleResist_pft(NZ)-RS)*Stomata_Activity
                   GSL=1.0_r8/RSL*AirConc_pft(NZ)
 !
@@ -252,12 +250,12 @@ implicit none
   LeafIntracellularCO2_pft          => plt_photo%LeafIntracellularCO2_pft     , &
   RubiscoCarboxyEff_node            => plt_photo%RubiscoCarboxyEff_node       , &
   Vmax4PEPCarboxy_pft               => plt_photo%Vmax4PEPCarboxy_pft          , &
-  CanopyLeafArea_lpft         => plt_morph%CanopyLeafArea_lpft    , &
+  CanopyLeafArea_lpft               => plt_morph%CanopyLeafArea_lpft          , &
   ZERO                              => plt_site%ZERO                          , &
   RadDifPAR_zsec                    => plt_rad%RadDifPAR_zsec                 , &
-  RadPAR_zsec                    => plt_rad%RadPAR_zsec                 , &
+  RadPAR_zsec                       => plt_rad%RadPAR_zsec                    , &
   TAU_RadThru                       => plt_rad%TAU_RadThru                    , &
-  TAU_DirRadTransm                       => plt_rad%TAU_DirRadTransm                      &
+  TAU_DirRadTransm                  => plt_rad%TAU_DirRadTransm                 &
   )
 
   CH2O3K=0._r8;CH2O4K=0._r8
@@ -437,7 +435,7 @@ implicit none
     Vmax4PEPCarboxy_pft       =>  plt_photo%Vmax4PEPCarboxy_pft      , &
     Vmax4RubiscoCarboxy_pft   =>  plt_photo%Vmax4RubiscoCarboxy_pft  , &
     iPlantRootProfile_pft     =>  plt_pheno%iPlantRootProfile_pft    , &
-    SineSunInclAngle_col       =>  plt_rad%SineSunInclAngle_col        , &
+    SineSunInclAngle_col      =>  plt_rad%SineSunInclAngle_col       , &
     RadPARbyCanopy_pft        =>  plt_rad%RadPARbyCanopy_pft         , &
     ZEROP                     =>  plt_biom%ZEROP                     , &
     LeafAreaNode_brch         =>  plt_morph%LeafAreaNode_brch        , &

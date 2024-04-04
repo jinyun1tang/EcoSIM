@@ -19,7 +19,7 @@
   use PlantDataRateType
   use CanopyDataType
   use RootDataType
-  use PlantMngmtDataType
+  use PlantMgmtDataType
   use SOMDataType
   use EcosimBGCFluxType
   use EcoSIMHistMod

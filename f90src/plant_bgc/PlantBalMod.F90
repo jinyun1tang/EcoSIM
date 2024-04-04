@@ -315,12 +315,11 @@ implicit none
   real(r8), optional, intent(out) :: massr2nd(NumPlantChemElms)
   real(r8), optional, intent(out) :: massnonst(NumPlantChemElms)
   real(r8), optional, intent(out) :: massnodul(NumPlantChemElms)
-  integer :: NE
+  integer :: NE,N
   real(r8) :: massr1st1(NumPlantChemElms)
   real(r8) :: massr2nd1(NumPlantChemElms)
-  real(r8) :: massnonst1(NumPlantChemElms)
   real(r8) :: massnodul1(NumPlantChemElms)
-
+  real(r8) :: massnonst1(NumPlantChemElms)
   associate(                                                                   &
     NU                            =>  plt_site%NU                            , &  
     MY                            =>  plt_morph%MY                           , &                  
@@ -330,16 +329,20 @@ implicit none
     NumRootAxes_pft               =>  plt_morph%NumRootAxes_pft              , &  
     RootNodulStrutElms_pvr        =>  plt_biom%RootNodulStrutElms_pvr        , &   
     RootNodulNonstElms_pvr        =>  plt_biom%RootNodulNonstElms_pvr        , &
+    RootMycoNonstElms_pft         =>  plt_biom%RootMycoNonstElms_pft         , &
     RootMyco1stStrutElms_rpvr     =>  plt_biom%RootMyco1stStrutElms_rpvr     , &
     RootMyco2ndStrutElms_rpvr     =>  plt_biom%RootMyco2ndStrutElms_rpvr     , &    
     RootMycoNonstElms_rpvr        =>  plt_biom%RootMycoNonstElms_rpvr          &
   )
-  massr1st1=0._r8;massr2nd1=0._r8;massnonst1=0._r8;massnodul1=0._r8
+  massr1st1=0._r8;massr2nd1=0._r8;massnodul1=0._r8
   mass_roots=0._r8
   DO NE=1,NumPlantChemElms
     massr1st1(NE)=sum(RootMyco1stStrutElms_rpvr(NE,1:MY(NZ),NU:MaxNumRootLays,1:NumRootAxes_pft(NZ),NZ))
     massr2nd1(NE)=sum(RootMyco2ndStrutElms_rpvr(NE,1:MY(NZ),NU:MaxNumRootLays,1:NumRootAxes_pft(NZ),NZ))
-    massnonst1(NE)=sum(RootMycoNonstElms_rpvr(NE,1:MY(NZ),NU:MaxNumRootLays,NZ))
+    DO N=1,MY(NZ)
+      RootMycoNonstElms_pft(NE,N,NZ)=sum(RootMycoNonstElms_rpvr(NE,N,NU:MaxNumRootLays,NZ))
+    enddo
+    massnonst1(NE)=sum(RootMycoNonstElms_pft(NE,1:MY(NZ),NZ))
     mass_roots(NE)=massr1st1(NE)+massr2nd1(NE)+massnonst1(NE)
     !add reserve to struct
     if(is_plant_N2fix(iPlantNfixType(NZ)) .and. is_root_N2fix(iPlantNfixType(NZ)))THEN

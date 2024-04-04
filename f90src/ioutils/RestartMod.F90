@@ -36,7 +36,7 @@ module RestartMod
   use SurfSoilDataType
   use CanopyDataType
   use SoilBGCDataType
-  use PlantMngmtDataType
+  use PlantMgmtDataType
   use EcoSimSumDataType
   use RootDataType
   use EcosimBGCFluxType

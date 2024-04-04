@@ -594,7 +594,7 @@ module grosubsMod
   integer :: L,NR,N,NE,NB
   real(r8) :: root1st, root2nd
 !     begin_execution
-  associate(                                                                &
+  associate(                                                               &
     CanopyNonstElms_brch          =>  plt_biom%CanopyNonstElms_brch      , &
     RootMycoNonstElms_rpvr        =>  plt_biom%RootMycoNonstElms_rpvr    , &
     CanopyNodulNonstElms_brch     =>  plt_biom%CanopyNodulNonstElms_brch , &
@@ -646,7 +646,7 @@ module grosubsMod
     NumRootAxes_pft               =>  plt_morph%NumRootAxes_pft          , &
     LeafAreaLive_brch             =>  plt_morph%LeafAreaLive_brch        , &
     CanopyStemArea_pft            =>  plt_morph%CanopyStemArea_pft       , &
-    CanopyStalkArea_lbrch          =>  plt_morph%CanopyStalkArea_lbrch     , &
+    CanopyStalkArea_lbrch         =>  plt_morph%CanopyStalkArea_lbrch    , &
     SeedNumSet_brch               =>  plt_morph%SeedNumSet_brch          , &
     CanopyLeafArea_pft            =>  plt_morph%CanopyLeafArea_pft       , &
     CanopyStemAreaZ_pft           =>  plt_morph%CanopyStemAreaZ_pft      , &

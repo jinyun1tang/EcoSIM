@@ -43,6 +43,7 @@ module RootDataType
   real(r8),target,allocatable ::  RootRaidus_rpft(:,:,:,:)                     !root internal radius, [m]
   real(r8),target,allocatable ::  CNRTS_pft(:,:,:)                       !root N:C ratio x root growth yield, [-]
   real(r8),target,allocatable ::  CPRTS_pft(:,:,:)                       !root P:C ratio x root growth yield, [-]
+  real(r8),target,allocatable ::  RootMycoNonstElms_pft(:,:,:,:,:)
   real(r8),target,allocatable ::  Root1stMaxRadius_pft(:,:,:,:)                    !maximum radius of primary roots, [m]
   real(r8),target,allocatable ::  Root2ndMaxRadius_pft(:,:,:,:)                    !maximum radius of secondary roots, [m]
   real(r8),target,allocatable ::  RootBranchFreq_pft(:,:,:)                        !root brancing frequency, [m-1]
@@ -127,6 +128,7 @@ contains
   allocate(RootRaidus_rpft(jroots,JP,JY,JX));  RootRaidus_rpft=0._r8
   allocate(CNRTS_pft(JP,JY,JX));    CNRTS_pft=0._r8
   allocate(CPRTS_pft(JP,JY,JX));    CPRTS_pft=0._r8
+  allocate(RootMycoNonstElms_pft(NumPlantChemElms,jroots,JP,JY,JX));RootMycoNonstElms_pft=0._r8
   allocate(RootNodulElms_pft(NumPlantChemElms,JP,JY,JX));RootNodulElms_pft=0._r8
   allocate(Root1stMaxRadius_pft(jroots,JP,JY,JX)); Root1stMaxRadius_pft=0._r8
   allocate(Root2ndMaxRadius_pft(jroots,JP,JY,JX)); Root2ndMaxRadius_pft=0._r8
@@ -209,6 +211,7 @@ contains
   call destroy(RootRaidus_rpft)
   call destroy(CNRTS_pft)
   call destroy(CPRTS_pft)
+  call destroy(RootMycoNonstElms_pft)
   call destroy(Root1stMaxRadius_pft)
   call destroy(Root2ndMaxRadius_pft)
   call destroy(RootBranchFreq_pft)

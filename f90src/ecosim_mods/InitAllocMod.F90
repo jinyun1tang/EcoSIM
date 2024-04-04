@@ -46,7 +46,7 @@ implicit none
   use SedimentDataType    , only : InitSedimentData
   use SoilWaterDataType   , only : InitSoilWater
   use PlantAPIData        , only : InitPlantAPIData
-  use PlantMngmtDataType  , only : InitPlantMngmtData
+  use PlantMgmtDataType  , only : InitPlantMngmtData
   use InitSOMBGCMod       , only : InitSOMBGC
 
   use EcoSIMConfig        , only : jcplx1 => jcplx1c
