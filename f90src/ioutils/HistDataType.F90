@@ -155,8 +155,8 @@ implicit none
   real(r8),pointer   :: h1D_CAN_TEMPC_ptc(:)      !TCelciusCanopy_pft(NZ,NY,NX)
   real(r8),pointer   :: h1D_CAN_TEMPFN_ptc(:)       !fTgrowCanP(NZ,NY,NX), canopy temperature growth function/stress
   real(r8),pointer   :: h1D_CAN_CO2_FLX_ptc(:)   !CO2NetFix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.148, umol m-2 s-1
-  real(r8),pointer   :: h1D_CAN_GPP_ptc(:)       !GrossCO2Fix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total gross CO2 fixation, gC m-2
-  real(r8),pointer   :: h1D_CAN_RA_ptc(:)        !CanopyPlusNodulRespC_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total autotrophic respiration
+  real(r8),pointer   :: h1D_CAN_GPP_ptc(:)       !GrossCO2Fix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX),  gross CO2 fixation, gC m-2/hr
+  real(r8),pointer   :: h1D_CAN_RA_ptc(:)        !CanopyRespC_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total autotrophic respiration
   real(r8),pointer   :: h1D_cTNC_ptc(:)          !CanopyNonstElmConc_pft(ielmc,NZ,NY,NX), canopy nonstructural C concentration, 
   real(r8),pointer   :: h1D_cTNN_ptc(:)          !CanopyNonstElmConc_pft(ielmn,NZ,NY,NX)
   real(r8),pointer   :: h1D_cTNP_ptc(:)          !CanopyNonstElmConc_pft(ielmp,NZ,NY,NX)
@@ -195,7 +195,6 @@ implicit none
   real(r8),pointer   :: h1D_LITRf_P_FLX_ptc(:)       !LitrfalStrutElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_SURF_LITRf_C_FLX_ptc(:)  !SurfLitrfalStrutElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_AUTO_RESP_FLX_ptc(:)     !GrossResp_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_ABV_GRD_RESP_FLX_ptc(:)  !CanopyPlusNodulRespC_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_HVST_C_FLX_ptc(:)        !EcoHavstElmnt_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_PLANT_BALANCE_C_ptc(:)     !ElmBalanceCum_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_STANDING_DEAD_C_ptc(:)    !StandDeadStrutElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -457,7 +456,6 @@ implicit none
   allocate(this%h1D_LITRf_P_FLX_ptc(beg_ptc:end_ptc))     ;this%h1D_LITRf_P_FLX_ptc=spval
   allocate(this%h1D_SURF_LITRf_C_FLX_ptc(beg_ptc:end_ptc));this%h1D_SURF_LITRf_C_FLX_ptc(:)=spval
   allocate(this%h1D_AUTO_RESP_FLX_ptc(beg_ptc:end_ptc))   ;this%h1D_AUTO_RESP_FLX_ptc(:)=spval
-  allocate(this%h1D_ABV_GRD_RESP_FLX_ptc(beg_ptc:end_ptc));this%h1D_ABV_GRD_RESP_FLX_ptc(:)=spval
   allocate(this%h1D_HVST_C_FLX_ptc(beg_ptc:end_ptc))      ;this%h1D_HVST_C_FLX_ptc(:)=spval
   allocate(this%h1D_STANDING_DEAD_C_ptc(beg_ptc:end_ptc)) ;this%h1D_STANDING_DEAD_C_ptc(:)=spval
   allocate(this%h1D_FIREp_CO2_FLX_ptc(beg_ptc:end_ptc))   ;this%h1D_FIREp_CO2_FLX_ptc(:)=spval
@@ -1009,8 +1007,8 @@ implicit none
     long_name='canopy net CO2 exchange',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_CAN_GPP_ptc(beg_ptc:end_ptc)    
-  call hist_addfld1d(fname='CAN_GPP',units='gC/m2',avgflag='A',&
-    long_name='cumulative total gross CO2 fixation',ptr_patch=data1d_ptr)      
+  call hist_addfld1d(fname='CAN_GPP',units='gC/m2/hr',avgflag='A',&
+    long_name='plant gross CO2 fixation',ptr_patch=data1d_ptr)      
   
   data1d_ptr => this%h1D_CAN_RA_ptc(beg_ptc:end_ptc)    
   call hist_addfld1d(fname='CAN_RA',units='gC/m2/hr',avgflag='A',&
@@ -1161,12 +1159,8 @@ implicit none
     long_name='Cumulative plant LitrFall C to the soil surface',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_AUTO_RESP_FLX_ptc(beg_ptc:end_ptc)    
-  call hist_addfld1d(fname='AUTO_RESP',units='gC/m2',avgflag='A',&
-    long_name='cumulative plant autotrophic respiration',ptr_patch=data1d_ptr)      
-
-  data1d_ptr => this%h1D_ABV_GRD_RESP_FLX_ptc(beg_ptc:end_ptc)  
-  call hist_addfld1d(fname='ABV_GRD_RESP',units='gC/m2/hr',&
-    avgflag='A',long_name='plant shoot autotrophic respiration',ptr_patch=data1d_ptr)      
+  call hist_addfld1d(fname='AUTO_RESP',units='gC/m2/hr',avgflag='A',&
+    long_name='whole plant autotrophic respiration',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_HVST_C_FLX_ptc(beg_ptc:end_ptc)      
   call hist_addfld1d(fname='HVST_C_FLX',units='gC/m2/hr',avgflag='A',&
@@ -1655,9 +1649,9 @@ implicit none
         this%h1D_ROOT_NONSTC_ptc(nptc)  = RootMycoNonstElms_pft(ielmc,ipltroot,NZ,NY,NX)
         this%h1D_ROOT_NONSTN_ptc(nptc)  = RootMycoNonstElms_pft(ielmn,ipltroot,NZ,NY,NX)
         this%h1D_ROOT_NONSTP_ptc(nptc)  = RootMycoNonstElms_pft(ielmp,ipltroot,NZ,NY,NX)                
-        this%h1D_LEAF_NONSTC_ptc(nptc)  =CanopyNonstElms_pft(ielmc,NY,NX)
-        this%h1D_LEAF_NONSTN_ptc(nptc)  =CanopyNonstElms_pft(ielmn,NY,NX)
-        this%h1D_LEAF_NONSTP_ptc(nptc)  =CanopyNonstElms_pft(ielmp,NY,NX)
+        this%h1D_LEAF_NONSTC_ptc(nptc)  =CanopyNonstElms_pft(ielmc,NZ,NY,NX)
+        this%h1D_LEAF_NONSTN_ptc(nptc)  =CanopyNonstElms_pft(ielmn,NZ,NY,NX)
+        this%h1D_LEAF_NONSTP_ptc(nptc)  =CanopyNonstElms_pft(ielmp,NZ,NY,NX)
         this%h1D_CAN_TEMPK_ptc(nptc)    = TKCanopy_pft(NZ,NY,NX)
         this%h1D_MIN_LWP_ptc(nptc)      = PSICanPDailyMin(NZ,NY,NX)
         this%h1D_LEAF_PC_ptc(nptc)      = safe_adb(LeafStrutElms_pft(ielmp,NZ,NY,NX)+CanopyNonstElms_pft(ielmp,NZ,NY,NX), &
@@ -1670,7 +1664,7 @@ implicit none
         this%h1D_CAN_TEMPFN_ptc(nptc)   = fTgrowCanP(NZ,NY,NX)
         this%h1D_CAN_CO2_FLX_ptc(nptc)  = CO2NetFix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*gC1hour2umol1sec
         this%h1D_CAN_GPP_ptc(nptc)      = GrossCO2Fix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_CAN_RA_ptc(nptc)       = CanopyPlusNodulRespC_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_CAN_RA_ptc(nptc)       = CanopyRespC_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_cTNC_ptc(nptc)         = CanopyNonstElmConc_pft(ielmc,NZ,NY,NX)
         this%h1D_cTNN_ptc(nptc)         = CanopyNonstElmConc_pft(ielmn,NZ,NY,NX)
         this%h1D_cTNP_ptc(nptc)         = CanopyNonstElmConc_pft(ielmp,NZ,NY,NX)
@@ -1711,7 +1705,6 @@ implicit none
         this%h1D_LITRf_C_FLX_ptc(nptc)      = LitrfalStrutElmsCum_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_SURF_LITRf_C_FLX_ptc(nptc) = SurfLitrfalStrutElmsCum_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_AUTO_RESP_FLX_ptc(nptc)    = GrossResp_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_ABV_GRD_RESP_FLX_ptc(nptc) = CanopyPlusNodulRespC_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_HVST_C_FLX_ptc(nptc)       = EcoHavstElmnt_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_HVST_N_FLX_ptc(nptc)       = EcoHavstElmnt_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)        
         this%h1D_HVST_P_FLX_ptc(nptc)       = EcoHavstElmnt_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)        

@@ -636,7 +636,7 @@ implicit none
   real(r8), pointer :: NH3Dep2Can_pft(:)      => null()   !canopy NH3 flux, [g d-2 h-1]
   real(r8), pointer :: TDFOME(:,:,:)   =>  null()  !total root element exchange, [g d-2 h-1]
   real(r8), pointer :: RootN2Fix_pvr(:,:)    =>  null()  !root N2 fixation, [gN d-2 h-1]
-  real(r8), pointer :: CanopyPlusNodulRespC_pft(:)      =>  null()  !total autotrophic respiration, [gC d-2 ]
+  real(r8), pointer :: CanopyRespC_pft(:)      =>  null()  !total autotrophic respiration, [gC d-2 ]
   real(r8), pointer :: LitrfalStrutElms_pvr(:,:,:,:,:) =>  null()  !plant LitrFall element, [g d-2 h-1]
   real(r8), pointer :: ROXYX(:)      =>  null()  !total root + microbial O2 uptake, [g d-2 h-1]
   real(r8), pointer :: RNHBX(:)      => null()   !total root + microbial NH4 uptake band, [gN d-2 h-1]
@@ -997,7 +997,7 @@ implicit none
   allocate(this%NH3Dep2Can_pft(JP1));this%NH3Dep2Can_pft=spval
   allocate(this%TDFOME(NumPlantChemElms,1:jcplx,JZ1));this%TDFOME=spval
   allocate(this%RootN2Fix_pvr(JZ1,JP1));this%RootN2Fix_pvr=spval
-  allocate(this%CanopyPlusNodulRespC_pft(JP1));this%CanopyPlusNodulRespC_pft=spval
+  allocate(this%CanopyRespC_pft(JP1));this%CanopyRespC_pft=spval
   allocate(this%RP1BX(0:JZ1));this%RP1BX=spval
   allocate(this%RNO3X(0:JZ1));this%RNO3X=spval
   allocate(this%RPO4X(0:JZ1));this%RPO4X=spval

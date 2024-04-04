@@ -185,6 +185,7 @@ implicit none
     CPRTS_pft(NZ,NY,NX) =plt_allom%CPRTS_pft(NZ)
     ETCanopy_pft(NZ,NY,NX) =plt_ew%ETCanopy_pft(NZ)
     GrossCO2Fix_pft(NZ,NY,NX) =plt_bgcr%GrossCO2Fix_pft(NZ)
+    GrossCO2FixCum_pft(NZ,NY,NX)=GrossCO2FixCum_pft(NZ,NY,NX)+GrossCO2Fix_pft(NZ,NY,NX)
     CHILL(NZ,NY,NX) =plt_photo%CHILL(NZ)
     DiffCO2Atmos2Intracel_pft(NZ,NY,NX)  =plt_photo%DiffCO2Atmos2Intracel_pft(NZ)
     DTKC(NZ,NY,NX)  =plt_ew%DTKC(NZ)
@@ -248,7 +249,8 @@ implicit none
     SeedDepth_pft(NZ,NY,NX) =plt_morph%SeedDepth_pft(NZ)
     HeatXAir2PCan(NZ,NY,NX) =plt_ew%HeatXAir2PCan(NZ)
     GrossResp_pft(NZ,NY,NX) =plt_bgcr%GrossResp_pft(NZ)
-    CanopyPlusNodulRespC_pft(NZ,NY,NX) =plt_bgcr%CanopyPlusNodulRespC_pft(NZ)
+    GrossRespCum_pft(NZ,NY,NX)=GrossRespCum_pft(NZ,NY,NX)+GrossResp_pft(NZ,NY,NX)
+    CanopyRespC_pft(NZ,NY,NX) =plt_bgcr%CanopyRespC_pft(NZ)
     TC4LeafOut_pft(NZ,NY,NX)   =plt_pheno%TC4LeafOut_pft(NZ)
     TC4LeafOff_pft(NZ,NY,NX)   =plt_pheno%TC4LeafOff_pft(NZ)
     NH3EmiCum_pft(NZ,NY,NX)  =plt_bgcr%NH3EmiCum_pft(NZ)
@@ -592,7 +594,7 @@ implicit none
     RSRA(2,NZ,NY,NX)  =plt_morph%RSRA(2,NZ)
 
     DO N=1,MY(NZ,NY,NX)
-      RootMycoNonstElms_pft(1:NumPlantChemElms,N,NZ,NY,NX)=RootMycoNonstElms_pft(1:NumPlantChemElms,N,NZ)
+      RootMycoNonstElms_pft(1:NumPlantChemElms,N,NZ,NY,NX)=plt_biom%RootMycoNonstElms_pft(1:NumPlantChemElms,N,NZ)
       RootPoreTortu4Gas(N,NZ,NY,NX)=plt_morph%RootPoreTortu4Gas(N,NZ)
       RootRaidus_rpft(N,NZ,NY,NX)=plt_morph%RootRaidus_rpft(N,NZ)
       RootVolPerMassC_pft(N,NZ,NY,NX) =plt_morph%RootVolPerMassC_pft(N,NZ)
@@ -1045,7 +1047,7 @@ implicit none
     plt_site%PPX(NZ)=PPX(NZ,NY,NX)
     plt_distb%O2ByFire_pft(NZ)=O2ByFire_pft(NZ,NY,NX)
     plt_ew%ENGYX(NZ)=ENGYX(NZ,NY,NX)
-    plt_bgcr%CanopyPlusNodulRespC_pft(NZ)=CanopyPlusNodulRespC_pft(NZ,NY,NX)
+    plt_bgcr%CanopyRespC_pft(NZ)=CanopyRespC_pft(NZ,NY,NX)
     plt_ew%ETCanopy_pft(NZ)=ETCanopy_pft(NZ,NY,NX)
 
     plt_morph%BranchNumber_pft(NZ)=BranchNumber_pft(NZ,NY,NX)
@@ -1077,7 +1079,6 @@ implicit none
 
     plt_biom%NoduleNonstructCconc_pft(NZ)=NoduleNonstructCconc_pft(NZ,NY,NX)
     plt_bgcr%CO2NetFix_pft(NZ)=CO2NetFix_pft(NZ,NY,NX)
-    plt_bgcr%GrossCO2Fix_pft(NZ)=GrossCO2Fix_pft(NZ,NY,NX)
 
     plt_allom%rCNNonstructRemob_pft(NZ)=rCNNonstructRemob_pft(NZ,NY,NX)
     plt_allom%rCPNonstructRemob_pft(NZ)=rCPNonstructRemob_pft(NZ,NY,NX)
@@ -1119,7 +1120,6 @@ implicit none
     plt_pheno%TKG(NZ)      =TKG(NZ,NY,NX)
     plt_pheno%fTgrowCanP(NZ)  =fTgrowCanP(NZ,NY,NX)
 
-    plt_bgcr%GrossResp_pft(NZ)  =GrossResp_pft(NZ,NY,NX)
     plt_photo%Km4LeafaqCO2_pft(NZ)=Km4LeafaqCO2_pft(NZ,NY,NX)
     plt_photo%Km4RubiscoCarboxy_pft(NZ)=Km4RubiscoCarboxy_pft(NZ,NY,NX)
     plt_bgcr%NH3EmiCum_pft(NZ)  =NH3EmiCum_pft(NZ,NY,NX)

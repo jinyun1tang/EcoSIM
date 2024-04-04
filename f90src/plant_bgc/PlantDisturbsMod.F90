@@ -398,7 +398,7 @@ module PlantDisturbsMod
     Eco_NBP_col                =>  plt_bgcr%Eco_NBP_col    , &
     Eco_AutoR_col              =>  plt_bgcr%Eco_AutoR_col    , &
     ECO_ER_col                 =>  plt_bgcr%ECO_ER_col    , &
-    CanopyPlusNodulRespC_pft   =>  plt_bgcr%CanopyPlusNodulRespC_pft   , &
+    CanopyRespC_pft   =>  plt_bgcr%CanopyRespC_pft   , &
     GrossResp_pft              =>  plt_bgcr%GrossResp_pft   , &
     SeasonalNonstElms_pft      =>  plt_biom%SeasonalNonstElms_pft     &
   )
@@ -470,7 +470,7 @@ module PlantDisturbsMod
       EcoHavstElmnt_col(NE)=EcoHavstElmnt_col(NE)+TotalElmntRemoval(NE)-TotalElmnt2Litr(NE)
     ENDDO
     GrossResp_pft(NZ)=GrossResp_pft(NZ)-GZ*(TotalElmntRemoval(ielmc)-TotalElmnt2Litr(ielmc))
-    CanopyPlusNodulRespC_pft(NZ)=CanopyPlusNodulRespC_pft(NZ)-GZ*(TotalElmntRemoval(ielmc)-TotalElmnt2Litr(ielmc))
+    CanopyRespC_pft(NZ)=CanopyRespC_pft(NZ)-GZ*(TotalElmntRemoval(ielmc)-TotalElmnt2Litr(ielmc))
 !     Eco_NBP_col=Eco_NBP_col+GY*(TotalElmnt2Litr(ielmc)-TotalElmntRemoval(ielmc))
 !     CO2NetFix_pft(NZ)=CO2NetFix_pft(NZ)+GZ*(TotalElmnt2Litr(ielmc)-TotalElmntRemoval(ielmc))
     ECO_ER_col=ECO_ER_col-GZ*(TotalElmntRemoval(ielmc)-TotalElmnt2Litr(ielmc))

@@ -886,7 +886,7 @@ module PlantBranchMod
   associate(                                                                 &
     CO2NetFix_pft                =>  plt_bgcr%CO2NetFix_pft                , &
     CanopyGrosRCO2_pft           =>  plt_bgcr%CanopyGrosRCO2_pft           , &
-    CanopyPlusNodulRespC_pft     =>  plt_bgcr%CanopyPlusNodulRespC_pft     , &
+    CanopyRespC_pft     =>  plt_bgcr%CanopyRespC_pft     , &
     Eco_AutoR_col                =>  plt_bgcr%Eco_AutoR_col                , &
     ECO_ER_col                   =>  plt_bgcr%ECO_ER_col                   , &
     LeafElmntNode_brch           =>  plt_biom%LeafElmntNode_brch           , &
@@ -953,14 +953,14 @@ module PlantBranchMod
 !
 !     TOTAL C EXCHANGE
 !
-!     CanopyGrosRCO2_pft,CanopyPlusNodulRespC_pft=total,above-ground PFT respiration
+!     CanopyGrosRCO2_pft,CanopyRespC_pft=total,above-ground PFT respiration
 !     CO2NetFix_pft=PFT net CO2 fixation
 !     ECO_ER_col=ecosystem respiration
 !     Eco_AutoR_col=total autotrophic respiration
 !     aquCO2IntraLeafLeakFromBndsheth=bundle sheath CO2 leakage
 !
       CanopyGrosRCO2_pft(NZ)=CanopyGrosRCO2_pft(NZ)-aquCO2IntraLeafLeakFromBndsheth
-      CanopyPlusNodulRespC_pft(NZ)=CanopyPlusNodulRespC_pft(NZ)-aquCO2IntraLeafLeakFromBndsheth
+      CanopyRespC_pft(NZ)=CanopyRespC_pft(NZ)-aquCO2IntraLeafLeakFromBndsheth
       CO2NetFix_pft(NZ)=CO2NetFix_pft(NZ)-aquCO2IntraLeafLeakFromBndsheth
       ECO_ER_col=ECO_ER_col-aquCO2IntraLeafLeakFromBndsheth
       Eco_AutoR_col=Eco_AutoR_col-aquCO2IntraLeafLeakFromBndsheth
@@ -3042,7 +3042,7 @@ module PlantBranchMod
     ECO_ER_col                         =>  plt_bgcr%ECO_ER_col                , &
     Eco_GPP_col                        =>  plt_bgcr%Eco_GPP_col               , &
     GrossCO2Fix_pft                    =>  plt_bgcr%GrossCO2Fix_pft           , &
-    CanopyPlusNodulRespC_pft           =>  plt_bgcr%CanopyPlusNodulRespC_pft  , &
+    CanopyRespC_pft           =>  plt_bgcr%CanopyRespC_pft  , &
     CanopyNonstElms_brch               =>  plt_biom%CanopyNonstElms_brch      , &
     LeafPetoNonstElmConc_brch          =>  plt_biom%LeafPetoNonstElmConc_brch , &
     LeafAreaLive_brch                  =>  plt_morph%LeafAreaLive_brch        , &        
@@ -3193,7 +3193,7 @@ module PlantBranchMod
 ! RCO2NonstC4Nassim_brch=respiration for N assimilation
 ! GrossCO2Fix_pft=total PFT CO2 fixation
 ! CO2F=total CO2 fixation
-! CanopyGrosRCO2_pft,CanopyPlusNodulRespC_pft=total,above-ground PFT respiration
+! CanopyGrosRCO2_pft,CanopyRespC_pft=total,above-ground PFT respiration
 ! CO2NetFix_pft=PFT net CO2 fixation
 ! Eco_GPP_col=ecosystem GPP
 ! ECO_ER_col=ecosystem respiration
@@ -3202,7 +3202,7 @@ module PlantBranchMod
   Rauto_brch=AMIN1(RCO2Maint_brch,RCO2NonstC_brch)+RgroCO2_ltd+RMxess_brch+RCO2NonstC4Nassim_brch
   GrossCO2Fix_pft(NZ)=GrossCO2Fix_pft(NZ)+CO2F
   CanopyGrosRCO2_pft(NZ)=CanopyGrosRCO2_pft(NZ)-Rauto_brch
-  CanopyPlusNodulRespC_pft(NZ)=CanopyPlusNodulRespC_pft(NZ)-Rauto_brch
+  CanopyRespC_pft(NZ)=CanopyRespC_pft(NZ)-Rauto_brch
   CO2NetFix_pft(NZ)=CO2NetFix_pft(NZ)+CO2F-Rauto_brch
   Eco_GPP_col=Eco_GPP_col+CO2F
   ECO_ER_col=ECO_ER_col-Rauto_brch

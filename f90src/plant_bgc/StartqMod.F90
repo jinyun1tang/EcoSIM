@@ -636,7 +636,7 @@ module StartqMod
     GrossCO2Fix_pft(NZ,NY,NX)=0._r8
     SurfLitrfalStrutElmsCum_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
     GrossResp_pft(NZ,NY,NX)=0._r8
-    CanopyPlusNodulRespC_pft(NZ,NY,NX)=0._r8
+    CanopyRespC_pft(NZ,NY,NX)=0._r8
     PlantExudChemElmCum_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
     LitrfalStrutElmsCum_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
     PlantN2FixCum_pft(NZ,NY,NX)=0._r8

@@ -28,15 +28,17 @@ module PlantDataRateType
   real(r8),target,allocatable ::  RCPSX(:,:,:,:)                     !P translocated from sheath during senescence, [g d-2 h-1]
   real(r8),target,allocatable ::  PetioleChemElmRemobFlx_brch(:,:,:,:,:)                   !element translocated from sheath during senescence, [g d-2 h-1]
   real(r8),target,allocatable ::  GrossCO2Fix_pft(:,:,:)                       !total gross CO2 fixation, [g d-2 ]
+  real(r8),target,allocatable ::  GrossCO2FixCum_pft(:,:,:)
   real(r8),target,allocatable ::  LitrfalStrutElms_pft(:,:,:,:)                     !total plant element LitrFall , [g d-2 ]
   real(r8),target,allocatable ::  PlantN2FixCum_pft(:,:,:)                      !total plant N2 fixation, [g d-2 ]
-  real(r8),target,allocatable ::  GrossResp_pft(:,:,:)                       !total plant respiration, [g d-2 ]
+  real(r8),target,allocatable ::  GrossRespCum_pft(:,:,:)                       !total plant respiration, [g d-2 ]
+  real(r8),target,allocatable ::  GrossResp_pft(:,:,:)
   real(r8),target,allocatable ::  ElmBalanceCum_pft(:,:,:,:)                      !plant element balance, [g d-2]
   real(r8),target,allocatable ::  LitrfalStrutElmsCum_pft(:,:,:,:)                     !plant element LitrFall, [g d-2 h-1]
   real(r8),target,allocatable ::  LitrfalStrutElms_pvr(:,:,:,:,:,:,:)                !plant LitrFall element, [g d-2 h-1]
   real(r8),target,allocatable ::  NetPrimProduct_pft(:,:,:)                        !total net primary productivity, [g d-2]
   real(r8),target,allocatable ::  ETCanopy_pft(:,:,:)                       !total transpiration, [m d-2], <0 into atmosphere
-  real(r8),target,allocatable ::  CanopyPlusNodulRespC_pft(:,:,:)                       !total autotrophic respiration, [g d-2 ]
+  real(r8),target,allocatable ::  CanopyRespC_pft(:,:,:)                       !total autotrophic respiration, [g d-2 ]
   real(r8),target,allocatable ::  EcoHavstElmnt_pft(:,:,:,:)                     !plant element harvest, [g d-2 ]
   real(r8),target,allocatable ::  EcoHavstElmntCum_pft(:,:,:,:)                    !total plant harvest, [g d-2 ]
   real(r8),target,allocatable ::  CO2ByFire_pft(:,:,:)                       !plant CO2 emission from fire, [g d-2 ]
@@ -140,15 +142,17 @@ module PlantDataRateType
   allocate(LeafElmntRemobFlx_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX)); LeafElmntRemobFlx_brch=0._r8
   allocate(PetioleChemElmRemobFlx_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX)); PetioleChemElmRemobFlx_brch=0._r8
   allocate(GrossCO2Fix_pft(JP,JY,JX));    GrossCO2Fix_pft=0._r8
+  allocate(GrossCO2FixCum_pft(JP,JY,JX)); GrossCO2FixCum_pft=0._r8
   allocate(LitrfalStrutElmsCum_pft(NumPlantChemElms,JP,JY,JX));    LitrfalStrutElmsCum_pft=0._r8
   allocate(PlantN2FixCum_pft(JP,JY,JX));   PlantN2FixCum_pft=0._r8
   allocate(GrossResp_pft(JP,JY,JX));    GrossResp_pft=0._r8
+  allocate(GrossRespCum_pft(JP,JY,JX)); GrossRespCum_pft=0._r8
   allocate(ElmBalanceCum_pft(NumPlantChemElms,JP,JY,JX));     ElmBalanceCum_pft=0._r8
   allocate(LitrfalStrutElms_pft(NumPlantChemElms,JP,JY,JX));    LitrfalStrutElms_pft=0._r8
   allocate(LitrfalStrutElms_pvr(NumPlantChemElms,jsken,1:NumOfPlantLitrCmplxs,0:JZ,JP,JY,JX));LitrfalStrutElms_pvr=0._r8
   allocate(NetPrimProduct_pft(JP,JY,JX));     NetPrimProduct_pft=0._r8
   allocate(ETCanopy_pft(JP,JY,JX));    ETCanopy_pft=0._r8
-  allocate(CanopyPlusNodulRespC_pft(JP,JY,JX));    CanopyPlusNodulRespC_pft=0._r8
+  allocate(CanopyRespC_pft(JP,JY,JX));    CanopyRespC_pft=0._r8
   allocate(EcoHavstElmnt_pft(NumPlantChemElms,JP,JY,JX));    EcoHavstElmnt_pft=0._r8
   allocate(EcoHavstElmntCum_pft(NumPlantChemElms,JP,JY,JX));   EcoHavstElmntCum_pft=0._r8
   allocate(CO2ByFire_pft(JP,JY,JX));    CO2ByFire_pft=0._r8
@@ -240,15 +244,17 @@ module PlantDataRateType
   call destroy(LeafElmntRemobFlx_brch)
   call destroy(PetioleChemElmRemobFlx_brch)
   call destroy(GrossCO2Fix_pft)
+  call destroy(GrossCO2FixCum_pft)
   call destroy(LitrfalStrutElmsCum_pft)
   call destroy(PlantN2FixCum_pft)
   call destroy(GrossResp_pft)
+  call destroy(GrossRespCum_pft)
   call destroy(ElmBalanceCum_pft)
   call destroy(LitrfalStrutElms_pft)
   call destroy(LitrfalStrutElms_pvr)
   call destroy(NetPrimProduct_pft)
   call destroy(ETCanopy_pft)
-  call destroy(CanopyPlusNodulRespC_pft)
+  call destroy(CanopyRespC_pft)
   call destroy(EcoHavstElmnt_pft)
   call destroy(EcoHavstElmntCum_pft)
   call destroy(NodulInfectElms_pft)

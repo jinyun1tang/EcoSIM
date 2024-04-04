@@ -271,6 +271,7 @@ implicit none
     MaxSoiL4Root            =>  plt_morph%MaxSoiL4Root           , &        
     MaxNumRootLays          =>  plt_site%MaxNumRootLays          , &
     CO2NetFix_pft           =>  plt_bgcr%CO2NetFix_pft           , &
+    CanopyRespC_pft         =>  plt_bgcr%CanopyRespC_pft         , &
     LitrfalStrutElms_pft    =>  plt_bgcr%LitrfalStrutElms_pft    , &
     NodulInfectElms_pft     =>  plt_bgcr%NodulInfectElms_pft     , &
     RootMycoExudElms_pft    =>  plt_rbgc%RootMycoExudElms_pft    , &

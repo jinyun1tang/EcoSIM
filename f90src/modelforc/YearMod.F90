@@ -84,7 +84,7 @@
       NodulInfectElmsCum_pft(NE,NZ,NY,NX)=0._r8
     ENDDO
     NetCumElmntFlx2Plant_pft(ielmc,NZ,NY,NX)=NetCumElmntFlx2Plant_pft(ielmc,NZ,NY,NX) &
-      +GrossCO2Fix_pft(NZ,NY,NX)+GrossResp_pft(NZ,NY,NX) &
+      +GrossCO2FixCum_pft(NZ,NY,NX)+GrossRespCum_pft(NZ,NY,NX) &
       -CO2ByFire_pft(NZ,NY,NX)-CH4ByFire_pft(NZ,NY,NX)
     NetCumElmntFlx2Plant_pft(ielmn,NZ,NY,NX)=NetCumElmntFlx2Plant_pft(ielmn,NZ,NY,NX) &
       +NH3EmiCum_pft(NZ,NY,NX)+PlantN2FixCum_pft(NZ,NY,NX) &
@@ -93,10 +93,10 @@
       -PO4byFire_pft(NZ,NY,NX)
 
 ! the following variables are accumulated daily
-    GrossCO2Fix_pft(NZ,NY,NX)=0._r8
+    GrossCO2FixCum_pft(NZ,NY,NX)=0._r8
     PlantExudChemElmCum_pft(:,NZ,NY,NX)=0._r8
-    GrossResp_pft(NZ,NY,NX)=0._r8
-    CanopyPlusNodulRespC_pft(NZ,NY,NX)=0._r8
+    GrossRespCum_pft(NZ,NY,NX)=0._r8
+    CanopyRespC_pft(NZ,NY,NX)=0._r8
     ETCanopy_pft(NZ,NY,NX)=0._r8
     PlantN2FixCum_pft(NZ,NY,NX)=0._r8
     NH3EmiCum_pft(NZ,NY,NX)=0._r8
