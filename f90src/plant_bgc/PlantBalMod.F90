@@ -56,7 +56,6 @@ implicit none
     ShootElmsBeg_pft               =>  plt_biom%ShootElmsBeg_pft       , &
     RootElms_pft                   =>  plt_biom%RootElms_pft           , &    
     ShootElms_brch                 =>  plt_biom%ShootElms_brch         , &
-    RootStrutElms_pft              =>  plt_biom%RootStrutElms_pft      , &
     ShootC4NonstC_brch             =>  plt_biom%ShootC4NonstC_brch     , &    
     RCO2A_pvr                      =>  plt_rbgc%RCO2A_pvr              , & 
     ShootElms_pft                  =>  plt_biom%ShootElms_pft            &
@@ -150,7 +149,6 @@ implicit none
     StandDeadKCompElms_pft         =>  plt_biom%StandDeadKCompElms_pft    , &       
     RootElms_pft                   =>  plt_biom%RootElms_pft              , &    
     ShootElms_brch                 =>  plt_biom%ShootElms_brch            , &
-    RootStrutElms_pft              =>  plt_biom%RootStrutElms_pft         , &      
     ShootElms_pft                  =>  plt_biom%ShootElms_pft               &
   )
   
@@ -333,6 +331,7 @@ implicit none
     RootMycoNonstElms_pft         =>  plt_biom%RootMycoNonstElms_pft         , &
     RootMyco1stStrutElms_rpvr     =>  plt_biom%RootMyco1stStrutElms_rpvr     , &
     RootMyco2ndStrutElms_rpvr     =>  plt_biom%RootMyco2ndStrutElms_rpvr     , &    
+    RootStrutElms_pft             =>  plt_biom%RootStrutElms_pft             , &          
     RootMycoNonstElms_rpvr        =>  plt_biom%RootMycoNonstElms_rpvr          &
   )
   massr1st1=0._r8;massr2nd1=0._r8;massnodul1=0._r8
@@ -340,6 +339,7 @@ implicit none
   DO NE=1,NumPlantChemElms
     massr1st1(NE)=sum(RootMyco1stStrutElms_rpvr(NE,1:MY(NZ),NU:MaxNumRootLays,1:NumRootAxes_pft(NZ),NZ))
     massr2nd1(NE)=sum(RootMyco2ndStrutElms_rpvr(NE,1:MY(NZ),NU:MaxNumRootLays,1:NumRootAxes_pft(NZ),NZ))
+    RootStrutElms_pft(NE,NZ)=massr1st1(NE)+massr2nd1(NE)
     DO N=1,MY(NZ)
       RootMycoNonstElms_pft(NE,N,NZ)=sum(RootMycoNonstElms_rpvr(NE,N,NU:MaxNumRootLays,NZ))
     enddo
