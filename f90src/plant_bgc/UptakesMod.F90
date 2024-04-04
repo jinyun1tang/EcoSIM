@@ -106,20 +106,8 @@ module UptakesMod
 
   call PrepH2ONutrientUptake(ElvAdjstedtSoiPSIMPa,AllRootC_vr,AirPoreAvail4Fill,WatAvail4Uptake)
 !
-
 !     IF PLANT SPECIES EXISTS
-!
-!  if(I+J==2)then
-!    write(128,'(A4,8(X,A13))')'NN','DOY' &
-!     ,'PSILT','syms','Canw','DIFU','TKCY' &
-!     ,'SWRad','LWRad'     
-!    write(129,'(A4,8(X,A13))')'NN','DOY' &
-!     ,'PSILT','syms','Canw','DIFU','TKCY' &
-!     ,'SWRad','LWRad'          
-     
-!    write(135,'(9(X,A13))')'DOY','EX','Rcbnd','Rstom','transp','PSILT','VPA','VPC','TKC1'                   
-!    write(136,'(9(X,A13))')'DOY','EX','Rcbnd','Rstom','transp','PSILT','VPA','VPC','TKC1'              
-!  endif   
+
   DO NZ=1,NP
     PopPlantO2Uptake=0.0_r8
     PopPlantO2Demand=0.0_r8
@@ -165,7 +153,6 @@ module UptakesMod
 !     CanopyWater_pft,WatByPCanopy=water volume in canopy,on canopy surfaces
 !
         PSICanopy_pft(NZ)=AMIN1(-ppmc,0.667_r8*PSICanopy_pft(NZ))
-        !if(I>=207)write(123,*)'inipsicanp NZ',I,J,NZ,PSICanopy_pft(NZ)
         Transpiration_pft(NZ)=0.0_r8
         VapXAir2Canopy_pft(NZ)=0.0_r8
         PrecHeatIntcptByCanP1=PrecIntcptByCanopy_pft(NZ)*cpw*TairK
@@ -179,11 +166,7 @@ module UptakesMod
         ELSE
           FracGrndByPFT=1.0_r8/NP
         ENDIF
-!        if(NZ==1)THEN
-!        write(182,'(F13.6,2(X,F16.6))')I+J/24.,CanopyLeafShethC_pft(NZ),CanopyStalkC_pft(NZ)
-!        ELSE
-!        write(183,'(F13.6,2(X,F16.6))')I+J/24.,CanopyLeafShethC_pft(NZ),CanopyStalkC_pft(NZ)
-!        ENDIF
+
         TKCX=TKC(NZ)
         !Canopy C mass, g/m2
         CanPMassC=AZMAX1(CanopyLeafShethC_pft(NZ)+CanopyStalkC_pft(NZ))
@@ -217,8 +200,6 @@ module UptakesMod
 !
 !     DEFAULT VALUES IF PLANT SPECIES DOES NOT EXIST
 !
-!        if(I>=207)write(122,*)'pfcanfin',I,J,NZ,PSICanopy_pft(NZ)
-
       ELSE
         call HandleBareSoil(NZ,ElvAdjstedtSoiPSIMPa,FDMP)
       ENDIF
@@ -620,7 +601,7 @@ module UptakesMod
       FTHRM=EMMC*stefboltz_const*FracRadPARbyCanopy_pft(NZ)*AREA3(NU)
       LWRadCanopy_pft(NZ)=FTHRM*TKC(NZ)**4._r8
       PSICanopy_pft(NZ)=ElvAdjstedtSoiPSIMPa(NGTopRootLayer_pft(NZ))     
-!      write(124,*)'pscandiv',etimer%get_curr_doy(),NZ,PSICanopy_pft(NZ)
+
       CCPOLT=CanopyNonstElmConc_pft(ielmc,NZ)+CanopyNonstElmConc_pft(ielmn,NZ)&
         +CanopyNonstElmConc_pft(ielmp,NZ)
 
@@ -838,14 +819,6 @@ module UptakesMod
     Transpiration_pft(NZ)=EX*CanopyBndlResist_pft(NZ)/(CanopyBndlResist_pft(NZ)+CanPStomaResistH2O_pft(NZ))
     !latent heat flux, negative means into atmosphere
     EvapTransHeat_pft(NZ)=(Transpiration_pft(NZ)+VapXAir2Canopy_pft(NZ))*EvapLHTC   
-!    if(NZ==1)THEN
-!    WRITE(135,'(9(X,F13.6))')I+J/24.+N/2000.,EX,CanopyBndlResist_pft(NZ),CanPStomaResistH2O_pft(NZ)&
-!      ,Transpiration_pft(NZ),PSICanopy_pft(NZ),VPA,VPC,TKC1
-!    ELSE
-!    WRITE(136,'(9(X,F13.6))')I+J/24.+N/2000.,EX,CanopyBndlResist_pft(NZ),CanPStomaResistH2O_pft(NZ)&
-!      ,Transpiration_pft(NZ),PSICanopy_pft(NZ),VPA,VPC,TKC1
-!    ENDIF
-
 !
 !     SENSIBLE + STORAGE HEAT FROM RN, LE AND CONVECTIVE HEAT FLUXES
 !
@@ -908,15 +881,7 @@ module UptakesMod
 !     ElvAdjstedtSoiPSIMPa=total soil water potential PSIST adjusted for surf elevn
 !     SoiAddRootResist=total soil+root resistance
 !     cumPRootH2OUptake=total water uptake from soil profile
-!
-!      if(NZ==1)then
-!        write(fmt,'(A,I1,A)')'(F13.6,',MaxSoiL4Root(NZ)-NU+2,'(X,F13.6))'
-!        write(124,trim(fmt))I+J/24.+NN/2000.,PSILC,(ElvAdjstedtSoiPSIMPa(L),L=NU,MaxSoiL4Root(NZ))
-!      else
-!        write(fmt,'(A,I1,A)')'(F13.6,',MaxSoiL4Root(NZ)-NU+2,'(X,F13.6))'
-!        write(125,trim(fmt))I+J/24.+NN/2000.,PSILC,(ElvAdjstedtSoiPSIMPa(L),L=NU,MaxSoiL4Root(NZ))
-!      endif
-      
+!      
       cumRootHeatUptake=0._r8
       D4200: DO N=1,MY(NZ)
         D4201: DO L=NU,MaxSoiL4Root(NZ)
@@ -1026,35 +991,10 @@ module UptakesMod
 
         DTmR=PTransPre-cumPRootH2OUptakePre
         dfTmRdP=(DTmR-DTmR_old)/DPSI_old
-!        if(DTmR>0._r8)then
-        !water unlimited, increase canopy potential
-!          DPSI=abs(DPSI)
-!        else
-        !water limited
-!          DPSI=-abs(DPSI)
-!        endif        
-!        IF(.not.isclose(DPSI_old,0.0_r8))THEN
-!          if(dfTmRdP*DTmR>0._r8)then
-!            DPSI=-abs(DPSI)
-!          else
-!            DPSI=abs(DPSI)
-!          endif
-!          if(NZ==1)THEN            
-!            write(128,'(I4,8(X,F13.6))')NN &
-!              ,NN/2000._r8+I+J/24._r8,PSICanopy_pft(NZ),CanPMassC,FDMP,DIFFU &
-!              ,TKCY,RadSWbyCanopy_pft(NZ),LWRad2CanP
-!          ELSE
-!            write(129,'(I4,8(X,F13.6))')NN &
-!              ,NN/2000._r8+I+J/24._r8,PSICanopy_pft(NZ),CanPMassC,FDMP,DIFFU &
-!              ,TKCY,RadSWbyCanopy_pft(NZ),LWRad2CanP               
-!          ENDIF
-!        endif
 
         PSICanopy_pft(NZ)=AZMIN1(PSICanopy_pft(NZ)+0.1_r8*DPSI)        
         DPSI_old=DPSI
         DTmR_old=PTransPre-cumPRootH2OUptakePre
-!        if(I>=207)then
-!        endif  
         XC=0.50_r8!      
       ENDIF
     ENDIF
@@ -1274,8 +1214,7 @@ module UptakesMod
   TCelciusCanopy_pft(NZ)=units%Kelvin2Celcius(TKC(NZ))
   FTHRM=EMMC*stefboltz_const*FracRadPARbyCanopy_pft(NZ)*AREA3(NU)
   LWRadCanopy_pft(NZ)=FTHRM*TKC(NZ)**4._r8
-  PSICanopy_pft(NZ)=ElvAdjstedtSoiPSIMPa(NGTopRootLayer_pft(NZ))
-  !WRITE(121,*)'PSICANELV',etimer%get_curr_doy(),NZ,PSICanopy_pft(NZ)
+  PSICanopy_pft(NZ)=ElvAdjstedtSoiPSIMPa(NGTopRootLayer_pft(NZ))  
   CCPOLT=sum(CanopyNonstElmConc_pft(1:NumPlantChemElms,NZ))
 
   call update_osmo_turg_pressure(PSICanopy_pft(NZ),CCPOLT,OSMO(NZ),TKC(NZ)&

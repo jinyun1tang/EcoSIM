@@ -15,7 +15,6 @@ module InitVegBGC
   use CanopyRadDataType
   implicit none
 
-
   real(r8), intent(out) :: YSIN(NumOfSkyAzimuSects)
   real(r8), intent(out) :: YCOS(NumOfSkyAzimuSects)
   real(r8), intent(out) :: SkyAzimuthAngle(NumOfSkyAzimuSects)
@@ -26,8 +25,6 @@ module InitVegBGC
 
   integer :: L,M,N
 
-!  write(*,*) "In InitIrradianceGeometry"
-
   !     begin_execution
   !     SineLeafAngle,CosineLeafAngle=sine,cosine of leaf inclination class
   !     ZAZI=leaf azimuth class, it is pi because only on one side of the leaf
@@ -36,30 +33,20 @@ module InitVegBGC
   !     iScatteringDiffus:1=backscattering,2=forward scattering of sky radiation
   !
 
-!  write(*,*) "First do loop over leaf azimuth sectors"
   D205: DO L=1,NumOfLeafAzimuthSectors
-!    write(*,*) "Setting ZAZI"
-!    write(*,*) "L = ", L, " of ", NumOfLeafAzimuthSectors
     ZAZI(L)=(L-0.5)*PICON/real(NumOfLeafAzimuthSectors,r8)
   ENDDO D205
-!  write(*,*) "Loop over sky azimuth sectors"
   !NumOfSkyAzimuSects: number of sky azimuth sectors
   !NumOfLeafAzimuthSectors: number of leaf azimuth sectors
   D230: DO N=1,NumOfSkyAzimuSects
-!    write(*,*) "Setting Yvars"
-!    write(*,*) "N = ", N, " of ", NumOfSkyAzimuSects
     SkyAzimuthAngle(N)=PICON*(2*N-1)/real(NumOfSkyAzimuSects,r8)
     YAGL=PICON/real(NumOfSkyAzimuSects,r8)
     YSIN(N)=SIN(YAGL)
     YCOS(N)=COS(YAGL)
     TotSineSkyAngles_grd=TotSineSkyAngles_grd+YSIN(N)
     D225: DO L=1,NumOfLeafAzimuthSectors
-!      write(*,*) "Setting DAZI"
-!      write(*,*) "L = ", L, " of ", NumOfLeafAzimuthSectors
       DAZI=COS(ZAZI(L)-SkyAzimuthAngle(N))
       DO  M=1,NumOfLeafZenithSectors
-!        write(*,*) "Setting Omega vars"
-!        write(*,*) "M = ", M, " of ", NumOfLeafZenithSectors
         OMEGY=CosineLeafAngle(M)*YSIN(N)+SineLeafAngle(M)*YCOS(N)*DAZI
         OMEGA(N,M,L)=ABS(OMEGY)
         OMEGX(N,M,L)=OMEGA(N,M,L)/YSIN(N)
@@ -73,7 +60,7 @@ module InitVegBGC
         ELSE
           ZAGL=YAGL-2.0_r8*(PICON+OMEGZ)
         ENDIF
-        IF(ZAGL.GT.0.0_r8.AND.ZAGL.LT.PICON)THEN
+        IF(ZAGL.GT.0.0_r8 .AND. ZAGL.LT.PICON)THEN
           iScatteringDiffus(N,M,L)=ibackward
         ELSE
           iScatteringDiffus(N,M,L)=iforward

@@ -510,7 +510,6 @@ module NoduleBGCMod
           CCC=AZMAX1(AMIN1(1.0_r8 &
             ,safe_adb(NodulNonstElmConc(ielmn),NodulNonstElmConc(ielmn)+NodulNonstElmConc(ielmc)*CNKI) &
             ,safe_adb(NodulNonstElmConc(ielmp),NodulNonstElmConc(ielmp)+NodulNonstElmConc(ielmc)*CPKI)))
-!          if(curday==73)write(*,*)NodulNonstElmConc(ielmc),NodulNonstElmConc(ielmc),NodulNonstElmConc(ielmn),CNKI
           CNC=AZMAX1(AMIN1(1.0_r8,safe_adb(NodulNonstElmConc(ielmc),NodulNonstElmConc(ielmc)+NodulNonstElmConc(ielmn)/CNKI)))
           CPC=AZMAX1(AMIN1(1.0_r8,safe_adb(NodulNonstElmConc(ielmc),NodulNonstElmConc(ielmc)+NodulNonstElmConc(ielmp)/CPKI)))
         ELSE

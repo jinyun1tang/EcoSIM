@@ -545,11 +545,7 @@ module grosubsMod
   ELSE
     !others
     Stomata_Activity=EXP(RCS(NZ)*PSICanopyTurg_pft(NZ))
-    if(NZ==1)THEN
-    WRITE(401,*)I+J/24.,Stomata_Activity,RCS(NZ),PSICanopyTurg_pft(NZ)
-    ELSE
-    WRITE(402,*)I+J/24.,Stomata_Activity,RCS(NZ),PSICanopyTurg_pft(NZ)
-    ENDIF
+
     WFNG=EXP(0.10_r8*PSICanopy_pft(NZ))
     WFNSG=WFNS**0.25_r8
   ENDIF

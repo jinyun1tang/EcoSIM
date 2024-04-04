@@ -179,9 +179,6 @@ implicit none
                     ENDIF
                   ENDDO D225
                   
-!                write(177,*)NZ,RadPAR_zsec(N,M,L,NZ),VL,VL*LeafAUnshaded_zsec(N,L,K,NB,NZ),TAU_DirRadTransm(L+1)
-
-!
 !               ACCUMULATE C3 FIXATION PRODUCT IN MESOPHYLL
 !
 !               CH2O3=total C3 CO2 fixation
@@ -441,7 +438,7 @@ implicit none
     LeafAreaNode_brch         =>  plt_morph%LeafAreaNode_brch        , &
     RubiscoActivity_brch      =>  plt_photo%RubiscoActivity_brch       &
   )
-!  write(193,*)'rubisco',NB,NZ,RubiscoActivity_brch(NB,NZ)
+
   CH2OClm=0._r8;CH2OLlm=0._r8
   IF(abs(RubiscoActivity_brch(NB,NZ)).GT.0._r8)THEN    
     IF(SineSunInclAngle_col.GT.0.0_r8 .AND. RadPARbyCanopy_pft(NZ).GT.0.0_r8 &
@@ -454,7 +451,7 @@ implicit none
         D100: DO K=1,MaxNodesPerBranch1
           CH2O3(K)=0._r8
           CH2O4(K)=0._r8
-!          write(192,*)'leafarea',K,NB,NZ,LeafAreaNode_brch(K,NB,NZ)
+
           IF(LeafAreaNode_brch(K,NB,NZ).GT.ZEROP(NZ))THEN
 !
 !             C4 PHOTOSYNTHESIS
@@ -468,7 +465,6 @@ implicit none
               CALL ComputeGPP_C4(K,NB,NZ,WFNG,Stomata_Activity,CH2O3(K),CH2O4(K))
               CO2F=CO2F+CH2O4(K)
               CH2O=CH2O+CH2O3(K)
-!              write(192,*)'ComputeGPP_C4',K,NB,NZ,CH2O3(K),CH2O4(K)
               
 !
 !               C3 PHOTOSYNTHESIS
@@ -479,7 +475,7 @@ implicit none
               CH2O=CH2O+CH2O3(K)
               CH2OClm=CH2OClm+CH2OClmK
               CH2OLlm=CH2OLlm+CH2OLlmK
-!              write(191,*)'ComputeGPP_C3',K,NB,NZ,CH2O3(K)
+
             ENDIF
           ENDIF
         ENDDO D100

@@ -366,7 +366,6 @@ module RootGasMod
               RDFOXP=0.0_r8
             ENDIF
           ENDIF
-!          write(106,*)'oxyflx2root',I,RDFOXS,RootOxyUptakePerPlant
 !
 !     MASS FLOW + DIFFUSIVE EXCHANGE OF OTHER GASES
 !     BETWEEN ROOT AND SOIL, CONSTRAINED BY COMPETITION
@@ -448,11 +447,6 @@ module RootGasMod
           ELSE
             RUPSolute(idg_beg:idg_end)=0.0_r8
           ENDIF
-!          if(nz==1)then
-!          write(105,*)'RUPoxy',I,ROXYLX,RUPOSX,RDFOXP,'DIFOP=',DIFOP,PlantPopulation_pft(NZ)
-!          else
-!          write(106,*)'RUPoxy',I,ROXYLX,RUPOSX,RDFOXP,'DIFOP=',DIFOP,PlantPopulation_pft(NZ)
-!          endif
 !
 !     GAS EXCHANGE BETWEEN GASEOUS AND AQUEOUS PHASES IN SOIL
 !     DURING ROOT UPTAKE DEPENDING ON CONCENTRATION DIFFERENCES
@@ -477,7 +471,7 @@ module RootGasMod
             RUPOST=RUPOSX-ROXYLX
             RDFQSolute(idg_O2)=DiffusivitySolutEffP*(AMAX1(ZEROP(NZ),trc_gasml_loc(idg_O2))*VOLWSolute(idg_O2) &
               -(AMAX1(ZEROS,trc_solml_loc(idg_O2))-RUPOST)*VLsoiAirPMM)/(VOLWSolute(idg_O2)+VLsoiAirPMM)
-!            write(106,*)'RDFQSolute(idg_O2)',RDFQSolute(idg_O2)  
+
             IF(N.EQ.ipltroot)THEN
               DO NTG=idg_beg,idg_NH3-1
                 if(NTG/=idg_CO2.and.NTG/=idg_O2)then
@@ -578,12 +572,6 @@ module RootGasMod
               RUPGasSol_vr(NTG,N,L,NZ)=RUPGasSol_vr(NTG,N,L,NZ)+RUPSolute(NTG)
             endif  
           enddo
-
-!          if(NZ==1)then
-!          write(153,*)'RUPOXS=',N,L,RUPGasSol_vr(idg_O2,N,L,NZ)+RUPSolute(idg_O2)
-!          else
-!          write(154,*)'RUPOXS=',N,L,RUPGasSol_vr(idg_O2,N,L,NZ)+RUPSolute(idg_O2)          
-!          endif
 !
 !     ACCUMULATE ROOT-ATMOSPHERE GAS EXCHANGE TO HOURLY TIME SCALE
 !
@@ -607,11 +595,7 @@ module RootGasMod
           RCO2P_pvr(N,L,NZ)=RCO2P_pvr(N,L,NZ)+RCO2PX+RUPSolute(idg_CO2)
           RUPOXP(N,L,NZ)=RUPOXP(N,L,NZ)-RUPSolute(idg_O2)
           ROXSK(M,L)=ROXSK(M,L)+RUPOSX
-!          if(NZ==1)then
-!          write(105,*)'RUPOXP',I,N,L,RUPOXP(N,L,NZ),-RUPSolute(idg_O2),'rupoxs=',RUPGasSol_vr(idg_O2,N,L,NZ)
-!          else
-!          write(106,*)'RUPOXP',I,N,L,RUPOXP(N,L,NZ),-RUPSolute(idg_O2),'rupoxs=',RUPGasSol_vr(idg_O2,N,L,NZ)          
-!          endif
+
         ENDDO D90
       ENDIF
     ENDDO D99
@@ -626,13 +610,7 @@ module RootGasMod
 !
     PopPlantO2Uptake_vr=RUPOXP(N,L,NZ)+RUPGasSol_vr(idg_O2,N,L,NZ)
     RAutoRootO2Limter_pvr(N,L,NZ)=AMIN1(1.0_r8,AZMAX1(PopPlantO2Uptake_vr/ROXYP(N,L,NZ)))
-!    if(NZ==1)THEN
-!      write(135,*)'PopPlantO2Uptake_vr=',I,RAutoRootO2Limter_pvr(N,L,NZ),&
-!        RUPOXP(N,L,NZ),RUPGasSol_vr(idg_O2,N,L,NZ)
-!    ELSE
-!      write(136,*)'PopPlantO2Uptake_vr=',I,RAutoRootO2Limter_pvr(N,L,NZ),&
-!        RUPOXP(N,L,NZ),RUPGasSol_vr(idg_O2,N,L,NZ)
-!    ENDIF  
+
   ELSE
     PopPlantO2Uptake_vr=0.0_r8
     IF(L.GT.NGTopRootLayer_pft(NZ))THEN

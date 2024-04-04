@@ -323,11 +323,6 @@ module HfuncsMod
           ENDIF
         ENDIF
       ENDIF
-      IF(NZ==1)THEN
-      write(301,*)'root_shoot_branching',I+J/24.,BranchNumber_pft(NZ),NumOfBranches_pft(NZ)
-      ELSE
-      write(302,*)'root_shoot_branching',I+J/24.,BranchNumber_pft(NZ),NumOfBranches_pft(NZ)
-      ENDIF
 !
 !     ADD AXIS TO ROOT IF PLANT GROWTH STAGE, ROOT NON-STRUCTURAL C
 !     CONCENTRATION PERMIT
@@ -492,15 +487,7 @@ module HfuncsMod
     IF(CanopyChk .AND. RootChk)THEN
       iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ)=I
       VHeatCapCanP(NZ)=cpw*(ShootStrutElms_pft(ielmc,NZ)*10.0E-06_r8+WatByPCanopy(NZ))
-!      write(101,*)'emergence',etimer%get_curr_yearAD(),I,MainBranchNum_pft(NZ),NZ
     ENDIF
-  ENDIF
-  if(NZ==1)THEN
-    WRITE(213,'(I3,4(X,F14.6),X,I6)')NB,I+J/24.,ShootArea,Root1stDepz_pft(ipltroot,1,NZ),SeedDepth_pft(NZ)+ppmc &
-      ,iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ)
-  ELSE
-    WRITE(214,'(I3,4(X,F14.6),X,I6)')NB,I+J/24.,ShootArea,Root1stDepz_pft(ipltroot,1,NZ),SeedDepth_pft(NZ)+ppmc &
-      ,iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ)  
   ENDIF
   end associate
   end subroutine stage_plant_phenology
@@ -848,13 +835,6 @@ module HfuncsMod
     doInitLeafOut_brch(NB,NZ)=iDisable
     doPlantLeafOut_brch(NB,NZ)=iEnable
     Hours4Leafout_brch(NB,NZ)=0.5_r8*Hours4Leafout_brch(MainBranchNum_pft(NZ),NZ)
-  ENDIF
-  IF(NZ==1)THEN
-  WRITE(303,*)NB,I+J/24.,iPlantCalendar_brch(ipltcal_Emerge,NB,NZ) &
-    ,iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ)
-  ELSE
-  WRITE(304,*)NB,I+J/24.,iPlantCalendar_brch(ipltcal_Emerge,NB,NZ) &
-    ,iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ)  
   ENDIF
 !
 ! CALCULATE NODE INITIATION AND LEAF APPEARANCE RATES

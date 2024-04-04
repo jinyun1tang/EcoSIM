@@ -16,8 +16,8 @@
   real(r8), PARAMETER :: CURV4=4.0_r8*CURV
   real(r8), PARAMETER :: ELEC3=4.5_r8       !e- requirement for CO2 fixed by rubisco (umol e- umol CO2)
   real(r8), PARAMETER :: ELEC4=3.0_r8       !e- requirement for CO2 fixed by PEP carboxylase (umol e- umol CO2)
-  real(r8), PARAMETER :: CNKI=1.0E+03_r8    !nonstruct N inhibition constant on rubisco (g N g-1 C),1.0E+02_r8
-  real(r8), PARAMETER :: CPKI=1.0E+04_r8    !nonstruct P inhibition constant on rubisco (g P g-1 C),1.0E+03_r8
+  real(r8), PARAMETER :: CNKI=1.0E+02_r8    !nonstruct N inhibition constant on rubisco (g N g-1 C),1.0E+02_r8
+  real(r8), PARAMETER :: CPKI=1.0E+03_r8    !nonstruct P inhibition constant on rubisco (g P g-1 C),1.0E+03_r8
   real(r8), PARAMETER :: RSMY=2.78E-03_r8   !minimum stomatal resistance for CO2 uptake (h m-1)
   real(r8), PARAMETER :: ATRPZ=276.9_r8     !hours to full dehardening of conifers in spring (h)
   real(r8), PARAMETER :: COMP4=0.5_r8       !C4 CO2 compensation point (uM)
@@ -562,13 +562,7 @@
     ELSE
       ProteinPerLeafArea=0.0_r8
     ENDIF
-!    if(LeafAreaNode_brch(K,NB,NZ)>0._r8)then
-!    if(NZ==1)then    
-!    write(185,*)K,NB,ProteinPerLeafArea,LeafAreaNode_brch(K,NB,NZ)
-!    else
-!    write(186,*)K,NB,ProteinPerLeafArea,LeafAreaNode_brch(K,NB,NZ)
-!    endif
-!    endif
+
     IF(ProteinPerLeafArea.GT.ZERO)THEN
 !
 !     iPlantPhotosynthesisType=photosynthesis type:3=C3,4=C4 from PFT file

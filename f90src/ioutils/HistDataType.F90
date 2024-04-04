@@ -1260,7 +1260,8 @@ implicit none
 
   data1d_ptr => this%h1D_WTR_STRESS_ptc(beg_ptc:end_ptc)    !HoursCanopyPSITooLow_pft(NZ,NY,NX)
   call hist_addfld1d(fname='WTR_STRESS',units='hr',avgflag='A',&
-    long_name='canopy plant water stress indicator: number of hours PSICanopy_pft(< PSILY',ptr_patch=data1d_ptr)      
+    long_name='canopy plant water stress indicator: number of ' &
+    //'hours PSICanopy_pft(< PSILY',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_OXY_STRESS_ptc(beg_ptc:end_ptc)    !OSTR(NZ,NY,NX)
   call hist_addfld1d(fname='OXY_STRESS',units='none',avgflag='A',&
