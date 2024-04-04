@@ -189,9 +189,9 @@ implicit none
   real(r8),pointer   :: h1D_ROOT_NONSTN_ptc(:)
   real(r8),pointer   :: h1D_ROOT_NONSTP_ptc(:)
   real(r8),pointer   :: h1D_ROOT_C_ptc(:)        !RootElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_ROOTST_C_pct(:)     
-  real(r8),pointer   :: h1D_ROOTST_N_pct(:) 
-  real(r8),pointer   :: h1D_ROOTST_P_pct(:)   
+  real(r8),pointer   :: h1D_ROOTST_C_ptc(:)     
+  real(r8),pointer   :: h1D_ROOTST_N_ptc(:) 
+  real(r8),pointer   :: h1D_ROOTST_P_ptc(:)   
   real(r8),pointer   :: h1D_NODULE_C_ptc(:)      !NodulStrutElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), nodule
   real(r8),pointer   :: h1D_STORED_C_ptc(:)      !NonStrutElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_GRAIN_NO_ptc(:)      !CanopySeedNum_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)

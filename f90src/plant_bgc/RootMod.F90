@@ -165,7 +165,7 @@ implicit none
     trcg_rootml_pvr               =>   plt_rbgc%trcg_rootml_pvr               , &
     trcs_rootml_pvr               =>   plt_rbgc%trcs_rootml_pvr               , &
     SoilResit4RootPentrate_vr     =>   plt_soilchem%SoilResit4RootPentrate_vr , &
-    VLSoilPoreMicP_vr                =>   plt_soilchem%VLSoilPoreMicP_vr            , &    
+    VLSoilPoreMicP_vr             =>   plt_soilchem%VLSoilPoreMicP_vr         , &    
     NU                            =>   plt_site%NU                            , &
     ZERO                          =>   plt_site%ZERO                          , &
     PlantPopulation_pft           =>   plt_site%PlantPopulation_pft           , &
@@ -441,8 +441,8 @@ implicit none
     rCNNonstructRemob_pft           =>  plt_allom%rCNNonstructRemob_pft        , &
     rCPNonstructRemob_pft           =>  plt_allom%rCPNonstructRemob_pft        , &
     FWODRE                          =>  plt_allom%FWODRE                       , &
-    CNRTS_pft                           =>  plt_allom%CNRTS_pft                        , &
-    CPRTS_pft                           =>  plt_allom%CPRTS_pft                        , &
+    CNRTS_pft                       =>  plt_allom%CNRTS_pft                    , &
+    CPRTS_pft                       =>  plt_allom%CPRTS_pft                    , &
     RootBiomGrosYld_pft             =>  plt_allom%RootBiomGrosYld_pft          , &
     k_woody_litr                    =>  pltpar%k_woody_litr                    , &
     k_fine_litr                     =>  pltpar%k_fine_litr                     , &
@@ -2136,20 +2136,13 @@ implicit none
         DO NE=1,NumPlantChemElms
           RootMycoNonstElms_rpvr(NE,N,L,NZ)=RootMycoNonstElms_rpvr(NE,N,L,NZ)-XFRE(NE)
           SeasonalNonstElms_pft(NE,NZ)=SeasonalNonstElms_pft(NE,NZ)+XFRE(NE)
-!          if(RootMycoNonstElms_rpvr(NE,N,L,NZ)<0._r8 .or. SeasonalNonstElms_pft(NE,NZ)<0._r8)then
-!            write(*,*)'1871RootMycoNonstElms_rpvr(NE,N,L,NZ)',NE,N,RootMycoNonstElms_rpvr(NE,N,L,NZ)+XFRE(NE),&
-!              SeasonalNonstElms_pft(NE,NZ)-XFRE(NE),XFRE(NE)
-!            stop
-!          endif
+
         ENDDO
       ENDDO D5550      
     ENDDO D5545
     DO NE=1,NumPlantChemElms
       mass_finale(NE)=sum(RootMycoNonstElms_rpvr(NE,1:MY(NZ),NU:MaxSoiL4Root(NZ),NZ))+SeasonalNonstElms_pft(NE,NZ)
     ENDDO
-!    if(I>=154 .and. NZ==2)then
-!    write(124,*)'rootmycossnxfer',I+J/24.,(mass_finale(NE)-mass_inital(NE),NE=1,NumPlantChemElms)    
-!    endif
   ENDIF
 !!=============================================================================
 !     ROOT AND NODULE TOTALS
