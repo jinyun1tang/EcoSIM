@@ -56,7 +56,7 @@ macro(set_up_compilers)
      set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -std=gnu -fbounds-check -pedantic -finit-local-zero -cpp -O2 -fmax-stack-var-size=524288")
 
     endif()
-    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -DCPRGNU -fdefault-real-8")
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fdefault-real-8 -fdefault-double-8")
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -Wno-unused-variable -ffpe-trap=invalid")
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -Wno-unused-parameter -Wno-unused-function")
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -Wuninitialized -Wno-unused-dummy-argument")
