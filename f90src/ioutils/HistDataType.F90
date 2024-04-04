@@ -1138,6 +1138,30 @@ implicit none
   call hist_addfld1d(fname='SSTORED_C',units='gC/m2',avgflag='A',&
     long_name='plant seasonal storage of nonstructural C',ptr_patch=data1d_ptr)      
 
+  data1d_ptr => this%h1D_ROOT_NONSTC_ptc(beg_ptc:end_ptc)
+  call hist_addfld1d(fname='ROOT_NONSTC',units='gC/m2',avgflag='A',&
+    long_name='plant root storage of nonstructural C',ptr_patch=data1d_ptr)      
+
+  data1d_ptr => this%h1D_ROOT_NONSTN_ptc(beg_ptc:end_ptc)
+  call hist_addfld1d(fname='ROOT_NONSTN',units='gN/m2',avgflag='A',&
+    long_name='plant root storage of nonstructural N',ptr_patch=data1d_ptr)      
+
+  data1d_ptr => this%h1D_ROOT_NONSTP_ptc(beg_ptc:end_ptc)
+  call hist_addfld1d(fname='ROOT_NONSTP',units='gP/m2',avgflag='A',&
+    long_name='plant root storage of nonstructural P',ptr_patch=data1d_ptr)      
+
+  data1d_ptr => this%h1D_LEAF_NONSTC_ptc(beg_ptc:end_ptc)
+  call hist_addfld1d(fname='LEAF_NONSTC',units='gC/m2',avgflag='A',&
+    long_name='plant leaf storage of nonstructural C',ptr_patch=data1d_ptr)      
+
+  data1d_ptr => this%h1D_LEAF_NONSTN_ptc(beg_ptc:end_ptc)
+  call hist_addfld1d(fname='LEAF_NONSTN',units='gN/m2',avgflag='A',&
+    long_name='plant leaf storage of nonstructural N',ptr_patch=data1d_ptr)      
+
+  data1d_ptr => this%h1D_LEAF_NONSTP_ptc(beg_ptc:end_ptc)
+  call hist_addfld1d(fname='LEAF_NONSTP',units='gP/m2',avgflag='A',&
+    long_name='plant leaf storage of nonstructural P',ptr_patch=data1d_ptr)      
+
   data1d_ptr => this%h1D_GRAIN_NO_ptc(beg_ptc:end_ptc) 
   call hist_addfld1d(fname='GRAIN_NO',units='1/m2',avgflag='A',&
     long_name='canopy grain number',ptr_patch=data1d_ptr)      
@@ -1646,61 +1670,61 @@ implicit none
 
       DO NZ=1,NP0(NY,NX)
         nptc=get_pft(NZ,NY,NX)
-        this%h1D_ROOT_NONSTC_ptc(nptc)  = RootMycoNonstElms_pft(ielmc,ipltroot,NZ,NY,NX)
-        this%h1D_ROOT_NONSTN_ptc(nptc)  = RootMycoNonstElms_pft(ielmn,ipltroot,NZ,NY,NX)
-        this%h1D_ROOT_NONSTP_ptc(nptc)  = RootMycoNonstElms_pft(ielmp,ipltroot,NZ,NY,NX)                
-        this%h1D_LEAF_NONSTC_ptc(nptc)  =CanopyNonstElms_pft(ielmc,NZ,NY,NX)
-        this%h1D_LEAF_NONSTN_ptc(nptc)  =CanopyNonstElms_pft(ielmn,NZ,NY,NX)
-        this%h1D_LEAF_NONSTP_ptc(nptc)  =CanopyNonstElms_pft(ielmp,NZ,NY,NX)
-        this%h1D_CAN_TEMPK_ptc(nptc)    = TKCanopy_pft(NZ,NY,NX)
-        this%h1D_MIN_LWP_ptc(nptc)      = PSICanPDailyMin(NZ,NY,NX)
-        this%h1D_LEAF_PC_ptc(nptc)      = safe_adb(LeafStrutElms_pft(ielmp,NZ,NY,NX)+CanopyNonstElms_pft(ielmp,NZ,NY,NX), &
+        this%h1D_ROOT_NONSTC_ptc(nptc)   = RootMycoNonstElms_pft(ielmc,ipltroot,NZ,NY,NX)
+        this%h1D_ROOT_NONSTN_ptc(nptc)   = RootMycoNonstElms_pft(ielmn,ipltroot,NZ,NY,NX)
+        this%h1D_ROOT_NONSTP_ptc(nptc)   = RootMycoNonstElms_pft(ielmp,ipltroot,NZ,NY,NX)                
+        this%h1D_LEAF_NONSTC_ptc(nptc)   = CanopyNonstElms_pft(ielmc,NZ,NY,NX)
+        this%h1D_LEAF_NONSTN_ptc(nptc)   = CanopyNonstElms_pft(ielmn,NZ,NY,NX)
+        this%h1D_LEAF_NONSTP_ptc(nptc)   = CanopyNonstElms_pft(ielmp,NZ,NY,NX)
+        this%h1D_CAN_TEMPK_ptc(nptc)     = TKCanopy_pft(NZ,NY,NX)
+        this%h1D_MIN_LWP_ptc(nptc)       = PSICanPDailyMin(NZ,NY,NX)
+        this%h1D_LEAF_PC_ptc(nptc)       = safe_adb(LeafStrutElms_pft(ielmp,NZ,NY,NX)+CanopyNonstElms_pft(ielmp,NZ,NY,NX), &
                                                  LeafStrutElms_pft(ielmc,NZ,NY,NX)+CanopyNonstElms_pft(ielmc,NZ,NY,NX))
-        this%h1D_CAN_RN_ptc(nptc)       = MJ2W*RadNet2Canopy_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_CAN_LE_ptc(nptc)       = MJ2W*EvapTransHeat_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_CAN_H_ptc(nptc)        = MJ2W*HeatXAir2PCan(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_CAN_G_ptc(nptc)        = MJ2W*HeatStorCanP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_CAN_RN_ptc(nptc)        = MJ2W*RadNet2Canopy_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_CAN_LE_ptc(nptc)        = MJ2W*EvapTransHeat_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_CAN_H_ptc(nptc)         = MJ2W*HeatXAir2PCan(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_CAN_G_ptc(nptc)         = MJ2W*HeatStorCanP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_CAN_TEMPC_ptc(nptc)     = TCelciusCanopy_pft(NZ,NY,NX)
-        this%h1D_CAN_TEMPFN_ptc(nptc)   = fTgrowCanP(NZ,NY,NX)
-        this%h1D_CAN_CO2_FLX_ptc(nptc)  = CO2NetFix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*gC1hour2umol1sec
-        this%h1D_CAN_GPP_ptc(nptc)      = GrossCO2Fix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_CAN_RA_ptc(nptc)       = CanopyRespC_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_cTNC_ptc(nptc)         = CanopyNonstElmConc_pft(ielmc,NZ,NY,NX)
-        this%h1D_cTNN_ptc(nptc)         = CanopyNonstElmConc_pft(ielmn,NZ,NY,NX)
-        this%h1D_cTNP_ptc(nptc)         = CanopyNonstElmConc_pft(ielmp,NZ,NY,NX)
-        this%h1D_STOML_RSC_CO2_ptc(nptc)= CanPStomaResistH2O_pft(NZ,NY,NX)*1.56_r8*secs1hour
-        this%h1D_BLYR_RSC_CO2_ptc(nptc) = CanopyBndlResist_pft(NZ,NY,NX)*1.34_r8*secs1hour
-        this%h1D_CAN_CO2_ptc(nptc)      = CanopyGasCO2_pft(NZ,NY,NX)
-        this%h1D_LAI_ptc(nptc)          = LeafStalkArea_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_PSI_CAN_ptc(nptc)      = PSICanopy_pft(NZ,NY,NX)
-        this%h1D_TURG_CAN_ptc(nptc)     = PSICanopyTurg_pft(NZ,NY,NX)
-        this%h1D_STOM_RSC_H2O_ptc(nptc) = CanPStomaResistH2O_pft(NZ,NY,NX)*secs1hour
-        this%h1D_BLYR_RSC_H2O_ptc(nptc) = CanopyBndlResist_pft(NZ,NY,NX)*secs1hour
-        this%h1D_TRANSPN_ptc(nptc)      = Transpiration_pft(NZ,NY,NX)*m2mm/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_NH4_UPTK_FLX_ptc(nptc) = RootNH4Uptake_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_NO3_UPTK_FLX_ptc(nptc) = RootNO3Uptake_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_N2_FIXN_FLX_ptc(nptc)  = RootN2Fix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_CAN_TEMPFN_ptc(nptc)    = fTgrowCanP(NZ,NY,NX)
+        this%h1D_CAN_CO2_FLX_ptc(nptc)   = CO2NetFix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*gC1hour2umol1sec
+        this%h1D_CAN_GPP_ptc(nptc)       = GrossCO2Fix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_CAN_RA_ptc(nptc)        = CanopyRespC_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_cTNC_ptc(nptc)          = CanopyNonstElmConc_pft(ielmc,NZ,NY,NX)
+        this%h1D_cTNN_ptc(nptc)          = CanopyNonstElmConc_pft(ielmn,NZ,NY,NX)
+        this%h1D_cTNP_ptc(nptc)          = CanopyNonstElmConc_pft(ielmp,NZ,NY,NX)
+        this%h1D_STOML_RSC_CO2_ptc(nptc) = CanPStomaResistH2O_pft(NZ,NY,NX)*1.56_r8*secs1hour
+        this%h1D_BLYR_RSC_CO2_ptc(nptc)  = CanopyBndlResist_pft(NZ,NY,NX)*1.34_r8*secs1hour
+        this%h1D_CAN_CO2_ptc(nptc)       = CanopyGasCO2_pft(NZ,NY,NX)
+        this%h1D_LAI_ptc(nptc)           = LeafStalkArea_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_PSI_CAN_ptc(nptc)       = PSICanopy_pft(NZ,NY,NX)
+        this%h1D_TURG_CAN_ptc(nptc)      = PSICanopyTurg_pft(NZ,NY,NX)
+        this%h1D_STOM_RSC_H2O_ptc(nptc)  = CanPStomaResistH2O_pft(NZ,NY,NX)*secs1hour
+        this%h1D_BLYR_RSC_H2O_ptc(nptc)  = CanopyBndlResist_pft(NZ,NY,NX)*secs1hour
+        this%h1D_TRANSPN_ptc(nptc)       = Transpiration_pft(NZ,NY,NX)*m2mm/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_NH4_UPTK_FLX_ptc(nptc)  = RootNH4Uptake_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_NO3_UPTK_FLX_ptc(nptc)  = RootNO3Uptake_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_N2_FIXN_FLX_ptc(nptc)   = RootN2Fix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_cNH3_FLX_ptc(nptc)      = NH3Dep2Can_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_PO4_UPTK_FLX_ptc(nptc)  = RootH2PO4Uptake_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_frcPARabs_ptc(nptc)     = FracRadPARbyCanopy_pft(NZ,NY,NX)
-        this%h1D_PAR_CAN_ptc(nptc)   = RadPARbyCanopy_pft(NZ,NY,NX)   !umol /m2/s        
+        this%h1D_PAR_CAN_ptc(nptc)       = RadPARbyCanopy_pft(NZ,NY,NX)   !umol /m2/s        
 
-        this%h1D_SHOOT_C_ptc(nptc)      = ShootStrutElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_Plant_C_ptc(nptc)      = (ShootStrutElms_pft(ielmc,NZ,NY,NX) &
+        this%h1D_SHOOT_C_ptc(nptc)       = ShootStrutElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_Plant_C_ptc(nptc)       = (ShootStrutElms_pft(ielmc,NZ,NY,NX) &
           +RootElms_pft(ielmc,NZ,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_LEAF_C_ptc(nptc)       = LeafStrutElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_Petole_C_ptc(nptc)       = PetioleStrutElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_STALK_C_ptc(nptc)      = StalkStrutElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_RESERVE_C_ptc(nptc)    = StalkRsrvElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_LEAF_C_ptc(nptc)        = LeafStrutElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_Petole_C_ptc(nptc)      = PetioleStrutElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_STALK_C_ptc(nptc)       = StalkStrutElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_RESERVE_C_ptc(nptc)     = StalkRsrvElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
 
-        this%h1D_HUSK_C_ptc(nptc)       = (HuskStrutElms_pft(ielmc,NZ,NY,NX) &
+        this%h1D_HUSK_C_ptc(nptc)        = (HuskStrutElms_pft(ielmc,NZ,NY,NX) &
           +EarStrutElms_pft(ielmc,NZ,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_GRAIN_C_ptc(nptc)      = GrainStrutElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_ROOT_C_ptc(nptc)       = RootElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_NODULE_C_ptc(nptc)        = NodulStrutElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_STORED_C_ptc(nptc)     = SeasonalNonstElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_GRAIN_NO_ptc(nptc)     = CanopySeedNum_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_LAIb_ptc(nptc)         = CanopyLeafArea_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_GRAIN_C_ptc(nptc)       = GrainStrutElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_ROOT_C_ptc(nptc)        = RootElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_NODULE_C_ptc(nptc)      = NodulStrutElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_STORED_C_ptc(nptc)      = SeasonalNonstElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_GRAIN_NO_ptc(nptc)      = CanopySeedNum_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_LAIb_ptc(nptc)          = CanopyLeafArea_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_EXUD_C_FLX_ptc(nptc)       = PlantExudChemElmCum_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_LITRf_C_FLX_ptc(nptc)      = LitrfalStrutElmsCum_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_SURF_LITRf_C_FLX_ptc(nptc) = SurfLitrfalStrutElmsCum_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
