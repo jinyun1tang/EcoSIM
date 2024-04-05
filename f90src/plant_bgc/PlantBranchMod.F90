@@ -32,7 +32,7 @@ module PlantBranchMod
 !------------------------------------------------------------------------------------------
 
   subroutine GrowOneBranch(I,J,NB,NZ,TFN6_vr,CanopyHeight_copy,CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW,TFN5,WFNG,&
-    Stomata_Activity,WFNS,WFNSG,PTRT,CanopyN2Fix_pft,BegRemoblize)
+    Stomata_Stress,WFNS,WFNSG,PTRT,CanopyN2Fix_pft,BegRemoblize)
   implicit none
   integer, intent(in)  :: I,J,NB,NZ
   REAL(R8), INTENT(IN) :: TFN6_vr(JZ1)
@@ -41,7 +41,7 @@ module PlantBranchMod
   real(r8), intent(in) :: CNSHW,CPSHW
   real(r8), intent(in) :: CNRTW,CPRTW
   real(r8), intent(in) :: TFN5,WFNG
-  real(r8), intent(in) :: Stomata_Activity
+  real(r8), intent(in) :: Stomata_Stress
   real(r8), intent(in) :: WFNS,WFNSG
   real(r8), intent(inout) :: CanopyN2Fix_pft(JP1)
   real(r8), intent(out) :: PTRT
@@ -106,7 +106,7 @@ module PlantBranchMod
 !   GROSS PRIMARY PRODUCTIVITY
 !
     call UpdatePhotosynthates(I,J,NB,NZ,TFN6_vr,DMSHD,CNLFM,CPLFM,CNSHX,CPSHX &
-      ,CNLFX,CPLFX,ShootStructE,TFN5,WFNG,Stomata_Activity,WFNSG,CH2O3,CH2O4,CNPG &
+      ,CNLFX,CPLFX,ShootStructE,TFN5,WFNG,Stomata_Stress,WFNSG,CH2O3,CH2O4,CNPG &
       ,RCO2NonstC_brch,RCO2Maint_brch,RMxess_brch,NonstC4Groth_brch,CNRDM,RCO2NonstC4Nassim_brch)
 !
 !
@@ -772,7 +772,7 @@ module PlantBranchMod
 !------------------------------------------------------------------------------------------
 
   subroutine UpdatePhotosynthates(I,J,NB,NZ,TFN6_vr,DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX,&
-    ShootStructE,TFN5,WFNG,Stomata_Activity,WFNSG,CH2O3,CH2O4,CNPG,RCO2NonstC_brch,RCO2Maint_brch,&
+    ShootStructE,TFN5,WFNG,Stomata_Stress,WFNSG,CH2O3,CH2O4,CNPG,RCO2NonstC_brch,RCO2Maint_brch,&
     RMxess_brch,NonstC4Groth_brch,CNRDM,RCO2NonstC4Nassim_brch)
   implicit none
   integer, intent(in) :: I,J,NB,NZ
@@ -780,7 +780,7 @@ module PlantBranchMod
   real(r8), intent(in) :: DMSHD
   real(r8), intent(in) :: CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX
   real(r8), intent(in) :: ShootStructE(NumPlantChemElms),TFN5,WFNG
-  real(r8), intent(in) :: Stomata_Activity,WFNSG
+  real(r8), intent(in) :: Stomata_Stress,WFNSG
   real(r8), intent(out) :: RCO2NonstC_brch
   real(r8), intent(out) :: RCO2Maint_brch
   real(r8), intent(out) :: CH2O3(pltpar%MaxNodesPerBranch1)
@@ -805,7 +805,7 @@ module PlantBranchMod
 !
   IF(iPlantCalendar_brch(ipltcal_Emerge,NB,NZ).NE.0)THEN
 !  
-    call ComputeGPP(NB,NZ,WFNG,Stomata_Activity,CH2O3,CH2O4,CH2O,CO2F,CH2OClm,CH2OLlm)
+    call ComputeGPP(NB,NZ,WFNG,Stomata_Stress,CH2O3,CH2O4,CH2O,CO2F,CH2OClm,CH2OLlm)
 
 !    CH2O=CH2O*50._r8;CO2F=CO2F*50._r8
 !   SHOOT AUTOTROPHIC RESPIRATION AFTER EMERGENCE
@@ -848,14 +848,14 @@ module PlantBranchMod
 !      ,'CH2OF','rubisco','stomactivty'
 !    endif
 !    write(101,'(F10.4,X,I3,6(X,F16.6))')I+J/24.,NB,NonstC4Groth_brch,CanopyNonstElms_brch(ielmc,NB,NZ)&
-!      ,dNonstCX, CO2F, RubiscoActivity_brch(NB,NZ),Stomata_Activity    
+!      ,dNonstCX, CO2F, RubiscoActivity_brch(NB,NZ),Stomata_Stress    
 !  ELSE
 !    if(ffirst(1))then
 !    write(102,'(A10,X,A3,6(X,A16))')'doy','brc','nonst4gro','canopynonst','NonstCX'&
 !      ,'CH2OF','rubisco','stomactivty'
 !    endif  
 !    write(102,'(F10.4,X,I3,6(X,F16.6))')I+J/24.,NB,NonstC4Groth_brch,CanopyNonstElms_brch(ielmc,NB,NZ)&
-!      ,dNonstCX, CO2F, RubiscoActivity_brch(NB,NZ),Stomata_Activity    
+!      ,dNonstCX, CO2F, RubiscoActivity_brch(NB,NZ),Stomata_Stress    
 !  ENDIF
   end associate
   end subroutine UpdatePhotosynthates

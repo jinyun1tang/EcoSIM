@@ -548,7 +548,7 @@ module UptakesMod
   real(r8) :: APSILT
   real(r8) :: CCPOLT
   real(r8) :: FTHRM,FDMR
-  real(r8) :: OSWT,Stomata_Activity
+  real(r8) :: OSWT,Stomata_Stress
 
   integer :: N,L
 ! begin_execution
@@ -608,9 +608,9 @@ module UptakesMod
       CALL update_osmo_turg_pressure(PSICanopy_pft(NZ),CCPOLT,OSMO(NZ),TKC(NZ) &
         ,PSICanopyOsmo_pft(NZ),PSICanopyTurg_pft(NZ),FDMP)
 
-      Stomata_Activity=EXP(RCS(NZ)*PSICanopyTurg_pft(NZ))
+      Stomata_Stress=EXP(RCS(NZ)*PSICanopyTurg_pft(NZ))
       CanPStomaResistH2O_pft(NZ)=MinCanPStomaResistH2O_pft(NZ) &
-        +(MaxCanPStomaResistH2O_pft(NZ)-MinCanPStomaResistH2O_pft(NZ))*Stomata_Activity
+        +(MaxCanPStomaResistH2O_pft(NZ)-MinCanPStomaResistH2O_pft(NZ))*Stomata_Stress
       CanopyBndlResist_pft(NZ)=RAZ(NZ)
       VHeatCapCanP(NZ)=cpw*(ShootStrutElms_pft(ielmc,NZ)*10.0E-06_r8)
       DTKC(NZ)=0.0_r8
@@ -658,7 +658,7 @@ module UptakesMod
   real(r8) :: cumPRootH2OUptakePre
   real(r8) :: cumRootHeatUptake
   real(r8) :: VOLWPX,VPC,SymplasmicWat
-  real(r8) :: XC,Stomata_Activity
+  real(r8) :: XC,Stomata_Stress
   real(r8) :: RichardsNO
   integer  :: IC,ICHK
   real(r8) :: DPSI_old
@@ -778,9 +778,9 @@ module UptakesMod
 !     MinCanPStomaResistH2O_pft=minimum CanPStomaResistH2O_pftat PSICanopy_pft=0 from stomate.f
 !     RSMX=cuticular resistance from PFT file
 !
-    Stomata_Activity=EXP(RCS(NZ)*PSICanopyTurg_pft(NZ))
+    Stomata_Stress=EXP(RCS(NZ)*PSICanopyTurg_pft(NZ))
 
-    CanPStomaResistH2O_pft(NZ)=MinCanPStomaResistH2O_pft(NZ)+Stomata_Activity &
+    CanPStomaResistH2O_pft(NZ)=MinCanPStomaResistH2O_pft(NZ)+Stomata_Stress &
       *(MaxCanPStomaResistH2O_pft(NZ)-MinCanPStomaResistH2O_pft(NZ))
 !
 !     CANOPY VAPOR PRESSURE AND EVAPORATION OF INTERCEPTED WATER
@@ -1155,7 +1155,7 @@ module UptakesMod
   real(r8) :: APSILT
   real(r8) :: CCPOLT
   real(r8) :: FTHRM,FDMR
-  real(r8) :: OSWT,Stomata_Activity
+  real(r8) :: OSWT,Stomata_Stress
 
 ! begin_execution
   associate(                         &
@@ -1220,9 +1220,9 @@ module UptakesMod
   call update_osmo_turg_pressure(PSICanopy_pft(NZ),CCPOLT,OSMO(NZ),TKC(NZ)&
     ,PSICanopyOsmo_pft(NZ),PSICanopyTurg_pft(NZ),FDMP)
 
-  Stomata_Activity=EXP(RCS(NZ)*PSICanopyTurg_pft(NZ))
+  Stomata_Stress=EXP(RCS(NZ)*PSICanopyTurg_pft(NZ))
   CanPStomaResistH2O_pft(NZ)=MinCanPStomaResistH2O_pft(NZ) &
-    +(MaxCanPStomaResistH2O_pft(NZ)-MinCanPStomaResistH2O_pft(NZ))*Stomata_Activity
+    +(MaxCanPStomaResistH2O_pft(NZ)-MinCanPStomaResistH2O_pft(NZ))*Stomata_Stress
   CanopyBndlResist_pft(NZ)=RAZ(NZ)
   VHeatCapCanP(NZ)=cpw*(ShootStrutElms_pft(ielmc,NZ)*10.0E-06_r8)
   DTKC(NZ)=0.0_r8

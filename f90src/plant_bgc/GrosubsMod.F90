@@ -313,7 +313,7 @@ module grosubsMod
   real(r8) :: RootPrimeAxsNum
   real(r8) :: TFN5
   real(r8) :: WFNG
-  real(r8) :: Stomata_Activity
+  real(r8) :: Stomata_Stress
   real(r8) :: WFNS,WFNSG
 ! begin_execution
   associate(                                                            &
@@ -337,7 +337,7 @@ module grosubsMod
 !    call SumPlantBiom(I,J,NZ,'bfstageplant')
     
     call StagePlantForGrowth(I,J,NZ,TFN6_vr,CNLFW,CPLFW,&
-      CNSHW,CPSHW,CNRTW,CPRTW,RootPrimeAxsNum,TFN5,WFNG,Stomata_Activity,WFNS,WFNSG)
+      CNSHW,CPSHW,CNRTW,CPRTW,RootPrimeAxsNum,TFN5,WFNG,Stomata_Stress,WFNS,WFNSG)
 !
 !     CALCULATE GROWTH OF EACH BRANCH
 !
@@ -348,7 +348,7 @@ module grosubsMod
     
     DO  NB=1,NumOfBranches_pft(NZ)
       call GrowOneBranch(I,J,NB,NZ,TFN6_vr,CanopyHeight_copy,CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW,&
-        TFN5,WFNG,Stomata_Activity,WFNS,WFNSG,PTRT,CanopyN2Fix_pft,BegRemoblize)
+        TFN5,WFNG,Stomata_Stress,WFNS,WFNSG,PTRT,CanopyN2Fix_pft,BegRemoblize)
     ENDDO
 !
 !    call SumPlantBiom(I,J,NZ,'bfRootBGCM')
@@ -370,11 +370,11 @@ module grosubsMod
 
 !------------------------------------------------------------------------------------------
   subroutine StagePlantForGrowth(I,J,NZ,TFN6_vr,CNLFW,CPLFW,CNSHW,&
-    CPSHW,CNRTW,CPRTW,RootPrimeAxsNum,TFN5,WFNG,Stomata_Activity,WFNS,WFNSG)
+    CPSHW,CNRTW,CPRTW,RootPrimeAxsNum,TFN5,WFNG,Stomata_Stress,WFNS,WFNSG)
   integer, intent(in) :: I,J,NZ
   REAL(R8), INTENT(OUT):: TFN6_vr(JZ1)
   REAL(R8), INTENT(OUT) :: CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW
-  real(r8), intent(out) :: RootPrimeAxsNum,TFN5,WFNG,Stomata_Activity
+  real(r8), intent(out) :: RootPrimeAxsNum,TFN5,WFNG,Stomata_Stress
   real(r8), intent(out) :: WFNS,WFNSG
   integer :: L,NR,N,NE
   real(r8) :: ACTVM,RTK,STK,TKCM,TKSM
@@ -530,7 +530,7 @@ module grosubsMod
 !
 !     WFNS=turgor expansion,extension function
 !     PSICanopyTurg_pft,PSIMin4OrganExtens=current,minimum canopy turgor potl for expansion,extension
-!     Stomata_Activity=stomatal resistance function of canopy turgor
+!     Stomata_Stress=stomatal resistance function of canopy turgor
 !     PSICanopy_pft=canopy water potential
 !     WFNG=growth function of canopy water potential
 !     WFNSG=expansion,extension function of canopy water potential
@@ -539,12 +539,12 @@ module grosubsMod
 
   IF(is_root_shallow(iPlantRootProfile_pft(NZ)))THEN
     !bryophyte, no turgor
-    Stomata_Activity=1.0_r8
+    Stomata_Stress=1.0_r8
     WFNG=EXP(0.05_r8*PSICanopy_pft(NZ))
     WFNSG=WFNS**0.10_r8
   ELSE
     !others
-    Stomata_Activity=EXP(RCS(NZ)*PSICanopyTurg_pft(NZ))
+    Stomata_Stress=EXP(RCS(NZ)*PSICanopyTurg_pft(NZ))
 
     WFNG=EXP(0.10_r8*PSICanopy_pft(NZ))
     WFNSG=WFNS**0.25_r8
