@@ -210,7 +210,7 @@
   real(r8) :: VOGRO
 !     begin_execution
   associate(                                                                      & 
-    CanopyLeafArea_lpft       =>  plt_morph%CanopyLeafArea_lpft     , &
+    CanopyLeafArea_lpft             =>  plt_morph%CanopyLeafArea_lpft           , &
     ZEROP                           =>  plt_biom%ZEROP                          , &
     O2L                             =>  plt_photo%O2L                           , &
     aquCO2Intraleaf_pft             =>  plt_photo%aquCO2Intraleaf_pft           , &
@@ -304,7 +304,7 @@
   associate(                                                                       &
     LeafElmntNode_brch             =>  plt_biom%LeafElmntNode_brch               , &
     ZEROP                          =>  plt_biom%ZEROP                            , &
-    CanopyLeafArea_lpft      =>  plt_morph%CanopyLeafArea_lpft       , &
+    CanopyLeafArea_lpft            =>  plt_morph%CanopyLeafArea_lpft             , &
     C4PhotosynDowreg_brch          =>  plt_photo%C4PhotosynDowreg_brch           , &
     LeafC4ChlorofilConc_pft        =>  plt_photo%LeafC4ChlorofilConc_pft         , &
     O2L                            =>  plt_photo%O2L                             , &
@@ -458,10 +458,10 @@
   associate(                                               &
     LeafAUnshaded_zsec  => plt_photo%LeafAUnshaded_zsec  , &
     ZEROP               => plt_biom%ZEROP                , &
-    RadPAR_zsec      => plt_rad%RadPAR_zsec        , &
+    RadPAR_zsec         => plt_rad%RadPAR_zsec           , &
     RadDifPAR_zsec      => plt_rad%RadDifPAR_zsec        , &
     TAU_RadThru         => plt_rad%TAU_RadThru           , &
-    TAU_DirRadTransm         => plt_rad%TAU_DirRadTransm             &
+    TAU_DirRadTransm    => plt_rad%TAU_DirRadTransm        &
     
   )
 !
@@ -590,6 +590,7 @@
   real(r8), intent(in) :: TFN_Carboxy,TFN_Oxy,TFN_eTransp,Km4RubOxy
   real(r8), intent(inout) :: CH2O  
   integer :: NE
+  real(r8) :: CNS,CPS
 !     begin_execution
   associate(                                                             &
     LeafPetoNonstElmConc_brch  =>  plt_biom%LeafPetoNonstElmConc_brch  , &
@@ -611,11 +612,11 @@
 !     CNKI,CPKI=nonstructural N,P inhibition constant on rubisco
 !
   IF(LeafPetoNonstElmConc_brch(ielmc,NB,NZ).GT.ZERO)THEN
-    RubiscoActivity_brch(NB,NZ)=AMIN1(LeafPetoNonstElmConc_brch(ielmn,NB,NZ) &
-      /(LeafPetoNonstElmConc_brch(ielmn,NB,NZ)&
-      +LeafPetoNonstElmConc_brch(ielmc,NB,NZ)*CNKI) &
-      ,LeafPetoNonstElmConc_brch(ielmp,NB,NZ)/(LeafPetoNonstElmConc_brch(ielmp,NB,NZ)&
-      +LeafPetoNonstElmConc_brch(ielmc,NB,NZ)*CPKI))
+    CNS=LeafPetoNonstElmConc_brch(ielmn,NB,NZ)/(LeafPetoNonstElmConc_brch(ielmn,NB,NZ)&
+      +LeafPetoNonstElmConc_brch(ielmc,NB,NZ)*CNKI)
+    CPS=LeafPetoNonstElmConc_brch(ielmp,NB,NZ)/(LeafPetoNonstElmConc_brch(ielmp,NB,NZ)&
+      +LeafPetoNonstElmConc_brch(ielmc,NB,NZ)*CPKI)
+    RubiscoActivity_brch(NB,NZ)=AMIN1(CNS,CPS)
   ELSE
     RubiscoActivity_brch(NB,NZ)=1.0_r8
   ENDIF

@@ -880,6 +880,13 @@ module HfuncsMod
 !
 !   PSTG,NumOfLeaves_brch=number of nodes initiated,leaves appeared
 !
+!    IF(NZ==1)THEN
+!    WRITE(105,*)NB,I+J/24.,ShootNodeNum_brch(NB,NZ),NodeInitRate &
+!      ,ShootNodeNum_brch(NB,NZ)+NodeInitRate
+!    ELSE
+!    WRITE(106,*)NB,I+J/24.,ShootNodeNum_brch(NB,NZ),NodeInitRate &
+!      ,ShootNodeNum_brch(NB,NZ)+NodeInitRate
+!    ENDIF
     ShootNodeNum_brch(NB,NZ)=ShootNodeNum_brch(NB,NZ)+NodeInitRate
     NumOfLeaves_brch(NB,NZ)=NumOfLeaves_brch(NB,NZ)+LeafAppearRate
 !
@@ -937,6 +944,17 @@ module HfuncsMod
       (iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldecid.OR.iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldroutdecid)
     PhenoChk2=iPlantPhenolPattern_pft(NZ).EQ.iplt_annual.AND.iPlantPhenolType_pft(NZ).EQ.iphenotyp_evgreen
     
+!    if(NZ==1)THEN
+!      WRITE(103,*)'chk1',I+J/24.,ShootNodeNum_brch(NB,NZ) &
+!        , MatureGroup_brch(NB,NZ)+NodeNum2InitFloral_brch(NB,NZ) &
+!        , NodeNumChk,(LeafOutChk.OR.PlantDayChk) &
+!        ,(PhenoChk1.OR.PhenoChk2) .AND. CanHeightChk .AND. DayLenChk
+!    ELSE
+!      WRITE(104,*)'chk1',I+J/24.,ShootNodeNum_brch(NB,NZ) &
+!        , MatureGroup_brch(NB,NZ)+NodeNum2InitFloral_brch(NB,NZ) &
+!        , NodeNumChk,(LeafOutChk.OR.PlantDayChk) &
+!        ,(PhenoChk1.OR.PhenoChk2) .AND. CanHeightChk .AND. DayLenChk
+!    ENDIF
     IF((NodeNumChk .AND. (LeafOutChk.OR.PlantDayChk)) .OR. &
       ((PhenoChk1.OR.PhenoChk2) .AND. CanHeightChk .AND. DayLenChk))THEN
 !
@@ -954,14 +972,20 @@ module HfuncsMod
         PPD=0.0_r8
       ELSE
         PPD=AZMAX1(CriticPhotoPeriod_pft(NZ)-DayLenthCurrent)
-        IF(iPlantPhotoperiodType_pft(NZ).EQ.iphotop_short.AND.DayLenthCurrent.GE.DayLenthPrev)PPD=0.0_r8
+        IF(iPlantPhotoperiodType_pft(NZ).EQ.iphotop_short .AND. DayLenthCurrent.GE.DayLenthPrev)PPD=0.0_r8
       ENDIF
       
       PhotoPrdChk=iPlantPhotoperiodType_pft(NZ).EQ.iphotop_neutral &
-        .OR.(iPlantPhotoperiodType_pft(NZ).EQ.iphotop_short.AND.PPD.GT.PhotoPeriodSens_pft(NZ)) &
-        .OR.(iPlantPhotoperiodType_pft(NZ).EQ.iphotop_long .AND.PPD.LT.PhotoPeriodSens_pft(NZ))
-
-      IF( PhotoPrdChk .OR. ((PhenoChk1.OR.PhenoChk2).AND.CanHeightChk.AND.DayLenChk))THEN
+        .OR.(iPlantPhotoperiodType_pft(NZ).EQ.iphotop_short.AND. PPD.GT.PhotoPeriodSens_pft(NZ)) &
+        .OR.(iPlantPhotoperiodType_pft(NZ).EQ.iphotop_long .AND. PPD.LT.PhotoPeriodSens_pft(NZ))
+!      if(NZ==1)THEN
+!        WRITE(103,*)'chk2',I+J/24.,iPlantPhotoperiodType_pft(NZ).EQ.iphotop_long, PPD.LT.PhotoPeriodSens_pft(NZ),&
+!          PPD,PhotoPeriodSens_pft(NZ),PhotoPrdChk,(PhenoChk1.OR.PhenoChk2),CanHeightChk.AND.DayLenChk
+!      ELSE
+!        WRITE(104,*)'chk2',I+J/24.,iPlantPhotoperiodType_pft(NZ).EQ.iphotop_long, PPD.LT.PhotoPeriodSens_pft(NZ),&
+!          PPD,PhotoPeriodSens_pft(NZ),PhotoPrdChk,(PhenoChk1.OR.PhenoChk2),CanHeightChk.AND.DayLenChk
+!      ENDIF
+      IF( PhotoPrdChk.OR.((PhenoChk1.OR.PhenoChk2).AND.CanHeightChk.AND.DayLenChk))THEN
         iPlantCalendar_brch(ipltcal_InitFloral,NB,NZ)=I
         NodeNum2InitFloral_brch(NB,NZ)=ShootNodeNum_brch(NB,NZ)
         IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual.AND.iPlantDevelopPattern_pft(NZ).EQ.ideterminate)THEN
