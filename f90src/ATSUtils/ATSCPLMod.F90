@@ -2,6 +2,7 @@ module ATSCPLMod
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use SharedDataMod
   use ATSEcoSIMInitMod
+  use ATSEcoSIMAdvanceMod
   use BGCContainers_module
   implicit none
 
@@ -13,7 +14,6 @@ contains
 !------------------------------------------------------------------------------------------
 
   subroutine ATS2EcoSIMData(ncol, state, props, sizes)
-  !send data from ATS to ecosim
   implicit none
 
   ! BGC coupler variables
@@ -22,26 +22,98 @@ contains
   type (BGCSizes), intent(out) :: sizes
 
   ! Ecosim variables
-  real(r8), pointer :: data(:)
+  real(r8), pointer :: data(:), nested_ptr(:)
   real(r8), pointer :: data2D(:,:)
+  real(r8), pointer :: temp, temp_deref, double_deref
+  real(r8) :: real_deref
+  type(c_ptr), pointer :: cptr_temp, ptr1
+  real(r8), target :: target_val
+  real(r8), pointer :: ptr(:,:)
+  real(r8), pointer :: temp_array(:,:)
   integer :: ncol, nvar, size_col, num_cols
-  integer :: j1,j2,j3
+  integer :: j1,j2,j3,i,j
+  real(r8) :: temp_eq, double_eq
 
-  write(*,*) "In the driver...."
-
-  write(*,*) "Setting sizes"
   call SetBGCSizes(sizes)
-
-  !ncol=size(filter_col)
-
-  !1D vertical vector,
-  write(*,*) "computing column size"
 
   size_col = sizes%ncells_per_col_
   num_cols = props%shortwave_radiation%size
 
+  allocate(temp_array(size_col, num_cols))
+
+  write(*,*) "size_col: ", size_col
+  write(*,*) "num_cols: ", num_cols
+  
+  call c_f_pointer(props%depth%data, cptr_temp)
+  call c_f_pointer(cptr_temp,data2D,[(/size_col/),(/num_cols/)])
+  a_CumDepth2LayerBottom=data2D(:,:)
+
+  call c_f_pointer(state%water_content%data, cptr_temp)
+  call c_f_pointer(cptr_temp,data2D,[(/size_col/),(/num_cols/)])
+  a_WC=data2D(:,:)
+
+  call c_f_pointer(props%volume%data, cptr_temp)
+  call c_f_pointer(cptr_temp,data2D,[(/size_col/),(/num_cols/)])
+  a_AREA3=data2D(:,:)
+
+  !do i = 1, size_col
+  !   write(*,*) "a_WC = ", a_WC(i, 1) 
+  !end do
+
+  call c_f_pointer(state%temperature%data, cptr_temp)
+  call c_f_pointer(cptr_temp,data2D,[(/size_col/),(/num_cols/)])
+  a_TEMP=data2D(:,:)
+
+  !do i = 1, size_col
+  !   write(*,*) "a_TEMP = ", a_TEMP(i, 1)   
+  !end do
+
+  call c_f_pointer(state%bulk_density%data, cptr_temp)
+  call c_f_pointer(cptr_temp,data2D,[(/size_col/),(/num_cols/)])
+  a_BKDSI=data2D(:,:)
+  
+  !do i = 1, size_col
+  !   write(*,*) "a_BKDSI = ", a_BKDSI(i, 1)   
+  !end do  
+
+  call c_f_pointer(state%matric_pressure%data, cptr_temp)
+  call c_f_pointer(cptr_temp,data2D,[(/size_col/),(/num_cols/)])
+  a_MATP=data2D(:,:)
+
+  do i = 1, size_col
+     a_MATP(i, 1) = 100.0  
+  end do
+
+  call c_f_pointer(state%porosity%data, cptr_temp)
+  call c_f_pointer(cptr_temp,data2D,[(/size_col/),(/num_cols/)])
+  a_PORO=data2D(:,:)
+
+  call c_f_pointer(props%liquid_saturation%data, cptr_temp)
+  call c_f_pointer(cptr_temp,data2D,[(/size_col/),(/num_cols/)])
+  a_LSAT=data2D(:,:)
+
+  call c_f_pointer(props%relative_permeability%data, cptr_temp)
+  call c_f_pointer(cptr_temp,data2D,[(/size_col/),(/num_cols/)])
+  a_RELPERM=data2D(:,:)
+
+  call c_f_pointer(state%hydraulic_conductivity%data, cptr_temp)
+  call c_f_pointer(cptr_temp,data2D,[(/size_col/),(/num_cols/)])
+  a_HCOND=data2D(:,:)
+
+  call c_f_pointer(props%rooting_depth_fraction%data, cptr_temp)
+  call c_f_pointer(cptr_temp,data2D,[(/size_col/),(/num_cols/)])
+  a_FC=data2D(:,:)
+
+  call c_f_pointer(state%subsurface_water_source%data, cptr_temp)
+  call c_f_pointer(cptr_temp,data2D,[(/size_col/),(/num_cols/)])
+  a_SSWS=data2D(:,:)
+
+  call c_f_pointer(state%subsurface_energy_source%data, cptr_temp)
+  call c_f_pointer(cptr_temp,data2D,[(/size_col/),(/num_cols/)])
+  a_SSES=data2D(:,:)
+
   call c_f_pointer(props%shortwave_radiation%data, data, (/num_cols/))
-  srad = data(:)
+  swrad = data(:)
 
   call c_f_pointer(props%longwave_radiation%data, data, (/num_cols/))
   sunrad = data(:)
@@ -58,7 +130,8 @@ contains
   call c_f_pointer(props%precipitation%data, data, (/num_cols/))
   prec = data(:)
 
-!!** Currently used by coupler **!!
+  call c_f_pointer(props%aspect%data, data, (/num_cols/))
+  a_ASP = data(:)
 
   atm_n2 = props%atm_n2
   atm_o2 = props%atm_o2
@@ -67,93 +140,71 @@ contains
   atm_n2o = props%atm_n2o
   atm_h2 = props%atm_h2
   atm_nh3 = props%atm_nh3
+  heat_capacity = props%heat_capacity
+  pressure_at_field_capacity = props%field_capacity
+  pressure_at_wilting_point = props%wilting_point
 
-  call c_f_pointer(props%plant_wilting_factor%data, data2D, [(/size_col/),(/num_cols/)])
-  a_WP=data2D(:,:)
+  !call c_f_pointer(state%surface_water_source%data, data, (/num_cols/))
+  !surf_w_source = data(:)
 
-  call c_f_pointer(props%rooting_depth_fraction%data, data2D, [(/size_col/),(/num_cols/)])
-  a_FC=data2D(:,:)
-
-  call c_f_pointer(state%bulk_density%data, data2D, [(/size_col/),(/num_cols/)])
-  a_BKDSI=data2D(:,:)
-
-!!***********************************!!
-
-  call c_f_pointer(state%porosity%data, data2D, [(/size_col/),(/num_cols/)])
-  a_PORO=data2D(:,:)
-
-  call c_f_pointer(state%water_content%data, data2D, [(/size_col/),(/num_cols/)])
-  a_WC=data2D(:,:)
-
-  call c_f_pointer(props%liquid_saturation%data, data2D, [(/size_col/),(/num_cols/)])
-  a_LSAT=data2D(:,:)
-
-  call c_f_pointer(props%relative_permeability%data, data2D, [(/size_col/),(/num_cols/)])
-  a_RELPERM=data2D(:,:)
-
-  call c_f_pointer(state%hydraulic_conductivity%data, data2D, [(/size_col/),(/num_cols/)])
-  a_HCOND=data2D(:,:)
-
-  call c_f_pointer(state%temperature%data, data2D, [(/size_col/),(/num_cols/)])
-  a_TEMP=data2D(:,:)
-
-  write(*,*) "Data Transfer Finished"
+  call c_f_pointer(state%surface_energy_source%data, data, (/num_cols/))
+  surf_e_source = data(:)
+  
   end subroutine ATS2EcoSIMData
 !------------------------------------------------------------------------------------------
 
   subroutine EcoSIM2ATSData(ncol, state, sizes)
-  !!grab data from ecosim and return it to ATS
   implicit none
-  !character(len=*), parameter :: subname=trim(mod_filename)//'::EcoSIM2ATSData'
-
   type (BGCState), intent(in) :: state
   type (BGCSizes), intent(out) :: sizes
 
-  ! Ecosim variables
   real(r8), pointer :: data(:)
   real(r8), pointer :: data2D(:,:)
-  integer :: ncol, nvar, size_col, size_procs
-  integer :: j1,j2,j3
+  integer :: num_cols, ncol, nvar, size_col, size_procs
+  integer :: j1,j2,j3, i
 
-  write(*,*) "Copying back"
   call SetBGCSizes(sizes)
 
   size_col = sizes%ncells_per_col_
   size_procs = state%porosity%cols
 
-  write(*,*) "column size: ", size_col, " columns on this process: ", size_procs
+  !call c_f_pointer(state%bulk_density%data, data2D, [(/size_col/),(/size_procs/)])
+  !data2D(:,:)=a_BKDSI
 
-  !seems like we call the pointer as normal,
-  !then just reverse the data
+  !call c_f_pointer(state%water_content%data, data2D, [(/size_col/),(/size_procs/)])
+  !data2D(:,:)=a_WC
 
-  call c_f_pointer(state%bulk_density%data, data2D, [(/size_col/),(/size_procs/)])
-  data2D(:,:)=a_BKDSI
+  !call c_f_pointer(state%hydraulic_conductivity%data, data2D, [(/size_col/),(/size_procs/)])
+  !data2D(:,:)=a_HCOND
 
-  call c_f_pointer(state%water_content%data, data2D, [(/size_col/),(/size_procs/)])
-  data2D(:,:)=a_WC
+  !call c_f_pointer(state%temperature%data, data2D, [(/size_col/),(/size_procs/)])
+  !data2D(:,:)=a_TEMP
 
-  call c_f_pointer(state%hydraulic_conductivity%data, data2D, [(/size_col/),(/size_procs/)])
-  data2D(:,:)=a_HCOND
+  !call c_f_pointer(state%subsurface_water_source%data, data2D, [(/size_col/),(/size_procs/)])
+  !data2D(:,:)=a_SSWS
 
-  call c_f_pointer(state%temperature%data, data2D, [(/size_col/),(/size_procs/)])
-  data2D(:,:)=a_TEMP
+  !call c_f_pointer(state%subsurface_energy_source%data, data2D, [(/size_col/),(/size_procs/)])
+  !data2D(:,:)=a_SSES
 
-  write(*,*) "finished copying back in driver"
+  !call c_f_pointer(state%surface_water_source%data, data, (/num_cols/))
+  !data(:) = surf_w_source
+
+  call c_f_pointer(state%surface_energy_source%data, data, (/num_cols/))
+  data(:) = surf_e_source
 
   end subroutine EcoSIM2ATSData
 
 !------------------------------------------------------------------------------------------
 
-  subroutine Run_EcoSIM_one_step()
-  !advance ecosim one time step
+  subroutine Run_EcoSIM_one_step(sizes)
   implicit none
-  !character(len=*), parameter :: subname=trim(mod_filename)//'::Run_EcoSIM_one_step'
 
+  type (BGCSizes), intent(in) :: sizes
 
   !copy data from compuler to EcoSIM
 
   !run surface energy balance
-  call SurfaceEBalance()
+  call SurfaceEBalance(sizes)
 
   !copy data back to coupler
   end subroutine Run_EcoSIM_one_step
@@ -162,7 +213,7 @@ contains
   subroutine Init_EcoSIM(sizes)
   !initialize ecosim
   implicit none
-  !character(len=*), parameter :: subname=trim(mod_filename)//'::Init_EcoSIM'
+
   type (BGCSizes), intent(in) :: sizes
   integer :: size_col, num_cols
 
@@ -171,15 +222,26 @@ contains
 
   call InitSharedData(size_col,num_cols)
 
-  call Init_EcoSIM_Soil(size_col)
+  call Init_EcoSIM_Soil(num_cols)
   end subroutine Init_EcoSIM
 !------------------------------------------------------------------------------------------
 
-  subroutine SurfaceEBalance()
-
+  subroutine SurfaceEBalance(sizes)
   implicit none
 
+  integer :: K, vec_size
+  type (BGCSizes), intent(in) :: sizes
+  integer :: size_col, num_cols
+
+  size_col = sizes%ncells_per_col_
+  num_cols = sizes%num_columns
+
+  vec_size = size(surf_e_source)
+  call RunEcoSIMSurfaceBalance(num_cols)
+
   end subroutine SurfaceEBalance
+
+!------------------------------------------------------------------------------------------
 
   subroutine SetBGCSizes(sizes)
 
@@ -191,7 +253,7 @@ contains
 
     sizes%num_components = 1
     sizes%ncells_per_col_ = 100
-    sizes%num_columns = 25
+    sizes%num_columns = 1
 
   end subroutine SetBGCSizes
 

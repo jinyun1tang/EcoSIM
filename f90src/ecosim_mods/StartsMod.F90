@@ -255,7 +255,6 @@ module StartsMod
 
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
-
       DO L=1,NL(NY,NX)
         N1=NX
         N2=NY
@@ -414,7 +413,7 @@ module StartsMod
         !it is a soil layer
         !compute particle density
         PTDS=ppmc*(1.30_r8*CORGCM+2.66_r8*(1.0E+06_r8-CORGCM))
-        POROS(L,NY,NX)=1.0_r8-(SoiBulkDensity(L,NY,NX)/PTDS)
+        POROS(L,NY,NX)=1.0_r8-(SoiBulkDensity(L,NY,NX)/PTDS) 
       ELSE
         !for ponding water
         PTDS=0.0_r8
@@ -846,7 +845,7 @@ module StartsMod
   use EcoSiMParDataMod, only : micpar
   implicit none
   integer, intent(in) :: NY, NX
-  integer :: L,K
+  integer :: L,K,j
   real(r8) :: VLitR0
   associate(                              &
     NumOfLitrCmplxs    => micpar%NumOfLitrCmplxs    , &
@@ -976,6 +975,7 @@ module StartsMod
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
       NM=MaxNumRootLays(NY,NX)+1
+      !NM=2
       call ComputeSoilHydroPars(NY,NX,NU(NY,NX),NM)
       call SetDeepSoil(NY,NX,NM,JZ)
     enddo
@@ -1052,7 +1052,7 @@ module StartsMod
 !     DISTRIBUTION OF OM AMONG FRACTIONS OF DIFFERING
 !     BIOLOGICAL ACTIVITY
 !
-
+      call InitHGrid(NY,NX)
       call InitLayerDepths(NY,NX)
     ! ActiveLayDepth=active layer depth (m)
       ActiveLayDepth(NY,NX)=9999.0_r8

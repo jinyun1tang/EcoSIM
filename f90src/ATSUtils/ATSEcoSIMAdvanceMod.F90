@@ -1,0 +1,119 @@
+module ATSEcoSIMAdvanceMod
+  use data_kind_mod, only : r8 => DAT_KIND_R8
+  use SoilWaterDataType
+  use SharedDataMod
+  use GridDataType
+  use GridConsts
+  use SOMDataType
+  USE SoilPhysDataType
+  use LandSurfDataType
+  use CanopyDataType, only: SWRadOnGrnd
+  !use PlantAPIData, only: CO2E, CH4E, OXYE, Z2GE, Z2OE, ZNH3E, &
+  !    H2GE
+  use ClimForcDataType, only : LWRadSky, TairK, &
+      VPA, WindSpeedAtm, RainH  
+  use SoilPropertyDataType
+  use HydroThermData, only : PSISM1, TKSoi1, VLHeatCapacity, &
+      SoilFracAsMicP, VLWatMicP1, VLiceMicP1 !need the only as some vars are double defined
+  use EcoSIMSolverPar, only : NPH, dts_HeatWatTP
+implicit none
+  character(len=*), private, parameter :: mod_filename=&
+  __FILE__
+  public :: RunEcoSIMSurfaceBalance
+  contains
+
+  subroutine RunEcoSIMSurfaceBalance(NYS)
+  use EcoSimConst
+  use GridMod           , only : SetMeshATS
+  use SurfPhysMod       , only : RunSurfacePhysModel, StageSurfacePhysModel
+  use StartsMod         , only : set_ecosim_solver
+  implicit none
+  integer :: NY,NX,L,NHW,NHE,NVN,NVS, I, J, M, heat_vec_size
+  integer, intent(in) :: NYS
+  real(r8) :: YSIN(NumOfSkyAzimuSects),YCOS(NumOfSkyAzimuSects),SkyAzimuthAngle(NumOfSkyAzimuSects)
+  real(r8) :: ResistanceLitRLay(JY,JX)
+  real(r8) :: KSatReductByRainKineticEnergy(JY,JX)
+  real(r8) :: HeatFluxAir2Soi(JY,JX)
+  real(r8) :: TopLayWatVol(JY,JX)
+  real(r8) :: Qinfl2MicP(JY,JX)
+  real(r8) :: HInfl2Soil(JY,JX)
+
+  NHW=1;NHE=1;NVN=1;NVS=NYS
+
+  call SetMeshATS(NHW,NVN,NHE,NVS)
+
+  NX=1
+
+
+  do NY=1,NYS
+    NU(NY,NX)=a_NU(NY)
+    NL(NY,NX)=a_NL(NY)
+    a_AREA3(0,NY) = 1.0_r8
+    AREA(3,0,NY,NX)=a_AREA3(0,NY)
+    AREA(3,NU(NY,NX),NY,NX)=a_AREA3(0,NY)
+    AREA(3,2,NY,NX)=a_AREA3(0,NY)
+
+
+    ASP(NY,NX)=a_ASP(NY)
+    !TairKClimMean(NY,NX)=a_ATKA(NY)
+    !CO2E(NY,NX)=atm_co2
+    !CH4E(NY,NX)=atm_ch4
+    !OXYE(NY,NX)=atm_o2
+    !Z2GE(NY,NX)=atm_n2
+    !Z2OE(NY,NX)=atm_n2o
+    !ZNH3E(NY,NX)=atm_nh3
+    !H2GE(NY,NX)=atm_H2
+    TairK(NY,NX)=tairc(NY)
+    !convert VPA from ATS units (Pa) to EcoSIM (MPa)
+    VPA(NY,NX) = vpair(NY)/1.0e6_r8
+    !convert WindSpeedAtm from ATS units (m s^-1) to EcoSIM (m h^-1)
+    WindSpeedAtm(NY,NX) = uwind(NY)*3600.0_r8
+    !converting radiation units from ATS (W m^-2) to EcoSIM (MJ m^-2 h^-1)
+    SWRadOnGrnd(NY,NX) = swrad(NY)*0.0036_r8
+    LWRadSky(NY,NX) = sunrad(NY)*0.0036_r8
+    !RainH(NY,NX) = prec
+    DO L=NU(NY,NX),NL(NY,NX)
+      CumDepth2LayerBottom(L,NY,NX)=a_CumDepth2LayerBottom(L,NY)
+      !Convert Bulk Density from ATS (kg m^-3) to EcoSIM (Mg m^-3)
+      SoiBulkDensityt0(L,NY,NX)=a_BKDSI(L,NY)/1.0e3_r8
+      CORGC(L,NY,NX)=a_CORGC(L,NY)
+      CORGN(L,NY,NX)=a_CORGN(L,NY)
+      CORGP(L,NY,NX)=a_CORGP(L,NY)
+      VLWatMicP1(L,NY,NX)=a_WC(L,NY)
+      VLiceMicP1(L,NY,NX)=0.0
+      TKSoi1(L,NY,NX) = a_TEMP(L,NY)
+      VLHeatCapacity(L,NY,NX) = heat_capacity
+      SoilFracAsMicP(L,NY,NX) = 1.0
+      PSISM1(L,NY,NX) = a_MATP(L,NY)
+      POROS(L,NY,NX) = a_PORO(L,NY)
+      !AREA3(L,NY,NX) = a_AREA3(L,NY)
+   ENDDO
+   POROS(0,NY,NX) = POROS(1,NY,NX)
+  ENDDO
+
+  PSIAtFldCapacity = pressure_at_field_capacity
+  PSIAtWiltPoint = pressure_at_wilting_point
+
+  call StageSurfacePhysModel(I,J,NHW,NHE,NVN,NVS,ResistanceLitRLay)
+
+  DO M=1,NPH
+    call RunSurfacePhysModel(M,NHE,NHW,NVS,NVN,ResistanceLitRLay,&
+      KSatReductByRainKineticEnergy,TopLayWatVol,HeatFluxAir2Soi,Qinfl2MicP,Hinfl2Soil)
+  ENDDO
+  
+  write(*,*) "Heat and water souces: "
+  write(*,*) "Hinfl2Soil = ", Hinfl2Soil, " MJ"
+  write(*,*) "HeatFluxAir2Soi = ", HeatFluxAir2Soi
+  write(*,*) "Qinfl2MicP = ", Qinfl2MicP 
+  write(*,*) "Timestep in EcoSIM: ", dts_HeatWatTP, " hr"
+  DO NY=1,NYS
+    write(*,*) "ATS true E source: ", Hinfl2Soil(NY,1) / (dts_HeatWatTP*3600._r8)
+    !for every column send the top layer to the transfer var
+    surf_e_source(NY) = Hinfl2Soil(NY,1) / (dts_HeatWatTP*3600._r8)
+    !surf_e_source(NY) = 1.0e-5
+    write(*,*) "After conversion ", surf_e_source(NY) , " MJ/s" 
+  ENDDO
+
+  end subroutine RunEcoSIMSurfaceBalance
+
+end module ATSEcoSIMAdvanceMod

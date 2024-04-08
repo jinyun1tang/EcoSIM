@@ -131,7 +131,6 @@ implicit none
 !       CORGN(L,NY,NX)=CORGN(L-1,NY,NX)
 !       CORGP(L,NY,NX)=CORGP(L-1,NY,NX)
 !     ENDIF
-
     CNH4(L,NY,NX)=CNH4(L-1,NY,NX)
     CNO3(L,NY,NX)=CNO3(L-1,NY,NX)
     CPO4(L,NY,NX)=CPO4(L-1,NY,NX)

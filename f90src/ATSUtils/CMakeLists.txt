@@ -3,6 +3,7 @@ set(ATSUTILS_MOD_SOURCES
   ATSUtilsMod.F90
   ATSCPLMod.F90
   ATSEcoSIMInitMod.F90
+  ATSEcoSIMAdvanceMod.F90
   BGC_containers.F90
   c_f_interface_module.F90
 )
@@ -15,9 +16,12 @@ target_include_directories(ATSUtils_mods  PRIVATE
    ${CMAKE_BINARY_DIR}/f90src/modelconfig/
    ${CMAKE_BINARY_DIR}/f90src/mesh/
    ${CMAKE_BINARY_DIR}/f90src/modelpars/
+   ${CMAKE_BINARY_DIR}/f90src/balances/   
    ${CMAKE_BINARY_DIR}/f90src/ecosim_datatype/
+   ${CMAKE_BINARY_DIR}/f90src/HydroTherm/PhysData/
    ${CMAKE_BINARY_DIR}/f90src/HydroTherm/SoilPhys/
-   ${CMAKE_BINARY_DIR}/f90src/HydroTherm/SurPhys/
+   ${CMAKE_BINARY_DIR}/f90src/HydroTherm/SurfPhys/
+   ${CMAKE_BINARY_DIR}/f90src/APIData/
    ${CMAKE_BINARY_DIR}/f90src/ecosim_mods/)
 
 

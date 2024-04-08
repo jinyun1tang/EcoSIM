@@ -37,8 +37,6 @@ module InitEcoSIM
 
   call InitUptake
 
-  call InitWatsub
-
   call initNitro
 
   call InitRedist

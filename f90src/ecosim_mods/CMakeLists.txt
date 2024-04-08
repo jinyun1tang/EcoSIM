@@ -18,6 +18,7 @@ target_include_directories(ecosim_mods  PRIVATE
   ${CMAKE_BINARY_DIR}/f90src/ioutils/
   ${CMAKE_BINARY_DIR}/f90src/HydroTherm/SnowPhys
   ${CMAKE_BINARY_DIR}/f90src/HydroTherm/SoilPhys
+  ${CMAKE_BINARY_DIR}/f90src/HydroTherm/SurfPhys
   ${CMAKE_BINARY_DIR}/f90src/HydroTherm/PhysData
   ${CMAKE_BINARY_DIR}/f90src/APIData/
   ${CMAKE_BINARY_DIR}/f90src/APIs/

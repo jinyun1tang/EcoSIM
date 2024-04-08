@@ -72,6 +72,7 @@ module CanopyRadDataType
 
   subroutine DestructCanopyRad
   use abortutils, only : destroy
+  use abortutils, only : destroy
   implicit none
   call destroy(SineLeafAngle)
   call destroy(CosineLeafAngle)

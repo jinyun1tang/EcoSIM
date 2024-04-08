@@ -624,6 +624,7 @@ contains
   IF(WatFlux4ErosionM(M,N2,N1).GT.ZEROS(N2,N1))THEN
     IF(VLWatMicPM(M,0,N2,N1).GT.ZEROS2(N2,N1))THEN
       VFLW=AMIN1(VFLWX,WatFlux4ErosionM(M,N2,N1)/VLWatMicPM(M,0,N2,N1))
+      VFLW=AMIN1(VFLWX,WatFlux4ErosionM(M,N2,N1)/VLWatMicPM(M,0,N2,N1))
     ELSE
       VFLW=VFLWX
     ENDIF

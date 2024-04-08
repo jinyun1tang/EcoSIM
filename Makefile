@@ -8,7 +8,7 @@ ifndef ATS
 	netcdfsys  = not-set
 endif
 
-TPL_INSTALL_PREFIX=/global/home/users/agraus/code/ats_dev_dir/amanzi_tpls-install-master-Debug
+TPL_INSTALL_PREFIX=/global2/agraus/code/ats_dev_dir/amanzi_tpls-install-master-Debug
 
 # Options set on command line.
 debug      = not-set

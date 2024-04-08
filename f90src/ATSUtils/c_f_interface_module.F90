@@ -1,5 +1,5 @@
 
-!
+! This code is adapted from Alquimia with the credits below:
 ! Alquimia Copyright (c) 2013-2016, The Regents of the University of California, 
 ! through Lawrence Berkeley National Laboratory (subject to receipt of any 
 ! required approvals from the U.S. Dept. of Energy).  All rights reserved.
@@ -24,8 +24,6 @@
 ! and to permit others to do so.
 ! 
 ! Authors: Benjamin Andre <bandre@lbl.gov>
-!
-
 ! Based on the c_interface_module API found at :
 !   http://fortranwiki.org/fortran/show/c_interface_module
 !

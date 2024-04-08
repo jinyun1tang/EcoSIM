@@ -55,6 +55,7 @@ implicit none
           IF(NN.EQ.1)THEN
             IF(NX.EQ.NHE)THEN
               !eastern boundary
+              !eastern boundary
               N4=NX+1
               N5=NY
               N6=L
@@ -64,6 +65,7 @@ implicit none
             ENDIF
           ELSEIF(NN.EQ.2)THEN
             IF(NX.EQ.NHW)THEN
+              !western boundary
               !western boundary
               N4=NX
               N5=NY
@@ -78,6 +80,7 @@ implicit none
           IF(NN.EQ.1)THEN
             IF(NY.EQ.NVS)THEN
               !south boundary
+              !south boundary
               N4=NX
               N5=NY+1
               N6=L
@@ -87,6 +90,7 @@ implicit none
             ENDIF
           ELSEIF(NN.EQ.2)THEN
             IF(NY.EQ.NVN)THEN
+              !north boundary
               !north boundary
               N4=NX
               N5=NY
@@ -165,6 +169,7 @@ implicit none
     IF(ABS(WQRN).GT.ZEROS(N5,N4))THEN
       CRUN=CRUN-WQRN
       URUN(NY,NX)=URUN(NY,NX)-WQRN
+      HQRN=XN*Heat2GridBySurfRunoff(N,NN,N5,N4)
       HQRN=XN*Heat2GridBySurfRunoff(N,NN,N5,N4)
       HEATOU=HEATOU-HQRN
 !
@@ -268,6 +273,7 @@ implicit none
 !       XQR*=solute in runoff from TranspSalt.f
 !       ECNDQ=electrical conductivity of runoff
 !       where are those coefficients from?
+        WX=Wat2GridBySurfRunoff(N,NN,N5,N4)
         WX=Wat2GridBySurfRunoff(N,NN,N5,N4)
         IF(ABS(WX).GT.ZEROS(N5,N4))THEN
           ECHY=0.337_r8*AZMAX1(trc_salt_rof_bounds(idsalt_Hp,N,NN,N5,N4)/WX)
@@ -716,6 +722,7 @@ implicit none
     IF(ABS(WQRS).GT.ZEROS(N5,N4))THEN
       CRUN=CRUN-WQRS
       URUN(NY,NX)=URUN(NY,NX)-WQRS
+      HQRS=XN*HeatBySnowRedistribution(N,N5,N4)
       HQRS=XN*HeatBySnowRedistribution(N,N5,N4)
       HEATOU=HEATOU-HQRS
       CXS=XN*(trcg_FloXSnow(idg_CO2,N,N5,N4)+trcg_FloXSnow(idg_CH4,N,N5,N4))
