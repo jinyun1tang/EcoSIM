@@ -1,4 +1,4 @@
-module PlantMngmtDataType
+module PlantMgmtDataType
 
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use GridConsts
@@ -6,6 +6,7 @@ module PlantMngmtDataType
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
 
+  logical, target,allocatable ::  flag_pft_active(:,:,:)
   real(r8),target,allocatable ::  THIN_pft(:,:,:,:)                      !thinning of plant population, [-]
   real(r8),target,allocatable ::  EHVST(:,:,:,:,:,:)                 !harvest efficiency, [-]
   real(r8),target,allocatable ::  HVST(:,:,:,:)                      !harvest cutting height (+ve) or fractional LAI removal (-ve), [m or -]
@@ -43,11 +44,12 @@ module PlantMngmtDataType
   subroutine InitAllocate
 
   implicit none
-  allocate(THIN_pft(05,366,JY,JX)); THIN_pft=0._r8
-  allocate(EHVST(2,4,05,366,JY,JX));EHVST=0._r8
-  allocate(HVST(05,366,JY,JX)); HVST=0._r8
-  allocate(iHarvstType_pft(05,366,JY,JX));iHarvstType_pft=0
-  allocate(jHarvst_pft(05,366,JY,JX));jHarvst_pft=0
+  allocate(flag_pft_active(JP,JY,JX));  flag_pft_active=.false.
+  allocate(THIN_pft(JP,366,JY,JX)); THIN_pft=0._r8
+  allocate(EHVST(2,4,JP,366,JY,JX));EHVST=0._r8
+  allocate(HVST(JP,366,JY,JX)); HVST=0._r8
+  allocate(iHarvstType_pft(JP,366,JY,JX));iHarvstType_pft=0
+  allocate(jHarvst_pft(JP,366,JY,JX));jHarvst_pft=0
 
   allocate(iYearPlanting_pft(JP,JY,JX));     iYearPlanting_pft=0
   allocate(iYearPlantHarvest_pft(JP,JY,JX));     iYearPlantHarvest_pft=0
@@ -71,6 +73,7 @@ module PlantMngmtDataType
   use abortutils, only : destroy
   implicit none
 
+  call destroy(flag_pft_active)
   call destroy(THIN_pft)
   call destroy(EHVST)
   call destroy(HVST)
@@ -94,4 +97,4 @@ module PlantMngmtDataType
   call destroy(PO4byFire_col)
   end subroutine DestructPlantMngmtData
 
-end module PlantMngmtDataType
+end module PlantMgmtDataType

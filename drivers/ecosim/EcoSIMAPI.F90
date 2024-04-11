@@ -143,7 +143,7 @@ contains
     finidat,restartFileFullPath,brnch_retain_casename,plant_model,microbial_model,&
     soichem_model,atm_ghg_in,aco2_ppm,ao2_ppm,an2_ppm,an2_ppm,ach4_ppm,anh3_ppm,&
     snowRedist_model,disp_planttrait,iErosionMode,grid_mode,atm_ch4_fix,atm_n2o_fix,&
-    atm_co2_fix,first_topou
+    atm_co2_fix,first_topou,first_pft
 
   namelist /ecosim/hist_nhtfrq,hist_mfilt,hist_fincl1,hist_fincl2,hist_yrclose, &
     do_budgets,ref_date,start_date
@@ -397,6 +397,7 @@ subroutine soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
       call hist_ecosim%hist_update(bounds)
 
       call hist_update_hbuf(bounds)
+
       call etimer%update_time_stamp()
 
       nlend=etimer%its_time_to_exit()
@@ -404,6 +405,7 @@ subroutine soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
       lnyr=etimer%its_a_new_year().and.hist_yrclose
 
       call hist_htapes_wrapup( rstwr, nlend, bounds, lnyr )
+
       if(rstwr)then
         call restFile(flag='write')
       endif
@@ -463,7 +465,7 @@ subroutine regressiontest(nmfile,case_name, NX, NY)
     call regression%OpenOutput()
 
     do NZ=1,NP(NY,NX)
-      IF(IsPlantActive_pft(NZ,NY,NX).EQ.iPlantIsActive)THEN
+      IF(IsPlantActive_pft(NZ,NY,NX).EQ.iActive)THEN
 
         category = 'flux'
         name = 'NH4_UPTK (g m^-3 h^-1)'

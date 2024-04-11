@@ -288,7 +288,7 @@ module InsideTranspMod
       ENDIF
 
       DO LL=N6,NL(NY,NX)
-        IF(VLSoilPoreMicP(LL,N5,N4).GT.ZEROS2(N5,N4))THEN
+        IF(VLSoilPoreMicP_vr(LL,N5,N4).GT.ZEROS2(N5,N4))THEN
           N6=LL
           exit
         ENDIF
@@ -297,7 +297,7 @@ module InsideTranspMod
 !     SOLUTE FLUXES BETWEEN ADJACENT GRID CELLS FROM
 !     WATER CONTEnsolutes AND WATER FLUXES 'WaterFlow2Soil' FROM 'WATSUB'
 !
-!     VLSoilPoreMicP,VLSoilMicP=soil volume excluding rock, macropore
+!     VLSoilPoreMicP_vr,VLSoilMicP=soil volume excluding rock, macropore
 !     VLNH4,VLNO3,VLPO4=non-band NH4,NO3,PO4 volume fraction
 !     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
 !     VLWatMicPM,VLWatMacPM=micropore,macropore water-filled porosity from watsub.f
@@ -305,7 +305,7 @@ module InsideTranspMod
 !     ReductVLsoiAirPM=change in air volume
 !     dt_GasCyc=1/number of cycles NPH-1 for gas flux calculations
 !
-      IF(VLSoilPoreMicP(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
+      IF(VLSoilPoreMicP_vr(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
         IF(N3.GE.NUM(N2,N1).AND.N6.GE.NUM(N5,N4) &
           .AND.N3.LE.NL(N2,N1).AND.N6.LE.NL(N5,N4))THEN
           IF(M.NE.MX)THEN

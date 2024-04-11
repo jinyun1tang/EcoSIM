@@ -223,8 +223,8 @@ implicit none
       READ(irrigf(kk),'(I2,I2,I4)')IDY1,IDY2,IDY3
 
       IF(lverb)then
-        PRINT*,irrigf(kk)
-        print*,IDY1,IDY2,IDY3,DY,RR,JST,JEN,WDPTHI,PHQX,CN4QX,CNOQX,CPOQX &
+        write(*,*)irrigf(kk)
+        write(*,*)IDY1,IDY2,IDY3,DY,RR,JST,JEN,WDPTHI,PHQX,CN4QX,CNOQX,CPOQX &
             ,CALQX,CFEQX,CCAQX,CMGQX,CNAQX,CKAQX,CSOQX,CCLQX
       endif
       LPY=0

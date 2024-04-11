@@ -17,7 +17,7 @@ module NitroDisturbMod
   use SoilWaterDataType
   use ClimForcDataType
   use EcosimConst
-  use PlantMngmtDataType
+  use PlantMgmtDataType
   use EcoSimSumDataType
   use EcosimBGCFluxType
   use SoilBGCDataType

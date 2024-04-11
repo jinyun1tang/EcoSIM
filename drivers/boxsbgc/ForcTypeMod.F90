@@ -47,7 +47,7 @@ implicit none
     real(r8) :: EHUM        !partitioning coefficient between humus and microbial residue, [], hour1.f
     real(r8) :: pH          !pH value
     real(r8) :: SoilMicPMassLayer        !mass of soil layer	Mg d-2
-    real(r8) :: VLSoilPoreMicP        !volume of soil layer	m3 d-2
+    real(r8) :: VLSoilPoreMicP_vr        !volume of soil layer	m3 d-2
     real(r8) :: ZNH4S       !NH4 non-band micropore, [g d-2]
     real(r8) :: ZNO3S       !NO3 band micropore, [g d-2]
     real(r8) :: H2PO4       !PO4 non-band micropore, [g d-2]
@@ -254,7 +254,7 @@ implicit none
   call ncd_getvar(ncf,'CNOSC',forc%CNOSC)
   call ncd_getvar(ncf,'CPOSC',forc%CPOSC)
   call ncd_getvar(ncf,'pH',forc%PH)
-  call ncd_getvar(ncf,'VLSoilPoreMicP',forc%VLSoilPoreMicP)
+  call ncd_getvar(ncf,'VLSoilPoreMicP_vr',forc%VLSoilPoreMicP_vr)
   call ncd_getvar(ncf,'ORGC',forc%ORGC)
   call ncd_getvar(ncf,'CFOMC',forc%CFOMC)
   call ncd_getvar(ncf,'VLSoilMicP',forc%VLSoilMicP)

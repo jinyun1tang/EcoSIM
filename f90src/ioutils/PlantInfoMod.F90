@@ -12,7 +12,7 @@ module PlantInfoMod
   use CanopyDataType
   use PlantTraitDataType
   use PlantMathFuncMod
-  use PlantMngmtDataType
+  use PlantMgmtDataType
   use EcosimConst
   use RootDataType
   use EcoSIMHistMod
@@ -328,18 +328,18 @@ implicit none
 !
 !   RE-CALCULATE PLANT INPUTS IN MODEL UNITS
 !
-!   CanopySWabsorpty_pft,CanopyPARabsorpty_pft=leaf SW,PAR absorbtivity
+!   LeafSWabsorpty_pft,LeafPARabsorpty_pft=leaf SW,PAR absorbtivity
 !
     VmaxRubCarboxyRef_pft(NZ,NY,NX)=2.5_r8*VmaxRubCarboxyRef_pft(NZ,NY,NX)
     VmaxRubOxyRef_pft(NZ,NY,NX)=2.5_r8*VmaxRubOxyRef_pft(NZ,NY,NX)
     VmaxPEPCarboxyRef_pft(NZ,NY,NX)=2.5_r8*VmaxPEPCarboxyRef_pft(NZ,NY,NX)
     SpecChloryfilAct_pft(NZ,NY,NX)=2.5_r8*SpecChloryfilAct_pft(NZ,NY,NX)
-    CanopySWabsorpty_pft(NZ,NY,NX)=1.0_r8-CanopySWAlbedo_pft(NZ,NY,NX)-TAUR(NZ,NY,NX)
-    CanopyPARabsorpty_pft(NZ,NY,NX)=1.0_r8-CanopyPARalbedo_pft(NZ,NY,NX)-TAUP(NZ,NY,NX)
-    CanopySWAlbedo_pft(NZ,NY,NX)=CanopySWAlbedo_pft(NZ,NY,NX)/CanopySWabsorpty_pft(NZ,NY,NX)
-    CanopyPARalbedo_pft(NZ,NY,NX)=CanopyPARalbedo_pft(NZ,NY,NX)/CanopyPARabsorpty_pft(NZ,NY,NX)
-    TAUR(NZ,NY,NX)=TAUR(NZ,NY,NX)/CanopySWabsorpty_pft(NZ,NY,NX)
-    TAUP(NZ,NY,NX)=TAUP(NZ,NY,NX)/CanopyPARabsorpty_pft(NZ,NY,NX)
+    LeafSWabsorpty_pft(NZ,NY,NX)=1.0_r8-RadSWLeafAlbedo_pft(NZ,NY,NX)-RadSWLeafTransmis_pft(NZ,NY,NX)
+    LeafPARabsorpty_pft(NZ,NY,NX)=1.0_r8-CanopyPARalbedo_pft(NZ,NY,NX)-RadPARLeafTransmis_pft(NZ,NY,NX)
+    RadSWLeafAlbedo_pft(NZ,NY,NX)=RadSWLeafAlbedo_pft(NZ,NY,NX)/LeafSWabsorpty_pft(NZ,NY,NX)
+    CanopyPARalbedo_pft(NZ,NY,NX)=CanopyPARalbedo_pft(NZ,NY,NX)/LeafPARabsorpty_pft(NZ,NY,NX)
+    RadSWLeafTransmis_pft(NZ,NY,NX)=RadSWLeafTransmis_pft(NZ,NY,NX)/LeafSWabsorpty_pft(NZ,NY,NX)
+    RadPARLeafTransmis_pft(NZ,NY,NX)=RadPARLeafTransmis_pft(NZ,NY,NX)/LeafPARabsorpty_pft(NZ,NY,NX)
     SineBranchAngle_pft(NZ,NY,NX)=SIN(BranchAngle_pft(NZ,NY,NX)*RadianPerDegree)
     SinePetioleAngle_pft(NZ,NY,NX)=SIN(PetioleAngle_pft(NZ,NY,NX)*RadianPerDegree)
     MatureGroup_pft(NZ,NY,NX)=GROUPX(NZ,NY,NX)
@@ -349,23 +349,23 @@ implicit none
       RefNodeInitRate_pft(NZ,NY,NX)=RefNodeInitRate_pft(NZ,NY,NX)/MaxNodesPerBranch
       RefLeafAppearRate_pft(NZ,NY,NX)=RefLeafAppearRate_pft(NZ,NY,NX)/MaxNodesPerBranch
       MatureGroup_pft(NZ,NY,NX)=MatureGroup_pft(NZ,NY,NX)/MaxNodesPerBranch
-      XTLI(NZ,NY,NX)=XTLI(NZ,NY,NX)/MaxNodesPerBranch
+      ShootNodeNumAtPlanting_pft(NZ,NY,NX)=ShootNodeNumAtPlanting_pft(NZ,NY,NX)/MaxNodesPerBranch
     ENDIF
-    MatureGroup_pft(NZ,NY,NX)=MatureGroup_pft(NZ,NY,NX)-XTLI(NZ,NY,NX)
-    IF(CriticalPhotoPeriod_pft(NZ,NY,NX).LT.0.0_r8)THEN
-      CriticalPhotoPeriod_pft(NZ,NY,NX)=DayLenthMax(NY,NX)
+    MatureGroup_pft(NZ,NY,NX)=MatureGroup_pft(NZ,NY,NX)-ShootNodeNumAtPlanting_pft(NZ,NY,NX)
+    IF(CriticPhotoPeriod_pft(NZ,NY,NX).LT.0.0_r8)THEN
+      CriticPhotoPeriod_pft(NZ,NY,NX)=DayLenthMax(NY,NX)
     ENDIF
     D5: DO NB=1,NumOfCanopyLayers
-      IF(iPlantPhenologyType_pft(NZ,NY,NX).EQ.iphenotyp_evgreen.AND.iPlantPhenologyPattern_pft(NZ,NY,NX).NE.iplt_annual)THEN
-        HourThreshold4LeafOut_brch(NB,NZ,NY,NX)=AMIN1(4380.0_r8,VRNLI+144.0_r8*PlantInitThermoAdaptZone(NZ,NY,NX)*(NB-1))
-        HourThreshold4LeafOff_brch(NB,NZ,NY,NX)=AMIN1(4380.0_r8,VRNXI+144.0_r8*PlantInitThermoAdaptZone(NZ,NY,NX)*(NB-1))
+      IF(iPlantPhenolType_pft(NZ,NY,NX).EQ.iphenotyp_evgreen.AND.iPlantPhenolPattern_pft(NZ,NY,NX).NE.iplt_annual)THEN
+        HourReq4LeafOut_brch(NB,NZ,NY,NX)=AMIN1(4380.0_r8,VRNLI+144.0_r8*PlantInitThermoAdaptZone(NZ,NY,NX)*(NB-1))
+        HourReq4LeafOff_brch(NB,NZ,NY,NX)=AMIN1(4380.0_r8,VRNXI+144.0_r8*PlantInitThermoAdaptZone(NZ,NY,NX)*(NB-1))
       ELSE
-        HourThreshold4LeafOut_brch(NB,NZ,NY,NX)=VRNLI
-        HourThreshold4LeafOff_brch(NB,NZ,NY,NX)=VRNXI
+        HourReq4LeafOut_brch(NB,NZ,NY,NX)=VRNLI
+        HourReq4LeafOff_brch(NB,NZ,NY,NX)=VRNXI
       ENDIF
     ENDDO D5
   ENDIF
-! WRITE(*,1111)'CRITICAL DAYLENGTH',IGO,NZ,CriticalPhotoPeriod_pft(NZ,NY,NX)
+! WRITE(*,1111)'CRITICAL DAYLENGTH',IGO,NZ,CriticPhotoPeriod_pft(NZ,NY,NX)
 !1111    FORMAT(A20,2I8,E12.4)
   end subroutine ReadPlantProperties
 
@@ -386,11 +386,11 @@ implicit none
   loc=get_pft_loc(DATAP(NZ,NY,NX)(1:6),pft_lname,koppen_climl,koppen_clims)
   DATAPI(NZ,NY,NX)=loc
   call ncd_getvar(pft_nfid, 'ICTYP', loc, iPlantPhotosynthesisType(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'IGTYP', loc, iPlantMorphologyType_pft(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'ISTYP', loc, iPlantPhenologyPattern_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'IGTYP', loc, iPlantRootProfile_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'ISTYP', loc, iPlantPhenolPattern_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'IDTYP', loc, iPlantDevelopPattern_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'INTYP', loc, iPlantNfixType(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'IWTYP', loc, iPlantPhenologyType_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'IWTYP', loc, iPlantPhenolType_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'IPTYP', loc, iPlantPhotoperiodType_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'IBTYP', loc, iPlantTurnoverPattern_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'IRTYP', loc, iPlantGrainType_pft(NZ,NY,NX))
@@ -410,22 +410,22 @@ implicit none
   call ncd_getvar(pft_nfid, 'CHL4', loc, LeafC4ChlorofilConc_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'FCO2', loc, CanPCi2CaRatio(NZ,NY,NX))
 
-  call ncd_getvar(pft_nfid, 'ALBR', loc, CanopySWAlbedo_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'ALBR', loc, RadSWLeafAlbedo_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'ALBP', loc, CanopyPARalbedo_pft(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'TAUR', loc, TAUR(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'TAUP', loc, TAUP(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'TAUR', loc, RadSWLeafTransmis_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'TAUP', loc, RadPARLeafTransmis_pft(NZ,NY,NX))
 
   call ncd_getvar(pft_nfid, 'XRNI', loc, RefNodeInitRate_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'XRLA', loc, RefLeafAppearRate_pft(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'CTC', loc, TCelciusChill4Seed(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'CTC', loc, TCChill4Seed_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'VRNLI', loc,VRNLI)
   call ncd_getvar(pft_nfid, 'VRNXI', loc,VRNXI)
   call ncd_getvar(pft_nfid, 'WDLF', loc,WDLF(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'PB', loc,MinNonstructalC4InitBranch(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'PB', loc,MinNonstC2InitBranch_pft(NZ,NY,NX))
 
   call ncd_getvar(pft_nfid, 'GROUPX', loc,GROUPX(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'XTLI', loc,XTLI(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'XDL', loc,CriticalPhotoPeriod_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'XTLI', loc,ShootNodeNumAtPlanting_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'XDL', loc,CriticPhotoPeriod_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'XPPD', loc,PhotoPeriodSens_pft(NZ,NY,NX))
 
   call ncd_getvar(pft_nfid, 'SLA1', loc,SLA1(NZ,NY,NX))
@@ -441,13 +441,13 @@ implicit none
   call ncd_getvar(pft_nfid, 'SDMX', loc,MaxSeedNumPerSite_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'GRMX', loc,MaxSeedCMass(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'GRDM', loc,SeedCMass(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'GFILL', loc,GrainFillRateat25C_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'GFILL', loc,GrainFillRate25C_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'WTSTDI', loc,StandingDeadInitC_pft(NZ,NY,NX))
 
-  call ncd_getvar(pft_nfid, 'RRAD1M', loc,Max1stRootRadius(1,NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'RRAD2M', loc,Max2ndRootRadius(1,NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'PORT', loc,RootPorosity(1,NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'PR', loc,MinNonstructuralC4InitRoot_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'RRAD1M', loc,Root1stMaxRadius_pft(1,NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'RRAD2M', loc,Root2ndMaxRadius_pft(1,NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'PORT', loc,RootPorosity_pft(1,NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'PR', loc,MinNonstC2InitRoot_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'RSRR', loc,RSRR(1,NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'RSRA', loc,RSRA(1,NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'PTSHT', loc,ShutRutNonstructElmntConducts_pft(NZ,NY,NX))
@@ -476,7 +476,7 @@ implicit none
   call ncd_getvar(pft_nfid, 'DMHSK', loc,HuskBiomGrowthYield(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'DMEAR', loc,EarBiomGrowthYield(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'DMGR', loc,GrainBiomGrowthYield(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'DMRT', loc,RootBiomGrowthYield(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'DMRT', loc,RootBiomGrosYld_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'DMND', loc,NoduGrowthYield_pft(NZ,NY,NX))
 
   call ncd_getvar(pft_nfid, 'CNLF', loc,CNLF(NZ,NY,NX))
@@ -523,163 +523,176 @@ implicit none
   character(len=*),intent(in) :: koppen_climl
   character(len=*),intent(in) :: koppen_clims
   integer :: j
+  character(len=60) :: strval
 
 !   iPlantPhotosynthesisType=photosynthesis type:3=C3,4=C4
-!   iPlantMorphologyType_pft=root profile:0=shallow (eg bryophytes),1=intermediate(eg herbs),2=deep (eg trees)
-!   iPlantPhenologyPattern_pft=growth habit:0=annual,1=perennial
+!   iPlantRootProfile_pft=root profile:0=shallow (eg bryophytes),1=intermediate(eg herbs),2=deep (eg trees)
+!   iPlantPhenolPattern_pft=growth habit:0=annual,1=perennial
 !   iPlantDevelopPattern_pft=growth habit:0=determinate,1=indetermimate
 !   iPlantNfixType=N2 fixation:1,2,3=rapid to slow root symbiosis (e.g.legumes),
 !   4,5,6=rapid to slow canopy symbiosis (e.g. cyanobacteria)
-!   iPlantPhenologyType_pft=phenology type:0=evergreen,1=cold deciduous,2=drought deciduous,3=1+2
+!   iPlantPhenolType_pft=phenology type:0=evergreen,1=cold deciduous,2=drought deciduous,3=1+2
 !   iPlantPhotoperiodType_pft=photoperiod type:0=day neutral,1=short day,2=long day
-!   iPlantTurnoverPattern_pft=turnover:if iPlantMorphologyType_pft=0 or 1:all above-ground:0,1=rapid(deciduous),2=very slow(evergreen),3=slow(semi-deciduous)
-!                   :if iPlantMorphologyType_pft=2:trees:1=rapid(deciduous),2=very slow(coniferous),3=slow(semi-deciduous)
+!   iPlantTurnoverPattern_pft=turnover:if iPlantRootProfile_pft=0 or 1:all above-ground:0,1=rapid(deciduous),2=very slow(evergreen),3=slow(semi-deciduous)
+!                   :if iPlantRootProfile_pft=2:trees:1=rapid(deciduous),2=very slow(coniferous),3=slow(semi-deciduous)
 !   iPlantGrainType_pft=storage organ:0=above ground,1=below ground
 !   MY=mycorrhizal:1=no,2=yes
 !   PlantInitThermoAdaptZone=thermal adaptation zone:1=arctic,boreal,2=cool temperate,
 !   3=warm temperate,4=subtropical,5=tropical
   write(nu_plt,*)('=',j=1,100)
   write(nu_plt,*)'PLANT traits for FUNCTIONAL TYPE (NZ,NY,NX)=',NZ,NY,NX,DATAP(NZ,NY,NX)(1:6)
-  write(nu_plt,*)'Plant name: ',pft_lname
-  write(nu_plt,*)'koppen climate info:',koppen_clims//','//koppen_climl
+  call writefixsl(nu_plt,'Plant name: ',pft_lname,40)
+  strval=koppen_clims//','//koppen_climl
+  call writefixsl(nu_plt,'Koppen climate info',strval,40)
+
   select CASE (iPlantPhotosynthesisType(NZ,NY,NX))
   case (3)
-    write(nu_plt,*)'C3 photosynthesis'
+    strval='C3'
   case (4)
-    write(nu_plt,*)'C4 photosynthesis'
+    strval='C4'
   case default
-    write(nu_plt,*)'photosynthesis type not defined'
+    strval='Not defined'
   end select
+  call writefixsl(nu_plt,'Photosynthesis pathway',strval,40)
 
-  select case(iPlantMorphologyType_pft(NZ,NY,NX))
+  select case(iPlantRootProfile_pft(NZ,NY,NX))
   case (0)
-    write(nu_plt,*)'shallow root profile, like bryophytes'
+    strval='Shallow root profile, like bryophytes'
   case (1)
-    write(nu_plt,*)'intermediate root profile, like herbs'
+    strval='Intermediate root profile, like herbs'
   case (2)
-    write(nu_plt,*)'deep root profile, like trees'
+    strval='Deep root profile, like trees'
   case default
-    write(nu_plt,*)'root profile not defined'
+    strval='Not defined'
   end select
+  call writefixsl(nu_plt,'Root profile pattern',strval,40)
 
-  select case (iPlantPhenologyPattern_pft(NZ,NY,NX))
+  select case (iPlantPhenolPattern_pft(NZ,NY,NX))
   case (0)
-    write(nu_plt,*)'Annual plant'
+    strval='Annual'
   case (1)
-    write(nu_plt,*)'perennial plant'
+    strval='Perennial'
   case default
-    write(nu_plt,*)'growth habit not defined'
+    strval='Not defined'
   end select
+  call writefixsl(nu_plt,'Life cycle',strval,40)
 
   select case (iPlantDevelopPattern_pft(NZ,NY,NX))
   case (0)
-    write(nu_plt,*)'determinate growth pattern'
+    strval='Determinate'
   case (1)
-    write(nu_plt,*)'indetermimate growth pattern'
+    strval='Indetermimate'
   case default
-    write(nu_plt,*)'growth pattern not defined'
+    strval='Not defined'
   end select
+  call writefixsl(nu_plt,'Growth pattern',strval,40)
 
   select case (iPlantNfixType(NZ,NY,NX))
 ! 1,2, 3, e.g. legumes
   case (in2fixtyp_root_fast)
-    write(nu_plt,*)'Rapid root N2 fixation symbiosis'
+    strval='Rapid root N-fixation'
   case (in2fixtyp_root_medium)
-    write(nu_plt,*)'Intermediate root N2 fixation symbiosis'
+    strval='Intermediate root N-fixation'
   case (in2fixtyp_root_slow)
-    write(nu_plt,*)'Slow root N2 fixation symbiosis'
+    strval='Slow root N-fixation'
 !4,5,6, e.g. cyanobacteria
   case (in2fixtyp_canopy_fast)
-    write(nu_plt,*)'Rapid canopy N2 fixation symbiosis'
+    strval='Rapid canopy N-fixation'
   case (in2fixtyp_canopy_medium)
-    write(nu_plt,*)'Intermediate canopy N2 fixation symbiosis'
+    strval='Intermediate canopy N-fixation'
   case (in2fixtyp_canopy_slow)
-    write(nu_plt,*)'Slow canopy N2 fixation symbiosis'
+    strval='Slow canopy N-fixation'
   case default
-    write(nu_plt,*)'No N2 fixation symbiosis defined'
+    strval='Not defined'
   end select
+  call writefixsl(nu_plt,'N-fixation symbiosis',strval,40)
 
-  select case(iPlantPhenologyType_pft(NZ,NY,NX))
+  select case(iPlantPhenolType_pft(NZ,NY,NX))
   case (iphenotyp_evgreen)
-    write(nu_plt,*)'phenology type: evergreen'
-  case (iphenotyp_coldecidu)
-    write(nu_plt,*)'phenology type: cold deciduous'
+    strval='Evergreen'
+  case (iphenotyp_coldecid)
+    strval='Cold deciduous'
   case (iphenotyp_drouhtdecidu)
-    write(nu_plt,*)'phenology type: drought deciduous'
-  case (iphenotyp_coldroutdecidu)
-    write(nu_plt,*)'phenology type: cold+drought deciduous'
+    strval='Drought deciduous'
+  case (iphenotyp_coldroutdecid)
+    strval='Cold&drought-tolerant deciduous'
   case default
-    write(nu_plt,*)'phenology type not defined'
+    strval='Not defined'
   end select
+  call writefixsl(nu_plt,'Phenology type',strval,40)
 
   select case(iPlantPhotoperiodType_pft(NZ,NY,NX))
   case (iphotop_neutral)
-    write(nu_plt,*)'day neutral photoperiod'
+    strval='Neutral day'
   case (iphotop_short)
-    write(nu_plt,*)'short day photoperiod'
+    strval='Short day'
   case (iphotop_long)
-    write(nu_plt,*)'long day photoperiod'
+    strval='Long day'
   case default
-    write(nu_plt,*)'photoperiod not defined'
+    strval='Not defined'
   end select
+  call writefixsl(nu_plt,'Photoperiod',strval,40)
 
-  if(is_plant_treelike(iPlantMorphologyType_pft(NZ,NY,NX)))then
+  if(is_plant_treelike(iPlantRootProfile_pft(NZ,NY,NX)))then
     select case(iPlantTurnoverPattern_pft(NZ,NY,NX))
     case (0, 1)
-      write(nu_plt,*)'Rapid tree biome turnover (deciduous)'
+      strval='Rapid, like deciduous tree'
     case (2)
-      write(nu_plt,*)'Very slow tree biome turnover (needleleaf evergreen)'
+      strval='Very slow, like evergreen needleleaf tree'
     case (3)
-      write(nu_plt,*)'Slow tree biome turnover (Broadleaf evergreen)'
+      strval='Slow, like evergreen broadleaf'
     case (4)
-      write(nu_plt,*)'Tree biome turnover semi-deciduous'
+      strval='Like semi-deciduous tree'
     case (5)
-      write(nu_plt,*)'Tree biome turnover semi-evergreen'
+      strval='Like semi-evergreen tree'
     case default
-      write(nu_plt,*)'Tree biome turnover not defined'
+      strval='Undefined tree-like pattern'
     end select
   else
     select case(iPlantTurnoverPattern_pft(NZ,NY,NX))
     case (0, 1)
-      write(nu_plt,*)'Rapid all aboveground plant biome turnover (herbaceous)'
+      strval='Rapid all aboveground biome, herbaceous'
     case default
-      write(nu_plt,*)'Plant biome turnover not defined'
+      strval='Undefined herbaceous pattern'
     end select
   endif
+  call writefixsl(nu_plt,'Biome turnover pattern',strval,40)
 
   select case(iPlantGrainType_pft(NZ,NY,NX))
   case (igraintyp_abvgrnd)
-    write(nu_plt,*)'Above ground storage organ'
+    strval='Aboveground'
   case (igraintyp_blwgrnd)
-    write(nu_plt,*)'Belowground storage organ'
+    strval='Belowground'
   case default
-    write(nu_plt,*)'Storage organ not defined'
+    strval='Not defined'
   end select
+  call writefixsl(nu_plt,'Storage organ',strval,40)
 
   select case(MY(NZ,NY,NX))
   case (1)
-    write(nu_plt,*)'No mycorrhizal'
+    strval='No'
   case (2)
-    write(nu_plt,*)'Mycorrhizal'
+    strval='YES'
   case default
-    write(nu_plt,*)'Wrong option for mycorrhizae'
+    strval='Wrong option'
   end select
+  call writefixsl(nu_plt,'Mycorrhizal association',strval,40)
 
   select case(INT(PlantInitThermoAdaptZone(NZ,NY,NX)+0.50005_r8))
   case (ithermozone_arcboreal)
-    write(nu_plt,*)'thermal adaptation zone: arctic, boreal'
+    strval='Arctic, boreal'
   case (ithermozone_cooltempr)
-    write(nu_plt,*)'thermal adaptation zone: cool temperate'
+    strval='Cool temperate'
   case (ithermozone_warmtempr)
-    write(nu_plt,*)'thermal adaptation zone: warm temperate'
+    strval='Warm temperate'
   case (ithermozone_subtropic)
-    write(nu_plt,*)'thermal adaptation zone: subtropical'
+    strval='Subtropical'
   case (ithermozone_tropical)
-    write(nu_plt,*)'thermal adaptation zone: tropical'
+    strval='Tropical'
   case default
-    write(nu_plt,*)'Not thermal adaptation zone defined'
+    strval='Not defined'
   end select
-
+  call writefixsl(nu_plt,'Thermal adaptation zone',strval,40)
   end subroutine pft_display
 
 !------------------------------------------------------------------------------------------
@@ -728,17 +741,17 @@ implicit none
   write(nu_plt,*)('-',j=1,100)
 
   write(nu_plt,*)'PHENOLOGICAL PROPERTIES'
-  call writefixl(nu_plt,'rate of node initiation at 25oC (h-1) XRNI',RefNodeInitRate_pft(NZ,NY,NX),70)
-  call writefixl(nu_plt,'rate of leaf appearance at 25oC (h-1) XRLA',RefLeafAppearRate_pft(NZ,NY,NX),70)
-  call writefixl(nu_plt,'chilling temperature for CO2 fixation, seed loss (oC) CTC',TCelciusChill4Seed(NZ,NY,NX),70)
-  call writefixl(nu_plt,'hour requirement for spring leafout VRNLI',VRNLI,70)
-  call writefixl(nu_plt,'hour requirement for autumn leafoff VRNXI',VRNXI,70)
-  call writefixl(nu_plt,'leaf length:width ratio WDLF',WDLF(NZ,NY,NX),70)
-  call writefixl(nu_plt,'nonstructural C concentration needed for branching PB',MinNonstructalC4InitBranch(NZ,NY,NX),70)
+  call writefixl(nu_plt,'Rate of node initiation at 25oC (h-1) XRNI',RefNodeInitRate_pft(NZ,NY,NX),70)
+  call writefixl(nu_plt,'Rate of leaf appearance at 25oC (h-1) XRLA',RefLeafAppearRate_pft(NZ,NY,NX),70)
+  call writefixl(nu_plt,'Chilling temperature for CO2 fixation, seed loss (oC) CTC',TCChill4Seed_pft(NZ,NY,NX),70)
+  call writefixl(nu_plt,'Hour requirement for spring leafout VRNLI',VRNLI,70)
+  call writefixl(nu_plt,'Hour requirement for autumn leafoff VRNXI',VRNXI,70)
+  call writefixl(nu_plt,'Leaf length:width ratio WDLF',WDLF(NZ,NY,NX),70)
+  call writefixl(nu_plt,'Nonstructural C concentration needed for branching PB',MinNonstC2InitBranch_pft(NZ,NY,NX),70)
   call writefixl(nu_plt,'Maturity group, node number required for floral initiation, GROUPX',GROUPX(NZ,NY,NX),70)
-  call writefixl(nu_plt,'Node number at planting XTLI',XTLI(NZ,NY,NX),70)
-  call writefixl(nu_plt,'critical photoperiod (h) <= maximum daylength XDL',CriticalPhotoPeriod_pft(NZ,NY,NX),70)
-  call writefixl(nu_plt,'photoperiod sensitivity (node h-1) XPPD',PhotoPeriodSens_pft(NZ,NY,NX),70)
+  call writefixl(nu_plt,'Node number at planting XTLI',ShootNodeNumAtPlanting_pft(NZ,NY,NX),70)
+  call writefixl(nu_plt,'Critical photoperiod (h) <= maximum daylength XDL',CriticPhotoPeriod_pft(NZ,NY,NX),70)
+  call writefixl(nu_plt,'Photoperiod sensitivity (node h-1) XPPD',PhotoPeriodSens_pft(NZ,NY,NX),70)
 
 
   end subroutine Phenology_trait_disp
@@ -765,7 +778,7 @@ implicit none
   call writefixl(nu_plt,'maximum seed number per STMX (none) SDMX',MaxSeedNumPerSite_pft(NZ,NY,NX),70)
   call writefixl(nu_plt,'maximum seed size per SDMX (g) GRMX',MaxSeedCMass(NZ,NY,NX),70)
   call writefixl(nu_plt,'seed size at planting (gC) GRDM',SeedCMass(NZ,NY,NX),70)    !could be greater than MaxSeedCMass, accouting for seedling
-  call writefixl(nu_plt,'grain filling rate at 25 oC (g seed-1 h-1) GFILL',GrainFillRateat25C_pft(NZ,NY,NX),70)
+  call writefixl(nu_plt,'grain filling rate at 25 oC (g seed-1 h-1) GFILL',GrainFillRate25C_pft(NZ,NY,NX),70)
   call writefixl(nu_plt,'mass of dead standing biomass at planting (gC m-2) WTSTDI',StandingDeadInitC_pft(NZ,NY,NX),70)
   end subroutine morphology_trait_disp
 
@@ -778,16 +791,16 @@ implicit none
 
   write(nu_plt,*)('-',j=1,100)
   write(nu_plt,*)'ROOT CHARACTERISTICS'
-  call writefixl(nu_plt,'radius of primary roots (m) RRAD1M',Max1stRootRadius(1,NZ,NY,NX),70)
-  call writefixl(nu_plt,'radius of secondary roots (m) RRAD2M',Max2ndRootRadius(1,NZ,NY,NX),70)
-  call writefixl(nu_plt,'primary/fine root porosity (m3 m-3) PORT',RootPorosity(1,NZ,NY,NX),70)
+  call writefixl(nu_plt,'radius of primary roots (m) RRAD1M',Root1stMaxRadius_pft(1,NZ,NY,NX),73)
+  call writefixl(nu_plt,'radius of secondary roots (m) RRAD2M',Root2ndMaxRadius_pft(1,NZ,NY,NX),73)
+  call writefixl(nu_plt,'primary/fine root porosity (m3 m-3) PORT',RootPorosity_pft(1,NZ,NY,NX),73)
   call writefixl(nu_plt,'nonstructural C concentration needed for root'// &
-    ' branching (gC/gC) PR',MinNonstructuralC4InitRoot_pft(NZ,NY,NX),70)
-  call writefixl(nu_plt,'radial root resistivity for water uptake (m2 MPa-1 h-1) RSRR',RSRR(1,NZ,NY,NX),70)
-  call writefixl(nu_plt,'axial root resistivity for water uptake (m2 MPa-1 h-1) RSRA',RSRA(1,NZ,NY,NX),70)
+    ' branching (gC/gC) PR',MinNonstC2InitRoot_pft(NZ,NY,NX),70)
+  call writefixl(nu_plt,'radial root resistivity for water uptake (m2 MPa-1 h-1) RSRR',RSRR(1,NZ,NY,NX),73)
+  call writefixl(nu_plt,'axial root resistivity for water uptake (m2 MPa-1 h-1) RSRA',RSRA(1,NZ,NY,NX),73)
   call writefixl(nu_plt,'rate constant for equilibrating shoot-root '// &
-    'nonstructural C concn PTSHT',ShutRutNonstructElmntConducts_pft(NZ,NY,NX),70)
-  call writefixl(nu_plt,'root branching frequency (m-1) RTFQ',RootBranchFreq_pft(NZ,NY,NX),70)
+    'nonstructural C concn PTSHT',ShutRutNonstructElmntConducts_pft(NZ,NY,NX),73)
+  call writefixl(nu_plt,'root branching frequency (m-1) RTFQ',RootBranchFreq_pft(NZ,NY,NX),73)
   end subroutine Root_trait_disp
 
 !------------------------------------------------------------------------------------------
@@ -851,7 +864,7 @@ implicit none
   call writefixl(nu_plt,'grain C production vs nonstructural C'// &
     ' consumption (g g-1) DMGR',GrainBiomGrowthYield(NZ,NY,NX),101)
   call writefixl(nu_plt,'root dry matter C production vs nonstructural C'// &
-    ' consumption (g g-1) DMRT',RootBiomGrowthYield(NZ,NY,NX),101)
+    ' consumption (g g-1) DMRT',RootBiomGrosYld_pft(NZ,NY,NX),101)
   call writefixl(nu_plt,'nodule bacteria in root, canopy dry matter '// &
     'C production vs nonstructural C consumption (g g-1) DMND' &
     ,NoduGrowthYield_pft(NZ,NY,NX),101)
@@ -896,10 +909,10 @@ implicit none
 
   write(nu_plt,*)('-',j=1,100)
   write(nu_plt,*)'OPTICAL PROPERTIES'
-  call writefixl(nu_plt,'leaf SW albedo ALBR',CanopySWAlbedo_pft(NZ,NY,NX),50)
+  call writefixl(nu_plt,'leaf SW albedo ALBR',RadSWLeafAlbedo_pft(NZ,NY,NX),50)
   call writefixl(nu_plt,'leaf PAR albedo ALBP',CanopyPARalbedo_pft(NZ,NY,NX),50)
-  call writefixl(nu_plt,'leaf SW transmission TAUR',TAUR(NZ,NY,NX),50)
-  call writefixl(nu_plt,'leaf PAR transmission TAUP',TAUP(NZ,NY,NX),50)
+  call writefixl(nu_plt,'leaf SW transmission TAUR',RadSWLeafTransmis_pft(NZ,NY,NX),50)
+  call writefixl(nu_plt,'leaf PAR transmission TAUP',RadPARLeafTransmis_pft(NZ,NY,NX),50)
   end subroutine plant_optic_trait_disp
 !------------------------------------------------------------------------------------------
 
@@ -1044,13 +1057,18 @@ implicit none
           D4975: DO NX=NH1,NH2
             D4970: DO NY=NV1,NV2
               D4965: DO NZ=1,NS
+                flag_pft_active(NZ,NY,NX)=.true.
                 IF(KoppenClimZone(NY,NX).GT.0)THEN
                   WRITE(CLIMATE,'(I2)')KoppenClimZone(NY,NX)
                   !the type of pft is specified by genra+Koppen climate zone
                   DATAX(NZ)=pft_gtype(NZ)(1:4)//CLIMATE
                 ENDIF
-
               ENDDO D4965
+              if(first_pft)then
+                flag_pft_active(2:NS,NY,NX)=.false.
+                NP0(NY,NX)=1
+                NS=1
+              endif  
             ENDDO D4970
           ENDDO D4975
         ENDIF
@@ -1076,7 +1094,7 @@ implicit none
 !          call read_checkpt(NS,NH1,NH2,NV1,NV2,NHW,NHE,NVN,NVS)
 !        ENDIF
       ENDDO
-    ENDIF
+    ENDIF 
     call ncd_pio_closefile(pftinfo_nfid)
   endif
   end subroutine ReadPlantInfoNC
@@ -1135,7 +1153,7 @@ implicit none
 ! the check point file has non-zero pft
           D200: DO NN=1,NPP(NY,NX)
             D205: DO NZ=1,NS
-              IF(DATAZ(NN,NY,NX).EQ.DATAX(NZ).AND.IsPlantActive_pft(NN,NY,NX).EQ.iPlantIsActive)THEN
+              IF(DATAZ(NN,NY,NX).EQ.DATAX(NZ).AND.IsPlantActive_pft(NN,NY,NX).EQ.iActive)THEN
                 DATAP(NN,NY,NX)=DATAX(NZ)
                 DATAM(NN,NY,NX)=DATAY(NZ)
                 DATAA(NZ,NY,NX)='NO'
@@ -1223,6 +1241,21 @@ implicit none
   line(width:width)=':'
   write(nu_plt,*)line,value
   end subroutine writefixl
+!------------------------------------------------------------------------------------------
+
+  subroutine writefixsl(nu_plt,desc,value,width)
+  implicit none
+  integer,intent(in)  :: nu_plt
+  character(len=*), intent(in) :: desc
+  integer, intent(in) :: width
+  character(len=*),intent(in) :: value
+
+  character(len=width) :: line
+  line=desc
+  line(width:width)=':'
+  write(nu_plt,*)line,' ',value
+  end subroutine writefixsl
+
 !------------------------------------------------------------------------------------------
 
   subroutine writeafixl(nu_plt,desc,values,width)

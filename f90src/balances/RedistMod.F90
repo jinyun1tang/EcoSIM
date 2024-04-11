@@ -158,7 +158,7 @@ module RedistMod
   implicit none
   integer, intent(in) :: I,J,NY,NX
   real(r8), intent(in) :: TXCO2(JY,JX)   !what does TXCO2 mean, be careful?
-  real(r8) :: VLSoilPoreMicPX,VOLTX
+  real(r8) :: VLSoilPoreMicP_vrX,VOLTX
   integer  :: L
 
   Eco_NetRad_col(NY,NX)=Eco_NetRad_col(NY,NX)+HeatByRadiation(NY,NX)
@@ -176,7 +176,7 @@ module RedistMod
     
   IF(NU(NY,NX).GT.NUI(NY,NX))THEN  !the surface is lowered
     DO L=NUI(NY,NX),NU(NY,NX)-1
-      IF(VLSoilPoreMicP(L,NY,NX).LE.ZEROS2(NY,NX))THEN
+      IF(VLSoilPoreMicP_vr(L,NY,NX).LE.ZEROS2(NY,NX))THEN
         TKS(L,NY,NX)=TKS(NU(NY,NX),NY,NX)
         TCS(L,NY,NX)=units%Kelvin2Celcius(TKS(L,NY,NX))
       ENDIF
@@ -198,8 +198,8 @@ module RedistMod
   !THETIZ(0,NY,NX)=AZMAX1(AMIN1(1.0,VLiceMicP(0,NY,NX)/VLitR(NY,NX)))
   
   D9945: DO L=NUI(NY,NX),NL(NY,NX)
-    VLSoilPoreMicPX=AREA(3,L,NY,NX)*DLYR(3,L,NY,NX)*FracSoiAsMicP(L,NY,NX)
-    VOLTX=VLSoilPoreMicPX+VLMacP(L,NY,NX)
+    VLSoilPoreMicP_vrX=AREA(3,L,NY,NX)*DLYR(3,L,NY,NX)*FracSoiAsMicP(L,NY,NX)
+    VOLTX=VLSoilPoreMicP_vrX+VLMacP(L,NY,NX)
     THETWZ(L,NY,NX)=safe_adb(VLWatMicP(L,NY,NX)+AMIN1(VLMacP(L,NY,NX),&
       VLWatMacP(L,NY,NX)),VOLTX)
     THETIZ(L,NY,NX)=safe_adb(VLiceMicP(L,NY,NX)+AMIN1(VLMacP(L,NY,NX) &
@@ -338,6 +338,7 @@ module RedistMod
   WO=VapXAir2GSurf(NY,NX)+TEVAPP(NY,NX) !total outgoing water flux
   CEVAP=CEVAP-WO
   UEVAP(NY,NX)=UEVAP(NY,NX)-WO
+  EvapoTransp_col(NY,NX)=-WO
   VOLWOU=VOLWOU-IrrigSubsurf(NY,NX)
   FWatDischarge(NY,NX)=FWatDischarge(NY,NX)-IrrigSubsurf(NY,NX)
   UVOLO(NY,NX)=UVOLO(NY,NX)-IrrigSubsurf(NY,NX)
@@ -472,15 +473,15 @@ module RedistMod
       -2.0_r8*Micb_N2Fixation_vr(0,NY,NX))/natomw
   SPM0=(2.0_r8*RNutMicbTransf_vr(ids_H1PO4,0,NY,NX)+3.0_r8*RNutMicbTransf_vr(ids_H2PO4,0,NY,NX))/patomw
   !
-  !     ACCUMULATE PLANT LITTERFALL FLUXES
+  !     ACCUMULATE PLANT LitrFall FLUXES
   !
-  XESN(ielmc)=XESN(ielmc)+LitterFallChemElm_col(ielmc,NY,NX)
-  XESN(ielmn)=XESN(ielmn)+LitterFallChemElm_col(ielmn,NY,NX)
-  XESN(ielmp)=XESN(ielmp)+LitterFallChemElm_col(ielmp,NY,NX)
+  XESN(ielmc)=XESN(ielmc)+LitrFallStrutElms_col(ielmc,NY,NX)
+  XESN(ielmn)=XESN(ielmn)+LitrFallStrutElms_col(ielmn,NY,NX)
+  XESN(ielmp)=XESN(ielmp)+LitrFallStrutElms_col(ielmp,NY,NX)
 
-  LiterfalOrgM_col(ielmc,NY,NX)=LiterfalOrgM_col(ielmc,NY,NX)+LitterFallChemElm_col(ielmc,NY,NX)
-  LiterfalOrgM_col(ielmn,NY,NX)=LiterfalOrgM_col(ielmn,NY,NX)+LitterFallChemElm_col(ielmn,NY,NX)
-  LiterfalOrgM_col(ielmp,NY,NX)=LiterfalOrgM_col(ielmp,NY,NX)+LitterFallChemElm_col(ielmp,NY,NX)
+  LiterfalOrgM_col(ielmc,NY,NX)=LiterfalOrgM_col(ielmc,NY,NX)+LitrFallStrutElms_col(ielmc,NY,NX)
+  LiterfalOrgM_col(ielmn,NY,NX)=LiterfalOrgM_col(ielmn,NY,NX)+LitrFallStrutElms_col(ielmn,NY,NX)
+  LiterfalOrgM_col(ielmp,NY,NX)=LiterfalOrgM_col(ielmp,NY,NX)+LitrFallStrutElms_col(ielmp,NY,NX)
   !
   !     SURFACE BOUNDARY SALT FLUXES FROM RAINFALL AND SURFACE IRRIGATION
   !
@@ -914,7 +915,7 @@ module RedistMod
       VLsoiAirP(L,NY,NX)=0.0_r8
 !     VLMicP(L,NY,NX)=VLWatMicP(L,NY,NX)+VLiceMicP(L,NY,NX)
 !    2+DVLWatMicP(L,NY,NX)+DVLiceMicP(L,NY,NX)
-!     VLSoilPoreMicP(L,NY,NX)=VLMicP(L,NY,NX)
+!     VLSoilPoreMicP_vr(L,NY,NX)=VLMicP(L,NY,NX)
 !     VGeomLayer(L,NY,NX)=VLMicP(L,NY,NX)
     ENDIF
     ENGY=VHeatCapacityX*TKSX
@@ -973,7 +974,7 @@ module RedistMod
     WaterStoreLandscape=WaterStoreLandscape+WS
     VOLISO=VOLISO+VLiceMicP(L,NY,NX)+VLiceMacP(L,NY,NX)
     UVLWatMicP(NY,NX)=UVLWatMicP(NY,NX)+WS
-!    2-WiltPoint(L,NY,NX)*VLSoilPoreMicP(L,NY,NX)
+!    2-WiltPoint(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
     HeatStoreLandscape=HeatStoreLandscape+VHeatCapacity(L,NY,NX)*TKS(L,NY,NX)
   ENDDO
   end subroutine update_physVar_Profile
@@ -1008,13 +1009,13 @@ module RedistMod
     SurfGasFlx(idg_H2,NY,NX)=SurfGasFlx(idg_H2,NY,NX)+Micb_N2Fixation_vr(L,NY,NX)
 
     !
-    !     RESIDUE FROM PLANT LITTERFALL
+    !     RESIDUE FROM PLANT LitrFall
 !
     D8565: DO K=1,micpar%NumOfPlantLitrCmplxs
       DO  M=1,jsken
-        OSA(M,K,L,NY,NX)=OSA(M,K,L,NY,NX)+LitrfalChemElemnts_vr(ielmc,M,K,L,NY,NX)*micpar%OMCI(1,K)
+        OSA(M,K,L,NY,NX)=OSA(M,K,L,NY,NX)+LitrfalStrutElms_vr(ielmc,M,K,L,NY,NX)*micpar%OMCI(1,K)
         DO NE=1,NumPlantChemElms
-          OSM(NE,M,K,L,NY,NX)=OSM(NE,M,K,L,NY,NX)+LitrfalChemElemnts_vr(NE,M,K,L,NY,NX)
+          OSM(NE,M,K,L,NY,NX)=OSM(NE,M,K,L,NY,NX)+LitrfalStrutElms_vr(NE,M,K,L,NY,NX)
         ENDDO
       enddo
     ENDDO D8565
@@ -1077,7 +1078,7 @@ module RedistMod
       +trcs_PoreTranspFlx_vr(idg_NH3,L,NY,NX)+trcg_ebu_flx_vr(idg_NH3,L,NY,NX)
 
     trc_solml_vr(idg_NH3B,L,NY,NX)=trc_solml_vr(idg_NH3B,L,NY,NX) &
-      +Gas_Disol_Flx_vr(idg_NH3B,L,NY,NX)+trcg_ebu_flx_vr(idg_NH3B,L,NY,NX)+ &
+      +Gas_Disol_Flx_vr(idg_NH3B,L,NY,NX)+trcg_ebu_flx_vr(idg_NH3B,L,NY,NX) &
       +trcs_Transp2MicP_vr(idg_NH3B,L,NY,NX) &
       +trcn_RChem_band_soil_vr(idg_NH3B,L,NY,NX)-trcs_plant_uptake_vr(idg_NH3B,L,NY,NX) &
       +trcs_Irrig_vr(idg_NH3B,L,NY,NX)+trcs_PoreTranspFlx_vr(idg_NH3B,L,NY,NX)
@@ -1534,24 +1535,24 @@ module RedistMod
   real(r8) :: HRAINR,RAINR
 
 !     begin_execution
-!     ADD ABOVE-GROUND LITTERFALL FROM EXTRACT.F TO SURFACE RESIDUE
+!     ADD ABOVE-GROUND LitrFall FROM EXTRACT.F TO SURFACE RESIDUE
 !
 !     OSC,OSN,OSP=SOC,SON,SOP
-!     CSNT,ZSNT,PSNT=total C,N,P litterfall
+!     CSNT,ZSNT,PSNT=total C,N,P LitrFall
 !     ORGC=total SOC
-!     RAINR,HRAINR=water,heat in litterfall
+!     RAINR,HRAINR=water,heat in LitrFall
 !     FLWR,HFLWR=water,heat flux into litter
 !     HEATIN=cumulative net surface heat transfer
 !
   DO   K=1,micpar%NumOfPlantLitrCmplxs
     DO  M=1,jsken
-      OSA(M,K,0,NY,NX)=OSA(M,K,0,NY,NX)+LitrfalChemElemnts_vr(ielmc,M,K,0,NY,NX)*micpar%OMCI(1,K)
+      OSA(M,K,0,NY,NX)=OSA(M,K,0,NY,NX)+LitrfalStrutElms_vr(ielmc,M,K,0,NY,NX)*micpar%OMCI(1,K)
       DO NE=1,NumPlantChemElms
-        OSM(NE,M,K,0,NY,NX)=OSM(NE,M,K,0,NY,NX)+LitrfalChemElemnts_vr(NE,M,K,0,NY,NX)
+        OSM(NE,M,K,0,NY,NX)=OSM(NE,M,K,0,NY,NX)+LitrfalStrutElms_vr(NE,M,K,0,NY,NX)
       ENDDO
 
-      ORGC(0,NY,NX)=ORGC(0,NY,NX)+LitrfalChemElemnts_vr(ielmc,M,K,0,NY,NX)
-      RAINR=LitrfalChemElemnts_vr(ielmc,M,K,0,NY,NX)*ThetaCX(K)
+      ORGC(0,NY,NX)=ORGC(0,NY,NX)+LitrfalStrutElms_vr(ielmc,M,K,0,NY,NX)
+      RAINR=LitrfalStrutElms_vr(ielmc,M,K,0,NY,NX)*ThetaCX(K)
       HRAINR=RAINR*cpw*TairK(NY,NX)
       WatFLo2Litr(NY,NX)=WatFLo2Litr(NY,NX)+RAINR
       HeatFLo2LitrByWat(NY,NX)=HeatFLo2LitrByWat(NY,NX)+HRAINR

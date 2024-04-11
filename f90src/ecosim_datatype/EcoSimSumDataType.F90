@@ -39,7 +39,7 @@ module EcoSimSumDataType
   real(r8) :: TOMOU(NumPlantChemElms)     !total subsurface C flux	g d-2
   real(r8) :: TZIN     !total surface N flux	g d-2
   real(r8) :: TPIN     !total surface P flux	g d-2
-  real(r8) :: XESN(NumPlantChemElms)     !total litterfall C	g d-2
+  real(r8) :: XESN(NumPlantChemElms)     !total LitrFall C	g d-2
   real(r8) :: TLCO2G   !total soil CO2	g d-2
   real(r8) :: TLN2G    !total soil N2	g d-2
 

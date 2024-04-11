@@ -5,7 +5,8 @@ module SurfSoilDataType
   implicit none
   public
   save
-  character(len=*), private, parameter :: mod_filename = __FILE__
+  character(len=*), private, parameter :: mod_filename = &
+  __FILE__
   real(r8),target,allocatable ::  FracSurfAsSnow(:,:)                !fraction of snow cover
   real(r8),target,allocatable ::  FracSurfSnoFree(:,:)               !fraction of snow-free cover
   real(r8),target,allocatable ::  FracSurfAsBareSoi(:,:)             !fraction of exposed soil surface, [-]

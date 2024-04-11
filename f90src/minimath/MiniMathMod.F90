@@ -6,9 +6,10 @@ module minimathmod
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use EcoSimConst
   implicit none
-  character(len=*),private, parameter :: mod_filename = &
-  __FILE__
   private
+  character(len=*), parameter :: mod_filename = &
+  __FILE__
+
   public :: safe_adb
   public :: p_adb
   public :: isclose         !test if two values a and b are close in magnitude
@@ -17,6 +18,7 @@ module minimathmod
   public :: isnan
   public :: AZMAX1,AZMIN1,AZMAX1t
   public :: GetMolAirPerm3
+  public :: fSiLU
   interface AZMAX1
     module procedure AZMAX1_s
     module procedure AZMAX1_d
@@ -230,6 +232,23 @@ module minimathmod
   endif
 
   end function GetMolAirPerm3
-
-
+! ----------------------------------------------------------------------
+  function fSiLU(x,b)result(ans)
+  !Sigmoid linear unit function
+  implicit none
+  real(r8), intent(in) :: x
+  real(r8),optional, intent(in) :: b
+  real(r8) :: b_loc
+  
+  real(r8) :: ans
+  
+  if(present(b))then
+    b_loc=b
+  else
+    b_loc=1._r8
+  endif
+  
+  ans=x/(1._r8+exp(-b_loc*x))
+  
+  end function fSiLU
 end module minimathmod

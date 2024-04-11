@@ -593,8 +593,6 @@ module MicBGCMod
   )
   RH2GZ=0.0_r8
 
-  TCGOMEheter(ielmc,:)=0.0_r8
-  TCGOMEheter(idom_acetate,:)=0.0_r8
   TCGOMEheter(:,:)=0.0_r8
 
   D760: DO K=1,jcplx
@@ -720,7 +718,7 @@ module MicBGCMod
     litrm => micfor%litrm, &
     ORGC=> micfor%ORGC, &
     ZEROS => micfor%ZEROS, &
-    VLSoilPoreMicP => micfor%VLSoilPoreMicP, &
+    VLSoilPoreMicP_vr => micfor%VLSoilPoreMicP_vr, &
     RNO2Y  => micfor%RNO2Y    &
 
   )
@@ -860,7 +858,7 @@ module MicBGCMod
 !  write(*,*)'HETEROTROPHIC DENITRIFICATION'
 !
   IF(N.EQ.micpar%n_anero_faculb.AND.ROXYM(NGL,K).GT.0.0_r8 &
-    .AND.(.not.litrm.OR.VLSoilPoreMicP.GT.ZEROS))THEN
+    .AND.(.not.litrm.OR.VLSoilPoreMicP_vr.GT.ZEROS))THEN
 
     call HeteroDenitrificCatabolism(NGL,N,K,FOQC,RGOCP,&
       VOLWZ,micfor,micstt,naqfdiag,nmicf,nmics,ncplxs,micflx)
@@ -1103,8 +1101,8 @@ module MicBGCMod
   real(r8) :: OQEX(idom_beg:idom_end)
   real(r8) :: OHEX(idom_beg:idom_end)
   integer :: idom
-  real(r8) :: VLSoilPoreMicPX
-  real(r8) :: VLSoilPoreMicPW,VOLCX,VOLCW,VOLAX,VOLAW
+  real(r8) :: VLSoilPoreMicP_vrX
+  real(r8) :: VLSoilPoreMicP_vrW,VOLCX,VOLCW,VOLAX,VOLAW
 !     begin_execution
   associate(                   &
     CGOMEheter  => nmicf%CGOMEheter,     &
@@ -1146,25 +1144,25 @@ module MicBGCMod
       OHEX(idom)=AMAX1(ZEROS,OHM(idom,K))
     ENDDO
 
-    VLSoilPoreMicPX=SoilMicPMassLayer*AECX*HSORP*FOSRH(K)
-    VLSoilPoreMicPW=VLWatMicPM(NPH)*FOSRH(K)
+    VLSoilPoreMicP_vrX=SoilMicPMassLayer*AECX*HSORP*FOSRH(K)
+    VLSoilPoreMicP_vrW=VLWatMicPM(NPH)*FOSRH(K)
     IF(FOCA(K).GT.ZERO)THEN
-      VOLCX=FOCA(K)*VLSoilPoreMicPX
-      VOLCW=FOCA(K)*VLSoilPoreMicPW
+      VOLCX=FOCA(K)*VLSoilPoreMicP_vrX
+      VOLCW=FOCA(K)*VLSoilPoreMicP_vrW
       OMSORP(idom_doc,K)=TSORP*(OQEX(idom_doc)*VOLCX-OHEX(idom_doc)*VOLCW)/(VOLCX+VOLCW)
     ELSE
-      OMSORP(idom_doc,K)=TSORP*(OQEX(idom_doc)*VLSoilPoreMicPX-OHEX(idom_doc)*VLSoilPoreMicPW)/(VLSoilPoreMicPX+VLSoilPoreMicPW)
+      OMSORP(idom_doc,K)=TSORP*(OQEX(idom_doc)*VLSoilPoreMicP_vrX-OHEX(idom_doc)*VLSoilPoreMicP_vrW)/(VLSoilPoreMicP_vrX+VLSoilPoreMicP_vrW)
     ENDIF
 
     IF(FOAA(K).GT.ZERO)THEN
-      VOLAX=FOAA(K)*VLSoilPoreMicPX
-      VOLAW=FOAA(K)*VLSoilPoreMicPW
+      VOLAX=FOAA(K)*VLSoilPoreMicP_vrX
+      VOLAW=FOAA(K)*VLSoilPoreMicP_vrW
       OMSORP(idom_acetate,K)=TSORP*(OQEX(idom_acetate)*VOLAX-OHEX(idom_acetate)*VOLAW)/(VOLAX+VOLAW)
     ELSE
-      OMSORP(idom_acetate,K)=TSORP*(OQEX(idom_acetate)*VLSoilPoreMicPX-OHEX(idom_acetate)*VLSoilPoreMicPW)/(VLSoilPoreMicPX+VLSoilPoreMicPW)
+      OMSORP(idom_acetate,K)=TSORP*(OQEX(idom_acetate)*VLSoilPoreMicP_vrX-OHEX(idom_acetate)*VLSoilPoreMicP_vrW)/(VLSoilPoreMicP_vrX+VLSoilPoreMicP_vrW)
     ENDIF
-    OMSORP(idom_don,K)=TSORP*(OQEX(idom_don)*VLSoilPoreMicPX-OHEX(idom_don)*VLSoilPoreMicPW)/(VLSoilPoreMicPX+VLSoilPoreMicPW)
-    OMSORP(idom_dop,K)=TSORP*(OQEX(idom_dop)*VLSoilPoreMicPX-OHEX(idom_dop)*VLSoilPoreMicPW)/(VLSoilPoreMicPX+VLSoilPoreMicPW)
+    OMSORP(idom_don,K)=TSORP*(OQEX(idom_don)*VLSoilPoreMicP_vrX-OHEX(idom_don)*VLSoilPoreMicP_vrW)/(VLSoilPoreMicP_vrX+VLSoilPoreMicP_vrW)
+    OMSORP(idom_dop,K)=TSORP*(OQEX(idom_dop)*VLSoilPoreMicP_vrX-OHEX(idom_dop)*VLSoilPoreMicP_vrW)/(VLSoilPoreMicP_vrX+VLSoilPoreMicP_vrW)
   ELSE
     DO idom=idom_beg,idom_end
       OMSORP(idom,K)=0.0_r8
@@ -1243,7 +1241,7 @@ module MicBGCMod
 !     DCKI=inhibition of decomposition by microbial concentration
 !     OSRH=total SOC
 !     COSC=concentration of total SOC
-!     SoilMicPMassLayer,VLSoilPoreMicP=mass, volume of soil layer
+!     SoilMicPMassLayer,VLSoilPoreMicP_vr=mass, volume of soil layer
 !     DFNS=effect of microbial concentration on decomposition
 !     OQCI=DOC product inhibition for decomposition
 !     OQKI=DOC product inhibition constant for decomposition
@@ -1495,9 +1493,9 @@ module MicBGCMod
 !
 !     FORC=fraction of total microbial residue
 !     ORCT=microbial residue
-!     RCCMEheter,RCCMN,RCCMP=transfer of auto litterfall C,N,P to each hetero K
-!     RCOMEheter,RCOMEheter,RCOMP=transfer of microbial C,N,P litterfall to residue
-!     RCMMEheter,RCMMN,RCMMEheter=transfer of senesence litterfall C,N,P to residue
+!     RCCMEheter,RCCMN,RCCMP=transfer of auto LitrFall C,N,P to each hetero K
+!     RCOMEheter,RCOMEheter,RCOMP=transfer of microbial C,N,P LitrFall to residue
+!     RCMMEheter,RCMMN,RCMMEheter=transfer of senesence LitrFall C,N,P to residue
 !
   D1690: DO K=1,KL
     IF(TORC.GT.ZEROS)THEN
@@ -1595,9 +1593,9 @@ module MicBGCMod
 !     MICROBIAL DECOMPOSITION PRODUCTS
 !
 !     ORC,ORN,ORP=microbial residue C,N,P
-!     RCOMEheter,RCOMEheter,RCOMP=transfer of microbial C,N,P litterfall to residue
-!     RCCMEheter,RCCMN,RCCMP=transfer of auto litterfall C,N,P to each hetero K
-!     RCMMEheter,RCMMN,RCMMEheter=transfer of senesence litterfall C,N,P to residue
+!     RCOMEheter,RCOMEheter,RCOMP=transfer of microbial C,N,P LitrFall to residue
+!     RCCMEheter,RCCMN,RCCMP=transfer of auto LitrFall C,N,P to each hetero K
+!     RCMMEheter,RCMMN,RCMMEheter=transfer of senesence LitrFall C,N,P to residue
 !
         D565: DO M=1,ndbiomcp
           DO NE=1,NumPlantChemElms
@@ -1696,8 +1694,8 @@ module MicBGCMod
 !     HUMIFICATION PRODUCTS
 !
 !     CFOMC=fractions allocated to humic vs fulvic humus
-!     RHOMC,RHOMN,RHOMEheter=transfer of microbial C,N,P litterfall to humus
-!     RHMMEheter,RHMMN,RHMMEheter=transfer of senesence litterfall C,N,P to humus
+!     RHOMC,RHOMN,RHOMEheter=transfer of microbial C,N,P LitrFall to humus
+!     RHMMEheter,RHMMN,RHMMEheter=transfer of senesence LitrFall C,N,P to humus
 !
             IF(.not.litrm)THEN
 !add as protein
@@ -2891,7 +2889,7 @@ module MicBGCMod
     Rain2LitRSurf => micfor%Rain2LitRSurf , &
     litrm => micfor%litrm , &
     OLSGL  => micfor%OLSGL, &
-    VLSoilPoreMicP => micfor%VLSoilPoreMicP, &
+    VLSoilPoreMicP_vr => micfor%VLSoilPoreMicP_vr, &
     VLSoilMicP  => micfor%VLSoilMicP, &
     ZERO => micfor%ZERO, &
     ZEROS  => micfor%ZEROS, &
@@ -2914,7 +2912,7 @@ module MicBGCMod
     ROXSK => micflx%ROXSK &
   )
   IF(ROXYP(NGL,K).GT.ZEROS.AND.FOXYX.GT.ZERO)THEN
-    IF(.not.litrm.OR.VLSoilPoreMicP.GT.ZEROS)THEN
+    IF(.not.litrm.OR.VLSoilPoreMicP_vr.GT.ZEROS)THEN
       !
       !write(*,*)'MAXIMUM O2 UPAKE FROM POTENTIAL RESPIRATION OF EACH AEROBIC'
       !     POPULATION
@@ -2942,7 +2940,7 @@ module MicBGCMod
         !     OF AQUEOUS O2 FROM DISSOLUTION RATE CONSTANT 'DiffusivitySolutEff'
         !     CALCULATED IN 'WATSUB'
         !
-        !     VLWatMicPM,VLsoiAirPM,VLSoilPoreMicP=water, air and total volumes
+        !     VLWatMicPM,VLsoiAirPM,VLSoilPoreMicP_vr=water, air and total volumes
         !     ORAD=microbial radius,FILM=water film thickness
         !     DIFOX=aqueous O2 diffusion, TortMicPM=tortuosity
         !     BIOS=microbial number, OMA=active biomass
@@ -3681,7 +3679,7 @@ module MicBGCMod
 !     SPOMC=basal decomposition rate
 !     SPOMK=effect of low microbial C concentration on microbial decay
 !     RXOMC,RXOMN,RXOMEheter=microbial C,N,P decomposition
-!     RDOMEheter,RDOMN,RDOMP=microbial C,N,P litterfall
+!     RDOMEheter,RDOMN,RDOMP=microbial C,N,P LitrFall
 !     R3OMC,R3OMN,R3OMEheter=microbial C,N,P recycling
 !
     MID=micpar%get_micb_id(M,NGL)
@@ -3698,9 +3696,9 @@ module MicBGCMod
 !     HUMIFICATION OF MICROBIAL DECOMPOSITION PRODUCTS FROM
 !     DECOMPOSITION RATE, SOIL CLAY AND OC 'EHUM' FROM 'HOUR1'
 !
-!     RHOMC,RHOMN,RHOMEheter=transfer of microbial C,N,P litterfall to humus
+!     RHOMC,RHOMN,RHOMEheter=transfer of microbial C,N,P LitrFall to humus
 !     EHUM=humus transfer fraction from hour1.f
-!     RCOMEheter,RCOMEheter,RCOMP=transfer of microbial C,N,P litterfall to residue
+!     RCOMEheter,RCOMEheter,RCOMP=transfer of microbial C,N,P LitrFall to residue
 !
 
       RHOMEheter(NE,M,NGL,K)=AZMAX1(RDOMEheter(NE,M,NGL,K)*EHUM)
@@ -3721,7 +3719,7 @@ module MicBGCMod
 !     RXMMEheter,RXMMN,RXMMP=microbial C,N,P loss from senescence
 !     RMOMC=maintenance respiration
 !     CNOMA,CPOMA=N:C,P:C ratios of active biomass
-!     RDMMC,RDMMEheter,RDMMP=microbial C,N,P litterfall from senescence
+!     RDMMC,RDMMEheter,RDMMP=microbial C,N,P LitrFall from senescence
 !     R3MMEheter,R3MMN,R3MMP=microbial C,N,P recycling from senescence
 !
   IF(RXOMT.GT.ZEROS.AND.RMOMT.GT.ZEROS.AND.RCCC.GT.ZERO)THEN
@@ -3740,9 +3738,9 @@ module MicBGCMod
 !     HUMIFICATION AND RECYCLING OF RESPIRATION DECOMPOSITION
 !     PRODUCTS
 !
-!     RHMMEheter,RHMMN,RHMMEheter=transfer of senesence litterfall C,N,P to humus
+!     RHMMEheter,RHMMN,RHMMEheter=transfer of senesence LitrFall C,N,P to humus
 !     EHUM=humus transfer fraction
-!     RCMMEheter,RCMMN,RCMMEheter=transfer of senesence litterfall C,N,P to residue
+!     RCMMEheter,RCMMN,RCMMEheter=transfer of senesence LitrFall C,N,P to residue
 !
 
         RHMMEheter(NE,M,NGL,K)=AZMAX1(RDMMEheter(NE,M,NGL,K)*EHUM)
