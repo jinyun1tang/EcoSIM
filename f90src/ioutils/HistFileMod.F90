@@ -2062,7 +2062,7 @@ implicit none
       write(cdate,'(i4.4,"-",i2.2)') yr,mon
    else                        !other
       call etimer%get_curr_date (yr, mon, day, sec)
-      write(cdate,'(i4.4,"-",i2.2,"-",i2.2,"-",i5.5)') yr,mon,day,sec
+      write(cdate,'(i4.4,"-",i2.2,"-",i2.2,"-",i5.5)') yr,mon,day-1,sec
    endif
    write(hist_index,'(i1.1)') hist_file - 1
    set_hist_filename = "./"//trim(case_name)//".ecosim"//trim(inst_suffix)//&

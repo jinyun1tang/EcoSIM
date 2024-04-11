@@ -24,7 +24,7 @@ module EcosimBGCFluxType
   real(r8),target,allocatable ::  NetPO4Mineralize_col(:,:)                        !total H2PO4 net mineraln (-ve) or immobiln (+ve)
   real(r8),target,allocatable ::  GPP(:,:)                           !gross primary productivity, [g d-2 h-1]
   real(r8),target,allocatable ::  Canopy_NEE_col(:,:)                         !total net CO2 fixation
-  real(r8),target,allocatable ::  LitterFallChemElm_col(:,:,:)                       !total litterfall element, [g d-2 h-1]
+  real(r8),target,allocatable ::  LitrFallStrutElms_col(:,:,:)                       !total LitrFall element, [g d-2 h-1]
   real(r8),target,allocatable ::  ECO_ER_col(:,:)                          !ecosystem respiration, [g d-2 h-1]
   real(r8),target,allocatable ::  Eco_NBP_col(:,:)                          !total NBP, [g d-2]
   real(r8),target,allocatable ::  RP14X(:,:,:)                       !HPO4 demand in non-band by all microbial,root,myco populations
@@ -50,7 +50,7 @@ contains
   allocate(NetPO4Mineralize_col(JY,JX));      NetPO4Mineralize_col=0._r8
   allocate(GPP(JY,JX));         GPP=0._r8
   allocate(Canopy_NEE_col(JY,JX));       Canopy_NEE_col=0._r8
-  allocate(LitterFallChemElm_col(NumPlantChemElms,JY,JX));       LitterFallChemElm_col=0._r8
+  allocate(LitrFallStrutElms_col(NumPlantChemElms,JY,JX));       LitrFallStrutElms_col=0._r8
   allocate(ECO_ER_col(JY,JX));        ECO_ER_col=0._r8
   allocate(Eco_NBP_col(JY,JX));        Eco_NBP_col=0._r8
   allocate(RP14X(0:JZ,JY,JX));  RP14X=0._r8
@@ -76,7 +76,7 @@ contains
   call destroy(NetPO4Mineralize_col)
   call destroy(GPP)
   call destroy(Canopy_NEE_col)
-  call destroy(LitterFallChemElm_col)
+  call destroy(LitrFallStrutElms_col)
   call destroy(ECO_ER_col)
   call destroy(Eco_NBP_col)
   call destroy(RP14X)

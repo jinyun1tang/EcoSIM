@@ -7,7 +7,8 @@ module PlantMathFuncMod
   use MiniMathMod
   use ElmIDMod
 implicit none
-  character(len=*), parameter, private :: mod_filename='PlantMathFuncMod'
+  character(len=*), parameter, private :: mod_filename=&
+  __FILE__
 
   type, public  :: PlantSoluteUptakeConfig_type
     real(r8) :: SolAdvFlx  
@@ -211,7 +212,7 @@ contains
   end subroutine SoluteUptakeByPlantRoots
 !--------------------------------------------------------------------------------
 
-  pure function is_plant_treelike(iPlantMorphologyType_pft)result(ans)
+  pure function is_plant_treelike(iPlantRootProfile_pft)result(ans)
 !
 ! currently, there are three plant growth types defined as
 ! iplt_bryophyte=0
@@ -219,15 +220,15 @@ contains
 !  iplt_treelike=2
 
   implicit none
-  integer, intent(in) :: iPlantMorphologyType_pft
+  integer, intent(in) :: iPlantRootProfile_pft
   logical :: ans
 
-  ans=iPlantMorphologyType_pft > 1
+  ans=iPlantRootProfile_pft > 1
   end function is_plant_treelike
 
 !--------------------------------------------------------------------------------
 
-  pure function is_plant_bryophyte(iPlantMorphologyType_pft)result(ans)
+  pure function is_root_shallow(iPlantRootProfile_pft)result(ans)
 !
 ! currently, there are three plant growth types defined as
 ! iplt_bryophyte=0
@@ -235,11 +236,11 @@ contains
 !  iplt_treelike=2
 
   implicit none
-  integer, intent(in) :: iPlantMorphologyType_pft
+  integer, intent(in) :: iPlantRootProfile_pft
   logical :: ans
 
-  ans=(iPlantMorphologyType_pft == iplt_bryophyte)
-  end function is_plant_bryophyte
+  ans=(iPlantRootProfile_pft == iplt_bryophyte)
+  end function is_root_shallow
 !--------------------------------------------------------------------------------
   pure function pMOD(a,b)result(c)
   !
@@ -279,7 +280,7 @@ contains
 
   logical :: yesno
 
-  yesno=iPlantNfixType.NE.in2fixtyp_none
+  yesno=iPlantNfixType.NE.iN2fixtyp_none
 
   end function is_plant_N2fix
 

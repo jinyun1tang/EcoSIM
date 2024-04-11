@@ -177,7 +177,7 @@ module TranspNoSaltMod
 !     ENTERED IN WEATHER AND IRRIGATION FILES
 !
 !     SnoFalPrec,RainFalPrec=snow,rain
-!     VLSnowHeatCapM,VLHeatCapSnowMin=current,minimum volumetric heat capacity of snowpack
+!     VLSnowHeatCapM,VLHeatCapSnowMin_col=current,minimum volumetric heat capacity of snowpack
 !     X*BLS=hourly solute flux to snowpack
 !     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
 !             :OC=DOC,ON=DON,OP=DOP,OA=acetate
@@ -386,7 +386,7 @@ module TranspNoSaltMod
 !
   D9685: DO L=NU(NY,NX),NL(NY,NX)
     IF(M.NE.MX)THEN
-      IF(VLSoilPoreMicP(L,NY,NX).GT.ZEROS2(NY,NX))THEN
+      IF(VLSoilPoreMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
 
         DO NTS=ids_beg,ids_end
           trc_solml_vr2(NTS,L,NY,NX)=trc_solml_vr2(NTS,L,NY,NX)+RFLZ_sol(NTS,L,NY,NX)
@@ -430,7 +430,7 @@ module TranspNoSaltMod
 !     gas code:*CO2*=CO2,*OXY*=O2,*CH4*=CH4,*Z2G*=N2,*Z2O*=N2O
 !             :*ZN3*=NH3,*H2G*=H2
 !
-    IF(VLSoilPoreMicP(L,NY,NX).GT.ZEROS2(NY,NX))THEN
+    IF(VLSoilPoreMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
       DO NTG=idg_beg,idg_end
         trc_solml_vr2(NTG,L,NY,NX)=trc_solml_vr2(NTG,L,NY,NX)+RGasDSFlx(NTG,L,NY,NX)
       ENDDO
@@ -530,7 +530,7 @@ module TranspNoSaltMod
 
   integer, intent(in) :: I
   integer, intent(in) :: NY,NX
-  IF(SnoFalPrec(NY,NX).GT.0.0_r8.OR.(RainFalPrec(NY,NX).GT.0.0_r8.AND.VLSnowHeatCapM(1,1,NY,NX).GT.VLHeatCapSnowMin(NY,NX)))THEN
+  IF(SnoFalPrec(NY,NX).GT.0.0_r8.OR.(RainFalPrec(NY,NX).GT.0.0_r8.AND.VLSnowHeatCapM(1,1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX)))THEN
     trcg_XBLS(idg_CO2,1,NY,NX)=Rain2SoilSurf(NY,NX)*CO2_rain_conc(NY,NX)+Irrig2SoilSurf(NY,NX)*CO2_irrig_conc(NY,NX)
     trcg_XBLS(idg_CH4,1,NY,NX)=Rain2SoilSurf(NY,NX)*CH4_rain_conc(NY,NX)+Irrig2SoilSurf(NY,NX)*CH4_irrig_conc(NY,NX)
     trcg_XBLS(idg_O2,1,NY,NX)=Rain2SoilSurf(NY,NX)*O2_rain_conc(NY,NX)+Irrig2SoilSurf(NY,NX)*O2_irrig_conc(NY,NX)
@@ -556,7 +556,7 @@ module TranspNoSaltMod
 !     ENTERED IN WEATHER AND IRRIGATION FILES
 !
   ELSEIF((PrecAtm(NY,NX).GT.0.0_r8.OR.IrrigSurface(NY,NX).GT.0.0_r8) &
-    .AND.VLSnowHeatCapM(1,1,NY,NX).LE.VLHeatCapSnowMin(NY,NX))THEN
+    .AND.VLSnowHeatCapM(1,1,NY,NX).LE.VLHeatCapSnowMin_col(NY,NX))THEN
 !
 !     HOURLY SOLUTE FLUXES FROM ATMOSPHERE TO SNOWPACK
 !     IF SNOWFALL AND IRRIGATION IS ZERO AND SNOWPACK IS ABSENT

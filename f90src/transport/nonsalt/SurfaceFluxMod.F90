@@ -1215,7 +1215,7 @@ contains
   real(r8) :: VFLWNH4,VFLWPO4,VFLWPOB
   integer  :: ngases,nnut
 !
-!     VLSnowHeatCapM,VLHeatCapSnowMin=current,minimum volumetric heat capacity of snowpack
+!     VLSnowHeatCapM,VLHeatCapSnowMin_col=current,minimum volumetric heat capacity of snowpack
 !     VOLWSL=snowpack water content
 !     WatFlowInSnowM=snowpack water flux
 !     R*BLS=solute flux in snowpack
@@ -1224,9 +1224,9 @@ contains
 !
   ICHKL=0
   DO  L=1,JS
-    IF(VLSnowHeatCapM(M,L,NY,NX).GT.VLHeatCapSnowMin(NY,NX))THEN
+    IF(VLSnowHeatCapM(M,L,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
       L2=MIN(JS,L+1)
-      IF(L.LT.JS.AND.VLSnowHeatCapM(M,L2,NY,NX).GT.VLHeatCapSnowMin(NY,NX))THEN
+      IF(L.LT.JS.AND.VLSnowHeatCapM(M,L2,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
         IF(VLWatSnow(L,NY,NX).GT.ZEROS2(NY,NX))THEN
           VFLWW=AZMAX1(AMIN1(1.0_r8,WatFlowInSnowM(M,L2,NY,NX)/VLWatSnow(L,NY,NX)))
         ELSE

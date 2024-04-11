@@ -2,6 +2,7 @@ module UptakePars
 ! USES:
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use EcoSimConst
+  use ElmIDMod
   implicit none
   public
   save
@@ -37,9 +38,7 @@ module UptakePars
   real(r8) :: PCKI
   real(r8) :: ZPKI
   real(r8) :: PZKI
-  real(r8) :: FEXUC
-  real(r8) :: FEXUN
-  real(r8) :: FEXUP
+  real(r8) :: FEXUDE(NumPlantChemElms)
 
   contains
   subroutine InitUptakePars
@@ -61,8 +60,9 @@ module UptakePars
   PCKI=0.5E-02_r8
   ZPKI=ZCKI/PCKI
   PZKI=PCKI/ZCKI
-  FEXUC=0.5E-03_r8
-  FEXUN=1.0E-02_r8
-  FEXUP=1.0E-02_r8
+  FEXUDE(ielmc)=0.5E-03_r8
+  FEXUDE(ielmn)=1.0E-02_r8
+  FEXUDE(ielmp)=1.0E-02_r8
+  
   end subroutine InitUptakePars
 end module UptakePars

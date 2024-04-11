@@ -9,12 +9,12 @@ module GrosubPars
   __FILE__
 ! PART1X,PART2X=modifiers to organ partitioning coefficients
 ! VMXC=rate constant for nonstructural C oxidation in respiration (h-1)
-! FSNR=rate constant for litterfall at end of growing season (h-1)
+! FSNR=rate constant for LitrFall at end of growing season (h-1)
 ! Hours4PhyslMature=number of hours with no grain filling required for physilogical maturity
-! Hours4FullSenescence=number of hours until full senescence after physl maturity
+! Hours4FullSenes=number of hours until full senescence after physl maturity
 ! XFRX=maximum storage C content for remobiln from stalk,root reserves
 ! XFRY=rate const for remobiln to storage from stalk,root reserves (h-1)
-! Hours4LiterfalAftMature_brch,HoursReq4LiterfalAftMature=current,required hours after physl maturity until start of litterfall
+! Hours4LiterfalAftMature_brch,HoursReq4LiterfalAftMature=current,required hours after physl maturity until start of LitrFall
 ! FSNK=min ratio of branch or mycorrhizae to root for calculating C transfer
 ! FXFS=rate constant for remobilization of stalk C,N,P (h-1)
 ! FMYC=rate constant for root-mycorrhizal C,N,P exchange (h-1)
@@ -22,10 +22,10 @@ module GrosubPars
 !
 !     CNKI,CPKI=nonstructural N,P inhibition constant on growth (g N,P g-1 C)
 !     RmSpecPlant=specific maintenance respiration rate (g C g-1 N h-1)
-!     PSIMin4OrganExtension=minimum water potential for organ expansion,extension (MPa)
+!     PSIMin4OrganExtens=minimum water potential for organ expansion,extension (MPa)
 !     RCMN=minimum stomatal resistance to CO2 (s m-1)
 !     RTDPX=distance behind growing point for secondary roots (m)
-!     MinAve2ndRootLen=minimum average secondary root length (m)
+!     Root2ndAveLenMin=minimum average secondary root length (m)
 !     EMODR=root modulus of elasticity (MPa)
 !
 !
@@ -58,7 +58,7 @@ module GrosubPars
 !     VMXO=specific respiration rate by bacterial N2 fixers (g g-1 h-1)
 !     SPNDL=specific decomposition rate by canopy,root bacterial N2 fixers (g g-1 h-1)
 !     CCNGB,CCNGR=parameters to calculate nonstructural C,N,P exchange between bacteria and branch,root
-!     NoduleBiomCatInfection=initial bacterial mass at infection (g C m-2)
+!     NodulBiomCatInfection=initial bacterial mass at infection (g C m-2)
 !     CZKM,CPKM=Km for nonstructural N,P uptake by bacteria (g N,P g-1 C)
 !     RCCZR,RCCYR=min,max fractions for root C recycling
 !     RCCXR,RCCQR=max fractions for root N,P recycling
@@ -67,12 +67,14 @@ module GrosubPars
 !     RCCZ,RCCY=min,max fractions for shoot,bacteria C recycling
 !     RCCX,RCCQ=max fractions for shoot,bacteria N,P recycling
 !
+  integer, parameter :: ibackward=1
+  integer, parameter :: iforward=2
   real(r8) :: PART1X
   real(r8) :: PART2X
   real(r8) :: VMXC
   real(r8) :: FSNR
   real(r8) :: Hours4PhyslMature
-  real(r8) :: Hours4FullSenescence
+  real(r8) :: Hours4FullSenes
   real(r8) :: XFRX
   real(r8) :: XFRY
   real(r8) :: FSNK
@@ -81,10 +83,10 @@ module GrosubPars
   real(r8) :: CNKI
   real(r8) :: CPKI
   real(r8) :: RmSpecPlant
-  real(r8) :: PSIMin4OrganExtension
+  real(r8) :: PSIMin4OrganExtens
   real(r8) :: RCMN
   real(r8) :: RTDPX
-  real(r8) :: MinAve2ndRootLen
+  real(r8) :: Root2ndAveLenMin
   real(r8) :: EMODR
   real(r8) :: QNTM
   real(r8) :: CURV
@@ -126,7 +128,7 @@ module GrosubPars
   real(r8) :: SPNDL
   real(r8) :: CCNGR
   real(r8) :: CCNGB
-  real(r8) :: NoduleBiomCatInfection
+  real(r8) :: NodulBiomCatInfection
   real(r8) :: CZKM
   real(r8) :: CPKM
   real(r8) :: RCCZR
@@ -144,7 +146,7 @@ module GrosubPars
   REAL(R8) :: RCCX(0:3),RCCQ(0:3)
   REAL(R8) :: RCCZ(0:3),RCCY(0:3)
   real(r8) :: Hours4SenesAftMature(0:3)
-  real(r8) :: ATRPX(0:1)
+  real(r8) :: HourReq2InitSStor4LeafOut(0:1)
   real(r8) :: GVMX(0:1)
   real(r8) :: RTSK(0:3)
   character(len=6), allocatable :: pftss(:)
@@ -201,29 +203,32 @@ module GrosubPars
   integer :: npft
   integer :: nkopenclms
 
-  if(.not. file_exists(pft_file_in))then
-    !call endrun(msg='Fail to locate plant trait file specified by pft_file_in in ' &
-    !  //mod_filename,line=__LINE__)
+  if (len_trim(pft_file_in) == 0)then
     write(*,*) "Setting PFTs to one"
     npfts=1
   else
-    npfts=get_dim_len(pft_file_in, 'npfts')
-    npft=get_dim_len(pft_file_in, 'npft')
-    nkopenclms=get_dim_len(pft_file_in,'nkopenclms')
-    allocate(pftss(npfts))
-    allocate(pft_long(npft))
-    allocate(pft_short(npft))
-    allocate(koppen_clim_no(nkopenclms))
-    allocate(koppen_clim_short(nkopenclms))
-    allocate(koppen_clim_long(nkopenclms))
-    call ncd_pio_openfile(pft_nfid, pft_file_in, ncd_nowrite)
-    call ncd_getvar(pft_nfid, 'pfts', pftss)
-    call ncd_getvar(pft_nfid,'pfts_long',pft_long)
-    call ncd_getvar(pft_nfid,'pfts_short',pft_short)
-    call ncd_getvar(pft_nfid,'koppen_clim_no',koppen_clim_no)
-    call ncd_getvar(pft_nfid,'koppen_clim_short',koppen_clim_short)
-    call ncd_getvar(pft_nfid,'koppen_clim_long',koppen_clim_long)
-  endif
+    if(.not. file_exists(trim(pft_file_in)))then
+      call endrun(msg='Fail to locate plant trait file '//trim(pft_file_in)//' in ' &
+        //mod_filename,line=__LINE__)
+    else
+      npfts=get_dim_len(pft_file_in, 'npfts')
+      npft=get_dim_len(pft_file_in, 'npft')
+      nkopenclms=get_dim_len(pft_file_in,'nkopenclms')
+      allocate(pftss(npfts))
+      allocate(pft_long(npft))
+      allocate(pft_short(npft))
+      allocate(koppen_clim_no(nkopenclms))
+      allocate(koppen_clim_short(nkopenclms))
+      allocate(koppen_clim_long(nkopenclms))
+      call ncd_pio_openfile(pft_nfid, pft_file_in, ncd_nowrite)
+      call ncd_getvar(pft_nfid, 'pfts', pftss)
+      call ncd_getvar(pft_nfid,'pfts_long',pft_long)
+      call ncd_getvar(pft_nfid,'pfts_short',pft_short)
+      call ncd_getvar(pft_nfid,'koppen_clim_no',koppen_clim_no)
+      call ncd_getvar(pft_nfid,'koppen_clim_short',koppen_clim_short)
+      call ncd_getvar(pft_nfid,'koppen_clim_long',koppen_clim_long)
+    endif
+  endif  
   pltpar%inonstruct=0
   pltpar%ifoliar=1
   pltpar%inonfoliar=2
@@ -238,7 +243,7 @@ module GrosubPars
   VMXC=0.015_r8
   FSNR=2.884E-03_r8
   Hours4PhyslMature=168.0_r8
-  Hours4FullSenescence=240.0_r8
+  Hours4FullSenes=240.0_r8
   XFRX=2.5E-02_r8
   XFRY=2.5E-03_r8
   FSNK=0.05_r8
@@ -247,10 +252,10 @@ module GrosubPars
   CNKI=1.0E-01_r8
   CPKI=1.0E-02_r8
   RmSpecPlant=0.010_r8
-  PSIMin4OrganExtension=0.1_r8
+  PSIMin4OrganExtens=0.1_r8
   RCMN=1.560E+01_r8
   RTDPX=0.00_r8
-  MinAve2ndRootLen=1.0E-03_r8
+  Root2ndAveLenMin=1.0E-03_r8
   EMODR=5.0_r8
   QNTM=0.45_r8
   CURV=0.70_r8
@@ -292,7 +297,7 @@ module GrosubPars
   SPNDL=5.0E-04_r8
   CCNGR=2.5E-01_r8
   CCNGB=6.0E-04_r8
-  NoduleBiomCatInfection=1.0E-03_r8
+  NodulBiomCatInfection=1.0E-03_r8
   CZKM=2.5E-03_r8
   CPKM=2.5E-04_r8
   RCCZR=0.056_r8
@@ -320,7 +325,7 @@ module GrosubPars
   FRSV=real((/0.025,0.025,0.001,0.001/),r8)
   FXFY=real((/0.025,0.005/),r8);FXFZ=real((/0.25,0.05/),r8)
   Hours4SenesAftMature=real((/360.0,1440.0,720.0,720.0/),r8)
-  ATRPX=real((/68.96,276.9/),r8);GVMX=real((/0.010,0.0025/),r8)
+  HourReq2InitSStor4LeafOut=real((/68.96,276.9/),r8);GVMX=real((/0.010,0.0025/),r8)
   
   end subroutine InitVegPars
 !------------------------------------------------------------------------------------------

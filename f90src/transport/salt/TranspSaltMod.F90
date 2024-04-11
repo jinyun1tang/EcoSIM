@@ -409,7 +409,7 @@ module TranspSaltMod
 !
 !
       IF(SnoFalPrec(NY,NX).GT.0.0.OR.(RainFalPrec(NY,NX).GT.0.0 &
-        .AND.VLSnowHeatCapM(1,1,NY,NX).GT.VLHeatCapSnowMin(NY,NX)))THEN
+        .AND.VLSnowHeatCapM(1,1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX)))THEN
   !     there is snowpack
 
         call AtmosSoluteFluxToSnowpack(I,NY,NX)
@@ -419,7 +419,7 @@ module TranspSaltMod
   !     ENTERED IN WEATHER AND IRRIGATION FILES
   !
       ELSEIF((PrecAtm(NY,NX).GT.0.0_r8.OR.IrrigSurface(NY,NX).GT.0.0_r8) &
-        .AND.VLSnowHeatCapM(1,1,NY,NX).LE.VLHeatCapSnowMin(NY,NX))THEN
+        .AND.VLSnowHeatCapM(1,1,NY,NX).LE.VLHeatCapSnowMin_col(NY,NX))THEN
   !     there is no significant snowpack, but precipitation
         call AtmosSoluteFluxToTopsoil(I,NY,NX)
   !
@@ -701,12 +701,12 @@ module TranspSaltMod
 !     begin_execution
 
   D1205: DO LS=1,JS
-    IF(VLSnowHeatCapM(M,LS,NY,NX).GT.VLHeatCapSnowMin(NY,NX))THEN
+    IF(VLSnowHeatCapM(M,LS,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
       LS2=MIN(JS,LS+1)
 !
 !     IF LOWER LAYER IS IN THE SNOWPACK
   !
-      IF(LS.LT.JS.AND.VLSnowHeatCapM(M,LS2,N2,N1).GT.VLHeatCapSnowMin(N2,N1))THEN
+      IF(LS.LT.JS.AND.VLSnowHeatCapM(M,LS2,N2,N1).GT.VLHeatCapSnowMin_col(N2,N1))THEN
         DO nsalts=idsalt_beg,idsalt_end
           trcSalt_TBLS(nsalts,LS,NY,NX)=trcSalt_TBLS(nsalts,LS,NY,NX) &
             +trcSaltAdv2SowLay(nsalts,LS,NY,NX)-trcSaltAdv2SowLay(nsalts,LS2,NY,NX)
@@ -759,13 +759,13 @@ module TranspSaltMod
 
   IF(FlowDirIndicator(N2,N1).NE.3.OR.N.EQ.3)THEN
     D1200: DO LL=N6,NL(NY,NX)
-      IF(VLSoilPoreMicP(LL,N2,N1).GT.ZEROS2(N2,N1))THEN
+      IF(VLSoilPoreMicP_vr(LL,N2,N1).GT.ZEROS2(N2,N1))THEN
         N6=LL
         exit
       ENDIF
     ENDDO D1200
 
-    IF(VLSoilPoreMicP(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
+    IF(VLSoilPoreMicP_vr(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
       DO nsalts=idsalt_beg,idsaltb_end
         trcSalt_Flo2MicP_vr(nsalts,N3,N2,N1)=trcSalt_Flo2MicP_vr(nsalts,N3,N2,N1) &
           +trcSalt3DFlo2CellM(nsalts,N,N3,N2,N1)-trcSalt3DFlo2CellM(nsalts,N,N6,N5,N4)
@@ -973,7 +973,7 @@ module TranspSaltMod
 !          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH4P2O8+,*M1P*=MgHPO4,*COO*=COOH-
 !          :*1=non-band,*B=band
 !
-            IF(VLSoilPoreMicP(N3,N2,N1).GT.ZEROS(NY,NX))THEN
+            IF(VLSoilPoreMicP_vr(N3,N2,N1).GT.ZEROS(NY,NX))THEN
 
               IF(FlowDirIndicator(M2,M1).NE.3.OR.N.EQ.3)THEN
                 IF(NN.EQ.1.AND.WaterFlow2MicPM(M,N,M6,M5,M4).GT.0.0 &
@@ -1036,7 +1036,7 @@ module TranspSaltMod
             ELSEIF(N.EQ.3)THEN
 !     NET SOLUTE FLUX IN SNOWPACK
 !
-!     VLSnowHeatCapM,VLHeatCapSnowMin=current,minimum volumetric heat capacity of snowpack
+!     VLSnowHeatCapM,VLHeatCapSnowMin_col=current,minimum volumetric heat capacity of snowpack
 !     T*BLS=net solute flux in snowpack
 !     R*BLS=solute flux in snowpack
               call NetFluxInSnowpack(M,NY,NX,N1,N2)
@@ -1144,7 +1144,7 @@ module TranspSaltMod
 !     R*FLZ,R*FBZ=subsurface solute flux in non-band,band
 !
   D9685: DO L=NU(NY,NX),NL(NY,NX)
-    IF(VLSoilPoreMicP(L,NY,NX).GT.ZEROS2(NY,NX))THEN
+    IF(VLSoilPoreMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
       DO nsalts=idsalt_beg,idsaltb_end
         trcSalt_solml2(nsalts,L,NY,NX)=trcSalt_solml2(nsalts,L,NY,NX) &
           +trcSalt_Flo2MicP_vr(nsalts,L,NY,NX)+trcSalt_RFXS(nsalts,L,NY,NX) &

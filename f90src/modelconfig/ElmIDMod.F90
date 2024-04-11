@@ -3,6 +3,8 @@ module ElmIDMod
 ! DESCRIPTION:
 !  Chemical element ids
 implicit none
+  character(len=*),private, parameter :: mod_filename =&
+   __FILE__
   integer, parameter :: ielmc=1    !carbon element
   integer, parameter :: ielmn=2    !nitrogen element
   integer, parameter :: ielmp=3    !phosphorus element
@@ -75,8 +77,8 @@ implicit none
   integer, parameter :: iLive=0  !plant organ alive
   integer, parameter :: iDead=1  !plant organ dead
 
-  integer, parameter :: iPlantIsActive=1  !plant active
-  integer, parameter :: iPlantIsDormant =0  !plant dormant/dead
+  integer, parameter :: iActive=1  !plant active
+  integer, parameter :: iDormant =0  !plant dormant/dead
 
   integer, parameter :: jharvtyp_noaction=0
   integer, parameter :: jharvtyp_terminate=1
@@ -119,9 +121,9 @@ implicit none
   integer, parameter :: iphotop_long   =2
 
   integer, parameter :: iphenotyp_evgreen=0
-  integer, parameter :: iphenotyp_coldecidu=1
+  integer, parameter :: iphenotyp_coldecid=1
   integer, parameter :: iphenotyp_drouhtdecidu=2
-  integer, parameter :: iphenotyp_coldroutdecidu=3
+  integer, parameter :: iphenotyp_coldroutdecid=3
 
   integer, parameter :: in2fixtyp_none=0
   integer, parameter :: in2fixtyp_root_fast=1

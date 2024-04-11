@@ -84,7 +84,7 @@ implicit none
 !       concentrations that drive microbial density effects on
 !       decomposition
       D998: DO L=0,NL(NY,NX)
-        IF(VLSoilPoreMicP(L,NY,NX).GT.ZEROS2(NY,NX))THEN
+        IF(VLSoilPoreMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
           IF(L.EQ.0.OR.L.GE.NU(NY,NX))THEN
              call MicBGC1Layer(I,J,L,NY,NX)
           ELSE
@@ -196,7 +196,7 @@ implicit none
   micfor%THETW =THETW(L,NY,NX)
   micfor%PH    =PH(L,NY,NX)
   micfor%SoilMicPMassLayer  =SoilMicPMassLayer(L,NY,NX)
-  micfor%VLSoilPoreMicP  =VLSoilPoreMicP(L,NY,NX)
+  micfor%VLSoilPoreMicP_vr  =VLSoilPoreMicP_vr(L,NY,NX)
   micfor%TFND  =TFND(L,NY,NX)
   micfor%VLNOB =trcs_VLN_vr(ids_NO3B,L,NY,NX)
   micfor%VLNO3 =trcs_VLN_vr(ids_NO3,L,NY,NX)

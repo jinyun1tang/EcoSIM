@@ -219,7 +219,7 @@ module IngridTranspMod
   
 !     begin_execution
 !
-!     VLSnowHeatCapM,VLHeatCapSnowMin=current,minimum volumetric heat capacity of snowpack
+!     VLSnowHeatCapM,VLHeatCapSnowMin_col=current,minimum volumetric heat capacity of snowpack
 !     VOLWSL=snowpack water content
 !     WatFlowInSnowM=snowpack water flux
 !     R*BLS=solute flux in snowpack
@@ -228,9 +228,9 @@ module IngridTranspMod
   ICHKL=0
   DO L=1,JS
     !
-    IF(VLSnowHeatCapM(M,L,NY,NX).GT.VLHeatCapSnowMin(NY,NX))THEN
+    IF(VLSnowHeatCapM(M,L,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
       L2=MIN(JS,L+1)
-      IF(L.LT.JS.AND.VLSnowHeatCapM(M,L2,NY,NX).GT.VLHeatCapSnowMin(NY,NX))THEN
+      IF(L.LT.JS.AND.VLSnowHeatCapM(M,L2,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
         IF(VLWatSnow(L,NY,NX).GT.ZEROS2(NY,NX))THEN
           VFLWW=AZMAX1(AMIN1(1.0_r8,WatFlowInSnowM(M,L2,NY,NX)/VLWatSnow(L,NY,NX)))
         ELSE
@@ -1742,7 +1742,7 @@ module IngridTranspMod
       ENDIF
 
       DO LL=N6,NL(NY,NX)
-        IF(VLSoilPoreMicP(LL,N5,N4).GT.ZEROS2(N5,N4))THEN
+        IF(VLSoilPoreMicP_vr(LL,N5,N4).GT.ZEROS2(N5,N4))THEN
           N6=LL
           exit
         ENDIF
@@ -1751,7 +1751,7 @@ module IngridTranspMod
 !     SOLUTE FLUXES BETWEEN ADJACENT GRID CELLS FROM
 !     WATER CONTENTS AND WATER FLUXES 'FLQM' FROM 'WATSUB'
 !
-!     VLSoilPoreMicP,VLSoilMicP=soil volume excluding rock, macropore
+!     VLSoilPoreMicP_vr,VLSoilMicP=soil volume excluding rock, macropore
 !     VLNH4,VLNO3,VLPO4=non-band NH4,NO3,PO4 volume fraction
 !     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
 !     VLWatMicPM,VLWatMacPM=micropore,macropore water-filled porosity from watsub.f
@@ -1759,7 +1759,7 @@ module IngridTranspMod
 !     FLPM=change in air volume
 !     dt_GasCyc=1/number of cycles NPH-1 for gas flux calculations
 !
-      IF(VLSoilPoreMicP(N3,N2,N1).GT.ZEROS2(NY,NX))THEN
+      IF(VLSoilPoreMicP_vr(N3,N2,N1).GT.ZEROS2(NY,NX))THEN
         IF(N3.GE.NUM(N2,N1).AND.N6.GE.NUM(N5,N4).AND.N3.LE.NL(N2,N1).AND.N6.LE.NL(N5,N4))THEN
           THETW1(N3,N2,N1)=AZMAX1(VLWatMicPM(M,N3,N2,N1)/VLSoilMicP(N3,N2,N1))
           THETW1(N6,N5,N4)=AZMAX1(VLWatMicPM(M,N6,N5,N4)/VLSoilMicP(N6,N5,N4))

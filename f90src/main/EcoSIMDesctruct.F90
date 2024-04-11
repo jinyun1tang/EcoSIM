@@ -42,7 +42,7 @@ module EcoSIMDesctruct
   use SedimentDataType    , only : DestructSedimentData
   use SoilWaterDataType   , only : DestructSoilWater
   use PlantAPIData        , only : DestructPlantAPIData
-  use PlantMngmtDataType  , only : DestructPlantMngmtData
+  use PlantMgmtDataType  , only : DestructPlantMngmtData
   use InitSOMBGCMOD       , only : DestructSOMBGC
   use TranspNoSaltMod           , only : DestructTranspNoSalt
   use SnowPhysData        , only : DestructSnowPhysData

@@ -209,7 +209,7 @@ module Hour1Mod
 !
       LWRadCanGPrev(NY,NX)=LWRadCanG(NY,NX)
       LWRadGrnd(NY,NX)=LWRadBySurf(NY,NX)
-      CNETX(NY,NX)=Eco_NEE_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      NetCO2Flx2Canopy_col(NY,NX)=Eco_NEE_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       LWRadCanG(NY,NX)=0.0_r8
       LWRadBySurf(NY,NX)=0.0_r8
       TLEX(NY,NX)=Canopy_Heat_Latent_col(NY,NX)
@@ -264,14 +264,14 @@ module Hour1Mod
 !     CANOPY RETENTION OF PRECIPITATION
 !
 !     XVOLWC=foliar surface water retention capacity
-!     CanopyLeafArea_pft,CanopyStemA_pft=leaf,stalk area of PFT
+!     CanopyLeafArea_pft,CanopyStemArea_pft=leaf,stalk area of PFT
 !     FLWC,TFLWC=water retention of PFT,combined canopy
 !     PRECA=precipitation+irrigation
 !     FracRadPARbyCanopy_pft=fraction of radiation received by each PFT canopy
 !     VOLWC=canopy surface water retention
 !
   DO  NZ=1,NP(NY,NX)
-    VOLWCX=XVOLWC(iPlantMorphologyType_pft(NZ,NY,NX))*(CanopyLeafArea_pft(NZ,NY,NX)+CanopyStemA_pft(NZ,NY,NX))
+    VOLWCX=XVOLWC(iPlantRootProfile_pft(NZ,NY,NX))*(CanopyLeafArea_pft(NZ,NY,NX)+CanopyStemArea_pft(NZ,NY,NX))
     PrecIntcptByCanopy_pft(NZ,NY,NX)=AZMAX1(AMIN1(PrecRainAndSurfirrig(NY,NX)*FracRadPARbyCanopy_pft(NZ,NY,NX),VOLWCX-WatByPCanopy(NZ,NY,NX)))
     TFLWCI(NY,NX)=TFLWCI(NY,NX)+PrecRainAndSurfirrig(NY,NX)*FracRadPARbyCanopy_pft(NZ,NY,NX)
     PrecIntcptByCanG(NY,NX)=PrecIntcptByCanG(NY,NX)+PrecIntcptByCanopy_pft(NZ,NY,NX)
@@ -529,7 +529,7 @@ module Hour1Mod
   D9975: DO L=NUI(NY,NX),NLI(NY,NX)
     !
     !     AREA,DLYR=lateral(1,2), vertical(3) area,thickness of soil layer
-    !     VOLT,VLSoilPoreMicP,VLSoilMicP=layer volume including,excluding rock,macropores
+    !     VOLT,VLSoilPoreMicP_vr,VLSoilMicP=layer volume including,excluding rock,macropores
     !
     IF(SoiBulkDensity(L,NY,NX).LE.ZERO.AND.DLYR(3,L,NY,NX).LE.ZERO2)THEN
       VLWatMicP(L,NY,NX)=0.0_r8
@@ -539,9 +539,9 @@ module Hour1Mod
     AREA(2,L,NY,NX)=DLYR(3,L,NY,NX)*DLYR(1,L,NY,NX)
     VGeomLayer(L,NY,NX)=AREA(3,L,NY,NX)*DLYR(3,L,NY,NX)
 
-    VLSoilPoreMicP(L,NY,NX)=AMAX1(VGeomLayer(L,NY,NX)*FracSoiAsMicP(L,NY,NX),1.e-8_r8)
+    VLSoilPoreMicP_vr(L,NY,NX)=AMAX1(VGeomLayer(L,NY,NX)*FracSoiAsMicP(L,NY,NX),1.e-8_r8)
     IF(SoiBulkDensity(L,NY,NX).LE.ZERO)THEN
-      VLSoilMicP(L,NY,NX)=VLSoilPoreMicP(L,NY,NX)
+      VLSoilMicP(L,NY,NX)=VLSoilPoreMicP_vr(L,NY,NX)
     ENDIF
     !
     !     BKVL=soil mass
@@ -560,7 +560,7 @@ module Hour1Mod
     !     FCL,LOGWiltPoint=log FC,WP
     !     FCD,PSD=FCL-LOGWiltPoint,log(POROS)-FCL
     !
-    SoilMicPMassLayer(L,NY,NX)=SoiBulkDensity(L,NY,NX)*VLSoilPoreMicP(L,NY,NX)
+    SoilMicPMassLayer(L,NY,NX)=SoiBulkDensity(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
 
     IF(SoilMicPMassLayer(L,NY,NX).GT.ZEROS(NY,NX))THEN
       CORGC(L,NY,NX)=AMIN1(orgcden,ORGC(L,NY,NX)/SoilMicPMassLayer(L,NY,NX))
@@ -794,8 +794,8 @@ module Hour1Mod
   TENGYC(NY,NX)=0.0_r8
 
   TRootGasLossDisturb_pft(idg_beg:idg_end-1,NY,NX)=0.0_r8
-  LitterFallChemElm_col(:,NY,NX)=0.0_r8
-  StandingDeadChemElm_col(1:NumPlantChemElms,NY,NX)=0.0_r8
+  LitrFallStrutElms_col(:,NY,NX)=0.0_r8
+  StandingDeadStrutElms_col(1:NumPlantChemElms,NY,NX)=0.0_r8
   PPT(NY,NX)=0.0_r8
 ! zero arrays in the snow layers
   WatConvSno2MicP(1:JS,NY,NX)=0.0_r8
@@ -825,7 +825,7 @@ module Hour1Mod
 
 !     begin_execution
 
-  LitrfalChemElemnts_vr(1:NumPlantChemElms,1:jsken,1:pltpar%NumOfPlantLitrCmplxs,&
+  LitrfalStrutElms_vr(1:NumPlantChemElms,1:jsken,1:pltpar%NumOfPlantLitrCmplxs,&
     0:NL(NY,NX),NY,NX)=0.0_r8
 
   RDOM_micb_flx(idom_doc,1:jcplx,0:NL(NY,NX),NY,NX)=0.0_r8
@@ -1486,7 +1486,7 @@ module Hour1Mod
 ! VLitR=dry litter volume
 ! BulkDensLitR=dry bulk density of woody(0),fine(1),manure(2) litter
 ! VxcessWatLitR=excess litter water+ice
-! VOLT,VLSoilPoreMicP=wet litter volume
+! VOLT,VLSoilPoreMicP_vr=wet litter volume
 ! BKVL=litter mass
 ! VOLW,VOLI,VOLA,VOLP=litter water,ice,porosity,air volume
 ! THETW,THETI,THETA,THETP=litter water,ice,porosity,air concentration
@@ -1499,7 +1499,7 @@ module Hour1Mod
   VxcessWatLitR=AZMAX1(VLWatMicP(0,NY,NX)+VLiceMicP(0,NY,NX)-VWatLitRHoldCapcity(NY,NX))
   VGeomLayer(0,NY,NX)=VxcessWatLitR+VLitR(NY,NX)
   IF(VGeomLayer(0,NY,NX).GT.ZEROS2(NY,NX))THEN
-    VLSoilPoreMicP(0,NY,NX)=VGeomLayer(0,NY,NX)
+    VLSoilPoreMicP_vr(0,NY,NX)=VGeomLayer(0,NY,NX)
     SoilMicPMassLayer(0,NY,NX)=MWC2Soil*ORGC(0,NY,NX)
     VLMicP(0,NY,NX)=AZMAX1(VLitR(NY,NX)-SoilMicPMassLayer(0,NY,NX)/1.30_r8)
     VLsoiAirP(0,NY,NX)=AZMAX1(VLMicP(0,NY,NX)-VLWatMicP(0,NY,NX)-VLiceMicP(0,NY,NX))
@@ -1528,7 +1528,7 @@ module Hour1Mod
     ENDIF
     DPTH0(NY,NX)=XVOLW0+XVOLI0
 
-    DLYR(3,0,NY,NX)=VLSoilPoreMicP(0,NY,NX)/AREA(3,0,NY,NX)
+    DLYR(3,0,NY,NX)=VLSoilPoreMicP_vr(0,NY,NX)/AREA(3,0,NY,NX)
     IF(VLitR(NY,NX).GT.ZEROS(NY,NX).AND.VLWatMicP(0,NY,NX).GT.ZEROS2(NY,NX))THEN
       ThetaWLitR=AMIN1(VWatLitRHoldCapcity(NY,NX),VLWatMicP(0,NY,NX))/VLitR(NY,NX)
       IF(ThetaWLitR.LT.FieldCapacity(0,NY,NX))THEN
@@ -1558,7 +1558,7 @@ module Hour1Mod
       trc_solcl_vr(ids_nut_beg:ids_nuts_end,0,NY,NX)=0.0_r8
     ENDIF
   ELSE
-    VLSoilPoreMicP(0,NY,NX)=0.0_r8
+    VLSoilPoreMicP_vr(0,NY,NX)=0.0_r8
     SoilMicPMassLayer(0,NY,NX)=0.0_r8
     VLMicP(0,NY,NX)=0.0_r8
     VLsoiAirP(0,NY,NX)=0.0_r8
@@ -2304,7 +2304,7 @@ module Hour1Mod
 
   DO L=NUI(NY,NX),NLI(NY,NX)
 
-    IF(VLSoilPoreMicP(L,NY,NX).LE.ZEROS(NY,NX))THEN
+    IF(VLSoilPoreMicP_vr(L,NY,NX).LE.ZEROS(NY,NX))THEN
       THETW(L,NY,NX)=POROS(L,NY,NX)
       THETI(L,NY,NX)=0.0_r8
       THETP(L,NY,NX)=0.0_r8

@@ -36,7 +36,7 @@ module MicForcTypeMod
   real(r8) :: pH
   real(r8) :: ZERO
   real(r8) :: SoilMicPMassLayer
-  real(r8) :: VLSoilPoreMicP
+  real(r8) :: VLSoilPoreMicP_vr
   real(r8) :: TFND
   real(r8) :: VLNOB
   real(r8) :: VLNO3

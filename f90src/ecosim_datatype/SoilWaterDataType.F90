@@ -69,7 +69,7 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  TortMicPM(:,:,:,:)                     !soil tortuosity, []
   real(r8),target,allocatable ::  TortMacPM(:,:,:,:)                    !macropore tortuosity, []
   real(r8),target,allocatable ::  DiffusivitySolutEff(:,:,:,:)                     !coefficient for dissolution - volatilization, []
-  real(r8),target,allocatable ::  SoilResit4RootPentration(:,:,:)                       !soil hydraulic resistance, [MPa h m-2]
+  real(r8),target,allocatable ::  SoilResit4RootPentrate_vr(:,:,:)                       !soil hydraulic resistance, [MPa h m-2]
   real(r8),target,allocatable ::  PSISE(:,:,:)                      !soil water potential at saturation, [Mpa]
   real(r8),target,allocatable ::  PSISoilAirEntry(:,:,:)                      !soil water potential at air entry, [Mpa]
   real(r8),target,allocatable ::  PSISoilOsmotic(:,:,:)                      !osmotic soil water potential , [Mpa]
@@ -77,6 +77,7 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  THETY(:,:,:)                      !air-dry water content, [m3 m-3]
   real(r8),target,allocatable ::  Theta_sat(:,:,:)                      !micropore class water content
   real(r8),target,allocatable ::  WaterFlowSoiMicPX(:,:,:,:)                     !unsaturated water flux , [m3 d-2 h-1]
+  real(r8),target,allocatable ::  EvapoTransp_col(:,:)              !evapotranspiration
   real(r8),target,allocatable ::  UEVAP(:,:)                        !total evaporation, [m3 d-2]
   real(r8),target,allocatable ::  URAIN(:,:)                        !total precipitation, [m3 d-2]
   real(r8),target,allocatable ::  URUN(:,:)                         !total surface runoff, [m3 d-2]
@@ -103,6 +104,7 @@ module SoilWaterDataType
   subroutine InitAllocate
 
   implicit none
+  allocate(EvapoTransp_col(JY,JX)); EvapoTransp_col=0._r8
   allocate(Qinflx2Soil_col(JY,JX)); Qinflx2Soil_col=0._r8
   allocate(THETP(0:JZ,JY,JX));  THETP=0._r8
   allocate(VLsoiAirP(0:JZ,JY,JX));   VLsoiAirP=0._r8
@@ -165,7 +167,7 @@ module SoilWaterDataType
   allocate(TortMicPM(60,0:JZ,JY,JX));TortMicPM=0._r8
   allocate(TortMacPM(60,JZ,JY,JX)); TortMacPM=0._r8
   allocate(DiffusivitySolutEff(60,0:JZ,JY,JX));DiffusivitySolutEff=0._r8
-  allocate(SoilResit4RootPentration(JZ,JY,JX));     SoilResit4RootPentration=0._r8
+  allocate(SoilResit4RootPentrate_vr(JZ,JY,JX));     SoilResit4RootPentrate_vr=0._r8
   allocate(PSISE(0:JZ,JY,JX));  PSISE=0._r8
   allocate(PSISoilAirEntry(0:JZ,JY,JX));  PSISoilAirEntry=0._r8
   allocate(PSISoilOsmotic(0:JZ,JY,JX));  PSISoilOsmotic=0._r8
@@ -251,7 +253,7 @@ module SoilWaterDataType
   call destroy(TortMicPM)
   call destroy(TortMacPM)
   call destroy(DiffusivitySolutEff)
-  call destroy(SoilResit4RootPentration)
+  call destroy(SoilResit4RootPentrate_vr)
   call destroy(PSISE)
   call destroy(PSISoilAirEntry)
   call destroy(PSISoilOsmotic)
@@ -260,6 +262,7 @@ module SoilWaterDataType
   call destroy(Theta_sat)
   call destroy(WaterFlowSoiMicPX)
   call destroy(UEVAP)
+  call destroy(EvapoTransp_col)
   call destroy(URAIN)
   call destroy(URUN)
   call destroy(UVLWatMicP)

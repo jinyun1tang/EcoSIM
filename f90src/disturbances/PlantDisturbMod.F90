@@ -14,7 +14,7 @@ module PlantDisturbMod
   use FertilizerDataType
   use ClimForcDataType
   use EcosimConst
-  use PlantMngmtDataType
+  use PlantMgmtDataType
   use RootDataType
   use CanopyDataType
   use EcoSimSumDataType
@@ -55,8 +55,8 @@ module PlantDisturbMod
           D1995: DO NX1=NHW,NHE
             D1990: DO NY1=NVN,NVS
               IF(LSG(NZ,NY1,NX1).EQ.LSG(NZ,NY,NX))THEN
-                IF(IsPlantActive_pft(NZ,NY1,NX1).EQ.iPlantIsActive)THEN
-                  WTSHTZ=WTSHTZ+ShootChemElms_pft(ielmc,NZ,NY1,NX1)
+                IF(IsPlantActive_pft(NZ,NY1,NX1).EQ.iActive)THEN
+                  WTSHTZ=WTSHTZ+ShootStrutElms_pft(ielmc,NZ,NY1,NX1)
                   NN=NN+1
                 ENDIF
               ENDIF
@@ -65,7 +65,7 @@ module PlantDisturbMod
           IF(NN.GT.0)THEN
             AvgCanopyBiomC2Graze_pft(NZ,NY,NX)=WTSHTZ/NN
           ELSE
-            AvgCanopyBiomC2Graze_pft(NZ,NY,NX)=ShootChemElms_pft(ielmc,NZ,NY,NX)
+            AvgCanopyBiomC2Graze_pft(NZ,NY,NX)=ShootStrutElms_pft(ielmc,NZ,NY,NX)
           ENDIF
         ENDIF
       ENDDO D2985

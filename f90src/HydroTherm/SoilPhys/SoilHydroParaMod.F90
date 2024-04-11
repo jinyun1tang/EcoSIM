@@ -60,7 +60,7 @@ contains
   ! FCI,WPI=FC,WP of ice
   ! THETIX=ice concentration
 !
-    IF(SoilMicPMassLayer(L,NY,NX).GT.ZEROS(NY,NX).AND.VLSoilPoreMicP(L,NY,NX).GT.ZEROS(NY,NX))THEN
+    IF(SoilMicPMassLayer(L,NY,NX).GT.ZEROS(NY,NX).AND.VLSoilPoreMicP_vr(L,NY,NX).GT.ZEROS(NY,NX))THEN
       THETW1=AZMAX1(AMIN1(POROS(L,NY,NX),VLWatMicP(L,NY,NX)/VLSoilMicP(L,NY,NX)),1.e-6_r8)
       IF(THETW1.LT.FieldCapacity(L,NY,NX))THEN
         PSISoilMatricP(L,NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIFLD(NY,NX) &
@@ -71,7 +71,7 @@ contains
       ELSE
         PSISoilMatricP(L,NY,NX)=PSISE(L,NY,NX)
       ENDIF
-    ELSE IF(VLSoilPoreMicP(L,NY,NX).GT.ZEROS2(NY,NX).and.THETI(L,NY,NX)>ZEROS2(NY,NX))THEN
+    ELSE IF(VLSoilPoreMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX).and.THETI(L,NY,NX)>ZEROS2(NY,NX))THEN
       FCX=FCI*THETI(L,NY,NX)
       WPX=WPI*THETI(L,NY,NX)
       FCLX=LOG(FCX)
@@ -102,7 +102,7 @@ contains
 !
 !     SOIL RESISTANCE TO ROOT PENETRATION
 !
-!     SoilResit4RootPentration=soil resistance to root penetration (MPa)
+!     SoilResit4RootPentrate_vr=soil resistance to root penetration (MPa)
 !
 !     IF(SoiBulkDensity(L,NY,NX).GT.ZERO)THEN
 !     CCLAYT=CCLAY(L,NY,NX)*1.0E+02
@@ -110,9 +110,9 @@ contains
 !     CC=EXP(-3.6733-0.1447*CCLAYT+0.7653*CORGCT)
 !     DD=-0.4805-0.1239*CCLAYT+0.2080*CORGCT
 !     EE=3.8521+0.0963*CCLAYT
-!     SoilResit4RootPentration(L,NY,NX)=CC*THETW(L,NY,NX)**DD*SoiBulkDensity(L,NY,NX)**EE
+!     SoilResit4RootPentrate_vr(L,NY,NX)=CC*THETW(L,NY,NX)**DD*SoiBulkDensity(L,NY,NX)**EE
 !     ELSE
-    SoilResit4RootPentration(L,NY,NX)=0.0_r8
+    SoilResit4RootPentrate_vr(L,NY,NX)=0.0_r8
 !     ENDIF
 !
 !     SOIL HYDRAULIC CONDUCTIVITIES FROM AMBIENT SOIL WATER CONTENTS
@@ -234,10 +234,10 @@ contains
 
       IF(cold_run())THEN
       !in a cold run, set it
-        VLWatMicP(L,NY,NX)=THETW(L,NY,NX)*VLSoilPoreMicP(L,NY,NX)
+        VLWatMicP(L,NY,NX)=THETW(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
         VLWatMicPX(L,NY,NX)=VLWatMicP(L,NY,NX)
         VLWatMacP(L,NY,NX)=THETW(L,NY,NX)*VLMacP(L,NY,NX)
-        VLiceMicP(L,NY,NX)=THETI(L,NY,NX)*VLSoilPoreMicP(L,NY,NX)
+        VLiceMicP(L,NY,NX)=THETI(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
         VLiceMacP(L,NY,NX)=THETI(L,NY,NX)*VLMacP(L,NY,NX)
         VHeatCapacity(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+Cpw*(VLWatMicP(L,NY,NX) &
           +VLWatMacP(L,NY,NX))+Cpi*(VLiceMicP(L,NY,NX)+VLiceMacP(L,NY,NX))
