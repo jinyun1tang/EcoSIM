@@ -247,7 +247,7 @@ implicit none
       ShootC4NonstC_brch(NB,NZ)=ShootC4NonstC_brch(NB,NZ)+CPOOL3_node(K,NB,NZ)+CPOOL4_node(K,NB,NZ) &
         +CMassCO2BundleSheath_node(K,NB,NZ)+CMassHCO3BundleSheath_node(K,NB,NZ)
     ENDDO D3251
-    ShootStrutElms_brch(NE,NB,NZ)=ShootStrutElms_brch(NE,NB,NZ)+ShootC4NonstC_brch(NB,NZ)
+    ShootStrutElms_brch(ielmc,NB,NZ)=ShootStrutElms_brch(ielmc,NB,NZ)+ShootC4NonstC_brch(NB,NZ)
   ENDIF
 
   ShootElms_brch(1:NumPlantChemElms,NB,NZ)=ShootStrutElms_brch(1:NumPlantChemElms,NB,NZ)

@@ -457,27 +457,27 @@ module UptakesMod
   real(r8) :: RootDepZ,RTDPX
   integer :: N,L,NR
 
-  associate(                           &
-     PopuRootMycoC_pvr       =>  plt_biom% PopuRootMycoC_pvr    , &
-    FracSoiAsMicP            =>  plt_site%FracSoiAsMicP     , &
-    CumSoilThickness         =>  plt_site%CumSoilThickness   , &
-    DLYR3                    =>  plt_site%DLYR3    , &
-    ZEROS                    =>  plt_site%ZEROS    , &
-    ZERO                     =>  plt_site%ZERO     , &
-    PlantPopulation_pft      =>  plt_site%PlantPopulation_pft       , &
-    NU                       =>  plt_site%NU       , &
-    NumRootAxes_pft          =>  plt_morph%NumRootAxes_pft    , &
-    MY                       =>  plt_morph%MY      , &
+  associate(                                                           &
+     PopuRootMycoC_pvr       =>  plt_biom% PopuRootMycoC_pvr         , &
+    FracSoiAsMicP            =>  plt_site%FracSoiAsMicP              , &
+    CumSoilThickness         =>  plt_site%CumSoilThickness           , &
+    DLYR3                    =>  plt_site%DLYR3                      , &
+    ZEROS                    =>  plt_site%ZEROS                      , &
+    ZERO                     =>  plt_site%ZERO                       , &
+    PlantPopulation_pft      =>  plt_site%PlantPopulation_pft        , &
+    NU                       =>  plt_site%NU                         , &
+    NumRootAxes_pft          =>  plt_morph%NumRootAxes_pft           , &
+    MY                       =>  plt_morph%MY                        , &
     RootLenDensPerPlant_pvr  =>  plt_morph%RootLenDensPerPlant_pvr   , &
-    Root2ndMaxRadius1_pft    =>  plt_morph%Root2ndMaxRadius1_pft  , &
-    HypoctoHeight_pft        =>  plt_morph%HypoctoHeight_pft   , &
-    RootLenPerPlant_pvr      =>  plt_morph%RootLenPerPlant_pvr   , &
-    Root1stDepz_pft          =>  plt_morph%Root1stDepz_pft   , &
-    RootPorosity_pft         =>  plt_morph%RootPorosity_pft    , &
-    RootVH2O_pvr             =>  plt_morph%RootVH2O_pvr  , &
-    Root2ndMaxRadius_pft     =>  plt_morph%Root2ndMaxRadius_pft  , &
-    SeedDepth_pft            =>  plt_morph%SeedDepth_pft   , &
-    MaxSoiL4Root             =>  plt_morph%MaxSoiL4Root        &
+    Root2ndMaxRadius1_pft    =>  plt_morph%Root2ndMaxRadius1_pft     , &
+    HypoctoHeight_pft        =>  plt_morph%HypoctoHeight_pft         , &
+    RootLenPerPlant_pvr      =>  plt_morph%RootLenPerPlant_pvr       , &
+    Root1stDepz_pft          =>  plt_morph%Root1stDepz_pft           , &
+    RootPorosity_pft         =>  plt_morph%RootPorosity_pft          , &
+    RootVH2O_pvr             =>  plt_morph%RootVH2O_pvr              , &
+    Root2ndMaxRadius_pft     =>  plt_morph%Root2ndMaxRadius_pft      , &
+    SeedDepth_pft            =>  plt_morph%SeedDepth_pft             , &
+    MaxSoiL4Root             =>  plt_morph%MaxSoiL4Root                &
   )
 !     RootDepZ,Root1stDepz_pft=primary root depth
 !     FracSoiLayByPrimRoot=fraction of each soil layer with primary root
@@ -552,38 +552,38 @@ module UptakesMod
 
   integer :: N,L
 ! begin_execution
-  associate(                         &
-   RAZ                             => plt_ew%RAZ       , &
-   DTKC                            => plt_ew%DTKC      , &
-   OSMO                            => plt_ew%OSMO      , &
-   PSICanopyOsmo_pft               => plt_ew%PSICanopyOsmo_pft     , &
-   TKC                             => plt_ew%TKC       , &
-   TairK                           => plt_ew%TairK       , &
-   TKS                             => plt_ew%TKS       , &
-   PSIRootOSMO_vr                  => plt_ew%PSIRootOSMO_vr     , &
-   TCelciusCanopy_pft              => plt_ew%TCelciusCanopy_pft      , &
+  associate(                                                                &
+   RAZ                             => plt_ew%RAZ                          , &
+   DTKC                            => plt_ew%DTKC                         , &
+   OSMO                            => plt_ew%OSMO                         , &
+   PSICanopyOsmo_pft               => plt_ew%PSICanopyOsmo_pft            , &
+   TKC                             => plt_ew%TKC                          , &
+   TairK                           => plt_ew%TairK                        , &
+   TKS                             => plt_ew%TKS                          , &
+   PSIRootOSMO_vr                  => plt_ew%PSIRootOSMO_vr               , &
+   TCelciusCanopy_pft              => plt_ew%TCelciusCanopy_pft           , &
    AllPlantRootH2OUptake_vr        => plt_ew%AllPlantRootH2OUptake_vr     , &
-   PSIRootTurg_vr                  => plt_ew%PSIRootTurg_vr     , &
-   PSICanopyTurg_pft               => plt_ew%PSICanopyTurg_pft     , &
-   PSIRoot_pvr                     => plt_ew%PSIRoot_pvr    , &
-   VHeatCapCanP                    => plt_ew%VHeatCapCanP     , &
-   PSICanopy_pft                   => plt_ew%PSICanopy_pft    , &
-   NU                              => plt_site%NU      , &
-   AREA3                           => plt_site%AREA3   , &
-   iYearCurrent                    => plt_site%iYearCurrent    , &
-   MaxSoiL4Root                    => plt_morph%MaxSoiL4Root     , &
-   NGTopRootLayer_pft              => plt_morph%NGTopRootLayer_pft    , &
-   MY                              => plt_morph%MY     , &
-   RootNonstructElmConc_pvr        => plt_biom%RootNonstructElmConc_pvr  , &
-   CanopyNonstElmConc_pft      => plt_biom%CanopyNonstElmConc_pft  , &
-   ShootStrutElms_pft              => plt_biom%ShootStrutElms_pft  , &
-   CanopyBndlResist_pft            => plt_photo%CanopyBndlResist_pft    , &
-   MinCanPStomaResistH2O_pft       => plt_photo%MinCanPStomaResistH2O_pft   , &
+   PSIRootTurg_vr                  => plt_ew%PSIRootTurg_vr               , &
+   PSICanopyTurg_pft               => plt_ew%PSICanopyTurg_pft            , &
+   PSIRoot_pvr                     => plt_ew%PSIRoot_pvr                  , &
+   VHeatCapCanP                    => plt_ew%VHeatCapCanP                 , &
+   PSICanopy_pft                   => plt_ew%PSICanopy_pft                , &
+   NU                              => plt_site%NU                         , &
+   AREA3                           => plt_site%AREA3                      , &
+   iYearCurrent                    => plt_site%iYearCurrent               , &
+   MaxSoiL4Root                    => plt_morph%MaxSoiL4Root              , &
+   NGTopRootLayer_pft              => plt_morph%NGTopRootLayer_pft        , &
+   MY                              => plt_morph%MY                        , &
+   RootNonstructElmConc_pvr        => plt_biom%RootNonstructElmConc_pvr   , &
+   CanopyNonstElmConc_pft          => plt_biom%CanopyNonstElmConc_pft     , &
+   ShootStrutElms_pft              => plt_biom%ShootStrutElms_pft         , &
+   CanopyBndlResist_pft            => plt_photo%CanopyBndlResist_pft      , &
+   MinCanPStomaResistH2O_pft       => plt_photo%MinCanPStomaResistH2O_pft , &
    CanPStomaResistH2O_pft          => plt_photo%CanPStomaResistH2O_pft    , &
-   MaxCanPStomaResistH2O_pft       => plt_photo%MaxCanPStomaResistH2O_pft   , &
-   RCS                             => plt_photo%RCS    , &
-   FracRadPARbyCanopy_pft          => plt_rad%FracRadPARbyCanopy_pft    , &
-   LWRadCanopy_pft                 => plt_rad%LWRadCanopy_pft      &
+   MaxCanPStomaResistH2O_pft       => plt_photo%MaxCanPStomaResistH2O_pft , &
+   RCS                             => plt_photo%RCS                       , &
+   FracRadPARbyCanopy_pft          => plt_rad%FracRadPARbyCanopy_pft      , &
+   LWRadCanopy_pft                 => plt_rad%LWRadCanopy_pft               &
   )
   IF(NN.GE.MaxIterNum)THEN
     WRITE(*,9999)iYearCurrent,I,J,NZ
@@ -662,8 +662,8 @@ module UptakesMod
   real(r8) :: RichardsNO
   integer  :: IC,ICHK
   real(r8) :: DPSI_old
-  real(r8) :: DTmR_old,DTmR
-  real(r8) :: dfTmRdP
+!  real(r8) :: DTmR_old,DTmR
+!  real(r8) :: dfTmRdP
   character(len=64) :: fmt
 !     return variables
   integer :: NN
@@ -732,7 +732,7 @@ module UptakesMod
   cumPRootH2OUptakePre=0.0_r8
   VOLWPX=0.0_r8
   DPSI_old=0._r8
-  DTmR_old=0._r8
+!  DTmR_old=0._r8
   D4000: DO NN=1,MaxIterNum
 !
 !     NET RADIATION FROM ABSORBED SW AND NET LW
@@ -989,12 +989,11 @@ module UptakesMod
         cumPRootH2OUptakePre=cumPRootH2OUptake
         VOLWPX=SymplasmicWat
 
-        DTmR=PTransPre-cumPRootH2OUptakePre
-        dfTmRdP=(DTmR-DTmR_old)/DPSI_old
+!        DTmR=PTransPre-cumPRootH2OUptakePre
 
         PSICanopy_pft(NZ)=AZMIN1(PSICanopy_pft(NZ)+0.1_r8*DPSI)        
         DPSI_old=DPSI
-        DTmR_old=PTransPre-cumPRootH2OUptakePre
+!        DTmR_old=PTransPre-cumPRootH2OUptakePre
         XC=0.50_r8!      
       ENDIF
     ENDIF

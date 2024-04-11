@@ -169,9 +169,9 @@
   associate(                                                 &
     ZEROP               => plt_biom%ZEROP                  , &
     LeafAUnshaded_zsec  => plt_photo%LeafAUnshaded_zsec    , &
-    RadPAR_zsec      => plt_rad%RadPAR_zsec          , &
+    RadPAR_zsec         => plt_rad%RadPAR_zsec             , &
     RadDifPAR_zsec      => plt_rad%RadDifPAR_zsec          , &
-    TAU_DirRadTransm         => plt_rad%TAU_DirRadTransm             , &
+    TAU_DirRadTransm    => plt_rad%TAU_DirRadTransm        , &
     TAU_RadThru         => plt_rad%TAU_RadThru               &
   )
 !     FOR EACH INCLINATION AND AZIMUTH CLASS
@@ -518,7 +518,7 @@
 !
   PARX=QNTM*PAR_zsec
   PARJ=PARX+LigthSatC4CarboxyRate_node(K,NB,NZ)
-  ETLF4=(PARJ-SQRT(PARJ**PARJ-CURV4*PARX*LigthSatC4CarboxyRate_node(K,NB,NZ)))/CURV2
+  ETLF4=(PARJ-SQRT(PARJ*PARJ-CURV4*PARX*LigthSatC4CarboxyRate_node(K,NB,NZ)))/CURV2
   EGRO4=ETLF4*C4CarboxyEff_node(K,NB,NZ)
 !
 !     C4 CARBOXYLATION RATE AND ACCUMULATED PRODUCT
@@ -530,8 +530,9 @@
 !     NutrientCtrlonC4Carboxy_node=N,P feedback inhibition on C4 CO2 fixation
 !     LeafAUnshaded_zsec=unself-shaded leaf surface area
 !     TAU_RadThru=fraction of diffuse radiation transmitted from layer above
-!
+!  
   VL=AMIN1(CO2lmtPEPCarboxyRate_node(K,NB,NZ),EGRO4)*NutrientCtrlonC4Carboxy_node(K,NB,NZ)
+      
   CH2O=CH2O+VL*LeafAUnshaded_zsec(N,L,K,NB,NZ)*TAU_Rad
   end associate
   end subroutine C4FixCO2

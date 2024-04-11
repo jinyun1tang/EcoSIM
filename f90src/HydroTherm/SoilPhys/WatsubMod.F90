@@ -107,15 +107,15 @@ module WatsubMod
 
     call FWDCopyTopLayerWatVolMit(NHW,NHE,NVN,NVS,TopLayWatVol)
 
-    ! run surface energy balance model, uses ResistanceLitRLay
+!    if(I>=132)print*,M,' run surface energy balance model, uses ResistanceLitRLay'
     call RunSurfacePhysModel(M,NHE,NHW,NVS,NVN,ResistanceLitRLay,KSatRedusByRainKinetEnergyS,&
       TopLayWatVol,HeatFluxAir2Soi,Qinfl2MicP,Hinfl2Soil)
 
     call CopySoilWatVolMit(NHW,NHE,NVN,NVS,TopLayWatVol)
         
-    ! do 3D water flow
-    call Subsurface3DFlowMit(M,NHW,NHE,NVN,NVS,KSatRedusByRainKinetEnergyS,HeatFluxAir2Soi)
-
+!    if(I>=132 .and. J==19)print*,M,J,' do 3D water flow'
+    call Subsurface3DFlowMit(I,J,M,NHW,NHE,NVN,NVS,KSatRedusByRainKinetEnergyS,HeatFluxAir2Soi)
+!    if(I>=132 .and. J==19)print*,M,'LateralWatHeat'
     call LateralWatHeatExchMit(M,NHW,NHE,NVN,NVS,KSatRedusByRainKinetEnergyS)
 
 !   update states and fluxes
@@ -127,12 +127,12 @@ module WatsubMod
     ENDDO  
 
     IF(M.NE.NPH)THEN
-!     intermediate iteration
+!      if(I>=132)print*,M,'intermediate iteration'
       call UpdateSurfaceAtM(M,NHW,NHE,NVN,NVS)
 
       call UpdateStateFluxAtM(M,NHW,NHE,NVN,NVS)
     ELSE
-!     last iteration
+!      if(I>=132)print*,M,'last iteration'
       call UpdateFluxAtExit(NHW,NHE,NVN,NVS)
     ENDIF
 
@@ -425,8 +425,9 @@ module WatsubMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine Subsurface3DFlowMit(M,NHW,NHE,NVN,NVS,KSatRedusByRainKinetEnergy,HeatFluxAir2Soi)
+  subroutine Subsurface3DFlowMit(I,J,M,NHW,NHE,NVN,NVS,KSatRedusByRainKinetEnergy,HeatFluxAir2Soi)
   implicit none
+  integer, intent(in) :: I,J
   integer, intent(in)  :: M,NHW,NHE,NVN,NVS
   real(r8), dimension(:,:),intent(in) :: KSatRedusByRainKinetEnergy(:,:)
   real(r8), dimension(:,:),intent(in) :: HeatFluxAir2Soi(:,:)
@@ -529,9 +530,9 @@ module WatsubMod
           IF(VLSoilPoreMicP_vr(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
             IF(N3.GE.NUM(N2,N1).AND.N6.GE.NUM(N5,N4).AND.N3.LE.NL(N2,N1).AND.N6.LE.NL(N5,N4))THEN
               !within the calculation domain
-              ! source layer
+    !          if(I>=132 .and. j==19)print*,' source layer'
               call CalcSoilWatPotential(NY,NX,N1,N2,N3,PSISoilMatricPtmp(N3,N2,N1),THETA1)
-              !dest
+   !           if(I>=132 .and. j==19)print*,'dest'
               call CalcSoilWatPotential(NY,NX,N4,N5,N6,PSISoilMatricPtmp(N6,N5,N4),THETAL)
               !
               !     ACCOUNT FOR WETTING FRONTS WHEN CALCULATING WATER CONTENTS,
@@ -543,18 +544,18 @@ module WatsubMod
               !     PSISM1=soil matric potential
               !     VLWatMicPX1=VLWatMicP1 accounting for wetting front
               !
-              !     DARCY FLOW IF BOTH CELLS ARE SATURATED
+  !            if(I>=132 .and. j==19)print*,'DARCY FLOW IF BOTH CELLS ARE SATURATED'
               !     (CURRENT WATER POTENTIAL > AIR ENTRY WATER POTENTIAL)
               !
               call MicporeDarcyFlow(NY,NX,N,N1,N2,N3,N4,N5,N6,THETA1,THETAL,&
                 KSatRedusByRainKinetEnergy(NY,NX),HeatByWatFlowMicP,PSISV1,PSISVL)          
 
           !
-          !     MACROPORE FLOW FROM POISEUILLE FLOW IF MACROPORES PRESENT
+ !             if(I>=132 .and. j==19)print*,'MACROPORE FLOW FROM POISEUILLE FLOW IF MACROPORES PRESENT'
           !
               call MacporeFLow(NY,NX,M,N,N1,N2,N3,N4,N5,N6,ConvectiveHeatFlxMacP,LInvalidMacP)
 
-          !     micropore flow
+!              if(I>=132 .and. j==19)print*,'  micropore flow'
               call WaterVaporFlow(M,N,N1,N2,N3,N4,N5,N6,PSISV1,PSISVL,ConvectVapFlux,&
                 ConvectHeatFluxMicP)
 
@@ -569,9 +570,10 @@ module WatsubMod
               HeatFlow2Soili(N,N6,N5,N4)=HeatByWatFlowMicP+ConvectiveHeatFlxMacP
           !    if(N6==1)write(*,*)'0HeatFlow2Soili(N,N6,N5,N4)',HeatFlow2Soili(N,N6,N5,N4)
           !
+ !             if(I>=132 .and. j==19)print*,'bfSolve4Heat'
 
-              call Solve4Heat(N,NY,NX,N1,N2,N3,N4,N5,N6,ConvectHeatFluxMicP,HeatFluxAir2Soi(NY,NX))
-
+              call Solve4Heat(I,J,N,NY,NX,N1,N2,N3,N4,N5,N6,ConvectHeatFluxMicP,HeatFluxAir2Soi(NY,NX))
+!              if(I>=132 .and. j==19)print*,'afSolve4Heat'
           !
           !     TOTAL WATER, VAPOR AND HEAT FLUXES
           !
@@ -657,7 +659,7 @@ module WatsubMod
         call Config4WaterTableDrain(L,NY,NX,IFLGU,IFLGUH,DPTHH)
 
 !
-!     IDENTIFY CONDITIONS FOR MICROPRE DISCHARGE TO TILE DRAIN
+!        if(I>=132 .and. J==19)print*,'IDENTIFY CONDITIONS FOR MICROPRE DISCHARGE TO TILE DRAIN'
         call Config4TileDrainage(L,NY,NX,IFLGD,IFLGDH,DPTHH)
 !
 !     LOCATE ALL EXTERNAL BOUNDARIES AND SET BOUNDARY CONDITIONS
@@ -788,7 +790,7 @@ module WatsubMod
 !           or the grid is a soil
             IF(L.EQ.NUM(N2,N1).AND.N.NE.ivertdir.AND. &
               (CumDepth2LayerBottom(NU(N2,N1)-1,N2,N1).LE.CumSoilDeptht0(N2,N1) &
-              .OR.SoiBulkDensity(NUI(N2,N1),N2,N1).GT.ZERO))THEN
+              .OR. SoiBulkDensity(NUI(N2,N1),N2,N1).GT.ZERO))THEN
 !not in vertical direction
               IF(.not.XGridRunoffFlag(NN,N,N2,N1).OR.isclose(RechargSurf,0._r8).OR. &
                 ABS(WatFlux4ErosionM(M,N2,N1)).LT.ZEROS(N2,N1))THEN
@@ -796,7 +798,7 @@ module WatsubMod
                 WatFlx2LitRByRunoff(N,NN,M5,M4)=0.0_r8
                 HeatFlx2LitRByRunoff(N,NN,M5,M4)=0.0_r8
               ELSE
-
+!                if(I>=132 .and. J==19)print*,'runoff'
                 call SurfaceRunoff(M,N,NN,N1,N2,M4,M5,RechargSurf,XN)
 !
         !     BOUNDARY SNOW FLUX
@@ -875,10 +877,11 @@ module WatsubMod
                  ! if(M6==1)write(*,*)'HeatFlow2Soili(N,M6,M5,M4)=',HeatFlow2Soili(N,M6,M5,M4)  
                 ELSE
 !
+!                  if(I>=132 .and. J==19)print*,'WaterTBLDrain'
                   CALL WaterTBLDrain(N,N1,N2,N3,M4,M5,M6,IFLGU,IFLGUH,RechargSubSurf,RechargRateWTBL,DPTHH,XN)
 
                   call TileDrain(N,N1,N2,N3,M4,M5,M6,IFLGD,IFLGDH,RechargRateWTBL,RechargSubSurf,DPTHH,XN)
-
+!                  if(I>=132 .and. J==19)print*,'SubSufXChangeWithExtWatTable'
                   call SubSufXChangeWithExtWatTable(NY,NX,N,N1,N2,N3,M4,M5,M6,DPTHH,RechargSubSurf,&
                     RechargRateWTBL,XN,AirfMicP,VOLPX2,AirfMacP)
 
@@ -892,7 +895,7 @@ module WatsubMod
         !     TCNDG=thermal conductivity below lower boundary
         !     SoilHeatSrcDepth,CDPTH=depth of thermal sink/source, lower boundary
         !     KoppenClimZone=Koppen climate zone
-                IF(N.EQ.ivertdir.AND.KoppenClimZone(N2,N1).NE.-2)THEN
+                IF(N.EQ.ivertdir .AND. KoppenClimZone(N2,N1).NE.-2)THEN
                   HeatFlow2Soili(N,M6,M5,M4)=HeatFlow2Soili(N,M6,M5,M4)+(TKSoi1(N3,N2,N1)-TKSD(N2,N1))* &
                     TCNDG/(SoilHeatSrcDepth(N2,N1)-CumDepth2LayerBottom(N3,N2,N1)) &
                     *AREA(N,N3,N2,N1)*dts_HeatWatTP
@@ -923,7 +926,7 @@ module WatsubMod
     !     HeatFlxBySnowRedistribut=convective heat transfer from snow,water,ice transfer
 !
           IF(L.EQ.NUM(N2,N1).AND.N.NE.ivertdir)THEN
-            !top layer snow redistribution
+!            if(I>=132 .and. j==19)print*,'top layer snow redistribution'
             call SumSnowDriftByRunoff(M,N,N1,N2,N4,N5,N4B,N5B)
           ENDIF
 !
@@ -996,7 +999,7 @@ module WatsubMod
           FWatExMacP2MicPi(N3,N2,N1)=0.0_r8
           FWatExMacP2MicPM(M,N3,N2,N1)=0.0_r8
         ENDIF
-
+!        if(I>=132 .and. j==19)print*,'FreezeThawMit'
         call FreezeThawMit(NY,NX,L,N1,N2,N3)
 !
 !     DISSIPATE WETTING FRONT
@@ -1765,8 +1768,9 @@ module WatsubMod
   end subroutine WaterVaporFlow  
 !------------------------------------------------------------------------------------------
 
-  subroutine Solve4Heat(N,NY,NX,N1,N2,N3,N4,N5,N6,ConvectHeatFluxMicP,HeatFluxAir2Soi)
+  subroutine Solve4Heat(I,J,N,NY,NX,N1,N2,N3,N4,N5,N6,ConvectHeatFluxMicP,HeatFluxAir2Soi)
   implicit none
+  integer , intent(in) :: I,J
   integer , intent(in) :: N,NY,NX
   integer , intent(in) :: N1,N2,N3  !source
   integer , intent(in) :: N4,N5,N6  !dest
@@ -1791,7 +1795,8 @@ module WatsubMod
 
   call CalcSoilThermConductivity(N4,N5,N6,DTKX,ThermCondDst)
 
-  ATCNDL=(2.0_r8*ThermCondSrc*ThermCondDst)/(ThermCondSrc*DLYR(N,N6,N5,N4)+ThermCondDst*DLYR(N,N3,N2,N1))
+  !if(I>=132 .and. J==19)print*,'atcndl',ThermCondSrc,DLYR(N,N6,N5,N4),ThermCondDst,DLYR(N,N3,N2,N1)
+  ATCNDL=safe_adb(2.0_r8*ThermCondSrc*ThermCondDst,(ThermCondSrc*DLYR(N,N6,N5,N4)+ThermCondDst*DLYR(N,N3,N2,N1)))
 
   !     HEAT FLOW FROM THERMAL CONDUCTIVITY AND TEMPERATURE GRADIENT
   !
@@ -1805,7 +1810,7 @@ module WatsubMod
   !     HeatCondSoi=source-destination conductive heat flux
   !     HFLWL=total conductive+convective source-destination heat flux
   !
-
+  !if(I>=132 .and. J==19)print*,'bftklx'
   IF(VLHeatCapacity(N3,N2,N1).GT.VHCPNX(NY,NX))THEN
     IF(N3.EQ.NUM(NY,NX).AND.VLHeatCapSnow(1,N2,N1).LE.VLHeatCapSnowMin_col(N2,N1))THEN
       !surface layer, not significant snowpack
@@ -1829,6 +1834,7 @@ module WatsubMod
     TK1X=TKSoi1(N3,N2,N1)
   ENDIF
 
+  !if(I>=132 .and. J==19)print*,'tklx'
   IF(VLHeatCapacity(N6,N5,N4).GT.ZEROS(NY,NX))THEN
     TKLX=TKSoi1(N6,N5,N4)+ConvectHeatFluxMicP/VLHeatCapacity(N6,N5,N4)
   ELSE
@@ -1841,7 +1847,8 @@ module WatsubMod
   ELSE
     TKY=(TK1X+TKLX)/2._r8
   endif 
-          !
+
+  !if(I>=132 .and. J==19)print*,'aftky'
   HFLWX=(TK1X-TKY)*VLHeatCapacity(N3,N2,N1)*dts_wat
   HFLWC=ATCNDL*(TK1X-TKLX)*AREA(N,N3,N2,N1)*dts_HeatWatTP
   IF(HFLWC.GE.0.0_r8)THEN
