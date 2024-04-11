@@ -7,7 +7,7 @@ module ATSEcoSIMAdvanceMod
   use SOMDataType
   USE SoilPhysDataType
   use LandSurfDataType
-  use CanopyDataType, only: SWRadOnGrnd
+  use CanopyDataType, only: RadSWGrnd_col
   !use PlantAPIData, only: CO2E, CH4E, OXYE, Z2GE, Z2OE, ZNH3E, &
   !    H2GE
   use ClimForcDataType, only : LWRadSky, TairK, &
@@ -69,7 +69,7 @@ implicit none
     !convert WindSpeedAtm from ATS units (m s^-1) to EcoSIM (m h^-1)
     WindSpeedAtm(NY,NX) = uwind(NY)*3600.0_r8
     !converting radiation units from ATS (W m^-2) to EcoSIM (MJ m^-2 h^-1)
-    SWRadOnGrnd(NY,NX) = swrad(NY)*0.0036_r8
+    RadSWGrnd_col(NY,NX) = swrad(NY)*0.0036_r8
     LWRadSky(NY,NX) = sunrad(NY)*0.0036_r8
     !RainH(NY,NX) = prec
     DO L=NU(NY,NX),NL(NY,NX)
