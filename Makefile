@@ -1,11 +1,11 @@
 # Makefile -- Use this to build on *NIX systems.
 
 ifndef ATS
-	CC         = not-set
-	CXX        = not-set
-	FC         = not-set
-	F90        = not-set
-	netcdfsys  = not-set
+  CC         = not-set
+  CXX        = not-set
+  FC         = not-set
+  F90        = not-set
+  netcdfsys  = not-set
 endif
 
 TPL_INSTALL_PREFIX=/global2/agraus/code/ats_dev_dir/amanzi_tpls-install-master-Debug
@@ -30,9 +30,9 @@ CONFIG_FLAGS = -DUNIX=1 -Wno-dev
 
 # Process configuration options.
 ifeq ($(F90), not-set)
-	CONFIG_FLAGS += -DF90=1
+  CONFIG_FLAGS += -DF90=1
 else
-	CONFIG_FLAGS += -DF90=${F90}
+  CONFIG_FLAGS += -DF90=${F90}
 endif
 
 # Travis-CI build
@@ -49,30 +49,30 @@ endif
 
 # MPI
 ifndef ATS
-	ifeq ($(mpi), 1)
-	  BUILDDIR := ${BUILDDIR}-mpi
-	  CC = mpicc
-	  CXX = mpicxx
-	  FC = mpif90
-	  CONFIG_FLAGS += -DHAVE_MPI=1
-	else
-	  ifeq ($(CC), not-set)
-	    CC  = icc
-	  endif
-	  ifeq ($(CXX), not-set)
-	    CXX = icpc
-	  endif
-	  ifeq ($(FC), not-set)
-	    FC = ifort
-	  endif
-	  CONFIG_FLAGS += -DHAVE_MPI=0
-	endif
+  ifeq ($(mpi), 1)
+    BUILDDIR := ${BUILDDIR}-mpi
+    CC = mpicc
+    CXX = mpicxx
+    FC = mpif90
+    CONFIG_FLAGS += -DHAVE_MPI=1
+  else
+    ifeq ($(CC), not-set)
+      CC  = icc
+    endif
+    ifeq ($(CXX), not-set)
+      CXX = icpc
+    endif
+    ifeq ($(FC), not-set)
+      FC = ifort
+    endif
+    CONFIG_FLAGS += -DHAVE_MPI=0
+  endif
 
-	ifeq ($(FC),ifort)
-	  compiler=intel
-	else
-	  compiler=gnu
-	endif
+  ifeq ($(FC),ifort)
+    compiler=intel
+  else
+    compiler=gnu
+  endif
 endif
 
 # Shared libs?
