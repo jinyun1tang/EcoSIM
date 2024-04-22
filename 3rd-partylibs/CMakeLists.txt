@@ -75,6 +75,11 @@ if (NOT EXISTS ${Z_LIBRARY})
   set(ZLIB_CONFIG_OPTS --prefix=${PROJECT_BINARY_DIR} --static)
 
   message("Preparing zlib...")
+  message("PROJECT_BINARY_DIR: ${PROJECT_BINARY_DIR}")
+  message("CMAKE_COMMAND: ${CMAKE_COMMAND}")
+  message("CMAKE_CURRENT_SOURCE_DIR: ${CMAKE_CURRENT_SOURCE_DIR}")
+  message("CMAKE_CURRENT_BINARY_DIR: ${CMAKE_CURRENT_BINARY_DIR}")
+
   execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/zlib ${CMAKE_CURRENT_BINARY_DIR}/zlib
                   RESULT_VARIABLE stat)
   if (NOT stat EQUAL 0)
@@ -82,6 +87,9 @@ if (NOT EXISTS ${Z_LIBRARY})
   endif()
 
   message("Configuring zlib...")
+  message("CMAKE_C_COMPILER: ${CMAKE_C_COMPILER}")
+  message("CMAKE_C_FLAGS: ${CMAKE_C_FLAGS}")
+  message("ZLIB_CONFIG_OPTS: ${ZLIB_CONFIG_OPTS}") 
 
   execute_process(COMMAND env CC=${CMAKE_C_COMPILER} env CFLAGS=${CMAKE_C_FLAGS} ./configure ${ZLIB_CONFIG_OPTS}
                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/zlib

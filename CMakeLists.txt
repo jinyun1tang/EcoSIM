@@ -1,3 +1,4 @@
+# NOTE: this is the old CMake file for compiling with a UNIX Makefile
 # Minimum CMake version, determined by hdf5.
 cmake_minimum_required (VERSION 3.4)
 
@@ -6,7 +7,6 @@ set (ECOSIM_MAJOR_VERSION 0)
 set (ECOSIM_MINOR_VERSION 1)
 set (ECOSIM_PATCH_VERSION 0)
 set (ECOSIM_VERSION "${ECOSIM_MAJOR_VERSION}.${ECOSIM_MINOR_VERSION}.${ECOSIM_PATCH_VERSION}")
-
 
 # Adjust CMake's module path.
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
@@ -19,8 +19,6 @@ option(BUILD_SHARED_LIBS "Builds shared libraries [ON]." ON)
 option(XSDK_WITH_NETCDF "Enables support for netcdf [OFF]." ON)
 option(TPL_NETCDF_LIBRARIES "List of absolute paths to netcdf link libraries [].")
 option(TPL_NETCDF_INCLUDE_DIRS "List of absolute paths to netcdf include directories [].")
-
-
 
 # For now, we disable shared libs on Macs.
 #if (APPLE)
@@ -36,7 +34,6 @@ endif()
 if (NOT CMAKE_INSTALL_PREFIX)
   set(CMAKE_INSTALL_PREFIX local)
 endif()
-
 
 # set the number of cores to something reasonable so we don't over
 # subscribe a laptop or exceed hpc login node restrictions. could
@@ -152,11 +149,9 @@ endif()
 set(ECOSIM_NEED_PFUNIT 0)
 set(ECOSIM_NEED_PETSC 0)
 set(ECOSIM_INCLUDE_DIRS "" CACHE LIST "Include directory of EcoSIM")
-#if (XSDK_WITH_NETCDF AND MACHINE MATCHES "supported")
 
+if (XSDK_WITH_NETCDF AND MACHINE MATCHES "supported")
   if ((TPL_NETCDF_LIBRARIES MATCHES "lib") AND (TPL_NETCDF_INCLUDE_DIRS MATCHES "include"))
-#    message(FATAL_ERROR "TPL_NETCDF_LIBRARIES option be set for netcdf support to be enabled.")
-#    message("TPL_NETCDF_LIBRARIES option be set for netcdf support to be enabled.")
      message("ECOSIM has netcdf support from the system")
      message("TPL_NETCDF_LIBRARIES ${TPL_NETCDF_LIBRARIES}")
      message("TPL_NETCDF_INCLUDE_DIRS ${TPL_NETCDF_INCLUDE_DIRS}")
@@ -167,30 +162,26 @@ set(ECOSIM_INCLUDE_DIRS "" CACHE LIST "Include directory of EcoSIM")
      message("ECOSIM does not have netcdf support from the system")
      set(ECOSIM_HAVE_NETCDF 0)
   endif()
-#  foreach(lib ${TPL_NETCDF_LIBRARIES})
-#    message(${lib})
-#    if (NOT EXISTS ${lib})
-#      message(FATAL_ERROR "netcdf library not found: ${lib}")
-#    endif()
-#  endforeach()
+endif()
 
-#  if (NOT TPL_NETCDF_INCLUDE_DIRS)
-#    message(FATAL_ERROR "TPL_NETCDF_INCLUDE_DIRS option be set for netcdf support to be enabled.")
-#  endif()
-  foreach(dir ${TPL_NETCDF_INCLUDE_DIRS})
-    string(STRIP ${dir} dirl)
-    if (NOT EXISTS ${dirl})
-      message(FATAL_ERROR "netcdf include directory not found: ${dir}")
-    endif()
-  endforeach()
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Templates/ecosim.cmake.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/ecosim.cmake"
+  @ONLY
+)
 
-#  message("-- Enabled support for netcdf.")
-#  list(APPEND ECOSIM_TPLS ${TPL_NETCDF_LIBRARIES})
-#  list(APPEND ECOSIM_INCLUDE_DIRS ${TPL_NETCDF_INCLUDE_DIRS})
-#  set(ECOSIM_HAVE_NETCDF 1)
-#else()
-#  set(ECOSIM_HAVE_NETCDF 0)
+# Install miscellaneous build/test files.
+#install(FILES ${CMAKE_CURRENT_BINARY_DIR}/ecosim.cmake DESTINATION share/ecosim)
+
+#if (NOT CMAKE_INSTALL_PREFIX STREQUAL "INSTALL_DISABLED")
+#target_link_libraries(ecosiml PUBLIC ${ECOSIM_TPLS})
+# message("CMAKE_INSTALL_PREFIX: ${CMAKE_INSTALL_PREFIX}")
+# Set the installation path for the library
+#install(TARGETS ecosiml DESTINATION lib/)
 #endif()
+
+# Now include the contents of the other CMakeLists.txt file
+
 # Other third-party libraries.
 add_subdirectory(3rd-partylibs)
 
@@ -219,28 +210,3 @@ include_directories("${PROJECT_SOURCE_DIR}")
 
 add_subdirectory(f90src)
 add_subdirectory(drivers)
-
-# Drivers for benchmarks.
-#X#add_subdirectory(drivers)
-
-# Benchmarks.
-#X#add_subdirectory(benchmarks)
-
-
-# Now that we have gathered all our libraries, generate an ecosim.cmake
-# file that contains all the vital information.
-configure_file(
-  "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Templates/ecosim.cmake.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/ecosim.cmake"
-  @ONLY
-)
-
-# Install miscellaneous build/test files.
-#install(FILES ${CMAKE_CURRENT_BINARY_DIR}/ecosim.cmake DESTINATION share/ecosim)
-
-#if (NOT CMAKE_INSTALL_PREFIX STREQUAL "INSTALL_DISABLED")
-#target_link_libraries(ecosiml PUBLIC ${ECOSIM_TPLS})
-# message("CMAKE_INSTALL_PREFIX: ${CMAKE_INSTALL_PREFIX}")
-# Set the installation path for the library
-#install(TARGETS ecosiml DESTINATION lib/)
-#endif()
