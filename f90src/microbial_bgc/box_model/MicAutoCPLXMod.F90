@@ -69,7 +69,7 @@ module MicAutoCPLXMod
     RUPOXff  => nmicf%RUPOXff,    &
     RGOMOff  => nmicf%RGOMOff,    &
     RO2Dmnd4RespAutor => nmicf%RO2Dmnd4RespAutor ,    &
-    ROXYPff=> nmicf%ROXYPff  ,    &
+    RO2DmndAutor=> nmicf%RO2DmndAutor  ,    &
     RO2Uptk4RespAutor => nmicf%RO2Uptk4RespAutor ,    &
     RDNO3ff => nmicf%RDNO3ff ,    &
     RDNOBff => nmicf%RDNOBff ,    &
@@ -93,7 +93,7 @@ module MicAutoCPLXMod
     litrm => micfor%litrm  , &
     VLSoilPoreMicP_vr  => micfor%VLSoilPoreMicP_vr, &
     ORGC   => micfor%ORGC  ,     &
-    RO2DmndAutor => micflx%RO2DmndAutor  &
+    RO2DmndAutort => micflx%RO2DmndAutort  &
   )
 ! FOMA,FOMN=fraction of total active biomass C,N in each N and K
 
@@ -175,8 +175,8 @@ module MicAutoCPLXMod
   else
     RGOMP=0.0_r8
     RO2Dmnd4RespAutor(NGL)=0.0_r8
-    ROXYPff(NGL)=0.0_r8
     RO2DmndAutor(NGL)=0.0_r8
+    RO2DmndAutort(NGL)=0.0_r8
   ENDif
 !
 !  write(*,*)'O2 UPTAKE BY AEROBES'
@@ -297,7 +297,7 @@ module MicAutoCPLXMod
     RINOOff   => micflx%RINOOff, &
     RINHBff   => micflx%RINHBff, &
     RINHOff   => micflx%RINHOff, &
-    RO2DmndAutor   => micflx%RO2DmndAutor  &
+    RO2DmndAutort   => micflx%RO2DmndAutort  &
   )
 ! F*=fraction of substrate uptake relative to total uptake from
 ! previous hour. OXYX=O2, NH4X=NH4 non-band, NB4X=NH4 band
@@ -306,7 +306,7 @@ module MicAutoCPLXMod
 ! oxidation, OQA=acetate oxidation
 !
   IF(ROXYY.GT.ZEROS)THEN
-    FOXYX=AMAX1(FMN,RO2DmndAutor(NGL)/ROXYY)
+    FOXYX=AMAX1(FMN,RO2DmndAutort(NGL)/ROXYY)
   ELSE
     FOXYX=AMAX1(FMN,FOMAff(NGL))
   ENDIF
@@ -658,7 +658,7 @@ module MicAutoCPLXMod
     RUPOXff  => nmicf%RUPOXff,    &
     RGOMOff  => nmicf%RGOMOff,    &
     RO2Dmnd4RespAutor => nmicf%RO2Dmnd4RespAutor,     &
-    ROXYPff=> nmicf%ROXYPff ,     &
+    RO2DmndAutor=> nmicf%RO2DmndAutor ,     &
     RO2Uptk4RespAutor => nmicf%RO2Uptk4RespAutor,     &
     RH2GXff  => nmicf%RH2GXff,    &
     ROQCD  => nmicf%ROQCD,    &
@@ -699,13 +699,13 @@ module MicAutoCPLXMod
     RNO2OxidAutorBand => micflx%RNO2OxidAutorBand  &
   )
 
-  IF(ROXYPff(NGL).GT.ZEROS.AND.FOXYX.GT.ZERO)THEN
+  IF(RO2DmndAutor(NGL).GT.ZEROS.AND.FOXYX.GT.ZERO)THEN
     IF(.not.litrm.OR.VLSoilPoreMicP_vr.GT.ZEROS)THEN
       !
       !write(*,*)'MAXIMUM O2 UPAKE FROM POTENTIAL RESPIRATION OF EACH AEROBIC'
       !     POPULATION
       !
-      RUPMX=ROXYPff(NGL)*dts_gas    !
+      RUPMX=RO2DmndAutor(NGL)*dts_gas    !
       ROXYFX=ROXYF*dts_gas*FOXYX    !O2 demand
       OLSGL1=OLSGL*dts_gas
       IF(.not.litrm)THEN
@@ -781,7 +781,7 @@ module MicAutoCPLXMod
       !     WFN=ratio of O2-limited to O2-unlimited uptake
       !     RVMX4,RVNHB,RVMX2,RVMB2=NH3,NO2 oxidation in non-band, band
       !
-      fLimO2Autor(NGL)=AMIN1(1.0,AZMAX1(RUPOXff(NGL)/ROXYPff(NGL)))
+      fLimO2Autor(NGL)=AMIN1(1.0,AZMAX1(RUPOXff(NGL)/RO2DmndAutor(NGL)))
       IF(N.EQ.AmmoniaOxidBacter)THEN
         RNH3OxidAutor(NGL)=RNH3OxidAutor(NGL)*fLimO2Autor(NGL)
         RNH3OxidAutorBand(NGL)=RNH3OxidAutorBand(NGL)*fLimO2Autor(NGL)
@@ -790,7 +790,7 @@ module MicAutoCPLXMod
         RNO2OxidAutorBand(NGL)=RNO2OxidAutorBand(NGL)*fLimO2Autor(NGL)
       ENDIF
     ELSE
-      RUPOXff(NGL)=ROXYPff(NGL)
+      RUPOXff(NGL)=RO2DmndAutor(NGL)
       fLimO2Autor(NGL)=1.0_r8
     ENDIF
   ELSE
@@ -973,7 +973,7 @@ module MicAutoCPLXMod
     FOMAff => nmics%FOMAff,  &
     OMAff  => nmics%OMAff ,  &
     RO2Dmnd4RespAutor=> nmicf%RO2Dmnd4RespAutor, &
-    ROXYPff=> nmicf%ROXYPff, &
+    RO2DmndAutor=> nmicf%RO2DmndAutor, &
     VLNH4  => micfor%VLNH4 , &
     VLNHB  => micfor%VLNHB , &
     ZEROS  => micfor%ZEROS , &
@@ -988,7 +988,7 @@ module MicAutoCPLXMod
     ZNH4B  => micstt%ZNH4B , &
     RNH3OxidAutor=> micflx%RNH3OxidAutor, &
     RNH3OxidAutorBand=> micflx%RNH3OxidAutorBand,  &
-    RO2DmndAutor => micflx%RO2DmndAutor   &
+    RO2DmndAutort => micflx%RO2DmndAutort   &
   )
 !
 !     FACTOR TO REGULATE COMPETITION FOR NH4 AMONG DIFFERENT
@@ -1079,8 +1079,8 @@ module MicAutoCPLXMod
 ! NH3+1.5O2-> NO2(-)+H2O+H(+), 1.5*32/14.=3.249
 
   RO2Dmnd4RespAutor(NGL)=2.667_r8*RGOMP
-  ROXYPff(NGL)=RO2Dmnd4RespAutor(NGL)+3.429_r8*RVOXP
-  RO2DmndAutor(NGL)=ROXYPff(NGL)
+  RO2DmndAutor(NGL)=RO2Dmnd4RespAutor(NGL)+3.429_r8*RVOXP
+  RO2DmndAutort(NGL)=RO2DmndAutor(NGL)
 !
   end associate
   end subroutine NH3OxidizerCatabolism
@@ -1113,7 +1113,7 @@ module MicAutoCPLXMod
     FOMNff => nmics%FOMNff,    &
     OMAff  => nmics%OMAff ,    &
     RO2Dmnd4RespAutor => nmicf%RO2Dmnd4RespAutor,  &
-    ROXYPff => nmicf%ROXYPff,  &
+    RO2DmndAutor => nmicf%RO2DmndAutor,  &
     VLNH4   => micfor%VLNH4   , &
     VLNHB  => micfor%VLNHB   , &
     VLNO3  => micfor%VLNO3   , &
@@ -1127,7 +1127,7 @@ module MicAutoCPLXMod
     ZNO2B  => micstt%ZNO2B   , &
     RNO2OxidAutor=> micflx%RNO2OxidAutor  , &
     RNO2OxidAutorBand => micflx%RNO2OxidAutorBand , &
-    RO2DmndAutor => micflx%RO2DmndAutor   &
+    RO2DmndAutort => micflx%RO2DmndAutort   &
   )
 !     FACTOR TO REGULATE COMPETITION FOR NO2 AMONG DIFFERENT
 !     MICROBIAL POPULATIONS
@@ -1191,8 +1191,8 @@ module MicAutoCPLXMod
 !     ROXYP,RO2Dmnd4RespHeter=O2 demand from respiration + NO2 oxidation
 !
   RO2Dmnd4RespAutor(NGL)=2.667_r8*RGOMP
-  ROXYPff(NGL)=RO2Dmnd4RespAutor(NGL)+1.143_r8*RVOXP
-  RO2DmndAutor(NGL)=ROXYPff(NGL)
+  RO2DmndAutor(NGL)=RO2Dmnd4RespAutor(NGL)+1.143_r8*RVOXP
+  RO2DmndAutort(NGL)=RO2DmndAutor(NGL)
 
   end associate
   end subroutine NO2OxidizerCatabolism
@@ -1221,11 +1221,11 @@ module MicAutoCPLXMod
     FCNPff => nmics%FCNPff,       &
     OMAff  => nmics%OMAff ,       &
     RO2Dmnd4RespAutor => nmicf%RO2Dmnd4RespAutor,     &
-    ROXYPff => nmicf%ROXYPff  ,    &
+    RO2DmndAutor => nmicf%RO2DmndAutor  ,    &
     TKS     => micfor%TKS       , &
     CH2GS   => micstt%CH2GS    , &
     H2GS    => micstt%H2GS     , &
-    RO2DmndAutor  => micflx%RO2DmndAutor     &
+    RO2DmndAutort  => micflx%RO2DmndAutort     &
   )
 !     begin_execution
 !
@@ -1250,8 +1250,8 @@ module MicAutoCPLXMod
   FSBST=CH2GS/(CH2GS+H2KM)
   RGOMP=AZMAX1(AMIN1(1.5*H2GSX,VMXA*FSBST))
   RO2Dmnd4RespAutor(NGL)=0.0_r8
-  ROXYPff(NGL)=0.0_r8
   RO2DmndAutor(NGL)=0.0_r8
+  RO2DmndAutort(NGL)=0.0_r8
   naqfdiag%TCH4A=naqfdiag%TCH4A+RGOMP
 !
   end associate
@@ -1286,7 +1286,7 @@ module MicAutoCPLXMod
     FCNPff => nmics%FCNPff,  &
     OMAff  => nmics%OMAff ,  &
     RO2Dmnd4RespAutor=> nmicf%RO2Dmnd4RespAutor, &
-    ROXYPff=> nmicf%ROXYPff, &
+    RO2DmndAutor=> nmicf%RO2DmndAutor, &
     CCH4E  => micfor%CCH4E  , &
     VLsoiAirPM  => micfor%VLsoiAirPM  , &
     VLWatMicPM  => micfor%VLWatMicPM  , &
@@ -1300,7 +1300,7 @@ module MicAutoCPLXMod
     SCH4L  => micstt%SCH4L  , &
     RCH4L  => micfor%RCH4L , &
     RCH4F  => micfor%RCH4F , &
-    RO2DmndAutor  => micflx%RO2DmndAutor &
+    RO2DmndAutort  => micflx%RO2DmndAutort &
   )
 !     begin_execution
 !
@@ -1399,8 +1399,8 @@ module MicAutoCPLXMod
 !     ROXYP=O2 demand from respiration + CH4 oxidation
 !
   RO2Dmnd4RespAutor(NGL)=2.667_r8*RGOMP
-  ROXYPff(NGL)=RO2Dmnd4RespAutor(NGL)+5.333_r8*RVOXP
-  RO2DmndAutor(NGL)=ROXYPff(NGL)
+  RO2DmndAutor(NGL)=RO2Dmnd4RespAutor(NGL)+5.333_r8*RVOXP
+  RO2DmndAutort(NGL)=RO2DmndAutor(NGL)
   end associate
   end subroutine MethanotrophCatabolism
 !------------------------------------------------------------------------------------------

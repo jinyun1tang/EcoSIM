@@ -153,7 +153,7 @@ module ExtractsMod
     RootNutUptake_pvr        => plt_rbgc%RootNutUptake_pvr , &
     trcg_air2root_flx_vr     => plt_rbgc%trcg_air2root_flx_vr , &
     trcg_TLP                 => plt_rbgc%trcg_TLP , &
-    ROXYP                    => plt_rbgc%ROXYP  , &
+    RootO2Dmnd4Resp_pvr                    => plt_rbgc%RootO2Dmnd4Resp_pvr  , &
     RootMycoExudElm_pvr      => plt_rbgc%RootMycoExudElm_pvr , &
     RUNNHP                   => plt_rbgc%RUNNHP , &
     RUNNOP                   => plt_rbgc%RUNNOP , &
@@ -298,7 +298,7 @@ module ExtractsMod
 !     RN3BX=NO3 demand in band by all microbial,root,myco populations
 !     RPOBX=H2PO4 demand in band by all microbial,root,myco populations
 !     RP1BX=HPO4 demand in band by all microbial,root,myco populations
-!     ROXYP=O2 demand by each root,myco population
+!     RootO2Dmnd4Resp_pvr=O2 demand by each root,myco population
 !     RUNNHP=NH4 demand in non-band by each root population
 !     RUNNOP=NO3 demand in non-band by each root population
 !     RUPP2P=H2PO4 demand in non-band by each root population
@@ -308,7 +308,7 @@ module ExtractsMod
 !     RUPP2B=H2PO4 demand in band by each root population
 !     RUPP1B=HPO4 demand in band by each root population
 !
-      ROXYX(L)=ROXYX(L)+ROXYP(N,L,NZ)
+      ROXYX(L)=ROXYX(L)+RootO2Dmnd4Resp_pvr(N,L,NZ)
       RNH4X(L)=RNH4X(L)+RUNNHP(N,L,NZ)
       RNO3X(L)=RNO3X(L)+RUNNOP(N,L,NZ)
       RPO4X(L)=RPO4X(L)+RUPP2P(N,L,NZ)

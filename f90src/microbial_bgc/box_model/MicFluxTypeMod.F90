@@ -36,12 +36,12 @@ implicit none
   real(r8) :: NetNH4Mineralize_col
   real(r8) :: NetPO4Mineralize_col
   real(r8), allocatable :: RDOM_micb_flx(:,:)
-  real(r8), allocatable :: RO2DmndAutor(:)
+  real(r8), allocatable :: RO2DmndAutort(:)
   real(r8), allocatable :: RNH3OxidAutor(:)
   real(r8), allocatable :: RNH3OxidAutorBand(:)
   real(r8), allocatable :: RNO2OxidAutor(:)
   real(r8), allocatable :: RNO2OxidAutorBand(:)
-  real(r8), allocatable :: RO2DmndHeter(:,:)
+  real(r8), allocatable :: RO2DmndHetert(:,:)
   real(r8), allocatable :: ROQCS(:,:)
   real(r8), allocatable :: ROQAS(:,:)
   real(r8), allocatable :: RVMX3(:,:)
@@ -99,7 +99,7 @@ implicit none
 
   allocate(this%ROXSK(NPH));this%ROXSK = spval
   allocate(this%RDOM_micb_flx(idom_beg:idom_end,1:jcplx));this%RDOM_micb_flx=spval
-  allocate(this%RO2DmndHeter(NumMicrbHetetrophCmplx,1:jcplx));this%RO2DmndHeter=spval
+  allocate(this%RO2DmndHetert(NumMicrbHetetrophCmplx,1:jcplx));this%RO2DmndHetert=spval
   allocate(this%ROQCS(NumMicrbHetetrophCmplx,1:jcplx));this%ROQCS=spval
   allocate(this%ROQAS(NumMicrbHetetrophCmplx,1:jcplx));this%ROQAS=spval
   allocate(this%RVMX3(NumMicrbHetetrophCmplx,1:jcplx));this%RVMX3=spval
@@ -121,7 +121,7 @@ implicit none
   allocate(this%RINOOR(NumMicrbHetetrophCmplx,1:jcplx));this%RINOOR=spval
   allocate(this%RIPOOR(NumMicrbHetetrophCmplx,1:jcplx));this%RIPOOR=spval
   allocate(this%RIPO1R(NumMicrbHetetrophCmplx,1:jcplx));this%RIPO1R=spval
-  allocate(this%RO2DmndAutor(NumMicrobAutrophCmplx));this%RO2DmndAutor=spval
+  allocate(this%RO2DmndAutort(NumMicrobAutrophCmplx));this%RO2DmndAutort=spval
   allocate(this%RINHOff(NumMicrobAutrophCmplx));this%RINHOff=spval
   allocate(this%RINHBff(NumMicrobAutrophCmplx));this%RINHBff=spval
   allocate(this%RINOOff(NumMicrobAutrophCmplx));this%RINOOff=spval
@@ -149,7 +149,7 @@ implicit none
 
   this%ROXSK = 0._r8
   this%RDOM_micb_flx=0._r8
-  this%RO2DmndHeter=0._r8
+  this%RO2DmndHetert=0._r8
   this%ROQCS=0._r8
   this%ROQAS=0._r8
   this%RVMX3=0._r8
@@ -171,7 +171,7 @@ implicit none
   this%RINOOR=0._r8
   this%RIPOOR=0._r8
   this%RIPO1R=0._r8
-  this%RO2DmndAutor=0._r8
+  this%RO2DmndAutort=0._r8
   this%RINHOff=0._r8
   this%RINHBff=0._r8
   this%RINOOff=0._r8
@@ -201,7 +201,7 @@ implicit none
   call destroy(this%RNH3OxidAutorBand)
   call destroy(this%RNO2OxidAutor)
   call destroy(this%RNO2OxidAutorBand)
-  call destroy(this%RO2DmndHeter)
+  call destroy(this%RO2DmndHetert)
   call destroy(this%ROQCS)
   call destroy(this%ROQAS)
   call destroy(this%RVMX3)
@@ -236,7 +236,7 @@ implicit none
   call destroy(this%RINOORff)
   call destroy(this%RIPOORff)
   call destroy(this%RIPO1Rff)
-  call destroy(this%RO2DmndAutor)
+  call destroy(this%RO2DmndAutort)
 
   end subroutine Destruct
 end module MicFluxTypeMod

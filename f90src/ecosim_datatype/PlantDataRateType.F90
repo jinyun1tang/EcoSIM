@@ -47,7 +47,7 @@ module PlantDataRateType
   real(r8),target,allocatable ::  NH3byFire_pft(:,:,:)                       !plant NH3 emission from fire, [g d-2 ]
   real(r8),target,allocatable ::  N2ObyFire_pft(:,:,:)                       !plant N2O emission from fire, [g d-2 ]
   real(r8),target,allocatable ::  PO4byFire_pft(:,:,:)                       !plant PO4 emission from fire, [g d-2 ]
-  real(r8),target,allocatable ::  ROXYP(:,:,:,:,:)                   !root  O2 demand from respiration, [g d-2 h-1]
+  real(r8),target,allocatable ::  RootO2Dmnd4Resp_pvr(:,:,:,:,:)                   !root  O2 demand from respiration, [g d-2 h-1]
   real(r8),target,allocatable ::  trcg_air2root_flx__pvr(:,:,:,:,:,:)                  !gaseous tracer flux through roots, [g d-2 h-1]
   real(r8),target,allocatable ::  trcg_Root_DisEvap_flx_vr(:,:,:,:,:,:)                  !dissolution (+ve) - volatilization (-ve) gas flux in roots, [g d-2 h-1]
   real(r8),target,allocatable ::  RCO2P_pvr(:,:,:,:,:)                   !aqueous CO2 flux from roots to root water , [g d-2 h-1]
@@ -161,7 +161,7 @@ module PlantDataRateType
   allocate(NH3byFire_pft(JP,JY,JX));    NH3byFire_pft=0._r8
   allocate(N2ObyFire_pft(JP,JY,JX));    N2ObyFire_pft=0._r8
   allocate(PO4byFire_pft(JP,JY,JX));    PO4byFire_pft=0._r8
-  allocate(ROXYP(jroots,JZ,JP,JY,JX));ROXYP=0._r8
+  allocate(RootO2Dmnd4Resp_pvr(jroots,JZ,JP,JY,JX));RootO2Dmnd4Resp_pvr=0._r8
   allocate(trcg_air2root_flx__pvr(idg_beg:idg_end-1,2,JZ,JP,JY,JX));trcg_air2root_flx__pvr=0._r8
   allocate(trcg_Root_DisEvap_flx_vr(idg_beg:idg_end-1,2,JZ,JP,JY,JX));trcg_Root_DisEvap_flx_vr=0._r8
   allocate(RUPGasSol_vr(idg_beg:idg_end,jroots,JZ,JP,JY,JX));RUPGasSol_vr=0._r8
@@ -265,7 +265,7 @@ module PlantDataRateType
   call destroy(NH3byFire_pft)
   call destroy(N2ObyFire_pft)
   call destroy(PO4byFire_pft)
-  call destroy(ROXYP)  
+  call destroy(RootO2Dmnd4Resp_pvr)  
   call destroy(RCO2P_pvr)
   call destroy(RUPOXP)
   call destroy(RootRespPotent_pvr)

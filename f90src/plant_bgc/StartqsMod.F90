@@ -961,7 +961,7 @@ module StartqsMod
       plt_rbgc%RootNutUptake_pvr(ids_NO3B,N,L,NZ)=0._r8
       plt_rbgc%RootNutUptake_pvr(ids_H2PO4B,N,L,NZ)=0._r8
       plt_rbgc%RootNutUptake_pvr(ids_H1PO4B,N,L,NZ)=0._r8
-      plt_rbgc%ROXYP(N,L,NZ)=0._r8
+      plt_rbgc%RootO2Dmnd4Resp_pvr(N,L,NZ)=0._r8
       plt_rbgc%RUNNHP(N,L,NZ)=0._r8
       plt_rbgc%RUNNBP(N,L,NZ)=0._r8
       plt_rbgc%RUNNOP(N,L,NZ)=0._r8

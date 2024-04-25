@@ -301,7 +301,7 @@ contains
   micflx%RIPBO(1:NumMicrbHetetrophCmplx,1:jcplx)=reshape(ystates0l(fid_RIPBO_b:fid_RIPBO_e),(/NumMicrbHetetrophCmplx,JCPLX/))
   micflx%RIPO1(1:NumMicrbHetetrophCmplx,1:jcplx)=reshape(ystates0l(fid_RIPO1_b:fid_RIPO1_e),(/NumMicrbHetetrophCmplx,JCPLX/))
   micflx%RIPB1(1:NumMicrbHetetrophCmplx,1:jcplx)=reshape(ystates0l(fid_RIPB1_b:fid_RIPB1_e),(/NumMicrbHetetrophCmplx,JCPLX/))
-  micflx%RO2DmndHeter(1:NumMicrbHetetrophCmplx,1:jcplx)=reshape(ystates0l(fid_RO2DmndHeter_b:fid_RO2DmndHeter_e),(/NumMicrbHetetrophCmplx,JCPLX/))
+  micflx%RO2DmndHetert(1:NumMicrbHetetrophCmplx,1:jcplx)=reshape(ystates0l(fid_RO2DmndHetert_b:fid_RO2DmndHetert_e),(/NumMicrbHetetrophCmplx,JCPLX/))
   end associate
   end subroutine BatchModelConfig
 
@@ -437,7 +437,7 @@ contains
   fid_RIPBO_b=addone(itemp);fid_RIPBO_e=fid_RIPBO_b+NumMicrbHetetrophCmplx*jcplx;itemp=fid_RIPBO_e
   fid_RIPO1_b=addone(itemp);fid_RIPO1_e=fid_RIPO1_b+NumMicrbHetetrophCmplx*jcplx;itemp=fid_RIPO1_e
   fid_RIPB1_b=addone(itemp);fid_RIPB1_e=fid_RIPB1_b+NumMicrbHetetrophCmplx*jcplx;itemp=fid_RIPB1_e
-  fid_RO2DmndHeter_b=addone(itemp);fid_RO2DmndHeter_e=fid_RO2DmndHeter_b+NumMicrbHetetrophCmplx*jcplx;itemp=fid_RO2DmndHeter_e
+  fid_RO2DmndHetert_b=addone(itemp);fid_RO2DmndHetert_e=fid_RO2DmndHetert_b+NumMicrbHetetrophCmplx*jcplx;itemp=fid_RO2DmndHetert_e
 
   fid_XCODFS=addone(itemp)
   fid_XCHDFS=addone(itemp)
@@ -614,7 +614,7 @@ contains
     IF(.not.micfor%litrm.or.(micpar%is_litter(K)))THEN
       DO N=1,NumMicbFunGroups
         DO NGL=micpar%JGnio(N),micpar%JGnfo(N)
-          ystatesfl(fid_ROXYY)=ystatesfl(fid_ROXYY)+micflx%RO2DmndHeter(NGL,K)
+          ystatesfl(fid_ROXYY)=ystatesfl(fid_ROXYY)+micflx%RO2DmndHetert(NGL,K)
           ystatesfl(fid_RNH4Y)=ystatesfl(fid_RNH4Y)+micflx%RVMX4(NGL,K)+micflx%RINHO(NGL,K)
           ystatesfl(fid_RNO3Y)=ystatesfl(fid_RNO3Y)+micflx%RVMX3(NGL,K)+micflx%RINOO(NGL,K)
           ystatesfl(fid_RNO2Y)=ystatesfl(fid_RNO2Y)+micflx%RVMX2(NGL,K)
@@ -635,7 +635,7 @@ contains
 
   DO  N=1,NumMicbFunGroups
     DO NGL=micpar%JGniA(N),micpar%JGnfA(N)
-      ystatesfl(fid_ROXYY)=ystatesfl(fid_ROXYY)+micflx%RO2DmndAutor(NGL)
+      ystatesfl(fid_ROXYY)=ystatesfl(fid_ROXYY)+micflx%RO2DmndAutort(NGL)
       ystatesfl(fid_RNH4Y)=ystatesfl(fid_RNH4Y)+micflx%RNH3OxidAutor(NGL)+micflx%RINHOff(NGL)
       ystatesfl(fid_RNO3Y)=ystatesfl(fid_RNO3Y)+micflx%RINOOff(NGL)
       ystatesfl(fid_RNO2Y)=ystatesfl(fid_RNO2Y)+micflx%RNO2OxidAutor(NGL)
@@ -1227,8 +1227,8 @@ contains
   DO k=1,jcplx
   DO N=1,NumMicbFunGroups
   DO NGL=micpar%JGnio(N),micpar%JGnfo(N)
-    jj=fid_RO2DmndHeter_b+ll
-    write(varl(jj),'(A,I2.2)')'RO2DmndHeter',ll
+    jj=fid_RO2DmndHetert_b+ll
+    write(varl(jj),'(A,I2.2)')'RO2DmndHetert',ll
     varlnml(jj)='aqueous O2 demand'//micpar%cplxname(k)
     vartypes(jj)=var_flux_type
     unitl(jj)='gO d-2 h-1'

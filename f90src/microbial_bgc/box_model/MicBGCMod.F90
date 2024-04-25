@@ -2128,7 +2128,7 @@ module MicBGCMod
     FNO3XR  =>nmicf%FNO3XR,   &
     FP14XR  => nmicf%FP14XR,  &
     FPO4XR  => nmicf%FPO4XR,  &
-    RO2DmndHeter => micflx%RO2DmndHeter, &
+    RO2DmndHetert => micflx%RO2DmndHetert, &
     RINHO => micflx%RINHO, &
     RINHB => micflx%RINHB, &
     RINOO => micflx%RINOO, &
@@ -2176,7 +2176,7 @@ module MicBGCMod
 ! oxidation, OQA=acetate oxidation
 !
   IF(ROXYY.GT.ZEROS)THEN
-    FOXYX=AMAX1(FMN,RO2DmndHeter(NGL,K)/ROXYY)
+    FOXYX=AMAX1(FMN,RO2DmndHetert(NGL,K)/ROXYY)
   ELSE
     FOXYX=AMAX1(FMN,FOMA(NGL,K))
   ENDIF
@@ -2308,7 +2308,7 @@ module MicBGCMod
     ROQCD => nmicf%ROQCD,     &
     CDOM  => ncplxs%CDOM,   &
     DOM => micstt%DOM, &
-    RO2DmndHeter => micflx%RO2DmndHeter, &
+    RO2DmndHetert => micflx%RO2DmndHetert, &
     ROQCS => micflx%ROQCS, &
     ROQAS => micflx%ROQAS, &
     ZERO  => micfor%ZERO, &
@@ -2345,7 +2345,7 @@ module MicBGCMod
   FGOAP=1.0_r8
   RO2Dmnd4RespHeter(NGL,K)=0.0_r8
   ROXYP(NGL,K)=0.0_r8
-  RO2DmndHeter(NGL,K)=0.0_r8
+  RO2DmndHetert(NGL,K)=0.0_r8
   ROQCS(NGL,K)=0.0_r8
   ROQAS(NGL,K)=RGOGZ
   ROQCD(NGL,K)=0.0_r8
@@ -2375,7 +2375,7 @@ module MicBGCMod
   real(r8) :: RGOCY,RGOCZ,RGOAZ
   real(r8) :: RGOCX,RGOAX
   real(r8) :: RGOAP
-  real(r8) :: RO2DmndHeterX,ROQCSX,ROQASX
+  real(r8) :: RO2DmndHetertX,ROQCSX,ROQASX
   real(r8) :: FSBST
 !     begin_execution
   associate(                  &
@@ -2390,7 +2390,7 @@ module MicBGCMod
     n_anero_faculb => micpar%n_anero_faculb, &
     n_aero_fungi => micpar%n_aero_fungi, &
     n_aero_n2fixer => micpar%n_aero_n2fixer, &
-    RO2DmndHeter => micflx%RO2DmndHeter, &
+    RO2DmndHetert => micflx%RO2DmndHetert, &
     ROQCS => micflx%ROQCS, &
     ROQAS => micflx%ROQAS, &
     FOCA  => ncplxs%FOCA,     &
@@ -2446,17 +2446,17 @@ module MicBGCMod
 ! BY HETEROTROPHIC AEROBES
 
 ! ECHZ=growth respiration yield
-! RO2Dmnd4RespHeter,ROXYP,RO2DmndHeter=O2 demand from DOC,DOA oxidation
+! RO2Dmnd4RespHeter,ROXYP,RO2DmndHetert=O2 demand from DOC,DOA oxidation
 ! ROQCS,ROQAS=DOC,DOA demand from DOC,DOA oxidation
 ! ROQCD=microbial respiration used to represent microbial activity
 !
   ECHZ=EO2Q*FGOCP+EO2A*FGOAP
   RO2Dmnd4RespHeter(NGL,K)=2.667_r8*RGOMP
   ROXYP(NGL,K)=RO2Dmnd4RespHeter(NGL,K)
-  RO2DmndHeterX=RO2DmndHeter(NGL,K)
+  RO2DmndHetertX=RO2DmndHetert(NGL,K)
   ROQCSX=ROQCS(NGL,K)
   ROQASX=ROQAS(NGL,K)
-  RO2DmndHeter(NGL,K)=ROXYP(NGL,K)
+  RO2DmndHetert(NGL,K)=ROXYP(NGL,K)
   ROQCS(NGL,K)=RGOCZ
   ROQAS(NGL,K)=RGOAZ
   ROQCD(NGL,K)=RGOCY
@@ -2497,7 +2497,7 @@ module MicBGCMod
     DOM  => micstt%DOM, &
     CH2GS => micstt%CH2GS , &
     COXYS => micstt%COXYS, &
-    RO2DmndHeter  => micflx%RO2DmndHeter, &
+    RO2DmndHetert  => micflx%RO2DmndHetert, &
     ROQCS => micflx%ROQCS , &
     ROQAS => micflx%ROQAS, &
     n_anaero_ferm => micpar%n_anaero_ferm, &
@@ -2539,7 +2539,7 @@ module MicBGCMod
   FGOAP=0.0_r8
   RO2Dmnd4RespHeter(NGL,K)=0.0_r8
   ROXYP(NGL,K)=0.0_r8
-  RO2DmndHeter(NGL,K)=0.0_r8
+  RO2DmndHetert(NGL,K)=0.0_r8
   ROQCS(NGL,K)=RGOFZ
   ROQAS(NGL,K)=0.0_r8
   ROQCD(NGL,K)=RGOFY

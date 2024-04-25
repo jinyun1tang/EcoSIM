@@ -129,7 +129,7 @@ module NutUptakeMod
     NU                      =>  plt_site%NU          , &
     ZERO                    =>  plt_site%ZERO        , &
     ZEROP                   =>  plt_biom%ZEROP       , &
-    ROXYP                   =>  plt_rbgc%ROXYP       , &
+    RootO2Dmnd4Resp_pvr                   =>  plt_rbgc%RootO2Dmnd4Resp_pvr       , &
     RAutoRootO2Limter_pvr   =>  plt_rbgc%RAutoRootO2Limter_pvr        , &
     RootRespPotent_pvr      =>  plt_rbgc%RootRespPotent_pvr       , &
     RootLenPerPlant_pvr     =>  plt_morph%RootLenPerPlant_pvr      , &
@@ -153,17 +153,17 @@ module NutUptakeMod
 !
 !     ROOT O2 DEMAND CALCULATED FROM O2 NON-LIMITED RESPIRATION RATE
 !
-!     ROXYP=O2 demand, g O2
+!     RootO2Dmnd4Resp_pvr=O2 demand, g O2
 !     RootRespPotent_pvr=respiration unlimited by O2
 !     RootVH2O_pvr=root or myco aqueous volume
 !     FOXYX=fraction of total O2 demand from previous hour
 !
-        ROXYP(N,L,NZ)=2.667_r8*RootRespPotent_pvr(N,L,NZ)
+        RootO2Dmnd4Resp_pvr(N,L,NZ)=2.667_r8*RootRespPotent_pvr(N,L,NZ)
 
         call RootSoilGasExchange(I,N,L,NZ,FineRootRadius,FracPRoot4Uptake,FracSoiLayByPrimRoot,&
           RootAreaDivRadius_vr,dtPerPlantRootH2OUptake,FOXYX,PopPlantO2Uptake_vr)
 
-        PopPlantO2Demand=PopPlantO2Demand+ROXYP(N,L,NZ)
+        PopPlantO2Demand=PopPlantO2Demand+RootO2Dmnd4Resp_pvr(N,L,NZ)
         PopPlantO2Uptake=PopPlantO2Uptake+PopPlantO2Uptake_vr
 
         call RootExudates(N,L,NZ)
@@ -1099,7 +1099,7 @@ module NutUptakeMod
   associate(                          &
     ROXYY                           => plt_bgcr%ROXYY   , &
     RCO2N_pvr                       => plt_rbgc%RCO2N_pvr   , &
-    ROXYP                           => plt_rbgc%ROXYP   , &
+    RootO2Dmnd4Resp_pvr             => plt_rbgc%RootO2Dmnd4Resp_pvr   , &
     PlantPopulation_pft             => plt_site%PlantPopulation_pft      , &
     ZEROS                           => plt_site%ZEROS   , &
     ZERO                            => plt_site%ZERO    , &
@@ -1171,7 +1171,7 @@ module NutUptakeMod
   !     IN PREVIOUS HOUR
   !
   !     ROXYY=O2 demand by all microbial,root,myco populations
-  !     ROXYP=O2 demand by each root,myco population
+  !     RootO2Dmnd4Resp_pvr=O2 demand by each root,myco population
   !     FOXYX=fraction of ROXYY by each root,myco population
   !     RNH4Y=NH4 demand in non-band by all microbial,root,myco populations
   !     RUNNHP=NH4 demand in non-band by each root,myco population
@@ -1201,7 +1201,7 @@ module NutUptakeMod
   !     FracPRoot4Uptake=PFT fraction of biome root mass
   !
   IF(ROXYY(L).GT.ZEROS)THEN
-    FOXYX=AMAX1(MinFracPRoot4Uptake(N,L,NZ),ROXYP(N,L,NZ)/ROXYY(L))
+    FOXYX=AMAX1(MinFracPRoot4Uptake(N,L,NZ),RootO2Dmnd4Resp_pvr(N,L,NZ)/ROXYY(L))
   ELSE
     FOXYX=FracPRoot4Uptake(N,L,NZ)
   ENDIF

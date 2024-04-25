@@ -159,7 +159,7 @@ type, public :: NitroAQMFluxDiagType
   real(r8),allocatable :: RGN2Fff(:)
   real(r8),allocatable :: RGOMOff(:)
   real(r8),allocatable :: RO2Dmnd4RespAutor(:)
-  real(r8),allocatable :: ROXYPff(:)
+  real(r8),allocatable :: RO2DmndAutor(:)
   real(r8),allocatable :: RO2Uptk4RespAutor(:)
   real(r8),allocatable :: RDNO3ff(:)
   real(r8),allocatable :: RDNOBff(:)
@@ -395,7 +395,7 @@ type, public :: NitroAQMFluxDiagType
   allocate(this%RGN2Fff(NumMicrobAutrophCmplx));this%RGN2Fff=spval
   allocate(this%RGOMOff(NumMicrobAutrophCmplx));this%RGOMOff=spval
   allocate(this%RO2Dmnd4RespAutor(NumMicrobAutrophCmplx));this%RO2Dmnd4RespAutor=spval
-  allocate(this%ROXYPff(NumMicrobAutrophCmplx));this%ROXYPff=spval
+  allocate(this%RO2DmndAutor(NumMicrobAutrophCmplx));this%RO2DmndAutor=spval
   allocate(this%RO2Uptk4RespAutor(NumMicrobAutrophCmplx));this%RO2Uptk4RespAutor=spval
   allocate(this%RDNO3ff(NumMicrobAutrophCmplx));this%RDNO3ff=spval
   allocate(this%RDNOBff(NumMicrobAutrophCmplx));this%RDNOBff=spval
@@ -550,7 +550,7 @@ type, public :: NitroAQMFluxDiagType
   this%RGN2Fff = 0._r8
   this%RGOMOff = 0._r8
   this%RO2Dmnd4RespAutor = 0._r8
-  this%ROXYPff = 0._r8
+  this%RO2DmndAutor = 0._r8
   this%RO2Uptk4RespAutor = 0._r8
   this%RDNO3ff = 0._r8
   this%RDNOBff = 0._r8
@@ -664,7 +664,7 @@ type, public :: NitroAQMFluxDiagType
   call destroy(this%RGN2Fff)
   call destroy(this%RGOMOff)
   call destroy(this%RO2Dmnd4RespAutor)
-  call destroy(this%ROXYPff)
+  call destroy(this%RO2DmndAutor)
   call destroy(this%RO2Uptk4RespAutor)
   call destroy(this%RDNO3ff)
   call destroy(this%RDNOBff)

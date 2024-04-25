@@ -709,7 +709,7 @@ implicit none
   real(r8), pointer :: RUPGasSol_vr(:,:,:,:)     => null()  !aqueous CO2 flux from roots to soil water, [g d-2 h-1]
   real(r8), pointer :: trcg_air2root_flx__pvr(:,:,:,:)    => null()  !gaseous tracer flux through roots, [g d-2 h-1]
   real(r8), pointer :: trcg_Root_DisEvap_flx_vr(:,:,:,:)    => null()  !dissolution (+ve) - volatilization (-ve) gas flux in roots, [g d-2 h-1]
-  real(r8), pointer :: ROXYP(:,:,:)     => null()  !root  O2 demand from respiration, [g d-2 h-1]
+  real(r8), pointer :: RootO2Dmnd4Resp_pvr(:,:,:)     => null()  !root  O2 demand from respiration, [g d-2 h-1]
   real(r8), pointer :: RUNNHP(:,:,:)    => null()  !root uptake of NH4 non-band unconstrained by NH4, [g d-2 h-1]
   real(r8), pointer :: RUNNBP(:,:,:)    => null()  !root uptake of NO3 band unconstrained by NO3, [g d-2 h-1]
   real(r8), pointer :: RUNNOP(:,:,:)    => null()  !root uptake of NH4 band unconstrained by NH4, [g d-2 h-1]
@@ -785,7 +785,7 @@ implicit none
 
   allocate(this%trcg_air2root_flx__pvr(idg_beg:idg_end-1,2,JZ1,JP1));this%trcg_air2root_flx__pvr=spval
   allocate(this%trcg_Root_DisEvap_flx_vr(idg_beg:idg_end-1,2,JZ1,JP1));this%trcg_Root_DisEvap_flx_vr=spval
-  allocate(this%ROXYP(jroots,JZ1,JP1));this%ROXYP=spval
+  allocate(this%RootO2Dmnd4Resp_pvr(jroots,JZ1,JP1));this%RootO2Dmnd4Resp_pvr=spval
   allocate(this%RUNNHP(jroots,JZ1,JP1));this%RUNNHP=spval
   allocate(this%RUNNBP(jroots,JZ1,JP1));this%RUNNBP=spval
   allocate(this%RUNNOP(jroots,JZ1,JP1));this%RUNNOP=spval
@@ -888,7 +888,7 @@ implicit none
 
 !  if(allocated(RNHDFA))deallocate(RNHDFA)
 !  if(allocated(RHGDFA))deallocate(RHGDFA)
-!  if(allocated(ROXYP))deallocate(ROXYP)
+!  if(allocated(RootO2Dmnd4Resp_pvr))deallocate(RootO2Dmnd4Resp_pvr)
 !  if(allocated(RUNNHP))deallocate(RUNNHP)
 !  if(allocated(RUNNBP))deallocate(RUNNBP)
 !  if(allocated(RUNNOP))deallocate(RUNNOP)

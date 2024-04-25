@@ -78,7 +78,7 @@ module RootGasMod
     RAutoRootO2Limter_pvr      =>  plt_rbgc%RAutoRootO2Limter_pvr    , &
     ZEROQ                      =>  plt_rbgc%ZEROQ                    , &
     RootRespPotent_pvr         =>  plt_rbgc%RootRespPotent_pvr       , &
-    ROXYP                      =>  plt_rbgc%ROXYP                    , &
+    RootO2Dmnd4Resp_pvr        =>  plt_rbgc%RootO2Dmnd4Resp_pvr      , &
     ROXSK                      =>  plt_rbgc%ROXSK                    , &
     RCO2P_pvr                  =>  plt_rbgc%RCO2P_pvr                , &
     trcg_air2root_flx__pvr     =>  plt_rbgc%trcg_air2root_flx__pvr   , &
@@ -148,7 +148,7 @@ module RootGasMod
 
     RTVLWA=RootVH2O_pvr(N,L,NZ)*trcs_VLN_vr(ids_NH4,L)
     RTVLWB=RootVH2O_pvr(N,L,NZ)*trcs_VLN_vr(ids_NH4B,L)
-    RootOxyDemandPerPlant=ROXYP(N,L,NZ)*dts_gas/PlantPopulation_pft(NZ)
+    RootOxyDemandPerPlant=RootO2Dmnd4Resp_pvr(N,L,NZ)*dts_gas/PlantPopulation_pft(NZ)
     ROXYFX=ROXYF(L)*FOXYX*dts_gas
     RCO2FX=RCO2F(L)*FOXYX*dts_gas
     ROXYLX=ROXYL(L)*FOXYX*dts_gas
@@ -601,15 +601,15 @@ module RootGasMod
     ENDDO D99
 !
 !     O2 CONSTRAINTS TO ROOT RESPIRATION DEPENDS UPON RATIO
-!     OF ROOT O2 UPTAKE 'RUPOXT' TO ROOT O2 DEMAND 'ROXYP'
+!     OF ROOT O2 UPTAKE 'RUPOXT' TO ROOT O2 DEMAND 'RootO2Dmnd4Resp_pvr'
 !
 !     RUPOXT=O2 uptake from soil+root by each root,myco population
-!     ROXYP=O2 demand by each root,myco population
+!     RootO2Dmnd4Resp_pvr=O2 demand by each root,myco population
 !     RAutoRootO2Limter_pvr=constraint by O2 consumption on all root processes
 !     imposed by O2 uptake
 !
     PopPlantO2Uptake_vr=RUPOXP(N,L,NZ)+RUPGasSol_vr(idg_O2,N,L,NZ)
-    RAutoRootO2Limter_pvr(N,L,NZ)=AMIN1(1.0_r8,AZMAX1(PopPlantO2Uptake_vr/ROXYP(N,L,NZ)))
+    RAutoRootO2Limter_pvr(N,L,NZ)=AMIN1(1.0_r8,AZMAX1(PopPlantO2Uptake_vr/RootO2Dmnd4Resp_pvr(N,L,NZ)))
 
   ELSE
     PopPlantO2Uptake_vr=0.0_r8

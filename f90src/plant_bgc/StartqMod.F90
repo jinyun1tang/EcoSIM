@@ -748,7 +748,7 @@ module StartqMod
       RootNutUptake_pvr(ids_NO3B,N,L,NZ,NY,NX)=0._r8
       RootNutUptake_pvr(ids_H2PO4B,N,L,NZ,NY,NX)=0._r8
       RootNutUptake_pvr(ids_H1PO4B,N,L,NZ,NY,NX)=0._r8
-      ROXYP(N,L,NZ,NY,NX)=0._r8
+      RootO2Dmnd4Resp_pvr(N,L,NZ,NY,NX)=0._r8
       RUNNHP(N,L,NZ,NY,NX)=0._r8
       RUNNBP(N,L,NZ,NY,NX)=0._r8
       RUNNOP(N,L,NZ,NY,NX)=0._r8

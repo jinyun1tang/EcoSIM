@@ -2976,7 +2976,8 @@ implicit none
     call restartvar(ncid, flag, varname='RootProteinC_pvr', dim1name='pft',dim2name='rootyps',&
      dim3name='levsoi',long_name='root layer protein C', units='g d-2', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,RootProteinC_pvr,datrp_3d,NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft) 
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,RootProteinC_pvr,datrp_3d,NumActivePlants=NumActivePlants,&
+      IsPlantActive_pft=IsPlantActive_pft) 
   else
     !print*,'RootProteinC_pvr'
     if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,RootProteinC_pvr,datrp_3d,NumActivePlants=NumActivePlants,&
@@ -2990,16 +2991,17 @@ implicit none
 
   if(flag=='read')then
     datpr3 => datrp_3d(1:npfts,1:pltpar%jroots,1:JZ)
-    call restartvar(ncid, flag, varname='ROXYP', dim1name='pft',dim2name='rootyps',&
+    call restartvar(ncid, flag, varname='RootO2Dmnd4Resp_pvr', dim1name='pft',dim2name='rootyps',&
      dim3name='levsoi',long_name='root O2 demand from respiration', units='g d-2 h-1', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,ROXYP,datrp_3d,NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft) 
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,RootO2Dmnd4Resp_pvr,datrp_3d,NumActivePlants=NumActivePlants,&
+      IsPlantActive_pft=IsPlantActive_pft) 
   else
-    !print*,'ROXYP'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,ROXYP,datrp_3d,NumActivePlants=NumActivePlants,&
+    !print*,'RootO2Dmnd4Resp_pvr'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,RootO2Dmnd4Resp_pvr,datrp_3d,NumActivePlants=NumActivePlants,&
       IsPlantActive_pft=IsPlantActive_pft)   
     datpr3 => datrp_3d(1:npfts,1:pltpar%jroots,1:JZ)
-    call restartvar(ncid, flag, varname='ROXYP', dim1name='pft',dim2name='rootyps',&
+    call restartvar(ncid, flag, varname='RootO2Dmnd4Resp_pvr', dim1name='pft',dim2name='rootyps',&
      dim3name='levsoi',long_name='root O2 demand from respiration', units='g d-2 h-1', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)
   endif  
@@ -6159,16 +6161,16 @@ implicit none
 
   if(flag=='read')then
     datpr4 => datrc_4d(1:ncols,1:NumMicrbHetetrophCmplx,1:jcplx,1:JZ+1)    
-    call restartvar(ncid, flag, varname='RO2DmndHeter', dim1name='column',dim2name='hetrmicb',&
+    call restartvar(ncid, flag, varname='RO2DmndHetert', dim1name='column',dim2name='hetrmicb',&
       dim3name='nomcomplx',dim4name='levsoi1',long_name='microbial aqueous O2 demand', units='g d-2 h-1', &
       interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)  
-    call cpcol(flag,NHW,NHE,NVN,NVS,RO2DmndHeter,datrc_4d)      
+    call cpcol(flag,NHW,NHE,NVN,NVS,RO2DmndHetert,datrc_4d)      
   else
-    !print*,'RO2DmndHeter'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RO2DmndHeter,datrc_4d)        
+    !print*,'RO2DmndHetert'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RO2DmndHetert,datrc_4d)        
     datpr4 => datrc_4d(1:ncols,1:NumMicrbHetetrophCmplx,1:jcplx,1:JZ+1)        
-    call restartvar(ncid, flag, varname='RO2DmndHeter', dim1name='column',dim2name='hetrmicb',&
+    call restartvar(ncid, flag, varname='RO2DmndHetert', dim1name='column',dim2name='hetrmicb',&
       dim3name='nomcomplx',dim4name='levsoi1',long_name='microbial aqueous O2 demand', units='g d-2 h-1', &
       interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)  
@@ -6502,16 +6504,16 @@ implicit none
   
   if(flag=='read')then
     datpr3 => datrc_3d(1:ncols,1:NumMicrobAutrophCmplx,1:JZ+1)    
-    call restartvar(ncid, flag, varname='RO2DmndAutor', dim1name='column',dim2name='automicb',&
+    call restartvar(ncid, flag, varname='RO2DmndAutort', dim1name='column',dim2name='automicb',&
       dim3name='levsoi1',long_name='autotrophic aqueous O2 demand', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr3, missing_value=spval, &
       fill_value=spval)        
-    call cpcol(flag,NHW,NHE,NVN,NVS,RO2DmndAutor,datrc_3d)      
+    call cpcol(flag,NHW,NHE,NVN,NVS,RO2DmndAutort,datrc_3d)      
   else
-    !print*,'RO2DmndAutor'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RO2DmndAutor,datrc_3d)        
+    !print*,'RO2DmndAutort'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RO2DmndAutort,datrc_3d)        
     datpr3 => datrc_3d(1:ncols,1:NumMicrobAutrophCmplx,1:JZ+1)    
-    call restartvar(ncid, flag, varname='RO2DmndAutor', dim1name='column',dim2name='automicb',&
+    call restartvar(ncid, flag, varname='RO2DmndAutort', dim1name='column',dim2name='automicb',&
       dim3name='levsoi1',long_name='autotrophic aqueous O2 demand', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr3, missing_value=spval, &
       fill_value=spval)   
