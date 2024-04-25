@@ -71,13 +71,13 @@ implicit none
     real(r8), allocatable :: ORM(:,:,:)
     real(r8), allocatable :: OHM(:,:)
     real(r8), allocatable :: DOM(:,:)
-    real(r8), allocatable :: OMEhetr(:,:,:)
+    real(r8), allocatable :: OMEheter(:,:,:)
     real(r8), allocatable :: OMEauto(:,:)
 
 !    real(r8) :: O2_irrig_conc        !surface irrigation  O2 concentration, [g m-3]
 !    real(r8) :: O2_rain_conc        !precipitation  O2 concentration, [g m-3]
 !    real(r8) :: Irrig2LitRSurf       !irrigation flux into surface litter, [m3 d-2 h-1]
-!    real(r8) :: Rain2LitRSurf       !precipitation flux into surface litter, [m3 d-2 h-1]
+!    real(r8) :: Rain2LitRSurf_col       !precipitation flux into surface litter, [m3 d-2 h-1]
 !
     real(r8) :: TKS          !temperature in kelvin, [K]
     real(r8) :: THETW        !volumetric water content [m3 m-3]
@@ -219,7 +219,7 @@ implicit none
   type(forc_type), intent(inout) :: forc
   character(len=*), intent(in) :: fname
   integer :: jcplx,ndbiomcp,nlbiomcp
-  integer :: NumMicbFunGroups,jsken,NumMicrbHetetrophCmplx,NumMicrobAutotrophCmplx
+  integer :: NumMicbFunGroups,jsken,NumMicrbHetetrophCmplx,NumMicrobAutrophCmplx
   integer :: NumLiveHeterBioms,NumLiveAutoBioms
   integer :: NumPlantChemElms
   type(file_desc_t) :: ncf
@@ -229,14 +229,14 @@ implicit none
   jcplx=get_dim_len(ncf,'jcplx')
   jsken =get_dim_len(ncf,'jsken')
   NumMicrbHetetrophCmplx=get_dim_len(ncf,'NumMicrbHetetrophCmplx')
-  NumMicrobAutotrophCmplx=get_dim_len(ncf,'NumMicrobAutotrophCmplx')
+  NumMicrobAutrophCmplx=get_dim_len(ncf,'NumMicrobAutrophCmplx')
   NumLiveHeterBioms = get_dim_len(ncf,'NumLiveHeterBioms')
   NumLiveAutoBioms = get_dim_len(ncf,'NumLiveAutoBioms')
   NumPlantChemElms=get_dim_len(ncf,'element')
   nlbiomcp=get_dim_len(ncf,'nlbiomcp')
   ndbiomcp=get_dim_len(ncf,'ndbiomcp')
   NumMicbFunGroups    =get_dim_len(ncf,'NumMicbFunGroups')
-  allocate(forc%OMEhetr(NumPlantChemElms,NumLiveHeterBioms,1:jcplx))
+  allocate(forc%OMEheter(NumPlantChemElms,NumLiveHeterBioms,1:jcplx))
   allocate(forc%DOM(idom_beg:idom_end,1:jcplx))
   allocate(forc%OSM(1:NumPlantChemElms,jsken,1:jcplx))
   allocate(forc%OSA(jsken,1:jcplx))
@@ -289,7 +289,7 @@ implicit none
   call ncd_getvar(ncf,'CCASO',forc%CCASO)
   call ncd_getvar(ncf,'BKDS',forc%BKDS)
   call ncd_getvar(ncf,'ATCS',forc%ATCS)
-  call ncd_getvar(ncf,'OMEhetr',forc%OMEhetr)
+  call ncd_getvar(ncf,'OMEheter',forc%OMEheter)
   call ncd_getvar(ncf,'OMEauto',forc%OMEauto)
   call ncd_getvar(ncf,'OSM',forc%OSM)
   call ncd_getvar(ncf,'OSA',forc%OSA)

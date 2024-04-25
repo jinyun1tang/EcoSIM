@@ -1029,7 +1029,7 @@ module Hour1Mod
 !  add heterotrophic complexs
     DO NC=1,jcplx
       DO NB=1,NumLiveHeterBioms
-        OC=OC+OMEhetr(ielmc,NB,NC,L,NY,NX)
+        OC=OC+OMEheter(ielmc,NB,NC,L,NY,NX)
       ENDDO
     ENDDO
 
@@ -1845,9 +1845,9 @@ module Hour1Mod
             OMC1g=OMC1/tglds
             OMN1g=OMN1/tglds
             OMP1g=OMP1/tglds
-            OMEhetr(ielmc,MID,K,LFDPTH,NY,NX)=OMEhetr(ielmc,MID,K,LFDPTH,NY,NX)+OMC1g
-            OMEhetr(ielmn,MID,K,LFDPTH,NY,NX)=OMEhetr(ielmn,MID,K,LFDPTH,NY,NX)+OMN1g
-            OMEhetr(ielmp,MID,K,LFDPTH,NY,NX)=OMEhetr(ielmp,MID,K,LFDPTH,NY,NX)+OMP1g
+            OMEheter(ielmc,MID,K,LFDPTH,NY,NX)=OMEheter(ielmc,MID,K,LFDPTH,NY,NX)+OMC1g
+            OMEheter(ielmn,MID,K,LFDPTH,NY,NX)=OMEheter(ielmn,MID,K,LFDPTH,NY,NX)+OMN1g
+            OMEheter(ielmp,MID,K,LFDPTH,NY,NX)=OMEheter(ielmp,MID,K,LFDPTH,NY,NX)+OMP1g
           ENDDO
           OSCX=OSCX+OMC1
           OSNX=OSNX+OMN1

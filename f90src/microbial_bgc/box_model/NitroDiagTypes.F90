@@ -329,10 +329,10 @@ type, public :: NitroAQMFluxDiagType
   class(NitroMicFluxType) :: this
   integer, intent(in) :: jcplx,NumMicbFunGroups
   integer :: ndbiomcp
-  integer :: NumMicrobAutotrophCmplx
+  integer :: NumMicrobAutrophCmplx
   integer :: NumMicrbHetetrophCmplx
   ndbiomcp=micpar%ndbiomcp
-  NumMicrobAutotrophCmplx=micpar%NumMicrobAutotrophCmplx
+  NumMicrobAutrophCmplx=micpar%NumMicrobAutrophCmplx
   NumMicrbHetetrophCmplx=micpar%NumMicrbHetetrophCmplx
 
   allocate(this%RUPOX(NumMicrbHetetrophCmplx,1:jcplx));this%RUPOX=spval
@@ -385,59 +385,59 @@ type, public :: NitroAQMFluxDiagType
   allocate(this%RIP1B(NumMicrbHetetrophCmplx,1:jcplx));this%RIP1B=spval
   allocate(this%RIP14R(NumMicrbHetetrophCmplx,1:jcplx));this%RIP14R=spval
 
-  allocate(this%RVOXA(NumMicrobAutotrophCmplx));this%RVOXA=spval
-  allocate(this%RVOXB(NumMicrobAutotrophCmplx));this%RVOXB=spval
+  allocate(this%RVOXA(NumMicrobAutrophCmplx));this%RVOXA=spval
+  allocate(this%RVOXB(NumMicrobAutrophCmplx));this%RVOXB=spval
   allocate(this%XOMZ(1:NumPlantChemElms,3,NumMicrbHetetrophCmplx,1:jcplx));this%XOMZ=spval
   allocate(this%ROQCD(NumMicrbHetetrophCmplx,1:jcplx));this%ROQCD=spval
   allocate(this%RCCMEheter(NumPlantChemElms,ndbiomcp,NumMicrbHetetrophCmplx,1:jcplx));this%RCCMEheter=spval
 
-  allocate(this%RUPOXff(NumMicrobAutotrophCmplx));this%RUPOXff=spval
-  allocate(this%RGN2Fff(NumMicrobAutotrophCmplx));this%RGN2Fff=spval
-  allocate(this%RGOMOff(NumMicrobAutotrophCmplx));this%RGOMOff=spval
-  allocate(this%ROXYMff(NumMicrobAutotrophCmplx));this%ROXYMff=spval
-  allocate(this%ROXYPff(NumMicrobAutotrophCmplx));this%ROXYPff=spval
-  allocate(this%ROXYOff(NumMicrobAutotrophCmplx));this%ROXYOff=spval
-  allocate(this%RDNO3ff(NumMicrobAutotrophCmplx));this%RDNO3ff=spval
-  allocate(this%RDNOBff(NumMicrobAutotrophCmplx));this%RDNOBff=spval
-  allocate(this%RDNO2ff(NumMicrobAutotrophCmplx));this%RDNO2ff=spval
-  allocate(this%RDN2Bff(NumMicrobAutotrophCmplx));this%RDN2Bff=spval
-  allocate(this%RDN2Off(NumMicrobAutotrophCmplx));this%RDN2Off=spval
-  allocate(this%RGOMDff(NumMicrobAutotrophCmplx));this%RGOMDff=spval
-  allocate(this%RMOMCff(2,NumMicrobAutotrophCmplx));this%RMOMCff=spval
-  allocate(this%RINH4ff(NumMicrobAutotrophCmplx));this%RINH4ff=spval
-  allocate(this%RINO3ff(NumMicrobAutotrophCmplx));this%RINO3ff=spval
-  allocate(this%RIPO4ff(NumMicrobAutotrophCmplx));this%RIPO4ff=spval
-  allocate(this%RINB4ff(NumMicrobAutotrophCmplx));this%RINB4ff=spval
-  allocate(this%RINB3ff(NumMicrobAutotrophCmplx));this%RINB3ff=spval
-  allocate(this%RIPOBff(NumMicrobAutotrophCmplx));this%RIPOBff=spval
-  allocate(this%RDOMEautor(NumPlantChemElms,2,NumMicrobAutotrophCmplx));this%RDOMEautor=spval
-  allocate(this%RHOMEautor(NumPlantChemElms,2,NumMicrobAutotrophCmplx));this%RHOMEautor=spval
-  allocate(this%RCOMEautor(NumPlantChemElms,2,NumMicrobAutotrophCmplx));this%RCOMEautor=spval
-  allocate(this%CGOMEautor(idom_beg:idom_end,NumMicrobAutotrophCmplx));this%CGOMEautor=spval
-  allocate(this%RH2GXff(NumMicrobAutotrophCmplx));this%RH2GXff=spval
-  allocate(this%RDMMEautor(NumPlantChemElms,2,NumMicrobAutotrophCmplx));this%RDMMEautor=spval
-  allocate(this%RHMMEautor(NumPlantChemElms,2,NumMicrobAutotrophCmplx));this%RHMMEautor=spval
-  allocate(this%RCMMEautor(NumPlantChemElms,2,NumMicrobAutotrophCmplx));this%RCMMEautor=spval
-  allocate(this%RN2FXff(NumMicrobAutotrophCmplx));this%RN2FXff=spval
-  allocate(this%RXOMEautor(NumPlantChemElms,2,NumMicrobAutotrophCmplx));this%RXOMEautor=spval
-  allocate(this%R3OMEautor(NumPlantChemElms,2,NumMicrobAutotrophCmplx));this%R3OMEautor=spval
-  allocate(this%RXMMEautor(NumPlantChemElms,2,NumMicrobAutotrophCmplx));this%RXMMEautor=spval
-  allocate(this%R3MMEautor(NumPlantChemElms,2,NumMicrobAutotrophCmplx));this%R3MMEautor=spval
-  allocate(this%RINH4Rff(NumMicrobAutotrophCmplx));this%RINH4Rff=spval
-  allocate(this%RINO3Rff(NumMicrobAutotrophCmplx));this%RINO3Rff=spval
-  allocate(this%RIPO4Rff(NumMicrobAutotrophCmplx));this%RIPO4Rff=spval
-  allocate(this%FNH4XRff(NumMicrobAutotrophCmplx));this%FNH4XRff=spval
-  allocate(this%FNO3XRff(NumMicrobAutotrophCmplx));this%FNO3XRff=spval
-  allocate(this%FPO4XRff(NumMicrobAutotrophCmplx));this%FPO4XRff=spval
-  allocate(this%RGOMYff(NumMicrobAutotrophCmplx));this%RGOMYff=spval
-  allocate(this%CGOSEautor(NumPlantChemElms,2,NumMicrobAutotrophCmplx));this%CGOSEautor=spval
-  allocate(this%FP14XRff(NumMicrobAutotrophCmplx));this%FP14XRff=spval
-  allocate(this%RCO2Xff(NumMicrobAutotrophCmplx));this%RCO2Xff=spval
-  allocate(this%RCH3Xff(NumMicrobAutotrophCmplx));this%RCH3Xff=spval
-  allocate(this%RCH4Xff(NumMicrobAutotrophCmplx));this%RCH4Xff=spval
-  allocate(this%RIP14ff(NumMicrobAutotrophCmplx));this%RIP14ff=spval
-  allocate(this%RIP1Bff(NumMicrobAutotrophCmplx));this%RIP1Bff=spval
-  allocate(this%RIP14Rff(NumMicrobAutotrophCmplx));this%RIP14Rff=spval
+  allocate(this%RUPOXff(NumMicrobAutrophCmplx));this%RUPOXff=spval
+  allocate(this%RGN2Fff(NumMicrobAutrophCmplx));this%RGN2Fff=spval
+  allocate(this%RGOMOff(NumMicrobAutrophCmplx));this%RGOMOff=spval
+  allocate(this%ROXYMff(NumMicrobAutrophCmplx));this%ROXYMff=spval
+  allocate(this%ROXYPff(NumMicrobAutrophCmplx));this%ROXYPff=spval
+  allocate(this%ROXYOff(NumMicrobAutrophCmplx));this%ROXYOff=spval
+  allocate(this%RDNO3ff(NumMicrobAutrophCmplx));this%RDNO3ff=spval
+  allocate(this%RDNOBff(NumMicrobAutrophCmplx));this%RDNOBff=spval
+  allocate(this%RDNO2ff(NumMicrobAutrophCmplx));this%RDNO2ff=spval
+  allocate(this%RDN2Bff(NumMicrobAutrophCmplx));this%RDN2Bff=spval
+  allocate(this%RDN2Off(NumMicrobAutrophCmplx));this%RDN2Off=spval
+  allocate(this%RGOMDff(NumMicrobAutrophCmplx));this%RGOMDff=spval
+  allocate(this%RMOMCff(2,NumMicrobAutrophCmplx));this%RMOMCff=spval
+  allocate(this%RINH4ff(NumMicrobAutrophCmplx));this%RINH4ff=spval
+  allocate(this%RINO3ff(NumMicrobAutrophCmplx));this%RINO3ff=spval
+  allocate(this%RIPO4ff(NumMicrobAutrophCmplx));this%RIPO4ff=spval
+  allocate(this%RINB4ff(NumMicrobAutrophCmplx));this%RINB4ff=spval
+  allocate(this%RINB3ff(NumMicrobAutrophCmplx));this%RINB3ff=spval
+  allocate(this%RIPOBff(NumMicrobAutrophCmplx));this%RIPOBff=spval
+  allocate(this%RDOMEautor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%RDOMEautor=spval
+  allocate(this%RHOMEautor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%RHOMEautor=spval
+  allocate(this%RCOMEautor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%RCOMEautor=spval
+  allocate(this%CGOMEautor(idom_beg:idom_end,NumMicrobAutrophCmplx));this%CGOMEautor=spval
+  allocate(this%RH2GXff(NumMicrobAutrophCmplx));this%RH2GXff=spval
+  allocate(this%RDMMEautor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%RDMMEautor=spval
+  allocate(this%RHMMEautor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%RHMMEautor=spval
+  allocate(this%RCMMEautor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%RCMMEautor=spval
+  allocate(this%RN2FXff(NumMicrobAutrophCmplx));this%RN2FXff=spval
+  allocate(this%RXOMEautor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%RXOMEautor=spval
+  allocate(this%R3OMEautor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%R3OMEautor=spval
+  allocate(this%RXMMEautor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%RXMMEautor=spval
+  allocate(this%R3MMEautor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%R3MMEautor=spval
+  allocate(this%RINH4Rff(NumMicrobAutrophCmplx));this%RINH4Rff=spval
+  allocate(this%RINO3Rff(NumMicrobAutrophCmplx));this%RINO3Rff=spval
+  allocate(this%RIPO4Rff(NumMicrobAutrophCmplx));this%RIPO4Rff=spval
+  allocate(this%FNH4XRff(NumMicrobAutrophCmplx));this%FNH4XRff=spval
+  allocate(this%FNO3XRff(NumMicrobAutrophCmplx));this%FNO3XRff=spval
+  allocate(this%FPO4XRff(NumMicrobAutrophCmplx));this%FPO4XRff=spval
+  allocate(this%RGOMYff(NumMicrobAutrophCmplx));this%RGOMYff=spval
+  allocate(this%CGOSEautor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%CGOSEautor=spval
+  allocate(this%FP14XRff(NumMicrobAutrophCmplx));this%FP14XRff=spval
+  allocate(this%RCO2Xff(NumMicrobAutrophCmplx));this%RCO2Xff=spval
+  allocate(this%RCH3Xff(NumMicrobAutrophCmplx));this%RCH3Xff=spval
+  allocate(this%RCH4Xff(NumMicrobAutrophCmplx));this%RCH4Xff=spval
+  allocate(this%RIP14ff(NumMicrobAutrophCmplx));this%RIP14ff=spval
+  allocate(this%RIP1Bff(NumMicrobAutrophCmplx));this%RIP1Bff=spval
+  allocate(this%RIP14Rff(NumMicrobAutrophCmplx));this%RIP14Rff=spval
 
   call this%ZeroOut()
   end subroutine nit_micf_init
@@ -448,8 +448,8 @@ type, public :: NitroAQMFluxDiagType
   implicit none
   class(NitroMicStateType) :: this
   integer, intent(in) :: jcplx,NumMicbFunGroups
-  integer :: NumMicrobAutotrophCmplx,NumMicrbHetetrophCmplx
-  NumMicrobAutotrophCmplx=micpar%NumMicrobAutotrophCmplx
+  integer :: NumMicrobAutrophCmplx,NumMicrbHetetrophCmplx
+  NumMicrobAutrophCmplx=micpar%NumMicrobAutrophCmplx
   NumMicrbHetetrophCmplx=micpar%NumMicrbHetetrophCmplx
 
   allocate(this%CNOMA(NumMicrbHetetrophCmplx,1:jcplx));this%CNOMA=spval
@@ -468,21 +468,21 @@ type, public :: NitroAQMFluxDiagType
   allocate(this%FCP(NumMicrbHetetrophCmplx,1:jcplx));this%FCP=spval
   allocate(this%FCNP(NumMicrbHetetrophCmplx,1:jcplx));this%FCNP=spval
 
-  allocate(this%CNOMAff(NumMicrobAutotrophCmplx));this%CNOMAff=spval
-  allocate(this%CPOMAff(NumMicrobAutotrophCmplx));this%CPOMAff=spval
-  allocate(this%OMAff(NumMicrobAutotrophCmplx));this%OMAff=spval
-  allocate(this%FOMAff(NumMicrobAutotrophCmplx));this%FOMAff=spval
-  allocate(this%FOMNff(NumMicrobAutotrophCmplx));this%FOMNff=spval
-  allocate(this%FOMKff(NumMicrobAutotrophCmplx));this%FOMKff=spval
-  allocate(this%OMC2ff(NumMicrobAutotrophCmplx));this%OMC2ff=spval
-  allocate(this%TFNGff(NumMicrobAutotrophCmplx));this%TFNGff=spval
-  allocate(this%TFNRff(NumMicrobAutotrophCmplx));this%TFNRff=spval
-  allocate(this%OMN2ff(NumMicrobAutotrophCmplx));this%OMN2ff=spval
-  allocate(this%FOM2ff(NumMicrobAutotrophCmplx));this%FOM2ff=spval
-  allocate(this%WFNff(NumMicrobAutotrophCmplx));this%WFNff=spval
-  allocate(this%FCNff(NumMicrobAutotrophCmplx));this%FCNff=spval
-  allocate(this%FCPff(NumMicrobAutotrophCmplx));this%FCPff=spval
-  allocate(this%FCNPff(NumMicrobAutotrophCmplx));this%FCNPff=spval
+  allocate(this%CNOMAff(NumMicrobAutrophCmplx));this%CNOMAff=spval
+  allocate(this%CPOMAff(NumMicrobAutrophCmplx));this%CPOMAff=spval
+  allocate(this%OMAff(NumMicrobAutrophCmplx));this%OMAff=spval
+  allocate(this%FOMAff(NumMicrobAutrophCmplx));this%FOMAff=spval
+  allocate(this%FOMNff(NumMicrobAutrophCmplx));this%FOMNff=spval
+  allocate(this%FOMKff(NumMicrobAutrophCmplx));this%FOMKff=spval
+  allocate(this%OMC2ff(NumMicrobAutrophCmplx));this%OMC2ff=spval
+  allocate(this%TFNGff(NumMicrobAutrophCmplx));this%TFNGff=spval
+  allocate(this%TFNRff(NumMicrobAutrophCmplx));this%TFNRff=spval
+  allocate(this%OMN2ff(NumMicrobAutrophCmplx));this%OMN2ff=spval
+  allocate(this%FOM2ff(NumMicrobAutrophCmplx));this%FOM2ff=spval
+  allocate(this%WFNff(NumMicrobAutrophCmplx));this%WFNff=spval
+  allocate(this%FCNff(NumMicrobAutrophCmplx));this%FCNff=spval
+  allocate(this%FCPff(NumMicrobAutrophCmplx));this%FCPff=spval
+  allocate(this%FCNPff(NumMicrobAutrophCmplx));this%FCNPff=spval
   end subroutine nit_mics_init
 !------------------------------------------------------------------------------------------
 

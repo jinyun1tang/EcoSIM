@@ -43,7 +43,7 @@ module InitSOMBGCMOD
   JGnfo  => micpar%JGnfo
   JGniA  => micpar%JGniA
   JGnfA  => micpar%JGnfA
-  NumMicrobAutotrophCmplx= micpar%NumMicrobAutotrophCmplx
+  NumMicrobAutrophCmplx= micpar%NumMicrobAutrophCmplx
   NumMicrbHetetrophCmplx= micpar%NumMicrbHetetrophCmplx
   NumLiveHeterBioms =micpar%NumLiveHeterBioms
   NumLiveAutoBioms  =micpar%NumLiveAutoBioms
@@ -91,9 +91,9 @@ module InitSOMBGCMOD
 
   associate(                  &
     rNCOMCa  => micpar%rNCOMCa ,&
-    rPCOMCa  => micpar%rPCOMCa ,&
-    nlbiomcp=> micpar%nlbiomcp, &
-    NumMicrobAutotrophCmplx => micpar%NumMicrobAutotrophCmplx, &
+    rPCOMCa               => micpar%rPCOMCa               , &
+    nlbiomcp              => micpar%nlbiomcp              , &
+    NumMicrobAutrophCmplx => micpar%NumMicrobAutrophCmplx , &
     k_humus => micpar%k_humus, &
     OHCK    => micpar%OHCK   ,&
     OMCK    => micpar%OMCK   ,&
@@ -253,9 +253,9 @@ module InitSOMBGCMOD
         OMP1=AZMAX1(OMC1*rPCOMCa(M,N,K)*FOSPI)
         do NGL=JGnio(N),JGnfo(N)
           MID=micpar%get_micb_id(M,NGL)
-          OMEhetr(ielmc,MID,K,L,NY,NX)=OMC1/tglds
-          OMEhetr(ielmn,MID,K,L,NY,NX)=OMN1/tglds
-          OMEhetr(ielmp,MID,K,L,NY,NX)=OMP1/tglds
+          OMEheter(ielmc,MID,K,L,NY,NX)=OMC1/tglds
+          OMEheter(ielmn,MID,K,L,NY,NX)=OMN1/tglds
+          OMEheter(ielmp,MID,K,L,NY,NX)=OMP1/tglds
         ENDDO
         OSCX(KK)=OSCX(KK)+OMC1
         OSNX(KK)=OSNX(KK)+OMN1
@@ -378,23 +378,23 @@ module InitSOMBGCMOD
     DO  N=1,NumMicbFunGroups
       do NGL=JGnio(n),JGnfo(n)
         DO  M=1,nlbiomcp
-          OC=OC+OMEhetr(ielmc,MID,K,L,NY,NX)
-          ON=ON+OMEhetr(ielmn,MID,K,L,NY,NX)
-          OP=OP+OMEhetr(ielmp,MID,K,L,NY,NX)
+          OC=OC+OMEheter(ielmc,MID,K,L,NY,NX)
+          ON=ON+OMEheter(ielmn,MID,K,L,NY,NX)
+          OP=OP+OMEheter(ielmp,MID,K,L,NY,NX)
           IF(K.LE.micpar%NumOfLitrCmplxs)THEN
-            RC=RC+OMEhetr(ielmc,MID,K,L,NY,NX)
+            RC=RC+OMEheter(ielmc,MID,K,L,NY,NX)
           ENDIF
-          RC0(K,NY,NX)=RC0(K,NY,NX)+OMEhetr(ielmc,MID,K,L,NY,NX)
+          RC0(K,NY,NX)=RC0(K,NY,NX)+OMEheter(ielmc,MID,K,L,NY,NX)
         ENDDO
       ENDDO
     enddo
   ENDDO D6990
 
   ROXYSff(:,L,NY,NX)=0.0_r8
-  RVMX4ff(:,L,NY,NX)=0.0_r8
+  RNH3OxidAutor(:,L,NY,NX)=0.0_r8
   RVMX3ff(:,L,NY,NX)=0.0_r8
   RVMB3ff(:,L,NY,NX)=0.0_r8
-  RVMX2ff(:,L,NY,NX)=0.0_r8
+  RNO2OxidAutor(:,L,NY,NX)=0.0_r8
   RVMX1ff(:,L,NY,NX)=0.0_r8
   RINHOff(:,L,NY,NX)=0.0_r8
   RINHBff(:,L,NY,NX)=0.0_r8

@@ -9,7 +9,7 @@ implicit none
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
 
-  real(r8),target,allocatable :: OMEhetr(:,:,:,:,:,:)    !microbial biomass element	[g d-2]
+  real(r8),target,allocatable :: OMEheter(:,:,:,:,:,:)    !microbial biomass element	[g d-2]
   real(r8),target,allocatable :: ROXYS(:,:,:,:,:)    !aqueous O2 demand	[g d-2 h-1]
   real(r8),target,allocatable :: ROQCS(:,:,:,:,:)    !net microbial DOC flux	[g d-2 h-1]
   real(r8),target,allocatable :: ROQAS(:,:,:,:,:)    !net microbial acetate flux	[g d-2 h-1]
@@ -42,12 +42,12 @@ implicit none
   real(r8),target,allocatable :: RINHORff(:,:,:)
   real(r8),target,allocatable :: RIPOORff(:,:,:)
   real(r8),target,allocatable :: RINOORff(:,:,:)
-  real(r8),target,allocatable :: RVMX4ff(:,:,:,:)
+  real(r8),target,allocatable :: RNH3OxidAutor(:,:,:,:)
   real(r8),target,allocatable :: RVMX3ff(:,:,:,:)
-  real(r8),target,allocatable :: RVMX2ff(:,:,:,:)
-  real(r8),target,allocatable :: RVMB4ff(:,:,:,:)
+  real(r8),target,allocatable :: RNO2OxidAutor(:,:,:,:)
+  real(r8),target,allocatable :: RNH3OxidAutorBand(:,:,:,:)
   real(r8),target,allocatable :: RVMB3ff(:,:,:,:)
-  real(r8),target,allocatable :: RVMB2ff(:,:,:,:)
+  real(r8),target,allocatable :: RNO2OxidAutorBand(:,:,:,:)
   real(r8),target,allocatable :: RVMX1ff(:,:,:,:)
   real(r8),target,allocatable :: RINHBff(:,:,:,:)
   real(r8),target,allocatable :: RINOBff(:,:,:,:)
@@ -72,7 +72,7 @@ implicit none
   subroutine InitAllocate
 
   implicit none
-  allocate(OMEhetr(NumPlantChemElms,NumLiveHeterBioms,1:jcplx,0:JZ,JY,JX))
+  allocate(OMEheter(NumPlantChemElms,NumLiveHeterBioms,1:jcplx,0:JZ,JY,JX))
   allocate(ROXYS(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
   allocate(ROQCS(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
   allocate(ROQAS(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
@@ -98,26 +98,26 @@ implicit none
   allocate(OMEERhetr(NumPlantChemElms,NumLiveHeterBioms,1:jcplx,2,2,JV,JH))
 
   allocate(OMEauto(NumPlantChemElms,NumLiveAutoBioms,0:JZ,JY,JX))
-  allocate(ROXYSff(NumMicrobAutotrophCmplx,0:JZ,JY,JX))
-  allocate(RINHOff(NumMicrobAutotrophCmplx,0:JZ,JY,JX))
-  allocate(RINOOff(NumMicrobAutotrophCmplx,0:JZ,JY,JX))
-  allocate(RIPOOff(NumMicrobAutotrophCmplx,0:JZ,JY,JX))
-  allocate(RINHORff(NumMicrobAutotrophCmplx,JY,JX))
-  allocate(RIPOORff(NumMicrobAutotrophCmplx,JY,JX))
-  allocate(RINOORff(NumMicrobAutotrophCmplx,JY,JX))
-  allocate(RVMX4ff(NumMicrobAutotrophCmplx,0:JZ,JY,JX))
-  allocate(RVMX3ff(NumMicrobAutotrophCmplx,0:JZ,JY,JX))
-  allocate(RVMX2ff(NumMicrobAutotrophCmplx,0:JZ,JY,JX))
-  allocate(RVMB4ff(NumMicrobAutotrophCmplx,0:JZ,JY,JX))
-  allocate(RVMB3ff(NumMicrobAutotrophCmplx,0:JZ,JY,JX))
-  allocate(RVMB2ff(NumMicrobAutotrophCmplx,0:JZ,JY,JX))
-  allocate(RVMX1ff(NumMicrobAutotrophCmplx,0:JZ,JY,JX))
-  allocate(RINHBff(NumMicrobAutotrophCmplx,0:JZ,JY,JX))
-  allocate(RINOBff(NumMicrobAutotrophCmplx,0:JZ,JY,JX))
-  allocate(RIPBOff(NumMicrobAutotrophCmplx,0:JZ,JY,JX))
-  allocate(RIPO1ff(NumMicrobAutotrophCmplx,0:JZ,JY,JX))
-  allocate(RIPB1ff(NumMicrobAutotrophCmplx,0:JZ,JY,JX))
-  allocate(RIPO1Rff(NumMicrobAutotrophCmplx,JY,JX))
+  allocate(ROXYSff(NumMicrobAutrophCmplx,0:JZ,JY,JX))
+  allocate(RINHOff(NumMicrobAutrophCmplx,0:JZ,JY,JX))
+  allocate(RINOOff(NumMicrobAutrophCmplx,0:JZ,JY,JX))
+  allocate(RIPOOff(NumMicrobAutrophCmplx,0:JZ,JY,JX))
+  allocate(RINHORff(NumMicrobAutrophCmplx,JY,JX))
+  allocate(RIPOORff(NumMicrobAutrophCmplx,JY,JX))
+  allocate(RINOORff(NumMicrobAutrophCmplx,JY,JX))
+  allocate(RNH3OxidAutor(NumMicrobAutrophCmplx,0:JZ,JY,JX))
+  allocate(RVMX3ff(NumMicrobAutrophCmplx,0:JZ,JY,JX))
+  allocate(RNO2OxidAutor(NumMicrobAutrophCmplx,0:JZ,JY,JX))
+  allocate(RNH3OxidAutorBand(NumMicrobAutrophCmplx,0:JZ,JY,JX))
+  allocate(RVMB3ff(NumMicrobAutrophCmplx,0:JZ,JY,JX))
+  allocate(RNO2OxidAutorBand(NumMicrobAutrophCmplx,0:JZ,JY,JX))
+  allocate(RVMX1ff(NumMicrobAutrophCmplx,0:JZ,JY,JX))
+  allocate(RINHBff(NumMicrobAutrophCmplx,0:JZ,JY,JX))
+  allocate(RINOBff(NumMicrobAutrophCmplx,0:JZ,JY,JX))
+  allocate(RIPBOff(NumMicrobAutrophCmplx,0:JZ,JY,JX))
+  allocate(RIPO1ff(NumMicrobAutrophCmplx,0:JZ,JY,JX))
+  allocate(RIPB1ff(NumMicrobAutrophCmplx,0:JZ,JY,JX))
+  allocate(RIPO1Rff(NumMicrobAutrophCmplx,JY,JX))
   allocate(OMEERauto(NumPlantChemElms,NumLiveAutoBioms,2,2,JV,JH))
   end subroutine InitAllocate
 !----------------------------------------------------------------------------------------------
@@ -125,7 +125,7 @@ implicit none
   subroutine DestructMicrobialData
   implicit none
 
-  if(allocated(OMEhetr))deallocate(OMEhetr)
+  if(allocated(OMEheter))deallocate(OMEheter)
   if(allocated(ROXYS))deallocate(ROXYS)
   if(allocated(ROQCS))deallocate(ROQCS)
   if(allocated(ROQAS))deallocate(ROQAS)
@@ -158,12 +158,12 @@ implicit none
   if(allocated(RINHORff))deallocate(RINHORff)
   if(allocated(RIPOORff))deallocate(RIPOORff)
   if(allocated(RINOORff))deallocate(RINOORff)
-  if(allocated(RVMX4ff))deallocate(RVMX4ff)
+  if(allocated(RNH3OxidAutor))deallocate(RNH3OxidAutor)
   if(allocated(RVMX3ff))deallocate(RVMX3ff)
-  if(allocated(RVMX2ff))deallocate(RVMX2ff)
-  if(allocated(RVMB4ff))deallocate(RVMB4ff)
+  if(allocated(RNO2OxidAutor))deallocate(RNO2OxidAutor)
+  if(allocated(RNH3OxidAutorBand))deallocate(RNH3OxidAutorBand)
   if(allocated(RVMB3ff))deallocate(RVMB3ff)
-  if(allocated(RVMB2ff))deallocate(RVMB2ff)
+  if(allocated(RNO2OxidAutorBand))deallocate(RNO2OxidAutorBand)
   if(allocated(RVMX1ff))deallocate(RVMX1ff)
   if(allocated(RINHBff))deallocate(RINHBff)
   if(allocated(RINOBff))deallocate(RINOBff)

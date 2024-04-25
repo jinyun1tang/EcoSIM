@@ -72,7 +72,7 @@ implicit none
   real(r8),allocatable :: ORM(:,:,:)
   real(r8),allocatable :: CNOSC(:,:)
   real(r8),allocatable :: CPOSC(:,:)
-  real(r8),allocatable :: OMEhetr(:,:,:)
+  real(r8),allocatable :: OMEheter(:,:,:)
   real(r8),allocatable :: OMEauto(:,:)
   real(r8) :: OSC13U,OSC14U,OSC24U
   real(r8) :: OSN13U,OSN14U,OSN24U
@@ -89,7 +89,7 @@ implicit none
   class(micsttype) :: this
   integer :: jcplx,NumMicbFunGroups,jsken
   integer, pointer :: ndbiomcp, nlbiomcp
-  integer, pointer :: NumMicrobAutotrophCmplx, NumMicrbHetetrophCmplx
+  integer, pointer :: NumMicrobAutrophCmplx, NumMicrbHetetrophCmplx
   integer, pointer :: NumLiveHeterBioms
   integer, pointer :: NumLiveAutoBioms
 
@@ -100,7 +100,7 @@ implicit none
   jsken=micpar%jsken
   ndbiomcp =>micpar%ndbiomcp
   nlbiomcp =>micpar%nlbiomcp
-  NumMicrobAutotrophCmplx=>micpar%NumMicrobAutotrophCmplx
+  NumMicrobAutrophCmplx=>micpar%NumMicrobAutrophCmplx
   NumMicrbHetetrophCmplx=>micpar%NumMicrbHetetrophCmplx
   NumLiveHeterBioms => micpar%NumLiveHeterBioms
 
@@ -112,7 +112,7 @@ implicit none
   allocate(this%ORM(1:NumPlantChemElms,ndbiomcp,1:jcplx));this%ORM=spval
   allocate(this%CNOSC(jsken,1:jcplx));this%CNOSC=spval
   allocate(this%CPOSC(jsken,1:jcplx));this%CPOSC=spval
-  allocate(this%OMEhetr(NumPlantChemElms,NumLiveHeterBioms,1:jcplx));this%OMEhetr=spval
+  allocate(this%OMEheter(NumPlantChemElms,NumLiveHeterBioms,1:jcplx));this%OMEheter=spval
   allocate(this%OMEauto(NumPlantChemElms,NumLiveAutoBioms));this%OMEauto=spval
 
   end subroutine Init
@@ -133,7 +133,7 @@ implicit none
   call destroy(this%ORM)
   call destroy(this%CNOSC)
   call destroy(this%CPOSC)
-  call destroy(this%OMEhetr)
+  call destroy(this%OMEheter)
   call destroy(this%OMEauto)
   end subroutine Destruct
 end module MicStateTraitTypeMod

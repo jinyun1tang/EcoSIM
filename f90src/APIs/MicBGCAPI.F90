@@ -164,13 +164,13 @@ implicit none
   type(micfluxtype), intent(inout) :: micflx
 
   integer :: NumMicbFunGroups, jcplx, k_POM, k_humus
-  integer :: kk, ndbiomcp, nlbiomcp, NumMicrobAutotrophCmplx, NumMicrbHetetrophCmplx
+  integer :: kk, ndbiomcp, nlbiomcp, NumMicrobAutrophCmplx, NumMicrbHetetrophCmplx
   NumMicbFunGroups=micpar%NumMicbFunGroups
   jcplx=micpar%jcplx
 
   ndbiomcp = micpar%ndbiomcp
   nlbiomcp = micpar%nlbiomcp
-  NumMicrobAutotrophCmplx  = micpar%NumMicrobAutotrophCmplx
+  NumMicrobAutrophCmplx  = micpar%NumMicrobAutrophCmplx
   NumMicrbHetetrophCmplx  = micpar%NumMicrbHetetrophCmplx
   k_humus  = micpar%k_humus
   k_POM    = micpar%k_POM
@@ -181,7 +181,7 @@ implicit none
   micfor%O2_irrig_conc  =O2_irrig_conc(NY,NX)
   micfor%O2_rain_conc  =O2_rain_conc(NY,NX)
   micfor%Irrig2LitRSurf =Irrig2LitRSurf(NY,NX)
-  micfor%Rain2LitRSurf =Rain2LitRSurf(NY,NX)
+  micfor%Rain2LitRSurf_col =Rain2LitRSurf_col(NY,NX)
   micfor%OFFSET=OFFSET(NY,NX)
   micfor%VLitR  =VLitR(NY,NX)
   micfor%VWatLitRHoldCapcity=VWatLitRHoldCapcity(NY,NX)
@@ -315,7 +315,7 @@ implicit none
   micstt%ORM(1:NumPlantChemElms,1:ndbiomcp,1:jcplx)=ORM(1:NumPlantChemElms,1:ndbiomcp,1:jcplx,L,NY,NX)
   micstt%CNOSC(1:jsken,1:jcplx)=CNOSC(1:jsken,1:jcplx,L,NY,NX)
   micstt%CPOSC(1:jsken,1:jcplx)=CPOSC(1:jsken,1:jcplx,L,NY,NX)
-  micstt%OMEhetr(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx)=OMEhetr(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx,L,NY,NX)
+  micstt%OMEheter(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx)=OMEheter(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx,L,NY,NX)
   micstt%OMEauto(1:NumPlantChemElms,1:NumLiveAutoBioms)=OMEauto(1:NumPlantChemElms,1:NumLiveAutoBioms,L,NY,NX)
   if(.not.micfor%litrm)then
     micfor%AEC=AEC(L,NY,NX)
@@ -323,15 +323,15 @@ implicit none
   endif
   micflx%RVMXC=RVMXC(L,NY,NX)
   micflx%RVMBC=RVMBC(L,NY,NX)
-  micflx%RINHOff(1:NumMicrobAutotrophCmplx)=RINHOff(1:NumMicrobAutotrophCmplx,L,NY,NX)
-  micflx%RINHBff(1:NumMicrobAutotrophCmplx)=RINHBff(1:NumMicrobAutotrophCmplx,L,NY,NX)
-  micflx%RINOOff(1:NumMicrobAutotrophCmplx)=RINOOff(1:NumMicrobAutotrophCmplx,L,NY,NX)
-  micflx%RINOBff(1:NumMicrobAutotrophCmplx)=RINOBff(1:NumMicrobAutotrophCmplx,L,NY,NX)
-  micflx%RIPOOff(1:NumMicrobAutotrophCmplx)=RIPOOff(1:NumMicrobAutotrophCmplx,L,NY,NX)
-  micflx%RIPBOff(1:NumMicrobAutotrophCmplx)=RIPBOff(1:NumMicrobAutotrophCmplx,L,NY,NX)
-  micflx%RIPO1ff(1:NumMicrobAutotrophCmplx)=RIPO1ff(1:NumMicrobAutotrophCmplx,L,NY,NX)
-  micflx%RIPB1ff(1:NumMicrobAutotrophCmplx)=RIPB1ff(1:NumMicrobAutotrophCmplx,L,NY,NX)
-  micflx%ROXYSff(1:NumMicrobAutotrophCmplx)=ROXYSff(1:NumMicrobAutotrophCmplx,L,NY,NX)
+  micflx%RINHOff(1:NumMicrobAutrophCmplx)=RINHOff(1:NumMicrobAutrophCmplx,L,NY,NX)
+  micflx%RINHBff(1:NumMicrobAutrophCmplx)=RINHBff(1:NumMicrobAutrophCmplx,L,NY,NX)
+  micflx%RINOOff(1:NumMicrobAutrophCmplx)=RINOOff(1:NumMicrobAutrophCmplx,L,NY,NX)
+  micflx%RINOBff(1:NumMicrobAutrophCmplx)=RINOBff(1:NumMicrobAutrophCmplx,L,NY,NX)
+  micflx%RIPOOff(1:NumMicrobAutrophCmplx)=RIPOOff(1:NumMicrobAutrophCmplx,L,NY,NX)
+  micflx%RIPBOff(1:NumMicrobAutrophCmplx)=RIPBOff(1:NumMicrobAutrophCmplx,L,NY,NX)
+  micflx%RIPO1ff(1:NumMicrobAutrophCmplx)=RIPO1ff(1:NumMicrobAutrophCmplx,L,NY,NX)
+  micflx%RIPB1ff(1:NumMicrobAutrophCmplx)=RIPB1ff(1:NumMicrobAutrophCmplx,L,NY,NX)
+  micflx%ROXYSff(1:NumMicrobAutrophCmplx)=ROXYSff(1:NumMicrobAutrophCmplx,L,NY,NX)
 
   micflx%RINHO(1:NumMicrbHetetrophCmplx,1:jcplx)=RINHO(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX)
   micflx%RINHB(1:NumMicrbHetetrophCmplx,1:jcplx)=RINHB(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX)
@@ -354,8 +354,8 @@ implicit none
   logical, intent(in) :: litrM
   type(micsttype), intent(in) :: micstt
   type(micfluxtype), intent(in) :: micflx
-  integer :: NumMicbFunGroups, jcplx, NumMicrobAutotrophCmplx
-  NumMicrobAutotrophCmplx = micpar%NumMicrobAutotrophCmplx
+  integer :: NumMicbFunGroups, jcplx, NumMicrobAutrophCmplx
+  NumMicrobAutrophCmplx = micpar%NumMicrobAutrophCmplx
   NumMicbFunGroups=micpar%NumMicbFunGroups
   jcplx=micpar%jcplx
 
@@ -385,11 +385,11 @@ implicit none
   RDOM_micb_flx(idom_dop,1:jcplx,L,NY,NX)=micflx%RDOM_micb_flx(idom_dop,1:jcplx)
   RDOM_micb_flx(idom_acetate,1:jcplx,L,NY,NX)=micflx%RDOM_micb_flx(idom_acetate,1:jcplx)
 
-  ROXYSff(1:NumMicrobAutotrophCmplx,L,NY,NX)=micflx%ROXYSff(1:NumMicrobAutotrophCmplx)
-  RVMX4ff(1:NumMicrobAutotrophCmplx,L,NY,NX)=micflx%RVMX4ff(1:NumMicrobAutotrophCmplx)
-  RVMB4ff(1:NumMicrobAutotrophCmplx,L,NY,NX)=micflx%RVMB4ff(1:NumMicrobAutotrophCmplx)
-  RVMX2ff(1:NumMicrobAutotrophCmplx,L,NY,NX)=micflx%RVMX2ff(1:NumMicrobAutotrophCmplx)
-  RVMB2ff(1:NumMicrobAutotrophCmplx,L,NY,NX)=micflx%RVMB2ff(1:NumMicrobAutotrophCmplx)
+  ROXYSff(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%ROXYSff(1:NumMicrobAutrophCmplx)
+  RNH3OxidAutor(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RNH3OxidAutor(1:NumMicrobAutrophCmplx)
+  RNH3OxidAutorBand(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RNH3OxidAutorBand(1:NumMicrobAutrophCmplx)
+  RNO2OxidAutor(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RNO2OxidAutor(1:NumMicrobAutrophCmplx)
+  RNO2OxidAutorBand(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RNO2OxidAutorBand(1:NumMicrobAutrophCmplx)
   ROXYS(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX)=micflx%ROXYS(1:NumMicrbHetetrophCmplx,1:jcplx)
   ROQCS(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX)=micflx%ROQCS(1:NumMicrbHetetrophCmplx,1:jcplx)
   ROQAS(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX)=micflx%ROQAS(1:NumMicrbHetetrophCmplx,1:jcplx)
@@ -417,10 +417,10 @@ implicit none
     RINOOR(1:NumMicrbHetetrophCmplx,1:jcplx,NY,NX)=micflx%RINOOR(1:NumMicrbHetetrophCmplx,1:jcplx)
     RIPOOR(1:NumMicrbHetetrophCmplx,1:jcplx,NY,NX)=micflx%RIPOOR(1:NumMicrbHetetrophCmplx,1:jcplx)
     RIPO1R(1:NumMicrbHetetrophCmplx,1:jcplx,NY,NX)=micflx%RIPO1R(1:NumMicrbHetetrophCmplx,1:jcplx)
-    RINHORff(1:NumMicrobAutotrophCmplx,NY,NX)=micflx%RINHORff(1:NumMicrobAutotrophCmplx)
-    RINOORff(1:NumMicrobAutotrophCmplx,NY,NX)=micflx%RINOORff(1:NumMicrobAutotrophCmplx)
-    RIPOORff(1:NumMicrobAutotrophCmplx,NY,NX)=micflx%RIPOORff(1:NumMicrobAutotrophCmplx)
-    RIPO1Rff(1:NumMicrobAutotrophCmplx,NY,NX)=micflx%RIPO1Rff(1:NumMicrobAutotrophCmplx)
+    RINHORff(1:NumMicrobAutrophCmplx,NY,NX)=micflx%RINHORff(1:NumMicrobAutrophCmplx)
+    RINOORff(1:NumMicrobAutrophCmplx,NY,NX)=micflx%RINOORff(1:NumMicrobAutrophCmplx)
+    RIPOORff(1:NumMicrobAutrophCmplx,NY,NX)=micflx%RIPOORff(1:NumMicrobAutrophCmplx)
+    RIPO1Rff(1:NumMicrobAutrophCmplx,NY,NX)=micflx%RIPO1Rff(1:NumMicrobAutrophCmplx)
     OSM(ielmc,micpar%iprotein,micpar%k_POM,NU(NY,NX),NY,NX)=micstt%OSC13U
     OSM(ielmc,micpar%iprotein,micpar%k_humus,NU(NY,NX),NY,NX)=micstt%OSC14U
     OSM(ielmc,micpar%icarbhyro,micpar%k_humus,NU(NY,NX),NY,NX)=micstt%OSC24U
@@ -434,14 +434,14 @@ implicit none
     OSM(ielmp,micpar%icarbhyro,micpar%k_humus,NU(NY,NX),NY,NX)=micstt%OSP24U
   endif
 
-  RINHOff(1:NumMicrobAutotrophCmplx,L,NY,NX)=micflx%RINHOff(1:NumMicrobAutotrophCmplx)
-  RINHBff(1:NumMicrobAutotrophCmplx,L,NY,NX)=micflx%RINHBff(1:NumMicrobAutotrophCmplx)
-  RINOOff(1:NumMicrobAutotrophCmplx,L,NY,NX)=micflx%RINOOff(1:NumMicrobAutotrophCmplx)
-  RINOBff(1:NumMicrobAutotrophCmplx,L,NY,NX)=micflx%RINOBff(1:NumMicrobAutotrophCmplx)
-  RIPOOff(1:NumMicrobAutotrophCmplx,L,NY,NX)=micflx%RIPOOff(1:NumMicrobAutotrophCmplx)
-  RIPBOff(1:NumMicrobAutotrophCmplx,L,NY,NX)=micflx%RIPBOff(1:NumMicrobAutotrophCmplx)
-  RIPO1ff(1:NumMicrobAutotrophCmplx,L,NY,NX)=micflx%RIPO1ff(1:NumMicrobAutotrophCmplx)
-  RIPB1ff(1:NumMicrobAutotrophCmplx,L,NY,NX)=micflx%RIPB1ff(1:NumMicrobAutotrophCmplx)
+  RINHOff(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RINHOff(1:NumMicrobAutrophCmplx)
+  RINHBff(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RINHBff(1:NumMicrobAutrophCmplx)
+  RINOOff(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RINOOff(1:NumMicrobAutrophCmplx)
+  RINOBff(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RINOBff(1:NumMicrobAutrophCmplx)
+  RIPOOff(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RIPOOff(1:NumMicrobAutrophCmplx)
+  RIPBOff(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RIPBOff(1:NumMicrobAutrophCmplx)
+  RIPO1ff(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RIPO1ff(1:NumMicrobAutrophCmplx)
+  RIPB1ff(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RIPB1ff(1:NumMicrobAutrophCmplx)
   ROXSK(1:NPH,L,NY,NX)=micflx%ROXSK(1:NPH)
 
   TFNQ(L,NY,NX)=micstt%TFNQ
@@ -453,7 +453,7 @@ implicit none
   OHM(idom_beg:idom_end,1:jcplx,L,NY,NX)=micstt%OHM(idom_beg:idom_end,1:jcplx)
 
   ORM(1:NumPlantChemElms,1:ndbiomcp,1:jcplx,L,NY,NX)=micstt%ORM(1:NumPlantChemElms,1:ndbiomcp,1:jcplx)
-  OMEhetr(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx,L,NY,NX)=micstt%OMEhetr(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx)
+  OMEheter(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx,L,NY,NX)=micstt%OMEheter(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx)
   OMEauto(1:NumPlantChemElms,1:NumLiveAutoBioms,L,NY,NX)=micstt%OMEauto(1:NumPlantChemElms,1:NumLiveAutoBioms)
 
   end subroutine MicAPIRecv

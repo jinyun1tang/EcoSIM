@@ -794,9 +794,9 @@ implicit none
         DO  M=1,nlbiomcp
           DO NGL=JGnio(N),JGnfo(N)
             MID=micpar%get_micb_id(M,NGL)
-            OMEhetr(ielmc,MID,K,L1,NY,NX)=OMEhetr(ielmc,MID,K,L1,NY,NX)+FX*OMEhetr(ielmc,MID,K,L0,NY,NX)
-            OMEhetr(ielmn,MID,K,L1,NY,NX)=OMEhetr(ielmn,MID,K,L1,NY,NX)+FX*OMEhetr(ielmn,MID,K,L0,NY,NX)
-            OMEhetr(ielmp,MID,K,L1,NY,NX)=OMEhetr(ielmp,MID,K,L1,NY,NX)+FX*OMEhetr(ielmp,MID,K,L0,NY,NX)
+            OMEheter(ielmc,MID,K,L1,NY,NX)=OMEheter(ielmc,MID,K,L1,NY,NX)+FX*OMEheter(ielmc,MID,K,L0,NY,NX)
+            OMEheter(ielmn,MID,K,L1,NY,NX)=OMEheter(ielmn,MID,K,L1,NY,NX)+FX*OMEheter(ielmn,MID,K,L0,NY,NX)
+            OMEheter(ielmp,MID,K,L1,NY,NX)=OMEheter(ielmp,MID,K,L1,NY,NX)+FX*OMEheter(ielmp,MID,K,L0,NY,NX)
           enddo
         enddo
       enddo
@@ -976,9 +976,9 @@ implicit none
         DO M=1,nlbiomcp
           DO NGL=JGnio(N),JGnfo(N)
             MID=micpar%get_micb_id(M,NGL)
-            OMEhetr(ielmc,MID,K,L0,NY,NX)=FY*OMEhetr(ielmc,MID,K,L0,NY,NX)
-            OMEhetr(ielmn,MID,K,L0,NY,NX)=FY*OMEhetr(ielmn,MID,K,L0,NY,NX)
-            OMEhetr(ielmp,MID,K,L0,NY,NX)=FY*OMEhetr(ielmp,MID,K,L0,NY,NX)
+            OMEheter(ielmc,MID,K,L0,NY,NX)=FY*OMEheter(ielmc,MID,K,L0,NY,NX)
+            OMEheter(ielmn,MID,K,L0,NY,NX)=FY*OMEheter(ielmn,MID,K,L0,NY,NX)
+            OMEheter(ielmp,MID,K,L0,NY,NX)=FY*OMEheter(ielmp,MID,K,L0,NY,NX)
           ENDDO
         enddo
       enddo
@@ -1117,15 +1117,15 @@ implicit none
         DO  M=1,nlbiomcp
           DO NGL=JGnio(N),JGnfo(N)
             MID=micpar%get_micb_id(M,NGL)          
-            FXOMC=FXO*OMEhetr(ielmc,MID,K,L0,NY,NX)
-            OMEhetr(ielmc,MID,K,L1,NY,NX)=OMEhetr(ielmc,MID,K,L1,NY,NX)+FXOMC
-            OMEhetr(ielmc,MID,K,L0,NY,NX)=OMEhetr(ielmc,MID,K,L0,NY,NX)-FXOMC
-            FXOMN=FXO*OMEhetr(ielmn,MID,K,L0,NY,NX)
-            OMEhetr(ielmn,MID,K,L1,NY,NX)=OMEhetr(ielmn,MID,K,L1,NY,NX)+FXOMN
-            OMEhetr(ielmn,MID,K,L0,NY,NX)=OMEhetr(ielmn,MID,K,L0,NY,NX)-FXOMN
-            FXOMP=FXO*OMEhetr(ielmp,MID,K,L0,NY,NX)
-            OMEhetr(ielmp,MID,K,L1,NY,NX)=OMEhetr(ielmp,MID,K,L1,NY,NX)+FXOMP
-            OMEhetr(ielmp,MID,K,L0,NY,NX)=OMEhetr(ielmp,MID,K,L0,NY,NX)-FXOMP
+            FXOMC=FXO*OMEheter(ielmc,MID,K,L0,NY,NX)
+            OMEheter(ielmc,MID,K,L1,NY,NX)=OMEheter(ielmc,MID,K,L1,NY,NX)+FXOMC
+            OMEheter(ielmc,MID,K,L0,NY,NX)=OMEheter(ielmc,MID,K,L0,NY,NX)-FXOMC
+            FXOMN=FXO*OMEheter(ielmn,MID,K,L0,NY,NX)
+            OMEheter(ielmn,MID,K,L1,NY,NX)=OMEheter(ielmn,MID,K,L1,NY,NX)+FXOMN
+            OMEheter(ielmn,MID,K,L0,NY,NX)=OMEheter(ielmn,MID,K,L0,NY,NX)-FXOMN
+            FXOMP=FXO*OMEheter(ielmp,MID,K,L0,NY,NX)
+            OMEheter(ielmp,MID,K,L1,NY,NX)=OMEheter(ielmp,MID,K,L1,NY,NX)+FXOMP
+            OMEheter(ielmp,MID,K,L0,NY,NX)=OMEheter(ielmp,MID,K,L0,NY,NX)-FXOMP
           enddo
         enddo
       enddo

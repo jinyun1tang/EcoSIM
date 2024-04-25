@@ -37,10 +37,10 @@ implicit none
   real(r8) :: NetPO4Mineralize_col
   real(r8), allocatable :: RDOM_micb_flx(:,:)
   real(r8), allocatable :: ROXYSff(:)
-  real(r8), allocatable :: RVMX4ff(:)
-  real(r8), allocatable :: RVMB4ff(:)
-  real(r8), allocatable :: RVMX2ff(:)
-  real(r8), allocatable :: RVMB2ff(:)
+  real(r8), allocatable :: RNH3OxidAutor(:)
+  real(r8), allocatable :: RNH3OxidAutorBand(:)
+  real(r8), allocatable :: RNO2OxidAutor(:)
+  real(r8), allocatable :: RNO2OxidAutorBand(:)
   real(r8), allocatable :: ROXYS(:,:)
   real(r8), allocatable :: ROQCS(:,:)
   real(r8), allocatable :: ROQAS(:,:)
@@ -89,13 +89,13 @@ implicit none
   implicit none
   class(micfluxtype) :: this
   integer :: jcplx,JG,NumMicbFunGroups
-  integer :: NumMicrbHetetrophCmplx, NumMicrobAutotrophCmplx
+  integer :: NumMicrbHetetrophCmplx, NumMicrobAutrophCmplx
 
   jcplx=micpar%jcplx
   JG=micpar%jguilds
   NumMicbFunGroups=micpar%NumMicbFunGroups
   NumMicrbHetetrophCmplx=micpar%NumMicrbHetetrophCmplx
-  NumMicrobAutotrophCmplx=micpar%NumMicrobAutotrophCmplx
+  NumMicrobAutrophCmplx=micpar%NumMicrobAutrophCmplx
 
   allocate(this%ROXSK(NPH));this%ROXSK = spval
   allocate(this%RDOM_micb_flx(idom_beg:idom_end,1:jcplx));this%RDOM_micb_flx=spval
@@ -121,23 +121,23 @@ implicit none
   allocate(this%RINOOR(NumMicrbHetetrophCmplx,1:jcplx));this%RINOOR=spval
   allocate(this%RIPOOR(NumMicrbHetetrophCmplx,1:jcplx));this%RIPOOR=spval
   allocate(this%RIPO1R(NumMicrbHetetrophCmplx,1:jcplx));this%RIPO1R=spval
-  allocate(this%ROXYSff(NumMicrobAutotrophCmplx));this%ROXYSff=spval
-  allocate(this%RINHOff(NumMicrobAutotrophCmplx));this%RINHOff=spval
-  allocate(this%RINHBff(NumMicrobAutotrophCmplx));this%RINHBff=spval
-  allocate(this%RINOOff(NumMicrobAutotrophCmplx));this%RINOOff=spval
-  allocate(this%RINOBff(NumMicrobAutotrophCmplx));this%RINOBff=spval
-  allocate(this%RIPOOff(NumMicrobAutotrophCmplx));this%RIPOOff=spval
-  allocate(this%RIPBOff(NumMicrobAutotrophCmplx));this%RIPBOff=spval
-  allocate(this%RIPO1ff(NumMicrobAutotrophCmplx));this%RIPO1ff=spval
-  allocate(this%RIPB1ff(NumMicrobAutotrophCmplx));this%RIPB1ff=spval
-  allocate(this%RINHORff(NumMicrobAutotrophCmplx));this%RINHORff=spval
-  allocate(this%RINOORff(NumMicrobAutotrophCmplx));this%RINOORff=spval
-  allocate(this%RIPOORff(NumMicrobAutotrophCmplx));this%RIPOORff=spval
-  allocate(this%RIPO1Rff(NumMicrobAutotrophCmplx));this%RIPO1Rff=spval
-  allocate(this%RVMX4ff(NumMicrobAutotrophCmplx));this%RVMX4ff=spval
-  allocate(this%RVMB4ff(NumMicrobAutotrophCmplx));this%RVMB4ff=spval
-  allocate(this%RVMX2ff(NumMicrobAutotrophCmplx));this%RVMX2ff=spval
-  allocate(this%RVMB2ff(NumMicrobAutotrophCmplx));this%RVMB2ff=spval
+  allocate(this%ROXYSff(NumMicrobAutrophCmplx));this%ROXYSff=spval
+  allocate(this%RINHOff(NumMicrobAutrophCmplx));this%RINHOff=spval
+  allocate(this%RINHBff(NumMicrobAutrophCmplx));this%RINHBff=spval
+  allocate(this%RINOOff(NumMicrobAutrophCmplx));this%RINOOff=spval
+  allocate(this%RINOBff(NumMicrobAutrophCmplx));this%RINOBff=spval
+  allocate(this%RIPOOff(NumMicrobAutrophCmplx));this%RIPOOff=spval
+  allocate(this%RIPBOff(NumMicrobAutrophCmplx));this%RIPBOff=spval
+  allocate(this%RIPO1ff(NumMicrobAutrophCmplx));this%RIPO1ff=spval
+  allocate(this%RIPB1ff(NumMicrobAutrophCmplx));this%RIPB1ff=spval
+  allocate(this%RINHORff(NumMicrobAutrophCmplx));this%RINHORff=spval
+  allocate(this%RINOORff(NumMicrobAutrophCmplx));this%RINOORff=spval
+  allocate(this%RIPOORff(NumMicrobAutrophCmplx));this%RIPOORff=spval
+  allocate(this%RIPO1Rff(NumMicrobAutrophCmplx));this%RIPO1Rff=spval
+  allocate(this%RNH3OxidAutor(NumMicrobAutrophCmplx));this%RNH3OxidAutor=spval
+  allocate(this%RNH3OxidAutorBand(NumMicrobAutrophCmplx));this%RNH3OxidAutorBand=spval
+  allocate(this%RNO2OxidAutor(NumMicrobAutrophCmplx));this%RNO2OxidAutor=spval
+  allocate(this%RNO2OxidAutorBand(NumMicrobAutrophCmplx));this%RNO2OxidAutorBand=spval
 
   end subroutine Init
 !------------------------------------------------------------------------------------------
@@ -184,10 +184,10 @@ implicit none
   this%RINOORff=0._r8
   this%RIPOORff=0._r8
   this%RIPO1Rff=0._r8
-  this%RVMX4ff=0._r8
-  this%RVMB4ff=0._r8
-  this%RVMX2ff=0._r8
-  this%RVMB2ff=0._r8
+  this%RNH3OxidAutor=0._r8
+  this%RNH3OxidAutorBand=0._r8
+  this%RNO2OxidAutor=0._r8
+  this%RNO2OxidAutorBand=0._r8
 
   end subroutine ZeroOut
 !------------------------------------------------------------------------------------------
@@ -197,10 +197,10 @@ implicit none
   class(micfluxtype) :: this
 
   call destroy(this%RDOM_micb_flx)
-  call destroy(this%RVMX4ff)
-  call destroy(this%RVMB4ff)
-  call destroy(this%RVMX2ff)
-  call destroy(this%RVMB2ff)
+  call destroy(this%RNH3OxidAutor)
+  call destroy(this%RNH3OxidAutorBand)
+  call destroy(this%RNO2OxidAutor)
+  call destroy(this%RNO2OxidAutorBand)
   call destroy(this%ROXYS)
   call destroy(this%ROQCS)
   call destroy(this%ROQAS)

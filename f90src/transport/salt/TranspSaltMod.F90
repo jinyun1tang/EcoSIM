@@ -191,7 +191,7 @@ module TranspSaltMod
 !     PrecAtm,PRECI=snow+rain,irrigation
 !     X*BLS=hourly solute flux to snowpack
 !     X*FLS,X*FLB=hourly solute flux to surface litter,soil surface micropore non-band,band
-!     Rain2LitRSurf,Irrig2LitRSurf=water flux to surface litter from rain,irrigation
+!     Rain2LitRSurf_col,Irrig2LitRSurf=water flux to surface litter from rain,irrigation
 !     FLQGQ,FLQGI=water flux to soil surface from rain,irrigation
 !     C*R,C*Q=precipitation,irrigation solute concentrations
 !     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
@@ -207,7 +207,7 @@ module TranspSaltMod
 !
   DO nsalts=idsalt_beg,idsalt_end
     trcSaltFlo2SnowLay(nsalts,1,NY,NX)=0.0_r8
-    trcSalt3DFlo2Cell(nsalts,3,0,NY,NX)=Rain2LitRSurf(NY,NX)*trcsalt_rain_conc(nsalts,NY,NX) &
+    trcSalt3DFlo2Cell(nsalts,3,0,NY,NX)=Rain2LitRSurf_col(NY,NX)*trcsalt_rain_conc(nsalts,NY,NX) &
       +Irrig2LitRSurf(NY,NX)*trcsalt_irrig_conc(nsalts,I,NY,NX)
   ENDDO
 

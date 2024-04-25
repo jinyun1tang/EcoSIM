@@ -244,7 +244,7 @@ module MicBGCMod
     OSA     => micstt%OSA  ,&
     ORM     => micstt%ORM   , &
     OHM     => micstt%OHM   , &
-    OMEhetr    => micstt%OMEhetr  , &
+    OMEheter    => micstt%OMEheter  , &
     DOM     => micstt%DOM   , &
     H1PO4 => micstt%H1PO4, &
     H1POB => micstt%H1POB, &
@@ -376,14 +376,14 @@ module MicBGCMod
       D895: DO N=1,NumMicbFunGroups
         DO NGL=JGnio(n),JGnfo(n)
           MID1=micpar%get_micb_id(1,NGL)
-          IF(OMEhetr(ielmc,MID1,K).GT.ZEROS)THEN
-            CNOMA(NGL,K)=AZMAX1(OMEhetr(ielmn,MID1,K)/OMEhetr(ielmc,MID1,K))
-            CPOMA(NGL,K)=AZMAX1(OMEhetr(ielmp,MID1,K)/OMEhetr(ielmc,MID1,K))
+          IF(OMEheter(ielmc,MID1,K).GT.ZEROS)THEN
+            CNOMA(NGL,K)=AZMAX1(OMEheter(ielmn,MID1,K)/OMEheter(ielmc,MID1,K))
+            CPOMA(NGL,K)=AZMAX1(OMEheter(ielmp,MID1,K)/OMEheter(ielmc,MID1,K))
           ELSE
             CNOMA(NGL,K)=rNCOMC(1,NGL,K)
             CPOMA(NGL,K)=rPCOMC(1,NGL,K)
           ENDIF
-          OMA(NGL,K)=AZMAX1(OMEhetr(ielmc,MID1,K)/FL(1))
+          OMA(NGL,K)=AZMAX1(OMEheter(ielmc,MID1,K)/FL(1))
           FCN(NGL,K)=AMIN1(1.0_r8,AMAX1(0.50_r8,SQRT(CNOMA(NGL,K)/rNCOMC(1,NGL,K))))
           FCP(NGL,K)=AMIN1(1.0_r8,AMAX1(0.50_r8,SQRT(CPOMA(NGL,K)/rPCOMC(1,NGL,K))))
           FCNP(NGL,K)=AMIN1(FCN(NGL,K),FCP(NGL,K))
@@ -396,10 +396,10 @@ module MicBGCMod
             TOMN=TOMN+OMA(NGL,K)
           ENDIF
           MID2=micpar%get_micb_id(2,NGL)
-          OMC2(NGL,K)=AZMAX1(AMIN1(OMA(NGL,K)*FL(2),OMEhetr(ielmc,MID2,K)))
-          IF(OMEhetr(ielmc,MID2,K).GT.ZEROS)THEN
-            FOM2(NGL,K)=AZMAX1(OMC2(NGL,K)/OMEhetr(ielmc,MID2,K))
-            OMN2(NGL,K)=AZMAX1(FOM2(NGL,K)*OMEhetr(ielmn,MID2,K))
+          OMC2(NGL,K)=AZMAX1(AMIN1(OMA(NGL,K)*FL(2),OMEheter(ielmc,MID2,K)))
+          IF(OMEheter(ielmc,MID2,K).GT.ZEROS)THEN
+            FOM2(NGL,K)=AZMAX1(OMC2(NGL,K)/OMEheter(ielmc,MID2,K))
+            OMN2(NGL,K)=AZMAX1(FOM2(NGL,K)*OMEheter(ielmn,MID2,K))
           ELSE
             FOM2(NGL,K)=0.0_r8
             OMN2(NGL,K)=0.0_r8
@@ -589,7 +589,7 @@ module MicBGCMod
     H2PO4 => micstt%H2PO4, &
     H2POB => micstt%H2POB, &
     OMEauto  => micstt%OMEauto, &
-    OMEhetr   => micstt%OMEhetr   &
+    OMEheter   => micstt%OMEheter   &
   )
   RH2GZ=0.0_r8
 
@@ -602,7 +602,7 @@ module MicBGCMod
         DO NGL=JGnio(N),JGnfo(N)
           DO M=1,2
             MID=micpar%get_micb_id(M,NGL)          
-            TOMCNK(M)=TOMCNK(M)+OMEhetr(ielmc,MID,K)
+            TOMCNK(M)=TOMCNK(M)+OMEheter(ielmc,MID,K)
           ENDDO
 
 !           WFNG=water potential (PSISoilMatricP) effect on microbial respiration
@@ -827,8 +827,8 @@ module MicBGCMod
 ! ROXYF,ROXYL=net O2 gaseous, aqueous fluxes from previous hour
 ! OLSGL=aqueous O2 diffusivity
 ! OXYG,OXYS=gaseous, aqueous O2 amounts
-! Rain2LitRSurf,Irrig2LitRSurf=surface water flux from precipitation, irrigation
-! O2_rain_conc,O2_irrig_conc=O2 concentration in Rain2LitRSurf,Irrig2LitRSurf
+! Rain2LitRSurf_col,Irrig2LitRSurf=surface water flux from precipitation, irrigation
+! O2_rain_conc,O2_irrig_conc=O2 concentration in Rain2LitRSurf_col,Irrig2LitRSurf
 !
   RUPOX(NGL,K)=0.0_r8
   !aerobic heterotrophs
@@ -997,7 +997,7 @@ module MicBGCMod
     OSRH  => ncplxs%OSRH  ,  &
     TOQCK => micstt%TOQCK, &
     DOM => micstt%DOM, &
-    OMEhetr=> micstt%OMEhetr, &
+    OMEheter=> micstt%OMEheter, &
     ZEROS => micfor%ZEROS , &
     TFND => micfor%TFND  &
   )
@@ -1044,10 +1044,10 @@ module MicBGCMod
               DO NGL=JGnio(N),JGnfo(N)
                 MID=micpar%get_micb_id(M,NGL)
                 DO NE=1,NumPlantChemElms
-                  XFME=FPRIMM*TFNG(NGL,K)*(OMEhetr(NE,MID,K)*OSRH(KK) &
-                    -OMEhetr(NE,MID,KK)*OSRH(K))/OSRT
-                  IF(OMEhetr(NE,MID,K)+XOMZ(NE,M,NGL,K)-XFME.GT.0.0_r8 &
-                    .AND.OMEhetr(NE,MID,KK)+XOMZ(NE,M,NGL,KK)+XFME.GT.0.0_r8)THEN
+                  XFME=FPRIMM*TFNG(NGL,K)*(OMEheter(NE,MID,K)*OSRH(KK) &
+                    -OMEheter(NE,MID,KK)*OSRH(K))/OSRT
+                  IF(OMEheter(NE,MID,K)+XOMZ(NE,M,NGL,K)-XFME.GT.0.0_r8 &
+                    .AND.OMEheter(NE,MID,KK)+XOMZ(NE,M,NGL,KK)+XFME.GT.0.0_r8)THEN
                     XOMZ(NE,M,NGL,K)=XOMZ(NE,M,NGL,K)-XFME
                     XOMZ(NE,M,NGL,KK)=XOMZ(NE,M,NGL,KK)+XFME
                   ENDIF
@@ -1079,7 +1079,7 @@ module MicBGCMod
         do NGL=JGnio(N),JGnfo(N)
           MID=micpar%get_micb_id(M,NGL)        
           DO NE=1,NumPlantChemElms
-            OMEhetr(NE,MID,K)=OMEhetr(NE,MID,K)+XOMZ(NE,M,NGL,K)
+            OMEheter(NE,MID,K)=OMEheter(NE,MID,K)+XOMZ(NE,M,NGL,K)
           ENDDO
         enddo
       enddo
@@ -1655,7 +1655,7 @@ module MicBGCMod
     RINH4   => nmicf%RINH4,   &
     k_POM => micpar%k_POM, &
     k_humus => micpar%k_humus, &
-    OMEhetr=> micstt%OMEhetr, &
+    OMEheter=> micstt%OMEheter, &
     OSM => micstt%OSM, &
     OSC14U => micstt%OSC14U, &
     OSN14U=> micstt%OSN14U, &
@@ -1684,11 +1684,11 @@ module MicBGCMod
         DO NGL=JGnio(N),JGnfo(N)
           D540: DO M=1,2
             MID=micpar%get_micb_id(M,NGL)          
-            OMEhetr(ielmc,MID,K)=OMEhetr(ielmc,MID,K)+CGOMES(ielmc,M,NGL,K) &
+            OMEheter(ielmc,MID,K)=OMEheter(ielmc,MID,K)+CGOMES(ielmc,M,NGL,K) &
               -RXOMEheter(ielmc,M,NGL,K)-RXMMEheter(ielmc,M,NGL,K)
-            OMEhetr(ielmn,MID,K)=OMEhetr(ielmn,MID,K)+CGOMES(ielmn,M,NGL,K) &
+            OMEheter(ielmn,MID,K)=OMEheter(ielmn,MID,K)+CGOMES(ielmn,M,NGL,K) &
               -RXOMEheter(ielmn,M,NGL,K)-RXMMEheter(ielmn,M,NGL,K)
-            OMEhetr(ielmp,MID,K)=OMEhetr(ielmp,MID,K)+CGOMES(ielmp,M,NGL,K) &
+            OMEheter(ielmp,MID,K)=OMEheter(ielmp,MID,K)+CGOMES(ielmp,M,NGL,K) &
               -RXOMEheter(ielmp,M,NGL,K)-RXMMEheter(ielmp,M,NGL,K)
 !
 !     HUMIFICATION PRODUCTS
@@ -1738,21 +1738,21 @@ module MicBGCMod
           MID3=micpar%get_micb_id(3,NGL)
           D555: DO M=1,2
             DO NE=1,NumPlantChemElms
-              OMEhetr(NE,MID3,K)=OMEhetr(NE,MID3,K)-CGOMES(NE,M,NGL,K)+R3OMEheter(NE,M,NGL,K)
+              OMEheter(NE,MID3,K)=OMEheter(NE,MID3,K)-CGOMES(NE,M,NGL,K)+R3OMEheter(NE,M,NGL,K)
             ENDDO
-            OMEhetr(ielmn,MID3,K)=OMEhetr(ielmn,MID3,K)+R3MMEheter(ielmn,M,NGL,K)
-            OMEhetr(ielmp,MID3,K)=OMEhetr(ielmp,MID3,K)+R3MMEheter(ielmp,M,NGL,K)
+            OMEheter(ielmn,MID3,K)=OMEheter(ielmn,MID3,K)+R3MMEheter(ielmn,M,NGL,K)
+            OMEheter(ielmp,MID3,K)=OMEheter(ielmp,MID3,K)+R3MMEheter(ielmp,M,NGL,K)
 
             RCO2X(NGL,K)=RCO2X(NGL,K)+R3MMEheter(ielmc,M,NGL,K)
           ENDDO D555
-          OMEhetr(ielmc,MID3,K)=OMEhetr(ielmc,MID3,K)+CGROMC
-          OMEhetr(ielmn,MID3,K)=OMEhetr(ielmn,MID3,K)+CGOMEheter(ielmp,NGL,K) &
+          OMEheter(ielmc,MID3,K)=OMEheter(ielmc,MID3,K)+CGROMC
+          OMEheter(ielmn,MID3,K)=OMEheter(ielmn,MID3,K)+CGOMEheter(ielmp,NGL,K) &
             +RINH4(NGL,K)+RINB4(NGL,K)+RINO3(NGL,K)+RINB3(NGL,K)+RN2FX(NGL,K)
-          OMEhetr(ielmp,MID3,K)=OMEhetr(ielmp,MID3,K)+CGOMEheter(ielmp,NGL,K) &
+          OMEheter(ielmp,MID3,K)=OMEheter(ielmp,MID3,K)+CGOMEheter(ielmp,NGL,K) &
             +RIPO4(NGL,K)+RIPOB(NGL,K)+RIP14(NGL,K)+RIP1B(NGL,K)
           IF(litrm)THEN
-            OMEhetr(ielmn,MID3,K)=OMEhetr(ielmn,MID3,K)+RINH4R(NGL,K)+RINO3R(NGL,K)
-            OMEhetr(ielmp,MID3,K)=OMEhetr(ielmp,MID3,K)+RIPO4R(NGL,K)+RIP14R(NGL,K)
+            OMEheter(ielmn,MID3,K)=OMEheter(ielmn,MID3,K)+RINH4R(NGL,K)+RINO3R(NGL,K)
+            OMEheter(ielmp,MID3,K)=OMEheter(ielmp,MID3,K)+RIPO4R(NGL,K)+RIP14R(NGL,K)
           ENDIF
         enddo
       ENDDO
@@ -2886,7 +2886,7 @@ module MicBGCMod
     ROXYF  => micfor%ROXYF,   &
     ROXYL => micfor%ROXYL, &
     Irrig2LitRSurf  => micfor%Irrig2LitRSurf, &
-    Rain2LitRSurf => micfor%Rain2LitRSurf , &
+    Rain2LitRSurf_col => micfor%Rain2LitRSurf_col , &
     litrm => micfor%litrm , &
     OLSGL  => micfor%OLSGL, &
     VLSoilPoreMicP_vr => micfor%VLSoilPoreMicP_vr, &
@@ -2925,7 +2925,7 @@ module MicBGCMod
         ROXYLX=ROXYL*dts_gas*FOXYX
       ELSE
         OXYG1=COXYG*VLsoiAirPM(1)*FOXYX
-        ROXYLX=(ROXYL+Rain2LitRSurf*O2_rain_conc+Irrig2LitRSurf*O2_irrig_conc)*dts_gas*FOXYX
+        ROXYLX=(ROXYL+Rain2LitRSurf_col*O2_rain_conc+Irrig2LitRSurf*O2_irrig_conc)*dts_gas*FOXYX
       ENDIF
       OXYS1=OXYS*FOXYX
 !
@@ -3116,7 +3116,7 @@ module MicBGCMod
    CNO3S  => micstt%CNO3S, &
    CNO3SU => micstt%CNO3SU, &
    CNO3BU => micstt%CNO3BU, &
-   OMEhetr => micstt%OMEhetr, &
+   OMEheter => micstt%OMEheter, &
    RINOB => micflx%RINOB, &
    RINOO  => micflx%RINOO, &
    RINHO  => micflx%RINHO, &
@@ -3155,7 +3155,7 @@ module MicBGCMod
   FNH4S=VLNH4
   FNHBS=VLNHB
   MID3=micpar%get_micb_id(3,NGL)
-  RINHP=(OMEhetr(ielmc,MID3,K)*rNCOMC(3,NGL,K)-OMEhetr(ielmn,MID3,K))
+  RINHP=(OMEheter(ielmc,MID3,K)*rNCOMC(3,NGL,K)-OMEheter(ielmn,MID3,K))
   IF(RINHP.GT.0.0_r8)THEN
     CNH4X=AZMAX1(CNH4S-Z4MN)
     CNH4Y=AZMAX1(CNH4B-Z4MN)
@@ -3236,7 +3236,7 @@ module MicBGCMod
   FH2PS=VLPO4
   FH2PB=VLPOB
   MID3=micpar%get_micb_id(3,NGL)
-  RIPOP=(OMEhetr(ielmc,MID3,K)*rPCOMC(3,NGL,K)-OMEhetr(ielmp,MID3,K))
+  RIPOP=(OMEheter(ielmc,MID3,K)*rPCOMC(3,NGL,K)-OMEheter(ielmp,MID3,K))
   IF(RIPOP.GT.0.0_r8)THEN
     CH2PX=AZMAX1(CH2P4-HPMN)
     CH2PY=AZMAX1(CH2P4B-HPMN)
@@ -3467,7 +3467,7 @@ module MicBGCMod
     n_aero_n2fixer => micpar%n_aero_n2fixer, &
     n_anero_n2fixer => micpar%n_anero_n2fixer ,&
     CZ2GS => micstt%CZ2GS, &
-    OMEhetr=> micstt%OMEhetr   &
+    OMEheter=> micstt%OMEheter   &
   )
 !     pH EFFECT ON MAINTENANCE RESPIRATION
 !
@@ -3481,7 +3481,7 @@ module MicBGCMod
 
   RMOMX=RMOM*TFNR(NGL,K)*FPH
   MID1=micpar%get_micb_id(1,NGL)
-  RMOMC(1,NGL,K)=OMEhetr(ielmn,MID1,K)*RMOMX*RMOMK(1)
+  RMOMC(1,NGL,K)=OMEheter(ielmn,MID1,K)*RMOMX*RMOMK(1)
   RMOMC(2,NGL,K)=OMN2(NGL,K)*RMOMX*RMOMK(2)
 !
 !     MICROBIAL MAINTENANCE AND GROWTH RESPIRATION
@@ -3512,10 +3512,10 @@ module MicBGCMod
 !
   IF(N.EQ.n_aero_n2fixer.OR.N.EQ.n_anero_n2fixer)THEN
     MID3=micpar%get_micb_id(3,NGL)
-    RGN2P=AZMAX1(OMEhetr(ielmc,MID3,K)*rNCOMC(3,NGL,K)-OMEhetr(ielmn,MID3,K))/EN2F(N)
+    RGN2P=AZMAX1(OMEheter(ielmc,MID3,K)*rNCOMC(3,NGL,K)-OMEheter(ielmn,MID3,K))/EN2F(N)
     IF(RGOMT.GT.ZEROS)THEN
       RGN2F(NGL,K)=AMIN1(RGOMT*RGN2P/(RGOMT+RGN2P) &
-        *CZ2GS/(CZ2GS+ZFKM),OMGR*OMEhetr(ielmc,MID3,K))
+        *CZ2GS/(CZ2GS+ZFKM),OMGR*OMEheter(ielmc,MID3,K))
     ELSE
       RGN2F(NGL,K)=0.0_r8
     ENDIF
@@ -3583,7 +3583,7 @@ module MicBGCMod
     rPCOMC   => micpar%rPCOMC , &
     FL      => micpar%FL    , &
     EHUM    => micstt%EHUM  , &
-    OMEhetr    => micstt%OMEhetr  , &
+    OMEheter    => micstt%OMEheter  , &
     DOM     => micstt%DOM   , &
     ZEROS   => micfor%ZEROS , &
     ZERO    => micfor%ZERO    &
@@ -3633,14 +3633,14 @@ module MicBGCMod
 !     RCCX,RCCQ=max N,P recycling fractions
 !
   MID1=micpar%get_micb_id(1,NGL);MID3=micpar%get_micb_id(3,NGL)
-  IF(OMEhetr(ielmc,MID3,K).GT.ZEROS .AND.OMEhetr(ielmc,MID1,K).GT.ZEROS)THEN
+  IF(OMEheter(ielmc,MID3,K).GT.ZEROS .AND.OMEheter(ielmc,MID1,K).GT.ZEROS)THEN
     CCC=AZMAX1(AMIN1(1.0_r8 &
-      ,OMEhetr(ielmn,MID3,K)/(OMEhetr(ielmn,MID3,K)+OMEhetr(ielmc,MID3,K)*rNCOMC(3,NGL,K)) &
-      ,OMEhetr(ielmp,MID3,K)/(OMEhetr(ielmp,MID3,K)+OMEhetr(ielmc,MID3,K)*rPCOMC(3,NGL,K))))
-    CXC=OMEhetr(ielmc,MID3,K)/OMEhetr(ielmc,MID1,K)
+      ,OMEheter(ielmn,MID3,K)/(OMEheter(ielmn,MID3,K)+OMEheter(ielmc,MID3,K)*rNCOMC(3,NGL,K)) &
+      ,OMEheter(ielmp,MID3,K)/(OMEheter(ielmp,MID3,K)+OMEheter(ielmc,MID3,K)*rPCOMC(3,NGL,K))))
+    CXC=OMEheter(ielmc,MID3,K)/OMEheter(ielmc,MID1,K)
     C3C=1.0_r8/(1.0_r8+CXC/CKC)
-    CNC=AZMAX1(AMIN1(1.0_r8,OMEhetr(ielmc,MID3,K)/(OMEhetr(ielmc,MID3,K)+OMEhetr(ielmn,MID3,K)/rNCOMC(3,NGL,K))))
-    CPC=AZMAX1(AMIN1(1.0_r8,OMEhetr(ielmc,MID3,K)/(OMEhetr(ielmc,MID3,K)+OMEhetr(ielmp,MID3,K)/rPCOMC(3,NGL,K))))
+    CNC=AZMAX1(AMIN1(1.0_r8,OMEheter(ielmc,MID3,K)/(OMEheter(ielmc,MID3,K)+OMEheter(ielmn,MID3,K)/rNCOMC(3,NGL,K))))
+    CPC=AZMAX1(AMIN1(1.0_r8,OMEheter(ielmc,MID3,K)/(OMEheter(ielmc,MID3,K)+OMEheter(ielmp,MID3,K)/rPCOMC(3,NGL,K))))
     RCCC=RCCZ+AMAX1(CCC,C3C)*RCCY
     RCCN=CNC*RCCX
     RCCP=CPC*RCCQ
@@ -3659,14 +3659,14 @@ module MicBGCMod
 !     FL=partitioning between labile and resistant microbial components
 !     OMC,OMN,OMP=nonstructural microbial C,N,P
 ! M=1:labile, 2, resistant
-  CGOMZ=TFNG(NGL,K)*OMGR*AZMAX1(OMEhetr(ielmc,MID3,K))
+  CGOMZ=TFNG(NGL,K)*OMGR*AZMAX1(OMEheter(ielmc,MID3,K))
   D745: DO M=1,2
     CGOMES(ielmc,M,NGL,K)=FL(M)*CGOMZ
-    IF(OMEhetr(ielmc,MID3,K).GT.ZEROS)THEN
-      CGOMES(ielmn,M,NGL,K)=AMIN1(FL(M)*AZMAX1(OMEhetr(ielmn,MID3,K)) &
-        ,CGOMES(ielmc,M,NGL,K)*OMEhetr(ielmn,MID3,K)/OMEhetr(ielmc,MID3,K))
-      CGOMES(ielmp,M,NGL,K)=AMIN1(FL(M)*AZMAX1(OMEhetr(ielmp,MID3,K)) &
-        ,CGOMES(ielmc,M,NGL,K)*OMEhetr(ielmp,MID3,K)/OMEhetr(ielmc,MID3,K))
+    IF(OMEheter(ielmc,MID3,K).GT.ZEROS)THEN
+      CGOMES(ielmn,M,NGL,K)=AMIN1(FL(M)*AZMAX1(OMEheter(ielmn,MID3,K)) &
+        ,CGOMES(ielmc,M,NGL,K)*OMEheter(ielmn,MID3,K)/OMEheter(ielmc,MID3,K))
+      CGOMES(ielmp,M,NGL,K)=AMIN1(FL(M)*AZMAX1(OMEheter(ielmp,MID3,K)) &
+        ,CGOMES(ielmc,M,NGL,K)*OMEheter(ielmp,MID3,K)/OMEheter(ielmc,MID3,K))
     ELSE
       CGOMES(ielmn,M,NGL,K)=0.0_r8
       CGOMES(ielmp,M,NGL,K)=0.0_r8
@@ -3684,9 +3684,9 @@ module MicBGCMod
 !
     MID=micpar%get_micb_id(M,NGL)
     SPOMX=SQRT(TFNG(NGL,K))*SPOMC(M)*SPOMK(M)
-    RXOMEheter(ielmc,M,NGL,K)=AZMAX1(OMEhetr(ielmc,MID,K)*SPOMX)
-    RXOMEheter(ielmn,M,NGL,K)=AZMAX1(OMEhetr(ielmn,MID,K)*SPOMX)
-    RXOMEheter(ielmp,M,NGL,K)=AZMAX1(OMEhetr(ielmp,MID,K)*SPOMX)
+    RXOMEheter(ielmc,M,NGL,K)=AZMAX1(OMEheter(ielmc,MID,K)*SPOMX)
+    RXOMEheter(ielmn,M,NGL,K)=AZMAX1(OMEheter(ielmn,MID,K)*SPOMX)
+    RXOMEheter(ielmp,M,NGL,K)=AZMAX1(OMEheter(ielmp,MID,K)*SPOMX)
     RDOMEheter(ielmc,M,NGL,K)=RXOMEheter(ielmc,M,NGL,K)*(1.0_r8-RCCC)
     RDOMEheter(ielmn,M,NGL,K)=RXOMEheter(ielmn,M,NGL,K)*(1.0_r8-RCCC)*(1.0_r8-RCCN)
     RDOMEheter(ielmp,M,NGL,K)=RXOMEheter(ielmp,M,NGL,K)*(1.0_r8-RCCC)*(1.0_r8-RCCP)
@@ -3726,9 +3726,9 @@ module MicBGCMod
     FRM=RXOMT/RMOMT
     D730: DO M=1,2
       MID=micpar%get_micb_id(M,NGL)    
-      RXMMEheter(ielmc,M,NGL,K)=AMIN1(OMEhetr(ielmc,MID,K),AZMAX1(FRM*RMOMC(M,NGL,K)/RCCC))
-      RXMMEheter(ielmn,M,NGL,K)=AMIN1(OMEhetr(ielmn,MID,K),AZMAX1(RXMMEheter(ielmc,M,NGL,K)*CNOMA(NGL,K)))
-      RXMMEheter(ielmp,M,NGL,K)=AMIN1(OMEhetr(ielmp,MID,K),AZMAX1(RXMMEheter(ielmc,M,NGL,K)*CPOMA(NGL,K)))
+      RXMMEheter(ielmc,M,NGL,K)=AMIN1(OMEheter(ielmc,MID,K),AZMAX1(FRM*RMOMC(M,NGL,K)/RCCC))
+      RXMMEheter(ielmn,M,NGL,K)=AMIN1(OMEheter(ielmn,MID,K),AZMAX1(RXMMEheter(ielmc,M,NGL,K)*CNOMA(NGL,K)))
+      RXMMEheter(ielmp,M,NGL,K)=AMIN1(OMEheter(ielmp,MID,K),AZMAX1(RXMMEheter(ielmc,M,NGL,K)*CPOMA(NGL,K)))
       RDMMEheter(ielmc,M,NGL,K)=RXMMEheter(ielmc,M,NGL,K)*(1.0_r8-RCCC)
       RDMMEheter(ielmn,M,NGL,K)=RXMMEheter(ielmn,M,NGL,K)*(1.0_r8-RCCN)*(1.0_r8-RCCC)
       RDMMEheter(ielmp,M,NGL,K)=RXMMEheter(ielmp,M,NGL,K)*(1.0_r8-RCCP)*(1.0_r8-RCCC)

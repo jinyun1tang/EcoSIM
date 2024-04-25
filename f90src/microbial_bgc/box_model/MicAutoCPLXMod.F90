@@ -188,8 +188,8 @@ module MicAutoCPLXMod
 ! ROXYF,ROXYL=net O2 gaseous, aqueous fluxes from previous hour
 ! OLSGL=aqueous O2 diffusivity
 ! OXYG,OXYS=gaseous, aqueous O2 amounts
-! Rain2LitRSurf,Irrig2LitRSurf=surface water flux from precipitation, irrigation
-! O2_rain_conc,O2_irrig_conc=O2 concentration in Rain2LitRSurf,Irrig2LitRSurf
+! Rain2LitRSurf_col,Irrig2LitRSurf=surface water flux from precipitation, irrigation
+! O2_rain_conc,O2_irrig_conc=O2 concentration in Rain2LitRSurf_col,Irrig2LitRSurf
 !
   RUPOXff(NGL)=0.0_r8
 
@@ -674,7 +674,7 @@ module MicAutoCPLXMod
     O2_rain_conc   => micfor%O2_rain_conc  , &
     O2_irrig_conc   => micfor%O2_irrig_conc  , &
     Irrig2LitRSurf  => micfor%Irrig2LitRSurf  , &
-    Rain2LitRSurf  => micfor%Rain2LitRSurf  , &
+    Rain2LitRSurf_col  => micfor%Rain2LitRSurf_col  , &
     litrm  => micfor%litrm  , &
     OLSGL => micfor%OLSGL , &
     ROXYL => micfor%ROXYL  , &
@@ -693,10 +693,10 @@ module MicAutoCPLXMod
     OXYS => micstt%OXYS , &
     COXYG => micstt%COXYG,   &
     ROXSK=> micflx%ROXSK, &
-    RVMX4ff => micflx%RVMX4ff,  &
-    RVMB4ff => micflx%RVMB4ff, &
-    RVMX2ff => micflx%RVMX2ff, &
-    RVMB2ff => micflx%RVMB2ff  &
+    RNH3OxidAutor => micflx%RNH3OxidAutor,  &
+    RNH3OxidAutorBand => micflx%RNH3OxidAutorBand, &
+    RNO2OxidAutor => micflx%RNO2OxidAutor, &
+    RNO2OxidAutorBand => micflx%RNO2OxidAutorBand  &
   )
 
   IF(ROXYPff(NGL).GT.ZEROS.AND.FOXYX.GT.ZERO)THEN
@@ -713,7 +713,7 @@ module MicAutoCPLXMod
         ROXYLX=ROXYL*dts_gas*FOXYX
       ELSE
         OXYG1=COXYG*VLsoiAirPM(1)*FOXYX
-        ROXYLX=(ROXYL+Rain2LitRSurf*O2_rain_conc &
+        ROXYLX=(ROXYL+Rain2LitRSurf_col*O2_rain_conc &
           +Irrig2LitRSurf*O2_irrig_conc)*dts_gas*FOXYX
       ENDIF
       OXYS1=OXYS*FOXYX
@@ -783,11 +783,11 @@ module MicAutoCPLXMod
       !
       WFNff(NGL)=AMIN1(1.0,AZMAX1(RUPOXff(NGL)/ROXYPff(NGL)))
       IF(N.EQ.AmmoniaOxidizeBacteria)THEN
-        RVMX4ff(NGL)=RVMX4ff(NGL)*WFNff(NGL)
-        RVMB4ff(NGL)=RVMB4ff(NGL)*WFNff(NGL)
+        RNH3OxidAutor(NGL)=RNH3OxidAutor(NGL)*WFNff(NGL)
+        RNH3OxidAutorBand(NGL)=RNH3OxidAutorBand(NGL)*WFNff(NGL)
       ELSEIF(N.EQ.NitriteOxidizeBacteria)THEN
-        RVMX2ff(NGL)=RVMX2ff(NGL)*WFNff(NGL)
-        RVMB2ff(NGL)=RVMB2ff(NGL)*WFNff(NGL)
+        RNO2OxidAutor(NGL)=RNO2OxidAutor(NGL)*WFNff(NGL)
+        RNO2OxidAutorBand(NGL)=RNO2OxidAutorBand(NGL)*WFNff(NGL)
       ENDIF
     ELSE
       RUPOXff(NGL)=ROXYPff(NGL)
@@ -867,8 +867,8 @@ module MicAutoCPLXMod
     CNO2S  => micstt%CNO2S   ,    &
     ZNO2B  => micstt%ZNO2B   ,    &
     ZNO2S  => micstt%ZNO2S   ,    &
-    RVMX2ff => micflx%RVMX2ff,    &
-    RVMB2ff  => micflx%RVMB2ff    &
+    RNO2OxidAutor => micflx%RNO2OxidAutor,    &
+    RNO2OxidAutorBand  => micflx%RNO2OxidAutorBand    &
   )
 !
 !     FACTOR TO CONSTRAIN NO2 UPAKE AMONG COMPETING MICROBIAL
@@ -877,12 +877,12 @@ module MicAutoCPLXMod
 !     FNO2,FNB2=fraction of total biological demand for NO2
 !
   IF(RNO2Y.GT.ZEROS)THEN
-    FNO2=AMAX1(FMN,RVMX2ff(NGL)/RNO2Y)
+    FNO2=AMAX1(FMN,RNO2OxidAutor(NGL)/RNO2Y)
   ELSE
     FNO2=AMAX1(FMN,FOMNff(NGL)*VLNO3)
   ENDIF
   IF(RN2BY.GT.ZEROS)THEN
-    FNB2=AMAX1(FMN,RVMB2ff(NGL)/RN2BY)
+    FNB2=AMAX1(FMN,RNO2OxidAutorBand(NGL)/RN2BY)
   ELSE
     FNB2=AMAX1(FMN,FOMNff(NGL)*VLNOB)
   ENDIF
@@ -933,8 +933,8 @@ module MicAutoCPLXMod
   RDNO3ff(NGL)=0.0_r8
   RDNOBff(NGL)=0.0_r8
   RDN2Off(NGL)=0.0_r8
-  RVMX2ff(NGL)=VMXD4S
-  RVMB2ff(NGL)=VMXD4B
+  RNO2OxidAutor(NGL)=VMXD4S
+  RNO2OxidAutorBand(NGL)=VMXD4B
   RVOXA(NGL)=RVOXA(NGL)+0.333_r8*RDNO2ff(NGL)
   RVOXB(NGL)=RVOXB(NGL)+0.333_r8*RDN2Bff(NGL)
 !     TRN2ON=TRN2ON+RDNO2ff(NGL)+RDN2Bff(NGL)
@@ -986,8 +986,8 @@ module MicAutoCPLXMod
     CNH4B  => micstt%CNH4B , &
     ZNH4S  => micstt%ZNH4S , &
     ZNH4B  => micstt%ZNH4B , &
-    RVMX4ff=> micflx%RVMX4ff, &
-    RVMB4ff=> micflx%RVMB4ff,  &
+    RNH3OxidAutor=> micflx%RNH3OxidAutor, &
+    RNH3OxidAutorBand=> micflx%RNH3OxidAutorBand,  &
     ROXYSff => micflx%ROXYSff   &
   )
 !
@@ -999,12 +999,12 @@ module MicAutoCPLXMod
   FNH4S=VLNH4
   FNHBS=VLNHB
   IF(RNH4Y.GT.ZEROS)THEN
-    FNH4=AMAX1(FMN,RVMX4ff(NGL)/RNH4Y)
+    FNH4=AMAX1(FMN,RNH3OxidAutor(NGL)/RNH4Y)
   ELSE
     FNH4=AMAX1(FMN,VLNH4*FOMAff(NGL))
   ENDIF
   IF(RNHBY.GT.ZEROS)THEN
-    FNB4=AMAX1(FMN,RVMB4ff(NGL)/RNHBY)
+    FNB4=AMAX1(FMN,RNH3OxidAutorBand(NGL)/RNHBY)
   ELSE
     FNB4=AMAX1(FMN,VLNHB*FOMAff(NGL))
   ENDIF
@@ -1068,8 +1068,8 @@ module MicAutoCPLXMod
   RVOXPA=RNNH4
   RVOXPB=RNNHB
   RGOMP=AZMAX1(RVOXP*ECNH*ECHZ)
-  RVMX4ff(NGL)=VMX4S
-  RVMB4ff(NGL)=VMX4B
+  RNH3OxidAutor(NGL)=VMX4S
+  RNH3OxidAutorBand(NGL)=VMX4B
 !
 !     O2 DEMAND FROM NH3 OXIDATION
 !
@@ -1125,8 +1125,8 @@ module MicAutoCPLXMod
     CNO2B  => micstt%CNO2B   , &
     ZNO2S  => micstt%ZNO2S   , &
     ZNO2B  => micstt%ZNO2B   , &
-    RVMX2ff=> micflx%RVMX2ff  , &
-    RVMB2ff => micflx%RVMB2ff , &
+    RNO2OxidAutor=> micflx%RNO2OxidAutor  , &
+    RNO2OxidAutorBand => micflx%RNO2OxidAutorBand , &
     ROXYSff => micflx%ROXYSff   &
   )
 !     FACTOR TO REGULATE COMPETITION FOR NO2 AMONG DIFFERENT
@@ -1137,12 +1137,12 @@ module MicAutoCPLXMod
   FNH4S=VLNH4
   FNHBS=VLNHB
   IF(RNO2Y.GT.ZEROS)THEN
-    FNO2=AMAX1(FMN,RVMX2ff(NGL)/RNO2Y)
+    FNO2=AMAX1(FMN,RNO2OxidAutor(NGL)/RNO2Y)
   ELSE
     FNO2=AMAX1(FMN,FOMNff(NGL)*VLNO3)
   ENDIF
   IF(RN2BY.GT.ZEROS)THEN
-    FNB2=AMAX1(FMN,RVMB2ff(NGL)/RN2BY)
+    FNB2=AMAX1(FMN,RNO2OxidAutorBand(NGL)/RN2BY)
   ELSE
     FNB2=AMAX1(FMN,FOMNff(NGL)*VLNOB)
   ENDIF
@@ -1182,8 +1182,8 @@ module MicAutoCPLXMod
   RVOXPA=RNNO2
   RVOXPB=RNNOB
   RGOMP=AZMAX1(RVOXP*ECNO*ECHZ)
-  RVMX2ff(NGL)=VMX2S
-  RVMB2ff(NGL)=VMX2B
+  RNO2OxidAutor(NGL)=VMX2S
+  RNO2OxidAutorBand(NGL)=VMX2B
 !
 !     O2 DEMAND FROM NO2 OXIDATION
 !

@@ -131,9 +131,9 @@ implicit none
             DO M=1,nlbiomcp
               MID=micpar%get_micb_id(M,NGL)
               DO NE=1,NumPlantChemElms
-                FOMC=FSINK*OMEhetr(NE,MID,K,L,NY,NX)
-                OMEhetr(NE,MID,K,LL,NY,NX)=OMEhetr(NE,MID,K,LL,NY,NX)+FOMC                
-                OMEhetr(NE,MID,K,L,NY,NX)=OMEhetr(NE,MID,K,L,NY,NX)-FOMC
+                FOMC=FSINK*OMEheter(NE,MID,K,L,NY,NX)
+                OMEheter(NE,MID,K,LL,NY,NX)=OMEheter(NE,MID,K,LL,NY,NX)+FOMC                
+                OMEheter(NE,MID,K,L,NY,NX)=OMEheter(NE,MID,K,L,NY,NX)-FOMC
               ENDDO
             enddo
           enddo

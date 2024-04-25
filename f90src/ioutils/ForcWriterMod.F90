@@ -57,7 +57,7 @@ implicit none
     call ncd_defdim(ncf,'NumLiveAutoBioms',NumLiveAutoBioms,recordDimID)
     call ncd_defdim(ncf,'NumLiveHeterBioms',NumLiveHeterBioms,recordDimID)
     call ncd_defdim(ncf,'NumMicrbHetetrophCmplx',NumMicrbHetetrophCmplx,recordDimID)
-    call ncd_defdim(ncf,'NumMicrobAutotrophCmplx',NumMicrobAutotrophCmplx,recordDimID)
+    call ncd_defdim(ncf,'NumMicrobAutrophCmplx',NumMicrobAutrophCmplx,recordDimID)
     call ncd_defdim(ncf,'element',NumPlantChemElms,recordDimID)
     call ncd_defdim(ncf,'ndoms',trc_confs%NDOMS,recordDimID)
     call ncd_defvar(ncf, 'pH', ncd_float, long_name='soil pH',  &
@@ -162,7 +162,7 @@ implicit none
     call ncd_defvar(ncf, 'ORM', ncd_float, dim1name='element',dim2name='ndbiomcp',&
             dim3name='jcplx',long_name='microbial residue C in each complex',  &
             units='gC d-2', missing_value=spval, fill_value=spval)
-    call ncd_defvar(ncf, 'OMEhetr', ncd_float,dim1name='element',&
+    call ncd_defvar(ncf, 'OMEheter', ncd_float,dim1name='element',&
             dim2name='NumLiveHeterBioms',dim3name='jcplx',&
             long_name='heterotrophic microbial biomass element in each complex',  &
             units='gC d-2', missing_value=spval, fill_value=spval)
@@ -263,7 +263,7 @@ implicit none
     call ncd_putvar(ncf,'OSM',OSM(:,:,:,L,NY,NX))
     call ncd_putvar(ncf,'OSA',OSA(:,:,L,NY,NX))
     call ncd_putvar(ncf,'ORM',ORM(:,:,:,L,NY,NX))
-    call ncd_putvar(ncf,'OMEhetr',OMEhetr(:,:,:,L,NY,NX))
+    call ncd_putvar(ncf,'OMEheter',OMEheter(:,:,:,L,NY,NX))
     call ncd_putvar(ncf,'OMEauto',OMEauto(:,:,L,NY,NX))
 
     if(bgc_forc_conf%laddband)then

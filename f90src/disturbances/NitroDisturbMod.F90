@@ -107,9 +107,9 @@ module NitroDisturbMod
               DO NGL=JGnio(N),JGnfo(N)
                 DO M=1,nlbiomcp
                   MID=micpar%get_micb_id(M,NGL)
-                  OCH=DCORPC*OMEhetr(ielmc,MID,K,L,NY,NX)
-                  ONH=DCORPC*OMEhetr(ielmn,MID,K,L,NY,NX)
-                  OPH=DCORPC*OMEhetr(ielmp,MID,K,L,NY,NX)
+                  OCH=DCORPC*OMEheter(ielmc,MID,K,L,NY,NX)
+                  ONH=DCORPC*OMEheter(ielmn,MID,K,L,NY,NX)
+                  OPH=DCORPC*OMEheter(ielmp,MID,K,L,NY,NX)
                   ONX=EFIRE(1,ITILL(I,NY,NX))*ONH
                   OPX=EFIRE(2,ITILL(I,NY,NX))*OPH
                   IF(micpar%is_litter(K))THEN
@@ -119,12 +119,12 @@ module NitroDisturbMod
                     ONL(1,K)=ONL(1,K)+ONH-ONX
                     OPL(1,K)=OPL(1,K)+OPH-OPX
                   ENDIF
-                  OMEhetr(ielmc,MID,K,L,NY,NX)=OMEhetr(ielmc,MID,K,L,NY,NX)-OCH
-                  OMEhetr(ielmn,MID,K,L,NY,NX)=OMEhetr(ielmn,MID,K,L,NY,NX)-ONH
-                  OMEhetr(ielmp,MID,K,L,NY,NX)=OMEhetr(ielmp,MID,K,L,NY,NX)-OPH
-                  DC=DC+OMEhetr(ielmc,MID,K,L,NY,NX)
-                  DN=DN+OMEhetr(ielmn,MID,K,L,NY,NX)
-                  DP=DP+OMEhetr(ielmp,MID,K,L,NY,NX)
+                  OMEheter(ielmc,MID,K,L,NY,NX)=OMEheter(ielmc,MID,K,L,NY,NX)-OCH
+                  OMEheter(ielmn,MID,K,L,NY,NX)=OMEheter(ielmn,MID,K,L,NY,NX)-ONH
+                  OMEheter(ielmp,MID,K,L,NY,NX)=OMEheter(ielmp,MID,K,L,NY,NX)-OPH
+                  DC=DC+OMEheter(ielmc,MID,K,L,NY,NX)
+                  DN=DN+OMEheter(ielmn,MID,K,L,NY,NX)
+                  DP=DP+OMEheter(ielmp,MID,K,L,NY,NX)
                   OC=OC+OCH
                   ON=ON+ONX
                   OP=OP+OPX

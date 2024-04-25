@@ -51,7 +51,7 @@ module TillageMixMod
   real(r8) :: TOMGC(1:NumLiveHeterBioms,1:jcplx)
   real(r8) :: TOMGN(1:NumLiveHeterBioms,1:jcplx)
   real(r8) :: TOMGP(1:NumLiveHeterBioms,1:jcplx)
-  REAL(R8) :: TOMEhetr(NumPlantChemElms,NumLiveHeterBioms,1:jcplx)
+  REAL(R8) :: TOMEheter(NumPlantChemElms,NumLiveHeterBioms,1:jcplx)
   REAL(R8) :: TOMEauto(NumPlantChemElms,NumLiveAutoBioms)
   real(r8) :: TORM(NumPlantChemElms,ndbiomcp,1:jcplx)
   real(r8) :: TDOM(idom_beg:idom_end,1:jcplx)
@@ -128,7 +128,7 @@ module TillageMixMod
     TP_salml(idsp_beg:idsp_end)=0._r8
     TG_gasml(idg_beg:idg_end-1)=0._r8
 
-    TOMEhetr=0.0_r8
+    TOMEheter=0.0_r8
     TOMEauto=0.0_r8
     TORM=0.0_r8
     TDOM=0.0_r8
@@ -162,15 +162,15 @@ module TillageMixMod
         DO NGL=JGnio(N),JGnfo(N)
           DO  M=1,nlbiomcp
             MID=micpar%get_micb_id(M,NGL)
-            TOMGC(MID,K)=OMEhetr(ielmc,MID,K,0,NY,NX)*CORP0
-            TOMGN(MID,K)=OMEhetr(ielmn,MID,K,0,NY,NX)*CORP0
-            TOMGP(MID,K)=OMEhetr(ielmp,MID,K,0,NY,NX)*CORP0
-            OMEhetr(ielmc,MID,K,0,NY,NX)=OMEhetr(ielmc,MID,K,0,NY,NX)*XCORP0
-            OMEhetr(ielmn,MID,K,0,NY,NX)=OMEhetr(ielmn,MID,K,0,NY,NX)*XCORP0
-            OMEhetr(ielmp,MID,K,0,NY,NX)=OMEhetr(ielmp,MID,K,0,NY,NX)*XCORP0
-            DC=DC+OMEhetr(ielmc,MID,K,0,NY,NX)
-            DN=DN+OMEhetr(ielmn,MID,K,0,NY,NX)
-            DP=DP+OMEhetr(ielmp,MID,K,0,NY,NX)
+            TOMGC(MID,K)=OMEheter(ielmc,MID,K,0,NY,NX)*CORP0
+            TOMGN(MID,K)=OMEheter(ielmn,MID,K,0,NY,NX)*CORP0
+            TOMGP(MID,K)=OMEheter(ielmp,MID,K,0,NY,NX)*CORP0
+            OMEheter(ielmc,MID,K,0,NY,NX)=OMEheter(ielmc,MID,K,0,NY,NX)*XCORP0
+            OMEheter(ielmn,MID,K,0,NY,NX)=OMEheter(ielmn,MID,K,0,NY,NX)*XCORP0
+            OMEheter(ielmp,MID,K,0,NY,NX)=OMEheter(ielmp,MID,K,0,NY,NX)*XCORP0
+            DC=DC+OMEheter(ielmc,MID,K,0,NY,NX)
+            DN=DN+OMEheter(ielmn,MID,K,0,NY,NX)
+            DP=DP+OMEheter(ielmp,MID,K,0,NY,NX)
           enddo
         enddo
       ENDDO
@@ -382,9 +382,9 @@ module TillageMixMod
             DO NGL=JGnio(N),JGnfo(N)
               DO  M=1,nlbiomcp
                 MID=micpar%get_micb_id(M,NGL)
-                TOMEhetr(ielmc,MID,K)=TOMEhetr(ielmc,MID,K)+TI*OMEhetr(ielmc,MID,K,L,NY,NX)
-                TOMEhetr(ielmn,MID,K)=TOMEhetr(ielmn,MID,K)+TI*OMEhetr(ielmn,MID,K,L,NY,NX)
-                TOMEhetr(ielmp,MID,K)=TOMEhetr(ielmp,MID,K)+TI*OMEhetr(ielmp,MID,K,L,NY,NX)
+                TOMEheter(ielmc,MID,K)=TOMEheter(ielmc,MID,K)+TI*OMEheter(ielmc,MID,K,L,NY,NX)
+                TOMEheter(ielmn,MID,K)=TOMEheter(ielmn,MID,K)+TI*OMEheter(ielmn,MID,K,L,NY,NX)
+                TOMEheter(ielmp,MID,K)=TOMEheter(ielmp,MID,K)+TI*OMEheter(ielmp,MID,K,L,NY,NX)
               enddo
             enddo
           enddo
@@ -522,12 +522,12 @@ module TillageMixMod
             DO NGL=JGnio(N),JGnfo(N)
               DO  M=1,nlbiomcp
                 MID=micpar%get_micb_id(M,NGL)
-                OMEhetr(ielmc,MID,K,L,NY,NX)=TI*OMEhetr(ielmc,MID,K,L,NY,NX)+CORP*(FI*TOMEhetr(ielmc,MID,K) &
-                  -TI*OMEhetr(ielmc,MID,K,L,NY,NX))+TX*OMEhetr(ielmc,MID,K,L,NY,NX)
-                OMEhetr(ielmn,MID,K,L,NY,NX)=TI*OMEhetr(ielmn,MID,K,L,NY,NX)+CORP*(FI*TOMEhetr(ielmn,MID,K) &
-                  -TI*OMEhetr(ielmn,MID,K,L,NY,NX))+TX*OMEhetr(ielmn,MID,K,L,NY,NX)
-                OMEhetr(ielmp,MID,K,L,NY,NX)=TI*OMEhetr(ielmp,MID,K,L,NY,NX)+CORP*(FI*TOMEhetr(ielmp,MID,K) &
-                  -TI*OMEhetr(ielmp,MID,K,L,NY,NX))+TX*OMEhetr(ielmp,MID,K,L,NY,NX)
+                OMEheter(ielmc,MID,K,L,NY,NX)=TI*OMEheter(ielmc,MID,K,L,NY,NX)+CORP*(FI*TOMEheter(ielmc,MID,K) &
+                  -TI*OMEheter(ielmc,MID,K,L,NY,NX))+TX*OMEheter(ielmc,MID,K,L,NY,NX)
+                OMEheter(ielmn,MID,K,L,NY,NX)=TI*OMEheter(ielmn,MID,K,L,NY,NX)+CORP*(FI*TOMEheter(ielmn,MID,K) &
+                  -TI*OMEheter(ielmn,MID,K,L,NY,NX))+TX*OMEheter(ielmn,MID,K,L,NY,NX)
+                OMEheter(ielmp,MID,K,L,NY,NX)=TI*OMEheter(ielmp,MID,K,L,NY,NX)+CORP*(FI*TOMEheter(ielmp,MID,K) &
+                  -TI*OMEheter(ielmp,MID,K,L,NY,NX))+TX*OMEheter(ielmp,MID,K,L,NY,NX)
               enddo
             enddo
           enddo
@@ -597,9 +597,9 @@ module TillageMixMod
             DO NGL=JGnio(N),JGnfo(N)
               DO M=1,nlbiomcp
                 MID=micpar%get_micb_id(M,NGL)
-                OMEhetr(ielmc,MID,K,L,NY,NX)=OMEhetr(ielmc,MID,K,L,NY,NX)+FI*TOMGC(MID,K)
-                OMEhetr(ielmn,MID,K,L,NY,NX)=OMEhetr(ielmn,MID,K,L,NY,NX)+FI*TOMGN(MID,K)
-                OMEhetr(ielmp,MID,K,L,NY,NX)=OMEhetr(ielmp,MID,K,L,NY,NX)+FI*TOMGP(MID,K)
+                OMEheter(ielmc,MID,K,L,NY,NX)=OMEheter(ielmc,MID,K,L,NY,NX)+FI*TOMGC(MID,K)
+                OMEheter(ielmn,MID,K,L,NY,NX)=OMEheter(ielmn,MID,K,L,NY,NX)+FI*TOMGN(MID,K)
+                OMEheter(ielmp,MID,K,L,NY,NX)=OMEheter(ielmp,MID,K,L,NY,NX)+FI*TOMGP(MID,K)
               enddo
             enddo
           ENDDO
@@ -653,9 +653,9 @@ module TillageMixMod
             DO NGL=JGnio(N),JGnfo(N)
               DO  M=1,nlbiomcp
                 MID=micpar%get_micb_id(M,NGL)
-                OC=OC+OMEhetr(ielmc,MID,K,L,NY,NX)
-                ON=ON+OMEhetr(ielmn,MID,K,L,NY,NX)
-                OP=OP+OMEhetr(ielmp,MID,K,L,NY,NX)
+                OC=OC+OMEheter(ielmc,MID,K,L,NY,NX)
+                ON=ON+OMEheter(ielmn,MID,K,L,NY,NX)
+                OP=OP+OMEheter(ielmp,MID,K,L,NY,NX)
               enddo
             enddo
           enddo
@@ -666,9 +666,9 @@ module TillageMixMod
             DO NGL=JGnio(N),JGnfo(N)
               DO  M=1,nlbiomcp
                 MID=micpar%get_micb_id(M,NGL)
-                DC=DC+OMEhetr(ielmc,MID,K,L,NY,NX)
-                DN=DN+OMEhetr(ielmn,MID,K,L,NY,NX)
-                DP=DP+OMEhetr(ielmp,MID,K,L,NY,NX)
+                DC=DC+OMEheter(ielmc,MID,K,L,NY,NX)
+                DN=DN+OMEheter(ielmn,MID,K,L,NY,NX)
+                DP=DP+OMEheter(ielmp,MID,K,L,NY,NX)
               enddo
             enddo
           enddo
