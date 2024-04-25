@@ -331,7 +331,7 @@ implicit none
   micflx%RIPBOff(1:NumMicrobAutrophCmplx)=RIPBOff(1:NumMicrobAutrophCmplx,L,NY,NX)
   micflx%RIPO1ff(1:NumMicrobAutrophCmplx)=RIPO1ff(1:NumMicrobAutrophCmplx,L,NY,NX)
   micflx%RIPB1ff(1:NumMicrobAutrophCmplx)=RIPB1ff(1:NumMicrobAutrophCmplx,L,NY,NX)
-  micflx%ROXYSff(1:NumMicrobAutrophCmplx)=ROXYSff(1:NumMicrobAutrophCmplx,L,NY,NX)
+  micflx%RO2DmndAutor(1:NumMicrobAutrophCmplx)=RO2DmndAutor(1:NumMicrobAutrophCmplx,L,NY,NX)
 
   micflx%RINHO(1:NumMicrbHetetrophCmplx,1:jcplx)=RINHO(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX)
   micflx%RINHB(1:NumMicrbHetetrophCmplx,1:jcplx)=RINHB(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX)
@@ -341,7 +341,7 @@ implicit none
   micflx%RIPBO(1:NumMicrbHetetrophCmplx,1:jcplx)=RIPBO(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX)
   micflx%RIPO1(1:NumMicrbHetetrophCmplx,1:jcplx)=RIPO1(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX)
   micflx%RIPB1(1:NumMicrbHetetrophCmplx,1:jcplx)=RIPB1(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX)
-  micflx%ROXYS(1:NumMicrbHetetrophCmplx,1:jcplx)=ROXYS(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX)
+  micflx%RO2DmndHeter(1:NumMicrbHetetrophCmplx,1:jcplx)=RO2DmndHeter(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX)
 
   end subroutine MicAPISend
 
@@ -385,12 +385,12 @@ implicit none
   RDOM_micb_flx(idom_dop,1:jcplx,L,NY,NX)=micflx%RDOM_micb_flx(idom_dop,1:jcplx)
   RDOM_micb_flx(idom_acetate,1:jcplx,L,NY,NX)=micflx%RDOM_micb_flx(idom_acetate,1:jcplx)
 
-  ROXYSff(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%ROXYSff(1:NumMicrobAutrophCmplx)
+  RO2DmndAutor(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RO2DmndAutor(1:NumMicrobAutrophCmplx)
   RNH3OxidAutor(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RNH3OxidAutor(1:NumMicrobAutrophCmplx)
   RNH3OxidAutorBand(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RNH3OxidAutorBand(1:NumMicrobAutrophCmplx)
   RNO2OxidAutor(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RNO2OxidAutor(1:NumMicrobAutrophCmplx)
   RNO2OxidAutorBand(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RNO2OxidAutorBand(1:NumMicrobAutrophCmplx)
-  ROXYS(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX)=micflx%ROXYS(1:NumMicrbHetetrophCmplx,1:jcplx)
+  RO2DmndHeter(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX)=micflx%RO2DmndHeter(1:NumMicrbHetetrophCmplx,1:jcplx)
   ROQCS(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX)=micflx%ROQCS(1:NumMicrbHetetrophCmplx,1:jcplx)
   ROQAS(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX)=micflx%ROQAS(1:NumMicrbHetetrophCmplx,1:jcplx)
   RVMX3(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX)=micflx%RVMX3(1:NumMicrbHetetrophCmplx,1:jcplx)

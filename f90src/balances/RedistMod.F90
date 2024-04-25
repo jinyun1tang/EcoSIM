@@ -1586,7 +1586,7 @@ module RedistMod
   !     RN3BX=NO3 demand in band by all microbial,root,myco populations
   !     RPOBX=H2PO4 demand in band by all microbial,root,myco populations
   !     RP1BX=HPO4 demand in band by all microbial,root,myco populations
-  !     ROXYS=O2 demand from DOC,DOA oxidation
+  !     RO2DmndHeter=O2 demand from DOC,DOA oxidation
   !     RVMX4=demand for NH4 oxidation
   !     RVMX3=demand for NO3 reduction
   !     RVMX2=demand for NO2 oxidation
@@ -1604,7 +1604,7 @@ module RedistMod
     IF(micpar%is_litter(K))THEN
       DO  N=1,NumMicbFunGroups
         DO NGL=JGnio(N),JGnfo(N)
-          ROXYX(0,NY,NX)=ROXYX(0,NY,NX)+ROXYS(NGL,K,0,NY,NX)
+          ROXYX(0,NY,NX)=ROXYX(0,NY,NX)+RO2DmndHeter(NGL,K,0,NY,NX)
           RNH4X(0,NY,NX)=RNH4X(0,NY,NX)+RVMX4(NGL,K,0,NY,NX)
           RNO3X(0,NY,NX)=RNO3X(0,NY,NX)+RVMX3(NGL,K,0,NY,NX)
           RNO2X(0,NY,NX)=RNO2X(0,NY,NX)+RVMX2(NGL,K,0,NY,NX)
@@ -1626,7 +1626,7 @@ module RedistMod
 
   DO  N=1,NumMicbFunGroups
     DO NGL=JGniA(N),JGnfA(N)
-      ROXYX(0,NY,NX)=ROXYX(0,NY,NX)+ROXYSff(NGL,0,NY,NX)
+      ROXYX(0,NY,NX)=ROXYX(0,NY,NX)+RO2DmndAutor(NGL,0,NY,NX)
       RNH4X(0,NY,NX)=RNH4X(0,NY,NX)+RNH3OxidAutor(NGL,0,NY,NX)
       RNO3X(0,NY,NX)=RNO3X(0,NY,NX)+RVMX3ff(NGL,0,NY,NX)
       RNO2X(0,NY,NX)=RNO2X(0,NY,NX)+RNO2OxidAutor(NGL,0,NY,NX)
@@ -1656,7 +1656,7 @@ module RedistMod
 
   integer :: K,N,NGL
 
-  ROXYX(L,NY,NX)=ROXYX(L,NY,NX)+SUM(ROXYS(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX))
+  ROXYX(L,NY,NX)=ROXYX(L,NY,NX)+SUM(RO2DmndHeter(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX))
   RNH4X(L,NY,NX)=RNH4X(L,NY,NX)+SUM(RVMX4(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX)) &
     +SUM(RINHO(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX))
   RNO3X(L,NY,NX)=RNO3X(L,NY,NX)+SUM(RVMX3(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX)) &
@@ -1676,7 +1676,7 @@ module RedistMod
     ROQCX(K,L,NY,NX)=ROQCX(K,L,NY,NX)+SUM(ROQCS(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX))
     ROQAX(K,L,NY,NX)=ROQAX(K,L,NY,NX)+SUM(ROQAS(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX))
   ENDDO
-  ROXYX(L,NY,NX)=ROXYX(L,NY,NX)+SUM(ROXYSff(1:NumMicrbHetetrophCmplx,L,NY,NX))
+  ROXYX(L,NY,NX)=ROXYX(L,NY,NX)+SUM(RO2DmndAutor(1:NumMicrbHetetrophCmplx,L,NY,NX))
   RNH4X(L,NY,NX)=RNH4X(L,NY,NX)+SUM(RNH3OxidAutor(1:NumMicrbHetetrophCmplx,L,NY,NX)) &
     +SUM(RINHOff(1:NumMicrbHetetrophCmplx,L,NY,NX))
   RNO3X(L,NY,NX)=RNO3X(L,NY,NX)+SUM(RVMX3ff(1:NumMicrbHetetrophCmplx,L,NY,NX)) &

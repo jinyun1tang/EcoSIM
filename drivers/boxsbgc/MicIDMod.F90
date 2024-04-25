@@ -105,5 +105,5 @@ implicit none
   integer :: fid_RIPBO_b,fid_RIPBO_e
   integer :: fid_RIPO1_b,fid_RIPO1_e
   integer :: fid_RIPB1_b,fid_RIPB1_e
-  integer :: fid_ROXYS_b,fid_ROXYS_e
+  integer :: fid_RO2DmndHeter_b,fid_RO2DmndHeter_e
 end module MicIDMod

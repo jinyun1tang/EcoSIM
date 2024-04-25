@@ -699,7 +699,7 @@ module MicBGCMod
     OMA => nmics%OMA,         &
     RUPOX  => nmicf%RUPOX,    &
     RGOMO  => nmicf%RGOMO,    &
-    ROXYM => nmicf%ROXYM ,    &
+    RO2Dmnd4RespHeter => nmicf%RO2Dmnd4RespHeter ,    &
     ROXYP=> nmicf%ROXYP  ,    &
     ROXYO => nmicf%ROXYO ,    &
     RDNO3 => nmicf%RDNO3 ,    &
@@ -844,20 +844,20 @@ module MicBGCMod
     RCO2X(NGL,K)=0.333_r8*RGOMO(NGL,K)
     RCH3X(NGL,K)=0.667_r8*RGOMO(NGL,K)
     RCH4X(NGL,K)=0.0_r8
-    ROXYO(NGL,K)=ROXYM(NGL,K)
+    ROXYO(NGL,K)=RO2Dmnd4RespHeter(NGL,K)
     RH2GX(NGL,K)=0.111_r8*RGOMO(NGL,K)
   ELSEIF(N.EQ.micpar%AcetotroMethanogenArchea)THEN
     RGOMO(NGL,K)=RGOMP
     RCO2X(NGL,K)=0.50_r8*RGOMO(NGL,K)
     RCH3X(NGL,K)=0.0_r8
     RCH4X(NGL,K)=0.50_r8*RGOMO(NGL,K)
-    ROXYO(NGL,K)=ROXYM(NGL,K)
+    ROXYO(NGL,K)=RO2Dmnd4RespHeter(NGL,K)
     RH2GX(NGL,K)=0.0_r8
   ENDIF
 !
 !  write(*,*)'HETEROTROPHIC DENITRIFICATION'
 !
-  IF(N.EQ.micpar%n_anero_faculb.AND.ROXYM(NGL,K).GT.0.0_r8 &
+  IF(N.EQ.micpar%n_anero_faculb.AND.RO2Dmnd4RespHeter(NGL,K).GT.0.0_r8 &
     .AND.(.not.litrm.OR.VLSoilPoreMicP_vr.GT.ZEROS))THEN
 
     call HeteroDenitrificCatabolism(NGL,N,K,FOQC,RGOCP,&
@@ -2128,7 +2128,7 @@ module MicBGCMod
     FNO3XR  =>nmicf%FNO3XR,   &
     FP14XR  => nmicf%FP14XR,  &
     FPO4XR  => nmicf%FPO4XR,  &
-    ROXYS => micflx%ROXYS, &
+    RO2DmndHeter => micflx%RO2DmndHeter, &
     RINHO => micflx%RINHO, &
     RINHB => micflx%RINHB, &
     RINOO => micflx%RINOO, &
@@ -2176,7 +2176,7 @@ module MicBGCMod
 ! oxidation, OQA=acetate oxidation
 !
   IF(ROXYY.GT.ZEROS)THEN
-    FOXYX=AMAX1(FMN,ROXYS(NGL,K)/ROXYY)
+    FOXYX=AMAX1(FMN,RO2DmndHeter(NGL,K)/ROXYY)
   ELSE
     FOXYX=AMAX1(FMN,FOMA(NGL,K))
   ENDIF
@@ -2304,11 +2304,11 @@ module MicBGCMod
     FCNP  => nmics%FCNP,      &
     OMA   => nmics%OMA ,      &
     ROXYP => nmicf%ROXYP,     &
-    ROXYM => nmicf%ROXYM,     &
+    RO2Dmnd4RespHeter => nmicf%RO2Dmnd4RespHeter,     &
     ROQCD => nmicf%ROQCD,     &
     CDOM  => ncplxs%CDOM,   &
     DOM => micstt%DOM, &
-    ROXYS => micflx%ROXYS, &
+    RO2DmndHeter => micflx%RO2DmndHeter, &
     ROQCS => micflx%ROQCS, &
     ROQAS => micflx%ROQAS, &
     ZERO  => micfor%ZERO, &
@@ -2343,9 +2343,9 @@ module MicBGCMod
   RGOMP=AMIN1(RGOGX,RGOGZ)
   FGOCP=0.0_r8
   FGOAP=1.0_r8
-  ROXYM(NGL,K)=0.0_r8
+  RO2Dmnd4RespHeter(NGL,K)=0.0_r8
   ROXYP(NGL,K)=0.0_r8
-  ROXYS(NGL,K)=0.0_r8
+  RO2DmndHeter(NGL,K)=0.0_r8
   ROQCS(NGL,K)=0.0_r8
   ROQAS(NGL,K)=RGOGZ
   ROQCD(NGL,K)=0.0_r8
@@ -2375,13 +2375,13 @@ module MicBGCMod
   real(r8) :: RGOCY,RGOCZ,RGOAZ
   real(r8) :: RGOCX,RGOAX
   real(r8) :: RGOAP
-  real(r8) :: ROXYSX,ROQCSX,ROQASX
+  real(r8) :: RO2DmndHeterX,ROQCSX,ROQASX
   real(r8) :: FSBST
 !     begin_execution
   associate(                  &
     OMA   => nmics%OMA  ,     &
     FCNP  => nmics%FCNP ,     &
-    ROXYM => nmicf%ROXYM,     &
+    RO2Dmnd4RespHeter => nmicf%RO2Dmnd4RespHeter,     &
     ROXYP=> nmicf%ROXYP ,     &
     ROQCD => nmicf%ROQCD,     &
     ZEROS => micfor%ZEROS, &
@@ -2390,7 +2390,7 @@ module MicBGCMod
     n_anero_faculb => micpar%n_anero_faculb, &
     n_aero_fungi => micpar%n_aero_fungi, &
     n_aero_n2fixer => micpar%n_aero_n2fixer, &
-    ROXYS => micflx%ROXYS, &
+    RO2DmndHeter => micflx%RO2DmndHeter, &
     ROQCS => micflx%ROQCS, &
     ROQAS => micflx%ROQAS, &
     FOCA  => ncplxs%FOCA,     &
@@ -2446,17 +2446,17 @@ module MicBGCMod
 ! BY HETEROTROPHIC AEROBES
 
 ! ECHZ=growth respiration yield
-! ROXYM,ROXYP,ROXYS=O2 demand from DOC,DOA oxidation
+! RO2Dmnd4RespHeter,ROXYP,RO2DmndHeter=O2 demand from DOC,DOA oxidation
 ! ROQCS,ROQAS=DOC,DOA demand from DOC,DOA oxidation
 ! ROQCD=microbial respiration used to represent microbial activity
 !
   ECHZ=EO2Q*FGOCP+EO2A*FGOAP
-  ROXYM(NGL,K)=2.667_r8*RGOMP
-  ROXYP(NGL,K)=ROXYM(NGL,K)
-  ROXYSX=ROXYS(NGL,K)
+  RO2Dmnd4RespHeter(NGL,K)=2.667_r8*RGOMP
+  ROXYP(NGL,K)=RO2Dmnd4RespHeter(NGL,K)
+  RO2DmndHeterX=RO2DmndHeter(NGL,K)
   ROQCSX=ROQCS(NGL,K)
   ROQASX=ROQAS(NGL,K)
-  ROXYS(NGL,K)=ROXYP(NGL,K)
+  RO2DmndHeter(NGL,K)=ROXYP(NGL,K)
   ROQCS(NGL,K)=RGOCZ
   ROQAS(NGL,K)=RGOAZ
   ROQCD(NGL,K)=RGOCY
@@ -2489,7 +2489,7 @@ module MicBGCMod
   associate(                    &
     FCNP   => nmics%FCNP,       &
     OMA    => nmics%OMA ,       &
-    ROXYM  => nmicf%ROXYM,      &
+    RO2Dmnd4RespHeter  => nmicf%RO2Dmnd4RespHeter,      &
     ROXYP  => nmicf%ROXYP  ,    &
     ROQCD  => nmicf%ROQCD  ,    &
     TKS => micfor%TKS, &
@@ -2497,7 +2497,7 @@ module MicBGCMod
     DOM  => micstt%DOM, &
     CH2GS => micstt%CH2GS , &
     COXYS => micstt%COXYS, &
-    ROXYS  => micflx%ROXYS, &
+    RO2DmndHeter  => micflx%RO2DmndHeter, &
     ROQCS => micflx%ROQCS , &
     ROQAS => micflx%ROQAS, &
     n_anaero_ferm => micpar%n_anaero_ferm, &
@@ -2537,9 +2537,9 @@ module MicBGCMod
   RGOMP=AMIN1(RGOFX,RGOFZ)
   FGOCP=1.0_r8
   FGOAP=0.0_r8
-  ROXYM(NGL,K)=0.0_r8
+  RO2Dmnd4RespHeter(NGL,K)=0.0_r8
   ROXYP(NGL,K)=0.0_r8
-  ROXYS(NGL,K)=0.0_r8
+  RO2DmndHeter(NGL,K)=0.0_r8
   ROQCS(NGL,K)=RGOFZ
   ROQAS(NGL,K)=0.0_r8
   ROQCD(NGL,K)=RGOFY
@@ -2598,7 +2598,7 @@ module MicBGCMod
   associate(                  &
     WFN    => nmics%WFN,      &
     FOMA   => nmics%FOMA,     &
-    ROXYM => nmicf%ROXYM,     &
+    RO2Dmnd4RespHeter => nmicf%RO2Dmnd4RespHeter,     &
     ROXYO => nmicf%ROXYO,     &
     RDNO3 => nmicf%RDNO3,     &
     RDNOB => nmicf%RDNOB,     &
@@ -2664,7 +2664,7 @@ module MicBGCMod
 !     CONCENTRATIONS AND STOICHIOMETRY OF REDOX ELECTRON TRANSFER
 !     NOT ACCEPTED BY O2 IN BAND AND NON-BAND SOIL ZONES
 !
-!     ROXYD=O2 demand ROXYM not met by O2 uptake ROXYO
+!     ROXYD=O2 demand RO2Dmnd4RespHeter not met by O2 uptake ROXYO
 !     VMXD3=demand for NO3-N reduction
 !     VMXDXS,VMXDXB=maximum NO3 reduction in non-band, band
 !     FNO3S,FNO3B=fractions of total NO3 in non-band, band
@@ -2678,7 +2678,7 @@ module MicBGCMod
 !     RGOM3X,RGOMD3=substrate-unltd,-ltd respn from NO3 reduction
 !     RVMX3,RVMB3=demand for NO3 reduction in non-band,band
 !
-  ROXYD=AZMAX1(ROXYM(NGL,K)-ROXYO(NGL,K))
+  ROXYD=AZMAX1(RO2Dmnd4RespHeter(NGL,K)-ROXYO(NGL,K))
   VMXD3=0.875_r8*ROXYD
   IF(CNO3S.GT.ZERO)THEN
     VMXDXS=FNO3S*VMXD3*CNO3S/(CNO3S+Z3KM)/(1.0_r8+(CNO2S*Z3KM)/(CNO3S*Z2KM))
@@ -2870,7 +2870,7 @@ module MicBGCMod
     OMA    => nmics%OMA,      &
     RUPOX  => nmicf%RUPOX,    &
     RGOMO  => nmicf%RGOMO,    &
-    ROXYM => nmicf%ROXYM,     &
+    RO2Dmnd4RespHeter => nmicf%RO2Dmnd4RespHeter,     &
     ROXYP=> nmicf%ROXYP ,     &
     ROXYO => nmicf%ROXYO,     &
     RH2GX  => nmicf%RH2GX,    &
@@ -3017,7 +3017,7 @@ module MicBGCMod
   RCO2X(NGL,K)=RGOMO(NGL,K)
   RCH3X(NGL,K)=0.0_r8
   RCH4X(NGL,K)=0.0_r8
-  ROXYO(NGL,K)=ROXYM(NGL,K)*WFN(NGL,K)
+  ROXYO(NGL,K)=RO2Dmnd4RespHeter(NGL,K)*WFN(NGL,K)
   RH2GX(NGL,K)=0.0_r8
   !write(*,*)'finish AerobicHeterO2Uptake'
   end associate

@@ -10,7 +10,7 @@ implicit none
   __FILE__
 
   real(r8),target,allocatable :: OMEheter(:,:,:,:,:,:)    !microbial biomass element	[g d-2]
-  real(r8),target,allocatable :: ROXYS(:,:,:,:,:)    !aqueous O2 demand	[g d-2 h-1]
+  real(r8),target,allocatable :: RO2DmndHeter(:,:,:,:,:)    !aqueous O2 demand	[g d-2 h-1]
   real(r8),target,allocatable :: ROQCS(:,:,:,:,:)    !net microbial DOC flux	[g d-2 h-1]
   real(r8),target,allocatable :: ROQAS(:,:,:,:,:)    !net microbial acetate flux	[g d-2 h-1]
   real(r8),target,allocatable :: RINHO(:,:,:,:,:)    !microbial NH4 demand in soil	[g d-2 h-1]
@@ -35,7 +35,7 @@ implicit none
   real(r8),target,allocatable :: OMEERhetr(:,:,:,:,:,:,:)  !microbial C  erosion 	[g d-2 h-1]
 
   real(r8),target,allocatable :: OMEauto(:,:,:,:,:)
-  real(r8),target,allocatable :: ROXYSff(:,:,:,:)
+  real(r8),target,allocatable :: RO2DmndAutor(:,:,:,:)
   real(r8),target,allocatable :: RINHOff(:,:,:,:)
   real(r8),target,allocatable :: RINOOff(:,:,:,:)
   real(r8),target,allocatable :: RIPOOff(:,:,:,:)
@@ -73,7 +73,7 @@ implicit none
 
   implicit none
   allocate(OMEheter(NumPlantChemElms,NumLiveHeterBioms,1:jcplx,0:JZ,JY,JX))
-  allocate(ROXYS(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
+  allocate(RO2DmndHeter(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
   allocate(ROQCS(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
   allocate(ROQAS(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
   allocate(RINHO(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
@@ -98,7 +98,7 @@ implicit none
   allocate(OMEERhetr(NumPlantChemElms,NumLiveHeterBioms,1:jcplx,2,2,JV,JH))
 
   allocate(OMEauto(NumPlantChemElms,NumLiveAutoBioms,0:JZ,JY,JX))
-  allocate(ROXYSff(NumMicrobAutrophCmplx,0:JZ,JY,JX))
+  allocate(RO2DmndAutor(NumMicrobAutrophCmplx,0:JZ,JY,JX))
   allocate(RINHOff(NumMicrobAutrophCmplx,0:JZ,JY,JX))
   allocate(RINOOff(NumMicrobAutrophCmplx,0:JZ,JY,JX))
   allocate(RIPOOff(NumMicrobAutrophCmplx,0:JZ,JY,JX))
@@ -126,7 +126,7 @@ implicit none
   implicit none
 
   if(allocated(OMEheter))deallocate(OMEheter)
-  if(allocated(ROXYS))deallocate(ROXYS)
+  if(allocated(RO2DmndHeter))deallocate(RO2DmndHeter)
   if(allocated(ROQCS))deallocate(ROQCS)
   if(allocated(ROQAS))deallocate(ROQAS)
   if(allocated(RINHO))deallocate(RINHO)
@@ -151,7 +151,7 @@ implicit none
   if(allocated(OMEERhetr))deallocate(OMEERhetr)
 
   if(allocated(OMEauto))deallocate(OMEauto)
-  if(allocated(ROXYSff))deallocate(ROXYSff)
+  if(allocated(RO2DmndAutor))deallocate(RO2DmndAutor)
   if(allocated(RINHOff))deallocate(RINHOff)
   if(allocated(RINOOff))deallocate(RINOOff)
   if(allocated(RIPOOff))deallocate(RIPOOff)

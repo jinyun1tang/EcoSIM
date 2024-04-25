@@ -355,7 +355,7 @@ module InitSOMBGCMOD
     RC0ff(NY,NX)=0._r8
   ENDIF
 
-  ROXYS(:,:,L,NY,NX)=0.0_r8
+  RO2DmndHeter(:,:,L,NY,NX)=0.0_r8
   RVMX4(:,:,L,NY,NX)=0.0_r8
   RVMX3(:,:,L,NY,NX)=0.0_r8
   RVMX2(:,:,L,NY,NX)=0.0_r8
@@ -390,7 +390,7 @@ module InitSOMBGCMOD
     enddo
   ENDDO D6990
 
-  ROXYSff(:,L,NY,NX)=0.0_r8
+  RO2DmndAutor(:,L,NY,NX)=0.0_r8
   RNH3OxidAutor(:,L,NY,NX)=0.0_r8
   RVMX3ff(:,L,NY,NX)=0.0_r8
   RVMB3ff(:,L,NY,NX)=0.0_r8

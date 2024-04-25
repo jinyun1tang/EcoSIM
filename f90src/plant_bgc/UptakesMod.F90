@@ -74,33 +74,33 @@ module UptakesMod
     PSICanopy_pft                  => plt_ew%PSICanopy_pft              , &
     HeatXAir2PCan                  => plt_ew%HeatXAir2PCan              , &
     Canopy_Heat_Sens_col           => plt_ew%Canopy_Heat_Sens_col       , &
-    DTKC                           => plt_ew%DTKC      , &
-    VapXAir2Canopy_pft             => plt_ew%VapXAir2Canopy_pft    , &
-    TairK                          => plt_ew%TairK       , &
-    Canopy_Heat_Latent_col         => plt_ew%Canopy_Heat_Latent_col      , &
-    Transpiration_pft              => plt_ew%Transpiration_pft      , &
-    WatByPCanopy                   => plt_ew%WatByPCanopy     , &
-    CumSoilThickness               => plt_site%CumSoilThickness  , &
-    PPT                            => plt_site%PPT     , &
-    NP                             => plt_site%NP      , &
+    DTKC                           => plt_ew%DTKC                       , &
+    VapXAir2Canopy_pft             => plt_ew%VapXAir2Canopy_pft         , &
+    TairK                          => plt_ew%TairK                      , &
+    Canopy_Heat_Latent_col         => plt_ew%Canopy_Heat_Latent_col     , &
+    Transpiration_pft              => plt_ew%Transpiration_pft          , &
+    WatByPCanopy                   => plt_ew%WatByPCanopy               , &
+    CumSoilThickness               => plt_site%CumSoilThickness         , &
+    PPT                            => plt_site%PPT                      , &
+    NP                             => plt_site%NP                       , &
     PlantPopulation_pft            => plt_site%PlantPopulation_pft      , &
-    NU                             => plt_site%NU      , &
-    AREA3                          => plt_site%AREA3   , &
-    ZEROS                          => plt_site%ZEROS   , &
-    PopuRootMycoC_pvr              => plt_biom% PopuRootMycoC_pvr   , &
-    ZEROL                          => plt_biom%ZEROL   , &
-    ZEROP                          => plt_biom%ZEROP   , &
-    CanopyLeafShethC_pft           => plt_biom%CanopyLeafShethC_pft    , &
-    CanopyStalkC_pft               => plt_biom%CanopyStalkC_pft   , &
-    iPlantCalendar_brch            => plt_pheno%iPlantCalendar_brch , &
-    PlantO2Stress                  => plt_pheno%PlantO2Stress   , &
-    IsPlantActive_pft              => plt_pheno%IsPlantActive_pft  , &
-    CanopyLeafArea_col             => plt_morph%CanopyLeafArea_col  , &
-    Root1stDepz_pft                  => plt_morph%Root1stDepz_pft  , &
-    LeafStalkArea_col                 => plt_morph%LeafStalkArea_col  , &
-    LeafStalkArea_pft                 => plt_morph%LeafStalkArea_pft  , &
-    SeedDepth_pft                  => plt_morph%SeedDepth_pft  , &
-    MainBranchNum_pft            => plt_morph%MainBranchNum_pft    , &
+    NU                             => plt_site%NU                       , &
+    AREA3                          => plt_site%AREA3                    , &
+    ZEROS                          => plt_site%ZEROS                    , &
+    PopuRootMycoC_pvr              => plt_biom% PopuRootMycoC_pvr       , &
+    ZEROL                          => plt_biom%ZEROL                    , &
+    ZEROP                          => plt_biom%ZEROP                    , &
+    CanopyLeafShethC_pft           => plt_biom%CanopyLeafShethC_pft     , &
+    CanopyStalkC_pft               => plt_biom%CanopyStalkC_pft         , &
+    iPlantCalendar_brch            => plt_pheno%iPlantCalendar_brch     , &
+    PlantO2Stress                  => plt_pheno%PlantO2Stress           , &
+    IsPlantActive_pft              => plt_pheno%IsPlantActive_pft       , &
+    CanopyLeafArea_col             => plt_morph%CanopyLeafArea_col      , &
+    Root1stDepz_pft                => plt_morph%Root1stDepz_pft         , &
+    LeafStalkArea_col              => plt_morph%LeafStalkArea_col       , &
+    LeafStalkArea_pft              => plt_morph%LeafStalkArea_pft       , &
+    SeedDepth_pft                  => plt_morph%SeedDepth_pft           , &
+    MainBranchNum_pft              => plt_morph%MainBranchNum_pft       , &
     FracRadPARbyCanopy_pft         => plt_rad%FracRadPARbyCanopy_pft      &
   )
 
@@ -234,27 +234,27 @@ module UptakesMod
   integer :: NZ, L, N
   real(r8) :: ARLSC
 
-  associate(                          &
-    ZERO                            => plt_site%ZERO     , &
-    NP                              => plt_site%NP       , &
-    MaxNumRootLays                  => plt_site%MaxNumRootLays       , &
-    VLWatMicPM                      => plt_site%VLWatMicPM    , &
-    ALT                             => plt_site%ALT      , &
-    NU                              => plt_site%NU       , &
-    NP0                             => plt_site%NP0      , &
+  associate(                                                            &
+    ZERO                            => plt_site%ZERO                  , &
+    NP                              => plt_site%NP                    , &
+    MaxNumRootLays                  => plt_site%MaxNumRootLays        , &
+    VLWatMicPM                      => plt_site%VLWatMicPM            , &
+    ALT                             => plt_site%ALT                   , &
+    NU                              => plt_site%NU                    , &
+    NP0                             => plt_site%NP0                   , &
     TotalSoilH2OPSIMPa              => plt_ew%TotalSoilH2OPSIMPa      , &
     PopuRootMycoC_pvr               => plt_biom% PopuRootMycoC_pvr    , &
-    VLMicP                          => plt_soilchem%VLMicP   , &
-    VLiceMicP                       => plt_soilchem%VLiceMicP , &
-    THETY                           => plt_soilchem%THETY, &
-    SoiBulkDensity                  => plt_soilchem%SoiBulkDensity , &
-    VLWatMicP                       => plt_soilchem%VLWatMicP , &
-    VLSoilMicP                      => plt_soilchem%VLSoilMicP , &
+    VLMicP                          => plt_soilchem%VLMicP            , &
+    VLiceMicP                       => plt_soilchem%VLiceMicP         , &
+    THETY                           => plt_soilchem%THETY             , &
+    SoiBulkDensity                  => plt_soilchem%SoiBulkDensity    , &
+    VLWatMicP                       => plt_soilchem%VLWatMicP         , &
+    VLSoilMicP                      => plt_soilchem%VLSoilMicP        , &
     CanopyStemArea_pft              => plt_morph%CanopyStemArea_pft   , &
-    MY                              => plt_morph%MY      , &
+    MY                              => plt_morph%MY                   , &
     CanopyLeafArea_pft              => plt_morph%CanopyLeafArea_pft   , &
-    RadNet2Canopy_pft                     => plt_rad%RadNet2Canopy_pft      , &
-    LWRadCanopy_pft                       => plt_rad%LWRadCanopy_pft       &
+    RadNet2Canopy_pft               => plt_rad%RadNet2Canopy_pft      , &
+    LWRadCanopy_pft                 => plt_rad%LWRadCanopy_pft          &
   )
 !
 !     RESET TOTAL UPTAKE ARRAYS
