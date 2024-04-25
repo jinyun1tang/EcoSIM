@@ -700,7 +700,7 @@ module MicBGCMod
     RUPOX  => nmicf%RUPOX,    &
     RGOMO  => nmicf%RGOMO,    &
     RO2Dmnd4RespHeter => nmicf%RO2Dmnd4RespHeter ,    &
-    ROXYP=> nmicf%ROXYP  ,    &
+    RO2DmndHeter=> nmicf%RO2DmndHeter  ,    &
     ROXYO => nmicf%ROXYO ,    &
     RDNO3 => nmicf%RDNO3 ,    &
     RDNOB => nmicf%RDNOB ,    &
@@ -820,7 +820,7 @@ module MicBGCMod
 !
 !  write(*,*)'O2 UPTAKE BY AEROBES'
 !
-! RUPOX, ROXYP=O2-limited, O2-unlimited rates of O2 uptake
+! RUPOX, RO2DmndHeter=O2-limited, O2-unlimited rates of O2 uptake
 ! RUPMX=O2-unlimited rate of O2 uptake
 ! FOXYX=fraction of O2 uptake by N,K relative to total
 ! dts_gas=1/(NPH*NPT)
@@ -2303,7 +2303,7 @@ module MicBGCMod
   associate(                  &
     FCNP  => nmics%FCNP,      &
     OMA   => nmics%OMA ,      &
-    ROXYP => nmicf%ROXYP,     &
+    RO2DmndHeter => nmicf%RO2DmndHeter,     &
     RO2Dmnd4RespHeter => nmicf%RO2Dmnd4RespHeter,     &
     ROQCD => nmicf%ROQCD,     &
     CDOM  => ncplxs%CDOM,   &
@@ -2344,7 +2344,7 @@ module MicBGCMod
   FGOCP=0.0_r8
   FGOAP=1.0_r8
   RO2Dmnd4RespHeter(NGL,K)=0.0_r8
-  ROXYP(NGL,K)=0.0_r8
+  RO2DmndHeter(NGL,K)=0.0_r8
   RO2DmndHetert(NGL,K)=0.0_r8
   ROQCS(NGL,K)=0.0_r8
   ROQAS(NGL,K)=RGOGZ
@@ -2382,7 +2382,7 @@ module MicBGCMod
     OMA   => nmics%OMA  ,     &
     FCNP  => nmics%FCNP ,     &
     RO2Dmnd4RespHeter => nmicf%RO2Dmnd4RespHeter,     &
-    ROXYP=> nmicf%ROXYP ,     &
+    RO2DmndHeter=> nmicf%RO2DmndHeter ,     &
     ROQCD => nmicf%ROQCD,     &
     ZEROS => micfor%ZEROS, &
     DOM  => micstt%DOM, &
@@ -2446,17 +2446,17 @@ module MicBGCMod
 ! BY HETEROTROPHIC AEROBES
 
 ! ECHZ=growth respiration yield
-! RO2Dmnd4RespHeter,ROXYP,RO2DmndHetert=O2 demand from DOC,DOA oxidation
+! RO2Dmnd4RespHeter,RO2DmndHeter,RO2DmndHetert=O2 demand from DOC,DOA oxidation
 ! ROQCS,ROQAS=DOC,DOA demand from DOC,DOA oxidation
 ! ROQCD=microbial respiration used to represent microbial activity
 !
   ECHZ=EO2Q*FGOCP+EO2A*FGOAP
   RO2Dmnd4RespHeter(NGL,K)=2.667_r8*RGOMP
-  ROXYP(NGL,K)=RO2Dmnd4RespHeter(NGL,K)
+  RO2DmndHeter(NGL,K)=RO2Dmnd4RespHeter(NGL,K)
   RO2DmndHetertX=RO2DmndHetert(NGL,K)
   ROQCSX=ROQCS(NGL,K)
   ROQASX=ROQAS(NGL,K)
-  RO2DmndHetert(NGL,K)=ROXYP(NGL,K)
+  RO2DmndHetert(NGL,K)=RO2DmndHeter(NGL,K)
   ROQCS(NGL,K)=RGOCZ
   ROQAS(NGL,K)=RGOAZ
   ROQCD(NGL,K)=RGOCY
@@ -2490,7 +2490,7 @@ module MicBGCMod
     FCNP   => nmics%FCNP,       &
     OMA    => nmics%OMA ,       &
     RO2Dmnd4RespHeter  => nmicf%RO2Dmnd4RespHeter,      &
-    ROXYP  => nmicf%ROXYP  ,    &
+    RO2DmndHeter  => nmicf%RO2DmndHeter  ,    &
     ROQCD  => nmicf%ROQCD  ,    &
     TKS => micfor%TKS, &
     ZERO => micfor%ZERO, &
@@ -2538,7 +2538,7 @@ module MicBGCMod
   FGOCP=1.0_r8
   FGOAP=0.0_r8
   RO2Dmnd4RespHeter(NGL,K)=0.0_r8
-  ROXYP(NGL,K)=0.0_r8
+  RO2DmndHeter(NGL,K)=0.0_r8
   RO2DmndHetert(NGL,K)=0.0_r8
   ROQCS(NGL,K)=RGOFZ
   ROQAS(NGL,K)=0.0_r8
@@ -2871,7 +2871,7 @@ module MicBGCMod
     RUPOX  => nmicf%RUPOX,    &
     RGOMO  => nmicf%RGOMO,    &
     RO2Dmnd4RespHeter => nmicf%RO2Dmnd4RespHeter,     &
-    ROXYP=> nmicf%ROXYP ,     &
+    RO2DmndHeter=> nmicf%RO2DmndHeter ,     &
     ROXYO => nmicf%ROXYO,     &
     RH2GX  => nmicf%RH2GX,    &
     ROQCD  => nmicf%ROQCD,    &
@@ -2911,13 +2911,13 @@ module MicBGCMod
     RVMB2 => micflx%RVMB2, &
     ROXSK => micflx%ROXSK &
   )
-  IF(ROXYP(NGL,K).GT.ZEROS.AND.FOXYX.GT.ZERO)THEN
+  IF(RO2DmndHeter(NGL,K).GT.ZEROS.AND.FOXYX.GT.ZERO)THEN
     IF(.not.litrm.OR.VLSoilPoreMicP_vr.GT.ZEROS)THEN
       !
       !write(*,*)'MAXIMUM O2 UPAKE FROM POTENTIAL RESPIRATION OF EACH AEROBIC'
       !     POPULATION
       !
-      RUPMX=ROXYP(NGL,K)*dts_gas
+      RUPMX=RO2DmndHeter(NGL,K)*dts_gas
       ROXYFX=ROXYF*dts_gas*FOXYX
       OLSGL1=OLSGL*dts_gas
       IF(.not.litrm)THEN
@@ -2992,14 +2992,14 @@ module MicBGCMod
       !     WFN=ratio of O2-limited to O2-unlimited uptake
       !     RVMX4,RVNHB,RVMX2,RVMB2=NH3,NO2 oxidation in non-band, band
       !
-      WFN(NGL,K)=AMIN1(1.0_r8,AZMAX1(RUPOX(NGL,K)/ROXYP(NGL,K)))
+      WFN(NGL,K)=AMIN1(1.0_r8,AZMAX1(RUPOX(NGL,K)/RO2DmndHeter(NGL,K)))
 !     IF(K.LE.4)THEN
 !       ROQCS(NGL,K)=ROQCS(NGL,K)*WFN(NGL,K)
 !       ROQAS(NGL,K)=ROQAS(NGL,K)*WFN(NGL,K)
 !       ROQCD(NGL,K)=ROQCD(NGL,K)*WFN(NGL,K)
 !     ENDIF
     ELSE
-      RUPOX(NGL,K)=ROXYP(NGL,K)
+      RUPOX(NGL,K)=RO2DmndHeter(NGL,K)
       WFN(NGL,K)=1.0_r8
     ENDIF
   ELSE

@@ -110,7 +110,7 @@ type, public :: NitroAQMFluxDiagType
   real(r8),allocatable :: RGN2F(:,:)
   real(r8),allocatable :: RGOMO(:,:)
   real(r8),allocatable :: RO2Dmnd4RespHeter(:,:)
-  real(r8),allocatable :: ROXYP(:,:)
+  real(r8),allocatable :: RO2DmndHeter(:,:)
   real(r8),allocatable :: ROXYO(:,:)
   real(r8),allocatable :: RDNO3(:,:)
   real(r8),allocatable :: RDNOB(:,:)
@@ -339,7 +339,7 @@ type, public :: NitroAQMFluxDiagType
   allocate(this%RGN2F(NumMicrbHetetrophCmplx,1:jcplx));this%RGN2F=spval
   allocate(this%RGOMO(NumMicrbHetetrophCmplx,1:jcplx));this%RGOMO=spval
   allocate(this%RO2Dmnd4RespHeter(NumMicrbHetetrophCmplx,1:jcplx));this%RO2Dmnd4RespHeter=spval
-  allocate(this%ROXYP(NumMicrbHetetrophCmplx,1:jcplx));this%ROXYP=spval
+  allocate(this%RO2DmndHeter(NumMicrbHetetrophCmplx,1:jcplx));this%RO2DmndHeter=spval
   allocate(this%ROXYO(NumMicrbHetetrophCmplx,1:jcplx));this%ROXYO=spval
   allocate(this%RDNO3(NumMicrbHetetrophCmplx,1:jcplx));this%RDNO3=spval
   allocate(this%RDNOB(NumMicrbHetetrophCmplx,1:jcplx));this%RDNOB=spval
@@ -494,7 +494,7 @@ type, public :: NitroAQMFluxDiagType
   this%RGN2F = 0._r8
   this%RGOMO = 0._r8
   this%RO2Dmnd4RespHeter = 0._r8
-  this%ROXYP = 0._r8
+  this%RO2DmndHeter = 0._r8
   this%ROXYO = 0._r8
   this%RDNO3 = 0._r8
   this%RDNOB = 0._r8
@@ -609,7 +609,7 @@ type, public :: NitroAQMFluxDiagType
   call destroy(this%RGN2F)
   call destroy(this%RGOMO)
   call destroy(this%RO2Dmnd4RespHeter)
-  call destroy(this%ROXYP)
+  call destroy(this%RO2DmndHeter)
   call destroy(this%ROXYO)
   call destroy(this%RDNO3)
   call destroy(this%RDNOB)
