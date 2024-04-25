@@ -35,14 +35,14 @@ implicit none
   real(r8),allocatable ::  TSANER(:,:)                        !
   real(r8),allocatable ::  TSILER(:,:)                        !
   real(r8),allocatable ::  TCLAER(:,:)                        !
-  real(r8),allocatable ::  TNH4ER(:,:)                        !
-  real(r8),allocatable ::  TNH3ER(:,:)                        !
-  real(r8),allocatable ::  TNHUER(:,:)                        !
-  real(r8),allocatable ::  TNO3ER(:,:)                        !
-  real(r8),allocatable ::  TNH4EB(:,:)                        !
-  real(r8),allocatable ::  TNH3EB(:,:)                        !
-  real(r8),allocatable ::  TNHUEB(:,:)                        !
-  real(r8),allocatable ::  TNO3EB(:,:)                        !
+  real(r8),allocatable ::  TNH4Eros_col(:,:)                        !
+  real(r8),allocatable ::  TNH3Eros_col(:,:)                        !
+  real(r8),allocatable ::  TNUreaEros_col(:,:)                        !
+  real(r8),allocatable ::  TNO3Eros_col(:,:)                        !
+  real(r8),allocatable ::  TNH4ErosBand_col(:,:)                        !
+  real(r8),allocatable ::  TNH3ErosBand_col(:,:)                        !
+  real(r8),allocatable ::  TNUreaErosBand_col(:,:)                        !
+  real(r8),allocatable ::  TNO3ErosBand_col(:,:)                        !
   real(r8),allocatable ::  trcx_TER(:,:,:)                         !
   real(r8),allocatable ::  trcp_TER(:,:,:)                        !
   real(r8),allocatable ::  tErosionSedmLoss(:,:)                        !
@@ -116,14 +116,14 @@ implicit none
   allocate(TSANER(JY,JX));      TSANER=0._r8
   allocate(TSILER(JY,JX));      TSILER=0._r8
   allocate(TCLAER(JY,JX));      TCLAER=0._r8
-  allocate(TNH4ER(JY,JX));      TNH4ER=0._r8
-  allocate(TNH3ER(JY,JX));      TNH3ER=0._r8
-  allocate(TNHUER(JY,JX));      TNHUER=0._r8
-  allocate(TNO3ER(JY,JX));      TNO3ER=0._r8
-  allocate(TNH4EB(JY,JX));      TNH4EB=0._r8
-  allocate(TNH3EB(JY,JX));      TNH3EB=0._r8
-  allocate(TNHUEB(JY,JX));      TNHUEB=0._r8
-  allocate(TNO3EB(JY,JX));      TNO3EB=0._r8
+  allocate(TNH4Eros_col(JY,JX));      TNH4Eros_col=0._r8
+  allocate(TNH3Eros_col(JY,JX));      TNH3Eros_col=0._r8
+  allocate(TNUreaEros_col(JY,JX));      TNUreaEros_col=0._r8
+  allocate(TNO3Eros_col(JY,JX));      TNO3Eros_col=0._r8
+  allocate(TNH4ErosBand_col(JY,JX));      TNH4ErosBand_col=0._r8
+  allocate(TNH3ErosBand_col(JY,JX));      TNH3ErosBand_col=0._r8
+  allocate(TNUreaErosBand_col(JY,JX));      TNUreaErosBand_col=0._r8
+  allocate(TNO3ErosBand_col(JY,JX));      TNO3ErosBand_col=0._r8
 
   allocate(trcx_TER(idx_beg:idx_end,JY,JX));    trcx_TER=0._r8
   allocate(trcp_TER(idsp_beg:idsp_end,JY,JX));      trcp_TER=0._r8
@@ -197,14 +197,14 @@ implicit none
   call destroy(TSANER)
   call destroy(TSILER)
   call destroy(TCLAER)
-  call destroy(TNH4ER)
-  call destroy(TNH3ER)
-  call destroy(TNHUER)
-  call destroy(TNO3ER)
-  call destroy(TNH4EB)
-  call destroy(TNH3EB)
-  call destroy(TNHUEB)
-  call destroy(TNO3EB)
+  call destroy(TNH4Eros_col)
+  call destroy(TNH3Eros_col)
+  call destroy(TNUreaEros_col)
+  call destroy(TNO3Eros_col)
+  call destroy(TNH4ErosBand_col)
+  call destroy(TNH3ErosBand_col)
+  call destroy(TNUreaErosBand_col)
+  call destroy(TNO3ErosBand_col)
   call destroy(tErosionSedmLoss)
   call destroy(TWatFlowCellMicP)
   call destroy(TWatFlowCellMicPX)

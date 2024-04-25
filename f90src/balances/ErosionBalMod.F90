@@ -205,14 +205,14 @@ implicit none
     TSANER(NY,NX)=0.0_r8
     TSILER(NY,NX)=0.0_r8
     TCLAER(NY,NX)=0.0_r8
-    TNH4ER(NY,NX)=0.0_r8
-    TNH3ER(NY,NX)=0.0_r8
-    TNHUER(NY,NX)=0.0_r8
-    TNO3ER(NY,NX)=0.0_r8
-    TNH4EB(NY,NX)=0.0_r8
-    TNH3EB(NY,NX)=0.0_r8
-    TNHUEB(NY,NX)=0.0_r8
-    TNO3EB(NY,NX)=0.0_r8
+    TNH4Eros_col(NY,NX)=0.0_r8
+    TNH3Eros_col(NY,NX)=0.0_r8
+    TNUreaEros_col(NY,NX)=0.0_r8
+    TNO3Eros_col(NY,NX)=0.0_r8
+    TNH4ErosBand_col(NY,NX)=0.0_r8
+    TNH3ErosBand_col(NY,NX)=0.0_r8
+    TNUreaErosBand_col(NY,NX)=0.0_r8
+    TNO3ErosBand_col(NY,NX)=0.0_r8
 
     trcx_TER(idx_beg:idx_end,NY,NX)=0.0_r8
     trcp_TER(idsp_beg:idsp_end,NY,NX)=0.0_r8

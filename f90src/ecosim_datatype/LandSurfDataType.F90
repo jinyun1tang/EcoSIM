@@ -25,7 +25,7 @@ module LandSurfDataType
   real(r8),target,allocatable ::  ALTZ(:,:)                          !altitude, [m]
   real(r8),target,allocatable ::  SL(:,:)                            !slope, [o]
   real(r8),target,allocatable ::  ASP(:,:)                           !aspect , [o]
-  real(r8),target,allocatable :: GasSfAtmFlx(:,:,:)   ! surface-atmosphere gas exchange flux , [g d-2 h-1]
+  real(r8),target,allocatable :: GasSfAtmFlx_col(:,:,:)   ! surface-atmosphere gas exchange flux , [g d-2 h-1]
   real(r8),target,allocatable ::  XCODFS(:,:)                        !surface - atmosphere CO2 dissolution (+ve) - volatilization (-ve) , [g d-2 h-1]
   real(r8),target,allocatable ::  XCHDFS(:,:)                        !surface - atmosphere CH4 dissolution (+ve) - volatilization (-ve) , [g d-2 h-1]
   real(r8),target,allocatable ::  XOXDFS(:,:)                        !surface - atmosphere O2 dissolution (+ve) - volatilization (-ve) , [g d-2 h-1]
@@ -64,7 +64,7 @@ contains
   allocate(XNBDFS(JY,JX));      XNBDFS=0._r8
   allocate(XHGDFS(JY,JX));      XHGDFS=0._r8
 
-  allocate(GasSfAtmFlx(idg_beg:idg_end,JY,JX)); GasSfAtmFlx=0._r8
+  allocate(GasSfAtmFlx_col(idg_beg:idg_end,JY,JX)); GasSfAtmFlx_col=0._r8
   end subroutine InitLandSurfData
 
 !----------------------------------------------------------------------

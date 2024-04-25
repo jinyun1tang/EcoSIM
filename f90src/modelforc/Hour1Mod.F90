@@ -781,7 +781,7 @@ module Hour1Mod
   VapXAir2GSurf(NY,NX)=0.0_r8
 
 
-  GasSfAtmFlx(idg_beg:idg_end,NY,NX)=0._r8
+  GasSfAtmFlx_col(idg_beg:idg_end,NY,NX)=0._r8
   trcg_surf_disevap_flx(idg_beg:idg_end-1,NY,NX)=0.0_r8
 
   CanWatg(NY,NX)=0.0_r8

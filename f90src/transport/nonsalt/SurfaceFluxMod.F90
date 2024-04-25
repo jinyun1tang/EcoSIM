@@ -1188,7 +1188,7 @@ contains
 !     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
 !   seven gas species plus aqueous NH3 in band
 
-      GasSfAtmFlx(ngases,NY,NX)=GasSfAtmFlx(ngases,NY,NX)+RGasSSVol(ngases,NY,NX)
+      GasSfAtmFlx_col(ngases,NY,NX)=GasSfAtmFlx_col(ngases,NY,NX)+RGasSSVol(ngases,NY,NX)
     ENDDO
 
   ELSE
