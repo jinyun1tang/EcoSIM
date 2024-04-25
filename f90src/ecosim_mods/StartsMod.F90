@@ -510,8 +510,8 @@ module StartsMod
 
 ! begin_execution
   L2=NL(NY,NX)
-  FertN_soil(ifertn_beg:ifertn_end,0:L2,NY,NX)=0._r8
-  FertN_band(ifertnb_beg:ifertnb_end,1:L2,NY,NX)=0._r8
+  FertN_soil_vr(ifertn_beg:ifertn_end,0:L2,NY,NX)=0._r8
+  FertN_Band_vr(ifertnb_beg:ifertnb_end,1:L2,NY,NX)=0._r8
   trcs_VLN_vr(ids_NH4,0:L2,NY,NX)=1.0_r8
   trcs_VLN_vr(idg_NH3,0:L2,NY,NX)=trcs_VLN_vr(ids_NH4,0:L2,NY,NX)
   trcs_VLN_vr(ids_NO3,0:L2,NY,NX)=1.0_r8

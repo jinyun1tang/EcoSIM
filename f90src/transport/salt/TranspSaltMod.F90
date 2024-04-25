@@ -188,7 +188,7 @@ module TranspSaltMod
 !     HOURLY SOLUTE FLUXES FROM ATMOSPHERE TO SNOWPACK
 !     IN SNOWFALL AND IRRIGATION IS ZERO IF SNOWPACK IS ABSENT
 !
-!     PrecAtm,PRECI=snow+rain,irrigation
+!     PrecAtm_col,PRECI=snow+rain,irrigation
 !     X*BLS=hourly solute flux to snowpack
 !     X*FLS,X*FLB=hourly solute flux to surface litter,soil surface micropore non-band,band
 !     Rain2LitRSurf_col,Irrig2LitRSurf=water flux to surface litter from rain,irrigation
@@ -418,7 +418,7 @@ module TranspSaltMod
   !     IN RAINFALL AND IRRIGATION ACCORDING TO CONCENTRATIONS
   !     ENTERED IN WEATHER AND IRRIGATION FILES
   !
-      ELSEIF((PrecAtm(NY,NX).GT.0.0_r8.OR.IrrigSurface(NY,NX).GT.0.0_r8) &
+      ELSEIF((PrecAtm_col(NY,NX).GT.0.0_r8.OR.IrrigSurface(NY,NX).GT.0.0_r8) &
         .AND.VLSnowHeatCapM(1,1,NY,NX).LE.VLHeatCapSnowMin_col(NY,NX))THEN
   !     there is no significant snowpack, but precipitation
         call AtmosSoluteFluxToTopsoil(I,NY,NX)

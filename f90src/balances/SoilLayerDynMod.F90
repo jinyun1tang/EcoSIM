@@ -735,11 +735,11 @@ implicit none
   TCS(L1,NY,NX)=units%Kelvin2Celcius(TKS(L1,NY,NX))
 
   DO NTF=ifertn_beg,ifertn_end
-    FertN_soil(NTF,L1,NY,NX)=FertN_soil(NTF,L1,NY,NX)+FX*FertN_soil(NTF,L0,NY,NX)
+    FertN_soil_vr(NTF,L1,NY,NX)=FertN_soil_vr(NTF,L1,NY,NX)+FX*FertN_soil_vr(NTF,L0,NY,NX)
   ENDDO
 
   DO NTF=ifertnb_beg,ifertnb_end
-    FertN_band(NTF,L1,NY,NX)=FertN_band(NTF,L1,NY,NX)+FX*FertN_band(NTF,L0,NY,NX)
+    FertN_Band_vr(NTF,L1,NY,NX)=FertN_Band_vr(NTF,L1,NY,NX)+FX*FertN_Band_vr(NTF,L0,NY,NX)
   ENDDO
 
   DO NTU=ids_nuts_beg,ids_nuts_end
@@ -924,11 +924,11 @@ implicit none
   TCS(L0,NY,NX)=units%Kelvin2Celcius(TKS(L0,NY,NX))
 
   DO NTF=ifertn_beg,ifertn_end
-    FertN_soil(NTF,L0,NY,NX)=FY*FertN_soil(NTF,L0,NY,NX)
+    FertN_soil_vr(NTF,L0,NY,NX)=FY*FertN_soil_vr(NTF,L0,NY,NX)
   ENDDO
 
   DO NTF=ifertnb_beg,ifertnb_end
-    FertN_band(NTF,L0,NY,NX)=FY*FertN_band(NTF,L0,NY,NX)
+    FertN_Band_vr(NTF,L0,NY,NX)=FY*FertN_Band_vr(NTF,L0,NY,NX)
   ENDDO
 
   DO NTU=ids_nuts_beg,ids_nuts_end
@@ -1464,16 +1464,16 @@ implicit none
 
 ! begin_execution
   DO NTF=ifertn_beg,ifertn_end
-    FXZN=AMIN1(FX*FertN_soil(NTF,L,NY,NX),FertN_soil(NTF,L0,NY,NX))
-    FertN_soil(NTF,L1,NY,NX)=FertN_soil(NTF,L1,NY,NX)+FXZN
-    FertN_soil(NTF,L0,NY,NX)=FertN_soil(NTF,L0,NY,NX)-FXZN
+    FXZN=AMIN1(FX*FertN_soil_vr(NTF,L,NY,NX),FertN_soil_vr(NTF,L0,NY,NX))
+    FertN_soil_vr(NTF,L1,NY,NX)=FertN_soil_vr(NTF,L1,NY,NX)+FXZN
+    FertN_soil_vr(NTF,L0,NY,NX)=FertN_soil_vr(NTF,L0,NY,NX)-FXZN
   ENDDO
 
   IF (L0>0) then
     DO NTF=ifertnb_beg,ifertnb_end
-      FXZN=AMIN1(FX*FertN_band(NTF,L,NY,NX),FertN_band(NTF,L0,NY,NX))
-      FertN_band(NTF,L1,NY,NX)=FertN_band(NTF,L1,NY,NX)+FXZN
-      FertN_band(NTF,L0,NY,NX)=FertN_band(NTF,L0,NY,NX)-FXZN
+      FXZN=AMIN1(FX*FertN_Band_vr(NTF,L,NY,NX),FertN_Band_vr(NTF,L0,NY,NX))
+      FertN_Band_vr(NTF,L1,NY,NX)=FertN_Band_vr(NTF,L1,NY,NX)+FXZN
+      FertN_Band_vr(NTF,L0,NY,NX)=FertN_Band_vr(NTF,L0,NY,NX)-FXZN
     ENDDO
   endif
 !

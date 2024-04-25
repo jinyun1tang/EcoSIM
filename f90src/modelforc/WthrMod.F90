@@ -557,15 +557,15 @@ module WthrMod
       !
       !     PRECR,PRECW=rainfall,snowfall
       !     PRECI,PRECU=surface,subsurface irrigation
-      !     PRECA,PrecAtm=rain+irrigation,rain+snow
+      !     PRECA,PrecAtm_col=rain+irrigation,rain+snow
       !     THS=sky LW radiation
 !
       RainFalPrec(NY,NX)=PrecAsRain(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
       SnoFalPrec(NY,NX)=PrecAsSnow(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
       IrrigSurface(NY,NX)=PRECII(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
-      IrrigSubsurf(NY,NX)=PRECUI(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
+      IrrigSubsurf_col(NY,NX)=PRECUI(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
       PrecRainAndSurfirrig(NY,NX)=RainFalPrec(NY,NX)+IrrigSurface(NY,NX)
-      PrecAtm(NY,NX)=RainFalPrec(NY,NX)+SnoFalPrec(NY,NX)
+      PrecAtm_col(NY,NX)=RainFalPrec(NY,NX)+SnoFalPrec(NY,NX)
       LWRadSky(NY,NX)=THSX(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
     ENDDO
   ENDDO

@@ -74,9 +74,9 @@ implicit none
 !     sediment code:NH4,NH3,NHU,NO3=NH4,NH3,urea,NO3
 !
       DO NTF=ifertn_beg,ifertn_end
-        FNX=FSINK*FertN_soil(NTF,L,NY,NX)
-        FertN_soil(NTF,L,NY,NX)=FertN_soil(NTF,L,NY,NX)-FNX
-        FertN_soil(NTF,LL,NY,NX)=FertN_soil(NTF,LL,NY,NX)+FNX
+        FNX=FSINK*FertN_soil_vr(NTF,L,NY,NX)
+        FertN_soil_vr(NTF,L,NY,NX)=FertN_soil_vr(NTF,L,NY,NX)-FNX
+        FertN_soil_vr(NTF,LL,NY,NX)=FertN_soil_vr(NTF,LL,NY,NX)+FNX
       ENDDO
 !
 !     EXCHANGEABLE CATIONS AND ANIONS

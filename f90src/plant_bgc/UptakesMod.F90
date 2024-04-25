@@ -338,29 +338,29 @@ module UptakesMod
   real(r8) :: TFRADP,RACZ(JP1)
   integer :: NB,K,L,N,NZZ
 
-  associate(                          &
-    ZERO                      =>  plt_site%ZERO    , &
-    NP                        =>  plt_site%NP      , &
-    KoppenClimZone            =>  plt_site%KoppenClimZone  , &
+  associate(                                                        &
+    ZERO                      =>  plt_site%ZERO                   , &
+    NP                        =>  plt_site%NP                     , &
+    KoppenClimZone            =>  plt_site%KoppenClimZone         , &
     BndlResistAboveCanG       =>  plt_ew%BndlResistAboveCanG      , &
-    TairK                     =>  plt_ew%TairK       , &
-    DTKC                      =>  plt_ew%DTKC      , &
-    ZeroPlanDisp              =>  plt_ew%ZeroPlanDisp        , &
-    RoughHeight               =>  plt_ew%RoughHeight        , &
-    RAZ                       =>  plt_ew%RAZ       , &
-    TKCanopy_pft              =>  plt_ew%TKCanopy_pft      , &
-    LeafProteinCNode_brch     =>  plt_biom%LeafProteinCNode_brch    , &
-    ZEROP                     =>  plt_biom%ZEROP   , &
-    FracRadPARbyCanopy_pft    =>  plt_rad%FracRadPARbyCanopy_pft    , &
-    LeafAUnshaded_zsec        =>  plt_photo%LeafAUnshaded_zsec  , &
-    LeafAreaNode_brch         =>  plt_morph%LeafAreaNode_brch  , &
-    KLEAFX                    =>  plt_morph%KLEAFX , &
-    CanopyHeight_pft          =>  plt_morph%CanopyHeight_pft    , &
-    ClumpFactorNow_pft    =>  plt_morph%ClumpFactorNow_pft    , &
-    LeafStalkArea_pft            =>  plt_morph%LeafStalkArea_pft  , &
-    NumOfBranches_pft         =>  plt_morph%NumOfBranches_pft    , &
-    LeafAreaZsec_brch         =>  plt_morph%LeafAreaZsec_brch   , &
-    CanopyHeight_col       =>  plt_morph%CanopyHeight_col       &
+    TairK                     =>  plt_ew%TairK                    , &
+    DTKC                      =>  plt_ew%DTKC                     , &
+    ZeroPlanDisp              =>  plt_ew%ZeroPlanDisp             , &
+    RoughHeight               =>  plt_ew%RoughHeight              , &
+    RAZ                       =>  plt_ew%RAZ                      , &
+    TKCanopy_pft              =>  plt_ew%TKCanopy_pft             , &
+    LeafProteinCNode_brch     =>  plt_biom%LeafProteinCNode_brch  , &
+    ZEROP                     =>  plt_biom%ZEROP                  , &
+    FracRadPARbyCanopy_pft    =>  plt_rad%FracRadPARbyCanopy_pft  , &
+    LeafAUnshaded_zsec        =>  plt_photo%LeafAUnshaded_zsec    , &
+    LeafAreaNode_brch         =>  plt_morph%LeafAreaNode_brch     , &
+    KLEAFX                    =>  plt_morph%KLEAFX                , &
+    CanopyHeight_pft          =>  plt_morph%CanopyHeight_pft      , &
+    ClumpFactorNow_pft        =>  plt_morph%ClumpFactorNow_pft    , &
+    LeafStalkArea_pft         =>  plt_morph%LeafStalkArea_pft     , &
+    NumOfBranches_pft         =>  plt_morph%NumOfBranches_pft     , &
+    LeafAreaZsec_brch         =>  plt_morph%LeafAreaZsec_brch     , &
+    CanopyHeight_col          =>  plt_morph%CanopyHeight_col        &
   )
 !
 !     APPLY CLUMPING FACTOR TO LEAF SURFACE AREA DEFINED BY
@@ -671,43 +671,43 @@ module UptakesMod
   integer :: N,L
 !     begin_execution
 
-  associate(                          &
-    NU                              => plt_site%NU      , &
-    AREA3                           => plt_site%AREA3   , &
-    PSICanopyOsmo_pft               => plt_ew%PSICanopyOsmo_pft     , &
-    OSMO                            => plt_ew%OSMO      , &
-    RAZ                             => plt_ew%RAZ       , &
-    VPA                             => plt_ew%VPA       , &
-    TKS                             => plt_ew%TKS       , &
-    TairK                           => plt_ew%TairK     , &
-    RIB                             => plt_ew%RIB       , &
-    Transpiration_pft               => plt_ew%Transpiration_pft      , &
-    PSICanopy_pft                   => plt_ew%PSICanopy_pft    , &
-    CanopyWater_pft                 => plt_ew%CanopyWater_pft     , &
-    AllPlantRootH2OUptake_vr        => plt_ew%AllPlantRootH2OUptake_vr     , &
-    TKCanopy_pft                    => plt_ew%TKCanopy_pft      , &
-    VapXAir2Canopy_pft              => plt_ew%VapXAir2Canopy_pft    , &
-    VHeatCapCanP                    => plt_ew%VHeatCapCanP     , &
-    PSICanopyTurg_pft               => plt_ew%PSICanopyTurg_pft     , &
-    WatByPCanopy                    => plt_ew%WatByPCanopy     , &
-    PrecIntcptByCanopy_pft          => plt_ew%PrecIntcptByCanopy_pft      , &
-    EvapTransHeat_pft               => plt_ew%EvapTransHeat_pft     , &
-    ZEROL                           => plt_biom%ZEROL   , &
-    ZEROP                           => plt_biom%ZEROP   , &
-    CanopyNonstElmConc_pft      => plt_biom%CanopyNonstElmConc_pft  , &
-    MaxSoiL4Root                    => plt_morph%MaxSoiL4Root     , &
-    MY                              => plt_morph%MY     , &
+  associate(                                                                   &
+    NU                              => plt_site%NU                           , &
+    AREA3                           => plt_site%AREA3                        , &
+    PSICanopyOsmo_pft               => plt_ew%PSICanopyOsmo_pft              , &
+    OSMO                            => plt_ew%OSMO                           , &
+    RAZ                             => plt_ew%RAZ                            , &
+    VPA                             => plt_ew%VPA                            , &
+    TKS                             => plt_ew%TKS                            , &
+    TairK                           => plt_ew%TairK                          , &
+    RIB                             => plt_ew%RIB                            , &
+    Transpiration_pft               => plt_ew%Transpiration_pft              , &
+    PSICanopy_pft                   => plt_ew%PSICanopy_pft                  , &
+    CanopyWater_pft                 => plt_ew%CanopyWater_pft                , &
+    AllPlantRootH2OUptake_vr        => plt_ew%AllPlantRootH2OUptake_vr       , &
+    TKCanopy_pft                    => plt_ew%TKCanopy_pft                   , &
+    VapXAir2Canopy_pft              => plt_ew%VapXAir2Canopy_pft             , &
+    VHeatCapCanP                    => plt_ew%VHeatCapCanP                   , &
+    PSICanopyTurg_pft               => plt_ew%PSICanopyTurg_pft              , &
+    WatByPCanopy                    => plt_ew%WatByPCanopy                   , &
+    PrecIntcptByCanopy_pft          => plt_ew%PrecIntcptByCanopy_pft         , &
+    EvapTransHeat_pft               => plt_ew%EvapTransHeat_pft              , &
+    ZEROL                           => plt_biom%ZEROL                        , &
+    ZEROP                           => plt_biom%ZEROP                        , &
+    CanopyNonstElmConc_pft          => plt_biom%CanopyNonstElmConc_pft       , &
+    MaxSoiL4Root                    => plt_morph%MaxSoiL4Root                , &
+    MY                              => plt_morph%MY                          , &
     MinCanPStomaResistH2O_pft       => plt_photo%MinCanPStomaResistH2O_pft   , &
-    RCS                             => plt_photo%RCS    , &
-    CanopyBndlResist_pft            => plt_photo%CanopyBndlResist_pft    , &
+    RCS                             => plt_photo%RCS                         , &
+    CanopyBndlResist_pft            => plt_photo%CanopyBndlResist_pft        , &
     MaxCanPStomaResistH2O_pft       => plt_photo%MaxCanPStomaResistH2O_pft   , &
-    CanPStomaResistH2O_pft          => plt_photo%CanPStomaResistH2O_pft    , &
-    RadNet2Canopy_pft               => plt_rad%RadNet2Canopy_pft     , &
-    RadSWbyCanopy_pft               => plt_rad%RadSWbyCanopy_pft     , &
-    LWRadSky                        => plt_rad%LWRadSky      , &
-    FracRadPARbyCanopy_pft          => plt_rad%FracRadPARbyCanopy_pft    , &
-    LWRadCanopy_pft                 => plt_rad%LWRadCanopy_pft    , &
-    LWRadGrnd                       => plt_rad%LWRadGrnd     &
+    CanPStomaResistH2O_pft          => plt_photo%CanPStomaResistH2O_pft      , &
+    RadNet2Canopy_pft               => plt_rad%RadNet2Canopy_pft             , &
+    RadSWbyCanopy_pft               => plt_rad%RadSWbyCanopy_pft             , &
+    LWRadSky                        => plt_rad%LWRadSky                      , &
+    FracRadPARbyCanopy_pft          => plt_rad%FracRadPARbyCanopy_pft        , &
+    LWRadCanopy_pft                 => plt_rad%LWRadCanopy_pft               , &
+    LWRadGrnd                       => plt_rad%LWRadGrnd                       &
   )
   
   !total nonstructural canopy C,N,P concentration
@@ -1018,34 +1018,34 @@ module UptakesMod
   real(r8) :: FRADW,FRAD1,FRAD2
   real(r8) :: RSSL,RTAR2
   integer :: N, L
-  associate(                          &
-    DPTHZ                          => plt_site%DPTHZ                     , &
-    PlantPopulation_pft            => plt_site%PlantPopulation_pft       , &
-    VLWatMicPM                     => plt_site%VLWatMicPM    , &
-    ZERO                           => plt_site%ZERO     , &
-    ZEROS2                         => plt_site%ZEROS2   , &
-    NU                             => plt_site%NU       , &
-    PSICanopy_pft                  => plt_ew%PSICanopy_pft     , &
-    ZEROP                          => plt_biom%ZEROP    , &
-    THETW                          => plt_soilchem%THETW, &
-    VLMicP                         => plt_soilchem%VLMicP , &
+  associate(                                                                  &
+    DPTHZ                          => plt_site%DPTHZ                        , &
+    PlantPopulation_pft            => plt_site%PlantPopulation_pft          , &
+    VLWatMicPM                     => plt_site%VLWatMicPM                   , &
+    ZERO                           => plt_site%ZERO                         , &
+    ZEROS2                         => plt_site%ZEROS2                       , &
+    NU                             => plt_site%NU                           , &
+    PSICanopy_pft                  => plt_ew%PSICanopy_pft                  , &
+    ZEROP                          => plt_biom%ZEROP                        , &
+    THETW                          => plt_soilchem%THETW                    , &
+    VLMicP                         => plt_soilchem%VLMicP                   , &
     HydroCondMicP4RootUptake       => plt_soilchem%HydroCondMicP4RootUptake , &
-    VLSoilPoreMicP_vr                 => plt_soilchem%VLSoilPoreMicP_vr , &
-    Root2ndXNum_pvr                => plt_morph%Root2ndXNum_pvr    , &
-    Root1stXNumL_pvr               => plt_morph%Root1stXNumL_pvr   , &
-    Root2ndMaxRadius_pft           => plt_morph%Root2ndMaxRadius_pft  , &
-    RSRA                           => plt_morph%RSRA    , &
-    Root2ndRadius_pvr              => plt_morph%Root2ndRadius_pvr   , &
-    RootLenDensPerPlant_pvr        => plt_morph%RootLenDensPerPlant_pvr   , &
-    CanPHeight4WatUptake           => plt_morph%CanPHeight4WatUptake   , &
-    RootLenPerPlant_pvr            => plt_morph%RootLenPerPlant_pvr   , &
-    Root2ndAveLen_pvr              => plt_morph%Root2ndAveLen_pvr   , &
-    Root1stRadius_pvr              => plt_morph%Root1stRadius_pvr   , &
-    MY                             => plt_morph%MY      , &
-    RSRR                           => plt_morph%RSRR    , &
-    CanopyHeight_pft               => plt_morph%CanopyHeight_pft     , &
-    NGTopRootLayer_pft             => plt_morph%NGTopRootLayer_pft     , &
-    MaxSoiL4Root                   => plt_morph%MaxSoiL4Root        &
+    VLSoilPoreMicP_vr              => plt_soilchem%VLSoilPoreMicP_vr        , &
+    Root2ndXNum_pvr                => plt_morph%Root2ndXNum_pvr             , &
+    Root1stXNumL_pvr               => plt_morph%Root1stXNumL_pvr            , &
+    Root2ndMaxRadius_pft           => plt_morph%Root2ndMaxRadius_pft        , &
+    RSRA                           => plt_morph%RSRA                        , &
+    Root2ndRadius_pvr              => plt_morph%Root2ndRadius_pvr           , &
+    RootLenDensPerPlant_pvr        => plt_morph%RootLenDensPerPlant_pvr     , &
+    CanPHeight4WatUptake           => plt_morph%CanPHeight4WatUptake        , &
+    RootLenPerPlant_pvr            => plt_morph%RootLenPerPlant_pvr         , &
+    Root2ndAveLen_pvr              => plt_morph%Root2ndAveLen_pvr           , &
+    Root1stRadius_pvr              => plt_morph%Root1stRadius_pvr           , &
+    MY                             => plt_morph%MY                          , &
+    RSRR                           => plt_morph%RSRR                        , &
+    CanopyHeight_pft               => plt_morph%CanopyHeight_pft            , &
+    NGTopRootLayer_pft             => plt_morph%NGTopRootLayer_pft          , &
+    MaxSoiL4Root                   => plt_morph%MaxSoiL4Root                  &
   )
 
   !     GRAVIMETRIC WATER POTENTIAL FROM CANOPY HEIGHT
@@ -1146,6 +1146,7 @@ module UptakesMod
   subroutine HandleBareSoil(NZ,ElvAdjstedtSoiPSIMPa,FDMP)
   !
   !plant has not emerged yet
+  use data_const_mod, only : spval => DAT_CONST_SPVAL
   implicit none
   integer, intent(in) :: NZ
   real(r8), intent(in) :: ElvAdjstedtSoiPSIMPa(JZ1)
@@ -1157,47 +1158,47 @@ module UptakesMod
   real(r8) :: OSWT,Stomata_Stress
 
 ! begin_execution
-  associate(                         &
-    TCelciusCanopy_pft             =>  plt_ew%TCelciusCanopy_pft      , &
-    OSMO                           =>  plt_ew%OSMO      , &
-    TKSnow                         =>  plt_ew%TKSnow       , &
-    TKC                            =>  plt_ew%TKC       , &
-    TKS                            =>  plt_ew%TKS       , &
-    TairK                          =>  plt_ew%TairK       , &
-    SnowDepth                      =>  plt_ew%SnowDepth     , &
-    DTKC                           =>  plt_ew%DTKC      , &
-    RAZ                            =>  plt_ew%RAZ       , &
-    VHeatCapCanP                   =>  plt_ew%VHeatCapCanP     , &
-    PSICanopyOsmo_pft              =>  plt_ew%PSICanopyOsmo_pft     , &
-    PSIRootTurg_vr                 =>  plt_ew%PSIRootTurg_vr     , &
+  associate(                                                                 &
+    TCelciusCanopy_pft             =>  plt_ew%TCelciusCanopy_pft           , &
+    OSMO                           =>  plt_ew%OSMO                         , &
+    TKSnow                         =>  plt_ew%TKSnow                       , &
+    TKC                            =>  plt_ew%TKC                          , &
+    TKS                            =>  plt_ew%TKS                          , &
+    TairK                          =>  plt_ew%TairK                        , &
+    SnowDepth                      =>  plt_ew%SnowDepth                    , &
+    DTKC                           =>  plt_ew%DTKC                         , &
+    RAZ                            =>  plt_ew%RAZ                          , &
+    VHeatCapCanP                   =>  plt_ew%VHeatCapCanP                 , &
+    PSICanopyOsmo_pft              =>  plt_ew%PSICanopyOsmo_pft            , &
+    PSIRootTurg_vr                 =>  plt_ew%PSIRootTurg_vr               , &
     AllPlantRootH2OUptake_vr       =>  plt_ew%AllPlantRootH2OUptake_vr     , &
-    PSICanopyTurg_pft              =>  plt_ew%PSICanopyTurg_pft     , &
-    PSICanopy_pft                  =>  plt_ew%PSICanopy_pft    , &
-    PSIRootOSMO_vr                 =>  plt_ew%PSIRootOSMO_vr     , &
-    PSIRoot_pvr                     =>  plt_ew%PSIRoot_pvr    , &
-    Transpiration_pft              =>  plt_ew%Transpiration_pft      , &
-    HeatStorCanP                   =>  plt_ew%HeatStorCanP     , &
-    EvapTransHeat_pft              =>  plt_ew%EvapTransHeat_pft     , &
-    HeatXAir2PCan                  =>  plt_ew%HeatXAir2PCan     , &
-    VapXAir2Canopy_pft             =>  plt_ew%VapXAir2Canopy_pft    , &
-    NU                             =>  plt_site%NU      , &
-    ZERO                           =>  plt_site%ZERO    , &
-    AREA3                          =>  plt_site%AREA3   , &
-    CanopyNonstElmConc_pft =>  plt_biom%CanopyNonstElmConc_pft  , &
-    RootNonstructElmConc_pvr =>  plt_biom%RootNonstructElmConc_pvr  , &
-    ShootStrutElms_pft              =>  plt_biom%ShootStrutElms_pft  , &
-    MaxSoiL4Root                   =>  plt_morph%MaxSoiL4Root     , &
-    CanopyHeight_pft               =>  plt_morph%CanopyHeight_pft    , &
-    NGTopRootLayer_pft             =>  plt_morph%NGTopRootLayer_pft    , &
-    MY                             =>  plt_morph%MY     , &
-    RCS                            =>  plt_photo%RCS    , &
-    CanopyBndlResist_pft           =>  plt_photo%CanopyBndlResist_pft    , &
+    PSICanopyTurg_pft              =>  plt_ew%PSICanopyTurg_pft            , &
+    PSICanopy_pft                  =>  plt_ew%PSICanopy_pft                , &
+    PSIRootOSMO_vr                 =>  plt_ew%PSIRootOSMO_vr               , &
+    PSIRoot_pvr                    =>  plt_ew%PSIRoot_pvr                  , &
+    Transpiration_pft              =>  plt_ew%Transpiration_pft            , &
+    HeatStorCanP                   =>  plt_ew%HeatStorCanP                 , &
+    EvapTransHeat_pft              =>  plt_ew%EvapTransHeat_pft            , &
+    HeatXAir2PCan                  =>  plt_ew%HeatXAir2PCan                , &
+    VapXAir2Canopy_pft             =>  plt_ew%VapXAir2Canopy_pft           , &
+    NU                             =>  plt_site%NU                         , &
+    ZERO                           =>  plt_site%ZERO                       , &
+    AREA3                          =>  plt_site%AREA3                      , &
+    CanopyNonstElmConc_pft         =>  plt_biom%CanopyNonstElmConc_pft     , &
+    RootNonstructElmConc_pvr       =>  plt_biom%RootNonstructElmConc_pvr   , &
+    ShootStrutElms_pft             =>  plt_biom%ShootStrutElms_pft         , &
+    MaxSoiL4Root                   =>  plt_morph%MaxSoiL4Root              , &
+    CanopyHeight_pft               =>  plt_morph%CanopyHeight_pft          , &
+    NGTopRootLayer_pft             =>  plt_morph%NGTopRootLayer_pft        , &
+    MY                             =>  plt_morph%MY                        , &
+    RCS                            =>  plt_photo%RCS                       , &
+    CanopyBndlResist_pft           =>  plt_photo%CanopyBndlResist_pft      , &
     CanPStomaResistH2O_pft         =>  plt_photo%CanPStomaResistH2O_pft    , &
-    MinCanPStomaResistH2O_pft      =>  plt_photo%MinCanPStomaResistH2O_pft   , &
-    MaxCanPStomaResistH2O_pft      =>  plt_photo%MaxCanPStomaResistH2O_pft   , &
-    FracRadPARbyCanopy_pft         =>  plt_rad%FracRadPARbyCanopy_pft    , &
-    LWRadCanopy_pft                      =>  plt_rad%LWRadCanopy_pft    , &
-    RadNet2Canopy_pft                    =>  plt_rad%RadNet2Canopy_pft       &
+    MinCanPStomaResistH2O_pft      =>  plt_photo%MinCanPStomaResistH2O_pft , &
+    MaxCanPStomaResistH2O_pft      =>  plt_photo%MaxCanPStomaResistH2O_pft , &
+    FracRadPARbyCanopy_pft         =>  plt_rad%FracRadPARbyCanopy_pft      , &
+    LWRadCanopy_pft                =>  plt_rad%LWRadCanopy_pft             , &
+    RadNet2Canopy_pft              =>  plt_rad%RadNet2Canopy_pft             &
   )
   RadNet2Canopy_pft(NZ)=0.0_r8
   EvapTransHeat_pft(NZ)=0.0_r8
@@ -1205,7 +1206,7 @@ module UptakesMod
   HeatStorCanP(NZ)=0.0_r8
   VapXAir2Canopy_pft(NZ)=0.0_r8
   Transpiration_pft(NZ)=0.0_r8
-  IF(CanopyHeight_pft(NZ).GE.SnowDepth-ZERO)THEN
+  IF(CanopyHeight_pft(NZ).GE.SnowDepth-ZERO .or. TKSnow==spval)THEN
     TKC(NZ)=TairK
   ELSE
     TKC(NZ)=TKSnow
@@ -1331,23 +1332,23 @@ module UptakesMod
   integer, intent(in) :: NZ
   real(r8) :: ACTV,RTK,STK,TKGO,TKSO
   integer :: L
-  associate(                          &
+  associate(                                                        &
     TCelciusCanopy_pft         =>  plt_ew%TCelciusCanopy_pft      , &
-    TKC                        =>  plt_ew%TKC       , &
-    TKS                        =>  plt_ew%TKS       , &
-    PSICanPDailyMin            =>  plt_ew%PSICanPDailyMin     , &
-    PSICanopy_pft              =>  plt_ew%PSICanopy_pft    , &
-    NU                         =>  plt_site%NU      , &
-    CHILL                      =>  plt_photo%CHILL  , &
-    OFFST                      =>  plt_pheno%OFFST  , &
-    TCChill4Seed_pft         =>  plt_pheno%TCChill4Seed_pft   , &
-    fTgrowRootP_vr                =>  plt_pheno%fTgrowRootP_vr   , &
-    TCG                        =>  plt_pheno%TCG    , &
-    TKG                        =>  plt_pheno%TKG    , &
-    iPlantCalendar_brch        =>  plt_pheno%iPlantCalendar_brch , &
-    fTgrowCanP                 =>  plt_pheno%fTgrowCanP   , &
-    MaxSoiL4Root               =>  plt_morph%MaxSoiL4Root     , &
-    MainBranchNum_pft        =>  plt_morph%MainBranchNum_pft      &
+    TKC                        =>  plt_ew%TKC                     , &
+    TKS                        =>  plt_ew%TKS                     , &
+    PSICanPDailyMin            =>  plt_ew%PSICanPDailyMin         , &
+    PSICanopy_pft              =>  plt_ew%PSICanopy_pft           , &
+    NU                         =>  plt_site%NU                    , &
+    CHILL                      =>  plt_photo%CHILL                , &
+    OFFST                      =>  plt_pheno%OFFST                , &
+    TCChill4Seed_pft           =>  plt_pheno%TCChill4Seed_pft     , &
+    fTgrowRootP_vr             =>  plt_pheno%fTgrowRootP_vr       , &
+    TCG                        =>  plt_pheno%TCG                  , &
+    TKG                        =>  plt_pheno%TKG                  , &
+    iPlantCalendar_brch        =>  plt_pheno%iPlantCalendar_brch  , &
+    fTgrowCanP                 =>  plt_pheno%fTgrowCanP           , &
+    MaxSoiL4Root               =>  plt_morph%MaxSoiL4Root         , &
+    MainBranchNum_pft          =>  plt_morph%MainBranchNum_pft      &
   )
   !
   !     SET CANOPY GROWTH TEMPERATURE FROM SOIL SURFACE

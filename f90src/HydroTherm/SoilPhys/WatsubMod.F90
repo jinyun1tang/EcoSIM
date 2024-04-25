@@ -300,8 +300,8 @@ module WatsubMod
         endif
         !LyrIrrig=layer number where irrigation is applied
         IF(L.EQ.LyrIrrig)THEN
-          FWatIrrigate2MicP(L,NY,NX)=IrrigSubsurf(NY,NX)
-          HeatIrrigation(L,NY,NX)=cpw*TairK(NY,NX)*IrrigSubsurf(NY,NX)
+          FWatIrrigate2MicP(L,NY,NX)=IrrigSubsurf_col(NY,NX)
+          HeatIrrigation(L,NY,NX)=cpw*TairK(NY,NX)*IrrigSubsurf_col(NY,NX)
           FWatIrrigate2MicP1(L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*dts_HeatWatTP
           HeatIrrigation1(L,NY,NX)=HeatIrrigation(L,NY,NX)*dts_HeatWatTP
         ELSE

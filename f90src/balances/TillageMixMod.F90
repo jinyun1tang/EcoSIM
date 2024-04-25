@@ -269,7 +269,7 @@ module TillageMixMod
     ENDDO
 
     DO NTN=ifertn_beg,ifertn_end
-      TFertNG_soil(NTN)=FertN_soil(NTN,0,NY,NX)*CORP0
+      TFertNG_soil(NTN)=FertN_soil_vr(NTN,0,NY,NX)*CORP0
     ENDDO
 
     TZNFNG=ZNFNI(0,NY,NX)*CORP0
@@ -303,7 +303,7 @@ module TillageMixMod
     trcp_salml(idsp_CaH4P2O8,0,NY,NX)=trcp_salml(idsp_CaH4P2O8,0,NY,NX)*XCORP0
 
     DO NTN=ifertn_beg,ifertn_end
-      FertN_soil(NTN,0,NY,NX)=FertN_soil(NTN,0,NY,NX)*XCORP0
+      FertN_soil_vr(NTN,0,NY,NX)=FertN_soil_vr(NTN,0,NY,NX)*XCORP0
     ENDDO
 
     VLWatMicP(0,NY,NX)=VLWatMicP(0,NY,NX)*XCORP0
@@ -346,11 +346,11 @@ module TillageMixMod
         TENGY=TENGY+TI*(cpw*(VLWatMicP(L,NY,NX)+VLWatMacP(L,NY,NX)) &
           +cpi*(VLiceMicP(L,NY,NX)+VLiceMacP(L,NY,NX)))*TKS(L,NY,NX)
         DO NTN=ifertn_beg,ifertn_end
-          TfertN_soil(NTN)=TfertN_soil(NTN)+TI*FertN_soil(NTN,L,NY,NX)
+          TfertN_soil(NTN)=TfertN_soil(NTN)+TI*FertN_soil_vr(NTN,L,NY,NX)
         ENDDO
 
         DO NTN=ifertnb_beg,ifertnb_end
-          TfertN_band(NTN)=TfertN_band(NTN)+TI*FertN_band(NTN,L,NY,NX)
+          TfertN_band(NTN)=TfertN_band(NTN)+TI*FertN_Band_vr(NTN,L,NY,NX)
         ENDDO
 
         DO NTS=ids_beg,ids_end
@@ -470,15 +470,15 @@ module TillageMixMod
         TKS(L,NY,NX)=(ENGYM+ENGYL)/VHeatCapacity(L,NY,NX)
         TCS(L,NY,NX)=units%Kelvin2Celcius(TKS(L,NY,NX))
         DO NTN=ifertn_beg,ifertn_end
-          FertN_soil(NTN,L,NY,NX)=TI*FertN_soil(NTN,L,NY,NX) &
-            +CORP*(FI*TfertN_soil(NTN)-TI*FertN_soil(NTN,L,NY,NX))&
-            +TX*FertN_soil(NTN,L,NY,NX)
+          FertN_soil_vr(NTN,L,NY,NX)=TI*FertN_soil_vr(NTN,L,NY,NX) &
+            +CORP*(FI*TfertN_soil(NTN)-TI*FertN_soil_vr(NTN,L,NY,NX))&
+            +TX*FertN_soil_vr(NTN,L,NY,NX)
         ENDDO
 
         DO NTN=ifertnb_beg,ifertnb_end
-          FertN_band(NTN,L,NY,NX)=TI*FertN_band(NTN,L,NY,NX) &
-            +CORP*(FI*TfertN_band(NTN)-TI*FertN_band(NTN,L,NY,NX)) &
-            +TX*FertN_band(NTN,L,NY,NX)
+          FertN_Band_vr(NTN,L,NY,NX)=TI*FertN_Band_vr(NTN,L,NY,NX) &
+            +CORP*(FI*TFertN_Band(NTN)-TI*FertN_Band_vr(NTN,L,NY,NX)) &
+            +TX*FertN_Band_vr(NTN,L,NY,NX)
         ENDDO
 
         !SALT
@@ -741,7 +741,7 @@ module TillageMixMod
         ENDDO
 
         DO NTN=ifertn_beg,ifertn_end
-          FertN_soil(NTN,L,NY,NX)=FertN_soil(NTN,L,NY,NX)+FI*TFertNG_soil(NTN)
+          FertN_soil_vr(NTN,L,NY,NX)=FertN_soil_vr(NTN,L,NY,NX)+FI*TFertNG_soil(NTN)
         ENDDO
 
         ZNHU0(L,NY,NX)=ZNHUX0

@@ -114,7 +114,7 @@ implicit none
   real(r8),target,allocatable ::  ATKS(:,:)                          !mean annual soil temperature, [K]
   real(r8),target,allocatable ::  RainFalPrec(:,:)                   !rainfall, [m3 d-2 h-1]
   real(r8),target,allocatable ::  SnoFalPrec(:,:)                    !snowfall, [m3 d-2 h-1]
-  real(r8),target,allocatable ::  PrecAtm(:,:)                         !rainfall + snowfall, [m3 d-2 h-1]
+  real(r8),target,allocatable ::  PrecAtm_col(:,:)                         !rainfall + snowfall, [m3 d-2 h-1]
   real(r8),target,allocatable ::  PrecRainAndSurfirrig(:,:)                         !rainfall + irrigation, [m3 d-2 h-1]
   real(r8),target,allocatable ::  EnergyImpact4Erosion(:,:)                         !cumulative rainfall energy impact on soil surface
   real(r8),target,allocatable ::  PHR(:,:)                           !precipitation pH, [-]
@@ -244,7 +244,7 @@ implicit none
   allocate(ATKS(JY,JX));        ATKS=0._r8
   allocate(RainFalPrec(JY,JX));       RainFalPrec=0._r8
   allocate(SnoFalPrec(JY,JX));       SnoFalPrec=0._r8
-  allocate(PrecAtm(JY,JX));       PrecAtm=0._r8
+  allocate(PrecAtm_col(JY,JX));       PrecAtm_col=0._r8
   allocate(PrecRainAndSurfirrig(JY,JX));       PrecRainAndSurfirrig=0._r8
   allocate(EnergyImpact4Erosion(JY,JX));       EnergyImpact4Erosion=0._r8
   allocate(PHR(JY,JX));         PHR=0._r8
@@ -374,7 +374,7 @@ implicit none
   call destroy(ATKS)
   call destroy(RainFalPrec)
   call destroy(SnoFalPrec)
-  call destroy(PrecAtm)
+  call destroy(PrecAtm_col)
   call destroy(PrecRainAndSurfirrig)
   call destroy(EnergyImpact4Erosion)
   call destroy(PHR)

@@ -1474,7 +1474,7 @@ contains
 !     PRECIP ON SNOW ARRAYS EXPORTED TO TranspNoSalt.F, TranspSalt.F
 !     FOR SOLUTE FLUX CALCULATIONS
 !
-!     SnoFalPrec,RainFalPrec,PrecAtm,PRECI=snow,rain,snow+rain,irrigation
+!     SnoFalPrec,RainFalPrec,PrecAtm_col,PRECI=snow,rain,snow+rain,irrigation
 !     VHCPW,VLHeatCapSnowMin_col=current, minimum snowpack heat capacities
 !     Rain2LitRSurf_col,Irrig2LitRSurf=water flux to surface litter from rain,irrigation
 !     FLQGQ,FLQGI=water flux to snowpack from rain,irrigation
@@ -1484,14 +1484,14 @@ contains
     !there is precipitation, there is significant snow layer
     Rain2LitRSurf_col(NY,NX)=0.0_r8
     Irrig2LitRSurf(NY,NX)=0.0_r8
-    Rain2SoilSurf(NY,NX)=PrecAtm(NY,NX)
+    Rain2SoilSurf(NY,NX)=PrecAtm_col(NY,NX)
     Irrig2SoilSurf(NY,NX)=IrrigSurface(NY,NX)
-  ELSEIF((PrecAtm(NY,NX).GT.0.0.OR.IrrigSurface(NY,NX).GT.0.0_r8) &
+  ELSEIF((PrecAtm_col(NY,NX).GT.0.0.OR.IrrigSurface(NY,NX).GT.0.0_r8) &
     .AND.VLHeatCapSnow(1,NY,NX).LE.VLHeatCapSnowMin_col(NY,NX))THEN
     !there is insignificant snow layer
-    Rain2LitRSurf_col(NY,NX)=PrecThrufall2LitR*PrecAtm(NY,NX)/(PrecAtm(NY,NX)+IrrigSurface(NY,NX))
-    Irrig2LitRSurf(NY,NX)=PrecThrufall2LitR*IrrigSurface(NY,NX)/(PrecAtm(NY,NX)+IrrigSurface(NY,NX))
-    Rain2SoilSurf(NY,NX)=PrecAtm(NY,NX)-Rain2LitRSurf_col(NY,NX)
+    Rain2LitRSurf_col(NY,NX)=PrecThrufall2LitR*PrecAtm_col(NY,NX)/(PrecAtm_col(NY,NX)+IrrigSurface(NY,NX))
+    Irrig2LitRSurf(NY,NX)=PrecThrufall2LitR*IrrigSurface(NY,NX)/(PrecAtm_col(NY,NX)+IrrigSurface(NY,NX))
+    Rain2SoilSurf(NY,NX)=PrecAtm_col(NY,NX)-Rain2LitRSurf_col(NY,NX)
     Irrig2SoilSurf(NY,NX)=IrrigSurface(NY,NX)-Irrig2LitRSurf(NY,NX)
   ELSE
     !no precipitation
