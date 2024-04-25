@@ -222,7 +222,7 @@ module MicBGCMod
     k_POM=>micpar%k_POM                     , &
     is_activef_micb=> micpar%is_activef_micb, &
     n_anero_faculb  => micpar%n_anero_faculb, &
-    AmmoniaOxidizeBacteria => micpar%AmmoniaOxidizeBacteria, &
+    AmmoniaOxidBacter => micpar%AmmoniaOxidBacter, &
     litrm    => micfor%litrm  , &
     VWatLitRHoldCapcity  => micfor%VWatLitRHoldCapcity , &
     VLWatMicP   => micfor%VLWatMicP, &
@@ -431,7 +431,7 @@ module MicBGCMod
 !
         TOMA=TOMA+OMAff(NGL)
 
-        IF(N.EQ.AmmoniaOxidizeBacteria)THEN
+        IF(N.EQ.AmmoniaOxidBacter)THEN
           TOMN=TOMN+OMAff(NGL)
         ENDIF
         MID2=micpar%get_micb_id(2,NGL)
@@ -628,7 +628,7 @@ module MicBGCMod
     ENDIF
   ENDDO D760
 
-  N=micpar%AmmoniaOxidizeBacteria
+  N=micpar%AmmoniaOxidBacter
   nmicf%RVOXAAO=SUM(nmicf%RVOXA(JGniA(N):JGnfA(N)))
   nmicf%RVOXBAO=SUM(nmicf%RVOXB(JGniA(N):JGnfA(N)))
   DO  N=1,NumMicbFunGroups
@@ -1896,9 +1896,9 @@ module MicBGCMod
     Lsurf   => micfor%Lsurf, &
     k_POM   =>micpar%k_POM, &
     k_humus => micpar%k_humus, &
-    AmmoniaOxidizeBacteria => micpar%AmmoniaOxidizeBacteria, &
+    AmmoniaOxidBacter => micpar%AmmoniaOxidBacter, &
     AerobicMethanotrophBacteria => micpar%AerobicMethanotrophBacteria, &
-    NitriteOxidizeBacteria => micpar%NitriteOxidizeBacteria, &
+    NitriteOxidBacter => micpar%NitriteOxidBacter, &
     is_activef_micb => micpar%is_activef_micb, &
     RCH4O => micflx%RCH4O, &
     RCO2O => micflx%RCO2O, &
@@ -2084,13 +2084,13 @@ module MicBGCMod
   XNH4B=-naqfdiag%TRINB
   XNO3B=-naqfdiag%TRIOB-naqfdiag%TRDNB+RCN3B
   XNO2B=naqfdiag%TRDNB-naqfdiag%TRD2B-RCNOB
-  !AmmoniaOxidizeBacteria=1, NitriteOxidizeBacteria=2, AerobicMethanotrophBacteria=3
-  DO NGL=JGniA(AmmoniaOxidizeBacteria),JGnfA(AmmoniaOxidizeBacteria)
+  !AmmoniaOxidBacter=1, NitriteOxidBacter=2, AerobicMethanotrophBacteria=3
+  DO NGL=JGniA(AmmoniaOxidBacter),JGnfA(AmmoniaOxidBacter)
     RNH4MicbTransf_vr=RNH4MicbTransf_vr-RVOXA(NGL)
     RNO2MicbTransf_vr=RNO2MicbTransf_vr+RVOXA(NGL)
     XNH4B=XNH4B-RVOXB(NGL)
   ENDDO
-  DO NGL=JGniA(NitriteOxidizeBacteria),JGnfA(NitriteOxidizeBacteria)
+  DO NGL=JGniA(NitriteOxidBacter),JGnfA(NitriteOxidBacter)
     RNO3MicbTransf_vr=RNO3MicbTransf_vr+RVOXA(NGL)
     RNO2MicbTransf_vr=RNO2MicbTransf_vr-RVOXA(NGL)
     XNO3B=XNO3B+RVOXB(NGL)

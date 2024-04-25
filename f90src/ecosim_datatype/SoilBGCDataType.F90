@@ -35,7 +35,7 @@ implicit none
   real(r8),target,allocatable :: AEC(:,:,:)            !soil anion exchange capacity	[cmol kg-1]
 
   real(r8),target,allocatable ::  ROXSK(:,:,:,:)                     !total O2 sink, [g d-2 t-1]
-  real(r8),target,allocatable ::  SurfGasFlx(:,:,:)                  !soil gas flux, [g d-2 h-1]
+  real(r8),target,allocatable ::  SurfGasFlx_col(:,:,:)                  !soil gas flux, [g d-2 h-1]
   real(r8),target,allocatable ::  AmendCFlx_col(:,:)                         !total C amendment, [g d-2]
   real(r8),target,allocatable ::  FertNFlx_col(:,:)                        !total fertilizer N amendment, [g d-2]
   real(r8),target,allocatable ::  FerPFlx_col(:,:)                        !total fertilizer P amendment, [g d-2]
@@ -137,7 +137,7 @@ implicit none
   allocate(AEC(JZ,JY,JX));AEC(JZ,JY,JX)=0._r8
 
   allocate(ROXSK(60,0:JZ,JY,JX));ROXSK=0._r8
-  allocate(SurfGasFlx(idg_beg:idg_NH3,JY,JX));  SurfGasFlx=0._r8
+  allocate(SurfGasFlx_col(idg_beg:idg_NH3,JY,JX));  SurfGasFlx_col=0._r8
   allocate(AmendCFlx_col(JY,JX));       AmendCFlx_col=0._r8
   allocate(FertNFlx_col(JY,JX));      FertNFlx_col=0._r8
   allocate(FerPFlx_col(JY,JX));      FerPFlx_col=0._r8

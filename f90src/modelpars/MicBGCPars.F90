@@ -20,10 +20,10 @@ implicit none
   integer :: k_manure
   integer :: k_POM
   integer :: k_humus
-  integer :: AmmoniaOxidizeBacteria
-  integer :: NitriteOxidizeBacteria
+  integer :: AmmoniaOxidBacter
+  integer :: NitriteOxidBacter
   integer :: AerobicMethanotrophBacteria
-  integer :: HydrogenoMethanogenArchea
+  integer :: H2GenoMethanogArchea
   integer :: n_aero_hetrophb
   integer :: n_anero_faculb
   integer :: n_aero_fungi
@@ -177,19 +177,19 @@ contains
   this%is_anerobic_hetr(this%n_anaero_ferm)=.true.
   this%is_anerobic_hetr(this%n_anero_n2fixer)=.true.
 !the abstract complex
-  this%AmmoniaOxidizeBacteria=1
-  this%NitriteOxidizeBacteria=2
+  this%AmmoniaOxidBacter=1
+  this%NitriteOxidBacter=2
   this%AerobicMethanotrophBacteria=3
-  this%HydrogenoMethanogenArchea=5
+  this%H2GenoMethanogArchea=5
 
-  this%is_activef_micb(this%AmmoniaOxidizeBacteria)=.True.
-  this%is_activef_micb(this%NitriteOxidizeBacteria)=.True.
+  this%is_activef_micb(this%AmmoniaOxidBacter)=.True.
+  this%is_activef_micb(this%NitriteOxidBacter)=.True.
   this%is_activef_micb(this%AerobicMethanotrophBacteria)=.True.
-  this%is_activef_micb(this%HydrogenoMethanogenArchea)=.True.
+  this%is_activef_micb(this%H2GenoMethanogArchea)=.True.
 
-  this%is_CO2_autotroph(this%AmmoniaOxidizeBacteria)=.true.
-  this%is_CO2_autotroph(this%NitriteOxidizeBacteria)=.true.
-  this%is_CO2_autotroph(this%HydrogenoMethanogenArchea)=.true.
+  this%is_CO2_autotroph(this%AmmoniaOxidBacter)=.true.
+  this%is_CO2_autotroph(this%NitriteOxidBacter)=.true.
+  this%is_CO2_autotroph(this%H2GenoMethanogArchea)=.true.
 
   end subroutine Init
 !------------------------------------------------------------------------------------------

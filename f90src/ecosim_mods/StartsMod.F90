@@ -733,9 +733,9 @@ module StartsMod
   TOMOU(ielmc)=0.0_r8
   TOMOU(ielmn)=0.0_r8
   TOMOU(ielmp)=0.0_r8
-  XESN(ielmc)=0.0_r8
-  XESN(ielmn)=0.0_r8
-  XESN(ielmp)=0.0_r8
+  Litrfall_lnds(ielmc)=0.0_r8
+  Litrfall_lnds(ielmn)=0.0_r8
+  Litrfall_lnds(ielmp)=0.0_r8
   TIONIN=0.0_r8
   TIONOU=0.0_r8
   end subroutine InitControlParms

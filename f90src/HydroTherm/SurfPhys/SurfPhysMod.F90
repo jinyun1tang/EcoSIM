@@ -1484,20 +1484,20 @@ contains
     !there is precipitation, there is significant snow layer
     Rain2LitRSurf_col(NY,NX)=0.0_r8
     Irrig2LitRSurf(NY,NX)=0.0_r8
-    Rain2SoilSurf(NY,NX)=PrecAtm_col(NY,NX)
+    Rain2SoilSurf_col(NY,NX)=PrecAtm_col(NY,NX)
     Irrig2SoilSurf(NY,NX)=IrrigSurface(NY,NX)
   ELSEIF((PrecAtm_col(NY,NX).GT.0.0.OR.IrrigSurface(NY,NX).GT.0.0_r8) &
     .AND.VLHeatCapSnow(1,NY,NX).LE.VLHeatCapSnowMin_col(NY,NX))THEN
     !there is insignificant snow layer
     Rain2LitRSurf_col(NY,NX)=PrecThrufall2LitR*PrecAtm_col(NY,NX)/(PrecAtm_col(NY,NX)+IrrigSurface(NY,NX))
     Irrig2LitRSurf(NY,NX)=PrecThrufall2LitR*IrrigSurface(NY,NX)/(PrecAtm_col(NY,NX)+IrrigSurface(NY,NX))
-    Rain2SoilSurf(NY,NX)=PrecAtm_col(NY,NX)-Rain2LitRSurf_col(NY,NX)
+    Rain2SoilSurf_col(NY,NX)=PrecAtm_col(NY,NX)-Rain2LitRSurf_col(NY,NX)
     Irrig2SoilSurf(NY,NX)=IrrigSurface(NY,NX)-Irrig2LitRSurf(NY,NX)
   ELSE
     !no precipitation
     Rain2LitRSurf_col(NY,NX)=0.0_r8
     Irrig2LitRSurf(NY,NX)=0.0_r8
-    Rain2SoilSurf(NY,NX)=0.0_r8
+    Rain2SoilSurf_col(NY,NX)=0.0_r8
     Irrig2SoilSurf(NY,NX)=0.0_r8
   ENDIF
 !

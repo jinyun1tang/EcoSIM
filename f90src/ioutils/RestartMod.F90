@@ -3460,18 +3460,18 @@ implicit none
 
   call restartvar(ncid, flag, varname='XCSN', &
        long_name='total LitrFall C', units='g d-2', &
-       interpinic_flag='skip', data=XESN(ielmc), missing_value=spval, &
+       interpinic_flag='skip', data=Litrfall_lnds(ielmc), missing_value=spval, &
        fill_value=spval)
 
   call restartvar(ncid, flag, varname='XZSN', &
        long_name='total LitrFall N', units='g d-2', &
-       interpinic_flag='skip', data=XESN(ielmn), missing_value=spval, &
+       interpinic_flag='skip', data=Litrfall_lnds(ielmn), missing_value=spval, &
        fill_value=spval)
 
   
   call restartvar(ncid, flag, varname='XPSN', &
        long_name='total LitrFall P', units='g d-2', &
-       interpinic_flag='skip', data=XESN(ielmp), missing_value=spval, &
+       interpinic_flag='skip', data=Litrfall_lnds(ielmp), missing_value=spval, &
        fill_value=spval)
   
 
@@ -3819,16 +3819,16 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrc_2d(1:ncols,1:trc_confs%NGasTracers)    
-    call restartvar(ncid, flag, varname='SurfGasFlx', dim1name='column',&
+    call restartvar(ncid, flag, varname='SurfGasFlx_col', dim1name='column',&
        dim2name='gastrcs',long_name='total soil gas flux', units='g d-2', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,SurfGasFlx,datrc_2d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,SurfGasFlx_col,datrc_2d) 
   else
     !print*,'UCH4G'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SurfGasFlx,datrc_2d)   
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SurfGasFlx_col,datrc_2d)   
     datpr2 => datrc_2d(1:ncols,1:trc_confs%NGasTracers)          
-    call restartvar(ncid, flag, varname='SurfGasFlx', dim1name='column',&
+    call restartvar(ncid, flag, varname='SurfGasFlx_col', dim1name='column',&
        dim2name='gastrcs',long_name='total soil gas flux', units='g d-2', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    

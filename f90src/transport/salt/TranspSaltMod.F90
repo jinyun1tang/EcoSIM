@@ -166,7 +166,7 @@ module TranspSaltMod
 !
   DO nsalts=idsalt_beg,idsalt_end
     trcSalt3DFlo2Cell(nsalts,3,0,NY,NX)=0.0
-    trcSaltFlo2SnowLay(nsalts,1,NY,NX)=Rain2SoilSurf(NY,NX)*trcsalt_rain_conc(nsalts,NY,NX) &
+    trcSaltFlo2SnowLay(nsalts,1,NY,NX)=Rain2SoilSurf_col(NY,NX)*trcsalt_rain_conc(nsalts,NY,NX) &
       +Irrig2SoilSurf(NY,NX)*trcsalt_irrig_conc(nsalts,I,NY,NX)    
   ENDDO
 
@@ -212,15 +212,15 @@ module TranspSaltMod
   ENDDO
 
   DO nsalts=idsalt_beg,idsalt_KSO4
-    trcSalt3DFlo2Cell(nsalts,3,NU(NY,NX),NY,NX)=Rain2SoilSurf(NY,NX)*trcsalt_rain_conc(nsalts,NY,NX) &
+    trcSalt3DFlo2Cell(nsalts,3,NU(NY,NX),NY,NX)=Rain2SoilSurf_col(NY,NX)*trcsalt_rain_conc(nsalts,NY,NX) &
       +Irrig2SoilSurf(NY,NX)*trcsalt_irrig_conc(nsalts,I,NY,NX)
   ENDDO
   
   DO nsalts=idsalt_H0PO4,idsalt_MgHPO4
     ids=nsalts-idsalt_H0PO4+idsalt_H0PO4B  
-    trcSalt3DFlo2Cell(nsalts,3,NU(NY,NX),NY,NX)=(Rain2SoilSurf(NY,NX)*trcsalt_rain_conc(nsalts,NY,NX) &
+    trcSalt3DFlo2Cell(nsalts,3,NU(NY,NX),NY,NX)=(Rain2SoilSurf_col(NY,NX)*trcsalt_rain_conc(nsalts,NY,NX) &
       +Irrig2SoilSurf(NY,NX)*trcsalt_irrig_conc(nsalts,I,NY,NX))*trcs_VLN_vr(ids_H1PO4,NU(NY,NX),NY,NX)
-    trcSalt3DFlo2Cell(ids,3,NU(NY,NX),NY,NX)=(Rain2SoilSurf(NY,NX)*trcsalt_rain_conc(nsalts,NY,NX) &
+    trcSalt3DFlo2Cell(ids,3,NU(NY,NX),NY,NX)=(Rain2SoilSurf_col(NY,NX)*trcsalt_rain_conc(nsalts,NY,NX) &
       +Irrig2SoilSurf(NY,NX)*trcsalt_irrig_conc(nsalts,I,NY,NX))*trcs_VLN_vr(ids_H1PO4B,NU(NY,NX),NY,NX)    
   ENDDO
 

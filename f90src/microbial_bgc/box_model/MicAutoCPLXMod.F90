@@ -84,9 +84,9 @@ module MicAutoCPLXMod
     RCH4Xff  => nmicf%RCH4Xff,    &
     TOMK  => ncplxs%TOMK     ,    &
     jcplx  => micpar%jcplx   ,    &
-    AmmoniaOxidizeBacteria => micpar%AmmoniaOxidizeBacteria, &
-    NitriteOxidizeBacteria  => micpar%NitriteOxidizeBacteria, &
-    HydrogenoMethanogenArchea  => micpar%HydrogenoMethanogenArchea, &
+    AmmoniaOxidBacter => micpar%AmmoniaOxidBacter, &
+    NitriteOxidBacter  => micpar%NitriteOxidBacter, &
+    H2GenoMethanogArchea  => micpar%H2GenoMethanogArchea, &
     AerobicMethanotrophBacteria  => micpar%AerobicMethanotrophBacteria, &
     ZEROS  => micfor%ZEROS  ,    &
     SoilMicPMassLayer  => micfor%SoilMicPMassLayer    ,    &
@@ -153,17 +153,17 @@ module MicAutoCPLXMod
 !     OXIDIZERS,(3) CH4 OXIDIZERS, (5) H2TROPHIC METHANOGENS
 !
 !
-  if (N.eq.AmmoniaOxidizeBacteria)then
+  if (N.eq.AmmoniaOxidBacter)then
 !   NH3 OXIDIZERS
     call NH3OxidizerCatabolism(NGL,N,XCO2,VOLWZ,TFNX,ECHZ,RGOMP,RVOXP,&
       RVOXPA,RVOXPB,micfor,micstt,naqfdiag,nmicf,nmics,micflx)
 
-  elseif (N.eq.NitriteOxidizeBacteria)then
+  elseif (N.eq.NitriteOxidBacter)then
 !     NO2 OXIDIZERS
     call NO2OxidizerCatabolism(NGL,N,XCO2,ECHZ,RGOMP,RVOXP,RVOXPA,RVOXPB,&
       micfor,micstt,naqfdiag,nmicf,nmics,micflx)
 
-  elseif (N.eq.HydrogenoMethanogenArchea)then
+  elseif (N.eq.H2GenoMethanogArchea)then
 !     H2TROPHIC METHANOGENS
     call H2MethanogensCatabolism(NGL,N,ECHZ,RGOMP,XCO2,micfor,micstt,&
       naqfdiag,nmicf,nmics,micflx)
@@ -193,11 +193,11 @@ module MicAutoCPLXMod
 !
   RUPOXff(NGL)=0.0_r8
 
-  if (N.eq.AmmoniaOxidizeBacteria .or. N.eq.NitriteOxidizeBacteria .or. N.eq.AerobicMethanotrophBacteria)then
+  if (N.eq.AmmoniaOxidBacter .or. N.eq.NitriteOxidBacter .or. N.eq.AerobicMethanotrophBacteria)then
 !   write(*,*)'AerobLeafO2Solubility_pftUptake'
     call AerobicAutorO2Uptake(NGL,N,FOXYX,OXKX,RGOMP,RVOXP,RVOXPA,RVOXPB,&
       micfor,micstt,nmicf,nmics,micflx)
-  elseif (N.eq.HydrogenoMethanogenArchea)then
+  elseif (N.eq.H2GenoMethanogArchea)then
     RGOMOff(NGL)=RGOMP
     RCO2Xff(NGL)=0.0_r8
     RCH3Xff(NGL)=0.0_r8
@@ -209,7 +209,7 @@ module MicAutoCPLXMod
 !
 !     AUTOTROPHIC DENITRIFICATION
 !
-  IF(N.EQ.AmmoniaOxidizeBacteria.AND.ROXYMff(NGL).GT.0.0_r8.AND.(.not.litrm.OR.VLSoilPoreMicP_vr.GT.ZEROS))THEN
+  IF(N.EQ.AmmoniaOxidBacter.AND.ROXYMff(NGL).GT.0.0_r8.AND.(.not.litrm.OR.VLSoilPoreMicP_vr.GT.ZEROS))THEN
     call AutotrophDenitrificCatabolism(NGL,N,XCO2,VOLWZ,micfor,micstt,&
       naqfdiag,nmicf,nmics,micflx)
   ELSE
@@ -429,7 +429,7 @@ module MicAutoCPLXMod
     CGOSEautor  => nmicf%CGOSEautor,    &
     RGOMOff  => nmicf%RGOMOff,    &
     RGOMDff  => nmicf%RGOMDff,    &
-    RMOMCff  => nmicf%RMOMCff,    &
+    RMaintCompAutor  => nmicf%RMaintCompAutor,    &
     RDOMEautor => nmicf%RDOMEautor,    &
     RHOMEautor  => nmicf%RHOMEautor,    &
     RCOMEautor  => nmicf%RCOMEautor,    &
@@ -587,7 +587,7 @@ module MicAutoCPLXMod
   IF(RXOMT.GT.ZEROS.AND.RMOMT.GT.ZEROS.AND.RCCC.GT.ZERO)THEN
     FRM=RXOMT/RMOMT
     DO  M=1,2
-      RXMMEautor(ielmc,M,NGL)=AMIN1(OMEauto(ielmc,MID),AZMAX1(FRM*RMOMCff(M,NGL)/RCCC))
+      RXMMEautor(ielmc,M,NGL)=AMIN1(OMEauto(ielmc,MID),AZMAX1(FRM*RMaintCompAutor(M,NGL)/RCCC))
       RXMMEautor(ielmn,M,NGL)=AMIN1(OMEauto(ielmn,MID),AZMAX1(RXMMEautor(ielmc,M,NGL)*CNOMAff(NGL)))
       RXMMEautor(ielmp,M,NGL)=AMIN1(OMEauto(ielmp,MID),AZMAX1(RXMMEautor(ielmc,M,NGL)*CPOMAff(NGL)))
 
@@ -653,7 +653,7 @@ module MicAutoCPLXMod
 
   ! begin_execution
   associate(                  &
-    WFNff    => nmics%WFNff,      &
+    fLimO2Autor    => nmics%fLimO2Autor,      &
     OMAff    => nmics%OMAff,      &
     RUPOXff  => nmicf%RUPOXff,    &
     RGOMOff  => nmicf%RGOMOff,    &
@@ -667,8 +667,8 @@ module MicAutoCPLXMod
     RCH4Xff  => nmicf%RCH4Xff,    &
     RVOXA  => nmicf%RVOXA,    &
     RVOXB  => nmicf%RVOXB,    &
-    AmmoniaOxidizeBacteria => micpar%AmmoniaOxidizeBacteria, &
-    NitriteOxidizeBacteria => micpar%NitriteOxidizeBacteria, &
+    AmmoniaOxidBacter => micpar%AmmoniaOxidBacter, &
+    NitriteOxidBacter => micpar%NitriteOxidBacter, &
     ROXYF  => micfor%ROXYF,  &
     COXYE  => micfor%COXYE  , &
     O2_rain_conc   => micfor%O2_rain_conc  , &
@@ -781,21 +781,21 @@ module MicAutoCPLXMod
       !     WFN=ratio of O2-limited to O2-unlimited uptake
       !     RVMX4,RVNHB,RVMX2,RVMB2=NH3,NO2 oxidation in non-band, band
       !
-      WFNff(NGL)=AMIN1(1.0,AZMAX1(RUPOXff(NGL)/ROXYPff(NGL)))
-      IF(N.EQ.AmmoniaOxidizeBacteria)THEN
-        RNH3OxidAutor(NGL)=RNH3OxidAutor(NGL)*WFNff(NGL)
-        RNH3OxidAutorBand(NGL)=RNH3OxidAutorBand(NGL)*WFNff(NGL)
-      ELSEIF(N.EQ.NitriteOxidizeBacteria)THEN
-        RNO2OxidAutor(NGL)=RNO2OxidAutor(NGL)*WFNff(NGL)
-        RNO2OxidAutorBand(NGL)=RNO2OxidAutorBand(NGL)*WFNff(NGL)
+      fLimO2Autor(NGL)=AMIN1(1.0,AZMAX1(RUPOXff(NGL)/ROXYPff(NGL)))
+      IF(N.EQ.AmmoniaOxidBacter)THEN
+        RNH3OxidAutor(NGL)=RNH3OxidAutor(NGL)*fLimO2Autor(NGL)
+        RNH3OxidAutorBand(NGL)=RNH3OxidAutorBand(NGL)*fLimO2Autor(NGL)
+      ELSEIF(N.EQ.NitriteOxidBacter)THEN
+        RNO2OxidAutor(NGL)=RNO2OxidAutor(NGL)*fLimO2Autor(NGL)
+        RNO2OxidAutorBand(NGL)=RNO2OxidAutorBand(NGL)*fLimO2Autor(NGL)
       ENDIF
     ELSE
       RUPOXff(NGL)=ROXYPff(NGL)
-      WFNff(NGL)=1.0_r8
+      fLimO2Autor(NGL)=1.0_r8
     ENDIF
   ELSE
     RUPOXff(NGL)=0.0_r8
-    WFNff(NGL)=1.0_r8
+    fLimO2Autor(NGL)=1.0_r8
   ENDIF
   !write(*,*)'RESPIRATION PRODUCTS ALLOCATED TO O2, CO2, ACETATE, CH4, H2'
   !
@@ -804,14 +804,14 @@ module MicAutoCPLXMod
   !     ROXYO=O2-limited O2 uptake
   !     RVOXA,RVOXB=total O2-lmited (1)NH4,(2)NO2,(3)CH4 oxidation
   !
-  RGOMOff(NGL)=RGOMP*WFNff(NGL)
+  RGOMOff(NGL)=RGOMP*fLimO2Autor(NGL)
   RCO2Xff(NGL)=RGOMOff(NGL)
   RCH3Xff(NGL)=0.0_r8
   RCH4Xff(NGL)=0.0_r8
-  ROXYOff(NGL)=ROXYMff(NGL)*WFNff(NGL)
+  ROXYOff(NGL)=ROXYMff(NGL)*fLimO2Autor(NGL)
   RH2GXff(NGL)=0.0_r8
-  RVOXA(NGL)=RVOXPA*WFNff(NGL)
-  RVOXB(NGL)=RVOXPB*WFNff(NGL)
+  RVOXA(NGL)=RVOXPA*fLimO2Autor(NGL)
+  RVOXB(NGL)=RVOXPB*fLimO2Autor(NGL)
   end associate
   end subroutine AerobicAutorO2Uptake
 
@@ -1829,7 +1829,7 @@ module MicAutoCPLXMod
   associate(                      &
     TFNRff  => nmics%TFNRff,      &
     OMN2ff  => nmics%OMN2ff,      &
-    RMOMCff => nmicf%RMOMCff ,    &
+    RMaintCompAutor => nmicf%RMaintCompAutor ,    &
     RGOMOff  => nmicf%RGOMOff,    &
     RGN2Fff => nmicf%RGN2Fff,     &
     RN2FXff  => nmicf%RN2FXff,    &
@@ -1848,8 +1848,8 @@ module MicAutoCPLXMod
   MID1=micpar%get_micb_id(1,NGL)
   FPH=1.0_r8+AZMAX1(0.25_r8*(6.5_r8-PH))
   RMOMX=RMOM*TFNRff(NGL)*FPH
-  RMOMCff(1,NGL)=OMEauto(ielmn,MID1)*RMOMX*RMOMK(1)
-  RMOMCff(2,NGL)=OMN2ff(NGL)*RMOMX*RMOMK(2)
+  RMaintCompAutor(1,NGL)=OMEauto(ielmn,MID1)*RMOMX*RMOMK(1)
+  RMaintCompAutor(2,NGL)=OMN2ff(NGL)*RMOMX*RMOMK(2)
 !
 !     MICROBIAL MAINTENANCE AND GROWTH RESPIRATION
 !
@@ -1857,7 +1857,7 @@ module MicAutoCPLXMod
 !     RGOMT=growth respiration
 !     RXOMT=senescence respiration
 !
-  RMOMT=RMOMCff(1,NGL)+RMOMCff(2,NGL)
+  RMOMT=RMaintCompAutor(1,NGL)+RMaintCompAutor(2,NGL)
   RGOMT=AZMAX1(RGOMOff(NGL)-RMOMT)
   RXOMT=AZMAX1(RMOMT-RGOMOff(NGL))
 

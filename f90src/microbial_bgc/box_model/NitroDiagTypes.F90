@@ -86,7 +86,7 @@ type, public :: NitroAQMFluxDiagType
   real(r8),allocatable :: TFNRff(:)
   real(r8),allocatable :: OMN2ff(:)
   real(r8),allocatable :: FOM2ff(:)
-  real(r8),allocatable :: WFNff(:)
+  real(r8),allocatable :: fLimO2Autor(:)
   real(r8),allocatable :: FCNff(:)
   real(r8),allocatable :: FCPff(:)
   real(r8),allocatable :: FCNPff(:)
@@ -167,7 +167,7 @@ type, public :: NitroAQMFluxDiagType
   real(r8),allocatable :: RDN2Bff(:)
   real(r8),allocatable :: RDN2Off(:)
   real(r8),allocatable :: RGOMDff(:)
-  real(r8),allocatable :: RMOMCff(:,:)
+  real(r8),allocatable :: RMaintCompAutor(:,:)
   real(r8),allocatable :: RINH4ff(:)
   real(r8),allocatable :: RINO3ff(:)
   real(r8),allocatable :: RIPO4ff(:)
@@ -403,7 +403,7 @@ type, public :: NitroAQMFluxDiagType
   allocate(this%RDN2Bff(NumMicrobAutrophCmplx));this%RDN2Bff=spval
   allocate(this%RDN2Off(NumMicrobAutrophCmplx));this%RDN2Off=spval
   allocate(this%RGOMDff(NumMicrobAutrophCmplx));this%RGOMDff=spval
-  allocate(this%RMOMCff(2,NumMicrobAutrophCmplx));this%RMOMCff=spval
+  allocate(this%RMaintCompAutor(2,NumMicrobAutrophCmplx));this%RMaintCompAutor=spval
   allocate(this%RINH4ff(NumMicrobAutrophCmplx));this%RINH4ff=spval
   allocate(this%RINO3ff(NumMicrobAutrophCmplx));this%RINO3ff=spval
   allocate(this%RIPO4ff(NumMicrobAutrophCmplx));this%RIPO4ff=spval
@@ -479,7 +479,7 @@ type, public :: NitroAQMFluxDiagType
   allocate(this%TFNRff(NumMicrobAutrophCmplx));this%TFNRff=spval
   allocate(this%OMN2ff(NumMicrobAutrophCmplx));this%OMN2ff=spval
   allocate(this%FOM2ff(NumMicrobAutrophCmplx));this%FOM2ff=spval
-  allocate(this%WFNff(NumMicrobAutrophCmplx));this%WFNff=spval
+  allocate(this%fLimO2Autor(NumMicrobAutrophCmplx));this%fLimO2Autor=spval
   allocate(this%FCNff(NumMicrobAutrophCmplx));this%FCNff=spval
   allocate(this%FCPff(NumMicrobAutrophCmplx));this%FCPff=spval
   allocate(this%FCNPff(NumMicrobAutrophCmplx));this%FCNPff=spval
@@ -558,7 +558,7 @@ type, public :: NitroAQMFluxDiagType
   this%RDN2Bff = 0._r8
   this%RDN2Off = 0._r8
   this%RGOMDff = 0._r8
-  this%RMOMCff = 0._r8
+  this%RMaintCompAutor = 0._r8
   this%RINH4ff = 0._r8
   this%RINO3ff = 0._r8
   this%RIPO4ff = 0._r8
@@ -672,7 +672,7 @@ type, public :: NitroAQMFluxDiagType
   call destroy(this%RDN2Bff)
   call destroy(this%RDN2Off)
   call destroy(this%RGOMDff)
-  call destroy(this%RMOMCff)
+  call destroy(this%RMaintCompAutor)
   call destroy(this%RINH4ff)
   call destroy(this%RINO3ff)
   call destroy(this%RIPO4ff)
@@ -742,7 +742,7 @@ type, public :: NitroAQMFluxDiagType
   call destroy(this%TFNRff)
   call destroy(this%OMN2ff)
   call destroy(this%FOM2ff)
-  call destroy(this%WFNff)
+  call destroy(this%fLimO2Autor)
   call destroy(this%FCNff)
   call destroy(this%FCPff)
   call destroy(this%FCNPff)
