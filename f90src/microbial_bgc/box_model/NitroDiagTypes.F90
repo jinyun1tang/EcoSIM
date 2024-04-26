@@ -57,9 +57,9 @@ type, public :: NitroAQMFluxDiagType
   end type NitroAQMFluxDiagType
 
   type, public :: NitroMicStateType
-  real(r8),allocatable :: CNOMA(:,:)
-  real(r8),allocatable :: CPOMA(:,:)
-  real(r8),allocatable :: OMA(:,:)
+  real(r8),allocatable :: CNOMActHeter(:,:)
+  real(r8),allocatable :: CPOMActHeter(:,:)
+  real(r8),allocatable :: OMActHeter(:,:)
 
   real(r8),allocatable :: OMC2(:,:)
   real(r8),allocatable :: TFNG(:,:)
@@ -71,14 +71,14 @@ type, public :: NitroAQMFluxDiagType
   real(r8),allocatable :: FCN(:,:)
   real(r8),allocatable :: FCP(:,:)
   real(r8),allocatable :: FCNP(:,:)
-  real(r8),allocatable :: FOMA(:,:)
+  real(r8),allocatable :: FracOMActHeter(:,:)
   real(r8),allocatable :: FOMN(:,:)
   real(r8),allocatable :: FOMK(:,:)
 
-  real(r8),allocatable :: CNOMAff(:)
-  real(r8),allocatable :: CPOMAff(:)
-  real(r8),allocatable :: OMAff(:)
-  real(r8),allocatable :: FOMAff(:)
+  real(r8),allocatable :: CNOMActAutor(:)
+  real(r8),allocatable :: CPOMActAutor(:)
+  real(r8),allocatable :: OMActAutor(:)
+  real(r8),allocatable :: FracOMActAutor(:)
   real(r8),allocatable :: FOMNff(:)
   real(r8),allocatable :: FOMKff(:)
   real(r8),allocatable :: OMC2ff(:)
@@ -450,10 +450,10 @@ type, public :: NitroAQMFluxDiagType
   NumMicrobAutrophCmplx=micpar%NumMicrobAutrophCmplx
   NumMicrbHetetrophCmplx=micpar%NumMicrbHetetrophCmplx
 
-  allocate(this%CNOMA(NumMicrbHetetrophCmplx,1:jcplx));this%CNOMA=spval
-  allocate(this%CPOMA(NumMicrbHetetrophCmplx,1:jcplx));this%CPOMA=spval
-  allocate(this%OMA(NumMicrbHetetrophCmplx,1:jcplx));this%OMA=spval
-  allocate(this%FOMA(NumMicrbHetetrophCmplx,1:jcplx));this%FOMA=spval
+  allocate(this%CNOMActHeter(NumMicrbHetetrophCmplx,1:jcplx));this%CNOMActHeter=spval
+  allocate(this%CPOMActHeter(NumMicrbHetetrophCmplx,1:jcplx));this%CPOMActHeter=spval
+  allocate(this%OMActHeter(NumMicrbHetetrophCmplx,1:jcplx));this%OMActHeter=spval
+  allocate(this%FracOMActHeter(NumMicrbHetetrophCmplx,1:jcplx));this%FracOMActHeter=spval
   allocate(this%FOMN(NumMicrbHetetrophCmplx,1:jcplx));this%FOMN=spval
   allocate(this%FOMK(NumMicrbHetetrophCmplx,1:jcplx));this%FOMK=spval
   allocate(this%OMC2(NumMicrbHetetrophCmplx,1:jcplx));this%OMC2=spval
@@ -466,10 +466,10 @@ type, public :: NitroAQMFluxDiagType
   allocate(this%FCP(NumMicrbHetetrophCmplx,1:jcplx));this%FCP=spval
   allocate(this%FCNP(NumMicrbHetetrophCmplx,1:jcplx));this%FCNP=spval
 
-  allocate(this%CNOMAff(NumMicrobAutrophCmplx));this%CNOMAff=spval
-  allocate(this%CPOMAff(NumMicrobAutrophCmplx));this%CPOMAff=spval
-  allocate(this%OMAff(NumMicrobAutrophCmplx));this%OMAff=spval
-  allocate(this%FOMAff(NumMicrobAutrophCmplx));this%FOMAff=spval
+  allocate(this%CNOMActAutor(NumMicrobAutrophCmplx));this%CNOMActAutor=spval
+  allocate(this%CPOMActAutor(NumMicrobAutrophCmplx));this%CPOMActAutor=spval
+  allocate(this%OMActAutor(NumMicrobAutrophCmplx));this%OMActAutor=spval
+  allocate(this%FracOMActAutor(NumMicrobAutrophCmplx));this%FracOMActAutor=spval
   allocate(this%FOMNff(NumMicrobAutrophCmplx));this%FOMNff=spval
   allocate(this%FOMKff(NumMicrobAutrophCmplx));this%FOMKff=spval
   allocate(this%OMC2ff(NumMicrobAutrophCmplx));this%OMC2ff=spval
@@ -711,10 +711,10 @@ type, public :: NitroAQMFluxDiagType
   implicit none
   class(NitroMicStateType) :: this
 
-  call destroy(this%CNOMA)
-  call destroy(this%CPOMA)
-  call destroy(this%OMA)
-  call destroy(this%FOMA)
+  call destroy(this%CNOMActHeter)
+  call destroy(this%CPOMActHeter)
+  call destroy(this%OMActHeter)
+  call destroy(this%FracOMActHeter)
   call destroy(this%FOMN)
   call destroy(this%FOMK)
   call destroy(this%OMC2)
@@ -727,10 +727,10 @@ type, public :: NitroAQMFluxDiagType
   call destroy(this%FCP)
   call destroy(this%FCNP)
 
-  call destroy(this%CNOMAff)
-  call destroy(this%CPOMAff)
-  call destroy(this%OMAff)
-  call destroy(this%FOMAff)
+  call destroy(this%CNOMActAutor)
+  call destroy(this%CPOMActAutor)
+  call destroy(this%OMActAutor)
+  call destroy(this%FracOMActAutor)
   call destroy(this%FOMNff)
   call destroy(this%FOMKff)
   call destroy(this%OMC2ff)

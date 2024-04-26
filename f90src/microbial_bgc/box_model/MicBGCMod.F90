@@ -167,31 +167,31 @@ module MicBGCMod
   real(r8) :: TSRH
 !     begin_execution
   associate(                   &
-    CNOMA  => nmics%CNOMA,     &
-    CPOMA  => nmics%CPOMA,     &
-    OMA    => nmics%OMA  ,     &
-    OMC2   => nmics%OMC2 ,     &
-    OMN2   => nmics%OMN2 ,     &
-    FOM2   => nmics%FOM2 ,     &
-    FCN    => nmics%FCN  ,     &
-    FCP    => nmics%FCP  ,     &
-    FCNP   => nmics%FCNP ,     &
-    OSRH  => ncplxs%OSRH,      &
-    TOMK  => ncplxs%TOMK,      &
-    TONK  => ncplxs%TONK,      &
-    TOPK  => ncplxs%TOPK,      &
-    FOCA  => ncplxs%FOCA,      &
-    FOAA  => ncplxs%FOAA,      &
+    CNOMActHeter => nmics%CNOMActHeter, &
+    CPOMActHeter => nmics%CPOMActHeter, &
+    OMActHeter   => nmics%OMActHeter , &
+    OMC2   => nmics%OMC2 , &
+    OMN2   => nmics%OMN2 , &
+    FOM2   => nmics%FOM2 , &
+    FCN    => nmics%FCN  , &
+    FCP    => nmics%FCP  , &
+    FCNP   => nmics%FCNP , &
+    OSRH  => ncplxs%OSRH, &
+    TOMK  => ncplxs%TOMK, &
+    TONK  => ncplxs%TONK, &
+    TOPK  => ncplxs%TOPK, &
+    FOCA  => ncplxs%FOCA, &
+    FOAA  => ncplxs%FOAA, &
     CNQ  => ncplxs%CNQ,        &
     CPQ  => ncplxs%CPQ,        &
     CDOM    => ncplxs%CDOM, &
-    ORCT  => ncplxs%ORCT,      &
-    OSCT  => ncplxs%OSCT,      &
-    OSAT  => ncplxs%OSAT,      &
-    TONX  => ncplxs%TONX,      &
-    TOPX  => ncplxs%TOPX,      &
+    ORCT  => ncplxs%ORCT, &
+    OSCT  => ncplxs%OSCT, &
+    OSAT  => ncplxs%OSAT, &
+    TONX  => ncplxs%TONX, &
+    TOPX  => ncplxs%TOPX, &
     TORC  =>  nmicdiag%TORC, &
-    TOMA  =>  nmicdiag%TOMA, &
+    TOMA =>  nmicdiag%TOMA, &
     TOMN  =>  nmicdiag%TOMN, &
     XCO2  =>  nmicdiag%XCO2, &
     TFNX  =>  nmicdiag%TFNX, &
@@ -204,20 +204,20 @@ module MicBGCMod
     ZNO2T  =>  nmicdiag%ZNO2T, &
     H2P4T  =>  nmicdiag%H2P4T, &
     H1P4T  =>  nmicdiag%H1P4T, &
-    CNOMAff  => nmics%CNOMAff,     &
-    CPOMAff  => nmics%CPOMAff,     &
-    OMAff    => nmics%OMAff  ,     &
-    OMC2ff   => nmics%OMC2ff ,     &
-    OMN2ff   => nmics%OMN2ff ,     &
-    FOM2ff   => nmics%FOM2ff ,     &
-    FCNff    => nmics%FCNff  ,     &
-    FCPff    => nmics%FCPff  ,     &
-    FCNPff   => nmics%FCNPff ,     &
-    rNCOMCff  => micpar%rNCOMCff,     &
+    CNOMActAutor  => nmics%CNOMActAutor, &
+    CPOMActAutor  => nmics%CPOMActAutor, &
+    OMActAutor    => nmics%OMActAutor  , &
+    OMC2ff   => nmics%OMC2ff , &
+    OMN2ff   => nmics%OMN2ff , &
+    FOM2ff   => nmics%FOM2ff , &
+    FCNff    => nmics%FCNff  , &
+    FCPff    => nmics%FCPff  , &
+    FCNPff   => nmics%FCNPff , &
+    rNCOMCff  => micpar%rNCOMCff, &
     rPCOMCff  => micpar%rPCOMCff, &
-    rNCOMC  => micpar%rNCOMC,     &
+    rNCOMC  => micpar%rNCOMC, &
     rPCOMC  => micpar%rPCOMC, &
-    FL       => micpar%FL   ,      &
+    FL       => micpar%FL   , &
     k_humus=>micpar%k_humus, &
     k_POM=>micpar%k_POM                     , &
     is_activef_micb=> micpar%is_activef_micb, &
@@ -377,26 +377,26 @@ module MicBGCMod
         DO NGL=JGnio(n),JGnfo(n)
           MID1=micpar%get_micb_id(1,NGL)
           IF(OMEheter(ielmc,MID1,K).GT.ZEROS)THEN
-            CNOMA(NGL,K)=AZMAX1(OMEheter(ielmn,MID1,K)/OMEheter(ielmc,MID1,K))
-            CPOMA(NGL,K)=AZMAX1(OMEheter(ielmp,MID1,K)/OMEheter(ielmc,MID1,K))
+            CNOMActHeter(NGL,K)=AZMAX1(OMEheter(ielmn,MID1,K)/OMEheter(ielmc,MID1,K))
+            CPOMActHeter(NGL,K)=AZMAX1(OMEheter(ielmp,MID1,K)/OMEheter(ielmc,MID1,K))
           ELSE
-            CNOMA(NGL,K)=rNCOMC(1,NGL,K)
-            CPOMA(NGL,K)=rPCOMC(1,NGL,K)
+            CNOMActHeter(NGL,K)=rNCOMC(1,NGL,K)
+            CPOMActHeter(NGL,K)=rPCOMC(1,NGL,K)
           ENDIF
-          OMA(NGL,K)=AZMAX1(OMEheter(ielmc,MID1,K)/FL(1))
-          FCN(NGL,K)=AMIN1(1.0_r8,AMAX1(0.50_r8,SQRT(CNOMA(NGL,K)/rNCOMC(1,NGL,K))))
-          FCP(NGL,K)=AMIN1(1.0_r8,AMAX1(0.50_r8,SQRT(CPOMA(NGL,K)/rPCOMC(1,NGL,K))))
+          OMActHeter(NGL,K)=AZMAX1(OMEheter(ielmc,MID1,K)/FL(1))
+          FCN(NGL,K)=AMIN1(1.0_r8,AMAX1(0.50_r8,SQRT(CNOMActHeter(NGL,K)/rNCOMC(1,NGL,K))))
+          FCP(NGL,K)=AMIN1(1.0_r8,AMAX1(0.50_r8,SQRT(CPOMActHeter(NGL,K)/rPCOMC(1,NGL,K))))
           FCNP(NGL,K)=AMIN1(FCN(NGL,K),FCP(NGL,K))
 
 !       TOTAL BIOMASS
 !       OMC2=active biomass in recalcitrant fraction
 !
-          TOMA=TOMA+OMA(NGL,K)
+          TOMA=TOMA+OMActHeter(NGL,K)
           IF(N.EQ.n_anero_faculb)THEN
-            TOMN=TOMN+OMA(NGL,K)
+            TOMN=TOMN+OMActHeter(NGL,K)
           ENDIF
           MID2=micpar%get_micb_id(2,NGL)
-          OMC2(NGL,K)=AZMAX1(AMIN1(OMA(NGL,K)*FL(2),OMEheter(ielmc,MID2,K)))
+          OMC2(NGL,K)=AZMAX1(AMIN1(OMActHeter(NGL,K)*FL(2),OMEheter(ielmc,MID2,K)))
           IF(OMEheter(ielmc,MID2,K).GT.ZEROS)THEN
             FOM2(NGL,K)=AZMAX1(OMC2(NGL,K)/OMEheter(ielmc,MID2,K))
             OMN2(NGL,K)=AZMAX1(FOM2(NGL,K)*OMEheter(ielmn,MID2,K))
@@ -415,27 +415,27 @@ module MicBGCMod
       DO NGL=JGniA(N),JGnfA(N)
         MID1=micpar%get_micb_id(1,NGL)
         IF(OMEauto(ielmc,MID1).GT.ZEROS)THEN
-          CNOMAff(NGL)=AZMAX1(OMEauto(ielmn,MID1)/OMEauto(ielmc,MID1))
-          CPOMAff(NGL)=AZMAX1(OMEauto(ielmp,MID1)/OMEauto(ielmc,MID1))
+          CNOMActAutor(NGL)=AZMAX1(OMEauto(ielmn,MID1)/OMEauto(ielmc,MID1))
+          CPOMActAutor(NGL)=AZMAX1(OMEauto(ielmp,MID1)/OMEauto(ielmc,MID1))
         ELSE
-          CNOMAff(NGL)=rNCOMCff(1,NGL)
-          CPOMAff(NGL)=rPCOMCff(1,NGL)
+          CNOMActAutor(NGL)=rNCOMCff(1,NGL)
+          CPOMActAutor(NGL)=rPCOMCff(1,NGL)
         ENDIF
-        OMAff(NGL)=AZMAX1(OMEauto(ielmc,MID1)/FL(1))
-        FCNff(NGL)=AMIN1(1.0_r8,AMAX1(0.50_r8,SQRT(CNOMAff(NGL)/rNCOMCff(1,NGL))))
-        FCPff(NGL)=AMIN1(1.0_r8,AMAX1(0.50_r8,SQRT(CPOMAff(NGL)/rPCOMCff(1,NGL))))
+        OMActAutor(NGL)=AZMAX1(OMEauto(ielmc,MID1)/FL(1))
+        FCNff(NGL)=AMIN1(1.0_r8,AMAX1(0.50_r8,SQRT(CNOMActAutor(NGL)/rNCOMCff(1,NGL))))
+        FCPff(NGL)=AMIN1(1.0_r8,AMAX1(0.50_r8,SQRT(CPOMActAutor(NGL)/rPCOMCff(1,NGL))))
         FCNPff(NGL)=AMIN1(FCNff(NGL),FCPff(NGL))
 !
 !       TOTAL BIOMASS
 !       OMC2=active biomass in recalcitrant fraction
 !
-        TOMA=TOMA+OMAff(NGL)
+        TOMA=TOMA+OMActAutor(NGL)
 
         IF(N.EQ.AmmoniaOxidBacter)THEN
-          TOMN=TOMN+OMAff(NGL)
+          TOMN=TOMN+OMActAutor(NGL)
         ENDIF
         MID2=micpar%get_micb_id(2,NGL)
-        OMC2ff(NGL)=AZMAX1(AMIN1(OMAff(NGL)*FL(2),OMEauto(ielmc,MID2)))
+        OMC2ff(NGL)=AZMAX1(AMIN1(OMActAutor(NGL)*FL(2),OMEauto(ielmc,MID2)))
         IF(OMEauto(ielmc,MID2).GT.ZEROS)THEN
           FOM2ff(NGL)=AZMAX1(OMC2ff(NGL)/OMEauto(ielmc,MID2))
           OMN2ff(NGL)=AZMAX1(FOM2ff(NGL)*OMEauto(ielmn,MID2))
@@ -455,12 +455,12 @@ module MicBGCMod
     TOPX(K)=0.0_r8
     D685: DO N=1,NumMicbFunGroups
       DO NGL=JGnio(N),JGnfo(N)
-        if(OMA(NGL,K)>ZEROS)THEN
-          TOMK(K)=TOMK(K)+OMA(NGL,K)
-          TONK(K)=TONK(K)+OMA(NGL,K)*CNOMA(NGL,K)
-          TOPK(K)=TOPK(K)+OMA(NGL,K)*CPOMA(NGL,K)
-          TONX(K)=TONX(K)+OMA(NGL,K)*rNCOMC(1,NGL,K)   !maximum total N in active micb
-          TOPX(K)=TOPX(K)+OMA(NGL,K)*rPCOMC(1,NGL,K)   !maximum total P in active micb
+        if(OMActHeter(NGL,K)>ZEROS)THEN
+          TOMK(K)=TOMK(K)+OMActHeter(NGL,K)
+          TONK(K)=TONK(K)+OMActHeter(NGL,K)*CNOMActHeter(NGL,K)
+          TOPK(K)=TOPK(K)+OMActHeter(NGL,K)*CPOMActHeter(NGL,K)
+          TONX(K)=TONX(K)+OMActHeter(NGL,K)*rNCOMC(1,NGL,K)   !maximum total N in active micb
+          TOPX(K)=TOPX(K)+OMActHeter(NGL,K)*rPCOMC(1,NGL,K)   !maximum total P in active micb
         ENDIF
       ENDDO
     ENDDO D685
@@ -474,12 +474,12 @@ module MicBGCMod
   TOPX(K)=0.0_r8  
   DO N=1,NumMicbFunGroups
     DO NGL=JGniA(N),JGnfA(N)
-      if(OMAff(NGL)>ZEROS)then
-        TOMK(K)=TOMK(K)+OMAff(NGL)      
-        TONK(K)=TONK(K)+OMAff(NGL)*CNOMAff(NGL)
-        TOPK(K)=TOPK(K)+OMAff(NGL)*CPOMAff(NGL)
-        TONX(K)=TONX(K)+OMAff(NGL)*rNCOMCff(1,NGL)   !maximum total N in active micb
-        TOPX(K)=TOPX(K)+OMAff(NGL)*rPCOMCff(1,NGL)   !maximum total P in active micb
+      if(OMActAutor(NGL)>ZEROS)then
+        TOMK(K)=TOMK(K)+OMActAutor(NGL)      
+        TONK(K)=TONK(K)+OMActAutor(NGL)*CNOMActAutor(NGL)
+        TOPK(K)=TOPK(K)+OMActAutor(NGL)*CPOMActAutor(NGL)
+        TONX(K)=TONX(K)+OMActAutor(NGL)*rNCOMCff(1,NGL)   !maximum total N in active micb
+        TOPX(K)=TOPX(K)+OMActAutor(NGL)*rPCOMCff(1,NGL)   !maximum total P in active micb
       endif
     ENDDO
   ENDDO
@@ -560,11 +560,11 @@ module MicBGCMod
   associate(                   &
     TFNR => nmics%TFNR,        &
     TFNG => nmics%TFNG,        &
-    OMA  => nmics%OMA,         &
+    OMActHeter => nmics%OMActHeter,         &
     TCGOMEheter  => ncplxf%TCGOMEheter, &
     XCO2   =>  nmicdiag%XCO2, &
     TFNX   =>  nmicdiag%TFNX, &
-    TOMA   =>  nmicdiag%TOMA, &
+    TOMA  =>  nmicdiag%TOMA, &
     TOMN   =>  nmicdiag%TOMN, &
     RH2GZ  =>  nmicdiag%RH2GZ, &
     WFNG   =>  nmicdiag%WFNG, &
@@ -576,8 +576,8 @@ module MicBGCMod
     H1P4T  =>  nmicdiag%H1P4T, &
     VOLWZ  =>  nmicdiag%VOLWZ, &
     TFNGff => nmics%TFNGff   , &
-    TFNRff => nmics%TFNRff  ,     &
-    OMAff  => nmics%OMAff   ,      &
+    TFNRff => nmics%TFNRff  , &
+    OMActAutor  => nmics%OMActAutor   , &
     k_humus => micpar%k_humus, &
     k_POM => micpar%k_POM, &
     n_aero_fungi => micpar%n_aero_fungi, &
@@ -618,7 +618,7 @@ module MicBGCMod
           OXKX=OXKM
           TFNG(NGL,K)=TFNX*WFNG
           TFNR(NGL,K)=TFNY
-          IF(OMA(NGL,K).GT.0.0_r8)THEN
+          IF(OMActHeter(NGL,K).GT.0.0_r8)THEN
             call ActiveMicrobes(NGL,N,K,VOLWZ,XCO2,TFNX,WFNG,TOMCNK,&
               OXKX,TOMA,TOMN,ZNH4T,ZNO3T,ZNO2T,H2P4T,H1P4T,&
               micfor,micstt,naqfdiag,nmicf,nmics,ncplxf,ncplxs,micflx)
@@ -644,7 +644,7 @@ module MicBGCMod
         OXKX=OXKA
         TFNGff(NGL)=TFNX*WFNG
         TFNRff(NGL)=TFNY
-        IF(OMAff(NGL).GT.0.0_r8)THEN
+        IF(OMActAutor(NGL).GT.0.0_r8)THEN
           call ActiveMicrobesff(NGL,N,VOLWZ,XCO2,TFNX,WFNG,TOMCNK,&
             OXKX,TOMA,TOMN,RH2GZ,ZNH4T,ZNO3T,ZNO2T,H2P4T,H1P4T,&
             micfor,micstt,micflx,naqfdiag,nmicf,nmics,ncplxf,ncplxs)
@@ -693,10 +693,10 @@ module MicBGCMod
   real(r8) :: RMOMK(2)
 ! begin_execution
   associate(                  &
-    FOMA => nmics%FOMA,       &
+    FracOMActHeter => nmics%FracOMActHeter,       &
     FOMN => nmics%FOMN,       &
     FOMK => nmics%FOMK,       &
-    OMA => nmics%OMA,         &
+    OMActHeter=> nmics%OMActHeter,         &
     RUPOX  => nmicf%RUPOX, &
     RGOMO  => nmicf%RGOMO, &
     RO2Dmnd4RespHeter => nmicf%RO2Dmnd4RespHeter , &
@@ -722,20 +722,20 @@ module MicBGCMod
     RNO2Y  => micfor%RNO2Y    &
 
   )
-! FOMA,FOMN=fraction of total active biomass C,N in each N and K
+! FracOMActHeter,FOMN=fraction of total active biomass C,N in each N and K
 
   IF(TOMA.GT.ZEROS)THEN
-    FOMA(NGL,K)=OMA(NGL,K)/TOMA
+    FracOMActHeter(NGL,K)=OMActHeter(NGL,K)/TOMA
   ELSE
-    FOMA(NGL,K)=1.0_r8
+    FracOMActHeter(NGL,K)=1.0_r8
   ENDIF
   IF(TOMN.GT.ZEROS)THEN
-    FOMN(NGL,K)=OMA(NGL,K)/TOMN
+    FOMN(NGL,K)=OMActHeter(NGL,K)/TOMN
   ELSE
     FOMN(NGL,K)=1.0_r8
   ENDIF
   IF(TOMK(K).GT.ZEROS)THEN
-    FOMK(NGL,K)=OMA(NGL,K)/TOMK(K)
+    FOMK(NGL,K)=OMActHeter(NGL,K)/TOMK(K)
   ELSE
     FOMK(NGL,K)=1.0_r8
   ENDIF
@@ -989,7 +989,7 @@ module MicBGCMod
   real(r8) :: XFME
 !     begin_execution
   associate(                 &
-    TFNG  => nmics%TFNG,     &
+    TFNG  => nmics%TFNG, &
     XOMZ  => nmicf%XOMZ, &
     ROQCK  => ncplxf%ROQCK, &
     XOQCK  => ncplxf%XOQCK, &
@@ -1104,25 +1104,25 @@ module MicBGCMod
   real(r8) :: VLSoilPoreMicP_vrX
   real(r8) :: VLSoilPoreMicP_vrW,VOLCX,VOLCW,VOLAX,VOLAW
 !     begin_execution
-  associate(                   &
-    CGOMEheter  => nmicf%CGOMEheter,     &
-    CGOQC  => nmicf%CGOQC,     &
-    CGOAC  => nmicf%CGOAC,     &
-    OMSORP  => ncplxf%OMSORP, &
-    TCGOMEheter  => ncplxf%TCGOMEheter, &
-    OSRH  => ncplxs%OSRH,      &
-    FOCA  => ncplxs%FOCA,      &
-    FOAA  => ncplxs%FOAA,      &
-    SoilMicPMassLayer => micfor%SoilMicPMassLayer, &
-    ZERO => micfor%ZERO, &
-    ZEROS2 => micfor%ZEROS2, &
-    ZEROS => micfor%ZEROS, &
-    litrm => micfor%litrm, &
-    VLWatMicPM => micfor%VLWatMicPM, &
-    FOSRH => micstt%FOSRH, &
-    DOM => micstt%DOM, &
-    OHM => micstt%OHM, &
-    AEC => micfor%AEC  &
+  associate(                                         &
+    CGOMEheter         => nmicf%CGOMEheter         , &
+    CGOQC              => nmicf%CGOQC              , &
+    CGOAC              => nmicf%CGOAC              , &
+    OMSORP             => ncplxf%OMSORP            , &
+    TCGOMEheter        => ncplxf%TCGOMEheter       , &
+    OSRH               => ncplxs%OSRH              , &
+    FOCA               => ncplxs%FOCA              , &
+    FOAA               => ncplxs%FOAA              , &
+    SoilMicPMassLayer  => micfor%SoilMicPMassLayer , &
+    ZERO               => micfor%ZERO              , &
+    ZEROS2             => micfor%ZEROS2            , &
+    ZEROS              => micfor%ZEROS             , &
+    litrm              => micfor%litrm             , &
+    VLWatMicPM         => micfor%VLWatMicPM        , &
+    FOSRH              => micstt%FOSRH             , &
+    DOM                => micstt%DOM               , &
+    OHM                => micstt%OHM               , &
+    AEC                => micfor%AEC                 &
   )
 !     VLWatMicPM=soil water content, FOSRH=fraction of total SOC
 !     AEC,AECX=anion exchange capacity
@@ -1151,7 +1151,8 @@ module MicBGCMod
       VOLCW=FOCA(K)*VLSoilPoreMicP_vrW
       OMSORP(idom_doc,K)=TSORP*(OQEX(idom_doc)*VOLCX-OHEX(idom_doc)*VOLCW)/(VOLCX+VOLCW)
     ELSE
-      OMSORP(idom_doc,K)=TSORP*(OQEX(idom_doc)*VLSoilPoreMicP_vrX-OHEX(idom_doc)*VLSoilPoreMicP_vrW)/(VLSoilPoreMicP_vrX+VLSoilPoreMicP_vrW)
+      OMSORP(idom_doc,K)=TSORP*(OQEX(idom_doc)*VLSoilPoreMicP_vrX  &
+        -OHEX(idom_doc)*VLSoilPoreMicP_vrW)/(VLSoilPoreMicP_vrX+VLSoilPoreMicP_vrW)
     ENDIF
 
     IF(FOAA(K).GT.ZERO)THEN
@@ -1159,10 +1160,13 @@ module MicBGCMod
       VOLAW=FOAA(K)*VLSoilPoreMicP_vrW
       OMSORP(idom_acetate,K)=TSORP*(OQEX(idom_acetate)*VOLAX-OHEX(idom_acetate)*VOLAW)/(VOLAX+VOLAW)
     ELSE
-      OMSORP(idom_acetate,K)=TSORP*(OQEX(idom_acetate)*VLSoilPoreMicP_vrX-OHEX(idom_acetate)*VLSoilPoreMicP_vrW)/(VLSoilPoreMicP_vrX+VLSoilPoreMicP_vrW)
+      OMSORP(idom_acetate,K)=TSORP*(OQEX(idom_acetate)*VLSoilPoreMicP_vrX &
+        -OHEX(idom_acetate)*VLSoilPoreMicP_vrW)/(VLSoilPoreMicP_vrX+VLSoilPoreMicP_vrW)
     ENDIF
-    OMSORP(idom_don,K)=TSORP*(OQEX(idom_don)*VLSoilPoreMicP_vrX-OHEX(idom_don)*VLSoilPoreMicP_vrW)/(VLSoilPoreMicP_vrX+VLSoilPoreMicP_vrW)
-    OMSORP(idom_dop,K)=TSORP*(OQEX(idom_dop)*VLSoilPoreMicP_vrX-OHEX(idom_dop)*VLSoilPoreMicP_vrW)/(VLSoilPoreMicP_vrX+VLSoilPoreMicP_vrW)
+    OMSORP(idom_don,K)=TSORP*(OQEX(idom_don)*VLSoilPoreMicP_vrX &
+      -OHEX(idom_don)*VLSoilPoreMicP_vrW)/(VLSoilPoreMicP_vrX+VLSoilPoreMicP_vrW)
+    OMSORP(idom_dop,K)=TSORP*(OQEX(idom_dop)*VLSoilPoreMicP_vrX &
+      -OHEX(idom_dop)*VLSoilPoreMicP_vrW)/(VLSoilPoreMicP_vrX+VLSoilPoreMicP_vrW)
   ELSE
     DO idom=idom_beg,idom_end
       OMSORP(idom,K)=0.0_r8
@@ -1205,8 +1209,8 @@ module MicBGCMod
     TOMK  => ncplxs%TOMK, &
     TONK  => ncplxs%TONK, &
     TOPK  => ncplxs%TOPK, &
-    CNH  => ncplxs%CNH,      &
-    CPH  => ncplxs%CPH,      &
+    CNH  => ncplxs%CNH, &
+    CPH  => ncplxs%CPH, &
     TONX  => ncplxs%TONX, &
     TOPX  => ncplxs%TOPX, &
     VOLWZ =>  nmicdiag%VOLWZ,&
@@ -1457,13 +1461,13 @@ module MicBGCMod
 !     begin_execution
   associate(                   &
     k_POM  => micpar%k_POM   , &
-    CGOMEheter  => nmicf%CGOMEheter,     &
-    CGOQC  => nmicf%CGOQC,     &
-    CGOAC  => nmicf%CGOAC,     &
-    RCOMEheter  => nmicf%RCOMEheter,     &
-    RCMMEheter  => nmicf%RCMMEheter,     &
-    RCCMEheter  => nmicf%RCCMEheter,     &
-    RCH3X  => nmicf%RCH3X,     &
+    CGOMEheter  => nmicf%CGOMEheter, &
+    CGOQC  => nmicf%CGOQC, &
+    CGOAC  => nmicf%CGOAC, &
+    RCOMEheter  => nmicf%RCOMEheter, &
+    RCMMEheter  => nmicf%RCMMEheter, &
+    RCCMEheter  => nmicf%RCCMEheter, &
+    RCH3X  => nmicf%RCH3X, &
     RDOSM  => ncplxf%RDOSM, &
     RHOSM  => ncplxf%RHOSM, &
     RCOSM  => ncplxf%RCOSM, &
@@ -1473,8 +1477,8 @@ module MicBGCMod
     ORCT  => ncplxs%ORCT    ,&
     RCOQN =>  nmicdiag%RCOQN,&
     TORC  =>  nmicdiag%TORC , &
-    RCMMEautor  => nmicf%RCMMEautor,     &
-    RCOMEautor  => nmicf%RCOMEautor,     &
+    RCMMEautor  => nmicf%RCMMEautor, &
+    RCOMEautor  => nmicf%RCOMEautor, &
     OSM      => micstt%OSM   , &
     iprotein  => micpar%iprotein , &
 !    OSA      => micstt%OSA   , &
@@ -1824,33 +1828,33 @@ module MicBGCMod
   integer  :: K,M,N,NGL,NE
 !     begin_execution
   associate(                   &
-    CGOMEheter  => nmicf%CGOMEheter,     &
-    CGOQC  => nmicf%CGOQC,     &
-    CGOAC  => nmicf%CGOAC,     &
-    RUPOX  => nmicf%RUPOX,     &
-    RDNO3 => nmicf%RDNO3 ,     &
-    RDNOB => nmicf%RDNOB ,     &
-    RDNO2 => nmicf%RDNO2 ,     &
-    RDN2B => nmicf%RDN2B ,     &
-    RDN2O => nmicf%RDN2O ,     &
-    RGOMD  => nmicf%RGOMD,     &
-    RNH4TransfSoilHeter => nmicf%RNH4TransfSoilHeter ,     &
-    RNO3TransfSoilHeter  => nmicf%RNO3TransfSoilHeter,     &
-    RH2PO4TransfSoilHeter  => nmicf%RH2PO4TransfSoilHeter,     &
-    RNH4TransfBandHeter => nmicf%RNH4TransfBandHeter ,     &
-    RNO3TransfBandHeter => nmicf%RNO3TransfBandHeter ,     &
-    RH2PO4TransfBandHeter => nmicf%RH2PO4TransfBandHeter ,     &
-    RH2GX  => nmicf%RH2GX,     &
+    CGOMEheter  => nmicf%CGOMEheter, &
+    CGOQC  => nmicf%CGOQC, &
+    CGOAC  => nmicf%CGOAC, &
+    RUPOX  => nmicf%RUPOX, &
+    RDNO3 => nmicf%RDNO3 , &
+    RDNOB => nmicf%RDNOB , &
+    RDNO2 => nmicf%RDNO2 , &
+    RDN2B => nmicf%RDN2B , &
+    RDN2O => nmicf%RDN2O , &
+    RGOMD  => nmicf%RGOMD, &
+    RNH4TransfSoilHeter => nmicf%RNH4TransfSoilHeter , &
+    RNO3TransfSoilHeter  => nmicf%RNO3TransfSoilHeter, &
+    RH2PO4TransfSoilHeter  => nmicf%RH2PO4TransfSoilHeter, &
+    RNH4TransfBandHeter => nmicf%RNH4TransfBandHeter , &
+    RNO3TransfBandHeter => nmicf%RNO3TransfBandHeter , &
+    RH2PO4TransfBandHeter => nmicf%RH2PO4TransfBandHeter , &
+    RH2GX  => nmicf%RH2GX, &
     RNH4TransfLitrHeter  => nmicf%RNH4TransfLitrHeter, &
     RNO3TransfLitrHeter  => nmicf%RNO3TransfLitrHeter, &
     RH2PO4TransfLitrHeter  => nmicf%RH2PO4TransfLitrHeter, &
     RCO2X  => nmicf%RCO2X  , &
     RCH3X  => nmicf%RCH3X , &
     RCH4X  => nmicf%RCH4X , &
-    RVOXA  => nmicf%RVOXA,     &
-    RVOXB  => nmicf%RVOXB,     &
-    RH1PO4TransfSoilHeter  => nmicf%RH1PO4TransfSoilHeter,     &
-    RH1PO4TransfBandHeter  => nmicf%RH1PO4TransfBandHeter,     &
+    RVOXA  => nmicf%RVOXA, &
+    RVOXB  => nmicf%RVOXB, &
+    RH1PO4TransfSoilHeter  => nmicf%RH1PO4TransfSoilHeter, &
+    RH1PO4TransfBandHeter  => nmicf%RH1PO4TransfBandHeter, &
     RH1PO4TransfLitrHeter  => nmicf%RH1PO4TransfLitrHeter, &
     RN2FixHeter  => nmicf%RN2FixHeter  , &
     RCOSM  => ncplxf%RCOSM, &
@@ -1866,28 +1870,28 @@ module MicBGCMod
     RCNO3  =>  nmicdiag%RCNO3, &
     RCN3B  =>  nmicdiag%RCN3B, &
     VOLWZ  =>  nmicdiag%VOLWZ, &
-    CGOMEautor  => nmicf%CGOMEautor,     &
-    RH2GXff  => nmicf%RH2GXff,     &
+    CGOMEautor  => nmicf%CGOMEautor, &
+    RH2GXff  => nmicf%RH2GXff, &
     RDN2Bff => nmicf%RDN2Bff , &
-    RNO3UptkAutor => nmicf%RNO3UptkAutor ,     &
+    RNO3UptkAutor => nmicf%RNO3UptkAutor , &
     RCH4Xff  => nmicf%RCH4Xff , &
-    RDNO2ff => nmicf%RDNO2ff ,     &
-    RO2UptkAutor  => nmicf%RO2UptkAutor,     &
-    RGOMDff  => nmicf%RGOMDff,     &
+    RDNO2ff => nmicf%RDNO2ff , &
+    RO2UptkAutor  => nmicf%RO2UptkAutor, &
+    RGOMDff  => nmicf%RGOMDff, &
     RCO2Xff  => nmicf%RCO2Xff  , &
     RH1PO4TransfLitrAutor  => nmicf%RH1PO4TransfLitrAutor, &
     RH2PO4TransfLitrAutor  => nmicf%RH2PO4TransfLitrAutor, &
     RNO3TransfLitrAutor  => nmicf%RNO3TransfLitrAutor, &
     RNH4TransfLitrAutor  => nmicf%RNH4TransfLitrAutor, &
     RN2FixAutor  => nmicf%RN2FixAutor  , &
-    RH1PO4TransfBandAutor  => nmicf%RH1PO4TransfBandAutor,     &
-    RH2PO4TransfBandAutor => nmicf%RH2PO4TransfBandAutor ,     &
-    RNO3TransfBandAutor => nmicf%RNO3TransfBandAutor ,     &
-    RNH4TransfBandAutor => nmicf%RNH4TransfBandAutor ,     &
-    RH2PO4TransfSoilAutor  => nmicf%RH2PO4TransfSoilAutor,     &
-    RNH4TransfSoilAutor => nmicf%RNH4TransfSoilAutor ,     &
-    RNO3TransfSoilAutor  => nmicf%RNO3TransfSoilAutor,     &
-    RH1PO4TransfSoilAutor  => nmicf%RH1PO4TransfSoilAutor,     &
+    RH1PO4TransfBandAutor  => nmicf%RH1PO4TransfBandAutor, &
+    RH2PO4TransfBandAutor => nmicf%RH2PO4TransfBandAutor , &
+    RNO3TransfBandAutor => nmicf%RNO3TransfBandAutor , &
+    RNH4TransfBandAutor => nmicf%RNH4TransfBandAutor , &
+    RH2PO4TransfSoilAutor  => nmicf%RH2PO4TransfSoilAutor, &
+    RNH4TransfSoilAutor => nmicf%RNH4TransfSoilAutor , &
+    RNO3TransfSoilAutor  => nmicf%RNO3TransfSoilAutor, &
+    RH1PO4TransfSoilAutor  => nmicf%RH1PO4TransfSoilAutor, &
     RDNOBff => nmicf%RDNOBff , &
     TFNQ    => micstt%TFNQ, &
     VOLQ    => micstt%VOLQ, &
@@ -2120,7 +2124,7 @@ module MicBGCMod
   type(micfluxtype), intent(inout) :: micflx
 ! begin_execution
   associate(                  &
-    FOMA    => nmics%FOMA, &
+    FracOMActHeter    => nmics%FracOMActHeter, &
     FOMK    => nmics%FOMK, &
     FNH4XR  =>nmicf%FNH4XR, &
     FNO3XR  =>nmicf%FNO3XR, &
@@ -2176,47 +2180,47 @@ module MicBGCMod
   IF(ROXYY.GT.ZEROS)THEN
     FOXYX=AMAX1(FMN,RO2DmndHetert(NGL,K)/ROXYY)
   ELSE
-    FOXYX=AMAX1(FMN,FOMA(NGL,K))
+    FOXYX=AMAX1(FMN,FracOMActHeter(NGL,K))
   ENDIF
   IF(RNH4Y.GT.ZEROS)THEN
     FNH4X=AMAX1(FMN,RINHO(NGL,K)/RNH4Y)
   ELSE
-    FNH4X=AMAX1(FMN,FOMA(NGL,K)*VLNH4)
+    FNH4X=AMAX1(FMN,FracOMActHeter(NGL,K)*VLNH4)
   ENDIF
   IF(RNHBY.GT.ZEROS)THEN
     FNB4X=AMAX1(FMN,RINHB(NGL,K)/RNHBY)
   ELSE
-    FNB4X=AMAX1(FMN,FOMA(NGL,K)*VLNHB)
+    FNB4X=AMAX1(FMN,FracOMActHeter(NGL,K)*VLNHB)
   ENDIF
   IF(RNO3Y.GT.ZEROS)THEN
     FNO3X=AMAX1(FMN,RINOO(NGL,K)/RNO3Y)
   ELSE
-    FNO3X=AMAX1(FMN,FOMA(NGL,K)*VLNO3)
+    FNO3X=AMAX1(FMN,FracOMActHeter(NGL,K)*VLNO3)
   ENDIF
   IF(RN3BY.GT.ZEROS)THEN
     FNB3X=AMAX1(FMN,RINOB(NGL,K)/RN3BY)
   ELSE
-    FNB3X=AMAX1(FMN,FOMA(NGL,K)*VLNOB)
+    FNB3X=AMAX1(FMN,FracOMActHeter(NGL,K)*VLNOB)
   ENDIF
   IF(RPO4Y.GT.ZEROS)THEN
     FPO4X=AMAX1(FMN,RIPOO(NGL,K)/RPO4Y)
   ELSE
-    FPO4X=AMAX1(FMN,FOMA(NGL,K)*VLPO4)
+    FPO4X=AMAX1(FMN,FracOMActHeter(NGL,K)*VLPO4)
   ENDIF
   IF(RPOBY.GT.ZEROS)THEN
     FPOBX=AMAX1(FMN,RIPBO(NGL,K)/RPOBY)
   ELSE
-    FPOBX=AMAX1(FMN,FOMA(NGL,K)*VLPOB)
+    FPOBX=AMAX1(FMN,FracOMActHeter(NGL,K)*VLPOB)
   ENDIF
   IF(RP14Y.GT.ZEROS)THEN
     FP14X=AMAX1(FMN,RIPO1(NGL,K)/RP14Y)
   ELSE
-    FP14X=AMAX1(FMN,FOMA(NGL,K)*VLPO4)
+    FP14X=AMAX1(FMN,FracOMActHeter(NGL,K)*VLPO4)
   ENDIF
   IF(RP1BY.GT.ZEROS)THEN
     FP1BX=AMAX1(FMN,RIPB1(NGL,K)/RP1BY)
   ELSE
-    FP1BX=AMAX1(FMN,FOMA(NGL,K)*VLPOB)
+    FP1BX=AMAX1(FMN,FracOMActHeter(NGL,K)*VLPOB)
   ENDIF
 
   IF(ROQCY(K).GT.ZEROS)THEN
@@ -2299,11 +2303,11 @@ module MicBGCMod
 
 ! begin_execution
   associate(                  &
-    FCNP  => nmics%FCNP,      &
-    OMA   => nmics%OMA ,      &
-    RO2DmndHeter => nmicf%RO2DmndHeter,     &
-    RO2Dmnd4RespHeter => nmicf%RO2Dmnd4RespHeter,     &
-    ROQCD => nmicf%ROQCD,     &
+    FCNP  => nmics%FCNP, &
+    OMActHeter  => nmics%OMActHeter, &
+    RO2DmndHeter => nmicf%RO2DmndHeter, &
+    RO2Dmnd4RespHeter => nmicf%RO2Dmnd4RespHeter, &
+    ROQCD => nmicf%ROQCD, &
     CDOM  => ncplxs%CDOM, &
     DOM => micstt%DOM, &
     RO2DmndHetert => micflx%RO2DmndHetert, &
@@ -2335,7 +2339,7 @@ module MicBGCMod
 !     ROQCD=microbial respiration used to represent microbial activity
 !
   FSBST=CDOM(idom_acetate,K)/(CDOM(idom_acetate,K)+OQKAM)
-  RGOGY=AZMAX1(FCNP(NGL,K)*VMXM*WFNG*OMA(NGL,K))
+  RGOGY=AZMAX1(FCNP(NGL,K)*VMXM*WFNG*OMActHeter(NGL,K))
   RGOGZ=RGOGY*FSBST*TFNX
   RGOGX=AZMAX1(DOM(idom_acetate,K)*FOQA*ECHZ)
   RGOMP=AMIN1(RGOGX,RGOGZ)
@@ -2377,11 +2381,11 @@ module MicBGCMod
   real(r8) :: FSBST
 !     begin_execution
   associate(                  &
-    OMA   => nmics%OMA  ,     &
-    FCNP  => nmics%FCNP ,     &
-    RO2Dmnd4RespHeter => nmicf%RO2Dmnd4RespHeter,     &
-    RO2DmndHeter=> nmicf%RO2DmndHeter ,     &
-    ROQCD => nmicf%ROQCD,     &
+    OMActHeter  => nmics%OMActHeter , &
+    FCNP  => nmics%FCNP , &
+    RO2Dmnd4RespHeter => nmicf%RO2Dmnd4RespHeter, &
+    RO2DmndHeter=> nmicf%RO2DmndHeter , &
+    ROQCD => nmicf%ROQCD, &
     ZEROS => micfor%ZEROS, &
     DOM  => micstt%DOM, &
     n_aero_hetrophb => micpar%n_aero_hetrophb, &
@@ -2391,8 +2395,8 @@ module MicBGCMod
     RO2DmndHetert => micflx%RO2DmndHetert, &
     ROQCS => micflx%ROQCS, &
     ROQAS => micflx%ROQAS, &
-    FOCA  => ncplxs%FOCA,     &
-    FOAA  => ncplxs%FOAA,     &
+    FOCA  => ncplxs%FOCA, &
+    FOAA  => ncplxs%FOAA, &
     CDOM  => ncplxs%CDOM     &
   )
 !     ENERGY YIELDS OF O2 REDOX REACTIONS
@@ -2424,7 +2428,7 @@ module MicBGCMod
   FSBSTC=CDOM(idom_doc,K)/(CDOM(idom_doc,K)+OQKM)
   FSBSTA=CDOM(idom_acetate,K)/(CDOM(idom_acetate,K)+OQKA)
   FSBST=FOCA(K)*FSBSTC+FOAA(K)*FSBSTA
-  RGOCY=AZMAX1(FCNP(NGL,K)*VMXO*WFNG*OMA(NGL,K))
+  RGOCY=AZMAX1(FCNP(NGL,K)*VMXO*WFNG*OMActHeter(NGL,K))
   RGOCZ=RGOCY*FSBSTC*FOCA(K)*TFNX
   RGOAZ=RGOCY*FSBSTA*FOAA(K)*TFNX
   RGOCX=AZMAX1(DOM(idom_doc,K)*FOQC*EO2Q)
@@ -2486,8 +2490,8 @@ module MicBGCMod
 !     begin_execution
   associate(                    &
     FCNP   => nmics%FCNP,       &
-    OMA    => nmics%OMA ,       &
-    RO2Dmnd4RespHeter  => nmicf%RO2Dmnd4RespHeter,      &
+    OMActHeter   => nmics%OMActHeter,       &
+    RO2Dmnd4RespHeter  => nmicf%RO2Dmnd4RespHeter, &
     RO2DmndHeter  => nmicf%RO2DmndHeter  , &
     ROQCD  => nmicf%ROQCD  , &
     TKS => micfor%TKS, &
@@ -2529,7 +2533,7 @@ module MicBGCMod
 !
   OXYI=1.0_r8-1.0_r8/(1.0_r8+EXP(1.0_r8*(-COXYS+2.5_r8)))
   FSBST=CDOM(idom_doc,K)/(CDOM(idom_doc,K)+OQKM)*OXYI
-  RGOFY=AZMAX1(FCNP(NGL,K)*VMXF*WFNG*OMA(NGL,K))
+  RGOFY=AZMAX1(FCNP(NGL,K)*VMXF*WFNG*OMActHeter(NGL,K))
   RGOFZ=RGOFY*FSBST*TFNX
   RGOFX=AZMAX1(DOM(idom_doc,K)*FOQC*ECHZ)
   RGOMP=AMIN1(RGOFX,RGOFZ)
@@ -2594,15 +2598,15 @@ module MicBGCMod
 
 ! begin_execution
   associate(                  &
-    WFN    => nmics%WFN,      &
-    FOMA   => nmics%FOMA,     &
-    RO2Dmnd4RespHeter => nmicf%RO2Dmnd4RespHeter,     &
-    ROXYO => nmicf%ROXYO,     &
-    RDNO3 => nmicf%RDNO3,     &
-    RDNOB => nmicf%RDNOB,     &
-    RDNO2 => nmicf%RDNO2,     &
-    RDN2B => nmicf%RDN2B,     &
-    RDN2O => nmicf%RDN2O,     &
+    WFN    => nmics%WFN, &
+    FracOMActHeter   => nmics%FracOMActHeter, &
+    RO2Dmnd4RespHeter => nmicf%RO2Dmnd4RespHeter, &
+    ROXYO => nmicf%ROXYO, &
+    RDNO3 => nmicf%RDNO3, &
+    RDNOB => nmicf%RDNOB, &
+    RDNO2 => nmicf%RDNO2, &
+    RDN2B => nmicf%RDN2B, &
+    RDN2O => nmicf%RDN2O, &
     RGOMD  => nmicf%RGOMD, &
     RGOMY  => nmicf%RGOMY, &
     OSRH  => ncplxs%OSRH , &
@@ -2647,12 +2651,12 @@ module MicBGCMod
   IF(RNO3Y.GT.ZEROS)THEN
     FNO3=AMAX1(FMN,RVMX3(NGL,K)/RNO3Y)
   ELSE
-    FNO3=AMAX1(FMN,FOMA(NGL,K)*VLNO3)
+    FNO3=AMAX1(FMN,FracOMActHeter(NGL,K)*VLNO3)
   ENDIF
   IF(RN3BY.GT.ZEROS)THEN
     FNB3=AMAX1(FMN,RVMB3(NGL,K)/RN3BY)
   ELSE
-    FNB3=AMAX1(FMN,FOMA(NGL,K)*VLNOB)
+    FNB3=AMAX1(FMN,FracOMActHeter(NGL,K)*VLNOB)
   ENDIF
   naqfdiag%TFNO3X=naqfdiag%TFNO3X+FNO3
   naqfdiag%TFNO3B=naqfdiag%TFNO3B+FNB3
@@ -2723,12 +2727,12 @@ module MicBGCMod
   IF(RNO2Y.GT.ZEROS)THEN
     FNO2=AMAX1(FMN,RVMX2(NGL,K)/RNO2Y)
   ELSE
-    FNO2=AMAX1(FMN,FOMA(NGL,K)*VLNO3)
+    FNO2=AMAX1(FMN,FracOMActHeter(NGL,K)*VLNO3)
   ENDIF
   IF(RN2BY.GT.ZEROS)THEN
     FNB2=AMAX1(FMN,RVMB2(NGL,K)/RN2BY)
   ELSE
-    FNB2=AMAX1(FMN,FOMA(NGL,K)*VLNOB)
+    FNB2=AMAX1(FMN,FracOMActHeter(NGL,K)*VLNOB)
   ENDIF
   naqfdiag%TFNO2X=naqfdiag%TFNO2X+FNO2
   naqfdiag%TFNO2B=naqfdiag%TFNO2B+FNB2
@@ -2794,7 +2798,7 @@ module MicBGCMod
   IF(RN2OY.GT.ZEROS)THEN
     FN2O=AMAX1(FMN,RVMX1(NGL,K)/RN2OY)
   ELSE
-    FN2O=AMAX1(FMN,FOMA(NGL,K))
+    FN2O=AMAX1(FMN,FracOMActHeter(NGL,K))
   ENDIF
   naqfdiag%TFN2OX=naqfdiag%TFN2OX+FN2O
 !
@@ -2864,13 +2868,13 @@ module MicBGCMod
 
   ! begin_execution
   associate(                  &
-    WFN    => nmics%WFN,      &
-    OMA    => nmics%OMA,      &
+    WFN    => nmics%WFN, &
+    OMActHeter   => nmics%OMActHeter, &
     RUPOX  => nmicf%RUPOX, &
     RGOMO  => nmicf%RGOMO, &
-    RO2Dmnd4RespHeter => nmicf%RO2Dmnd4RespHeter,     &
-    RO2DmndHeter=> nmicf%RO2DmndHeter ,     &
-    ROXYO => nmicf%ROXYO,     &
+    RO2Dmnd4RespHeter => nmicf%RO2Dmnd4RespHeter, &
+    RO2DmndHeter=> nmicf%RO2DmndHeter , &
+    ROXYO => nmicf%ROXYO, &
     RH2GX  => nmicf%RH2GX, &
     ROQCD  => nmicf%ROQCD, &
     RCO2X  => nmicf%RCO2X, &
@@ -2950,7 +2954,7 @@ module MicBGCMod
         !write(*,*)'VLSoilMicP=',VLSoilMicP
         THETW1=AZMAX1(safe_adb(VLWatMicPM(M),VLSoilMicP))
         RRADO=ORAD*(FILM(M)+ORAD)/FILM(M)
-        DIFOX=TortMicPM(M)*OLSGL1*12.57_r8*BIOS*OMA(NGL,K)*RRADO
+        DIFOX=TortMicPM(M)*OLSGL1*12.57_r8*BIOS*OMActHeter(NGL,K)*RRADO
         VOLWOX=VLWatMicPM(M)*SOXYL
         VOLPOX=VLsoiAirPM(M)
         VOLWPM=VOLWOX+VOLPOX
@@ -3058,7 +3062,7 @@ module MicBGCMod
 !     begin_execution
   associate(                 &
    TFNG    => nmics%TFNG  , &
-   OMA     => nmics%OMA   , &
+   OMActHeter    => nmics%OMActHeter  , &
    FNH4XR  => nmicf%FNH4XR, &
    FNO3XR  => nmicf%FNO3XR, &
    FPO4XR  => nmicf%FPO4XR, &
@@ -3157,7 +3161,7 @@ module MicBGCMod
   IF(RINHP.GT.0.0_r8)THEN
     CNH4X=AZMAX1(CNH4S-Z4MN)
     CNH4Y=AZMAX1(CNH4B-Z4MN)
-    RINHX=AMIN1(RINHP,BIOA*OMA(NGL,K)*TFNG(NGL,K)*Z4MX)
+    RINHX=AMIN1(RINHP,BIOA*OMActHeter(NGL,K)*TFNG(NGL,K)*Z4MX)
     RINHO(NGL,K)=FNH4S*RINHX*CNH4X/(CNH4X+Z4KU)
     RINHB(NGL,K)=FNHBS*RINHX*CNH4Y/(CNH4Y+Z4KU)
     ZNH4M=Z4MN*VOLWU*FNH4S
@@ -3196,7 +3200,7 @@ module MicBGCMod
   IF(RINOP.GT.0.0_r8)THEN
     CNO3X=AZMAX1(CNO3S-ZOMN)
     CNO3Y=AZMAX1(CNO3B-ZOMN)
-    RINOX=AMIN1(RINOP,BIOA*OMA(NGL,K)*TFNG(NGL,K)*ZOMX)
+    RINOX=AMIN1(RINOP,BIOA*OMActHeter(NGL,K)*TFNG(NGL,K)*ZOMX)
     RINOO(NGL,K)=FNO3S*RINOX*CNO3X/(CNO3X+ZOKU)
     RINOB(NGL,K)=FNO3B*RINOX*CNO3Y/(CNO3Y+ZOKU)
     ZNO3M=ZOMN*VOLWU*FNO3S
@@ -3238,7 +3242,7 @@ module MicBGCMod
   IF(RIPOP.GT.0.0_r8)THEN
     CH2PX=AZMAX1(CH2P4-HPMN)
     CH2PY=AZMAX1(CH2P4B-HPMN)
-    RIPOX=AMIN1(RIPOP,BIOA*OMA(NGL,K)*TFNG(NGL,K)*HPMX)
+    RIPOX=AMIN1(RIPOP,BIOA*OMActHeter(NGL,K)*TFNG(NGL,K)*HPMX)
     RIPOO(NGL,K)=FH2PS*RIPOX*CH2PX/(CH2PX+HPKU)
     RIPBO(NGL,K)=FH2PB*RIPOX*CH2PY/(CH2PY+HPKU)
     H2POM=HPMN*VLWatMicP*FH2PS
@@ -3277,7 +3281,7 @@ module MicBGCMod
   IF(RIP1P.GT.0.0_r8)THEN
     CH1PX=AZMAX1(CH1P4-HPMN)
     CH1PY=AZMAX1(CH1P4B-HPMN)
-    RIP1X=AMIN1(RIP1P,BIOA*OMA(NGL,K)*TFNG(NGL,K)*HPMX)
+    RIP1X=AMIN1(RIP1P,BIOA*OMActHeter(NGL,K)*TFNG(NGL,K)*HPMX)
     RIPO1(NGL,K)=FH1PS*RIP1X*CH1PX/(CH1PX+HPKU)
     RIPB1(NGL,K)=FH1PB*RIP1X*CH1PY/(CH1PY+HPKU)
     H1POM=HPMN*VLWatMicP*FH1PS
@@ -3316,7 +3320,7 @@ module MicBGCMod
     IF(RINHPR.GT.0.0_r8)THEN
       CNH4X=AZMAX1(CNH4SU-Z4MN)
       CNH4Y=AZMAX1(CNH4BU-Z4MN)
-      RINHOR(NGL,K)=AMIN1(RINHPR,BIOA*OMA(NGL,K)*TFNG(NGL,K)*Z4MX) &
+      RINHOR(NGL,K)=AMIN1(RINHPR,BIOA*OMActHeter(NGL,K)*TFNG(NGL,K)*Z4MX) &
         *(FNH4S*CNH4X/(CNH4X+Z4KU)+FNHBS*CNH4Y/(CNH4Y+Z4KU))
       ZNH4M=Z4MN*VLWatMicP
       RNH4TransfLitrHeter(NGL,K)=AMIN1(FNH4XR(NGL,K)*AZMAX1((ZNH4TU-ZNH4M)),RINHOR(NGL,K))
@@ -3350,7 +3354,7 @@ module MicBGCMod
     IF(RINOPR.GT.0.0_r8)THEN
       CNO3X=AZMAX1(CNO3SU-ZOMN)
       CNO3Y=AZMAX1(CNO3BU-ZOMN)
-      RINOOR(NGL,K)=AMAX1(RINOPR,BIOA*OMA(NGL,K)*TFNG(NGL,K)*ZOMX) &
+      RINOOR(NGL,K)=AMAX1(RINOPR,BIOA*OMActHeter(NGL,K)*TFNG(NGL,K)*ZOMX) &
         *(FNO3S*CNO3X/(CNO3X+ZOKU)+FNO3B*CNO3Y/(CNO3Y+ZOKU))
       ZNO3M=ZOMN*VLWatMicP
       RNO3TransfLitrHeter(NGL,K)=AMIN1(FNO3XR(NGL,K)*AZMAX1((ZNO3TU-ZNO3M)),RINOOR(NGL,K))
@@ -3384,7 +3388,7 @@ module MicBGCMod
     IF(RIPOPR.GT.0.0_r8)THEN
       CH2PX=AZMAX1(CH2P4U-HPMN)
       CH2PY=AZMAX1(CH2P4BU-HPMN)
-      RIPOOR(NGL,K)=AMIN1(RIPOPR,BIOA*OMA(NGL,K)*TFNG(NGL,K)*HPMX) &
+      RIPOOR(NGL,K)=AMIN1(RIPOPR,BIOA*OMActHeter(NGL,K)*TFNG(NGL,K)*HPMX) &
         *(FH2PS*CH2PX/(CH2PX+HPKU)+FH2PB*CH2PY/(CH2PY+HPKU))
       H2P4M=HPMN*VOLWU
       RH2PO4TransfLitrHeter(NGL,K)=AMIN1(FPO4XR(NGL,K)*AZMAX1((H2P4TU-H2P4M)),RIPOOR(NGL,K))
@@ -3420,7 +3424,7 @@ module MicBGCMod
     IF(RIP1PR.GT.0.0_r8)THEN
       CH1PX=AZMAX1(CH1P4U-HPMN)
       CH1PY=AZMAX1(CH1P4BU-HPMN)
-      RIPO1R(NGL,K)=AMIN1(RIP1PR,BIOA*OMA(NGL,K)*TFNG(NGL,K)*HPMX) &
+      RIPO1R(NGL,K)=AMIN1(RIP1PR,BIOA*OMActHeter(NGL,K)*TFNG(NGL,K)*HPMX) &
         *(FH1PS*CH1PX/(CH1PX+HPKU)+FH1PB*CH1PY/(CH1PY+HPKU))
       H1P4M=HPMN*VOLWU
       RH1PO4TransfLitrHeter(NGL,K)=AMIN1(FP14XR(NGL,K)*AZMAX1((H1P4TU-H1P4M)),RIPO1R(NGL,K))
@@ -3450,9 +3454,9 @@ module MicBGCMod
   real(r8) :: RGN2P
 !     begin_execution
   associate(                  &
-    TFNR  => nmics%TFNR,      &
-    OMN2  => nmics%OMN2,      &
-    RGN2F => nmicf%RGN2F,     &
+    TFNR  => nmics%TFNR, &
+    OMN2  => nmics%OMN2, &
+    RGN2F => nmicf%RGN2F, &
     RGOMO  => nmicf%RGOMO, &
     RMOMC => nmicf%RMOMC , &
     RNH4TransfSoilHeter => nmicf%RNH4TransfSoilHeter , &
@@ -3548,8 +3552,8 @@ module MicBGCMod
   real(r8) :: FRM
 !     begin_execution
   associate(                  &
-    CNOMA  => nmics%CNOMA, &
-    CPOMA  => nmics%CPOMA, &
+    CNOMActHeter => nmics%CNOMActHeter, &
+    CPOMActHeter => nmics%CPOMActHeter, &
     TFNG   => nmics%TFNG , &
     FCN    => nmics%FCN  , &
     FCP    => nmics%FCP  , &
@@ -3602,7 +3606,7 @@ module MicBGCMod
 !     CGOMEheter,CGOMEheter=DON, DOP uptake
 !     FGOCP,FGOAP=DOC,acetate/(DOC+acetate)
 !     OQN,OPQ=DON,DOP
-!     FOMK=faction of OMA in total OMA
+!     FOMK=faction of OMActHeterin total OMA
 !     CNQ,CPQ=DON/DOC, DOP/DOC
 !     FCN,FCP=limitation from N,P
 !
@@ -3725,8 +3729,8 @@ module MicBGCMod
     D730: DO M=1,2
       MID=micpar%get_micb_id(M,NGL)    
       RXMMEheter(ielmc,M,NGL,K)=AMIN1(OMEheter(ielmc,MID,K),AZMAX1(FRM*RMOMC(M,NGL,K)/RCCC))
-      RXMMEheter(ielmn,M,NGL,K)=AMIN1(OMEheter(ielmn,MID,K),AZMAX1(RXMMEheter(ielmc,M,NGL,K)*CNOMA(NGL,K)))
-      RXMMEheter(ielmp,M,NGL,K)=AMIN1(OMEheter(ielmp,MID,K),AZMAX1(RXMMEheter(ielmc,M,NGL,K)*CPOMA(NGL,K)))
+      RXMMEheter(ielmn,M,NGL,K)=AMIN1(OMEheter(ielmn,MID,K),AZMAX1(RXMMEheter(ielmc,M,NGL,K)*CNOMActHeter(NGL,K)))
+      RXMMEheter(ielmp,M,NGL,K)=AMIN1(OMEheter(ielmp,MID,K),AZMAX1(RXMMEheter(ielmc,M,NGL,K)*CPOMActHeter(NGL,K)))
       RDMMEheter(ielmc,M,NGL,K)=RXMMEheter(ielmc,M,NGL,K)*(1.0_r8-RCCC)
       RDMMEheter(ielmn,M,NGL,K)=RXMMEheter(ielmn,M,NGL,K)*(1.0_r8-RCCN)*(1.0_r8-RCCC)
       RDMMEheter(ielmp,M,NGL,K)=RXMMEheter(ielmp,M,NGL,K)*(1.0_r8-RCCP)*(1.0_r8-RCCC)

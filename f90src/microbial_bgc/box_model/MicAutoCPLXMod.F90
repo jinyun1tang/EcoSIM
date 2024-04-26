@@ -62,10 +62,10 @@ module MicAutoCPLXMod
   real(r8) :: RMOMK(2)
 ! begin_execution
   associate(                      &
-    FOMAff => nmics%FOMAff,       &
+    FracOMActAutor => nmics%FracOMActAutor,       &
     FOMNff => nmics%FOMNff,       &
     FOMKff => nmics%FOMKff,       &
-    OMAff => nmics%OMAff,         &
+    OMActAutor => nmics%OMActAutor,         &
     RO2UptkAutor  => nmicf%RO2UptkAutor,    &
     RGOMOff  => nmicf%RGOMOff,    &
     RO2Dmnd4RespAutor => nmicf%RO2Dmnd4RespAutor ,    &
@@ -94,22 +94,22 @@ module MicAutoCPLXMod
     ORGC   => micfor%ORGC  ,     &
     RO2DmndAutort => micflx%RO2DmndAutort  &
   )
-! FOMA,FOMN=fraction of total active biomass C,N in each N and K
+! FracOMActHeter,FOMN=fraction of total active biomass C,N in each N and K
 
   IF(TOMA.GT.ZEROS)THEN
-    FOMAff(NGL)=OMAff(NGL)/TOMA
+    FracOMActAutor(NGL)=OMActAutor(NGL)/TOMA
   ELSE
-    FOMAff(NGL)=1.0_r8
+    FracOMActAutor(NGL)=1.0_r8
   ENDIF
   IF(TOMN.GT.ZEROS)THEN
-    FOMNff(NGL)=OMAff(NGL)/TOMN
+    FOMNff(NGL)=OMActAutor(NGL)/TOMN
   ELSE
     FOMNff(NGL)=1.0_r8
   ENDIF
 
   K=micpar%jcplx
   IF(TOMK(K).GT.ZEROS)THEN
-    FOMKff(NGL)=OMAff(NGL)/TOMK(K)
+    FOMKff(NGL)=OMActAutor(NGL)/TOMK(K)
   ELSE
     FOMKff(NGL)=1.0_r8
   ENDIF
@@ -252,7 +252,7 @@ module MicAutoCPLXMod
   type(micfluxtype), intent(inout) :: micflx
 ! begin_execution
   associate(                  &
-    FOMAff    => nmics%FOMAff,    &
+    FracOMActAutor    => nmics%FracOMActAutor,    &
     FOMKff    => nmics%FOMKff,    &
     FNH4XRff  =>nmicf%FNH4XRff,   &
     FNO3XRff  =>nmicf%FNO3XRff,   &
@@ -306,47 +306,47 @@ module MicAutoCPLXMod
   IF(ROXYY.GT.ZEROS)THEN
     FOXYX=AMAX1(FMN,RO2DmndAutort(NGL)/ROXYY)
   ELSE
-    FOXYX=AMAX1(FMN,FOMAff(NGL))
+    FOXYX=AMAX1(FMN,FracOMActAutor(NGL))
   ENDIF
   IF(RNH4Y.GT.ZEROS)THEN
     FNH4X=AMAX1(FMN,RNH4UptkSoilAutor(NGL)/RNH4Y)
   ELSE
-    FNH4X=AMAX1(FMN,FOMAff(NGL)*VLNH4)
+    FNH4X=AMAX1(FMN,FracOMActAutor(NGL)*VLNH4)
   ENDIF
   IF(RNHBY.GT.ZEROS)THEN
     FNB4X=AMAX1(FMN,RNH4UptkBandAutor(NGL)/RNHBY)
   ELSE
-    FNB4X=AMAX1(FMN,FOMAff(NGL)*VLNHB)
+    FNB4X=AMAX1(FMN,FracOMActAutor(NGL)*VLNHB)
   ENDIF
   IF(RNO3Y.GT.ZEROS)THEN
     FNO3X=AMAX1(FMN,RNO3UptkSoilAutor(NGL)/RNO3Y)
   ELSE
-    FNO3X=AMAX1(FMN,FOMAff(NGL)*VLNO3)
+    FNO3X=AMAX1(FMN,FracOMActAutor(NGL)*VLNO3)
   ENDIF
   IF(RN3BY.GT.ZEROS)THEN
     FNB3X=AMAX1(FMN,RNO3UptkBandAutor(NGL)/RN3BY)
   ELSE
-    FNB3X=AMAX1(FMN,FOMAff(NGL)*VLNOB)
+    FNB3X=AMAX1(FMN,FracOMActAutor(NGL)*VLNOB)
   ENDIF
   IF(RPO4Y.GT.ZEROS)THEN
     FPO4X=AMAX1(FMN,RH2PO4UptkSoilAutor(NGL)/RPO4Y)
   ELSE
-    FPO4X=AMAX1(FMN,FOMAff(NGL)*VLPO4)
+    FPO4X=AMAX1(FMN,FracOMActAutor(NGL)*VLPO4)
   ENDIF
   IF(RPOBY.GT.ZEROS)THEN
     FPOBX=AMAX1(FMN,RH2PO4UptkBandAutor(NGL)/RPOBY)
   ELSE
-    FPOBX=AMAX1(FMN,FOMAff(NGL)*VLPOB)
+    FPOBX=AMAX1(FMN,FracOMActAutor(NGL)*VLPOB)
   ENDIF
   IF(RP14Y.GT.ZEROS)THEN
     FP14X=AMAX1(FMN,RH1PO4UptkSoilAutor(NGL)/RP14Y)
   ELSE
-    FP14X=AMAX1(FMN,FOMAff(NGL)*VLPO4)
+    FP14X=AMAX1(FMN,FracOMActAutor(NGL)*VLPO4)
   ENDIF
   IF(RP1BY.GT.ZEROS)THEN
     FP1BX=AMAX1(FMN,RH1PO4UptkBandAutor(NGL)/RP1BY)
   ELSE
-    FP1BX=AMAX1(FMN,FOMAff(NGL)*VLPOB)
+    FP1BX=AMAX1(FMN,FracOMActAutor(NGL)*VLPOB)
   ENDIF
   naqfdiag%TFOXYX=naqfdiag%TFOXYX+FOXYX
   naqfdiag%TFNH4X=naqfdiag%TFNH4X+FNH4X
@@ -420,8 +420,8 @@ module MicAutoCPLXMod
   real(r8) :: FRM
 !     begin_execution
   associate(                      &
-    CNOMAff  => nmics%CNOMAff,    &
-    CPOMAff  => nmics%CPOMAff,    &
+    CNOMActAutor  => nmics%CNOMActAutor,    &
+    CPOMActAutor  => nmics%CPOMActAutor,    &
     TFNGff   => nmics%TFNGff ,    &
     CGOMEautor  => nmicf%CGOMEautor,    &
     CGOSEautor  => nmicf%CGOSEautor,    &
@@ -586,8 +586,8 @@ module MicAutoCPLXMod
     FRM=RXOMT/RMOMT
     DO  M=1,2
       RXMMEautor(ielmc,M,NGL)=AMIN1(OMEauto(ielmc,MID),AZMAX1(FRM*RMaintCompAutor(M,NGL)/RCCC))
-      RXMMEautor(ielmn,M,NGL)=AMIN1(OMEauto(ielmn,MID),AZMAX1(RXMMEautor(ielmc,M,NGL)*CNOMAff(NGL)))
-      RXMMEautor(ielmp,M,NGL)=AMIN1(OMEauto(ielmp,MID),AZMAX1(RXMMEautor(ielmc,M,NGL)*CPOMAff(NGL)))
+      RXMMEautor(ielmn,M,NGL)=AMIN1(OMEauto(ielmn,MID),AZMAX1(RXMMEautor(ielmc,M,NGL)*CNOMActAutor(NGL)))
+      RXMMEautor(ielmp,M,NGL)=AMIN1(OMEauto(ielmp,MID),AZMAX1(RXMMEautor(ielmc,M,NGL)*CPOMActAutor(NGL)))
 
       RDMMEautor(ielmc,M,NGL)=RXMMEautor(ielmc,M,NGL)*(1.0_r8-RCCC)
       RDMMEautor(ielmn,M,NGL)=RXMMEautor(ielmn,M,NGL)*(1.0_r8-RCCN)*(1.0_r8-RCCC)
@@ -652,7 +652,7 @@ module MicAutoCPLXMod
   ! begin_execution
   associate(                  &
     fLimO2Autor    => nmics%fLimO2Autor,      &
-    OMAff    => nmics%OMAff,      &
+    OMActAutor    => nmics%OMActAutor,      &
     RO2UptkAutor  => nmicf%RO2UptkAutor,    &
     RGOMOff  => nmicf%RGOMOff,    &
     RO2Dmnd4RespAutor => nmicf%RO2Dmnd4RespAutor,     &
@@ -738,7 +738,7 @@ module MicAutoCPLXMod
         !
         THETW1=AZMAX1(safe_adb(VLWatMicPM(M),VLSoilMicP))
         RRADO=ORAD*(FILM(M)+ORAD)/FILM(M)
-        DIFOX=TortMicPM(M)*OLSGL1*12.57_r8*BIOS*OMAff(NGL)*RRADO
+        DIFOX=TortMicPM(M)*OLSGL1*12.57_r8*BIOS*OMActAutor(NGL)*RRADO
         VOLWOX=VLWatMicPM(M)*SOXYL
         VOLPOX=VLsoiAirPM(M)
         VOLWPM=VOLWOX+VOLPOX
@@ -966,8 +966,8 @@ module MicAutoCPLXMod
   associate(             &
     TFNGff => nmics%TFNGff,  &
     FCNPff => nmics%FCNPff,  &
-    FOMAff => nmics%FOMAff,  &
-    OMAff  => nmics%OMAff ,  &
+    FracOMActAutor => nmics%FracOMActAutor,  &
+    OMActAutor  => nmics%OMActAutor ,  &
     RO2Dmnd4RespAutor=> nmicf%RO2Dmnd4RespAutor, &
     RO2DmndAutor=> nmicf%RO2DmndAutor, &
     VLNH4  => micfor%VLNH4 , &
@@ -997,12 +997,12 @@ module MicAutoCPLXMod
   IF(RNH4Y.GT.ZEROS)THEN
     FNH4=AMAX1(FMN,RNH3OxidAutor(NGL)/RNH4Y)
   ELSE
-    FNH4=AMAX1(FMN,VLNH4*FOMAff(NGL))
+    FNH4=AMAX1(FMN,VLNH4*FracOMActAutor(NGL))
   ENDIF
   IF(RNHBY.GT.ZEROS)THEN
     FNB4=AMAX1(FMN,RNH3OxidAutorBand(NGL)/RNHBY)
   ELSE
-    FNB4=AMAX1(FMN,VLNHB*FOMAff(NGL))
+    FNB4=AMAX1(FMN,VLNHB*FracOMActAutor(NGL))
   ENDIF
   naqfdiag%TFNH4X=naqfdiag%TFNH4X+FNH4
   naqfdiag%TFNH4B=naqfdiag%TFNH4B+FNB4
@@ -1047,7 +1047,7 @@ module MicAutoCPLXMod
 !     RVMX4,RVMXB=nitrifier demand for NH4 in non-band, band
 !
   ECHZ=EO2X
-  VMXX=VMXH*TFNGff(NGL)*FCNPff(NGL)*XCO2*OMAff(NGL)
+  VMXX=VMXH*TFNGff(NGL)*FCNPff(NGL)*XCO2*OMActAutor(NGL)
   IF(VOLWZ.GT.ZEROS2)THEN
     VMXA=VMXX/(1.0_r8+VMXX/(VHKI*VOLWZ))
   ELSE
@@ -1107,7 +1107,7 @@ module MicAutoCPLXMod
     TFNGff => nmics%TFNGff,    &
     FCNPff => nmics%FCNPff,    &
     FOMNff => nmics%FOMNff,    &
-    OMAff  => nmics%OMAff ,    &
+    OMActAutor  => nmics%OMActAutor ,    &
     RO2Dmnd4RespAutor => nmicf%RO2Dmnd4RespAutor,  &
     RO2DmndAutor => nmicf%RO2DmndAutor,  &
     VLNH4   => micfor%VLNH4   , &
@@ -1166,7 +1166,7 @@ module MicAutoCPLXMod
 !     RVMX2,RVMB2=nitrifier demand for NO2 in non-band, band
 !
   ECHZ=EO2X
-  VMXA=TFNGff(NGL)*FCNPff(NGL)*XCO2*OMAff(NGL)*VMXN
+  VMXA=TFNGff(NGL)*FCNPff(NGL)*XCO2*OMActAutor(NGL)*VMXN
   FCN2S=FNH4S*CNO2S/(CNO2S+ZNKM)
   FCN2B=FNHBS*CNO2B/(CNO2B+ZNKM)
   FSBST=FCN2S+FCN2B
@@ -1215,7 +1215,7 @@ module MicAutoCPLXMod
   associate(                  &
     TFNGff => nmics%TFNGff,       &
     FCNPff => nmics%FCNPff,       &
-    OMAff  => nmics%OMAff ,       &
+    OMActAutor  => nmics%OMActAutor ,       &
     RO2Dmnd4RespAutor => nmicf%RO2Dmnd4RespAutor,     &
     RO2DmndAutor => nmicf%RO2DmndAutor  ,    &
     TKS     => micfor%TKS       , &
@@ -1241,7 +1241,7 @@ module MicAutoCPLXMod
   GH2X=RGAS*1.E-3_r8*TKS*LOG((AMAX1(1.0E-03_r8,CH2GS)/H2KI)**4)
   GH2H=GH2X/12.08_r8
   ECHZ=AMAX1(EO2X,AMIN1(1.0_r8,1.0_r8/(1.0_r8+AZMAX1((GCOX+GH2H))/EOMH)))
-  VMXA=TFNGff(NGL)*FCNPff(NGL)*XCO2*OMAff(NGL)*VMXC
+  VMXA=TFNGff(NGL)*FCNPff(NGL)*XCO2*OMActAutor(NGL)*VMXC
   H2GSX=H2GS+0.111_r8*naqfdiag%TRH2G
   FSBST=CH2GS/(CH2GS+H2KM)
   RGOMP=AZMAX1(AMIN1(1.5*H2GSX,VMXA*FSBST))
@@ -1280,7 +1280,7 @@ module MicAutoCPLXMod
   associate(             &
     TFNGff => nmics%TFNGff,  &
     FCNPff => nmics%FCNPff,  &
-    OMAff  => nmics%OMAff ,  &
+    OMActAutor  => nmics%OMActAutor ,  &
     RO2Dmnd4RespAutor=> nmicf%RO2Dmnd4RespAutor, &
     RO2DmndAutor=> nmicf%RO2DmndAutor, &
     CCH4E  => micfor%CCH4E  , &
@@ -1323,7 +1323,7 @@ module MicAutoCPLXMod
 !     DiffusivitySolutEff=rate constant for gaseous-aqueous exchange
 !
   ECHZ=EH4X
-  VMXA=TFNGff(NGL)*FCNPff(NGL)*OMAff(NGL)*VMX4
+  VMXA=TFNGff(NGL)*FCNPff(NGL)*OMActAutor(NGL)*VMX4
   RCH4L1=RCH4L*dts_gas
   RCH4F1=RCH4F*dts_gas
   RCH4S1=(naqfdiag%TCH4H+naqfdiag%TCH4A)*dts_gas
@@ -1435,7 +1435,7 @@ module MicAutoCPLXMod
 !     begin_execution
   associate(                 &
    TFNGff    => nmics%TFNGff  ,  &
-   OMAff     => nmics%OMAff  ,  &
+   OMActAutor     => nmics%OMActAutor  ,  &
    FNH4XRff  => nmicf%FNH4XRff,  &
    FNO3XRff  => nmicf%FNO3XRff,  &
    FPO4XRff  => nmicf%FPO4XRff,  &
@@ -1526,7 +1526,7 @@ module MicAutoCPLXMod
   IF(RINHP.GT.0.0_r8)THEN
     CNH4X=AZMAX1(CNH4S-Z4MN)
     CNH4Y=AZMAX1(CNH4B-Z4MN)
-    RINHX=AMIN1(RINHP,BIOA*OMAff(NGL)*TFNGff(NGL)*Z4MX)
+    RINHX=AMIN1(RINHP,BIOA*OMActAutor(NGL)*TFNGff(NGL)*Z4MX)
     RNH4UptkSoilAutor(NGL)=FNH4S*RINHX*CNH4X/(CNH4X+Z4KU)
     RNH4UptkBandAutor(NGL)=FNHBS*RINHX*CNH4Y/(CNH4Y+Z4KU)
     ZNH4M=Z4MN*VLWatMicP*FNH4S
@@ -1565,7 +1565,7 @@ module MicAutoCPLXMod
   IF(RINOP.GT.0.0)THEN
     CNO3X=AZMAX1(CNO3S-ZOMN)
     CNO3Y=AZMAX1(CNO3B-ZOMN)
-    RINOX=AMIN1(RINOP,BIOA*OMAff(NGL)*TFNGff(NGL)*ZOMX)
+    RINOX=AMIN1(RINOP,BIOA*OMActAutor(NGL)*TFNGff(NGL)*ZOMX)
     RNO3UptkSoilAutor(NGL)=FNO3S*RINOX*CNO3X/(CNO3X+ZOKU)
     RNO3UptkBandAutor(NGL)=FNO3B*RINOX*CNO3Y/(CNO3Y+ZOKU)
     ZNO3M=ZOMN*VLWatMicP*FNO3S
@@ -1609,7 +1609,7 @@ module MicAutoCPLXMod
   IF(RIPOP.GT.0.0)THEN
     CH2PX=AZMAX1(CH2P4-HPMN)
     CH2PY=AZMAX1(CH2P4B-HPMN)
-    RIPOX=AMIN1(RIPOP,BIOA*OMAff(NGL)*TFNGff(NGL)*HPMX)
+    RIPOX=AMIN1(RIPOP,BIOA*OMActAutor(NGL)*TFNGff(NGL)*HPMX)
     RH2PO4UptkSoilAutor(NGL)=FH2PS*RIPOX*CH2PX/(CH2PX+HPKU)
     RH2PO4UptkBandAutor(NGL)=FH2PB*RIPOX*CH2PY/(CH2PY+HPKU)
     H2POM=HPMN*VLWatMicP*FH2PS
@@ -1648,7 +1648,7 @@ module MicAutoCPLXMod
   IF(RIP1P.GT.0.0_r8)THEN
     CH1PX=AZMAX1(CH1P4-HPMN)
     CH1PY=AZMAX1(CH1P4B-HPMN)
-    RIP1X=AMIN1(RIP1P,BIOA*OMAff(NGL)*TFNGff(NGL)*HPMX)
+    RIP1X=AMIN1(RIP1P,BIOA*OMActAutor(NGL)*TFNGff(NGL)*HPMX)
     RH1PO4UptkSoilAutor(NGL)=FH1PS*RIP1X*CH1PX/(CH1PX+HPKU)
     RH1PO4UptkBandAutor(NGL)=FH1PB*RIP1X*CH1PY/(CH1PY+HPKU)
     H1POM=HPMN*VLWatMicP*FH1PS
@@ -1687,7 +1687,7 @@ module MicAutoCPLXMod
     IF(RINHPR.GT.0.0_r8)THEN
       CNH4X=AZMAX1(CNH4S-Z4MN)
       CNH4Y=AZMAX1(CNH4B-Z4MN)
-      RNH4UptkLitrAutor(NGL)=AMIN1(RINHPR,BIOA*OMAff(NGL)*TFNGff(NGL)*Z4MX) &
+      RNH4UptkLitrAutor(NGL)=AMIN1(RINHPR,BIOA*OMActAutor(NGL)*TFNGff(NGL)*Z4MX) &
         *(FNH4S*CNH4X/(CNH4X+Z4KU)+FNHBS*CNH4Y/(CNH4Y+Z4KU))
       ZNH4M=Z4MN*VLWatMicP
       RNH4TransfLitrAutor(NGL)=AMIN1(FNH4XRff(NGL)*AZMAX1((ZNH4T-ZNH4M)),RNH4UptkLitrAutor(NGL))
@@ -1721,7 +1721,7 @@ module MicAutoCPLXMod
     IF(RINOPR.GT.0.0_r8)THEN
       CNO3X=AZMAX1(CNO3S-ZOMN)
       CNO3Y=AZMAX1(CNO3B-ZOMN)
-      RNO3UptkLitrAutor(NGL)=AMAX1(RINOPR,BIOA*OMAff(NGL)*TFNGff(NGL)*ZOMX) &
+      RNO3UptkLitrAutor(NGL)=AMAX1(RINOPR,BIOA*OMActAutor(NGL)*TFNGff(NGL)*ZOMX) &
         *(FNO3S*CNO3X/(CNO3X+ZOKU)+FNO3B*CNO3Y/(CNO3Y+ZOKU))
       ZNO3M=ZOMN*VLWatMicP
       RNO3TransfLitrAutor(NGL)=AMIN1(FNO3XRff(NGL)*AZMAX1((ZNO3T-ZNO3M)),RNO3UptkLitrAutor(NGL))
@@ -1755,7 +1755,7 @@ module MicAutoCPLXMod
     IF(RIPOPR.GT.0.0_r8)THEN
       CH2PX=AZMAX1(CH2P4-HPMN)
       CH2PY=AZMAX1(CH2P4B-HPMN)
-      RH2PO4UptkLitrAutor(NGL)=AMIN1(RIPOPR,BIOA*OMAff(NGL)*TFNGff(NGL)*HPMX) &
+      RH2PO4UptkLitrAutor(NGL)=AMIN1(RIPOPR,BIOA*OMActAutor(NGL)*TFNGff(NGL)*HPMX) &
         *(FH2PS*CH2PX/(CH2PX+HPKU)+FH2PB*CH2PY/(CH2PY+HPKU))
       H2P4M=HPMN*VLWatMicP
       RH2PO4TransfLitrAutor(NGL)=AMIN1(FPO4XRff(NGL)*AZMAX1((H2P4T-H2P4M)),RH2PO4UptkLitrAutor(NGL))
@@ -1791,7 +1791,7 @@ module MicAutoCPLXMod
     IF(RIP1PR.GT.0.0_r8)THEN
       CH1PX=AZMAX1(CH1P4-HPMN)
       CH1PY=AZMAX1(CH1P4B-HPMN)
-      RH1PO4UptkLitrAutor(NGL)=AMIN1(RIP1PR,BIOA*OMAff(NGL)*TFNGff(NGL)*HPMX) &
+      RH1PO4UptkLitrAutor(NGL)=AMIN1(RIP1PR,BIOA*OMActAutor(NGL)*TFNGff(NGL)*HPMX) &
         *(FH1PS*CH1PX/(CH1PX+HPKU)+FH1PB*CH1PY/(CH1PY+HPKU))
       H1P4M=HPMN*VLWatMicP
       RH1PO4TransfLitrAutor(NGL)=AMIN1(FP14XRff(NGL)*AZMAX1((H1P4T-H1P4M)),RH1PO4UptkLitrAutor(NGL))
