@@ -639,13 +639,13 @@ contains
       ystatesfl(fid_RNH4Y)=ystatesfl(fid_RNH4Y)+micflx%RNH3OxidAutor(NGL)+micflx%RNH4UptkSoilAutor(NGL)
       ystatesfl(fid_RNO3Y)=ystatesfl(fid_RNO3Y)+micflx%RNO3UptkSoilAutor(NGL)
       ystatesfl(fid_RNO2Y)=ystatesfl(fid_RNO2Y)+micflx%RNO2OxidAutor(NGL)
-      ystatesfl(fid_RPO4Y)=ystatesfl(fid_RPO4Y)+micflx%RIPOOff(NGL)
-      ystatesfl(fid_RP14Y)=ystatesfl(fid_RP14Y)+micflx%RIPO1ff(NGL)
+      ystatesfl(fid_RPO4Y)=ystatesfl(fid_RPO4Y)+micflx%RH2PO4UptkSoilAutor(NGL)
+      ystatesfl(fid_RP14Y)=ystatesfl(fid_RP14Y)+micflx%RH1PO4UptkSoilAutor(NGL)
       ystatesfl(fid_RNHBY)=ystatesfl(fid_RNHBY)+micflx%RNH3OxidAutorBand(NGL)+micflx%RNH4UptkBandAutor(NGL)
       ystatesfl(fid_RN3BY)=ystatesfl(fid_RN3BY)+micflx%RNO3UptkBandAutor(NGL)
       ystatesfl(fid_RN2BY)=ystatesfl(fid_RN2BY)+micflx%RNO2OxidAutorBand(NGL)
-      ystatesfl(fid_RPOBY)=ystatesfl(fid_RPOBY)+micflx%RIPBOff(NGL)
-      ystatesfl(fid_RP1BY)=ystatesfl(fid_RP1BY)+micflx%RIPB1ff(NGL)
+      ystatesfl(fid_RPOBY)=ystatesfl(fid_RPOBY)+micflx%RH2PO4UptkBandAutor(NGL)
+      ystatesfl(fid_RP1BY)=ystatesfl(fid_RP1BY)+micflx%RH1PO4UptkBandAutor(NGL)
     enddo
   ENDDO
 

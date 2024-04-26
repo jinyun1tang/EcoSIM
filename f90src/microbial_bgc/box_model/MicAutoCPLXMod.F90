@@ -283,14 +283,14 @@ module MicAutoCPLXMod
     VLPOB     => micfor%VLPOB,   &
     VLNHB     => micfor%VLNHB,   &
     VLNH4     => micfor%VLNH4,   &
-    RIPO1Rff  => micflx%RIPO1Rff, &
-    RIPOORff  => micflx%RIPOORff, &
-    RINOORff  => micflx%RINOORff, &
-    RINHORff  => micflx%RINHORff, &
-    RIPB1ff   => micflx%RIPB1ff, &
-    RIPO1ff   => micflx%RIPO1ff, &
-    RIPBOff   => micflx%RIPBOff, &
-    RIPOOff   => micflx%RIPOOff, &
+    RH1PO4UptkLitrAutor  => micflx%RH1PO4UptkLitrAutor, &
+    RH2PO4UptkLitrAutor  => micflx%RH2PO4UptkLitrAutor, &
+    RNO3UptkLitrAutor  => micflx%RNO3UptkLitrAutor, &
+    RNH4UptkLitrAutor  => micflx%RNH4UptkLitrAutor, &
+    RH1PO4UptkBandAutor   => micflx%RH1PO4UptkBandAutor, &
+    RH1PO4UptkSoilAutor   => micflx%RH1PO4UptkSoilAutor, &
+    RH2PO4UptkBandAutor   => micflx%RH2PO4UptkBandAutor, &
+    RH2PO4UptkSoilAutor   => micflx%RH2PO4UptkSoilAutor, &
     RNO3UptkBandAutor   => micflx%RNO3UptkBandAutor, &
     RNO3UptkSoilAutor   => micflx%RNO3UptkSoilAutor, &
     RNH4UptkBandAutor   => micflx%RNH4UptkBandAutor, &
@@ -329,22 +329,22 @@ module MicAutoCPLXMod
     FNB3X=AMAX1(FMN,FOMAff(NGL)*VLNOB)
   ENDIF
   IF(RPO4Y.GT.ZEROS)THEN
-    FPO4X=AMAX1(FMN,RIPOOff(NGL)/RPO4Y)
+    FPO4X=AMAX1(FMN,RH2PO4UptkSoilAutor(NGL)/RPO4Y)
   ELSE
     FPO4X=AMAX1(FMN,FOMAff(NGL)*VLPO4)
   ENDIF
   IF(RPOBY.GT.ZEROS)THEN
-    FPOBX=AMAX1(FMN,RIPBOff(NGL)/RPOBY)
+    FPOBX=AMAX1(FMN,RH2PO4UptkBandAutor(NGL)/RPOBY)
   ELSE
     FPOBX=AMAX1(FMN,FOMAff(NGL)*VLPOB)
   ENDIF
   IF(RP14Y.GT.ZEROS)THEN
-    FP14X=AMAX1(FMN,RIPO1ff(NGL)/RP14Y)
+    FP14X=AMAX1(FMN,RH1PO4UptkSoilAutor(NGL)/RP14Y)
   ELSE
     FP14X=AMAX1(FMN,FOMAff(NGL)*VLPO4)
   ENDIF
   IF(RP1BY.GT.ZEROS)THEN
-    FP1BX=AMAX1(FMN,RIPB1ff(NGL)/RP1BY)
+    FP1BX=AMAX1(FMN,RH1PO4UptkBandAutor(NGL)/RP1BY)
   ELSE
     FP1BX=AMAX1(FMN,FOMAff(NGL)*VLPOB)
   ENDIF
@@ -365,22 +365,22 @@ module MicAutoCPLXMod
 !
   IF(litrm)THEN
     IF(RNH4YU.GT.ZEROS)THEN
-      FNH4XRff(NGL)=AMAX1(FMN,RINHORff(NGL)/RNH4YU)
+      FNH4XRff(NGL)=AMAX1(FMN,RNH4UptkLitrAutor(NGL)/RNH4YU)
     ELSE
       FNH4XRff(NGL)=AMAX1(FMN,FOMKff(NGL))
     ENDIF
     IF(RNO3YU.GT.ZEROS)THEN
-      FNO3XRff(NGL)=AMAX1(FMN,RINOORff(NGL)/RNO3YU)
+      FNO3XRff(NGL)=AMAX1(FMN,RNO3UptkLitrAutor(NGL)/RNO3YU)
     ELSE
       FNO3XRff(NGL)=AMAX1(FMN,FOMKff(NGL))
     ENDIF
     IF(RPO4YU.GT.ZEROS)THEN
-      FPO4XRff(NGL)=AMAX1(FMN,RIPOORff(NGL)/RPO4YU)
+      FPO4XRff(NGL)=AMAX1(FMN,RH2PO4UptkLitrAutor(NGL)/RPO4YU)
     ELSE
       FPO4XRff(NGL)=AMAX1(FMN,FOMKff(NGL))
     ENDIF
     IF(RP14YU.GT.ZEROS)THEN
-      FP14XRff(NGL)=AMAX1(FMN,RIPO1Rff(NGL)/RP14YU)
+      FP14XRff(NGL)=AMAX1(FMN,RH1PO4UptkLitrAutor(NGL)/RP14YU)
     ELSE
       FP14XRff(NGL)=AMAX1(FMN,FOMKff(NGL))
     ENDIF
@@ -1440,18 +1440,18 @@ module MicAutoCPLXMod
    FNO3XRff  => nmicf%FNO3XRff,  &
    FPO4XRff  => nmicf%FPO4XRff,  &
    FP14XRff  => nmicf%FP14XRff,  &
-   RINH4ff => nmicf%RINH4ff   ,  &
-   RINO3ff  => nmicf%RINO3ff  ,  &
-   RIPO4ff  => nmicf%RIPO4ff  ,  &
-   RINB4ff => nmicf%RINB4ff   ,  &
-   RINB3ff => nmicf%RINB3ff   ,  &
-   RIPOBff => nmicf%RIPOBff   ,  &
-   RINH4Rff  => nmicf%RINH4Rff,  &
-   RINO3Rff  => nmicf%RINO3Rff,  &
-   RIPO4Rff  => nmicf%RIPO4Rff,  &
-   RIP14ff  => nmicf%RIP14ff,    &
-   RIP1Bff  => nmicf%RIP1Bff,    &
-   RIP14Rff  => nmicf%RIP14Rff,  &
+   RNH4TransfSoilAutor => nmicf%RNH4TransfSoilAutor   ,  &
+   RNO3TransfSoilAutor  => nmicf%RNO3TransfSoilAutor  ,  &
+   RH2PO4TransfSoilAutor  => nmicf%RH2PO4TransfSoilAutor  ,  &
+   RNH4TransfBandAutor => nmicf%RNH4TransfBandAutor   ,  &
+   RNO3TransfBandAutor => nmicf%RNO3TransfBandAutor   ,  &
+   RH2PO4TransfBandAutor => nmicf%RH2PO4TransfBandAutor   ,  &
+   RNH4TransfLitrAutor  => nmicf%RNH4TransfLitrAutor,  &
+   RNO3TransfLitrAutor  => nmicf%RNO3TransfLitrAutor,  &
+   RH2PO4TransfLitrAutor  => nmicf%RH2PO4TransfLitrAutor,  &
+   RH1PO4TransfSoilAutor  => nmicf%RH1PO4TransfSoilAutor,    &
+   RH1PO4TransfBandAutor  => nmicf%RH1PO4TransfBandAutor,    &
+   RH1PO4TransfLitrAutor  => nmicf%RH1PO4TransfLitrAutor,  &
    rNCOMCff  => micpar%rNCOMCff   , &
    rPCOMCff  => micpar%rPCOMCff   , &
    VLNH4    => micfor%VLNH4     , &
@@ -1484,20 +1484,20 @@ module MicAutoCPLXMod
    RNO3UptkSoilAutor  => micflx%RNO3UptkSoilAutor   , &
    RNO3UptkBandAutor  => micflx%RNO3UptkBandAutor   , &
    NetNH4Mineralize_col   => micflx%NetNH4Mineralize_col    , &
-   RIPOOff  => micflx%RIPOOff   , &
-   RIPBOff  => micflx%RIPBOff   , &
+   RH2PO4UptkSoilAutor  => micflx%RH2PO4UptkSoilAutor   , &
+   RH2PO4UptkBandAutor  => micflx%RH2PO4UptkBandAutor   , &
    NetPO4Mineralize_col   => micflx%NetPO4Mineralize_col    , &
    RIPO1    => micflx%RIPO1     , &
    RIPB1    => micflx%RIPB1     , &
    RINHOR   => micflx%RINHOR    , &
    RINOOR   => micflx%RINOOR    , &
    RIPOOR   => micflx%RIPOOR    , &
-   RIPO1ff  => micflx%RIPO1ff   , &
-   RIPB1ff  => micflx%RIPB1ff   , &
-   RIPO1Rff   => micflx%RIPO1Rff,  &
-   RINHORff  => micflx%RINHORff , &
-   RINOORff  => micflx%RINOORff , &
-   RIPOORff  => micflx%RIPOORff   &
+   RH1PO4UptkSoilAutor  => micflx%RH1PO4UptkSoilAutor   , &
+   RH1PO4UptkBandAutor  => micflx%RH1PO4UptkBandAutor   , &
+   RH1PO4UptkLitrAutor   => micflx%RH1PO4UptkLitrAutor,  &
+   RNH4UptkLitrAutor  => micflx%RNH4UptkLitrAutor , &
+   RNO3UptkLitrAutor  => micflx%RNO3UptkLitrAutor , &
+   RH2PO4UptkLitrAutor  => micflx%RH2PO4UptkLitrAutor   &
   )
 !     MINERALIZATION-IMMOBILIZATION OF NH4 IN SOIL FROM MICROBIAL
 !     C:N AND NH4 CONCENTRATION IN BAND AND NON-BAND SOIL ZONES
@@ -1531,15 +1531,15 @@ module MicAutoCPLXMod
     RNH4UptkBandAutor(NGL)=FNHBS*RINHX*CNH4Y/(CNH4Y+Z4KU)
     ZNH4M=Z4MN*VLWatMicP*FNH4S
     ZNHBM=Z4MN*VLWatMicP*FNHBS
-    RINH4ff(NGL)=AMIN1(FNH4X*AZMAX1((ZNH4S-ZNH4M)),RNH4UptkSoilAutor(NGL))
-    RINB4ff(NGL)=AMIN1(FNB4X*AZMAX1((ZNH4B-ZNHBM)),RNH4UptkBandAutor(NGL))
+    RNH4TransfSoilAutor(NGL)=AMIN1(FNH4X*AZMAX1((ZNH4S-ZNH4M)),RNH4UptkSoilAutor(NGL))
+    RNH4TransfBandAutor(NGL)=AMIN1(FNB4X*AZMAX1((ZNH4B-ZNHBM)),RNH4UptkBandAutor(NGL))
   ELSE
     RNH4UptkSoilAutor(NGL)=0.0_r8
     RNH4UptkBandAutor(NGL)=0.0_r8
-    RINH4ff(NGL)=RINHP*FNH4S
-    RINB4ff(NGL)=RINHP*FNHBS
+    RNH4TransfSoilAutor(NGL)=RINHP*FNH4S
+    RNH4TransfBandAutor(NGL)=RINHP*FNHBS
   ENDIF
-  NetNH4Mineralize_col=NetNH4Mineralize_col+(RINH4ff(NGL)+RINB4ff(NGL))
+  NetNH4Mineralize_col=NetNH4Mineralize_col+(RNH4TransfSoilAutor(NGL)+RNH4TransfBandAutor(NGL))
 !
 !     MINERALIZATION-IMMOBILIZATION OF NO3 IN SOIL FROM MICROBIAL
 !     C:N AND NO3 CONCENTRATION IN BAND AND NON-BAND SOIL ZONES
@@ -1561,7 +1561,7 @@ module MicAutoCPLXMod
 !
   FNO3S=VLNO3
   FNO3B=VLNOB
-  RINOP=AZMAX1(RINHP-RINH4ff(NGL)-RINB4ff(NGL))
+  RINOP=AZMAX1(RINHP-RNH4TransfSoilAutor(NGL)-RNH4TransfBandAutor(NGL))
   IF(RINOP.GT.0.0)THEN
     CNO3X=AZMAX1(CNO3S-ZOMN)
     CNO3Y=AZMAX1(CNO3B-ZOMN)
@@ -1570,17 +1570,17 @@ module MicAutoCPLXMod
     RNO3UptkBandAutor(NGL)=FNO3B*RINOX*CNO3Y/(CNO3Y+ZOKU)
     ZNO3M=ZOMN*VLWatMicP*FNO3S
     ZNOBM=ZOMN*VLWatMicP*FNO3B
-    RINO3ff(NGL)=AMIN1(FNO3X*AZMAX1((ZNO3S-ZNO3M)) &
+    RNO3TransfSoilAutor(NGL)=AMIN1(FNO3X*AZMAX1((ZNO3S-ZNO3M)) &
       ,RNO3UptkSoilAutor(NGL))
-    RINB3ff(NGL)=AMIN1(FNB3X*AZMAX1((ZNO3B-ZNOBM)) &
+    RNO3TransfBandAutor(NGL)=AMIN1(FNB3X*AZMAX1((ZNO3B-ZNOBM)) &
       ,RNO3UptkBandAutor(NGL))
   ELSE
     RNO3UptkSoilAutor(NGL)=0.0_r8
     RNO3UptkBandAutor(NGL)=0.0_r8
-    RINO3ff(NGL)=RINOP*FNO3S
-    RINB3ff(NGL)=RINOP*FNO3B
+    RNO3TransfSoilAutor(NGL)=RINOP*FNO3S
+    RNO3TransfBandAutor(NGL)=RINOP*FNO3B
   ENDIF
-  NetNH4Mineralize_col=NetNH4Mineralize_col+(RINO3ff(NGL)+RINB3ff(NGL))
+  NetNH4Mineralize_col=NetNH4Mineralize_col+(RNO3TransfSoilAutor(NGL)+RNO3TransfBandAutor(NGL))
 !
 !     MINERALIZATION-IMMOBILIZATION OF H2PO4 IN SOIL FROM MICROBIAL
 !     C:P AND PO4 CONCENTRATION IN BAND AND NON-BAND SOIL ZONES
@@ -1610,19 +1610,19 @@ module MicAutoCPLXMod
     CH2PX=AZMAX1(CH2P4-HPMN)
     CH2PY=AZMAX1(CH2P4B-HPMN)
     RIPOX=AMIN1(RIPOP,BIOA*OMAff(NGL)*TFNGff(NGL)*HPMX)
-    RIPOOff(NGL)=FH2PS*RIPOX*CH2PX/(CH2PX+HPKU)
-    RIPBOff(NGL)=FH2PB*RIPOX*CH2PY/(CH2PY+HPKU)
+    RH2PO4UptkSoilAutor(NGL)=FH2PS*RIPOX*CH2PX/(CH2PX+HPKU)
+    RH2PO4UptkBandAutor(NGL)=FH2PB*RIPOX*CH2PY/(CH2PY+HPKU)
     H2POM=HPMN*VLWatMicP*FH2PS
     H2PBM=HPMN*VLWatMicP*FH2PB
-    RIPO4ff(NGL)=AMIN1(FPO4X*AZMAX1((H2PO4-H2POM)),RIPOOff(NGL))
-    RIPOBff(NGL)=AMIN1(FPOBX*AZMAX1((H2POB-H2PBM)),RIPBOff(NGL))
+    RH2PO4TransfSoilAutor(NGL)=AMIN1(FPO4X*AZMAX1((H2PO4-H2POM)),RH2PO4UptkSoilAutor(NGL))
+    RH2PO4TransfBandAutor(NGL)=AMIN1(FPOBX*AZMAX1((H2POB-H2PBM)),RH2PO4UptkBandAutor(NGL))
   ELSE
-    RIPOOff(NGL)=0.0_r8
-    RIPBOff(NGL)=0.0_r8
-    RIPO4ff(NGL)=RIPOP*FH2PS
-    RIPOBff(NGL)=RIPOP*FH2PB
+    RH2PO4UptkSoilAutor(NGL)=0.0_r8
+    RH2PO4UptkBandAutor(NGL)=0.0_r8
+    RH2PO4TransfSoilAutor(NGL)=RIPOP*FH2PS
+    RH2PO4TransfBandAutor(NGL)=RIPOP*FH2PB
   ENDIF
-  NetPO4Mineralize_col=NetPO4Mineralize_col+(RIPO4ff(NGL)+RIPOBff(NGL))
+  NetPO4Mineralize_col=NetPO4Mineralize_col+(RH2PO4TransfSoilAutor(NGL)+RH2PO4TransfBandAutor(NGL))
 !
 !     MINERALIZATION-IMMOBILIZATION OF HPO4 IN SOIL FROM MICROBIAL
 !     C:P AND PO4 CONCENTRATION IN BAND AND NON-BAND SOIL ZONES
@@ -1644,26 +1644,24 @@ module MicAutoCPLXMod
 !
   FH1PS=VLPO4
   FH1PB=VLPOB
-  RIP1P=0.1_r8*AZMAX1(RIPOP-RIPO4ff(NGL)-RIPOBff(NGL))
+  RIP1P=0.1_r8*AZMAX1(RIPOP-RH2PO4TransfSoilAutor(NGL)-RH2PO4TransfBandAutor(NGL))
   IF(RIP1P.GT.0.0_r8)THEN
     CH1PX=AZMAX1(CH1P4-HPMN)
     CH1PY=AZMAX1(CH1P4B-HPMN)
     RIP1X=AMIN1(RIP1P,BIOA*OMAff(NGL)*TFNGff(NGL)*HPMX)
-    RIPO1ff(NGL)=FH1PS*RIP1X*CH1PX/(CH1PX+HPKU)
-    RIPB1ff(NGL)=FH1PB*RIP1X*CH1PY/(CH1PY+HPKU)
+    RH1PO4UptkSoilAutor(NGL)=FH1PS*RIP1X*CH1PX/(CH1PX+HPKU)
+    RH1PO4UptkBandAutor(NGL)=FH1PB*RIP1X*CH1PY/(CH1PY+HPKU)
     H1POM=HPMN*VLWatMicP*FH1PS
     H1PBM=HPMN*VLWatMicP*FH1PB
-    RIP14ff(NGL)=AMIN1(FP14X*AZMAX1((H1PO4-H1POM)) &
-      ,RIPO1ff(NGL))
-    RIP1Bff(NGL)=AMIN1(FP1BX*AZMAX1((H1POB-H1PBM)) &
-      ,RIPB1ff(NGL))
+    RH1PO4TransfSoilAutor(NGL)=AMIN1(FP14X*AZMAX1((H1PO4-H1POM)),RH1PO4UptkSoilAutor(NGL))
+    RH1PO4TransfBandAutor(NGL)=AMIN1(FP1BX*AZMAX1((H1POB-H1PBM)),RH1PO4UptkBandAutor(NGL))
   ELSE
-    RIPO1ff(NGL)=0.0_r8
-    RIPB1ff(NGL)=0.0_r8
-    RIP14ff(NGL)=RIP1P*FH1PS
-    RIP1Bff(NGL)=RIP1P*FH1PB
+    RH1PO4UptkSoilAutor(NGL)=0.0_r8
+    RH1PO4UptkBandAutor(NGL)=0.0_r8
+    RH1PO4TransfSoilAutor(NGL)=RIP1P*FH1PS
+    RH1PO4TransfBandAutor(NGL)=RIP1P*FH1PB
   ENDIF
-  NetPO4Mineralize_col=NetPO4Mineralize_col+(RIP14ff(NGL)+RIP1Bff(NGL))
+  NetPO4Mineralize_col=NetPO4Mineralize_col+(RH1PO4TransfSoilAutor(NGL)+RH1PO4TransfBandAutor(NGL))
 !
 !     MINERALIZATION-IMMOBILIZATION OF NH4 IN SURFACE RESIDUE FROM
 !     MICROBIAL C:N AND NH4 CONCENTRATION IN BAND AND NON-BAND SOIL
@@ -1685,19 +1683,19 @@ module MicAutoCPLXMod
 !     NetNH4Mineralize_col=total NH4 net mineraln (-ve) or immobiln (+ve)
 !
   IF(litrm)THEN
-    RINHPR=RINHP-RINH4ff(NGL)-RINO3ff(NGL)
+    RINHPR=RINHP-RNH4TransfSoilAutor(NGL)-RNO3TransfSoilAutor(NGL)
     IF(RINHPR.GT.0.0_r8)THEN
       CNH4X=AZMAX1(CNH4S-Z4MN)
       CNH4Y=AZMAX1(CNH4B-Z4MN)
-      RINHORff(NGL)=AMIN1(RINHPR,BIOA*OMAff(NGL)*TFNGff(NGL)*Z4MX) &
+      RNH4UptkLitrAutor(NGL)=AMIN1(RINHPR,BIOA*OMAff(NGL)*TFNGff(NGL)*Z4MX) &
         *(FNH4S*CNH4X/(CNH4X+Z4KU)+FNHBS*CNH4Y/(CNH4Y+Z4KU))
       ZNH4M=Z4MN*VLWatMicP
-      RINH4Rff(NGL)=AMIN1(FNH4XRff(NGL)*AZMAX1((ZNH4T-ZNH4M)),RINHORff(NGL))
+      RNH4TransfLitrAutor(NGL)=AMIN1(FNH4XRff(NGL)*AZMAX1((ZNH4T-ZNH4M)),RNH4UptkLitrAutor(NGL))
     ELSE
-      RINHORff(NGL)=0.0_r8
-      RINH4Rff(NGL)=RINHPR
+      RNH4UptkLitrAutor(NGL)=0.0_r8
+      RNH4TransfLitrAutor(NGL)=RINHPR
     ENDIF
-    NetNH4Mineralize_col=NetNH4Mineralize_col+RINH4Rff(NGL)
+    NetNH4Mineralize_col=NetNH4Mineralize_col+RNH4TransfLitrAutor(NGL)
 !
 !     MINERALIZATION-IMMOBILIZATION OF NO3 IN SURFACE RESIDUE FROM
 !     MICROBIAL C:N AND NO3 CONCENTRATION IN BAND AND NON-BAND SOIL
@@ -1719,19 +1717,19 @@ module MicAutoCPLXMod
 !     RINO3R=substrate-limited NO3 immobiln
 !     NetNH4Mineralize_col=total NH4+NO3 net mineraln (-ve) or immobiln (+ve)
 !
-    RINOPR=AZMAX1(RINHPR-RINH4Rff(NGL))
+    RINOPR=AZMAX1(RINHPR-RNH4TransfLitrAutor(NGL))
     IF(RINOPR.GT.0.0_r8)THEN
       CNO3X=AZMAX1(CNO3S-ZOMN)
       CNO3Y=AZMAX1(CNO3B-ZOMN)
-      RINOORff(NGL)=AMAX1(RINOPR,BIOA*OMAff(NGL)*TFNGff(NGL)*ZOMX) &
+      RNO3UptkLitrAutor(NGL)=AMAX1(RINOPR,BIOA*OMAff(NGL)*TFNGff(NGL)*ZOMX) &
         *(FNO3S*CNO3X/(CNO3X+ZOKU)+FNO3B*CNO3Y/(CNO3Y+ZOKU))
       ZNO3M=ZOMN*VLWatMicP
-      RINO3Rff(NGL)=AMIN1(FNO3XRff(NGL)*AZMAX1((ZNO3T-ZNO3M)),RINOORff(NGL))
+      RNO3TransfLitrAutor(NGL)=AMIN1(FNO3XRff(NGL)*AZMAX1((ZNO3T-ZNO3M)),RNO3UptkLitrAutor(NGL))
     ELSE
-      RINOORff(NGL)=0.0_r8
-      RINO3Rff(NGL)=RINOPR
+      RNO3UptkLitrAutor(NGL)=0.0_r8
+      RNO3TransfLitrAutor(NGL)=RINOPR
     ENDIF
-    NetNH4Mineralize_col=NetNH4Mineralize_col+RINO3Rff(NGL)
+    NetNH4Mineralize_col=NetNH4Mineralize_col+RNO3TransfLitrAutor(NGL)
 !
 !     MINERALIZATION-IMMOBILIZATION OF H2PO4 IN SURFACE RESIDUE FROM
 !     MICROBIAL C:P AND PO4 CONCENTRATION IN BAND AND NON-BAND SOIL
@@ -1753,19 +1751,19 @@ module MicAutoCPLXMod
 !     RIPO4R=substrate-limited H2PO4 mineraln-immobiln
 !     NetPO4Mineralize_col=total H2PO4 net mineraln (-ve) or immobiln (+ve)
 !
-    RIPOPR=RIPOP-RIPO4ff(NGL)
+    RIPOPR=RIPOP-RH2PO4TransfSoilAutor(NGL)
     IF(RIPOPR.GT.0.0_r8)THEN
       CH2PX=AZMAX1(CH2P4-HPMN)
       CH2PY=AZMAX1(CH2P4B-HPMN)
-      RIPOORff(NGL)=AMIN1(RIPOPR,BIOA*OMAff(NGL)*TFNGff(NGL)*HPMX) &
+      RH2PO4UptkLitrAutor(NGL)=AMIN1(RIPOPR,BIOA*OMAff(NGL)*TFNGff(NGL)*HPMX) &
         *(FH2PS*CH2PX/(CH2PX+HPKU)+FH2PB*CH2PY/(CH2PY+HPKU))
       H2P4M=HPMN*VLWatMicP
-      RIPO4Rff(NGL)=AMIN1(FPO4XRff(NGL)*AZMAX1((H2P4T-H2P4M)),RIPOORff(NGL))
+      RH2PO4TransfLitrAutor(NGL)=AMIN1(FPO4XRff(NGL)*AZMAX1((H2P4T-H2P4M)),RH2PO4UptkLitrAutor(NGL))
     ELSE
-      RIPOORff(NGL)=0.0_r8
-      RIPO4Rff(NGL)=RIPOPR
+      RH2PO4UptkLitrAutor(NGL)=0.0_r8
+      RH2PO4TransfLitrAutor(NGL)=RIPOPR
     ENDIF
-    NetPO4Mineralize_col=NetPO4Mineralize_col+RIPO4Rff(NGL)
+    NetPO4Mineralize_col=NetPO4Mineralize_col+RH2PO4TransfLitrAutor(NGL)
 !
 !     MINERALIZATION-IMMOBILIZATION OF HPO4 IN SURFACE RESIDUE FROM
 !     MICROBIAL C:P AND PO4 CONCENTRATION IN BAND AND NON-BAND SOIL
@@ -1789,19 +1787,19 @@ module MicAutoCPLXMod
 !
     FH1PS=VLPO4
     FH1PB=VLPOB
-    RIP1PR=0.1*AZMAX1(RIPOPR-RIPO4Rff(NGL))
+    RIP1PR=0.1*AZMAX1(RIPOPR-RH2PO4TransfLitrAutor(NGL))
     IF(RIP1PR.GT.0.0_r8)THEN
       CH1PX=AZMAX1(CH1P4-HPMN)
       CH1PY=AZMAX1(CH1P4B-HPMN)
-      RIPO1Rff(NGL)=AMIN1(RIP1PR,BIOA*OMAff(NGL)*TFNGff(NGL)*HPMX) &
+      RH1PO4UptkLitrAutor(NGL)=AMIN1(RIP1PR,BIOA*OMAff(NGL)*TFNGff(NGL)*HPMX) &
         *(FH1PS*CH1PX/(CH1PX+HPKU)+FH1PB*CH1PY/(CH1PY+HPKU))
       H1P4M=HPMN*VLWatMicP
-      RIP14Rff(NGL)=AMIN1(FP14XRff(NGL)*AZMAX1((H1P4T-H1P4M)),RIPO1Rff(NGL))
+      RH1PO4TransfLitrAutor(NGL)=AMIN1(FP14XRff(NGL)*AZMAX1((H1P4T-H1P4M)),RH1PO4UptkLitrAutor(NGL))
     ELSE
-      RIPO1Rff(NGL)=0.0_r8
-      RIP14Rff(NGL)=RIP1PR
+      RH1PO4UptkLitrAutor(NGL)=0.0_r8
+      RH1PO4TransfLitrAutor(NGL)=RIP1PR
     ENDIF
-    NetPO4Mineralize_col=NetPO4Mineralize_col+RIP14Rff(NGL)
+    NetPO4Mineralize_col=NetPO4Mineralize_col+RH1PO4TransfLitrAutor(NGL)
   ENDIF
   end associate
   end subroutine BiomassMineralizationff
@@ -1896,12 +1894,12 @@ module MicAutoCPLXMod
     RGN2Fff  => nmicf%RGN2Fff,    &
     RGOMOff  => nmicf%RGOMOff,    &
     RGOMDff  => nmicf%RGOMDff,    &
-    RINO3ff  => nmicf%RINO3ff,    &
+    RNO3TransfSoilAutor  => nmicf%RNO3TransfSoilAutor,    &
     RCO2Xff  => nmicf%RCO2Xff,    &
-    RIPO4ff  => nmicf%RIPO4ff,    &
-    RINB4ff => nmicf%RINB4ff ,    &
-    RINB3ff => nmicf%RINB3ff ,    &
-    RIPOBff => nmicf%RIPOBff ,    &
+    RH2PO4TransfSoilAutor  => nmicf%RH2PO4TransfSoilAutor,    &
+    RNH4TransfBandAutor => nmicf%RNH4TransfBandAutor ,    &
+    RNO3TransfBandAutor => nmicf%RNO3TransfBandAutor ,    &
+    RH2PO4TransfBandAutor => nmicf%RH2PO4TransfBandAutor ,    &
     RHOMEautor => nmicf%RHOMEautor ,    &
     RHMMEautor  => nmicf%RHMMEautor,    &
     RN2FXff  => nmicf%RN2FXff,    &
@@ -1909,13 +1907,13 @@ module MicAutoCPLXMod
     R3OMEautor  => nmicf%R3OMEautor,    &
     RXMMEautor  => nmicf%RXMMEautor,    &
     R3MMEautor  => nmicf%R3MMEautor,    &
-    RINH4Rff  => nmicf%RINH4Rff,  &
-    RINO3Rff  => nmicf%RINO3Rff,  &
-    RIPO4Rff  => nmicf%RIPO4Rff,  &
-    RIP14ff   => nmicf%RIP14ff ,  &
-    RIP1Bff   => nmicf%RIP1Bff,  &
-    RIP14Rff  => nmicf%RIP14Rff,  &
-    RINH4ff   => nmicf%RINH4ff,  &
+    RNH4TransfLitrAutor  => nmicf%RNH4TransfLitrAutor,  &
+    RNO3TransfLitrAutor  => nmicf%RNO3TransfLitrAutor,  &
+    RH2PO4TransfLitrAutor  => nmicf%RH2PO4TransfLitrAutor,  &
+    RH1PO4TransfSoilAutor   => nmicf%RH1PO4TransfSoilAutor ,  &
+    RH1PO4TransfBandAutor   => nmicf%RH1PO4TransfBandAutor,  &
+    RH1PO4TransfLitrAutor  => nmicf%RH1PO4TransfLitrAutor,  &
+    RNH4TransfSoilAutor   => nmicf%RNH4TransfSoilAutor,  &
     litrm     => micfor%litrm  , &
     CFOMC     => micfor%CFOMC  , &
     CFOMCU    => micfor%CFOMCU , &
@@ -1994,12 +1992,12 @@ module MicAutoCPLXMod
         ENDDO
         OMEauto(ielmc,MID3)=OMEauto(ielmc,MID3)+CGROMC
         OMEauto(ielmn,MID3)=OMEauto(ielmn,MID3)+CGOMEautor(ielmn,NGL) &
-          +RINH4ff(NGL)+RINB4ff(NGL)+RINO3ff(NGL)+RINB3ff(NGL)+RN2FXff(NGL)
+          +RNH4TransfSoilAutor(NGL)+RNH4TransfBandAutor(NGL)+RNO3TransfSoilAutor(NGL)+RNO3TransfBandAutor(NGL)+RN2FXff(NGL)
         OMEauto(ielmp,MID3)=OMEauto(ielmp,MID3)+CGOMEautor(ielmp,NGL) &
-          +RIPO4ff(NGL)+RIPOBff(NGL)+RIP14ff(NGL)+RIP1Bff(NGL)
+          +RH2PO4TransfSoilAutor(NGL)+RH2PO4TransfBandAutor(NGL)+RH1PO4TransfSoilAutor(NGL)+RH1PO4TransfBandAutor(NGL)
         IF(litrm)THEN
-          OMEauto(ielmn,MID3)=OMEauto(ielmn,MID3)+RINH4Rff(NGL)+RINO3Rff(NGL)
-          OMEauto(ielmp,MID3)=OMEauto(ielmp,MID3)+RIPO4Rff(NGL)+RIP14Rff(NGL)
+          OMEauto(ielmn,MID3)=OMEauto(ielmn,MID3)+RNH4TransfLitrAutor(NGL)+RNO3TransfLitrAutor(NGL)
+          OMEauto(ielmp,MID3)=OMEauto(ielmp,MID3)+RH2PO4TransfLitrAutor(NGL)+RH1PO4TransfLitrAutor(NGL)
         ENDIF
       enddo
     ENDIF

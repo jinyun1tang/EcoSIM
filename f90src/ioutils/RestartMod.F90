@@ -6674,16 +6674,16 @@ implicit none
 
   if(flag=='read')then
     datpr3 => datrc_3d(1:ncols,1:NumMicrobAutrophCmplx,1:JZ+1)    
-    call restartvar(ncid, flag, varname='RIPOOff', dim1name='column',dim2name='automicb',&
+    call restartvar(ncid, flag, varname='RH2PO4UptkSoilAutor_vr', dim1name='column',dim2name='automicb',&
       dim3name='levsoi1',long_name='total autotrophic microbial PO4 demand in soil', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr3, missing_value=spval, &
       fill_value=spval)          
-    call cpcol(flag,NHW,NHE,NVN,NVS,RIPOOff,datrc_3d)     
+    call cpcol(flag,NHW,NHE,NVN,NVS,RH2PO4UptkSoilAutor_vr,datrc_3d)     
   else
-    !print*,'RIPOOff'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RIPOOff,datrc_3d)       
+    !print*,'RH2PO4UptkSoilAutor_vr'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RH2PO4UptkSoilAutor_vr,datrc_3d)       
     datpr3 => datrc_3d(1:ncols,1:NumMicrobAutrophCmplx,1:JZ+1)    
-    call restartvar(ncid, flag, varname='RIPOOff', dim1name='column',dim2name='automicb',&
+    call restartvar(ncid, flag, varname='RH2PO4UptkSoilAutor_vr', dim1name='column',dim2name='automicb',&
       dim3name='levsoi1',long_name='total autotrophic microbial PO4 demand in soil', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr3, missing_value=spval, &
       fill_value=spval)          
@@ -6725,16 +6725,16 @@ implicit none
 
   if(flag=='read')then
     datpr3 => datrc_3d(1:ncols,1:NumMicrobAutrophCmplx,1:JZ+1)    
-    call restartvar(ncid, flag, varname='RIPBOff', dim1name='column',dim2name='automicb',&
+    call restartvar(ncid, flag, varname='RH2PO4UptkBandAutor_vr', dim1name='column',dim2name='automicb',&
       dim3name='levsoi1',long_name='total autotrophic H2PO4 immobilization (+ve) - mineralization (-ve) band', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr3, missing_value=spval, &
       fill_value=spval)      
-    call cpcol(flag,NHW,NHE,NVN,NVS,RIPBOff,datrc_3d)     
+    call cpcol(flag,NHW,NHE,NVN,NVS,RH2PO4UptkBandAutor_vr,datrc_3d)     
   else
-    !print*,'RIPBOff'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RIPBOff,datrc_3d)       
+    !print*,'RH2PO4UptkBandAutor_vr'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RH2PO4UptkBandAutor_vr,datrc_3d)       
     datpr3 => datrc_3d(1:ncols,1:NumMicrobAutrophCmplx,1:JZ+1)    
-    call restartvar(ncid, flag, varname='RIPBOff', dim1name='column',dim2name='automicb',&
+    call restartvar(ncid, flag, varname='RH2PO4UptkBandAutor_vr', dim1name='column',dim2name='automicb',&
       dim3name='levsoi1',long_name='total autotrophic H2PO4 immobilization (+ve) - mineralization (-ve) band', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr3, missing_value=spval, &
       fill_value=spval)      
@@ -6742,16 +6742,16 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrc_2d(1:ncols,1:NumMicrobAutrophCmplx)    
-    call restartvar(ncid, flag, varname='RINHORff', dim1name='column',dim2name='automicb',&
+    call restartvar(ncid, flag, varname='RNH4UptkLitrAutor_col', dim1name='column',dim2name='automicb',&
       long_name='total autotrophic microbial NH4 demand in surface litte', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr2, missing_value=spval, &
       fill_value=spval)      
-    call cpcol(flag,NHW,NHE,NVN,NVS,RINHORff,datrc_2d)     
+    call cpcol(flag,NHW,NHE,NVN,NVS,RNH4UptkLitrAutor_col,datrc_2d)     
   else
-    !print*,'RINHORff'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RINHORff,datrc_2d)       
+    !print*,'RNH4UptkLitrAutor_col'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RNH4UptkLitrAutor_col,datrc_2d)       
     datpr2 => datrc_2d(1:ncols,1:NumMicrobAutrophCmplx)       
-    call restartvar(ncid, flag, varname='RINHORff', dim1name='column',dim2name='automicb',&
+    call restartvar(ncid, flag, varname='RNH4UptkLitrAutor_col', dim1name='column',dim2name='automicb',&
       long_name='total autotrophic microbial NH4 demand in surface litte', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr2, missing_value=spval, &
       fill_value=spval)        
@@ -6759,16 +6759,16 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrc_2d(1:ncols,1:NumMicrobAutrophCmplx)       
-    call restartvar(ncid, flag, varname='RINOORff', dim1name='column',dim2name='automicb',&
+    call restartvar(ncid, flag, varname='RNO3UptkLitrAutor_col', dim1name='column',dim2name='automicb',&
       long_name='total autotrophic microbial NO3 demand in surface litte', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr2, missing_value=spval, &
       fill_value=spval)            
-    call cpcol(flag,NHW,NHE,NVN,NVS,RINOORff,datrc_2d)     
+    call cpcol(flag,NHW,NHE,NVN,NVS,RNO3UptkLitrAutor_col,datrc_2d)     
   else
-    !print*,'RINOORff'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RINOORff,datrc_2d)       
+    !print*,'RNO3UptkLitrAutor_col'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RNO3UptkLitrAutor_col,datrc_2d)       
     datpr2 => datrc_2d(1:ncols,1:NumMicrobAutrophCmplx)       
-    call restartvar(ncid, flag, varname='RINOORff', dim1name='column',dim2name='automicb',&
+    call restartvar(ncid, flag, varname='RNO3UptkLitrAutor_col', dim1name='column',dim2name='automicb',&
       long_name='total autotrophic microbial NO3 demand in surface litte', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr2, missing_value=spval, &
       fill_value=spval)            
@@ -6776,20 +6776,38 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrc_2d(1:ncols,1:NumMicrobAutrophCmplx)       
-    call restartvar(ncid, flag, varname='RIPOORff', dim1name='column',dim2name='automicb',&
-      long_name='total autotrophic microbial PO4 demand in surface litte', &
+    call restartvar(ncid, flag, varname='RH2PO4UptkLitrAutor_col', dim1name='column',dim2name='automicb',&
+      long_name='total autotrophic microbial H2PO4 demand in surface litte', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr2, missing_value=spval, &
       fill_value=spval)            
-    call cpcol(flag,NHW,NHE,NVN,NVS,RIPOORff,datrc_2d)     
+    call cpcol(flag,NHW,NHE,NVN,NVS,RH2PO4UptkLitrAutor_col,datrc_2d)     
   else
-    !print*,'RIPOORff'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RIPOORff,datrc_2d)       
+    !print*,'RH2PO4UptkLitrAutor_col'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RH2PO4UptkLitrAutor_col,datrc_2d)       
     datpr2 => datrc_2d(1:ncols,1:NumMicrobAutrophCmplx)       
-    call restartvar(ncid, flag, varname='RIPOORff', dim1name='column',dim2name='automicb',&
-      long_name='total autotrophic microbial PO4 demand in surface litte', &
+    call restartvar(ncid, flag, varname='RH2PO4UptkLitrAutor_col', dim1name='column',dim2name='automicb',&
+      long_name='total autotrophic microbial H2PO4 demand in surface litte', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr2, missing_value=spval, &
       fill_value=spval)            
   endif  
+
+  if(flag=='read')then
+    datpr2 => datrc_2d(1:ncols,1:NumMicrobAutrophCmplx)       
+    call restartvar(ncid, flag, varname='RH1PO4UptkLitrAutor_col', dim1name='column',dim2name='automicb',&
+      long_name='total autotrophic microbial H1PO4 demand in surface litte', &
+      units='g d-2 h-1', interpinic_flag='skip', data=datpr2, missing_value=spval, &
+      fill_value=spval)            
+    call cpcol(flag,NHW,NHE,NVN,NVS,RH1PO4UptkLitrAutor_col,datrc_2d)     
+  else
+    !print*,'RH1PO4UptkLitrAutor_col'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RH1PO4UptkLitrAutor_col,datrc_2d)       
+    datpr2 => datrc_2d(1:ncols,1:NumMicrobAutrophCmplx)       
+    call restartvar(ncid, flag, varname='RH1PO4UptkLitrAutor_col', dim1name='column',dim2name='automicb',&
+      long_name='total autotrophic microbial H1PO4 demand in surface litte', &
+      units='g d-2 h-1', interpinic_flag='skip', data=datpr2, missing_value=spval, &
+      fill_value=spval)            
+  endif  
+
 
   if(flag=='read')then
     datpr4 => datrc_4d(1:ncols,1:NumPlantChemElms,1:NumLiveAutoBioms,1:JZ+1)       

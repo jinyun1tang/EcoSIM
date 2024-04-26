@@ -68,14 +68,14 @@ implicit none
   real(r8), allocatable :: RNH4UptkBandAutor(:)
   real(r8), allocatable :: RNO3UptkSoilAutor(:)
   real(r8), allocatable :: RNO3UptkBandAutor(:)
-  real(r8), allocatable :: RIPOOff(:)
-  real(r8), allocatable :: RIPBOff(:)
-  real(r8), allocatable :: RIPO1ff(:)
-  real(r8), allocatable :: RIPB1ff(:)
-  real(r8), allocatable :: RINHORff(:)
-  real(r8), allocatable :: RINOORff(:)
-  real(r8), allocatable :: RIPOORff(:)
-  real(r8), allocatable :: RIPO1Rff(:)
+  real(r8), allocatable :: RH2PO4UptkSoilAutor(:)
+  real(r8), allocatable :: RH2PO4UptkBandAutor(:)
+  real(r8), allocatable :: RH1PO4UptkSoilAutor(:)
+  real(r8), allocatable :: RH1PO4UptkBandAutor(:)
+  real(r8), allocatable :: RNH4UptkLitrAutor(:)
+  real(r8), allocatable :: RNO3UptkLitrAutor(:)
+  real(r8), allocatable :: RH2PO4UptkLitrAutor(:)
+  real(r8), allocatable :: RH1PO4UptkLitrAutor(:)
   contains
    procedure, public :: Init
    procedure, public :: Destroy=> Destruct
@@ -126,14 +126,14 @@ implicit none
   allocate(this%RNH4UptkBandAutor(NumMicrobAutrophCmplx));this%RNH4UptkBandAutor=spval
   allocate(this%RNO3UptkSoilAutor(NumMicrobAutrophCmplx));this%RNO3UptkSoilAutor=spval
   allocate(this%RNO3UptkBandAutor(NumMicrobAutrophCmplx));this%RNO3UptkBandAutor=spval
-  allocate(this%RIPOOff(NumMicrobAutrophCmplx));this%RIPOOff=spval
-  allocate(this%RIPBOff(NumMicrobAutrophCmplx));this%RIPBOff=spval
-  allocate(this%RIPO1ff(NumMicrobAutrophCmplx));this%RIPO1ff=spval
-  allocate(this%RIPB1ff(NumMicrobAutrophCmplx));this%RIPB1ff=spval
-  allocate(this%RINHORff(NumMicrobAutrophCmplx));this%RINHORff=spval
-  allocate(this%RINOORff(NumMicrobAutrophCmplx));this%RINOORff=spval
-  allocate(this%RIPOORff(NumMicrobAutrophCmplx));this%RIPOORff=spval
-  allocate(this%RIPO1Rff(NumMicrobAutrophCmplx));this%RIPO1Rff=spval
+  allocate(this%RH2PO4UptkSoilAutor(NumMicrobAutrophCmplx));this%RH2PO4UptkSoilAutor=spval
+  allocate(this%RH2PO4UptkBandAutor(NumMicrobAutrophCmplx));this%RH2PO4UptkBandAutor=spval
+  allocate(this%RH1PO4UptkSoilAutor(NumMicrobAutrophCmplx));this%RH1PO4UptkSoilAutor=spval
+  allocate(this%RH1PO4UptkBandAutor(NumMicrobAutrophCmplx));this%RH1PO4UptkBandAutor=spval
+  allocate(this%RNH4UptkLitrAutor(NumMicrobAutrophCmplx));this%RNH4UptkLitrAutor=spval
+  allocate(this%RNO3UptkLitrAutor(NumMicrobAutrophCmplx));this%RNO3UptkLitrAutor=spval
+  allocate(this%RH2PO4UptkLitrAutor(NumMicrobAutrophCmplx));this%RH2PO4UptkLitrAutor=spval
+  allocate(this%RH1PO4UptkLitrAutor(NumMicrobAutrophCmplx));this%RH1PO4UptkLitrAutor=spval
   allocate(this%RNH3OxidAutor(NumMicrobAutrophCmplx));this%RNH3OxidAutor=spval
   allocate(this%RNH3OxidAutorBand(NumMicrobAutrophCmplx));this%RNH3OxidAutorBand=spval
   allocate(this%RNO2OxidAutor(NumMicrobAutrophCmplx));this%RNO2OxidAutor=spval
@@ -176,14 +176,14 @@ implicit none
   this%RNH4UptkBandAutor=0._r8
   this%RNO3UptkSoilAutor=0._r8
   this%RNO3UptkBandAutor=0._r8
-  this%RIPOOff=0._r8
-  this%RIPBOff=0._r8
-  this%RIPO1ff=0._r8
-  this%RIPB1ff=0._r8
-  this%RINHORff=0._r8
-  this%RINOORff=0._r8
-  this%RIPOORff=0._r8
-  this%RIPO1Rff=0._r8
+  this%RH2PO4UptkSoilAutor=0._r8
+  this%RH2PO4UptkBandAutor=0._r8
+  this%RH1PO4UptkSoilAutor=0._r8
+  this%RH1PO4UptkBandAutor=0._r8
+  this%RNH4UptkLitrAutor=0._r8
+  this%RNO3UptkLitrAutor=0._r8
+  this%RH2PO4UptkLitrAutor=0._r8
+  this%RH1PO4UptkLitrAutor=0._r8
   this%RNH3OxidAutor=0._r8
   this%RNH3OxidAutorBand=0._r8
   this%RNO2OxidAutor=0._r8
@@ -228,14 +228,14 @@ implicit none
   call destroy(this%RNH4UptkBandAutor)
   call destroy(this%RNO3UptkSoilAutor)
   call destroy(this%RNO3UptkBandAutor)
-  call destroy(this%RIPOOff)
-  call destroy(this%RIPBOff)
-  call destroy(this%RIPO1ff)
-  call destroy(this%RIPB1ff)
-  call destroy(this%RINHORff)
-  call destroy(this%RINOORff)
-  call destroy(this%RIPOORff)
-  call destroy(this%RIPO1Rff)
+  call destroy(this%RH2PO4UptkSoilAutor)
+  call destroy(this%RH2PO4UptkBandAutor)
+  call destroy(this%RH1PO4UptkSoilAutor)
+  call destroy(this%RH1PO4UptkBandAutor)
+  call destroy(this%RNH4UptkLitrAutor)
+  call destroy(this%RNO3UptkLitrAutor)
+  call destroy(this%RH2PO4UptkLitrAutor)
+  call destroy(this%RH1PO4UptkLitrAutor)
   call destroy(this%RO2DmndAutort)
 
   end subroutine Destruct

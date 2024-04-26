@@ -167,12 +167,12 @@ type, public :: NitroAQMFluxDiagType
   real(r8),allocatable :: RDN2Bff(:)
   real(r8),allocatable :: RGOMDff(:)
   real(r8),allocatable :: RMaintCompAutor(:,:)
-  real(r8),allocatable :: RINH4ff(:)
-  real(r8),allocatable :: RINO3ff(:)
-  real(r8),allocatable :: RIPO4ff(:)
-  real(r8),allocatable :: RINB4ff(:)
-  real(r8),allocatable :: RINB3ff(:)
-  real(r8),allocatable :: RIPOBff(:)
+  real(r8),allocatable :: RNH4TransfSoilAutor(:)
+  real(r8),allocatable :: RNO3TransfSoilAutor(:)
+  real(r8),allocatable :: RH2PO4TransfSoilAutor(:)
+  real(r8),allocatable :: RNH4TransfBandAutor(:)
+  real(r8),allocatable :: RNO3TransfBandAutor(:)
+  real(r8),allocatable :: RH2PO4TransfBandAutor(:)
   real(r8),allocatable :: RDOMEautor(:,:,:)
   real(r8),allocatable :: RHOMEautor(:,:,:)
   real(r8),allocatable :: RCOMEautor(:,:,:)
@@ -186,9 +186,9 @@ type, public :: NitroAQMFluxDiagType
   real(r8),allocatable :: R3OMEautor(:,:,:)
   real(r8),allocatable :: RXMMEautor(:,:,:)
   real(r8),allocatable :: R3MMEautor(:,:,:)
-  real(r8),allocatable :: RINH4Rff(:)
-  real(r8),allocatable :: RINO3Rff(:)
-  real(r8),allocatable :: RIPO4Rff(:)
+  real(r8),allocatable :: RNH4TransfLitrAutor(:)
+  real(r8),allocatable :: RNO3TransfLitrAutor(:)
+  real(r8),allocatable :: RH2PO4TransfLitrAutor(:)
   real(r8),allocatable :: FNH4XRff(:)
   real(r8),allocatable :: FNO3XRff(:)
   real(r8),allocatable :: FPO4XRff(:)
@@ -198,9 +198,9 @@ type, public :: NitroAQMFluxDiagType
   real(r8),allocatable :: RCO2Xff(:)
   real(r8),allocatable :: RCH3Xff(:)
   real(r8),allocatable :: RCH4Xff(:)
-  real(r8),allocatable :: RIP14ff(:)
-  real(r8),allocatable :: RIP1Bff(:)
-  real(r8),allocatable :: RIP14Rff(:)
+  real(r8),allocatable :: RH1PO4TransfSoilAutor(:)
+  real(r8),allocatable :: RH1PO4TransfBandAutor(:)
+  real(r8),allocatable :: RH1PO4TransfLitrAutor(:)
   contains
     procedure, public :: Init => nit_micf_init
     procedure, public :: ZeroOut => nit_micf_zero
@@ -402,12 +402,12 @@ type, public :: NitroAQMFluxDiagType
   allocate(this%RDN2Bff(NumMicrobAutrophCmplx));this%RDN2Bff=spval
   allocate(this%RGOMDff(NumMicrobAutrophCmplx));this%RGOMDff=spval
   allocate(this%RMaintCompAutor(2,NumMicrobAutrophCmplx));this%RMaintCompAutor=spval
-  allocate(this%RINH4ff(NumMicrobAutrophCmplx));this%RINH4ff=spval
-  allocate(this%RINO3ff(NumMicrobAutrophCmplx));this%RINO3ff=spval
-  allocate(this%RIPO4ff(NumMicrobAutrophCmplx));this%RIPO4ff=spval
-  allocate(this%RINB4ff(NumMicrobAutrophCmplx));this%RINB4ff=spval
-  allocate(this%RINB3ff(NumMicrobAutrophCmplx));this%RINB3ff=spval
-  allocate(this%RIPOBff(NumMicrobAutrophCmplx));this%RIPOBff=spval
+  allocate(this%RNH4TransfSoilAutor(NumMicrobAutrophCmplx));this%RNH4TransfSoilAutor=spval
+  allocate(this%RNO3TransfSoilAutor(NumMicrobAutrophCmplx));this%RNO3TransfSoilAutor=spval
+  allocate(this%RH2PO4TransfSoilAutor(NumMicrobAutrophCmplx));this%RH2PO4TransfSoilAutor=spval
+  allocate(this%RNH4TransfBandAutor(NumMicrobAutrophCmplx));this%RNH4TransfBandAutor=spval
+  allocate(this%RNO3TransfBandAutor(NumMicrobAutrophCmplx));this%RNO3TransfBandAutor=spval
+  allocate(this%RH2PO4TransfBandAutor(NumMicrobAutrophCmplx));this%RH2PO4TransfBandAutor=spval
   allocate(this%RDOMEautor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%RDOMEautor=spval
   allocate(this%RHOMEautor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%RHOMEautor=spval
   allocate(this%RCOMEautor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%RCOMEautor=spval
@@ -421,9 +421,9 @@ type, public :: NitroAQMFluxDiagType
   allocate(this%R3OMEautor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%R3OMEautor=spval
   allocate(this%RXMMEautor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%RXMMEautor=spval
   allocate(this%R3MMEautor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%R3MMEautor=spval
-  allocate(this%RINH4Rff(NumMicrobAutrophCmplx));this%RINH4Rff=spval
-  allocate(this%RINO3Rff(NumMicrobAutrophCmplx));this%RINO3Rff=spval
-  allocate(this%RIPO4Rff(NumMicrobAutrophCmplx));this%RIPO4Rff=spval
+  allocate(this%RNH4TransfLitrAutor(NumMicrobAutrophCmplx));this%RNH4TransfLitrAutor=spval
+  allocate(this%RNO3TransfLitrAutor(NumMicrobAutrophCmplx));this%RNO3TransfLitrAutor=spval
+  allocate(this%RH2PO4TransfLitrAutor(NumMicrobAutrophCmplx));this%RH2PO4TransfLitrAutor=spval
   allocate(this%FNH4XRff(NumMicrobAutrophCmplx));this%FNH4XRff=spval
   allocate(this%FNO3XRff(NumMicrobAutrophCmplx));this%FNO3XRff=spval
   allocate(this%FPO4XRff(NumMicrobAutrophCmplx));this%FPO4XRff=spval
@@ -433,9 +433,9 @@ type, public :: NitroAQMFluxDiagType
   allocate(this%RCO2Xff(NumMicrobAutrophCmplx));this%RCO2Xff=spval
   allocate(this%RCH3Xff(NumMicrobAutrophCmplx));this%RCH3Xff=spval
   allocate(this%RCH4Xff(NumMicrobAutrophCmplx));this%RCH4Xff=spval
-  allocate(this%RIP14ff(NumMicrobAutrophCmplx));this%RIP14ff=spval
-  allocate(this%RIP1Bff(NumMicrobAutrophCmplx));this%RIP1Bff=spval
-  allocate(this%RIP14Rff(NumMicrobAutrophCmplx));this%RIP14Rff=spval
+  allocate(this%RH1PO4TransfSoilAutor(NumMicrobAutrophCmplx));this%RH1PO4TransfSoilAutor=spval
+  allocate(this%RH1PO4TransfBandAutor(NumMicrobAutrophCmplx));this%RH1PO4TransfBandAutor=spval
+  allocate(this%RH1PO4TransfLitrAutor(NumMicrobAutrophCmplx));this%RH1PO4TransfLitrAutor=spval
 
   call this%ZeroOut()
   end subroutine nit_micf_init
@@ -556,12 +556,12 @@ type, public :: NitroAQMFluxDiagType
   this%RDN2Bff = 0._r8
   this%RGOMDff = 0._r8
   this%RMaintCompAutor = 0._r8
-  this%RINH4ff = 0._r8
-  this%RINO3ff = 0._r8
-  this%RIPO4ff = 0._r8
-  this%RINB4ff = 0._r8
-  this%RINB3ff = 0._r8
-  this%RIPOBff = 0._r8
+  this%RNH4TransfSoilAutor = 0._r8
+  this%RNO3TransfSoilAutor = 0._r8
+  this%RH2PO4TransfSoilAutor = 0._r8
+  this%RNH4TransfBandAutor = 0._r8
+  this%RNO3TransfBandAutor = 0._r8
+  this%RH2PO4TransfBandAutor = 0._r8
   this%RDOMEautor = 0._r8
   this%RHOMEautor = 0._r8
   this%RCOMEautor = 0._r8
@@ -576,9 +576,9 @@ type, public :: NitroAQMFluxDiagType
   this%R3OMEautor = 0._r8
   this%RXMMEautor = 0._r8
   this%R3MMEautor = 0._r8
-  this%RINH4Rff = 0._r8
-  this%RINO3Rff = 0._r8
-  this%RIPO4Rff = 0._r8
+  this%RNH4TransfLitrAutor = 0._r8
+  this%RNO3TransfLitrAutor = 0._r8
+  this%RH2PO4TransfLitrAutor = 0._r8
   this%FNH4XRff = 0._r8
   this%FNO3XRff = 0._r8
   this%FPO4XRff = 0._r8
@@ -588,9 +588,9 @@ type, public :: NitroAQMFluxDiagType
   this%RCO2Xff = 0._r8
   this%RCH3Xff = 0._r8
   this%RCH4Xff = 0._r8
-  this%RIP14ff = 0._r8
-  this%RIP1Bff = 0._r8
-  this%RIP14Rff = 0._r8
+  this%RH1PO4TransfSoilAutor = 0._r8
+  this%RH1PO4TransfBandAutor = 0._r8
+  this%RH1PO4TransfLitrAutor = 0._r8
 
   end subroutine nit_micf_zero
 
@@ -669,12 +669,12 @@ type, public :: NitroAQMFluxDiagType
   call destroy(this%RDN2Bff)
   call destroy(this%RGOMDff)
   call destroy(this%RMaintCompAutor)
-  call destroy(this%RINH4ff)
-  call destroy(this%RINO3ff)
-  call destroy(this%RIPO4ff)
-  call destroy(this%RINB4ff)
-  call destroy(this%RINB3ff)
-  call destroy(this%RIPOBff)
+  call destroy(this%RNH4TransfSoilAutor)
+  call destroy(this%RNO3TransfSoilAutor)
+  call destroy(this%RH2PO4TransfSoilAutor)
+  call destroy(this%RNH4TransfBandAutor)
+  call destroy(this%RNO3TransfBandAutor)
+  call destroy(this%RH2PO4TransfBandAutor)
   call destroy(this%RDOMEautor)
   call destroy(this%RHOMEautor)
   call destroy(this%RCOMEautor)
@@ -688,9 +688,9 @@ type, public :: NitroAQMFluxDiagType
   call destroy(this%R3OMEautor)
   call destroy(this%RXMMEautor)
   call destroy(this%R3MMEautor)
-  call destroy(this%RINH4Rff)
-  call destroy(this%RINO3Rff)
-  call destroy(this%RIPO4Rff)
+  call destroy(this%RNH4TransfLitrAutor)
+  call destroy(this%RNO3TransfLitrAutor)
+  call destroy(this%RH2PO4TransfLitrAutor)
   call destroy(this%FNH4XRff)
   call destroy(this%FNO3XRff)
   call destroy(this%FPO4XRff)
@@ -700,9 +700,9 @@ type, public :: NitroAQMFluxDiagType
   call destroy(this%RCO2Xff)
   call destroy(this%RCH3Xff)
   call destroy(this%RCH4Xff)
-  call destroy(this%RIP14ff)
-  call destroy(this%RIP1Bff)
-  call destroy(this%RIP14Rff)
+  call destroy(this%RH1PO4TransfSoilAutor)
+  call destroy(this%RH1PO4TransfBandAutor)
+  call destroy(this%RH1PO4TransfLitrAutor)
 
   end subroutine nit_micf_destroy
 !------------------------------------------------------------------------------------------

@@ -327,10 +327,10 @@ implicit none
   micflx%RNH4UptkBandAutor(1:NumMicrobAutrophCmplx)=RNH4UptkBandAutor_vr(1:NumMicrobAutrophCmplx,L,NY,NX)
   micflx%RNO3UptkSoilAutor(1:NumMicrobAutrophCmplx)=RNO3UptkSoilAutor_vr(1:NumMicrobAutrophCmplx,L,NY,NX)
   micflx%RNO3UptkBandAutor(1:NumMicrobAutrophCmplx)=RNO3UptkBandAutor_vr(1:NumMicrobAutrophCmplx,L,NY,NX)
-  micflx%RIPOOff(1:NumMicrobAutrophCmplx)=RIPOOff(1:NumMicrobAutrophCmplx,L,NY,NX)
-  micflx%RIPBOff(1:NumMicrobAutrophCmplx)=RIPBOff(1:NumMicrobAutrophCmplx,L,NY,NX)
-  micflx%RIPO1ff(1:NumMicrobAutrophCmplx)=RIPO1ff(1:NumMicrobAutrophCmplx,L,NY,NX)
-  micflx%RIPB1ff(1:NumMicrobAutrophCmplx)=RIPB1ff(1:NumMicrobAutrophCmplx,L,NY,NX)
+  micflx%RH2PO4UptkSoilAutor(1:NumMicrobAutrophCmplx)=RH2PO4UptkSoilAutor_vr(1:NumMicrobAutrophCmplx,L,NY,NX)
+  micflx%RH2PO4UptkBandAutor(1:NumMicrobAutrophCmplx)=RH2PO4UptkBandAutor_vr(1:NumMicrobAutrophCmplx,L,NY,NX)
+  micflx%RH1PO4UptkSoilAutor(1:NumMicrobAutrophCmplx)=RH1PO4UptkSoilAutor_vr(1:NumMicrobAutrophCmplx,L,NY,NX)
+  micflx%RH1PO4UptkBandAutor(1:NumMicrobAutrophCmplx)=RH1PO4UptkBandAutor_vr(1:NumMicrobAutrophCmplx,L,NY,NX)
   micflx%RO2DmndAutort(1:NumMicrobAutrophCmplx)=RO2DmndAutort(1:NumMicrobAutrophCmplx,L,NY,NX)
 
   micflx%RINHO(1:NumMicrbHetetrophCmplx,1:jcplx)=RINHO(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX)
@@ -417,10 +417,10 @@ implicit none
     RINOOR(1:NumMicrbHetetrophCmplx,1:jcplx,NY,NX)=micflx%RINOOR(1:NumMicrbHetetrophCmplx,1:jcplx)
     RIPOOR(1:NumMicrbHetetrophCmplx,1:jcplx,NY,NX)=micflx%RIPOOR(1:NumMicrbHetetrophCmplx,1:jcplx)
     RIPO1R(1:NumMicrbHetetrophCmplx,1:jcplx,NY,NX)=micflx%RIPO1R(1:NumMicrbHetetrophCmplx,1:jcplx)
-    RINHORff(1:NumMicrobAutrophCmplx,NY,NX)=micflx%RINHORff(1:NumMicrobAutrophCmplx)
-    RINOORff(1:NumMicrobAutrophCmplx,NY,NX)=micflx%RINOORff(1:NumMicrobAutrophCmplx)
-    RIPOORff(1:NumMicrobAutrophCmplx,NY,NX)=micflx%RIPOORff(1:NumMicrobAutrophCmplx)
-    RIPO1Rff(1:NumMicrobAutrophCmplx,NY,NX)=micflx%RIPO1Rff(1:NumMicrobAutrophCmplx)
+    RNH4UptkLitrAutor_col(1:NumMicrobAutrophCmplx,NY,NX)=micflx%RNH4UptkLitrAutor(1:NumMicrobAutrophCmplx)
+    RNO3UptkLitrAutor_col(1:NumMicrobAutrophCmplx,NY,NX)=micflx%RNO3UptkLitrAutor(1:NumMicrobAutrophCmplx)
+    RH2PO4UptkLitrAutor_col(1:NumMicrobAutrophCmplx,NY,NX)=micflx%RH2PO4UptkLitrAutor(1:NumMicrobAutrophCmplx)
+    RH1PO4UptkLitrAutor_col(1:NumMicrobAutrophCmplx,NY,NX)=micflx%RH1PO4UptkLitrAutor(1:NumMicrobAutrophCmplx)
     OSM(ielmc,micpar%iprotein,micpar%k_POM,NU(NY,NX),NY,NX)=micstt%OSC13U
     OSM(ielmc,micpar%iprotein,micpar%k_humus,NU(NY,NX),NY,NX)=micstt%OSC14U
     OSM(ielmc,micpar%icarbhyro,micpar%k_humus,NU(NY,NX),NY,NX)=micstt%OSC24U
@@ -438,10 +438,10 @@ implicit none
   RNH4UptkBandAutor_vr(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RNH4UptkBandAutor(1:NumMicrobAutrophCmplx)
   RNO3UptkSoilAutor_vr(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RNO3UptkSoilAutor(1:NumMicrobAutrophCmplx)
   RNO3UptkBandAutor_vr(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RNO3UptkBandAutor(1:NumMicrobAutrophCmplx)
-  RIPOOff(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RIPOOff(1:NumMicrobAutrophCmplx)
-  RIPBOff(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RIPBOff(1:NumMicrobAutrophCmplx)
-  RIPO1ff(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RIPO1ff(1:NumMicrobAutrophCmplx)
-  RIPB1ff(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RIPB1ff(1:NumMicrobAutrophCmplx)
+  RH2PO4UptkSoilAutor_vr(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RH2PO4UptkSoilAutor(1:NumMicrobAutrophCmplx)
+  RH2PO4UptkBandAutor_vr(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RH2PO4UptkBandAutor(1:NumMicrobAutrophCmplx)
+  RH1PO4UptkSoilAutor_vr(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RH1PO4UptkSoilAutor(1:NumMicrobAutrophCmplx)
+  RH1PO4UptkBandAutor_vr(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RH1PO4UptkBandAutor(1:NumMicrobAutrophCmplx)
   RO2UptkSoilM_vr(1:NPH,L,NY,NX)=micflx%ROXSK(1:NPH)
 
   TFNQ(L,NY,NX)=micstt%TFNQ

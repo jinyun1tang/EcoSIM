@@ -400,14 +400,14 @@ module InitSOMBGCMOD
   RNH4UptkBandAutor_vr(:,L,NY,NX)=0.0_r8
   RNO3UptkSoilAutor_vr(:,L,NY,NX)=0.0_r8
   RNO3UptkBandAutor_vr(:,L,NY,NX)=0.0_r8
-  RIPOOff(:,L,NY,NX)=0.0_r8
-  RIPBOff(:,L,NY,NX)=0.0_r8
-  RIPO1ff(:,L,NY,NX)=0.0_r8
-  RIPB1ff(:,L,NY,NX)=0.0_r8
+  RH2PO4UptkSoilAutor_vr(:,L,NY,NX)=0.0_r8
+  RH2PO4UptkBandAutor_vr(:,L,NY,NX)=0.0_r8
+  RH1PO4UptkSoilAutor_vr(:,L,NY,NX)=0.0_r8
+  RH1PO4UptkBandAutor_vr(:,L,NY,NX)=0.0_r8
   IF(L.EQ.0)THEN
-    RINHORff(:,NY,NX)=0.0_r8
-    RINOORff(:,NY,NX)=0.0_r8
-    RIPOORff(:,NY,NX)=0.0_r8
+    RNH4UptkLitrAutor_col(:,NY,NX)=0.0_r8
+    RNO3UptkLitrAutor_col(:,NY,NX)=0.0_r8
+    RH2PO4UptkLitrAutor_col(:,NY,NX)=0.0_r8
   ENDIF
     DO  N=1,NumMicbFunGroups
       do NGL=JGniA(n),JGnfA(n)
