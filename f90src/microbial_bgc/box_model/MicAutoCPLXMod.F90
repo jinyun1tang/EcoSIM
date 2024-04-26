@@ -66,16 +66,15 @@ module MicAutoCPLXMod
     FOMNff => nmics%FOMNff,       &
     FOMKff => nmics%FOMKff,       &
     OMAff => nmics%OMAff,         &
-    RUPOXff  => nmicf%RUPOXff,    &
+    RO2UptkAutor  => nmicf%RO2UptkAutor,    &
     RGOMOff  => nmicf%RGOMOff,    &
     RO2Dmnd4RespAutor => nmicf%RO2Dmnd4RespAutor ,    &
     RO2DmndAutor=> nmicf%RO2DmndAutor  ,    &
     RO2Uptk4RespAutor => nmicf%RO2Uptk4RespAutor ,    &
-    RDNO3ff => nmicf%RDNO3ff ,    &
+    RNO3UptkAutor => nmicf%RNO3UptkAutor ,    &
     RDNOBff => nmicf%RDNOBff ,    &
     RDNO2ff => nmicf%RDNO2ff ,    &
     RDN2Bff => nmicf%RDN2Bff ,    &
-    RDN2Off => nmicf%RDN2Off ,    &
     RGOMDff  => nmicf%RGOMDff,    &
     RH2GXff  => nmicf%RH2GXff,    &
     RGOMYff  => nmicf%RGOMYff,    &
@@ -191,7 +190,7 @@ module MicAutoCPLXMod
 ! Rain2LitRSurf_col,Irrig2LitRSurf=surface water flux from precipitation, irrigation
 ! O2_rain_conc,O2_irrig_conc=O2 concentration in Rain2LitRSurf_col,Irrig2LitRSurf
 !
-  RUPOXff(NGL)=0.0_r8
+  RO2UptkAutor(NGL)=0.0_r8
 
   if (N.eq.AmmoniaOxidBacter .or. N.eq.NitriteOxidBacter .or. N.eq.AerobicMethanotrophBacteria)then
 !   write(*,*)'AerobLeafO2Solubility_pftUptake'
@@ -213,11 +212,10 @@ module MicAutoCPLXMod
     call AutotrophDenitrificCatabolism(NGL,N,XCO2,VOLWZ,micfor,micstt,&
       naqfdiag,nmicf,nmics,micflx)
   ELSE
-    RDNO3ff(NGL)=0.0_r8
+    RNO3UptkAutor(NGL)=0.0_r8
     RDNOBff(NGL)=0.0_r8
     RDNO2ff(NGL)=0.0_r8
     RDN2Bff(NGL)=0.0_r8
-    RDN2Off(NGL)=0.0_r8
     RGOMYff(NGL)=0.0_r8
     RGOMDff(NGL)=0.0_r8
   ENDIF
@@ -655,7 +653,7 @@ module MicAutoCPLXMod
   associate(                  &
     fLimO2Autor    => nmics%fLimO2Autor,      &
     OMAff    => nmics%OMAff,      &
-    RUPOXff  => nmicf%RUPOXff,    &
+    RO2UptkAutor  => nmicf%RO2UptkAutor,    &
     RGOMOff  => nmicf%RGOMOff,    &
     RO2Dmnd4RespAutor => nmicf%RO2Dmnd4RespAutor,     &
     RO2DmndAutor=> nmicf%RO2DmndAutor ,     &
@@ -769,7 +767,7 @@ module MicAutoCPLXMod
           OXYG1=OXYG1-ROXDFQ
           OXYS1=OXYS1+ROXDFQ
           !accumulate uptake flux
-          RUPOXff(NGL)=RUPOXff(NGL)+RMPOX
+          RO2UptkAutor(NGL)=RO2UptkAutor(NGL)+RMPOX
           ROXSK(M)=ROXSK(M)+RMPOX
         ENDDO
 
@@ -781,7 +779,7 @@ module MicAutoCPLXMod
       !     WFN=ratio of O2-limited to O2-unlimited uptake
       !     RVMX4,RVNHB,RVMX2,RVMB2=NH3,NO2 oxidation in non-band, band
       !
-      fLimO2Autor(NGL)=AMIN1(1.0,AZMAX1(RUPOXff(NGL)/RO2DmndAutor(NGL)))
+      fLimO2Autor(NGL)=AMIN1(1.0,AZMAX1(RO2UptkAutor(NGL)/RO2DmndAutor(NGL)))
       IF(N.EQ.AmmoniaOxidBacter)THEN
         RNH3OxidAutor(NGL)=RNH3OxidAutor(NGL)*fLimO2Autor(NGL)
         RNH3OxidAutorBand(NGL)=RNH3OxidAutorBand(NGL)*fLimO2Autor(NGL)
@@ -790,11 +788,11 @@ module MicAutoCPLXMod
         RNO2OxidAutorBand(NGL)=RNO2OxidAutorBand(NGL)*fLimO2Autor(NGL)
       ENDIF
     ELSE
-      RUPOXff(NGL)=RO2DmndAutor(NGL)
+      RO2UptkAutor(NGL)=RO2DmndAutor(NGL)
       fLimO2Autor(NGL)=1.0_r8
     ENDIF
   ELSE
-    RUPOXff(NGL)=0.0_r8
+    RO2UptkAutor(NGL)=0.0_r8
     fLimO2Autor(NGL)=1.0_r8
   ENDIF
   !write(*,*)'RESPIRATION PRODUCTS ALLOCATED TO O2, CO2, ACETATE, CH4, H2'
@@ -846,11 +844,10 @@ module MicAutoCPLXMod
     FOMNff => nmics%FOMNff,       &
     RO2Dmnd4RespAutor  => nmicf%RO2Dmnd4RespAutor,    &
     RO2Uptk4RespAutor => nmicf%RO2Uptk4RespAutor ,    &
-    RDNO3ff => nmicf%RDNO3ff ,    &
+    RNO3UptkAutor => nmicf%RNO3UptkAutor ,    &
     RDNOBff => nmicf%RDNOBff ,    &
     RDNO2ff => nmicf%RDNO2ff ,    &
     RDN2Bff => nmicf%RDN2Bff ,    &
-    RDN2Off => nmicf%RDN2Off ,    &
     RGOMDff  => nmicf%RGOMDff,    &
     RGOMYff  => nmicf%RGOMYff,    &
     RVOXA    => nmicf%RVOXA  ,    &
@@ -930,9 +927,8 @@ module MicAutoCPLXMod
   RDNOT=RDNO2ff(NGL)+RDN2Bff(NGL)
   RGOMYff(NGL)=0.0_r8
   RGOMDff(NGL)=RDNOT*ECNO*ENOX
-  RDNO3ff(NGL)=0.0_r8
+  RNO3UptkAutor(NGL)=0.0_r8
   RDNOBff(NGL)=0.0_r8
-  RDN2Off(NGL)=0.0_r8
   RNO2OxidAutor(NGL)=VMXD4S
   RNO2OxidAutorBand(NGL)=VMXD4B
   RVOXA(NGL)=RVOXA(NGL)+0.333_r8*RDNO2ff(NGL)

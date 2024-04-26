@@ -286,8 +286,8 @@ module UptakesMod
     DO  L=NU,MaxNumRootLays
       DO  N=1,MY(NZ)
         plt_ew%AllPlantRootH2OUptake_vr(N,L,NZ)=0.0_r8
-        plt_rbgc%RCO2P_pvr(N,L,NZ)=0.0_r8
-        plt_rbgc%RUPOXP(N,L,NZ)=0.0_r8
+        plt_rbgc%RootCO2Emis_pvr(N,L,NZ)=0.0_r8
+        plt_rbgc%RootO2Uptk_pvr(N,L,NZ)=0.0_r8
         plt_rbgc%RUPGasSol_vr(idg_CO2,N,L,NZ)=0.0_r8
         plt_rbgc%RUPGasSol_vr(idg_O2,N,L,NZ)=0.0_r8
         plt_rbgc%RUPGasSol_vr(idg_CH4,N,L,NZ)=0.0_r8

@@ -212,8 +212,8 @@ module NutUptakeMod
   plt_rbgc%trcg_air2root_flx__pvr(idg_beg:idg_end-1,1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%trcg_Root_DisEvap_flx_vr(idg_beg:idg_end-1,1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%RUPGasSol_vr(idg_beg:idg_end,1:NN,L1:L2,NZ)=0.0_r8
-  plt_rbgc%RCO2P_pvr(1:NN,L1:L2,NZ)=0.0_r8
-  plt_rbgc%RUPOXP(1:NN,L1:L2,NZ)=0.0_r8
+  plt_rbgc%RootCO2Emis_pvr(1:NN,L1:L2,NZ)=0.0_r8
+  plt_rbgc%RootO2Uptk_pvr(1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%RootMycoExudElm_pvr(1:NumPlantChemElms,1:NN,1:jcplx,L1:L2,NZ)=0.0_r8
   plt_rbgc%RAutoRootO2Limter_pvr(1:NN,L1:L2,NZ)=1.0
   plt_rbgc%RUNNHP(1:NN,L1:L2,NZ)=0.0_r8

@@ -853,7 +853,7 @@ module Hour1Mod
   Gas_Disol_Flx_vr(idg_beg:idg_end,0:NL(NY,NX),NY,NX)=0.0_r8
 
   TDFOME(1:NumPlantChemElms,1:jcplx,NU(NY,NX):NL(NY,NX),NY,NX)=0.0_r8
-  ROXSK(1:NPH,NU(NY,NX):NL(NY,NX),NY,NX)=0.0_r8
+  RO2UptkSoilM_vr(1:NPH,NU(NY,NX):NL(NY,NX),NY,NX)=0.0_r8
   end subroutine SetArrays4PlantSoilTransfer
 !------------------------------------------------------------------------------------------
 
@@ -2358,7 +2358,7 @@ module Hour1Mod
     trcs_plant_uptake_vr(ids_beg:ids_end,L,NY,NX)=0.0_r8
     TCO2P(L,NY,NX)=0.0_r8
     trcg_TLP(idg_beg:idg_end-1,L,NY,NX)=0.0_r8
-    TUPOXP(L,NY,NX)=0.0_r8
+    TRO2Uptk_vr(L,NY,NX)=0.0_r8
     trcg_air2root_flx_vr(idg_beg:idg_end-1,L,NY,NX)=0.0_r8
 
     trcn_RChem_band_soil_vr(ids_NH4B,L,NY,NX)=0.0_r8

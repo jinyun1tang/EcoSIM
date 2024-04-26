@@ -1190,7 +1190,7 @@ module RedistMod
     HydroSubsDICFlx_col(NY,NX)=HydroSubsDICFlx_col(NY,NX)-12.0*TBCO2(L,NY,NX)
     TXCO2(NY,NX)=TXCO2(NY,NX)+12.0*TBCO2(L,NY,NX)
     OXYGIN=OXYGIN+OIB
-    OOB=trcg_RMicbTransf_vr(idg_O2,L,NY,NX)+TUPOXP(L,NY,NX)+trcs_plant_uptake_vr(idg_O2,L,NY,NX)
+    OOB=trcg_RMicbTransf_vr(idg_O2,L,NY,NX)+TRO2Uptk_vr(L,NY,NX)+trcs_plant_uptake_vr(idg_O2,L,NY,NX)
     OXYGOU=OXYGOU+OOB
     H2GIN=H2GIN+HGB
     HOB=trcg_RMicbTransf_vr(idg_H2,L,NY,NX)+trcs_plant_uptake_vr(idg_H2,L,NY,NX)

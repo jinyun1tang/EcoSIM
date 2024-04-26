@@ -738,7 +738,7 @@ module PlantDisturbsMod
     icwood                      =>  pltpar%icwood                        , &
     RootGasLossDisturb_pft      =>   plt_bgcr%RootGasLossDisturb_pft     , &
     LitrfalStrutElms_pvr        =>  plt_bgcr%LitrfalStrutElms_pvr        , &
-    RCO2A_pvr                   =>  plt_rbgc%RCO2A_pvr                   , &
+    RootCO2Autor_pvr                   =>  plt_rbgc%RootCO2Autor_pvr                   , &
     RootRespPotent_pvr          =>  plt_rbgc%RootRespPotent_pvr          , &
     RCO2N_pvr                   =>  plt_rbgc%RCO2N_pvr                   , &
     FracRadPARbyCanopy_pft      =>  plt_rad%FracRadPARbyCanopy_pft       , &
@@ -1013,7 +1013,7 @@ module PlantDisturbsMod
 !     RootLenDensPerPlant_pvr,RootLenPerPlant_pvr=root length density,root length per plant
 !     RootVH2O_pvr,RootPoreVol_pvr=root or myco aqueous,gaseous volume
 !     RootAreaPerPlant_pvr=root surface area per plant
-!     RootRespPotent_pvr,RCO2N_pvr,RCO2A_pvr unlimited by O2,nonstructural C
+!     RootRespPotent_pvr,RCO2N_pvr,RootCO2Autor_pvr unlimited by O2,nonstructural C
 !
             D8960: DO NR=1,NumRootAxes_pft(NZ)
               DO NE=1,NumPlantChemElms
@@ -1040,7 +1040,7 @@ module PlantDisturbsMod
             RootAreaPerPlant_pvr(N,L,NZ)=RootAreaPerPlant_pvr(N,L,NZ)*XHVST
             RootRespPotent_pvr(N,L,NZ)=RootRespPotent_pvr(N,L,NZ)*XHVST
             RCO2N_pvr(N,L,NZ)=RCO2N_pvr(N,L,NZ)*XHVST
-            RCO2A_pvr(N,L,NZ)=RCO2A_pvr(N,L,NZ)*XHVST
+            RootCO2Autor_pvr(N,L,NZ)=RootCO2Autor_pvr(N,L,NZ)*XHVST
 !
 !     LitrFall AND STATE VARIABLES FOR NODULES DURING TILLAGE
 !
@@ -1259,7 +1259,7 @@ module PlantDisturbsMod
     LitrfalStrutElms_pvr                =>  plt_bgcr%LitrfalStrutElms_pvr                , &
     Eco_NBP_col                         =>  plt_bgcr%Eco_NBP_col                         , &
     CO2NetFix_pft                       =>  plt_bgcr%CO2NetFix_pft                       , &
-    RCO2A_pvr                           =>  plt_rbgc%RCO2A_pvr                           , &
+    RootCO2Autor_pvr                           =>  plt_rbgc%RootCO2Autor_pvr                           , &
     RootRespPotent_pvr                  =>  plt_rbgc%RootRespPotent_pvr                  , &
     RCO2N_pvr                           =>  plt_rbgc%RCO2N_pvr                           , &
     Root2ndXNum_pvr                     =>  plt_morph%Root2ndXNum_pvr                    , &
@@ -2457,7 +2457,7 @@ module PlantDisturbsMod
 !     RootLenDensPerPlant_pvr,RootLenPerPlant_pvr=root length density,root length per plant
 !     RootVH2O_pvr,RootPoreVol_pvr=root or myco aqueous,gaseous volume
 !     RootAreaPerPlant_pvr=root surface area per plant
-!     RootRespPotent_pvr,RCO2N_pvr,RCO2A_pvr unlimited by O2,nonstructural C
+!     RootRespPotent_pvr,RCO2N_pvr,RootCO2Autor_pvr unlimited by O2,nonstructural C
 !
             D3960: DO NR=1,NumRootAxes_pft(NZ)
               DO NE=1,NumPlantChemElms
@@ -2484,7 +2484,7 @@ module PlantDisturbsMod
             RootAreaPerPlant_pvr(N,L,NZ)=RootAreaPerPlant_pvr(N,L,NZ)*XHVST(ielmc)
             RootRespPotent_pvr(N,L,NZ)=RootRespPotent_pvr(N,L,NZ)*XHVST(ielmc)
             RCO2N_pvr(N,L,NZ)=RCO2N_pvr(N,L,NZ)*XHVST(ielmc)
-            RCO2A_pvr(N,L,NZ)=RCO2A_pvr(N,L,NZ)*XHVST(ielmc)
+            RootCO2Autor_pvr(N,L,NZ)=RootCO2Autor_pvr(N,L,NZ)*XHVST(ielmc)
 !
 !     NODULE LitrFall AND STATE VARIABLES DURING HARVESTING
 !

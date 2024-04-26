@@ -660,7 +660,7 @@ implicit none
   real(r8), pointer :: ROXYL(:)      => null()   !net aqueous O2 flux, [g d-2 h-1]
   real(r8), pointer :: ROXYY(:)      => null()   !total root + microbial O2 uptake, [g d-2 h-1]
   real(r8), pointer :: TCO2P(:)      => null()   !total root CO2 flux, [gC d-2 h-1]
-  real(r8), pointer :: TUPOXP(:)     => null()   !total root internal O2 flux, [g d-2 h-1]
+  real(r8), pointer :: TRO2Uptk_vr(:)     => null()   !total root internal O2 flux, [g d-2 h-1]
   real(r8), pointer :: LitrfalStrutElms_vr(:,:,:,:)   => null() !total LitrFall element, [g d-2 h-1]
   real(r8), pointer :: RDOM_micb_flx(:,:,:)    => null()  !net microbial DOC flux, [gC d-2 h-1]
   real(r8), pointer :: CO2NetFix_pft(:)       => null()  !canopy net CO2 exchange, [gC d-2 h-1]
@@ -693,7 +693,7 @@ implicit none
   real(r8), pointer :: RootH2PO4Uptake_pft(:)         => null()  !total root uptake of PO4, [g d-2 h-1]
   real(r8), pointer :: RootMycoExudElm_pvr(:,:,:,:,:)  => null()  !root uptake (+ve) - exudation (-ve) of DOE, [g d-2 h-1]
   real(r8), pointer :: PlantRootSoilElmNetX_pft(:,:)      => null()  !net root element uptake (+ve) - exudation (-ve), [gC d-2 h-1]
-  real(r8), pointer :: ROXSK(:,:)       => null()  !total O2 sink, [g d-2 t-1]
+  real(r8), pointer :: RO2UptkSoilM_vr(:,:)       => null()  !total O2 sink, [g d-2 t-1]
   real(r8), pointer :: ZEROQ(:)         => null()  !threshold zero for uptake calculation
   real(r8), pointer :: CMinPO4Root_pft(:,:)      => null()  !minimum PO4 concentration for root NH4 uptake, [g m-3]
   real(r8), pointer :: VmaxPO4Root_pft(:,:)      => null()  !maximum root PO4 uptake rate, [g m-2 h-1]
@@ -704,8 +704,8 @@ implicit none
   real(r8), pointer :: CMinNH4Root_pft(:,:)      => null()  !minimum NH4 concentration for root NH4 uptake, [g m-3]
   real(r8), pointer :: VmaxNH4Root_pft(:,:)      => null()  !maximum root NH4 uptake rate, [g m-2 h-1]
   real(r8), pointer :: KmNH4Root_pft(:,:)      => null()  !Km for root NH4 uptake, [g m-3]
-  real(r8), pointer :: RCO2P_pvr(:,:,:)     => null()  !aqueous CO2 flux from roots to root water , [g d-2 h-1]
-  real(r8), pointer :: RUPOXP(:,:,:)    => null()  !aqueous O2 flux from roots to root water , [g d-2 h-1]
+  real(r8), pointer :: RootCO2Emis_pvr(:,:,:)     => null()  !aqueous CO2 flux from roots to root water , [g d-2 h-1]
+  real(r8), pointer :: RootO2Uptk_pvr(:,:,:)    => null()  !aqueous O2 flux from roots to root water , [g d-2 h-1]
   real(r8), pointer :: RUPGasSol_vr(:,:,:,:)     => null()  !aqueous CO2 flux from roots to soil water, [g d-2 h-1]
   real(r8), pointer :: trcg_air2root_flx__pvr(:,:,:,:)    => null()  !gaseous tracer flux through roots, [g d-2 h-1]
   real(r8), pointer :: trcg_Root_DisEvap_flx_vr(:,:,:,:)    => null()  !dissolution (+ve) - volatilization (-ve) gas flux in roots, [g d-2 h-1]
@@ -727,7 +727,7 @@ implicit none
   real(r8), pointer :: RootCUlmNutUptake_pvr(:,:,:,:)    => null()  !root uptake of NH4 band unconstrained by root nonstructural C, [g d-2 h-1]
   real(r8), pointer :: RootRespPotent_pvr(:,:,:)     => null()  !root respiration unconstrained by O2, [g d-2 h-1]
   real(r8), pointer :: RCO2N_pvr(:,:,:)     => null()  !root CO2 efflux unconstrained by root nonstructural C, [g d-2 h-1]
-  real(r8), pointer :: RCO2A_pvr(:,:,:)     => null()  !root respiration constrained by O2, [g d-2 h-1]
+  real(r8), pointer :: RootCO2Autor_pvr(:,:,:)     => null()  !root respiration constrained by O2, [g d-2 h-1]
   real(r8), pointer :: PlantExudChemElmCum_pft(:,:)      => null()  !total net root element uptake (+ve) - exudation (-ve), [gC d-2 ]
   real(r8), pointer :: trcg_TLP(:,:)    => null()   !total root internal gas flux, [g d-2 h-1]
   real(r8), pointer :: trcg_air2root_flx_vr(:,:)   => null()   !total internal root gas flux , [gC d-2 h-1]
@@ -760,7 +760,7 @@ implicit none
   allocate(this%trcg_rootml_pvr(idg_beg:idg_end-1,2,JZ1,JP1));this%trcg_rootml_pvr=spval
   allocate(this%trcs_rootml_pvr(idg_beg:idg_end-1,2,JZ1,JP1));this%trcs_rootml_pvr=spval
   allocate(this%TRootGasLossDisturb_pft(idg_beg:idg_end-1));this%TRootGasLossDisturb_pft=spval
-  allocate(this%ROXSK(60,0:JZ1)); this%ROXSK=spval
+  allocate(this%RO2UptkSoilM_vr(60,0:JZ1)); this%RO2UptkSoilM_vr=spval
   allocate(this%RootMycoExudElm_pvr(NumPlantChemElms,2,1:jcplx,0:JZ1,JP1));this%RootMycoExudElm_pvr=spval
   allocate(this%PlantRootSoilElmNetX_pft(NumPlantChemElms,JP1)); this%PlantRootSoilElmNetX_pft=spval
   allocate(this%PlantExudChemElmCum_pft(NumPlantChemElms,JP1));this%PlantExudChemElmCum_pft=spval
@@ -774,7 +774,7 @@ implicit none
   allocate(this%ZEROQ(JP1)); this%ZEROQ=spval
   allocate(this%RootRespPotent_pvr(jroots,JZ1,JP1)); this%RootRespPotent_pvr=spval
   allocate(this%RCO2N_pvr(jroots,JZ1,JP1)); this%RCO2N_pvr=spval
-  allocate(this%RCO2A_pvr(jroots,JZ1,JP1)); this%RCO2A_pvr=spval
+  allocate(this%RootCO2Autor_pvr(jroots,JZ1,JP1)); this%RootCO2Autor_pvr=spval
   allocate(this%RootNutUptake_pvr(ids_nutb_beg+1:ids_nuts_end,jroots,JZ1,JP1)); this%RootNutUptake_pvr=spval
   allocate(this%RootOUlmNutUptake_pvr(ids_nutb_beg+1:ids_nuts_end,jroots,JZ1,JP1));this%RootOUlmNutUptake_pvr=spval
   allocate(this%RootCUlmNutUptake_pvr(ids_nutb_beg+1:ids_nuts_end,jroots,JZ1,JP1));this%RootCUlmNutUptake_pvr=spval
@@ -805,8 +805,8 @@ implicit none
   allocate(this%CMinNH4Root_pft(jroots,JP1));this%CMinNH4Root_pft=spval
   allocate(this%VmaxNH4Root_pft(jroots,JP1));this%VmaxNH4Root_pft=spval
   allocate(this%KmNH4Root_pft(jroots,JP1));this%KmNH4Root_pft=spval
-  allocate(this%RCO2P_pvr(jroots,JZ1,JP1));this%RCO2P_pvr=spval
-  allocate(this%RUPOXP(jroots,JZ1,JP1));this%RUPOXP=spval
+  allocate(this%RootCO2Emis_pvr(jroots,JZ1,JP1));this%RootCO2Emis_pvr=spval
+  allocate(this%RootO2Uptk_pvr(jroots,JZ1,JP1));this%RootO2Uptk_pvr=spval
   allocate(this%RUPGasSol_vr(idg_beg:idg_end,jroots,JZ1,JP1));this%RUPGasSol_vr=spval
   end subroutine plt_rootbgc_init
 !----------------------------------------------------------------------
@@ -825,7 +825,7 @@ implicit none
 !  if(allocated(OXYP))deallocate(OXYP)
 !  if(allocated(OXYA))deallocate(OXYA)
 !  if(allocated(TRootN2Fix_pft))deallocate(TRootN2Fix_pft)
-!  if(allocated(ROXSK))deallocate(ROXSK)
+!  if(allocated(RO2UptkSoilM_vr))deallocate(RO2UptkSoilM_vr)
 !  if(allocated(RootMycoExudElm_pvr))deallocate(RootMycoExudElm_pvr)
 !  if(allocated(PlantRootSoilElmNetX_pft))deallocate(PlantRootSoilElmNetX_pft)
 !  if(allocated(PlantExudChemElmCum_pft))deallocate(PlantExudChemElmCum_pft)
@@ -839,9 +839,9 @@ implicit none
 !  if(allocated(ZEROQ))deallocate(ZEROQ)
 !  if(allocated(RootRespPotent_pvr))deallocate(RootRespPotent_pvr)
 !  if(allocated(RCO2N_pvr))deallocate(RCO2N_pvr)
-!  if(allocated(RCO2A_pvr))deallocate(RCO2A_pvr)
+!  if(allocated(RootCO2Autor_pvr))deallocate(RootCO2Autor_pvr)
 !  if(allocated(RCO2P))deallocate(RCO2P)
-!  if(allocated(RUPOXP))deallocate(RUPOXP)
+!  if(allocated(RootO2Uptk_pvr))deallocate(RootO2Uptk_pvr)
 !  if(allocated(RCO2S))deallocate(RCO2S)
 !  if(allocated(RUPOXS))deallocate(RUPOXS)
 !  if(allocated(RUPCHS))deallocate(RUPCHS)
@@ -966,7 +966,7 @@ implicit none
   class(plant_bgcrate_type) :: this
 
   allocate(this%TCO2P(JZ1)); this%TCO2P=spval
-  allocate(this%TUPOXP(JZ1)); this%TUPOXP=spval
+  allocate(this%TRO2Uptk_vr(JZ1)); this%TRO2Uptk_vr=spval
   allocate(this%RPO4Y(0:JZ1)); this%RPO4Y=spval
   allocate(this%RPOBY(0:JZ1)); this%RPOBY=spval
   allocate(this%RP14Y(0:JZ1)); this%RP14Y=spval

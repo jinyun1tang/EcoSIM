@@ -57,7 +57,7 @@ implicit none
     RootElms_pft                   =>  plt_biom%RootElms_pft           , &    
     ShootElms_brch                 =>  plt_biom%ShootElms_brch         , &
     ShootC4NonstC_brch             =>  plt_biom%ShootC4NonstC_brch     , &    
-    RCO2A_pvr                      =>  plt_rbgc%RCO2A_pvr              , & 
+    RootCO2Autor_pvr                      =>  plt_rbgc%RootCO2Autor_pvr              , & 
     ShootElms_pft                  =>  plt_biom%ShootElms_pft            &
   )
 
@@ -86,7 +86,7 @@ implicit none
   RootGrosRCO2_pft(NZ)=0._r8
   DO N=1,MY(NZ)
     DO L=NU,MaxSoiL4Root(NZ)
-      RootGrosRCO2_pft(NZ)=RootGrosRCO2_pft(NZ)+RCO2A_pvr(N,L,NZ)
+      RootGrosRCO2_pft(NZ)=RootGrosRCO2_pft(NZ)+RootCO2Autor_pvr(N,L,NZ)
     ENDDO     
   ENDDO  
 
@@ -277,7 +277,7 @@ implicit none
     GrossResp_pft           =>  plt_bgcr%GrossResp_pft           , &
     GrossCO2Fix_pft         =>  plt_bgcr%GrossCO2Fix_pft         , &    
     CanopyGrosRCO2_pft      =>  plt_bgcr%CanopyGrosRCO2_pft      , &               
-    RCO2A_pvr               =>  plt_rbgc%RCO2A_pvr               , &     
+    RootCO2Autor_pvr               =>  plt_rbgc%RootCO2Autor_pvr               , &     
     LitrfalStrutElms_pvr    =>  plt_bgcr%LitrfalStrutElms_pvr      &
   )  
   
@@ -291,7 +291,7 @@ implicit none
         ENDDO
       ENDDO
     ENDDO D1
-    RCO2A_pvr(1:MY(NZ),NU:MaxSoiL4Root(NZ),NZ)=0._r8
+    RootCO2Autor_pvr(1:MY(NZ),NU:MaxSoiL4Root(NZ),NZ)=0._r8
     NH3Dep2Can_pft(NZ)=0._r8
     GrossResp_pft(NZ)=0._r8
     GrossCO2Fix_pft(NZ)=0._r8    

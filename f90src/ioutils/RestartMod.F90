@@ -2877,16 +2877,16 @@ implicit none
 
   if(flag=='read')then
     datpr3 => datrp_3d(1:npfts,1:pltpar%jroots,1:JZ)
-    call restartvar(ncid, flag, varname='RCO2A_pvr', dim1name='pft',dim2name='rootyps',&
+    call restartvar(ncid, flag, varname='RootCO2Autor_pvr', dim1name='pft',dim2name='rootyps',&
      dim3name='levsoi',long_name='root respiration constrained by O2', units='g d-2 h-1', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval) 
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,RCO2A_pvr,datrp_3d,NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft) 
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,RootCO2Autor_pvr,datrp_3d,NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft) 
   else
-    !print*,'RCO2A_pvr'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,RCO2A_pvr,datrp_3d,NumActivePlants=NumActivePlants,&
+    !print*,'RootCO2Autor_pvr'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,RootCO2Autor_pvr,datrp_3d,NumActivePlants=NumActivePlants,&
       IsPlantActive_pft=IsPlantActive_pft)   
     datpr3 => datrp_3d(1:npfts,1:pltpar%jroots,1:JZ)
-    call restartvar(ncid, flag, varname='RCO2A_pvr', dim1name='pft',dim2name='rootyps',&
+    call restartvar(ncid, flag, varname='RootCO2Autor_pvr', dim1name='pft',dim2name='rootyps',&
      dim3name='levsoi',long_name='root respiration constrained by O2', units='g d-2 h-1', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval) 
   endif  

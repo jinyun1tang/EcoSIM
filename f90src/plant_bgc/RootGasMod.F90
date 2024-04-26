@@ -74,17 +74,17 @@ module RootGasMod
     ROXYF                      =>  plt_bgcr%ROXYF                    , &
     RCO2F                      =>  plt_bgcr%RCO2F                    , &
     ROXYL                      =>  plt_bgcr%ROXYL                    , &
-    RUPOXP                     =>  plt_rbgc%RUPOXP                   , &
+    RootO2Uptk_pvr             =>  plt_rbgc%RootO2Uptk_pvr           , &
     RAutoRootO2Limter_pvr      =>  plt_rbgc%RAutoRootO2Limter_pvr    , &
     ZEROQ                      =>  plt_rbgc%ZEROQ                    , &
     RootRespPotent_pvr         =>  plt_rbgc%RootRespPotent_pvr       , &
     RootO2Dmnd4Resp_pvr        =>  plt_rbgc%RootO2Dmnd4Resp_pvr      , &
-    ROXSK                      =>  plt_rbgc%ROXSK                    , &
-    RCO2P_pvr                  =>  plt_rbgc%RCO2P_pvr                , &
+    RO2UptkSoilM_vr            =>  plt_rbgc%RO2UptkSoilM_vr          , &
+    RootCO2Emis_pvr            =>  plt_rbgc%RootCO2Emis_pvr          , &
     trcg_air2root_flx__pvr     =>  plt_rbgc%trcg_air2root_flx__pvr   , &
     trcg_Root_DisEvap_flx_vr   =>  plt_rbgc%trcg_Root_DisEvap_flx_vr , &
     RUPGasSol_vr               =>  plt_rbgc%RUPGasSol_vr             , &
-    RCO2A_pvr                  =>  plt_rbgc%RCO2A_pvr                , &
+    RootCO2Autor_pvr                  =>  plt_rbgc%RootCO2Autor_pvr                , &
     trcg_rootml_pvr            =>  plt_rbgc%trcg_rootml_pvr          , &
     trcs_rootml_pvr            =>  plt_rbgc%trcs_rootml_pvr          , &
     TFND                       =>  plt_soilchem%TFND                 , &
@@ -208,7 +208,7 @@ module RootGasMod
 !     DF*A=root-atmosphere gas conductance
 !     DFGP=rate const for equilibrn of gas concn in gaseous-aqueous phases
 !     RCO2PX=root CO2 gas flux at time step for gas flux calculations
-!     RCO2A_pvr=root CO2 flux from grosub.f
+!     RootCO2Autor_pvr=root CO2 flux from grosub.f
 !
 
     IF(N.EQ.ipltroot.AND.iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).GT.0 &
@@ -227,7 +227,7 @@ module RootGasMod
     ENDIF
 
     DFGP=AMIN1(1.0,XNPD*SQRT(RootPorosity_pft(N,NZ))*TFND(L))
-    RCO2PX=-RCO2A_pvr(N,L,NZ)*dts_gas
+    RCO2PX=-RootCO2Autor_pvr(N,L,NZ)*dts_gas
 !
 !     SOLVE FOR GAS EXCHANGE IN SOIL AND ROOTS DURING ROOT UPTAKE
 !     AT SMALLER TIME STEP NPH
@@ -589,12 +589,12 @@ module RootGasMod
 !     ACCUMULATE SOIL-ROOT GAS EXCHANGE TO HOURLY TIME SCALE
 !
 !     RCO2P=root CO2 emission into root
-!     RUPOXP=root O2 uptake from root
-!     ROXSK=total O2 uptake from soil by all microbial,root popns
+!     RootO2Uptk_pvr=root O2 uptake from root
+!     RO2UptkSoilM_vr=total O2 uptake from soil by all microbial,root popns
 !
-          RCO2P_pvr(N,L,NZ)=RCO2P_pvr(N,L,NZ)+RCO2PX+RUPSolute(idg_CO2)
-          RUPOXP(N,L,NZ)=RUPOXP(N,L,NZ)-RUPSolute(idg_O2)
-          ROXSK(M,L)=ROXSK(M,L)+RUPOSX
+          RootCO2Emis_pvr(N,L,NZ)=RootCO2Emis_pvr(N,L,NZ)+RCO2PX+RUPSolute(idg_CO2)
+          RootO2Uptk_pvr(N,L,NZ)=RootO2Uptk_pvr(N,L,NZ)-RUPSolute(idg_O2)
+          RO2UptkSoilM_vr(M,L)=RO2UptkSoilM_vr(M,L)+RUPOSX
 
         ENDDO D90
       ENDIF
@@ -608,7 +608,7 @@ module RootGasMod
 !     RAutoRootO2Limter_pvr=constraint by O2 consumption on all root processes
 !     imposed by O2 uptake
 !
-    PopPlantO2Uptake_vr=RUPOXP(N,L,NZ)+RUPGasSol_vr(idg_O2,N,L,NZ)
+    PopPlantO2Uptake_vr=RootO2Uptk_pvr(N,L,NZ)+RUPGasSol_vr(idg_O2,N,L,NZ)
     RAutoRootO2Limter_pvr(N,L,NZ)=AMIN1(1.0_r8,AZMAX1(PopPlantO2Uptake_vr/RootO2Dmnd4Resp_pvr(N,L,NZ)))
 
   ELSE

@@ -398,7 +398,7 @@ module grosubsMod
     CanopyLeafCLyr_pft        =>  plt_biom%CanopyLeafCLyr_pft         , &
     iPlantTurnoverPattern_pft =>  plt_pheno%iPlantTurnoverPattern_pft , &
     iPlantRootProfile_pft     =>  plt_pheno%iPlantRootProfile_pft     , &
-    RCO2A_pvr                 =>  plt_rbgc%RCO2A_pvr                  , &
+    RootCO2Autor_pvr                 =>  plt_rbgc%RootCO2Autor_pvr                  , &
     RootRespPotent_pvr        =>  plt_rbgc%RootRespPotent_pvr         , &
     RCO2N_pvr                 =>  plt_rbgc%RCO2N_pvr                  , &
     RootrNC_pft               =>  plt_allom%RootrNC_pft               , &
@@ -437,7 +437,7 @@ module grosubsMod
       Root2ndXNum_pvr(N,L,NZ)=0._r8
       RootRespPotent_pvr(N,L,NZ)=0._r8
       RCO2N_pvr(N,L,NZ)=0._r8
-      RCO2A_pvr(N,L,NZ)=0._r8
+      RootCO2Autor_pvr(N,L,NZ)=0._r8
     ENDDO D6
   ENDDO D9
 !

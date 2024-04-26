@@ -3177,7 +3177,7 @@ module PlantBranchMod
     CO2NetFix_pft                      =>  plt_bgcr%CO2NetFix_pft               , &
     RootRespPotent_pvr                 =>  plt_rbgc%RootRespPotent_pvr          , &
     RCO2N_pvr                          =>  plt_rbgc%RCO2N_pvr                   , &
-    RCO2A_pvr                          =>  plt_rbgc%RCO2A_pvr                   , &
+    RootCO2Autor_pvr                          =>  plt_rbgc%RootCO2Autor_pvr                   , &
     ZERO                               =>  plt_site%ZERO                        , &
     NGTopRootLayer_pft                 =>  plt_morph%NGTopRootLayer_pft         , &
     C4PhotosynDowreg_brch              =>  plt_photo%C4PhotosynDowreg_brch        &
@@ -3311,14 +3311,14 @@ module PlantBranchMod
 ! RCO2GM,RgroCO2_ltd=growth respiration limited by N,P unltd,ltd by O2
 ! SNCRM,RMxess_brch=excess maintenance respiration unltd,ltd by O2
 ! CNRDM,RCO2NonstC4Nassim_brch=respiration for N assimilation unltd,ltd by O2
-! RCO2A_pvr=total root respiration
-! RootRespPotent_pvr,RCO2N_pvr=RCO2A_pvr unltd by O2,nonstructural C
+! RootCO2Autor_pvr=total root respiration
+! RootRespPotent_pvr,RCO2N_pvr=RootCO2Autor_pvr unltd by O2,nonstructural C
 !
   RCO2TM=RCO2Maint_brch+RCO2GM+SNCRM+CNRDM
   Rauto_brch=RCO2Maint_brch+RgroCO2_ltd+RMxess_brch+RCO2NonstC4Nassim_brch
   RootRespPotent_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)=RootRespPotent_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)+RCO2TM
   RCO2N_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)=RCO2N_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)+Rauto_brch
-  RCO2A_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)=RCO2A_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)-Rauto_brch
+  RootCO2Autor_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)=RootCO2Autor_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)-Rauto_brch
 
   end associate
   end subroutine ComputRAutoB4Emergence

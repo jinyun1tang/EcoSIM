@@ -451,7 +451,7 @@ module NoduleBGCMod
     RootRespPotent_pvr           =>   plt_rbgc%RootRespPotent_pvr     , &
     RCO2N_pvr                    =>   plt_rbgc%RCO2N_pvr     , &
     RAutoRootO2Limter_pvr        =>   plt_rbgc%RAutoRootO2Limter_pvr      , &
-    RCO2A_pvr                    =>   plt_rbgc%RCO2A_pvr     , &
+    RootCO2Autor_pvr                    =>   plt_rbgc%RootCO2Autor_pvr     , &
     NodulInfectElms_pft          =>   plt_bgcr%NodulInfectElms_pft  , &        
     LitrfalStrutElms_pvr         =>   plt_bgcr%LitrfalStrutElms_pvr      , &
     RootN2Fix_pft                =>   plt_rbgc%RootN2Fix_pft      , &
@@ -684,14 +684,14 @@ module NoduleBGCMod
 !     RespNonst_Oltd=respiration from non-structural C
 !     NoduleCResp=bacterial respiration for growth and N2 fixation
 !     NodulELmSenes2Recyc(ielmc)=bacterial C senescence to recycling
-!     RCO2A_pvr=total root respiration
-!     RootRespPotent_pvr,RCO2N_pvr,RCO2A_pvr unlimited by O2,nonstructural C
+!     RootCO2Autor_pvr=total root respiration
+!     RootRespPotent_pvr,RCO2N_pvr,RootCO2Autor_pvr unlimited by O2,nonstructural C
 !
         RCO2TM=AMIN1(Rmaint,RespNonst_OUltd)+RGNDLM+NodulELmSenes2Recyc(ielmc)
         RCO2T=AMIN1(Rmaint,RespNonst_Oltd)+NoduleCResp+NodulELmSenes2Recyc(ielmc)
         RootRespPotent_pvr(ipltroot,L,NZ)=RootRespPotent_pvr(ipltroot,L,NZ)+RCO2TM
         RCO2N_pvr(ipltroot,L,NZ)=RCO2N_pvr(ipltroot,L,NZ)+RCO2T
-        RCO2A_pvr(ipltroot,L,NZ)=RCO2A_pvr(ipltroot,L,NZ)-RCO2T
+        RootCO2Autor_pvr(ipltroot,L,NZ)=RootCO2Autor_pvr(ipltroot,L,NZ)-RCO2T
 !
 !     NODULE LitrFall CAUSED BY REMOBILIZATION
 !

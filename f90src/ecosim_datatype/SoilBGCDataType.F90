@@ -34,7 +34,7 @@ implicit none
   real(r8),target,allocatable :: CEC(:,:,:)            !soil cation exchange capacity	[cmol kg-1]
   real(r8),target,allocatable :: AEC(:,:,:)            !soil anion exchange capacity	[cmol kg-1]
 
-  real(r8),target,allocatable ::  ROXSK(:,:,:,:)                     !total O2 sink, [g d-2 t-1]
+  real(r8),target,allocatable ::  RO2UptkSoilM_vr(:,:,:,:)                     !total O2 sink, [g d-2 t-1]
   real(r8),target,allocatable ::  SurfGasFlx_col(:,:,:)                  !soil gas flux, [g d-2 h-1]
   real(r8),target,allocatable ::  AmendCFlx_col(:,:)                         !total C amendment, [g d-2]
   real(r8),target,allocatable ::  FertNFlx_col(:,:)                        !total fertilizer N amendment, [g d-2]
@@ -136,7 +136,7 @@ implicit none
   allocate(CEC(JZ,JY,JX));CEC(JZ,JY,JX)=0._r8
   allocate(AEC(JZ,JY,JX));AEC(JZ,JY,JX)=0._r8
 
-  allocate(ROXSK(60,0:JZ,JY,JX));ROXSK=0._r8
+  allocate(RO2UptkSoilM_vr(60,0:JZ,JY,JX));RO2UptkSoilM_vr=0._r8
   allocate(SurfGasFlx_col(idg_beg:idg_NH3,JY,JX));  SurfGasFlx_col=0._r8
   allocate(AmendCFlx_col(JY,JX));       AmendCFlx_col=0._r8
   allocate(FertNFlx_col(JY,JX));      FertNFlx_col=0._r8
@@ -231,7 +231,7 @@ implicit none
   call destroy(CEC)
   call destroy(AEC)
   call destroy(CPO4S)
-  call destroy(ROXSK)
+  call destroy(RO2UptkSoilM_vr)
   call destroy(AmendCFlx_col)
   call destroy(FertNFlx_col)
   call destroy(FerPFlx_col)

@@ -161,7 +161,7 @@ module InsideTranspMod
     DO nsolutes=ids_nut_beg,ids_nuts_end
       trc_solml_vr2(nsolutes,0,NY,NX)=trc_solml_vr2(nsolutes,0,NY,NX)-RBGCSinkS(nsolutes,0,NY,NX)
     ENDDO
-    RBGCSinkG(idg_O2,0,NY,NX)=ROXSK(M,0,NY,NX)*dt_GasCyc
+    RBGCSinkG(idg_O2,0,NY,NX)=RO2UptkSoilM_vr(M,0,NY,NX)*dt_GasCyc
   ENDIF
 
   DO ngases=idg_beg,idg_NH3
@@ -206,7 +206,7 @@ module InsideTranspMod
         trc_solml_vr2(nsolutes,L,NY,NX)=trc_solml_vr2(nsolutes,L,NY,NX)-RBGCSinkS(nsolutes,L,NY,NX)
       ENDDO
 
-      RBGCSinkG(idg_O2,L,NY,NX)=ROXSK(M,L,NY,NX)*dt_GasCyc
+      RBGCSinkG(idg_O2,L,NY,NX)=RO2UptkSoilM_vr(M,L,NY,NX)*dt_GasCyc
     ENDIF
 !
 !     SOIL GAS FLUX ACCUMULATORS

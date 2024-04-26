@@ -442,7 +442,7 @@ implicit none
   RIPBOff(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RIPBOff(1:NumMicrobAutrophCmplx)
   RIPO1ff(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RIPO1ff(1:NumMicrobAutrophCmplx)
   RIPB1ff(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RIPB1ff(1:NumMicrobAutrophCmplx)
-  ROXSK(1:NPH,L,NY,NX)=micflx%ROXSK(1:NPH)
+  RO2UptkSoilM_vr(1:NPH,L,NY,NX)=micflx%ROXSK(1:NPH)
 
   TFNQ(L,NY,NX)=micstt%TFNQ
   VOLQ(L,NY,NX)=micstt%VOLQ

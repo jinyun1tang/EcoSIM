@@ -103,7 +103,7 @@ implicit none
       RDOM_micb_flx(idom_dop,K,L,NY,NX)=plt_bgcr%RDOM_micb_flx(idom_dop,K,L)
     ENDDO
     DO M=1,NPH
-      ROXSK(M,L,NY,NX)=plt_rbgc%ROXSK(M,L)
+      RO2UptkSoilM_vr(M,L,NY,NX)=plt_rbgc%RO2UptkSoilM_vr(M,L)
     ENDDO
   ENDDO
 
@@ -133,7 +133,7 @@ implicit none
     trcg_TLP(idg_beg:idg_end-1,L,NY,NX)=plt_rbgc%trcg_TLP(idg_beg:idg_end-1,L)
     trcg_air2root_flx_vr(idg_beg:idg_end-1,L,NY,NX)=plt_rbgc%trcg_air2root_flx_vr(idg_beg:idg_end-1,L)
     TCO2P(L,NY,NX) =plt_bgcr%TCO2P(L)
-    TUPOXP(L,NY,NX)=plt_bgcr%TUPOXP(L)
+    TRO2Uptk_vr(L,NY,NX)=plt_bgcr%TRO2Uptk_vr(L)
     
     trcs_plant_uptake_vr(ids_beg:ids_end,L,NY,NX) =plt_rbgc%trcs_plant_uptake_vr(ids_beg:ids_end,L)
     DO  K=1,jcplx
@@ -474,9 +474,9 @@ implicit none
         Root2ndAveLen_pvr(N,L,NZ,NY,NX) =plt_morph%Root2ndAveLen_pvr(N,L,NZ)
         RootRespPotent_pvr(N,L,NZ,NY,NX) =plt_rbgc%RootRespPotent_pvr(N,L,NZ)
         RCO2N_pvr(N,L,NZ,NY,NX) =plt_rbgc%RCO2N_pvr(N,L,NZ)
-        RCO2A_pvr(N,L,NZ,NY,NX) =plt_rbgc%RCO2A_pvr(N,L,NZ)
-        RCO2P_pvr(N,L,NZ,NY,NX) =plt_rbgc%RCO2P_pvr(N,L,NZ)
-        RUPOXP(N,L,NZ,NY,NX)=plt_rbgc%RUPOXP(N,L,NZ)
+        RootCO2Autor_pvr(N,L,NZ,NY,NX) =plt_rbgc%RootCO2Autor_pvr(N,L,NZ)
+        RootCO2Emis_pvr(N,L,NZ,NY,NX) =plt_rbgc%RootCO2Emis_pvr(N,L,NZ)
+        RootO2Uptk_pvr(N,L,NZ,NY,NX)=plt_rbgc%RootO2Uptk_pvr(N,L,NZ)
         RUPGasSol_vr(idg_CO2,N,L,NZ,NY,NX) =plt_rbgc%RUPGasSol_vr(idg_CO2,N,L,NZ)
         RUPGasSol_vr(idg_O2,N,L,NZ,NY,NX)=plt_rbgc%RUPGasSol_vr(idg_O2,N,L,NZ)
         RUPGasSol_vr(idg_CH4,N,L,NZ,NY,NX)=plt_rbgc%RUPGasSol_vr(idg_CH4,N,L,NZ)
@@ -969,7 +969,7 @@ implicit none
     plt_rbgc%trcg_TLP(idg_beg:idg_end-1,L)=trcg_TLP(idg_beg:idg_end-1,L,NY,NX)
     plt_rbgc%trcg_air2root_flx_vr(idg_beg:idg_end-1,L)=trcg_air2root_flx_vr(idg_beg:idg_end-1,L,NY,NX)
     plt_bgcr%TCO2P(L) =TCO2P(L,NY,NX)
-    plt_bgcr%TUPOXP(L)=TUPOXP(L,NY,NX)
+    plt_bgcr%TRO2Uptk_vr(L)=TRO2Uptk_vr(L,NY,NX)
     DO  K=1,jcplx
       plt_bgcr%TDFOME(1:NumPlantChemElms,K,L)=TDFOME(1:NumPlantChemElms,K,L,NY,NX)
     ENDDO
@@ -1318,7 +1318,7 @@ implicit none
         plt_rbgc%RootCUlmNutUptake_pvr(ids_H2PO4B,N,L,NZ)=RootCUlmNutUptake_pvr(ids_H2PO4B,N,L,NZ,NY,NX)
         plt_rbgc%RootRespPotent_pvr(N,L,NZ)=RootRespPotent_pvr(N,L,NZ,NY,NX)
         plt_rbgc%RCO2N_pvr(N,L,NZ)=RCO2N_pvr(N,L,NZ,NY,NX)
-        plt_rbgc%RCO2A_pvr(N,L,NZ)=RCO2A_pvr(N,L,NZ,NY,NX)
+        plt_rbgc%RootCO2Autor_pvr(N,L,NZ)=RootCO2Autor_pvr(N,L,NZ,NY,NX)
         plt_morph%Root1stXNumL_pvr(N,L,NZ)=Root1stXNumL_pvr(N,L,NZ,NY,NX)
         plt_morph%Root2ndXNum_pvr(N,L,NZ)=Root2ndXNum_pvr(N,L,NZ,NY,NX)
         plt_morph%RootLenPerPlant_pvr(N,L,NZ)=RootLenPerPlant_pvr(N,L,NZ,NY,NX)
@@ -1329,8 +1329,8 @@ implicit none
         plt_morph%Root2ndRadius_pvr(N,L,NZ)=Root2ndRadius_pvr(N,L,NZ,NY,NX)
         plt_morph%RootAreaPerPlant_pvr(N,L,NZ)=RootAreaPerPlant_pvr(N,L,NZ,NY,NX)
         plt_morph%Root2ndAveLen_pvr(N,L,NZ)=Root2ndAveLen_pvr(N,L,NZ,NY,NX)
-        plt_rbgc%RCO2P_pvr(N,L,NZ)=RCO2P_pvr(N,L,NZ,NY,NX)
-        plt_rbgc%RUPOXP(N,L,NZ)=RUPOXP(N,L,NZ,NY,NX)
+        plt_rbgc%RootCO2Emis_pvr(N,L,NZ)=RootCO2Emis_pvr(N,L,NZ,NY,NX)
+        plt_rbgc%RootO2Uptk_pvr(N,L,NZ)=RootO2Uptk_pvr(N,L,NZ,NY,NX)
         plt_rbgc%RUPGasSol_vr(idg_CO2,N,L,NZ)=RUPGasSol_vr(idg_CO2,N,L,NZ,NY,NX)
         plt_rbgc%RUPGasSol_vr(idg_O2,N,L,NZ)=RUPGasSol_vr(idg_O2,N,L,NZ,NY,NX)
         plt_rbgc%RUPGasSol_vr(idg_CH4,N,L,NZ)=RUPGasSol_vr(idg_CH4,N,L,NZ,NY,NX)
@@ -1419,7 +1419,7 @@ implicit none
 
   DO L=1,NL(NY,NX)
     DO M=1,NPH
-      plt_rbgc%ROXSK(M,L)=ROXSK(M,L,NY,NX)
+      plt_rbgc%RO2UptkSoilM_vr(M,L)=RO2UptkSoilM_vr(M,L,NY,NX)
       plt_soilchem%THETPM(M,L)=THETPM(M,L,NY,NX)
     ENDDO
   ENDDO

@@ -155,17 +155,16 @@ type, public :: NitroAQMFluxDiagType
   real(r8),allocatable :: RIP1B(:,:)
   real(r8),allocatable :: RIP14R(:,:)
 
-  real(r8),allocatable :: RUPOXff(:)
+  real(r8),allocatable :: RO2UptkAutor(:)
   real(r8),allocatable :: RGN2Fff(:)
   real(r8),allocatable :: RGOMOff(:)
   real(r8),allocatable :: RO2Dmnd4RespAutor(:)
   real(r8),allocatable :: RO2DmndAutor(:)
   real(r8),allocatable :: RO2Uptk4RespAutor(:)
-  real(r8),allocatable :: RDNO3ff(:)
+  real(r8),allocatable :: RNO3UptkAutor(:)
   real(r8),allocatable :: RDNOBff(:)
   real(r8),allocatable :: RDNO2ff(:)
   real(r8),allocatable :: RDN2Bff(:)
-  real(r8),allocatable :: RDN2Off(:)
   real(r8),allocatable :: RGOMDff(:)
   real(r8),allocatable :: RMaintCompAutor(:,:)
   real(r8),allocatable :: RINH4ff(:)
@@ -391,17 +390,16 @@ type, public :: NitroAQMFluxDiagType
   allocate(this%ROQCD(NumMicrbHetetrophCmplx,1:jcplx));this%ROQCD=spval
   allocate(this%RCCMEheter(NumPlantChemElms,ndbiomcp,NumMicrbHetetrophCmplx,1:jcplx));this%RCCMEheter=spval
 
-  allocate(this%RUPOXff(NumMicrobAutrophCmplx));this%RUPOXff=spval
+  allocate(this%RO2UptkAutor(NumMicrobAutrophCmplx));this%RO2UptkAutor=spval
   allocate(this%RGN2Fff(NumMicrobAutrophCmplx));this%RGN2Fff=spval
   allocate(this%RGOMOff(NumMicrobAutrophCmplx));this%RGOMOff=spval
   allocate(this%RO2Dmnd4RespAutor(NumMicrobAutrophCmplx));this%RO2Dmnd4RespAutor=spval
   allocate(this%RO2DmndAutor(NumMicrobAutrophCmplx));this%RO2DmndAutor=spval
   allocate(this%RO2Uptk4RespAutor(NumMicrobAutrophCmplx));this%RO2Uptk4RespAutor=spval
-  allocate(this%RDNO3ff(NumMicrobAutrophCmplx));this%RDNO3ff=spval
+  allocate(this%RNO3UptkAutor(NumMicrobAutrophCmplx));this%RNO3UptkAutor=spval
   allocate(this%RDNOBff(NumMicrobAutrophCmplx));this%RDNOBff=spval
   allocate(this%RDNO2ff(NumMicrobAutrophCmplx));this%RDNO2ff=spval
   allocate(this%RDN2Bff(NumMicrobAutrophCmplx));this%RDN2Bff=spval
-  allocate(this%RDN2Off(NumMicrobAutrophCmplx));this%RDN2Off=spval
   allocate(this%RGOMDff(NumMicrobAutrophCmplx));this%RGOMDff=spval
   allocate(this%RMaintCompAutor(2,NumMicrobAutrophCmplx));this%RMaintCompAutor=spval
   allocate(this%RINH4ff(NumMicrobAutrophCmplx));this%RINH4ff=spval
@@ -546,17 +544,16 @@ type, public :: NitroAQMFluxDiagType
   this%RIP1B = 0._r8
   this%RIP14R = 0._r8
 
-  this%RUPOXff = 0._r8
+  this%RO2UptkAutor = 0._r8
   this%RGN2Fff = 0._r8
   this%RGOMOff = 0._r8
   this%RO2Dmnd4RespAutor = 0._r8
   this%RO2DmndAutor = 0._r8
   this%RO2Uptk4RespAutor = 0._r8
-  this%RDNO3ff = 0._r8
+  this%RNO3UptkAutor = 0._r8
   this%RDNOBff = 0._r8
   this%RDNO2ff = 0._r8
   this%RDN2Bff = 0._r8
-  this%RDN2Off = 0._r8
   this%RGOMDff = 0._r8
   this%RMaintCompAutor = 0._r8
   this%RINH4ff = 0._r8
@@ -660,17 +657,16 @@ type, public :: NitroAQMFluxDiagType
   call destroy(this%RIP1B)
   call destroy(this%RIP14R)
 
-  call destroy(this%RUPOXff)
+  call destroy(this%RO2UptkAutor)
   call destroy(this%RGN2Fff)
   call destroy(this%RGOMOff)
   call destroy(this%RO2Dmnd4RespAutor)
   call destroy(this%RO2DmndAutor)
   call destroy(this%RO2Uptk4RespAutor)
-  call destroy(this%RDNO3ff)
+  call destroy(this%RNO3UptkAutor)
   call destroy(this%RDNOBff)
   call destroy(this%RDNO2ff)
   call destroy(this%RDN2Bff)
-  call destroy(this%RDN2Off)
   call destroy(this%RGOMDff)
   call destroy(this%RMaintCompAutor)
   call destroy(this%RINH4ff)

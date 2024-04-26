@@ -145,10 +145,10 @@ module ExtractsMod
     RUPP1B                   => plt_rbgc%RUPP1B , &
     RUPP2B                   => plt_rbgc%RUPP2B , &
     RUNNXP                   => plt_rbgc%RUNNXP , &
-    RUPOXP                   => plt_rbgc%RUPOXP , &
+    RootO2Uptk_pvr                   => plt_rbgc%RootO2Uptk_pvr , &
     trcg_Root_DisEvap_flx_vr => plt_rbgc%trcg_Root_DisEvap_flx_vr , &
     trcg_air2root_flx__pvr   => plt_rbgc%trcg_air2root_flx__pvr , &
-    RCO2P_pvr                => plt_rbgc%RCO2P_pvr , &
+    RootCO2Emis_pvr                => plt_rbgc%RootCO2Emis_pvr , &
     RUPGasSol_vr             => plt_rbgc%RUPGasSol_vr , &
     RootNutUptake_pvr        => plt_rbgc%RootNutUptake_pvr , &
     trcg_air2root_flx_vr     => plt_rbgc%trcg_air2root_flx_vr , &
@@ -169,7 +169,7 @@ module ExtractsMod
     RNHBX                    => plt_bgcr%RNHBX  , &
     ROXYX                    => plt_bgcr%ROXYX  , &
     TDFOME                   => plt_bgcr%TDFOME , &
-    TUPOXP                   => plt_bgcr%TUPOXP , &
+    TRO2Uptk_vr                   => plt_bgcr%TRO2Uptk_vr , &
     TCO2P                    => plt_bgcr%TCO2P  , &
     RPOBX                    => plt_bgcr%RPOBX  , &
     RP1BX                    => plt_bgcr%RP1BX  , &
@@ -219,8 +219,8 @@ module ExtractsMod
           +trcg_air2root_flx__pvr(NTG,N,L,NZ)-trcg_Root_DisEvap_flx_vr(NTG,N,L,NZ)
       ENDDO
 
-      trcs_rootml_pvr(idg_CO2,N,L,NZ)=trcs_rootml_pvr(idg_CO2,N,L,NZ)+trcg_Root_DisEvap_flx_vr(idg_CO2,N,L,NZ)+RCO2P_pvr(N,L,NZ)
-      trcs_rootml_pvr(idg_O2,N,L,NZ)=trcs_rootml_pvr(idg_O2,N,L,NZ)+trcg_Root_DisEvap_flx_vr(idg_O2,N,L,NZ)-RUPOXP(N,L,NZ)
+      trcs_rootml_pvr(idg_CO2,N,L,NZ)=trcs_rootml_pvr(idg_CO2,N,L,NZ)+trcg_Root_DisEvap_flx_vr(idg_CO2,N,L,NZ)+RootCO2Emis_pvr(N,L,NZ)
+      trcs_rootml_pvr(idg_O2,N,L,NZ)=trcs_rootml_pvr(idg_O2,N,L,NZ)+trcg_Root_DisEvap_flx_vr(idg_O2,N,L,NZ)-RootO2Uptk_pvr(N,L,NZ)
       trcs_rootml_pvr(idg_CH4,N,L,NZ)=trcs_rootml_pvr(idg_CH4,N,L,NZ) &
         +trcg_Root_DisEvap_flx_vr(idg_CH4,N,L,NZ)+RUPGasSol_vr(idg_CH4,N,L,NZ)
       trcs_rootml_pvr(idg_N2O,N,L,NZ)=trcs_rootml_pvr(idg_N2O,N,L,NZ) &
@@ -254,8 +254,8 @@ module ExtractsMod
         trcg_air2root_flx_vr(NTG,L)=trcg_air2root_flx_vr(NTG,L)+trcg_air2root_flx__pvr(NTG,N,L,NZ)
       ENDDO
 
-      TCO2P(L)=TCO2P(L)-RCO2P_pvr(N,L,NZ)
-      TUPOXP(L)=TUPOXP(L)+RUPOXP(N,L,NZ)
+      TCO2P(L)=TCO2P(L)-RootCO2Emis_pvr(N,L,NZ)
+      TRO2Uptk_vr(L)=TRO2Uptk_vr(L)+RootO2Uptk_pvr(N,L,NZ)
       trcs_plant_uptake_vr(idg_CO2,L)=trcs_plant_uptake_vr(idg_CO2,L)+RUPGasSol_vr(idg_CO2,N,L,NZ)
       trcs_plant_uptake_vr(idg_O2,L)=trcs_plant_uptake_vr(idg_O2,L)+RUPGasSol_vr(idg_O2,N,L,NZ)
       trcs_plant_uptake_vr(idg_CH4,L)=trcs_plant_uptake_vr(idg_CH4,L)+RUPGasSol_vr(idg_CH4,N,L,NZ)

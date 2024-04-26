@@ -416,7 +416,7 @@ implicit none
     Root2ndRadius_pvr               =>  plt_morph%Root2ndRadius_pvr            , &    
     PSIRoot_pvr                     =>  plt_ew%PSIRoot_pvr                     , &    
     PSIRootTurg_vr                  =>  plt_ew%PSIRootTurg_vr                  , &    
-    RCO2A_pvr                       =>  plt_rbgc%RCO2A_pvr                     , &
+    RootCO2Autor_pvr                       =>  plt_rbgc%RootCO2Autor_pvr                     , &
     RCO2N_pvr                       =>  plt_rbgc%RCO2N_pvr                     , &
     RootRespPotent_pvr              =>  plt_rbgc%RootRespPotent_pvr            , &
     RAutoRootO2Limter_pvr           =>  plt_rbgc%RAutoRootO2Limter_pvr         , &
@@ -759,14 +759,14 @@ implicit none
 !     RGrowCO2_OUltd,RGrowCO2_Oltd=growth respiration limited by N,P unltd,ltd by O2
 !     RCO2Nonst4Xmaint2nd_OUltd,RCO2Nonst4Xmaint2nd_Oltd=excess maintenance respiration unltd,ltd by O2
 !     RCO2Nonst4Nassim_OUltd,RCO2Nonst4Nassim_Oltd=respiration for N assimilation unltd,ltd by O2
-!     RCO2A_pvr=total root respiration
-!     RootRespPotent_pvr,RCO2N_pvr=RCO2A_pvr unltd by O2,nonstructural C
+!     RootCO2Autor_pvr=total root respiration
+!     RootRespPotent_pvr,RCO2N_pvr=RootCO2Autor_pvr unltd by O2,nonstructural C
 !
       RCO2T2nd_OUltd=AMIN1(Rmaint2nd_CO2,RNonstCO2_OUltd)+RGrowCO2_OUltd+RCO2Nonst4Nassim_OUltd+RCO2Nonst4Xmaint2nd_OUltd
       RCO2T2nd_Oltd=AMIN1(Rmaint2nd_CO2,RNonstCO2_Oltd)+RGrowCO2_Oltd+RCO2Nonst4Nassim_Oltd+RCO2Nonst4Xmaint2nd_Oltd
       RootRespPotent_pvr(N,L,NZ)=RootRespPotent_pvr(N,L,NZ)+RCO2T2nd_OUltd
       RCO2N_pvr(N,L,NZ)=RCO2N_pvr(N,L,NZ)+RCO2T2nd_Oltd
-      RCO2A_pvr(N,L,NZ)=RCO2A_pvr(N,L,NZ)-RCO2T2nd_Oltd
+      RootCO2Autor_pvr(N,L,NZ)=RootCO2Autor_pvr(N,L,NZ)-RCO2T2nd_Oltd
       RCO2flx=RCO2flx-RCO2T2nd_Oltd
       RootMycoNonstElms_rpvr(ielmc,N,L,NZ)=RootMycoNonstElms_rpvr(ielmc,N,L,NZ)-RCO2T2nd_Oltd
 !
@@ -899,7 +899,7 @@ implicit none
   
   associate(                                                                       &
     ZERO                            =>  plt_site%ZERO                            , &  
-    RCO2A_pvr                       =>  plt_rbgc%RCO2A_pvr                       , &
+    RootCO2Autor_pvr                       =>  plt_rbgc%RootCO2Autor_pvr                       , &
     RCO2N_pvr                       =>  plt_rbgc%RCO2N_pvr                       , &    
     RootRespPotent_pvr              =>  plt_rbgc%RootRespPotent_pvr              , &        
     LitrfalStrutElms_pvr            =>  plt_bgcr%LitrfalStrutElms_pvr            , &    
@@ -1107,8 +1107,8 @@ implicit none
 !     RNonstCO2_OUltd,RNonstCO2_Oltd=respiration from non-structural C unltd,ltd by O2
 !     RGrowCO2_OUltd,RGrowCO2_Oltd=growth respiration limited by N,P unltd,ltd by O2
 !     RCO2Nonst4Nassim_OUltd,RCO2Nonst4Nassim_Oltd=respiration for N assimilation unltd,ltd by O2
-!     RCO2A_pvr=total root respiration
-!     RootRespPotent_pvr,RCO2N_pvr=RCO2A_pvr unltd by O2,nonstructural C
+!     RootCO2Autor_pvr=total root respiration
+!     RootRespPotent_pvr,RCO2N_pvr=RootCO2Autor_pvr unltd by O2,nonstructural C
 !
       dRootMycoElms=0._r8
       RCO2T1st_OUltd=AMIN1(Rmaint1st_CO2,RNonstCO2_OUltd)+RGrowCO2_OUltd+RCO2Nonst4Nassim_OUltd
@@ -1132,8 +1132,8 @@ implicit none
 !     Root1stLen_rpvr=primary root length
 !     SeedDepth_pft=seeding depth
 !     FRCO2=fraction of primary root respiration attributed to layer
-!     RCO2A_pvr=total root respiration
-!     RootRespPotent_pvr,RCO2N_pvr=RCO2A_pvr unltd by O2,nonstructural C
+!     RootCO2Autor_pvr=total root respiration
+!     RootRespPotent_pvr,RCO2N_pvr=RootCO2Autor_pvr unltd by O2,nonstructural C
 !     RCO2T1st_OUltd,RCO2T1st_Oltd=total C respiration unltd,ltd by O2
 !
       IF(Root1stDepz_pft(N,NR,NZ).GT.CumSoilThickness(NGTopRootLayer_pft(NZ)))THEN
@@ -1147,13 +1147,13 @@ implicit none
           TFRCO2=TFRCO2+FRCO2
           RootRespPotent_pvr(N,LL,NZ)=RootRespPotent_pvr(N,LL,NZ)+RCO2T1st_OUltd*FRCO2
           RCO2N_pvr(N,LL,NZ)=RCO2N_pvr(N,LL,NZ)+RCO2T1st_Oltd*FRCO2
-          RCO2A_pvr(N,LL,NZ)=RCO2A_pvr(N,LL,NZ)-RCO2T1st_Oltd*FRCO2
+          RootCO2Autor_pvr(N,LL,NZ)=RootCO2Autor_pvr(N,LL,NZ)-RCO2T1st_Oltd*FRCO2
           RCO2flx=RCO2flx-RCO2T1st_Oltd*FRCO2
         ENDDO D5100
       ELSE
         RootRespPotent_pvr(N,L,NZ)=RootRespPotent_pvr(N,L,NZ)+RCO2T1st_OUltd
         RCO2N_pvr(N,L,NZ)=RCO2N_pvr(N,L,NZ)+RCO2T1st_Oltd
-        RCO2A_pvr(N,L,NZ)=RCO2A_pvr(N,L,NZ)-RCO2T1st_Oltd
+        RootCO2Autor_pvr(N,L,NZ)=RootCO2Autor_pvr(N,L,NZ)-RCO2T1st_Oltd
         RCO2flx=RCO2flx-RCO2T1st_Oltd
       ENDIF
 !
@@ -1889,7 +1889,7 @@ implicit none
     ShutRutNonstructElmntConducts_pft  =>   plt_pheno%ShutRutNonstructElmntConducts_pft  , &
     iPlantCalendar_brch                =>   plt_pheno%iPlantCalendar_brch                , &
     Hours2LeafOut_brch                 =>   plt_pheno%Hours2LeafOut_brch                 , &
-    RCO2A_pvr                          =>   plt_rbgc%RCO2A_pvr                           , &
+    RootCO2Autor_pvr                          =>   plt_rbgc%RootCO2Autor_pvr                           , &
     ECO_ER_col                         =>   plt_bgcr%ECO_ER_col                          , &
     Eco_AutoR_col                      =>   plt_bgcr%Eco_AutoR_col                       , &
     NU                                 =>   plt_site%NU                                  , &
@@ -2107,7 +2107,7 @@ implicit none
 !     RootMycoActiveBiomC_pvr,WTRTD=active,actual root C mass
 !     WTRT1,WTRT2=primary,secondary root C mass in soil layer
 !     GrossResp_pft=total PFT respiration
-!     RCO2A_pvr=total root respiration
+!     RootCO2Autor_pvr=total root respiration
 !     ECO_ER_col=ecosystem respiration
 !     Eco_AutoR_col=total autotrophic respiration
 !
@@ -2120,8 +2120,8 @@ implicit none
         PopuRootMycoC_pvr(N,L,NZ)=PopuRootMycoC_pvr(N,L,NZ)+RootMyco2ndStrutElms_rpvr(ielmc,N,L,NR,NZ) &
           +RootMyco1stStrutElms_rpvr(ielmc,N,L,NR,NZ)
       ENDDO D5460
-      ECO_ER_col=ECO_ER_col+RCO2A_pvr(N,L,NZ)
-      Eco_AutoR_col=Eco_AutoR_col+RCO2A_pvr(N,L,NZ)
+      ECO_ER_col=ECO_ER_col+RootCO2Autor_pvr(N,L,NZ)
+      Eco_AutoR_col=Eco_AutoR_col+RootCO2Autor_pvr(N,L,NZ)
     ENDDO D5450
 
     DO  NR=1,NumRootAxes_pft(NZ)
@@ -2288,7 +2288,7 @@ implicit none
     RootMycoExudElm_pvr       =>   plt_rbgc%RootMycoExudElm_pvr       , &
     RCO2N_pvr                 =>   plt_rbgc%RCO2N_pvr                 , &
     RootRespPotent_pvr        =>   plt_rbgc%RootRespPotent_pvr        , &
-    RCO2A_pvr                 =>   plt_rbgc%RCO2A_pvr                 , &
+    RootCO2Autor_pvr                 =>   plt_rbgc%RootCO2Autor_pvr                 , &
     CanPHeight4WatUptake      =>   plt_morph%CanPHeight4WatUptake     , &
     MY                        =>   plt_morph%MY                       , &
     Root1stRadius_pvr         =>   plt_morph%Root1stRadius_pvr        , &
@@ -2343,15 +2343,15 @@ implicit none
 !
 !     ACCUMULATE RESPIRATION IN FLUX ARRAYS
 !
-!     RCO2A_pvr=total root respiration
-!     RootRespPotent_pvr,RCO2N_pvr=RCO2A_pvr unltd by O2,nonstructural C
+!     RootCO2Autor_pvr=total root respiration
+!     RootRespPotent_pvr,RCO2N_pvr=RootCO2Autor_pvr unltd by O2,nonstructural C
 !     RecoRootMycoC4Nup=C respiration for nutrient uptake
 !     CUPRO,CUPRC=RecoRootMycoC4Nup unlimited by O2,root nonstructural C
 !     CPOOLR=non-structural C mass in root
 !
         RootRespPotent_pvr(N,L,NZ)=RootRespPotent_pvr(N,L,NZ)+CUPRO
         RCO2N_pvr(N,L,NZ)=RCO2N_pvr(N,L,NZ)+CUPRC
-        RCO2A_pvr(N,L,NZ)=RCO2A_pvr(N,L,NZ)-RecoRootMycoC4Nup
+        RootCO2Autor_pvr(N,L,NZ)=RootCO2Autor_pvr(N,L,NZ)-RecoRootMycoC4Nup
         RootMycoNonstElms_rpvr(ielmc,N,L,NZ)=RootMycoNonstElms_rpvr(ielmc,N,L,NZ)-RecoRootMycoC4Nup
         RCO2flx=RCO2flx-RecoRootMycoC4Nup
 

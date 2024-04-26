@@ -1868,12 +1868,11 @@ module MicBGCMod
     VOLWZ  =>  nmicdiag%VOLWZ, &
     CGOMEautor  => nmicf%CGOMEautor,     &
     RH2GXff  => nmicf%RH2GXff,     &
-    RDN2Off => nmicf%RDN2Off,    &
     RDN2Bff => nmicf%RDN2Bff ,   &
-    RDNO3ff => nmicf%RDNO3ff ,     &
+    RNO3UptkAutor => nmicf%RNO3UptkAutor ,     &
     RCH4Xff  => nmicf%RCH4Xff ,    &
     RDNO2ff => nmicf%RDNO2ff ,     &
-    RUPOXff  => nmicf%RUPOXff,     &
+    RO2UptkAutor  => nmicf%RO2UptkAutor,     &
     RGOMDff  => nmicf%RGOMDff,     &
     RCO2Xff  => nmicf%RCO2Xff  ,   &
     RIP14Rff  => nmicf%RIP14Rff,   &
@@ -1974,12 +1973,11 @@ module MicBGCMod
         naqfdiag%TRGOM=naqfdiag%TRGOM+RCO2Xff(NGL)
         naqfdiag%TRGOC=naqfdiag%TRGOC+RCH4Xff(NGL)
         naqfdiag%TRGOD=naqfdiag%TRGOD+RGOMDff(NGL)
-        naqfdiag%TUPOX=naqfdiag%TUPOX+RUPOXff(NGL)
-        naqfdiag%TRDN3=naqfdiag%TRDN3+RDNO3ff(NGL)
+        naqfdiag%TUPOX=naqfdiag%TUPOX+RO2UptkAutor(NGL)
+        naqfdiag%TRDN3=naqfdiag%TRDN3+RNO3UptkAutor(NGL)
         naqfdiag%TRDNB=naqfdiag%TRDNB+RDNOBff(NGL)
         naqfdiag%TRDN2=naqfdiag%TRDN2+RDNO2ff(NGL)
         naqfdiag%TRD2B=naqfdiag%TRD2B+RDN2Bff(NGL)
-        naqfdiag%TRDNO=naqfdiag%TRDNO+RDN2Off(NGL)
         naqfdiag%TRGOH=naqfdiag%TRGOH+RH2GXff(NGL)
       ENDDO
     ENDIF
@@ -2579,10 +2577,10 @@ module MicBGCMod
   real(r8) :: OQCZ1
   real(r8) :: OQCD1
   real(r8) :: ROXYD
-  real(r8) :: RDNO3X,RDNOBX,RDNOX
+  real(r8) :: RNO3UptkSoil,RNO3UptkBand,RDNOX
   real(r8) :: RDNOT
   real(r8) :: RGOM3X,RGOMD3
-  real(r8) :: RDNO2X,RDN2X,RDN2T,RGOM2X,RGOMD2,RDN2OX,RGOM1X
+  real(r8) :: RNO2UptkSoil,RNO2UptkBand,RDN2X,RDN2T,RGOM2X,RGOMD2,RDN2OX,RGOM1X
   real(r8) :: RGOMD1
   real(r8) :: VMXD3
   real(r8) :: VMXDXS
@@ -2704,11 +2702,11 @@ module MicBGCMod
   OQCD3B=OQCD3*FNO3B
   ZNO3SX=ZNO3S*FNO3
   ZNO3BX=ZNO3B*FNB3
-  RDNO3X=AZMAX1(AMIN1(ZNO3SX,VMXD3S))
-  RDNOBX=AZMAX1(AMIN1(ZNO3BX,VMXD3B))
+  RNO3UptkSoil=AZMAX1(AMIN1(ZNO3SX,VMXD3S))
+  RNO3UptkBand=AZMAX1(AMIN1(ZNO3BX,VMXD3B))
   RDNO3(NGL,K)=AZMAX1(AMIN1(VMXD3S,OQCD3S,ZNO3SX))
   RDNOB(NGL,K)=AZMAX1(AMIN1(VMXD3B,OQCD3B,ZNO3BX))
-  RDNOX=RDNO3X+RDNOBX
+  RDNOX=RNO3UptkSoil+RNO3UptkBand
   RDNOT=RDNO3(NGL,K)+RDNOB(NGL,K)
   RGOM3X=ECN3*RDNOX
   RGOMD3=ECN3*RDNOT
@@ -2777,11 +2775,11 @@ module MicBGCMod
   OQCD2B=OQCD2*FNO3B
   ZNO2SX=(ZNO2S+RDNO3(NGL,K))*FNO2
   ZNO2BX=(ZNO2B+RDNOB(NGL,K))*FNB2
-  RDNO2X=AZMAX1(AMIN1(ZNO2SX,VMXD2S))
-  RDNOBX=AZMAX1(AMIN1(ZNO2BX,VMXD2B))
+  RNO2UptkSoil=AZMAX1(AMIN1(ZNO2SX,VMXD2S))
+  RNO2UptkBand=AZMAX1(AMIN1(ZNO2BX,VMXD2B))
   RDNO2(NGL,K)=AZMAX1(AMIN1(VMXD2S,OQCD2S,ZNO2SX))
   RDN2B(NGL,K)=AZMAX1(AMIN1(VMXD2B,OQCD2B,ZNO2BX))
-  RDN2X=RDNO2X+RDNOBX
+  RDN2X=RNO2UptkSoil+RNO2UptkBand
   RDN2T=RDNO2(NGL,K)+RDN2B(NGL,K)
   RGOM2X=ECN2*RDN2X
   RGOMD2=ECN2*RDN2T

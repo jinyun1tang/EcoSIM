@@ -50,10 +50,10 @@ module PlantDataRateType
   real(r8),target,allocatable ::  RootO2Dmnd4Resp_pvr(:,:,:,:,:)                   !root  O2 demand from respiration, [g d-2 h-1]
   real(r8),target,allocatable ::  trcg_air2root_flx__pvr(:,:,:,:,:,:)                  !gaseous tracer flux through roots, [g d-2 h-1]
   real(r8),target,allocatable ::  trcg_Root_DisEvap_flx_vr(:,:,:,:,:,:)                  !dissolution (+ve) - volatilization (-ve) gas flux in roots, [g d-2 h-1]
-  real(r8),target,allocatable ::  RCO2P_pvr(:,:,:,:,:)                   !aqueous CO2 flux from roots to root water , [g d-2 h-1]
-  real(r8),target,allocatable ::  RUPOXP(:,:,:,:,:)                  !aqueous O2 flux from roots to root water , [g d-2 h-1]
+  real(r8),target,allocatable ::  RootCO2Emis_pvr(:,:,:,:,:)                   !aqueous CO2 flux from roots to root water , [g d-2 h-1]
+  real(r8),target,allocatable ::  RootO2Uptk_pvr(:,:,:,:,:)                  !aqueous O2 flux from roots to root water , [g d-2 h-1]
   real(r8),target,allocatable ::  RootRespPotent_pvr(:,:,:,:,:)                   !root respiration unconstrained by O2, [g d-2 h-1]
-  real(r8),target,allocatable ::  RCO2A_pvr(:,:,:,:,:)                   !root respiration constrained by O2, [g d-2 h-1]
+  real(r8),target,allocatable ::  RootCO2Autor_pvr(:,:,:,:,:)                   !root respiration constrained by O2, [g d-2 h-1]
   real(r8),target,allocatable ::  RootMycoExudElms_pft(:,:,:,:)                     !total root uptake (+ve) - exudation (-ve) of dissovled element, [g d-2 h-1]
   real(r8),target,allocatable ::  RootNH4Uptake_pft(:,:,:)                       !total root uptake of NH4, [g d-2 h-1]
   real(r8),target,allocatable ::  RootNO3Uptake_pft(:,:,:)                       !total root uptake of NO3, [g d-2 h-1]
@@ -81,7 +81,7 @@ module PlantDataRateType
   real(r8),target,allocatable ::  trcs_plant_uptake_vr(:,:,:,:)      !total root-soil solute flux, [g d-2 h-1]
   real(r8),target,allocatable ::  TDFOME(:,:,:,:,:)                  !total root element exchange, [g d-2 h-1]
   real(r8),target,allocatable ::  TCO2P(:,:,:)                       !total root CO2 flux, [g d-2 h-1]
-  real(r8),target,allocatable ::  TUPOXP(:,:,:)                      !total root internal O2 flux, [g d-2 h-1]
+  real(r8),target,allocatable ::  TRO2Uptk_vr(:,:,:)                      !total root internal O2 flux, [g d-2 h-1]
   real(r8),target,allocatable ::  RTDNT(:,:,:)                       !total root length density, [m m-3]
   real(r8),target,allocatable ::  ROXYX(:,:,:)                       !total root + microbial O2 uptake, [g d-2 h-1]
   real(r8),target,allocatable ::  ROXYY(:,:,:)                       !total root + microbial O2 uptake, [g d-2 h-1]
@@ -165,10 +165,10 @@ module PlantDataRateType
   allocate(trcg_air2root_flx__pvr(idg_beg:idg_end-1,2,JZ,JP,JY,JX));trcg_air2root_flx__pvr=0._r8
   allocate(trcg_Root_DisEvap_flx_vr(idg_beg:idg_end-1,2,JZ,JP,JY,JX));trcg_Root_DisEvap_flx_vr=0._r8
   allocate(RUPGasSol_vr(idg_beg:idg_end,jroots,JZ,JP,JY,JX));RUPGasSol_vr=0._r8
-  allocate(RCO2P_pvr(jroots,JZ,JP,JY,JX));RCO2P_pvr=0._r8
-  allocate(RUPOXP(jroots,JZ,JP,JY,JX));RUPOXP=0._r8
+  allocate(RootCO2Emis_pvr(jroots,JZ,JP,JY,JX));RootCO2Emis_pvr=0._r8
+  allocate(RootO2Uptk_pvr(jroots,JZ,JP,JY,JX));RootO2Uptk_pvr=0._r8
   allocate(RootRespPotent_pvr(jroots,JZ,JP,JY,JX));RootRespPotent_pvr=0._r8
-  allocate(RCO2A_pvr(jroots,JZ,JP,JY,JX));RCO2A_pvr=0._r8
+  allocate(RootCO2Autor_pvr(jroots,JZ,JP,JY,JX));RootCO2Autor_pvr=0._r8
   allocate(RootMycoExudElms_pft(1:NumPlantChemElms,JP,JY,JX));    RootMycoExudElms_pft=0._r8
   allocate(RootNH4Uptake_pft(JP,JY,JX));    RootNH4Uptake_pft=0._r8
   allocate(RootNO3Uptake_pft(JP,JY,JX));    RootNO3Uptake_pft=0._r8
@@ -196,7 +196,7 @@ module PlantDataRateType
   allocate(trcs_plant_uptake_vr(ids_beg:ids_end,JZ,JY,JX));    trcs_plant_uptake_vr=0._r8
   allocate(TDFOME(NumPlantChemElms,1:jcplx,JZ,JY,JX));TDFOME=0._r8
   allocate(TCO2P(JZ,JY,JX));    TCO2P=0._r8
-  allocate(TUPOXP(JZ,JY,JX));   TUPOXP=0._r8
+  allocate(TRO2Uptk_vr(JZ,JY,JX));   TRO2Uptk_vr=0._r8
   allocate(RTDNT(JZ,JY,JX));    RTDNT=0._r8
   allocate(ROXYX(0:JZ,JY,JX));  ROXYX=0._r8
   allocate(ROXYY(0:JZ,JY,JX));  ROXYY=0._r8
@@ -266,10 +266,10 @@ module PlantDataRateType
   call destroy(N2ObyFire_pft)
   call destroy(PO4byFire_pft)
   call destroy(RootO2Dmnd4Resp_pvr)  
-  call destroy(RCO2P_pvr)
-  call destroy(RUPOXP)
+  call destroy(RootCO2Emis_pvr)
+  call destroy(RootO2Uptk_pvr)
   call destroy(RootRespPotent_pvr)
-  call destroy(RCO2A_pvr)
+  call destroy(RootCO2Autor_pvr)
   call destroy(RootMycoExudElms_pft)
   call destroy(RootNH4Uptake_pft)
   call destroy(RootNO3Uptake_pft)
@@ -293,7 +293,7 @@ module PlantDataRateType
   call destroy(THeatRootUptake)
   call destroy(TDFOME)
   call destroy(TCO2P)
-  call destroy(TUPOXP)
+  call destroy(TRO2Uptk_vr)
   call destroy(RTDNT)
   call destroy(ROXYX)
   call destroy(ROXYY)
