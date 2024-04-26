@@ -1516,7 +1516,7 @@ module MicAutoCPLXMod
 !     VLWatMicP=water content
 !     ZNH4M,ZNHBM=NH4 not available for uptake in non-band, band
 !     FNH4X,FNB4X=fractions of biological NH4 demand in non-band, band
-!     RINH4,RINB4=substrate-limited NH4 mineraln-immobiln in non-band, band
+!     RNH4TransfSoilHeter,RNH4TransfBandHeter=substrate-limited NH4 mineraln-immobiln in non-band, band
 !     NetNH4Mineralize_col=total NH4 net mineraln (-ve) or immobiln (+ve)
 !
   FNH4S=VLNH4
@@ -1556,7 +1556,7 @@ module MicAutoCPLXMod
 !     VLWatMicP=water content
 !     ZNO3M,ZNOBM=NO3 not available for uptake in non-band, band
 !     FNO3X,FNB3X=fractions of biological NO3 demand in non-band, band
-!     RINO3,RINB3=substrate-limited NO3 immobiln in non-band, band
+!     RNO3TransfSoilHeter,RNO3TransfBandHeter=substrate-limited NO3 immobiln in non-band, band
 !     NetNH4Mineralize_col=total net NH4+NO3 mineraln (-ve) or immobiln (+ve)
 !
   FNO3S=VLNO3
@@ -1599,7 +1599,7 @@ module MicAutoCPLXMod
 !     H2POM,H2PBM=H2PO4 not available for uptake in non-band, band
 !     VOLW=water content
 !     FPO4X,FPOBX=fractions of biol H2PO4 demand in non-band, band
-!     RIPO4,RIPOB=substrate-limited H2PO4 mineraln-immobn in non-band, band
+!     RH2PO4TransfSoilHeter,RH2PO4TransfBandHeter=substrate-limited H2PO4 mineraln-immobn in non-band, band
 !     NetPO4Mineralize_col=total H2PO4 net mineraln (-ve) or immobiln (+ve)
 !
   FH2PS=VLPO4
@@ -1639,7 +1639,7 @@ module MicAutoCPLXMod
 !     H1POM,H1PBM=HPO4 not available for uptake in non-band, band
 !     VOLW=water content
 !     FP14X,FP1BX=fractions of biol HPO4 demand in non-band, band
-!     RIP14,RIP1B=substrate-limited HPO4 mineraln-immobn in non-band, band
+!     RH1PO4TransfSoilHeter,RH1PO4TransfBandHeter=substrate-limited HPO4 mineraln-immobn in non-band, band
 !     NetPO4Mineralize_col=total H2PO4+HPO4 net mineraln (-ve) or immobiln (+ve)
 !
   FH1PS=VLPO4
@@ -1679,7 +1679,7 @@ module MicAutoCPLXMod
 !     VOLW=water content
 !     ZNH4M=NH4 not available for uptake
 !     FNH4XR=fractions of biological NH4 demand
-!     RINH4R=substrate-limited NH4 mineraln-immobiln
+!     RNH4TransfLitrHeter=substrate-limited NH4 mineraln-immobiln
 !     NetNH4Mineralize_col=total NH4 net mineraln (-ve) or immobiln (+ve)
 !
   IF(litrm)THEN
@@ -1710,11 +1710,11 @@ module MicAutoCPLXMod
 !     BIOA=microbial surface area, OMA=active biomass
 !     TFNG=temp+water stress
 !     FNO3S,FNO3B=fractions of NO3 in non-band, band
-!     RINO3R=substrate-unlimited NO3 immobiln
+!     RNO3TransfLitrHeter=substrate-unlimited NO3 immobiln
 !     VLWatMicP=water content
 !     ZNO3M=NO3 not available for uptake
 !     FNO3XR=fraction of biological NO3 demand
-!     RINO3R=substrate-limited NO3 immobiln
+!     RNO3TransfLitrHeter=substrate-limited NO3 immobiln
 !     NetNH4Mineralize_col=total NH4+NO3 net mineraln (-ve) or immobiln (+ve)
 !
     RINOPR=AZMAX1(RINHPR-RNH4TransfLitrAutor(NGL))
@@ -1748,7 +1748,7 @@ module MicAutoCPLXMod
 !     VLWatMicP=water content
 !     H2P4M=H2PO4 not available for uptake
 !     FPO4XR=fractions of biological H2PO4 demand
-!     RIPO4R=substrate-limited H2PO4 mineraln-immobiln
+!     RH2PO4TransfLitrHeter=substrate-limited H2PO4 mineraln-immobiln
 !     NetPO4Mineralize_col=total H2PO4 net mineraln (-ve) or immobiln (+ve)
 !
     RIPOPR=RIPOP-RH2PO4TransfSoilAutor(NGL)
@@ -1782,7 +1782,7 @@ module MicAutoCPLXMod
 !     VLWatMicP=water content
 !     H1P4M=HPO4 not available for uptake
 !     FP14XR=fraction of biological HPO4 demand
-!     RIP14R=substrate-limited HPO4 minereraln-immobiln
+!     RH1PO4TransfLitrHeter=substrate-limited HPO4 minereraln-immobiln
 !     NetPO4Mineralize_col=total HPO4 net mineraln (-ve) or immobiln (+ve)
 !
     FH1PS=VLPO4
@@ -1826,7 +1826,7 @@ module MicAutoCPLXMod
     RMaintCompAutor => nmicf%RMaintCompAutor ,    &
     RGOMOff  => nmicf%RGOMOff,    &
     RGN2Fff => nmicf%RGN2Fff,     &
-    RN2FXff  => nmicf%RN2FXff,    &
+    RN2FixAutor  => nmicf%RN2FixAutor,    &
     pH      => micfor%pH    ,    &
     OMEauto   => micstt%OMEauto       &
 
@@ -1870,10 +1870,10 @@ module MicAutoCPLXMod
 !     CZ2GS=aqueous N2 concentration
 !     ZFKM=Km for N2 uptake
 !     OMGR*OMC(3,NGL,N,K)=nonstructural C limitation to RGN2F
-!     RN2FX=N2 fixation rate
+!     RN2FixHeter=N2 fixation rate
 !
 
-  RN2FXff(NGL)=0.0_r8
+  RN2FixAutor(NGL)=0.0_r8
   RGN2Fff(NGL)=0.0_r8
   end associate
   end subroutine GatherMicrobialRespirationff
@@ -1902,7 +1902,7 @@ module MicAutoCPLXMod
     RH2PO4TransfBandAutor => nmicf%RH2PO4TransfBandAutor ,    &
     RHOMEautor => nmicf%RHOMEautor ,    &
     RHMMEautor  => nmicf%RHMMEautor,    &
-    RN2FXff  => nmicf%RN2FXff,    &
+    RN2FixAutor  => nmicf%RN2FixAutor,    &
     RXOMEautor  => nmicf%RXOMEautor,    &
     R3OMEautor  => nmicf%R3OMEautor,    &
     RXMMEautor  => nmicf%RXMMEautor,    &
@@ -1974,12 +1974,12 @@ module MicAutoCPLXMod
 !     R3OMC,R3OMN,R3OMP=microbial C,N,P recycling
 !     R3MMC,R3MMN,R3MMP=microbial C,N,P recycling from senescence
 !     CGOMN,CGOMP=DON, DOP uptake
-!     RINH4,RINB4=substrate-limited NH4 mineraln-immobiln in non-band, band
-!     RINO3,RINB3=substrate-limited NO3 immobiln in non-band, band
-!     RIPO4,RIPOB=substrate-limited H2PO4 mineraln-immobn in non-band, band
-!     RIP14,RIP1B=substrate-limited HPO4 mineraln-immobn in non-band, band
-!     RINH4R,RINO3R =substrate-limited NH4,NO3 mineraln-immobiln
-!     RIPO4R,RIP14R=substrate-limited H2PO4,HPO4 mineraln-immobiln
+!     RNH4TransfSoilHeter,RNH4TransfBandHeter=substrate-limited NH4 mineraln-immobiln in non-band, band
+!     RNO3TransfSoilHeter,RNO3TransfBandHeter=substrate-limited NO3 immobiln in non-band, band
+!     RH2PO4TransfSoilHeter,RH2PO4TransfBandHeter=substrate-limited H2PO4 mineraln-immobn in non-band, band
+!     RH1PO4TransfSoilHeter,RH1PO4TransfBandHeter=substrate-limited HPO4 mineraln-immobn in non-band, band
+!     RNH4TransfLitrHeter,RNO3TransfLitrHeter =substrate-limited NH4,NO3 mineraln-immobiln
+!     RH2PO4TransfLitrHeter,RH1PO4TransfLitrHeter=substrate-limited H2PO4,HPO4 mineraln-immobiln
 !
         CGROMC=CGOMEautor(ielmc,NGL)-RGOMOff(NGL)-RGOMDff(NGL)-RGN2Fff(NGL)
         RCO2Xff(NGL)=RCO2Xff(NGL)+RGN2Fff(NGL)
@@ -1992,7 +1992,7 @@ module MicAutoCPLXMod
         ENDDO
         OMEauto(ielmc,MID3)=OMEauto(ielmc,MID3)+CGROMC
         OMEauto(ielmn,MID3)=OMEauto(ielmn,MID3)+CGOMEautor(ielmn,NGL) &
-          +RNH4TransfSoilAutor(NGL)+RNH4TransfBandAutor(NGL)+RNO3TransfSoilAutor(NGL)+RNO3TransfBandAutor(NGL)+RN2FXff(NGL)
+          +RNH4TransfSoilAutor(NGL)+RNH4TransfBandAutor(NGL)+RNO3TransfSoilAutor(NGL)+RNO3TransfBandAutor(NGL)+RN2FixAutor(NGL)
         OMEauto(ielmp,MID3)=OMEauto(ielmp,MID3)+CGOMEautor(ielmp,NGL) &
           +RH2PO4TransfSoilAutor(NGL)+RH2PO4TransfBandAutor(NGL)+RH1PO4TransfSoilAutor(NGL)+RH1PO4TransfBandAutor(NGL)
         IF(litrm)THEN

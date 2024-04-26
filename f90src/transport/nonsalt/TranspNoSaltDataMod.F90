@@ -49,7 +49,6 @@ implicit none
   real(r8), allocatable ::  RCHFXS(:,:,:)                      !
   real(r8), allocatable ::  ROXFXS(:,:,:)                      !
   real(r8), allocatable ::  RNGFXS(:,:,:)                      !
-  real(r8), allocatable ::  RN2FXS(:,:,:)                      !
   real(r8), allocatable ::  RN4FXW(:,:,:)                      !
   real(r8), allocatable ::  RN3FXW(:,:,:)                      !
   real(r8), allocatable ::  RNOFXW(:,:,:)                      !
@@ -286,7 +285,6 @@ contains
   allocate(RCHFXS(JZ,JY,JX));   RCHFXS=0._r8
   allocate(ROXFXS(JZ,JY,JX));   ROXFXS=0._r8
   allocate(RNGFXS(JZ,JY,JX));   RNGFXS=0._r8
-  allocate(RN2FXS(JZ,JY,JX));   RN2FXS=0._r8
   allocate(RN4FXW(JZ,JY,JX));   RN4FXW=0._r8
   allocate(RN3FXW(JZ,JY,JX));   RN3FXW=0._r8
   allocate(RNOFXW(JZ,JY,JX));   RNOFXW=0._r8
@@ -531,7 +529,6 @@ contains
   call destroy(RCHFXS)
   call destroy(ROXFXS)
   call destroy(RNGFXS)
-  call destroy(RN2FXS)
   call destroy(RN4FXW)
   call destroy(RN3FXW)
   call destroy(RNOFXW)
