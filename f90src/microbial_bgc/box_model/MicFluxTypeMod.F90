@@ -64,10 +64,10 @@ implicit none
   real(r8), allocatable :: RINOOR(:,:)
   real(r8), allocatable :: RIPOOR(:,:)
   real(r8), allocatable :: RIPO1R(:,:)
-  real(r8), allocatable :: RINHOff(:)
-  real(r8), allocatable :: RINHBff(:)
-  real(r8), allocatable :: RINOOff(:)
-  real(r8), allocatable :: RINOBff(:)
+  real(r8), allocatable :: RNH4UptkSoilAutor(:)
+  real(r8), allocatable :: RNH4UptkBandAutor(:)
+  real(r8), allocatable :: RNO3UptkSoilAutor(:)
+  real(r8), allocatable :: RNO3UptkBandAutor(:)
   real(r8), allocatable :: RIPOOff(:)
   real(r8), allocatable :: RIPBOff(:)
   real(r8), allocatable :: RIPO1ff(:)
@@ -122,10 +122,10 @@ implicit none
   allocate(this%RIPOOR(NumMicrbHetetrophCmplx,1:jcplx));this%RIPOOR=spval
   allocate(this%RIPO1R(NumMicrbHetetrophCmplx,1:jcplx));this%RIPO1R=spval
   allocate(this%RO2DmndAutort(NumMicrobAutrophCmplx));this%RO2DmndAutort=spval
-  allocate(this%RINHOff(NumMicrobAutrophCmplx));this%RINHOff=spval
-  allocate(this%RINHBff(NumMicrobAutrophCmplx));this%RINHBff=spval
-  allocate(this%RINOOff(NumMicrobAutrophCmplx));this%RINOOff=spval
-  allocate(this%RINOBff(NumMicrobAutrophCmplx));this%RINOBff=spval
+  allocate(this%RNH4UptkSoilAutor(NumMicrobAutrophCmplx));this%RNH4UptkSoilAutor=spval
+  allocate(this%RNH4UptkBandAutor(NumMicrobAutrophCmplx));this%RNH4UptkBandAutor=spval
+  allocate(this%RNO3UptkSoilAutor(NumMicrobAutrophCmplx));this%RNO3UptkSoilAutor=spval
+  allocate(this%RNO3UptkBandAutor(NumMicrobAutrophCmplx));this%RNO3UptkBandAutor=spval
   allocate(this%RIPOOff(NumMicrobAutrophCmplx));this%RIPOOff=spval
   allocate(this%RIPBOff(NumMicrobAutrophCmplx));this%RIPBOff=spval
   allocate(this%RIPO1ff(NumMicrobAutrophCmplx));this%RIPO1ff=spval
@@ -172,10 +172,10 @@ implicit none
   this%RIPOOR=0._r8
   this%RIPO1R=0._r8
   this%RO2DmndAutort=0._r8
-  this%RINHOff=0._r8
-  this%RINHBff=0._r8
-  this%RINOOff=0._r8
-  this%RINOBff=0._r8
+  this%RNH4UptkSoilAutor=0._r8
+  this%RNH4UptkBandAutor=0._r8
+  this%RNO3UptkSoilAutor=0._r8
+  this%RNO3UptkBandAutor=0._r8
   this%RIPOOff=0._r8
   this%RIPBOff=0._r8
   this%RIPO1ff=0._r8
@@ -224,10 +224,10 @@ implicit none
   call destroy(this%RINOOR)
   call destroy(this%RIPOOR)
   call destroy(this%RIPO1R)
-  call destroy(this%RINHOff)
-  call destroy(this%RINHBff)
-  call destroy(this%RINOOff)
-  call destroy(this%RINOBff)
+  call destroy(this%RNH4UptkSoilAutor)
+  call destroy(this%RNH4UptkBandAutor)
+  call destroy(this%RNO3UptkSoilAutor)
+  call destroy(this%RNO3UptkBandAutor)
   call destroy(this%RIPOOff)
   call destroy(this%RIPBOff)
   call destroy(this%RIPO1ff)

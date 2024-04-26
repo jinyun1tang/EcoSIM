@@ -323,10 +323,10 @@ implicit none
   endif
   micflx%RVMXC=RVMXC(L,NY,NX)
   micflx%RVMBC=RVMBC(L,NY,NX)
-  micflx%RINHOff(1:NumMicrobAutrophCmplx)=RINHOff(1:NumMicrobAutrophCmplx,L,NY,NX)
-  micflx%RINHBff(1:NumMicrobAutrophCmplx)=RINHBff(1:NumMicrobAutrophCmplx,L,NY,NX)
-  micflx%RINOOff(1:NumMicrobAutrophCmplx)=RINOOff(1:NumMicrobAutrophCmplx,L,NY,NX)
-  micflx%RINOBff(1:NumMicrobAutrophCmplx)=RINOBff(1:NumMicrobAutrophCmplx,L,NY,NX)
+  micflx%RNH4UptkSoilAutor(1:NumMicrobAutrophCmplx)=RNH4UptkSoilAutor_vr(1:NumMicrobAutrophCmplx,L,NY,NX)
+  micflx%RNH4UptkBandAutor(1:NumMicrobAutrophCmplx)=RNH4UptkBandAutor_vr(1:NumMicrobAutrophCmplx,L,NY,NX)
+  micflx%RNO3UptkSoilAutor(1:NumMicrobAutrophCmplx)=RNO3UptkSoilAutor_vr(1:NumMicrobAutrophCmplx,L,NY,NX)
+  micflx%RNO3UptkBandAutor(1:NumMicrobAutrophCmplx)=RNO3UptkBandAutor_vr(1:NumMicrobAutrophCmplx,L,NY,NX)
   micflx%RIPOOff(1:NumMicrobAutrophCmplx)=RIPOOff(1:NumMicrobAutrophCmplx,L,NY,NX)
   micflx%RIPBOff(1:NumMicrobAutrophCmplx)=RIPBOff(1:NumMicrobAutrophCmplx,L,NY,NX)
   micflx%RIPO1ff(1:NumMicrobAutrophCmplx)=RIPO1ff(1:NumMicrobAutrophCmplx,L,NY,NX)
@@ -434,10 +434,10 @@ implicit none
     OSM(ielmp,micpar%icarbhyro,micpar%k_humus,NU(NY,NX),NY,NX)=micstt%OSP24U
   endif
 
-  RINHOff(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RINHOff(1:NumMicrobAutrophCmplx)
-  RINHBff(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RINHBff(1:NumMicrobAutrophCmplx)
-  RINOOff(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RINOOff(1:NumMicrobAutrophCmplx)
-  RINOBff(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RINOBff(1:NumMicrobAutrophCmplx)
+  RNH4UptkSoilAutor_vr(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RNH4UptkSoilAutor(1:NumMicrobAutrophCmplx)
+  RNH4UptkBandAutor_vr(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RNH4UptkBandAutor(1:NumMicrobAutrophCmplx)
+  RNO3UptkSoilAutor_vr(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RNO3UptkSoilAutor(1:NumMicrobAutrophCmplx)
+  RNO3UptkBandAutor_vr(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RNO3UptkBandAutor(1:NumMicrobAutrophCmplx)
   RIPOOff(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RIPOOff(1:NumMicrobAutrophCmplx)
   RIPBOff(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RIPBOff(1:NumMicrobAutrophCmplx)
   RIPO1ff(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RIPO1ff(1:NumMicrobAutrophCmplx)

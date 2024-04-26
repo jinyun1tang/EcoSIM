@@ -396,10 +396,10 @@ module InitSOMBGCMOD
   RVMB3ff(:,L,NY,NX)=0.0_r8
   RNO2OxidAutor(:,L,NY,NX)=0.0_r8
   RVMX1ff(:,L,NY,NX)=0.0_r8
-  RINHOff(:,L,NY,NX)=0.0_r8
-  RINHBff(:,L,NY,NX)=0.0_r8
-  RINOOff(:,L,NY,NX)=0.0_r8
-  RINOBff(:,L,NY,NX)=0.0_r8
+  RNH4UptkSoilAutor_vr(:,L,NY,NX)=0.0_r8
+  RNH4UptkBandAutor_vr(:,L,NY,NX)=0.0_r8
+  RNO3UptkSoilAutor_vr(:,L,NY,NX)=0.0_r8
+  RNO3UptkBandAutor_vr(:,L,NY,NX)=0.0_r8
   RIPOOff(:,L,NY,NX)=0.0_r8
   RIPBOff(:,L,NY,NX)=0.0_r8
   RIPO1ff(:,L,NY,NX)=0.0_r8

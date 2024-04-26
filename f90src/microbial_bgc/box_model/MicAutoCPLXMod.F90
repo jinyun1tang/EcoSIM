@@ -291,10 +291,10 @@ module MicAutoCPLXMod
     RIPO1ff   => micflx%RIPO1ff, &
     RIPBOff   => micflx%RIPBOff, &
     RIPOOff   => micflx%RIPOOff, &
-    RINOBff   => micflx%RINOBff, &
-    RINOOff   => micflx%RINOOff, &
-    RINHBff   => micflx%RINHBff, &
-    RINHOff   => micflx%RINHOff, &
+    RNO3UptkBandAutor   => micflx%RNO3UptkBandAutor, &
+    RNO3UptkSoilAutor   => micflx%RNO3UptkSoilAutor, &
+    RNH4UptkBandAutor   => micflx%RNH4UptkBandAutor, &
+    RNH4UptkSoilAutor   => micflx%RNH4UptkSoilAutor, &
     RO2DmndAutort   => micflx%RO2DmndAutort  &
   )
 ! F*=fraction of substrate uptake relative to total uptake from
@@ -309,22 +309,22 @@ module MicAutoCPLXMod
     FOXYX=AMAX1(FMN,FOMAff(NGL))
   ENDIF
   IF(RNH4Y.GT.ZEROS)THEN
-    FNH4X=AMAX1(FMN,RINHOff(NGL)/RNH4Y)
+    FNH4X=AMAX1(FMN,RNH4UptkSoilAutor(NGL)/RNH4Y)
   ELSE
     FNH4X=AMAX1(FMN,FOMAff(NGL)*VLNH4)
   ENDIF
   IF(RNHBY.GT.ZEROS)THEN
-    FNB4X=AMAX1(FMN,RINHBff(NGL)/RNHBY)
+    FNB4X=AMAX1(FMN,RNH4UptkBandAutor(NGL)/RNHBY)
   ELSE
     FNB4X=AMAX1(FMN,FOMAff(NGL)*VLNHB)
   ENDIF
   IF(RNO3Y.GT.ZEROS)THEN
-    FNO3X=AMAX1(FMN,RINOOff(NGL)/RNO3Y)
+    FNO3X=AMAX1(FMN,RNO3UptkSoilAutor(NGL)/RNO3Y)
   ELSE
     FNO3X=AMAX1(FMN,FOMAff(NGL)*VLNO3)
   ENDIF
   IF(RN3BY.GT.ZEROS)THEN
-    FNB3X=AMAX1(FMN,RINOBff(NGL)/RN3BY)
+    FNB3X=AMAX1(FMN,RNO3UptkBandAutor(NGL)/RN3BY)
   ELSE
     FNB3X=AMAX1(FMN,FOMAff(NGL)*VLNOB)
   ENDIF
@@ -1479,10 +1479,10 @@ module MicAutoCPLXMod
    CH1P4B   => micstt%CH1P4B    , &
    H1PO4    => micstt%H1PO4     , &
    H1POB    => micstt%H1POB     , &
-   RINHOff  => micflx%RINHOff   , &
-   RINHBff  => micflx%RINHBff   , &
-   RINOOff  => micflx%RINOOff   , &
-   RINOBff  => micflx%RINOBff   , &
+   RNH4UptkSoilAutor  => micflx%RNH4UptkSoilAutor   , &
+   RNH4UptkBandAutor  => micflx%RNH4UptkBandAutor   , &
+   RNO3UptkSoilAutor  => micflx%RNO3UptkSoilAutor   , &
+   RNO3UptkBandAutor  => micflx%RNO3UptkBandAutor   , &
    NetNH4Mineralize_col   => micflx%NetNH4Mineralize_col    , &
    RIPOOff  => micflx%RIPOOff   , &
    RIPBOff  => micflx%RIPBOff   , &
@@ -1527,15 +1527,15 @@ module MicAutoCPLXMod
     CNH4X=AZMAX1(CNH4S-Z4MN)
     CNH4Y=AZMAX1(CNH4B-Z4MN)
     RINHX=AMIN1(RINHP,BIOA*OMAff(NGL)*TFNGff(NGL)*Z4MX)
-    RINHOff(NGL)=FNH4S*RINHX*CNH4X/(CNH4X+Z4KU)
-    RINHBff(NGL)=FNHBS*RINHX*CNH4Y/(CNH4Y+Z4KU)
+    RNH4UptkSoilAutor(NGL)=FNH4S*RINHX*CNH4X/(CNH4X+Z4KU)
+    RNH4UptkBandAutor(NGL)=FNHBS*RINHX*CNH4Y/(CNH4Y+Z4KU)
     ZNH4M=Z4MN*VLWatMicP*FNH4S
     ZNHBM=Z4MN*VLWatMicP*FNHBS
-    RINH4ff(NGL)=AMIN1(FNH4X*AZMAX1((ZNH4S-ZNH4M)),RINHOff(NGL))
-    RINB4ff(NGL)=AMIN1(FNB4X*AZMAX1((ZNH4B-ZNHBM)),RINHBff(NGL))
+    RINH4ff(NGL)=AMIN1(FNH4X*AZMAX1((ZNH4S-ZNH4M)),RNH4UptkSoilAutor(NGL))
+    RINB4ff(NGL)=AMIN1(FNB4X*AZMAX1((ZNH4B-ZNHBM)),RNH4UptkBandAutor(NGL))
   ELSE
-    RINHOff(NGL)=0.0_r8
-    RINHBff(NGL)=0.0_r8
+    RNH4UptkSoilAutor(NGL)=0.0_r8
+    RNH4UptkBandAutor(NGL)=0.0_r8
     RINH4ff(NGL)=RINHP*FNH4S
     RINB4ff(NGL)=RINHP*FNHBS
   ENDIF
@@ -1566,17 +1566,17 @@ module MicAutoCPLXMod
     CNO3X=AZMAX1(CNO3S-ZOMN)
     CNO3Y=AZMAX1(CNO3B-ZOMN)
     RINOX=AMIN1(RINOP,BIOA*OMAff(NGL)*TFNGff(NGL)*ZOMX)
-    RINOOff(NGL)=FNO3S*RINOX*CNO3X/(CNO3X+ZOKU)
-    RINOBff(NGL)=FNO3B*RINOX*CNO3Y/(CNO3Y+ZOKU)
+    RNO3UptkSoilAutor(NGL)=FNO3S*RINOX*CNO3X/(CNO3X+ZOKU)
+    RNO3UptkBandAutor(NGL)=FNO3B*RINOX*CNO3Y/(CNO3Y+ZOKU)
     ZNO3M=ZOMN*VLWatMicP*FNO3S
     ZNOBM=ZOMN*VLWatMicP*FNO3B
     RINO3ff(NGL)=AMIN1(FNO3X*AZMAX1((ZNO3S-ZNO3M)) &
-      ,RINOOff(NGL))
+      ,RNO3UptkSoilAutor(NGL))
     RINB3ff(NGL)=AMIN1(FNB3X*AZMAX1((ZNO3B-ZNOBM)) &
-      ,RINOBff(NGL))
+      ,RNO3UptkBandAutor(NGL))
   ELSE
-    RINOOff(NGL)=0.0_r8
-    RINOBff(NGL)=0.0_r8
+    RNO3UptkSoilAutor(NGL)=0.0_r8
+    RNO3UptkBandAutor(NGL)=0.0_r8
     RINO3ff(NGL)=RINOP*FNO3S
     RINB3ff(NGL)=RINOP*FNO3B
   ENDIF

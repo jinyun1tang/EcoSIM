@@ -1631,8 +1631,8 @@ module RedistMod
       RNO3X(0,NY,NX)=RNO3X(0,NY,NX)+RVMX3ff(NGL,0,NY,NX)
       RNO2X(0,NY,NX)=RNO2X(0,NY,NX)+RNO2OxidAutor(NGL,0,NY,NX)
       RN2OX(0,NY,NX)=RN2OX(0,NY,NX)+RVMX1ff(NGL,0,NY,NX)
-      RNH4X(0,NY,NX)=RNH4X(0,NY,NX)+RINHOff(NGL,0,NY,NX)
-      RNO3X(0,NY,NX)=RNO3X(0,NY,NX)+RINOOff(NGL,0,NY,NX)
+      RNH4X(0,NY,NX)=RNH4X(0,NY,NX)+RNH4UptkSoilAutor_vr(NGL,0,NY,NX)
+      RNO3X(0,NY,NX)=RNO3X(0,NY,NX)+RNO3UptkSoilAutor_vr(NGL,0,NY,NX)
       RPO4X(0,NY,NX)=RPO4X(0,NY,NX)+RIPOOff(NGL,0,NY,NX)
       RP14X(0,NY,NX)=RP14X(0,NY,NX)+RIPO1ff(NGL,0,NY,NX)
       RNH4X(NU(NY,NX),NY,NX)=RNH4X(NU(NY,NX),NY,NX)+RINHORff(NGL,NY,NX)
@@ -1678,17 +1678,17 @@ module RedistMod
   ENDDO
   ROXYX(L,NY,NX)=ROXYX(L,NY,NX)+SUM(RO2DmndAutort(1:NumMicrbHetetrophCmplx,L,NY,NX))
   RNH4X(L,NY,NX)=RNH4X(L,NY,NX)+SUM(RNH3OxidAutor(1:NumMicrbHetetrophCmplx,L,NY,NX)) &
-    +SUM(RINHOff(1:NumMicrbHetetrophCmplx,L,NY,NX))
+    +SUM(RNH4UptkSoilAutor_vr(1:NumMicrbHetetrophCmplx,L,NY,NX))
   RNO3X(L,NY,NX)=RNO3X(L,NY,NX)+SUM(RVMX3ff(1:NumMicrbHetetrophCmplx,L,NY,NX)) &
-    +SUM(RINOOff(1:NumMicrbHetetrophCmplx,L,NY,NX))
+    +SUM(RNO3UptkSoilAutor_vr(1:NumMicrbHetetrophCmplx,L,NY,NX))
   RNO2X(L,NY,NX)=RNO2X(L,NY,NX)+SUM(RNO2OxidAutor(1:NumMicrbHetetrophCmplx,L,NY,NX))
   RN2OX(L,NY,NX)=RN2OX(L,NY,NX)+SUM(RVMX1ff(1:NumMicrbHetetrophCmplx,L,NY,NX))
   RPO4X(L,NY,NX)=RPO4X(L,NY,NX)+SUM(RIPOOff(1:NumMicrbHetetrophCmplx,L,NY,NX))
   RP14X(L,NY,NX)=RP14X(L,NY,NX)+SUM(RIPO1ff(1:NumMicrbHetetrophCmplx,L,NY,NX))
   RNHBX(L,NY,NX)=RNHBX(L,NY,NX)+SUM(RNH3OxidAutorBand(1:NumMicrbHetetrophCmplx,L,NY,NX)) &
-    +SUM(RINHBff(1:NumMicrbHetetrophCmplx,L,NY,NX))
+    +SUM(RNH4UptkBandAutor_vr(1:NumMicrbHetetrophCmplx,L,NY,NX))
   RN3BX(L,NY,NX)=RN3BX(L,NY,NX)+SUM(RVMB3ff(1:NumMicrbHetetrophCmplx,L,NY,NX)) &
-    +SUM(RINOBff(1:NumMicrbHetetrophCmplx,L,NY,NX))
+    +SUM(RNO3UptkBandAutor_vr(1:NumMicrbHetetrophCmplx,L,NY,NX))
   RN2BX(L,NY,NX)=RN2BX(L,NY,NX)+SUM(RNO2OxidAutorBand(1:NumMicrbHetetrophCmplx,L,NY,NX))
   RPOBX(L,NY,NX)=RPOBX(L,NY,NX)+SUM(RIPBOff(1:NumMicrbHetetrophCmplx,L,NY,NX))
   RP1BX(L,NY,NX)=RP1BX(L,NY,NX)+SUM(RIPB1ff(1:NumMicrbHetetrophCmplx,L,NY,NX))
