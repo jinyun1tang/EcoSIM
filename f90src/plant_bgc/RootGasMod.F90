@@ -601,9 +601,9 @@ module RootGasMod
     ENDDO D99
 !
 !     O2 CONSTRAINTS TO ROOT RESPIRATION DEPENDS UPON RATIO
-!     OF ROOT O2 UPTAKE 'RUPOXT' TO ROOT O2 DEMAND 'RootO2Dmnd4Resp_pvr'
+!     OF ROOT O2 UPTAKE 'RO2UptkHeterT' TO ROOT O2 DEMAND 'RootO2Dmnd4Resp_pvr'
 !
-!     RUPOXT=O2 uptake from soil+root by each root,myco population
+!     RO2UptkHeterT=O2 uptake from soil+root by each root,myco population
 !     RootO2Dmnd4Resp_pvr=O2 demand by each root,myco population
 !     RAutoRootO2Limter_pvr=constraint by O2 consumption on all root processes
 !     imposed by O2 uptake

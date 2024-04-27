@@ -106,17 +106,17 @@ type, public :: NitroAQMFluxDiagType
   real(r8),allocatable :: CGOQC(:,:)
   real(r8),allocatable :: CGOAC(:,:)
   real(r8),allocatable :: CGOMES(:,:,:,:)
-  real(r8),allocatable :: RUPOX(:,:)
+  real(r8),allocatable :: RO2UptkHeter(:,:)
   real(r8),allocatable :: RGN2F(:,:)
   real(r8),allocatable :: RGOMO(:,:)
   real(r8),allocatable :: RO2Dmnd4RespHeter(:,:)
   real(r8),allocatable :: RO2DmndHeter(:,:)
-  real(r8),allocatable :: ROXYO(:,:)
-  real(r8),allocatable :: RDNO3(:,:)
-  real(r8),allocatable :: RDNOB(:,:)
-  real(r8),allocatable :: RDNO2(:,:)
-  real(r8),allocatable :: RDN2B(:,:)
-  real(r8),allocatable :: RDN2O(:,:)
+  real(r8),allocatable :: RO2Uptk4RespHeter(:,:)
+  real(r8),allocatable :: RNO3ReduxHeterSoil(:,:)
+  real(r8),allocatable :: RNO3ReduxHeterBand(:,:)
+  real(r8),allocatable :: RNO2ReduxHeterSoil(:,:)
+  real(r8),allocatable :: RNO2ReduxHeterBand(:,:)
+  real(r8),allocatable :: RN2OReduxHeter(:,:)
   real(r8),allocatable :: RGOMD(:,:)
   real(r8),allocatable :: RMOMC(:,:,:)
   real(r8),allocatable :: RNH4TransfSoilHeter(:,:)
@@ -143,9 +143,9 @@ type, public :: NitroAQMFluxDiagType
   real(r8),allocatable :: RH2PO4TransfLitrHeter(:,:)
   real(r8),allocatable :: RGOMY(:,:)
   real(r8),allocatable :: ROQCD(:,:)
-  real(r8),allocatable :: RCO2X(:,:)
+  real(r8),allocatable :: RCO2ProdHeter(:,:)
   real(r8),allocatable :: RCH3X(:,:)
-  real(r8),allocatable :: RCH4X(:,:)
+  real(r8),allocatable :: RCH4ProdHeter(:,:)
   real(r8),allocatable :: RVOXA(:)
   real(r8),allocatable :: RVOXB(:)
   real(r8) :: RVOXAAO
@@ -162,9 +162,8 @@ type, public :: NitroAQMFluxDiagType
   real(r8),allocatable :: RO2DmndAutor(:)
   real(r8),allocatable :: RO2Uptk4RespAutor(:)
   real(r8),allocatable :: RNO3UptkAutor(:)
-  real(r8),allocatable :: RDNOBff(:)
-  real(r8),allocatable :: RDNO2ff(:)
-  real(r8),allocatable :: RDN2Bff(:)
+  real(r8),allocatable :: RNO2ReduxAutorSoil(:)
+  real(r8),allocatable :: RNO2ReduxAutorBand(:)
   real(r8),allocatable :: RGOMDff(:)
   real(r8),allocatable :: RMaintCompAutor(:,:)
   real(r8),allocatable :: RNH4TransfSoilAutor(:)
@@ -195,9 +194,9 @@ type, public :: NitroAQMFluxDiagType
   real(r8),allocatable :: RGOMYff(:)
   real(r8),allocatable :: CGOSEautor(:,:,:)
   real(r8),allocatable :: FP14XRff(:)
-  real(r8),allocatable :: RCO2Xff(:)
+  real(r8),allocatable :: RCO2ProdAutor(:)
   real(r8),allocatable :: RCH3Xff(:)
-  real(r8),allocatable :: RCH4Xff(:)
+  real(r8),allocatable :: RCH4ProdAutor(:)
   real(r8),allocatable :: RH1PO4TransfSoilAutor(:)
   real(r8),allocatable :: RH1PO4TransfBandAutor(:)
   real(r8),allocatable :: RH1PO4TransfLitrAutor(:)
@@ -334,17 +333,17 @@ type, public :: NitroAQMFluxDiagType
   NumMicrobAutrophCmplx=micpar%NumMicrobAutrophCmplx
   NumMicrbHetetrophCmplx=micpar%NumMicrbHetetrophCmplx
 
-  allocate(this%RUPOX(NumMicrbHetetrophCmplx,1:jcplx));this%RUPOX=spval
+  allocate(this%RO2UptkHeter(NumMicrbHetetrophCmplx,1:jcplx));this%RO2UptkHeter=spval
   allocate(this%RGN2F(NumMicrbHetetrophCmplx,1:jcplx));this%RGN2F=spval
   allocate(this%RGOMO(NumMicrbHetetrophCmplx,1:jcplx));this%RGOMO=spval
   allocate(this%RO2Dmnd4RespHeter(NumMicrbHetetrophCmplx,1:jcplx));this%RO2Dmnd4RespHeter=spval
   allocate(this%RO2DmndHeter(NumMicrbHetetrophCmplx,1:jcplx));this%RO2DmndHeter=spval
-  allocate(this%ROXYO(NumMicrbHetetrophCmplx,1:jcplx));this%ROXYO=spval
-  allocate(this%RDNO3(NumMicrbHetetrophCmplx,1:jcplx));this%RDNO3=spval
-  allocate(this%RDNOB(NumMicrbHetetrophCmplx,1:jcplx));this%RDNOB=spval
-  allocate(this%RDNO2(NumMicrbHetetrophCmplx,1:jcplx));this%RDNO2=spval
-  allocate(this%RDN2B(NumMicrbHetetrophCmplx,1:jcplx));this%RDN2B=spval
-  allocate(this%RDN2O(NumMicrbHetetrophCmplx,1:jcplx));this%RDN2O=spval
+  allocate(this%RO2Uptk4RespHeter(NumMicrbHetetrophCmplx,1:jcplx));this%RO2Uptk4RespHeter=spval
+  allocate(this%RNO3ReduxHeterSoil(NumMicrbHetetrophCmplx,1:jcplx));this%RNO3ReduxHeterSoil=spval
+  allocate(this%RNO3ReduxHeterBand(NumMicrbHetetrophCmplx,1:jcplx));this%RNO3ReduxHeterBand=spval
+  allocate(this%RNO2ReduxHeterSoil(NumMicrbHetetrophCmplx,1:jcplx));this%RNO2ReduxHeterSoil=spval
+  allocate(this%RNO2ReduxHeterBand(NumMicrbHetetrophCmplx,1:jcplx));this%RNO2ReduxHeterBand=spval
+  allocate(this%RN2OReduxHeter(NumMicrbHetetrophCmplx,1:jcplx));this%RN2OReduxHeter=spval
   allocate(this%RGOMD(NumMicrbHetetrophCmplx,1:jcplx));this%RGOMD=spval
   allocate(this%RMOMC(2,NumMicrbHetetrophCmplx,1:jcplx));this%RMOMC=spval
   allocate(this%RNH4TransfSoilHeter(NumMicrbHetetrophCmplx,1:jcplx));this%RNH4TransfSoilHeter=spval
@@ -377,9 +376,9 @@ type, public :: NitroAQMFluxDiagType
   allocate(this%RGOMY(NumMicrbHetetrophCmplx,1:jcplx));this%RGOMY=spval
   allocate(this%CGOMES(NumPlantChemElms,2,NumMicrbHetetrophCmplx,1:jcplx));this%CGOMES=spval
   allocate(this%FP14XR(NumMicrbHetetrophCmplx,1:jcplx));this%FP14XR=spval
-  allocate(this%RCO2X(NumMicrbHetetrophCmplx,1:jcplx));this%RCO2X=spval
+  allocate(this%RCO2ProdHeter(NumMicrbHetetrophCmplx,1:jcplx));this%RCO2ProdHeter=spval
   allocate(this%RCH3X(NumMicrbHetetrophCmplx,1:jcplx));this%RCH3X=spval
-  allocate(this%RCH4X(NumMicrbHetetrophCmplx,1:jcplx));this%RCH4X=spval
+  allocate(this%RCH4ProdHeter(NumMicrbHetetrophCmplx,1:jcplx));this%RCH4ProdHeter=spval
   allocate(this%RH1PO4TransfSoilHeter(NumMicrbHetetrophCmplx,1:jcplx));this%RH1PO4TransfSoilHeter=spval
   allocate(this%RH1PO4TransfBandHeter(NumMicrbHetetrophCmplx,1:jcplx));this%RH1PO4TransfBandHeter=spval
   allocate(this%RH1PO4TransfLitrHeter(NumMicrbHetetrophCmplx,1:jcplx));this%RH1PO4TransfLitrHeter=spval
@@ -397,9 +396,8 @@ type, public :: NitroAQMFluxDiagType
   allocate(this%RO2DmndAutor(NumMicrobAutrophCmplx));this%RO2DmndAutor=spval
   allocate(this%RO2Uptk4RespAutor(NumMicrobAutrophCmplx));this%RO2Uptk4RespAutor=spval
   allocate(this%RNO3UptkAutor(NumMicrobAutrophCmplx));this%RNO3UptkAutor=spval
-  allocate(this%RDNOBff(NumMicrobAutrophCmplx));this%RDNOBff=spval
-  allocate(this%RDNO2ff(NumMicrobAutrophCmplx));this%RDNO2ff=spval
-  allocate(this%RDN2Bff(NumMicrobAutrophCmplx));this%RDN2Bff=spval
+  allocate(this%RNO2ReduxAutorSoil(NumMicrobAutrophCmplx));this%RNO2ReduxAutorSoil=spval
+  allocate(this%RNO2ReduxAutorBand(NumMicrobAutrophCmplx));this%RNO2ReduxAutorBand=spval
   allocate(this%RGOMDff(NumMicrobAutrophCmplx));this%RGOMDff=spval
   allocate(this%RMaintCompAutor(2,NumMicrobAutrophCmplx));this%RMaintCompAutor=spval
   allocate(this%RNH4TransfSoilAutor(NumMicrobAutrophCmplx));this%RNH4TransfSoilAutor=spval
@@ -430,9 +428,9 @@ type, public :: NitroAQMFluxDiagType
   allocate(this%RGOMYff(NumMicrobAutrophCmplx));this%RGOMYff=spval
   allocate(this%CGOSEautor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%CGOSEautor=spval
   allocate(this%FP14XRff(NumMicrobAutrophCmplx));this%FP14XRff=spval
-  allocate(this%RCO2Xff(NumMicrobAutrophCmplx));this%RCO2Xff=spval
+  allocate(this%RCO2ProdAutor(NumMicrobAutrophCmplx));this%RCO2ProdAutor=spval
   allocate(this%RCH3Xff(NumMicrobAutrophCmplx));this%RCH3Xff=spval
-  allocate(this%RCH4Xff(NumMicrobAutrophCmplx));this%RCH4Xff=spval
+  allocate(this%RCH4ProdAutor(NumMicrobAutrophCmplx));this%RCH4ProdAutor=spval
   allocate(this%RH1PO4TransfSoilAutor(NumMicrobAutrophCmplx));this%RH1PO4TransfSoilAutor=spval
   allocate(this%RH1PO4TransfBandAutor(NumMicrobAutrophCmplx));this%RH1PO4TransfBandAutor=spval
   allocate(this%RH1PO4TransfLitrAutor(NumMicrobAutrophCmplx));this%RH1PO4TransfLitrAutor=spval
@@ -488,17 +486,17 @@ type, public :: NitroAQMFluxDiagType
   implicit none
   class(NitroMicFLuxType) :: this
 
-  this%RUPOX = 0._r8
+  this%RO2UptkHeter = 0._r8
   this%RGN2F = 0._r8
   this%RGOMO = 0._r8
   this%RO2Dmnd4RespHeter = 0._r8
   this%RO2DmndHeter = 0._r8
-  this%ROXYO = 0._r8
-  this%RDNO3 = 0._r8
-  this%RDNOB = 0._r8
-  this%RDNO2 = 0._r8
-  this%RDN2B = 0._r8
-  this%RDN2O = 0._r8
+  this%RO2Uptk4RespHeter = 0._r8
+  this%RNO3ReduxHeterSoil = 0._r8
+  this%RNO3ReduxHeterBand = 0._r8
+  this%RNO2ReduxHeterSoil = 0._r8
+  this%RNO2ReduxHeterBand = 0._r8
+  this%RN2OReduxHeter = 0._r8
   this%RGOMD = 0._r8
   this%RMOMC = 0._r8
   this%RNH4TransfSoilHeter = 0._r8
@@ -534,9 +532,9 @@ type, public :: NitroAQMFluxDiagType
   this%ROQCD = 0._r8
   this%CGOMES = 0._r8
   this%FP14XR = 0._r8
-  this%RCO2X = 0._r8
+  this%RCO2ProdHeter = 0._r8
   this%RCH3X = 0._r8
-  this%RCH4X = 0._r8
+  this%RCH4ProdHeter = 0._r8
   this%RVOXA = 0._r8
   this%RVOXB = 0._r8
   this%XOMZ = 0._r8
@@ -551,9 +549,8 @@ type, public :: NitroAQMFluxDiagType
   this%RO2DmndAutor = 0._r8
   this%RO2Uptk4RespAutor = 0._r8
   this%RNO3UptkAutor = 0._r8
-  this%RDNOBff = 0._r8
-  this%RDNO2ff = 0._r8
-  this%RDN2Bff = 0._r8
+  this%RNO2ReduxAutorSoil = 0._r8
+  this%RNO2ReduxAutorBand = 0._r8
   this%RGOMDff = 0._r8
   this%RMaintCompAutor = 0._r8
   this%RNH4TransfSoilAutor = 0._r8
@@ -585,9 +582,9 @@ type, public :: NitroAQMFluxDiagType
   this%RGOMYff = 0._r8
   this%CGOSEautor = 0._r8
   this%FP14XRff = 0._r8
-  this%RCO2Xff = 0._r8
+  this%RCO2ProdAutor = 0._r8
   this%RCH3Xff = 0._r8
-  this%RCH4Xff = 0._r8
+  this%RCH4ProdAutor = 0._r8
   this%RH1PO4TransfSoilAutor = 0._r8
   this%RH1PO4TransfBandAutor = 0._r8
   this%RH1PO4TransfLitrAutor = 0._r8
@@ -602,17 +599,17 @@ type, public :: NitroAQMFluxDiagType
   implicit none
   class(NitroMicFLuxType) :: this
 
-  call destroy(this%RUPOX)
+  call destroy(this%RO2UptkHeter)
   call destroy(this%RGN2F)
   call destroy(this%RGOMO)
   call destroy(this%RO2Dmnd4RespHeter)
   call destroy(this%RO2DmndHeter)
-  call destroy(this%ROXYO)
-  call destroy(this%RDNO3)
-  call destroy(this%RDNOB)
-  call destroy(this%RDNO2)
-  call destroy(this%RDN2B)
-  call destroy(this%RDN2O)
+  call destroy(this%RO2Uptk4RespHeter)
+  call destroy(this%RNO3ReduxHeterSoil)
+  call destroy(this%RNO3ReduxHeterBand)
+  call destroy(this%RNO2ReduxHeterSoil)
+  call destroy(this%RNO2ReduxHeterBand)
+  call destroy(this%RN2OReduxHeter)
   call destroy(this%RGOMD)
   call destroy(this%RMOMC)
   call destroy(this%RNH4TransfSoilHeter)
@@ -647,9 +644,9 @@ type, public :: NitroAQMFluxDiagType
   call destroy(this%ROQCD)
   call destroy(this%CGOMES)
   call destroy(this%FP14XR)
-  call destroy(this%RCO2X)
+  call destroy(this%RCO2ProdHeter)
   call destroy(this%RCH3X)
-  call destroy(this%RCH4X)
+  call destroy(this%RCH4ProdHeter)
   call destroy(this%RVOXA)
   call destroy(this%RVOXB)
   call destroy(this%XOMZ)
@@ -664,9 +661,8 @@ type, public :: NitroAQMFluxDiagType
   call destroy(this%RO2DmndAutor)
   call destroy(this%RO2Uptk4RespAutor)
   call destroy(this%RNO3UptkAutor)
-  call destroy(this%RDNOBff)
-  call destroy(this%RDNO2ff)
-  call destroy(this%RDN2Bff)
+  call destroy(this%RNO2ReduxAutorSoil)
+  call destroy(this%RNO2ReduxAutorBand)
   call destroy(this%RGOMDff)
   call destroy(this%RMaintCompAutor)
   call destroy(this%RNH4TransfSoilAutor)
@@ -697,9 +693,9 @@ type, public :: NitroAQMFluxDiagType
   call destroy(this%RGOMYff)
   call destroy(this%CGOSEautor)
   call destroy(this%FP14XRff)
-  call destroy(this%RCO2Xff)
+  call destroy(this%RCO2ProdAutor)
   call destroy(this%RCH3Xff)
-  call destroy(this%RCH4Xff)
+  call destroy(this%RCH4ProdAutor)
   call destroy(this%RH1PO4TransfSoilAutor)
   call destroy(this%RH1PO4TransfBandAutor)
   call destroy(this%RH1PO4TransfLitrAutor)

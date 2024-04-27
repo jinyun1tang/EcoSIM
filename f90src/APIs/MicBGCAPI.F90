@@ -362,7 +362,7 @@ implicit none
   trcg_RMicbTransf_vr(idg_CO2,L,NY,NX) =micflx%RCO2O
   trcg_RMicbTransf_vr(idg_CH4,L,NY,NX) =micflx%RCH4O
   trcg_RMicbTransf_vr(idg_H2,L,NY,NX) =micflx%RH2GO
-  trcg_RMicbTransf_vr(idg_O2,L,NY,NX)=micflx%RUPOXO
+  trcg_RMicbTransf_vr(idg_O2,L,NY,NX)=micflx%RO2UptkMicb
   trcg_RMicbTransf_vr(idg_N2,L,NY,NX)  =micflx%RN2G
   trcg_RMicbTransf_vr(idg_N2O,L,NY,NX)  =micflx%RN2O
   RNutMicbTransf_vr(ids_NH4,L,NY,NX) =micflx%RNH4MicbTransf_vr

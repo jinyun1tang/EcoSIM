@@ -551,7 +551,7 @@ contains
 
   ystatesfl(cid_CO2S) =ystates0l(cid_CO2S)-micflx%RCO2O
   ystatesfl(cid_Z2OS) =ystates0l(cid_Z2OS)-micflx%RN2O
-  ystatesfl(cid_OXYS) =ystates0l(cid_OXYS)-micflx%RUPOXO
+  ystatesfl(cid_OXYS) =ystates0l(cid_OXYS)-micflx%RO2UptkMicb
   ystatesfl(cid_H2GS) =ystates0l(cid_H2GS)-micflx%RH2GO
   ystatesfl(cid_CH4S) =ystates0l(cid_CH4S)-micflx%RCH4O
   ystatesfl(cid_Z2GS) =ystates0l(cid_Z2GS)-micflx%RN2G-micflx%XN2GS

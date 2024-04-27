@@ -72,15 +72,14 @@ module MicAutoCPLXMod
     RO2DmndAutor=> nmicf%RO2DmndAutor  ,    &
     RO2Uptk4RespAutor => nmicf%RO2Uptk4RespAutor ,    &
     RNO3UptkAutor => nmicf%RNO3UptkAutor ,    &
-    RDNOBff => nmicf%RDNOBff ,    &
-    RDNO2ff => nmicf%RDNO2ff ,    &
-    RDN2Bff => nmicf%RDN2Bff ,    &
+    RNO2ReduxAutorSoil => nmicf%RNO2ReduxAutorSoil ,    &
+    RNO2ReduxAutorBand => nmicf%RNO2ReduxAutorBand ,    &
     RGOMDff  => nmicf%RGOMDff,    &
     RH2GXff  => nmicf%RH2GXff,    &
     RGOMYff  => nmicf%RGOMYff,    &
-    RCO2Xff  => nmicf%RCO2Xff,    &
+    RCO2ProdAutor  => nmicf%RCO2ProdAutor,    &
     RCH3Xff  => nmicf%RCH3Xff,    &
-    RCH4Xff  => nmicf%RCH4Xff,    &
+    RCH4ProdAutor  => nmicf%RCH4ProdAutor,    &
     TOMK  => ncplxs%TOMK     ,    &
     jcplx  => micpar%jcplx   ,    &
     AmmoniaOxidBacter => micpar%AmmoniaOxidBacter, &
@@ -180,7 +179,7 @@ module MicAutoCPLXMod
 !
 !  write(*,*)'O2 UPTAKE BY AEROBES'
 !
-! RUPOX, ROXYP=O2-limited, O2-unlimited rates of O2 uptake
+! RO2UptkHeter, ROXYP=O2-limited, O2-unlimited rates of O2 uptake
 ! RUPMX=O2-unlimited rate of O2 uptake
 ! FOXYX=fraction of O2 uptake by N,K relative to total
 ! dts_gas=1/(NPH*NPT)
@@ -198,9 +197,9 @@ module MicAutoCPLXMod
       micfor,micstt,nmicf,nmics,micflx)
   elseif (N.eq.H2GenoMethanogArchea)then
     RGOMOff(NGL)=RGOMP
-    RCO2Xff(NGL)=0.0_r8
+    RCO2ProdAutor(NGL)=0.0_r8
     RCH3Xff(NGL)=0.0_r8
-    RCH4Xff(NGL)=RGOMOff(NGL)
+    RCH4ProdAutor(NGL)=RGOMOff(NGL)
     RO2Uptk4RespAutor(NGL)=RO2Dmnd4RespAutor(NGL)
     RH2GXff(NGL)=0.0_r8
     RH2GZ=0.667_r8*RGOMOff(NGL)
@@ -213,9 +212,8 @@ module MicAutoCPLXMod
       naqfdiag,nmicf,nmics,micflx)
   ELSE
     RNO3UptkAutor(NGL)=0.0_r8
-    RDNOBff(NGL)=0.0_r8
-    RDNO2ff(NGL)=0.0_r8
-    RDN2Bff(NGL)=0.0_r8
+    RNO2ReduxAutorSoil(NGL)=0.0_r8
+    RNO2ReduxAutorBand(NGL)=0.0_r8
     RGOMYff(NGL)=0.0_r8
     RGOMDff(NGL)=0.0_r8
   ENDIF
@@ -659,10 +657,9 @@ module MicAutoCPLXMod
     RO2DmndAutor=> nmicf%RO2DmndAutor ,     &
     RO2Uptk4RespAutor => nmicf%RO2Uptk4RespAutor,     &
     RH2GXff  => nmicf%RH2GXff,    &
-    ROQCD  => nmicf%ROQCD,    &
-    RCO2Xff  => nmicf%RCO2Xff,    &
+    RCO2ProdAutor  => nmicf%RCO2ProdAutor,    &
     RCH3Xff  => nmicf%RCH3Xff,    &
-    RCH4Xff  => nmicf%RCH4Xff,    &
+    RCH4ProdAutor  => nmicf%RCH4ProdAutor,    &
     RVOXA  => nmicf%RVOXA,    &
     RVOXB  => nmicf%RVOXB,    &
     AmmoniaOxidBacter => micpar%AmmoniaOxidBacter, &
@@ -798,14 +795,14 @@ module MicAutoCPLXMod
   !write(*,*)'RESPIRATION PRODUCTS ALLOCATED TO O2, CO2, ACETATE, CH4, H2'
   !
   !     RGOMO,RGOMP=O2-limited, O2-unlimited respiration
-  !     RCO2X,RCH3X,RCH4X,RH2GX=CO2,acetate,CH4,H2 production from RGOMO
-  !     ROXYO=O2-limited O2 uptake
+  !     RCO2X,RCH3X,RCH4ProdHeter,RH2GX=CO2,acetate,CH4,H2 production from RGOMO
+  !     RO2Uptk4RespHeter=O2-limited O2 uptake
   !     RVOXA,RVOXB=total O2-lmited (1)NH4,(2)NO2,(3)CH4 oxidation
   !
   RGOMOff(NGL)=RGOMP*fLimO2Autor(NGL)
-  RCO2Xff(NGL)=RGOMOff(NGL)
+  RCO2ProdAutor(NGL)=RGOMOff(NGL)
   RCH3Xff(NGL)=0.0_r8
-  RCH4Xff(NGL)=0.0_r8
+  RCH4ProdAutor(NGL)=0.0_r8
   RO2Uptk4RespAutor(NGL)=RO2Dmnd4RespAutor(NGL)*fLimO2Autor(NGL)
   RH2GXff(NGL)=0.0_r8
   RVOXA(NGL)=RVOXPA*fLimO2Autor(NGL)
@@ -845,9 +842,8 @@ module MicAutoCPLXMod
     RO2Dmnd4RespAutor  => nmicf%RO2Dmnd4RespAutor,    &
     RO2Uptk4RespAutor => nmicf%RO2Uptk4RespAutor ,    &
     RNO3UptkAutor => nmicf%RNO3UptkAutor ,    &
-    RDNOBff => nmicf%RDNOBff ,    &
-    RDNO2ff => nmicf%RDNO2ff ,    &
-    RDN2Bff => nmicf%RDN2Bff ,    &
+    RNO2ReduxAutorSoil => nmicf%RNO2ReduxAutorSoil ,    &
+    RNO2ReduxAutorBand => nmicf%RNO2ReduxAutorBand ,    &
     RGOMDff  => nmicf%RGOMDff,    &
     RGOMYff  => nmicf%RGOMYff,    &
     RVOXA    => nmicf%RVOXA  ,    &
@@ -891,7 +887,7 @@ module MicAutoCPLXMod
 !     CONCENTRATIONS AND STOICHIOMETRY OF REDOX ELECTRON TRANSFER
 !     NOT ACCEPTED BY O2
 !
-!     ROXYD=O2 demand RO2Dmnd4RespHeter not met by O2 uptake ROXYO
+!     ROXYD=O2 demand RO2Dmnd4RespHeter not met by O2 uptake RO2Uptk4RespHeter
 !     VMXD4=demand for NO2-N reduction
 !     VMXDXS,VMXDXB=maximum NO2 reduction in non-band, band
 !     FNO2S,FNO2B=fractions of total NO2 in non-band, band
@@ -900,7 +896,7 @@ module MicAutoCPLXMod
 !     FVMXDX=nonlinear effect of product inhibition for NOx reduction
 !     VMKI=product inhibition for NOx reduction
 !     VMXD4S,VMXD4B=substrate-unlimited NO2 reduction in non-band,band
-!     RDNO2,RDN2B=substrate-limited NO2 reduction in non-band,band
+!     RNO2ReduxHeterSoil,RNO2ReduxHeterBand=substrate-limited NO2 reduction in non-band,band
 !     RGOMY,RGOMD=total substrate-unltd,-ltd respn from NO2 reduction
 !     ECNO=efficiency CO2 conversion to biomass
 !     ECHZ=growth respiration efficiency
@@ -922,18 +918,17 @@ module MicAutoCPLXMod
   VMXD4B=VMXDXB*FVMXDX
   ZNO2SX=ZNO2S+RVOXAAO
   ZNO2BX=ZNO2B+RVOXBAO
-  RDNO2ff(NGL)=AZMAX1(AMIN1(VMXD4S,ZNO2SX))
-  RDN2Bff(NGL)=AZMAX1(AMIN1(VMXD4B,ZNO2BX))
-  RDNOT=RDNO2ff(NGL)+RDN2Bff(NGL)
+  RNO2ReduxAutorSoil(NGL)=AZMAX1(AMIN1(VMXD4S,ZNO2SX))
+  RNO2ReduxAutorBand(NGL)=AZMAX1(AMIN1(VMXD4B,ZNO2BX))
+  RDNOT=RNO2ReduxAutorSoil(NGL)+RNO2ReduxAutorBand(NGL)
   RGOMYff(NGL)=0.0_r8
   RGOMDff(NGL)=RDNOT*ECNO*ENOX
   RNO3UptkAutor(NGL)=0.0_r8
-  RDNOBff(NGL)=0.0_r8
   RNO2OxidAutor(NGL)=VMXD4S
   RNO2OxidAutorBand(NGL)=VMXD4B
-  RVOXA(NGL)=RVOXA(NGL)+0.333_r8*RDNO2ff(NGL)
-  RVOXB(NGL)=RVOXB(NGL)+0.333_r8*RDN2Bff(NGL)
-!     TRN2ON=TRN2ON+RDNO2ff(NGL)+RDN2Bff(NGL)
+  RVOXA(NGL)=RVOXA(NGL)+0.333_r8*RNO2ReduxAutorSoil(NGL)
+  RVOXB(NGL)=RVOXB(NGL)+0.333_r8*RNO2ReduxAutorBand(NGL)
+!     TRN2ON=TRN2ON+RNO2ReduxAutorSoil(NGL)+RNO2ReduxAutorBand(NGL)
   end associate
   end subroutine AutotrophDenitrificCatabolism
 !------------------------------------------------------------------------------------------
@@ -1895,7 +1890,7 @@ module MicAutoCPLXMod
     RGOMOff  => nmicf%RGOMOff,    &
     RGOMDff  => nmicf%RGOMDff,    &
     RNO3TransfSoilAutor  => nmicf%RNO3TransfSoilAutor,    &
-    RCO2Xff  => nmicf%RCO2Xff,    &
+    RCO2ProdAutor  => nmicf%RCO2ProdAutor,    &
     RH2PO4TransfSoilAutor  => nmicf%RH2PO4TransfSoilAutor,    &
     RNH4TransfBandAutor => nmicf%RNH4TransfBandAutor ,    &
     RNO3TransfBandAutor => nmicf%RNO3TransfBandAutor ,    &
@@ -1982,13 +1977,13 @@ module MicAutoCPLXMod
 !     RH2PO4TransfLitrHeter,RH1PO4TransfLitrHeter=substrate-limited H2PO4,HPO4 mineraln-immobiln
 !
         CGROMC=CGOMEautor(ielmc,NGL)-RGOMOff(NGL)-RGOMDff(NGL)-RGN2Fff(NGL)
-        RCO2Xff(NGL)=RCO2Xff(NGL)+RGN2Fff(NGL)
+        RCO2ProdAutor(NGL)=RCO2ProdAutor(NGL)+RGN2Fff(NGL)
         MID3=micpar%get_micb_id(3,NGL)
         DO M=1,2
           OMEauto(ielmc,MID3)=OMEauto(ielmc,MID3)-CGOSEautor(ielmc,M,NGL)+R3OMEautor(ielmc,M,NGL)
           OMEauto(ielmn,MID3)=OMEauto(ielmn,MID3)-CGOSEautor(ielmn,M,NGL)+R3OMEautor(ielmn,M,NGL)+R3MMEautor(ielmn,M,NGL)
           OMEauto(ielmp,MID3)=OMEauto(ielmp,MID3)-CGOSEautor(ielmp,M,NGL)+R3OMEautor(ielmp,M,NGL)+R3MMEautor(ielmp,M,NGL)
-          RCO2Xff(NGL)=RCO2Xff(NGL)+R3MMEautor(ielmc,M,NGL)
+          RCO2ProdAutor(NGL)=RCO2ProdAutor(NGL)+R3MMEautor(ielmc,M,NGL)
         ENDDO
         OMEauto(ielmc,MID3)=OMEauto(ielmc,MID3)+CGROMC
         OMEauto(ielmn,MID3)=OMEauto(ielmn,MID3)+CGOMEautor(ielmn,NGL) &

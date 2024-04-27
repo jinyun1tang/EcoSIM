@@ -17,7 +17,7 @@ implicit none
   real(r8) :: RCO2O
   real(r8) :: RCH4O
   real(r8) :: RH2GO
-  real(r8) :: RUPOXO
+  real(r8) :: RO2UptkMicb
   real(r8) :: RN2G
   real(r8) :: RN2O
   real(r8) :: RNH4MicbTransf_vr

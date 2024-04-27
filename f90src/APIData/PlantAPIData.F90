@@ -843,7 +843,7 @@ implicit none
 !  if(allocated(RCO2P))deallocate(RCO2P)
 !  if(allocated(RootO2Uptk_pvr))deallocate(RootO2Uptk_pvr)
 !  if(allocated(RCO2S))deallocate(RCO2S)
-!  if(allocated(RUPOXS))deallocate(RUPOXS)
+!  if(allocated(RO2UptkHeterS))deallocate(RO2UptkHeterS)
 !  if(allocated(RUPCHS))deallocate(RUPCHS)
 !  if(allocated(RUPN2S))deallocate(RUPN2S)
 !  if(allocated(RUPN3S))deallocate(RUPN3S)
