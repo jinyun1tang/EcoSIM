@@ -742,7 +742,7 @@ implicit none
 
     plt_site%DLYR3(L)     =DLYR(3,L,NY,NX)
     DO K=1,jcplx
-      plt_soilchem%FOSRH(K,L)=FOSRH(K,L,NY,NX)
+      plt_soilchem%FracBulkSOM_vr(K,L)=FracBulkSOM_vr(K,L,NY,NX)
       plt_soilchem%DOM(idom_doc,K,L)=DOM(idom_doc,K,L,NY,NX)
       plt_soilchem%DOM(idom_don,K,L)=DOM(idom_don,K,L,NY,NX)
       plt_soilchem%DOM(idom_dop,K,L)=DOM(idom_dop,K,L,NY,NX)

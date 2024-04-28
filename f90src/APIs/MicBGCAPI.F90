@@ -306,7 +306,7 @@ implicit none
   micstt%SCH4L=GasSolbility_vr(idg_CH4,L,NY,NX)
   micstt%ZNFN0=ZNFN0(L,NY,NX)
   micstt%ZNFNI=ZNFNI(L,NY,NX)
-  micstt%FOSRH(1:jcplx)=FOSRH(1:jcplx,L,NY,NX)
+  micstt%FracBulkSOM(1:jcplx)=FracBulkSOM_vr(1:jcplx,L,NY,NX)
   micstt%DOM(idom_beg:idom_end,1:jcplx)=DOM(idom_beg:idom_end,1:jcplx,L,NY,NX)
   micstt%OHM(idom_beg:idom_end,1:jcplx)=OHM(idom_beg:idom_end,1:jcplx,L,NY,NX)
 
@@ -448,7 +448,7 @@ implicit none
   VOLQ(L,NY,NX)=micstt%VOLQ
   TOQCK(L,NY,NX)=micstt%TOQCK
   ZNFNI(L,NY,NX)=micstt%ZNFNI
-  FOSRH(1:jcplx,L,NY,NX)=micstt%FOSRH(1:jcplx)
+  FracBulkSOM_vr(1:jcplx,L,NY,NX)=micstt%FracBulkSOM(1:jcplx)
   DOM(idom_beg:idom_end,1:jcplx,L,NY,NX)=micstt%DOM(idom_beg:idom_end,1:jcplx)
   OHM(idom_beg:idom_end,1:jcplx,L,NY,NX)=micstt%OHM(idom_beg:idom_end,1:jcplx)
 

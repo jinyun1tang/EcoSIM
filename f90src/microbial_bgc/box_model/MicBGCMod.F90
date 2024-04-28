@@ -166,98 +166,98 @@ module MicBGCMod
   real(r8) :: TOSC,TOSA,TOHC
   real(r8) :: TSRH
 !     begin_execution
-  associate(                                    &
-    CNOMActHeter   => nmics%CNOMActHeter      , &
-    CPOMActHeter   => nmics%CPOMActHeter      , &
-    OMActHeter     => nmics%OMActHeter        , &
-    OMC2           => nmics%OMC2              , &
-    OMN2           => nmics%OMN2              , &
-    FOM2           => nmics%FOM2              , &
-    FCN            => nmics%FCN               , &
-    FCP            => nmics%FCP               , &
-    FCNP           => nmics%FCNP              , &
-    OSRH           => ncplxs%OSRH             , &
-    TOMK           => ncplxs%TOMK             , &
-    TONK           => ncplxs%TONK             , &
-    TOPK           => ncplxs%TOPK             , &
-    FOCA           => ncplxs%FOCA             , &
-    FOAA           => ncplxs%FOAA             , &
-    CNQ            => ncplxs%CNQ              , &
-    CPQ            => ncplxs%CPQ              , &
-    CDOM           => ncplxs%CDOM             , &
-    ORCT           => ncplxs%ORCT             , &
-    OSCT           => ncplxs%OSCT             , &
-    OSAT           => ncplxs%OSAT             , &
-    TONX           => ncplxs%TONX             , &
-    TOPX           => ncplxs%TOPX             , &
-    TORC           => nmicdiag%TORC           , &
-    TOMA           => nmicdiag%TOMA           , &
-    TOMN           => nmicdiag%TOMN           , &
-    XCO2           => nmicdiag%XCO2           , &
-    TSensGrowth    => nmicdiag%TSensGrowth    , &
-    TSensMaintR    => nmicdiag%TSensMaintR    , &
-    ThetaLitr      => nmicdiag%ThetaLitr      , &
-    ThetaZ          => nmicdiag%ThetaZ          , &
-    VOLWZ          => nmicdiag%VOLWZ          , &
-    ZNH4T  =>  nmicdiag%ZNH4T, &
-    ZNO3T  =>  nmicdiag%ZNO3T, &
-    ZNO2T  =>  nmicdiag%ZNO2T, &
-    H2P4T  =>  nmicdiag%H2P4T, &
-    H1P4T  =>  nmicdiag%H1P4T, &
-    CNOMActAutor  => nmics%CNOMActAutor, &
-    CPOMActAutor  => nmics%CPOMActAutor, &
-    OMActAutor    => nmics%OMActAutor  , &
-    OMC2ff   => nmics%OMC2ff , &
-    OMN2ff   => nmics%OMN2ff , &
-    FOM2ff   => nmics%FOM2ff , &
-    FCNff    => nmics%FCNff  , &
-    FCPff    => nmics%FCPff  , &
-    FCNPff   => nmics%FCNPff , &
-    rNCOMCff  => micpar%rNCOMCff, &
-    rPCOMCff  => micpar%rPCOMCff, &
-    rNCOMC  => micpar%rNCOMC, &
-    rPCOMC  => micpar%rPCOMC, &
-    FL       => micpar%FL   , &
-    k_humus=>micpar%k_humus, &
-    k_POM=>micpar%k_POM                     , &
-    is_activef_micb=> micpar%is_activef_micb, &
-    n_anero_faculb  => micpar%n_anero_faculb, &
-    AmmoniaOxidBacter => micpar%AmmoniaOxidBacter, &
-    litrm    => micfor%litrm  , &
-    VWatLitRHoldCapcity  => micfor%VWatLitRHoldCapcity , &
-    VLWatMicP   => micfor%VLWatMicP, &
-    VOLW0   => micfor%VOLW0, &
-    THETY  => micfor%THETY, &
-    VLitR   => micfor%VLitR , &
-    VLSoilMicP   => micfor%VLSoilMicP , &
-    POROS  => micfor%POROS, &
-    ZEROS => micfor%ZEROS, &
-    FieldCapacity    => micfor%FieldCapacity  , &
-    THETW   => micfor%THETW , &
-    TKS    => micfor%TKS, &
-    OFFSET  => micfor%OFFSET, &
-    VLWatMicPM  => micfor%VLWatMicPM  , &
-    ZEROS2  => micfor%ZEROS2 , &
-    ZERO   => micfor%ZERO    , &
-    CCO2S   => micstt%CCO2S, &
-    OSM     => micstt%OSM  ,&
-    OSA     => micstt%OSA  ,&
-    ORM     => micstt%ORM   , &
-    OHM     => micstt%OHM   , &
-    OMEheter    => micstt%OMEheter  , &
-    DOM     => micstt%DOM   , &
-    H1PO4 => micstt%H1PO4, &
-    H1POB => micstt%H1POB, &
-    H2PO4 => micstt%H2PO4, &
-    H2POB => micstt%H2POB, &
-    ZNH4B => micstt%ZNH4B, &
-    ZNH4S => micstt%ZNH4S, &
-    ZNO2B => micstt%ZNO2B, &
-    ZNO2S => micstt%ZNO2S, &
-    ZNO3B => micstt%ZNO3B, &
-    ZNO3S => micstt%ZNO3S, &
-    OMEauto => micstt%OMEauto, &
-    FOSRH   => micstt%FOSRH   &
+  associate(                                               &
+    CNOMActHeter         => nmics%CNOMActHeter           , &
+    CPOMActHeter         => nmics%CPOMActHeter           , &
+    OMActHeter           => nmics%OMActHeter             , &
+    OMC2                 => nmics%OMC2                   , &
+    OMN2                 => nmics%OMN2                   , &
+    FOM2                 => nmics%FOM2                   , &
+    FCN                  => nmics%FCN                    , &
+    FCP                  => nmics%FCP                    , &
+    FCNP                 => nmics%FCNP                   , &
+    BulkSOM                 => ncplxs%BulkSOM                  , &
+    TOMK                 => ncplxs%TOMK                  , &
+    TONK                 => ncplxs%TONK                  , &
+    TOPK                 => ncplxs%TOPK                  , &
+    FOCA                 => ncplxs%FOCA                  , &
+    FOAA                 => ncplxs%FOAA                  , &
+    CNQ                  => ncplxs%CNQ                   , &
+    CPQ                  => ncplxs%CPQ                   , &
+    CDOM                 => ncplxs%CDOM                  , &
+    ORCT                 => ncplxs%ORCT                  , &
+    OSCT                 => ncplxs%OSCT                  , &
+    OSAT                 => ncplxs%OSAT                  , &
+    TONX                 => ncplxs%TONX                  , &
+    TOPX                 => ncplxs%TOPX                  , &
+    TORC                 => nmicdiag%TORC                , &
+    TOMA                 => nmicdiag%TOMA                , &
+    TOMN                 => nmicdiag%TOMN                , &
+    XCO2                 => nmicdiag%XCO2                , &
+    TSensGrowth          => nmicdiag%TSensGrowth         , &
+    TSensMaintR          => nmicdiag%TSensMaintR         , &
+    ThetaLitr            => nmicdiag%ThetaLitr           , &
+    ThetaZ               => nmicdiag%ThetaZ              , &
+    VOLWZ                => nmicdiag%VOLWZ               , &
+    ZNH4T                => nmicdiag%ZNH4T               , &
+    ZNO3T                => nmicdiag%ZNO3T               , &
+    ZNO2T                => nmicdiag%ZNO2T               , &
+    H2P4T                => nmicdiag%H2P4T               , &
+    H1P4T                => nmicdiag%H1P4T               , &
+    CNOMActAutor         => nmics%CNOMActAutor           , &
+    CPOMActAutor         => nmics%CPOMActAutor           , &
+    OMActAutor           => nmics%OMActAutor             , &
+    OMC2ff               => nmics%OMC2ff                 , &
+    OMN2ff               => nmics%OMN2ff                 , &
+    FOM2ff               => nmics%FOM2ff                 , &
+    FCNff                => nmics%FCNff                  , &
+    FCPff                => nmics%FCPff                  , &
+    FCNPff               => nmics%FCNPff                 , &
+    rNCOMCff             => micpar%rNCOMCff              , &
+    rPCOMCff             => micpar%rPCOMCff              , &
+    rNCOMC               => micpar%rNCOMC                , &
+    rPCOMC               => micpar%rPCOMC                , &
+    FL                   => micpar%FL                    , &
+    k_humus              => micpar%k_humus               , &
+    k_POM                => micpar%k_POM                 , &
+    is_activef_micb      => micpar%is_activef_micb       , &
+    n_anero_faculb       => micpar%n_anero_faculb        , &
+    AmmoniaOxidBacter    => micpar%AmmoniaOxidBacter     , &
+    litrm                => micfor%litrm                 , &
+    VWatLitRHoldCapcity  => micfor%VWatLitRHoldCapcity   , &
+    VLWatMicP            => micfor%VLWatMicP             , &
+    VOLW0                => micfor%VOLW0                 , &
+    THETY                => micfor%THETY                 , &
+    VLitR                => micfor%VLitR                 , &
+    VLSoilMicP           => micfor%VLSoilMicP            , &
+    POROS                => micfor%POROS                 , &
+    ZEROS                => micfor%ZEROS                 , &
+    FieldCapacity        => micfor%FieldCapacity         , &
+    THETW                => micfor%THETW                 , &
+    TKS                  => micfor%TKS                   , &
+    OFFSET               => micfor%OFFSET                , &
+    VLWatMicPM           => micfor%VLWatMicPM            , &
+    ZEROS2               => micfor%ZEROS2                , &
+    ZERO                 => micfor%ZERO                  , &
+    CCO2S                => micstt%CCO2S                 , &
+    OSM                  => micstt%OSM                   , &
+    OSA                  => micstt%OSA                   , &
+    ORM                  => micstt%ORM                   , &
+    OHM                  => micstt%OHM                   , &
+    OMEheter             => micstt%OMEheter              , &
+    DOM                  => micstt%DOM                   , &
+    H1PO4                => micstt%H1PO4                 , &
+    H1POB                => micstt%H1POB                 , &
+    H2PO4                => micstt%H2PO4                 , &
+    H2POB                => micstt%H2POB                 , &
+    ZNH4B                => micstt%ZNH4B                 , &
+    ZNH4S                => micstt%ZNH4S                 , &
+    ZNO2B                => micstt%ZNO2B                 , &
+    ZNO2S                => micstt%ZNO2S                 , &
+    ZNO3B                => micstt%ZNO3B                 , &
+    ZNO3S                => micstt%ZNO3S                 , &
+    OMEauto              => micstt%OMEauto               , &
+    FracBulkSOM                => micstt%FracBulkSOM                   &
   )
 
 ! get KL, the number of mic-om complexes
@@ -354,13 +354,13 @@ module MicBGCMod
 !
 !     TOTAL ADSORBED AND DISSOLVED SUBSTRATE
 !
-!     OSRH=total SOC
+!     BulkSOM=total SOC
 !
     TOHC=TOHC+OHM(ielmc,K)+OHM(idom_acetate,K)
   enddo
 
   D860: DO K=1,KL
-    OSRH(K)=OSAT(K)+ORCT(K)+OHM(ielmc,K)+OHM(idom_acetate,K)
+    BulkSOM(K)=OSAT(K)+ORCT(K)+OHM(ielmc,K)+OHM(idom_acetate,K)
   ENDDO D860
   TSRH=TOSA+TORC+TOHC
 !
@@ -485,25 +485,25 @@ module MicBGCMod
   ENDDO
 
 !
-!     FOSRH=fraction of total SOC in each substrate complex K
+!     FracBulkSOM=fraction of total SOC in each substrate complex K
 !
   D790: DO K=1,KL
     IF(TSRH.GT.ZEROS)THEN
-      FOSRH(K)=OSRH(K)/TSRH
+      FracBulkSOM(K)=BulkSOM(K)/TSRH
     ELSE
-      FOSRH(K)=1.0_r8
+      FracBulkSOM(K)=1.0_r8
     ENDIF
     !
     !     DOC CONCENTRATIONS
     !
     !     COQC,COQA=aqueous DOC,acetate concentrations
-    !     VLWatMicPM=soil water content, FOSRH=fraction of total SOC
+    !     VLWatMicPM=soil water content, FracBulkSOM=fraction of total SOC
     !     occupied by each substrate complex K
     !
     IF(VLWatMicPM(NPH).GT.ZEROS2)THEN
-      IF(FOSRH(K).GT.ZERO)THEN
-        CDOM(idom_doc,K)=AZMAX1(DOM(idom_doc,K)/(VLWatMicPM(NPH)*FOSRH(K)))
-        CDOM(idom_acetate,K)=AZMAX1(DOM(idom_acetate,K)/(VLWatMicPM(NPH)*FOSRH(K)))
+      IF(FracBulkSOM(K).GT.ZERO)THEN
+        CDOM(idom_doc,K)=AZMAX1(DOM(idom_doc,K)/(VLWatMicPM(NPH)*FracBulkSOM(K)))
+        CDOM(idom_acetate,K)=AZMAX1(DOM(idom_acetate,K)/(VLWatMicPM(NPH)*FracBulkSOM(K)))
       ELSE
         CDOM(idom_doc,K)=AZMAX1(DOM(idom_doc,K)/VLWatMicPM(NPH))
         CDOM(idom_acetate,K)=AZMAX1(DOM(idom_acetate,K)/VLWatMicPM(NPH))
@@ -994,7 +994,7 @@ module MicBGCMod
     ROQCK  => ncplxf%ROQCK, &
     XOQCK  => ncplxf%XOQCK, &
     XOQMZ  => ncplxf%XOQMZ, &
-    OSRH  => ncplxs%OSRH  , &
+    BulkSOM  => ncplxs%BulkSOM  , &
     TOQCK => micstt%TOQCK, &
     DOM => micstt%DOM, &
     OMEheter=> micstt%OMEheter, &
@@ -1002,7 +1002,7 @@ module MicBGCMod
     TFND => micfor%TFND  &
   )
 !
-!     OSRH=total SOC in each K
+!     BulkSOM=total SOC in each K
 !     XFRK,XFRC,XFRN,XFRP,XFRA=transfer of respiration,DOC,DON,DOP,acetate
 !     between each K and KK, FPRIM=priming transfer rate constant
 !     TFND=temperature effect on priming transfers
@@ -1012,11 +1012,11 @@ module MicBGCMod
   D795: DO K=1,KL
     IF(K.LE.KL-1)THEN
       D800: DO KK=K+1,KL
-        OSRT=OSRH(K)+OSRH(KK)
-        IF(OSRH(K).GT.ZEROS.AND.OSRH(KK).GT.ZEROS)THEN
-          XFRK=FPRIM*TFND*(ROQCK(K)*OSRH(KK)-ROQCK(KK)*OSRH(K))/OSRT
+        OSRT=BulkSOM(K)+BulkSOM(KK)
+        IF(BulkSOM(K).GT.ZEROS.AND.BulkSOM(KK).GT.ZEROS)THEN
+          XFRK=FPRIM*TFND*(ROQCK(K)*BulkSOM(KK)-ROQCK(KK)*BulkSOM(K))/OSRT
           DO idom=idom_beg,idom_end
-            XFROM(idom)=FPRIM*TFND*(DOM(idom,K)*OSRH(KK)-DOM(idom,KK)*OSRH(K))/OSRT
+            XFROM(idom)=FPRIM*TFND*(DOM(idom,K)*BulkSOM(KK)-DOM(idom,KK)*BulkSOM(K))/OSRT
           ENDDO
           IF(ROQCK(K)+XOQCK(K)-XFRK.GT.0.0_r8.AND.ROQCK(KK)+XOQCK(KK)+XFRK.GT.0.0_r8)THEN
             XOQCK(K)=XOQCK(K)-XFRK
@@ -1036,7 +1036,7 @@ module MicBGCMod
 !     between each K and KK, FPRIMM=priming transfer rate constant
 !     TFNG=temperature+water effect
 !     OMC,OMN,OMP=microbial C,N,P
-!     OSRH=total SOC in each K
+!     BulkSOM=total SOC in each K
 !     XOMCZ,XOMNZ,XOMPZ=total microbial C,N,P transfer for all K
 !
           D850: DO N=1,NumMicbFunGroups
@@ -1044,8 +1044,8 @@ module MicBGCMod
               DO NGL=JGnio(N),JGnfo(N)
                 MID=micpar%get_micb_id(M,NGL)
                 DO NE=1,NumPlantChemElms
-                  XFME=FPRIMM*TFNG(NGL,K)*(OMEheter(NE,MID,K)*OSRH(KK) &
-                    -OMEheter(NE,MID,KK)*OSRH(K))/OSRT
+                  XFME=FPRIMM*TFNG(NGL,K)*(OMEheter(NE,MID,K)*BulkSOM(KK) &
+                    -OMEheter(NE,MID,KK)*BulkSOM(K))/OSRT
                   IF(OMEheter(NE,MID,K)+XOMZ(NE,M,NGL,K)-XFME.GT.0.0_r8 &
                     .AND.OMEheter(NE,MID,KK)+XOMZ(NE,M,NGL,KK)+XFME.GT.0.0_r8)THEN
                     XOMZ(NE,M,NGL,K)=XOMZ(NE,M,NGL,K)-XFME
@@ -1110,7 +1110,7 @@ module MicBGCMod
     CGOAC              => nmicf%CGOAC              , &
     OMSORP             => ncplxf%OMSORP            , &
     TCGOMEheter        => ncplxf%TCGOMEheter       , &
-    OSRH               => ncplxs%OSRH              , &
+    BulkSOM               => ncplxs%BulkSOM              , &
     FOCA               => ncplxs%FOCA              , &
     FOAA               => ncplxs%FOAA              , &
     SoilMicPMassLayer  => micfor%SoilMicPMassLayer , &
@@ -1119,12 +1119,12 @@ module MicBGCMod
     ZEROS              => micfor%ZEROS             , &
     litrm              => micfor%litrm             , &
     VLWatMicPM         => micfor%VLWatMicPM        , &
-    FOSRH              => micstt%FOSRH             , &
+    FracBulkSOM              => micstt%FracBulkSOM             , &
     DOM                => micstt%DOM               , &
     OHM                => micstt%OHM               , &
     AEC                => micfor%AEC                 &
   )
-!     VLWatMicPM=soil water content, FOSRH=fraction of total SOC
+!     VLWatMicPM=soil water content, FracBulkSOM=fraction of total SOC
 !     AEC,AECX=anion exchange capacity
 !     OQC,OQN,OQP,OQA=DOC,DON,DOP,acetate in micropores
 !     TCGOQC,TCGOMEheter,TCGOMEheter,TCGOAC=total uptake of DOC,DON,DOP,acetate
@@ -1133,7 +1133,7 @@ module MicBGCMod
 !     FOCA,FOAA=fractions of DOC and acetate vs. DOC+acetate
 !     CSORP,CSORPA,ZSORP,PSORP=sorption(ad=+ve,de=-ve) of OQC,acetate,DON,DOP
 !
-  IF(VLWatMicPM(NPH).GT.ZEROS2.AND.FOSRH(K).GT.ZERO)THEN
+  IF(VLWatMicPM(NPH).GT.ZEROS2.AND.FracBulkSOM(K).GT.ZERO)THEN
     IF(litrm)THEN
       AECX=0.5E+03_r8
     ELSE
@@ -1144,8 +1144,8 @@ module MicBGCMod
       OHEX(idom)=AMAX1(ZEROS,OHM(idom,K))
     ENDDO
 
-    VLSoilPoreMicP_vrX=SoilMicPMassLayer*AECX*HSORP*FOSRH(K)
-    VLSoilPoreMicP_vrW=VLWatMicPM(NPH)*FOSRH(K)
+    VLSoilPoreMicP_vrX=SoilMicPMassLayer*AECX*HSORP*FracBulkSOM(K)
+    VLSoilPoreMicP_vrW=VLWatMicPM(NPH)*FracBulkSOM(K)
     IF(FOCA(K).GT.ZERO)THEN
       VOLCX=FOCA(K)*VLSoilPoreMicP_vrX
       VOLCW=FOCA(K)*VLSoilPoreMicP_vrW
@@ -1205,7 +1205,7 @@ module MicBGCMod
     RDORM  => ncplxf%RDORM, &
     RDOHM  => ncplxf%RDOHM, &
     ROQCK  => ncplxf%ROQCK, &
-    OSRH  => ncplxs%OSRH, &
+    BulkSOM  => ncplxs%BulkSOM, &
     TOMK  => ncplxs%TOMK, &
     TONK  => ncplxs%TONK, &
     TOPK  => ncplxs%TOPK, &
@@ -1243,7 +1243,7 @@ module MicBGCMod
 !     DCKD=Km for decomposition of SOC at current COQCK
 !     DCKM0,DCKML=Km for decomposition of SOC at zero COQCK
 !     DCKI=inhibition of decomposition by microbial concentration
-!     OSRH=total SOC
+!     BulkSOM=total SOC
 !     COSC=concentration of total SOC
 !     SoilMicPMassLayer,VLSoilPoreMicP_vr=mass, volume of soil layer
 !     DFNS=effect of microbial concentration on decomposition
@@ -1273,11 +1273,11 @@ module MicBGCMod
   ELSE
     DCKD=DCKML*(1.0_r8+COQCK/DCKI)
   ENDIF
-  IF(OSRH(K).GT.ZEROS)THEN
+  IF(BulkSOM(K).GT.ZEROS)THEN
     IF(SoilMicPMassLayer.GT.ZEROS)THEN
-      COSC=OSRH(K)/SoilMicPMassLayer
+      COSC=BulkSOM(K)/SoilMicPMassLayer
     ELSE
-      COSC=OSRH(K)/VLSoilMicP
+      COSC=BulkSOM(K)/VLSoilMicP
     ENDIF
     DFNS=COSC/(COSC+DCKD)
     OQCI=1.0_r8/(1.0_r8+CDOM(idom_doc,K)/OQKI)
@@ -1294,7 +1294,7 @@ module MicBGCMod
 !     DFNS=effect of microbial concentration on decomposition
 !     OQCI=DOC product inhibition for decomposition
 !     TSensGrowth=temperature stress effect
-!     OSRH=total SOC
+!     BulkSOM=total SOC
 !     FCNK,FCPK=N,P limitation to microbial activity in each K
 !
     D785: DO M=1,jsken
@@ -1302,7 +1302,7 @@ module MicBGCMod
         CNS(M,K)=AZMAX1(OSM(ielmn,M,K)/OSM(ielmc,M,K))
         CPS(M,K)=AZMAX1(OSM(ielmp,M,K)/OSM(ielmc,M,K))
         RDOSM(ielmc,M,K)=AZMAX1(AMIN1(0.5_r8*OSA(M,K) &
-          ,SPOSC(M,K)*ROQCK(K)*DFNS*OQCI*TSensGrowth*OSA(M,K)/OSRH(K)))
+          ,SPOSC(M,K)*ROQCK(K)*DFNS*OQCI*TSensGrowth*OSA(M,K)/BulkSOM(K)))
         RDOSM(ielmn,M,K)=AZMAX1(AMIN1(OSM(ielmn,M,K),CNS(M,K)*RDOSM(ielmc,M,K)))/FCNK(K)
         RDOSM(ielmp,M,K)=AZMAX1(AMIN1(OSM(ielmp,M,K),CPS(M,K)*RDOSM(ielmc,M,K)))/FCPK(K)
 
@@ -1374,16 +1374,16 @@ module MicBGCMod
 !     DFNS=effect of microbial concentration on decomposition
 !     OQCI=DOC product inhibition for decomposition
 !     TSensGrowth=temperature stress effect
-!     OSRH=total SOC
+!     BulkSOM=total SOC
 !     FCNK,FCPK=N,P limitation to microbial activity in each K
 !
-  IF(OSRH(K).GT.ZEROS)THEN
+  IF(BulkSOM(K).GT.ZEROS)THEN
     D775: DO M=1,ndbiomcp
       IF(ORM(ielmc,M,K).GT.ZEROS)THEN
         CNR=AZMAX1(ORM(ielmn,M,K)/ORM(ielmc,M,K))
         CPR=AZMAX1(ORM(ielmp,M,K)/ORM(ielmc,M,K))
         RDORM(ielmc,M,K)=AZMAX1(AMIN1(ORM(ielmc,M,K) &
-          ,SPORC(M)*ROQCK(K)*DFNS*OQCI*TSensGrowth*ORM(ielmc,M,K)/OSRH(K)))
+          ,SPORC(M)*ROQCK(K)*DFNS*OQCI*TSensGrowth*ORM(ielmc,M,K)/BulkSOM(K)))
     !    3*AMIN1(FCNK(K),FCPK(K))
         RDORM(ielmn,M,K)=AZMAX1(AMIN1(ORM(ielmn,M,K),CNR*RDORM(ielmc,M,K)))/FCNK(K)
         RDORM(ielmp,M,K)=AZMAX1(AMIN1(ORM(ielmp,M,K),CPR*RDORM(ielmc,M,K)))/FCPK(K)
@@ -1413,20 +1413,20 @@ module MicBGCMod
 !     DFNS=effect of microbial concentration on decomposition
 !     OQCI=DOC product inhibition for decomposition
 !     TSensGrowth=temperature stress effect
-!     OSRH=total SOC
+!     BulkSOM=total SOC
 !     FCNK,FCPK=N,P limitation to microbial activity in each K
 !
-  IF(OSRH(K).GT.ZEROS)THEN
+  IF(BulkSOM(K).GT.ZEROS)THEN
     IF(OHM(ielmc,K).GT.ZEROS)THEN
       CNH(K)=AZMAX1(OHM(ielmn,K)/OHM(ielmc,K))
       CPH(K)=AZMAX1(OHM(ielmp,K)/OHM(ielmc,K))
       RDOHM(ielmc,K)=AZMAX1(AMIN1(OHM(ielmc,K) &
-        ,SPOHC*ROQCK(K)*DFNS*OQCI*TSensGrowth*OHM(ielmc,K)/OSRH(K)))
+        ,SPOHC*ROQCK(K)*DFNS*OQCI*TSensGrowth*OHM(ielmc,K)/BulkSOM(K)))
 !    3*AMIN1(FCNK(K),FCPK(K))
       RDOHM(ielmn,K)=AZMAX1(AMIN1(OHM(ielmn,K),CNH(K)*RDOHM(ielmc,K)))/FCNK(K)
       RDOHM(ielmp,K)=AZMAX1(AMIN1(OHM(ielmp,K),CPH(K)*RDOHM(ielmc,K)))/FCPK(K)
       RDOHM(idom_acetate,K)=AZMAX1(AMIN1(OHM(idom_acetate,K) &
-        ,SPOHA*ROQCK(K)*DFNS*TSensGrowth*OHM(idom_acetate,K)/OSRH(K)))
+        ,SPOHA*ROQCK(K)*DFNS*TSensGrowth*OHM(idom_acetate,K)/BulkSOM(K)))
 !    3*AMIN1(FCNK(K),FCPK(K))
     ELSE
       CNH(K)=0.0_r8
@@ -2607,7 +2607,7 @@ module MicBGCMod
     RN2OReduxHeter=> nmicf%RN2OReduxHeter, &
     RGOMD  => nmicf%RGOMD, &
     RGOMY  => nmicf%RGOMY, &
-    OSRH  => ncplxs%OSRH , &
+    BulkSOM  => ncplxs%BulkSOM , &
     RNO2EcoUptkSoilPrev  => micfor%RNO2EcoUptkSoilPrev, &
     RN2OEcoUptkSoilPrev  => micfor%RN2OEcoUptkSoilPrev, &
     RNO3Y  => micfor%RNO3Y , &
@@ -2628,7 +2628,7 @@ module MicBGCMod
     ZNO3S => micstt%ZNO3S, &
     CNO2B => micstt%CNO2B , &
     CNO2S => micstt%CNO2S, &
-    FOSRH => micstt%FOSRH, &
+    FracBulkSOM => micstt%FracBulkSOM, &
     CH2GS => micstt%CH2GS, &
     DOM => micstt%DOM, &
     RVMX3 => micflx%RVMX3, &
@@ -2691,8 +2691,8 @@ module MicBGCMod
     VMXDXB=0.0_r8
   ENDIF
   VMXDXT=VMXDXS+VMXDXB
-  IF(VOLWZ.GT.ZEROS2.AND.FOSRH(K).GT.ZERO)THEN
-    FVMXDX=1.0_r8/(1.0_r8+VMXDXT/(VMKI*VOLWZ*FOSRH(K)))
+  IF(VOLWZ.GT.ZEROS2.AND.FracBulkSOM(K).GT.ZERO)THEN
+    FVMXDX=1.0_r8/(1.0_r8+VMXDXT/(VMKI*VOLWZ*FracBulkSOM(K)))
   ELSE
     FVMXDX=0.0_r8
   ENDIF
@@ -2764,8 +2764,8 @@ module MicBGCMod
     VMXDXB=0.0_r8
   ENDIF
   VMXDXT=VMXDXS+VMXDXB
-  IF(VOLWZ.GT.ZEROS2.AND.FOSRH(K).GT.ZERO)THEN
-    FVMXDX=1.0_r8/(1.0_r8+VMXDXT/(VMKI*VOLWZ*FOSRH(K)))
+  IF(VOLWZ.GT.ZEROS2.AND.FracBulkSOM(K).GT.ZERO)THEN
+    FVMXDX=1.0_r8/(1.0_r8+VMXDXT/(VMKI*VOLWZ*FracBulkSOM(K)))
   ELSE
     FVMXDX=0.0_r8
   ENDIF
@@ -2820,8 +2820,8 @@ module MicBGCMod
 !
   VMXD1=(VMXD2-RDN2T)*2.0_r8
   VMXDXS=VMXD1*CZ2OS/(CZ2OS+Z1KM)
-  IF(VOLWZ.GT.ZEROS2.AND.FOSRH(K).GT.ZERO)THEN
-    FVMXDX=1.0_r8/(1.0_r8+VMXDXS/(VMKI*VOLWZ*FOSRH(K)))
+  IF(VOLWZ.GT.ZEROS2.AND.FracBulkSOM(K).GT.ZERO)THEN
+    FVMXDX=1.0_r8/(1.0_r8+VMXDXS/(VMKI*VOLWZ*FracBulkSOM(K)))
   ELSE
     FVMXDX=0.0_r8
   ENDIF

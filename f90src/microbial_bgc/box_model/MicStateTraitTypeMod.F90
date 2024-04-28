@@ -64,7 +64,7 @@ implicit none
   real(r8) ::CNO3BU
   real(r8) :: TFNQ
   real(r8) :: VOLQ
-  real(r8),allocatable :: FOSRH(:)
+  real(r8),allocatable :: FracBulkSOM(:)
   real(r8),allocatable :: DOM(:,:)
   real(r8),allocatable :: OHM(:,:)
   real(r8),allocatable :: OSA(:,:)
@@ -104,7 +104,7 @@ implicit none
   NumMicrbHetetrophCmplx=>micpar%NumMicrbHetetrophCmplx
   NumLiveHeterBioms => micpar%NumLiveHeterBioms
 
-  allocate(this%FOSRH(1:jcplx));this%FOSRH=spval
+  allocate(this%FracBulkSOM(1:jcplx));this%FracBulkSOM=spval
   allocate(this%DOM(idom_beg:idom_end,1:jcplx));this%DOM=spval
   allocate(this%OHM(idom_beg:idom_end,1:jcplx));this%OHM=spval
   allocate(this%OSA(jsken,1:jcplx));this%OSA=spval
@@ -125,7 +125,7 @@ implicit none
   implicit none
   class(micsttype) :: this
 
-  call destroy(this%FOSRH)
+  call destroy(this%FracBulkSOM)
   call destroy(this%DOM)
   call destroy(this%OHM)
   call destroy(this%OSA)

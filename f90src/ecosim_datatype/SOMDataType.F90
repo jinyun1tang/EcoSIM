@@ -36,7 +36,7 @@ module SOMDataType
   real(r8),target,allocatable ::  EPOC(:,:,:)                       !partitioning coefficient between POC and litter, []
   real(r8),target,allocatable ::  EHUM(:,:,:)                       !partitioning coefficient between humus and microbial residue, []
   real(r8),target,allocatable ::  CDOM(:,:,:,:,:)                     !DOC concentration, [g m-3]
-  real(r8),target,allocatable ::  FOSRH(:,:,:,:)                    !fraction of total organic C in complex, [-]
+  real(r8),target,allocatable ::  FracBulkSOM_vr(:,:,:,:)                    !fraction of total organic C in complex, [-]
   real(r8),target,allocatable ::  DIC_mass_col(:,:)                        !total soil DIC, [g d-2]
   real(r8),target,allocatable ::  UNH4(:,:)                         !total soil NH4 + NH3 content, [g d-2]
   real(r8),target,allocatable ::  UNO3(:,:)                         !total soil NO3 + NO2 content, [g d-2]
@@ -88,7 +88,7 @@ module SOMDataType
   allocate(EPOC(0:JZ,JY,JX));   EPOC=0._r8
   allocate(EHUM(0:JZ,JY,JX));   EHUM=0._r8
   allocate(CDOM(idom_beg:idom_end,1:jcplx,0:JZ,JY,JX));CDOM=0._r8
-  allocate(FOSRH(1:jcplx,0:JZ,JY,JX));FOSRH=0._r8
+  allocate(FracBulkSOM_vr(1:jcplx,0:JZ,JY,JX));FracBulkSOM_vr=0._r8
   allocate(DIC_mass_col(JY,JX));       DIC_mass_col=0._r8
   allocate(UNH4(JY,JX));        UNH4=0._r8
   allocate(UNO3(JY,JX));        UNO3=0._r8
@@ -131,7 +131,7 @@ module SOMDataType
   call destroy(EHUM)
 
   call destroy(CDOM)
-  call destroy(FOSRH)
+  call destroy(FracBulkSOM_vr)
   call destroy(DIC_mass_col)
   call destroy(UNH4)
   call destroy(UNO3)
