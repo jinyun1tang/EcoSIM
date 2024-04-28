@@ -528,14 +528,14 @@ module StartsMod
   ROXYX(0:L2,NY,NX)=0.0_r8
   RNH4X(0:L2,NY,NX)=0.0_r8
   RNO3X(0:L2,NY,NX)=0.0_r8
-  RNO2X(0:L2,NY,NX)=0.0_r8
-  RN2OX(0:L2,NY,NX)=0.0_r8
+  RNO2EcoUptkSoil_vr(0:L2,NY,NX)=0.0_r8
+  RN2OEcoUptkSoil_vr(0:L2,NY,NX)=0.0_r8
   RPO4X(0:L2,NY,NX)=0.0_r8
   RP14X(0:L2,NY,NX)=0.0_r8
   RVMXC(0:L2,NY,NX)=0.0_r8
   RNHBX(0:L2,NY,NX)=0.0_r8
   RN3BX(0:L2,NY,NX)=0.0_r8
-  RN2BX(0:L2,NY,NX)=0.0_r8
+  RNO2EcoUptkBand_vr(0:L2,NY,NX)=0.0_r8
   RPOBX(0:L2,NY,NX)=0.0_r8
   RP1BX(0:L2,NY,NX)=0.0_r8
   RVMBC(0:L2,NY,NX)=0.0_r8

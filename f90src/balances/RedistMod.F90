@@ -1597,7 +1597,7 @@ module RedistMod
   !     RIPO1,RIPO1R=substrate-unlimited HPO4 immobilization
   !     ROQCX,ROQAX=total DOC,DOA demand from DOC,DOA oxidation
   !     ROQCS,ROQAS=DOC,DOA demand from DOC,DOA oxidation
-  !     RNO2X=total demand for NO2 reduction
+  !     RNO2EcoUptkSoil_vr=total demand for NO2 reduction
   !     RVMXC=demand for NO2 reduction
 !
   DO K=1,jcplx
@@ -1607,8 +1607,8 @@ module RedistMod
           ROXYX(0,NY,NX)=ROXYX(0,NY,NX)+RO2DmndHetert(NGL,K,0,NY,NX)
           RNH4X(0,NY,NX)=RNH4X(0,NY,NX)+RVMX4(NGL,K,0,NY,NX)
           RNO3X(0,NY,NX)=RNO3X(0,NY,NX)+RVMX3(NGL,K,0,NY,NX)
-          RNO2X(0,NY,NX)=RNO2X(0,NY,NX)+RVMX2(NGL,K,0,NY,NX)
-          RN2OX(0,NY,NX)=RN2OX(0,NY,NX)+RVMX1(NGL,K,0,NY,NX)
+          RNO2EcoUptkSoil_vr(0,NY,NX)=RNO2EcoUptkSoil_vr(0,NY,NX)+RVMX2(NGL,K,0,NY,NX)
+          RN2OEcoUptkSoil_vr(0,NY,NX)=RN2OEcoUptkSoil_vr(0,NY,NX)+RVMX1(NGL,K,0,NY,NX)
           RNH4X(0,NY,NX)=RNH4X(0,NY,NX)+RINHO(NGL,K,0,NY,NX)
           RNO3X(0,NY,NX)=RNO3X(0,NY,NX)+RINOO(NGL,K,0,NY,NX)
           RPO4X(0,NY,NX)=RPO4X(0,NY,NX)+RIPOO(NGL,K,0,NY,NX)
@@ -1629,8 +1629,8 @@ module RedistMod
       ROXYX(0,NY,NX)=ROXYX(0,NY,NX)+RO2DmndAutort(NGL,0,NY,NX)
       RNH4X(0,NY,NX)=RNH4X(0,NY,NX)+RNH3OxidAutor(NGL,0,NY,NX)
       RNO3X(0,NY,NX)=RNO3X(0,NY,NX)+RVMX3ff(NGL,0,NY,NX)
-      RNO2X(0,NY,NX)=RNO2X(0,NY,NX)+RNO2OxidAutor(NGL,0,NY,NX)
-      RN2OX(0,NY,NX)=RN2OX(0,NY,NX)+RVMX1ff(NGL,0,NY,NX)
+      RNO2EcoUptkSoil_vr(0,NY,NX)=RNO2EcoUptkSoil_vr(0,NY,NX)+RNO2OxidAutor(NGL,0,NY,NX)
+      RN2OEcoUptkSoil_vr(0,NY,NX)=RN2OEcoUptkSoil_vr(0,NY,NX)+RVMX1ff(NGL,0,NY,NX)
       RNH4X(0,NY,NX)=RNH4X(0,NY,NX)+RNH4UptkSoilAutor_vr(NGL,0,NY,NX)
       RNO3X(0,NY,NX)=RNO3X(0,NY,NX)+RNO3UptkSoilAutor_vr(NGL,0,NY,NX)
       RPO4X(0,NY,NX)=RPO4X(0,NY,NX)+RH2PO4UptkSoilAutor_vr(NGL,0,NY,NX)
@@ -1643,8 +1643,8 @@ module RedistMod
     ENDDO
   ENDDO
 
-  RNO2X(0,NY,NX)=RNO2X(0,NY,NX)+RVMXC(0,NY,NX)
-  RN2BX(0,NY,NX)=RN2BX(0,NY,NX)+RVMBC(0,NY,NX)
+  RNO2EcoUptkSoil_vr(0,NY,NX)=RNO2EcoUptkSoil_vr(0,NY,NX)+RVMXC(0,NY,NX)
+  RNO2EcoUptkBand_vr(0,NY,NX)=RNO2EcoUptkBand_vr(0,NY,NX)+RVMBC(0,NY,NX)
   end subroutine SumSurfMicBGCFluxes
 
 !------------------------------------------------------------------------------------------
@@ -1661,15 +1661,15 @@ module RedistMod
     +SUM(RINHO(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX))
   RNO3X(L,NY,NX)=RNO3X(L,NY,NX)+SUM(RVMX3(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX)) &
     +SUM(RINOO(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX))
-  RNO2X(L,NY,NX)=RNO2X(L,NY,NX)+SUM(RVMX2(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX))
-  RN2OX(L,NY,NX)=RN2OX(L,NY,NX)+SUM(RVMX1(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX))
+  RNO2EcoUptkSoil_vr(L,NY,NX)=RNO2EcoUptkSoil_vr(L,NY,NX)+SUM(RVMX2(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX))
+  RN2OEcoUptkSoil_vr(L,NY,NX)=RN2OEcoUptkSoil_vr(L,NY,NX)+SUM(RVMX1(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX))
   RPO4X(L,NY,NX)=RPO4X(L,NY,NX)+SUM(RIPOO(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX))
   RP14X(L,NY,NX)=RP14X(L,NY,NX)+SUM(RIPO1(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX))
   RNHBX(L,NY,NX)=RNHBX(L,NY,NX)+SUM(RVMB4(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX)) &
     +SUM(RINHB(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX))
   RN3BX(L,NY,NX)=RN3BX(L,NY,NX)+SUM(RVMB3(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX)) &
     +SUM(RINOB(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX))
-  RN2BX(L,NY,NX)=RN2BX(L,NY,NX)+SUM(RVMB2(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX))
+  RNO2EcoUptkBand_vr(L,NY,NX)=RNO2EcoUptkBand_vr(L,NY,NX)+SUM(RVMB2(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX))
   RPOBX(L,NY,NX)=RPOBX(L,NY,NX)+SUM(RIPBO(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX))
   RP1BX(L,NY,NX)=RP1BX(L,NY,NX)+SUM(RIPB1(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX))
   DO K=1,jcplx
@@ -1681,20 +1681,20 @@ module RedistMod
     +SUM(RNH4UptkSoilAutor_vr(1:NumMicrbHetetrophCmplx,L,NY,NX))
   RNO3X(L,NY,NX)=RNO3X(L,NY,NX)+SUM(RVMX3ff(1:NumMicrbHetetrophCmplx,L,NY,NX)) &
     +SUM(RNO3UptkSoilAutor_vr(1:NumMicrbHetetrophCmplx,L,NY,NX))
-  RNO2X(L,NY,NX)=RNO2X(L,NY,NX)+SUM(RNO2OxidAutor(1:NumMicrbHetetrophCmplx,L,NY,NX))
-  RN2OX(L,NY,NX)=RN2OX(L,NY,NX)+SUM(RVMX1ff(1:NumMicrbHetetrophCmplx,L,NY,NX))
+  RNO2EcoUptkSoil_vr(L,NY,NX)=RNO2EcoUptkSoil_vr(L,NY,NX)+SUM(RNO2OxidAutor(1:NumMicrbHetetrophCmplx,L,NY,NX))
+  RN2OEcoUptkSoil_vr(L,NY,NX)=RN2OEcoUptkSoil_vr(L,NY,NX)+SUM(RVMX1ff(1:NumMicrbHetetrophCmplx,L,NY,NX))
   RPO4X(L,NY,NX)=RPO4X(L,NY,NX)+SUM(RH2PO4UptkSoilAutor_vr(1:NumMicrbHetetrophCmplx,L,NY,NX))
   RP14X(L,NY,NX)=RP14X(L,NY,NX)+SUM(RH1PO4UptkSoilAutor_vr(1:NumMicrbHetetrophCmplx,L,NY,NX))
   RNHBX(L,NY,NX)=RNHBX(L,NY,NX)+SUM(RNH3OxidAutorBand(1:NumMicrbHetetrophCmplx,L,NY,NX)) &
     +SUM(RNH4UptkBandAutor_vr(1:NumMicrbHetetrophCmplx,L,NY,NX))
   RN3BX(L,NY,NX)=RN3BX(L,NY,NX)+SUM(RVMB3ff(1:NumMicrbHetetrophCmplx,L,NY,NX)) &
     +SUM(RNO3UptkBandAutor_vr(1:NumMicrbHetetrophCmplx,L,NY,NX))
-  RN2BX(L,NY,NX)=RN2BX(L,NY,NX)+SUM(RNO2OxidAutorBand(1:NumMicrbHetetrophCmplx,L,NY,NX))
+  RNO2EcoUptkBand_vr(L,NY,NX)=RNO2EcoUptkBand_vr(L,NY,NX)+SUM(RNO2OxidAutorBand(1:NumMicrbHetetrophCmplx,L,NY,NX))
   RPOBX(L,NY,NX)=RPOBX(L,NY,NX)+SUM(RH2PO4UptkBandAutor_vr(1:NumMicrbHetetrophCmplx,L,NY,NX))
   RP1BX(L,NY,NX)=RP1BX(L,NY,NX)+SUM(RH1PO4UptkBandAutor_vr(1:NumMicrbHetetrophCmplx,L,NY,NX))
 
-  RNO2X(L,NY,NX)=RNO2X(L,NY,NX)+RVMXC(L,NY,NX)
-  RN2BX(L,NY,NX)=RN2BX(L,NY,NX)+RVMBC(L,NY,NX)
+  RNO2EcoUptkSoil_vr(L,NY,NX)=RNO2EcoUptkSoil_vr(L,NY,NX)+RVMXC(L,NY,NX)
+  RNO2EcoUptkBand_vr(L,NY,NX)=RNO2EcoUptkBand_vr(L,NY,NX)+RVMBC(L,NY,NX)
 
   end subroutine SumMicBGCFluxes
 end module RedistMod

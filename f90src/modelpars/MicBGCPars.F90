@@ -22,7 +22,7 @@ implicit none
   integer :: k_humus
   integer :: AmmoniaOxidBacter
   integer :: NitriteOxidBacter
-  integer :: AerobicMethanotrophBacteria
+  integer :: AerobicMethanotrofBacter
   integer :: H2GenoMethanogArchea
   integer :: n_aero_hetrophb
   integer :: n_anero_faculb
@@ -179,12 +179,12 @@ contains
 !the abstract complex
   this%AmmoniaOxidBacter=1
   this%NitriteOxidBacter=2
-  this%AerobicMethanotrophBacteria=3
+  this%AerobicMethanotrofBacter=3
   this%H2GenoMethanogArchea=5
 
   this%is_activef_micb(this%AmmoniaOxidBacter)=.True.
   this%is_activef_micb(this%NitriteOxidBacter)=.True.
-  this%is_activef_micb(this%AerobicMethanotrophBacteria)=.True.
+  this%is_activef_micb(this%AerobicMethanotrofBacter)=.True.
   this%is_activef_micb(this%H2GenoMethanogArchea)=.True.
 
   this%is_CO2_autotroph(this%AmmoniaOxidBacter)=.true.

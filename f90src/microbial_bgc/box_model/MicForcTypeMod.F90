@@ -48,9 +48,9 @@ module MicForcTypeMod
   real(r8) :: PSISoilMatricP
   real(r8) :: OLSGL
   real(r8) :: ORGC
-  real(r8) :: RNO2Y
-  real(r8) :: RN2BY
-  real(r8) :: RN2OY
+  real(r8) :: RNO2EcoUptkSoilPrev
+  real(r8) :: RNO2EcoUptkBandPrev
+  real(r8) :: RN2OEcoUptkSoilPrev
   real(r8) :: ROXYY
   real(r8) :: ROXYF
   real(r8) :: RCH4L

@@ -711,7 +711,7 @@ module MicBGCMod
     RH2GX              => nmicf%RH2GX               , &
     RGOMY              => nmicf%RGOMY               , &
     RCO2ProdHeter      => nmicf%RCO2ProdHeter       , &
-    RCH3X              => nmicf%RCH3X               , &
+    RAcettProdHeter              => nmicf%RAcettProdHeter               , &
     RCH4ProdHeter      => nmicf%RCH4ProdHeter       , &
     TOMK               => ncplxs%TOMK               , &
     SoilMicPMassLayer  => micfor%SoilMicPMassLayer  , &
@@ -719,7 +719,7 @@ module MicBGCMod
     ORGC               => micfor%ORGC               , &
     ZEROS              => micfor%ZEROS              , &
     VLSoilPoreMicP_vr  => micfor%VLSoilPoreMicP_vr  , &
-    RNO2Y              => micfor%RNO2Y                &
+    RNO2EcoUptkSoilPrev              => micfor%RNO2EcoUptkSoilPrev                &
 
   )
 ! FracOMActHeter,FOMN=fraction of total active biomass C,N in each N and K
@@ -842,14 +842,14 @@ module MicBGCMod
   ELSEIF(micpar%is_anerobic_hetr(N))THEN
     RGOMO(NGL,K)=RGOMP
     RCO2ProdHeter(NGL,K)=0.333_r8*RGOMO(NGL,K)
-    RCH3X(NGL,K)=0.667_r8*RGOMO(NGL,K)
+    RAcettProdHeter(NGL,K)=0.667_r8*RGOMO(NGL,K)
     RCH4ProdHeter(NGL,K)=0.0_r8
     RO2Uptk4RespHeter(NGL,K)=RO2Dmnd4RespHeter(NGL,K)
     RH2GX(NGL,K)=0.111_r8*RGOMO(NGL,K)
   ELSEIF(N.EQ.micpar%AcetotroMethanogenArchea)THEN
     RGOMO(NGL,K)=RGOMP
     RCO2ProdHeter(NGL,K)=0.50_r8*RGOMO(NGL,K)
-    RCH3X(NGL,K)=0.0_r8
+    RAcettProdHeter(NGL,K)=0.0_r8
     RCH4ProdHeter(NGL,K)=0.50_r8*RGOMO(NGL,K)
     RO2Uptk4RespHeter(NGL,K)=RO2Dmnd4RespHeter(NGL,K)
     RH2GX(NGL,K)=0.0_r8
@@ -911,8 +911,8 @@ module MicBGCMod
     RCNO3  =>  nmicdiag%RCNO3, &
     RCN3B  =>  nmicdiag%RCN3B, &
     RCOQN  =>  nmicdiag%RCOQN, &
-    RNO2Y  =>  micfor%RNO2Y  , &
-    RN2BY  =>  micfor%RN2BY , &
+    RNO2EcoUptkSoilPrev  =>  micfor%RNO2EcoUptkSoilPrev  , &
+    RNO2EcoUptkBandPrev  =>  micfor%RNO2EcoUptkBandPrev , &
     ph => micfor%pH, &
     VLWatMicPM => micfor%VLWatMicPM, &
     ZEROS => micfor%ZEROS, &
@@ -943,13 +943,13 @@ module MicBGCMod
   CHNO2=CNO2S*H_1p_conc/0.5_r8
   CHNOB=CNO2B*H_1p_conc/0.5_r8
 
-  IF(RNO2Y.GT.ZEROS)THEN
-    FNO2=AMAX1(FMN,RVMXC/RNO2Y)
+  IF(RNO2EcoUptkSoilPrev.GT.ZEROS)THEN
+    FNO2=AMAX1(FMN,RVMXC/RNO2EcoUptkSoilPrev)
   ELSE
     FNO2=FMN*VLNO3
   ENDIF
-  IF(RN2BY.GT.ZEROS)THEN
-    FNB2=AMAX1(FMN,RVMBC/RN2BY)
+  IF(RNO2EcoUptkBandPrev.GT.ZEROS)THEN
+    FNB2=AMAX1(FMN,RVMBC/RNO2EcoUptkBandPrev)
   ELSE
     FNB2=FMN*VLNOB
   ENDIF
@@ -1467,7 +1467,7 @@ module MicBGCMod
     RCOMEheter  => nmicf%RCOMEheter, &
     RCMMEheter  => nmicf%RCMMEheter, &
     RCCMEheter  => nmicf%RCCMEheter, &
-    RCH3X  => nmicf%RCH3X, &
+    RAcettProdHeter  => nmicf%RAcettProdHeter, &
     RDOSM  => ncplxf%RDOSM, &
     RHOSM  => ncplxf%RHOSM, &
     RCOSM  => ncplxf%RCOSM, &
@@ -1585,14 +1585,14 @@ module MicBGCMod
 !     MICROBIAL UPTAKE OF DISSOLVED C, N, P
 !
 !     CGOQC,CGOAC,CGOMEheter,CGOMEheter=DOC,acetate,DON,DOP uptake
-!     RCH3X=acetate production from fermentation
+!     RAcettProdHeter=acetate production from fermentation
 !
     D570: DO N=1,NumMicbFunGroups
       DO NGL=JGnio(N),JGnfo(N)
         DOM(idom_doc,K)=DOM(idom_doc,K)-CGOQC(NGL,K)
         DOM(idom_don,K)=DOM(idom_don,K)-CGOMEheter(ielmp,NGL,K)
         DOM(idom_dop,K)=DOM(idom_dop,K)-CGOMEheter(ielmp,NGL,K)
-        DOM(idom_acetate,K)=DOM(idom_acetate,K)-CGOAC(NGL,K)+RCH3X(NGL,K)
+        DOM(idom_acetate,K)=DOM(idom_acetate,K)-CGOAC(NGL,K)+RAcettProdHeter(NGL,K)
 !
 !     MICROBIAL DECOMPOSITION PRODUCTS
 !
@@ -1849,7 +1849,7 @@ module MicBGCMod
     RNO3TransfLitrHeter  => nmicf%RNO3TransfLitrHeter, &
     RH2PO4TransfLitrHeter  => nmicf%RH2PO4TransfLitrHeter, &
     RCO2ProdHeter  => nmicf%RCO2ProdHeter  , &
-    RCH3X  => nmicf%RCH3X , &
+    RAcettProdHeter  => nmicf%RAcettProdHeter , &
     RCH4ProdHeter  => nmicf%RCH4ProdHeter , &
     RVOXA  => nmicf%RVOXA, &
     RVOXB  => nmicf%RVOXB, &
@@ -1899,7 +1899,7 @@ module MicBGCMod
     k_POM   =>micpar%k_POM, &
     k_humus => micpar%k_humus, &
     AmmoniaOxidBacter => micpar%AmmoniaOxidBacter, &
-    AerobicMethanotrophBacteria => micpar%AerobicMethanotrophBacteria, &
+    AerobicMethanotrofBacter => micpar%AerobicMethanotrofBacter, &
     NitriteOxidBacter => micpar%NitriteOxidBacter, &
     is_activef_micb => micpar%is_activef_micb, &
     RCH4O => micflx%RCH4O, &
@@ -2018,7 +2018,7 @@ module MicBGCMod
   RCO2O=naqfdiag%TRGOA-naqfdiag%TRGOM-naqfdiag%TRGOD
   RCH4O=-naqfdiag%TRGOC
 
-  DO NGL=JGniA(AerobicMethanotrophBacteria),JGnfA(AerobicMethanotrophBacteria)
+  DO NGL=JGniA(AerobicMethanotrofBacter),JGnfA(AerobicMethanotrofBacter)
     RCO2O=RCO2O-RVOXA(NGL)
     RCH4O=RCH4O+RVOXA(NGL)+CGOMEautor(ielmc,NGL)
   ENDDO
@@ -2048,7 +2048,7 @@ module MicBGCMod
         RDOM_micb_flx(idom_doc,K)=RDOM_micb_flx(idom_doc,K)-CGOQC(NGL,K)
         RDOM_micb_flx(idom_don,K)=RDOM_micb_flx(idom_don,K)-CGOMEheter(ielmp,NGL,K)
         RDOM_micb_flx(idom_dop,K)=RDOM_micb_flx(idom_dop,K)-CGOMEheter(ielmp,NGL,K)
-        RDOM_micb_flx(idom_acetate,K)=RDOM_micb_flx(idom_acetate,K)-CGOAC(NGL,K)+RCH3X(NGL,K)
+        RDOM_micb_flx(idom_acetate,K)=RDOM_micb_flx(idom_acetate,K)-CGOAC(NGL,K)+RAcettProdHeter(NGL,K)
       ENDDO
     ENDDO D670
     DO NE=1,NumPlantChemElms
@@ -2084,7 +2084,7 @@ module MicBGCMod
   XNH4B=-naqfdiag%TRINB
   XNO3B=-naqfdiag%TRIOB-naqfdiag%TRDNB+RCN3B
   XNO2B=naqfdiag%TRDNB-naqfdiag%TRD2B-RCNOB
-  !AmmoniaOxidBacter=1, NitriteOxidBacter=2, AerobicMethanotrophBacteria=3
+  !AmmoniaOxidBacter=1, NitriteOxidBacter=2, AerobicMethanotrofBacter=3
   DO NGL=JGniA(AmmoniaOxidBacter),JGnfA(AmmoniaOxidBacter)
     RNH4MicbTransf_vr=RNH4MicbTransf_vr-RVOXA(NGL)
     RNO2MicbTransf_vr=RNO2MicbTransf_vr+RVOXA(NGL)
@@ -2608,14 +2608,14 @@ module MicBGCMod
     RGOMD  => nmicf%RGOMD, &
     RGOMY  => nmicf%RGOMY, &
     OSRH  => ncplxs%OSRH , &
-    RNO2Y  => micfor%RNO2Y, &
-    RN2OY  => micfor%RN2OY, &
+    RNO2EcoUptkSoilPrev  => micfor%RNO2EcoUptkSoilPrev, &
+    RN2OEcoUptkSoilPrev  => micfor%RN2OEcoUptkSoilPrev, &
     RNO3Y  => micfor%RNO3Y , &
     VLNO3  => micfor%VLNO3, &
     ZERO   => micfor%ZERO, &
     ZEROS  => micfor%ZEROS, &
     ZEROS2 => micfor%ZEROS2, &
-    RN2BY => micfor%RN2BY, &
+    RNO2EcoUptkBandPrev => micfor%RNO2EcoUptkBandPrev, &
     RN3BY => micfor%RN3BY, &
     VLNOB => micfor%VLNOB, &
     CNO3B => micstt%CNO3B, &
@@ -2722,13 +2722,13 @@ module MicBGCMod
 !
   FNO2S=VLNO3
   FNO2B=VLNOB
-  IF(RNO2Y.GT.ZEROS)THEN
-    FNO2=AMAX1(FMN,RVMX2(NGL,K)/RNO2Y)
+  IF(RNO2EcoUptkSoilPrev.GT.ZEROS)THEN
+    FNO2=AMAX1(FMN,RVMX2(NGL,K)/RNO2EcoUptkSoilPrev)
   ELSE
     FNO2=AMAX1(FMN,FracOMActHeter(NGL,K)*VLNO3)
   ENDIF
-  IF(RN2BY.GT.ZEROS)THEN
-    FNB2=AMAX1(FMN,RVMB2(NGL,K)/RN2BY)
+  IF(RNO2EcoUptkBandPrev.GT.ZEROS)THEN
+    FNB2=AMAX1(FMN,RVMB2(NGL,K)/RNO2EcoUptkBandPrev)
   ELSE
     FNB2=AMAX1(FMN,FracOMActHeter(NGL,K)*VLNOB)
   ENDIF
@@ -2793,8 +2793,8 @@ module MicBGCMod
 !
 !     FN2O=fraction of total biological demand for N2O
 !
-  IF(RN2OY.GT.ZEROS)THEN
-    FN2O=AMAX1(FMN,RVMX1(NGL,K)/RN2OY)
+  IF(RN2OEcoUptkSoilPrev.GT.ZEROS)THEN
+    FN2O=AMAX1(FMN,RVMX1(NGL,K)/RN2OEcoUptkSoilPrev)
   ELSE
     FN2O=AMAX1(FMN,FracOMActHeter(NGL,K))
   ENDIF
@@ -2876,7 +2876,7 @@ module MicBGCMod
     RH2GX  => nmicf%RH2GX, &
     ROQCD  => nmicf%ROQCD, &
     RCO2ProdHeter  => nmicf%RCO2ProdHeter, &
-    RCH3X  => nmicf%RCH3X, &
+    RAcettProdHeter  => nmicf%RAcettProdHeter, &
     RCH4ProdHeter  => nmicf%RCH4ProdHeter, &
     RVOXA  => nmicf%RVOXA, &
     RVOXB  => nmicf%RVOXB, &
@@ -3009,13 +3009,13 @@ module MicBGCMod
   !write(*,*)'RESPIRATION PRODUCTS ALLOCATED TO O2, CO2, ACETATE, CH4, H2'
   !
   !     RGOMO,RGOMP=O2-limited, O2-unlimited respiration
-  !     RCO2ProdHeter,RCH3X,RCH4ProdHeter,RH2GX=CO2,acetate,CH4,H2 production from RGOMO
+  !     RCO2ProdHeter,RAcettProdHeter,RCH4ProdHeter,RH2GX=CO2,acetate,CH4,H2 production from RGOMO
   !     RO2Uptk4RespHeter=O2-limited O2 uptake
   !     RVOXA,RVOXB=total O2-lmited (1)NH4,(2)NO2,(3)CH4 oxidation
   !
   RGOMO(NGL,K)=RGOMP*WFN(NGL,K)
   RCO2ProdHeter(NGL,K)=RGOMO(NGL,K)
-  RCH3X(NGL,K)=0.0_r8
+  RAcettProdHeter(NGL,K)=0.0_r8
   RCH4ProdHeter(NGL,K)=0.0_r8
   RO2Uptk4RespHeter(NGL,K)=RO2Dmnd4RespHeter(NGL,K)*WFN(NGL,K)
   RH2GX(NGL,K)=0.0_r8

@@ -191,9 +191,9 @@ implicit none
     real(r8) :: VWatLitRHoldCapcity    !surface litter water holding capacity, [m3 d-2]
  !non litter layer
     real(r8) :: ROXYY       !total root + microbial O2 uptake from previous hour, [g d-2 h-1], updated in hour1
-    real(r8) :: RN2OY       !total root + microbial N2O uptake from previous hour, [g d-2 h-1]
-    real(r8) :: RNO2Y       !total root + microbial NO2 uptake non-band from previous hour, [g d-2 h-1]
-    real(r8) :: RN2BY       !total root + microbial NO2 uptake band from previous hour, [g d-2 h-1]
+    real(r8) :: RN2OEcoUptkSoilPrev       !total root + microbial N2O uptake from previous hour, [g d-2 h-1]
+    real(r8) :: RNO2EcoUptkSoilPrev       !total root + microbial NO2 uptake non-band from previous hour, [g d-2 h-1]
+    real(r8) :: RNO2EcoUptkBandPrev       !total root + microbial NO2 uptake band from previous hour, [g d-2 h-1]
     real(r8) :: RNHBY       !total root + microbial NH4 uptake band from previous hour, [g d-2 h-1]
     real(r8) :: RN3BY       !total root + microbial NO3 uptake band from previous hour, [g d-2 h-1]
     real(r8) :: RPOBY       !total root + microbial PO4 uptake band from previous hour, [g d-2 h-1]
@@ -480,9 +480,9 @@ implicit none
   endif
 
   forc%ROXYY=0._r8
-  forc%RN2OY=0._r8
-  forc%RNO2Y=0._r8
-  forc%RN2BY=0._r8
+  forc%RN2OEcoUptkSoilPrev=0._r8
+  forc%RNO2EcoUptkSoilPrev=0._r8
+  forc%RNO2EcoUptkBandPrev=0._r8
   forc%RNHBY=0._r8
   forc%RN3BY=0._r8
   forc%RPOBY=0._r8

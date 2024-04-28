@@ -5730,16 +5730,16 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrc_2d(1:ncols,1:JZ+1)        
-    call restartvar(ncid, flag, varname='RNO2X', dim1name='column',dim2name='levsoi1',&
+    call restartvar(ncid, flag, varname='RNO2EcoUptkSoil_vr', dim1name='column',dim2name='levsoi1',&
        long_name='total root + microbial NO2 uptake non-band', units='g d-2 h-1', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)  
-    call cpcol(flag,NHW,NHE,NVN,NVS,RNO2X,datrc_2d)      
+    call cpcol(flag,NHW,NHE,NVN,NVS,RNO2EcoUptkSoil_vr,datrc_2d)      
   else
-    !print*,'RNO2X'
-    if(flag=='write') call cpcol(flag,NHW,NHE,NVN,NVS,RNO2X,datrc_2d)        
+    !print*,'RNO2EcoUptkSoil_vr'
+    if(flag=='write') call cpcol(flag,NHW,NHE,NVN,NVS,RNO2EcoUptkSoil_vr,datrc_2d)        
     datpr2 => datrc_2d(1:ncols,1:JZ+1)        
-    call restartvar(ncid, flag, varname='RNO2X', dim1name='column',dim2name='levsoi1',&
+    call restartvar(ncid, flag, varname='RNO2EcoUptkSoil_vr', dim1name='column',dim2name='levsoi1',&
        long_name='total root + microbial NO2 uptake non-band', units='g d-2 h-1', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)  
@@ -5747,16 +5747,16 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrc_2d(1:ncols,1:JZ+1)        
-    call restartvar(ncid, flag, varname='RN2OX', dim1name='column',dim2name='levsoi1',&
+    call restartvar(ncid, flag, varname='RN2OEcoUptkSoil_vr', dim1name='column',dim2name='levsoi1',&
        long_name='total root + microbial N2O uptake non-band', units='g d-2 h-1', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)  
-    call cpcol(flag,NHW,NHE,NVN,NVS,RN2OX,datrc_2d)      
+    call cpcol(flag,NHW,NHE,NVN,NVS,RN2OEcoUptkSoil_vr,datrc_2d)      
   else
-    !print*,'RN2OX'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RN2OX,datrc_2d)        
+    !print*,'RN2OEcoUptkSoil_vr'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RN2OEcoUptkSoil_vr,datrc_2d)        
     datpr2 => datrc_2d(1:ncols,1:JZ+1)        
-    call restartvar(ncid, flag, varname='RN2OX', dim1name='column',dim2name='levsoi1',&
+    call restartvar(ncid, flag, varname='RN2OEcoUptkSoil_vr', dim1name='column',dim2name='levsoi1',&
        long_name='total root + microbial N2O uptake non-band', units='g d-2 h-1', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)  
@@ -5832,16 +5832,16 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrc_2d(1:ncols,1:JZ+1)        
-    call restartvar(ncid, flag, varname='RN2BX', dim1name='column',dim2name='levsoi1',&
+    call restartvar(ncid, flag, varname='RNO2EcoUptkBand_vr', dim1name='column',dim2name='levsoi1',&
        long_name='total root + microbial NO2 uptake band', units='g d-2 h-1', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)  
-    call cpcol(flag,NHW,NHE,NVN,NVS,RN2BX,datrc_2d)      
+    call cpcol(flag,NHW,NHE,NVN,NVS,RNO2EcoUptkBand_vr,datrc_2d)      
   else
-    !print*,'RN2BX'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RN2BX,datrc_2d)        
+    !print*,'RNO2EcoUptkBand_vr'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RNO2EcoUptkBand_vr,datrc_2d)        
     datpr2 => datrc_2d(1:ncols,1:JZ+1)        
-    call restartvar(ncid, flag, varname='RN2BX', dim1name='column',dim2name='levsoi1',&
+    call restartvar(ncid, flag, varname='RNO2EcoUptkBand_vr', dim1name='column',dim2name='levsoi1',&
        long_name='total root + microbial NO2 uptake band', units='g d-2 h-1', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)  

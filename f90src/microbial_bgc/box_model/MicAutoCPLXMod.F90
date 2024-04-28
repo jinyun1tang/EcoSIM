@@ -78,14 +78,13 @@ module MicAutoCPLXMod
     RH2GXff  => nmicf%RH2GXff,    &
     RGOMYff  => nmicf%RGOMYff,    &
     RCO2ProdAutor  => nmicf%RCO2ProdAutor,    &
-    RCH3Xff  => nmicf%RCH3Xff,    &
     RCH4ProdAutor  => nmicf%RCH4ProdAutor,    &
     TOMK  => ncplxs%TOMK     ,    &
     jcplx  => micpar%jcplx   ,    &
     AmmoniaOxidBacter => micpar%AmmoniaOxidBacter, &
     NitriteOxidBacter  => micpar%NitriteOxidBacter, &
     H2GenoMethanogArchea  => micpar%H2GenoMethanogArchea, &
-    AerobicMethanotrophBacteria  => micpar%AerobicMethanotrophBacteria, &
+    AerobicMethanotrofBacter  => micpar%AerobicMethanotrofBacter, &
     ZEROS  => micfor%ZEROS  ,    &
     SoilMicPMassLayer  => micfor%SoilMicPMassLayer    ,    &
     litrm => micfor%litrm  , &
@@ -166,7 +165,7 @@ module MicAutoCPLXMod
     call H2MethanogensCatabolism(NGL,N,ECHZ,RGOMP,XCO2,micfor,micstt,&
       naqfdiag,nmicf,nmics,micflx)
 
-  elseif (N.eq.AerobicMethanotrophBacteria)then
+  elseif (N.eq.AerobicMethanotrofBacter)then
 !     METHANOTROPHS
     call MethanotrophCatabolism(NGL,N,ECHZ,RGOMP,&
       RVOXP,RVOXPA,RVOXPB,micfor,micstt,naqfdiag,nmicf,nmics,micflx)
@@ -191,14 +190,13 @@ module MicAutoCPLXMod
 !
   RO2UptkAutor(NGL)=0.0_r8
 
-  if (N.eq.AmmoniaOxidBacter .or. N.eq.NitriteOxidBacter .or. N.eq.AerobicMethanotrophBacteria)then
+  if (N.eq.AmmoniaOxidBacter .or. N.eq.NitriteOxidBacter .or. N.eq.AerobicMethanotrofBacter)then
 !   write(*,*)'AerobLeafO2Solubility_pftUptake'
     call AerobicAutorO2Uptake(NGL,N,FOXYX,OXKX,RGOMP,RVOXP,RVOXPA,RVOXPB,&
       micfor,micstt,nmicf,nmics,micflx)
   elseif (N.eq.H2GenoMethanogArchea)then
     RGOMOff(NGL)=RGOMP
     RCO2ProdAutor(NGL)=0.0_r8
-    RCH3Xff(NGL)=0.0_r8
     RCH4ProdAutor(NGL)=RGOMOff(NGL)
     RO2Uptk4RespAutor(NGL)=RO2Dmnd4RespAutor(NGL)
     RH2GXff(NGL)=0.0_r8
@@ -658,7 +656,6 @@ module MicAutoCPLXMod
     RO2Uptk4RespAutor => nmicf%RO2Uptk4RespAutor,     &
     RH2GXff  => nmicf%RH2GXff,    &
     RCO2ProdAutor  => nmicf%RCO2ProdAutor,    &
-    RCH3Xff  => nmicf%RCH3Xff,    &
     RCH4ProdAutor  => nmicf%RCH4ProdAutor,    &
     RVOXA  => nmicf%RVOXA,    &
     RVOXB  => nmicf%RVOXB,    &
@@ -795,13 +792,12 @@ module MicAutoCPLXMod
   !write(*,*)'RESPIRATION PRODUCTS ALLOCATED TO O2, CO2, ACETATE, CH4, H2'
   !
   !     RGOMO,RGOMP=O2-limited, O2-unlimited respiration
-  !     RCO2X,RCH3X,RCH4ProdHeter,RH2GX=CO2,acetate,CH4,H2 production from RGOMO
+  !     RCO2X,RAcettProdHeter,RCH4ProdHeter,RH2GX=CO2,acetate,CH4,H2 production from RGOMO
   !     RO2Uptk4RespHeter=O2-limited O2 uptake
   !     RVOXA,RVOXB=total O2-lmited (1)NH4,(2)NO2,(3)CH4 oxidation
   !
   RGOMOff(NGL)=RGOMP*fLimO2Autor(NGL)
   RCO2ProdAutor(NGL)=RGOMOff(NGL)
-  RCH3Xff(NGL)=0.0_r8
   RCH4ProdAutor(NGL)=0.0_r8
   RO2Uptk4RespAutor(NGL)=RO2Dmnd4RespAutor(NGL)*fLimO2Autor(NGL)
   RH2GXff(NGL)=0.0_r8
@@ -850,10 +846,10 @@ module MicAutoCPLXMod
     RVOXB    => nmicf%RVOXB  ,    &
     RVOXAAO => nmicf%RVOXAAO,   &
     RVOXBAO => nmicf%RVOXBAO,   &
-    RNO2Y  => micfor%RNO2Y   ,    &
+    RNO2EcoUptkSoilPrev  => micfor%RNO2EcoUptkSoilPrev   ,    &
     VLNO3  => micfor%VLNO3   ,    &
     VLNOB  => micfor%VLNOB   ,    &
-    RN2BY  =>  micfor%RN2BY  ,    &
+    RNO2EcoUptkBandPrev  =>  micfor%RNO2EcoUptkBandPrev  ,    &
     ZEROS  => micfor%ZEROS   ,    &
     ZEROS2  => micfor%ZEROS2   ,    &
     CNO2B  => micstt%CNO2B   ,    &
@@ -869,13 +865,13 @@ module MicAutoCPLXMod
 !
 !     FNO2,FNB2=fraction of total biological demand for NO2
 !
-  IF(RNO2Y.GT.ZEROS)THEN
-    FNO2=AMAX1(FMN,RNO2OxidAutor(NGL)/RNO2Y)
+  IF(RNO2EcoUptkSoilPrev.GT.ZEROS)THEN
+    FNO2=AMAX1(FMN,RNO2OxidAutor(NGL)/RNO2EcoUptkSoilPrev)
   ELSE
     FNO2=AMAX1(FMN,FOMNff(NGL)*VLNO3)
   ENDIF
-  IF(RN2BY.GT.ZEROS)THEN
-    FNB2=AMAX1(FMN,RNO2OxidAutorBand(NGL)/RN2BY)
+  IF(RNO2EcoUptkBandPrev.GT.ZEROS)THEN
+    FNB2=AMAX1(FMN,RNO2OxidAutorBand(NGL)/RNO2EcoUptkBandPrev)
   ELSE
     FNB2=AMAX1(FMN,FOMNff(NGL)*VLNOB)
   ENDIF
@@ -1110,8 +1106,8 @@ module MicAutoCPLXMod
     VLNO3  => micfor%VLNO3   , &
     VLNOB  => micfor%VLNOB   , &
     ZEROS  => micfor%ZEROS   , &
-    RNO2Y  => micfor%RNO2Y   , &
-    RN2BY  =>  micfor%RN2BY  , &
+    RNO2EcoUptkSoilPrev  => micfor%RNO2EcoUptkSoilPrev   , &
+    RNO2EcoUptkBandPrev  =>  micfor%RNO2EcoUptkBandPrev  , &
     CNO2S  => micstt%CNO2S   , &
     CNO2B  => micstt%CNO2B   , &
     ZNO2S  => micstt%ZNO2S   , &
@@ -1127,13 +1123,13 @@ module MicAutoCPLXMod
 !
   FNH4S=VLNH4
   FNHBS=VLNHB
-  IF(RNO2Y.GT.ZEROS)THEN
-    FNO2=AMAX1(FMN,RNO2OxidAutor(NGL)/RNO2Y)
+  IF(RNO2EcoUptkSoilPrev.GT.ZEROS)THEN
+    FNO2=AMAX1(FMN,RNO2OxidAutor(NGL)/RNO2EcoUptkSoilPrev)
   ELSE
     FNO2=AMAX1(FMN,FOMNff(NGL)*VLNO3)
   ENDIF
-  IF(RN2BY.GT.ZEROS)THEN
-    FNB2=AMAX1(FMN,RNO2OxidAutorBand(NGL)/RN2BY)
+  IF(RNO2EcoUptkBandPrev.GT.ZEROS)THEN
+    FNB2=AMAX1(FMN,RNO2OxidAutorBand(NGL)/RNO2EcoUptkBandPrev)
   ELSE
     FNB2=AMAX1(FMN,FOMNff(NGL)*VLNOB)
   ENDIF
