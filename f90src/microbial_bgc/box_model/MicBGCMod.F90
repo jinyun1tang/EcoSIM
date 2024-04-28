@@ -166,39 +166,39 @@ module MicBGCMod
   real(r8) :: TOSC,TOSA,TOHC
   real(r8) :: TSRH
 !     begin_execution
-  associate(                   &
-    CNOMActHeter => nmics%CNOMActHeter, &
-    CPOMActHeter => nmics%CPOMActHeter, &
-    OMActHeter   => nmics%OMActHeter , &
-    OMC2   => nmics%OMC2 , &
-    OMN2   => nmics%OMN2 , &
-    FOM2   => nmics%FOM2 , &
-    FCN    => nmics%FCN  , &
-    FCP    => nmics%FCP  , &
-    FCNP   => nmics%FCNP , &
-    OSRH  => ncplxs%OSRH, &
-    TOMK  => ncplxs%TOMK, &
-    TONK  => ncplxs%TONK, &
-    TOPK  => ncplxs%TOPK, &
-    FOCA  => ncplxs%FOCA, &
-    FOAA  => ncplxs%FOAA, &
-    CNQ  => ncplxs%CNQ,        &
-    CPQ  => ncplxs%CPQ,        &
-    CDOM    => ncplxs%CDOM, &
-    ORCT  => ncplxs%ORCT, &
-    OSCT  => ncplxs%OSCT, &
-    OSAT  => ncplxs%OSAT, &
-    TONX  => ncplxs%TONX, &
-    TOPX  => ncplxs%TOPX, &
-    TORC  =>  nmicdiag%TORC, &
-    TOMA =>  nmicdiag%TOMA, &
-    TOMN  =>  nmicdiag%TOMN, &
-    XCO2  =>  nmicdiag%XCO2, &
-    TFNX  =>  nmicdiag%TFNX, &
-    TFNY  =>  nmicdiag%TFNY, &
-    THETR => nmicdiag%THETR, &
-    THETZ => nmicdiag%THETZ, &
-    VOLWZ => nmicdiag%VOLWZ, &
+  associate(                                    &
+    CNOMActHeter   => nmics%CNOMActHeter      , &
+    CPOMActHeter   => nmics%CPOMActHeter      , &
+    OMActHeter     => nmics%OMActHeter        , &
+    OMC2           => nmics%OMC2              , &
+    OMN2           => nmics%OMN2              , &
+    FOM2           => nmics%FOM2              , &
+    FCN            => nmics%FCN               , &
+    FCP            => nmics%FCP               , &
+    FCNP           => nmics%FCNP              , &
+    OSRH           => ncplxs%OSRH             , &
+    TOMK           => ncplxs%TOMK             , &
+    TONK           => ncplxs%TONK             , &
+    TOPK           => ncplxs%TOPK             , &
+    FOCA           => ncplxs%FOCA             , &
+    FOAA           => ncplxs%FOAA             , &
+    CNQ            => ncplxs%CNQ              , &
+    CPQ            => ncplxs%CPQ              , &
+    CDOM           => ncplxs%CDOM             , &
+    ORCT           => ncplxs%ORCT             , &
+    OSCT           => ncplxs%OSCT             , &
+    OSAT           => ncplxs%OSAT             , &
+    TONX           => ncplxs%TONX             , &
+    TOPX           => ncplxs%TOPX             , &
+    TORC           => nmicdiag%TORC           , &
+    TOMA           => nmicdiag%TOMA           , &
+    TOMN           => nmicdiag%TOMN           , &
+    XCO2           => nmicdiag%XCO2           , &
+    TSensGrowth    => nmicdiag%TSensGrowth    , &
+    TSensMaintR    => nmicdiag%TSensMaintR    , &
+    ThetaLitr      => nmicdiag%ThetaLitr      , &
+    ThetaZ          => nmicdiag%ThetaZ          , &
+    VOLWZ          => nmicdiag%VOLWZ          , &
     ZNH4T  =>  nmicdiag%ZNH4T, &
     ZNO3T  =>  nmicdiag%ZNO3T, &
     ZNO2T  =>  nmicdiag%ZNO2T, &
@@ -269,17 +269,17 @@ module MicBGCMod
     ! surface litter layer
     KL=micpar%NumOfLitrCmplxs
     IF(VWatLitRHoldCapcity.GT.ZEROS2)THEN
-      THETR=VOLW0/VLitR
-      THETZ=AZMAX1(THETR-THETY)
-      VOLWZ=THETZ*VLitR
+      ThetaLitr=VOLW0/VLitR
+      ThetaZ=AZMAX1(ThetaLitr-THETY)
+      VOLWZ=ThetaZ*VLitR
     ELSE
       VOLWZ=0.0_r8
     ENDIF
   ELSE
 !     non-surface layer
     KL=micpar%jcplx
-    THETZ=AZMAX1((AMIN1(AMAX1(0.5_r8*POROS,FieldCapacity),THETW)-THETY))
-    VOLWZ=THETZ*VLSoilMicP
+    ThetaZ=AZMAX1((AMIN1(AMAX1(0.5_r8*POROS,FieldCapacity),THETW)-THETY))
+    VOLWZ=ThetaZ*VLSoilMicP
   ENDIF
 
 
@@ -289,11 +289,11 @@ module MicBGCMod
 !     62500=activation energy
 !     197500,195000 low temp inactivation for growth,maintenance
 !     222500,232500 high temp inactivation for growth,maintenance
-!     TFNX,TFNY=temperature function for growth,maintenance respiration
+!     TSensGrowth,TSensMaintR=temperature function for growth,maintenance respiration
 !
   TKSO=TKS+OFFSET
 
-  call MicrobPhysTempFun(TKSO, TFNX, TFNY)
+  call MicrobPhysTempFun(TKSO, TSensGrowth, TSensMaintR)
 
 !
 !     OXYI=inhibition of fermenters by O2
@@ -558,17 +558,17 @@ module MicBGCMod
   REAL(R8) :: OXKX
 ! begin_execution
   associate(                   &
-    TFNR => nmics%TFNR,        &
-    TFNG => nmics%TFNG,        &
+    TFNR => nmics%TFNR, &
+    TFNG => nmics%TFNG, &
     OMActHeter => nmics%OMActHeter, &
     TCGOMEheter  => ncplxf%TCGOMEheter, &
     XCO2   =>  nmicdiag%XCO2, &
-    TFNX   =>  nmicdiag%TFNX, &
+    TSensGrowth   =>  nmicdiag%TSensGrowth, &
     TOMA  =>  nmicdiag%TOMA, &
     TOMN   =>  nmicdiag%TOMN, &
     RH2GZ  =>  nmicdiag%RH2GZ, &
-    WFNG   =>  nmicdiag%WFNG, &
-    TFNY   =>  nmicdiag%TFNY, &
+    WatStressMicb   =>  nmicdiag%WatStressMicb, &
+    TSensMaintR   =>  nmicdiag%TSensMaintR, &
     ZNH4T  =>  nmicdiag%ZNH4T, &
     ZNO3T  =>  nmicdiag%ZNO3T, &
     ZNO2T  =>  nmicdiag%ZNO2T, &
@@ -605,21 +605,21 @@ module MicBGCMod
             TOMCNK(M)=TOMCNK(M)+OMEheter(ielmc,MID,K)
           ENDDO
 
-!           WFNG=water potential (PSISoilMatricP) effect on microbial respiration
+!           WatStressMicb=water potential (PSISoilMatricP) effect on microbial respiration
 !           OXKX=Km for O2 uptake
 !           OXKM=Km for heterotrophic O2 uptake set in starts.f
 !           TFNG=combined temp and water stress effect on growth respiration
 !           TFNR=temperature effect on maintenance respiration
           IF(N.EQ.n_aero_fungi)THEN
-            WFNG=EXP(0.1_r8*PSISoilMatricP)
+            WatStressMicb=EXP(0.1_r8*PSISoilMatricP)
           ELSE
-            WFNG=EXP(0.2_r8*PSISoilMatricP)
+            WatStressMicb=EXP(0.2_r8*PSISoilMatricP)
           ENDIF
           OXKX=OXKM
-          TFNG(NGL,K)=TFNX*WFNG
-          TFNR(NGL,K)=TFNY
+          TFNG(NGL,K)=TSensGrowth*WatStressMicb
+          TFNR(NGL,K)=TSensMaintR
           IF(OMActHeter(NGL,K).GT.0.0_r8)THEN
-            call ActiveMicrobes(NGL,N,K,VOLWZ,XCO2,TFNX,WFNG,TOMCNK,&
+            call ActiveMicrobes(NGL,N,K,VOLWZ,XCO2,TSensGrowth,WatStressMicb,TOMCNK,&
               OXKX,TOMA,TOMN,ZNH4T,ZNO3T,ZNO2T,H2P4T,H1P4T,&
               micfor,micstt,naqfdiag,nmicf,nmics,ncplxf,ncplxs,micflx)
           ENDIF
@@ -629,8 +629,8 @@ module MicBGCMod
   ENDDO D760
 
   N=micpar%AmmoniaOxidBacter
-  nmicf%RVOXAAO=SUM(nmicf%RVOXA(JGniA(N):JGnfA(N)))
-  nmicf%RVOXBAO=SUM(nmicf%RVOXB(JGniA(N):JGnfA(N)))
+  nmicf%RTotNH3OxidSoilAutor=SUM(nmicf%RSOxidSoilAutor(JGniA(N):JGnfA(N)))
+  nmicf%RTotNH3OxidBandAutor=SUM(nmicf%RSOxidBandAutor(JGniA(N):JGnfA(N)))
   DO  N=1,NumMicbFunGroups
     IF(is_activef_micb(N))THEN
       TOMCNK(:)=0.0_r8
@@ -640,12 +640,12 @@ module MicBGCMod
           TOMCNK(M)=TOMCNK(M)+OMEauto(ielmc,MID)
         ENDDO
 
-        WFNG=EXP(0.2_r8*PSISoilMatricP)
+        WatStressMicb=EXP(0.2_r8*PSISoilMatricP)
         OXKX=OXKA
-        TFNGff(NGL)=TFNX*WFNG
-        TFNRff(NGL)=TFNY
+        TFNGff(NGL)=TSensGrowth*WatStressMicb
+        TFNRff(NGL)=TSensMaintR
         IF(OMActAutor(NGL).GT.0.0_r8)THEN
-          call ActiveMicrobesff(NGL,N,VOLWZ,XCO2,TFNX,WFNG,TOMCNK,&
+          call ActiveMicrobesff(NGL,N,VOLWZ,XCO2,TSensGrowth,WatStressMicb,TOMCNK,&
             OXKX,TOMA,TOMN,RH2GZ,ZNH4T,ZNO3T,ZNO2T,H2P4T,H1P4T,&
             micfor,micstt,micflx,naqfdiag,nmicf,nmics,ncplxf,ncplxs)
         ENDIF
@@ -656,12 +656,12 @@ module MicBGCMod
   end associate
   end subroutine MicrobialCatabolism
 !------------------------------------------------------------------------------------------
-  subroutine ActiveMicrobes(NGL,N,K,VOLWZ,XCO2,TFNX,WFNG,TOMCNK,OXKX,TOMA,TOMN,&
+  subroutine ActiveMicrobes(NGL,N,K,VOLWZ,XCO2,TSensGrowth,WatStressMicb,TOMCNK,OXKX,TOMA,TOMN,&
     ZNH4T,ZNO3T,ZNO2T,H2P4T,H1P4T,micfor,micstt,naqfdiag,nmicf,nmics,ncplxf,ncplxs,micflx)
   implicit none
   integer, intent(in) :: NGL,K,N
   real(r8), intent(in) :: VOLWZ
-  real(r8), intent(in):: OXKX,tomcnk(2),WFNG,TFNX,XCO2
+  real(r8), intent(in):: OXKX,tomcnk(2),WatStressMicb,TSensGrowth,XCO2
   real(r8), intent(in) :: TOMA,TOMN
   real(r8), intent(in) :: ZNH4T,ZNO3T,ZNO2T,H2P4T,H1P4T
   type(micforctype), intent(in) :: micfor
@@ -781,7 +781,7 @@ module MicBGCMod
 !
   IF(micpar%is_aerobic_hetr(N))THEN
 !     write(*,*)'AerobicHeterotrophCatabolism'
-    call AerobicHeterotrophCatabolism(NGL,N,K,TFNX,WFNG,FOQC,FOQA,&
+    call AerobicHeterotrophCatabolism(NGL,N,K,TSensGrowth,WatStressMicb,FOQC,FOQA,&
       ECHZ,FGOCP,FGOAP,RGOCP,RGOMP,micfor,micstt,naqfdiag,nmicf,nmics,ncplxs,micflx)
 !     RESPIRATION BY HETEROTROPHIC ANAEROBES:
 !     N=(4)ACETOGENIC FERMENTERS (7) ACETOGENIC N2 FIXERS
@@ -796,7 +796,7 @@ module MicBGCMod
 !
   ELSEIF(micpar%is_anerobic_hetr(N))THEN
 !     write(*,*)'AnaerobCatabolism'
-    call AnaerobCatabolism(NGL,N,K,TFNX,WFNG,FOQC,ECHZ,FGOCP,FGOAP,RGOMP,&
+    call AnaerobCatabolism(NGL,N,K,TSensGrowth,WatStressMicb,FOQC,ECHZ,FGOCP,FGOAP,RGOMP,&
       micfor,micstt,naqfdiag,ncplxs,nmicf,nmics,micflx)
 !     ENERGY YIELD FROM ACETOTROPHIC METHANOGENESIS
 !
@@ -805,7 +805,7 @@ module MicBGCMod
 !
   ELSEIF(N.EQ.micpar%AcetotroMethanogenArchea)THEN
 !     write(*,*)'AcetoMethanogenCatabolism'
-    call AcetoMethanogenCatabolism(NGL,N,K,TFNX,WFNG,FOQA,ECHZ,&
+    call AcetoMethanogenCatabolism(NGL,N,K,TSensGrowth,WatStressMicb,FOQA,ECHZ,&
       FGOCP,FGOAP,RGOMP,micfor,micstt,naqfdiag,nmicf,nmics,ncplxs,micflx)
   ENDIF
 !
@@ -903,14 +903,14 @@ module MicBGCMod
   real(r8) :: VMXC4S,VMXC4B
 !     begin_execution
   associate(                   &
-    TFNX  =>  nmicdiag%TFNX, &
-    RCNO2  =>  nmicdiag%RCNO2, &
-    RCNOB  =>  nmicdiag%RCNOB, &
-    RCN2O  =>  nmicdiag%RCN2O, &
-    RCN2B  =>  nmicdiag%RCN2B, &
-    RCNO3  =>  nmicdiag%RCNO3, &
-    RCN3B  =>  nmicdiag%RCN3B, &
-    RCOQN  =>  nmicdiag%RCOQN, &
+    TSensGrowth  =>  nmicdiag%TSensGrowth, &
+    RNO2ReduxSoilChemo  =>  nmicdiag%RNO2ReduxSoilChemo, &
+    RNO2ReduxBandChemo  =>  nmicdiag%RNO2ReduxBandChemo, &
+    RN2OProdSoilChemo  =>  nmicdiag%RN2OProdSoilChemo, &
+    RN2OProdBandChemo  =>  nmicdiag%RN2OProdBandChemo, &
+    RNO3ProdSoilChemo  =>  nmicdiag%RNO3ProdSoilChemo, &
+    RNO3ProdBandChemo  =>  nmicdiag%RNO3ProdBandChemo, &
+    RNO2ReduxChemo  =>  nmicdiag%RNO2ReduxChemo, &
     RNO2EcoUptkSoilPrev  =>  micfor%RNO2EcoUptkSoilPrev  , &
     RNO2EcoUptkBandPrev  =>  micfor%RNO2EcoUptkBandPrev , &
     ph => micfor%pH, &
@@ -932,11 +932,11 @@ module MicBGCMod
 !     CHNO2,CHNOB=nitrous acid concentration in non-band,band
 !     VLWatMicPM=soil water content
 !     FNO3S,FNO3B=fractions of NO2 in non-band,band
-!     TFNX=temperature stress function
-!     RCNO2,RCNOB=substrate-limited nitrous acid reduction in non-band,band
-!     RCN2O,RCN2B=N2O production from nitrous acid reduction in non-band,band
-!     RCNO3,RCN3B=NO3 production from nitrous acid reduction in non-band,band
-!     RCOQN=DON production from nitrous acid reduction
+!     TSensGrowth=temperature stress function
+!     RNO2ReduxSoilChemo,RNO2ReduxBandChemo=substrate-limited nitrous acid reduction in non-band,band
+!     RN2OProdSoilChemo,RN2OProdBandChemo=N2O production from nitrous acid reduction in non-band,band
+!     RNO3ProdSoilChemo,RNO3ProdBandChemo=NO3 production from nitrous acid reduction in non-band,band
+!     RNO2ReduxChemo=DON production from nitrous acid reduction
 !     RVMXC,RVMBC=demand for NO2 reduction in non-band,band
 !     nitrous acid concn CHNO2
   H_1p_conc=AMAX1(ZERO,10.0**(-(PH-3.0_r8)))
@@ -957,15 +957,15 @@ module MicBGCMod
   naqfdiag%TFNO2B=naqfdiag%TFNO2B+FNB2
   FNO3S=VLNO3
   FNO3B=VLNOB
-  VMXC4S=7.5E-02_r8*CHNO2*VLWatMicPM(NPH)*FNO3S*TFNX
-  VMXC4B=7.5E-02_r8*CHNOB*VLWatMicPM(NPH)*FNO3B*TFNX
-  RCNO2=AZMAX1(AMIN1(ZNO2S*FNO2,VMXC4S))
-  RCNOB=AZMAX1(AMIN1(ZNO2B*FNB2,VMXC4B))
-  RCN2O=0.10_r8*RCNO2
-  RCN2B=0.10_r8*RCNOB
-  RCNO3=0.80_r8*RCNO2
-  RCN3B=0.80_r8*RCNOB
-  RCOQN=0.10*(RCNO2+RCNOB)
+  VMXC4S=7.5E-02_r8*CHNO2*VLWatMicPM(NPH)*FNO3S*TSensGrowth
+  VMXC4B=7.5E-02_r8*CHNOB*VLWatMicPM(NPH)*FNO3B*TSensGrowth
+  RNO2ReduxSoilChemo=AZMAX1(AMIN1(ZNO2S*FNO2,VMXC4S))
+  RNO2ReduxBandChemo=AZMAX1(AMIN1(ZNO2B*FNB2,VMXC4B))
+  RN2OProdSoilChemo=0.10_r8*RNO2ReduxSoilChemo
+  RN2OProdBandChemo=0.10_r8*RNO2ReduxBandChemo
+  RNO3ProdSoilChemo=0.80_r8*RNO2ReduxSoilChemo
+  RNO3ProdBandChemo=0.80_r8*RNO2ReduxBandChemo
+  RNO2ReduxChemo=0.10*(RNO2ReduxSoilChemo+RNO2ReduxBandChemo)
   RVMXC=VMXC4S
   RVMBC=VMXC4B
 
@@ -1214,7 +1214,7 @@ module MicBGCMod
     TONX  => ncplxs%TONX, &
     TOPX  => ncplxs%TOPX, &
     VOLWZ =>  nmicdiag%VOLWZ,&
-    TFNX  =>  nmicdiag%TFNX ,&
+    TSensGrowth  =>  nmicdiag%TSensGrowth ,&
     iprotein  => micpar%iprotein, &
     icarbhyro => micpar%icarbhyro, &
     icellulos => micpar%icellulos, &
@@ -1293,7 +1293,7 @@ module MicBGCMod
 !     ROQCK=total respiration of DOC+DOA used to represent microbial activity
 !     DFNS=effect of microbial concentration on decomposition
 !     OQCI=DOC product inhibition for decomposition
-!     TFNX=temperature stress effect
+!     TSensGrowth=temperature stress effect
 !     OSRH=total SOC
 !     FCNK,FCPK=N,P limitation to microbial activity in each K
 !
@@ -1302,7 +1302,7 @@ module MicBGCMod
         CNS(M,K)=AZMAX1(OSM(ielmn,M,K)/OSM(ielmc,M,K))
         CPS(M,K)=AZMAX1(OSM(ielmp,M,K)/OSM(ielmc,M,K))
         RDOSM(ielmc,M,K)=AZMAX1(AMIN1(0.5_r8*OSA(M,K) &
-          ,SPOSC(M,K)*ROQCK(K)*DFNS*OQCI*TFNX*OSA(M,K)/OSRH(K)))
+          ,SPOSC(M,K)*ROQCK(K)*DFNS*OQCI*TSensGrowth*OSA(M,K)/OSRH(K)))
         RDOSM(ielmn,M,K)=AZMAX1(AMIN1(OSM(ielmn,M,K),CNS(M,K)*RDOSM(ielmc,M,K)))/FCNK(K)
         RDOSM(ielmp,M,K)=AZMAX1(AMIN1(OSM(ielmp,M,K),CPS(M,K)*RDOSM(ielmc,M,K)))/FCPK(K)
 
@@ -1373,7 +1373,7 @@ module MicBGCMod
 !     ROQCK=total respiration of DOC+DOA used to represent microbial activity
 !     DFNS=effect of microbial concentration on decomposition
 !     OQCI=DOC product inhibition for decomposition
-!     TFNX=temperature stress effect
+!     TSensGrowth=temperature stress effect
 !     OSRH=total SOC
 !     FCNK,FCPK=N,P limitation to microbial activity in each K
 !
@@ -1383,7 +1383,7 @@ module MicBGCMod
         CNR=AZMAX1(ORM(ielmn,M,K)/ORM(ielmc,M,K))
         CPR=AZMAX1(ORM(ielmp,M,K)/ORM(ielmc,M,K))
         RDORM(ielmc,M,K)=AZMAX1(AMIN1(ORM(ielmc,M,K) &
-          ,SPORC(M)*ROQCK(K)*DFNS*OQCI*TFNX*ORM(ielmc,M,K)/OSRH(K)))
+          ,SPORC(M)*ROQCK(K)*DFNS*OQCI*TSensGrowth*ORM(ielmc,M,K)/OSRH(K)))
     !    3*AMIN1(FCNK(K),FCPK(K))
         RDORM(ielmn,M,K)=AZMAX1(AMIN1(ORM(ielmn,M,K),CNR*RDORM(ielmc,M,K)))/FCNK(K)
         RDORM(ielmp,M,K)=AZMAX1(AMIN1(ORM(ielmp,M,K),CPR*RDORM(ielmc,M,K)))/FCPK(K)
@@ -1412,7 +1412,7 @@ module MicBGCMod
 !     ROQCK=total respiration of DOC+DOA used to represent microbial activity
 !     DFNS=effect of microbial concentration on decomposition
 !     OQCI=DOC product inhibition for decomposition
-!     TFNX=temperature stress effect
+!     TSensGrowth=temperature stress effect
 !     OSRH=total SOC
 !     FCNK,FCPK=N,P limitation to microbial activity in each K
 !
@@ -1421,12 +1421,12 @@ module MicBGCMod
       CNH(K)=AZMAX1(OHM(ielmn,K)/OHM(ielmc,K))
       CPH(K)=AZMAX1(OHM(ielmp,K)/OHM(ielmc,K))
       RDOHM(ielmc,K)=AZMAX1(AMIN1(OHM(ielmc,K) &
-        ,SPOHC*ROQCK(K)*DFNS*OQCI*TFNX*OHM(ielmc,K)/OSRH(K)))
+        ,SPOHC*ROQCK(K)*DFNS*OQCI*TSensGrowth*OHM(ielmc,K)/OSRH(K)))
 !    3*AMIN1(FCNK(K),FCPK(K))
       RDOHM(ielmn,K)=AZMAX1(AMIN1(OHM(ielmn,K),CNH(K)*RDOHM(ielmc,K)))/FCNK(K)
       RDOHM(ielmp,K)=AZMAX1(AMIN1(OHM(ielmp,K),CPH(K)*RDOHM(ielmc,K)))/FCPK(K)
       RDOHM(idom_acetate,K)=AZMAX1(AMIN1(OHM(idom_acetate,K) &
-        ,SPOHA*ROQCK(K)*DFNS*TFNX*OHM(idom_acetate,K)/OSRH(K)))
+        ,SPOHA*ROQCK(K)*DFNS*TSensGrowth*OHM(idom_acetate,K)/OSRH(K)))
 !    3*AMIN1(FCNK(K),FCPK(K))
     ELSE
       CNH(K)=0.0_r8
@@ -1475,7 +1475,7 @@ module MicBGCMod
     RDOHM  => ncplxf%RDOHM, &
     OMSORP  => ncplxf%OMSORP, &
     ORCT  => ncplxs%ORCT    ,&
-    RCOQN =>  nmicdiag%RCOQN,&
+    RNO2ReduxChemo =>  nmicdiag%RNO2ReduxChemo,&
     TORC  =>  nmicdiag%TORC , &
     RCMMEautor  => nmicf%RCMMEautor, &
     RCOMEautor  => nmicf%RCOMEautor, &
@@ -1569,7 +1569,7 @@ module MicBGCMod
 !     ORC,ORN,ORP=microbial residue C,N,P
 !     RDORC,RDORN,RDORP=decomposition of microbial residue C,N,P
 !     RDOHC,RDOHN,RDOHP,RDOHA=decomposition of adsorbed C,N,P,acetate
-!     RCOQN=DON production from nitrous acid reduction
+!     RNO2ReduxChemo=DON production from nitrous acid reduction
 !
     D575: DO M=1,ndbiomcp
       DO NE=1,NumPlantChemElms    
@@ -1851,8 +1851,8 @@ module MicBGCMod
     RCO2ProdHeter  => nmicf%RCO2ProdHeter  , &
     RAcettProdHeter  => nmicf%RAcettProdHeter , &
     RCH4ProdHeter  => nmicf%RCH4ProdHeter , &
-    RVOXA  => nmicf%RVOXA, &
-    RVOXB  => nmicf%RVOXB, &
+    RSOxidSoilAutor  => nmicf%RSOxidSoilAutor, &
+    RSOxidBandAutor  => nmicf%RSOxidBandAutor, &
     RH1PO4TransfSoilHeter  => nmicf%RH1PO4TransfSoilHeter, &
     RH1PO4TransfBandHeter  => nmicf%RH1PO4TransfBandHeter, &
     RH1PO4TransfLitrHeter  => nmicf%RH1PO4TransfLitrHeter, &
@@ -1861,14 +1861,14 @@ module MicBGCMod
     RDORM  => ncplxf%RDORM, &
     RDOHM  => ncplxf%RDOHM, &
     OMSORP  => ncplxf%OMSORP, &
-    TFNX  =>  nmicdiag%TFNX, &
+    TSensGrowth  =>  nmicdiag%TSensGrowth, &
     RH2GZ  =>  nmicdiag%RH2GZ, &
-    RCNO2  =>  nmicdiag%RCNO2, &
-    RCNOB  =>  nmicdiag%RCNOB, &
-    RCN2O  =>  nmicdiag%RCN2O, &
-    RCN2B  =>  nmicdiag%RCN2B, &
-    RCNO3  =>  nmicdiag%RCNO3, &
-    RCN3B  =>  nmicdiag%RCN3B, &
+    RNO2ReduxSoilChemo  =>  nmicdiag%RNO2ReduxSoilChemo, &
+    RNO2ReduxBandChemo  =>  nmicdiag%RNO2ReduxBandChemo, &
+    RN2OProdSoilChemo  =>  nmicdiag%RN2OProdSoilChemo, &
+    RN2OProdBandChemo  =>  nmicdiag%RN2OProdBandChemo, &
+    RNO3ProdSoilChemo  =>  nmicdiag%RNO3ProdSoilChemo, &
+    RNO3ProdBandChemo  =>  nmicdiag%RNO3ProdBandChemo, &
     VOLWZ  =>  nmicdiag%VOLWZ, &
     CGOMEautor  => nmicf%CGOMEautor, &
     RH2GXff  => nmicf%RH2GXff, &
@@ -2001,7 +2001,7 @@ module MicBGCMod
 !     RCO2O=net CO2 uptake
 !     TRGOM total CO2 emission by heterotrophs reducing O2
 !     TRGOD=total CO2 emission by denitrifiers reducing NOx
-!     RVOXA(3)=CH4 oxidation
+!     RSOxidSoilAutor(3)=CH4 oxidation
 !     RCH4O=net CH4 uptake
 !     CGOMEheter=total CH4 uptake by autotrophs
 !     TRGOC=total CH4 emission
@@ -2012,20 +2012,20 @@ module MicBGCMod
 !     TRDNO=total N2O reduction
 !     RN2O=total N2O uptake
 !     TRDN2,TRD2B=total NO2 reduction in non-band,band
-!     RCN2O,RCN2B=nitrous acid reduction in non-band,band
+!     RN2OProdSoilChemo,RN2OProdBandChemo=nitrous acid reduction in non-band,band
 !
 !  print*,'rco2o',naqfdiag%TRGOA,naqfdiag%TRGOM,naqfdiag%TRGOD
   RCO2O=naqfdiag%TRGOA-naqfdiag%TRGOM-naqfdiag%TRGOD
   RCH4O=-naqfdiag%TRGOC
 
   DO NGL=JGniA(AerobicMethanotrofBacter),JGnfA(AerobicMethanotrofBacter)
-    RCO2O=RCO2O-RVOXA(NGL)
-    RCH4O=RCH4O+RVOXA(NGL)+CGOMEautor(ielmc,NGL)
+    RCO2O=RCO2O-RSOxidSoilAutor(NGL)
+    RCH4O=RCH4O+RSOxidSoilAutor(NGL)+CGOMEautor(ielmc,NGL)
   ENDDO
   RH2GO =RH2GZ-naqfdiag%TRGOH
   RO2UptkMicb=naqfdiag%TUPOX
   RN2G  =-naqfdiag%TRDNO
-  RN2O  =-naqfdiag%TRDN2-naqfdiag%TRD2B-RCN2O-RCN2B+naqfdiag%TRDNO
+  RN2O  =-naqfdiag%TRDN2-naqfdiag%TRD2B-RN2OProdSoilChemo-RN2OProdBandChemo+naqfdiag%TRDNO
 !
   D655: DO K=1,jcplx
     D660: DO M=1,jsken
@@ -2059,15 +2059,15 @@ module MicBGCMod
 !
 !     RNH4MicbTransf_vr,XNH4B=net change in NH4 in band,non-band
 !     TRINH,TRINB=total NH4 mineraln-immobn in non-band,band
-!     RVOXA(1),RVOXB(1)=total NH4 oxidation in non-band,band
+!     RSOxidSoilAutor(1),RSOxidBandAutor(1)=total NH4 oxidation in non-band,band
 !     RNO3MicbTransf_vr,XNO3B=net change in NO3 in band,non-band
 !     TRINO,TRIOB=total NO3 immobn in non-band,band
-!     RVOXA(2),RVOXB(2)=total NO2 oxidation in non-band,band
+!     RSOxidSoilAutor(2),RSOxidBandAutor(2)=total NO2 oxidation in non-band,band
 !     TRDN3,TRDNB=total NO3 reduction in non-band,band
-!     RCNO3,RCN3B=NO3 production from nitrous acid reduction in non-band,band
+!     RNO3ProdSoilChemo,RNO3ProdBandChemo=NO3 production from nitrous acid reduction in non-band,band
 !     RNO2MicbTransf_vr,XNO2B=net change in NO3 in band,non-band
 !     TRDN2,TRD2B=total NO2 reduction in non-band,band
-!     RCNO2,RCNOB=substrate-limited nitrous acid reduction in non-band,band
+!     RNO2ReduxSoilChemo,RNO2ReduxBandChemo=substrate-limited nitrous acid reduction in non-band,band
 !     RH2PO4MicbTransf_vr,XH2BS=net change in H2PO4 in band,non-band
 !     TRIPO,TRIPB=total H2PO4 mineraln-immobn in non-band,band
 !     RH1PO4MicbTransf_vr,XH1BS=net change in HPO4 in band,non-band
@@ -2077,30 +2077,30 @@ module MicBGCMod
 !     TRN2F=total N2 fixation
 !
   RNH4MicbTransf_vr=-naqfdiag%TRINH
-  RNO3MicbTransf_vr=-naqfdiag%TRINO-naqfdiag%TRDN3+RCNO3
-  RNO2MicbTransf_vr=+naqfdiag%TRDN3-naqfdiag%TRDN2-RCNO2
+  RNO3MicbTransf_vr=-naqfdiag%TRINO-naqfdiag%TRDN3+RNO3ProdSoilChemo
+  RNO2MicbTransf_vr=+naqfdiag%TRDN3-naqfdiag%TRDN2-RNO2ReduxSoilChemo
   RH2PO4MicbTransf_vr=-naqfdiag%TRIPO
   RH1PO4MicbTransf_vr=-naqfdiag%TRIP1
   XNH4B=-naqfdiag%TRINB
-  XNO3B=-naqfdiag%TRIOB-naqfdiag%TRDNB+RCN3B
-  XNO2B=naqfdiag%TRDNB-naqfdiag%TRD2B-RCNOB
+  XNO3B=-naqfdiag%TRIOB-naqfdiag%TRDNB+RNO3ProdBandChemo
+  XNO2B=naqfdiag%TRDNB-naqfdiag%TRD2B-RNO2ReduxBandChemo
   !AmmoniaOxidBacter=1, NitriteOxidBacter=2, AerobicMethanotrofBacter=3
   DO NGL=JGniA(AmmoniaOxidBacter),JGnfA(AmmoniaOxidBacter)
-    RNH4MicbTransf_vr=RNH4MicbTransf_vr-RVOXA(NGL)
-    RNO2MicbTransf_vr=RNO2MicbTransf_vr+RVOXA(NGL)
-    XNH4B=XNH4B-RVOXB(NGL)
+    RNH4MicbTransf_vr=RNH4MicbTransf_vr-RSOxidSoilAutor(NGL)
+    RNO2MicbTransf_vr=RNO2MicbTransf_vr+RSOxidSoilAutor(NGL)
+    XNH4B=XNH4B-RSOxidBandAutor(NGL)
   ENDDO
   DO NGL=JGniA(NitriteOxidBacter),JGnfA(NitriteOxidBacter)
-    RNO3MicbTransf_vr=RNO3MicbTransf_vr+RVOXA(NGL)
-    RNO2MicbTransf_vr=RNO2MicbTransf_vr-RVOXA(NGL)
-    XNO3B=XNO3B+RVOXB(NGL)
-    XNO2B=XNO2B-RVOXB(NGL)
+    RNO3MicbTransf_vr=RNO3MicbTransf_vr+RSOxidSoilAutor(NGL)
+    RNO2MicbTransf_vr=RNO2MicbTransf_vr-RSOxidSoilAutor(NGL)
+    XNO3B=XNO3B+RSOxidBandAutor(NGL)
+    XNO2B=XNO2B-RSOxidBandAutor(NGL)
   ENDDO
 
   XH2BS=-naqfdiag%TRIPB
   XH1BS=-naqfdiag%TRIB1
   XN2GS=naqfdiag%TRN2F
-  TFNQ=TFNX
+  TFNQ=TSensGrowth
   VOLQ=VOLWZ
   end associate
   end subroutine AggregateTransformations
@@ -2281,11 +2281,11 @@ module MicBGCMod
   end subroutine SubstrateCompetitionFactors
 !------------------------------------------------------------------------------------------
 
-  subroutine AcetoMethanogenCatabolism(NGL,N,K,TFNX,WFNG,FOQA,ECHZ,&
+  subroutine AcetoMethanogenCatabolism(NGL,N,K,TSensGrowth,WatStressMicb,FOQA,ECHZ,&
     FGOCP,FGOAP,RGOMP,micfor,micstt,naqfdiag,nmicf,nmics,ncplxs,micflx)
   implicit none
   integer, intent(in) :: NGL,N,K
-  real(r8), intent(in) :: FOQA,TFNX,WFNG
+  real(r8), intent(in) :: FOQA,TSensGrowth,WatStressMicb
   real(r8), intent(out) :: ECHZ
   REAL(R8), intent(out) :: FGOCP,FGOAP,RGOMP
   type(micforctype), intent(in) :: micfor
@@ -2327,8 +2327,8 @@ module MicBGCMod
 !     COQA=DOA concentration
 !     OQKAM=Km for acetate uptake,FCNP=N,P limitation
 !     VMXM=specific respiration rate
-!     WFNG=water stress effect, OMA=active biomass
-!     TFNX=temp stress effect, FOQA= acetate limitation
+!     WatStressMicb=water stress effect, OMA=active biomass
+!     TSensGrowth=temp stress effect, FOQA= acetate limitation
 !     RGOGX=substrate-limited respiration of acetate
 !     RGOGX=competition-limited respiration of acetate
 !     OQA=acetate, FOQA=fraction of biological demand for acetate
@@ -2337,8 +2337,8 @@ module MicBGCMod
 !     ROQCD=microbial respiration used to represent microbial activity
 !
   FSBST=CDOM(idom_acetate,K)/(CDOM(idom_acetate,K)+OQKAM)
-  RGOGY=AZMAX1(FCNP(NGL,K)*VMXM*WFNG*OMActHeter(NGL,K))
-  RGOGZ=RGOGY*FSBST*TFNX
+  RGOGY=AZMAX1(FCNP(NGL,K)*VMXM*WatStressMicb*OMActHeter(NGL,K))
+  RGOGZ=RGOGY*FSBST*TSensGrowth
   RGOGX=AZMAX1(DOM(idom_acetate,K)*FOQA*ECHZ)
   RGOMP=AMIN1(RGOGX,RGOGZ)
   FGOCP=0.0_r8
@@ -2354,11 +2354,11 @@ module MicBGCMod
   end subroutine AcetoMethanogenCatabolism
 !------------------------------------------------------------------------------------------
 
-  subroutine AerobicHeterotrophCatabolism(NGL,N,K,TFNX,WFNG,FOQC,FOQA,&
+  subroutine AerobicHeterotrophCatabolism(NGL,N,K,TSensGrowth,WatStressMicb,FOQC,FOQA,&
     ECHZ,FGOCP,FGOAP,RGOCP,RGOMP,micfor,micstt,naqfdiag,nmicf,nmics,ncplxs,micflx)
   implicit none
   integer, intent(in) :: NGL,N,K
-  REAL(R8), INTENT(IN) :: FOQC,FOQA,WFNG,TFNX
+  REAL(R8), INTENT(IN) :: FOQC,FOQA,WatStressMicb,TSensGrowth
   real(r8), intent(out) :: ECHZ,RGOMP
   REAL(R8), INTENT(OUT) :: FGOCP,FGOAP
   real(r8), intent(out) :: RGOCP
@@ -2418,17 +2418,17 @@ module MicBGCMod
 
 ! COQC,COQA=DOC,DOA concentration, FOCA,FOAA=DOC,DOA vs DOC+DOA
 ! FCNP=N,P limitation,VMXO=specific respiration rate
-! WFNG=water stress effect, OMA=active biomass
-! TFNX=temp stress effect,FOQC,FOQA=OQC,OQA limitation
+! WatStressMicb=water stress effect, OMA=active biomass
+! TSensGrowth=temp stress effect,FOQC,FOQA=OQC,OQA limitation
 ! RGOMP=O2-unlimited respiration of DOC+DOA
 ! RGOCP,RGOAP,RGOMP=O2-unlimited respiration of DOC, DOA, DOC+DOA
 !
   FSBSTC=CDOM(idom_doc,K)/(CDOM(idom_doc,K)+OQKM)
   FSBSTA=CDOM(idom_acetate,K)/(CDOM(idom_acetate,K)+OQKA)
   FSBST=FOCA(K)*FSBSTC+FOAA(K)*FSBSTA
-  RGOCY=AZMAX1(FCNP(NGL,K)*VMXO*WFNG*OMActHeter(NGL,K))
-  RGOCZ=RGOCY*FSBSTC*FOCA(K)*TFNX
-  RGOAZ=RGOCY*FSBSTA*FOAA(K)*TFNX
+  RGOCY=AZMAX1(FCNP(NGL,K)*VMXO*WatStressMicb*OMActHeter(NGL,K))
+  RGOCZ=RGOCY*FSBSTC*FOCA(K)*TSensGrowth
+  RGOAZ=RGOCY*FSBSTA*FOAA(K)*TSensGrowth
   RGOCX=AZMAX1(DOM(idom_doc,K)*FOQC*EO2Q)
   RGOAX=AZMAX1(DOM(idom_acetate,K)*FOQA*EO2A)
   RGOCP=AMIN1(RGOCX,RGOCZ)
@@ -2465,11 +2465,11 @@ module MicBGCMod
   end subroutine AerobicHeterotrophCatabolism
 !------------------------------------------------------------------------------------------
 
-  subroutine AnaerobCatabolism(NGL,N,K,TFNX,WFNG,FOQC,ECHZ,FGOCP,FGOAP,RGOMP,&
+  subroutine AnaerobCatabolism(NGL,N,K,TSensGrowth,WatStressMicb,FOQC,ECHZ,FGOCP,FGOAP,RGOMP,&
     micfor,micstt,naqfdiag,ncplxs,nmicf,nmics,micflx)
   implicit none
   integer, intent(in) :: NGL,N,K
-  REAL(R8), INTENT(IN) :: FOQC,WFNG,TFNX
+  REAL(R8), INTENT(IN) :: FOQC,WatStressMicb,TSensGrowth
   real(r8), intent(out) :: ECHZ,RGOMP
   real(r8), intent(out) :: FGOCP,FGOAP
   type(micforctype), intent(in) :: micfor
@@ -2523,16 +2523,16 @@ module MicBGCMod
 !     OXYI=O2 inhibition of fermentation
 !     FCNP=N,P limitation on respiration
 !     VMXF=maximum respiration rate by fermenters
-!     WFNG=water stress effect on respiration
+!     WatStressMicb=water stress effect on respiration
 !     OMA=active fermenter biomass
-!     TFNX=temp stress effect, FOQC=OQC limitation
+!     TSensGrowth=temp stress effect, FOQC=OQC limitation
 !     RFOMP=O2-unlimited respiration of DOC
 !     ROQCD=microbial respiration used to represent microbial activity
 !
   OXYI=1.0_r8-1.0_r8/(1.0_r8+EXP(1.0_r8*(-COXYS+2.5_r8)))
   FSBST=CDOM(idom_doc,K)/(CDOM(idom_doc,K)+OQKM)*OXYI
-  RGOFY=AZMAX1(FCNP(NGL,K)*VMXF*WFNG*OMActHeter(NGL,K))
-  RGOFZ=RGOFY*FSBST*TFNX
+  RGOFY=AZMAX1(FCNP(NGL,K)*VMXF*WatStressMicb*OMActHeter(NGL,K))
+  RGOFZ=RGOFY*FSBST*TSensGrowth
   RGOFX=AZMAX1(DOM(idom_doc,K)*FOQC*ECHZ)
   RGOMP=AMIN1(RGOFX,RGOFZ)
   FGOCP=1.0_r8
@@ -2878,8 +2878,8 @@ module MicBGCMod
     RCO2ProdHeter  => nmicf%RCO2ProdHeter, &
     RAcettProdHeter  => nmicf%RAcettProdHeter, &
     RCH4ProdHeter  => nmicf%RCH4ProdHeter, &
-    RVOXA  => nmicf%RVOXA, &
-    RVOXB  => nmicf%RVOXB, &
+    RSOxidSoilAutor  => nmicf%RSOxidSoilAutor, &
+    RSOxidBandAutor  => nmicf%RSOxidBandAutor, &
     O2_irrig_conc   => micfor%O2_irrig_conc, &
     O2_rain_conc   => micfor%O2_rain_conc, &
     COXYE => micfor%COXYE, &
@@ -3011,7 +3011,7 @@ module MicBGCMod
   !     RGOMO,RGOMP=O2-limited, O2-unlimited respiration
   !     RCO2ProdHeter,RAcettProdHeter,RCH4ProdHeter,RH2GX=CO2,acetate,CH4,H2 production from RGOMO
   !     RO2Uptk4RespHeter=O2-limited O2 uptake
-  !     RVOXA,RVOXB=total O2-lmited (1)NH4,(2)NO2,(3)CH4 oxidation
+  !     RSOxidSoilAutor,RSOxidBandAutor=total O2-lmited (1)NH4,(2)NO2,(3)CH4 oxidation
   !
   RGOMO(NGL,K)=RGOMP*WFN(NGL,K)
   RCO2ProdHeter(NGL,K)=RGOMO(NGL,K)
