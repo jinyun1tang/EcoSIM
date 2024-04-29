@@ -25,7 +25,7 @@ implicit none
   integer :: AerobicMethanotrofBacter
   integer :: H2GenoMethanogArchea
   integer :: n_aero_hetrophb
-  integer :: n_anero_faculb
+  integer :: n_O2facult_bacter
   integer :: n_aero_fungi
   integer :: n_anaero_ferm
   integer :: AcetotroMethanogenArchea
@@ -43,12 +43,12 @@ implicit none
   real(r8), pointer :: FL(:)       !allocation to microbial kinetic fractions
   real(r8), pointer :: rNCOMC(:,:,:)        !maximum/minimum mass based microbial N:C
   real(r8), pointer :: rPCOMC(:,:,:)        !maximum/minimum mass based microbial P:C
-  real(r8), pointer :: rNCOMCff(:,:)        !maximum/minimum mass based microbial N:C
-  real(r8), pointer :: rPCOMCff(:,:)        !maximum/minimum mass based microbial P:C
+  real(r8), pointer :: rNCOMCAutor(:,:)        !maximum/minimum mass based microbial N:C
+  real(r8), pointer :: rPCOMCAutor(:,:)        !maximum/minimum mass based microbial P:C
   real(r8), pointer :: rNCOMCa(:,:,:)         !average maximum/minimum mass based microbial N:C
   real(r8), pointer :: rPCOMCa(:,:,:)         !average maximum/minimum mass based microbial P:C
-  real(r8), pointer :: rNCOMCffa(:,:)         !average maximum/minimum mass based microbial N:C
-  real(r8), pointer :: rPCOMCffa(:,:)         !average maximum/minimum mass based microbial P:C
+  real(r8), pointer :: rNCOMCAutora(:,:)         !average maximum/minimum mass based microbial N:C
+  real(r8), pointer :: rPCOMCAutora(:,:)         !average maximum/minimum mass based microbial P:C
   real(r8), pointer :: DOSA(:)
   real(r8), pointer :: SPOSC(:,:)
   real(r8), pointer :: CNOFC(:,:)                         !fractions to allocate N to kinetic components
@@ -162,7 +162,7 @@ contains
 !set up functional group ids
 !five om-complexes
   this%n_aero_hetrophb=1
-  this%n_anero_faculb=2
+  this%n_O2facult_bacter=2
   this%n_aero_fungi=3
   this%n_anaero_ferm=4
   this%AcetotroMethanogenArchea=5
@@ -170,7 +170,7 @@ contains
   this%n_anero_n2fixer=7
 
   this%is_aerobic_hetr(this%n_aero_hetrophb)=.true.
-  this%is_aerobic_hetr(this%n_anero_faculb)=.true.
+  this%is_aerobic_hetr(this%n_O2facult_bacter)=.true.
   this%is_aerobic_hetr(this%n_aero_fungi)=.true.
   this%is_aerobic_hetr(this%n_aero_n2fixer)=.true.
 
@@ -213,8 +213,8 @@ contains
     CPOFC    => this%CPOFC    , &
     rNCOMC    => this%rNCOMC    , &
     rPCOMC    => this%rPCOMC    , &
-    rNCOMCff  => this%rNCOMCff  , &
-    rPCOMCff  => this%rPCOMCff  , &
+    rNCOMCAutor  => this%rNCOMCAutor  , &
+    rPCOMCAutor  => this%rPCOMCAutor  , &
     FL       => this%FL       , &
     DOSA     => this%DOSA     , &
     SPOSC    => this%SPOSC    , &
@@ -311,21 +311,21 @@ contains
 
   DO  N=1,this%NumMicbFunGroups
     do NGL=this%JGniA(n),this%JGnfA(n)
-      rNCOMCff(1,NGL)=0.225_r8
-      rNCOMCff(2,NGL)=0.135_r8
-      rPCOMCff(1,NGL)=0.0225_r8
-      rPCOMCff(2,NGL)=0.0135_r8
+      rNCOMCAutor(1,NGL)=0.225_r8
+      rNCOMCAutor(2,NGL)=0.135_r8
+      rPCOMCAutor(1,NGL)=0.0225_r8
+      rPCOMCAutor(2,NGL)=0.0135_r8
     enddo
-    this%rNCOMCffa(1,N)=0.225_r8
-    this%rNCOMCffa(2,N)=0.135_r8
-    this%rPCOMCffa(1,N)=0.0225_r8
-    this%rPCOMCffa(2,N)=0.0135_r8
+    this%rNCOMCAutora(1,N)=0.225_r8
+    this%rNCOMCAutora(2,N)=0.135_r8
+    this%rPCOMCAutora(1,N)=0.0225_r8
+    this%rPCOMCAutora(2,N)=0.0135_r8
     do NGL=this%JGniA(n),this%JGnfA(n)
-      rNCOMCff(3,NGL)=DOT_PRODUCT(FL,rNCOMCff(1:2,NGL))
-      rPCOMCff(3,NGL)=DOT_PRODUCT(FL,rPCOMCff(1:2,NGL))
+      rNCOMCAutor(3,NGL)=DOT_PRODUCT(FL,rNCOMCAutor(1:2,NGL))
+      rPCOMCAutor(3,NGL)=DOT_PRODUCT(FL,rPCOMCAutor(1:2,NGL))
     enddo
-    this%rNCOMCffa(3,N)=DOT_PRODUCT(FL,this%rNCOMCffa(1:2,N))
-    this%rPCOMCffa(3,N)=DOT_PRODUCT(FL,this%rPCOMCffa(1:2,N))
+    this%rNCOMCAutora(3,N)=DOT_PRODUCT(FL,this%rNCOMCAutora(1:2,N))
+    this%rPCOMCAutora(3,N)=DOT_PRODUCT(FL,this%rPCOMCAutora(1:2,N))
   enddo
 
   end associate
@@ -378,12 +378,12 @@ contains
   allocate(this%OMCI(NumLiveMicrbCompts,1:jcplx))
   allocate(this%rNCOMC(NumLiveMicrbCompts,this%NumMicrbHetetrophCmplx,1:jcplx))
   allocate(this%rPCOMC(NumLiveMicrbCompts,this%NumMicrbHetetrophCmplx,1:jcplx))
-  allocate(this%rNCOMCff(NumLiveMicrbCompts,this%NumMicrobAutrophCmplx))
-  allocate(this%rPCOMCff(NumLiveMicrbCompts,this%NumMicrobAutrophCmplx))
+  allocate(this%rNCOMCAutor(NumLiveMicrbCompts,this%NumMicrobAutrophCmplx))
+  allocate(this%rPCOMCAutor(NumLiveMicrbCompts,this%NumMicrobAutrophCmplx))
   allocate(this%rNCOMCa(NumLiveMicrbCompts,NumMicbFunGroups,1:jcplx))
   allocate(this%rPCOMCa(NumLiveMicrbCompts,NumMicbFunGroups,1:jcplx))
-  allocate(this%rNCOMCffa(NumLiveMicrbCompts,NumMicbFunGroups))
-  allocate(this%rPCOMCffa(NumLiveMicrbCompts,NumMicbFunGroups))
+  allocate(this%rNCOMCAutora(NumLiveMicrbCompts,NumMicbFunGroups))
+  allocate(this%rPCOMCAutora(NumLiveMicrbCompts,NumMicbFunGroups))
 
   allocate(this%CNOFC(jsken,1:this%NumOfLitrCmplxs))
   allocate(this%CPOFC(jsken,1:this%NumOfLitrCmplxs))
@@ -412,8 +412,8 @@ contains
   call destroy(this%OMCI)
   call destroy(this%rNCOMC)
   call destroy(this%rPCOMC)
-  call destroy(this%rNCOMCff)
-  call destroy(this%rPCOMCff)
+  call destroy(this%rNCOMCAutor)
+  call destroy(this%rPCOMCAutor)
   call destroy(this%CNOFC)
   call destroy(this%CPOFC)
   call destroy(this%FL)
