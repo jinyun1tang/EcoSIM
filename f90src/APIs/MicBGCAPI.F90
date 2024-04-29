@@ -321,8 +321,8 @@ implicit none
     micfor%AEC=AEC(L,NY,NX)
     micstt%OXYG=trc_gasml_vr(idg_O2,L,NY,NX)
   endif
-  micflx%RVMXC=RVMXC(L,NY,NX)
-  micflx%RVMBC=RVMBC(L,NY,NX)
+  micflx%RNO2DmndSoilChemo=RNO2DmndSoilChemo_vr(L,NY,NX)
+  micflx%RNO2DmndBandChemo=RNO2DmndBandChemo_vr(L,NY,NX)
   micflx%RNH4UptkSoilAutor(1:NumMicrobAutrophCmplx)=RNH4UptkSoilAutor_vr(1:NumMicrobAutrophCmplx,L,NY,NX)
   micflx%RNH4UptkBandAutor(1:NumMicrobAutrophCmplx)=RNH4UptkBandAutor_vr(1:NumMicrobAutrophCmplx,L,NY,NX)
   micflx%RNO3UptkSoilAutor(1:NumMicrobAutrophCmplx)=RNO3UptkSoilAutor_vr(1:NumMicrobAutrophCmplx,L,NY,NX)
@@ -376,8 +376,8 @@ implicit none
   RNutMicbTransf_vr(ids_H2PO4B,L,NY,NX) =micflx%XH2BS
   RNutMicbTransf_vr(ids_H1PO4B,L,NY,NX) =micflx%XH1BS
   Micb_N2Fixation_vr(L,NY,NX) =micflx%XN2GS
-  RVMXC(L,NY,NX)=micflx%RVMXC
-  RVMBC(L,NY,NX)=micflx%RVMBC
+  RNO2DmndSoilChemo_vr(L,NY,NX)=micflx%RNO2DmndSoilChemo
+  RNO2DmndBandChemo_vr(L,NY,NX)=micflx%RNO2DmndBandChemo
   NetNH4Mineralize_col(NY,NX)=NetNH4Mineralize_col(NY,NX)+micflx%NetNH4Mineralize_col
   NetPO4Mineralize_col(NY,NX)=NetPO4Mineralize_col(NY,NX)+micflx%NetPO4Mineralize_col
   RDOM_micb_flx(idom_doc,1:jcplx,L,NY,NX)=micflx%RDOM_micb_flx(idom_doc,1:jcplx)

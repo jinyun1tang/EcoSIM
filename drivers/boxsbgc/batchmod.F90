@@ -649,8 +649,8 @@ contains
     enddo
   ENDDO
 
-  ystatesfl(fid_RNO2EcoUptkSoilPrev)=ystatesfl(fid_RNO2EcoUptkSoilPrev)+micflx%RVMXC
-  ystatesfl(fid_RNO2EcoUptkBandPrev)=ystatesfl(fid_RNO2EcoUptkBandPrev)+micflx%RVMBC
+  ystatesfl(fid_RNO2EcoUptkSoilPrev)=ystatesfl(fid_RNO2EcoUptkSoilPrev)+micflx%RNO2DmndSoilChemo
+  ystatesfl(fid_RNO2EcoUptkBandPrev)=ystatesfl(fid_RNO2EcoUptkBandPrev)+micflx%RNO2DmndBandChemo
 
   end associate
   end subroutine UpdateStateVars
@@ -670,13 +670,13 @@ contains
   integer :: iknen,icplx
   integer :: jj,ll,k,m,n,ngl
 
-  associate(                        &
-    jcplx     => micpar%jcplx    , &
-    JG        => micpar%jguilds   , &
-    jsken     => micpar%jsken     , &
-    NumMicbFunGroups      => micpar%NumMicbFunGroups      , &
-    nlbiomcp  => micpar%nlbiomcp  , &
-    ndbiomcp  => micpar%ndbiomcp    &
+  associate(                                     &
+    jcplx            => micpar%jcplx,            &
+    JG               => micpar%jguilds,          &
+    jsken            => micpar%jsken,            &
+    NumMicbFunGroups => micpar%NumMicbFunGroups, &
+    nlbiomcp         => micpar%nlbiomcp,         &
+    ndbiomcp         => micpar%ndbiomcp          &
   )
 
   !configure variables

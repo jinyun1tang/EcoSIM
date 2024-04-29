@@ -532,13 +532,13 @@ module StartsMod
   RN2OEcoUptkSoil_vr(0:L2,NY,NX)=0.0_r8
   RPO4X(0:L2,NY,NX)=0.0_r8
   RP14X(0:L2,NY,NX)=0.0_r8
-  RVMXC(0:L2,NY,NX)=0.0_r8
+  RNO2DmndSoilChemo_vr(0:L2,NY,NX)=0.0_r8
   RNHBX(0:L2,NY,NX)=0.0_r8
   RN3BX(0:L2,NY,NX)=0.0_r8
   RNO2EcoUptkBand_vr(0:L2,NY,NX)=0.0_r8
   RPOBX(0:L2,NY,NX)=0.0_r8
   RP1BX(0:L2,NY,NX)=0.0_r8
-  RVMBC(0:L2,NY,NX)=0.0_r8
+  RNO2DmndBandChemo_vr(0:L2,NY,NX)=0.0_r8
   ZNHUI(0:L2,NY,NX)=0.0_r8
   ZNHU0(0:L2,NY,NX)=0.0_r8
   ZNFNI(0:L2,NY,NX)=0.0_r8

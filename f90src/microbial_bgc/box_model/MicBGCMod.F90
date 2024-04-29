@@ -925,8 +925,8 @@ module MicBGCMod
     CNO2B               => micstt%CNO2B                  , &
     ZNO2B               => micstt%ZNO2B                  , &
     ZNO2S               => micstt%ZNO2S                  , &
-    RVMXC               => micflx%RVMXC                  , &
-    RVMBC               => micflx%RVMBC                    &
+    RNO2DmndSoilChemo               => micflx%RNO2DmndSoilChemo                  , &
+    RNO2DmndBandChemo               => micflx%RNO2DmndBandChemo                    &
   )
 !
 !     FNO2,FNB2=fraction of total NO2 demand in non-band,band
@@ -939,19 +939,19 @@ module MicBGCMod
 !     RN2OProdSoilChemo,RN2OProdBandChemo=N2O production from nitrous acid reduction in non-band,band
 !     RNO3ProdSoilChemo,RNO3ProdBandChemo=NO3 production from nitrous acid reduction in non-band,band
 !     RNO2ReduxChemo=DON production from nitrous acid reduction
-!     RVMXC,RVMBC=demand for NO2 reduction in non-band,band
+!     RNO2DmndSoilChemo,RNO2DmndBandChemo=demand for NO2 reduction in non-band,band
 !     nitrous acid concn CHNO2
   H_1p_conc=AMAX1(ZERO,10.0**(-(PH-3.0_r8)))
   CHNO2=CNO2S*H_1p_conc/0.5_r8
   CHNOB=CNO2B*H_1p_conc/0.5_r8
 
   IF(RNO2EcoUptkSoilPrev.GT.ZEROS)THEN
-    FNO2=AMAX1(FMN,RVMXC/RNO2EcoUptkSoilPrev)
+    FNO2=AMAX1(FMN,RNO2DmndSoilChemo/RNO2EcoUptkSoilPrev)
   ELSE
     FNO2=FMN*VLNO3
   ENDIF
   IF(RNO2EcoUptkBandPrev.GT.ZEROS)THEN
-    FNB2=AMAX1(FMN,RVMBC/RNO2EcoUptkBandPrev)
+    FNB2=AMAX1(FMN,RNO2DmndBandChemo/RNO2EcoUptkBandPrev)
   ELSE
     FNB2=FMN*VLNOB
   ENDIF
@@ -968,8 +968,8 @@ module MicBGCMod
   RNO3ProdSoilChemo=0.80_r8*RNO2ReduxSoilChemo
   RNO3ProdBandChemo=0.80_r8*RNO2ReduxBandChemo
   RNO2ReduxChemo=0.10*(RNO2ReduxSoilChemo+RNO2ReduxBandChemo)
-  RVMXC=VMXC4S
-  RVMBC=VMXC4B
+  RNO2DmndSoilChemo=VMXC4S
+  RNO2DmndBandChemo=VMXC4B
 
   end associate
   end subroutine ChemoDenitrification

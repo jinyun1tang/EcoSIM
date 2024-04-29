@@ -1598,7 +1598,7 @@ module RedistMod
   !     ROQCX,ROQAX=total DOC,DOA demand from DOC,DOA oxidation
   !     ROQCS,ROQAS=DOC,DOA demand from DOC,DOA oxidation
   !     RNO2EcoUptkSoil_vr=total demand for NO2 reduction
-  !     RVMXC=demand for NO2 reduction
+  !     RNO2DmndSoilChemo_vr=demand for NO2 reduction
 !
   DO K=1,jcplx
     IF(micpar%is_litter(K))THEN
@@ -1643,8 +1643,8 @@ module RedistMod
     ENDDO
   ENDDO
 
-  RNO2EcoUptkSoil_vr(0,NY,NX)=RNO2EcoUptkSoil_vr(0,NY,NX)+RVMXC(0,NY,NX)
-  RNO2EcoUptkBand_vr(0,NY,NX)=RNO2EcoUptkBand_vr(0,NY,NX)+RVMBC(0,NY,NX)
+  RNO2EcoUptkSoil_vr(0,NY,NX)=RNO2EcoUptkSoil_vr(0,NY,NX)+RNO2DmndSoilChemo_vr(0,NY,NX)
+  RNO2EcoUptkBand_vr(0,NY,NX)=RNO2EcoUptkBand_vr(0,NY,NX)+RNO2DmndBandChemo_vr(0,NY,NX)
   end subroutine SumSurfMicBGCFluxes
 
 !------------------------------------------------------------------------------------------
@@ -1693,8 +1693,8 @@ module RedistMod
   RPOBX(L,NY,NX)=RPOBX(L,NY,NX)+SUM(RH2PO4UptkBandAutor_vr(1:NumMicrbHetetrophCmplx,L,NY,NX))
   RP1BX(L,NY,NX)=RP1BX(L,NY,NX)+SUM(RH1PO4UptkBandAutor_vr(1:NumMicrbHetetrophCmplx,L,NY,NX))
 
-  RNO2EcoUptkSoil_vr(L,NY,NX)=RNO2EcoUptkSoil_vr(L,NY,NX)+RVMXC(L,NY,NX)
-  RNO2EcoUptkBand_vr(L,NY,NX)=RNO2EcoUptkBand_vr(L,NY,NX)+RVMBC(L,NY,NX)
+  RNO2EcoUptkSoil_vr(L,NY,NX)=RNO2EcoUptkSoil_vr(L,NY,NX)+RNO2DmndSoilChemo_vr(L,NY,NX)
+  RNO2EcoUptkBand_vr(L,NY,NX)=RNO2EcoUptkBand_vr(L,NY,NX)+RNO2DmndBandChemo_vr(L,NY,NX)
 
   end subroutine SumMicBGCFluxes
 end module RedistMod

@@ -83,8 +83,8 @@ implicit none
   real(r8),target,allocatable ::  DPNH4(:,:)                         !total depth of NH4 band, [m]
   real(r8),target,allocatable ::  DPNO3(:,:)                         !total depth of NO3 band, [m]
   real(r8),target,allocatable ::  DPPO4(:,:)                         !total depth of PO4 band, [m]
-  real(r8),target,allocatable ::  RVMXC(:,:,:)                       !total chemodenitrification N2O uptake non-band unconstrained by N2O, [g d-2 h-1]
-  real(r8),target,allocatable ::  RVMBC(:,:,:)                       !total chemodenitrification N2O uptake band unconstrained by N2O, [g d-2 h-1]
+  real(r8),target,allocatable ::  RNO2DmndSoilChemo_vr(:,:,:)                       !total chemodenitrification N2O uptake non-band unconstrained by N2O, [g d-2 h-1]
+  real(r8),target,allocatable ::  RNO2DmndBandChemo_vr(:,:,:)                       !total chemodenitrification N2O uptake band unconstrained by N2O, [g d-2 h-1]
   real(r8),target,allocatable ::  trcg_surf_disevap_flx(:,:,:)                   !soil surface gas dissolution (+ve) - volatilization (-ve), [g d-2 h-1]
   real(r8),target,allocatable ::  trcg_ebu_flx_vr(:,:,:,:)                      !CO2 bubbling, [g d-2 h-1]
   real(r8),target,allocatable ::  XZHYS(:,:,:)                       !total H+ production
@@ -188,8 +188,8 @@ implicit none
   allocate(DPNH4(JY,JX));       DPNH4=0._r8
   allocate(DPNO3(JY,JX));       DPNO3=0._r8
   allocate(DPPO4(JY,JX));       DPPO4=0._r8
-  allocate(RVMXC(0:JZ,JY,JX));  RVMXC=0._r8
-  allocate(RVMBC(0:JZ,JY,JX));  RVMBC=0._r8
+  allocate(RNO2DmndSoilChemo_vr(0:JZ,JY,JX));  RNO2DmndSoilChemo_vr=0._r8
+  allocate(RNO2DmndBandChemo_vr(0:JZ,JY,JX));  RNO2DmndBandChemo_vr=0._r8
   allocate(trcg_surf_disevap_flx(idg_beg:idg_end-1,JY,JX));      trcg_surf_disevap_flx=0._r8
   allocate(trcg_ebu_flx_vr(idg_beg:idg_end,JZ,JY,JX));  trcg_ebu_flx_vr=0._r8
   allocate(XZHYS(0:JZ,JY,JX));  XZHYS=0._r8
@@ -281,8 +281,8 @@ implicit none
   call destroy(DPNH4)
   call destroy(DPNO3)
   call destroy(DPPO4)
-  call destroy(RVMXC)
-  call destroy(RVMBC)
+  call destroy(RNO2DmndSoilChemo_vr)
+  call destroy(RNO2DmndBandChemo_vr)
   call destroy(XZHYS)
   call destroy(WaterFlowSoiMicP)
   call destroy(WaterFlowMacP)

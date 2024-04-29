@@ -31,8 +31,8 @@ implicit none
   real(r8) :: XH2BS
   real(r8) :: XH1BS
   real(r8) :: XN2GS
-  real(r8) :: RVMXC
-  real(r8) :: RVMBC
+  real(r8) :: RNO2DmndSoilChemo
+  real(r8) :: RNO2DmndBandChemo
   real(r8) :: NetNH4Mineralize_col
   real(r8) :: NetPO4Mineralize_col
   real(r8), allocatable :: RDOM_micb_flx(:,:)
