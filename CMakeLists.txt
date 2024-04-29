@@ -20,11 +20,6 @@ option(XSDK_WITH_NETCDF "Enables support for netcdf [OFF]." ON)
 option(TPL_NETCDF_LIBRARIES "List of absolute paths to netcdf link libraries [].")
 option(TPL_NETCDF_INCLUDE_DIRS "List of absolute paths to netcdf include directories [].")
 
-# For now, we disable shared libs on Macs.
-#if (APPLE)
-#  set(BUILD_SHARED_LIBS OFF)
-#endif()
-
 if (BUILD_SHARED_LIBS)
 	message("-- EcoSIM will be built as a shared library.")
 else()
@@ -150,37 +145,32 @@ set(ECOSIM_NEED_PFUNIT 0)
 set(ECOSIM_NEED_PETSC 0)
 set(ECOSIM_INCLUDE_DIRS "" CACHE LIST "Include directory of EcoSIM")
 
-if (XSDK_WITH_NETCDF AND MACHINE MATCHES "supported")
-  if ((TPL_NETCDF_LIBRARIES MATCHES "lib") AND (TPL_NETCDF_INCLUDE_DIRS MATCHES "include"))
-     message("ECOSIM has netcdf support from the system")
-     message("TPL_NETCDF_LIBRARIES ${TPL_NETCDF_LIBRARIES}")
-     message("TPL_NETCDF_INCLUDE_DIRS ${TPL_NETCDF_INCLUDE_DIRS}")
-     list(APPEND ECOSIM_TPLS ${TPL_NETCDF_LIBRARIES})
-     list(APPEND ECOSIM_INCLUDE_DIRS ${TPL_NETCDF_INCLUDE_DIRS})
-     set(ECOSIM_HAVE_NETCDF 1)
-  else()
-     message("ECOSIM does not have netcdf support from the system")
-     set(ECOSIM_HAVE_NETCDF 0)
-  endif()
-endif()
+message("TPL_NETCDF_LIBRARIES: ${TPL_NETCDF_LIBRARIES}")
+message("TPL_NETCDF_INCLUDE_DIRS: ${TPL_NETCDF_INCLUDE_DIRS}")
+message("ECOSIM_LIBRARIES: ${ECOSIM_LIBRARIES}")
+
+message("XSDK_WITH_NETCDF: ${XSDK_WITH_NETCDF}")
+message("MACHINE: ${MACHINE}")
+
+#if (XSDK_WITH_NETCDF AND MACHINE MATCHES "supported")
+#  if ((TPL_NETCDF_LIBRARIES MATCHES "lib") AND (TPL_NETCDF_INCLUDE_DIRS MATCHES "include"))
+#     message("ECOSIM has netcdf support from the system")
+#     message("TPL_NETCDF_LIBRARIES ${TPL_NETCDF_LIBRARIES}")
+#     message("TPL_NETCDF_INCLUDE_DIRS ${TPL_NETCDF_INCLUDE_DIRS}")
+#     list(APPEND ECOSIM_TPLS ${TPL_NETCDF_LIBRARIES})
+#     list(APPEND ECOSIM_INCLUDE_DIRS ${TPL_NETCDF_INCLUDE_DIRS})
+#     set(ECOSIM_HAVE_NETCDF 1)
+#  else()
+#     message("ECOSIM does not have netcdf support from the system")
+#     set(ECOSIM_HAVE_NETCDF 0)
+#  endif()
+#endif()
 
 configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Templates/ecosim.cmake.in"
   "${CMAKE_CURRENT_BINARY_DIR}/ecosim.cmake"
   @ONLY
 )
-
-# Install miscellaneous build/test files.
-#install(FILES ${CMAKE_CURRENT_BINARY_DIR}/ecosim.cmake DESTINATION share/ecosim)
-
-#if (NOT CMAKE_INSTALL_PREFIX STREQUAL "INSTALL_DISABLED")
-#target_link_libraries(ecosiml PUBLIC ${ECOSIM_TPLS})
-# message("CMAKE_INSTALL_PREFIX: ${CMAKE_INSTALL_PREFIX}")
-# Set the installation path for the library
-#install(TARGETS ecosiml DESTINATION lib/)
-#endif()
-
-# Now include the contents of the other CMakeLists.txt file
 
 # Other third-party libraries.
 add_subdirectory(3rd-partylibs)
@@ -199,14 +189,17 @@ link_directories("${PROJECT_BINARY_DIR}/lib")
 list(APPEND ECOSIM_INCLUDE_DIRS "${PROJECT_BINARY_DIR}/include")
 include_directories(${ECOSIM_INCLUDE_DIRS})
 
-#message("ECOSIM_INCLUDE_DIRS ${ECOSIM_INCLUDE_DIRS}")
-#message("${PROJECT_BINARY_DIR}/include")
-#message("${PROJECT_BINARY_DIR}/lib")
-# Unit testing.
 enable_testing()
 
 # Source code itself.
 include_directories("${PROJECT_SOURCE_DIR}")
+
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Choose the type of build (Debug or Release)" FORCE)
+    message(STATUS "CMAKE_BUILD_TYPE not specified, defaulting to Debug")
+endif()
+
+message(STATUS "CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
 
 add_subdirectory(f90src)
 add_subdirectory(drivers)
