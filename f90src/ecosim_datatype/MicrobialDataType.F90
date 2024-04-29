@@ -21,11 +21,11 @@ implicit none
   real(r8),target,allocatable :: RINOOR(:,:,:,:)     !microbial NO3 demand in surface litter	[g d-2 h-1]
   real(r8),target,allocatable :: RVMX4(:,:,:,:,:)    !total microbial NH4 uptake non-band unconstrained by NH4	[g d-2 h-1]
   real(r8),target,allocatable :: RVMX3(:,:,:,:,:)    !total microbial NO3 uptake non-band unconstrained by NO3	[g d-2 h-1]
-  real(r8),target,allocatable :: RVMX2(:,:,:,:,:)    !total microbial NO2 uptake non-band unconstrained by NO2	[g d-2 h-1]
+  real(r8),target,allocatable :: RNO2DmndReduxSoilHeter_vr(:,:,:,:,:)    !total microbial NO2 uptake non-band unconstrained by NO2	[g d-2 h-1]
   real(r8),target,allocatable :: RVMB4(:,:,:,:,:)    !total microbial NH4 uptake non-band unconstrained by NH4	[g d-2 h-1]
   real(r8),target,allocatable :: RVMB3(:,:,:,:,:)    !total microbial NO3 uptake band unconstrained by NO3	[g d-2 h-1]
-  real(r8),target,allocatable :: RVMB2(:,:,:,:,:)    !total microbial NO2 uptake band unconstrained by NH4	[g d-2 h-1]
-  real(r8),target,allocatable :: RVMX1(:,:,:,:,:)    !total microbial N2O uptake unconstrained by N2O	[g d-2 h-1]
+  real(r8),target,allocatable :: RNO2DmndReduxBandHeter_vr(:,:,:,:,:)    !total microbial NO2 uptake band unconstrained by NH4	[g d-2 h-1]
+  real(r8),target,allocatable :: RN2ODmndReduxHeter_vr(:,:,:,:,:)    !total microbial N2O uptake unconstrained by N2O	[g d-2 h-1]
   real(r8),target,allocatable :: RINHB(:,:,:,:,:)    !microbial NH4 immobilization (+ve) - mineralization (-ve) band	[g d-2 h-1]
   real(r8),target,allocatable :: RINOB(:,:,:,:,:)    !microbial NO3 immobilization (+ve) - mineralization (-ve) band	[g d-2 h-1]
   real(r8),target,allocatable :: RIPBO(:,:,:,:,:)    !substrate-unlimited H2PO4 mineraln-immobiln
@@ -48,7 +48,7 @@ implicit none
   real(r8),target,allocatable :: RNH3OxidAutorBand(:,:,:,:)
   real(r8),target,allocatable :: RVMB3ff(:,:,:,:)
   real(r8),target,allocatable :: RNO2OxidAutorBand(:,:,:,:)
-  real(r8),target,allocatable :: RVMX1ff(:,:,:,:)
+  real(r8),target,allocatable :: RN2ODmndReduxAutor_vr(:,:,:,:)
   real(r8),target,allocatable :: RNH4UptkBandAutor_vr(:,:,:,:)
   real(r8),target,allocatable :: RNO3UptkBandAutor_vr(:,:,:,:)
   real(r8),target,allocatable :: RH2PO4UptkBandAutor_vr(:,:,:,:)
@@ -84,11 +84,11 @@ implicit none
   allocate(RINOOR(NumMicrbHetetrophCmplx,1:jcplx,JY,JX))
   allocate(RVMX4(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
   allocate(RVMX3(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(RVMX2(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
+  allocate(RNO2DmndReduxSoilHeter_vr(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
   allocate(RVMB4(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
   allocate(RVMB3(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(RVMB2(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(RVMX1(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
+  allocate(RNO2DmndReduxBandHeter_vr(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
+  allocate(RN2ODmndReduxHeter_vr(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
   allocate(RINHB(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
   allocate(RINOB(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
   allocate(RIPBO(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
@@ -111,7 +111,7 @@ implicit none
   allocate(RNH3OxidAutorBand(NumMicrobAutrophCmplx,0:JZ,JY,JX))
   allocate(RVMB3ff(NumMicrobAutrophCmplx,0:JZ,JY,JX))
   allocate(RNO2OxidAutorBand(NumMicrobAutrophCmplx,0:JZ,JY,JX))
-  allocate(RVMX1ff(NumMicrobAutrophCmplx,0:JZ,JY,JX))
+  allocate(RN2ODmndReduxAutor_vr(NumMicrobAutrophCmplx,0:JZ,JY,JX))
   allocate(RNH4UptkBandAutor_vr(NumMicrobAutrophCmplx,0:JZ,JY,JX))
   allocate(RNO3UptkBandAutor_vr(NumMicrobAutrophCmplx,0:JZ,JY,JX))
   allocate(RH2PO4UptkBandAutor_vr(NumMicrobAutrophCmplx,0:JZ,JY,JX))
@@ -137,11 +137,11 @@ implicit none
   if(allocated(RINOOR))deallocate(RINOOR)
   if(allocated(RVMX4))deallocate(RVMX4)
   if(allocated(RVMX3))deallocate(RVMX3)
-  if(allocated(RVMX2))deallocate(RVMX2)
+  if(allocated(RNO2DmndReduxSoilHeter_vr))deallocate(RNO2DmndReduxSoilHeter_vr)
   if(allocated(RVMB4))deallocate(RVMB4)
   if(allocated(RVMB3))deallocate(RVMB3)
-  if(allocated(RVMB2))deallocate(RVMB2)
-  if(allocated(RVMX1))deallocate(RVMX1)
+  if(allocated(RNO2DmndReduxBandHeter_vr))deallocate(RNO2DmndReduxBandHeter_vr)
+  if(allocated(RN2ODmndReduxHeter_vr))deallocate(RN2ODmndReduxHeter_vr)
   if(allocated(RINHB))deallocate(RINHB)
   if(allocated(RINOB))deallocate(RINOB)
   if(allocated(RIPBO))deallocate(RIPBO)
@@ -164,7 +164,7 @@ implicit none
   if(allocated(RNH3OxidAutorBand))deallocate(RNH3OxidAutorBand)
   if(allocated(RVMB3ff))deallocate(RVMB3ff)
   if(allocated(RNO2OxidAutorBand))deallocate(RNO2OxidAutorBand)
-  if(allocated(RVMX1ff))deallocate(RVMX1ff)
+  if(allocated(RN2ODmndReduxAutor_vr))deallocate(RN2ODmndReduxAutor_vr)
   if(allocated(RNH4UptkBandAutor_vr))deallocate(RNH4UptkBandAutor_vr)
   if(allocated(RNO3UptkBandAutor_vr))deallocate(RNO3UptkBandAutor_vr)
   if(allocated(RH2PO4UptkBandAutor_vr))deallocate(RH2PO4UptkBandAutor_vr)

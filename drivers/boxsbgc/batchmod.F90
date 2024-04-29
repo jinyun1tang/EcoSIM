@@ -55,17 +55,17 @@ contains
   call initNitro1Layer
 
 
-  associate(                      &
-    nlbiomcp => micpar%nlbiomcp , &
-    ndbiomcp => micpar%ndbiomcp , &
-    jsken    => micpar%jsken    , &
-    NumMicbFunGroups     => micpar%NumMicbFunGroups     , &
-    NumMicrbHetetrophCmplx  => micpar%NumMicrbHetetrophCmplx  , &
-    NumMicrobAutrophCmplx  => micpar%NumMicrobAutrophCmplx  , &
-    NumLiveHeterBioms => micpar%NumLiveHeterBioms, &
-    NumLiveAutoBioms  => micpar%NumLiveAutoBioms, &
-    jcplx    => micpar%jcplx    , &
-    JG       => micpar%jguilds    &
+  associate(                                                 &
+    nlbiomcp               => micpar%nlbiomcp,               &
+    ndbiomcp               => micpar%ndbiomcp,               &
+    jsken                  => micpar%jsken,                  &
+    NumMicbFunGroups       => micpar%NumMicbFunGroups,       &
+    NumMicrbHetetrophCmplx => micpar%NumMicrbHetetrophCmplx, &
+    NumMicrobAutrophCmplx  => micpar%NumMicrobAutrophCmplx,  &
+    NumLiveHeterBioms      => micpar%NumLiveHeterBioms,      &
+    NumLiveAutoBioms       => micpar%NumLiveAutoBioms,       &
+    jcplx                  => micpar%jcplx,                  &
+    JG                     => micpar%jguilds                 &
   )
 
   ystates0l(cid_oqc_b:cid_oqc_e)=forc%DOM(idom_doc,1:jcplx)
@@ -115,21 +115,21 @@ contains
 
   call err_status%reset()
 
-  associate(                      &
-    nlbiomcp => micpar%nlbiomcp , &
-    ndbiomcp => micpar%ndbiomcp , &
-    NumMicrbHetetrophCmplx  => micpar%NumMicrbHetetrophCmplx  , &
-    NumMicrobAutrophCmplx  => micpar%NumMicrobAutrophCmplx  , &
-    k_humus  => micpar%k_humus  , &
-    k_POM    => micpar%k_POM    , &
-    icarbhyro=> micpar%icarbhyro, &
-    iprotein => micpar%iprotein , &
-    jsken    => micpar%jsken    , &
-    NumMicbFunGroups     => micpar%NumMicbFunGroups     , &
-    NumLiveHeterBioms => micpar%NumLiveHeterBioms, &
-    NumLiveAutoBioms  => micpar%NumLiveAutoBioms, &
-    jcplx    => micpar%jcplx    , &
-    JG       => micpar%jguilds    &
+  associate(                                                 &
+    nlbiomcp               => micpar%nlbiomcp,               &
+    ndbiomcp               => micpar%ndbiomcp,               &
+    NumMicrbHetetrophCmplx => micpar%NumMicrbHetetrophCmplx, &
+    NumMicrobAutrophCmplx  => micpar%NumMicrobAutrophCmplx,  &
+    k_humus                => micpar%k_humus,                &
+    k_POM                  => micpar%k_POM,                  &
+    icarbhyro              => micpar%icarbhyro,              &
+    iprotein               => micpar%iprotein,               &
+    jsken                  => micpar%jsken,                  &
+    NumMicbFunGroups       => micpar%NumMicbFunGroups,       &
+    NumLiveHeterBioms      => micpar%NumLiveHeterBioms,      &
+    NumLiveAutoBioms       => micpar%NumLiveAutoBioms,       &
+    jcplx                  => micpar%jcplx,                  &
+    JG                     => micpar%jguilds                 &
   )
   micfor%ZERO  =ZERO
   micfor%ZEROS2=ZEROS2
@@ -301,7 +301,8 @@ contains
   micflx%RIPBO(1:NumMicrbHetetrophCmplx,1:jcplx)=reshape(ystates0l(fid_RIPBO_b:fid_RIPBO_e),(/NumMicrbHetetrophCmplx,JCPLX/))
   micflx%RIPO1(1:NumMicrbHetetrophCmplx,1:jcplx)=reshape(ystates0l(fid_RIPO1_b:fid_RIPO1_e),(/NumMicrbHetetrophCmplx,JCPLX/))
   micflx%RIPB1(1:NumMicrbHetetrophCmplx,1:jcplx)=reshape(ystates0l(fid_RIPB1_b:fid_RIPB1_e),(/NumMicrbHetetrophCmplx,JCPLX/))
-  micflx%RO2DmndHetert(1:NumMicrbHetetrophCmplx,1:jcplx)=reshape(ystates0l(fid_RO2DmndHetert_b:fid_RO2DmndHetert_e),(/NumMicrbHetetrophCmplx,JCPLX/))
+  micflx%RO2DmndHetert(1:NumMicrbHetetrophCmplx,1:jcplx)=reshape(ystates0l(fid_RO2DmndHetert_b:fid_RO2DmndHetert_e),&
+    (/NumMicrbHetetrophCmplx,JCPLX/))
   end associate
   end subroutine BatchModelConfig
 
@@ -517,22 +518,22 @@ contains
   real(r8), intent(inout) :: ystatesfl(nvars)
 
   integer :: K,N,NGL,M
-  associate(                         &
-    jcplx     => micpar%jcplx      , &
-    NumMicbFunGroups      => micpar%NumMicbFunGroups       , &
-    jsken     => micpar%jsken      , &
-    k_humus   => micpar%k_humus    , &
-    k_POM     => micpar%k_POM      , &
-    iprotein  => micpar%iprotein   , &
-    icarbhyro => micpar%icarbhyro  , &
-    nlbiomcp  => micpar%nlbiomcp   , &
-    ndbiomcp  => micpar%ndbiomcp   , &
-    is_litter => micpar%is_litter  , &
-    NumLiveAutoBioms => micpar%NumLiveAutoBioms, &
-    NumLiveHeterBioms => micpar%NumLiveHeterBioms, &
-    NumMicrbHetetrophCmplx   => micpar%NumMicrbHetetrophCmplx    , &
-    NumMicrobAutrophCmplx   => micpar%NumMicrobAutrophCmplx    , &
-    VLWatMicP  => micfor%VLWatMicP         &
+  associate(                                                 &
+    jcplx                  => micpar%jcplx,                  &
+    NumMicbFunGroups       => micpar%NumMicbFunGroups,       &
+    jsken                  => micpar%jsken,                  &
+    k_humus                => micpar%k_humus,                &
+    k_POM                  => micpar%k_POM,                  &
+    iprotein               => micpar%iprotein,               &
+    icarbhyro              => micpar%icarbhyro,              &
+    nlbiomcp               => micpar%nlbiomcp,               &
+    ndbiomcp               => micpar%ndbiomcp,               &
+    is_litter              => micpar%is_litter,              &
+    NumLiveAutoBioms       => micpar%NumLiveAutoBioms,       &
+    NumLiveHeterBioms      => micpar%NumLiveHeterBioms,      &
+    NumMicrbHetetrophCmplx => micpar%NumMicrbHetetrophCmplx, &
+    NumMicrobAutrophCmplx  => micpar%NumMicrobAutrophCmplx,  &
+    VLWatMicP              => micfor%VLWatMicP               &
   )
 !atmospheric gaseous CO2,CH4,O2,NH3,N2,N2O,H2
 !
@@ -617,13 +618,13 @@ contains
           ystatesfl(fid_ROXYY)=ystatesfl(fid_ROXYY)+micflx%RO2DmndHetert(NGL,K)
           ystatesfl(fid_RNH4Y)=ystatesfl(fid_RNH4Y)+micflx%RVMX4(NGL,K)+micflx%RINHO(NGL,K)
           ystatesfl(fid_RNO3Y)=ystatesfl(fid_RNO3Y)+micflx%RVMX3(NGL,K)+micflx%RINOO(NGL,K)
-          ystatesfl(fid_RNO2EcoUptkSoilPrev)=ystatesfl(fid_RNO2EcoUptkSoilPrev)+micflx%RVMX2(NGL,K)
-          ystatesfl(fid_RN2OEcoUptkSoilPrev)=ystatesfl(fid_RN2OEcoUptkSoilPrev)+micflx%RVMX1(NGL,K)
+          ystatesfl(fid_RNO2EcoUptkSoilPrev)=ystatesfl(fid_RNO2EcoUptkSoilPrev)+micflx%RNO2DmndReduxSoilHeter(NGL,K)
+          ystatesfl(fid_RN2OEcoUptkSoilPrev)=ystatesfl(fid_RN2OEcoUptkSoilPrev)+micflx%RN2ODmndReduxHeter(NGL,K)
           ystatesfl(fid_RPO4Y)=ystatesfl(fid_RPO4Y)+micflx%RIPOO(NGL,K)
           ystatesfl(fid_RP14Y)=ystatesfl(fid_RP14Y)+micflx%RIPO1(NGL,K)
           ystatesfl(fid_RNHBY)=ystatesfl(fid_RNHBY)+micflx%RVMB4(NGL,K)+micflx%RINHB(NGL,K)
           ystatesfl(fid_RN3BY)=ystatesfl(fid_RN3BY)+micflx%RVMB3(NGL,K)+micflx%RINOB(NGL,K)
-          ystatesfl(fid_RNO2EcoUptkBandPrev)=ystatesfl(fid_RNO2EcoUptkBandPrev)+micflx%RVMB2(NGL,K)
+          ystatesfl(fid_RNO2EcoUptkBandPrev)=ystatesfl(fid_RNO2EcoUptkBandPrev)+micflx%RNO2DmndReduxBandHeter(NGL,K)
           ystatesfl(fid_RPOBY)=ystatesfl(fid_RPOBY)+micflx%RIPBO(NGL,K)
           ystatesfl(fid_RP1BY)=ystatesfl(fid_RP1BY)+micflx%RIPB1(NGL,K)
           ystatesfl(fid_ROQCY_b+K)=ystatesfl(fid_ROQCY_b+K)+micflx%ROQCS(NGL,K)

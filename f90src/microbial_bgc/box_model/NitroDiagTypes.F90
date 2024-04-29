@@ -128,7 +128,7 @@ type, public :: NitroAQMFluxDiagType
   real(r8),allocatable :: RDOMEheter(:,:,:,:)
   real(r8),allocatable :: RHOMEheter(:,:,:,:)
   real(r8),allocatable :: RCOMEheter(:,:,:,:)
-  real(r8),allocatable :: RH2GX(:,:)
+  real(r8),allocatable :: RH2ProdHeter(:,:)
   real(r8),allocatable :: RDMMEheter(:,:,:,:)
   real(r8),allocatable :: RHMMEheter(:,:,:,:)
   real(r8),allocatable :: RCMMEheter(:,:,:,:)
@@ -176,7 +176,6 @@ type, public :: NitroAQMFluxDiagType
   real(r8),allocatable :: RHOMEautor(:,:,:)
   real(r8),allocatable :: RCOMEautor(:,:,:)
   real(r8),allocatable :: CGOMEautor(:,:)
-  real(r8),allocatable :: RH2GXff(:)
   real(r8),allocatable :: RDMMEautor(:,:,:)
   real(r8),allocatable :: RHMMEautor(:,:,:)
   real(r8),allocatable :: RCMMEautor(:,:,:)
@@ -355,7 +354,7 @@ type, public :: NitroAQMFluxDiagType
   allocate(this%RHOMEheter(NumPlantChemElms,2,NumMicrbHetetrophCmplx,1:jcplx));this%RHOMEheter=spval
   allocate(this%RCOMEheter(NumPlantChemElms,2,NumMicrbHetetrophCmplx,1:jcplx));this%RCOMEheter=spval
   allocate(this%CGOMEheter(NumPlantChemElms,NumMicrbHetetrophCmplx,1:jcplx));this%CGOMEheter=spval
-  allocate(this%RH2GX(NumMicrbHetetrophCmplx,1:jcplx));this%RH2GX=spval
+  allocate(this%RH2ProdHeter(NumMicrbHetetrophCmplx,1:jcplx));this%RH2ProdHeter=spval
   allocate(this%RDMMEheter(NumPlantChemElms,2,NumMicrbHetetrophCmplx,1:jcplx));this%RDMMEheter=spval
   allocate(this%RHMMEheter(NumPlantChemElms,2,NumMicrbHetetrophCmplx,1:jcplx));this%RHMMEheter=spval
   allocate(this%RCMMEheter(NumPlantChemElms,2,NumMicrbHetetrophCmplx,1:jcplx));this%RCMMEheter=spval
@@ -409,7 +408,6 @@ type, public :: NitroAQMFluxDiagType
   allocate(this%RHOMEautor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%RHOMEautor=spval
   allocate(this%RCOMEautor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%RCOMEautor=spval
   allocate(this%CGOMEautor(idom_beg:idom_end,NumMicrobAutrophCmplx));this%CGOMEautor=spval
-  allocate(this%RH2GXff(NumMicrobAutrophCmplx));this%RH2GXff=spval
   allocate(this%RDMMEautor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%RDMMEautor=spval
   allocate(this%RHMMEautor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%RHMMEautor=spval
   allocate(this%RCMMEautor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%RCMMEautor=spval
@@ -507,7 +505,7 @@ type, public :: NitroAQMFluxDiagType
   this%RHOMEheter = 0._r8
   this%RCOMEheter = 0._r8
   this%CGOMEheter = 0._r8
-  this%RH2GX = 0._r8
+  this%RH2ProdHeter = 0._r8
   this%RHMMEheter = 0._r8
   this%RCMMEheter = 0._r8
   this%RDMMEheter = 0._r8
@@ -561,7 +559,6 @@ type, public :: NitroAQMFluxDiagType
   this%RHOMEautor = 0._r8
   this%RCOMEautor = 0._r8
   this%CGOMEautor = 0._r8
-  this%RH2GXff = 0._r8
   this%RDMMEautor = 0._r8
   this%RHMMEautor = 0._r8
   this%RCMMEautor = 0._r8
@@ -619,7 +616,7 @@ type, public :: NitroAQMFluxDiagType
   call destroy(this%RHOMEheter)
   call destroy(this%RCOMEheter)
   call destroy(this%CGOMEheter)
-  call destroy(this%RH2GX)
+  call destroy(this%RH2ProdHeter)
   call destroy(this%RHMMEheter)
   call destroy(this%RCMMEheter)
   call destroy(this%RDMMEheter)
@@ -672,7 +669,6 @@ type, public :: NitroAQMFluxDiagType
   call destroy(this%RHOMEautor)
   call destroy(this%RCOMEautor)
   call destroy(this%CGOMEautor)
-  call destroy(this%RH2GXff)
   call destroy(this%RDMMEautor)
   call destroy(this%RHMMEautor)
   call destroy(this%RCMMEautor)

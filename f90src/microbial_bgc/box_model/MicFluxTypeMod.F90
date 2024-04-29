@@ -46,9 +46,9 @@ implicit none
   real(r8), allocatable :: ROQAS(:,:)
   real(r8), allocatable :: RVMX3(:,:)
   real(r8), allocatable :: RVMB3(:,:)
-  real(r8), allocatable :: RVMX2(:,:)
-  real(r8), allocatable :: RVMB2(:,:)
-  real(r8), allocatable :: RVMX1(:,:)
+  real(r8), allocatable :: RNO2DmndReduxSoilHeter(:,:)
+  real(r8), allocatable :: RNO2DmndReduxBandHeter(:,:)
+  real(r8), allocatable :: RN2ODmndReduxHeter(:,:)
   real(r8), allocatable :: ROXSK(:)
   real(r8), allocatable :: RVMX4(:,:)
   real(r8), allocatable :: RVMB4(:,:)
@@ -104,9 +104,9 @@ implicit none
   allocate(this%ROQAS(NumMicrbHetetrophCmplx,1:jcplx));this%ROQAS=spval
   allocate(this%RVMX3(NumMicrbHetetrophCmplx,1:jcplx));this%RVMX3=spval
   allocate(this%RVMB3(NumMicrbHetetrophCmplx,1:jcplx));this%RVMB3=spval
-  allocate(this%RVMX2(NumMicrbHetetrophCmplx,1:jcplx));this%RVMX2=spval
-  allocate(this%RVMB2(NumMicrbHetetrophCmplx,1:jcplx));this%RVMB2=spval
-  allocate(this%RVMX1(NumMicrbHetetrophCmplx,1:jcplx));this%RVMX1=spval
+  allocate(this%RNO2DmndReduxSoilHeter(NumMicrbHetetrophCmplx,1:jcplx));this%RNO2DmndReduxSoilHeter=spval
+  allocate(this%RNO2DmndReduxBandHeter(NumMicrbHetetrophCmplx,1:jcplx));this%RNO2DmndReduxBandHeter=spval
+  allocate(this%RN2ODmndReduxHeter(NumMicrbHetetrophCmplx,1:jcplx));this%RN2ODmndReduxHeter=spval
   allocate(this%RVMX4(NumMicrbHetetrophCmplx,1:jcplx));this%RVMX4=spval
   allocate(this%RVMB4(NumMicrbHetetrophCmplx,1:jcplx));this%RVMB4=spval
   allocate(this%RINHO(NumMicrbHetetrophCmplx,1:jcplx));this%RINHO=spval
@@ -154,9 +154,9 @@ implicit none
   this%ROQAS=0._r8
   this%RVMX3=0._r8
   this%RVMB3=0._r8
-  this%RVMX2=0._r8
-  this%RVMB2=0._r8
-  this%RVMX1=0._r8
+  this%RNO2DmndReduxSoilHeter=0._r8
+  this%RNO2DmndReduxBandHeter=0._r8
+  this%RN2ODmndReduxHeter=0._r8
   this%RVMX4=0._r8
   this%RVMB4=0._r8
   this%RINHO=0._r8
@@ -206,9 +206,9 @@ implicit none
   call destroy(this%ROQAS)
   call destroy(this%RVMX3)
   call destroy(this%RVMB3)
-  call destroy(this%RVMX2)
-  call destroy(this%RVMB2)
-  call destroy(this%RVMX1)
+  call destroy(this%RNO2DmndReduxSoilHeter)
+  call destroy(this%RNO2DmndReduxBandHeter)
+  call destroy(this%RN2ODmndReduxHeter)
   call destroy(this%ROXSK)
   call destroy(this%RVMX4)
   call destroy(this%RVMB4)

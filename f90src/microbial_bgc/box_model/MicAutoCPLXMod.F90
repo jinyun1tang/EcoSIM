@@ -76,7 +76,6 @@ module MicAutoCPLXMod
     RNO2ReduxAutorSoil       => nmicf%RNO2ReduxAutorSoil,        &
     RNO2ReduxAutorBand       => nmicf%RNO2ReduxAutorBand,        &
     RGOMDff                  => nmicf%RGOMDff,                   &
-    RH2GXff                  => nmicf%RH2GXff,                   &
     RGOMYff                  => nmicf%RGOMYff,                   &
     RCO2ProdAutor            => nmicf%RCO2ProdAutor,             &
     RCH4ProdAutor            => nmicf%RCH4ProdAutor,             &
@@ -201,7 +200,6 @@ module MicAutoCPLXMod
     RCO2ProdAutor(NGL)=0.0_r8
     RCH4ProdAutor(NGL)=RespGrossAutor(NGL)
     RO2Uptk4RespAutor(NGL)=RO2Dmnd4RespAutor(NGL)
-    RH2GXff(NGL)=0.0_r8
     RH2GZ=0.667_r8*RespGrossAutor(NGL)
   ENDIF
 !
@@ -656,7 +654,6 @@ module MicAutoCPLXMod
     RO2Dmnd4RespAutor   => nmicf%RO2Dmnd4RespAutor,    &
     RO2DmndAutor        => nmicf%RO2DmndAutor,         &
     RO2Uptk4RespAutor   => nmicf%RO2Uptk4RespAutor,    &
-    RH2GXff             => nmicf%RH2GXff,              &
     RCO2ProdAutor       => nmicf%RCO2ProdAutor,        &
     RCH4ProdAutor       => nmicf%RCH4ProdAutor,        &
     RSOxidSoilAutor     => nmicf%RSOxidSoilAutor,      &
@@ -773,7 +770,7 @@ module MicAutoCPLXMod
       !     RATIO OF ACTUAL O2 UPAKE TO BIOLOGICAL DEMAND (WFN)
       !
       !     WFN=ratio of O2-limited to O2-unlimited uptake
-      !     RVMX4,RVNHB,RVMX2,RVMB2=NH3,NO2 oxidation in non-band, band
+      !     RVMX4,RVNHB,RNO2DmndReduxSoilHeter_vr,RNO2DmndReduxBandHeter_vr=NH3,NO2 oxidation in non-band, band
       !
       fLimO2Autor(NGL)=AMIN1(1.0,AZMAX1(RO2UptkAutor(NGL)/RO2DmndAutor(NGL)))
       IF(N.EQ.AmmoniaOxidBacter)THEN
@@ -794,7 +791,7 @@ module MicAutoCPLXMod
   !write(*,*)'RESPIRATION PRODUCTS ALLOCATED TO O2, CO2, ACETATE, CH4, H2'
   !
   !     RespGrossHeter,RGOMP=O2-limited, O2-unlimited respiration
-  !     RCO2X,RAcettProdHeter,RCH4ProdHeter,RH2GX=CO2,acetate,CH4,H2 production from RespGrossHeter
+  !     RCO2X,RAcettProdHeter,RCH4ProdHeter,RH2ProdHeter=CO2,acetate,CH4,H2 production from RespGrossHeter
   !     RO2Uptk4RespHeter=O2-limited O2 uptake
   !     RSOxidSoilAutor,RSOxidBandAutor=total O2-lmited (1)NH4,(2)NO2,(3)CH4 oxidation
   !
@@ -802,7 +799,6 @@ module MicAutoCPLXMod
   RCO2ProdAutor(NGL)=RespGrossAutor(NGL)
   RCH4ProdAutor(NGL)=0.0_r8
   RO2Uptk4RespAutor(NGL)=RO2Dmnd4RespAutor(NGL)*fLimO2Autor(NGL)
-  RH2GXff(NGL)=0.0_r8
   RSOxidSoilAutor(NGL)=RVOXPA*fLimO2Autor(NGL)
   RSOxidBandAutor(NGL)=RVOXPB*fLimO2Autor(NGL)
   end associate
@@ -1156,7 +1152,7 @@ module MicAutoCPLXMod
 !     RNNO2,RNNOB=NO2 oxidation in non-band, band
 !     RGOMP=O2-unlimited respiration
 !     ECNO=efficiency CO2 conversion to biomass
-!     RVMX2,RVMB2=nitrifier demand for NO2 in non-band, band
+!     RNO2DmndReduxSoilHeter_vr,RNO2DmndReduxBandHeter_vr=nitrifier demand for NO2 in non-band, band
 !
   ECHZ=EO2X
   VMXA=TFNGff(NGL)*FCNPff(NGL)*XCO2*OMActAutor(NGL)*VMXN
@@ -1884,8 +1880,8 @@ module MicAutoCPLXMod
   associate(                                              &
     CGOMEautor            => nmicf%CGOMEautor           , &
     CGOSEautor            => nmicf%CGOSEautor           , &
-    Resp4NFixAutor               => nmicf%Resp4NFixAutor              , &
-    RespGrossAutor               => nmicf%RespGrossAutor              , &
+    Resp4NFixAutor        => nmicf%Resp4NFixAutor       , &
+    RespGrossAutor        => nmicf%RespGrossAutor       , &
     RGOMDff               => nmicf%RGOMDff              , &
     RNO3TransfSoilAutor   => nmicf%RNO3TransfSoilAutor  , &
     RCO2ProdAutor         => nmicf%RCO2ProdAutor        , &
