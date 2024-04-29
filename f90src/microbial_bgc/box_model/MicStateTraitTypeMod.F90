@@ -66,10 +66,10 @@ implicit none
   real(r8) :: VOLQ
   real(r8),allocatable :: FracBulkSOM(:)
   real(r8),allocatable :: DOM(:,:)
-  real(r8),allocatable :: OHM(:,:)
+  real(r8),allocatable :: SorbedOM(:,:)
   real(r8),allocatable :: OSA(:,:)
-  real(r8),allocatable :: OSM(:,:,:)
-  real(r8),allocatable :: ORM(:,:,:)
+  real(r8),allocatable :: SolidOM(:,:,:)
+  real(r8),allocatable :: OMBioResdu(:,:,:)
   real(r8),allocatable :: CNOSC(:,:)
   real(r8),allocatable :: CPOSC(:,:)
   real(r8),allocatable :: OMEheter(:,:,:)
@@ -106,10 +106,10 @@ implicit none
 
   allocate(this%FracBulkSOM(1:jcplx));this%FracBulkSOM=spval
   allocate(this%DOM(idom_beg:idom_end,1:jcplx));this%DOM=spval
-  allocate(this%OHM(idom_beg:idom_end,1:jcplx));this%OHM=spval
+  allocate(this%SorbedOM(idom_beg:idom_end,1:jcplx));this%SorbedOM=spval
   allocate(this%OSA(jsken,1:jcplx));this%OSA=spval
-  allocate(this%OSM(NumPlantChemElms,jsken,1:jcplx));this%OSM=spval
-  allocate(this%ORM(1:NumPlantChemElms,ndbiomcp,1:jcplx));this%ORM=spval
+  allocate(this%SolidOM(NumPlantChemElms,jsken,1:jcplx));this%SolidOM=spval
+  allocate(this%OMBioResdu(1:NumPlantChemElms,ndbiomcp,1:jcplx));this%OMBioResdu=spval
   allocate(this%CNOSC(jsken,1:jcplx));this%CNOSC=spval
   allocate(this%CPOSC(jsken,1:jcplx));this%CPOSC=spval
   allocate(this%OMEheter(NumPlantChemElms,NumLiveHeterBioms,1:jcplx));this%OMEheter=spval
@@ -127,10 +127,10 @@ implicit none
 
   call destroy(this%FracBulkSOM)
   call destroy(this%DOM)
-  call destroy(this%OHM)
+  call destroy(this%SorbedOM)
   call destroy(this%OSA)
-  call destroy(this%OSM)
-  call destroy(this%ORM)
+  call destroy(this%SolidOM)
+  call destroy(this%OMBioResdu)
   call destroy(this%CNOSC)
   call destroy(this%CPOSC)
   call destroy(this%OMEheter)

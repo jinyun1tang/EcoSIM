@@ -235,15 +235,15 @@ implicit none
     micstt%CH1P4BU=trc_solcl_vr(ids_H1PO4B,NU(NY,NX),NY,NX)
     micstt%CNO3SU=trc_solcl_vr(ids_NO3,NU(NY,NX),NY,NX)
     micstt%CNO3BU=trc_solcl_vr(ids_NO3B,NU(NY,NX),NY,NX)
-    micstt%OSC13U=OSM(ielmc,micpar%iprotein,micpar%k_POM,NU(NY,NX),NY,NX)
-    micstt%OSN13U=OSM(ielmn,micpar%iprotein,micpar%k_POM,NU(NY,NX),NY,NX)
-    micstt%OSP13U=OSM(ielmp,micpar%iprotein,micpar%k_POM,NU(NY,NX),NY,NX)
-    micstt%OSC14U=OSM(ielmc,micpar%iprotein,micpar%k_humus,NU(NY,NX),NY,NX)
-    micstt%OSN14U=OSM(ielmn,micpar%iprotein,micpar%k_humus,NU(NY,NX),NY,NX)
-    micstt%OSP14U=OSM(ielmp,micpar%iprotein,micpar%k_humus,NU(NY,NX),NY,NX)
-    micstt%OSC24U=OSM(ielmc,micpar%icarbhyro,micpar%k_humus,NU(NY,NX),NY,NX)
-    micstt%OSN24U=OSM(ielmn,micpar%icarbhyro,micpar%k_humus,NU(NY,NX),NY,NX)
-    micstt%OSP24U=OSM(ielmp,micpar%icarbhyro,micpar%k_humus,NU(NY,NX),NY,NX)
+    micstt%OSC13U=SolidOM_vr(ielmc,micpar%iprotein,micpar%k_POM,NU(NY,NX),NY,NX)
+    micstt%OSN13U=SolidOM_vr(ielmn,micpar%iprotein,micpar%k_POM,NU(NY,NX),NY,NX)
+    micstt%OSP13U=SolidOM_vr(ielmp,micpar%iprotein,micpar%k_POM,NU(NY,NX),NY,NX)
+    micstt%OSC14U=SolidOM_vr(ielmc,micpar%iprotein,micpar%k_humus,NU(NY,NX),NY,NX)
+    micstt%OSN14U=SolidOM_vr(ielmn,micpar%iprotein,micpar%k_humus,NU(NY,NX),NY,NX)
+    micstt%OSP14U=SolidOM_vr(ielmp,micpar%iprotein,micpar%k_humus,NU(NY,NX),NY,NX)
+    micstt%OSC24U=SolidOM_vr(ielmc,micpar%icarbhyro,micpar%k_humus,NU(NY,NX),NY,NX)
+    micstt%OSN24U=SolidOM_vr(ielmn,micpar%icarbhyro,micpar%k_humus,NU(NY,NX),NY,NX)
+    micstt%OSP24U=SolidOM_vr(ielmp,micpar%icarbhyro,micpar%k_humus,NU(NY,NX),NY,NX)
     micfor%RNH4YU =RNH4Y(NU(NY,NX),NY,NX)
     micfor%RNO3YU =RNO3Y(NU(NY,NX),NY,NX)
     micfor%RPO4YU =RPO4Y(NU(NY,NX),NY,NX)
@@ -308,11 +308,11 @@ implicit none
   micstt%ZNFNI=ZNFNI(L,NY,NX)
   micstt%FracBulkSOM(1:jcplx)=FracBulkSOM_vr(1:jcplx,L,NY,NX)
   micstt%DOM(idom_beg:idom_end,1:jcplx)=DOM(idom_beg:idom_end,1:jcplx,L,NY,NX)
-  micstt%OHM(idom_beg:idom_end,1:jcplx)=OHM(idom_beg:idom_end,1:jcplx,L,NY,NX)
+  micstt%SorbedOM(idom_beg:idom_end,1:jcplx)=SorbedOM_vr(idom_beg:idom_end,1:jcplx,L,NY,NX)
 
   micstt%OSA(1:jsken,1:jcplx)=OSA(1:jsken,1:jcplx,L,NY,NX)
-  micstt%OSM(1:NumPlantChemElms,1:jsken,1:jcplx)=OSM(1:NumPlantChemElms,1:jsken,1:jcplx,L,NY,NX)
-  micstt%ORM(1:NumPlantChemElms,1:ndbiomcp,1:jcplx)=ORM(1:NumPlantChemElms,1:ndbiomcp,1:jcplx,L,NY,NX)
+  micstt%SolidOM(1:NumPlantChemElms,1:jsken,1:jcplx)=SolidOM_vr(1:NumPlantChemElms,1:jsken,1:jcplx,L,NY,NX)
+  micstt%OMBioResdu(1:NumPlantChemElms,1:ndbiomcp,1:jcplx)=OMBioResdu_vr(1:NumPlantChemElms,1:ndbiomcp,1:jcplx,L,NY,NX)
   micstt%CNOSC(1:jsken,1:jcplx)=CNOSC(1:jsken,1:jcplx,L,NY,NX)
   micstt%CPOSC(1:jsken,1:jcplx)=CPOSC(1:jsken,1:jcplx,L,NY,NX)
   micstt%OMEheter(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx)=OMEheter(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx,L,NY,NX)
@@ -409,7 +409,7 @@ implicit none
   RIPO1(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX)=micflx%RIPO1(1:NumMicrbHetetrophCmplx,1:jcplx)
   RIPB1(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX)=micflx%RIPB1(1:NumMicrbHetetrophCmplx,1:jcplx)
 
-  OSM(1:NumPlantChemElms,1:jsken,1:jcplx,L,NY,NX)=micstt%OSM(1:NumPlantChemElms,1:jsken,1:jcplx)
+  SolidOM_vr(1:NumPlantChemElms,1:jsken,1:jcplx,L,NY,NX)=micstt%SolidOM(1:NumPlantChemElms,1:jsken,1:jcplx)
   OSA(1:jsken,1:jcplx,L,NY,NX)=micstt%OSA(1:jsken,1:jcplx)
 
   if(litrm)then
@@ -421,17 +421,17 @@ implicit none
     RNO3UptkLitrAutor_col(1:NumMicrobAutrophCmplx,NY,NX)=micflx%RNO3UptkLitrAutor(1:NumMicrobAutrophCmplx)
     RH2PO4UptkLitrAutor_col(1:NumMicrobAutrophCmplx,NY,NX)=micflx%RH2PO4UptkLitrAutor(1:NumMicrobAutrophCmplx)
     RH1PO4UptkLitrAutor_col(1:NumMicrobAutrophCmplx,NY,NX)=micflx%RH1PO4UptkLitrAutor(1:NumMicrobAutrophCmplx)
-    OSM(ielmc,micpar%iprotein,micpar%k_POM,NU(NY,NX),NY,NX)=micstt%OSC13U
-    OSM(ielmc,micpar%iprotein,micpar%k_humus,NU(NY,NX),NY,NX)=micstt%OSC14U
-    OSM(ielmc,micpar%icarbhyro,micpar%k_humus,NU(NY,NX),NY,NX)=micstt%OSC24U
+    SolidOM_vr(ielmc,micpar%iprotein,micpar%k_POM,NU(NY,NX),NY,NX)=micstt%OSC13U
+    SolidOM_vr(ielmc,micpar%iprotein,micpar%k_humus,NU(NY,NX),NY,NX)=micstt%OSC14U
+    SolidOM_vr(ielmc,micpar%icarbhyro,micpar%k_humus,NU(NY,NX),NY,NX)=micstt%OSC24U
 
-    OSM(ielmn,micpar%iprotein,micpar%k_POM,NU(NY,NX),NY,NX)=micstt%OSN13U
-    OSM(ielmn,micpar%iprotein,micpar%k_humus,NU(NY,NX),NY,NX)=micstt%OSN14U
-    OSM(ielmn,micpar%icarbhyro,micpar%k_humus,NU(NY,NX),NY,NX)=micstt%OSN24U
+    SolidOM_vr(ielmn,micpar%iprotein,micpar%k_POM,NU(NY,NX),NY,NX)=micstt%OSN13U
+    SolidOM_vr(ielmn,micpar%iprotein,micpar%k_humus,NU(NY,NX),NY,NX)=micstt%OSN14U
+    SolidOM_vr(ielmn,micpar%icarbhyro,micpar%k_humus,NU(NY,NX),NY,NX)=micstt%OSN24U
 
-    OSM(ielmp,micpar%iprotein,micpar%k_POM,NU(NY,NX),NY,NX)=micstt%OSP13U
-    OSM(ielmp,micpar%iprotein,micpar%k_humus,NU(NY,NX),NY,NX)=micstt%OSP14U
-    OSM(ielmp,micpar%icarbhyro,micpar%k_humus,NU(NY,NX),NY,NX)=micstt%OSP24U
+    SolidOM_vr(ielmp,micpar%iprotein,micpar%k_POM,NU(NY,NX),NY,NX)=micstt%OSP13U
+    SolidOM_vr(ielmp,micpar%iprotein,micpar%k_humus,NU(NY,NX),NY,NX)=micstt%OSP14U
+    SolidOM_vr(ielmp,micpar%icarbhyro,micpar%k_humus,NU(NY,NX),NY,NX)=micstt%OSP24U
   endif
 
   RNH4UptkSoilAutor_vr(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RNH4UptkSoilAutor(1:NumMicrobAutrophCmplx)
@@ -450,9 +450,9 @@ implicit none
   ZNFNI(L,NY,NX)=micstt%ZNFNI
   FracBulkSOM_vr(1:jcplx,L,NY,NX)=micstt%FracBulkSOM(1:jcplx)
   DOM(idom_beg:idom_end,1:jcplx,L,NY,NX)=micstt%DOM(idom_beg:idom_end,1:jcplx)
-  OHM(idom_beg:idom_end,1:jcplx,L,NY,NX)=micstt%OHM(idom_beg:idom_end,1:jcplx)
+  SorbedOM_vr(idom_beg:idom_end,1:jcplx,L,NY,NX)=micstt%SorbedOM(idom_beg:idom_end,1:jcplx)
 
-  ORM(1:NumPlantChemElms,1:ndbiomcp,1:jcplx,L,NY,NX)=micstt%ORM(1:NumPlantChemElms,1:ndbiomcp,1:jcplx)
+  OMBioResdu_vr(1:NumPlantChemElms,1:ndbiomcp,1:jcplx,L,NY,NX)=micstt%OMBioResdu(1:NumPlantChemElms,1:ndbiomcp,1:jcplx)
   OMEheter(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx,L,NY,NX)=micstt%OMEheter(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx)
   OMEauto(1:NumPlantChemElms,1:NumLiveAutoBioms,L,NY,NX)=micstt%OMEauto(1:NumPlantChemElms,1:NumLiveAutoBioms)
 

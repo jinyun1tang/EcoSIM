@@ -1908,7 +1908,7 @@ module MicAutoCPLXMod
     litrm     => micfor%litrm  , &
     CFOMC     => micfor%CFOMC  , &
     CFOMCU    => micfor%CFOMCU , &
-    OSM       => micstt%OSM    , &
+    SolidOM       => micstt%SolidOM    , &
     OMEauto     => micstt%OMEauto  , &
     OSC14U    => micstt%OSC14U , &
     OSN14U    => micstt%OSN14U , &
@@ -1941,8 +1941,8 @@ module MicAutoCPLXMod
 !
           IF(.not.litrm)THEN
             DO NE=1,NumPlantChemElms
-              OSM(NE,iprotein,k_POM)=OSM(NE,iprotein,k_POM)+CFOMC(1)*(RHOMEautor(NE,M,NGL)+RHMMEautor(NE,M,NGL))
-              OSM(NE,icarbhyro,k_POM)=OSM(NE,icarbhyro,k_POM)+CFOMC(2)*(RHOMEautor(NE,M,NGL)+RHMMEautor(NE,M,NGL))
+              SolidOM(NE,iprotein,k_POM)=SolidOM(NE,iprotein,k_POM)+CFOMC(1)*(RHOMEautor(NE,M,NGL)+RHMMEautor(NE,M,NGL))
+              SolidOM(NE,icarbhyro,k_POM)=SolidOM(NE,icarbhyro,k_POM)+CFOMC(2)*(RHOMEautor(NE,M,NGL)+RHMMEautor(NE,M,NGL))
             ENDDO
           ELSE
             OSC14U=OSC14U+CFOMCU(1)*(RHOMEautor(ielmc,M,NGL)+RHMMEautor(ielmc,M,NGL))

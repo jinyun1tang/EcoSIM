@@ -154,92 +154,92 @@ module nitrosMod
       if(.not.micpar%is_finelitter(K))cycle
       D7941: DO M=1,micpar%ndbiomcp
         IF(FOSCXS.GT.0.0_r8)THEN
-          ORCXS=FOSCXS*AZMAX1(ORM(ielmc,M,K,L,NY,NX))
-          ORNXS=FOSCXS*AZMAX1(ORM(ielmn,M,K,L,NY,NX))
-          ORPXS=FOSCXS*AZMAX1(ORM(ielmp,M,K,L,NY,NX))
+          ORCXS=FOSCXS*AZMAX1(OMBioResdu_vr(ielmc,M,K,L,NY,NX))
+          ORNXS=FOSCXS*AZMAX1(OMBioResdu_vr(ielmn,M,K,L,NY,NX))
+          ORPXS=FOSCXS*AZMAX1(OMBioResdu_vr(ielmp,M,K,L,NY,NX))
         ELSE
-          ORCXS=FOSCXS*AZMAX1(ORM(ielmc,M,K,LL,NY,NX))
-          ORNXS=FOSCXS*AZMAX1(ORM(ielmn,M,K,LL,NY,NX))
-          ORPXS=FOSCXS*AZMAX1(ORM(ielmp,M,K,LL,NY,NX))
+          ORCXS=FOSCXS*AZMAX1(OMBioResdu_vr(ielmc,M,K,LL,NY,NX))
+          ORNXS=FOSCXS*AZMAX1(OMBioResdu_vr(ielmn,M,K,LL,NY,NX))
+          ORPXS=FOSCXS*AZMAX1(OMBioResdu_vr(ielmp,M,K,LL,NY,NX))
         ENDIF
-        ORM(ielmc,M,K,L,NY,NX)=ORM(ielmc,M,K,L,NY,NX)-ORCXS
-        ORM(ielmn,M,K,L,NY,NX)=ORM(ielmn,M,K,L,NY,NX)-ORNXS
-        ORM(ielmp,M,K,L,NY,NX)=ORM(ielmp,M,K,L,NY,NX)-ORPXS
-        ORM(ielmc,M,K,LL,NY,NX)=ORM(ielmc,M,K,LL,NY,NX)+ORCXS
-        ORM(ielmn,M,K,LL,NY,NX)=ORM(ielmn,M,K,LL,NY,NX)+ORNXS
-        ORM(ielmp,M,K,LL,NY,NX)=ORM(ielmp,M,K,LL,NY,NX)+ORPXS
+        OMBioResdu_vr(ielmc,M,K,L,NY,NX)=OMBioResdu_vr(ielmc,M,K,L,NY,NX)-ORCXS
+        OMBioResdu_vr(ielmn,M,K,L,NY,NX)=OMBioResdu_vr(ielmn,M,K,L,NY,NX)-ORNXS
+        OMBioResdu_vr(ielmp,M,K,L,NY,NX)=OMBioResdu_vr(ielmp,M,K,L,NY,NX)-ORPXS
+        OMBioResdu_vr(ielmc,M,K,LL,NY,NX)=OMBioResdu_vr(ielmc,M,K,LL,NY,NX)+ORCXS
+        OMBioResdu_vr(ielmn,M,K,LL,NY,NX)=OMBioResdu_vr(ielmn,M,K,LL,NY,NX)+ORNXS
+        OMBioResdu_vr(ielmp,M,K,LL,NY,NX)=OMBioResdu_vr(ielmp,M,K,LL,NY,NX)+ORPXS
       ENDDO D7941
       IF(FOSCXS.GT.0.0_r8)THEN
         OQCXS=FOSCXS*AZMAX1(DOM(idom_doc,K,L,NY,NX))
         OQCHXS=FOSCXS*AZMAX1(DOM_Macp(idom_doc,K,L,NY,NX))
-        OHCXS=FOSCXS*AZMAX1(OHM(ielmc,K,L,NY,NX))
+        OHCXS=FOSCXS*AZMAX1(SorbedOM_vr(ielmc,K,L,NY,NX))
         OQAXS=FOSCXS*AZMAX1(DOM(idom_acetate,K,L,NY,NX))
         OQAHXS=FOSCXS*AZMAX1(DOM_Macp(idom_acetate,K,L,NY,NX))
-        OHAXS=FOSCXS*AZMAX1(OHM(idom_acetate,K,L,NY,NX))
+        OHAXS=FOSCXS*AZMAX1(SorbedOM_vr(idom_acetate,K,L,NY,NX))
         OQNXS=FOSCXS*AZMAX1(DOM(idom_don,K,L,NY,NX))
         OQNHXS=FOSCXS*AZMAX1(DOM_Macp(idom_don,K,L,NY,NX))
-        OHNXS=FOSCXS*AZMAX1(OHM(ielmn,K,L,NY,NX))
+        OHNXS=FOSCXS*AZMAX1(SorbedOM_vr(ielmn,K,L,NY,NX))
         OQPXS=FOSCXS*AZMAX1(DOM(idom_dop,K,L,NY,NX))
         OQPHXS=FOSCXS*AZMAX1(DOM_Macp(idom_dop,K,L,NY,NX))
-        OHPXS=FOSCXS*AZMAX1(OHM(ielmp,K,L,NY,NX))
+        OHPXS=FOSCXS*AZMAX1(SorbedOM_vr(ielmp,K,L,NY,NX))
       ELSE
         OQCXS=FOSCXS*AZMAX1(DOM(idom_doc,K,LL,NY,NX))
         OQCHXS=FOSCXS*AZMAX1(DOM_Macp(idom_doc,K,LL,NY,NX))
-        OHCXS=FOSCXS*AZMAX1(OHM(ielmc,K,LL,NY,NX))
+        OHCXS=FOSCXS*AZMAX1(SorbedOM_vr(ielmc,K,LL,NY,NX))
         OQAXS=FOSCXS*AZMAX1(DOM(idom_acetate,K,LL,NY,NX))
         OQAHXS=FOSCXS*AZMAX1(DOM_Macp(idom_acetate,K,LL,NY,NX))
-        OHAXS=FOSCXS*AZMAX1(OHM(idom_acetate,K,LL,NY,NX))
+        OHAXS=FOSCXS*AZMAX1(SorbedOM_vr(idom_acetate,K,LL,NY,NX))
         OQNXS=FOSCXS*AZMAX1(DOM(idom_don,K,LL,NY,NX))
         OQNHXS=FOSCXS*AZMAX1(DOM_Macp(idom_don,K,LL,NY,NX))
-        OHNXS=FOSCXS*AZMAX1(OHM(ielmn,K,LL,NY,NX))
+        OHNXS=FOSCXS*AZMAX1(SorbedOM_vr(ielmn,K,LL,NY,NX))
         OQPXS=FOSCXS*AZMAX1(DOM(idom_dop,K,LL,NY,NX))
         OQPHXS=FOSCXS*AZMAX1(DOM_Macp(idom_dop,K,LL,NY,NX))
-        OHPXS=FOSCXS*AZMAX1(OHM(ielmp,K,LL,NY,NX))
+        OHPXS=FOSCXS*AZMAX1(SorbedOM_vr(ielmp,K,LL,NY,NX))
       ENDIF
       DOM(idom_doc,K,L,NY,NX)=DOM(idom_doc,K,L,NY,NX)-OQCXS
       DOM_Macp(idom_doc,K,L,NY,NX)=DOM_Macp(idom_doc,K,L,NY,NX)-OQCHXS
-      OHM(ielmc,K,L,NY,NX)=OHM(ielmc,K,L,NY,NX)-OHCXS
+      SorbedOM_vr(ielmc,K,L,NY,NX)=SorbedOM_vr(ielmc,K,L,NY,NX)-OHCXS
       DOM(idom_acetate,K,L,NY,NX)=DOM(idom_acetate,K,L,NY,NX)-OQAXS
       DOM_Macp(idom_acetate,K,L,NY,NX)=DOM_Macp(idom_acetate,K,L,NY,NX)-OQAHXS
-      OHM(idom_acetate,K,L,NY,NX)=OHM(idom_acetate,K,L,NY,NX)-OHAXS
+      SorbedOM_vr(idom_acetate,K,L,NY,NX)=SorbedOM_vr(idom_acetate,K,L,NY,NX)-OHAXS
       DOM(idom_don,K,L,NY,NX)=DOM(idom_don,K,L,NY,NX)-OQNXS
       DOM_Macp(idom_don,K,L,NY,NX)=DOM_Macp(idom_don,K,L,NY,NX)-OQNHXS
-      OHM(ielmn,K,L,NY,NX)=OHM(ielmn,K,L,NY,NX)-OHNXS
+      SorbedOM_vr(ielmn,K,L,NY,NX)=SorbedOM_vr(ielmn,K,L,NY,NX)-OHNXS
       DOM(idom_dop,K,L,NY,NX)=DOM(idom_dop,K,L,NY,NX)-OQPXS
       DOM_Macp(idom_dop,K,L,NY,NX)=DOM_Macp(idom_dop,K,L,NY,NX)-OQPHXS
-      OHM(ielmp,K,L,NY,NX)=OHM(ielmp,K,L,NY,NX)-OHPXS
+      SorbedOM_vr(ielmp,K,L,NY,NX)=SorbedOM_vr(ielmp,K,L,NY,NX)-OHPXS
       DOM(idom_doc,K,LL,NY,NX)=DOM(idom_doc,K,LL,NY,NX)+OQCXS
       DOM_Macp(idom_doc,K,LL,NY,NX)=DOM_Macp(idom_doc,K,LL,NY,NX)+OQCHXS
-      OHM(ielmc,K,LL,NY,NX)=OHM(ielmc,K,LL,NY,NX)+OHCXS
+      SorbedOM_vr(ielmc,K,LL,NY,NX)=SorbedOM_vr(ielmc,K,LL,NY,NX)+OHCXS
       DOM(idom_acetate,K,LL,NY,NX)=DOM(idom_acetate,K,LL,NY,NX)+OQAXS
       DOM_Macp(idom_acetate,K,LL,NY,NX)=DOM_Macp(idom_acetate,K,LL,NY,NX)+OQAHXS
-      OHM(idom_acetate,K,LL,NY,NX)=OHM(idom_acetate,K,LL,NY,NX)+OHAXS
+      SorbedOM_vr(idom_acetate,K,LL,NY,NX)=SorbedOM_vr(idom_acetate,K,LL,NY,NX)+OHAXS
       DOM(idom_don,K,LL,NY,NX)=DOM(idom_don,K,LL,NY,NX)+OQNXS
       DOM_Macp(idom_don,K,LL,NY,NX)=DOM_Macp(idom_don,K,LL,NY,NX)+OQNHXS
-      OHM(ielmn,K,LL,NY,NX)=OHM(ielmn,K,LL,NY,NX)+OHNXS
+      SorbedOM_vr(ielmn,K,LL,NY,NX)=SorbedOM_vr(ielmn,K,LL,NY,NX)+OHNXS
       DOM(idom_dop,K,LL,NY,NX)=DOM(idom_dop,K,LL,NY,NX)+OQPXS
       DOM_Macp(idom_dop,K,LL,NY,NX)=DOM_Macp(idom_dop,K,LL,NY,NX)+OQPHXS
-      OHM(ielmp,K,LL,NY,NX)=OHM(ielmp,K,LL,NY,NX)+OHPXS
+      SorbedOM_vr(ielmp,K,LL,NY,NX)=SorbedOM_vr(ielmp,K,LL,NY,NX)+OHPXS
       D7931: DO M=1,jsken
         IF(FOSCXS.GT.0.0_r8)THEN
-          OSCXS=FOSCXS*AZMAX1(OSM(ielmc,M,K,L,NY,NX))
+          OSCXS=FOSCXS*AZMAX1(SolidOM_vr(ielmc,M,K,L,NY,NX))
           OSAXS=FOSCXS*AZMAX1(OSA(M,K,L,NY,NX))
-          OSNXS=FOSCXS*AZMAX1(OSM(ielmn,M,K,L,NY,NX))
-          OSPXS=FOSCXS*AZMAX1(OSM(ielmp,M,K,L,NY,NX))
+          OSNXS=FOSCXS*AZMAX1(SolidOM_vr(ielmn,M,K,L,NY,NX))
+          OSPXS=FOSCXS*AZMAX1(SolidOM_vr(ielmp,M,K,L,NY,NX))
         ELSE
-          OSCXS=FOSCXS*AZMAX1(OSM(ielmc,M,K,LL,NY,NX))
-          OSNXS=FOSCXS*AZMAX1(OSM(ielmn,M,K,LL,NY,NX))
-          OSPXS=FOSCXS*AZMAX1(OSM(ielmp,M,K,LL,NY,NX))
+          OSCXS=FOSCXS*AZMAX1(SolidOM_vr(ielmc,M,K,LL,NY,NX))
+          OSNXS=FOSCXS*AZMAX1(SolidOM_vr(ielmn,M,K,LL,NY,NX))
+          OSPXS=FOSCXS*AZMAX1(SolidOM_vr(ielmp,M,K,LL,NY,NX))
           OSAXS=FOSCXS*AZMAX1(OSA(M,K,LL,NY,NX))          
         ENDIF
-        OSM(ielmc,M,K,L,NY,NX)=OSM(ielmc,M,K,L,NY,NX)-OSCXS
+        SolidOM_vr(ielmc,M,K,L,NY,NX)=SolidOM_vr(ielmc,M,K,L,NY,NX)-OSCXS
         OSA(M,K,L,NY,NX)=OSA(M,K,L,NY,NX)-OSAXS
-        OSM(ielmn,M,K,L,NY,NX)=OSM(ielmn,M,K,L,NY,NX)-OSNXS
-        OSM(ielmp,M,K,L,NY,NX)=OSM(ielmp,M,K,L,NY,NX)-OSPXS
-        OSM(ielmc,M,K,LL,NY,NX)=OSM(ielmc,M,K,LL,NY,NX)+OSCXS
+        SolidOM_vr(ielmn,M,K,L,NY,NX)=SolidOM_vr(ielmn,M,K,L,NY,NX)-OSNXS
+        SolidOM_vr(ielmp,M,K,L,NY,NX)=SolidOM_vr(ielmp,M,K,L,NY,NX)-OSPXS
+        SolidOM_vr(ielmc,M,K,LL,NY,NX)=SolidOM_vr(ielmc,M,K,LL,NY,NX)+OSCXS
         OSA(M,K,LL,NY,NX)=OSA(M,K,LL,NY,NX)+OSAXS
-        OSM(ielmn,M,K,LL,NY,NX)=OSM(ielmn,M,K,LL,NY,NX)+OSNXS
-        OSM(ielmp,M,K,LL,NY,NX)=OSM(ielmp,M,K,LL,NY,NX)+OSPXS
+        SolidOM_vr(ielmn,M,K,LL,NY,NX)=SolidOM_vr(ielmn,M,K,LL,NY,NX)+OSNXS
+        SolidOM_vr(ielmp,M,K,LL,NY,NX)=SolidOM_vr(ielmp,M,K,LL,NY,NX)+OSPXS
       ENDDO D7931
     ENDDO D7901
   ENDIF

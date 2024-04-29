@@ -206,11 +206,11 @@ type, public :: NitroAQMFluxDiagType
   end type NitroMicFluxType
 
   type, public :: NitroOMcplxFluxType
-    real(r8),allocatable :: RDOSM(:,:,:)
-    real(r8),allocatable :: RHOSM(:,:,:)
-    real(r8),allocatable :: RCOSM(:,:,:)
-    real(r8),allocatable :: RDORM(:,:,:)
-    real(r8),allocatable :: RDOHM(:,:)
+    real(r8),allocatable :: RHydlysSolidOM(:,:,:)
+    real(r8),allocatable :: RHumifySolidOM(:,:,:)
+    real(r8),allocatable :: RDcmpProdDOM(:,:,:)
+    real(r8),allocatable :: RHydlysBioResduOM(:,:,:)
+    real(r8),allocatable :: RHydlysSorptOM(:,:)
     real(r8),allocatable :: OMSORP(:,:)
     real(r8),allocatable :: TCGOMEheter(:,:)
     real(r8),allocatable :: ROQCK(:)
@@ -746,11 +746,11 @@ type, public :: NitroAQMFluxDiagType
   nkinets=micpar%jsken
   ncplx=micpar%jcplx
   ndbiomcp=micpar%ndbiomcp
-  allocate(this%RDOSM(NumPlantChemElms,nkinets,1:ncplx))
-  allocate(this%RHOSM(1:NumPlantChemElms,nkinets,1:ncplx))
-  allocate(this%RCOSM(1:NumPlantChemElms,nkinets,1:ncplx))
-  allocate(this%RDORM(1:NumPlantChemElms,ndbiomcp,1:ncplx))
-  allocate(this%RDOHM(idom_beg:idom_end,1:ncplx))
+  allocate(this%RHydlysSolidOM(NumPlantChemElms,nkinets,1:ncplx))
+  allocate(this%RHumifySolidOM(1:NumPlantChemElms,nkinets,1:ncplx))
+  allocate(this%RDcmpProdDOM(1:NumPlantChemElms,nkinets,1:ncplx))
+  allocate(this%RHydlysBioResduOM(1:NumPlantChemElms,ndbiomcp,1:ncplx))
+  allocate(this%RHydlysSorptOM(idom_beg:idom_end,1:ncplx))
   allocate(this%OMSORP(idom_beg:idom_end,1:ncplx))
   allocate(this%TCGOMEheter(idom_beg:idom_end,1:ncplx+1))
   allocate(this%ROQCK(1:ncplx))
@@ -765,11 +765,11 @@ type, public :: NitroAQMFluxDiagType
   implicit none
   class(NitroOMcplxFluxType) :: this
 
-  call destroy(this%RDOSM)
-  call destroy(this%RHOSM)
-  call destroy(this%RCOSM)
-  call destroy(this%RDORM)
-  call destroy(this%RDOHM)
+  call destroy(this%RHydlysSolidOM)
+  call destroy(this%RHumifySolidOM)
+  call destroy(this%RDcmpProdDOM)
+  call destroy(this%RHydlysBioResduOM)
+  call destroy(this%RHydlysSorptOM)
   call destroy(this%OMSORP)
   call destroy(this%ROQCK)
   call destroy(this%XOQCK)
@@ -782,11 +782,11 @@ type, public :: NitroAQMFluxDiagType
   implicit none
   class(NitroOMcplxFluxType) :: this
 
-  this%RDOSM=0._r8
-  this%RHOSM=0._r8
-  this%RCOSM=0._r8
-  this%RDORM=0._r8
-  this%RDOHM=0._r8
+  this%RHydlysSolidOM=0._r8
+  this%RHumifySolidOM=0._r8
+  this%RDcmpProdDOM=0._r8
+  this%RHydlysBioResduOM=0._r8
+  this%RHydlysSorptOM=0._r8
   this%OMSORP=0._r8
   this%ROQCK=0._r8
   this%XOQCK=0._r8

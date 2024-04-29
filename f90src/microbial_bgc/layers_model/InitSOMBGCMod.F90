@@ -281,12 +281,12 @@ module InitSOMBGCMOD
 !     ORCI=allocation of microbial residue to kinetic components
 !  X is an indicator of surface residual layer
     D8985: DO M=1,ndbiomcp
-      ORM(ielmc,M,K,L,NY,NX)=X*AZMAX1(OSCM(K)*ORCI(M,K)*FOSCI)
-      ORM(ielmn,M,K,L,NY,NX)=AZMAX1(ORM(ielmc,M,K,L,NY,NX)*rNCOMCa(M,1,K)*FOSNI)
-      ORM(ielmp,M,K,L,NY,NX)=AZMAX1(ORM(ielmc,M,K,L,NY,NX)*rPCOMCa(M,1,K)*FOSPI)
-      OSCX(KK)=OSCX(KK)+ORM(ielmc,M,K,L,NY,NX)
-      OSNX(KK)=OSNX(KK)+ORM(ielmn,M,K,L,NY,NX)
-      OSPX(KK)=OSPX(KK)+ORM(ielmp,M,K,L,NY,NX)
+      OMBioResdu_vr(ielmc,M,K,L,NY,NX)=X*AZMAX1(OSCM(K)*ORCI(M,K)*FOSCI)
+      OMBioResdu_vr(ielmn,M,K,L,NY,NX)=AZMAX1(OMBioResdu_vr(ielmc,M,K,L,NY,NX)*rNCOMCa(M,1,K)*FOSNI)
+      OMBioResdu_vr(ielmp,M,K,L,NY,NX)=AZMAX1(OMBioResdu_vr(ielmc,M,K,L,NY,NX)*rPCOMCa(M,1,K)*FOSPI)
+      OSCX(KK)=OSCX(KK)+OMBioResdu_vr(ielmc,M,K,L,NY,NX)
+      OSNX(KK)=OSNX(KK)+OMBioResdu_vr(ielmn,M,K,L,NY,NX)
+      OSPX(KK)=OSPX(KK)+OMBioResdu_vr(ielmp,M,K,L,NY,NX)
     ENDDO D8985
 !
 !     DOC, DON AND DOP
@@ -310,36 +310,36 @@ module InitSOMBGCMOD
 !
 !     OHC,OHN,OHP,OHA=adsorbed C,N,P,acetate
 !
-    OHM(ielmc,K,L,NY,NX)=X*AZMAX1(OSCM(K)*OHCK(K)*FOSCI)
-    OHM(ielmn,K,L,NY,NX)=AZMAX1(OHM(ielmc,K,L,NY,NX)*CNOSCT(KK)*FOSNI)
-    OHM(ielmp,K,L,NY,NX)=AZMAX1(OHM(ielmc,K,L,NY,NX)*CPOSCT(KK)*FOSPI)
-    OHM(idom_acetate,K,L,NY,NX)=0.0_r8
-    OSCX(KK)=OSCX(KK)+OHM(ielmc,K,L,NY,NX)+OHM(idom_acetate,K,L,NY,NX)
-    OSNX(KK)=OSNX(KK)+OHM(ielmn,K,L,NY,NX)
-    OSPX(KK)=OSPX(KK)+OHM(ielmp,K,L,NY,NX)
+    SorbedOM_vr(ielmc,K,L,NY,NX)=X*AZMAX1(OSCM(K)*OHCK(K)*FOSCI)
+    SorbedOM_vr(ielmn,K,L,NY,NX)=AZMAX1(SorbedOM_vr(ielmc,K,L,NY,NX)*CNOSCT(KK)*FOSNI)
+    SorbedOM_vr(ielmp,K,L,NY,NX)=AZMAX1(SorbedOM_vr(ielmc,K,L,NY,NX)*CPOSCT(KK)*FOSPI)
+    SorbedOM_vr(idom_acetate,K,L,NY,NX)=0.0_r8
+    OSCX(KK)=OSCX(KK)+SorbedOM_vr(ielmc,K,L,NY,NX)+SorbedOM_vr(idom_acetate,K,L,NY,NX)
+    OSNX(KK)=OSNX(KK)+SorbedOM_vr(ielmn,K,L,NY,NX)
+    OSPX(KK)=OSPX(KK)+SorbedOM_vr(ielmp,K,L,NY,NX)
 !
 !     HUMUS C, N AND P
 !
 !     OSC,OAA,OSN,OSP=SOC,colonized SOC,SON,SOP
 
     D8980: DO M=1,jsken
-      OSM(ielmc,M,K,L,NY,NX)=AZMAX1(CFOSC(M,K,L,NY,NX)*(OSCI(K)-OSCX(K)))
+      SolidOM_vr(ielmc,M,K,L,NY,NX)=AZMAX1(CFOSC(M,K,L,NY,NX)*(OSCI(K)-OSCX(K)))
       IF(CNOSCT(K).GT.ZERO)THEN
-        OSM(ielmn,M,K,L,NY,NX)=AZMAX1(CFOSC(M,K,L,NY,NX)*CNOSC(M,K,L,NY,NX) &
+        SolidOM_vr(ielmn,M,K,L,NY,NX)=AZMAX1(CFOSC(M,K,L,NY,NX)*CNOSC(M,K,L,NY,NX) &
           /CNOSCT(K)*(OSNI(K)-OSNX(K)))
       ELSE
-        OSM(ielmn,M,K,L,NY,NX)=0.0_r8
+        SolidOM_vr(ielmn,M,K,L,NY,NX)=0.0_r8
       ENDIF
       IF(CPOSCT(K).GT.ZERO)THEN
-        OSM(ielmp,M,K,L,NY,NX)=AZMAX1(CFOSC(M,K,L,NY,NX)*CPOSC(M,K,L,NY,NX) &
+        SolidOM_vr(ielmp,M,K,L,NY,NX)=AZMAX1(CFOSC(M,K,L,NY,NX)*CPOSC(M,K,L,NY,NX) &
           /CPOSCT(K)*(OSPI(K)-OSPX(K)))
       ELSE
-        OSM(ielmp,M,K,L,NY,NX)=0.0_r8
+        SolidOM_vr(ielmp,M,K,L,NY,NX)=0.0_r8
       ENDIF
       IF(K.EQ.micpar%k_woody_litr)THEN
-        OSA(M,K,L,NY,NX)=OSM(ielmc,M,K,L,NY,NX)*OMCI(1,K)
+        OSA(M,K,L,NY,NX)=SolidOM_vr(ielmc,M,K,L,NY,NX)*OMCI(1,K)
       ELSE
-        OSA(M,K,L,NY,NX)=OSM(ielmc,M,K,L,NY,NX)
+        OSA(M,K,L,NY,NX)=SolidOM_vr(ielmc,M,K,L,NY,NX)
       ENDIF
     ENDDO D8980
   ENDDO D8995
@@ -423,39 +423,39 @@ module InitSOMBGCMOD
 
   D6995: DO K=1,jcplx
     D6985: DO M=1,ndbiomcp
-      OC=OC+ORM(ielmc,M,K,L,NY,NX)
-      ON=ON+ORM(ielmn,M,K,L,NY,NX)
-      OP=OP+ORM(ielmp,M,K,L,NY,NX)
+      OC=OC+OMBioResdu_vr(ielmc,M,K,L,NY,NX)
+      ON=ON+OMBioResdu_vr(ielmn,M,K,L,NY,NX)
+      OP=OP+OMBioResdu_vr(ielmp,M,K,L,NY,NX)
       IF(K.LE.micpar%NumOfLitrCmplxs)THEN
-        RC=RC+ORM(ielmc,M,K,L,NY,NX)
+        RC=RC+OMBioResdu_vr(ielmc,M,K,L,NY,NX)
       ENDIF
       IF(L.EQ.0)THEN
-        RC0(K,NY,NX)=RC0(K,NY,NX)+ORM(ielmc,M,K,L,NY,NX)
+        RC0(K,NY,NX)=RC0(K,NY,NX)+OMBioResdu_vr(ielmc,M,K,L,NY,NX)
       ENDIF
     ENDDO D6985
-    OC=OC+DOM(idom_doc,K,L,NY,NX)+DOM_Macp(idom_doc,K,L,NY,NX)+OHM(ielmc,K,L,NY,NX) &
-      +DOM(idom_acetate,K,L,NY,NX)+DOM_Macp(idom_acetate,K,L,NY,NX)+OHM(idom_acetate,K,L,NY,NX)
-    ON=ON+DOM(idom_don,K,L,NY,NX)+DOM_Macp(idom_don,K,L,NY,NX)+OHM(ielmn,K,L,NY,NX)
-    OP=OP+DOM(idom_dop,K,L,NY,NX)+DOM_Macp(idom_dop,K,L,NY,NX)+OHM(ielmp,K,L,NY,NX)
+    OC=OC+DOM(idom_doc,K,L,NY,NX)+DOM_Macp(idom_doc,K,L,NY,NX)+SorbedOM_vr(ielmc,K,L,NY,NX) &
+      +DOM(idom_acetate,K,L,NY,NX)+DOM_Macp(idom_acetate,K,L,NY,NX)+SorbedOM_vr(idom_acetate,K,L,NY,NX)
+    ON=ON+DOM(idom_don,K,L,NY,NX)+DOM_Macp(idom_don,K,L,NY,NX)+SorbedOM_vr(ielmn,K,L,NY,NX)
+    OP=OP+DOM(idom_dop,K,L,NY,NX)+DOM_Macp(idom_dop,K,L,NY,NX)+SorbedOM_vr(ielmp,K,L,NY,NX)
     OC=OC+DOM(idom_acetate,K,L,NY,NX)+DOM_Macp(idom_acetate,K,L,NY,NX)
     IF(K.LE.micpar%NumOfLitrCmplxs)THEN
-      RC=RC+DOM(idom_doc,K,L,NY,NX)+DOM_Macp(idom_doc,K,L,NY,NX)+OHM(ielmc,K,L,NY,NX) &
-        +DOM(idom_acetate,K,L,NY,NX)+DOM_Macp(idom_acetate,K,L,NY,NX)+OHM(idom_acetate,K,L,NY,NX)
+      RC=RC+DOM(idom_doc,K,L,NY,NX)+DOM_Macp(idom_doc,K,L,NY,NX)+SorbedOM_vr(ielmc,K,L,NY,NX) &
+        +DOM(idom_acetate,K,L,NY,NX)+DOM_Macp(idom_acetate,K,L,NY,NX)+SorbedOM_vr(idom_acetate,K,L,NY,NX)
       RC=RC+DOM(idom_acetate,K,L,NY,NX)+DOM_Macp(idom_acetate,K,L,NY,NX)
     ENDIF
     IF(L.EQ.0)THEN
       RC0(K,NY,NX)=RC0(K,NY,NX)+DOM(idom_doc,K,L,NY,NX)+DOM_Macp(idom_doc,K,L,NY,NX) &
-        +OHM(ielmc,K,L,NY,NX)+DOM(idom_acetate,K,L,NY,NX)+DOM_Macp(idom_acetate,K,L,NY,NX)+OHM(idom_acetate,K,L,NY,NX)
+        +SorbedOM_vr(ielmc,K,L,NY,NX)+DOM(idom_acetate,K,L,NY,NX)+DOM_Macp(idom_acetate,K,L,NY,NX)+SorbedOM_vr(idom_acetate,K,L,NY,NX)
     ENDIF
     D6980: DO M=1,jsken
-      OC=OC+OSM(ielmc,M,K,L,NY,NX)
-      ON=ON+OSM(ielmn,M,K,L,NY,NX)
-      OP=OP+OSM(ielmp,M,K,L,NY,NX)
+      OC=OC+SolidOM_vr(ielmc,M,K,L,NY,NX)
+      ON=ON+SolidOM_vr(ielmn,M,K,L,NY,NX)
+      OP=OP+SolidOM_vr(ielmp,M,K,L,NY,NX)
       IF(K.LE.micpar%NumOfLitrCmplxs)THEN
-        RC=RC+OSM(ielmc,M,K,L,NY,NX)
+        RC=RC+SolidOM_vr(ielmc,M,K,L,NY,NX)
       ENDIF
       IF(L.EQ.0)THEN
-        RC0(K,NY,NX)=RC0(K,NY,NX)+OSM(ielmc,M,K,L,NY,NX)
+        RC0(K,NY,NX)=RC0(K,NY,NX)+SolidOM_vr(ielmc,M,K,L,NY,NX)
       ENDIF
     ENDDO D6980
   ENDDO D6995

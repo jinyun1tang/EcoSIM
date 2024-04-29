@@ -666,20 +666,20 @@ module RedistMod
     D9275: DO K=1,jcplx
       D9270: DO M=1,ndbiomcp
         DO NE=1,NumPlantChemElms
-          ORM(NE,M,K,NU(NY,NX),NY,NX)=ORM(NE,M,K,NU(NY,NX),NY,NX)+TORMER(NE,M,K,NY,NX)
+          OMBioResdu_vr(NE,M,K,NU(NY,NX),NY,NX)=OMBioResdu_vr(NE,M,K,NU(NY,NX),NY,NX)+TORMER(NE,M,K,NY,NX)
         ENDDO
         DORGE(NY,NX)=DORGE(NY,NX)+TORMER(ielmc,M,K,NY,NX)
         DORGP=DORGP+TORMER(ielmp,M,K,NY,NX)
       ENDDO D9270
       DO idom=idom_beg,idom_end
-        OHM(idom,K,NU(NY,NX),NY,NX)=OHM(idom,K,NU(NY,NX),NY,NX)+TOHMER(idom,K,NY,NX)
+        SorbedOM_vr(idom,K,NU(NY,NX),NY,NX)=SorbedOM_vr(idom,K,NU(NY,NX),NY,NX)+TOHMER(idom,K,NY,NX)
       ENDDO
       DORGE(NY,NX)=DORGE(NY,NX)+TOHMER(idom_doc,K,NY,NX)+TOHMER(idom_acetate,K,NY,NX)
       DORGP=DORGP+TOHMER(idom_dop,K,NY,NX)
       D9265: DO M=1,jsken
         OSA(M,K,NU(NY,NX),NY,NX)=OSA(M,K,NU(NY,NX),NY,NX)+TOSAER(M,K,NY,NX)
         DO NE=1,NumPlantChemElms
-          OSM(NE,M,K,NU(NY,NX),NY,NX)=OSM(NE,M,K,NU(NY,NX),NY,NX)+TOSMER(NE,M,K,NY,NX)
+          SolidOM_vr(NE,M,K,NU(NY,NX),NY,NX)=SolidOM_vr(NE,M,K,NU(NY,NX),NY,NX)+TOSMER(NE,M,K,NY,NX)
         ENDDO
         DORGE(NY,NX)=DORGE(NY,NX)+TOSMER(ielmc,M,K,NY,NX)
         DORGP=DORGP+TOSMER(ielmp,M,K,NY,NX)
@@ -756,14 +756,14 @@ module RedistMod
   !     TOTAL MICROBIAL RESIDUE C,N,P
   !
   DO NE=1,NumPlantChemElms  
-    DES(NE)=DES(NE)+SUM(ORM(NE,1:ndbiomcp,1:NumOfLitrCmplxs,0,NY,NX))
+    DES(NE)=DES(NE)+SUM(OMBioResdu_vr(NE,1:ndbiomcp,1:NumOfLitrCmplxs,0,NY,NX))
   ENDDO
   DO K=1,NumOfLitrCmplxs
-    RC0(K,NY,NX)=RC0(K,NY,NX)+SUM(ORM(ielmc,1:ndbiomcp,K,0,NY,NX))
+    RC0(K,NY,NX)=RC0(K,NY,NX)+SUM(OMBioResdu_vr(ielmc,1:ndbiomcp,K,0,NY,NX))
     RC0(K,NY,NX)=RC0(K,NY,NX)+DOM(idom_doc,K,0,NY,NX)+DOM_Macp(idom_doc,K,0,NY,NX) &
-      +OHM(ielmc,K,0,NY,NX)+DOM(idom_acetate,K,0,NY,NX) &
-      +DOM_Macp(idom_acetate,K,0,NY,NX)+OHM(idom_acetate,K,0,NY,NX)
-    RC0(K,NY,NX)=RC0(K,NY,NX)+SUM(OSM(ielmc,1:jsken,K,0,NY,NX))
+      +SorbedOM_vr(ielmc,K,0,NY,NX)+DOM(idom_acetate,K,0,NY,NX) &
+      +DOM_Macp(idom_acetate,K,0,NY,NX)+SorbedOM_vr(idom_acetate,K,0,NY,NX)
+    RC0(K,NY,NX)=RC0(K,NY,NX)+SUM(SolidOM_vr(ielmc,1:jsken,K,0,NY,NX))
   ENDDO
 
 !
@@ -771,21 +771,21 @@ module RedistMod
 !
   DES(idom_doc)=DES(idom_doc)+SUM(DOM(idom_doc,1:NumOfLitrCmplxs,0,NY,NX)) &
     +SUM(DOM_Macp(idom_doc,1:NumOfLitrCmplxs,0,NY,NX)) &
-    +SUM(OHM(ielmc,1:NumOfLitrCmplxs,0,NY,NX))+SUM(DOM(idom_acetate,1:NumOfLitrCmplxs,0,NY,NX)) &
+    +SUM(SorbedOM_vr(ielmc,1:NumOfLitrCmplxs,0,NY,NX))+SUM(DOM(idom_acetate,1:NumOfLitrCmplxs,0,NY,NX)) &
     +SUM(DOM_Macp(idom_acetate,1:NumOfLitrCmplxs,0,NY,NX)) &
-    +SUM(OHM(idom_acetate,1:NumOfLitrCmplxs,0,NY,NX))
+    +SUM(SorbedOM_vr(idom_acetate,1:NumOfLitrCmplxs,0,NY,NX))
 
   DES(idom_don)=DES(idom_don)+SUM(DOM(idom_don,1:NumOfLitrCmplxs,0,NY,NX)) &
     +SUM(DOM_Macp(idom_don,1:NumOfLitrCmplxs,0,NY,NX)) &
-    +SUM(OHM(ielmn,1:NumOfLitrCmplxs,0,NY,NX))
+    +SUM(SorbedOM_vr(ielmn,1:NumOfLitrCmplxs,0,NY,NX))
   DES(idom_dop)=DES(idom_dop)+SUM(DOM(idom_dop,1:NumOfLitrCmplxs,0,NY,NX)) &
     +SUM(DOM_Macp(idom_dop,1:NumOfLitrCmplxs,0,NY,NX)) &
-    +SUM(OHM(ielmp,1:NumOfLitrCmplxs,0,NY,NX))
+    +SUM(SorbedOM_vr(ielmp,1:NumOfLitrCmplxs,0,NY,NX))
 !
     !     TOTAL PLANT RESIDUE C,N,P
 !
   DO NE=1,NumPlantChemElms
-    DES(NE)=DES(NE)+SUM(OSM(NE,1:jsken,1:NumOfLitrCmplxs,0,NY,NX))
+    DES(NE)=DES(NE)+SUM(SolidOM_vr(NE,1:jsken,1:NumOfLitrCmplxs,0,NY,NX))
   ENDDO
 
   ORGC(0,NY,NX)=DES(ielmc)
@@ -1015,7 +1015,7 @@ module RedistMod
       DO  M=1,jsken
         OSA(M,K,L,NY,NX)=OSA(M,K,L,NY,NX)+LitrfalStrutElms_vr(ielmc,M,K,L,NY,NX)*micpar%OMCI(1,K)
         DO NE=1,NumPlantChemElms
-          OSM(NE,M,K,L,NY,NX)=OSM(NE,M,K,L,NY,NX)+LitrfalStrutElms_vr(NE,M,K,L,NY,NX)
+          SolidOM_vr(NE,M,K,L,NY,NX)=SolidOM_vr(NE,M,K,L,NY,NX)+LitrfalStrutElms_vr(NE,M,K,L,NY,NX)
         ENDDO
       enddo
     ENDDO D8565
@@ -1476,28 +1476,28 @@ module RedistMod
     IF(micpar%is_litter(K))THEN
 ! litter + manure
       DO NE=1,NumPlantChemElms
-        DES(NE)=DES(NE)+SUM(ORM(NE,1:ndbiomcp,K,L,NY,NX))
+        DES(NE)=DES(NE)+SUM(OMBioResdu_vr(NE,1:ndbiomcp,K,L,NY,NX))
       ENDDO
 
-      DES(ielmc)=DES(ielmc)+DOM(idom_doc,K,L,NY,NX)+DOM_Macp(idom_doc,K,L,NY,NX)+OHM(ielmc,K,L,NY,NX) &
-        +DOM(idom_acetate,K,L,NY,NX)+DOM_Macp(idom_acetate,K,L,NY,NX)+OHM(idom_acetate,K,L,NY,NX)
-      DES(ielmn)=DES(ielmn)+DOM(idom_don,K,L,NY,NX)+DOM_Macp(idom_don,K,L,NY,NX)+OHM(ielmn,K,L,NY,NX)
-      DES(ielmp)=DES(ielmp)+DOM(idom_dop,K,L,NY,NX)+DOM_Macp(idom_dop,K,L,NY,NX)+OHM(ielmp,K,L,NY,NX)
+      DES(ielmc)=DES(ielmc)+DOM(idom_doc,K,L,NY,NX)+DOM_Macp(idom_doc,K,L,NY,NX)+SorbedOM_vr(ielmc,K,L,NY,NX) &
+        +DOM(idom_acetate,K,L,NY,NX)+DOM_Macp(idom_acetate,K,L,NY,NX)+SorbedOM_vr(idom_acetate,K,L,NY,NX)
+      DES(ielmn)=DES(ielmn)+DOM(idom_don,K,L,NY,NX)+DOM_Macp(idom_don,K,L,NY,NX)+SorbedOM_vr(ielmn,K,L,NY,NX)
+      DES(ielmp)=DES(ielmp)+DOM(idom_dop,K,L,NY,NX)+DOM_Macp(idom_dop,K,L,NY,NX)+SorbedOM_vr(ielmp,K,L,NY,NX)
 
       DO NE=1,NumPlantChemElms
-        DES(NE)=DES(NE)+SUM(OSM(NE,1:jsken,K,L,NY,NX))
+        DES(NE)=DES(NE)+SUM(SolidOM_vr(NE,1:jsken,K,L,NY,NX))
       ENDDO
     ELSE
       DO NE=1,NumPlantChemElms    
-        OM(NE)=OM(NE)+SUM(ORM(NE,1:ndbiomcp,K,L,NY,NX))
+        OM(NE)=OM(NE)+SUM(OMBioResdu_vr(NE,1:ndbiomcp,K,L,NY,NX))
       ENDDO
-      OM(ielmc)=OM(ielmc)+DOM(idom_doc,K,L,NY,NX)+DOM_Macp(idom_doc,K,L,NY,NX)+OHM(ielmc,K,L,NY,NX) &
-        +DOM(idom_acetate,K,L,NY,NX)+DOM_Macp(idom_acetate,K,L,NY,NX)+OHM(idom_acetate,K,L,NY,NX)
-      OM(ielmn)=OM(ielmn)+DOM(idom_don,K,L,NY,NX)+DOM_Macp(idom_don,K,L,NY,NX)+OHM(ielmn,K,L,NY,NX)
-      OM(ielmp)=OM(ielmp)+DOM(idom_dop,K,L,NY,NX)+DOM_Macp(idom_dop,K,L,NY,NX)+OHM(ielmp,K,L,NY,NX)
+      OM(ielmc)=OM(ielmc)+DOM(idom_doc,K,L,NY,NX)+DOM_Macp(idom_doc,K,L,NY,NX)+SorbedOM_vr(ielmc,K,L,NY,NX) &
+        +DOM(idom_acetate,K,L,NY,NX)+DOM_Macp(idom_acetate,K,L,NY,NX)+SorbedOM_vr(idom_acetate,K,L,NY,NX)
+      OM(ielmn)=OM(ielmn)+DOM(idom_don,K,L,NY,NX)+DOM_Macp(idom_don,K,L,NY,NX)+SorbedOM_vr(ielmn,K,L,NY,NX)
+      OM(ielmp)=OM(ielmp)+DOM(idom_dop,K,L,NY,NX)+DOM_Macp(idom_dop,K,L,NY,NX)+SorbedOM_vr(ielmp,K,L,NY,NX)
 
       DO NE=1,NumPlantChemElms    
-        OM(NE)=OM(NE)+SUM(OSM(NE,1:jsken,K,L,NY,NX))
+        OM(NE)=OM(NE)+SUM(SolidOM_vr(NE,1:jsken,K,L,NY,NX))
       ENDDO
     ENDIF
   ENDDO
@@ -1548,7 +1548,7 @@ module RedistMod
     DO  M=1,jsken
       OSA(M,K,0,NY,NX)=OSA(M,K,0,NY,NX)+LitrfalStrutElms_vr(ielmc,M,K,0,NY,NX)*micpar%OMCI(1,K)
       DO NE=1,NumPlantChemElms
-        OSM(NE,M,K,0,NY,NX)=OSM(NE,M,K,0,NY,NX)+LitrfalStrutElms_vr(NE,M,K,0,NY,NX)
+        SolidOM_vr(NE,M,K,0,NY,NX)=SolidOM_vr(NE,M,K,0,NY,NX)+LitrfalStrutElms_vr(NE,M,K,0,NY,NX)
       ENDDO
 
       ORGC(0,NY,NX)=ORGC(0,NY,NX)+LitrfalStrutElms_vr(ielmc,M,K,0,NY,NX)

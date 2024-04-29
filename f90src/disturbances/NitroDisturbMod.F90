@@ -168,11 +168,11 @@ module NitroDisturbMod
 !     REMOVE MICROBIAL RESIDUE
 !
         D2900: DO K=1,jcplx
-          IF(L.NE.0.OR.(micpar%is_litter(K)))THEN
+          IF(L.NE.0 .OR. (micpar%is_litter(K)))THEN
             D2940: DO M=1,ndbiomcp
-              OCH=DCORPC*ORM(ielmc,M,K,L,NY,NX)
-              ONH=DCORPC*ORM(ielmn,M,K,L,NY,NX)
-              OPH=DCORPC*ORM(ielmp,M,K,L,NY,NX)
+              OCH=DCORPC*OMBioResdu_vr(ielmc,M,K,L,NY,NX)
+              ONH=DCORPC*OMBioResdu_vr(ielmn,M,K,L,NY,NX)
+              OPH=DCORPC*OMBioResdu_vr(ielmp,M,K,L,NY,NX)
               ONX=EFIRE(1,ITILL(I,NY,NX))*ONH
               OPX=EFIRE(2,ITILL(I,NY,NX))*OPH
               IF(micpar%is_litter(K))THEN
@@ -182,12 +182,12 @@ module NitroDisturbMod
                 ONL(1,K)=ONL(1,K)+ONH-ONX
                 OPL(1,K)=OPL(1,K)+OPH-OPX
               ENDIF
-              ORM(ielmc,M,K,L,NY,NX)=ORM(ielmc,M,K,L,NY,NX)-OCH
-              ORM(ielmn,M,K,L,NY,NX)=ORM(ielmn,M,K,L,NY,NX)-ONH
-              ORM(ielmp,M,K,L,NY,NX)=ORM(ielmp,M,K,L,NY,NX)-OPH
-              DC=DC+ORM(ielmc,M,K,L,NY,NX)
-              DN=DN+ORM(ielmn,M,K,L,NY,NX)
-              DP=DP+ORM(ielmp,M,K,L,NY,NX)
+              OMBioResdu_vr(ielmc,M,K,L,NY,NX)=OMBioResdu_vr(ielmc,M,K,L,NY,NX)-OCH
+              OMBioResdu_vr(ielmn,M,K,L,NY,NX)=OMBioResdu_vr(ielmn,M,K,L,NY,NX)-ONH
+              OMBioResdu_vr(ielmp,M,K,L,NY,NX)=OMBioResdu_vr(ielmp,M,K,L,NY,NX)-OPH
+              DC=DC+OMBioResdu_vr(ielmc,M,K,L,NY,NX)
+              DN=DN+OMBioResdu_vr(ielmn,M,K,L,NY,NX)
+              DP=DP+OMBioResdu_vr(ielmp,M,K,L,NY,NX)
               OC=OC+OCH
               ON=ON+ONX
               OP=OP+OPX
@@ -238,10 +238,10 @@ module NitroDisturbMod
 !
 !     REMOVE ADSORBED OM
 !
-            OCH=DCORPC*OHM(ielmc,K,L,NY,NX)
-            ONH=DCORPC*OHM(ielmn,K,L,NY,NX)
-            OPH=DCORPC*OHM(ielmp,K,L,NY,NX)
-            OAH=DCORPC*OHM(idom_acetate,K,L,NY,NX)
+            OCH=DCORPC*SorbedOM_vr(ielmc,K,L,NY,NX)
+            ONH=DCORPC*SorbedOM_vr(ielmn,K,L,NY,NX)
+            OPH=DCORPC*SorbedOM_vr(ielmp,K,L,NY,NX)
+            OAH=DCORPC*SorbedOM_vr(idom_acetate,K,L,NY,NX)
             ONX=EFIRE(1,ITILL(I,NY,NX))*ONH
             OPX=EFIRE(2,ITILL(I,NY,NX))*OPH
             IF(micpar%is_litter(K))THEN
@@ -251,14 +251,14 @@ module NitroDisturbMod
               ONL(1,K)=ONL(1,K)+ONH-ONX
               OPL(1,K)=OPL(1,K)+OPH-OPX
             ENDIF
-            OHM(ielmc,K,L,NY,NX)=OHM(ielmc,K,L,NY,NX)-OCH
-            OHM(ielmn,K,L,NY,NX)=OHM(ielmn,K,L,NY,NX)-ONH
-            OHM(ielmp,K,L,NY,NX)=OHM(ielmp,K,L,NY,NX)-OPH
-            OHM(idom_acetate,K,L,NY,NX)=OHM(idom_acetate,K,L,NY,NX)-OAH
-            DC=DC+DOM(idom_doc,K,L,NY,NX)+DOM_Macp(idom_doc,K,L,NY,NX)+OHM(ielmc,K,L,NY,NX) &
-              +DOM(idom_acetate,K,L,NY,NX)+DOM_Macp(idom_acetate,K,L,NY,NX)+OHM(idom_acetate,K,L,NY,NX)
-            DN=DN+DOM(idom_don,K,L,NY,NX)+DOM_Macp(idom_don,K,L,NY,NX)+OHM(ielmn,K,L,NY,NX)
-            DP=DP+DOM(idom_dop,K,L,NY,NX)+DOM_Macp(idom_dop,K,L,NY,NX)+OHM(ielmp,K,L,NY,NX)
+            SorbedOM_vr(ielmc,K,L,NY,NX)=SorbedOM_vr(ielmc,K,L,NY,NX)-OCH
+            SorbedOM_vr(ielmn,K,L,NY,NX)=SorbedOM_vr(ielmn,K,L,NY,NX)-ONH
+            SorbedOM_vr(ielmp,K,L,NY,NX)=SorbedOM_vr(ielmp,K,L,NY,NX)-OPH
+            SorbedOM_vr(idom_acetate,K,L,NY,NX)=SorbedOM_vr(idom_acetate,K,L,NY,NX)-OAH
+            DC=DC+DOM(idom_doc,K,L,NY,NX)+DOM_Macp(idom_doc,K,L,NY,NX)+SorbedOM_vr(ielmc,K,L,NY,NX) &
+              +DOM(idom_acetate,K,L,NY,NX)+DOM_Macp(idom_acetate,K,L,NY,NX)+SorbedOM_vr(idom_acetate,K,L,NY,NX)
+            DN=DN+DOM(idom_don,K,L,NY,NX)+DOM_Macp(idom_don,K,L,NY,NX)+SorbedOM_vr(ielmn,K,L,NY,NX)
+            DP=DP+DOM(idom_dop,K,L,NY,NX)+DOM_Macp(idom_dop,K,L,NY,NX)+SorbedOM_vr(ielmp,K,L,NY,NX)
             OC=OC+OCH
             ON=ON+ONX
             OP=OP+OPX
@@ -266,21 +266,21 @@ module NitroDisturbMod
 !     REMOVE RESIDUE
 !
             D2930: DO M=1,jsken
-              OCH=DCORPC*OSM(ielmc,M,K,L,NY,NX)
-              ONH=DCORPC*OSM(ielmn,M,K,L,NY,NX)
-              OPH=DCORPC*OSM(ielmp,M,K,L,NY,NX)
+              OCH=DCORPC*SolidOM_vr(ielmc,M,K,L,NY,NX)
+              ONH=DCORPC*SolidOM_vr(ielmn,M,K,L,NY,NX)
+              OPH=DCORPC*SolidOM_vr(ielmp,M,K,L,NY,NX)
               OCA=DCORPC*OSA(M,K,L,NY,NX)
               ONX=EFIRE(1,ITILL(I,NY,NX))*ONH
               OPX=EFIRE(2,ITILL(I,NY,NX))*OPH
               ONL(M,K)=ONL(M,K)+ONH-ONX
               OPL(M,K)=OPL(M,K)+OPH-OPX
-              OSM(ielmc,M,K,L,NY,NX)=OSM(ielmc,M,K,L,NY,NX)-OCH
-              OSM(ielmn,M,K,L,NY,NX)=OSM(ielmn,M,K,L,NY,NX)-ONH
-              OSM(ielmp,M,K,L,NY,NX)=OSM(ielmp,M,K,L,NY,NX)-OPH
+              SolidOM_vr(ielmc,M,K,L,NY,NX)=SolidOM_vr(ielmc,M,K,L,NY,NX)-OCH
+              SolidOM_vr(ielmn,M,K,L,NY,NX)=SolidOM_vr(ielmn,M,K,L,NY,NX)-ONH
+              SolidOM_vr(ielmp,M,K,L,NY,NX)=SolidOM_vr(ielmp,M,K,L,NY,NX)-OPH
               OSA(M,K,L,NY,NX)=OSA(M,K,L,NY,NX)-OCA              
-              DC=DC+OSM(ielmc,M,K,L,NY,NX)
-              DN=DN+OSM(ielmn,M,K,L,NY,NX)
-              DP=DP+OSM(ielmp,M,K,L,NY,NX)
+              DC=DC+SolidOM_vr(ielmc,M,K,L,NY,NX)
+              DN=DN+SolidOM_vr(ielmn,M,K,L,NY,NX)
+              DP=DP+SolidOM_vr(ielmp,M,K,L,NY,NX)
               OC=OC+OCH
               ON=ON+ONX
               OP=OP+OPX
@@ -292,8 +292,8 @@ module NitroDisturbMod
 !
         D2905: DO K=1,jcplx
           DO  M=1,jsken
-            OSM(ielmn,M,K,L,NY,NX)=OSM(ielmn,M,K,L,NY,NX)+ONL(M,K)
-            OSM(ielmp,M,K,L,NY,NX)=OSM(ielmp,M,K,L,NY,NX)+OPL(M,K)
+            SolidOM_vr(ielmn,M,K,L,NY,NX)=SolidOM_vr(ielmn,M,K,L,NY,NX)+ONL(M,K)
+            SolidOM_vr(ielmp,M,K,L,NY,NX)=SolidOM_vr(ielmp,M,K,L,NY,NX)+OPL(M,K)
             DN=DN+ONL(M,K)
             DP=DP+OPL(M,K)
           enddo

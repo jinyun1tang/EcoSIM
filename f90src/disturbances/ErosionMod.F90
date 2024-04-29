@@ -536,15 +536,15 @@ module ErosionMod
               DO  K=1,jcplx
                 DO  M=1,ndbiomcp
                   DO NE=1,NumPlantChemElms
-                    ORMER(NE,M,K,N,2,N5,N4)=FSEDER*ORM(NE,M,K,NU(N2,N1),N2,N1)
+                    ORMER(NE,M,K,N,2,N5,N4)=FSEDER*OMBioResdu_vr(NE,M,K,NU(N2,N1),N2,N1)
                   ENDDO
                 ENDDO
                 DO idom=idom_beg,idom_end
-                  OHMER(idom,K,N,2,N5,N4)=FSEDER*OHM(idom,K,NU(N2,N1),N2,N1)
+                  OHMER(idom,K,N,2,N5,N4)=FSEDER*SorbedOM_vr(idom,K,NU(N2,N1),N2,N1)
                 ENDDO
                 DO  M=1,jsken
                   DO NE=1,NumPlantChemElms
-                    OSMER(NE,M,K,N,2,N5,N4)=FSEDER*OSM(NE,M,K,NU(N2,N1),N2,N1)
+                    OSMER(NE,M,K,N,2,N5,N4)=FSEDER*SolidOM_vr(NE,M,K,NU(N2,N1),N2,N1)
                   ENDDO
                   OSAER(M,K,N,2,N5,N4)=FSEDER*OSA(M,K,NU(N2,N1),N2,N1)
                 ENDDO
@@ -695,16 +695,16 @@ module ErosionMod
                 DO  K=1,jcplx
                   DO  M=1,ndbiomcp
                     DO NE=1,NumPlantChemElms   
-                      ORMER(NE,M,K,N,1,N5B,N4B)=FSEDER*ORM(NE,M,K,NU(N2,N1),N2,N1)
+                      ORMER(NE,M,K,N,1,N5B,N4B)=FSEDER*OMBioResdu_vr(NE,M,K,NU(N2,N1),N2,N1)
                     ENDDO
                   ENDDO
                   DO idom=idom_beg,idom_end
-                    OHMER(idom,K,N,1,N5B,N4B)=FSEDER*OHM(idom,K,NU(N2,N1),N2,N1)
+                    OHMER(idom,K,N,1,N5B,N4B)=FSEDER*SorbedOM_vr(idom,K,NU(N2,N1),N2,N1)
                   ENDDO
                   DO  M=1,jsken
                     OSAER(M,K,N,1,N5B,N4B)=FSEDER*OSA(M,K,NU(N2,N1),N2,N1)
                     DO NE=1,NumPlantChemElms                      
-                      OSMER(NE,M,K,N,1,N5B,N4B)=FSEDER*OSM(NE,M,K,NU(N2,N1),N2,N1)
+                      OSMER(NE,M,K,N,1,N5B,N4B)=FSEDER*SolidOM_vr(NE,M,K,NU(N2,N1),N2,N1)
                     ENDDO  
                   ENDDO
                 ENDDO
@@ -984,16 +984,16 @@ module ErosionMod
               DO  K=1,jcplx
                 DO  M=1,ndbiomcp
                   DO NE=1,NumPlantChemElms                       
-                    ORMER(NE,M,K,N,NN,M5,M4)=FSEDER*ORM(NE,M,K,NU(N2,N1),N2,N1)
+                    ORMER(NE,M,K,N,NN,M5,M4)=FSEDER*OMBioResdu_vr(NE,M,K,NU(N2,N1),N2,N1)
                   ENDDO  
                 ENDDO
                 DO idom=idom_beg,idom_end
-                  OHMER(idom,K,N,NN,M5,M4)=FSEDER*OHM(idom,K,NU(N2,N1),N2,N1)
+                  OHMER(idom,K,N,NN,M5,M4)=FSEDER*SorbedOM_vr(idom,K,NU(N2,N1),N2,N1)
                 ENDDO
                 DO  M=1,jsken
                   OSAER(M,K,N,NN,M5,M4)=FSEDER*OSA(M,K,NU(N2,N1),N2,N1)
                   DO NE=1,NumPlantChemElms                       
-                    OSMER(NE,M,K,N,NN,M5,M4)=FSEDER*OSM(NE,M,K,NU(N2,N1),N2,N1)
+                    OSMER(NE,M,K,N,NN,M5,M4)=FSEDER*SolidOM_vr(NE,M,K,NU(N2,N1),N2,N1)
                   ENDDO
                 ENDDO
               ENDDO

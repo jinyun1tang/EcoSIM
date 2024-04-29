@@ -164,18 +164,18 @@ implicit none
       D1900: DO K=1,micpar%NumOfLitrCmplxs
         D1940: DO M=1,ndbiomcp
           DO NE=1,NumPlantChemElms                   
-            FORC=FSINK*ORM(NE,M,K,L,NY,NX)
-            ORM(NE,M,K,LL,NY,NX)=ORM(NE,M,K,LL,NY,NX)+FORC
-            ORM(NE,M,K,L,NY,NX)=ORM(NE,M,K,L,NY,NX)-FORC
+            FORC=FSINK*OMBioResdu_vr(NE,M,K,L,NY,NX)
+            OMBioResdu_vr(NE,M,K,LL,NY,NX)=OMBioResdu_vr(NE,M,K,LL,NY,NX)+FORC
+            OMBioResdu_vr(NE,M,K,L,NY,NX)=OMBioResdu_vr(NE,M,K,L,NY,NX)-FORC
           ENDDO
         ENDDO D1940
 !
 !       ADSORBED C,N,P
 !
         DO idom=idom_beg,idom_end
-          FOHC=FSINK*OHM(idom,K,L,NY,NX)
-          OHM(idom,K,LL,NY,NX)=OHM(idom,K,LL,NY,NX)+FOHC
-          OHM(idom,K,L,NY,NX)=OHM(idom,K,L,NY,NX)-FOHC
+          FOHC=FSINK*SorbedOM_vr(idom,K,L,NY,NX)
+          SorbedOM_vr(idom,K,LL,NY,NX)=SorbedOM_vr(idom,K,LL,NY,NX)+FOHC
+          SorbedOM_vr(idom,K,L,NY,NX)=SorbedOM_vr(idom,K,L,NY,NX)-FOHC
         ENDDO
 !
 !       SOC,N,P
@@ -185,9 +185,9 @@ implicit none
           OSA(M,K,LL,NY,NX)=OSA(M,K,LL,NY,NX)+FOSA
           OSA(M,K,L,NY,NX)=OSA(M,K,L,NY,NX)-FOSA
           DO NE=1,NumPlantChemElms
-            FOSC=FSINK*OSM(NE,M,K,L,NY,NX)
-            OSM(NE,M,K,LL,NY,NX)=OSM(NE,M,K,LL,NY,NX)+FOSC
-            OSM(NE,M,K,L,NY,NX)=OSM(NE,M,K,L,NY,NX)-FOSC
+            FOSC=FSINK*SolidOM_vr(NE,M,K,L,NY,NX)
+            SolidOM_vr(NE,M,K,LL,NY,NX)=SolidOM_vr(NE,M,K,LL,NY,NX)+FOSC
+            SolidOM_vr(NE,M,K,L,NY,NX)=SolidOM_vr(NE,M,K,L,NY,NX)-FOSC
           ENDDO
         ENDDO D1930
       ENDDO D1900

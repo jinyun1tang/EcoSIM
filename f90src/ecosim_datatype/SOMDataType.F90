@@ -3,6 +3,7 @@ module SOMDataType
   use GridConsts
   use TracerIDMod
   use EcoSIMConfig, only : jcplx => jcplxc,jsken=>jskenc, ndbiomcp=>NumDeadMicrbCompts
+  use data_const_mod, only : spval => DAT_CONST_SPVAL  
   implicit none
   public
   save
@@ -15,9 +16,9 @@ module SOMDataType
   real(r8),target,allocatable :: CFOSC(:,:,:,:,:)                   !fraction of SOC in kinetic components
   real(r8),target,allocatable :: CNOSC(:,:,:,:,:)                   !N:C,ratios of SOC kinetic components
   real(r8),target,allocatable :: CPOSC(:,:,:,:,:)                   !P:C ratios of SOC kinetic components
-  real(r8),target,allocatable :: OSM(:,:,:,:,:,:)                   !humus soil OM	[g d-2]
-  real(r8),target,allocatable :: OHM(:,:,:,:,:)                     !adsorbed soil C	[g d-2]
-  real(r8),target,allocatable :: ORM(:,:,:,:,:,:)                     !microbial residue [C	g d-2]
+  real(r8),target,allocatable :: SolidOM_vr(:,:,:,:,:,:)                   !humus soil OM	[g d-2]
+  real(r8),target,allocatable :: SorbedOM_vr(:,:,:,:,:)                     !adsorbed soil C	[g d-2]
+  real(r8),target,allocatable :: OMBioResdu_vr(:,:,:,:,:,:)                     !microbial residue [C	g d-2]
   real(r8),target,allocatable :: DOM(:,:,:,:,:)                       !dissolved organic C micropore	[g d-2]
   real(r8),target,allocatable :: DOM_Macp(:,:,:,:,:)                      !dissolved organic C macropore	[g d-2]
   real(r8),target,allocatable :: ORGC(:,:,:)                        !total soil organic C [g d-2]
@@ -67,9 +68,9 @@ module SOMDataType
   allocate(CFOSC(jsken,1:jcplx,0:JZ,JY,JX))
   allocate(CNOSC(jsken,1:jcplx,0:JZ,JY,JX))
   allocate(CPOSC(jsken,1:jcplx,0:JZ,JY,JX))
-  allocate(OSM(NumPlantChemElms,jsken,1:jcplx,0:JZ,JY,JX))
-  allocate(OHM(idom_beg:idom_end,1:jcplx,0:JZ,JY,JX))
-  allocate(ORM(1:NumPlantChemElms,ndbiomcp,1:jcplx,0:JZ,JY,JX))
+  allocate(SolidOM_vr(NumPlantChemElms,jsken,1:jcplx,0:JZ,JY,JX));SolidOM_vr=spval
+  allocate(SorbedOM_vr(idom_beg:idom_end,1:jcplx,0:JZ,JY,JX));SorbedOM_vr=spval
+  allocate(OMBioResdu_vr(1:NumPlantChemElms,ndbiomcp,1:jcplx,0:JZ,JY,JX)); OMBioResdu_vr=spval
   allocate(DOM(idom_beg:idom_end,1:jcplx,0:JZ,JY,JX))
   allocate(DOM_Macp(idom_beg:idom_end,1:jcplx,0:JZ,JY,JX));DOM_MacP=0._r8
   allocate(ORGC(0:JZ,JY,JX))
@@ -109,9 +110,9 @@ module SOMDataType
   call destroy(CFOSC)
   call destroy(CNOSC)
   call destroy(CPOSC)
-  call destroy(OSM)
-  call destroy(OHM)
-  call destroy(ORM)
+  call destroy(SolidOM_vr)
+  call destroy(SorbedOM_vr)
+  call destroy(OMBioResdu_vr)
   call destroy(DOM)
   call destroy(DOM_MacP)
   call destroy(ORGC)

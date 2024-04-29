@@ -6832,10 +6832,10 @@ implicit none
       dim3name='nlbiomcp',dim4name='nomcomplx',dim5name='levsoi1',long_name='microbial residue matter', &
       units='g d-2', interpinic_flag='skip', data=datpr5, missing_value=spval, &
       fill_value=spval)      
-    call cpcol(flag,NHW,NHE,NVN,NVS,ORM,datrc_5d)     
+    call cpcol(flag,NHW,NHE,NVN,NVS,OMBioResdu_vr,datrc_5d)     
   else
     !print*,'ORC'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,ORM,datrc_5d)       
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,OMBioResdu_vr,datrc_5d)       
     datpr5 => datrc_5d(1:ncols,1:NumPlantChemElms,1:nlbiomcp,1:jcplx,1:JZ+1)           
     call restartvar(ncid, flag, varname='ORM', dim1name='column',dim2name='elements',&
       dim3name='nlbiomcp',dim4name='nomcomplx',dim5name='levsoi1',long_name='microbial residue matter', &
@@ -6883,9 +6883,9 @@ implicit none
       dim3name='nomcomplx',dim4name='levsoi1',long_name='adsorbed soil organic matter', &
       units='g d-2', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)      
-    call cpcol(flag,NHW,NHE,NVN,NVS,OHM,datrc_4d)
+    call cpcol(flag,NHW,NHE,NVN,NVS,SorbedOM_vr,datrc_4d)
   else
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,OHM,datrc_4d)  
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SorbedOM_vr,datrc_4d)  
     datpr4 => datrc_4d(1:ncols,1:trc_confs%NDOMS,1:jcplx,1:JZ+1)                   
     call restartvar(ncid, flag, varname='OHM', dim1name='column',dim2name='ndoms',&
       dim3name='nomcomplx',dim4name='levsoi1',long_name='adsorbed soil organic matter', &
@@ -6901,10 +6901,10 @@ implicit none
       long_name='solid soil organic matter', &
       units='g d-2', interpinic_flag='skip', data=datpr5, missing_value=spval, &
       fill_value=spval)      
-    call cpcol(flag,NHW,NHE,NVN,NVS,OSM,datrc_5d)
+    call cpcol(flag,NHW,NHE,NVN,NVS,SolidOM_vr,datrc_5d)
   else
     !print*,'OSC'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,OSM,datrc_5d)  
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SolidOM_vr,datrc_5d)  
     datpr5 => datrc_5d(1:ncols,1:NumPlantChemElms,1:jsken,1:jcplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='OSM', dim1name='column',dim2name='elements',&
       dim3name='nkinecmp',dim4name='nomcomplx',dim5name='levsoi1',&

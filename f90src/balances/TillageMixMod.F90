@@ -195,15 +195,15 @@ module TillageMixMod
 
     DO K=1,micpar%NumOfLitrCmplxs
       DO M=1,ndbiomcp
-        TORXC(M,K)=ORM(ielmc,M,K,0,NY,NX)*CORP0
-        TORXN(M,K)=ORM(ielmn,M,K,0,NY,NX)*CORP0
-        TORXP(M,K)=ORM(ielmp,M,K,0,NY,NX)*CORP0
-        ORM(ielmc,M,K,0,NY,NX)=ORM(ielmc,M,K,0,NY,NX)*XCORP0
-        ORM(ielmn,M,K,0,NY,NX)=ORM(ielmn,M,K,0,NY,NX)*XCORP0
-        ORM(ielmp,M,K,0,NY,NX)=ORM(ielmp,M,K,0,NY,NX)*XCORP0
-        DC=DC+ORM(ielmc,M,K,0,NY,NX)
-        DN=DN+ORM(ielmn,M,K,0,NY,NX)
-        DP=DP+ORM(ielmp,M,K,0,NY,NX)
+        TORXC(M,K)=OMBioResdu_vr(ielmc,M,K,0,NY,NX)*CORP0
+        TORXN(M,K)=OMBioResdu_vr(ielmn,M,K,0,NY,NX)*CORP0
+        TORXP(M,K)=OMBioResdu_vr(ielmp,M,K,0,NY,NX)*CORP0
+        OMBioResdu_vr(ielmc,M,K,0,NY,NX)=OMBioResdu_vr(ielmc,M,K,0,NY,NX)*XCORP0
+        OMBioResdu_vr(ielmn,M,K,0,NY,NX)=OMBioResdu_vr(ielmn,M,K,0,NY,NX)*XCORP0
+        OMBioResdu_vr(ielmp,M,K,0,NY,NX)=OMBioResdu_vr(ielmp,M,K,0,NY,NX)*XCORP0
+        DC=DC+OMBioResdu_vr(ielmc,M,K,0,NY,NX)
+        DN=DN+OMBioResdu_vr(ielmn,M,K,0,NY,NX)
+        DP=DP+OMBioResdu_vr(ielmp,M,K,0,NY,NX)
       ENDDO
       TOQGC(K)=DOM(idom_doc,K,0,NY,NX)*CORP0
       TOQGN(K)=DOM(idom_don,K,0,NY,NX)*CORP0
@@ -213,10 +213,10 @@ module TillageMixMod
       TOQHN(K)=DOM_Macp(idom_don,K,0,NY,NX)*CORP0
       TOQHP(K)=DOM_Macp(idom_dop,K,0,NY,NX)*CORP0
       TOQHA(K)=DOM_Macp(idom_acetate,K,0,NY,NX)*CORP0
-      TOHGC(K)=OHM(ielmc,K,0,NY,NX)*CORP0
-      TOHGN(K)=OHM(ielmn,K,0,NY,NX)*CORP0
-      TOHGP(K)=OHM(ielmp,K,0,NY,NX)*CORP0
-      TOHGA(K)=OHM(idom_acetate,K,0,NY,NX)*CORP0
+      TOHGC(K)=SorbedOM_vr(ielmc,K,0,NY,NX)*CORP0
+      TOHGN(K)=SorbedOM_vr(ielmn,K,0,NY,NX)*CORP0
+      TOHGP(K)=SorbedOM_vr(ielmp,K,0,NY,NX)*CORP0
+      TOHGA(K)=SorbedOM_vr(idom_acetate,K,0,NY,NX)*CORP0
   !
   !     REDUCE SURFACE RESIDUE STATE VARIABLES FOR INCORPORATION
   !
@@ -228,26 +228,26 @@ module TillageMixMod
       DOM_Macp(idom_don,K,0,NY,NX)=DOM_Macp(idom_don,K,0,NY,NX)*XCORP0
       DOM_Macp(idom_dop,K,0,NY,NX)=DOM_Macp(idom_dop,K,0,NY,NX)*XCORP0
       DOM_Macp(idom_acetate,K,0,NY,NX)=DOM_Macp(idom_acetate,K,0,NY,NX)*XCORP0
-      OHM(ielmc,K,0,NY,NX)=OHM(ielmc,K,0,NY,NX)*XCORP0
-      OHM(ielmn,K,0,NY,NX)=OHM(ielmn,K,0,NY,NX)*XCORP0
-      OHM(ielmp,K,0,NY,NX)=OHM(ielmp,K,0,NY,NX)*XCORP0
-      OHM(idom_acetate,K,0,NY,NX)=OHM(idom_acetate,K,0,NY,NX)*XCORP0
-      DC=DC+DOM(idom_doc,K,0,NY,NX)+DOM_Macp(idom_doc,K,0,NY,NX)+OHM(ielmc,K,0,NY,NX) &
-        +DOM(idom_acetate,K,0,NY,NX)+DOM_Macp(idom_acetate,K,0,NY,NX)+OHM(idom_acetate,K,0,NY,NX)
-      DN=DN+DOM(idom_don,K,0,NY,NX)+DOM_Macp(idom_don,K,0,NY,NX)+OHM(ielmn,K,0,NY,NX)
-      DP=DP+DOM(idom_dop,K,0,NY,NX)+DOM_Macp(idom_dop,K,0,NY,NX)+OHM(ielmp,K,0,NY,NX)
+      SorbedOM_vr(ielmc,K,0,NY,NX)=SorbedOM_vr(ielmc,K,0,NY,NX)*XCORP0
+      SorbedOM_vr(ielmn,K,0,NY,NX)=SorbedOM_vr(ielmn,K,0,NY,NX)*XCORP0
+      SorbedOM_vr(ielmp,K,0,NY,NX)=SorbedOM_vr(ielmp,K,0,NY,NX)*XCORP0
+      SorbedOM_vr(idom_acetate,K,0,NY,NX)=SorbedOM_vr(idom_acetate,K,0,NY,NX)*XCORP0
+      DC=DC+DOM(idom_doc,K,0,NY,NX)+DOM_Macp(idom_doc,K,0,NY,NX)+SorbedOM_vr(ielmc,K,0,NY,NX) &
+        +DOM(idom_acetate,K,0,NY,NX)+DOM_Macp(idom_acetate,K,0,NY,NX)+SorbedOM_vr(idom_acetate,K,0,NY,NX)
+      DN=DN+DOM(idom_don,K,0,NY,NX)+DOM_Macp(idom_don,K,0,NY,NX)+SorbedOM_vr(ielmn,K,0,NY,NX)
+      DP=DP+DOM(idom_dop,K,0,NY,NX)+DOM_Macp(idom_dop,K,0,NY,NX)+SorbedOM_vr(ielmp,K,0,NY,NX)
       DO  M=1,jsken
-        TOSGC(M,K)=OSM(ielmc,M,K,0,NY,NX)*CORP0
+        TOSGC(M,K)=SolidOM_vr(ielmc,M,K,0,NY,NX)*CORP0
         TOSGA(M,K)=OSA(M,K,0,NY,NX)*CORP0
-        TOSGN(M,K)=OSM(ielmn,M,K,0,NY,NX)*CORP0
-        TOSGP(M,K)=OSM(ielmp,M,K,0,NY,NX)*CORP0
-        OSM(ielmc,M,K,0,NY,NX)=OSM(ielmc,M,K,0,NY,NX)*XCORP0
+        TOSGN(M,K)=SolidOM_vr(ielmn,M,K,0,NY,NX)*CORP0
+        TOSGP(M,K)=SolidOM_vr(ielmp,M,K,0,NY,NX)*CORP0
+        SolidOM_vr(ielmc,M,K,0,NY,NX)=SolidOM_vr(ielmc,M,K,0,NY,NX)*XCORP0
         OSA(M,K,0,NY,NX)=OSA(M,K,0,NY,NX)*XCORP0
-        OSM(ielmn,M,K,0,NY,NX)=OSM(ielmn,M,K,0,NY,NX)*XCORP0
-        OSM(ielmp,M,K,0,NY,NX)=OSM(ielmp,M,K,0,NY,NX)*XCORP0
-        DC=DC+OSM(ielmc,M,K,0,NY,NX)
-        DN=DN+OSM(ielmn,M,K,0,NY,NX)
-        DP=DP+OSM(ielmp,M,K,0,NY,NX)
+        SolidOM_vr(ielmn,M,K,0,NY,NX)=SolidOM_vr(ielmn,M,K,0,NY,NX)*XCORP0
+        SolidOM_vr(ielmp,M,K,0,NY,NX)=SolidOM_vr(ielmp,M,K,0,NY,NX)*XCORP0
+        DC=DC+SolidOM_vr(ielmc,M,K,0,NY,NX)
+        DN=DN+SolidOM_vr(ielmn,M,K,0,NY,NX)
+        DP=DP+SolidOM_vr(ielmp,M,K,0,NY,NX)
       ENDDO
     ENDDO
 
@@ -404,18 +404,18 @@ module TillageMixMod
       DO K=1,jcplx
         DO  M=1,ndbiomcp
           DO NE=1,NumPlantChemElms
-            TORM(NE,M,K)=TORM(NE,M,K)+TI*ORM(NE,M,K,L,NY,NX)
+            TORM(NE,M,K)=TORM(NE,M,K)+TI*OMBioResdu_vr(NE,M,K,L,NY,NX)
           ENDDO
         ENDDO
         do idom=idom_beg,idom_end
           TDOM(idom,K)=TDOM(idom,K)+TI*DOM(idom,K,L,NY,NX)
-          TOHM(idom,K)=TOHM(idom,K)+TI*OHM(idom,K,L,NY,NX)
+          TOHM(idom,K)=TOHM(idom,K)+TI*SorbedOM_vr(idom,K,L,NY,NX)
         enddo
         DO  M=1,jsken
-          TOSM(ielmc,M,K)=TOSM(ielmc,M,K)+TI*OSM(ielmc,M,K,L,NY,NX)
+          TOSM(ielmc,M,K)=TOSM(ielmc,M,K)+TI*SolidOM_vr(ielmc,M,K,L,NY,NX)
           TOSA(M,K)=TOSA(M,K)+TI*OSA(M,K,L,NY,NX)
-          TOSM(ielmn,M,K)=TOSM(ielmn,M,K)+TI*OSM(ielmn,M,K,L,NY,NX)
-          TOSM(ielmp,M,K)=TOSM(ielmp,M,K)+TI*OSM(ielmp,M,K,L,NY,NX)
+          TOSM(ielmn,M,K)=TOSM(ielmn,M,K)+TI*SolidOM_vr(ielmn,M,K,L,NY,NX)
+          TOSM(ielmp,M,K)=TOSM(ielmp,M,K)+TI*SolidOM_vr(ielmp,M,K,L,NY,NX)
         ENDDO
       ENDDO
       ZNHUX0=AMAX1(ZNHUX0,ZNHU0(L,NY,NX))
@@ -548,12 +548,12 @@ module TillageMixMod
 
         DO  K=1,jcplx
           DO  M=1,ndbiomcp
-            ORM(ielmc,M,K,L,NY,NX)=TI*ORM(ielmc,M,K,L,NY,NX)+CORP*(FI*TORM(ielmc,M,K) &
-              -TI*ORM(ielmc,M,K,L,NY,NX))+TX*ORM(ielmc,M,K,L,NY,NX)
-            ORM(ielmn,M,K,L,NY,NX)=TI*ORM(ielmn,M,K,L,NY,NX)+CORP*(FI*TORM(ielmn,M,K) &
-              -TI*ORM(ielmn,M,K,L,NY,NX))+TX*ORM(ielmn,M,K,L,NY,NX)
-            ORM(ielmp,M,K,L,NY,NX)=TI*ORM(ielmp,M,K,L,NY,NX)+CORP*(FI*TORM(ielmp,M,K) &
-              -TI*ORM(ielmp,M,K,L,NY,NX))+TX*ORM(ielmp,M,K,L,NY,NX)
+            OMBioResdu_vr(ielmc,M,K,L,NY,NX)=TI*OMBioResdu_vr(ielmc,M,K,L,NY,NX)+CORP*(FI*TORM(ielmc,M,K) &
+              -TI*OMBioResdu_vr(ielmc,M,K,L,NY,NX))+TX*OMBioResdu_vr(ielmc,M,K,L,NY,NX)
+            OMBioResdu_vr(ielmn,M,K,L,NY,NX)=TI*OMBioResdu_vr(ielmn,M,K,L,NY,NX)+CORP*(FI*TORM(ielmn,M,K) &
+              -TI*OMBioResdu_vr(ielmn,M,K,L,NY,NX))+TX*OMBioResdu_vr(ielmn,M,K,L,NY,NX)
+            OMBioResdu_vr(ielmp,M,K,L,NY,NX)=TI*OMBioResdu_vr(ielmp,M,K,L,NY,NX)+CORP*(FI*TORM(ielmp,M,K) &
+              -TI*OMBioResdu_vr(ielmp,M,K,L,NY,NX))+TX*OMBioResdu_vr(ielmp,M,K,L,NY,NX)
           ENDDO
           DOM(idom_doc,K,L,NY,NX)=TI*DOM(idom_doc,K,L,NY,NX)+CORP*(FI*TDOM(idom_doc,K) &
             -TI*DOM(idom_doc,K,L,NY,NX))+TX*DOM(idom_doc,K,L,NY,NX)+CORP*DOM_Macp(idom_doc,K,L,NY,NX)
@@ -569,23 +569,23 @@ module TillageMixMod
           DOM_Macp(idom_dop,K,L,NY,NX)=XCORP(NY,NX)*DOM_Macp(idom_dop,K,L,NY,NX)
           DOM_Macp(idom_acetate,K,L,NY,NX)=XCORP(NY,NX)*DOM_Macp(idom_acetate,K,L,NY,NX)
 
-          OHM(ielmc,K,L,NY,NX)=TI*OHM(ielmc,K,L,NY,NX)+CORP*(FI*TOHM(ielmc,K) &
-            -TI*OHM(ielmc,K,L,NY,NX))+TX*OHM(ielmc,K,L,NY,NX)
-          OHM(ielmn,K,L,NY,NX)=TI*OHM(ielmn,K,L,NY,NX)+CORP*(FI*TOHM(ielmn,K) &
-            -TI*OHM(ielmn,K,L,NY,NX))+TX*OHM(ielmn,K,L,NY,NX)
-          OHM(ielmp,K,L,NY,NX)=TI*OHM(ielmp,K,L,NY,NX)+CORP*(FI*TOHM(ielmp,K) &
-            -TI*OHM(ielmp,K,L,NY,NX))+TX*OHM(ielmp,K,L,NY,NX)
-          OHM(idom_acetate,K,L,NY,NX)=TI*OHM(idom_acetate,K,L,NY,NX)+CORP*(FI*TOHM(idom_acetate,K) &
-            -TI*OHM(idom_acetate,K,L,NY,NX))+TX*OHM(idom_acetate,K,L,NY,NX)
+          SorbedOM_vr(ielmc,K,L,NY,NX)=TI*SorbedOM_vr(ielmc,K,L,NY,NX)+CORP*(FI*TOHM(ielmc,K) &
+            -TI*SorbedOM_vr(ielmc,K,L,NY,NX))+TX*SorbedOM_vr(ielmc,K,L,NY,NX)
+          SorbedOM_vr(ielmn,K,L,NY,NX)=TI*SorbedOM_vr(ielmn,K,L,NY,NX)+CORP*(FI*TOHM(ielmn,K) &
+            -TI*SorbedOM_vr(ielmn,K,L,NY,NX))+TX*SorbedOM_vr(ielmn,K,L,NY,NX)
+          SorbedOM_vr(ielmp,K,L,NY,NX)=TI*SorbedOM_vr(ielmp,K,L,NY,NX)+CORP*(FI*TOHM(ielmp,K) &
+            -TI*SorbedOM_vr(ielmp,K,L,NY,NX))+TX*SorbedOM_vr(ielmp,K,L,NY,NX)
+          SorbedOM_vr(idom_acetate,K,L,NY,NX)=TI*SorbedOM_vr(idom_acetate,K,L,NY,NX)+CORP*(FI*TOHM(idom_acetate,K) &
+            -TI*SorbedOM_vr(idom_acetate,K,L,NY,NX))+TX*SorbedOM_vr(idom_acetate,K,L,NY,NX)
           DO  M=1,jsken
-            OSM(ielmc,M,K,L,NY,NX)=TI*OSM(ielmc,M,K,L,NY,NX)+CORP*(FI*TOSM(ielmc,M,K) &
-              -TI*OSM(ielmc,M,K,L,NY,NX))+TX*OSM(ielmc,M,K,L,NY,NX)
+            SolidOM_vr(ielmc,M,K,L,NY,NX)=TI*SolidOM_vr(ielmc,M,K,L,NY,NX)+CORP*(FI*TOSM(ielmc,M,K) &
+              -TI*SolidOM_vr(ielmc,M,K,L,NY,NX))+TX*SolidOM_vr(ielmc,M,K,L,NY,NX)
             OSA(M,K,L,NY,NX)=TI*OSA(M,K,L,NY,NX)+CORP*(FI*TOSA(M,K) &
               -TI*OSA(M,K,L,NY,NX))+TX*OSA(M,K,L,NY,NX)
-            OSM(ielmn,M,K,L,NY,NX)=TI*OSM(ielmn,M,K,L,NY,NX)+CORP*(FI*TOSM(ielmn,M,K) &
-              -TI*OSM(ielmn,M,K,L,NY,NX))+TX*OSM(ielmn,M,K,L,NY,NX)
-            OSM(ielmp,M,K,L,NY,NX)=TI*OSM(ielmp,M,K,L,NY,NX)+CORP*(FI*TOSM(ielmp,M,K) &
-              -TI*OSM(ielmp,M,K,L,NY,NX))+TX*OSM(ielmp,M,K,L,NY,NX)
+            SolidOM_vr(ielmn,M,K,L,NY,NX)=TI*SolidOM_vr(ielmn,M,K,L,NY,NX)+CORP*(FI*TOSM(ielmn,M,K) &
+              -TI*SolidOM_vr(ielmn,M,K,L,NY,NX))+TX*SolidOM_vr(ielmn,M,K,L,NY,NX)
+            SolidOM_vr(ielmp,M,K,L,NY,NX)=TI*SolidOM_vr(ielmp,M,K,L,NY,NX)+CORP*(FI*TOSM(ielmp,M,K) &
+              -TI*SolidOM_vr(ielmp,M,K,L,NY,NX))+TX*SolidOM_vr(ielmp,M,K,L,NY,NX)
           ENDDO
         ENDDO
 !
@@ -618,9 +618,9 @@ module TillageMixMod
 
         DO K=1,micpar%NumOfLitrCmplxs
           DO  M=1,ndbiomcp
-            ORM(ielmc,M,K,L,NY,NX)=ORM(ielmc,M,K,L,NY,NX)+FI*TORXC(M,K)
-            ORM(ielmn,M,K,L,NY,NX)=ORM(ielmn,M,K,L,NY,NX)+FI*TORXN(M,K)
-            ORM(ielmp,M,K,L,NY,NX)=ORM(ielmp,M,K,L,NY,NX)+FI*TORXP(M,K)
+            OMBioResdu_vr(ielmc,M,K,L,NY,NX)=OMBioResdu_vr(ielmc,M,K,L,NY,NX)+FI*TORXC(M,K)
+            OMBioResdu_vr(ielmn,M,K,L,NY,NX)=OMBioResdu_vr(ielmn,M,K,L,NY,NX)+FI*TORXN(M,K)
+            OMBioResdu_vr(ielmp,M,K,L,NY,NX)=OMBioResdu_vr(ielmp,M,K,L,NY,NX)+FI*TORXP(M,K)
           ENDDO
           DOM(idom_doc,K,L,NY,NX)=DOM(idom_doc,K,L,NY,NX)+FI*TOQGC(K)
           DOM(idom_don,K,L,NY,NX)=DOM(idom_don,K,L,NY,NX)+FI*TOQGN(K)
@@ -630,15 +630,15 @@ module TillageMixMod
           DOM_Macp(idom_don,K,L,NY,NX)=DOM_Macp(idom_don,K,L,NY,NX)+FI*TOQHN(K)
           DOM_Macp(idom_dop,K,L,NY,NX)=DOM_Macp(idom_dop,K,L,NY,NX)+FI*TOQHP(K)
           DOM_Macp(idom_acetate,K,L,NY,NX)=DOM_Macp(idom_acetate,K,L,NY,NX)+FI*TOQHA(K)
-          OHM(ielmc,K,L,NY,NX)=OHM(ielmc,K,L,NY,NX)+FI*TOHGC(K)
-          OHM(ielmn,K,L,NY,NX)=OHM(ielmn,K,L,NY,NX)+FI*TOHGN(K)
-          OHM(ielmp,K,L,NY,NX)=OHM(ielmp,K,L,NY,NX)+FI*TOHGP(K)
-          OHM(idom_acetate,K,L,NY,NX)=OHM(idom_acetate,K,L,NY,NX)+FI*TOHGA(K)
+          SorbedOM_vr(ielmc,K,L,NY,NX)=SorbedOM_vr(ielmc,K,L,NY,NX)+FI*TOHGC(K)
+          SorbedOM_vr(ielmn,K,L,NY,NX)=SorbedOM_vr(ielmn,K,L,NY,NX)+FI*TOHGN(K)
+          SorbedOM_vr(ielmp,K,L,NY,NX)=SorbedOM_vr(ielmp,K,L,NY,NX)+FI*TOHGP(K)
+          SorbedOM_vr(idom_acetate,K,L,NY,NX)=SorbedOM_vr(idom_acetate,K,L,NY,NX)+FI*TOHGA(K)
           DO  M=1,jsken
-            OSM(ielmc,M,K,L,NY,NX)=OSM(ielmc,M,K,L,NY,NX)+FI*TOSGC(M,K)
+            SolidOM_vr(ielmc,M,K,L,NY,NX)=SolidOM_vr(ielmc,M,K,L,NY,NX)+FI*TOSGC(M,K)
             OSA(M,K,L,NY,NX)=OSA(M,K,L,NY,NX)+FI*TOSGA(M,K)
-            OSM(ielmn,M,K,L,NY,NX)=OSM(ielmn,M,K,L,NY,NX)+FI*TOSGN(M,K)
-            OSM(ielmp,M,K,L,NY,NX)=OSM(ielmp,M,K,L,NY,NX)+FI*TOSGP(M,K)
+            SolidOM_vr(ielmn,M,K,L,NY,NX)=SolidOM_vr(ielmn,M,K,L,NY,NX)+FI*TOSGN(M,K)
+            SolidOM_vr(ielmp,M,K,L,NY,NX)=SolidOM_vr(ielmp,M,K,L,NY,NX)+FI*TOSGP(M,K)
           ENDDO
         ENDDO
         OC=0.0_r8
@@ -686,34 +686,34 @@ module TillageMixMod
 
         DO K=1,jcplx
           DO  M=1,ndbiomcp
-            OC=OC+ORM(ielmc,M,K,L,NY,NX)
-            ON=ON+ORM(ielmn,M,K,L,NY,NX)
-            OP=OP+ORM(ielmp,M,K,L,NY,NX)
+            OC=OC+OMBioResdu_vr(ielmc,M,K,L,NY,NX)
+            ON=ON+OMBioResdu_vr(ielmn,M,K,L,NY,NX)
+            OP=OP+OMBioResdu_vr(ielmp,M,K,L,NY,NX)
             IF(micpar%is_litter(K))THEN
-              DC=DC+ORM(ielmc,M,K,L,NY,NX)
-              DN=DN+ORM(ielmn,M,K,L,NY,NX)
-              DP=DP+ORM(ielmp,M,K,L,NY,NX)
+              DC=DC+OMBioResdu_vr(ielmc,M,K,L,NY,NX)
+              DN=DN+OMBioResdu_vr(ielmn,M,K,L,NY,NX)
+              DP=DP+OMBioResdu_vr(ielmp,M,K,L,NY,NX)
             ENDIF
           ENDDO
 
-          OC=OC+DOM(idom_doc,K,L,NY,NX)+DOM_Macp(idom_doc,K,L,NY,NX)+OHM(ielmc,K,L,NY,NX) &
-            +DOM(idom_acetate,K,L,NY,NX)+DOM_Macp(idom_acetate,K,L,NY,NX)+OHM(idom_acetate,K,L,NY,NX)
-          ON=ON+DOM(idom_don,K,L,NY,NX)+DOM_Macp(idom_don,K,L,NY,NX)+OHM(ielmn,K,L,NY,NX)
-          OP=OP+DOM(idom_dop,K,L,NY,NX)+DOM_Macp(idom_dop,K,L,NY,NX)+OHM(ielmp,K,L,NY,NX)
+          OC=OC+DOM(idom_doc,K,L,NY,NX)+DOM_Macp(idom_doc,K,L,NY,NX)+SorbedOM_vr(ielmc,K,L,NY,NX) &
+            +DOM(idom_acetate,K,L,NY,NX)+DOM_Macp(idom_acetate,K,L,NY,NX)+SorbedOM_vr(idom_acetate,K,L,NY,NX)
+          ON=ON+DOM(idom_don,K,L,NY,NX)+DOM_Macp(idom_don,K,L,NY,NX)+SorbedOM_vr(ielmn,K,L,NY,NX)
+          OP=OP+DOM(idom_dop,K,L,NY,NX)+DOM_Macp(idom_dop,K,L,NY,NX)+SorbedOM_vr(ielmp,K,L,NY,NX)
           IF(micpar%is_litter(K))THEN
-            DC=DC+DOM(idom_doc,K,L,NY,NX)+DOM_Macp(idom_doc,K,L,NY,NX)+OHM(ielmc,K,L,NY,NX) &
-                +DOM(idom_acetate,K,L,NY,NX)+DOM_Macp(idom_acetate,K,L,NY,NX)+OHM(idom_acetate,K,L,NY,NX)
-            DN=DN+DOM(idom_don,K,L,NY,NX)+DOM_Macp(idom_don,K,L,NY,NX)+OHM(ielmn,K,L,NY,NX)
-            DC=DC+DOM(idom_doc,K,L,NY,NX)+DOM_Macp(idom_doc,K,L,NY,NX)+OHM(ielmc,K,L,NY,NX)
+            DC=DC+DOM(idom_doc,K,L,NY,NX)+DOM_Macp(idom_doc,K,L,NY,NX)+SorbedOM_vr(ielmc,K,L,NY,NX) &
+                +DOM(idom_acetate,K,L,NY,NX)+DOM_Macp(idom_acetate,K,L,NY,NX)+SorbedOM_vr(idom_acetate,K,L,NY,NX)
+            DN=DN+DOM(idom_don,K,L,NY,NX)+DOM_Macp(idom_don,K,L,NY,NX)+SorbedOM_vr(ielmn,K,L,NY,NX)
+            DC=DC+DOM(idom_doc,K,L,NY,NX)+DOM_Macp(idom_doc,K,L,NY,NX)+SorbedOM_vr(ielmc,K,L,NY,NX)
           ENDIF
           DO  M=1,jsken
-            OC=OC+OSM(ielmc,M,K,L,NY,NX)
-            ON=ON+OSM(ielmn,M,K,L,NY,NX)
-            OP=OP+OSM(ielmp,M,K,L,NY,NX)
+            OC=OC+SolidOM_vr(ielmc,M,K,L,NY,NX)
+            ON=ON+SolidOM_vr(ielmn,M,K,L,NY,NX)
+            OP=OP+SolidOM_vr(ielmp,M,K,L,NY,NX)
             IF(micpar%is_litter(K))THEN
-              DC=DC+OSM(ielmc,M,K,L,NY,NX)
-              DN=DN+OSM(ielmn,M,K,L,NY,NX)
-              DP=DP+OSM(ielmp,M,K,L,NY,NX)
+              DC=DC+SolidOM_vr(ielmc,M,K,L,NY,NX)
+              DN=DN+SolidOM_vr(ielmn,M,K,L,NY,NX)
+              DP=DP+SolidOM_vr(ielmp,M,K,L,NY,NX)
             ENDIF
           ENDDO
         ENDDO
