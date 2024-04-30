@@ -183,7 +183,7 @@ module MicAutoCPLXMod
 ! FOXYX=fraction of O2 uptake by N,K relative to total
 ! dts_gas=1/(NPH*NPT)
 ! ROXYF,ROXYL=net O2 gaseous, aqueous fluxes from previous hour
-! OLSGL=aqueous O2 diffusivity
+! O2AquaDiffusvity=aqueous O2 diffusivity
 ! OXYG,OXYS=gaseous, aqueous O2 amounts
 ! Rain2LitRSurf_col,Irrig2LitRSurf=surface water flux from precipitation, irrigation
 ! O2_rain_conc,O2_irrig_conc=O2 concentration in Rain2LitRSurf_col,Irrig2LitRSurf
@@ -633,7 +633,7 @@ module MicAutoCPLXMod
 
   integer  :: M,MX
   real(r8) :: COXYS1,DIFOX
-  real(r8) :: B,C,OLSGL1
+  real(r8) :: B,C,O2AquaDiffusvity1
   real(r8) :: OXYG1,OXYS1
   real(r8) :: RUPMX,RO2DmndX
   real(r8) :: ROXYLX
@@ -665,7 +665,7 @@ module MicAutoCPLXMod
     Irrig2LitRSurf      => micfor%Irrig2LitRSurf,      &
     Rain2LitRSurf_col   => micfor%Rain2LitRSurf_col,   &
     litrm               => micfor%litrm,               &
-    OLSGL               => micfor%OLSGL,               &
+    O2AquaDiffusvity    => micfor%O2AquaDiffusvity,    &
     ROXYL               => micfor%ROXYL,               &
     VLSoilPoreMicP_vr   => micfor%VLSoilPoreMicP_vr,   &
     VLSoilMicP          => micfor%VLSoilMicP,          &
@@ -677,7 +677,7 @@ module MicAutoCPLXMod
     ZERO                => micfor%ZERO,                &
     ZEROS               => micfor%ZEROS,               &
     DiffusivitySolutEff => micfor%DiffusivitySolutEff, &
-    SOXYL               => micstt%SOXYL,               &
+    O2GSolubility       => micstt%O2GSolubility,       &
     OXYG                => micstt%OXYG,                &
     OXYS                => micstt%OXYS,                &
     COXYG               => micstt%COXYG,               &
@@ -685,7 +685,7 @@ module MicAutoCPLXMod
     RNH3OxidAutor       => micflx%RNH3OxidAutor,       &
     RNH3OxidAutorBand   => micflx%RNH3OxidAutorBand,   &
     RNO2OxidAutor       => micflx%RNO2OxidAutor,       &
-    RNO2OxidAutorBand   => micflx%RNO2OxidAutorBand  &
+    RNO2OxidAutorBand   => micflx%RNO2OxidAutorBand    &
   )
 
   IF(RO2DmndAutor(NGL).GT.ZEROS.AND.FOXYX.GT.ZERO)THEN
@@ -696,7 +696,7 @@ module MicAutoCPLXMod
       !
       RUPMX=RO2DmndAutor(NGL)*dts_gas    !
       RO2DmndX=ROXYF*dts_gas*FOXYX    !O2 demand
-      OLSGL1=OLSGL*dts_gas
+      O2AquaDiffusvity1=O2AquaDiffusvity*dts_gas
       IF(.not.litrm)THEN
         OXYG1=OXYG*FOXYX
         ROXYLX=ROXYL*dts_gas*FOXYX
@@ -722,15 +722,15 @@ module MicAutoCPLXMod
         !     ORAD=microbial radius,FILM=water film thickness
         !     DIFOX=aqueous O2 diffusion, TortMicPM=tortuosity
         !     BIOS=microbial number, OMA=active biomass
-        !     SOXYL=O2 solubility, OXKX=Km for O2 uptake
+        !     O2GSolubility=O2 solubility, OXKX=Km for O2 uptake
         !     OXYS,COXYS=aqueous O2 amount, concentration
         !     OXYG,COXYG=gaseous O2 amount, concentration
         !     RMPOX,ROXSK=O2 uptake
         !
         THETW1=AZMAX1(safe_adb(VLWatMicPM(M),VLSoilMicP))
         RRADO=ORAD*(FILM(M)+ORAD)/FILM(M)
-        DIFOX=TortMicPM(M)*OLSGL1*12.57_r8*BIOS*OMActAutor(NGL)*RRADO
-        VOLWOX=VLWatMicPM(M)*SOXYL
+        DIFOX=TortMicPM(M)*O2AquaDiffusvity1*12.57_r8*BIOS*OMActAutor(NGL)*RRADO
+        VOLWOX=VLWatMicPM(M)*O2GSolubility
         VOLPOX=VLsoiAirPM(M)
         VOLWPM=VOLWOX+VOLPOX
 
@@ -738,7 +738,7 @@ module MicAutoCPLXMod
         DO  MX=1,NPT
           OXYG1=OXYG1+RO2DmndX
           OXYS1=OXYS1+ROXYLX
-          COXYS1=AMIN1(COXYE*SOXYL,AZMAX1(safe_adb(OXYS1,(VLWatMicPM(M)*FOXYX))))
+          COXYS1=AMIN1(COXYE*O2GSolubility,AZMAX1(safe_adb(OXYS1,(VLWatMicPM(M)*FOXYX))))
 
           !solve for uptake flux
           IF(OXYS1<=ZEROS)THEN
@@ -829,30 +829,30 @@ module MicAutoCPLXMod
   real(r8) :: ZNO2SX,ZNO2BX
 
 !     begin_execution
-  associate(                                            &
-    FracNO2ReduxAutor               => nmics%FracNO2ReduxAutor,               &
-    RO2Dmnd4RespAutor    => nmicf%RO2Dmnd4RespAutor,    &
-    RO2Uptk4RespAutor    => nmicf%RO2Uptk4RespAutor,    &
-    RNO3UptkAutor        => nmicf%RNO3UptkAutor,        &
-    RNO2ReduxAutorSoil   => nmicf%RNO2ReduxAutorSoil,   &
-    RNO2ReduxAutorBand   => nmicf%RNO2ReduxAutorBand,   &
-    RNOxReduxRespAutorLim              => nmicf%RNOxReduxRespAutorLim,              &
-    RSOxidSoilAutor      => nmicf%RSOxidSoilAutor,      &
-    RSOxidBandAutor      => nmicf%RSOxidBandAutor,      &
-    RTotNH3OxidSoilAutor => nmicf%RTotNH3OxidSoilAutor, &
-    RTotNH3OxidBandAutor => nmicf%RTotNH3OxidBandAutor, &
-    RNO2EcoUptkSoilPrev  => micfor%RNO2EcoUptkSoilPrev, &
-    VLNO3                => micfor%VLNO3,               &
-    VLNOB                => micfor%VLNOB,               &
-    RNO2EcoUptkBandPrev  => micfor%RNO2EcoUptkBandPrev, &
-    ZEROS                => micfor%ZEROS,               &
-    ZEROS2               => micfor%ZEROS2,              &
-    CNO2B                => micstt%CNO2B,               &
-    CNO2S                => micstt%CNO2S,               &
-    ZNO2B                => micstt%ZNO2B,               &
-    ZNO2S                => micstt%ZNO2S,               &
-    RNO2OxidAutor        => micflx%RNO2OxidAutor,       &
-    RNO2OxidAutorBand    => micflx%RNO2OxidAutorBand    &
+  associate(                                              &
+    FracNO2ReduxAutor     => nmics%FracNO2ReduxAutor,     &
+    RO2Dmnd4RespAutor     => nmicf%RO2Dmnd4RespAutor,     &
+    RO2Uptk4RespAutor     => nmicf%RO2Uptk4RespAutor,     &
+    RNO3UptkAutor         => nmicf%RNO3UptkAutor,         &
+    RNO2ReduxAutorSoil    => nmicf%RNO2ReduxAutorSoil,    &
+    RNO2ReduxAutorBand    => nmicf%RNO2ReduxAutorBand,    &
+    RNOxReduxRespAutorLim => nmicf%RNOxReduxRespAutorLim, &
+    RSOxidSoilAutor       => nmicf%RSOxidSoilAutor,       &
+    RSOxidBandAutor       => nmicf%RSOxidBandAutor,       &
+    RTotNH3OxidSoilAutor  => nmicf%RTotNH3OxidSoilAutor,  &
+    RTotNH3OxidBandAutor  => nmicf%RTotNH3OxidBandAutor,  &
+    RNO2EcoUptkSoilPrev   => micfor%RNO2EcoUptkSoilPrev,  &
+    VLNO3                 => micfor%VLNO3,                &
+    VLNOB                 => micfor%VLNOB,                &
+    RNO2EcoUptkBandPrev   => micfor%RNO2EcoUptkBandPrev,  &
+    ZEROS                 => micfor%ZEROS,                &
+    ZEROS2                => micfor%ZEROS2,               &
+    CNO2B                 => micstt%CNO2B,                &
+    CNO2S                 => micstt%CNO2S,                &
+    ZNO2B                 => micstt%ZNO2B,                &
+    ZNO2S                 => micstt%ZNO2S,                &
+    RNO2OxidAutor         => micflx%RNO2OxidAutor,        &
+    RNO2OxidAutorBand     => micflx%RNO2OxidAutorBand     &
   )
 !
 !     FACTOR TO CONSTRAIN NO2 UPAKE AMONG COMPETING MICROBIAL
@@ -948,28 +948,28 @@ module MicAutoCPLXMod
   real(r8) :: VMXA
 
 !     begin_execution
-  associate(             &
-    TFNGff => nmics%TFNGff,  &
-    FCNPff => nmics%FCNPff,  &
-    FracOMActAutor => nmics%FracOMActAutor,  &
-    OMActAutor  => nmics%OMActAutor ,  &
-    RO2Dmnd4RespAutor=> nmicf%RO2Dmnd4RespAutor, &
-    RO2DmndAutor=> nmicf%RO2DmndAutor, &
-    VLNH4  => micfor%VLNH4 , &
-    VLNHB  => micfor%VLNHB , &
-    ZEROS  => micfor%ZEROS , &
-    ZEROS2 => micfor%ZEROS2, &
-    RNH4EcoDmndSoilPrev  => micfor%RNH4EcoDmndSoilPrev  , &
-    RNH4EcoDmndBandPrev  => micfor%RNH4EcoDmndBandPrev  , &
-    ZNFN0  => micstt%ZNFN0 , &
-    ZNFNI  => micstt%ZNFNI , &
-    CNH4S  => micstt%CNH4S , &
-    CNH4B  => micstt%CNH4B , &
-    ZNH4S  => micstt%ZNH4S , &
-    ZNH4B  => micstt%ZNH4B , &
-    RNH3OxidAutor=> micflx%RNH3OxidAutor, &
-    RNH3OxidAutorBand=> micflx%RNH3OxidAutorBand,  &
-    RO2DmndAutort => micflx%RO2DmndAutort   &
+  associate(                                           &
+    TFNGff              => nmics%TFNGff,               &
+    FCNPff              => nmics%FCNPff,               &
+    FracOMActAutor      => nmics%FracOMActAutor,       &
+    OMActAutor          => nmics%OMActAutor,           &
+    RO2Dmnd4RespAutor   => nmicf%RO2Dmnd4RespAutor,    &
+    RO2DmndAutor        => nmicf%RO2DmndAutor,         &
+    VLNH4               => micfor%VLNH4,               &
+    VLNHB               => micfor%VLNHB,               &
+    ZEROS               => micfor%ZEROS,               &
+    ZEROS2              => micfor%ZEROS2,              &
+    RNH4EcoDmndSoilPrev => micfor%RNH4EcoDmndSoilPrev, &
+    RNH4EcoDmndBandPrev => micfor%RNH4EcoDmndBandPrev, &
+    ZNFN0               => micstt%ZNFN0,               &
+    ZNFNI               => micstt%ZNFNI,               &
+    CNH4S               => micstt%CNH4S,               &
+    CNH4B               => micstt%CNH4B,               &
+    ZNH4S               => micstt%ZNH4S,               &
+    ZNH4B               => micstt%ZNH4B,               &
+    RNH3OxidAutor       => micflx%RNH3OxidAutor,       &
+    RNH3OxidAutorBand   => micflx%RNH3OxidAutorBand,   &
+    RO2DmndAutort       => micflx%RO2DmndAutort        &
   )
 !
 !     FACTOR TO REGULATE COMPETITION FOR NH4 AMONG DIFFERENT
@@ -1091,7 +1091,7 @@ module MicAutoCPLXMod
   associate(                                           &
     TFNGff              => nmics%TFNGff,               &
     FCNPff              => nmics%FCNPff,               &
-    FracNO2ReduxAutor              => nmics%FracNO2ReduxAutor,               &
+    FracNO2ReduxAutor   => nmics%FracNO2ReduxAutor,    &
     OMActAutor          => nmics%OMActAutor,           &
     RO2Dmnd4RespAutor   => nmicf%RO2Dmnd4RespAutor,    &
     RO2DmndAutor        => nmicf%RO2DmndAutor,         &
@@ -1108,7 +1108,7 @@ module MicAutoCPLXMod
     ZNO2B               => micstt%ZNO2B,               &
     RNO2OxidAutor       => micflx%RNO2OxidAutor,       &
     RNO2OxidAutorBand   => micflx%RNO2OxidAutorBand,   &
-    RO2DmndAutort       => micflx%RO2DmndAutort   &
+    RO2DmndAutort       => micflx%RO2DmndAutort        &
   )
 !     FACTOR TO REGULATE COMPETITION FOR NO2 AMONG DIFFERENT
 !     MICROBIAL POPULATIONS
@@ -1197,16 +1197,16 @@ module MicAutoCPLXMod
   real(r8) :: FSBST
   real(r8) :: VMXA
 
-  associate(                  &
-    TFNGff => nmics%TFNGff, &
-    FCNPff => nmics%FCNPff, &
-    OMActAutor  => nmics%OMActAutor , &
+  associate(                                      &
+    TFNGff            => nmics%TFNGff,            &
+    FCNPff            => nmics%FCNPff,            &
+    OMActAutor        => nmics%OMActAutor,        &
     RO2Dmnd4RespAutor => nmicf%RO2Dmnd4RespAutor, &
-    RO2DmndAutor => nmicf%RO2DmndAutor  , &
-    TKS     => micfor%TKS       , &
-    CH2GS   => micstt%CH2GS    , &
-    H2GS    => micstt%H2GS     , &
-    RO2DmndAutort  => micflx%RO2DmndAutort     &
+    RO2DmndAutor      => nmicf%RO2DmndAutor,      &
+    TKS               => micfor%TKS,              &
+    CH2GS             => micstt%CH2GS,            &
+    H2GS              => micstt%H2GS,             &
+    RO2DmndAutort     => micflx%RO2DmndAutort     &
   )
 !     begin_execution
 !
@@ -1262,26 +1262,26 @@ module MicAutoCPLXMod
   real(r8) :: VMXA
   REAL(R8) :: VOLWPM
 
-  associate(             &
-    TFNGff => nmics%TFNGff,  &
-    FCNPff => nmics%FCNPff,  &
-    OMActAutor  => nmics%OMActAutor ,  &
-    RO2Dmnd4RespAutor=> nmicf%RO2Dmnd4RespAutor, &
-    RO2DmndAutor=> nmicf%RO2DmndAutor, &
-    CCH4E  => micfor%CCH4E  , &
-    VLsoiAirPM  => micfor%VLsoiAirPM  , &
-    VLWatMicPM  => micfor%VLWatMicPM  , &
-    ZEROS2  => micfor%ZEROS2 , &
-    ZEROS  => micfor%ZEROS , &
-    THETPM  => micfor%THETPM, &
-    DiffusivitySolutEff   => micfor%DiffusivitySolutEff   , &
-    litrm  => micfor%litrm  , &
-    CCH4G  => micstt%CCH4G  , &
-    CH4S   => micstt%CH4S   , &
-    SCH4L  => micstt%SCH4L  , &
-    RCH4L  => micfor%RCH4L , &
-    RCH4F  => micfor%RCH4F , &
-    RO2DmndAutort  => micflx%RO2DmndAutort &
+  associate(                                           &
+    TFNGff              => nmics%TFNGff,               &
+    FCNPff              => nmics%FCNPff,               &
+    OMActAutor          => nmics%OMActAutor,           &
+    RO2Dmnd4RespAutor   => nmicf%RO2Dmnd4RespAutor,    &
+    RO2DmndAutor        => nmicf%RO2DmndAutor,         &
+    CCH4E               => micfor%CCH4E,               &
+    VLsoiAirPM          => micfor%VLsoiAirPM,          &
+    VLWatMicPM          => micfor%VLWatMicPM,          &
+    ZEROS2              => micfor%ZEROS2,              &
+    ZEROS               => micfor%ZEROS,               &
+    THETPM              => micfor%THETPM,              &
+    DiffusivitySolutEff => micfor%DiffusivitySolutEff, &
+    litrm               => micfor%litrm,               &
+    CCH4G               => micstt%CCH4G,               &
+    CH4S                => micstt%CH4S,                &
+    SCH4L               => micstt%SCH4L,               &
+    RCH4L               => micfor%RCH4L,               &
+    RCH4F               => micfor%RCH4F,               &
+    RO2DmndAutort       => micflx%RO2DmndAutort        &
   )
 !     begin_execution
 !

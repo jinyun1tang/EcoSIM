@@ -107,7 +107,7 @@ implicit none
     real(r8) :: VLPO4       !PO4 non-band volume fraction,[-]:=1-VLPOB
 
     real(r8) :: PSISoilMatricP       !soil micropore matric water potential, [MPa]
-    real(r8) :: OLSGL       !aqueous O2 diffusivity, [m2 h-1], set in hour1
+    real(r8) :: O2AquaDiffusvity       !aqueous O2 diffusivity, [m2 h-1], set in hour1
     real(r8) :: CLSGL       !aqueous CO2 diffusivity	[m2 h-1]
     real(r8) :: CQSGL       !aqueous CH4 diffusivity	m2 h-1
     real(r8) :: ZLSGL       !aqueous N2 diffusivity, [m2 h-1]
@@ -175,7 +175,7 @@ implicit none
     real(r8) :: H2GS      !aqueous H2 	[g d-2]
     real(r8) :: CH4S      !aqueous CO2  micropore	[g d-2]
     real(r8) :: SCH4L     !solubility of CH4, [m3 m-3]
-    real(r8) :: SOXYL     !solubility of O2, [m3 m-3]
+    real(r8) :: O2GSolubility     !solubility of O2, [m3 m-3]
     real(r8) :: SCO2L     !solubility of CO2, [m3 m-3]
     real(r8) :: SN2GL     !solubility of N2, [m3 m-3]
     real(r8) :: SN2OL     !solubility of N2O, [m3 m-3]
@@ -404,7 +404,7 @@ implicit none
 
     TCS=TKS-TC2K
     forc%SCH4L=gas_solubility(idg_CH4,TCS)
-    forc%SOXYL=gas_solubility(idg_O2, TCS)
+    forc%O2GSolubility=gas_solubility(idg_O2, TCS)
     forc%SCO2L=gas_solubility(idg_CO2, TCS)     !solubility of CO2, [m3 m-3]
     forc%SN2GL=gas_solubility(idg_N2, TCS)      !solubility of N2, [m3 m-3]
     forc%SN2OL=gas_solubility(idg_N2O, TCS)     !solubility of N2O, [m3 m-3]
@@ -422,7 +422,7 @@ implicit none
 
     !variable temperature
     forc%TFND=TEFAQUDIF(TKS)
-    forc%OLSGL=OLSG*forc%TFND       !aqueous O2 diffusivity [m2 h-1]
+    forc%O2AquaDiffusvity=OLSG*forc%TFND       !aqueous O2 diffusivity [m2 h-1]
     forc%CLSGL=CLSG*forc%TFND       !aqueous CO2 diffusivity	[m2 h-1]
     forc%CQSGL=CQSG*forc%TFND       !aqueous CH4 diffusivity	m2 h-1
     forc%ZLSGL=ZLSG*forc%TFND       !aqueous N2 diffusivity, [m2 h-1]

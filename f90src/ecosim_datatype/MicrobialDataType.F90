@@ -20,10 +20,10 @@ implicit none
   real(r8),target,allocatable :: RH2PO4DmndLitrHeter_col(:,:,:,:)     !microbial PO4 demand in surface litter	[g d-2 h-1]
   real(r8),target,allocatable :: RNO3DmndLitrHeter_col(:,:,:,:)     !microbial NO3 demand in surface litter	[g d-2 h-1]
   real(r8),target,allocatable :: RVMX4(:,:,:,:,:)    !total microbial NH4 uptake non-band unconstrained by NH4	[g d-2 h-1]
-  real(r8),target,allocatable :: RVMX3(:,:,:,:,:)    !total microbial NO3 uptake non-band unconstrained by NO3	[g d-2 h-1]
+  real(r8),target,allocatable :: RNO3ReduxDmndSoilHeter_vr(:,:,:,:,:)    !total microbial NO3 uptake non-band unconstrained by NO3	[g d-2 h-1]
   real(r8),target,allocatable :: RNO2DmndReduxSoilHeter_vr(:,:,:,:,:)    !total microbial NO2 uptake non-band unconstrained by NO2	[g d-2 h-1]
   real(r8),target,allocatable :: RVMB4(:,:,:,:,:)    !total microbial NH4 uptake non-band unconstrained by NH4	[g d-2 h-1]
-  real(r8),target,allocatable :: RVMB3(:,:,:,:,:)    !total microbial NO3 uptake band unconstrained by NO3	[g d-2 h-1]
+  real(r8),target,allocatable :: RNO3ReduxDmndBandHeter_vr(:,:,:,:,:)    !total microbial NO3 uptake band unconstrained by NO3	[g d-2 h-1]
   real(r8),target,allocatable :: RNO2DmndReduxBandHeter_vr(:,:,:,:,:)    !total microbial NO2 uptake band unconstrained by NH4	[g d-2 h-1]
   real(r8),target,allocatable :: RN2ODmndReduxHeter_vr(:,:,:,:,:)    !total microbial N2O uptake unconstrained by N2O	[g d-2 h-1]
   real(r8),target,allocatable :: RNH4DmndBandHeter_vr(:,:,:,:,:)    !microbial NH4 immobilization (+ve) - mineralization (-ve) band	[g d-2 h-1]
@@ -43,10 +43,8 @@ implicit none
   real(r8),target,allocatable :: RH2PO4UptkLitrAutor_col(:,:,:)
   real(r8),target,allocatable :: RNO3UptkLitrAutor_col(:,:,:)
   real(r8),target,allocatable :: RNH3OxidAutor(:,:,:,:)
-  real(r8),target,allocatable :: RVMX3ff(:,:,:,:)
   real(r8),target,allocatable :: RNO2OxidAutor(:,:,:,:)
   real(r8),target,allocatable :: RNH3OxidAutorBand(:,:,:,:)
-  real(r8),target,allocatable :: RVMB3ff(:,:,:,:)
   real(r8),target,allocatable :: RNO2OxidAutorBand(:,:,:,:)
   real(r8),target,allocatable :: RN2ODmndReduxAutor_vr(:,:,:,:)
   real(r8),target,allocatable :: RNH4UptkBandAutor_vr(:,:,:,:)
@@ -83,10 +81,10 @@ implicit none
   allocate(RH2PO4DmndLitrHeter_col(NumMicrbHetetrophCmplx,1:jcplx,JY,JX))
   allocate(RNO3DmndLitrHeter_col(NumMicrbHetetrophCmplx,1:jcplx,JY,JX))
   allocate(RVMX4(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(RVMX3(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
+  allocate(RNO3ReduxDmndSoilHeter_vr(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
   allocate(RNO2DmndReduxSoilHeter_vr(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
   allocate(RVMB4(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(RVMB3(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
+  allocate(RNO3ReduxDmndBandHeter_vr(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
   allocate(RNO2DmndReduxBandHeter_vr(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
   allocate(RN2ODmndReduxHeter_vr(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
   allocate(RNH4DmndBandHeter_vr(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
@@ -106,10 +104,8 @@ implicit none
   allocate(RH2PO4UptkLitrAutor_col(NumMicrobAutrophCmplx,JY,JX))
   allocate(RNO3UptkLitrAutor_col(NumMicrobAutrophCmplx,JY,JX))
   allocate(RNH3OxidAutor(NumMicrobAutrophCmplx,0:JZ,JY,JX))
-  allocate(RVMX3ff(NumMicrobAutrophCmplx,0:JZ,JY,JX))
   allocate(RNO2OxidAutor(NumMicrobAutrophCmplx,0:JZ,JY,JX))
   allocate(RNH3OxidAutorBand(NumMicrobAutrophCmplx,0:JZ,JY,JX))
-  allocate(RVMB3ff(NumMicrobAutrophCmplx,0:JZ,JY,JX))
   allocate(RNO2OxidAutorBand(NumMicrobAutrophCmplx,0:JZ,JY,JX))
   allocate(RN2ODmndReduxAutor_vr(NumMicrobAutrophCmplx,0:JZ,JY,JX))
   allocate(RNH4UptkBandAutor_vr(NumMicrobAutrophCmplx,0:JZ,JY,JX))
@@ -136,10 +132,10 @@ implicit none
   if(allocated(RH2PO4DmndLitrHeter_col))deallocate(RH2PO4DmndLitrHeter_col)
   if(allocated(RNO3DmndLitrHeter_col))deallocate(RNO3DmndLitrHeter_col)
   if(allocated(RVMX4))deallocate(RVMX4)
-  if(allocated(RVMX3))deallocate(RVMX3)
+  if(allocated(RNO3ReduxDmndSoilHeter_vr))deallocate(RNO3ReduxDmndSoilHeter_vr)
   if(allocated(RNO2DmndReduxSoilHeter_vr))deallocate(RNO2DmndReduxSoilHeter_vr)
   if(allocated(RVMB4))deallocate(RVMB4)
-  if(allocated(RVMB3))deallocate(RVMB3)
+  if(allocated(RNO3ReduxDmndBandHeter_vr))deallocate(RNO3ReduxDmndBandHeter_vr)
   if(allocated(RNO2DmndReduxBandHeter_vr))deallocate(RNO2DmndReduxBandHeter_vr)
   if(allocated(RN2ODmndReduxHeter_vr))deallocate(RN2ODmndReduxHeter_vr)
   if(allocated(RNH4DmndBandHeter_vr))deallocate(RNH4DmndBandHeter_vr)
@@ -159,10 +155,8 @@ implicit none
   if(allocated(RH2PO4UptkLitrAutor_col))deallocate(RH2PO4UptkLitrAutor_col)
   if(allocated(RNO3UptkLitrAutor_col))deallocate(RNO3UptkLitrAutor_col)
   if(allocated(RNH3OxidAutor))deallocate(RNH3OxidAutor)
-  if(allocated(RVMX3ff))deallocate(RVMX3ff)
   if(allocated(RNO2OxidAutor))deallocate(RNO2OxidAutor)
   if(allocated(RNH3OxidAutorBand))deallocate(RNH3OxidAutorBand)
-  if(allocated(RVMB3ff))deallocate(RVMB3ff)
   if(allocated(RNO2OxidAutorBand))deallocate(RNO2OxidAutorBand)
   if(allocated(RN2ODmndReduxAutor_vr))deallocate(RN2ODmndReduxAutor_vr)
   if(allocated(RNH4UptkBandAutor_vr))deallocate(RNH4UptkBandAutor_vr)

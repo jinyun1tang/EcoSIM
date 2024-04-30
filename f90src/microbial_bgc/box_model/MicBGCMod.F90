@@ -827,7 +827,7 @@ module MicBGCMod
 ! FOXYX=fraction of O2 uptake by N,K relative to total
 ! dts_gas=1/(NPH*NPT)
 ! ROXYF,ROXYL=net O2 gaseous, aqueous fluxes from previous hour
-! OLSGL=aqueous O2 diffusivity
+! O2AquaDiffusvity=aqueous O2 diffusivity
 ! OXYG,OXYS=gaseous, aqueous O2 amounts
 ! Rain2LitRSurf_col,Irrig2LitRSurf=surface water flux from precipitation, irrigation
 ! O2_rain_conc,O2_irrig_conc=O2 concentration in Rain2LitRSurf_col,Irrig2LitRSurf
@@ -2637,11 +2637,11 @@ module MicBGCMod
     FracBulkSOM            => micstt%FracBulkSOM,            &
     CH2GS                  => micstt%CH2GS,                  &
     DOM                    => micstt%DOM,                    &
-    RVMX3                  => micflx%RVMX3,                  &
+    RNO3ReduxDmndSoilHeter                  => micflx%RNO3ReduxDmndSoilHeter,                  &
     RNO2DmndReduxSoilHeter => micflx%RNO2DmndReduxSoilHeter, &
     RN2ODmndReduxHeter     => micflx%RN2ODmndReduxHeter,     &
     RNO2DmndReduxBandHeter => micflx%RNO2DmndReduxBandHeter, &
-    RVMB3                  => micflx%RVMB3                   &
+    RNO3ReduxDmndBandHeter                  => micflx%RNO3ReduxDmndBandHeter                   &
   )
 !
 ! FACTOR TO CONSTRAIN NO3 UPAKE AMONG COMPETING MICROBIAL
@@ -2653,12 +2653,12 @@ module MicBGCMod
   FNO3S=VLNO3
   FNO3B=VLNOB
   IF(RNO3EcoDmndSoilPrev.GT.ZEROS)THEN
-    FNO3=AMAX1(FMN,RVMX3(NGL,K)/RNO3EcoDmndSoilPrev)
+    FNO3=AMAX1(FMN,RNO3ReduxDmndSoilHeter(NGL,K)/RNO3EcoDmndSoilPrev)
   ELSE
     FNO3=AMAX1(FMN,FracOMActHeter(NGL,K)*VLNO3)
   ENDIF
   IF(RNO3EcoDmndBandPrev.GT.ZEROS)THEN
-    FNB3=AMAX1(FMN,RVMB3(NGL,K)/RNO3EcoDmndBandPrev)
+    FNB3=AMAX1(FMN,RNO3ReduxDmndBandHeter(NGL,K)/RNO3EcoDmndBandPrev)
   ELSE
     FNB3=AMAX1(FMN,FracOMActHeter(NGL,K)*VLNOB)
   ENDIF
@@ -2682,7 +2682,7 @@ module MicBGCMod
 !     OQCD3S,OQCD3B=DOC limitation to NO3 reduction in non-band, band
 !     RNO3ReduxHeterSoil,RNO3ReduxHeterBand=substrate-limited NO3 reduction in non-band,band
 !     RGOM3X,RNOxReduxRespDenitLim3=substrate-unltd,-ltd respn from NO3 reduction
-!     RVMX3,RVMB3=demand for NO3 reduction in non-band,band
+!     RNO3ReduxDmndSoilHeter,RNO3ReduxDmndBandHeter=demand for NO3 reduction in non-band,band
 !
   ROXYD=AZMAX1(RO2Dmnd4RespHeter(NGL,K)-RO2Uptk4RespHeter(NGL,K))
   VMXD3=0.875_r8*ROXYD
@@ -2718,8 +2718,8 @@ module MicBGCMod
   RDNOT=RNO3ReduxHeterSoil(NGL,K)+RNO3ReduxHeterBand(NGL,K)
   RGOM3X=eQNO3toOxy*RDNOX
   RNOxReduxRespDenitLim3=eQNO3toOxy*RDNOT
-  RVMX3(NGL,K)=VMXD3S
-  RVMB3(NGL,K)=VMXD3B
+  RNO3ReduxDmndSoilHeter(NGL,K)=VMXD3S
+  RNO3ReduxDmndBandHeter(NGL,K)=VMXD3B
 !
 !     FACTOR TO CONSTRAIN NO2 UPAKE AMONG COMPETING MICROBIAL
 !     POPULATIONS
@@ -2860,7 +2860,7 @@ module MicBGCMod
   type(micfluxtype), intent(inout) :: micflx
   integer  :: M,MX
   real(r8) :: COXYS1,DIFOX
-  real(r8) :: B,C,OLSGL1
+  real(r8) :: B,C,O2AquaDiffusvity1
   real(r8) :: OXYG1,OXYS1
   real(r8) :: RUPMX,ROXYFX
   real(r8) :: ROXYLX
@@ -2894,7 +2894,7 @@ module MicBGCMod
     Irrig2LitRSurf         => micfor%Irrig2LitRSurf,         &
     Rain2LitRSurf_col      => micfor%Rain2LitRSurf_col,      &
     litrm                  => micfor%litrm,                  &
-    OLSGL                  => micfor%OLSGL,                  &
+    O2AquaDiffusvity                  => micfor%O2AquaDiffusvity,                  &
     VLSoilPoreMicP_vr      => micfor%VLSoilPoreMicP_vr,      &
     VLSoilMicP             => micfor%VLSoilMicP,             &
     ZERO                   => micfor%ZERO,                   &
@@ -2909,7 +2909,7 @@ module MicBGCMod
     OXYG                   => micstt%OXYG,                   &
     OXYS                   => micstt%OXYS,                   &
     COXYS                  => micstt%COXYS,                  &
-    SOXYL                  => micstt%SOXYL,                  &
+    O2GSolubility                  => micstt%O2GSolubility,                  &
     COXYG                  => micstt%COXYG,                  &
     RVMX4                  => micflx%RVMX4,                  &
     RVMB4                  => micflx%RVMB4,                  &
@@ -2925,7 +2925,7 @@ module MicBGCMod
       !
       RUPMX=RO2DmndHeter(NGL,K)*dts_gas
       ROXYFX=ROXYF*dts_gas*FOXYX
-      OLSGL1=OLSGL*dts_gas
+      O2AquaDiffusvity1=O2AquaDiffusvity*dts_gas
       IF(.not.litrm)THEN
         OXYG1=OXYG*FOXYX
         ROXYLX=ROXYL*dts_gas*FOXYX
@@ -2950,7 +2950,7 @@ module MicBGCMod
         !     ORAD=microbial radius,FILM=water film thickness
         !     DIFOX=aqueous O2 diffusion, TortMicPM=tortuosity
         !     BIOS=microbial number, OMA=active biomass
-        !     SOXYL=O2 solubility, OXKX=Km for O2 uptake
+        !     O2GSolubility=O2 solubility, OXKX=Km for O2 uptake
         !     OXYS,COXYS=aqueous O2 amount, concentration
         !     OXYG,COXYG=gaseous O2 amount, concentration
         !     RMPOX,ROXSK=O2 uptake
@@ -2958,15 +2958,15 @@ module MicBGCMod
         !write(*,*)'VLSoilMicP=',VLSoilMicP
         THETW1=AZMAX1(safe_adb(VLWatMicPM(M),VLSoilMicP))
         RRADO=ORAD*(FILM(M)+ORAD)/FILM(M)
-        DIFOX=TortMicPM(M)*OLSGL1*12.57_r8*BIOS*OMActHeter(NGL,K)*RRADO
-        VOLWOX=VLWatMicPM(M)*SOXYL
+        DIFOX=TortMicPM(M)*O2AquaDiffusvity1*12.57_r8*BIOS*OMActHeter(NGL,K)*RRADO
+        VOLWOX=VLWatMicPM(M)*O2GSolubility
         VOLPOX=VLsoiAirPM(M)
         VOLWPM=VOLWOX+VOLPOX
 
         D425: DO MX=1,NPT
           OXYG1=OXYG1+ROXYFX
           OXYS1=OXYS1+ROXYLX
-          COXYS1=AMIN1(COXYE*SOXYL,AZMAX1(safe_adb(OXYS1,(VLWatMicPM(M)*FOXYX))))
+          COXYS1=AMIN1(COXYE*O2GSolubility,AZMAX1(safe_adb(OXYS1,(VLWatMicPM(M)*FOXYX))))
 
           !obtain uptake flux
           if(OXYS1<=ZEROS)then

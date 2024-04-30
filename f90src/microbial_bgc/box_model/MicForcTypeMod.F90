@@ -46,7 +46,7 @@ module MicForcTypeMod
   real(r8) :: VLPOB
   real(r8) :: AEC
   real(r8) :: PSISoilMatricP
-  real(r8) :: OLSGL
+  real(r8) :: O2AquaDiffusvity
   real(r8) :: ORGC
   real(r8) :: RNO2EcoUptkSoilPrev
   real(r8) :: RNO2EcoUptkBandPrev

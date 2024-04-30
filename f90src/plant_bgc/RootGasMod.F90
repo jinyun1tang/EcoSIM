@@ -40,7 +40,7 @@ module RootGasMod
   real(r8) :: DFAGas(idg_beg:idg_end-1),DFGP,RUPOSX
   real(r8) :: trcs_rootml_loc(idg_beg:idg_end-1),trc_solml_loc(idg_beg:idg_end)
   real(r8) :: trc_gasml_loc(idg_beg:idg_end-1)
-  real(r8) :: OLSGLP,RTVLWA
+  real(r8) :: O2AquaDiffusvityP,RTVLWA
   real(r8) :: RTVLWB,ROXYFX,RCO2FX,ROXYLX
   real(r8) :: RDFQSolute(idg_beg:idg_end)
   real(r8) :: RTCR1,RTCR2,RTCRA,RTARRX,RCO2PX,RRADS
@@ -164,7 +164,7 @@ module RootGasMod
       GasDifc_loc(NTG)=GasDifc_vr(NTG,L)*dts_gas*RootPoreTortu4Gas(N,NZ)
       SolDifc_loc(NTG)=SolDifc_vr(NTG,L)*dts_gas*FOXYX
     enddo
-    OLSGLP=SolDifc_vr(idg_O2,L)*dts_gas
+    O2AquaDiffusvityP=SolDifc_vr(idg_O2,L)*dts_gas
 
     RDFQSolute(idg_beg:idg_end)=0.0_r8
     trcg_Root2Soil_flx(idg_beg:idg_end-1)=0.0_r8
@@ -214,7 +214,7 @@ module RootGasMod
     IF(N.EQ.ipltroot.AND.iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).GT.0 &
       .AND.RootLenPerPlant_pvr(N,L,NZ).GT.ZEROP(NZ))THEN
       RTARRX=RootAreaDivRadius_vr(N,L)/RootRaidus_rpft(N,NZ)
-      DIFOP=OLSGLP*RTARRX
+      DIFOP=O2AquaDiffusvityP*RTARRX
       DO NTG=idg_beg,idg_end-1
         DisolvedGasVolume(NTG)=RootVH2O_pvr(N,L,NZ)*GasSolbility_vr(NTG,L)
         DFAGas(NTG)=GasDifc_loc(NTG)*RTCRA

@@ -162,7 +162,7 @@ contains
   micfor%VLPO4 =forc%VLPO4
   micfor%VLPOB =forc%VLPOB
   micfor%PSISoilMatricP =forc%PSISoilMatricP
-  micfor%OLSGL =forc%OLSGL
+  micfor%O2AquaDiffusvity =forc%O2AquaDiffusvity
   micfor%ORGC  =forc%ORGC
   micfor%RNO2EcoUptkSoilPrev =ystates0l(fid_RNO2EcoUptkSoilPrev)
   micfor%RN2OEcoUptkSoilPrev =ystates0l(fid_RN2OEcoUptkSoilPrev)
@@ -258,7 +258,7 @@ contains
   micstt%Z2OS=ystates0l(cid_Z2OS)
   micstt%COXYS=ystates0l(cid_OXYS)/forc%VLWatMicP
   micstt%OXYS =ystates0l(cid_OXYS)
-  micstt%SOXYL=forc%SOXYL
+  micstt%O2GSolubility=forc%O2GSolubility
   micstt%COXYG=ystates0l(cid_COXYG)
   micstt%CZ2GS=ystates0l(cid_CZ2GS)
   micstt%CH2GS=ystates0l(cid_CH2GS)
@@ -618,13 +618,13 @@ contains
         DO NGL=micpar%JGnio(N),micpar%JGnfo(N)
           ystatesfl(fid_RO2EcoDmndPrev)=ystatesfl(fid_RO2EcoDmndPrev)+micflx%RO2DmndHetert(NGL,K)
           ystatesfl(fid_RNH4EcoDmndSoilPrev)=ystatesfl(fid_RNH4EcoDmndSoilPrev)+micflx%RVMX4(NGL,K)+micflx%RNH4DmndSoilHeter(NGL,K)
-          ystatesfl(fid_RNO3EcoDmndSoilPrev)=ystatesfl(fid_RNO3EcoDmndSoilPrev)+micflx%RVMX3(NGL,K)+micflx%RNO3DmndSoilHeter(NGL,K)
+          ystatesfl(fid_RNO3EcoDmndSoilPrev)=ystatesfl(fid_RNO3EcoDmndSoilPrev)+micflx%RNO3ReduxDmndSoilHeter(NGL,K)+micflx%RNO3DmndSoilHeter(NGL,K)
           ystatesfl(fid_RNO2EcoUptkSoilPrev)=ystatesfl(fid_RNO2EcoUptkSoilPrev)+micflx%RNO2DmndReduxSoilHeter(NGL,K)
           ystatesfl(fid_RN2OEcoUptkSoilPrev)=ystatesfl(fid_RN2OEcoUptkSoilPrev)+micflx%RN2ODmndReduxHeter(NGL,K)
           ystatesfl(fid_RH2PO4EcoDmndSoilPrev)=ystatesfl(fid_RH2PO4EcoDmndSoilPrev)+micflx%RH2PO4DmndSoilHeter(NGL,K)
           ystatesfl(fid_RH1PO4EcoDmndSoilPrev)=ystatesfl(fid_RH1PO4EcoDmndSoilPrev)+micflx%RH1PO4DmndSoilHeter(NGL,K)
           ystatesfl(fid_RNH4EcoDmndBandPrev)=ystatesfl(fid_RNH4EcoDmndBandPrev)+micflx%RVMB4(NGL,K)+micflx%RNH4DmndBandHeter(NGL,K)
-          ystatesfl(fid_RNO3EcoDmndBandPrev)=ystatesfl(fid_RNO3EcoDmndBandPrev)+micflx%RVMB3(NGL,K)+micflx%RNO3DmndBandHeter(NGL,K)
+          ystatesfl(fid_RNO3EcoDmndBandPrev)=ystatesfl(fid_RNO3EcoDmndBandPrev)+micflx%RNO3ReduxDmndBandHeter(NGL,K)+micflx%RNO3DmndBandHeter(NGL,K)
           ystatesfl(fid_RNO2EcoUptkBandPrev)=ystatesfl(fid_RNO2EcoUptkBandPrev)+micflx%RNO2DmndReduxBandHeter(NGL,K)
           ystatesfl(fid_RH2PO4EcoDmndBandPrev)=ystatesfl(fid_RH2PO4EcoDmndBandPrev)+micflx%RH2PO4DmndBandHeter(NGL,K)
           ystatesfl(fid_RH1PO4EcoDmndBandPrev)=ystatesfl(fid_RH1PO4EcoDmndBandPrev)+micflx%RH1PO4DmndBandHeter(NGL,K)
@@ -1485,7 +1485,7 @@ contains
       TortMicPM1=forc%TortMicPM*forc%AREA3/(0.5_r8*DLYR1)
       DiffusivitySolutEffCO=forc%CLSGL*TortMicPM1*dts_HeatWatTP
       DiffusivitySolutEffCH=forc%CQSGL*TortMicPM1*dts_HeatWatTP
-      DiffusivitySolutEffOX=forc%OLSGL*TortMicPM1*dts_HeatWatTP
+      DiffusivitySolutEffOX=forc%O2AquaDiffusvity*TortMicPM1*dts_HeatWatTP
       DiffusivitySolutEffNG=forc%ZLSGL*TortMicPM1*dts_HeatWatTP
       DiffusivitySolutEffN2=forc%ZNSGL*TortMicPM1*dts_HeatWatTP
       DiffusivitySolutEffN3=forc%ZVSGL*TortMicPM1*dts_HeatWatTP
@@ -1493,7 +1493,7 @@ contains
 
       CCO2GQ=(PARG*forc%CCO2E*forc%SCO2L+DiffusivitySolutEffCO*CCO2S2)/(DiffusivitySolutEffCO+PARG)
       CCH4GQ=(PARG*forc%CCH4E*forc%SCH4L+DiffusivitySolutEffCH*CCH4S2)/(DiffusivitySolutEffCH+PARG)
-      COXYGQ=(PARG*forc%COXYE*forc%SOXYL+DiffusivitySolutEffOX*COXYS2)/(DiffusivitySolutEffOX+PARG)
+      COXYGQ=(PARG*forc%COXYE*forc%O2GSolubility+DiffusivitySolutEffOX*COXYS2)/(DiffusivitySolutEffOX+PARG)
       CZ2GGQ=(PARG*forc%CZ2GE*forc%SN2GL+DiffusivitySolutEffNG*CZ2GS2)/(DiffusivitySolutEffNG+PARG)
       CZ2OGQ=(PARG*forc%CZ2OE*forc%SN2OL+DiffusivitySolutEffN2*CZ2OS2)/(DiffusivitySolutEffN2+PARG)
       CZN3GQ=(PARG*forc%CNH3E*forc%SNH3L+DiffusivitySolutEffN3*CNH3S2)/(DiffusivitySolutEffN3+PARG)
@@ -1535,7 +1535,7 @@ contains
       VLsoiAirPMB=VLsoiAirP*forc%VLNHB
       VLWatMicPMCO=VLWatMicP*forc%SCO2L
       VLWatMicPMCH=VLWatMicP*forc%SCH4L
-      VLWatMicPMOX=VLWatMicP*forc%SOXYL
+      VLWatMicPMOX=VLWatMicP*forc%O2GSolubility
       VLWatMicPMNG=VLWatMicP*forc%SN2GL
       VLWatMicPMN2=VLWatMicP*forc%SN2OL
       VLWatMicPMN3=VLWatMicPMA*forc%SNH3L

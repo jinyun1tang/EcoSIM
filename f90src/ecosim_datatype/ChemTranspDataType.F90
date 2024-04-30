@@ -18,7 +18,7 @@ module ChemTranspDataType
   real(r8),target,allocatable ::  CGSGL(:,:,:)                       !gaseous CO2 diffusivity	[m2 h-1]
   real(r8),target,allocatable ::  CLSGL(:,:,:)                       !aqueous CO2 diffusivity	[m2 h-1]
   real(r8),target,allocatable ::  OGSGL(:,:,:)                       !gaseous O2 diffusivity	m2 h-1
-  real(r8),target,allocatable ::  OLSGL(:,:,:)                       !aqueous CO2 diffusivity	m2 h-1
+  real(r8),target,allocatable ::  O2AquaDiffusvity(:,:,:)                       !aqueous CO2 diffusivity	m2 h-1
   real(r8),target,allocatable ::  ZGSGL(:,:,:)                       !gaseous N2 diffusivity	m2 h-1
   real(r8),target,allocatable ::  CHSGL(:,:,:)                       !gaseous CH4 diffusivity	m2 h-1
   real(r8),target,allocatable ::  CQSGL(:,:,:)                       !aqueous CH4 diffusivity	m2 h-1
@@ -95,7 +95,7 @@ module ChemTranspDataType
   allocate(CGSGL(JZ,JY,JX));    CGSGL=0._r8
   allocate(CLSGL(0:JZ,JY,JX));  CLSGL=0._r8
   allocate(OGSGL(JZ,JY,JX));    OGSGL=0._r8
-  allocate(OLSGL(0:JZ,JY,JX));  OLSGL=0._r8
+  allocate(O2AquaDiffusvity(0:JZ,JY,JX));  O2AquaDiffusvity=0._r8
   allocate(ZGSGL(JZ,JY,JX));    ZGSGL=0._r8
   allocate(CHSGL(JZ,JY,JX));    CHSGL=0._r8
   allocate(CQSGL(0:JZ,JY,JX));  CQSGL=0._r8
@@ -167,7 +167,7 @@ module ChemTranspDataType
   call destroy(CGSGL)
   call destroy(CLSGL)
   call destroy(OGSGL)
-  call destroy(OLSGL)
+  call destroy(O2AquaDiffusvity)
   call destroy(ZGSGL)
   call destroy(CHSGL)
   call destroy(CQSGL)

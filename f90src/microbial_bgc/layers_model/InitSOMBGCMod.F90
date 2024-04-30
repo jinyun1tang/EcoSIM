@@ -357,7 +357,7 @@ module InitSOMBGCMOD
 
   RO2DmndHetert(:,:,L,NY,NX)=0.0_r8
   RVMX4(:,:,L,NY,NX)=0.0_r8
-  RVMX3(:,:,L,NY,NX)=0.0_r8
+  RNO3ReduxDmndSoilHeter_vr(:,:,L,NY,NX)=0.0_r8
   RNO2DmndReduxSoilHeter_vr(:,:,L,NY,NX)=0.0_r8
   RN2ODmndReduxHeter_vr(:,:,L,NY,NX)=0.0_r8
   RNH4DmndSoilHeter_vr(:,:,L,NY,NX)=0.0_r8
@@ -392,8 +392,6 @@ module InitSOMBGCMOD
 
   RO2DmndAutort(:,L,NY,NX)=0.0_r8
   RNH3OxidAutor(:,L,NY,NX)=0.0_r8
-  RVMX3ff(:,L,NY,NX)=0.0_r8
-  RVMB3ff(:,L,NY,NX)=0.0_r8
   RNO2OxidAutor(:,L,NY,NX)=0.0_r8
   RN2ODmndReduxAutor_vr(:,L,NY,NX)=0.0_r8
   RNH4UptkSoilAutor_vr(:,L,NY,NX)=0.0_r8

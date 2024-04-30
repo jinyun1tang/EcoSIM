@@ -36,7 +36,7 @@ implicit none
   real(r8) :: OXYG
   real(r8) :: OXYS
   real(r8) :: COXYS
-  real(r8) :: SOXYL
+  real(r8) :: O2GSolubility
   real(r8) :: COXYG
   real(r8) :: CH2P4
   real(r8) :: CH2P4B

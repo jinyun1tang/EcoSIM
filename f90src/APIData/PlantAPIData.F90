@@ -1465,7 +1465,7 @@ implicit none
 !  if(allocated(THETPM))deallocate(THETPM)
 !  if(allocated(DiffusivitySolutEff))deallocate(DiffusivitySolutEff)
 !  if(allocated(ZVSGL))deallocate(ZVSGL)
-!  if(allocated(SOXYL))deallocate(SOXYL)
+!  if(allocated(O2GSolubility))deallocate(O2GSolubility)
 
 !  if(allocated(HydroCondMicP4RootUptake))deallocate(HydroCondMicP4RootUptake)
 !  if(allocated(CGSGL))deallocate(CGSGL)
@@ -1487,7 +1487,7 @@ implicit none
 !  if(allocated(HLSGL))deallocate(HLSGL)
 
 !   call destroy(this%trcs_VLN_vr)
-!  if(allocated(OLSGL))deallocate(OLSGL)
+!  if(allocated(O2AquaDiffusvity))deallocate(O2AquaDiffusvity)
 !  if(allocated(POSGL))deallocate(POSGL)
 !  if(allocated(VLSoilMicP))deallocate(VLSoilMicP)
 !  if(allocated(VOLI))deallocate(VOLI)

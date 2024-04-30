@@ -64,7 +64,7 @@ implicit none
   real(r8), allocatable ::  CLSGL2(:,:,:)                      !
   real(r8), allocatable ::  CQSGL2(:,:,:)                      !
   real(r8), allocatable ::  POSGL2(:,:,:)                      !
-  real(r8), allocatable ::  OLSGL2(:,:,:)                      !
+  real(r8), allocatable ::  O2AquaDiffusvity2(:,:,:)                      !
   real(r8), allocatable ::  ZNSGL2(:,:,:)                      !
   real(r8), allocatable ::  ZLSGL2(:,:,:)                      !
   real(r8), allocatable ::  ZVSGL2(:,:,:)                      !
@@ -300,7 +300,7 @@ contains
   allocate(CLSGL2(0:JZ,JY,JX)); CLSGL2=0._r8
   allocate(CQSGL2(0:JZ,JY,JX)); CQSGL2=0._r8
   allocate(POSGL2(0:JZ,JY,JX)); POSGL2=0._r8
-  allocate(OLSGL2(0:JZ,JY,JX)); OLSGL2=0._r8
+  allocate(O2AquaDiffusvity2(0:JZ,JY,JX)); O2AquaDiffusvity2=0._r8
   allocate(ZNSGL2(0:JZ,JY,JX)); ZNSGL2=0._r8
   allocate(ZLSGL2(0:JZ,JY,JX)); ZLSGL2=0._r8
   allocate(ZVSGL2(0:JZ,JY,JX)); ZVSGL2=0._r8
@@ -546,7 +546,7 @@ contains
   call destroy(CLSGL2)
   call destroy(CQSGL2)
   call destroy(POSGL2)
-  call destroy(OLSGL2)
+  call destroy(O2AquaDiffusvity2)
   call destroy(ZNSGL2)
   call destroy(ZLSGL2)
   call destroy(ZVSGL2)

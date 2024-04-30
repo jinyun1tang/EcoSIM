@@ -44,8 +44,8 @@ implicit none
   real(r8), allocatable :: RO2DmndHetert(:,:)
   real(r8), allocatable :: ROQCS(:,:)
   real(r8), allocatable :: ROQAS(:,:)
-  real(r8), allocatable :: RVMX3(:,:)
-  real(r8), allocatable :: RVMB3(:,:)
+  real(r8), allocatable :: RNO3ReduxDmndSoilHeter(:,:)
+  real(r8), allocatable :: RNO3ReduxDmndBandHeter(:,:)
   real(r8), allocatable :: RNO2DmndReduxSoilHeter(:,:)
   real(r8), allocatable :: RNO2DmndReduxBandHeter(:,:)
   real(r8), allocatable :: RN2ODmndReduxHeter(:,:)
@@ -102,8 +102,8 @@ implicit none
   allocate(this%RO2DmndHetert(NumMicrbHetetrophCmplx,1:jcplx));this%RO2DmndHetert=spval
   allocate(this%ROQCS(NumMicrbHetetrophCmplx,1:jcplx));this%ROQCS=spval
   allocate(this%ROQAS(NumMicrbHetetrophCmplx,1:jcplx));this%ROQAS=spval
-  allocate(this%RVMX3(NumMicrbHetetrophCmplx,1:jcplx));this%RVMX3=spval
-  allocate(this%RVMB3(NumMicrbHetetrophCmplx,1:jcplx));this%RVMB3=spval
+  allocate(this%RNO3ReduxDmndSoilHeter(NumMicrbHetetrophCmplx,1:jcplx));this%RNO3ReduxDmndSoilHeter=spval
+  allocate(this%RNO3ReduxDmndBandHeter(NumMicrbHetetrophCmplx,1:jcplx));this%RNO3ReduxDmndBandHeter=spval
   allocate(this%RNO2DmndReduxSoilHeter(NumMicrbHetetrophCmplx,1:jcplx));this%RNO2DmndReduxSoilHeter=spval
   allocate(this%RNO2DmndReduxBandHeter(NumMicrbHetetrophCmplx,1:jcplx));this%RNO2DmndReduxBandHeter=spval
   allocate(this%RN2ODmndReduxHeter(NumMicrbHetetrophCmplx,1:jcplx));this%RN2ODmndReduxHeter=spval
@@ -152,8 +152,8 @@ implicit none
   this%RO2DmndHetert=0._r8
   this%ROQCS=0._r8
   this%ROQAS=0._r8
-  this%RVMX3=0._r8
-  this%RVMB3=0._r8
+  this%RNO3ReduxDmndSoilHeter=0._r8
+  this%RNO3ReduxDmndBandHeter=0._r8
   this%RNO2DmndReduxSoilHeter=0._r8
   this%RNO2DmndReduxBandHeter=0._r8
   this%RN2ODmndReduxHeter=0._r8
@@ -204,8 +204,8 @@ implicit none
   call destroy(this%RO2DmndHetert)
   call destroy(this%ROQCS)
   call destroy(this%ROQAS)
-  call destroy(this%RVMX3)
-  call destroy(this%RVMB3)
+  call destroy(this%RNO3ReduxDmndSoilHeter)
+  call destroy(this%RNO3ReduxDmndBandHeter)
   call destroy(this%RNO2DmndReduxSoilHeter)
   call destroy(this%RNO2DmndReduxBandHeter)
   call destroy(this%RN2ODmndReduxHeter)
