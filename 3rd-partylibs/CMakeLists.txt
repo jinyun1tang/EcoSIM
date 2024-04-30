@@ -370,22 +370,24 @@ if (NOT EXISTS ${NETCDF_LIBRARY})
   message("NETCDF_CPPFLAGS: ${NETCDF_CPPFLAGS}")
   message("NETCDF_LIBFLAGS: ${NETCDF_LIBFLAGS}")
 
-  #execute_process(COMMAND env CC=${CMAKE_C_COMPILER} env FC=${CMAKE_Fortran_COMPILER}
-  #  env CXX=${CMAKE_CXX_COMPILER} env CXXFLAGS=${CMAKE_CXX_FLAGS} env CPPFLAGS=-I${PROJECT_BINARY_DIR}/include
-  #  env CFLAGS=${CMAKE_C_FLAGS} env LDFLAGS=-L${PROJECT_BINARY_DIR}/lib
-  #  ./configure ${NETCDF_C_CONFIG_OPTS}
-  #  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/netcdf-c
-  #  OUTPUT_VARIABLE netcdf_c_config_log ERROR_VARIABLE netcdf_c_config_err
-  #  RESULT_VARIABLE stat)
-
+  #Original version
   execute_process(COMMAND env CC=${CMAKE_C_COMPILER} env FC=${CMAKE_Fortran_COMPILER}
-    env CXX=${CMAKE_CXX_COMPILER} env CXXFLAGS=${CMAKE_CXX_FLAGS} env CPPFLAGS=${NETCDF_CPPFLAGS}
-    env CFLAGS=${CMAKE_C_FLAGS} env LDFLAGS=${NETCDF_LIBFLAGS}
-    env LD_LIBRARY_PATH=${PROJECT_BINARY_DIR}/lib/ env LIBS=${NETCDF_LIBFLAGS} 
+    env CXX=${CMAKE_CXX_COMPILER} env CXXFLAGS=${CMAKE_CXX_FLAGS} env CPPFLAGS=-I${PROJECT_BINARY_DIR}/include
+    env CFLAGS=${CMAKE_C_FLAGS} env LDFLAGS=-L${PROJECT_BINARY_DIR}/lib
     ./configure ${NETCDF_C_CONFIG_OPTS}
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/netcdf-c
     OUTPUT_VARIABLE netcdf_c_config_log ERROR_VARIABLE netcdf_c_config_err
     RESULT_VARIABLE stat)
+
+  #Attempt to change (might have made things worse)
+  #execute_process(COMMAND env CC=${CMAKE_C_COMPILER} env FC=${CMAKE_Fortran_COMPILER}
+  #  env CXX=${CMAKE_CXX_COMPILER} env CXXFLAGS=${CMAKE_CXX_FLAGS} env CPPFLAGS=${NETCDF_CPPFLAGS}
+  #  env CFLAGS=${CMAKE_C_FLAGS} env LDFLAGS=${NETCDF_LIBFLAGS}
+  #  env LD_LIBRARY_PATH=${PROJECT_BINARY_DIR}/lib/ env LIBS=${NETCDF_LIBFLAGS} 
+  #  ./configure ${NETCDF_C_CONFIG_OPTS}
+  #  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/netcdf-c
+  #  OUTPUT_VARIABLE netcdf_c_config_log ERROR_VARIABLE netcdf_c_config_err
+  #  RESULT_VARIABLE stat)
 
   message("In netcdf c build:")
   message("NETCDF_C_CONFIG_OPTS: ${NETCDF_C_CONFIG_OPTS}")
