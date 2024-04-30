@@ -62,7 +62,7 @@ implicit none
   real(r8) ::CH1P4BU
   real(r8) ::CNO3SU
   real(r8) ::CNO3BU
-  real(r8) :: TFNQ
+  real(r8) :: TSens4MicbGrwoth
   real(r8) :: VOLQ
   real(r8),allocatable :: FracBulkSOM(:)
   real(r8),allocatable :: DOM(:,:)

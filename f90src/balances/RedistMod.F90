@@ -1596,7 +1596,7 @@ module RedistMod
   !     RH2PO4DmndSoilHeter_vr,RH2PO4DmndLitrHeter_col=substrate-unlimited H2PO4 immobilization
   !     RH1PO4DmndSoilHeter_vr,RH1PO4DmndLitrHeter_col=substrate-unlimited HPO4 immobilization
   !     ROQCX,ROQAX=total DOC,DOA demand from DOC,DOA oxidation
-  !     ROQCS,ROQAS=DOC,DOA demand from DOC,DOA oxidation
+  !     RDOCUptkHeter_vr,RAcetateUptkHeter_vr=DOC,DOA demand from DOC,DOA oxidation
   !     RNO2EcoUptkSoil_vr=total demand for NO2 reduction
   !     RNO2DmndSoilChemo_vr=demand for NO2 reduction
 !
@@ -1617,8 +1617,8 @@ module RedistMod
           RNO3X(NU(NY,NX),NY,NX)=RNO3X(NU(NY,NX),NY,NX)+RNO3DmndLitrHeter_col(NGL,K,NY,NX)
           RPO4X(NU(NY,NX),NY,NX)=RPO4X(NU(NY,NX),NY,NX)+RH2PO4DmndLitrHeter_col(NGL,K,NY,NX)
           RP14X(NU(NY,NX),NY,NX)=RP14X(NU(NY,NX),NY,NX)+RH1PO4DmndLitrHeter_col(NGL,K,NY,NX)
-          ROQCX(K,0,NY,NX)=ROQCX(K,0,NY,NX)+ROQCS(NGL,K,0,NY,NX)
-          ROQAX(K,0,NY,NX)=ROQAX(K,0,NY,NX)+ROQAS(NGL,K,0,NY,NX)
+          ROQCX(K,0,NY,NX)=ROQCX(K,0,NY,NX)+RDOCUptkHeter_vr(NGL,K,0,NY,NX)
+          ROQAX(K,0,NY,NX)=ROQAX(K,0,NY,NX)+RAcetateUptkHeter_vr(NGL,K,0,NY,NX)
         ENDDO
       ENDDO
     ENDIF
@@ -1672,8 +1672,8 @@ module RedistMod
   RPOBX(L,NY,NX)=RPOBX(L,NY,NX)+SUM(RH2PO4DmndBandHeter_vr(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX))
   RP1BX(L,NY,NX)=RP1BX(L,NY,NX)+SUM(RH1PO4DmndBandHeter_vr(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX))
   DO K=1,jcplx
-    ROQCX(K,L,NY,NX)=ROQCX(K,L,NY,NX)+SUM(ROQCS(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX))
-    ROQAX(K,L,NY,NX)=ROQAX(K,L,NY,NX)+SUM(ROQAS(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX))
+    ROQCX(K,L,NY,NX)=ROQCX(K,L,NY,NX)+SUM(RDOCUptkHeter_vr(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX))
+    ROQAX(K,L,NY,NX)=ROQAX(K,L,NY,NX)+SUM(RAcetateUptkHeter_vr(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX))
   ENDDO
   ROXYX(L,NY,NX)=ROXYX(L,NY,NX)+SUM(RO2DmndAutort(1:NumMicrbHetetrophCmplx,L,NY,NX))
   RNH4X(L,NY,NX)=RNH4X(L,NY,NX)+SUM(RNH3OxidAutor(1:NumMicrbHetetrophCmplx,L,NY,NX)) &

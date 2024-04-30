@@ -359,12 +359,12 @@ implicit none
   NumMicbFunGroups=micpar%NumMicbFunGroups
   jcplx=micpar%jcplx
 
-  trcg_RMicbTransf_vr(idg_CO2,L,NY,NX) =micflx%RCO2O
-  trcg_RMicbTransf_vr(idg_CH4,L,NY,NX) =micflx%RCH4O
-  trcg_RMicbTransf_vr(idg_H2,L,NY,NX) =micflx%RH2GO
+  trcg_RMicbTransf_vr(idg_CO2,L,NY,NX) =micflx%RCO2NetUptkMicb
+  trcg_RMicbTransf_vr(idg_CH4,L,NY,NX) =micflx%RCH4UptkAutor
+  trcg_RMicbTransf_vr(idg_H2,L,NY,NX) =micflx%RH2NetUptkMicb
   trcg_RMicbTransf_vr(idg_O2,L,NY,NX)=micflx%RO2UptkMicb
-  trcg_RMicbTransf_vr(idg_N2,L,NY,NX)  =micflx%RN2G
-  trcg_RMicbTransf_vr(idg_N2O,L,NY,NX)  =micflx%RN2O
+  trcg_RMicbTransf_vr(idg_N2,L,NY,NX)  =micflx%RN2NetUptkMicb
+  trcg_RMicbTransf_vr(idg_N2O,L,NY,NX)  =micflx%RN2ONetUptkMicb
   RNutMicbTransf_vr(ids_NH4,L,NY,NX) =micflx%RNH4MicbTransf_vr
   RNutMicbTransf_vr(ids_NO3,L,NY,NX) =micflx%RNO3MicbTransf_vr
   RNutMicbTransf_vr(ids_NO2,L,NY,NX) =micflx%RNO2MicbTransf_vr
@@ -391,8 +391,8 @@ implicit none
   RNO2OxidAutor(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RNO2OxidAutor(1:NumMicrobAutrophCmplx)
   RNO2OxidAutorBand(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RNO2OxidAutorBand(1:NumMicrobAutrophCmplx)
   RO2DmndHetert(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX)=micflx%RO2DmndHetert(1:NumMicrbHetetrophCmplx,1:jcplx)
-  ROQCS(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX)=micflx%ROQCS(1:NumMicrbHetetrophCmplx,1:jcplx)
-  ROQAS(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX)=micflx%ROQAS(1:NumMicrbHetetrophCmplx,1:jcplx)
+  RDOCUptkHeter_vr(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX)=micflx%RDOCUptkHeter(1:NumMicrbHetetrophCmplx,1:jcplx)
+  RAcetateUptkHeter_vr(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX)=micflx%RAcetateUptkHeter(1:NumMicrbHetetrophCmplx,1:jcplx)
   RNO3ReduxDmndSoilHeter_vr(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX)=micflx%RNO3ReduxDmndSoilHeter(1:NumMicrbHetetrophCmplx,1:jcplx)
   RNO3ReduxDmndBandHeter_vr(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX)=micflx%RNO3ReduxDmndBandHeter(1:NumMicrbHetetrophCmplx,1:jcplx)
   RNO2DmndReduxSoilHeter_vr(1:NumMicrbHetetrophCmplx,1:jcplx,L,NY,NX)=micflx%RNO2DmndReduxSoilHeter(1:NumMicrbHetetrophCmplx,1:jcplx)
@@ -444,7 +444,7 @@ implicit none
   RH1PO4UptkBandAutor_vr(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RH1PO4UptkBandAutor(1:NumMicrobAutrophCmplx)
   RO2UptkSoilM_vr(1:NPH,L,NY,NX)=micflx%ROXSK(1:NPH)
 
-  TFNQ(L,NY,NX)=micstt%TFNQ
+  TSens4MicbGrwoth_vr(L,NY,NX)=micstt%TSens4MicbGrwoth
   VOLQ(L,NY,NX)=micstt%VOLQ
   TOQCK(L,NY,NX)=micstt%TOQCK
   ZNFNI(L,NY,NX)=micstt%ZNFNI

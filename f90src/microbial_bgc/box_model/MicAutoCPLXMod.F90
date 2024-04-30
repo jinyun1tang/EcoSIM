@@ -25,7 +25,7 @@ module MicAutoCPLXMod
 
 !------------------------------------------------------------------------------------------
   subroutine ActiveMicrobAutotrophs(NGL,N,VOLWZ,XCO2,TSensGrowth,WatStressMicb,&
-    TOMCNK,OXKX,TotActMicrobiom,TotBiomNO2Consumers,RH2GZ,&
+    TOMCNK,OXKX,TotActMicrobiom,TotBiomNO2Consumers,RH2UptkAutor,&
     ZNH4T,ZNO3T,ZNO2T,H2P4T,H1P4T,micfor,micstt,micflx,naqfdiag,nmicf,nmics,ncplxf,ncplxs)
   implicit none
   integer, intent(in) :: NGL,N
@@ -36,7 +36,7 @@ module MicAutoCPLXMod
   type(micforctype), intent(in) :: micfor
   type(micsttype), intent(inout) :: micstt
   type(micfluxtype), intent(inout) :: micflx
-  real(r8), intent(out):: RH2GZ
+  real(r8), intent(out):: RH2UptkAutor
   type(NitroAQMFluxDiagType), INTENT(INOUT) :: naqfdiag
   type(NitroMicStateType), intent(inout) :: nmics
   type(NitroMicFluxType), intent(inout) :: nmicf
@@ -199,7 +199,7 @@ module MicAutoCPLXMod
     RCO2ProdAutor(NGL)=0.0_r8
     RCH4ProdAutor(NGL)=RespGrossAutor(NGL)
     RO2Uptk4RespAutor(NGL)=RO2Dmnd4RespAutor(NGL)
-    RH2GZ=0.667_r8*RespGrossAutor(NGL)
+    RH2UptkAutor=0.667_r8*RespGrossAutor(NGL)
   ENDIF
 !
 !     AUTOTROPHIC DENITRIFICATION

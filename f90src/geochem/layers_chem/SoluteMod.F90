@@ -184,7 +184,7 @@ module SoluteMod
 !     DFNSA=effect of microbial concentration on urea hydrolysis in non-band
 !     RSNUA=rate of urea hydrolysis in non-band
 !     SPNHU=specific rate constant for urea hydrolysis
-!     TFNQ=temperature effect on microbial activity from nitro.f
+!     TSens4MicbGrwoth_vr=temperature effect on microbial activity from nitro.f
 !     ZNHUI=current inhibition activity
 !
   IF(FertN_soil_vr(ifert_urea,L,NY,NX).GT.ZEROS(NY,NX).AND.SoilMicPMassLayer(L,NY,NX).GT.ZEROS(NY,NX))THEN
@@ -195,7 +195,7 @@ module SoluteMod
     CNHUA=0._r8
   ENDIF
   DFNSA=CNHUA/(CNHUA+DUKD)
-  RSNUA=AMIN1(FertN_soil_vr(ifert_urea,L,NY,NX),SPNHU*TOQCK(L,NY,NX)*DFNSA*TFNQ(L,NY,NX))*(1.0-ZNHUI(L,NY,NX))
+  RSNUA=AMIN1(FertN_soil_vr(ifert_urea,L,NY,NX),SPNHU*TOQCK(L,NY,NX)*DFNSA*TSens4MicbGrwoth_vr(L,NY,NX))*(1.0-ZNHUI(L,NY,NX))
 !
 !     UREA CONCENTRATION AND HYDROLYSIS IN BAND
 !
@@ -204,7 +204,7 @@ module SoluteMod
 !     DFNSB=effect of microbial concentration on urea hydrolysis in band
 !     RSNUB=rate of urea hydrolysis in non-band
 !     SPNHU=specific rate constant for urea hydrolysis
-!     TFNQ=temperature effect on microbial activity from nitro.f
+!     TSens4MicbGrwoth_vr=temperature effect on microbial activity from nitro.f
 !
   IF(FertN_Band_vr(ifert_urea_band,L,NY,NX).GT.ZEROS(NY,NX).AND.SoilMicPMassLayer(L,NY,NX).GT.ZEROS(NY,NX))THEN
     CNHUB=FertN_Band_vr(ifert_urea_band,L,NY,NX)/SoilMicPMassLayer(L,NY,NX)
@@ -214,7 +214,7 @@ module SoluteMod
     CNHUB=0._r8
   ENDIF
   DFNSB=CNHUB/(CNHUB+DUKD)
-  RSNUB=AMIN1(FertN_Band_vr(ifert_urea_band,L,NY,NX),SPNHU*TOQCK(L,NY,NX)*DFNSB*TFNQ(L,NY,NX))*(1.0-ZNHUI(L,NY,NX))
+  RSNUB=AMIN1(FertN_Band_vr(ifert_urea_band,L,NY,NX),SPNHU*TOQCK(L,NY,NX)*DFNSB*TSens4MicbGrwoth_vr(L,NY,NX))*(1.0-ZNHUI(L,NY,NX))
 
   end subroutine UreaHydrolysis
 !------------------------------------------------------------------------
@@ -942,7 +942,7 @@ module SoluteMod
 !     RNHUI=rate constant for decline in urea hydrolysis inhibition
 !
     IF(ZNHU0(0,NY,NX).GT.ZEROS(NY,NX).AND.ZNHUI(0,NY,NX).GT.ZEROS(NY,NX))THEN
-      ZNHUI(0,NY,NX)=ZNHUI(0,NY,NX)-TFNQ(0,NY,NX)**0.25_r8 &
+      ZNHUI(0,NY,NX)=ZNHUI(0,NY,NX)-TSens4MicbGrwoth_vr(0,NY,NX)**0.25_r8 &
         *RNHUI(IUTYP(NY,NX))*ZNHUI(0,NY,NX) &
         *AMAX1(RNHUI(IUTYP(NY,NX)),1.0_r8-ZNHUI(0,NY,NX)/ZNHU0(0,NY,NX))
     ELSE
@@ -956,13 +956,13 @@ module SoluteMod
 !     DFNSA=effect of microbial concentration on urea hydrolysis
 !     RSNUA=rate of urea hydrolysis
 !     SPNHU=specific rate constant for urea hydrolysis
-!     TFNQ=temperature effect on microbial activity from nitro.f
+!     TSens4MicbGrwoth_vr=temperature effect on microbial activity from nitro.f
 !
     IF(FertN_soil_vr(ifert_urea,0,NY,NX).GT.ZEROS(NY,NX) &
       .AND.SoilMicPMassLayer(0,NY,NX).GT.ZEROS(NY,NX))THEN
       CNHUA=FertN_soil_vr(ifert_urea,0,NY,NX)/SoilMicPMassLayer(0,NY,NX)
       DFNSA=CNHUA/(CNHUA+DUKD)
-      RSNUA=AMIN1(FertN_soil_vr(ifert_urea,0,NY,NX),SPNHU*TOQCK(0,NY,NX)*DFNSA*TFNQ(0,NY,NX))*(1.0_r8-ZNHUI(0,NY,NX))
+      RSNUA=AMIN1(FertN_soil_vr(ifert_urea,0,NY,NX),SPNHU*TOQCK(0,NY,NX)*DFNSA*TSens4MicbGrwoth_vr(0,NY,NX))*(1.0_r8-ZNHUI(0,NY,NX))
     ELSE
       RSNUA=0._r8
     ENDIF

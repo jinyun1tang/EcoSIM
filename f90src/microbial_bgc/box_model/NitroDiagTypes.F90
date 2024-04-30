@@ -246,7 +246,7 @@ type, public :: NitroAQMFluxDiagType
   type, public :: NitroMicDiagType
   real(r8) :: H1P4T
   real(r8) :: H2P4T
-  real(r8) :: RH2GZ
+  real(r8) :: RH2UptkAutor
   real(r8) :: RNO2ReduxSoilChemo
   real(r8) :: RNO2ReduxBandChemo
   real(r8) :: RN2OProdSoilChemo

@@ -14,12 +14,12 @@ implicit none
   
   type, public :: micfluxtype
 
-  real(r8) :: RCO2O
-  real(r8) :: RCH4O
-  real(r8) :: RH2GO
+  real(r8) :: RCO2NetUptkMicb
+  real(r8) :: RCH4UptkAutor
+  real(r8) :: RH2NetUptkMicb
   real(r8) :: RO2UptkMicb
-  real(r8) :: RN2G
-  real(r8) :: RN2O
+  real(r8) :: RN2NetUptkMicb
+  real(r8) :: RN2ONetUptkMicb
   real(r8) :: RNH4MicbTransf_vr
   real(r8) :: RNO3MicbTransf_vr
   real(r8) :: RNO2MicbTransf_vr
@@ -42,8 +42,8 @@ implicit none
   real(r8), allocatable :: RNO2OxidAutor(:)
   real(r8), allocatable :: RNO2OxidAutorBand(:)
   real(r8), allocatable :: RO2DmndHetert(:,:)
-  real(r8), allocatable :: ROQCS(:,:)
-  real(r8), allocatable :: ROQAS(:,:)
+  real(r8), allocatable :: RDOCUptkHeter(:,:)
+  real(r8), allocatable :: RAcetateUptkHeter(:,:)
   real(r8), allocatable :: RNO3ReduxDmndSoilHeter(:,:)
   real(r8), allocatable :: RNO3ReduxDmndBandHeter(:,:)
   real(r8), allocatable :: RNO2DmndReduxSoilHeter(:,:)
@@ -100,8 +100,8 @@ implicit none
   allocate(this%ROXSK(NPH));this%ROXSK = spval
   allocate(this%RDOM_micb_flx(idom_beg:idom_end,1:jcplx));this%RDOM_micb_flx=spval
   allocate(this%RO2DmndHetert(NumMicrbHetetrophCmplx,1:jcplx));this%RO2DmndHetert=spval
-  allocate(this%ROQCS(NumMicrbHetetrophCmplx,1:jcplx));this%ROQCS=spval
-  allocate(this%ROQAS(NumMicrbHetetrophCmplx,1:jcplx));this%ROQAS=spval
+  allocate(this%RDOCUptkHeter(NumMicrbHetetrophCmplx,1:jcplx));this%RDOCUptkHeter=spval
+  allocate(this%RAcetateUptkHeter(NumMicrbHetetrophCmplx,1:jcplx));this%RAcetateUptkHeter=spval
   allocate(this%RNO3ReduxDmndSoilHeter(NumMicrbHetetrophCmplx,1:jcplx));this%RNO3ReduxDmndSoilHeter=spval
   allocate(this%RNO3ReduxDmndBandHeter(NumMicrbHetetrophCmplx,1:jcplx));this%RNO3ReduxDmndBandHeter=spval
   allocate(this%RNO2DmndReduxSoilHeter(NumMicrbHetetrophCmplx,1:jcplx));this%RNO2DmndReduxSoilHeter=spval
@@ -150,8 +150,8 @@ implicit none
   this%ROXSK = 0._r8
   this%RDOM_micb_flx=0._r8
   this%RO2DmndHetert=0._r8
-  this%ROQCS=0._r8
-  this%ROQAS=0._r8
+  this%RDOCUptkHeter=0._r8
+  this%RAcetateUptkHeter=0._r8
   this%RNO3ReduxDmndSoilHeter=0._r8
   this%RNO3ReduxDmndBandHeter=0._r8
   this%RNO2DmndReduxSoilHeter=0._r8
@@ -202,8 +202,8 @@ implicit none
   call destroy(this%RNO2OxidAutor)
   call destroy(this%RNO2OxidAutorBand)
   call destroy(this%RO2DmndHetert)
-  call destroy(this%ROQCS)
-  call destroy(this%ROQAS)
+  call destroy(this%RDOCUptkHeter)
+  call destroy(this%RAcetateUptkHeter)
   call destroy(this%RNO3ReduxDmndSoilHeter)
   call destroy(this%RNO3ReduxDmndBandHeter)
   call destroy(this%RNO2DmndReduxSoilHeter)

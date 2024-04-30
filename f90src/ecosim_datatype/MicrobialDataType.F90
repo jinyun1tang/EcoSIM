@@ -11,8 +11,8 @@ implicit none
 
   real(r8),target,allocatable :: OMEheter(:,:,:,:,:,:)    !microbial biomass element	[g d-2]
   real(r8),target,allocatable :: RO2DmndHetert(:,:,:,:,:)    !aqueous O2 demand	[g d-2 h-1]
-  real(r8),target,allocatable :: ROQCS(:,:,:,:,:)    !net microbial DOC flux	[g d-2 h-1]
-  real(r8),target,allocatable :: ROQAS(:,:,:,:,:)    !net microbial acetate flux	[g d-2 h-1]
+  real(r8),target,allocatable :: RDOCUptkHeter_vr(:,:,:,:,:)    !net microbial DOC flux	[g d-2 h-1]
+  real(r8),target,allocatable :: RAcetateUptkHeter_vr(:,:,:,:,:)    !net microbial acetate flux	[g d-2 h-1]
   real(r8),target,allocatable :: RNH4DmndSoilHeter_vr(:,:,:,:,:)    !microbial NH4 demand in soil	[g d-2 h-1]
   real(r8),target,allocatable :: RNO3DmndSoilHeter_vr(:,:,:,:,:)    !microbial NO3 demand in soil	[g d-2 h-1]
   real(r8),target,allocatable :: RH2PO4DmndSoilHeter_vr(:,:,:,:,:)    !microbial PO4 demand in soil	[g d-2 h-1]
@@ -72,8 +72,8 @@ implicit none
   implicit none
   allocate(OMEheter(NumPlantChemElms,NumLiveHeterBioms,1:jcplx,0:JZ,JY,JX))
   allocate(RO2DmndHetert(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(ROQCS(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(ROQAS(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
+  allocate(RDOCUptkHeter_vr(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
+  allocate(RAcetateUptkHeter_vr(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
   allocate(RNH4DmndSoilHeter_vr(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
   allocate(RNO3DmndSoilHeter_vr(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
   allocate(RH2PO4DmndSoilHeter_vr(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
@@ -123,8 +123,8 @@ implicit none
 
   if(allocated(OMEheter))deallocate(OMEheter)
   if(allocated(RO2DmndHetert))deallocate(RO2DmndHetert)
-  if(allocated(ROQCS))deallocate(ROQCS)
-  if(allocated(ROQAS))deallocate(ROQAS)
+  if(allocated(RDOCUptkHeter_vr))deallocate(RDOCUptkHeter_vr)
+  if(allocated(RAcetateUptkHeter_vr))deallocate(RAcetateUptkHeter_vr)
   if(allocated(RNH4DmndSoilHeter_vr))deallocate(RNH4DmndSoilHeter_vr)
   if(allocated(RNO3DmndSoilHeter_vr))deallocate(RNO3DmndSoilHeter_vr)
   if(allocated(RH2PO4DmndSoilHeter_vr))deallocate(RH2PO4DmndSoilHeter_vr)

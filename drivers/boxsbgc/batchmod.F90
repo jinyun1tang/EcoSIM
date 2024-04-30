@@ -551,12 +551,12 @@ contains
   ystatesfl(cid_ZNO2B)=ystates0l(cid_ZNO2B)+micflx%XNO2B
   ystatesfl(cid_ZNO2S)=ystates0l(cid_ZNO2S)+micflx%RNO2MicbTransf_vr
 
-  ystatesfl(cid_CO2S) =ystates0l(cid_CO2S)-micflx%RCO2O
-  ystatesfl(cid_Z2OS) =ystates0l(cid_Z2OS)-micflx%RN2O
+  ystatesfl(cid_CO2S) =ystates0l(cid_CO2S)-micflx%RCO2NetUptkMicb
+  ystatesfl(cid_Z2OS) =ystates0l(cid_Z2OS)-micflx%RN2ONetUptkMicb
   ystatesfl(cid_OXYS) =ystates0l(cid_OXYS)-micflx%RO2UptkMicb
-  ystatesfl(cid_H2GS) =ystates0l(cid_H2GS)-micflx%RH2GO
-  ystatesfl(cid_CH4S) =ystates0l(cid_CH4S)-micflx%RCH4O
-  ystatesfl(cid_Z2GS) =ystates0l(cid_Z2GS)-micflx%RN2G-micflx%XN2GS
+  ystatesfl(cid_H2GS) =ystates0l(cid_H2GS)-micflx%RH2NetUptkMicb
+  ystatesfl(cid_CH4S) =ystates0l(cid_CH4S)-micflx%RCH4UptkAutor
+  ystatesfl(cid_Z2GS) =ystates0l(cid_Z2GS)-micflx%RN2NetUptkMicb-micflx%XN2GS
   ystatesfl(cid_ZNFN0)=micstt%ZNFN0
   ystatesfl(cid_ZNFNI)=micstt%ZNFNI
 
@@ -628,8 +628,8 @@ contains
           ystatesfl(fid_RNO2EcoUptkBandPrev)=ystatesfl(fid_RNO2EcoUptkBandPrev)+micflx%RNO2DmndReduxBandHeter(NGL,K)
           ystatesfl(fid_RH2PO4EcoDmndBandPrev)=ystatesfl(fid_RH2PO4EcoDmndBandPrev)+micflx%RH2PO4DmndBandHeter(NGL,K)
           ystatesfl(fid_RH1PO4EcoDmndBandPrev)=ystatesfl(fid_RH1PO4EcoDmndBandPrev)+micflx%RH1PO4DmndBandHeter(NGL,K)
-          ystatesfl(fid_RDOMEcoDmndPrev_b+K)=ystatesfl(fid_RDOMEcoDmndPrev_b+K)+micflx%ROQCS(NGL,K)
-          ystatesfl(fid_RAcetateEcoDmndPrev_b+K)=ystatesfl(fid_RAcetateEcoDmndPrev_b+K)+micflx%ROQAS(NGL,K)
+          ystatesfl(fid_RDOMEcoDmndPrev_b+K)=ystatesfl(fid_RDOMEcoDmndPrev_b+K)+micflx%RDOCUptkHeter(NGL,K)
+          ystatesfl(fid_RAcetateEcoDmndPrev_b+K)=ystatesfl(fid_RAcetateEcoDmndPrev_b+K)+micflx%RAcetateUptkHeter(NGL,K)
         enddo
       ENDDO
     ENDIF
