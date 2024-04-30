@@ -153,8 +153,8 @@ contains
   micfor%THETW =forc%THETW
   micfor%PH    =forc%PH
   micfor%SoilMicPMassLayer  =forc%SoilMicPMassLayer
-  micfor%VLSoilPoreMicP_vr  =forc%VLSoilPoreMicP_vr
-  micfor%TFND  =forc%TFND
+  micfor%VLSoilPoreMicP  =forc%VLSoilPoreMicP
+  micfor%TScal4Difsvity  =forc%TScal4Difsvity
   micfor%VLNOB =forc%VLNOB
   micfor%VLNO3 =forc%VLNO3
   micfor%VLNH4 =forc%VLNH4

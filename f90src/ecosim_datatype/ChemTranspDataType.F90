@@ -9,7 +9,7 @@ module ChemTranspDataType
   save
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
-  real(r8),target,allocatable ::  TFND(:,:,:)                        !temperature effect on diffusivity
+  real(r8),target,allocatable ::  TScal4Difsvity_vr(:,:,:)                        !temperature effect on diffusivity
   real(r8),target,allocatable ::  DISP(:,:,:,:)                      !aqueous dispersivity
 
   real(r8),target,allocatable ::  Gas_Disol_Flx_vr(:,:,:,:)                 !Gas dissolution flux
@@ -87,7 +87,7 @@ module ChemTranspDataType
 
   subroutine InitAllocate
   implicit none
-  allocate(TFND(0:JZ,JY,JX));   TFND=0._r8
+  allocate(TScal4Difsvity_vr(0:JZ,JY,JX));   TScal4Difsvity_vr=0._r8
   allocate(DISP(3,JD,JV,JH));   DISP=0._r8
 
   allocate(GasDifc_vr(idg_beg:idg_end,JZ,JY,JX));GasDifc_vr=0._r8
@@ -162,7 +162,7 @@ module ChemTranspDataType
   call destroy(trc_salt_rof_bounds)
   call destroy(GasDifc_vr)
   call destroy(SolDifc_vr)
-  call destroy(TFND)
+  call destroy(TScal4Difsvity_vr)
   call destroy(DISP)
   call destroy(CGSGL)
   call destroy(CLSGL)

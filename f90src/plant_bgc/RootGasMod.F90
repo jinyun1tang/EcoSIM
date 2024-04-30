@@ -87,7 +87,7 @@ module RootGasMod
     RootCO2Autor_pvr                  =>  plt_rbgc%RootCO2Autor_pvr                , &
     trcg_rootml_pvr            =>  plt_rbgc%trcg_rootml_pvr          , &
     trcs_rootml_pvr            =>  plt_rbgc%trcs_rootml_pvr          , &
-    TFND                       =>  plt_soilchem%TFND                 , &
+    TScal4Difsvity_vr                       =>  plt_soilchem%TScal4Difsvity_vr                 , &
     trcs_VLN_vr                =>  plt_soilchem%trcs_VLN_vr          , &
     trc_solml_vr               =>  plt_soilchem%trc_solml_vr         , &
     trc_gascl_vr               =>  plt_soilchem%trc_gascl_vr         , &
@@ -226,7 +226,7 @@ module RootGasMod
       DFAGas(idg_beg:idg_end-1)=0.0_r8
     ENDIF
 
-    DFGP=AMIN1(1.0,XNPD*SQRT(RootPorosity_pft(N,NZ))*TFND(L))
+    DFGP=AMIN1(1.0,XNPD*SQRT(RootPorosity_pft(N,NZ))*TScal4Difsvity_vr(L))
     RCO2PX=-RootCO2Autor_pvr(N,L,NZ)*dts_gas
 !
 !     SOLVE FOR GAS EXCHANGE IN SOIL AND ROOTS DURING ROOT UPTAKE

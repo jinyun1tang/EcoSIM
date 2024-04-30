@@ -1390,7 +1390,7 @@ module WatsubMod
   implicit none
   integer, intent(in) :: NY,NX,M
   integer :: L
-  real(r8) :: THETWT,TFND1,THETWA
+  real(r8) :: THETWT,TScal4Aquadifsvity,THETWA
   real(r8) :: VLSoiPorAV,VLWatSoi,scalar
   real(r8) :: THETWH,Z3S
 
@@ -1408,7 +1408,7 @@ module WatsubMod
 !   VOLA1,VLiceMicP1,VLWatMicP1=total,ice-,water-filled microporosity
 !   VLMacP1,VLiceMacP1,VLWatMacP1=total,ice-,water-filled macroporosity
 !   VLsoiAirPM=air-filled porosity
-!   TFND1=temperature effect on gas diffusivity
+!   TScal4Aquadifsvity=temperature effect on gas diffusivity
 !   DiffusivitySolutEff=rate constant for air-water gas exchange
 !   Z1S,Z2SW,Z2SD,Z3SX=parameters for soil air-water gas transfers
 !   XNPD=time step for gas transfer calculations
@@ -1418,9 +1418,9 @@ module WatsubMod
     VLSoiPorAV=VLMicP1(L,NY,NX)+VLMacP1(L,NY,NX)-VLiceMicP1(L,NY,NX)-VLiceMacP1(L,NY,NX)
     IF(VLSoiPorAV.GT.ZEROS2(NY,NX).AND.VLsoiAirPM(M,L,NY,NX).GT.ZEROS2(NY,NX))THEN
       THETWA=AZMAX1(AMIN1(1.0_r8,VLWatSoi/VLSoiPorAV))
-      TFND1=TEFAQUDIF(TKSoi1(0,NY,NX))
+      TScal4Aquadifsvity=TEFAQUDIF(TKSoi1(0,NY,NX))
       Z3S=FieldCapacity(L,NY,NX)/POROS(L,NY,NX)
-      scalar=TFND1*XNPD
+      scalar=TScal4Aquadifsvity*XNPD
       DiffusivitySolutEff(M,L,NY,NX)=fDiffusivitySolutEff(scalar,THETWA,Z3S)
     ELSE
       DiffusivitySolutEff(M,L,NY,NX)=0.0_r8

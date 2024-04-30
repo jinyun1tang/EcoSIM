@@ -62,7 +62,7 @@ type, public :: NitroAQMFluxDiagType
   real(r8),allocatable :: OMActHeter(:,:)
 
   real(r8),allocatable :: OMC2(:,:)
-  real(r8),allocatable :: TFNG(:,:)
+  real(r8),allocatable :: GrowthEnvScalHeter(:,:)
   real(r8),allocatable :: TFNR(:,:)
   real(r8),allocatable :: OMN2(:,:)
   real(r8),allocatable :: FOM2(:,:)
@@ -82,8 +82,8 @@ type, public :: NitroAQMFluxDiagType
   real(r8),allocatable :: FracNO2ReduxAutor(:)
   real(r8),allocatable :: FracAutorBiomOfActK(:)
   real(r8),allocatable :: OMC2ff(:)
-  real(r8),allocatable :: TFNGff(:)
-  real(r8),allocatable :: TFNRff(:)
+  real(r8),allocatable :: GrowthEnvScalAutor(:)
+  real(r8),allocatable :: TSensMaintRAutor(:)
   real(r8),allocatable :: OMN2ff(:)
   real(r8),allocatable :: FOM2ff(:)
   real(r8),allocatable :: fLimO2Autor(:)
@@ -449,7 +449,7 @@ type, public :: NitroAQMFluxDiagType
   allocate(this%FracNO2ReduxHeter(NumMicrbHetetrophCmplx,1:jcplx));this%FracNO2ReduxHeter=spval
   allocate(this%FracHeterBiomOfActK(NumMicrbHetetrophCmplx,1:jcplx));this%FracHeterBiomOfActK=spval
   allocate(this%OMC2(NumMicrbHetetrophCmplx,1:jcplx));this%OMC2=spval
-  allocate(this%TFNG(NumMicrbHetetrophCmplx,1:jcplx));this%TFNG=spval
+  allocate(this%GrowthEnvScalHeter(NumMicrbHetetrophCmplx,1:jcplx));this%GrowthEnvScalHeter=spval
   allocate(this%TFNR(NumMicrbHetetrophCmplx,1:jcplx));this%TFNR=spval
   allocate(this%OMN2(NumMicrbHetetrophCmplx,1:jcplx));this%OMN2=spval
   allocate(this%FOM2(NumMicrbHetetrophCmplx,1:jcplx));this%FOM2=spval
@@ -465,8 +465,8 @@ type, public :: NitroAQMFluxDiagType
   allocate(this%FracNO2ReduxAutor(NumMicrobAutrophCmplx));this%FracNO2ReduxAutor=spval
   allocate(this%FracAutorBiomOfActK(NumMicrobAutrophCmplx));this%FracAutorBiomOfActK=spval
   allocate(this%OMC2ff(NumMicrobAutrophCmplx));this%OMC2ff=spval
-  allocate(this%TFNGff(NumMicrobAutrophCmplx));this%TFNGff=spval
-  allocate(this%TFNRff(NumMicrobAutrophCmplx));this%TFNRff=spval
+  allocate(this%GrowthEnvScalAutor(NumMicrobAutrophCmplx));this%GrowthEnvScalAutor=spval
+  allocate(this%TSensMaintRAutor(NumMicrobAutrophCmplx));this%TSensMaintRAutor=spval
   allocate(this%OMN2ff(NumMicrobAutrophCmplx));this%OMN2ff=spval
   allocate(this%FOM2ff(NumMicrobAutrophCmplx));this%FOM2ff=spval
   allocate(this%fLimO2Autor(NumMicrobAutrophCmplx));this%fLimO2Autor=spval
@@ -702,7 +702,7 @@ type, public :: NitroAQMFluxDiagType
   call destroy(this%FracNO2ReduxHeter)
   call destroy(this%FracHeterBiomOfActK)
   call destroy(this%OMC2)
-  call destroy(this%TFNG)
+  call destroy(this%GrowthEnvScalHeter)
   call destroy(this%TFNR)
   call destroy(this%OMN2)
   call destroy(this%FOM2)
@@ -718,8 +718,8 @@ type, public :: NitroAQMFluxDiagType
   call destroy(this%FracNO2ReduxAutor)
   call destroy(this%FracAutorBiomOfActK)
   call destroy(this%OMC2ff)
-  call destroy(this%TFNGff)
-  call destroy(this%TFNRff)
+  call destroy(this%GrowthEnvScalAutor)
+  call destroy(this%TSensMaintRAutor)
   call destroy(this%OMN2ff)
   call destroy(this%FOM2ff)
   call destroy(this%fLimO2Autor)

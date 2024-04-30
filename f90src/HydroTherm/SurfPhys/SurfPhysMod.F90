@@ -1188,7 +1188,7 @@ contains
   integer :: L  
   real(r8) :: scalar,THETWT,HFLQR1,FLQRS
   real(r8) :: FLQRH,VOLAT0,ENGYD
-  real(r8) :: ENGYB,RAS,TFND1,THETWA
+  real(r8) :: ENGYB,RAS,TScal4Aquadifsvity,THETWA
   real(r8) :: HV
 
 ! begin_execution
@@ -1249,7 +1249,7 @@ contains
 ! WATER GAS EXCHANGE COEFFICIENTS IN SURFACE LITTER
 !
 ! VOLA1,VLiceMicP1,VLWatMicP1,VsoiPM=total,ice-,water-,air-filled porosity
-! TFND1=temperature effect on gas diffusivity
+! TScal4Aquadifsvity=temperature effect on gas diffusivity
 ! DiffusivitySolutEff=rate constant for air-water gas exchange
 ! Z1R,Z2RW,Z2RD,Z3RX=parameters for litter air-water gas transfers
 ! XNPD=time step for gas transfer calculations, it is tunable parameter
@@ -1260,8 +1260,8 @@ contains
   IF(VOLAT0.GT.ZEROS2(NY,NX).AND.VLsoiAirPM(M,0,NY,NX).GT.ZEROS2(NY,NX))THEN
     !litter layer is not saturated
     THETWA=AZMAX1(AMIN1(1.0_r8,VLWatMicP1(0,NY,NX)/VOLAT0))
-    TFND1=TEFAQUDIF(TKSoi1(0,NY,NX))
-    scalar=TFND1*XNPD
+    TScal4Aquadifsvity=TEFAQUDIF(TKSoi1(0,NY,NX))
+    scalar=TScal4Aquadifsvity*XNPD
     DiffusivitySolutEff(M,0,NY,NX)=fDiffusivitySolutEff(scalar,THETWA,0.0_r8,is_litter=.true.)
   ELSE
     !litter layer saturated

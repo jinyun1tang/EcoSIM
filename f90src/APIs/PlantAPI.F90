@@ -727,7 +727,7 @@ implicit none
 
     plt_soilchem%THETW(L) =THETW(L,NY,NX)
     plt_soilchem%THETY(L) =THETY(L,NY,NX)
-    plt_soilchem%TFND(L)  =TFND(L,NY,NX)
+    plt_soilchem%TScal4Difsvity_vr(L)  =TScal4Difsvity_vr(L,NY,NX)
     plt_soilchem%VLSoilPoreMicP_vr(L)  =VLSoilPoreMicP_vr(L,NY,NX)
     plt_soilchem%trcs_VLN_vr(ids_H1PO4B,L) =trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
     plt_soilchem%trcs_VLN_vr(ids_NO3,L) =trcs_VLN_vr(ids_NO3,L,NY,NX)

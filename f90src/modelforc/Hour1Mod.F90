@@ -1145,7 +1145,7 @@ module Hour1Mod
 !     *SG PARAMETER statement above
 !
   TFACL=TEFAQUDIF(TKS(0,NY,NX))
-  TFND(0,NY,NX)=TFACL
+  TScal4Difsvity_vr(0,NY,NX)=TFACL
 
   SolDifc_vr(idg_CO2,0,NY,NX)=CLSG*TFACL
   SolDifc_vr(idg_CH4,0,NY,NX)=CQSG*TFACL
@@ -1361,7 +1361,7 @@ module Hour1Mod
 !
     TFACG=TEFGASDIF(TKS(L,NY,NX))
     TFACL=TEFAQUDIF(TKS(L,NY,NX))
-    TFND(L,NY,NX)=TFACL
+    TScal4Difsvity_vr(L,NY,NX)=TFACL
 
     GasDifc_vr(idg_CO2,L,NY,NX)=CGSG*TFACG
     GasDifc_vr(idg_CH4,L,NY,NX)=CHSG*TFACG

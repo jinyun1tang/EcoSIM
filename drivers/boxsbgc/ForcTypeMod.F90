@@ -47,7 +47,7 @@ implicit none
     real(r8) :: EHUM        !partitioning coefficient between humus and microbial residue, [], hour1.f
     real(r8) :: pH          !pH value
     real(r8) :: SoilMicPMassLayer        !mass of soil layer	Mg d-2
-    real(r8) :: VLSoilPoreMicP_vr        !volume of soil layer	m3 d-2
+    real(r8) :: VLSoilPoreMicP        !volume of soil layer	m3 d-2
     real(r8) :: ZNH4S       !NH4 non-band micropore, [g d-2]
     real(r8) :: ZNO3S       !NO3 band micropore, [g d-2]
     real(r8) :: H2PO4       !PO4 non-band micropore, [g d-2]
@@ -184,7 +184,7 @@ implicit none
     real(r8) :: ZNFN0     !initial nitrification inhibition activity
     real(r8) :: ZNFNI     !current nitrification inhibition activity
 
-    real(r8) :: TFND      !temperature effect on aqueous diffusivity
+    real(r8) :: TScal4Difsvity      !temperature effect on aqueous diffusivity
     real(r8) :: ATKA      !mean annual air temperature [K]
  !litter layer
     real(r8) :: VLitR      !surface litter volume, [m3 d-2]
@@ -254,7 +254,7 @@ implicit none
   call ncd_getvar(ncf,'CNOSC',forc%CNOSC)
   call ncd_getvar(ncf,'CPOSC',forc%CPOSC)
   call ncd_getvar(ncf,'pH',forc%PH)
-  call ncd_getvar(ncf,'VLSoilPoreMicP_vr',forc%VLSoilPoreMicP_vr)
+  call ncd_getvar(ncf,'VLSoilPoreMicP',forc%VLSoilPoreMicP)
   call ncd_getvar(ncf,'ORGC',forc%ORGC)
   call ncd_getvar(ncf,'CFOMC',forc%CFOMC)
   call ncd_getvar(ncf,'VLSoilMicP',forc%VLSoilMicP)
@@ -421,21 +421,21 @@ implicit none
     forc%CH2GE=forc%H2GE*8.92E-05_r8*Tref/TKS    ![gH/m3]
 
     !variable temperature
-    forc%TFND=TEFAQUDIF(TKS)
-    forc%O2AquaDiffusvity=OLSG*forc%TFND       !aqueous O2 diffusivity [m2 h-1]
-    forc%CLSGL=CLSG*forc%TFND       !aqueous CO2 diffusivity	[m2 h-1]
-    forc%CQSGL=CQSG*forc%TFND       !aqueous CH4 diffusivity	m2 h-1
-    forc%ZLSGL=ZLSG*forc%TFND       !aqueous N2 diffusivity, [m2 h-1]
-    forc%ZNSGL=ZNSG*forc%TFND       !aqueous NH3 diffusivity, [m2 h-1]
-    forc%ZVSGL=ZVSG*forc%TFND       !aqueous N2O diffusivity, [m2 h-1]
-    forc%HLSGL=HLSG*forc%TFND       !aqueous H2 diffusivity, [m2 h-1]
+    forc%TScal4Difsvity=TEFAQUDIF(TKS)
+    forc%O2AquaDiffusvity=OLSG*forc%TScal4Difsvity       !aqueous O2 diffusivity [m2 h-1]
+    forc%CLSGL=CLSG*forc%TScal4Difsvity       !aqueous CO2 diffusivity	[m2 h-1]
+    forc%CQSGL=CQSG*forc%TScal4Difsvity       !aqueous CH4 diffusivity	m2 h-1
+    forc%ZLSGL=ZLSG*forc%TScal4Difsvity       !aqueous N2 diffusivity, [m2 h-1]
+    forc%ZNSGL=ZNSG*forc%TScal4Difsvity       !aqueous NH3 diffusivity, [m2 h-1]
+    forc%ZVSGL=ZVSG*forc%TScal4Difsvity       !aqueous N2O diffusivity, [m2 h-1]
+    forc%HLSGL=HLSG*forc%TScal4Difsvity       !aqueous H2 diffusivity, [m2 h-1]
 
   endif
 
   if (first .or. forctype <=2)then
     Z3S=forc%FieldCapacity/forc%POROS
     XNPD=600.0_r8*dts_gas
-    scalar=forc%TFND*XNPD
+    scalar=forc%TScal4Difsvity*XNPD
     forc%DiffusivitySolutEff=fDiffusivitySolutEff(scalar,THETW,Z3S)
 
     DFLG2=2.0_r8*AZMAX1(forc%THETPM)*POROQ &
