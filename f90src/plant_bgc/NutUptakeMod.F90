@@ -1033,8 +1033,8 @@ module NutUptakeMod
     RUNNBP  =>  plt_rbgc%RUNNBP , &
     RUNNOP  =>  plt_rbgc%RUNNOP , &
     RNO3Y   =>  plt_bgcr%RNO3Y  , &
-    RNHBY   =>  plt_bgcr%RNHBY  , &
-    RNH4Y   =>  plt_bgcr%RNH4Y  , &
+    RNH4EcoDmndBandPrev_vr   =>  plt_bgcr%RNH4EcoDmndBandPrev_vr  , &
+    RNH4EcoDmndSoilPrev_vr   =>  plt_bgcr%RNH4EcoDmndSoilPrev_vr  , &
     RN3BY   =>  plt_bgcr%RN3BY    &
   )
   TFNH4X=0.0_r8
@@ -1043,13 +1043,13 @@ module NutUptakeMod
   TFNOBX=0.0_r8
 
 
-  IF(RNH4Y(L).GT.ZEROS)THEN
-    FNH4X=AMAX1(MinFracPRoot4Uptake(N,L,NZ),RUNNHP(N,L,NZ)/RNH4Y(L))
+  IF(RNH4EcoDmndSoilPrev_vr(L).GT.ZEROS)THEN
+    FNH4X=AMAX1(MinFracPRoot4Uptake(N,L,NZ),RUNNHP(N,L,NZ)/RNH4EcoDmndSoilPrev_vr(L))
   ELSE
     FNH4X=FracPRoot4Uptake(N,L,NZ)
   ENDIF
-  IF(RNHBY(L).GT.ZEROS)THEN
-    FNHBX=AMAX1(MinFracPRoot4Uptake(N,L,NZ),RUNNBP(N,L,NZ)/RNHBY(L))
+  IF(RNH4EcoDmndBandPrev_vr(L).GT.ZEROS)THEN
+    FNHBX=AMAX1(MinFracPRoot4Uptake(N,L,NZ),RUNNBP(N,L,NZ)/RNH4EcoDmndBandPrev_vr(L))
   ELSE
     FNHBX=FracPRoot4Uptake(N,L,NZ)
   ENDIF
@@ -1173,12 +1173,12 @@ module NutUptakeMod
   !     ROXYY=O2 demand by all microbial,root,myco populations
   !     RootO2Dmnd4Resp_pvr=O2 demand by each root,myco population
   !     FOXYX=fraction of ROXYY by each root,myco population
-  !     RNH4Y=NH4 demand in non-band by all microbial,root,myco populations
+  !     RNH4EcoDmndSoilPrev_vr=NH4 demand in non-band by all microbial,root,myco populations
   !     RUNNHP=NH4 demand in non-band by each root,myco population
-  !     FNH4X=fraction of RNH4Y by each root,myco populn
-  !     RNHBY=NH4 demand in band by all microbial,root,myco populations
+  !     FNH4X=fraction of RNH4EcoDmndSoilPrev_vr by each root,myco populn
+  !     RNH4EcoDmndBandPrev_vr=NH4 demand in band by all microbial,root,myco populations
   !     RUNNBP=NH4 demand in band by each root,myco population
-  !     FNHBX=fraction of RNHBY by each root,myco populn
+  !     FNHBX=fraction of RNH4EcoDmndBandPrev_vr by each root,myco populn
   !     RNO3Y=NO3 demand in non-band by all microbial,root,myco populations
   !     RUNNOP=NO3 demand in non-band by each root,myco population
   !     FNO3X=fraction of RNO3Y by each root,myco populn

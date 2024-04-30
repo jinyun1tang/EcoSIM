@@ -1176,7 +1176,7 @@ module Hour1Mod
 !     used in nitro.f, uptake.f
 !
   ROXYY(0,NY,NX)=ROXYX(0,NY,NX)
-  RNH4Y(0,NY,NX)=RNH4X(0,NY,NX)
+  RNH4EcoDmndSoilPrev_vr(0,NY,NX)=RNH4X(0,NY,NX)
   RNO3Y(0,NY,NX)=RNO3X(0,NY,NX)
   RNO2EcoUptkSoilPrev_vr(0,NY,NX)=RNO2EcoUptkSoil_vr(0,NY,NX)
   RN2OEcoUptkSoilPrev_vr(0,NY,NX)=RN2OEcoUptkSoil_vr(0,NY,NX)
@@ -1321,13 +1321,13 @@ module Hour1Mod
 ! used in nitro.f, uptake.f
 !
     ROXYY(L,NY,NX)=ROXYX(L,NY,NX)
-    RNH4Y(L,NY,NX)=RNH4X(L,NY,NX)
+    RNH4EcoDmndSoilPrev_vr(L,NY,NX)=RNH4X(L,NY,NX)
     RNO3Y(L,NY,NX)=RNO3X(L,NY,NX)
     RNO2EcoUptkSoilPrev_vr(L,NY,NX)=RNO2EcoUptkSoil_vr(L,NY,NX)
     RN2OEcoUptkSoilPrev_vr(L,NY,NX)=RN2OEcoUptkSoil_vr(L,NY,NX)
     RP14Y(L,NY,NX)=RP14X(L,NY,NX)
     RPO4Y(L,NY,NX)=RPO4X(L,NY,NX)
-    RNHBY(L,NY,NX)=RNHBX(L,NY,NX)
+    RNH4EcoDmndBandPrev_vr(L,NY,NX)=RNHBX(L,NY,NX)
     RN3BY(L,NY,NX)=RN3BX(L,NY,NX)
     RNO2EcoUptkBandPrev_vr(L,NY,NX)=RNO2EcoUptkBand_vr(L,NY,NX)
     RP1BY(L,NY,NX)=RP1BX(L,NY,NX)

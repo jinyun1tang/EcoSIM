@@ -73,14 +73,14 @@ type, public :: NitroAQMFluxDiagType
   real(r8),allocatable :: FCNP(:,:)
   real(r8),allocatable :: FracOMActHeter(:,:)
   real(r8),allocatable :: FracNO2ReduxHeter(:,:)
-  real(r8),allocatable :: FOMK(:,:)
+  real(r8),allocatable :: FracHeterBiomOfActK(:,:)
 
   real(r8),allocatable :: CNOMActAutor(:)
   real(r8),allocatable :: CPOMActAutor(:)
   real(r8),allocatable :: OMActAutor(:)
   real(r8),allocatable :: FracOMActAutor(:)
   real(r8),allocatable :: FracNO2ReduxAutor(:)
-  real(r8),allocatable :: FOMKff(:)
+  real(r8),allocatable :: FracAutorBiomOfActK(:)
   real(r8),allocatable :: OMC2ff(:)
   real(r8),allocatable :: TFNGff(:)
   real(r8),allocatable :: TFNRff(:)
@@ -449,7 +449,7 @@ type, public :: NitroAQMFluxDiagType
   allocate(this%OMActHeter(NumMicrbHetetrophCmplx,1:jcplx));this%OMActHeter=spval
   allocate(this%FracOMActHeter(NumMicrbHetetrophCmplx,1:jcplx));this%FracOMActHeter=spval
   allocate(this%FracNO2ReduxHeter(NumMicrbHetetrophCmplx,1:jcplx));this%FracNO2ReduxHeter=spval
-  allocate(this%FOMK(NumMicrbHetetrophCmplx,1:jcplx));this%FOMK=spval
+  allocate(this%FracHeterBiomOfActK(NumMicrbHetetrophCmplx,1:jcplx));this%FracHeterBiomOfActK=spval
   allocate(this%OMC2(NumMicrbHetetrophCmplx,1:jcplx));this%OMC2=spval
   allocate(this%TFNG(NumMicrbHetetrophCmplx,1:jcplx));this%TFNG=spval
   allocate(this%TFNR(NumMicrbHetetrophCmplx,1:jcplx));this%TFNR=spval
@@ -465,7 +465,7 @@ type, public :: NitroAQMFluxDiagType
   allocate(this%OMActAutor(NumMicrobAutrophCmplx));this%OMActAutor=spval
   allocate(this%FracOMActAutor(NumMicrobAutrophCmplx));this%FracOMActAutor=spval
   allocate(this%FracNO2ReduxAutor(NumMicrobAutrophCmplx));this%FracNO2ReduxAutor=spval
-  allocate(this%FOMKff(NumMicrobAutrophCmplx));this%FOMKff=spval
+  allocate(this%FracAutorBiomOfActK(NumMicrobAutrophCmplx));this%FracAutorBiomOfActK=spval
   allocate(this%OMC2ff(NumMicrobAutrophCmplx));this%OMC2ff=spval
   allocate(this%TFNGff(NumMicrobAutrophCmplx));this%TFNGff=spval
   allocate(this%TFNRff(NumMicrobAutrophCmplx));this%TFNRff=spval
@@ -704,7 +704,7 @@ type, public :: NitroAQMFluxDiagType
   call destroy(this%OMActHeter)
   call destroy(this%FracOMActHeter)
   call destroy(this%FracNO2ReduxHeter)
-  call destroy(this%FOMK)
+  call destroy(this%FracHeterBiomOfActK)
   call destroy(this%OMC2)
   call destroy(this%TFNG)
   call destroy(this%TFNR)
@@ -720,7 +720,7 @@ type, public :: NitroAQMFluxDiagType
   call destroy(this%OMActAutor)
   call destroy(this%FracOMActAutor)
   call destroy(this%FracNO2ReduxAutor)
-  call destroy(this%FOMKff)
+  call destroy(this%FracAutorBiomOfActK)
   call destroy(this%OMC2ff)
   call destroy(this%TFNGff)
   call destroy(this%TFNRff)

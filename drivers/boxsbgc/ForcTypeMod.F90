@@ -194,11 +194,11 @@ implicit none
     real(r8) :: RN2OEcoUptkSoilPrev       !total root + microbial N2O uptake from previous hour, [g d-2 h-1]
     real(r8) :: RNO2EcoUptkSoilPrev       !total root + microbial NO2 uptake non-band from previous hour, [g d-2 h-1]
     real(r8) :: RNO2EcoUptkBandPrev       !total root + microbial NO2 uptake band from previous hour, [g d-2 h-1]
-    real(r8) :: RNHBY       !total root + microbial NH4 uptake band from previous hour, [g d-2 h-1]
+    real(r8) :: RNH4EcoDmndBandPrev       !total root + microbial NH4 uptake band from previous hour, [g d-2 h-1]
     real(r8) :: RN3BY       !total root + microbial NO3 uptake band from previous hour, [g d-2 h-1]
     real(r8) :: RPOBY       !total root + microbial PO4 uptake band from previous hour, [g d-2 h-1]
     real(r8) :: RP1BY       !HPO4 demand in band by all microbial, root, myco populations from previous hour
-    real(r8) :: RNH4Y       !total root + microbial NH4 uptake non-band from previous hour, [g d-2 h-1]
+    real(r8) :: RNH4EcoDmndSoilPrev       !total root + microbial NH4 uptake non-band from previous hour, [g d-2 h-1]
     real(r8) :: RNO3Y       !total root + microbial NO3 uptake non-band from previous hour, [g d-2 h-1]
     real(r8) :: RPO4Y       !total root + microbial PO4 uptake non-band from previous hour, [g d-2 h-1]
     real(r8) :: RP14Y       !HPO4 demand in non-band by all microbial, root, myco populations from previous hour
@@ -483,11 +483,11 @@ implicit none
   forc%RN2OEcoUptkSoilPrev=0._r8
   forc%RNO2EcoUptkSoilPrev=0._r8
   forc%RNO2EcoUptkBandPrev=0._r8
-  forc%RNHBY=0._r8
+  forc%RNH4EcoDmndBandPrev=0._r8
   forc%RN3BY=0._r8
   forc%RPOBY=0._r8
   forc%RP1BY=0._r8
-  forc%RNH4Y=0._r8
+  forc%RNH4EcoDmndSoilPrev=0._r8
   forc%RNO3Y=0._r8
   forc%RPO4Y=0._r8
   forc%RP14Y=0._r8

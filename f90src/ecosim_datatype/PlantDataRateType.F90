@@ -86,7 +86,7 @@ module PlantDataRateType
   real(r8),target,allocatable ::  ROXYX(:,:,:)                       !total root + microbial O2 uptake, [g d-2 h-1]
   real(r8),target,allocatable ::  ROXYY(:,:,:)                       !total root + microbial O2 uptake, [g d-2 h-1]
   real(r8),target,allocatable ::  RNH4X(:,:,:)                       !total root + microbial NH4 uptake non-band, [g d-2 h-1]
-  real(r8),target,allocatable ::  RNH4Y(:,:,:)                       !total root + microbial NH4 uptake non-band, [g d-2 h-1]
+  real(r8),target,allocatable ::  RNH4EcoDmndSoilPrev_vr(:,:,:)                       !total root + microbial NH4 uptake non-band, [g d-2 h-1]
   real(r8),target,allocatable ::  RNO3X(:,:,:)                       !total root + microbial NO3 uptake non-band, [g d-2 h-1]
   real(r8),target,allocatable ::  RNO3Y(:,:,:)                       !total root + microbial NO3 uptake non-band, [g d-2 h-1]
   real(r8),target,allocatable ::  RNO2EcoUptkSoil_vr(:,:,:)                       !total root + microbial NO2 uptake non-band, [g d-2 h-1]
@@ -96,7 +96,7 @@ module PlantDataRateType
   real(r8),target,allocatable ::  RN2OEcoUptkSoil_vr(:,:,:)                       !total root + microbial N2O uptake , [g d-2 h-1]
   real(r8),target,allocatable ::  RN2OEcoUptkSoilPrev_vr(:,:,:)                       !total root + microbial N2O uptake, [g d-2 h-1]
   real(r8),target,allocatable ::  RNHBX(:,:,:)                       !total root + microbial NH4 uptake band, [g d-2 h-1]
-  real(r8),target,allocatable ::  RNHBY(:,:,:)                       !total root + microbial NH4 uptake band, [g d-2 h-1]
+  real(r8),target,allocatable ::  RNH4EcoDmndBandPrev_vr(:,:,:)                       !total root + microbial NH4 uptake band, [g d-2 h-1]
   real(r8),target,allocatable ::  RN3BX(:,:,:)                       !total root + microbial NO3 uptake band, [g d-2 h-1]
   real(r8),target,allocatable ::  RN3BY(:,:,:)                       !total root + microbial NO3 uptake band, [g d-2 h-1]
   real(r8),target,allocatable ::  RNO2EcoUptkBand_vr(:,:,:)                       !total root + microbial NO2 uptake band, [g d-2 h-1]
@@ -201,7 +201,7 @@ module PlantDataRateType
   allocate(ROXYX(0:JZ,JY,JX));  ROXYX=0._r8
   allocate(ROXYY(0:JZ,JY,JX));  ROXYY=0._r8
   allocate(RNH4X(0:JZ,JY,JX));  RNH4X=0._r8
-  allocate(RNH4Y(0:JZ,JY,JX));  RNH4Y=0._r8
+  allocate(RNH4EcoDmndSoilPrev_vr(0:JZ,JY,JX));  RNH4EcoDmndSoilPrev_vr=0._r8
   allocate(RNO3X(0:JZ,JY,JX));  RNO3X=0._r8
   allocate(RNO3Y(0:JZ,JY,JX));  RNO3Y=0._r8
   allocate(RNO2EcoUptkSoil_vr(0:JZ,JY,JX));  RNO2EcoUptkSoil_vr=0._r8
@@ -211,7 +211,7 @@ module PlantDataRateType
   allocate(RN2OEcoUptkSoil_vr(0:JZ,JY,JX));  RN2OEcoUptkSoil_vr=0._r8
   allocate(RN2OEcoUptkSoilPrev_vr(0:JZ,JY,JX));  RN2OEcoUptkSoilPrev_vr=0._r8
   allocate(RNHBX(0:JZ,JY,JX));  RNHBX=0._r8
-  allocate(RNHBY(0:JZ,JY,JX));  RNHBY=0._r8
+  allocate(RNH4EcoDmndBandPrev_vr(0:JZ,JY,JX));  RNH4EcoDmndBandPrev_vr=0._r8
   allocate(RN3BX(0:JZ,JY,JX));  RN3BX=0._r8
   allocate(RN3BY(0:JZ,JY,JX));  RN3BY=0._r8
   allocate(RNO2EcoUptkBand_vr(0:JZ,JY,JX));  RNO2EcoUptkBand_vr=0._r8
@@ -298,7 +298,7 @@ module PlantDataRateType
   call destroy(ROXYX)
   call destroy(ROXYY)
   call destroy(RNH4X)
-  call destroy(RNH4Y)
+  call destroy(RNH4EcoDmndSoilPrev_vr)
   call destroy(RNO3X)
   call destroy(RNO3Y)
   call destroy(RNO2EcoUptkSoil_vr)
@@ -308,7 +308,7 @@ module PlantDataRateType
   call destroy(RN2OEcoUptkSoil_vr)
   call destroy(RN2OEcoUptkSoilPrev_vr)
   call destroy(RNHBX)
-  call destroy(RNHBY)
+  call destroy(RNH4EcoDmndBandPrev_vr)
   call destroy(RN3BX)
   call destroy(RN3BY)
   call destroy(RNO2EcoUptkBand_vr)

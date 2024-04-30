@@ -55,8 +55,8 @@ module MicForcTypeMod
   real(r8) :: ROXYF
   real(r8) :: RCH4L
   real(r8) :: RCH4F
-  real(r8) :: RNH4Y
-  real(r8) :: RNHBY
+  real(r8) :: RNH4EcoDmndSoilPrev
+  real(r8) :: RNH4EcoDmndBandPrev
   real(r8) :: RNO3Y
   real(r8) :: RN3BY
   real(r8) :: RPO4Y
@@ -66,10 +66,10 @@ module MicForcTypeMod
   real(r8) :: SoilMicPMassLayer0
   logical  :: LitrM                     !true if it is the litter layer
   logical  :: Lsurf
-  real(r8) :: RNH4YU
-  real(r8) :: RNO3YU
-  real(r8) :: RPO4YU
-  real(r8) :: RP14YU
+  real(r8) :: RNH4EcoDmndLitrPrev
+  real(r8) :: RNO3EcoDmndLitrPrev
+  real(r8) :: RH2PO4EcoDmndLitrPrev
+  real(r8) :: RH1PO4EcoDmndLitrPrev
   real(r8) :: ROXYL
   real(r8) :: VOLWU
   real(r8), allocatable :: CFOMC(:)

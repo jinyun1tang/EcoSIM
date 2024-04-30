@@ -652,8 +652,8 @@ implicit none
   real(r8), pointer :: RP14Y(:)      => null()   !HPO4 demand in non-band by all microbial,root,myco populations, [gP d-2 h-1]
   real(r8), pointer :: RP1BY(:)      => null()   !HPO4 demand in band by all microbial,root,myco populations, [gP d-2 h-1]
   real(r8), pointer :: RNO3Y(:)      => null()   !total root + microbial NO3 uptake non-band, [gN d-2 h-1]
-  real(r8), pointer :: RNH4Y(:)      => null()   !total root + microbial NH4 uptake non-band, [gN d-2 h-1]
-  real(r8), pointer :: RNHBY(:)      => null()   !total root + microbial NH4 uptake band, [gN d-2 h-1]
+  real(r8), pointer :: RNH4EcoDmndSoilPrev_vr(:)      => null()   !total root + microbial NH4 uptake non-band, [gN d-2 h-1]
+  real(r8), pointer :: RNH4EcoDmndBandPrev_vr(:)      => null()   !total root + microbial NH4 uptake band, [gN d-2 h-1]
   real(r8), pointer :: RN3BY(:)      => null()   !total root + microbial NO3 uptake band, [gN d-2 h-1]
   real(r8), pointer :: ROXYF(:)      => null()   !net gaseous O2 flux, [g d-2 h-1]
   real(r8), pointer :: RCO2F(:)      => null()   !net gaseous CO2 flux, [g d-2 h-1]
@@ -972,8 +972,8 @@ implicit none
   allocate(this%RP14Y(0:JZ1)); this%RP14Y=spval
   allocate(this%RP1BY(0:JZ1)); this%RP1BY=spval
   allocate(this%RNO3Y(0:JZ1)); this%RNO3Y=spval
-  allocate(this%RNH4Y(0:JZ1)); this%RNH4Y =spval
-  allocate(this%RNHBY(0:JZ1)); this%RNHBY=spval
+  allocate(this%RNH4EcoDmndSoilPrev_vr(0:JZ1)); this%RNH4EcoDmndSoilPrev_vr =spval
+  allocate(this%RNH4EcoDmndBandPrev_vr(0:JZ1)); this%RNH4EcoDmndBandPrev_vr=spval
   allocate(this%RN3BY(0:JZ1)); this%RN3BY=spval
   allocate(this%ROXYF(0:JZ1)); this%ROXYF=spval
   allocate(this%RCO2F(0:JZ1)); this%RCO2F=spval

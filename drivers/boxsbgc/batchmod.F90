@@ -169,7 +169,7 @@ contains
   micfor%RNO2EcoUptkBandPrev =ystates0l(fid_RNO2EcoUptkBandPrev)
   micfor%ROXYY =ystates0l(fid_ROXYY)
   micfor%ROXYF =ystates0l(fid_ROXYF)
-  micfor%RNHBY =ystates0l(fid_RNHBY)
+  micfor%RNH4EcoDmndBandPrev =ystates0l(fid_RNH4EcoDmndBandPrev)
   micfor%RN3BY =ystates0l(fid_RN3BY)
   micfor%RPOBY =ystates0l(fid_RPOBY)
   micfor%RP1BY =ystates0l(fid_RP1BY)
@@ -204,10 +204,10 @@ contains
     micstt%OSC24U=forc%SolidOM(ielmc,icarbhyro,k_humus)
     micstt%OSN24U=forc%SolidOM(ielmn,icarbhyro,k_humus)
     micstt%OSP24U=forc%SolidOM(ielmp,icarbhyro,k_humus)
-    micfor%RNH4YU=ystates0l(fid_RNH4Y)
-    micfor%RNO3YU=ystates0l(fid_RNO3Y)
-    micfor%RPO4YU=ystates0l(fid_RPO4Y)
-    micfor%RP14YU=ystates0l(fid_RP14Y)
+    micfor%RNH4EcoDmndLitrPrev=ystates0l(fid_RNH4EcoDmndSoilPrev)
+    micfor%RNO3EcoDmndLitrPrev=ystates0l(fid_RNO3Y)
+    micfor%RH2PO4EcoDmndLitrPrev=ystates0l(fid_RPO4Y)
+    micfor%RH1PO4EcoDmndLitrPrev=ystates0l(fid_RP14Y)
     micfor%VOLWU =forc%VLWatMicP
     micfor%CFOMCU=forc%CFOMC(1:ndbiomcp)
   else
@@ -223,7 +223,7 @@ contains
   micstt%CH2P4 =ystates0l(cid_H2PO4)/(forc%VLWatMicP*forc%VLPO4)
   micstt%CH1P4 =ystates0l(cid_H1PO4)/(forc%VLWatMicP*forc%VLPO4)
   micstt%CH1P4B=forc%CH1P4B
-  micfor%RNH4Y =ystates0l(fid_RNH4Y)
+  micfor%RNH4EcoDmndSoilPrev =ystates0l(fid_RNH4EcoDmndSoilPrev)
   micfor%RNO3Y =ystates0l(fid_RNO3Y)
   micfor%RPO4Y =ystates0l(fid_RPO4Y)
   micfor%RP14Y =ystates0l(fid_RP14Y)
@@ -417,13 +417,13 @@ contains
 
   fid_ROXYY=addone(itemp)
   fid_ROXYF=addone(itemp)
-  fid_RNH4Y=addone(itemp)
+  fid_RNH4EcoDmndSoilPrev=addone(itemp)
   fid_RNO3Y=addone(itemp)
   fid_RNO2EcoUptkSoilPrev=addone(itemp)
   fid_RN2OEcoUptkSoilPrev=addone(itemp)
   fid_RPO4Y=addone(itemp)
   fid_RP14Y=addone(itemp)
-  fid_RNHBY=addone(itemp)
+  fid_RNH4EcoDmndBandPrev=addone(itemp)
   fid_RN3BY=addone(itemp)
   fid_RNO2EcoUptkBandPrev=addone(itemp)
   fid_RPOBY=addone(itemp)
@@ -616,13 +616,13 @@ contains
       DO N=1,NumMicbFunGroups
         DO NGL=micpar%JGnio(N),micpar%JGnfo(N)
           ystatesfl(fid_ROXYY)=ystatesfl(fid_ROXYY)+micflx%RO2DmndHetert(NGL,K)
-          ystatesfl(fid_RNH4Y)=ystatesfl(fid_RNH4Y)+micflx%RVMX4(NGL,K)+micflx%RINHO(NGL,K)
+          ystatesfl(fid_RNH4EcoDmndSoilPrev)=ystatesfl(fid_RNH4EcoDmndSoilPrev)+micflx%RVMX4(NGL,K)+micflx%RINHO(NGL,K)
           ystatesfl(fid_RNO3Y)=ystatesfl(fid_RNO3Y)+micflx%RVMX3(NGL,K)+micflx%RINOO(NGL,K)
           ystatesfl(fid_RNO2EcoUptkSoilPrev)=ystatesfl(fid_RNO2EcoUptkSoilPrev)+micflx%RNO2DmndReduxSoilHeter(NGL,K)
           ystatesfl(fid_RN2OEcoUptkSoilPrev)=ystatesfl(fid_RN2OEcoUptkSoilPrev)+micflx%RN2ODmndReduxHeter(NGL,K)
           ystatesfl(fid_RPO4Y)=ystatesfl(fid_RPO4Y)+micflx%RIPOO(NGL,K)
           ystatesfl(fid_RP14Y)=ystatesfl(fid_RP14Y)+micflx%RIPO1(NGL,K)
-          ystatesfl(fid_RNHBY)=ystatesfl(fid_RNHBY)+micflx%RVMB4(NGL,K)+micflx%RINHB(NGL,K)
+          ystatesfl(fid_RNH4EcoDmndBandPrev)=ystatesfl(fid_RNH4EcoDmndBandPrev)+micflx%RVMB4(NGL,K)+micflx%RINHB(NGL,K)
           ystatesfl(fid_RN3BY)=ystatesfl(fid_RN3BY)+micflx%RVMB3(NGL,K)+micflx%RINOB(NGL,K)
           ystatesfl(fid_RNO2EcoUptkBandPrev)=ystatesfl(fid_RNO2EcoUptkBandPrev)+micflx%RNO2DmndReduxBandHeter(NGL,K)
           ystatesfl(fid_RPOBY)=ystatesfl(fid_RPOBY)+micflx%RIPBO(NGL,K)
@@ -637,12 +637,12 @@ contains
   DO  N=1,NumMicbFunGroups
     DO NGL=micpar%JGniA(N),micpar%JGnfA(N)
       ystatesfl(fid_ROXYY)=ystatesfl(fid_ROXYY)+micflx%RO2DmndAutort(NGL)
-      ystatesfl(fid_RNH4Y)=ystatesfl(fid_RNH4Y)+micflx%RNH3OxidAutor(NGL)+micflx%RNH4UptkSoilAutor(NGL)
+      ystatesfl(fid_RNH4EcoDmndSoilPrev)=ystatesfl(fid_RNH4EcoDmndSoilPrev)+micflx%RNH3OxidAutor(NGL)+micflx%RNH4UptkSoilAutor(NGL)
       ystatesfl(fid_RNO3Y)=ystatesfl(fid_RNO3Y)+micflx%RNO3UptkSoilAutor(NGL)
       ystatesfl(fid_RNO2EcoUptkSoilPrev)=ystatesfl(fid_RNO2EcoUptkSoilPrev)+micflx%RNO2OxidAutor(NGL)
       ystatesfl(fid_RPO4Y)=ystatesfl(fid_RPO4Y)+micflx%RH2PO4UptkSoilAutor(NGL)
       ystatesfl(fid_RP14Y)=ystatesfl(fid_RP14Y)+micflx%RH1PO4UptkSoilAutor(NGL)
-      ystatesfl(fid_RNHBY)=ystatesfl(fid_RNHBY)+micflx%RNH3OxidAutorBand(NGL)+micflx%RNH4UptkBandAutor(NGL)
+      ystatesfl(fid_RNH4EcoDmndBandPrev)=ystatesfl(fid_RNH4EcoDmndBandPrev)+micflx%RNH3OxidAutorBand(NGL)+micflx%RNH4UptkBandAutor(NGL)
       ystatesfl(fid_RN3BY)=ystatesfl(fid_RN3BY)+micflx%RNO3UptkBandAutor(NGL)
       ystatesfl(fid_RNO2EcoUptkBandPrev)=ystatesfl(fid_RNO2EcoUptkBandPrev)+micflx%RNO2OxidAutorBand(NGL)
       ystatesfl(fid_RPOBY)=ystatesfl(fid_RPOBY)+micflx%RH2PO4UptkBandAutor(NGL)
@@ -993,8 +993,8 @@ contains
   varl(fid_ROXYF)='ROXYF';varlnml(fid_ROXYF)='net gaseous O2 flux from previous hour'
   unitl(fid_ROXYF)='g d-2 h-1'; vartypes(fid_ROXYF)=var_flux_type
 
-  varl(fid_RNH4Y)='RNH4Y';varlnml(fid_RNH4Y)='total root + microbial NH4 uptake potential non-band soil'
-  unitl(fid_RNH4Y)='gN d-2 h-1'; vartypes(fid_RNH4Y)=var_flux_type
+  varl(fid_RNH4EcoDmndSoilPrev)='RNH4EcoDmndSoilPrev';varlnml(fid_RNH4EcoDmndSoilPrev)='total root + microbial NH4 uptake potential non-band soil'
+  unitl(fid_RNH4EcoDmndSoilPrev)='gN d-2 h-1'; vartypes(fid_RNH4EcoDmndSoilPrev)=var_flux_type
 
   varl(fid_RNO3Y)='RNO3Y';varlnml(fid_RNO3Y)='total root + microbial NO3 uptake potential non-band soil'
   unitl(fid_RNO3Y)='gN d-2 h-1'; vartypes(fid_RNO3Y)=var_flux_type
@@ -1011,8 +1011,8 @@ contains
   varl(fid_RP14Y)='RP14Y';varlnml(fid_RP14Y)='total root + microbial HPO4 uptake non-band soil'
   unitl(fid_RP14Y)='gP d-2 h-1'; vartypes(fid_RP14Y)=var_flux_type
 
-  varl(fid_RNHBY)='RNHBY';varlnml(fid_RNHBY)='total root + microbial NH4 uptake potential band soil'
-  unitl(fid_RNHBY)='gN d-2 h-1'; vartypes(fid_RNHBY)=var_flux_type
+  varl(fid_RNH4EcoDmndBandPrev)='RNH4EcoDmndBandPrev';varlnml(fid_RNH4EcoDmndBandPrev)='total root + microbial NH4 uptake potential band soil'
+  unitl(fid_RNH4EcoDmndBandPrev)='gN d-2 h-1'; vartypes(fid_RNH4EcoDmndBandPrev)=var_flux_type
 
   varl(fid_RN3BY)='RN3BY';varlnml(fid_RN3BY)='total root + microbial NO3 uptake potential band soil'
   unitl(fid_RN3BY)='gN d-2 h-1'; vartypes(fid_RN3BY)=var_flux_type

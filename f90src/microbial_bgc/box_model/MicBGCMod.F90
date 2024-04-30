@@ -686,9 +686,9 @@ module MicBGCMod
   real(r8) :: RVOXP
   real(r8) :: RVOXPA
   real(r8) :: RVOXPB
-  real(r8) :: RGOMT
-  real(r8) :: RXOMT
-  real(r8) :: RMOMT
+  real(r8) :: RGrowthRespHeter
+  real(r8) :: RMaintDefcitAutor
+  real(r8) :: RMaintRespHeter
   real(r8) :: SPOMK(2)
   real(r8) :: RMOMK(2)
 ! begin_execution
@@ -696,7 +696,7 @@ module MicBGCMod
     FracOMActHeter         => nmics%FracOMActHeter            , &
     FracNO2ReduxHeter      => nmics%FracNO2ReduxHeter         , &
     n_O2facult_bacter      => micpar%n_O2facult_bacter        , &    
-    FOMK                   => nmics%FOMK                      , &
+    FracHeterBiomOfActK                   => nmics%FracHeterBiomOfActK                      , &
     OMActHeter             => nmics%OMActHeter                , &
     RO2UptkHeter           => nmicf%RO2UptkHeter              , &
     RespGrossHeter         => nmicf%RespGrossHeter            , &
@@ -737,9 +737,9 @@ module MicBGCMod
     FracNO2ReduxHeter(NGL,K)=1.0_r8
   ENDIF
   IF(TOMK(K).GT.ZEROS)THEN
-    FOMK(NGL,K)=OMActHeter(NGL,K)/TOMK(K)
+    FracHeterBiomOfActK(NGL,K)=OMActHeter(NGL,K)/TOMK(K)
   ELSE
-    FOMK(NGL,K)=1.0_r8
+    FracHeterBiomOfActK(NGL,K)=1.0_r8
   ENDIF
 !
   !     ADJUST MCROBIAL GROWTH AND DECOMPOSITION RATES FOR BIOMASS
@@ -881,11 +881,11 @@ module MicBGCMod
     ZNH4T,ZNO3T,ZNO2T,H2P4T,H1P4T,micfor,micstt, &
     nmicf,nmics,micflx)
 !
-  call GatherMicrobialRespiration(NGL,N,K,RMOMK,RGOMT,RXOMT,RMOMT, &
+  call GatherMicrobialRespiration(NGL,N,K,RMOMK,RGrowthRespHeter,RMaintDefcitAutor,RMaintRespHeter, &
     micfor,micstt,nmicf,nmics)
 !
   call GetMicrobialAnabolismFlux(NGL,N,K,ECHZ,FGOCP, &
-    FGOAP,RGOMT,RXOMT,RMOMT,spomk,rmomk,micfor,micstt,nmicf, &
+    FGOAP,RGrowthRespHeter,RMaintDefcitAutor,RMaintRespHeter,spomk,rmomk,micfor,micstt,nmicf, &
     nmics,ncplxf,ncplxs)
   end associate
   end subroutine ActiveMicrobes
@@ -2128,7 +2128,7 @@ module MicBGCMod
 ! begin_execution
   associate(                                            &
     FracOMActHeter     => nmics%FracOMActHeter        , &
-    FOMK               => nmics%FOMK                  , &
+    FracHeterBiomOfActK               => nmics%FracHeterBiomOfActK                  , &
     FNH4XR             => nmicf%FNH4XR                , &
     FNO3XR             => nmicf%FNO3XR                , &
     FP14XR             => nmicf%FP14XR                , &
@@ -2157,13 +2157,13 @@ module MicBGCMod
     VLPO4              => micfor%VLPO4                , &
     ZEROS              => micfor%ZEROS                , &
     ROXYY              => micfor%ROXYY                , &
-    RNH4Y              => micfor%RNH4Y                , &
-    RNHBY              => micfor%RNHBY                , &
+    RNH4EcoDmndSoilPrev              => micfor%RNH4EcoDmndSoilPrev                , &
+    RNH4EcoDmndBandPrev              => micfor%RNH4EcoDmndBandPrev                , &
     RNO3Y              => micfor%RNO3Y                , &
-    RNH4YU             => micfor%RNH4YU               , &
-    RNO3YU             => micfor%RNO3YU               , &
-    RP14YU             => micfor%RP14YU               , &
-    RPO4YU             => micfor%RPO4YU               , &
+    RNH4EcoDmndLitrPrev             => micfor%RNH4EcoDmndLitrPrev               , &
+    RNO3EcoDmndLitrPrev             => micfor%RNO3EcoDmndLitrPrev               , &
+    RH1PO4EcoDmndLitrPrev             => micfor%RH1PO4EcoDmndLitrPrev               , &
+    RH2PO4EcoDmndLitrPrev             => micfor%RH2PO4EcoDmndLitrPrev               , &
     RN3BY              => micfor%RN3BY                , &
     RPO4Y              => micfor%RPO4Y                , &
     RPOBY              => micfor%RPOBY                , &
@@ -2185,13 +2185,13 @@ module MicBGCMod
   ELSE
     FOXYX=AMAX1(FMN,FracOMActHeter(NGL,K))
   ENDIF
-  IF(RNH4Y.GT.ZEROS)THEN
-    FNH4X=AMAX1(FMN,RINHO(NGL,K)/RNH4Y)
+  IF(RNH4EcoDmndSoilPrev.GT.ZEROS)THEN
+    FNH4X=AMAX1(FMN,RINHO(NGL,K)/RNH4EcoDmndSoilPrev)
   ELSE
     FNH4X=AMAX1(FMN,FracOMActHeter(NGL,K)*VLNH4)
   ENDIF
-  IF(RNHBY.GT.ZEROS)THEN
-    FNB4X=AMAX1(FMN,RINHB(NGL,K)/RNHBY)
+  IF(RNH4EcoDmndBandPrev.GT.ZEROS)THEN
+    FNB4X=AMAX1(FMN,RINHB(NGL,K)/RNH4EcoDmndBandPrev)
   ELSE
     FNB4X=AMAX1(FMN,FracOMActHeter(NGL,K)*VLNHB)
   ENDIF
@@ -2229,13 +2229,13 @@ module MicBGCMod
   IF(ROQCY(K).GT.ZEROS)THEN
     FOQC=AMAX1(FMN,ROQCS(NGL,K)/ROQCY(K))
   ELSE
-    FOQC=AMAX1(FMN,FOMK(NGL,K))
+    FOQC=AMAX1(FMN,FracHeterBiomOfActK(NGL,K))
   ENDIF
   naqfdiag%TFOQC=naqfdiag%TFOQC+FOQC
   IF(ROQAY(K).GT.ZEROS)THEN
     FOQA=AMAX1(FMN,ROQAS(NGL,K)/ROQAY(K))
   ELSE
-    FOQA=AMAX1(FMN,FOMK(NGL,K))
+    FOQA=AMAX1(FMN,FracHeterBiomOfActK(NGL,K))
   ENDIF
   naqfdiag%TFOQA=naqfdiag%TFOQA+FOQA
   naqfdiag%TFOXYX=naqfdiag%TFOXYX+FOXYX
@@ -2254,25 +2254,25 @@ module MicBGCMod
 ! previous hour in surface litter, labels as for soil layers above
 !
   IF(litrm)THEN
-    IF(RNH4YU.GT.ZEROS)THEN
-      FNH4XR(NGL,K)=AMAX1(FMN,RINHOR(NGL,K)/RNH4YU)
+    IF(RNH4EcoDmndLitrPrev.GT.ZEROS)THEN
+      FNH4XR(NGL,K)=AMAX1(FMN,RINHOR(NGL,K)/RNH4EcoDmndLitrPrev)
     ELSE
-      FNH4XR(NGL,K)=AMAX1(FMN,FOMK(NGL,K))
+      FNH4XR(NGL,K)=AMAX1(FMN,FracHeterBiomOfActK(NGL,K))
     ENDIF
-    IF(RNO3YU.GT.ZEROS)THEN
-      FNO3XR(NGL,K)=AMAX1(FMN,RINOOR(NGL,K)/RNO3YU)
+    IF(RNO3EcoDmndLitrPrev.GT.ZEROS)THEN
+      FNO3XR(NGL,K)=AMAX1(FMN,RINOOR(NGL,K)/RNO3EcoDmndLitrPrev)
     ELSE
-      FNO3XR(NGL,K)=AMAX1(FMN,FOMK(NGL,K))
+      FNO3XR(NGL,K)=AMAX1(FMN,FracHeterBiomOfActK(NGL,K))
     ENDIF
-    IF(RPO4YU.GT.ZEROS)THEN
-      FPO4XR(NGL,K)=AMAX1(FMN,RIPOOR(NGL,K)/RPO4YU)
+    IF(RH2PO4EcoDmndLitrPrev.GT.ZEROS)THEN
+      FPO4XR(NGL,K)=AMAX1(FMN,RIPOOR(NGL,K)/RH2PO4EcoDmndLitrPrev)
     ELSE
-      FPO4XR(NGL,K)=AMAX1(FMN,FOMK(NGL,K))
+      FPO4XR(NGL,K)=AMAX1(FMN,FracHeterBiomOfActK(NGL,K))
     ENDIF
-    IF(RP14YU.GT.ZEROS)THEN
-      FP14XR(NGL,K)=AMAX1(FMN,RIPO1R(NGL,K)/RP14YU)
+    IF(RH1PO4EcoDmndLitrPrev.GT.ZEROS)THEN
+      FP14XR(NGL,K)=AMAX1(FMN,RIPO1R(NGL,K)/RH1PO4EcoDmndLitrPrev)
     ELSE
-      FP14XR(NGL,K)=AMAX1(FMN,FOMK(NGL,K))
+      FP14XR(NGL,K)=AMAX1(FMN,FracHeterBiomOfActK(NGL,K))
     ENDIF
   ENDIF
   IF(Lsurf.AND.K.NE.micpar%k_POM.AND.K.NE.micpar%k_humus &
@@ -3441,13 +3441,13 @@ module MicBGCMod
   end subroutine BiomassMineralization
 !------------------------------------------------------------------------------------------
 
-  subroutine GatherMicrobialRespiration(NGL,N,K,RMOMK,RGOMT,RXOMT,RMOMT, &
+  subroutine GatherMicrobialRespiration(NGL,N,K,RMOMK,RGrowthRespHeter,RMaintDefcitAutor,RMaintRespHeter, &
     micfor,micstt,nmicf,nmics)
   implicit none
   integer, intent(in) :: NGL,N,K
   real(r8), intent(in) :: RMOMK(2)
-  real(r8), intent(out) :: RGOMT,RXOMT
-  real(r8), intent(out) :: RMOMT
+  real(r8), intent(out) :: RGrowthRespHeter,RMaintDefcitAutor
+  real(r8), intent(out) :: RMaintRespHeter
   type(micforctype), intent(in) :: micfor
   type(micsttype), intent(inout) :: micstt
   type(NitroMicStateType), intent(inout) :: nmics
@@ -3491,13 +3491,13 @@ module MicBGCMod
 !
 !     MICROBIAL MAINTENANCE AND GROWTH RESPIRATION
 !
-!     RMOMT=total maintenance respiration
-!     RGOMT=growth respiration
-!     RXOMT=senescence respiration
+!     RMaintRespHeter=total maintenance respiration
+!     RGrowthRespHeter=growth respiration
+!     RMaintDefcitAutor=senescence respiration
 !
-  RMOMT=RMOMC(1,NGL,K)+RMOMC(2,NGL,K)
-  RGOMT=AZMAX1(RespGrossHeter(NGL,K)-RMOMT)
-  RXOMT=AZMAX1(RMOMT-RespGrossHeter(NGL,K))
+  RMaintRespHeter=RMOMC(1,NGL,K)+RMOMC(2,NGL,K)
+  RGrowthRespHeter=AZMAX1(RespGrossHeter(NGL,K)-RMaintRespHeter)
+  RMaintDefcitAutor=AZMAX1(RMaintRespHeter-RespGrossHeter(NGL,K))
 !
 !     N2 FIXATION: N=(6) AEROBIC, (7) ANAEROBIC
 !     FROM GROWTH RESPIRATION, FIXATION ENERGY REQUIREMENT,
@@ -3508,7 +3508,7 @@ module MicBGCMod
 !     OMC,OMN=microbial nonstructural C,N
 !     rNCOMC=maximum microbial N:C ratio
 !     EN2F=N2 fixation yield per unit nonstructural C
-!     RGOMT=growth respiration
+!     RGrowthRespHeter=growth respiration
 !     Resp4NFixHeter=respiration for N2 fixation
 !     CZ2GS=aqueous N2 concentration
 !     ZFKM=Km for N2 uptake
@@ -3518,8 +3518,8 @@ module MicBGCMod
   IF(N.EQ.n_aero_n2fixer.OR.N.EQ.n_anero_n2fixer)THEN
     MID3=micpar%get_micb_id(3,NGL)
     RGN2P=AZMAX1(OMEheter(ielmc,MID3,K)*rNCOMC(3,NGL,K)-OMEheter(ielmn,MID3,K))/EN2F(N)
-    IF(RGOMT.GT.ZEROS)THEN
-      Resp4NFixHeter(NGL,K)=AMIN1(RGOMT*RGN2P/(RGOMT+RGN2P) &
+    IF(RGrowthRespHeter.GT.ZEROS)THEN
+      Resp4NFixHeter(NGL,K)=AMIN1(RGrowthRespHeter*RGN2P/(RGrowthRespHeter+RGN2P) &
         *CZ2GS/(CZ2GS+ZFKM),OMGR*OMEheter(ielmc,MID3,K))
     ELSE
       Resp4NFixHeter(NGL,K)=0.0_r8
@@ -3531,11 +3531,11 @@ module MicBGCMod
 !------------------------------------------------------------------------------------------
 
   subroutine GetMicrobialAnabolismFlux(NGL,N,K,ECHZ,FGOCP,FGOAP, &
-    RGOMT,RXOMT,RMOMT,spomk,rmomk,micfor,micstt,nmicf,nmics,ncplxf,ncplxs)
+    RGrowthRespHeter,RMaintDefcitAutor,RMaintRespHeter,spomk,rmomk,micfor,micstt,nmicf,nmics,ncplxf,ncplxs)
   implicit none
   integer, intent(in) :: NGL,N,K
   real(r8), intent(in) :: ECHZ
-  real(r8), intent(in) :: FGOCP,FGOAP,RGOMT,RXOMT,RMOMT
+  real(r8), intent(in) :: FGOCP,FGOAP,RGrowthRespHeter,RMaintDefcitAutor,RMaintRespHeter
   real(r8), intent(in) :: spomk(2)
   real(r8), intent(in) :: RMOMK(2)
   type(micforctype), intent(in) :: micfor
@@ -3554,42 +3554,42 @@ module MicBGCMod
   real(r8) :: SPOMX
   real(r8) :: FRM
 !     begin_execution
-  associate(                                &
-    CNOMActHeter   => nmics%CNOMActHeter,   &
-    CPOMActHeter   => nmics%CPOMActHeter,   &
-    TFNG           => nmics%TFNG,           &
-    FCN            => nmics%FCN,            &
-    FCP            => nmics%FCP,            &
-    FOMK           => nmics%FOMK,           &
-    CGOMEheter     => nmicf%CGOMEheter,     &
-    CGOQC          => nmicf%CGOQC,          &
-    CGOAC          => nmicf%CGOAC,          &
-    CGOMES         => nmicf%CGOMES,         &
-    RespGrossHeter => nmicf%RespGrossHeter, &
-    RGOMD          => nmicf%RGOMD,          &
-    RMOMC          => nmicf%RMOMC,          &
-    RDOMEheter     => nmicf%RDOMEheter,     &
-    RHOMEheter     => nmicf%RHOMEheter,     &
-    RCOMEheter     => nmicf%RCOMEheter,     &
-    RHMMEheter     => nmicf%RHMMEheter,     &
-    RCMMEheter     => nmicf%RCMMEheter,     &
-    RDMMEheter     => nmicf%RDMMEheter,     &
-    RXOMEheter     => nmicf%RXOMEheter,     &
-    R3OMEheter     => nmicf%R3OMEheter,     &
-    RXMMEheter     => nmicf%RXMMEheter,     &
-    R3MMEheter     => nmicf%R3MMEheter,     &
-    Resp4NFixHeter => nmicf%Resp4NFixHeter, &
-    TCGOMEheter    => ncplxf%TCGOMEheter,   &
-    CNQ            => ncplxs%CNQ,           &
-    CPQ            => ncplxs%CPQ,           &
-    rNCOMC         => micpar%rNCOMC,        &
-    rPCOMC         => micpar%rPCOMC,        &
-    FL             => micpar%FL,            &
-    EHUM           => micstt%EHUM,          &
-    OMEheter       => micstt%OMEheter,      &
-    DOM            => micstt%DOM,           &
-    ZEROS          => micfor%ZEROS,         &
-    ZERO           => micfor%ZERO           &
+  associate(                                          &
+    CNOMActHeter        => nmics%CNOMActHeter,        &
+    CPOMActHeter        => nmics%CPOMActHeter,        &
+    TFNG                => nmics%TFNG,                &
+    FCN                 => nmics%FCN,                 &
+    FCP                 => nmics%FCP,                 &
+    FracHeterBiomOfActK => nmics%FracHeterBiomOfActK, &
+    CGOMEheter          => nmicf%CGOMEheter,          &
+    CGOQC               => nmicf%CGOQC,               &
+    CGOAC               => nmicf%CGOAC,               &
+    CGOMES              => nmicf%CGOMES,              &
+    RespGrossHeter      => nmicf%RespGrossHeter,      &
+    RGOMD               => nmicf%RGOMD,               &
+    RMOMC               => nmicf%RMOMC,               &
+    RDOMEheter          => nmicf%RDOMEheter,          &
+    RHOMEheter          => nmicf%RHOMEheter,          &
+    RCOMEheter          => nmicf%RCOMEheter,          &
+    RHMMEheter          => nmicf%RHMMEheter,          &
+    RCMMEheter          => nmicf%RCMMEheter,          &
+    RDMMEheter          => nmicf%RDMMEheter,          &
+    RXOMEheter          => nmicf%RXOMEheter,          &
+    R3OMEheter          => nmicf%R3OMEheter,          &
+    RXMMEheter          => nmicf%RXMMEheter,          &
+    R3MMEheter          => nmicf%R3MMEheter,          &
+    Resp4NFixHeter      => nmicf%Resp4NFixHeter,      &
+    TCGOMEheter         => ncplxf%TCGOMEheter,        &
+    CNQ                 => ncplxs%CNQ,                &
+    CPQ                 => ncplxs%CPQ,                &
+    rNCOMC              => micpar%rNCOMC,             &
+    rPCOMC              => micpar%rPCOMC,             &
+    FL                  => micpar%FL,                 &
+    EHUM                => micstt%EHUM,               &
+    OMEheter            => micstt%OMEheter,           &
+    DOM                 => micstt%DOM,                &
+    ZEROS               => micfor%ZEROS,              &
+    ZERO                => micfor%ZERO                &
   )
 
 !     DOC, DON, DOP AND ACETATE UPTAKE DRIVEN BY GROWTH RESPIRATION
@@ -3597,7 +3597,7 @@ module MicBGCMod
 !
 !     CGOMX=DOC+acetate uptake from aerobic growth respiration
 !     CGOMD=DOC+acetate uptake from denitrifier growth respiration
-!     RMOMT=maintenance respiration
+!     RMaintRespHeter=maintenance respiration
 !     RespGrossHeter=total respiration
 !     RGOMD=respiration for denitrifcation
 !     Resp4NFixHeter=respiration for N2 fixation
@@ -3607,20 +3607,20 @@ module MicBGCMod
 !     CGOMEheter,CGOMEheter=DON, DOP uptake
 !     FGOCP,FGOAP=DOC,acetate/(DOC+acetate)
 !     OQN,OPQ=DON,DOP
-!     FOMK=faction of OMActHeterin total OMA
+!     FracHeterBiomOfActK=faction of OMActHeterin total OMA
 !     CNQ,CPQ=DON/DOC, DOP/DOC
 !     FCN,FCP=limitation from N,P
 !
 
-  CGOMX=AMIN1(RMOMT,RespGrossHeter(NGL,K))+Resp4NFixHeter(NGL,K)+(RGOMT-Resp4NFixHeter(NGL,K))/ECHZ
+  CGOMX=AMIN1(RMaintRespHeter,RespGrossHeter(NGL,K))+Resp4NFixHeter(NGL,K)+(RGrowthRespHeter-Resp4NFixHeter(NGL,K))/ECHZ
   CGOMD=RGOMD(NGL,K)/ENOX
   CGOMEheter(ielmc,NGL,K)=CGOMX+CGOMD
 
   CGOQC(NGL,K)=CGOMX*FGOCP+CGOMD
   CGOAC(NGL,K)=CGOMX*FGOAP
   CGOXC=CGOQC(NGL,K)+CGOAC(NGL,K)
-  CGOMEheter(ielmp,NGL,K)=AZMAX1(AMIN1(DOM(idom_don,K)*FOMK(NGL,K),CGOXC*CNQ(K)/FCN(NGL,K)))
-  CGOMEheter(ielmp,NGL,K)=AZMAX1(AMIN1(DOM(idom_dop,K)*FOMK(NGL,K),CGOXC*CPQ(K)/FCP(NGL,K)))
+  CGOMEheter(ielmp,NGL,K)=AZMAX1(AMIN1(DOM(idom_don,K)*FracHeterBiomOfActK(NGL,K),CGOXC*CNQ(K)/FCN(NGL,K)))
+  CGOMEheter(ielmp,NGL,K)=AZMAX1(AMIN1(DOM(idom_dop,K)*FracHeterBiomOfActK(NGL,K),CGOXC*CPQ(K)/FCP(NGL,K)))
   TCGOMEheter(ielmc,K)=TCGOMEheter(ielmc,K)+CGOQC(NGL,K)
   TCGOMEheter(idom_acetate,K)=TCGOMEheter(idom_acetate,K)+CGOAC(NGL,K)
   TCGOMEheter(ielmp,K)=TCGOMEheter(ielmp,K)+CGOMEheter(ielmp,NGL,K)
@@ -3716,8 +3716,8 @@ module MicBGCMod
 !     EXCEEDS UPTAKE
 !
 !     OMC,OMN,OMP=microbial C,N,P
-!     RMOMT=total maintenance respiration
-!     RXOMT=senescence respiration
+!     RMaintRespHeter=total maintenance respiration
+!     RMaintDefcitAutor=senescence respiration
 !     RCCC=C recycling fraction
 !     RXMMEheter,RXMMN,RXMMP=microbial C,N,P loss from senescence
 !     RMOMC=maintenance respiration
@@ -3725,8 +3725,8 @@ module MicBGCMod
 !     RDMMC,RDMMEheter,RDMMP=microbial C,N,P LitrFall from senescence
 !     R3MMEheter,R3MMN,R3MMP=microbial C,N,P recycling from senescence
 !
-  IF(RXOMT.GT.ZEROS.AND.RMOMT.GT.ZEROS.AND.RCCC.GT.ZERO)THEN
-    FRM=RXOMT/RMOMT
+  IF(RMaintDefcitAutor.GT.ZEROS.AND.RMaintRespHeter.GT.ZEROS.AND.RCCC.GT.ZERO)THEN
+    FRM=RMaintDefcitAutor/RMaintRespHeter
     D730: DO M=1,2
       MID=micpar%get_micb_id(M,NGL)    
       RXMMEheter(ielmc,M,NGL,K)=AMIN1(OMEheter(ielmc,MID,K),AZMAX1(FRM*RMOMC(M,NGL,K)/RCCC))
