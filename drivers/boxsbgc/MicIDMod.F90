@@ -97,13 +97,13 @@ implicit none
   integer :: fid_RH1PO4EcoDmndBandPrev               !HPO4 demand in band by all microbial,root,myco populations [gP d-2 h-1]
   integer :: fid_RDOMEcoDmndPrev_b,fid_RDOMEcoDmndPrev_e !total root + microbial DOC uptake, [gC d-2 h-1]
   integer :: fid_RAcetateEcoDmndPrev_b,fid_RAcetateEcoDmndPrev_e !total root + microbial acetate uptake, [gC d-2 h-1]
-  integer :: fid_RINHO_b,fid_RINHO_e
-  integer :: fid_RINHB_b,fid_RINHB_e
-  integer :: fid_RINOO_b,fid_RINOO_e
-  integer :: fid_RINOB_b,fid_RINOB_e
-  integer :: fid_RIPOO_b,fid_RIPOO_e
-  integer :: fid_RIPBO_b,fid_RIPBO_e
-  integer :: fid_RIPO1_b,fid_RIPO1_e
-  integer :: fid_RIPB1_b,fid_RIPB1_e
+  integer :: fid_RNH4DmndSoilHeter_b,fid_RNH4DmndSoilHeter_e
+  integer :: fid_RNH4DmndBandHeter_b,fid_RNH4DmndBandHeter_e
+  integer :: fid_RNO3DmndSoilHeter_b,fid_RNO3DmndSoilHeter_e
+  integer :: fid_RNO3DmndBandHeter_b,fid_RNO3DmndBandHeter_e
+  integer :: fid_RH2PO4DmndSoilHeter_b,fid_RH2PO4DmndSoilHeter_e
+  integer :: fid_RH2PO4DmndBandHeter_b,fid_RH2PO4DmndBandHeter_e
+  integer :: fid_RH1PO4DmndSoilHeter_b,fid_RH1PO4DmndSoilHeter_e
+  integer :: fid_RH1PO4DmndBandHeter_b,fid_RH1PO4DmndBandHeter_e
   integer :: fid_RO2DmndHetert_b,fid_RO2DmndHetert_e
 end module MicIDMod

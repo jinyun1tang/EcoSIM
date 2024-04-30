@@ -52,18 +52,18 @@ implicit none
   real(r8), allocatable :: ROXSK(:)
   real(r8), allocatable :: RVMX4(:,:)
   real(r8), allocatable :: RVMB4(:,:)
-  real(r8), allocatable :: RINHO(:,:)
-  real(r8), allocatable :: RINHB(:,:)
-  real(r8), allocatable :: RINOO(:,:)
-  real(r8), allocatable :: RINOB(:,:)
-  real(r8), allocatable :: RIPOO(:,:)
-  real(r8), allocatable :: RIPBO(:,:)
-  real(r8), allocatable :: RIPO1(:,:)
-  real(r8), allocatable :: RIPB1(:,:)
-  real(r8), allocatable :: RINHOR(:,:)
-  real(r8), allocatable :: RINOOR(:,:)
-  real(r8), allocatable :: RIPOOR(:,:)
-  real(r8), allocatable :: RIPO1R(:,:)
+  real(r8), allocatable :: RNH4DmndSoilHeter(:,:)
+  real(r8), allocatable :: RNH4DmndBandHeter(:,:)
+  real(r8), allocatable :: RNO3DmndSoilHeter(:,:)
+  real(r8), allocatable :: RNO3DmndBandHeter(:,:)
+  real(r8), allocatable :: RH2PO4DmndSoilHeter(:,:)
+  real(r8), allocatable :: RH2PO4DmndBandHeter(:,:)
+  real(r8), allocatable :: RH1PO4DmndSoilHeter(:,:)
+  real(r8), allocatable :: RH1PO4DmndBandHeter(:,:)
+  real(r8), allocatable :: RNH4DmndLitrHeter(:,:)
+  real(r8), allocatable :: RNO3DmndLitrHeter(:,:)
+  real(r8), allocatable :: RH2PO4DmndLitrHeter(:,:)
+  real(r8), allocatable :: RH1PO4DmndLitrHeter(:,:)
   real(r8), allocatable :: RNH4UptkSoilAutor(:)
   real(r8), allocatable :: RNH4UptkBandAutor(:)
   real(r8), allocatable :: RNO3UptkSoilAutor(:)
@@ -109,18 +109,18 @@ implicit none
   allocate(this%RN2ODmndReduxHeter(NumMicrbHetetrophCmplx,1:jcplx));this%RN2ODmndReduxHeter=spval
   allocate(this%RVMX4(NumMicrbHetetrophCmplx,1:jcplx));this%RVMX4=spval
   allocate(this%RVMB4(NumMicrbHetetrophCmplx,1:jcplx));this%RVMB4=spval
-  allocate(this%RINHO(NumMicrbHetetrophCmplx,1:jcplx));this%RINHO=spval
-  allocate(this%RINHB(NumMicrbHetetrophCmplx,1:jcplx));this%RINHB=spval
-  allocate(this%RINOO(NumMicrbHetetrophCmplx,1:jcplx));this%RINOO=spval
-  allocate(this%RINOB(NumMicrbHetetrophCmplx,1:jcplx));this%RINOB=spval
-  allocate(this%RIPOO(NumMicrbHetetrophCmplx,1:jcplx));this%RIPOO=spval
-  allocate(this%RIPBO(NumMicrbHetetrophCmplx,1:jcplx));this%RIPBO=spval
-  allocate(this%RIPO1(NumMicrbHetetrophCmplx,1:jcplx));this%RIPO1=spval
-  allocate(this%RIPB1(NumMicrbHetetrophCmplx,1:jcplx));this%RIPB1=spval
-  allocate(this%RINHOR(NumMicrbHetetrophCmplx,1:jcplx));this%RINHOR=spval
-  allocate(this%RINOOR(NumMicrbHetetrophCmplx,1:jcplx));this%RINOOR=spval
-  allocate(this%RIPOOR(NumMicrbHetetrophCmplx,1:jcplx));this%RIPOOR=spval
-  allocate(this%RIPO1R(NumMicrbHetetrophCmplx,1:jcplx));this%RIPO1R=spval
+  allocate(this%RNH4DmndSoilHeter(NumMicrbHetetrophCmplx,1:jcplx));this%RNH4DmndSoilHeter=spval
+  allocate(this%RNH4DmndBandHeter(NumMicrbHetetrophCmplx,1:jcplx));this%RNH4DmndBandHeter=spval
+  allocate(this%RNO3DmndSoilHeter(NumMicrbHetetrophCmplx,1:jcplx));this%RNO3DmndSoilHeter=spval
+  allocate(this%RNO3DmndBandHeter(NumMicrbHetetrophCmplx,1:jcplx));this%RNO3DmndBandHeter=spval
+  allocate(this%RH2PO4DmndSoilHeter(NumMicrbHetetrophCmplx,1:jcplx));this%RH2PO4DmndSoilHeter=spval
+  allocate(this%RH2PO4DmndBandHeter(NumMicrbHetetrophCmplx,1:jcplx));this%RH2PO4DmndBandHeter=spval
+  allocate(this%RH1PO4DmndSoilHeter(NumMicrbHetetrophCmplx,1:jcplx));this%RH1PO4DmndSoilHeter=spval
+  allocate(this%RH1PO4DmndBandHeter(NumMicrbHetetrophCmplx,1:jcplx));this%RH1PO4DmndBandHeter=spval
+  allocate(this%RNH4DmndLitrHeter(NumMicrbHetetrophCmplx,1:jcplx));this%RNH4DmndLitrHeter=spval
+  allocate(this%RNO3DmndLitrHeter(NumMicrbHetetrophCmplx,1:jcplx));this%RNO3DmndLitrHeter=spval
+  allocate(this%RH2PO4DmndLitrHeter(NumMicrbHetetrophCmplx,1:jcplx));this%RH2PO4DmndLitrHeter=spval
+  allocate(this%RH1PO4DmndLitrHeter(NumMicrbHetetrophCmplx,1:jcplx));this%RH1PO4DmndLitrHeter=spval
   allocate(this%RO2DmndAutort(NumMicrobAutrophCmplx));this%RO2DmndAutort=spval
   allocate(this%RNH4UptkSoilAutor(NumMicrobAutrophCmplx));this%RNH4UptkSoilAutor=spval
   allocate(this%RNH4UptkBandAutor(NumMicrobAutrophCmplx));this%RNH4UptkBandAutor=spval
@@ -159,18 +159,18 @@ implicit none
   this%RN2ODmndReduxHeter=0._r8
   this%RVMX4=0._r8
   this%RVMB4=0._r8
-  this%RINHO=0._r8
-  this%RINHB=0._r8
-  this%RINOO=0._r8
-  this%RINOB=0._r8
-  this%RIPOO=0._r8
-  this%RIPBO=0._r8
-  this%RIPO1=0._r8
-  this%RIPB1=0._r8
-  this%RINHOR=0._r8
-  this%RINOOR=0._r8
-  this%RIPOOR=0._r8
-  this%RIPO1R=0._r8
+  this%RNH4DmndSoilHeter=0._r8
+  this%RNH4DmndBandHeter=0._r8
+  this%RNO3DmndSoilHeter=0._r8
+  this%RNO3DmndBandHeter=0._r8
+  this%RH2PO4DmndSoilHeter=0._r8
+  this%RH2PO4DmndBandHeter=0._r8
+  this%RH1PO4DmndSoilHeter=0._r8
+  this%RH1PO4DmndBandHeter=0._r8
+  this%RNH4DmndLitrHeter=0._r8
+  this%RNO3DmndLitrHeter=0._r8
+  this%RH2PO4DmndLitrHeter=0._r8
+  this%RH1PO4DmndLitrHeter=0._r8
   this%RO2DmndAutort=0._r8
   this%RNH4UptkSoilAutor=0._r8
   this%RNH4UptkBandAutor=0._r8
@@ -212,18 +212,18 @@ implicit none
   call destroy(this%ROXSK)
   call destroy(this%RVMX4)
   call destroy(this%RVMB4)
-  call destroy(this%RINHO)
-  call destroy(this%RINHB)
-  call destroy(this%RINOO)
-  call destroy(this%RINOB)
-  call destroy(this%RIPOO)
-  call destroy(this%RIPBO)
-  call destroy(this%RIPO1)
-  call destroy(this%RIPB1)
-  call destroy(this%RINHOR)
-  call destroy(this%RINOOR)
-  call destroy(this%RIPOOR)
-  call destroy(this%RIPO1R)
+  call destroy(this%RNH4DmndSoilHeter)
+  call destroy(this%RNH4DmndBandHeter)
+  call destroy(this%RNO3DmndSoilHeter)
+  call destroy(this%RNO3DmndBandHeter)
+  call destroy(this%RH2PO4DmndSoilHeter)
+  call destroy(this%RH2PO4DmndBandHeter)
+  call destroy(this%RH1PO4DmndSoilHeter)
+  call destroy(this%RH1PO4DmndBandHeter)
+  call destroy(this%RNH4DmndLitrHeter)
+  call destroy(this%RNO3DmndLitrHeter)
+  call destroy(this%RH2PO4DmndLitrHeter)
+  call destroy(this%RH1PO4DmndLitrHeter)
   call destroy(this%RNH4UptkSoilAutor)
   call destroy(this%RNH4UptkBandAutor)
   call destroy(this%RNO3UptkSoilAutor)

@@ -102,7 +102,7 @@ module MicBGCMod
   DO  K=1,KL
     DO  N=1,NumMicbFunGroups
       DO NGL=JGnio(N),JGnfo(N)
-        ncplxf%ROQCK(K)=ncplxf%ROQCK(K)+nmicf%ROQCD(NGL,K)
+        ncplxf%ROQCK(K)=ncplxf%ROQCK(K)+nmicf%ROQC4HeterMicrobAct(NGL,K)
       enddo
     ENDDO
   ENDDO
@@ -708,9 +708,9 @@ module MicBGCMod
     RNO2ReduxHeterSoil     => nmicf%RNO2ReduxHeterSoil        , &
     RNO2ReduxHeterBand     => nmicf%RNO2ReduxHeterBand        , &
     RN2OReduxHeter         => nmicf%RN2OReduxHeter            , &
-    RGOMD                  => nmicf%RGOMD                     , &
+    RNOxReduxRespDenitLim                  => nmicf%RNOxReduxRespDenitLim                     , &
     RH2ProdHeter           => nmicf%RH2ProdHeter              , &
-    RGOMY                  => nmicf%RGOMY                     , &
+    RNOxReduxRespDenitUlm                  => nmicf%RNOxReduxRespDenitUlm                     , &
     RCO2ProdHeter          => nmicf%RCO2ProdHeter             , &
     RAcettProdHeter        => nmicf%RAcettProdHeter           , &
     RCH4ProdHeter          => nmicf%RCH4ProdHeter             , &
@@ -870,8 +870,8 @@ module MicBGCMod
     RNO2ReduxHeterSoil(NGL,K)=0.0_r8
     RNO2ReduxHeterBand(NGL,K)=0.0_r8
     RN2OReduxHeter(NGL,K)=0.0_r8
-    RGOMY(NGL,K)=0.0_r8
-    RGOMD(NGL,K)=0.0_r8
+    RNOxReduxRespDenitUlm(NGL,K)=0.0_r8
+    RNOxReduxRespDenitLim(NGL,K)=0.0_r8
   ENDIF
 !
 !     BIOMASS DECOMPOSITION AND MINERALIZATION
@@ -1639,7 +1639,7 @@ module MicBGCMod
     CGOMES                 => nmicf%CGOMES                  , &
     Resp4NFixHeter         => nmicf%Resp4NFixHeter          , &
     RespGrossHeter         => nmicf%RespGrossHeter          , &
-    RGOMD                  => nmicf%RGOMD                   , &
+    RNOxReduxRespDenitLim                  => nmicf%RNOxReduxRespDenitLim                   , &
     RNO3TransfSoilHeter    => nmicf%RNO3TransfSoilHeter     , &
     RCO2ProdHeter          => nmicf%RCO2ProdHeter           , &
     RH2PO4TransfSoilHeter  => nmicf%RH2PO4TransfSoilHeter   , &
@@ -1728,7 +1728,7 @@ module MicBGCMod
 !
 !     CGOMEheter=total DOC+acetate uptake
 !     RespGrossHeter=total respiration
-!     RGOMD=respiration for denitrifcation
+!     RNOxReduxRespDenitLim=respiration for denitrifcation
 !     Resp4NFixHeter=respiration for N2 fixation
 !     RCO2ProdHeter=total CO2 emission
 !     CGOMS,CGONS,CGOPS=transfer from nonstructural to structural C,N,P
@@ -1742,7 +1742,7 @@ module MicBGCMod
 !     RNH4TransfLitrHeter,RNO3TransfLitrHeter =substrate-limited NH4,NO3 mineraln-immobiln
 !     RH2PO4TransfLitrHeter,RH1PO4TransfLitrHeter=substrate-limited H2PO4,HPO4 mineraln-immobiln
 !
-          CGROMC=CGOMEheter(ielmc,NGL,K)-RespGrossHeter(NGL,K)-RGOMD(NGL,K)-Resp4NFixHeter(NGL,K)
+          CGROMC=CGOMEheter(ielmc,NGL,K)-RespGrossHeter(NGL,K)-RNOxReduxRespDenitLim(NGL,K)-Resp4NFixHeter(NGL,K)
           RCO2ProdHeter(NGL,K)=RCO2ProdHeter(NGL,K)+Resp4NFixHeter(NGL,K)
           MID3=micpar%get_micb_id(3,NGL)
           D555: DO M=1,2
@@ -1844,7 +1844,7 @@ module MicBGCMod
     RNO2ReduxHeterSoil       => nmicf%RNO2ReduxHeterSoil       , &
     RNO2ReduxHeterBand       => nmicf%RNO2ReduxHeterBand       , &
     RN2OReduxHeter           => nmicf%RN2OReduxHeter           , &
-    RGOMD                    => nmicf%RGOMD                    , &
+    RNOxReduxRespDenitLim                    => nmicf%RNOxReduxRespDenitLim                    , &
     RNH4TransfSoilHeter      => nmicf%RNH4TransfSoilHeter      , &
     RNO3TransfSoilHeter      => nmicf%RNO3TransfSoilHeter      , &
     RH2PO4TransfSoilHeter    => nmicf%RH2PO4TransfSoilHeter    , &
@@ -1883,7 +1883,7 @@ module MicBGCMod
     RCH4ProdAutor            => nmicf%RCH4ProdAutor            , &
     RNO2ReduxAutorSoil       => nmicf%RNO2ReduxAutorSoil       , &
     RO2UptkAutor             => nmicf%RO2UptkAutor             , &
-    RGOMDff                  => nmicf%RGOMDff                  , &
+    RNOxReduxRespAutorLim                  => nmicf%RNOxReduxRespAutorLim                  , &
     RCO2ProdAutor            => nmicf%RCO2ProdAutor            , &
     RH1PO4TransfLitrAutor    => nmicf%RH1PO4TransfLitrAutor    , &
     RH2PO4TransfLitrAutor    => nmicf%RH2PO4TransfLitrAutor    , &
@@ -1948,7 +1948,7 @@ module MicBGCMod
           ENDIF
           naqfdiag%TRGOM=naqfdiag%TRGOM+RCO2ProdHeter(NGL,K)
           naqfdiag%TRGOC=naqfdiag%TRGOC+RCH4ProdHeter(NGL,K)
-          naqfdiag%TRGOD=naqfdiag%TRGOD+RGOMD(NGL,K)
+          naqfdiag%TRGOD=naqfdiag%TRGOD+RNOxReduxRespDenitLim(NGL,K)
           naqfdiag%TUPOX=naqfdiag%TUPOX+RO2UptkHeter(NGL,K)
           naqfdiag%TRDN3=naqfdiag%TRDN3+RNO3ReduxHeterSoil(NGL,K)
           naqfdiag%TRDNB=naqfdiag%TRDNB+RNO3ReduxHeterBand(NGL,K)
@@ -1981,7 +1981,7 @@ module MicBGCMod
         ENDIF
         naqfdiag%TRGOM=naqfdiag%TRGOM+RCO2ProdAutor(NGL)
         naqfdiag%TRGOC=naqfdiag%TRGOC+RCH4ProdAutor(NGL)
-        naqfdiag%TRGOD=naqfdiag%TRGOD+RGOMDff(NGL)
+        naqfdiag%TRGOD=naqfdiag%TRGOD+RNOxReduxRespAutorLim(NGL)
         naqfdiag%TUPOX=naqfdiag%TUPOX+RO2UptkAutor(NGL)
         naqfdiag%TRDN3=naqfdiag%TRDN3+RNO3UptkAutor(NGL)
         naqfdiag%TRDN2=naqfdiag%TRDN2+RNO2ReduxAutorSoil(NGL)
@@ -2134,20 +2134,20 @@ module MicBGCMod
     FP14XR                => nmicf%FP14XR,                 &
     FPO4XR                => nmicf%FPO4XR,                 &
     RO2DmndHetert         => micflx%RO2DmndHetert,         &
-    RINHO                 => micflx%RINHO,                 &
-    RINHB                 => micflx%RINHB,                 &
-    RINOO                 => micflx%RINOO,                 &
-    RINOB                 => micflx%RINOB,                 &
-    RIPOO                 => micflx%RIPOO,                 &
-    RIPBO                 => micflx%RIPBO,                 &
-    RIPO1                 => micflx%RIPO1,                 &
-    RIPB1                 => micflx%RIPB1,                 &
+    RNH4DmndSoilHeter                 => micflx%RNH4DmndSoilHeter,                 &
+    RNH4DmndBandHeter                 => micflx%RNH4DmndBandHeter,                 &
+    RNO3DmndSoilHeter                 => micflx%RNO3DmndSoilHeter,                 &
+    RNO3DmndBandHeter                 => micflx%RNO3DmndBandHeter,                 &
+    RH2PO4DmndSoilHeter                 => micflx%RH2PO4DmndSoilHeter,                 &
+    RH2PO4DmndBandHeter                 => micflx%RH2PO4DmndBandHeter,                 &
+    RH1PO4DmndSoilHeter                 => micflx%RH1PO4DmndSoilHeter,                 &
+    RH1PO4DmndBandHeter                 => micflx%RH1PO4DmndBandHeter,                 &
     ROQCS                 => micflx%ROQCS,                 &
     ROQAS                 => micflx%ROQAS,                 &
-    RINHOR                => micflx%RINHOR,                &
-    RINOOR                => micflx%RINOOR,                &
-    RIPOOR                => micflx%RIPOOR,                &
-    RIPO1R                => micflx%RIPO1R,                &
+    RNH4DmndLitrHeter                => micflx%RNH4DmndLitrHeter,                &
+    RNO3DmndLitrHeter                => micflx%RNO3DmndLitrHeter,                &
+    RH2PO4DmndLitrHeter                => micflx%RH2PO4DmndLitrHeter,                &
+    RH1PO4DmndLitrHeter                => micflx%RH1PO4DmndLitrHeter,                &
     litrm                 => micfor%litrm,                 &
     VLNH4                 => micfor%VLNH4,                 &
     VLNHB                 => micfor%VLNHB,                 &
@@ -2186,42 +2186,42 @@ module MicBGCMod
     FOXYX=AMAX1(FMN,FracOMActHeter(NGL,K))
   ENDIF
   IF(RNH4EcoDmndSoilPrev.GT.ZEROS)THEN
-    FNH4X=AMAX1(FMN,RINHO(NGL,K)/RNH4EcoDmndSoilPrev)
+    FNH4X=AMAX1(FMN,RNH4DmndSoilHeter(NGL,K)/RNH4EcoDmndSoilPrev)
   ELSE
     FNH4X=AMAX1(FMN,FracOMActHeter(NGL,K)*VLNH4)
   ENDIF
   IF(RNH4EcoDmndBandPrev.GT.ZEROS)THEN
-    FNB4X=AMAX1(FMN,RINHB(NGL,K)/RNH4EcoDmndBandPrev)
+    FNB4X=AMAX1(FMN,RNH4DmndBandHeter(NGL,K)/RNH4EcoDmndBandPrev)
   ELSE
     FNB4X=AMAX1(FMN,FracOMActHeter(NGL,K)*VLNHB)
   ENDIF
   IF(RNO3EcoDmndSoilPrev.GT.ZEROS)THEN
-    FNO3X=AMAX1(FMN,RINOO(NGL,K)/RNO3EcoDmndSoilPrev)
+    FNO3X=AMAX1(FMN,RNO3DmndSoilHeter(NGL,K)/RNO3EcoDmndSoilPrev)
   ELSE
     FNO3X=AMAX1(FMN,FracOMActHeter(NGL,K)*VLNO3)
   ENDIF
   IF(RNO3EcoDmndBandPrev.GT.ZEROS)THEN
-    FNB3X=AMAX1(FMN,RINOB(NGL,K)/RNO3EcoDmndBandPrev)
+    FNB3X=AMAX1(FMN,RNO3DmndBandHeter(NGL,K)/RNO3EcoDmndBandPrev)
   ELSE
     FNB3X=AMAX1(FMN,FracOMActHeter(NGL,K)*VLNOB)
   ENDIF
   IF(RH2PO4EcoDmndSoilPrev.GT.ZEROS)THEN
-    FPO4X=AMAX1(FMN,RIPOO(NGL,K)/RH2PO4EcoDmndSoilPrev)
+    FPO4X=AMAX1(FMN,RH2PO4DmndSoilHeter(NGL,K)/RH2PO4EcoDmndSoilPrev)
   ELSE
     FPO4X=AMAX1(FMN,FracOMActHeter(NGL,K)*VLPO4)
   ENDIF
   IF(RH2PO4EcoDmndBandPrev.GT.ZEROS)THEN
-    FPOBX=AMAX1(FMN,RIPBO(NGL,K)/RH2PO4EcoDmndBandPrev)
+    FPOBX=AMAX1(FMN,RH2PO4DmndBandHeter(NGL,K)/RH2PO4EcoDmndBandPrev)
   ELSE
     FPOBX=AMAX1(FMN,FracOMActHeter(NGL,K)*VLPOB)
   ENDIF
   IF(RH1PO4EcoDmndSoilPrev.GT.ZEROS)THEN
-    FP14X=AMAX1(FMN,RIPO1(NGL,K)/RH1PO4EcoDmndSoilPrev)
+    FP14X=AMAX1(FMN,RH1PO4DmndSoilHeter(NGL,K)/RH1PO4EcoDmndSoilPrev)
   ELSE
     FP14X=AMAX1(FMN,FracOMActHeter(NGL,K)*VLPO4)
   ENDIF
   IF(RH1PO4EcoDmndBandPrev.GT.ZEROS)THEN
-    FP1BX=AMAX1(FMN,RIPB1(NGL,K)/RH1PO4EcoDmndBandPrev)
+    FP1BX=AMAX1(FMN,RH1PO4DmndBandHeter(NGL,K)/RH1PO4EcoDmndBandPrev)
   ELSE
     FP1BX=AMAX1(FMN,FracOMActHeter(NGL,K)*VLPOB)
   ENDIF
@@ -2256,22 +2256,22 @@ module MicBGCMod
 !
   IF(litrm)THEN
     IF(RNH4EcoDmndLitrPrev.GT.ZEROS)THEN
-      FNH4XR(NGL,K)=AMAX1(FMN,RINHOR(NGL,K)/RNH4EcoDmndLitrPrev)
+      FNH4XR(NGL,K)=AMAX1(FMN,RNH4DmndLitrHeter(NGL,K)/RNH4EcoDmndLitrPrev)
     ELSE
       FNH4XR(NGL,K)=AMAX1(FMN,FracHeterBiomOfActK(NGL,K))
     ENDIF
     IF(RNO3EcoDmndLitrPrev.GT.ZEROS)THEN
-      FNO3XR(NGL,K)=AMAX1(FMN,RINOOR(NGL,K)/RNO3EcoDmndLitrPrev)
+      FNO3XR(NGL,K)=AMAX1(FMN,RNO3DmndLitrHeter(NGL,K)/RNO3EcoDmndLitrPrev)
     ELSE
       FNO3XR(NGL,K)=AMAX1(FMN,FracHeterBiomOfActK(NGL,K))
     ENDIF
     IF(RH2PO4EcoDmndLitrPrev.GT.ZEROS)THEN
-      FPO4XR(NGL,K)=AMAX1(FMN,RIPOOR(NGL,K)/RH2PO4EcoDmndLitrPrev)
+      FPO4XR(NGL,K)=AMAX1(FMN,RH2PO4DmndLitrHeter(NGL,K)/RH2PO4EcoDmndLitrPrev)
     ELSE
       FPO4XR(NGL,K)=AMAX1(FMN,FracHeterBiomOfActK(NGL,K))
     ENDIF
     IF(RH1PO4EcoDmndLitrPrev.GT.ZEROS)THEN
-      FP14XR(NGL,K)=AMAX1(FMN,RIPO1R(NGL,K)/RH1PO4EcoDmndLitrPrev)
+      FP14XR(NGL,K)=AMAX1(FMN,RH1PO4DmndLitrHeter(NGL,K)/RH1PO4EcoDmndLitrPrev)
     ELSE
       FP14XR(NGL,K)=AMAX1(FMN,FracHeterBiomOfActK(NGL,K))
     ENDIF
@@ -2311,7 +2311,7 @@ module MicBGCMod
     OMActHeter        => nmics%OMActHeter       , &
     RO2DmndHeter      => nmicf%RO2DmndHeter     , &
     RO2Dmnd4RespHeter => nmicf%RO2Dmnd4RespHeter, &
-    ROQCD             => nmicf%ROQCD            , &
+    ROQC4HeterMicrobAct             => nmicf%ROQC4HeterMicrobAct            , &
     CDOM              => ncplxs%CDOM            , &
     DOM               => micstt%DOM             , &
     RO2DmndHetert     => micflx%RO2DmndHetert   , &
@@ -2340,7 +2340,7 @@ module MicBGCMod
 !     OQA=acetate, FOQA=fraction of biological demand for acetate
 !     RGOMP=O2-unlimited respiration of acetate
 !     ROXY*=O2 demand, ROQCS,ROQCA=DOC, acetate demand
-!     ROQCD=microbial respiration used to represent microbial activity
+!     ROQC4HeterMicrobAct=microbial respiration used to represent microbial activity
 !
   FSBST=CDOM(idom_acetate,K)/(CDOM(idom_acetate,K)+OQKAM)
   RGOGY=AZMAX1(FCNP(NGL,K)*VMXM*WatStressMicb*OMActHeter(NGL,K))
@@ -2354,7 +2354,7 @@ module MicBGCMod
   RO2DmndHetert(NGL,K)=0.0_r8
   ROQCS(NGL,K)=0.0_r8
   ROQAS(NGL,K)=RGOGZ
-  ROQCD(NGL,K)=0.0_r8
+  ROQC4HeterMicrobAct(NGL,K)=0.0_r8
   naqfdiag%TCH4H=naqfdiag%TCH4H+0.5_r8*RGOMP
   end associate
   end subroutine AcetoMethanogenCatabolism
@@ -2389,7 +2389,7 @@ module MicBGCMod
     FCNP              => nmics%FCNP,               &
     RO2Dmnd4RespHeter => nmicf%RO2Dmnd4RespHeter,  &
     RO2DmndHeter      => nmicf%RO2DmndHeter,       &
-    ROQCD             => nmicf%ROQCD,              &
+    ROQC4HeterMicrobAct             => nmicf%ROQC4HeterMicrobAct,              &
     ZEROS             => micfor%ZEROS,             &
     DOM               => micstt%DOM,               &
     n_aero_hetrophb   => micpar%n_aero_hetrophb,   &
@@ -2454,7 +2454,7 @@ module MicBGCMod
 ! ECHZ=growth respiration yield
 ! RO2Dmnd4RespHeter,RO2DmndHeter,RO2DmndHetert=O2 demand from DOC,DOA oxidation
 ! ROQCS,ROQAS=DOC,DOA demand from DOC,DOA oxidation
-! ROQCD=microbial respiration used to represent microbial activity
+! ROQC4HeterMicrobAct=microbial respiration used to represent microbial activity
 !
   ECHZ=EO2Q*FGOCP+EO2A*FGOAP
   RO2Dmnd4RespHeter(NGL,K)=2.667_r8*RGOMP
@@ -2465,7 +2465,7 @@ module MicBGCMod
   RO2DmndHetert(NGL,K)=RO2DmndHeter(NGL,K)
   ROQCS(NGL,K)=RGOCZ
   ROQAS(NGL,K)=RGOAZ
-  ROQCD(NGL,K)=RGOCY
+  ROQC4HeterMicrobAct(NGL,K)=RGOCY
 !
   end associate
   end subroutine AerobicHeterotrophCatabolism
@@ -2497,7 +2497,7 @@ module MicBGCMod
     OMActHeter        => nmics%OMActHeter       , &
     RO2Dmnd4RespHeter => nmicf%RO2Dmnd4RespHeter, &
     RO2DmndHeter      => nmicf%RO2DmndHeter     , &
-    ROQCD             => nmicf%ROQCD            , &
+    ROQC4HeterMicrobAct             => nmicf%ROQC4HeterMicrobAct            , &
     TKS               => micfor%TKS             , &
     ZERO              => micfor%ZERO            , &
     DOM               => micstt%DOM             , &
@@ -2533,7 +2533,7 @@ module MicBGCMod
 !     OMA=active fermenter biomass
 !     TSensGrowth=temp stress effect, FOQC=OQC limitation
 !     RFOMP=O2-unlimited respiration of DOC
-!     ROQCD=microbial respiration used to represent microbial activity
+!     ROQC4HeterMicrobAct=microbial respiration used to represent microbial activity
 !
   OXYI=1.0_r8-1.0_r8/(1.0_r8+EXP(1.0_r8*(-COXYS+2.5_r8)))
   FSBST=CDOM(idom_doc,K)/(CDOM(idom_doc,K)+OQKM)*OXYI
@@ -2548,7 +2548,7 @@ module MicBGCMod
   RO2DmndHetert(NGL,K)=0.0_r8
   ROQCS(NGL,K)=RGOFZ
   ROQAS(NGL,K)=0.0_r8
-  ROQCD(NGL,K)=RGOFY
+  ROQC4HeterMicrobAct(NGL,K)=RGOFY
   naqfdiag%TRH2G=naqfdiag%TRH2G+RGOMP
 !
   end associate
@@ -2587,9 +2587,9 @@ module MicBGCMod
   real(r8) :: ROXYD
   real(r8) :: RNO3UptkSoil,RNO3UptkBand,RDNOX
   real(r8) :: RDNOT
-  real(r8) :: RGOM3X,RGOMD3
-  real(r8) :: RNO2UptkSoil,RNO2UptkBand,RDN2X,RDN2T,RGOM2X,RGOMD2,RDN2OX,RGOM1X
-  real(r8) :: RGOMD1
+  real(r8) :: RGOM3X,RNOxReduxRespDenitLim3
+  real(r8) :: RNO2UptkSoil,RNO2UptkBand,RDN2X,RDN2T,RGOM2X,RNOxReduxRespDenitLim2,RDN2OX,RGOM1X
+  real(r8) :: RNOxReduxRespDenitLim1
   real(r8) :: VMXD3
   real(r8) :: VMXDXS
   real(r8) :: VMXDXB
@@ -2602,7 +2602,7 @@ module MicBGCMod
 
 ! begin_execution
   associate(                                                 &
-    WFN                    => nmics%WFN,                     &
+    OxyLimterHeter         => nmics%OxyLimterHeter,          &
     FracOMActHeter         => nmics%FracOMActHeter,          &
     RO2Dmnd4RespHeter      => nmicf%RO2Dmnd4RespHeter,       &
     RO2Uptk4RespHeter      => nmicf%RO2Uptk4RespHeter,       &
@@ -2611,18 +2611,18 @@ module MicBGCMod
     RNO2ReduxHeterSoil     => nmicf%RNO2ReduxHeterSoil,      &
     RNO2ReduxHeterBand     => nmicf%RNO2ReduxHeterBand,      &
     RN2OReduxHeter         => nmicf%RN2OReduxHeter,          &
-    RGOMD                  => nmicf%RGOMD,                   &
-    RGOMY                  => nmicf%RGOMY,                   &
+    RNOxReduxRespDenitLim  => nmicf%RNOxReduxRespDenitLim,   &
+    RNOxReduxRespDenitUlm  => nmicf%RNOxReduxRespDenitUlm,   &
     BulkSOM                => ncplxs%BulkSOM,                &
     RNO2EcoUptkSoilPrev    => micfor%RNO2EcoUptkSoilPrev,    &
     RN2OEcoUptkSoilPrev    => micfor%RN2OEcoUptkSoilPrev,    &
-    RNO3EcoDmndSoilPrev                  => micfor%RNO3EcoDmndSoilPrev,                  &
+    RNO3EcoDmndSoilPrev    => micfor%RNO3EcoDmndSoilPrev,    &
     VLNO3                  => micfor%VLNO3,                  &
     ZERO                   => micfor%ZERO,                   &
     ZEROS                  => micfor%ZEROS,                  &
     ZEROS2                 => micfor%ZEROS2,                 &
     RNO2EcoUptkBandPrev    => micfor%RNO2EcoUptkBandPrev,    &
-    RNO3EcoDmndBandPrev                  => micfor%RNO3EcoDmndBandPrev,                  &
+    RNO3EcoDmndBandPrev    => micfor%RNO3EcoDmndBandPrev,    &
     VLNOB                  => micfor%VLNOB,                  &
     CNO3B                  => micstt%CNO3B,                  &
     CNO3S                  => micstt%CNO3S,                  &
@@ -2681,7 +2681,7 @@ module MicBGCMod
 !     VMXD3S,VMXD3B=substrate-unlimited NO3 reduction in non-band,band
 !     OQCD3S,OQCD3B=DOC limitation to NO3 reduction in non-band, band
 !     RNO3ReduxHeterSoil,RNO3ReduxHeterBand=substrate-limited NO3 reduction in non-band,band
-!     RGOM3X,RGOMD3=substrate-unltd,-ltd respn from NO3 reduction
+!     RGOM3X,RNOxReduxRespDenitLim3=substrate-unltd,-ltd respn from NO3 reduction
 !     RVMX3,RVMB3=demand for NO3 reduction in non-band,band
 !
   ROXYD=AZMAX1(RO2Dmnd4RespHeter(NGL,K)-RO2Uptk4RespHeter(NGL,K))
@@ -2704,7 +2704,7 @@ module MicBGCMod
   ENDIF
   VMXD3S=VMXDXS*FVMXDX
   VMXD3B=VMXDXB*FVMXDX
-  OQCZ3=AZMAX1(DOM(idom_doc,K)*FOQC-RGOCP*WFN(NGL,K))
+  OQCZ3=AZMAX1(DOM(idom_doc,K)*FOQC-RGOCP*OxyLimterHeter(NGL,K))
   OQCD3=OQCZ3/eQNO3toOxy
   OQCD3S=OQCD3*FNO3S
   OQCD3B=OQCD3*FNO3B
@@ -2717,7 +2717,7 @@ module MicBGCMod
   RDNOX=RNO3UptkSoil+RNO3UptkBand
   RDNOT=RNO3ReduxHeterSoil(NGL,K)+RNO3ReduxHeterBand(NGL,K)
   RGOM3X=eQNO3toOxy*RDNOX
-  RGOMD3=eQNO3toOxy*RDNOT
+  RNOxReduxRespDenitLim3=eQNO3toOxy*RDNOT
   RVMX3(NGL,K)=VMXD3S
   RVMB3(NGL,K)=VMXD3B
 !
@@ -2756,7 +2756,7 @@ module MicBGCMod
 !     VMXD2S,VMXD2B=substrate-unlimited NO2 reduction in non-band,band
 !     OQCD2S,OQCD2B=DOC limitation to NO2 reduction in non-band, band
 !     RNO2ReduxHeterSoil,RNO2ReduxHeterBand=substrate-limited NO2 reduction in non-band,band
-!     RGOM2X,RGOMD2=substrate-unltd,-ltd respn from NO2 reduction
+!     RGOM2X,RNOxReduxRespDenitLim2=substrate-unltd,-ltd respn from NO2 reduction
 !
   VMXD2=VMXD3-RDNOT
   IF(CNO2S.GT.ZERO)THEN
@@ -2777,7 +2777,7 @@ module MicBGCMod
   ENDIF
   VMXD2S=VMXDXS*FVMXDX
   VMXD2B=VMXDXB*FVMXDX
-  OQCZ2=AZMAX1(OQCZ3-RGOMD3)
+  OQCZ2=AZMAX1(OQCZ3-RNOxReduxRespDenitLim3)
   OQCD2=OQCZ2/eQNO2toOxy
   OQCD2S=OQCD2*FNO3S
   OQCD2B=OQCD2*FNO3B
@@ -2790,7 +2790,7 @@ module MicBGCMod
   RDN2X=RNO2UptkSoil+RNO2UptkBand
   RDN2T=RNO2ReduxHeterSoil(NGL,K)+RNO2ReduxHeterBand(NGL,K)
   RGOM2X=eQNO2toOxy*RDN2X
-  RGOMD2=eQNO2toOxy*RDN2T
+  RNOxReduxRespDenitLim2=eQNO2toOxy*RDN2T
   RNO2DmndReduxSoilHeter(NGL,K)=VMXD2S
   RNO2DmndReduxBandHeter(NGL,K)=VMXD2B
 !
@@ -2820,8 +2820,8 @@ module MicBGCMod
 !     VMXD1S=substrate-unlimited N2O reduction
 !     OQCD1=DOC limitation to N2O reduction
 !     RDN2O=substrate-limited N2O reduction
-!     RGOM1X,RGOMD1=substrate-unltd,-ltd  respn from N2O reduction
-!     RGOMY,RGOMD=total substrate-unltd,-ltd respn from NOx reduction
+!     RGOM1X,RNOxReduxRespDenitLim1=substrate-unltd,-ltd  respn from N2O reduction
+!     RNOxReduxRespDenitUlm,RNOxReduxRespDenitLim=total substrate-unltd,-ltd respn from NOx reduction
 !     RN2ODmndReduxHeter=demand for N2O reduction
 !
   VMXD1=(VMXD2-RDN2T)*2.0_r8
@@ -2832,15 +2832,15 @@ module MicBGCMod
     FVMXDX=0.0_r8
   ENDIF
   VMXD1S=VMXDXS*FVMXDX
-  OQCZ1=AZMAX1(OQCZ2-RGOMD2)
+  OQCZ1=AZMAX1(OQCZ2-RNOxReduxRespDenitLim2)
   OQCD1=OQCZ1/eQN2OtoOxy
   Z2OSX=(Z2OS+RDN2T)*FN2O
   RDN2OX=AZMAX1(AMIN1(Z2OSX,VMXD1S))
   RN2OReduxHeter(NGL,K)=AZMAX1(AMIN1(VMXD1S,OQCD1,Z2OSX))
   RGOM1X=eQN2OtoOxy*RDN2OX
-  RGOMD1=eQN2OtoOxy*RN2OReduxHeter(NGL,K)
-  RGOMY(NGL,K)=RGOM3X+RGOM2X+RGOM1X
-  RGOMD(NGL,K)=RGOMD3+RGOMD2+RGOMD1
+  RNOxReduxRespDenitLim1=eQN2OtoOxy*RN2OReduxHeter(NGL,K)
+  RNOxReduxRespDenitUlm(NGL,K)=RGOM3X+RGOM2X+RGOM1X
+  RNOxReduxRespDenitLim(NGL,K)=RNOxReduxRespDenitLim3+RNOxReduxRespDenitLim2+RNOxReduxRespDenitLim1
   RN2ODmndReduxHeter(NGL,K)=VMXD1S
   end associate
   end subroutine HeteroDenitrificCatabolism
@@ -2871,51 +2871,51 @@ module MicBGCMod
   real(r8) :: VOLWPM
 
   ! begin_execution
-  associate(                                           &
-    WFN                 => nmics%WFN                 , &
-    OMActHeter          => nmics%OMActHeter          , &
-    RO2UptkHeter        => nmicf%RO2UptkHeter        , &
-    RespGrossHeter      => nmicf%RespGrossHeter      , &
-    RO2Dmnd4RespHeter   => nmicf%RO2Dmnd4RespHeter   , &
-    RO2DmndHeter        => nmicf%RO2DmndHeter        , &
-    RO2Uptk4RespHeter   => nmicf%RO2Uptk4RespHeter   , &
-    RH2ProdHeter        => nmicf%RH2ProdHeter        , &
-    ROQCD               => nmicf%ROQCD               , &
-    RCO2ProdHeter       => nmicf%RCO2ProdHeter       , &
-    RAcettProdHeter     => nmicf%RAcettProdHeter     , &
-    RCH4ProdHeter       => nmicf%RCH4ProdHeter       , &
-    RSOxidSoilAutor     => nmicf%RSOxidSoilAutor     , &
-    RSOxidBandAutor     => nmicf%RSOxidBandAutor     , &
-    O2_irrig_conc       => micfor%O2_irrig_conc      , &
-    O2_rain_conc        => micfor%O2_rain_conc       , &
-    COXYE               => micfor%COXYE              , &
-    ROXYF               => micfor%ROXYF              , &
-    ROXYL               => micfor%ROXYL              , &
-    Irrig2LitRSurf      => micfor%Irrig2LitRSurf     , &
-    Rain2LitRSurf_col   => micfor%Rain2LitRSurf_col  , &
-    litrm               => micfor%litrm              , &
-    OLSGL               => micfor%OLSGL              , &
-    VLSoilPoreMicP_vr   => micfor%VLSoilPoreMicP_vr  , &
-    VLSoilMicP          => micfor%VLSoilMicP         , &
-    ZERO                => micfor%ZERO               , &
-    ZEROS               => micfor%ZEROS              , &
-    VLsoiAirPM          => micfor%VLsoiAirPM         , &
-    VLWatMicP           => micfor%VLWatMicP          , &
-    VLWatMicPM          => micfor%VLWatMicPM         , &
-    THETPM              => micfor%THETPM             , &
-    DiffusivitySolutEff => micfor%DiffusivitySolutEff, &
-    FILM                => micfor%FILM               , &
-    TortMicPM           => micfor%TortMicPM          , &
-    OXYG                => micstt%OXYG               , &
-    OXYS                => micstt%OXYS               , &
-    COXYS               => micstt%COXYS              , &
-    SOXYL               => micstt%SOXYL              , &
-    COXYG               => micstt%COXYG              , &
-    RVMX4               => micflx%RVMX4              , &
-    RVMB4               => micflx%RVMB4              , &
-    RNO2DmndReduxSoilHeter  => micflx%RNO2DmndReduxSoilHeter , &
-    RNO2DmndReduxBandHeter               => micflx%RNO2DmndReduxBandHeter              , &
-    ROXSK               => micflx%ROXSK                &
+  associate(                                                 &
+    OxyLimterHeter         => nmics%OxyLimterHeter,          &
+    OMActHeter             => nmics%OMActHeter,              &
+    RO2UptkHeter           => nmicf%RO2UptkHeter,            &
+    RespGrossHeter         => nmicf%RespGrossHeter,          &
+    RO2Dmnd4RespHeter      => nmicf%RO2Dmnd4RespHeter,       &
+    RO2DmndHeter           => nmicf%RO2DmndHeter,            &
+    RO2Uptk4RespHeter      => nmicf%RO2Uptk4RespHeter,       &
+    RH2ProdHeter           => nmicf%RH2ProdHeter,            &
+    ROQC4HeterMicrobAct    => nmicf%ROQC4HeterMicrobAct,     &
+    RCO2ProdHeter          => nmicf%RCO2ProdHeter,           &
+    RAcettProdHeter        => nmicf%RAcettProdHeter,         &
+    RCH4ProdHeter          => nmicf%RCH4ProdHeter,           &
+    RSOxidSoilAutor        => nmicf%RSOxidSoilAutor,         &
+    RSOxidBandAutor        => nmicf%RSOxidBandAutor,         &
+    O2_irrig_conc          => micfor%O2_irrig_conc,          &
+    O2_rain_conc           => micfor%O2_rain_conc,           &
+    COXYE                  => micfor%COXYE,                  &
+    ROXYF                  => micfor%ROXYF,                  &
+    ROXYL                  => micfor%ROXYL,                  &
+    Irrig2LitRSurf         => micfor%Irrig2LitRSurf,         &
+    Rain2LitRSurf_col      => micfor%Rain2LitRSurf_col,      &
+    litrm                  => micfor%litrm,                  &
+    OLSGL                  => micfor%OLSGL,                  &
+    VLSoilPoreMicP_vr      => micfor%VLSoilPoreMicP_vr,      &
+    VLSoilMicP             => micfor%VLSoilMicP,             &
+    ZERO                   => micfor%ZERO,                   &
+    ZEROS                  => micfor%ZEROS,                  &
+    VLsoiAirPM             => micfor%VLsoiAirPM,             &
+    VLWatMicP              => micfor%VLWatMicP,              &
+    VLWatMicPM             => micfor%VLWatMicPM,             &
+    THETPM                 => micfor%THETPM,                 &
+    DiffusivitySolutEff    => micfor%DiffusivitySolutEff,    &
+    FILM                   => micfor%FILM,                   &
+    TortMicPM              => micfor%TortMicPM,              &
+    OXYG                   => micstt%OXYG,                   &
+    OXYS                   => micstt%OXYS,                   &
+    COXYS                  => micstt%COXYS,                  &
+    SOXYL                  => micstt%SOXYL,                  &
+    COXYG                  => micstt%COXYG,                  &
+    RVMX4                  => micflx%RVMX4,                  &
+    RVMB4                  => micflx%RVMB4,                  &
+    RNO2DmndReduxSoilHeter => micflx%RNO2DmndReduxSoilHeter, &
+    RNO2DmndReduxBandHeter => micflx%RNO2DmndReduxBandHeter, &
+    ROXSK                  => micflx%ROXSK                   &
   )
   IF(RO2DmndHeter(NGL,K).GT.ZEROS.AND.FOXYX.GT.ZERO)THEN
     IF(.not.litrm.OR.VLSoilPoreMicP_vr.GT.ZEROS)THEN
@@ -2993,24 +2993,24 @@ module MicBGCMod
       ENDDO D420
       !write(*,*)'420'
       !
-      !     RATIO OF ACTUAL O2 UPAKE TO BIOLOGICAL DEMAND (WFN)
+      !     RATIO OF ACTUAL O2 UPAKE TO BIOLOGICAL DEMAND (OxyLimterHeter)
       !
-      !     WFN=ratio of O2-limited to O2-unlimited uptake
+      !     OxyLimterHeter=ratio of O2-limited to O2-unlimited uptake
       !     RVMX4,RVNHB,RNO2DmndReduxSoilHeter,RNO2DmndReduxBandHeter=NH3,NO2 oxidation in non-band, band
       !
-      WFN(NGL,K)=AMIN1(1.0_r8,AZMAX1(RO2UptkHeter(NGL,K)/RO2DmndHeter(NGL,K)))
+      OxyLimterHeter(NGL,K)=AMIN1(1.0_r8,AZMAX1(RO2UptkHeter(NGL,K)/RO2DmndHeter(NGL,K)))
 !     IF(K.LE.4)THEN
-!       ROQCS(NGL,K)=ROQCS(NGL,K)*WFN(NGL,K)
-!       ROQAS(NGL,K)=ROQAS(NGL,K)*WFN(NGL,K)
-!       ROQCD(NGL,K)=ROQCD(NGL,K)*WFN(NGL,K)
+!       ROQCS(NGL,K)=ROQCS(NGL,K)*OxyLimterHeter(NGL,K)
+!       ROQAS(NGL,K)=ROQAS(NGL,K)*OxyLimterHeter(NGL,K)
+!       ROQC4HeterMicrobAct(NGL,K)=ROQC4HeterMicrobAct(NGL,K)*OxyLimterHeter(NGL,K)
 !     ENDIF
     ELSE
       RO2UptkHeter(NGL,K)=RO2DmndHeter(NGL,K)
-      WFN(NGL,K)=1.0_r8
+      OxyLimterHeter(NGL,K)=1.0_r8
     ENDIF
   ELSE
     RO2UptkHeter(NGL,K)=0.0_r8
-    WFN(NGL,K)=1.0_r8
+    OxyLimterHeter(NGL,K)=1.0_r8
   ENDIF
   !write(*,*)'RESPIRATION PRODUCTS ALLOCATED TO O2, CO2, ACETATE, CH4, H2'
   !
@@ -3019,11 +3019,11 @@ module MicBGCMod
   !     RO2Uptk4RespHeter=O2-limited O2 uptake
   !     RSOxidSoilAutor,RSOxidBandAutor=total O2-lmited (1)NH4,(2)NO2,(3)CH4 oxidation
   !
-  RespGrossHeter(NGL,K)=RGOMP*WFN(NGL,K)
+  RespGrossHeter(NGL,K)=RGOMP*OxyLimterHeter(NGL,K)
   RCO2ProdHeter(NGL,K)=RespGrossHeter(NGL,K)
   RAcettProdHeter(NGL,K)=0.0_r8
   RCH4ProdHeter(NGL,K)=0.0_r8
-  RO2Uptk4RespHeter(NGL,K)=RO2Dmnd4RespHeter(NGL,K)*WFN(NGL,K)
+  RO2Uptk4RespHeter(NGL,K)=RO2Dmnd4RespHeter(NGL,K)*OxyLimterHeter(NGL,K)
   RH2ProdHeter(NGL,K)=0.0_r8
   !write(*,*)'finish AerobicHeterO2Uptake'
   end associate
@@ -3065,76 +3065,76 @@ module MicBGCMod
 
 !     begin_execution
   associate(                                             &
-   TFNG                  => nmics%TFNG                 , &
-   OMActHeter            => nmics%OMActHeter           , &
-   FNH4XR                => nmicf%FNH4XR               , &
-   FNO3XR                => nmicf%FNO3XR               , &
-   FPO4XR                => nmicf%FPO4XR               , &
-   FP14XR                => nmicf%FP14XR               , &
-   RNH4TransfSoilHeter   => nmicf%RNH4TransfSoilHeter  , &
-   RNO3TransfSoilHeter   => nmicf%RNO3TransfSoilHeter  , &
+   TFNG                  => nmics%TFNG,                  &
+   OMActHeter            => nmics%OMActHeter,            &
+   FNH4XR                => nmicf%FNH4XR,                &
+   FNO3XR                => nmicf%FNO3XR,                &
+   FPO4XR                => nmicf%FPO4XR,                &
+   FP14XR                => nmicf%FP14XR,                &
+   RNH4TransfSoilHeter   => nmicf%RNH4TransfSoilHeter,   &
+   RNO3TransfSoilHeter   => nmicf%RNO3TransfSoilHeter,   &
    RH2PO4TransfSoilHeter => nmicf%RH2PO4TransfSoilHeter, &
-   RNH4TransfBandHeter   => nmicf%RNH4TransfBandHeter  , &
-   RNO3TransfBandHeter   => nmicf%RNO3TransfBandHeter  , &
+   RNH4TransfBandHeter   => nmicf%RNH4TransfBandHeter,   &
+   RNO3TransfBandHeter   => nmicf%RNO3TransfBandHeter,   &
    RH2PO4TransfBandHeter => nmicf%RH2PO4TransfBandHeter, &
-   RNH4TransfLitrHeter   => nmicf%RNH4TransfLitrHeter  , &
-   RNO3TransfLitrHeter   => nmicf%RNO3TransfLitrHeter  , &
+   RNH4TransfLitrHeter   => nmicf%RNH4TransfLitrHeter,   &
+   RNO3TransfLitrHeter   => nmicf%RNO3TransfLitrHeter,   &
    RH2PO4TransfLitrHeter => nmicf%RH2PO4TransfLitrHeter, &
    RH1PO4TransfSoilHeter => nmicf%RH1PO4TransfSoilHeter, &
    RH1PO4TransfBandHeter => nmicf%RH1PO4TransfBandHeter, &
    RH1PO4TransfLitrHeter => nmicf%RH1PO4TransfLitrHeter, &
-   rNCOMC                => micpar%rNCOMC              , &
-   rPCOMC                => micpar%rPCOMC              , &
-   litrm                 => micfor%litrm               , &
-   VLNH4                 => micfor%VLNH4               , &
-   VLNHB                 => micfor%VLNHB               , &
-   VLNO3                 => micfor%VLNO3               , &
-   VLNOB                 => micfor%VLNOB               , &
-   VLPOB                 => micfor%VLPOB               , &
-   VLWatMicP             => micfor%VLWatMicP           , &
-   VOLWU                 => micfor%VOLWU               , &
-   VLPO4                 => micfor%VLPO4               , &
-   ZNH4B                 => micstt%ZNH4B               , &
-   ZNH4S                 => micstt%ZNH4S               , &
-   ZNO3B                 => micstt%ZNO3B               , &
-   ZNO3S                 => micstt%ZNO3S               , &
-   ZNH4TU                => micstt%ZNH4TU              , &
-   ZNO3TU                => micstt%ZNO3TU              , &
-   H1P4TU                => micstt%H1P4TU              , &
-   H2P4TU                => micstt%H2P4TU              , &
-   CNH4BU                => micstt%CNH4BU              , &
-   CNH4SU                => micstt%CNH4SU              , &
-   CH2P4U                => micstt%CH2P4U              , &
-   CH2P4BU               => micstt%CH2P4BU             , &
-   CH1P4U                => micstt%CH1P4U              , &
-   CH1P4BU               => micstt%CH1P4BU             , &
-   CH2P4                 => micstt%CH2P4               , &
-   CH2P4B                => micstt%CH2P4B              , &
-   CNH4B                 => micstt%CNH4B               , &
-   CNH4S                 => micstt%CNH4S               , &
-   CH1P4                 => micstt%CH1P4               , &
-   CH1P4B                => micstt%CH1P4B              , &
-   H1PO4                 => micstt%H1PO4               , &
-   H1POB                 => micstt%H1POB               , &
-   H2PO4                 => micstt%H2PO4               , &
-   H2POB                 => micstt%H2POB               , &
-   CNO3B                 => micstt%CNO3B               , &
-   CNO3S                 => micstt%CNO3S               , &
-   CNO3SU                => micstt%CNO3SU              , &
-   CNO3BU                => micstt%CNO3BU              , &
-   OMEheter              => micstt%OMEheter            , &
-   RINOB                 => micflx%RINOB               , &
-   RINOO                 => micflx%RINOO               , &
-   RINHO                 => micflx%RINHO               , &
-   RINHB                 => micflx%RINHB               , &
-   RIPOO                 => micflx%RIPOO               , &
-   RIPBO                 => micflx%RIPBO               , &
-   RIPO1                 => micflx%RIPO1               , &
-   RIPB1                 => micflx%RIPB1               , &
-   RINHOR                => micflx%RINHOR              , &
-   RINOOR                => micflx%RINOOR              , &
-   RIPOOR                => micflx%RIPOOR              , &
-   RIPO1R                => micflx%RIPO1R              , &
+   rNCOMC                => micpar%rNCOMC,               &
+   rPCOMC                => micpar%rPCOMC,               &
+   litrm                 => micfor%litrm,                &
+   VLNH4                 => micfor%VLNH4,                &
+   VLNHB                 => micfor%VLNHB,                &
+   VLNO3                 => micfor%VLNO3,                &
+   VLNOB                 => micfor%VLNOB,                &
+   VLPOB                 => micfor%VLPOB,                &
+   VLWatMicP             => micfor%VLWatMicP,            &
+   VOLWU                 => micfor%VOLWU,                &
+   VLPO4                 => micfor%VLPO4,                &
+   ZNH4B                 => micstt%ZNH4B,                &
+   ZNH4S                 => micstt%ZNH4S,                &
+   ZNO3B                 => micstt%ZNO3B,                &
+   ZNO3S                 => micstt%ZNO3S,                &
+   ZNH4TU                => micstt%ZNH4TU,               &
+   ZNO3TU                => micstt%ZNO3TU,               &
+   H1P4TU                => micstt%H1P4TU,               &
+   H2P4TU                => micstt%H2P4TU,               &
+   CNH4BU                => micstt%CNH4BU,               &
+   CNH4SU                => micstt%CNH4SU,               &
+   CH2P4U                => micstt%CH2P4U,               &
+   CH2P4BU               => micstt%CH2P4BU,              &
+   CH1P4U                => micstt%CH1P4U,               &
+   CH1P4BU               => micstt%CH1P4BU,              &
+   CH2P4                 => micstt%CH2P4,                &
+   CH2P4B                => micstt%CH2P4B,               &
+   CNH4B                 => micstt%CNH4B,                &
+   CNH4S                 => micstt%CNH4S,                &
+   CH1P4                 => micstt%CH1P4,                &
+   CH1P4B                => micstt%CH1P4B,               &
+   H1PO4                 => micstt%H1PO4,                &
+   H1POB                 => micstt%H1POB,                &
+   H2PO4                 => micstt%H2PO4,                &
+   H2POB                 => micstt%H2POB,                &
+   CNO3B                 => micstt%CNO3B,                &
+   CNO3S                 => micstt%CNO3S,                &
+   CNO3SU                => micstt%CNO3SU,               &
+   CNO3BU                => micstt%CNO3BU,               &
+   OMEheter              => micstt%OMEheter,             &
+   RNO3DmndBandHeter     => micflx%RNO3DmndBandHeter,    &
+   RNO3DmndSoilHeter     => micflx%RNO3DmndSoilHeter,    &
+   RNH4DmndSoilHeter     => micflx%RNH4DmndSoilHeter,    &
+   RNH4DmndBandHeter     => micflx%RNH4DmndBandHeter,    &
+   RH2PO4DmndSoilHeter   => micflx%RH2PO4DmndSoilHeter,  &
+   RH2PO4DmndBandHeter   => micflx%RH2PO4DmndBandHeter,  &
+   RH1PO4DmndSoilHeter   => micflx%RH1PO4DmndSoilHeter,  &
+   RH1PO4DmndBandHeter   => micflx%RH1PO4DmndBandHeter,  &
+   RNH4DmndLitrHeter     => micflx%RNH4DmndLitrHeter,    &
+   RNO3DmndLitrHeter     => micflx%RNO3DmndLitrHeter,    &
+   RH2PO4DmndLitrHeter   => micflx%RH2PO4DmndLitrHeter,  &
+   RH1PO4DmndLitrHeter   => micflx%RH1PO4DmndLitrHeter,  &
    NetNH4Mineralize_col  => micflx%NetNH4Mineralize_col, &
    NetPO4Mineralize_col  => micflx%NetPO4Mineralize_col  &
   )
@@ -3151,7 +3151,7 @@ module MicBGCMod
 !     BIOA=microbial surface area, OMA=active biomass
 !     TFNG=temp+water stress
 !     FNH4S,FNHBS=fractions of NH4 in non-band, band
-!     RINHO,RINHB=substrate-unlimited NH4 mineraln-immobiln
+!     RNH4DmndSoilHeter,RNH4DmndBandHeter=substrate-unlimited NH4 mineraln-immobiln
 !     VOLW=water content
 !     ZNH4M,ZNHBM=NH4 not available for uptake in non-band, band
 !     FNH4X,FNB4X=fractions of biological NH4 demand in non-band, band
@@ -3166,15 +3166,15 @@ module MicBGCMod
     CNH4X=AZMAX1(CNH4S-Z4MN)
     CNH4Y=AZMAX1(CNH4B-Z4MN)
     RINHX=AMIN1(RINHP,BIOA*OMActHeter(NGL,K)*TFNG(NGL,K)*Z4MX)
-    RINHO(NGL,K)=FNH4S*RINHX*CNH4X/(CNH4X+Z4KU)
-    RINHB(NGL,K)=FNHBS*RINHX*CNH4Y/(CNH4Y+Z4KU)
+    RNH4DmndSoilHeter(NGL,K)=FNH4S*RINHX*CNH4X/(CNH4X+Z4KU)
+    RNH4DmndBandHeter(NGL,K)=FNHBS*RINHX*CNH4Y/(CNH4Y+Z4KU)
     ZNH4M=Z4MN*VOLWU*FNH4S
     ZNHBM=Z4MN*VOLWU*FNHBS
-    RNH4TransfSoilHeter(NGL,K)=AMIN1(FNH4X*AZMAX1((ZNH4S-ZNH4M)),RINHO(NGL,K))
-    RNH4TransfBandHeter(NGL,K)=AMIN1(FNB4X*AZMAX1((ZNH4B-ZNHBM)),RINHB(NGL,K))
+    RNH4TransfSoilHeter(NGL,K)=AMIN1(FNH4X*AZMAX1((ZNH4S-ZNH4M)),RNH4DmndSoilHeter(NGL,K))
+    RNH4TransfBandHeter(NGL,K)=AMIN1(FNB4X*AZMAX1((ZNH4B-ZNHBM)),RNH4DmndBandHeter(NGL,K))
   ELSE
-    RINHO(NGL,K)=0.0_r8
-    RINHB(NGL,K)=0.0_r8
+    RNH4DmndSoilHeter(NGL,K)=0.0_r8
+    RNH4DmndBandHeter(NGL,K)=0.0_r8
     RNH4TransfSoilHeter(NGL,K)=RINHP*FNH4S
     RNH4TransfBandHeter(NGL,K)=RINHP*FNHBS
   ENDIF
@@ -3191,7 +3191,7 @@ module MicBGCMod
 !     BIOA=microbial surface area, OMA=active biomass
 !     TFNG=temp+water stress
 !     FNO3S,FNO3B=fractions of NO3 in non-band, band
-!     RINOO,RINOB=substrate-unlimited NO3 immobiln
+!     RNO3DmndSoilHeter,RNO3DmndBandHeter=substrate-unlimited NO3 immobiln
 !     VOLW=water content
 !     ZNO3M,ZNOBM=NO3 not available for uptake in non-band, band
 !     FNO3X,FNB3X=fractions of biological NO3 demand in non-band, band
@@ -3205,15 +3205,15 @@ module MicBGCMod
     CNO3X=AZMAX1(CNO3S-ZOMN)
     CNO3Y=AZMAX1(CNO3B-ZOMN)
     RINOX=AMIN1(RINOP,BIOA*OMActHeter(NGL,K)*TFNG(NGL,K)*ZOMX)
-    RINOO(NGL,K)=FNO3S*RINOX*CNO3X/(CNO3X+ZOKU)
-    RINOB(NGL,K)=FNO3B*RINOX*CNO3Y/(CNO3Y+ZOKU)
+    RNO3DmndSoilHeter(NGL,K)=FNO3S*RINOX*CNO3X/(CNO3X+ZOKU)
+    RNO3DmndBandHeter(NGL,K)=FNO3B*RINOX*CNO3Y/(CNO3Y+ZOKU)
     ZNO3M=ZOMN*VOLWU*FNO3S
     ZNOBM=ZOMN*VOLWU*FNO3B
-    RNO3TransfSoilHeter(NGL,K)=AMIN1(FNO3X*AZMAX1((ZNO3S-ZNO3M)),RINOO(NGL,K))
-    RNO3TransfBandHeter(NGL,K)=AMIN1(FNB3X*AZMAX1((ZNO3B-ZNOBM)),RINOB(NGL,K))
+    RNO3TransfSoilHeter(NGL,K)=AMIN1(FNO3X*AZMAX1((ZNO3S-ZNO3M)),RNO3DmndSoilHeter(NGL,K))
+    RNO3TransfBandHeter(NGL,K)=AMIN1(FNB3X*AZMAX1((ZNO3B-ZNOBM)),RNO3DmndBandHeter(NGL,K))
   ELSE
-    RINOO(NGL,K)=0.0_r8
-    RINOB(NGL,K)=0.0_r8
+    RNO3DmndSoilHeter(NGL,K)=0.0_r8
+    RNO3DmndBandHeter(NGL,K)=0.0_r8
     RNO3TransfSoilHeter(NGL,K)=RINOP*FNO3S
     RNO3TransfBandHeter(NGL,K)=RINOP*FNO3B
   ENDIF
@@ -3232,7 +3232,7 @@ module MicBGCMod
 !     BIOA=microbial surface area, OMA=active biomass
 !     TFNG=temp+water stress
 !     FH2PS,FH2PB=fractions of H2PO4 in non-band, band
-!     RIPOO,RIPBO=substrate-unlimited H2PO4 mineraln-immobiln
+!     RH2PO4DmndSoilHeter,RH2PO4DmndBandHeter=substrate-unlimited H2PO4 mineraln-immobiln
 !     H2POM,H2PBM=H2PO4 not available for uptake in non-band, band
 !     VOLW=water content
 !     FPO4X,FPOBX=fractions of biol H2PO4 demand in non-band, band
@@ -3247,15 +3247,15 @@ module MicBGCMod
     CH2PX=AZMAX1(CH2P4-HPMN)
     CH2PY=AZMAX1(CH2P4B-HPMN)
     RIPOX=AMIN1(RIPOP,BIOA*OMActHeter(NGL,K)*TFNG(NGL,K)*HPMX)
-    RIPOO(NGL,K)=FH2PS*RIPOX*CH2PX/(CH2PX+HPKU)
-    RIPBO(NGL,K)=FH2PB*RIPOX*CH2PY/(CH2PY+HPKU)
+    RH2PO4DmndSoilHeter(NGL,K)=FH2PS*RIPOX*CH2PX/(CH2PX+HPKU)
+    RH2PO4DmndBandHeter(NGL,K)=FH2PB*RIPOX*CH2PY/(CH2PY+HPKU)
     H2POM=HPMN*VLWatMicP*FH2PS
     H2PBM=HPMN*VLWatMicP*FH2PB
-    RH2PO4TransfSoilHeter(NGL,K)=AMIN1(FPO4X*AZMAX1((H2PO4-H2POM)),RIPOO(NGL,K))
-    RH2PO4TransfBandHeter(NGL,K)=AMIN1(FPOBX*AZMAX1((H2POB-H2PBM)),RIPBO(NGL,K))
+    RH2PO4TransfSoilHeter(NGL,K)=AMIN1(FPO4X*AZMAX1((H2PO4-H2POM)),RH2PO4DmndSoilHeter(NGL,K))
+    RH2PO4TransfBandHeter(NGL,K)=AMIN1(FPOBX*AZMAX1((H2POB-H2PBM)),RH2PO4DmndBandHeter(NGL,K))
   ELSE
-    RIPOO(NGL,K)=0.0_r8
-    RIPBO(NGL,K)=0.0_r8
+    RH2PO4DmndSoilHeter(NGL,K)=0.0_r8
+    RH2PO4DmndBandHeter(NGL,K)=0.0_r8
     RH2PO4TransfSoilHeter(NGL,K)=RIPOP*FH2PS
     RH2PO4TransfBandHeter(NGL,K)=RIPOP*FH2PB
   ENDIF
@@ -3272,7 +3272,7 @@ module MicBGCMod
 !     BIOA=microbial surface area, OMA=active biomass
 !     TFNG=temp+water stress
 !     FH1PS,FH1PB=fractions of HPO4 in non-band, band
-!     RIPO1,RIPB1=substrate-unlimited HPO4 mineraln-immobiln
+!     RH1PO4DmndSoilHeter,RH1PO4DmndBandHeter=substrate-unlimited HPO4 mineraln-immobiln
 !     H1POM,H1PBM=HPO4 not available for uptake in non-band, band
 !     VOLW=water content
 !     FP14X,FP1BX=fractions of biol HPO4 demand in non-band, band
@@ -3286,15 +3286,15 @@ module MicBGCMod
     CH1PX=AZMAX1(CH1P4-HPMN)
     CH1PY=AZMAX1(CH1P4B-HPMN)
     RIP1X=AMIN1(RIP1P,BIOA*OMActHeter(NGL,K)*TFNG(NGL,K)*HPMX)
-    RIPO1(NGL,K)=FH1PS*RIP1X*CH1PX/(CH1PX+HPKU)
-    RIPB1(NGL,K)=FH1PB*RIP1X*CH1PY/(CH1PY+HPKU)
+    RH1PO4DmndSoilHeter(NGL,K)=FH1PS*RIP1X*CH1PX/(CH1PX+HPKU)
+    RH1PO4DmndBandHeter(NGL,K)=FH1PB*RIP1X*CH1PY/(CH1PY+HPKU)
     H1POM=HPMN*VLWatMicP*FH1PS
     H1PBM=HPMN*VLWatMicP*FH1PB
-    RH1PO4TransfSoilHeter(NGL,K)=AMIN1(FP14X*AZMAX1((H1PO4-H1POM)),RIPO1(NGL,K))
-    RH1PO4TransfBandHeter(NGL,K)=AMIN1(FP1BX*AZMAX1((H1POB-H1PBM)),RIPB1(NGL,K))
+    RH1PO4TransfSoilHeter(NGL,K)=AMIN1(FP14X*AZMAX1((H1PO4-H1POM)),RH1PO4DmndSoilHeter(NGL,K))
+    RH1PO4TransfBandHeter(NGL,K)=AMIN1(FP1BX*AZMAX1((H1POB-H1PBM)),RH1PO4DmndBandHeter(NGL,K))
   ELSE
-    RIPO1(NGL,K)=0.0_r8
-    RIPB1(NGL,K)=0.0_r8
+    RH1PO4DmndSoilHeter(NGL,K)=0.0_r8
+    RH1PO4DmndBandHeter(NGL,K)=0.0_r8
     RH1PO4TransfSoilHeter(NGL,K)=RIP1P*FH1PS
     RH1PO4TransfBandHeter(NGL,K)=RIP1P*FH1PB
   ENDIF
@@ -3312,7 +3312,7 @@ module MicBGCMod
 !     BIOA=microbial surface area, OMA=active biomass
 !     TFNG=temp+water stress
 !     FNH4S,FNHBS=fractions of NH4 in non-band, band
-!     RINHOR=substrate-unlimited NH4 mineraln-immobiln
+!     RNH4DmndLitrHeter=substrate-unlimited NH4 mineraln-immobiln
 !     VOLW=water content
 !     ZNH4M=NH4 not available for uptake
 !     FNH4XR=fractions of biological NH4 demand
@@ -3324,12 +3324,12 @@ module MicBGCMod
     IF(RINHPR.GT.0.0_r8)THEN
       CNH4X=AZMAX1(CNH4SU-Z4MN)
       CNH4Y=AZMAX1(CNH4BU-Z4MN)
-      RINHOR(NGL,K)=AMIN1(RINHPR,BIOA*OMActHeter(NGL,K)*TFNG(NGL,K)*Z4MX) &
+      RNH4DmndLitrHeter(NGL,K)=AMIN1(RINHPR,BIOA*OMActHeter(NGL,K)*TFNG(NGL,K)*Z4MX) &
         *(FNH4S*CNH4X/(CNH4X+Z4KU)+FNHBS*CNH4Y/(CNH4Y+Z4KU))
       ZNH4M=Z4MN*VLWatMicP
-      RNH4TransfLitrHeter(NGL,K)=AMIN1(FNH4XR(NGL,K)*AZMAX1((ZNH4TU-ZNH4M)),RINHOR(NGL,K))
+      RNH4TransfLitrHeter(NGL,K)=AMIN1(FNH4XR(NGL,K)*AZMAX1((ZNH4TU-ZNH4M)),RNH4DmndLitrHeter(NGL,K))
     ELSE
-      RINHOR(NGL,K)=0.0_r8
+      RNH4DmndLitrHeter(NGL,K)=0.0_r8
       RNH4TransfLitrHeter(NGL,K)=RINHPR
     ENDIF
     NetNH4Mineralize_col=NetNH4Mineralize_col+RNH4TransfLitrHeter(NGL,K)
@@ -3343,7 +3343,7 @@ module MicBGCMod
 !     CNO3S,CNO3B=aqueous NO3 concentrations in non-band, band
 !     ZOMX,ZOMN,ZOKU=parameters for max NO3 uptake rate,
 !     minimum NO3 concentration and Km for NO3 uptake
-!     RINOOR=microbially limited NO3 demand
+!     RNO3DmndLitrHeter=microbially limited NO3 demand
 !     BIOA=microbial surface area, OMA=active biomass
 !     TFNG=temp+water stress
 !     FNO3S,FNO3B=fractions of NO3 in non-band, band
@@ -3358,12 +3358,12 @@ module MicBGCMod
     IF(RINOPR.GT.0.0_r8)THEN
       CNO3X=AZMAX1(CNO3SU-ZOMN)
       CNO3Y=AZMAX1(CNO3BU-ZOMN)
-      RINOOR(NGL,K)=AMAX1(RINOPR,BIOA*OMActHeter(NGL,K)*TFNG(NGL,K)*ZOMX) &
+      RNO3DmndLitrHeter(NGL,K)=AMAX1(RINOPR,BIOA*OMActHeter(NGL,K)*TFNG(NGL,K)*ZOMX) &
         *(FNO3S*CNO3X/(CNO3X+ZOKU)+FNO3B*CNO3Y/(CNO3Y+ZOKU))
       ZNO3M=ZOMN*VLWatMicP
-      RNO3TransfLitrHeter(NGL,K)=AMIN1(FNO3XR(NGL,K)*AZMAX1((ZNO3TU-ZNO3M)),RINOOR(NGL,K))
+      RNO3TransfLitrHeter(NGL,K)=AMIN1(FNO3XR(NGL,K)*AZMAX1((ZNO3TU-ZNO3M)),RNO3DmndLitrHeter(NGL,K))
     ELSE
-      RINOOR(NGL,K)=0.0_r8
+      RNO3DmndLitrHeter(NGL,K)=0.0_r8
       RNO3TransfLitrHeter(NGL,K)=RINOPR
     ENDIF
     NetNH4Mineralize_col=NetNH4Mineralize_col+RNO3TransfLitrHeter(NGL,K)
@@ -3377,11 +3377,11 @@ module MicBGCMod
 !     CH2P4,CH2P4B=aqueous H2PO4 concentrations in non-band, band
 !     HPMX,HPMN,HPKU=parameters for max H2PO4 uptake rate,
 !     minimum H2PO4 concentration and Km for H2PO4 uptake
-!     RIPOOR=microbially limited H2PO4 demand
+!     RH2PO4DmndLitrHeter=microbially limited H2PO4 demand
 !     BIOA=microbial surface area, OMA=active biomass
 !     TFNG=temp+water stress
 !     FH2PS,FH2PB=fractions of H2PO4 in non-band, band
-!     RIPOOR=substrate-unlimited H2PO4 mineraln-immobiln
+!     RH2PO4DmndLitrHeter=substrate-unlimited H2PO4 mineraln-immobiln
 !     VOLW=water content
 !     H2P4M=H2PO4 not available for uptake
 !     FPO4XR=fractions of biological H2PO4 demand
@@ -3392,12 +3392,12 @@ module MicBGCMod
     IF(RIPOPR.GT.0.0_r8)THEN
       CH2PX=AZMAX1(CH2P4U-HPMN)
       CH2PY=AZMAX1(CH2P4BU-HPMN)
-      RIPOOR(NGL,K)=AMIN1(RIPOPR,BIOA*OMActHeter(NGL,K)*TFNG(NGL,K)*HPMX) &
+      RH2PO4DmndLitrHeter(NGL,K)=AMIN1(RIPOPR,BIOA*OMActHeter(NGL,K)*TFNG(NGL,K)*HPMX) &
         *(FH2PS*CH2PX/(CH2PX+HPKU)+FH2PB*CH2PY/(CH2PY+HPKU))
       H2P4M=HPMN*VOLWU
-      RH2PO4TransfLitrHeter(NGL,K)=AMIN1(FPO4XR(NGL,K)*AZMAX1((H2P4TU-H2P4M)),RIPOOR(NGL,K))
+      RH2PO4TransfLitrHeter(NGL,K)=AMIN1(FPO4XR(NGL,K)*AZMAX1((H2P4TU-H2P4M)),RH2PO4DmndLitrHeter(NGL,K))
     ELSE
-      RIPOOR(NGL,K)=0.0_r8
+      RH2PO4DmndLitrHeter(NGL,K)=0.0_r8
       RH2PO4TransfLitrHeter(NGL,K)=RIPOPR
     ENDIF
     NetPO4Mineralize_col=NetPO4Mineralize_col+RH2PO4TransfLitrHeter(NGL,K)
@@ -3411,11 +3411,11 @@ module MicBGCMod
 !     CH1P4,CH1P4B=aqueous HPO4 concentrations in non-band, band
 !     HPMX,HPMN,HPKU=parameters for max HPO4 uptake rate,
 !     minimum HPO4 concentration and Km for HPO4 uptake
-!     RIPO1R=microbially limited HPO4 demand
+!     RH1PO4DmndLitrHeter=microbially limited HPO4 demand
 !     BIOA=microbial surface area, OMA=active biomass
 !     TFNG=temp+water stress
 !     FH1PS,FH1PB=fractions of HPO4 in non-band, band
-!     RIPO1R=substrate-unlimited HPO4 mineraln-immobiln
+!     RH1PO4DmndLitrHeter=substrate-unlimited HPO4 mineraln-immobiln
 !     VOLW=water content
 !     H1P4M=HPO4 not available for uptake
 !     FP14XR=fraction of biological HPO4 demand
@@ -3428,12 +3428,12 @@ module MicBGCMod
     IF(RIP1PR.GT.0.0_r8)THEN
       CH1PX=AZMAX1(CH1P4U-HPMN)
       CH1PY=AZMAX1(CH1P4BU-HPMN)
-      RIPO1R(NGL,K)=AMIN1(RIP1PR,BIOA*OMActHeter(NGL,K)*TFNG(NGL,K)*HPMX) &
+      RH1PO4DmndLitrHeter(NGL,K)=AMIN1(RIP1PR,BIOA*OMActHeter(NGL,K)*TFNG(NGL,K)*HPMX) &
         *(FH1PS*CH1PX/(CH1PX+HPKU)+FH1PB*CH1PY/(CH1PY+HPKU))
       H1P4M=HPMN*VOLWU
-      RH1PO4TransfLitrHeter(NGL,K)=AMIN1(FP14XR(NGL,K)*AZMAX1((H1P4TU-H1P4M)),RIPO1R(NGL,K))
+      RH1PO4TransfLitrHeter(NGL,K)=AMIN1(FP14XR(NGL,K)*AZMAX1((H1P4TU-H1P4M)),RH1PO4DmndLitrHeter(NGL,K))
     ELSE
-      RIPO1R(NGL,K)=0.0_r8
+      RH1PO4DmndLitrHeter(NGL,K)=0.0_r8
       RH1PO4TransfLitrHeter(NGL,K)=RIP1PR
     ENDIF
     NetPO4Mineralize_col=NetPO4Mineralize_col+RH1PO4TransfLitrHeter(NGL,K)
@@ -3567,7 +3567,7 @@ module MicBGCMod
     CGOAC               => nmicf%CGOAC,               &
     CGOMES              => nmicf%CGOMES,              &
     RespGrossHeter      => nmicf%RespGrossHeter,      &
-    RGOMD               => nmicf%RGOMD,               &
+    RNOxReduxRespDenitLim               => nmicf%RNOxReduxRespDenitLim,               &
     RMOMC               => nmicf%RMOMC,               &
     RDOMEheter          => nmicf%RDOMEheter,          &
     RHOMEheter          => nmicf%RHOMEheter,          &
@@ -3600,7 +3600,7 @@ module MicBGCMod
 !     CGOMD=DOC+acetate uptake from denitrifier growth respiration
 !     RMaintRespHeter=maintenance respiration
 !     RespGrossHeter=total respiration
-!     RGOMD=respiration for denitrifcation
+!     RNOxReduxRespDenitLim=respiration for denitrifcation
 !     Resp4NFixHeter=respiration for N2 fixation
 !     ECHZ,ENOX=growth respiration efficiencies for O2, NOx reduction
 !     CGOMEheter,CGOQC,CGOAC=total DOC+acetate, DOC, acetate uptake(heterotrophs
@@ -3614,7 +3614,7 @@ module MicBGCMod
 !
 
   CGOMX=AMIN1(RMaintRespHeter,RespGrossHeter(NGL,K))+Resp4NFixHeter(NGL,K)+(RGrowthRespHeter-Resp4NFixHeter(NGL,K))/ECHZ
-  CGOMD=RGOMD(NGL,K)/ENOX
+  CGOMD=RNOxReduxRespDenitLim(NGL,K)/ENOX
   CGOMEheter(ielmc,NGL,K)=CGOMX+CGOMD
 
   CGOQC(NGL,K)=CGOMX*FGOCP+CGOMD

@@ -360,18 +360,18 @@ module InitSOMBGCMOD
   RVMX3(:,:,L,NY,NX)=0.0_r8
   RNO2DmndReduxSoilHeter_vr(:,:,L,NY,NX)=0.0_r8
   RN2ODmndReduxHeter_vr(:,:,L,NY,NX)=0.0_r8
-  RINHO(:,:,L,NY,NX)=0.0_r8
-  RINHB(:,:,L,NY,NX)=0.0_r8
-  RINOO(:,:,L,NY,NX)=0.0_r8
-  RIPOO(:,:,L,NY,NX)=0.0_r8
-  RINOB(:,:,L,NY,NX)=0.0_r8
-  RIPBO(:,:,L,NY,NX)=0.0_r8
-  RIPO1(:,:,L,NY,NX)=0.0_r8
-  RIPB1(:,:,L,NY,NX)=0.0_r8
+  RNH4DmndSoilHeter_vr(:,:,L,NY,NX)=0.0_r8
+  RNH4DmndBandHeter_vr(:,:,L,NY,NX)=0.0_r8
+  RNO3DmndSoilHeter_vr(:,:,L,NY,NX)=0.0_r8
+  RH2PO4DmndSoilHeter_vr(:,:,L,NY,NX)=0.0_r8
+  RNO3DmndBandHeter_vr(:,:,L,NY,NX)=0.0_r8
+  RH2PO4DmndBandHeter_vr(:,:,L,NY,NX)=0.0_r8
+  RH1PO4DmndSoilHeter_vr(:,:,L,NY,NX)=0.0_r8
+  RH1PO4DmndBandHeter_vr(:,:,L,NY,NX)=0.0_r8
   IF(L.EQ.0)THEN
-    RINHOR(:,:,NY,NX)=0.0_r8
-    RINOOR(:,:,NY,NX)=0.0_r8
-    RIPOOR(:,:,NY,NX)=0.0_r8
+    RNH4DmndLitrHeter_col(:,:,NY,NX)=0.0_r8
+    RNO3DmndLitrHeter_col(:,:,NY,NX)=0.0_r8
+    RH2PO4DmndLitrHeter_col(:,:,NY,NX)=0.0_r8
   ENDIF
 
   D6990: DO K=1,jcplx
