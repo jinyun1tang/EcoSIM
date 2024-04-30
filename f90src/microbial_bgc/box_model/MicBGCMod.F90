@@ -2126,53 +2126,53 @@ module MicBGCMod
   type(NitroMicFluxType), intent(inout) :: nmicf
   type(micfluxtype), intent(inout) :: micflx
 ! begin_execution
-  associate(                                            &
-    FracOMActHeter     => nmics%FracOMActHeter        , &
-    FracHeterBiomOfActK               => nmics%FracHeterBiomOfActK                  , &
-    FNH4XR             => nmicf%FNH4XR                , &
-    FNO3XR             => nmicf%FNO3XR                , &
-    FP14XR             => nmicf%FP14XR                , &
-    FPO4XR             => nmicf%FPO4XR                , &
-    RO2DmndHetert      => micflx%RO2DmndHetert        , &
-    RINHO              => micflx%RINHO                , &
-    RINHB              => micflx%RINHB                , &
-    RINOO              => micflx%RINOO                , &
-    RINOB              => micflx%RINOB                , &
-    RIPOO              => micflx%RIPOO                , &
-    RIPBO              => micflx%RIPBO                , &
-    RIPO1              => micflx%RIPO1                , &
-    RIPB1              => micflx%RIPB1                , &
-    ROQCS              => micflx%ROQCS                , &
-    ROQAS              => micflx%ROQAS                , &
-    RINHOR             => micflx%RINHOR               , &
-    RINOOR             => micflx%RINOOR               , &
-    RIPOOR             => micflx%RIPOOR               , &
-    RIPO1R             => micflx%RIPO1R               , &
-    litrm              => micfor%litrm                , &
-    VLNH4              => micfor%VLNH4                , &
-    VLNHB              => micfor%VLNHB                , &
-    VLNOB              => micfor%VLNOB                , &
-    VLNO3              => micfor%VLNO3                , &
-    VLPOB              => micfor%VLPOB                , &
-    VLPO4              => micfor%VLPO4                , &
-    ZEROS              => micfor%ZEROS                , &
-    ROXYY              => micfor%ROXYY                , &
-    RNH4EcoDmndSoilPrev              => micfor%RNH4EcoDmndSoilPrev                , &
-    RNH4EcoDmndBandPrev              => micfor%RNH4EcoDmndBandPrev                , &
-    RNO3Y              => micfor%RNO3Y                , &
-    RNH4EcoDmndLitrPrev             => micfor%RNH4EcoDmndLitrPrev               , &
-    RNO3EcoDmndLitrPrev             => micfor%RNO3EcoDmndLitrPrev               , &
-    RH1PO4EcoDmndLitrPrev             => micfor%RH1PO4EcoDmndLitrPrev               , &
-    RH2PO4EcoDmndLitrPrev             => micfor%RH2PO4EcoDmndLitrPrev               , &
-    RN3BY              => micfor%RN3BY                , &
-    RPO4Y              => micfor%RPO4Y                , &
-    RPOBY              => micfor%RPOBY                , &
-    RP14Y              => micfor%RP14Y                , &
-    RP1BY              => micfor%RP1BY                , &
-    ROQCY              => micfor%ROQCY                , &
-    ROQAY              => micfor%ROQAY                , &
-    Lsurf              => micfor%Lsurf                , &
-    SoilMicPMassLayer0 => micfor%SoilMicPMassLayer0     &
+  associate(                                               &
+    FracOMActHeter        => nmics%FracOMActHeter,         &
+    FracHeterBiomOfActK   => nmics%FracHeterBiomOfActK,    &
+    FNH4XR                => nmicf%FNH4XR,                 &
+    FNO3XR                => nmicf%FNO3XR,                 &
+    FP14XR                => nmicf%FP14XR,                 &
+    FPO4XR                => nmicf%FPO4XR,                 &
+    RO2DmndHetert         => micflx%RO2DmndHetert,         &
+    RINHO                 => micflx%RINHO,                 &
+    RINHB                 => micflx%RINHB,                 &
+    RINOO                 => micflx%RINOO,                 &
+    RINOB                 => micflx%RINOB,                 &
+    RIPOO                 => micflx%RIPOO,                 &
+    RIPBO                 => micflx%RIPBO,                 &
+    RIPO1                 => micflx%RIPO1,                 &
+    RIPB1                 => micflx%RIPB1,                 &
+    ROQCS                 => micflx%ROQCS,                 &
+    ROQAS                 => micflx%ROQAS,                 &
+    RINHOR                => micflx%RINHOR,                &
+    RINOOR                => micflx%RINOOR,                &
+    RIPOOR                => micflx%RIPOOR,                &
+    RIPO1R                => micflx%RIPO1R,                &
+    litrm                 => micfor%litrm,                 &
+    VLNH4                 => micfor%VLNH4,                 &
+    VLNHB                 => micfor%VLNHB,                 &
+    VLNOB                 => micfor%VLNOB,                 &
+    VLNO3                 => micfor%VLNO3,                 &
+    VLPOB                 => micfor%VLPOB,                 &
+    VLPO4                 => micfor%VLPO4,                 &
+    ZEROS                 => micfor%ZEROS,                 &
+    RO2EcoDmndPrev        => micfor%RO2EcoDmndPrev,        &
+    RNH4EcoDmndSoilPrev   => micfor%RNH4EcoDmndSoilPrev,   &
+    RNH4EcoDmndBandPrev   => micfor%RNH4EcoDmndBandPrev,   &
+    RNO3EcoDmndSoilPrev   => micfor%RNO3EcoDmndSoilPrev,   &
+    RNH4EcoDmndLitrPrev   => micfor%RNH4EcoDmndLitrPrev,   &
+    RNO3EcoDmndLitrPrev   => micfor%RNO3EcoDmndLitrPrev,   &
+    RH1PO4EcoDmndLitrPrev => micfor%RH1PO4EcoDmndLitrPrev, &
+    RH2PO4EcoDmndLitrPrev => micfor%RH2PO4EcoDmndLitrPrev, &
+    RNO3EcoDmndBandPrev   => micfor%RNO3EcoDmndBandPrev,   &
+    RH2PO4EcoDmndSoilPrev => micfor%RH2PO4EcoDmndSoilPrev, &
+    RH2PO4EcoDmndBandPrev => micfor%RH2PO4EcoDmndBandPrev, &
+    RH1PO4EcoDmndSoilPrev => micfor%RH1PO4EcoDmndSoilPrev, &
+    RH1PO4EcoDmndBandPrev => micfor%RH1PO4EcoDmndBandPrev, &
+    RDOMEcoDmndPrev       => micfor%RDOMEcoDmndPrev,       &
+    RAcetateEcoDmndPrev   => micfor%RAcetateEcoDmndPrev,   &
+    Lsurf                 => micfor%Lsurf,                 &
+    SoilMicPMassLayer0    => micfor%SoilMicPMassLayer0     &
   )
 ! F*=fraction of substrate uptake relative to total uptake from
 ! previous hour. OXYX=O2, NH4X=NH4 non-band, NB4X=NH4 band
@@ -2180,8 +2180,8 @@ module MicBGCMod
 ! POBX=H2PO4 band,P14X=HPO4 non-band, P1BX=HPO4 band, OQC=DOC
 ! oxidation, OQA=acetate oxidation
 !
-  IF(ROXYY.GT.ZEROS)THEN
-    FOXYX=AMAX1(FMN,RO2DmndHetert(NGL,K)/ROXYY)
+  IF(RO2EcoDmndPrev.GT.ZEROS)THEN
+    FOXYX=AMAX1(FMN,RO2DmndHetert(NGL,K)/RO2EcoDmndPrev)
   ELSE
     FOXYX=AMAX1(FMN,FracOMActHeter(NGL,K))
   ENDIF
@@ -2195,48 +2195,49 @@ module MicBGCMod
   ELSE
     FNB4X=AMAX1(FMN,FracOMActHeter(NGL,K)*VLNHB)
   ENDIF
-  IF(RNO3Y.GT.ZEROS)THEN
-    FNO3X=AMAX1(FMN,RINOO(NGL,K)/RNO3Y)
+  IF(RNO3EcoDmndSoilPrev.GT.ZEROS)THEN
+    FNO3X=AMAX1(FMN,RINOO(NGL,K)/RNO3EcoDmndSoilPrev)
   ELSE
     FNO3X=AMAX1(FMN,FracOMActHeter(NGL,K)*VLNO3)
   ENDIF
-  IF(RN3BY.GT.ZEROS)THEN
-    FNB3X=AMAX1(FMN,RINOB(NGL,K)/RN3BY)
+  IF(RNO3EcoDmndBandPrev.GT.ZEROS)THEN
+    FNB3X=AMAX1(FMN,RINOB(NGL,K)/RNO3EcoDmndBandPrev)
   ELSE
     FNB3X=AMAX1(FMN,FracOMActHeter(NGL,K)*VLNOB)
   ENDIF
-  IF(RPO4Y.GT.ZEROS)THEN
-    FPO4X=AMAX1(FMN,RIPOO(NGL,K)/RPO4Y)
+  IF(RH2PO4EcoDmndSoilPrev.GT.ZEROS)THEN
+    FPO4X=AMAX1(FMN,RIPOO(NGL,K)/RH2PO4EcoDmndSoilPrev)
   ELSE
     FPO4X=AMAX1(FMN,FracOMActHeter(NGL,K)*VLPO4)
   ENDIF
-  IF(RPOBY.GT.ZEROS)THEN
-    FPOBX=AMAX1(FMN,RIPBO(NGL,K)/RPOBY)
+  IF(RH2PO4EcoDmndBandPrev.GT.ZEROS)THEN
+    FPOBX=AMAX1(FMN,RIPBO(NGL,K)/RH2PO4EcoDmndBandPrev)
   ELSE
     FPOBX=AMAX1(FMN,FracOMActHeter(NGL,K)*VLPOB)
   ENDIF
-  IF(RP14Y.GT.ZEROS)THEN
-    FP14X=AMAX1(FMN,RIPO1(NGL,K)/RP14Y)
+  IF(RH1PO4EcoDmndSoilPrev.GT.ZEROS)THEN
+    FP14X=AMAX1(FMN,RIPO1(NGL,K)/RH1PO4EcoDmndSoilPrev)
   ELSE
     FP14X=AMAX1(FMN,FracOMActHeter(NGL,K)*VLPO4)
   ENDIF
-  IF(RP1BY.GT.ZEROS)THEN
-    FP1BX=AMAX1(FMN,RIPB1(NGL,K)/RP1BY)
+  IF(RH1PO4EcoDmndBandPrev.GT.ZEROS)THEN
+    FP1BX=AMAX1(FMN,RIPB1(NGL,K)/RH1PO4EcoDmndBandPrev)
   ELSE
     FP1BX=AMAX1(FMN,FracOMActHeter(NGL,K)*VLPOB)
   ENDIF
 
-  IF(ROQCY(K).GT.ZEROS)THEN
-    FOQC=AMAX1(FMN,ROQCS(NGL,K)/ROQCY(K))
+  IF(RDOMEcoDmndPrev(K).GT.ZEROS)THEN
+    FOQC=AMAX1(FMN,ROQCS(NGL,K)/RDOMEcoDmndPrev(K))
   ELSE
     FOQC=AMAX1(FMN,FracHeterBiomOfActK(NGL,K))
   ENDIF
   naqfdiag%TFOQC=naqfdiag%TFOQC+FOQC
-  IF(ROQAY(K).GT.ZEROS)THEN
-    FOQA=AMAX1(FMN,ROQAS(NGL,K)/ROQAY(K))
+  IF(RAcetateEcoDmndPrev(K).GT.ZEROS)THEN
+    FOQA=AMAX1(FMN,ROQAS(NGL,K)/RAcetateEcoDmndPrev(K))
   ELSE
     FOQA=AMAX1(FMN,FracHeterBiomOfActK(NGL,K))
   ENDIF
+
   naqfdiag%TFOQA=naqfdiag%TFOQA+FOQA
   naqfdiag%TFOXYX=naqfdiag%TFOXYX+FOXYX
   naqfdiag%TFNH4X=naqfdiag%TFNH4X+FNH4X
@@ -2615,13 +2616,13 @@ module MicBGCMod
     BulkSOM                => ncplxs%BulkSOM,                &
     RNO2EcoUptkSoilPrev    => micfor%RNO2EcoUptkSoilPrev,    &
     RN2OEcoUptkSoilPrev    => micfor%RN2OEcoUptkSoilPrev,    &
-    RNO3Y                  => micfor%RNO3Y,                  &
+    RNO3EcoDmndSoilPrev                  => micfor%RNO3EcoDmndSoilPrev,                  &
     VLNO3                  => micfor%VLNO3,                  &
     ZERO                   => micfor%ZERO,                   &
     ZEROS                  => micfor%ZEROS,                  &
     ZEROS2                 => micfor%ZEROS2,                 &
     RNO2EcoUptkBandPrev    => micfor%RNO2EcoUptkBandPrev,    &
-    RN3BY                  => micfor%RN3BY,                  &
+    RNO3EcoDmndBandPrev                  => micfor%RNO3EcoDmndBandPrev,                  &
     VLNOB                  => micfor%VLNOB,                  &
     CNO3B                  => micstt%CNO3B,                  &
     CNO3S                  => micstt%CNO3S,                  &
@@ -2651,13 +2652,13 @@ module MicBGCMod
 
   FNO3S=VLNO3
   FNO3B=VLNOB
-  IF(RNO3Y.GT.ZEROS)THEN
-    FNO3=AMAX1(FMN,RVMX3(NGL,K)/RNO3Y)
+  IF(RNO3EcoDmndSoilPrev.GT.ZEROS)THEN
+    FNO3=AMAX1(FMN,RVMX3(NGL,K)/RNO3EcoDmndSoilPrev)
   ELSE
     FNO3=AMAX1(FMN,FracOMActHeter(NGL,K)*VLNO3)
   ENDIF
-  IF(RN3BY.GT.ZEROS)THEN
-    FNB3=AMAX1(FMN,RVMB3(NGL,K)/RN3BY)
+  IF(RNO3EcoDmndBandPrev.GT.ZEROS)THEN
+    FNB3=AMAX1(FMN,RVMB3(NGL,K)/RNO3EcoDmndBandPrev)
   ELSE
     FNB3=AMAX1(FMN,FracOMActHeter(NGL,K)*VLNOB)
   ENDIF

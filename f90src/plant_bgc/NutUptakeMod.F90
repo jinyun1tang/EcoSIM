@@ -277,10 +277,10 @@ module NutUptakeMod
     RUPP2P       =>   plt_rbgc%RUPP2P     , &
     RUPP2B       =>   plt_rbgc%RUPP2B     , &
     SolDifc_vr   =>   plt_soilchem%SolDifc_vr, &
-    RP1BY        =>   plt_bgcr%RP1BY      , &
-    RPOBY        =>   plt_bgcr%RPOBY      , &
-    RP14Y        =>   plt_bgcr%RP14Y      , &
-    RPO4Y        =>   plt_bgcr%RPO4Y        &
+    RH1PO4EcoDmndBandPrev_vr        =>   plt_bgcr%RH1PO4EcoDmndBandPrev_vr      , &
+    RH2PO4EcoDmndBandPrev_vr        =>   plt_bgcr%RH2PO4EcoDmndBandPrev_vr      , &
+    RH1PO4EcoDmndSoilPrev_vr        =>   plt_bgcr%RH1PO4EcoDmndSoilPrev_vr      , &
+    RH2PO4EcoDmndSoilPrev_vr        =>   plt_bgcr%RH2PO4EcoDmndSoilPrev_vr        &
   )
   TFPO4X=0.0_r8
   TFPOBX=0.0_r8
@@ -288,23 +288,23 @@ module NutUptakeMod
   TFP1BX=0.0_r8
 
 !     begin_execution
-  IF(RPO4Y(L).GT.ZEROS)THEN
-    FPO4X=AMAX1(MinFracPRoot4Uptake(N,L,NZ),RUPP2P(N,L,NZ)/RPO4Y(L))
+  IF(RH2PO4EcoDmndSoilPrev_vr(L).GT.ZEROS)THEN
+    FPO4X=AMAX1(MinFracPRoot4Uptake(N,L,NZ),RUPP2P(N,L,NZ)/RH2PO4EcoDmndSoilPrev_vr(L))
   ELSE
     FPO4X=FracPRoot4Uptake(N,L,NZ)
   ENDIF
-  IF(RPOBY(L).GT.ZEROS)THEN
-    FPOBX=AMAX1(MinFracPRoot4Uptake(N,L,NZ),RUPP2B(N,L,NZ)/RPOBY(L))
+  IF(RH2PO4EcoDmndBandPrev_vr(L).GT.ZEROS)THEN
+    FPOBX=AMAX1(MinFracPRoot4Uptake(N,L,NZ),RUPP2B(N,L,NZ)/RH2PO4EcoDmndBandPrev_vr(L))
   ELSE
     FPOBX=FracPRoot4Uptake(N,L,NZ)
   ENDIF
-  IF(RP14Y(L).GT.ZEROS)THEN
-    FP14X=AMAX1(MinFracPRoot4Uptake(N,L,NZ),RUPP1P(N,L,NZ)/RP14Y(L))
+  IF(RH1PO4EcoDmndSoilPrev_vr(L).GT.ZEROS)THEN
+    FP14X=AMAX1(MinFracPRoot4Uptake(N,L,NZ),RUPP1P(N,L,NZ)/RH1PO4EcoDmndSoilPrev_vr(L))
   ELSE
     FP14X=FracPRoot4Uptake(N,L,NZ)
   ENDIF
-  IF(RP1BY(L).GT.ZEROS)THEN
-    FP1BX=AMAX1(MinFracPRoot4Uptake(N,L,NZ),RUPP1B(N,L,NZ)/RP1BY(L))
+  IF(RH1PO4EcoDmndBandPrev_vr(L).GT.ZEROS)THEN
+    FP1BX=AMAX1(MinFracPRoot4Uptake(N,L,NZ),RUPP1B(N,L,NZ)/RH1PO4EcoDmndBandPrev_vr(L))
   ELSE
     FP1BX=FracPRoot4Uptake(N,L,NZ)
   ENDIF
@@ -1032,10 +1032,10 @@ module NutUptakeMod
     RUNNHP  =>  plt_rbgc%RUNNHP , &
     RUNNBP  =>  plt_rbgc%RUNNBP , &
     RUNNOP  =>  plt_rbgc%RUNNOP , &
-    RNO3Y   =>  plt_bgcr%RNO3Y  , &
+    RNO3EcoDmndSoilPrev_vr   =>  plt_bgcr%RNO3EcoDmndSoilPrev_vr  , &
     RNH4EcoDmndBandPrev_vr   =>  plt_bgcr%RNH4EcoDmndBandPrev_vr  , &
     RNH4EcoDmndSoilPrev_vr   =>  plt_bgcr%RNH4EcoDmndSoilPrev_vr  , &
-    RN3BY   =>  plt_bgcr%RN3BY    &
+    RNO3EcoDmndBandPrev_vr   =>  plt_bgcr%RNO3EcoDmndBandPrev_vr    &
   )
   TFNH4X=0.0_r8
   TFNHBX=0.0_r8
@@ -1054,13 +1054,13 @@ module NutUptakeMod
     FNHBX=FracPRoot4Uptake(N,L,NZ)
   ENDIF
 
-  IF(RNO3Y(L).GT.ZEROS)THEN
-    FNO3X=AMAX1(MinFracPRoot4Uptake(N,L,NZ),RUNNOP(N,L,NZ)/RNO3Y(L))
+  IF(RNO3EcoDmndSoilPrev_vr(L).GT.ZEROS)THEN
+    FNO3X=AMAX1(MinFracPRoot4Uptake(N,L,NZ),RUNNOP(N,L,NZ)/RNO3EcoDmndSoilPrev_vr(L))
   ELSE
     FNO3X=FracPRoot4Uptake(N,L,NZ)
   ENDIF
-  IF(RN3BY(L).GT.ZEROS)THEN
-    FNOBX=AMAX1(MinFracPRoot4Uptake(N,L,NZ),RUNNXP(N,L,NZ)/RN3BY(L))
+  IF(RNO3EcoDmndBandPrev_vr(L).GT.ZEROS)THEN
+    FNOBX=AMAX1(MinFracPRoot4Uptake(N,L,NZ),RUNNXP(N,L,NZ)/RNO3EcoDmndBandPrev_vr(L))
   ELSE
     FNOBX=FracPRoot4Uptake(N,L,NZ)
   ENDIF
@@ -1097,7 +1097,7 @@ module NutUptakeMod
   real(r8), intent(out):: FCUP,FZUP,FPUP,FWSRT,PerPlantRootH2OUptake,dtPerPlantRootH2OUptake,FOXYX
 
   associate(                                                                 &
-    ROXYY                           => plt_bgcr%ROXYY                      , &
+    RO2EcoDmndPrev_vr                           => plt_bgcr%RO2EcoDmndPrev_vr                      , &
     RCO2N_pvr                       => plt_rbgc%RCO2N_pvr                  , &
     RootO2Dmnd4Resp_pvr             => plt_rbgc%RootO2Dmnd4Resp_pvr        , &
     PlantPopulation_pft             => plt_site%PlantPopulation_pft        , &
@@ -1170,38 +1170,38 @@ module NutUptakeMod
   !     IN BAND AND NON-BAND SOIL ZONES FROM DEMAND CALCULATED
   !     IN PREVIOUS HOUR
   !
-  !     ROXYY=O2 demand by all microbial,root,myco populations
+  !     RO2EcoDmndPrev_vr=O2 demand by all microbial,root,myco populations
   !     RootO2Dmnd4Resp_pvr=O2 demand by each root,myco population
-  !     FOXYX=fraction of ROXYY by each root,myco population
+  !     FOXYX=fraction of RO2EcoDmndPrev_vr by each root,myco population
   !     RNH4EcoDmndSoilPrev_vr=NH4 demand in non-band by all microbial,root,myco populations
   !     RUNNHP=NH4 demand in non-band by each root,myco population
   !     FNH4X=fraction of RNH4EcoDmndSoilPrev_vr by each root,myco populn
   !     RNH4EcoDmndBandPrev_vr=NH4 demand in band by all microbial,root,myco populations
   !     RUNNBP=NH4 demand in band by each root,myco population
   !     FNHBX=fraction of RNH4EcoDmndBandPrev_vr by each root,myco populn
-  !     RNO3Y=NO3 demand in non-band by all microbial,root,myco populations
+  !     RNO3EcoDmndSoilPrev_vr=NO3 demand in non-band by all microbial,root,myco populations
   !     RUNNOP=NO3 demand in non-band by each root,myco population
-  !     FNO3X=fraction of RNO3Y by each root,myco populn
-  !     RN3BY=NO3 demand in band by all microbial,root,myco populations
+  !     FNO3X=fraction of RNO3EcoDmndSoilPrev_vr by each root,myco populn
+  !     RNO3EcoDmndBandPrev_vr=NO3 demand in band by all microbial,root,myco populations
   !     RUNNXB=NO3 demand in band by each root,myco population
-  !     FNOBX=fraction of RN3BY by each root,myco populn
-  !     RPO4Y=H2PO4 demand in non-band by all microbial,root,myco populations
+  !     FNOBX=fraction of RNO3EcoDmndBandPrev_vr by each root,myco populn
+  !     RH2PO4EcoDmndSoilPrev_vr=H2PO4 demand in non-band by all microbial,root,myco populations
   !     RUPP2P=H2PO4 demand in non-band by each root,myco population
-  !     FPO4X=fraction of RPO4Y by each root,myco populn
-  !     RPOBY=H2PO4 demand in band by all microbial,root,myco populations
+  !     FPO4X=fraction of RH2PO4EcoDmndSoilPrev_vr by each root,myco populn
+  !     RH2PO4EcoDmndBandPrev_vr=H2PO4 demand in band by all microbial,root,myco populations
   !     RUPP2B=H2PO4 demand in band by each root,myco population
-  !     FPOBX=fraction of RPOBY by each root,myco populn
-  !     RP14Y=HPO4 demand in non-band by all microbial,root,myco populations
+  !     FPOBX=fraction of RH2PO4EcoDmndBandPrev_vr by each root,myco populn
+  !     RH1PO4EcoDmndSoilPrev_vr=HPO4 demand in non-band by all microbial,root,myco populations
   !     RUPP1P=HPO4 demand in non-band by each root,myco population
-  !     FP14X=fraction of RP14Y by each root,myco populn
-  !     RP1BY=HPO4 demand in band by all microbial,root,myco populations
+  !     FP14X=fraction of RH1PO4EcoDmndSoilPrev_vr by each root,myco populn
+  !     RH1PO4EcoDmndBandPrev_vr=HPO4 demand in band by all microbial,root,myco populations
   !     RUPP1B=HPO4 demand in band by each root,myco population
-  !     FP1BX=fraction of RP1BY by each root,myco populn
+  !     FP1BX=fraction of RH1PO4EcoDmndBandPrev_vr by each root,myco populn
   !     MinFracPRoot4Uptake=minimum uptake fraction
   !     FracPRoot4Uptake=PFT fraction of biome root mass
   !
-  IF(ROXYY(L).GT.ZEROS)THEN
-    FOXYX=AMAX1(MinFracPRoot4Uptake(N,L,NZ),RootO2Dmnd4Resp_pvr(N,L,NZ)/ROXYY(L))
+  IF(RO2EcoDmndPrev_vr(L).GT.ZEROS)THEN
+    FOXYX=AMAX1(MinFracPRoot4Uptake(N,L,NZ),RootO2Dmnd4Resp_pvr(N,L,NZ)/RO2EcoDmndPrev_vr(L))
   ELSE
     FOXYX=FracPRoot4Uptake(N,L,NZ)
   ENDIF

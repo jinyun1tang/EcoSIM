@@ -51,18 +51,18 @@ module MicForcTypeMod
   real(r8) :: RNO2EcoUptkSoilPrev
   real(r8) :: RNO2EcoUptkBandPrev
   real(r8) :: RN2OEcoUptkSoilPrev
-  real(r8) :: ROXYY
+  real(r8) :: RO2EcoDmndPrev
   real(r8) :: ROXYF
   real(r8) :: RCH4L
   real(r8) :: RCH4F
   real(r8) :: RNH4EcoDmndSoilPrev
   real(r8) :: RNH4EcoDmndBandPrev
-  real(r8) :: RNO3Y
-  real(r8) :: RN3BY
-  real(r8) :: RPO4Y
-  real(r8) :: RPOBY
-  real(r8) :: RP14Y
-  real(r8) :: RP1BY
+  real(r8) :: RNO3EcoDmndSoilPrev
+  real(r8) :: RNO3EcoDmndBandPrev
+  real(r8) :: RH2PO4EcoDmndSoilPrev
+  real(r8) :: RH2PO4EcoDmndBandPrev
+  real(r8) :: RH1PO4EcoDmndSoilPrev
+  real(r8) :: RH1PO4EcoDmndBandPrev
   real(r8) :: SoilMicPMassLayer0
   logical  :: LitrM                     !true if it is the litter layer
   logical  :: Lsurf
@@ -74,8 +74,8 @@ module MicForcTypeMod
   real(r8) :: VOLWU
   real(r8), allocatable :: CFOMC(:)
   real(r8), allocatable :: CFOMCU(:)
-  real(r8), allocatable :: ROQCY(:)
-  real(r8), allocatable :: ROQAY(:)
+  real(r8), allocatable :: RDOMEcoDmndPrev(:)
+  real(r8), allocatable :: RAcetateEcoDmndPrev(:)
   real(r8), allocatable :: DiffusivitySolutEff(:)  !rate constant for air-water gas exchange
   real(r8), allocatable :: FILM(:)
   real(r8), allocatable :: THETPM(:)
@@ -98,8 +98,8 @@ module MicForcTypeMod
   jcplx=micpar%jcplx
   allocate(this%CFOMC(1:micpar%ndbiomcp));this%CFOMC=spval
   allocate(this%CFOMCU(1:micpar%ndbiomcp));this%CFOMCU=spval
-  allocate(this%ROQCY(1:jcplx));this%ROQCY=spval
-  allocate(this%ROQAY(1:jcplx));this%ROQAY=spval
+  allocate(this%RDOMEcoDmndPrev(1:jcplx));this%RDOMEcoDmndPrev=spval
+  allocate(this%RAcetateEcoDmndPrev(1:jcplx));this%RAcetateEcoDmndPrev=spval
   allocate(this%VLWatMicPM(NPH));this%VLWatMicPM=spval
   allocate(this%THETPM(NPH));this%THETPM=spval
   allocate(this%FILM(NPH));this%FILM=spval
@@ -121,8 +121,8 @@ module MicForcTypeMod
   call destroy(this%TortMicPM)
   call destroy(this%VLsoiAirPM)
   call destroy(this%DiffusivitySolutEff)
-  call destroy(this%ROQCY)
-  call destroy(this%ROQAY)
+  call destroy(this%RDOMEcoDmndPrev)
+  call destroy(this%RAcetateEcoDmndPrev)
   call destroy(this%CFOMC)
   call destroy(this%CFOMCU)
 

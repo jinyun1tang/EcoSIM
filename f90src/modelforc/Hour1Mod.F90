@@ -1175,13 +1175,13 @@ module Hour1Mod
 !     R*Y,R*X=total substrate uptake from previous,current hour
 !     used in nitro.f, uptake.f
 !
-  ROXYY(0,NY,NX)=ROXYX(0,NY,NX)
+  RO2EcoDmndPrev_vr(0,NY,NX)=ROXYX(0,NY,NX)
   RNH4EcoDmndSoilPrev_vr(0,NY,NX)=RNH4X(0,NY,NX)
-  RNO3Y(0,NY,NX)=RNO3X(0,NY,NX)
+  RNO3EcoDmndSoilPrev_vr(0,NY,NX)=RNO3X(0,NY,NX)
   RNO2EcoUptkSoilPrev_vr(0,NY,NX)=RNO2EcoUptkSoil_vr(0,NY,NX)
   RN2OEcoUptkSoilPrev_vr(0,NY,NX)=RN2OEcoUptkSoil_vr(0,NY,NX)
-  RP14Y(0,NY,NX)=RP14X(0,NY,NX)
-  RPO4Y(0,NY,NX)=RPO4X(0,NY,NX)
+  RH1PO4EcoDmndSoilPrev_vr(0,NY,NX)=RP14X(0,NY,NX)
+  RH2PO4EcoDmndSoilPrev_vr(0,NY,NX)=RPO4X(0,NY,NX)
   ROXYX(0,NY,NX)=0.0_r8
   RNH4X(0,NY,NX)=0.0_r8
   RNO3X(0,NY,NX)=0.0_r8
@@ -1190,8 +1190,8 @@ module Hour1Mod
   RP14X(0,NY,NX)=0.0_r8
   RPO4X(0,NY,NX)=0.0_r8
   D5055: DO K=1,jcplx
-    ROQCY(K,0,NY,NX)=ROQCX(K,0,NY,NX)
-    ROQAY(K,0,NY,NX)=ROQAX(K,0,NY,NX)
+    RDOMEcoDmndPrev_vr(K,0,NY,NX)=ROQCX(K,0,NY,NX)
+    RAcetateEcoDmndPrev_vr(K,0,NY,NX)=ROQAX(K,0,NY,NX)
     ROQCX(K,0,NY,NX)=0.0_r8
     ROQAX(K,0,NY,NX)=0.0_r8
   ENDDO D5055
@@ -1320,18 +1320,18 @@ module Hour1Mod
 ! R*Y,R*X=total substrate uptake from previous,current hour
 ! used in nitro.f, uptake.f
 !
-    ROXYY(L,NY,NX)=ROXYX(L,NY,NX)
+    RO2EcoDmndPrev_vr(L,NY,NX)=ROXYX(L,NY,NX)
     RNH4EcoDmndSoilPrev_vr(L,NY,NX)=RNH4X(L,NY,NX)
-    RNO3Y(L,NY,NX)=RNO3X(L,NY,NX)
+    RNO3EcoDmndSoilPrev_vr(L,NY,NX)=RNO3X(L,NY,NX)
     RNO2EcoUptkSoilPrev_vr(L,NY,NX)=RNO2EcoUptkSoil_vr(L,NY,NX)
     RN2OEcoUptkSoilPrev_vr(L,NY,NX)=RN2OEcoUptkSoil_vr(L,NY,NX)
-    RP14Y(L,NY,NX)=RP14X(L,NY,NX)
-    RPO4Y(L,NY,NX)=RPO4X(L,NY,NX)
+    RH1PO4EcoDmndSoilPrev_vr(L,NY,NX)=RP14X(L,NY,NX)
+    RH2PO4EcoDmndSoilPrev_vr(L,NY,NX)=RPO4X(L,NY,NX)
     RNH4EcoDmndBandPrev_vr(L,NY,NX)=RNHBX(L,NY,NX)
-    RN3BY(L,NY,NX)=RN3BX(L,NY,NX)
+    RNO3EcoDmndBandPrev_vr(L,NY,NX)=RN3BX(L,NY,NX)
     RNO2EcoUptkBandPrev_vr(L,NY,NX)=RNO2EcoUptkBand_vr(L,NY,NX)
-    RP1BY(L,NY,NX)=RP1BX(L,NY,NX)
-    RPOBY(L,NY,NX)=RPOBX(L,NY,NX)
+    RH1PO4EcoDmndBandPrev_vr(L,NY,NX)=RP1BX(L,NY,NX)
+    RH2PO4EcoDmndBandPrev_vr(L,NY,NX)=RPOBX(L,NY,NX)
     ROXYX(L,NY,NX)=0.0_r8
     RNH4X(L,NY,NX)=0.0_r8
     RNO3X(L,NY,NX)=0.0_r8
@@ -1346,8 +1346,8 @@ module Hour1Mod
     RPOBX(L,NY,NX)=0.0_r8
 
     D5050: DO K=1,jcplx
-      ROQCY(K,L,NY,NX)=ROQCX(K,L,NY,NX)
-      ROQAY(K,L,NY,NX)=ROQAX(K,L,NY,NX)
+      RDOMEcoDmndPrev_vr(K,L,NY,NX)=ROQCX(K,L,NY,NX)
+      RAcetateEcoDmndPrev_vr(K,L,NY,NX)=ROQAX(K,L,NY,NX)
       ROQCX(K,L,NY,NX)=0.0_r8
       ROQAX(K,L,NY,NX)=0.0_r8
     ENDDO D5050
