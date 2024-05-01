@@ -62,6 +62,19 @@ fi
 # Configure the EcoSIM build
 # Note: many of the options that used to be in the CMakeLists.txt file
 # have been moved here to remove redundancies
+echo "cmd_configure with settings: "
+echo "cmake_binary: $cmake_binary"
+echo "build_c_flags: $build_c_flags"
+echo "build_fort_flags: $build_fort_flags"
+echo "build_link_flags: $build_link_flags"
+ehco "ecosim_install_prefix: $ecosim_install_prefix"
+echo "build_type: $build_type"
+echo "structured: $structured"
+echo "unstructured: $structured"
+echo "openmp: $openmp"
+echo "shared: $shared"
+echo "ecosim_source_dir: $ecosim_source_dir"
+
 cmd_configure="${cmake_binary} \
     -DCMAKE_C_FLAGS:STRING="${build_c_flags}" \
     -DCMAKE_CXX_FLAGS:STRING="${build_cxx_flags}" \
@@ -75,6 +88,9 @@ cmd_configure="${cmake_binary} \
     -DBUILD_SHARED_LIBS:BOOL=${shared} \
     ${ecosim_source_dir}"
 
+echo "cmd_configure: $cmd_configure"
+
+echo "building in: $ecosim_build_dir"
 #run the configure command
 cd ${ecosim_build_dir}
 ${cmd_configure}
