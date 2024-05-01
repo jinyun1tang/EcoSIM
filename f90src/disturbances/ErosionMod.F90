@@ -546,7 +546,7 @@ module ErosionMod
                   DO NE=1,NumPlantChemElms
                     OSMER(NE,M,K,N,2,N5,N4)=FSEDER*SolidOM_vr(NE,M,K,NU(N2,N1),N2,N1)
                   ENDDO
-                  OSAER(M,K,N,2,N5,N4)=FSEDER*OSA(M,K,NU(N2,N1),N2,N1)
+                  OSAER(M,K,N,2,N5,N4)=FSEDER*SolidOMAct_vr(M,K,NU(N2,N1),N2,N1)
                 ENDDO
               ENDDO
             ELSE
@@ -702,7 +702,7 @@ module ErosionMod
                     OHMER(idom,K,N,1,N5B,N4B)=FSEDER*SorbedOM_vr(idom,K,NU(N2,N1),N2,N1)
                   ENDDO
                   DO  M=1,jsken
-                    OSAER(M,K,N,1,N5B,N4B)=FSEDER*OSA(M,K,NU(N2,N1),N2,N1)
+                    OSAER(M,K,N,1,N5B,N4B)=FSEDER*SolidOMAct_vr(M,K,NU(N2,N1),N2,N1)
                     DO NE=1,NumPlantChemElms                      
                       OSMER(NE,M,K,N,1,N5B,N4B)=FSEDER*SolidOM_vr(NE,M,K,NU(N2,N1),N2,N1)
                     ENDDO  
@@ -991,7 +991,7 @@ module ErosionMod
                   OHMER(idom,K,N,NN,M5,M4)=FSEDER*SorbedOM_vr(idom,K,NU(N2,N1),N2,N1)
                 ENDDO
                 DO  M=1,jsken
-                  OSAER(M,K,N,NN,M5,M4)=FSEDER*OSA(M,K,NU(N2,N1),N2,N1)
+                  OSAER(M,K,N,NN,M5,M4)=FSEDER*SolidOMAct_vr(M,K,NU(N2,N1),N2,N1)
                   DO NE=1,NumPlantChemElms                       
                     OSMER(NE,M,K,N,NN,M5,M4)=FSEDER*SolidOM_vr(NE,M,K,NU(N2,N1),N2,N1)
                   ENDDO

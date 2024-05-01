@@ -181,9 +181,9 @@ implicit none
 !       SOC,N,P
 !
         D1930: DO M=1,jsken
-          FOSA=FSINK*OSA(M,K,L,NY,NX)
-          OSA(M,K,LL,NY,NX)=OSA(M,K,LL,NY,NX)+FOSA
-          OSA(M,K,L,NY,NX)=OSA(M,K,L,NY,NX)-FOSA
+          FOSA=FSINK*SolidOMAct_vr(M,K,L,NY,NX)
+          SolidOMAct_vr(M,K,LL,NY,NX)=SolidOMAct_vr(M,K,LL,NY,NX)+FOSA
+          SolidOMAct_vr(M,K,L,NY,NX)=SolidOMAct_vr(M,K,L,NY,NX)-FOSA
           DO NE=1,NumPlantChemElms
             FOSC=FSINK*SolidOM_vr(NE,M,K,L,NY,NX)
             SolidOM_vr(NE,M,K,LL,NY,NX)=SolidOM_vr(NE,M,K,LL,NY,NX)+FOSC

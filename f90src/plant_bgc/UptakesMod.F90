@@ -1340,7 +1340,7 @@ module UptakesMod
     PSICanopy_pft              =>  plt_ew%PSICanopy_pft           , &
     NU                         =>  plt_site%NU                    , &
     CHILL                      =>  plt_photo%CHILL                , &
-    OFFST                      =>  plt_pheno%OFFST                , &
+    TempOffset_pft                      =>  plt_pheno%TempOffset_pft                , &
     TCChill4Seed_pft           =>  plt_pheno%TCChill4Seed_pft     , &
     fTgrowRootP_vr             =>  plt_pheno%fTgrowRootP_vr       , &
     TCG                        =>  plt_pheno%TCG                  , &
@@ -1369,17 +1369,17 @@ module UptakesMod
   !
   !     TKG,TKGO=canopy temperature,canopy temp used in Arrhenius eqn
   !     TKS,TKSO=soil temperature,soil temp used in Arrhenius eqn
-  !     OFFST=shift in Arrhenius curve for thermal adaptation
+  !     TempOffset_pft=shift in Arrhenius curve for thermal adaptation
   !     fTgrowCanP,fTgrowRootP_vr=temperature function for canopy,root growth (25 oC =1)
   !     RGAS,710.0=gas constant,enthalpy
   !     62500,197500,222500=energy of activn,high,low temp inactivn(KJ mol-1)
   !     PSICanPDailyMin=minimum daily canopy water potential
   !
-  TKGO=TKG(NZ)+OFFST(NZ)
+  TKGO=TKG(NZ)+TempOffset_pft(NZ)
   fTgrowCanP(NZ)=calc_canopy_grow_tempf(TKGO)
 
   D100: DO L=NU,MaxSoiL4Root(NZ)
-    TKSO=TKS(L)+OFFST(NZ)
+    TKSO=TKS(L)+TempOffset_pft(NZ)
     fTgrowRootP_vr(L,NZ)=calc_root_grow_tempf(TKSO)
   ENDDO D100
   PSICanPDailyMin(NZ)=AMIN1(PSICanPDailyMin(NZ),PSICanopy_pft(NZ))

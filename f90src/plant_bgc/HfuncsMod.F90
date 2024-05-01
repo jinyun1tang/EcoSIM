@@ -798,7 +798,7 @@ module HfuncsMod
     iPlantCalendar_brch                  =>  plt_pheno%iPlantCalendar_brch              , &
     RefLeafAppearRate_pft                =>  plt_pheno%RefLeafAppearRate_pft            , &
     ReprodNodeNumNormByMatrgrp_brch      =>  plt_pheno%ReprodNodeNumNormByMatrgrp_brch  , &
-    OFFST                                =>  plt_pheno%OFFST                            , &
+    TempOffset_pft                       =>  plt_pheno%TempOffset_pft                   , &
     iPlantPhenolPattern_pft              =>  plt_pheno%iPlantPhenolPattern_pft          , &
     doPlantLeafOut_brch                  =>  plt_pheno%doPlantLeafOut_brch              , &
     NumOfLeaves_brch                     =>  plt_morph%NumOfLeaves_brch                 , &
@@ -844,7 +844,7 @@ module HfuncsMod
 ! iPlantPhenolType_pft=phenology type from PFT file, 0=evergreen,1=cold deciduous, 2=drought deciduous,3=1+2
 ! Hours4LeafOff_brch,VRNX=leafoff hours,hours required for leafoff
 ! TKG,TKCO=canopy temperature,canopy temp used in Arrhenius eqn
-! OFFST=shift in Arrhenius curve for thermal adaptation
+! TempOffset_pft=shift in Arrhenius curve for thermal adaptation
 ! TFNP=temperature function for phenology (25 oC =1 )
 ! 8.313,710.0=gas constant,enthalpy
 ! 60000,197500,218500=energy of activn,high,low temp inactivn(KJ mol-1)
@@ -853,7 +853,7 @@ module HfuncsMod
 !
   IF(iPlantPhenolType_pft(NZ).EQ.iphenotyp_evgreen &
     .OR. Hours4LeafOff_brch(NB,NZ).LT.HourReq4LeafOff_brch(NB,NZ))THEN
-    TKCO=TKG(NZ)+OFFST(NZ)
+    TKCO=TKG(NZ)+TempOffset_pft(NZ)
     TFNP=calc_leave_grow_tempf(TKCO)    
     NodeInitRate=AZMAX1(RefNodeInitRate_pft(NZ)*TFNP)
     LeafAppearRate=AZMAX1(RefLeafAppearRate_pft(NZ)*TFNP)

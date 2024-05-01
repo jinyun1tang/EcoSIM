@@ -402,7 +402,7 @@ module StartqsMod
     HighTCLimtSeed_pft         =>  plt_pheno%HighTCLimtSeed_pft   , &
     TC4LeafOff_pft =>  plt_pheno%TC4LeafOff_pft    , &
     TC4LeafOut_pft        =>  plt_pheno%TC4LeafOut_pft   , &
-    OFFST                      =>  plt_pheno%OFFST  , &
+    TempOffset_pft                      =>  plt_pheno%TempOffset_pft  , &
     PlantInitThermoAdaptZone   =>  plt_pheno%PlantInitThermoAdaptZone , &
     iPlantThermoAdaptZone      =>  plt_pheno%iPlantThermoAdaptZone  , &
     SSTX                       =>  plt_pheno%SSTX     &
@@ -411,15 +411,15 @@ module StartqsMod
 !     PFT THERMAL ACCLIMATION
 !
 !     ZTYP,PlantInitThermoAdaptZone=dynamic,initial thermal adaptation zone from PFT file
-!     OFFST=shift in Arrhenius curve for thermal adaptation (oC)
+!     TempOffset_pft=shift in Arrhenius curve for thermal adaptation (oC)
 !     TCZ,TC4LeafOff_pft=threshold temperature for leafout,leafoff
 !     HTC=high temperature threshold for grain number loss (oC)
 !     SSTX=sensitivity to HTC (seeds oC-1 above HTC)
 !
   iPlantThermoAdaptZone(NZ)=PlantInitThermoAdaptZone(NZ)
-  OFFST(NZ)=2.667_r8*(2.5_r8-iPlantThermoAdaptZone(NZ))
-  TC4LeafOut_pft(NZ)=TCZD-OFFST(NZ)
-  TC4LeafOff_pft(NZ)=AMIN1(15.0_r8,TCXD-OFFST(NZ))
+  TempOffset_pft(NZ)=2.667_r8*(2.5_r8-iPlantThermoAdaptZone(NZ))
+  TC4LeafOut_pft(NZ)=TCZD-TempOffset_pft(NZ)
+  TC4LeafOff_pft(NZ)=AMIN1(15.0_r8,TCXD-TempOffset_pft(NZ))
   IF(iPlantPhotosynthesisType(NZ).EQ.ic3_photo)THEN
     IF(DATAP(NZ)(1:4).EQ.'soyb')THEN
       HighTCLimtSeed_pft(NZ)=30.0_r8+3.0_r8*iPlantThermoAdaptZone(NZ)

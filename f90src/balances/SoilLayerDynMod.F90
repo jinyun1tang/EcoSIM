@@ -835,7 +835,7 @@ implicit none
       SorbedOM_vr(idom_acetate,K,L1,NY,NX)=SorbedOM_vr(idom_acetate,K,L1,NY,NX)+FX*SorbedOM_vr(idom_acetate,K,L0,NY,NX)
       
       DO M=1,jsken
-        OSA(M,K,L1,NY,NX)=OSA(M,K,L1,NY,NX)+FX*OSA(M,K,L0,NY,NX)
+        SolidOMAct_vr(M,K,L1,NY,NX)=SolidOMAct_vr(M,K,L1,NY,NX)+FX*SolidOMAct_vr(M,K,L0,NY,NX)
         DO NE=1,NumPlantChemElms
           SolidOM_vr(NE,M,K,L1,NY,NX)=SolidOM_vr(NE,M,K,L1,NY,NX)+FX*SolidOM_vr(NE,M,K,L0,NY,NX)
         ENDDO
@@ -1019,7 +1019,7 @@ implicit none
       SorbedOM_vr(idom_acetate,K,L0,NY,NX)=FY*SorbedOM_vr(idom_acetate,K,L0,NY,NX)
       DO  M=1,jsken
         SolidOM_vr(ielmc,M,K,L0,NY,NX)=FY*SolidOM_vr(ielmc,M,K,L0,NY,NX)
-        OSA(M,K,L0,NY,NX)=FY*OSA(M,K,L0,NY,NX)
+        SolidOMAct_vr(M,K,L0,NY,NX)=FY*SolidOMAct_vr(M,K,L0,NY,NX)
         SolidOM_vr(ielmn,M,K,L0,NY,NX)=FY*SolidOM_vr(ielmn,M,K,L0,NY,NX)
         SolidOM_vr(ielmp,M,K,L0,NY,NX)=FY*SolidOM_vr(ielmp,M,K,L0,NY,NX)
       ENDDO
@@ -1204,9 +1204,9 @@ implicit none
         FXOSC=FXO*SolidOM_vr(ielmc,M,K,L0,NY,NX)
         SolidOM_vr(ielmc,M,K,L1,NY,NX)=SolidOM_vr(ielmc,M,K,L1,NY,NX)+FXOSC
         SolidOM_vr(ielmc,M,K,L0,NY,NX)=SolidOM_vr(ielmc,M,K,L0,NY,NX)-FXOSC
-        FXOSA=FXO*OSA(M,K,L0,NY,NX)
-        OSA(M,K,L1,NY,NX)=OSA(M,K,L1,NY,NX)+FXOSA
-        OSA(M,K,L0,NY,NX)=OSA(M,K,L0,NY,NX)-FXOSA
+        FXOSA=FXO*SolidOMAct_vr(M,K,L0,NY,NX)
+        SolidOMAct_vr(M,K,L1,NY,NX)=SolidOMAct_vr(M,K,L1,NY,NX)+FXOSA
+        SolidOMAct_vr(M,K,L0,NY,NX)=SolidOMAct_vr(M,K,L0,NY,NX)-FXOSA
         FXOSN=FXO*SolidOM_vr(ielmn,M,K,L0,NY,NX)
         SolidOM_vr(ielmn,M,K,L1,NY,NX)=SolidOM_vr(ielmn,M,K,L1,NY,NX)+FXOSN
         SolidOM_vr(ielmn,M,K,L0,NY,NX)=SolidOM_vr(ielmn,M,K,L0,NY,NX)-FXOSN

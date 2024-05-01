@@ -310,7 +310,7 @@ implicit none
   micstt%DOM(idom_beg:idom_end,1:jcplx)=DOM(idom_beg:idom_end,1:jcplx,L,NY,NX)
   micstt%SorbedOM(idom_beg:idom_end,1:jcplx)=SorbedOM_vr(idom_beg:idom_end,1:jcplx,L,NY,NX)
 
-  micstt%OSA(1:jsken,1:jcplx)=OSA(1:jsken,1:jcplx,L,NY,NX)
+  micstt%SolidOMAct(1:jsken,1:jcplx)=SolidOMAct_vr(1:jsken,1:jcplx,L,NY,NX)
   micstt%SolidOM(1:NumPlantChemElms,1:jsken,1:jcplx)=SolidOM_vr(1:NumPlantChemElms,1:jsken,1:jcplx,L,NY,NX)
   micstt%OMBioResdu(1:NumPlantChemElms,1:ndbiomcp,1:jcplx)=OMBioResdu_vr(1:NumPlantChemElms,1:ndbiomcp,1:jcplx,L,NY,NX)
   micstt%CNOSC(1:jsken,1:jcplx)=CNOSC(1:jsken,1:jcplx,L,NY,NX)
@@ -408,7 +408,7 @@ implicit none
   RH1PO4DmndBandHeter_vr(1:NumHetetrMicCmplx,1:jcplx,L,NY,NX)=micflx%RH1PO4DmndBandHeter(1:NumHetetrMicCmplx,1:jcplx)
 
   SolidOM_vr(1:NumPlantChemElms,1:jsken,1:jcplx,L,NY,NX)=micstt%SolidOM(1:NumPlantChemElms,1:jsken,1:jcplx)
-  OSA(1:jsken,1:jcplx,L,NY,NX)=micstt%OSA(1:jsken,1:jcplx)
+  SolidOMAct_vr(1:jsken,1:jcplx,L,NY,NX)=micstt%SolidOMAct(1:jsken,1:jcplx)
 
   if(litrm)then
     RNH4DmndLitrHeter_col(1:NumHetetrMicCmplx,1:jcplx,NY,NX)=micflx%RNH4DmndLitrHeter(1:NumHetetrMicCmplx,1:jcplx)

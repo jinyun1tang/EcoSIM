@@ -6851,10 +6851,10 @@ implicit none
       dim3name='nomcomplx',dim4name='levsoi1',long_name='colonized soil organic C', &
       units='g d-2', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)      
-    call cpcol(flag,NHW,NHE,NVN,NVS,OSA,datrc_4d)
+    call cpcol(flag,NHW,NHE,NVN,NVS,SolidOMAct_vr,datrc_4d)
   else
     !print*,'OSA'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,OSA,datrc_4d)  
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SolidOMAct_vr,datrc_4d)  
     datpr4 => datrc_4d(1:ncols,1:jsken,1:jcplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='OSA', dim1name='column',dim2name='nkinecmp',&
       dim3name='nomcomplx',dim4name='levsoi1',long_name='colonized soil organic C', &

@@ -261,7 +261,7 @@ implicit none
     call ncd_putvar(ncf,'CPOSC',CPOSC(:,:,L,NY,NX))
     call ncd_putvar(ncf,'ATCS',ATCS(NY,NX))
     call ncd_putvar(ncf,'OSM',SolidOM_vr(:,:,:,L,NY,NX))
-    call ncd_putvar(ncf,'OSA',OSA(:,:,L,NY,NX))
+    call ncd_putvar(ncf,'OSA',SolidOMAct_vr(:,:,L,NY,NX))
     call ncd_putvar(ncf,'ORM',OMBioResdu_vr(:,:,:,L,NY,NX))
     call ncd_putvar(ncf,'OMEheter',OMEheter(:,:,:,L,NY,NX))
     call ncd_putvar(ncf,'OMEauto',OMEauto(:,:,L,NY,NX))

@@ -388,7 +388,7 @@ module grosubsMod
     PlantPopulation_pft       =>  plt_site%PlantPopulation_pft        , &
     NU                        =>  plt_site%NU                         , &
     MaxNumRootLays            =>  plt_site%MaxNumRootLays             , &
-    OFFST                     =>  plt_pheno%OFFST                     , &
+    TempOffset_pft                     =>  plt_pheno%TempOffset_pft                     , &
     ZEROP                     =>  plt_biom%ZEROP                      , &
     CanopyStalkC_pft          =>  plt_biom%CanopyStalkC_pft           , &
     RootProteinC_pvr          =>  plt_biom%RootProteinC_pvr           , &
@@ -502,16 +502,16 @@ module grosubsMod
 !
 !     TKC,TKCM=canopy temperature,canopy temp used in Arrhenius eqn
 !     TKS,TKSM=soil temperature,soil temp used in Arrhenius eqn
-!     OFFST=shift in Arrhenius curve for thermal adaptation
+!     TempOffset_pft=shift in Arrhenius curve for thermal adaptation
 !     TFN5,TFN6_vr=temperature function for canopy,root mntc respn (25 oC =1)
 !     8.3143,710.0=gas constant,enthalpy
 !     62500,195000,232500=energy of activn,high,low temp inactivn(KJ mol-1)
 !
-  TKCM=TKC(NZ)+OFFST(NZ)
+  TKCM=TKC(NZ)+TempOffset_pft(NZ)
 
   TFN5=calc_plant_maint_tempf(TKCM)  
   D7: DO L=NU,MaxNumRootLays
-    TKSM=TKS(L)+OFFST(NZ)
+    TKSM=TKS(L)+TempOffset_pft(NZ)
     TFN6_vr(L)=calc_plant_maint_tempf(TKSM)  
   ENDDO D7
 !

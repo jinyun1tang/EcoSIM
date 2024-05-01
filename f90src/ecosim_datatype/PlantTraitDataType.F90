@@ -164,7 +164,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  PhotoPeriodSens_pft(:,:,:)                        !difference between current and critical daylengths used to calculate  phenological progress, [h]
   real(r8),target,allocatable ::  ClumpFactorInit_pft(:,:,:)                         !initial clumping factor for self-shading in canopy layer, [-]
   real(r8),target,allocatable ::  HourReq4LeafOff_brch(:,:,:,:)                      !number of hours below set temperature required for autumn leafoff/hardening, [-]
-  real(r8),target,allocatable ::  OFFST(:,:,:)                       !adjustment of Arhhenius curves for plant thermal acclimation, [oC]
+  real(r8),target,allocatable ::  TempOffset_pft(:,:,:)                       !adjustment of Arhhenius curves for plant thermal acclimation, [oC]
 !----------------------------------------------------------------------
 
 contains
@@ -324,7 +324,7 @@ contains
   allocate(PhotoPeriodSens_pft(JP,JY,JX));     PhotoPeriodSens_pft=0._r8
   allocate(ClumpFactorInit_pft(JP,JY,JX));      ClumpFactorInit_pft=0._r8
   allocate(HourReq4LeafOff_brch(NumOfCanopyLayers,JP,JY,JX));  HourReq4LeafOff_brch=0._r8
-  allocate(OFFST(JP,JY,JX));    OFFST=0._r8
+  allocate(TempOffset_pft(JP,JY,JX));    TempOffset_pft=0._r8
   end subroutine InitPlantTraits
 
 !----------------------------------------------------------------------
@@ -481,7 +481,7 @@ contains
   call destroy(PhotoPeriodSens_pft)
   call destroy(ClumpFactorInit_pft)
   call destroy(HourReq4LeafOff_brch)
-  call destroy(OFFST)
+  call destroy(TempOffset_pft)
   end subroutine DestructPlantTraits
 
 end module PlantTraitDataType

@@ -24,7 +24,7 @@ module SOMDataType
   real(r8),target,allocatable :: ORGC(:,:,:)                        !total soil organic C [g d-2]
   real(r8),target,allocatable :: ORGN(:,:,:)                        !total soil organic N [g d-2]
   real(r8),target,allocatable :: ORGCX(:,:,:)                       !SOC concentration	[g Mg-1]
-  real(r8),target,allocatable :: OSA(:,:,:,:,:)                     !colonized humus C in each complex [g d-2]
+  real(r8),target,allocatable :: SolidOMAct_vr(:,:,:,:,:)                     !colonized humus C in each complex [g d-2]
   real(r8),target,allocatable :: ORGR(:,:,:)                        !total particulate organic C [g d-2]
   real(r8),target,allocatable :: CORGC(:,:,:)                       !soil organic C content [g kg-1]
   real(r8),target,allocatable :: CORGN(:,:,:)                       !soil organic N content [mg kg-1]
@@ -76,7 +76,7 @@ module SOMDataType
   allocate(ORGC(0:JZ,JY,JX))
   allocate(ORGN(0:JZ,JY,JX))
   allocate(ORGCX(0:JZ,JY,JX))
-  allocate(OSA(jsken,1:jcplx,0:JZ,JY,JX))
+  allocate(SolidOMAct_vr(jsken,1:jcplx,0:JZ,JY,JX));SolidOMAct_vr=0._r8
   allocate(ORGR(0:JZ,JY,JX))
   allocate(CORGC(0:JZ,JY,JX))
   allocate(CORGN(JZ,JY,JX))
@@ -118,7 +118,7 @@ module SOMDataType
   call destroy(ORGC)
   call destroy(ORGN)
   call destroy(ORGCX)
-  call destroy(OSA)
+  call destroy(SolidOMAct_vr)
   call destroy(ORGR)
   call destroy(CORGC)
   call destroy(CORGN)

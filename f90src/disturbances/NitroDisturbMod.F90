@@ -269,7 +269,7 @@ module NitroDisturbMod
               OCH=DCORPC*SolidOM_vr(ielmc,M,K,L,NY,NX)
               ONH=DCORPC*SolidOM_vr(ielmn,M,K,L,NY,NX)
               OPH=DCORPC*SolidOM_vr(ielmp,M,K,L,NY,NX)
-              OCA=DCORPC*OSA(M,K,L,NY,NX)
+              OCA=DCORPC*SolidOMAct_vr(M,K,L,NY,NX)
               ONX=EFIRE(1,ITILL(I,NY,NX))*ONH
               OPX=EFIRE(2,ITILL(I,NY,NX))*OPH
               ONL(M,K)=ONL(M,K)+ONH-ONX
@@ -277,7 +277,7 @@ module NitroDisturbMod
               SolidOM_vr(ielmc,M,K,L,NY,NX)=SolidOM_vr(ielmc,M,K,L,NY,NX)-OCH
               SolidOM_vr(ielmn,M,K,L,NY,NX)=SolidOM_vr(ielmn,M,K,L,NY,NX)-ONH
               SolidOM_vr(ielmp,M,K,L,NY,NX)=SolidOM_vr(ielmp,M,K,L,NY,NX)-OPH
-              OSA(M,K,L,NY,NX)=OSA(M,K,L,NY,NX)-OCA              
+              SolidOMAct_vr(M,K,L,NY,NX)=SolidOMAct_vr(M,K,L,NY,NX)-OCA              
               DC=DC+SolidOM_vr(ielmc,M,K,L,NY,NX)
               DN=DN+SolidOM_vr(ielmn,M,K,L,NY,NX)
               DP=DP+SolidOM_vr(ielmp,M,K,L,NY,NX)

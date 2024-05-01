@@ -238,11 +238,11 @@ module TillageMixMod
       DP=DP+DOM(idom_dop,K,0,NY,NX)+DOM_Macp(idom_dop,K,0,NY,NX)+SorbedOM_vr(ielmp,K,0,NY,NX)
       DO  M=1,jsken
         TOSGC(M,K)=SolidOM_vr(ielmc,M,K,0,NY,NX)*CORP0
-        TOSGA(M,K)=OSA(M,K,0,NY,NX)*CORP0
+        TOSGA(M,K)=SolidOMAct_vr(M,K,0,NY,NX)*CORP0
         TOSGN(M,K)=SolidOM_vr(ielmn,M,K,0,NY,NX)*CORP0
         TOSGP(M,K)=SolidOM_vr(ielmp,M,K,0,NY,NX)*CORP0
         SolidOM_vr(ielmc,M,K,0,NY,NX)=SolidOM_vr(ielmc,M,K,0,NY,NX)*XCORP0
-        OSA(M,K,0,NY,NX)=OSA(M,K,0,NY,NX)*XCORP0
+        SolidOMAct_vr(M,K,0,NY,NX)=SolidOMAct_vr(M,K,0,NY,NX)*XCORP0
         SolidOM_vr(ielmn,M,K,0,NY,NX)=SolidOM_vr(ielmn,M,K,0,NY,NX)*XCORP0
         SolidOM_vr(ielmp,M,K,0,NY,NX)=SolidOM_vr(ielmp,M,K,0,NY,NX)*XCORP0
         DC=DC+SolidOM_vr(ielmc,M,K,0,NY,NX)
@@ -413,7 +413,7 @@ module TillageMixMod
         enddo
         DO  M=1,jsken
           TOSM(ielmc,M,K)=TOSM(ielmc,M,K)+TI*SolidOM_vr(ielmc,M,K,L,NY,NX)
-          TOSA(M,K)=TOSA(M,K)+TI*OSA(M,K,L,NY,NX)
+          TOSA(M,K)=TOSA(M,K)+TI*SolidOMAct_vr(M,K,L,NY,NX)
           TOSM(ielmn,M,K)=TOSM(ielmn,M,K)+TI*SolidOM_vr(ielmn,M,K,L,NY,NX)
           TOSM(ielmp,M,K)=TOSM(ielmp,M,K)+TI*SolidOM_vr(ielmp,M,K,L,NY,NX)
         ENDDO
@@ -580,8 +580,8 @@ module TillageMixMod
           DO  M=1,jsken
             SolidOM_vr(ielmc,M,K,L,NY,NX)=TI*SolidOM_vr(ielmc,M,K,L,NY,NX)+CORP*(FI*TOSM(ielmc,M,K) &
               -TI*SolidOM_vr(ielmc,M,K,L,NY,NX))+TX*SolidOM_vr(ielmc,M,K,L,NY,NX)
-            OSA(M,K,L,NY,NX)=TI*OSA(M,K,L,NY,NX)+CORP*(FI*TOSA(M,K) &
-              -TI*OSA(M,K,L,NY,NX))+TX*OSA(M,K,L,NY,NX)
+            SolidOMAct_vr(M,K,L,NY,NX)=TI*SolidOMAct_vr(M,K,L,NY,NX)+CORP*(FI*TOSA(M,K) &
+              -TI*SolidOMAct_vr(M,K,L,NY,NX))+TX*SolidOMAct_vr(M,K,L,NY,NX)
             SolidOM_vr(ielmn,M,K,L,NY,NX)=TI*SolidOM_vr(ielmn,M,K,L,NY,NX)+CORP*(FI*TOSM(ielmn,M,K) &
               -TI*SolidOM_vr(ielmn,M,K,L,NY,NX))+TX*SolidOM_vr(ielmn,M,K,L,NY,NX)
             SolidOM_vr(ielmp,M,K,L,NY,NX)=TI*SolidOM_vr(ielmp,M,K,L,NY,NX)+CORP*(FI*TOSM(ielmp,M,K) &
@@ -636,7 +636,7 @@ module TillageMixMod
           SorbedOM_vr(idom_acetate,K,L,NY,NX)=SorbedOM_vr(idom_acetate,K,L,NY,NX)+FI*TOHGA(K)
           DO  M=1,jsken
             SolidOM_vr(ielmc,M,K,L,NY,NX)=SolidOM_vr(ielmc,M,K,L,NY,NX)+FI*TOSGC(M,K)
-            OSA(M,K,L,NY,NX)=OSA(M,K,L,NY,NX)+FI*TOSGA(M,K)
+            SolidOMAct_vr(M,K,L,NY,NX)=SolidOMAct_vr(M,K,L,NY,NX)+FI*TOSGA(M,K)
             SolidOM_vr(ielmn,M,K,L,NY,NX)=SolidOM_vr(ielmn,M,K,L,NY,NX)+FI*TOSGN(M,K)
             SolidOM_vr(ielmp,M,K,L,NY,NX)=SolidOM_vr(ielmp,M,K,L,NY,NX)+FI*TOSGP(M,K)
           ENDDO

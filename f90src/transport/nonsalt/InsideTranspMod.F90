@@ -243,14 +243,14 @@ module InsideTranspMod
   real(r8) :: VOLH2A,VOLH2B
   real(r8) :: VLWatMacPS,VOLWT
 
-  integer :: IFLGB,N,L,K,LL
+  integer :: iFlagEbu,N,L,K,LL
   integer :: N1,N2,N3,N4,N5,N6
 
 ! begin_execution
 !     N3,N2,N1=L,NY,NX of source grid cell
 !     N6,N5,N4=L,NY,NX of destination grid cell
 !
-  IFLGB=0
+  iFlagEbu=0
   D125: DO L=1,NL(NY,NX)
     N1=NX;N2=NY;N3=L
 !
@@ -358,7 +358,7 @@ module InsideTranspMod
 !
 !     CHECK FOR BUBBLING IF THE SUM OF ALL GASEOUS EQUIVALENT
 !     PARTIAL CONCENTRATIONS EXCEEDS ATMOSPHERIC PRESSURE
-    call BubbleEfflux(M,N1,N2,N3,NY,NX,MX,IFLGB)
+    call BubbleEfflux(M,N1,N2,N3,NY,NX,MX,iFlagEbu)
 
   ENDDO D125
   end subroutine TracerExchInBetweenCells
@@ -1265,10 +1265,10 @@ module InsideTranspMod
   end subroutine MicMacPoresSoluteDifExchange
 
 ! ----------------------------------------------------------------------
-  subroutine BubbleEfflux(M,N1,N2,N3,NY,NX,MX,IFLGB)
+  subroutine BubbleEfflux(M,N1,N2,N3,NY,NX,MX,iFlagEbu)
   implicit none
   integer, intent(in) :: M,N1,N2,N3,NY,NX,MX
-  integer, intent(inout) :: IFLGB
+  integer, intent(inout) :: iFlagEbu
   real(r8) :: THETW1
   real(r8) :: trcg_SLX(idg_beg:idg_end)
   real(r8) :: trcg_VOLG(idg_beg:idg_end)
@@ -1277,12 +1277,12 @@ module InsideTranspMod
 !
 !     VLWatMicPM=micropore water-filled porosity from watsub.f
 !     VLSoilMicP=micropore volume
-!     IFLGB=bubbling flag:0=enabled,1=disabled
+!     iFlagEbu=bubbling flag:0=enabled,1=disabled
 !     S*L=solubility of gas in water from hour1.f
 !
   IF(N3.GE.NUM(N2,N1).AND.M.NE.MX)THEN
     THETW1=AZMAX1(safe_adb(VLWatMicPM(M,N3,N2,N1),VLSoilMicP(N3,N2,N1)))
-    IF(THETW1.GT.THETY(N3,N2,N1).AND.IFLGB.EQ.0)THEN
+    IF(THETW1.GT.THETY(N3,N2,N1).AND.iFlagEbu.EQ.0)THEN
 
       trcg_SLX(idg_CO2) =catomw*GasSolbility_vr(idg_CO2,N3,N2,N1)  !conver into carbon g C/mol
       trcg_SLX(idg_CH4) =catomw*GasSolbility_vr(idg_CH4,N3,N2,N1)
@@ -1342,7 +1342,7 @@ module InsideTranspMod
         trcg_BBL(idg_beg:idg_end,N3,N2,N1)=0.0_r8
       ENDIF
     ELSE
-      IFLGB=1
+      iFlagEbu=1
       trcg_BBL(idg_beg:idg_end,N3,N2,N1)=0.0_r8
     ENDIF
 

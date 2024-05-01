@@ -103,8 +103,8 @@ type, public :: NitroAQMFluxDiagType
   real(r8),allocatable :: AttenfH1PO4Heter(:,:)
 ! fluxes
   real(r8),allocatable :: CGOMEheter(:,:,:)
-  real(r8),allocatable :: CGOQC(:,:)
-  real(r8),allocatable :: CGOAC(:,:)
+  real(r8),allocatable :: RAnabolDOCUptkHeter(:,:)
+  real(r8),allocatable :: RAnabolAcetUptkHeter(:,:)
   real(r8),allocatable :: CGOMES(:,:,:,:)
   real(r8),allocatable :: RO2UptkHeter(:,:)
   real(r8),allocatable :: Resp4NFixHeter(:,:)
@@ -362,8 +362,8 @@ type, public :: NitroAQMFluxDiagType
   allocate(this%R3OMEheter(NumPlantChemElms,2,NumHetetrMicCmplx,1:jcplx));this%R3OMEheter=spval
   allocate(this%RXMMEheter(NumPlantChemElms,2,NumHetetrMicCmplx,1:jcplx));this%RXMMEheter=spval
   allocate(this%R3MMEheter(NumPlantChemElms,2,NumHetetrMicCmplx,1:jcplx));this%R3MMEheter=spval
-  allocate(this%CGOQC(NumHetetrMicCmplx,1:jcplx));this%CGOQC=spval
-  allocate(this%CGOAC(NumHetetrMicCmplx,1:jcplx));this%CGOAC=spval
+  allocate(this%RAnabolDOCUptkHeter(NumHetetrMicCmplx,1:jcplx));this%RAnabolDOCUptkHeter=spval
+  allocate(this%RAnabolAcetUptkHeter(NumHetetrMicCmplx,1:jcplx));this%RAnabolAcetUptkHeter=spval
   allocate(this%RNH4TransfLitrHeter(NumHetetrMicCmplx,1:jcplx));this%RNH4TransfLitrHeter=spval
   allocate(this%RNO3TransfLitrHeter(NumHetetrMicCmplx,1:jcplx));this%RNO3TransfLitrHeter=spval
   allocate(this%RH2PO4TransfLitrHeter(NumHetetrMicCmplx,1:jcplx));this%RH2PO4TransfLitrHeter=spval
@@ -514,8 +514,8 @@ type, public :: NitroAQMFluxDiagType
   this%R3OMEheter = 0._r8
   this%RXMMEheter = 0._r8
   this%R3MMEheter = 0._r8
-  this%CGOQC = 0._r8
-  this%CGOAC = 0._r8
+  this%RAnabolDOCUptkHeter = 0._r8
+  this%RAnabolAcetUptkHeter = 0._r8
   this%RNH4TransfLitrHeter = 0._r8
   this%RNO3TransfLitrHeter = 0._r8
   this%RH2PO4TransfLitrHeter = 0._r8
@@ -623,8 +623,8 @@ type, public :: NitroAQMFluxDiagType
   call destroy(this%R3OMEheter)
   call destroy(this%RXMMEheter)
   call destroy(this%R3MMEheter)
-  call destroy(this%CGOQC)
-  call destroy(this%CGOAC)
+  call destroy(this%RAnabolDOCUptkHeter)
+  call destroy(this%RAnabolAcetUptkHeter)
   call destroy(this%RNH4TransfLitrHeter)
   call destroy(this%RNO3TransfLitrHeter)
   call destroy(this%RH2PO4TransfLitrHeter)

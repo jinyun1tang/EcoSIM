@@ -223,21 +223,21 @@ module nitrosMod
       D7931: DO M=1,jsken
         IF(FOSCXS.GT.0.0_r8)THEN
           OSCXS=FOSCXS*AZMAX1(SolidOM_vr(ielmc,M,K,L,NY,NX))
-          OSAXS=FOSCXS*AZMAX1(OSA(M,K,L,NY,NX))
+          OSAXS=FOSCXS*AZMAX1(SolidOMAct_vr(M,K,L,NY,NX))
           OSNXS=FOSCXS*AZMAX1(SolidOM_vr(ielmn,M,K,L,NY,NX))
           OSPXS=FOSCXS*AZMAX1(SolidOM_vr(ielmp,M,K,L,NY,NX))
         ELSE
           OSCXS=FOSCXS*AZMAX1(SolidOM_vr(ielmc,M,K,LL,NY,NX))
           OSNXS=FOSCXS*AZMAX1(SolidOM_vr(ielmn,M,K,LL,NY,NX))
           OSPXS=FOSCXS*AZMAX1(SolidOM_vr(ielmp,M,K,LL,NY,NX))
-          OSAXS=FOSCXS*AZMAX1(OSA(M,K,LL,NY,NX))          
+          OSAXS=FOSCXS*AZMAX1(SolidOMAct_vr(M,K,LL,NY,NX))          
         ENDIF
         SolidOM_vr(ielmc,M,K,L,NY,NX)=SolidOM_vr(ielmc,M,K,L,NY,NX)-OSCXS
-        OSA(M,K,L,NY,NX)=OSA(M,K,L,NY,NX)-OSAXS
+        SolidOMAct_vr(M,K,L,NY,NX)=SolidOMAct_vr(M,K,L,NY,NX)-OSAXS
         SolidOM_vr(ielmn,M,K,L,NY,NX)=SolidOM_vr(ielmn,M,K,L,NY,NX)-OSNXS
         SolidOM_vr(ielmp,M,K,L,NY,NX)=SolidOM_vr(ielmp,M,K,L,NY,NX)-OSPXS
         SolidOM_vr(ielmc,M,K,LL,NY,NX)=SolidOM_vr(ielmc,M,K,LL,NY,NX)+OSCXS
-        OSA(M,K,LL,NY,NX)=OSA(M,K,LL,NY,NX)+OSAXS
+        SolidOMAct_vr(M,K,LL,NY,NX)=SolidOMAct_vr(M,K,LL,NY,NX)+OSAXS
         SolidOM_vr(ielmn,M,K,LL,NY,NX)=SolidOM_vr(ielmn,M,K,LL,NY,NX)+OSNXS
         SolidOM_vr(ielmp,M,K,LL,NY,NX)=SolidOM_vr(ielmp,M,K,LL,NY,NX)+OSPXS
       ENDDO D7931

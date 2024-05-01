@@ -337,9 +337,9 @@ module InitSOMBGCMOD
         SolidOM_vr(ielmp,M,K,L,NY,NX)=0.0_r8
       ENDIF
       IF(K.EQ.micpar%k_woody_litr)THEN
-        OSA(M,K,L,NY,NX)=SolidOM_vr(ielmc,M,K,L,NY,NX)*OMCI(1,K)
+        SolidOMAct_vr(M,K,L,NY,NX)=SolidOM_vr(ielmc,M,K,L,NY,NX)*OMCI(1,K)
       ELSE
-        OSA(M,K,L,NY,NX)=SolidOM_vr(ielmc,M,K,L,NY,NX)
+        SolidOMAct_vr(M,K,L,NY,NX)=SolidOM_vr(ielmc,M,K,L,NY,NX)
       ENDIF
     ENDDO D8980
   ENDDO D8995
