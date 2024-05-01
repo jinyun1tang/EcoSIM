@@ -30,17 +30,17 @@ compiler_cxx=g++
 compiler_fc=gfortran
 
 #Compiler flags
-build_c_flags=
-build_cxx_flags=
-build_fort_flags=
-build_link_flags=
+build_c_flags='-std=c99 -Wall -Wpedantic -Wextra -Wno-sign-compare -Wno-unused-parameter -Wno-unused-function -Wno-cast-qual -Wno-unused-but-set-variable -Wno-overlength-strings -Wno-int-to-pointer-cast -Wno-pointer-to-int-cast -Wno-discarded-qualifiers -Wno-sign-conversion -Wno-maybe-uninitialized -D_POSIX_C_SOURCE=200809L'
+build_cxx_flags=' '
+build_fort_flags='-W -Wall -fbounds-check -std=gnu -pedantic -fcheck=all -cpp -g -fbacktrace -fmax-stack-var-size=524288  -DCPRGNU -fdefault-real-8 -Wno-unused-variable -ffpe-trap=invalid -Wno-unused-parameter -Wno-unused-function -Wuninitialized -Wno-unused-dummy-argument -ffree-line-length-none'
+build_link_flags=' '
 
 #Install prefix
-ecosim_install_prefix=
-build_type=
-structured=
-unstructured=
-shared=
+ecosim_install_prefix=local
+build_type=Debug
+structured=0
+unstructured=0
+shared=0
 
 #This is a little confusing, but we have to move into the build dir
 #and then point cmake to the top-level CMakeLists file which will
