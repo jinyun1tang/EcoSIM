@@ -1,4 +1,4 @@
-module HfuncsMod
+module PlantPhenolMod
 !!
 ! Description:
 ! code to do plant phenology
@@ -1118,4 +1118,4 @@ module HfuncsMod
   end associate
   end subroutine live_branch_phenology
 
-end module HfuncsMod
+end module PlantPhenolMod
