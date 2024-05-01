@@ -31,7 +31,7 @@ module nitrosMod
 
 !
   public :: initNitro
-  public :: VerticalLitterMixLvsLL
+  public :: DownwardMixOM
   contains
 
 !------------------------------------------------------------------------------------------
@@ -46,7 +46,7 @@ module nitrosMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine VerticalLitterMixLvsLL(I,J,L,NY,NX)
+  subroutine DownwardMixOM(I,J,L,NY,NX)
 
   implicit none
   integer, intent(in) :: I,J,L,NY,NX
@@ -104,7 +104,7 @@ module nitrosMod
     ENDIF
 
   ENDIF
-  end subroutine VerticalLitterMixLvsLL
+  end subroutine DownwardMixOM
 !------------------------------------------------------------------------------------------
 
   subroutine ApplyVerticalMix(FracLitrMix,L,LL,NY,NX)

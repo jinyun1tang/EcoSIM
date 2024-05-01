@@ -77,7 +77,7 @@ implicit none
 !    real(r8) :: O2_irrig_conc        !surface irrigation  O2 concentration, [g m-3]
 !    real(r8) :: O2_rain_conc        !precipitation  O2 concentration, [g m-3]
 !    real(r8) :: Irrig2LitRSurf       !irrigation flux into surface litter, [m3 d-2 h-1]
-!    real(r8) :: Rain2LitRSurf_col       !precipitation flux into surface litter, [m3 d-2 h-1]
+!    real(r8) :: Rain2LitRSurf       !precipitation flux into surface litter, [m3 d-2 h-1]
 !
     real(r8) :: TKS          !temperature in kelvin, [K]
     real(r8) :: THETW        !volumetric water content [m3 m-3]

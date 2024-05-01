@@ -231,9 +231,9 @@ type, public :: NitroAQMFluxDiagType
     real(r8),allocatable :: CPQ(:)
     real(r8),allocatable :: CNH(:)
     real(r8),allocatable :: CPH(:)
-    real(r8),allocatable :: ORCT(:)
-    real(r8),allocatable :: OSCT(:)
-    real(r8),allocatable :: OSAT(:)
+    real(r8),allocatable :: OMBioResduK(:)
+    real(r8),allocatable :: SolidOMK(:)
+    real(r8),allocatable :: SolidOMActK(:)
     real(r8),allocatable :: TONX(:)
     real(r8),allocatable :: TOPX(:)
     real(r8),allocatable :: CDOM(:,:)
@@ -256,7 +256,7 @@ type, public :: NitroAQMFluxDiagType
   real(r8) :: RNO2ReduxChemo
   real(r8) :: ThetaLitr
   real(r8) :: ThetaZ
-  real(r8) :: TORC
+  real(r8) :: TOMBioResdu
   real(r8) :: TotActMicrobiom
   real(r8) :: TotBiomNO2Consumers
   real(r8) :: TSensGrowth
@@ -802,9 +802,9 @@ type, public :: NitroAQMFluxDiagType
   allocate(this%CPQ(1:ncplx));this%CPQ=spval
   allocate(this%CNH(1:ncplx));this%CNH=spval
   allocate(this%CPH(1:ncplx));this%CPH=spval
-  allocate(this%ORCT(1:ncplx));this%ORCT=spval
-  allocate(this%OSCT(1:ncplx));this%OSCT=spval
-  allocate(this%OSAT(1:ncplx));this%OSAT=spval
+  allocate(this%OMBioResduK(1:ncplx));this%OMBioResduK=spval
+  allocate(this%SolidOMK(1:ncplx));this%SolidOMK=spval
+  allocate(this%SolidOMActK(1:ncplx));this%SolidOMActK=spval
   allocate(this%TONX(1:ncplx+1));this%TONX=spval
   allocate(this%TOPX(1:ncplx+1));this%TOPX=spval
   allocate(this%CDOM(idom_beg:idom_end,1:ncplx));this%CDOM=spval
@@ -827,9 +827,9 @@ type, public :: NitroAQMFluxDiagType
   this%CPQ=0._r8
   this%CNH=0._r8
   this%CPH=0._r8
-  this%ORCT=0._r8
-  this%OSCT=0._r8
-  this%OSAT=0._r8
+  this%OMBioResduK=0._r8
+  this%SolidOMK=0._r8
+  this%SolidOMActK=0._r8
   this%TONX=0._r8
   this%TOPX=0._r8
 
@@ -851,9 +851,9 @@ type, public :: NitroAQMFluxDiagType
   call destroy(this%CPQ)
   call destroy(this%CNH)
   call destroy(this%CPH)
-  call destroy(this%ORCT)
-  call destroy(this%OSCT)
-  call destroy(this%OSAT)
+  call destroy(this%OMBioResduK)
+  call destroy(this%SolidOMK)
+  call destroy(this%SolidOMActK)
   call destroy(this%TONX)
   call destroy(this%TOPX)
   call destroy(this%CDOM)

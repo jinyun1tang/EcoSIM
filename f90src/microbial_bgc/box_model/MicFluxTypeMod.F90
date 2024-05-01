@@ -34,7 +34,7 @@ implicit none
   real(r8) :: RNO2DmndSoilChemo
   real(r8) :: RNO2DmndBandChemo
   real(r8) :: NetNH4Mineralize
-  real(r8) :: NetPO4Mineralize_col
+  real(r8) :: NetPO4Mineralize
   real(r8), allocatable :: RDOM_micb_flx(:,:)
   real(r8), allocatable :: RO2DmndAutort(:)
   real(r8), allocatable :: RNH3OxidAutor(:)

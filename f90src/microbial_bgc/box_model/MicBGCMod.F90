@@ -84,7 +84,7 @@ module MicBGCMod
   call ncplxs%Init()
   call naqfdiag%ZeroOut()
 
-  micflx%NetNH4Mineralize=0._r8;micflx%NetPO4Mineralize_col=0._r8
+  micflx%NetNH4Mineralize=0._r8;micflx%NetPO4Mineralize=0._r8
 ! write(*,*)'StageBGCEnvironCondition'
   call StageBGCEnvironCondition(micfor,KL,micstt,naqfdiag,nmicdiag,nmics,ncplxs)
 !
@@ -147,6 +147,7 @@ module MicBGCMod
   call nmicf%destroy()
   call ncplxf%destroy()
   call ncplxs%destroy()
+
   end subroutine SoilBGCOneLayer
 !------------------------------------------------------------------------------------------
 
@@ -185,12 +186,12 @@ module MicBGCMod
     CNQ                  => ncplxs%CNQ,                   &
     CPQ                  => ncplxs%CPQ,                   &
     CDOM                 => ncplxs%CDOM,                  &
-    ORCT                 => ncplxs%ORCT,                  &
-    OSCT                 => ncplxs%OSCT,                  &
-    OSAT                 => ncplxs%OSAT,                  &
+    OMBioResduK                 => ncplxs%OMBioResduK,                  &
+    SolidOMK                 => ncplxs%SolidOMK,                  &
+    SolidOMActK                 => ncplxs%SolidOMActK,                  &
     TONX                 => ncplxs%TONX,                  &
     TOPX                 => ncplxs%TOPX,                  &
-    TORC                 => nmicdiag%TORC,                &
+    TOMBioResdu                 => nmicdiag%TOMBioResdu,                &
     TotActMicrobiom      => nmicdiag%TotActMicrobiom,     &
     TotBiomNO2Consumers  => nmicdiag%TotBiomNO2Consumers, &
     XCO2                 => nmicdiag%XCO2,                &
@@ -256,7 +257,7 @@ module MicBGCMod
     ZNO2S                => micstt%ZNO2S,                 &
     ZNO3B                => micstt%ZNO3B,                 &
     ZNO3S                => micstt%ZNO3S,                 &
-    OMEAutor              => micstt%OMEAutor,               &
+    OMEAutor             => micstt%OMEAutor,              &
     FracBulkSOM          => micstt%FracBulkSOM            &
   )
 
@@ -290,7 +291,7 @@ module MicBGCMod
 !     197500,195000 low temp inactivation for growth,maintenance
 !     222500,232500 high temp inactivation for growth,maintenance
 !     TSensGrowth,TSensMaintR=temperature function for growth,maintenance respiration
-!
+! the offset could be micobial guild/group specific
   TKSO=TKS+TempOffset
 
   call MicrobPhysTempFun(TKSO, TSensGrowth, TSensMaintR)
@@ -319,38 +320,38 @@ module MicBGCMod
 !     TOTAL SUBSTRATE
 !
 !     TOSC=total SOC, TOSA=total colonized SOC
-!     TORC=total microbial residue, TOHC=total adsorbed C
+!     TOMBioResdu=total microbial residue, TOHC=total adsorbed C
 !     in each K:
-!     OSCT=total SOC n each K, OSAT=total colonized SOC
-!     ORCT=total microbial residue, OHCT=total adsorbed C
+!     SolidOMK=total SOC n each K, SolidOMActK=total colonized SOC
+!     OMBioResduK=total microbial residue, OHCT=total adsorbed C
 !
   TOSC=0.0_r8
   TOSA=0.0_r8
-  TORC=0.0_r8
+  TOMBioResdu=0.0_r8
   TOHC=0.0_r8
 !
 !     TOTAL SOLID SUBSTRATE
 !
   DO  K=1,KL
-    OSCT(K)=0.0_r8
-    OSAT(K)=0.0_r8
+    SolidOMK(K)=0.0_r8
+    SolidOMActK(K)=0.0_r8
 
     DO M=1,jsken
-      OSCT(K)=OSCT(K)+SolidOM(ielmc,M,K)
-      OSAT(K)=OSAT(K)+SolidOMAct(M,K)
+      SolidOMK(K)=SolidOMK(K)+SolidOM(ielmc,M,K)
+      SolidOMActK(K)=SolidOMActK(K)+SolidOMAct(M,K)
     enddo
-    TOSC=TOSC+OSCT(K)
-    TOSA=TOSA+OSAT(K)
+    TOSC=TOSC+SolidOMK(K)
+    TOSA=TOSA+SolidOMActK(K)
   enddo
 !
 !     TOTAL BIORESIDUE
 !
   DO  K=1,KL
-    ORCT(K)=0.0_r8
+    OMBioResduK(K)=0.0_r8
     DO  M=1,ndbiomcp
-      ORCT(K)=ORCT(K)+OMBioResdu(ielmc,M,K)
+      OMBioResduK(K)=OMBioResduK(K)+OMBioResdu(ielmc,M,K)
     ENDDO
-    TORC=TORC+ORCT(K)
+    TOMBioResdu=TOMBioResdu+OMBioResduK(K)
 !
 !     TOTAL ADSORBED AND DISSOLVED SUBSTRATE
 !
@@ -360,9 +361,10 @@ module MicBGCMod
   enddo
 
   D860: DO K=1,KL
-    BulkSOM(K)=OSAT(K)+ORCT(K)+SorbedOM(ielmc,K)+SorbedOM(idom_acetate,K)
+    BulkSOM(K)=SolidOMActK(K)+OMBioResduK(K)+SorbedOM(ielmc,K)+SorbedOM(idom_acetate,K)
   ENDDO D860
-  TSRH=TOSA+TORC+TOHC
+  
+  TSRH=TOSA+TOMBioResdu+TOHC
 !
 !     C:N AND C:P RATIOS OF TOTAL BIOMASS
 !     CNOMA,CPOMA=N,P contents of active biomass OMA
@@ -828,8 +830,8 @@ module MicBGCMod
 ! ROXYF,ROXYL=net O2 gaseous, aqueous fluxes from previous hour
 ! O2AquaDiffusvity=aqueous O2 diffusivity
 ! OXYG,OXYS=gaseous, aqueous O2 amounts
-! Rain2LitRSurf_col,Irrig2LitRSurf=surface water flux from precipitation, irrigation
-! O2_rain_conc,O2_irrig_conc=O2 concentration in Rain2LitRSurf_col,Irrig2LitRSurf
+! Rain2LitRSurf,Irrig2LitRSurf=surface water flux from precipitation, irrigation
+! O2_rain_conc,O2_irrig_conc=O2 concentration in Rain2LitRSurf,Irrig2LitRSurf
 !
   RO2UptkHeter(NGL,K)=0.0_r8
   !aerobic heterotrophs
@@ -1476,11 +1478,11 @@ module MicBGCMod
     RHydlysBioResduOM    => ncplxf%RHydlysBioResduOM,   &
     RHydlysSorptOM       => ncplxf%RHydlysSorptOM,      &
     DOMSorp              => ncplxf%DOMSorp,             &
-    ORCT                 => ncplxs%ORCT,                &
+    OMBioResduK          => ncplxs%OMBioResduK,         &
     RNO2ReduxChemo       => nmicdiag%RNO2ReduxChemo,    &
-    TORC                 => nmicdiag%TORC,              &
+    TOMBioResdu          => nmicdiag%TOMBioResdu,       &
     RCMMEautor           => nmicf%RCMMEautor,           &
-    RCOMEAutorr           => nmicf%RCOMEAutorr,           &
+    RCOMEAutorr          => nmicf%RCOMEAutorr,          &
     SolidOM              => micstt%SolidOM,             &
     iprotein             => micpar%iprotein,            &
     SolidOMAct           => micstt%SolidOMAct,          &
@@ -1498,14 +1500,14 @@ module MicBGCMod
 !     HETEROTROPHIC SUBSTRATE-MICROBE complexES
 !
 !     FORC=fraction of total microbial residue
-!     ORCT=microbial residue
+!     OMBioResduK=microbial residue
 !     RCCMEheter,RCCMN,RCCMP=transfer of auto LitrFall C,N,P to each hetero K
 !     RCOMEheter,RCOMEheter,RCOMP=transfer of microbial C,N,P LitrFall to residue
 !     RCMMEheter,RCMMN,RCMMEheter=transfer of senesence LitrFall C,N,P to residue
 !
   D1690: DO K=1,KL
-    IF(TORC.GT.ZEROS)THEN
-      FORC(K)=ORCT(K)/TORC
+    IF(TOMBioResdu.GT.ZEROS)THEN
+      FORC(K)=OMBioResduK(K)/TOMBioResdu
     ELSE
       IF(K.EQ.k_POM)THEN
         FORC(K)=1.0_r8
@@ -1716,6 +1718,7 @@ module MicBGCMod
               OSC14U=OSC14U+CFOMCU(1)*(RHOMEheter(ielmc,M,NGL,K)+RHMMEheter(ielmc,M,NGL,K))
               OSN14U=OSN14U+CFOMCU(1)*(RHOMEheter(ielmn,M,NGL,K)+RHMMEheter(ielmn,M,NGL,K))
               OSP14U=OSP14U+CFOMCU(1)*(RHOMEheter(ielmp,M,NGL,K)+RHMMEheter(ielmp,M,NGL,K))
+
               OSC24U=OSC24U+CFOMC(2)*(RHOMEheter(ielmc,M,NGL,K)+RHMMEheter(ielmc,M,NGL,K))
               OSN24U=OSN24U+CFOMCU(2)*(RHOMEheter(ielmn,M,NGL,K)+RHMMEheter(ielmn,M,NGL,K))
               OSP24U=OSP24U+CFOMCU(2)*(RHOMEheter(ielmp,M,NGL,K)+RHMMEheter(ielmp,M,NGL,K))
@@ -1785,32 +1788,32 @@ module MicBGCMod
 !     begin_execution
   associate(                   &
     ROQC4HeterMicActCmpK   => ncplxf%ROQC4HeterMicActCmpK  , &
-    OSCT    => ncplxs%OSCT   , &
-    OSAT    => ncplxs%OSAT   , &
+    SolidOMK    => ncplxs%SolidOMK   , &
+    SolidOMActK    => ncplxs%SolidOMActK   , &
     ZEROS   => micfor%ZEROS  , &
     SolidOMAct    => micstt%SolidOMAct   , &
     SolidOM => micstt%SolidOM, &
     DOSA    => micpar%DOSA     &
   )
-!     OSCT,OSAT,OSCX=total,colonized,uncolonized SOC
+!     SolidOMK,SolidOMActK,OSCX=total,colonized,uncolonized SOC
 !     OSA,OSC=colonized,total litter
 !     DOSA=rate constant for litter colonization
 !     ROQC4HeterMicActCmpK=total respiration of DOC+DOA used to represent microbial activity
 !
   D475: DO K=1,KL
-    OSCT(K)=0.0_r8
-    OSAT(K)=0.0_r8
+    SolidOMK(K)=0.0_r8
+    SolidOMActK(K)=0.0_r8
     DO  M=1,jsken
-      OSCT(K)=OSCT(K)+SolidOM(ielmc,M,K)
-      OSAT(K)=OSAT(K)+SolidOMAct(M,K)
+      SolidOMK(K)=SolidOMK(K)+SolidOM(ielmc,M,K)
+      SolidOMActK(K)=SolidOMActK(K)+SolidOMAct(M,K)
     enddo
   ENDDO D475
 
   D480: DO K=1,KL
-    IF(OSCT(K).GT.ZEROS)THEN
+    IF(SolidOMK(K).GT.ZEROS)THEN
       DOSAK=DOSA(K)*AZMAX1(ROQC4HeterMicActCmpK(K))
       D485: DO M=1,jsken
-        SolidOMAct(M,K)=AMIN1(SolidOM(ielmc,M,K),SolidOMAct(M,K)+DOSAK*SolidOM(ielmc,M,K)/OSCT(K))
+        SolidOMAct(M,K)=AMIN1(SolidOM(ielmc,M,K),SolidOMAct(M,K)+DOSAK*SolidOM(ielmc,M,K)/SolidOMK(K))
       ENDDO D485
     ELSE
       D490: DO M=1,jsken
@@ -2275,6 +2278,7 @@ module MicBGCMod
       AttenfH1PO4Heter(NGL,K)=AMAX1(FMN,FracHeterBiomOfActK(NGL,K))
     ENDIF
   ENDIF
+
   IF(Lsurf.AND.K.NE.micpar%k_POM.AND.K.NE.micpar%k_humus &
     .AND.SoilMicPMassLayer0.GT.ZEROS)THEN
     naqfdiag%TFNH4X=naqfdiag%TFNH4X+AttenfNH4Heter(NGL,K)
@@ -2305,19 +2309,19 @@ module MicBGCMod
   real(r8) :: RGOGY,RGOGZ,RGOGX
 
 ! begin_execution
-  associate(                                          &
-    FBiomStoiScalarHeter                => nmics%FBiomStoiScalarHeter,                &
-    OMActHeter          => nmics%OMActHeter,          &
-    RO2DmndHeter        => nmicf%RO2DmndHeter,        &
-    RO2Dmnd4RespHeter   => nmicf%RO2Dmnd4RespHeter,   &
-    ROQC4HeterMicrobAct => nmicf%ROQC4HeterMicrobAct, &
-    CDOM                => ncplxs%CDOM,               &
-    DOM                 => micstt%DOM,                &
-    RO2DmndHetert       => micflx%RO2DmndHetert,      &
-    RDOCUptkHeter       => micflx%RDOCUptkHeter,      &
-    RAcetateUptkHeter   => micflx%RAcetateUptkHeter,  &
-    ZERO                => micfor%ZERO,               &
-    TKS                 => micfor%TKS                 &
+  associate(                                            &
+    FBiomStoiScalarHeter => nmics%FBiomStoiScalarHeter, &
+    OMActHeter           => nmics%OMActHeter,           &
+    RO2DmndHeter         => nmicf%RO2DmndHeter,         &
+    RO2Dmnd4RespHeter    => nmicf%RO2Dmnd4RespHeter,    &
+    ROQC4HeterMicrobAct  => nmicf%ROQC4HeterMicrobAct,  &
+    CDOM                 => ncplxs%CDOM,                &
+    DOM                  => micstt%DOM,                 &
+    RO2DmndHetert        => micflx%RO2DmndHetert,       &
+    RDOCUptkHeter        => micflx%RDOCUptkHeter,       &
+    RAcetateUptkHeter    => micflx%RAcetateUptkHeter,   &
+    ZERO                 => micfor%ZERO,                &
+    TKS                  => micfor%TKS                  &
   )
   GOMX=RGAS*1.E-3_r8*TKS*LOG((AMAX1(ZERO,CDOM(idom_acetate,K))/OAKI))
   GOMM=GOMX/24.0_r8
@@ -2889,7 +2893,7 @@ module MicBGCMod
     RO2GasXchangePrev      => micfor%RO2GasXchangePrev,      &
     RO2AquaXchangePrev     => micfor%RO2AquaXchangePrev,     &
     Irrig2LitRSurf         => micfor%Irrig2LitRSurf,         &
-    Rain2LitRSurf_col      => micfor%Rain2LitRSurf_col,      &
+    Rain2LitRSurf          => micfor%Rain2LitRSurf,          &
     litrm                  => micfor%litrm,                  &
     O2AquaDiffusvity       => micfor%O2AquaDiffusvity,       &
     VLSoilPoreMicP         => micfor%VLSoilPoreMicP,         &
@@ -2926,7 +2930,7 @@ module MicBGCMod
         ROXYLX=RO2AquaXchangePrev*dts_gas*FOXYX
       ELSE
         OXYG1=COXYG*VLsoiAirPM(1)*FOXYX
-        ROXYLX=(RO2AquaXchangePrev+Rain2LitRSurf_col*O2_rain_conc+Irrig2LitRSurf*O2_irrig_conc)*dts_gas*FOXYX
+        ROXYLX=(RO2AquaXchangePrev+Rain2LitRSurf*O2_rain_conc+Irrig2LitRSurf*O2_irrig_conc)*dts_gas*FOXYX
       ENDIF
       OXYS1=OXYS*FOXYX
 !
@@ -3131,7 +3135,7 @@ module MicBGCMod
    RH2PO4DmndLitrHeter   => micflx%RH2PO4DmndLitrHeter,  &
    RH1PO4DmndLitrHeter   => micflx%RH1PO4DmndLitrHeter,  &
    NetNH4Mineralize  => micflx%NetNH4Mineralize, &
-   NetPO4Mineralize_col  => micflx%NetPO4Mineralize_col  &
+   NetPO4Mineralize  => micflx%NetPO4Mineralize  &
   )
 !     MINERALIZATION-IMMOBILIZATION OF NH4 IN SOIL FROM MICROBIAL
 !     C:N AND NH4 CONCENTRATION IN BAND AND NON-BAND SOIL ZONES
@@ -3232,7 +3236,7 @@ module MicBGCMod
 !     VOLW=water content
 !     FPO4X,FPOBX=fractions of biol H2PO4 demand in non-band, band
 !     RH2PO4TransfSoilHeter,RH2PO4TransfBandHeter=substrate-limited H2PO4 mineraln-immobn in non-band, band
-!     NetPO4Mineralize_col=total H2PO4 net mineraln (-ve) or immobiln (+ve)
+!     NetPO4Mineralize=total H2PO4 net mineraln (-ve) or immobiln (+ve)
 !
   FH2PS=VLPO4
   FH2PB=VLPOB
@@ -3254,7 +3258,7 @@ module MicBGCMod
     RH2PO4TransfSoilHeter(NGL,K)=RIPOP*FH2PS
     RH2PO4TransfBandHeter(NGL,K)=RIPOP*FH2PB
   ENDIF
-  NetPO4Mineralize_col=NetPO4Mineralize_col+(RH2PO4TransfSoilHeter(NGL,K)+RH2PO4TransfBandHeter(NGL,K))
+  NetPO4Mineralize=NetPO4Mineralize+(RH2PO4TransfSoilHeter(NGL,K)+RH2PO4TransfBandHeter(NGL,K))
 !
 !     MINERALIZATION-IMMOBILIZATION OF HPO4 IN SOIL FROM MICROBIAL
 !     C:P AND PO4 CONCENTRATION IN BAND AND NON-BAND SOIL ZONES
@@ -3272,7 +3276,7 @@ module MicBGCMod
 !     VOLW=water content
 !     FP14X,FP1BX=fractions of biol HPO4 demand in non-band, band
 !     RH1PO4TransfSoilHeter,RH1PO4TransfBandHeter=substrate-limited HPO4 mineraln-immobn in non-band, band
-!     NetPO4Mineralize_col=total H2PO4+HPO4 net mineraln (-ve) or immobiln (+ve)
+!     NetPO4Mineralize=total H2PO4+HPO4 net mineraln (-ve) or immobiln (+ve)
 !
   FH1PS=VLPO4
   FH1PB=VLPOB
@@ -3293,7 +3297,7 @@ module MicBGCMod
     RH1PO4TransfSoilHeter(NGL,K)=RIP1P*FH1PS
     RH1PO4TransfBandHeter(NGL,K)=RIP1P*FH1PB
   ENDIF
-  NetPO4Mineralize_col=NetPO4Mineralize_col+(RH1PO4TransfSoilHeter(NGL,K)+RH1PO4TransfBandHeter(NGL,K))
+  NetPO4Mineralize=NetPO4Mineralize+(RH1PO4TransfSoilHeter(NGL,K)+RH1PO4TransfBandHeter(NGL,K))
 !
 !     MINERALIZATION-IMMOBILIZATION OF NH4 IN SURFACE RESIDUE FROM
 !     MICROBIAL C:N AND NH4 CONCENTRATION IN BAND AND NON-BAND SOIL
@@ -3381,7 +3385,7 @@ module MicBGCMod
 !     H2P4M=H2PO4 not available for uptake
 !     AttenfH2PO4Heter=fractions of biological H2PO4 demand
 !     RH2PO4TransfLitrHeter=substrate-limited H2PO4 mineraln-immobiln
-!     NetPO4Mineralize_col=total H2PO4 net mineraln (-ve) or immobiln (+ve)
+!     NetPO4Mineralize=total H2PO4 net mineraln (-ve) or immobiln (+ve)
 !
     RIPOPR=RIPOP-RH2PO4TransfSoilHeter(NGL,K)
     IF(RIPOPR.GT.0.0_r8)THEN
@@ -3395,7 +3399,7 @@ module MicBGCMod
       RH2PO4DmndLitrHeter(NGL,K)=0.0_r8
       RH2PO4TransfLitrHeter(NGL,K)=RIPOPR
     ENDIF
-    NetPO4Mineralize_col=NetPO4Mineralize_col+RH2PO4TransfLitrHeter(NGL,K)
+    NetPO4Mineralize=NetPO4Mineralize+RH2PO4TransfLitrHeter(NGL,K)
 !
 !     MINERALIZATION-IMMOBILIZATION OF HPO4 IN SURFACE RESIDUE FROM
 !     MICROBIAL C:P AND PO4 CONCENTRATION IN BAND AND NON-BAND SOIL
@@ -3415,7 +3419,7 @@ module MicBGCMod
 !     H1P4M=HPO4 not available for uptake
 !     AttenfH1PO4Heter=fraction of biological HPO4 demand
 !     RH1PO4TransfLitrHeter=substrate-limited HPO4 minereraln-immobiln
-!     NetPO4Mineralize_col=total HPO4 net mineraln (-ve) or immobiln (+ve)
+!     NetPO4Mineralize=total HPO4 net mineraln (-ve) or immobiln (+ve)
 !
     FH1PS=VLPO4
     FH1PB=VLPOB
@@ -3431,7 +3435,7 @@ module MicBGCMod
       RH1PO4DmndLitrHeter(NGL,K)=0.0_r8
       RH1PO4TransfLitrHeter(NGL,K)=RIP1PR
     ENDIF
-    NetPO4Mineralize_col=NetPO4Mineralize_col+RH1PO4TransfLitrHeter(NGL,K)
+    NetPO4Mineralize=NetPO4Mineralize+RH1PO4TransfLitrHeter(NGL,K)
   ENDIF
   end associate
   end subroutine BiomassMineralization

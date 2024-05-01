@@ -185,8 +185,8 @@ module MicAutoCPLXMod
 ! ROXYF,ROXYL=net O2 gaseous, aqueous fluxes from previous hour
 ! O2AquaDiffusvity=aqueous O2 diffusivity
 ! OXYG,OXYS=gaseous, aqueous O2 amounts
-! Rain2LitRSurf_col,Irrig2LitRSurf=surface water flux from precipitation, irrigation
-! O2_rain_conc,O2_irrig_conc=O2 concentration in Rain2LitRSurf_col,Irrig2LitRSurf
+! Rain2LitRSurf,Irrig2LitRSurf=surface water flux from precipitation, irrigation
+! O2_rain_conc,O2_irrig_conc=O2 concentration in Rain2LitRSurf,Irrig2LitRSurf
 !
   RO2UptkAutor(NGL)=0.0_r8
 
@@ -663,7 +663,7 @@ module MicAutoCPLXMod
     O2_rain_conc        => micfor%O2_rain_conc,        &
     O2_irrig_conc       => micfor%O2_irrig_conc,       &
     Irrig2LitRSurf      => micfor%Irrig2LitRSurf,      &
-    Rain2LitRSurf_col   => micfor%Rain2LitRSurf_col,   &
+    Rain2LitRSurf       => micfor%Rain2LitRSurf,       &
     litrm               => micfor%litrm,               &
     O2AquaDiffusvity    => micfor%O2AquaDiffusvity,    &
     RO2AquaXchangePrev  => micfor%RO2AquaXchangePrev,  &
@@ -702,7 +702,7 @@ module MicAutoCPLXMod
         ROXYLX=RO2AquaXchangePrev*dts_gas*FOXYX
       ELSE
         OXYG1=COXYG*VLsoiAirPM(1)*FOXYX
-        ROXYLX=(RO2AquaXchangePrev+Rain2LitRSurf_col*O2_rain_conc &
+        ROXYLX=(RO2AquaXchangePrev+Rain2LitRSurf*O2_rain_conc &
           +Irrig2LitRSurf*O2_irrig_conc)*dts_gas*FOXYX
       ENDIF
       OXYS1=OXYS*FOXYX
@@ -1471,7 +1471,7 @@ module MicAutoCPLXMod
    NetNH4Mineralize      => micflx%NetNH4Mineralize,     &
    RH2PO4UptkSoilAutor   => micflx%RH2PO4UptkSoilAutor,  &
    RH2PO4UptkBandAutor   => micflx%RH2PO4UptkBandAutor,  &
-   NetPO4Mineralize_col  => micflx%NetPO4Mineralize_col, &
+   NetPO4Mineralize  => micflx%NetPO4Mineralize, &
    RH1PO4UptkSoilAutor   => micflx%RH1PO4UptkSoilAutor,  &
    RH1PO4UptkBandAutor   => micflx%RH1PO4UptkBandAutor,  &
    RH1PO4UptkLitrAutor   => micflx%RH1PO4UptkLitrAutor,  &
@@ -1578,7 +1578,7 @@ module MicAutoCPLXMod
 !     VOLW=water content
 !     FPO4X,FPOBX=fractions of biol H2PO4 demand in non-band, band
 !     RH2PO4TransfSoilHeter,RH2PO4TransfBandHeter=substrate-limited H2PO4 mineraln-immobn in non-band, band
-!     NetPO4Mineralize_col=total H2PO4 net mineraln (-ve) or immobiln (+ve)
+!     NetPO4Mineralize=total H2PO4 net mineraln (-ve) or immobiln (+ve)
 !
   FH2PS=VLPO4
   FH2PB=VLPOB
@@ -1600,7 +1600,7 @@ module MicAutoCPLXMod
     RH2PO4TransfSoilAutor(NGL)=RIPOP*FH2PS
     RH2PO4TransfBandAutor(NGL)=RIPOP*FH2PB
   ENDIF
-  NetPO4Mineralize_col=NetPO4Mineralize_col+(RH2PO4TransfSoilAutor(NGL)+RH2PO4TransfBandAutor(NGL))
+  NetPO4Mineralize=NetPO4Mineralize+(RH2PO4TransfSoilAutor(NGL)+RH2PO4TransfBandAutor(NGL))
 !
 !     MINERALIZATION-IMMOBILIZATION OF HPO4 IN SOIL FROM MICROBIAL
 !     C:P AND PO4 CONCENTRATION IN BAND AND NON-BAND SOIL ZONES
@@ -1618,7 +1618,7 @@ module MicAutoCPLXMod
 !     VOLW=water content
 !     FP14X,FP1BX=fractions of biol HPO4 demand in non-band, band
 !     RH1PO4TransfSoilHeter,RH1PO4TransfBandHeter=substrate-limited HPO4 mineraln-immobn in non-band, band
-!     NetPO4Mineralize_col=total H2PO4+HPO4 net mineraln (-ve) or immobiln (+ve)
+!     NetPO4Mineralize=total H2PO4+HPO4 net mineraln (-ve) or immobiln (+ve)
 !
   FH1PS=VLPO4
   FH1PB=VLPOB
@@ -1639,7 +1639,7 @@ module MicAutoCPLXMod
     RH1PO4TransfSoilAutor(NGL)=RIP1P*FH1PS
     RH1PO4TransfBandAutor(NGL)=RIP1P*FH1PB
   ENDIF
-  NetPO4Mineralize_col=NetPO4Mineralize_col+(RH1PO4TransfSoilAutor(NGL)+RH1PO4TransfBandAutor(NGL))
+  NetPO4Mineralize=NetPO4Mineralize+(RH1PO4TransfSoilAutor(NGL)+RH1PO4TransfBandAutor(NGL))
 !
 !     MINERALIZATION-IMMOBILIZATION OF NH4 IN SURFACE RESIDUE FROM
 !     MICROBIAL C:N AND NH4 CONCENTRATION IN BAND AND NON-BAND SOIL
@@ -1727,7 +1727,7 @@ module MicAutoCPLXMod
 !     H2P4M=H2PO4 not available for uptake
 !     AttenfH2PO4Heter=fractions of biological H2PO4 demand
 !     RH2PO4TransfLitrHeter=substrate-limited H2PO4 mineraln-immobiln
-!     NetPO4Mineralize_col=total H2PO4 net mineraln (-ve) or immobiln (+ve)
+!     NetPO4Mineralize=total H2PO4 net mineraln (-ve) or immobiln (+ve)
 !
     RIPOPR=RIPOP-RH2PO4TransfSoilAutor(NGL)
     IF(RIPOPR.GT.0.0_r8)THEN
@@ -1741,7 +1741,7 @@ module MicAutoCPLXMod
       RH2PO4UptkLitrAutor(NGL)=0.0_r8
       RH2PO4TransfLitrAutor(NGL)=RIPOPR
     ENDIF
-    NetPO4Mineralize_col=NetPO4Mineralize_col+RH2PO4TransfLitrAutor(NGL)
+    NetPO4Mineralize=NetPO4Mineralize+RH2PO4TransfLitrAutor(NGL)
 !
 !     MINERALIZATION-IMMOBILIZATION OF HPO4 IN SURFACE RESIDUE FROM
 !     MICROBIAL C:P AND PO4 CONCENTRATION IN BAND AND NON-BAND SOIL
@@ -1761,7 +1761,7 @@ module MicAutoCPLXMod
 !     H1P4M=HPO4 not available for uptake
 !     AttenfH1PO4Heter=fraction of biological HPO4 demand
 !     RH1PO4TransfLitrHeter=substrate-limited HPO4 minereraln-immobiln
-!     NetPO4Mineralize_col=total HPO4 net mineraln (-ve) or immobiln (+ve)
+!     NetPO4Mineralize=total HPO4 net mineraln (-ve) or immobiln (+ve)
 !
     FH1PS=VLPO4
     FH1PB=VLPOB
@@ -1777,7 +1777,7 @@ module MicAutoCPLXMod
       RH1PO4UptkLitrAutor(NGL)=0.0_r8
       RH1PO4TransfLitrAutor(NGL)=RIP1PR
     ENDIF
-    NetPO4Mineralize_col=NetPO4Mineralize_col+RH1PO4TransfLitrAutor(NGL)
+    NetPO4Mineralize=NetPO4Mineralize+RH1PO4TransfLitrAutor(NGL)
   ENDIF
   end associate
   end subroutine BiomassMineralizationff
@@ -1935,6 +1935,7 @@ module MicAutoCPLXMod
             OSC14U=OSC14U+CFOMCU(1)*(RHOMEAutorr(ielmc,M,NGL)+RHMMEautor(ielmc,M,NGL))
             OSN14U=OSN14U+CFOMCU(1)*(RHOMEAutorr(ielmn,M,NGL)+RHMMEautor(ielmn,M,NGL))
             OSP14U=OSP14U+CFOMCU(1)*(RHOMEAutorr(ielmp,M,NGL)+RHMMEautor(ielmp,M,NGL))
+            
             OSC24U=OSC24U+CFOMCU(2)*(RHOMEAutorr(ielmc,M,NGL)+RHMMEautor(ielmc,M,NGL))
             OSN24U=OSN24U+CFOMCU(2)*(RHOMEAutorr(ielmn,M,NGL)+RHMMEautor(ielmn,M,NGL))
             OSP24U=OSP24U+CFOMCU(2)*(RHOMEAutorr(ielmp,M,NGL)+RHMMEautor(ielmp,M,NGL))

@@ -18,7 +18,7 @@ module MicForcTypeMod
   real(r8) :: O2_irrig_conc
   real(r8) :: O2_rain_conc
   real(r8) :: Irrig2LitRSurf
-  real(r8) :: Rain2LitRSurf_col
+  real(r8) :: Rain2LitRSurf
   real(r8) :: TempOffset
   real(r8) :: VLitR
   real(r8) :: VWatLitRHoldCapcity

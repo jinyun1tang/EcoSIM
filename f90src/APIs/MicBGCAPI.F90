@@ -1,7 +1,7 @@
 module MicBGCAPI
 
   use data_kind_mod  , only : r8 => DAT_KIND_R8
-  use NitrosMod      , only : VerticalLitterMixLvsLL
+  use NitrosMod      , only : DownwardMixOM
   use NitroDisturbMod, only : SOMRemovalByDisturbance
   use EcoSIMSolverPar
   use MicFLuxTypeMod, only : micfluxtype
@@ -107,7 +107,7 @@ implicit none
             Micb_N2Fixation_vr(L,NY,NX)=0.0_r8
           ENDIF
   !     MIX LITTER C BETWEEN ADJACENT SOIL LAYERS L AND LL
-          call VerticalLitterMixLvsLL(I,J,L,NY,NX)
+          call DownwardMixOM(I,J,L,NY,NX)
 
         ELSE
           trcg_RMicbTransf_vr(idg_CO2,L,NY,NX)=0.0_r8
@@ -181,7 +181,7 @@ implicit none
   micfor%O2_irrig_conc  =O2_irrig_conc(NY,NX)
   micfor%O2_rain_conc  =O2_rain_conc(NY,NX)
   micfor%Irrig2LitRSurf =Irrig2LitRSurf(NY,NX)
-  micfor%Rain2LitRSurf_col =Rain2LitRSurf_col(NY,NX)
+  micfor%Rain2LitRSurf =Rain2LitRSurf_col(NY,NX)
   micfor%TempOffset=TempOffset_col(NY,NX)
   micfor%VLitR  =VLitR(NY,NX)
   micfor%VWatLitRHoldCapcity=VWatLitRHoldCapcity(NY,NX)
@@ -220,7 +220,9 @@ implicit none
   micfor%RO2AquaXchangePrev =RO2AquaXchangePrev_vr(L,NY,NX)
   micfor%RDOMEcoDmndPrev(1:jcplx)=RDOMEcoDmndPrev_vr(1:jcplx,L,NY,NX)
   micfor%RAcetateEcoDmndPrev(1:jcplx)=RAcetateEcoDmndPrev_vr(1:jcplx,L,NY,NX)
+  !is it litter layer?
   micfor%litrm=(L==0)
+  !is it surface layer
   micfor%Lsurf=(L==NU(NY,NX))
   if(micfor%litrm)then
     micstt%ZNH4TU=AZMAX1(trc_solml_vr(ids_NH4,NU(NY,NX),NY,NX))+AZMAX1(trc_solml_vr(ids_NH4B,NU(NY,NX),NY,NX))
@@ -379,7 +381,7 @@ implicit none
   RNO2DmndSoilChemo_vr(L,NY,NX)=micflx%RNO2DmndSoilChemo
   RNO2DmndBandChemo_vr(L,NY,NX)=micflx%RNO2DmndBandChemo
   NetNH4Mineralize_col(NY,NX)=NetNH4Mineralize_col(NY,NX)+micflx%NetNH4Mineralize
-  NetPO4Mineralize_col(NY,NX)=NetPO4Mineralize_col(NY,NX)+micflx%NetPO4Mineralize_col
+  NetPO4Mineralize_col(NY,NX)=NetPO4Mineralize_col(NY,NX)+micflx%NetPO4Mineralize
   RDOM_micb_flx(idom_doc,1:jcplx,L,NY,NX)=micflx%RDOM_micb_flx(idom_doc,1:jcplx)
   RDOM_micb_flx(idom_don,1:jcplx,L,NY,NX)=micflx%RDOM_micb_flx(idom_don,1:jcplx)
   RDOM_micb_flx(idom_dop,1:jcplx,L,NY,NX)=micflx%RDOM_micb_flx(idom_dop,1:jcplx)
@@ -419,6 +421,7 @@ implicit none
     RNO3UptkLitrAutor_col(1:NumMicrobAutrophCmplx,NY,NX)=micflx%RNO3UptkLitrAutor(1:NumMicrobAutrophCmplx)
     RH2PO4UptkLitrAutor_col(1:NumMicrobAutrophCmplx,NY,NX)=micflx%RH2PO4UptkLitrAutor(1:NumMicrobAutrophCmplx)
     RH1PO4UptkLitrAutor_col(1:NumMicrobAutrophCmplx,NY,NX)=micflx%RH1PO4UptkLitrAutor(1:NumMicrobAutrophCmplx)
+
     SolidOM_vr(ielmc,micpar%iprotein,micpar%k_POM,NU(NY,NX),NY,NX)=micstt%OSC13U
     SolidOM_vr(ielmc,micpar%iprotein,micpar%k_humus,NU(NY,NX),NY,NX)=micstt%OSC14U
     SolidOM_vr(ielmc,micpar%icarbhyro,micpar%k_humus,NU(NY,NX),NY,NX)=micstt%OSC24U
