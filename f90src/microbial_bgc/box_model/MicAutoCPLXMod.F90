@@ -248,10 +248,10 @@ module MicAutoCPLXMod
   associate(                                               &
     FracOMActAutor        => nmics%FracOMActAutor,         &
     FracAutorBiomOfActK   => nmics%FracAutorBiomOfActK,    &
-    FNH4XRff              => nmicf%FNH4XRff,               &
-    FNO3XRff              => nmicf%FNO3XRff,               &
-    FP14XRff              => nmicf%FP14XRff,               &
-    FPO4XRff              => nmicf%FPO4XRff,               &
+    AttenfNH4Autor        => nmicf%AttenfNH4Autor,         &
+    AttenfNO3Autor        => nmicf%AttenfNO3Autor,         &
+    AttenfH1PO4Autor      => nmicf%AttenfH1PO4Autor,       &
+    AttenfH2PO4Autor      => nmicf%AttenfH2PO4Autor,       &
     RO2EcoDmndPrev        => micfor%RO2EcoDmndPrev,        &
     RNH4EcoDmndSoilPrev   => micfor%RNH4EcoDmndSoilPrev,   &
     RNH4EcoDmndBandPrev   => micfor%RNH4EcoDmndBandPrev,   &
@@ -359,31 +359,31 @@ module MicAutoCPLXMod
 !
   IF(litrm)THEN
     IF(RNH4EcoDmndLitrPrev.GT.ZEROS)THEN
-      FNH4XRff(NGL)=AMAX1(FMN,RNH4UptkLitrAutor(NGL)/RNH4EcoDmndLitrPrev)
+      AttenfNH4Autor(NGL)=AMAX1(FMN,RNH4UptkLitrAutor(NGL)/RNH4EcoDmndLitrPrev)
     ELSE
-      FNH4XRff(NGL)=AMAX1(FMN,FracAutorBiomOfActK(NGL))
+      AttenfNH4Autor(NGL)=AMAX1(FMN,FracAutorBiomOfActK(NGL))
     ENDIF
     IF(RNO3EcoDmndLitrPrev.GT.ZEROS)THEN
-      FNO3XRff(NGL)=AMAX1(FMN,RNO3UptkLitrAutor(NGL)/RNO3EcoDmndLitrPrev)
+      AttenfNO3Autor(NGL)=AMAX1(FMN,RNO3UptkLitrAutor(NGL)/RNO3EcoDmndLitrPrev)
     ELSE
-      FNO3XRff(NGL)=AMAX1(FMN,FracAutorBiomOfActK(NGL))
+      AttenfNO3Autor(NGL)=AMAX1(FMN,FracAutorBiomOfActK(NGL))
     ENDIF
     IF(RH2PO4EcoDmndLitrPrev.GT.ZEROS)THEN
-      FPO4XRff(NGL)=AMAX1(FMN,RH2PO4UptkLitrAutor(NGL)/RH2PO4EcoDmndLitrPrev)
+      AttenfH2PO4Autor(NGL)=AMAX1(FMN,RH2PO4UptkLitrAutor(NGL)/RH2PO4EcoDmndLitrPrev)
     ELSE
-      FPO4XRff(NGL)=AMAX1(FMN,FracAutorBiomOfActK(NGL))
+      AttenfH2PO4Autor(NGL)=AMAX1(FMN,FracAutorBiomOfActK(NGL))
     ENDIF
     IF(RH1PO4EcoDmndLitrPrev.GT.ZEROS)THEN
-      FP14XRff(NGL)=AMAX1(FMN,RH1PO4UptkLitrAutor(NGL)/RH1PO4EcoDmndLitrPrev)
+      AttenfH1PO4Autor(NGL)=AMAX1(FMN,RH1PO4UptkLitrAutor(NGL)/RH1PO4EcoDmndLitrPrev)
     ELSE
-      FP14XRff(NGL)=AMAX1(FMN,FracAutorBiomOfActK(NGL))
+      AttenfH1PO4Autor(NGL)=AMAX1(FMN,FracAutorBiomOfActK(NGL))
     ENDIF
   ENDIF
   IF(Lsurf.AND.SoilMicPMassLayer0.GT.ZEROS)THEN
-    naqfdiag%TFNH4X=naqfdiag%TFNH4X+FNH4XRff(NGL)
-    naqfdiag%TFNO3X=naqfdiag%TFNO3X+FNO3XRff(NGL)
-    naqfdiag%TFPO4X=naqfdiag%TFPO4X+FPO4XRff(NGL)
-    naqfdiag%TFP14X=naqfdiag%TFP14X+FP14XRff(NGL)
+    naqfdiag%TFNH4X=naqfdiag%TFNH4X+AttenfNH4Autor(NGL)
+    naqfdiag%TFNO3X=naqfdiag%TFNO3X+AttenfNO3Autor(NGL)
+    naqfdiag%TFPO4X=naqfdiag%TFPO4X+AttenfH2PO4Autor(NGL)
+    naqfdiag%TFP14X=naqfdiag%TFP14X+AttenfH1PO4Autor(NGL)
   ENDIF
   end associate
   end subroutine SubstrateCompetitionFactorsff
@@ -658,7 +658,7 @@ module MicAutoCPLXMod
     RSOxidBandAutor     => nmicf%RSOxidBandAutor,      &
     AmmoniaOxidBacter   => micpar%AmmoniaOxidBacter,   &
     NitriteOxidBacter   => micpar%NitriteOxidBacter,   &
-    ROXYF               => micfor%ROXYF,               &
+    RO2GasXchangePrev   => micfor%RO2GasXchangePrev,   &
     COXYE               => micfor%COXYE,               &
     O2_rain_conc        => micfor%O2_rain_conc,        &
     O2_irrig_conc       => micfor%O2_irrig_conc,       &
@@ -666,8 +666,8 @@ module MicAutoCPLXMod
     Rain2LitRSurf_col   => micfor%Rain2LitRSurf_col,   &
     litrm               => micfor%litrm,               &
     O2AquaDiffusvity    => micfor%O2AquaDiffusvity,    &
-    ROXYL               => micfor%ROXYL,               &
-    VLSoilPoreMicP   => micfor%VLSoilPoreMicP,   &
+    RO2AquaXchangePrev  => micfor%RO2AquaXchangePrev,  &
+    VLSoilPoreMicP      => micfor%VLSoilPoreMicP,      &
     VLSoilMicP          => micfor%VLSoilMicP,          &
     VLsoiAirPM          => micfor%VLsoiAirPM,          &
     VLWatMicPM          => micfor%VLWatMicPM,          &
@@ -681,7 +681,7 @@ module MicAutoCPLXMod
     OXYG                => micstt%OXYG,                &
     OXYS                => micstt%OXYS,                &
     COXYG               => micstt%COXYG,               &
-    ROXSK               => micflx%ROXSK,               &
+    RO2UptkSoilM        => micflx%RO2UptkSoilM,        &
     RNH3OxidAutor       => micflx%RNH3OxidAutor,       &
     RNH3OxidAutorBand   => micflx%RNH3OxidAutorBand,   &
     RNO2OxidAutor       => micflx%RNO2OxidAutor,       &
@@ -695,14 +695,14 @@ module MicAutoCPLXMod
       !     POPULATION
       !
       RUPMX=RO2DmndAutor(NGL)*dts_gas    !
-      RO2DmndX=ROXYF*dts_gas*FOXYX    !O2 demand
+      RO2DmndX=RO2GasXchangePrev*dts_gas*FOXYX    !O2 demand
       O2AquaDiffusvity1=O2AquaDiffusvity*dts_gas
       IF(.not.litrm)THEN
         OXYG1=OXYG*FOXYX
-        ROXYLX=ROXYL*dts_gas*FOXYX
+        ROXYLX=RO2AquaXchangePrev*dts_gas*FOXYX
       ELSE
         OXYG1=COXYG*VLsoiAirPM(1)*FOXYX
-        ROXYLX=(ROXYL+Rain2LitRSurf_col*O2_rain_conc &
+        ROXYLX=(RO2AquaXchangePrev+Rain2LitRSurf_col*O2_rain_conc &
           +Irrig2LitRSurf*O2_irrig_conc)*dts_gas*FOXYX
       ENDIF
       OXYS1=OXYS*FOXYX
@@ -725,7 +725,7 @@ module MicAutoCPLXMod
         !     O2GSolubility=O2 solubility, OXKX=Km for O2 uptake
         !     OXYS,COXYS=aqueous O2 amount, concentration
         !     OXYG,COXYG=gaseous O2 amount, concentration
-        !     RMPOX,ROXSK=O2 uptake
+        !     RMPOX,RO2UptkSoilM=O2 uptake
         !
         THETW1=AZMAX1(safe_adb(VLWatMicPM(M),VLSoilMicP))
         RRADO=ORAD*(FILM(M)+ORAD)/FILM(M)
@@ -759,7 +759,7 @@ module MicAutoCPLXMod
           OXYS1=OXYS1+ROXDFQ
           !accumulate uptake flux
           RO2UptkAutor(NGL)=RO2UptkAutor(NGL)+RMPOX
-          ROXSK(M)=ROXSK(M)+RMPOX
+          RO2UptkSoilM(M)=RO2UptkSoilM(M)+RMPOX
         ENDDO
 
       ENDDO
@@ -949,8 +949,8 @@ module MicAutoCPLXMod
 
 !     begin_execution
   associate(                                           &
-    GrowthEnvScalAutor              => nmics%GrowthEnvScalAutor,               &
-    FCNPff              => nmics%FCNPff,               &
+    GrowthEnvScalAutor  => nmics%GrowthEnvScalAutor,   &
+    FBiomStoiScalarAutor              => nmics%FBiomStoiScalarAutor,               &
     FracOMActAutor      => nmics%FracOMActAutor,       &
     OMActAutor          => nmics%OMActAutor,           &
     RO2Dmnd4RespAutor   => nmicf%RO2Dmnd4RespAutor,    &
@@ -1017,7 +1017,7 @@ module MicAutoCPLXMod
 !
 !     ECHZ=growth respiration efficiency
 !     VMXX=potential NH3 oxidation, VMXH=specific oxidation
-!     TFNG=temperature+water limitation, FCNP=N,P limitation
+!     TFNG=temperature+water limitation, FBiomStoiScalarAutorr=N,P limitation
 !     XCO2=aqueous CO2 limitation, OMA=active biomass
 !     VMXA= non-substrate limited NH3 oxidation
 !     VHKI=nonlinear increase in VMXA with VMXH
@@ -1032,7 +1032,7 @@ module MicAutoCPLXMod
 !     RVMX4,RVMXB=nitrifier demand for NH4 in non-band, band
 !
   ECHZ=EO2X
-  VMXX=VMXH*GrowthEnvScalAutor(NGL)*FCNPff(NGL)*XCO2*OMActAutor(NGL)
+  VMXX=VMXH*GrowthEnvScalAutor(NGL)*FBiomStoiScalarAutor(NGL)*XCO2*OMActAutor(NGL)
   IF(VOLWZ.GT.ZEROS2)THEN
     VMXA=VMXX/(1.0_r8+VMXX/(VHKI*VOLWZ))
   ELSE
@@ -1089,8 +1089,8 @@ module MicAutoCPLXMod
 
 !     begin_execution
   associate(                                           &
-    GrowthEnvScalAutor              => nmics%GrowthEnvScalAutor,               &
-    FCNPff              => nmics%FCNPff,               &
+    GrowthEnvScalAutor  => nmics%GrowthEnvScalAutor,   &
+    FBiomStoiScalarAutor              => nmics%FBiomStoiScalarAutor,               &
     FracNO2ReduxAutor   => nmics%FracNO2ReduxAutor,    &
     OMActAutor          => nmics%OMActAutor,           &
     RO2Dmnd4RespAutor   => nmicf%RO2Dmnd4RespAutor,    &
@@ -1137,7 +1137,7 @@ module MicAutoCPLXMod
 !     ECHZ=growth respiration efficiency
 !     VMXA= non-substrate limited NH3 oxidation
 !     VMXN=specific oxidation
-!     TFNG=temperature+water limitation, FCNP=N,P limitation
+!     TFNG=temperature+water limitation, FBiomStoiScalarAutorr=N,P limitation
 !     XCO2=aqueous CO2 limitation, OMA=active biomass
 !     OMA=active biomass
 !     FNH4S,FNHBS=fractions of NH4 in non-band, band
@@ -1151,7 +1151,7 @@ module MicAutoCPLXMod
 !     RNO2DmndReduxSoilHeter_vr,RNO2DmndReduxBandHeter_vr=nitrifier demand for NO2 in non-band, band
 !
   ECHZ=EO2X
-  VMXA=GrowthEnvScalAutor(NGL)*FCNPff(NGL)*XCO2*OMActAutor(NGL)*VMXN
+  VMXA=GrowthEnvScalAutor(NGL)*FBiomStoiScalarAutor(NGL)*XCO2*OMActAutor(NGL)*VMXN
   FCN2S=FNH4S*CNO2S/(CNO2S+ZNKM)
   FCN2B=FNHBS*CNO2B/(CNO2B+ZNKM)
   FSBST=FCN2S+FCN2B
@@ -1199,7 +1199,7 @@ module MicAutoCPLXMod
 
   associate(                                      &
     GrowthEnvScalAutor            => nmics%GrowthEnvScalAutor,            &
-    FCNPff            => nmics%FCNPff,            &
+    FBiomStoiScalarAutor            => nmics%FBiomStoiScalarAutor,            &
     OMActAutor        => nmics%OMActAutor,        &
     RO2Dmnd4RespAutor => nmicf%RO2Dmnd4RespAutor, &
     RO2DmndAutor      => nmicf%RO2DmndAutor,      &
@@ -1226,7 +1226,7 @@ module MicAutoCPLXMod
   GH2X=RGAS*1.E-3_r8*TKS*LOG((AMAX1(1.0E-03_r8,CH2GS)/H2KI)**4)
   GH2H=GH2X/12.08_r8
   ECHZ=AMAX1(EO2X,AMIN1(1.0_r8,1.0_r8/(1.0_r8+AZMAX1((GCOX+GH2H))/EOMH)))
-  VMXA=GrowthEnvScalAutor(NGL)*FCNPff(NGL)*XCO2*OMActAutor(NGL)*VMXC
+  VMXA=GrowthEnvScalAutor(NGL)*FBiomStoiScalarAutor(NGL)*XCO2*OMActAutor(NGL)*VMXC
   H2GSX=H2GS+0.111_r8*naqfdiag%TRH2G
   FSBST=CH2GS/(CH2GS+H2KM)
   RGOMP=AZMAX1(AMIN1(1.5*H2GSX,VMXA*FSBST))
@@ -1264,7 +1264,7 @@ module MicAutoCPLXMod
 
   associate(                                           &
     GrowthEnvScalAutor              => nmics%GrowthEnvScalAutor,               &
-    FCNPff              => nmics%FCNPff,               &
+    FBiomStoiScalarAutor              => nmics%FBiomStoiScalarAutor,               &
     OMActAutor          => nmics%OMActAutor,           &
     RO2Dmnd4RespAutor   => nmicf%RO2Dmnd4RespAutor,    &
     RO2DmndAutor        => nmicf%RO2DmndAutor,         &
@@ -1291,7 +1291,7 @@ module MicAutoCPLXMod
 !
 !     ECHZ=growth respiration efficiency
 !     VMXA=potential oxidation
-!     TFNG=temperature+water effect,FCNP=N,P limitation
+!     TFNG=temperature+water effect,FBiomStoiScalarAutorr=N,P limitation
 !     OMA=active biomass,VMX4=specific respiration rate
 !     RCH4L=total aqueous CH4 exchange from previous hour
 !     RCH4F=total gaseous CH4 exchange from previous hour
@@ -1308,7 +1308,7 @@ module MicAutoCPLXMod
 !     DiffusivitySolutEff=rate constant for gaseous-aqueous exchange
 !
   ECHZ=EH4X
-  VMXA=GrowthEnvScalAutor(NGL)*FCNPff(NGL)*OMActAutor(NGL)*VMX4
+  VMXA=GrowthEnvScalAutor(NGL)*FBiomStoiScalarAutor(NGL)*OMActAutor(NGL)*VMX4
   RCH4L1=RCH4L*dts_gas
   RCH4F1=RCH4F*dts_gas
   RCH4S1=(naqfdiag%TCH4H+naqfdiag%TCH4A)*dts_gas
@@ -1421,10 +1421,10 @@ module MicAutoCPLXMod
   associate(                                             &
    GrowthEnvScalAutor    => nmics%GrowthEnvScalAutor,    &
    OMActAutor            => nmics%OMActAutor,            &
-   FNH4XRff              => nmicf%FNH4XRff,              &
-   FNO3XRff              => nmicf%FNO3XRff,              &
-   FPO4XRff              => nmicf%FPO4XRff,              &
-   FP14XRff              => nmicf%FP14XRff,              &
+   AttenfNH4Autor              => nmicf%AttenfNH4Autor,              &
+   AttenfNO3Autor              => nmicf%AttenfNO3Autor,              &
+   AttenfH2PO4Autor              => nmicf%AttenfH2PO4Autor,              &
+   AttenfH1PO4Autor              => nmicf%AttenfH1PO4Autor,              &
    RNH4TransfSoilAutor   => nmicf%RNH4TransfSoilAutor,   &
    RNO3TransfSoilAutor   => nmicf%RNO3TransfSoilAutor,   &
    RH2PO4TransfSoilAutor => nmicf%RH2PO4TransfSoilAutor, &
@@ -1468,7 +1468,7 @@ module MicAutoCPLXMod
    RNH4UptkBandAutor     => micflx%RNH4UptkBandAutor,    &
    RNO3UptkSoilAutor     => micflx%RNO3UptkSoilAutor,    &
    RNO3UptkBandAutor     => micflx%RNO3UptkBandAutor,    &
-   NetNH4Mineralize_col  => micflx%NetNH4Mineralize_col, &
+   NetNH4Mineralize      => micflx%NetNH4Mineralize,     &
    RH2PO4UptkSoilAutor   => micflx%RH2PO4UptkSoilAutor,  &
    RH2PO4UptkBandAutor   => micflx%RH2PO4UptkBandAutor,  &
    NetPO4Mineralize_col  => micflx%NetPO4Mineralize_col, &
@@ -1496,7 +1496,7 @@ module MicAutoCPLXMod
 !     ZNH4M,ZNHBM=NH4 not available for uptake in non-band, band
 !     FNH4X,FNB4X=fractions of biological NH4 demand in non-band, band
 !     RNH4TransfSoilHeter,RNH4TransfBandHeter=substrate-limited NH4 mineraln-immobiln in non-band, band
-!     NetNH4Mineralize_col=total NH4 net mineraln (-ve) or immobiln (+ve)
+!     NetNH4Mineralize=total NH4 net mineraln (-ve) or immobiln (+ve)
 !
   FNH4S=VLNH4
   FNHBS=VLNHB
@@ -1518,7 +1518,7 @@ module MicAutoCPLXMod
     RNH4TransfSoilAutor(NGL)=RINHP*FNH4S
     RNH4TransfBandAutor(NGL)=RINHP*FNHBS
   ENDIF
-  NetNH4Mineralize_col=NetNH4Mineralize_col+(RNH4TransfSoilAutor(NGL)+RNH4TransfBandAutor(NGL))
+  NetNH4Mineralize=NetNH4Mineralize+(RNH4TransfSoilAutor(NGL)+RNH4TransfBandAutor(NGL))
 !
 !     MINERALIZATION-IMMOBILIZATION OF NO3 IN SOIL FROM MICROBIAL
 !     C:N AND NO3 CONCENTRATION IN BAND AND NON-BAND SOIL ZONES
@@ -1535,7 +1535,7 @@ module MicAutoCPLXMod
 !     ZNO3M,ZNOBM=NO3 not available for uptake in non-band, band
 !     FNO3X,FNB3X=fractions of biological NO3 demand in non-band, band
 !     RNO3TransfSoilHeter,RNO3TransfBandHeter=substrate-limited NO3 immobiln in non-band, band
-!     NetNH4Mineralize_col=total net NH4+NO3 mineraln (-ve) or immobiln (+ve)
+!     NetNH4Mineralize=total net NH4+NO3 mineraln (-ve) or immobiln (+ve)
 !
   FNO3S=VLNO3
   FNO3B=VLNOB
@@ -1558,7 +1558,7 @@ module MicAutoCPLXMod
     RNO3TransfSoilAutor(NGL)=RINOP*FNO3S
     RNO3TransfBandAutor(NGL)=RINOP*FNO3B
   ENDIF
-  NetNH4Mineralize_col=NetNH4Mineralize_col+(RNO3TransfSoilAutor(NGL)+RNO3TransfBandAutor(NGL))
+  NetNH4Mineralize=NetNH4Mineralize+(RNO3TransfSoilAutor(NGL)+RNO3TransfBandAutor(NGL))
 !
 !     MINERALIZATION-IMMOBILIZATION OF H2PO4 IN SOIL FROM MICROBIAL
 !     C:P AND PO4 CONCENTRATION IN BAND AND NON-BAND SOIL ZONES
@@ -1656,9 +1656,9 @@ module MicAutoCPLXMod
 !     RNH4DmndLitrHeter=substrate-unlimited NH4 mineraln-immobiln
 !     VOLW=water content
 !     ZNH4M=NH4 not available for uptake
-!     FNH4XR=fractions of biological NH4 demand
+!     AttenfNH4Heter=fractions of biological NH4 demand
 !     RNH4TransfLitrHeter=substrate-limited NH4 mineraln-immobiln
-!     NetNH4Mineralize_col=total NH4 net mineraln (-ve) or immobiln (+ve)
+!     NetNH4Mineralize=total NH4 net mineraln (-ve) or immobiln (+ve)
 !
   IF(litrm)THEN
     RINHPR=RINHP-RNH4TransfSoilAutor(NGL)-RNO3TransfSoilAutor(NGL)
@@ -1668,12 +1668,12 @@ module MicAutoCPLXMod
       RNH4UptkLitrAutor(NGL)=AMIN1(RINHPR,BIOA*OMActAutor(NGL)*GrowthEnvScalAutor(NGL)*Z4MX) &
         *(FNH4S*CNH4X/(CNH4X+Z4KU)+FNHBS*CNH4Y/(CNH4Y+Z4KU))
       ZNH4M=Z4MN*VLWatMicP
-      RNH4TransfLitrAutor(NGL)=AMIN1(FNH4XRff(NGL)*AZMAX1((ZNH4T-ZNH4M)),RNH4UptkLitrAutor(NGL))
+      RNH4TransfLitrAutor(NGL)=AMIN1(AttenfNH4Autor(NGL)*AZMAX1((ZNH4T-ZNH4M)),RNH4UptkLitrAutor(NGL))
     ELSE
       RNH4UptkLitrAutor(NGL)=0.0_r8
       RNH4TransfLitrAutor(NGL)=RINHPR
     ENDIF
-    NetNH4Mineralize_col=NetNH4Mineralize_col+RNH4TransfLitrAutor(NGL)
+    NetNH4Mineralize=NetNH4Mineralize+RNH4TransfLitrAutor(NGL)
 !
 !     MINERALIZATION-IMMOBILIZATION OF NO3 IN SURFACE RESIDUE FROM
 !     MICROBIAL C:N AND NO3 CONCENTRATION IN BAND AND NON-BAND SOIL
@@ -1691,9 +1691,9 @@ module MicAutoCPLXMod
 !     RNO3TransfLitrHeter=substrate-unlimited NO3 immobiln
 !     VLWatMicP=water content
 !     ZNO3M=NO3 not available for uptake
-!     FNO3XR=fraction of biological NO3 demand
+!     AttenfNO3Heter=fraction of biological NO3 demand
 !     RNO3TransfLitrHeter=substrate-limited NO3 immobiln
-!     NetNH4Mineralize_col=total NH4+NO3 net mineraln (-ve) or immobiln (+ve)
+!     NetNH4Mineralize=total NH4+NO3 net mineraln (-ve) or immobiln (+ve)
 !
     RINOPR=AZMAX1(RINHPR-RNH4TransfLitrAutor(NGL))
     IF(RINOPR.GT.0.0_r8)THEN
@@ -1702,12 +1702,12 @@ module MicAutoCPLXMod
       RNO3UptkLitrAutor(NGL)=AMAX1(RINOPR,BIOA*OMActAutor(NGL)*GrowthEnvScalAutor(NGL)*ZOMX) &
         *(FNO3S*CNO3X/(CNO3X+ZOKU)+FNO3B*CNO3Y/(CNO3Y+ZOKU))
       ZNO3M=ZOMN*VLWatMicP
-      RNO3TransfLitrAutor(NGL)=AMIN1(FNO3XRff(NGL)*AZMAX1((ZNO3T-ZNO3M)),RNO3UptkLitrAutor(NGL))
+      RNO3TransfLitrAutor(NGL)=AMIN1(AttenfNO3Autor(NGL)*AZMAX1((ZNO3T-ZNO3M)),RNO3UptkLitrAutor(NGL))
     ELSE
       RNO3UptkLitrAutor(NGL)=0.0_r8
       RNO3TransfLitrAutor(NGL)=RINOPR
     ENDIF
-    NetNH4Mineralize_col=NetNH4Mineralize_col+RNO3TransfLitrAutor(NGL)
+    NetNH4Mineralize=NetNH4Mineralize+RNO3TransfLitrAutor(NGL)
 !
 !     MINERALIZATION-IMMOBILIZATION OF H2PO4 IN SURFACE RESIDUE FROM
 !     MICROBIAL C:P AND PO4 CONCENTRATION IN BAND AND NON-BAND SOIL
@@ -1725,7 +1725,7 @@ module MicAutoCPLXMod
 !     RH2PO4DmndLitrHeter=substrate-unlimited H2PO4 mineraln-immobiln
 !     VLWatMicP=water content
 !     H2P4M=H2PO4 not available for uptake
-!     FPO4XR=fractions of biological H2PO4 demand
+!     AttenfH2PO4Heter=fractions of biological H2PO4 demand
 !     RH2PO4TransfLitrHeter=substrate-limited H2PO4 mineraln-immobiln
 !     NetPO4Mineralize_col=total H2PO4 net mineraln (-ve) or immobiln (+ve)
 !
@@ -1736,7 +1736,7 @@ module MicAutoCPLXMod
       RH2PO4UptkLitrAutor(NGL)=AMIN1(RIPOPR,BIOA*OMActAutor(NGL)*GrowthEnvScalAutor(NGL)*HPMX) &
         *(FH2PS*CH2PX/(CH2PX+HPKU)+FH2PB*CH2PY/(CH2PY+HPKU))
       H2P4M=HPMN*VLWatMicP
-      RH2PO4TransfLitrAutor(NGL)=AMIN1(FPO4XRff(NGL)*AZMAX1((H2P4T-H2P4M)),RH2PO4UptkLitrAutor(NGL))
+      RH2PO4TransfLitrAutor(NGL)=AMIN1(AttenfH2PO4Autor(NGL)*AZMAX1((H2P4T-H2P4M)),RH2PO4UptkLitrAutor(NGL))
     ELSE
       RH2PO4UptkLitrAutor(NGL)=0.0_r8
       RH2PO4TransfLitrAutor(NGL)=RIPOPR
@@ -1759,7 +1759,7 @@ module MicAutoCPLXMod
 !     RH1PO4DmndLitrHeter_col=substrate-unlimited HPO4 mineraln-immobiln
 !     VLWatMicP=water content
 !     H1P4M=HPO4 not available for uptake
-!     FP14XR=fraction of biological HPO4 demand
+!     AttenfH1PO4Heter=fraction of biological HPO4 demand
 !     RH1PO4TransfLitrHeter=substrate-limited HPO4 minereraln-immobiln
 !     NetPO4Mineralize_col=total HPO4 net mineraln (-ve) or immobiln (+ve)
 !
@@ -1772,7 +1772,7 @@ module MicAutoCPLXMod
       RH1PO4UptkLitrAutor(NGL)=AMIN1(RIP1PR,BIOA*OMActAutor(NGL)*GrowthEnvScalAutor(NGL)*HPMX) &
         *(FH1PS*CH1PX/(CH1PX+HPKU)+FH1PB*CH1PY/(CH1PY+HPKU))
       H1P4M=HPMN*VLWatMicP
-      RH1PO4TransfLitrAutor(NGL)=AMIN1(FP14XRff(NGL)*AZMAX1((H1P4T-H1P4M)),RH1PO4UptkLitrAutor(NGL))
+      RH1PO4TransfLitrAutor(NGL)=AMIN1(AttenfH1PO4Autor(NGL)*AZMAX1((H1P4T-H1P4M)),RH1PO4UptkLitrAutor(NGL))
     ELSE
       RH1PO4UptkLitrAutor(NGL)=0.0_r8
       RH1PO4TransfLitrAutor(NGL)=RIP1PR
@@ -1800,7 +1800,7 @@ module MicAutoCPLXMod
 !     begin_execution
   associate(                                    &
     TSensMaintRAutor => nmics%TSensMaintRAutor, &
-    OMN2ff           => nmics%OMN2ff,           &
+    OMN2Autor           => nmics%OMN2Autor,           &
     RMaintCompAutor  => nmicf%RMaintCompAutor,  &
     RespGrossAutor   => nmicf%RespGrossAutor,   &
     Resp4NFixAutor   => nmicf%Resp4NFixAutor,   &
@@ -1813,7 +1813,7 @@ module MicAutoCPLXMod
 !
 !     FPH=pH effect on maintenance respiration
 !     RMOM=specific maintenance respiration rate
-!     TFNR=temperature effect on maintenance respiration
+!     TempMaintRHeter=temperature effect on maintenance respiration
 !     OMN=microbial N biomass
 !     RMOMK=effect of low microbial C concentration on mntc respn
 !
@@ -1821,7 +1821,7 @@ module MicAutoCPLXMod
   FPH=1.0_r8+AZMAX1(0.25_r8*(6.5_r8-PH))
   RMOMX=RMOM*TSensMaintRAutor(NGL)*FPH
   RMaintCompAutor(1,NGL)=OMEauto(ielmn,MID1)*RMOMX*RMOMK(1)
-  RMaintCompAutor(2,NGL)=OMN2ff(NGL)*RMOMX*RMOMK(2)
+  RMaintCompAutor(2,NGL)=OMN2Autor(NGL)*RMOMX*RMOMK(2)
 !
 !     MICROBIAL MAINTENANCE AND GROWTH RESPIRATION
 !

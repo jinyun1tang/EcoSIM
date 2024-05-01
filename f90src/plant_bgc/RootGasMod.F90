@@ -71,9 +71,9 @@ module RootGasMod
     VLsoiAirPM                 =>  plt_site%VLsoiAirPM               , &
     TortMicPM                  =>  plt_site%TortMicPM                , &
     FILM                       =>  plt_site%FILM                     , &
-    ROXYF                      =>  plt_bgcr%ROXYF                    , &
+    RO2GasXchangePrev_vr                      =>  plt_bgcr%RO2GasXchangePrev_vr                    , &
     RCO2F                      =>  plt_bgcr%RCO2F                    , &
-    ROXYL                      =>  plt_bgcr%ROXYL                    , &
+    RO2AquaXchangePrev_vr                      =>  plt_bgcr%RO2AquaXchangePrev_vr                    , &
     RootO2Uptk_pvr             =>  plt_rbgc%RootO2Uptk_pvr           , &
     RAutoRootO2Limter_pvr      =>  plt_rbgc%RAutoRootO2Limter_pvr    , &
     ZEROQ                      =>  plt_rbgc%ZEROQ                    , &
@@ -149,9 +149,9 @@ module RootGasMod
     RTVLWA=RootVH2O_pvr(N,L,NZ)*trcs_VLN_vr(ids_NH4,L)
     RTVLWB=RootVH2O_pvr(N,L,NZ)*trcs_VLN_vr(ids_NH4B,L)
     RootOxyDemandPerPlant=RootO2Dmnd4Resp_pvr(N,L,NZ)*dts_gas/PlantPopulation_pft(NZ)
-    ROXYFX=ROXYF(L)*FOXYX*dts_gas
+    ROXYFX=RO2GasXchangePrev_vr(L)*FOXYX*dts_gas
     RCO2FX=RCO2F(L)*FOXYX*dts_gas
-    ROXYLX=ROXYL(L)*FOXYX*dts_gas
+    ROXYLX=RO2AquaXchangePrev_vr(L)*FOXYX*dts_gas
 !
 !     GASEOUS AND AQUEOUS DIFFUSIVITIES IN ROOT AND SOIL
 !

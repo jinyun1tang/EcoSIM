@@ -82,7 +82,7 @@ implicit none
   integer :: fid_XHGFLG             !H2 gaseous exchange with atmosphere (-) into atmosphere
 
 
-  integer :: fid_ROXYF               !net gaseous O2 flux from previous hour, [g d-2 h-1]
+  integer :: fid_RO2GasXchangePrev               !net gaseous O2 flux from previous hour, [g d-2 h-1]
   integer :: fid_RO2EcoDmndPrev               !total root + microbial O2 uptake, [g d-2 h-1]
   integer :: fid_RNH4EcoDmndSoilPrev               !total root + microbial NH4(+) uptake non-band, [gN d-2 h-1]
   integer :: fid_RNO3EcoDmndSoilPrev               !total root + microbial NO3(-) uptake non-band, [gN d-2 h-1]

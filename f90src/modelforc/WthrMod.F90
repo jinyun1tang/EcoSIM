@@ -461,7 +461,7 @@ module WthrMod
         !
         !     DTS=change in daily average soil temperature
         !     ATCA,ATCS=mean annual air,soil temperature
-        !     OFFSET=shift in Arrhenius curve for MFT activity in nitro.f
+        !     TempOffset_col=shift in Arrhenius curve for MFT activity in nitro.f
         !     OFFST=shift in Arrhenius curve for PFT activity in uptake.f
         !     iPlantThermoAdaptZone=PFT thermal adaptation zone
         !     HTC=high temperature threshold for grain number loss (oC)
@@ -471,7 +471,7 @@ module WthrMod
           DTS=0.5_r8*DTA
           ATCA(NY,NX)=ATCAI(NY,NX)+DTA
           ATCS(NY,NX)=ATCAI(NY,NX)+DTS
-          OFFSET(NY,NX)=0.33*(12.5-AZMAX1(AMIN1(25.0,ATCS(NY,NX))))
+          TempOffset_col(NY,NX)=0.33*(12.5-AZMAX1(AMIN1(25.0,ATCS(NY,NX))))
           DO NZ=1,NP(NY,NX)
             iPlantThermoAdaptZone(NZ,NY,NX)=PlantInitThermoAdaptZone(NZ,NY,NX)+0.30_r8/2.667_r8*DTA
             OFFST(NZ,NY,NX)=2.667*(2.5-iPlantThermoAdaptZone(NZ,NY,NX))

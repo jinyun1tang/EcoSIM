@@ -74,7 +74,7 @@ implicit none
   integer, pointer :: JGniA(:)   !guid indices for autotrophic-microbial complex
   integer, pointer :: JGnfA(:)   !guid indices for autotrophic-microbial complex
   integer :: NumMicrobAutrophCmplx        !total number of microbial guilds in the autotrophic complex
-  integer :: NumMicrbHetetrophCmplx         !total number of microbial guilds in one organic-microbial complex
+  integer :: NumHetetrMicCmplx         !total number of microbial guilds in one organic-microbial complex
   integer :: NumOfLitrCmplxs                !number of litter organo-microbial complexes, plant litter + manure
   integer :: NumOfPlantLitrCmplxs           !number of plant litter complexs, woody + fine litter
   integer :: NumLiveHeterBioms              !total number of biomass components in one heterotrophic OM complexes
@@ -354,7 +354,7 @@ contains
 
   k=1
   this%NumMicrobAutrophCmplx=0
-  this%NumMicrbHetetrophCmplx=0
+  this%NumHetetrMicCmplx=0
   !replace the functional group specification with external input later
   do n=1,NumMicbFunGroups
     this%JGnio(n)=k
@@ -363,9 +363,9 @@ contains
     this%JGnfo(n)=k-1
     this%JGnfA(n)=k-1
     this%NumMicrobAutrophCmplx=this%NumMicrobAutrophCmplx+this%JGnfA(n)-this%JGniA(n)+1
-    this%NumMicrbHetetrophCmplx=this%NumMicrbHetetrophCmplx+this%JGnfo(n)-this%JGnio(n)+1
+    this%NumHetetrMicCmplx=this%NumHetetrMicCmplx+this%JGnfo(n)-this%JGnio(n)+1
   enddo
-  this%NumLiveHeterBioms=this%nlbiomcp*this%NumMicrbHetetrophCmplx
+  this%NumLiveHeterBioms=this%nlbiomcp*this%NumHetetrMicCmplx
   this%NumLiveAutoBioms=this%nlbiomcp*this%NumMicrobAutrophCmplx
 
   allocate(this%DOSA(1:jcplx))
@@ -376,8 +376,8 @@ contains
   allocate(this%OQCK(1:jcplx))
   allocate(this%ORCI(NumDeadMicrbCompts,1:jcplx))
   allocate(this%OMCI(NumLiveMicrbCompts,1:jcplx))
-  allocate(this%rNCOMC(NumLiveMicrbCompts,this%NumMicrbHetetrophCmplx,1:jcplx))
-  allocate(this%rPCOMC(NumLiveMicrbCompts,this%NumMicrbHetetrophCmplx,1:jcplx))
+  allocate(this%rNCOMC(NumLiveMicrbCompts,this%NumHetetrMicCmplx,1:jcplx))
+  allocate(this%rPCOMC(NumLiveMicrbCompts,this%NumHetetrMicCmplx,1:jcplx))
   allocate(this%rNCOMCAutor(NumLiveMicrbCompts,this%NumMicrobAutrophCmplx))
   allocate(this%rPCOMCAutor(NumLiveMicrbCompts,this%NumMicrobAutrophCmplx))
   allocate(this%rNCOMCa(NumLiveMicrbCompts,NumMicbFunGroups,1:jcplx))

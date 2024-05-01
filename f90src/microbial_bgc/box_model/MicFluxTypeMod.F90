@@ -33,7 +33,7 @@ implicit none
   real(r8) :: XN2GS
   real(r8) :: RNO2DmndSoilChemo
   real(r8) :: RNO2DmndBandChemo
-  real(r8) :: NetNH4Mineralize_col
+  real(r8) :: NetNH4Mineralize
   real(r8) :: NetPO4Mineralize_col
   real(r8), allocatable :: RDOM_micb_flx(:,:)
   real(r8), allocatable :: RO2DmndAutort(:)
@@ -49,9 +49,7 @@ implicit none
   real(r8), allocatable :: RNO2DmndReduxSoilHeter(:,:)
   real(r8), allocatable :: RNO2DmndReduxBandHeter(:,:)
   real(r8), allocatable :: RN2ODmndReduxHeter(:,:)
-  real(r8), allocatable :: ROXSK(:)
-  real(r8), allocatable :: RVMX4(:,:)
-  real(r8), allocatable :: RVMB4(:,:)
+  real(r8), allocatable :: RO2UptkSoilM(:)
   real(r8), allocatable :: RNH4DmndSoilHeter(:,:)
   real(r8), allocatable :: RNH4DmndBandHeter(:,:)
   real(r8), allocatable :: RNO3DmndSoilHeter(:,:)
@@ -89,38 +87,36 @@ implicit none
   implicit none
   class(micfluxtype) :: this
   integer :: jcplx,JG,NumMicbFunGroups
-  integer :: NumMicrbHetetrophCmplx, NumMicrobAutrophCmplx
+  integer :: NumHetetrMicCmplx, NumMicrobAutrophCmplx
 
   jcplx=micpar%jcplx
   JG=micpar%jguilds
   NumMicbFunGroups=micpar%NumMicbFunGroups
-  NumMicrbHetetrophCmplx=micpar%NumMicrbHetetrophCmplx
+  NumHetetrMicCmplx=micpar%NumHetetrMicCmplx
   NumMicrobAutrophCmplx=micpar%NumMicrobAutrophCmplx
 
-  allocate(this%ROXSK(NPH));this%ROXSK = spval
+  allocate(this%RO2UptkSoilM(NPH));this%RO2UptkSoilM = spval
   allocate(this%RDOM_micb_flx(idom_beg:idom_end,1:jcplx));this%RDOM_micb_flx=spval
-  allocate(this%RO2DmndHetert(NumMicrbHetetrophCmplx,1:jcplx));this%RO2DmndHetert=spval
-  allocate(this%RDOCUptkHeter(NumMicrbHetetrophCmplx,1:jcplx));this%RDOCUptkHeter=spval
-  allocate(this%RAcetateUptkHeter(NumMicrbHetetrophCmplx,1:jcplx));this%RAcetateUptkHeter=spval
-  allocate(this%RNO3ReduxDmndSoilHeter(NumMicrbHetetrophCmplx,1:jcplx));this%RNO3ReduxDmndSoilHeter=spval
-  allocate(this%RNO3ReduxDmndBandHeter(NumMicrbHetetrophCmplx,1:jcplx));this%RNO3ReduxDmndBandHeter=spval
-  allocate(this%RNO2DmndReduxSoilHeter(NumMicrbHetetrophCmplx,1:jcplx));this%RNO2DmndReduxSoilHeter=spval
-  allocate(this%RNO2DmndReduxBandHeter(NumMicrbHetetrophCmplx,1:jcplx));this%RNO2DmndReduxBandHeter=spval
-  allocate(this%RN2ODmndReduxHeter(NumMicrbHetetrophCmplx,1:jcplx));this%RN2ODmndReduxHeter=spval
-  allocate(this%RVMX4(NumMicrbHetetrophCmplx,1:jcplx));this%RVMX4=spval
-  allocate(this%RVMB4(NumMicrbHetetrophCmplx,1:jcplx));this%RVMB4=spval
-  allocate(this%RNH4DmndSoilHeter(NumMicrbHetetrophCmplx,1:jcplx));this%RNH4DmndSoilHeter=spval
-  allocate(this%RNH4DmndBandHeter(NumMicrbHetetrophCmplx,1:jcplx));this%RNH4DmndBandHeter=spval
-  allocate(this%RNO3DmndSoilHeter(NumMicrbHetetrophCmplx,1:jcplx));this%RNO3DmndSoilHeter=spval
-  allocate(this%RNO3DmndBandHeter(NumMicrbHetetrophCmplx,1:jcplx));this%RNO3DmndBandHeter=spval
-  allocate(this%RH2PO4DmndSoilHeter(NumMicrbHetetrophCmplx,1:jcplx));this%RH2PO4DmndSoilHeter=spval
-  allocate(this%RH2PO4DmndBandHeter(NumMicrbHetetrophCmplx,1:jcplx));this%RH2PO4DmndBandHeter=spval
-  allocate(this%RH1PO4DmndSoilHeter(NumMicrbHetetrophCmplx,1:jcplx));this%RH1PO4DmndSoilHeter=spval
-  allocate(this%RH1PO4DmndBandHeter(NumMicrbHetetrophCmplx,1:jcplx));this%RH1PO4DmndBandHeter=spval
-  allocate(this%RNH4DmndLitrHeter(NumMicrbHetetrophCmplx,1:jcplx));this%RNH4DmndLitrHeter=spval
-  allocate(this%RNO3DmndLitrHeter(NumMicrbHetetrophCmplx,1:jcplx));this%RNO3DmndLitrHeter=spval
-  allocate(this%RH2PO4DmndLitrHeter(NumMicrbHetetrophCmplx,1:jcplx));this%RH2PO4DmndLitrHeter=spval
-  allocate(this%RH1PO4DmndLitrHeter(NumMicrbHetetrophCmplx,1:jcplx));this%RH1PO4DmndLitrHeter=spval
+  allocate(this%RO2DmndHetert(NumHetetrMicCmplx,1:jcplx));this%RO2DmndHetert=spval
+  allocate(this%RDOCUptkHeter(NumHetetrMicCmplx,1:jcplx));this%RDOCUptkHeter=spval
+  allocate(this%RAcetateUptkHeter(NumHetetrMicCmplx,1:jcplx));this%RAcetateUptkHeter=spval
+  allocate(this%RNO3ReduxDmndSoilHeter(NumHetetrMicCmplx,1:jcplx));this%RNO3ReduxDmndSoilHeter=spval
+  allocate(this%RNO3ReduxDmndBandHeter(NumHetetrMicCmplx,1:jcplx));this%RNO3ReduxDmndBandHeter=spval
+  allocate(this%RNO2DmndReduxSoilHeter(NumHetetrMicCmplx,1:jcplx));this%RNO2DmndReduxSoilHeter=spval
+  allocate(this%RNO2DmndReduxBandHeter(NumHetetrMicCmplx,1:jcplx));this%RNO2DmndReduxBandHeter=spval
+  allocate(this%RN2ODmndReduxHeter(NumHetetrMicCmplx,1:jcplx));this%RN2ODmndReduxHeter=spval
+  allocate(this%RNH4DmndSoilHeter(NumHetetrMicCmplx,1:jcplx));this%RNH4DmndSoilHeter=spval
+  allocate(this%RNH4DmndBandHeter(NumHetetrMicCmplx,1:jcplx));this%RNH4DmndBandHeter=spval
+  allocate(this%RNO3DmndSoilHeter(NumHetetrMicCmplx,1:jcplx));this%RNO3DmndSoilHeter=spval
+  allocate(this%RNO3DmndBandHeter(NumHetetrMicCmplx,1:jcplx));this%RNO3DmndBandHeter=spval
+  allocate(this%RH2PO4DmndSoilHeter(NumHetetrMicCmplx,1:jcplx));this%RH2PO4DmndSoilHeter=spval
+  allocate(this%RH2PO4DmndBandHeter(NumHetetrMicCmplx,1:jcplx));this%RH2PO4DmndBandHeter=spval
+  allocate(this%RH1PO4DmndSoilHeter(NumHetetrMicCmplx,1:jcplx));this%RH1PO4DmndSoilHeter=spval
+  allocate(this%RH1PO4DmndBandHeter(NumHetetrMicCmplx,1:jcplx));this%RH1PO4DmndBandHeter=spval
+  allocate(this%RNH4DmndLitrHeter(NumHetetrMicCmplx,1:jcplx));this%RNH4DmndLitrHeter=spval
+  allocate(this%RNO3DmndLitrHeter(NumHetetrMicCmplx,1:jcplx));this%RNO3DmndLitrHeter=spval
+  allocate(this%RH2PO4DmndLitrHeter(NumHetetrMicCmplx,1:jcplx));this%RH2PO4DmndLitrHeter=spval
+  allocate(this%RH1PO4DmndLitrHeter(NumHetetrMicCmplx,1:jcplx));this%RH1PO4DmndLitrHeter=spval
   allocate(this%RO2DmndAutort(NumMicrobAutrophCmplx));this%RO2DmndAutort=spval
   allocate(this%RNH4UptkSoilAutor(NumMicrobAutrophCmplx));this%RNH4UptkSoilAutor=spval
   allocate(this%RNH4UptkBandAutor(NumMicrobAutrophCmplx));this%RNH4UptkBandAutor=spval
@@ -147,7 +143,7 @@ implicit none
   class(micfluxtype) :: this
   integer :: jcplx,JG,NumMicbFunGroups
 
-  this%ROXSK = 0._r8
+  this%RO2UptkSoilM = 0._r8
   this%RDOM_micb_flx=0._r8
   this%RO2DmndHetert=0._r8
   this%RDOCUptkHeter=0._r8
@@ -157,8 +153,6 @@ implicit none
   this%RNO2DmndReduxSoilHeter=0._r8
   this%RNO2DmndReduxBandHeter=0._r8
   this%RN2ODmndReduxHeter=0._r8
-  this%RVMX4=0._r8
-  this%RVMB4=0._r8
   this%RNH4DmndSoilHeter=0._r8
   this%RNH4DmndBandHeter=0._r8
   this%RNO3DmndSoilHeter=0._r8
@@ -209,9 +203,7 @@ implicit none
   call destroy(this%RNO2DmndReduxSoilHeter)
   call destroy(this%RNO2DmndReduxBandHeter)
   call destroy(this%RN2ODmndReduxHeter)
-  call destroy(this%ROXSK)
-  call destroy(this%RVMX4)
-  call destroy(this%RVMB4)
+  call destroy(this%RO2UptkSoilM)
   call destroy(this%RNH4DmndSoilHeter)
   call destroy(this%RNH4DmndBandHeter)
   call destroy(this%RNO3DmndSoilHeter)

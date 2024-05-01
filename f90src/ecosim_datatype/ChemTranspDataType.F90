@@ -51,8 +51,8 @@ module ChemTranspDataType
   real(r8),target,allocatable ::  XHGDFG(:,:,:)                      !soil H2 dissolution (+ve) - volatilization (-ve) , [g d-2 h-1]
   real(r8),target,allocatable ::  RCO2F(:,:,:)                       !net gaseous CO2 flux, [g d-2 h-1]
   real(r8),target,allocatable ::  RCH4L(:,:,:)                       !net aqueous CH4 flux, [g d-2 h-1]
-  real(r8),target,allocatable ::  ROXYF(:,:,:)                       !net gaseous O2 flux, [g d-2 h-1]
-  real(r8),target,allocatable ::  ROXYL(:,:,:)                       !net aqueous O2 flux, [g d-2 h-1]
+  real(r8),target,allocatable ::  RO2GasXchangePrev_vr(:,:,:)                       !net gaseous O2 flux, [g d-2 h-1]
+  real(r8),target,allocatable ::  RO2AquaXchangePrev_vr(:,:,:)                       !net aqueous O2 flux, [g d-2 h-1]
   real(r8),target,allocatable ::  RCH4F(:,:,:)                       !net gaseous CH4 flux, [g d-2 h-1]
   real(r8),target,allocatable ::  ALSGL(:,:,:)                       !aqueous Al diffusivity, [m2 h-1]
   real(r8),target,allocatable ::  FESGL(:,:,:)                       !aqueous Fe diffusivity, [m2 h-1]
@@ -130,8 +130,8 @@ module ChemTranspDataType
   allocate(XHGDFG(0:JZ,JY,JX)); XHGDFG=0._r8
   allocate(RCO2F(0:JZ,JY,JX));  RCO2F=0._r8
   allocate(RCH4L(0:JZ,JY,JX));  RCH4L=0._r8
-  allocate(ROXYF(0:JZ,JY,JX));  ROXYF=0._r8
-  allocate(ROXYL(0:JZ,JY,JX));  ROXYL=0._r8
+  allocate(RO2GasXchangePrev_vr(0:JZ,JY,JX));  RO2GasXchangePrev_vr=0._r8
+  allocate(RO2AquaXchangePrev_vr(0:JZ,JY,JX));  RO2AquaXchangePrev_vr=0._r8
   allocate(RCH4F(0:JZ,JY,JX));  RCH4F=0._r8
   allocate(ALSGL(JZ,JY,JX));    ALSGL=0._r8
   allocate(FESGL(JZ,JY,JX));    FESGL=0._r8
@@ -203,8 +203,8 @@ module ChemTranspDataType
   call destroy(XHGDFG)
   call destroy(RCO2F)
   call destroy(RCH4L)
-  call destroy(ROXYF)
-  call destroy(ROXYL)
+  call destroy(RO2GasXchangePrev_vr)
+  call destroy(RO2AquaXchangePrev_vr)
   call destroy(RCH4F)
   call destroy(ALSGL)
   call destroy(FESGL)

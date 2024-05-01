@@ -19,10 +19,8 @@ implicit none
   real(r8),target,allocatable :: RNH4DmndLitrHeter_col(:,:,:,:)     !microbial NH4 demand in surface litter	[g d-2 h-1]
   real(r8),target,allocatable :: RH2PO4DmndLitrHeter_col(:,:,:,:)     !microbial PO4 demand in surface litter	[g d-2 h-1]
   real(r8),target,allocatable :: RNO3DmndLitrHeter_col(:,:,:,:)     !microbial NO3 demand in surface litter	[g d-2 h-1]
-  real(r8),target,allocatable :: RVMX4(:,:,:,:,:)    !total microbial NH4 uptake non-band unconstrained by NH4	[g d-2 h-1]
   real(r8),target,allocatable :: RNO3ReduxDmndSoilHeter_vr(:,:,:,:,:)    !total microbial NO3 uptake non-band unconstrained by NO3	[g d-2 h-1]
   real(r8),target,allocatable :: RNO2DmndReduxSoilHeter_vr(:,:,:,:,:)    !total microbial NO2 uptake non-band unconstrained by NO2	[g d-2 h-1]
-  real(r8),target,allocatable :: RVMB4(:,:,:,:,:)    !total microbial NH4 uptake non-band unconstrained by NH4	[g d-2 h-1]
   real(r8),target,allocatable :: RNO3ReduxDmndBandHeter_vr(:,:,:,:,:)    !total microbial NO3 uptake band unconstrained by NO3	[g d-2 h-1]
   real(r8),target,allocatable :: RNO2DmndReduxBandHeter_vr(:,:,:,:,:)    !total microbial NO2 uptake band unconstrained by NH4	[g d-2 h-1]
   real(r8),target,allocatable :: RN2ODmndReduxHeter_vr(:,:,:,:,:)    !total microbial N2O uptake unconstrained by N2O	[g d-2 h-1]
@@ -71,28 +69,26 @@ implicit none
 
   implicit none
   allocate(OMEheter(NumPlantChemElms,NumLiveHeterBioms,1:jcplx,0:JZ,JY,JX))
-  allocate(RO2DmndHetert(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(RDOCUptkHeter_vr(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(RAcetateUptkHeter_vr(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(RNH4DmndSoilHeter_vr(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(RNO3DmndSoilHeter_vr(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(RH2PO4DmndSoilHeter_vr(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(RNH4DmndLitrHeter_col(NumMicrbHetetrophCmplx,1:jcplx,JY,JX))
-  allocate(RH2PO4DmndLitrHeter_col(NumMicrbHetetrophCmplx,1:jcplx,JY,JX))
-  allocate(RNO3DmndLitrHeter_col(NumMicrbHetetrophCmplx,1:jcplx,JY,JX))
-  allocate(RVMX4(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(RNO3ReduxDmndSoilHeter_vr(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(RNO2DmndReduxSoilHeter_vr(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(RVMB4(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(RNO3ReduxDmndBandHeter_vr(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(RNO2DmndReduxBandHeter_vr(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(RN2ODmndReduxHeter_vr(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(RNH4DmndBandHeter_vr(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(RNO3DmndBandHeter_vr(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(RH2PO4DmndBandHeter_vr(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(RH1PO4DmndSoilHeter_vr(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(RH1PO4DmndBandHeter_vr(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(RH1PO4DmndLitrHeter_col(NumMicrbHetetrophCmplx,1:jcplx,JY,JX))
+  allocate(RO2DmndHetert(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX))
+  allocate(RDOCUptkHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX))
+  allocate(RAcetateUptkHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX))
+  allocate(RNH4DmndSoilHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX))
+  allocate(RNO3DmndSoilHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX))
+  allocate(RH2PO4DmndSoilHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX))
+  allocate(RNH4DmndLitrHeter_col(NumHetetrMicCmplx,1:jcplx,JY,JX))
+  allocate(RH2PO4DmndLitrHeter_col(NumHetetrMicCmplx,1:jcplx,JY,JX))
+  allocate(RNO3DmndLitrHeter_col(NumHetetrMicCmplx,1:jcplx,JY,JX))
+  allocate(RNO3ReduxDmndSoilHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX))
+  allocate(RNO2DmndReduxSoilHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX))
+  allocate(RNO3ReduxDmndBandHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX))
+  allocate(RNO2DmndReduxBandHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX))
+  allocate(RN2ODmndReduxHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX))
+  allocate(RNH4DmndBandHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX))
+  allocate(RNO3DmndBandHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX))
+  allocate(RH2PO4DmndBandHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX))
+  allocate(RH1PO4DmndSoilHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX))
+  allocate(RH1PO4DmndBandHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX))
+  allocate(RH1PO4DmndLitrHeter_col(NumHetetrMicCmplx,1:jcplx,JY,JX))
   allocate(OMEERhetr(NumPlantChemElms,NumLiveHeterBioms,1:jcplx,2,2,JV,JH))
 
   allocate(OMEauto(NumPlantChemElms,NumLiveAutoBioms,0:JZ,JY,JX))
@@ -131,10 +127,8 @@ implicit none
   if(allocated(RNH4DmndLitrHeter_col))deallocate(RNH4DmndLitrHeter_col)
   if(allocated(RH2PO4DmndLitrHeter_col))deallocate(RH2PO4DmndLitrHeter_col)
   if(allocated(RNO3DmndLitrHeter_col))deallocate(RNO3DmndLitrHeter_col)
-  if(allocated(RVMX4))deallocate(RVMX4)
   if(allocated(RNO3ReduxDmndSoilHeter_vr))deallocate(RNO3ReduxDmndSoilHeter_vr)
   if(allocated(RNO2DmndReduxSoilHeter_vr))deallocate(RNO2DmndReduxSoilHeter_vr)
-  if(allocated(RVMB4))deallocate(RVMB4)
   if(allocated(RNO3ReduxDmndBandHeter_vr))deallocate(RNO3ReduxDmndBandHeter_vr)
   if(allocated(RNO2DmndReduxBandHeter_vr))deallocate(RNO2DmndReduxBandHeter_vr)
   if(allocated(RN2ODmndReduxHeter_vr))deallocate(RN2ODmndReduxHeter_vr)

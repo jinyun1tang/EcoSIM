@@ -76,7 +76,7 @@ implicit none
   real(r8),target,allocatable ::  TWIND(:,:)                         !total daily wind travel, [m d-1]
   real(r8),target,allocatable ::  TRAI(:,:)                          !total daily precipitation, [m d-1]
   real(r8),target,allocatable ::  THSX(:,:)                          !sky longwave radiation , [MJ m-2 h-1]
-  real(r8),target,allocatable ::  OFFSET(:,:)                        !offset for calculating temperature in Arrhenius curves, [oC]
+  real(r8),target,allocatable ::  TempOffset_col(:,:)                        !TempOffset_col for calculating temperature in Arrhenius curves, [oC]
   real(r8),target,allocatable ::  PRECD(:,:)                         !precipitation at ground surface used to calculate soil erosion, [m h-1]
   real(r8),target,allocatable ::  PRECB(:,:)                         !precipitation at ground surface used to calculate soil erosion, [m h-1]
   real(r8),target,allocatable ::  CO2EI(:,:)                         !initial atmospheric CO2 concentration, [umol mol-1]
@@ -205,7 +205,7 @@ implicit none
   allocate(TWIND(JY,JX));       TWIND=0._r8
   allocate(TRAI(JY,JX));        TRAI=0._r8
   allocate(THSX(JY,JX));        THSX=0._r8
-  allocate(OFFSET(JY,JX));      OFFSET=0._r8
+  allocate(TempOffset_col(JY,JX));      TempOffset_col=0._r8
   allocate(PRECD(JY,JX));       PRECD=0._r8
   allocate(PRECB(JY,JX));       PRECB=0._r8
   allocate(CO2EI(JY,JX));       CO2EI=0._r8
@@ -335,7 +335,7 @@ implicit none
   call destroy(TWIND)
   call destroy(TRAI)
   call destroy(THSX)
-  call destroy(OFFSET)
+  call destroy(TempOffset_col)
   call destroy(PRECD)
   call destroy(PRECB)
   call destroy(CO2EI)

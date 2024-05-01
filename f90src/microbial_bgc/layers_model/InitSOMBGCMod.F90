@@ -44,7 +44,7 @@ module InitSOMBGCMOD
   JGniA  => micpar%JGniA
   JGnfA  => micpar%JGnfA
   NumMicrobAutrophCmplx= micpar%NumMicrobAutrophCmplx
-  NumMicrbHetetrophCmplx= micpar%NumMicrbHetetrophCmplx
+  NumHetetrMicCmplx= micpar%NumHetetrMicCmplx
   NumLiveHeterBioms =micpar%NumLiveHeterBioms
   NumLiveAutoBioms  =micpar%NumLiveAutoBioms
   allocate(CORGCX(1:jcplx))
@@ -356,7 +356,6 @@ module InitSOMBGCMOD
   ENDIF
 
   RO2DmndHetert(:,:,L,NY,NX)=0.0_r8
-  RVMX4(:,:,L,NY,NX)=0.0_r8
   RNO3ReduxDmndSoilHeter_vr(:,:,L,NY,NX)=0.0_r8
   RNO2DmndReduxSoilHeter_vr(:,:,L,NY,NX)=0.0_r8
   RN2ODmndReduxHeter_vr(:,:,L,NY,NX)=0.0_r8

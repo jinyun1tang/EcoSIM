@@ -718,9 +718,9 @@ implicit none
     plt_bgcr%RNH4EcoDmndSoilPrev_vr(L)     =RNH4EcoDmndSoilPrev_vr(L,NY,NX)
     plt_bgcr%RNH4EcoDmndBandPrev_vr(L)     =RNH4EcoDmndBandPrev_vr(L,NY,NX)
     plt_bgcr%RNO3EcoDmndBandPrev_vr(L)     =RNO3EcoDmndBandPrev_vr(L,NY,NX)
-    plt_bgcr%ROXYF(L)     =ROXYF(L,NY,NX)
+    plt_bgcr%RO2GasXchangePrev_vr(L)     =RO2GasXchangePrev_vr(L,NY,NX)
     plt_bgcr%RCO2F(L)     =RCO2F(L,NY,NX)
-    plt_bgcr%ROXYL(L)     =ROXYL(L,NY,NX)
+    plt_bgcr%RO2AquaXchangePrev_vr(L)     =RO2AquaXchangePrev_vr(L,NY,NX)
     plt_bgcr%RO2EcoDmndPrev_vr(L)     =RO2EcoDmndPrev_vr(L,NY,NX)
     plt_ew%TKS(L)         =TKS(L,NY,NX)
 

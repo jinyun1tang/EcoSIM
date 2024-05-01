@@ -943,6 +943,8 @@ module HfuncsMod
     CanHeightChk=CanopyHeight_pft(NZ).GE.SnowDepth-ZERO
     PhenoChk1=iPlantPhenolPattern_pft(NZ).EQ.iplt_perennial .AND. &
       (iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldecid.OR.iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldroutdecid)
+    !Annual crop plants (i.e. those seeded by human) are set as evergreen, if it is self-seeding, then 
+    !iPlantPhenolType_pft should be set according to koppen climate zone.  
     PhenoChk2=iPlantPhenolPattern_pft(NZ).EQ.iplt_annual.AND.iPlantPhenolType_pft(NZ).EQ.iphenotyp_evgreen
     
 !    if(NZ==1)THEN

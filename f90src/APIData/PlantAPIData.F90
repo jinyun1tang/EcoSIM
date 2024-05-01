@@ -655,9 +655,9 @@ implicit none
   real(r8), pointer :: RNH4EcoDmndSoilPrev_vr(:)      => null()   !total root + microbial NH4 uptake non-band, [gN d-2 h-1]
   real(r8), pointer :: RNH4EcoDmndBandPrev_vr(:)      => null()   !total root + microbial NH4 uptake band, [gN d-2 h-1]
   real(r8), pointer :: RNO3EcoDmndBandPrev_vr(:)      => null()   !total root + microbial NO3 uptake band, [gN d-2 h-1]
-  real(r8), pointer :: ROXYF(:)      => null()   !net gaseous O2 flux, [g d-2 h-1]
+  real(r8), pointer :: RO2GasXchangePrev_vr(:)      => null()   !net gaseous O2 flux, [g d-2 h-1]
   real(r8), pointer :: RCO2F(:)      => null()   !net gaseous CO2 flux, [g d-2 h-1]
-  real(r8), pointer :: ROXYL(:)      => null()   !net aqueous O2 flux, [g d-2 h-1]
+  real(r8), pointer :: RO2AquaXchangePrev_vr(:)      => null()   !net aqueous O2 flux, [g d-2 h-1]
   real(r8), pointer :: RO2EcoDmndPrev_vr(:)      => null()   !total root + microbial O2 uptake, [g d-2 h-1]
   real(r8), pointer :: TCO2P(:)      => null()   !total root CO2 flux, [gC d-2 h-1]
   real(r8), pointer :: TRO2Uptk_vr(:)     => null()   !total root internal O2 flux, [g d-2 h-1]
@@ -975,9 +975,9 @@ implicit none
   allocate(this%RNH4EcoDmndSoilPrev_vr(0:JZ1)); this%RNH4EcoDmndSoilPrev_vr =spval
   allocate(this%RNH4EcoDmndBandPrev_vr(0:JZ1)); this%RNH4EcoDmndBandPrev_vr=spval
   allocate(this%RNO3EcoDmndBandPrev_vr(0:JZ1)); this%RNO3EcoDmndBandPrev_vr=spval
-  allocate(this%ROXYF(0:JZ1)); this%ROXYF=spval
+  allocate(this%RO2GasXchangePrev_vr(0:JZ1)); this%RO2GasXchangePrev_vr=spval
   allocate(this%RCO2F(0:JZ1)); this%RCO2F=spval
-  allocate(this%ROXYL(0:JZ1)); this%ROXYL=spval
+  allocate(this%RO2AquaXchangePrev_vr(0:JZ1)); this%RO2AquaXchangePrev_vr=spval
   allocate(this%RO2EcoDmndPrev_vr(0:JZ1)); this%RO2EcoDmndPrev_vr=spval
   allocate(this%LitrfalStrutElms_vr(NumPlantChemElms,jsken,NumOfPlantLitrCmplxs,0:JZ1));this%LitrfalStrutElms_vr=spval
   allocate(this%GrossCO2Fix_pft(JP1));this%GrossCO2Fix_pft=spval

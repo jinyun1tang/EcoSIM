@@ -138,7 +138,7 @@ module StartsMod
 !     OFFSET=shift in Arrhenius curve used in nitro.f (oC)
 !     ATCS=mean annual soil temperature (OC)
 !
-      OFFSET(NY,NX)=fOFFSET(ATCS(NY,NX))
+      TempOffset_col(NY,NX)=fOFFSET(ATCS(NY,NX))
 
 !
 !     INITIALIZE WATER POTENTIAL VARIABLES FOR SOIL LAYERS
@@ -402,9 +402,9 @@ module StartsMod
     !
     PSISE(L,NY,NX)=PSIPS
     PSISoilAirEntry(L,NY,NX)=-1.5E-03_r8
-    ROXYF(L,NY,NX)=0.0_r8
+    RO2GasXchangePrev_vr(L,NY,NX)=0.0_r8
     RCO2F(L,NY,NX)=0.0_r8
-    ROXYL(L,NY,NX)=0.0_r8
+    RO2AquaXchangePrev_vr(L,NY,NX)=0.0_r8
     RCH4F(L,NY,NX)=0.0_r8
     RCH4L(L,NY,NX)=0.0_r8
 
@@ -1034,7 +1034,7 @@ module StartsMod
 !     OFFSET=shift in Arrhenius curve used in nitro.f (oC)
 !     ATCS=mean annual soil temperature (OC)
 !
-      OFFSET(NY,NX)=fOFFSET(ATCS(NY,NX))
+      TempOffset_col(NY,NX)=fOFFSET(ATCS(NY,NX))
 
 !
 !     INITIALIZE WATER POTENTIAL VARIABLES FOR SOIL LAYERS

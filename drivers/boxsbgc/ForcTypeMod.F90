@@ -92,7 +92,7 @@ implicit none
     real(r8) :: DNH3GQ
     real(r8) :: DH2GGQ
 
-    real(r8) :: OFFSET      !offset for calculating temperature in Arrhenius curves, [oC]
+    real(r8) :: TempOffset      !offset for calculating temperature in Arrhenius curves, [oC]
 
     real(r8) :: THETY       !air-dry water content, [m3 m-3]
     real(r8) :: VLWatMicP        !soil micropore water content [m3 d-2]
@@ -202,9 +202,9 @@ implicit none
     real(r8) :: RNO3EcoDmndSoilPrev       !total root + microbial NO3 uptake non-band from previous hour, [g d-2 h-1]
     real(r8) :: RH2PO4EcoDmndSoilPrev       !total root + microbial PO4 uptake non-band from previous hour, [g d-2 h-1]
     real(r8) :: RH1PO4EcoDmndSoilPrev       !HPO4 demand in non-band by all microbial, root, myco populations from previous hour
-    real(r8) :: ROXYF       !net gaseous O2 flux, [g d-2 h-1], updated in redist.f
+    real(r8) :: RO2GasXchangePrev       !net gaseous O2 flux, [g d-2 h-1], updated in redist.f
     real(r8) :: RCH4L       !net aqueous CH4 flux, [g d-2 h-1], updated in redist.f
-    real(r8) :: ROXYL       !net aqueous O2 flux from previous hour, [g d-2 h-1], updated in redist.f
+    real(r8) :: RO2AquaXchangePrev       !net aqueous O2 flux from previous hour, [g d-2 h-1], updated in redist.f
     logical  :: disvolonly  !flag to only do dissolution/volatilization
   end type forc_type
 
@@ -219,7 +219,7 @@ implicit none
   type(forc_type), intent(inout) :: forc
   character(len=*), intent(in) :: fname
   integer :: jcplx,ndbiomcp,nlbiomcp
-  integer :: NumMicbFunGroups,jsken,NumMicrbHetetrophCmplx,NumMicrobAutrophCmplx
+  integer :: NumMicbFunGroups,jsken,NumHetetrMicCmplx,NumMicrobAutrophCmplx
   integer :: NumLiveHeterBioms,NumLiveAutoBioms
   integer :: NumPlantChemElms
   type(file_desc_t) :: ncf
@@ -228,7 +228,7 @@ implicit none
 
   jcplx=get_dim_len(ncf,'jcplx')
   jsken =get_dim_len(ncf,'jsken')
-  NumMicrbHetetrophCmplx=get_dim_len(ncf,'NumMicrbHetetrophCmplx')
+  NumHetetrMicCmplx=get_dim_len(ncf,'NumHetetrMicCmplx')
   NumMicrobAutrophCmplx=get_dim_len(ncf,'NumMicrobAutrophCmplx')
   NumLiveHeterBioms = get_dim_len(ncf,'NumLiveHeterBioms')
   NumLiveAutoBioms = get_dim_len(ncf,'NumLiveAutoBioms')
@@ -305,7 +305,7 @@ implicit none
   call ncd_getvar(ncf,'ATKA', forc%ATKA)
   call ncd_pio_closefile(ncf)
 
-  forc%OFFSET=fOFFSET(forc%ATCS)
+  forc%TempOffset=fOFFSET(forc%ATCS)
   forc%VLNOB=0._r8
   forc%VLNO3=1._r8
   forc%VLNHB=0._r8
@@ -491,9 +491,9 @@ implicit none
   forc%RNO3EcoDmndSoilPrev=0._r8
   forc%RH2PO4EcoDmndSoilPrev=0._r8
   forc%RH1PO4EcoDmndSoilPrev=0._r8
-  forc%ROXYF=0._r8
+  forc%RO2GasXchangePrev=0._r8
   forc%RCH4L=0._r8
-  forc%ROXYL=0._r8
+  forc%RO2AquaXchangePrev=0._r8
 
   first=.false.
   end associate

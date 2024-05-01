@@ -19,7 +19,7 @@ module MicForcTypeMod
   real(r8) :: O2_rain_conc
   real(r8) :: Irrig2LitRSurf
   real(r8) :: Rain2LitRSurf_col
-  real(r8) :: offset
+  real(r8) :: TempOffset
   real(r8) :: VLitR
   real(r8) :: VWatLitRHoldCapcity
   real(r8) :: ZEROS2
@@ -52,7 +52,7 @@ module MicForcTypeMod
   real(r8) :: RNO2EcoUptkBandPrev
   real(r8) :: RN2OEcoUptkSoilPrev
   real(r8) :: RO2EcoDmndPrev
-  real(r8) :: ROXYF
+  real(r8) :: RO2GasXchangePrev
   real(r8) :: RCH4L
   real(r8) :: RCH4F
   real(r8) :: RNH4EcoDmndSoilPrev
@@ -70,7 +70,7 @@ module MicForcTypeMod
   real(r8) :: RNO3EcoDmndLitrPrev
   real(r8) :: RH2PO4EcoDmndLitrPrev
   real(r8) :: RH1PO4EcoDmndLitrPrev
-  real(r8) :: ROXYL
+  real(r8) :: RO2AquaXchangePrev
   real(r8) :: VOLWU
   real(r8), allocatable :: CFOMC(:)
   real(r8), allocatable :: CFOMCU(:)
