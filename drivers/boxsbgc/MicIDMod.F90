@@ -55,7 +55,7 @@ implicit none
   integer :: cid_orn_b,cid_orn_e     !microbial mass residue N [gN d-2]
   integer :: cid_orp_b,cid_orp_e     !microbial mass residue P [gP d-2]
   integer :: cid_OMEheter_b,cid_OMEheter_e     !microbial biomass component	[g d-2]
-  integer :: cid_omeauto_b,cid_omeauto_e   !autotrophic microbial biomass component	[g d-2]
+  integer :: cid_OMEAutor_b,cid_OMEAutor_e   !autotrophic microbial biomass component	[g d-2]
 
   integer :: fid_XCODFS             !CO2 dissolution (+)-volatiziation (-) with respect to atmosphere
   integer :: fid_XCHDFS             !CH4 dissolution (+)-volatiziation (-) with respect to atmosphere

@@ -32,7 +32,7 @@ implicit none
   real(r8),target,allocatable :: RH1PO4DmndLitrHeter_col(:,:,:,:)     !substrate-unlimited HPO4 immobilization
   real(r8),target,allocatable :: OMEERhetr(:,:,:,:,:,:,:)  !microbial C  erosion 	[g d-2 h-1]
 
-  real(r8),target,allocatable :: OMEauto(:,:,:,:,:)
+  real(r8),target,allocatable :: OMEAutor(:,:,:,:,:)
   real(r8),target,allocatable :: RO2DmndAutort(:,:,:,:)
   real(r8),target,allocatable :: RNH4UptkSoilAutor_vr(:,:,:,:)
   real(r8),target,allocatable :: RNO3UptkSoilAutor_vr(:,:,:,:)
@@ -91,7 +91,7 @@ implicit none
   allocate(RH1PO4DmndLitrHeter_col(NumHetetrMicCmplx,1:jcplx,JY,JX))
   allocate(OMEERhetr(NumPlantChemElms,NumLiveHeterBioms,1:jcplx,2,2,JV,JH))
 
-  allocate(OMEauto(NumPlantChemElms,NumLiveAutoBioms,0:JZ,JY,JX))
+  allocate(OMEAutor(NumPlantChemElms,NumLiveAutoBioms,0:JZ,JY,JX))
   allocate(RO2DmndAutort(NumMicrobAutrophCmplx,0:JZ,JY,JX))
   allocate(RNH4UptkSoilAutor_vr(NumMicrobAutrophCmplx,0:JZ,JY,JX))
   allocate(RNO3UptkSoilAutor_vr(NumMicrobAutrophCmplx,0:JZ,JY,JX))
@@ -140,7 +140,7 @@ implicit none
   if(allocated(RH1PO4DmndLitrHeter_col))deallocate(RH1PO4DmndLitrHeter_col)
   if(allocated(OMEERhetr))deallocate(OMEERhetr)
 
-  if(allocated(OMEauto))deallocate(OMEauto)
+  if(allocated(OMEAutor))deallocate(OMEAutor)
   if(allocated(RO2DmndAutort))deallocate(RO2DmndAutort)
   if(allocated(RNH4UptkSoilAutor_vr))deallocate(RNH4UptkSoilAutor_vr)
   if(allocated(RNO3UptkSoilAutor_vr))deallocate(RNO3UptkSoilAutor_vr)

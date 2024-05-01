@@ -6743,16 +6743,16 @@ implicit none
 
   if(flag=='read')then
     datpr4 => datrc_4d(1:ncols,1:NumPlantChemElms,1:NumLiveAutoBioms,1:JZ+1)       
-    call restartvar(ncid, flag, varname='OMEauto', dim1name='column',dim2name='elmnts',&
+    call restartvar(ncid, flag, varname='OMEAutor', dim1name='column',dim2name='elmnts',&
       dim3name='nliveautomicb',dim4name='levsoi1',long_name='autotrophic microbial biomass element', &
       units='g d-2', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)            
-    call cpcol(flag,NHW,NHE,NVN,NVS,OMEauto,datrc_4d)     
+    call cpcol(flag,NHW,NHE,NVN,NVS,OMEAutor,datrc_4d)     
   else
     !print*,'OMCff'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,OMEauto,datrc_4d)       
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,OMEAutor,datrc_4d)       
     datpr4 => datrc_4d(1:ncols,1:NumPlantChemElms,1:NumLiveAutoBioms,1:JZ+1)           
-    call restartvar(ncid, flag, varname='OMEauto', dim1name='column',dim2name='elmnts',&
+    call restartvar(ncid, flag, varname='OMEAutor', dim1name='column',dim2name='elmnts',&
       dim3name='nliveautomicb',dim4name='levsoi1',long_name='autotrophic microbial biomass element', &
       units='g d-2', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)            
@@ -6903,10 +6903,10 @@ implicit none
       long_name='total particulate organic C', units='g d-2', interpinic_flag='skip',&
       data=datpr2, missing_value=spval, &
       fill_value=spval)      
-    call cpcol(flag,NHW,NHE,NVN,NVS,ORGR,datrc_2d)
+    call cpcol(flag,NHW,NHE,NVN,NVS,OMLitrC_vr,datrc_2d)
   else
     !print*,'ORGR'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,ORGR,datrc_2d)  
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,OMLitrC_vr,datrc_2d)  
     datpr2 => datrc_2d(1:ncols,1:JZ+1)    
     call restartvar(ncid, flag, varname='ORGR', dim1name='column',dim2name='levsoi1',&
       long_name='total particulate organic C', units='g d-2', interpinic_flag='skip',&

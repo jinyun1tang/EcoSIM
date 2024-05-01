@@ -1035,7 +1035,7 @@ module Hour1Mod
 
 !  add autotrophic complex
     DO NB=1,NumLiveAutoBioms
-      OC=OC+OMEauto(ielmc,NB,L,NY,NX)
+      OC=OC+OMEAutor(ielmc,NB,L,NY,NX)
     ENDDO
 !  add microbial residue
     OC=OC+SUM(OMBioResdu_vr(ielmc,1:ndbiomcp,1:jcplx,L,NY,NX))
@@ -1859,9 +1859,9 @@ module Hour1Mod
               OMC1g=OMC1/tglds
               OMN1g=OMN1/tglds
               OMP1g=OMP1/tglds
-              OMEauto(ielmc,MID,LFDPTH,NY,NX)=OMEauto(ielmc,MID,LFDPTH,NY,NX)+OMC1g*micpar%OMCA(NN)
-              OMEauto(ielmn,MID,LFDPTH,NY,NX)=OMEauto(ielmn,MID,LFDPTH,NY,NX)+OMN1g*micpar%OMCA(NN)
-              OMEauto(ielmp,MID,LFDPTH,NY,NX)=OMEauto(ielmp,MID,LFDPTH,NY,NX)+OMP1g*micpar%OMCA(NN)
+              OMEAutor(ielmc,MID,LFDPTH,NY,NX)=OMEAutor(ielmc,MID,LFDPTH,NY,NX)+OMC1g*micpar%OMCA(NN)
+              OMEAutor(ielmn,MID,LFDPTH,NY,NX)=OMEAutor(ielmn,MID,LFDPTH,NY,NX)+OMN1g*micpar%OMCA(NN)
+              OMEAutor(ielmp,MID,LFDPTH,NY,NX)=OMEAutor(ielmp,MID,LFDPTH,NY,NX)+OMP1g*micpar%OMCA(NN)
             ENDDO
             OSCX=OSCX+OMC1*micpar%OMCA(NN)
             OSNX=OSNX+OMN1*micpar%OMCA(NN)

@@ -446,7 +446,7 @@ module readiMod
     call ncd_getvar(grid_nfid, 'AEC',ntp,AEC(1:JZ,NV1,NH1))
 
     call ncd_getvar(grid_nfid, 'CORGC',ntp,CORGC(1:JZ,NV1,NH1))
-    call ncd_getvar(grid_nfid, 'CORGR',ntp,CORGR(1:JZ,NV1,NH1))
+    call ncd_getvar(grid_nfid, 'CORGR',ntp,COMLitrC_vr(1:JZ,NV1,NH1))
     call ncd_getvar(grid_nfid, 'CORGN',ntp,CORGN(1:JZ,NV1,NH1))
     call ncd_getvar(grid_nfid, 'CORGP',ntp,CORGP(1:JZ,NV1,NH1))
 
@@ -557,7 +557,7 @@ module readiMod
             CEC(L,NY,NX)=CEC(L,NV1,NH1)
             AEC(L,NY,NX)=AEC(L,NV1,NH1)
             CORGC(L,NY,NX)=CORGC(L,NV1,NH1)
-            CORGR(L,NY,NX)=CORGR(L,NV1,NH1)
+            COMLitrC_vr(L,NY,NX)=COMLitrC_vr(L,NV1,NH1)
             CORGN(L,NY,NX)=CORGN(L,NV1,NH1)
             CORGP(L,NY,NX)=CORGP(L,NV1,NH1)
 
@@ -647,7 +647,7 @@ module readiMod
               CEC(L,NY,NX)=CEC(L+1,NY,NX)
               AEC(L,NY,NX)=AEC(L+1,NY,NX)
               CORGC(L,NY,NX)=1.0_r8*CORGC(L+1,NY,NX)
-              CORGR(L,NY,NX)=1.0_r8*CORGR(L+1,NY,NX)
+              COMLitrC_vr(L,NY,NX)=1.0_r8*COMLitrC_vr(L+1,NY,NX)
               CORGN(L,NY,NX)=1.0_r8*CORGN(L+1,NY,NX)
               CORGP(L,NY,NX)=1.0_r8*CORGP(L+1,NY,NX)
               CNH4(L,NY,NX)=CNH4(L+1,NY,NX)
@@ -721,7 +721,7 @@ module readiMod
           SatHydroCondHrzn(L,NY,NX)=0.098_r8*SatHydroCondHrzn(L,NY,NX)*FracSoiAsMicP(L,NY,NX)
           CCLAY(L,NY,NX)=AZMAX1(1.0E+03_r8-(CSAND(L,NY,NX)+CSILT(L,NY,NX)))
           CORGC(L,NY,NX)=CORGC(L,NY,NX)*1.0E+03_r8   !convert from Kg to g C
-          CORGR(L,NY,NX)=CORGR(L,NY,NX)*1.0E+03_r8   !convert from Kg to g C
+          COMLitrC_vr(L,NY,NX)=COMLitrC_vr(L,NY,NX)*1.0E+03_r8   !convert from Kg to g C
           CORGCI(L,NY,NX)=CORGC(L,NY,NX)
           SoilFracAsMacPt0(L,NY,NX)=SoilFracAsMacP(L,NY,NX)
   !
@@ -877,14 +877,14 @@ module readiMod
 !
 !     ORGANIC C, N AND P CONCENTRATIONS
 !
-!     CORGC,CORGR=total SOC,POC(part of SOC) (kg Mg-1)
+!     CORGC,COMLitrC_vr=total SOC,POC(part of SOC) (kg Mg-1)
 !     CORGN,CORGP=SON,SOP:<0=unknown (g Mg-1)
 !
   write(*,*)''
   write(*,*)'Total SOC (kg C/Mg soil): CORGC'
   write(*,*)(CORGC(L,NY,NX),L=NU,NM)
   write(*,*)'POC (part of SOC) (kg C/Mg soil): CORGR '
-  write(*,*)(CORGR(L,NY,NX),L=NU,NM)
+  write(*,*)(COMLitrC_vr(L,NY,NX),L=NU,NM)
   write(*,*)'Total SON (g N/Mg soil): CORGN '
   write(*,*)(CORGN(L,NY,NX),L=NU,NM)
   write(*,*)'Total SOP (g P/Mg soil): CORGP'

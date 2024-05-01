@@ -172,16 +172,16 @@ type, public :: NitroAQMFluxDiagType
   real(r8),allocatable :: RNH4TransfBandAutor(:)
   real(r8),allocatable :: RNO3TransfBandAutor(:)
   real(r8),allocatable :: RH2PO4TransfBandAutor(:)
-  real(r8),allocatable :: RDOMEautor(:,:,:)
-  real(r8),allocatable :: RHOMEautor(:,:,:)
-  real(r8),allocatable :: RCOMEautor(:,:,:)
-  real(r8),allocatable :: CGOMEautor(:,:)
+  real(r8),allocatable :: RDOMEAutorr(:,:,:)
+  real(r8),allocatable :: RHOMEAutorr(:,:,:)
+  real(r8),allocatable :: RCOMEAutorr(:,:,:)
+  real(r8),allocatable :: CGOMEAutorr(:,:)
   real(r8),allocatable :: RDMMEautor(:,:,:)
   real(r8),allocatable :: RHMMEautor(:,:,:)
   real(r8),allocatable :: RCMMEautor(:,:,:)
   real(r8),allocatable :: RN2FixAutor(:)
-  real(r8),allocatable :: RXOMEautor(:,:,:)
-  real(r8),allocatable :: R3OMEautor(:,:,:)
+  real(r8),allocatable :: RXOMEAutorr(:,:,:)
+  real(r8),allocatable :: R3OMEAutorr(:,:,:)
   real(r8),allocatable :: RXMMEautor(:,:,:)
   real(r8),allocatable :: R3MMEautor(:,:,:)
   real(r8),allocatable :: RNH4TransfLitrAutor(:)
@@ -403,16 +403,16 @@ type, public :: NitroAQMFluxDiagType
   allocate(this%RNH4TransfBandAutor(NumMicrobAutrophCmplx));this%RNH4TransfBandAutor=spval
   allocate(this%RNO3TransfBandAutor(NumMicrobAutrophCmplx));this%RNO3TransfBandAutor=spval
   allocate(this%RH2PO4TransfBandAutor(NumMicrobAutrophCmplx));this%RH2PO4TransfBandAutor=spval
-  allocate(this%RDOMEautor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%RDOMEautor=spval
-  allocate(this%RHOMEautor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%RHOMEautor=spval
-  allocate(this%RCOMEautor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%RCOMEautor=spval
-  allocate(this%CGOMEautor(idom_beg:idom_end,NumMicrobAutrophCmplx));this%CGOMEautor=spval
+  allocate(this%RDOMEAutorr(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%RDOMEAutorr=spval
+  allocate(this%RHOMEAutorr(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%RHOMEAutorr=spval
+  allocate(this%RCOMEAutorr(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%RCOMEAutorr=spval
+  allocate(this%CGOMEAutorr(idom_beg:idom_end,NumMicrobAutrophCmplx));this%CGOMEAutorr=spval
   allocate(this%RDMMEautor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%RDMMEautor=spval
   allocate(this%RHMMEautor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%RHMMEautor=spval
   allocate(this%RCMMEautor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%RCMMEautor=spval
   allocate(this%RN2FixAutor(NumMicrobAutrophCmplx));this%RN2FixAutor=spval
-  allocate(this%RXOMEautor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%RXOMEautor=spval
-  allocate(this%R3OMEautor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%R3OMEautor=spval
+  allocate(this%RXOMEAutorr(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%RXOMEAutorr=spval
+  allocate(this%R3OMEAutorr(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%R3OMEAutorr=spval
   allocate(this%RXMMEautor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%RXMMEautor=spval
   allocate(this%R3MMEautor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%R3MMEautor=spval
   allocate(this%RNH4TransfLitrAutor(NumMicrobAutrophCmplx));this%RNH4TransfLitrAutor=spval
@@ -553,17 +553,17 @@ type, public :: NitroAQMFluxDiagType
   this%RNH4TransfBandAutor = 0._r8
   this%RNO3TransfBandAutor = 0._r8
   this%RH2PO4TransfBandAutor = 0._r8
-  this%RDOMEautor = 0._r8
-  this%RHOMEautor = 0._r8
-  this%RCOMEautor = 0._r8
-  this%CGOMEautor = 0._r8
+  this%RDOMEAutorr = 0._r8
+  this%RHOMEAutorr = 0._r8
+  this%RCOMEAutorr = 0._r8
+  this%CGOMEAutorr = 0._r8
   this%RDMMEautor = 0._r8
   this%RHMMEautor = 0._r8
   this%RCMMEautor = 0._r8
   this%RN2FixAutor = 0._r8
 
-  this%RXOMEautor = 0._r8
-  this%R3OMEautor = 0._r8
+  this%RXOMEAutorr = 0._r8
+  this%R3OMEAutorr = 0._r8
   this%RXMMEautor = 0._r8
   this%R3MMEautor = 0._r8
   this%RNH4TransfLitrAutor = 0._r8
@@ -662,16 +662,16 @@ type, public :: NitroAQMFluxDiagType
   call destroy(this%RNH4TransfBandAutor)
   call destroy(this%RNO3TransfBandAutor)
   call destroy(this%RH2PO4TransfBandAutor)
-  call destroy(this%RDOMEautor)
-  call destroy(this%RHOMEautor)
-  call destroy(this%RCOMEautor)
-  call destroy(this%CGOMEautor)
+  call destroy(this%RDOMEAutorr)
+  call destroy(this%RHOMEAutorr)
+  call destroy(this%RCOMEAutorr)
+  call destroy(this%CGOMEAutorr)
   call destroy(this%RDMMEautor)
   call destroy(this%RHMMEautor)
   call destroy(this%RCMMEautor)
   call destroy(this%RN2FixAutor)
-  call destroy(this%RXOMEautor)
-  call destroy(this%R3OMEautor)
+  call destroy(this%RXOMEAutorr)
+  call destroy(this%R3OMEAutorr)
   call destroy(this%RXMMEautor)
   call destroy(this%R3MMEautor)
   call destroy(this%RNH4TransfLitrAutor)

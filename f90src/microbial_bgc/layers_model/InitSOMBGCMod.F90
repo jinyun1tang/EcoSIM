@@ -89,24 +89,24 @@ module InitSOMBGCMOD
   integer :: MID
   ! begin_execution
 
-  associate(                  &
-    rNCOMCa  => micpar%rNCOMCa ,&
-    rPCOMCa               => micpar%rPCOMCa               , &
-    nlbiomcp              => micpar%nlbiomcp              , &
-    NumMicrobAutrophCmplx => micpar%NumMicrobAutrophCmplx , &
-    k_humus => micpar%k_humus, &
-    OHCK    => micpar%OHCK   ,&
-    OMCK    => micpar%OMCK   ,&
-    OQCK    => micpar%OQCK   ,&
-    ORCK    => micpar%ORCK   ,&
-    ORCI    => micpar%ORCI   ,&
-    OMCI    => micpar%OMCI   ,&
-    CNRH    => micpar%CNRH   ,&
-    CPRH    => micpar%CPRH   ,&
-    CNOFC   => micpar%CNOFC  ,&
-    CPOFC   => micpar%CPOFC  ,&
-    OMCF    => micpar%OMCF   ,&
-    OMCA    => micpar%OMCA    &
+  associate(                                               &
+    rNCOMCa               => micpar%rNCOMCa,               &
+    rPCOMCa               => micpar%rPCOMCa,               &
+    nlbiomcp              => micpar%nlbiomcp,              &
+    NumMicrobAutrophCmplx => micpar%NumMicrobAutrophCmplx, &
+    k_humus               => micpar%k_humus,               &
+    OHCK                  => micpar%OHCK,                  &
+    OMCK                  => micpar%OMCK,                  &
+    OQCK                  => micpar%OQCK,                  &
+    ORCK                  => micpar%ORCK,                  &
+    ORCI                  => micpar%ORCI,                  &
+    OMCI                  => micpar%OMCI,                  &
+    CNRH                  => micpar%CNRH,                  &
+    CPRH                  => micpar%CPRH,                  &
+    CNOFC                 => micpar%CNOFC,                 &
+    CPOFC                 => micpar%CPOFC,                 &
+    OMCF                  => micpar%OMCF,                  &
+    OMCA                  => micpar%OMCA                   &
   )
 
   D975: DO K=1,micpar%NumOfLitrCmplxs
@@ -243,7 +243,7 @@ module InitSOMBGCMOD
 !     OSCX,OSNX,OSPX=remaining unallocated SOC,SON,SOP
 !  The reason that initialization of complex 5 microbes is repated for each
 ! complex is because complex 5 is shared by the other complexes
-    OMEauto(1:NumPlantChemElms,1:NumLiveAutoBioms,L,NY,NX)=0._r8
+    OMEAutor(1:NumPlantChemElms,1:NumLiveAutoBioms,L,NY,NX)=0._r8
 
     D8990: DO N=1,NumMicbFunGroups
       tglds=JGnfo(N)-JGnio(N)+1._r8
@@ -264,9 +264,9 @@ module InitSOMBGCMOD
           tglds=JGnfA(N)-JGniA(N)+1._r8
           do NGL=JGniA(N),JGnfA(N)
             MID=micpar%get_micb_id(M,NGL)
-            OMEauto(ielmc,MID,L,NY,NX)=OMEauto(ielmc,MID,L,NY,NX)+OMC1*OMCA(NN)/tglds
-            OMEauto(ielmn,MID,L,NY,NX)=OMEauto(ielmn,MID,L,NY,NX)+OMN1*OMCA(NN)/tglds
-            OMEauto(ielmp,MID,L,NY,NX)=OMEauto(ielmp,MID,L,NY,NX)+OMP1*OMCA(NN)/tglds
+            OMEAutor(ielmc,MID,L,NY,NX)=OMEAutor(ielmc,MID,L,NY,NX)+OMC1*OMCA(NN)/tglds
+            OMEAutor(ielmn,MID,L,NY,NX)=OMEAutor(ielmn,MID,L,NY,NX)+OMN1*OMCA(NN)/tglds
+            OMEAutor(ielmp,MID,L,NY,NX)=OMEAutor(ielmp,MID,L,NY,NX)+OMP1*OMCA(NN)/tglds
           ENDDO
           OSCX(KK)=OSCX(KK)+OMC1*OMCA(NN)
           OSNX(KK)=OSNX(KK)+OMN1*OMCA(NN)
@@ -410,10 +410,10 @@ module InitSOMBGCMOD
       do NGL=JGniA(n),JGnfA(n)
         DO  M=1,nlbiomcp
           MID=micpar%get_micb_id(M,NGL)
-          OC=OC+OMEauto(ielmc,MID,L,NY,NX)
-          ON=ON+OMEauto(ielmn,MID,L,NY,NX)
-          OP=OP+OMEauto(ielmp,MID,L,NY,NX)
-          RC0ff(NY,NX)=RC0ff(NY,NX)+OMEauto(ielmc,MID,L,NY,NX)
+          OC=OC+OMEAutor(ielmc,MID,L,NY,NX)
+          ON=ON+OMEAutor(ielmn,MID,L,NY,NX)
+          OP=OP+OMEAutor(ielmp,MID,L,NY,NX)
+          RC0ff(NY,NX)=RC0ff(NY,NX)+OMEAutor(ielmc,MID,L,NY,NX)
         ENDDO
       ENDDO
     enddo
@@ -458,8 +458,9 @@ module InitSOMBGCMOD
   ENDDO D6995
   ORGC(L,NY,NX)=OC
   ORGCX(L,NY,NX)=ORGC(L,NY,NX)
-  ORGR(L,NY,NX)=RC
+  OMLitrC_vr(L,NY,NX)=RC
   ORGN(L,NY,NX)=ON
+  ORGP(L,NY,NX)=OP
   end associate
   end subroutine InitSOMVars
 
@@ -750,7 +751,7 @@ module InitSOMBGCMOD
     !
     IF(L.GT.0)THEN
       CORGCZ=CORGC(L,NY,NX)
-      CORGRZ=CORGR(L,NY,NX)
+      CORGRZ=COMLitrC_vr(L,NY,NX)
       CORGNZ=CORGN(L,NY,NX)
       CORGPZ=CORGP(L,NY,NX)
       IF(CORGCZ.GT.ZERO)THEN

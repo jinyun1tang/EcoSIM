@@ -316,7 +316,7 @@ implicit none
   micstt%CNOSC(1:jsken,1:jcplx)=CNOSC(1:jsken,1:jcplx,L,NY,NX)
   micstt%CPOSC(1:jsken,1:jcplx)=CPOSC(1:jsken,1:jcplx,L,NY,NX)
   micstt%OMEheter(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx)=OMEheter(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx,L,NY,NX)
-  micstt%OMEauto(1:NumPlantChemElms,1:NumLiveAutoBioms)=OMEauto(1:NumPlantChemElms,1:NumLiveAutoBioms,L,NY,NX)
+  micstt%OMEAutor(1:NumPlantChemElms,1:NumLiveAutoBioms)=OMEAutor(1:NumPlantChemElms,1:NumLiveAutoBioms,L,NY,NX)
   if(.not.micfor%litrm)then
     micfor%AEC=AEC(L,NY,NX)
     micstt%OXYG=trc_gasml_vr(idg_O2,L,NY,NX)
@@ -452,7 +452,7 @@ implicit none
 
   OMBioResdu_vr(1:NumPlantChemElms,1:ndbiomcp,1:jcplx,L,NY,NX)=micstt%OMBioResdu(1:NumPlantChemElms,1:ndbiomcp,1:jcplx)
   OMEheter(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx,L,NY,NX)=micstt%OMEheter(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx)
-  OMEauto(1:NumPlantChemElms,1:NumLiveAutoBioms,L,NY,NX)=micstt%OMEauto(1:NumPlantChemElms,1:NumLiveAutoBioms)
+  OMEAutor(1:NumPlantChemElms,1:NumLiveAutoBioms,L,NY,NX)=micstt%OMEAutor(1:NumPlantChemElms,1:NumLiveAutoBioms)
 
   end subroutine MicAPIRecv
 end module MicBGCAPI

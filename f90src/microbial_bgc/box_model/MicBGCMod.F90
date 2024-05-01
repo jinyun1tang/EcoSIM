@@ -256,7 +256,7 @@ module MicBGCMod
     ZNO2S                => micstt%ZNO2S,                 &
     ZNO3B                => micstt%ZNO3B,                 &
     ZNO3S                => micstt%ZNO3S,                 &
-    OMEauto              => micstt%OMEauto,               &
+    OMEAutor              => micstt%OMEAutor,               &
     FracBulkSOM          => micstt%FracBulkSOM            &
   )
 
@@ -414,14 +414,14 @@ module MicBGCMod
     IF(is_activef_micb(N))THEN
       DO NGL=JGniA(N),JGnfA(N)
         MID1=micpar%get_micb_id(1,NGL)
-        IF(OMEauto(ielmc,MID1).GT.ZEROS)THEN
-          CNOMActAutor(NGL)=AZMAX1(OMEauto(ielmn,MID1)/OMEauto(ielmc,MID1))
-          CPOMActAutor(NGL)=AZMAX1(OMEauto(ielmp,MID1)/OMEauto(ielmc,MID1))
+        IF(OMEAutor(ielmc,MID1).GT.ZEROS)THEN
+          CNOMActAutor(NGL)=AZMAX1(OMEAutor(ielmn,MID1)/OMEAutor(ielmc,MID1))
+          CPOMActAutor(NGL)=AZMAX1(OMEAutor(ielmp,MID1)/OMEAutor(ielmc,MID1))
         ELSE
           CNOMActAutor(NGL)=rNCOMCAutor(1,NGL)
           CPOMActAutor(NGL)=rPCOMCAutor(1,NGL)
         ENDIF
-        OMActAutor(NGL)=AZMAX1(OMEauto(ielmc,MID1)/FL(1))
+        OMActAutor(NGL)=AZMAX1(OMEAutor(ielmc,MID1)/FL(1))
         FCNAutor(NGL)=AMIN1(1.0_r8,AMAX1(0.50_r8,SQRT(CNOMActAutor(NGL)/rNCOMCAutor(1,NGL))))
         FCPAutor(NGL)=AMIN1(1.0_r8,AMAX1(0.50_r8,SQRT(CPOMActAutor(NGL)/rPCOMCAutor(1,NGL))))
         FBiomStoiScalarAutor(NGL)=AMIN1(FCNAutor(NGL),FCPAutor(NGL))
@@ -435,10 +435,10 @@ module MicBGCMod
           TotBiomNO2Consumers=TotBiomNO2Consumers+OMActAutor(NGL)
         ENDIF
         MID2=micpar%get_micb_id(2,NGL)
-        OMC2Autor(NGL)=AZMAX1(AMIN1(OMActAutor(NGL)*FL(2),OMEauto(ielmc,MID2)))
-        IF(OMEauto(ielmc,MID2).GT.ZEROS)THEN
-          FOM2Autor(NGL)=AZMAX1(OMC2Autor(NGL)/OMEauto(ielmc,MID2))
-          OMN2Autor(NGL)=AZMAX1(FOM2Autor(NGL)*OMEauto(ielmn,MID2))
+        OMC2Autor(NGL)=AZMAX1(AMIN1(OMActAutor(NGL)*FL(2),OMEAutor(ielmc,MID2)))
+        IF(OMEAutor(ielmc,MID2).GT.ZEROS)THEN
+          FOM2Autor(NGL)=AZMAX1(OMC2Autor(NGL)/OMEAutor(ielmc,MID2))
+          OMN2Autor(NGL)=AZMAX1(FOM2Autor(NGL)*OMEAutor(ielmn,MID2))
         ELSE
           FOM2Autor(NGL)=0.0_r8
           OMN2Autor(NGL)=0.0_r8
@@ -588,7 +588,7 @@ module MicBGCMod
     H1POB               => micstt%H1POB,                 &
     H2PO4               => micstt%H2PO4,                 &
     H2POB               => micstt%H2POB,                 &
-    OMEauto             => micstt%OMEauto,               &
+    OMEAutor             => micstt%OMEAutor,               &
     OMEheter            => micstt%OMEheter               &
   )
   RH2UptkAutor=0.0_r8
@@ -637,7 +637,7 @@ module MicBGCMod
       DO NGL=JGniA(N),JGnfA(N)
         DO M=1,2
           MID=micpar%get_micb_id(M,NGL)
-          TOMCNK(M)=TOMCNK(M)+OMEauto(ielmc,MID)
+          TOMCNK(M)=TOMCNK(M)+OMEAutor(ielmc,MID)
         ENDDO
 
         WatStressMicb=EXP(0.2_r8*PSISoilMatricP)
@@ -1480,7 +1480,7 @@ module MicBGCMod
     RNO2ReduxChemo       => nmicdiag%RNO2ReduxChemo,    &
     TORC                 => nmicdiag%TORC,              &
     RCMMEautor           => nmicf%RCMMEautor,           &
-    RCOMEautor           => nmicf%RCOMEautor,           &
+    RCOMEAutorr           => nmicf%RCOMEAutorr,           &
     SolidOM              => micstt%SolidOM,             &
     iprotein             => micpar%iprotein,            &
     SolidOMAct           => micstt%SolidOMAct,          &
@@ -1517,7 +1517,7 @@ module MicBGCMod
       D1680: DO M=1,ndbiomcp
         DO NGL=JGniA(N),JGnfA(N)
         DO NE=1,NumPlantChemElms
-          RCCMEheter(NE,M,NGL,K)=(RCOMEautor(NE,M,NGL)+RCMMEautor(NE,M,NGL))*FORC(K)
+          RCCMEheter(NE,M,NGL,K)=(RCOMEAutorr(NE,M,NGL)+RCMMEautor(NE,M,NGL))*FORC(K)
           ENDDO
         ENDDO
       ENDDO D1680
@@ -1876,7 +1876,7 @@ module MicBGCMod
     RNO3ProdSoilChemo        => nmicdiag%RNO3ProdSoilChemo,      &
     RNO3ProdBandChemo        => nmicdiag%RNO3ProdBandChemo,      &
     VOLWZ                    => nmicdiag%VOLWZ,                  &
-    CGOMEautor               => nmicf%CGOMEautor,                &
+    CGOMEAutorr               => nmicf%CGOMEAutorr,                &
     RNO2ReduxAutorBand       => nmicf%RNO2ReduxAutorBand,        &
     RNO3UptkAutor            => nmicf%RNO3UptkAutor,             &
     RCH4ProdAutor            => nmicf%RCH4ProdAutor,             &
@@ -1994,7 +1994,7 @@ module MicBGCMod
   D645: DO N=1,NumMicbFunGroups
     IF(micpar%is_CO2_autotroph(N))THEN
       DO NGL=JGniA(N),JGnfA(N)
-        naqfdiag%TRGOA=naqfdiag%TRGOA+CGOMEautor(ielmc,NGL)
+        naqfdiag%TRGOA=naqfdiag%TRGOA+CGOMEAutorr(ielmc,NGL)
       ENDDO
     ENDIF
   ENDDO D645
@@ -2024,7 +2024,7 @@ module MicBGCMod
 
   DO NGL=JGniA(AerobicMethanotrofBacter),JGnfA(AerobicMethanotrofBacter)
     RCO2NetUptkMicb=RCO2NetUptkMicb-RSOxidSoilAutor(NGL)
-    RCH4UptkAutor=RCH4UptkAutor+RSOxidSoilAutor(NGL)+CGOMEautor(ielmc,NGL)
+    RCH4UptkAutor=RCH4UptkAutor+RSOxidSoilAutor(NGL)+CGOMEAutorr(ielmc,NGL)
   ENDDO
   RH2NetUptkMicb =RH2UptkAutor-naqfdiag%TRGOH
   RO2UptkMicb=naqfdiag%TUPOX

@@ -150,9 +150,9 @@ implicit none
           DO M=1,nlbiomcp
             MID=micpar%get_micb_id(M,NGL)        
             DO NE=1,NumPlantChemElms              
-              FOMC=FSINK*OMEauto(NE,MID,L,NY,NX)
-              OMEauto(NE,MID,LL,NY,NX)=OMEauto(NE,MID,LL,NY,NX)+FOMC
-              OMEauto(NE,MID,L,NY,NX)=OMEauto(NE,MID,L,NY,NX)-FOMC
+              FOMC=FSINK*OMEAutor(NE,MID,L,NY,NX)
+              OMEAutor(NE,MID,LL,NY,NX)=OMEAutor(NE,MID,LL,NY,NX)+FOMC
+              OMEAutor(NE,MID,L,NY,NX)=OMEAutor(NE,MID,L,NY,NX)-FOMC
             ENDDO
           enddo
         enddo

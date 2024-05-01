@@ -806,7 +806,7 @@ implicit none
         DO NGL=JGniA(N),JGnfA(N)
           MID=micpar%get_micb_id(M,NGL)
           DO NE=1,NumPlantChemElms
-            OMEauto(NE,MID,L1,NY,NX)=OMEauto(NE,MID,L1,NY,NX)+FX*OMEauto(NE,MID,L0,NY,NX)
+            OMEAutor(NE,MID,L1,NY,NX)=OMEAutor(NE,MID,L1,NY,NX)+FX*OMEAutor(NE,MID,L0,NY,NX)
           ENDDO
         enddo
       enddo
@@ -991,7 +991,7 @@ implicit none
         DO NGL=JGniA(N),JGnfA(N)
           MID=micpar%get_micb_id(M,NGL)
           DO NE=1,NumPlantChemElms
-            OMEauto(NE,MID,L0,NY,NX)=FY*OMEauto(NE,MID,L0,NY,NX)
+            OMEAutor(NE,MID,L0,NY,NX)=FY*OMEAutor(NE,MID,L0,NY,NX)
           ENDDO
         ENDDO
       enddo
@@ -1137,15 +1137,15 @@ implicit none
       DO  M=1,nlbiomcp
         DO NGL=JGniA(N),JGnfA(N)
           MID=micpar%get_micb_id(M,NGL)
-          FXOMC=FXO*OMEauto(ielmc,MID,L0,NY,NX)
-          OMEauto(ielmc,MID,L1,NY,NX)=OMEauto(ielmc,MID,L1,NY,NX)+FXOMC
-          OMEauto(ielmc,MID,L0,NY,NX)=OMEauto(ielmc,MID,L0,NY,NX)-FXOMC
-          FXOMN=FXO*OMEauto(ielmn,MID,L0,NY,NX)
-          OMEauto(ielmn,MID,L1,NY,NX)=OMEauto(ielmn,MID,L1,NY,NX)+FXOMN
-          OMEauto(ielmn,MID,L0,NY,NX)=OMEauto(ielmn,MID,L0,NY,NX)-FXOMN
-          FXOMP=FXO*OMEauto(ielmp,MID,L0,NY,NX)
-          OMEauto(ielmp,MID,L1,NY,NX)=OMEauto(ielmp,MID,L1,NY,NX)+FXOMP
-          OMEauto(ielmp,MID,L0,NY,NX)=OMEauto(ielmp,MID,L0,NY,NX)-FXOMP
+          FXOMC=FXO*OMEAutor(ielmc,MID,L0,NY,NX)
+          OMEAutor(ielmc,MID,L1,NY,NX)=OMEAutor(ielmc,MID,L1,NY,NX)+FXOMC
+          OMEAutor(ielmc,MID,L0,NY,NX)=OMEAutor(ielmc,MID,L0,NY,NX)-FXOMC
+          FXOMN=FXO*OMEAutor(ielmn,MID,L0,NY,NX)
+          OMEAutor(ielmn,MID,L1,NY,NX)=OMEAutor(ielmn,MID,L1,NY,NX)+FXOMN
+          OMEAutor(ielmn,MID,L0,NY,NX)=OMEAutor(ielmn,MID,L0,NY,NX)-FXOMN
+          FXOMP=FXO*OMEAutor(ielmp,MID,L0,NY,NX)
+          OMEAutor(ielmp,MID,L1,NY,NX)=OMEAutor(ielmp,MID,L1,NY,NX)+FXOMP
+          OMEAutor(ielmp,MID,L0,NY,NX)=OMEAutor(ielmp,MID,L0,NY,NX)-FXOMP
         enddo
       enddo
     enddo

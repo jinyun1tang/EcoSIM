@@ -143,19 +143,19 @@ module NitroDisturbMod
           DO NGL=JGniA(N),JGnfA(N)
             DO M=1,nlbiomcp
               MID=micpar%get_micb_id(M,NGL)
-              OCH=DCORPC*OMEauto(ielmc,MID,L,NY,NX)
-              ONH=DCORPC*OMEauto(ielmn,MID,L,NY,NX)
-              OPH=DCORPC*OMEauto(ielmp,MID,L,NY,NX)
+              OCH=DCORPC*OMEAutor(ielmc,MID,L,NY,NX)
+              ONH=DCORPC*OMEAutor(ielmn,MID,L,NY,NX)
+              OPH=DCORPC*OMEAutor(ielmp,MID,L,NY,NX)
               ONX=EFIRE(1,ITILL(I,NY,NX))*ONH
               OPX=EFIRE(2,ITILL(I,NY,NX))*OPH
               ONL(4,1)=ONL(4,1)+ONH-ONX
               OPL(4,1)=OPL(4,1)+OPH-OPX
-              OMEauto(ielmc,MID,L,NY,NX)=OMEauto(ielmc,MID,L,NY,NX)-OCH
-              OMEauto(ielmn,MID,L,NY,NX)=OMEauto(ielmn,MID,L,NY,NX)-ONH
-              OMEauto(ielmp,MID,L,NY,NX)=OMEauto(ielmp,MID,L,NY,NX)-OPH
-              DC=DC+OMEauto(ielmc,MID,L,NY,NX)
-              DN=DN+OMEauto(ielmn,MID,L,NY,NX)
-              DP=DP+OMEauto(ielmp,MID,L,NY,NX)
+              OMEAutor(ielmc,MID,L,NY,NX)=OMEAutor(ielmc,MID,L,NY,NX)-OCH
+              OMEAutor(ielmn,MID,L,NY,NX)=OMEAutor(ielmn,MID,L,NY,NX)-ONH
+              OMEAutor(ielmp,MID,L,NY,NX)=OMEAutor(ielmp,MID,L,NY,NX)-OPH
+              DC=DC+OMEAutor(ielmc,MID,L,NY,NX)
+              DN=DN+OMEAutor(ielmn,MID,L,NY,NX)
+              DP=DP+OMEAutor(ielmp,MID,L,NY,NX)
               OC=OC+OCH
               ON=ON+ONX
               OP=OP+OPX
@@ -325,6 +325,7 @@ module NitroDisturbMod
         ENDIF
         ORGC(L,NY,NX)=DC
         ORGN(L,NY,NX)=DN
+        ORGP(L,NY,NX)=DP
         IF(L.EQ.0)THEN
           HFLXD=4.19E-06_r8*(ORGCX(L,NY,NX)-ORGC(L,NY,NX))*TKS(L,NY,NX)
           HEATOU=HEATOU+HFLXD

@@ -122,12 +122,12 @@ implicit none
 !       0.25_r8 is the geometric decreasing ratio (tunable)
 !  or different scheme can be used
     CORGC(L,NY,NX)=0.25_r8*CORGC(L-1,NY,NX)
-    CORGR(L,NY,NX)=0.25_r8*CORGR(L-1,NY,NX)
+    COMLitrC_vr(L,NY,NX)=0.25_r8*COMLitrC_vr(L-1,NY,NX)
     CORGN(L,NY,NX)=0.25_r8*CORGN(L-1,NY,NX)
     CORGP(L,NY,NX)=0.25_r8*CORGP(L-1,NY,NX)
 !     ELSE
 !       CORGC(L,NY,NX)=CORGC(L-1,NY,NX)
-!       CORGR(L,NY,NX)=CORGR(L-1,NY,NX)
+!       COMLitrC_vr(L,NY,NX)=COMLitrC_vr(L-1,NY,NX)
 !       CORGN(L,NY,NX)=CORGN(L-1,NY,NX)
 !       CORGP(L,NY,NX)=CORGP(L-1,NY,NX)
 !     ENDIF

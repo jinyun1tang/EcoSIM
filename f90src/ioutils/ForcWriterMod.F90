@@ -167,7 +167,7 @@ implicit none
             long_name='heterotrophic microbial biomass element in each complex',  &
             units='gC d-2', missing_value=spval, fill_value=spval)
 
-    call ncd_defvar(ncf, 'OMEauto', ncd_float, dim1name='element',dim2name='NumLiveAutoBioms',&
+    call ncd_defvar(ncf, 'OMEAutor', ncd_float, dim1name='element',dim2name='NumLiveAutoBioms',&
             long_name='microbial biomass element in autotrophic complex',  &
             units='gC d-2', missing_value=spval, fill_value=spval)
 
@@ -264,7 +264,7 @@ implicit none
     call ncd_putvar(ncf,'OSA',SolidOMAct_vr(:,:,L,NY,NX))
     call ncd_putvar(ncf,'ORM',OMBioResdu_vr(:,:,:,L,NY,NX))
     call ncd_putvar(ncf,'OMEheter',OMEheter(:,:,:,L,NY,NX))
-    call ncd_putvar(ncf,'OMEauto',OMEauto(:,:,L,NY,NX))
+    call ncd_putvar(ncf,'OMEAutor',OMEAutor(:,:,L,NY,NX))
 
     if(bgc_forc_conf%laddband)then
       call ncd_putvar(ncf,'ZNH4S',trc_solml_vr(ids_NH4,L,NY,NX)+trc_solml_vr(ids_NH4B,L,NY,NX))

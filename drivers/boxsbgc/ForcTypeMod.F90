@@ -72,7 +72,7 @@ implicit none
     real(r8), allocatable :: SorbedOM(:,:)
     real(r8), allocatable :: DOM(:,:)
     real(r8), allocatable :: OMEheter(:,:,:)
-    real(r8), allocatable :: OMEauto(:,:)
+    real(r8), allocatable :: OMEAutor(:,:)
 
 !    real(r8) :: O2_irrig_conc        !surface irrigation  O2 concentration, [g m-3]
 !    real(r8) :: O2_rain_conc        !precipitation  O2 concentration, [g m-3]
@@ -241,7 +241,7 @@ implicit none
   allocate(forc%SolidOM(1:NumPlantChemElms,jsken,1:jcplx))
   allocate(forc%SolidOMAct(jsken,1:jcplx))
   allocate(forc%OMBioResdu(1:NumPlantChemElms,ndbiomcp,1:jcplx))
-  allocate(forc%OMEauto(NumPlantChemElms,NumLiveAutoBioms))
+  allocate(forc%OMEAutor(NumPlantChemElms,NumLiveAutoBioms))
   allocate(forc%SorbedOM(idom_beg:idom_end,1:jcplx))
   allocate(forc%CFOMC(ndbiomcp))
   allocate(forc%CNOSC(1:jsken,1:jcplx))
@@ -290,7 +290,7 @@ implicit none
   call ncd_getvar(ncf,'BKDS',forc%BKDS)
   call ncd_getvar(ncf,'ATCS',forc%ATCS)
   call ncd_getvar(ncf,'OMEheter',forc%OMEheter)
-  call ncd_getvar(ncf,'OMEauto',forc%OMEauto)
+  call ncd_getvar(ncf,'OMEAutor',forc%OMEAutor)
   call ncd_getvar(ncf,'OSM',forc%SolidOM)
   call ncd_getvar(ncf,'OSA',forc%SolidOMAct)
   call ncd_getvar(ncf,'ORM',forc%OMBioResdu)

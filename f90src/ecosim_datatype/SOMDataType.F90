@@ -23,13 +23,14 @@ module SOMDataType
   real(r8),target,allocatable :: DOM_Macp(:,:,:,:,:)                      !dissolved organic C macropore	[g d-2]
   real(r8),target,allocatable :: ORGC(:,:,:)                        !total soil organic C [g d-2]
   real(r8),target,allocatable :: ORGN(:,:,:)                        !total soil organic N [g d-2]
+  real(r8),target,allocatable :: ORGP(:,:,:)                        !total soil organic P [g d-2]
   real(r8),target,allocatable :: ORGCX(:,:,:)                       !SOC concentration	[g Mg-1]
   real(r8),target,allocatable :: SolidOMAct_vr(:,:,:,:,:)                     !colonized humus C in each complex [g d-2]
-  real(r8),target,allocatable :: ORGR(:,:,:)                        !total particulate organic C [g d-2]
+  real(r8),target,allocatable :: OMLitrC_vr(:,:,:)                        !total particulate organic C [g d-2]
   real(r8),target,allocatable :: CORGC(:,:,:)                       !soil organic C content [g kg-1]
   real(r8),target,allocatable :: CORGN(:,:,:)                       !soil organic N content [mg kg-1]
   real(r8),target,allocatable :: CORGP(:,:,:)                       !soil organic P content  [mg kg-1]
-  real(r8),target,allocatable :: CORGR(:,:,:)                       !soil particulate C content [g kg-1]
+  real(r8),target,allocatable :: COMLitrC_vr(:,:,:)                       !soil particulate C content [g kg-1]
   real(r8),target,allocatable :: CFOMC(:,:,:,:)                     !allocation coefficient to humus fractions
   real(r8),target,allocatable ::  TOMET(:,:,:)                         !total micriobial C, [g d-2]
   real(r8),target,allocatable ::  URSDM(:,:,:)                        !total litter C, [g d-2]
@@ -75,13 +76,14 @@ module SOMDataType
   allocate(DOM_Macp(idom_beg:idom_end,1:jcplx,0:JZ,JY,JX));DOM_MacP=0._r8
   allocate(ORGC(0:JZ,JY,JX))
   allocate(ORGN(0:JZ,JY,JX))
+  allocate(ORGP(0:JZ,JY,JX))
   allocate(ORGCX(0:JZ,JY,JX))
   allocate(SolidOMAct_vr(jsken,1:jcplx,0:JZ,JY,JX));SolidOMAct_vr=0._r8
-  allocate(ORGR(0:JZ,JY,JX))
+  allocate(OMLitrC_vr(0:JZ,JY,JX));OMLitrC_vr=0._r8
   allocate(CORGC(0:JZ,JY,JX))
   allocate(CORGN(JZ,JY,JX))
   allocate(CORGP(JZ,JY,JX))
-  allocate(CORGR(JZ,JY,JX))
+  allocate(COMLitrC_vr(JZ,JY,JX));COMLitrC_vr=0._r8
   allocate(CFOMC(2,JZ,JY,JX))
   allocate(TOMET(NumPlantChemElms,JY,JX));        TOMET=0._r8
   allocate(URSDM(NumPlantChemElms,JY,JX));       URSDM=0._r8
@@ -117,13 +119,14 @@ module SOMDataType
   call destroy(DOM_MacP)
   call destroy(ORGC)
   call destroy(ORGN)
+  call destroy(ORGP)
   call destroy(ORGCX)
   call destroy(SolidOMAct_vr)
-  call destroy(ORGR)
+  call destroy(OMLitrC_vr)
   call destroy(CORGC)
   call destroy(CORGN)
   call destroy(CORGP)
-  call destroy(CORGR)
+  call destroy(COMLitrC_vr)
   call destroy(CFOMC)
   call destroy(TOMET)
   call destroy(URSDM)

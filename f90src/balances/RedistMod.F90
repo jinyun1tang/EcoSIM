@@ -655,7 +655,7 @@ module RedistMod
         DO  M=1,nlbiomcp
           MID=micpar%get_micb_id(M,NGL)
           DO NE=1,NumPlantChemElms
-            OMEauto(NE,MID,NU(NY,NX),NY,NX)=OMEauto(NE,MID,NU(NY,NX),NY,NX)+TOMEERauto(NE,MID,NY,NX)
+            OMEAutor(NE,MID,NU(NY,NX),NY,NX)=OMEAutor(NE,MID,NU(NY,NX),NY,NX)+TOMEERauto(NE,MID,NY,NX)
           ENDDO
           DORGE(NY,NX)=DORGE(NY,NX)+TOMEERauto(ielmc,MID,NY,NX)
           DORGP=DORGP+TOMEERauto(ielmp,MID,NY,NX)
@@ -741,7 +741,7 @@ module RedistMod
   tDElmt=0._r8
   DO NB=1,NumLiveAutoBioms
     DO NE=1,NumPlantChemElms
-      tDElmt(NE)=tDElmt(NE)+OMEauto(NE,NB,0,NY,NX)
+      tDElmt(NE)=tDElmt(NE)+OMEAutor(NE,NB,0,NY,NX)
     ENDDO
   ENDDO
   RC0ff(NY,NX)=RC0ff(NY,NX)+tDElmt(ielmc)
@@ -790,7 +790,7 @@ module RedistMod
 
   ORGC(0,NY,NX)=DES(ielmc)
   ORGN(0,NY,NX)=DES(ielmn)
-  ORGR(0,NY,NX)=DES(ielmc)
+  OMLitrC_vr(0,NY,NX)=DES(ielmc)
 
   DO NE=1,NumPlantChemElms
     LitRMStoreLndscap(NE)=LitRMStoreLndscap(NE)+DES(NE)
@@ -1465,7 +1465,7 @@ module RedistMod
 
 ! add autotrophs
   DO NE=1,NumPlantChemElms
-    tDES(NE)=SUM(OMEauto(NE,1:NumLiveAutoBioms,L,NY,NX))
+    tDES(NE)=SUM(OMEAutor(NE,1:NumLiveAutoBioms,L,NY,NX))
     OM(NE)=OM(NE)+tDES(NE)
     TOMET(NE,NY,NX)=TOMET(NE,NY,NX)+tDES(NE)
   ENDDO
@@ -1504,7 +1504,8 @@ module RedistMod
   !litter plus non-litter
   ORGC(L,NY,NX)=DES(ielmc)+OM(ielmc)
   ORGN(L,NY,NX)=DES(ielmn)+OM(ielmn)
-  ORGR(L,NY,NX)=DES(ielmc)
+  ORGP(L,NY,NX)=DES(ielmp)+OM(ielmp)
+  OMLitrC_vr(L,NY,NX)=DES(ielmc)
 
   IF(iErosionMode.EQ.ieros_frzthawsom.OR.iErosionMode.EQ.ieros_frzthawsomeros)THEN
 ! change in organic C
