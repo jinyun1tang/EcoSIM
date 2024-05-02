@@ -60,7 +60,7 @@ module nitrosMod
 !     OMLitrC_vr=total litter C
 !     FOSCZ0=rate constant for mixing surface litter
 !     FracLitrMix=mixing fraction for surface litter
-!     TOQCK=total active biomass respiration activity
+!     TMicHeterAct_vr=total active biomass respiration activity
 !     VLSoilPoreMicP_vr=soil layer volume
 !     OSCXD=mixing required for equilibrating litter concentration
 !     FOSCXD=mixing fraction for equilibrating subsurface litter
@@ -71,7 +71,7 @@ module nitrosMod
       IF(L.EQ.0)THEN
         LL=NU(NY,NX)
         IF(OMLitrC_vr(L,NY,NX).GT.ZEROS(NY,NX))THEN
-          FracLitrMix=AMIN1(1.0_r8,FOSCZ0/OMLitrC_vr(L,NY,NX)*TOQCK(L,NY,NX))
+          FracLitrMix=AMIN1(1.0_r8,FOSCZ0/OMLitrC_vr(L,NY,NX)*TMicHeterAct_vr(L,NY,NX))
         ELSE
           FracLitrMix=0.0_r8
         ENDIF
@@ -93,7 +93,7 @@ module nitrosMod
           FOSCXD=0.0_r8
         ENDIF
         IF(VGeomLayer(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-          FracLitrMix=FOSCZL*FOSCXD*TOQCK(L,NY,NX)/VGeomLayer(L,NY,NX)
+          FracLitrMix=FOSCZL*FOSCXD*TMicHeterAct_vr(L,NY,NX)/VGeomLayer(L,NY,NX)
         ELSE
           FracLitrMix=0.0_r8
         ENDIF

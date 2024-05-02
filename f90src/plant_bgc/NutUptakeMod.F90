@@ -1230,7 +1230,7 @@ module NutUptakeMod
     VLWatMicPM                =>  plt_site%VLWatMicPM                , &
     RootVH2O_pvr              =>  plt_morph%RootVH2O_pvr             , &
     RootMycoExudElm_pvr       =>  plt_rbgc%RootMycoExudElm_pvr       , &
-    FracBulkSOM_vr                     =>  plt_soilchem%FracBulkSOM_vr                 , &
+    FracBulkSOMC_vr                     =>  plt_soilchem%FracBulkSOMC_vr                 , &
     DOM                       =>  plt_soilchem%DOM                     &
   )
   !
@@ -1238,7 +1238,7 @@ module NutUptakeMod
   !     BETWEEN ROOT NON-STRUCTURAL POOLS AND SOIL DISSOLVED POOLS
   !
   !     VLWatMicPMM=soil micropore water volume
-  !     FracBulkSOM_vr=fraction of total SOC in each substrate K from nitro.f
+  !     FracBulkSOMC_vr=fraction of total SOC in each substrate K from nitro.f
   !     RootVH2O_pvr=root aqueous volume
   !     CPOOLR,ZPOOLR,PPOOLR=non-structural C,N,P in root,myco
   !     XFRC,XFRN,XFRP=nonstructural C,N,P exchg at root-soil DOC equilibrium
@@ -1252,7 +1252,7 @@ module NutUptakeMod
   !     OSTR=O2 stress indicator
   !
   D195: DO K=1,jcplx
-    VLWatMicPK=VLWatMicPM(NPH,L)*FracBulkSOM_vr(K,L)
+    VLWatMicPK=VLWatMicPM(NPH,L)*FracBulkSOMC_vr(K,L)
     IF(VLWatMicPK.GT.ZEROS2.AND.RootVH2O_pvr(N,L,NZ).GT.ZEROP(NZ))THEN
       VLWatMicPT=VLWatMicPK+RootVH2O_pvr(N,L,NZ)
       CPOOLX=AMIN1(1.25E+03_r8*RootVH2O_pvr(N,L,NZ),RootMycoNonstElms_rpvr(ielmc,N,L,NZ))

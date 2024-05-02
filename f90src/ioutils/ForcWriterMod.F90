@@ -135,7 +135,7 @@ implicit none
             units='mg kg-1', missing_value=spval, fill_value=spval)
     call ncd_defvar(ncf, 'CCASO', ncd_float, long_name='soil CaSO4 content',  &
             units='mg kg-1', missing_value=spval, fill_value=spval)
-    call ncd_defvar(ncf, 'FracBulkSOM_vr', ncd_float, dim1name='jcplx',&
+    call ncd_defvar(ncf, 'FracBulkSOMC_vr', ncd_float, dim1name='jcplx',&
             long_name='fraction of total organic C in complex',  &
             units='none', missing_value=spval, fill_value=spval)
     call ncd_defvar(ncf, 'OQM', ncd_float, dim1name='ndom',dim2name='jcplx',&
@@ -253,7 +253,7 @@ implicit none
     call ncd_putvar(ncf,'CCASO',CCASO(L,NY,NX))
     call ncd_putvar(ncf,'BKDS',SoiBulkDensity(L,NY,NX))
 
-    call ncd_putvar(ncf,'FracBulkSOM_vr',FracBulkSOM_vr(:,L,NY,NX))
+    call ncd_putvar(ncf,'FracBulkSOMC_vr',FracBulkSOMC_vr(:,L,NY,NX))
     call ncd_putvar(ncf,'OQM',DOM(:,:,L,NY,NX))
     call ncd_putvar(ncf,'OHM',SorbedOM_vr(:,:,L,NY,NX))
 

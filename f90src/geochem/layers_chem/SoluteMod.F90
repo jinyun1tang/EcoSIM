@@ -153,13 +153,13 @@ module SoluteMod
 !
 !     UREA HYDROLYSIS IN BAND AND NON-BAND SOIL ZONES
 !
-!     VOLQ=biologically active soil water volume from nitro.f
+!     VWatMicrobAct_vr=biologically active soil water volume from nitro.f
 !     COMA=concentration of active biomass
-!     TOQCK=total microbial activity from nitro.f
+!     TMicHeterAct_vr=total microbial activity from nitro.f
 !     DUKD=Km for urea hydrolysis
 !
-  IF(VOLQ(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-    COMA=AMIN1(0.1E+06_r8,TOQCK(L,NY,NX)/VOLQ(L,NY,NX))
+  IF(VWatMicrobAct_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
+    COMA=AMIN1(0.1E+06_r8,TMicHeterAct_vr(L,NY,NX)/VWatMicrobAct_vr(L,NY,NX))
   ELSE
     COMA=0.1E+06_r8
   ENDIF
@@ -195,7 +195,7 @@ module SoluteMod
     CNHUA=0._r8
   ENDIF
   DFNSA=CNHUA/(CNHUA+DUKD)
-  RSNUA=AMIN1(FertN_soil_vr(ifert_urea,L,NY,NX),SPNHU*TOQCK(L,NY,NX)*DFNSA*TSens4MicbGrwoth_vr(L,NY,NX))*(1.0-ZNHUI(L,NY,NX))
+  RSNUA=AMIN1(FertN_soil_vr(ifert_urea,L,NY,NX),SPNHU*TMicHeterAct_vr(L,NY,NX)*DFNSA*TSens4MicbGrwoth_vr(L,NY,NX))*(1.0-ZNHUI(L,NY,NX))
 !
 !     UREA CONCENTRATION AND HYDROLYSIS IN BAND
 !
@@ -214,7 +214,7 @@ module SoluteMod
     CNHUB=0._r8
   ENDIF
   DFNSB=CNHUB/(CNHUB+DUKD)
-  RSNUB=AMIN1(FertN_Band_vr(ifert_urea_band,L,NY,NX),SPNHU*TOQCK(L,NY,NX)*DFNSB*TSens4MicbGrwoth_vr(L,NY,NX))*(1.0-ZNHUI(L,NY,NX))
+  RSNUB=AMIN1(FertN_Band_vr(ifert_urea_band,L,NY,NX),SPNHU*TMicHeterAct_vr(L,NY,NX)*DFNSB*TSens4MicbGrwoth_vr(L,NY,NX))*(1.0-ZNHUI(L,NY,NX))
 
   end subroutine UreaHydrolysis
 !------------------------------------------------------------------------
@@ -924,13 +924,13 @@ module SoluteMod
 !
 !     UREA HYDROLYSIS IN SURFACE RESIDUE
 !
-!     VOLQ=biologically active litter water volume from nitro.f
+!     VWatMicrobAct_vr=biologically active litter water volume from nitro.f
 !     COMA=concentration of active biomass
-!     TOQCK=total microbial activity from nitro.f
+!     TMicHeterAct_vr=total microbial activity from nitro.f
 !     DUKD=Km for urea hydrolysis
 !
-    IF(VOLQ(0,NY,NX).GT.ZEROS2(NY,NX))THEN
-      COMA=AMIN1(0.1E+06_r8,TOQCK(0,NY,NX)/VOLQ(0,NY,NX))
+    IF(VWatMicrobAct_vr(0,NY,NX).GT.ZEROS2(NY,NX))THEN
+      COMA=AMIN1(0.1E+06_r8,TMicHeterAct_vr(0,NY,NX)/VWatMicrobAct_vr(0,NY,NX))
     ELSE
       COMA=0.1E+06_r8
     ENDIF
@@ -962,7 +962,7 @@ module SoluteMod
       .AND.SoilMicPMassLayer(0,NY,NX).GT.ZEROS(NY,NX))THEN
       CNHUA=FertN_soil_vr(ifert_urea,0,NY,NX)/SoilMicPMassLayer(0,NY,NX)
       DFNSA=CNHUA/(CNHUA+DUKD)
-      RSNUA=AMIN1(FertN_soil_vr(ifert_urea,0,NY,NX),SPNHU*TOQCK(0,NY,NX)*DFNSA*TSens4MicbGrwoth_vr(0,NY,NX))*(1.0_r8-ZNHUI(0,NY,NX))
+      RSNUA=AMIN1(FertN_soil_vr(ifert_urea,0,NY,NX),SPNHU*TMicHeterAct_vr(0,NY,NX)*DFNSA*TSens4MicbGrwoth_vr(0,NY,NX))*(1.0_r8-ZNHUI(0,NY,NX))
     ELSE
       RSNUA=0._r8
     ENDIF

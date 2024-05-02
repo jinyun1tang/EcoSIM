@@ -96,12 +96,15 @@ type, public :: NitroAQMFluxDiagType
   end type NitroMicStateType
 
   type, public :: NitroMicFluxType
-! flux ratios
+  !fluxes
+  real(r8) :: RTotNH3OxidSoilAutor
+  real(r8) :: RTotNH3OxidBandAutor  
+! allocatable flux ratios
   real(r8),allocatable :: AttenfNH4Heter(:,:)
   real(r8),allocatable :: AttenfNO3Heter(:,:)
   real(r8),allocatable :: AttenfH2PO4Heter(:,:)
   real(r8),allocatable :: AttenfH1PO4Heter(:,:)
-! fluxes
+! allocatable fluxes
   real(r8),allocatable :: CGOMEheter(:,:,:)
   real(r8),allocatable :: RAnabolDOCUptkHeter(:,:)
   real(r8),allocatable :: RAnabolAcetUptkHeter(:,:)
@@ -148,8 +151,7 @@ type, public :: NitroAQMFluxDiagType
   real(r8),allocatable :: RCH4ProdHeter(:,:)
   real(r8),allocatable :: RSOxidSoilAutor(:)
   real(r8),allocatable :: RSOxidBandAutor(:)
-  real(r8) :: RTotNH3OxidSoilAutor
-  real(r8) :: RTotNH3OxidBandAutor
+
   real(r8),allocatable :: XOMZ(:,:,:,:)
   real(r8),allocatable :: RH1PO4TransfSoilHeter(:,:)
   real(r8),allocatable :: RH1PO4TransfBandHeter(:,:)
@@ -221,7 +223,7 @@ type, public :: NitroAQMFluxDiagType
   end type NitroOMcplxFluxType
 
   type, public :: NitroOMcplxStateType
-    real(r8),allocatable :: BulkSOM(:)
+    real(r8),allocatable :: BulkSOMC(:)
     real(r8),allocatable :: TOMK(:)
     real(r8),allocatable :: TONK(:)
     real(r8),allocatable :: TOPK(:)
@@ -792,7 +794,7 @@ type, public :: NitroAQMFluxDiagType
   integer :: ncplx
 
   ncplx=micpar%jcplx
-  allocate(this%BulkSOM(1:ncplx));this%BulkSOM=spval
+  allocate(this%BulkSOMC(1:ncplx));this%BulkSOMC=spval
   allocate(this%TOMK(1:ncplx+1));this%TOMK=spval
   allocate(this%TONK(1:ncplx+1));this%TONK=spval
   allocate(this%TOPK(1:ncplx+1));this%TOPK=spval
@@ -817,7 +819,7 @@ type, public :: NitroAQMFluxDiagType
   implicit none
   class(NitroOMcplxStateType) :: this
 
-  this%BulkSOM=0._r8
+  this%BulkSOMC=0._r8
   this%TOMK=0._r8
   this%TONK=0._r8
   this%TOPK=0._r8
@@ -841,7 +843,7 @@ type, public :: NitroAQMFluxDiagType
   implicit none
   class(NitroOMcplxStateType) :: this
 
-  call destroy(this%BulkSOM)
+  call destroy(this%BulkSOMC)
   call destroy(this%TOMK)
   call destroy(this%TONK)
   call destroy(this%TOPK)

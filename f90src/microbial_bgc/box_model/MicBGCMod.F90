@@ -4,19 +4,19 @@ module MicBGCMod
 ! codes to do soil biological transfOMBioResduations
 !
 ! USES:
-  use data_kind_mod, only : r8 => DAT_KIND_R8
-  use abortutils  , only : endrun,destroy
+  use data_kind_mod, only: r8 => DAT_KIND_R8
+  use abortutils,    only: endrun, destroy
   use TracerIDMod
   use MicAutoCPLXMod
-  use minimathmod, only : safe_adb,AZMAX1
+  use minimathmod, only: safe_adb, AZMAX1
   use EcosimConst
   use EcoSIMSolverPar
   use NitroPars
   use NitroDiagTypes
-  use MicFLuxTypeMod, only : micfluxtype
-  use MicStateTraitTypeMod, only : micsttype
-  use MicForcTypeMod, only : micforctype
-  use EcoSiMParDataMod, only : micpar
+  use MicFLuxTypeMod,       only: micfluxtype
+  use MicStateTraitTypeMod, only: micsttype
+  use MicForcTypeMod,       only: micforctype
+  use EcoSiMParDataMod,     only: micpar
   use MicrobMathFuncMod
   use MicrobMathFuncMod
   implicit none
@@ -76,6 +76,8 @@ module MicBGCMod
   type(NitroMicFluxType) :: nmicf
   type(NitroOMcplxFluxType) :: ncplxf
   type(NitroOMcplxStateType) :: ncplxs
+  real(r8) :: totOMbeg(1:NumPlantChemElms)
+  real(r8) :: totOMend(1:NumPlantChemElms)
 
 ! begin_execution
   call nmicf%Init(jcplx,NumMicbFunGroups)
@@ -87,6 +89,8 @@ module MicBGCMod
   micflx%NetNH4Mineralize=0._r8;micflx%NetPO4Mineralize=0._r8
 ! write(*,*)'StageBGCEnvironCondition'
   call StageBGCEnvironCondition(micfor,KL,micstt,naqfdiag,nmicdiag,nmics,ncplxs)
+
+  call SumOneLayer(KL,micstt,totOMbeg)
 !
 ! write(*,*)'MicrobialCatabolism'
   call MicrobialCatabolism(micfor,micstt,micflx,nmicdiag, &
@@ -112,7 +116,7 @@ module MicBGCMod
         !
         !     TRANSFER ALL PRIMING AMONG ALL K
         !
-        !     TOQCK=total respiration of DOC+DOA in soil layer
+        !     TMicHeterAct=total respiration of DOC+DOA in soil layer
         !     ROQC4HeterMicActCmpK=total respiration of DOC+DOA in substrate complex
         !     OQC,OQN,OQP,OQA=DOC,DON,DOP,acetate in micropores
         !     OMC,OMN,OMP=microbial C,N,P
@@ -142,6 +146,9 @@ module MicBGCMod
 !     AGGREGATE ALL TRANSFOMBioResduATIONS CALCULATED ABOVE FOR EACH N,K
 !
   call AggregateTransfOMBioResduations(micfor,micstt,nmicdiag,naqfdiag,nmicf,ncplxf,micflx)
+
+  call SumOneLayer(KL,micstt,totOMend)
+
 !
   call nmics%destroy()
   call nmicf%destroy()
@@ -149,6 +156,61 @@ module MicBGCMod
   call ncplxs%destroy()
 
   end subroutine SoilBGCOneLayer
+!------------------------------------------------------------------------------------------
+  subroutine SumOneLayer(KL,micstt,toms)
+  implicit none
+  integer, intent(in) :: KL
+  type(micsttype), intent(in) :: micstt  
+  real(r8), intent(out) :: toms(1:NumPlantChemElms)
+  integer :: K,M,NBM,NE,N
+
+!     begin_execution
+  associate(                                      &  
+    SolidOM           => micstt%SolidOM,          &
+    OMBioResdu        => micstt%OMBioResdu,       &
+    SorbedOM          => micstt%SorbedOM,         &
+    DOM               => micstt%DOM,              &
+    OMEheter          => micstt%OMEheter,         &    
+    OMEAutor          => micstt%OMEAutor,         &
+    NumLiveAutoBioms  => micpar%NumLiveAutoBioms, &
+    NumLiveHeterBioms => micpar%NumLiveHeterBioms &
+  )
+
+  toms=0._r8
+  DO K=1,KL
+    DO M=1,jsken
+      DO NE=1,NumPlantChemElms
+        TOMS(NE)=TOMS(NE)+SolidOM(NE,M,K)
+      ENDDO
+    ENDDO
+
+    DO NBM=1,ndbiomcp
+      DO NE=1,NumPlantChemElms
+        TOMS(NE)=TOMS(NE)+OMBioResdu(NE,NBM,K)
+      ENDDO
+    ENDDO
+
+    DO NE=1,NumPlantChemElms
+      TOMS(NE)=TOMS(NE)+SorbedOM(NE,K)
+      TOMS(NE)=TOMS(NE)+DOM(NE,K)
+    ENDDO
+
+    DO N=1,NumLiveHeterBioms
+      DO NE=1,NumPlantChemElms
+        TOMS(NE)=TOMS(NE)+OMEheter(NE,N,K)
+      ENDDO
+    ENDDO
+  ENDDO
+
+  DO N=1,NumLiveAutoBioms
+    DO NE=1,NumPlantChemElms
+      TOMS(NE)=TOMS(NE)+OMEAutor(NE,N)      
+    ENDDO
+  ENDDO
+  
+  end associate
+
+  end subroutine SumOneLayer
 !------------------------------------------------------------------------------------------
 
   subroutine StageBGCEnvironCondition(micfor,KL,micstt,naqfdiag,nmicdiag,nmics,ncplxs)
@@ -160,12 +222,13 @@ module MicBGCMod
   type(NitroMicDiagType), intent(inout) :: nmicdiag
   type(NitroMicStateType), intent(inout) :: nmics
   type(NitroOMcplxStateType),intent(inout):: ncplxs
+  real(r8) :: TBulkOMC  
   integer  :: K
   integer  :: M,N,NGL,MID1,MID2
   real(r8) :: ORGCL
   real(r8) :: TKSO
-  real(r8) :: TOSC,TOSA,TOHC
-  real(r8) :: TSRH
+  real(r8) :: TOSC,TSolidOMActC,TSorbedOMC
+
 !     begin_execution
   associate(                                              &
     CNOMActHeter         => nmics%CNOMActHeter,           &
@@ -177,7 +240,7 @@ module MicBGCMod
     FCN                  => nmics%FCN,                    &
     FCP                  => nmics%FCP,                    &
     FBiomStoiScalarHeter => nmics%FBiomStoiScalarHeter,   &
-    BulkSOM              => ncplxs%BulkSOM,               &
+    BulkSOMC              => ncplxs%BulkSOMC,               &
     TOMK                 => ncplxs%TOMK,                  &
     TONK                 => ncplxs%TONK,                  &
     TOPK                 => ncplxs%TOPK,                  &
@@ -186,12 +249,12 @@ module MicBGCMod
     CNQ                  => ncplxs%CNQ,                   &
     CPQ                  => ncplxs%CPQ,                   &
     CDOM                 => ncplxs%CDOM,                  &
-    OMBioResduK                 => ncplxs%OMBioResduK,                  &
-    SolidOMK                 => ncplxs%SolidOMK,                  &
-    SolidOMActK                 => ncplxs%SolidOMActK,                  &
+    OMBioResduK          => ncplxs%OMBioResduK,           &
+    SolidOMK             => ncplxs%SolidOMK,              &
+    SolidOMActK          => ncplxs%SolidOMActK,           &
     TONX                 => ncplxs%TONX,                  &
     TOPX                 => ncplxs%TOPX,                  &
-    TOMBioResdu                 => nmicdiag%TOMBioResdu,                &
+    TOMBioResdu          => nmicdiag%TOMBioResdu,         &
     TotActMicrobiom      => nmicdiag%TotActMicrobiom,     &
     TotBiomNO2Consumers  => nmicdiag%TotBiomNO2Consumers, &
     XCO2                 => nmicdiag%XCO2,                &
@@ -258,7 +321,7 @@ module MicBGCMod
     ZNO3B                => micstt%ZNO3B,                 &
     ZNO3S                => micstt%ZNO3S,                 &
     OMEAutor             => micstt%OMEAutor,              &
-    FracBulkSOM          => micstt%FracBulkSOM            &
+    FracBulkSOMC          => micstt%FracBulkSOMC            &
   )
 
 ! get KL, the number of mic-om complexes
@@ -319,16 +382,16 @@ module MicBGCMod
 !
 !     TOTAL SUBSTRATE
 !
-!     TOSC=total SOC, TOSA=total colonized SOC
-!     TOMBioResdu=total microbial residue, TOHC=total adsorbed C
+!     TOSC=total SOC, TSolidOMActC=total colonized SOC
+!     TOMBioResdu=total microbial residue, TSorbedOMC=total adsorbed C
 !     in each K:
 !     SolidOMK=total SOC n each K, SolidOMActK=total colonized SOC
 !     OMBioResduK=total microbial residue, OHCT=total adsorbed C
 !
   TOSC=0.0_r8
-  TOSA=0.0_r8
+  TSolidOMActC=0.0_r8
   TOMBioResdu=0.0_r8
-  TOHC=0.0_r8
+  TSorbedOMC=0.0_r8
 !
 !     TOTAL SOLID SUBSTRATE
 !
@@ -341,7 +404,7 @@ module MicBGCMod
       SolidOMActK(K)=SolidOMActK(K)+SolidOMAct(M,K)
     enddo
     TOSC=TOSC+SolidOMK(K)
-    TOSA=TOSA+SolidOMActK(K)
+    TSolidOMActC=TSolidOMActC+SolidOMActK(K)
   enddo
 !
 !     TOTAL BIORESIDUE
@@ -355,16 +418,16 @@ module MicBGCMod
 !
 !     TOTAL ADSORBED AND DISSOLVED SUBSTRATE
 !
-!     BulkSOM=total SOC
+!     BulkSOMC=total SOC
 !
-    TOHC=TOHC+SorbedOM(ielmc,K)+SorbedOM(idom_acetate,K)
+    TSorbedOMC=TSorbedOMC+SorbedOM(ielmc,K)+SorbedOM(idom_acetate,K)
   enddo
 
   D860: DO K=1,KL
-    BulkSOM(K)=SolidOMActK(K)+OMBioResduK(K)+SorbedOM(ielmc,K)+SorbedOM(idom_acetate,K)
+    BulkSOMC(K)=SolidOMActK(K)+OMBioResduK(K)+SorbedOM(ielmc,K)+SorbedOM(idom_acetate,K)
   ENDDO D860
   
-  TSRH=TOSA+TOMBioResdu+TOHC
+  TBulkOMC=TSolidOMActC+TOMBioResdu+TSorbedOMC
 !
 !     C:N AND C:P RATIOS OF TOTAL BIOMASS
 !     CNOMA,CPOMA=N,P contents of active biomass OMA
@@ -487,25 +550,25 @@ module MicBGCMod
   ENDDO
 
 !
-!     FracBulkSOM=fraction of total SOC in each substrate complex K
+!     FracBulkSOMC=fraction of total SOC in each substrate complex K
 !
   D790: DO K=1,KL
-    IF(TSRH.GT.ZEROS)THEN
-      FracBulkSOM(K)=BulkSOM(K)/TSRH
+    IF(TBulkOMC.GT.ZEROS)THEN
+      FracBulkSOMC(K)=BulkSOMC(K)/TBulkOMC
     ELSE
-      FracBulkSOM(K)=1.0_r8
+      FracBulkSOMC(K)=1.0_r8
     ENDIF
     !
     !     DOC CONCENTRATIONS
     !
     !     COQC,COQA=aqueous DOC,acetate concentrations
-    !     VLWatMicPM=soil water content, FracBulkSOM=fraction of total SOC
+    !     VLWatMicPM=soil water content, FracBulkSOMC=fraction of total SOC
     !     occupied by each substrate complex K
     !
     IF(VLWatMicPM(NPH).GT.ZEROS2)THEN
-      IF(FracBulkSOM(K).GT.ZERO)THEN
-        CDOM(idom_doc,K)=AZMAX1(DOM(idom_doc,K)/(VLWatMicPM(NPH)*FracBulkSOM(K)))
-        CDOM(idom_acetate,K)=AZMAX1(DOM(idom_acetate,K)/(VLWatMicPM(NPH)*FracBulkSOM(K)))
+      IF(FracBulkSOMC(K).GT.ZERO)THEN
+        CDOM(idom_doc,K)=AZMAX1(DOM(idom_doc,K)/(VLWatMicPM(NPH)*FracBulkSOMC(K)))
+        CDOM(idom_acetate,K)=AZMAX1(DOM(idom_acetate,K)/(VLWatMicPM(NPH)*FracBulkSOMC(K)))
       ELSE
         CDOM(idom_doc,K)=AZMAX1(DOM(idom_doc,K)/VLWatMicPM(NPH))
         CDOM(idom_acetate,K)=AZMAX1(DOM(idom_acetate,K)/VLWatMicPM(NPH))
@@ -997,15 +1060,15 @@ module MicBGCMod
     ROQC4HeterMicActCmpK => ncplxf%ROQC4HeterMicActCmpK, &
     XOQCK                => ncplxf%XOQCK,                &
     XOQMZ                => ncplxf%XOQMZ,                &
-    BulkSOM              => ncplxs%BulkSOM,              &
-    TOQCK                => micstt%TOQCK,                &
+    BulkSOMC             => ncplxs%BulkSOMC,             &
+    TMicHeterAct         => micstt%TMicHeterAct,         &
     DOM                  => micstt%DOM,                  &
     OMEheter             => micstt%OMEheter,             &
     ZEROS                => micfor%ZEROS,                &
     TScal4Difsvity       => micfor%TScal4Difsvity        &
   )
 !
-!     BulkSOM=total SOC in each K
+!     BulkSOMC=total SOC in each K
 !     XFRK,XFRC,XFRN,XFRP,XFRA=transfer of respiration,DOC,DON,DOP,acetate
 !     between each K and KK, FPRIM=priming transfer rate constant
 !     TScal4Difsvity=temperature effect on priming transfers
@@ -1015,11 +1078,11 @@ module MicBGCMod
   D795: DO K=1,KL
     IF(K.LE.KL-1)THEN
       D800: DO KK=K+1,KL
-        OSRT=BulkSOM(K)+BulkSOM(KK)
-        IF(BulkSOM(K).GT.ZEROS.AND.BulkSOM(KK).GT.ZEROS)THEN
-          XFRK=FPRIM*TScal4Difsvity*(ROQC4HeterMicActCmpK(K)*BulkSOM(KK)-ROQC4HeterMicActCmpK(KK)*BulkSOM(K))/OSRT
+        OSRT=BulkSOMC(K)+BulkSOMC(KK)
+        IF(BulkSOMC(K).GT.ZEROS.AND.BulkSOMC(KK).GT.ZEROS)THEN
+          XFRK=FPRIM*TScal4Difsvity*(ROQC4HeterMicActCmpK(K)*BulkSOMC(KK)-ROQC4HeterMicActCmpK(KK)*BulkSOMC(K))/OSRT
           DO idom=idom_beg,idom_end
-            XFROM(idom)=FPRIM*TScal4Difsvity*(DOM(idom,K)*BulkSOM(KK)-DOM(idom,KK)*BulkSOM(K))/OSRT
+            XFROM(idom)=FPRIM*TScal4Difsvity*(DOM(idom,K)*BulkSOMC(KK)-DOM(idom,KK)*BulkSOMC(K))/OSRT
           ENDDO
           IF(ROQC4HeterMicActCmpK(K)+XOQCK(K)-XFRK.GT.0.0_r8 .AND. ROQC4HeterMicActCmpK(KK)+XOQCK(KK)+XFRK.GT.0.0_r8)THEN
             XOQCK(K)=XOQCK(K)-XFRK
@@ -1039,7 +1102,7 @@ module MicBGCMod
 !     between each K and KK, FPRIMM=priming transfer rate constant
 !     GrowthEnvScalHeter=temperature+water effect
 !     OMC,OMN,OMP=microbial C,N,P
-!     BulkSOM=total SOC in each K
+!     BulkSOMC=total SOC in each K
 !     XOMCZ,XOMNZ,XOMPZ=total microbial C,N,P transfer for all K
 !
           D850: DO N=1,NumMicbFunGroups
@@ -1047,8 +1110,8 @@ module MicBGCMod
               DO NGL=JGnio(N),JGnfo(N)
                 MID=micpar%get_micb_id(M,NGL)
                 DO NE=1,NumPlantChemElms
-                  XFME=FPRIMM*GrowthEnvScalHeter(NGL,K)*(OMEheter(NE,MID,K)*BulkSOM(KK) &
-                    -OMEheter(NE,MID,KK)*BulkSOM(K))/OSRT
+                  XFME=FPRIMM*GrowthEnvScalHeter(NGL,K)*(OMEheter(NE,MID,K)*BulkSOMC(KK) &
+                    -OMEheter(NE,MID,KK)*BulkSOMC(K))/OSRT
                   IF(OMEheter(NE,MID,K)+XOMZ(NE,M,NGL,K)-XFME.GT.0.0_r8 &
                     .AND.OMEheter(NE,MID,KK)+XOMZ(NE,M,NGL,KK)+XFME.GT.0.0_r8)THEN
                     XOMZ(NE,M,NGL,K)=XOMZ(NE,M,NGL,K)-XFME
@@ -1065,15 +1128,15 @@ module MicBGCMod
 !
 !     TRANSFER ALL PRIMING AMONG ALL K
 !
-!     TOQCK=total respiration of DOC+DOA in soil layer
+!     TMicHeterAct=total respiration of DOC+DOA in soil layer
 !     ROQC4HeterMicActCmpK=total respiration of DOC+DOA in substrate complex
 !     OQC,OQN,OQP,OQA=DOC,DON,DOP,acetate in micropores
 !     OMC,OMN,OMP=microbial C,N,P
 !
-  TOQCK=0.0_r8
+  TMicHeterAct=0.0_r8
   D840: DO K=1,KL
     ROQC4HeterMicActCmpK(K)=ROQC4HeterMicActCmpK(K)+XOQCK(K)
-    TOQCK=TOQCK+ROQC4HeterMicActCmpK(K)
+    TMicHeterAct=TMicHeterAct+ROQC4HeterMicActCmpK(K)
     DO idom=idom_beg,idom_end
       DOM(idom,K)=DOM(idom,K)+XOQMZ(idom,K)
     ENDDO
@@ -1113,7 +1176,7 @@ module MicBGCMod
     RAnabolAcetUptkHeter => nmicf%RAnabolAcetUptkHeter, &
     DOMSorp              => ncplxf%DOMSorp,             &
     TCGOMEheter          => ncplxf%TCGOMEheter,         &
-    BulkSOM              => ncplxs%BulkSOM,             &
+    BulkSOMC              => ncplxs%BulkSOMC,             &
     FOCA                 => ncplxs%FOCA,                &
     FOAA                 => ncplxs%FOAA,                &
     SoilMicPMassLayer    => micfor%SoilMicPMassLayer,   &
@@ -1122,12 +1185,12 @@ module MicBGCMod
     ZEROS                => micfor%ZEROS,               &
     litrm                => micfor%litrm,               &
     VLWatMicPM           => micfor%VLWatMicPM,          &
-    FracBulkSOM          => micstt%FracBulkSOM,         &
+    FracBulkSOMC          => micstt%FracBulkSOMC,         &
     DOM                  => micstt%DOM,                 &
     SorbedOM             => micstt%SorbedOM,            &
     AEC                  => micfor%AEC                  &
   )
-!     VLWatMicPM=soil water content, FracBulkSOM=fraction of total SOC
+!     VLWatMicPM=soil water content, FracBulkSOMC=fraction of total SOC
 !     AEC,AECX=anion exchange capacity
 !     OQC,OQN,OQP,OQA=DOC,DON,DOP,acetate in micropores
 !     TCGOQC,TCGOMEheter,TCGOMEheter,TCGOAC=total uptake of DOC,DON,DOP,acetate
@@ -1136,7 +1199,7 @@ module MicBGCMod
 !     FOCA,FOAA=fractions of DOC and acetate vs. DOC+acetate
 !     CSORP,CSORPA,ZSORP,PSORP=sorption(ad=+ve,de=-ve) of OQC,acetate,DON,DOP
 !
-  IF(VLWatMicPM(NPH).GT.ZEROS2.AND.FracBulkSOM(K).GT.ZERO)THEN
+  IF(VLWatMicPM(NPH).GT.ZEROS2.AND.FracBulkSOMC(K).GT.ZERO)THEN
     IF(litrm)THEN
       AECX=0.5E+03_r8
     ELSE
@@ -1147,8 +1210,8 @@ module MicBGCMod
       OHEX(idom)=AMAX1(ZEROS,SorbedOM(idom,K))
     ENDDO
 
-    VLSoilPoreMicPX=SoilMicPMassLayer*AECX*HSORP*FracBulkSOM(K)
-    VLSoilPoreMicPW=VLWatMicPM(NPH)*FracBulkSOM(K)
+    VLSoilPoreMicPX=SoilMicPMassLayer*AECX*HSORP*FracBulkSOMC(K)
+    VLSoilPoreMicPW=VLWatMicPM(NPH)*FracBulkSOMC(K)
     IF(FOCA(K).GT.ZERO)THEN
       VOLCX=FOCA(K)*VLSoilPoreMicPX
       VOLCW=FOCA(K)*VLSoilPoreMicPW
@@ -1208,7 +1271,7 @@ module MicBGCMod
     RHydlysBioResduOM    => ncplxf%RHydlysBioResduOM,    &
     RHydlysSorptOM       => ncplxf%RHydlysSorptOM,       &
     ROQC4HeterMicActCmpK => ncplxf%ROQC4HeterMicActCmpK, &
-    BulkSOM              => ncplxs%BulkSOM,              &
+    BulkSOMC              => ncplxs%BulkSOMC,              &
     TOMK                 => ncplxs%TOMK,                 &
     TONK                 => ncplxs%TONK,                 &
     TOPK                 => ncplxs%TOPK,                 &
@@ -1246,7 +1309,7 @@ module MicBGCMod
 !     DCKD=Km for decomposition of SOC at current COQCK
 !     DCKM0,DCKML=Km for decomposition of SOC at zero COQCK
 !     DCKI=inhibition of decomposition by microbial concentration
-!     BulkSOM=total SOC
+!     BulkSOMC=total SOC
 !     COSC=concentration of total SOC
 !     SoilMicPMassLayer,VLSoilPoreMicP=mass, volume of soil layer
 !     DFNS=effect of microbial concentration on decomposition
@@ -1276,11 +1339,11 @@ module MicBGCMod
   ELSE
     DCKD=DCKML*(1.0_r8+COQCK/DCKI)
   ENDIF
-  IF(BulkSOM(K).GT.ZEROS)THEN
+  IF(BulkSOMC(K).GT.ZEROS)THEN
     IF(SoilMicPMassLayer.GT.ZEROS)THEN
-      COSC=BulkSOM(K)/SoilMicPMassLayer
+      COSC=BulkSOMC(K)/SoilMicPMassLayer
     ELSE
-      COSC=BulkSOM(K)/VLSoilMicP
+      COSC=BulkSOMC(K)/VLSoilMicP
     ENDIF
     DFNS=COSC/(COSC+DCKD)
     OQCI=1.0_r8/(1.0_r8+CDOM(idom_doc,K)/OQKI)
@@ -1297,7 +1360,7 @@ module MicBGCMod
 !     DFNS=effect of microbial concentration on decomposition
 !     OQCI=DOC product inhibition for decomposition
 !     TSensGrowth=temperature stress effect
-!     BulkSOM=total SOC
+!     BulkSOMC=total SOC
 !     FCNK,FCPK=N,P limitation to microbial activity in each K
 !
     D785: DO M=1,jsken
@@ -1305,7 +1368,7 @@ module MicBGCMod
         CNS(M,K)=AZMAX1(SolidOM(ielmn,M,K)/SolidOM(ielmc,M,K))
         CPS(M,K)=AZMAX1(SolidOM(ielmp,M,K)/SolidOM(ielmc,M,K))
         RHydlysSolidOM(ielmc,M,K)=AZMAX1(AMIN1(0.5_r8*SolidOMAct(M,K) &
-          ,SPOSC(M,K)*ROQC4HeterMicActCmpK(K)*DFNS*OQCI*TSensGrowth*SolidOMAct(M,K)/BulkSOM(K)))
+          ,SPOSC(M,K)*ROQC4HeterMicActCmpK(K)*DFNS*OQCI*TSensGrowth*SolidOMAct(M,K)/BulkSOMC(K)))
         RHydlysSolidOM(ielmn,M,K)=AZMAX1(AMIN1(SolidOM(ielmn,M,K),CNS(M,K)*RHydlysSolidOM(ielmc,M,K)))/FCNK(K)
         RHydlysSolidOM(ielmp,M,K)=AZMAX1(AMIN1(SolidOM(ielmp,M,K),CPS(M,K)*RHydlysSolidOM(ielmc,M,K)))/FCPK(K)
 
@@ -1378,16 +1441,16 @@ module MicBGCMod
 !     DFNS=effect of microbial concentration on decomposition
 !     OQCI=DOC product inhibition for decomposition
 !     TSensGrowth=temperature stress effect
-!     BulkSOM=total SOC
+!     BulkSOMC=total SOC
 !     FCNK,FCPK=N,P limitation to microbial activity in each K
 !
-  IF(BulkSOM(K).GT.ZEROS)THEN
+  IF(BulkSOMC(K).GT.ZEROS)THEN
     D775: DO M=1,ndbiomcp
       IF(OMBioResdu(ielmc,M,K).GT.ZEROS)THEN
         CNR=AZMAX1(OMBioResdu(ielmn,M,K)/OMBioResdu(ielmc,M,K))
         CPR=AZMAX1(OMBioResdu(ielmp,M,K)/OMBioResdu(ielmc,M,K))
         RHydlysBioResduOM(ielmc,M,K)=AZMAX1(AMIN1(OMBioResdu(ielmc,M,K) &
-          ,SPORC(M)*ROQC4HeterMicActCmpK(K)*DFNS*OQCI*TSensGrowth*OMBioResdu(ielmc,M,K)/BulkSOM(K)))
+          ,SPORC(M)*ROQC4HeterMicActCmpK(K)*DFNS*OQCI*TSensGrowth*OMBioResdu(ielmc,M,K)/BulkSOMC(K)))
     !    3*AMIN1(FCNK(K),FCPK(K))
         RHydlysBioResduOM(ielmn,M,K)=AZMAX1(AMIN1(OMBioResdu(ielmn,M,K),CNR*RHydlysBioResduOM(ielmc,M,K)))/FCNK(K)
         RHydlysBioResduOM(ielmp,M,K)=AZMAX1(AMIN1(OMBioResdu(ielmp,M,K),CPR*RHydlysBioResduOM(ielmc,M,K)))/FCPK(K)
@@ -1417,20 +1480,20 @@ module MicBGCMod
 !     DFNS=effect of microbial concentration on decomposition
 !     OQCI=DOC product inhibition for decomposition
 !     TSensGrowth=temperature stress effect
-!     BulkSOM=total SOC
+!     BulkSOMC=total SOC
 !     FCNK,FCPK=N,P limitation to microbial activity in each K
 !
-  IF(BulkSOM(K).GT.ZEROS)THEN
+  IF(BulkSOMC(K).GT.ZEROS)THEN
     IF(SorbedOM(ielmc,K).GT.ZEROS)THEN
       CNH(K)=AZMAX1(SorbedOM(ielmn,K)/SorbedOM(ielmc,K))
       CPH(K)=AZMAX1(SorbedOM(ielmp,K)/SorbedOM(ielmc,K))
       RHydlysSorptOM(ielmc,K)=AZMAX1(AMIN1(SorbedOM(ielmc,K) &
-        ,SPOHC*ROQC4HeterMicActCmpK(K)*DFNS*OQCI*TSensGrowth*SorbedOM(ielmc,K)/BulkSOM(K)))
+        ,SPOHC*ROQC4HeterMicActCmpK(K)*DFNS*OQCI*TSensGrowth*SorbedOM(ielmc,K)/BulkSOMC(K)))
 !    3*AMIN1(FCNK(K),FCPK(K))
       RHydlysSorptOM(ielmn,K)=AZMAX1(AMIN1(SorbedOM(ielmn,K),CNH(K)*RHydlysSorptOM(ielmc,K)))/FCNK(K)
       RHydlysSorptOM(ielmp,K)=AZMAX1(AMIN1(SorbedOM(ielmp,K),CPH(K)*RHydlysSorptOM(ielmc,K)))/FCPK(K)
       RHydlysSorptOM(idom_acetate,K)=AZMAX1(AMIN1(SorbedOM(idom_acetate,K) &
-        ,SPOHA*ROQC4HeterMicActCmpK(K)*DFNS*TSensGrowth*SorbedOM(idom_acetate,K)/BulkSOM(K)))
+        ,SPOHA*ROQC4HeterMicActCmpK(K)*DFNS*TSensGrowth*SorbedOM(idom_acetate,K)/BulkSOMC(K)))
 !    3*AMIN1(FCNK(K),FCPK(K))
     ELSE
       CNH(K)=0.0_r8
@@ -1486,9 +1549,7 @@ module MicBGCMod
     SolidOM              => micstt%SolidOM,             &
     iprotein             => micpar%iprotein,            &
     SolidOMAct           => micstt%SolidOMAct,          &
-    OSC13U               => micstt%OSC13U,              &
-    OSN13U               => micstt%OSN13U,              &
-    OSP13U               => micstt%OSP13U,              &
+    SOMPomProtein        => micstt%SOMPomProtein,       &
     DOM                  => micstt%DOM,                 &
     OMBioResdu           => micstt%OMBioResdu,          &
     SorbedOM             => micstt%SorbedOM,            &
@@ -1561,9 +1622,9 @@ module MicBGCMod
         ENDDO
       ELSE
  !      OSA13U=OSA13U+RHumifySolidOM(ielmc,M,K)
-        OSC13U=OSC13U+RHumifySolidOM(ielmc,M,K)
-        OSN13U=OSN13U+RHumifySolidOM(ielmn,M,K)
-        OSP13U=OSP13U+RHumifySolidOM(ielmp,M,K)
+        SOMPomProtein(ielmc)=SOMPomProtein(ielmc)+RHumifySolidOM(ielmc,M,K)
+        SOMPomProtein(ielmn)=SOMPomProtein(ielmn)+RHumifySolidOM(ielmn,M,K)
+        SOMPomProtein(ielmp)=SOMPomProtein(ielmp)+RHumifySolidOM(ielmp,M,K)
       ENDIF
 
     ENDDO D580
@@ -1635,47 +1696,43 @@ module MicBGCMod
   integer  :: K,M,N,NGL,MID3,MID,NE
   real(r8) ::CGROMC
 !     begin_execution
-  associate(                                                  &
-    CGOMEheter             => nmicf%CGOMEheter              , &
-    CGOMES                 => nmicf%CGOMES                  , &
-    Resp4NFixHeter         => nmicf%Resp4NFixHeter          , &
-    RespGrossHeter         => nmicf%RespGrossHeter          , &
-    RNOxReduxRespDenitLim  => nmicf%RNOxReduxRespDenitLim   , &
-    RNO3TransfSoilHeter    => nmicf%RNO3TransfSoilHeter     , &
-    RCO2ProdHeter          => nmicf%RCO2ProdHeter           , &
-    RH2PO4TransfSoilHeter  => nmicf%RH2PO4TransfSoilHeter   , &
-    RNH4TransfBandHeter    => nmicf%RNH4TransfBandHeter     , &
-    RNO3TransfBandHeter    => nmicf%RNO3TransfBandHeter     , &
-    RH2PO4TransfBandHeter  => nmicf%RH2PO4TransfBandHeter   , &
-    RHOMEheter             => nmicf%RHOMEheter              , &
-    RHMMEheter             => nmicf%RHMMEheter              , &
-    RN2FixHeter            => nmicf%RN2FixHeter             , &
-    RXOMEheter             => nmicf%RXOMEheter              , &
-    R3OMEheter             => nmicf%R3OMEheter              , &
-    RXMMEheter             => nmicf%RXMMEheter              , &
-    R3MMEheter             => nmicf%R3MMEheter              , &
-    RNH4TransfLitrHeter    => nmicf%RNH4TransfLitrHeter     , &
-    RNO3TransfLitrHeter    => nmicf%RNO3TransfLitrHeter     , &
-    RH2PO4TransfLitrHeter  => nmicf%RH2PO4TransfLitrHeter   , &
-    RH1PO4TransfSoilHeter  => nmicf%RH1PO4TransfSoilHeter   , &
-    RH1PO4TransfBandHeter  => nmicf%RH1PO4TransfBandHeter   , &
-    RH1PO4TransfLitrHeter  => nmicf%RH1PO4TransfLitrHeter   , &
-    RNH4TransfSoilHeter    => nmicf%RNH4TransfSoilHeter     , &
-    k_POM                  => micpar%k_POM                  , &
-    k_humus                => micpar%k_humus                , &
-    OMEheter               => micstt%OMEheter               , &
-    SolidOM                => micstt%SolidOM                , &
-    OSC14U                 => micstt%OSC14U                 , &
-    OSN14U                 => micstt%OSN14U                 , &
-    OSP14U                 => micstt%OSP14U                 , &
-    OSC24U                 => micstt%OSC24U                 , &
-    OSN24U                 => micstt%OSN24U                 , &
-    OSP24U                 => micstt%OSP24U                 , &
-    CFOMC                  => micfor%CFOMC                  , &
-    CFOMCU                 => micfor%CFOMCU                 , &
-    icarbhyro              => micpar%icarbhyro              , &
-    iprotein               => micpar%iprotein               , &
-    Litrm                  => micfor%litrm                    &
+  associate(                                              &
+    CGOMEheter            => nmicf%CGOMEheter,            &
+    CGOMES                => nmicf%CGOMES,                &
+    Resp4NFixHeter        => nmicf%Resp4NFixHeter,        &
+    RespGrossHeter        => nmicf%RespGrossHeter,        &
+    RNOxReduxRespDenitLim => nmicf%RNOxReduxRespDenitLim, &
+    RNO3TransfSoilHeter   => nmicf%RNO3TransfSoilHeter,   &
+    RCO2ProdHeter         => nmicf%RCO2ProdHeter,         &
+    RH2PO4TransfSoilHeter => nmicf%RH2PO4TransfSoilHeter, &
+    RNH4TransfBandHeter   => nmicf%RNH4TransfBandHeter,   &
+    RNO3TransfBandHeter   => nmicf%RNO3TransfBandHeter,   &
+    RH2PO4TransfBandHeter => nmicf%RH2PO4TransfBandHeter, &
+    RHOMEheter            => nmicf%RHOMEheter,            &
+    RHMMEheter            => nmicf%RHMMEheter,            &
+    RN2FixHeter           => nmicf%RN2FixHeter,           &
+    RXOMEheter            => nmicf%RXOMEheter,            &
+    R3OMEheter            => nmicf%R3OMEheter,            &
+    RXMMEheter            => nmicf%RXMMEheter,            &
+    R3MMEheter            => nmicf%R3MMEheter,            &
+    RNH4TransfLitrHeter   => nmicf%RNH4TransfLitrHeter,   &
+    RNO3TransfLitrHeter   => nmicf%RNO3TransfLitrHeter,   &
+    RH2PO4TransfLitrHeter => nmicf%RH2PO4TransfLitrHeter, &
+    RH1PO4TransfSoilHeter => nmicf%RH1PO4TransfSoilHeter, &
+    RH1PO4TransfBandHeter => nmicf%RH1PO4TransfBandHeter, &
+    RH1PO4TransfLitrHeter => nmicf%RH1PO4TransfLitrHeter, &
+    RNH4TransfSoilHeter   => nmicf%RNH4TransfSoilHeter,   &
+    k_POM                 => micpar%k_POM,                &
+    k_humus               => micpar%k_humus,              &
+    OMEheter              => micstt%OMEheter,             &
+    SolidOM               => micstt%SolidOM,              &
+    SOMHumProtein         => micstt%SOMHumProtein,        &
+    SOMHumCarbohyd        => micstt%SOMHumCarbohyd,       &
+    CFOMC                 => micfor%CFOMC,                &
+    CFOMCU                => micfor%CFOMCU,               &
+    icarbhyro             => micpar%icarbhyro,            &
+    iprotein              => micpar%iprotein,             &
+    Litrm                 => micfor%litrm                 &
   )
 !
 !     OMC,OMN,OMP=microbial C,N,P
@@ -1715,13 +1772,13 @@ module MicBGCMod
                   +CFOMC(2)*(RHOMEheter(NE,M,NGL,K)+RHMMEheter(NE,M,NGL,K))
               ENDDO
             ELSE
-              OSC14U=OSC14U+CFOMCU(1)*(RHOMEheter(ielmc,M,NGL,K)+RHMMEheter(ielmc,M,NGL,K))
-              OSN14U=OSN14U+CFOMCU(1)*(RHOMEheter(ielmn,M,NGL,K)+RHMMEheter(ielmn,M,NGL,K))
-              OSP14U=OSP14U+CFOMCU(1)*(RHOMEheter(ielmp,M,NGL,K)+RHMMEheter(ielmp,M,NGL,K))
+              SOMHumProtein(ielmc)=SOMHumProtein(ielmc)+CFOMCU(1)*(RHOMEheter(ielmc,M,NGL,K)+RHMMEheter(ielmc,M,NGL,K))
+              SOMHumProtein(ielmn)=SOMHumProtein(ielmn)+CFOMCU(1)*(RHOMEheter(ielmn,M,NGL,K)+RHMMEheter(ielmn,M,NGL,K))
+              SOMHumProtein(ielmp)=SOMHumProtein(ielmp)+CFOMCU(1)*(RHOMEheter(ielmp,M,NGL,K)+RHMMEheter(ielmp,M,NGL,K))
 
-              OSC24U=OSC24U+CFOMC(2)*(RHOMEheter(ielmc,M,NGL,K)+RHMMEheter(ielmc,M,NGL,K))
-              OSN24U=OSN24U+CFOMCU(2)*(RHOMEheter(ielmn,M,NGL,K)+RHMMEheter(ielmn,M,NGL,K))
-              OSP24U=OSP24U+CFOMCU(2)*(RHOMEheter(ielmp,M,NGL,K)+RHMMEheter(ielmp,M,NGL,K))
+              SOMHumCarbohyd(ielmc)=SOMHumCarbohyd(ielmc)+CFOMC(2)*(RHOMEheter(ielmc,M,NGL,K)+RHMMEheter(ielmc,M,NGL,K))
+              SOMHumCarbohyd(ielmn)=SOMHumCarbohyd(ielmn)+CFOMCU(2)*(RHOMEheter(ielmn,M,NGL,K)+RHMMEheter(ielmn,M,NGL,K))
+              SOMHumCarbohyd(ielmp)=SOMHumCarbohyd(ielmp)+CFOMCU(2)*(RHOMEheter(ielmp,M,NGL,K)+RHMMEheter(ielmp,M,NGL,K))
             ENDIF
           ENDDO D540
 
@@ -1786,14 +1843,14 @@ module MicBGCMod
   real(r8) :: DOSAK
 
 !     begin_execution
-  associate(                   &
-    ROQC4HeterMicActCmpK   => ncplxf%ROQC4HeterMicActCmpK  , &
-    SolidOMK    => ncplxs%SolidOMK   , &
-    SolidOMActK    => ncplxs%SolidOMActK   , &
-    ZEROS   => micfor%ZEROS  , &
-    SolidOMAct    => micstt%SolidOMAct   , &
-    SolidOM => micstt%SolidOM, &
-    DOSA    => micpar%DOSA     &
+  associate(                                             &
+    ROQC4HeterMicActCmpK => ncplxf%ROQC4HeterMicActCmpK, &
+    SolidOMK             => ncplxs%SolidOMK,             &
+    SolidOMActK          => ncplxs%SolidOMActK,          &
+    ZEROS                => micfor%ZEROS,                &
+    SolidOMAct           => micstt%SolidOMAct,           &
+    SolidOM              => micstt%SolidOM,              &
+    DOSA                 => micpar%DOSA                  &
   )
 !     SolidOMK,SolidOMActK,OSCX=total,colonized,uncolonized SOC
 !     OSA,OSC=colonized,total litter
@@ -1838,8 +1895,8 @@ module MicBGCMod
 !     begin_execution
   associate(                                                     &
     CGOMEheter               => nmicf%CGOMEheter,                &
-    RAnabolDOCUptkHeter                    => nmicf%RAnabolDOCUptkHeter,                     &
-    RAnabolAcetUptkHeter                    => nmicf%RAnabolAcetUptkHeter,                     &
+    RAnabolDOCUptkHeter      => nmicf%RAnabolDOCUptkHeter,       &
+    RAnabolAcetUptkHeter     => nmicf%RAnabolAcetUptkHeter,      &
     RO2UptkHeter             => nmicf%RO2UptkHeter,              &
     RNO3ReduxHeterSoil       => nmicf%RNO3ReduxHeterSoil,        &
     RNO3ReduxHeterBand       => nmicf%RNO3ReduxHeterBand,        &
@@ -1879,7 +1936,7 @@ module MicBGCMod
     RNO3ProdSoilChemo        => nmicdiag%RNO3ProdSoilChemo,      &
     RNO3ProdBandChemo        => nmicdiag%RNO3ProdBandChemo,      &
     VOLWZ                    => nmicdiag%VOLWZ,                  &
-    CGOMEAutorr               => nmicf%CGOMEAutorr,                &
+    CGOMEAutorr              => nmicf%CGOMEAutorr,               &
     RNO2ReduxAutorBand       => nmicf%RNO2ReduxAutorBand,        &
     RNO3UptkAutor            => nmicf%RNO3UptkAutor,             &
     RCH4ProdAutor            => nmicf%RCH4ProdAutor,             &
@@ -1901,7 +1958,7 @@ module MicBGCMod
     RNO3TransfSoilAutor      => nmicf%RNO3TransfSoilAutor,       &
     RH1PO4TransfSoilAutor    => nmicf%RH1PO4TransfSoilAutor,     &
     TSens4MicbGrwoth         => micstt%TSens4MicbGrwoth,         &
-    VOLQ                     => micstt%VOLQ,                     &
+    VWatMicrobAct            => micstt%VWatMicrobAct,            &
     litrm                    => micfor%litrm,                    &
     Lsurf                    => micfor%Lsurf,                    &
     k_POM                    => micpar%k_POM,                    &
@@ -2108,7 +2165,7 @@ module MicBGCMod
   XH1BS=-naqfdiag%TRIB1
   XN2GS=naqfdiag%TRN2F
   TSens4MicbGrwoth=TSensGrowth
-  VOLQ=VOLWZ
+  VWatMicrobAct=VOLWZ
   end associate
   end subroutine AggregateTransfOMBioResduations
 !------------------------------------------------------------------------------------------
@@ -2614,7 +2671,7 @@ module MicBGCMod
     RN2OReduxHeter         => nmicf%RN2OReduxHeter,          &
     RNOxReduxRespDenitLim  => nmicf%RNOxReduxRespDenitLim,   &
     RNOxReduxRespDenitUlm  => nmicf%RNOxReduxRespDenitUlm,   &
-    BulkSOM                => ncplxs%BulkSOM,                &
+    BulkSOMC                => ncplxs%BulkSOMC,                &
     RNO2EcoUptkSoilPrev    => micfor%RNO2EcoUptkSoilPrev,    &
     RN2OEcoUptkSoilPrev    => micfor%RN2OEcoUptkSoilPrev,    &
     RNO3EcoDmndSoilPrev    => micfor%RNO3EcoDmndSoilPrev,    &
@@ -2635,7 +2692,7 @@ module MicBGCMod
     ZNO3S                  => micstt%ZNO3S,                  &
     CNO2B                  => micstt%CNO2B,                  &
     CNO2S                  => micstt%CNO2S,                  &
-    FracBulkSOM            => micstt%FracBulkSOM,            &
+    FracBulkSOMC            => micstt%FracBulkSOMC,            &
     CH2GS                  => micstt%CH2GS,                  &
     DOM                    => micstt%DOM,                    &
     RNO3ReduxDmndSoilHeter => micflx%RNO3ReduxDmndSoilHeter, &
@@ -2698,8 +2755,8 @@ module MicBGCMod
     VMXDXB=0.0_r8
   ENDIF
   VMXDXT=VMXDXS+VMXDXB
-  IF(VOLWZ.GT.ZEROS2.AND.FracBulkSOM(K).GT.ZERO)THEN
-    FVMXDX=1.0_r8/(1.0_r8+VMXDXT/(VMKI*VOLWZ*FracBulkSOM(K)))
+  IF(VOLWZ.GT.ZEROS2.AND.FracBulkSOMC(K).GT.ZERO)THEN
+    FVMXDX=1.0_r8/(1.0_r8+VMXDXT/(VMKI*VOLWZ*FracBulkSOMC(K)))
   ELSE
     FVMXDX=0.0_r8
   ENDIF
@@ -2771,8 +2828,8 @@ module MicBGCMod
     VMXDXB=0.0_r8
   ENDIF
   VMXDXT=VMXDXS+VMXDXB
-  IF(VOLWZ.GT.ZEROS2.AND.FracBulkSOM(K).GT.ZERO)THEN
-    FVMXDX=1.0_r8/(1.0_r8+VMXDXT/(VMKI*VOLWZ*FracBulkSOM(K)))
+  IF(VOLWZ.GT.ZEROS2.AND.FracBulkSOMC(K).GT.ZERO)THEN
+    FVMXDX=1.0_r8/(1.0_r8+VMXDXT/(VMKI*VOLWZ*FracBulkSOMC(K)))
   ELSE
     FVMXDX=0.0_r8
   ENDIF
@@ -2827,8 +2884,8 @@ module MicBGCMod
 !
   VMXD1=(VMXD2-RDN2T)*2.0_r8
   VMXDXS=VMXD1*CZ2OS/(CZ2OS+Z1KM)
-  IF(VOLWZ.GT.ZEROS2.AND.FracBulkSOM(K).GT.ZERO)THEN
-    FVMXDX=1.0_r8/(1.0_r8+VMXDXS/(VMKI*VOLWZ*FracBulkSOM(K)))
+  IF(VOLWZ.GT.ZEROS2.AND.FracBulkSOMC(K).GT.ZERO)THEN
+    FVMXDX=1.0_r8/(1.0_r8+VMXDXS/(VMKI*VOLWZ*FracBulkSOMC(K)))
   ELSE
     FVMXDX=0.0_r8
   ENDIF

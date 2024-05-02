@@ -64,8 +64,8 @@ implicit none
   real(r8),target,allocatable ::  trcg_RMicbTransf_vr(:,:,:,:)       !microbial gases transformation, [g d-2 h-1]
   real(r8),target,allocatable ::  Micb_N2Fixation_vr(:,:,:)                       !net microbial N2 exchange, [g d-2 h-1]
   real(r8),target,allocatable ::  RDOM_micb_flx(:,:,:,:,:)                     !net microbial DOC flux, [g d-2 h-1]
-  real(r8),target,allocatable ::  TOQCK(:,:,:)                       !total respiration of DOC+DOA in soil layer
-  real(r8),target,allocatable ::  VOLQ(:,:,:)                        !soil water volume occupied by microial biomass, [m3 m-3]
+  real(r8),target,allocatable ::  TMicHeterAct_vr(:,:,:)                       !total respiration of DOC+DOA in soil layer
+  real(r8),target,allocatable ::  VWatMicrobAct_vr(:,:,:)                        !soil water volume occupied by microial biomass, [m3 m-3]
   real(r8),target,allocatable ::  TSens4MicbGrwoth_vr(:,:,:)                        !constraints of temperature and water potential on microbial activity, []
   real(r8),target,allocatable ::  LitrfalStrutElms_vr(:,:,:,:,:,:)                    !total LitrFall C, [g d-2 h-1]
   real(r8),target,allocatable :: trcs_VLN_vr(:,:,:,:)
@@ -168,8 +168,8 @@ implicit none
   allocate(Micb_N2Fixation_vr(0:JZ,JY,JX));  Micb_N2Fixation_vr=0._r8
 
   allocate(RDOM_micb_flx(idom_beg:idom_end,1:jcplx,0:JZ,JY,JX));RDOM_micb_flx=0._r8
-  allocate(TOQCK(0:JZ,JY,JX));  TOQCK=0._r8
-  allocate(VOLQ(0:JZ,JY,JX));   VOLQ=0._r8
+  allocate(TMicHeterAct_vr(0:JZ,JY,JX));  TMicHeterAct_vr=0._r8
+  allocate(VWatMicrobAct_vr(0:JZ,JY,JX));   VWatMicrobAct_vr=0._r8
   allocate(TSens4MicbGrwoth_vr(0:JZ,JY,JX));   TSens4MicbGrwoth_vr=0._r8
   allocate(LitrfalStrutElms_vr(NumPlantChemElms,jsken,1:NumOfPlantLitrCmplxs,0:JZ,JY,JX));LitrfalStrutElms_vr=0._r8
   allocate(trcs_VLN_vr(ids_beg:ids_end,0:JZ,JY,JX));trcs_VLN_vr=1._r8
@@ -259,8 +259,8 @@ implicit none
   call destroy(Micb_N2Fixation_vr)
   call destroy(RNutMicbTransf_vr)
   call destroy(RDOM_micb_flx)
-  call destroy(TOQCK)
-  call destroy(VOLQ)
+  call destroy(TMicHeterAct_vr)
+  call destroy(VWatMicrobAct_vr)
   call destroy(TSens4MicbGrwoth_vr)
   call destroy(LitrfalStrutElms_vr)
 

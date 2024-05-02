@@ -13,7 +13,7 @@ implicit none
   type, public :: micsttype
   real(r8) :: EPOC
   real(r8) :: EHUM
-  real(r8) :: TOQCK
+  real(r8) :: TMicHeterAct
   real(r8) :: ZNH4B
   real(r8) :: ZNH4S
   real(r8) :: ZNO3B
@@ -63,8 +63,8 @@ implicit none
   real(r8) ::CNO3SU
   real(r8) ::CNO3BU
   real(r8) :: TSens4MicbGrwoth
-  real(r8) :: VOLQ
-  real(r8),allocatable :: FracBulkSOM(:)
+  real(r8) :: VWatMicrobAct
+  real(r8),allocatable :: FracBulkSOMC(:)
   real(r8),allocatable :: DOM(:,:)
   real(r8),allocatable :: SorbedOM(:,:)
   real(r8),allocatable :: SolidOMAct(:,:)
@@ -74,9 +74,10 @@ implicit none
   real(r8),allocatable :: CPOSC(:,:)
   real(r8),allocatable :: OMEheter(:,:,:)
   real(r8),allocatable :: OMEAutor(:,:)
-  real(r8) :: OSC13U,OSC14U,OSC24U
-  real(r8) :: OSN13U,OSN14U,OSN24U
-  real(r8) :: OSP13U,OSP14U,OSP24U
+  real(r8),allocatable :: SOMPomProtein(:)
+  real(r8),allocatable :: SOMHumProtein(:)
+  real(r8),allocatable :: SOMHumCarbohyd(:)
+
   contains
   procedure, public :: Init
   procedure, public :: Destroy=> Destruct
@@ -104,7 +105,7 @@ implicit none
   NumHetetrMicCmplx=>micpar%NumHetetrMicCmplx
   NumLiveHeterBioms => micpar%NumLiveHeterBioms
 
-  allocate(this%FracBulkSOM(1:jcplx));this%FracBulkSOM=spval
+  allocate(this%FracBulkSOMC(1:jcplx));this%FracBulkSOMC=spval
   allocate(this%DOM(idom_beg:idom_end,1:jcplx));this%DOM=spval
   allocate(this%SorbedOM(idom_beg:idom_end,1:jcplx));this%SorbedOM=spval
   allocate(this%SolidOMAct(jsken,1:jcplx));this%SolidOMAct=spval
@@ -114,6 +115,10 @@ implicit none
   allocate(this%CPOSC(jsken,1:jcplx));this%CPOSC=spval
   allocate(this%OMEheter(NumPlantChemElms,NumLiveHeterBioms,1:jcplx));this%OMEheter=spval
   allocate(this%OMEAutor(NumPlantChemElms,NumLiveAutoBioms));this%OMEAutor=spval
+
+  allocate(this%SOMPomProtein(1:NumPlantChemElms));
+  allocate(this%SOMHumProtein(1:NumPlantChemElms));
+  allocate(this%SOMHumCarbohyd(1:NumPlantChemElms));
 
   end subroutine Init
 
@@ -125,7 +130,7 @@ implicit none
   implicit none
   class(micsttype) :: this
 
-  call destroy(this%FracBulkSOM)
+  call destroy(this%FracBulkSOMC)
   call destroy(this%DOM)
   call destroy(this%SorbedOM)
   call destroy(this%SolidOMAct)
@@ -135,5 +140,8 @@ implicit none
   call destroy(this%CPOSC)
   call destroy(this%OMEheter)
   call destroy(this%OMEAutor)
+  call destroy(this%SOMHumCarbohyd)
+  call destroy(this%SOMPomProtein)
+  call destroy(this%SOMHumProtein)
   end subroutine Destruct
 end module MicStateTraitTypeMod

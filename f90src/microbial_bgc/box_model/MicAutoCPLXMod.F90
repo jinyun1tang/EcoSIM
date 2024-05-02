@@ -948,28 +948,28 @@ module MicAutoCPLXMod
   real(r8) :: VMXA
 
 !     begin_execution
-  associate(                                           &
-    GrowthEnvScalAutor  => nmics%GrowthEnvScalAutor,   &
-    FBiomStoiScalarAutor              => nmics%FBiomStoiScalarAutor,               &
-    FracOMActAutor      => nmics%FracOMActAutor,       &
-    OMActAutor          => nmics%OMActAutor,           &
-    RO2Dmnd4RespAutor   => nmicf%RO2Dmnd4RespAutor,    &
-    RO2DmndAutor        => nmicf%RO2DmndAutor,         &
-    VLNH4               => micfor%VLNH4,               &
-    VLNHB               => micfor%VLNHB,               &
-    ZEROS               => micfor%ZEROS,               &
-    ZEROS2              => micfor%ZEROS2,              &
-    RNH4EcoDmndSoilPrev => micfor%RNH4EcoDmndSoilPrev, &
-    RNH4EcoDmndBandPrev => micfor%RNH4EcoDmndBandPrev, &
-    ZNFN0               => micstt%ZNFN0,               &
-    ZNFNI               => micstt%ZNFNI,               &
-    CNH4S               => micstt%CNH4S,               &
-    CNH4B               => micstt%CNH4B,               &
-    ZNH4S               => micstt%ZNH4S,               &
-    ZNH4B               => micstt%ZNH4B,               &
-    RNH3OxidAutor       => micflx%RNH3OxidAutor,       &
-    RNH3OxidAutorBand   => micflx%RNH3OxidAutorBand,   &
-    RO2DmndAutort       => micflx%RO2DmndAutort        &
+  associate(                                            &
+    GrowthEnvScalAutor   => nmics%GrowthEnvScalAutor,   &
+    FBiomStoiScalarAutor => nmics%FBiomStoiScalarAutor, &
+    FracOMActAutor       => nmics%FracOMActAutor,       &
+    OMActAutor           => nmics%OMActAutor,           &
+    RO2Dmnd4RespAutor    => nmicf%RO2Dmnd4RespAutor,    &
+    RO2DmndAutor         => nmicf%RO2DmndAutor,         &
+    VLNH4                => micfor%VLNH4,               &
+    VLNHB                => micfor%VLNHB,               &
+    ZEROS                => micfor%ZEROS,               &
+    ZEROS2               => micfor%ZEROS2,              &
+    RNH4EcoDmndSoilPrev  => micfor%RNH4EcoDmndSoilPrev, &
+    RNH4EcoDmndBandPrev  => micfor%RNH4EcoDmndBandPrev, &
+    ZNFN0                => micstt%ZNFN0,               &
+    ZNFNI                => micstt%ZNFNI,               &
+    CNH4S                => micstt%CNH4S,               &
+    CNH4B                => micstt%CNH4B,               &
+    ZNH4S                => micstt%ZNH4S,               &
+    ZNH4B                => micstt%ZNH4B,               &
+    RNH3OxidAutor        => micflx%RNH3OxidAutor,       &
+    RNH3OxidAutorBand    => micflx%RNH3OxidAutorBand,   &
+    RO2DmndAutort        => micflx%RO2DmndAutort        &
   )
 !
 !     FACTOR TO REGULATE COMPETITION FOR NH4 AMONG DIFFERENT
@@ -1088,27 +1088,27 @@ module MicAutoCPLXMod
   real(r8) :: VMXA
 
 !     begin_execution
-  associate(                                           &
-    GrowthEnvScalAutor  => nmics%GrowthEnvScalAutor,   &
-    FBiomStoiScalarAutor              => nmics%FBiomStoiScalarAutor,               &
-    FracNO2ReduxAutor   => nmics%FracNO2ReduxAutor,    &
-    OMActAutor          => nmics%OMActAutor,           &
-    RO2Dmnd4RespAutor   => nmicf%RO2Dmnd4RespAutor,    &
-    RO2DmndAutor        => nmicf%RO2DmndAutor,         &
-    VLNH4               => micfor%VLNH4,               &
-    VLNHB               => micfor%VLNHB,               &
-    VLNO3               => micfor%VLNO3,               &
-    VLNOB               => micfor%VLNOB,               &
-    ZEROS               => micfor%ZEROS,               &
-    RNO2EcoUptkSoilPrev => micfor%RNO2EcoUptkSoilPrev, &
-    RNO2EcoUptkBandPrev => micfor%RNO2EcoUptkBandPrev, &
-    CNO2S               => micstt%CNO2S,               &
-    CNO2B               => micstt%CNO2B,               &
-    ZNO2S               => micstt%ZNO2S,               &
-    ZNO2B               => micstt%ZNO2B,               &
-    RNO2OxidAutor       => micflx%RNO2OxidAutor,       &
-    RNO2OxidAutorBand   => micflx%RNO2OxidAutorBand,   &
-    RO2DmndAutort       => micflx%RO2DmndAutort        &
+  associate(                                            &
+    GrowthEnvScalAutor   => nmics%GrowthEnvScalAutor,   &
+    FBiomStoiScalarAutor => nmics%FBiomStoiScalarAutor, &
+    FracNO2ReduxAutor    => nmics%FracNO2ReduxAutor,    &
+    OMActAutor           => nmics%OMActAutor,           &
+    RO2Dmnd4RespAutor    => nmicf%RO2Dmnd4RespAutor,    &
+    RO2DmndAutor         => nmicf%RO2DmndAutor,         &
+    VLNH4                => micfor%VLNH4,               &
+    VLNHB                => micfor%VLNHB,               &
+    VLNO3                => micfor%VLNO3,               &
+    VLNOB                => micfor%VLNOB,               &
+    ZEROS                => micfor%ZEROS,               &
+    RNO2EcoUptkSoilPrev  => micfor%RNO2EcoUptkSoilPrev, &
+    RNO2EcoUptkBandPrev  => micfor%RNO2EcoUptkBandPrev, &
+    CNO2S                => micstt%CNO2S,               &
+    CNO2B                => micstt%CNO2B,               &
+    ZNO2S                => micstt%ZNO2S,               &
+    ZNO2B                => micstt%ZNO2B,               &
+    RNO2OxidAutor        => micflx%RNO2OxidAutor,       &
+    RNO2OxidAutorBand    => micflx%RNO2OxidAutorBand,   &
+    RO2DmndAutort        => micflx%RO2DmndAutort        &
   )
 !     FACTOR TO REGULATE COMPETITION FOR NO2 AMONG DIFFERENT
 !     MICROBIAL POPULATIONS
@@ -1800,13 +1800,13 @@ module MicAutoCPLXMod
 !     begin_execution
   associate(                                    &
     TSensMaintRAutor => nmics%TSensMaintRAutor, &
-    OMN2Autor           => nmics%OMN2Autor,           &
+    OMN2Autor        => nmics%OMN2Autor,        &
     RMaintCompAutor  => nmicf%RMaintCompAutor,  &
     RespGrossAutor   => nmicf%RespGrossAutor,   &
     Resp4NFixAutor   => nmicf%Resp4NFixAutor,   &
     RN2FixAutor      => nmicf%RN2FixAutor,      &
     pH               => micfor%pH,              &
-    OMEAutor          => micstt%OMEAutor          &
+    OMEAutor         => micstt%OMEAutor         &
 
   )
 !     pH EFFECT ON MAINTENANCE RESPIRATION
@@ -1867,48 +1867,44 @@ module MicAutoCPLXMod
   real(r8) :: CGROMC
   integer :: N,M,NGL,MID,MID3,NE
   associate(                                              &
-    CGOMEAutorr            => nmicf%CGOMEAutorr           , &
-    CGOSEautor            => nmicf%CGOSEautor           , &
-    Resp4NFixAutor        => nmicf%Resp4NFixAutor       , &
-    RespGrossAutor        => nmicf%RespGrossAutor       , &
-    RNOxReduxRespAutorLim               => nmicf%RNOxReduxRespAutorLim              , &
-    RNO3TransfSoilAutor   => nmicf%RNO3TransfSoilAutor  , &
-    RCO2ProdAutor         => nmicf%RCO2ProdAutor        , &
+    CGOMEAutorr           => nmicf%CGOMEAutorr,           &
+    CGOSEautor            => nmicf%CGOSEautor,            &
+    Resp4NFixAutor        => nmicf%Resp4NFixAutor,        &
+    RespGrossAutor        => nmicf%RespGrossAutor,        &
+    RNOxReduxRespAutorLim => nmicf%RNOxReduxRespAutorLim, &
+    RNO3TransfSoilAutor   => nmicf%RNO3TransfSoilAutor,   &
+    RCO2ProdAutor         => nmicf%RCO2ProdAutor,         &
     RH2PO4TransfSoilAutor => nmicf%RH2PO4TransfSoilAutor, &
-    RNH4TransfBandAutor   => nmicf%RNH4TransfBandAutor  , &
-    RNO3TransfBandAutor   => nmicf%RNO3TransfBandAutor  , &
+    RNH4TransfBandAutor   => nmicf%RNH4TransfBandAutor,   &
+    RNO3TransfBandAutor   => nmicf%RNO3TransfBandAutor,   &
     RH2PO4TransfBandAutor => nmicf%RH2PO4TransfBandAutor, &
-    RHOMEAutorr            => nmicf%RHOMEAutorr           , &
-    RHMMEautor            => nmicf%RHMMEautor           , &
-    RN2FixAutor           => nmicf%RN2FixAutor          , &
-    RXOMEAutorr            => nmicf%RXOMEAutorr           , &
-    R3OMEAutorr            => nmicf%R3OMEAutorr           , &
-    RXMMEautor            => nmicf%RXMMEautor           , &
-    R3MMEautor            => nmicf%R3MMEautor           , &
-    RNH4TransfLitrAutor   => nmicf%RNH4TransfLitrAutor  , &
-    RNO3TransfLitrAutor   => nmicf%RNO3TransfLitrAutor  , &
+    RHOMEAutorr           => nmicf%RHOMEAutorr,           &
+    RHMMEautor            => nmicf%RHMMEautor,            &
+    RN2FixAutor           => nmicf%RN2FixAutor,           &
+    RXOMEAutorr           => nmicf%RXOMEAutorr,           &
+    R3OMEAutorr           => nmicf%R3OMEAutorr,           &
+    RXMMEautor            => nmicf%RXMMEautor,            &
+    R3MMEautor            => nmicf%R3MMEautor,            &
+    RNH4TransfLitrAutor   => nmicf%RNH4TransfLitrAutor,   &
+    RNO3TransfLitrAutor   => nmicf%RNO3TransfLitrAutor,   &
     RH2PO4TransfLitrAutor => nmicf%RH2PO4TransfLitrAutor, &
     RH1PO4TransfSoilAutor => nmicf%RH1PO4TransfSoilAutor, &
     RH1PO4TransfBandAutor => nmicf%RH1PO4TransfBandAutor, &
     RH1PO4TransfLitrAutor => nmicf%RH1PO4TransfLitrAutor, &
-    RNH4TransfSoilAutor   => nmicf%RNH4TransfSoilAutor  , &
-    litrm                 => micfor%litrm               , &
-    CFOMC                 => micfor%CFOMC               , &
-    CFOMCU                => micfor%CFOMCU              , &
-    SolidOM               => micstt%SolidOM             , &
-    OMEAutor               => micstt%OMEAutor             , &
-    OSC14U                => micstt%OSC14U              , &
-    OSN14U                => micstt%OSN14U              , &
-    OSP14U                => micstt%OSP14U              , &
-    OSC24U                => micstt%OSC24U              , &
-    OSN24U                => micstt%OSN24U              , &
-    OSP24U                => micstt%OSP24U              , &
-    JGniA                 => micpar%JGniA               , &
-    JGnfA                 => micpar%JGnfA               , &
-    NumMicbFunGroups      => micpar%NumMicbFunGroups    , &
-    icarbhyro             => micpar%icarbhyro           , &
-    iprotein              => micpar%iprotein            , &
-    k_POM                 => micpar%k_POM               , &
+    RNH4TransfSoilAutor   => nmicf%RNH4TransfSoilAutor,   &
+    litrm                 => micfor%litrm,                &
+    CFOMC                 => micfor%CFOMC,                &
+    CFOMCU                => micfor%CFOMCU,               &
+    SolidOM               => micstt%SolidOM,              &
+    OMEAutor              => micstt%OMEAutor,             &
+    SOMHumProtein         => micstt%SOMHumProtein,        &
+    SOMHumCarbohyd        => micstt%SOMHumCarbohyd,       &
+    JGniA                 => micpar%JGniA,                &
+    JGnfA                 => micpar%JGnfA,                &
+    NumMicbFunGroups      => micpar%NumMicbFunGroups,     &
+    icarbhyro             => micpar%icarbhyro,            &
+    iprotein              => micpar%iprotein,             &
+    k_POM                 => micpar%k_POM,                &
     is_activef_micb       => micpar%is_activef_micb       &
   )
   DO  N=1,NumMicbFunGroups
@@ -1932,13 +1928,13 @@ module MicAutoCPLXMod
               SolidOM(NE,icarbhyro,k_POM)=SolidOM(NE,icarbhyro,k_POM)+CFOMC(2)*(RHOMEAutorr(NE,M,NGL)+RHMMEautor(NE,M,NGL))
             ENDDO
           ELSE
-            OSC14U=OSC14U+CFOMCU(1)*(RHOMEAutorr(ielmc,M,NGL)+RHMMEautor(ielmc,M,NGL))
-            OSN14U=OSN14U+CFOMCU(1)*(RHOMEAutorr(ielmn,M,NGL)+RHMMEautor(ielmn,M,NGL))
-            OSP14U=OSP14U+CFOMCU(1)*(RHOMEAutorr(ielmp,M,NGL)+RHMMEautor(ielmp,M,NGL))
+            SOMHumProtein(ielmc)=SOMHumProtein(ielmc)+CFOMCU(1)*(RHOMEAutorr(ielmc,M,NGL)+RHMMEautor(ielmc,M,NGL))
+            SOMHumProtein(ielmn)=SOMHumProtein(ielmn)+CFOMCU(1)*(RHOMEAutorr(ielmn,M,NGL)+RHMMEautor(ielmn,M,NGL))
+            SOMHumProtein(ielmp)=SOMHumProtein(ielmp)+CFOMCU(1)*(RHOMEAutorr(ielmp,M,NGL)+RHMMEautor(ielmp,M,NGL))
             
-            OSC24U=OSC24U+CFOMCU(2)*(RHOMEAutorr(ielmc,M,NGL)+RHMMEautor(ielmc,M,NGL))
-            OSN24U=OSN24U+CFOMCU(2)*(RHOMEAutorr(ielmn,M,NGL)+RHMMEautor(ielmn,M,NGL))
-            OSP24U=OSP24U+CFOMCU(2)*(RHOMEAutorr(ielmp,M,NGL)+RHMMEautor(ielmp,M,NGL))
+            SOMHumCarbohyd(ielmc)=SOMHumCarbohyd(ielmc)+CFOMCU(2)*(RHOMEAutorr(ielmc,M,NGL)+RHMMEautor(ielmc,M,NGL))
+            SOMHumCarbohyd(ielmn)=SOMHumCarbohyd(ielmn)+CFOMCU(2)*(RHOMEAutorr(ielmn,M,NGL)+RHMMEautor(ielmn,M,NGL))
+            SOMHumCarbohyd(ielmp)=SOMHumCarbohyd(ielmp)+CFOMCU(2)*(RHOMEAutorr(ielmp,M,NGL)+RHMMEautor(ielmp,M,NGL))
           ENDIF
         ENDDO
 !

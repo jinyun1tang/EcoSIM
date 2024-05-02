@@ -366,7 +366,7 @@ implicit none
   end type plant_pheno_type
 
   type, public :: plant_soilchem_type
-  real(r8), pointer :: FracBulkSOM_vr(:,:)  => null()  !fraction of total organic C in complex, [-]
+  real(r8), pointer :: FracBulkSOMC_vr(:,:)  => null()  !fraction of total organic C in complex, [-]
   real(r8), pointer :: CFOPE(:,:,:,:)=> null() !litter kinetic fraction, [-]
   real(r8), pointer :: TScal4Difsvity_vr(:)     => null()  !temperature effect on diffusivity
   real(r8), pointer :: THETPM(:,:) => null()  !soil air-filled porosity, [m3 m-3]
@@ -1421,7 +1421,7 @@ implicit none
 
   class(plant_soilchem_type) :: this
 
-  allocate(this%FracBulkSOM_vr(1:jcplx,0:JZ1));this%FracBulkSOM_vr=spval
+  allocate(this%FracBulkSOMC_vr(1:jcplx,0:JZ1));this%FracBulkSOMC_vr=spval
   allocate(this%CFOPE(NumPlantChemElms,0:NumLitterGroups,jsken,JP1));this%CFOPE=spval
   allocate(this%TScal4Difsvity_vr(0:JZ1));this%TScal4Difsvity_vr=spval
   allocate(this%THETPM(60,0:JZ1));this%THETPM=spval
@@ -1458,7 +1458,7 @@ implicit none
   implicit none
   class(plant_soilchem_type) :: this
 
-!  if(allocated(FracBulkSOM_vr))deallocate(FracBulkSOM_vr)
+!  if(allocated(FracBulkSOMC_vr))deallocate(FracBulkSOMC_vr)
 
 !  if(allocated(CFOPE))deallocate(CFOPE)
 !  if(allocated(TScal4Difsvity_vr))deallocate(TScal4Difsvity_vr)

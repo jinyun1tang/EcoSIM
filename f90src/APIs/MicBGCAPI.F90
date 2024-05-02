@@ -224,11 +224,14 @@ implicit none
   micfor%litrm=(L==0)
   !is it surface layer
   micfor%Lsurf=(L==NU(NY,NX))
+
+  !litter layer is modeled
   if(micfor%litrm)then
     micstt%ZNH4TU=AZMAX1(trc_solml_vr(ids_NH4,NU(NY,NX),NY,NX))+AZMAX1(trc_solml_vr(ids_NH4B,NU(NY,NX),NY,NX))
     micstt%ZNO3TU=AZMAX1(trc_solml_vr(ids_NO3,NU(NY,NX),NY,NX))+AZMAX1(trc_solml_vr(ids_NO3B,NU(NY,NX),NY,NX))
     micstt%H1P4TU=AZMAX1(trc_solml_vr(ids_H1PO4,NU(NY,NX),NY,NX))+AZMAX1(trc_solml_vr(ids_H1PO4B,NU(NY,NX),NY,NX))
     micstt%H2P4TU=AZMAX1(trc_solml_vr(ids_H2PO4,NU(NY,NX),NY,NX))+AZMAX1(trc_solml_vr(ids_H2PO4B,NU(NY,NX),NY,NX))
+
     micstt%CNH4BU=trc_solcl_vr(ids_NH4B,NU(NY,NX),NY,NX)
     micstt%CNH4SU=trc_solcl_vr(ids_NH4,NU(NY,NX),NY,NX)
     micstt%CH2P4U=trc_solcl_vr(ids_H2PO4,NU(NY,NX),NY,NX)
@@ -237,15 +240,17 @@ implicit none
     micstt%CH1P4BU=trc_solcl_vr(ids_H1PO4B,NU(NY,NX),NY,NX)
     micstt%CNO3SU=trc_solcl_vr(ids_NO3,NU(NY,NX),NY,NX)
     micstt%CNO3BU=trc_solcl_vr(ids_NO3B,NU(NY,NX),NY,NX)
-    micstt%OSC13U=SolidOM_vr(ielmc,micpar%iprotein,micpar%k_POM,NU(NY,NX),NY,NX)
-    micstt%OSN13U=SolidOM_vr(ielmn,micpar%iprotein,micpar%k_POM,NU(NY,NX),NY,NX)
-    micstt%OSP13U=SolidOM_vr(ielmp,micpar%iprotein,micpar%k_POM,NU(NY,NX),NY,NX)
-    micstt%OSC14U=SolidOM_vr(ielmc,micpar%iprotein,micpar%k_humus,NU(NY,NX),NY,NX)
-    micstt%OSN14U=SolidOM_vr(ielmn,micpar%iprotein,micpar%k_humus,NU(NY,NX),NY,NX)
-    micstt%OSP14U=SolidOM_vr(ielmp,micpar%iprotein,micpar%k_humus,NU(NY,NX),NY,NX)
-    micstt%OSC24U=SolidOM_vr(ielmc,micpar%icarbhyro,micpar%k_humus,NU(NY,NX),NY,NX)
-    micstt%OSN24U=SolidOM_vr(ielmn,micpar%icarbhyro,micpar%k_humus,NU(NY,NX),NY,NX)
-    micstt%OSP24U=SolidOM_vr(ielmp,micpar%icarbhyro,micpar%k_humus,NU(NY,NX),NY,NX)
+
+    micstt%SOMPomProtein(ielmc)=SolidOM_vr(ielmc,micpar%iprotein,micpar%k_POM,NU(NY,NX),NY,NX)
+    micstt%SOMPomProtein(ielmn)=SolidOM_vr(ielmn,micpar%iprotein,micpar%k_POM,NU(NY,NX),NY,NX)
+    micstt%SOMPomProtein(ielmp)=SolidOM_vr(ielmp,micpar%iprotein,micpar%k_POM,NU(NY,NX),NY,NX)
+    micstt%SOMHumProtein(ielmc)=SolidOM_vr(ielmc,micpar%iprotein,micpar%k_humus,NU(NY,NX),NY,NX)
+    micstt%SOMHumProtein(ielmn)=SolidOM_vr(ielmn,micpar%iprotein,micpar%k_humus,NU(NY,NX),NY,NX)
+    micstt%SOMHumProtein(ielmp)=SolidOM_vr(ielmp,micpar%iprotein,micpar%k_humus,NU(NY,NX),NY,NX)
+    micstt%SOMHumCarbohyd(ielmc)=SolidOM_vr(ielmc,micpar%icarbhyro,micpar%k_humus,NU(NY,NX),NY,NX)
+    micstt%SOMHumCarbohyd(ielmn)=SolidOM_vr(ielmn,micpar%icarbhyro,micpar%k_humus,NU(NY,NX),NY,NX)
+    micstt%SOMHumCarbohyd(ielmp)=SolidOM_vr(ielmp,micpar%icarbhyro,micpar%k_humus,NU(NY,NX),NY,NX)
+
     micfor%RNH4EcoDmndLitrPrev =RNH4EcoDmndSoilPrev_vr(NU(NY,NX),NY,NX)
     micfor%RNO3EcoDmndLitrPrev =RNO3EcoDmndSoilPrev_vr(NU(NY,NX),NY,NX)
     micfor%RH2PO4EcoDmndLitrPrev =RH2PO4EcoDmndSoilPrev_vr(NU(NY,NX),NY,NX)
@@ -308,10 +313,9 @@ implicit none
   micstt%SCH4L=GasSolbility_vr(idg_CH4,L,NY,NX)
   micstt%ZNFN0=ZNFN0(L,NY,NX)
   micstt%ZNFNI=ZNFNI(L,NY,NX)
-  micstt%FracBulkSOM(1:jcplx)=FracBulkSOM_vr(1:jcplx,L,NY,NX)
+  
   micstt%DOM(idom_beg:idom_end,1:jcplx)=DOM(idom_beg:idom_end,1:jcplx,L,NY,NX)
   micstt%SorbedOM(idom_beg:idom_end,1:jcplx)=SorbedOM_vr(idom_beg:idom_end,1:jcplx,L,NY,NX)
-
   micstt%SolidOMAct(1:jsken,1:jcplx)=SolidOMAct_vr(1:jsken,1:jcplx,L,NY,NX)
   micstt%SolidOM(1:NumPlantChemElms,1:jsken,1:jcplx)=SolidOM_vr(1:NumPlantChemElms,1:jsken,1:jcplx,L,NY,NX)
   micstt%OMBioResdu(1:NumPlantChemElms,1:ndbiomcp,1:jcplx)=OMBioResdu_vr(1:NumPlantChemElms,1:ndbiomcp,1:jcplx,L,NY,NX)
@@ -422,17 +426,17 @@ implicit none
     RH2PO4UptkLitrAutor_col(1:NumMicrobAutrophCmplx,NY,NX)=micflx%RH2PO4UptkLitrAutor(1:NumMicrobAutrophCmplx)
     RH1PO4UptkLitrAutor_col(1:NumMicrobAutrophCmplx,NY,NX)=micflx%RH1PO4UptkLitrAutor(1:NumMicrobAutrophCmplx)
 
-    SolidOM_vr(ielmc,micpar%iprotein,micpar%k_POM,NU(NY,NX),NY,NX)=micstt%OSC13U
-    SolidOM_vr(ielmc,micpar%iprotein,micpar%k_humus,NU(NY,NX),NY,NX)=micstt%OSC14U
-    SolidOM_vr(ielmc,micpar%icarbhyro,micpar%k_humus,NU(NY,NX),NY,NX)=micstt%OSC24U
+    SolidOM_vr(ielmc,micpar%iprotein,micpar%k_POM,NU(NY,NX),NY,NX)=micstt%SOMPomProtein(ielmc)
+    SolidOM_vr(ielmc,micpar%iprotein,micpar%k_humus,NU(NY,NX),NY,NX)=micstt%SOMHumProtein(ielmc)
+    SolidOM_vr(ielmc,micpar%icarbhyro,micpar%k_humus,NU(NY,NX),NY,NX)=micstt%SOMHumCarbohyd(ielmc)
 
-    SolidOM_vr(ielmn,micpar%iprotein,micpar%k_POM,NU(NY,NX),NY,NX)=micstt%OSN13U
-    SolidOM_vr(ielmn,micpar%iprotein,micpar%k_humus,NU(NY,NX),NY,NX)=micstt%OSN14U
-    SolidOM_vr(ielmn,micpar%icarbhyro,micpar%k_humus,NU(NY,NX),NY,NX)=micstt%OSN24U
+    SolidOM_vr(ielmn,micpar%iprotein,micpar%k_POM,NU(NY,NX),NY,NX)=micstt%SOMPomProtein(ielmn)
+    SolidOM_vr(ielmn,micpar%iprotein,micpar%k_humus,NU(NY,NX),NY,NX)=micstt%SOMHumProtein(ielmn)
+    SolidOM_vr(ielmn,micpar%icarbhyro,micpar%k_humus,NU(NY,NX),NY,NX)=micstt%SOMHumCarbohyd(ielmn)
 
-    SolidOM_vr(ielmp,micpar%iprotein,micpar%k_POM,NU(NY,NX),NY,NX)=micstt%OSP13U
-    SolidOM_vr(ielmp,micpar%iprotein,micpar%k_humus,NU(NY,NX),NY,NX)=micstt%OSP14U
-    SolidOM_vr(ielmp,micpar%icarbhyro,micpar%k_humus,NU(NY,NX),NY,NX)=micstt%OSP24U
+    SolidOM_vr(ielmp,micpar%iprotein,micpar%k_POM,NU(NY,NX),NY,NX)=micstt%SOMPomProtein(ielmp)
+    SolidOM_vr(ielmp,micpar%iprotein,micpar%k_humus,NU(NY,NX),NY,NX)=micstt%SOMHumProtein(ielmp)
+    SolidOM_vr(ielmp,micpar%icarbhyro,micpar%k_humus,NU(NY,NX),NY,NX)=micstt%SOMHumCarbohyd(ielmp)
   endif
 
   RNH4UptkSoilAutor_vr(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RNH4UptkSoilAutor(1:NumMicrobAutrophCmplx)
@@ -446,10 +450,10 @@ implicit none
   RO2UptkSoilM_vr(1:NPH,L,NY,NX)=micflx%RO2UptkSoilM(1:NPH)
 
   TSens4MicbGrwoth_vr(L,NY,NX)=micstt%TSens4MicbGrwoth
-  VOLQ(L,NY,NX)=micstt%VOLQ
-  TOQCK(L,NY,NX)=micstt%TOQCK
+  VWatMicrobAct_vr(L,NY,NX)=micstt%VWatMicrobAct
+  TMicHeterAct_vr(L,NY,NX)=micstt%TMicHeterAct
   ZNFNI(L,NY,NX)=micstt%ZNFNI
-  FracBulkSOM_vr(1:jcplx,L,NY,NX)=micstt%FracBulkSOM(1:jcplx)
+  FracBulkSOMC_vr(1:jcplx,L,NY,NX)=micstt%FracBulkSOMC(1:jcplx)
   DOM(idom_beg:idom_end,1:jcplx,L,NY,NX)=micstt%DOM(idom_beg:idom_end,1:jcplx)
   SorbedOM_vr(idom_beg:idom_end,1:jcplx,L,NY,NX)=micstt%SorbedOM(idom_beg:idom_end,1:jcplx)
 
