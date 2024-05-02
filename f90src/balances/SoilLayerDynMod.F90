@@ -790,7 +790,7 @@ implicit none
 
   IF(IFLGL(L,3).EQ.0)THEN
     DO  K=1,jcplx
-      DO  N=1,NumMicbFunGroups
+      DO  N=1,NumMicbFunGrupsPerCmplx
         DO  M=1,nlbiomcp
           DO NGL=JGnio(N),JGnfo(N)
             MID=micpar%get_micb_id(M,NGL)
@@ -801,7 +801,7 @@ implicit none
         enddo
       enddo
     ENDDO
-    DO  N=1,NumMicbFunGroups
+    DO  N=1,NumMicbFunGrupsPerCmplx
       DO  M=1,nlbiomcp
         DO NGL=JGniA(N),JGnfA(N)
           MID=micpar%get_micb_id(M,NGL)
@@ -974,7 +974,7 @@ implicit none
   ENDDO
   IF(IFLGL(L,3).EQ.0)THEN
     DO  K=1,jcplx
-       DO N=1,NumMicbFunGroups
+       DO N=1,NumMicbFunGrupsPerCmplx
         DO M=1,nlbiomcp
           DO NGL=JGnio(N),JGnfo(N)
             MID=micpar%get_micb_id(M,NGL)
@@ -986,7 +986,7 @@ implicit none
       enddo
     ENDDO
 
-    DO N=1,NumMicbFunGroups
+    DO N=1,NumMicbFunGrupsPerCmplx
       DO M=1,nlbiomcp
         DO NGL=JGniA(N),JGnfA(N)
           MID=micpar%get_micb_id(M,NGL)
@@ -1115,7 +1115,7 @@ implicit none
     ENDIF
 
     DO  K=1,jcplx
-      DO  N=1,NumMicbFunGroups
+      DO  N=1,NumMicbFunGrupsPerCmplx
         DO  M=1,nlbiomcp
           DO NGL=JGnio(N),JGnfo(N)
             MID=micpar%get_micb_id(M,NGL)          
@@ -1133,7 +1133,7 @@ implicit none
       enddo
     ENDDO
 
-    DO  N=1,NumMicbFunGroups
+    DO  N=1,NumMicbFunGrupsPerCmplx
       DO  M=1,nlbiomcp
         DO NGL=JGniA(N),JGnfA(N)
           MID=micpar%get_micb_id(M,NGL)

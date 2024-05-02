@@ -183,7 +183,7 @@ type, public :: NitroAQMFluxDiagType
   real(r8),allocatable :: RMaintdefLitrfal2ResduOMAutor(:,:,:)
   real(r8),allocatable :: RN2FixAutor(:)
   real(r8),allocatable :: RKillOMAutor(:,:,:)
-  real(r8),allocatable :: R3OMEAutor(:,:,:)
+  real(r8),allocatable :: RkillRecycOMAutor(:,:,:)
   real(r8),allocatable :: RMaintdefKillOMAutor(:,:,:)
   real(r8),allocatable :: RMaintdefRecycOMAutor(:,:,:)
   real(r8),allocatable :: RNH4TransfLitrAutor(:)
@@ -321,10 +321,10 @@ type, public :: NitroAQMFluxDiagType
   end subroutine nit_aqmf_diag
 !------------------------------------------------------------------------------------------
 
-  subroutine nit_micf_init(this,jcplx,NumMicbFunGroups)
+  subroutine nit_micf_init(this,jcplx,NumMicbFunGrupsPerCmplx)
   implicit none
   class(NitroMicFluxType) :: this
-  integer, intent(in) :: jcplx,NumMicbFunGroups
+  integer, intent(in) :: jcplx,NumMicbFunGrupsPerCmplx
   integer :: ndbiomcp
   integer :: NumMicrobAutrophCmplx
   integer :: NumHetetrMicCmplx
@@ -414,7 +414,7 @@ type, public :: NitroAQMFluxDiagType
   allocate(this%RMaintdefLitrfal2ResduOMAutor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%RMaintdefLitrfal2ResduOMAutor=spval
   allocate(this%RN2FixAutor(NumMicrobAutrophCmplx));this%RN2FixAutor=spval
   allocate(this%RKillOMAutor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%RKillOMAutor=spval
-  allocate(this%R3OMEAutor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%R3OMEAutor=spval
+  allocate(this%RkillRecycOMAutor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%RkillRecycOMAutor=spval
   allocate(this%RMaintdefKillOMAutor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%RMaintdefKillOMAutor=spval
   allocate(this%RMaintdefRecycOMAutor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%RMaintdefRecycOMAutor=spval
   allocate(this%RNH4TransfLitrAutor(NumMicrobAutrophCmplx));this%RNH4TransfLitrAutor=spval
@@ -435,11 +435,11 @@ type, public :: NitroAQMFluxDiagType
   end subroutine nit_micf_init
 !------------------------------------------------------------------------------------------
 
-  subroutine nit_mics_init(this, jcplx,NumMicbFunGroups)
+  subroutine nit_mics_init(this, jcplx,NumMicbFunGrupsPerCmplx)
 
   implicit none
   class(NitroMicStateType) :: this
-  integer, intent(in) :: jcplx,NumMicbFunGroups
+  integer, intent(in) :: jcplx,NumMicbFunGrupsPerCmplx
   integer :: NumMicrobAutrophCmplx,NumHetetrMicCmplx
   NumMicrobAutrophCmplx=micpar%NumMicrobAutrophCmplx
   NumHetetrMicCmplx=micpar%NumHetetrMicCmplx
@@ -565,7 +565,7 @@ type, public :: NitroAQMFluxDiagType
   this%RN2FixAutor = 0._r8
 
   this%RKillOMAutor = 0._r8
-  this%R3OMEAutor = 0._r8
+  this%RkillRecycOMAutor = 0._r8
   this%RMaintdefKillOMAutor = 0._r8
   this%RMaintdefRecycOMAutor = 0._r8
   this%RNH4TransfLitrAutor = 0._r8
@@ -673,7 +673,7 @@ type, public :: NitroAQMFluxDiagType
   call destroy(this%RMaintdefLitrfal2ResduOMAutor)
   call destroy(this%RN2FixAutor)
   call destroy(this%RKillOMAutor)
-  call destroy(this%R3OMEAutor)
+  call destroy(this%RkillRecycOMAutor)
   call destroy(this%RMaintdefKillOMAutor)
   call destroy(this%RMaintdefRecycOMAutor)
   call destroy(this%RNH4TransfLitrAutor)

@@ -103,7 +103,7 @@ module NitroDisturbMod
 !
 !     REMOVE MICROBIAL BIOMASS
 !
-            D2960: DO N=1,NumMicbFunGroups
+            D2960: DO N=1,NumMicbFunGrupsPerCmplx
               DO NGL=JGnio(N),JGnfo(N)
                 DO M=1,nlbiomcp
                   MID=micpar%get_micb_id(M,NGL)
@@ -139,7 +139,7 @@ module NitroDisturbMod
 !
 !     REMOVE MICROBIAL BIOMASS
 !
-        DO  N=1,NumMicbFunGroups
+        DO  N=1,NumMicbFunGrupsPerCmplx
           DO NGL=JGniA(N),JGnfA(N)
             DO M=1,nlbiomcp
               MID=micpar%get_micb_id(M,NGL)

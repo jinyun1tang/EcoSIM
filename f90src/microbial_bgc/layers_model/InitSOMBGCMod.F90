@@ -245,7 +245,7 @@ module InitSOMBGCMOD
 ! complex is because complex 5 is shared by the other complexes
     OMEAutor(1:NumPlantChemElms,1:NumLiveAutoBioms,L,NY,NX)=0._r8
 
-    D8990: DO N=1,NumMicbFunGroups
+    D8990: DO N=1,NumMicbFunGrupsPerCmplx
       tglds=JGnfo(N)-JGnio(N)+1._r8
       D8991: DO M=1,nlbiomcp
         OMC1=AZMAX1(OSCM(K)*OMCI(M,K)*OMCF(N)*FOSCI)
@@ -260,7 +260,7 @@ module InitSOMBGCMOD
         OSCX(KK)=OSCX(KK)+OMC1
         OSNX(KK)=OSNX(KK)+OMN1
         OSPX(KK)=OSPX(KK)+OMP1
-        D8992: DO NN=1,NumMicbFunGroups
+        D8992: DO NN=1,NumMicbFunGrupsPerCmplx
           tglds=JGnfA(N)-JGniA(N)+1._r8
           do NGL=JGniA(N),JGnfA(N)
             MID=micpar%get_micb_id(M,NGL)
@@ -374,7 +374,7 @@ module InitSOMBGCMOD
   ENDIF
 
   D6990: DO K=1,jcplx
-    DO  N=1,NumMicbFunGroups
+    DO  N=1,NumMicbFunGrupsPerCmplx
       do NGL=JGnio(n),JGnfo(n)
         DO  M=1,nlbiomcp
           OC=OC+OMEheter(ielmc,MID,K,L,NY,NX)
@@ -406,7 +406,7 @@ module InitSOMBGCMOD
     RNO3UptkLitrAutor_col(:,NY,NX)=0.0_r8
     RH2PO4UptkLitrAutor_col(:,NY,NX)=0.0_r8
   ENDIF
-    DO  N=1,NumMicbFunGroups
+    DO  N=1,NumMicbFunGrupsPerCmplx
       do NGL=JGniA(n),JGnfA(n)
         DO  M=1,nlbiomcp
           MID=micpar%get_micb_id(M,NGL)

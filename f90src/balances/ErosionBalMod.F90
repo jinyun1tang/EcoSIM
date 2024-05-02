@@ -126,7 +126,7 @@ implicit none
 !         OHC,OHN,OHP,OHA=adsorbed C,N,P,acetate
 !         OSC,OAA,OSN,OSP=SOC,colonized SOC,SON,SOP
 !
-        D1960: DO N=1,NumMicbFunGroups
+        D1960: DO N=1,NumMicbFunGrupsPerCmplx
           DO NGL=JGnio(N),JGnfo(N)
             DO M=1,nlbiomcp
               MID=micpar%get_micb_id(M,NGL)
@@ -145,7 +145,7 @@ implicit none
 !         OHC,OHN,OHP,OHA=adsorbed C,N,P,acetate
 !         OSC,OAA,OSN,OSP=SOC,colonized SOC,SON,SOP
 !
-      DO N=1,NumMicbFunGroups
+      DO N=1,NumMicbFunGrupsPerCmplx
         DO NGL=JGniA(N),JGnfA(N)
           DO M=1,nlbiomcp
             MID=micpar%get_micb_id(M,NGL)        

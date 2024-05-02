@@ -123,7 +123,7 @@ module nitrosMod
     !mix microbial biomass
     D7971: DO K=1,micpar%NumOfLitrCmplxs
       if(.not.micpar%is_finelitter(K))cycle
-      D7961: DO N=1,NumMicbFunGroups
+      D7961: DO N=1,NumMicbFunGrupsPerCmplx
         DO NGL=JGnio(N),JGnfo(N)
           D7962: DO M=1,micpar%nlbiomcp
             MID=micpar%get_micb_id(M,NGL)            

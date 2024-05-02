@@ -88,7 +88,7 @@ implicit none
   subroutine Init(this)
   implicit none
   class(micsttype) :: this
-  integer :: jcplx,NumMicbFunGroups,jsken
+  integer :: jcplx,NumMicbFunGrupsPerCmplx,jsken
   integer, pointer :: ndbiomcp, nlbiomcp
   integer, pointer :: NumMicrobAutrophCmplx, NumHetetrMicCmplx
   integer, pointer :: NumLiveHeterBioms
@@ -97,7 +97,7 @@ implicit none
 
   jcplx=micpar%jcplx
   NumLiveAutoBioms => micpar%NumLiveAutoBioms
-  NumMicbFunGroups=micpar%NumMicbFunGroups
+  NumMicbFunGrupsPerCmplx=micpar%NumMicbFunGrupsPerCmplx
   jsken=micpar%jsken
   ndbiomcp =>micpar%ndbiomcp
   nlbiomcp =>micpar%nlbiomcp

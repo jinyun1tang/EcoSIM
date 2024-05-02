@@ -59,7 +59,7 @@ contains
     nlbiomcp               => micpar%nlbiomcp,               &
     ndbiomcp               => micpar%ndbiomcp,               &
     jsken                  => micpar%jsken,                  &
-    NumMicbFunGroups       => micpar%NumMicbFunGroups,       &
+    NumMicbFunGrupsPerCmplx       => micpar%NumMicbFunGrupsPerCmplx,       &
     NumHetetrMicCmplx => micpar%NumHetetrMicCmplx, &
     NumMicrobAutrophCmplx  => micpar%NumMicrobAutrophCmplx,  &
     NumLiveHeterBioms      => micpar%NumLiveHeterBioms,      &
@@ -125,7 +125,7 @@ contains
     icarbhyro              => micpar%icarbhyro,              &
     iprotein               => micpar%iprotein,               &
     jsken                  => micpar%jsken,                  &
-    NumMicbFunGroups       => micpar%NumMicbFunGroups,       &
+    NumMicbFunGrupsPerCmplx       => micpar%NumMicbFunGrupsPerCmplx,       &
     NumLiveHeterBioms      => micpar%NumLiveHeterBioms,      &
     NumLiveAutoBioms       => micpar%NumLiveAutoBioms,       &
     jcplx                  => micpar%jcplx,                  &
@@ -323,7 +323,7 @@ contains
   associate(                        &
     jcplx    => micpar%jcplx      , &
     jsken    => micpar%jsken      , &
-    NumMicbFunGroups     => micpar%NumMicbFunGroups       , &
+    NumMicbFunGrupsPerCmplx     => micpar%NumMicbFunGrupsPerCmplx       , &
     NumMicrobAutrophCmplx  => micpar%NumMicrobAutrophCmplx    , &
     NumHetetrMicCmplx  => micpar%NumHetetrMicCmplx    , &
     NumLiveHeterBioms => micpar%NumLiveHeterBioms, &
@@ -521,7 +521,7 @@ contains
   integer :: K,N,NGL,M
   associate(                                                 &
     jcplx                  => micpar%jcplx,                  &
-    NumMicbFunGroups       => micpar%NumMicbFunGroups,       &
+    NumMicbFunGrupsPerCmplx       => micpar%NumMicbFunGrupsPerCmplx,       &
     jsken                  => micpar%jsken,                  &
     k_humus                => micpar%k_humus,                &
     k_POM                  => micpar%k_POM,                  &
@@ -614,7 +614,7 @@ contains
 ! summarize diagnostic fluxes
   DO K=1,jcplx
     IF(.not.micfor%litrm.or.(micpar%is_litter(K)))THEN
-      DO N=1,NumMicbFunGroups
+      DO N=1,NumMicbFunGrupsPerCmplx
         DO NGL=micpar%JGnio(N),micpar%JGnfo(N)
           ystatesfl(fid_RO2EcoDmndPrev)=ystatesfl(fid_RO2EcoDmndPrev)+micflx%RO2DmndHetert(NGL,K)
           ystatesfl(fid_RNH4EcoDmndSoilPrev)=ystatesfl(fid_RNH4EcoDmndSoilPrev)+micflx%RNH4DmndSoilHeter(NGL,K)
@@ -635,7 +635,7 @@ contains
     ENDIF
   ENDDO
 
-  DO  N=1,NumMicbFunGroups
+  DO  N=1,NumMicbFunGrupsPerCmplx
     DO NGL=micpar%JGniA(N),micpar%JGnfA(N)
       ystatesfl(fid_RO2EcoDmndPrev)=ystatesfl(fid_RO2EcoDmndPrev)+micflx%RO2DmndAutort(NGL)
       ystatesfl(fid_RNH4EcoDmndSoilPrev)=ystatesfl(fid_RNH4EcoDmndSoilPrev)+micflx%RNH3OxidAutor(NGL)+micflx%RNH4UptkSoilAutor(NGL)
@@ -676,7 +676,7 @@ contains
     jcplx            => micpar%jcplx,            &
     JG               => micpar%jguilds,          &
     jsken            => micpar%jsken,            &
-    NumMicbFunGroups => micpar%NumMicbFunGroups, &
+    NumMicbFunGrupsPerCmplx => micpar%NumMicbFunGrupsPerCmplx, &
     nlbiomcp         => micpar%nlbiomcp,         &
     ndbiomcp         => micpar%ndbiomcp          &
   )
@@ -925,7 +925,7 @@ contains
 
   jj=0
   DO k=1,jcplx
-  DO N=1,NumMicbFunGroups
+  DO N=1,NumMicbFunGrupsPerCmplx
   DO NGL=micpar%JGnio(N),micpar%JGnfo(N)
   DO M=1,nlbiomcp
     ll=cid_OMEheter_b+jj;jj=jj+1
@@ -957,7 +957,7 @@ contains
   ENDDO
 
   jj=0
-  DO N=1,NumMicbFunGroups
+  DO N=1,NumMicbFunGrupsPerCmplx
   DO NGL=micpar%JGnio(N),micpar%JGnfo(N)
   DO M=1,nlbiomcp
     ll=cid_OMEAutor_b+jj;jj=jj+1
@@ -1113,7 +1113,7 @@ contains
 
   ll=0
   DO k=1,jcplx
-  DO N=1,NumMicbFunGroups
+  DO N=1,NumMicbFunGrupsPerCmplx
   DO NGL=micpar%JGniA(N),micpar%JGnfA(N)
     jj=fid_RNH4DmndSoilHeter_b+ll
     write(varl(jj),'(A,I2.2)')'RNH4DmndSoilHeter',ll
@@ -1127,7 +1127,7 @@ contains
 
   ll=0
   DO k=1,jcplx
-  DO N=1,NumMicbFunGroups
+  DO N=1,NumMicbFunGrupsPerCmplx
   DO NGL=micpar%JGnio(N),micpar%JGnfo(N)
     jj=fid_RNH4DmndBandHeter_b+ll
     write(varl(jj),'(A,I2.2)')'RNH4DmndBandHeter',ll
@@ -1142,7 +1142,7 @@ contains
 
   ll=0
   DO k=1,jcplx
-  DO N=1,NumMicbFunGroups
+  DO N=1,NumMicbFunGrupsPerCmplx
   DO NGL=micpar%JGnio(N),micpar%JGnfo(N)
     jj=fid_RNO3DmndSoilHeter_b+ll
     write(varl(jj),'(A,I2.2)')'RNO3DmndSoilHeter',ll
@@ -1156,7 +1156,7 @@ contains
 
   ll=0
   DO k=1,jcplx
-  DO N=1,NumMicbFunGroups
+  DO N=1,NumMicbFunGrupsPerCmplx
   DO NGL=micpar%JGnio(N),micpar%JGnfo(N)
     jj=fid_RNO3DmndBandHeter_b+ll
     write(varl(jj),'(A,I2.2)')'RNO3DmndBandHeter',ll
@@ -1171,7 +1171,7 @@ contains
 
   ll=0
   DO k=1,jcplx
-  DO N=1,NumMicbFunGroups
+  DO N=1,NumMicbFunGrupsPerCmplx
   DO NGL=micpar%JGnio(N),micpar%JGnfo(N)
     jj=fid_RH2PO4DmndSoilHeter_b+ll
     write(varl(jj),'(A,I2.2)')'RH2PO4DmndSoilHeter',ll
@@ -1185,7 +1185,7 @@ contains
 
   ll=0
   DO k=1,jcplx
-  DO N=1,NumMicbFunGroups
+  DO N=1,NumMicbFunGrupsPerCmplx
   DO NGL=micpar%JGnio(N),micpar%JGnfo(N)
     jj=fid_RH2PO4DmndBandHeter_b+ll
     write(varl(jj),'(A,I2.2)')'RH2PO4DmndBandHeter',ll
@@ -1199,7 +1199,7 @@ contains
 
   ll=0
   DO k=1,jcplx
-  DO N=1,NumMicbFunGroups
+  DO N=1,NumMicbFunGrupsPerCmplx
   DO NGL=micpar%JGnio(N),micpar%JGnfo(N)
     jj=fid_RH1PO4DmndSoilHeter_b+ll
     write(varl(jj),'(A,I2.2)')'RH1PO4DmndSoilHeter',ll
@@ -1213,7 +1213,7 @@ contains
 
   ll=0
   DO k=1,jcplx
-  DO N=1,NumMicbFunGroups
+  DO N=1,NumMicbFunGrupsPerCmplx
   DO NGL=micpar%JGnio(N),micpar%JGnfo(N)
     jj=fid_RH1PO4DmndBandHeter_b+ll
     write(varl(jj),'(A,I2.2)')'RH1PO4DmndBandHeter',ll
@@ -1227,7 +1227,7 @@ contains
 
   ll=0
   DO k=1,jcplx
-  DO N=1,NumMicbFunGroups
+  DO N=1,NumMicbFunGrupsPerCmplx
   DO NGL=micpar%JGnio(N),micpar%JGnfo(N)
     jj=fid_RO2DmndHetert_b+ll
     write(varl(jj),'(A,I2.2)')'RO2DmndHetert',ll
@@ -1686,7 +1686,7 @@ contains
 
   DO K=1,micpar%jcplx
     IF(micpar%is_litter(K))THEN
-      DO N=1,micpar%NumMicbFunGroups
+      DO N=1,micpar%NumMicbFunGrupsPerCmplx
         DO NGL=micpar%JGnio(N),micpar%JGnfo(N)
           DO  M=1,micpar%nlbiomcp
             MID=micpar%get_micb_id(M,NGL)
@@ -1697,7 +1697,7 @@ contains
         enddo
       ENDDO
     ELSE
-      DO N=1,micpar%NumMicbFunGroups
+      DO N=1,micpar%NumMicbFunGrupsPerCmplx
         DO NGL=micpar%JGnio(N),micpar%JGnfo(N)
           DO  M=1,micpar%nlbiomcp
             MID=micpar%get_micb_id(M,NGL)          
@@ -1710,7 +1710,7 @@ contains
     ENDIF
   ENDDO
 ! abstract complex
-  DO  N=1,micpar%NumMicbFunGroups
+  DO  N=1,micpar%NumMicbFunGrupsPerCmplx
     DO NGL=micpar%JGniA(N),micpar%JGnfA(N)
       DO  M=1,micpar%nlbiomcp
         MID=micpar%get_micb_id(M,NGL)               

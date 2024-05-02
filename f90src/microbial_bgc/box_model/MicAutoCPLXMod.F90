@@ -408,7 +408,7 @@ module MicAutoCPLXMod
     RMaintdefLitrfal2HumOMAutor   => nmicf%RMaintdefLitrfal2HumOMAutor,   &
     RMaintdefLitrfal2ResduOMAutor => nmicf%RMaintdefLitrfal2ResduOMAutor, &
     RKillOMAutor                  => nmicf%RKillOMAutor,                  &
-    R3OMEAutor                    => nmicf%R3OMEAutor,                    &
+    RkillRecycOMAutor                    => nmicf%RkillRecycOMAutor,                    &
     RMaintdefKillOMAutor          => nmicf%RMaintdefKillOMAutor,          &
     RMaintdefRecycOMAutor         => nmicf%RMaintdefRecycOMAutor,         &
     Resp4NFixAutor                => nmicf%Resp4NFixAutor,                &
@@ -527,7 +527,7 @@ module MicAutoCPLXMod
     RkillLitfalOMAutor(ielmn,M,NGL)=RKillOMAutor(ielmn,M,NGL)*(1.0_r8-RCCC)*(1.0_r8-RCCN)
     RkillLitfalOMAutor(ielmp,M,NGL)=RKillOMAutor(ielmp,M,NGL)*(1.0_r8-RCCC)*(1.0_r8-RCCP)
     DO NE=1,NumPlantChemElms
-      R3OMEAutor(NE,M,NGL)=RKillOMAutor(NE,M,NGL)-RkillLitfalOMAutor(NE,M,NGL)
+      RkillRecycOMAutor(NE,M,NGL)=RKillOMAutor(NE,M,NGL)-RkillLitfalOMAutor(NE,M,NGL)
 !
 !     HUMIFICATION OF MICROBIAL DECOMPOSITION PRODUCTS FROM
 !     DECOMPOSITION RATE, SOIL CLAY AND OC 'EHUM' FROM 'HOUR1'
@@ -1867,7 +1867,7 @@ module MicAutoCPLXMod
     RMaintdefLitrfal2HumOMAutor => nmicf%RMaintdefLitrfal2HumOMAutor, &
     RN2FixAutor                 => nmicf%RN2FixAutor,                 &
     RKillOMAutor                => nmicf%RKillOMAutor,                &
-    R3OMEAutor                  => nmicf%R3OMEAutor,                  &
+    RkillRecycOMAutor           => nmicf%RkillRecycOMAutor,           &
     RMaintdefKillOMAutor        => nmicf%RMaintdefKillOMAutor,        &
     RMaintdefRecycOMAutor       => nmicf%RMaintdefRecycOMAutor,       &
     RNH4TransfLitrAutor         => nmicf%RNH4TransfLitrAutor,         &
@@ -1886,14 +1886,14 @@ module MicAutoCPLXMod
     SOMHumCarbohyd              => micstt%SOMHumCarbohyd,             &
     JGniA                       => micpar%JGniA,                      &
     JGnfA                       => micpar%JGnfA,                      &
-    NumMicbFunGroups            => micpar%NumMicbFunGroups,           &
+    NumMicbFunGrupsPerCmplx     => micpar%NumMicbFunGrupsPerCmplx,    &
     icarbhyro                   => micpar%icarbhyro,                  &
     iprotein                    => micpar%iprotein,                   &
     k_POM                       => micpar%k_POM,                      &
-    is_activef_micb             => micpar%is_activef_micb       &
+    is_activeMicrbFungrpAutor             => micpar%is_activeMicrbFungrpAutor             &
   )
-  DO  N=1,NumMicbFunGroups
-    IF(is_activef_micb(N))THEN
+  DO  N=1,NumMicbFunGrupsPerCmplx
+    IF(is_activeMicrbFungrpAutor(N))THEN
       DO NGL=JGniA(N),JGnfA(N)
         DO  M=1,2
           MID=micpar%get_micb_id(M,NGL)
@@ -1945,9 +1945,11 @@ module MicAutoCPLXMod
         RCO2ProdAutor(NGL)=RCO2ProdAutor(NGL)+Resp4NFixAutor(NGL)
         MID3=micpar%get_micb_id(3,NGL)
         DO M=1,2
-          OMEAutor(ielmc,MID3)=OMEAutor(ielmc,MID3)-NonstX2stBiomAutor(ielmc,M,NGL)+R3OMEAutor(ielmc,M,NGL)
-          OMEAutor(ielmn,MID3)=OMEAutor(ielmn,MID3)-NonstX2stBiomAutor(ielmn,M,NGL)+R3OMEAutor(ielmn,M,NGL)+RMaintdefRecycOMAutor(ielmn,M,NGL)
-          OMEAutor(ielmp,MID3)=OMEAutor(ielmp,MID3)-NonstX2stBiomAutor(ielmp,M,NGL)+R3OMEAutor(ielmp,M,NGL)+RMaintdefRecycOMAutor(ielmp,M,NGL)
+          DO NE=1,NumPlantChemElms
+            OMEAutor(NE,MID3)=OMEAutor(NE,MID3)-NonstX2stBiomAutor(NE,M,NGL)+RkillRecycOMAutor(NE,M,NGL)
+          ENDDO
+          OMEAutor(ielmn,MID3)=OMEAutor(ielmn,MID3)+RMaintdefRecycOMAutor(ielmn,M,NGL)
+          OMEAutor(ielmp,MID3)=OMEAutor(ielmp,MID3)+RMaintdefRecycOMAutor(ielmp,M,NGL)
           RCO2ProdAutor(NGL)=RCO2ProdAutor(NGL)+RMaintdefRecycOMAutor(ielmc,M,NGL)
         ENDDO
         OMEAutor(ielmc,MID3)=OMEAutor(ielmc,MID3)+CGROMC

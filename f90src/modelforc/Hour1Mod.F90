@@ -43,7 +43,7 @@ module Hour1Mod
   use PlantDataRateType
   use GridDataType
   use EcoSIMConfig, only : jcplx1 => jcplx1c,jcplx=>jcplxc,nlbiomcp=>NumLiveMicrbCompts
-  use EcoSIMConfig, only : ndbiomcp=>NumDeadMicrbCompts,jsken=>jskenc,NumMicbFunGroups=>NumMicbFunGroups,do_instequil
+  use EcoSIMConfig, only : ndbiomcp=>NumDeadMicrbCompts,jsken=>jskenc,NumMicbFunGrupsPerCmplx=>NumMicbFunGrupsPerCmplx,do_instequil
   use EcoSiMParDataMod, only : micpar,pltpar
   implicit none
 
@@ -1834,7 +1834,7 @@ module Hour1Mod
 !     OMCI=microbial biomass content in litter
 !     OMCF,OMCA=hetero,autotrophic biomass composition in litter
 !
-      D2960: DO N=1,NumMicbFunGroups
+      D2960: DO N=1,NumMicbFunGrupsPerCmplx
         tglds=JGnfo(N)-JGnfo(N)+1
         D2961: DO M=1,nlbiomcp
           OMC1=AZMAX1(AMIN1(OSCI*micpar%OMCI(M,K)*micpar%OMCF(N),OSCI-OSCX))
@@ -1852,7 +1852,7 @@ module Hour1Mod
           OSCX=OSCX+OMC1
           OSNX=OSNX+OMN1
           OSPX=OSPX+OMP1
-          D2962: DO NN=1,NumMicbFunGroups
+          D2962: DO NN=1,NumMicbFunGrupsPerCmplx
             tglds=JGnfA(N)-JGniA(N)+1
             DO NGL=JGniA(NN),JGnfA(NN)
               MID=micpar%get_micb_id(M,NGL)

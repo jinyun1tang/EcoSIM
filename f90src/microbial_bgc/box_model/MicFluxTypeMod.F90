@@ -86,12 +86,12 @@ implicit none
 
   implicit none
   class(micfluxtype) :: this
-  integer :: jcplx,JG,NumMicbFunGroups
+  integer :: jcplx,JG,NumMicbFunGrupsPerCmplx
   integer :: NumHetetrMicCmplx, NumMicrobAutrophCmplx
 
   jcplx=micpar%jcplx
   JG=micpar%jguilds
-  NumMicbFunGroups=micpar%NumMicbFunGroups
+  NumMicbFunGrupsPerCmplx=micpar%NumMicbFunGrupsPerCmplx
   NumHetetrMicCmplx=micpar%NumHetetrMicCmplx
   NumMicrobAutrophCmplx=micpar%NumMicrobAutrophCmplx
 
@@ -141,7 +141,7 @@ implicit none
 
   implicit none
   class(micfluxtype) :: this
-  integer :: jcplx,JG,NumMicbFunGroups
+  integer :: jcplx,JG,NumMicbFunGrupsPerCmplx
 
   this%RO2UptkSoilM = 0._r8
   this%RDOM_micb_flx=0._r8

@@ -163,9 +163,9 @@ implicit none
   type(micsttype), intent(inout) :: micstt
   type(micfluxtype), intent(inout) :: micflx
 
-  integer :: NumMicbFunGroups, jcplx, k_POM, k_humus
+  integer :: NumMicbFunGrupsPerCmplx, jcplx, k_POM, k_humus
   integer :: kk, ndbiomcp, nlbiomcp, NumMicrobAutrophCmplx, NumHetetrMicCmplx
-  NumMicbFunGroups=micpar%NumMicbFunGroups
+  NumMicbFunGrupsPerCmplx=micpar%NumMicbFunGrupsPerCmplx
   jcplx=micpar%jcplx
 
   ndbiomcp = micpar%ndbiomcp
@@ -360,9 +360,9 @@ implicit none
   logical, intent(in) :: litrM
   type(micsttype), intent(in) :: micstt
   type(micfluxtype), intent(in) :: micflx
-  integer :: NumMicbFunGroups, jcplx, NumMicrobAutrophCmplx
+  integer :: NumMicbFunGrupsPerCmplx, jcplx, NumMicrobAutrophCmplx
   NumMicrobAutrophCmplx = micpar%NumMicrobAutrophCmplx
-  NumMicbFunGroups=micpar%NumMicbFunGroups
+  NumMicbFunGrupsPerCmplx=micpar%NumMicbFunGrupsPerCmplx
   jcplx=micpar%jcplx
 
   trcg_RMicbTransf_vr(idg_CO2,L,NY,NX) =micflx%RCO2NetUptkMicb

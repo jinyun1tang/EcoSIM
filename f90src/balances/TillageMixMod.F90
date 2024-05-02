@@ -158,7 +158,7 @@ module TillageMixMod
     DP=0.0_r8
 
     DO  K=1,micpar%NumOfLitrCmplxs
-      DO  N=1,NumMicbFunGroups
+      DO  N=1,NumMicbFunGrupsPerCmplx
         DO NGL=JGnio(N),JGnfo(N)
           DO  M=1,nlbiomcp
             MID=micpar%get_micb_id(M,NGL)
@@ -176,7 +176,7 @@ module TillageMixMod
       ENDDO
     ENDDO
 
-    DO  N=1,NumMicbFunGroups
+    DO  N=1,NumMicbFunGrupsPerCmplx
       DO NGL=JGniA(N),JGnfA(N)
         DO  M=1,nlbiomcp
           MID=micpar%get_micb_id(M,NGL)
@@ -379,7 +379,7 @@ module TillageMixMod
         ENDDO
 
         DO  K=1,jcplx
-          DO  N=1,NumMicbFunGroups
+          DO  N=1,NumMicbFunGrupsPerCmplx
             DO NGL=JGnio(N),JGnfo(N)
               DO  M=1,nlbiomcp
                 MID=micpar%get_micb_id(M,NGL)
@@ -391,7 +391,7 @@ module TillageMixMod
           enddo
         ENDDO
 
-        DO  N=1,NumMicbFunGroups
+        DO  N=1,NumMicbFunGrupsPerCmplx
           DO NGL=JGniA(N),JGnfA(N)
             DO  M=1,nlbiomcp
               MID=micpar%get_micb_id(M,NGL)
@@ -521,7 +521,7 @@ module TillageMixMod
         call MixSoluteH(L,NY,NX)
 
         DO  K=1,jcplx
-          DO  N=1,NumMicbFunGroups
+          DO  N=1,NumMicbFunGrupsPerCmplx
             DO NGL=JGnio(N),JGnfo(N)
               DO  M=1,nlbiomcp
                 MID=micpar%get_micb_id(M,NGL)
@@ -535,7 +535,7 @@ module TillageMixMod
             enddo
           enddo
         ENDDO
-        DO  N=1,NumMicbFunGroups
+        DO  N=1,NumMicbFunGrupsPerCmplx
           DO NGL=JGniA(N),JGnfA(N)
             DO  M=1,nlbiomcp
               MID=micpar%get_micb_id(M,NGL)
@@ -596,7 +596,7 @@ module TillageMixMod
 !     WITHIN TILLAGE MIXING ZONE
 !
         DO  K=1,micpar%NumOfLitrCmplxs
-          DO  N=1,NumMicbFunGroups
+          DO  N=1,NumMicbFunGrupsPerCmplx
             DO NGL=JGnio(N),JGnfo(N)
               DO M=1,nlbiomcp
                 MID=micpar%get_micb_id(M,NGL)
@@ -608,7 +608,7 @@ module TillageMixMod
           ENDDO
         ENDDO
 
-        DO  N=1,NumMicbFunGroups
+        DO  N=1,NumMicbFunGrupsPerCmplx
           DO NGL=JGniA(N),JGnfA(N)
             DO M=1,nlbiomcp
               MID=micpar%get_micb_id(M,NGL)
@@ -652,7 +652,7 @@ module TillageMixMod
         DP=0.0_r8
 
         DO  K=1,jcplx
-          DO  N=1,NumMicbFunGroups
+          DO  N=1,NumMicbFunGrupsPerCmplx
             DO NGL=JGnio(N),JGnfo(N)
               DO  M=1,nlbiomcp
                 MID=micpar%get_micb_id(M,NGL)
@@ -665,7 +665,7 @@ module TillageMixMod
         ENDDO
 
         DO  K=1,micpar%NumOfLitrCmplxs
-          DO  N=1,NumMicbFunGroups
+          DO  N=1,NumMicbFunGrupsPerCmplx
             DO NGL=JGnio(N),JGnfo(N)
               DO  M=1,nlbiomcp
                 MID=micpar%get_micb_id(M,NGL)
@@ -676,7 +676,7 @@ module TillageMixMod
             enddo
           enddo
         ENDDO
-        DO  N=1,NumMicbFunGroups
+        DO  N=1,NumMicbFunGrupsPerCmplx
           DO NGL=JGniA(N),JGnfA(N)
             DO  M=1,nlbiomcp
               MID=micpar%get_micb_id(M,NGL)
