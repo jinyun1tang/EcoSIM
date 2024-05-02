@@ -626,7 +626,7 @@ module MicBGCMod
     TempMaintRHeter     => nmics%TempMaintRHeter,        &
     GrowthEnvScalHeter  => nmics%GrowthEnvScalHeter,     &
     OMActHeter          => nmics%OMActHeter,             &
-    TCGOMEheter         => ncplxf%TCGOMEheter,           &
+    TDOMUptkHeter         => ncplxf%TDOMUptkHeter,           &
     XCO2                => nmicdiag%XCO2,                &
     TSensGrowth         => nmicdiag%TSensGrowth,         &
     TotActMicrobiom     => nmicdiag%TotActMicrobiom,     &
@@ -658,7 +658,7 @@ module MicBGCMod
   )
   RH2UptkAutor=0.0_r8
 
-  TCGOMEheter(:,:)=0.0_r8
+  TDOMUptkHeter(:,:)=0.0_r8
 
   D760: DO K=1,jcplx
     IF(.not.litrm.OR.(K.NE.k_POM.AND.K.NE.k_humus))THEN
@@ -669,6 +669,9 @@ module MicBGCMod
             MID=micpar%get_micb_id(M,NGL)          
             TOMCNK(M)=TOMCNK(M)+OMEheter(ielmc,MID,K)
           ENDDO
+        ENDDO  
+
+        DO NGL=JGnio(N),JGnfo(N)        
 
 !           WatStressMicb=water potential (PSISoilMatricP) effect on microbial respiration
 !           OXKX=Km for O2 uptake
@@ -704,7 +707,8 @@ module MicBGCMod
           MID=micpar%get_micb_id(M,NGL)
           TOMCNK(M)=TOMCNK(M)+OMEAutor(ielmc,MID)
         ENDDO
-
+      ENDDO
+      DO NGL=JGniA(N),JGnfA(N)
         WatStressMicb=EXP(0.2_r8*PSISoilMatricP)
         OXKX=OXKA
         GrowthEnvScalAutor(NGL)=TSensGrowth*WatStressMicb
@@ -1175,7 +1179,7 @@ module MicBGCMod
     RAnabolDOCUptkHeter  => nmicf%RAnabolDOCUptkHeter,  &
     RAnabolAcetUptkHeter => nmicf%RAnabolAcetUptkHeter, &
     DOMSorp              => ncplxf%DOMSorp,             &
-    TCGOMEheter          => ncplxf%TCGOMEheter,         &
+    TDOMUptkHeter          => ncplxf%TDOMUptkHeter,         &
     BulkSOMC              => ncplxs%BulkSOMC,             &
     FOCA                 => ncplxs%FOCA,                &
     FOAA                 => ncplxs%FOAA,                &
@@ -1193,7 +1197,7 @@ module MicBGCMod
 !     VLWatMicPM=soil water content, FracBulkSOMC=fraction of total SOC
 !     AEC,AECX=anion exchange capacity
 !     OQC,OQN,OQP,OQA=DOC,DON,DOP,acetate in micropores
-!     TCGOQC,TCGOMEheter,TCGOMEheter,TCGOAC=total uptake of DOC,DON,DOP,acetate
+!     TCGOQC,TDOMUptkHeter,TDOMUptkHeter,TCGOAC=total uptake of DOC,DON,DOP,acetate
 !     OHC,OHN,OHP,OHA=adsorbed C,N,P,acetate
 !     TSORP,HSORP=sorption rate constant and coefficient for OHC
 !     FOCA,FOAA=fractions of DOC and acetate vs. DOC+acetate
@@ -1206,7 +1210,7 @@ module MicBGCMod
       AECX=AEC
     ENDIF
     DO idom=idom_beg,idom_end
-      OQEX(idom)=AMAX1(ZEROS,DOM(idom,K)-TCGOMEheter(idom,K))
+      OQEX(idom)=AMAX1(ZEROS,DOM(idom,K)-TDOMUptkHeter(idom,K))
       OHEX(idom)=AMAX1(ZEROS,SorbedOM(idom,K))
     ENDDO
 
@@ -3518,7 +3522,7 @@ module MicBGCMod
     OMN2                => nmics%OMN2,                &
     Resp4NFixHeter      => nmicf%Resp4NFixHeter,      &
     RespGrossHeter      => nmicf%RespGrossHeter,      &
-    RMaintDmndHeter               => nmicf%RMaintDmndHeter,               &
+    RMaintDmndHeter     => nmicf%RMaintDmndHeter,     &
     RNH4TransfSoilHeter => nmicf%RNH4TransfSoilHeter, &
     RNO3TransfSoilHeter => nmicf%RNO3TransfSoilHeter, &
     RN2FixHeter         => nmicf%RN2FixHeter,         &
@@ -3612,42 +3616,42 @@ module MicBGCMod
   real(r8) :: SPOMX
   real(r8) :: FRM
 !     begin_execution
-  associate(                                              &
-    CNOMActHeter          => nmics%CNOMActHeter,          &
-    CPOMActHeter          => nmics%CPOMActHeter,          &
-    GrowthEnvScalHeter    => nmics%GrowthEnvScalHeter,    &
-    FCN                   => nmics%FCN,                   &
-    FCP                   => nmics%FCP,                   &
-    FracHeterBiomOfActK   => nmics%FracHeterBiomOfActK,   &
-    CGOMEheter            => nmicf%CGOMEheter,            &
-    RAnabolDOCUptkHeter   => nmicf%RAnabolDOCUptkHeter,   &
-    RAnabolAcetUptkHeter  => nmicf%RAnabolAcetUptkHeter,  &
-    NonstX2stBiomHeter    => nmicf%NonstX2stBiomHeter,    &
-    RespGrossHeter        => nmicf%RespGrossHeter,        &
-    RNOxReduxRespDenitLim => nmicf%RNOxReduxRespDenitLim, &
-    RMaintDmndHeter       => nmicf%RMaintDmndHeter,       &
-    RkillLitfalOMHeter    => nmicf%RkillLitfalOMHeter,    &
-    RkillLitrfal2HumOMHeter            => nmicf%RkillLitrfal2HumOMHeter,            &
-    RkillLitrfal2ResduOMHeter            => nmicf%RkillLitrfal2ResduOMHeter,            &
-    RMaintdefLitrfal2HumOMHeter            => nmicf%RMaintdefLitrfal2HumOMHeter,            &
-    RMaintdefLitrfal2ResduOMHeter            => nmicf%RMaintdefLitrfal2ResduOMHeter,            &
-    RMaintdefLitrfalOMHeter            => nmicf%RMaintdefLitrfalOMHeter,            &
-    RKillOMHeter          => nmicf%RKillOMHeter,          &
-    RkillRecycOMHeter     => nmicf%RkillRecycOMHeter,     &
-    RMaintdefKillOMHeter            => nmicf%RMaintdefKillOMHeter,            &
-    RMaintdefRecycOMHeter            => nmicf%RMaintdefRecycOMHeter,            &
-    Resp4NFixHeter        => nmicf%Resp4NFixHeter,        &
-    TCGOMEheter           => ncplxf%TCGOMEheter,          &
-    CNQ                   => ncplxs%CNQ,                  &
-    CPQ                   => ncplxs%CPQ,                  &
-    rNCOMC                => micpar%rNCOMC,               &
-    rPCOMC                => micpar%rPCOMC,               &
-    FL                    => micpar%FL,                   &
-    EHUM                  => micstt%EHUM,                 &
-    OMEheter              => micstt%OMEheter,             &
-    DOM                   => micstt%DOM,                  &
-    ZEROS                 => micfor%ZEROS,                &
-    ZERO                  => micfor%ZERO                  &
+  associate(                                                              &
+    CNOMActHeter                  => nmics%CNOMActHeter,                  &
+    CPOMActHeter                  => nmics%CPOMActHeter,                  &
+    GrowthEnvScalHeter            => nmics%GrowthEnvScalHeter,            &
+    FCN                           => nmics%FCN,                           &
+    FCP                           => nmics%FCP,                           &
+    FracHeterBiomOfActK           => nmics%FracHeterBiomOfActK,           &
+    CGOMEheter                    => nmicf%CGOMEheter,                    &
+    RAnabolDOCUptkHeter           => nmicf%RAnabolDOCUptkHeter,           &
+    RAnabolAcetUptkHeter          => nmicf%RAnabolAcetUptkHeter,          &
+    NonstX2stBiomHeter            => nmicf%NonstX2stBiomHeter,            &
+    RespGrossHeter                => nmicf%RespGrossHeter,                &
+    RNOxReduxRespDenitLim         => nmicf%RNOxReduxRespDenitLim,         &
+    RMaintDmndHeter               => nmicf%RMaintDmndHeter,               &
+    RkillLitfalOMHeter            => nmicf%RkillLitfalOMHeter,            &
+    RkillLitrfal2HumOMHeter       => nmicf%RkillLitrfal2HumOMHeter,       &
+    RkillLitrfal2ResduOMHeter     => nmicf%RkillLitrfal2ResduOMHeter,     &
+    RMaintdefLitrfal2HumOMHeter   => nmicf%RMaintdefLitrfal2HumOMHeter,   &
+    RMaintdefLitrfal2ResduOMHeter => nmicf%RMaintdefLitrfal2ResduOMHeter, &
+    RMaintdefLitrfalOMHeter       => nmicf%RMaintdefLitrfalOMHeter,       &
+    RKillOMHeter                  => nmicf%RKillOMHeter,                  &
+    RkillRecycOMHeter             => nmicf%RkillRecycOMHeter,             &
+    RMaintdefKillOMHeter          => nmicf%RMaintdefKillOMHeter,          &
+    RMaintdefRecycOMHeter         => nmicf%RMaintdefRecycOMHeter,         &
+    Resp4NFixHeter                => nmicf%Resp4NFixHeter,                &
+    TDOMUptkHeter                   => ncplxf%TDOMUptkHeter,                  &
+    CNQ                           => ncplxs%CNQ,                          &
+    CPQ                           => ncplxs%CPQ,                          &
+    rNCOMC                        => micpar%rNCOMC,                       &
+    rPCOMC                        => micpar%rPCOMC,                       &
+    FL                            => micpar%FL,                           &
+    EHUM                          => micstt%EHUM,                         &
+    OMEheter                      => micstt%OMEheter,                     &
+    DOM                           => micstt%DOM,                          &
+    ZEROS                         => micfor%ZEROS,                        &
+    ZERO                          => micfor%ZERO                          &
   )
 
 !     DOC, DON, DOP AND ACETATE UPTAKE DRIVEN BY GROWTH RESPIRATION
@@ -3677,12 +3681,13 @@ module MicBGCMod
   RAnabolDOCUptkHeter(NGL,K)=CGOMX*FGOCP+CGOMD
   RAnabolAcetUptkHeter(NGL,K)=CGOMX*FGOAP
   CGOXC=RAnabolDOCUptkHeter(NGL,K)+RAnabolAcetUptkHeter(NGL,K)
-  CGOMEheter(ielmp,NGL,K)=AZMAX1(AMIN1(DOM(idom_don,K)*FracHeterBiomOfActK(NGL,K),CGOXC*CNQ(K)/FCN(NGL,K)))
+  CGOMEheter(ielmn,NGL,K)=AZMAX1(AMIN1(DOM(idom_don,K)*FracHeterBiomOfActK(NGL,K),CGOXC*CNQ(K)/FCN(NGL,K)))
   CGOMEheter(ielmp,NGL,K)=AZMAX1(AMIN1(DOM(idom_dop,K)*FracHeterBiomOfActK(NGL,K),CGOXC*CPQ(K)/FCP(NGL,K)))
-  TCGOMEheter(ielmc,K)=TCGOMEheter(ielmc,K)+RAnabolDOCUptkHeter(NGL,K)
-  TCGOMEheter(idom_acetate,K)=TCGOMEheter(idom_acetate,K)+RAnabolAcetUptkHeter(NGL,K)
-  TCGOMEheter(ielmp,K)=TCGOMEheter(ielmp,K)+CGOMEheter(ielmp,NGL,K)
-  TCGOMEheter(ielmp,K)=TCGOMEheter(ielmp,K)+CGOMEheter(ielmp,NGL,K)
+
+  TDOMUptkHeter(ielmc,K)=TDOMUptkHeter(ielmc,K)+RAnabolDOCUptkHeter(NGL,K)
+  TDOMUptkHeter(idom_acetate,K)=TDOMUptkHeter(idom_acetate,K)+RAnabolAcetUptkHeter(NGL,K)
+  TDOMUptkHeter(ielmn,K)=TDOMUptkHeter(ielmn,K)+CGOMEheter(ielmn,NGL,K)
+  TDOMUptkHeter(ielmp,K)=TDOMUptkHeter(ielmp,K)+CGOMEheter(ielmp,NGL,K)
 !
 !     TRANSFER UPTAKEN C,N,P FROM STORAGE TO ACTIVE BIOMASS
 !
