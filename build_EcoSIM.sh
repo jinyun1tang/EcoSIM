@@ -21,26 +21,27 @@ function status_message()
 
 ############# EDIT THESE! ##################
 #cmake
-cmake_binary='which cmake'
+#cmake_binary=$(which cmake)
 
 #Compilers 
 #GNU compilers should work, intel compilers are trickier
-compiler_c=gcc
-compiler_cxx=g++
-compiler_fc=gfortran
+#compiler_c=$(which gcc)
+#compiler_cxx=$(which g++)
+#compiler_fc=$(which gfortran)
 
 #Compiler flags
-build_c_flags='-std=c99 -Wall -Wpedantic -Wextra -Wno-sign-compare -Wno-unused-parameter -Wno-unused-function -Wno-cast-qual -Wno-unused-but-set-variable -Wno-overlength-strings -Wno-int-to-pointer-cast -Wno-pointer-to-int-cast -Wno-discarded-qualifiers -Wno-sign-conversion -Wno-maybe-uninitialized -D_POSIX_C_SOURCE=200809L'
-build_cxx_flags=' '
-build_fort_flags='-W -Wall -fbounds-check -std=gnu -pedantic -fcheck=all -cpp -g -fbacktrace -fmax-stack-var-size=524288  -DCPRGNU -fdefault-real-8 -Wno-unused-variable -ffpe-trap=invalid -Wno-unused-parameter -Wno-unused-function -Wuninitialized -Wno-unused-dummy-argument -ffree-line-length-none'
-build_link_flags=' '
+#build_c_flags='-std=c99 -Wall -Wpedantic -Wextra -Wno-sign-compare -Wno-unused-parameter -Wno-unused-function -Wno-cast-qual -Wno-unused-but-set-variable -Wno-overlength-strings -Wno-int-to-pointer-cast -Wno-pointer-to-int-cast -Wno-discarded-qualifiers -Wno-sign-conversion -Wno-maybe-uninitialized'
+#build_cxx_flags=' '
+#build_fort_flags='-W -Wall -Wno-unused-variable -Wno-unused-parameter -Wno-unused-function -Wuninitialized -Wno-unused-dummy-argument'
+#build_link_flags=' '
 
 #Install prefix
-ecosim_install_prefix=local
-build_type=Debug
-structured=0
-unstructured=0
-shared=0
+#ecosim_install_prefix=local
+#build_type=Debug
+#structured=0
+#unstructured=0
+#shared=0
+#openmp=0
 
 #This is a little confusing, but we have to move into the build dir
 #and then point cmake to the top-level CMakeLists file which will
@@ -62,38 +63,19 @@ fi
 # Configure the EcoSIM build
 # Note: many of the options that used to be in the CMakeLists.txt file
 # have been moved here to remove redundancies
-echo "cmd_configure with settings: "
-echo "cmake_binary: $cmake_binary"
-echo "build_c_flags: $build_c_flags"
-echo "build_fort_flags: $build_fort_flags"
-echo "build_link_flags: $build_link_flags"
-ehco "ecosim_install_prefix: $ecosim_install_prefix"
-echo "build_type: $build_type"
-echo "structured: $structured"
-echo "unstructured: $structured"
-echo "openmp: $openmp"
-echo "shared: $shared"
-echo "ecosim_source_dir: $ecosim_source_dir"
 
 cmd_configure="${cmake_binary} \
-    -DCMAKE_C_FLAGS:STRING="${build_c_flags}" \
-    -DCMAKE_CXX_FLAGS:STRING="${build_cxx_flags}" \
-    -DCMAKE_Fortran_FLAGS:STRING="${build_fort_flags}" \
-    -DCMAKE_EXE_LINKER_FLAGS:STRING="${build_link_flags}" \
-    -DCMAKE_INSTALL_PREFIX:STRING=${ecosim_install_prefix} \
-    -DCMAKE_BUILD_TYPE:STRING=${build_type} \
-    -DENABLE_Structured:BOOL=${structured} \
-    -DENABLE_Unstructured:BOOL=${unstructured} \
-    -DENABLE_OpenMP:BOOL=${openmp} \
-    -DBUILD_SHARED_LIBS:BOOL=${shared} \
     ${ecosim_source_dir}"
 
 echo "cmd_configure: $cmd_configure"
 
 echo "building in: $ecosim_build_dir"
 #run the configure command
-cd ${ecosim_build_dir}
-${cmd_configure}
+#cd ${ecosim_build_dir}
+#${cmd_configure}
+cd build
+pwd
+cmake ../
 
 #This does the build
 make -j ${parallel_jobs}
