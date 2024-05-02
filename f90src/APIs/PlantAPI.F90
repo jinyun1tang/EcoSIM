@@ -98,9 +98,9 @@ implicit none
   ENDDO
   DO L=NU(NY,NX),NL(NY,NX)
     DO K=1,jcplx
-      RDOM_micb_flx(idom_doc,K,L,NY,NX)=plt_bgcr%RDOM_micb_flx(idom_doc,K,L)
-      RDOM_micb_flx(idom_don,K,L,NY,NX)=plt_bgcr%RDOM_micb_flx(idom_don,K,L)
-      RDOM_micb_flx(idom_dop,K,L,NY,NX)=plt_bgcr%RDOM_micb_flx(idom_dop,K,L)
+      DO NE=1,NumPlantChemElms
+        REcoDOMUptk_vr(NE,K,L,NY,NX)=plt_bgcr%REcoDOMUptk_vr(NE,K,L)
+      ENDDO
     ENDDO
     DO M=1,NPH
       RO2UptkSoilM_vr(M,L,NY,NX)=plt_rbgc%RO2UptkSoilM_vr(M,L)
@@ -937,9 +937,9 @@ implicit none
 
   DO L=0,NL(NY,NX)
     DO K=1,jcplx
-      plt_bgcr%RDOM_micb_flx(idom_doc,K,L)=RDOM_micb_flx(idom_doc,K,L,NY,NX)
-      plt_bgcr%RDOM_micb_flx(idom_don,K,L)=RDOM_micb_flx(idom_don,K,L,NY,NX)
-      plt_bgcr%RDOM_micb_flx(idom_dop,K,L)=RDOM_micb_flx(idom_dop,K,L,NY,NX)
+      DO NE=1,NumPlantChemElms
+        plt_bgcr%REcoDOMUptk_vr(NE,K,L)=REcoDOMUptk_vr(NE,K,L,NY,NX)
+      ENDDO
     ENDDO
   ENDDO
 

@@ -63,7 +63,7 @@ implicit none
   real(r8),target,allocatable ::  RNutMicbTransf_vr(:,:,:,:)         !total nutrient exchange, [g d-2 h-1]
   real(r8),target,allocatable ::  trcg_RMicbTransf_vr(:,:,:,:)       !microbial gases transformation, [g d-2 h-1]
   real(r8),target,allocatable ::  Micb_N2Fixation_vr(:,:,:)                       !net microbial N2 exchange, [g d-2 h-1]
-  real(r8),target,allocatable ::  RDOM_micb_flx(:,:,:,:,:)                     !net microbial DOC flux, [g d-2 h-1]
+  real(r8),target,allocatable ::  REcoDOMUptk_vr(:,:,:,:,:)          !net plant+microbial DOC flux, >0 into soil [g d-2 h-1]
   real(r8),target,allocatable ::  TMicHeterAct_vr(:,:,:)                       !total respiration of DOC+DOA in soil layer
   real(r8),target,allocatable ::  VWatMicrobAct_vr(:,:,:)                        !soil water volume occupied by microial biomass, [m3 m-3]
   real(r8),target,allocatable ::  TSens4MicbGrwoth_vr(:,:,:)                        !constraints of temperature and water potential on microbial activity, []
@@ -167,7 +167,7 @@ implicit none
   allocate(trcg_RMicbTransf_vr(idg_beg:idg_NH3-1,0:JZ,JY,JX)); trcg_RMicbTransf_vr=0._r8
   allocate(Micb_N2Fixation_vr(0:JZ,JY,JX));  Micb_N2Fixation_vr=0._r8
 
-  allocate(RDOM_micb_flx(idom_beg:idom_end,1:jcplx,0:JZ,JY,JX));RDOM_micb_flx=0._r8
+  allocate(REcoDOMUptk_vr(idom_beg:idom_end,1:jcplx,0:JZ,JY,JX));REcoDOMUptk_vr=0._r8
   allocate(TMicHeterAct_vr(0:JZ,JY,JX));  TMicHeterAct_vr=0._r8
   allocate(VWatMicrobAct_vr(0:JZ,JY,JX));   VWatMicrobAct_vr=0._r8
   allocate(TSens4MicbGrwoth_vr(0:JZ,JY,JX));   TSens4MicbGrwoth_vr=0._r8
@@ -258,7 +258,7 @@ implicit none
   call destroy(HydroIonFlx_col)
   call destroy(Micb_N2Fixation_vr)
   call destroy(RNutMicbTransf_vr)
-  call destroy(RDOM_micb_flx)
+  call destroy(REcoDOMUptk_vr)
   call destroy(TMicHeterAct_vr)
   call destroy(VWatMicrobAct_vr)
   call destroy(TSens4MicbGrwoth_vr)

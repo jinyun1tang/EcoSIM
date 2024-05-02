@@ -662,7 +662,7 @@ implicit none
   real(r8), pointer :: TCO2P(:)      => null()   !total root CO2 flux, [gC d-2 h-1]
   real(r8), pointer :: TRO2Uptk_vr(:)     => null()   !total root internal O2 flux, [g d-2 h-1]
   real(r8), pointer :: LitrfalStrutElms_vr(:,:,:,:)   => null() !total LitrFall element, [g d-2 h-1]
-  real(r8), pointer :: RDOM_micb_flx(:,:,:)    => null()  !net microbial DOC flux, [gC d-2 h-1]
+  real(r8), pointer :: REcoDOMUptk_vr(:,:,:)    => null()  !net microbial DOC flux, [gC d-2 h-1]
   real(r8), pointer :: CO2NetFix_pft(:)       => null()  !canopy net CO2 exchange, [gC d-2 h-1]
   real(r8), pointer :: GrossCO2Fix_pft(:)      => null()  !total gross CO2 fixation, [gC d-2 ]
   real(r8), pointer :: LitrfalStrutElms_pft(:,:)    => null()  !plant element LitrFall, [g d-2 h-1]
@@ -981,7 +981,7 @@ implicit none
   allocate(this%RO2EcoDmndPrev_vr(0:JZ1)); this%RO2EcoDmndPrev_vr=spval
   allocate(this%LitrfalStrutElms_vr(NumPlantChemElms,jsken,NumOfPlantLitrCmplxs,0:JZ1));this%LitrfalStrutElms_vr=spval
   allocate(this%GrossCO2Fix_pft(JP1));this%GrossCO2Fix_pft=spval
-  allocate(this%RDOM_micb_flx(idom_beg:idom_end,1:jcplx,0:JZ1));this%RDOM_micb_flx=spval
+  allocate(this%REcoDOMUptk_vr(1:NumPlantChemElms,1:jcplx,0:JZ1));this%REcoDOMUptk_vr=spval
   allocate(this%CO2NetFix_pft(JP1));this%CO2NetFix_pft=spval
   allocate(this%RootGasLossDisturb_pft(idg_beg:idg_end-1,JP1));this%RootGasLossDisturb_pft=spval
   allocate(this%GrossResp_pft(JP1));this%GrossResp_pft=spval

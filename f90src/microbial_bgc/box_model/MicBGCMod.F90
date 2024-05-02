@@ -1843,19 +1843,18 @@ module MicBGCMod
 !add as protein
               DO NE=1,NumPlantChemElms
                 SolidOM(NE,iprotein,k_humus)=SolidOM(NE,iprotein,k_humus) &
-                  +CFOMC(1)*(RkillLitrfal2HumOMHeter(NE,M,NGL,K)+RMaintdefLitrfal2HumOMHeter(NE,M,NGL,K))
+                  +CFOMC(iprotein)*(RkillLitrfal2HumOMHeter(NE,M,NGL,K)+RMaintdefLitrfal2HumOMHeter(NE,M,NGL,K))
   !add as carbon hydro
                 SolidOM(NE,icarbhyro,k_humus)=SolidOM(NE,icarbhyro,k_humus) &
-                  +CFOMC(2)*(RkillLitrfal2HumOMHeter(NE,M,NGL,K)+RMaintdefLitrfal2HumOMHeter(NE,M,NGL,K))
+                  +CFOMC(icarbhyro)*(RkillLitrfal2HumOMHeter(NE,M,NGL,K)+RMaintdefLitrfal2HumOMHeter(NE,M,NGL,K))
               ENDDO
             ELSE
-              SOMHumProtein(ielmc)=SOMHumProtein(ielmc)+CFOMCU(1)*(RkillLitrfal2HumOMHeter(ielmc,M,NGL,K)+RMaintdefLitrfal2HumOMHeter(ielmc,M,NGL,K))
-              SOMHumProtein(ielmn)=SOMHumProtein(ielmn)+CFOMCU(1)*(RkillLitrfal2HumOMHeter(ielmn,M,NGL,K)+RMaintdefLitrfal2HumOMHeter(ielmn,M,NGL,K))
-              SOMHumProtein(ielmp)=SOMHumProtein(ielmp)+CFOMCU(1)*(RkillLitrfal2HumOMHeter(ielmp,M,NGL,K)+RMaintdefLitrfal2HumOMHeter(ielmp,M,NGL,K))
-
-              SOMHumCarbohyd(ielmc)=SOMHumCarbohyd(ielmc)+CFOMC(2)*(RkillLitrfal2HumOMHeter(ielmc,M,NGL,K)+RMaintdefLitrfal2HumOMHeter(ielmc,M,NGL,K))
-              SOMHumCarbohyd(ielmn)=SOMHumCarbohyd(ielmn)+CFOMCU(2)*(RkillLitrfal2HumOMHeter(ielmn,M,NGL,K)+RMaintdefLitrfal2HumOMHeter(ielmn,M,NGL,K))
-              SOMHumCarbohyd(ielmp)=SOMHumCarbohyd(ielmp)+CFOMCU(2)*(RkillLitrfal2HumOMHeter(ielmp,M,NGL,K)+RMaintdefLitrfal2HumOMHeter(ielmp,M,NGL,K))
+              DO NE=1,NumPlantChemElms
+                SOMHumProtein(NE)=SOMHumProtein(NE)+CFOMCU(iprotein) &
+                  *(RkillLitrfal2HumOMHeter(NE,M,NGL,K)+RMaintdefLitrfal2HumOMHeter(NE,M,NGL,K))
+                SOMHumCarbohyd(NE)=SOMHumCarbohyd(NE)+CFOMC(icarbhyro) &
+                  *(RkillLitrfal2HumOMHeter(NE,M,NGL,K)+RMaintdefLitrfal2HumOMHeter(NE,M,NGL,K))
+              ENDDO
             ENDIF
           ENDDO D540
 
@@ -2060,7 +2059,7 @@ module MicBGCMod
     RNO2MicbTransf_vr        => micflx%RNO2MicbTransf_vr,        &
     XNO3B                    => micflx%XNO3B,                    &
     RNO3MicbTransf_vr        => micflx%RNO3MicbTransf_vr,        &
-    RDOM_micb_flx            => micflx%RDOM_micb_flx             &
+    REcoDOMUptk            => micflx%REcoDOMUptk             &
   )
   D650: DO K=1,jcplx
     IF(.not.litrm.OR.(K.NE.k_POM.AND.K.NE.k_humus))THEN
@@ -2170,31 +2169,31 @@ module MicBGCMod
   D655: DO K=1,jcplx
     D660: DO M=1,jsken
       DO NE=1,NumPlantChemElms
-        RDOM_micb_flx(NE,K)=RDOM_micb_flx(NE,K)+RDcmpProdDOM(NE,M,K)
+        REcoDOMUptk(NE,K)=REcoDOMUptk(NE,K)+RDcmpProdDOM(NE,M,K)
       ENDDO
     ENDDO D660
 
     D665: DO M=1,ndbiomcp
       DO NE=1,NumPlantChemElms
-        RDOM_micb_flx(NE,K)=RDOM_micb_flx(NE,K)+RHydlysBioResduOM(NE,M,K)
+        REcoDOMUptk(NE,K)=REcoDOMUptk(NE,K)+RHydlysBioResduOM(NE,M,K)
       ENDDO
     ENDDO D665
     DO NE=1,NumPlantChemElms
-      RDOM_micb_flx(NE,K)=RDOM_micb_flx(NE,K)+RHydlysSorptOM(NE,K)
+      REcoDOMUptk(NE,K)=REcoDOMUptk(NE,K)+RHydlysSorptOM(NE,K)
     ENDDO
-    RDOM_micb_flx(idom_acetate,K)=RDOM_micb_flx(idom_acetate,K)+RHydlysSorptOM(idom_acetate,K)
+    REcoDOMUptk(idom_acetate,K)=REcoDOMUptk(idom_acetate,K)+RHydlysSorptOM(idom_acetate,K)
     D670: DO N=1,NumMicbFunGrupsPerCmplx
       DO NGL=JGnio(N),JGnfo(N)
-        RDOM_micb_flx(idom_doc,K)=RDOM_micb_flx(idom_doc,K)-RAnabolDOCUptkHeter(NGL,K)
-        RDOM_micb_flx(idom_don,K)=RDOM_micb_flx(idom_don,K)-CGOMEheter(ielmp,NGL,K)
-        RDOM_micb_flx(idom_dop,K)=RDOM_micb_flx(idom_dop,K)-CGOMEheter(ielmp,NGL,K)
-        RDOM_micb_flx(idom_acetate,K)=RDOM_micb_flx(idom_acetate,K)-RAnabolAcetUptkHeter(NGL,K)+RAcettProdHeter(NGL,K)
+        REcoDOMUptk(idom_doc,K)=REcoDOMUptk(idom_doc,K)-RAnabolDOCUptkHeter(NGL,K)
+        REcoDOMUptk(idom_don,K)=REcoDOMUptk(idom_don,K)-CGOMEheter(ielmp,NGL,K)
+        REcoDOMUptk(idom_dop,K)=REcoDOMUptk(idom_dop,K)-CGOMEheter(ielmp,NGL,K)
+        REcoDOMUptk(idom_acetate,K)=REcoDOMUptk(idom_acetate,K)-RAnabolAcetUptkHeter(NGL,K)+RAcettProdHeter(NGL,K)
       ENDDO
     ENDDO D670
     DO NE=1,NumPlantChemElms
-      RDOM_micb_flx(NE,K)=RDOM_micb_flx(NE,K)-DOMSorp(NE,K)
+      REcoDOMUptk(NE,K)=REcoDOMUptk(NE,K)-DOMSorp(NE,K)
     ENDDO
-    RDOM_micb_flx(idom_acetate,K)=RDOM_micb_flx(idom_acetate,K)-DOMSorp(idom_acetate,K)
+    REcoDOMUptk(idom_acetate,K)=REcoDOMUptk(idom_acetate,K)-DOMSorp(idom_acetate,K)
   ENDDO D655
 !
 !     RNH4MicbTransf_vr,XNH4B=net change in NH4 in band,non-band

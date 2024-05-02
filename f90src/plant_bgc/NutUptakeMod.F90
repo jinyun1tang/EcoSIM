@@ -1222,16 +1222,16 @@ module NutUptakeMod
   real(r8) :: RootExudE,scal
   integer :: K,NE
   !     begin_execution
-  associate(                                                           &
-    RootMycoNonstElms_rpvr    =>  plt_biom%RootMycoNonstElms_rpvr    , &
-    ZEROP                     =>  plt_biom%ZEROP                     , &
-    ZEROS                     =>  plt_site%ZEROS                     , &
-    ZEROS2                    =>  plt_site%ZEROS2                    , &
-    VLWatMicPM                =>  plt_site%VLWatMicPM                , &
-    RootVH2O_pvr              =>  plt_morph%RootVH2O_pvr             , &
-    RootMycoExudElm_pvr       =>  plt_rbgc%RootMycoExudElm_pvr       , &
-    FracBulkSOMC_vr                     =>  plt_soilchem%FracBulkSOMC_vr                 , &
-    DOM                       =>  plt_soilchem%DOM                     &
+  associate(                                                   &
+    RootMycoNonstElms_rpvr => plt_biom%RootMycoNonstElms_rpvr, &
+    ZEROP                  => plt_biom%ZEROP,                  &
+    ZEROS                  => plt_site%ZEROS,                  &
+    ZEROS2                 => plt_site%ZEROS2,                 &
+    VLWatMicPM             => plt_site%VLWatMicPM,             &
+    RootVH2O_pvr           => plt_morph%RootVH2O_pvr,          &
+    RootMycoExudElm_pvr    => plt_rbgc%RootMycoExudElm_pvr,    &
+    FracBulkSOMC_vr        => plt_soilchem%FracBulkSOMC_vr,    &
+    DOM                    => plt_soilchem%DOM                 &
   )
   !
   !     ROOT EXUDATION OF C, N AND P DEPENDS ON CONCN DIFFERENCES
@@ -1307,7 +1307,7 @@ module NutUptakeMod
   integer :: K,NE
   !     begin_execution
   associate(                                                      &
-    RDOM_micb_flx           =>  plt_bgcr%RDOM_micb_flx          , &
+    REcoDOMUptk_vr           =>  plt_bgcr%REcoDOMUptk_vr          , &
     RootMycoNonstElms_rpvr  => plt_biom%RootMycoNonstElms_rpvr  , &    
     RootMycoExudElm_pvr     =>  plt_rbgc%RootMycoExudElm_pvr    , &
     RootMycoExudElms_pft    =>  plt_rbgc%RootMycoExudElms_pft   , &
@@ -1330,10 +1330,10 @@ module NutUptakeMod
     DO NE=1,NumPlantChemElms
       RootMycoExudElms_pft(NE,NZ)=RootMycoExudElms_pft(NE,NZ)+RootMycoExudElm_pvr(NE,N,K,L,NZ)
     ENDDO
-
-    RDOM_micb_flx(idom_doc,K,L)=RDOM_micb_flx(idom_doc,K,L)-RootMycoExudElm_pvr(ielmc,N,K,L,NZ)
-    RDOM_micb_flx(idom_don,K,L)=RDOM_micb_flx(idom_don,K,L)-RootMycoExudElm_pvr(ielmn,N,K,L,NZ)
-    RDOM_micb_flx(idom_dop,K,L)=RDOM_micb_flx(idom_dop,K,L)-RootMycoExudElm_pvr(ielmp,N,K,L,NZ)
+    !negative means uptake
+    REcoDOMUptk_vr(idom_doc,K,L)=REcoDOMUptk_vr(idom_doc,K,L)-RootMycoExudElm_pvr(ielmc,N,K,L,NZ)
+    REcoDOMUptk_vr(idom_don,K,L)=REcoDOMUptk_vr(idom_don,K,L)-RootMycoExudElm_pvr(ielmn,N,K,L,NZ)
+    REcoDOMUptk_vr(idom_dop,K,L)=REcoDOMUptk_vr(idom_dop,K,L)-RootMycoExudElm_pvr(ielmp,N,K,L,NZ)
   ENDDO D295
   
   RootNH4Uptake_pft(NZ)=RootNH4Uptake_pft(NZ) &

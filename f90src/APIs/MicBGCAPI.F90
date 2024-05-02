@@ -361,6 +361,8 @@ implicit none
   type(micsttype), intent(in) :: micstt
   type(micfluxtype), intent(in) :: micflx
   integer :: NumMicbFunGrupsPerCmplx, jcplx, NumMicrobAutrophCmplx
+  integer :: NE,idom
+  
   NumMicrobAutrophCmplx = micpar%NumMicrobAutrophCmplx
   NumMicbFunGrupsPerCmplx=micpar%NumMicbFunGrupsPerCmplx
   jcplx=micpar%jcplx
@@ -386,11 +388,10 @@ implicit none
   RNO2DmndBandChemo_vr(L,NY,NX)=micflx%RNO2DmndBandChemo
   NetNH4Mineralize_col(NY,NX)=NetNH4Mineralize_col(NY,NX)+micflx%NetNH4Mineralize
   NetPO4Mineralize_col(NY,NX)=NetPO4Mineralize_col(NY,NX)+micflx%NetPO4Mineralize
-  RDOM_micb_flx(idom_doc,1:jcplx,L,NY,NX)=micflx%RDOM_micb_flx(idom_doc,1:jcplx)
-  RDOM_micb_flx(idom_don,1:jcplx,L,NY,NX)=micflx%RDOM_micb_flx(idom_don,1:jcplx)
-  RDOM_micb_flx(idom_dop,1:jcplx,L,NY,NX)=micflx%RDOM_micb_flx(idom_dop,1:jcplx)
-  RDOM_micb_flx(idom_acetate,1:jcplx,L,NY,NX)=micflx%RDOM_micb_flx(idom_acetate,1:jcplx)
-
+  DO idom=idom_beg,idom_end
+    REcoDOMUptk_vr(idom,1:jcplx,L,NY,NX)=micflx%REcoDOMUptk(idom,1:jcplx)
+  ENDDO
+ 
   RO2DmndAutort(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RO2DmndAutort(1:NumMicrobAutrophCmplx)
   RNH3OxidAutor(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RNH3OxidAutor(1:NumMicrobAutrophCmplx)
   RNH3OxidAutorBand(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RNH3OxidAutorBand(1:NumMicrobAutrophCmplx)
@@ -426,17 +427,12 @@ implicit none
     RH2PO4UptkLitrAutor_col(1:NumMicrobAutrophCmplx,NY,NX)=micflx%RH2PO4UptkLitrAutor(1:NumMicrobAutrophCmplx)
     RH1PO4UptkLitrAutor_col(1:NumMicrobAutrophCmplx,NY,NX)=micflx%RH1PO4UptkLitrAutor(1:NumMicrobAutrophCmplx)
 
-    SolidOM_vr(ielmc,micpar%iprotein,micpar%k_POM,NU(NY,NX),NY,NX)=micstt%SOMPomProtein(ielmc)
-    SolidOM_vr(ielmc,micpar%iprotein,micpar%k_humus,NU(NY,NX),NY,NX)=micstt%SOMHumProtein(ielmc)
-    SolidOM_vr(ielmc,micpar%icarbhyro,micpar%k_humus,NU(NY,NX),NY,NX)=micstt%SOMHumCarbohyd(ielmc)
+    DO NE=1,NumPlantChemElms
+      SolidOM_vr(NE,micpar%iprotein,micpar%k_POM,NU(NY,NX),NY,NX)=micstt%SOMPomProtein(NE)
+      SolidOM_vr(NE,micpar%iprotein,micpar%k_humus,NU(NY,NX),NY,NX)=micstt%SOMHumProtein(NE)
+      SolidOM_vr(NE,micpar%icarbhyro,micpar%k_humus,NU(NY,NX),NY,NX)=micstt%SOMHumCarbohyd(NE)
+    ENDDO
 
-    SolidOM_vr(ielmn,micpar%iprotein,micpar%k_POM,NU(NY,NX),NY,NX)=micstt%SOMPomProtein(ielmn)
-    SolidOM_vr(ielmn,micpar%iprotein,micpar%k_humus,NU(NY,NX),NY,NX)=micstt%SOMHumProtein(ielmn)
-    SolidOM_vr(ielmn,micpar%icarbhyro,micpar%k_humus,NU(NY,NX),NY,NX)=micstt%SOMHumCarbohyd(ielmn)
-
-    SolidOM_vr(ielmp,micpar%iprotein,micpar%k_POM,NU(NY,NX),NY,NX)=micstt%SOMPomProtein(ielmp)
-    SolidOM_vr(ielmp,micpar%iprotein,micpar%k_humus,NU(NY,NX),NY,NX)=micstt%SOMHumProtein(ielmp)
-    SolidOM_vr(ielmp,micpar%icarbhyro,micpar%k_humus,NU(NY,NX),NY,NX)=micstt%SOMHumCarbohyd(ielmp)
   endif
 
   RNH4UptkSoilAutor_vr(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RNH4UptkSoilAutor(1:NumMicrobAutrophCmplx)

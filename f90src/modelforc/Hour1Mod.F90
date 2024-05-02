@@ -828,10 +828,7 @@ module Hour1Mod
   LitrfalStrutElms_vr(1:NumPlantChemElms,1:jsken,1:pltpar%NumOfPlantLitrCmplxs,&
     0:NL(NY,NX),NY,NX)=0.0_r8
 
-  RDOM_micb_flx(idom_doc,1:jcplx,0:NL(NY,NX),NY,NX)=0.0_r8
-  RDOM_micb_flx(idom_don,1:jcplx,0:NL(NY,NX),NY,NX)=0.0_r8
-  RDOM_micb_flx(idom_dop,1:jcplx,0:NL(NY,NX),NY,NX)=0.0_r8
-  RDOM_micb_flx(idom_acetate,1:jcplx,0:NL(NY,NX),NY,NX)=0.0_r8
+  REcoDOMUptk_vr(idom_beg:idom_end,1:jcplx,0:NL(NY,NX),NY,NX)=0.0_r8
 
   XZHYS(0:NL(NY,NX),NY,NX)=0.0_r8
   trcn_RChem_soil_vr(ids_NH4,0:NL(NY,NX),NY,NX)=0.0_r8

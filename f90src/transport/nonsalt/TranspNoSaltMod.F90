@@ -307,7 +307,7 @@ module TranspNoSaltMod
   implicit none
   integer, intent(in) :: NY,NX
 
-  integer :: K,NTG,NTS
+  integer :: K,NTG,NTS,idom
 !     STATE VARIABLES FOR SOLUTES IN SURFACE RESIDUE AND IN
 !     MICROPORES AND MACROPORES IN SOIL SURFACE LAYER FROM OVERLAND
 !     FLOW AND SURFACE VOLATILIZATION-DISSOLUTION
@@ -324,10 +324,9 @@ module TranspNoSaltMod
 !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
 !
   DO  K=1,jcplx
-    DOM_MicP2(idom_doc,K,0,NY,NX)=DOM_MicP2(idom_doc,K,0,NY,NX)+DOM_3DMicp_Transp_flxM(idom_doc,K,3,0,NY,NX)
-    DOM_MicP2(idom_don,K,0,NY,NX)=DOM_MicP2(idom_don,K,0,NY,NX)+DOM_3DMicp_Transp_flxM(idom_don,K,3,0,NY,NX)
-    DOM_MicP2(idom_dop,K,0,NY,NX)=DOM_MicP2(idom_dop,K,0,NY,NX)+DOM_3DMicp_Transp_flxM(idom_dop,K,3,0,NY,NX)
-    DOM_MicP2(idom_acetate,K,0,NY,NX)=DOM_MicP2(idom_acetate,K,0,NY,NX)+DOM_3DMicp_Transp_flxM(idom_acetate,K,3,0,NY,NX)
+    DO idom=idom_beg,idom_end
+      DOM_MicP2(idom,K,0,NY,NX)=DOM_MicP2(idom,K,0,NY,NX)+DOM_3DMicp_Transp_flxM(idom,K,3,0,NY,NX)
+    ENDDO
   ENDDO
 !exclude NH3B
   DO NTG=idg_beg,idg_end-1
@@ -344,11 +343,11 @@ module TranspNoSaltMod
   ENDDO
 
   D9680: DO K=1,jcplx
-    DOM_MicP2(idom_doc,K,0,NY,NX)=DOM_MicP2(idom_doc,K,0,NY,NX)+dom_TFloXSurRunoff(idom_doc,K,NY,NX)
-    DOM_MicP2(idom_don,K,0,NY,NX)=DOM_MicP2(idom_don,K,0,NY,NX)+dom_TFloXSurRunoff(idom_don,K,NY,NX)
-    DOM_MicP2(idom_dop,K,0,NY,NX)=DOM_MicP2(idom_dop,K,0,NY,NX)+dom_TFloXSurRunoff(idom_dop,K,NY,NX)
-    DOM_MicP2(idom_acetate,K,0,NY,NX)=DOM_MicP2(idom_acetate,K,0,NY,NX)+dom_TFloXSurRunoff(idom_acetate,K,NY,NX)
+    DO idom=idom_beg,idom_end
+      DOM_MicP2(idom,K,0,NY,NX)=DOM_MicP2(idom,K,0,NY,NX)+dom_TFloXSurRunoff(idom,K,NY,NX)
+    ENDDO
   ENDDO D9680
+
 !exclude NH3B
   DO NTG=idg_beg,idg_end-1
     trc_solml_vr2(NTG,0,NY,NX)=trc_solml_vr2(NTG,0,NY,NX)+trcg_TFloXSurRunoff(NTG,NY,NX)
@@ -366,7 +365,7 @@ module TranspNoSaltMod
   implicit none
   integer, intent(in) :: M,NY,NX,MX
 
-  integer :: L,K,NTG,NTS
+  integer :: L,K,NTG,NTS,idom
 
 !     STATE VARIABLES FOR SOLUTES IN MICROPORES AND
 !     MACROPORES IN SOIL LAYERS FROM SUBSURFACE FLOW, MICROBIAL
@@ -402,14 +401,10 @@ module TranspNoSaltMod
         trc_solml_vr2(idg_H2,L,NY,NX)=trc_solml_vr2(idg_H2,L,NY,NX)+trcg_BBL(idg_H2,L,NY,NX)
 
         DO  K=1,jcplx
-          DOM_MicP2(idom_doc,K,L,NY,NX)=DOM_MicP2(idom_doc,K,L,NY,NX)+DOM_Transp2Micp_flx(idom_doc,K,L,NY,NX)+DOM_XPoreTransp_flx(idom_doc,K,L,NY,NX)
-          DOM_MicP2(idom_don,K,L,NY,NX)=DOM_MicP2(idom_don,K,L,NY,NX)+DOM_Transp2Micp_flx(idom_don,K,L,NY,NX)+DOM_XPoreTransp_flx(idom_don,K,L,NY,NX)
-          DOM_MicP2(idom_dop,K,L,NY,NX)=DOM_MicP2(idom_dop,K,L,NY,NX)+DOM_Transp2Micp_flx(idom_dop,K,L,NY,NX)+DOM_XPoreTransp_flx(idom_dop,K,L,NY,NX)
-          DOM_MicP2(idom_acetate,K,L,NY,NX)=DOM_MicP2(idom_acetate,K,L,NY,NX)+DOM_Transp2Micp_flx(idom_acetate,K,L,NY,NX)+DOM_XPoreTransp_flx(idom_acetate,K,L,NY,NX)
-          DOM_MacP2(idom_doc,K,L,NY,NX)=DOM_MacP2(idom_doc,K,L,NY,NX)+DOM_Transp2Macp_flx(idom_doc,K,L,NY,NX)-DOM_XPoreTransp_flx(idom_doc,K,L,NY,NX)
-          DOM_MacP2(idom_don,K,L,NY,NX)=DOM_MacP2(idom_don,K,L,NY,NX)+DOM_Transp2Macp_flx(idom_don,K,L,NY,NX)-DOM_XPoreTransp_flx(idom_don,K,L,NY,NX)
-          DOM_MacP2(idom_dop,K,L,NY,NX)=DOM_MacP2(idom_dop,K,L,NY,NX)+DOM_Transp2Macp_flx(idom_dop,K,L,NY,NX)-DOM_XPoreTransp_flx(idom_dop,K,L,NY,NX)
-          DOM_MacP2(idom_acetate,K,L,NY,NX)=DOM_MacP2(idom_acetate,K,L,NY,NX)+DOM_Transp2Macp_flx(idom_acetate,K,L,NY,NX)-DOM_XPoreTransp_flx(idom_acetate,K,L,NY,NX)
+          DO idom=idom_beg,idom_end
+            DOM_MicP2(idom,K,L,NY,NX)=DOM_MicP2(idom,K,L,NY,NX)+DOM_Transp2Micp_flx(idom,K,L,NY,NX)+DOM_XPoreTransp_flx(idom,K,L,NY,NX)
+            DOM_MacP2(idom,K,L,NY,NX)=DOM_MacP2(idom,K,L,NY,NX)+DOM_Transp2Macp_flx(idom,K,L,NY,NX)-DOM_XPoreTransp_flx(idom,K,L,NY,NX)
+          ENDDO
         ENDDO
         DO NTS=ids_beg,ids_end
           trc_solml_vr2(NTS,L,NY,NX)=trc_solml_vr2(NTS,L,NY,NX) &
@@ -452,7 +447,7 @@ module TranspNoSaltMod
 
   integer, intent(in) :: NY, NX
 
-  integer :: K
+  integer :: K,idom
 
   RBGCSinkG(idg_CO2,0,NY,NX)=trcg_RMicbTransf_vr(idg_CO2,0,NY,NX)*dts_gas
   RBGCSinkG(idg_CH4,0,NY,NX)=trcg_RMicbTransf_vr(idg_CH4,0,NY,NX)*dts_gas
@@ -461,10 +456,9 @@ module TranspNoSaltMod
   RBGCSinkG(idg_NH3,0,NY,NX)=0.0_r8
   RBGCSinkG(idg_H2,0,NY,NX)=trcg_RMicbTransf_vr(idg_H2,0,NY,NX)*dts_gas
   DO  K=1,jcplx
-    RDOM_micb_cumflx(idom_doc,K,0,NY,NX)=-RDOM_micb_flx(idom_doc,K,0,NY,NX)*dts_HeatWatTP
-    RDOM_micb_cumflx(idom_don,K,0,NY,NX)=-RDOM_micb_flx(idom_don,K,0,NY,NX)*dts_HeatWatTP
-    RDOM_micb_cumflx(idom_dop,K,0,NY,NX)=-RDOM_micb_flx(idom_dop,K,0,NY,NX)*dts_HeatWatTP
-    RDOM_micb_cumflx(idom_acetate,K,0,NY,NX)=-RDOM_micb_flx(idom_acetate,K,0,NY,NX)*dts_HeatWatTP
+    DO idom=idom_beg,idom_end
+      RDOM_micb_cumflx(idom,K,0,NY,NX)=-REcoDOMUptk_vr(idom,K,0,NY,NX)*dts_HeatWatTP
+    ENDDO
   ENDDO
   RBGCSinkS(ids_NH4,0,NY,NX)=(-RNutMicbTransf_vr(ids_NH4,0,NY,NX)-trcn_RChem_soil_vr(ids_NH4,0,NY,NX))*dts_HeatWatTP
   RBGCSinkS(idg_NH3,0,NY,NX)=-TR_NH3_soil_vr(0,NY,NX)*dts_HeatWatTP
@@ -481,7 +475,7 @@ module TranspNoSaltMod
 
   integer, intent(in) :: NY, NX
 
-  integer :: K,NTG,NTS
+  integer :: K,NTG,NTS,idom
 
 ! exclude banded nutrient
   DO NTG=idg_beg,idg_end-1
@@ -489,10 +483,9 @@ module TranspNoSaltMod
   ENDDO
 
   D9979: DO K=1,jcplx
-    DOM_MicP2(idom_doc,K,0,NY,NX)=DOM(idom_doc,K,0,NY,NX)-RDOM_micb_flx(idom_doc,K,0,NY,NX)
-    DOM_MicP2(idom_don,K,0,NY,NX)=DOM(idom_don,K,0,NY,NX)-RDOM_micb_flx(idom_don,K,0,NY,NX)
-    DOM_MicP2(idom_dop,K,0,NY,NX)=DOM(idom_dop,K,0,NY,NX)-RDOM_micb_flx(idom_dop,K,0,NY,NX)
-    DOM_MicP2(idom_acetate,K,0,NY,NX)=DOM(idom_acetate,K,0,NY,NX)-RDOM_micb_flx(idom_acetate,K,0,NY,NX)
+    DO idom=idom_beg,idom_end
+    DOM_MicP2(idom,K,0,NY,NX)=DOM(idom,K,0,NY,NX)-REcoDOMUptk_vr(idom,K,0,NY,NX)
+    ENDDO
   ENDDO D9979
 
 ! exclude banded nutrient
@@ -718,7 +711,7 @@ module TranspNoSaltMod
   integer, intent(in) ::  I,NY, NX
 
   real(r8) :: FLWU(JZ,JY,JX)
-  integer :: L,K,NTG,NTS
+  integer :: L,K,NTG,NTS,idom
 
   DO L=NU(NY,NX),NL(NY,NX)
     CHY0(L,NY,NX)=10.0_r8**(-(PH(L,NY,NX)-3.0_r8))
@@ -730,10 +723,9 @@ module TranspNoSaltMod
     RBGCSinkG(idg_NH3,L,NY,NX)=-TRN3G(L,NY,NX)*dts_gas
     RBGCSinkG(idg_H2,L,NY,NX)=(trcg_RMicbTransf_vr(idg_H2,L,NY,NX)+trcs_plant_uptake_vr(idg_H2,L,NY,NX))*dts_gas
     DO  K=1,jcplx
-      RDOM_micb_cumflx(idom_doc,K,L,NY,NX)=-RDOM_micb_flx(idom_doc,K,L,NY,NX)*dts_HeatWatTP
-      RDOM_micb_cumflx(idom_don,K,L,NY,NX)=-RDOM_micb_flx(idom_don,K,L,NY,NX)*dts_HeatWatTP
-      RDOM_micb_cumflx(idom_dop,K,L,NY,NX)=-RDOM_micb_flx(idom_dop,K,L,NY,NX)*dts_HeatWatTP
-      RDOM_micb_cumflx(idom_acetate,K,L,NY,NX)=-RDOM_micb_flx(idom_acetate,K,L,NY,NX)*dts_HeatWatTP
+      DO idom=idom_beg,idom_end
+        RDOM_micb_cumflx(idom,K,L,NY,NX)=-REcoDOMUptk_vr(idom,K,L,NY,NX)*dts_HeatWatTP
+      enddo
     ENDDO
     RBGCSinkS(ids_NH4,L,NY,NX)=(-RNutMicbTransf_vr(ids_NH4,L,NY,NX)-trcn_RChem_soil_vr(ids_NH4,L,NY,NX)+trcs_plant_uptake_vr(ids_NH4,L,NY,NX))*dts_HeatWatTP
     RBGCSinkS(idg_NH3,L,NY,NX)=(-TR_NH3_soil_vr(L,NY,NX)+trcs_plant_uptake_vr(idg_NH3,L,NY,NX))*dts_HeatWatTP
@@ -829,15 +821,10 @@ module TranspNoSaltMod
     ENDDO
 
     DO  K=1,jcplx
-      DOM_MicP2(idom_doc,K,L,NY,NX)=DOM(idom_doc,K,L,NY,NX)-RDOM_micb_flx(idom_doc,K,L,NY,NX)
-      DOM_MicP2(idom_don,K,L,NY,NX)=DOM(idom_don,K,L,NY,NX)-RDOM_micb_flx(idom_don,K,L,NY,NX)
-      DOM_MicP2(idom_dop,K,L,NY,NX)=DOM(idom_dop,K,L,NY,NX)-RDOM_micb_flx(idom_dop,K,L,NY,NX)
-      DOM_MicP2(idom_acetate,K,L,NY,NX)=DOM(idom_acetate,K,L,NY,NX)-RDOM_micb_flx(idom_acetate,K,L,NY,NX)
-
-      DOM_MacP2(idom_doc,K,L,NY,NX)=DOM_Macp(idom_doc,K,L,NY,NX)
-      DOM_MacP2(idom_don,K,L,NY,NX)=DOM_Macp(idom_don,K,L,NY,NX)
-      DOM_MacP2(idom_dop,K,L,NY,NX)=DOM_Macp(idom_dop,K,L,NY,NX)
-      DOM_MacP2(idom_acetate,K,L,NY,NX)=DOM_Macp(idom_acetate,K,L,NY,NX)
+      DO idom=idom_beg,idom_end
+        DOM_MicP2(idom,K,L,NY,NX)=DOM(idom,K,L,NY,NX)-REcoDOMUptk_vr(idom,K,L,NY,NX)
+        DOM_MacP2(idom,K,L,NY,NX)=DOM_Macp(idom,K,L,NY,NX)
+      ENDDO
     enddo
     DO NTS=ids_beg,ids_end
       trc_solml_vr2(NTS,L,NY,NX)=trc_solml_vr(NTS,L,NY,NX)
