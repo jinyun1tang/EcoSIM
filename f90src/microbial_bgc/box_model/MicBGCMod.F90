@@ -601,6 +601,103 @@ module MicBGCMod
 !
   end associate
   end subroutine StageBGCEnvironCondition
+
+!------------------------------------------------------------------------------------------
+  subroutine GetMicrobDensFactorHeter(N,K,micfor, micstt, ORGCL, SPOMK, RMOMK)
+
+  implicit none  
+  integer, intent(in) :: N,K
+  type(micforctype), intent(in) :: micfor
+  type(micsttype), intent(in) :: micstt    
+  real(r8), intent(in) :: ORGCL
+  real(r8), intent(out) :: SPOMK(2)
+  real(r8), intent(out)  :: RMOMK(2)    
+
+  integer :: NGL,M,MID  
+  real(r8) :: TOMCNK(2),COMC
+
+  associate(                             &
+    ZEROS    => micfor%ZEROS           , &
+    OMEheter => micstt%OMEheter          &
+  )
+
+  TOMCNK(:)=0.0_r8
+  DO NGL=JGnio(N),JGnfo(N)
+    DO M=1,2
+      MID=micpar%get_micb_id(M,NGL)          
+      TOMCNK(M)=TOMCNK(M)+OMEheter(ielmc,MID,K)
+    ENDDO
+  ENDDO  
+
+!     ADJUST MCROBIAL GROWTH AND DECOMPOSITION RATES FOR BIOMASS
+!
+!     COMC=microbial C concentration relative to substrate
+!     SPOMK=effect of microbial C concentration on microbial decay
+!     RMOMK=effect of microbial C concentration on maintenance respn
+!
+
+  IF(ORGCL.GT.ZEROS)THEN
+    DO M=1,2
+      COMC=TOMCNK(M)/ORGCL
+      SPOMK(M)=COMC/(COMC+COMKI)
+      RMOMK(M)=COMC/(COMC+COMKM)
+    ENDDO
+  ELSE
+    DO M=1,2
+      SPOMK(M)=1.0_r8
+      RMOMK(M)=1.0_r8
+    ENDDO
+  ENDIF
+  end associate
+  end subroutine GetMicrobDensFactorHeter
+!------------------------------------------------------------------------------------------
+  subroutine GetMicrobDensFactorAutor(N, micfor, micstt, ORGCL, SPOMK, RMOMK)
+
+  implicit none  
+  integer, intent(in) :: N
+  type(micforctype), intent(in) :: micfor
+  type(micsttype), intent(in) :: micstt  
+  real(r8), intent(in) :: ORGCL
+  real(r8), intent(out) :: SPOMK(2)
+  real(r8), intent(out)  :: RMOMK(2)    
+
+  integer :: NGL,M,MID  
+  real(r8) :: TOMCNK(2),COMC
+
+  associate(                             &
+    ZEROS    => micfor%ZEROS           , &
+    OMEAutor => micstt%OMEAutor          &
+  )
+
+  TOMCNK(:)=0.0_r8
+  DO NGL=JGnio(N),JGnfo(N)
+    DO M=1,2
+      MID=micpar%get_micb_id(M,NGL)          
+      TOMCNK(M)=TOMCNK(M)+OMEAutor(ielmc,MID)
+    ENDDO
+  ENDDO  
+
+!     ADJUST MCROBIAL GROWTH AND DECOMPOSITION RATES FOR BIOMASS
+!
+!     COMC=microbial C concentration relative to substrate
+!     SPOMK=effect of microbial C concentration on microbial decay
+!     RMOMK=effect of microbial C concentration on maintenance respn
+!
+
+  IF(ORGCL.GT.ZEROS)THEN
+    DO M=1,2
+      COMC=TOMCNK(M)/ORGCL
+      SPOMK(M)=COMC/(COMC+COMKI)
+      RMOMK(M)=COMC/(COMC+COMKM)
+    ENDDO
+  ELSE
+    DO M=1,2
+      SPOMK(M)=1.0_r8
+      RMOMK(M)=1.0_r8
+    ENDDO
+  ENDIF
+  end associate
+  end subroutine GetMicrobDensFactorAutor
 !------------------------------------------------------------------------------------------
 
   subroutine MicrobialCatabolism(micfor,micstt,micflx,nmicdiag,naqfdiag, &
@@ -619,57 +716,59 @@ module MicBGCMod
   type(NitroOMcplxFluxType), intent(inout) :: ncplxf
   type(NitroOMcplxStateType), intent(inout):: ncplxs
   integer :: K,M,N,NGL,MID
-  real(r8) :: TOMCNK(2)
+  real(r8) :: SPOMK(2)
+  real(r8) :: RMOMK(2)    
+
   REAL(R8) :: OXKX
+  real(r8) :: ORGCL
 ! begin_execution
-  associate(                                             &
-    TempMaintRHeter     => nmics%TempMaintRHeter,        &
-    GrowthEnvScalHeter  => nmics%GrowthEnvScalHeter,     &
-    OMActHeter          => nmics%OMActHeter,             &
-    TDOMUptkHeter         => ncplxf%TDOMUptkHeter,           &
-    XCO2                => nmicdiag%XCO2,                &
-    TSensGrowth         => nmicdiag%TSensGrowth,         &
-    TotActMicrobiom     => nmicdiag%TotActMicrobiom,     &
-    TotBiomNO2Consumers => nmicdiag%TotBiomNO2Consumers, &
-    RH2UptkAutor        => nmicdiag%RH2UptkAutor,        &
-    WatStressMicb       => nmicdiag%WatStressMicb,       &
-    TSensMaintR         => nmicdiag%TSensMaintR,         &
-    ZNH4T               => nmicdiag%ZNH4T,               &
-    ZNO3T               => nmicdiag%ZNO3T,               &
-    ZNO2T               => nmicdiag%ZNO2T,               &
-    H2P4T               => nmicdiag%H2P4T,               &
-    H1P4T               => nmicdiag%H1P4T,               &
-    VOLWZ               => nmicdiag%VOLWZ,               &
-    GrowthEnvScalAutor  => nmics%GrowthEnvScalAutor,     &
-    TSensMaintRAutor    => nmics%TSensMaintRAutor,       &
-    OMActAutor          => nmics%OMActAutor,             &
-    k_humus             => micpar%k_humus,               &
-    k_POM               => micpar%k_POM,                 &
-    n_aero_fungi        => micpar%n_aero_fungi,          &
-    is_activef_micb     => micpar%is_activef_micb,       &
-    PSISoilMatricP      => micfor%PSISoilMatricP,        &
-    litrm               => micfor%litrm,                 &
-    H1PO4               => micstt%H1PO4,                 &
-    H1POB               => micstt%H1POB,                 &
-    H2PO4               => micstt%H2PO4,                 &
-    H2POB               => micstt%H2POB,                 &
-    OMEAutor             => micstt%OMEAutor,               &
-    OMEheter            => micstt%OMEheter               &
+  associate(                                           &
+  TempMaintRHeter     => nmics%TempMaintRHeter,        &
+  GrowthEnvScalHeter  => nmics%GrowthEnvScalHeter,     &
+  OMActHeter          => nmics%OMActHeter,             &
+  TDOMUptkHeter       => ncplxf%TDOMUptkHeter,         &
+  XCO2                => nmicdiag%XCO2,                &
+  TSensGrowth         => nmicdiag%TSensGrowth,         &
+  TotActMicrobiom     => nmicdiag%TotActMicrobiom,     &
+  TotBiomNO2Consumers => nmicdiag%TotBiomNO2Consumers, &
+  RH2UptkAutor        => nmicdiag%RH2UptkAutor,        &
+  WatStressMicb       => nmicdiag%WatStressMicb,       &
+  TSensMaintR         => nmicdiag%TSensMaintR,         &
+  ZNH4T               => nmicdiag%ZNH4T,               &
+  ZNO3T               => nmicdiag%ZNO3T,               &
+  ZNO2T               => nmicdiag%ZNO2T,               &
+  H2P4T               => nmicdiag%H2P4T,               &
+  H1P4T               => nmicdiag%H1P4T,               &
+  VOLWZ               => nmicdiag%VOLWZ,               &
+  GrowthEnvScalAutor  => nmics%GrowthEnvScalAutor,     &
+  TSensMaintRAutor    => nmics%TSensMaintRAutor,       &
+  OMActAutor          => nmics%OMActAutor,             &
+  k_humus             => micpar%k_humus,               &
+  k_POM               => micpar%k_POM,                 &
+  n_aero_fungi        => micpar%n_aero_fungi,          &
+  is_activef_micb     => micpar%is_activef_micb,       &
+  PSISoilMatricP      => micfor%PSISoilMatricP,        &
+  litrm               => micfor%litrm,                 &
+  H1PO4               => micstt%H1PO4,                 &
+  H1POB               => micstt%H1POB,                 &
+  H2PO4               => micstt%H2PO4,                 &
+  H2POB               => micstt%H2POB,                 &
+  ORGC                => micfor%ORGC,                  &
+  SoilMicPMassLayer   => micfor%SoilMicPMassLayer,     &
+  OMEAutor            => micstt%OMEAutor,              &
+  OMEheter            => micstt%OMEheter               &
   )
   RH2UptkAutor=0.0_r8
 
   TDOMUptkHeter(:,:)=0.0_r8
 
+  ORGCL=AMIN1(1.0E+05_r8*SoilMicPMassLayer,ORGC)
+
   D760: DO K=1,jcplx
     IF(.not.litrm.OR.(K.NE.k_POM.AND.K.NE.k_humus))THEN
       DO  N=1,NumMicbFunGroups
-        TOMCNK(:)=0.0_r8
-        DO NGL=JGnio(N),JGnfo(N)
-          DO M=1,2
-            MID=micpar%get_micb_id(M,NGL)          
-            TOMCNK(M)=TOMCNK(M)+OMEheter(ielmc,MID,K)
-          ENDDO
-        ENDDO  
+
+        call GetMicrobDensFactorHeter(N,K,micfor, micstt, ORGCL,SPOMK,RMOMK)
 
         DO NGL=JGnio(N),JGnfo(N)        
 
@@ -687,7 +786,7 @@ module MicBGCMod
           GrowthEnvScalHeter(NGL,K)=TSensGrowth*WatStressMicb
           TempMaintRHeter(NGL,K)=TSensMaintR
           IF(OMActHeter(NGL,K).GT.0.0_r8)THEN
-            call ActiveMicrobes(NGL,N,K,VOLWZ,XCO2,TSensGrowth,WatStressMicb,TOMCNK, &
+            call ActiveMicrobes(NGL,N,K,VOLWZ,XCO2,TSensGrowth,WatStressMicb,SPOMK, RMOMK, &
               OXKX,TotActMicrobiom,TotBiomNO2Consumers,ZNH4T,ZNO3T,ZNO2T,H2P4T,H1P4T, &
               micfor,micstt,naqfdiag,nmicf,nmics,ncplxf,ncplxs,micflx)
           ENDIF
@@ -701,20 +800,15 @@ module MicBGCMod
   nmicf%RTotNH3OxidBandAutor=SUM(nmicf%RSOxidBandAutor(JGniA(N):JGnfA(N)))
   DO  N=1,NumMicbFunGroups
     IF(is_activef_micb(N))THEN
-      TOMCNK(:)=0.0_r8
-      DO NGL=JGniA(N),JGnfA(N)
-        DO M=1,2
-          MID=micpar%get_micb_id(M,NGL)
-          TOMCNK(M)=TOMCNK(M)+OMEAutor(ielmc,MID)
-        ENDDO
-      ENDDO
+
+      call GetMicrobDensFactorAutor(N,micfor, micstt, ORGCL,SPOMK,RMOMK)
       DO NGL=JGniA(N),JGnfA(N)
         WatStressMicb=EXP(0.2_r8*PSISoilMatricP)
         OXKX=OXKA
         GrowthEnvScalAutor(NGL)=TSensGrowth*WatStressMicb
         TSensMaintRAutor(NGL)=TSensMaintR
         IF(OMActAutor(NGL).GT.0.0_r8)THEN
-          call ActiveMicrobAutotrophs(NGL,N,VOLWZ,XCO2,TSensGrowth,WatStressMicb,TOMCNK, &
+          call ActiveMicrobAutotrophs(NGL,N,VOLWZ,XCO2,TSensGrowth,WatStressMicb,SPOMK, RMOMK, &
             OXKX,TotActMicrobiom,TotBiomNO2Consumers,RH2UptkAutor,ZNH4T,ZNO3T,ZNO2T,H2P4T,H1P4T, &
             micfor,micstt,micflx,naqfdiag,nmicf,nmics,ncplxf,ncplxs)
         ENDIF
@@ -725,14 +819,16 @@ module MicBGCMod
   end associate
   end subroutine MicrobialCatabolism
 !------------------------------------------------------------------------------------------
-  subroutine ActiveMicrobes(NGL,N,K,VOLWZ,XCO2,TSensGrowth,WatStressMicb,TOMCNK,OXKX,TotActMicrobiom,TotBiomNO2Consumers, &
+  subroutine ActiveMicrobes(NGL,N,K,VOLWZ,XCO2,TSensGrowth,WatStressMicb,SPOMK,RMOMK,OXKX,TotActMicrobiom,TotBiomNO2Consumers, &
     ZNH4T,ZNO3T,ZNO2T,H2P4T,H1P4T,micfor,micstt,naqfdiag,nmicf,nmics,ncplxf,ncplxs,micflx)
   implicit none
   integer, intent(in) :: NGL,K,N
   real(r8), intent(in) :: VOLWZ
-  real(r8), intent(in):: OXKX,tomcnk(2),WatStressMicb,TSensGrowth,XCO2
+  real(r8), intent(in):: OXKX,WatStressMicb,TSensGrowth,XCO2
   real(r8), intent(in) :: TotActMicrobiom,TotBiomNO2Consumers
   real(r8), intent(in) :: ZNH4T,ZNO3T,ZNO2T,H2P4T,H1P4T
+  real(r8), intent(in) :: SPOMK(2)
+  real(r8), intent(in) :: RMOMK(2)  
   type(micforctype), intent(in) :: micfor
   type(micsttype), intent(inout) :: micstt
   type(NitroAQMFluxDiagType), INTENT(INOUT) :: naqfdiag
@@ -744,7 +840,6 @@ module MicBGCMod
   integer  :: M
   real(r8) :: COMC
   real(r8) :: ECHZ
-  real(r8) :: ORGCL
   real(r8) :: FOXYX
   real(r8) :: FNH4X
   real(r8) :: FNB3X,FNB4X,FNO3X,FPO4X,FPOBX,FP14X,FP1BX
@@ -758,8 +853,7 @@ module MicBGCMod
   real(r8) :: RGrowthRespHeter
   real(r8) :: RMaintDefcitHeter
   real(r8) :: RMaintRespHeter
-  real(r8) :: SPOMK(2)
-  real(r8) :: RMOMK(2)
+
 ! begin_execution
   associate(                                              &
     FracOMActHeter        => nmics%FracOMActHeter,        &
@@ -784,9 +878,7 @@ module MicBGCMod
     RAcettProdHeter       => nmicf%RAcettProdHeter,       &
     RCH4ProdHeter         => nmicf%RCH4ProdHeter,         &
     TOMK                  => ncplxs%TOMK,                 &
-    SoilMicPMassLayer     => micfor%SoilMicPMassLayer,    &
     litrm                 => micfor%litrm,                &
-    ORGC                  => micfor%ORGC,                 &
     ZEROS                 => micfor%ZEROS,                &
     VLSoilPoreMicP        => micfor%VLSoilPoreMicP,       &
     RNO2EcoUptkSoilPrev   => micfor%RNO2EcoUptkSoilPrev   &
@@ -810,25 +902,6 @@ module MicBGCMod
     FracHeterBiomOfActK(NGL,K)=1.0_r8
   ENDIF
 !
-  !     ADJUST MCROBIAL GROWTH AND DECOMPOSITION RATES FOR BIOMASS
-  !
-  !     COMC=microbial C concentration relative to substrate
-  !     SPOMK=effect of microbial C concentration on microbial decay
-  !     RMOMK=effect of microbial C concentration on maintenance respn
-  !
-  ORGCL=AMIN1(1.0E+05_r8*SoilMicPMassLayer,ORGC)
-  IF(ORGCL.GT.ZEROS)THEN
-    D765: DO M=1,2
-      COMC=TOMCNK(M)/ORGCL
-      SPOMK(M)=COMC/(COMC+COMKI)
-      RMOMK(M)=COMC/(COMC+COMKM)
-    ENDDO D765
-  ELSE
-    D770: DO M=1,2
-      SPOMK(M)=1.0_r8
-      RMOMK(M)=1.0_r8
-    ENDDO D770
-  ENDIF
 !
 ! FACTORS CONSTRAINING DOC, ACETATE, O2, NH4, NO3, PO4 UPTAKE
 ! AMONG COMPETING MICROBIAL AND ROOT POPULATIONS IN SOIL LAYERS

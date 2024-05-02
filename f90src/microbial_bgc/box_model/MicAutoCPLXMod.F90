@@ -25,14 +25,16 @@ module MicAutoCPLXMod
 
 !------------------------------------------------------------------------------------------
   subroutine ActiveMicrobAutotrophs(NGL,N,VOLWZ,XCO2,TSensGrowth,WatStressMicb,&
-    TOMCNK,OXKX,TotActMicrobiom,TotBiomNO2Consumers,RH2UptkAutor,&
+    SPOMK, RMOMK, OXKX,TotActMicrobiom,TotBiomNO2Consumers,RH2UptkAutor,&
     ZNH4T,ZNO3T,ZNO2T,H2P4T,H1P4T,micfor,micstt,micflx,naqfdiag,nmicf,nmics,ncplxf,ncplxs)
   implicit none
   integer, intent(in) :: NGL,N
   real(r8), intent(in) :: VOLWZ
-  real(r8), intent(in):: OXKX,tomcnk(2),WatStressMicb,TSensGrowth,XCO2
+  real(r8), intent(in):: OXKX,WatStressMicb,TSensGrowth,XCO2
   real(r8), intent(in) :: TotActMicrobiom,TotBiomNO2Consumers
   real(r8), intent(in) :: ZNH4T,ZNO3T,ZNO2T,H2P4T,H1P4T
+  real(r8), intent(in) :: SPOMK(2)
+  real(r8), intent(in)  :: RMOMK(2)
   type(micforctype), intent(in) :: micfor
   type(micsttype), intent(inout) :: micstt
   type(micfluxtype), intent(inout) :: micflx
@@ -45,7 +47,6 @@ module MicAutoCPLXMod
   integer  :: M,K
   real(r8) :: COMC
   real(r8) :: ECHZ
-  real(r8) :: ORGCL
   real(r8) :: FOXYX
   real(r8) :: FNH4X
   real(r8) :: FNB3X,FNB4X,FNO3X,FPO4X,FPOBX,FP14X,FP1BX
@@ -59,8 +60,7 @@ module MicAutoCPLXMod
   real(r8) :: RGrowthRespAutor
   real(r8) :: RMaintDefcitAutor
   real(r8) :: RMaintRespAutor
-  real(r8) :: SPOMK(2)
-  real(r8) :: RMOMK(2)
+
 ! begin_execution
   associate(                                                     &
     FracOMActAutor           => nmics%FracOMActAutor,            &
@@ -88,7 +88,6 @@ module MicAutoCPLXMod
     SoilMicPMassLayer        => micfor%SoilMicPMassLayer,        &
     litrm                    => micfor%litrm,                    &
     VLSoilPoreMicP           => micfor%VLSoilPoreMicP,           &
-    ORGC                     => micfor%ORGC,                     &
     RO2DmndAutort            => micflx%RO2DmndAutort             &
   )
 ! FracOMActHeter,FOMN=fraction of total active biomass C,N in each N and K
@@ -110,26 +109,6 @@ module MicAutoCPLXMod
     FracAutorBiomOfActK(NGL)=OMActAutor(NGL)/TOMK(K)
   ELSE
     FracAutorBiomOfActK(NGL)=1.0_r8
-  ENDIF
-!
-  !     ADJUST MCROBIAL GROWTH AND DECOMPOSITION RATES FOR BIOMASS
-  !
-  !     COMC=microbial C concentration relative to substrate
-  !     SPOMK=effect of microbial C concentration on microbial decay
-  !     RMOMK=effect of microbial C concentration on maintenance respn
-  !
-  ORGCL=AMIN1(1.0E+05_r8*SoilMicPMassLayer,ORGC)
-  IF(ORGCL.GT.ZEROS)THEN
-    DO M=1,2
-      COMC=TOMCNK(M)/ORGCL
-      SPOMK(M)=COMC/(COMC+COMKI)
-      RMOMK(M)=COMC/(COMC+COMKM)
-    ENDDO
-  ELSE
-    DO  M=1,2
-      SPOMK(M)=1.0
-      RMOMK(M)=1.0
-    ENDDO
   ENDIF
 !
 ! FACTORS CONSTRAINING DOC, ACETATE, O2, NH4, NO3, PO4 UPTAKE
