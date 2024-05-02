@@ -418,7 +418,7 @@ implicit none
     VHCPRXX=VLHeatCapcityLitR2
     
     ! VLHeatCapcityLitR2: heat capacity, kJ/kg/Kelvin
-    VLHeatCapcityLitR2=cpo*ORGC(0,NY,NX)+cpw*VWatLitr2+cpi*VLiceMicP1(0,NY,NX)
+    VLHeatCapcityLitR2=cpo*ORGC_vr(0,NY,NX)+cpw*VWatLitr2+cpi*VLiceMicP1(0,NY,NX)
     VLHeatCapacity2=VLHeatCapacity2+cpw*EvapLitR2Soi2
     tk1pre=TKR1
     TKR1=(ENGYR+TotHeatAir2LitR2+PrecHeat2LitR2-HeatSensVapLitR2Soi2-HeatSensLitR2Soi2)/VLHeatCapcityLitR2
@@ -427,7 +427,7 @@ implicit none
 !    endif
     TKS1=TKS1+(HeatSensVapLitR2Soi2+HeatSensLitR2Soi2)/VLHeatCapacity2
 !    print*,'tkr1',NN,TKR1,TKS1,TKQ(NY,NX),TairK(NY,NX),TKSoi1(0,NY,NX),TKSoi1(NUM(NY,NX),NY,NX)
-!    print*,'cplitr',NN,VLHeatCapcityLitR2,ORGC(0,NY,NX),VWatLitr2,VLiceMicP1(0,NY,NX)
+!    print*,'cplitr',NN,VLHeatCapcityLitR2,ORGC_vr(0,NY,NX),VWatLitr2,VLiceMicP1(0,NY,NX)
   ENDDO D5000
   end subroutine SurfLitterIterateNN
 
@@ -454,7 +454,7 @@ implicit none
   ! IN HEAT STORAGE
   !
   VHeatCapacityLitrX=VHeatCapacity(0,NY,NX)                          
-  VHeatCapacityLitR=cpw*VLWatMicP(0,NY,NX)+cpi*VLiceMicP(0,NY,NX)+cpo*ORGC(0,NY,NX) 
+  VHeatCapacityLitR=cpw*VLWatMicP(0,NY,NX)+cpi*VLiceMicP(0,NY,NX)+cpo*ORGC_vr(0,NY,NX) 
   VLWatMicPr=VLWatMicP(0,NY,NX)
   VLiceMicPr=VLiceMicP(0,NY,NX)
   if(VLWatMicP(0,NY,NX)<0._r8 .or. VLiceMicP(0,NY,NX)<0._r8 .or. VHeatCapacityLitR<0._r8)then
@@ -469,7 +469,7 @@ implicit none
   !update water, ice content and heat capacity of residue
   VLWatMicP(0,NY,NX)=AZMAX1(VLWatMicP(0,NY,NX)+WatFLo2Litr(NY,NX)+TLitrIceFlxThaw(NY,NX)+WatInByRunoff)
   VLiceMicP(0,NY,NX)=AZMAX1(VLiceMicP(0,NY,NX)-TLitrIceFlxThaw(NY,NX)/DENSICE)
-  VHeatCapacity(0,NY,NX)=cpo*ORGC(0,NY,NX)+cpw*VLWatMicP(0,NY,NX)+cpi*VLiceMicP(0,NY,NX)
+  VHeatCapacity(0,NY,NX)=cpo*ORGC_vr(0,NY,NX)+cpw*VLWatMicP(0,NY,NX)+cpi*VLiceMicP(0,NY,NX)
 
   IF(VHeatCapacity(0,NY,NX).GT.VHeatCapLitR(NY,NX))THEN
     !when there are still significant heat capacity of the residual layer
@@ -483,7 +483,7 @@ implicit none
       write(*,*)'ice',VLiceMicPr,VLiceMicP(0,NY,NX)
       write(*,*)'engy',ENGYZ,HeatFLo2LitrByWat(NY,NX),TLitrIceHeatFlxFrez(NY,NX),HeatByLitrMassChange, &
         HeatInByRunoff,VHeatCapacity(0,NY,NX)        
-      write(*,*)'vhc',VHeatCapacityLitrX,VHeatCapacityLitR,dVHeatCapacityLitR,TairK(NY,NX),ORGC(0,NY,NX)   
+      write(*,*)'vhc',VHeatCapacityLitrX,VHeatCapacityLitR,dVHeatCapacityLitR,TairK(NY,NX),ORGC_vr(0,NY,NX)   
       write(*,*)'tengz',ENGYZ/VHeatCapacity(0,NY,NX),HeatFLo2LitrByWat(NY,NX)/VHeatCapacity(0,NY,NX),&
         TLitrIceHeatFlxFrez(NY,NX)/VHeatCapacity(0,NY,NX),HeatByLitrMassChange/VHeatCapacity(0,NY,NX), &
         HeatInByRunoff/VHeatCapacity(0,NY,NX)
@@ -569,16 +569,16 @@ implicit none
   VLHeatCapLitRPre=VLHeatCapacity(0,NY,NX)                !heat capacity
   TK0Prev=TKSoi1(0,NY,NX)                                 !residual temperature
   ENGYR=VLHeatCapacity(0,NY,NX)*TKSoi1(0,NY,NX)  !initial energy content
-  VLHeatCapacity(0,NY,NX)=cpo*ORGC(0,NY,NX)+cpw*VLWatMicP1(0,NY,NX)+cpi*VLiceMicP1(0,NY,NX)  !update heat capacity
+  VLHeatCapacity(0,NY,NX)=cpo*ORGC_vr(0,NY,NX)+cpw*VLWatMicP1(0,NY,NX)+cpi*VLiceMicP1(0,NY,NX)  !update heat capacity
 
   IF(VLHeatCapacity(0,NY,NX).GT.VHeatCapLitR(NY,NX))THEN
     TKSoi1(0,NY,NX)=(ENGYR+HeatFLoByWat2LitRi(NY,NX)+LitrIceHeatFlxFrez(NY,NX))/VLHeatCapacity(0,NY,NX)
-!    print*,'cpksoi0',VLHeatCapacity(0,NY,NX),ORGC(0,NY,NX),VLWatMicP1(0,NY,NX),VLiceMicP1(0,NY,NX)
+!    print*,'cpksoi0',VLHeatCapacity(0,NY,NX),ORGC_vr(0,NY,NX),VLWatMicP1(0,NY,NX),VLiceMicP1(0,NY,NX)
     if(TKSoi1(0,NY,NX)<100._r8 .or. TKSoi1(0,NY,NX)>400._r8)then
       write(*,*)'weird litter temp UpdateLitRB4RunoffM=',M,NY,NX,TKSoi1(0,NY,NX),TK0Prev,VLHeatCapacity(0,NY,NX)
       write(*,*)'engy',ENGYR/VLHeatCapacity(0,NY,NX),HeatFLoByWat2LitRi(NY,NX)/VLHeatCapacity(0,NY,NX),&
         LitrIceHeatFlxFrez(NY,NX)/VLHeatCapacity(0,NY,NX)
-      write(*,*)'cpo',cpo*ORGC(0,NY,NX),cpw*VLWatMicP1(0,NY,NX),cpi*VLiceMicP1(0,NY,NX),VLHeatCapLitRPre,VHeatCapLitR(NY,NX) 
+      write(*,*)'cpo',cpo*ORGC_vr(0,NY,NX),cpw*VLWatMicP1(0,NY,NX),cpi*VLiceMicP1(0,NY,NX),VLHeatCapLitRPre,VHeatCapLitR(NY,NX) 
       write(*,*)'cpw',cpw*VLWatMicP10,VLWatMicP10,VLiceMicP10,VLWatMicP1(0,NY,NX),VLiceMicP1(0,NY,NX)
       write(*,*)'watflw',ENGYR,WatFLow2LitR(NY,NX),HeatFLoByWat2LitRi(NY,NX),HeatFLoByWat2LitRi(NY,NX)/(WatFLow2LitR(NY,NX)*cpw)
       write(*,*)'vlwat',VLWatMicP10,WatFLow2LitR(NY,NX),cumWatFlx2LitRByRunoff(NY,NX),cumHeatFlx2LitRByRunoff(NY,NX)
@@ -657,7 +657,7 @@ implicit none
   VLHeatCapLitRPre=VLHeatCapacity(0,NY,NX)                !heat capacity
   TK0Prev=TKSoi1(0,NY,NX)                                 !residual temperature
   ENGYR=VLHeatCapacity(0,NY,NX)*TKSoi1(0,NY,NX)  !initial energy content
-  VLHeatCapacity(0,NY,NX)=cpo*ORGC(0,NY,NX)+cpw*VLWatMicP1(0,NY,NX)+cpi*VLiceMicP1(0,NY,NX)  !update heat capacity
+  VLHeatCapacity(0,NY,NX)=cpo*ORGC_vr(0,NY,NX)+cpw*VLWatMicP1(0,NY,NX)+cpi*VLiceMicP1(0,NY,NX)  !update heat capacity
 
   IF(VLHeatCapacity(0,NY,NX).GT.VHeatCapLitR(NY,NX))THEN
     TKSoi1(0,NY,NX)=(ENGYR+cumHeatFlx2LitRByRunoff(NY,NX))/VLHeatCapacity(0,NY,NX)
@@ -667,11 +667,11 @@ implicit none
 !        dEvap=AMIN1((TKSoi1(0,NY,NX)-TK0Prev)*VLHeatCapacity(0,NY,NX)/EvapLHTC,VLWatMicP1(0,NY,NX))
 !        VLWatMicP1(0,NY,NX)=VLWatMicP1(0,NY,NX)-dEvap
 
-!        VLHeatCapacity(0,NY,NX)=cpo*ORGC(0,NY,NX)+cpw*VLWatMicP1(0,NY,NX)+cpi*VLiceMicP1(0,NY,NX)
+!        VLHeatCapacity(0,NY,NX)=cpo*ORGC_vr(0,NY,NX)+cpw*VLWatMicP1(0,NY,NX)+cpi*VLiceMicP1(0,NY,NX)
 !      endif
       write(*,*)'weird litter temp UpdateLitRAftRunoff  =',M,NY,NX,TKSoi1(0,NY,NX),TK0Prev,VLHeatCapacity(0,NY,NX)
       write(*,*)ENGYR/VLHeatCapacity(0,NY,NX),cumHeatFlx2LitRByRunoff(NY,NX)/VLHeatCapacity(0,NY,NX)
-      write(*,*)cpo*ORGC(0,NY,NX),cpw*VLWatMicP1(0,NY,NX),cpi*VLiceMicP1(0,NY,NX),VLHeatCapLitRPre,VHeatCapLitR(NY,NX) 
+      write(*,*)cpo*ORGC_vr(0,NY,NX),cpw*VLWatMicP1(0,NY,NX),cpi*VLiceMicP1(0,NY,NX),VLHeatCapLitRPre,VHeatCapLitR(NY,NX) 
       write(*,*)cpw*VLWatMicP10,VLWatMicP10,VLiceMicP10,VLWatMicP1(0,NY,NX),VLiceMicP1(0,NY,NX)
       write(*,*)VLWatMicP10,cumWatFlx2LitRByRunoff(NY,NX),cumHeatFlx2LitRByRunoff(NY,NX)
       call endrun(trim(mod_filename)//'at line',__LINE__)

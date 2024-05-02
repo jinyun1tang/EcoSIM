@@ -1245,7 +1245,8 @@ module MicAutoCPLXMod
   implicit none
   integer, intent(in) :: NGL,N
   real(r8), intent(out) :: ECHZ,RGOMP,RVOXP
-  real(r8), intent(out) :: RVOXPA,RVOXPB
+  real(r8), intent(out) :: RVOXPA    !methane oxidation
+  real(r8), intent(out) :: RVOXPB
   type(micforctype), intent(in) :: micfor
   type(micsttype), intent(in) :: micstt
   type(NitroAQMFluxDiagType), intent(in) :: naqfdiag
@@ -1262,26 +1263,26 @@ module MicAutoCPLXMod
   real(r8) :: VMXA
   REAL(R8) :: VOLWPM
 
-  associate(                                           &
-    GrowthEnvScalAutor              => nmics%GrowthEnvScalAutor,               &
-    FBiomStoiScalarAutor              => nmics%FBiomStoiScalarAutor,               &
-    OMActAutor          => nmics%OMActAutor,           &
-    RO2Dmnd4RespAutor   => nmicf%RO2Dmnd4RespAutor,    &
-    RO2DmndAutor        => nmicf%RO2DmndAutor,         &
-    CCH4E               => micfor%CCH4E,               &
-    VLsoiAirPM          => micfor%VLsoiAirPM,          &
-    VLWatMicPM          => micfor%VLWatMicPM,          &
-    ZEROS2              => micfor%ZEROS2,              &
-    ZEROS               => micfor%ZEROS,               &
-    THETPM              => micfor%THETPM,              &
-    DiffusivitySolutEff => micfor%DiffusivitySolutEff, &
-    litrm               => micfor%litrm,               &
-    CCH4G               => micstt%CCH4G,               &
-    CH4S                => micstt%CH4S,                &
-    SCH4L               => micstt%SCH4L,               &
-    RCH4L               => micfor%RCH4L,               &
-    RCH4F               => micfor%RCH4F,               &
-    RO2DmndAutort       => micflx%RO2DmndAutort        &
+  associate(                                            &
+    GrowthEnvScalAutor   => nmics%GrowthEnvScalAutor,   &
+    FBiomStoiScalarAutor => nmics%FBiomStoiScalarAutor, &
+    OMActAutor           => nmics%OMActAutor,           &
+    RO2Dmnd4RespAutor    => nmicf%RO2Dmnd4RespAutor,    &
+    RO2DmndAutor         => nmicf%RO2DmndAutor,         &
+    CCH4E                => micfor%CCH4E,               &
+    VLsoiAirPM           => micfor%VLsoiAirPM,          &
+    VLWatMicPM           => micfor%VLWatMicPM,          &
+    ZEROS2               => micfor%ZEROS2,              &
+    ZEROS                => micfor%ZEROS,               &
+    THETPM               => micfor%THETPM,              &
+    DiffusivitySolutEff  => micfor%DiffusivitySolutEff, &
+    litrm                => micfor%litrm,               &
+    CCH4G                => micstt%CCH4G,               &
+    CH4S                 => micstt%CH4S,                &
+    CH4AquaSolubility    => micstt%CH4AquaSolubility,   &
+    RCH4L                => micfor%RCH4L,               &
+    RCH4F                => micfor%RCH4F,               &
+    RO2DmndAutort        => micflx%RO2DmndAutort        &
   )
 !     begin_execution
 !
@@ -1300,7 +1301,7 @@ module MicAutoCPLXMod
 !     CH4G1,CH4S1=CH4 gaseous, aqueous amounts
 !     CCH4E,CCH4G=CH4 gas concentration in atmosphere, soil
 !     VLsoiAirPM,VLWatMicPM=air,water-filled porosity
-!     SCH4L=CH4 aqueous solubility
+!     CH4AquaSolubility=CH4 aqueous solubility
 !     CCK4=Km for CH4 uptake
 !     ECHO=efficiency CO2 conversion to biomass
 !     RGOMP1=substrate-limited CH4 oxidation
@@ -1331,13 +1332,15 @@ module MicAutoCPLXMod
 ! to intracellular C for respiration. (Grant 1999), the C yield is approximated
 ! as the energy required for turning CH4 into organic C, and the energy released
 ! from turnining CH4 into CO2. 
-! the catabolic reaction is
+! the catabolic reaction is (molar-basis)
 !  CH4 + 2O2 -> CO2 + 2H2O
-!    
+!  mass basis becomes (2*32/12=5.33)
+!  CH4 + 5.33 O2 -> CO2 + 2H2O  
+!  
 !  C+ O2 -> CO2,  32/12=2.667
   D320: DO M=1,NPH
     IF(VLWatMicPM(M).GT.ZEROS2)THEN
-      VOLWCH=VLWatMicPM(M)*SCH4L
+      VOLWCH=VLWatMicPM(M)*CH4AquaSolubility
       VOLWPM=VOLWCH+VLsoiAirPM(M)
 
       !CH4 uptake by aerobic oxidation
@@ -1351,8 +1354,8 @@ module MicAutoCPLXMod
         
         FSBST=CCH4S1/(CCH4S1+CCK4)
         !RVOXP1 energy from oxidizing CH4 into CO2
-        RVOXP1=AMIN1(AZMAX1(CH4S1)/(1.0+ECHO*ECHZ),VMXA1*FSBST)
-        !the respiration yield
+        RVOXP1=AMIN1(AZMAX1(CH4S1)/(1.0_r8+ECHO*ECHZ),VMXA1*FSBST)
+        !the respiration yield of CH2O, CH4+O2 -> CH2O + H2O (molar basis)
         RGOMP1=RVOXP1*ECHO*ECHZ
         !
         CH4S1=CH4S1-RVOXP1-RGOMP1
@@ -1378,7 +1381,7 @@ module MicAutoCPLXMod
 !
 !     RO2Dmnd4RespHeter=O2 demand from respiration
 !     ROXYP=O2 demand from respiration + CH4 oxidation
-!
+! 
   RO2Dmnd4RespAutor(NGL)=2.667_r8*RGOMP
   RO2DmndAutor(NGL)=RO2Dmnd4RespAutor(NGL)+5.333_r8*RVOXP
   RO2DmndAutort(NGL)=RO2DmndAutor(NGL)

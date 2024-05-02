@@ -314,7 +314,7 @@ module StartsMod
       !     SURFACE LITTER HEAT CAPACITY
       !
       SoilMicPMassLayerMn(NY,NX)=AZMAX1(SAND(NU(NY,NX),NY,NX)+SILT(NU(NY,NX),NY,NX)+CLAY(NU(NY,NX),NY,NX))
-      VHeatCapacity(0,NY,NX)=cpo*ORGC(0,NY,NX)+cpw*VLWatMicP(0,NY,NX)+cpi*VLiceMicP(0,NY,NX)
+      VHeatCapacity(0,NY,NX)=cpo*ORGC_vr(0,NY,NX)+cpw*VLWatMicP(0,NY,NX)+cpi*VLiceMicP(0,NY,NX)
       VHeatCapacitySoilM(0,NY,NX)=0.0_r8
       VLMicPt0(0,NY,NX)=0.0_r8
     ENDDO
@@ -861,7 +861,7 @@ module StartsMod
 
 ! surface litter:L=0,soil layer:L>0
 ! DLYR,AREA=layer thickness,x-sectional area:1=EW,2=NS,3=vertical
-! ORGC=organic C content
+! ORGC=organic C content (gC d-2)
 ! VOLT,VOLX=volume including,excluding macropores+rock
 ! BKVL=mass
 ! CDPTH,DPTH=depth to bottom,midpoint
@@ -870,8 +870,8 @@ module StartsMod
       ! surface litter residue layer
       TAREA=TAREA+AREA(3,L,NY,NX)
       CumSoilThickness(L,NY,NX)=0.0_r8
-      ORGC(L,NY,NX)=SUM(RSC(1:NumOfLitrCmplxs,L,NY,NX))*AREA(3,L,NY,NX)
-      ORGCX(L,NY,NX)=ORGC(L,NY,NX)
+      ORGC_vr(L,NY,NX)=SUM(RSC(1:NumOfLitrCmplxs,L,NY,NX))*AREA(3,L,NY,NX)
+      ORGCX(L,NY,NX)=ORGC_vr(L,NY,NX)
       VLitR0=0._r8
       DO K=1,NumOfLitrCmplxs
         VLitR0=VLitR0+RSC(K,L,NY,NX)/BulkDensLitR(K)
@@ -882,7 +882,7 @@ module StartsMod
       VLSoilPoreMicP_vr(L,NY,NX)=VGeomLayer(L,NY,NX)
       VLSoilMicP(L,NY,NX)=VLSoilPoreMicP_vr(L,NY,NX)
       VGeomLayert0(L,NY,NX)=VGeomLayer(L,NY,NX)
-      SoilMicPMassLayer(L,NY,NX)=MWC2Soil*ORGC(L,NY,NX)  !mass of soil layer, Mg/d2
+      SoilMicPMassLayer(L,NY,NX)=MWC2Soil*ORGC_vr(L,NY,NX)  !mass of soil layer, Mg/d2
       !thickness of litter layer 
       DLYRI(3,L,NY,NX)=VLSoilPoreMicP_vr(L,NY,NX)/AREA(3,L,NY,NX)  
       DLYR(3,L,NY,NX)=DLYRI(3,L,NY,NX)

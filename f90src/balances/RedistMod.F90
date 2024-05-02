@@ -139,7 +139,7 @@ module RedistMod
 !     CHECK MATERIAL BALANCES
 !
 !      IF(I.EQ.365.AND.J.EQ.24)THEN
-!        WRITE(19,2221)'ORGC',I,J,iYearCurrent,NX,NY,(ORGC(L,NY,NX)/AREA(3,L,NY,NX),L=0,NL(NY,NX))
+!        WRITE(19,2221)'ORGC',I,J,iYearCurrent,NX,NY,(ORGC_vr(L,NY,NX)/AREA(3,L,NY,NX),L=0,NL(NY,NX))
 !        WRITE(20,2221)'ORGN',I,J,iYearCurrent,NX,NY,(ORGN(L,NY,NX)/AREA(3,L,NY,NX),L=0,NL(NY,NX))
 2221    FORMAT(A8,5I6,21E14.6)
 !      ENDIF
@@ -788,7 +788,7 @@ module RedistMod
     DES(NE)=DES(NE)+SUM(SolidOM_vr(NE,1:jsken,1:NumOfLitrCmplxs,0,NY,NX))
   ENDDO
 
-  ORGC(0,NY,NX)=DES(ielmc)
+  ORGC_vr(0,NY,NX)=DES(ielmc)
   ORGN(0,NY,NX)=DES(ielmn)
   OMLitrC_vr(0,NY,NX)=DES(ielmc)
 
@@ -1502,14 +1502,14 @@ module RedistMod
     ENDIF
   ENDDO
   !litter plus non-litter
-  ORGC(L,NY,NX)=DES(ielmc)+OM(ielmc)
+  ORGC_vr(L,NY,NX)=DES(ielmc)+OM(ielmc)
   ORGN(L,NY,NX)=DES(ielmn)+OM(ielmn)
   ORGP(L,NY,NX)=DES(ielmp)+OM(ielmp)
   OMLitrC_vr(L,NY,NX)=DES(ielmc)
 
   IF(iErosionMode.EQ.ieros_frzthawsom.OR.iErosionMode.EQ.ieros_frzthawsomeros)THEN
 ! change in organic C
-    DORGCL=ORGCX(L,NY,NX)-ORGC(L,NY,NX)
+    DORGCL=ORGCX(L,NY,NX)-ORGC_vr(L,NY,NX)
     IF(L.EQ.NU(NY,NX))THEN
       DORGCL=DORGCL+DORGEC
     ENDIF
@@ -1552,7 +1552,7 @@ module RedistMod
         SolidOM_vr(NE,M,K,0,NY,NX)=SolidOM_vr(NE,M,K,0,NY,NX)+LitrfalStrutElms_vr(NE,M,K,0,NY,NX)
       ENDDO
 
-      ORGC(0,NY,NX)=ORGC(0,NY,NX)+LitrfalStrutElms_vr(ielmc,M,K,0,NY,NX)
+      ORGC_vr(0,NY,NX)=ORGC_vr(0,NY,NX)+LitrfalStrutElms_vr(ielmc,M,K,0,NY,NX)
       RAINR=LitrfalStrutElms_vr(ielmc,M,K,0,NY,NX)*ThetaCX(K)
       HRAINR=RAINR*cpw*TairK(NY,NX)
       WatFLo2Litr(NY,NX)=WatFLo2Litr(NY,NX)+RAINR

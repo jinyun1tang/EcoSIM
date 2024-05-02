@@ -265,7 +265,7 @@ contains
   micstt%H2GS =ystates0l(cid_H2GS)
   micstt%CCH4G=ystates0l(cid_CCH4G)
   micstt%CH4S =ystates0l(cid_CH4S)
-  micstt%SCH4L=forc%SCH4L
+  micstt%CH4AquaSolubility=forc%CH4AquaSolubility
   micstt%ZNFN0=forc%ZNFN0
   micstt%ZNFNI=forc%ZNFNI
 
@@ -1492,7 +1492,7 @@ contains
       DiffusivitySolutEffHL=forc%HLSGL*TortMicPM1*dts_HeatWatTP
 
       CCO2GQ=(PARG*forc%CCO2E*forc%SCO2L+DiffusivitySolutEffCO*CCO2S2)/(DiffusivitySolutEffCO+PARG)
-      CCH4GQ=(PARG*forc%CCH4E*forc%SCH4L+DiffusivitySolutEffCH*CCH4S2)/(DiffusivitySolutEffCH+PARG)
+      CCH4GQ=(PARG*forc%CCH4E*forc%CH4AquaSolubility+DiffusivitySolutEffCH*CCH4S2)/(DiffusivitySolutEffCH+PARG)
       COXYGQ=(PARG*forc%COXYE*forc%O2GSolubility+DiffusivitySolutEffOX*COXYS2)/(DiffusivitySolutEffOX+PARG)
       CZ2GGQ=(PARG*forc%CZ2GE*forc%SN2GL+DiffusivitySolutEffNG*CZ2GS2)/(DiffusivitySolutEffNG+PARG)
       CZ2OGQ=(PARG*forc%CZ2OE*forc%SN2OL+DiffusivitySolutEffN2*CZ2OS2)/(DiffusivitySolutEffN2+PARG)
@@ -1534,7 +1534,7 @@ contains
       VLsoiAirPMA=VLsoiAirP*forc%VLNH4
       VLsoiAirPMB=VLsoiAirP*forc%VLNHB
       VLWatMicPMCO=VLWatMicP*forc%SCO2L
-      VLWatMicPMCH=VLWatMicP*forc%SCH4L
+      VLWatMicPMCH=VLWatMicP*forc%CH4AquaSolubility
       VLWatMicPMOX=VLWatMicP*forc%O2GSolubility
       VLWatMicPMNG=VLWatMicP*forc%SN2GL
       VLWatMicPMN2=VLWatMicP*forc%SN2OL

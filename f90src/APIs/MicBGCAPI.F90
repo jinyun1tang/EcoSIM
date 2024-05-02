@@ -206,7 +206,7 @@ implicit none
   micfor%VLPOB =trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
   micfor%PSISoilMatricP =PSISoilMatricP(L,NY,NX)
   micfor%O2AquaDiffusvity =SolDifc_vr(idg_O2,L,NY,NX)
-  micfor%ORGC  =ORGC(L,NY,NX)
+  micfor%ORGC  =ORGC_vr(L,NY,NX)
   micfor%RNO2EcoUptkSoilPrev =RNO2EcoUptkSoilPrev_vr(L,NY,NX)
   micfor%RN2OEcoUptkSoilPrev =RN2OEcoUptkSoilPrev_vr(L,NY,NX)
   micfor%RNO2EcoUptkBandPrev =RNO2EcoUptkBandPrev_vr(L,NY,NX)
@@ -310,7 +310,7 @@ implicit none
   micstt%H2GS=trc_solml_vr(idg_H2,L,NY,NX)
   micstt%CCH4G=trc_gascl_vr(idg_CH4,L,NY,NX)
   micstt%CH4S=trc_solml_vr(idg_CH4,L,NY,NX)
-  micstt%SCH4L=GasSolbility_vr(idg_CH4,L,NY,NX)
+  micstt%CH4AquaSolubility=GasSolbility_vr(idg_CH4,L,NY,NX)
   micstt%ZNFN0=ZNFN0(L,NY,NX)
   micstt%ZNFNI=ZNFNI(L,NY,NX)
   

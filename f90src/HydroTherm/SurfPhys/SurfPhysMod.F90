@@ -149,7 +149,7 @@ contains
 !     PSISM*=litter matric water potential
 !
   LWRadBySurf(NY,NX)=0.0_r8
-  VLHeatCapacity(0,NY,NX)=cpo*ORGC(0,NY,NX)+cpw*VLWatMicP(0,NY,NX)+cpi*VLiceMicP(0,NY,NX)
+  VLHeatCapacity(0,NY,NX)=cpo*ORGC_vr(0,NY,NX)+cpw*VLWatMicP(0,NY,NX)+cpi*VLiceMicP(0,NY,NX)
   VLPoreLitR(NY,NX)=VLMicP(0,NY,NX)
   VLWatMicP1(0,NY,NX)=AZMAX1(VLWatMicP(0,NY,NX))
   VLiceMicP1(0,NY,NX)=AZMAX1(VLiceMicP(0,NY,NX))
@@ -201,7 +201,7 @@ contains
   FracSurfSnoFree(NY,NX)=1.0_r8-FracSurfAsSnow(NY,NX)
   !if there is heat-wise significant litter layer
   IF(VLHeatCapacity(0,NY,NX).GT.VHeatCapLitR(NY,NX))THEN
-    FracSurfAsBareSoi(NY,NX)=AMIN1(1.0_r8,AZMAX1(EXP(-0.8E-02_r8*(ORGC(0,NY,NX)/AREA(3,0,NY,NX)))))
+    FracSurfAsBareSoi(NY,NX)=AMIN1(1.0_r8,AZMAX1(EXP(-0.8E-02_r8*(ORGC_vr(0,NY,NX)/AREA(3,0,NY,NX)))))
   ELSE
     FracSurfAsBareSoi(NY,NX)=1.0_r8
   ENDIF
@@ -927,7 +927,7 @@ contains
 !     VLWatMicP1*,VLiceMicP1=litter water,ice volume
 !     VLHeatCapacity*=litter volumetric heat capacity
 !     TK1*=litter temperature
-!     ORGC=litter organic C
+!     ORGC_vr=litter organic C
 !     HFLWRL=total litter conductive, convective heat flux
 !     LitrIceHeatFlxFrezPt,TFLX=unltd,ltd latent heat from freeze-thaw
 !     LitrIceHeatFlxFrez,LitrIceFlxThaw=litter water,latent heat flux from freeze-thaw
@@ -935,7 +935,7 @@ contains
   TFREEZ=-9.0959E+04_r8/(PSISM1(0,NY,NX)-LtHeatIceMelt)
   VLWatMicP1X=AZMAX1(VLWatMicP1(0,NY,NX)+WatFLow2LitR(NY,NX))
   ENGYR=VLHeatCapacity(0,NY,NX)*TKSoi1(0,NY,NX)
-  VLHeatCapacityX=cpo*ORGC(0,NY,NX)+cpw*VLWatMicP1X+cpi*VLiceMicP1(0,NY,NX)
+  VLHeatCapacityX=cpo*ORGC_vr(0,NY,NX)+cpw*VLWatMicP1X+cpi*VLiceMicP1(0,NY,NX)
 
   IF(VLHeatCapacityX.GT.ZEROS(NY,NX))THEN
     TK1X=(ENGYR+HeatFLoByWat2LitRi(NY,NX))/VLHeatCapacityX

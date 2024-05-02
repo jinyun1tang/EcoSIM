@@ -174,7 +174,7 @@ implicit none
     real(r8) :: OXYS      !aqueous O2  micropore	[g d-2]
     real(r8) :: H2GS      !aqueous H2 	[g d-2]
     real(r8) :: CH4S      !aqueous CO2  micropore	[g d-2]
-    real(r8) :: SCH4L     !solubility of CH4, [m3 m-3]
+    real(r8) :: CH4AquaSolubility     !solubility of CH4, [m3 m-3]
     real(r8) :: O2GSolubility     !solubility of O2, [m3 m-3]
     real(r8) :: SCO2L     !solubility of CO2, [m3 m-3]
     real(r8) :: SN2GL     !solubility of N2, [m3 m-3]
@@ -403,7 +403,7 @@ implicit none
   if(first .or. forctype ==0 .or. forctype==2)then
 
     TCS=TKS-TC2K
-    forc%SCH4L=gas_solubility(idg_CH4,TCS)
+    forc%CH4AquaSolubility=gas_solubility(idg_CH4,TCS)
     forc%O2GSolubility=gas_solubility(idg_O2, TCS)
     forc%SCO2L=gas_solubility(idg_CO2, TCS)     !solubility of CO2, [m3 m-3]
     forc%SN2GL=gas_solubility(idg_N2, TCS)      !solubility of N2, [m3 m-3]

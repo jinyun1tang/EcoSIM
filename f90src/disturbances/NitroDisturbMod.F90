@@ -323,15 +323,15 @@ module NitroDisturbMod
             FertN_soil_vr(NTF,L,NY,NX)=DCORPC1*FertN_soil_vr(NTF,L,NY,NX)
           ENDDO
         ENDIF
-        ORGC(L,NY,NX)=DC
+        ORGC_vr(L,NY,NX)=DC
         ORGN(L,NY,NX)=DN
         ORGP(L,NY,NX)=DP
         IF(L.EQ.0)THEN
-          HFLXD=4.19E-06_r8*(ORGCX(L,NY,NX)-ORGC(L,NY,NX))*TKS(L,NY,NX)
+          HFLXD=4.19E-06_r8*(ORGCX(L,NY,NX)-ORGC_vr(L,NY,NX))*TKS(L,NY,NX)
           HEATOU=HEATOU+HFLXD
         ENDIF
 !     IF(L.EQ.0)THEN
-!     VHeatCapacity(0,NY,NX)=2.496E-06*ORGC(0,NY,NX)+4.19*VLWatMicP(0,NY,NX)
+!     VHeatCapacity(0,NY,NX)=2.496E-06*ORGC_vr(0,NY,NX)+4.19*VLWatMicP(0,NY,NX)
 !    2+1.9274*VLiceMicP(0,NY,NX)
 !     ELSE
 !     VHeatCapacity(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+4.19*(VLWatMicP(L,NY,NX)+VLWatMacP(L,NY,NX))

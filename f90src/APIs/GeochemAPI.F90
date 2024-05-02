@@ -184,7 +184,7 @@ module GeochemAPI
   chemvar%XHC=trcx_solml(idx_COOH,L,NY,NX)
   chemvar%XALO2=trcx_solml(idx_AlOH2,L,NY,NX)
   chemvar%XFEO2=trcx_solml(idx_FeOH2,L,NY,NX)
-  chemvar%ORGC=ORGC(L,NY,NX)
+  chemvar%ORGC=ORGC_vr(L,NY,NX)
   chemvar%PALOH=trcp_salml(idsp_AlOH3,L,NY,NX)
   chemvar%PFEOH=trcp_salml(idsp_FeOH3,L,NY,NX)
   chemvar%PCACO=trcp_salml(idsp_CaCO3,L,NY,NX)

@@ -563,7 +563,7 @@ module Hour1Mod
     SoilMicPMassLayer(L,NY,NX)=SoiBulkDensity(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
 
     IF(SoilMicPMassLayer(L,NY,NX).GT.ZEROS(NY,NX))THEN
-      CORGC(L,NY,NX)=AMIN1(orgcden,ORGC(L,NY,NX)/SoilMicPMassLayer(L,NY,NX))
+      CORGC(L,NY,NX)=AMIN1(orgcden,ORGC_vr(L,NY,NX)/SoilMicPMassLayer(L,NY,NX))
       CSAND(L,NY,NX)=SAND(L,NY,NX)/SoilMicPMassLayer(L,NY,NX)
       CSILT(L,NY,NX)=SILT(L,NY,NX)/SoilMicPMassLayer(L,NY,NX)
       CCLAY(L,NY,NX)=CLAY(L,NY,NX)/SoilMicPMassLayer(L,NY,NX)
@@ -966,11 +966,11 @@ module Hour1Mod
       !     ZM=surface roughness used in runoff velocity calculation in watsub.f
       !
       SoilMicPMassLayerMX(NY,NX)=AZMAX1(SoilMicPMassLayerMn(NY,NX)+&
-        MWC2Soil*ORGC(NU(NY,NX),NY,NX))
+        MWC2Soil*ORGC_vr(NU(NY,NX),NY,NX))
       BKVLNX=SAND(NU(NY,NX),NY,NX)+SILT(NU(NY,NX),NY,NX) &
-        +CLAY(NU(NY,NX),NY,NX)+1.82E-06*ORGC(NU(NY,NX),NY,NX)
+        +CLAY(NU(NY,NX),NY,NX)+1.82E-06*ORGC_vr(NU(NY,NX),NY,NX)
       IF(BKVLNX.GT.ZEROS(NY,NX))THEN
-        CORGM=MWC2Soil*ORGC(NU(NY,NX),NY,NX)/BKVLNX
+        CORGM=MWC2Soil*ORGC_vr(NU(NY,NX),NY,NX)/BKVLNX
         CORGC(NU(NY,NX),NY,NX)=orgcden*CORGM
         CSAND(NU(NY,NX),NY,NX)=SAND(NU(NY,NX),NY,NX)/BKVLNX
         CSILT(NU(NY,NX),NY,NX)=SILT(NU(NY,NX),NY,NX)/BKVLNX
@@ -1500,7 +1500,7 @@ module Hour1Mod
   VGeomLayer(0,NY,NX)=VxcessWatLitR+VLitR(NY,NX)
   IF(VGeomLayer(0,NY,NX).GT.ZEROS2(NY,NX))THEN
     VLSoilPoreMicP_vr(0,NY,NX)=VGeomLayer(0,NY,NX)
-    SoilMicPMassLayer(0,NY,NX)=MWC2Soil*ORGC(0,NY,NX)
+    SoilMicPMassLayer(0,NY,NX)=MWC2Soil*ORGC_vr(0,NY,NX)
     VLMicP(0,NY,NX)=AZMAX1(VLitR(NY,NX)-SoilMicPMassLayer(0,NY,NX)/1.30_r8)
     VLsoiAirP(0,NY,NX)=AZMAX1(VLMicP(0,NY,NX)-VLWatMicP(0,NY,NX)-VLiceMicP(0,NY,NX))
     IF(VLitR(NY,NX).GT.ZEROS(NY,NX))THEN

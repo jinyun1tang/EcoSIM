@@ -144,9 +144,9 @@ module TillageMixMod
 !     ACCUMULATE STATE VARIABLES IN SURFACE RESIDUE FOR ADDITION
 !     TO SOIL IN TILLAGE MIXING ZONE
 !
-!     IF(ORGC(0,NY,NX).GT.ZEROS(NY,NX))THEN
+!     IF(ORGC_vr(0,NY,NX).GT.ZEROS(NY,NX))THEN
 !     XCORP0=AMAX1(XCORP(NY,NX),AMIN1(1.0,
-!    2(VHeatCapLitR(NY,NX)/cpo)/ORGC(0,NY,NX)))
+!    2(VHeatCapLitR(NY,NX)/cpo)/ORGC_vr(0,NY,NX)))
     XCORP0=AMAX1(0.001_r8,XCORP(NY,NX))
 !     ELSE
 !     XCORP0=1.0
@@ -274,11 +274,11 @@ module TillageMixMod
 
     TZNFNG=ZNFNI(0,NY,NX)*CORP0
     TVOLWR=VLWatMicP(0,NY,NX)*CORP0
-    HFLXD=cpo*ORGC(0,NY,NX)*CORP0*TKS(0,NY,NX)
+    HFLXD=cpo*ORGC_vr(0,NY,NX)*CORP0*TKS(0,NY,NX)
     HEATIN=HEATIN-HFLXD
     HeatStoreLandscape=HeatStoreLandscape-HFLXD
     TENGYR=cpw*TVOLWR*TKS(0,NY,NX)
-    ORGC(0,NY,NX)=DC
+    ORGC_vr(0,NY,NX)=DC
     ORGN(0,NY,NX)=DN
     ORGP(0,NY,NX)=DP
     OMLitrC_vr(0,NY,NX)=DC
@@ -308,7 +308,7 @@ module TillageMixMod
     ENDDO
 
     VLWatMicP(0,NY,NX)=VLWatMicP(0,NY,NX)*XCORP0
-    VHeatCapacity(0,NY,NX)=cpo*ORGC(0,NY,NX)+cpw*VLWatMicP(0,NY,NX)+cpi*VLiceMicP(0,NY,NX)
+    VHeatCapacity(0,NY,NX)=cpo*ORGC_vr(0,NY,NX)+cpw*VLWatMicP(0,NY,NX)+cpi*VLiceMicP(0,NY,NX)
     VLitR(NY,NX)=VLitR(NY,NX)*XCORP0
     VGeomLayer(0,NY,NX)=VGeomLayer(0,NY,NX)*XCORP0
     ZNHUX0=AMAX1(ZNHUX0,ZNHU0(0,NY,NX))
@@ -720,7 +720,7 @@ module TillageMixMod
             ENDIF
           ENDDO
         ENDDO
-        ORGC(L,NY,NX)=OC
+        ORGC_vr(L,NY,NX)=OC
         ORGN(L,NY,NX)=ON
         OMLitrC_vr(L,NY,NX)=DC
 
