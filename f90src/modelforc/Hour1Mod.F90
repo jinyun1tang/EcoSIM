@@ -2026,7 +2026,7 @@ module Hour1Mod
     FDPTHF=FDPTH(I,NY,NX)+CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)
     IF(FDPTHF.LE.0.0_r8.AND.isclose(Z4B+Z3B+ZUB+ZOB+PMB,0._r8))THEN
       LFDPTH=0
-      CVRDF=1.0_r8-EXP(-0.8E-02_r8*(ORGC(0,NY,NX)/AREA(3,0,NY,NX)))
+      CVRDF=1.0_r8-EXP(-0.8E-02_r8*(ORGC_vr(0,NY,NX)/AREA(3,0,NY,NX)))
     ELSE
       D65: DO L=NUI(NY,NX),JZ
         IF(CumDepth2LayerBottom(L,NY,NX).GE.FDPTHF)THEN
@@ -2339,7 +2339,7 @@ module Hour1Mod
 !     CORGC=SOC concentration
 !
     IF(SoilMicPMassLayer(L,NY,NX).GT.ZEROS(NY,NX))THEN
-      CORGC(L,NY,NX)=AMIN1(orgcden,ORGC(L,NY,NX)/SoilMicPMassLayer(L,NY,NX))
+      CORGC(L,NY,NX)=AMIN1(orgcden,ORGC_vr(L,NY,NX)/SoilMicPMassLayer(L,NY,NX))
     ELSE
       CORGC(L,NY,NX)=0.0_r8
     ENDIF

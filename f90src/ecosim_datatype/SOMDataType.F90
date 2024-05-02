@@ -22,8 +22,8 @@ module SOMDataType
   real(r8),target,allocatable :: DOM(:,:,:,:,:)                       !dissolved organic C micropore	[g d-2]
   real(r8),target,allocatable :: DOM_Macp(:,:,:,:,:)                      !dissolved organic C macropore	[g d-2]
   real(r8),target,allocatable :: ORGC_vr(:,:,:)                        !total soil organic C [g d-2]
-  real(r8),target,allocatable :: ORGN(:,:,:)                        !total soil organic N [g d-2]
-  real(r8),target,allocatable :: ORGP(:,:,:)                        !total soil organic P [g d-2]
+  real(r8),target,allocatable :: ORGN_vr(:,:,:)                        !total soil organic N [g d-2]
+  real(r8),target,allocatable :: ORGP_vr(:,:,:)                        !total soil organic P [g d-2]
   real(r8),target,allocatable :: ORGCX(:,:,:)                       !SOC concentration	[g Mg-1]
   real(r8),target,allocatable :: SolidOMAct_vr(:,:,:,:,:)                     !colonized humus C in each complex [g d-2]
   real(r8),target,allocatable :: OMLitrC_vr(:,:,:)                        !total particulate organic C [g d-2]
@@ -75,8 +75,8 @@ module SOMDataType
   allocate(DOM(idom_beg:idom_end,1:jcplx,0:JZ,JY,JX))
   allocate(DOM_Macp(idom_beg:idom_end,1:jcplx,0:JZ,JY,JX));DOM_MacP=0._r8
   allocate(ORGC_vr(0:JZ,JY,JX));ORGC_vr=0._r8
-  allocate(ORGN(0:JZ,JY,JX))
-  allocate(ORGP(0:JZ,JY,JX))
+  allocate(ORGN_vr(0:JZ,JY,JX));ORGN_vr=0._r8
+  allocate(ORGP_vr(0:JZ,JY,JX));ORGP_vr=0._r8
   allocate(ORGCX(0:JZ,JY,JX))
   allocate(SolidOMAct_vr(jsken,1:jcplx,0:JZ,JY,JX));SolidOMAct_vr=0._r8
   allocate(OMLitrC_vr(0:JZ,JY,JX));OMLitrC_vr=0._r8
@@ -118,8 +118,8 @@ module SOMDataType
   call destroy(DOM)
   call destroy(DOM_MacP)
   call destroy(ORGC_vr)
-  call destroy(ORGN)
-  call destroy(ORGP)
+  call destroy(ORGN_vr)
+  call destroy(ORGP_vr)
   call destroy(ORGCX)
   call destroy(SolidOMAct_vr)
   call destroy(OMLitrC_vr)

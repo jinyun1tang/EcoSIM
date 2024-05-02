@@ -140,7 +140,7 @@ module RedistMod
 !
 !      IF(I.EQ.365.AND.J.EQ.24)THEN
 !        WRITE(19,2221)'ORGC',I,J,iYearCurrent,NX,NY,(ORGC_vr(L,NY,NX)/AREA(3,L,NY,NX),L=0,NL(NY,NX))
-!        WRITE(20,2221)'ORGN',I,J,iYearCurrent,NX,NY,(ORGN(L,NY,NX)/AREA(3,L,NY,NX),L=0,NL(NY,NX))
+!        WRITE(20,2221)'ORGN',I,J,iYearCurrent,NX,NY,(ORGN_vr(L,NY,NX)/AREA(3,L,NY,NX),L=0,NL(NY,NX))
 2221    FORMAT(A8,5I6,21E14.6)
 !      ENDIF
 
@@ -789,7 +789,7 @@ module RedistMod
   ENDDO
 
   ORGC_vr(0,NY,NX)=DES(ielmc)
-  ORGN(0,NY,NX)=DES(ielmn)
+  ORGN_vr(0,NY,NX)=DES(ielmn)
   OMLitrC_vr(0,NY,NX)=DES(ielmc)
 
   DO NE=1,NumPlantChemElms
@@ -1503,8 +1503,8 @@ module RedistMod
   ENDDO
   !litter plus non-litter
   ORGC_vr(L,NY,NX)=DES(ielmc)+OM(ielmc)
-  ORGN(L,NY,NX)=DES(ielmn)+OM(ielmn)
-  ORGP(L,NY,NX)=DES(ielmp)+OM(ielmp)
+  ORGN_vr(L,NY,NX)=DES(ielmn)+OM(ielmn)
+  ORGP_vr(L,NY,NX)=DES(ielmp)+OM(ielmp)
   OMLitrC_vr(L,NY,NX)=DES(ielmc)
 
   IF(iErosionMode.EQ.ieros_frzthawsom.OR.iErosionMode.EQ.ieros_frzthawsomeros)THEN

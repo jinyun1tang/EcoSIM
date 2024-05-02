@@ -279,8 +279,8 @@ module TillageMixMod
     HeatStoreLandscape=HeatStoreLandscape-HFLXD
     TENGYR=cpw*TVOLWR*TKS(0,NY,NX)
     ORGC_vr(0,NY,NX)=DC
-    ORGN(0,NY,NX)=DN
-    ORGP(0,NY,NX)=DP
+    ORGN_vr(0,NY,NX)=DN
+    ORGP_vr(0,NY,NX)=DP
     OMLitrC_vr(0,NY,NX)=DC
 
     DO NTS=ids_beg,idg_NH3
@@ -721,7 +721,7 @@ module TillageMixMod
           ENDDO
         ENDDO
         ORGC_vr(L,NY,NX)=OC
-        ORGN(L,NY,NX)=ON
+        ORGN_vr(L,NY,NX)=ON
         OMLitrC_vr(L,NY,NX)=DC
 
         DO NTS=ids_beg,idg_NH3

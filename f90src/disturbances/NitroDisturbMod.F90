@@ -324,8 +324,8 @@ module NitroDisturbMod
           ENDDO
         ENDIF
         ORGC_vr(L,NY,NX)=DC
-        ORGN(L,NY,NX)=DN
-        ORGP(L,NY,NX)=DP
+        ORGN_vr(L,NY,NX)=DN
+        ORGP_vr(L,NY,NX)=DP
         IF(L.EQ.0)THEN
           HFLXD=4.19E-06_r8*(ORGCX(L,NY,NX)-ORGC_vr(L,NY,NX))*TKS(L,NY,NX)
           HEATOU=HEATOU+HFLXD

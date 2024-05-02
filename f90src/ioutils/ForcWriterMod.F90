@@ -210,7 +210,7 @@ implicit none
 
     call ncd_putvar(ncf,'pH',PH(L,NY,NX))
     call ncd_putvar(ncf,'VLSoilPoreMicP_vr',VLSoilPoreMicP_vr(L,NY,NX))
-    call ncd_putvar(ncf,'ORGC',ORGC(L,NY,NX))
+    call ncd_putvar(ncf,'ORGC',ORGC_vr(L,NY,NX))
     call ncd_putvar(ncf,'CFOMC',CFOMC(:,L,NY,NX))
     call ncd_putvar(ncf,'VLSoilMicP',VLSoilMicP(L,NY,NX))
     call ncd_putvar(ncf,'BKVL',SoilMicPMassLayer(L,NY,NX))

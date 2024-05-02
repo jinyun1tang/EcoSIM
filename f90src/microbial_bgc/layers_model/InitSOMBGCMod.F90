@@ -459,8 +459,8 @@ module InitSOMBGCMOD
   ORGC_vr(L,NY,NX)=OC
   ORGCX(L,NY,NX)=ORGC_vr(L,NY,NX)
   OMLitrC_vr(L,NY,NX)=RC
-  ORGN(L,NY,NX)=ON
-  ORGP(L,NY,NX)=OP
+  ORGN_vr(L,NY,NX)=ON
+  ORGP_vr(L,NY,NX)=OP
   end associate
   end subroutine InitSOMVars
 
