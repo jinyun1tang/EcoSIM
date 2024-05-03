@@ -675,7 +675,7 @@ module TranspNoSaltMod
 !     dt_GasCyc=1/number of cycles NPH-1 for gas flux calculations
 !
   DO NTS=ids_beg,ids_end
-    SolDifc_vrc(NTS,0,NY,NX)=SolDifc_vr(NTS,0,NY,NX)*dts_HeatWatTP
+    SoluteDifusvty_vrc(NTS,0,NY,NX)=SoluteDifusvty_vr(NTS,0,NY,NX)*dts_HeatWatTP
   ENDDO
 
   DO idom=idom_beg,idom_end
@@ -786,7 +786,7 @@ module TranspNoSaltMod
     DOMdiffusivity2_vr(idom_acetate,L,NY,NX)=DOMdiffusivity_vr(idom_acetate,L,NY,NX)*dts_HeatWatTP
 
     DO NTS=ids_beg,ids_end
-      SolDifc_vrc(NTS,L,NY,NX)=SolDifc_vr(NTS,L,NY,NX)*dts_HeatWatTP
+      SoluteDifusvty_vrc(NTS,L,NY,NX)=SoluteDifusvty_vr(NTS,L,NY,NX)*dts_HeatWatTP
     ENDDO
 
     DO NTG=idg_beg,idg_end

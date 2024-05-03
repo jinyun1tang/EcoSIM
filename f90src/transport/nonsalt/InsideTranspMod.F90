@@ -603,7 +603,7 @@ module InsideTranspMod
     DIFOM(idom_acetate)=(DOMdiffusivity2_vr(idom_acetate,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
 
     DO nsolutes=ids_beg,ids_end
-      SDifc(nsolutes)=(SolDifc_vrc(nsolutes,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
+      SDifc(nsolutes)=(SoluteDifusvty_vrc(nsolutes,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
     ENDDO
 
 !
@@ -936,7 +936,7 @@ module InsideTranspMod
     DIFOM(idom_acetate)=(DOMdiffusivity2_vr(idom_acetate,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
 
     DO nsolutes=ids_beg,ids_end
-      SDifc(nsolutes)=(SolDifc_vrc(nsolutes,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
+      SDifc(nsolutes)=(SoluteDifusvty_vrc(nsolutes,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
     ENDDO
 
 !
@@ -1389,7 +1389,7 @@ module InsideTranspMod
   DO ngases=idg_beg,idg_end
     CNDC1=DFLG2*GasDifc_vrc(ngases,N3,N2,N1)
     CNDC2=DFLGL*GasDifc_vrc(ngases,N6,N5,N4)
-    DifuscG(ngases,N,N6,N5,N4)=(CNDC1*CNDC2)/(CNDC1+CNDC2)
+    DifuscG_vr(ngases,N,N6,N5,N4)=(CNDC1*CNDC2)/(CNDC1+CNDC2)
   ENDDO
 !
 !     GASEOUS CONCENTRATIONS FROM AIR-FILLED POROSITY
@@ -1412,7 +1412,7 @@ module InsideTranspMod
   DO ngases=idg_beg,idg_NH3
     trc_gasc1(ngases)=AZMAX1(trc_gasml_vr2(ngases,N3,N2,N1)/VLsoiAirPM(M,N3,N2,N1))
     trc_gasc2(ngases)=AZMAX1(trc_gasml_vr2(ngases,N6,N5,N4)/VLsoiAirPM(M,N6,N5,N4))
-    DFVGG(ngases)=DifuscG(ngases,N,N6,N5,N4)*(trc_gasc1(ngases)-trc_gasc2(ngases))
+    DFVGG(ngases)=DifuscG_vr(ngases,N,N6,N5,N4)*(trc_gasc1(ngases)-trc_gasc2(ngases))
     R3GasADFlx(ngases,N,N6,N5,N4)=DFVGG(ngases)
   ENDDO
 
@@ -1570,7 +1570,7 @@ module InsideTranspMod
 
   integer :: K
 
-  DifuscG(idg_beg:idg_end,N,N6,N5,N4) = 0._r8
+  DifuscG_vr(idg_beg:idg_end,N,N6,N5,N4) = 0._r8
 
   D9750: DO K=1,jcplx
     DOM_3DMicp_Transp_flxM(idom_beg:idom_end,K,N,N6,N5,N4)=0.0_r8
@@ -1592,7 +1592,7 @@ module InsideTranspMod
 
   integer :: K
 
-  DifuscG(idg_beg:idg_NH3,N,N3,N2,N1)=0.0_r8
+  DifuscG_vr(idg_beg:idg_NH3,N,N3,N2,N1)=0.0_r8
 
   D9751: DO K=1,jcplx
     DOM_3DMicp_Transp_flxM(idom_beg:idom_end,K,N,N3,N2,N1)=0.0_r8

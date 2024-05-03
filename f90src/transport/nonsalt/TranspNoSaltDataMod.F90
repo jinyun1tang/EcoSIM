@@ -52,8 +52,8 @@ implicit none
   real(r8), allocatable ::  R3PorTSoHFlx(:,:,:,:)          !total 3D macropore flux
 
   real(r8), allocatable ::  GasDifc_vrc(:,:,:,:)
-  real(r8), allocatable ::  SolDifc_vrc(:,:,:,:)
-  real(r8), allocatable ::  DifuscG(:,:,:,:,:)
+  real(r8), allocatable ::  SoluteDifusvty_vrc(:,:,:,:)
+  real(r8), allocatable ::  DifuscG_vr(:,:,:,:,:)
   real(r8), allocatable ::  trcg_VLWatMicP(:,:,:,:)                      !
 
   real(r8), allocatable ::  DH2GG(:,:,:,:)                     !
@@ -144,8 +144,8 @@ contains
   allocate(CDOM_MicP2(idom_beg:idom_end,1:jcplx)); CDOM_MicP2=0._r8
 
   allocate(GasDifc_vrc(idg_beg:idg_end,JZ,JY,JX))
-  allocate(SolDifc_vrc(ids_beg:ids_end,0:JZ,JY,JX));SolDifc_vrc=0._r8
-  allocate(DifuscG(idg_beg:idg_end,3,JZ,JY,JX)); DifuscG=0._r8
+  allocate(SoluteDifusvty_vrc(ids_beg:ids_end,0:JZ,JY,JX));SoluteDifusvty_vrc=0._r8
+  allocate(DifuscG_vr(idg_beg:idg_end,3,JZ,JY,JX)); DifuscG_vr=0._r8
 
   allocate(trcg_VLWatMicP(idg_beg:idg_end,0:JZ,JY,JX)); trcg_VLWatMicP=0._r8
 

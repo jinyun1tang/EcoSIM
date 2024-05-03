@@ -1144,25 +1144,25 @@ module Hour1Mod
   TFACL=TEFAQUDIF(TKS(0,NY,NX))
   TScal4Difsvity_vr(0,NY,NX)=TFACL
 
-  SolDifc_vr(idg_CO2,0,NY,NX)=CLSG*TFACL
-  SolDifc_vr(idg_CH4,0,NY,NX)=CQSG*TFACL
-  SolDifc_vr(idg_O2,0,NY,NX)=OLSG*TFACL
-  SolDifc_vr(idg_N2,0,NY,NX)=ZLSG*TFACL
-  SolDifc_vr(idg_NH3,0,NY,NX)=ZNSG*TFACL
-  SolDifc_vr(idg_H2,0,NY,NX)=HLSG*TFACL
-  SolDifc_vr(idg_N2O,0,NY,NX)=ZVSG*TFACL
+  SoluteDifusvty_vr(idg_CO2,0,NY,NX)=CLSG*TFACL
+  SoluteDifusvty_vr(idg_CH4,0,NY,NX)=CQSG*TFACL
+  SoluteDifusvty_vr(idg_O2,0,NY,NX)=OLSG*TFACL
+  SoluteDifusvty_vr(idg_N2,0,NY,NX)=ZLSG*TFACL
+  SoluteDifusvty_vr(idg_NH3,0,NY,NX)=ZNSG*TFACL
+  SoluteDifusvty_vr(idg_H2,0,NY,NX)=HLSG*TFACL
+  SoluteDifusvty_vr(idg_N2O,0,NY,NX)=ZVSG*TFACL
 
-  SolDifc_vr(ids_NO3,0,NY,NX)=ZOSG*TFACL
-  SolDifc_vr(ids_H1PO4,0,NY,NX)=POSG*TFACL
-  SolDifc_vr(ids_NH4,0,NY,NX)   =SolDifc_vr(idg_NH3,0,NY,NX)
-  SolDifc_vr(ids_NH4B,0,NY,NX)  =SolDifc_vr(ids_NH4,0,NY,NX)
-  SolDifc_vr(idg_NH3B,0,NY,NX)  =SolDifc_vr(idg_NH3,0,NY,NX)
-  SolDifc_vr(ids_NO3B,0,NY,NX)  =SolDifc_vr(ids_NO3,0,NY,NX)
-  SolDifc_vr(ids_NO2,0,NY,NX)   =SolDifc_vr(ids_NO3,0,NY,NX)
-  SolDifc_vr(ids_NO2B,0,NY,NX)  =SolDifc_vr(ids_NO2,0,NY,NX)
-  SolDifc_vr(ids_H2PO4,0,NY,NX) =SolDifc_vr(ids_H1PO4,0,NY,NX)
-  SolDifc_vr(ids_H1PO4B,0,NY,NX)=SolDifc_vr(ids_H1PO4,0,NY,NX)
-  SolDifc_vr(ids_H2PO4B,0,NY,NX)=SolDifc_vr(ids_H2PO4,0,NY,NX)
+  SoluteDifusvty_vr(ids_NO3,0,NY,NX)=ZOSG*TFACL
+  SoluteDifusvty_vr(ids_H1PO4,0,NY,NX)=POSG*TFACL
+  SoluteDifusvty_vr(ids_NH4,0,NY,NX)   =SoluteDifusvty_vr(idg_NH3,0,NY,NX)
+  SoluteDifusvty_vr(ids_NH4B,0,NY,NX)  =SoluteDifusvty_vr(ids_NH4,0,NY,NX)
+  SoluteDifusvty_vr(idg_NH3B,0,NY,NX)  =SoluteDifusvty_vr(idg_NH3,0,NY,NX)
+  SoluteDifusvty_vr(ids_NO3B,0,NY,NX)  =SoluteDifusvty_vr(ids_NO3,0,NY,NX)
+  SoluteDifusvty_vr(ids_NO2,0,NY,NX)   =SoluteDifusvty_vr(ids_NO3,0,NY,NX)
+  SoluteDifusvty_vr(ids_NO2B,0,NY,NX)  =SoluteDifusvty_vr(ids_NO2,0,NY,NX)
+  SoluteDifusvty_vr(ids_H2PO4,0,NY,NX) =SoluteDifusvty_vr(ids_H1PO4,0,NY,NX)
+  SoluteDifusvty_vr(ids_H1PO4B,0,NY,NX)=SoluteDifusvty_vr(ids_H1PO4,0,NY,NX)
+  SoluteDifusvty_vr(ids_H2PO4B,0,NY,NX)=SoluteDifusvty_vr(ids_H2PO4,0,NY,NX)
 
   DOMdiffusivity_vr(idom_doc,0,NY,NX)=OCSG*TFACL
   DOMdiffusivity_vr(idom_don,0,NY,NX)=ONSG*TFACL
@@ -1369,25 +1369,25 @@ module Hour1Mod
     GasDifc_vr(idg_H2,L,NY,NX)=HGSG*TFACG
     GasDifc_vr(idg_NH3B,L,NY,NX)=ZHSG*TFACG
 
-    SolDifc_vr(idg_CO2,L,NY,NX)=CLSG*TFACL
-    SolDifc_vr(idg_CH4,L,NY,NX)=CQSG*TFACL
-    SolDifc_vr(idg_O2,L,NY,NX)=OLSG*TFACL
-    SolDifc_vr(idg_N2,L,NY,NX)=ZLSG*TFACL
-    SolDifc_vr(idg_NH3,L,NY,NX)=ZNSG*TFACL
-    SolDifc_vr(idg_H2,L,NY,NX)=HLSG*TFACL
-    SolDifc_vr(idg_N2O,L,NY,NX)=ZVSG*TFACL
-    SolDifc_vr(idg_NH3B,L,NY,NX)=SolDifc_vr(idg_NH3,L,NY,NX)
-    SolDifc_vr(ids_NO3,L,NY,NX)=ZOSG*TFACL
-    SolDifc_vr(ids_H1PO4,L,NY,NX)=POSG*TFACL
+    SoluteDifusvty_vr(idg_CO2,L,NY,NX)=CLSG*TFACL
+    SoluteDifusvty_vr(idg_CH4,L,NY,NX)=CQSG*TFACL
+    SoluteDifusvty_vr(idg_O2,L,NY,NX)=OLSG*TFACL
+    SoluteDifusvty_vr(idg_N2,L,NY,NX)=ZLSG*TFACL
+    SoluteDifusvty_vr(idg_NH3,L,NY,NX)=ZNSG*TFACL
+    SoluteDifusvty_vr(idg_H2,L,NY,NX)=HLSG*TFACL
+    SoluteDifusvty_vr(idg_N2O,L,NY,NX)=ZVSG*TFACL
+    SoluteDifusvty_vr(idg_NH3B,L,NY,NX)=SoluteDifusvty_vr(idg_NH3,L,NY,NX)
+    SoluteDifusvty_vr(ids_NO3,L,NY,NX)=ZOSG*TFACL
+    SoluteDifusvty_vr(ids_H1PO4,L,NY,NX)=POSG*TFACL
 
-    SolDifc_vr(ids_NH4,L,NY,NX)   =SolDifc_vr(idg_NH3,L,NY,NX)
-    SolDifc_vr(ids_NH4B,L,NY,NX)  =SolDifc_vr(ids_NH4,L,NY,NX)
-    SolDifc_vr(ids_NO3B,L,NY,NX)  =SolDifc_vr(ids_NO3,L,NY,NX)
-    SolDifc_vr(ids_NO2,L,NY,NX)   =SolDifc_vr(ids_NO3,L,NY,NX)
-    SolDifc_vr(ids_NO2B,L,NY,NX)  =SolDifc_vr(ids_NO2,L,NY,NX)
-    SolDifc_vr(ids_H2PO4,L,NY,NX) =SolDifc_vr(ids_H1PO4,L,NY,NX)
-    SolDifc_vr(ids_H1PO4B,L,NY,NX)=SolDifc_vr(ids_H1PO4,L,NY,NX)
-    SolDifc_vr(ids_H2PO4B,L,NY,NX)=SolDifc_vr(ids_H2PO4,L,NY,NX)
+    SoluteDifusvty_vr(ids_NH4,L,NY,NX)   =SoluteDifusvty_vr(idg_NH3,L,NY,NX)
+    SoluteDifusvty_vr(ids_NH4B,L,NY,NX)  =SoluteDifusvty_vr(ids_NH4,L,NY,NX)
+    SoluteDifusvty_vr(ids_NO3B,L,NY,NX)  =SoluteDifusvty_vr(ids_NO3,L,NY,NX)
+    SoluteDifusvty_vr(ids_NO2,L,NY,NX)   =SoluteDifusvty_vr(ids_NO3,L,NY,NX)
+    SoluteDifusvty_vr(ids_NO2B,L,NY,NX)  =SoluteDifusvty_vr(ids_NO2,L,NY,NX)
+    SoluteDifusvty_vr(ids_H2PO4,L,NY,NX) =SoluteDifusvty_vr(ids_H1PO4,L,NY,NX)
+    SoluteDifusvty_vr(ids_H1PO4B,L,NY,NX)=SoluteDifusvty_vr(ids_H1PO4,L,NY,NX)
+    SoluteDifusvty_vr(ids_H2PO4B,L,NY,NX)=SoluteDifusvty_vr(ids_H2PO4,L,NY,NX)
 
     DOMdiffusivity_vr(idom_doc,L,NY,NX)=OCSG*TFACL
     DOMdiffusivity_vr(idom_don,L,NY,NX)=ONSG*TFACL
@@ -1396,18 +1396,18 @@ module Hour1Mod
     WVapDifusvitySoil_vr(L,NY,NX)=WGSG*TFACG
 
     IF(salt_model)THEN
-      ALSGL(L,NY,NX)=ALSG*TFACL
-      FESGL(L,NY,NX)=FESG*TFACL
-      HYSGL(L,NY,NX)=HYSG*TFACL
-      CASGL(L,NY,NX)=CASG*TFACL
-      GMSGL(L,NY,NX)=GMSG*TFACL
-      ANSGL(L,NY,NX)=ANSG*TFACL
-      AKSGL(L,NY,NX)=AKSG*TFACL
-      OHSGL(L,NY,NX)=OHSG*TFACL
-      C3SGL(L,NY,NX)=C3SG*TFACL
-      HCSGL(L,NY,NX)=HCSG*TFACL
-      SOSGL(L,NY,NX)=SOSG*TFACL
-      CLSXL(L,NY,NX)=CLSX*TFACL
+      AquaIonDifusivty_vr(idsalt_Al,L,NY,NX)=ALSG*TFACL
+      AquaIonDifusivty_vr(idsalt_Fe,L,NY,NX)=FESG*TFACL
+      AquaIonDifusivty_vr(idsalt_Hp,L,NY,NX)=HYSG*TFACL
+      AquaIonDifusivty_vr(idsalt_Ca,L,NY,NX)=CASG*TFACL
+      AquaIonDifusivty_vr(idsalt_Mg,L,NY,NX)=GMSG*TFACL
+      AquaIonDifusivty_vr(idsalt_Na,L,NY,NX)=ANSG*TFACL
+      AquaIonDifusivty_vr(idsalt_K,L,NY,NX)=AKSG*TFACL
+      AquaIonDifusivty_vr(idsalt_OH,L,NY,NX)=OHSG*TFACL
+      AquaIonDifusivty_vr(idsalt_CO3,L,NY,NX)=C3SG*TFACL
+      AquaIonDifusivty_vr(idsalt_HCO3,L,NY,NX)=HCSG*TFACL
+      AquaIonDifusivty_vr(idsalt_SO4,L,NY,NX)=SOSG*TFACL
+      AquaIonDifusivty_vr(idsalt_Cl,L,NY,NX)=CLSX*TFACL
 !
 !   TOTAL ION CONCENTRATION
 !

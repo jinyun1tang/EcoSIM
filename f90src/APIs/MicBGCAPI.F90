@@ -190,7 +190,7 @@ implicit none
   micfor%VLPO4 =trcs_VLN_vr(ids_H1PO4,L,NY,NX)
   micfor%VLPOB =trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
   micfor%PSISoilMatricP =PSISoilMatricP(L,NY,NX)
-  micfor%O2AquaDiffusvity =SolDifc_vr(idg_O2,L,NY,NX)
+  micfor%O2AquaDiffusvity =SoluteDifusvty_vr(idg_O2,L,NY,NX)
   micfor%ORGC  =ORGC_vr(L,NY,NX)
   micfor%RNO2EcoUptkSoilPrev =RNO2EcoUptkSoilPrev_vr(L,NY,NX)
   micfor%RN2OEcoUptkSoilPrev =RN2OEcoUptkSoilPrev_vr(L,NY,NX)

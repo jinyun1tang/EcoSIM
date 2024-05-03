@@ -14,7 +14,7 @@ module ChemTranspDataType
 
   real(r8),target,allocatable ::  Gas_Disol_Flx_vr(:,:,:,:)                 !Gas dissolution flux
   real(r8),target,allocatable ::  GasDifc_vr(:,:,:,:)                   !gaseous diffusivity [m2 h-1]
-  real(r8),target,allocatable ::  SolDifc_vr(:,:,:,:)
+  real(r8),target,allocatable ::  SoluteDifusvty_vr(:,:,:,:)
 
   real(r8),target,allocatable ::  O2AquaDiffusvity(:,:,:)             !aqueous CO2 diffusivity	m2 h-1
 
@@ -31,18 +31,7 @@ module ChemTranspDataType
   real(r8),target,allocatable ::  RO2GasXchangePrev_vr(:,:,:)                       !net gaseous O2 flux, [g d-2 h-1]
   real(r8),target,allocatable ::  RO2AquaXchangePrev_vr(:,:,:)                       !net aqueous O2 flux, [g d-2 h-1]
   real(r8),target,allocatable ::  RCH4F(:,:,:)                       !net gaseous CH4 flux, [g d-2 h-1]
-  real(r8),target,allocatable ::  ALSGL(:,:,:)                       !aqueous Al diffusivity, [m2 h-1]
-  real(r8),target,allocatable ::  FESGL(:,:,:)                       !aqueous Fe diffusivity, [m2 h-1]
-  real(r8),target,allocatable ::  HYSGL(:,:,:)                       !aqueous H diffusivity, [m2 h-1]
-  real(r8),target,allocatable ::  CASGL(:,:,:)                       !aqueous Ca diffusivity, [m2 h-1]
-  real(r8),target,allocatable ::  GMSGL(:,:,:)                       !aqueous Mg diffusivity, [m2 h-1]
-  real(r8),target,allocatable ::  ANSGL(:,:,:)                       !aqueous Na diffusivity, [m2 h-1]
-  real(r8),target,allocatable ::  AKSGL(:,:,:)                       !aqueous K diffusivity, [m2 h-1]
-  real(r8),target,allocatable ::  OHSGL(:,:,:)                       !aqueous OH diffusivity, [m2 h-1]
-  real(r8),target,allocatable ::  C3SGL(:,:,:)                       !aqueous CO3 diffusivity, [m2 h-1]
-  real(r8),target,allocatable ::  HCSGL(:,:,:)                       !aqueous HCO3 diffusivity, [m2 h-1]
-  real(r8),target,allocatable ::  SOSGL(:,:,:)                       !aqueous SO4 diffusivity, [m2 h-1]
-  real(r8),target,allocatable ::  CLSXL(:,:,:)                       !aqueous Cl diffusivity, [m2 h-1]
+  real(r8),target,allocatable ::  AquaIonDifusivty_vr(:,:,:,:)
   real(r8),target,allocatable ::  trc_salt_rof_bounds(:,:,:,:,:)                     !total Al in runoff, [mol d-2 h-1]
   real(r8),target,allocatable ::  trcg_2DFloXSurRunoff(:,:,:,:,:)                    !surface runoff gas flux, [g d-2 h-1]
   real(r8),target,allocatable ::  trcn_2DFloXSurRunoff(:,:,:,:,:)                    !surface runoff nutrient flux, [g d-2 h-1]
@@ -53,22 +42,25 @@ module ChemTranspDataType
   contains
 
 
-  subroutine InitChemTranspData
+  subroutine InitChemTranspData(lsalt_model)
 
   implicit none
+  logical, intent(in) :: lsalt_model
 
-  call InitAllocate
+  call InitAllocate(lsalt_model)
 
   end subroutine InitChemTranspData
 !------------------------------------------------------------------------------------------
 
-  subroutine InitAllocate
+  subroutine InitAllocate(lsalt_model)
   implicit none
+  logical, intent(in) :: lsalt_model
+  
   allocate(TScal4Difsvity_vr(0:JZ,JY,JX));   TScal4Difsvity_vr=0._r8
   allocate(DISP(3,JD,JV,JH));   DISP=0._r8
 
   allocate(GasDifc_vr(idg_beg:idg_end,JZ,JY,JX));GasDifc_vr=0._r8
-  allocate(SolDifc_vr(ids_beg:ids_end,0:JZ,JY,JX));SolDifc_vr=0._r8
+  allocate(SoluteDifusvty_vr(ids_beg:ids_end,0:JZ,JY,JX));SoluteDifusvty_vr=0._r8
 
   allocate(O2AquaDiffusvity(0:JZ,JY,JX));  O2AquaDiffusvity=0._r8
 
@@ -86,18 +78,11 @@ module ChemTranspDataType
   allocate(RO2GasXchangePrev_vr(0:JZ,JY,JX));  RO2GasXchangePrev_vr=0._r8
   allocate(RO2AquaXchangePrev_vr(0:JZ,JY,JX));  RO2AquaXchangePrev_vr=0._r8
   allocate(RCH4F(0:JZ,JY,JX));  RCH4F=0._r8
-  allocate(ALSGL(JZ,JY,JX));    ALSGL=0._r8
-  allocate(FESGL(JZ,JY,JX));    FESGL=0._r8
-  allocate(HYSGL(JZ,JY,JX));    HYSGL=0._r8
-  allocate(CASGL(JZ,JY,JX));    CASGL=0._r8
-  allocate(GMSGL(JZ,JY,JX));    GMSGL=0._r8
-  allocate(ANSGL(JZ,JY,JX));    ANSGL=0._r8
-  allocate(AKSGL(JZ,JY,JX));    AKSGL=0._r8
-  allocate(OHSGL(JZ,JY,JX));    OHSGL=0._r8
-  allocate(C3SGL(JZ,JY,JX));    C3SGL=0._r8
-  allocate(HCSGL(JZ,JY,JX));    HCSGL=0._r8
-  allocate(SOSGL(JZ,JY,JX));    SOSGL=0._r8
-  allocate(CLSXL(JZ,JY,JX));    CLSXL=0._r8
+  if(lsalt_model)then
+    allocate(AquaIonDifusivty_vr(idsalt_beg:idsalt_mend,JZ,JY,JX));AquaIonDifusivty_vr=0._r8
+  endif
+
+
   allocate(trc_salt_rof_bounds(idsalt_beg:idsalt_end,2,2,JV,JH));   trc_salt_rof_bounds=0._r8
   allocate(trcg_2DFloXSurRunoff(idg_beg:idg_end-1,2,2,JV,JH));  trcg_2DFloXSurRunoff=0._r8
   allocate(trcn_2DFloXSurRunoff(ids_nut_beg:ids_nuts_end,2,2,JV,JH));  trcn_2DFloXSurRunoff=0._r8
@@ -114,7 +99,7 @@ module ChemTranspDataType
 
   call destroy(trc_salt_rof_bounds)
   call destroy(GasDifc_vr)
-  call destroy(SolDifc_vr)
+  call destroy(SoluteDifusvty_vr)
   call destroy(TScal4Difsvity_vr)
   call destroy(DISP)
 
@@ -129,24 +114,12 @@ module ChemTranspDataType
   call destroy(trcn_2DFloXSurRunoff)
   call destroy(trcg_2DFloXSurRunoff)
   call destroy(GasSolbility_vr)
-
+  call destroy(AquaIonDifusivty_vr)
   call destroy(RCO2F)
   call destroy(RCH4L)
   call destroy(RO2GasXchangePrev_vr)
   call destroy(RO2AquaXchangePrev_vr)
   call destroy(RCH4F)
-  call destroy(ALSGL)
-  call destroy(FESGL)
-  call destroy(HYSGL)
-  call destroy(CASGL)
-  call destroy(GMSGL)
-  call destroy(ANSGL)
-  call destroy(AKSGL)
-  call destroy(OHSGL)
-  call destroy(C3SGL)
-  call destroy(HCSGL)
-  call destroy(SOSGL)
-  call destroy(CLSXL)
   call destroy(dom_2DFloXSurRunoff)
   end subroutine DestructChemTranspData
 end module ChemTranspDataType

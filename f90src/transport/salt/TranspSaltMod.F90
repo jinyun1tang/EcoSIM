@@ -351,19 +351,9 @@ module TranspSaltMod
 !     *SGL*=solute diffusivity from hour1.f
 !     solute code:PO=PO4,AL=Al,FE=Fe,HY=H,CA=Ca,GM=Mg,AN=Na,AK=KOH=OH
 !                :SO=SO4,CL=Cl,C3=CO3,HC=HCO3
-    POSGL2(L,NY,NX)=SolDifc_vr(ids_H1PO4,L,NY,NX)*dts_HeatWatTP
-    ALSGL2(L,NY,NX)=ALSGL(L,NY,NX)*dts_HeatWatTP
-    FESGL2(L,NY,NX)=FESGL(L,NY,NX)*dts_HeatWatTP
-    HYSGL2(L,NY,NX)=HYSGL(L,NY,NX)*dts_HeatWatTP
-    CASGL2(L,NY,NX)=CASGL(L,NY,NX)*dts_HeatWatTP
-    GMSGL2(L,NY,NX)=GMSGL(L,NY,NX)*dts_HeatWatTP
-    ANSGL2(L,NY,NX)=ANSGL(L,NY,NX)*dts_HeatWatTP
-    AKSGL2(L,NY,NX)=AKSGL(L,NY,NX)*dts_HeatWatTP
-    OHSGL2(L,NY,NX)=OHSGL(L,NY,NX)*dts_HeatWatTP
-    SOSGL2(L,NY,NX)=SOSGL(L,NY,NX)*dts_HeatWatTP
-    CLSXL2(L,NY,NX)=CLSXL(L,NY,NX)*dts_HeatWatTP
-    C3SGL2(L,NY,NX)=C3SGL(L,NY,NX)*dts_HeatWatTP
-    HCSGL2(L,NY,NX)=HCSGL(L,NY,NX)*dts_HeatWatTP
+    POSGL2(L,NY,NX)=SoluteDifusvty_vr(ids_H1PO4,L,NY,NX)*dts_HeatWatTP
+
+    AquaIonDifusivty2_vr(idsalt_beg:idsalt_mend,L,NY,NX)=AquaIonDifusivty_vr(idsalt_beg:idsalt_mend,L,NY,NX)*dts_HeatWatTP
 !
 !     STATE VARIABLES FOR SOLUTES USED IN 'TranspSalt'
 !     TO STORE SUB-HOURLY CHANGES DURING FLUX CALCULATIONS

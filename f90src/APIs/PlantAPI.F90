@@ -698,7 +698,7 @@ implicit none
 
     plt_soilchem%trc_solcl_vr(ids_beg:ids_end,L) =trc_solcl_vr(ids_beg:ids_end,L,NY,NX)
 
-    plt_soilchem%SolDifc_vr(ids_beg:ids_end,L) =SolDifc_vr(ids_beg:ids_end,L,NY,NX)
+    plt_soilchem%SoluteDifusvty_vr(ids_beg:ids_end,L) =SoluteDifusvty_vr(ids_beg:ids_end,L,NY,NX)
 
     plt_soilchem%trc_gascl_vr(idg_beg:idg_end,L) =trc_gascl_vr(idg_beg:idg_end,L,NY,NX)
     plt_soilchem%CORGC(L) =CORGC(L,NY,NX)

@@ -381,7 +381,7 @@ implicit none
   real(r8), pointer :: HydroCondMicP4RootUptake(:)     => null()  !soil micropore hydraulic conductivity for root water uptake [m MPa-1 h-1]
 
   real(r8), pointer :: GasDifc_vr(:,:)=> null()  !gaseous diffusivity [m2 h-1]
-  real(r8), pointer :: SolDifc_vr(:,:)=> null()  !aqueous diffusivity [m2 h-1]
+  real(r8), pointer :: SoluteDifusvty_vr(:,:)=> null()  !aqueous diffusivity [m2 h-1]
 
   real(r8), pointer :: trc_gasml_vr(:,:)=> null()!gas layer mass [g d-2]
 
@@ -1446,7 +1446,7 @@ implicit none
 
   allocate(this%GasSolbility_vr(idg_beg:idg_end,0:JZ1));this%GasSolbility_vr=spval
   allocate(this%GasDifc_vr(idg_beg:idg_end,0:JZ1));this%GasDifc_vr=spval
-  allocate(this%SolDifc_vr(ids_beg:ids_end,0:JZ1));this%SolDifc_vr=spval
+  allocate(this%SoluteDifusvty_vr(ids_beg:ids_end,0:JZ1));this%SoluteDifusvty_vr=spval
   allocate(this%SoilResit4RootPentrate_vr(JZ1));this%SoilResit4RootPentrate_vr=spval
   allocate(this%SoiBulkDensity(0:JZ1));this%SoiBulkDensity=spval
   allocate(this%HydroCondMicP4RootUptake(JZ1));this%HydroCondMicP4RootUptake=spval

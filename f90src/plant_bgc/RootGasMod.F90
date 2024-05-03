@@ -92,7 +92,7 @@ module RootGasMod
     trc_solml_vr               =>  plt_soilchem%trc_solml_vr         , &
     trc_gascl_vr               =>  plt_soilchem%trc_gascl_vr         , &
     GasDifc_vr                 =>  plt_soilchem%GasDifc_vr           , &
-    SolDifc_vr                 =>  plt_soilchem%SolDifc_vr           , &
+    SoluteDifusvty_vr                 =>  plt_soilchem%SoluteDifusvty_vr           , &
     GasSolbility_vr            => plt_soilchem%GasSolbility_vr       , &
     trc_solcl_vr               =>  plt_soilchem%trc_solcl_vr         , &
     THETY                      =>  plt_soilchem%THETY                , &
@@ -162,9 +162,9 @@ module RootGasMod
 !
     do NTG=idg_beg,idg_end-1
       GasDifc_loc(NTG)=GasDifc_vr(NTG,L)*dts_gas*RootPoreTortu4Gas(N,NZ)
-      SolDifc_loc(NTG)=SolDifc_vr(NTG,L)*dts_gas*FOXYX
+      SolDifc_loc(NTG)=SoluteDifusvty_vr(NTG,L)*dts_gas*FOXYX
     enddo
-    O2AquaDiffusvityP=SolDifc_vr(idg_O2,L)*dts_gas
+    O2AquaDiffusvityP=SoluteDifusvty_vr(idg_O2,L)*dts_gas
 
     RDFQSolute(idg_beg:idg_end)=0.0_r8
     trcg_Root2Soil_flx(idg_beg:idg_end-1)=0.0_r8

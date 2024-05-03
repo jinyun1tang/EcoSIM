@@ -31,7 +31,7 @@ implicit none
   integer :: ids_nut_beg,ids_nuts_beg,ids_nuts_end
   integer :: ids_nutb_beg,ids_nutb_end
 ! salt tracers
-  integer :: idsalt_beg,idsalt_end
+  integer :: idsalt_beg,idsalt_end,idsalt_mend
 
   integer :: idsalt_Al      ! Al
   integer :: idsalt_Fe      ! Fe
@@ -215,6 +215,7 @@ implicit none
     idsalt_Cl=addone(idsalt_end)
     idsalt_CO3=addone(idsalt_end)
     idsalt_HCO3=addone(idsalt_end)
+    idsalt_mend=idsalt_end
     idsalt_AlOH=addone(idsalt_end)
     idsalt_AlOH2=addone(idsalt_end)
     idsalt_AlOH3=addone(idsalt_end)

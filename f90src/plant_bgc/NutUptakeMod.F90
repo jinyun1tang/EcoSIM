@@ -276,7 +276,7 @@ module NutUptakeMod
     RUPP1P       =>   plt_rbgc%RUPP1P     , &
     RUPP2P       =>   plt_rbgc%RUPP2P     , &
     RUPP2B       =>   plt_rbgc%RUPP2B     , &
-    SolDifc_vr   =>   plt_soilchem%SolDifc_vr, &
+    SoluteDifusvty_vr   =>   plt_soilchem%SoluteDifusvty_vr, &
     RH1PO4EcoDmndBandPrev_vr        =>   plt_bgcr%RH1PO4EcoDmndBandPrev_vr      , &
     RH2PO4EcoDmndBandPrev_vr        =>   plt_bgcr%RH2PO4EcoDmndBandPrev_vr      , &
     RH1PO4EcoDmndSoilPrev_vr        =>   plt_bgcr%RH1PO4EcoDmndSoilPrev_vr      , &
@@ -326,7 +326,7 @@ module NutUptakeMod
     !     FineRootRadius=root radius
     !     DIFFL=PO4 diffusion per plant
     !
-    POSGX=SolDifc_vr(ids_H1PO4,L)*TortMicPM(NPH,L)
+    POSGX=SoluteDifusvty_vr(ids_H1PO4,L)*TortMicPM(NPH,L)
     PATHL=AMIN1(PATH(N,L),FineRootRadius(N,L)+SQRT(2.0*POSGX))
     DIFFL=POSGX*safe_adb(RootAreaDivRadius_vr(N,L),LOG(PATHL/FineRootRadius(N,L)))
 
@@ -372,7 +372,7 @@ module NutUptakeMod
     RootNutUptake_pvr         =>  plt_rbgc%RootNutUptake_pvr    , &
     RUNNXP                    =>  plt_rbgc%RUNNXP     , &
     RootOUlmNutUptake_pvr     =>  plt_rbgc%RootOUlmNutUptake_pvr     , &
-    SolDifc_vr                =>  plt_soilchem%SolDifc_vr, &
+    SoluteDifusvty_vr                =>  plt_soilchem%SoluteDifusvty_vr, &
     trc_solml_vr              => plt_soilchem%trc_solml_vr  , &
     trcs_VLN_vr               =>  plt_soilchem%trcs_VLN_vr  , &
     trc_solcl_vr              =>  plt_soilchem%trc_solcl_vr , &
@@ -388,7 +388,7 @@ module NutUptakeMod
 ! PATH=path length of water and nutrient uptake
 ! DIFFL=NO3 diffusion per plant
 !
-  ZOSGX=SolDifc_vr(ids_NO3,L)*TortMicPM(NPH,L)
+  ZOSGX=SoluteDifusvty_vr(ids_NO3,L)*TortMicPM(NPH,L)
   PATHL=AMIN1(PATH(N,L),FineRootRadius(N,L)+SQRT(2.0_r8*ZOSGX))
   DIFFL=ZOSGX*safe_adb(RootAreaDivRadius_vr(N,L),LOG(PATHL/FineRootRadius(N,L)))
   !
@@ -548,7 +548,7 @@ module NutUptakeMod
     RUNNHP                      =>  plt_rbgc%RUNNHP                      , &
     RUNNBP                      =>  plt_rbgc%RUNNBP                      , &
     RootAreaPerPlant_pvr        =>  plt_morph%RootAreaPerPlant_pvr       , &
-    SolDifc_vr                  =>  plt_soilchem%SolDifc_vr              , &
+    SoluteDifusvty_vr                  =>  plt_soilchem%SoluteDifusvty_vr              , &
     VLWatMicP                   =>  plt_soilchem%VLWatMicP               , &
     trcs_VLN_vr                 =>  plt_soilchem%trcs_VLN_vr             , &
     trc_solml_vr                =>  plt_soilchem%trc_solml_vr            , &
@@ -560,7 +560,7 @@ module NutUptakeMod
 ! FineRootRadius=root radius
 ! DIFFL=NH4 diffusion per plant
 !
-  ZNSGX=SolDifc_vr(idg_NH3,L)*TortMicPM(NPH,L)
+  ZNSGX=SoluteDifusvty_vr(idg_NH3,L)*TortMicPM(NPH,L)
   PATHL=AMIN1(PATH(N,L),FineRootRadius(N,L)+SQRT(2.0*ZNSGX))
   DIFFL=ZNSGX*safe_adb(RootAreaDivRadius_vr(N,L),LOG(PATHL/FineRootRadius(N,L)))
 !

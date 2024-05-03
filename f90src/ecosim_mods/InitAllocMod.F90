@@ -106,7 +106,7 @@ implicit none
 
   call InitMicrobialData
 
-  call InitChemTranspData
+  call InitChemTranspData(salt_model)
 
   call InitSoilBGCData(pltpar%NumOfPlantLitrCmplxs)
 

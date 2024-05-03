@@ -494,7 +494,7 @@ module SoluteMod
 !     ZNSGL=NH4 diffusivity
 !     TortMicPM=tortuosity
 !
-      DWNH4=0.5*SQRT(SolDifc_vr(idg_NH3,L,NY,NX))*TortMicPM(NPH,L,NY,NX)
+      DWNH4=0.5*SQRT(SoluteDifusvty_vr(idg_NH3,L,NY,NX))*TortMicPM(NPH,L,NY,NX)
       WDNHB(L,NY,NX)=AMIN1(ROWN(NY,NX),AMAX1(0.025,WDNHB(L,NY,NX))+DWNH4)
 !
 !     NH4 BAND DEPTH
@@ -596,7 +596,7 @@ module SoluteMod
 !     POSGL=H2PO4 diffusivity
 !     TortMicPM=tortuosity
 !
-      DWPO4=0.5*SQRT(SolDifc_vr(ids_H1PO4,L,NY,NX))*TortMicPM(NPH,L,NY,NX)
+      DWPO4=0.5*SQRT(SoluteDifusvty_vr(ids_H1PO4,L,NY,NX))*TortMicPM(NPH,L,NY,NX)
       WDPOB(L,NY,NX)=AMIN1(ROWP(NY,NX),WDPOB(L,NY,NX)+DWPO4)
 !
 !     PO4 BAND DEPTH
@@ -667,46 +667,46 @@ module SoluteMod
         DPCHP=FVLPO4*trcp_salml(idsp_HA,L,NY,NX)
         DPCMP=FVLPO4*trcp_salml(idsp_CaH4P2O8,L,NY,NX)
 
-        trcSalt_TR(idsalt_H0PO4,L,NY,NX)=trcSalt_TR(idsalt_H0PO4,L,NY,NX)+DZH0P
-        trcn_RChem_soil_vr(ids_H1PO4,L,NY,NX)=trcn_RChem_soil_vr(ids_H1PO4,L,NY,NX)+DZH1P
-        trcn_RChem_soil_vr(ids_H2PO4,L,NY,NX)=trcn_RChem_soil_vr(ids_H2PO4,L,NY,NX)+DZH2P
-        trcSalt_TR(idsalt_H3PO4,L,NY,NX)=trcSalt_TR(idsalt_H3PO4,L,NY,NX)+DZH3P
-        trcSalt_TR(idsalt_FeHPO4,L,NY,NX)=trcSalt_TR(idsalt_FeHPO4,L,NY,NX)+DZF1P
-        trcSalt_TR(idsalt_FeH2PO4,L,NY,NX)=trcSalt_TR(idsalt_FeH2PO4,L,NY,NX)+DZF2P
-        trcSalt_TR(idsalt_CaPO4,L,NY,NX)=trcSalt_TR(idsalt_CaPO4,L,NY,NX)+DZC0P
-        trcSalt_TR(idsalt_CaHPO4,L,NY,NX)=trcSalt_TR(idsalt_CaHPO4,L,NY,NX)+DZC1P
-        trcSalt_TR(idsalt_CaH4P2O8,L,NY,NX)=trcSalt_TR(idsalt_CaH4P2O8,L,NY,NX)+DZC2P
-        trcSalt_TR(idsalt_MgHPO4,L,NY,NX)=trcSalt_TR(idsalt_MgHPO4,L,NY,NX)+DZM1P
-        trcSalt_TR(idsalt_H0PO4B,L,NY,NX)=trcSalt_TR(idsalt_H0PO4B,L,NY,NX)-DZH0P
-        trcn_RChem_band_soil_vr(ids_H1PO4B,L,NY,NX)=trcn_RChem_band_soil_vr(ids_H1PO4B,L,NY,NX)-DZH1P
-        trcn_RChem_band_soil_vr(ids_H2PO4B,L,NY,NX)=trcn_RChem_band_soil_vr(ids_H2PO4B,L,NY,NX)-DZH2P
-        trcSalt_TR(idsalt_H3PO4B,L,NY,NX)=trcSalt_TR(idsalt_H3PO4B,L,NY,NX)-DZH3P
-        trcSalt_TR(idsalt_FeHPO4B,L,NY,NX)=trcSalt_TR(idsalt_FeHPO4B,L,NY,NX)-DZF1P
-        trcSalt_TR(idsalt_FeH2PO4B,L,NY,NX)=trcSalt_TR(idsalt_FeH2PO4B,L,NY,NX)-DZF2P
-        trcSalt_TR(idsalt_CaPO4B,L,NY,NX)=trcSalt_TR(idsalt_CaPO4B,L,NY,NX)-DZC0P
-        trcSalt_TR(idsalt_CaHPO4B,L,NY,NX)=trcSalt_TR(idsalt_CaHPO4B,L,NY,NX)-DZC1P
-        trcSalt_TR(idsalt_CaH4P2O8B,L,NY,NX)=trcSalt_TR(idsalt_CaH4P2O8B,L,NY,NX)-DZC2P
-        trcSalt_TR(idsalt_MgHPO4B,L,NY,NX)=trcSalt_TR(idsalt_MgHPO4B,L,NY,NX)-DZM1P
-        trcx_TRSoilChem_vr(idx_OHe,L,NY,NX)=trcx_TRSoilChem_vr(idx_OHe,L,NY,NX)+DXOH0
-        trcx_TRSoilChem_vr(idx_OH,L,NY,NX)=trcx_TRSoilChem_vr(idx_OH,L,NY,NX)+DXOH1
-        trcx_TRSoilChem_vr(idx_OHp,L,NY,NX)=trcx_TRSoilChem_vr(idx_OHp,L,NY,NX)+DXOH2
-        trcx_TRSoilChem_vr(idx_HPO4,L,NY,NX)=trcx_TRSoilChem_vr(idx_HPO4,L,NY,NX)+DXH1P
-        trcx_TRSoilChem_vr(idx_H2PO4,L,NY,NX)=trcx_TRSoilChem_vr(idx_H2PO4,L,NY,NX)+DXH2P
-        trcx_TRSoilChem_vr(idx_OHeB,L,NY,NX)=trcx_TRSoilChem_vr(idx_OHeB,L,NY,NX)-DXOH0
-        trcx_TRSoilChem_vr(idx_OHB,L,NY,NX)=trcx_TRSoilChem_vr(idx_OHB,L,NY,NX)-DXOH1
-        trcx_TRSoilChem_vr(idx_OHpB,L,NY,NX)=trcx_TRSoilChem_vr(idx_OHpB,L,NY,NX)-DXOH2
-        trcx_TRSoilChem_vr(idx_HPO4B,L,NY,NX)=trcx_TRSoilChem_vr(idx_HPO4B,L,NY,NX)-DXH1P
-        trcx_TRSoilChem_vr(idx_H2PO4B,L,NY,NX)=trcx_TRSoilChem_vr(idx_H2PO4B,L,NY,NX)-DXH2P
-        trcp_RChem_soil(idsp_AlPO4,L,NY,NX)=trcp_RChem_soil(idsp_AlPO4,L,NY,NX)+DPALP
-        trcp_RChem_soil(idsp_FePO4,L,NY,NX)=trcp_RChem_soil(idsp_FePO4,L,NY,NX)+DPFEP
-        trcp_RChem_soil(idsp_CaHPO4,L,NY,NX)=trcp_RChem_soil(idsp_CaHPO4,L,NY,NX)+DPCDP
-        trcp_RChem_soil(idsp_HA,L,NY,NX)=trcp_RChem_soil(idsp_HA,L,NY,NX)+DPCHP
-        trcp_RChem_soil(idsp_CaH4P2O8,L,NY,NX)=trcp_RChem_soil(idsp_CaH4P2O8,L,NY,NX)+DPCMP
-        trcp_RChem_soil(idsp_AlPO4B,L,NY,NX)=trcp_RChem_soil(idsp_AlPO4B,L,NY,NX)-DPALP
-        trcp_RChem_soil(idsp_FePO4B,L,NY,NX)=trcp_RChem_soil(idsp_FePO4B,L,NY,NX)-DPFEP
-        trcp_RChem_soil(idsp_CaHPO4B,L,NY,NX)=trcp_RChem_soil(idsp_CaHPO4B,L,NY,NX)-DPCDP
-        trcp_RChem_soil(idsp_HAB,L,NY,NX)=trcp_RChem_soil(idsp_HAB,L,NY,NX)-DPCHP
-        trcp_RChem_soil(idsp_CaH4P2O8B,L,NY,NX)=trcp_RChem_soil(idsp_CaH4P2O8B,L,NY,NX)-DPCMP
+        trcSalt_TR(idsalt_H0PO4,L,NY,NX)            = trcSalt_TR(idsalt_H0PO4,L,NY,NX)+DZH0P
+        trcn_RChem_soil_vr(ids_H1PO4,L,NY,NX)       = trcn_RChem_soil_vr(ids_H1PO4,L,NY,NX)+DZH1P
+        trcn_RChem_soil_vr(ids_H2PO4,L,NY,NX)       = trcn_RChem_soil_vr(ids_H2PO4,L,NY,NX)+DZH2P
+        trcSalt_TR(idsalt_H3PO4,L,NY,NX)            = trcSalt_TR(idsalt_H3PO4,L,NY,NX)+DZH3P
+        trcSalt_TR(idsalt_FeHPO4,L,NY,NX)           = trcSalt_TR(idsalt_FeHPO4,L,NY,NX)+DZF1P
+        trcSalt_TR(idsalt_FeH2PO4,L,NY,NX)          = trcSalt_TR(idsalt_FeH2PO4,L,NY,NX)+DZF2P
+        trcSalt_TR(idsalt_CaPO4,L,NY,NX)            = trcSalt_TR(idsalt_CaPO4,L,NY,NX)+DZC0P
+        trcSalt_TR(idsalt_CaHPO4,L,NY,NX)           = trcSalt_TR(idsalt_CaHPO4,L,NY,NX)+DZC1P
+        trcSalt_TR(idsalt_CaH4P2O8,L,NY,NX)         = trcSalt_TR(idsalt_CaH4P2O8,L,NY,NX)+DZC2P
+        trcSalt_TR(idsalt_MgHPO4,L,NY,NX)           = trcSalt_TR(idsalt_MgHPO4,L,NY,NX)+DZM1P
+        trcSalt_TR(idsalt_H0PO4B,L,NY,NX)           = trcSalt_TR(idsalt_H0PO4B,L,NY,NX)-DZH0P
+        trcn_RChem_band_soil_vr(ids_H1PO4B,L,NY,NX) = trcn_RChem_band_soil_vr(ids_H1PO4B,L,NY,NX)-DZH1P
+        trcn_RChem_band_soil_vr(ids_H2PO4B,L,NY,NX) = trcn_RChem_band_soil_vr(ids_H2PO4B,L,NY,NX)-DZH2P
+        trcSalt_TR(idsalt_H3PO4B,L,NY,NX)           = trcSalt_TR(idsalt_H3PO4B,L,NY,NX)-DZH3P
+        trcSalt_TR(idsalt_FeHPO4B,L,NY,NX)          = trcSalt_TR(idsalt_FeHPO4B,L,NY,NX)-DZF1P
+        trcSalt_TR(idsalt_FeH2PO4B,L,NY,NX)         = trcSalt_TR(idsalt_FeH2PO4B,L,NY,NX)-DZF2P
+        trcSalt_TR(idsalt_CaPO4B,L,NY,NX)           = trcSalt_TR(idsalt_CaPO4B,L,NY,NX)-DZC0P
+        trcSalt_TR(idsalt_CaHPO4B,L,NY,NX)          = trcSalt_TR(idsalt_CaHPO4B,L,NY,NX)-DZC1P
+        trcSalt_TR(idsalt_CaH4P2O8B,L,NY,NX)        = trcSalt_TR(idsalt_CaH4P2O8B,L,NY,NX)-DZC2P
+        trcSalt_TR(idsalt_MgHPO4B,L,NY,NX)      = trcSalt_TR(idsalt_MgHPO4B,L,NY,NX)-DZM1P
+        trcx_TRSoilChem_vr(idx_OHe,L,NY,NX)     = trcx_TRSoilChem_vr(idx_OHe,L,NY,NX)+DXOH0
+        trcx_TRSoilChem_vr(idx_OH,L,NY,NX)      = trcx_TRSoilChem_vr(idx_OH,L,NY,NX)+DXOH1
+        trcx_TRSoilChem_vr(idx_OHp,L,NY,NX)     = trcx_TRSoilChem_vr(idx_OHp,L,NY,NX)+DXOH2
+        trcx_TRSoilChem_vr(idx_HPO4,L,NY,NX)    = trcx_TRSoilChem_vr(idx_HPO4,L,NY,NX)+DXH1P
+        trcx_TRSoilChem_vr(idx_H2PO4,L,NY,NX)   = trcx_TRSoilChem_vr(idx_H2PO4,L,NY,NX)+DXH2P
+        trcx_TRSoilChem_vr(idx_OHeB,L,NY,NX)    = trcx_TRSoilChem_vr(idx_OHeB,L,NY,NX)-DXOH0
+        trcx_TRSoilChem_vr(idx_OHB,L,NY,NX)     = trcx_TRSoilChem_vr(idx_OHB,L,NY,NX)-DXOH1
+        trcx_TRSoilChem_vr(idx_OHpB,L,NY,NX)    = trcx_TRSoilChem_vr(idx_OHpB,L,NY,NX)-DXOH2
+        trcx_TRSoilChem_vr(idx_HPO4B,L,NY,NX)   = trcx_TRSoilChem_vr(idx_HPO4B,L,NY,NX)-DXH1P
+        trcx_TRSoilChem_vr(idx_H2PO4B,L,NY,NX)  = trcx_TRSoilChem_vr(idx_H2PO4B,L,NY,NX)-DXH2P
+        trcp_RChem_soil(idsp_AlPO4,L,NY,NX)     = trcp_RChem_soil(idsp_AlPO4,L,NY,NX)+DPALP
+        trcp_RChem_soil(idsp_FePO4,L,NY,NX)     = trcp_RChem_soil(idsp_FePO4,L,NY,NX)+DPFEP
+        trcp_RChem_soil(idsp_CaHPO4,L,NY,NX)    = trcp_RChem_soil(idsp_CaHPO4,L,NY,NX)+DPCDP
+        trcp_RChem_soil(idsp_HA,L,NY,NX)        = trcp_RChem_soil(idsp_HA,L,NY,NX)+DPCHP
+        trcp_RChem_soil(idsp_CaH4P2O8,L,NY,NX)  = trcp_RChem_soil(idsp_CaH4P2O8,L,NY,NX)+DPCMP
+        trcp_RChem_soil(idsp_AlPO4B,L,NY,NX)    = trcp_RChem_soil(idsp_AlPO4B,L,NY,NX)-DPALP
+        trcp_RChem_soil(idsp_FePO4B,L,NY,NX)    = trcp_RChem_soil(idsp_FePO4B,L,NY,NX)-DPFEP
+        trcp_RChem_soil(idsp_CaHPO4B,L,NY,NX)   = trcp_RChem_soil(idsp_CaHPO4B,L,NY,NX)-DPCDP
+        trcp_RChem_soil(idsp_HAB,L,NY,NX)       = trcp_RChem_soil(idsp_HAB,L,NY,NX)-DPCHP
+        trcp_RChem_soil(idsp_CaH4P2O8B,L,NY,NX) = trcp_RChem_soil(idsp_CaH4P2O8B,L,NY,NX)-DPCMP
       ELSE
         DZH1P=FVLPO4*trc_solml_vr(ids_H1PO4,L,NY,NX)/patomw
         DZH2P=FVLPO4*trc_solml_vr(ids_H2PO4,L,NY,NX)/patomw
@@ -821,7 +821,7 @@ module SoluteMod
 !     ZOSGL=NO3 diffusivity
 !     TortMicPM=tortuosity
 !
-      DWNO3=0.5_r8*SQRT(SolDifc_vr(ids_NO3,L,NY,NX))*TortMicPM(NPH,L,NY,NX)
+      DWNO3=0.5_r8*SQRT(SoluteDifusvty_vr(ids_NO3,L,NY,NX))*TortMicPM(NPH,L,NY,NX)
       WDNOB(L,NY,NX)=AMIN1(ROWO(NY,NX),WDNOB(L,NY,NX)+DWNO3)
 !
 !     NO3 BAND DEPTH

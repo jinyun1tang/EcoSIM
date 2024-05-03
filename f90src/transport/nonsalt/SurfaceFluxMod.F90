@@ -260,8 +260,8 @@ contains
     DIFOA=DIFOA0*DIFOA1/(DIFOA0+DIFOA1)*AREA(3,NU(NY,NX),NY,NX)
 
     DO nnut=ids_beg,ids_end
-      DIF0=(SolDifc_vrc(nnut,0,NY,NX)*TORT0+DISPN)
-      DIF1=(SolDifc_vrc(nnut,NU(NY,NX),NY,NX)*TORT1+DISPN)
+      DIF0=(SoluteDifusvty_vrc(nnut,0,NY,NX)*TORT0+DISPN)
+      DIF1=(SoluteDifusvty_vrc(nnut,NU(NY,NX),NY,NX)*TORT1+DISPN)
       SDifc(nnut)=DIF0*DIF1/(DIF0+DIF1)*AREA(3,NU(NY,NX),NY,NX)
     ENDDO
 
@@ -961,7 +961,7 @@ contains
     TORT0=TortMicPM(M,0,NY,NX)*AREA(3,NU(NY,NX),NY,NX)/(0.5_r8*DLYR0)*FracSurfByLitR(NY,NX)
 
     DO ngases=idg_beg,idg_NH3
-      DFGcc(ngases)=SolDifc_vrc(ngases,0,NY,NX)*TORT0
+      DFGcc(ngases)=SoluteDifusvty_vrc(ngases,0,NY,NX)*TORT0
     ENDDO
 
     DO  K=1,jcplx
@@ -1135,7 +1135,7 @@ contains
 !
 !include NH3B
     DO ngases=idg_beg,idg_end
-      DiffusivitySolutEff=SolDifc_vrc(ngases,NU(NY,NX),NY,NX)*TORT1
+      DiffusivitySolutEff=SoluteDifusvty_vrc(ngases,NU(NY,NX),NY,NX)*TORT1
       trc_gsolc2=AZMAX1(trc_solml_vr2(ngases,NU(NY,NX),NY,NX)/VLWatMicPM(M,NU(NY,NX),NY,NX))
       trc_gsolc=(PARG(M,NY,NX)*AtmGasCgperm3(ngases,NY,NX)*GasSolbility_vr(ngases,NU(NY,NX),NY,NX) &
         +DiffusivitySolutEff*trc_gsolc2)/(DiffusivitySolutEff+PARG(M,NY,NX))
@@ -1365,7 +1365,7 @@ contains
     *AREA(3,NU(NY,NX),NY,NX)/AMAX1(ZERO2,DLYR(3,NU(NY,NX),NY,NX))
 
   DO ngases=idg_beg,idg_NH3
-    DifuscG(ngases,3,NU(NY,NX),NY,NX)=DFLG2*GasDifc_vrc(ngases,NU(NY,NX),NY,NX)
+    DifuscG_vr(ngases,3,NU(NY,NX),NY,NX)=DFLG2*GasDifc_vrc(ngases,NU(NY,NX),NY,NX)
 !
 !     SURFACE GAS CONCENTRATIONS
 !
@@ -1389,8 +1389,8 @@ contains
 !     C*E=atmospheric gas concentration from hour1.f
 !     C*G2=gaseous concentration
 !
-    DGQ_cef=DifuscG(ngases,3,NU(NY,NX),NY,NX)*PARG_cef(ngases,NY,NX) &
-      /(DifuscG(ngases,3,NU(NY,NX),NY,NX)+PARG_cef(ngases,NY,NX))
+    DGQ_cef=DifuscG_vr(ngases,3,NU(NY,NX),NY,NX)*PARG_cef(ngases,NY,NX) &
+      /(DifuscG_vr(ngases,3,NU(NY,NX),NY,NX)+PARG_cef(ngases,NY,NX))
 
     DFV_g=DGQ_cef*(AtmGasCgperm3(ngases,NY,NX)-trcg_cl2)
 
