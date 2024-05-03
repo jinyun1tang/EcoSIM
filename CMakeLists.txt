@@ -26,6 +26,11 @@ else()
 	message("-- EcoSIM will be built as a static library.")
 endif()
 
+message(STATUS "ATS_ECOSIM_BUILD: ${ATS_ECOSIM_BUILD}")
+if (ATS_ECOSIM_BUILD)
+  message(STATUS "Building EcoSIM within ATS")
+endif()
+
 if (NOT CMAKE_INSTALL_PREFIX)
   set(CMAKE_INSTALL_PREFIX local)
 endif()
