@@ -20,17 +20,17 @@ implicit none
   real(r8) :: RO2UptkMicb
   real(r8) :: RN2NetUptkMicb
   real(r8) :: RN2ONetUptkMicb
-  real(r8) :: RNH4MicbTransf_vr
-  real(r8) :: RNO3MicbTransf_vr
-  real(r8) :: RNO2MicbTransf_vr
-  real(r8) :: RH2PO4MicbTransf_vr
-  real(r8) :: RH1PO4MicbTransf_vr
-  real(r8) :: XNH4B
-  real(r8) :: XNO3B
-  real(r8) :: XNO2B
-  real(r8) :: XH2BS
-  real(r8) :: XH1BS
-  real(r8) :: XN2GS
+  real(r8) :: RNH4MicbTransfSoil_vr
+  real(r8) :: RNO3MicbTransfSoil_vr
+  real(r8) :: RNO2MicbTransfSoil_vr
+  real(r8) :: RH2PO4MicbTransfSoil_vr
+  real(r8) :: RH1PO4MicbTransfSoil_vr
+  real(r8) :: RNH4MicbTransfBand_vr
+  real(r8) :: RNO3MicbTransfBand_vr
+  real(r8) :: RNO2MicbTransfBand_vr
+  real(r8) :: RH2PO4MicbTransfBand_vr
+  real(r8) :: RH1PO4MicbTransfBand_vr
+  real(r8) :: MicrbN2Fix
   real(r8) :: RNO2DmndSoilChemo
   real(r8) :: RNO2DmndBandChemo
   real(r8) :: NetNH4Mineralize

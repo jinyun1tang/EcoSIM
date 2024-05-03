@@ -153,22 +153,20 @@ module InsideTranspMod
     trcg_SnowDrift(idg_beg:idg_NH3,NY,NX)=0.0_r8
     trcn_SnowDrift(ids_nut_beg:ids_nuts_end,NY,NX)=0.0_r8
 
-    TQSCOS(NY,NX)=0.0_r8
-
 !   because NH3 is gas-aqua dual phase
     trc_solml_vr2(idg_NH3,0,NY,NX)=trc_solml_vr2(idg_NH3,0,NY,NX)-RBGCSinkS(idg_NH3,0,NY,NX)
 !   exclude nutrients in band
     DO nsolutes=ids_nut_beg,ids_nuts_end
       trc_solml_vr2(nsolutes,0,NY,NX)=trc_solml_vr2(nsolutes,0,NY,NX)-RBGCSinkS(nsolutes,0,NY,NX)
     ENDDO
-    RBGCSinkG(idg_O2,0,NY,NX)=RO2UptkSoilM_vr(M,0,NY,NX)*dt_GasCyc
+    RBGCSinkG_vr(idg_O2,0,NY,NX)=RO2UptkSoilM_vr(M,0,NY,NX)*dt_GasCyc
   ENDIF
 
   DO ngases=idg_beg,idg_NH3
     if(ngases/=idg_NH3)then
-      trc_solml_vr2(ngases,0,NY,NX)=trc_solml_vr2(ngases,0,NY,NX)-RBGCSinkG(ngases,0,NY,NX)
+      trc_solml_vr2(ngases,0,NY,NX)=trc_solml_vr2(ngases,0,NY,NX)-RBGCSinkG_vr(ngases,0,NY,NX)
     ELSE
-      trc_gasml_vr2(idg_NH3,0,NY,NX)=trc_gasml_vr2(idg_NH3,0,NY,NX)-RBGCSinkG(idg_NH3,0,NY,NX)
+      trc_gasml_vr2(idg_NH3,0,NY,NX)=trc_gasml_vr2(idg_NH3,0,NY,NX)-RBGCSinkG_vr(idg_NH3,0,NY,NX)
     ENDIF
   ENDDO
 !
@@ -206,7 +204,7 @@ module InsideTranspMod
         trc_solml_vr2(nsolutes,L,NY,NX)=trc_solml_vr2(nsolutes,L,NY,NX)-RBGCSinkS(nsolutes,L,NY,NX)
       ENDDO
 
-      RBGCSinkG(idg_O2,L,NY,NX)=RO2UptkSoilM_vr(M,L,NY,NX)*dt_GasCyc
+      RBGCSinkG_vr(idg_O2,L,NY,NX)=RO2UptkSoilM_vr(M,L,NY,NX)*dt_GasCyc
     ENDIF
 !
 !     SOIL GAS FLUX ACCUMULATORS
@@ -218,9 +216,9 @@ module InsideTranspMod
     Gas_AdvDif_Flx_vr(idg_beg:idg_NH3,L,NY,NX)=0._r8
     DO ngases=idg_beg,idg_NH3
       if(ngases/=idg_NH3)then
-        trc_solml_vr2(ngases,L,NY,NX)=trc_solml_vr2(ngases,L,NY,NX)-RBGCSinkG(ngases,L,NY,NX)
+        trc_solml_vr2(ngases,L,NY,NX)=trc_solml_vr2(ngases,L,NY,NX)-RBGCSinkG_vr(ngases,L,NY,NX)
       else
-        trc_gasml_vr2(idg_NH3,L,NY,NX)=trc_gasml_vr2(idg_NH3,L,NY,NX)-RBGCSinkG(ngases,L,NY,NX)
+        trc_gasml_vr2(idg_NH3,L,NY,NX)=trc_gasml_vr2(idg_NH3,L,NY,NX)-RBGCSinkG_vr(ngases,L,NY,NX)
       endif
     ENDDO
 
@@ -423,7 +421,7 @@ module InsideTranspMod
   ENDIF
 
   DO nsolutes=ids_beg,ids_end
-    R3PoreSolFlx(nsolutes,N,N6,N5,N4)=trc_RFL(nsolutes)
+    R3PoreSolFlx_vr(nsolutes,N,N6,N5,N4)=trc_RFL(nsolutes)
   ENDDO
 
   end subroutine SoluteAdvTranspMicropore
@@ -599,10 +597,10 @@ module InsideTranspMod
     TORTL=(TortMicPM(M,N3,N2,N1)*DLYR1+TortMicPM(M,N6,N5,N4)*DLYR2)/(DLYR1+DLYR2)
     DISPN=DISP(N,N6,N5,N4)*AMIN1(VFLWX,ABS(WaterFlow2MicPM(M,N,N6,N5,N4)/AREA(N,N6,N5,N4)))
 
-    DIFOM(idom_doc)=(OCSGL2(N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
-    DIFOM(idom_don)=(ONSGL2(N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
-    DIFOM(idom_dop)=(OPSGL2(N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
-    DIFOM(idom_acetate)=(OASGL2(N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
+    DIFOM(idom_doc)=(DOMdiffusivity2_vr(idom_doc,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
+    DIFOM(idom_don)=(DOMdiffusivity2_vr(idom_don,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
+    DIFOM(idom_dop)=(DOMdiffusivity2_vr(idom_dop,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
+    DIFOM(idom_acetate)=(DOMdiffusivity2_vr(idom_acetate,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
 
     DO nsolutes=ids_beg,ids_end
       SDifc(nsolutes)=(SolDifc_vrc(nsolutes,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
@@ -634,7 +632,7 @@ module InsideTranspMod
   ENDIF
 
   DO nsolutes=ids_beg,ids_end
-    R3PoreSolFlx(nsolutes,N,N6,N5,N4)=R3PoreSolFlx(nsolutes,N,N6,N5,N4)+SDifFlx(nsolutes)
+    R3PoreSolFlx_vr(nsolutes,N,N6,N5,N4)=R3PoreSolFlx_vr(nsolutes,N,N6,N5,N4)+SDifFlx(nsolutes)
   ENDDO
 
   end subroutine SoluteDifTranspMicropore
@@ -932,10 +930,10 @@ module InsideTranspMod
     TORTL=(TortMacPM(M,N3,N2,N1)*DLYR1+TortMacPM(M,N6,N5,N4)*DLYR2)/(DLYR1+DLYR2)
     DISPN=DISP(N,N6,N5,N4)*AMIN1(VFLWX,ABS(WaterFlow2MacPM(M,N,N6,N5,N4)/AREA(N,N6,N5,N4)))
 
-    DIFOM(idom_doc)=(OCSGL2(N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
-    DIFOM(idom_don)=(ONSGL2(N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
-    DIFOM(idom_dop)=(OPSGL2(N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
-    DIFOM(idom_acetate)=(OASGL2(N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
+    DIFOM(idom_doc)=(DOMdiffusivity2_vr(idom_doc,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
+    DIFOM(idom_don)=(DOMdiffusivity2_vr(idom_don,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
+    DIFOM(idom_dop)=(DOMdiffusivity2_vr(idom_dop,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
+    DIFOM(idom_acetate)=(DOMdiffusivity2_vr(idom_acetate,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
 
     DO nsolutes=ids_beg,ids_end
       SDifc(nsolutes)=(SolDifc_vrc(nsolutes,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
@@ -1042,8 +1040,8 @@ module InsideTranspMod
   ENDDO D9755
 
   DO nsolutes=ids_beg,ids_end
-    trcs_3DTransp2MicP(nsolutes,N,N6,N5,N4)=trcs_3DTransp2MicP(nsolutes,N,N6,N5,N4) &
-      +R3PoreSolFlx(nsolutes,N,N6,N5,N4)
+    trcs_3DTransp2MicP_vr(nsolutes,N,N6,N5,N4)=trcs_3DTransp2MicP_vr(nsolutes,N,N6,N5,N4) &
+      +R3PoreSolFlx_vr(nsolutes,N,N6,N5,N4)
     trcs_3DTransp2MacP(nsolutes,N,N6,N5,N4)=trcs_3DTransp2MacP(nsolutes,N,N6,N5,N4) &
       +R3PoreSoHFlx(nsolutes,N,N6,N5,N4)
   ENDDO
@@ -1328,7 +1326,7 @@ module InsideTranspMod
       IF(VTGAS.GT.VTATM)THEN
         DVTGAS=0.5_r8*(VTATM-VTGAS)
         DO ngases=idg_beg,idg_end
-          trcg_BBL(ngases,N3,N2,N1)=AZMIN1(DVTGAS*trcg_VOLG(ngases)/VTGAS)*trcg_SLX(ngases)
+          trcg_Ebu_vr(ngases,N3,N2,N1)=AZMIN1(DVTGAS*trcg_VOLG(ngases)/VTGAS)*trcg_SLX(ngases)
         ENDDO
 !
 !     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
@@ -1336,14 +1334,14 @@ module InsideTranspMod
 !     X*BBL=hourly bubble flux
 !
         DO ngases=idg_beg,idg_end
-          trcg_ebu_flx_vr(ngases,N3,N2,N1)=trcg_ebu_flx_vr(ngases,N3,N2,N1)+trcg_BBL(ngases,N3,N2,N1)
+          trcg_ebu_flx_vr(ngases,N3,N2,N1)=trcg_ebu_flx_vr(ngases,N3,N2,N1)+trcg_Ebu_vr(ngases,N3,N2,N1)
         ENDDO
       ELSE
-        trcg_BBL(idg_beg:idg_end,N3,N2,N1)=0.0_r8
+        trcg_Ebu_vr(idg_beg:idg_end,N3,N2,N1)=0.0_r8
       ENDIF
     ELSE
       iFlagEbu=1
-      trcg_BBL(idg_beg:idg_end,N3,N2,N1)=0.0_r8
+      trcg_Ebu_vr(idg_beg:idg_end,N3,N2,N1)=0.0_r8
     ENDIF
 
   ENDIF
@@ -1579,7 +1577,7 @@ module InsideTranspMod
     DOM_3DMacp_Transp_flxM(idom_beg:idom_end,K,N,N6,N5,N4)=0.0_r8
   ENDDO D9750
 
-  R3PoreSolFlx(ids_beg:ids_end,N,N6,N5,N4)=0.0_r8
+  R3PoreSolFlx_vr(ids_beg:ids_end,N,N6,N5,N4)=0.0_r8
 
   R3PoreSoHFlx(ids_beg:ids_end,N,N6,N5,N4)=0.0_r8
 
@@ -1601,7 +1599,7 @@ module InsideTranspMod
     DOM_3DMacp_Transp_flxM(idom_beg:idom_end,K,N,N3,N2,N1)=0.0_r8
   ENDDO D9751
 
-  R3PoreSolFlx(ids_beg:ids_end,N,N3,N2,N1)=0.0_r8
+  R3PoreSolFlx_vr(ids_beg:ids_end,N,N3,N2,N1)=0.0_r8
   R3PoreSoHFlx(ids_beg:ids_end,N,N3,N2,N1)=0.0_r8
   R3GasADFlx(idg_beg:idg_NH3,N,N3,N2,N1)=0.0_r8
   end subroutine ZeroTransport2

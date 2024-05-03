@@ -1724,7 +1724,7 @@ module WatsubMod
   !     PSISV1,PSISVL=matric+osmotic water potl in source,destination
   !     CNV1,CNVL=vapor conductivities of source, destination
   !     POROS,POROQ=porosity, tortuosity
-  !     WGSGL=vapor diffusivity
+  !     WVapDifusvitySoil_vr=vapor diffusivity
   !     ATCNVL=source,destination vapor conductance
   !     DLYR=soil layer depth
   !     PotentialVaporFlux,MaxVaporFlux=vapor flux unlimited,limited by vapor
@@ -1738,8 +1738,8 @@ module WatsubMod
 
     VP1=vapsat(TK11)*EXP(18.0_r8*PSISV1/(RGAS*TK11))
     VPL=vapsat(TK12)*EXP(18.0_r8*PSISVL/(RGAS*TK12))
-    CNV1=WGSGL(N3,N2,N1)*THETPM(M,N3,N2,N1)*POROQ*THETPM(M,N3,N2,N1)/POROS(N3,N2,N1)
-    CNVL=WGSGL(N6,N5,N4)*THETPM(M,N6,N5,N4)*POROQ*THETPM(M,N6,N5,N4)/POROS(N6,N5,N4)
+    CNV1=WVapDifusvitySoil_vr(N3,N2,N1)*THETPM(M,N3,N2,N1)*POROQ*THETPM(M,N3,N2,N1)/POROS(N3,N2,N1)
+    CNVL=WVapDifusvitySoil_vr(N6,N5,N4)*THETPM(M,N6,N5,N4)*POROQ*THETPM(M,N6,N5,N4)/POROS(N6,N5,N4)
     ATCNVL=2.0_r8*CNV1*CNVL/(CNV1*DLYR(N,N6,N5,N4)+CNVL*DLYR(N,N3,N2,N1))
     !
     !     VAPOR FLUX FROM VAPOR PRESSURE AND DIFFUSIVITY,

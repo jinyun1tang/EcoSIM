@@ -98,7 +98,7 @@ implicit none
   ! CNVR,CNV1=litter,soil vapor conductivity
   ! THETPM=litter air concentration
   ! POROS,POROQ=litter porosity, tortuosity
-  ! VaporDiffusivityLitR,WGSGL=litter,soil vapor diffusivity
+  ! VaporDiffusivityLitR,WVapDifusvitySoil_vr=litter,soil vapor diffusivity
   ! CVRD=litter cover fraction
   ! ATCNVR=litter-soil vapor conductance
   ! DLYRR,DLYR=litter,soil depths
@@ -110,7 +110,7 @@ implicit none
   ! ATCNDR=litter-soil thermal conductance
   !
   CNVR=VaporDiffusivityLitR(NY,NX)*THETPM(M,0,NY,NX)*POROQ*THETPM(M,0,NY,NX)/POROS(0,NY,NX)
-  CNV1=WGSGL(NUM(NY,NX),NY,NX)*THETPM(M,NUM(NY,NX),NY,NX)*POROQ &
+  CNV1=WVapDifusvitySoil_vr(NUM(NY,NX),NY,NX)*THETPM(M,NUM(NY,NX),NY,NX)*POROQ &
     *THETPM(M,NUM(NY,NX),NY,NX)/POROS(NUM(NY,NX),NY,NX)
 
   IF(FracSurfByLitR(NY,NX).GT.ZERO)THEN

@@ -244,15 +244,15 @@ contains
     DLYR1=AMAX1(ZERO2,DLYR(3,NU(NY,NX),NY,NX))
     TORT1=TortMicPM(M,NU(NY,NX),NY,NX)/DLYR1
     DISPN=DISP(3,NU(NY,NX),NY,NX)*AMIN1(VFLWX,ABS(FLWRM1/AREA(3,NU(NY,NX),NY,NX)))
-    DIFOC0=(OCSGL2(0,NY,NX)*TORT0+DISPN)
-    DIFON0=(ONSGL2(0,NY,NX)*TORT0+DISPN)
-    DIFOP0=(OPSGL2(0,NY,NX)*TORT0+DISPN)
-    DIFOA0=(OASGL2(0,NY,NX)*TORT0+DISPN)
+    DIFOC0=(DOMdiffusivity2_vr(idom_doc,0,NY,NX)*TORT0+DISPN)
+    DIFON0=(DOMdiffusivity2_vr(idom_don,0,NY,NX)*TORT0+DISPN)
+    DIFOP0=(DOMdiffusivity2_vr(idom_dop,0,NY,NX)*TORT0+DISPN)
+    DIFOA0=(DOMdiffusivity2_vr(idom_acetate,0,NY,NX)*TORT0+DISPN)
 
-    DIFOC1=(OCSGL2(NU(NY,NX),NY,NX)*TORT1+DISPN)
-    DIFON1=(ONSGL2(NU(NY,NX),NY,NX)*TORT1+DISPN)
-    DIFOP1=(OPSGL2(NU(NY,NX),NY,NX)*TORT1+DISPN)
-    DIFOA1=(OASGL2(NU(NY,NX),NY,NX)*TORT1+DISPN)
+    DIFOC1=(DOMdiffusivity2_vr(idom_doc,NU(NY,NX),NY,NX)*TORT1+DISPN)
+    DIFON1=(DOMdiffusivity2_vr(idom_don,NU(NY,NX),NY,NX)*TORT1+DISPN)
+    DIFOP1=(DOMdiffusivity2_vr(idom_dop,NU(NY,NX),NY,NX)*TORT1+DISPN)
+    DIFOA1=(DOMdiffusivity2_vr(idom_acetate,NU(NY,NX),NY,NX)*TORT1+DISPN)
 
     DIFOC=DIFOC0*DIFOC1/(DIFOC0+DIFOC1)*AREA(3,NU(NY,NX),NY,NX)
     DIFON=DIFON0*DIFON1/(DIFON0+DIFON1)*AREA(3,NU(NY,NX),NY,NX)
@@ -311,7 +311,7 @@ contains
   real(r8), intent(in) :: RFLs_adv(ids_beg:ids_end)
   real(r8), intent(in) :: trcg_FloSno2LitR(idg_beg:idg_NH3)
   real(r8), intent(in) :: trcn_FloSno2LitR(ids_nut_beg:ids_nuts_end)
-  integer :: K,ngases
+  integer :: K,ntg,idom,nts
 
 !     R*FLS=convective + diffusive solute flux between litter, soil surface
 !     R*FLW,R*FLB=convective + diffusive solute flux into soil in non-band,band
@@ -324,48 +324,38 @@ contains
 !     DFV*=diffusive solute flux between litter and soil surface
 !
   DO K=1,micpar%NumOfLitrCmplxs
-    DOM_3DMicp_Transp_flxM(idom_doc,K,3,0,NY,NX)=ROCFL0(K,NY,NX)-DOM_Adv2MicP_flx(idom_doc,K)-Difus_Micp_flx_DOM(idom_doc,K)
-    DOM_3DMicp_Transp_flxM(idom_don,K,3,0,NY,NX)=RONFL0(K,NY,NX)-DOM_Adv2MicP_flx(idom_don,K)-Difus_Micp_flx_DOM(idom_don,K)
-    DOM_3DMicp_Transp_flxM(idom_dop,K,3,0,NY,NX)=ROPFL0(K,NY,NX)-DOM_Adv2MicP_flx(idom_dop,K)-Difus_Micp_flx_DOM(idom_dop,K)
-    DOM_3DMicp_Transp_flxM(idom_acetate,K,3,0,NY,NX)=ROAFL0(K,NY,NX)-DOM_Adv2MicP_flx(idom_acetate,K)-Difus_Micp_flx_DOM(idom_acetate,K)
+    DO idom=idom_beg,idom_end
+      DOM_3DMicp_Transp_flxM(idom,K,3,0,NY,NX)=RDOMFL0(idom,K,NY,NX)-DOM_Adv2MicP_flx(idom,K)-Difus_Micp_flx_DOM(idom,K)
 
-    DOM_3DMicp_Transp_flxM(idom_doc,K,3,NU(NY,NX),NY,NX)=ROCFL1(K,NY,NX)+DOM_Adv2MicP_flx(idom_doc,K)+Difus_Micp_flx_DOM(idom_doc,K)
-    DOM_3DMicp_Transp_flxM(idom_don,K,3,NU(NY,NX),NY,NX)=RONFL1(K,NY,NX)+DOM_Adv2MicP_flx(idom_don,K)+Difus_Micp_flx_DOM(idom_don,K)
-    DOM_3DMicp_Transp_flxM(idom_dop,K,3,NU(NY,NX),NY,NX)=ROPFL1(K,NY,NX)+DOM_Adv2MicP_flx(idom_dop,K)+Difus_Micp_flx_DOM(idom_dop,K)
-    DOM_3DMicp_Transp_flxM(idom_acetate,K,3,NU(NY,NX),NY,NX)=ROAFL1(K,NY,NX)+DOM_Adv2MicP_flx(idom_acetate,K)+Difus_Micp_flx_DOM(idom_acetate,K)
+      DOM_3DMicp_Transp_flxM(idom,K,3,NU(NY,NX),NY,NX)=RDOMFL1(idom,K,NY,NX)+DOM_Adv2MicP_flx(idom,K)+Difus_Micp_flx_DOM(idom,K)
+    ENDDO
   ENDDO
 
-  DO ngases=idg_beg,idg_NH3
-    R3PoreSolFlx(ngases,3,0,NY,NX)=trcg_RFL0(ngases,NY,NX)+trcg_FloSno2LitR(ngases)-RFLs_adv(ngases)-SDifFlx(ngases)
+  DO ntg=idg_beg,idg_NH3
+    R3PoreSolFlx_vr(ntg,3,0,NY,NX)=trcg_RFL0(ntg,NY,NX)+trcg_FloSno2LitR(ntg)-RFLs_adv(ntg)-SDifFlx(ntg)
   ENDDO
 
-  R3PoreSolFlx(idg_NH3,3,0,NY,NX)=R3PoreSolFlx(idg_NH3,3,0,NY,NX)-RFLs_adv(idg_NH3B)-SDifFlx(idg_NH3B)
-  R3PoreSolFlx(ids_NH4,3,0,NY,NX)=trcn_RFL0(ids_NH4,NY,NX)+trcn_FloSno2LitR(ids_NH4)-RFLs_adv(ids_NH4)-SDifFlx(ids_NH4)-RFLs_adv(ids_NH4B)-SDifFlx(ids_NH4B)
-  R3PoreSolFlx(ids_NO3,3,0,NY,NX)=trcn_RFL0(ids_NO3,NY,NX)+trcn_FloSno2LitR(ids_NO3)-RFLs_adv(ids_NO3)-SDifFlx(ids_NO3)-RFLs_adv(ids_NO3B)-SDifFlx(ids_NO3B)
-  R3PoreSolFlx(ids_NO2,3,0,NY,NX)=trcn_RFL0(ids_NO2,NY,NX)+trcn_FloSno2LitR(ids_NO2)-RFLs_adv(ids_NO2)-SDifFlx(ids_NO2)-RFLs_adv(ids_NO2B)-SDifFlx(ids_NO2B)
-  R3PoreSolFlx(ids_H1PO4,3,0,NY,NX)=trcn_RFL0(ids_H1PO4,NY,NX)+trcn_FloSno2LitR(ids_H1PO4)-RFLs_adv(ids_H1PO4)-SDifFlx(ids_H1PO4)-RFLs_adv(ids_H1PO4B)-SDifFlx(ids_H1PO4B)
-  R3PoreSolFlx(ids_H2PO4,3,0,NY,NX)=trcn_RFL0(ids_H2PO4,NY,NX)+trcn_FloSno2LitR(ids_H2PO4)-RFLs_adv(ids_H2PO4)-SDifFlx(ids_H2PO4)-RFLs_adv(ids_H2PO4B)-SDifFlx(ids_H2PO4B)
+  do nts=ids_nut_beg,ids_nuts_end
+    R3PoreSolFlx_vr(nts,3,0,NY,NX)=trcn_RFL0(nts,NY,NX)+trcn_FloSno2LitR(nts)-RFLs_adv(nts)-SDifFlx(nts)
+  enddo
+  R3PoreSolFlx_vr(idg_NH3,3,0,NY,NX)=R3PoreSolFlx_vr(idg_NH3,3,0,NY,NX)-RFLs_adv(idg_NH3B)-SDifFlx(idg_NH3B)
+  R3PoreSolFlx_vr(ids_NH4,3,0,NY,NX)=R3PoreSolFlx_vr(ids_NH4,3,0,NY,NX)-RFLs_adv(ids_NH4B)-SDifFlx(ids_NH4B)
+  R3PoreSolFlx_vr(ids_NO3,3,0,NY,NX)=R3PoreSolFlx_vr(ids_NO3,3,0,NY,NX)-RFLs_adv(ids_NO3B)-SDifFlx(ids_NO3B)
+  R3PoreSolFlx_vr(ids_NO2,3,0,NY,NX)=R3PoreSolFlx_vr(ids_NO2,3,0,NY,NX)-RFLs_adv(ids_NO2B)-SDifFlx(ids_NO2B)
+  R3PoreSolFlx_vr(ids_H1PO4,3,0,NY,NX)=R3PoreSolFlx_vr(ids_H1PO4,3,0,NY,NX)-RFLs_adv(ids_H1PO4B)-SDifFlx(ids_H1PO4B)
+  R3PoreSolFlx_vr(ids_H2PO4,3,0,NY,NX)=R3PoreSolFlx_vr(ids_H2PO4,3,0,NY,NX)-RFLs_adv(ids_H2PO4B)-SDifFlx(ids_H2PO4B)
 
-  R3PoreSolFlx(idg_CO2,3,NU(NY,NX),NY,NX)=trcs_RFL1(idg_CO2,NY,NX)+trcg_VFloSnow(idg_CO2)+RFLs_adv(idg_CO2)+SDifFlx(idg_CO2)
-  R3PoreSolFlx(idg_CH4,3,NU(NY,NX),NY,NX)=trcs_RFL1(idg_CH4,NY,NX)+trcg_VFloSnow(idg_CH4)+RFLs_adv(idg_CH4)+SDifFlx(idg_CH4)
-  R3PoreSolFlx(idg_O2,3,NU(NY,NX),NY,NX)=trcs_RFL1(idg_O2,NY,NX)+trcg_VFloSnow(idg_O2)+RFLs_adv(idg_O2)+SDifFlx(idg_O2)
-  R3PoreSolFlx(idg_N2,3,NU(NY,NX),NY,NX)=trcs_RFL1(idg_N2,NY,NX)+trcg_VFloSnow(idg_N2)+RFLs_adv(idg_N2)+SDifFlx(idg_N2)
-  R3PoreSolFlx(idg_N2O,3,NU(NY,NX),NY,NX)=trcs_RFL1(idg_N2O,NY,NX)+trcg_VFloSnow(idg_N2O)+RFLs_adv(idg_N2O)+SDifFlx(idg_N2O)
-  R3PoreSolFlx(idg_H2,3,NU(NY,NX),NY,NX)=trcs_RFL1(idg_H2,NY,NX)+RFLs_adv(idg_H2)+SDifFlx(idg_H2)
-  R3PoreSolFlx(idg_NH3,3,NU(NY,NX),NY,NX)=trcs_RFL1(idg_NH3,NY,NX)+trcg_VFloSnow(idg_NH3)+RFLs_adv(idg_NH3)+SDifFlx(idg_NH3)
+  DO ntg=idg_beg,idg_NH3
+    R3PoreSolFlx_vr(ntg,3,NU(NY,NX),NY,NX)=trcs_RFL1(ntg,NY,NX)+trcg_VFloSnow(ntg)+RFLs_adv(ntg)+SDifFlx(ntg)
+  ENDDO
 
-  R3PoreSolFlx(ids_NH4,3,NU(NY,NX),NY,NX)=trcs_RFL1(ids_NH4,NY,NX)+trcn_soil_VFloSnow(ids_NH4)+RFLs_adv(ids_NH4)+SDifFlx(ids_NH4)
-  R3PoreSolFlx(ids_NO3,3,NU(NY,NX),NY,NX)=trcs_RFL1(ids_NO3,NY,NX)+trcn_soil_VFloSnow(ids_NO3)+RFLs_adv(ids_NO3)+SDifFlx(ids_NO3)
-  R3PoreSolFlx(ids_NO2,3,NU(NY,NX),NY,NX)=trcs_RFL1(ids_NO2,NY,NX)+RFLs_adv(ids_NO2)+SDifFlx(ids_NO2)
-  R3PoreSolFlx(ids_H1PO4,3,NU(NY,NX),NY,NX)=trcs_RFL1(ids_H1PO4,NY,NX)+trcn_soil_VFloSnow(ids_H1PO4)+RFLs_adv(ids_H1PO4)+SDifFlx(ids_H1PO4)
-  R3PoreSolFlx(ids_H2PO4,3,NU(NY,NX),NY,NX)=trcs_RFL1(ids_H2PO4,NY,NX)+trcn_soil_VFloSnow(ids_H2PO4)+RFLs_adv(ids_H2PO4)+SDifFlx(ids_H2PO4)
+  do nts=ids_nut_beg,ids_nuts_end
+    R3PoreSolFlx_vr(nts,3,NU(NY,NX),NY,NX)=trcs_RFL1(nts,NY,NX)+trcn_soil_VFloSnow(nts)+RFLs_adv(nts)+SDifFlx(nts)
+  enddo
 
-  R3PoreSolFlx(ids_NH4B,3,NU(NY,NX),NY,NX)=trcs_RFL1(ids_NH4B,NY,NX)+trcn_band_VFloSnow(ids_NH4B)+RFLs_adv(ids_NH4B)+SDifFlx(ids_NH4B)
-  R3PoreSolFlx(idg_NH3B,3,NU(NY,NX),NY,NX)=trcs_RFL1(idg_NH3B,NY,NX)+trcg_VFloSnow(idg_NH3B)+RFLs_adv(idg_NH3B)+SDifFlx(idg_NH3B)
-  R3PoreSolFlx(ids_NO3B,3,NU(NY,NX),NY,NX)=trcs_RFL1(ids_NO3B,NY,NX)+trcn_band_VFloSnow(ids_NO3B)+RFLs_adv(ids_NO3B)+SDifFlx(ids_NO3B)
-  R3PoreSolFlx(ids_NO2B,3,NU(NY,NX),NY,NX)=trcs_RFL1(ids_NO2B,NY,NX)+RFLs_adv(ids_NO2B)+SDifFlx(ids_NO2B)
-  R3PoreSolFlx(ids_H1PO4B,3,NU(NY,NX),NY,NX)=trcs_RFL1(ids_H1PO4B,NY,NX)+trcn_band_VFloSnow(ids_H1PO4B)+RFLs_adv(ids_H1PO4B)+SDifFlx(ids_H1PO4B)
-  R3PoreSolFlx(ids_H2PO4B,3,NU(NY,NX),NY,NX)=trcs_RFL1(ids_H2PO4B,NY,NX)+trcn_band_VFloSnow(ids_H2PO4B)+RFLs_adv(ids_H2PO4B)+SDifFlx(ids_H2PO4B)
+  do nts=ids_nutb_beg,ids_nutb_end
+    R3PoreSolFlx_vr(nts,3,NU(NY,NX),NY,NX)=trcs_RFL1(nts,NY,NX)+trcn_band_VFloSnow(nts)+RFLs_adv(nts)+SDifFlx(nts)
+  enddo
 !
 !     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
 !
@@ -373,47 +363,39 @@ contains
 !     X*FLW,X*FLB= hourly convective + diffusive solute flux in non-band,band
 !
   DO K=1,micpar%NumOfLitrCmplxs
-    DOM_3DMicp_Transp_flx(idom_doc,K,3,0,NY,NX)=DOM_3DMicp_Transp_flx(idom_doc,K,3,0,NY,NX)-DOM_Adv2MicP_flx(idom_doc,K)-Difus_Micp_flx_DOM(idom_doc,K)
-    DOM_3DMicp_Transp_flx(idom_don,K,3,0,NY,NX)=DOM_3DMicp_Transp_flx(idom_don,K,3,0,NY,NX)-DOM_Adv2MicP_flx(idom_don,K)-Difus_Micp_flx_DOM(idom_don,K)
-    DOM_3DMicp_Transp_flx(idom_dop,K,3,0,NY,NX)=DOM_3DMicp_Transp_flx(idom_dop,K,3,0,NY,NX)-DOM_Adv2MicP_flx(idom_dop,K)-Difus_Micp_flx_DOM(idom_dop,K)
-    DOM_3DMicp_Transp_flx(idom_acetate,K,3,0,NY,NX)=DOM_3DMicp_Transp_flx(idom_acetate,K,3,0,NY,NX)-DOM_Adv2MicP_flx(idom_acetate,K)-Difus_Micp_flx_DOM(idom_acetate,K)
-    DOM_3DMicp_Transp_flx(idom_doc,K,3,NU(NY,NX),NY,NX)=DOM_3DMicp_Transp_flx(idom_doc,K,3,NU(NY,NX),NY,NX)+DOM_Adv2MicP_flx(idom_doc,K)+Difus_Micp_flx_DOM(idom_doc,K)
-    DOM_3DMicp_Transp_flx(idom_don,K,3,NU(NY,NX),NY,NX)=DOM_3DMicp_Transp_flx(idom_don,K,3,NU(NY,NX),NY,NX)+DOM_Adv2MicP_flx(idom_don,K)+Difus_Micp_flx_DOM(idom_don,K)
-    DOM_3DMicp_Transp_flx(idom_dop,K,3,NU(NY,NX),NY,NX)=DOM_3DMicp_Transp_flx(idom_dop,K,3,NU(NY,NX),NY,NX)+DOM_Adv2MicP_flx(idom_dop,K)+Difus_Micp_flx_DOM(idom_dop,K)
-    DOM_3DMicp_Transp_flx(idom_acetate,K,3,NU(NY,NX),NY,NX)=DOM_3DMicp_Transp_flx(idom_acetate,K,3,NU(NY,NX),NY,NX)+DOM_Adv2MicP_flx(idom_acetate,K)+Difus_Micp_flx_DOM(idom_acetate,K)
+    do idom=idom_beg,idom_end
+      DOM_3DMicp_Transp_flx(idom,K,3,0,NY,NX)=DOM_3DMicp_Transp_flx(idom,K,3,0,NY,NX) &
+        -DOM_Adv2MicP_flx(idom,K)-Difus_Micp_flx_DOM(idom,K)
+      DOM_3DMicp_Transp_flx(idom,K,3,NU(NY,NX),NY,NX)=DOM_3DMicp_Transp_flx(idom,K,3,NU(NY,NX),NY,NX) &
+        +DOM_Adv2MicP_flx(idom,K)+Difus_Micp_flx_DOM(idom,K)
+    ENDDO
   ENDDO
 
-  trcs_3DTransp2MicP(idg_CO2,3,0,NY,NX)=trcs_3DTransp2MicP(idg_CO2,3,0,NY,NX)+trcg_FloSno2LitR(idg_CO2)-RFLs_adv(idg_CO2)-SDifFlx(idg_CO2)
-  trcs_3DTransp2MicP(idg_CH4,3,0,NY,NX)=trcs_3DTransp2MicP(idg_CH4,3,0,NY,NX)+trcg_FloSno2LitR(idg_CH4)-RFLs_adv(idg_CH4)-SDifFlx(idg_CH4)
-  trcs_3DTransp2MicP(idg_O2,3,0,NY,NX)=trcs_3DTransp2MicP(idg_O2,3,0,NY,NX)+trcg_FloSno2LitR(idg_O2)-RFLs_adv(idg_O2)-SDifFlx(idg_O2)
-  trcs_3DTransp2MicP(idg_N2,3,0,NY,NX)=trcs_3DTransp2MicP(idg_N2,3,0,NY,NX)+trcg_FloSno2LitR(idg_N2)-RFLs_adv(idg_N2)-SDifFlx(idg_N2)
-  trcs_3DTransp2MicP(idg_N2O,3,0,NY,NX)=trcs_3DTransp2MicP(idg_N2O,3,0,NY,NX)+trcg_FloSno2LitR(idg_N2O)-RFLs_adv(idg_N2O)-SDifFlx(idg_N2O)
-  trcs_3DTransp2MicP(idg_H2,3,0,NY,NX)=trcs_3DTransp2MicP(idg_H2,3,0,NY,NX)-RFLs_adv(idg_H2)-SDifFlx(idg_H2)
-  trcs_3DTransp2MicP(ids_NH4,3,0,NY,NX)=trcs_3DTransp2MicP(ids_NH4,3,0,NY,NX)+trcn_FloSno2LitR(ids_NH4)-RFLs_adv(ids_NH4)-SDifFlx(ids_NH4)-RFLs_adv(ids_NH4B)-SDifFlx(ids_NH4B)
-  trcs_3DTransp2MicP(idg_NH3,3,0,NY,NX)=trcs_3DTransp2MicP(idg_NH3,3,0,NY,NX)+trcg_FloSno2LitR(idg_NH3)-RFLs_adv(idg_NH3)-SDifFlx(idg_NH3)-RFLs_adv(idg_NH3B)-SDifFlx(idg_NH3B)  
-  trcs_3DTransp2MicP(ids_NO3,3,0,NY,NX)=trcs_3DTransp2MicP(ids_NO3,3,0,NY,NX)+trcn_FloSno2LitR(ids_NO3)-RFLs_adv(ids_NO3)-SDifFlx(ids_NO3)-RFLs_adv(ids_NO3B)-SDifFlx(ids_NO3B)  
-  trcs_3DTransp2MicP(ids_NO2,3,0,NY,NX)=trcs_3DTransp2MicP(ids_NO2,3,0,NY,NX)-RFLs_adv(ids_NO2)-SDifFlx(ids_NO2)-RFLs_adv(ids_NO2B)-SDifFlx(ids_NO2B)  
-  trcs_3DTransp2MicP(ids_H1PO4,3,0,NY,NX)=trcs_3DTransp2MicP(ids_H1PO4,3,0,NY,NX)+trcn_FloSno2LitR(ids_H1PO4)-RFLs_adv(ids_H1PO4)-SDifFlx(ids_H1PO4)-RFLs_adv(ids_H1PO4B)-SDifFlx(ids_H1PO4B)
-  trcs_3DTransp2MicP(ids_H2PO4,3,0,NY,NX)=trcs_3DTransp2MicP(ids_H2PO4,3,0,NY,NX)+trcn_FloSno2LitR(ids_H2PO4)-RFLs_adv(ids_H2PO4)-SDifFlx(ids_H2PO4)-RFLs_adv(ids_H2PO4B)-SDifFlx(ids_H2PO4B)
+  do ntg=idg_beg,idg_NH3
+    trcs_3DTransp2MicP_vr(ntg,3,0,NY,NX)=trcs_3DTransp2MicP_vr(ntg,3,0,NY,NX)+trcg_FloSno2LitR(ntg)-RFLs_adv(ntg)-SDifFlx(ntg)
+  ENDDO
 
-  trcs_3DTransp2MicP(idg_CO2,3,NU(NY,NX),NY,NX)=trcs_3DTransp2MicP(idg_CO2,3,NU(NY,NX),NY,NX)+trcg_VFloSnow(idg_CO2)+RFLs_adv(idg_CO2)+SDifFlx(idg_CO2)
-  trcs_3DTransp2MicP(idg_CH4,3,NU(NY,NX),NY,NX)=trcs_3DTransp2MicP(idg_CH4,3,NU(NY,NX),NY,NX)+trcg_VFloSnow(idg_CH4)+RFLs_adv(idg_CH4)+SDifFlx(idg_CH4)
-  trcs_3DTransp2MicP(idg_O2,3,NU(NY,NX),NY,NX)=trcs_3DTransp2MicP(idg_O2,3,NU(NY,NX),NY,NX)+trcg_VFloSnow(idg_O2)+RFLs_adv(idg_O2)+SDifFlx(idg_O2)
-  trcs_3DTransp2MicP(idg_N2,3,NU(NY,NX),NY,NX)=trcs_3DTransp2MicP(idg_N2,3,NU(NY,NX),NY,NX)+trcg_VFloSnow(idg_N2)+RFLs_adv(idg_N2)+SDifFlx(idg_N2)
-  trcs_3DTransp2MicP(idg_N2O,3,NU(NY,NX),NY,NX)=trcs_3DTransp2MicP(idg_N2O,3,NU(NY,NX),NY,NX)+trcg_VFloSnow(idg_N2O)+RFLs_adv(idg_N2O)+SDifFlx(idg_N2O)
-  trcs_3DTransp2MicP(idg_H2,3,NU(NY,NX),NY,NX)=trcs_3DTransp2MicP(idg_H2,3,NU(NY,NX),NY,NX)+RFLs_adv(idg_H2)+SDifFlx(idg_H2)
-  trcs_3DTransp2MicP(ids_NH4,3,NU(NY,NX),NY,NX)=trcs_3DTransp2MicP(ids_NH4,3,NU(NY,NX),NY,NX)+trcn_soil_VFloSnow(ids_NH4)+RFLs_adv(ids_NH4)+SDifFlx(ids_NH4)
-  trcs_3DTransp2MicP(idg_NH3,3,NU(NY,NX),NY,NX)=trcs_3DTransp2MicP(idg_NH3,3,NU(NY,NX),NY,NX)+trcg_VFloSnow(idg_NH3)+RFLs_adv(idg_NH3)+SDifFlx(idg_NH3)
-  trcs_3DTransp2MicP(ids_NO3,3,NU(NY,NX),NY,NX)=trcs_3DTransp2MicP(ids_NO3,3,NU(NY,NX),NY,NX)+trcn_soil_VFloSnow(ids_NO3)+RFLs_adv(ids_NO3)+SDifFlx(ids_NO3)
-  trcs_3DTransp2MicP(ids_NO2,3,NU(NY,NX),NY,NX)=trcs_3DTransp2MicP(ids_NO2,3,NU(NY,NX),NY,NX)+RFLs_adv(ids_NO2)+SDifFlx(ids_NO2)
-  trcs_3DTransp2MicP(ids_H1PO4,3,NU(NY,NX),NY,NX)=trcs_3DTransp2MicP(ids_H1PO4,3,NU(NY,NX),NY,NX)+trcn_soil_VFloSnow(ids_H1PO4)+RFLs_adv(ids_H1PO4)+SDifFlx(ids_H1PO4)
-  trcs_3DTransp2MicP(ids_H2PO4,3,NU(NY,NX),NY,NX)=trcs_3DTransp2MicP(ids_H2PO4,3,NU(NY,NX),NY,NX)+trcn_soil_VFloSnow(ids_H2PO4)+RFLs_adv(ids_H2PO4)+SDifFlx(ids_H2PO4)
-  trcs_3DTransp2MicP(ids_NH4B,3,NU(NY,NX),NY,NX)=trcs_3DTransp2MicP(ids_NH4B,3,NU(NY,NX),NY,NX)+trcn_band_VFloSnow(ids_NH4B)+RFLs_adv(ids_NH4B)+SDifFlx(ids_NH4B)
-  trcs_3DTransp2MicP(idg_NH3B,3,NU(NY,NX),NY,NX)=trcs_3DTransp2MicP(idg_NH3B,3,NU(NY,NX),NY,NX)+trcg_VFloSnow(idg_NH3B)+RFLs_adv(idg_NH3B)+SDifFlx(idg_NH3B)
-  trcs_3DTransp2MicP(ids_NO3B,3,NU(NY,NX),NY,NX)=trcs_3DTransp2MicP(ids_NO3B,3,NU(NY,NX),NY,NX)+trcn_band_VFloSnow(ids_NO3B)+RFLs_adv(ids_NO3B)+SDifFlx(ids_NO3B)
-  trcs_3DTransp2MicP(ids_NO2B,3,NU(NY,NX),NY,NX)=trcs_3DTransp2MicP(ids_NO2B,3,NU(NY,NX),NY,NX)+RFLs_adv(ids_NO2B)+SDifFlx(ids_NO2B)
-  trcs_3DTransp2MicP(ids_H1PO4B,3,NU(NY,NX),NY,NX)=trcs_3DTransp2MicP(ids_H1PO4B,3,NU(NY,NX),NY,NX)+trcn_band_VFloSnow(ids_H1PO4B)+RFLs_adv(ids_H1PO4B)+SDifFlx(ids_H1PO4B)
-  trcs_3DTransp2MicP(ids_H2PO4B,3,NU(NY,NX),NY,NX)=trcs_3DTransp2MicP(ids_H2PO4B,3,NU(NY,NX),NY,NX)+trcn_band_VFloSnow(ids_H2PO4B)+RFLs_adv(ids_H2PO4B)+SDifFlx(ids_H2PO4B)
+  do nts=ids_nut_beg,ids_nuts_end
+    trcs_3DTransp2MicP_vr(nts,3,0,NY,NX)=trcs_3DTransp2MicP_vr(nts,3,0,NY,NX)+trcn_FloSno2LitR(nts)-RFLs_adv(nts)-SDifFlx(nts)
+  enddo
+  trcs_3DTransp2MicP_vr(idg_NH3,3,0,NY,NX)=trcs_3DTransp2MicP_vr(idg_NH3,3,0,NY,NX)-RFLs_adv(idg_NH3B)-SDifFlx(idg_NH3B)  
+  trcs_3DTransp2MicP_vr(ids_NH4,3,0,NY,NX)=trcs_3DTransp2MicP_vr(ids_NH4,3,0,NY,NX)-RFLs_adv(ids_NH4B)-SDifFlx(ids_NH4B)
+  trcs_3DTransp2MicP_vr(ids_NO3,3,0,NY,NX)=trcs_3DTransp2MicP_vr(ids_NO3,3,0,NY,NX)-RFLs_adv(ids_NO3B)-SDifFlx(ids_NO3B)  
+  trcs_3DTransp2MicP_vr(ids_NO2,3,0,NY,NX)=trcs_3DTransp2MicP_vr(ids_NO2,3,0,NY,NX)-RFLs_adv(ids_NO2B)-SDifFlx(ids_NO2B)  
+  trcs_3DTransp2MicP_vr(ids_H1PO4,3,0,NY,NX)=trcs_3DTransp2MicP_vr(ids_H1PO4,3,0,NY,NX)-RFLs_adv(ids_H1PO4B)-SDifFlx(ids_H1PO4B)
+  trcs_3DTransp2MicP_vr(ids_H2PO4,3,0,NY,NX)=trcs_3DTransp2MicP_vr(ids_H2PO4,3,0,NY,NX)-RFLs_adv(ids_H2PO4B)-SDifFlx(ids_H2PO4B)
+
+  do ntg=idg_beg,idg_NH3
+    trcs_3DTransp2MicP_vr(ntg,3,NU(NY,NX),NY,NX)=trcs_3DTransp2MicP_vr(ntg,3,NU(NY,NX),NY,NX)+trcg_VFloSnow(ntg)+RFLs_adv(ntg)+SDifFlx(ntg)
+  enddo
+
+  do nts=ids_nut_beg,ids_nuts_end
+    trcs_3DTransp2MicP_vr(nts,3,NU(NY,NX),NY,NX)=trcs_3DTransp2MicP_vr(nts,3,NU(NY,NX),NY,NX)+trcn_soil_VFloSnow(nts)+RFLs_adv(nts)+SDifFlx(nts)
+  enddo
+
+  do nts=ids_nutb_beg,ids_nutb_end
+    trcs_3DTransp2MicP_vr(nts,3,NU(NY,NX),NY,NX)=trcs_3DTransp2MicP_vr(nts,3,NU(NY,NX),NY,NX)+trcn_band_VFloSnow(nts)+RFLs_adv(nts)+SDifFlx(nts)
+  enddo
   end subroutine TotalPoreFluxAdjacentCell
 !------------------------------------------------------------------------------------------
 
@@ -421,7 +403,7 @@ contains
   implicit none
 
   integer, intent(in) :: M, NY, NX
-  integer :: K,nnut,ngases,nsolutes
+  integer :: K,nnut,ngases,nsolutes,idom
   real(r8) :: VFLW
   real(r8) :: VLWatMacPS,VOLWT
   real(r8) :: SDifFlx(ids_beg:ids_end)
@@ -447,10 +429,9 @@ contains
       VFLW=VFLWX
     ENDIF
     DO  K=1,jcplx
-      DOM_Adv2MicP_flx(idom_doc,K)=VFLW*AZMAX1(DOM_MacP2(idom_doc,K,NU(NY,NX),NY,NX))
-      DOM_Adv2MicP_flx(idom_don,K)=VFLW*AZMAX1(DOM_MacP2(idom_don,K,NU(NY,NX),NY,NX))
-      DOM_Adv2MicP_flx(idom_dop,K)=VFLW*AZMAX1(DOM_MacP2(idom_dop,K,NU(NY,NX),NY,NX))
-      DOM_Adv2MicP_flx(idom_acetate,K)=VFLW*AZMAX1(DOM_MacP2(idom_acetate,K,NU(NY,NX),NY,NX))
+      do idom=idom_beg,idom_end
+        DOM_Adv2MicP_flx(idom,K)=VFLW*AZMAX1(DOM_MacP2(idom,K,NU(NY,NX),NY,NX))
+      enddo
     ENDDO
 
     do ngases=idg_beg,idg_NH3-1
@@ -472,10 +453,9 @@ contains
       VFLW=-VFLWX
     ENDIF
     DO  K=1,jcplx
-      DOM_Adv2MicP_flx(idom_doc,K)=VFLW*AZMAX1(DOM_MicP2(idom_doc,K,NU(NY,NX),NY,NX))
-      DOM_Adv2MicP_flx(idom_don,K)=VFLW*AZMAX1(DOM_MicP2(idom_don,K,NU(NY,NX),NY,NX))
-      DOM_Adv2MicP_flx(idom_dop,K)=VFLW*AZMAX1(DOM_MicP2(idom_dop,K,NU(NY,NX),NY,NX))
-      DOM_Adv2MicP_flx(idom_acetate,K)=VFLW*AZMAX1(DOM_MicP2(idom_acetate,K,NU(NY,NX),NY,NX))
+      do idom=idom_beg,idom_end
+        DOM_Adv2MicP_flx(idom,K)=VFLW*AZMAX1(DOM_MicP2(idom,K,NU(NY,NX),NY,NX))
+      enddo
     ENDDO
     do ngases=idg_beg,idg_NH3-1
       SAdvFlx(ngases)=VFLW*AZMAX1(trc_solml_vr2(ngases,NU(NY,NX),NY,NX))
@@ -491,10 +471,9 @@ contains
 !
   ELSE
     DO  K=1,jcplx
-      DOM_Adv2MicP_flx(idom_doc,K)=0.0_r8
-      DOM_Adv2MicP_flx(idom_don,K)=0.0_r8
-      DOM_Adv2MicP_flx(idom_dop,K)=0.0_r8
-      DOM_Adv2MicP_flx(idom_acetate,K)=0.0_r8
+      do idom=idom_beg,idom_end
+        DOM_Adv2MicP_flx(idom,K)=0.0_r8
+      enddo
     ENDDO
     SAdvFlx(ids_beg:ids_end)=0._r8
   ENDIF
@@ -518,14 +497,10 @@ contains
     VLWatMacPS=AMIN1(XFRS*VGeomLayer(NU(NY,NX),NY,NX),VLWatMacPM(M,NU(NY,NX),NY,NX))
     VOLWT=VLWatMicPM(M,NU(NY,NX),NY,NX)+VLWatMacPS
     DO  K=1,jcplx
-      Difus_Micp_flx_DOM(idom_doc,K)=dts_HeatWatTP*(AZMAX1(DOM_MacP2(idom_doc,K,NU(NY,NX),NY,NX))*VLWatMicPM(M,NU(NY,NX),NY,NX) &
-        -AZMAX1(DOM_MicP2(idom_doc,K,NU(NY,NX),NY,NX))*VLWatMacPS)/VOLWT
-      Difus_Micp_flx_DOM(idom_don,K)=dts_HeatWatTP*(AZMAX1(DOM_MacP2(idom_don,K,NU(NY,NX),NY,NX))*VLWatMicPM(M,NU(NY,NX),NY,NX) &
-        -AZMAX1(DOM_MicP2(idom_don,K,NU(NY,NX),NY,NX))*VLWatMacPS)/VOLWT
-      Difus_Micp_flx_DOM(idom_dop,K)=dts_HeatWatTP*(AZMAX1(DOM_MacP2(idom_dop,K,NU(NY,NX),NY,NX))*VLWatMicPM(M,NU(NY,NX),NY,NX) &
-        -AZMAX1(DOM_MicP2(idom_dop,K,NU(NY,NX),NY,NX))*VLWatMacPS)/VOLWT
-      Difus_Micp_flx_DOM(idom_acetate,K)=dts_HeatWatTP*(AZMAX1(DOM_MacP2(idom_acetate,K,NU(NY,NX),NY,NX))*VLWatMicPM(M,NU(NY,NX),NY,NX) &
-        -AZMAX1(DOM_MicP2(idom_acetate,K,NU(NY,NX),NY,NX))*VLWatMacPS)/VOLWT
+      do idom=idom_beg,idom_end
+        Difus_Micp_flx_DOM(idom,K)=dts_HeatWatTP*(AZMAX1(DOM_MacP2(idom,K,NU(NY,NX),NY,NX))*VLWatMicPM(M,NU(NY,NX),NY,NX) &
+          -AZMAX1(DOM_MicP2(idom,K,NU(NY,NX),NY,NX))*VLWatMacPS)/VOLWT
+      enddo
     ENDDO
 
     do ngases=idg_beg,idg_NH3-1
@@ -547,10 +522,9 @@ contains
 
   ELSE
     DO  K=1,jcplx
-      Difus_Micp_flx_DOM(idom_doc,K)=0.0_r8
-      Difus_Micp_flx_DOM(idom_don,K)=0.0_r8
-      Difus_Micp_flx_DOM(idom_dop,K)=0.0_r8
-      Difus_Micp_flx_DOM(idom_acetate,K)=0.0_r8
+      do idom=idom_beg,idom_end
+        Difus_Micp_flx_DOM(idom,K)=0.0_r8
+      enddo
     ENDDO
     SDifFlx(ids_beg:ids_end)=0._r8
   ENDIF
@@ -566,10 +540,9 @@ contains
 !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
 !
   DO  K=1,jcplx
-    DOM_XPoreTransp_flx(idom_doc,K,NU(NY,NX),NY,NX)=DOM_Adv2MicP_flx(idom_doc,K)+Difus_Micp_flx_DOM(idom_doc,K)
-    DOM_XPoreTransp_flx(idom_don,K,NU(NY,NX),NY,NX)=DOM_Adv2MicP_flx(idom_don,K)+Difus_Micp_flx_DOM(idom_don,K)
-    DOM_XPoreTransp_flx(idom_dop,K,NU(NY,NX),NY,NX)=DOM_Adv2MicP_flx(idom_dop,K)+Difus_Micp_flx_DOM(idom_dop,K)
-    DOM_XPoreTransp_flx(idom_acetate,K,NU(NY,NX),NY,NX)=DOM_Adv2MicP_flx(idom_acetate,K)+Difus_Micp_flx_DOM(idom_acetate,K)
+    do idom=idom_beg,idom_end
+      DOM_XPoreTransp_flx(idom,K,NU(NY,NX),NY,NX)=DOM_Adv2MicP_flx(idom,K)+Difus_Micp_flx_DOM(idom,K)
+    enddo
   ENDDO
 
   DO nnut=ids_beg,ids_end
@@ -586,10 +559,9 @@ contains
 !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
 !
   DO  K=1,jcplx
-    DOM_PoreTranspFlx(idom_doc,K,NU(NY,NX),NY,NX)=DOM_PoreTranspFlx(idom_doc,K,NU(NY,NX),NY,NX)+DOM_XPoreTransp_flx(idom_doc,K,NU(NY,NX),NY,NX)
-    DOM_PoreTranspFlx(idom_don,K,NU(NY,NX),NY,NX)=DOM_PoreTranspFlx(idom_don,K,NU(NY,NX),NY,NX)+DOM_XPoreTransp_flx(idom_don,K,NU(NY,NX),NY,NX)
-    DOM_PoreTranspFlx(idom_dop,K,NU(NY,NX),NY,NX)=DOM_PoreTranspFlx(idom_dop,K,NU(NY,NX),NY,NX)+DOM_XPoreTransp_flx(idom_dop,K,NU(NY,NX),NY,NX)
-    DOM_PoreTranspFlx(idom_acetate,K,NU(NY,NX),NY,NX)=DOM_PoreTranspFlx(idom_acetate,K,NU(NY,NX),NY,NX)+DOM_XPoreTransp_flx(idom_acetate,K,NU(NY,NX),NY,NX)
+    do idom=idom_beg,idom_end
+      DOM_PoreTranspFlx(idom,K,NU(NY,NX),NY,NX)=DOM_PoreTranspFlx(idom,K,NU(NY,NX),NY,NX)+DOM_XPoreTransp_flx(idom,K,NU(NY,NX),NY,NX)
+    enddo
   ENDDO
 
   DO nnut=ids_beg,ids_end

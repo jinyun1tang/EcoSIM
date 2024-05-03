@@ -644,7 +644,7 @@ implicit none
 
       DO NTS=ids_beg,ids_end
         trcs_Transp2MicP_vr(NTS,N3,N2,N1)=trcs_Transp2MicP_vr(NTS,N3,N2,N1) &
-          +trcs_3DTransp2MicP(NTS,N,N3,N2,N1)-trcs_3DTransp2MicP(NTS,N,N6,N5,N4)
+          +trcs_3DTransp2MicP_vr(NTS,N,N3,N2,N1)-trcs_3DTransp2MicP_vr(NTS,N,N6,N5,N4)
         trcs_Transp2MacP_vr(NTS,N3,N2,N1)=trcs_Transp2MacP_vr(NTS,N3,N2,N1) &
           +trcs_3DTransp2MacP(NTS,N,N3,N2,N1)-trcs_3DTransp2MacP(NTS,N,N6,N5,N4)
       ENDDO

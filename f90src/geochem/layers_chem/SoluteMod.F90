@@ -350,7 +350,7 @@ module SoluteMod
 !     RNBX,R3BX=NH4,NH3 input from uptake, mineraln, dissoln in band
 !     TRootNH4Uptake_pft,TUPNH3=soil-root exchange of NH4,NH3 in non-band from uptake.f
 !     TUPNHB,TUPN3B=soil-root exchange of NH4,NH3 in band from uptake.f
-!     RNH4MicbTransf_vr,XNH4B=net change in NH4 in band,non-band from nitro.f
+!     RNH4MicbTransfSoil_vr,RNH4MicbTransfBand_vr=net change in NH4 in band,non-band from nitro.f
 !     NH4_1p_conc,NH3_aqu_conc,NH4_1p_band_conc,NH3_aqu_band_conc=total NH4,NH3 concentration in non-band,band
 !     XNH4_conc,XNH4_band_conc=adsorbed NH4 concentration in non-band,band
 !
@@ -389,7 +389,7 @@ module SoluteMod
 !     VLWatMicPPO,VLWatMicPPB=water volume in H2PO4 non-band,band
 !     RH1PX,RH2PX=HPO4,H2PO4 inputs from mineraln, uptake in non-band
 !     RH1BX,RH2BX=HPO4,H2PO4 inputs from mineraln, uptake in band
-!     RH1PO4MicbTransf_vr,XH1BS=net change in HPO4 in band,non-band from nitro.f
+!     RH1PO4MicbTransfSoil_vr,RH1PO4MicbTransfBand_vr=net change in HPO4 in band,non-band from nitro.f
 !     TRootHPO4Uptake_pft,TRootH2PO4Uptake_pft=soil-root exch of HPO4,H2PO4 in non-band from uptake.f
 !     TUPH1B,TUPH2B=soil-root exch of HPO4,H2PO4 in band from uptake.f
 !     H1PO4_2e_conc,H2PO4_1e_conc=HPO4,H2PO4 concentrations in non-band
@@ -494,7 +494,7 @@ module SoluteMod
 !     ZNSGL=NH4 diffusivity
 !     TortMicPM=tortuosity
 !
-      DWNH4=0.5*SQRT(ZNSGL(L,NY,NX))*TortMicPM(NPH,L,NY,NX)
+      DWNH4=0.5*SQRT(SolDifc_vr(idg_NH3,L,NY,NX))*TortMicPM(NPH,L,NY,NX)
       WDNHB(L,NY,NX)=AMIN1(ROWN(NY,NX),AMAX1(0.025,WDNHB(L,NY,NX))+DWNH4)
 !
 !     NH4 BAND DEPTH
@@ -596,7 +596,7 @@ module SoluteMod
 !     POSGL=H2PO4 diffusivity
 !     TortMicPM=tortuosity
 !
-      DWPO4=0.5*SQRT(POSGL(L,NY,NX))*TortMicPM(NPH,L,NY,NX)
+      DWPO4=0.5*SQRT(SolDifc_vr(ids_H1PO4,L,NY,NX))*TortMicPM(NPH,L,NY,NX)
       WDPOB(L,NY,NX)=AMIN1(ROWP(NY,NX),WDPOB(L,NY,NX)+DWPO4)
 !
 !     PO4 BAND DEPTH
@@ -992,7 +992,7 @@ module SoluteMod
 !
 !     VLWatMicPNH=water volume
 !     RN4X,RN3X=NH4,NH3 input from uptake, mineraln, dissoln
-!     RNH4MicbTransf_vr=net change in NH4 from nitro.f
+!     RNH4MicbTransfSoil_vr=net change in NH4 from nitro.f
 !     NH4_1p_conc,NH3_aqu_conc=total NH4,NH3 concentration
 !     XNH4_conc=adsorbed NH4 concentration
 !
@@ -1012,7 +1012,7 @@ module SoluteMod
 !
 !     VLWatMicPMP=water volume
 !     RH1PX,RH2PX=HPO4,H2PO4 inputs from mineraln, uptake
-!     RH1PO4MicbTransf_vr=net change in HPO4 from nitro.f
+!     RH1PO4MicbTransfSoil_vr=net change in HPO4 from nitro.f
 !     H1PO4_2e_conc,H2PO4_1e_conc=HPO4,H2PO4 concentrations
 !
       VLWatMicPMP=patomw*VLWatMicPM(NPH,0,NY,NX)

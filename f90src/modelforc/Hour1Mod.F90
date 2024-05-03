@@ -417,9 +417,9 @@ module Hour1Mod
 !
       DO  L=0,NL(NY,NX)+1
 
-        trcs_3DTransp2MicP(idg_beg:idg_end-1,1:3,L,NY,NX)=0.0_r8
+        trcs_3DTransp2MicP_vr(idg_beg:idg_end-1,1:3,L,NY,NX)=0.0_r8
 
-        trcs_3DTransp2MicP(ids_nut_beg:ids_nuts_end,1:3,L,NY,NX)=0.0_r8
+        trcs_3DTransp2MicP_vr(ids_nut_beg:ids_nuts_end,1:3,L,NY,NX)=0.0_r8
 
         DOM_3DMicp_Transp_flx(idom_beg:idom_end,1:jcplx,1:3,L,NY,NX)=0.0_r8
       ENDDO
@@ -432,7 +432,7 @@ module Hour1Mod
         WaterFlowMacP(1:3,L,NY,NX)=0.0_r8
         HeatFlow2Soil(1:3,L,NY,NX)=0.0_r8
 
-        trcs_3DTransp2MicP(ids_beg:ids_end,1:3,L,NY,NX)=0.0_r8
+        trcs_3DTransp2MicP_vr(ids_beg:ids_end,1:3,L,NY,NX)=0.0_r8
         Gas_3DAdvDif_Flx_vr(idg_beg:idg_end,1:3,L,NY,NX)=0._r8
 
         DOM_3DMacp_Transp_flx(idom_beg:idom_end,1:jcplx,1:3,L,NY,NX)=0.0_r8
@@ -1164,10 +1164,10 @@ module Hour1Mod
   SolDifc_vr(ids_H1PO4B,0,NY,NX)=SolDifc_vr(ids_H1PO4,0,NY,NX)
   SolDifc_vr(ids_H2PO4B,0,NY,NX)=SolDifc_vr(ids_H2PO4,0,NY,NX)
 
-  OCSGL(0,NY,NX)=OCSG*TFACL
-  ONSGL(0,NY,NX)=ONSG*TFACL
-  OPSGL(0,NY,NX)=OPSG*TFACL
-  OASGL(0,NY,NX)=OASG*TFACL
+  DOMdiffusivity_vr(idom_doc,0,NY,NX)=OCSG*TFACL
+  DOMdiffusivity_vr(idom_don,0,NY,NX)=ONSG*TFACL
+  DOMdiffusivity_vr(idom_dop,0,NY,NX)=OPSG*TFACL
+  DOMdiffusivity_vr(idom_acetate,0,NY,NX)=OASG*TFACL
 !
 !     R*Y,R*X=total substrate uptake from previous,current hour
 !     used in nitro.f, uptake.f
@@ -1193,10 +1193,10 @@ module Hour1Mod
     ROQAX(K,0,NY,NX)=0.0_r8
   ENDDO D5055
 !
-!     WGSGA,VaporDiffusivityLitR,WGSGW=vapor diffusivity in air,litter,snowpack
+!     WVapDifusvityAir_col,VaporDiffusivityLitR,WGSGW=vapor diffusivity in air,litter,snowpack
 !
   TFACA=TEFGASDIF(TairK(NY,NX))
-  WGSGA(NY,NX)=WGSG*TFACA
+  WVapDifusvityAir_col(NY,NX)=WGSG*TFACA
   TFACR=TEFGASDIF(TKS(0,NY,NX))
   VaporDiffusivityLitR(NY,NX)=WGSG*TFACR
   !write(*,*) "VaporDiffusivityLitR(NY,NX) = ", VaporDiffusivityLitR(NY,NX)
@@ -1389,11 +1389,11 @@ module Hour1Mod
     SolDifc_vr(ids_H1PO4B,L,NY,NX)=SolDifc_vr(ids_H1PO4,L,NY,NX)
     SolDifc_vr(ids_H2PO4B,L,NY,NX)=SolDifc_vr(ids_H2PO4,L,NY,NX)
 
-    OCSGL(L,NY,NX)=OCSG*TFACL
-    ONSGL(L,NY,NX)=ONSG*TFACL
-    OPSGL(L,NY,NX)=OPSG*TFACL
-    OASGL(L,NY,NX)=OASG*TFACL
-    WGSGL(L,NY,NX)=WGSG*TFACG
+    DOMdiffusivity_vr(idom_doc,L,NY,NX)=OCSG*TFACL
+    DOMdiffusivity_vr(idom_don,L,NY,NX)=ONSG*TFACL
+    DOMdiffusivity_vr(idom_dop,L,NY,NX)=OPSG*TFACL
+    DOMdiffusivity_vr(idom_acetate,L,NY,NX)=OASG*TFACL
+    WVapDifusvitySoil_vr(L,NY,NX)=WGSG*TFACG
 
     IF(salt_model)THEN
       ALSGL(L,NY,NX)=ALSG*TFACL

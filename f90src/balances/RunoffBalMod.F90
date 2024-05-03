@@ -518,28 +518,28 @@ implicit none
         MOD(ielmn)=MOD(ielmn)+XN*(DOM_3DMicp_Transp_flx(idom_don,K,N,N6,N5,N4)+DOM_3DMacp_Transp_flx(idom_don,K,N,N6,N5,N4))
         MOD(ielmp)=MOD(ielmp)+XN*(DOM_3DMicp_Transp_flx(idom_dop,K,N,N6,N5,N4)+DOM_3DMacp_Transp_flx(idom_dop,K,N,N6,N5,N4))
       ENDDO D450
-      MXD(ielmc)=XN*(trcs_3DTransp2MicP(idg_CO2,N,N6,N5,N4)+trcs_3DTransp2MacP(idg_CO2,N,N6,N5,N4) &
-        +Gas_3DAdvDif_Flx_vr(idg_CO2,N,N6,N5,N4)+trcs_3DTransp2MicP(idg_CH4,N,N6,N5,N4) &
+      MXD(ielmc)=XN*(trcs_3DTransp2MicP_vr(idg_CO2,N,N6,N5,N4)+trcs_3DTransp2MacP(idg_CO2,N,N6,N5,N4) &
+        +Gas_3DAdvDif_Flx_vr(idg_CO2,N,N6,N5,N4)+trcs_3DTransp2MicP_vr(idg_CH4,N,N6,N5,N4) &
         +trcs_3DTransp2MacP(idg_CH4,N,N6,N5,N4)+Gas_3DAdvDif_Flx_vr(idg_CH4,N,N6,N5,N4))
-      MXD(ielmn)=XN*(trcs_3DTransp2MicP(ids_NH4,N,N6,N5,N4)+trcs_3DTransp2MicP(idg_NH3,N,N6,N5,N4) &
-        +trcs_3DTransp2MicP(ids_NO3,N,N6,N5,N4) &
-        +trcs_3DTransp2MicP(ids_NH4B,N,N6,N5,N4)+trcs_3DTransp2MicP(idg_NH3B,N,N6,N5,N4)&
-        +trcs_3DTransp2MicP(ids_NO3B,N,N6,N5,N4) &
-        +trcs_3DTransp2MicP(ids_NO2,N,N6,N5,N4)+trcs_3DTransp2MicP(ids_NO2B,N,N6,N5,N4) &
+      MXD(ielmn)=XN*(trcs_3DTransp2MicP_vr(ids_NH4,N,N6,N5,N4)+trcs_3DTransp2MicP_vr(idg_NH3,N,N6,N5,N4) &
+        +trcs_3DTransp2MicP_vr(ids_NO3,N,N6,N5,N4) &
+        +trcs_3DTransp2MicP_vr(ids_NH4B,N,N6,N5,N4)+trcs_3DTransp2MicP_vr(idg_NH3B,N,N6,N5,N4)&
+        +trcs_3DTransp2MicP_vr(ids_NO3B,N,N6,N5,N4) &
+        +trcs_3DTransp2MicP_vr(ids_NO2,N,N6,N5,N4)+trcs_3DTransp2MicP_vr(ids_NO2B,N,N6,N5,N4) &
         +trcs_3DTransp2MacP(ids_NH4,N,N6,N5,N4)+trcs_3DTransp2MacP(idg_NH3,N,N6,N5,N4) &
         +trcs_3DTransp2MacP(ids_NO3,N,N6,N5,N4) &
         +trcs_3DTransp2MacP(ids_NH4B,N,N6,N5,N4)+trcs_3DTransp2MacP(idg_NH3B,N,N6,N5,N4) &
         +trcs_3DTransp2MacP(ids_NO3B,N,N6,N5,N4) &
         +trcs_3DTransp2MacP(ids_NO2,N,N6,N5,N4)+trcs_3DTransp2MacP(ids_NO2B,N,N6,N5,N4))
-      ZGD=XN*(trcs_3DTransp2MicP(idg_N2,N,N6,N5,N4)+Gas_3DAdvDif_Flx_vr(idg_N2,N,N6,N5,N4) &
+      ZGD=XN*(trcs_3DTransp2MicP_vr(idg_N2,N,N6,N5,N4)+Gas_3DAdvDif_Flx_vr(idg_N2,N,N6,N5,N4) &
         +trcs_3DTransp2MacP(idg_N2,N,N6,N5,N4) &
-        +trcs_3DTransp2MicP(idg_N2O,N,N6,N5,N4)+Gas_3DAdvDif_Flx_vr(idg_N2O,N,N6,N5,N4) &
+        +trcs_3DTransp2MicP_vr(idg_N2O,N,N6,N5,N4)+Gas_3DAdvDif_Flx_vr(idg_N2O,N,N6,N5,N4) &
         +trcs_3DTransp2MacP(idg_N2O,N,N6,N5,N4) &
         +Gas_3DAdvDif_Flx_vr(idg_NH3,N,N6,N5,N4))
-      MXD(ielmp)=XN*(trcs_3DTransp2MicP(ids_H2PO4,N,N6,N5,N4)+trcs_3DTransp2MicP(ids_H2PO4B,N,N6,N5,N4) &
+      MXD(ielmp)=XN*(trcs_3DTransp2MicP_vr(ids_H2PO4,N,N6,N5,N4)+trcs_3DTransp2MicP_vr(ids_H2PO4B,N,N6,N5,N4) &
         +trcs_3DTransp2MacP(ids_H2PO4,N,N6,N5,N4)+trcs_3DTransp2MacP(ids_H2PO4B,N,N6,N5,N4)&
-        +trcs_3DTransp2MicP(ids_H1PO4,N,N6,N5,N4) &
-        +trcs_3DTransp2MicP(ids_H1PO4B,N,N6,N5,N4)+trcs_3DTransp2MacP(ids_H1PO4,N,N6,N5,N4) &
+        +trcs_3DTransp2MicP_vr(ids_H1PO4,N,N6,N5,N4) &
+        +trcs_3DTransp2MicP_vr(ids_H1PO4B,N,N6,N5,N4)+trcs_3DTransp2MacP(ids_H1PO4,N,N6,N5,N4) &
         +trcs_3DTransp2MacP(ids_H1PO4B,N,N6,N5,N4))
 
       TOMOU(ielmc)=TOMOU(ielmc)-MOD(ielmc)-MXD(ielmc)
@@ -558,9 +558,9 @@ implicit none
 !     X*FLG=convective+diffusive gas flux from TranspNoSalt.f
 !     OXYGOU,H2GOU=cumulative O2,H2 loss through lateral and lower boundaries
 !
-      OOD=XN*(trcs_3DTransp2MicP(idg_O2,N,N6,N5,N4)+trcs_3DTransp2MacP(idg_O2,N,N6,N5,N4)+Gas_3DAdvDif_Flx_vr(idg_O2,N,N6,N5,N4))
+      OOD=XN*(trcs_3DTransp2MicP_vr(idg_O2,N,N6,N5,N4)+trcs_3DTransp2MacP(idg_O2,N,N6,N5,N4)+Gas_3DAdvDif_Flx_vr(idg_O2,N,N6,N5,N4))
       OXYGOU=OXYGOU-OOD
-      HOD=XN*(trcs_3DTransp2MicP(idg_H2,N,N6,N5,N4)+trcs_3DTransp2MacP(idg_H2,N,N6,N5,N4)+Gas_3DAdvDif_Flx_vr(idg_H2,N,N6,N5,N4))
+      HOD=XN*(trcs_3DTransp2MicP_vr(idg_H2,N,N6,N5,N4)+trcs_3DTransp2MacP(idg_H2,N,N6,N5,N4)+Gas_3DAdvDif_Flx_vr(idg_H2,N,N6,N5,N4))
       H2GOU=H2GOU-HOD
 !
 !     SUBSURFACE BOUNDARY FLUXES OF SOLUTES
@@ -689,7 +689,7 @@ implicit none
           ECHC=0.044*AZMAX1((trcSalt3DFlo2Cell(idsalt_HCO3,N,N6,N5,N4)+trcSalt_XFHS(idsalt_HCO3,N,N6,N5,N4))/WX)
           ECSO=0.080*AZMAX1((trcSalt3DFlo2Cell(idsalt_SO4,N,N6,N5,N4)+trcSalt_XFHS(idsalt_SO4,N,N6,N5,N4))*2.0/WX)
           ECCL=0.076*AZMAX1((trcSalt3DFlo2Cell(idsalt_Cl,N,N6,N5,N4)+trcSalt_XFHS(idsalt_Cl,N,N6,N5,N4))/WX)
-          ECNO=0.071*AZMAX1((trcs_3DTransp2MicP(ids_NO3,N,N6,N5,N4)+trcs_3DTransp2MacP(ids_NO3,N,N6,N5,N4))/(WX*natomw))
+          ECNO=0.071*AZMAX1((trcs_3DTransp2MicP_vr(ids_NO3,N,N6,N5,N4)+trcs_3DTransp2MacP(ids_NO3,N,N6,N5,N4))/(WX*natomw))
           ECNDX=ECHY+ECOH+ECAL+ECFE+ECCA+ECMG+ECNA+ECKA+ECCO+ECHC+ECSO+ECCL+ECNO
 !     IF((I/10)*10.EQ.I.AND.J.EQ.15)THEN
 !     WRITE(*,9992)'ECNDX',iYearCurrent,I,J,N4,N5,N6,N,WX,ECNDX
@@ -700,7 +700,7 @@ implicit none
           ECNDX=0.0_r8
         ENDIF
       ENDIF
-      SG=SG+trcs_3DTransp2MicP(idg_H2,N,N6,N5,N4)+Gas_3DAdvDif_Flx_vr(idg_H2,N,N6,N5,N4)
+      SG=SG+trcs_3DTransp2MicP_vr(idg_H2,N,N6,N5,N4)+Gas_3DAdvDif_Flx_vr(idg_H2,N,N6,N5,N4)
     ENDIF
   ENDIF
   end subroutine SubsurfaceBoundaryFluxes

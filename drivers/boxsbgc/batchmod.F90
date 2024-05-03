@@ -538,25 +538,25 @@ contains
   )
 !atmospheric gaseous CO2,CH4,O2,NH3,N2,N2O,H2
 !
-  ystatesfl(cid_ZNH3B)=ystates0l(cid_ZNH3B)+ystatesfl(fid_TR_NH3_band_soil)+micflx%XNH4B
-  ystatesfl(cid_ZNH3S)=ystates0l(cid_ZNH3S)+ystatesfl(fid_TR_NH3_soil_vr)+micflx%RNH4MicbTransf_vr
-  ystatesfl(cid_ZNH4B)=ystates0l(cid_ZNH4B)+ystatesfl(fid_TR_NH3_band_soil)+micflx%XNH4B
-  ystatesfl(cid_ZNH4S)=ystates0l(cid_ZNH4S)+ystatesfl(fid_TR_NH4_soil)+micflx%RNH4MicbTransf_vr
-  ystatesfl(cid_H1POB)=ystates0l(cid_H1POB)+ystatesfl(fid_TR_H1PO4_band_soil)+micflx%XH1BS
-  ystatesfl(cid_H1PO4)=ystates0l(cid_H1PO4)+ystatesfl(fid_TR_H1PO4_soil)+micflx%RH1PO4MicbTransf_vr
-  ystatesfl(cid_H2POB)=ystates0l(cid_H2POB)+ystatesfl(fid_TR_H2PO4_band_soil)+micflx%XH2BS
-  ystatesfl(cid_H2PO4)=ystates0l(cid_H2PO4)+ystatesfl(fid_TR_H2PO4_soil)+micflx%RH2PO4MicbTransf_vr
-  ystatesfl(cid_ZNO3B)=ystates0l(cid_ZNO3B)+micflx%XNO3B
-  ystatesfl(cid_ZNO3S)=ystates0l(cid_ZNO3S)+micflx%RNO3MicbTransf_vr
-  ystatesfl(cid_ZNO2B)=ystates0l(cid_ZNO2B)+micflx%XNO2B
-  ystatesfl(cid_ZNO2S)=ystates0l(cid_ZNO2S)+micflx%RNO2MicbTransf_vr
+  ystatesfl(cid_ZNH3B)=ystates0l(cid_ZNH3B)+ystatesfl(fid_TR_NH3_band_soil)+micflx%RNH4MicbTransfBand_vr
+  ystatesfl(cid_ZNH3S)=ystates0l(cid_ZNH3S)+ystatesfl(fid_TR_NH3_soil_vr)+micflx%RNH4MicbTransfSoil_vr
+  ystatesfl(cid_ZNH4B)=ystates0l(cid_ZNH4B)+ystatesfl(fid_TR_NH3_band_soil)+micflx%RNH4MicbTransfBand_vr
+  ystatesfl(cid_ZNH4S)=ystates0l(cid_ZNH4S)+ystatesfl(fid_TR_NH4_soil)+micflx%RNH4MicbTransfSoil_vr
+  ystatesfl(cid_H1POB)=ystates0l(cid_H1POB)+ystatesfl(fid_TR_H1PO4_band_soil)+micflx%RH1PO4MicbTransfBand_vr
+  ystatesfl(cid_H1PO4)=ystates0l(cid_H1PO4)+ystatesfl(fid_TR_H1PO4_soil)+micflx%RH1PO4MicbTransfSoil_vr
+  ystatesfl(cid_H2POB)=ystates0l(cid_H2POB)+ystatesfl(fid_TR_H2PO4_band_soil)+micflx%RH2PO4MicbTransfBand_vr
+  ystatesfl(cid_H2PO4)=ystates0l(cid_H2PO4)+ystatesfl(fid_TR_H2PO4_soil)+micflx%RH2PO4MicbTransfSoil_vr
+  ystatesfl(cid_ZNO3B)=ystates0l(cid_ZNO3B)+micflx%RNO3MicbTransfBand_vr
+  ystatesfl(cid_ZNO3S)=ystates0l(cid_ZNO3S)+micflx%RNO3MicbTransfSoil_vr
+  ystatesfl(cid_ZNO2B)=ystates0l(cid_ZNO2B)+micflx%RNO2MicbTransfBand_vr
+  ystatesfl(cid_ZNO2S)=ystates0l(cid_ZNO2S)+micflx%RNO2MicbTransfSoil_vr
 
   ystatesfl(cid_CO2S) =ystates0l(cid_CO2S)-micflx%RCO2NetUptkMicb
   ystatesfl(cid_Z2OS) =ystates0l(cid_Z2OS)-micflx%RN2ONetUptkMicb
   ystatesfl(cid_OXYS) =ystates0l(cid_OXYS)-micflx%RO2UptkMicb
   ystatesfl(cid_H2GS) =ystates0l(cid_H2GS)-micflx%RH2NetUptkMicb
   ystatesfl(cid_CH4S) =ystates0l(cid_CH4S)-micflx%RCH4UptkAutor
-  ystatesfl(cid_Z2GS) =ystates0l(cid_Z2GS)-micflx%RN2NetUptkMicb-micflx%XN2GS
+  ystatesfl(cid_Z2GS) =ystates0l(cid_Z2GS)-micflx%RN2NetUptkMicb-micflx%MicrbN2Fix
   ystatesfl(cid_ZNFN0)=micstt%ZNFN0
   ystatesfl(cid_ZNFNI)=micstt%ZNFNI
 

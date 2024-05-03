@@ -88,12 +88,9 @@ implicit none
           IF(L.EQ.0.OR.L.GE.NU(NY,NX))THEN
              call MicBGC1Layer(I,J,L,NY,NX)
           ELSE
-            trcg_RMicbTransf_vr(idg_CO2,L,NY,NX)=0.0_r8
-            trcg_RMicbTransf_vr(idg_CH4,L,NY,NX)=0.0_r8
-            trcg_RMicbTransf_vr(idg_H2,L,NY,NX)=0.0_r8
-            trcg_RMicbTransf_vr(idg_O2,L,NY,NX)=0.0_r8
-            trcg_RMicbTransf_vr(idg_N2,L,NY,NX)=0.0_r8
-            trcg_RMicbTransf_vr(idg_N2O,L,NY,NX)=0.0_r8
+
+            trcg_RMicbTransf_vr(idg_beg:idg_NH3-1,L,NY,NX)=0.0_r8
+
             RNutMicbTransf_vr(ids_NH4,L,NY,NX)=0.0_r8
             RNutMicbTransf_vr(ids_NO3,L,NY,NX)=0.0_r8
             RNutMicbTransf_vr(ids_NO2,L,NY,NX)=0.0_r8
@@ -110,22 +107,10 @@ implicit none
           call DownwardMixOM(I,J,L,NY,NX)
 
         ELSE
-          trcg_RMicbTransf_vr(idg_CO2,L,NY,NX)=0.0_r8
-          trcg_RMicbTransf_vr(idg_CH4,L,NY,NX)=0.0_r8
-          trcg_RMicbTransf_vr(idg_H2,L,NY,NX)=0.0_r8
-          trcg_RMicbTransf_vr(idg_O2,L,NY,NX)=0.0_r8
-          trcg_RMicbTransf_vr(idg_N2,L,NY,NX)=0.0_r8
-          trcg_RMicbTransf_vr(idg_N2O,L,NY,NX)=0.0_r8
-          RNutMicbTransf_vr(ids_NH4,L,NY,NX)=0.0_r8
-          RNutMicbTransf_vr(ids_NO3,L,NY,NX)=0.0_r8
-          RNutMicbTransf_vr(ids_NO2,L,NY,NX)=0.0_r8
-          RNutMicbTransf_vr(ids_H2PO4,L,NY,NX)=0.0_r8
-          RNutMicbTransf_vr(ids_H1PO4,L,NY,NX)=0.0_r8
-          RNutMicbTransf_vr(ids_NH4B,L,NY,NX)=0.0_r8
-          RNutMicbTransf_vr(ids_NO3B,L,NY,NX)=0.0_r8
-          RNutMicbTransf_vr(ids_NO2B,L,NY,NX)=0.0_r8
-          RNutMicbTransf_vr(ids_H2PO4B,L,NY,NX)=0.0_r8
-          RNutMicbTransf_vr(ids_H1PO4B,L,NY,NX)=0.0_r8
+          trcg_RMicbTransf_vr(idg_beg:idg_NH3-1,L,NY,NX)=0.0_r8
+          RNutMicbTransf_vr(ids_nut_beg:ids_nuts_end,L,NY,NX)=0.0_r8
+
+          RNutMicbTransf_vr(ids_NH4B:ids_nutb_end,L,NY,NX)=0.0_r8
           Micb_N2Fixation_vr(L,NY,NX)=0.0_r8
         ENDIF
       ENDDO D998
@@ -367,25 +352,25 @@ implicit none
   NumMicbFunGrupsPerCmplx=micpar%NumMicbFunGrupsPerCmplx
   jcplx=micpar%jcplx
 
-  trcg_RMicbTransf_vr(idg_CO2,L,NY,NX) =micflx%RCO2NetUptkMicb
-  trcg_RMicbTransf_vr(idg_CH4,L,NY,NX) =micflx%RCH4UptkAutor
-  trcg_RMicbTransf_vr(idg_H2,L,NY,NX) =micflx%RH2NetUptkMicb
-  trcg_RMicbTransf_vr(idg_O2,L,NY,NX)=micflx%RO2UptkMicb
-  trcg_RMicbTransf_vr(idg_N2,L,NY,NX)  =micflx%RN2NetUptkMicb
-  trcg_RMicbTransf_vr(idg_N2O,L,NY,NX)  =micflx%RN2ONetUptkMicb
-  RNutMicbTransf_vr(ids_NH4,L,NY,NX) =micflx%RNH4MicbTransf_vr
-  RNutMicbTransf_vr(ids_NO3,L,NY,NX) =micflx%RNO3MicbTransf_vr
-  RNutMicbTransf_vr(ids_NO2,L,NY,NX) =micflx%RNO2MicbTransf_vr
-  RNutMicbTransf_vr(ids_H2PO4,L,NY,NX) =micflx%RH2PO4MicbTransf_vr
-  RNutMicbTransf_vr(ids_H1PO4,L,NY,NX) =micflx%RH1PO4MicbTransf_vr
-  RNutMicbTransf_vr(ids_NH4B,L,NY,NX) =micflx%XNH4B
-  RNutMicbTransf_vr(ids_NO3B,L,NY,NX) =micflx%XNO3B
-  RNutMicbTransf_vr(ids_NO2B,L,NY,NX) =micflx%XNO2B
-  RNutMicbTransf_vr(ids_H2PO4B,L,NY,NX) =micflx%XH2BS
-  RNutMicbTransf_vr(ids_H1PO4B,L,NY,NX) =micflx%XH1BS
-  Micb_N2Fixation_vr(L,NY,NX) =micflx%XN2GS
-  RNO2DmndSoilChemo_vr(L,NY,NX)=micflx%RNO2DmndSoilChemo
-  RNO2DmndBandChemo_vr(L,NY,NX)=micflx%RNO2DmndBandChemo
+  trcg_RMicbTransf_vr(idg_CO2,L,NY,NX)  = micflx%RCO2NetUptkMicb
+  trcg_RMicbTransf_vr(idg_CH4,L,NY,NX)  = micflx%RCH4UptkAutor
+  trcg_RMicbTransf_vr(idg_H2,L,NY,NX)   = micflx%RH2NetUptkMicb
+  trcg_RMicbTransf_vr(idg_O2,L,NY,NX)   = micflx%RO2UptkMicb
+  trcg_RMicbTransf_vr(idg_N2,L,NY,NX)   = micflx%RN2NetUptkMicb
+  trcg_RMicbTransf_vr(idg_N2O,L,NY,NX)  = micflx%RN2ONetUptkMicb
+  RNutMicbTransf_vr(ids_NH4,L,NY,NX)    = micflx%RNH4MicbTransfSoil_vr
+  RNutMicbTransf_vr(ids_NO3,L,NY,NX)    = micflx%RNO3MicbTransfSoil_vr
+  RNutMicbTransf_vr(ids_NO2,L,NY,NX)    = micflx%RNO2MicbTransfSoil_vr
+  RNutMicbTransf_vr(ids_H2PO4,L,NY,NX)  = micflx%RH2PO4MicbTransfSoil_vr
+  RNutMicbTransf_vr(ids_H1PO4,L,NY,NX)  = micflx%RH1PO4MicbTransfSoil_vr
+  RNutMicbTransf_vr(ids_NH4B,L,NY,NX)   = micflx%RNH4MicbTransfBand_vr
+  RNutMicbTransf_vr(ids_NO3B,L,NY,NX)   = micflx%RNO3MicbTransfBand_vr
+  RNutMicbTransf_vr(ids_NO2B,L,NY,NX)   = micflx%RNO2MicbTransfBand_vr
+  RNutMicbTransf_vr(ids_H2PO4B,L,NY,NX) = micflx%RH2PO4MicbTransfBand_vr
+  RNutMicbTransf_vr(ids_H1PO4B,L,NY,NX) = micflx%RH1PO4MicbTransfBand_vr
+  Micb_N2Fixation_vr(L,NY,NX)           = micflx%MicrbN2Fix
+  RNO2DmndSoilChemo_vr(L,NY,NX)         = micflx%RNO2DmndSoilChemo
+  RNO2DmndBandChemo_vr(L,NY,NX)         = micflx%RNO2DmndBandChemo
   NetNH4Mineralize_col(NY,NX)=NetNH4Mineralize_col(NY,NX)+micflx%NetNH4Mineralize
   NetPO4Mineralize_col(NY,NX)=NetPO4Mineralize_col(NY,NX)+micflx%NetPO4Mineralize
   DO idom=idom_beg,idom_end
