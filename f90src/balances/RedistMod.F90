@@ -790,6 +790,7 @@ module RedistMod
 
   ORGC_vr(0,NY,NX)=DES(ielmc)
   ORGN_vr(0,NY,NX)=DES(ielmn)
+  ORGP_vr(0,NY,NX)=DES(ielmp)
   OMLitrC_vr(0,NY,NX)=DES(ielmc)
 
   DO NE=1,NumPlantChemElms

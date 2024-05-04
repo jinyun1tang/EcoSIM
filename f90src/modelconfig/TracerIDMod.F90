@@ -200,9 +200,9 @@ implicit none
   idom_don=addone(idom_end)
   idom_dop=addone(idom_end)
   idom_acetate=addone(idom_end)
-  
+
+  idsalt_beg=1;idsalt_end=0  
   if(lsalt_model)then
-    idsalt_beg=1;idsalt_end=0
     idsalt_Al=addone(idsalt_end)
     idsalt_Fe=addone(idsalt_end)
     idsalt_Hp=addone(idsalt_end)

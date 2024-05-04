@@ -86,6 +86,8 @@ implicit none
   real(r8),pointer   :: h1D_CO2_FLX_col(:)        !UCO2G(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_tMICRO_C_col(:)        !TOMET(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_OMC_LITR_col(:)       !ORGC_vr(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total residual C
+  real(r8),pointer   :: h1D_OMN_LITR_col(:)       !ORGN_vr(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total residual N
+  real(r8),pointer   :: h1D_OMP_LITR_col(:)       !ORGP_vr(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total residual P
   real(r8),pointer   :: h1D_SUR_DOC_FLX_col(:)    !HydroSufDOCFlx_col(NY,NX)/TAREA
   real(r8),pointer   :: h1D_SUB_DOC_FLX_col(:)    !HydroSubsDOCFlx_col(NY,NX)/TAREA
   real(r8),pointer   :: h1D_SUR_DIC_FLX_col(:)    !HydroSufDICFlx_col(NY,NX)/TAREA
@@ -362,6 +364,9 @@ implicit none
   allocate(this%h1D_CO2_FLX_col(beg_col:end_col))         ;this%h1D_CO2_FLX_col(:)=spval
   allocate(this%h1D_tMICRO_C_col(beg_col:end_col))        ;this%h1D_tMICRO_C_col(:)=spval
   allocate(this%h1D_OMC_LITR_col(beg_col:end_col))        ;this%h1D_OMC_LITR_col(:)=spval
+  allocate(this%h1D_OMN_LITR_col(beg_col:end_col))        ;this%h1D_OMN_LITR_col(:)=spval
+  allocate(this%h1D_OMP_LITR_col(beg_col:end_col))        ;this%h1D_OMP_LITR_col(:)=spval
+
   allocate(this%h1D_ATM_CO2_col(beg_col:end_col))         ;this%h1D_ATM_CO2_col(:)=spval
   allocate(this%h1D_ATM_CH4_col(beg_col:end_col))         ;this%h1D_ATM_CH4_col(:)=spval
   allocate(this%h1D_NBP_col(beg_col:end_col))             ;this%h1D_NBP_col(:)=spval
@@ -784,6 +789,15 @@ implicit none
   data1d_ptr => this%h1D_OMC_LITR_col(beg_col:end_col)   
   call hist_addfld1d(fname='OMC_LITR',units='gC/m2',avgflag='A',&
     long_name='total litter residual C',ptr_col=data1d_ptr)      
+
+  data1d_ptr => this%h1D_OMN_LITR_col(beg_col:end_col)   
+  call hist_addfld1d(fname='OMN_LITR',units='gN/m2',avgflag='A',&
+    long_name='total litter residual N',ptr_col=data1d_ptr)      
+
+  data1d_ptr => this%h1D_OMP_LITR_col(beg_col:end_col)   
+  call hist_addfld1d(fname='OMP_LITR',units='gP/m2',avgflag='A',&
+    long_name='total litter residual P',ptr_col=data1d_ptr)      
+
 
   data1d_ptr => this%h1D_ATM_CO2_col(beg_col:end_col)   
   call hist_addfld1d(fname='ATM_CO2',units='umol/mol',avgflag='A',&
@@ -1627,6 +1641,8 @@ implicit none
       this%h1D_CO2_FLX_col(ncol)     = SurfGasFlx_col(idg_CO2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tMICRO_C_col(ncol)     = TOMET(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_OMC_LITR_col(ncol)    = ORGC_vr(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_OMN_LITR_col(ncol)    = ORGN_vr(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_OMP_LITR_col(ncol)    = ORGP_vr(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_ATM_CO2_col(ncol)     = CO2E(NY,NX)
       this%h1D_ATM_CH4_col(ncol)     = CH4E(NY,NX)
       this%h1D_NBP_col(ncol)         = Eco_NBP_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)

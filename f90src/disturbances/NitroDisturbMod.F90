@@ -348,6 +348,7 @@ module NitroDisturbMod
           HydroSufDOCFlx_col(NY,NX)=HydroSufDOCFlx_col(NY,NX)+OMelm(ielmc)
           HydroSufDONFlx_col(NY,NX)=HydroSufDONFlx_col(NY,NX)+OMelm(ielmn)
           HydroSufDOPFlx_col(NY,NX)=HydroSufDOPFlx_col(NY,NX)+OMelm(ielmp)
+          
           Eco_NBP_col(NY,NX)=Eco_NBP_col(NY,NX)-OMelm(ielmc)
         ELSEIF(ITILL(I,NY,NX).EQ.22)THEN
           CO2GIN=CO2GIN-OMelm(ielmc)

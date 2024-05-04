@@ -20,6 +20,7 @@ module TillageMixMod
   USE EcoSimSumDataType
   use EcoSIMConfig , only : ndbiomcp => NumDeadMicrbCompts
   use UnitMod, only : units
+  use nitrosMod, only : sumLitrOMLayL,sumORGMLayL
   implicit none
   character(len=*),private, parameter :: mod_filename =&
      __FILE__
@@ -34,23 +35,13 @@ module TillageMixMod
 
   integer :: K,N,M,L,LL,NGL,NTS
 
-  REAL(R8) :: TOSGC(jsken,0:micpar%NumOfLitrCmplxs),TOSGA(jsken,0:micpar%NumOfLitrCmplxs)
-  real(r8) :: TOSGN(jsken,0:micpar%NumOfLitrCmplxs),TOSGP(jsken,0:micpar%NumOfLitrCmplxs)
-  real(r8) :: TORXC(ndbiomcp,0:micpar%NumOfLitrCmplxs)
-  real(r8) :: TORXN(ndbiomcp,0:micpar%NumOfLitrCmplxs),TORXP(ndbiomcp,0:micpar%NumOfLitrCmplxs)
-  real(r8) :: TOQGC(0:micpar%NumOfLitrCmplxs),TOQGN(0:micpar%NumOfLitrCmplxs)
-  real(r8) :: TOQGP(0:micpar%NumOfLitrCmplxs),TOQHC(0:micpar%NumOfLitrCmplxs)
-  real(r8) :: TOQHN(0:micpar%NumOfLitrCmplxs),TOQHP(0:micpar%NumOfLitrCmplxs)
-  real(r8) :: TOHGC(0:micpar%NumOfLitrCmplxs),TOHGN(0:micpar%NumOfLitrCmplxs)
-  real(r8) :: TOHGP(0:micpar%NumOfLitrCmplxs),TOHGA(0:micpar%NumOfLitrCmplxs)
-  real(r8) :: TOQGA(0:micpar%NumOfLitrCmplxs),TOQHA(0:micpar%NumOfLitrCmplxs)
+  REAL(R8) :: TOSGE(1:NumPlantChemElms,jsken,0:micpar%NumOfLitrCmplxs),TOSGA(jsken,0:micpar%NumOfLitrCmplxs)
+  real(r8) :: TORXE(1:NumPlantChemElms,ndbiomcp,0:micpar%NumOfLitrCmplxs)
+  real(r8) :: TDOMG(idom_beg:idom_end,0:micpar%NumOfLitrCmplxs),TDOMH(idom_beg:idom_end,0:micpar%NumOfLitrCmplxs)
+  real(r8) :: TDOMHG(idom_beg:idom_end,0:micpar%NumOfLitrCmplxs)
 
-  real(r8) :: TOMGCff(1:NumLiveAutoBioms)
-  real(r8) :: TOMGNff(1:NumLiveAutoBioms)
-  real(r8) :: TOMGPff(1:NumLiveAutoBioms)
-  real(r8) :: TOMGC(1:NumLiveHeterBioms,1:jcplx)
-  real(r8) :: TOMGN(1:NumLiveHeterBioms,1:jcplx)
-  real(r8) :: TOMGP(1:NumLiveHeterBioms,1:jcplx)
+  real(r8) :: TOMGAutor(1:NumPlantChemElms,1:NumLiveAutoBioms)
+  real(r8) :: TBOMGE(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx)
   REAL(R8) :: TmBOMHeter(NumPlantChemElms,NumLiveHeterBioms,1:jcplx)
   REAL(R8) :: TmBOMAutor(NumPlantChemElms,NumLiveAutoBioms)
   real(r8) :: TORM(NumPlantChemElms,ndbiomcp,1:jcplx)
@@ -80,7 +71,7 @@ module TillageMixMod
   real(r8) :: TNFNIH,TfertN_soil(ifertn_beg:ifertn_end)
   real(r8) :: TENGYR,TVOLW,TENGY
   real(r8) :: ENGYV,ENGYL,ENGYM
-  real(r8) :: DC,DN,DP,OC,ON,OP
+  real(r8) :: ORGM(1:NumPlantChemElms),litrOM(1:NumPlantChemElms)
   real(r8) :: TVOLI,HFLXD
   real(r8) :: FI,TI,TX,TL
   integer  :: NTX,NTP,NTG,NTSA,NTN,idom,MID,NE
@@ -153,26 +144,15 @@ module TillageMixMod
 !     ENDIF
     CORP0=1.0_r8-XCORP0   !fraction mixed into next layer
 
-    DC=0.0_r8
-    DN=0.0_r8
-    DP=0.0_r8
-
     DO  K=1,micpar%NumOfLitrCmplxs
       DO  N=1,NumMicbFunGrupsPerCmplx
         DO NGL=JGnio(N),JGnfo(N)
           DO  M=1,nlbiomcp
             MID=micpar%get_micb_id(M,NGL)
-            TOMGC(MID,K)=mBOMHeter_vr(ielmc,MID,K,0,NY,NX)*CORP0
-            TOMGN(MID,K)=mBOMHeter_vr(ielmn,MID,K,0,NY,NX)*CORP0
-            TOMGP(MID,K)=mBOMHeter_vr(ielmp,MID,K,0,NY,NX)*CORP0
-
-            mBOMHeter_vr(ielmc,MID,K,0,NY,NX)=mBOMHeter_vr(ielmc,MID,K,0,NY,NX)*XCORP0
-            mBOMHeter_vr(ielmn,MID,K,0,NY,NX)=mBOMHeter_vr(ielmn,MID,K,0,NY,NX)*XCORP0
-            mBOMHeter_vr(ielmp,MID,K,0,NY,NX)=mBOMHeter_vr(ielmp,MID,K,0,NY,NX)*XCORP0
-
-            DC=DC+mBOMHeter_vr(ielmc,MID,K,0,NY,NX)
-            DN=DN+mBOMHeter_vr(ielmn,MID,K,0,NY,NX)
-            DP=DP+mBOMHeter_vr(ielmp,MID,K,0,NY,NX)
+            DO NE=1,NumPlantChemElms
+              TBOMGE(NE,MID,K)=mBOMHeter_vr(NE,MID,K,0,NY,NX)*CORP0
+              mBOMHeter_vr(NE,MID,K,0,NY,NX)=mBOMHeter_vr(NE,MID,K,0,NY,NX)*XCORP0
+            ENDDO
           enddo
         enddo
       ENDDO
@@ -182,78 +162,46 @@ module TillageMixMod
       DO NGL=JGniA(N),JGnfA(N)
         DO  M=1,nlbiomcp
           MID=micpar%get_micb_id(M,NGL)
-          TOMGCff(MID)=mBOMAutor_vr(ielmc,MID,0,NY,NX)*CORP0
-          TOMGNff(MID)=mBOMAutor_vr(ielmn,MID,0,NY,NX)*CORP0
-          TOMGPff(MID)=mBOMAutor_vr(ielmp,MID,0,NY,NX)*CORP0
-
-          mBOMAutor_vr(ielmc,MID,0,NY,NX)=mBOMAutor_vr(ielmc,MID,0,NY,NX)*XCORP0
-          mBOMAutor_vr(ielmn,MID,0,NY,NX)=mBOMAutor_vr(ielmn,MID,0,NY,NX)*XCORP0
-          mBOMAutor_vr(ielmp,MID,0,NY,NX)=mBOMAutor_vr(ielmp,MID,0,NY,NX)*XCORP0
-
-          DC=DC+mBOMAutor_vr(ielmc,MID,0,NY,NX)
-          DN=DN+mBOMAutor_vr(ielmn,MID,0,NY,NX)
-          DP=DP+mBOMAutor_vr(ielmp,MID,0,NY,NX)
+          DO NE=1,NumPlantChemElms
+            TOMGAutor(NE,MID)=mBOMAutor_vr(NE,MID,0,NY,NX)*CORP0
+            mBOMAutor_vr(NE,MID,0,NY,NX)=mBOMAutor_vr(NE,MID,0,NY,NX)*XCORP0
+          ENDDO
         enddo
       enddo
     ENDDO
 
     DO K=1,micpar%NumOfLitrCmplxs
       DO M=1,ndbiomcp
-        TORXC(M,K)=OMBioResdu_vr(ielmc,M,K,0,NY,NX)*CORP0
-        TORXN(M,K)=OMBioResdu_vr(ielmn,M,K,0,NY,NX)*CORP0
-        TORXP(M,K)=OMBioResdu_vr(ielmp,M,K,0,NY,NX)*CORP0
+        DO NE=1,NumPlantChemElms
+          TORXE(NE,M,K)=OMBioResdu_vr(NE,M,K,0,NY,NX)*CORP0
+          OMBioResdu_vr(NE,M,K,0,NY,NX)=OMBioResdu_vr(NE,M,K,0,NY,NX)*XCORP0
+        ENDDO
 
-        OMBioResdu_vr(ielmc,M,K,0,NY,NX)=OMBioResdu_vr(ielmc,M,K,0,NY,NX)*XCORP0
-        OMBioResdu_vr(ielmn,M,K,0,NY,NX)=OMBioResdu_vr(ielmn,M,K,0,NY,NX)*XCORP0
-        OMBioResdu_vr(ielmp,M,K,0,NY,NX)=OMBioResdu_vr(ielmp,M,K,0,NY,NX)*XCORP0
-
-        DC=DC+OMBioResdu_vr(ielmc,M,K,0,NY,NX)
-        DN=DN+OMBioResdu_vr(ielmn,M,K,0,NY,NX)
-        DP=DP+OMBioResdu_vr(ielmp,M,K,0,NY,NX)
       ENDDO
-      TOQGC(K)=DOM(idom_doc,K,0,NY,NX)*CORP0
-      TOQGN(K)=DOM(idom_don,K,0,NY,NX)*CORP0
-      TOQGP(K)=DOM(idom_dop,K,0,NY,NX)*CORP0
-      TOQGA(K)=DOM(idom_acetate,K,0,NY,NX)*CORP0
-      TOQHC(K)=DOM_Macp(idom_doc,K,0,NY,NX)*CORP0
-      TOQHN(K)=DOM_Macp(idom_don,K,0,NY,NX)*CORP0
-      TOQHP(K)=DOM_Macp(idom_dop,K,0,NY,NX)*CORP0
-      TOQHA(K)=DOM_Macp(idom_acetate,K,0,NY,NX)*CORP0
-      TOHGC(K)=SorbedOM_vr(ielmc,K,0,NY,NX)*CORP0
-      TOHGN(K)=SorbedOM_vr(ielmn,K,0,NY,NX)*CORP0
-      TOHGP(K)=SorbedOM_vr(ielmp,K,0,NY,NX)*CORP0
-      TOHGA(K)=SorbedOM_vr(idom_acetate,K,0,NY,NX)*CORP0
+
+      DO idom=idom_beg,idom_end
+        TDOMG(idom,K)=DOM(idom,K,0,NY,NX)*CORP0
+        TDOMH(idom,K)=DOM_Macp(idom,K,0,NY,NX)*CORP0
+        TDOMHG(idom,K)=SorbedOM_vr(idom,K,0,NY,NX)*CORP0
   !
+
   !     REDUCE SURFACE RESIDUE STATE VARIABLES FOR INCORPORATION
   !
-      DOM(idom_doc,K,0,NY,NX)=DOM(idom_doc,K,0,NY,NX)*XCORP0
-      DOM(idom_don,K,0,NY,NX)=DOM(idom_don,K,0,NY,NX)*XCORP0
-      DOM(idom_dop,K,0,NY,NX)=DOM(idom_dop,K,0,NY,NX)*XCORP0
-      DOM(idom_acetate,K,0,NY,NX)=DOM(idom_acetate,K,0,NY,NX)*XCORP0
-      DOM_Macp(idom_doc,K,0,NY,NX)=DOM_Macp(idom_doc,K,0,NY,NX)*XCORP0
-      DOM_Macp(idom_don,K,0,NY,NX)=DOM_Macp(idom_don,K,0,NY,NX)*XCORP0
-      DOM_Macp(idom_dop,K,0,NY,NX)=DOM_Macp(idom_dop,K,0,NY,NX)*XCORP0
-      DOM_Macp(idom_acetate,K,0,NY,NX)=DOM_Macp(idom_acetate,K,0,NY,NX)*XCORP0
-      SorbedOM_vr(ielmc,K,0,NY,NX)=SorbedOM_vr(ielmc,K,0,NY,NX)*XCORP0
-      SorbedOM_vr(ielmn,K,0,NY,NX)=SorbedOM_vr(ielmn,K,0,NY,NX)*XCORP0
-      SorbedOM_vr(ielmp,K,0,NY,NX)=SorbedOM_vr(ielmp,K,0,NY,NX)*XCORP0
-      SorbedOM_vr(idom_acetate,K,0,NY,NX)=SorbedOM_vr(idom_acetate,K,0,NY,NX)*XCORP0
-      DC=DC+DOM(idom_doc,K,0,NY,NX)+DOM_Macp(idom_doc,K,0,NY,NX)+SorbedOM_vr(ielmc,K,0,NY,NX) &
-        +DOM(idom_acetate,K,0,NY,NX)+DOM_Macp(idom_acetate,K,0,NY,NX)+SorbedOM_vr(idom_acetate,K,0,NY,NX)
-      DN=DN+DOM(idom_don,K,0,NY,NX)+DOM_Macp(idom_don,K,0,NY,NX)+SorbedOM_vr(ielmn,K,0,NY,NX)
-      DP=DP+DOM(idom_dop,K,0,NY,NX)+DOM_Macp(idom_dop,K,0,NY,NX)+SorbedOM_vr(ielmp,K,0,NY,NX)
+        DOM(idom,K,0,NY,NX)=DOM(idom,K,0,NY,NX)*XCORP0
+        
+        DOM_Macp(idom,K,0,NY,NX)=DOM_Macp(idom,K,0,NY,NX)*XCORP0
+        SorbedOM_vr(idom,K,0,NY,NX)=SorbedOM_vr(idom,K,0,NY,NX)*XCORP0
+      enddo 
+
       DO  M=1,jsken
-        TOSGC(M,K)=SolidOM_vr(ielmc,M,K,0,NY,NX)*CORP0
-        TOSGA(M,K)=SolidOMAct_vr(M,K,0,NY,NX)*CORP0
-        TOSGN(M,K)=SolidOM_vr(ielmn,M,K,0,NY,NX)*CORP0
-        TOSGP(M,K)=SolidOM_vr(ielmp,M,K,0,NY,NX)*CORP0
-        SolidOM_vr(ielmc,M,K,0,NY,NX)=SolidOM_vr(ielmc,M,K,0,NY,NX)*XCORP0
+        TOSGA(M,K)=SolidOMAct_vr(M,K,0,NY,NX)*CORP0      
         SolidOMAct_vr(M,K,0,NY,NX)=SolidOMAct_vr(M,K,0,NY,NX)*XCORP0
-        SolidOM_vr(ielmn,M,K,0,NY,NX)=SolidOM_vr(ielmn,M,K,0,NY,NX)*XCORP0
-        SolidOM_vr(ielmp,M,K,0,NY,NX)=SolidOM_vr(ielmp,M,K,0,NY,NX)*XCORP0
-        DC=DC+SolidOM_vr(ielmc,M,K,0,NY,NX)
-        DN=DN+SolidOM_vr(ielmn,M,K,0,NY,NX)
-        DP=DP+SolidOM_vr(ielmp,M,K,0,NY,NX)
+
+        DO NE=1,NumPlantChemElms
+          TOSGE(NE,M,K)=SolidOM_vr(NE,M,K,0,NY,NX)*CORP0
+          SolidOM_vr(NE,M,K,0,NY,NX)=SolidOM_vr(NE,M,K,0,NY,NX)*XCORP0
+        ENDDO
+
       ENDDO
     ENDDO
 
@@ -284,10 +232,14 @@ module TillageMixMod
     HEATIN=HEATIN-HFLXD
     HeatStoreLandscape=HeatStoreLandscape-HFLXD
     TENGYR=cpw*TVOLWR*TKS(0,NY,NX)
-    ORGC_vr(0,NY,NX)=DC
-    ORGN_vr(0,NY,NX)=DN
-    ORGP_vr(0,NY,NX)=DP
-    OMLitrC_vr(0,NY,NX)=DC
+
+    call sumLitrOMLayL(0,NY,NX,litrOM)
+
+    ORGC_vr(0,NY,NX)=litrOM(ielmc)
+    ORGN_vr(0,NY,NX)=litrOM(ielmn)
+    ORGP_vr(0,NY,NX)=litrOM(ielmp)
+    OMLitrC_vr(0,NY,NX)=litrOM(ielmc)
+
 
     DO NTS=ids_beg,idg_NH3
       trc_solml_vr(NTS,0,NY,NX)=trc_solml_vr(NTS,0,NY,NX)*XCORP0
@@ -303,11 +255,11 @@ module TillageMixMod
       trcx_solml(idx_OHe,0,NY,NX)=trcx_solml(idx_OHe,0,NY,NX)*XCORP0
     ENDDO
 
-    trcp_salml(idsp_AlPO4,0,NY,NX)=trcp_salml(idsp_AlPO4,0,NY,NX)*XCORP0
-    trcp_salml(idsp_FePO4,0,NY,NX)=trcp_salml(idsp_FePO4,0,NY,NX)*XCORP0
-    trcp_salml(idsp_CaHPO4,0,NY,NX)=trcp_salml(idsp_CaHPO4,0,NY,NX)*XCORP0
-    trcp_salml(idsp_HA,0,NY,NX)=trcp_salml(idsp_HA,0,NY,NX)*XCORP0
-    trcp_salml(idsp_CaH4P2O8,0,NY,NX)=trcp_salml(idsp_CaH4P2O8,0,NY,NX)*XCORP0
+    trcp_salml(idsp_AlPO4,0,NY,NX)    = trcp_salml(idsp_AlPO4,0,NY,NX)*XCORP0
+    trcp_salml(idsp_FePO4,0,NY,NX)    = trcp_salml(idsp_FePO4,0,NY,NX)*XCORP0
+    trcp_salml(idsp_CaHPO4,0,NY,NX)   = trcp_salml(idsp_CaHPO4,0,NY,NX)*XCORP0
+    trcp_salml(idsp_HA,0,NY,NX)       = trcp_salml(idsp_HA,0,NY,NX)*XCORP0
+    trcp_salml(idsp_CaH4P2O8,0,NY,NX) = trcp_salml(idsp_CaH4P2O8,0,NY,NX)*XCORP0
 
     DO NTN=ifertn_beg,ifertn_end
       FertN_soil_vr(NTN,0,NY,NX)=FertN_soil_vr(NTN,0,NY,NX)*XCORP0
@@ -443,13 +395,13 @@ module TillageMixMod
         FI=TL/DCORPZ
         TI=TL/DLYR(3,L,NY,NX)
         TX=1.0_r8-TI
-        SoiBulkDensityt0(L,NY,NX)=TI*(SoiBulkDensityt0(L,NY,NX)+CORP*(TBKDX-SoiBulkDensityt0(L,NY,NX))) &
+        SoiBulkDensityt0(L,NY,NX) = TI*(SoiBulkDensityt0(L,NY,NX)+CORP*(TBKDX-SoiBulkDensityt0(L,NY,NX))) &
           +TX*SoiBulkDensityt0(L,NY,NX)
-        FieldCapacity(L,NY,NX)=TI*(FieldCapacity(L,NY,NX)+CORP*(TFC-FieldCapacity(L,NY,NX)))+TX*FieldCapacity(L,NY,NX)
-        WiltPoint(L,NY,NX)=TI*(WiltPoint(L,NY,NX)+CORP*(TWP-WiltPoint(L,NY,NX)))+TX*WiltPoint(L,NY,NX)
-        SatHydroCondVert(L,NY,NX)=TI*(SatHydroCondVert(L,NY,NX)+CORP*(TSatHydroCondVert-SatHydroCondVert(L,NY,NX)))&
+        FieldCapacity(L,NY,NX)    = TI*(FieldCapacity(L,NY,NX)+CORP*(TFC-FieldCapacity(L,NY,NX)))+TX*FieldCapacity(L,NY,NX)
+        WiltPoint(L,NY,NX)        = TI*(WiltPoint(L,NY,NX)+CORP*(TWP-WiltPoint(L,NY,NX)))+TX*WiltPoint(L,NY,NX)
+        SatHydroCondVert(L,NY,NX) = TI*(SatHydroCondVert(L,NY,NX)+CORP*(TSatHydroCondVert-SatHydroCondVert(L,NY,NX)))&
           +TX*SatHydroCondVert(L,NY,NX)
-        SatHydroCondHrzn(L,NY,NX)=TI*(SatHydroCondHrzn(L,NY,NX)+CORP*(TSCNH-SatHydroCondHrzn(L,NY,NX))) &
+        SatHydroCondHrzn(L,NY,NX) = TI*(SatHydroCondHrzn(L,NY,NX)+CORP*(TSCNH-SatHydroCondHrzn(L,NY,NX))) &
           +TX*SatHydroCondHrzn(L,NY,NX)
         SAND(L,NY,NX)=TI*SAND(L,NY,NX)+CORP*(FI*TSAND-TI*SAND(L,NY,NX))+TX*SAND(L,NY,NX)
         SILT(L,NY,NX)=TI*SILT(L,NY,NX)+CORP*(FI*TSILT-TI*SILT(L,NY,NX))+TX*SILT(L,NY,NX)
@@ -465,7 +417,7 @@ module TillageMixMod
         ENGYV=(cpw*(VLWatMicP(L,NY,NX)+VLWatMacP(L,NY,NX))+cpi*(VLiceMicP(L,NY,NX)+VLiceMacP(L,NY,NX)))*TKS(L,NY,NX)
         VLWatMicP(L,NY,NX)=TI*VLWatMicP(L,NY,NX)+CORP*(FI*TVOLW-TI*VLWatMicP(L,NY,NX))+TX*VLWatMicP(L,NY,NX)+FI*TVOLWR
         VLiceMicP(L,NY,NX)=TI*VLiceMicP(L,NY,NX)+CORP*(FI*TVOLI-TI*VLiceMicP(L,NY,NX))+TX*VLiceMicP(L,NY,NX)
-      VLWatMicPX(L,NY,NX)=VLWatMicP(L,NY,NX)
+        VLWatMicPX(L,NY,NX)=VLWatMicP(L,NY,NX)
 !     VLWatMicP(L,NY,NX)=VLWatMicP(L,NY,NX)+CORP*VLWatMacP(L,NY,NX)
 !     VLiceMicP(L,NY,NX)=VLiceMicP(L,NY,NX)+CORP*VLiceMacP(L,NY,NX)
 !     VLMicP(L,NY,NX)=VLMicP(L,NY,NX)+CORP*VLMacP(L,NY,NX)
@@ -478,6 +430,7 @@ module TillageMixMod
           +cpi*(VLiceMicP(L,NY,NX)+VLiceMacP(L,NY,NX))
         TKS(L,NY,NX)=(ENGYM+ENGYL)/VHeatCapacity(L,NY,NX)
         TCS(L,NY,NX)=units%Kelvin2Celcius(TKS(L,NY,NX))
+
         DO NTN=ifertn_beg,ifertn_end
           FertN_soil_vr(NTN,L,NY,NX)=TI*FertN_soil_vr(NTN,L,NY,NX) &
             +CORP*(FI*TfertN_soil(NTN)-TI*FertN_soil_vr(NTN,L,NY,NX))&
@@ -524,7 +477,7 @@ module TillageMixMod
             -TI*trc_gasml_vr(NTG,L,NY,NX))+TX*trc_gasml_vr(NTG,L,NY,NX)
         ENDDO
 
-        call MixSoluteH(L,NY,NX)
+        call MixSoluteMacpore(L,NY,NX)
 
         DO  K=1,jcplx
           DO  N=1,NumMicbFunGrupsPerCmplx
@@ -585,10 +538,10 @@ module TillageMixMod
           DO  N=1,NumMicbFunGrupsPerCmplx
             DO NGL=JGnio(N),JGnfo(N)
               DO M=1,nlbiomcp
-                MID=micpar%get_micb_id(M,NGL)                
-                mBOMHeter_vr(ielmc,MID,K,L,NY,NX)=mBOMHeter_vr(ielmc,MID,K,L,NY,NX)+FI*TOMGC(MID,K)
-                mBOMHeter_vr(ielmn,MID,K,L,NY,NX)=mBOMHeter_vr(ielmn,MID,K,L,NY,NX)+FI*TOMGN(MID,K)
-                mBOMHeter_vr(ielmp,MID,K,L,NY,NX)=mBOMHeter_vr(ielmp,MID,K,L,NY,NX)+FI*TOMGP(MID,K)
+                MID=micpar%get_micb_id(M,NGL)         
+                DO NE=1,NumPlantChemElms       
+                  mBOMHeter_vr(NE,MID,K,L,NY,NX)=mBOMHeter_vr(NE,MID,K,L,NY,NX)+FI*TBOMGE(NE,MID,K)
+                ENDDO
               enddo
             enddo
           ENDDO
@@ -598,119 +551,39 @@ module TillageMixMod
           DO NGL=JGniA(N),JGnfA(N)
             DO M=1,nlbiomcp
               MID=micpar%get_micb_id(M,NGL)
-              mBOMAutor_vr(ielmc,MID,L,NY,NX)=mBOMAutor_vr(ielmc,MID,L,NY,NX)+FI*TOMGCff(MID)
-              mBOMAutor_vr(ielmn,MID,L,NY,NX)=mBOMAutor_vr(ielmn,MID,L,NY,NX)+FI*TOMGNff(MID)
-              mBOMAutor_vr(ielmp,MID,L,NY,NX)=mBOMAutor_vr(ielmp,MID,L,NY,NX)+FI*TOMGPff(MID)
+              DO NE=1,NumPlantChemElms
+                mBOMAutor_vr(NE,MID,L,NY,NX)=mBOMAutor_vr(NE,MID,L,NY,NX)+FI*TOMGAutor(NE,MID)
+              ENDDO
             enddo
           enddo
         ENDDO
 
         DO K=1,micpar%NumOfLitrCmplxs
           DO  M=1,ndbiomcp
-            OMBioResdu_vr(ielmc,M,K,L,NY,NX)=OMBioResdu_vr(ielmc,M,K,L,NY,NX)+FI*TORXC(M,K)
-            OMBioResdu_vr(ielmn,M,K,L,NY,NX)=OMBioResdu_vr(ielmn,M,K,L,NY,NX)+FI*TORXN(M,K)
-            OMBioResdu_vr(ielmp,M,K,L,NY,NX)=OMBioResdu_vr(ielmp,M,K,L,NY,NX)+FI*TORXP(M,K)
+            DO NE=1,NumPlantChemElms
+              OMBioResdu_vr(NE,M,K,L,NY,NX)=OMBioResdu_vr(NE,M,K,L,NY,NX)+FI*TORXE(NE,M,K)
+            ENDDO
           ENDDO
-          DOM(idom_doc,K,L,NY,NX)=DOM(idom_doc,K,L,NY,NX)+FI*TOQGC(K)
-          DOM(idom_don,K,L,NY,NX)=DOM(idom_don,K,L,NY,NX)+FI*TOQGN(K)
-          DOM(idom_dop,K,L,NY,NX)=DOM(idom_dop,K,L,NY,NX)+FI*TOQGP(K)
-          DOM(idom_acetate,K,L,NY,NX)=DOM(idom_acetate,K,L,NY,NX)+FI*TOQGA(K)
-          DOM_Macp(idom_doc,K,L,NY,NX)=DOM_Macp(idom_doc,K,L,NY,NX)+FI*TOQHC(K)
-          DOM_Macp(idom_don,K,L,NY,NX)=DOM_Macp(idom_don,K,L,NY,NX)+FI*TOQHN(K)
-          DOM_Macp(idom_dop,K,L,NY,NX)=DOM_Macp(idom_dop,K,L,NY,NX)+FI*TOQHP(K)
-          DOM_Macp(idom_acetate,K,L,NY,NX)=DOM_Macp(idom_acetate,K,L,NY,NX)+FI*TOQHA(K)
-
-          SorbedOM_vr(ielmc,K,L,NY,NX)=SorbedOM_vr(ielmc,K,L,NY,NX)+FI*TOHGC(K)
-          SorbedOM_vr(ielmn,K,L,NY,NX)=SorbedOM_vr(ielmn,K,L,NY,NX)+FI*TOHGN(K)
-          SorbedOM_vr(ielmp,K,L,NY,NX)=SorbedOM_vr(ielmp,K,L,NY,NX)+FI*TOHGP(K)
-          SorbedOM_vr(idom_acetate,K,L,NY,NX)=SorbedOM_vr(idom_acetate,K,L,NY,NX)+FI*TOHGA(K)
+          DO idom=idom_beg,idom_end
+            DOM(idom,K,L,NY,NX)=DOM(idom,K,L,NY,NX)+FI*TDOMG(idom,K)
+            DOM_Macp(idom,K,L,NY,NX)=DOM_Macp(idom,K,L,NY,NX)+FI*TDOMH(idom,K)
+            SorbedOM_vr(idom,K,L,NY,NX)=SorbedOM_vr(idom,K,L,NY,NX)+FI*TDOMHG(idom,K)
+          ENDDO
           DO  M=1,jsken
-            SolidOM_vr(ielmc,M,K,L,NY,NX)=SolidOM_vr(ielmc,M,K,L,NY,NX)+FI*TOSGC(M,K)
             SolidOMAct_vr(M,K,L,NY,NX)=SolidOMAct_vr(M,K,L,NY,NX)+FI*TOSGA(M,K)
-            SolidOM_vr(ielmn,M,K,L,NY,NX)=SolidOM_vr(ielmn,M,K,L,NY,NX)+FI*TOSGN(M,K)
-            SolidOM_vr(ielmp,M,K,L,NY,NX)=SolidOM_vr(ielmp,M,K,L,NY,NX)+FI*TOSGP(M,K)
-          ENDDO
-        ENDDO
-        OC=0.0_r8
-        ON=0.0_r8
-        OP=0.0_r8
-        DC=0.0_r8
-        DN=0.0_r8
-        DP=0.0_r8
-
-        DO  K=1,jcplx
-          DO  N=1,NumMicbFunGrupsPerCmplx
-            DO NGL=JGnio(N),JGnfo(N)
-              DO  M=1,nlbiomcp
-                MID=micpar%get_micb_id(M,NGL)
-                OC=OC+mBOMHeter_vr(ielmc,MID,K,L,NY,NX)
-                ON=ON+mBOMHeter_vr(ielmn,MID,K,L,NY,NX)
-                OP=OP+mBOMHeter_vr(ielmp,MID,K,L,NY,NX)
-              enddo
-            enddo
-          enddo
-        ENDDO
-
-        DO  K=1,micpar%NumOfLitrCmplxs
-          DO  N=1,NumMicbFunGrupsPerCmplx
-            DO NGL=JGnio(N),JGnfo(N)
-              DO  M=1,nlbiomcp
-                MID=micpar%get_micb_id(M,NGL)
-                DC=DC+mBOMHeter_vr(ielmc,MID,K,L,NY,NX)
-                DN=DN+mBOMHeter_vr(ielmn,MID,K,L,NY,NX)
-                DP=DP+mBOMHeter_vr(ielmp,MID,K,L,NY,NX)
-              enddo
-            enddo
-          enddo
-        ENDDO
-        DO  N=1,NumMicbFunGrupsPerCmplx
-          DO NGL=JGniA(N),JGnfA(N)
-            DO  M=1,nlbiomcp
-              MID=micpar%get_micb_id(M,NGL)
-              OC=OC+mBOMAutor_vr(ielmc,MID,L,NY,NX)
-              ON=ON+mBOMAutor_vr(ielmn,MID,L,NY,NX)
-              OP=OP+mBOMAutor_vr(ielmp,MID,L,NY,NX)
-            enddo
-          enddo
-        enddo
-
-        DO K=1,jcplx
-          DO  M=1,ndbiomcp
-            OC=OC+OMBioResdu_vr(ielmc,M,K,L,NY,NX)
-            ON=ON+OMBioResdu_vr(ielmn,M,K,L,NY,NX)
-            OP=OP+OMBioResdu_vr(ielmp,M,K,L,NY,NX)
-            IF(micpar%is_litter(K))THEN
-              DC=DC+OMBioResdu_vr(ielmc,M,K,L,NY,NX)
-              DN=DN+OMBioResdu_vr(ielmn,M,K,L,NY,NX)
-              DP=DP+OMBioResdu_vr(ielmp,M,K,L,NY,NX)
-            ENDIF
-          ENDDO
-
-          OC=OC+DOM(idom_doc,K,L,NY,NX)+DOM_Macp(idom_doc,K,L,NY,NX)+SorbedOM_vr(ielmc,K,L,NY,NX) &
-            +DOM(idom_acetate,K,L,NY,NX)+DOM_Macp(idom_acetate,K,L,NY,NX)+SorbedOM_vr(idom_acetate,K,L,NY,NX)
-          ON=ON+DOM(idom_don,K,L,NY,NX)+DOM_Macp(idom_don,K,L,NY,NX)+SorbedOM_vr(ielmn,K,L,NY,NX)
-          OP=OP+DOM(idom_dop,K,L,NY,NX)+DOM_Macp(idom_dop,K,L,NY,NX)+SorbedOM_vr(ielmp,K,L,NY,NX)
-          IF(micpar%is_litter(K))THEN
-            DC=DC+DOM(idom_doc,K,L,NY,NX)+DOM_Macp(idom_doc,K,L,NY,NX)+SorbedOM_vr(ielmc,K,L,NY,NX) &
-                +DOM(idom_acetate,K,L,NY,NX)+DOM_Macp(idom_acetate,K,L,NY,NX)+SorbedOM_vr(idom_acetate,K,L,NY,NX)
-            DN=DN+DOM(idom_don,K,L,NY,NX)+DOM_Macp(idom_don,K,L,NY,NX)+SorbedOM_vr(ielmn,K,L,NY,NX)
-            DC=DC+DOM(idom_doc,K,L,NY,NX)+DOM_Macp(idom_doc,K,L,NY,NX)+SorbedOM_vr(ielmc,K,L,NY,NX)
-          ENDIF
-          DO  M=1,jsken
-            OC=OC+SolidOM_vr(ielmc,M,K,L,NY,NX)
-            ON=ON+SolidOM_vr(ielmn,M,K,L,NY,NX)
-            OP=OP+SolidOM_vr(ielmp,M,K,L,NY,NX)
-            IF(micpar%is_litter(K))THEN
-              DC=DC+SolidOM_vr(ielmc,M,K,L,NY,NX)
-              DN=DN+SolidOM_vr(ielmn,M,K,L,NY,NX)
-              DP=DP+SolidOM_vr(ielmp,M,K,L,NY,NX)
-            ENDIF
+            DO NE=1,NumPlantChemElms
+              SolidOM_vr(NE,M,K,L,NY,NX)=SolidOM_vr(NE,M,K,L,NY,NX)+FI*TOSGE(NE,M,K)
+            ENDDO
           ENDDO
         ENDDO
 
-        ORGC_vr(L,NY,NX)=OC
-        ORGN_vr(L,NY,NX)=ON
-        OMLitrC_vr(L,NY,NX)=DC
+        call sumORGMLayL(L,NY,NX,ORGM)
+
+        call sumLitrOMLayL(L,NY,NX,litrOM)
+
+        ORGC_vr(L,NY,NX)=ORGM(ielmc)
+        ORGN_vr(L,NY,NX)=ORGM(ielmn)
+        OMLitrC_vr(L,NY,NX)=litrOM(ielmc)
 
         DO NTS=ids_beg,idg_NH3
           trc_solml_vr(NTS,L,NY,NX)=trc_solml_vr(NTS,L,NY,NX)+FI*TS0_solml(NTS)
@@ -761,7 +634,7 @@ module TillageMixMod
 
 !--------------------------------------------------------------------------------
 
-  subroutine MixSoluteH(L,NY,NX)
+  subroutine MixSoluteMacpore(L,NY,NX)
   implicit none
   integer, intent(in) :: L,NY,NX
   integer :: NTS,NTSA
@@ -773,7 +646,7 @@ module TillageMixMod
   DO NTSA=idsalt_beg,idsalt_end
     trcSalt_soHml(ntsa,L,NY,NX)=XCORP(NY,NX)*trcSalt_soHml(ntsa,L,NY,NX)
   ENDDO
-  end subroutine MixSoluteH
+  end subroutine MixSoluteMacpore
 
 
 end module TillageMixMod
