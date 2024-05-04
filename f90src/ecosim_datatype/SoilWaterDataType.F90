@@ -10,7 +10,7 @@ module SoilWaterDataType
 
   real(r8),target,allocatable ::  THETP(:,:,:)                      !air concentration [m3 m-3]
   real(r8),target,allocatable ::  VLsoiAirP(:,:,:)                       !soil air content [m3 d-2]
-  real(r8),target,allocatable ::  THETW(:,:,:)                      !volumetric water content [m3 m-3]
+  real(r8),target,allocatable ::  THETW_vr(:,:,:)                      !volumetric water content [m3 m-3]
   real(r8),target,allocatable ::  THETI(:,:,:)                      !volumetric ice content [m3 m-3]
   real(r8),target,allocatable ::  THETWZ(:,:,:)                     !volumetric moblize water [m3 m-3]
   real(r8),target,allocatable ::  THETIZ(:,:,:)                     !volumetric mobile ice [m3 m-3]
@@ -74,7 +74,7 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  PSISoilAirEntry(:,:,:)                      !soil water potential at air entry, [Mpa]
   real(r8),target,allocatable ::  PSISoilOsmotic(:,:,:)                      !osmotic soil water potential , [Mpa]
   real(r8),target,allocatable ::  PSIGrav(:,:,:)                      !gravimetric soil water potential , [Mpa]
-  real(r8),target,allocatable ::  THETY(:,:,:)                      !air-dry water content, [m3 m-3]
+  real(r8),target,allocatable ::  THETY_vr(:,:,:)                      !air-dry water content, [m3 m-3]
   real(r8),target,allocatable ::  Theta_sat(:,:,:)                      !micropore class water content
   real(r8),target,allocatable ::  WaterFlowSoiMicPX(:,:,:,:)                     !unsaturated water flux , [m3 d-2 h-1]
   real(r8),target,allocatable ::  EvapoTransp_col(:,:)              !evapotranspiration
@@ -108,7 +108,7 @@ module SoilWaterDataType
   allocate(Qinflx2Soil_col(JY,JX)); Qinflx2Soil_col=0._r8
   allocate(THETP(0:JZ,JY,JX));  THETP=0._r8
   allocate(VLsoiAirP(0:JZ,JY,JX));   VLsoiAirP=0._r8
-  allocate(THETW(0:JZ,JY,JX));  THETW=0._r8
+  allocate(THETW_vr(0:JZ,JY,JX));  THETW_vr=0._r8
   allocate(THETI(0:JZ,JY,JX));  THETI=0._r8
   allocate(THETWZ(0:JZ,JY,JX)); THETWZ=0._r8
   allocate(THETIZ(0:JZ,JY,JX)); THETIZ=0._r8
@@ -172,7 +172,7 @@ module SoilWaterDataType
   allocate(PSISoilAirEntry(0:JZ,JY,JX));  PSISoilAirEntry=0._r8
   allocate(PSISoilOsmotic(0:JZ,JY,JX));  PSISoilOsmotic=0._r8
   allocate(PSIGrav(0:JZ,JY,JX));  PSIGrav=0._r8
-  allocate(THETY(0:JZ,JY,JX));  THETY=0._r8
+  allocate(THETY_vr(0:JZ,JY,JX));  THETY_vr=0._r8
   allocate(Theta_sat(0:JZ,JY,JX));  Theta_sat=0._r8
   allocate(WaterFlowSoiMicPX(3,JD,JV,JH));   WaterFlowSoiMicPX=0._r8
   allocate(UEVAP(JY,JX));       UEVAP=0._r8
@@ -194,7 +194,7 @@ module SoilWaterDataType
   implicit none
   call destroy(THETP)
   call destroy(VLsoiAirP)
-  call destroy(THETW)
+  call destroy(THETW_vr)
   call destroy(THETI)
   call destroy(THETWZ)
   call destroy(THETIZ)
@@ -258,7 +258,7 @@ module SoilWaterDataType
   call destroy(PSISoilAirEntry)
   call destroy(PSISoilOsmotic)
   call destroy(PSIGrav)
-  call destroy(THETY)
+  call destroy(THETY_vr)
   call destroy(Theta_sat)
   call destroy(WaterFlowSoiMicPX)
   call destroy(UEVAP)

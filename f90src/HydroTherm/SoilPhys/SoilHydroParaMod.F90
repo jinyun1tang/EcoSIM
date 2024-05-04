@@ -78,11 +78,11 @@ contains
       WPLX=LOG(WPX)
       PSDX=LOGPOROS(L,NY,NX)-FCLX
       FCDX=FCLX-WPLX
-      IF(THETW(L,NY,NX).LT.FCX)THEN
+      IF(THETW_vr(L,NY,NX).LT.FCX)THEN
         PSISoilMatricP(L,NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIFLD(NY,NX) &
-          +((FCLX-LOG(THETW(L,NY,NX)))/FCDX*LOGPSIMND(NY,NX))))
-      ELSE IF(THETW(L,NY,NX).LT.POROS(L,NY,NX)-DTHETW)THEN
-        PSISoilMatricP(L,NY,NX)=-EXP(LOGPSIAtSat(NY,NX)+(((LOGPOROS(L,NY,NX)-LOG(THETW(L,NY,NX))) &
+          +((FCLX-LOG(THETW_vr(L,NY,NX)))/FCDX*LOGPSIMND(NY,NX))))
+      ELSE IF(THETW_vr(L,NY,NX).LT.POROS(L,NY,NX)-DTHETW)THEN
+        PSISoilMatricP(L,NY,NX)=-EXP(LOGPSIAtSat(NY,NX)+(((LOGPOROS(L,NY,NX)-LOG(THETW_vr(L,NY,NX))) &
           /PSDX)*LOGPSIMXD(NY,NX)))
       ELSE
         PSISoilMatricP(L,NY,NX)=PSISE(L,NY,NX)
@@ -110,7 +110,7 @@ contains
 !     CC=EXP(-3.6733-0.1447*CCLAYT+0.7653*CORGCT)
 !     DD=-0.4805-0.1239*CCLAYT+0.2080*CORGCT
 !     EE=3.8521+0.0963*CCLAYT
-!     SoilResit4RootPentrate_vr(L,NY,NX)=CC*THETW(L,NY,NX)**DD*SoiBulkDensity(L,NY,NX)**EE
+!     SoilResit4RootPentrate_vr(L,NY,NX)=CC*THETW_vr(L,NY,NX)**DD*SoiBulkDensity(L,NY,NX)**EE
 !     ELSE
     SoilResit4RootPentrate_vr(L,NY,NX)=0.0_r8
 !     ENDIF
@@ -119,7 +119,7 @@ contains
 !
 !     HydroCondMicP4RootUptake=soil hydraulic conductivity for root uptake
 !
-    K=MAX(1,MIN(100,INT(100.0_r8*(POROS(L,NY,NX)-THETW(L,NY,NX))/POROS(L,NY,NX))+1))
+    K=MAX(1,MIN(100,INT(100.0_r8*(POROS(L,NY,NX)-THETW_vr(L,NY,NX))/POROS(L,NY,NX))+1))
     HydroCondMicP4RootUptake(L,NY,NX)=0.5_r8*(HydroCond3D(1,K,L,NY,NX)+HydroCond3D(3,K,L,NY,NX))
   END DO
   end subroutine GetSoilHydraulicVars
@@ -210,16 +210,16 @@ contains
       !ExtWaterTablet0=external water table depth, [m]
       IF(THW(L,NY,NX).GT.1.0_r8.OR.SoiDepthMidLay(L,NY,NX).GE.ExtWaterTablet0(NY,NX))THEN
         !below the water table, thus it is saturated
-        THETW(L,NY,NX)=POROS(L,NY,NX)
+        THETW_vr(L,NY,NX)=POROS(L,NY,NX)
       ELSEIF(isclose(THW(L,NY,NX),1._r8))THEN
         !at field capacity
-        THETW(L,NY,NX)=FieldCapacity(L,NY,NX)
+        THETW_vr(L,NY,NX)=FieldCapacity(L,NY,NX)
       ELSEIF(isclose(THW(L,NY,NX),0._r8))THEN
         !at wilting point
-        THETW(L,NY,NX)=WiltPoint(L,NY,NX)
+        THETW_vr(L,NY,NX)=WiltPoint(L,NY,NX)
       ELSEIF(THW(L,NY,NX).LT.0.0_r8)THEN
         !CO2CompenPoint_nodeetely dry
-        THETW(L,NY,NX)=0.0_r8
+        THETW_vr(L,NY,NX)=0.0_r8
       ENDIF
 
       IF(THI(L,NY,NX).GT.1.0_r8.OR.SoiDepthMidLay(L,NY,NX).GE.ExtWaterTablet0(NY,NX))THEN
@@ -234,14 +234,14 @@ contains
 
       IF(cold_run())THEN
       !in a cold run, set it
-        VLWatMicP(L,NY,NX)=THETW(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
+        VLWatMicP(L,NY,NX)=THETW_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
         VLWatMicPX(L,NY,NX)=VLWatMicP(L,NY,NX)
-        VLWatMacP(L,NY,NX)=THETW(L,NY,NX)*VLMacP(L,NY,NX)
+        VLWatMacP(L,NY,NX)=THETW_vr(L,NY,NX)*VLMacP(L,NY,NX)
         VLiceMicP(L,NY,NX)=THETI(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
         VLiceMacP(L,NY,NX)=THETI(L,NY,NX)*VLMacP(L,NY,NX)
         VHeatCapacity(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+Cpw*(VLWatMicP(L,NY,NX) &
           +VLWatMacP(L,NY,NX))+Cpi*(VLiceMicP(L,NY,NX)+VLiceMacP(L,NY,NX))
-        THETWZ(L,NY,NX)=THETW(L,NY,NX)
+        THETWZ(L,NY,NX)=THETW_vr(L,NY,NX)
         THETIZ(L,NY,NX)=THETI(L,NY,NX)
       ENDIF
     ENDIF
@@ -258,9 +258,9 @@ contains
   ENDIF
 
   IF(SoiBulkDensity(L,NY,NX).GT.ZERO)THEN
-    THETY(L,NY,NX)=EXP((LOGPSIFLD(NY,NX)-LOG(-PSIHY))*FCD(L,NY,NX)/LOGPSIMND(NY,NX)+LOGFldCapacity(L,NY,NX))
+    THETY_vr(L,NY,NX)=EXP((LOGPSIFLD(NY,NX)-LOG(-PSIHY))*FCD(L,NY,NX)/LOGPSIMND(NY,NX)+LOGFldCapacity(L,NY,NX))
   ELSE
-    THETY(L,NY,NX)=ZERO2
+    THETY_vr(L,NY,NX)=ZERO2
   ENDIF
       !
       !     SATURATED HYDRAULIC CONDUCTIVITY FROM SWC AT SATURATION VS.
@@ -375,7 +375,7 @@ contains
   ELSE
     SoiBulkDensity(0,NY,NX)=BulkDensLitR(micpar%k_fine_litr)
   ENDIF
-  THETY(0,NY,NX)=EXP((LOGPSIFLD(NY,NX)-LOG(-PSIHY))*FCD(0,NY,NX)/LOGPSIMND(NY,NX)+LOGFldCapacity(0,NY,NX))
+  THETY_vr(0,NY,NX)=EXP((LOGPSIFLD(NY,NX)-LOG(-PSIHY))*FCD(0,NY,NX)/LOGPSIMND(NY,NX)+LOGFldCapacity(0,NY,NX))
   SUM2=0.0_r8
   D1220: DO  K=1,n100
     XK=K-1

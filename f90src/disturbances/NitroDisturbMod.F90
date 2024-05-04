@@ -41,28 +41,33 @@ module NitroDisturbMod
   implicit none
   integer, intent(in) :: I,J,NY,NX
 
-  integer :: L,K,M,N,IFLGJ,NLL,NGL,NTF,MID
+  integer :: L,K,M,N,IFLGJ,NLL,NGL,NTF,MID,ids,NE,idom
   real(r8) :: DC,DN,DP
   real(r8) :: DCORPC
   real(r8) :: FORGCX
   real(r8) :: HFLXD
-  real(r8) :: OC,ON,OP,OCH,ONH,OPH,ONX
+  real(r8) :: ONX
   REAL(R8) :: OPX,OCA,OAH
   real(r8) :: ONL(4,1:jcplx),OPL(4,1:jcplx)
+  real(r8) :: rmDOM(idom_beg:idom_end)
+  real(r8) :: rmBiom(1:NumPlantChemElms )
+  real(r8) :: OMelm(1:NumPlantChemElms)
+  real(r8) :: dOMelm(1:NumPlantChemElms)
   real(r8) :: DCORPC1
+
 !     begin_execution
 
-  IF(J.EQ.INT(SolarNoonHour_col(NY,NX)).AND.(ITILL(I,NY,NX).EQ.21.OR.ITILL(I,NY,NX).EQ.22))THEN
+  IF(J.EQ.INT(SolarNoonHour_col(NY,NX)) .AND. (ITILL(I,NY,NX).EQ.21 .OR. ITILL(I,NY,NX).EQ.22))THEN
     IF(ITILL(I,NY,NX).EQ.22)THEN
       IFLGS(NY,NX)=1
       IFLGJ=0
       NLL=-1
-      D2945: DO L=0,NL(NY,NX)
 
-        IF(L.EQ.0.OR.L.GE.NUM(NY,NX))THEN
+      D2945: DO L=0,NL(NY,NX)
+        IF(L.EQ.0 .OR. L.GE.NUM(NY,NX))THEN
           IF(IFLGJ.EQ.1)THEN
             exit
-          ELSEIF(THETW(L,NY,NX).GT.FVLWB.OR.CORGC(L,NY,NX).LE.FORGC)THEN
+          ELSEIF(THETW_vr(L,NY,NX).GT.FVLWB .OR. CORGC(L,NY,NX).LE.FORGC)THEN
             IFLGJ=1
           ELSE
             NLL=L
@@ -89,12 +94,9 @@ module NitroDisturbMod
 !     VOLWOU=VOLWOU+DCORPC*VLWatMicP(L,NY,NX)
 !     HEATOU=HEATOU+DCORPC*4.19*TKS(L,NY,NX)*VLWatMicP(L,NY,NX)
 !     VLWatMicP(L,NY,NX)=VLWatMicP(L,NY,NX)-DCORPC*VLWatMicP(L,NY,NX)
-        OC=0.0_r8
-        ON=0.0_r8
-        OP=0.0_r8
-        DC=0.0_r8
-        DN=0.0_r8
-        DP=0.0_r8
+        OMelm=0._r8
+        dOMelm=0._r8
+
         ONL(1:4,1:jcplx)=0._r8
         OPL(1:4,1:jcplx)=0._r8
 
@@ -107,27 +109,26 @@ module NitroDisturbMod
               DO NGL=JGnio(N),JGnfo(N)
                 DO M=1,nlbiomcp
                   MID=micpar%get_micb_id(M,NGL)
-                  OCH=DCORPC*OMEheter(ielmc,MID,K,L,NY,NX)
-                  ONH=DCORPC*OMEheter(ielmn,MID,K,L,NY,NX)
-                  OPH=DCORPC*OMEheter(ielmp,MID,K,L,NY,NX)
-                  ONX=EFIRE(1,ITILL(I,NY,NX))*ONH
-                  OPX=EFIRE(2,ITILL(I,NY,NX))*OPH
+                  DO NE=1,NumPlantChemElms 
+                    rmBiom(NE)=DCORPC*mBOMHeter_vr(NE,MID,K,L,NY,NX)
+                  enddo
+
+                  ONX=EFIRE(1,ITILL(I,NY,NX))*rmBiom(ielmn)
+                  OPX=EFIRE(2,ITILL(I,NY,NX))*rmBiom(ielmp)
                   IF(micpar%is_litter(K))THEN
-                    ONL(4,K)=ONL(4,K)+ONH-ONX
-                    OPL(4,K)=OPL(4,K)+OPH-OPX
+                    ONL(4,K)=ONL(4,K)+rmBiom(ielmn)-ONX
+                    OPL(4,K)=OPL(4,K)+rmBiom(ielmp)-OPX
                   ELSE
-                    ONL(1,K)=ONL(1,K)+ONH-ONX
-                    OPL(1,K)=OPL(1,K)+OPH-OPX
+                    ONL(1,K)=ONL(1,K)+rmBiom(ielmn)-ONX
+                    OPL(1,K)=OPL(1,K)+rmBiom(ielmp)-OPX
                   ENDIF
-                  OMEheter(ielmc,MID,K,L,NY,NX)=OMEheter(ielmc,MID,K,L,NY,NX)-OCH
-                  OMEheter(ielmn,MID,K,L,NY,NX)=OMEheter(ielmn,MID,K,L,NY,NX)-ONH
-                  OMEheter(ielmp,MID,K,L,NY,NX)=OMEheter(ielmp,MID,K,L,NY,NX)-OPH
-                  DC=DC+OMEheter(ielmc,MID,K,L,NY,NX)
-                  DN=DN+OMEheter(ielmn,MID,K,L,NY,NX)
-                  DP=DP+OMEheter(ielmp,MID,K,L,NY,NX)
-                  OC=OC+OCH
-                  ON=ON+ONX
-                  OP=OP+OPX
+                  DO  NE=1,NumPlantChemElms 
+                    mBOMHeter_vr(NE,MID,K,L,NY,NX)=mBOMHeter_vr(NE,MID,K,L,NY,NX)-rmBiom(NE)
+                    dOMelm(NE)=dOMelm(NE)+mBOMHeter_vr(NE,MID,K,L,NY,NX)                    
+                  ENDDO
+                  OMelm(ielmc)=OMelm(ielmc)+rmBiom(ielmc)
+                  OMelm(ielmn)=OMelm(ielmn)+ONX
+                  OMelm(ielmp)=OMelm(ielmp)+OPX
                 enddo
               enddo
             ENDDO D2960
@@ -143,22 +144,23 @@ module NitroDisturbMod
           DO NGL=JGniA(N),JGnfA(N)
             DO M=1,nlbiomcp
               MID=micpar%get_micb_id(M,NGL)
-              OCH=DCORPC*OMEAutor(ielmc,MID,L,NY,NX)
-              ONH=DCORPC*OMEAutor(ielmn,MID,L,NY,NX)
-              OPH=DCORPC*OMEAutor(ielmp,MID,L,NY,NX)
-              ONX=EFIRE(1,ITILL(I,NY,NX))*ONH
-              OPX=EFIRE(2,ITILL(I,NY,NX))*OPH
-              ONL(4,1)=ONL(4,1)+ONH-ONX
-              OPL(4,1)=OPL(4,1)+OPH-OPX
-              OMEAutor(ielmc,MID,L,NY,NX)=OMEAutor(ielmc,MID,L,NY,NX)-OCH
-              OMEAutor(ielmn,MID,L,NY,NX)=OMEAutor(ielmn,MID,L,NY,NX)-ONH
-              OMEAutor(ielmp,MID,L,NY,NX)=OMEAutor(ielmp,MID,L,NY,NX)-OPH
-              DC=DC+OMEAutor(ielmc,MID,L,NY,NX)
-              DN=DN+OMEAutor(ielmn,MID,L,NY,NX)
-              DP=DP+OMEAutor(ielmp,MID,L,NY,NX)
-              OC=OC+OCH
-              ON=ON+ONX
-              OP=OP+OPX
+              DO NE=1,NumPlantChemElms
+                rmBiom(NE)=DCORPC*mBOMAutor_vr(NE,MID,L,NY,NX)
+              enddo
+
+              ONX=EFIRE(1,ITILL(I,NY,NX))*rmBiom(ielmn)
+              OPX=EFIRE(2,ITILL(I,NY,NX))*rmBiom(ielmp)
+
+              ONL(4,1)=ONL(4,1)+rmBiom(ielmn)-ONX
+              OPL(4,1)=OPL(4,1)+rmBiom(ielmp)-OPX
+
+              DO NE=1,NumPlantChemElms
+                mBOMAutor_vr(NE,MID,L,NY,NX)=mBOMAutor_vr(NE,MID,L,NY,NX)-rmBiom(NE)
+                dOMelm(NE)=dOMelm(NE)+mBOMAutor_vr(NE,MID,L,NY,NX)
+              enddo
+              OMelm(ielmc)=OMelm(ielmc)+rmBiom(ielmc)
+              OMelm(ielmn)=OMelm(ielmn)+ONX
+              OMelm(ielmp)=OMelm(ielmp)+OPX              
             enddo
           enddo
         ENDDO
@@ -170,120 +172,121 @@ module NitroDisturbMod
         D2900: DO K=1,jcplx
           IF(L.NE.0 .OR. (micpar%is_litter(K)))THEN
             D2940: DO M=1,ndbiomcp
-              OCH=DCORPC*OMBioResdu_vr(ielmc,M,K,L,NY,NX)
-              ONH=DCORPC*OMBioResdu_vr(ielmn,M,K,L,NY,NX)
-              OPH=DCORPC*OMBioResdu_vr(ielmp,M,K,L,NY,NX)
-              ONX=EFIRE(1,ITILL(I,NY,NX))*ONH
-              OPX=EFIRE(2,ITILL(I,NY,NX))*OPH
+              DO NE=1,NumPlantChemElms
+                rmBiom(NE)=DCORPC*OMBioResdu_vr(NE,M,K,L,NY,NX)
+              enddo
+
+              ONX=EFIRE(1,ITILL(I,NY,NX))*rmBiom(ielmn)
+              OPX=EFIRE(2,ITILL(I,NY,NX))*rmBiom(ielmp)
               IF(micpar%is_litter(K))THEN
-                ONL(4,K)=ONL(4,K)+ONH-ONX
-                OPL(4,K)=OPL(4,K)+OPH-OPX
+                ONL(4,K)=ONL(4,K)+rmBiom(ielmn)-ONX
+                OPL(4,K)=OPL(4,K)+rmBiom(ielmp)-OPX
               ELSE
-                ONL(1,K)=ONL(1,K)+ONH-ONX
-                OPL(1,K)=OPL(1,K)+OPH-OPX
+                ONL(1,K)=ONL(1,K)+rmBiom(ielmn)-ONX
+                OPL(1,K)=OPL(1,K)+rmBiom(ielmp)-OPX
               ENDIF
-              OMBioResdu_vr(ielmc,M,K,L,NY,NX)=OMBioResdu_vr(ielmc,M,K,L,NY,NX)-OCH
-              OMBioResdu_vr(ielmn,M,K,L,NY,NX)=OMBioResdu_vr(ielmn,M,K,L,NY,NX)-ONH
-              OMBioResdu_vr(ielmp,M,K,L,NY,NX)=OMBioResdu_vr(ielmp,M,K,L,NY,NX)-OPH
-              DC=DC+OMBioResdu_vr(ielmc,M,K,L,NY,NX)
-              DN=DN+OMBioResdu_vr(ielmn,M,K,L,NY,NX)
-              DP=DP+OMBioResdu_vr(ielmp,M,K,L,NY,NX)
-              OC=OC+OCH
-              ON=ON+ONX
-              OP=OP+OPX
+              DO NE=1,NumPlantChemElms
+                OMBioResdu_vr(NE,M,K,L,NY,NX)=OMBioResdu_vr(NE,M,K,L,NY,NX)-rmBiom(NE)
+                dOMelm(NE)=dOMelm(NE)+OMBioResdu_vr(NE,M,K,L,NY,NX)
+              enddo
+              OMelm(ielmc)=OMelm(ielmc)+rmBiom(ielmc)
+              OMelm(ielmn)=OMelm(ielmn)+ONX
+              OMelm(ielmp)=OMelm(ielmp)+OPX                            
             ENDDO D2940
 !
 !     REMOVE DOC, DON, DOP
 !
-            OCH=DCORPC*DOM(idom_doc,K,L,NY,NX)
-            OCA=DCORPC*DOM(idom_acetate,K,L,NY,NX)
-            ONH=DCORPC*DOM(idom_don,K,L,NY,NX)
-            OPH=DCORPC*DOM(idom_dop,K,L,NY,NX)
-            ONX=EFIRE(1,ITILL(I,NY,NX))*ONH
-            OPX=EFIRE(2,ITILL(I,NY,NX))*OPH
+            DO idom=idom_beg,idom_end
+              rmDOM(idom)=DCORPC*DOM(idom_doc,K,L,NY,NX)
+            enddo
+
+            ONX=EFIRE(1,ITILL(I,NY,NX))*rmDOM(ielmn)
+            OPX=EFIRE(2,ITILL(I,NY,NX))*rmDOM(ielmp)
             IF(micpar%is_litter(K))THEN
-              ONL(4,K)=ONL(4,K)+ONH-ONX
-              OPL(4,K)=OPL(4,K)+OPH-OPX
+              ONL(4,K)=ONL(4,K)+rmDOM(ielmn)-ONX
+              OPL(4,K)=OPL(4,K)+rmDOM(ielmp)-OPX
             ELSE
-              ONL(1,K)=ONL(1,K)+ONH-ONX
-              OPL(1,K)=OPL(1,K)+OPH-OPX
+              ONL(1,K)=ONL(1,K)+rmDOM(ielmn)-ONX
+              OPL(1,K)=OPL(1,K)+rmDOM(ielmp)-OPX
             ENDIF
-            DOM(idom_doc,K,L,NY,NX)=DOM(idom_doc,K,L,NY,NX)-OCH
-            DOM(idom_acetate,K,L,NY,NX)=DOM(idom_acetate,K,L,NY,NX)-OCA
-            DOM(idom_don,K,L,NY,NX)=DOM(idom_don,K,L,NY,NX)-ONH
-            DOM(idom_dop,K,L,NY,NX)=DOM(idom_dop,K,L,NY,NX)-OPH
-            OC=OC+OCH+OCA
-            ON=ON+ONX
-            OP=OP+OPX
-            OCH=DCORPC*DOM_Macp(idom_doc,K,L,NY,NX)
-            ONH=DCORPC*DOM_Macp(idom_don,K,L,NY,NX)
-            OPH=DCORPC*DOM_Macp(idom_dop,K,L,NY,NX)
-            OAH=DCORPC*DOM_Macp(idom_acetate,K,L,NY,NX)
-            ONX=EFIRE(1,ITILL(I,NY,NX))*ONH
-            OPX=EFIRE(2,ITILL(I,NY,NX))*OPH
+            DO idom=idom_beg,idom_end
+              DOM(idom,K,L,NY,NX)=DOM(idom,K,L,NY,NX)-rmDOM(idom)
+            enddo
+
+            OMelm(ielmc)=OMelm(ielmc)+rmDOM(idom_doc)+rmDOM(idom_acetate)            
+            OMelm(ielmn)=OMelm(ielmn)+ONX
+            OMelm(ielmp)=OMelm(ielmp)+OPX
+
+            DO idom=idom_beg,idom_end
+              rmDOM(idom)=DCORPC*DOM_Macp(idom,K,L,NY,NX)
+            enddo
+
+            ONX=EFIRE(1,ITILL(I,NY,NX))*rmDOM(ielmn)
+            OPX=EFIRE(2,ITILL(I,NY,NX))*rmDOM(ielmp)
             IF(micpar%is_litter(K))THEN
-              ONL(4,K)=ONL(4,K)+ONH-ONX
-              OPL(4,K)=OPL(4,K)+OPH-OPX
+              ONL(4,K)=ONL(4,K)+rmDOM(ielmn)-ONX
+              OPL(4,K)=OPL(4,K)+rmDOM(ielmp)-OPX
             ELSE
-              ONL(1,K)=ONL(1,K)+ONH-ONX
-              OPL(1,K)=OPL(1,K)+OPH-OPX
+              ONL(1,K)=ONL(1,K)+rmDOM(ielmn)-ONX
+              OPL(1,K)=OPL(1,K)+rmDOM(ielmp)-OPX
             ENDIF
-            DOM_Macp(idom_doc,K,L,NY,NX)=DOM_Macp(idom_doc,K,L,NY,NX)-OCH
-            DOM_Macp(idom_don,K,L,NY,NX)=DOM_Macp(idom_don,K,L,NY,NX)-ONH
-            DOM_Macp(idom_dop,K,L,NY,NX)=DOM_Macp(idom_dop,K,L,NY,NX)-OPH
-            DOM_Macp(idom_acetate,K,L,NY,NX)=DOM_Macp(idom_acetate,K,L,NY,NX)-OAH
-            OC=OC+OCH+OAH
-            ON=ON+ONX
-            OP=OP+OPX
+            DO idom=idom_beg,idom_end
+              DOM_Macp(idom,K,L,NY,NX)=DOM_Macp(idom,K,L,NY,NX)-rmDOM(idom)
+            enddo
+
+            OMelm(ielmc)=OMelm(ielmc)+rmDOM(idom_doc)+rmDOM(idom_acetate)            
+            OMelm(ielmn)=OMelm(ielmn)+ONX
+            OMelm(ielmp)=OMelm(ielmp)+OPX
 !
 !     REMOVE ADSORBED OM
 !
-            OCH=DCORPC*SorbedOM_vr(ielmc,K,L,NY,NX)
-            ONH=DCORPC*SorbedOM_vr(ielmn,K,L,NY,NX)
-            OPH=DCORPC*SorbedOM_vr(ielmp,K,L,NY,NX)
-            OAH=DCORPC*SorbedOM_vr(idom_acetate,K,L,NY,NX)
-            ONX=EFIRE(1,ITILL(I,NY,NX))*ONH
-            OPX=EFIRE(2,ITILL(I,NY,NX))*OPH
+            DO idom=idom_beg,idom_end
+              rmDOM(idom)=DCORPC*SorbedOM_vr(idom,K,L,NY,NX)
+            enddo
+
+            ONX=EFIRE(1,ITILL(I,NY,NX))*rmDOM(ielmn)
+            OPX=EFIRE(2,ITILL(I,NY,NX))*rmDOM(ielmp)
             IF(micpar%is_litter(K))THEN
-              ONL(4,K)=ONL(4,K)+ONH-ONX
-              OPL(4,K)=OPL(4,K)+OPH-OPX
+              ONL(4,K)=ONL(4,K)+rmDOM(ielmn)-ONX
+              OPL(4,K)=OPL(4,K)+rmDOM(ielmp)-OPX
             ELSE
-              ONL(1,K)=ONL(1,K)+ONH-ONX
-              OPL(1,K)=OPL(1,K)+OPH-OPX
+              ONL(1,K)=ONL(1,K)+rmDOM(ielmn)-ONX
+              OPL(1,K)=OPL(1,K)+rmDOM(ielmp)-OPX
             ENDIF
-            SorbedOM_vr(ielmc,K,L,NY,NX)=SorbedOM_vr(ielmc,K,L,NY,NX)-OCH
-            SorbedOM_vr(ielmn,K,L,NY,NX)=SorbedOM_vr(ielmn,K,L,NY,NX)-ONH
-            SorbedOM_vr(ielmp,K,L,NY,NX)=SorbedOM_vr(ielmp,K,L,NY,NX)-OPH
-            SorbedOM_vr(idom_acetate,K,L,NY,NX)=SorbedOM_vr(idom_acetate,K,L,NY,NX)-OAH
-            DC=DC+DOM(idom_doc,K,L,NY,NX)+DOM_Macp(idom_doc,K,L,NY,NX)+SorbedOM_vr(ielmc,K,L,NY,NX) &
+            DO idom=idom_beg,idom_end
+              SorbedOM_vr(idom,K,L,NY,NX)=SorbedOM_vr(idom,K,L,NY,NX)-rmDOM(idom)
+            enddo
+
+            dOMelm(ielmc)=dOMelm(ielmc)+DOM(idom_doc,K,L,NY,NX)+DOM_Macp(idom_doc,K,L,NY,NX)+SorbedOM_vr(ielmc,K,L,NY,NX) &
               +DOM(idom_acetate,K,L,NY,NX)+DOM_Macp(idom_acetate,K,L,NY,NX)+SorbedOM_vr(idom_acetate,K,L,NY,NX)
-            DN=DN+DOM(idom_don,K,L,NY,NX)+DOM_Macp(idom_don,K,L,NY,NX)+SorbedOM_vr(ielmn,K,L,NY,NX)
-            DP=DP+DOM(idom_dop,K,L,NY,NX)+DOM_Macp(idom_dop,K,L,NY,NX)+SorbedOM_vr(ielmp,K,L,NY,NX)
-            OC=OC+OCH
-            ON=ON+ONX
-            OP=OP+OPX
-!
+            dOMelm(ielmn)=dOMelm(ielmn)+DOM(idom_don,K,L,NY,NX)+DOM_Macp(idom_don,K,L,NY,NX)+SorbedOM_vr(ielmn,K,L,NY,NX)
+            dOMelm(ielmp)=dOMelm(ielmp)+DOM(idom_dop,K,L,NY,NX)+DOM_Macp(idom_dop,K,L,NY,NX)+SorbedOM_vr(ielmp,K,L,NY,NX)
+
+            OMelm(ielmc)=OMelm(ielmc)+rmDOM(idom_doc)+rmDOM(idom_acetate)
+            OMelm(ielmn)=OMelm(ielmn)+ONX
+            OMelm(ielmp)=OMelm(ielmp)+OPX!
 !     REMOVE RESIDUE
 !
             D2930: DO M=1,jsken
-              OCH=DCORPC*SolidOM_vr(ielmc,M,K,L,NY,NX)
-              ONH=DCORPC*SolidOM_vr(ielmn,M,K,L,NY,NX)
-              OPH=DCORPC*SolidOM_vr(ielmp,M,K,L,NY,NX)
+              do NE=1,NumPlantChemElms
+                rmBiom(NE)=DCORPC*SolidOM_vr(NE,M,K,L,NY,NX)
+              enddo
+
               OCA=DCORPC*SolidOMAct_vr(M,K,L,NY,NX)
-              ONX=EFIRE(1,ITILL(I,NY,NX))*ONH
-              OPX=EFIRE(2,ITILL(I,NY,NX))*OPH
-              ONL(M,K)=ONL(M,K)+ONH-ONX
-              OPL(M,K)=OPL(M,K)+OPH-OPX
-              SolidOM_vr(ielmc,M,K,L,NY,NX)=SolidOM_vr(ielmc,M,K,L,NY,NX)-OCH
-              SolidOM_vr(ielmn,M,K,L,NY,NX)=SolidOM_vr(ielmn,M,K,L,NY,NX)-ONH
-              SolidOM_vr(ielmp,M,K,L,NY,NX)=SolidOM_vr(ielmp,M,K,L,NY,NX)-OPH
+              ONX=EFIRE(1,ITILL(I,NY,NX))*rmBiom(ielmn)
+              OPX=EFIRE(2,ITILL(I,NY,NX))*rmBiom(ielmp)
+              ONL(M,K)=ONL(M,K)+rmBiom(ielmn)-ONX
+              OPL(M,K)=OPL(M,K)+rmBiom(ielmp)-OPX
+
+              do NE=1,NumPlantChemElms
+                SolidOM_vr(NE,M,K,L,NY,NX)=SolidOM_vr(NE,M,K,L,NY,NX)-rmBiom(NE)
+                dOMelm(NE)=dOMelm(NE)+SolidOM_vr(NE,M,K,L,NY,NX)
+              enddo
+                            
               SolidOMAct_vr(M,K,L,NY,NX)=SolidOMAct_vr(M,K,L,NY,NX)-OCA              
-              DC=DC+SolidOM_vr(ielmc,M,K,L,NY,NX)
-              DN=DN+SolidOM_vr(ielmn,M,K,L,NY,NX)
-              DP=DP+SolidOM_vr(ielmp,M,K,L,NY,NX)
-              OC=OC+OCH
-              ON=ON+ONX
-              OP=OP+OPX
+              OMelm(ielmc)=OMelm(ielmc)+rmBiom(ielmc)
+              OMelm(ielmn)=OMelm(ielmn)+ONX
+              OMelm(ielmp)=OMelm(ielmp)+OPX      
             ENDDO D2930
           ENDIF
         ENDDO D2900
@@ -302,30 +305,30 @@ module NitroDisturbMod
 !     REMOVE FERTILIZER IN RESIDUE
 !
         IF(ITILL(I,NY,NX).EQ.21)THEN
-          ON=ON+DCORPC*(trc_solml_vr(ids_NH4,L,NY,NX)+trc_solml_vr(idg_NH3,L,NY,NX) &
+          OMelm(ielmn)=OMelm(ielmn)+DCORPC*(trc_solml_vr(ids_NH4,L,NY,NX)+trc_solml_vr(idg_NH3,L,NY,NX) &
             +trc_solml_vr(ids_NO3,L,NY,NX)+trc_solml_vr(ids_NO2,L,NY,NX))
-          OP=OP+DCORPC*(trc_solml_vr(ids_H1PO4,L,NY,NX)+trc_solml_vr(ids_H2PO4,L,NY,NX))
+          OMelm(ielmp)=OMelm(ielmp)+DCORPC*(trc_solml_vr(ids_H1PO4,L,NY,NX)+trc_solml_vr(ids_H2PO4,L,NY,NX))
+          
           DCORPC1=1.0_r8-DCORPC
-          trc_solml_vr(ids_NH4,L,NY,NX)=DCORPC1*trc_solml_vr(ids_NH4,L,NY,NX)
+
           trc_solml_vr(idg_NH3,L,NY,NX)=DCORPC1*trc_solml_vr(idg_NH3,L,NY,NX)
-          trc_solml_vr(ids_NO3,L,NY,NX)=DCORPC1*trc_solml_vr(ids_NO3,L,NY,NX)
-          trc_solml_vr(ids_NO2,L,NY,NX)=DCORPC1*trc_solml_vr(ids_NO2,L,NY,NX)
-          trc_solml_vr(ids_H1PO4,L,NY,NX)=DCORPC1*trc_solml_vr(ids_H1PO4,L,NY,NX)
-          trc_solml_vr(ids_H2PO4,L,NY,NX)=DCORPC1*trc_solml_vr(ids_H2PO4,L,NY,NX)
+          do ids=ids_nut_beg,ids_nuts_end
+            trc_solml_vr(ids,L,NY,NX)=DCORPC1*trc_solml_vr(ids,L,NY,NX)
+          enddo
           trcx_solml(idx_NH4,L,NY,NX)  =DCORPC1*trcx_solml(idx_NH4,L,NY,NX)
-          trcp_salml(idsp_AlPO4,L,NY,NX)=DCORPC1*trcp_salml(idsp_AlPO4,L,NY,NX)
-          trcp_salml(idsp_FePO4,L,NY,NX)=DCORPC1*trcp_salml(idsp_FePO4,L,NY,NX)
-          trcp_salml(idsp_CaHPO4,L,NY,NX)=DCORPC1*trcp_salml(idsp_CaHPO4,L,NY,NX)
-          trcp_salml(idsp_HA,L,NY,NX)=DCORPC1*trcp_salml(idsp_HA,L,NY,NX)
-          trcp_salml(idsp_CaH4P2O8,L,NY,NX)=DCORPC1*trcp_salml(idsp_CaH4P2O8,L,NY,NX)
+          trcp_salml(idsp_AlPO4,L,NY,NX)    = DCORPC1*trcp_salml(idsp_AlPO4,L,NY,NX)
+          trcp_salml(idsp_FePO4,L,NY,NX)    = DCORPC1*trcp_salml(idsp_FePO4,L,NY,NX)
+          trcp_salml(idsp_CaHPO4,L,NY,NX)   = DCORPC1*trcp_salml(idsp_CaHPO4,L,NY,NX)
+          trcp_salml(idsp_HA,L,NY,NX)       = DCORPC1*trcp_salml(idsp_HA,L,NY,NX)
+          trcp_salml(idsp_CaH4P2O8,L,NY,NX) = DCORPC1*trcp_salml(idsp_CaH4P2O8,L,NY,NX)
 
           DO NTF=ifertn_beg,ifertn_end
             FertN_soil_vr(NTF,L,NY,NX)=DCORPC1*FertN_soil_vr(NTF,L,NY,NX)
           ENDDO
         ENDIF
-        ORGC_vr(L,NY,NX)=DC
-        ORGN_vr(L,NY,NX)=DN
-        ORGP_vr(L,NY,NX)=DP
+        ORGC_vr(L,NY,NX)=dOMelm(ielmc)
+        ORGN_vr(L,NY,NX)=dOMelm(ielmn)
+        ORGP_vr(L,NY,NX)=dOMelm(ielmp)
         IF(L.EQ.0)THEN
           HFLXD=4.19E-06_r8*(ORGCX(L,NY,NX)-ORGC_vr(L,NY,NX))*TKS(L,NY,NX)
           HEATOU=HEATOU+HFLXD
@@ -338,26 +341,28 @@ module NitroDisturbMod
 !    2+1.9274*(VLiceMicP(L,NY,NX)+VLiceMacP(L,NY,NX))
 !     ENDIF
         IF(ITILL(I,NY,NX).EQ.21)THEN
-          TOMOU(ielmc)=TOMOU(ielmc)+OC
-          TOMOU(ielmn)=TOMOU(ielmn)+ON
-          TOMOU(ielmp)=TOMOU(ielmp)+OP
-          HydroSufDOCFlx_col(NY,NX)=HydroSufDOCFlx_col(NY,NX)+OC
-          HydroSufDONFlx_col(NY,NX)=HydroSufDONFlx_col(NY,NX)+ON
-          HydroSufDOPFlx_col(NY,NX)=HydroSufDOPFlx_col(NY,NX)+OP
-          Eco_NBP_col(NY,NX)=Eco_NBP_col(NY,NX)-OC
+          DO NE=1,NumPlantChemElms
+            TOMOU(NE)=TOMOU(NE)+OMelm(NE)
+          ENDDO
+
+          HydroSufDOCFlx_col(NY,NX)=HydroSufDOCFlx_col(NY,NX)+OMelm(ielmc)
+          HydroSufDONFlx_col(NY,NX)=HydroSufDONFlx_col(NY,NX)+OMelm(ielmn)
+          HydroSufDOPFlx_col(NY,NX)=HydroSufDOPFlx_col(NY,NX)+OMelm(ielmp)
+          Eco_NBP_col(NY,NX)=Eco_NBP_col(NY,NX)-OMelm(ielmc)
         ELSEIF(ITILL(I,NY,NX).EQ.22)THEN
-          CO2GIN=CO2GIN-OC
-          OXYGIN=OXYGIN+2.667_r8*OC
-          OXYGOU=OXYGOU+2.667_r8*OC
-          TOMOU(ielmn)=TOMOU(ielmn)+ON
-          TOMOU(ielmp)=TOMOU(ielmp)+OP
-          CO2byFire_col(NY,NX)=CO2byFire_col(NY,NX)-(1.0_r8-FCH4F)*OC
-          CH4byFire_col(NY,NX)=CH4byFire_col(NY,NX)-FCH4F*OC
-          O2byFire_col(NY,NX)=O2byFire_col(NY,NX)+(1.0_r8-FCH4F)*2.667_r8*OC
-          NH3byFire_col(NY,NX)=NH3byFire_col(NY,NX)-ON
+          CO2GIN=CO2GIN-OMelm(ielmc)
+          OXYGIN=OXYGIN+2.667_r8*OMelm(ielmc)
+          OXYGOU=OXYGOU+2.667_r8*OMelm(ielmc)
+
+          TOMOU(ielmn)=TOMOU(ielmn)+OMelm(ielmn)
+          TOMOU(ielmp)=TOMOU(ielmp)+OMelm(ielmp)
+          CO2byFire_col(NY,NX)=CO2byFire_col(NY,NX)-(1.0_r8-FCH4F)*OMelm(ielmc)
+          CH4byFire_col(NY,NX)=CH4byFire_col(NY,NX)-FCH4F*OMelm(ielmc)
+          O2byFire_col(NY,NX)=O2byFire_col(NY,NX)+(1.0_r8-FCH4F)*2.667_r8*OMelm(ielmc)
+          NH3byFire_col(NY,NX)=NH3byFire_col(NY,NX)-OMelm(ielmn)
           N2ObyFire_col(NY,NX)=N2ObyFire_col(NY,NX)-0.0_r8
-          PO4byFire_col(NY,NX)=PO4byFire_col(NY,NX)-OP
-          Eco_NBP_col(NY,NX)=Eco_NBP_col(NY,NX)-OC
+          PO4byFire_col(NY,NX)=PO4byFire_col(NY,NX)-OMelm(ielmp)
+          Eco_NBP_col(NY,NX)=Eco_NBP_col(NY,NX)-OMelm(ielmc)
         ENDIF
       ENDIF
     ENDDO D2950

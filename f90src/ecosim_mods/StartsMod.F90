@@ -452,15 +452,15 @@ module StartsMod
       IF(ISOIL(isoi_fc,L,NY,NX).EQ.0.AND.ISOIL(isoi_wp,L,NY,NX).EQ.0)THEN
       ! field capacity and wilting point are read from input
         IF(THW(L,NY,NX).GT.1.0_r8)THEN
-          THETW(L,NY,NX)=POROS(L,NY,NX)
+          THETW_vr(L,NY,NX)=POROS(L,NY,NX)
         ELSEIF(isclose(THW(L,NY,NX),1.0_r8))THEN
-          THETW(L,NY,NX)=FieldCapacity(L,NY,NX)
+          THETW_vr(L,NY,NX)=FieldCapacity(L,NY,NX)
         ELSEIF(isclose(THW(L,NY,NX),0.0_r8))THEN
-          THETW(L,NY,NX)=WiltPoint(L,NY,NX)
+          THETW_vr(L,NY,NX)=WiltPoint(L,NY,NX)
         ELSEIF(THW(L,NY,NX).LT.0.0)THEN
-          THETW(L,NY,NX)=0.0_r8
+          THETW_vr(L,NY,NX)=0.0_r8
         ELSE
-          THETW(L,NY,NX)=THW(L,NY,NX)
+          THETW_vr(L,NY,NX)=THW(L,NY,NX)
         ENDIF
         IF(THI(L,NY,NX).GT.1.0_r8)THEN
           THETI(L,NY,NX)=AZMAX1(AMIN1(POROS(L,NY,NX),POROS(L,NY,NX)-THW(L,NY,NX)))
@@ -473,9 +473,9 @@ module StartsMod
         ELSE
           THETI(L,NY,NX)=THI(L,NY,NX)
         ENDIF
-        VLWatMicP(L,NY,NX)=THETW(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
+        VLWatMicP(L,NY,NX)=THETW_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
         VLWatMicPX(L,NY,NX)=VLWatMicP(L,NY,NX)
-        VLWatMacP(L,NY,NX)=THETW(L,NY,NX)*VLMacP(L,NY,NX)
+        VLWatMacP(L,NY,NX)=THETW_vr(L,NY,NX)*VLMacP(L,NY,NX)
         VLiceMicP(L,NY,NX)=THETI(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
         VLiceMacP(L,NY,NX)=THETI(L,NY,NX)*VLMacP(L,NY,NX)
 !       total air-filled porosity, micropores + macropores
@@ -483,7 +483,7 @@ module StartsMod
           +AZMAX1(VLMacP(L,NY,NX)-VLWatMacP(L,NY,NX)-VLiceMacP(L,NY,NX))
         VHeatCapacity(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+cpw*(VLWatMicP(L,NY,NX) &
           +VLWatMacP(L,NY,NX))+cpi*(VLiceMicP(L,NY,NX)+VLiceMacP(L,NY,NX))
-        THETWZ(L,NY,NX)=THETW(L,NY,NX)
+        THETWZ(L,NY,NX)=THETW_vr(L,NY,NX)
         THETIZ(L,NY,NX)=THETI(L,NY,NX)
       ENDIF
     ENDIF

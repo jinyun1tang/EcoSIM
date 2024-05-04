@@ -6451,16 +6451,16 @@ implicit none
 
   if(flag=='read')then
     datpr5 => datrc_5d(1:ncols,1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx,1:JZ+1)    
-    call restartvar(ncid, flag, varname='OMEheter', dim1name='column',dim2name='elmnts',&
+    call restartvar(ncid, flag, varname='mBOMHeter', dim1name='column',dim2name='elmnts',&
       dim3name='nlivehetermicb',dim4name='nomcomplx',dim5name='levsoi1',&
       long_name='heterotrophic microbial biomass element',units='g d-2', interpinic_flag='skip', &
       data=datpr5, missing_value=spval, fill_value=spval)      
-    call cpcol(flag,NHW,NHE,NVN,NVS,OMEheter,datrc_5d)      
+    call cpcol(flag,NHW,NHE,NVN,NVS,mBOMHeter_vr,datrc_5d)      
   else
     !print*,'OMC'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,OMEheter,datrc_5d)        
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,mBOMHeter_vr,datrc_5d)        
     datpr5 => datrc_5d(1:ncols,1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx,1:JZ+1)    
-    call restartvar(ncid, flag, varname='OMEheter', dim1name='column',dim2name='elmnts',&
+    call restartvar(ncid, flag, varname='mBOMHeter', dim1name='column',dim2name='elmnts',&
       dim3name='nlivehetermicb',dim4name='nomcomplx',dim5name='levsoi1',&
       long_name='heterotrophic microbial biomass element', &
       units='g d-2', interpinic_flag='skip', data=datpr5, missing_value=spval, &
@@ -6743,16 +6743,16 @@ implicit none
 
   if(flag=='read')then
     datpr4 => datrc_4d(1:ncols,1:NumPlantChemElms,1:NumLiveAutoBioms,1:JZ+1)       
-    call restartvar(ncid, flag, varname='OMEAutor', dim1name='column',dim2name='elmnts',&
+    call restartvar(ncid, flag, varname='mBOMAutor', dim1name='column',dim2name='elmnts',&
       dim3name='nliveautomicb',dim4name='levsoi1',long_name='autotrophic microbial biomass element', &
       units='g d-2', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)            
-    call cpcol(flag,NHW,NHE,NVN,NVS,OMEAutor,datrc_4d)     
+    call cpcol(flag,NHW,NHE,NVN,NVS,mBOMAutor_vr,datrc_4d)     
   else
     !print*,'OMCff'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,OMEAutor,datrc_4d)       
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,mBOMAutor_vr,datrc_4d)       
     datpr4 => datrc_4d(1:ncols,1:NumPlantChemElms,1:NumLiveAutoBioms,1:JZ+1)           
-    call restartvar(ncid, flag, varname='OMEAutor', dim1name='column',dim2name='elmnts',&
+    call restartvar(ncid, flag, varname='mBOMAutor', dim1name='column',dim2name='elmnts',&
       dim3name='nliveautomicb',dim4name='levsoi1',long_name='autotrophic microbial biomass element', &
       units='g d-2', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)            

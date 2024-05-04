@@ -54,22 +54,22 @@ module NutUptakeMod
   real(r8) :: ZPOOLB
   integer :: NB
 
-  associate(                        &
-    TCelciusCanopy_pft         =>  plt_ew%TCelciusCanopy_pft       , &
-    NU                         =>  plt_site%NU       , &
-    AREA3                      =>  plt_site%AREA3    , &
-    NH3Dep2Can_brch            =>  plt_rbgc%NH3Dep2Can_brch    , &
-    ZEROP                      =>  plt_biom%ZEROP    , &
-    AtmGasc                    =>  plt_site%AtmGasc  , &    
-    LeafPetolBiomassC_brch     =>  plt_biom%LeafPetolBiomassC_brch    , &
-    CanopyNonstElms_brch       =>  plt_biom%CanopyNonstElms_brch   , &
-    LeafPetoNonstElmConc_brch  =>  plt_biom%LeafPetoNonstElmConc_brch   , &
-    CanPStomaResistH2O_pft     =>  plt_photo%CanPStomaResistH2O_pft      , &
-    CanopyBndlResist_pft       =>  plt_photo%CanopyBndlResist_pft     , &
-    LeafAreaLive_brch          =>  plt_morph%LeafAreaLive_brch   , &
-    NumOfBranches_pft          =>  plt_morph%NumOfBranches_pft     , &
-    FracRadPARbyCanopy_pft     =>  plt_rad%FracRadPARbyCanopy_pft     , &
-    CanopyLeafArea_pft         =>  plt_morph%CanopyLeafArea_pft     &
+  associate(                                                         &
+    TCelciusCanopy_pft        => plt_ew%TCelciusCanopy_pft,          &
+    NU                        => plt_site%NU,                        &
+    AREA3                     => plt_site%AREA3,                     &
+    NH3Dep2Can_brch           => plt_rbgc%NH3Dep2Can_brch,           &
+    ZEROP                     => plt_biom%ZEROP,                     &
+    AtmGasc                   => plt_site%AtmGasc,                   &
+    LeafPetolBiomassC_brch    => plt_biom%LeafPetolBiomassC_brch,    &
+    CanopyNonstElms_brch      => plt_biom%CanopyNonstElms_brch,      &
+    LeafPetoNonstElmConc_brch => plt_biom%LeafPetoNonstElmConc_brch, &
+    CanPStomaResistH2O_pft    => plt_photo%CanPStomaResistH2O_pft,   &
+    CanopyBndlResist_pft      => plt_photo%CanopyBndlResist_pft,     &
+    LeafAreaLive_brch         => plt_morph%LeafAreaLive_brch,        &
+    NumOfBranches_pft         => plt_morph%NumOfBranches_pft,        &
+    FracRadPARbyCanopy_pft    => plt_rad%FracRadPARbyCanopy_pft,     &
+    CanopyLeafArea_pft        => plt_morph%CanopyLeafArea_pft        &
   )
   !
   !     NH3 EXCHANGE BETWEEN CANOPY AND ATMOSPHERE FROM NH3
@@ -122,21 +122,21 @@ module NutUptakeMod
   real(r8) :: FCUP,FZUP,FPUP,FWSRT,PerPlantRootH2OUptake,dtPerPlantRootH2OUptake,FOXYX,PopPlantO2Uptake_vr
   integer :: N,L
 !     begin_execution
-  associate(                             &
-    THETW                   =>  plt_soilchem%THETW   , &
-    VLSoilPoreMicP_vr          =>  plt_soilchem%VLSoilPoreMicP_vr    , &
-    ZEROS2                  =>  plt_site%ZEROS2      , &
-    NU                      =>  plt_site%NU          , &
-    ZERO                    =>  plt_site%ZERO        , &
-    ZEROP                   =>  plt_biom%ZEROP       , &
-    RootO2Dmnd4Resp_pvr                   =>  plt_rbgc%RootO2Dmnd4Resp_pvr       , &
-    RAutoRootO2Limter_pvr   =>  plt_rbgc%RAutoRootO2Limter_pvr        , &
-    RootRespPotent_pvr      =>  plt_rbgc%RootRespPotent_pvr       , &
-    RootLenPerPlant_pvr     =>  plt_morph%RootLenPerPlant_pvr      , &
-    MY                      =>  plt_morph%MY         , &
-    RootLenDensPerPlant_pvr =>  plt_morph%RootLenDensPerPlant_pvr      , &
-    RootVH2O_pvr            =>  plt_morph%RootVH2O_pvr     , &
-    MaxSoiL4Root            =>  plt_morph%MaxSoiL4Root           &
+  associate(                                                      &
+    THETW_vr                => plt_soilchem%THETW_vr,             &
+    VLSoilPoreMicP_vr       => plt_soilchem%VLSoilPoreMicP_vr,    &
+    ZEROS2                  => plt_site%ZEROS2,                   &
+    NU                      => plt_site%NU,                       &
+    ZERO                    => plt_site%ZERO,                     &
+    ZEROP                   => plt_biom%ZEROP,                    &
+    RootO2Dmnd4Resp_pvr     => plt_rbgc%RootO2Dmnd4Resp_pvr,      &
+    RAutoRootO2Limter_pvr   => plt_rbgc%RAutoRootO2Limter_pvr,    &
+    RootRespPotent_pvr      => plt_rbgc%RootRespPotent_pvr,       &
+    RootLenPerPlant_pvr     => plt_morph%RootLenPerPlant_pvr,     &
+    MY                      => plt_morph%MY,                      &
+    RootLenDensPerPlant_pvr => plt_morph%RootLenDensPerPlant_pvr, &
+    RootVH2O_pvr            => plt_morph%RootVH2O_pvr,            &
+    MaxSoiL4Root            => plt_morph%MaxSoiL4Root             &
   )
 
   call ZeroUptake(NZ)
@@ -144,7 +144,7 @@ module NutUptakeMod
   D955: DO N=1,MY(NZ)
     D950: DO L=NU,MaxSoiL4Root(NZ)
       IF(VLSoilPoreMicP_vr(L).GT.ZEROS2.AND.RootLenDensPerPlant_pvr(N,L,NZ).GT.ZERO &
-        .AND.RootVH2O_pvr(N,L,NZ).GT.ZEROP(NZ).AND.THETW(L).GT.ZERO)THEN
+        .AND.RootVH2O_pvr(N,L,NZ).GT.ZEROP(NZ).AND.THETW_vr(L).GT.ZERO)THEN
         TFOXYX=0.0_r8
         call GetUptakeCapcity(N,L,NZ,FracPRoot4Uptake,MinFracPRoot4Uptake,FCUP,FZUP,FPUP,&
           FWSRT,PerPlantRootH2OUptake,dtPerPlantRootH2OUptake,FOXYX)
@@ -268,19 +268,19 @@ module NutUptakeMod
   real(r8) :: FPO4X,FPOBX
   real(r8) :: POSGX
   real(r8) :: PATHL
-  associate(                               &
-    TortMicPM    =>   plt_site%TortMicPM       , &
-    ZEROS        =>   plt_site%ZEROS      , &
-    ZERO2        =>   plt_site%ZERO2      , &
-    RUPP1B       =>   plt_rbgc%RUPP1B     , &
-    RUPP1P       =>   plt_rbgc%RUPP1P     , &
-    RUPP2P       =>   plt_rbgc%RUPP2P     , &
-    RUPP2B       =>   plt_rbgc%RUPP2B     , &
-    SoluteDifusvty_vr   =>   plt_soilchem%SoluteDifusvty_vr, &
-    RH1PO4EcoDmndBandPrev_vr        =>   plt_bgcr%RH1PO4EcoDmndBandPrev_vr      , &
-    RH2PO4EcoDmndBandPrev_vr        =>   plt_bgcr%RH2PO4EcoDmndBandPrev_vr      , &
-    RH1PO4EcoDmndSoilPrev_vr        =>   plt_bgcr%RH1PO4EcoDmndSoilPrev_vr      , &
-    RH2PO4EcoDmndSoilPrev_vr        =>   plt_bgcr%RH2PO4EcoDmndSoilPrev_vr        &
+  associate(                                                       &
+    TortMicPM                => plt_site%TortMicPM,                &
+    ZEROS                    => plt_site%ZEROS,                    &
+    ZERO2                    => plt_site%ZERO2,                    &
+    RUPP1B                   => plt_rbgc%RUPP1B,                   &
+    RUPP1P                   => plt_rbgc%RUPP1P,                   &
+    RUPP2P                   => plt_rbgc%RUPP2P,                   &
+    RUPP2B                   => plt_rbgc%RUPP2B,                   &
+    SoluteDifusvty_vr        => plt_soilchem%SoluteDifusvty_vr,    &
+    RH1PO4EcoDmndBandPrev_vr => plt_bgcr%RH1PO4EcoDmndBandPrev_vr, &
+    RH2PO4EcoDmndBandPrev_vr => plt_bgcr%RH2PO4EcoDmndBandPrev_vr, &
+    RH1PO4EcoDmndSoilPrev_vr => plt_bgcr%RH1PO4EcoDmndSoilPrev_vr, &
+    RH2PO4EcoDmndSoilPrev_vr => plt_bgcr%RH2PO4EcoDmndSoilPrev_vr  &
   )
   TFPO4X=0.0_r8
   TFPOBX=0.0_r8
@@ -357,26 +357,26 @@ module NutUptakeMod
   type(PlantSoluteUptakeConfig_type) :: PlantSoluteUptakeConfig
 
 ! begin_execution
-  associate(                              &
-    PlantPopulation_pft       =>  plt_site%PlantPopulation_pft         , &
-    TortMicPM                 =>  plt_site%TortMicPM       , &
-    ZERO                      =>  plt_site%ZERO       , &
-    RootAreaPerPlant_pvr      =>  plt_morph%RootAreaPerPlant_pvr     , &
-    fTgrowRootP_vr            =>  plt_pheno%fTgrowRootP_vr      , &
-    RAutoRootO2Limter_pvr     =>  plt_rbgc%RAutoRootO2Limter_pvr       , &
-    VmaxNO3Root_pft           =>  plt_rbgc%VmaxNO3Root_pft     , &
-    CminNO3Root_pft           =>  plt_rbgc%CminNO3Root_pft     , &
-    KmNO3Root_pft             =>  plt_rbgc%KmNO3Root_pft     , &
-    RootCUlmNutUptake_pvr     =>  plt_rbgc%RootCUlmNutUptake_pvr     , &
-    RUNNOP                    =>  plt_rbgc%RUNNOP     , &
-    RootNutUptake_pvr         =>  plt_rbgc%RootNutUptake_pvr    , &
-    RUNNXP                    =>  plt_rbgc%RUNNXP     , &
-    RootOUlmNutUptake_pvr     =>  plt_rbgc%RootOUlmNutUptake_pvr     , &
-    SoluteDifusvty_vr                =>  plt_soilchem%SoluteDifusvty_vr, &
-    trc_solml_vr              => plt_soilchem%trc_solml_vr  , &
-    trcs_VLN_vr               =>  plt_soilchem%trcs_VLN_vr  , &
-    trc_solcl_vr              =>  plt_soilchem%trc_solcl_vr , &
-    VLWatMicP                 =>  plt_soilchem%VLWatMicP     &
+  associate(                                                 &
+    PlantPopulation_pft   => plt_site%PlantPopulation_pft,   &
+    TortMicPM             => plt_site%TortMicPM,             &
+    ZERO                  => plt_site%ZERO,                  &
+    RootAreaPerPlant_pvr  => plt_morph%RootAreaPerPlant_pvr, &
+    fTgrowRootP_vr        => plt_pheno%fTgrowRootP_vr,       &
+    RAutoRootO2Limter_pvr => plt_rbgc%RAutoRootO2Limter_pvr, &
+    VmaxNO3Root_pft       => plt_rbgc%VmaxNO3Root_pft,       &
+    CminNO3Root_pft       => plt_rbgc%CminNO3Root_pft,       &
+    KmNO3Root_pft         => plt_rbgc%KmNO3Root_pft,         &
+    RootCUlmNutUptake_pvr => plt_rbgc%RootCUlmNutUptake_pvr, &
+    RUNNOP                => plt_rbgc%RUNNOP,                &
+    RootNutUptake_pvr     => plt_rbgc%RootNutUptake_pvr,     &
+    RUNNXP                => plt_rbgc%RUNNXP,                &
+    RootOUlmNutUptake_pvr => plt_rbgc%RootOUlmNutUptake_pvr, &
+    SoluteDifusvty_vr     => plt_soilchem%SoluteDifusvty_vr, &
+    trc_solml_vr          => plt_soilchem%trc_solml_vr,      &
+    trcs_VLN_vr           => plt_soilchem%trcs_VLN_vr,       &
+    trc_solcl_vr          => plt_soilchem%trc_solcl_vr,      &
+    VLWatMicP             => plt_soilchem%VLWatMicP          &
   )
 !
 ! PARAMETERS FOR RADIAL MASS FLOW AND DIFFUSION OF NO3
@@ -548,7 +548,7 @@ module NutUptakeMod
     RUNNHP                      =>  plt_rbgc%RUNNHP                      , &
     RUNNBP                      =>  plt_rbgc%RUNNBP                      , &
     RootAreaPerPlant_pvr        =>  plt_morph%RootAreaPerPlant_pvr       , &
-    SoluteDifusvty_vr                  =>  plt_soilchem%SoluteDifusvty_vr              , &
+    SoluteDifusvty_vr           =>  plt_soilchem%SoluteDifusvty_vr       , &
     VLWatMicP                   =>  plt_soilchem%VLWatMicP               , &
     trcs_VLN_vr                 =>  plt_soilchem%trcs_VLN_vr             , &
     trc_solml_vr                =>  plt_soilchem%trc_solml_vr            , &
@@ -708,24 +708,24 @@ module NutUptakeMod
   real(r8) :: X,Y
   type(PlantSoluteUptakeConfig_type) :: PlantSoluteUptakeConfig
   !     begin_execution
-  associate(                             &
-    PlantPopulation_pft         => plt_site%PlantPopulation_pft         , &
-    ZERO                        => plt_site%ZERO       , &
-    fTgrowRootP_vr              => plt_pheno%fTgrowRootP_vr      , &
-    RAutoRootO2Limter_pvr       => plt_rbgc%RAutoRootO2Limter_pvr       , &
-    CMinPO4Root_pft             => plt_rbgc%CMinPO4Root_pft     , &
-    KmPO4Root_pft               => plt_rbgc%KmPO4Root_pft     , &
-    VmaxPO4Root_pft             => plt_rbgc%VmaxPO4Root_pft     , &
-    RootCUlmNutUptake_pvr       => plt_rbgc%RootCUlmNutUptake_pvr     , &
-    RUPP1P                      => plt_rbgc%RUPP1P     , &
-    RootNutUptake_pvr           => plt_rbgc%RootNutUptake_pvr     , &
-    RootOUlmNutUptake_pvr       => plt_rbgc%RootOUlmNutUptake_pvr     , &
-    RUPP1B                      => plt_rbgc%RUPP1B     , &
-    RootAreaPerPlant_pvr        => plt_morph%RootAreaPerPlant_pvr     , &
-    VLWatMicP                   => plt_soilchem%VLWatMicP   , &
-    trcs_VLN_vr                 => plt_soilchem%trcs_VLN_vr  , &
-    trc_solcl_vr                => plt_soilchem%trc_solcl_vr  , &
-    trc_solml_vr                => plt_soilchem%trc_solml_vr    &
+  associate(                                                 &
+    PlantPopulation_pft   => plt_site%PlantPopulation_pft,   &
+    ZERO                  => plt_site%ZERO,                  &
+    fTgrowRootP_vr        => plt_pheno%fTgrowRootP_vr,       &
+    RAutoRootO2Limter_pvr => plt_rbgc%RAutoRootO2Limter_pvr, &
+    CMinPO4Root_pft       => plt_rbgc%CMinPO4Root_pft,       &
+    KmPO4Root_pft         => plt_rbgc%KmPO4Root_pft,         &
+    VmaxPO4Root_pft       => plt_rbgc%VmaxPO4Root_pft,       &
+    RootCUlmNutUptake_pvr => plt_rbgc%RootCUlmNutUptake_pvr, &
+    RUPP1P                => plt_rbgc%RUPP1P,                &
+    RootNutUptake_pvr     => plt_rbgc%RootNutUptake_pvr,     &
+    RootOUlmNutUptake_pvr => plt_rbgc%RootOUlmNutUptake_pvr, &
+    RUPP1B                => plt_rbgc%RUPP1B,                &
+    RootAreaPerPlant_pvr  => plt_morph%RootAreaPerPlant_pvr, &
+    VLWatMicP             => plt_soilchem%VLWatMicP,         &
+    trcs_VLN_vr           => plt_soilchem%trcs_VLN_vr,       &
+    trc_solcl_vr          => plt_soilchem%trc_solcl_vr,      &
+    trc_solml_vr          => plt_soilchem%trc_solml_vr       &
 
   )
   !
@@ -1025,17 +1025,17 @@ module NutUptakeMod
   real(r8) :: TFNH4X,TFNO3X,TFNHBX,TFNOBX
 
 !     begin_execution
-  associate(                          &
-    ZERO2   =>  plt_site%ZERO2  , &
-    ZEROS   =>  plt_site%ZEROS  , &
-    RUNNXP  =>  plt_rbgc%RUNNXP , &
-    RUNNHP  =>  plt_rbgc%RUNNHP , &
-    RUNNBP  =>  plt_rbgc%RUNNBP , &
-    RUNNOP  =>  plt_rbgc%RUNNOP , &
-    RNO3EcoDmndSoilPrev_vr   =>  plt_bgcr%RNO3EcoDmndSoilPrev_vr  , &
-    RNH4EcoDmndBandPrev_vr   =>  plt_bgcr%RNH4EcoDmndBandPrev_vr  , &
-    RNH4EcoDmndSoilPrev_vr   =>  plt_bgcr%RNH4EcoDmndSoilPrev_vr  , &
-    RNO3EcoDmndBandPrev_vr   =>  plt_bgcr%RNO3EcoDmndBandPrev_vr    &
+  associate(                                                   &
+    ZERO2                  => plt_site%ZERO2,                  &
+    ZEROS                  => plt_site%ZEROS,                  &
+    RUNNXP                 => plt_rbgc%RUNNXP,                 &
+    RUNNHP                 => plt_rbgc%RUNNHP,                 &
+    RUNNBP                 => plt_rbgc%RUNNBP,                 &
+    RUNNOP                 => plt_rbgc%RUNNOP,                 &
+    RNO3EcoDmndSoilPrev_vr => plt_bgcr%RNO3EcoDmndSoilPrev_vr, &
+    RNH4EcoDmndBandPrev_vr => plt_bgcr%RNH4EcoDmndBandPrev_vr, &
+    RNH4EcoDmndSoilPrev_vr => plt_bgcr%RNH4EcoDmndSoilPrev_vr, &
+    RNO3EcoDmndBandPrev_vr => plt_bgcr%RNO3EcoDmndBandPrev_vr  &
   )
   TFNH4X=0.0_r8
   TFNHBX=0.0_r8
@@ -1097,7 +1097,7 @@ module NutUptakeMod
   real(r8), intent(out):: FCUP,FZUP,FPUP,FWSRT,PerPlantRootH2OUptake,dtPerPlantRootH2OUptake,FOXYX
 
   associate(                                                                 &
-    RO2EcoDmndPrev_vr                           => plt_bgcr%RO2EcoDmndPrev_vr                      , &
+    RO2EcoDmndPrev_vr               => plt_bgcr%RO2EcoDmndPrev_vr          , &
     RCO2N_pvr                       => plt_rbgc%RCO2N_pvr                  , &
     RootO2Dmnd4Resp_pvr             => plt_rbgc%RootO2Dmnd4Resp_pvr        , &
     PlantPopulation_pft             => plt_site%PlantPopulation_pft        , &
@@ -1307,7 +1307,7 @@ module NutUptakeMod
   integer :: K,NE
   !     begin_execution
   associate(                                                      &
-    REcoDOMUptk_vr           =>  plt_bgcr%REcoDOMUptk_vr          , &
+    REcoDOMUptk_vr          =>  plt_bgcr%REcoDOMUptk_vr         , &
     RootMycoNonstElms_rpvr  => plt_biom%RootMycoNonstElms_rpvr  , &    
     RootMycoExudElm_pvr     =>  plt_rbgc%RootMycoExudElm_pvr    , &
     RootMycoExudElms_pft    =>  plt_rbgc%RootMycoExudElms_pft   , &

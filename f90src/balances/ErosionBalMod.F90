@@ -131,9 +131,9 @@ implicit none
             DO M=1,nlbiomcp
               MID=micpar%get_micb_id(M,NGL)
               DO NE=1,NumPlantChemElms
-                FOMC=FSINK*OMEheter(NE,MID,K,L,NY,NX)
-                OMEheter(NE,MID,K,LL,NY,NX)=OMEheter(NE,MID,K,LL,NY,NX)+FOMC                
-                OMEheter(NE,MID,K,L,NY,NX)=OMEheter(NE,MID,K,L,NY,NX)-FOMC
+                FOMC=FSINK*mBOMHeter_vr(NE,MID,K,L,NY,NX)
+                mBOMHeter_vr(NE,MID,K,LL,NY,NX)=mBOMHeter_vr(NE,MID,K,LL,NY,NX)+FOMC                
+                mBOMHeter_vr(NE,MID,K,L,NY,NX)=mBOMHeter_vr(NE,MID,K,L,NY,NX)-FOMC
               ENDDO
             enddo
           enddo
@@ -150,9 +150,9 @@ implicit none
           DO M=1,nlbiomcp
             MID=micpar%get_micb_id(M,NGL)        
             DO NE=1,NumPlantChemElms              
-              FOMC=FSINK*OMEAutor(NE,MID,L,NY,NX)
-              OMEAutor(NE,MID,LL,NY,NX)=OMEAutor(NE,MID,LL,NY,NX)+FOMC
-              OMEAutor(NE,MID,L,NY,NX)=OMEAutor(NE,MID,L,NY,NX)-FOMC
+              FOMC=FSINK*mBOMAutor_vr(NE,MID,L,NY,NX)
+              mBOMAutor_vr(NE,MID,LL,NY,NX)=mBOMAutor_vr(NE,MID,LL,NY,NX)+FOMC
+              mBOMAutor_vr(NE,MID,L,NY,NX)=mBOMAutor_vr(NE,MID,L,NY,NX)-FOMC
             ENDDO
           enddo
         enddo

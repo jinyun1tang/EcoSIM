@@ -59,61 +59,61 @@ module RootGasMod
   real(r8) :: ZH3PA,ZH3PB,ZH3GA,ZH3GB
   integer  :: NTG
 !     begin_execution
-  associate(                                                           &
-    RootStrutElms_pft          =>  plt_biom%RootStrutElms_pft        , &
-    ZEROP                      =>  plt_biom%ZEROP                    , &
-    PlantPopulation_pft        =>  plt_site%PlantPopulation_pft      , &
-    DPTHZ                      =>  plt_site%DPTHZ                    , &
-    AtmGasc                    =>  plt_site%AtmGasc                  , &
-    ZEROS                      =>  plt_site%ZEROS                    , &
-    ZERO                       =>  plt_site%ZERO                     , &
-    VLWatMicPM                 =>  plt_site%VLWatMicPM               , &
-    VLsoiAirPM                 =>  plt_site%VLsoiAirPM               , &
-    TortMicPM                  =>  plt_site%TortMicPM                , &
-    FILM                       =>  plt_site%FILM                     , &
-    RO2GasXchangePrev_vr                      =>  plt_bgcr%RO2GasXchangePrev_vr                    , &
-    RCO2F                      =>  plt_bgcr%RCO2F                    , &
-    RO2AquaXchangePrev_vr                      =>  plt_bgcr%RO2AquaXchangePrev_vr                    , &
-    RootO2Uptk_pvr             =>  plt_rbgc%RootO2Uptk_pvr           , &
-    RAutoRootO2Limter_pvr      =>  plt_rbgc%RAutoRootO2Limter_pvr    , &
-    ZEROQ                      =>  plt_rbgc%ZEROQ                    , &
-    RootRespPotent_pvr         =>  plt_rbgc%RootRespPotent_pvr       , &
-    RootO2Dmnd4Resp_pvr        =>  plt_rbgc%RootO2Dmnd4Resp_pvr      , &
-    RO2UptkSoilM_vr            =>  plt_rbgc%RO2UptkSoilM_vr          , &
-    RootCO2Emis_pvr            =>  plt_rbgc%RootCO2Emis_pvr          , &
-    trcg_air2root_flx__pvr     =>  plt_rbgc%trcg_air2root_flx__pvr   , &
-    trcg_Root_DisEvap_flx_vr   =>  plt_rbgc%trcg_Root_DisEvap_flx_vr , &
-    RUPGasSol_vr               =>  plt_rbgc%RUPGasSol_vr             , &
-    RootCO2Autor_pvr                  =>  plt_rbgc%RootCO2Autor_pvr                , &
-    trcg_rootml_pvr            =>  plt_rbgc%trcg_rootml_pvr          , &
-    trcs_rootml_pvr            =>  plt_rbgc%trcs_rootml_pvr          , &
-    TScal4Difsvity_vr                       =>  plt_soilchem%TScal4Difsvity_vr                 , &
-    trcs_VLN_vr                =>  plt_soilchem%trcs_VLN_vr          , &
-    trc_solml_vr               =>  plt_soilchem%trc_solml_vr         , &
-    trc_gascl_vr               =>  plt_soilchem%trc_gascl_vr         , &
-    GasDifc_vr                 =>  plt_soilchem%GasDifc_vr           , &
-    SoluteDifusvty_vr                 =>  plt_soilchem%SoluteDifusvty_vr           , &
-    GasSolbility_vr            => plt_soilchem%GasSolbility_vr       , &
-    trc_solcl_vr               =>  plt_soilchem%trc_solcl_vr         , &
-    THETY                      =>  plt_soilchem%THETY                , &
-    VLSoilMicP                 =>  plt_soilchem%VLSoilMicP           , &
-    THETPM                     =>  plt_soilchem%THETPM               , &
-    trc_gasml_vr               => plt_soilchem%trc_gasml_vr          , &
-    DiffusivitySolutEff        =>  plt_soilchem%DiffusivitySolutEff  , &
-    iPlantCalendar_brch        =>  plt_pheno%iPlantCalendar_brch     , &
-    RootPoreTortu4Gas          =>  plt_morph%RootPoreTortu4Gas       , &
-    Root1stRadius_pvr          =>  plt_morph%Root1stRadius_pvr       , &
-    Root2ndAveLen_pvr          =>  plt_morph%Root2ndAveLen_pvr       , &
-    RootPoreVol_pvr            =>  plt_morph%RootPoreVol_pvr         , &
-    RootLenPerPlant_pvr        =>  plt_morph%RootLenPerPlant_pvr     , &
-    Root2ndXNum_pvr            =>  plt_morph%Root2ndXNum_pvr         , &
-    Root2ndRadius_pvr          =>  plt_morph%Root2ndRadius_pvr       , &
-    RootRaidus_rpft            =>  plt_morph%RootRaidus_rpft         , &
-    RootVH2O_pvr               =>  plt_morph%RootVH2O_pvr            , &
-    RootPorosity_pft           =>  plt_morph%RootPorosity_pft        , &
-    Root1stXNumL_pvr           =>  plt_morph%Root1stXNumL_pvr        , &
-    NGTopRootLayer_pft         =>  plt_morph%NGTopRootLayer_pft      , &
-    MainBranchNum_pft          =>  plt_morph%MainBranchNum_pft         &
+  associate(                                                       &
+    RootStrutElms_pft        => plt_biom%RootStrutElms_pft,        &
+    ZEROP                    => plt_biom%ZEROP,                    &
+    PlantPopulation_pft      => plt_site%PlantPopulation_pft,      &
+    DPTHZ                    => plt_site%DPTHZ,                    &
+    AtmGasc                  => plt_site%AtmGasc,                  &
+    ZEROS                    => plt_site%ZEROS,                    &
+    ZERO                     => plt_site%ZERO,                     &
+    VLWatMicPM               => plt_site%VLWatMicPM,               &
+    VLsoiAirPM               => plt_site%VLsoiAirPM,               &
+    TortMicPM                => plt_site%TortMicPM,                &
+    FILM                     => plt_site%FILM,                     &
+    RO2GasXchangePrev_vr     => plt_bgcr%RO2GasXchangePrev_vr,     &
+    RCO2F                    => plt_bgcr%RCO2F,                    &
+    RO2AquaXchangePrev_vr    => plt_bgcr%RO2AquaXchangePrev_vr,    &
+    RootO2Uptk_pvr           => plt_rbgc%RootO2Uptk_pvr,           &
+    RAutoRootO2Limter_pvr    => plt_rbgc%RAutoRootO2Limter_pvr,    &
+    ZEROQ                    => plt_rbgc%ZEROQ,                    &
+    RootRespPotent_pvr       => plt_rbgc%RootRespPotent_pvr,       &
+    RootO2Dmnd4Resp_pvr      => plt_rbgc%RootO2Dmnd4Resp_pvr,      &
+    RO2UptkSoilM_vr          => plt_rbgc%RO2UptkSoilM_vr,          &
+    RootCO2Emis_pvr          => plt_rbgc%RootCO2Emis_pvr,          &
+    trcg_air2root_flx__pvr   => plt_rbgc%trcg_air2root_flx__pvr,   &
+    trcg_Root_DisEvap_flx_vr => plt_rbgc%trcg_Root_DisEvap_flx_vr, &
+    RUPGasSol_vr             => plt_rbgc%RUPGasSol_vr,             &
+    RootCO2Autor_pvr         => plt_rbgc%RootCO2Autor_pvr,         &
+    trcg_rootml_pvr          => plt_rbgc%trcg_rootml_pvr,          &
+    trcs_rootml_pvr          => plt_rbgc%trcs_rootml_pvr,          &
+    TScal4Difsvity_vr        => plt_soilchem%TScal4Difsvity_vr,    &
+    trcs_VLN_vr              => plt_soilchem%trcs_VLN_vr,          &
+    trc_solml_vr             => plt_soilchem%trc_solml_vr,         &
+    trc_gascl_vr             => plt_soilchem%trc_gascl_vr,         &
+    GasDifc_vr               => plt_soilchem%GasDifc_vr,           &
+    SoluteDifusvty_vr        => plt_soilchem%SoluteDifusvty_vr,    &
+    GasSolbility_vr          => plt_soilchem%GasSolbility_vr,      &
+    trc_solcl_vr             => plt_soilchem%trc_solcl_vr,         &
+    THETY_vr                 => plt_soilchem%THETY_vr,             &
+    VLSoilMicP               => plt_soilchem%VLSoilMicP,           &
+    THETPM                   => plt_soilchem%THETPM,               &
+    trc_gasml_vr             => plt_soilchem%trc_gasml_vr,         &
+    DiffusivitySolutEff      => plt_soilchem%DiffusivitySolutEff,  &
+    iPlantCalendar_brch      => plt_pheno%iPlantCalendar_brch,     &
+    RootPoreTortu4Gas        => plt_morph%RootPoreTortu4Gas,       &
+    Root1stRadius_pvr        => plt_morph%Root1stRadius_pvr,       &
+    Root2ndAveLen_pvr        => plt_morph%Root2ndAveLen_pvr,       &
+    RootPoreVol_pvr          => plt_morph%RootPoreVol_pvr,         &
+    RootLenPerPlant_pvr      => plt_morph%RootLenPerPlant_pvr,     &
+    Root2ndXNum_pvr          => plt_morph%Root2ndXNum_pvr,         &
+    Root2ndRadius_pvr        => plt_morph%Root2ndRadius_pvr,       &
+    RootRaidus_rpft          => plt_morph%RootRaidus_rpft,         &
+    RootVH2O_pvr             => plt_morph%RootVH2O_pvr,            &
+    RootPorosity_pft         => plt_morph%RootPorosity_pft,        &
+    Root1stXNumL_pvr         => plt_morph%Root1stXNumL_pvr,        &
+    NGTopRootLayer_pft       => plt_morph%NGTopRootLayer_pft,      &
+    MainBranchNum_pft        => plt_morph%MainBranchNum_pft        &
   )
   
   IF(RootRespPotent_pvr(N,L,NZ).GT.ZEROP(NZ).AND.RootVH2O_pvr(N,L,NZ).GT.ZEROP(NZ) &
@@ -263,7 +263,7 @@ module RootGasMod
       VOLWSB=RTVLWB+VLWatMicPMB
       THETW1=AZMAX1(VLWatMicPM(M,L)/VLSoilMicP(L))
 
-      IF(THETW1.GT.THETY(L).AND.FracPRoot4Uptake(N,L,NZ).GT.ZEROQ(NZ))THEN
+      IF(THETW1.GT.THETY_vr(L).AND.FracPRoot4Uptake(N,L,NZ).GT.ZEROQ(NZ))THEN
         THETM=TortMicPM(M,L)*THETW1
         RRADS=LOG((FILM(M,L)+FineRootRadius(N,L))/FineRootRadius(N,L))
         RTARRX=RootAreaDivRadius_vr(N,L)/RRADS

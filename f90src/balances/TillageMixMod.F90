@@ -51,8 +51,8 @@ module TillageMixMod
   real(r8) :: TOMGC(1:NumLiveHeterBioms,1:jcplx)
   real(r8) :: TOMGN(1:NumLiveHeterBioms,1:jcplx)
   real(r8) :: TOMGP(1:NumLiveHeterBioms,1:jcplx)
-  REAL(R8) :: TOMEheter(NumPlantChemElms,NumLiveHeterBioms,1:jcplx)
-  REAL(R8) :: TOMEAutor(NumPlantChemElms,NumLiveAutoBioms)
+  REAL(R8) :: TmBOMHeter(NumPlantChemElms,NumLiveHeterBioms,1:jcplx)
+  REAL(R8) :: TmBOMAutor(NumPlantChemElms,NumLiveAutoBioms)
   real(r8) :: TORM(NumPlantChemElms,ndbiomcp,1:jcplx)
   real(r8) :: TDOM(idom_beg:idom_end,1:jcplx)
   real(r8) :: TOHM(idom_beg:idom_end,1:jcplx)
@@ -128,8 +128,8 @@ module TillageMixMod
     TP_salml(idsp_beg:idsp_end)=0._r8
     TG_gasml(idg_beg:idg_end-1)=0._r8
 
-    TOMEheter=0.0_r8
-    TOMEAutor=0.0_r8
+    TmBOMHeter=0.0_r8
+    TmBOMAutor=0.0_r8
     TORM=0.0_r8
     TDOM=0.0_r8
     TOHM=0.0_r8
@@ -162,15 +162,17 @@ module TillageMixMod
         DO NGL=JGnio(N),JGnfo(N)
           DO  M=1,nlbiomcp
             MID=micpar%get_micb_id(M,NGL)
-            TOMGC(MID,K)=OMEheter(ielmc,MID,K,0,NY,NX)*CORP0
-            TOMGN(MID,K)=OMEheter(ielmn,MID,K,0,NY,NX)*CORP0
-            TOMGP(MID,K)=OMEheter(ielmp,MID,K,0,NY,NX)*CORP0
-            OMEheter(ielmc,MID,K,0,NY,NX)=OMEheter(ielmc,MID,K,0,NY,NX)*XCORP0
-            OMEheter(ielmn,MID,K,0,NY,NX)=OMEheter(ielmn,MID,K,0,NY,NX)*XCORP0
-            OMEheter(ielmp,MID,K,0,NY,NX)=OMEheter(ielmp,MID,K,0,NY,NX)*XCORP0
-            DC=DC+OMEheter(ielmc,MID,K,0,NY,NX)
-            DN=DN+OMEheter(ielmn,MID,K,0,NY,NX)
-            DP=DP+OMEheter(ielmp,MID,K,0,NY,NX)
+            TOMGC(MID,K)=mBOMHeter_vr(ielmc,MID,K,0,NY,NX)*CORP0
+            TOMGN(MID,K)=mBOMHeter_vr(ielmn,MID,K,0,NY,NX)*CORP0
+            TOMGP(MID,K)=mBOMHeter_vr(ielmp,MID,K,0,NY,NX)*CORP0
+
+            mBOMHeter_vr(ielmc,MID,K,0,NY,NX)=mBOMHeter_vr(ielmc,MID,K,0,NY,NX)*XCORP0
+            mBOMHeter_vr(ielmn,MID,K,0,NY,NX)=mBOMHeter_vr(ielmn,MID,K,0,NY,NX)*XCORP0
+            mBOMHeter_vr(ielmp,MID,K,0,NY,NX)=mBOMHeter_vr(ielmp,MID,K,0,NY,NX)*XCORP0
+
+            DC=DC+mBOMHeter_vr(ielmc,MID,K,0,NY,NX)
+            DN=DN+mBOMHeter_vr(ielmn,MID,K,0,NY,NX)
+            DP=DP+mBOMHeter_vr(ielmp,MID,K,0,NY,NX)
           enddo
         enddo
       ENDDO
@@ -180,15 +182,17 @@ module TillageMixMod
       DO NGL=JGniA(N),JGnfA(N)
         DO  M=1,nlbiomcp
           MID=micpar%get_micb_id(M,NGL)
-          TOMGCff(MID)=OMEAutor(ielmc,MID,0,NY,NX)*CORP0
-          TOMGNff(MID)=OMEAutor(ielmn,MID,0,NY,NX)*CORP0
-          TOMGPff(MID)=OMEAutor(ielmp,MID,0,NY,NX)*CORP0
-          OMEAutor(ielmc,MID,0,NY,NX)=OMEAutor(ielmc,MID,0,NY,NX)*XCORP0
-          OMEAutor(ielmn,MID,0,NY,NX)=OMEAutor(ielmn,MID,0,NY,NX)*XCORP0
-          OMEAutor(ielmp,MID,0,NY,NX)=OMEAutor(ielmp,MID,0,NY,NX)*XCORP0
-          DC=DC+OMEAutor(ielmc,MID,0,NY,NX)
-          DN=DN+OMEAutor(ielmn,MID,0,NY,NX)
-          DP=DP+OMEAutor(ielmp,MID,0,NY,NX)
+          TOMGCff(MID)=mBOMAutor_vr(ielmc,MID,0,NY,NX)*CORP0
+          TOMGNff(MID)=mBOMAutor_vr(ielmn,MID,0,NY,NX)*CORP0
+          TOMGPff(MID)=mBOMAutor_vr(ielmp,MID,0,NY,NX)*CORP0
+
+          mBOMAutor_vr(ielmc,MID,0,NY,NX)=mBOMAutor_vr(ielmc,MID,0,NY,NX)*XCORP0
+          mBOMAutor_vr(ielmn,MID,0,NY,NX)=mBOMAutor_vr(ielmn,MID,0,NY,NX)*XCORP0
+          mBOMAutor_vr(ielmp,MID,0,NY,NX)=mBOMAutor_vr(ielmp,MID,0,NY,NX)*XCORP0
+
+          DC=DC+mBOMAutor_vr(ielmc,MID,0,NY,NX)
+          DN=DN+mBOMAutor_vr(ielmn,MID,0,NY,NX)
+          DP=DP+mBOMAutor_vr(ielmp,MID,0,NY,NX)
         enddo
       enddo
     ENDDO
@@ -198,9 +202,11 @@ module TillageMixMod
         TORXC(M,K)=OMBioResdu_vr(ielmc,M,K,0,NY,NX)*CORP0
         TORXN(M,K)=OMBioResdu_vr(ielmn,M,K,0,NY,NX)*CORP0
         TORXP(M,K)=OMBioResdu_vr(ielmp,M,K,0,NY,NX)*CORP0
+
         OMBioResdu_vr(ielmc,M,K,0,NY,NX)=OMBioResdu_vr(ielmc,M,K,0,NY,NX)*XCORP0
         OMBioResdu_vr(ielmn,M,K,0,NY,NX)=OMBioResdu_vr(ielmn,M,K,0,NY,NX)*XCORP0
         OMBioResdu_vr(ielmp,M,K,0,NY,NX)=OMBioResdu_vr(ielmp,M,K,0,NY,NX)*XCORP0
+
         DC=DC+OMBioResdu_vr(ielmc,M,K,0,NY,NX)
         DN=DN+OMBioResdu_vr(ielmn,M,K,0,NY,NX)
         DP=DP+OMBioResdu_vr(ielmp,M,K,0,NY,NX)
@@ -383,9 +389,9 @@ module TillageMixMod
             DO NGL=JGnio(N),JGnfo(N)
               DO  M=1,nlbiomcp
                 MID=micpar%get_micb_id(M,NGL)
-                TOMEheter(ielmc,MID,K)=TOMEheter(ielmc,MID,K)+TI*OMEheter(ielmc,MID,K,L,NY,NX)
-                TOMEheter(ielmn,MID,K)=TOMEheter(ielmn,MID,K)+TI*OMEheter(ielmn,MID,K,L,NY,NX)
-                TOMEheter(ielmp,MID,K)=TOMEheter(ielmp,MID,K)+TI*OMEheter(ielmp,MID,K,L,NY,NX)
+                DO NE=1,NumPlantChemElms
+                  TmBOMHeter(NE,MID,K)=TmBOMHeter(NE,MID,K)+TI*mBOMHeter_vr(NE,MID,K,L,NY,NX)
+                ENDDO
               enddo
             enddo
           enddo
@@ -395,9 +401,9 @@ module TillageMixMod
           DO NGL=JGniA(N),JGnfA(N)
             DO  M=1,nlbiomcp
               MID=micpar%get_micb_id(M,NGL)
-              TOMEAutor(ielmc,MID)=TOMEAutor(ielmc,MID)+TI*OMEAutor(ielmc,MID,L,NY,NX)
-              TOMEAutor(ielmn,MID)=TOMEAutor(ielmn,MID)+TI*OMEAutor(ielmn,MID,L,NY,NX)
-              TOMEAutor(ielmp,MID)=TOMEAutor(ielmp,MID)+TI*OMEAutor(ielmp,MID,L,NY,NX)
+              DO NE=1,NumPlantChemElms
+              TmBOMAutor(NE,MID)=TmBOMAutor(NE,MID)+TI*mBOMAutor_vr(NE,MID,L,NY,NX)
+              ENDDO
             enddo
           enddo
         enddo
@@ -413,10 +419,10 @@ module TillageMixMod
           TOHM(idom,K)=TOHM(idom,K)+TI*SorbedOM_vr(idom,K,L,NY,NX)
         enddo
         DO  M=1,jsken
-          TOSM(ielmc,M,K)=TOSM(ielmc,M,K)+TI*SolidOM_vr(ielmc,M,K,L,NY,NX)
           TOSA(M,K)=TOSA(M,K)+TI*SolidOMAct_vr(M,K,L,NY,NX)
-          TOSM(ielmn,M,K)=TOSM(ielmn,M,K)+TI*SolidOM_vr(ielmn,M,K,L,NY,NX)
-          TOSM(ielmp,M,K)=TOSM(ielmp,M,K)+TI*SolidOM_vr(ielmp,M,K,L,NY,NX)
+          DO NE=1,NumPlantChemElms
+            TOSM(NE,M,K)=TOSM(NE,M,K)+TI*SolidOM_vr(NE,M,K,L,NY,NX)
+          ENDDO
         ENDDO
       ENDDO
       ZNHUX0=AMAX1(ZNHUX0,ZNHU0(L,NY,NX))
@@ -525,12 +531,10 @@ module TillageMixMod
             DO NGL=JGnio(N),JGnfo(N)
               DO  M=1,nlbiomcp
                 MID=micpar%get_micb_id(M,NGL)
-                OMEheter(ielmc,MID,K,L,NY,NX)=TI*OMEheter(ielmc,MID,K,L,NY,NX)+CORP*(FI*TOMEheter(ielmc,MID,K) &
-                  -TI*OMEheter(ielmc,MID,K,L,NY,NX))+TX*OMEheter(ielmc,MID,K,L,NY,NX)
-                OMEheter(ielmn,MID,K,L,NY,NX)=TI*OMEheter(ielmn,MID,K,L,NY,NX)+CORP*(FI*TOMEheter(ielmn,MID,K) &
-                  -TI*OMEheter(ielmn,MID,K,L,NY,NX))+TX*OMEheter(ielmn,MID,K,L,NY,NX)
-                OMEheter(ielmp,MID,K,L,NY,NX)=TI*OMEheter(ielmp,MID,K,L,NY,NX)+CORP*(FI*TOMEheter(ielmp,MID,K) &
-                  -TI*OMEheter(ielmp,MID,K,L,NY,NX))+TX*OMEheter(ielmp,MID,K,L,NY,NX)
+                DO NE=1,NumPlantChemElms
+                  mBOMHeter_vr(NE,MID,K,L,NY,NX)=TI*mBOMHeter_vr(NE,MID,K,L,NY,NX)+CORP*(FI*TmBOMHeter(NE,MID,K) &
+                    -TI*mBOMHeter_vr(NE,MID,K,L,NY,NX))+TX*mBOMHeter_vr(NE,MID,K,L,NY,NX)
+                  ENDDO
               enddo
             enddo
           enddo
@@ -539,56 +543,38 @@ module TillageMixMod
           DO NGL=JGniA(N),JGnfA(N)
             DO  M=1,nlbiomcp
               MID=micpar%get_micb_id(M,NGL)
-              OMEAutor(ielmc,MID,L,NY,NX)=TI*OMEAutor(ielmc,MID,L,NY,NX)+CORP*(FI*TOMEAutor(ielmc,MID) &
-                -TI*OMEAutor(ielmc,MID,L,NY,NX))+TX*OMEAutor(ielmc,MID,L,NY,NX)
-              OMEAutor(ielmn,MID,L,NY,NX)=TI*OMEAutor(ielmn,MID,L,NY,NX)+CORP*(FI*TOMEAutor(ielmn,MID) &
-                -TI*OMEAutor(ielmn,MID,L,NY,NX))+TX*OMEAutor(ielmn,MID,L,NY,NX)
-              OMEAutor(ielmp,MID,L,NY,NX)=TI*OMEAutor(ielmp,MID,L,NY,NX)+CORP*(FI*TOMEAutor(ielmp,MID) &
-                -TI*OMEAutor(ielmp,MID,L,NY,NX))+TX*OMEAutor(ielmp,MID,L,NY,NX)
+              DO NE=1,NumPlantChemElms
+                mBOMAutor_vr(NE,MID,L,NY,NX)=TI*mBOMAutor_vr(NE,MID,L,NY,NX)+CORP*(FI*TmBOMAutor(NE,MID) &
+                  -TI*mBOMAutor_vr(NE,MID,L,NY,NX))+TX*mBOMAutor_vr(NE,MID,L,NY,NX)
+              ENDDO  
             enddo
           enddo
         enddo
 
         DO  K=1,jcplx
           DO  M=1,ndbiomcp
-            OMBioResdu_vr(ielmc,M,K,L,NY,NX)=TI*OMBioResdu_vr(ielmc,M,K,L,NY,NX)+CORP*(FI*TORM(ielmc,M,K) &
-              -TI*OMBioResdu_vr(ielmc,M,K,L,NY,NX))+TX*OMBioResdu_vr(ielmc,M,K,L,NY,NX)
-            OMBioResdu_vr(ielmn,M,K,L,NY,NX)=TI*OMBioResdu_vr(ielmn,M,K,L,NY,NX)+CORP*(FI*TORM(ielmn,M,K) &
-              -TI*OMBioResdu_vr(ielmn,M,K,L,NY,NX))+TX*OMBioResdu_vr(ielmn,M,K,L,NY,NX)
-            OMBioResdu_vr(ielmp,M,K,L,NY,NX)=TI*OMBioResdu_vr(ielmp,M,K,L,NY,NX)+CORP*(FI*TORM(ielmp,M,K) &
-              -TI*OMBioResdu_vr(ielmp,M,K,L,NY,NX))+TX*OMBioResdu_vr(ielmp,M,K,L,NY,NX)
+            DO NE=1,NumPlantChemElms
+              OMBioResdu_vr(NE,M,K,L,NY,NX)=TI*OMBioResdu_vr(NE,M,K,L,NY,NX)+CORP*(FI*TORM(NE,M,K) &
+                -TI*OMBioResdu_vr(NE,M,K,L,NY,NX))+TX*OMBioResdu_vr(NE,M,K,L,NY,NX)
+            ENDDO  
           ENDDO
-          DOM(idom_doc,K,L,NY,NX)=TI*DOM(idom_doc,K,L,NY,NX)+CORP*(FI*TDOM(idom_doc,K) &
-            -TI*DOM(idom_doc,K,L,NY,NX))+TX*DOM(idom_doc,K,L,NY,NX)+CORP*DOM_Macp(idom_doc,K,L,NY,NX)
-          DOM(idom_don,K,L,NY,NX)=TI*DOM(idom_don,K,L,NY,NX)+CORP*(FI*TDOM(idom_don,K) &
-            -TI*DOM(idom_don,K,L,NY,NX))+TX*DOM(idom_don,K,L,NY,NX)+CORP*DOM_Macp(idom_don,K,L,NY,NX)
-          DOM(idom_dop,K,L,NY,NX)=TI*DOM(idom_dop,K,L,NY,NX)+CORP*(FI*TDOM(idom_dop,K) &
-            -TI*DOM(idom_dop,K,L,NY,NX))+TX*DOM(idom_dop,K,L,NY,NX)+CORP*DOM_Macp(idom_dop,K,L,NY,NX)
-          DOM(idom_acetate,K,L,NY,NX)=TI*DOM(idom_acetate,K,L,NY,NX)+CORP*(FI*TDOM(idom_acetate,K) &
-            -TI*DOM(idom_acetate,K,L,NY,NX))+TX*DOM(idom_acetate,K,L,NY,NX)+CORP*DOM_Macp(idom_acetate,K,L,NY,NX)
 
-          DOM_Macp(idom_doc,K,L,NY,NX)=XCORP(NY,NX)*DOM_Macp(idom_doc,K,L,NY,NX)
-          DOM_Macp(idom_don,K,L,NY,NX)=XCORP(NY,NX)*DOM_Macp(idom_don,K,L,NY,NX)
-          DOM_Macp(idom_dop,K,L,NY,NX)=XCORP(NY,NX)*DOM_Macp(idom_dop,K,L,NY,NX)
-          DOM_Macp(idom_acetate,K,L,NY,NX)=XCORP(NY,NX)*DOM_Macp(idom_acetate,K,L,NY,NX)
+          DO idom=idom_beg,idom_end
+            DOM(idom,K,L,NY,NX)=TI*DOM(idom,K,L,NY,NX)+CORP*(FI*TDOM(idom,K) &
+              -TI*DOM(idom,K,L,NY,NX))+TX*DOM(idom,K,L,NY,NX)+CORP*DOM_Macp(idom,K,L,NY,NX)
+            DOM_Macp(idom,K,L,NY,NX)=XCORP(NY,NX)*DOM_Macp(idom,K,L,NY,NX)
+            SorbedOM_vr(idom,K,L,NY,NX)=TI*SorbedOM_vr(idom,K,L,NY,NX)+CORP*(FI*TOHM(idom,K) &
+              -TI*SorbedOM_vr(idom,K,L,NY,NX))+TX*SorbedOM_vr(idom,K,L,NY,NX)
+          ENDDO  
 
-          SorbedOM_vr(ielmc,K,L,NY,NX)=TI*SorbedOM_vr(ielmc,K,L,NY,NX)+CORP*(FI*TOHM(ielmc,K) &
-            -TI*SorbedOM_vr(ielmc,K,L,NY,NX))+TX*SorbedOM_vr(ielmc,K,L,NY,NX)
-          SorbedOM_vr(ielmn,K,L,NY,NX)=TI*SorbedOM_vr(ielmn,K,L,NY,NX)+CORP*(FI*TOHM(ielmn,K) &
-            -TI*SorbedOM_vr(ielmn,K,L,NY,NX))+TX*SorbedOM_vr(ielmn,K,L,NY,NX)
-          SorbedOM_vr(ielmp,K,L,NY,NX)=TI*SorbedOM_vr(ielmp,K,L,NY,NX)+CORP*(FI*TOHM(ielmp,K) &
-            -TI*SorbedOM_vr(ielmp,K,L,NY,NX))+TX*SorbedOM_vr(ielmp,K,L,NY,NX)
-          SorbedOM_vr(idom_acetate,K,L,NY,NX)=TI*SorbedOM_vr(idom_acetate,K,L,NY,NX)+CORP*(FI*TOHM(idom_acetate,K) &
-            -TI*SorbedOM_vr(idom_acetate,K,L,NY,NX))+TX*SorbedOM_vr(idom_acetate,K,L,NY,NX)
           DO  M=1,jsken
-            SolidOM_vr(ielmc,M,K,L,NY,NX)=TI*SolidOM_vr(ielmc,M,K,L,NY,NX)+CORP*(FI*TOSM(ielmc,M,K) &
-              -TI*SolidOM_vr(ielmc,M,K,L,NY,NX))+TX*SolidOM_vr(ielmc,M,K,L,NY,NX)
             SolidOMAct_vr(M,K,L,NY,NX)=TI*SolidOMAct_vr(M,K,L,NY,NX)+CORP*(FI*TOSA(M,K) &
               -TI*SolidOMAct_vr(M,K,L,NY,NX))+TX*SolidOMAct_vr(M,K,L,NY,NX)
-            SolidOM_vr(ielmn,M,K,L,NY,NX)=TI*SolidOM_vr(ielmn,M,K,L,NY,NX)+CORP*(FI*TOSM(ielmn,M,K) &
-              -TI*SolidOM_vr(ielmn,M,K,L,NY,NX))+TX*SolidOM_vr(ielmn,M,K,L,NY,NX)
-            SolidOM_vr(ielmp,M,K,L,NY,NX)=TI*SolidOM_vr(ielmp,M,K,L,NY,NX)+CORP*(FI*TOSM(ielmp,M,K) &
-              -TI*SolidOM_vr(ielmp,M,K,L,NY,NX))+TX*SolidOM_vr(ielmp,M,K,L,NY,NX)
+            DO NE=1,NumPlantChemElms  
+              SolidOM_vr(NE,M,K,L,NY,NX)=TI*SolidOM_vr(NE,M,K,L,NY,NX)+CORP*(FI*TOSM(NE,M,K) &
+                -TI*SolidOM_vr(NE,M,K,L,NY,NX))+TX*SolidOM_vr(NE,M,K,L,NY,NX)
+            ENDDO
+
           ENDDO
         ENDDO
 !
@@ -599,10 +585,10 @@ module TillageMixMod
           DO  N=1,NumMicbFunGrupsPerCmplx
             DO NGL=JGnio(N),JGnfo(N)
               DO M=1,nlbiomcp
-                MID=micpar%get_micb_id(M,NGL)
-                OMEheter(ielmc,MID,K,L,NY,NX)=OMEheter(ielmc,MID,K,L,NY,NX)+FI*TOMGC(MID,K)
-                OMEheter(ielmn,MID,K,L,NY,NX)=OMEheter(ielmn,MID,K,L,NY,NX)+FI*TOMGN(MID,K)
-                OMEheter(ielmp,MID,K,L,NY,NX)=OMEheter(ielmp,MID,K,L,NY,NX)+FI*TOMGP(MID,K)
+                MID=micpar%get_micb_id(M,NGL)                
+                mBOMHeter_vr(ielmc,MID,K,L,NY,NX)=mBOMHeter_vr(ielmc,MID,K,L,NY,NX)+FI*TOMGC(MID,K)
+                mBOMHeter_vr(ielmn,MID,K,L,NY,NX)=mBOMHeter_vr(ielmn,MID,K,L,NY,NX)+FI*TOMGN(MID,K)
+                mBOMHeter_vr(ielmp,MID,K,L,NY,NX)=mBOMHeter_vr(ielmp,MID,K,L,NY,NX)+FI*TOMGP(MID,K)
               enddo
             enddo
           ENDDO
@@ -612,9 +598,9 @@ module TillageMixMod
           DO NGL=JGniA(N),JGnfA(N)
             DO M=1,nlbiomcp
               MID=micpar%get_micb_id(M,NGL)
-              OMEAutor(ielmc,MID,L,NY,NX)=OMEAutor(ielmc,MID,L,NY,NX)+FI*TOMGCff(MID)
-              OMEAutor(ielmn,MID,L,NY,NX)=OMEAutor(ielmn,MID,L,NY,NX)+FI*TOMGNff(MID)
-              OMEAutor(ielmp,MID,L,NY,NX)=OMEAutor(ielmp,MID,L,NY,NX)+FI*TOMGPff(MID)
+              mBOMAutor_vr(ielmc,MID,L,NY,NX)=mBOMAutor_vr(ielmc,MID,L,NY,NX)+FI*TOMGCff(MID)
+              mBOMAutor_vr(ielmn,MID,L,NY,NX)=mBOMAutor_vr(ielmn,MID,L,NY,NX)+FI*TOMGNff(MID)
+              mBOMAutor_vr(ielmp,MID,L,NY,NX)=mBOMAutor_vr(ielmp,MID,L,NY,NX)+FI*TOMGPff(MID)
             enddo
           enddo
         ENDDO
@@ -633,6 +619,7 @@ module TillageMixMod
           DOM_Macp(idom_don,K,L,NY,NX)=DOM_Macp(idom_don,K,L,NY,NX)+FI*TOQHN(K)
           DOM_Macp(idom_dop,K,L,NY,NX)=DOM_Macp(idom_dop,K,L,NY,NX)+FI*TOQHP(K)
           DOM_Macp(idom_acetate,K,L,NY,NX)=DOM_Macp(idom_acetate,K,L,NY,NX)+FI*TOQHA(K)
+
           SorbedOM_vr(ielmc,K,L,NY,NX)=SorbedOM_vr(ielmc,K,L,NY,NX)+FI*TOHGC(K)
           SorbedOM_vr(ielmn,K,L,NY,NX)=SorbedOM_vr(ielmn,K,L,NY,NX)+FI*TOHGN(K)
           SorbedOM_vr(ielmp,K,L,NY,NX)=SorbedOM_vr(ielmp,K,L,NY,NX)+FI*TOHGP(K)
@@ -656,9 +643,9 @@ module TillageMixMod
             DO NGL=JGnio(N),JGnfo(N)
               DO  M=1,nlbiomcp
                 MID=micpar%get_micb_id(M,NGL)
-                OC=OC+OMEheter(ielmc,MID,K,L,NY,NX)
-                ON=ON+OMEheter(ielmn,MID,K,L,NY,NX)
-                OP=OP+OMEheter(ielmp,MID,K,L,NY,NX)
+                OC=OC+mBOMHeter_vr(ielmc,MID,K,L,NY,NX)
+                ON=ON+mBOMHeter_vr(ielmn,MID,K,L,NY,NX)
+                OP=OP+mBOMHeter_vr(ielmp,MID,K,L,NY,NX)
               enddo
             enddo
           enddo
@@ -669,9 +656,9 @@ module TillageMixMod
             DO NGL=JGnio(N),JGnfo(N)
               DO  M=1,nlbiomcp
                 MID=micpar%get_micb_id(M,NGL)
-                DC=DC+OMEheter(ielmc,MID,K,L,NY,NX)
-                DN=DN+OMEheter(ielmn,MID,K,L,NY,NX)
-                DP=DP+OMEheter(ielmp,MID,K,L,NY,NX)
+                DC=DC+mBOMHeter_vr(ielmc,MID,K,L,NY,NX)
+                DN=DN+mBOMHeter_vr(ielmn,MID,K,L,NY,NX)
+                DP=DP+mBOMHeter_vr(ielmp,MID,K,L,NY,NX)
               enddo
             enddo
           enddo
@@ -680,9 +667,9 @@ module TillageMixMod
           DO NGL=JGniA(N),JGnfA(N)
             DO  M=1,nlbiomcp
               MID=micpar%get_micb_id(M,NGL)
-              OC=OC+OMEAutor(ielmc,MID,L,NY,NX)
-              ON=ON+OMEAutor(ielmn,MID,L,NY,NX)
-              OP=OP+OMEAutor(ielmp,MID,L,NY,NX)
+              OC=OC+mBOMAutor_vr(ielmc,MID,L,NY,NX)
+              ON=ON+mBOMAutor_vr(ielmn,MID,L,NY,NX)
+              OP=OP+mBOMAutor_vr(ielmp,MID,L,NY,NX)
             enddo
           enddo
         enddo
@@ -720,6 +707,7 @@ module TillageMixMod
             ENDIF
           ENDDO
         ENDDO
+
         ORGC_vr(L,NY,NX)=OC
         ORGN_vr(L,NY,NX)=ON
         OMLitrC_vr(L,NY,NX)=DC

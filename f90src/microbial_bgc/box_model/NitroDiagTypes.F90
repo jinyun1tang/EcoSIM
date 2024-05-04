@@ -105,7 +105,7 @@ type, public :: NitroAQMFluxDiagType
   real(r8),allocatable :: AttenfH2PO4Heter(:,:)
   real(r8),allocatable :: AttenfH1PO4Heter(:,:)
 ! allocatable fluxes
-  real(r8),allocatable :: CGOMEheter(:,:,:)
+  real(r8),allocatable :: CGmBOMHeter(:,:,:)
   real(r8),allocatable :: RAnabolDOCUptkHeter(:,:)
   real(r8),allocatable :: RAnabolAcetUptkHeter(:,:)
   real(r8),allocatable :: NonstX2stBiomHeter(:,:,:,:)
@@ -177,7 +177,7 @@ type, public :: NitroAQMFluxDiagType
   real(r8),allocatable :: RkillLitfalOMAutor(:,:,:)
   real(r8),allocatable :: RkillLitrfal2HumOMAutor(:,:,:)
   real(r8),allocatable :: RkillLitrfal2ResduOMAutor(:,:,:)
-  real(r8),allocatable :: CGOMEAutor(:,:)
+  real(r8),allocatable :: CGmBOMAutor(:,:)
   real(r8),allocatable :: RMaintdefLitrfalOMAutor(:,:,:)
   real(r8),allocatable :: RMaintdefLitrfal2HumOMAutor(:,:,:)
   real(r8),allocatable :: RMaintdefLitrfal2ResduOMAutor(:,:,:)
@@ -354,7 +354,7 @@ type, public :: NitroAQMFluxDiagType
   allocate(this%RkillLitfalOMHeter(NumPlantChemElms,2,NumHetetrMicCmplx,1:jcplx));this%RkillLitfalOMHeter=spval
   allocate(this%RkillLitrfal2HumOMHeter(NumPlantChemElms,2,NumHetetrMicCmplx,1:jcplx));this%RkillLitrfal2HumOMHeter=spval
   allocate(this%RkillLitrfal2ResduOMHeter(NumPlantChemElms,2,NumHetetrMicCmplx,1:jcplx));this%RkillLitrfal2ResduOMHeter=spval
-  allocate(this%CGOMEheter(NumPlantChemElms,NumHetetrMicCmplx,1:jcplx));this%CGOMEheter=spval
+  allocate(this%CGmBOMHeter(NumPlantChemElms,NumHetetrMicCmplx,1:jcplx));this%CGmBOMHeter=spval
   allocate(this%RH2ProdHeter(NumHetetrMicCmplx,1:jcplx));this%RH2ProdHeter=spval
   allocate(this%RMaintdefLitrfalOMHeter(NumPlantChemElms,2,NumHetetrMicCmplx,1:jcplx));this%RMaintdefLitrfalOMHeter=spval
   allocate(this%RMaintdefLitrfal2HumOMHeter(NumPlantChemElms,2,NumHetetrMicCmplx,1:jcplx));this%RMaintdefLitrfal2HumOMHeter=spval
@@ -408,7 +408,7 @@ type, public :: NitroAQMFluxDiagType
   allocate(this%RkillLitfalOMAutor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%RkillLitfalOMAutor=spval
   allocate(this%RkillLitrfal2HumOMAutor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%RkillLitrfal2HumOMAutor=spval
   allocate(this%RkillLitrfal2ResduOMAutor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%RkillLitrfal2ResduOMAutor=spval
-  allocate(this%CGOMEAutor(idom_beg:idom_end,NumMicrobAutrophCmplx));this%CGOMEAutor=spval
+  allocate(this%CGmBOMAutor(idom_beg:idom_end,NumMicrobAutrophCmplx));this%CGmBOMAutor=spval
   allocate(this%RMaintdefLitrfalOMAutor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%RMaintdefLitrfalOMAutor=spval
   allocate(this%RMaintdefLitrfal2HumOMAutor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%RMaintdefLitrfal2HumOMAutor=spval
   allocate(this%RMaintdefLitrfal2ResduOMAutor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%RMaintdefLitrfal2ResduOMAutor=spval
@@ -504,7 +504,7 @@ type, public :: NitroAQMFluxDiagType
   this%RkillLitfalOMHeter = 0._r8
   this%RkillLitrfal2HumOMHeter = 0._r8
   this%RkillLitrfal2ResduOMHeter = 0._r8
-  this%CGOMEheter = 0._r8
+  this%CGmBOMHeter = 0._r8
   this%RH2ProdHeter = 0._r8
   this%RMaintdefLitrfal2HumOMHeter = 0._r8
   this%RMaintdefLitrfal2ResduOMHeter = 0._r8
@@ -558,7 +558,7 @@ type, public :: NitroAQMFluxDiagType
   this%RkillLitfalOMAutor = 0._r8
   this%RkillLitrfal2HumOMAutor = 0._r8
   this%RkillLitrfal2ResduOMAutor = 0._r8
-  this%CGOMEAutor = 0._r8
+  this%CGmBOMAutor = 0._r8
   this%RMaintdefLitrfalOMAutor = 0._r8
   this%RMaintdefLitrfal2HumOMAutor = 0._r8
   this%RMaintdefLitrfal2ResduOMAutor = 0._r8
@@ -614,7 +614,7 @@ type, public :: NitroAQMFluxDiagType
   call destroy(this%RkillLitfalOMHeter)
   call destroy(this%RkillLitrfal2HumOMHeter)
   call destroy(this%RkillLitrfal2ResduOMHeter)
-  call destroy(this%CGOMEheter)
+  call destroy(this%CGmBOMHeter)
   call destroy(this%RH2ProdHeter)
   call destroy(this%RMaintdefLitrfal2HumOMHeter)
   call destroy(this%RMaintdefLitrfal2ResduOMHeter)
@@ -667,7 +667,7 @@ type, public :: NitroAQMFluxDiagType
   call destroy(this%RkillLitfalOMAutor)
   call destroy(this%RkillLitrfal2HumOMAutor)
   call destroy(this%RkillLitrfal2ResduOMAutor)
-  call destroy(this%CGOMEAutor)
+  call destroy(this%CGmBOMAutor)
   call destroy(this%RMaintdefLitrfalOMAutor)
   call destroy(this%RMaintdefLitrfal2HumOMAutor)
   call destroy(this%RMaintdefLitrfal2ResduOMAutor)

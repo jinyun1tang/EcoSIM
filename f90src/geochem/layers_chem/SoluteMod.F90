@@ -329,18 +329,18 @@ module SoluteMod
 !     VLPO4,VLPOB=fractions of soil volume in H2PO4 non-band,band
 !     THETW=soil water concentration
 !
-  RSN4AA=SPNH4*FertN_soil_vr(ifert_nh4,L,NY,NX)*trcs_VLN_vr(ids_NH4,L,NY,NX)*THETW(L,NY,NX)
+  RSN4AA=SPNH4*FertN_soil_vr(ifert_nh4,L,NY,NX)*trcs_VLN_vr(ids_NH4,L,NY,NX)*THETW_vr(L,NY,NX)
   RSN3AA=SPNH3*FertN_soil_vr(ifert_nh3,L,NY,NX)*trcs_VLN_vr(ids_NH4,L,NY,NX)
-  RSNUAA=RSNUA*trcs_VLN_vr(ids_NH4,L,NY,NX)*THETW(L,NY,NX)
-  RSNOAA=SPNO3*FertN_soil_vr(ifert_no3,L,NY,NX)*trcs_VLN_vr(ids_NO3,L,NY,NX)*THETW(L,NY,NX)
-  RSN4BA=SPNH4*FertN_soil_vr(ifert_nh4,L,NY,NX)*trcs_VLN_vr(ids_NH4B,L,NY,NX)*THETW(L,NY,NX)
+  RSNUAA=RSNUA*trcs_VLN_vr(ids_NH4,L,NY,NX)*THETW_vr(L,NY,NX)
+  RSNOAA=SPNO3*FertN_soil_vr(ifert_no3,L,NY,NX)*trcs_VLN_vr(ids_NO3,L,NY,NX)*THETW_vr(L,NY,NX)
+  RSN4BA=SPNH4*FertN_soil_vr(ifert_nh4,L,NY,NX)*trcs_VLN_vr(ids_NH4B,L,NY,NX)*THETW_vr(L,NY,NX)
   RSN3BA=SPNH3*FertN_soil_vr(ifert_nh3,L,NY,NX)*trcs_VLN_vr(ids_NH4B,L,NY,NX)
-  RSNUBA=RSNUA*trcs_VLN_vr(ids_NH4B,L,NY,NX)*THETW(L,NY,NX)
-  RSNOBA=SPNO3*FertN_soil_vr(ifert_no3,L,NY,NX)*trcs_VLN_vr(ids_NO3B,L,NY,NX)*THETW(L,NY,NX)
-  RSN4BB=SPNH4*FertN_Band_vr(ifert_nh4_band,L,NY,NX)*THETW(L,NY,NX)
+  RSNUBA=RSNUA*trcs_VLN_vr(ids_NH4B,L,NY,NX)*THETW_vr(L,NY,NX)
+  RSNOBA=SPNO3*FertN_soil_vr(ifert_no3,L,NY,NX)*trcs_VLN_vr(ids_NO3B,L,NY,NX)*THETW_vr(L,NY,NX)
+  RSN4BB=SPNH4*FertN_Band_vr(ifert_nh4_band,L,NY,NX)*THETW_vr(L,NY,NX)
   RSN3BB=SPNH3*FertN_Band_vr(ifert_nh3_band,L,NY,NX)
-  RSNUBB=RSNUB*trcs_VLN_vr(ids_NH4B,L,NY,NX)*THETW(L,NY,NX)
-  RSNOBB=SPNO3*FertN_Band_vr(ifert_no3_band,L,NY,NX)*THETW(L,NY,NX)
+  RSNUBB=RSNUB*trcs_VLN_vr(ids_NH4B,L,NY,NX)*THETW_vr(L,NY,NX)
+  RSNOBB=SPNO3*FertN_Band_vr(ifert_no3_band,L,NY,NX)*THETW_vr(L,NY,NX)
 !
 !     SOLUBLE AND EXCHANGEABLE NH4 CONCENTRATIONS
 !     IN NON-BAND AND BAND SOIL ZONES

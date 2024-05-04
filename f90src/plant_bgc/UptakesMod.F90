@@ -246,7 +246,7 @@ module UptakesMod
     PopuRootMycoC_pvr               => plt_biom% PopuRootMycoC_pvr    , &
     VLMicP                          => plt_soilchem%VLMicP            , &
     VLiceMicP                       => plt_soilchem%VLiceMicP         , &
-    THETY                           => plt_soilchem%THETY             , &
+    THETY_vr                        => plt_soilchem%THETY_vr          , &
     SoiBulkDensity                  => plt_soilchem%SoiBulkDensity    , &
     VLWatMicP                       => plt_soilchem%VLWatMicP         , &
     VLSoilMicP                      => plt_soilchem%VLSoilMicP        , &
@@ -288,13 +288,7 @@ module UptakesMod
         plt_ew%AllPlantRootH2OUptake_vr(N,L,NZ)=0.0_r8
         plt_rbgc%RootCO2Emis_pvr(N,L,NZ)=0.0_r8
         plt_rbgc%RootO2Uptk_pvr(N,L,NZ)=0.0_r8
-        plt_rbgc%RUPGasSol_vr(idg_CO2,N,L,NZ)=0.0_r8
-        plt_rbgc%RUPGasSol_vr(idg_O2,N,L,NZ)=0.0_r8
-        plt_rbgc%RUPGasSol_vr(idg_CH4,N,L,NZ)=0.0_r8
-        plt_rbgc%RUPGasSol_vr(idg_N2O,N,L,NZ)=0.0_r8
-        plt_rbgc%RUPGasSol_vr(idg_NH3,N,L,NZ)=0.0_r8
-        plt_rbgc%RUPGasSol_vr(idg_NH3B,N,L,NZ)=0.0_r8
-        plt_rbgc%RUPGasSol_vr(idg_H2,N,L,NZ)=0.0_r8
+        plt_rbgc%RUPGasSol_vr(idg_beg:idg_end,N,L,NZ)=0.0_r8
         plt_rbgc%trcg_air2root_flx__pvr(idg_beg:idg_end-1,N,L,NZ)=0.0_r8
         plt_rbgc%trcg_Root_DisEvap_flx_vr(idg_beg:idg_end-1,N,L,NZ)=0.0_r8
       enddo
@@ -311,7 +305,7 @@ module UptakesMod
   D9000: DO L=NU,MaxNumRootLays
     ElvAdjstedtSoiPSIMPa(L)=TotalSoilH2OPSIMPa(L)-mGravAccelerat*ALT
     IF(SoiBulkDensity(L).GT.ZERO)THEN
-      WatAvail4Uptake(L)=VLWatMicPM(NPH,L)-THETY(L)*VLSoilMicP(L)     !maximum amount of water for uptake
+      WatAvail4Uptake(L)=VLWatMicPM(NPH,L)-THETY_vr(L)*VLSoilMicP(L)     !maximum amount of water for uptake
       AirPoreAvail4Fill(L)=AZMAX1(VLMicP(L)-VLWatMicP(L)-VLiceMicP(L))  !air volume
     ELSE
       WatAvail4Uptake(L)=VLWatMicPM(NPH,L)
@@ -1027,7 +1021,7 @@ module UptakesMod
     NU                             => plt_site%NU                           , &
     PSICanopy_pft                  => plt_ew%PSICanopy_pft                  , &
     ZEROP                          => plt_biom%ZEROP                        , &
-    THETW                          => plt_soilchem%THETW                    , &
+    THETW_vr                       => plt_soilchem%THETW_vr                 , &
     VLMicP                         => plt_soilchem%VLMicP                   , &
     HydroCondMicP4RootUptake       => plt_soilchem%HydroCondMicP4RootUptake , &
     VLSoilPoreMicP_vr              => plt_soilchem%VLSoilPoreMicP_vr        , &
@@ -1078,7 +1072,7 @@ module UptakesMod
         .AND.HydroCondMicP4RootUptake(L).GT.ZERO &
         .AND.Root1stXNumL_pvr(ipltroot,L,NZ).GT.ZEROP(NZ) &
         .AND.Root2ndXNum_pvr(N,L,NZ).GT.ZEROP(NZ) &
-        .AND.THETW(L).GT.ZERO)THEN
+        .AND.THETW_vr(L).GT.ZERO)THEN
         LayrHasRoot(N,L)=itrue
         !
         !     SOIL HYDRAULIC RESISTANCE FROM RADIAL UPTAKE GEOMETRY

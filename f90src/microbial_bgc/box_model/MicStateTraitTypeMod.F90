@@ -72,8 +72,8 @@ implicit none
   real(r8),allocatable :: OMBioResdu(:,:,:)
   real(r8),allocatable :: CNOSC(:,:)
   real(r8),allocatable :: CPOSC(:,:)
-  real(r8),allocatable :: OMEheter(:,:,:)
-  real(r8),allocatable :: OMEAutor(:,:)
+  real(r8),allocatable :: mBOMHeter(:,:,:)
+  real(r8),allocatable :: mBOMAutor(:,:)
   real(r8),allocatable :: SOMPomProtein(:)
   real(r8),allocatable :: SOMHumProtein(:)
   real(r8),allocatable :: SOMHumCarbohyd(:)
@@ -113,8 +113,8 @@ implicit none
   allocate(this%OMBioResdu(1:NumPlantChemElms,ndbiomcp,1:jcplx));this%OMBioResdu=spval
   allocate(this%CNOSC(jsken,1:jcplx));this%CNOSC=spval
   allocate(this%CPOSC(jsken,1:jcplx));this%CPOSC=spval
-  allocate(this%OMEheter(NumPlantChemElms,NumLiveHeterBioms,1:jcplx));this%OMEheter=spval
-  allocate(this%OMEAutor(NumPlantChemElms,NumLiveAutoBioms));this%OMEAutor=spval
+  allocate(this%mBOMHeter(NumPlantChemElms,NumLiveHeterBioms,1:jcplx));this%mBOMHeter=spval
+  allocate(this%mBOMAutor(NumPlantChemElms,NumLiveAutoBioms));this%mBOMAutor=spval
 
   allocate(this%SOMPomProtein(1:NumPlantChemElms));
   allocate(this%SOMHumProtein(1:NumPlantChemElms));
@@ -138,8 +138,8 @@ implicit none
   call destroy(this%OMBioResdu)
   call destroy(this%CNOSC)
   call destroy(this%CPOSC)
-  call destroy(this%OMEheter)
-  call destroy(this%OMEAutor)
+  call destroy(this%mBOMHeter)
+  call destroy(this%mBOMAutor)
   call destroy(this%SOMHumCarbohyd)
   call destroy(this%SOMPomProtein)
   call destroy(this%SOMHumProtein)

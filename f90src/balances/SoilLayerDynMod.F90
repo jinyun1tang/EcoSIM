@@ -795,7 +795,7 @@ implicit none
           DO NGL=JGnio(N),JGnfo(N)
             MID=micpar%get_micb_id(M,NGL)
             DO NE=1,NumPlantChemElms
-              OMEheter(NE,MID,K,L1,NY,NX)=OMEheter(NE,MID,K,L1,NY,NX)+FX*OMEheter(NE,MID,K,L0,NY,NX)
+              mBOMHeter_vr(NE,MID,K,L1,NY,NX)=mBOMHeter_vr(NE,MID,K,L1,NY,NX)+FX*mBOMHeter_vr(NE,MID,K,L0,NY,NX)
             ENDDO
           enddo
         enddo
@@ -806,7 +806,7 @@ implicit none
         DO NGL=JGniA(N),JGnfA(N)
           MID=micpar%get_micb_id(M,NGL)
           DO NE=1,NumPlantChemElms
-            OMEAutor(NE,MID,L1,NY,NX)=OMEAutor(NE,MID,L1,NY,NX)+FX*OMEAutor(NE,MID,L0,NY,NX)
+            mBOMAutor_vr(NE,MID,L1,NY,NX)=mBOMAutor_vr(NE,MID,L1,NY,NX)+FX*mBOMAutor_vr(NE,MID,L0,NY,NX)
           ENDDO
         enddo
       enddo
@@ -979,7 +979,7 @@ implicit none
           DO NGL=JGnio(N),JGnfo(N)
             MID=micpar%get_micb_id(M,NGL)
             DO NE=1,NumPlantChemElms
-              OMEheter(NE,MID,K,L0,NY,NX)=FY*OMEheter(NE,MID,K,L0,NY,NX)
+              mBOMHeter_vr(NE,MID,K,L0,NY,NX)=FY*mBOMHeter_vr(NE,MID,K,L0,NY,NX)
             ENDDO
           ENDDO
         enddo
@@ -991,7 +991,7 @@ implicit none
         DO NGL=JGniA(N),JGnfA(N)
           MID=micpar%get_micb_id(M,NGL)
           DO NE=1,NumPlantChemElms
-            OMEAutor(NE,MID,L0,NY,NX)=FY*OMEAutor(NE,MID,L0,NY,NX)
+            mBOMAutor_vr(NE,MID,L0,NY,NX)=FY*mBOMAutor_vr(NE,MID,L0,NY,NX)
           ENDDO
         ENDDO
       enddo
@@ -1119,15 +1119,15 @@ implicit none
         DO  M=1,nlbiomcp
           DO NGL=JGnio(N),JGnfo(N)
             MID=micpar%get_micb_id(M,NGL)          
-            FXOMC=FXO*OMEheter(ielmc,MID,K,L0,NY,NX)
-            OMEheter(ielmc,MID,K,L1,NY,NX)=OMEheter(ielmc,MID,K,L1,NY,NX)+FXOMC
-            OMEheter(ielmc,MID,K,L0,NY,NX)=OMEheter(ielmc,MID,K,L0,NY,NX)-FXOMC
-            FXOMN=FXO*OMEheter(ielmn,MID,K,L0,NY,NX)
-            OMEheter(ielmn,MID,K,L1,NY,NX)=OMEheter(ielmn,MID,K,L1,NY,NX)+FXOMN
-            OMEheter(ielmn,MID,K,L0,NY,NX)=OMEheter(ielmn,MID,K,L0,NY,NX)-FXOMN
-            FXOMP=FXO*OMEheter(ielmp,MID,K,L0,NY,NX)
-            OMEheter(ielmp,MID,K,L1,NY,NX)=OMEheter(ielmp,MID,K,L1,NY,NX)+FXOMP
-            OMEheter(ielmp,MID,K,L0,NY,NX)=OMEheter(ielmp,MID,K,L0,NY,NX)-FXOMP
+            FXOMC=FXO*mBOMHeter_vr(ielmc,MID,K,L0,NY,NX)
+            mBOMHeter_vr(ielmc,MID,K,L1,NY,NX)=mBOMHeter_vr(ielmc,MID,K,L1,NY,NX)+FXOMC
+            mBOMHeter_vr(ielmc,MID,K,L0,NY,NX)=mBOMHeter_vr(ielmc,MID,K,L0,NY,NX)-FXOMC
+            FXOMN=FXO*mBOMHeter_vr(ielmn,MID,K,L0,NY,NX)
+            mBOMHeter_vr(ielmn,MID,K,L1,NY,NX)=mBOMHeter_vr(ielmn,MID,K,L1,NY,NX)+FXOMN
+            mBOMHeter_vr(ielmn,MID,K,L0,NY,NX)=mBOMHeter_vr(ielmn,MID,K,L0,NY,NX)-FXOMN
+            FXOMP=FXO*mBOMHeter_vr(ielmp,MID,K,L0,NY,NX)
+            mBOMHeter_vr(ielmp,MID,K,L1,NY,NX)=mBOMHeter_vr(ielmp,MID,K,L1,NY,NX)+FXOMP
+            mBOMHeter_vr(ielmp,MID,K,L0,NY,NX)=mBOMHeter_vr(ielmp,MID,K,L0,NY,NX)-FXOMP
           enddo
         enddo
       enddo
@@ -1137,15 +1137,15 @@ implicit none
       DO  M=1,nlbiomcp
         DO NGL=JGniA(N),JGnfA(N)
           MID=micpar%get_micb_id(M,NGL)
-          FXOMC=FXO*OMEAutor(ielmc,MID,L0,NY,NX)
-          OMEAutor(ielmc,MID,L1,NY,NX)=OMEAutor(ielmc,MID,L1,NY,NX)+FXOMC
-          OMEAutor(ielmc,MID,L0,NY,NX)=OMEAutor(ielmc,MID,L0,NY,NX)-FXOMC
-          FXOMN=FXO*OMEAutor(ielmn,MID,L0,NY,NX)
-          OMEAutor(ielmn,MID,L1,NY,NX)=OMEAutor(ielmn,MID,L1,NY,NX)+FXOMN
-          OMEAutor(ielmn,MID,L0,NY,NX)=OMEAutor(ielmn,MID,L0,NY,NX)-FXOMN
-          FXOMP=FXO*OMEAutor(ielmp,MID,L0,NY,NX)
-          OMEAutor(ielmp,MID,L1,NY,NX)=OMEAutor(ielmp,MID,L1,NY,NX)+FXOMP
-          OMEAutor(ielmp,MID,L0,NY,NX)=OMEAutor(ielmp,MID,L0,NY,NX)-FXOMP
+          FXOMC=FXO*mBOMAutor_vr(ielmc,MID,L0,NY,NX)
+          mBOMAutor_vr(ielmc,MID,L1,NY,NX)=mBOMAutor_vr(ielmc,MID,L1,NY,NX)+FXOMC
+          mBOMAutor_vr(ielmc,MID,L0,NY,NX)=mBOMAutor_vr(ielmc,MID,L0,NY,NX)-FXOMC
+          FXOMN=FXO*mBOMAutor_vr(ielmn,MID,L0,NY,NX)
+          mBOMAutor_vr(ielmn,MID,L1,NY,NX)=mBOMAutor_vr(ielmn,MID,L1,NY,NX)+FXOMN
+          mBOMAutor_vr(ielmn,MID,L0,NY,NX)=mBOMAutor_vr(ielmn,MID,L0,NY,NX)-FXOMN
+          FXOMP=FXO*mBOMAutor_vr(ielmp,MID,L0,NY,NX)
+          mBOMAutor_vr(ielmp,MID,L1,NY,NX)=mBOMAutor_vr(ielmp,MID,L1,NY,NX)+FXOMP
+          mBOMAutor_vr(ielmp,MID,L0,NY,NX)=mBOMAutor_vr(ielmp,MID,L0,NY,NX)-FXOMP
         enddo
       enddo
     enddo

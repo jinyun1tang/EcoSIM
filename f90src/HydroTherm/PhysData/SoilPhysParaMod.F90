@@ -43,7 +43,7 @@ implicit none
   !     DTHETW=minimum water content for numerical purpose
   ! soil matric potential upper layer
 
-  THETA1=AMAX1(THETY(N3,N2,N1),AMIN1(POROS(N3,N2,N1),safe_adb(VLWatMicP1(N3,N2,N1),VLSoilMicP(N3,N2,N1))))
+  THETA1=AMAX1(THETY_vr(N3,N2,N1),AMIN1(POROS(N3,N2,N1),safe_adb(VLWatMicP1(N3,N2,N1),VLSoilMicP(N3,N2,N1))))
 
   IF(SoilMicPMassLayer(N3,N2,N1).GT.ZEROS(NY,NX))THEN
     !source layer is active soil

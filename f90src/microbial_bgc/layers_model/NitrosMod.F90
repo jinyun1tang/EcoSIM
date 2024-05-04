@@ -133,9 +133,9 @@ module nitrosMod
               L1=LL
             ENDIF
             DO NE=1,NumPlantChemElms            
-              OMEXS=FracLitrMix*AZMAX1(OMEheter(NE,MID,K,L1,NY,NX))
-              OMEheter(NE,MID,K,L,NY,NX)=OMEheter(NE,MID,K,L,NY,NX)-OMEXS
-              OMEheter(NE,MID,K,LL,NY,NX)=OMEheter(NE,MID,K,LL,NY,NX)+OMEXS
+              OMEXS=FracLitrMix*AZMAX1(mBOMHeter_vr(NE,MID,K,L1,NY,NX))
+              mBOMHeter_vr(NE,MID,K,L,NY,NX)=mBOMHeter_vr(NE,MID,K,L,NY,NX)-OMEXS
+              mBOMHeter_vr(NE,MID,K,LL,NY,NX)=mBOMHeter_vr(NE,MID,K,LL,NY,NX)+OMEXS
             ENDDO
           ENDDO D7962
         ENDDO

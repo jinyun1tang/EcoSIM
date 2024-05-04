@@ -174,11 +174,11 @@ implicit none
   micfor%ZEROS2=ZEROS2(NY,NX)
   micfor%ZEROS =ZEROS(NY,NX)
   micfor%VLSoilMicP  =VLSoilMicP(L,NY,NX)
-  micfor%THETY =THETY(L,NY,NX)
+  micfor%THETY =THETY_vr(L,NY,NX)
   micfor%POROS =POROS(L,NY,NX)
   micfor%FieldCapacity    =FieldCapacity(L,NY,NX)
   micfor%TKS   =TKS(L,NY,NX)
-  micfor%THETW =THETW(L,NY,NX)
+  micfor%THETW =THETW_vr(L,NY,NX)
   micfor%PH    =PH(L,NY,NX)
   micfor%SoilMicPMassLayer  =SoilMicPMassLayer(L,NY,NX)
   micfor%VLSoilPoreMicP  =VLSoilPoreMicP_vr(L,NY,NX)
@@ -306,8 +306,8 @@ implicit none
   micstt%OMBioResdu(1:NumPlantChemElms,1:ndbiomcp,1:jcplx)=OMBioResdu_vr(1:NumPlantChemElms,1:ndbiomcp,1:jcplx,L,NY,NX)
   micstt%CNOSC(1:jsken,1:jcplx)=CNOSC(1:jsken,1:jcplx,L,NY,NX)
   micstt%CPOSC(1:jsken,1:jcplx)=CPOSC(1:jsken,1:jcplx,L,NY,NX)
-  micstt%OMEheter(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx)=OMEheter(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx,L,NY,NX)
-  micstt%OMEAutor(1:NumPlantChemElms,1:NumLiveAutoBioms)=OMEAutor(1:NumPlantChemElms,1:NumLiveAutoBioms,L,NY,NX)
+  micstt%mBOMHeter(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx)=mBOMHeter_vr(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx,L,NY,NX)
+  micstt%mBOMAutor(1:NumPlantChemElms,1:NumLiveAutoBioms)=mBOMAutor_vr(1:NumPlantChemElms,1:NumLiveAutoBioms,L,NY,NX)
   if(.not.micfor%litrm)then
     micfor%AEC=AEC(L,NY,NX)
     micstt%OXYG=trc_gasml_vr(idg_O2,L,NY,NX)
@@ -439,8 +439,8 @@ implicit none
   SorbedOM_vr(idom_beg:idom_end,1:jcplx,L,NY,NX)=micstt%SorbedOM(idom_beg:idom_end,1:jcplx)
 
   OMBioResdu_vr(1:NumPlantChemElms,1:ndbiomcp,1:jcplx,L,NY,NX)=micstt%OMBioResdu(1:NumPlantChemElms,1:ndbiomcp,1:jcplx)
-  OMEheter(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx,L,NY,NX)=micstt%OMEheter(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx)
-  OMEAutor(1:NumPlantChemElms,1:NumLiveAutoBioms,L,NY,NX)=micstt%OMEAutor(1:NumPlantChemElms,1:NumLiveAutoBioms)
+  mBOMHeter_vr(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx,L,NY,NX)=micstt%mBOMHeter(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx)
+  mBOMAutor_vr(1:NumPlantChemElms,1:NumLiveAutoBioms,L,NY,NX)=micstt%mBOMAutor(1:NumPlantChemElms,1:NumLiveAutoBioms)
 
   end subroutine MicAPIRecv
 end module MicBGCAPI

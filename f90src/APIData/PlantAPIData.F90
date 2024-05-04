@@ -387,8 +387,8 @@ implicit none
 
   real(r8), pointer :: GasSolbility_vr(:,:)=> null() !gas solubility, [m3 m-3]
 
-  real(r8), pointer :: THETW(:)    => null()  !volumetric water content [m3 m-3]
-  real(r8), pointer :: THETY(:)    => null()  !air-dry water content, [m3 m-3]
+  real(r8), pointer :: THETW_vr(:)    => null()  !volumetric water content [m3 m-3]
+  real(r8), pointer :: THETY_vr(:)    => null()  !air-dry water content, [m3 m-3]
   real(r8), pointer :: VLSoilPoreMicP_vr(:)     => null()  !volume of soil layer	m3 d-2
   real(r8), pointer :: trcs_VLN_vr(:,:)=> null()
 
@@ -1441,8 +1441,8 @@ implicit none
   allocate(this%trc_solcl_vr(ids_beg:ids_end,0:jZ1));this%trc_solcl_vr=spval
 
   allocate(this%VLSoilPoreMicP_vr(0:JZ1));this%VLSoilPoreMicP_vr=spval
-  allocate(this%THETW(0:JZ1));this%THETW=spval
-  allocate(this%THETY(0:JZ1));this%THETY=spval
+  allocate(this%THETW_vr(0:JZ1));this%THETW_vr=spval
+  allocate(this%THETY_vr(0:JZ1));this%THETY_vr=spval
 
   allocate(this%GasSolbility_vr(idg_beg:idg_end,0:JZ1));this%GasSolbility_vr=spval
   allocate(this%GasDifc_vr(idg_beg:idg_end,0:JZ1));this%GasDifc_vr=spval

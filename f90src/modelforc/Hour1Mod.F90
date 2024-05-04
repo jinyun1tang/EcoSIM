@@ -909,7 +909,7 @@ module Hour1Mod
                 *PSD(L,NY,NX)/LOGPSIMXD(NY,NX)+LOGPOROS(L,NY,NX)))
 
               IF(THETWM.GT.THETW1)THEN
-                THETPX=AMIN1(1.0_r8,AZMAX1((THETWM-THETW(L,NY,NX))/(THETWM-THETW1)))
+                THETPX=AMIN1(1.0_r8,AZMAX1((THETWM-THETW_vr(L,NY,NX))/(THETWM-THETW1)))
                 DepthInternalWTBL(NY,NX)=CumDepth2LayerBottom(L,NY,NX)-DLYR(3,L,NY,NX)*(1.0_r8-THETPX)
               ELSE
                 DepthInternalWTBL(NY,NX)=CumDepth2LayerBottom(L,NY,NX)-DLYR(3,L,NY,NX)
@@ -922,7 +922,7 @@ module Hour1Mod
               THETW1=AMIN1(THETWM,EXP((LOGPSIAtSat(NY,NX)-LOG(-PSIEquil)) &
                 *PSD(L-1,NY,NX)/LOGPSIMXD(NY,NX)+LOGPOROS(L-1,NY,NX)))
               IF(THETWM.GT.THETW1)THEN
-                THETPX=AMIN1(1.0_r8,AZMAX1((THETWM-THETW(L-1,NY,NX))/(THETWM-THETW1)))
+                THETPX=AMIN1(1.0_r8,AZMAX1((THETWM-THETW_vr(L-1,NY,NX))/(THETWM-THETW1)))
                 DepthInternalWTBL(NY,NX)=CumDepth2LayerBottom(L-1,NY,NX)-DLYR(3,L-1,NY,NX)*(1.0_r8-THETPX)
               ELSE
                 DepthInternalWTBL(NY,NX)=CumDepth2LayerBottom(L-1,NY,NX)-DLYR(3,L-1,NY,NX)
@@ -1026,13 +1026,13 @@ module Hour1Mod
 !  add heterotrophic complexs
     DO NC=1,jcplx
       DO NB=1,NumLiveHeterBioms
-        OC=OC+OMEheter(ielmc,NB,NC,L,NY,NX)
+        OC=OC+mBOMHeter_vr(ielmc,NB,NC,L,NY,NX)
       ENDDO
     ENDDO
 
 !  add autotrophic complex
     DO NB=1,NumLiveAutoBioms
-      OC=OC+OMEAutor(ielmc,NB,L,NY,NX)
+      OC=OC+mBOMAutor_vr(ielmc,NB,L,NY,NX)
     ENDDO
 !  add microbial residue
     OC=OC+SUM(OMBioResdu_vr(ielmc,1:ndbiomcp,1:jcplx,L,NY,NX))
@@ -1503,13 +1503,13 @@ module Hour1Mod
     IF(VLitR(NY,NX).GT.ZEROS(NY,NX))THEN
       POROS(0,NY,NX)=VLMicP(0,NY,NX)/VLitR(NY,NX)
       !write(*,*) "VLitR gt 0 - POROS(0,NY,NX) = ", POROS(0,NY,NX)
-      THETW(0,NY,NX)=AZMAX1(AMIN1(1.0_r8,VLWatMicP(0,NY,NX)/VLitR(NY,NX)))
+      THETW_vr(0,NY,NX)=AZMAX1(AMIN1(1.0_r8,VLWatMicP(0,NY,NX)/VLitR(NY,NX)))
       THETI(0,NY,NX)=AZMAX1(AMIN1(1.0_r8,VLiceMicP(0,NY,NX)/VLitR(NY,NX)))
       THETP(0,NY,NX)=AZMAX1(AMIN1(1.0_r8,VLsoiAirP(0,NY,NX)/VLitR(NY,NX)))
     ELSE
       POROS(0,NY,NX)=1.0_r8
       !write(*,*) "VLitR else - POROS(0,NY,NX) = ", POROS(0,NY,NX)
-      THETW(0,NY,NX)=0.0_r8
+      THETW_vr(0,NY,NX)=0.0_r8
       THETI(0,NY,NX)=0.0_r8
       THETP(0,NY,NX)=0.0_r8
     ENDIF
@@ -1561,7 +1561,7 @@ module Hour1Mod
     VLsoiAirP(0,NY,NX)=0.0_r8
     POROS(0,NY,NX)=1.0
     DLYR(3,0,NY,NX)=0.0_r8
-    THETW(0,NY,NX)=0.0_r8
+    THETW_vr(0,NY,NX)=0.0_r8
     THETI(0,NY,NX)=0.0_r8
     THETP(0,NY,NX)=1.0
     VWatLitRHoldCapcity(NY,NX)=0.0_r8
@@ -1842,9 +1842,9 @@ module Hour1Mod
             OMC1g=OMC1/tglds
             OMN1g=OMN1/tglds
             OMP1g=OMP1/tglds
-            OMEheter(ielmc,MID,K,LFDPTH,NY,NX)=OMEheter(ielmc,MID,K,LFDPTH,NY,NX)+OMC1g
-            OMEheter(ielmn,MID,K,LFDPTH,NY,NX)=OMEheter(ielmn,MID,K,LFDPTH,NY,NX)+OMN1g
-            OMEheter(ielmp,MID,K,LFDPTH,NY,NX)=OMEheter(ielmp,MID,K,LFDPTH,NY,NX)+OMP1g
+            mBOMHeter_vr(ielmc,MID,K,LFDPTH,NY,NX)=mBOMHeter_vr(ielmc,MID,K,LFDPTH,NY,NX)+OMC1g
+            mBOMHeter_vr(ielmn,MID,K,LFDPTH,NY,NX)=mBOMHeter_vr(ielmn,MID,K,LFDPTH,NY,NX)+OMN1g
+            mBOMHeter_vr(ielmp,MID,K,LFDPTH,NY,NX)=mBOMHeter_vr(ielmp,MID,K,LFDPTH,NY,NX)+OMP1g
           ENDDO
           OSCX=OSCX+OMC1
           OSNX=OSNX+OMN1
@@ -1856,9 +1856,9 @@ module Hour1Mod
               OMC1g=OMC1/tglds
               OMN1g=OMN1/tglds
               OMP1g=OMP1/tglds
-              OMEAutor(ielmc,MID,LFDPTH,NY,NX)=OMEAutor(ielmc,MID,LFDPTH,NY,NX)+OMC1g*micpar%OMCA(NN)
-              OMEAutor(ielmn,MID,LFDPTH,NY,NX)=OMEAutor(ielmn,MID,LFDPTH,NY,NX)+OMN1g*micpar%OMCA(NN)
-              OMEAutor(ielmp,MID,LFDPTH,NY,NX)=OMEAutor(ielmp,MID,LFDPTH,NY,NX)+OMP1g*micpar%OMCA(NN)
+              mBOMAutor_vr(ielmc,MID,LFDPTH,NY,NX)=mBOMAutor_vr(ielmc,MID,LFDPTH,NY,NX)+OMC1g*micpar%OMCA(NN)
+              mBOMAutor_vr(ielmn,MID,LFDPTH,NY,NX)=mBOMAutor_vr(ielmn,MID,LFDPTH,NY,NX)+OMN1g*micpar%OMCA(NN)
+              mBOMAutor_vr(ielmp,MID,LFDPTH,NY,NX)=mBOMAutor_vr(ielmp,MID,LFDPTH,NY,NX)+OMP1g*micpar%OMCA(NN)
             ENDDO
             OSCX=OSCX+OMC1*micpar%OMCA(NN)
             OSNX=OSNX+OMN1*micpar%OMCA(NN)
@@ -2302,15 +2302,15 @@ module Hour1Mod
   DO L=NUI(NY,NX),NLI(NY,NX)
 
     IF(VLSoilPoreMicP_vr(L,NY,NX).LE.ZEROS(NY,NX))THEN
-      THETW(L,NY,NX)=POROS(L,NY,NX)
+      THETW_vr(L,NY,NX)=POROS(L,NY,NX)
       THETI(L,NY,NX)=0.0_r8
       THETP(L,NY,NX)=0.0_r8
     ELSE
-      THETW(L,NY,NX)=AZMAX1(AMIN1(POROS(L,NY,NX),VLWatMicP(L,NY,NX)/VLSoilMicP(L,NY,NX)))
+      THETW_vr(L,NY,NX)=AZMAX1(AMIN1(POROS(L,NY,NX),VLWatMicP(L,NY,NX)/VLSoilMicP(L,NY,NX)))
       THETI(L,NY,NX)=AZMAX1(AMIN1(POROS(L,NY,NX),VLiceMicP(L,NY,NX)/VLSoilMicP(L,NY,NX)))
       THETP(L,NY,NX)=AZMAX1(VLsoiAirP(L,NY,NX)/VLSoilMicP(L,NY,NX))
     ENDIF
-    THETPZ(L,NY,NX)=AZMAX1(POROS(L,NY,NX)-THETW(L,NY,NX)-THETI(L,NY,NX))
+    THETPZ(L,NY,NX)=AZMAX1(POROS(L,NY,NX)-THETW_vr(L,NY,NX)-THETI(L,NY,NX))
 !
 !     GAS CONCENTRATIONS
 !

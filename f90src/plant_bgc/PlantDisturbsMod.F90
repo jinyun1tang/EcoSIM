@@ -1243,7 +1243,7 @@ module PlantDisturbsMod
     HourFailGrainFill_brch              =>  plt_pheno%HourFailGrainFill_brch             , &
     MatureGroup_pft                     =>  plt_pheno%MatureGroup_pft                    , &
     CORGC                               =>  plt_soilchem%CORGC                           , &
-    THETW                               =>  plt_soilchem%THETW                           , &
+    THETW_vr                            =>  plt_soilchem%THETW_vr                        , &
     CFOPE                               =>  plt_soilchem%CFOPE                           , &
     inonstruct                          =>  pltpar%inonstruct                            , &
     ifoliar                             =>  pltpar%ifoliar                               , &
@@ -1259,7 +1259,7 @@ module PlantDisturbsMod
     LitrfalStrutElms_pvr                =>  plt_bgcr%LitrfalStrutElms_pvr                , &
     Eco_NBP_col                         =>  plt_bgcr%Eco_NBP_col                         , &
     CO2NetFix_pft                       =>  plt_bgcr%CO2NetFix_pft                       , &
-    RootCO2Autor_pvr                           =>  plt_rbgc%RootCO2Autor_pvr                           , &
+    RootCO2Autor_pvr                    =>  plt_rbgc%RootCO2Autor_pvr                    , &
     RootRespPotent_pvr                  =>  plt_rbgc%RootRespPotent_pvr                  , &
     RCO2N_pvr                           =>  plt_rbgc%RCO2N_pvr                           , &
     Root2ndXNum_pvr                     =>  plt_morph%Root2ndXNum_pvr                    , &
@@ -1273,7 +1273,7 @@ module PlantDisturbsMod
     RootVH2O_pvr                        =>  plt_morph%RootVH2O_pvr                       , &
     RootLenDensPerPlant_pvr             =>  plt_morph%RootLenDensPerPlant_pvr            , &
     iPlantNfixType                      =>  plt_morph%iPlantNfixType                     , &
-    CanopyLeafAareZ_col                    =>  plt_morph%CanopyLeafAareZ_col                   , &
+    CanopyLeafAareZ_col                 =>  plt_morph%CanopyLeafAareZ_col                , &
     CanopyHeightZ_col                   =>  plt_morph%CanopyHeightZ_col                  , &
     LeafAreaLive_brch                   =>  plt_morph%LeafAreaLive_brch                  , &
     NumOfBranches_pft                   =>  plt_morph%NumOfBranches_pft                  , &
@@ -2365,7 +2365,7 @@ module PlantDisturbsMod
               XHVST(ielmp)=XHVST(ielmc)
               FFIRE(1:NumPlantChemElms)=0._r8
             ELSE
-              IF(THETW(L).GT.FVLWB.OR.CORGC(L).LE.FORGC.OR.ITILL.NE.22)THEN
+              IF(THETW_vr(L).GT.FVLWB.OR.CORGC(L).LE.FORGC.OR.ITILL.NE.22)THEN
                 XHVST(ielmc)=1.0_r8
                 XHVST(ielmn)=XHVST(ielmc)
                 XHVST(ielmp)=XHVST(ielmc)

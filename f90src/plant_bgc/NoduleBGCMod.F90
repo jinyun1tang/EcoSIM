@@ -54,31 +54,31 @@ module NoduleBGCMod
   REAL(R8) :: RCCC,RCCN,RCCP
   integer :: NE
 !     begin_execution
-  associate(                                                          &
-    NU                        =>  plt_site%NU                       , &
-    ZERO                      =>  plt_site%ZERO                     , &
-    AREA3                     =>  plt_site%AREA3                    , &
-    k_fine_litr               => pltpar%k_fine_litr                 , &
-    CFOPE                     =>  plt_soilchem%CFOPE                , &
-    iPlantNfixType            =>  plt_morph%iPlantNfixType          , &
-    fTgrowCanP                =>  plt_pheno%fTgrowCanP              , &
-    CanopyGrosRCO2_pft        =>  plt_bgcr%CanopyGrosRCO2_pft       , &
-    ECO_ER_col                =>  plt_bgcr%ECO_ER_col               , &
-    CanopyRespC_pft  =>  plt_bgcr%CanopyRespC_pft , &
-    Eco_AutoR_col             =>  plt_bgcr%Eco_AutoR_col            , &
-    CO2NetFix_pft             =>  plt_bgcr%CO2NetFix_pft            , &
-    LitrfalStrutElms_pvr      =>  plt_bgcr%LitrfalStrutElms_pvr     , &
-    NodulInfectElms_pft       =>  plt_bgcr%NodulInfectElms_pft      , &    
-    ifoliar                   =>  pltpar%ifoliar                    , &
-    NoduGrowthYield_pft       =>  plt_allom%NoduGrowthYield_pft     , &
-    NodulerNC_pft             =>  plt_allom%NodulerNC_pft           , &
-    NodulerPC_pft             =>  plt_allom%NodulerPC_pft           , &
-    LeafPetolBiomassC_brch    =>  plt_biom%LeafPetolBiomassC_brch   , &
-    CanopyNonstElms_brch      =>  plt_biom%CanopyNonstElms_brch     , &
-    CanopyNodulNonstElms_brch =>  plt_biom%CanopyNodulNonstElms_brch, &
-    ZEROP                     =>  plt_biom%ZEROP                    , &
-    ZEROL                     =>  plt_biom%ZEROL                    , &
-    CanopyNodulStrutElms_brch =>  plt_biom%CanopyNodulStrutElms_brch  &
+  associate(                                                         &
+    NU                        => plt_site%NU,                        &
+    ZERO                      => plt_site%ZERO,                      &
+    AREA3                     => plt_site%AREA3,                     &
+    k_fine_litr               => pltpar%k_fine_litr,                 &
+    CFOPE                     => plt_soilchem%CFOPE,                 &
+    iPlantNfixType            => plt_morph%iPlantNfixType,           &
+    fTgrowCanP                => plt_pheno%fTgrowCanP,               &
+    CanopyGrosRCO2_pft        => plt_bgcr%CanopyGrosRCO2_pft,        &
+    ECO_ER_col                => plt_bgcr%ECO_ER_col,                &
+    CanopyRespC_pft           => plt_bgcr%CanopyRespC_pft,           &
+    Eco_AutoR_col             => plt_bgcr%Eco_AutoR_col,             &
+    CO2NetFix_pft             => plt_bgcr%CO2NetFix_pft,             &
+    LitrfalStrutElms_pvr      => plt_bgcr%LitrfalStrutElms_pvr,      &
+    NodulInfectElms_pft       => plt_bgcr%NodulInfectElms_pft,       &
+    ifoliar                   => pltpar%ifoliar,                     &
+    NoduGrowthYield_pft       => plt_allom%NoduGrowthYield_pft,      &
+    NodulerNC_pft             => plt_allom%NodulerNC_pft,            &
+    NodulerPC_pft             => plt_allom%NodulerPC_pft,            &
+    LeafPetolBiomassC_brch    => plt_biom%LeafPetolBiomassC_brch,    &
+    CanopyNonstElms_brch      => plt_biom%CanopyNonstElms_brch,      &
+    CanopyNodulNonstElms_brch => plt_biom%CanopyNodulNonstElms_brch, &
+    ZEROP                     => plt_biom%ZEROP,                     &
+    ZEROL                     => plt_biom%ZEROL,                     &
+    CanopyNodulStrutElms_brch => plt_biom%CanopyNodulStrutElms_brch  &
   )
 !     iPlantNfixType=N2 fixation: 4,5,6=rapid to slow canopy symbiosis
 !
@@ -382,9 +382,11 @@ module NoduleBGCMod
 
         CPOOLT=CanopyNonstElms_brch(ielmc,NB,NZ)+CanopyNodulNonstElms_brch(ielmc,NB,NZ)
         IF(CPOOLT.GT.ZEROP(NZ))THEN
-          ZPOOLD=(CanopyNonstElms_brch(ielmn,NB,NZ)*CanopyNodulNonstElms_brch(ielmc,NB,NZ)-CanopyNodulNonstElms_brch(ielmn,NB,NZ)*CanopyNonstElms_brch(ielmc,NB,NZ))/CPOOLT
+          ZPOOLD=(CanopyNonstElms_brch(ielmn,NB,NZ)*CanopyNodulNonstElms_brch(ielmc,NB,NZ) &
+            -CanopyNodulNonstElms_brch(ielmn,NB,NZ)*CanopyNonstElms_brch(ielmc,NB,NZ))/CPOOLT
           XFRE(ielmn)=FXRNX*ZPOOLD
-          PPOOLD=(CanopyNonstElms_brch(ielmp,NB,NZ)*CanopyNodulNonstElms_brch(ielmc,NB,NZ)-CanopyNodulNonstElms_brch(ielmp,NB,NZ)*CanopyNonstElms_brch(ielmc,NB,NZ))/CPOOLT
+          PPOOLD=(CanopyNonstElms_brch(ielmp,NB,NZ)*CanopyNodulNonstElms_brch(ielmc,NB,NZ) &
+            -CanopyNodulNonstElms_brch(ielmp,NB,NZ)*CanopyNonstElms_brch(ielmc,NB,NZ))/CPOOLT
           XFRE(ielmp)=FXRNX*PPOOLD
           DO NE=2,NumPlantChemElms
             CanopyNonstElms_brch(NE,NB,NZ)=CanopyNonstElms_brch(NE,NB,NZ)-XFRE(NE)
@@ -438,33 +440,33 @@ module NoduleBGCMod
   real(r8) :: RCCC,RCCN,RCCP
   integer  :: NE
 !     begin_execution
-  associate(                          &
-    NU                           =>   plt_site%NU        , &
-    AREA3                        =>   plt_site%AREA3     , &
-    ZERO                         =>   plt_site%ZERO      , &
-    fTgrowRootP_vr               =>   plt_pheno%fTgrowRootP_vr     , &
-    NoduGrowthYield_pft          =>   plt_allom%NoduGrowthYield_pft    , &
-    NodulerNC_pft                =>   plt_allom%NodulerNC_pft    , &
-    NodulerPC_pft                =>   plt_allom%NodulerPC_pft    , &
-    k_fine_litr                  =>   pltpar%k_fine_litr , &
-    iroot                        =>   pltpar%iroot       , &
-    RootRespPotent_pvr           =>   plt_rbgc%RootRespPotent_pvr     , &
-    RCO2N_pvr                    =>   plt_rbgc%RCO2N_pvr     , &
-    RAutoRootO2Limter_pvr        =>   plt_rbgc%RAutoRootO2Limter_pvr      , &
-    RootCO2Autor_pvr                    =>   plt_rbgc%RootCO2Autor_pvr     , &
-    NodulInfectElms_pft          =>   plt_bgcr%NodulInfectElms_pft  , &        
-    LitrfalStrutElms_pvr         =>   plt_bgcr%LitrfalStrutElms_pvr      , &
-    RootN2Fix_pft                =>   plt_rbgc%RootN2Fix_pft      , &
-    RootN2Fix_pvr                =>   plt_bgcr%RootN2Fix_pvr     , &
-    PopuRootMycoC_pvr            =>   plt_biom% PopuRootMycoC_pvr    , &
-    RootNodulStrutElms_pvr       =>   plt_biom%RootNodulStrutElms_pvr    , &
-    ZEROP                        =>   plt_biom%ZEROP     , &
-    RootNodulNonstElms_pvr       =>   plt_biom%RootNodulNonstElms_pvr   , &
-    ZEROL                        =>   plt_biom%ZEROL     , &
-    RootMycoNonstElms_rpvr       =>   plt_biom%RootMycoNonstElms_rpvr    , &
-    CFOPE                        =>   plt_soilchem%CFOPE , &
-    iPlantNfixType               =>   plt_morph%iPlantNfixType   , &
-    NIXBotRootLayer_pft          =>   plt_morph%NIXBotRootLayer_pft       &
+  associate(                                                   &
+    NU                     => plt_site%NU,                     &
+    AREA3                  => plt_site%AREA3,                  &
+    ZERO                   => plt_site%ZERO,                   &
+    fTgrowRootP_vr         => plt_pheno%fTgrowRootP_vr,        &
+    NoduGrowthYield_pft    => plt_allom%NoduGrowthYield_pft,   &
+    NodulerNC_pft          => plt_allom%NodulerNC_pft,         &
+    NodulerPC_pft          => plt_allom%NodulerPC_pft,         &
+    k_fine_litr            => pltpar%k_fine_litr,              &
+    iroot                  => pltpar%iroot,                    &
+    RootRespPotent_pvr     => plt_rbgc%RootRespPotent_pvr,     &
+    RCO2N_pvr              => plt_rbgc%RCO2N_pvr,              &
+    RAutoRootO2Limter_pvr  => plt_rbgc%RAutoRootO2Limter_pvr,  &
+    RootCO2Autor_pvr       => plt_rbgc%RootCO2Autor_pvr,       &
+    NodulInfectElms_pft    => plt_bgcr%NodulInfectElms_pft,    &
+    LitrfalStrutElms_pvr   => plt_bgcr%LitrfalStrutElms_pvr,   &
+    RootN2Fix_pft          => plt_rbgc%RootN2Fix_pft,          &
+    RootN2Fix_pvr          => plt_bgcr%RootN2Fix_pvr,          &
+    PopuRootMycoC_pvr      => plt_biom% PopuRootMycoC_pvr,     &
+    RootNodulStrutElms_pvr => plt_biom%RootNodulStrutElms_pvr, &
+    ZEROP                  => plt_biom%ZEROP,                  &
+    RootNodulNonstElms_pvr => plt_biom%RootNodulNonstElms_pvr, &
+    ZEROL                  => plt_biom%ZEROL,                  &
+    RootMycoNonstElms_rpvr => plt_biom%RootMycoNonstElms_rpvr, &
+    CFOPE                  => plt_soilchem%CFOPE,              &
+    iPlantNfixType         => plt_morph%iPlantNfixType,        &
+    NIXBotRootLayer_pft    => plt_morph%NIXBotRootLayer_pft    &
   )
 !     iPlantNfixType=N2 fixation: 1,2,3=rapid to slow root symbiosis
 !     WTNDL,WTNDLN,WTNDLP=bacterial C,N,P mass

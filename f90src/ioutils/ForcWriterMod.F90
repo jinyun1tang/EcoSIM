@@ -162,12 +162,12 @@ implicit none
     call ncd_defvar(ncf, 'ORM', ncd_float, dim1name='element',dim2name='ndbiomcp',&
             dim3name='jcplx',long_name='microbial residue C in each complex',  &
             units='gC d-2', missing_value=spval, fill_value=spval)
-    call ncd_defvar(ncf, 'OMEheter', ncd_float,dim1name='element',&
+    call ncd_defvar(ncf, 'mBOMHeter', ncd_float,dim1name='element',&
             dim2name='NumLiveHeterBioms',dim3name='jcplx',&
             long_name='heterotrophic microbial biomass element in each complex',  &
             units='gC d-2', missing_value=spval, fill_value=spval)
 
-    call ncd_defvar(ncf, 'OMEAutor', ncd_float, dim1name='element',dim2name='NumLiveAutoBioms',&
+    call ncd_defvar(ncf, 'mBOMAutor', ncd_float, dim1name='element',dim2name='NumLiveAutoBioms',&
             long_name='microbial biomass element in autotrophic complex',  &
             units='gC d-2', missing_value=spval, fill_value=spval)
 
@@ -221,7 +221,7 @@ implicit none
     call ncd_putvar(ncf,'SRP',SRP(L,NY,NX))
     call ncd_putvar(ncf,'EHUM',EHUM(L,NY,NX))
     call ncd_putvar(ncf,'EPOC',EPOC(L,NY,NX))
-    call ncd_putvar(ncf,'THETY',THETY(L,NY,NX))
+    call ncd_putvar(ncf,'THETY',THETY_vr(L,NY,NX))
     call ncd_putvar(ncf,'PSIMX',LOGPSIFLD(NY,NX))
     call ncd_putvar(ncf,'PSIMD',LOGPSIMND(NY,NX))
     call ncd_putvar(ncf,'PSIMS',LOGPSIAtSat(NY,NX))
@@ -263,8 +263,8 @@ implicit none
     call ncd_putvar(ncf,'OSM',SolidOM_vr(:,:,:,L,NY,NX))
     call ncd_putvar(ncf,'OSA',SolidOMAct_vr(:,:,L,NY,NX))
     call ncd_putvar(ncf,'ORM',OMBioResdu_vr(:,:,:,L,NY,NX))
-    call ncd_putvar(ncf,'OMEheter',OMEheter(:,:,:,L,NY,NX))
-    call ncd_putvar(ncf,'OMEAutor',OMEAutor(:,:,L,NY,NX))
+    call ncd_putvar(ncf,'mBOMHeter',mBOMHeter_vr(:,:,:,L,NY,NX))
+    call ncd_putvar(ncf,'mBOMAutor',mBOMAutor_vr(:,:,L,NY,NX))
 
     if(bgc_forc_conf%laddband)then
       call ncd_putvar(ncf,'ZNH4S',trc_solml_vr(ids_NH4,L,NY,NX)+trc_solml_vr(ids_NH4B,L,NY,NX))

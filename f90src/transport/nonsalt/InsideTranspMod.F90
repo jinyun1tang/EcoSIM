@@ -441,7 +441,7 @@ module InsideTranspMod
   real(r8) :: DLYR1,DLYR2,TORTL
   integer  :: K,nsolutes,ngases,idom
 
-  IF(THETW1(N3,N2,N1).GT.THETY(N3,N2,N1).AND.THETW1(N6,N5,N4).GT.THETY(N6,N5,N4) &
+  IF(THETW1(N3,N2,N1).GT.THETY_vr(N3,N2,N1).AND.THETW1(N6,N5,N4).GT.THETY_vr(N6,N5,N4) &
     .AND.VLWatMicPM(M,N3,N2,N1).GT.ZEROS2(N2,N1).AND.VLWatMicPM(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
 
       VLWatMicP2A=VLWatMicPM(M,N3,N2,N1)*trcs_VLN_vr(ids_H1PO4,N3,N2,N1)
@@ -773,8 +773,8 @@ module InsideTranspMod
 !     THETY=hygroscopic water content
 !     VOLAH=total macropore volume
 !
-  IF(VLWatMacPM(M,N3,N2,N1).GT.THETY(N3,N2,N1)*VLMacP(N3,N2,N1) &
-    .AND.VLWatMacPM(M,N6,N5,N4).GT.THETY(N6,N5,N4)*VLMacP(N6,N5,N4))THEN
+  IF(VLWatMacPM(M,N3,N2,N1).GT.THETY_vr(N3,N2,N1)*VLMacP(N3,N2,N1) &
+    .AND.VLWatMacPM(M,N6,N5,N4).GT.THETY_vr(N6,N5,N4)*VLMacP(N6,N5,N4))THEN
 !
 !     MACROPORE CONCENTRATIONS IN CURRENT AND ADJACENT GRID CELLS
 !
@@ -1280,7 +1280,7 @@ module InsideTranspMod
 !
   IF(N3.GE.NUM(N2,N1).AND.M.NE.MX)THEN
     THETW1=AZMAX1(safe_adb(VLWatMicPM(M,N3,N2,N1),VLSoilMicP(N3,N2,N1)))
-    IF(THETW1.GT.THETY(N3,N2,N1).AND.iFlagEbu.EQ.0)THEN
+    IF(THETW1.GT.THETY_vr(N3,N2,N1).AND.iFlagEbu.EQ.0)THEN
 
       trcg_SLX(idg_CO2) =catomw*GasSolbility_vr(idg_CO2,N3,N2,N1)  !conver into carbon g C/mol
       trcg_SLX(idg_CH4) =catomw*GasSolbility_vr(idg_CH4,N3,N2,N1)

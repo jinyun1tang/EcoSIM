@@ -641,7 +641,7 @@ module RedistMod
           DO  M=1,nlbiomcp
             MID=micpar%get_micb_id(M,NGL)
             DO NE=1,NumPlantChemElms
-              OMEheter(NE,MID,K,NU(NY,NX),NY,NX)=OMEheter(NE,MID,K,NU(NY,NX),NY,NX)+TOMEERhetr(NE,MID,K,NY,NX)
+              mBOMHeter_vr(NE,MID,K,NU(NY,NX),NY,NX)=mBOMHeter_vr(NE,MID,K,NU(NY,NX),NY,NX)+TOMEERhetr(NE,MID,K,NY,NX)
             ENDDO
             DORGE(NY,NX)=DORGE(NY,NX)+TOMEERhetr(ielmc,MID,K,NY,NX)
             DORGP=DORGP+TOMEERhetr(ielmp,MID,K,NY,NX)
@@ -655,7 +655,7 @@ module RedistMod
         DO  M=1,nlbiomcp
           MID=micpar%get_micb_id(M,NGL)
           DO NE=1,NumPlantChemElms
-            OMEAutor(NE,MID,NU(NY,NX),NY,NX)=OMEAutor(NE,MID,NU(NY,NX),NY,NX)+TOMEERauto(NE,MID,NY,NX)
+            mBOMAutor_vr(NE,MID,NU(NY,NX),NY,NX)=mBOMAutor_vr(NE,MID,NU(NY,NX),NY,NX)+TOMEERauto(NE,MID,NY,NX)
           ENDDO
           DORGE(NY,NX)=DORGE(NY,NX)+TOMEERauto(ielmc,MID,NY,NX)
           DORGP=DORGP+TOMEERauto(ielmp,MID,NY,NX)
@@ -722,7 +722,7 @@ module RedistMod
     tDElmt=0._r8    
     DO NB=1,NumLiveHeterBioms
       do NE=1,NumPlantChemElms
-        tDElmt(NE)=tDElmt(NE)+OMEheter(NE,NB,K,0,NY,NX)
+        tDElmt(NE)=tDElmt(NE)+mBOMHeter_vr(NE,NB,K,0,NY,NX)
       ENDDO
     ENDDO
 
@@ -741,7 +741,7 @@ module RedistMod
   tDElmt=0._r8
   DO NB=1,NumLiveAutoBioms
     DO NE=1,NumPlantChemElms
-      tDElmt(NE)=tDElmt(NE)+OMEAutor(NE,NB,0,NY,NX)
+      tDElmt(NE)=tDElmt(NE)+mBOMAutor_vr(NE,NB,0,NY,NX)
     ENDDO
   ENDDO
   RC0ff(NY,NX)=RC0ff(NY,NX)+tDElmt(ielmc)
@@ -1442,7 +1442,7 @@ module RedistMod
 ! add living microbes
   DO K=1,jcplx
     DO NE=1,NumPlantChemElms
-      tDES(NE)=SUM(OMEheter(NE,1:NumLiveHeterBioms,K,L,NY,NX))
+      tDES(NE)=SUM(mBOMHeter_vr(NE,1:NumLiveHeterBioms,K,L,NY,NX))
     ENDDO
 
     IF(micpar%is_litter(K))THEN  
@@ -1465,7 +1465,7 @@ module RedistMod
 
 ! add autotrophs
   DO NE=1,NumPlantChemElms
-    tDES(NE)=SUM(OMEAutor(NE,1:NumLiveAutoBioms,L,NY,NX))
+    tDES(NE)=SUM(mBOMAutor_vr(NE,1:NumLiveAutoBioms,L,NY,NX))
     OM(NE)=OM(NE)+tDES(NE)
     TOMET(NE,NY,NX)=TOMET(NE,NY,NX)+tDES(NE)
   ENDDO
