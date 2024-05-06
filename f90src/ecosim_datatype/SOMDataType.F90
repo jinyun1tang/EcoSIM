@@ -21,18 +21,15 @@ module SOMDataType
   real(r8),target,allocatable :: OMBioResdu_vr(:,:,:,:,:,:)                     !microbial residue [C	g d-2]
   real(r8),target,allocatable :: DOM_vr(:,:,:,:,:)                       !dissolved organic C micropore	[g d-2]
   real(r8),target,allocatable :: DOM_MacP_vr(:,:,:,:,:)                      !dissolved organic C macropore	[g d-2]
-  real(r8),target,allocatable :: ORGC_vr(:,:,:)                        !total soil organic C [g d-2]
-  real(r8),target,allocatable :: ORGN_vr(:,:,:)                        !total soil organic N [g d-2]
-  real(r8),target,allocatable :: ORGP_vr(:,:,:)                        !total soil organic P [g d-2]
+  real(r8),target,allocatable :: SoilOrgM_vr(:,:,:,:)                        !total soil organic C [g d-2]
   real(r8),target,allocatable :: ORGCX_vr(:,:,:)                       !SOC concentration	[g Mg-1]
   real(r8),target,allocatable :: SolidOMAct_vr(:,:,:,:,:)                     !colonized humus C in each complex [g d-2]
   real(r8),target,allocatable :: OMLitrC_vr(:,:,:)                        !total particulate organic C [g d-2]
-  real(r8),target,allocatable :: CORGC_vr(:,:,:)                       !soil organic C content [g kg-1]
-  real(r8),target,allocatable :: CORGN_vr(:,:,:)                       !soil organic N content [mg kg-1]
-  real(r8),target,allocatable :: CORGP_vr(:,:,:)                       !soil organic P content  [mg kg-1]
+  real(r8),target,allocatable :: CSoilOrgM_vr(:,:,:,:)                       !soil organic matter content [g kg-1]
   real(r8),target,allocatable :: COMLitrC_vr(:,:,:)                       !soil particulate C content [g kg-1]
   real(r8),target,allocatable :: CFOMC_vr(:,:,:,:)                     !allocation coefficient to humus fractions
-  real(r8),target,allocatable ::  tMicBiome(:,:,:)                         !total micriobial C, [g d-2]
+  real(r8),target,allocatable ::  tMicBiome_col(:,:,:)                         !total micriobial C, [g d-2]
+  real(r8),target,allocatable :: tSoilOrgM_col(:,:,:)                  !total soil organic matter, include everything organic (exclude live roots) [g d-2]
   real(r8),target,allocatable ::  tLitrOM_col(:,:,:)                        !total litter C, [g d-2]
   real(r8),target,allocatable ::  tHumOM_col(:,:,:)                        !total humus C, [g d-2]
   real(r8),target,allocatable ::  EPOC(:,:,:)                       !partitioning coefficient between POC and litter, []
@@ -61,29 +58,26 @@ module SOMDataType
   implicit none
   integer, intent(in) :: NumOfLitrCmplxs
 
-  allocate(RSC(1:NumOfLitrCmplxs,0:JZ,JY,JX))
-  allocate(RSN(1:NumOfLitrCmplxs,0:JZ,JY,JX))
-  allocate(RSP(1:NumOfLitrCmplxs,0:JZ,JY,JX))
-  allocate(CFOSC(jsken,1:jcplx,0:JZ,JY,JX))
-  allocate(CNOSC(jsken,1:jcplx,0:JZ,JY,JX))
-  allocate(CPOSC(jsken,1:jcplx,0:JZ,JY,JX))
+  allocate(RSC(1:NumOfLitrCmplxs,0:JZ,JY,JX)); RSC=0._r8
+  allocate(RSN(1:NumOfLitrCmplxs,0:JZ,JY,JX)); RSN=0._r8
+  allocate(RSP(1:NumOfLitrCmplxs,0:JZ,JY,JX)); RSP=0._r8
+  allocate(CFOSC(jsken,1:jcplx,0:JZ,JY,JX)); CFOSC=0._r8
+  allocate(CNOSC(jsken,1:jcplx,0:JZ,JY,JX)); CNOSC=0._r8
+  allocate(CPOSC(jsken,1:jcplx,0:JZ,JY,JX)); CPOSC=0._r8
   allocate(SolidOM_vr(NumPlantChemElms,jsken,1:jcplx,0:JZ,JY,JX));SolidOM_vr=0._r8
   allocate(SorbedOM_vr(idom_beg:idom_end,1:jcplx,0:JZ,JY,JX));SorbedOM_vr=0._r8
   allocate(OMBioResdu_vr(1:NumPlantChemElms,ndbiomcp,1:jcplx,0:JZ,JY,JX)); OMBioResdu_vr=0._r8
   allocate(DOM_vr(idom_beg:idom_end,1:jcplx,0:JZ,JY,JX));DOM_vr=0._r8
   allocate(DOM_MacP_vr(idom_beg:idom_end,1:jcplx,0:JZ,JY,JX));DOM_MacP_vr=0._r8
-  allocate(ORGC_vr(0:JZ,JY,JX));ORGC_vr=0._r8
-  allocate(ORGN_vr(0:JZ,JY,JX));ORGN_vr=0._r8
-  allocate(ORGP_vr(0:JZ,JY,JX));ORGP_vr=0._r8
+  allocate(SoilOrgM_vr(1:NumPlantChemElms,0:JZ,JY,JX));SoilOrgM_vr=0._r8
   allocate(ORGCX_vr(0:JZ,JY,JX)); ORGCX_vr=0._r8
   allocate(SolidOMAct_vr(jsken,1:jcplx,0:JZ,JY,JX));SolidOMAct_vr=0._r8
   allocate(OMLitrC_vr(0:JZ,JY,JX));OMLitrC_vr=0._r8
-  allocate(CORGC_vr(0:JZ,JY,JX));CORGC_vr=0._r8
-  allocate(CORGN_vr(JZ,JY,JX));CORGN_vr=0._r8
-  allocate(CORGP_vr(JZ,JY,JX));CORGP_vr=0._r8
+  allocate(CSoilOrgM_vr(1:NumPlantChemElms,0:JZ,JY,JX));CSoilOrgM_vr=0._r8
   allocate(COMLitrC_vr(JZ,JY,JX));COMLitrC_vr=0._r8
   allocate(CFOMC_vr(2,JZ,JY,JX));; CFOMC_vr=0._r8
-  allocate(tMicBiome(NumPlantChemElms,JY,JX));        tMicBiome=0._r8
+  allocate(tMicBiome_col(NumPlantChemElms,JY,JX));        tMicBiome_col=0._r8
+  allocate(tSoilOrgM_col(NumPlantChemElms,JY,JX)); tSoilOrgM_col=0._r8
   allocate(tLitrOM_col(NumPlantChemElms,JY,JX));       tLitrOM_col=0._r8
   allocate(tHumOM_col(NumPlantChemElms,JY,JX));       tHumOM_col=0._r8
   allocate(EPOC(0:JZ,JY,JX));   EPOC=0._r8
@@ -114,18 +108,15 @@ module SOMDataType
   call destroy(OMBioResdu_vr)
   call destroy(DOM_vr)
   call destroy(DOM_MacP_vr)
-  call destroy(ORGC_vr)
-  call destroy(ORGN_vr)
-  call destroy(ORGP_vr)
+  call destroy(SoilOrgM_vr)
   call destroy(ORGCX_vr)
   call destroy(SolidOMAct_vr)
   call destroy(OMLitrC_vr)
-  call destroy(CORGC_vr)
-  call destroy(CORGN_vr)
-  call destroy(CORGP_vr)
+  call destroy(CSoilOrgM_vr)
   call destroy(COMLitrC_vr)
   call destroy(CFOMC_vr)
-  call destroy(tMicBiome)
+  call destroy(tMicBiome_col)
+  call destroy(tSoilOrgM_col)
   call destroy(tLitrOM_col)
   call destroy(tHumOM_col)
   call destroy(EPOC)

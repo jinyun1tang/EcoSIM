@@ -251,7 +251,7 @@ module VisualMod
           OUT(57)=1.E-3_r8*RootElms_pft(ielmc,2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
           L=0
           D62: DO N=58,68
-            OUT(N)=1.E-3_r8*ORGC_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+            OUT(N)=1.E-3_r8*SoilOrgM_vr(ielmc,L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
             L=L+1
           ENDDO D62
 !

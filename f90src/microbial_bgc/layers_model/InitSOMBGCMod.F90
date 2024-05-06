@@ -386,10 +386,10 @@ module InitSOMBGCMOD
   
   call sumORGMLayL(L,NY,NX,ORGM)
 
-  ORGC_vr(L,NY,NX)=ORGM(ielmc)
-  ORGN_vr(L,NY,NX)=ORGM(ielmn)
-  ORGP_vr(L,NY,NX)=ORGM(ielmp)
-  ORGCX_vr(L,NY,NX)=ORGC_vr(L,NY,NX)
+  SoilOrgM_vr(ielmc,L,NY,NX)=ORGM(ielmc)
+  SoilOrgM_vr(ielmn,L,NY,NX)=ORGM(ielmn)
+  SoilOrgM_vr(ielmp,L,NY,NX)=ORGM(ielmp)
+  ORGCX_vr(L,NY,NX)=SoilOrgM_vr(ielmc,L,NY,NX)
 
   call sumLitrOMLayL(L,NY,NX,litrOM)
   OMLitrC_vr(L,NY,NX)=litrOM(ielmc)
@@ -560,7 +560,7 @@ module InitSOMBGCMOD
       !     FCX=reduction in FC0 at DPTH
       !     CORGCX,CORGNX,CORGPX=C,N,P concentations in humus
 !
-      IF(CORGC_vr(L,NY,NX).LE.FORGC.OR.SoiDepthMidLay(L,NY,NX).LE.ExtWaterTablet0(NY,NX) &
+      IF(CSoilOrgM_vr(ielmc,L,NY,NX).LE.FORGC.OR.SoiDepthMidLay(L,NY,NX).LE.ExtWaterTablet0(NY,NX) &
         +CumDepth2LayerBottom(NU(NY,NX),NY,NX)-LandScape1stSoiLayDepth)THEN
         FCY=0.60_r8
         IF(CORGCX(k_humus).GT.1.0E-32_r8)THEN
@@ -683,10 +683,10 @@ module InitSOMBGCMOD
     !     ALLOCATE SOC TO POC(3) AND HUMUS(4)
     !
     IF(L.GT.0)THEN
-      CORGCZ=CORGC_vr(L,NY,NX)
+      CORGCZ=CSoilOrgM_vr(ielmc,L,NY,NX)
       CORGRZ=COMLitrC_vr(L,NY,NX)
-      CORGNZ=CORGN_vr(L,NY,NX)
-      CORGPZ=CORGP_vr(L,NY,NX)
+      CORGNZ=CSoilOrgM_vr(ielmn,L,NY,NX)
+      CORGPZ=CSoilOrgM_vr(ielmp,L,NY,NX)
       IF(CORGCZ.GT.ZERO)THEN
         CORGCX(k_POM)=CORGRZ
         CORGCX(k_humus)=AZMAX1(CORGCZ-CORGCX(3))

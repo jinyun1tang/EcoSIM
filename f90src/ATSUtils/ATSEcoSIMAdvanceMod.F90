@@ -76,9 +76,9 @@ implicit none
       CumDepth2LayerBottom(L,NY,NX)=a_CumDepth2LayerBottom(L,NY)
       !Convert Bulk Density from ATS (kg m^-3) to EcoSIM (Mg m^-3)
       SoiBulkDensityt0(L,NY,NX)=a_BKDSI(L,NY)/1.0e3_r8
-      CORGC_vr(L,NY,NX)=a_CORGC(L,NY)
-      CORGN_vr(L,NY,NX)=a_CORGN(L,NY)
-      CORGP_vr(L,NY,NX)=a_CORGP(L,NY)
+      CSoilOrgM_vr(ielmc,L,NY,NX)=a_CORGC(L,NY)
+      CSoilOrgM_vr(ielmn,L,NY,NX)=a_CORGN(L,NY)
+      CSoilOrgM_vr(ielmp,L,NY,NX)=a_CORGP(L,NY)
       VLWatMicP1(L,NY,NX)=a_WC(L,NY)
       VLiceMicP1(L,NY,NX)=0.0
       TKSoi1(L,NY,NX) = a_TEMP(L,NY)

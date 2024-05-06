@@ -106,7 +106,7 @@ contains
 !
 !     IF(SoiBulkDensity(L,NY,NX).GT.ZERO)THEN
 !     CCLAYT=CCLAY(L,NY,NX)*1.0E+02
-!     CORGCT=CORGC_vr(L,NY,NX)*1.0E-04
+!     CORGCT=CSoilOrgM_vr(ielmc,L,NY,NX)*1.0E-04
 !     CC=EXP(-3.6733-0.1447*CCLAYT+0.7653*CORGCT)
 !     DD=-0.4805-0.1239*CCLAYT+0.2080*CORGCT
 !     EE=3.8521+0.0963*CCLAYT
@@ -140,9 +140,9 @@ contains
   real(r8) :: XK,YK,SUM1,SUM2
   real(r8) :: VISCWL
 
-  IF(CORGC_vr(L,NY,NX).GT.FORGC)THEN
+  IF(CSoilOrgM_vr(ielmc,L,NY,NX).GT.FORGC)THEN
     SRP(L,NY,NX)=0.25_r8
-  ELSE IF(CORGC_vr(L,NY,NX).GT.0.5_r8*FORGC)THEN
+  ELSE IF(CSoilOrgM_vr(ielmc,L,NY,NX).GT.0.5_r8*FORGC)THEN
     SRP(L,NY,NX)=0.33_r8
   ELSE
     SRP(L,NY,NX)=1.00_r8
@@ -167,9 +167,9 @@ contains
     ! restart is defined as simulation starting from a previous run
       IF(ISOIL(isoi_fc,L,NY,NX).EQ.1.OR.ISOIL(isoi_wp,L,NY,NX).EQ.1)THEN
         !calculating FC or WP
-        IF(CORGC_vr(L,NY,NX).LT.FORGW)THEN
+        IF(CSoilOrgM_vr(ielmc,L,NY,NX).LT.FORGW)THEN
           FieldCapacity(L,NY,NX)=0.2576_r8-0.20_r8*CSAND(L,NY,NX) &
-                +0.36_r8*CCLAY(L,NY,NX)+0.60E-06*CORGC_vr(L,NY,NX)
+                +0.36_r8*CCLAY(L,NY,NX)+0.60E-06*CSoilOrgM_vr(ielmc,L,NY,NX)
         ELSE
           IF(SoiBulkDensity(L,NY,NX).LT.0.075_r8)THEN
             FieldCapacity(L,NY,NX)=0.27_r8
@@ -181,8 +181,8 @@ contains
         ENDIF
         FieldCapacity(L,NY,NX)=FieldCapacity(L,NY,NX)/(1.0_r8-SoilFracAsMacP(L,NY,NX))
         FieldCapacity(L,NY,NX)=AMIN1(0.75_r8*POROS(L,NY,NX),FieldCapacity(L,NY,NX))
-        IF(CORGC_vr(L,NY,NX).LT.FORGW)THEN
-          WiltPoint(L,NY,NX)=0.0260_r8+0.50_r8*CCLAY(L,NY,NX)+0.32E-06_r8*CORGC_vr(L,NY,NX)
+        IF(CSoilOrgM_vr(ielmc,L,NY,NX).LT.FORGW)THEN
+          WiltPoint(L,NY,NX)=0.0260_r8+0.50_r8*CCLAY(L,NY,NX)+0.32E-06_r8*CSoilOrgM_vr(ielmc,L,NY,NX)
         ELSE
           IF(SoiBulkDensity(L,NY,NX).LT.0.075_r8)THEN
             WiltPoint(L,NY,NX)=0.04_r8
@@ -270,7 +270,7 @@ contains
   !
   IF(ISOIL(isoi_scnv,L,NY,NX).EQ.1)THEN
     !computing vertical saturated hydraulic conductivity
-    IF(CORGC_vr(L,NY,NX).LT.FORGW)THEN
+    IF(CSoilOrgM_vr(ielmc,L,NY,NX).LT.FORGW)THEN
       THETF=AMIN1(POROS(L,NY,NX),EXP((LOGPSIAtSat(NY,NX)-LOG(0.033_r8)) &
         *(LOGPOROS(L,NY,NX)-LOGFldCapacity(L,NY,NX))/LOGPSIMXD(NY,NX)+LOGPOROS(L,NY,NX)))
       SatHydroCondVert(L,NY,NX)=1.54_r8*((POROS(L,NY,NX)-THETF)/THETF)**2
@@ -282,7 +282,7 @@ contains
 
   IF(ISOIL(isoi_scnh,L,NY,NX).EQ.1)THEN
     !computing horizontal saturated hydraulic conductivity
-    IF(CORGC_vr(L,NY,NX).LT.FORGW)THEN
+    IF(CSoilOrgM_vr(ielmc,L,NY,NX).LT.FORGW)THEN
       THETF=AMIN1(POROS(L,NY,NX),EXP((LOGPSIAtSat(NY,NX)-LOG(0.033_r8)) &
         *(LOGPOROS(L,NY,NX)-LOGFldCapacity(L,NY,NX))/LOGPSIMXD(NY,NX)+LOGPOROS(L,NY,NX)))
       SatHydroCondHrzn(L,NY,NX)=1.54_r8*((POROS(L,NY,NX)-THETF)/THETF)**2._r8

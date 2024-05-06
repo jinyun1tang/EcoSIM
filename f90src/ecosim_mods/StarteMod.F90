@@ -158,7 +158,7 @@ module StarteMod
 
             solutevar%XAEC  = trcx_solml(idx_AEC,L,NY,NX)
             solutevar%CEC   = CEC(L,NY,NX)
-            solutevar%ORGC  = ORGC_vr(L,NY,NX)
+            solutevar%ORGC  = SoilOrgM_vr(ielmc,L,NY,NX)
             solutevar%VLPO4 = trcs_VLN_vr(ids_H1PO4,L,NY,NX)
             solutevar%XCEC  = trcx_solml(idx_CEC,L,NY,NX)
             solutevar%GKC4  = GKC4(L,NY,NX)

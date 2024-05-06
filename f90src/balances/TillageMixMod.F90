@@ -135,9 +135,9 @@ module TillageMixMod
 !     ACCUMULATE STATE VARIABLES IN SURFACE RESIDUE FOR ADDITION
 !     TO SOIL IN TILLAGE MIXING ZONE
 !
-!     IF(ORGC_vr(0,NY,NX).GT.ZEROS(NY,NX))THEN
+!     IF(SoilOrgM_vr(ielmc,0,NY,NX).GT.ZEROS(NY,NX))THEN
 !     XCORP0=AMAX1(XCORP(NY,NX),AMIN1(1.0,
-!    2(VHeatCapLitR(NY,NX)/cpo)/ORGC_vr(0,NY,NX)))
+!    2(VHeatCapLitR(NY,NX)/cpo)/SoilOrgM_vr(ielmc,0,NY,NX)))
     XCORP0=AMAX1(0.001_r8,XCORP(NY,NX))
 !     ELSE
 !     XCORP0=1.0
@@ -184,7 +184,6 @@ module TillageMixMod
         TDOMH(idom,K)=DOM_MacP_vr(idom,K,0,NY,NX)*CORP0
         TDOMHG(idom,K)=SorbedOM_vr(idom,K,0,NY,NX)*CORP0
   !
-
   !     REDUCE SURFACE RESIDUE STATE VARIABLES FOR INCORPORATION
   !
         DOM_vr(idom,K,0,NY,NX)=DOM_vr(idom,K,0,NY,NX)*XCORP0
@@ -228,16 +227,16 @@ module TillageMixMod
 
     TZNFNG=ZNFNI(0,NY,NX)*CORP0
     TVOLWR=VLWatMicP(0,NY,NX)*CORP0
-    HFLXD=cpo*ORGC_vr(0,NY,NX)*CORP0*TKS(0,NY,NX)
+    HFLXD=cpo*SoilOrgM_vr(ielmc,0,NY,NX)*CORP0*TKS(0,NY,NX)
     HEATIN=HEATIN-HFLXD
     HeatStoreLandscape=HeatStoreLandscape-HFLXD
     TENGYR=cpw*TVOLWR*TKS(0,NY,NX)
 
     call sumLitrOMLayL(0,NY,NX,litrOM)
 
-    ORGC_vr(0,NY,NX)=litrOM(ielmc)
-    ORGN_vr(0,NY,NX)=litrOM(ielmn)
-    ORGP_vr(0,NY,NX)=litrOM(ielmp)
+    SoilOrgM_vr(ielmc,0,NY,NX)=litrOM(ielmc)
+    SoilOrgM_vr(ielmn,0,NY,NX)=litrOM(ielmn)
+    SoilOrgM_vr(ielmp,0,NY,NX)=litrOM(ielmp)
     OMLitrC_vr(0,NY,NX)=litrOM(ielmc)
 
 
@@ -266,7 +265,7 @@ module TillageMixMod
     ENDDO
 
     VLWatMicP(0,NY,NX)=VLWatMicP(0,NY,NX)*XCORP0
-    VHeatCapacity(0,NY,NX)=cpo*ORGC_vr(0,NY,NX)+cpw*VLWatMicP(0,NY,NX)+cpi*VLiceMicP(0,NY,NX)
+    VHeatCapacity(0,NY,NX)=cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP(0,NY,NX)+cpi*VLiceMicP(0,NY,NX)
     VLitR(NY,NX)=VLitR(NY,NX)*XCORP0
     VGeomLayer(0,NY,NX)=VGeomLayer(0,NY,NX)*XCORP0
     ZNHUX0=AMAX1(ZNHUX0,ZNHU0(0,NY,NX))
@@ -581,8 +580,8 @@ module TillageMixMod
 
         call sumLitrOMLayL(L,NY,NX,litrOM)
 
-        ORGC_vr(L,NY,NX)=ORGM(ielmc)
-        ORGN_vr(L,NY,NX)=ORGM(ielmn)
+        SoilOrgM_vr(ielmc,L,NY,NX)=ORGM(ielmc)
+        SoilOrgM_vr(ielmn,L,NY,NX)=ORGM(ielmn)
         OMLitrC_vr(L,NY,NX)=litrOM(ielmc)
 
         DO NTS=ids_beg,idg_NH3

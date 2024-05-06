@@ -947,8 +947,8 @@ module MicBGCMod
 !     ECHZ=growth respiration efficiency of aceto. methanogenesis
 !
   ELSEIF(N.EQ.micpar%AcetotroMethanogenArchea)THEN
-!     write(*,*)'AcetMicBiomehanogenCatabolism'
-    call AcetMicBiomehanogenCatabolism(NGL,N,K,TSensGrowth,WatStressMicb,FOQA,ECHZ, &
+!     write(*,*)'AcetMicBiome_colhanogenCatabolism'
+    call AcetMicBiome_colhanogenCatabolism(NGL,N,K,TSensGrowth,WatStressMicb,FOQA,ECHZ, &
       FGOCP,FGOAP,RGOMP,micfor,micstt,naqfdiag,nmicf,nmics,ncplxs,micflx)
   ENDIF
 !
@@ -2423,7 +2423,7 @@ module MicBGCMod
   end subroutine SubstrateAttenf4Compet
 !------------------------------------------------------------------------------------------
 
-  subroutine AcetMicBiomehanogenCatabolism(NGL,N,K,TSensGrowth,WatStressMicb,FOQA,ECHZ, &
+  subroutine AcetMicBiome_colhanogenCatabolism(NGL,N,K,TSensGrowth,WatStressMicb,FOQA,ECHZ, &
     FGOCP,FGOAP,RGOMP,micfor,micstt,naqfdiag,nmicf,nmics,ncplxs,micflx)
   implicit none
   integer, intent(in) :: NGL,N,K
@@ -2493,7 +2493,7 @@ module MicBGCMod
   ROQC4HeterMicrobAct(NGL,K)=0.0_r8
   naqfdiag%TCH4H=naqfdiag%TCH4H+0.5_r8*RGOMP
   end associate
-  end subroutine AcetMicBiomehanogenCatabolism
+  end subroutine AcetMicBiome_colhanogenCatabolism
 !------------------------------------------------------------------------------------------
 
   subroutine AerobicHeterotrophCatabolism(NGL,N,K,TSensGrowth,WatStressMicb,FOQC,FOQA, &

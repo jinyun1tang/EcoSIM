@@ -1068,7 +1068,7 @@ module SoluteMod
 !     H2PO4_1e_AlPO4_dissol_flx=H2PO4 dissolution from AlPO4 in litter
 !
     H2PO4_1e_AlPO4_eqv=SYA0P2/(Al_3p_conc*OH_1e_conc**2)
-    H2PO4_1e_AlPO4_dissol_flx=AMIN1(AZMAX1(4.0E-08*ORGC_vr(0,NY,NX)-Precp_AlPO4_conc),&
+    H2PO4_1e_AlPO4_dissol_flx=AMIN1(AZMAX1(4.0E-08*SoilOrgM_vr(ielmc,0,NY,NX)-Precp_AlPO4_conc),&
       AMAX1(-Precp_AlPO4_conc,TPD*(H2PO4_1e_conc-H2PO4_1e_AlPO4_eqv)))
 !
 !     IRON PHOSPHATE (STRENGITE)
@@ -1078,7 +1078,7 @@ module SoluteMod
 !     H2PO4_1e_FePO4_dissol_flx=H2PO4 dissolution from FePO4 in litter
 !
     H2PO4_1e_FePO4_eqv=SYF0P2/(Fe_3p_conc*OH_1e_conc**2)
-    H2PO4_1e_FePO4_dissol_flx=AMIN1(AZMAX1(2.0E-06*ORGC_vr(0,NY,NX)-Precp_FePO4_conc),&
+    H2PO4_1e_FePO4_dissol_flx=AMIN1(AZMAX1(2.0E-06*SoilOrgM_vr(ielmc,0,NY,NX)-Precp_FePO4_conc),&
       AMAX1(-Precp_FePO4_conc,TPD*(H2PO4_1e_conc-H2PO4_1e_FePO4_eqv)))
 !
 !     DICALCIUM PHOSPHATE
@@ -1088,7 +1088,7 @@ module SoluteMod
 !     H2PO4_1e_CaHPO4_dissol_flx=H2PO4 dissolution from CaHPO4 in litter
 !   CaHPO4.H2O <->HPO4(-)+Ca(2+)+OH(-) 
     H2PO4_1e_CaHPO4_eqv=SYCAD2/(Ca_2p_conc*OH_1e_conc)
-    H2PO4_1e_CaHPO4_dissol_flx=AMIN1(AMAX1(0-.0,5.0E-05*ORGC_vr(0,NY,NX)-Precp_CaHPO4_conc),&
+    H2PO4_1e_CaHPO4_dissol_flx=AMIN1(AMAX1(0-.0,5.0E-05*SoilOrgM_vr(ielmc,0,NY,NX)-Precp_CaHPO4_conc),&
       AMAX1(-Precp_CaHPO4_conc,TPD*(H2PO4_1e_conc-H2PO4_1e_CaHPO4_eqv)))
 !
 !     HYDROXYAPATITE
@@ -1098,7 +1098,7 @@ module SoluteMod
 !     H2PO4_1e_apatite_dissol_flx=H2PO4 dissolution from apatite in litter
 !
     H2PO4_1e_apatite_eqv=(SYCAH2/(Ca_2p_conc**5_r8*OH_1e_conc**7))**0.333_r8
-    H2PO4_1e_apatite_dissol_flx=AMIN1(AZMAX1(5.0E-05_r8*ORGC_vr(0,NY,NX)-Precp_Ca5P3O12O3H3_conc),&
+    H2PO4_1e_apatite_dissol_flx=AMIN1(AZMAX1(5.0E-05_r8*SoilOrgM_vr(ielmc,0,NY,NX)-Precp_Ca5P3O12O3H3_conc),&
       AMAX1(-Precp_Ca5P3O12O3H3_conc,TPD*(H2PO4_1e_conc-H2PO4_1e_apatite_eqv)))
 !
 !     MONOCALCIUM PHOSPHATE
@@ -1108,7 +1108,7 @@ module SoluteMod
 !     H2PO4_1e_CaH4P2O8_dissol_flx=H2PO4 dissolution from Ca(H2PO4)2 in litter
 !
     H2PO4_1e_CaH4P2O8_eqv=SQRT(SPCAM/Ca_2p_conc)
-    H2PO4_1e_CaH4P2O8_dissol_flx=AMIN1(AZMAX1(5.0E-05_r8*ORGC_vr(0,NY,NX)-Precp_CaH4P2O8_conc),&
+    H2PO4_1e_CaH4P2O8_dissol_flx=AMIN1(AZMAX1(5.0E-05_r8*SoilOrgM_vr(ielmc,0,NY,NX)-Precp_CaH4P2O8_conc),&
       AMAX1(-Precp_CaH4P2O8_conc*SPPO4,TPD*(H2PO4_1e_conc-H2PO4_1e_CaH4P2O8_eqv)))
 
 !
@@ -1141,7 +1141,7 @@ module SoluteMod
 !     ORGC_vr=gC/d-2
 !     COOH=mol/gC, CEC of organic matter
     IF(BulkSoilMass.GT.ZEROS(NY,NX))THEN
-      CCEC0=AMAX1(ZERO,COOH*ORGC_vr(0,NY,NX)/BulkSoilMass)
+      CCEC0=AMAX1(ZERO,COOH*SoilOrgM_vr(ielmc,0,NY,NX)/BulkSoilMass)
     ELSE
       CCEC0=ZERO
     ENDIF

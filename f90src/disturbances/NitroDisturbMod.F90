@@ -37,7 +37,8 @@ module NitroDisturbMod
   subroutine SOMRemovalByDisturbance(I,J,NY,NX)
 !
 !     Description:
-!
+!ITILL,DCORP=disturbance type,intensity
+!ITILL=soil disturbance type 1-20:tillage,21=litter removal,22=fire,23-24=drainage
   implicit none
   integer, intent(in) :: I,J,NY,NX
 
@@ -67,7 +68,7 @@ module NitroDisturbMod
         IF(L.EQ.0 .OR. L.GE.NUM(NY,NX))THEN
           IF(IFLGJ.EQ.1)THEN
             exit
-          ELSEIF(THETW_vr(L,NY,NX).GT.FVLWB .OR. CORGC_vr(L,NY,NX).LE.FORGC)THEN
+          ELSEIF(THETW_vr(L,NY,NX).GT.FVLWB .OR. CSoilOrgM_vr(ielmc,L,NY,NX).LE.FORGC)THEN
             IFLGJ=1
           ELSE
             NLL=L
@@ -86,8 +87,8 @@ module NitroDisturbMod
           ELSE
             FORGCX=FORGC
           ENDIF
-          DCORPC=AMIN1(0.999_r8,DCORP(I,NY,NX))*(CORGC_vr(L,NY,NX)-FORGCX) &
-            /(AMAX1(CORGC_vr(L,NY,NX),orgcden)-FORGCX)
+          DCORPC=AMIN1(0.999_r8,DCORP(I,NY,NX))*(CSoilOrgM_vr(ielmc,L,NY,NX)-FORGCX) &
+            /(AMAX1(CSoilOrgM_vr(ielmc,L,NY,NX),orgcden)-FORGCX)
         ELSE
           DCORPC=AMIN1(0.999_r8,DCORP(I,NY,NX))
         ENDIF
@@ -326,15 +327,15 @@ module NitroDisturbMod
             FertN_soil_vr(NTF,L,NY,NX)=DCORPC1*FertN_soil_vr(NTF,L,NY,NX)
           ENDDO
         ENDIF
-        ORGC_vr(L,NY,NX)=dOMelm(ielmc)
-        ORGN_vr(L,NY,NX)=dOMelm(ielmn)
-        ORGP_vr(L,NY,NX)=dOMelm(ielmp)
+        SoilOrgM_vr(ielmc,L,NY,NX)=dOMelm(ielmc)
+        SoilOrgM_vr(ielmn,L,NY,NX)=dOMelm(ielmn)
+        SoilOrgM_vr(ielmp,L,NY,NX)=dOMelm(ielmp)
         IF(L.EQ.0)THEN
-          HFLXD=4.19E-06_r8*(ORGCX_vr(L,NY,NX)-ORGC_vr(L,NY,NX))*TKS(L,NY,NX)
+          HFLXD=4.19E-06_r8*(ORGCX_vr(L,NY,NX)-SoilOrgM_vr(ielmc,L,NY,NX))*TKS(L,NY,NX)
           HEATOU=HEATOU+HFLXD
         ENDIF
 !     IF(L.EQ.0)THEN
-!     VHeatCapacity(0,NY,NX)=2.496E-06*ORGC_vr(0,NY,NX)+4.19*VLWatMicP(0,NY,NX)
+!     VHeatCapacity(0,NY,NX)=2.496E-06*SoilOrgM_vr(ielmc,0,NY,NX)+4.19*VLWatMicP(0,NY,NX)
 !    2+1.9274*VLiceMicP(0,NY,NX)
 !     ELSE
 !     VHeatCapacity(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+4.19*(VLWatMicP(L,NY,NX)+VLWatMacP(L,NY,NX))

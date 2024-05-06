@@ -315,7 +315,7 @@ module StartsMod
       !     SURFACE LITTER HEAT CAPACITY
       !
       SoilMicPMassLayerMn(NY,NX)=AZMAX1(SAND(NU(NY,NX),NY,NX)+SILT(NU(NY,NX),NY,NX)+CLAY(NU(NY,NX),NY,NX))
-      VHeatCapacity(0,NY,NX)=cpo*ORGC_vr(0,NY,NX)+cpw*VLWatMicP(0,NY,NX)+cpi*VLiceMicP(0,NY,NX)
+      VHeatCapacity(0,NY,NX)=cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP(0,NY,NX)+cpi*VLiceMicP(0,NY,NX)
       VHeatCapacitySoilM(0,NY,NX)=0.0_r8
       VLMicPt0(0,NY,NX)=0.0_r8
     ENDDO
@@ -349,10 +349,10 @@ module StartsMod
 !
   TORGC=0.0_r8
   D1190: DO L=NU(NY,NX),NL(NY,NX)
-    !     CORGCZ=CORGC_vr(L,NY,NX)
+    !     CORGCZ=CSoilOrgM_vr(ielmc,L,NY,NX)
     !     CORGRZ=CORGR(L,NY,NX)
-    !     CORGNZ=CORGN_vr(L,NY,NX)
-    !     CORGPZ=CORGP_vr(L,NY,NX)
+    !     CORGNZ=CSoilOrgM_vr(ielmn,L,NY,NX)
+    !     CORGPZ=CSoilOrgM_vr(ielmp,L,NY,NX)
     !
     !     ALLOCATE SOC TO POC(3) AND HUMUS(4)
     !
@@ -362,7 +362,7 @@ module StartsMod
     !     CORGNX(4)=AZMAX1(CORGNZ-CORGNX(3))
     !     CORGPX(3)=AMIN1(CPRH(3)*CORGCX(3),CORGPZ)
     !     CORGPX(4)=AZMAX1(CORGPZ-CORGPX(3))
-    CORGL=AZMAX1(CORGC_vr(L,NY,NX)-COMLitrC_vr(L,NY,NX))
+    CORGL=AZMAX1(CSoilOrgM_vr(ielmc,L,NY,NX)-COMLitrC_vr(L,NY,NX))
     TORGL(L)=TORGC+CORGL*SoilMicPMassLayer(L,NY,NX)/AREA(3,L,NY,NX)*0.5_r8
     TORGC=TORGC+CORGL*SoilMicPMassLayer(L,NY,NX)/AREA(3,L,NY,NX)
   ENDDO D1190
@@ -873,8 +873,8 @@ module StartsMod
       ! surface litter residue layer
       TAREA=TAREA+AREA(3,L,NY,NX)
       CumSoilThickness(L,NY,NX)=0.0_r8
-      ORGC_vr(L,NY,NX)=SUM(RSC(1:NumOfLitrCmplxs,L,NY,NX))*AREA(3,L,NY,NX)
-      ORGCX_vr(L,NY,NX)=ORGC_vr(L,NY,NX)
+      SoilOrgM_vr(ielmc,L,NY,NX)=SUM(RSC(1:NumOfLitrCmplxs,L,NY,NX))*AREA(3,L,NY,NX)
+      ORGCX_vr(L,NY,NX)=SoilOrgM_vr(ielmc,L,NY,NX)
       VLitR0=0._r8
       DO K=1,NumOfLitrCmplxs
         VLitR0=VLitR0+RSC(K,L,NY,NX)/BulkDensLitR(K)
@@ -885,7 +885,7 @@ module StartsMod
       VLSoilPoreMicP_vr(L,NY,NX)=VGeomLayer(L,NY,NX)
       VLSoilMicP(L,NY,NX)=VLSoilPoreMicP_vr(L,NY,NX)
       VGeomLayert0(L,NY,NX)=VGeomLayer(L,NY,NX)
-      SoilMicPMassLayer(L,NY,NX)=MWC2Soil*ORGC_vr(L,NY,NX)  !mass of soil layer, Mg/d2
+      SoilMicPMassLayer(L,NY,NX)=MWC2Soil*SoilOrgM_vr(ielmc,L,NY,NX)  !mass of soil layer, Mg/d2
       !thickness of litter layer 
       DLYRI(3,L,NY,NX)=VLSoilPoreMicP_vr(L,NY,NX)/AREA(3,L,NY,NX)  
       DLYR(3,L,NY,NX)=DLYRI(3,L,NY,NX)

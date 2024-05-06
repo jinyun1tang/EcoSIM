@@ -141,7 +141,7 @@ contains
   this%hmicname(2)='anerofaclb'
   this%hmicname(3)='aerofungi'
   this%hmicname(4)='aneroferm'
-  this%hmicname(5)='acetMicBiomehg'
+  this%hmicname(5)='acetMicBiome_colhg'
   this%hmicname(6)='aeron2fix'
   this%hmicname(7)='aneron2fix'
   this%amicname(1)='amoniaoxib'

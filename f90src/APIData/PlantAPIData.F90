@@ -376,7 +376,7 @@ implicit none
   real(r8), pointer :: trc_solcl_vr(:,:) => null() !aqueous tracer concentration [g m-3]
   real(r8), pointer :: trc_gascl_vr(:,:) => null() !gaseous tracer concentration [g m-3]
 
-  real(r8), pointer :: CORGC_vr(:)    => null()  !soil organic C content [gC kg soil-1]
+  real(r8), pointer :: CSoilOrgM_vr(:,:)    => null()  !soil organic C content [gC kg soil-1]
 
   real(r8), pointer :: HydroCondMicP4RootUptake(:)     => null()  !soil micropore hydraulic conductivity for root water uptake [m MPa-1 h-1]
 
@@ -1436,7 +1436,7 @@ implicit none
 
   allocate(this%trc_gasml_vr(idg_beg:idg_end,0:JZ1));this%trc_gasml_vr=spval
   allocate(this%trc_gascl_vr(idg_beg:idg_end,0:JZ1));this%trc_gascl_vr=spval
-  allocate(this%CORGC_vr(0:JZ1));this%CORGC_vr=spval
+  allocate(this%CSoilOrgM_vr(1:NumPlantChemElms,0:JZ1));this%CSoilOrgM_vr=spval
 
   allocate(this%trc_solcl_vr(ids_beg:ids_end,0:jZ1));this%trc_solcl_vr=spval
 

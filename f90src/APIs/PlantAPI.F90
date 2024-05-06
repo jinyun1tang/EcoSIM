@@ -701,7 +701,7 @@ implicit none
     plt_soilchem%SoluteDifusvty_vr(ids_beg:ids_end,L) =SoluteDifusvty_vr(ids_beg:ids_end,L,NY,NX)
 
     plt_soilchem%trc_gascl_vr(idg_beg:idg_end,L) =trc_gascl_vr(idg_beg:idg_end,L,NY,NX)
-    plt_soilchem%CORGC_vr(L) =CORGC_vr(L,NY,NX)
+    plt_soilchem%CSoilOrgM_vr(ielmc,L) =CSoilOrgM_vr(ielmc,L,NY,NX)
     plt_site%CumSoilThickness(L)    =CumSoilThickness(L,NY,NX)
     plt_site%FracSoiAsMicP(L) =FracSoiAsMicP(L,NY,NX)
 

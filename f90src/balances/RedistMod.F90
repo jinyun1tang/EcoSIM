@@ -140,8 +140,8 @@ module RedistMod
 !     CHECK MATERIAL BALANCES
 !
 !      IF(I.EQ.365.AND.J.EQ.24)THEN
-!        WRITE(19,2221)'ORGC',I,J,iYearCurrent,NX,NY,(ORGC_vr(L,NY,NX)/AREA(3,L,NY,NX),L=0,NL(NY,NX))
-!        WRITE(20,2221)'ORGN',I,J,iYearCurrent,NX,NY,(ORGN_vr(L,NY,NX)/AREA(3,L,NY,NX),L=0,NL(NY,NX))
+!        WRITE(19,2221)'ORGC',I,J,iYearCurrent,NX,NY,(SoilOrgM_vr(ielmc,L,NY,NX)/AREA(3,L,NY,NX),L=0,NL(NY,NX))
+!        WRITE(20,2221)'ORGN',I,J,iYearCurrent,NX,NY,(SoilOrgM_vr(ielmn,L,NY,NX)/AREA(3,L,NY,NX),L=0,NL(NY,NX))
 2221    FORMAT(A8,5I6,21E14.6)
 !      ENDIF
 
@@ -707,13 +707,15 @@ module RedistMod
 
   call sumSurfOMCK(NY,NX,RC0(:,NY,NX),RC0ff(NY,NX))
 
-  call sumMicBiomLayL(0,NY,NX,tMicBiome(1:NumPlantChemElms,NY,NX))
+  call sumMicBiomLayL(0,NY,NX,tMicBiome_col(1:NumPlantChemElms,NY,NX))
   
   call sumLitrOMLayL(0,NY,NX,litrOM)
 
-  ORGC_vr(0,NY,NX)=litrOM(ielmc)
-  ORGN_vr(0,NY,NX)=litrOM(ielmn)
-  ORGP_vr(0,NY,NX)=litrOM(ielmp)
+  SoilOrgM_vr(1:NumPlantChemElms,0,NY,NX)=litrOM
+
+  DO NE=1,NumPlantChemElms
+    tSoilOrgM_col(NE,NY,NX)=tSoilOrgM_col(NE,NY,NX)+SoilOrgM_vr(NE,0,NY,NX)
+  enddo
 
   OMLitrC_vr(0,NY,NX)=litrOM(ielmc)
 
@@ -1352,15 +1354,14 @@ module RedistMod
   call sumMicBiomLayL(L,NY,NX,ORGM)
 
   DO NE=1,NumPlantChemElms
-    tMicBiome(NE,NY,NX)=tMicBiome(NE,NY,NX)+ORGM(NE)
+    tMicBiome_col(NE,NY,NX)=tMicBiome_col(NE,NY,NX)+ORGM(NE)
   ENDDO
+    
+  call sumORGMLayL(L,NY,NX,SoilOrgM_vr(1:NumPlantChemElms,L,NY,NX))
   
-  
-  call sumORGMLayL(L,NY,NX,ORGM)
-  
-  ORGC_vr(L,NY,NX)=ORGM(ielmc)
-  ORGN_vr(L,NY,NX)=ORGM(ielmn)
-  ORGP_vr(L,NY,NX)=ORGM(ielmp)
+  DO NE=1,NumPlantChemElms
+    tSoilOrgM_col(NE,NY,NX)=tSoilOrgM_col(NE,NY,NX)+SoilOrgM_vr(NE,L,NY,NX)
+  ENDDO
 
   !sum up litter complexes
   call sumLitrOMLayL(L,NY,NX,litrOM)
@@ -1368,7 +1369,7 @@ module RedistMod
 
   IF(iErosionMode.EQ.ieros_frzthawsom .OR. iErosionMode.EQ.ieros_frzthawsomeros)THEN
 ! change in organic C
-    DORGCL=ORGCX_vr(L,NY,NX)-ORGC_vr(L,NY,NX)
+    DORGCL=ORGCX_vr(L,NY,NX)-SoilOrgM_vr(ielmc,L,NY,NX)
     IF(L.EQ.NU(NY,NX))THEN
       DORGCL=DORGCL+DORGEC
     ENDIF
@@ -1414,7 +1415,7 @@ module RedistMod
         SolidOM_vr(NE,M,K,0,NY,NX)=SolidOM_vr(NE,M,K,0,NY,NX)+LitrfalStrutElms_vr(NE,M,K,0,NY,NX)
       ENDDO
 
-      ORGC_vr(0,NY,NX)=ORGC_vr(0,NY,NX)+LitrfalStrutElms_vr(ielmc,M,K,0,NY,NX)
+      SoilOrgM_vr(ielmc,0,NY,NX)=SoilOrgM_vr(ielmc,0,NY,NX)+LitrfalStrutElms_vr(ielmc,M,K,0,NY,NX)
       RAINR=LitrfalStrutElms_vr(ielmc,M,K,0,NY,NX)*ThetaCX(K)
       HRAINR=RAINR*cpw*TairK(NY,NX)
       WatFLo2Litr(NY,NX)=WatFLo2Litr(NY,NX)+RAINR
