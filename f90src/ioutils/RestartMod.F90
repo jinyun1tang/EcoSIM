@@ -4774,8 +4774,8 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrc_2d(1:ncols,1:jcplx)    
-    call restartvar(ncid, flag, varname='RC0', dim1name='column',dim2name='nomcomplx',&
-       long_name='surface mic OM in each complex', units='g d-2', &
+    call restartvar(ncid, flag, varname='RC0', dim1name='column',dim2name='nlitromcomplx',&
+       long_name='surface OM in each complex', units='g d-2', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
     call cpcol(flag,NHW,NHE,NVN,NVS,RC0,datrc_2d) 
@@ -4783,26 +4783,9 @@ implicit none
     !print*,'RC0',size(RC0,1),size(RC0,2)
     if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RC0,datrc_2d)   
     datpr2 => datrc_2d(1:ncols,1:jcplx)    
-    call restartvar(ncid, flag, varname='RC0', dim1name='column',dim2name='nomcomplx',&
-       long_name='surface mic OM in each complex', units='g d-2', &
+    call restartvar(ncid, flag, varname='RC0', dim1name='column',dim2name='nlitromcomplx',&
+       long_name='surface OM in each complex', units='g d-2', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
-       fill_value=spval)    
-  endif  
-
-  if(flag=='read')then
-    datpr1 => datrc_1d    
-    call restartvar(ncid, flag, varname='RC0ff', dim1name='column',&
-       long_name='surface mic OM in autotroph complex', units='m', &
-       interpinic_flag='skip', data=datpr1, missing_value=spval, &
-       fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,RC0ff,datrc_1d) 
-  else
-    !print*,'RC0ff'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RC0ff,datrc_1d)   
-    datpr1 => datrc_1d    
-    call restartvar(ncid, flag, varname='RC0ff', dim1name='column',&
-       long_name='surface mic OM in autotroph complex', units='m', &
-       interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
   endif  
 
@@ -5205,17 +5188,51 @@ implicit none
        long_name='soil organic C content', units='g kg-1', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,CORGC,datrc_2d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,CORGC_vr,datrc_2d) 
   else
     !print*,'CORGC'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,CORGC,datrc_2d)   
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,CORGC_vr,datrc_2d)   
     datpr2 => datrc_2d(1:ncols,1:JZ+1)    
     call restartvar(ncid, flag, varname='CORGC', dim1name='column',dim2name='levsoi1',&
        long_name='soil organic C content', units='g kg-1', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
-
   endif  
+
+  if(flag=='read')then
+    datpr2 => datrc_2d(1:ncols,1:JZ+1)    
+    call restartvar(ncid, flag, varname='CORGN', dim1name='column',dim2name='levsoi1',&
+       long_name='soil organic N content', units='g kg-1', &
+       interpinic_flag='skip', data=datpr2, missing_value=spval, &
+       fill_value=spval)    
+    call cpcol(flag,NHW,NHE,NVN,NVS,CORGN_vr,datrc_2d) 
+  else
+    !print*,'CORGC'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,CORGN_vr,datrc_2d)   
+    datpr2 => datrc_2d(1:ncols,1:JZ+1)    
+    call restartvar(ncid, flag, varname='CORGN', dim1name='column',dim2name='levsoi1',&
+       long_name='soil organic N content', units='g kg-1', &
+       interpinic_flag='skip', data=datpr2, missing_value=spval, &
+       fill_value=spval)    
+  endif  
+
+  if(flag=='read')then
+    datpr2 => datrc_2d(1:ncols,1:JZ+1)    
+    call restartvar(ncid, flag, varname='CORGP', dim1name='column',dim2name='levsoi1',&
+       long_name='soil organic P content', units='g kg-1', &
+       interpinic_flag='skip', data=datpr2, missing_value=spval, &
+       fill_value=spval)    
+    call cpcol(flag,NHW,NHE,NVN,NVS,CORGP_vr,datrc_2d) 
+  else
+    !print*,'CORGC'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,CORGP_vr,datrc_2d)   
+    datpr2 => datrc_2d(1:ncols,1:JZ+1)    
+    call restartvar(ncid, flag, varname='CORGP', dim1name='column',dim2name='levsoi1',&
+       long_name='soil organic P content', units='g kg-1', &
+       interpinic_flag='skip', data=datpr2, missing_value=spval, &
+       fill_value=spval)    
+  endif  
+
 
   if(flag=='read')then
     datpr2 => datrc_2d(1:ncols,1:JZ+1)    
@@ -6781,9 +6798,9 @@ implicit none
       dim3name='nomcomplx',dim4name='levsoi1',long_name='dissolved organic C micropore', &
       units='g d-2', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)      
-    call cpcol(flag,NHW,NHE,NVN,NVS,DOM,datrc_4d)     
+    call cpcol(flag,NHW,NHE,NVN,NVS,DOM_vr,datrc_4d)     
   else
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,DOM,datrc_4d)       
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,DOM_vr,datrc_4d)       
     datpr4 => datrc_4d(1:ncols,1:trc_confs%NDOMS,1:jcplx,1:JZ+1)                   
     call restartvar(ncid, flag, varname='DOM', dim1name='column',dim2name='ndoms',&
       dim3name='nomcomplx',dim4name='levsoi1',long_name='dissolved organic matter micropore', &
@@ -6798,10 +6815,10 @@ implicit none
       dim3name='nomcomplx',dim4name='levsoi1',long_name='dissolved organic matter macropore', &
       units='g d-2', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)      
-    call cpcol(flag,NHW,NHE,NVN,NVS,DOM_MacP,datrc_4d)
+    call cpcol(flag,NHW,NHE,NVN,NVS,DOM_MacP_vr,datrc_4d)
   else
     !print*,'OQCH'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,DOM_MacP,datrc_4d)  
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,DOM_MacP_vr,datrc_4d)  
     datpr4 => datrc_4d(1:ncols,1:trc_confs%NDOMS,1:jcplx,1:JZ+1)                   
     call restartvar(ncid, flag, varname='DOM_MacP', dim1name='column',dim2name='ndoms',&
       dim3name='nomcomplx',dim4name='levsoi1',long_name='dissolved organic matter macropore', &
@@ -7957,6 +7974,7 @@ implicit none
   call ncd_defdim(ncid, 'elmnts',NumPlantChemElms,dimid)
   call ncd_defdim(ncid, 'nkinecmp',jsken,dimid)
   call ncd_defdim(ncid, 'nomcomplx',jcplx,dimid)
+  call ncd_defdim(ncid, 'nlitromcomplx',micpar%NumOfLitrCmplxs,dimid)
   call ncd_defdim(ncid, 'sdim',3,dimid)   !grid dimension
   call ncd_defdim(ncid,'hetrmicb',NumHetetrMicCmplx,dimid)
   call ncd_defdim(ncid,'rootyps'  , pltpar%jroots, dimid)

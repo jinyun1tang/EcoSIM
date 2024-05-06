@@ -947,8 +947,8 @@ module MicBGCMod
 !     ECHZ=growth respiration efficiency of aceto. methanogenesis
 !
   ELSEIF(N.EQ.micpar%AcetotroMethanogenArchea)THEN
-!     write(*,*)'AcetoMethanogenCatabolism'
-    call AcetoMethanogenCatabolism(NGL,N,K,TSensGrowth,WatStressMicb,FOQA,ECHZ, &
+!     write(*,*)'AcetMicBiomehanogenCatabolism'
+    call AcetMicBiomehanogenCatabolism(NGL,N,K,TSensGrowth,WatStressMicb,FOQA,ECHZ, &
       FGOCP,FGOAP,RGOMP,micfor,micstt,naqfdiag,nmicf,nmics,ncplxs,micflx)
   ENDIF
 !
@@ -1603,35 +1603,35 @@ module MicBGCMod
   integer :: K,M,N,NGL,NE,idom
   real(r8) :: FORC(0:jcplx)
 !     begin_execution
-  associate(                                            &
-    k_POM                => micpar%k_POM,               &
-    CGmBOMHeter           => nmicf%CGmBOMHeter,           &
-    RAnabolDOCUptkHeter  => nmicf%RAnabolDOCUptkHeter,  &
-    RAnabolAcetUptkHeter => nmicf%RAnabolAcetUptkHeter, &
-    RkillLitrfal2ResduOMHeter           => nmicf%RkillLitrfal2ResduOMHeter,           &
-    RMaintdefLitrfal2ResduOMHeter           => nmicf%RMaintdefLitrfal2ResduOMHeter,           &
-    RCCMEheter           => nmicf%RCCMEheter,           &
-    RAcettProdHeter      => nmicf%RAcettProdHeter,      &
-    RHydlysSolidOM       => ncplxf%RHydlysSolidOM,      &
-    RHumifySolidOM       => ncplxf%RHumifySolidOM,      &
-    RDcmpProdDOM         => ncplxf%RDcmpProdDOM,        &
-    RHydlysBioResduOM    => ncplxf%RHydlysBioResduOM,   &
-    RHydlysSorptOM       => ncplxf%RHydlysSorptOM,      &
-    DOMSorp              => ncplxf%DOMSorp,             &
-    OMBioResduK          => ncplxs%OMBioResduK,         &
-    RNO2ReduxChemo       => nmicdiag%RNO2ReduxChemo,    &
-    TOMBioResdu          => nmicdiag%TOMBioResdu,       &
-    RMaintdefLitrfal2ResduOMAutor           => nmicf%RMaintdefLitrfal2ResduOMAutor,           &
-    RkillLitrfal2ResduOMAutor          => nmicf%RkillLitrfal2ResduOMAutor,          &
-    SolidOM              => micstt%SolidOM,             &
-    iprotein             => micpar%iprotein,            &
-    SolidOMAct           => micstt%SolidOMAct,          &
-    SOMPomProtein        => micstt%SOMPomProtein,       &
-    DOM                  => micstt%DOM,                 &
-    OMBioResdu           => micstt%OMBioResdu,          &
-    SorbedOM             => micstt%SorbedOM,            &
-    ZEROS                => micfor%ZEROS,               &
-    Litrm                => micfor%litrm                &
+  associate(                                                              &
+    k_POM                         => micpar%k_POM,                        &
+    CGmBOMHeter                   => nmicf%CGmBOMHeter,                   &
+    RAnabolDOCUptkHeter           => nmicf%RAnabolDOCUptkHeter,           &
+    RAnabolAcetUptkHeter          => nmicf%RAnabolAcetUptkHeter,          &
+    RkillLitrfal2ResduOMHeter     => nmicf%RkillLitrfal2ResduOMHeter,     &
+    RMaintdefLitrfal2ResduOMHeter => nmicf%RMaintdefLitrfal2ResduOMHeter, &
+    RCCMEheter                    => nmicf%RCCMEheter,                    &
+    RAcettProdHeter               => nmicf%RAcettProdHeter,               &
+    RHydlysSolidOM                => ncplxf%RHydlysSolidOM,               &
+    RHumifySolidOM                => ncplxf%RHumifySolidOM,               &
+    RDcmpProdDOM                  => ncplxf%RDcmpProdDOM,                 &
+    RHydlysBioResduOM             => ncplxf%RHydlysBioResduOM,            &
+    RHydlysSorptOM                => ncplxf%RHydlysSorptOM,               &
+    DOMSorp                       => ncplxf%DOMSorp,                      &
+    OMBioResduK                   => ncplxs%OMBioResduK,                  &
+    RNO2ReduxChemo                => nmicdiag%RNO2ReduxChemo,             &
+    TOMBioResdu                   => nmicdiag%TOMBioResdu,                &
+    RMaintdefLitrfal2ResduOMAutor => nmicf%RMaintdefLitrfal2ResduOMAutor, &
+    RkillLitrfal2ResduOMAutor     => nmicf%RkillLitrfal2ResduOMAutor,     &
+    SolidOM                       => micstt%SolidOM,                      &
+    iprotein                      => micpar%iprotein,                     &
+    SolidOMAct                    => micstt%SolidOMAct,                   &
+    SOMPomProtein                 => micstt%SOMPomProtein,                &
+    DOM                           => micstt%DOM,                          &
+    OMBioResdu                    => micstt%OMBioResdu,                   &
+    SorbedOM                      => micstt%SorbedOM,                     &
+    ZEROS                         => micfor%ZEROS,                        &
+    Litrm                         => micfor%litrm                         &
   )
 !
 !     REDISTRIBUTE AUTOTROPHIC DECOMPOSITION PRODUCTS AMONG
@@ -1698,10 +1698,9 @@ module MicBGCMod
           SolidOM(NE,iprotein,k_POM)=SolidOM(NE,iprotein,k_POM)+RHumifySolidOM(NE,M,K)
         ENDDO
       ELSE
- !      OSA13U=OSA13U+RHumifySolidOM(ielmc,M,K)
-        SOMPomProtein(ielmc)=SOMPomProtein(ielmc)+RHumifySolidOM(ielmc,M,K)
-        SOMPomProtein(ielmn)=SOMPomProtein(ielmn)+RHumifySolidOM(ielmn,M,K)
-        SOMPomProtein(ielmp)=SOMPomProtein(ielmp)+RHumifySolidOM(ielmp,M,K)
+        DO NE=1,NumPlantChemElms
+          SOMPomProtein(NE)=SOMPomProtein(NE)+RHumifySolidOM(NE,M,K)
+        ENDDO
       ENDIF
 
     ENDDO D580
@@ -1745,7 +1744,8 @@ module MicBGCMod
 !
         D565: DO M=1,ndbiomcp
           DO NE=1,NumPlantChemElms
-            OMBioResdu(NE,M,K)=OMBioResdu(NE,M,K)+RkillLitrfal2ResduOMHeter(NE,M,NGL,K)+RCCMEheter(NE,M,NGL,K)+RMaintdefLitrfal2ResduOMHeter(NE,M,NGL,K)
+            OMBioResdu(NE,M,K)=OMBioResdu(NE,M,K)+RkillLitrfal2ResduOMHeter(NE,M,NGL,K) &
+              +RCCMEheter(NE,M,NGL,K)+RMaintdefLitrfal2ResduOMHeter(NE,M,NGL,K)
           ENDDO
         ENDDO D565
       enddo
@@ -1774,7 +1774,7 @@ module MicBGCMod
   real(r8) ::CGROMC
 !     begin_execution
   associate(                                                          &
-    CGmBOMHeter                  => nmicf%CGmBOMHeter,                  &
+    CGmBOMHeter                 => nmicf%CGmBOMHeter,                 &
     NonstX2stBiomHeter          => nmicf%NonstX2stBiomHeter,          &
     Resp4NFixHeter              => nmicf%Resp4NFixHeter,              &
     RespGrossHeter              => nmicf%RespGrossHeter,              &
@@ -1801,7 +1801,7 @@ module MicBGCMod
     RNH4TransfSoilHeter         => nmicf%RNH4TransfSoilHeter,         &
     k_POM                       => micpar%k_POM,                      &
     k_humus                     => micpar%k_humus,                    &
-    mBOMHeter                    => micstt%mBOMHeter,                   &
+    mBOMHeter                   => micstt%mBOMHeter,                  &
     SolidOM                     => micstt%SolidOM,                    &
     SOMHumProtein               => micstt%SOMHumProtein,              &
     SOMHumCarbohyd              => micstt%SOMHumCarbohyd,             &
@@ -1825,13 +1825,11 @@ module MicBGCMod
       DO  N=1,NumMicbFunGrupsPerCmplx
         DO NGL=JGnio(N),JGnfo(N)
           D540: DO M=1,2
-            MID=micpar%get_micb_id(M,NGL)          
-            mBOMHeter(ielmc,MID,K)=mBOMHeter(ielmc,MID,K)+NonstX2stBiomHeter(ielmc,M,NGL,K) &
-              -RKillOMHeter(ielmc,M,NGL,K)-RMaintdefKillOMHeter(ielmc,M,NGL,K)
-            mBOMHeter(ielmn,MID,K)=mBOMHeter(ielmn,MID,K)+NonstX2stBiomHeter(ielmn,M,NGL,K) &
-              -RKillOMHeter(ielmn,M,NGL,K)-RMaintdefKillOMHeter(ielmn,M,NGL,K)
-            mBOMHeter(ielmp,MID,K)=mBOMHeter(ielmp,MID,K)+NonstX2stBiomHeter(ielmp,M,NGL,K) &
-              -RKillOMHeter(ielmp,M,NGL,K)-RMaintdefKillOMHeter(ielmp,M,NGL,K)
+            MID=micpar%get_micb_id(M,NGL)     
+            DO NE=1,NumPlantChemElms     
+              mBOMHeter(NE,MID,K)=mBOMHeter(NE,MID,K)+NonstX2stBiomHeter(NE,M,NGL,K) &
+                -RKillOMHeter(NE,M,NGL,K)-RMaintdefKillOMHeter(NE,M,NGL,K)
+            ENDDO  
 !
 !     HUMIFICATION PRODUCTS
 !
@@ -1849,12 +1847,15 @@ module MicBGCMod
                   +CFOMC(icarbhyro)*(RkillLitrfal2HumOMHeter(NE,M,NGL,K)+RMaintdefLitrfal2HumOMHeter(NE,M,NGL,K))
               ENDDO
             ELSE
+
               DO NE=1,NumPlantChemElms
                 SOMHumProtein(NE)=SOMHumProtein(NE)+CFOMCU(iprotein) &
                   *(RkillLitrfal2HumOMHeter(NE,M,NGL,K)+RMaintdefLitrfal2HumOMHeter(NE,M,NGL,K))
-                SOMHumCarbohyd(NE)=SOMHumCarbohyd(NE)+CFOMC(icarbhyro) &
+                SOMHumCarbohyd(NE)=SOMHumCarbohyd(NE)+CFOMCU(icarbhyro) &
                   *(RkillLitrfal2HumOMHeter(NE,M,NGL,K)+RMaintdefLitrfal2HumOMHeter(NE,M,NGL,K))
+
               ENDDO
+
             ENDIF
           ENDDO D540
 
@@ -1968,98 +1969,98 @@ module MicBGCMod
   type(micfluxtype), intent(inout) :: micflx
   integer  :: K,M,N,NGL,NE
 !     begin_execution
-  associate(                                                     &
+  associate(                                                       &
     CGmBOMHeter               => nmicf%CGmBOMHeter,                &
-    RAnabolDOCUptkHeter      => nmicf%RAnabolDOCUptkHeter,       &
-    RAnabolAcetUptkHeter     => nmicf%RAnabolAcetUptkHeter,      &
-    RO2UptkHeter             => nmicf%RO2UptkHeter,              &
-    RNO3ReduxHeterSoil       => nmicf%RNO3ReduxHeterSoil,        &
-    RNO3ReduxHeterBand       => nmicf%RNO3ReduxHeterBand,        &
-    RNO2ReduxHeterSoil       => nmicf%RNO2ReduxHeterSoil,        &
-    RNO2ReduxHeterBand       => nmicf%RNO2ReduxHeterBand,        &
-    RN2OReduxHeter           => nmicf%RN2OReduxHeter,            &
-    RNOxReduxRespDenitLim    => nmicf%RNOxReduxRespDenitLim,     &
-    RNH4TransfSoilHeter      => nmicf%RNH4TransfSoilHeter,       &
-    RNO3TransfSoilHeter      => nmicf%RNO3TransfSoilHeter,       &
-    RH2PO4TransfSoilHeter    => nmicf%RH2PO4TransfSoilHeter,     &
-    RNH4TransfBandHeter      => nmicf%RNH4TransfBandHeter,       &
-    RNO3TransfBandHeter      => nmicf%RNO3TransfBandHeter,       &
-    RH2PO4TransfBandHeter    => nmicf%RH2PO4TransfBandHeter,     &
-    RH2ProdHeter             => nmicf%RH2ProdHeter,              &
-    RNH4TransfLitrHeter      => nmicf%RNH4TransfLitrHeter,       &
-    RNO3TransfLitrHeter      => nmicf%RNO3TransfLitrHeter,       &
-    RH2PO4TransfLitrHeter    => nmicf%RH2PO4TransfLitrHeter,     &
-    RCO2ProdHeter            => nmicf%RCO2ProdHeter,             &
-    RAcettProdHeter          => nmicf%RAcettProdHeter,           &
-    RCH4ProdHeter            => nmicf%RCH4ProdHeter,             &
-    RSOxidSoilAutor          => nmicf%RSOxidSoilAutor,           &
-    RSOxidBandAutor          => nmicf%RSOxidBandAutor,           &
-    RH1PO4TransfSoilHeter    => nmicf%RH1PO4TransfSoilHeter,     &
-    RH1PO4TransfBandHeter    => nmicf%RH1PO4TransfBandHeter,     &
-    RH1PO4TransfLitrHeter    => nmicf%RH1PO4TransfLitrHeter,     &
-    RN2FixHeter              => nmicf%RN2FixHeter,               &
-    RDcmpProdDOM             => ncplxf%RDcmpProdDOM,             &
-    RHydlysBioResduOM        => ncplxf%RHydlysBioResduOM,        &
-    RHydlysSorptOM           => ncplxf%RHydlysSorptOM,           &
-    DOMSorp                  => ncplxf%DOMSorp,                  &
-    TSensGrowth              => nmicdiag%TSensGrowth,            &
-    RH2UptkAutor             => nmicdiag%RH2UptkAutor,           &
-    RNO2ReduxSoilChemo       => nmicdiag%RNO2ReduxSoilChemo,     &
-    RNO2ReduxBandChemo       => nmicdiag%RNO2ReduxBandChemo,     &
-    RN2OProdSoilChemo        => nmicdiag%RN2OProdSoilChemo,      &
-    RN2OProdBandChemo        => nmicdiag%RN2OProdBandChemo,      &
-    RNO3ProdSoilChemo        => nmicdiag%RNO3ProdSoilChemo,      &
-    RNO3ProdBandChemo        => nmicdiag%RNO3ProdBandChemo,      &
-    VOLWZ                    => nmicdiag%VOLWZ,                  &
-    CGmBOMAutor              => nmicf%CGmBOMAutor,               &
-    RNO2ReduxAutorBand       => nmicf%RNO2ReduxAutorBand,        &
-    RNO3UptkAutor            => nmicf%RNO3UptkAutor,             &
-    RCH4ProdAutor            => nmicf%RCH4ProdAutor,             &
-    RNO2ReduxAutorSoil       => nmicf%RNO2ReduxAutorSoil,        &
-    RO2UptkAutor             => nmicf%RO2UptkAutor,              &
-    RNOxReduxRespAutorLim    => nmicf%RNOxReduxRespAutorLim,     &
-    RCO2ProdAutor            => nmicf%RCO2ProdAutor,             &
-    RH1PO4TransfLitrAutor    => nmicf%RH1PO4TransfLitrAutor,     &
-    RH2PO4TransfLitrAutor    => nmicf%RH2PO4TransfLitrAutor,     &
-    RNO3TransfLitrAutor      => nmicf%RNO3TransfLitrAutor,       &
-    RNH4TransfLitrAutor      => nmicf%RNH4TransfLitrAutor,       &
-    RN2FixAutor              => nmicf%RN2FixAutor,               &
-    RH1PO4TransfBandAutor    => nmicf%RH1PO4TransfBandAutor,     &
-    RH2PO4TransfBandAutor    => nmicf%RH2PO4TransfBandAutor,     &
-    RNO3TransfBandAutor      => nmicf%RNO3TransfBandAutor,       &
-    RNH4TransfBandAutor      => nmicf%RNH4TransfBandAutor,       &
-    RH2PO4TransfSoilAutor    => nmicf%RH2PO4TransfSoilAutor,     &
-    RNH4TransfSoilAutor      => nmicf%RNH4TransfSoilAutor,       &
-    RNO3TransfSoilAutor      => nmicf%RNO3TransfSoilAutor,       &
-    RH1PO4TransfSoilAutor    => nmicf%RH1PO4TransfSoilAutor,     &
-    TSens4MicbGrwoth         => micstt%TSens4MicbGrwoth,         &
-    VWatMicrobAct            => micstt%VWatMicrobAct,            &
-    litrm                    => micfor%litrm,                    &
-    Lsurf                    => micfor%Lsurf,                    &
-    k_POM                    => micpar%k_POM,                    &
-    k_humus                  => micpar%k_humus,                  &
-    AmmoniaOxidBacter        => micpar%AmmoniaOxidBacter,        &
-    AerobicMethanotrofBacter => micpar%AerobicMethanotrofBacter, &
-    NitriteOxidBacter        => micpar%NitriteOxidBacter,        &
-    is_activeMicrbFungrpAutor          => micpar%is_activeMicrbFungrpAutor,          &
-    RCH4UptkAutor            => micflx%RCH4UptkAutor,            &
-    RCO2NetUptkMicb          => micflx%RCO2NetUptkMicb,          &
-    RH2NetUptkMicb           => micflx%RH2NetUptkMicb,           &
-    RN2NetUptkMicb           => micflx%RN2NetUptkMicb,           &
-    RN2ONetUptkMicb          => micflx%RN2ONetUptkMicb,          &
-    RO2UptkMicb              => micflx%RO2UptkMicb,              &
-    RH1PO4MicbTransfBand_vr                    => micflx%RH1PO4MicbTransfBand_vr,                    &
-    RH1PO4MicbTransfSoil_vr      => micflx%RH1PO4MicbTransfSoil_vr,      &
-    RH2PO4MicbTransfBand_vr                    => micflx%RH2PO4MicbTransfBand_vr,                    &
-    RH2PO4MicbTransfSoil_vr      => micflx%RH2PO4MicbTransfSoil_vr,      &
-    MicrbN2Fix                    => micflx%MicrbN2Fix,                    &
-    RNH4MicbTransfBand_vr                    => micflx%RNH4MicbTransfBand_vr,                    &
-    RNH4MicbTransfSoil_vr        => micflx%RNH4MicbTransfSoil_vr,        &
-    RNO2MicbTransfBand_vr                    => micflx%RNO2MicbTransfBand_vr,                    &
-    RNO2MicbTransfSoil_vr        => micflx%RNO2MicbTransfSoil_vr,        &
-    RNO3MicbTransfBand_vr                    => micflx%RNO3MicbTransfBand_vr,                    &
-    RNO3MicbTransfSoil_vr        => micflx%RNO3MicbTransfSoil_vr,        &
-    REcoDOMUptk            => micflx%REcoDOMUptk             &
+    RAnabolDOCUptkHeter       => nmicf%RAnabolDOCUptkHeter,        &
+    RAnabolAcetUptkHeter      => nmicf%RAnabolAcetUptkHeter,       &
+    RO2UptkHeter              => nmicf%RO2UptkHeter,               &
+    RNO3ReduxHeterSoil        => nmicf%RNO3ReduxHeterSoil,         &
+    RNO3ReduxHeterBand        => nmicf%RNO3ReduxHeterBand,         &
+    RNO2ReduxHeterSoil        => nmicf%RNO2ReduxHeterSoil,         &
+    RNO2ReduxHeterBand        => nmicf%RNO2ReduxHeterBand,         &
+    RN2OReduxHeter            => nmicf%RN2OReduxHeter,             &
+    RNOxReduxRespDenitLim     => nmicf%RNOxReduxRespDenitLim,      &
+    RNH4TransfSoilHeter       => nmicf%RNH4TransfSoilHeter,        &
+    RNO3TransfSoilHeter       => nmicf%RNO3TransfSoilHeter,        &
+    RH2PO4TransfSoilHeter     => nmicf%RH2PO4TransfSoilHeter,      &
+    RNH4TransfBandHeter       => nmicf%RNH4TransfBandHeter,        &
+    RNO3TransfBandHeter       => nmicf%RNO3TransfBandHeter,        &
+    RH2PO4TransfBandHeter     => nmicf%RH2PO4TransfBandHeter,      &
+    RH2ProdHeter              => nmicf%RH2ProdHeter,               &
+    RNH4TransfLitrHeter       => nmicf%RNH4TransfLitrHeter,        &
+    RNO3TransfLitrHeter       => nmicf%RNO3TransfLitrHeter,        &
+    RH2PO4TransfLitrHeter     => nmicf%RH2PO4TransfLitrHeter,      &
+    RCO2ProdHeter             => nmicf%RCO2ProdHeter,              &
+    RAcettProdHeter           => nmicf%RAcettProdHeter,            &
+    RCH4ProdHeter             => nmicf%RCH4ProdHeter,              &
+    RSOxidSoilAutor           => nmicf%RSOxidSoilAutor,            &
+    RSOxidBandAutor           => nmicf%RSOxidBandAutor,            &
+    RH1PO4TransfSoilHeter     => nmicf%RH1PO4TransfSoilHeter,      &
+    RH1PO4TransfBandHeter     => nmicf%RH1PO4TransfBandHeter,      &
+    RH1PO4TransfLitrHeter     => nmicf%RH1PO4TransfLitrHeter,      &
+    RN2FixHeter               => nmicf%RN2FixHeter,                &
+    RDcmpProdDOM              => ncplxf%RDcmpProdDOM,              &
+    RHydlysBioResduOM         => ncplxf%RHydlysBioResduOM,         &
+    RHydlysSorptOM            => ncplxf%RHydlysSorptOM,            &
+    DOMSorp                   => ncplxf%DOMSorp,                   &
+    TSensGrowth               => nmicdiag%TSensGrowth,             &
+    RH2UptkAutor              => nmicdiag%RH2UptkAutor,            &
+    RNO2ReduxSoilChemo        => nmicdiag%RNO2ReduxSoilChemo,      &
+    RNO2ReduxBandChemo        => nmicdiag%RNO2ReduxBandChemo,      &
+    RN2OProdSoilChemo         => nmicdiag%RN2OProdSoilChemo,       &
+    RN2OProdBandChemo         => nmicdiag%RN2OProdBandChemo,       &
+    RNO3ProdSoilChemo         => nmicdiag%RNO3ProdSoilChemo,       &
+    RNO3ProdBandChemo         => nmicdiag%RNO3ProdBandChemo,       &
+    VOLWZ                     => nmicdiag%VOLWZ,                   &
+    CGmBOMAutor               => nmicf%CGmBOMAutor,                &
+    RNO2ReduxAutorBand        => nmicf%RNO2ReduxAutorBand,         &
+    RNO3UptkAutor             => nmicf%RNO3UptkAutor,              &
+    RCH4ProdAutor             => nmicf%RCH4ProdAutor,              &
+    RNO2ReduxAutorSoil        => nmicf%RNO2ReduxAutorSoil,         &
+    RO2UptkAutor              => nmicf%RO2UptkAutor,               &
+    RNOxReduxRespAutorLim     => nmicf%RNOxReduxRespAutorLim,      &
+    RCO2ProdAutor             => nmicf%RCO2ProdAutor,              &
+    RH1PO4TransfLitrAutor     => nmicf%RH1PO4TransfLitrAutor,      &
+    RH2PO4TransfLitrAutor     => nmicf%RH2PO4TransfLitrAutor,      &
+    RNO3TransfLitrAutor       => nmicf%RNO3TransfLitrAutor,        &
+    RNH4TransfLitrAutor       => nmicf%RNH4TransfLitrAutor,        &
+    RN2FixAutor               => nmicf%RN2FixAutor,                &
+    RH1PO4TransfBandAutor     => nmicf%RH1PO4TransfBandAutor,      &
+    RH2PO4TransfBandAutor     => nmicf%RH2PO4TransfBandAutor,      &
+    RNO3TransfBandAutor       => nmicf%RNO3TransfBandAutor,        &
+    RNH4TransfBandAutor       => nmicf%RNH4TransfBandAutor,        &
+    RH2PO4TransfSoilAutor     => nmicf%RH2PO4TransfSoilAutor,      &
+    RNH4TransfSoilAutor       => nmicf%RNH4TransfSoilAutor,        &
+    RNO3TransfSoilAutor       => nmicf%RNO3TransfSoilAutor,        &
+    RH1PO4TransfSoilAutor     => nmicf%RH1PO4TransfSoilAutor,      &
+    TSens4MicbGrwoth          => micstt%TSens4MicbGrwoth,          &
+    VWatMicrobAct             => micstt%VWatMicrobAct,             &
+    litrm                     => micfor%litrm,                     &
+    Lsurf                     => micfor%Lsurf,                     &
+    k_POM                     => micpar%k_POM,                     &
+    k_humus                   => micpar%k_humus,                   &
+    AmmoniaOxidBacter         => micpar%AmmoniaOxidBacter,         &
+    AerobicMethanotrofBacter  => micpar%AerobicMethanotrofBacter,  &
+    NitriteOxidBacter         => micpar%NitriteOxidBacter,         &
+    is_activeMicrbFungrpAutor => micpar%is_activeMicrbFungrpAutor, &
+    RCH4UptkAutor             => micflx%RCH4UptkAutor,             &
+    RCO2NetUptkMicb           => micflx%RCO2NetUptkMicb,           &
+    RH2NetUptkMicb            => micflx%RH2NetUptkMicb,            &
+    RN2NetUptkMicb            => micflx%RN2NetUptkMicb,            &
+    RN2ONetUptkMicb           => micflx%RN2ONetUptkMicb,           &
+    RO2UptkMicb               => micflx%RO2UptkMicb,               &
+    RH1PO4MicbTransfBand_vr   => micflx%RH1PO4MicbTransfBand_vr,   &
+    RH1PO4MicbTransfSoil_vr   => micflx%RH1PO4MicbTransfSoil_vr,   &
+    RH2PO4MicbTransfBand_vr   => micflx%RH2PO4MicbTransfBand_vr,   &
+    RH2PO4MicbTransfSoil_vr   => micflx%RH2PO4MicbTransfSoil_vr,   &
+    MicrbN2Fix                => micflx%MicrbN2Fix,                &
+    RNH4MicbTransfBand_vr     => micflx%RNH4MicbTransfBand_vr,     &
+    RNH4MicbTransfSoil_vr     => micflx%RNH4MicbTransfSoil_vr,     &
+    RNO2MicbTransfBand_vr     => micflx%RNO2MicbTransfBand_vr,     &
+    RNO2MicbTransfSoil_vr     => micflx%RNO2MicbTransfSoil_vr,     &
+    RNO3MicbTransfBand_vr     => micflx%RNO3MicbTransfBand_vr,     &
+    RNO3MicbTransfSoil_vr     => micflx%RNO3MicbTransfSoil_vr,     &
+    REcoDOMUptk               => micflx%REcoDOMUptk                &
   )
   D650: DO K=1,jcplx
     IF(.not.litrm.OR.(K.NE.k_POM.AND.K.NE.k_humus))THEN
@@ -2422,7 +2423,7 @@ module MicBGCMod
   end subroutine SubstrateAttenf4Compet
 !------------------------------------------------------------------------------------------
 
-  subroutine AcetoMethanogenCatabolism(NGL,N,K,TSensGrowth,WatStressMicb,FOQA,ECHZ, &
+  subroutine AcetMicBiomehanogenCatabolism(NGL,N,K,TSensGrowth,WatStressMicb,FOQA,ECHZ, &
     FGOCP,FGOAP,RGOMP,micfor,micstt,naqfdiag,nmicf,nmics,ncplxs,micflx)
   implicit none
   integer, intent(in) :: NGL,N,K
@@ -2492,7 +2493,7 @@ module MicBGCMod
   ROQC4HeterMicrobAct(NGL,K)=0.0_r8
   naqfdiag%TCH4H=naqfdiag%TCH4H+0.5_r8*RGOMP
   end associate
-  end subroutine AcetoMethanogenCatabolism
+  end subroutine AcetMicBiomehanogenCatabolism
 !------------------------------------------------------------------------------------------
 
   subroutine AerobicHeterotrophCatabolism(NGL,N,K,TSensGrowth,WatStressMicb,FOQC,FOQA, &

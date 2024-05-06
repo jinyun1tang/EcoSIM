@@ -104,6 +104,7 @@ implicit none
             Micb_N2Fixation_vr(L,NY,NX)=0.0_r8
           ENDIF
   !     MIX LITTER C BETWEEN ADJACENT SOIL LAYERS L AND LL
+
           call DownwardMixOM(I,J,L,NY,NX)
 
         ELSE
@@ -149,7 +150,7 @@ implicit none
   type(micfluxtype), intent(inout) :: micflx
 
   integer :: NumMicbFunGrupsPerCmplx, jcplx, k_POM, k_humus
-  integer :: kk, ndbiomcp, nlbiomcp, NumMicrobAutrophCmplx, NumHetetrMicCmplx
+  integer :: kk, ndbiomcp, nlbiomcp, NumMicrobAutrophCmplx, NumHetetrMicCmplx,NE
   NumMicbFunGrupsPerCmplx=micpar%NumMicbFunGrupsPerCmplx
   jcplx=micpar%jcplx
 
@@ -226,24 +227,19 @@ implicit none
     micstt%CNO3SU=trc_solcl_vr(ids_NO3,NU(NY,NX),NY,NX)
     micstt%CNO3BU=trc_solcl_vr(ids_NO3B,NU(NY,NX),NY,NX)
 
-    micstt%SOMPomProtein(ielmc)=SolidOM_vr(ielmc,micpar%iprotein,micpar%k_POM,NU(NY,NX),NY,NX)
-    micstt%SOMPomProtein(ielmn)=SolidOM_vr(ielmn,micpar%iprotein,micpar%k_POM,NU(NY,NX),NY,NX)
-    micstt%SOMPomProtein(ielmp)=SolidOM_vr(ielmp,micpar%iprotein,micpar%k_POM,NU(NY,NX),NY,NX)
-    micstt%SOMHumProtein(ielmc)=SolidOM_vr(ielmc,micpar%iprotein,micpar%k_humus,NU(NY,NX),NY,NX)
-    micstt%SOMHumProtein(ielmn)=SolidOM_vr(ielmn,micpar%iprotein,micpar%k_humus,NU(NY,NX),NY,NX)
-    micstt%SOMHumProtein(ielmp)=SolidOM_vr(ielmp,micpar%iprotein,micpar%k_humus,NU(NY,NX),NY,NX)
-    micstt%SOMHumCarbohyd(ielmc)=SolidOM_vr(ielmc,micpar%icarbhyro,micpar%k_humus,NU(NY,NX),NY,NX)
-    micstt%SOMHumCarbohyd(ielmn)=SolidOM_vr(ielmn,micpar%icarbhyro,micpar%k_humus,NU(NY,NX),NY,NX)
-    micstt%SOMHumCarbohyd(ielmp)=SolidOM_vr(ielmp,micpar%icarbhyro,micpar%k_humus,NU(NY,NX),NY,NX)
-
+    DO NE=1,NumPlantChemElms
+      micstt%SOMPomProtein(NE)=SolidOM_vr(NE,micpar%iprotein,micpar%k_POM,NU(NY,NX),NY,NX)
+      micstt%SOMHumProtein(NE)=SolidOM_vr(NE,micpar%iprotein,micpar%k_humus,NU(NY,NX),NY,NX)
+      micstt%SOMHumCarbohyd(NE)=SolidOM_vr(NE,micpar%icarbhyro,micpar%k_humus,NU(NY,NX),NY,NX)
+    ENDDO
     micfor%RNH4EcoDmndLitrPrev =RNH4EcoDmndSoilPrev_vr(NU(NY,NX),NY,NX)
     micfor%RNO3EcoDmndLitrPrev =RNO3EcoDmndSoilPrev_vr(NU(NY,NX),NY,NX)
     micfor%RH2PO4EcoDmndLitrPrev =RH2PO4EcoDmndSoilPrev_vr(NU(NY,NX),NY,NX)
     micfor%RH1PO4EcoDmndLitrPrev =RH1PO4EcoDmndSoilPrev_vr(NU(NY,NX),NY,NX)
     micfor%VOLWU =VLWatMicP(NU(NY,NX),NY,NX)
-    micfor%CFOMCU=CFOMC(1:2,NU(NY,NX),NY,NX)
+    micfor%CFOMCU=CFOMC_vr(1:2,NU(NY,NX),NY,NX)
   else
-    micfor%CFOMC =CFOMC(1:2,L,NY,NX)
+    micfor%CFOMC =CFOMC_vr(1:2,L,NY,NX)
   endif
   micstt%CNH4B =trc_solcl_vr(ids_NH4B,L,NY,NX)
   micstt%CNH4S =trc_solcl_vr(ids_NH4,L,NY,NX)
@@ -299,7 +295,7 @@ implicit none
   micstt%ZNFN0=ZNFN0(L,NY,NX)
   micstt%ZNFNI=ZNFNI(L,NY,NX)
   
-  micstt%DOM(idom_beg:idom_end,1:jcplx)=DOM(idom_beg:idom_end,1:jcplx,L,NY,NX)
+  micstt%DOM(idom_beg:idom_end,1:jcplx)=DOM_vr(idom_beg:idom_end,1:jcplx,L,NY,NX)
   micstt%SorbedOM(idom_beg:idom_end,1:jcplx)=SorbedOM_vr(idom_beg:idom_end,1:jcplx,L,NY,NX)
   micstt%SolidOMAct(1:jsken,1:jcplx)=SolidOMAct_vr(1:jsken,1:jcplx,L,NY,NX)
   micstt%SolidOM(1:NumPlantChemElms,1:jsken,1:jcplx)=SolidOM_vr(1:NumPlantChemElms,1:jsken,1:jcplx,L,NY,NX)
@@ -399,9 +395,10 @@ implicit none
   RH1PO4DmndSoilHeter_vr(1:NumHetetrMicCmplx,1:jcplx,L,NY,NX)=micflx%RH1PO4DmndSoilHeter(1:NumHetetrMicCmplx,1:jcplx)
   RH1PO4DmndBandHeter_vr(1:NumHetetrMicCmplx,1:jcplx,L,NY,NX)=micflx%RH1PO4DmndBandHeter(1:NumHetetrMicCmplx,1:jcplx)
 
+  
   SolidOM_vr(1:NumPlantChemElms,1:jsken,1:jcplx,L,NY,NX)=micstt%SolidOM(1:NumPlantChemElms,1:jsken,1:jcplx)
   SolidOMAct_vr(1:jsken,1:jcplx,L,NY,NX)=micstt%SolidOMAct(1:jsken,1:jcplx)
-
+  
   if(litrm)then
     RNH4DmndLitrHeter_col(1:NumHetetrMicCmplx,1:jcplx,NY,NX)=micflx%RNH4DmndLitrHeter(1:NumHetetrMicCmplx,1:jcplx)
     RNO3DmndLitrHeter_col(1:NumHetetrMicCmplx,1:jcplx,NY,NX)=micflx%RNO3DmndLitrHeter(1:NumHetetrMicCmplx,1:jcplx)
@@ -415,7 +412,7 @@ implicit none
     DO NE=1,NumPlantChemElms
       SolidOM_vr(NE,micpar%iprotein,micpar%k_POM,NU(NY,NX),NY,NX)=micstt%SOMPomProtein(NE)
       SolidOM_vr(NE,micpar%iprotein,micpar%k_humus,NU(NY,NX),NY,NX)=micstt%SOMHumProtein(NE)
-      SolidOM_vr(NE,micpar%icarbhyro,micpar%k_humus,NU(NY,NX),NY,NX)=micstt%SOMHumCarbohyd(NE)
+      SolidOM_vr(NE,micpar%icarbhyro,micpar%k_humus,NU(NY,NX),NY,NX)=micstt%SOMHumCarbohyd(NE)      
     ENDDO
 
   endif
@@ -435,7 +432,7 @@ implicit none
   TMicHeterAct_vr(L,NY,NX)=micstt%TMicHeterAct
   ZNFNI(L,NY,NX)=micstt%ZNFNI
   FracBulkSOMC_vr(1:jcplx,L,NY,NX)=micstt%FracBulkSOMC(1:jcplx)
-  DOM(idom_beg:idom_end,1:jcplx,L,NY,NX)=micstt%DOM(idom_beg:idom_end,1:jcplx)
+  DOM_vr(idom_beg:idom_end,1:jcplx,L,NY,NX)=micstt%DOM(idom_beg:idom_end,1:jcplx)
   SorbedOM_vr(idom_beg:idom_end,1:jcplx,L,NY,NX)=micstt%SorbedOM(idom_beg:idom_end,1:jcplx)
 
   OMBioResdu_vr(1:NumPlantChemElms,1:ndbiomcp,1:jcplx,L,NY,NX)=micstt%OMBioResdu(1:NumPlantChemElms,1:ndbiomcp,1:jcplx)

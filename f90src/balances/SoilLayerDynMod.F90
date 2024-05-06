@@ -699,7 +699,7 @@ implicit none
   real(r8), intent(inout) :: CDPTHY(0:JZ)
   integer, intent(in) ::  IFLGL(0:JZ,6)
   integer :: N,M,NZ,K,NGL,NR,NE,NTU,NTSA,NTSAB,NTG,NTP
-  integer :: NTX,NTF,MID
+  integer :: NTX,NTF,MID,idom
   real(r8) :: ENGY0,ENGY1
 ! begin_execution
 
@@ -818,21 +818,11 @@ implicit none
           OMBioResdu_vr(NE,M,K,L1,NY,NX)=OMBioResdu_vr(NE,M,K,L1,NY,NX)+FX*OMBioResdu_vr(NE,M,K,L0,NY,NX)
         ENDDO
       ENDDO
-
-      DOM(idom_doc,K,L1,NY,NX)=DOM(idom_doc,K,L1,NY,NX)+FX*DOM(idom_doc,K,L0,NY,NX)
-      DOM(idom_don,K,L1,NY,NX)=DOM(idom_don,K,L1,NY,NX)+FX*DOM(idom_don,K,L0,NY,NX)
-      DOM(idom_dop,K,L1,NY,NX)=DOM(idom_dop,K,L1,NY,NX)+FX*DOM(idom_dop,K,L0,NY,NX)
-      DOM(idom_acetate,K,L1,NY,NX)=DOM(idom_acetate,K,L1,NY,NX)+FX*DOM(idom_acetate,K,L0,NY,NX)
-
-      DOM_Macp(idom_doc,K,L1,NY,NX)=DOM_Macp(idom_doc,K,L1,NY,NX)+FX*DOM_Macp(idom_doc,K,L0,NY,NX)
-      DOM_Macp(idom_don,K,L1,NY,NX)=DOM_Macp(idom_don,K,L1,NY,NX)+FX*DOM_Macp(idom_don,K,L0,NY,NX)
-      DOM_Macp(idom_dop,K,L1,NY,NX)=DOM_Macp(idom_dop,K,L1,NY,NX)+FX*DOM_Macp(idom_dop,K,L0,NY,NX)
-      DOM_Macp(idom_acetate,K,L1,NY,NX)=DOM_Macp(idom_acetate,K,L1,NY,NX)+FX*DOM_Macp(idom_acetate,K,L0,NY,NX)
-      
-      SorbedOM_vr(ielmc,K,L1,NY,NX)=SorbedOM_vr(ielmc,K,L1,NY,NX)+FX*SorbedOM_vr(ielmc,K,L0,NY,NX)
-      SorbedOM_vr(ielmn,K,L1,NY,NX)=SorbedOM_vr(ielmn,K,L1,NY,NX)+FX*SorbedOM_vr(ielmn,K,L0,NY,NX)
-      SorbedOM_vr(ielmp,K,L1,NY,NX)=SorbedOM_vr(ielmp,K,L1,NY,NX)+FX*SorbedOM_vr(ielmp,K,L0,NY,NX)
-      SorbedOM_vr(idom_acetate,K,L1,NY,NX)=SorbedOM_vr(idom_acetate,K,L1,NY,NX)+FX*SorbedOM_vr(idom_acetate,K,L0,NY,NX)
+      DO idom=idom_beg,idom_end
+        DOM_vr(idom,K,L1,NY,NX)=DOM_vr(idom,K,L1,NY,NX)+FX*DOM_vr(idom,K,L0,NY,NX)
+        DOM_MacP_vr(idom,K,L1,NY,NX)=DOM_MacP_vr(idom,K,L1,NY,NX)+FX*DOM_MacP_vr(idom,K,L0,NY,NX)
+        SorbedOM_vr(idom,K,L1,NY,NX)=SorbedOM_vr(idom,K,L1,NY,NX)+FX*SorbedOM_vr(idom,K,L0,NY,NX)
+      enddo
       
       DO M=1,jsken
         SolidOMAct_vr(M,K,L1,NY,NX)=SolidOMAct_vr(M,K,L1,NY,NX)+FX*SolidOMAct_vr(M,K,L0,NY,NX)
@@ -1003,25 +993,16 @@ implicit none
           OMBioResdu_vr(NE,M,K,L0,NY,NX)=FY*OMBioResdu_vr(NE,M,K,L0,NY,NX)
         ENDDO
       ENDDO
-      DOM(idom_doc,K,L0,NY,NX)=FY*DOM(idom_doc,K,L0,NY,NX)
-      DOM(idom_don,K,L0,NY,NX)=FY*DOM(idom_don,K,L0,NY,NX)
-      DOM(idom_dop,K,L0,NY,NX)=FY*DOM(idom_dop,K,L0,NY,NX)
-      DOM(idom_acetate,K,L0,NY,NX)=FY*DOM(idom_acetate,K,L0,NY,NX)
-
-      DOM_Macp(idom_doc,K,L0,NY,NX)=FY*DOM_Macp(idom_doc,K,L0,NY,NX)
-      DOM_Macp(idom_don,K,L0,NY,NX)=FY*DOM_Macp(idom_don,K,L0,NY,NX)
-      DOM_Macp(idom_dop,K,L0,NY,NX)=FY*DOM_Macp(idom_dop,K,L0,NY,NX)
-      DOM_Macp(idom_acetate,K,L0,NY,NX)=FY*DOM_Macp(idom_acetate,K,L0,NY,NX)
-
-      SorbedOM_vr(ielmc,K,L0,NY,NX)=FY*SorbedOM_vr(ielmc,K,L0,NY,NX)
-      SorbedOM_vr(ielmn,K,L0,NY,NX)=FY*SorbedOM_vr(ielmn,K,L0,NY,NX)
-      SorbedOM_vr(ielmp,K,L0,NY,NX)=FY*SorbedOM_vr(ielmp,K,L0,NY,NX)
-      SorbedOM_vr(idom_acetate,K,L0,NY,NX)=FY*SorbedOM_vr(idom_acetate,K,L0,NY,NX)
+      do idom=idom_beg,idom_end
+        DOM_vr(idom,K,L0,NY,NX)=FY*DOM_vr(idom,K,L0,NY,NX)
+        DOM_MacP_vr(idom,K,L0,NY,NX)=FY*DOM_MacP_vr(idom,K,L0,NY,NX)
+        SorbedOM_vr(idom,K,L0,NY,NX)=FY*SorbedOM_vr(idom,K,L0,NY,NX)
+      enddo
       DO  M=1,jsken
-        SolidOM_vr(ielmc,M,K,L0,NY,NX)=FY*SolidOM_vr(ielmc,M,K,L0,NY,NX)
         SolidOMAct_vr(M,K,L0,NY,NX)=FY*SolidOMAct_vr(M,K,L0,NY,NX)
-        SolidOM_vr(ielmn,M,K,L0,NY,NX)=FY*SolidOM_vr(ielmn,M,K,L0,NY,NX)
-        SolidOM_vr(ielmp,M,K,L0,NY,NX)=FY*SolidOM_vr(ielmp,M,K,L0,NY,NX)
+        do NE=1,NumPlantChemElms
+          SolidOM_vr(NE,M,K,L0,NY,NX)=FY*SolidOM_vr(NE,M,K,L0,NY,NX)
+        ENDDO
       ENDDO
     ENDDO
   ENDIF
@@ -1090,7 +1071,7 @@ implicit none
   real(r8),intent(in) :: FO
   integer, intent(in) :: IFLGL(0:JZ,6)
 
-  integer :: K,N,M,NGL,NR,NZ,NE,NTG,MID
+  integer :: K,N,M,NGL,NR,NZ,NE,NTG,MID,idom
   real(r8) :: FXO,FRO
   real(r8) :: FXRTLG2,FXRTN2,FXEPOOLR,FXWTRTL
   real(r8) :: WTNDLE,FXEPOOLN
@@ -1162,57 +1143,31 @@ implicit none
         OMBioResdu_vr(ielmp,M,K,L1,NY,NX)=OMBioResdu_vr(ielmp,M,K,L1,NY,NX)+FXORP
         OMBioResdu_vr(ielmp,M,K,L0,NY,NX)=OMBioResdu_vr(ielmp,M,K,L0,NY,NX)-FXORP
       ENDDO
-      FXOQC=FXO*DOM(idom_doc,K,L0,NY,NX)
-      DOM(idom_doc,K,L1,NY,NX)=DOM(idom_doc,K,L1,NY,NX)+FXOQC
-      DOM(idom_doc,K,L0,NY,NX)=DOM(idom_doc,K,L0,NY,NX)-FXOQC
-      FXOQN=FXO*DOM(idom_don,K,L0,NY,NX)
-      DOM(idom_don,K,L1,NY,NX)=DOM(idom_don,K,L1,NY,NX)+FXOQN
-      DOM(idom_don,K,L0,NY,NX)=DOM(idom_don,K,L0,NY,NX)-FXOQN
-      FXOQP=FXO*DOM(idom_dop,K,L0,NY,NX)
-      DOM(idom_dop,K,L1,NY,NX)=DOM(idom_dop,K,L1,NY,NX)+FXOQP
-      DOM(idom_dop,K,L0,NY,NX)=DOM(idom_dop,K,L0,NY,NX)-FXOQP
-      FXOQA=FXO*DOM(idom_acetate,K,L0,NY,NX)
-      DOM(idom_acetate,K,L1,NY,NX)=DOM(idom_acetate,K,L1,NY,NX)+FXOQA
-      DOM(idom_acetate,K,L0,NY,NX)=DOM(idom_acetate,K,L0,NY,NX)-FXOQA
+
+      DO idom=idom_beg,idom_end
+        FXOQC=FXO*DOM_vr(idom,K,L0,NY,NX)
+        DOM_vr(idom,K,L1,NY,NX)=DOM_vr(idom,K,L1,NY,NX)+FXOQC
+        DOM_vr(idom,K,L0,NY,NX)=DOM_vr(idom,K,L0,NY,NX)-FXOQC
+      enddo
+
       IF(SoilFracAsMacP(L1,NY,NX).GT.ZERO.AND.SoilFracAsMacP(L0,NY,NX).GT.ZERO)THEN
-        FXOQCH=FXO*DOM_Macp(idom_doc,K,L0,NY,NX)
-        DOM_Macp(idom_doc,K,L1,NY,NX)=DOM_Macp(idom_doc,K,L1,NY,NX)+FXOQCH
-        DOM_Macp(idom_doc,K,L0,NY,NX)=DOM_Macp(idom_doc,K,L0,NY,NX)-FXOQCH
-        FXOQNH=FXO*DOM_Macp(idom_don,K,L0,NY,NX)
-        DOM_Macp(idom_don,K,L1,NY,NX)=DOM_Macp(idom_don,K,L1,NY,NX)+FXOQNH
-        DOM_Macp(idom_don,K,L0,NY,NX)=DOM_Macp(idom_don,K,L0,NY,NX)-FXOQNH
-        FXOQPH=FXO*DOM_Macp(idom_dop,K,L0,NY,NX)
-        DOM_Macp(idom_dop,K,L1,NY,NX)=DOM_Macp(idom_dop,K,L1,NY,NX)+FXOQPH
-        DOM_Macp(idom_dop,K,L0,NY,NX)=DOM_Macp(idom_dop,K,L0,NY,NX)-FXOQPH
-        FXOQAH=FXO*DOM_Macp(idom_acetate,K,L0,NY,NX)
-        DOM_Macp(idom_acetate,K,L1,NY,NX)=DOM_Macp(idom_acetate,K,L1,NY,NX)+FXOQAH
-        DOM_Macp(idom_acetate,K,L0,NY,NX)=DOM_Macp(idom_acetate,K,L0,NY,NX)-FXOQAH
+        DO idom=idom_beg,idom_end
+          FXOQCH=FXO*DOM_MacP_vr(idom,K,L0,NY,NX)
+          DOM_MacP_vr(idom,K,L1,NY,NX)=DOM_MacP_vr(idom,K,L1,NY,NX)+FXOQCH
+          DOM_MacP_vr(idom,K,L0,NY,NX)=DOM_MacP_vr(idom,K,L0,NY,NX)-FXOQCH
+        ENDDO
       ENDIF
-      FXOHC=FXO*SorbedOM_vr(ielmc,K,L0,NY,NX)
-      SorbedOM_vr(ielmc,K,L1,NY,NX)=SorbedOM_vr(ielmc,K,L1,NY,NX)+FXOHC
-      SorbedOM_vr(ielmc,K,L0,NY,NX)=SorbedOM_vr(ielmc,K,L0,NY,NX)-FXOHC
-      FXOHN=FXO*SorbedOM_vr(ielmn,K,L0,NY,NX)
-      SorbedOM_vr(ielmn,K,L1,NY,NX)=SorbedOM_vr(ielmn,K,L1,NY,NX)+FXOHN
-      SorbedOM_vr(ielmn,K,L0,NY,NX)=SorbedOM_vr(ielmn,K,L0,NY,NX)-FXOHN
-      FXOHP=FXO*SorbedOM_vr(ielmp,K,L0,NY,NX)
-      SorbedOM_vr(ielmp,K,L1,NY,NX)=SorbedOM_vr(ielmp,K,L1,NY,NX)+FXOHP
-      SorbedOM_vr(ielmp,K,L0,NY,NX)=SorbedOM_vr(ielmp,K,L0,NY,NX)-FXOHP
-      FXOHA=FXO*SorbedOM_vr(idom_acetate,K,L0,NY,NX)
-      SorbedOM_vr(idom_acetate,K,L1,NY,NX)=SorbedOM_vr(idom_acetate,K,L1,NY,NX)+FXOHA
-      SorbedOM_vr(idom_acetate,K,L0,NY,NX)=SorbedOM_vr(idom_acetate,K,L0,NY,NX)-FXOHA
+       DO idom=idom_beg,idom_end
+        FXOHC=FXO*SorbedOM_vr(idom,K,L0,NY,NX)
+        SorbedOM_vr(idom,K,L1,NY,NX)=SorbedOM_vr(idom,K,L1,NY,NX)+FXOHC
+        SorbedOM_vr(idom,K,L0,NY,NX)=SorbedOM_vr(idom,K,L0,NY,NX)-FXOHC
+      ENDDO
       DO M=1,jsken
-        FXOSC=FXO*SolidOM_vr(ielmc,M,K,L0,NY,NX)
-        SolidOM_vr(ielmc,M,K,L1,NY,NX)=SolidOM_vr(ielmc,M,K,L1,NY,NX)+FXOSC
-        SolidOM_vr(ielmc,M,K,L0,NY,NX)=SolidOM_vr(ielmc,M,K,L0,NY,NX)-FXOSC
-        FXOSA=FXO*SolidOMAct_vr(M,K,L0,NY,NX)
-        SolidOMAct_vr(M,K,L1,NY,NX)=SolidOMAct_vr(M,K,L1,NY,NX)+FXOSA
-        SolidOMAct_vr(M,K,L0,NY,NX)=SolidOMAct_vr(M,K,L0,NY,NX)-FXOSA
-        FXOSN=FXO*SolidOM_vr(ielmn,M,K,L0,NY,NX)
-        SolidOM_vr(ielmn,M,K,L1,NY,NX)=SolidOM_vr(ielmn,M,K,L1,NY,NX)+FXOSN
-        SolidOM_vr(ielmn,M,K,L0,NY,NX)=SolidOM_vr(ielmn,M,K,L0,NY,NX)-FXOSN
-        FXOSP=FXO*SolidOM_vr(ielmp,M,K,L0,NY,NX)
-        SolidOM_vr(ielmp,M,K,L1,NY,NX)=SolidOM_vr(ielmp,M,K,L1,NY,NX)+FXOSP
-        SolidOM_vr(ielmp,M,K,L0,NY,NX)=SolidOM_vr(ielmp,M,K,L0,NY,NX)-FXOSP
+        DO NE=1,NumPlantChemElms
+          FXOSC=FXO*SolidOM_vr(NE,M,K,L0,NY,NX)
+          SolidOM_vr(NE,M,K,L1,NY,NX)=SolidOM_vr(NE,M,K,L1,NY,NX)+FXOSC
+          SolidOM_vr(NE,M,K,L0,NY,NX)=SolidOM_vr(NE,M,K,L0,NY,NX)-FXOSC
+        ENDDO
       ENDDO
     ENDDO
 !

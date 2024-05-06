@@ -701,7 +701,7 @@ implicit none
     plt_soilchem%SoluteDifusvty_vr(ids_beg:ids_end,L) =SoluteDifusvty_vr(ids_beg:ids_end,L,NY,NX)
 
     plt_soilchem%trc_gascl_vr(idg_beg:idg_end,L) =trc_gascl_vr(idg_beg:idg_end,L,NY,NX)
-    plt_soilchem%CORGC(L) =CORGC(L,NY,NX)
+    plt_soilchem%CORGC_vr(L) =CORGC_vr(L,NY,NX)
     plt_site%CumSoilThickness(L)    =CumSoilThickness(L,NY,NX)
     plt_site%FracSoiAsMicP(L) =FracSoiAsMicP(L,NY,NX)
 
@@ -743,9 +743,9 @@ implicit none
     plt_site%DLYR3(L)     =DLYR(3,L,NY,NX)
     DO K=1,jcplx
       plt_soilchem%FracBulkSOMC_vr(K,L)=FracBulkSOMC_vr(K,L,NY,NX)
-      plt_soilchem%DOM(idom_doc,K,L)=DOM(idom_doc,K,L,NY,NX)
-      plt_soilchem%DOM(idom_don,K,L)=DOM(idom_don,K,L,NY,NX)
-      plt_soilchem%DOM(idom_dop,K,L)=DOM(idom_dop,K,L,NY,NX)
+      plt_soilchem%DOM_vr(idom_doc,K,L)=DOM_vr(idom_doc,K,L,NY,NX)
+      plt_soilchem%DOM_vr(idom_don,K,L)=DOM_vr(idom_don,K,L,NY,NX)
+      plt_soilchem%DOM_vr(idom_dop,K,L)=DOM_vr(idom_dop,K,L,NY,NX)
     ENDDO
   ENDDO
 

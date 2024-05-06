@@ -480,7 +480,7 @@ module TranspNoSaltMod
 
   D9979: DO K=1,jcplx
     DO idom=idom_beg,idom_end
-    DOM_MicP2(idom,K,0,NY,NX)=DOM(idom,K,0,NY,NX)-REcoDOMUptk_vr(idom,K,0,NY,NX)
+    DOM_MicP2(idom,K,0,NY,NX)=DOM_vr(idom,K,0,NY,NX)-REcoDOMUptk_vr(idom,K,0,NY,NX)
     ENDDO
   ENDDO D9979
 
@@ -813,8 +813,8 @@ module TranspNoSaltMod
 
     DO  K=1,jcplx
       DO idom=idom_beg,idom_end
-        DOM_MicP2(idom,K,L,NY,NX)=DOM(idom,K,L,NY,NX)-REcoDOMUptk_vr(idom,K,L,NY,NX)
-        DOM_MacP2(idom,K,L,NY,NX)=DOM_Macp(idom,K,L,NY,NX)
+        DOM_MicP2(idom,K,L,NY,NX)=DOM_vr(idom,K,L,NY,NX)-REcoDOMUptk_vr(idom,K,L,NY,NX)
+        DOM_MacP2(idom,K,L,NY,NX)=DOM_MacP_vr(idom,K,L,NY,NX)
       ENDDO
     enddo
     DO NTS=ids_beg,ids_end

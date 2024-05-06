@@ -35,6 +35,9 @@ module nitrosMod
   public :: DownwardMixOM
   public :: sumORGMLayL
   public :: sumLitrOMLayL
+  public :: sumSurfOMCK
+  public :: sumMicBiomLayL
+  public :: sumHumOMLayL
   contains
 
 !------------------------------------------------------------------------------------------
@@ -168,16 +171,16 @@ module nitrosMod
         L1=LL
       ENDIF      
       DO NE=idom_beg,idom_end
-        OQMXS=FracLitrMix*AZMAX1(DOM(NE,K,L1,NY,NX))
-        OQMHXS=FracLitrMix*AZMAX1(DOM_Macp(NE,K,L1,NY,NX))
+        OQMXS=FracLitrMix*AZMAX1(DOM_vr(NE,K,L1,NY,NX))
+        OQMHXS=FracLitrMix*AZMAX1(DOM_MacP_vr(NE,K,L1,NY,NX))
         OHMXS=FracLitrMix*AZMAX1(SorbedOM_vr(NE,K,L1,NY,NX))
 
-        DOM(NE,K,L,NY,NX)=DOM(NE,K,L,NY,NX)-OQMXS
-        DOM_Macp(NE,K,L,NY,NX)=DOM_Macp(NE,K,L,NY,NX)-OQMHXS
+        DOM_vr(NE,K,L,NY,NX)=DOM_vr(NE,K,L,NY,NX)-OQMXS
+        DOM_MacP_vr(NE,K,L,NY,NX)=DOM_MacP_vr(NE,K,L,NY,NX)-OQMHXS
         SorbedOM_vr(NE,K,L,NY,NX)=SorbedOM_vr(NE,K,L,NY,NX)-OHMXS
 
-        DOM(NE,K,LL,NY,NX)=DOM(NE,K,LL,NY,NX)+OQMXS
-        DOM_Macp(NE,K,LL,NY,NX)=DOM_Macp(NE,K,LL,NY,NX)+OQMHXS
+        DOM_vr(NE,K,LL,NY,NX)=DOM_vr(NE,K,LL,NY,NX)+OQMXS
+        DOM_MacP_vr(NE,K,LL,NY,NX)=DOM_MacP_vr(NE,K,LL,NY,NX)+OQMHXS
         SorbedOM_vr(NE,K,LL,NY,NX)=SorbedOM_vr(NE,K,LL,NY,NX)+OHMXS
       ENDDO
 
@@ -202,57 +205,77 @@ module nitrosMod
   end subroutine ApplyVerticalMix
 
 !------------------------------------------------------------------------------------------
-  subroutine sumORGMLayL(L,NY,NX,ORGM)
+  subroutine sumORGMLayL(L,NY,NX,ORGM,conly)
   !
   !sum up organic matter in layer L
+  !including live microbial biomass, microbial residue, sorbed dom+acetate, and solid SOM
+  
   implicit none
   integer, intent(in) :: L, NY,NX
   real(r8), intent(out) :: ORGM(1:NumPlantChemElms)
+  logical, optional, intent(in) :: conly
+  integer :: K,N,NGL,M,MID,NE,jcplx1,nelms
+  logical :: conly_loc
 
-  integer :: K,N,NGL,M,MID,NE
+  if(present(conly))then
+    conly_loc=conly
+  else
+    conly_loc=.false.
+  endif
 
   ORGM=0._r8
   !sumup heterotrophic microbes
-  DO  K=1,jcplx
-    DO  N=1,NumMicbFunGrupsPerCmplx
-      DO NGL=JGnio(N),JGnfo(N)
-        DO  M=1,nlbiomcp
-          MID=micpar%get_micb_id(M,NGL)
-          DO NE=1,NumPlantChemElms
-            ORGM(NE)=ORGM(NE)+mBOMHeter_vr(NE,MID,K,L,NY,NX)
-          ENDDO
-        enddo
-      enddo
-    enddo
-  ENDDO
+  if(L==0)then
+    jcplx1=micpar%NumOfLitrCmplxs
+  else
+    jcplx1=jcplx
+  endif
+  if(conly_loc)then
+    nelms=1
+  else
+    nelms=NumPlantChemElms
+  endif  
   !add autotrophic microbes
   DO  N=1,NumMicbFunGrupsPerCmplx
     DO NGL=JGniA(N),JGnfA(N)
       DO  M=1,nlbiomcp
         MID=micpar%get_micb_id(M,NGL)
-        DO NE=1,NumPlantChemElms
+        DO NE=1,nelms
           ORGM(NE)=ORGM(NE)+mBOMAutor_vr(NE,MID,L,NY,NX)
         ENDDO
       enddo
     enddo
   enddo
+
+  DO K=1,jcplx1
+    !add heterotrophic microbes
+    DO  N=1,NumMicbFunGrupsPerCmplx
+      DO NGL=JGnio(N),JGnfo(N)
+        DO  M=1,nlbiomcp
+          MID=micpar%get_micb_id(M,NGL)
+          DO NE=1,nelms
+            ORGM(NE)=ORGM(NE)+mBOMHeter_vr(NE,MID,K,L,NY,NX)
+          ENDDO
+        enddo
+      enddo
+    enddo
+
   !add microbial residual
-  DO K=1,jcplx
     DO  M=1,ndbiomcp
-      DO NE=1,NumPlantChemElms
+      DO NE=1,nelms
         ORGM(NE)=ORGM(NE)+OMBioResdu_vr(NE,M,K,L,NY,NX)
       ENDDO    
     ENDDO
 
     !add dom
-    DO NE=1,NumPlantChemElms
-      ORGM(NE)=ORGM(NE)+DOM(NE,K,L,NY,NX)+DOM_Macp(NE,K,L,NY,NX)+SorbedOM_vr(NE,K,L,NY,NX)
+    DO NE=1,nelms
+      ORGM(NE)=ORGM(NE)+DOM_vr(NE,K,L,NY,NX)+DOM_MacP_vr(NE,K,L,NY,NX)+SorbedOM_vr(NE,K,L,NY,NX)
     ENDDO
-    ORGM(ielmc)=ORGM(ielmc)+DOM(idom_acetate,K,L,NY,NX)+DOM_Macp(idom_acetate,K,L,NY,NX)+SorbedOM_vr(idom_acetate,K,L,NY,NX)    
+    ORGM(ielmc)=ORGM(ielmc)+DOM_vr(idom_acetate,K,L,NY,NX)+DOM_MacP_vr(idom_acetate,K,L,NY,NX)+SorbedOM_vr(idom_acetate,K,L,NY,NX)    
 
     !add solid organic matter
     DO  M=1,jsken
-      DO NE=1,NumPlantChemElms
+      DO NE=1,nelms
         ORGM(NE)=ORGM(NE)+SolidOM_vr(NE,M,K,L,NY,NX)
       ENDDO  
     ENDDO  
@@ -263,28 +286,14 @@ module nitrosMod
 
   subroutine sumLitrOMLayL(L,NY,NX,ORGM)
   !
-  !sum up litter OM in layer L
+  !sum up litter OM (DOM + litter OM) in layer L
   implicit none
   integer, intent(in) :: L, NY,NX
   real(r8), intent(out) :: ORGM(1:NumPlantChemElms)
   integer :: K,N,NGL,M,MID,NE
 
   ORGM=0._r8
-  !sumup heterotrophic microbes
 
-  DO  K=1,micpar%NumOfLitrCmplxs
-    IF(.not.micpar%is_litter(K))cycle
-    DO  N=1,NumMicbFunGrupsPerCmplx
-      DO NGL=JGnio(N),JGnfo(N)
-        DO  M=1,nlbiomcp
-          MID=micpar%get_micb_id(M,NGL)
-          DO NE=1,NumPlantChemElms
-            ORGM(NE)=ORGM(NE)+mBOMHeter_vr(NE,MID,K,L,NY,NX)
-          ENDDO
-        enddo
-      enddo
-    enddo
-  ENDDO
   !add autotrophic microbes
   DO  N=1,NumMicbFunGrupsPerCmplx
     DO NGL=JGniA(N),JGnfA(N)
@@ -296,8 +305,22 @@ module nitrosMod
       enddo
     enddo
   enddo
-  !add microbial residual
+
+
   DO K=1,micpar%NumOfLitrCmplxs
+    !add live heterotrophic microbes
+    DO  N=1,NumMicbFunGrupsPerCmplx
+      DO NGL=JGnio(N),JGnfo(N)
+        DO  M=1,nlbiomcp
+          MID=micpar%get_micb_id(M,NGL)
+          DO NE=1,NumPlantChemElms
+            ORGM(NE)=ORGM(NE)+mBOMHeter_vr(NE,MID,K,L,NY,NX)
+          ENDDO
+        enddo
+      enddo
+    enddo
+
+   !add microbial residual
     DO  M=1,ndbiomcp
       DO NE=1,NumPlantChemElms
         ORGM(NE)=ORGM(NE)+OMBioResdu_vr(NE,M,K,L,NY,NX)
@@ -306,9 +329,9 @@ module nitrosMod
 
     !add dom
     DO NE=1,NumPlantChemElms
-      ORGM(NE)=ORGM(NE)+DOM(NE,K,L,NY,NX)+DOM_Macp(NE,K,L,NY,NX)+SorbedOM_vr(NE,K,L,NY,NX)
+      ORGM(NE)=ORGM(NE)+DOM_vr(NE,K,L,NY,NX)+DOM_MacP_vr(NE,K,L,NY,NX)+SorbedOM_vr(NE,K,L,NY,NX)
     ENDDO
-    ORGM(ielmc)=ORGM(ielmc)+DOM(idom_acetate,K,L,NY,NX)+DOM_Macp(idom_acetate,K,L,NY,NX)+SorbedOM_vr(idom_acetate,K,L,NY,NX)    
+    ORGM(ielmc)=ORGM(ielmc)+DOM_vr(idom_acetate,K,L,NY,NX)+DOM_MacP_vr(idom_acetate,K,L,NY,NX)+SorbedOM_vr(idom_acetate,K,L,NY,NX)    
 
     !add solid organic matter
     DO  M=1,jsken
@@ -319,4 +342,167 @@ module nitrosMod
   ENDDO    
 
   end subroutine sumLitrOMLayL
+
+!------------------------------------------------------------------------------------------
+
+  subroutine sumHumOMLayL(L,NY,NX,ORGM)
+  !
+  !sum up litter OM in layer L
+  implicit none
+  integer, intent(in) :: L, NY,NX
+  real(r8), intent(out) :: ORGM(1:NumPlantChemElms)
+  integer :: K,N,NGL,M,MID,NE
+
+  ORGM=0._r8
+
+  !add autotrophic microbes
+  DO  N=1,NumMicbFunGrupsPerCmplx
+    DO NGL=JGniA(N),JGnfA(N)
+      DO  M=1,nlbiomcp
+        MID=micpar%get_micb_id(M,NGL)
+        DO NE=1,NumPlantChemElms
+          ORGM(NE)=ORGM(NE)+mBOMAutor_vr(NE,MID,L,NY,NX)
+        ENDDO
+      enddo
+    enddo
+  enddo
+
+  DO  K=micpar%NumOfLitrCmplxs+1,jcplx
+   !sumup heterotrophic microbes
+    DO  N=1,NumMicbFunGrupsPerCmplx
+      DO NGL=JGnio(N),JGnfo(N)
+        DO  M=1,nlbiomcp
+          MID=micpar%get_micb_id(M,NGL)
+          DO NE=1,NumPlantChemElms
+            ORGM(NE)=ORGM(NE)+mBOMHeter_vr(NE,MID,K,L,NY,NX)
+          ENDDO
+        enddo
+      enddo
+    enddo
+  !add microbial residual
+    DO  M=1,ndbiomcp
+      DO NE=1,NumPlantChemElms
+        ORGM(NE)=ORGM(NE)+OMBioResdu_vr(NE,M,K,L,NY,NX)
+      ENDDO    
+    ENDDO
+
+    !add dom
+    DO NE=1,NumPlantChemElms
+      ORGM(NE)=ORGM(NE)+DOM_vr(NE,K,L,NY,NX)+DOM_MacP_vr(NE,K,L,NY,NX)+SorbedOM_vr(NE,K,L,NY,NX)
+    ENDDO
+    !add acetate
+    ORGM(ielmc)=ORGM(ielmc)+DOM_vr(idom_acetate,K,L,NY,NX)+DOM_MacP_vr(idom_acetate,K,L,NY,NX)+SorbedOM_vr(idom_acetate,K,L,NY,NX)    
+
+    !add solid organic matter
+    DO  M=1,jsken
+      DO NE=1,NumPlantChemElms
+        ORGM(NE)=ORGM(NE)+SolidOM_vr(NE,M,K,L,NY,NX)
+      ENDDO  
+    ENDDO  
+  ENDDO    
+
+  end subroutine sumHumOMLayL
+  
+
+!------------------------------------------------------------------------------------------
+
+  subroutine sumMicBiomLayL(L,NY,NX,ORGM)
+  !
+  !sum up litter OM in layer L
+  implicit none
+  integer, intent(in) :: L, NY,NX
+  real(r8), intent(out) :: ORGM(1:NumPlantChemElms)
+  integer :: K,N,NGL,M,MID,NE,jcplx1
+
+  ORGM=0._r8
+
+  if(L==0)then
+    jcplx1=micpar%NumOfLitrCmplxs
+  else
+    jcplx1=jcplx
+  endif
+
+  !add autotrophic microbes
+  DO  N=1,NumMicbFunGrupsPerCmplx
+    DO NGL=JGniA(N),JGnfA(N)
+      DO  M=1,nlbiomcp
+        MID=micpar%get_micb_id(M,NGL)
+        DO NE=1,NumPlantChemElms
+          ORGM(NE)=ORGM(NE)+mBOMAutor_vr(NE,MID,L,NY,NX)
+        ENDDO
+      enddo
+    enddo
+  enddo
+
+  DO K=1,jcplx1
+    !add heterotrophic microbes
+    DO  N=1,NumMicbFunGrupsPerCmplx
+      DO NGL=JGnio(N),JGnfo(N)
+        DO  M=1,nlbiomcp
+          MID=micpar%get_micb_id(M,NGL)
+          DO NE=1,NumPlantChemElms
+            ORGM(NE)=ORGM(NE)+mBOMHeter_vr(NE,MID,K,L,NY,NX)
+          ENDDO
+        enddo
+      enddo
+    enddo
+  enddo  
+  end subroutine sumMicBiomLayL
+!------------------------------------------------------------------------------------------
+
+  subroutine sumSurfOMCK(NY,NX,SOMHeterK,SOMAutor)
+  implicit none
+  integer, intent(in) :: NY,NX
+  real(r8), intent(out) :: SOMHeterK(1:micpar%NumOfLitrCmplxs)
+  real(r8), intent(out) :: SOMAutor
+  integer :: K,N,NGL,M,MID,NE,L
+
+  SOMHeterK=0._r8
+  SOMAutor=0._r8
+  L=0
+
+  DO  N=1,NumMicbFunGrupsPerCmplx
+    do NGL=JGniA(n),JGnfA(n)
+      DO  M=1,nlbiomcp
+        MID=micpar%get_micb_id(M,NGL)
+        DO NE=1,ielmc
+          SOMAutor=SOMAutor+mBOMAutor_vr(NE,MID,L,NY,NX)
+        ENDDO
+      ENDDO
+    ENDDO
+  enddo
+
+  DO K=1,micpar%NumOfLitrCmplxs
+    DO  N=1,NumMicbFunGrupsPerCmplx
+      do NGL=JGnio(n),JGnfo(n)
+        DO  M=1,nlbiomcp
+          MID=micpar%get_micb_id(M,NGL)
+          DO NE=1,ielmc
+            SOMHeterK(K)=SOMHeterK(K)+mBOMHeter_vr(NE,MID,K,L,NY,NX)
+          ENDDO
+        enddo
+      enddo  
+    enddo    
+
+    DO  M=1,ndbiomcp
+      DO NE=1,ielmc
+        SOMHeterK(K)=SOMHeterK(K)+OMBioResdu_vr(NE,M,K,L,NY,NX)        
+      ENDDO
+    ENDDO  
+
+    !add dom
+    DO NE=1,ielmc
+      SOMHeterK(K)=SOMHeterK(K)+DOM_vr(NE,K,L,NY,NX)+DOM_MacP_vr(NE,K,L,NY,NX)+SorbedOM_vr(NE,K,L,NY,NX)
+    ENDDO
+    !add acetate
+    SOMHeterK(K)=SOMHeterK(K)+DOM_vr(idom_acetate,K,L,NY,NX)+DOM_MacP_vr(idom_acetate,K,L,NY,NX)+SorbedOM_vr(idom_acetate,K,L,NY,NX)    
+
+    DO M=1,jsken
+      DO NE=1,ielmc
+        SOMHeterK(K)=SOMHeterK(K)+SolidOM_vr(NE,M,K,L,NY,NX)
+      ENDDO
+    ENDDO  
+  ENDDO
+  
+  end subroutine sumSurfOMCK
 end module nitrosMod

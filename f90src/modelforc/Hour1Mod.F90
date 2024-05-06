@@ -45,6 +45,7 @@ module Hour1Mod
   use EcoSIMConfig, only : jcplx1 => jcplx1c,jcplx=>jcplxc,nlbiomcp=>NumLiveMicrbCompts
   use EcoSIMConfig, only : ndbiomcp=>NumDeadMicrbCompts,jsken=>jskenc,NumMicbFunGrupsPerCmplx=>NumMicbFunGrupsPerCmplx,do_instequil
   use EcoSiMParDataMod, only : micpar,pltpar
+  use nitrosMod, only : sumORGMLayL
   implicit none
 
   private
@@ -120,7 +121,7 @@ module Hour1Mod
 !
   if(lverb)write(*,*)'set atms gas conc'
   DO  NX=NHW,NHE
-    DO  NY=NVN,NVS
+    DO  NY=NVN,NVS     
       tPBOT=PBOT(NY,NX)/1.01325E+02_r8
       tmp=Tref/TairKClimMean(NY,NX)*tPBOT
       CCO2EI(NY,NX)=CO2EI(NY,NX)*5.36E-04_r8*tmp
@@ -175,7 +176,7 @@ module Hour1Mod
 !     IF SOC FLAG IS SET
 !
 
-      IF(iErosionMode.EQ.ieros_frzthawsom.OR.iErosionMode.EQ.ieros_frzthawsomeros)THEN
+      IF(iErosionMode.EQ.ieros_frzthawsom .OR. iErosionMode.EQ.ieros_frzthawsomeros)THEN
         call UpdateTotalSOC(NY,NX)
       ENDIF
 
@@ -563,18 +564,18 @@ module Hour1Mod
     SoilMicPMassLayer(L,NY,NX)=SoiBulkDensity(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
 
     IF(SoilMicPMassLayer(L,NY,NX).GT.ZEROS(NY,NX))THEN
-      CORGC(L,NY,NX)=AMIN1(orgcden,ORGC_vr(L,NY,NX)/SoilMicPMassLayer(L,NY,NX))
+      CORGC_vr(L,NY,NX)=AMIN1(orgcden,ORGC_vr(L,NY,NX)/SoilMicPMassLayer(L,NY,NX))
       CSAND(L,NY,NX)=SAND(L,NY,NX)/SoilMicPMassLayer(L,NY,NX)
       CSILT(L,NY,NX)=SILT(L,NY,NX)/SoilMicPMassLayer(L,NY,NX)
       CCLAY(L,NY,NX)=CLAY(L,NY,NX)/SoilMicPMassLayer(L,NY,NX)
     ELSE
-      CORGC(L,NY,NX)=0.0_r8
+      CORGC_vr(L,NY,NX)=0.0_r8
       CSAND(L,NY,NX)=0.0_r8
       CSILT(L,NY,NX)=0.0_r8
       CCLAY(L,NY,NX)=0.0_r8
     ENDIF
     IF(SoilMicPMassLayer(L,NY,NX).GT.ZERO)THEN
-      CORGCM=AZMAX1(AMIN1(1.0_r8,MWC2Soil*CORGC(L,NY,NX)))
+      CORGCM=AZMAX1(AMIN1(1.0_r8,MWC2Soil*CORGC_vr(L,NY,NX)))
       ParticleDens=1.30_r8*CORGCM+2.66_r8*(1.0_r8-CORGCM)
       IF(L.EQ.NU(NY,NX))THEN
 !surface layer
@@ -648,7 +649,7 @@ module Hour1Mod
 !     FCR=litter water content at -0.01 MPa
 !     THETY=litter hygroscopic water content
 !
-  CORGC(0,NY,NX)=orgcden
+  CORGC_vr(0,NY,NX)=orgcden
 !
 !     SOIL SURFACE WATER STORAGE CAPACITY
 !
@@ -747,16 +748,16 @@ module Hour1Mod
   Qinflx2Soil_col(NY,NX)=0._r8
   HeatFlx2G_col(NY,NX)=0._r8
   DIC_mass_col(NY,NX)=0.0_r8
-  TOMET(ielmc,NY,NX)=0.0_r8
-  TOMET(ielmn,NY,NX)=0.0_r8
-  TOMET(ielmp,NY,NX)=0.0_r8
+  tMicBiome(ielmc,NY,NX)=0.0_r8
+  tMicBiome(ielmn,NY,NX)=0.0_r8
+  tMicBiome(ielmp,NY,NX)=0.0_r8
   UVLWatMicP(NY,NX)=0.0_r8
-  URSDM(ielmc,NY,NX)=0.0_r8
-  UORGM(ielmc,NY,NX)=0.0_r8
-  URSDM(ielmn,NY,NX)=0.0_r8
-  UORGM(ielmn,NY,NX)=0.0_r8
-  URSDM(ielmp,NY,NX)=0.0_r8
-  UORGM(ielmp,NY,NX)=0.0_r8
+  tLitrOM_col(ielmc,NY,NX)=0.0_r8
+  tHumOM_col(ielmc,NY,NX)=0.0_r8
+  tLitrOM_col(ielmn,NY,NX)=0.0_r8
+  tHumOM_col(ielmn,NY,NX)=0.0_r8
+  tLitrOM_col(ielmp,NY,NX)=0.0_r8
+  tHumOM_col(ielmp,NY,NX)=0.0_r8
   UNH4(NY,NX)=0.0_r8
   UNO3(NY,NX)=0.0_r8
   UPO4(NY,NX)=0.0_r8
@@ -968,13 +969,13 @@ module Hour1Mod
         +CLAY(NU(NY,NX),NY,NX)+1.82E-06*ORGC_vr(NU(NY,NX),NY,NX)
       IF(BKVLNX.GT.ZEROS(NY,NX))THEN
         CORGM=MWC2Soil*ORGC_vr(NU(NY,NX),NY,NX)/BKVLNX
-        CORGC(NU(NY,NX),NY,NX)=orgcden*CORGM
+        CORGC_vr(NU(NY,NX),NY,NX)=orgcden*CORGM
         CSAND(NU(NY,NX),NY,NX)=SAND(NU(NY,NX),NY,NX)/BKVLNX
         CSILT(NU(NY,NX),NY,NX)=SILT(NU(NY,NX),NY,NX)/BKVLNX
         CCLAY(NU(NY,NX),NY,NX)=CLAY(NU(NY,NX),NY,NX)/BKVLNX
       ELSE
         CORGM=0.0_r8
-        CORGC(NU(NY,NX),NY,NX)=0.0_r8
+        CORGC_vr(NU(NY,NX),NY,NX)=0.0_r8
         CSAND(NU(NY,NX),NY,NX)=0.0_r8
         CSILT(NU(NY,NX),NY,NX)=1.0
         CCLAY(NU(NY,NX),NY,NX)=0.0_r8
@@ -1009,41 +1010,12 @@ module Hour1Mod
 
   real(r8) :: OC
   integer :: K,M,N,NGL,L,NB,NC
+  real(r8) :: orgm(1:NumPlantChemElms)
   !     begin_execution
   !
-  !     TOTAL SOC FOR CALCULATING CHANGES IN SOC CALCULATED IN NITRO.F
-  !
-  !     OMC=microbial biomass, ORC=microbial residue
-  !     OQC,OQCH=DOC in micropores,macropores
-  !     OQA,OQAH=acetate in micropores,macropores
-  !     OHC,OHA=adsorbed SOC,acetate
-  !     OSC=SOC(K=0:woody litter, K=1:non-woody litter,
-  !     K=2:manure, K=3:POC, K=4:humus)
-  !
-  OC=0.0_r8
-
   DO L=0,NL(NY,NX)
-!  add heterotrophic complexs
-    DO NC=1,jcplx
-      DO NB=1,NumLiveHeterBioms
-        OC=OC+mBOMHeter_vr(ielmc,NB,NC,L,NY,NX)
-      ENDDO
-    ENDDO
-
-!  add autotrophic complex
-    DO NB=1,NumLiveAutoBioms
-      OC=OC+mBOMAutor_vr(ielmc,NB,L,NY,NX)
-    ENDDO
-!  add microbial residue
-    OC=OC+SUM(OMBioResdu_vr(ielmc,1:ndbiomcp,1:jcplx,L,NY,NX))
-!  add dissolved/sorbed OM and acetate
-    OC=OC+SUM(DOM(idom_doc,1:jcplx,L,NY,NX))+SUM(DOM_Macp(idom_doc,1:jcplx,L,NY,NX)) &
-         +SUM(SorbedOM_vr(ielmc,1:jcplx,L,NY,NX))+SUM(DOM(idom_acetate,1:jcplx,L,NY,NX)) &
-         +SUM(DOM_Macp(idom_acetate,1:jcplx,L,NY,NX))+SUM(SorbedOM_vr(idom_acetate,1:jcplx,L,NY,NX))
-!  add OM complexes
-    OC=OC+SUM(SolidOM_vr(ielmc,1:jsken,1:jcplx,L,NY,NX))
-!
-    ORGCX(L,NY,NX)=OC
+    call sumORGMLayL(L,NY,NX,ORGM,.true.)
+    ORGCX_vr(L,NY,NX)=ORGM(ielmc)
   ENDDO
   end subroutine UpdateTotalSOC
 !------------------------------------------------------------------------------------------
@@ -1883,9 +1855,9 @@ module Hour1Mod
       OQC1=AMIN1(0.1_r8*OSCX,OSCI-OSCX)
       OQN1=AMIN1(0.1_r8*OSNX,OSNI-OSNX)
       OQP1=AMIN1(0.1_r8*OSPX,OSPI-OSPX)
-      DOM(idom_doc,K,LFDPTH,NY,NX)=DOM(idom_doc,K,LFDPTH,NY,NX)+OQC1
-      DOM(idom_don,K,LFDPTH,NY,NX)=DOM(idom_don,K,LFDPTH,NY,NX)+OQN1
-      DOM(idom_dop,K,LFDPTH,NY,NX)=DOM(idom_dop,K,LFDPTH,NY,NX)+OQP1
+      DOM_vr(idom_doc,K,LFDPTH,NY,NX)=DOM_vr(idom_doc,K,LFDPTH,NY,NX)+OQC1
+      DOM_vr(idom_don,K,LFDPTH,NY,NX)=DOM_vr(idom_don,K,LFDPTH,NY,NX)+OQN1
+      DOM_vr(idom_dop,K,LFDPTH,NY,NX)=DOM_vr(idom_dop,K,LFDPTH,NY,NX)+OQP1
 !
 !     REMAINDER DISTRIBUTED TO RESIDUE FRACTIONS
 !
@@ -2345,9 +2317,9 @@ module Hour1Mod
 !     CORGC=SOC concentration
 !
     IF(SoilMicPMassLayer(L,NY,NX).GT.ZEROS(NY,NX))THEN
-      CORGC(L,NY,NX)=AMIN1(orgcden,ORGC_vr(L,NY,NX)/SoilMicPMassLayer(L,NY,NX))
+      CORGC_vr(L,NY,NX)=AMIN1(orgcden,ORGC_vr(L,NY,NX)/SoilMicPMassLayer(L,NY,NX))
     ELSE
-      CORGC(L,NY,NX)=0.0_r8
+      CORGC_vr(L,NY,NX)=0.0_r8
     ENDIF
   ENDDO
   end subroutine GetChemicalConcsInSoil

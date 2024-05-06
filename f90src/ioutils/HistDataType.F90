@@ -43,10 +43,10 @@ implicit none
   real(r8),pointer   :: h1D_cNO3_LITR_col(:)      !(trc_solml_vr(ids_NO3,0,NY,NX)+trc_solml_vr(ids_NO2,0,NY,NX))/SoilMicPMassLayer(0,NY,NX)                            
   real(r8),pointer   :: h1D_ECO_HVST_N_col(:)     !EcoHavstElmnt_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_NET_N_MIN_col(:)      !-NetNH4Mineralize_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_SURF_tLITR_P_FLX_col(:)    !URSDM(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_HUMUS_C_col(:)        !UORGM(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_HUMUS_N_col(:)        !UORGM(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_HUMUS_P_col(:)        !UORGM(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_SURF_tLITR_P_FLX_col(:)    !tLitrOM_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_HUMUS_C_col(:)        !tHumOM_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_HUMUS_N_col(:)        !tHumOM_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_HUMUS_P_col(:)        !tHumOM_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_AMENDED_P_col(:)       !FerPFlx_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_tLITRf_P_FLX_col(:)   !LiterfalOrgM_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_tEXCH_PO4_col(:)       !UPO4(NY,NX)/AREA(3,NU(NY,NX),NY,NX), exchangeable 
@@ -57,7 +57,7 @@ implicit none
   real(r8),pointer   :: h1D_HeatFlx2G_col(:)      !
   real(r8),pointer   :: h1D_Qinfl2soi_col(:)      !
   real(r8),pointer   :: h1D_tPRECIP_P_col(:)       !UPP4(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_tMICRO_P_col(:)        !TOMET(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_tMICRO_P_col(:)        !tMicBiome(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_PO4_FIRE_col(:)       !PO4byFire_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_cPO4_LITR_col(:)      !trc_solml_vr(ids_H2PO4,0,NY,NX)/SoilMicPMassLayer(0,NY,NX)
   real(r8),pointer   :: h1D_cEXCH_P_LITR_col(:)     !31.0*(trcx_solml(idx_HPO4,0,NY,NX)+trcx_solml(idx_H2PO4,0,NY,NX))/SoilMicPMassLayer(0,NY,NX)
@@ -67,7 +67,7 @@ implicit none
   real(r8),pointer   :: h1D_tSALT_DISCHG_FLX_col(:)    !HydroIonFlx_col(NY,NX)/TAREA
   real(r8),pointer   :: h1D_PSI_SURF_col(:)       !PSISM(0,NY,NX)
   real(r8),pointer   :: h1D_SURF_ELEV_col(:)      !-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)+DLYR(3,0,NY,NX)
-  real(r8),pointer   :: h1D_SURF_tLITR_N_FLX_col(:)      !URSDM(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_SURF_tLITR_N_FLX_col(:)      !tLitrOM_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
 
   real(r8),pointer   :: h1D_AMENDED_N_col(:)       !FertNFlx_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_tLITRf_N_FLX_col(:)  !LiterfalOrgM_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -78,13 +78,13 @@ implicit none
   real(r8),pointer   :: h1D_SUB_DON_FLX_col(:)    !HydroSubsDONFlx_col(NY,NX)/TAREA, daily flux
   real(r8),pointer   :: h1D_SUR_DIN_FLX_col(:)    !HydroSufDINFlx_col(NY,NX)/TAREA
   real(r8),pointer   :: h1D_SUB_DIN_FLX_col(:)    !HydroSubsDINFlx_col(NY,NX)/TAREA
-  real(r8),pointer   :: h1D_tMICRO_N_col(:)        !TOMET(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_tMICRO_N_col(:)        !tMicBiome(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_TEMP_LITR_col(:)      !TCS(0,NY,NX)
   real(r8),pointer   :: h1D_TEMP_SNOW_col(:)      !TCSnow(1,NY,NX)
-  real(r8),pointer   :: h1D_SURF_tLITR_C_FLX_col(:)      !URSDM(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_SURF_tLITR_C_FLX_col(:)      !tLitrOM_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_AMENDED_C_col(:)      !AmendCFlx_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_CO2_FLX_col(:)        !UCO2G(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_tMICRO_C_col(:)        !TOMET(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_tMICRO_C_col(:)        !tMicBiome(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_OMC_LITR_col(:)       !ORGC_vr(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total residual C
   real(r8),pointer   :: h1D_OMN_LITR_col(:)       !ORGN_vr(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total residual N
   real(r8),pointer   :: h1D_OMP_LITR_col(:)       !ORGP_vr(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total residual P
@@ -150,6 +150,8 @@ implicit none
   real(r8),pointer   :: h1D_Plant_P_ptc(:)        !whole plant P  
   real(r8),pointer   :: h1D_LEAF_PC_ptc(:)       !(LeafStrutElms_pft(ielmp,NZ,NY,NX)+CanopyNonstElms_pft(ielmp,NZ,NY,NX))/(LeafStrutElms_pft(ielmc,NZ,NY,NX)+CanopyNonstElms_pft(ielmc,NZ,NY,NX)),mass based CP ratio of leaf
   real(r8),pointer   :: h2D_tSOC_vr_col(:,:)        !ORGC_vr(1:JZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total soil C
+  real(r8),pointer   :: h2D_tSON_vr_col(:,:)
+  real(r8),pointer   :: h2D_tSOP_vr_col(:,:)  
   real(r8),pointer   :: h1D_CAN_RN_ptc(:)        !277.8*RadNet2Canopy_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), W m-2
   real(r8),pointer   :: h1D_CAN_LE_ptc(:)        !277.8*EvapTransHeat_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_CAN_H_ptc(:)         !277.8*HeatXAir2PCan(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -532,6 +534,8 @@ implicit none
   allocate(this%h1D_ROOT_NONSTN_ptc(beg_ptc:end_ptc))     ;this%h1D_ROOT_NONSTN_ptc(:)=spval
   allocate(this%h1D_ROOT_NONSTP_ptc(beg_ptc:end_ptc))     ;this%h1D_ROOT_NONSTP_ptc(:)=spval
   allocate(this%h2D_tSOC_vr_col(beg_col:end_col,1:JZ))    ;this%h2D_tSOC_vr_col(:,:)=spval
+  allocate(this%h2D_tSON_vr_col(beg_col:end_col,1:JZ))    ;this%h2D_tSON_vr_col(:,:)=spval
+  allocate(this%h2D_tSOP_vr_col(beg_col:end_col,1:JZ))    ;this%h2D_tSOP_vr_col(:,:)=spval
   allocate(this%h2D_LEAF_NODE_NO_ptc(beg_ptc:end_ptc,1:MaxNumBranches));this%h2D_LEAF_NODE_NO_ptc(:,:)=spval
   allocate(this%h2D_RUB_ACTVN_ptc(beg_ptc:end_ptc,1:MaxNumBranches));  this%h2D_RUB_ACTVN_ptc(:,:)=spval
   allocate(this%h2D_CO2_vr_col(beg_col:end_col,1:JZ))        ;this%h2D_CO2_vr_col(:,:)=spval
@@ -1452,6 +1456,14 @@ implicit none
   call hist_addfld2d(fname='tSOC_vr',units='gC/m3',type2d='levsoi',avgflag='A',&
     long_name='*Vertically resolved total soil organic C',ptr_col=data2d_ptr)      
 
+  data2d_ptr => this%h2D_tSON_vr_col(beg_col:end_col,1:JZ)       
+  call hist_addfld2d(fname='tSON_vr',units='gN/m3',type2d='levsoi',avgflag='A',&
+    long_name='*Vertically resolved total soil organic N',ptr_col=data2d_ptr)      
+
+  data2d_ptr => this%h2D_tSOP_vr_col(beg_col:end_col,1:JZ)       
+  call hist_addfld2d(fname='tSOP_vr',units='gC/m3',type2d='levsoi',avgflag='A',&
+    long_name='*Vertically resolved total soil organic P',ptr_col=data2d_ptr)      
+
   data2d_ptr => this%h2D_LEAF_NODE_NO_ptc(beg_ptc:end_ptc,1:MaxNumBranches)        !NumOfLeaves_brch(MainBranchNum_pft(NZ,NY,NX),NZ,NY,NX), leaf NO
   call hist_addfld2d(fname='LEAF_NODE_NO',units='none',type2d='nbranches',avgflag='I',&
     long_name='Leaf number',ptr_patch=data2d_ptr)      
@@ -1588,10 +1600,10 @@ implicit none
         trc_solml_vr(ids_NO2,0,NY,NX),SoilMicPMassLayer(0,NY,NX))
       this%h1D_ECO_HVST_N_col(ncol)       =  EcoHavstElmnt_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_NET_N_MIN_col(ncol)        = -NetNH4Mineralize_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_SURF_tLITR_P_FLX_col(ncol) =  URSDM(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_HUMUS_C_col(ncol)          = UORGM(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_HUMUS_N_col(ncol)          = UORGM(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_HUMUS_P_col(ncol)          = UORGM(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_SURF_tLITR_P_FLX_col(ncol) =  tLitrOM_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_HUMUS_C_col(ncol)          = tHumOM_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_HUMUS_N_col(ncol)          = tHumOM_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_HUMUS_P_col(ncol)          = tHumOM_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_AMENDED_P_col(ncol)        = FerPFlx_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tLITRf_C_FLX_col(ncol)     = LiterfalOrgM_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tLITRf_N_FLX_col(ncol)     = LiterfalOrgM_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -1614,7 +1626,7 @@ implicit none
       this%h1D_SUB_DIC_FLX_col(ncol)      = HydroSubsDICFlx_col(NY,NX)/TAREA
       this%h1D_SUR_DIP_FLX_col(ncol)      = HydroSufDIPFlx_col(NY,NX)/TAREA
       this%h1D_tPRECIP_P_col(ncol)        = UPP4(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_tMICRO_P_col(ncol)         = TOMET(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_tMICRO_P_col(ncol)         = tMicBiome(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_PO4_FIRE_col(ncol)         = PO4byFire_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_cPO4_LITR_col(ncol)        = safe_adb(trc_solml_vr(ids_H2PO4,0,NY,NX),SoilMicPMassLayer(0,NY,NX))
       this%h1D_cEXCH_P_LITR_col(ncol)     =  patomw*safe_adb(trcx_solml(idx_HPO4,0,NY,NX)+&
@@ -1624,22 +1636,22 @@ implicit none
       this%h1D_RADN_col(ncol)             = TRAD(NY,NX)
       this%h1D_PSI_SURF_col(ncol)         = PSISoilMatricP(0,NY,NX)
       this%h1D_SURF_ELEV_col(ncol)        = -CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)+DLYR(3,0,NY,NX)
-      this%h1D_SURF_tLITR_N_FLX_col(ncol) = URSDM(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_SURF_tLITR_N_FLX_col(ncol) = tLitrOM_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_AMENDED_N_col(ncol)        = FertNFlx_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tNH4X_col(ncol)            = UNH4(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tNO3_col(ncol)             = UNO3(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_tMICRO_N_col(ncol)         = TOMET(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_tMICRO_N_col(ncol)         = tMicBiome(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_TEMP_LITR_col(ncol)        = TCS(0,NY,NX)
       if(VcumSnowWE(NY,NX)<=ZEROS(NY,NX))then
         this%h1D_TEMP_SNOW_col(ncol)   = spval
       else
         this%h1D_TEMP_SNOW_col(ncol)   = TCSnow(1,NY,NX)
       endif
-      this%h1D_SURF_tLITR_C_FLX_col(ncol)   = URSDM(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_SURF_tLITR_C_FLX_col(ncol)   = tLitrOM_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
 
       this%h1D_AMENDED_C_col(ncol)   = AmendCFlx_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_CO2_FLX_col(ncol)     = SurfGasFlx_col(idg_CO2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_tMICRO_C_col(ncol)     = TOMET(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_tMICRO_C_col(ncol)     = tMicBiome(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_OMC_LITR_col(ncol)    = ORGC_vr(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_OMN_LITR_col(ncol)    = ORGN_vr(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_OMP_LITR_col(ncol)    = ORGP_vr(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -1696,6 +1708,9 @@ implicit none
 
       DO L=1,JZ
         this%h2D_tSOC_vr_col(ncol,L) =  ORGC_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        if(this%h2D_tSOC_vr_col(ncol,L)>1.e10)stop
+        this%h2D_tSON_vr_col(ncol,L) =  ORGN_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h2D_tSOP_vr_col(ncol,L) =  ORGP_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h2D_CO2_vr_col(ncol,L)  =  trc_solcl_vr(idg_CO2,L,NY,NX)
         this%h2D_CH4_vr_col(ncol,L)  =  trc_solcl_vr(idg_CH4,L,NY,NX)
         this%h2D_O2_vr_col(ncol,L)   =  trc_solcl_vr(idg_O2,L,NY,NX)

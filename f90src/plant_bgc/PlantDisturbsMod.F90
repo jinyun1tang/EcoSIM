@@ -1242,7 +1242,7 @@ module PlantDisturbsMod
     TotReproNodeNumNormByMatrgrp_brch   =>  plt_pheno%TotReproNodeNumNormByMatrgrp_brch  , &
     HourFailGrainFill_brch              =>  plt_pheno%HourFailGrainFill_brch             , &
     MatureGroup_pft                     =>  plt_pheno%MatureGroup_pft                    , &
-    CORGC                               =>  plt_soilchem%CORGC                           , &
+    CORGC_vr                            =>  plt_soilchem%CORGC_vr                        , &
     THETW_vr                            =>  plt_soilchem%THETW_vr                        , &
     CFOPE                               =>  plt_soilchem%CFOPE                           , &
     inonstruct                          =>  pltpar%inonstruct                            , &
@@ -2365,14 +2365,14 @@ module PlantDisturbsMod
               XHVST(ielmp)=XHVST(ielmc)
               FFIRE(1:NumPlantChemElms)=0._r8
             ELSE
-              IF(THETW_vr(L).GT.FVLWB.OR.CORGC(L).LE.FORGC.OR.ITILL.NE.22)THEN
+              IF(THETW_vr(L).GT.FVLWB.OR.CORGC_vr(L).LE.FORGC.OR.ITILL.NE.22)THEN
                 XHVST(ielmc)=1.0_r8
                 XHVST(ielmn)=XHVST(ielmc)
                 XHVST(ielmp)=XHVST(ielmc)
                 FFIRE(1:NumPlantChemElms)=0._r8
               ELSE
                 XHVST(ielmc)=1.0_r8-DCORP*EHVST(1,iplthvst_woody,NZ) &
-                  *AMIN1(1.0_r8,(CORGC(L)-FORGC)/(orgcden-FORGC))
+                  *AMIN1(1.0_r8,(CORGC_vr(L)-FORGC)/(orgcden-FORGC))
                 XHVST(ielmn)=XHVST(ielmc)
                 XHVST(ielmp)=XHVST(ielmc)
                 FFIRE(ielmc)=EHVST(2,iplthvst_woody,NZ)

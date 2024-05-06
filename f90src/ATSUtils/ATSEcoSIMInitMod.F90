@@ -64,9 +64,9 @@ implicit none
       CumDepth2LayerBottom(L,NY,NX)=a_CumDepth2LayerBottom(L,NY)
       POROS(L,NY,NX)=a_PORO(L,NY)
       SoiBulkDensityt0(L,NY,NX)=a_BKDSI(L,NY)
-      CORGC(L,NY,NX)=a_CORGC(L,NY)
-      CORGN(L,NY,NX)=a_CORGN(L,NY)
-      CORGP(L,NY,NX)=a_CORGP(L,NY)
+      CORGC_vr(L,NY,NX)=a_CORGC(L,NY)
+      CORGN_vr(L,NY,NX)=a_CORGN(L,NY)
+      CORGP_vr(L,NY,NX)=a_CORGP(L,NY)
     ENDDO
   ENDDO
 

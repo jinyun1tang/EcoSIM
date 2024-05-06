@@ -42,6 +42,7 @@ module StartsMod
   use SedimentDataType
   use GridDataType
   use MiniFuncMod
+  use nitrosMod, only : sumSurfOMCK
   use UnitMod, only : units
   implicit none
 
@@ -348,10 +349,10 @@ module StartsMod
 !
   TORGC=0.0_r8
   D1190: DO L=NU(NY,NX),NL(NY,NX)
-    !     CORGCZ=CORGC(L,NY,NX)
+    !     CORGCZ=CORGC_vr(L,NY,NX)
     !     CORGRZ=CORGR(L,NY,NX)
-    !     CORGNZ=CORGN(L,NY,NX)
-    !     CORGPZ=CORGP(L,NY,NX)
+    !     CORGNZ=CORGN_vr(L,NY,NX)
+    !     CORGPZ=CORGP_vr(L,NY,NX)
     !
     !     ALLOCATE SOC TO POC(3) AND HUMUS(4)
     !
@@ -361,7 +362,7 @@ module StartsMod
     !     CORGNX(4)=AZMAX1(CORGNZ-CORGNX(3))
     !     CORGPX(3)=AMIN1(CPRH(3)*CORGCX(3),CORGPZ)
     !     CORGPX(4)=AZMAX1(CORGPZ-CORGPX(3))
-    CORGL=AZMAX1(CORGC(L,NY,NX)-COMLitrC_vr(L,NY,NX))
+    CORGL=AZMAX1(CORGC_vr(L,NY,NX)-COMLitrC_vr(L,NY,NX))
     TORGL(L)=TORGC+CORGL*SoilMicPMassLayer(L,NY,NX)/AREA(3,L,NY,NX)*0.5_r8
     TORGC=TORGC+CORGL*SoilMicPMassLayer(L,NY,NX)/AREA(3,L,NY,NX)
   ENDDO D1190
@@ -494,6 +495,8 @@ module StartsMod
     call InitSOMVars(L,NY,NX,FCX)
     !
   ENDDO D1200
+  call sumSurfOMCK(NY,NX,RC0(:,NY,NX),RC0ff(NY,NX))
+
   POROSI(0,NY,NX)=1._r8  !this is added for numerical fixing
   !
   !  INITIALIZE FERTILIZER ARRAYS
@@ -871,7 +874,7 @@ module StartsMod
       TAREA=TAREA+AREA(3,L,NY,NX)
       CumSoilThickness(L,NY,NX)=0.0_r8
       ORGC_vr(L,NY,NX)=SUM(RSC(1:NumOfLitrCmplxs,L,NY,NX))*AREA(3,L,NY,NX)
-      ORGCX(L,NY,NX)=ORGC_vr(L,NY,NX)
+      ORGCX_vr(L,NY,NX)=ORGC_vr(L,NY,NX)
       VLitR0=0._r8
       DO K=1,NumOfLitrCmplxs
         VLitR0=VLitR0+RSC(K,L,NY,NX)/BulkDensLitR(K)

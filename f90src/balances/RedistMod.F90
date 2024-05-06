@@ -3,6 +3,8 @@ module RedistMod
   use abortutils, only : padr, print_info,endrun,destroy
   use minimathmod, only : safe_adb,AZMAX1
   use EcoSiMParDataMod, only : micpar
+  use SurfLitterPhysMod, only : UpdateLitRPhys
+  use nitrosMod  
   use ElmIDMod
   use EcosimConst
   use FlagDataType
@@ -38,7 +40,6 @@ module RedistMod
   USE LateralTranspMod
   use UnitMod, only : units
   use SnowBalanceMod
-  use SurfLitterPhysMod, only : UpdateLitRPhys
   implicit none
 
   private
@@ -89,7 +90,7 @@ module RedistMod
   TFLWT=0.0_r8
   VOLPT=0.0_r8
   VOLTT=0.0_r8
-
+  
   D9995: DO NX=NHW,NHE
     D9990: DO NY=NVN,NVS
       TXCO2(NY,NX)=0.0_r8
@@ -123,7 +124,7 @@ module RedistMod
 !
       call DiagSnowChemMass(NY,NX)
 !
-      call SumLitterLayerChemMass(NY,NX)
+      call LitterLayerSummary(NY,NX)
 !
       call update_physVar_Profile(NY,NX,VOLISO,DVLiceMicP)    
 
@@ -506,7 +507,7 @@ module RedistMod
   !
   D9680: DO K=1,micpar%NumOfLitrCmplxs 
     do idom=idom_beg,idom_end   
-      DOM(idom,K,0,NY,NX)=DOM(idom,K,0,NY,NX)+DOM_3DMicp_Transp_flx(idom,K,3,0,NY,NX)
+      DOM_vr(idom,K,0,NY,NX)=DOM_vr(idom,K,0,NY,NX)+DOM_3DMicp_Transp_flx(idom,K,3,0,NY,NX)
     enddo
   ENDDO D9680
 
@@ -576,7 +577,7 @@ module RedistMod
     !
     D8570: DO K=1,micpar%NumOfLitrCmplxs    
       DO idom=idom_beg,idom_end
-        DOM(idom,K,0,NY,NX)=DOM(idom,K,0,NY,NX)+TOMQRS(idom,K,NY,NX)
+        DOM_vr(idom,K,0,NY,NX)=DOM_vr(idom,K,0,NY,NX)+TOMQRS(idom,K,NY,NX)
       ENDDO
     ENDDO D8570
 !
@@ -690,113 +691,37 @@ module RedistMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine SumLitterLayerChemMass(NY,NX)
+  subroutine LitterLayerSummary(NY,NX)
   implicit none
   integer, intent(in) :: NY,NX
   integer :: K,N,M,NGL,NB,NE
   real(r8) :: PSS,HS,CS
-  real(r8) :: DES(1:NumPlantChemElms),OS
+  real(r8) :: litrOM(1:NumPlantChemElms),OS
   real(r8) :: POS,POX,POP
   real(r8) :: SSS,ZG,Z4S,WS,Z4X
   real(r8) :: Z4F,ZOS,ZOF
-  real(r8) :: tDElmt(1:NumPlantChemElms)
-  integer :: NumOfLitrCmplxs
+
 !     begin_execution
 !     TOTAL C,N,P, SALTS IN SURFACE RESIDUE
 !
 
-  NumOfLitrCmplxs   = micpar%NumOfLitrCmplxs
+  call sumSurfOMCK(NY,NX,RC0(:,NY,NX),RC0ff(NY,NX))
 
-  DES(:)=0.0_r8
-  DO K=1,jcplx
-    RC0(K,NY,NX)=0.0_r8
-  ENDDO
-  RC0ff(NY,NX)=0.0_r8
-  OMCL(0,NY,NX)=0.0_r8
-  OMNL(0,NY,NX)=0.0_r8
+  call sumMicBiomLayL(0,NY,NX,tMicBiome(1:NumPlantChemElms,NY,NX))
+  
+  call sumLitrOMLayL(0,NY,NX,litrOM)
 
-  DO K=1,NumOfLitrCmplxs
-    !
-    ! TOTAL heterotrophic MICROBIAL C,N,P
-    !
-    tDElmt=0._r8    
-    DO NB=1,NumLiveHeterBioms
-      do NE=1,NumPlantChemElms
-        tDElmt(NE)=tDElmt(NE)+mBOMHeter_vr(NE,NB,K,0,NY,NX)
-      ENDDO
-    ENDDO
+  ORGC_vr(0,NY,NX)=litrOM(ielmc)
+  ORGN_vr(0,NY,NX)=litrOM(ielmn)
+  ORGP_vr(0,NY,NX)=litrOM(ielmp)
 
-    RC0(K,NY,NX)=RC0(K,NY,NX)+tDElmt(ielmc)
-    do NE=1,NumPlantChemElms    
-      DES(NE)=DES(NE)+tDElmt(NE)
-      TOMET(NE,NY,NX)=TOMET(NE,NY,NX)+tDElmt(NE)
-    ENDDO
-    OMCL(0,NY,NX)=OMCL(0,NY,NX)+tDElmt(ielmc)
-    OMNL(0,NY,NX)=OMNL(0,NY,NX)+tDElmt(ielmn)
-  ENDDO
-
-  !
-  ! TOTAL autotrophic MICROBIAL C,N,P
-  !
-  tDElmt=0._r8
-  DO NB=1,NumLiveAutoBioms
-    DO NE=1,NumPlantChemElms
-      tDElmt(NE)=tDElmt(NE)+mBOMAutor_vr(NE,NB,0,NY,NX)
-    ENDDO
-  ENDDO
-  RC0ff(NY,NX)=RC0ff(NY,NX)+tDElmt(ielmc)
-  DO NE=1,NumPlantChemElms  
-    DES(NE)=DES(NE)+tDElmt(NE)
-    TOMET(NE,NY,NX)=TOMET(NE,NY,NX)+tDElmt(NE)
-  ENDDO
-  OMCL(0,NY,NX)=OMCL(0,NY,NX)+tDElmt(ielmc)
-  OMNL(0,NY,NX)=OMNL(0,NY,NX)+tDElmt(ielmn)
-
-  !
-  !     TOTAL MICROBIAL RESIDUE C,N,P
-  !
-  DO NE=1,NumPlantChemElms  
-    DES(NE)=DES(NE)+SUM(OMBioResdu_vr(NE,1:ndbiomcp,1:NumOfLitrCmplxs,0,NY,NX))
-  ENDDO
-  DO K=1,NumOfLitrCmplxs
-    RC0(K,NY,NX)=RC0(K,NY,NX)+SUM(OMBioResdu_vr(ielmc,1:ndbiomcp,K,0,NY,NX))
-    RC0(K,NY,NX)=RC0(K,NY,NX)+DOM(idom_doc,K,0,NY,NX)+DOM_Macp(idom_doc,K,0,NY,NX) &
-      +SorbedOM_vr(ielmc,K,0,NY,NX)+DOM(idom_acetate,K,0,NY,NX) &
-      +DOM_Macp(idom_acetate,K,0,NY,NX)+SorbedOM_vr(idom_acetate,K,0,NY,NX)
-    RC0(K,NY,NX)=RC0(K,NY,NX)+SUM(SolidOM_vr(ielmc,1:jsken,K,0,NY,NX))
-  ENDDO
-
-!
-!     TOTAL DOC, DON, DOP
-!
-  DES(idom_doc)=DES(idom_doc)+SUM(DOM(idom_doc,1:NumOfLitrCmplxs,0,NY,NX)) &
-    +SUM(DOM_Macp(idom_doc,1:NumOfLitrCmplxs,0,NY,NX)) &
-    +SUM(SorbedOM_vr(ielmc,1:NumOfLitrCmplxs,0,NY,NX))+SUM(DOM(idom_acetate,1:NumOfLitrCmplxs,0,NY,NX)) &
-    +SUM(DOM_Macp(idom_acetate,1:NumOfLitrCmplxs,0,NY,NX)) &
-    +SUM(SorbedOM_vr(idom_acetate,1:NumOfLitrCmplxs,0,NY,NX))
-
-  DES(idom_don)=DES(idom_don)+SUM(DOM(idom_don,1:NumOfLitrCmplxs,0,NY,NX)) &
-    +SUM(DOM_Macp(idom_don,1:NumOfLitrCmplxs,0,NY,NX)) &
-    +SUM(SorbedOM_vr(ielmn,1:NumOfLitrCmplxs,0,NY,NX))
-  DES(idom_dop)=DES(idom_dop)+SUM(DOM(idom_dop,1:NumOfLitrCmplxs,0,NY,NX)) &
-    +SUM(DOM_Macp(idom_dop,1:NumOfLitrCmplxs,0,NY,NX)) &
-    +SUM(SorbedOM_vr(ielmp,1:NumOfLitrCmplxs,0,NY,NX))
-!
-    !     TOTAL PLANT RESIDUE C,N,P
-!
-  DO NE=1,NumPlantChemElms
-    DES(NE)=DES(NE)+SUM(SolidOM_vr(NE,1:jsken,1:NumOfLitrCmplxs,0,NY,NX))
-  ENDDO
-
-  ORGC_vr(0,NY,NX)=DES(ielmc)
-  ORGN_vr(0,NY,NX)=DES(ielmn)
-  ORGP_vr(0,NY,NX)=DES(ielmp)
-  OMLitrC_vr(0,NY,NX)=DES(ielmc)
+  OMLitrC_vr(0,NY,NX)=litrOM(ielmc)
 
   DO NE=1,NumPlantChemElms
-    LitRMStoreLndscap(NE)=LitRMStoreLndscap(NE)+DES(NE)
-    URSDM(NE,NY,NX)=URSDM(NE,NY,NX)+DES(NE)
+    LitRMStoreLndscap(NE)=LitRMStoreLndscap(NE)+litrOM(NE)
+    tLitrOM_col(NE,NY,NX)=tLitrOM_col(NE,NY,NX)+litrOM(NE)
   ENDDO
+
   WS=CanH2OHeldVg(NY,NX)+CanWatg(NY,NX)+VLWatMicP(0,NY,NX)+VLiceMicP(0,NY,NX)*DENSICE
   WaterStoreLandscape=WaterStoreLandscape+WS
   UVLWatMicP(NY,NX)=UVLWatMicP(NY,NX)+WS
@@ -832,7 +757,7 @@ module RedistMod
 
   IF(salt_model)call DiagSurfLitRLayerSalt(NY,NX,TLPO4)
 
-  end subroutine SumLitterLayerChemMass
+  end subroutine LitterLayerSummary
 !------------------------------------------------------------------------------------------
 
   subroutine DiagSurfLitRLayerSalt(NY,NX,TLPO4)
@@ -1025,23 +950,12 @@ module RedistMod
 !
     D8560: DO K=1,jcplx
       do idom=idom_beg,idom_end
-        DOM(idom,K,L,NY,NX)=DOM(idom,K,L,NY,NX)+DOM_Transp2Micp_flx(idom,K,L,NY,NX) &
+        DOM_vr(idom,K,L,NY,NX)=DOM_vr(idom,K,L,NY,NX)+DOM_Transp2Micp_flx(idom,K,L,NY,NX) &
           +DOM_PoreTranspFlx(idom,K,L,NY,NX)
-        DOM(idom,K,L,NY,NX)=DOM(idom,K,L,NY,NX)+DOM_Transp2Micp_flx(idom,K,L,NY,NX) &
-          +DOM_PoreTranspFlx(idom,K,L,NY,NX)
-        DOM(idom,K,L,NY,NX)=DOM(idom,K,L,NY,NX)+DOM_Transp2Micp_flx(idom,K,L,NY,NX) &
-          +DOM_PoreTranspFlx(idom,K,L,NY,NX)
-        DOM(idom,K,L,NY,NX)=DOM(idom,K,L,NY,NX)+DOM_Transp2Micp_flx(idom,K,L,NY,NX) &
-          +DOM_PoreTranspFlx(idom,K,L,NY,NX)
+          
+        DOM_MacP_vr(idom,K,L,NY,NX)=DOM_MacP_vr(idom,K,L,NY,NX)+DOM_Transp2Macp_flx(idom,K,L,NY,NX) &
+          -DOM_PoreTranspFlx(idom,K,L,NY,NX)
 
-        DOM_Macp(idom,K,L,NY,NX)=DOM_Macp(idom,K,L,NY,NX)+DOM_Transp2Macp_flx(idom,K,L,NY,NX) &
-          -DOM_PoreTranspFlx(idom,K,L,NY,NX)
-        DOM_Macp(idom,K,L,NY,NX)=DOM_Macp(idom,K,L,NY,NX)+DOM_Transp2Macp_flx(idom,K,L,NY,NX) &
-          -DOM_PoreTranspFlx(idom,K,L,NY,NX)
-        DOM_Macp(idom,K,L,NY,NX)=DOM_Macp(idom,K,L,NY,NX)+DOM_Transp2Macp_flx(idom,K,L,NY,NX) &
-          -DOM_PoreTranspFlx(idom,K,L,NY,NX)
-        DOM_Macp(idom,K,L,NY,NX)=DOM_Macp(idom,K,L,NY,NX)+DOM_Transp2Macp_flx(idom,K,L,NY,NX) &
-          -DOM_PoreTranspFlx(idom,K,L,NY,NX)
       enddo
     ENDDO D8560
     !
@@ -1049,7 +963,7 @@ module RedistMod
     !
     D195: DO K=1,jcplx
       DO NE=1,NumPlantChemElms
-      DOM(NE,K,L,NY,NX)=DOM(NE,K,L,NY,NX)+TDFOME(NE,K,L,NY,NX)
+      DOM_vr(NE,K,L,NY,NX)=DOM_vr(NE,K,L,NY,NX)+TDFOME(NE,K,L,NY,NX)
       ENDDO
     ENDDO D195
     !
@@ -1419,11 +1333,12 @@ module RedistMod
   integer, intent(in) :: L,NY,NX
   real(r8), intent(in):: DORGEC
   real(r8), intent(out):: DORGCL
-  real(r8) :: DES(NumPlantChemElms),OM(NumPlantChemElms)
 
-  integer :: K,N,M,NGL,NE
-  integer :: NumOfLitrCmplxs
-  real(r8) :: tDES(NumPlantChemElms)
+  real(r8) :: ORGM(NumPlantChemElms)
+  real(r8) :: litrOM(NumPlantChemElms)
+  real(r8) :: HumOM(NumPlantChemElms)
+  
+  integer :: NE
     !     TOTAL SOC,SON,SOP
     !
     !     OMC=microbial biomass, ORC=microbial residue
@@ -1433,98 +1348,44 @@ module RedistMod
     !     OSC=SOC(K=0:woody litter, K=1:non-woody litter,
     !     K=2:manure, K=3:POC, K=4:humus)
 !
-  NumOfLitrCmplxs  = micpar%NumOfLitrCmplxs
+  !sum up living microbes
+  call sumMicBiomLayL(L,NY,NX,ORGM)
 
-  DES(:)=0.0_r8
-  OM(:)=0.0_r8
-  OMCL(L,NY,NX)=0.0_r8
-  OMNL(L,NY,NX)=0.0_r8
-
-! add living microbes
-  DO K=1,jcplx
-    DO NE=1,NumPlantChemElms
-      tDES(NE)=SUM(mBOMHeter_vr(NE,1:NumLiveHeterBioms,K,L,NY,NX))
-    ENDDO
-
-    IF(micpar%is_litter(K))THEN  
-      !K=0,1,2: woody litr, nonwoody litr, and manure
-      DO NE=1,NumPlantChemElms
-        DES(NE)=DES(NE)+tDES(NE)
-        TOMET(NE,NY,NX)=TOMET(NE,NY,NX)+tDES(NE)
-      ENDDO
-      OMCL(L,NY,NX)=OMCL(L,NY,NX)+tDES(ielmc)
-      OMNL(L,NY,NX)=OMNL(L,NY,NX)+tDES(ielmn)
-    ELSE
-      DO NE=1,NumPlantChemElms
-        OM(NE)=OM(NE)+tDES(NE)
-        TOMET(NE,NY,NX)=TOMET(NE,NY,NX)+tDES(NE)
-      ENDDO
-      OMCL(L,NY,NX)=OMCL(L,NY,NX)+tDES(ielmc)
-      OMNL(L,NY,NX)=OMNL(L,NY,NX)+tDES(ielmn)
-    ENDIF
-  ENDDO
-
-! add autotrophs
   DO NE=1,NumPlantChemElms
-    tDES(NE)=SUM(mBOMAutor_vr(NE,1:NumLiveAutoBioms,L,NY,NX))
-    OM(NE)=OM(NE)+tDES(NE)
-    TOMET(NE,NY,NX)=TOMET(NE,NY,NX)+tDES(NE)
+    tMicBiome(NE,NY,NX)=tMicBiome(NE,NY,NX)+ORGM(NE)
   ENDDO
-  OMCL(L,NY,NX)=OMCL(L,NY,NX)+tDES(ielmc)
-  OMNL(L,NY,NX)=OMNL(L,NY,NX)+tDES(ielmn)
+  
+  
+  call sumORGMLayL(L,NY,NX,ORGM)
+  
+  ORGC_vr(L,NY,NX)=ORGM(ielmc)
+  ORGN_vr(L,NY,NX)=ORGM(ielmn)
+  ORGP_vr(L,NY,NX)=ORGM(ielmp)
 
-  DO K=1,jcplx
-    IF(micpar%is_litter(K))THEN
-! litter + manure
-      DO NE=1,NumPlantChemElms
-        DES(NE)=DES(NE)+SUM(OMBioResdu_vr(NE,1:ndbiomcp,K,L,NY,NX))
-      ENDDO
+  !sum up litter complexes
+  call sumLitrOMLayL(L,NY,NX,litrOM)
+  OMLitrC_vr(L,NY,NX)=litrOM(ielmc)
 
-      DES(ielmc)=DES(ielmc)+DOM(idom_doc,K,L,NY,NX)+DOM_Macp(idom_doc,K,L,NY,NX)+SorbedOM_vr(ielmc,K,L,NY,NX) &
-        +DOM(idom_acetate,K,L,NY,NX)+DOM_Macp(idom_acetate,K,L,NY,NX)+SorbedOM_vr(idom_acetate,K,L,NY,NX)
-      DES(ielmn)=DES(ielmn)+DOM(idom_don,K,L,NY,NX)+DOM_Macp(idom_don,K,L,NY,NX)+SorbedOM_vr(ielmn,K,L,NY,NX)
-      DES(ielmp)=DES(ielmp)+DOM(idom_dop,K,L,NY,NX)+DOM_Macp(idom_dop,K,L,NY,NX)+SorbedOM_vr(ielmp,K,L,NY,NX)
-
-      DO NE=1,NumPlantChemElms
-        DES(NE)=DES(NE)+SUM(SolidOM_vr(NE,1:jsken,K,L,NY,NX))
-      ENDDO
-    ELSE
-      DO NE=1,NumPlantChemElms    
-        OM(NE)=OM(NE)+SUM(OMBioResdu_vr(NE,1:ndbiomcp,K,L,NY,NX))
-      ENDDO
-      OM(ielmc)=OM(ielmc)+DOM(idom_doc,K,L,NY,NX)+DOM_Macp(idom_doc,K,L,NY,NX)+SorbedOM_vr(ielmc,K,L,NY,NX) &
-        +DOM(idom_acetate,K,L,NY,NX)+DOM_Macp(idom_acetate,K,L,NY,NX)+SorbedOM_vr(idom_acetate,K,L,NY,NX)
-      OM(ielmn)=OM(ielmn)+DOM(idom_don,K,L,NY,NX)+DOM_Macp(idom_don,K,L,NY,NX)+SorbedOM_vr(ielmn,K,L,NY,NX)
-      OM(ielmp)=OM(ielmp)+DOM(idom_dop,K,L,NY,NX)+DOM_Macp(idom_dop,K,L,NY,NX)+SorbedOM_vr(ielmp,K,L,NY,NX)
-
-      DO NE=1,NumPlantChemElms    
-        OM(NE)=OM(NE)+SUM(SolidOM_vr(NE,1:jsken,K,L,NY,NX))
-      ENDDO
-    ENDIF
-  ENDDO
-  !litter plus non-litter
-  ORGC_vr(L,NY,NX)=DES(ielmc)+OM(ielmc)
-  ORGN_vr(L,NY,NX)=DES(ielmn)+OM(ielmn)
-  ORGP_vr(L,NY,NX)=DES(ielmp)+OM(ielmp)
-  OMLitrC_vr(L,NY,NX)=DES(ielmc)
-
-  IF(iErosionMode.EQ.ieros_frzthawsom.OR.iErosionMode.EQ.ieros_frzthawsomeros)THEN
+  IF(iErosionMode.EQ.ieros_frzthawsom .OR. iErosionMode.EQ.ieros_frzthawsomeros)THEN
 ! change in organic C
-    DORGCL=ORGCX(L,NY,NX)-ORGC_vr(L,NY,NX)
+    DORGCL=ORGCX_vr(L,NY,NX)-ORGC_vr(L,NY,NX)
     IF(L.EQ.NU(NY,NX))THEN
       DORGCL=DORGCL+DORGEC
     ENDIF
   ELSE
     DORGCL=0.0_r8
   ENDIF
+  !sum non-litter complexes
+  call sumHumOMLayL(L,NY,NX,HumOM)
+
   DO NE=1,NumPlantChemElms
-    LitRMStoreLndscap(NE)=LitRMStoreLndscap(NE)+DES(NE)
-    URSDM(NE,NY,NX)=URSDM(NE,NY,NX)+DES(NE)
+    LitRMStoreLndscap(NE)=LitRMStoreLndscap(NE)+litrOM(NE)
+    tLitrOM_col(NE,NY,NX)=tLitrOM_col(NE,NY,NX)+litrOM(NE)
     
-    POMHumStoreLndscap(NE)=POMHumStoreLndscap(NE)+OM(NE)
-    UORGM(NE,NY,NX)=UORGM(NE,NY,NX)+OM(NE)
+    POMHumStoreLndscap(NE)=POMHumStoreLndscap(NE)+HumOM(NE)
+    tHumOM_col(NE,NY,NX)=tHumOM_col(NE,NY,NX)+HumOM(NE)
   ENDDO
-  TSEDSO=TSEDSO+(DES(ielmc)+OM(ielmc))*ppmc
+  TSEDSO=TSEDSO+(litrOM(ielmc)+HumOM(ielmc))*ppmc
   end subroutine SumOMStates
 
 !------------------------------------------------------------------------------------------

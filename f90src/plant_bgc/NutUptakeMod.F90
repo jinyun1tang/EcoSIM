@@ -1231,7 +1231,7 @@ module NutUptakeMod
     RootVH2O_pvr           => plt_morph%RootVH2O_pvr,          &
     RootMycoExudElm_pvr    => plt_rbgc%RootMycoExudElm_pvr,    &
     FracBulkSOMC_vr        => plt_soilchem%FracBulkSOMC_vr,    &
-    DOM                    => plt_soilchem%DOM                 &
+    DOM_vr                 => plt_soilchem%DOM_vr              &
   )
   !
   !     ROOT EXUDATION OF C, N AND P DEPENDS ON CONCN DIFFERENCES
@@ -1256,15 +1256,15 @@ module NutUptakeMod
     IF(VLWatMicPK.GT.ZEROS2.AND.RootVH2O_pvr(N,L,NZ).GT.ZEROP(NZ))THEN
       VLWatMicPT=VLWatMicPK+RootVH2O_pvr(N,L,NZ)
       CPOOLX=AMIN1(1.25E+03_r8*RootVH2O_pvr(N,L,NZ),RootMycoNonstElms_rpvr(ielmc,N,L,NZ))
-      XFRE(ielmc)=(DOM(idom_doc,K,L)*RootVH2O_pvr(N,L,NZ)-CPOOLX*VLWatMicPK)/VLWatMicPT
+      XFRE(ielmc)=(DOM_vr(idom_doc,K,L)*RootVH2O_pvr(N,L,NZ)-CPOOLX*VLWatMicPK)/VLWatMicPT
       !XFRC, positive into plants
       RootMycoExudElm_pvr(ielmc,N,K,L,NZ)=FEXUDE(ielmc)*XFRE(ielmc)
-      IF(DOM(idom_doc,K,L).GT.ZEROS.AND. RootMycoNonstElms_rpvr(ielmc,N,L,NZ).GT.ZEROP(NZ))THEN
-        CPOOLT=DOM(idom_doc,K,L)+RootMycoNonstElms_rpvr(ielmc,N,L,NZ)
+      IF(DOM_vr(idom_doc,K,L).GT.ZEROS.AND. RootMycoNonstElms_rpvr(ielmc,N,L,NZ).GT.ZEROP(NZ))THEN
+        CPOOLT=DOM_vr(idom_doc,K,L)+RootMycoNonstElms_rpvr(ielmc,N,L,NZ)
         ZPOOLX=0.1_r8*RootMycoNonstElms_rpvr(ielmn,N,L,NZ)
         PPOOLX=0.1_r8*RootMycoNonstElms_rpvr(ielmp,N,L,NZ)
-        XFRE(ielmn)=(DOM(idom_don,K,L)*RootMycoNonstElms_rpvr(ielmc,N,L,NZ)-ZPOOLX*DOM(idom_doc,K,L))/CPOOLT
-        XFRE(ielmp)=(DOM(idom_dop,K,L)*RootMycoNonstElms_rpvr(ielmc,N,L,NZ)-PPOOLX*DOM(idom_doc,K,L))/CPOOLT
+        XFRE(ielmn)=(DOM_vr(idom_don,K,L)*RootMycoNonstElms_rpvr(ielmc,N,L,NZ)-ZPOOLX*DOM_vr(idom_doc,K,L))/CPOOLT
+        XFRE(ielmp)=(DOM_vr(idom_dop,K,L)*RootMycoNonstElms_rpvr(ielmc,N,L,NZ)-PPOOLX*DOM_vr(idom_doc,K,L))/CPOOLT
         RootMycoExudElm_pvr(ielmn,N,K,L,NZ)=FEXUDE(ielmn)*XFRE(ielmn)
         RootMycoExudElm_pvr(ielmp,N,K,L,NZ)=FEXUDE(ielmp)*XFRE(ielmp)
       ELSE

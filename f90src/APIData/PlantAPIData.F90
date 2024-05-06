@@ -376,7 +376,7 @@ implicit none
   real(r8), pointer :: trc_solcl_vr(:,:) => null() !aqueous tracer concentration [g m-3]
   real(r8), pointer :: trc_gascl_vr(:,:) => null() !gaseous tracer concentration [g m-3]
 
-  real(r8), pointer :: CORGC(:)    => null()  !soil organic C content [gC kg soil-1]
+  real(r8), pointer :: CORGC_vr(:)    => null()  !soil organic C content [gC kg soil-1]
 
   real(r8), pointer :: HydroCondMicP4RootUptake(:)     => null()  !soil micropore hydraulic conductivity for root water uptake [m MPa-1 h-1]
 
@@ -397,7 +397,7 @@ implicit none
   real(r8), pointer :: VLWatMicP(:)     => null()  !soil micropore water content [m3 d-2]
   real(r8), pointer :: VLMicP(:)     => null()  !total volume in micropores [m3 d-2]
 
-  real(r8), pointer :: DOM(:,:,:)    => null()  !dissolved organic C micropore	[gC d-2]
+  real(r8), pointer :: DOM_vr(:,:,:)    => null()  !dissolved organic C micropore	[gC d-2]
   real(r8), pointer :: trc_solml_vr(:,:)=> null() !aqueous tracer [g d-2]
   contains
     procedure, public :: Init => plt_soilchem_init
@@ -1431,12 +1431,12 @@ implicit none
   allocate(this%VLWatMicP(0:JZ1));this%VLWatMicP=spval
   allocate(this%VLMicP(0:JZ1));this%VLMicP=spval
   allocate(this%trcs_VLN_vr(ids_nuts_beg:ids_nuts_end,0:JZ1));this%trcs_VLN_vr=spval
-  allocate(this%DOM(idom_beg:idom_end,1:jcplx,0:JZ1));this%DOM=spval
+  allocate(this%DOM_vr(idom_beg:idom_end,1:jcplx,0:JZ1));this%DOM_vr=spval
   allocate(this%trc_solml_vr(ids_beg:ids_end,0:JZ1));this%trc_solml_vr=spval
 
   allocate(this%trc_gasml_vr(idg_beg:idg_end,0:JZ1));this%trc_gasml_vr=spval
   allocate(this%trc_gascl_vr(idg_beg:idg_end,0:JZ1));this%trc_gascl_vr=spval
-  allocate(this%CORGC(0:JZ1));this%CORGC=spval
+  allocate(this%CORGC_vr(0:JZ1));this%CORGC_vr=spval
 
   allocate(this%trc_solcl_vr(ids_beg:ids_end,0:jZ1));this%trc_solcl_vr=spval
 

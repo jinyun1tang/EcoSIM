@@ -67,7 +67,7 @@ module NitroDisturbMod
         IF(L.EQ.0 .OR. L.GE.NUM(NY,NX))THEN
           IF(IFLGJ.EQ.1)THEN
             exit
-          ELSEIF(THETW_vr(L,NY,NX).GT.FVLWB .OR. CORGC(L,NY,NX).LE.FORGC)THEN
+          ELSEIF(THETW_vr(L,NY,NX).GT.FVLWB .OR. CORGC_vr(L,NY,NX).LE.FORGC)THEN
             IFLGJ=1
           ELSE
             NLL=L
@@ -86,8 +86,8 @@ module NitroDisturbMod
           ELSE
             FORGCX=FORGC
           ENDIF
-          DCORPC=AMIN1(0.999_r8,DCORP(I,NY,NX))*(CORGC(L,NY,NX)-FORGCX) &
-            /(AMAX1(CORGC(L,NY,NX),orgcden)-FORGCX)
+          DCORPC=AMIN1(0.999_r8,DCORP(I,NY,NX))*(CORGC_vr(L,NY,NX)-FORGCX) &
+            /(AMAX1(CORGC_vr(L,NY,NX),orgcden)-FORGCX)
         ELSE
           DCORPC=AMIN1(0.999_r8,DCORP(I,NY,NX))
         ENDIF
@@ -197,7 +197,7 @@ module NitroDisturbMod
 !     REMOVE DOC, DON, DOP
 !
             DO idom=idom_beg,idom_end
-              rmDOM(idom)=DCORPC*DOM(idom_doc,K,L,NY,NX)
+              rmDOM(idom)=DCORPC*DOM_vr(idom_doc,K,L,NY,NX)
             enddo
 
             ONX=EFIRE(1,ITILL(I,NY,NX))*rmDOM(ielmn)
@@ -210,7 +210,7 @@ module NitroDisturbMod
               OPL(1,K)=OPL(1,K)+rmDOM(ielmp)-OPX
             ENDIF
             DO idom=idom_beg,idom_end
-              DOM(idom,K,L,NY,NX)=DOM(idom,K,L,NY,NX)-rmDOM(idom)
+              DOM_vr(idom,K,L,NY,NX)=DOM_vr(idom,K,L,NY,NX)-rmDOM(idom)
             enddo
 
             OMelm(ielmc)=OMelm(ielmc)+rmDOM(idom_doc)+rmDOM(idom_acetate)            
@@ -218,7 +218,7 @@ module NitroDisturbMod
             OMelm(ielmp)=OMelm(ielmp)+OPX
 
             DO idom=idom_beg,idom_end
-              rmDOM(idom)=DCORPC*DOM_Macp(idom,K,L,NY,NX)
+              rmDOM(idom)=DCORPC*DOM_MacP_vr(idom,K,L,NY,NX)
             enddo
 
             ONX=EFIRE(1,ITILL(I,NY,NX))*rmDOM(ielmn)
@@ -231,7 +231,7 @@ module NitroDisturbMod
               OPL(1,K)=OPL(1,K)+rmDOM(ielmp)-OPX
             ENDIF
             DO idom=idom_beg,idom_end
-              DOM_Macp(idom,K,L,NY,NX)=DOM_Macp(idom,K,L,NY,NX)-rmDOM(idom)
+              DOM_MacP_vr(idom,K,L,NY,NX)=DOM_MacP_vr(idom,K,L,NY,NX)-rmDOM(idom)
             enddo
 
             OMelm(ielmc)=OMelm(ielmc)+rmDOM(idom_doc)+rmDOM(idom_acetate)            
@@ -257,10 +257,10 @@ module NitroDisturbMod
               SorbedOM_vr(idom,K,L,NY,NX)=SorbedOM_vr(idom,K,L,NY,NX)-rmDOM(idom)
             enddo
 
-            dOMelm(ielmc)=dOMelm(ielmc)+DOM(idom_doc,K,L,NY,NX)+DOM_Macp(idom_doc,K,L,NY,NX)+SorbedOM_vr(ielmc,K,L,NY,NX) &
-              +DOM(idom_acetate,K,L,NY,NX)+DOM_Macp(idom_acetate,K,L,NY,NX)+SorbedOM_vr(idom_acetate,K,L,NY,NX)
-            dOMelm(ielmn)=dOMelm(ielmn)+DOM(idom_don,K,L,NY,NX)+DOM_Macp(idom_don,K,L,NY,NX)+SorbedOM_vr(ielmn,K,L,NY,NX)
-            dOMelm(ielmp)=dOMelm(ielmp)+DOM(idom_dop,K,L,NY,NX)+DOM_Macp(idom_dop,K,L,NY,NX)+SorbedOM_vr(ielmp,K,L,NY,NX)
+            dOMelm(ielmc)=dOMelm(ielmc)+DOM_vr(idom_doc,K,L,NY,NX)+DOM_MacP_vr(idom_doc,K,L,NY,NX)+SorbedOM_vr(ielmc,K,L,NY,NX) &
+              +DOM_vr(idom_acetate,K,L,NY,NX)+DOM_MacP_vr(idom_acetate,K,L,NY,NX)+SorbedOM_vr(idom_acetate,K,L,NY,NX)
+            dOMelm(ielmn)=dOMelm(ielmn)+DOM_vr(idom_don,K,L,NY,NX)+DOM_MacP_vr(idom_don,K,L,NY,NX)+SorbedOM_vr(ielmn,K,L,NY,NX)
+            dOMelm(ielmp)=dOMelm(ielmp)+DOM_vr(idom_dop,K,L,NY,NX)+DOM_MacP_vr(idom_dop,K,L,NY,NX)+SorbedOM_vr(ielmp,K,L,NY,NX)
 
             OMelm(ielmc)=OMelm(ielmc)+rmDOM(idom_doc)+rmDOM(idom_acetate)
             OMelm(ielmn)=OMelm(ielmn)+ONX
@@ -330,7 +330,7 @@ module NitroDisturbMod
         ORGN_vr(L,NY,NX)=dOMelm(ielmn)
         ORGP_vr(L,NY,NX)=dOMelm(ielmp)
         IF(L.EQ.0)THEN
-          HFLXD=4.19E-06_r8*(ORGCX(L,NY,NX)-ORGC_vr(L,NY,NX))*TKS(L,NY,NX)
+          HFLXD=4.19E-06_r8*(ORGCX_vr(L,NY,NX)-ORGC_vr(L,NY,NX))*TKS(L,NY,NX)
           HEATOU=HEATOU+HFLXD
         ENDIF
 !     IF(L.EQ.0)THEN

@@ -211,7 +211,7 @@ implicit none
     call ncd_putvar(ncf,'pH',PH(L,NY,NX))
     call ncd_putvar(ncf,'VLSoilPoreMicP_vr',VLSoilPoreMicP_vr(L,NY,NX))
     call ncd_putvar(ncf,'ORGC',ORGC_vr(L,NY,NX))
-    call ncd_putvar(ncf,'CFOMC',CFOMC(:,L,NY,NX))
+    call ncd_putvar(ncf,'CFOMC',CFOMC_vr(:,L,NY,NX))
     call ncd_putvar(ncf,'VLSoilMicP',VLSoilMicP(L,NY,NX))
     call ncd_putvar(ncf,'BKVL',SoilMicPMassLayer(L,NY,NX))
     call ncd_putvar(ncf,'POROS',POROS(L,NY,NX))
@@ -254,7 +254,7 @@ implicit none
     call ncd_putvar(ncf,'BKDS',SoiBulkDensity(L,NY,NX))
 
     call ncd_putvar(ncf,'FracBulkSOMC_vr',FracBulkSOMC_vr(:,L,NY,NX))
-    call ncd_putvar(ncf,'OQM',DOM(:,:,L,NY,NX))
+    call ncd_putvar(ncf,'OQM',DOM_vr(:,:,L,NY,NX))
     call ncd_putvar(ncf,'OHM',SorbedOM_vr(:,:,L,NY,NX))
 
     call ncd_putvar(ncf,'CNOSC',CNOSC(:,:,L,NY,NX))

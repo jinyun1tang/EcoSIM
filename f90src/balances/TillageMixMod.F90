@@ -180,16 +180,16 @@ module TillageMixMod
       ENDDO
 
       DO idom=idom_beg,idom_end
-        TDOMG(idom,K)=DOM(idom,K,0,NY,NX)*CORP0
-        TDOMH(idom,K)=DOM_Macp(idom,K,0,NY,NX)*CORP0
+        TDOMG(idom,K)=DOM_vr(idom,K,0,NY,NX)*CORP0
+        TDOMH(idom,K)=DOM_MacP_vr(idom,K,0,NY,NX)*CORP0
         TDOMHG(idom,K)=SorbedOM_vr(idom,K,0,NY,NX)*CORP0
   !
 
   !     REDUCE SURFACE RESIDUE STATE VARIABLES FOR INCORPORATION
   !
-        DOM(idom,K,0,NY,NX)=DOM(idom,K,0,NY,NX)*XCORP0
+        DOM_vr(idom,K,0,NY,NX)=DOM_vr(idom,K,0,NY,NX)*XCORP0
         
-        DOM_Macp(idom,K,0,NY,NX)=DOM_Macp(idom,K,0,NY,NX)*XCORP0
+        DOM_MacP_vr(idom,K,0,NY,NX)=DOM_MacP_vr(idom,K,0,NY,NX)*XCORP0
         SorbedOM_vr(idom,K,0,NY,NX)=SorbedOM_vr(idom,K,0,NY,NX)*XCORP0
       enddo 
 
@@ -367,7 +367,7 @@ module TillageMixMod
           ENDDO
         ENDDO
         do idom=idom_beg,idom_end
-          TDOM(idom,K)=TDOM(idom,K)+TI*DOM(idom,K,L,NY,NX)
+          TDOM(idom,K)=TDOM(idom,K)+TI*DOM_vr(idom,K,L,NY,NX)
           TOHM(idom,K)=TOHM(idom,K)+TI*SorbedOM_vr(idom,K,L,NY,NX)
         enddo
         DO  M=1,jsken
@@ -513,9 +513,9 @@ module TillageMixMod
           ENDDO
 
           DO idom=idom_beg,idom_end
-            DOM(idom,K,L,NY,NX)=TI*DOM(idom,K,L,NY,NX)+CORP*(FI*TDOM(idom,K) &
-              -TI*DOM(idom,K,L,NY,NX))+TX*DOM(idom,K,L,NY,NX)+CORP*DOM_Macp(idom,K,L,NY,NX)
-            DOM_Macp(idom,K,L,NY,NX)=XCORP(NY,NX)*DOM_Macp(idom,K,L,NY,NX)
+            DOM_vr(idom,K,L,NY,NX)=TI*DOM_vr(idom,K,L,NY,NX)+CORP*(FI*TDOM(idom,K) &
+              -TI*DOM_vr(idom,K,L,NY,NX))+TX*DOM_vr(idom,K,L,NY,NX)+CORP*DOM_MacP_vr(idom,K,L,NY,NX)
+            DOM_MacP_vr(idom,K,L,NY,NX)=XCORP(NY,NX)*DOM_MacP_vr(idom,K,L,NY,NX)
             SorbedOM_vr(idom,K,L,NY,NX)=TI*SorbedOM_vr(idom,K,L,NY,NX)+CORP*(FI*TOHM(idom,K) &
               -TI*SorbedOM_vr(idom,K,L,NY,NX))+TX*SorbedOM_vr(idom,K,L,NY,NX)
           ENDDO  
@@ -565,8 +565,8 @@ module TillageMixMod
             ENDDO
           ENDDO
           DO idom=idom_beg,idom_end
-            DOM(idom,K,L,NY,NX)=DOM(idom,K,L,NY,NX)+FI*TDOMG(idom,K)
-            DOM_Macp(idom,K,L,NY,NX)=DOM_Macp(idom,K,L,NY,NX)+FI*TDOMH(idom,K)
+            DOM_vr(idom,K,L,NY,NX)=DOM_vr(idom,K,L,NY,NX)+FI*TDOMG(idom,K)
+            DOM_MacP_vr(idom,K,L,NY,NX)=DOM_MacP_vr(idom,K,L,NY,NX)+FI*TDOMH(idom,K)
             SorbedOM_vr(idom,K,L,NY,NX)=SorbedOM_vr(idom,K,L,NY,NX)+FI*TDOMHG(idom,K)
           ENDDO
           DO  M=1,jsken
