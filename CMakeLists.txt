@@ -8,28 +8,29 @@ set (ECOSIM_MINOR_VERSION 1)
 set (ECOSIM_PATCH_VERSION 0)
 set (ECOSIM_VERSION "${ECOSIM_MAJOR_VERSION}.${ECOSIM_MINOR_VERSION}.${ECOSIM_PATCH_VERSION}")
 
+message("We are in the EcoSIM top-level CMakeLists")
+
 # Adjust CMake's module path.
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
 # Options for building EcoSIM. These come from the xSDK compliance rules.
-option(USE_XSDK_DEFAULTS "Set to use xSDK defaults for options [ON]." ON)
-option(CMAKE_INSTALL_PREFIX "Sets installation prefix [/usr/local].")
-option(XSDK_ENABLE_DEBUG "Enables Debug mode builds [OFF]." OFF)
-option(BUILD_SHARED_LIBS "Builds shared libraries [OFF]." OFF)
-option(XSDK_WITH_NETCDF "Enables support for netcdf [OFF]." ON)
-option(TPL_NETCDF_LIBRARIES "List of absolute paths to netcdf link libraries [].")
-option(TPL_NETCDF_INCLUDE_DIRS "List of absolute paths to netcdf include directories [].")
-
-if (BUILD_SHARED_LIBS)
-	message("-- EcoSIM will be built as a shared library.")
-else()
-	message("-- EcoSIM will be built as a static library.")
-endif()
+#ioption(USE_XSDK_DEFAULTS "Set to use xSDK defaults for options [ON]." ON)
+#option(CMAKE_INSTALL_PREFIX "Sets installation prefix [/usr/local].")
+#option(XSDK_ENABLE_DEBUG "Enables Debug mode builds [OFF]." OFF)
+#option(BUILD_SHARED_LIBS "Builds shared libraries [OFF]." OFF)
+#option(XSDK_WITH_NETCDF "Enables support for netcdf [OFF]." ON)
+#option(TPL_NETCDF_LIBRARIES "List of absolute paths to netcdf link libraries [].")
+#option(TPL_NETCDF_INCLUDE_DIRS "List of absolute paths to netcdf include directories [].")
 
 message(STATUS "ATS_ECOSIM_BUILD: ${ATS_ECOSIM_BUILD}")
 if (ATS_ECOSIM_BUILD)
   message(STATUS "Building EcoSIM within ATS")
 endif()
+
+message(STATUS "Environment variables:")
+foreach (env_var IN LISTS ENV)
+    message(STATUS "${env_var}=${$ENV{env_var}}")
+endforeach()
 
 if (NOT CMAKE_INSTALL_PREFIX)
   set(CMAKE_INSTALL_PREFIX local)
