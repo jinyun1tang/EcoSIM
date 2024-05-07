@@ -710,14 +710,14 @@ implicit none
   real(r8), pointer :: trcg_air2root_flx__pvr(:,:,:,:)    => null()  !gaseous tracer flux through roots, [g d-2 h-1]
   real(r8), pointer :: trcg_Root_DisEvap_flx_vr(:,:,:,:)    => null()  !dissolution (+ve) - volatilization (-ve) gas flux in roots, [g d-2 h-1]
   real(r8), pointer :: RootO2Dmnd4Resp_pvr(:,:,:)     => null()  !root  O2 demand from respiration, [g d-2 h-1]
-  real(r8), pointer :: RUNNHP(:,:,:)    => null()  !root uptake of NH4 non-band unconstrained by NH4, [g d-2 h-1]
-  real(r8), pointer :: RUNNBP(:,:,:)    => null()  !root uptake of NO3 band unconstrained by NO3, [g d-2 h-1]
-  real(r8), pointer :: RUNNOP(:,:,:)    => null()  !root uptake of NH4 band unconstrained by NH4, [g d-2 h-1]
-  real(r8), pointer :: RUNNXP(:,:,:)    => null()  !root uptake of NO3 non-band unconstrained by NO3, [g d-2 h-1]
-  real(r8), pointer :: RUPP2P(:,:,:)    => null()  !root uptake of H2PO4 non-band
-  real(r8), pointer :: RUPP2B(:,:,:)    => null()  !root uptake of H2PO4 band
-  real(r8), pointer :: RUPP1P(:,:,:)    => null()  !HPO4 demand in non-band by each root population
-  real(r8), pointer :: RUPP1B(:,:,:)    => null()  !HPO4 demand in band by each root population
+  real(r8), pointer :: RootNH4DmndSoil_pvr(:,:,:)    => null()  !root uptake of NH4 non-band unconstrained by NH4, [g d-2 h-1]
+  real(r8), pointer :: RootNH4DmndBand_pvr(:,:,:)    => null()  !root uptake of NO3 band unconstrained by NO3, [g d-2 h-1]
+  real(r8), pointer :: RootNO3DmndSoil_pvr(:,:,:)    => null()  !root uptake of NH4 band unconstrained by NH4, [g d-2 h-1]
+  real(r8), pointer :: RootNO3DmndBand_pvr(:,:,:)    => null()  !root uptake of NO3 non-band unconstrained by NO3, [g d-2 h-1]
+  real(r8), pointer :: RootH2PO4DmndSoil_pvr(:,:,:)    => null()  !root uptake of H2PO4 non-band
+  real(r8), pointer :: RootH2PO4DmndBand_pvr(:,:,:)    => null()  !root uptake of H2PO4 band
+  real(r8), pointer :: RootH1PO4DmndSoil_pvr(:,:,:)    => null()  !HPO4 demand in non-band by each root population
+  real(r8), pointer :: RootH1PO4DmndBand_pvr(:,:,:)    => null()  !HPO4 demand in band by each root population
   real(r8), pointer :: RAutoRootO2Limter_pvr(:,:,:)       => null()  !O2 constraint to root respiration, []
   real(r8), pointer :: trcg_rootml_pvr(:,:,:,:)=> null() !root gas content, [g d-2]
   real(r8), pointer :: trcs_rootml_pvr(:,:,:,:)=> null() !root aqueous content, [g d-2]
@@ -786,14 +786,14 @@ implicit none
   allocate(this%trcg_air2root_flx__pvr(idg_beg:idg_end-1,2,JZ1,JP1));this%trcg_air2root_flx__pvr=spval
   allocate(this%trcg_Root_DisEvap_flx_vr(idg_beg:idg_end-1,2,JZ1,JP1));this%trcg_Root_DisEvap_flx_vr=spval
   allocate(this%RootO2Dmnd4Resp_pvr(jroots,JZ1,JP1));this%RootO2Dmnd4Resp_pvr=spval
-  allocate(this%RUNNHP(jroots,JZ1,JP1));this%RUNNHP=spval
-  allocate(this%RUNNBP(jroots,JZ1,JP1));this%RUNNBP=spval
-  allocate(this%RUNNOP(jroots,JZ1,JP1));this%RUNNOP=spval
-  allocate(this%RUNNXP(jroots,JZ1,JP1));this%RUNNXP=spval
-  allocate(this%RUPP2P(jroots,JZ1,JP1));this%RUPP2P=spval
-  allocate(this%RUPP2B(jroots,JZ1,JP1));this%RUPP2B=spval
-  allocate(this%RUPP1P(jroots,JZ1,JP1));this%RUPP1P=spval
-  allocate(this%RUPP1B(jroots,JZ1,JP1));this%RUPP1B=spval
+  allocate(this%RootNH4DmndSoil_pvr(jroots,JZ1,JP1));this%RootNH4DmndSoil_pvr=spval
+  allocate(this%RootNH4DmndBand_pvr(jroots,JZ1,JP1));this%RootNH4DmndBand_pvr=spval
+  allocate(this%RootNO3DmndSoil_pvr(jroots,JZ1,JP1));this%RootNO3DmndSoil_pvr=spval
+  allocate(this%RootNO3DmndBand_pvr(jroots,JZ1,JP1));this%RootNO3DmndBand_pvr=spval
+  allocate(this%RootH2PO4DmndSoil_pvr(jroots,JZ1,JP1));this%RootH2PO4DmndSoil_pvr=spval
+  allocate(this%RootH2PO4DmndBand_pvr(jroots,JZ1,JP1));this%RootH2PO4DmndBand_pvr=spval
+  allocate(this%RootH1PO4DmndSoil_pvr(jroots,JZ1,JP1));this%RootH1PO4DmndSoil_pvr=spval
+  allocate(this%RootH1PO4DmndBand_pvr(jroots,JZ1,JP1));this%RootH1PO4DmndBand_pvr=spval
 
   allocate(this%RAutoRootO2Limter_pvr(jroots,JZ1,JP1));this%RAutoRootO2Limter_pvr=spval
   allocate(this%CMinPO4Root_pft(jroots,JP1));this%CMinPO4Root_pft=spval
@@ -889,14 +889,14 @@ implicit none
 !  if(allocated(RNHDFA))deallocate(RNHDFA)
 !  if(allocated(RHGDFA))deallocate(RHGDFA)
 !  if(allocated(RootO2Dmnd4Resp_pvr))deallocate(RootO2Dmnd4Resp_pvr)
-!  if(allocated(RUNNHP))deallocate(RUNNHP)
-!  if(allocated(RUNNBP))deallocate(RUNNBP)
-!  if(allocated(RUNNOP))deallocate(RUNNOP)
-!  if(allocated(RUNNXP))deallocate(RUNNXP)
-!  if(allocated(RUPP2P))deallocate(RUPP2P)
-!  if(allocated(RUPP2B))deallocate(RUPP2B)
-!  if(allocated(RUPP1P))deallocate(RUPP1P)
-!  if(allocated(RUPP1B))deallocate(RUPP1B)
+!  if(allocated(RootNH4DmndSoil_pvr))deallocate(RootNH4DmndSoil_pvr)
+!  if(allocated(RootNH4DmndBand_pvr))deallocate(RootNH4DmndBand_pvr)
+!  if(allocated(RootNO3DmndSoil_pvr))deallocate(RootNO3DmndSoil_pvr)
+!  if(allocated(RootNO3DmndBand_pvr))deallocate(RootNO3DmndBand_pvr)
+!  if(allocated(RootH2PO4DmndSoil_pvr))deallocate(RootH2PO4DmndSoil_pvr)
+!  if(allocated(RootH2PO4DmndBand_pvr))deallocate(RootH2PO4DmndBand_pvr)
+!  if(allocated(RootH1PO4DmndSoil_pvr))deallocate(RootH1PO4DmndSoil_pvr)
+!  if(allocated(RootH1PO4DmndBand_pvr))deallocate(RootH1PO4DmndBand_pvr)
 !  if(allocated(RAutoRootO2Limter_pvr))deallocate(RAutoRootO2Limter_pvr)
 !  if(allocated(CMinPO4Root_pft))deallocate(CMinPO4Root_pft)
 !  if(allocated(VmaxPO4Root_pft))deallocate(VmaxPO4Root_pft)

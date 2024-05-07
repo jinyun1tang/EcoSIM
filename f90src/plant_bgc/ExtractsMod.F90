@@ -47,20 +47,20 @@ module ExtractsMod
   implicit none
   integer :: NZ,L,K,M
   integer :: NE
-  associate(                             &
-   NP0                       => plt_site%NP0        , &
-   WGLFT                     => plt_biom%WGLFT      , &
-   StandingDeadStrutElms_col => plt_biom%StandingDeadStrutElms_col   , &
-   StandDeadStrutElms_pft    => plt_biom%StandDeadStrutElms_pft     , &
-   LitrfalStrutElms_pft      => plt_bgcr%LitrfalStrutElms_pft      , &
-   LitrFallStrutElms_col     => plt_bgcr%LitrFallStrutElms_col      , &
-   LitrfalStrutElms_vr       => plt_bgcr%LitrfalStrutElms_vr       , &
-   LitrfalStrutElms_pvr       => plt_bgcr%LitrfalStrutElms_pvr       , &
-   MaxSoiL4Root              => plt_morph%MaxSoiL4Root       , &
-   CanopyStemAareZ_col           => plt_morph%CanopyStemAareZ_col     , &
-   CanopyLeafAareZ_col          =>  plt_morph%CanopyLeafAareZ_col    , &
-   StemArea_col              =>  plt_morph%StemArea_col    , &
-   CanopyLeafArea_col        =>  plt_morph%CanopyLeafArea_col      &
+  associate(                                                        &
+   NP0                       => plt_site%NP0,                       &
+   WGLFT                     => plt_biom%WGLFT,                     &
+   StandingDeadStrutElms_col => plt_biom%StandingDeadStrutElms_col, &
+   StandDeadStrutElms_pft    => plt_biom%StandDeadStrutElms_pft,    &
+   LitrfalStrutElms_pft      => plt_bgcr%LitrfalStrutElms_pft,      &
+   LitrFallStrutElms_col     => plt_bgcr%LitrFallStrutElms_col,     &
+   LitrfalStrutElms_vr       => plt_bgcr%LitrfalStrutElms_vr,       &
+   LitrfalStrutElms_pvr      => plt_bgcr%LitrfalStrutElms_pvr,      &
+   MaxSoiL4Root              => plt_morph%MaxSoiL4Root,             &
+   CanopyStemAareZ_col       => plt_morph%CanopyStemAareZ_col,      &
+   CanopyLeafAareZ_col       => plt_morph%CanopyLeafAareZ_col,      &
+   StemArea_col              => plt_morph%StemArea_col,             &
+   CanopyLeafArea_col        => plt_morph%CanopyLeafArea_col        &
   )
   DO NZ=1,NP0
 !
@@ -111,13 +111,13 @@ module ExtractsMod
   implicit none
   integer, intent(in) :: NZ
   integer :: L
-  associate(                              &
-    CanopyLeafCLyr_pft    => plt_biom%CanopyLeafCLyr_pft      , &
-    WGLFT                 => plt_biom%WGLFT      , &
-    CanopyLeafAareZ_col      =>  plt_morph%CanopyLeafAareZ_col    , &
-    CanopyStemAreaZ_pft    =>  plt_morph%CanopyStemAreaZ_pft    , &
-    CanopyStemAareZ_col       => plt_morph%CanopyStemAareZ_col     , &
-    CanopyLeafAreaZ_pft    => plt_morph%CanopyLeafAreaZ_pft       &
+  associate(                                              &
+    CanopyLeafCLyr_pft  => plt_biom%CanopyLeafCLyr_pft,   &
+    WGLFT               => plt_biom%WGLFT,                &
+    CanopyLeafAareZ_col => plt_morph%CanopyLeafAareZ_col, &
+    CanopyStemAreaZ_pft => plt_morph%CanopyStemAreaZ_pft, &
+    CanopyStemAareZ_col => plt_morph%CanopyStemAareZ_col, &
+    CanopyLeafAreaZ_pft => plt_morph%CanopyLeafAreaZ_pft  &
   )
   DO L=1,NumOfCanopyLayers1
     CanopyLeafAareZ_col(L)=CanopyLeafAareZ_col(L)+CanopyLeafAreaZ_pft(L,NZ)
@@ -136,15 +136,15 @@ module ExtractsMod
   implicit none
   integer, intent(in) :: NZ
 
-  integer :: N,L,K,NTG,NE
+  integer :: N,L,K,NTG,NE,idg,ids
  
   associate(                                                        &
     NU                        => plt_site%NU,                       &
     AREA3                     => plt_site%AREA3,                    &
     PlantPopulation_pft       => plt_site%PlantPopulation_pft,      &
-    RUPP1B                    => plt_rbgc%RUPP1B,                   &
-    RUPP2B                    => plt_rbgc%RUPP2B,                   &
-    RUNNXP                    => plt_rbgc%RUNNXP,                   &
+    RootH1PO4DmndBand_pvr                    => plt_rbgc%RootH1PO4DmndBand_pvr,                   &
+    RootH2PO4DmndBand_pvr                    => plt_rbgc%RootH2PO4DmndBand_pvr,                   &
+    RootNO3DmndBand_pvr                    => plt_rbgc%RootNO3DmndBand_pvr,                   &
     RootO2Uptk_pvr            => plt_rbgc%RootO2Uptk_pvr,           &
     trcg_Root_DisEvap_flx_vr  => plt_rbgc%trcg_Root_DisEvap_flx_vr, &
     trcg_air2root_flx__pvr    => plt_rbgc%trcg_air2root_flx__pvr,   &
@@ -155,11 +155,11 @@ module ExtractsMod
     trcg_TLP                  => plt_rbgc%trcg_TLP,                 &
     RootO2Dmnd4Resp_pvr       => plt_rbgc%RootO2Dmnd4Resp_pvr,      &
     RootMycoExudElm_pvr       => plt_rbgc%RootMycoExudElm_pvr,      &
-    RUNNHP                    => plt_rbgc%RUNNHP,                   &
-    RUNNOP                    => plt_rbgc%RUNNOP,                   &
-    RUPP2P                    => plt_rbgc%RUPP2P,                   &
-    RUNNBP                    => plt_rbgc%RUNNBP,                   &
-    RUPP1P                    => plt_rbgc%RUPP1P,                   &
+    RootNH4DmndSoil_pvr                    => plt_rbgc%RootNH4DmndSoil_pvr,                   &
+    RootNO3DmndSoil_pvr                    => plt_rbgc%RootNO3DmndSoil_pvr,                   &
+    RootH2PO4DmndSoil_pvr                    => plt_rbgc%RootH2PO4DmndSoil_pvr,                   &
+    RootNH4DmndBand_pvr                    => plt_rbgc%RootNH4DmndBand_pvr,                   &
+    RootH1PO4DmndSoil_pvr                    => plt_rbgc%RootH1PO4DmndSoil_pvr,                   &
     trcs_plant_uptake_vr      => plt_rbgc%trcs_plant_uptake_vr,     &
     RNO3X                     => plt_bgcr%RNO3X,                    &
     RNH4X                     => plt_bgcr%RNH4X,                    &
@@ -168,7 +168,7 @@ module ExtractsMod
     RP14X                     => plt_bgcr%RP14X,                    &
     RNHBX                     => plt_bgcr%RNHBX,                    &
     ROXYX                     => plt_bgcr%ROXYX,                    &
-    tRootMycoExud2Soil_vr                    => plt_bgcr%tRootMycoExud2Soil_vr,                   &
+    tRootMycoExud2Soil_vr     => plt_bgcr%tRootMycoExud2Soil_vr,    &
     TRO2Uptk_vr               => plt_bgcr%TRO2Uptk_vr,              &
     TCO2P                     => plt_bgcr%TCO2P,                    &
     RPOBX                     => plt_bgcr%RPOBX,                    &
@@ -219,8 +219,10 @@ module ExtractsMod
           +trcg_air2root_flx__pvr(NTG,N,L,NZ)-trcg_Root_DisEvap_flx_vr(NTG,N,L,NZ)
       ENDDO
 
-      trcs_rootml_pvr(idg_CO2,N,L,NZ)=trcs_rootml_pvr(idg_CO2,N,L,NZ)+trcg_Root_DisEvap_flx_vr(idg_CO2,N,L,NZ)+RootCO2Emis_pvr(N,L,NZ)
-      trcs_rootml_pvr(idg_O2,N,L,NZ)=trcs_rootml_pvr(idg_O2,N,L,NZ)+trcg_Root_DisEvap_flx_vr(idg_O2,N,L,NZ)-RootO2Uptk_pvr(N,L,NZ)
+      trcs_rootml_pvr(idg_CO2,N,L,NZ)=trcs_rootml_pvr(idg_CO2,N,L,NZ) &
+        +trcg_Root_DisEvap_flx_vr(idg_CO2,N,L,NZ)+RootCO2Emis_pvr(N,L,NZ)
+      trcs_rootml_pvr(idg_O2,N,L,NZ)=trcs_rootml_pvr(idg_O2,N,L,NZ) &
+        +trcg_Root_DisEvap_flx_vr(idg_O2,N,L,NZ)-RootO2Uptk_pvr(N,L,NZ)
       trcs_rootml_pvr(idg_CH4,N,L,NZ)=trcs_rootml_pvr(idg_CH4,N,L,NZ) &
         +trcg_Root_DisEvap_flx_vr(idg_CH4,N,L,NZ)+RUPGasSol_vr(idg_CH4,N,L,NZ)
       trcs_rootml_pvr(idg_N2O,N,L,NZ)=trcs_rootml_pvr(idg_N2O,N,L,NZ) &
@@ -256,23 +258,13 @@ module ExtractsMod
 
       TCO2P(L)=TCO2P(L)-RootCO2Emis_pvr(N,L,NZ)
       TRO2Uptk_vr(L)=TRO2Uptk_vr(L)+RootO2Uptk_pvr(N,L,NZ)
-      trcs_plant_uptake_vr(idg_CO2,L)=trcs_plant_uptake_vr(idg_CO2,L)+RUPGasSol_vr(idg_CO2,N,L,NZ)
-      trcs_plant_uptake_vr(idg_O2,L)=trcs_plant_uptake_vr(idg_O2,L)+RUPGasSol_vr(idg_O2,N,L,NZ)
-      trcs_plant_uptake_vr(idg_CH4,L)=trcs_plant_uptake_vr(idg_CH4,L)+RUPGasSol_vr(idg_CH4,N,L,NZ)
-      trcs_plant_uptake_vr(idg_N2O,L)=trcs_plant_uptake_vr(idg_N2O,L)+RUPGasSol_vr(idg_N2O,N,L,NZ)
-      trcs_plant_uptake_vr(idg_NH3,L)=trcs_plant_uptake_vr(idg_NH3,L)+RUPGasSol_vr(idg_NH3,N,L,NZ)
-      trcs_plant_uptake_vr(idg_NH3B,L)=trcs_plant_uptake_vr(idg_NH3B,L)+RUPGasSol_vr(idg_NH3B,N,L,NZ)
-      trcs_plant_uptake_vr(idg_H2,L)=trcs_plant_uptake_vr(idg_H2,L)+RUPGasSol_vr(idg_H2,N,L,NZ)
-      trcs_plant_uptake_vr(idg_N2,L)=trcs_plant_uptake_vr(idg_N2,L)+RUPGasSol_vr(idg_N2,N,L,NZ)
+      DO idg=idg_beg,idg_end
+        trcs_plant_uptake_vr(idg,L)=trcs_plant_uptake_vr(idg,L)+RUPGasSol_vr(idg,N,L,NZ)
+      ENDDO
 
-      trcs_plant_uptake_vr(ids_NH4,L)=trcs_plant_uptake_vr(ids_NH4,L)+RootNutUptake_pvr(ids_NH4,N,L,NZ)
-      trcs_plant_uptake_vr(ids_NO3,L)=trcs_plant_uptake_vr(ids_NO3,L)+RootNutUptake_pvr(ids_NO3,N,L,NZ)
-      trcs_plant_uptake_vr(ids_H2PO4,L)=trcs_plant_uptake_vr(ids_H2PO4,L)+RootNutUptake_pvr(ids_H2PO4,N,L,NZ)
-      trcs_plant_uptake_vr(ids_H1PO4,L)=trcs_plant_uptake_vr(ids_H1PO4,L)+RootNutUptake_pvr(ids_H1PO4,N,L,NZ)
-      trcs_plant_uptake_vr(ids_NH4B,L)=trcs_plant_uptake_vr(ids_NH4B,L)+RootNutUptake_pvr(ids_NH4B,N,L,NZ)
-      trcs_plant_uptake_vr(ids_NO3B,L)=trcs_plant_uptake_vr(ids_NO3B,L)+RootNutUptake_pvr(ids_NO3B,N,L,NZ)
-      trcs_plant_uptake_vr(ids_H2PO4B,L)=trcs_plant_uptake_vr(ids_H2PO4B,L)+RootNutUptake_pvr(ids_H2PO4B,N,L,NZ)
-      trcs_plant_uptake_vr(ids_H1PO4B,L)=trcs_plant_uptake_vr(ids_H1PO4B,L)+RootNutUptake_pvr(ids_H1PO4B,N,L,NZ)
+      do ids=ids_NH4B,ids_nuts_end
+        trcs_plant_uptake_vr(ids,L)=trcs_plant_uptake_vr(ids,L)+RootNutUptake_pvr(ids,N,L,NZ)
+      ENDDO
 !
 !     TOTAL ROOT C,N,P EXUDATION
 !
@@ -299,24 +291,24 @@ module ExtractsMod
 !     RPOBX=H2PO4 demand in band by all microbial,root,myco populations
 !     RP1BX=HPO4 demand in band by all microbial,root,myco populations
 !     RootO2Dmnd4Resp_pvr=O2 demand by each root,myco population
-!     RUNNHP=NH4 demand in non-band by each root population
-!     RUNNOP=NO3 demand in non-band by each root population
-!     RUPP2P=H2PO4 demand in non-band by each root population
-!     RUPP1P=HPO4 demand in non-band by each root population
-!     RUNNBP=NH4 demand in band by each root population
+!     RootNH4DmndSoil_pvr=NH4 demand in non-band by each root population
+!     RootNO3DmndSoil_pvr=NO3 demand in non-band by each root population
+!     RootH2PO4DmndSoil_pvr=H2PO4 demand in non-band by each root population
+!     RootH1PO4DmndSoil_pvr=HPO4 demand in non-band by each root population
+!     RootNH4DmndBand_pvr=NH4 demand in band by each root population
 !     RUNNXB=NO3 demand in band by each root population
-!     RUPP2B=H2PO4 demand in band by each root population
-!     RUPP1B=HPO4 demand in band by each root population
+!     RootH2PO4DmndBand_pvr=H2PO4 demand in band by each root population
+!     RootH1PO4DmndBand_pvr=HPO4 demand in band by each root population
 !
       ROXYX(L)=ROXYX(L)+RootO2Dmnd4Resp_pvr(N,L,NZ)
-      RNH4X(L)=RNH4X(L)+RUNNHP(N,L,NZ)
-      RNO3X(L)=RNO3X(L)+RUNNOP(N,L,NZ)
-      RPO4X(L)=RPO4X(L)+RUPP2P(N,L,NZ)
-      RP14X(L)=RP14X(L)+RUPP1P(N,L,NZ)
-      RNHBX(L)=RNHBX(L)+RUNNBP(N,L,NZ)
-      RN3BX(L)=RN3BX(L)+RUNNXP(N,L,NZ)
-      RPOBX(L)=RPOBX(L)+RUPP2B(N,L,NZ)
-      RP1BX(L)=RP1BX(L)+RUPP1B(N,L,NZ)
+      RNH4X(L)=RNH4X(L)+RootNH4DmndSoil_pvr(N,L,NZ)
+      RNO3X(L)=RNO3X(L)+RootNO3DmndSoil_pvr(N,L,NZ)
+      RPO4X(L)=RPO4X(L)+RootH2PO4DmndSoil_pvr(N,L,NZ)
+      RP14X(L)=RP14X(L)+RootH1PO4DmndSoil_pvr(N,L,NZ)
+      RNHBX(L)=RNHBX(L)+RootNH4DmndBand_pvr(N,L,NZ)
+      RN3BX(L)=RN3BX(L)+RootNO3DmndBand_pvr(N,L,NZ)
+      RPOBX(L)=RPOBX(L)+RootH2PO4DmndBand_pvr(N,L,NZ)
+      RP1BX(L)=RP1BX(L)+RootH1PO4DmndBand_pvr(N,L,NZ)
     ENDDO
   ENDDO
   end associate

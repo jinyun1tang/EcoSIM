@@ -19,10 +19,10 @@ module PlantDataRateType
   real(r8),target,allocatable ::  RootNutUptake_pvr(:,:,:,:,:,:)       !root uptake of NH4 non-band, [g d-2 h-1]
   real(r8),target,allocatable ::  RootN2Fix_pvr(:,:,:,:)             !root N2 fixation, [g d-2 h-1]
   real(r8),target,allocatable ::  RUPGasSol_vr(:,:,:,:,:,:)          !aqueous H2 flux from roots to soil water, [g d-2 h-1]
-  real(r8),target,allocatable ::  RUPP2P(:,:,:,:,:)                  !root uptake of H2PO4 non-band
-  real(r8),target,allocatable ::  RUPP2B(:,:,:,:,:)                  !root uptake of H2PO4 band
-  real(r8),target,allocatable ::  RUPP1P(:,:,:,:,:)                  !HPO4 demand in non-band by each root population
-  real(r8),target,allocatable ::  RUPP1B(:,:,:,:,:)                  !HPO4 demand in band by each root population
+  real(r8),target,allocatable ::  RootH2PO4DmndSoil_pvr(:,:,:,:,:)                  !root uptake of H2PO4 non-band
+  real(r8),target,allocatable ::  RootH2PO4DmndBand_pvr(:,:,:,:,:)                  !root uptake of H2PO4 band
+  real(r8),target,allocatable ::  RootH1PO4DmndSoil_pvr(:,:,:,:,:)                  !HPO4 demand in non-band by each root population
+  real(r8),target,allocatable ::  RootH1PO4DmndBand_pvr(:,:,:,:,:)                  !HPO4 demand in band by each root population
   real(r8),target,allocatable ::  LeafElmntRemobFlx_brch(:,:,:,:,:)                   !element translocated from leaf during senescence, [g d-2 h-1]
   real(r8),target,allocatable ::  RCZSX(:,:,:,:)                     !N translocated from sheath during senescence, [g d-2 h-1]
   real(r8),target,allocatable ::  RCPSX(:,:,:,:)                     !P translocated from sheath during senescence, [g d-2 h-1]
@@ -64,10 +64,10 @@ module PlantDataRateType
   real(r8),target,allocatable ::  RootOUlmNutUptake_pvr(:,:,:,:,:,:)                  !root uptake of NH4 non-band unconstrained by O2, [g d-2 h-1]
   real(r8),target,allocatable ::  RootCUlmNutUptake_pvr(:,:,:,:,:,:)                  !root uptake of NH4 non-band unconstrained by root nonstructural C, [g d-2 h-1]
   real(r8),target,allocatable ::  RCO2N_pvr(:,:,:,:,:)                   !root CO2 efflux unconstrained by root nonstructural C, [g d-2 h-1]
-  real(r8),target,allocatable ::  RUNNHP(:,:,:,:,:)                  !root uptake of NH4 non-band unconstrained by NH4, [g d-2 h-1]
-  real(r8),target,allocatable ::  RUNNOP(:,:,:,:,:)                  !root uptake of NH4 band unconstrained by NH4, [g d-2 h-1]
-  real(r8),target,allocatable ::  RUNNBP(:,:,:,:,:)                  !root uptake of NO3 band unconstrained by NO3, [g d-2 h-1]
-  real(r8),target,allocatable ::  RUNNXP(:,:,:,:,:)                  !root uptake of NO3 non-band unconstrained by NO3, [g d-2 h-1]
+  real(r8),target,allocatable ::  RootNH4DmndSoil_pvr(:,:,:,:,:)                  !root uptake of NH4 non-band unconstrained by NH4, [g d-2 h-1]
+  real(r8),target,allocatable ::  RootNO3DmndSoil_pvr(:,:,:,:,:)                  !root uptake of NH4 band unconstrained by NH4, [g d-2 h-1]
+  real(r8),target,allocatable ::  RootNH4DmndBand_pvr(:,:,:,:,:)                  !root uptake of NO3 band unconstrained by NO3, [g d-2 h-1]
+  real(r8),target,allocatable ::  RootNO3DmndBand_pvr(:,:,:,:,:)                  !root uptake of NO3 non-band unconstrained by NO3, [g d-2 h-1]
   real(r8),target,allocatable ::  RNH3Z(:,:,:)                       !gaseous NH3 flux fron root disturbance non-band, [g d-2 h-1]
   real(r8),target,allocatable ::  NH3Dep2Can_brch(:,:,:,:)                     !gaseous NH3 flux fron root disturbance band, [g d-2 h-1]
   real(r8),target,allocatable ::  RAutoRootO2Limter_pvr(:,:,:,:,:)                     !O2 constraint to root respiration, []
@@ -134,10 +134,10 @@ module PlantDataRateType
   allocate(RootMycoExudElm_pvr(NumPlantChemElms,jroots,1:jcplx,JZ,JP,JY,JX));RootMycoExudElm_pvr=0._r8
   allocate(RootNutUptake_pvr(ids_nutb_beg+1:ids_nuts_end,jroots,JZ,JP,JY,JX));RootNutUptake_pvr=0._r8
   allocate(RootN2Fix_pvr(JZ,JP,JY,JX)); RootN2Fix_pvr=0._r8
-  allocate(RUPP2P(jroots,JZ,JP,JY,JX));RUPP2P=0._r8
-  allocate(RUPP2B(jroots,JZ,JP,JY,JX));RUPP2B=0._r8
-  allocate(RUPP1P(jroots,JZ,JP,JY,JX));RUPP1P=0._r8
-  allocate(RUPP1B(jroots,JZ,JP,JY,JX));RUPP1B=0._r8
+  allocate(RootH2PO4DmndSoil_pvr(jroots,JZ,JP,JY,JX));RootH2PO4DmndSoil_pvr=0._r8
+  allocate(RootH2PO4DmndBand_pvr(jroots,JZ,JP,JY,JX));RootH2PO4DmndBand_pvr=0._r8
+  allocate(RootH1PO4DmndSoil_pvr(jroots,JZ,JP,JY,JX));RootH1PO4DmndSoil_pvr=0._r8
+  allocate(RootH1PO4DmndBand_pvr(jroots,JZ,JP,JY,JX));RootH1PO4DmndBand_pvr=0._r8
   allocate(LeafElmntRemobFlx_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX)); LeafElmntRemobFlx_brch=0._r8
   allocate(PetioleChemElmRemobFlx_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX)); PetioleChemElmRemobFlx_brch=0._r8
   allocate(GrossCO2Fix_pft(JP,JY,JX));    GrossCO2Fix_pft=0._r8
@@ -178,10 +178,10 @@ module PlantDataRateType
   allocate(RootCUlmNutUptake_pvr(ids_nutb_beg+1:ids_nuts_end,jroots,JZ,JP,JY,JX));RootCUlmNutUptake_pvr=0._r8
   allocate(RootOUlmNutUptake_pvr(ids_nutb_beg+1:ids_nuts_end,jroots,JZ,JP,JY,JX));RootOUlmNutUptake_pvr=0._r8
   allocate(RCO2N_pvr(jroots,JZ,JP,JY,JX));RCO2N_pvr=0._r8
-  allocate(RUNNHP(jroots,JZ,JP,JY,JX));RUNNHP=0._r8
-  allocate(RUNNOP(jroots,JZ,JP,JY,JX));RUNNOP=0._r8
-  allocate(RUNNBP(jroots,JZ,JP,JY,JX));RUNNBP=0._r8
-  allocate(RUNNXP(jroots,JZ,JP,JY,JX));RUNNXP=0._r8
+  allocate(RootNH4DmndSoil_pvr(jroots,JZ,JP,JY,JX));RootNH4DmndSoil_pvr=0._r8
+  allocate(RootNO3DmndSoil_pvr(jroots,JZ,JP,JY,JX));RootNO3DmndSoil_pvr=0._r8
+  allocate(RootNH4DmndBand_pvr(jroots,JZ,JP,JY,JX));RootNH4DmndBand_pvr=0._r8
+  allocate(RootNO3DmndBand_pvr(jroots,JZ,JP,JY,JX));RootNO3DmndBand_pvr=0._r8
   allocate(RNH3Z(JP,JY,JX));    RNH3Z=0._r8
   allocate(NH3Dep2Can_brch(MaxNumBranches,JP,JY,JX)); NH3Dep2Can_brch=0._r8
   allocate(RAutoRootO2Limter_pvr(jroots,JZ,JP,JY,JX)); RAutoRootO2Limter_pvr=0._r8
@@ -235,10 +235,10 @@ module PlantDataRateType
   call destroy(RootNutUptake_pvr)
   call destroy(RUPGasSol_vr)
   call destroy(RootN2Fix_pvr)
-  call destroy(RUPP2P)
-  call destroy(RUPP2B)
-  call destroy(RUPP1P)
-  call destroy(RUPP1B)
+  call destroy(RootH2PO4DmndSoil_pvr)
+  call destroy(RootH2PO4DmndBand_pvr)
+  call destroy(RootH1PO4DmndSoil_pvr)
+  call destroy(RootH1PO4DmndBand_pvr)
   call destroy(LeafElmntRemobFlx_brch)
   call destroy(PetioleChemElmRemobFlx_brch)
   call destroy(GrossCO2Fix_pft)
@@ -277,10 +277,10 @@ module PlantDataRateType
   call destroy(RootOUlmNutUptake_pvr)
   call destroy(RootCUlmNutUptake_pvr)
   call destroy(RCO2N_pvr)
-  call destroy(RUNNHP)
-  call destroy(RUNNOP)
-  call destroy(RUNNBP)
-  call destroy(RUNNXP)
+  call destroy(RootNH4DmndSoil_pvr)
+  call destroy(RootNO3DmndSoil_pvr)
+  call destroy(RootNH4DmndBand_pvr)
+  call destroy(RootNO3DmndBand_pvr)
   call destroy(RNH3Z)
   call destroy(NH3Dep2Can_brch)
   call destroy(RAutoRootO2Limter_pvr)

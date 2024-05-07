@@ -175,12 +175,12 @@ implicit none
   idg_end=idg_NH3B;
 
   ids_nuts_beg=idg_NH3;  !the first nutrient tracer, including band
-  ids_end=idg_end   !initalize the solute counter
+  ids_end=idg_end        !initalize the solute counter
   ids_NH4B=addone(ids_end);
   ids_NO3B=addone(ids_end);
   ids_NO2B=addone(ids_end);
-  ids_H1PO4B=addone(ids_end)
-  ids_H2PO4B=addone(ids_end)
+  ids_H1PO4B=addone(ids_end);
+  ids_H2PO4B=addone(ids_end);
   ids_nuts=ids_H2PO4B-ids_NH4B
 
   ids_nutb_beg=idg_NH3B;ids_nutb_end=ids_H2PO4B

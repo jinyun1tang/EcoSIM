@@ -216,35 +216,35 @@ module NutUptakeMod
   plt_rbgc%RootO2Uptk_pvr(1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%RootMycoExudElm_pvr(1:NumPlantChemElms,1:NN,1:jcplx,L1:L2,NZ)=0.0_r8
   plt_rbgc%RAutoRootO2Limter_pvr(1:NN,L1:L2,NZ)=1.0
-  plt_rbgc%RUNNHP(1:NN,L1:L2,NZ)=0.0_r8
+  plt_rbgc%RootNH4DmndSoil_pvr(1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%RootNutUptake_pvr(ids_NH4,1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%RootOUlmNutUptake_pvr(ids_NH4,1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%RootCUlmNutUptake_pvr(ids_NH4,1:NN,L1:L2,NZ)=0.0_r8
-  plt_rbgc%RUNNBP(1:NN,L1:L2,NZ)=0.0_r8
+  plt_rbgc%RootNH4DmndBand_pvr(1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%RootNutUptake_pvr(ids_NH4B,1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%RootOUlmNutUptake_pvr(ids_NH4B,1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%RootCUlmNutUptake_pvr(ids_NH4B,1:NN,L1:L2,NZ)=0.0_r8
-  plt_rbgc%RUNNOP(1:NN,L1:L2,NZ)=0.0_r8
+  plt_rbgc%RootNO3DmndSoil_pvr(1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%RootNutUptake_pvr(ids_NO3,1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%RootOUlmNutUptake_pvr(ids_NO3,1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%RootCUlmNutUptake_pvr(ids_NO3,1:NN,L1:L2,NZ)=0.0_r8
-  plt_rbgc%RUNNXP(1:NN,L1:L2,NZ)=0.0_r8
+  plt_rbgc%RootNO3DmndBand_pvr(1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%RootNutUptake_pvr(ids_NO3B,1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%RootOUlmNutUptake_pvr(ids_NO3B,1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%RootCUlmNutUptake_pvr(ids_NO3B,1:NN,L1:L2,NZ)=0.0_r8
-  plt_rbgc%RUPP2P(1:NN,L1:L2,NZ)=0.0_r8
+  plt_rbgc%RootH2PO4DmndSoil_pvr(1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%RootNutUptake_pvr(ids_H2PO4,1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%RootOUlmNutUptake_pvr(ids_H2PO4,1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%RootCUlmNutUptake_pvr(ids_H2PO4,1:NN,L1:L2,NZ)=0.0_r8
-  plt_rbgc%RUPP2B(1:NN,L1:L2,NZ)=0.0_r8
+  plt_rbgc%RootH2PO4DmndBand_pvr(1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%RootNutUptake_pvr(ids_H2PO4B,1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%RootOUlmNutUptake_pvr(ids_H2PO4B,1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%RootCUlmNutUptake_pvr(ids_H2PO4B,1:NN,L1:L2,NZ)=0.0_r8
-  plt_rbgc%RUPP1P(1:NN,L1:L2,NZ)=0.0_r8
+  plt_rbgc%RootH1PO4DmndSoil_pvr(1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%RootNutUptake_pvr(ids_H1PO4,1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%RootOUlmNutUptake_pvr(ids_H1PO4,1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%RootCUlmNutUptake_pvr(ids_H1PO4,1:NN,L1:L2,NZ)=0.0_r8
-  plt_rbgc%RUPP1B(1:NN,L1:L2,NZ)=0.0_r8
+  plt_rbgc%RootH1PO4DmndBand_pvr(1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%RootNutUptake_pvr(ids_H1PO4B,1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%RootOUlmNutUptake_pvr(ids_H1PO4B,1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%RootCUlmNutUptake_pvr(ids_H1PO4B,1:NN,L1:L2,NZ)=0.0_r8
@@ -272,10 +272,10 @@ module NutUptakeMod
     TortMicPM                => plt_site%TortMicPM,                &
     ZEROS                    => plt_site%ZEROS,                    &
     ZERO2                    => plt_site%ZERO2,                    &
-    RUPP1B                   => plt_rbgc%RUPP1B,                   &
-    RUPP1P                   => plt_rbgc%RUPP1P,                   &
-    RUPP2P                   => plt_rbgc%RUPP2P,                   &
-    RUPP2B                   => plt_rbgc%RUPP2B,                   &
+    RootH1PO4DmndBand_pvr                   => plt_rbgc%RootH1PO4DmndBand_pvr,                   &
+    RootH1PO4DmndSoil_pvr                   => plt_rbgc%RootH1PO4DmndSoil_pvr,                   &
+    RootH2PO4DmndSoil_pvr                   => plt_rbgc%RootH2PO4DmndSoil_pvr,                   &
+    RootH2PO4DmndBand_pvr                   => plt_rbgc%RootH2PO4DmndBand_pvr,                   &
     SoluteDifusvty_vr        => plt_soilchem%SoluteDifusvty_vr,    &
     RH1PO4EcoDmndBandPrev_vr => plt_bgcr%RH1PO4EcoDmndBandPrev_vr, &
     RH2PO4EcoDmndBandPrev_vr => plt_bgcr%RH2PO4EcoDmndBandPrev_vr, &
@@ -289,22 +289,22 @@ module NutUptakeMod
 
 !     begin_execution
   IF(RH2PO4EcoDmndSoilPrev_vr(L).GT.ZEROS)THEN
-    FPO4X=AMAX1(MinFracPRoot4Uptake(N,L,NZ),RUPP2P(N,L,NZ)/RH2PO4EcoDmndSoilPrev_vr(L))
+    FPO4X=AMAX1(MinFracPRoot4Uptake(N,L,NZ),RootH2PO4DmndSoil_pvr(N,L,NZ)/RH2PO4EcoDmndSoilPrev_vr(L))
   ELSE
     FPO4X=FracPRoot4Uptake(N,L,NZ)
   ENDIF
   IF(RH2PO4EcoDmndBandPrev_vr(L).GT.ZEROS)THEN
-    FPOBX=AMAX1(MinFracPRoot4Uptake(N,L,NZ),RUPP2B(N,L,NZ)/RH2PO4EcoDmndBandPrev_vr(L))
+    FPOBX=AMAX1(MinFracPRoot4Uptake(N,L,NZ),RootH2PO4DmndBand_pvr(N,L,NZ)/RH2PO4EcoDmndBandPrev_vr(L))
   ELSE
     FPOBX=FracPRoot4Uptake(N,L,NZ)
   ENDIF
   IF(RH1PO4EcoDmndSoilPrev_vr(L).GT.ZEROS)THEN
-    FP14X=AMAX1(MinFracPRoot4Uptake(N,L,NZ),RUPP1P(N,L,NZ)/RH1PO4EcoDmndSoilPrev_vr(L))
+    FP14X=AMAX1(MinFracPRoot4Uptake(N,L,NZ),RootH1PO4DmndSoil_pvr(N,L,NZ)/RH1PO4EcoDmndSoilPrev_vr(L))
   ELSE
     FP14X=FracPRoot4Uptake(N,L,NZ)
   ENDIF
   IF(RH1PO4EcoDmndBandPrev_vr(L).GT.ZEROS)THEN
-    FP1BX=AMAX1(MinFracPRoot4Uptake(N,L,NZ),RUPP1B(N,L,NZ)/RH1PO4EcoDmndBandPrev_vr(L))
+    FP1BX=AMAX1(MinFracPRoot4Uptake(N,L,NZ),RootH1PO4DmndBand_pvr(N,L,NZ)/RH1PO4EcoDmndBandPrev_vr(L))
   ELSE
     FP1BX=FracPRoot4Uptake(N,L,NZ)
   ENDIF
@@ -368,9 +368,9 @@ module NutUptakeMod
     CminNO3Root_pft       => plt_rbgc%CminNO3Root_pft,       &
     KmNO3Root_pft         => plt_rbgc%KmNO3Root_pft,         &
     RootCUlmNutUptake_pvr => plt_rbgc%RootCUlmNutUptake_pvr, &
-    RUNNOP                => plt_rbgc%RUNNOP,                &
+    RootNO3DmndSoil_pvr                => plt_rbgc%RootNO3DmndSoil_pvr,                &
     RootNutUptake_pvr     => plt_rbgc%RootNutUptake_pvr,     &
-    RUNNXP                => plt_rbgc%RUNNXP,                &
+    RootNO3DmndBand_pvr                => plt_rbgc%RootNO3DmndBand_pvr,                &
     RootOUlmNutUptake_pvr => plt_rbgc%RootOUlmNutUptake_pvr, &
     SoluteDifusvty_vr     => plt_soilchem%SoluteDifusvty_vr, &
     trc_solml_vr          => plt_soilchem%trc_solml_vr,      &
@@ -430,7 +430,7 @@ module NutUptakeMod
     !     RTKNO3,RTKNOP=NO3 uptake per plant in non-band lmtd,unlmtd by O2
     !     ZNO3M,ZNO3X=minimum,maximum NO3 available for uptake in non-band
     !     FNO3X=fraction of total NH4 uptake in non-band by root,myco populn
-    !     RUNNOP,RootNO3Uptake_pvr=NO3 uptake in non-band unlimited,limited by NO3
+    !     RootNO3DmndSoil_pvr,RootNO3Uptake_pvr=NO3 uptake in non-band unlimited,limited by NO3
     !     RootOUlmNutUptake_pvr=NO3 uptake in non-band unlimited by O2
     !     RootCUlmNutUptake_pvr=NO3 uptake in non-band unlimited by nonstructural C
 !
@@ -448,7 +448,7 @@ module NutUptakeMod
     PlantSoluteUptakeConfig%PlantPopulation= PlantPopulation_pft(NZ)
     PlantSoluteUptakeConfig%SoluteKM=KmNO3Root_pft(N,NZ)
 
-    call SoluteUptakeByPlantRoots(PlantSoluteUptakeConfig,RUNNOP(N,L,NZ),RootNutUptake_pvr(ids_NO3,N,L,NZ),&
+    call SoluteUptakeByPlantRoots(PlantSoluteUptakeConfig,RootNO3DmndSoil_pvr(N,L,NZ),RootNutUptake_pvr(ids_NO3,N,L,NZ),&
       RootNutUptake_pvr(ids_NO3B,N,L,NZ),RootCUlmNutUptake_pvr(ids_NO3,N,L,NZ))
 
   ENDIF
@@ -491,7 +491,7 @@ module NutUptakeMod
     !     RTKNOB,RTKNPB=NO3 uptake per plant in band lmtd,unlmtd by O2
     !     ZNOBM,ZNOBX=minimum,maximum NO3 available for uptake in band
     !     FNOBX=fraction of total NO3 uptake in band by root,myco populn
-    !     RUNNXP,RootNO3BUptake_pvr=NO3 uptake in band unlimited,limited by NH4
+    !     RootNO3DmndBand_pvr,RootNO3BUptake_pvr=NO3 uptake in band unlimited,limited by NH4
     !     RootOUlmNutUptake_pvr=NO3 uptake in band unlimited by O2
     !     RootCUlmNutUptake_pvr=NO3 uptake in band unlimited by nonstructural C
     !
@@ -509,7 +509,7 @@ module NutUptakeMod
     PlantSoluteUptakeConfig%PlantPopulation= PlantPopulation_pft(NZ)
     PlantSoluteUptakeConfig%SoluteKM=KmNO3Root_pft(N,NZ)
 
-    call SoluteUptakeByPlantRoots(PlantSoluteUptakeConfig,RUNNXP(N,L,NZ),RootOUlmNutUptake_pvr(ids_NO3B,N,L,NZ),&
+    call SoluteUptakeByPlantRoots(PlantSoluteUptakeConfig,RootNO3DmndBand_pvr(N,L,NZ),RootOUlmNutUptake_pvr(ids_NO3B,N,L,NZ),&
       RootNutUptake_pvr(ids_NO3B,N,L,NZ),RootCUlmNutUptake_pvr(ids_NO3B,N,L,NZ))
 
   ENDIF
@@ -545,8 +545,8 @@ module NutUptakeMod
     RootNutUptake_pvr           =>  plt_rbgc%RootNutUptake_pvr           , &
     RootCUlmNutUptake_pvr       =>  plt_rbgc%RootCUlmNutUptake_pvr       , &
     RootOUlmNutUptake_pvr       =>  plt_rbgc%RootOUlmNutUptake_pvr       , &
-    RUNNHP                      =>  plt_rbgc%RUNNHP                      , &
-    RUNNBP                      =>  plt_rbgc%RUNNBP                      , &
+    RootNH4DmndSoil_pvr                      =>  plt_rbgc%RootNH4DmndSoil_pvr                      , &
+    RootNH4DmndBand_pvr                      =>  plt_rbgc%RootNH4DmndBand_pvr                      , &
     RootAreaPerPlant_pvr        =>  plt_morph%RootAreaPerPlant_pvr       , &
     SoluteDifusvty_vr           =>  plt_soilchem%SoluteDifusvty_vr       , &
     VLWatMicP                   =>  plt_soilchem%VLWatMicP               , &
@@ -601,7 +601,7 @@ module NutUptakeMod
 !   RTKNH4,RTKNHP=NH4 uptake per plant in non-band lmtd,unlmtd by O2
 !   ZNH4M,ZNH4X=minimum,maximum NH4 available for uptake in non-band
 !   FNH4X=fraction of total NH4 uptake in non-band by root,myco populn
-!   RUNNHP,RootNH4Uptake_pvr=NH4 uptake in non-band unlimited,limited by NH4
+!   RootNH4DmndSoil_pvr,RootNH4Uptake_pvr=NH4 uptake in non-band unlimited,limited by NH4
 !   RootOUlmNutUptake_pvr=NH4 uptake in non-band unlimited by O2
 !   RootCUlmNutUptake_pvr=NH4 uptake in non-band unlimited by nonstructural C
 !
@@ -619,7 +619,7 @@ module NutUptakeMod
     PlantSoluteUptakeConfig%PlantPopulation= PlantPopulation_pft(NZ)
     PlantSoluteUptakeConfig%SoluteKM=KmNH4Root_pft(N,NZ)
 
-    call SoluteUptakeByPlantRoots(PlantSoluteUptakeConfig,RUNNHP(N,L,NZ),RootOUlmNutUptake_pvr(ids_NH4,N,L,NZ),&
+    call SoluteUptakeByPlantRoots(PlantSoluteUptakeConfig,RootNH4DmndSoil_pvr(N,L,NZ),RootOUlmNutUptake_pvr(ids_NH4,N,L,NZ),&
       RootNutUptake_pvr(ids_NH4,N,L,NZ),RootCUlmNutUptake_pvr(ids_NH4,N,L,NZ))
 
   ENDIF
@@ -662,7 +662,7 @@ module NutUptakeMod
 !   RTKNHB,RTKNBP=NH4 uptake per plant in band lmtd,unlmtd by O2
 !   ZNHBM,ZNHBX=minimum,maximum NH4 available for uptake in band
 !   FNHBX=fraction of total NH4 uptake in band by root,myco populn
-!   RUNNBP,RootNH4BUptake_pvr=NH4 uptake in band unlimited,limited by NH4
+!   RootNH4DmndBand_pvr,RootNH4BUptake_pvr=NH4 uptake in band unlimited,limited by NH4
 !   RootOUlmNutUptake_pvr=NH4 uptake in band unlimited by O2
 !   RootCUlmNutUptake_pvr=NH4 uptake in band unlimited by nonstructural C
 !
@@ -681,7 +681,7 @@ module NutUptakeMod
     PlantSoluteUptakeConfig%PlantPopulation= PlantPopulation_pft(NZ)
     PlantSoluteUptakeConfig%SoluteKM=KmNH4Root_pft(N,NZ)
 
-    call SoluteUptakeByPlantRoots(PlantSoluteUptakeConfig,RUNNBP(N,L,NZ),RootOUlmNutUptake_pvr(ids_NH4B,N,L,NZ),&
+    call SoluteUptakeByPlantRoots(PlantSoluteUptakeConfig,RootNH4DmndBand_pvr(N,L,NZ),RootOUlmNutUptake_pvr(ids_NH4B,N,L,NZ),&
       RootNutUptake_pvr(ids_NH4B,N,L,NZ),RootCUlmNutUptake_pvr(ids_NH4B,N,L,NZ))
 
   ENDIF
@@ -717,10 +717,10 @@ module NutUptakeMod
     KmPO4Root_pft         => plt_rbgc%KmPO4Root_pft,         &
     VmaxPO4Root_pft       => plt_rbgc%VmaxPO4Root_pft,       &
     RootCUlmNutUptake_pvr => plt_rbgc%RootCUlmNutUptake_pvr, &
-    RUPP1P                => plt_rbgc%RUPP1P,                &
+    RootH1PO4DmndSoil_pvr                => plt_rbgc%RootH1PO4DmndSoil_pvr,                &
     RootNutUptake_pvr     => plt_rbgc%RootNutUptake_pvr,     &
     RootOUlmNutUptake_pvr => plt_rbgc%RootOUlmNutUptake_pvr, &
-    RUPP1B                => plt_rbgc%RUPP1B,                &
+    RootH1PO4DmndBand_pvr                => plt_rbgc%RootH1PO4DmndBand_pvr,                &
     RootAreaPerPlant_pvr  => plt_morph%RootAreaPerPlant_pvr, &
     VLWatMicP             => plt_soilchem%VLWatMicP,         &
     trcs_VLN_vr           => plt_soilchem%trcs_VLN_vr,       &
@@ -766,7 +766,7 @@ module NutUptakeMod
     !     RTKH1P,RTKHP1=HPO4 uptake per plant in non-band lmtd,unlmtd by O2
     !     H1POM,H1POX=minimum,maximum HPO4 available for uptake in non-band
     !     FP14X=fraction of total HPO4 uptake in non-band by root,myco populn
-    !     RUPP1P,RootNutUptake_pvr=HPO4 uptake in non-band unlimited,limited by HPO4
+    !     RootH1PO4DmndSoil_pvr,RootNutUptake_pvr=HPO4 uptake in non-band unlimited,limited by HPO4
     !     RootOUlmNutUptake_pvr(ids_H1PO4,=HPO4 uptake in non-band unlimited by O2
     !     RootCUlmNutUptake_pvr=HPO4 uptake in non-band unlimited by nonstructural C
 
@@ -784,7 +784,7 @@ module NutUptakeMod
     PlantSoluteUptakeConfig%PlantPopulation= PlantPopulation_pft(NZ)
     PlantSoluteUptakeConfig%SoluteKM=KmPO4Root_pft(N,NZ)
 
-    call SoluteUptakeByPlantRoots(PlantSoluteUptakeConfig,RUPP1P(N,L,NZ),RootOUlmNutUptake_pvr(ids_H1PO4,N,L,NZ),&
+    call SoluteUptakeByPlantRoots(PlantSoluteUptakeConfig,RootH1PO4DmndSoil_pvr(N,L,NZ),RootOUlmNutUptake_pvr(ids_H1PO4,N,L,NZ),&
       RootNutUptake_pvr(ids_H1PO4,N,L,NZ),RootCUlmNutUptake_pvr(ids_H1PO4,N,L,NZ))
 
   ENDIF
@@ -826,7 +826,7 @@ module NutUptakeMod
     !     RTKH1B,RTKHB1=HPO4 uptake per plant in band lmtd,unlmtd by O2
     !     H1PXM,H1PXB=minimum,maximum HPO4 available for uptake in band
     !     FP1BX=fraction of total HPO4 uptake in band by root,myco populn
-    !     RUPP1B,RootH1PO4BUptake_pvr=HPO4 uptake in band unlimited,limited by H2PO4
+    !     RootH1PO4DmndBand_pvr,RootH1PO4BUptake_pvr=HPO4 uptake in band unlimited,limited by H2PO4
     !     RootOUlmNutUptake_pvr=HPO4 uptake in band unlimited by O2
     !     RootCUlmNutUptake_pvr=HPO4 uptake in band unlimited by nonstructural C
 
@@ -844,7 +844,7 @@ module NutUptakeMod
     PlantSoluteUptakeConfig%PlantPopulation= PlantPopulation_pft(NZ)
     PlantSoluteUptakeConfig%SoluteKM=KmPO4Root_pft(N,NZ)
 
-    call SoluteUptakeByPlantRoots(PlantSoluteUptakeConfig,RUPP1B(N,L,NZ),RootOUlmNutUptake_pvr(ids_H1PO4B,N,L,NZ),&
+    call SoluteUptakeByPlantRoots(PlantSoluteUptakeConfig,RootH1PO4DmndBand_pvr(N,L,NZ),RootOUlmNutUptake_pvr(ids_H1PO4B,N,L,NZ),&
       RootNutUptake_pvr(ids_H1PO4B,N,L,NZ),RootCUlmNutUptake_pvr(ids_H1PO4B,N,L,NZ))
 
   ENDIF
@@ -877,8 +877,8 @@ module NutUptakeMod
     RootCUlmNutUptake_pvr       => plt_rbgc%RootCUlmNutUptake_pvr       , &
     RootNutUptake_pvr           => plt_rbgc%RootNutUptake_pvr           , &
     RootOUlmNutUptake_pvr       => plt_rbgc%RootOUlmNutUptake_pvr       , &
-    RUPP2B                      => plt_rbgc%RUPP2B                      , &
-    RUPP2P                      => plt_rbgc%RUPP2P                      , &
+    RootH2PO4DmndBand_pvr                      => plt_rbgc%RootH2PO4DmndBand_pvr                      , &
+    RootH2PO4DmndSoil_pvr                      => plt_rbgc%RootH2PO4DmndSoil_pvr                      , &
     fTgrowRootP_vr              => plt_pheno%fTgrowRootP_vr             , &
     RootAreaPerPlant_pvr        => plt_morph%RootAreaPerPlant_pvr       , &
     trc_solml_vr                => plt_soilchem%trc_solml_vr            , &
@@ -923,7 +923,7 @@ module NutUptakeMod
       !     RTKH2P,RTKHPP=H2PO4 uptake per plant in non-band lmtd,unlmtd by O2
       !     H2POM,H2POX=minimum,maximum H2PO4 available for uptake in non-band
       !     FPO4X=fraction of total H2PO4 uptake in non-band by root,myco populn
-      !     RUPP2P,RootH2PO4Uptake_pvr=H2PO4 uptake in non-band unlimited,limited by H2PO4
+      !     RootH2PO4DmndSoil_pvr,RootH2PO4Uptake_pvr=H2PO4 uptake in non-band unlimited,limited by H2PO4
       !     RootOUlmNutUptake_pvr=H2PO4 uptake in non-band unlimited by O2
       !     RootCUlmNutUptake_pvr=H2PO4 uptake in non-band unlimited by nonstructural C
 
@@ -941,7 +941,7 @@ module NutUptakeMod
       PlantSoluteUptakeConfig%PlantPopulation= PlantPopulation_pft(NZ)
       PlantSoluteUptakeConfig%SoluteKM=KmPO4Root_pft(N,NZ)
 
-      call SoluteUptakeByPlantRoots(PlantSoluteUptakeConfig,RUPP2P(N,L,NZ),RootOUlmNutUptake_pvr(ids_H2PO4,N,L,NZ),&
+      call SoluteUptakeByPlantRoots(PlantSoluteUptakeConfig,RootH2PO4DmndSoil_pvr(N,L,NZ),RootOUlmNutUptake_pvr(ids_H2PO4,N,L,NZ),&
         RootNutUptake_pvr(ids_H2PO4,N,L,NZ),RootCUlmNutUptake_pvr(ids_H2PO4,N,L,NZ))
 
     ENDIF
@@ -985,7 +985,7 @@ module NutUptakeMod
     !     RTKH2B,RTKHPB=H2PO4 uptake per plant in band lmtd,unlmtd by O2
     !     H2PXM,H2PXB=minimum,maximum H2PO4 available for uptake in band
     !     FPOBX=fraction of total H2PO4 uptake in band by root,myco populn
-    !     RUPP2B,RootNutUptake_pvr=H2PO4 uptake in band unlimited,limited by H2PO4
+    !     RootH2PO4DmndBand_pvr,RootNutUptake_pvr=H2PO4 uptake in band unlimited,limited by H2PO4
     !     RootOUlmNutUptake_pvr=H2PO4 uptake in band unlimited by O2
     !     RootCUlmNutUptake_pvr=H2PO4 uptake in band unlimited by nonstructural C
 
@@ -1003,7 +1003,7 @@ module NutUptakeMod
     PlantSoluteUptakeConfig%PlantPopulation= PlantPopulation_pft(NZ)
     PlantSoluteUptakeConfig%SoluteKM=KmPO4Root_pft(N,NZ)
 
-    call SoluteUptakeByPlantRoots(PlantSoluteUptakeConfig,RUPP2B(N,L,NZ),RootOUlmNutUptake_pvr(ids_H2PO4B,N,L,NZ),&
+    call SoluteUptakeByPlantRoots(PlantSoluteUptakeConfig,RootH2PO4DmndBand_pvr(N,L,NZ),RootOUlmNutUptake_pvr(ids_H2PO4B,N,L,NZ),&
       RootNutUptake_pvr(ids_H2PO4B,N,L,NZ),RootCUlmNutUptake_pvr(ids_H2PO4B,N,L,NZ))
 
   ENDIF
@@ -1028,10 +1028,10 @@ module NutUptakeMod
   associate(                                                   &
     ZERO2                  => plt_site%ZERO2,                  &
     ZEROS                  => plt_site%ZEROS,                  &
-    RUNNXP                 => plt_rbgc%RUNNXP,                 &
-    RUNNHP                 => plt_rbgc%RUNNHP,                 &
-    RUNNBP                 => plt_rbgc%RUNNBP,                 &
-    RUNNOP                 => plt_rbgc%RUNNOP,                 &
+    RootNO3DmndBand_pvr                 => plt_rbgc%RootNO3DmndBand_pvr,                 &
+    RootNH4DmndSoil_pvr                 => plt_rbgc%RootNH4DmndSoil_pvr,                 &
+    RootNH4DmndBand_pvr                 => plt_rbgc%RootNH4DmndBand_pvr,                 &
+    RootNO3DmndSoil_pvr                 => plt_rbgc%RootNO3DmndSoil_pvr,                 &
     RNO3EcoDmndSoilPrev_vr => plt_bgcr%RNO3EcoDmndSoilPrev_vr, &
     RNH4EcoDmndBandPrev_vr => plt_bgcr%RNH4EcoDmndBandPrev_vr, &
     RNH4EcoDmndSoilPrev_vr => plt_bgcr%RNH4EcoDmndSoilPrev_vr, &
@@ -1044,23 +1044,23 @@ module NutUptakeMod
 
 
   IF(RNH4EcoDmndSoilPrev_vr(L).GT.ZEROS)THEN
-    FNH4X=AMAX1(MinFracPRoot4Uptake(N,L,NZ),RUNNHP(N,L,NZ)/RNH4EcoDmndSoilPrev_vr(L))
+    FNH4X=AMAX1(MinFracPRoot4Uptake(N,L,NZ),RootNH4DmndSoil_pvr(N,L,NZ)/RNH4EcoDmndSoilPrev_vr(L))
   ELSE
     FNH4X=FracPRoot4Uptake(N,L,NZ)
   ENDIF
   IF(RNH4EcoDmndBandPrev_vr(L).GT.ZEROS)THEN
-    FNHBX=AMAX1(MinFracPRoot4Uptake(N,L,NZ),RUNNBP(N,L,NZ)/RNH4EcoDmndBandPrev_vr(L))
+    FNHBX=AMAX1(MinFracPRoot4Uptake(N,L,NZ),RootNH4DmndBand_pvr(N,L,NZ)/RNH4EcoDmndBandPrev_vr(L))
   ELSE
     FNHBX=FracPRoot4Uptake(N,L,NZ)
   ENDIF
 
   IF(RNO3EcoDmndSoilPrev_vr(L).GT.ZEROS)THEN
-    FNO3X=AMAX1(MinFracPRoot4Uptake(N,L,NZ),RUNNOP(N,L,NZ)/RNO3EcoDmndSoilPrev_vr(L))
+    FNO3X=AMAX1(MinFracPRoot4Uptake(N,L,NZ),RootNO3DmndSoil_pvr(N,L,NZ)/RNO3EcoDmndSoilPrev_vr(L))
   ELSE
     FNO3X=FracPRoot4Uptake(N,L,NZ)
   ENDIF
   IF(RNO3EcoDmndBandPrev_vr(L).GT.ZEROS)THEN
-    FNOBX=AMAX1(MinFracPRoot4Uptake(N,L,NZ),RUNNXP(N,L,NZ)/RNO3EcoDmndBandPrev_vr(L))
+    FNOBX=AMAX1(MinFracPRoot4Uptake(N,L,NZ),RootNO3DmndBand_pvr(N,L,NZ)/RNO3EcoDmndBandPrev_vr(L))
   ELSE
     FNOBX=FracPRoot4Uptake(N,L,NZ)
   ENDIF
@@ -1174,28 +1174,28 @@ module NutUptakeMod
   !     RootO2Dmnd4Resp_pvr=O2 demand by each root,myco population
   !     FOXYX=fraction of RO2EcoDmndPrev_vr by each root,myco population
   !     RNH4EcoDmndSoilPrev_vr=NH4 demand in non-band by all microbial,root,myco populations
-  !     RUNNHP=NH4 demand in non-band by each root,myco population
+  !     RootNH4DmndSoil_pvr=NH4 demand in non-band by each root,myco population
   !     FNH4X=fraction of RNH4EcoDmndSoilPrev_vr by each root,myco populn
   !     RNH4EcoDmndBandPrev_vr=NH4 demand in band by all microbial,root,myco populations
-  !     RUNNBP=NH4 demand in band by each root,myco population
+  !     RootNH4DmndBand_pvr=NH4 demand in band by each root,myco population
   !     FNHBX=fraction of RNH4EcoDmndBandPrev_vr by each root,myco populn
   !     RNO3EcoDmndSoilPrev_vr=NO3 demand in non-band by all microbial,root,myco populations
-  !     RUNNOP=NO3 demand in non-band by each root,myco population
+  !     RootNO3DmndSoil_pvr=NO3 demand in non-band by each root,myco population
   !     FNO3X=fraction of RNO3EcoDmndSoilPrev_vr by each root,myco populn
   !     RNO3EcoDmndBandPrev_vr=NO3 demand in band by all microbial,root,myco populations
   !     RUNNXB=NO3 demand in band by each root,myco population
   !     FNOBX=fraction of RNO3EcoDmndBandPrev_vr by each root,myco populn
   !     RH2PO4EcoDmndSoilPrev_vr=H2PO4 demand in non-band by all microbial,root,myco populations
-  !     RUPP2P=H2PO4 demand in non-band by each root,myco population
+  !     RootH2PO4DmndSoil_pvr=H2PO4 demand in non-band by each root,myco population
   !     FPO4X=fraction of RH2PO4EcoDmndSoilPrev_vr by each root,myco populn
   !     RH2PO4EcoDmndBandPrev_vr=H2PO4 demand in band by all microbial,root,myco populations
-  !     RUPP2B=H2PO4 demand in band by each root,myco population
+  !     RootH2PO4DmndBand_pvr=H2PO4 demand in band by each root,myco population
   !     FPOBX=fraction of RH2PO4EcoDmndBandPrev_vr by each root,myco populn
   !     RH1PO4EcoDmndSoilPrev_vr=HPO4 demand in non-band by all microbial,root,myco populations
-  !     RUPP1P=HPO4 demand in non-band by each root,myco population
+  !     RootH1PO4DmndSoil_pvr=HPO4 demand in non-band by each root,myco population
   !     FP14X=fraction of RH1PO4EcoDmndSoilPrev_vr by each root,myco populn
   !     RH1PO4EcoDmndBandPrev_vr=HPO4 demand in band by all microbial,root,myco populations
-  !     RUPP1B=HPO4 demand in band by each root,myco population
+  !     RootH1PO4DmndBand_pvr=HPO4 demand in band by each root,myco population
   !     FP1BX=fraction of RH1PO4EcoDmndBandPrev_vr by each root,myco populn
   !     MinFracPRoot4Uptake=minimum uptake fraction
   !     FracPRoot4Uptake=PFT fraction of biome root mass
