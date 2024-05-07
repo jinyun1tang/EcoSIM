@@ -78,7 +78,7 @@ module PlantDataRateType
   real(r8),target,allocatable ::  trcg_air2root_flx_vr(:,:,:,:)                 !total internal root gas flux , [g d-2 h-1]
   real(r8),target,allocatable ::  trcg_TLP(:,:,:,:)                  !total root internal gas flux, [g d-2 h-1]
   real(r8),target,allocatable ::  trcs_plant_uptake_vr(:,:,:,:)      !total root-soil solute flux, [g d-2 h-1]
-  real(r8),target,allocatable ::  TDFOME(:,:,:,:,:)                  !total root element exchange, [g d-2 h-1]
+  real(r8),target,allocatable ::  tRootMycoExud2Soil_vr(:,:,:,:,:)                  !total root element exchange, [g d-2 h-1]
   real(r8),target,allocatable ::  TCO2P(:,:,:)                       !total root CO2 flux, [g d-2 h-1]
   real(r8),target,allocatable ::  TRO2Uptk_vr(:,:,:)                      !total root internal O2 flux, [g d-2 h-1]
   real(r8),target,allocatable ::  RTDNT(:,:,:)                       !total root length density, [m m-3]
@@ -192,7 +192,7 @@ module PlantDataRateType
   allocate(trcg_air2root_flx_vr(idg_beg:idg_end-1,JZ,JY,JX));   trcg_air2root_flx_vr=0._r8
   allocate(trcg_TLP(idg_beg:idg_end-1,JZ,JY,JX));   trcg_TLP=0._r8
   allocate(trcs_plant_uptake_vr(ids_beg:ids_end,JZ,JY,JX));    trcs_plant_uptake_vr=0._r8
-  allocate(TDFOME(NumPlantChemElms,1:jcplx,JZ,JY,JX));TDFOME=0._r8
+  allocate(tRootMycoExud2Soil_vr(NumPlantChemElms,1:jcplx,JZ,JY,JX));tRootMycoExud2Soil_vr=0._r8
   allocate(TCO2P(JZ,JY,JX));    TCO2P=0._r8
   allocate(TRO2Uptk_vr(JZ,JY,JX));   TRO2Uptk_vr=0._r8
   allocate(RTDNT(JZ,JY,JX));    RTDNT=0._r8
@@ -288,7 +288,7 @@ module PlantDataRateType
   call destroy(PlantExudChemElmCum_pft)
   call destroy(GridPlantRootH2OUptake_vr)
   call destroy(THeatRootUptake)
-  call destroy(TDFOME)
+  call destroy(tRootMycoExud2Soil_vr)
   call destroy(TCO2P)
   call destroy(TRO2Uptk_vr)
   call destroy(RTDNT)

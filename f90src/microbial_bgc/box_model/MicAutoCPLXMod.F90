@@ -58,7 +58,7 @@ module MicAutoCPLXMod
   real(r8) :: RVOXPA
   real(r8) :: RVOXPB
   real(r8) :: RGrowthRespAutor
-  real(r8) :: RMaintDefcitAutor
+  real(r8) :: RMaintDefcitcitAutor
   real(r8) :: RMaintRespAutor
 
 ! begin_execution
@@ -183,7 +183,7 @@ module MicAutoCPLXMod
 !
 !     AUTOTROPHIC DENITRIFICATION
 !
-  IF(N.EQ.AmmoniaOxidBacter.AND.RO2Dmnd4RespAutor(NGL).GT.0.0_r8.AND.(.not.litrm.OR.VLSoilPoreMicP.GT.ZEROS))THEN
+  IF(N.EQ.AmmoniaOxidBacter .AND. RO2Dmnd4RespAutor(NGL).GT.0.0_r8 .AND. (.not.litrm.OR.VLSoilPoreMicP.GT.ZEROS))THEN
     call AutotrophDenitrificCatabolism(NGL,N,XCO2,VOLWZ,micfor,micstt,&
       naqfdiag,nmicf,nmics,micflx)
   ELSE
@@ -200,10 +200,10 @@ module MicAutoCPLXMod
     ZNH4T,ZNO3T,ZNO2T,H2P4T,H1P4T,micfor,micstt,micflx,nmicf,nmics)
 !
   call GatherAutotrophRespiration(NGL,N,RMOMK,micfor,micstt,RGrowthRespAutor,&
-    RMaintDefcitAutor,RMaintRespAutor,nmicf,nmics)
+    RMaintDefcitcitAutor,RMaintRespAutor,nmicf,nmics)
 !
   call GetMicrobAnabolicFluxAutor(NGL,N,ECHZ,FGOCP,&
-    FGOAP,RGrowthRespAutor,RMaintDefcitAutor,RMaintRespAutor,spomk,rmomk,micfor,micstt,nmicf,nmics,ncplxf,ncplxs)
+    FGOAP,RGrowthRespAutor,RMaintDefcitcitAutor,RMaintRespAutor,spomk,rmomk,micfor,micstt,nmicf,nmics,ncplxf,ncplxs)
   end associate
   end subroutine ActiveMicrobAutotrophs
 
@@ -369,11 +369,11 @@ module MicAutoCPLXMod
 !------------------------------------------------------------------------------------------
 
   subroutine GetMicrobAnabolicFluxAutor(NGL,N,ECHZ,FGOCP,FGOAP,&
-    RGrowthRespAutor,RMaintDefcitAutor,RMaintRespAutor,spomk,rmomk,micfor,micstt,nmicf,nmics,ncplxf,ncplxs)
+    RGrowthRespAutor,RMaintDefcitcitAutor,RMaintRespAutor,spomk,rmomk,micfor,micstt,nmicf,nmics,ncplxf,ncplxs)
   implicit none
   integer, intent(in) :: NGL,N
   real(r8), intent(in) :: ECHZ
-  real(r8), intent(in) :: FGOCP,FGOAP,RGrowthRespAutor,RMaintDefcitAutor,RMaintRespAutor
+  real(r8), intent(in) :: FGOCP,FGOAP,RGrowthRespAutor,RMaintDefcitcitAutor,RMaintRespAutor
   real(r8), intent(in) :: spomk(2)
   real(r8), intent(in) :: RMOMK(2)
   type(MicForcType), intent(in) :: micfor
@@ -392,36 +392,36 @@ module MicAutoCPLXMod
   real(r8) :: SPOMX
   real(r8) :: FRM
 !     begin_execution
-  associate(                                                              &
-    CNOMActAutor                  => nmics%CNOMActAutor,                  &
-    CPOMActAutor                  => nmics%CPOMActAutor,                  &
-    GrowthEnvScalAutor            => nmics%GrowthEnvScalAutor,            &
-    CGmBOMAutor                    => nmicf%CGmBOMAutor,                    &
-    NonstX2stBiomAutor            => nmicf%NonstX2stBiomAutor,            &
-    RespGrossAutor                => nmicf%RespGrossAutor,                &
-    RNOxReduxRespAutorLim         => nmicf%RNOxReduxRespAutorLim,         &
-    RMaintDmndAutor               => nmicf%RMaintDmndAutor,               &
-    RkillLitfalOMAutor            => nmicf%RkillLitfalOMAutor,            &
-    RkillLitrfal2HumOMAutor       => nmicf%RkillLitrfal2HumOMAutor,       &
-    RkillLitrfal2ResduOMAutor     => nmicf%RkillLitrfal2ResduOMAutor,     &
-    RMaintdefLitrfalOMAutor       => nmicf%RMaintdefLitrfalOMAutor,       &
-    RMaintdefLitrfal2HumOMAutor   => nmicf%RMaintdefLitrfal2HumOMAutor,   &
-    RMaintdefLitrfal2ResduOMAutor => nmicf%RMaintdefLitrfal2ResduOMAutor, &
-    RKillOMAutor                  => nmicf%RKillOMAutor,                  &
-    RkillRecycOMAutor                    => nmicf%RkillRecycOMAutor,                    &
-    RMaintdefKillOMAutor          => nmicf%RMaintdefKillOMAutor,          &
-    RMaintdefRecycOMAutor         => nmicf%RMaintdefRecycOMAutor,         &
-    Resp4NFixAutor                => nmicf%Resp4NFixAutor,                &
-    TDOMUptkHeter                 => ncplxf%TDOMUptkHeter,                &
-    CNQ                           => ncplxs%CNQ,                          &
-    CPQ                           => ncplxs%CPQ,                          &
-    rNCOMCAutor                   => micpar%rNCOMCAutor,                  &
-    rPCOMCAutor                   => micpar%rPCOMCAutor,                  &
-    FL                            => micpar%FL,                           &
-    ZEROS                         => micfor%ZEROS,                        &
-    ZERO                          => micfor%ZERO,                         &
-    mBOMAutor                      => micstt%mBOMAutor,                     &
-    EHUM                          => micstt%EHUM                          &
+  associate(                                                                    &
+    CNOMActAutor                     => nmics%CNOMActAutor,                     &
+    CPOMActAutor                     => nmics%CPOMActAutor,                     &
+    GrowthEnvScalAutor               => nmics%GrowthEnvScalAutor,               &
+    CGmBOMAutor                      => nmicf%CGmBOMAutor,                      &
+    NonstX2stBiomAutor               => nmicf%NonstX2stBiomAutor,               &
+    RespGrossAutor                   => nmicf%RespGrossAutor,                   &
+    RNOxReduxRespAutorLim            => nmicf%RNOxReduxRespAutorLim,            &
+    RMaintDmndAutor                  => nmicf%RMaintDmndAutor,                  &
+    RkillLitfalOMAutor               => nmicf%RkillLitfalOMAutor,               &
+    RkillLitrfal2HumOMAutor          => nmicf%RkillLitrfal2HumOMAutor,          &
+    RkillLitrfal2ResduOMAutor        => nmicf%RkillLitrfal2ResduOMAutor,        &
+    RMaintDefcitLitrfalOMAutor       => nmicf%RMaintDefcitLitrfalOMAutor,       &
+    RMaintDefcitLitrfal2HumOMAutor   => nmicf%RMaintDefcitLitrfal2HumOMAutor,   &
+    RMaintDefcitLitrfal2ResduOMAutor => nmicf%RMaintDefcitLitrfal2ResduOMAutor, &
+    RKillOMAutor                     => nmicf%RKillOMAutor,                     &
+    RkillRecycOMAutor                => nmicf%RkillRecycOMAutor,                &
+    RMaintDefcitKillOMAutor          => nmicf%RMaintDefcitKillOMAutor,          &
+    RMaintDefcitRecycOMAutor         => nmicf%RMaintDefcitRecycOMAutor,         &
+    Resp4NFixAutor                   => nmicf%Resp4NFixAutor,                   &
+    TDOMUptkHeter                    => ncplxf%TDOMUptkHeter,                   &
+    CNQ                              => ncplxs%CNQ,                             &
+    CPQ                              => ncplxs%CPQ,                             &
+    rNCOMCAutor                      => micpar%rNCOMCAutor,                     &
+    rPCOMCAutor                      => micpar%rPCOMCAutor,                     &
+    FL                               => micpar%FL,                              &
+    ZEROS                            => micfor%ZEROS,                           &
+    ZERO                             => micfor%ZERO,                            &
+    mBOMAutor                        => micstt%mBOMAutor,                       &
+    EHUM                             => micstt%EHUM                             &
   )
 
 !     DOC, DON, DOP AND ACETATE UPTAKE DRIVEN BY GROWTH RESPIRATION
@@ -519,9 +519,9 @@ module MicAutoCPLXMod
 !
     MID=micpar%get_micb_id(M,NGL)
     SPOMX=SQRT(GrowthEnvScalAutor(NGL))*SPOMC(M)*SPOMK(M)
-    RKillOMAutor(ielmc,M,NGL)=AZMAX1(mBOMAutor(ielmc,MID)*SPOMX)
-    RKillOMAutor(ielmn,M,NGL)=AZMAX1(mBOMAutor(ielmn,MID)*SPOMX)
-    RKillOMAutor(ielmp,M,NGL)=AZMAX1(mBOMAutor(ielmp,MID)*SPOMX)
+    DO NE=1,NumPlantChemElms
+      RKillOMAutor(NE,M,NGL)=AZMAX1(mBOMAutor(NE,MID)*SPOMX)
+    ENDDO
 
     RkillLitfalOMAutor(ielmc,M,NGL)=RKillOMAutor(ielmc,M,NGL)*(1.0_r8-RCCC)
     RkillLitfalOMAutor(ielmn,M,NGL)=RKillOMAutor(ielmn,M,NGL)*(1.0_r8-RCCC)*(1.0_r8-RCCN)
@@ -549,7 +549,7 @@ module MicAutoCPLXMod
 !
 !     OMC,OMN,OMP=microbial C,N,P
 !     RMaintRespAutor=total maintenance respiration
-!     RMaintDefcitAutor=senescence respiration
+!     RMaintDefcitcitAutor=senescence respiration
 !     RCCC=C recycling fraction
 !     RXMMC,RXMMN,RXMMP=microbial C,N,P loss from senescence
 !     RMaintDmndHeter=maintenance respiration
@@ -557,18 +557,18 @@ module MicAutoCPLXMod
 !     RDMMC,RDMMN,RDMMP=microbial C,N,P LitrFall from senescence
 !     R3MMC,R3MMN,R3MMP=microbial C,N,P recycling from senescence
 !
-  IF(RMaintDefcitAutor.GT.ZEROS.AND.RMaintRespAutor.GT.ZEROS.AND.RCCC.GT.ZERO)THEN
-    FRM=RMaintDefcitAutor/RMaintRespAutor
+  IF(RMaintDefcitcitAutor.GT.ZEROS.AND.RMaintRespAutor.GT.ZEROS.AND.RCCC.GT.ZERO)THEN
+    FRM=RMaintDefcitcitAutor/RMaintRespAutor
     DO  M=1,2
-      RMaintdefKillOMAutor(ielmc,M,NGL)=AMIN1(mBOMAutor(ielmc,MID),AZMAX1(FRM*RMaintDmndAutor(M,NGL)/RCCC))
-      RMaintdefKillOMAutor(ielmn,M,NGL)=AMIN1(mBOMAutor(ielmn,MID),AZMAX1(RMaintdefKillOMAutor(ielmc,M,NGL)*CNOMActAutor(NGL)))
-      RMaintdefKillOMAutor(ielmp,M,NGL)=AMIN1(mBOMAutor(ielmp,MID),AZMAX1(RMaintdefKillOMAutor(ielmc,M,NGL)*CPOMActAutor(NGL)))
+      RMaintDefcitKillOMAutor(ielmc,M,NGL)=AMIN1(mBOMAutor(ielmc,MID),AZMAX1(FRM*RMaintDmndAutor(M,NGL)/RCCC))
+      RMaintDefcitKillOMAutor(ielmn,M,NGL)=AMIN1(mBOMAutor(ielmn,MID),AZMAX1(RMaintDefcitKillOMAutor(ielmc,M,NGL)*CNOMActAutor(NGL)))
+      RMaintDefcitKillOMAutor(ielmp,M,NGL)=AMIN1(mBOMAutor(ielmp,MID),AZMAX1(RMaintDefcitKillOMAutor(ielmc,M,NGL)*CPOMActAutor(NGL)))
 
-      RMaintdefLitrfalOMAutor(ielmc,M,NGL)=RMaintdefKillOMAutor(ielmc,M,NGL)*(1.0_r8-RCCC)
-      RMaintdefLitrfalOMAutor(ielmn,M,NGL)=RMaintdefKillOMAutor(ielmn,M,NGL)*(1.0_r8-RCCN)*(1.0_r8-RCCC)
-      RMaintdefLitrfalOMAutor(ielmp,M,NGL)=RMaintdefKillOMAutor(ielmp,M,NGL)*(1.0_r8-RCCP)*(1.0_r8-RCCC)
+      RMaintDefcitLitrfalOMAutor(ielmc,M,NGL)=RMaintDefcitKillOMAutor(ielmc,M,NGL)*(1.0_r8-RCCC)
+      RMaintDefcitLitrfalOMAutor(ielmn,M,NGL)=RMaintDefcitKillOMAutor(ielmn,M,NGL)*(1.0_r8-RCCN)*(1.0_r8-RCCC)
+      RMaintDefcitLitrfalOMAutor(ielmp,M,NGL)=RMaintDefcitKillOMAutor(ielmp,M,NGL)*(1.0_r8-RCCP)*(1.0_r8-RCCC)
       DO NE=1,NumPlantChemElms
-        RMaintdefRecycOMAutor(NE,M,NGL)=RMaintdefKillOMAutor(NE,M,NGL)-RMaintdefLitrfalOMAutor(NE,M,NGL)
+        RMaintDefcitRecycOMAutor(NE,M,NGL)=RMaintDefcitKillOMAutor(NE,M,NGL)-RMaintDefcitLitrfalOMAutor(NE,M,NGL)
       ENDDO
 !
 !     HUMIFICATION AND RECYCLING OF RESPIRATION DECOMPOSITION
@@ -579,18 +579,18 @@ module MicAutoCPLXMod
 !     RCMMC,RCMMN,RCMMC=transfer of senesence LitrFall C,N,P to residue
 !
       DO NE=1,NumPlantChemElms
-        RMaintdefLitrfal2HumOMAutor(NE,M,NGL)=AZMAX1(RMaintdefLitrfalOMAutor(NE,M,NGL)*EHUM)
-        RMaintdefLitrfal2ResduOMAutor(NE,M,NGL)=RMaintdefLitrfalOMAutor(NE,M,NGL)-RMaintdefLitrfal2HumOMAutor(NE,M,NGL)
+        RMaintDefcitLitrfal2HumOMAutor(NE,M,NGL)=AZMAX1(RMaintDefcitLitrfalOMAutor(NE,M,NGL)*EHUM)
+        RMaintDefcitLitrfal2ResduOMAutor(NE,M,NGL)=RMaintDefcitLitrfalOMAutor(NE,M,NGL)-RMaintDefcitLitrfal2HumOMAutor(NE,M,NGL)
       ENDDO
     ENDDO
   ELSE
     DO  M=1,2
       DO NE=1,NumPlantChemElms
-        RMaintdefKillOMAutor(NE,M,NGL)=0.0_r8
-        RMaintdefLitrfalOMAutor(NE,M,NGL)=0.0_r8
-        RMaintdefRecycOMAutor(NE,M,NGL)=0.0_r8
-        RMaintdefLitrfal2HumOMAutor(NE,M,NGL)=0.0_r8
-        RMaintdefLitrfal2ResduOMAutor(NE,M,NGL)=0.0_r8
+        RMaintDefcitKillOMAutor(NE,M,NGL)=0.0_r8
+        RMaintDefcitLitrfalOMAutor(NE,M,NGL)=0.0_r8
+        RMaintDefcitRecycOMAutor(NE,M,NGL)=0.0_r8
+        RMaintDefcitLitrfal2HumOMAutor(NE,M,NGL)=0.0_r8
+        RMaintDefcitLitrfal2ResduOMAutor(NE,M,NGL)=0.0_r8
       ENDDO
     ENDDO
   ENDIF
@@ -1768,14 +1768,14 @@ module MicAutoCPLXMod
   end subroutine BiomassMineralizationff
 !------------------------------------------------------------------------------------------
 
-  subroutine GatherAutotrophRespiration(NGL,N,RMOMK,micfor,micstt,RGrowthRespAutor,RMaintDefcitAutor,RMaintRespAutor,&
+  subroutine GatherAutotrophRespiration(NGL,N,RMOMK,micfor,micstt,RGrowthRespAutor,RMaintDefcitcitAutor,RMaintRespAutor,&
     nmicf,nmics)
   implicit none
   integer, intent(in) :: NGL,N
   real(r8), intent(in) :: RMOMK(2)
   type(micforctype), intent(in) :: micfor
   type(micsttype), intent(in) :: micstt
-  real(r8), intent(out) :: RGrowthRespAutor,RMaintDefcitAutor
+  real(r8), intent(out) :: RGrowthRespAutor,RMaintDefcitcitAutor
   real(r8), intent(out) :: RMaintRespAutor
   type(NitroMicStateType), intent(inout) :: nmics
   type(NitroMicFluxType), intent(inout) :: nmicf
@@ -1791,7 +1791,7 @@ module MicAutoCPLXMod
     Resp4NFixAutor   => nmicf%Resp4NFixAutor,   &
     RN2FixAutor      => nmicf%RN2FixAutor,      &
     pH               => micfor%pH,              &
-    mBOMAutor         => micstt%mBOMAutor         &
+    mBOMAutor         => micstt%mBOMAutor       &
 
   )
 !     pH EFFECT ON MAINTENANCE RESPIRATION
@@ -1812,11 +1812,11 @@ module MicAutoCPLXMod
 !
 !     RMaintRespAutor=total maintenance respiration
 !     RGrowthRespAutor=growth respiration
-!     RMaintDefcitAutor=senescence respiration
+!     RMaintDefcitcitAutor=senescence respiration
 !
   RMaintRespAutor=RMaintDmndAutor(1,NGL)+RMaintDmndAutor(2,NGL)
   RGrowthRespAutor=AZMAX1(RespGrossAutor(NGL)-RMaintRespAutor)
-  RMaintDefcitAutor=AZMAX1(RMaintRespAutor-RespGrossAutor(NGL))
+  RMaintDefcitcitAutor=AZMAX1(RMaintRespAutor-RespGrossAutor(NGL))
 
 !
 !     N2 FIXATION: N=(6) AEROBIC, (7) ANAEROBIC
@@ -1851,46 +1851,46 @@ module MicAutoCPLXMod
   type(NitroMicFluxType), intent(inout) :: nmicf
   real(r8) :: CGROMC
   integer :: N,M,NGL,MID,MID3,NE
-  associate(                                                          &
-    CGmBOMAutor                  => nmicf%CGmBOMAutor,                  &
-    NonstX2stBiomAutor          => nmicf%NonstX2stBiomAutor,          &
-    Resp4NFixAutor              => nmicf%Resp4NFixAutor,              &
-    RespGrossAutor              => nmicf%RespGrossAutor,              &
-    RNOxReduxRespAutorLim       => nmicf%RNOxReduxRespAutorLim,       &
-    RNO3TransfSoilAutor         => nmicf%RNO3TransfSoilAutor,         &
-    RCO2ProdAutor               => nmicf%RCO2ProdAutor,               &
-    RH2PO4TransfSoilAutor       => nmicf%RH2PO4TransfSoilAutor,       &
-    RNH4TransfBandAutor         => nmicf%RNH4TransfBandAutor,         &
-    RNO3TransfBandAutor         => nmicf%RNO3TransfBandAutor,         &
-    RH2PO4TransfBandAutor       => nmicf%RH2PO4TransfBandAutor,       &
-    RkillLitrfal2HumOMAutor     => nmicf%RkillLitrfal2HumOMAutor,     &
-    RMaintdefLitrfal2HumOMAutor => nmicf%RMaintdefLitrfal2HumOMAutor, &
-    RN2FixAutor                 => nmicf%RN2FixAutor,                 &
-    RKillOMAutor                => nmicf%RKillOMAutor,                &
-    RkillRecycOMAutor           => nmicf%RkillRecycOMAutor,           &
-    RMaintdefKillOMAutor        => nmicf%RMaintdefKillOMAutor,        &
-    RMaintdefRecycOMAutor       => nmicf%RMaintdefRecycOMAutor,       &
-    RNH4TransfLitrAutor         => nmicf%RNH4TransfLitrAutor,         &
-    RNO3TransfLitrAutor         => nmicf%RNO3TransfLitrAutor,         &
-    RH2PO4TransfLitrAutor       => nmicf%RH2PO4TransfLitrAutor,       &
-    RH1PO4TransfSoilAutor       => nmicf%RH1PO4TransfSoilAutor,       &
-    RH1PO4TransfBandAutor       => nmicf%RH1PO4TransfBandAutor,       &
-    RH1PO4TransfLitrAutor       => nmicf%RH1PO4TransfLitrAutor,       &
-    RNH4TransfSoilAutor         => nmicf%RNH4TransfSoilAutor,         &
-    litrm                       => micfor%litrm,                      &
-    CFOMC                       => micfor%CFOMC,                      &
-    CFOMCU                      => micfor%CFOMCU,                     &
-    SolidOM                     => micstt%SolidOM,                    &
-    mBOMAutor                    => micstt%mBOMAutor,                   &
-    SOMHumProtein               => micstt%SOMHumProtein,              &
-    SOMHumCarbohyd              => micstt%SOMHumCarbohyd,             &
-    JGniA                       => micpar%JGniA,                      &
-    JGnfA                       => micpar%JGnfA,                      &
-    NumMicbFunGrupsPerCmplx     => micpar%NumMicbFunGrupsPerCmplx,    &
-    icarbhyro                   => micpar%icarbhyro,                  &
-    iprotein                    => micpar%iprotein,                   &
-    k_POM                       => micpar%k_POM,                      &
-    is_activeMicrbFungrpAutor             => micpar%is_activeMicrbFungrpAutor             &
+  associate(                                                                &
+    CGmBOMAutor                    => nmicf%CGmBOMAutor,                    &
+    NonstX2stBiomAutor             => nmicf%NonstX2stBiomAutor,             &
+    Resp4NFixAutor                 => nmicf%Resp4NFixAutor,                 &
+    RespGrossAutor                 => nmicf%RespGrossAutor,                 &
+    RNOxReduxRespAutorLim          => nmicf%RNOxReduxRespAutorLim,          &
+    RNO3TransfSoilAutor            => nmicf%RNO3TransfSoilAutor,            &
+    RCO2ProdAutor                  => nmicf%RCO2ProdAutor,                  &
+    RH2PO4TransfSoilAutor          => nmicf%RH2PO4TransfSoilAutor,          &
+    RNH4TransfBandAutor            => nmicf%RNH4TransfBandAutor,            &
+    RNO3TransfBandAutor            => nmicf%RNO3TransfBandAutor,            &
+    RH2PO4TransfBandAutor          => nmicf%RH2PO4TransfBandAutor,          &
+    RkillLitrfal2HumOMAutor        => nmicf%RkillLitrfal2HumOMAutor,        &
+    RMaintDefcitLitrfal2HumOMAutor => nmicf%RMaintDefcitLitrfal2HumOMAutor, &
+    RN2FixAutor                    => nmicf%RN2FixAutor,                    &
+    RKillOMAutor                   => nmicf%RKillOMAutor,                   &
+    RkillRecycOMAutor              => nmicf%RkillRecycOMAutor,              &
+    RMaintDefcitKillOMAutor        => nmicf%RMaintDefcitKillOMAutor,        &
+    RMaintDefcitRecycOMAutor       => nmicf%RMaintDefcitRecycOMAutor,       &
+    RNH4TransfLitrAutor            => nmicf%RNH4TransfLitrAutor,            &
+    RNO3TransfLitrAutor            => nmicf%RNO3TransfLitrAutor,            &
+    RH2PO4TransfLitrAutor          => nmicf%RH2PO4TransfLitrAutor,          &
+    RH1PO4TransfSoilAutor          => nmicf%RH1PO4TransfSoilAutor,          &
+    RH1PO4TransfBandAutor          => nmicf%RH1PO4TransfBandAutor,          &
+    RH1PO4TransfLitrAutor          => nmicf%RH1PO4TransfLitrAutor,          &
+    RNH4TransfSoilAutor            => nmicf%RNH4TransfSoilAutor,            &
+    litrm                          => micfor%litrm,                         &
+    CFOMC                          => micfor%CFOMC,                         &
+    CFOMCU                         => micfor%CFOMCU,                        &
+    SolidOM                        => micstt%SolidOM,                       &
+    mBOMAutor                      => micstt%mBOMAutor,                     &
+    SOMHumProtein                  => micstt%SOMHumProtein,                 &
+    SOMHumCarbohyd                 => micstt%SOMHumCarbohyd,                &
+    JGniA                          => micpar%JGniA,                         &
+    JGnfA                          => micpar%JGnfA,                         &
+    NumMicbFunGrupsPerCmplx        => micpar%NumMicbFunGrupsPerCmplx,       &
+    icarbhyro                      => micpar%icarbhyro,                     &
+    iprotein                       => micpar%iprotein,                      &
+    k_POM                          => micpar%k_POM,                         &
+    is_activeMicrbFungrpAutor      => micpar%is_activeMicrbFungrpAutor      &
   )
   DO  N=1,NumMicbFunGrupsPerCmplx
     IF(is_activeMicrbFungrpAutor(N))THEN
@@ -1898,7 +1898,7 @@ module MicAutoCPLXMod
         DO  M=1,2
           MID=micpar%get_micb_id(M,NGL)
           DO NE=1,NumPlantChemElms
-            mBOMAutor(NE,MID)=mBOMAutor(NE,MID)+NonstX2stBiomAutor(NE,M,NGL)-RKillOMAutor(NE,M,NGL)-RMaintdefKillOMAutor(NE,M,NGL)
+            mBOMAutor(NE,MID)=mBOMAutor(NE,MID)+NonstX2stBiomAutor(NE,M,NGL)-RKillOMAutor(NE,M,NGL)-RMaintDefcitKillOMAutor(NE,M,NGL)
           ENDDO
 
 !     HUMIFICATION PRODUCTS
@@ -1909,17 +1909,14 @@ module MicAutoCPLXMod
 !
           IF(.not.litrm)THEN
             DO NE=1,NumPlantChemElms
-              SolidOM(NE,iprotein,k_POM)=SolidOM(NE,iprotein,k_POM)+CFOMC(1)*(RkillLitrfal2HumOMAutor(NE,M,NGL)+RMaintdefLitrfal2HumOMAutor(NE,M,NGL))
-              SolidOM(NE,icarbhyro,k_POM)=SolidOM(NE,icarbhyro,k_POM)+CFOMC(2)*(RkillLitrfal2HumOMAutor(NE,M,NGL)+RMaintdefLitrfal2HumOMAutor(NE,M,NGL))
+              SolidOM(NE,iprotein,k_POM)=SolidOM(NE,iprotein,k_POM)+CFOMC(1)*(RkillLitrfal2HumOMAutor(NE,M,NGL)+RMaintDefcitLitrfal2HumOMAutor(NE,M,NGL))
+              SolidOM(NE,icarbhyro,k_POM)=SolidOM(NE,icarbhyro,k_POM)+CFOMC(2)*(RkillLitrfal2HumOMAutor(NE,M,NGL)+RMaintDefcitLitrfal2HumOMAutor(NE,M,NGL))
             ENDDO
           ELSE
-            SOMHumProtein(ielmc)=SOMHumProtein(ielmc)+CFOMCU(1)*(RkillLitrfal2HumOMAutor(ielmc,M,NGL)+RMaintdefLitrfal2HumOMAutor(ielmc,M,NGL))
-            SOMHumProtein(ielmn)=SOMHumProtein(ielmn)+CFOMCU(1)*(RkillLitrfal2HumOMAutor(ielmn,M,NGL)+RMaintdefLitrfal2HumOMAutor(ielmn,M,NGL))
-            SOMHumProtein(ielmp)=SOMHumProtein(ielmp)+CFOMCU(1)*(RkillLitrfal2HumOMAutor(ielmp,M,NGL)+RMaintdefLitrfal2HumOMAutor(ielmp,M,NGL))
-            
-            SOMHumCarbohyd(ielmc)=SOMHumCarbohyd(ielmc)+CFOMCU(2)*(RkillLitrfal2HumOMAutor(ielmc,M,NGL)+RMaintdefLitrfal2HumOMAutor(ielmc,M,NGL))
-            SOMHumCarbohyd(ielmn)=SOMHumCarbohyd(ielmn)+CFOMCU(2)*(RkillLitrfal2HumOMAutor(ielmn,M,NGL)+RMaintdefLitrfal2HumOMAutor(ielmn,M,NGL))
-            SOMHumCarbohyd(ielmp)=SOMHumCarbohyd(ielmp)+CFOMCU(2)*(RkillLitrfal2HumOMAutor(ielmp,M,NGL)+RMaintdefLitrfal2HumOMAutor(ielmp,M,NGL))
+            DO NE=1,NumPlantChemElms
+              SOMHumProtein(NE)=SOMHumProtein(NE)+CFOMCU(1)*(RkillLitrfal2HumOMAutor(NE,M,NGL)+RMaintDefcitLitrfal2HumOMAutor(NE,M,NGL))
+              SOMHumCarbohyd(NE)=SOMHumCarbohyd(NE)+CFOMCU(2)*(RkillLitrfal2HumOMAutor(NE,M,NGL)+RMaintDefcitLitrfal2HumOMAutor(NE,M,NGL))
+            ENDDO
           ENDIF
         ENDDO
 !
@@ -1948,9 +1945,9 @@ module MicAutoCPLXMod
           DO NE=1,NumPlantChemElms
             mBOMAutor(NE,MID3)=mBOMAutor(NE,MID3)-NonstX2stBiomAutor(NE,M,NGL)+RkillRecycOMAutor(NE,M,NGL)
           ENDDO
-          mBOMAutor(ielmn,MID3)=mBOMAutor(ielmn,MID3)+RMaintdefRecycOMAutor(ielmn,M,NGL)
-          mBOMAutor(ielmp,MID3)=mBOMAutor(ielmp,MID3)+RMaintdefRecycOMAutor(ielmp,M,NGL)
-          RCO2ProdAutor(NGL)=RCO2ProdAutor(NGL)+RMaintdefRecycOMAutor(ielmc,M,NGL)
+          mBOMAutor(ielmn,MID3)=mBOMAutor(ielmn,MID3)+RMaintDefcitRecycOMAutor(ielmn,M,NGL)
+          mBOMAutor(ielmp,MID3)=mBOMAutor(ielmp,MID3)+RMaintDefcitRecycOMAutor(ielmp,M,NGL)
+          RCO2ProdAutor(NGL)=RCO2ProdAutor(NGL)+RMaintDefcitRecycOMAutor(ielmc,M,NGL)
         ENDDO
         mBOMAutor(ielmc,MID3)=mBOMAutor(ielmc,MID3)+CGROMC
         mBOMAutor(ielmn,MID3)=mBOMAutor(ielmn,MID3)+CGmBOMAutor(ielmn,NGL) &

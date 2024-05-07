@@ -137,7 +137,7 @@ implicit none
     
     trcs_plant_uptake_vr(ids_beg:ids_end,L,NY,NX) =plt_rbgc%trcs_plant_uptake_vr(ids_beg:ids_end,L)
     DO  K=1,jcplx
-      TDFOME(1:NumPlantChemElms,K,L,NY,NX)=plt_bgcr%TDFOME(1:NumPlantChemElms,K,L)
+      tRootMycoExud2Soil_vr(1:NumPlantChemElms,K,L,NY,NX)=plt_bgcr%tRootMycoExud2Soil_vr(1:NumPlantChemElms,K,L)
     ENDDO
   ENDDO
   DO NZ=1,NP0(NY,NX)
@@ -971,7 +971,7 @@ implicit none
     plt_bgcr%TCO2P(L) =TCO2P(L,NY,NX)
     plt_bgcr%TRO2Uptk_vr(L)=TRO2Uptk_vr(L,NY,NX)
     DO  K=1,jcplx
-      plt_bgcr%TDFOME(1:NumPlantChemElms,K,L)=TDFOME(1:NumPlantChemElms,K,L,NY,NX)
+      plt_bgcr%tRootMycoExud2Soil_vr(1:NumPlantChemElms,K,L)=tRootMycoExud2Soil_vr(1:NumPlantChemElms,K,L,NY,NX)
     ENDDO
   ENDDO
 

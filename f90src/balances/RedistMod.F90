@@ -965,7 +965,7 @@ module RedistMod
     !
     D195: DO K=1,jcplx
       DO NE=1,NumPlantChemElms
-      DOM_vr(NE,K,L,NY,NX)=DOM_vr(NE,K,L,NY,NX)+TDFOME(NE,K,L,NY,NX)
+        DOM_vr(NE,K,L,NY,NX)=DOM_vr(NE,K,L,NY,NX)+tRootMycoExud2Soil_vr(NE,K,L,NY,NX)
       ENDDO
     ENDDO D195
     !

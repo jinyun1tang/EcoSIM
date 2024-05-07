@@ -634,7 +634,7 @@ implicit none
   real(r8), pointer :: LitrFallStrutElms_col(:) => null() !total LitrFall element, [g d-2 h-1]
   real(r8), pointer :: NetPrimProduct_pft(:)       => null()   !total net primary productivity, [gC d-2]
   real(r8), pointer :: NH3Dep2Can_pft(:)      => null()   !canopy NH3 flux, [g d-2 h-1]
-  real(r8), pointer :: TDFOME(:,:,:)   =>  null()  !total root element exchange, [g d-2 h-1]
+  real(r8), pointer :: tRootMycoExud2Soil_vr(:,:,:)   =>  null()  !total root element exchange, [g d-2 h-1]
   real(r8), pointer :: RootN2Fix_pvr(:,:)    =>  null()  !root N2 fixation, [gN d-2 h-1]
   real(r8), pointer :: CanopyRespC_pft(:)      =>  null()  !total autotrophic respiration, [gC d-2 ]
   real(r8), pointer :: LitrfalStrutElms_pvr(:,:,:,:,:) =>  null()  !plant LitrFall element, [g d-2 h-1]
@@ -995,7 +995,7 @@ implicit none
   allocate(this%LitrFallStrutElms_col(NumPlantChemElms));this%LitrFallStrutElms_col=spval
   allocate(this%NetPrimProduct_pft(JP1));this%NetPrimProduct_pft=spval
   allocate(this%NH3Dep2Can_pft(JP1));this%NH3Dep2Can_pft=spval
-  allocate(this%TDFOME(NumPlantChemElms,1:jcplx,JZ1));this%TDFOME=spval
+  allocate(this%tRootMycoExud2Soil_vr(NumPlantChemElms,1:jcplx,JZ1));this%tRootMycoExud2Soil_vr=spval
   allocate(this%RootN2Fix_pvr(JZ1,JP1));this%RootN2Fix_pvr=spval
   allocate(this%CanopyRespC_pft(JP1));this%CanopyRespC_pft=spval
   allocate(this%RP1BX(0:JZ1));this%RP1BX=spval

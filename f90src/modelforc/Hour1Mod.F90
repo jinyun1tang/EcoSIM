@@ -751,12 +751,8 @@ module Hour1Mod
   tMicBiome_col(1:NumPlantChemElms,NY,NX)=0.0_r8
   tSoilOrgM_col(1:NumPlantChemElms,NY,NX)=0._r8
   UVLWatMicP(NY,NX)=0.0_r8
-  tLitrOM_col(ielmc,NY,NX)=0.0_r8
-  tHumOM_col(ielmc,NY,NX)=0.0_r8
-  tLitrOM_col(ielmn,NY,NX)=0.0_r8
-  tHumOM_col(ielmn,NY,NX)=0.0_r8
-  tLitrOM_col(ielmp,NY,NX)=0.0_r8
-  tHumOM_col(ielmp,NY,NX)=0.0_r8
+  tLitrOM_col(1:NumPlantChemElms,NY,NX)=0.0_r8
+  tHumOM_col(1:NumPlantChemElms,NY,NX)=0.0_r8
   UNH4(NY,NX)=0.0_r8
   UNO3(NY,NX)=0.0_r8
   UPO4(NY,NX)=0.0_r8
@@ -841,7 +837,7 @@ module Hour1Mod
 
   Gas_Disol_Flx_vr(idg_beg:idg_end,0:NL(NY,NX),NY,NX)=0.0_r8
 
-  TDFOME(1:NumPlantChemElms,1:jcplx,NU(NY,NX):NL(NY,NX),NY,NX)=0.0_r8
+  tRootMycoExud2Soil_vr(1:NumPlantChemElms,1:jcplx,NU(NY,NX):NL(NY,NX),NY,NX)=0.0_r8
   RO2UptkSoilM_vr(1:NPH,NU(NY,NX):NL(NY,NX),NY,NX)=0.0_r8
   end subroutine SetArrays4PlantSoilTransfer
 !------------------------------------------------------------------------------------------

@@ -137,52 +137,52 @@ module ExtractsMod
   integer, intent(in) :: NZ
 
   integer :: N,L,K,NTG,NE
-
-  associate(                       &
-    NU                       => plt_site%NU     , &
-    AREA3                    => plt_site%AREA3  , &
-    PlantPopulation_pft      => plt_site%PlantPopulation_pft     , &
-    RUPP1B                   => plt_rbgc%RUPP1B , &
-    RUPP2B                   => plt_rbgc%RUPP2B , &
-    RUNNXP                   => plt_rbgc%RUNNXP , &
-    RootO2Uptk_pvr                   => plt_rbgc%RootO2Uptk_pvr , &
-    trcg_Root_DisEvap_flx_vr => plt_rbgc%trcg_Root_DisEvap_flx_vr , &
-    trcg_air2root_flx__pvr   => plt_rbgc%trcg_air2root_flx__pvr , &
-    RootCO2Emis_pvr                => plt_rbgc%RootCO2Emis_pvr , &
-    RUPGasSol_vr             => plt_rbgc%RUPGasSol_vr , &
-    RootNutUptake_pvr        => plt_rbgc%RootNutUptake_pvr , &
-    trcg_air2root_flx_vr     => plt_rbgc%trcg_air2root_flx_vr , &
-    trcg_TLP                 => plt_rbgc%trcg_TLP , &
-    RootO2Dmnd4Resp_pvr                    => plt_rbgc%RootO2Dmnd4Resp_pvr  , &
-    RootMycoExudElm_pvr      => plt_rbgc%RootMycoExudElm_pvr , &
-    RUNNHP                   => plt_rbgc%RUNNHP , &
-    RUNNOP                   => plt_rbgc%RUNNOP , &
-    RUPP2P                   => plt_rbgc%RUPP2P , &
-    RUNNBP                   => plt_rbgc%RUNNBP , &
-    RUPP1P                   => plt_rbgc%RUPP1P , &
-    trcs_plant_uptake_vr     => plt_rbgc%trcs_plant_uptake_vr , &
-    RNO3X                    => plt_bgcr%RNO3X  , &
-    RNH4X                    => plt_bgcr%RNH4X  , &
-    RPO4X                    => plt_bgcr%RPO4X  , &
-    RN3BX                    => plt_bgcr%RN3BX  , &
-    RP14X                    => plt_bgcr%RP14X  , &
-    RNHBX                    => plt_bgcr%RNHBX  , &
-    ROXYX                    => plt_bgcr%ROXYX  , &
-    TDFOME                   => plt_bgcr%TDFOME , &
-    TRO2Uptk_vr                   => plt_bgcr%TRO2Uptk_vr , &
-    TCO2P                    => plt_bgcr%TCO2P  , &
-    RPOBX                    => plt_bgcr%RPOBX  , &
-    RP1BX                    => plt_bgcr%RP1BX  , &
-    TKS                      => plt_ew%TKS      , &
-    THeatRootUptake          => plt_ew%THeatRootUptake    , &
-    GridPlantRootH2OUptake_vr=> plt_ew%GridPlantRootH2OUptake_vr   , &
-    AllPlantRootH2OUptake_vr => plt_ew%AllPlantRootH2OUptake_vr    , &
-    trcg_rootml_pvr           => plt_rbgc%trcg_rootml_pvr,&
-    trcs_rootml_pvr           => plt_rbgc%trcs_rootml_pvr, &
-    RootLenDensPerPlant_pvr  => plt_morph%RootLenDensPerPlant_pvr , &
-    RTDNT                    => plt_morph%RTDNT , &
-    MY                       => plt_morph%MY    , &
-    MaxSoiL4Root             => plt_morph%MaxSoiL4Root     &
+ 
+  associate(                                                        &
+    NU                        => plt_site%NU,                       &
+    AREA3                     => plt_site%AREA3,                    &
+    PlantPopulation_pft       => plt_site%PlantPopulation_pft,      &
+    RUPP1B                    => plt_rbgc%RUPP1B,                   &
+    RUPP2B                    => plt_rbgc%RUPP2B,                   &
+    RUNNXP                    => plt_rbgc%RUNNXP,                   &
+    RootO2Uptk_pvr            => plt_rbgc%RootO2Uptk_pvr,           &
+    trcg_Root_DisEvap_flx_vr  => plt_rbgc%trcg_Root_DisEvap_flx_vr, &
+    trcg_air2root_flx__pvr    => plt_rbgc%trcg_air2root_flx__pvr,   &
+    RootCO2Emis_pvr           => plt_rbgc%RootCO2Emis_pvr,          &
+    RUPGasSol_vr              => plt_rbgc%RUPGasSol_vr,             &
+    RootNutUptake_pvr         => plt_rbgc%RootNutUptake_pvr,        &
+    trcg_air2root_flx_vr      => plt_rbgc%trcg_air2root_flx_vr,     &
+    trcg_TLP                  => plt_rbgc%trcg_TLP,                 &
+    RootO2Dmnd4Resp_pvr       => plt_rbgc%RootO2Dmnd4Resp_pvr,      &
+    RootMycoExudElm_pvr       => plt_rbgc%RootMycoExudElm_pvr,      &
+    RUNNHP                    => plt_rbgc%RUNNHP,                   &
+    RUNNOP                    => plt_rbgc%RUNNOP,                   &
+    RUPP2P                    => plt_rbgc%RUPP2P,                   &
+    RUNNBP                    => plt_rbgc%RUNNBP,                   &
+    RUPP1P                    => plt_rbgc%RUPP1P,                   &
+    trcs_plant_uptake_vr      => plt_rbgc%trcs_plant_uptake_vr,     &
+    RNO3X                     => plt_bgcr%RNO3X,                    &
+    RNH4X                     => plt_bgcr%RNH4X,                    &
+    RPO4X                     => plt_bgcr%RPO4X,                    &
+    RN3BX                     => plt_bgcr%RN3BX,                    &
+    RP14X                     => plt_bgcr%RP14X,                    &
+    RNHBX                     => plt_bgcr%RNHBX,                    &
+    ROXYX                     => plt_bgcr%ROXYX,                    &
+    tRootMycoExud2Soil_vr                    => plt_bgcr%tRootMycoExud2Soil_vr,                   &
+    TRO2Uptk_vr               => plt_bgcr%TRO2Uptk_vr,              &
+    TCO2P                     => plt_bgcr%TCO2P,                    &
+    RPOBX                     => plt_bgcr%RPOBX,                    &
+    RP1BX                     => plt_bgcr%RP1BX,                    &
+    TKS                       => plt_ew%TKS,                        &
+    THeatRootUptake           => plt_ew%THeatRootUptake,            &
+    GridPlantRootH2OUptake_vr => plt_ew%GridPlantRootH2OUptake_vr,  &
+    AllPlantRootH2OUptake_vr  => plt_ew%AllPlantRootH2OUptake_vr,   &
+    trcg_rootml_pvr           => plt_rbgc%trcg_rootml_pvr,          &
+    trcs_rootml_pvr           => plt_rbgc%trcs_rootml_pvr,          &
+    RootLenDensPerPlant_pvr   => plt_morph%RootLenDensPerPlant_pvr, &
+    RTDNT                     => plt_morph%RTDNT,                   &
+    MY                        => plt_morph%MY,                      &
+    MaxSoiL4Root              => plt_morph%MaxSoiL4Root             &
   )
 
   DO N=1,MY(NZ)
@@ -276,12 +276,12 @@ module ExtractsMod
 !
 !     TOTAL ROOT C,N,P EXUDATION
 !
-!     TDFOME=total nonstructl C,N,P exchange
+!     tRootMycoExud2Soil_vr=total nonstructl C,N,P exchange
 !     RDFOMC,RDFOMN,RDFOMP=PFT nonstructl C,N,P exchange
 !
       DO K=1,jcplx
         DO NE=1,NumPlantChemElms
-          TDFOME(NE,K,L)=TDFOME(NE,K,L)-RootMycoExudElm_pvr(ielmc,N,K,L,NZ)
+          tRootMycoExud2Soil_vr(NE,K,L)=tRootMycoExud2Soil_vr(NE,K,L)-RootMycoExudElm_pvr(NE,N,K,L,NZ)
         ENDDO
       ENDDO
 !
