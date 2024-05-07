@@ -2049,17 +2049,17 @@ module MicBGCMod
     RN2NetUptkMicb            => micflx%RN2NetUptkMicb,            &
     RN2ONetUptkMicb           => micflx%RN2ONetUptkMicb,           &
     RO2UptkMicb               => micflx%RO2UptkMicb,               &
-    RH1PO4MicbTransfBand_vr   => micflx%RH1PO4MicbTransfBand_vr,   &
-    RH1PO4MicbTransfSoil_vr   => micflx%RH1PO4MicbTransfSoil_vr,   &
-    RH2PO4MicbTransfBand_vr   => micflx%RH2PO4MicbTransfBand_vr,   &
-    RH2PO4MicbTransfSoil_vr   => micflx%RH2PO4MicbTransfSoil_vr,   &
+    RH1PO4MicbTransfBand   => micflx%RH1PO4MicbTransfBand,   &
+    RH1PO4MicbTransfSoil   => micflx%RH1PO4MicbTransfSoil,   &
+    RH2PO4MicbTransfBand   => micflx%RH2PO4MicbTransfBand,   &
+    RH2PO4MicbTransfSoil   => micflx%RH2PO4MicbTransfSoil,   &
     MicrbN2Fix                => micflx%MicrbN2Fix,                &
-    RNH4MicbTransfBand_vr     => micflx%RNH4MicbTransfBand_vr,     &
-    RNH4MicbTransfSoil_vr     => micflx%RNH4MicbTransfSoil_vr,     &
-    RNO2MicbTransfBand_vr     => micflx%RNO2MicbTransfBand_vr,     &
-    RNO2MicbTransfSoil_vr     => micflx%RNO2MicbTransfSoil_vr,     &
-    RNO3MicbTransfBand_vr     => micflx%RNO3MicbTransfBand_vr,     &
-    RNO3MicbTransfSoil_vr     => micflx%RNO3MicbTransfSoil_vr,     &
+    RNH4MicbTransfBand     => micflx%RNH4MicbTransfBand,     &
+    RNH4MicbTransfSoil     => micflx%RNH4MicbTransfSoil,     &
+    RNO2MicbTransfBand     => micflx%RNO2MicbTransfBand,     &
+    RNO2MicbTransfSoil     => micflx%RNO2MicbTransfSoil,     &
+    RNO3MicbTransfBand     => micflx%RNO3MicbTransfBand,     &
+    RNO3MicbTransfSoil     => micflx%RNO3MicbTransfSoil,     &
     REcoDOMUptk               => micflx%REcoDOMUptk                &
   )
   D650: DO K=1,jcplx
@@ -2197,48 +2197,48 @@ module MicBGCMod
     REcoDOMUptk(idom_acetate,K)=REcoDOMUptk(idom_acetate,K)-RDOMSorp(idom_acetate,K)
   ENDDO D655
 !
-!     RNH4MicbTransfSoil_vr,RNH4MicbTransfBand_vr=net change in NH4 in band,non-band
+!     RNH4MicbTransfSoil,RNH4MicbTransfBand=net change in NH4 in band,non-band
 !     TRINH,TRINB=total NH4 mineraln-immobn in non-band,band
 !     RSOxidSoilAutor(1),RSOxidBandAutor(1)=total NH4 oxidation in non-band,band
-!     RNO3MicbTransfSoil_vr,RNO3MicbTransfBand_vr=net change in NO3 in band,non-band
+!     RNO3MicbTransfSoil,RNO3MicbTransfBand=net change in NO3 in band,non-band
 !     TRINO,TRIOB=total NO3 immobn in non-band,band
 !     RSOxidSoilAutor(2),RSOxidBandAutor(2)=total NO2 oxidation in non-band,band
 !     TReduxNO3Soil,TReduxNO3Band=total NO3 reduction in non-band,band
 !     RNO3ProdSoilChemo,RNO3ProdBandChemo=NO3 production from nitrous acid reduction in non-band,band
-!     RNO2MicbTransfSoil_vr,RNO2MicbTransfBand_vr=net change in NO3 in band,non-band
+!     RNO2MicbTransfSoil,RNO2MicbTransfBand=net change in NO3 in band,non-band
 !     TReduxNO2Soil,TReduxNO2Band=total NO2 reduction in non-band,band
 !     RNO2ReduxSoilChemo,RNO2ReduxBandChemo=substrate-limited nitrous acid reduction in non-band,band
-!     RH2PO4MicbTransfSoil_vr,RH2PO4MicbTransfBand_vr=net change in H2PO4 in band,non-band
+!     RH2PO4MicbTransfSoil,RH2PO4MicbTransfBand=net change in H2PO4 in band,non-band
 !     TRIPO,TRIPB=total H2PO4 mineraln-immobn in non-band,band
-!     RH1PO4MicbTransfSoil_vr,RH1PO4MicbTransfBand_vr=net change in HPO4 in band,non-band
+!     RH1PO4MicbTransfSoil,RH1PO4MicbTransfBand=net change in HPO4 in band,non-band
 !     TRIP1,TRIB1=total HPO4 mineraln-immobn in non-band,band
 !     MicrbN2Fix=total N2 fixation
 !     XZHYS=total H+ production
 !     TFixN2=total N2 fixation
 !
-  RNH4MicbTransfSoil_vr=-naqfdiag%TRINH
-  RNO3MicbTransfSoil_vr=-naqfdiag%TRINO-naqfdiag%TReduxNO3Soil+RNO3ProdSoilChemo
-  RNO2MicbTransfSoil_vr=+naqfdiag%TReduxNO3Soil-naqfdiag%TReduxNO2Soil-RNO2ReduxSoilChemo
-  RH2PO4MicbTransfSoil_vr=-naqfdiag%TRIPO
-  RH1PO4MicbTransfSoil_vr=-naqfdiag%TRIP1
-  RNH4MicbTransfBand_vr=-naqfdiag%TRINB
-  RNO3MicbTransfBand_vr=-naqfdiag%TRIOB-naqfdiag%TReduxNO3Band+RNO3ProdBandChemo
-  RNO2MicbTransfBand_vr=naqfdiag%TReduxNO3Band-naqfdiag%TReduxNO2Band-RNO2ReduxBandChemo
+  RNH4MicbTransfSoil=-naqfdiag%TRINH
+  RNO3MicbTransfSoil=-naqfdiag%TRINO-naqfdiag%TReduxNO3Soil+RNO3ProdSoilChemo
+  RNO2MicbTransfSoil=+naqfdiag%TReduxNO3Soil-naqfdiag%TReduxNO2Soil-RNO2ReduxSoilChemo
+  RH2PO4MicbTransfSoil=-naqfdiag%TRIPO
+  RH1PO4MicbTransfSoil=-naqfdiag%TRIP1
+  RNH4MicbTransfBand=-naqfdiag%TRINB
+  RNO3MicbTransfBand=-naqfdiag%TRIOB-naqfdiag%TReduxNO3Band+RNO3ProdBandChemo
+  RNO2MicbTransfBand=naqfdiag%TReduxNO3Band-naqfdiag%TReduxNO2Band-RNO2ReduxBandChemo
   !AmmoniaOxidBacter=1, NitriteOxidBacter=2, AerobicMethanotrofBacter=3
   DO NGL=JGniA(AmmoniaOxidBacter),JGnfA(AmmoniaOxidBacter)
-    RNH4MicbTransfSoil_vr=RNH4MicbTransfSoil_vr-RSOxidSoilAutor(NGL)
-    RNO2MicbTransfSoil_vr=RNO2MicbTransfSoil_vr+RSOxidSoilAutor(NGL)
-    RNH4MicbTransfBand_vr=RNH4MicbTransfBand_vr-RSOxidBandAutor(NGL)
+    RNH4MicbTransfSoil=RNH4MicbTransfSoil-RSOxidSoilAutor(NGL)
+    RNO2MicbTransfSoil=RNO2MicbTransfSoil+RSOxidSoilAutor(NGL)
+    RNH4MicbTransfBand=RNH4MicbTransfBand-RSOxidBandAutor(NGL)
   ENDDO
   DO NGL=JGniA(NitriteOxidBacter),JGnfA(NitriteOxidBacter)
-    RNO3MicbTransfSoil_vr=RNO3MicbTransfSoil_vr+RSOxidSoilAutor(NGL)
-    RNO2MicbTransfSoil_vr=RNO2MicbTransfSoil_vr-RSOxidSoilAutor(NGL)
-    RNO3MicbTransfBand_vr=RNO3MicbTransfBand_vr+RSOxidBandAutor(NGL)
-    RNO2MicbTransfBand_vr=RNO2MicbTransfBand_vr-RSOxidBandAutor(NGL)
+    RNO3MicbTransfSoil=RNO3MicbTransfSoil+RSOxidSoilAutor(NGL)
+    RNO2MicbTransfSoil=RNO2MicbTransfSoil-RSOxidSoilAutor(NGL)
+    RNO3MicbTransfBand=RNO3MicbTransfBand+RSOxidBandAutor(NGL)
+    RNO2MicbTransfBand=RNO2MicbTransfBand-RSOxidBandAutor(NGL)
   ENDDO
 
-  RH2PO4MicbTransfBand_vr=-naqfdiag%TRIPB
-  RH1PO4MicbTransfBand_vr=-naqfdiag%TRIB1
+  RH2PO4MicbTransfBand=-naqfdiag%TRIPB
+  RH1PO4MicbTransfBand=-naqfdiag%TRIB1
   MicrbN2Fix=naqfdiag%TFixN2
   TSens4MicbGrwoth=TSensGrowth
   VWatMicrobAct=VOLWZ
