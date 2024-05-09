@@ -179,6 +179,20 @@ configure_file(
 )
 
 # Other third-party libraries.
+# adding in ATS tpl support:
+
+set(ATS-EcoSIM TRUE)
+
+if (ATS-EcoSIM)
+    message(STATUS "In if statement")
+    set(NETCDF_FFLAGS "${TPL_INSTALL_PREFIX}/include")
+    set(NETCDF_FLIBS "-L${TPL_INSTALL_PREFIX}/lib -lnetcdff -lnetcdf -lnetcdf -lhdf5")
+    set(ECOSIM_HAVE_NETCDF TRUE)
+endif()
+
+set(CONFIG_FLAGS "-DTPL_NETCDF_INCLUDE_DIRS=\"${NETCDF_FFLAGS}\"")
+set(CONFIG_FLAGS "${CONFIG_FLAGS} -DTPL_NETCDF_LIBRARIES=\"${NETCDF_FLIBS}\"")
+
 add_subdirectory(3rd-partylibs)
 
 if (NOT ECOSIM_HAVE_NETCDF)
