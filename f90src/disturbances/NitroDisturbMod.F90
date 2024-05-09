@@ -68,7 +68,7 @@ module NitroDisturbMod
         IF(L.EQ.0 .OR. L.GE.NUM(NY,NX))THEN
           IF(IFLGJ.EQ.1)THEN
             exit
-          ELSEIF(THETW_vr(L,NY,NX).GT.FVLWB .OR. CSoilOrgM_vr(ielmc,L,NY,NX).LE.FORGC)THEN
+          ELSEIF(THETW_vr(L,NY,NX).GT.VolMaxSoilMoist4Fire .OR. CSoilOrgM_vr(ielmc,L,NY,NX).LE.FORGC)THEN
             IFLGJ=1
           ELSE
             NLL=L

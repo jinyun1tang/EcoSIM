@@ -8,7 +8,7 @@ module PlantMgmtDataType
 
   logical, target,allocatable ::  flag_pft_active(:,:,:)
   real(r8),target,allocatable ::  THIN_pft(:,:,:,:)                      !thinning of plant population, [-]
-  real(r8),target,allocatable ::  EHVST(:,:,:,:,:,:)                 !harvest efficiency, [-]
+  real(r8),target,allocatable ::  FracBiomRMbyHVST(:,:,:,:,:,:)                 !harvest efficiency, [-]
   real(r8),target,allocatable ::  HVST(:,:,:,:)                      !harvest cutting height (+ve) or fractional LAI removal (-ve), [m or -]
   integer ,target,allocatable ::  iHarvstType_pft(:,:,:,:)                      !type of harvest, [-]
   integer ,target,allocatable ::  jHarvst_pft(:,:,:,:)                      !flag for stand replacing disturbance, [-]
@@ -46,7 +46,7 @@ module PlantMgmtDataType
   implicit none
   allocate(flag_pft_active(JP,JY,JX));  flag_pft_active=.false.
   allocate(THIN_pft(JP,366,JY,JX)); THIN_pft=0._r8
-  allocate(EHVST(2,4,JP,366,JY,JX));EHVST=0._r8
+  allocate(FracBiomRMbyHVST(2,4,JP,366,JY,JX));FracBiomRMbyHVST=0._r8
   allocate(HVST(JP,366,JY,JX)); HVST=0._r8
   allocate(iHarvstType_pft(JP,366,JY,JX));iHarvstType_pft=0
   allocate(jHarvst_pft(JP,366,JY,JX));jHarvst_pft=0
@@ -75,7 +75,7 @@ module PlantMgmtDataType
 
   call destroy(flag_pft_active)
   call destroy(THIN_pft)
-  call destroy(EHVST)
+  call destroy(FracBiomRMbyHVST)
   call destroy(HVST)
   call destroy(iHarvstType_pft)
   call destroy(jHarvst_pft)

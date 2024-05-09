@@ -133,14 +133,14 @@ implicit none
             jHarvst_pft(NZ,M,NY,NX)=0
             HVST(NZ,M,NY,NX)=1.0E+06_r8
             THIN_pft(NZ,M,NY,NX)=-1.0_r8
-            EHVST(1,iplthvst_leaf,NZ,M,NY,NX)=1.0_r8
-            EHVST(1,iplthvst_finenonleaf,NZ,M,NY,NX)=1.0_r8
-            EHVST(1,iplthvst_woody,NZ,M,NY,NX)=1.0_r8
-            EHVST(1,iplthvst_stdead,NZ,M,NY,NX)=1.0_r8
-            EHVST(2,iplthvst_leaf,NZ,M,NY,NX)=1.0_r8
-            EHVST(2,iplthvst_finenonleaf,NZ,M,NY,NX)=1.0_r8
-            EHVST(2,iplthvst_woody,NZ,M,NY,NX)=1.0_r8
-            EHVST(2,iplthvst_stdead,NZ,M,NY,NX)=1.0_r8
+            FracBiomRMbyHVST(1,iplthvst_leaf,NZ,M,NY,NX)=1.0_r8
+            FracBiomRMbyHVST(1,iplthvst_finenonleaf,NZ,M,NY,NX)=1.0_r8
+            FracBiomRMbyHVST(1,iplthvst_woody,NZ,M,NY,NX)=1.0_r8
+            FracBiomRMbyHVST(1,iplthvst_stdead,NZ,M,NY,NX)=1.0_r8
+            FracBiomRMbyHVST(2,iplthvst_leaf,NZ,M,NY,NX)=1.0_r8
+            FracBiomRMbyHVST(2,iplthvst_finenonleaf,NZ,M,NY,NX)=1.0_r8
+            FracBiomRMbyHVST(2,iplthvst_woody,NZ,M,NY,NX)=1.0_r8
+            FracBiomRMbyHVST(2,iplthvst_stdead,NZ,M,NY,NX)=1.0_r8
           ENDDO
           PlantinDepth(NZ,NY,NX)=ppmc
         ENDDO
@@ -256,14 +256,14 @@ implicit none
                 jHarvst_pft(NZ,IDY,NY,NX)=NumOfCanopyLayersUT
                 HVST(NZ,IDY,NY,NX)=HCUT
                 THIN_pft(NZ,IDY,NY,NX)=PCUT
-                EHVST(1,iplthvst_leaf,NZ,IDY,NY,NX)=ECUT11
-                EHVST(1,iplthvst_finenonleaf,NZ,IDY,NY,NX)=ECUT12
-                EHVST(1,iplthvst_woody,NZ,IDY,NY,NX)=ECUT13
-                EHVST(1,iplthvst_stdead,NZ,IDY,NY,NX)=ECUT14
-                EHVST(2,iplthvst_leaf,NZ,IDY,NY,NX)=ECUT21
-                EHVST(2,iplthvst_finenonleaf,NZ,IDY,NY,NX)=ECUT22
-                EHVST(2,iplthvst_woody,NZ,IDY,NY,NX)=ECUT23
-                EHVST(2,iplthvst_stdead,NZ,IDY,NY,NX)=ECUT24
+                FracBiomRMbyHVST(1,iplthvst_leaf,NZ,IDY,NY,NX)=ECUT11
+                FracBiomRMbyHVST(1,iplthvst_finenonleaf,NZ,IDY,NY,NX)=ECUT12
+                FracBiomRMbyHVST(1,iplthvst_woody,NZ,IDY,NY,NX)=ECUT13
+                FracBiomRMbyHVST(1,iplthvst_stdead,NZ,IDY,NY,NX)=ECUT14
+                FracBiomRMbyHVST(2,iplthvst_leaf,NZ,IDY,NY,NX)=ECUT21
+                FracBiomRMbyHVST(2,iplthvst_finenonleaf,NZ,IDY,NY,NX)=ECUT22
+                FracBiomRMbyHVST(2,iplthvst_woody,NZ,IDY,NY,NX)=ECUT23
+                FracBiomRMbyHVST(2,iplthvst_stdead,NZ,IDY,NY,NX)=ECUT24
 
                 IF(iHarvstType_pft(NZ,IDY,NY,NX).EQ.4.OR.iHarvstType_pft(NZ,IDY,NY,NX).EQ.6)THEN
                   !animal or insect biomass
@@ -275,14 +275,14 @@ implicit none
                       jHarvst_pft(NZ,IDYG,NY,NX)=NumOfCanopyLayersUT
                       HVST(NZ,IDYG,NY,NX)=HCUT
                       THIN_pft(NZ,IDYG,NY,NX)=PCUT
-                      EHVST(1,iplthvst_leaf,NZ,IDYG,NY,NX)=ECUT11
-                      EHVST(1,iplthvst_finenonleaf,NZ,IDYG,NY,NX)=ECUT12
-                      EHVST(1,iplthvst_woody,NZ,IDYG,NY,NX)=ECUT13
-                      EHVST(1,iplthvst_stdead,NZ,IDYG,NY,NX)=ECUT14
-                      EHVST(2,iplthvst_leaf,NZ,IDYG,NY,NX)=ECUT21
-                      EHVST(2,iplthvst_finenonleaf,NZ,IDYG,NY,NX)=ECUT22
-                      EHVST(2,iplthvst_woody,NZ,IDYG,NY,NX)=ECUT23
-                      EHVST(2,iplthvst_stdead,NZ,IDYG,NY,NX)=ECUT24
+                      FracBiomRMbyHVST(1,iplthvst_leaf,NZ,IDYG,NY,NX)=ECUT11
+                      FracBiomRMbyHVST(1,iplthvst_finenonleaf,NZ,IDYG,NY,NX)=ECUT12
+                      FracBiomRMbyHVST(1,iplthvst_woody,NZ,IDYG,NY,NX)=ECUT13
+                      FracBiomRMbyHVST(1,iplthvst_stdead,NZ,IDYG,NY,NX)=ECUT14
+                      FracBiomRMbyHVST(2,iplthvst_leaf,NZ,IDYG,NY,NX)=ECUT21
+                      FracBiomRMbyHVST(2,iplthvst_finenonleaf,NZ,IDYG,NY,NX)=ECUT22
+                      FracBiomRMbyHVST(2,iplthvst_woody,NZ,IDYG,NY,NX)=ECUT23
+                      FracBiomRMbyHVST(2,iplthvst_stdead,NZ,IDYG,NY,NX)=ECUT24
                     ENDDO D580
                   endif
                   IDYS=IDY

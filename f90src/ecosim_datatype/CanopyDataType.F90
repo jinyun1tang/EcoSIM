@@ -91,7 +91,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  VapXAir2CanG(:,:)                        !total canopy evaporation, [m3 d-2]
   real(r8),target,allocatable ::  TENGYC(:,:)                        !total canopy heat content, [MJ  d-2]
   real(r8),target,allocatable ::  THFLXC(:,:)                        !total canopy heat flux, [MJ  d-2]
-  real(r8),target,allocatable ::  CanWatg(:,:)                       !total canopy water content stored in dry matter, [m3 d-2]
+  real(r8),target,allocatable ::  CanWat_col(:,:)                       !total canopy water content stored in dry matter, [m3 d-2]
   real(r8),target,allocatable ::  LWRadCanG(:,:)                         !total canopy LW emission, [MJ d-2 h-1]
   real(r8),target,allocatable ::  RadSWLeafAlbedo_pft(:,:,:)                        !canopy shortwave albedo , [-]
   real(r8),target,allocatable ::  RadSWLeafTransmis_pft(:,:,:)                        !canopy shortwave transmissivity , [-]
@@ -103,7 +103,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  TKCanopy_pft(:,:,:)                        !canopy temperature, [K]
   real(r8),target,allocatable ::  CPOOL3_node(:,:,:,:,:)                  !minimum sink strength for nonstructural C transfer, [g d-2]
   real(r8),target,allocatable ::  NetCumElmntFlx2Plant_pft(:,:,:,:)                     !effect of canopy element status on seed set , []
-  real(r8),target,allocatable ::  WGLFT(:,:,:)                       !total leaf mass, [g d-2]
+  real(r8),target,allocatable ::  tCanLeafC_cl(:,:,:)                       !total leaf mass, [g d-2]
   real(r8),target,allocatable ::  CFOPE(:,:,:,:,:,:)                 !litter kinetic fraction, [-]
   real(r8),target,allocatable ::  ShootElms_pft(:,:,:,:)                 !
   real(r8),target,allocatable ::  ShootElmsbeg_pft(:,:,:,:)           !shoot biomass for each pft
@@ -245,7 +245,7 @@ module CanopyDataType
   allocate(VapXAir2CanG(JY,JX));      VapXAir2CanG=0._r8
   allocate(TENGYC(JY,JX));      TENGYC=0._r8
   allocate(THFLXC(JY,JX));      THFLXC=0._r8
-  allocate(CanWatg(JY,JX));      CanWatg=0._r8
+  allocate(CanWat_col(JY,JX));      CanWat_col=0._r8
   allocate(LWRadCanG(JY,JX));       LWRadCanG=0._r8
   allocate(RadSWLeafAlbedo_pft(JP,JY,JX));     RadSWLeafAlbedo_pft=0._r8
   allocate(RadSWLeafTransmis_pft(JP,JY,JX));     RadSWLeafTransmis_pft=0._r8
@@ -257,7 +257,7 @@ module CanopyDataType
   allocate(TKCanopy_pft(JP,JY,JX));     TKCanopy_pft=0._r8
   allocate(CPOOL3_node(MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));CPOOL3_node=0._r8
   allocate(NetCumElmntFlx2Plant_pft(NumPlantChemElms,JP,JY,JX));    NetCumElmntFlx2Plant_pft=0._r8
-  allocate(WGLFT(NumOfCanopyLayers,JY,JX));    WGLFT=0._r8
+  allocate(tCanLeafC_cl(NumOfCanopyLayers,JY,JX));    tCanLeafC_cl=0._r8
   allocate(CFOPE(NumPlantChemElms,0:NumLitterGroups,jsken,JP,JY,JX));CFOPE=0._r8
   allocate(ShootElmsbeg_pft(NumPlantChemElms,JP,JY,JX)); ShootElmsbeg_pft=0._r8
   allocate(ShootStrutElms_pft(NumPlantChemElms,JP,JY,JX)); ShootStrutElms_pft=0._r8
@@ -402,7 +402,7 @@ module CanopyDataType
   call destroy(VapXAir2CanG)
   call destroy(TENGYC)
   call destroy(THFLXC)
-  call destroy(CanWatg)
+  call destroy(CanWat_col)
   call destroy(LWRadCanG)
   call destroy(RadSWLeafAlbedo_pft)
   call destroy(RadSWLeafTransmis_pft)
@@ -415,7 +415,7 @@ module CanopyDataType
   call destroy(CPOOL3_node)
   call destroy(ShootElms_pft)
   call destroy(NetCumElmntFlx2Plant_pft)
-  call destroy(WGLFT)
+  call destroy(tCanLeafC_cl)
   call destroy(CFOPE)
   call destroy(ShootElmsbeg_pft)
   call destroy(ShootStrutElms_pft)

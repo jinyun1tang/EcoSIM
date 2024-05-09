@@ -49,7 +49,7 @@ module ExtractsMod
   integer :: NE
   associate(                                                        &
    NP0                       => plt_site%NP0,                       &
-   WGLFT                     => plt_biom%WGLFT,                     &
+   tCanLeafC_cl              => plt_biom%tCanLeafC_cl,              &
    StandingDeadStrutElms_col => plt_biom%StandingDeadStrutElms_col, &
    StandDeadStrutElms_pft    => plt_biom%StandDeadStrutElms_pft,    &
    LitrfalStrutElms_pft      => plt_bgcr%LitrfalStrutElms_pft,      &
@@ -92,7 +92,7 @@ module ExtractsMod
   StemArea_col=0._r8
   DO  L=1,NumOfCanopyLayers1
     CanopyLeafAareZ_col(L)=0._r8
-    WGLFT(L)=0._r8
+    tCanLeafC_cl(L)=0._r8
     CanopyStemAareZ_col(L)=0._r8
   ENDDO
   end associate
@@ -105,7 +105,7 @@ module ExtractsMod
 !
 !     CanopyLeafAareZ_col,CanopyStemAareZ_col=total leaf,stalk area of combined canopy layer
 !     CanopyLeafAreaZ_pft,CanopyStemAreaZ_pft=PFT leaf,stalk area in canopy layer
-!     WGLFT=total leaf C of combined canopy layer
+!     tCanLeafC_cl=total leaf C of combined canopy layer
 !     CanopyLeafCLyr_pft=PFT leaf C in canopy layer
 !
   implicit none
@@ -113,7 +113,7 @@ module ExtractsMod
   integer :: L
   associate(                                              &
     CanopyLeafCLyr_pft  => plt_biom%CanopyLeafCLyr_pft,   &
-    WGLFT               => plt_biom%WGLFT,                &
+    tCanLeafC_cl        => plt_biom%tCanLeafC_cl,         &
     CanopyLeafAareZ_col => plt_morph%CanopyLeafAareZ_col, &
     CanopyStemAreaZ_pft => plt_morph%CanopyStemAreaZ_pft, &
     CanopyStemAareZ_col => plt_morph%CanopyStemAareZ_col, &
@@ -121,7 +121,7 @@ module ExtractsMod
   )
   DO L=1,NumOfCanopyLayers1
     CanopyLeafAareZ_col(L)=CanopyLeafAareZ_col(L)+CanopyLeafAreaZ_pft(L,NZ)
-    WGLFT(L)=WGLFT(L)+CanopyLeafCLyr_pft(L,NZ)
+    tCanLeafC_cl(L)=tCanLeafC_cl(L)+CanopyLeafCLyr_pft(L,NZ)
     CanopyStemAareZ_col(L)=CanopyStemAareZ_col(L)+CanopyStemAreaZ_pft(L,NZ)
   ENDDO
   end associate
@@ -142,9 +142,9 @@ module ExtractsMod
     NU                        => plt_site%NU,                       &
     AREA3                     => plt_site%AREA3,                    &
     PlantPopulation_pft       => plt_site%PlantPopulation_pft,      &
-    RootH1PO4DmndBand_pvr                    => plt_rbgc%RootH1PO4DmndBand_pvr,                   &
-    RootH2PO4DmndBand_pvr                    => plt_rbgc%RootH2PO4DmndBand_pvr,                   &
-    RootNO3DmndBand_pvr                    => plt_rbgc%RootNO3DmndBand_pvr,                   &
+    RootH1PO4DmndBand_pvr     => plt_rbgc%RootH1PO4DmndBand_pvr,    &
+    RootH2PO4DmndBand_pvr     => plt_rbgc%RootH2PO4DmndBand_pvr,    &
+    RootNO3DmndBand_pvr       => plt_rbgc%RootNO3DmndBand_pvr,      &
     RootO2Uptk_pvr            => plt_rbgc%RootO2Uptk_pvr,           &
     trcg_Root_DisEvap_flx_vr  => plt_rbgc%trcg_Root_DisEvap_flx_vr, &
     trcg_air2root_flx__pvr    => plt_rbgc%trcg_air2root_flx__pvr,   &
@@ -155,24 +155,24 @@ module ExtractsMod
     trcg_TLP                  => plt_rbgc%trcg_TLP,                 &
     RootO2Dmnd4Resp_pvr       => plt_rbgc%RootO2Dmnd4Resp_pvr,      &
     RootMycoExudElm_pvr       => plt_rbgc%RootMycoExudElm_pvr,      &
-    RootNH4DmndSoil_pvr                    => plt_rbgc%RootNH4DmndSoil_pvr,                   &
-    RootNO3DmndSoil_pvr                    => plt_rbgc%RootNO3DmndSoil_pvr,                   &
-    RootH2PO4DmndSoil_pvr                    => plt_rbgc%RootH2PO4DmndSoil_pvr,                   &
-    RootNH4DmndBand_pvr                    => plt_rbgc%RootNH4DmndBand_pvr,                   &
-    RootH1PO4DmndSoil_pvr                    => plt_rbgc%RootH1PO4DmndSoil_pvr,                   &
+    RootNH4DmndSoil_pvr       => plt_rbgc%RootNH4DmndSoil_pvr,      &
+    RootNO3DmndSoil_pvr       => plt_rbgc%RootNO3DmndSoil_pvr,      &
+    RootH2PO4DmndSoil_pvr     => plt_rbgc%RootH2PO4DmndSoil_pvr,    &
+    RootNH4DmndBand_pvr       => plt_rbgc%RootNH4DmndBand_pvr,      &
+    RootH1PO4DmndSoil_pvr     => plt_rbgc%RootH1PO4DmndSoil_pvr,    &
     trcs_plant_uptake_vr      => plt_rbgc%trcs_plant_uptake_vr,     &
-    RNO3X                     => plt_bgcr%RNO3X,                    &
-    RNH4X                     => plt_bgcr%RNH4X,                    &
-    RPO4X                     => plt_bgcr%RPO4X,                    &
-    RN3BX                     => plt_bgcr%RN3BX,                    &
-    RP14X                     => plt_bgcr%RP14X,                    &
-    RNHBX                     => plt_bgcr%RNHBX,                    &
-    ROXYX                     => plt_bgcr%ROXYX,                    &
+    REcoNO3DmndSoil_vr        => plt_bgcr%REcoNO3DmndSoil_vr,       &
+    REcoNH4DmndSoil_vr        => plt_bgcr%REcoNH4DmndSoil_vr,       &
+    REcoH2PO4DmndSoil_vr      => plt_bgcr%REcoH2PO4DmndSoil_vr,     &
+    REcoNO3DmndBand_vr        => plt_bgcr%REcoNO3DmndBand_vr,       &
+    REcoH1PO4DmndSoil_vr      => plt_bgcr%REcoH1PO4DmndSoil_vr,     &
+    REcoNH4DmndBand_vr        => plt_bgcr%REcoNH4DmndBand_vr,       &
+    REcoO2DmndResp_vr         => plt_bgcr%REcoO2DmndResp_vr,        &
     tRootMycoExud2Soil_vr     => plt_bgcr%tRootMycoExud2Soil_vr,    &
     TRO2Uptk_vr               => plt_bgcr%TRO2Uptk_vr,              &
     TCO2P                     => plt_bgcr%TCO2P,                    &
-    RPOBX                     => plt_bgcr%RPOBX,                    &
-    RP1BX                     => plt_bgcr%RP1BX,                    &
+    REcoH2PO4DmndBand_vr      => plt_bgcr%REcoH2PO4DmndBand_vr,     &
+    REcoH1PO4DmndBand_vr      => plt_bgcr%REcoH1PO4DmndBand_vr,     &
     TKS                       => plt_ew%TKS,                        &
     THeatRootUptake           => plt_ew%THeatRootUptake,            &
     GridPlantRootH2OUptake_vr => plt_ew%GridPlantRootH2OUptake_vr,  &
@@ -180,7 +180,7 @@ module ExtractsMod
     trcg_rootml_pvr           => plt_rbgc%trcg_rootml_pvr,          &
     trcs_rootml_pvr           => plt_rbgc%trcs_rootml_pvr,          &
     RootLenDensPerPlant_pvr   => plt_morph%RootLenDensPerPlant_pvr, &
-    RTDNT                     => plt_morph%RTDNT,                   &
+    totRootLenDens_vr         => plt_morph%totRootLenDens_vr,       &
     MY                        => plt_morph%MY,                      &
     MaxSoiL4Root              => plt_morph%MaxSoiL4Root             &
   )
@@ -190,7 +190,7 @@ module ExtractsMod
 !
 !     TOTAL ROOT DENSITY
 !
-!     RTDNT=total root length density
+!     totRootLenDens_vr=total root length density
 !     RootLenDensPerPlant_pvr=PFT root length density per plant
 !     AllPlantRootH2OUptake_vr=total water uptake
 !     AllPlantRootH2OUptake_vr=PFT root water uptake
@@ -199,7 +199,7 @@ module ExtractsMod
 !     PP=PFT population, this is dynamic, and can goes to zero
 !
       IF(N.EQ.ipltroot)THEN
-        RTDNT(L)=RTDNT(L)+RootLenDensPerPlant_pvr(N,L,NZ)*PlantPopulation_pft(NZ)/AREA3(L)
+        totRootLenDens_vr(L)=totRootLenDens_vr(L)+RootLenDensPerPlant_pvr(N,L,NZ)*PlantPopulation_pft(NZ)/AREA3(L)
       ENDIF
 !
 !     TOTAL WATER UPTAKE
@@ -281,15 +281,15 @@ module ExtractsMod
 !     TOTAL ROOT + MICROBIAL UPTAKE USED TO CALCULATE
 !     COMPETITION CONSTRAINTS
 !
-!     ROXYX=O2 demand by all microbial,root,myco populations
-!     RNH4X=NH4 demand in non-band by all microbial,root,myco populations
-!     RNO3X=NO3 demand in non-band by all microbial,root,myco populations
-!     RPO4X=H2PO4 demand in non-band by all microbial,root,myco populations
-!     RP14X=HPO4 demand in non-band by all microbial,root,myco populations
-!     RNHBX=NH4 demand in band by all microbial,root,myco populations
-!     RN3BX=NO3 demand in band by all microbial,root,myco populations
-!     RPOBX=H2PO4 demand in band by all microbial,root,myco populations
-!     RP1BX=HPO4 demand in band by all microbial,root,myco populations
+!     REcoO2DmndResp_vr=O2 demand by all microbial,root,myco populations
+!     REcoNH4DmndSoil_vr=NH4 demand in non-band by all microbial,root,myco populations
+!     REcoNO3DmndSoil_vr=NO3 demand in non-band by all microbial,root,myco populations
+!     REcoH2PO4DmndSoil_vr=H2PO4 demand in non-band by all microbial,root,myco populations
+!     REcoH1PO4DmndSoil_vr=HPO4 demand in non-band by all microbial,root,myco populations
+!     REcoNH4DmndBand_vr=NH4 demand in band by all microbial,root,myco populations
+!     REcoNO3DmndBand_vr=NO3 demand in band by all microbial,root,myco populations
+!     REcoH2PO4DmndBand_vr=H2PO4 demand in band by all microbial,root,myco populations
+!     REcoH1PO4DmndBand_vr=HPO4 demand in band by all microbial,root,myco populations
 !     RootO2Dmnd4Resp_pvr=O2 demand by each root,myco population
 !     RootNH4DmndSoil_pvr=NH4 demand in non-band by each root population
 !     RootNO3DmndSoil_pvr=NO3 demand in non-band by each root population
@@ -300,15 +300,15 @@ module ExtractsMod
 !     RootH2PO4DmndBand_pvr=H2PO4 demand in band by each root population
 !     RootH1PO4DmndBand_pvr=HPO4 demand in band by each root population
 !
-      ROXYX(L)=ROXYX(L)+RootO2Dmnd4Resp_pvr(N,L,NZ)
-      RNH4X(L)=RNH4X(L)+RootNH4DmndSoil_pvr(N,L,NZ)
-      RNO3X(L)=RNO3X(L)+RootNO3DmndSoil_pvr(N,L,NZ)
-      RPO4X(L)=RPO4X(L)+RootH2PO4DmndSoil_pvr(N,L,NZ)
-      RP14X(L)=RP14X(L)+RootH1PO4DmndSoil_pvr(N,L,NZ)
-      RNHBX(L)=RNHBX(L)+RootNH4DmndBand_pvr(N,L,NZ)
-      RN3BX(L)=RN3BX(L)+RootNO3DmndBand_pvr(N,L,NZ)
-      RPOBX(L)=RPOBX(L)+RootH2PO4DmndBand_pvr(N,L,NZ)
-      RP1BX(L)=RP1BX(L)+RootH1PO4DmndBand_pvr(N,L,NZ)
+      REcoO2DmndResp_vr(L)=REcoO2DmndResp_vr(L)+RootO2Dmnd4Resp_pvr(N,L,NZ)
+      REcoNH4DmndSoil_vr(L)=REcoNH4DmndSoil_vr(L)+RootNH4DmndSoil_pvr(N,L,NZ)
+      REcoNO3DmndSoil_vr(L)=REcoNO3DmndSoil_vr(L)+RootNO3DmndSoil_pvr(N,L,NZ)
+      REcoH2PO4DmndSoil_vr(L)=REcoH2PO4DmndSoil_vr(L)+RootH2PO4DmndSoil_pvr(N,L,NZ)
+      REcoH1PO4DmndSoil_vr(L)=REcoH1PO4DmndSoil_vr(L)+RootH1PO4DmndSoil_pvr(N,L,NZ)
+      REcoNH4DmndBand_vr(L)=REcoNH4DmndBand_vr(L)+RootNH4DmndBand_pvr(N,L,NZ)
+      REcoNO3DmndBand_vr(L)=REcoNO3DmndBand_vr(L)+RootNO3DmndBand_pvr(N,L,NZ)
+      REcoH2PO4DmndBand_vr(L)=REcoH2PO4DmndBand_vr(L)+RootH2PO4DmndBand_pvr(N,L,NZ)
+      REcoH1PO4DmndBand_vr(L)=REcoH1PO4DmndBand_vr(L)+RootH1PO4DmndBand_pvr(N,L,NZ)
     ENDDO
   ENDDO
   end associate
@@ -328,53 +328,53 @@ module ExtractsMod
   integer :: L, NE,NB,NTG
   real(r8) :: ENGYC
 
-  associate(                       &
-    PlantElemntStoreLandscape  => plt_site%PlantElemntStoreLandscape  , &
-    ElmBalanceCum_pft          => plt_site%ElmBalanceCum_pft   , &
-    NH3EmiCum_pft              => plt_bgcr%NH3EmiCum_pft  , &
-    Canopy_NEE_col             => plt_bgcr%Canopy_NEE_col  , &
-    LitrFallStrutElms_col      => plt_bgcr%LitrFallStrutElms_col  , &
-    RootGasLossDisturb_pft     => plt_bgcr%RootGasLossDisturb_pft, &
-    RootN2Fix_pvr              => plt_bgcr%RootN2Fix_pvr  , &
-    CO2NetFix_pft              => plt_bgcr%CO2NetFix_pft   , &
-    ETCanopy_pft               => plt_ew%ETCanopy_pft    , &
-    TH2GZ                      => plt_bgcr%TH2GZ  , &
-    trcs_plant_uptake_vr       => plt_rbgc%trcs_plant_uptake_vr, &    
-    PlantRootSoilElmNetX_pft   => plt_rbgc%PlantRootSoilElmNetX_pft , &
-    TRootGasLossDisturb_pft    => plt_rbgc%TRootGasLossDisturb_pft  , &
-    Transpiration_pft          => plt_ew%Transpiration_pft      , &
-    PrecIntcptByCanopy_pft     => plt_ew%PrecIntcptByCanopy_pft     , &
-    VapXAir2Canopy_pft         => plt_ew%VapXAir2Canopy_pft   , &
-    WatByPCanopy               => plt_ew%WatByPCanopy    , &
-    CanopyWater_pft            => plt_ew%CanopyWater_pft    , &
-    Eco_Heat_Grnd_col          => plt_ew%Eco_Heat_Grnd_col      , &
-    HeatXAir2PCan              => plt_ew%HeatXAir2PCan    , &
-    EvapTransHeat_pft          => plt_ew%EvapTransHeat_pft    , &
-    CanWatg                    => plt_ew%CanWatg   , &
-    TKC                        => plt_ew%TKC      , &
-    TKS                        => plt_ew%TKS      , &
-    ENGYX                      => plt_ew%ENGYX    , &
-    Eco_Heat_Sens_col          => plt_ew%Eco_Heat_Sens_col      , &
-    VapXAir2CanG               => plt_ew%VapXAir2CanG   , &
-    TENGYC                     => plt_ew%TENGYC   , &
-    TEVAPP                     => plt_ew%TEVAPP   , &
-    THFLXC                     => plt_ew%THFLXC   , &
-    LWRadCanG                  => plt_ew%LWRadCanG    , &
-    TairK                      => plt_ew%TairK      , &
-    HeatStorCanP               => plt_ew%HeatStorCanP    , &
-    Eco_Heat_Latent_col        => plt_ew%Eco_Heat_Latent_col      , &
-    CanH2OHeldVg               => plt_ew%CanH2OHeldVg   , &
-    NU                         => plt_site%NU     , &
-    NH3Dep2Can_pft             =>  plt_bgcr%NH3Dep2Can_pft  , &     
-    StemArea_col               => plt_morph%StemArea_col , &
-    CanopyLeafArea_col         => plt_morph%CanopyLeafArea_col , &
-    MaxSoiL4Root               => plt_morph%MaxSoiL4Root   , &
-    NumOfBranches_pft          => plt_morph%NumOfBranches_pft   , &
-    CanopyStemArea_pft         => plt_morph%CanopyStemArea_pft , &
-    CanopyLeafArea_pft         => plt_morph%CanopyLeafArea_pft , &
-    RadNet2Canopy_pft                => plt_rad%RadNet2Canopy_pft    , &
-    LWRadCanopy_pft                  => plt_rad%LWRadCanopy_pft   , &
-    Eco_NetRad_col             => plt_rad%Eco_NetRad_col       &
+  associate(                                                         &
+    PlantElemntStoreLandscape => plt_site%PlantElemntStoreLandscape, &
+    ElmBalanceCum_pft         => plt_site%ElmBalanceCum_pft,         &
+    NH3EmisCum_pft            => plt_bgcr%NH3EmisCum_pft,            &
+    Canopy_NEE_col            => plt_bgcr%Canopy_NEE_col,            &
+    LitrFallStrutElms_col     => plt_bgcr%LitrFallStrutElms_col,     &
+    RootGasLossDisturb_pft    => plt_bgcr%RootGasLossDisturb_pft,    &
+    RootN2Fix_pvr             => plt_bgcr%RootN2Fix_pvr,             &
+    CO2NetFix_pft             => plt_bgcr%CO2NetFix_pft,             &
+    ETCanopy_pft              => plt_ew%ETCanopy_pft,                &
+    TH2GZ                     => plt_bgcr%TH2GZ,                     &
+    trcs_plant_uptake_vr      => plt_rbgc%trcs_plant_uptake_vr,      &
+    PlantRootSoilElmNetX_pft  => plt_rbgc%PlantRootSoilElmNetX_pft,  &
+    TRootGasLossDisturb_pft   => plt_rbgc%TRootGasLossDisturb_pft,   &
+    Transpiration_pft         => plt_ew%Transpiration_pft,           &
+    PrecIntcptByCanopy_pft    => plt_ew%PrecIntcptByCanopy_pft,      &
+    VapXAir2Canopy_pft        => plt_ew%VapXAir2Canopy_pft,          &
+    WatByPCanopy              => plt_ew%WatByPCanopy,                &
+    CanopyWater_pft           => plt_ew%CanopyWater_pft,             &
+    Eco_Heat_Grnd_col         => plt_ew%Eco_Heat_Grnd_col,           &
+    HeatXAir2PCan             => plt_ew%HeatXAir2PCan,               &
+    EvapTransHeat_pft         => plt_ew%EvapTransHeat_pft,           &
+    CanWat_col                => plt_ew%CanWat_col,                  &
+    TKC                       => plt_ew%TKC,                         &
+    TKS                       => plt_ew%TKS,                         &
+    ENGYX                     => plt_ew%ENGYX,                       &
+    Eco_Heat_Sens_col         => plt_ew%Eco_Heat_Sens_col,           &
+    VapXAir2CanG              => plt_ew%VapXAir2CanG,                &
+    TENGYC                    => plt_ew%TENGYC,                      &
+    TEVAPP                    => plt_ew%TEVAPP,                      &
+    THFLXC                    => plt_ew%THFLXC,                      &
+    LWRadCanG                 => plt_ew%LWRadCanG,                   &
+    TairK                     => plt_ew%TairK,                       &
+    HeatStorCanP              => plt_ew%HeatStorCanP,                &
+    Eco_Heat_Latent_col       => plt_ew%Eco_Heat_Latent_col,         &
+    CanH2OHeldVg              => plt_ew%CanH2OHeldVg,                &
+    NU                        => plt_site%NU,                        &
+    NH3Dep2Can_pft            => plt_bgcr%NH3Dep2Can_pft,            &
+    StemArea_col              => plt_morph%StemArea_col,             &
+    CanopyLeafArea_col        => plt_morph%CanopyLeafArea_col,       &
+    MaxSoiL4Root              => plt_morph%MaxSoiL4Root,             &
+    NumOfBranches_pft         => plt_morph%NumOfBranches_pft,        &
+    CanopyStemArea_pft        => plt_morph%CanopyStemArea_pft,       &
+    CanopyLeafArea_pft        => plt_morph%CanopyLeafArea_pft,       &
+    RadNet2Canopy_pft         => plt_rad%RadNet2Canopy_pft,          &
+    LWRadCanopy_pft           => plt_rad%LWRadCanopy_pft,            &
+    Eco_NetRad_col            => plt_rad%Eco_NetRad_col              &
   )
   DO L=NU,MaxSoiL4Root(NZ)
     trcs_plant_uptake_vr(idg_N2,L)=trcs_plant_uptake_vr(idg_N2,L)+RootN2Fix_pvr(L,NZ)
@@ -392,7 +392,7 @@ module ExtractsMod
 !     HeatStorCanP=PFT canopy storage heat flux
 !     Canopy_NEE_col=total net CO2 fixation
 !     CO2NetFix_pft=PFT net CO2 fixation
-!     CanWatg,CanH2OHeldVg=total water volume in canopy,on canopy surfaces
+!     CanWat_col,CanH2OHeldVg=total water volume in canopy,on canopy surfaces
 !     CanopyWater_pft,WatByPCanopy=PFT water volume in canopy,on canopy surfaces
 !     TEVAPP,VapXAir2CanG=total water flux to,from canopy,canopy surfaces
 !     VapXAir2PCan,Transpiration_pft=water flux to,from canopy surfaces, inside canopy
@@ -413,7 +413,7 @@ module ExtractsMod
   Eco_Heat_Grnd_col  = Eco_Heat_Grnd_col+HeatStorCanP(NZ)
   Canopy_NEE_col     = Canopy_NEE_col+CO2NetFix_pft(NZ)
   ETCanopy_pft(NZ)   = ETCanopy_pft(NZ)+Transpiration_pft(NZ)+VapXAir2Canopy_pft(NZ)
-  CanWatg            = CanWatg+CanopyWater_pft(NZ)
+  CanWat_col         = CanWat_col+CanopyWater_pft(NZ)
   CanH2OHeldVg       = CanH2OHeldVg+WatByPCanopy(NZ)
   TEVAPP             = TEVAPP+Transpiration_pft(NZ)+VapXAir2Canopy_pft(NZ)
   VapXAir2CanG       = VapXAir2CanG+VapXAir2Canopy_pft(NZ)
@@ -436,10 +436,10 @@ module ExtractsMod
 !
 !     TOTAL CANOPY NH3 EXCHANGE AND EXUDATION
 !
-!     NH3EmiCum_pft=total NH3 flux between atmosphere and canopy
+!     NH3EmisCum_pft=total NH3 flux between atmosphere and canopy
 !
     
-  NH3EmiCum_pft(NZ)=NH3EmiCum_pft(NZ)+NH3Dep2Can_pft(NZ)
+  NH3EmisCum_pft(NZ)=NH3EmisCum_pft(NZ)+NH3Dep2Can_pft(NZ)
 
   end associate
   end subroutine CanopyFluxesandFixation

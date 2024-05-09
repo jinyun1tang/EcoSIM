@@ -156,7 +156,7 @@ module grosubsMod
     NetPrimProduct_pft             => plt_bgcr%NetPrimProduct_pft          , &
     PlantN2FixCum_pft              => plt_bgcr%PlantN2FixCum_pft           , &
     LitrfalStrutElms_pft           => plt_bgcr%LitrfalStrutElms_pft        , &
-    NH3EmiCum_pft                  => plt_bgcr%NH3EmiCum_pft               , &
+    NH3EmisCum_pft                  => plt_bgcr%NH3EmisCum_pft               , &
     LitrfalStrutElmsCum_pft        => plt_bgcr%LitrfalStrutElmsCum_pft     , &
     SurfLitrfalStrutElmsCum_pft    => plt_bgcr%SurfLitrfalStrutElmsCum_pft , &
     GrossResp_pft                  => plt_bgcr%GrossResp_pft               , &
@@ -266,14 +266,14 @@ module grosubsMod
 !     WTSHN,WTRTN,WTNDN,WTRVN,WTSTGN=PFT shoot,root,bacteria,storage,standing dead N
 !     TZSNC=cumulative PFT N LitrFall
 !     TZUPTK=cumulative PFT root-soil N exchange
-!     NH3EmiCum_pft=cumulative NH3 exchange
+!     NH3EmisCum_pft=cumulative NH3 exchange
 !     RSETN=cumulative N balance from previous year
 !     THVSTN=cumulative PFT N removed from ecosystem from previous year
 !     HVSTN=total PFT N removed from ecosystem in current year
 !     NH3byFire_pft,N2ObyFire_pft=NH3,N2O emission from disturbance
 !     PlantN2FixCum_pft=cumulative PFT N2 fixation
 !
-      ElmBalanceCum_pft(ielmn,NZ)=ElmBalanceCum_pft(ielmn,NZ)-NH3EmiCum_pft(NZ) &
+      ElmBalanceCum_pft(ielmn,NZ)=ElmBalanceCum_pft(ielmn,NZ)-NH3EmisCum_pft(NZ) &
         -NH3byFire_pft(NZ)-N2ObyFire_pft(NZ)-PlantN2FixCum_pft(NZ)
 !
 !     PLANT P BALANCE = TOTAL P STATE VARIABLES + TOTAL P LitrFall

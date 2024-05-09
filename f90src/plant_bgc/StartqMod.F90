@@ -641,7 +641,7 @@ module StartqMod
     LitrfalStrutElmsCum_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
     PlantN2FixCum_pft(NZ,NY,NX)=0._r8
     NH3Dep2Can_pft(NZ,NY,NX)=0._r8
-    NH3EmiCum_pft(NZ,NY,NX)=0._r8
+    NH3EmisCum_pft(NZ,NY,NX)=0._r8
     CO2ByFire_pft(NZ,NY,NX)=0._r8
     CH4ByFire_pft(NZ,NY,NX)=0._r8
     O2ByFire_pft(NZ,NY,NX)=0._r8

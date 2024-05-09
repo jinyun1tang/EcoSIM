@@ -87,7 +87,7 @@
       +GrossCO2FixCum_pft(NZ,NY,NX)+GrossRespCum_pft(NZ,NY,NX) &
       -CO2ByFire_pft(NZ,NY,NX)-CH4ByFire_pft(NZ,NY,NX)
     NetCumElmntFlx2Plant_pft(ielmn,NZ,NY,NX)=NetCumElmntFlx2Plant_pft(ielmn,NZ,NY,NX) &
-      +NH3EmiCum_pft(NZ,NY,NX)+PlantN2FixCum_pft(NZ,NY,NX) &
+      +NH3EmisCum_pft(NZ,NY,NX)+PlantN2FixCum_pft(NZ,NY,NX) &
       -NH3byFire_pft(NZ,NY,NX)-N2ObyFire_pft(NZ,NY,NX)
     NetCumElmntFlx2Plant_pft(ielmp,NZ,NY,NX)=NetCumElmntFlx2Plant_pft(ielmp,NZ,NY,NX) &
       -PO4byFire_pft(NZ,NY,NX)
@@ -99,7 +99,7 @@
     CanopyRespC_pft(NZ,NY,NX)=0._r8
     ETCanopy_pft(NZ,NY,NX)=0._r8
     PlantN2FixCum_pft(NZ,NY,NX)=0._r8
-    NH3EmiCum_pft(NZ,NY,NX)=0._r8
+    NH3EmisCum_pft(NZ,NY,NX)=0._r8
     CO2ByFire_pft(NZ,NY,NX)=0._r8
     CH4ByFire_pft(NZ,NY,NX)=0._r8
     O2ByFire_pft(NZ,NY,NX)=0._r8

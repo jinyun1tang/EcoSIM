@@ -233,7 +233,7 @@ implicit none
   real(r8),pointer   :: h1D_LITRf_N_FLX_ptc(:)       !LitrfalStrutElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total plant LitrFall N
   real(r8),pointer   :: h1D_TL_N_FIXED_FLX_ptc(:)    !PlantN2FixCum_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total plant N2 fixation
   real(r8),pointer   :: h1D_HVST_N_FLX_ptc(:)        !EcoHavstElmnt_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_NH3can_FLX_ptc(:)    !NH3EmiCum_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_NH3can_FLX_ptc(:)    !NH3EmisCum_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_PLANT_BALANCE_N_ptc(:)     !ElmBalanceCum_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_STANDING_DEAD_N_ptc(:)    !StandDeadStrutElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_FIREp_N_FLX_ptc(:)        !NH3byFire_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), plant N emission from fire
@@ -1852,7 +1852,7 @@ implicit none
         this%h1D_EXUD_N_FLX_ptc(nptc)       = PlantExudChemElmCum_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_LITRf_N_FLX_ptc(nptc)      = LitrfalStrutElmsCum_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_TL_N_FIXED_FLX_ptc(nptc)   = PlantN2FixCum_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_NH3can_FLX_ptc(nptc)   = NH3EmiCum_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_NH3can_FLX_ptc(nptc)   = NH3EmisCum_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_STANDING_DEAD_N_ptc(nptc)   = StandDeadStrutElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_FIREp_N_FLX_ptc(nptc)       = NH3byFire_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_SURF_LITRf_N_FLX_ptc(nptc)  = SurfLitrfalStrutElmsCum_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)

@@ -724,7 +724,7 @@ module RedistMod
     tLitrOM_col(NE,NY,NX)=tLitrOM_col(NE,NY,NX)+litrOM(NE)
   ENDDO
 
-  WS=CanH2OHeldVg(NY,NX)+CanWatg(NY,NX)+VLWatMicP(0,NY,NX)+VLiceMicP(0,NY,NX)*DENSICE
+  WS=CanH2OHeldVg(NY,NX)+CanWat_col(NY,NX)+VLWatMicP(0,NY,NX)+VLiceMicP(0,NY,NX)*DENSICE
   WaterStoreLandscape=WaterStoreLandscape+WS
   UVLWatMicP(NY,NX)=UVLWatMicP(NY,NX)+WS
   HeatStoreLandscape=HeatStoreLandscape+TENGYC(NY,NX)
@@ -1441,15 +1441,15 @@ module RedistMod
   !     TOTALS FOR CALCULATING COMPETITION CONSTRAINTS ON MICROBIAL
   !     AND ROOT POPULATIONS IN NITRO.F AND UPTAKE.F
   !
-  !     ROXYX=O2 demand by all microbial,root,myco populations
-  !     RNH4X=NH4 demand in non-band by all microbial,root,myco populations
-  !     RNO3X=NO3 demand in non-band by all microbial,root,myco populations
-  !     RPO4X=H2PO4 demand in non-band by all microbial,root,myco populations
-  !     RP14X=HPO4 demand in non-band by all microbial,root,myco populations
-  !     RNHBX=NH4 demand in band by all microbial,root,myco populations
-  !     RN3BX=NO3 demand in band by all microbial,root,myco populations
-  !     RPOBX=H2PO4 demand in band by all microbial,root,myco populations
-  !     RP1BX=HPO4 demand in band by all microbial,root,myco populations
+  !     REcoO2DmndResp_vr=O2 demand by all microbial,root,myco populations
+  !     REcoNH4DmndSoil_vr=NH4 demand in non-band by all microbial,root,myco populations
+  !     REcoNO3DmndSoil_vr=NO3 demand in non-band by all microbial,root,myco populations
+  !     REcoH2PO4DmndSoil_vr=H2PO4 demand in non-band by all microbial,root,myco populations
+  !     REcoH1PO4DmndSoil_vr=HPO4 demand in non-band by all microbial,root,myco populations
+  !     REcoNH4DmndBand_vr=NH4 demand in band by all microbial,root,myco populations
+  !     REcoNO3DmndBand_vr=NO3 demand in band by all microbial,root,myco populations
+  !     REcoH2PO4DmndBand_vr=H2PO4 demand in band by all microbial,root,myco populations
+  !     REcoH1PO4DmndBand_vr=HPO4 demand in band by all microbial,root,myco populations
   !     RO2DmndHetert=O2 demand from DOC,DOA oxidation
   !     RNO3ReduxDmndSoilHeter_vr=demand for NO3 reduction
   !     RNO2DmndReduxSoilHeter_vr=demand for NO2 oxidation
@@ -1467,18 +1467,18 @@ module RedistMod
     IF(micpar%is_litter(K))THEN
       DO  N=1,NumMicbFunGrupsPerCmplx
         DO NGL=JGnio(N),JGnfo(N)
-          ROXYX(0,NY,NX)=ROXYX(0,NY,NX)+RO2DmndHetert(NGL,K,0,NY,NX)
-          RNO3X(0,NY,NX)=RNO3X(0,NY,NX)+RNO3ReduxDmndSoilHeter_vr(NGL,K,0,NY,NX)
+          REcoO2DmndResp_vr(0,NY,NX)=REcoO2DmndResp_vr(0,NY,NX)+RO2DmndHetert(NGL,K,0,NY,NX)
+          REcoNO3DmndSoil_vr(0,NY,NX)=REcoNO3DmndSoil_vr(0,NY,NX)+RNO3ReduxDmndSoilHeter_vr(NGL,K,0,NY,NX)
           RNO2EcoUptkSoil_vr(0,NY,NX)=RNO2EcoUptkSoil_vr(0,NY,NX)+RNO2DmndReduxSoilHeter_vr(NGL,K,0,NY,NX)
           RN2OEcoUptkSoil_vr(0,NY,NX)=RN2OEcoUptkSoil_vr(0,NY,NX)+RN2ODmndReduxHeter_vr(NGL,K,0,NY,NX)
-          RNH4X(0,NY,NX)=RNH4X(0,NY,NX)+RNH4DmndSoilHeter_vr(NGL,K,0,NY,NX)
-          RNO3X(0,NY,NX)=RNO3X(0,NY,NX)+RNO3DmndSoilHeter_vr(NGL,K,0,NY,NX)
-          RPO4X(0,NY,NX)=RPO4X(0,NY,NX)+RH2PO4DmndSoilHeter_vr(NGL,K,0,NY,NX)
-          RP14X(0,NY,NX)=RP14X(0,NY,NX)+RH1PO4DmndSoilHeter_vr(NGL,K,0,NY,NX)
-          RNH4X(NU(NY,NX),NY,NX)=RNH4X(NU(NY,NX),NY,NX)+RNH4DmndLitrHeter_col(NGL,K,NY,NX)
-          RNO3X(NU(NY,NX),NY,NX)=RNO3X(NU(NY,NX),NY,NX)+RNO3DmndLitrHeter_col(NGL,K,NY,NX)
-          RPO4X(NU(NY,NX),NY,NX)=RPO4X(NU(NY,NX),NY,NX)+RH2PO4DmndLitrHeter_col(NGL,K,NY,NX)
-          RP14X(NU(NY,NX),NY,NX)=RP14X(NU(NY,NX),NY,NX)+RH1PO4DmndLitrHeter_col(NGL,K,NY,NX)
+          REcoNH4DmndSoil_vr(0,NY,NX)=REcoNH4DmndSoil_vr(0,NY,NX)+RNH4DmndSoilHeter_vr(NGL,K,0,NY,NX)
+          REcoNO3DmndSoil_vr(0,NY,NX)=REcoNO3DmndSoil_vr(0,NY,NX)+RNO3DmndSoilHeter_vr(NGL,K,0,NY,NX)
+          REcoH2PO4DmndSoil_vr(0,NY,NX)=REcoH2PO4DmndSoil_vr(0,NY,NX)+RH2PO4DmndSoilHeter_vr(NGL,K,0,NY,NX)
+          REcoH1PO4DmndSoil_vr(0,NY,NX)=REcoH1PO4DmndSoil_vr(0,NY,NX)+RH1PO4DmndSoilHeter_vr(NGL,K,0,NY,NX)
+          REcoNH4DmndSoil_vr(NU(NY,NX),NY,NX)=REcoNH4DmndSoil_vr(NU(NY,NX),NY,NX)+RNH4DmndLitrHeter_col(NGL,K,NY,NX)
+          REcoNO3DmndSoil_vr(NU(NY,NX),NY,NX)=REcoNO3DmndSoil_vr(NU(NY,NX),NY,NX)+RNO3DmndLitrHeter_col(NGL,K,NY,NX)
+          REcoH2PO4DmndSoil_vr(NU(NY,NX),NY,NX)=REcoH2PO4DmndSoil_vr(NU(NY,NX),NY,NX)+RH2PO4DmndLitrHeter_col(NGL,K,NY,NX)
+          REcoH1PO4DmndSoil_vr(NU(NY,NX),NY,NX)=REcoH1PO4DmndSoil_vr(NU(NY,NX),NY,NX)+RH1PO4DmndLitrHeter_col(NGL,K,NY,NX)
           ROQCX(K,0,NY,NX)=ROQCX(K,0,NY,NX)+RDOCUptkHeter_vr(NGL,K,0,NY,NX)
           ROQAX(K,0,NY,NX)=ROQAX(K,0,NY,NX)+RAcetateUptkHeter_vr(NGL,K,0,NY,NX)
         ENDDO
@@ -1488,18 +1488,18 @@ module RedistMod
 
   DO  N=1,NumMicbFunGrupsPerCmplx
     DO NGL=JGniA(N),JGnfA(N)
-      ROXYX(0,NY,NX)=ROXYX(0,NY,NX)+RO2DmndAutort(NGL,0,NY,NX)
-      RNH4X(0,NY,NX)=RNH4X(0,NY,NX)+RNH3OxidAutor(NGL,0,NY,NX)
+      REcoO2DmndResp_vr(0,NY,NX)=REcoO2DmndResp_vr(0,NY,NX)+RO2DmndAutort(NGL,0,NY,NX)
+      REcoNH4DmndSoil_vr(0,NY,NX)=REcoNH4DmndSoil_vr(0,NY,NX)+RNH3OxidAutor(NGL,0,NY,NX)
       RNO2EcoUptkSoil_vr(0,NY,NX)=RNO2EcoUptkSoil_vr(0,NY,NX)+RNO2OxidAutor(NGL,0,NY,NX)
       RN2OEcoUptkSoil_vr(0,NY,NX)=RN2OEcoUptkSoil_vr(0,NY,NX)+RN2ODmndReduxAutor_vr(NGL,0,NY,NX)
-      RNH4X(0,NY,NX)=RNH4X(0,NY,NX)+RNH4UptkSoilAutor_vr(NGL,0,NY,NX)
-      RNO3X(0,NY,NX)=RNO3X(0,NY,NX)+RNO3UptkSoilAutor_vr(NGL,0,NY,NX)
-      RPO4X(0,NY,NX)=RPO4X(0,NY,NX)+RH2PO4UptkSoilAutor_vr(NGL,0,NY,NX)
-      RP14X(0,NY,NX)=RP14X(0,NY,NX)+RH1PO4UptkSoilAutor_vr(NGL,0,NY,NX)
-      RNH4X(NU(NY,NX),NY,NX)=RNH4X(NU(NY,NX),NY,NX)+RNH4UptkLitrAutor_col(NGL,NY,NX)
-      RNO3X(NU(NY,NX),NY,NX)=RNO3X(NU(NY,NX),NY,NX)+RNO3UptkLitrAutor_col(NGL,NY,NX)
-      RPO4X(NU(NY,NX),NY,NX)=RPO4X(NU(NY,NX),NY,NX)+RH2PO4UptkLitrAutor_col(NGL,NY,NX)
-      RP14X(NU(NY,NX),NY,NX)=RP14X(NU(NY,NX),NY,NX)+RH1PO4UptkLitrAutor_col(NGL,NY,NX)
+      REcoNH4DmndSoil_vr(0,NY,NX)=REcoNH4DmndSoil_vr(0,NY,NX)+RNH4UptkSoilAutor_vr(NGL,0,NY,NX)
+      REcoNO3DmndSoil_vr(0,NY,NX)=REcoNO3DmndSoil_vr(0,NY,NX)+RNO3UptkSoilAutor_vr(NGL,0,NY,NX)
+      REcoH2PO4DmndSoil_vr(0,NY,NX)=REcoH2PO4DmndSoil_vr(0,NY,NX)+RH2PO4UptkSoilAutor_vr(NGL,0,NY,NX)
+      REcoH1PO4DmndSoil_vr(0,NY,NX)=REcoH1PO4DmndSoil_vr(0,NY,NX)+RH1PO4UptkSoilAutor_vr(NGL,0,NY,NX)
+      REcoNH4DmndSoil_vr(NU(NY,NX),NY,NX)=REcoNH4DmndSoil_vr(NU(NY,NX),NY,NX)+RNH4UptkLitrAutor_col(NGL,NY,NX)
+      REcoNO3DmndSoil_vr(NU(NY,NX),NY,NX)=REcoNO3DmndSoil_vr(NU(NY,NX),NY,NX)+RNO3UptkLitrAutor_col(NGL,NY,NX)
+      REcoH2PO4DmndSoil_vr(NU(NY,NX),NY,NX)=REcoH2PO4DmndSoil_vr(NU(NY,NX),NY,NX)+RH2PO4UptkLitrAutor_col(NGL,NY,NX)
+      REcoH1PO4DmndSoil_vr(NU(NY,NX),NY,NX)=REcoH1PO4DmndSoil_vr(NU(NY,NX),NY,NX)+RH1PO4UptkLitrAutor_col(NGL,NY,NX)
 
     ENDDO
   ENDDO
@@ -1517,38 +1517,38 @@ module RedistMod
 
   integer :: K,N,NGL
 
-  ROXYX(L,NY,NX)=ROXYX(L,NY,NX)+SUM(RO2DmndHetert(1:NumHetetrMicCmplx,1:jcplx,L,NY,NX))
-  RNH4X(L,NY,NX)=RNH4X(L,NY,NX)+SUM(RNH4DmndSoilHeter_vr(1:NumHetetrMicCmplx,1:jcplx,L,NY,NX))
-  RNO3X(L,NY,NX)=RNO3X(L,NY,NX)+SUM(RNO3ReduxDmndSoilHeter_vr(1:NumHetetrMicCmplx,1:jcplx,L,NY,NX)) &
+  REcoO2DmndResp_vr(L,NY,NX)=REcoO2DmndResp_vr(L,NY,NX)+SUM(RO2DmndHetert(1:NumHetetrMicCmplx,1:jcplx,L,NY,NX))
+  REcoNH4DmndSoil_vr(L,NY,NX)=REcoNH4DmndSoil_vr(L,NY,NX)+SUM(RNH4DmndSoilHeter_vr(1:NumHetetrMicCmplx,1:jcplx,L,NY,NX))
+  REcoNO3DmndSoil_vr(L,NY,NX)=REcoNO3DmndSoil_vr(L,NY,NX)+SUM(RNO3ReduxDmndSoilHeter_vr(1:NumHetetrMicCmplx,1:jcplx,L,NY,NX)) &
     +SUM(RNO3DmndSoilHeter_vr(1:NumHetetrMicCmplx,1:jcplx,L,NY,NX))
   RNO2EcoUptkSoil_vr(L,NY,NX)=RNO2EcoUptkSoil_vr(L,NY,NX)+SUM(RNO2DmndReduxSoilHeter_vr(1:NumHetetrMicCmplx,1:jcplx,L,NY,NX))
   RN2OEcoUptkSoil_vr(L,NY,NX)=RN2OEcoUptkSoil_vr(L,NY,NX)+SUM(RN2ODmndReduxHeter_vr(1:NumHetetrMicCmplx,1:jcplx,L,NY,NX))
-  RPO4X(L,NY,NX)=RPO4X(L,NY,NX)+SUM(RH2PO4DmndSoilHeter_vr(1:NumHetetrMicCmplx,1:jcplx,L,NY,NX))
-  RP14X(L,NY,NX)=RP14X(L,NY,NX)+SUM(RH1PO4DmndSoilHeter_vr(1:NumHetetrMicCmplx,1:jcplx,L,NY,NX))
-  RNHBX(L,NY,NX)=RNHBX(L,NY,NX)+SUM(RNH4DmndBandHeter_vr(1:NumHetetrMicCmplx,1:jcplx,L,NY,NX))
-  RN3BX(L,NY,NX)=RN3BX(L,NY,NX)+SUM(RNO3ReduxDmndBandHeter_vr(1:NumHetetrMicCmplx,1:jcplx,L,NY,NX)) &
+  REcoH2PO4DmndSoil_vr(L,NY,NX)=REcoH2PO4DmndSoil_vr(L,NY,NX)+SUM(RH2PO4DmndSoilHeter_vr(1:NumHetetrMicCmplx,1:jcplx,L,NY,NX))
+  REcoH1PO4DmndSoil_vr(L,NY,NX)=REcoH1PO4DmndSoil_vr(L,NY,NX)+SUM(RH1PO4DmndSoilHeter_vr(1:NumHetetrMicCmplx,1:jcplx,L,NY,NX))
+  REcoNH4DmndBand_vr(L,NY,NX)=REcoNH4DmndBand_vr(L,NY,NX)+SUM(RNH4DmndBandHeter_vr(1:NumHetetrMicCmplx,1:jcplx,L,NY,NX))
+  REcoNO3DmndBand_vr(L,NY,NX)=REcoNO3DmndBand_vr(L,NY,NX)+SUM(RNO3ReduxDmndBandHeter_vr(1:NumHetetrMicCmplx,1:jcplx,L,NY,NX)) &
     +SUM(RNO3DmndBandHeter_vr(1:NumHetetrMicCmplx,1:jcplx,L,NY,NX))
   RNO2EcoUptkBand_vr(L,NY,NX)=RNO2EcoUptkBand_vr(L,NY,NX)+SUM(RNO2DmndReduxBandHeter_vr(1:NumHetetrMicCmplx,1:jcplx,L,NY,NX))
-  RPOBX(L,NY,NX)=RPOBX(L,NY,NX)+SUM(RH2PO4DmndBandHeter_vr(1:NumHetetrMicCmplx,1:jcplx,L,NY,NX))
-  RP1BX(L,NY,NX)=RP1BX(L,NY,NX)+SUM(RH1PO4DmndBandHeter_vr(1:NumHetetrMicCmplx,1:jcplx,L,NY,NX))
+  REcoH2PO4DmndBand_vr(L,NY,NX)=REcoH2PO4DmndBand_vr(L,NY,NX)+SUM(RH2PO4DmndBandHeter_vr(1:NumHetetrMicCmplx,1:jcplx,L,NY,NX))
+  REcoH1PO4DmndBand_vr(L,NY,NX)=REcoH1PO4DmndBand_vr(L,NY,NX)+SUM(RH1PO4DmndBandHeter_vr(1:NumHetetrMicCmplx,1:jcplx,L,NY,NX))
   DO K=1,jcplx
     ROQCX(K,L,NY,NX)=ROQCX(K,L,NY,NX)+SUM(RDOCUptkHeter_vr(1:NumHetetrMicCmplx,1:jcplx,L,NY,NX))
     ROQAX(K,L,NY,NX)=ROQAX(K,L,NY,NX)+SUM(RAcetateUptkHeter_vr(1:NumHetetrMicCmplx,1:jcplx,L,NY,NX))
   ENDDO
-  ROXYX(L,NY,NX)=ROXYX(L,NY,NX)+SUM(RO2DmndAutort(1:NumHetetrMicCmplx,L,NY,NX))
-  RNH4X(L,NY,NX)=RNH4X(L,NY,NX)+SUM(RNH3OxidAutor(1:NumHetetrMicCmplx,L,NY,NX)) &
+  REcoO2DmndResp_vr(L,NY,NX)=REcoO2DmndResp_vr(L,NY,NX)+SUM(RO2DmndAutort(1:NumHetetrMicCmplx,L,NY,NX))
+  REcoNH4DmndSoil_vr(L,NY,NX)=REcoNH4DmndSoil_vr(L,NY,NX)+SUM(RNH3OxidAutor(1:NumHetetrMicCmplx,L,NY,NX)) &
     +SUM(RNH4UptkSoilAutor_vr(1:NumHetetrMicCmplx,L,NY,NX))
-  RNO3X(L,NY,NX)=RNO3X(L,NY,NX)+SUM(RNO3UptkSoilAutor_vr(1:NumHetetrMicCmplx,L,NY,NX))
+  REcoNO3DmndSoil_vr(L,NY,NX)=REcoNO3DmndSoil_vr(L,NY,NX)+SUM(RNO3UptkSoilAutor_vr(1:NumHetetrMicCmplx,L,NY,NX))
   RNO2EcoUptkSoil_vr(L,NY,NX)=RNO2EcoUptkSoil_vr(L,NY,NX)+SUM(RNO2OxidAutor(1:NumHetetrMicCmplx,L,NY,NX))
   RN2OEcoUptkSoil_vr(L,NY,NX)=RN2OEcoUptkSoil_vr(L,NY,NX)+SUM(RN2ODmndReduxAutor_vr(1:NumHetetrMicCmplx,L,NY,NX))
-  RPO4X(L,NY,NX)=RPO4X(L,NY,NX)+SUM(RH2PO4UptkSoilAutor_vr(1:NumHetetrMicCmplx,L,NY,NX))
-  RP14X(L,NY,NX)=RP14X(L,NY,NX)+SUM(RH1PO4UptkSoilAutor_vr(1:NumHetetrMicCmplx,L,NY,NX))
-  RNHBX(L,NY,NX)=RNHBX(L,NY,NX)+SUM(RNH3OxidAutorBand(1:NumHetetrMicCmplx,L,NY,NX)) &
+  REcoH2PO4DmndSoil_vr(L,NY,NX)=REcoH2PO4DmndSoil_vr(L,NY,NX)+SUM(RH2PO4UptkSoilAutor_vr(1:NumHetetrMicCmplx,L,NY,NX))
+  REcoH1PO4DmndSoil_vr(L,NY,NX)=REcoH1PO4DmndSoil_vr(L,NY,NX)+SUM(RH1PO4UptkSoilAutor_vr(1:NumHetetrMicCmplx,L,NY,NX))
+  REcoNH4DmndBand_vr(L,NY,NX)=REcoNH4DmndBand_vr(L,NY,NX)+SUM(RNH3OxidAutorBand(1:NumHetetrMicCmplx,L,NY,NX)) &
     +SUM(RNH4UptkBandAutor_vr(1:NumHetetrMicCmplx,L,NY,NX))
-  RN3BX(L,NY,NX)=RN3BX(L,NY,NX)+SUM(RNO3UptkBandAutor_vr(1:NumHetetrMicCmplx,L,NY,NX))
+  REcoNO3DmndBand_vr(L,NY,NX)=REcoNO3DmndBand_vr(L,NY,NX)+SUM(RNO3UptkBandAutor_vr(1:NumHetetrMicCmplx,L,NY,NX))
   RNO2EcoUptkBand_vr(L,NY,NX)=RNO2EcoUptkBand_vr(L,NY,NX)+SUM(RNO2OxidAutorBand(1:NumHetetrMicCmplx,L,NY,NX))
-  RPOBX(L,NY,NX)=RPOBX(L,NY,NX)+SUM(RH2PO4UptkBandAutor_vr(1:NumHetetrMicCmplx,L,NY,NX))
-  RP1BX(L,NY,NX)=RP1BX(L,NY,NX)+SUM(RH1PO4UptkBandAutor_vr(1:NumHetetrMicCmplx,L,NY,NX))
+  REcoH2PO4DmndBand_vr(L,NY,NX)=REcoH2PO4DmndBand_vr(L,NY,NX)+SUM(RH2PO4UptkBandAutor_vr(1:NumHetetrMicCmplx,L,NY,NX))
+  REcoH1PO4DmndBand_vr(L,NY,NX)=REcoH1PO4DmndBand_vr(L,NY,NX)+SUM(RH1PO4UptkBandAutor_vr(1:NumHetetrMicCmplx,L,NY,NX))
 
   RNO2EcoUptkSoil_vr(L,NY,NX)=RNO2EcoUptkSoil_vr(L,NY,NX)+RNO2DmndSoilChemo_vr(L,NY,NX)
   RNO2EcoUptkBand_vr(L,NY,NX)=RNO2EcoUptkBand_vr(L,NY,NX)+RNO2DmndBandChemo_vr(L,NY,NX)

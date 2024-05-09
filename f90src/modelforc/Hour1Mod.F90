@@ -774,7 +774,7 @@ module Hour1Mod
   GasSfAtmFlx_col(idg_beg:idg_end,NY,NX)=0._r8
   trcg_surf_disevap_flx(idg_beg:idg_end-1,NY,NX)=0.0_r8
 
-  CanWatg(NY,NX)=0.0_r8
+  CanWat_col(NY,NX)=0.0_r8
   CanH2OHeldVg(NY,NX)=0.0_r8
   TFLWCI(NY,NX)=0.0_r8
   PrecIntcptByCanG(NY,NX)=0.0_r8
@@ -978,7 +978,7 @@ module Hour1Mod
 
         SoilDetachability4Erosion1(NY,NX)=ppmc*(1.0_r8+2.0_r8*(1.0_r8-CSILT(NU(NY,NX),NY,NX)-CORGM))
         COHS=2.0_r8+10.0_r8*(CCLAY(NU(NY,NX),NY,NX)+CORGM) &
-          +5.0_r8*(1.0_r8-EXP(-2.0E-06_r8*RTDNT(NU(NY,NX),NY,NX)))
+          +5.0_r8*(1.0_r8-EXP(-2.0E-06_r8*totRootLenDens_vr(NU(NY,NX),NY,NX)))
         SoilDetachability4Erosion2(NY,NX)=0.79_r8*EXP(-0.85_r8*AMAX1(1.0_r8,COHS))
 
         ParticleDensitySurfLay(NY,NX)=1.30_r8*CORGM+2.66_r8*(1.0_r8-CORGM)
@@ -1131,20 +1131,20 @@ module Hour1Mod
 !     R*Y,R*X=total substrate uptake from previous,current hour
 !     used in nitro.f, uptake.f
 !
-  RO2EcoDmndPrev_vr(0,NY,NX)=ROXYX(0,NY,NX)
-  RNH4EcoDmndSoilPrev_vr(0,NY,NX)=RNH4X(0,NY,NX)
-  RNO3EcoDmndSoilPrev_vr(0,NY,NX)=RNO3X(0,NY,NX)
+  RO2EcoDmndPrev_vr(0,NY,NX)=REcoO2DmndResp_vr(0,NY,NX)
+  RNH4EcoDmndSoilPrev_vr(0,NY,NX)=REcoNH4DmndSoil_vr(0,NY,NX)
+  RNO3EcoDmndSoilPrev_vr(0,NY,NX)=REcoNO3DmndSoil_vr(0,NY,NX)
   RNO2EcoUptkSoilPrev_vr(0,NY,NX)=RNO2EcoUptkSoil_vr(0,NY,NX)
   RN2OEcoUptkSoilPrev_vr(0,NY,NX)=RN2OEcoUptkSoil_vr(0,NY,NX)
-  RH1PO4EcoDmndSoilPrev_vr(0,NY,NX)=RP14X(0,NY,NX)
-  RH2PO4EcoDmndSoilPrev_vr(0,NY,NX)=RPO4X(0,NY,NX)
-  ROXYX(0,NY,NX)=0.0_r8
-  RNH4X(0,NY,NX)=0.0_r8
-  RNO3X(0,NY,NX)=0.0_r8
+  RH1PO4EcoDmndSoilPrev_vr(0,NY,NX)=REcoH1PO4DmndSoil_vr(0,NY,NX)
+  RH2PO4EcoDmndSoilPrev_vr(0,NY,NX)=REcoH2PO4DmndSoil_vr(0,NY,NX)
+  REcoO2DmndResp_vr(0,NY,NX)=0.0_r8
+  REcoNH4DmndSoil_vr(0,NY,NX)=0.0_r8
+  REcoNO3DmndSoil_vr(0,NY,NX)=0.0_r8
   RNO2EcoUptkSoil_vr(0,NY,NX)=0.0_r8
   RN2OEcoUptkSoil_vr(0,NY,NX)=0.0_r8
-  RP14X(0,NY,NX)=0.0_r8
-  RPO4X(0,NY,NX)=0.0_r8
+  REcoH1PO4DmndSoil_vr(0,NY,NX)=0.0_r8
+  REcoH2PO4DmndSoil_vr(0,NY,NX)=0.0_r8
   D5055: DO K=1,jcplx
     RDOMEcoDmndPrev_vr(K,0,NY,NX)=ROQCX(K,0,NY,NX)
     RAcetateEcoDmndPrev_vr(K,0,NY,NX)=ROQAX(K,0,NY,NX)
@@ -1285,30 +1285,30 @@ module Hour1Mod
 ! R*Y,R*X=total substrate uptake from previous,current hour
 ! used in nitro.f, uptake.f
 !
-    RO2EcoDmndPrev_vr(L,NY,NX)=ROXYX(L,NY,NX)
-    RNH4EcoDmndSoilPrev_vr(L,NY,NX)=RNH4X(L,NY,NX)
-    RNO3EcoDmndSoilPrev_vr(L,NY,NX)=RNO3X(L,NY,NX)
+    RO2EcoDmndPrev_vr(L,NY,NX)=REcoO2DmndResp_vr(L,NY,NX)
+    RNH4EcoDmndSoilPrev_vr(L,NY,NX)=REcoNH4DmndSoil_vr(L,NY,NX)
+    RNO3EcoDmndSoilPrev_vr(L,NY,NX)=REcoNO3DmndSoil_vr(L,NY,NX)
     RNO2EcoUptkSoilPrev_vr(L,NY,NX)=RNO2EcoUptkSoil_vr(L,NY,NX)
     RN2OEcoUptkSoilPrev_vr(L,NY,NX)=RN2OEcoUptkSoil_vr(L,NY,NX)
-    RH1PO4EcoDmndSoilPrev_vr(L,NY,NX)=RP14X(L,NY,NX)
-    RH2PO4EcoDmndSoilPrev_vr(L,NY,NX)=RPO4X(L,NY,NX)
-    RNH4EcoDmndBandPrev_vr(L,NY,NX)=RNHBX(L,NY,NX)
-    RNO3EcoDmndBandPrev_vr(L,NY,NX)=RN3BX(L,NY,NX)
+    RH1PO4EcoDmndSoilPrev_vr(L,NY,NX)=REcoH1PO4DmndSoil_vr(L,NY,NX)
+    RH2PO4EcoDmndSoilPrev_vr(L,NY,NX)=REcoH2PO4DmndSoil_vr(L,NY,NX)
+    RNH4EcoDmndBandPrev_vr(L,NY,NX)=REcoNH4DmndBand_vr(L,NY,NX)
+    RNO3EcoDmndBandPrev_vr(L,NY,NX)=REcoNO3DmndBand_vr(L,NY,NX)
     RNO2EcoUptkBandPrev_vr(L,NY,NX)=RNO2EcoUptkBand_vr(L,NY,NX)
-    RH1PO4EcoDmndBandPrev_vr(L,NY,NX)=RP1BX(L,NY,NX)
-    RH2PO4EcoDmndBandPrev_vr(L,NY,NX)=RPOBX(L,NY,NX)
-    ROXYX(L,NY,NX)=0.0_r8
-    RNH4X(L,NY,NX)=0.0_r8
-    RNO3X(L,NY,NX)=0.0_r8
+    RH1PO4EcoDmndBandPrev_vr(L,NY,NX)=REcoH1PO4DmndBand_vr(L,NY,NX)
+    RH2PO4EcoDmndBandPrev_vr(L,NY,NX)=REcoH2PO4DmndBand_vr(L,NY,NX)
+    REcoO2DmndResp_vr(L,NY,NX)=0.0_r8
+    REcoNH4DmndSoil_vr(L,NY,NX)=0.0_r8
+    REcoNO3DmndSoil_vr(L,NY,NX)=0.0_r8
     RNO2EcoUptkSoil_vr(L,NY,NX)=0.0_r8
     RN2OEcoUptkSoil_vr(L,NY,NX)=0.0_r8
-    RP14X(L,NY,NX)=0.0_r8
-    RPO4X(L,NY,NX)=0.0_r8
-    RNHBX(L,NY,NX)=0.0_r8
-    RN3BX(L,NY,NX)=0.0_r8
+    REcoH1PO4DmndSoil_vr(L,NY,NX)=0.0_r8
+    REcoH2PO4DmndSoil_vr(L,NY,NX)=0.0_r8
+    REcoNH4DmndBand_vr(L,NY,NX)=0.0_r8
+    REcoNO3DmndBand_vr(L,NY,NX)=0.0_r8
     RNO2EcoUptkBand_vr(L,NY,NX)=0.0_r8
-    RP1BX(L,NY,NX)=0.0_r8
-    RPOBX(L,NY,NX)=0.0_r8
+    REcoH1PO4DmndBand_vr(L,NY,NX)=0.0_r8
+    REcoH2PO4DmndBand_vr(L,NY,NX)=0.0_r8
 
     D5050: DO K=1,jcplx
       RDOMEcoDmndPrev_vr(K,L,NY,NX)=ROQCX(K,L,NY,NX)
@@ -2371,7 +2371,7 @@ module Hour1Mod
     TLIceThawMacP(L,NY,NX)=0.0_r8
     TLPhaseChangeHeat2Soi(L,NY,NX)=0.0_r8
     trcg_ebu_flx_vr(idg_beg:idg_end,L,NY,NX)=0.0_r8
-    RTDNT(L,NY,NX)=0.0_r8
+    totRootLenDens_vr(L,NY,NX)=0.0_r8
   ENDDO
   end subroutine ZeroHourlyArrays
 

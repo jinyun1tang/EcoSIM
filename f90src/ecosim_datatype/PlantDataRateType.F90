@@ -13,7 +13,7 @@ module PlantDataRateType
   real(r8),target,allocatable ::  NH3Dep2Can_pft(:,:,:)                       !canopy NH3 flux, [g d-2 h-1]
   real(r8),target,allocatable ::  NodulInfectElms_pft(:,:,:,:)             
   real(r8),target,allocatable ::  NodulInfectElmsCum_pft(:,:,:,:)             
-  real(r8),target,allocatable ::  NH3EmiCum_pft(:,:,:)                       !total canopy NH3 flux, [g d-2 ]
+  real(r8),target,allocatable ::  NH3EmisCum_pft(:,:,:)                       !total canopy NH3 flux, [g d-2 ]
   real(r8),target,allocatable ::  SurfLitrfalStrutElmsCum_pft(:,:,:,:)                     !total surface LitrFall element, [g d-2]
   real(r8),target,allocatable ::  RootMycoExudElm_pvr(:,:,:,:,:,:,:)              !root uptake (+ve) - exudation (-ve) of DOC, [g d-2 h-1]
   real(r8),target,allocatable ::  RootNutUptake_pvr(:,:,:,:,:,:)       !root uptake of NH4 non-band, [g d-2 h-1]
@@ -81,26 +81,26 @@ module PlantDataRateType
   real(r8),target,allocatable ::  tRootMycoExud2Soil_vr(:,:,:,:,:)                  !total root element exchange, [g d-2 h-1]
   real(r8),target,allocatable ::  TCO2P(:,:,:)                       !total root CO2 flux, [g d-2 h-1]
   real(r8),target,allocatable ::  TRO2Uptk_vr(:,:,:)                      !total root internal O2 flux, [g d-2 h-1]
-  real(r8),target,allocatable ::  RTDNT(:,:,:)                       !total root length density, [m m-3]
-  real(r8),target,allocatable ::  ROXYX(:,:,:)                       !total root + microbial O2 uptake, [g d-2 h-1]
+  real(r8),target,allocatable ::  totRootLenDens_vr(:,:,:)                       !total root length density, [m m-3]
+  real(r8),target,allocatable ::  REcoO2DmndResp_vr(:,:,:)                       !total root + microbial O2 uptake, [g d-2 h-1]
   real(r8),target,allocatable ::  RO2EcoDmndPrev_vr(:,:,:)                       !total root + microbial O2 uptake, [g d-2 h-1]
-  real(r8),target,allocatable ::  RNH4X(:,:,:)                       !total root + microbial NH4 uptake non-band, [g d-2 h-1]
+  real(r8),target,allocatable ::  REcoNH4DmndSoil_vr(:,:,:)                       !total root + microbial NH4 uptake non-band, [g d-2 h-1]
   real(r8),target,allocatable ::  RNH4EcoDmndSoilPrev_vr(:,:,:)                       !total root + microbial NH4 uptake non-band, [g d-2 h-1]
-  real(r8),target,allocatable ::  RNO3X(:,:,:)                       !total root + microbial NO3 uptake non-band, [g d-2 h-1]
+  real(r8),target,allocatable ::  REcoNO3DmndSoil_vr(:,:,:)                       !total root + microbial NO3 uptake non-band, [g d-2 h-1]
   real(r8),target,allocatable ::  RNO3EcoDmndSoilPrev_vr(:,:,:)                       !total root + microbial NO3 uptake non-band, [g d-2 h-1]
   real(r8),target,allocatable ::  RNO2EcoUptkSoil_vr(:,:,:)                       !total root + microbial NO2 uptake non-band, [g d-2 h-1]
   real(r8),target,allocatable ::  RNO2EcoUptkSoilPrev_vr(:,:,:)                       !total root + microbial NO2 uptake non-band, [g d-2 h-1]
-  real(r8),target,allocatable ::  RPO4X(:,:,:)                       !total root + microbial PO4 uptake non-band, [g d-2 h-1]
+  real(r8),target,allocatable ::  REcoH2PO4DmndSoil_vr(:,:,:)                       !total root + microbial PO4 uptake non-band, [g d-2 h-1]
   real(r8),target,allocatable ::  RH2PO4EcoDmndSoilPrev_vr(:,:,:)                       !total root + microbial PO4 uptake non-band, [g d-2 h-1]
   real(r8),target,allocatable ::  RN2OEcoUptkSoil_vr(:,:,:)                       !total root + microbial N2O uptake , [g d-2 h-1]
   real(r8),target,allocatable ::  RN2OEcoUptkSoilPrev_vr(:,:,:)                       !total root + microbial N2O uptake, [g d-2 h-1]
-  real(r8),target,allocatable ::  RNHBX(:,:,:)                       !total root + microbial NH4 uptake band, [g d-2 h-1]
+  real(r8),target,allocatable ::  REcoNH4DmndBand_vr(:,:,:)                       !total root + microbial NH4 uptake band, [g d-2 h-1]
   real(r8),target,allocatable ::  RNH4EcoDmndBandPrev_vr(:,:,:)                       !total root + microbial NH4 uptake band, [g d-2 h-1]
-  real(r8),target,allocatable ::  RN3BX(:,:,:)                       !total root + microbial NO3 uptake band, [g d-2 h-1]
+  real(r8),target,allocatable ::  REcoNO3DmndBand_vr(:,:,:)                       !total root + microbial NO3 uptake band, [g d-2 h-1]
   real(r8),target,allocatable ::  RNO3EcoDmndBandPrev_vr(:,:,:)                       !total root + microbial NO3 uptake band, [g d-2 h-1]
   real(r8),target,allocatable ::  RNO2EcoUptkBand_vr(:,:,:)                       !total root + microbial NO2 uptake band, [g d-2 h-1]
   real(r8),target,allocatable ::  RNO2EcoUptkBandPrev_vr(:,:,:)                       !total root + microbial NO2 uptake band, [g d-2 h-1]
-  real(r8),target,allocatable ::  RPOBX(:,:,:)                       !total root + microbial PO4 uptake band, [g d-2 h-1]
+  real(r8),target,allocatable ::  REcoH2PO4DmndBand_vr(:,:,:)                       !total root + microbial PO4 uptake band, [g d-2 h-1]
   real(r8),target,allocatable ::  RH2PO4EcoDmndBandPrev_vr(:,:,:)                       !total root + microbial PO4 uptake band, [g d-2 h-1]
   real(r8),target,allocatable ::  ROQCX(:,:,:,:)                     !total root + microbial DOC uptake, [g d-2 h-1]
   real(r8),target,allocatable ::  RDOMEcoDmndPrev_vr(:,:,:,:)                     !total root + microbial DOC uptake, [g d-2 h-1]
@@ -127,7 +127,7 @@ module PlantDataRateType
   integer, intent(in) :: jroots    !number of root types, root,mycos
   allocate(Eco_NEE_col(JY,JX));       Eco_NEE_col=0._r8
   allocate(NH3Dep2Can_pft(JP,JY,JX));    NH3Dep2Can_pft=0._r8
-  allocate(NH3EmiCum_pft(JP,JY,JX));    NH3EmiCum_pft=0._r8  
+  allocate(NH3EmisCum_pft(JP,JY,JX));    NH3EmisCum_pft=0._r8  
   allocate(NodulInfectElms_pft(NumPlantChemElms,JP,JY,JX));NodulInfectElms_pft=0._r8
   allocate(NodulInfectElmsCum_pft(NumPlantChemElms,JP,JY,JX));NodulInfectElmsCum_pft=0._r8  
   allocate(SurfLitrfalStrutElmsCum_pft(NumPlantChemElms,JP,JY,JX));    SurfLitrfalStrutElmsCum_pft=0._r8
@@ -195,26 +195,26 @@ module PlantDataRateType
   allocate(tRootMycoExud2Soil_vr(NumPlantChemElms,1:jcplx,JZ,JY,JX));tRootMycoExud2Soil_vr=0._r8
   allocate(TCO2P(JZ,JY,JX));    TCO2P=0._r8
   allocate(TRO2Uptk_vr(JZ,JY,JX));   TRO2Uptk_vr=0._r8
-  allocate(RTDNT(JZ,JY,JX));    RTDNT=0._r8
-  allocate(ROXYX(0:JZ,JY,JX));  ROXYX=0._r8
+  allocate(totRootLenDens_vr(JZ,JY,JX));    totRootLenDens_vr=0._r8
+  allocate(REcoO2DmndResp_vr(0:JZ,JY,JX));  REcoO2DmndResp_vr=0._r8
   allocate(RO2EcoDmndPrev_vr(0:JZ,JY,JX));  RO2EcoDmndPrev_vr=0._r8
-  allocate(RNH4X(0:JZ,JY,JX));  RNH4X=0._r8
+  allocate(REcoNH4DmndSoil_vr(0:JZ,JY,JX));  REcoNH4DmndSoil_vr=0._r8
   allocate(RNH4EcoDmndSoilPrev_vr(0:JZ,JY,JX));  RNH4EcoDmndSoilPrev_vr=0._r8
-  allocate(RNO3X(0:JZ,JY,JX));  RNO3X=0._r8
+  allocate(REcoNO3DmndSoil_vr(0:JZ,JY,JX));  REcoNO3DmndSoil_vr=0._r8
   allocate(RNO3EcoDmndSoilPrev_vr(0:JZ,JY,JX));  RNO3EcoDmndSoilPrev_vr=0._r8
   allocate(RNO2EcoUptkSoil_vr(0:JZ,JY,JX));  RNO2EcoUptkSoil_vr=0._r8
   allocate(RNO2EcoUptkSoilPrev_vr(0:JZ,JY,JX));  RNO2EcoUptkSoilPrev_vr=0._r8
-  allocate(RPO4X(0:JZ,JY,JX));  RPO4X=0._r8
+  allocate(REcoH2PO4DmndSoil_vr(0:JZ,JY,JX));  REcoH2PO4DmndSoil_vr=0._r8
   allocate(RH2PO4EcoDmndSoilPrev_vr(0:JZ,JY,JX));  RH2PO4EcoDmndSoilPrev_vr=0._r8
   allocate(RN2OEcoUptkSoil_vr(0:JZ,JY,JX));  RN2OEcoUptkSoil_vr=0._r8
   allocate(RN2OEcoUptkSoilPrev_vr(0:JZ,JY,JX));  RN2OEcoUptkSoilPrev_vr=0._r8
-  allocate(RNHBX(0:JZ,JY,JX));  RNHBX=0._r8
+  allocate(REcoNH4DmndBand_vr(0:JZ,JY,JX));  REcoNH4DmndBand_vr=0._r8
   allocate(RNH4EcoDmndBandPrev_vr(0:JZ,JY,JX));  RNH4EcoDmndBandPrev_vr=0._r8
-  allocate(RN3BX(0:JZ,JY,JX));  RN3BX=0._r8
+  allocate(REcoNO3DmndBand_vr(0:JZ,JY,JX));  REcoNO3DmndBand_vr=0._r8
   allocate(RNO3EcoDmndBandPrev_vr(0:JZ,JY,JX));  RNO3EcoDmndBandPrev_vr=0._r8
   allocate(RNO2EcoUptkBand_vr(0:JZ,JY,JX));  RNO2EcoUptkBand_vr=0._r8
   allocate(RNO2EcoUptkBandPrev_vr(0:JZ,JY,JX));  RNO2EcoUptkBandPrev_vr=0._r8
-  allocate(RPOBX(0:JZ,JY,JX));  RPOBX=0._r8
+  allocate(REcoH2PO4DmndBand_vr(0:JZ,JY,JX));  REcoH2PO4DmndBand_vr=0._r8
   allocate(RH2PO4EcoDmndBandPrev_vr(0:JZ,JY,JX));  RH2PO4EcoDmndBandPrev_vr=0._r8
   allocate(ROQCX(1:jcplx,0:JZ,JY,JX));ROQCX=0._r8
   allocate(RDOMEcoDmndPrev_vr(1:jcplx,0:JZ,JY,JX));RDOMEcoDmndPrev_vr=0._r8
@@ -229,7 +229,7 @@ module PlantDataRateType
   implicit none
   call destroy(Eco_NEE_col)
   call destroy(NH3Dep2Can_pft)
-  call destroy(NH3EmiCum_pft)
+  call destroy(NH3EmisCum_pft)
   call destroy(SurfLitrfalStrutElmsCum_pft)
   call destroy(RootMycoExudElm_pvr)
   call destroy(RootNutUptake_pvr)
@@ -291,26 +291,26 @@ module PlantDataRateType
   call destroy(tRootMycoExud2Soil_vr)
   call destroy(TCO2P)
   call destroy(TRO2Uptk_vr)
-  call destroy(RTDNT)
-  call destroy(ROXYX)
+  call destroy(totRootLenDens_vr)
+  call destroy(REcoO2DmndResp_vr)
   call destroy(RO2EcoDmndPrev_vr)
-  call destroy(RNH4X)
+  call destroy(REcoNH4DmndSoil_vr)
   call destroy(RNH4EcoDmndSoilPrev_vr)
-  call destroy(RNO3X)
+  call destroy(REcoNO3DmndSoil_vr)
   call destroy(RNO3EcoDmndSoilPrev_vr)
   call destroy(RNO2EcoUptkSoil_vr)
   call destroy(RNO2EcoUptkSoilPrev_vr)
-  call destroy(RPO4X)
+  call destroy(REcoH2PO4DmndSoil_vr)
   call destroy(RH2PO4EcoDmndSoilPrev_vr)
   call destroy(RN2OEcoUptkSoil_vr)
   call destroy(RN2OEcoUptkSoilPrev_vr)
-  call destroy(RNHBX)
+  call destroy(REcoNH4DmndBand_vr)
   call destroy(RNH4EcoDmndBandPrev_vr)
-  call destroy(RN3BX)
+  call destroy(REcoNO3DmndBand_vr)
   call destroy(RNO3EcoDmndBandPrev_vr)
   call destroy(RNO2EcoUptkBand_vr)
   call destroy(RNO2EcoUptkBandPrev_vr)
-  call destroy(RPOBX)
+  call destroy(REcoH2PO4DmndBand_vr)
   call destroy(RH2PO4EcoDmndBandPrev_vr)
   call destroy(ROQCX)
   call destroy(RDOMEcoDmndPrev_vr)

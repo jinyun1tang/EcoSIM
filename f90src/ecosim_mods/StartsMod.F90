@@ -53,7 +53,7 @@ module StartsMod
   !
   !     BulkDensLitR=dry bulk density of woody(0),fine(1),manure(2) litter
   !     FORGC=minimum SOC for organic soil (g Mg-1)
-  !      FVLWB,FCH4F=maximum SWC,CH4 emission fraction for combustion
+  !      VolMaxSoilMoist4Fire,FCH4F=maximum SWC,CH4 emission fraction for combustion
   !     PSIHY=hygroscopic water potential (MPa)
   !     FCI,WPI=FC,WP for water retention by ice (MPa)
   !     CDPTHSI=depth to bottom of snowpack layers
@@ -195,7 +195,7 @@ module StartsMod
   CanopyHeightZ_col(0:NumOfCanopyLayers,:,:)=0.0_r8
   CanopyLeafAareZ_col(1:NumOfCanopyLayers,:,:)=0.0_r8
   CanopyStemAareZ_col(1:NumOfCanopyLayers,:,:)=0.0_r8
-  WGLFT(1:NumOfCanopyLayers,:,:)=0.0_r8
+  tCanLeafC_cl(1:NumOfCanopyLayers,:,:)=0.0_r8
 
 !
   call InitSoilVars(NHW,NHE,NVN,NVS,ALTZG,LandScape1stSoiLayDepth)
@@ -528,19 +528,19 @@ module StartsMod
   trcs_VLN_vr(ids_H1PO4B,0:L2,NY,NX)=0.0_r8
   trcs_VLN_vr(ids_H2PO4B,0:L2,NY,NX)=trcs_VLN_vr(ids_H1PO4B,0:L2,NY,NX)
 
-  ROXYX(0:L2,NY,NX)=0.0_r8
-  RNH4X(0:L2,NY,NX)=0.0_r8
-  RNO3X(0:L2,NY,NX)=0.0_r8
+  REcoO2DmndResp_vr(0:L2,NY,NX)=0.0_r8
+  REcoNH4DmndSoil_vr(0:L2,NY,NX)=0.0_r8
+  REcoNO3DmndSoil_vr(0:L2,NY,NX)=0.0_r8
   RNO2EcoUptkSoil_vr(0:L2,NY,NX)=0.0_r8
   RN2OEcoUptkSoil_vr(0:L2,NY,NX)=0.0_r8
-  RPO4X(0:L2,NY,NX)=0.0_r8
-  RP14X(0:L2,NY,NX)=0.0_r8
+  REcoH2PO4DmndSoil_vr(0:L2,NY,NX)=0.0_r8
+  REcoH1PO4DmndSoil_vr(0:L2,NY,NX)=0.0_r8
   RNO2DmndSoilChemo_vr(0:L2,NY,NX)=0.0_r8
-  RNHBX(0:L2,NY,NX)=0.0_r8
-  RN3BX(0:L2,NY,NX)=0.0_r8
+  REcoNH4DmndBand_vr(0:L2,NY,NX)=0.0_r8
+  REcoNO3DmndBand_vr(0:L2,NY,NX)=0.0_r8
   RNO2EcoUptkBand_vr(0:L2,NY,NX)=0.0_r8
-  RPOBX(0:L2,NY,NX)=0.0_r8
-  RP1BX(0:L2,NY,NX)=0.0_r8
+  REcoH2PO4DmndBand_vr(0:L2,NY,NX)=0.0_r8
+  REcoH1PO4DmndBand_vr(0:L2,NY,NX)=0.0_r8
   RNO2DmndBandChemo_vr(0:L2,NY,NX)=0.0_r8
   ZNHUI(0:L2,NY,NX)=0.0_r8
   ZNHU0(0:L2,NY,NX)=0.0_r8
@@ -913,7 +913,7 @@ module StartsMod
 !     bulk density is defined only for soil with micropores
 !     bulk soil mass evaluated as micropore volume
       SoilMicPMassLayer(L,NY,NX)=SoiBulkDensity(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
-      RTDNT(L,NY,NX)=0.0_r8
+      totRootLenDens_vr(L,NY,NX)=0.0_r8
     ENDIF
     AREA(1,L,NY,NX)=DLYR(3,L,NY,NX)*DLYR(2,L,NY,NX)
     AREA(2,L,NY,NX)=DLYR(3,L,NY,NX)*DLYR(1,L,NY,NX)
@@ -1092,7 +1092,7 @@ module StartsMod
   CanopyHeightZ_col(0:NumOfCanopyLayers,:,:)=0.0_r8
   CanopyLeafAareZ_col(1:NumOfCanopyLayers,:,:)=0.0_r8
   CanopyStemAareZ_col(1:NumOfCanopyLayers,:,:)=0.0_r8
-  WGLFT(1:NumOfCanopyLayers,:,:)=0.0_r8
+  tCanLeafC_cl(1:NumOfCanopyLayers,:,:)=0.0_r8
 
 !
   call InitSoilVars(NHW,NHE,NVN,NVS,ALTZG,LandScape1stSoiLayDepth)
