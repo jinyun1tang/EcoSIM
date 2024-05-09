@@ -310,7 +310,7 @@ module CanopyCondsMod
     SolarNoonHour_col        => plt_site%SolarNoonHour_col           , &
     VLSoilPoreMicP_vr        => plt_soilchem%VLSoilPoreMicP_vr    , &
     VLSoilMicP               => plt_soilchem%VLSoilMicP              , &
-    VLWatMicP                => plt_soilchem%VLWatMicP               , &
+    VLWatMicP_vr             => plt_soilchem%VLWatMicP_vr            , &
     ClumpFactorNow_pft       => plt_morph%ClumpFactorNow_pft         , &
     CanopyHeightZ_col        => plt_morph%CanopyHeightZ_col          , &
     NumOfBranches_pft        => plt_morph%NumOfBranches_pft          , &
@@ -785,7 +785,7 @@ module CanopyCondsMod
         GrndAlbedo=FracGrndBySnow*SnowpackAlbedo+(1.0_r8-FracGrndBySnow)*SoilAlbedo
       ELSE
         IF(VLSoilPoreMicP_vr(NU).GT.ZEROS2)THEN
-          THETW1=AMIN1(POROS1,VLWatMicP(NU)/VLSoilMicP(NU))
+          THETW1=AMIN1(POROS1,VLWatMicP_vr(NU)/VLSoilMicP(NU))
         ELSE
           THETW1=0.0_r8
         ENDIF

@@ -27,7 +27,7 @@ module SOMDataType
   real(r8),target,allocatable :: OMLitrC_vr(:,:,:)                        !total particulate organic C [g d-2]
   real(r8),target,allocatable :: CSoilOrgM_vr(:,:,:,:)                       !soil organic matter content [g kg-1]
   real(r8),target,allocatable :: COMLitrC_vr(:,:,:)                       !soil particulate C content [g kg-1]
-  real(r8),target,allocatable :: CFOMC_vr(:,:,:,:)                     !allocation coefficient to humus fractions
+  real(r8),target,allocatable :: ElmAllocmatMicrblitr2POM_vr(:,:,:,:)                     !allocation coefficient to humus fractions
   real(r8),target,allocatable ::  tMicBiome_col(:,:,:)                         !total micriobial C, [g d-2]
   real(r8),target,allocatable :: tSoilOrgM_col(:,:,:)                  !total soil organic matter, include everything organic (exclude live roots) [g d-2]
   real(r8),target,allocatable ::  tLitrOM_col(:,:,:)                        !total litter C, [g d-2]
@@ -75,7 +75,7 @@ module SOMDataType
   allocate(OMLitrC_vr(0:JZ,JY,JX));OMLitrC_vr=0._r8
   allocate(CSoilOrgM_vr(1:NumPlantChemElms,0:JZ,JY,JX));CSoilOrgM_vr=0._r8
   allocate(COMLitrC_vr(JZ,JY,JX));COMLitrC_vr=0._r8
-  allocate(CFOMC_vr(2,JZ,JY,JX));; CFOMC_vr=0._r8
+  allocate(ElmAllocmatMicrblitr2POM_vr(2,JZ,JY,JX));; ElmAllocmatMicrblitr2POM_vr=0._r8
   allocate(tMicBiome_col(NumPlantChemElms,JY,JX));        tMicBiome_col=0._r8
   allocate(tSoilOrgM_col(NumPlantChemElms,JY,JX)); tSoilOrgM_col=0._r8
   allocate(tLitrOM_col(NumPlantChemElms,JY,JX));       tLitrOM_col=0._r8
@@ -114,7 +114,7 @@ module SOMDataType
   call destroy(OMLitrC_vr)
   call destroy(CSoilOrgM_vr)
   call destroy(COMLitrC_vr)
-  call destroy(CFOMC_vr)
+  call destroy(ElmAllocmatMicrblitr2POM_vr)
   call destroy(tMicBiome_col)
   call destroy(tSoilOrgM_col)
   call destroy(tLitrOM_col)

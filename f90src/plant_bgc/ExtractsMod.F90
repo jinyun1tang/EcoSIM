@@ -185,6 +185,7 @@ module ExtractsMod
     MaxSoiL4Root              => plt_morph%MaxSoiL4Root             &
   )
 
+  trcs_plant_uptake_vr=0._r8
   DO N=1,MY(NZ)
     DO L=NU,MaxSoiL4Root(NZ)
 !

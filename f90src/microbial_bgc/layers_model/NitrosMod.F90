@@ -139,9 +139,9 @@ module nitrosMod
               L1=LL
             ENDIF
             DO NE=1,NumPlantChemElms            
-              OMEXS=FracLitrMix*AZMAX1(mBOMHeter_vr(NE,MID,K,L1,NY,NX))
-              mBOMHeter_vr(NE,MID,K,L,NY,NX)=mBOMHeter_vr(NE,MID,K,L,NY,NX)-OMEXS
-              mBOMHeter_vr(NE,MID,K,LL,NY,NX)=mBOMHeter_vr(NE,MID,K,LL,NY,NX)+OMEXS
+              OMEXS=FracLitrMix*AZMAX1(mBiomeHeter_vr(NE,MID,K,L1,NY,NX))
+              mBiomeHeter_vr(NE,MID,K,L,NY,NX)=mBiomeHeter_vr(NE,MID,K,L,NY,NX)-OMEXS
+              mBiomeHeter_vr(NE,MID,K,LL,NY,NX)=mBiomeHeter_vr(NE,MID,K,LL,NY,NX)+OMEXS
             ENDDO
           ENDDO D7962
         ENDDO
@@ -241,7 +241,7 @@ module nitrosMod
       DO  M=1,nlbiomcp
         MID=micpar%get_micb_id(M,NGL)
         DO NE=1,nelms
-          ORGM(NE)=ORGM(NE)+mBOMAutor_vr(NE,MID,L,NY,NX)
+          ORGM(NE)=ORGM(NE)+mBiomeAutor_vr(NE,MID,L,NY,NX)
         ENDDO
       enddo
     enddo
@@ -254,7 +254,7 @@ module nitrosMod
         DO  M=1,nlbiomcp
           MID=micpar%get_micb_id(M,NGL)
           DO NE=1,nelms
-            ORGM(NE)=ORGM(NE)+mBOMHeter_vr(NE,MID,K,L,NY,NX)
+            ORGM(NE)=ORGM(NE)+mBiomeHeter_vr(NE,MID,K,L,NY,NX)
           ENDDO
         enddo
       enddo
@@ -300,7 +300,7 @@ module nitrosMod
       DO  M=1,nlbiomcp
         MID=micpar%get_micb_id(M,NGL)
         DO NE=1,NumPlantChemElms
-          ORGM(NE)=ORGM(NE)+mBOMAutor_vr(NE,MID,L,NY,NX)
+          ORGM(NE)=ORGM(NE)+mBiomeAutor_vr(NE,MID,L,NY,NX)
         ENDDO
       enddo
     enddo
@@ -314,7 +314,7 @@ module nitrosMod
         DO  M=1,nlbiomcp
           MID=micpar%get_micb_id(M,NGL)
           DO NE=1,NumPlantChemElms
-            ORGM(NE)=ORGM(NE)+mBOMHeter_vr(NE,MID,K,L,NY,NX)
+            ORGM(NE)=ORGM(NE)+mBiomeHeter_vr(NE,MID,K,L,NY,NX)
           ENDDO
         enddo
       enddo
@@ -361,7 +361,7 @@ module nitrosMod
       DO  M=1,nlbiomcp
         MID=micpar%get_micb_id(M,NGL)
         DO NE=1,NumPlantChemElms
-          ORGM(NE)=ORGM(NE)+mBOMAutor_vr(NE,MID,L,NY,NX)
+          ORGM(NE)=ORGM(NE)+mBiomeAutor_vr(NE,MID,L,NY,NX)
         ENDDO
       enddo
     enddo
@@ -374,7 +374,7 @@ module nitrosMod
         DO  M=1,nlbiomcp
           MID=micpar%get_micb_id(M,NGL)
           DO NE=1,NumPlantChemElms
-            ORGM(NE)=ORGM(NE)+mBOMHeter_vr(NE,MID,K,L,NY,NX)
+            ORGM(NE)=ORGM(NE)+mBiomeHeter_vr(NE,MID,K,L,NY,NX)
           ENDDO
         enddo
       enddo
@@ -428,7 +428,7 @@ module nitrosMod
       DO  M=1,nlbiomcp
         MID=micpar%get_micb_id(M,NGL)
         DO NE=1,NumPlantChemElms
-          ORGM(NE)=ORGM(NE)+mBOMAutor_vr(NE,MID,L,NY,NX)
+          ORGM(NE)=ORGM(NE)+mBiomeAutor_vr(NE,MID,L,NY,NX)
         ENDDO
       enddo
     enddo
@@ -441,7 +441,7 @@ module nitrosMod
         DO  M=1,nlbiomcp
           MID=micpar%get_micb_id(M,NGL)
           DO NE=1,NumPlantChemElms
-            ORGM(NE)=ORGM(NE)+mBOMHeter_vr(NE,MID,K,L,NY,NX)
+            ORGM(NE)=ORGM(NE)+mBiomeHeter_vr(NE,MID,K,L,NY,NX)
           ENDDO
         enddo
       enddo
@@ -466,7 +466,7 @@ module nitrosMod
       DO  M=1,nlbiomcp
         MID=micpar%get_micb_id(M,NGL)
         DO NE=1,ielmc
-          SOMAutor=SOMAutor+mBOMAutor_vr(NE,MID,L,NY,NX)
+          SOMAutor=SOMAutor+mBiomeAutor_vr(NE,MID,L,NY,NX)
         ENDDO
       ENDDO
     ENDDO
@@ -478,7 +478,7 @@ module nitrosMod
         DO  M=1,nlbiomcp
           MID=micpar%get_micb_id(M,NGL)
           DO NE=1,ielmc
-            SOMHeterK(K)=SOMHeterK(K)+mBOMHeter_vr(NE,MID,K,L,NY,NX)
+            SOMHeterK(K)=SOMHeterK(K)+mBiomeHeter_vr(NE,MID,K,L,NY,NX)
           ENDDO
         enddo
       enddo  

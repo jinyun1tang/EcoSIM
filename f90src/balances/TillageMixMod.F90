@@ -42,8 +42,8 @@ module TillageMixMod
 
   real(r8) :: TOMGAutor(1:NumPlantChemElms,1:NumLiveAutoBioms)
   real(r8) :: TBOMGE(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx)
-  REAL(R8) :: TmBOMHeter(NumPlantChemElms,NumLiveHeterBioms,1:jcplx)
-  REAL(R8) :: TmBOMAutor(NumPlantChemElms,NumLiveAutoBioms)
+  REAL(R8) :: TmBiomeHeter(NumPlantChemElms,NumLiveHeterBioms,1:jcplx)
+  REAL(R8) :: TmBiomeAutor(NumPlantChemElms,NumLiveAutoBioms)
   real(r8) :: TORM(NumPlantChemElms,ndbiomcp,1:jcplx)
   real(r8) :: TDOM(idom_beg:idom_end,1:jcplx)
   real(r8) :: TOHM(idom_beg:idom_end,1:jcplx)
@@ -119,8 +119,8 @@ module TillageMixMod
     TP_salml(idsp_beg:idsp_end)=0._r8
     TG_gasml(idg_beg:idg_end-1)=0._r8
 
-    TmBOMHeter=0.0_r8
-    TmBOMAutor=0.0_r8
+    TmBiomeHeter=0.0_r8
+    TmBiomeAutor=0.0_r8
     TORM=0.0_r8
     TDOM=0.0_r8
     TOHM=0.0_r8
@@ -150,8 +150,8 @@ module TillageMixMod
           DO  M=1,nlbiomcp
             MID=micpar%get_micb_id(M,NGL)
             DO NE=1,NumPlantChemElms
-              TBOMGE(NE,MID,K)=mBOMHeter_vr(NE,MID,K,0,NY,NX)*CORP0
-              mBOMHeter_vr(NE,MID,K,0,NY,NX)=mBOMHeter_vr(NE,MID,K,0,NY,NX)*XCORP0
+              TBOMGE(NE,MID,K)=mBiomeHeter_vr(NE,MID,K,0,NY,NX)*CORP0
+              mBiomeHeter_vr(NE,MID,K,0,NY,NX)=mBiomeHeter_vr(NE,MID,K,0,NY,NX)*XCORP0
             ENDDO
           enddo
         enddo
@@ -163,8 +163,8 @@ module TillageMixMod
         DO  M=1,nlbiomcp
           MID=micpar%get_micb_id(M,NGL)
           DO NE=1,NumPlantChemElms
-            TOMGAutor(NE,MID)=mBOMAutor_vr(NE,MID,0,NY,NX)*CORP0
-            mBOMAutor_vr(NE,MID,0,NY,NX)=mBOMAutor_vr(NE,MID,0,NY,NX)*XCORP0
+            TOMGAutor(NE,MID)=mBiomeAutor_vr(NE,MID,0,NY,NX)*CORP0
+            mBiomeAutor_vr(NE,MID,0,NY,NX)=mBiomeAutor_vr(NE,MID,0,NY,NX)*XCORP0
           ENDDO
         enddo
       enddo
@@ -226,7 +226,7 @@ module TillageMixMod
     ENDDO
 
     TZNFNG=ZNFNI(0,NY,NX)*CORP0
-    TVOLWR=VLWatMicP(0,NY,NX)*CORP0
+    TVOLWR=VLWatMicP_vr(0,NY,NX)*CORP0
     HFLXD=cpo*SoilOrgM_vr(ielmc,0,NY,NX)*CORP0*TKS(0,NY,NX)
     HEATIN=HEATIN-HFLXD
     HeatStoreLandscape=HeatStoreLandscape-HFLXD
@@ -264,8 +264,8 @@ module TillageMixMod
       FertN_soil_vr(NTN,0,NY,NX)=FertN_soil_vr(NTN,0,NY,NX)*XCORP0
     ENDDO
 
-    VLWatMicP(0,NY,NX)=VLWatMicP(0,NY,NX)*XCORP0
-    VHeatCapacity(0,NY,NX)=cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP(0,NY,NX)+cpi*VLiceMicP(0,NY,NX)
+    VLWatMicP_vr(0,NY,NX)=VLWatMicP_vr(0,NY,NX)*XCORP0
+    VHeatCapacity(0,NY,NX)=cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP(0,NY,NX)
     VLitR(NY,NX)=VLitR(NY,NX)*XCORP0
     VGeomLayer(0,NY,NX)=VGeomLayer(0,NY,NX)*XCORP0
     ZNHUX0=AMAX1(ZNHUX0,ZNHU0(0,NY,NX))
@@ -297,11 +297,11 @@ module TillageMixMod
         TGKCM=TGKCM+FI*GKCM(L,NY,NX)
         TGKCN=TGKCN+FI*GKCN(L,NY,NX)
         TGKCK=TGKCK+FI*GKCK(L,NY,NX)
-        TVOLW=TVOLW+TI*VLWatMicP(L,NY,NX)
+        TVOLW=TVOLW+TI*VLWatMicP_vr(L,NY,NX)
         TVOLI=TVOLI+TI*VLiceMicP(L,NY,NX)
 !     TVOLP=TVOLP+TI*VLsoiAirP(L,NY,NX)
 !     TVOLA=TVOLA+TI*VLMicP(L,NY,NX)
-        TENGY=TENGY+TI*(cpw*(VLWatMicP(L,NY,NX)+VLWatMacP(L,NY,NX)) &
+        TENGY=TENGY+TI*(cpw*(VLWatMicP_vr(L,NY,NX)+VLWatMacP(L,NY,NX)) &
           +cpi*(VLiceMicP(L,NY,NX)+VLiceMacP(L,NY,NX)))*TKS(L,NY,NX)
         DO NTN=ifertn_beg,ifertn_end
           TfertN_soil(NTN)=TfertN_soil(NTN)+TI*FertN_soil_vr(NTN,L,NY,NX)
@@ -341,7 +341,7 @@ module TillageMixMod
               DO  M=1,nlbiomcp
                 MID=micpar%get_micb_id(M,NGL)
                 DO NE=1,NumPlantChemElms
-                  TmBOMHeter(NE,MID,K)=TmBOMHeter(NE,MID,K)+TI*mBOMHeter_vr(NE,MID,K,L,NY,NX)
+                  TmBiomeHeter(NE,MID,K)=TmBiomeHeter(NE,MID,K)+TI*mBiomeHeter_vr(NE,MID,K,L,NY,NX)
                 ENDDO
               enddo
             enddo
@@ -353,7 +353,7 @@ module TillageMixMod
             DO  M=1,nlbiomcp
               MID=micpar%get_micb_id(M,NGL)
               DO NE=1,NumPlantChemElms
-              TmBOMAutor(NE,MID)=TmBOMAutor(NE,MID)+TI*mBOMAutor_vr(NE,MID,L,NY,NX)
+              TmBiomeAutor(NE,MID)=TmBiomeAutor(NE,MID)+TI*mBiomeAutor_vr(NE,MID,L,NY,NX)
               ENDDO
             enddo
           enddo
@@ -413,11 +413,11 @@ module TillageMixMod
         GKCK(L,NY,NX)=TI*(GKCK(L,NY,NX)+CORP*(TGKCK-GKCK(L,NY,NX)))+TX*GKCK(L,NY,NX)
         
         ENGYM=VHeatCapacitySoilM(L,NY,NX)*TKS(L,NY,NX)
-        ENGYV=(cpw*(VLWatMicP(L,NY,NX)+VLWatMacP(L,NY,NX))+cpi*(VLiceMicP(L,NY,NX)+VLiceMacP(L,NY,NX)))*TKS(L,NY,NX)
-        VLWatMicP(L,NY,NX)=TI*VLWatMicP(L,NY,NX)+CORP*(FI*TVOLW-TI*VLWatMicP(L,NY,NX))+TX*VLWatMicP(L,NY,NX)+FI*TVOLWR
+        ENGYV=(cpw*(VLWatMicP_vr(L,NY,NX)+VLWatMacP(L,NY,NX))+cpi*(VLiceMicP(L,NY,NX)+VLiceMacP(L,NY,NX)))*TKS(L,NY,NX)
+        VLWatMicP_vr(L,NY,NX)=TI*VLWatMicP_vr(L,NY,NX)+CORP*(FI*TVOLW-TI*VLWatMicP_vr(L,NY,NX))+TX*VLWatMicP_vr(L,NY,NX)+FI*TVOLWR
         VLiceMicP(L,NY,NX)=TI*VLiceMicP(L,NY,NX)+CORP*(FI*TVOLI-TI*VLiceMicP(L,NY,NX))+TX*VLiceMicP(L,NY,NX)
-        VLWatMicPX(L,NY,NX)=VLWatMicP(L,NY,NX)
-!     VLWatMicP(L,NY,NX)=VLWatMicP(L,NY,NX)+CORP*VLWatMacP(L,NY,NX)
+        VLWatMicPX(L,NY,NX)=VLWatMicP_vr(L,NY,NX)
+!     VLWatMicP_vr(L,NY,NX)=VLWatMicP_vr(L,NY,NX)+CORP*VLWatMacP(L,NY,NX)
 !     VLiceMicP(L,NY,NX)=VLiceMicP(L,NY,NX)+CORP*VLiceMacP(L,NY,NX)
 !     VLMicP(L,NY,NX)=VLMicP(L,NY,NX)+CORP*VLMacP(L,NY,NX)
 !     VLWatMacP(L,NY,NX)=XCORP(NY,NX)*VLWatMacP(L,NY,NX)
@@ -425,7 +425,7 @@ module TillageMixMod
 !     VLMacP(L,NY,NX)=XCORP(NY,NX)*VLMacP(L,NY,NX)
 !     SoilFracAsMacP(L,NY,NX)=XCORP(NY,NX)*SoilFracAsMacP(L,NY,NX)
         ENGYL=TI*ENGYV+CORP*(FI*TENGY-TI*ENGYV)+TX*ENGYV+FI*TENGYR
-        VHeatCapacity(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+cpw*(VLWatMicP(L,NY,NX)+VLWatMacP(L,NY,NX)) &
+        VHeatCapacity(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+cpw*(VLWatMicP_vr(L,NY,NX)+VLWatMacP(L,NY,NX)) &
           +cpi*(VLiceMicP(L,NY,NX)+VLiceMacP(L,NY,NX))
         TKS(L,NY,NX)=(ENGYM+ENGYL)/VHeatCapacity(L,NY,NX)
         TCS(L,NY,NX)=units%Kelvin2Celcius(TKS(L,NY,NX))
@@ -453,7 +453,7 @@ module TillageMixMod
         DO NTS=ids_beg,ids_end
           trc_solml_vr(NTS,L,NY,NX)=TI*trc_solml_vr(NTS,L,NY,NX) &
             +CORP*(FI*TS_solml(NTS)-TI*trc_solml_vr(NTS,L,NY,NX)) &
-            +TX*trc_solml_vr(NTS,L,NY,NX)+CORP*trc_soHml(NTS,L,NY,NX)
+            +TX*trc_solml_vr(NTS,L,NY,NX)+CORP*trc_soHml_vr(NTS,L,NY,NX)
         ENDDO
 
         DO NTX=idx_CEC,idx_cation_end
@@ -484,8 +484,8 @@ module TillageMixMod
               DO  M=1,nlbiomcp
                 MID=micpar%get_micb_id(M,NGL)
                 DO NE=1,NumPlantChemElms
-                  mBOMHeter_vr(NE,MID,K,L,NY,NX)=TI*mBOMHeter_vr(NE,MID,K,L,NY,NX)+CORP*(FI*TmBOMHeter(NE,MID,K) &
-                    -TI*mBOMHeter_vr(NE,MID,K,L,NY,NX))+TX*mBOMHeter_vr(NE,MID,K,L,NY,NX)
+                  mBiomeHeter_vr(NE,MID,K,L,NY,NX)=TI*mBiomeHeter_vr(NE,MID,K,L,NY,NX)+CORP*(FI*TmBiomeHeter(NE,MID,K) &
+                    -TI*mBiomeHeter_vr(NE,MID,K,L,NY,NX))+TX*mBiomeHeter_vr(NE,MID,K,L,NY,NX)
                   ENDDO
               enddo
             enddo
@@ -496,8 +496,8 @@ module TillageMixMod
             DO  M=1,nlbiomcp
               MID=micpar%get_micb_id(M,NGL)
               DO NE=1,NumPlantChemElms
-                mBOMAutor_vr(NE,MID,L,NY,NX)=TI*mBOMAutor_vr(NE,MID,L,NY,NX)+CORP*(FI*TmBOMAutor(NE,MID) &
-                  -TI*mBOMAutor_vr(NE,MID,L,NY,NX))+TX*mBOMAutor_vr(NE,MID,L,NY,NX)
+                mBiomeAutor_vr(NE,MID,L,NY,NX)=TI*mBiomeAutor_vr(NE,MID,L,NY,NX)+CORP*(FI*TmBiomeAutor(NE,MID) &
+                  -TI*mBiomeAutor_vr(NE,MID,L,NY,NX))+TX*mBiomeAutor_vr(NE,MID,L,NY,NX)
               ENDDO  
             enddo
           enddo
@@ -539,7 +539,7 @@ module TillageMixMod
               DO M=1,nlbiomcp
                 MID=micpar%get_micb_id(M,NGL)         
                 DO NE=1,NumPlantChemElms       
-                  mBOMHeter_vr(NE,MID,K,L,NY,NX)=mBOMHeter_vr(NE,MID,K,L,NY,NX)+FI*TBOMGE(NE,MID,K)
+                  mBiomeHeter_vr(NE,MID,K,L,NY,NX)=mBiomeHeter_vr(NE,MID,K,L,NY,NX)+FI*TBOMGE(NE,MID,K)
                 ENDDO
               enddo
             enddo
@@ -551,7 +551,7 @@ module TillageMixMod
             DO M=1,nlbiomcp
               MID=micpar%get_micb_id(M,NGL)
               DO NE=1,NumPlantChemElms
-                mBOMAutor_vr(NE,MID,L,NY,NX)=mBOMAutor_vr(NE,MID,L,NY,NX)+FI*TOMGAutor(NE,MID)
+                mBiomeAutor_vr(NE,MID,L,NY,NX)=mBiomeAutor_vr(NE,MID,L,NY,NX)+FI*TOMGAutor(NE,MID)
               ENDDO
             enddo
           enddo
@@ -639,7 +639,7 @@ module TillageMixMod
   integer :: NTS,NTSA
 
   DO NTS=ids_beg,ids_end
-    trc_soHml(NTS,L,NY,NX)=XCORP(NY,NX)*trc_soHml(NTS,L,NY,NX)
+    trc_soHml_vr(NTS,L,NY,NX)=XCORP(NY,NX)*trc_soHml_vr(NTS,L,NY,NX)
   ENDDO
 
   DO NTSA=idsalt_beg,idsalt_end

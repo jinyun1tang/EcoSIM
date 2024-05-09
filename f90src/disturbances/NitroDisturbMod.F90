@@ -92,9 +92,9 @@ module NitroDisturbMod
         ELSE
           DCORPC=AMIN1(0.999_r8,DCORP(I,NY,NX))
         ENDIF
-!     VOLWOU=VOLWOU+DCORPC*VLWatMicP(L,NY,NX)
-!     HEATOU=HEATOU+DCORPC*4.19*TKS(L,NY,NX)*VLWatMicP(L,NY,NX)
-!     VLWatMicP(L,NY,NX)=VLWatMicP(L,NY,NX)-DCORPC*VLWatMicP(L,NY,NX)
+!     VOLWOU=VOLWOU+DCORPC*VLWatMicP_vr(L,NY,NX)
+!     HEATOU=HEATOU+DCORPC*4.19*TKS(L,NY,NX)*VLWatMicP_vr(L,NY,NX)
+!     VLWatMicP_vr(L,NY,NX)=VLWatMicP_vr(L,NY,NX)-DCORPC*VLWatMicP_vr(L,NY,NX)
         OMelm=0._r8
         dOMelm=0._r8
 
@@ -111,7 +111,7 @@ module NitroDisturbMod
                 DO M=1,nlbiomcp
                   MID=micpar%get_micb_id(M,NGL)
                   DO NE=1,NumPlantChemElms 
-                    rmBiom(NE)=DCORPC*mBOMHeter_vr(NE,MID,K,L,NY,NX)
+                    rmBiom(NE)=DCORPC*mBiomeHeter_vr(NE,MID,K,L,NY,NX)
                   enddo
 
                   ONX=EFIRE(1,ITILL(I,NY,NX))*rmBiom(ielmn)
@@ -124,8 +124,8 @@ module NitroDisturbMod
                     OPL(1,K)=OPL(1,K)+rmBiom(ielmp)-OPX
                   ENDIF
                   DO  NE=1,NumPlantChemElms 
-                    mBOMHeter_vr(NE,MID,K,L,NY,NX)=mBOMHeter_vr(NE,MID,K,L,NY,NX)-rmBiom(NE)
-                    dOMelm(NE)=dOMelm(NE)+mBOMHeter_vr(NE,MID,K,L,NY,NX)                    
+                    mBiomeHeter_vr(NE,MID,K,L,NY,NX)=mBiomeHeter_vr(NE,MID,K,L,NY,NX)-rmBiom(NE)
+                    dOMelm(NE)=dOMelm(NE)+mBiomeHeter_vr(NE,MID,K,L,NY,NX)                    
                   ENDDO
                   OMelm(ielmc)=OMelm(ielmc)+rmBiom(ielmc)
                   OMelm(ielmn)=OMelm(ielmn)+ONX
@@ -146,7 +146,7 @@ module NitroDisturbMod
             DO M=1,nlbiomcp
               MID=micpar%get_micb_id(M,NGL)
               DO NE=1,NumPlantChemElms
-                rmBiom(NE)=DCORPC*mBOMAutor_vr(NE,MID,L,NY,NX)
+                rmBiom(NE)=DCORPC*mBiomeAutor_vr(NE,MID,L,NY,NX)
               enddo
 
               ONX=EFIRE(1,ITILL(I,NY,NX))*rmBiom(ielmn)
@@ -156,8 +156,8 @@ module NitroDisturbMod
               OPL(4,1)=OPL(4,1)+rmBiom(ielmp)-OPX
 
               DO NE=1,NumPlantChemElms
-                mBOMAutor_vr(NE,MID,L,NY,NX)=mBOMAutor_vr(NE,MID,L,NY,NX)-rmBiom(NE)
-                dOMelm(NE)=dOMelm(NE)+mBOMAutor_vr(NE,MID,L,NY,NX)
+                mBiomeAutor_vr(NE,MID,L,NY,NX)=mBiomeAutor_vr(NE,MID,L,NY,NX)-rmBiom(NE)
+                dOMelm(NE)=dOMelm(NE)+mBiomeAutor_vr(NE,MID,L,NY,NX)
               enddo
               OMelm(ielmc)=OMelm(ielmc)+rmBiom(ielmc)
               OMelm(ielmn)=OMelm(ielmn)+ONX
@@ -335,10 +335,10 @@ module NitroDisturbMod
           HEATOU=HEATOU+HFLXD
         ENDIF
 !     IF(L.EQ.0)THEN
-!     VHeatCapacity(0,NY,NX)=2.496E-06*SoilOrgM_vr(ielmc,0,NY,NX)+4.19*VLWatMicP(0,NY,NX)
+!     VHeatCapacity(0,NY,NX)=2.496E-06*SoilOrgM_vr(ielmc,0,NY,NX)+4.19*VLWatMicP_vr(0,NY,NX)
 !    2+1.9274*VLiceMicP(0,NY,NX)
 !     ELSE
-!     VHeatCapacity(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+4.19*(VLWatMicP(L,NY,NX)+VLWatMacP(L,NY,NX))
+!     VHeatCapacity(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+4.19*(VLWatMicP_vr(L,NY,NX)+VLWatMacP(L,NY,NX))
 !    2+1.9274*(VLiceMicP(L,NY,NX)+VLiceMacP(L,NY,NX))
 !     ENDIF
         IF(ITILL(I,NY,NX).EQ.21)THEN

@@ -89,7 +89,7 @@ implicit none
 
   real(r8), allocatable :: trc_gasml_vr2(:,:,:,:)
   real(r8), allocatable :: trc_solml_vr2(:,:,:,:)
-  real(r8), allocatable :: trc_soHml2(:,:,:,:)
+  real(r8), allocatable :: trc_soHml2_vr(:,:,:,:)
 
   real(r8), allocatable ::  trcn_2DSnowDrift(:,:,:,:)                      !
   real(r8), allocatable ::  trcg_2DSnowDrift(:,:,:,:)                      !
@@ -186,7 +186,7 @@ contains
 
   allocate(trc_gasml_vr2(idg_beg:idg_end,0:JZ,JY,JX)); trc_gasml_vr2(:,:,:,:) = 0._r8
   allocate(trc_solml_vr2(ids_beg:ids_end,0:JZ,JY,JX)); trc_solml_vr2(:,:,:,:) = 0._r8
-  allocate(trc_soHml2(ids_beg:ids_end,0:JZ,JY,JX)); trc_soHml2(:,:,:,:)       = 0._r8
+  allocate(trc_soHml2_vr(ids_beg:ids_end,0:JZ,JY,JX)); trc_soHml2_vr(:,:,:,:)       = 0._r8
 
   allocate(trcg_2DSnowDrift(idg_beg:idg_NH3,2,JV,JH));    trcg_2DSnowDrift                    = 0._r8
   allocate(trcn_2DFloXSurRunoffM(ids_nut_beg:ids_nuts_end,2,2,JV,JH));  trcn_2DFloXSurRunoffM = 0._r8
@@ -279,7 +279,7 @@ contains
 
   call destroy(trc_gasml_vr2)
   call destroy(trc_solml_vr2)
-  call destroy(trc_soHml2)
+  call destroy(trc_soHml2_vr)
   call destroy(trcn_band_VFloSnow)
   call destroy(trcn_soil_VFloSnow)
 

@@ -436,7 +436,7 @@ implicit none
     iPlantPhenolType_pft            =>  plt_pheno%iPlantPhenolType_pft         , &
     fTgrowRootP_vr                  =>  plt_pheno%fTgrowRootP_vr               , &
     iPlantCalendar_brch             =>  plt_pheno%iPlantCalendar_brch          , &
-    CFOPE                           =>  plt_soilchem%CFOPE                     , &
+    ElmAllocmat4Litr                           =>  plt_soilchem%ElmAllocmat4Litr                     , &
     SoilResit4RootPentrate_vr       =>  plt_soilchem%SoilResit4RootPentrate_vr , &
     DLYR3                           =>  plt_site%DLYR3                         , &
     ZERO                            =>  plt_site%ZERO                          , &
@@ -714,8 +714,8 @@ implicit none
         D6350: DO M=1,jsken
           DO NE=1,NumPlantChemElms
             dsenecE=Remobl2ndelm(NE)-Remobl2ndcycl(NE)
-            dwoodyE=CFOPE(NE,icwood,M,NZ)*dsenecE*FWODRE(NE,k_woody_litr)
-            dfineE=CFOPE(NE,iroot,M,NZ)*dsenecE*FWODRE(NE,k_fine_litr)
+            dwoodyE=ElmAllocmat4Litr(NE,icwood,M,NZ)*dsenecE*FWODRE(NE,k_woody_litr)
+            dfineE=ElmAllocmat4Litr(NE,iroot,M,NZ)*dsenecE*FWODRE(NE,k_fine_litr)
             LitrfalStrutElms_pvr(NE,M,k_woody_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_woody_litr,L,NZ)+dwoodyE
             LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)+dfineE
 
@@ -935,7 +935,7 @@ implicit none
     MainBranchNum_pft               =>  plt_morph%MainBranchNum_pft              , &
     NIXBotRootLayer_rpft            =>  plt_morph%NIXBotRootLayer_rpft           , &     
     PSIRootTurg_vr                  =>  plt_ew%PSIRootTurg_vr                    , &       
-    CFOPE                           =>  plt_soilchem%CFOPE                       , &    
+    ElmAllocmat4Litr                           =>  plt_soilchem%ElmAllocmat4Litr                       , &    
     SoiBulkDensity                  =>  plt_soilchem%SoiBulkDensity              , &    
     SoilResit4RootPentrate_vr       =>  plt_soilchem%SoilResit4RootPentrate_vr   , &    
     C4PhotosynDowreg_brch           =>  plt_photo%C4PhotosynDowreg_brch            &
@@ -1253,7 +1253,7 @@ implicit none
     RootMycoActiveBiomC_pvr         =>  plt_biom%RootMycoActiveBiomC_pvr         , &       
     LitrfalStrutElms_pvr            =>  plt_bgcr%LitrfalStrutElms_pvr            , &    
     icwood                          =>  pltpar%icwood                            , & 
-    CFOPE                           =>  plt_soilchem%CFOPE                       , &    
+    ElmAllocmat4Litr                           =>  plt_soilchem%ElmAllocmat4Litr                       , &    
     FWODRE                          =>  plt_allom%FWODRE                         , &        
     iroot                           =>  pltpar%iroot                             , &   
     k_woody_litr                    =>  pltpar%k_woody_litr                      , &
@@ -1315,13 +1315,13 @@ implicit none
       D6450: DO M=1,jsken
         DO NE=1,NumPlantChemElms
           dsenecE=FSNCM*(RootMyco2ndStrutElms_rpvr(NE,imycorrhz,LL,NR,NZ))
-          dwoodyE=CFOPE(NE,icwood,M,NZ)*dsenecE*FWODRE(NE,k_woody_litr)
-          dfineE1=CFOPE(NE,iroot,M,NZ)*dsenecE*FWODRE(NE,k_fine_litr)
+          dwoodyE=ElmAllocmat4Litr(NE,icwood,M,NZ)*dsenecE*FWODRE(NE,k_woody_litr)
+          dfineE1=ElmAllocmat4Litr(NE,iroot,M,NZ)*dsenecE*FWODRE(NE,k_fine_litr)
           LitrfalStrutElms_pvr(NE,M,k_woody_litr,LL,NZ)=LitrfalStrutElms_pvr(NE,M,k_woody_litr,LL,NZ)+dwoodyE
           LitrfalStrutElms_pvr(NE,M,k_fine_litr,LL,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,LL,NZ)+dfineE1
           dRootMyco2ndst2Litr(NE)=dRootMyco2ndst2Litr(NE)+dwoodyE+dfineE1
 
-          dfineE2=CFOPE(NE,inonstruct,M,NZ)*FSNCP*(RootMycoNonstElms_rpvr(NE,imycorrhz,LL,NZ))
+          dfineE2=ElmAllocmat4Litr(NE,inonstruct,M,NZ)*FSNCP*(RootMycoNonstElms_rpvr(NE,imycorrhz,LL,NZ))
           LitrfalStrutElms_pvr(NE,M,k_fine_litr,LL,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,LL,NZ)+dfineE2
           dRootMycoNonst2Litr(NE)=dRootMycoNonst2Litr(NE)+dfineE2
 
@@ -1374,7 +1374,7 @@ implicit none
     k_fine_litr                     =>  pltpar%k_fine_litr                , &
     iroot                           =>  pltpar%iroot                      , &
     FWODRE                          =>  plt_allom%FWODRE                  , &
-    CFOPE                           =>  plt_soilchem%CFOPE                , &
+    ElmAllocmat4Litr                           =>  plt_soilchem%ElmAllocmat4Litr                , &
     RAutoRootO2Limter_pvr           =>  plt_rbgc%RAutoRootO2Limter_pvr    , &
     LitrfalStrutElms_pvr            =>  plt_bgcr%LitrfalStrutElms_pvr     , &
     iPlantCalendar_brch             =>  plt_pheno%iPlantCalendar_brch     , &
@@ -1474,12 +1474,12 @@ implicit none
       DO NE=1,NumPlantChemElms    
         dsenecE=Frac2Senes1*(Root1stElm_raxs(NE,N,NR,NZ)-Root1stStrutRemob(NE))
         LitrfalStrutElms_pvr(NE,M,k_woody_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_woody_litr,L,NZ) &
-          +CFOPE(NE,icwood,M,NZ)*dsenecE*FWODRE(NE,k_woody_litr)
-        litrflx(NE)=litrflx(NE)+CFOPE(NE,icwood,M,NZ)*dsenecE*FWODRE(NE,k_woody_litr)
+          +ElmAllocmat4Litr(NE,icwood,M,NZ)*dsenecE*FWODRE(NE,k_woody_litr)
+        litrflx(NE)=litrflx(NE)+ElmAllocmat4Litr(NE,icwood,M,NZ)*dsenecE*FWODRE(NE,k_woody_litr)
         
         LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ) &
-          +CFOPE(NE,iroot,M,NZ)*dsenecE*FWODRE(NE,k_fine_litr)
-        litrflx(NE)=litrflx(NE)+CFOPE(NE,iroot,M,NZ)*dsenecE*FWODRE(NE,k_fine_litr)  
+          +ElmAllocmat4Litr(NE,iroot,M,NZ)*dsenecE*FWODRE(NE,k_fine_litr)
+        litrflx(NE)=litrflx(NE)+ElmAllocmat4Litr(NE,iroot,M,NZ)*dsenecE*FWODRE(NE,k_fine_litr)  
       ENDDO
     ENDDO D6355
   endif

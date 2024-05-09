@@ -683,12 +683,12 @@ module InsideTranspMod
       ENDDO D9800
 
       DO ngases=idg_beg,idg_end-2
-        trcs_RFH(ngases)=VFLW*AZMAX1((trc_soHml2(ngases,N3,N2,N1) &
+        trcs_RFH(ngases)=VFLW*AZMAX1((trc_soHml2_vr(ngases,N3,N2,N1) &
           -AZMIN1(RporeSoXFlx(ngases,NU(N2,N1),N2,N1))))
       ENDDO
 
       DO nsolutes=ids_nuts_beg,ids_nuts_end
-        trcs_RFH(nsolutes)=VFLW*AZMAX1((trc_soHml2(nsolutes,N3,N2,N1) &
+        trcs_RFH(nsolutes)=VFLW*AZMAX1((trc_soHml2_vr(nsolutes,N3,N2,N1) &
           -AZMIN1(RporeSoXFlx(nsolutes,NU(N2,N1),N2,N1)*trcs_VLN_vr(nsolutes,N3,N2,N1)))) &
           *trcs_VLN_vr(nsolutes,N6,N5,N4)
       ENDDO
@@ -703,11 +703,11 @@ module InsideTranspMod
       ENDDO D9850
 !exclude NH3 and NH3B
       DO ngases=idg_beg,idg_end-2
-        trcs_RFH(ngases)=VFLW*AZMAX1(trc_soHml2(ngases,N3,N2,N1))
+        trcs_RFH(ngases)=VFLW*AZMAX1(trc_soHml2_vr(ngases,N3,N2,N1))
       ENDDO
 
       DO nsolutes=ids_nuts_beg,ids_nuts_end
-        trcs_RFH(nsolutes)=VFLW*AZMAX1(trc_soHml2(nsolutes,N3,N2,N1))*trcs_VLN_vr(nsolutes,N6,N5,N4)
+        trcs_RFH(nsolutes)=VFLW*AZMAX1(trc_soHml2_vr(nsolutes,N3,N2,N1))*trcs_VLN_vr(nsolutes,N6,N5,N4)
       ENDDO
     ENDIF
 !
@@ -729,11 +729,11 @@ module InsideTranspMod
     ENDDO D9665
 
     DO ngases=idg_beg,idg_end-2
-      trcs_RFH(ngases)=VFLW*AZMAX1(trc_soHml2(ngases,N6,N5,N4))
+      trcs_RFH(ngases)=VFLW*AZMAX1(trc_soHml2_vr(ngases,N6,N5,N4))
     ENDDO
 
     DO nsolutes=ids_nuts_beg,ids_nuts_end
-      trcs_RFH(nsolutes)=VFLW*AZMAX1(trc_soHml2(nsolutes,N6,N5,N4))*trcs_VLN_vr(nsolutes,N6,N5,N4)
+      trcs_RFH(nsolutes)=VFLW*AZMAX1(trc_soHml2_vr(nsolutes,N6,N5,N4))*trcs_VLN_vr(nsolutes,N6,N5,N4)
     ENDDO
   ELSE
 !
@@ -808,100 +808,100 @@ module InsideTranspMod
     ENDDO D9790
 !exclude NH3 and NH3B
     DO ngases=idg_beg,idg_end-2
-      trcs_coH1(ngases)=AZMAX1(trc_soHml2(ngases,N3,N2,N1)/VLWatMacPM(M,N3,N2,N1))
+      trcs_coH1(ngases)=AZMAX1(trc_soHml2_vr(ngases,N3,N2,N1)/VLWatMacPM(M,N3,N2,N1))
     ENDDO
 
     IF(VOLH4A.GT.ZEROS2(N2,N1))THEN
-      trcs_coH1(ids_NH4)=AZMAX1(trc_soHml2(ids_NH4,N3,N2,N1)/VOLH4A)
-      trcs_coH1(idg_NH3)=AZMAX1(trc_soHml2(idg_NH3,N3,N2,N1)/VOLH4A)
+      trcs_coH1(ids_NH4)=AZMAX1(trc_soHml2_vr(ids_NH4,N3,N2,N1)/VOLH4A)
+      trcs_coH1(idg_NH3)=AZMAX1(trc_soHml2_vr(idg_NH3,N3,N2,N1)/VOLH4A)
     ELSE
       trcs_coH1(ids_NH4)=0.0_r8
       trcs_coH1(idg_NH3)=0.0_r8
     ENDIF
     IF(VOLH3A.GT.ZEROS2(N2,N1))THEN
-      trcs_coH1(ids_NO3)=AZMAX1(trc_soHml2(ids_NO3,N3,N2,N1)/VOLH3A)
-      trcs_coH1(ids_NO2)=AZMAX1(trc_soHml2(ids_NO2,N3,N2,N1)/VOLH3A)
+      trcs_coH1(ids_NO3)=AZMAX1(trc_soHml2_vr(ids_NO3,N3,N2,N1)/VOLH3A)
+      trcs_coH1(ids_NO2)=AZMAX1(trc_soHml2_vr(ids_NO2,N3,N2,N1)/VOLH3A)
     ELSE
       trcs_coH1(ids_NO3)=0.0_r8
       trcs_coH1(ids_NO2)=0.0_r8
     ENDIF
     IF(VOLH2A.GT.ZEROS2(N2,N1))THEN
-      trcs_coH1(ids_H1PO4)=AZMAX1(trc_soHml2(ids_H1PO4,N3,N2,N1)/VOLH2A)
-      trcs_coH1(ids_H2PO4)=AZMAX1(trc_soHml2(ids_H2PO4,N3,N2,N1)/VOLH2A)
+      trcs_coH1(ids_H1PO4)=AZMAX1(trc_soHml2_vr(ids_H1PO4,N3,N2,N1)/VOLH2A)
+      trcs_coH1(ids_H2PO4)=AZMAX1(trc_soHml2_vr(ids_H2PO4,N3,N2,N1)/VOLH2A)
     ELSE
       trcs_coH1(ids_H1PO4)=0.0_r8
       trcs_coH1(ids_H2PO4)=0.0_r8
     ENDIF
     IF(VOLH4B.GT.ZEROS2(N2,N1))THEN
-      trcs_coH1(ids_NH4B)=AZMAX1(trc_soHml2(ids_NH4B,N3,N2,N1)/VOLH4B)
-      trcs_coH1(idg_NH3B)=AZMAX1(trc_soHml2(idg_NH3B,N3,N2,N1)/VOLH4B)
+      trcs_coH1(ids_NH4B)=AZMAX1(trc_soHml2_vr(ids_NH4B,N3,N2,N1)/VOLH4B)
+      trcs_coH1(idg_NH3B)=AZMAX1(trc_soHml2_vr(idg_NH3B,N3,N2,N1)/VOLH4B)
     ELSE
       trcs_coH1(ids_NH4B)=trcs_coH1(ids_NH4)
       trcs_coH1(idg_NH3B)=trcs_coH1(idg_NH3)
     ENDIF
     IF(VOLH3B.GT.ZEROS2(N2,N1))THEN
-      trcs_coH1(ids_NO3B)=AZMAX1(trc_soHml2(ids_NO3B,N3,N2,N1)/VOLH3B)
-      trcs_coH1(ids_NO2B)=AZMAX1(trc_soHml2(ids_NO2B,N3,N2,N1)/VOLH3B)
+      trcs_coH1(ids_NO3B)=AZMAX1(trc_soHml2_vr(ids_NO3B,N3,N2,N1)/VOLH3B)
+      trcs_coH1(ids_NO2B)=AZMAX1(trc_soHml2_vr(ids_NO2B,N3,N2,N1)/VOLH3B)
     ELSE
       trcs_coH1(ids_NO3B)=trcs_coH1(ids_NO3)
       trcs_coH1(ids_NO2B)=trcs_coH1(ids_NO2)
     ENDIF
     IF(VOLH2B.GT.ZEROS2(N2,N1))THEN
-      trcs_coH1(ids_H1PO4B)=AZMAX1(trc_soHml2(ids_H1PO4B,N3,N2,N1)/VOLH2B)
-      trcs_coH1(ids_H2PO4B)=AZMAX1(trc_soHml2(ids_H2PO4B,N3,N2,N1)/VOLH2B)
+      trcs_coH1(ids_H1PO4B)=AZMAX1(trc_soHml2_vr(ids_H1PO4B,N3,N2,N1)/VOLH2B)
+      trcs_coH1(ids_H2PO4B)=AZMAX1(trc_soHml2_vr(ids_H2PO4B,N3,N2,N1)/VOLH2B)
     ELSE
       trcs_coH1(ids_H1PO4B)=trcs_coH1(ids_H1PO4)
       trcs_coH1(ids_H2PO4B)=trcs_coH1(ids_H2PO4)
     ENDIF
 !excldue NH3 and NH3B
     DO ngases=idg_beg,idg_end-2
-      trcs_coH2(ngases)=AZMAX1(trc_soHml2(ngases,N6,N5,N4)/VLWatMacPM(M,N6,N5,N4))
+      trcs_coH2(ngases)=AZMAX1(trc_soHml2_vr(ngases,N6,N5,N4)/VLWatMacPM(M,N6,N5,N4))
     ENDDO
 
     VOLHMA=VLWatMacPM(M,N6,N5,N4)*trcs_VLN_vr(ids_NH4,N6,N5,N4)
     IF(VOLHMA.GT.ZEROS2(N5,N4))THEN
-      trcs_coH2(ids_NH4)=AZMAX1(trc_soHml2(ids_NH4,N6,N5,N4)/VOLHMA)
-      trcs_coH2(idg_NH3)=AZMAX1(trc_soHml2(idg_NH3,N6,N5,N4)/VOLHMA)
+      trcs_coH2(ids_NH4)=AZMAX1(trc_soHml2_vr(ids_NH4,N6,N5,N4)/VOLHMA)
+      trcs_coH2(idg_NH3)=AZMAX1(trc_soHml2_vr(idg_NH3,N6,N5,N4)/VOLHMA)
     ELSE
       trcs_coH2(ids_NH4)=0.0_r8
       trcs_coH2(idg_NH3)=0.0_r8
     ENDIF
     VOLHOA=VLWatMacPM(M,N6,N5,N4)*trcs_VLN_vr(ids_NO3,N6,N5,N4)
     IF(VOLHOA.GT.ZEROS2(N5,N4))THEN
-      trcs_coH2(ids_NO3)=AZMAX1(trc_soHml2(ids_NO3,N6,N5,N4)/VOLHOA)
-      trcs_coH2(ids_NO2)=AZMAX1(trc_soHml2(ids_NO2,N6,N5,N4)/VOLHOA)
+      trcs_coH2(ids_NO3)=AZMAX1(trc_soHml2_vr(ids_NO3,N6,N5,N4)/VOLHOA)
+      trcs_coH2(ids_NO2)=AZMAX1(trc_soHml2_vr(ids_NO2,N6,N5,N4)/VOLHOA)
     ELSE
       trcs_coH2(ids_NO3)=0.0_r8
       trcs_coH2(ids_NO2)=0.0_r8
     ENDIF
     VOLHPA=VLWatMacPM(M,N6,N5,N4)*trcs_VLN_vr(ids_H1PO4,N6,N5,N4)
     IF(VOLHPA.GT.ZEROS2(N5,N4))THEN
-      trcs_coH2(ids_H1PO4)=AZMAX1(trc_soHml2(ids_H1PO4,N6,N5,N4)/VOLHPA)
-      trcs_coH2(ids_H2PO4)=AZMAX1(trc_soHml2(ids_H2PO4,N6,N5,N4)/VOLHPA)
+      trcs_coH2(ids_H1PO4)=AZMAX1(trc_soHml2_vr(ids_H1PO4,N6,N5,N4)/VOLHPA)
+      trcs_coH2(ids_H2PO4)=AZMAX1(trc_soHml2_vr(ids_H2PO4,N6,N5,N4)/VOLHPA)
     ELSE
       trcs_coH2(ids_H1PO4)=0.0_r8
       trcs_coH2(ids_H2PO4)=0.0_r8
     ENDIF
     VOLHMB=VLWatMacPM(M,N6,N5,N4)*trcs_VLN_vr(ids_NH4B,N6,N5,N4)
     IF(VOLHMB.GT.ZEROS2(N5,N4))THEN
-      trcs_coH2(ids_NH4B)=AZMAX1(trc_soHml2(ids_NH4B,N6,N5,N4)/VOLHMB)
-      trcs_coH2(idg_NH3B)=AZMAX1(trc_soHml2(idg_NH3B,N6,N5,N4)/VOLHMB)
+      trcs_coH2(ids_NH4B)=AZMAX1(trc_soHml2_vr(ids_NH4B,N6,N5,N4)/VOLHMB)
+      trcs_coH2(idg_NH3B)=AZMAX1(trc_soHml2_vr(idg_NH3B,N6,N5,N4)/VOLHMB)
     ELSE
       trcs_coH2(ids_NH4B)=trcs_coH2(ids_NH4)
       trcs_coH2(idg_NH3B)=trcs_coH2(idg_NH3)
     ENDIF
     VOLHOB=VLWatMacPM(M,N6,N5,N4)*trcs_VLN_vr(ids_NO3B,N6,N5,N4)
     IF(VOLHOB.GT.ZEROS2(N5,N4))THEN
-      trcs_coH2(ids_NO3B)=AZMAX1(trc_soHml2(ids_NO3B,N6,N5,N4)/VOLHOB)
-      trcs_coH2(ids_NO2B)=AZMAX1(trc_soHml2(ids_NO2B,N6,N5,N4)/VOLHOB)
+      trcs_coH2(ids_NO3B)=AZMAX1(trc_soHml2_vr(ids_NO3B,N6,N5,N4)/VOLHOB)
+      trcs_coH2(ids_NO2B)=AZMAX1(trc_soHml2_vr(ids_NO2B,N6,N5,N4)/VOLHOB)
     ELSE
       trcs_coH2(ids_NO3B)=trcs_coH2(ids_NO3)
       trcs_coH2(ids_NO2B)=trcs_coH2(ids_NO2)
     ENDIF
     VOLHPB=VLWatMacPM(M,N6,N5,N4)*trcs_VLN_vr(ids_H1PO4B,N6,N5,N4)
     IF(VOLHPB.GT.ZEROS2(N5,N4))THEN
-      trcs_coH2(ids_H1PO4B)=AZMAX1(trc_soHml2(ids_H1PO4B,N6,N5,N4)/VOLHPB)
-      trcs_coH2(ids_H2PO4B)=AZMAX1(trc_soHml2(ids_H2PO4B,N6,N5,N4)/VOLHPB)
+      trcs_coH2(ids_H1PO4B)=AZMAX1(trc_soHml2_vr(ids_H1PO4B,N6,N5,N4)/VOLHPB)
+      trcs_coH2(ids_H2PO4B)=AZMAX1(trc_soHml2_vr(ids_H2PO4B,N6,N5,N4)/VOLHPB)
     ELSE
       trcs_coH2(ids_H1PO4B)=trcs_coH2(ids_H1PO4)
       trcs_coH2(ids_H2PO4B)=trcs_coH2(ids_H2PO4)
@@ -1129,11 +1129,11 @@ module InsideTranspMod
     ENDDO D9970
 
     DO ngases=idg_beg,idg_end-2
-      trc_RFL(ngases)=VFLW*AZMAX1(trc_soHml2(ngases,N6,N5,N4))
+      trc_RFL(ngases)=VFLW*AZMAX1(trc_soHml2_vr(ngases,N6,N5,N4))
     ENDDO
 
     DO nsolutes=ids_nuts_beg,ids_nuts_end
-      trc_RFL(nsolutes)=VFLW*AZMAX1(trc_soHml2(nsolutes,N6,N5,N4))*trcs_VLN_vr(nsolutes,N6,N5,N4)
+      trc_RFL(nsolutes)=VFLW*AZMAX1(trc_soHml2_vr(nsolutes,N6,N5,N4))*trcs_VLN_vr(nsolutes,N6,N5,N4)
     ENDDO
 !
 !     MICROPORE TO MACROPORE TRANSFER
@@ -1222,12 +1222,12 @@ module InsideTranspMod
     ENDDO D9955
 
     DO ngases=idg_beg,idg_NH3-1
-      trcs_DFV(ngases)=dts_HeatWatTP*(AZMAX1(trc_soHml2(ngases,N6,N5,N4))*VLWatMicPM(M,N6,N5,N4) &
+      trcs_DFV(ngases)=dts_HeatWatTP*(AZMAX1(trc_soHml2_vr(ngases,N6,N5,N4))*VLWatMicPM(M,N6,N5,N4) &
         -AZMAX1(trc_solml_vr2(ngases,N6,N5,N4))*VLWatMacPS)/VOLWT
     ENDDO
 
     DO nsolutes=ids_nuts_beg,ids_nuts_end
-      trcs_DFV(nsolutes)=dts_HeatWatTP*(AZMAX1(trc_soHml2(nsolutes,N6,N5,N4))*VLWatMicPM(M,N6,N5,N4) &
+      trcs_DFV(nsolutes)=dts_HeatWatTP*(AZMAX1(trc_soHml2_vr(nsolutes,N6,N5,N4))*VLWatMicPM(M,N6,N5,N4) &
         -AZMAX1(trc_solml_vr2(nsolutes,N6,N5,N4))*VLWatMacPS)/VOLWT &
         *trcs_VLN_vr(nsolutes,N6,N5,N4)
     ENDDO

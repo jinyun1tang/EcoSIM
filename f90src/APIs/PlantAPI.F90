@@ -573,7 +573,7 @@ implicit none
     DO M=1,jsken
       DO N=0,pltpar%NumLitterGroups
         DO NE=1,NumPlantChemElms        
-          CFOPE(NE,N,M,NZ,NY,NX)=plt_soilchem%CFOPE(NE,N,M,NZ)
+          ElmAllocmat4Litr(NE,N,M,NZ,NY,NX)=plt_soilchem%ElmAllocmat4Litr(NE,N,M,NZ)
         enddo
       enddo
     ENDDO
@@ -734,7 +734,7 @@ implicit none
     plt_soilchem%trcs_VLN_vr(ids_H1PO4,L) =trcs_VLN_vr(ids_H1PO4,L,NY,NX)
     plt_soilchem%VLSoilMicP(L)  =VLSoilMicP(L,NY,NX)
     plt_soilchem%VLiceMicP(L)  =VLiceMicP(L,NY,NX)
-    plt_soilchem%VLWatMicP(L)  =VLWatMicP(L,NY,NX)
+    plt_soilchem%VLWatMicP_vr(L)  =VLWatMicP_vr(L,NY,NX)
     plt_soilchem%VLMicP(L)  =VLMicP(L,NY,NX)
     plt_soilchem%trcs_VLN_vr(ids_NO3B,L) =trcs_VLN_vr(ids_NO3B,L,NY,NX)
     plt_soilchem%trcs_VLN_vr(ids_NH4,L) =trcs_VLN_vr(ids_NH4,L,NY,NX)
@@ -1411,7 +1411,7 @@ implicit none
     DO M=1,jsken
       DO N=0,pltpar%NumLitterGroups
         DO NE=1,NumPlantChemElms        
-          plt_soilchem%CFOPE(NE,N,M,NZ)=CFOPE(NE,N,M,NZ,NY,NX)
+          plt_soilchem%ElmAllocmat4Litr(NE,N,M,NZ)=ElmAllocmat4Litr(NE,N,M,NZ,NY,NX)
         enddo
       enddo
     ENDDO
@@ -1462,7 +1462,7 @@ implicit none
     plt_site%AREA3(L)=AREA(3,L,NY,NX)
     plt_soilchem%VLSoilPoreMicP_vr(L)=VLSoilPoreMicP_vr(L,NY,NX)
     plt_soilchem%VLSoilMicP(L)=VLSoilMicP(L,NY,NX)
-    plt_soilchem%VLWatMicP(L)=VLWatMicP(L,NY,NX)
+    plt_soilchem%VLWatMicP_vr(L)=VLWatMicP_vr(L,NY,NX)
   ENDDO
   plt_rad%SineSunInclAngle_col=SineSunInclAngle_col(NY,NX)
   plt_site%SolarNoonHour_col=SolarNoonHour_col(NY,NX)

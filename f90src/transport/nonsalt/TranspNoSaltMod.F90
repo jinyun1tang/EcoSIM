@@ -404,7 +404,7 @@ module TranspNoSaltMod
         DO NTS=ids_beg,ids_end
           trc_solml_vr2(NTS,L,NY,NX)=trc_solml_vr2(NTS,L,NY,NX) &
             +R3PorTSolFlx(NTS,L,NY,NX)+RporeSoXFlx(NTS,L,NY,NX)
-          trc_soHml2(NTS,L,NY,NX)=trc_soHml2(NTS,L,NY,NX) &
+          trc_soHml2_vr(NTS,L,NY,NX)=trc_soHml2_vr(NTS,L,NY,NX) &
             +R3PorTSoHFlx(NTS,L,NY,NX)-RporeSoXFlx(NTS,L,NY,NX)
         ENDDO
 
@@ -819,7 +819,7 @@ module TranspNoSaltMod
     enddo
     DO NTS=ids_beg,ids_end
       trc_solml_vr2(NTS,L,NY,NX)=trc_solml_vr(NTS,L,NY,NX)
-      trc_soHml2(NTS,L,NY,NX)=trc_soHml(NTS,L,NY,NX)
+      trc_soHml2_vr(NTS,L,NY,NX)=trc_soHml_vr(NTS,L,NY,NX)
     ENDDO
 
   enddo

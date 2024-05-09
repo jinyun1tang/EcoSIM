@@ -367,7 +367,7 @@ implicit none
 
   type, public :: plant_soilchem_type
   real(r8), pointer :: FracBulkSOMC_vr(:,:)  => null()  !fraction of total organic C in complex, [-]
-  real(r8), pointer :: CFOPE(:,:,:,:)=> null() !litter kinetic fraction, [-]
+  real(r8), pointer :: ElmAllocmat4Litr(:,:,:,:)=> null() !litter kinetic fraction, [-]
   real(r8), pointer :: TScal4Difsvity_vr(:)     => null()  !temperature effect on diffusivity
   real(r8), pointer :: THETPM(:,:) => null()  !soil air-filled porosity, [m3 m-3]
   real(r8), pointer :: DiffusivitySolutEff(:,:)   => null()  !coefficient for dissolution - volatilization, []
@@ -394,7 +394,7 @@ implicit none
 
   real(r8), pointer :: VLSoilMicP(:)     => null()  !total micropore volume in layer [m3 d-2]
   real(r8), pointer :: VLiceMicP(:)     => null()  !soil micropore ice content   [m3 d-2]
-  real(r8), pointer :: VLWatMicP(:)     => null()  !soil micropore water content [m3 d-2]
+  real(r8), pointer :: VLWatMicP_vr(:)     => null()  !soil micropore water content [m3 d-2]
   real(r8), pointer :: VLMicP(:)     => null()  !total volume in micropores [m3 d-2]
 
   real(r8), pointer :: DOM_vr(:,:,:)    => null()  !dissolved organic C micropore	[gC d-2]
@@ -1422,13 +1422,13 @@ implicit none
   class(plant_soilchem_type) :: this
 
   allocate(this%FracBulkSOMC_vr(1:jcplx,0:JZ1));this%FracBulkSOMC_vr=spval
-  allocate(this%CFOPE(NumPlantChemElms,0:NumLitterGroups,jsken,JP1));this%CFOPE=spval
+  allocate(this%ElmAllocmat4Litr(NumPlantChemElms,0:NumLitterGroups,jsken,JP1));this%ElmAllocmat4Litr=spval
   allocate(this%TScal4Difsvity_vr(0:JZ1));this%TScal4Difsvity_vr=spval
   allocate(this%THETPM(60,0:JZ1));this%THETPM=spval
   allocate(this%DiffusivitySolutEff(60,0:JZ1));this%DiffusivitySolutEff=spval
   allocate(this%VLSoilMicP(0:JZ1));this%VLSoilMicP=spval
   allocate(this%VLiceMicP(0:JZ1));this%VLiceMicP=spval
-  allocate(this%VLWatMicP(0:JZ1));this%VLWatMicP=spval
+  allocate(this%VLWatMicP_vr(0:JZ1));this%VLWatMicP_vr=spval
   allocate(this%VLMicP(0:JZ1));this%VLMicP=spval
   allocate(this%trcs_VLN_vr(ids_nuts_beg:ids_nuts_end,0:JZ1));this%trcs_VLN_vr=spval
   allocate(this%DOM_vr(idom_beg:idom_end,1:jcplx,0:JZ1));this%DOM_vr=spval
@@ -1460,7 +1460,7 @@ implicit none
 
 !  if(allocated(FracBulkSOMC_vr))deallocate(FracBulkSOMC_vr)
 
-!  if(allocated(CFOPE))deallocate(CFOPE)
+!  if(allocated(ElmAllocmat4Litr))deallocate(ElmAllocmat4Litr)
 !  if(allocated(TScal4Difsvity_vr))deallocate(TScal4Difsvity_vr)
 !  if(allocated(THETPM))deallocate(THETPM)
 !  if(allocated(DiffusivitySolutEff))deallocate(DiffusivitySolutEff)

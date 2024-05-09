@@ -14,7 +14,7 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  THETI(:,:,:)                      !volumetric ice content [m3 m-3]
   real(r8),target,allocatable ::  THETWZ(:,:,:)                     !volumetric moblize water [m3 m-3]
   real(r8),target,allocatable ::  THETIZ(:,:,:)                     !volumetric mobile ice [m3 m-3]
-  real(r8),target,allocatable ::  VLWatMicP(:,:,:)                       !soil micropore water content [m3 d-2]
+  real(r8),target,allocatable ::  VLWatMicP_vr(:,:,:)                       !soil micropore water content [m3 d-2]
   real(r8),target,allocatable ::  VLiceMicP(:,:,:)                       !soil micropore ice content   [m3 d-2]
   real(r8),target,allocatable ::  VLWatMacP(:,:,:)                      !soil macropore water content [m3 d-2]
   real(r8),target,allocatable ::  PSISoilMatricP(:,:,:)             !soil micropore matric water potential [MPa]
@@ -81,7 +81,7 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  UEVAP(:,:)                        !total evaporation, [m3 d-2]
   real(r8),target,allocatable ::  URAIN(:,:)                        !total precipitation, [m3 d-2]
   real(r8),target,allocatable ::  URUN(:,:)                         !total surface runoff, [m3 d-2]
-  real(r8),target,allocatable ::  UVLWatMicP(:,:)                        !total soil water content, [m3 d-2]
+  real(r8),target,allocatable ::  UVLWatMicP(:,:)                !total soil water content, [m3 d-2]
   real(r8),target,allocatable ::  UVOLO(:,:)                        !total subsurface water flux, [m3 d-2]
   real(r8),target,allocatable ::  UDRAIN(:,:)                       !total water drainage below root zone, [m3 d-2]
   real(r8),target,allocatable ::  Wat2GridBySurfRunoff(:,:,:,:)                       !soil surface runoff water, [m3 d-2 h-1]
@@ -112,7 +112,7 @@ module SoilWaterDataType
   allocate(THETI(0:JZ,JY,JX));  THETI=0._r8
   allocate(THETWZ(0:JZ,JY,JX)); THETWZ=0._r8
   allocate(THETIZ(0:JZ,JY,JX)); THETIZ=0._r8
-  allocate(VLWatMicP(0:JZ,JY,JX));   VLWatMicP=0._r8
+  allocate(VLWatMicP_vr(0:JZ,JY,JX));   VLWatMicP_vr=0._r8
   allocate(VLiceMicP(0:JZ,JY,JX));   VLiceMicP=0._r8
   allocate(VLWatMacP(JZ,JY,JX));    VLWatMacP=0._r8
   allocate(PSISoilMatricP(0:JZ,JY,JX));  PSISoilMatricP=0._r8
@@ -198,7 +198,7 @@ module SoilWaterDataType
   call destroy(THETI)
   call destroy(THETWZ)
   call destroy(THETIZ)
-  call destroy(VLWatMicP)
+  call destroy(VLWatMicP_vr)
   call destroy(VLiceMicP)
   call destroy(VLWatMacP)
   call destroy(PSISoilMatricP)

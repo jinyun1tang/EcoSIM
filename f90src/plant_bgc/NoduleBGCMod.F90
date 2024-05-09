@@ -59,7 +59,7 @@ module NoduleBGCMod
     ZERO                      => plt_site%ZERO,                      &
     AREA3                     => plt_site%AREA3,                     &
     k_fine_litr               => pltpar%k_fine_litr,                 &
-    CFOPE                     => plt_soilchem%CFOPE,                 &
+    ElmAllocmat4Litr                     => plt_soilchem%ElmAllocmat4Litr,                 &
     iPlantNfixType            => plt_morph%iPlantNfixType,           &
     fTgrowCanP                => plt_pheno%fTgrowCanP,               &
     CanopyGrosRCO2_pft        => plt_bgcr%CanopyGrosRCO2_pft,        &
@@ -315,7 +315,7 @@ module NoduleBGCMod
     D6470: DO M=1,jsken
       DO NE=1,NumPlantChemElms
         LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ) &
-          +CFOPE(NE,ifoliar,M,NZ)*(NoduleElmntDecay2Litr(NE)+NodulELmSenes2Litr(NE))
+          +ElmAllocmat4Litr(NE,ifoliar,M,NZ)*(NoduleElmntDecay2Litr(NE)+NodulELmSenes2Litr(NE))
       ENDDO
     ENDDO D6470
 !
@@ -464,7 +464,7 @@ module NoduleBGCMod
     RootNodulNonstElms_pvr => plt_biom%RootNodulNonstElms_pvr, &
     ZEROL                  => plt_biom%ZEROL,                  &
     RootMycoNonstElms_rpvr => plt_biom%RootMycoNonstElms_rpvr, &
-    CFOPE                  => plt_soilchem%CFOPE,              &
+    ElmAllocmat4Litr                  => plt_soilchem%ElmAllocmat4Litr,              &
     iPlantNfixType         => plt_morph%iPlantNfixType,        &
     NIXBotRootLayer_pft    => plt_morph%NIXBotRootLayer_pft    &
   )
@@ -705,7 +705,7 @@ module NoduleBGCMod
         D6370: DO M=1,jsken
           DO NE=1,NumPlantChemElms
             LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)&
-              +CFOPE(NE,iroot,M,NZ)*(NoduleElmntDecay2Litr(NE)+NodulELmSenes2Litr(NE))
+              +ElmAllocmat4Litr(NE,iroot,M,NZ)*(NoduleElmntDecay2Litr(NE)+NodulELmSenes2Litr(NE))
           ENDDO
         ENDDO D6370
 !

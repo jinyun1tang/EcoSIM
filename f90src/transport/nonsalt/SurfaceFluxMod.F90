@@ -435,13 +435,13 @@ contains
     ENDDO
 
     do ngases=idg_beg,idg_NH3-1
-      SAdvFlx(ngases)=VFLW*AZMAX1(trc_soHml2(ngases,NU(NY,NX),NY,NX))
+      SAdvFlx(ngases)=VFLW*AZMAX1(trc_soHml2_vr(ngases,NU(NY,NX),NY,NX))
     enddo
-    SAdvFlx(idg_NH3)=VFLW*AZMAX1(trc_soHml2(idg_NH3,NU(NY,NX),NY,NX))*trcs_VLN_vr(ids_NH4,NU(NY,NX),NY,NX)
-    SAdvFlx(idg_NH3B)=VFLW*AZMAX1(trc_soHml2(idg_NH3B,NU(NY,NX),NY,NX))*trcs_VLN_vr(ids_NH4B,NU(NY,NX),NY,NX)
+    SAdvFlx(idg_NH3)=VFLW*AZMAX1(trc_soHml2_vr(idg_NH3,NU(NY,NX),NY,NX))*trcs_VLN_vr(ids_NH4,NU(NY,NX),NY,NX)
+    SAdvFlx(idg_NH3B)=VFLW*AZMAX1(trc_soHml2_vr(idg_NH3B,NU(NY,NX),NY,NX))*trcs_VLN_vr(ids_NH4B,NU(NY,NX),NY,NX)
 
     do nsolutes=ids_beg,ids_end
-      SAdvFlx(nsolutes)=VFLW*AZMAX1(trc_soHml2(nsolutes,NU(NY,NX),NY,NX))*trcs_VLN_vr(nsolutes,NU(NY,NX),NY,NX)
+      SAdvFlx(nsolutes)=VFLW*AZMAX1(trc_soHml2_vr(nsolutes,NU(NY,NX),NY,NX))*trcs_VLN_vr(nsolutes,NU(NY,NX),NY,NX)
     enddo 
 !
 !     MICROPORE TO MACROPORE TRANSFER
@@ -504,18 +504,18 @@ contains
     ENDDO
 
     do ngases=idg_beg,idg_NH3-1
-      SDifFlx(ngases)=dts_HeatWatTP*(AZMAX1(trc_soHml2(ngases,NU(NY,NX),NY,NX)) &
+      SDifFlx(ngases)=dts_HeatWatTP*(AZMAX1(trc_soHml2_vr(ngases,NU(NY,NX),NY,NX)) &
         *VLWatMicPM(M,NU(NY,NX),NY,NX)-AZMAX1(trc_solml_vr2(ngases,NU(NY,NX),NY,NX))*VLWatMacPS)/VOLWT
     enddo  
-    SDifFlx(idg_NH3)=dts_HeatWatTP*(AZMAX1(trc_soHml2(idg_NH3,NU(NY,NX),NY,NX)) &
+    SDifFlx(idg_NH3)=dts_HeatWatTP*(AZMAX1(trc_soHml2_vr(idg_NH3,NU(NY,NX),NY,NX)) &
       *VLWatMicPM(M,NU(NY,NX),NY,NX)-AZMAX1(trc_solml_vr2(idg_NH3,NU(NY,NX),NY,NX))*VLWatMacPS)/VOLWT &
       *trcs_VLN_vr(ids_NH4,NU(NY,NX),NY,NX)
-    SDifFlx(idg_NH3B)=dts_HeatWatTP*(AZMAX1(trc_soHml2(idg_NH3B,NU(NY,NX),NY,NX)) &
+    SDifFlx(idg_NH3B)=dts_HeatWatTP*(AZMAX1(trc_soHml2_vr(idg_NH3B,NU(NY,NX),NY,NX)) &
       *VLWatMicPM(M,NU(NY,NX),NY,NX)-AZMAX1(trc_solml_vr2(idg_NH3B,NU(NY,NX),NY,NX))*VLWatMacPS)/VOLWT &
       *trcs_VLN_vr(ids_NH4B,NU(NY,NX),NY,NX)
 
     do nsolutes=ids_beg,ids_end
-      SDifFlx(nsolutes)=dts_HeatWatTP*(AZMAX1(trc_soHml2(nsolutes,NU(NY,NX),NY,NX)) &
+      SDifFlx(nsolutes)=dts_HeatWatTP*(AZMAX1(trc_soHml2_vr(nsolutes,NU(NY,NX),NY,NX)) &
         *VLWatMicPM(M,NU(NY,NX),NY,NX)-AZMAX1(trc_solml_vr2(nsolutes,NU(NY,NX),NY,NX))*VLWatMacPS)/VOLWT &
         *trcs_VLN_vr(nsolutes,NU(NY,NX),NY,NX)
     enddo    

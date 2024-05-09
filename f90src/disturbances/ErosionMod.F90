@@ -515,7 +515,7 @@ module ErosionMod
                     DO M=1,nlbiomcp
                       MID=micpar%get_micb_id(M,NGL)
                       DO NE=1,NumPlantChemElms
-                        OMEERhetr(NE,MID,K,N,2,N5,N4)=FSEDER*mBOMHeter_vr(NE,MID,K,NU(N2,N1),N2,N1)
+                        OMEERhetr(NE,MID,K,N,2,N5,N4)=FSEDER*mBiomeHeter_vr(NE,MID,K,NU(N2,N1),N2,N1)
                       ENDDO
                     ENDDO
                   ENDDO
@@ -527,7 +527,7 @@ module ErosionMod
                   DO M=1,nlbiomcp
                     MID=micpar%get_micb_id(M,NGL)
                     DO NE=1,NumPlantChemElms
-                      OMEERauto(NE,MID,N,2,N5,N4)=FSEDER*mBOMAutor_vr(NE,MID,NU(N2,N1),N2,N1)
+                      OMEERauto(NE,MID,N,2,N5,N4)=FSEDER*mBiomeAutor_vr(NE,MID,NU(N2,N1),N2,N1)
                     ENDDO
                   ENDDO
                 ENDDO
@@ -675,7 +675,7 @@ module ErosionMod
                       DO  M=1,nlbiomcp
                         MID=micpar%get_micb_id(M,NGL)      
                         DO NE=1,NumPlantChemElms                                                 
-                          OMEERhetr(NE,MID,K,N,1,N5B,N4B)=FSEDER*mBOMHeter_vr(NE,MID,K,NU(N2,N1),N2,N1)
+                          OMEERhetr(NE,MID,K,N,1,N5B,N4B)=FSEDER*mBiomeHeter_vr(NE,MID,K,NU(N2,N1),N2,N1)
                         ENDDO
                       enddo
                     enddo
@@ -686,7 +686,7 @@ module ErosionMod
                     DO  M=1,nlbiomcp
                       MID=micpar%get_micb_id(M,NGL)
                       DO NE=1,NumPlantChemElms         
-                        OMEERauto(NE,MID,N,1,N5B,N4B)=FSEDER*mBOMAutor_vr(NE,MID,NU(N2,N1),N2,N1)
+                        OMEERauto(NE,MID,N,1,N5B,N4B)=FSEDER*mBiomeAutor_vr(NE,MID,NU(N2,N1),N2,N1)
                       ENDDO
                     enddo
                   enddo
@@ -964,7 +964,7 @@ module ErosionMod
                     DO M=1,nlbiomcp
                       MID=micpar%get_micb_id(M,NGL)                    
                       DO NE=1,NumPlantChemElms                       
-                        OMEERhetr(NE,MID,K,N,NN,M5,M4)=FSEDER*mBOMHeter_vr(NE,MID,K,NU(N2,N1),N2,N1)
+                        OMEERhetr(NE,MID,K,N,NN,M5,M4)=FSEDER*mBiomeHeter_vr(NE,MID,K,NU(N2,N1),N2,N1)
                       ENDDO
                     ENDDO
                   ENDDO
@@ -975,7 +975,7 @@ module ErosionMod
                   DO M=1,nlbiomcp
                     MID=micpar%get_micb_id(M,NGL)
                     DO NE=1,NumPlantChemElms                       
-                      OMEERauto(NE,MID,N,NN,M5,M4)=FSEDER*mBOMAutor_vr(NE,MID,NU(N2,N1),N2,N1)
+                      OMEERauto(NE,MID,N,NN,M5,M4)=FSEDER*mBiomeAutor_vr(NE,MID,NU(N2,N1),N2,N1)
                     ENDDO
                   ENDDO
                 ENDDO

@@ -189,8 +189,8 @@ module SoluteMod
 !
   IF(FertN_soil_vr(ifert_urea,L,NY,NX).GT.ZEROS(NY,NX).AND.SoilMicPMassLayer(L,NY,NX).GT.ZEROS(NY,NX))THEN
     CNHUA=FertN_soil_vr(ifert_urea,L,NY,NX)/SoilMicPMassLayer(L,NY,NX)
-  ELSEIF(VLWatMicP(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-    CNHUA=FertN_soil_vr(ifert_urea,L,NY,NX)/VLWatMicP(L,NY,NX)
+  ELSEIF(VLWatMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
+    CNHUA=FertN_soil_vr(ifert_urea,L,NY,NX)/VLWatMicP_vr(L,NY,NX)
   ELSE
     CNHUA=0._r8
   ENDIF
@@ -208,8 +208,8 @@ module SoluteMod
 !
   IF(FertN_Band_vr(ifert_urea_band,L,NY,NX).GT.ZEROS(NY,NX).AND.SoilMicPMassLayer(L,NY,NX).GT.ZEROS(NY,NX))THEN
     CNHUB=FertN_Band_vr(ifert_urea_band,L,NY,NX)/SoilMicPMassLayer(L,NY,NX)
-  ELSEIF(VLWatMicP(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-    CNHUB=FertN_Band_vr(ifert_urea_band,L,NY,NX)/VLWatMicP(L,NY,NX)
+  ELSEIF(VLWatMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
+    CNHUB=FertN_Band_vr(ifert_urea_band,L,NY,NX)/VLWatMicP_vr(L,NY,NX)
   ELSE
     CNHUB=0._r8
   ENDIF
@@ -979,7 +979,7 @@ module SoluteMod
 !     RSNOAA=rate of broadcast NO3 fertilizer dissoln
 !
     IF(VWatLitRHoldCapcity(NY,NX).GT.ZEROS(NY,NX))THEN
-      ThetaWLitR=AMIN1(1.0,VLWatMicP(0,NY,NX)/VWatLitRHoldCapcity(NY,NX))
+      ThetaWLitR=AMIN1(1.0,VLWatMicP_vr(0,NY,NX)/VWatLitRHoldCapcity(NY,NX))
     ELSE
       ThetaWLitR=1._r8
     ENDIF

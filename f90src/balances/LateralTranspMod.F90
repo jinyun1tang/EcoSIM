@@ -84,7 +84,7 @@ implicit none
 
     IF(THETP(L,NY,NX).GE.THETX.AND.LX.EQ.0)LG=L
     !make a copy of soil water/ice in micro- and macropores
-    VLWatMicP1(L,NY,NX)=VLWatMicP(L,NY,NX)
+    VLWatMicP1(L,NY,NX)=VLWatMicP_vr(L,NY,NX)
     VLiceMicP1(L,NY,NX)=VLiceMicP(L,NY,NX)
     VLWatMacP1(L,NY,NX)=VLWatMacP(L,NY,NX)
     VLiceMacP1(L,NY,NX)=VLiceMacP(L,NY,NX)
@@ -620,7 +620,7 @@ implicit none
       !     WRITE(*,6632)'TFLW',I,J,N,N1,N2,N3,N4,N5,N6,NU(N2,N1)
       !    2,TWatFlowCellMicP(N3,N2,N1),WaterFlowSoiMicP(N,N3,N2,N1),WaterFlowSoiMicP(N,N6,N5,N4),LakeSurfFlowMicP(N5,N4)
       !    3,THeatFlow2Soil(N3,N2,N1),HeatFlow2Soil(N,N3,N2,N1),HeatFlow2Soil(N,N6,N5,N4)
-      !    2,LakeSurfHeatFlux(N5,N4),VLWatMicP(N3,N2,N1)
+      !    2,LakeSurfHeatFlux(N5,N4),VLWatMicP_vr(N3,N2,N1)
 !6632  FORMAT(A8,10I4,12E16.8)
       !     ENDIF
       !

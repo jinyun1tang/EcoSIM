@@ -57,8 +57,7 @@ type, public :: NitroAQMFluxDiagType
   end type NitroAQMFluxDiagType
 
   type, public :: NitroMicStateType
-  real(r8),allocatable :: CNOMActHeter(:,:)
-  real(r8),allocatable :: CPOMActHeter(:,:)
+  real(r8),allocatable :: rCNBiomeActHeter(:,:,:)  !Nutrient to carbon ratio for active heterotrophs
   real(r8),allocatable :: OMActHeter(:,:)
 
   real(r8),allocatable :: OMC2(:,:)
@@ -75,8 +74,7 @@ type, public :: NitroAQMFluxDiagType
   real(r8),allocatable :: FracNO2ReduxHeter(:,:)
   real(r8),allocatable :: FracHeterBiomOfActK(:,:)
 
-  real(r8),allocatable :: CNOMActAutor(:)
-  real(r8),allocatable :: CPOMActAutor(:)
+  real(r8),allocatable :: rCNBiomeActAutor(:,:)   !nutrient to carbon ratio for active autotrophs
   real(r8),allocatable :: OMActAutor(:)
   real(r8),allocatable :: FracOMActAutor(:)
   real(r8),allocatable :: FracNO2ReduxAutor(:)
@@ -105,7 +103,7 @@ type, public :: NitroAQMFluxDiagType
   real(r8),allocatable :: AttenfH2PO4Heter(:,:)
   real(r8),allocatable :: AttenfH1PO4Heter(:,:)
 ! allocatable fluxes
-  real(r8),allocatable :: CGmBOMHeter(:,:,:)
+  real(r8),allocatable :: DOMuptk4GrothHeter(:,:,:)
   real(r8),allocatable :: RAnabolDOCUptkHeter(:,:)
   real(r8),allocatable :: RAnabolAcetUptkHeter(:,:)
   real(r8),allocatable :: NonstX2stBiomHeter(:,:,:,:)
@@ -177,7 +175,7 @@ type, public :: NitroAQMFluxDiagType
   real(r8),allocatable :: RkillLitfalOMAutor(:,:,:)
   real(r8),allocatable :: RkillLitrfal2HumOMAutor(:,:,:)
   real(r8),allocatable :: RkillLitrfal2ResduOMAutor(:,:,:)
-  real(r8),allocatable :: CGmBOMAutor(:,:)
+  real(r8),allocatable :: DOMuptk4GrothAutor(:,:)
   real(r8),allocatable :: RMaintDefcitLitrfalOMAutor(:,:,:)
   real(r8),allocatable :: RMaintDefcitLitrfal2HumOMAutor(:,:,:)
   real(r8),allocatable :: RMaintDefcitLitrfal2ResduOMAutor(:,:,:)
@@ -354,7 +352,7 @@ type, public :: NitroAQMFluxDiagType
   allocate(this%RkillLitfalOMHeter(NumPlantChemElms,2,NumHetetrMicCmplx,1:jcplx));this%RkillLitfalOMHeter=spval
   allocate(this%RkillLitrfal2HumOMHeter(NumPlantChemElms,2,NumHetetrMicCmplx,1:jcplx));this%RkillLitrfal2HumOMHeter=spval
   allocate(this%RkillLitrfal2ResduOMHeter(NumPlantChemElms,2,NumHetetrMicCmplx,1:jcplx));this%RkillLitrfal2ResduOMHeter=spval
-  allocate(this%CGmBOMHeter(NumPlantChemElms,NumHetetrMicCmplx,1:jcplx));this%CGmBOMHeter=spval
+  allocate(this%DOMuptk4GrothHeter(NumPlantChemElms,NumHetetrMicCmplx,1:jcplx));this%DOMuptk4GrothHeter=spval
   allocate(this%RH2ProdHeter(NumHetetrMicCmplx,1:jcplx));this%RH2ProdHeter=spval
   allocate(this%RMaintDefcitLitrfalOMHeter(NumPlantChemElms,2,NumHetetrMicCmplx,1:jcplx));this%RMaintDefcitLitrfalOMHeter=spval
   allocate(this%RMaintDefcitLitrfal2HumOMHeter(NumPlantChemElms,2,NumHetetrMicCmplx,1:jcplx));this%RMaintDefcitLitrfal2HumOMHeter=spval
@@ -408,7 +406,7 @@ type, public :: NitroAQMFluxDiagType
   allocate(this%RkillLitfalOMAutor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%RkillLitfalOMAutor=spval
   allocate(this%RkillLitrfal2HumOMAutor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%RkillLitrfal2HumOMAutor=spval
   allocate(this%RkillLitrfal2ResduOMAutor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%RkillLitrfal2ResduOMAutor=spval
-  allocate(this%CGmBOMAutor(idom_beg:idom_end,NumMicrobAutrophCmplx));this%CGmBOMAutor=spval
+  allocate(this%DOMuptk4GrothAutor(idom_beg:idom_end,NumMicrobAutrophCmplx));this%DOMuptk4GrothAutor=spval
   allocate(this%RMaintDefcitLitrfalOMAutor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%RMaintDefcitLitrfalOMAutor=spval
   allocate(this%RMaintDefcitLitrfal2HumOMAutor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%RMaintDefcitLitrfal2HumOMAutor=spval
   allocate(this%RMaintDefcitLitrfal2ResduOMAutor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%RMaintDefcitLitrfal2ResduOMAutor=spval
@@ -444,8 +442,7 @@ type, public :: NitroAQMFluxDiagType
   NumMicrobAutrophCmplx=micpar%NumMicrobAutrophCmplx
   NumHetetrMicCmplx=micpar%NumHetetrMicCmplx
 
-  allocate(this%CNOMActHeter(NumHetetrMicCmplx,1:jcplx));this%CNOMActHeter=spval
-  allocate(this%CPOMActHeter(NumHetetrMicCmplx,1:jcplx));this%CPOMActHeter=spval
+  allocate(this%rCNBiomeActHeter(NumPlantChemElms,NumHetetrMicCmplx,1:jcplx));this%rCNBiomeActHeter=1._r8
   allocate(this%OMActHeter(NumHetetrMicCmplx,1:jcplx));this%OMActHeter=spval
   allocate(this%FracOMActHeter(NumHetetrMicCmplx,1:jcplx));this%FracOMActHeter=spval
   allocate(this%FracNO2ReduxHeter(NumHetetrMicCmplx,1:jcplx));this%FracNO2ReduxHeter=spval
@@ -460,8 +457,7 @@ type, public :: NitroAQMFluxDiagType
   allocate(this%FCP(NumHetetrMicCmplx,1:jcplx));this%FCP=spval
   allocate(this%FBiomStoiScalarHeter(NumHetetrMicCmplx,1:jcplx));this%FBiomStoiScalarHeter=spval
 
-  allocate(this%CNOMActAutor(NumMicrobAutrophCmplx));this%CNOMActAutor=spval
-  allocate(this%CPOMActAutor(NumMicrobAutrophCmplx));this%CPOMActAutor=spval
+  allocate(this%rCNBiomeActAutor(NumPlantChemElms,NumMicrobAutrophCmplx));this%rCNBiomeActAutor=1.0_r8
   allocate(this%OMActAutor(NumMicrobAutrophCmplx));this%OMActAutor=spval
   allocate(this%FracOMActAutor(NumMicrobAutrophCmplx));this%FracOMActAutor=spval
   allocate(this%FracNO2ReduxAutor(NumMicrobAutrophCmplx));this%FracNO2ReduxAutor=spval
@@ -504,7 +500,7 @@ type, public :: NitroAQMFluxDiagType
   this%RkillLitfalOMHeter = 0._r8
   this%RkillLitrfal2HumOMHeter = 0._r8
   this%RkillLitrfal2ResduOMHeter = 0._r8
-  this%CGmBOMHeter = 0._r8
+  this%DOMuptk4GrothHeter = 0._r8
   this%RH2ProdHeter = 0._r8
   this%RMaintDefcitLitrfal2HumOMHeter = 0._r8
   this%RMaintDefcitLitrfal2ResduOMHeter = 0._r8
@@ -558,7 +554,7 @@ type, public :: NitroAQMFluxDiagType
   this%RkillLitfalOMAutor = 0._r8
   this%RkillLitrfal2HumOMAutor = 0._r8
   this%RkillLitrfal2ResduOMAutor = 0._r8
-  this%CGmBOMAutor = 0._r8
+  this%DOMuptk4GrothAutor = 0._r8
   this%RMaintDefcitLitrfalOMAutor = 0._r8
   this%RMaintDefcitLitrfal2HumOMAutor = 0._r8
   this%RMaintDefcitLitrfal2ResduOMAutor = 0._r8
@@ -614,7 +610,7 @@ type, public :: NitroAQMFluxDiagType
   call destroy(this%RkillLitfalOMHeter)
   call destroy(this%RkillLitrfal2HumOMHeter)
   call destroy(this%RkillLitrfal2ResduOMHeter)
-  call destroy(this%CGmBOMHeter)
+  call destroy(this%DOMuptk4GrothHeter)
   call destroy(this%RH2ProdHeter)
   call destroy(this%RMaintDefcitLitrfal2HumOMHeter)
   call destroy(this%RMaintDefcitLitrfal2ResduOMHeter)
@@ -667,7 +663,7 @@ type, public :: NitroAQMFluxDiagType
   call destroy(this%RkillLitfalOMAutor)
   call destroy(this%RkillLitrfal2HumOMAutor)
   call destroy(this%RkillLitrfal2ResduOMAutor)
-  call destroy(this%CGmBOMAutor)
+  call destroy(this%DOMuptk4GrothAutor)
   call destroy(this%RMaintDefcitLitrfalOMAutor)
   call destroy(this%RMaintDefcitLitrfal2HumOMAutor)
   call destroy(this%RMaintDefcitLitrfal2ResduOMAutor)
@@ -697,8 +693,7 @@ type, public :: NitroAQMFluxDiagType
   implicit none
   class(NitroMicStateType) :: this
 
-  call destroy(this%CNOMActHeter)
-  call destroy(this%CPOMActHeter)
+  call destroy(this%rCNBiomeActHeter)
   call destroy(this%OMActHeter)
   call destroy(this%FracOMActHeter)
   call destroy(this%FracNO2ReduxHeter)
@@ -713,8 +708,7 @@ type, public :: NitroAQMFluxDiagType
   call destroy(this%FCP)
   call destroy(this%FBiomStoiScalarHeter)
 
-  call destroy(this%CNOMActAutor)
-  call destroy(this%CPOMActAutor)
+  call destroy(this%rCNBiomeActAutor)
   call destroy(this%OMActAutor)
   call destroy(this%FracOMActAutor)
   call destroy(this%FracNO2ReduxAutor)

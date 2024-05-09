@@ -131,9 +131,9 @@ implicit none
             DO M=1,nlbiomcp
               MID=micpar%get_micb_id(M,NGL)
               DO NE=1,NumPlantChemElms
-                FOMC=FSINK*mBOMHeter_vr(NE,MID,K,L,NY,NX)
-                mBOMHeter_vr(NE,MID,K,LL,NY,NX)=mBOMHeter_vr(NE,MID,K,LL,NY,NX)+FOMC                
-                mBOMHeter_vr(NE,MID,K,L,NY,NX)=mBOMHeter_vr(NE,MID,K,L,NY,NX)-FOMC
+                FOMC=FSINK*mBiomeHeter_vr(NE,MID,K,L,NY,NX)
+                mBiomeHeter_vr(NE,MID,K,LL,NY,NX)=mBiomeHeter_vr(NE,MID,K,LL,NY,NX)+FOMC                
+                mBiomeHeter_vr(NE,MID,K,L,NY,NX)=mBiomeHeter_vr(NE,MID,K,L,NY,NX)-FOMC
               ENDDO
             enddo
           enddo
@@ -150,9 +150,9 @@ implicit none
           DO M=1,nlbiomcp
             MID=micpar%get_micb_id(M,NGL)        
             DO NE=1,NumPlantChemElms              
-              FOMC=FSINK*mBOMAutor_vr(NE,MID,L,NY,NX)
-              mBOMAutor_vr(NE,MID,LL,NY,NX)=mBOMAutor_vr(NE,MID,LL,NY,NX)+FOMC
-              mBOMAutor_vr(NE,MID,L,NY,NX)=mBOMAutor_vr(NE,MID,L,NY,NX)-FOMC
+              FOMC=FSINK*mBiomeAutor_vr(NE,MID,L,NY,NX)
+              mBiomeAutor_vr(NE,MID,LL,NY,NX)=mBiomeAutor_vr(NE,MID,LL,NY,NX)+FOMC
+              mBiomeAutor_vr(NE,MID,L,NY,NX)=mBiomeAutor_vr(NE,MID,L,NY,NX)-FOMC
             ENDDO
           enddo
         enddo

@@ -18,7 +18,7 @@ implicit none
   real(r8),target,allocatable :: CPO4B(:,:,:)                       !PO4 concentration band micropore	[g m-3]
   real(r8),target,allocatable :: CPO4S(:,:,:)                       !PO4 concentration non-band micropore	[g m-3]
 
-  real(r8),target,allocatable :: trc_soHml(:,:,:,:)                 !solute mass in macropore [g d-2]
+  real(r8),target,allocatable :: trc_soHml_vr(:,:,:,:)                 !solute mass in macropore [g d-2]
   real(r8),target,allocatable :: trc_solml_vr(:,:,:,:)                 !solute mass in micropore [g d-2]
   real(r8),target,allocatable :: trc_solcl_vr(:,:,:,:)                 !solute concentration in micropre [g m-3]
   real(r8),target,allocatable :: trc_gascl_vr(:,:,:,:)                 !gaseous concentation [g m-3]
@@ -121,7 +121,7 @@ implicit none
   allocate(CPO4(JZ,JY,JX));     CPO4=0._r8
 
   allocate(trc_gasml_vr(idg_beg:idg_end,JZ,JY,JX)); trc_gasml_vr=0._r8
-  allocate(trc_soHml(ids_beg:ids_end,0:JZ,JY,JX)); trc_soHml=0._r8
+  allocate(trc_soHml_vr(ids_beg:ids_end,0:JZ,JY,JX)); trc_soHml_vr=0._r8
   allocate(trc_solml_vr(ids_beg:ids_end,0:JZ,JY,JX)); trc_solml_vr=0._r8
   allocate(trc_solcl_vr(ids_beg:ids_end,0:JZ,JY,JX)); trc_solcl_vr=0._r8
   allocate(trc_gascl_vr(idg_beg:idg_end,0:JZ,JY,JX)); trc_gascl_vr=0._r8
@@ -220,7 +220,7 @@ implicit none
   call destroy(CPO4B)
 
   call destroy(trc_solml_vr)
-  call destroy(trc_soHml)
+  call destroy(trc_soHml_vr)
 
   call destroy(ZNFNI)
   call destroy(ZNFN0)

@@ -393,10 +393,9 @@ module MicAutoCPLXMod
   real(r8) :: FRM
 !     begin_execution
   associate(                                                                    &
-    CNOMActAutor                     => nmics%CNOMActAutor,                     &
-    CPOMActAutor                     => nmics%CPOMActAutor,                     &
+    rCNBiomeActAutor                 => nmics%rCNBiomeActAutor,                 &
     GrowthEnvScalAutor               => nmics%GrowthEnvScalAutor,               &
-    CGmBOMAutor                      => nmicf%CGmBOMAutor,                      &
+    DOMuptk4GrothAutor                      => nmicf%DOMuptk4GrothAutor,                      &
     NonstX2stBiomAutor               => nmicf%NonstX2stBiomAutor,               &
     RespGrossAutor                   => nmicf%RespGrossAutor,                   &
     RNOxReduxRespAutorLim            => nmicf%RNOxReduxRespAutorLim,            &
@@ -420,7 +419,7 @@ module MicAutoCPLXMod
     FL                               => micpar%FL,                              &
     ZEROS                            => micfor%ZEROS,                           &
     ZERO                             => micfor%ZERO,                            &
-    mBOMAutor                        => micstt%mBOMAutor,                       &
+    mBiomeAutor                        => micstt%mBiomeAutor,                       &
     EHUM                             => micstt%EHUM                             &
   )
 
@@ -444,15 +443,15 @@ module MicAutoCPLXMod
 !     FCN,FCP=limitation from N,P
 !
 
-  CGmBOMAutor(idom_beg:idom_end,NGL)=0._r8
+  DOMuptk4GrothAutor(idom_beg:idom_end,NGL)=0._r8
   CGOMX=AMIN1(RMaintRespAutor,RespGrossAutor(NGL))+Resp4NFixAutor(NGL)+(RGrowthRespAutor-Resp4NFixAutor(NGL))/ECHZ
   CGOMD=RNOxReduxRespAutorLim(NGL)/ENOX
-  CGmBOMAutor(ielmc,NGL)=CGOMX+CGOMD
+  DOMuptk4GrothAutor(ielmc,NGL)=CGOMX+CGOMD
 
   !the following few lines needs double check
   K=micpar%jcplx
   DO idom=idom_beg,idom_end
-    TDOMUptkHeter(idom,K)=TDOMUptkHeter(idom,K)+CGmBOMAutor(idom,NGL)
+    TDOMUptkHeter(idom,K)=TDOMUptkHeter(idom,K)+DOMuptk4GrothAutor(idom,NGL)
   ENDDO
 !
 !     TRANSFER UPTAKEN C,N,P FROM STORAGE TO ACTIVE BIOMASS
@@ -465,16 +464,16 @@ module MicAutoCPLXMod
 !     RCCX,RCCQ=max N,P recycling fractions
 !
   MID1=micpar%get_micb_id(1,NGL);MID3=micpar%get_micb_id(3,NGL)
-  IF(mBOMAutor(ielmc,MID3).GT.ZEROS.AND.mBOMAutor(ielmc,MID1).GT.ZEROS)THEN
+  IF(mBiomeAutor(ielmc,MID3).GT.ZEROS.AND.mBiomeAutor(ielmc,MID1).GT.ZEROS)THEN
     CCC=AZMAX1(AMIN1(1.0_r8 &
-      ,mBOMAutor(ielmn,MID3)/(mBOMAutor(ielmn,MID3)+mBOMAutor(ielmc,MID3)*rNCOMCAutor(3,NGL)) &
-      ,mBOMAutor(ielmp,MID3)/(mBOMAutor(ielmp,MID3)+mBOMAutor(ielmc,MID3)*rPCOMCAutor(3,NGL))))
-    CXC=mBOMAutor(ielmc,MID3)/mBOMAutor(ielmc,MID1)
+      ,mBiomeAutor(ielmn,MID3)/(mBiomeAutor(ielmn,MID3)+mBiomeAutor(ielmc,MID3)*rNCOMCAutor(3,NGL)) &
+      ,mBiomeAutor(ielmp,MID3)/(mBiomeAutor(ielmp,MID3)+mBiomeAutor(ielmc,MID3)*rPCOMCAutor(3,NGL))))
+    CXC=mBiomeAutor(ielmc,MID3)/mBiomeAutor(ielmc,MID1)
     C3C=1.0_r8/(1.0_r8+CXC/CKC)
     CNC=AZMAX1(AMIN1(1.0_r8 &
-      ,mBOMAutor(ielmc,MID3)/(mBOMAutor(ielmc,MID3)+mBOMAutor(ielmn,MID3)/rNCOMCAutor(3,NGL))))
+      ,mBiomeAutor(ielmc,MID3)/(mBiomeAutor(ielmc,MID3)+mBiomeAutor(ielmn,MID3)/rNCOMCAutor(3,NGL))))
     CPC=AZMAX1(AMIN1(1.0_r8 &
-      ,mBOMAutor(ielmc,MID3)/(mBOMAutor(ielmc,MID3)+mBOMAutor(ielmp,MID3)/rPCOMCAutor(3,NGL))))
+      ,mBiomeAutor(ielmc,MID3)/(mBiomeAutor(ielmc,MID3)+mBiomeAutor(ielmp,MID3)/rPCOMCAutor(3,NGL))))
     RCCC=RCCZ+AMAX1(CCC,C3C)*RCCY
     RCCN=CNC*RCCX
     RCCP=CPC*RCCQ
@@ -494,14 +493,14 @@ module MicAutoCPLXMod
 !     OMC,OMN,OMP=nonstructural microbial C,N,P
 !
   MID3=micpar%get_micb_id(3,NGL)
-  CGOMZ=GrowthEnvScalAutor(NGL)*OMGR*AZMAX1(mBOMAutor(ielmc,MID3))
+  CGOMZ=GrowthEnvScalAutor(NGL)*OMGR*AZMAX1(mBiomeAutor(ielmc,MID3))
   DO  M=1,2
     NonstX2stBiomAutor(ielmc,M,NGL)=FL(M)*CGOMZ
-    IF(mBOMAutor(ielmc,MID3).GT.ZEROS)THEN
-      NonstX2stBiomAutor(ielmn,M,NGL)=AMIN1(FL(M)*AZMAX1(mBOMAutor(ielmn,MID3)) &
-        ,NonstX2stBiomAutor(ielmc,M,NGL)*mBOMAutor(ielmn,MID3)/mBOMAutor(ielmc,MID3))
-      NonstX2stBiomAutor(ielmp,M,NGL)=AMIN1(FL(M)*AZMAX1(mBOMAutor(ielmp,MID3)) &
-        ,NonstX2stBiomAutor(ielmc,M,NGL)*mBOMAutor(ielmp,MID3)/mBOMAutor(ielmc,MID3))
+    IF(mBiomeAutor(ielmc,MID3).GT.ZEROS)THEN
+      NonstX2stBiomAutor(ielmn,M,NGL)=AMIN1(FL(M)*AZMAX1(mBiomeAutor(ielmn,MID3)) &
+        ,NonstX2stBiomAutor(ielmc,M,NGL)*mBiomeAutor(ielmn,MID3)/mBiomeAutor(ielmc,MID3))
+      NonstX2stBiomAutor(ielmp,M,NGL)=AMIN1(FL(M)*AZMAX1(mBiomeAutor(ielmp,MID3)) &
+        ,NonstX2stBiomAutor(ielmc,M,NGL)*mBiomeAutor(ielmp,MID3)/mBiomeAutor(ielmc,MID3))
     ELSE
       NonstX2stBiomAutor(ielmn,M,NGL)=0.0_r8
       NonstX2stBiomAutor(ielmp,M,NGL)=0.0_r8
@@ -520,7 +519,7 @@ module MicAutoCPLXMod
     MID=micpar%get_micb_id(M,NGL)
     SPOMX=SQRT(GrowthEnvScalAutor(NGL))*SPOMC(M)*SPOMK(M)
     DO NE=1,NumPlantChemElms
-      RKillOMAutor(NE,M,NGL)=AZMAX1(mBOMAutor(NE,MID)*SPOMX)
+      RKillOMAutor(NE,M,NGL)=AZMAX1(mBiomeAutor(NE,MID)*SPOMX)
     ENDDO
 
     RkillLitfalOMAutor(ielmc,M,NGL)=RKillOMAutor(ielmc,M,NGL)*(1.0_r8-RCCC)
@@ -560,9 +559,9 @@ module MicAutoCPLXMod
   IF(RMaintDefcitcitAutor.GT.ZEROS.AND.RMaintRespAutor.GT.ZEROS.AND.RCCC.GT.ZERO)THEN
     FRM=RMaintDefcitcitAutor/RMaintRespAutor
     DO  M=1,2
-      RMaintDefcitKillOMAutor(ielmc,M,NGL)=AMIN1(mBOMAutor(ielmc,MID),AZMAX1(FRM*RMaintDmndAutor(M,NGL)/RCCC))
-      RMaintDefcitKillOMAutor(ielmn,M,NGL)=AMIN1(mBOMAutor(ielmn,MID),AZMAX1(RMaintDefcitKillOMAutor(ielmc,M,NGL)*CNOMActAutor(NGL)))
-      RMaintDefcitKillOMAutor(ielmp,M,NGL)=AMIN1(mBOMAutor(ielmp,MID),AZMAX1(RMaintDefcitKillOMAutor(ielmc,M,NGL)*CPOMActAutor(NGL)))
+      RMaintDefcitKillOMAutor(ielmc,M,NGL)=AMIN1(mBiomeAutor(ielmc,MID),AZMAX1(FRM*RMaintDmndAutor(M,NGL)/RCCC))
+      RMaintDefcitKillOMAutor(ielmn,M,NGL)=AMIN1(mBiomeAutor(ielmn,MID),AZMAX1(RMaintDefcitKillOMAutor(ielmc,M,NGL)*rCNBiomeActAutor(ielmn,NGL)))
+      RMaintDefcitKillOMAutor(ielmp,M,NGL)=AMIN1(mBiomeAutor(ielmp,MID),AZMAX1(RMaintDefcitKillOMAutor(ielmc,M,NGL)*rCNBiomeActAutor(ielmp,NGL)))
 
       RMaintDefcitLitrfalOMAutor(ielmc,M,NGL)=RMaintDefcitKillOMAutor(ielmc,M,NGL)*(1.0_r8-RCCC)
       RMaintDefcitLitrfalOMAutor(ielmn,M,NGL)=RMaintDefcitKillOMAutor(ielmn,M,NGL)*(1.0_r8-RCCN)*(1.0_r8-RCCC)
@@ -1432,7 +1431,7 @@ module MicAutoCPLXMod
    VLPO4                 => micfor%VLPO4,                &
    VLPOB                 => micfor%VLPOB,                &
    litrm                 => micfor%litrm,                &
-   mBOMAutor              => micstt%mBOMAutor,             &
+   mBiomeAutor              => micstt%mBiomeAutor,             &
    ZNH4S                 => micstt%ZNH4S,                &
    ZNH4B                 => micstt%ZNH4B,                &
    ZNO3S                 => micstt%ZNO3S,                &
@@ -1486,7 +1485,7 @@ module MicAutoCPLXMod
   FNH4S=VLNH4
   FNHBS=VLNHB
   MID3=micpar%get_micb_id(3,NGL)
-  RNetNH4MinPotent=mBOMAutor(ielmc,MID3)*rNCOMCAutor(3,NGL)-mBOMAutor(ielmn,MID3)
+  RNetNH4MinPotent=mBiomeAutor(ielmc,MID3)*rNCOMCAutor(3,NGL)-mBiomeAutor(ielmn,MID3)
   IF(RNetNH4MinPotent.GT.0.0_r8)THEN
     CNH4X=AZMAX1(CNH4S-Z4MN)
     CNH4Y=AZMAX1(CNH4B-Z4MN)
@@ -1568,7 +1567,7 @@ module MicAutoCPLXMod
   FH2PS=VLPO4
   FH2PB=VLPOB
   MID3=micpar%get_micb_id(3,NGL)
-  RNetH2PO4MinPotent=(mBOMAutor(ielmc,MID3)*rPCOMCAutor(3,NGL)-mBOMAutor(ielmp,MID3))
+  RNetH2PO4MinPotent=(mBiomeAutor(ielmc,MID3)*rPCOMCAutor(3,NGL)-mBiomeAutor(ielmp,MID3))
   IF(RNetH2PO4MinPotent.GT.0.0)THEN
     CH2PX=AZMAX1(CH2P4-HPMN)
     CH2PY=AZMAX1(CH2P4B-HPMN)
@@ -1791,7 +1790,7 @@ module MicAutoCPLXMod
     Resp4NFixAutor   => nmicf%Resp4NFixAutor,   &
     RN2FixAutor      => nmicf%RN2FixAutor,      &
     pH               => micfor%pH,              &
-    mBOMAutor         => micstt%mBOMAutor       &
+    mBiomeAutor         => micstt%mBiomeAutor       &
 
   )
 !     pH EFFECT ON MAINTENANCE RESPIRATION
@@ -1805,7 +1804,7 @@ module MicAutoCPLXMod
   MID1=micpar%get_micb_id(1,NGL)
   FPH=1.0_r8+AZMAX1(0.25_r8*(6.5_r8-PH))
   RMOMX=RMOM*TSensMaintRAutor(NGL)*FPH
-  RMaintDmndAutor(1,NGL)=mBOMAutor(ielmn,MID1)*RMOMX*RMOMK(1)
+  RMaintDmndAutor(1,NGL)=mBiomeAutor(ielmn,MID1)*RMOMX*RMOMK(1)
   RMaintDmndAutor(2,NGL)=OMN2Autor(NGL)*RMOMX*RMOMK(2)
 !
 !     MICROBIAL MAINTENANCE AND GROWTH RESPIRATION
@@ -1852,7 +1851,7 @@ module MicAutoCPLXMod
   real(r8) :: CGROMC
   integer :: N,M,NGL,MID,MID3,NE
   associate(                                                                &
-    CGmBOMAutor                    => nmicf%CGmBOMAutor,                    &
+    DOMuptk4GrothAutor             => nmicf%DOMuptk4GrothAutor,             &
     NonstX2stBiomAutor             => nmicf%NonstX2stBiomAutor,             &
     Resp4NFixAutor                 => nmicf%Resp4NFixAutor,                 &
     RespGrossAutor                 => nmicf%RespGrossAutor,                 &
@@ -1878,10 +1877,10 @@ module MicAutoCPLXMod
     RH1PO4TransfLitrAutor          => nmicf%RH1PO4TransfLitrAutor,          &
     RNH4TransfSoilAutor            => nmicf%RNH4TransfSoilAutor,            &
     litrm                          => micfor%litrm,                         &
-    CFOMC                          => micfor%CFOMC,                         &
-    CFOMCU                         => micfor%CFOMCU,                        &
+    ElmAllocmatMicrblitr2POM                          => micfor%ElmAllocmatMicrblitr2POM,                         &
+    ElmAllocmatMicrblitr2POMU                         => micfor%ElmAllocmatMicrblitr2POMU,                        &
     SolidOM                        => micstt%SolidOM,                       &
-    mBOMAutor                      => micstt%mBOMAutor,                     &
+    mBiomeAutor                    => micstt%mBiomeAutor,                   &
     SOMHumProtein                  => micstt%SOMHumProtein,                 &
     SOMHumCarbohyd                 => micstt%SOMHumCarbohyd,                &
     JGniA                          => micpar%JGniA,                         &
@@ -1898,24 +1897,24 @@ module MicAutoCPLXMod
         DO  M=1,2
           MID=micpar%get_micb_id(M,NGL)
           DO NE=1,NumPlantChemElms
-            mBOMAutor(NE,MID)=mBOMAutor(NE,MID)+NonstX2stBiomAutor(NE,M,NGL)-RKillOMAutor(NE,M,NGL)-RMaintDefcitKillOMAutor(NE,M,NGL)
+            mBiomeAutor(NE,MID)=mBiomeAutor(NE,MID)+NonstX2stBiomAutor(NE,M,NGL)-RKillOMAutor(NE,M,NGL)-RMaintDefcitKillOMAutor(NE,M,NGL)
           ENDDO
 
 !     HUMIFICATION PRODUCTS
 !
-!     CFOMC=fractions allocated to humic vs fulvic humus
+!     ElmAllocmatMicrblitr2POM=fractions allocated to humic vs fulvic humus
 !     RHOMC,RHOMN,RHOMP=transfer of microbial C,N,P LitrFall to humus
 !     RHMMC,RHMMN,RHMMC=transfer of senesence LitrFall C,N,P to humus
 !
           IF(.not.litrm)THEN
             DO NE=1,NumPlantChemElms
-              SolidOM(NE,iprotein,k_POM)=SolidOM(NE,iprotein,k_POM)+CFOMC(1)*(RkillLitrfal2HumOMAutor(NE,M,NGL)+RMaintDefcitLitrfal2HumOMAutor(NE,M,NGL))
-              SolidOM(NE,icarbhyro,k_POM)=SolidOM(NE,icarbhyro,k_POM)+CFOMC(2)*(RkillLitrfal2HumOMAutor(NE,M,NGL)+RMaintDefcitLitrfal2HumOMAutor(NE,M,NGL))
+              SolidOM(NE,iprotein,k_POM)=SolidOM(NE,iprotein,k_POM)+ElmAllocmatMicrblitr2POM(1)*(RkillLitrfal2HumOMAutor(NE,M,NGL)+RMaintDefcitLitrfal2HumOMAutor(NE,M,NGL))
+              SolidOM(NE,icarbhyro,k_POM)=SolidOM(NE,icarbhyro,k_POM)+ElmAllocmatMicrblitr2POM(2)*(RkillLitrfal2HumOMAutor(NE,M,NGL)+RMaintDefcitLitrfal2HumOMAutor(NE,M,NGL))
             ENDDO
           ELSE
             DO NE=1,NumPlantChemElms
-              SOMHumProtein(NE)=SOMHumProtein(NE)+CFOMCU(1)*(RkillLitrfal2HumOMAutor(NE,M,NGL)+RMaintDefcitLitrfal2HumOMAutor(NE,M,NGL))
-              SOMHumCarbohyd(NE)=SOMHumCarbohyd(NE)+CFOMCU(2)*(RkillLitrfal2HumOMAutor(NE,M,NGL)+RMaintDefcitLitrfal2HumOMAutor(NE,M,NGL))
+              SOMHumProtein(NE)=SOMHumProtein(NE)+ElmAllocmatMicrblitr2POMU(1)*(RkillLitrfal2HumOMAutor(NE,M,NGL)+RMaintDefcitLitrfal2HumOMAutor(NE,M,NGL))
+              SOMHumCarbohyd(NE)=SOMHumCarbohyd(NE)+ElmAllocmatMicrblitr2POMU(2)*(RkillLitrfal2HumOMAutor(NE,M,NGL)+RMaintDefcitLitrfal2HumOMAutor(NE,M,NGL))
             ENDDO
           ENDIF
         ENDDO
@@ -1938,25 +1937,25 @@ module MicAutoCPLXMod
 !     RNH4TransfLitrHeter,RNO3TransfLitrHeter =substrate-limited NH4,NO3 mineraln-immobiln
 !     RH2PO4TransfLitrHeter,RH1PO4TransfLitrHeter=substrate-limited H2PO4,HPO4 mineraln-immobiln
 !
-        CGROMC=CGmBOMAutor(ielmc,NGL)-RespGrossAutor(NGL)-RNOxReduxRespAutorLim(NGL)-Resp4NFixAutor(NGL)
+        CGROMC=DOMuptk4GrothAutor(ielmc,NGL)-RespGrossAutor(NGL)-RNOxReduxRespAutorLim(NGL)-Resp4NFixAutor(NGL)
         RCO2ProdAutor(NGL)=RCO2ProdAutor(NGL)+Resp4NFixAutor(NGL)
         MID3=micpar%get_micb_id(3,NGL)
         DO M=1,2
           DO NE=1,NumPlantChemElms
-            mBOMAutor(NE,MID3)=mBOMAutor(NE,MID3)-NonstX2stBiomAutor(NE,M,NGL)+RkillRecycOMAutor(NE,M,NGL)
+            mBiomeAutor(NE,MID3)=mBiomeAutor(NE,MID3)-NonstX2stBiomAutor(NE,M,NGL)+RkillRecycOMAutor(NE,M,NGL)
           ENDDO
-          mBOMAutor(ielmn,MID3)=mBOMAutor(ielmn,MID3)+RMaintDefcitRecycOMAutor(ielmn,M,NGL)
-          mBOMAutor(ielmp,MID3)=mBOMAutor(ielmp,MID3)+RMaintDefcitRecycOMAutor(ielmp,M,NGL)
+          mBiomeAutor(ielmn,MID3)=mBiomeAutor(ielmn,MID3)+RMaintDefcitRecycOMAutor(ielmn,M,NGL)
+          mBiomeAutor(ielmp,MID3)=mBiomeAutor(ielmp,MID3)+RMaintDefcitRecycOMAutor(ielmp,M,NGL)
           RCO2ProdAutor(NGL)=RCO2ProdAutor(NGL)+RMaintDefcitRecycOMAutor(ielmc,M,NGL)
         ENDDO
-        mBOMAutor(ielmc,MID3)=mBOMAutor(ielmc,MID3)+CGROMC
-        mBOMAutor(ielmn,MID3)=mBOMAutor(ielmn,MID3)+CGmBOMAutor(ielmn,NGL) &
+        mBiomeAutor(ielmc,MID3)=mBiomeAutor(ielmc,MID3)+CGROMC
+        mBiomeAutor(ielmn,MID3)=mBiomeAutor(ielmn,MID3)+DOMuptk4GrothAutor(ielmn,NGL) &
           +RNH4TransfSoilAutor(NGL)+RNH4TransfBandAutor(NGL)+RNO3TransfSoilAutor(NGL)+RNO3TransfBandAutor(NGL)+RN2FixAutor(NGL)
-        mBOMAutor(ielmp,MID3)=mBOMAutor(ielmp,MID3)+CGmBOMAutor(ielmp,NGL) &
+        mBiomeAutor(ielmp,MID3)=mBiomeAutor(ielmp,MID3)+DOMuptk4GrothAutor(ielmp,NGL) &
           +RH2PO4TransfSoilAutor(NGL)+RH2PO4TransfBandAutor(NGL)+RH1PO4TransfSoilAutor(NGL)+RH1PO4TransfBandAutor(NGL)
         IF(litrm)THEN
-          mBOMAutor(ielmn,MID3)=mBOMAutor(ielmn,MID3)+RNH4TransfLitrAutor(NGL)+RNO3TransfLitrAutor(NGL)
-          mBOMAutor(ielmp,MID3)=mBOMAutor(ielmp,MID3)+RH2PO4TransfLitrAutor(NGL)+RH1PO4TransfLitrAutor(NGL)
+          mBiomeAutor(ielmn,MID3)=mBiomeAutor(ielmn,MID3)+RNH4TransfLitrAutor(NGL)+RNO3TransfLitrAutor(NGL)
+          mBiomeAutor(ielmp,MID3)=mBiomeAutor(ielmp,MID3)+RH2PO4TransfLitrAutor(NGL)+RH1PO4TransfLitrAutor(NGL)
         ENDIF
       enddo
     ENDIF

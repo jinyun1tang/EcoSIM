@@ -72,8 +72,8 @@ module MicForcTypeMod
   real(r8) :: RH1PO4EcoDmndLitrPrev
   real(r8) :: RO2AquaXchangePrev
   real(r8) :: VOLWU
-  real(r8), allocatable :: CFOMC(:)
-  real(r8), allocatable :: CFOMCU(:)
+  real(r8), allocatable :: ElmAllocmatMicrblitr2POM(:)
+  real(r8), allocatable :: ElmAllocmatMicrblitr2POMU(:)
   real(r8), allocatable :: RDOMEcoDmndPrev(:)
   real(r8), allocatable :: RAcetateEcoDmndPrev(:)
   real(r8), allocatable :: DiffusivitySolutEff(:)  !rate constant for air-water gas exchange
@@ -96,8 +96,8 @@ module MicForcTypeMod
   class(micforctype) :: this
   integer :: jcplx
   jcplx=micpar%jcplx
-  allocate(this%CFOMC(1:micpar%ndbiomcp));this%CFOMC=spval
-  allocate(this%CFOMCU(1:micpar%ndbiomcp));this%CFOMCU=spval
+  allocate(this%ElmAllocmatMicrblitr2POM(1:micpar%ndbiomcp));this%ElmAllocmatMicrblitr2POM=spval
+  allocate(this%ElmAllocmatMicrblitr2POMU(1:micpar%ndbiomcp));this%ElmAllocmatMicrblitr2POMU=spval
   allocate(this%RDOMEcoDmndPrev(1:jcplx));this%RDOMEcoDmndPrev=spval
   allocate(this%RAcetateEcoDmndPrev(1:jcplx));this%RAcetateEcoDmndPrev=spval
   allocate(this%VLWatMicPM(NPH));this%VLWatMicPM=spval
@@ -123,8 +123,8 @@ module MicForcTypeMod
   call destroy(this%DiffusivitySolutEff)
   call destroy(this%RDOMEcoDmndPrev)
   call destroy(this%RAcetateEcoDmndPrev)
-  call destroy(this%CFOMC)
-  call destroy(this%CFOMCU)
+  call destroy(this%ElmAllocmatMicrblitr2POM)
+  call destroy(this%ElmAllocmatMicrblitr2POMU)
 
   end subroutine Destruct
 

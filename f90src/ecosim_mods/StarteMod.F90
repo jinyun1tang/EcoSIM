@@ -167,7 +167,7 @@ module StarteMod
             solutevar%GKCK  = GKCK(L,NY,NX)
             solutevar%GKCN  = GKCN(L,NY,NX)
             solutevar%GKCM  = GKCM(L,NY,NX)
-            solutevar%VLWatMicP = VLWatMicP(L,NY,NX)
+            solutevar%VLWatMicP = VLWatMicP_vr(L,NY,NX)
 
             call InitSoluteModel(K,BulkSoilMass,solutevar)
 
@@ -397,36 +397,36 @@ module StarteMod
     IF(CumDepth2LayerBottom(L-1,NY,NX).LT.ExtWaterTablet0(NY,NX))THEN
       ! above water table
       trc_solml_vr(idg_O2,L,NY,NX)=AtmGasCgperm3(idg_O2,NY,NX)*gas_solubility(idg_O2, ATCA(NY,NX)) &
-        /(EXP(ACTCG(idg_O2)*solutevar%CSTR1))*solutevar%FH2O*VLWatMicP(L,NY,NX)
+        /(EXP(ACTCG(idg_O2)*solutevar%CSTR1))*solutevar%FH2O*VLWatMicP_vr(L,NY,NX)
     ELSE
       !below water table
       trc_solml_vr(idg_O2,L,NY,NX)=0._r8
     ENDIF
 
     trc_solml_vr(idg_CO2,L,NY,NX)=CCO2EI(NY,NX)*gas_solubility(idg_CO2, ATCA(NY,NX)) &
-      /(EXP(ACTCG(idg_CO2)*solutevar%CSTR1))*solutevar%FH2O*VLWatMicP(L,NY,NX)
+      /(EXP(ACTCG(idg_CO2)*solutevar%CSTR1))*solutevar%FH2O*VLWatMicP_vr(L,NY,NX)
     trc_solml_vr(idg_CH4,L,NY,NX)=AtmGasCgperm3(idg_CH4,NY,NX)*gas_solubility(idg_CH4, ATCA(NY,NX)) &
-      /(EXP(ACTCG(idg_CH4)*solutevar%CSTR1))*solutevar%FH2O*VLWatMicP(L,NY,NX)
+      /(EXP(ACTCG(idg_CH4)*solutevar%CSTR1))*solutevar%FH2O*VLWatMicP_vr(L,NY,NX)
     trc_solml_vr(idg_N2,L,NY,NX)=AtmGasCgperm3(idg_N2,NY,NX)*gas_solubility(idg_N2, ATCA(NY,NX)) &
-      /(EXP(ACTCG(idg_N2)*solutevar%CSTR1))*solutevar%FH2O*VLWatMicP(L,NY,NX)
+      /(EXP(ACTCG(idg_N2)*solutevar%CSTR1))*solutevar%FH2O*VLWatMicP_vr(L,NY,NX)
     trc_solml_vr(idg_N2O,L,NY,NX)=AtmGasCgperm3(idg_N2O,NY,NX)*gas_solubility(idg_N2O, ATCA(NY,NX)) &
-      /(EXP(ACTCG(idg_N2O)*solutevar%CSTR1))*solutevar%FH2O*VLWatMicP(L,NY,NX)
+      /(EXP(ACTCG(idg_N2O)*solutevar%CSTR1))*solutevar%FH2O*VLWatMicP_vr(L,NY,NX)
     trc_solml_vr(idg_H2,L,NY,NX)=AtmGasCgperm3(idg_H2,NY,NX)*gas_solubility(idg_H2, ATCA(NY,NX)) &
-      /(EXP(ACTCG(idg_H2)*solutevar%CSTR1))*solutevar%FH2O*VLWatMicP(L,NY,NX)
+      /(EXP(ACTCG(idg_H2)*solutevar%CSTR1))*solutevar%FH2O*VLWatMicP_vr(L,NY,NX)
 !
 !     INITIAL STATE VARIABLES FOR MINERAL N AND P IN SOIL
 !
-    trc_solml_vr(ids_NH4,L,NY,NX)=trcn_irrig(ids_NH4,L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN_vr(ids_NH4,L,NY,NX)*natomw
-    trc_solml_vr(ids_NH4B,L,NY,NX)=trcn_irrig(ids_NH4B,L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN_vr(ids_NH4B,L,NY,NX)*natomw
-    trc_solml_vr(idg_NH3,L,NY,NX)=trcn_irrig(idg_NH3,L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN_vr(ids_NH4,L,NY,NX)*natomw
-    trc_solml_vr(idg_NH3B,L,NY,NX)=trcn_irrig(idg_NH3B,L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN_vr(ids_NH4B,L,NY,NX)*natomw
-    trc_solml_vr(ids_NO3,L,NY,NX)=trcn_irrig(ids_NO3,L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN_vr(ids_NO3,L,NY,NX)*natomw
-    trc_solml_vr(ids_NO3B,L,NY,NX)=trcn_irrig(ids_NO3B,L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN_vr(ids_NO3B,L,NY,NX)*natomw
+    trc_solml_vr(ids_NH4,L,NY,NX)=trcn_irrig(ids_NH4,L,NY,NX)*VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_NH4,L,NY,NX)*natomw
+    trc_solml_vr(ids_NH4B,L,NY,NX)=trcn_irrig(ids_NH4B,L,NY,NX)*VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_NH4B,L,NY,NX)*natomw
+    trc_solml_vr(idg_NH3,L,NY,NX)=trcn_irrig(idg_NH3,L,NY,NX)*VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_NH4,L,NY,NX)*natomw
+    trc_solml_vr(idg_NH3B,L,NY,NX)=trcn_irrig(idg_NH3B,L,NY,NX)*VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_NH4B,L,NY,NX)*natomw
+    trc_solml_vr(ids_NO3,L,NY,NX)=trcn_irrig(ids_NO3,L,NY,NX)*VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_NO3,L,NY,NX)*natomw
+    trc_solml_vr(ids_NO3B,L,NY,NX)=trcn_irrig(ids_NO3B,L,NY,NX)*VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_NO3B,L,NY,NX)*natomw
 
-    trc_solml_vr(ids_H2PO4,L,NY,NX)=trcn_irrig(ids_H2PO4,L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)*patomw
-    trc_solml_vr(ids_H2PO4B,L,NY,NX)=trcn_irrig(ids_H2PO4B,L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)*patomw
-    trc_solml_vr(ids_H1PO4,L,NY,NX)=trcn_irrig(ids_H1PO4,L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)*patomw
-    trc_solml_vr(ids_H1PO4B,L,NY,NX)=trcn_irrig(ids_H1PO4B,L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)*patomw
+    trc_solml_vr(ids_H2PO4,L,NY,NX)=trcn_irrig(ids_H2PO4,L,NY,NX)*VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)*patomw
+    trc_solml_vr(ids_H2PO4B,L,NY,NX)=trcn_irrig(ids_H2PO4B,L,NY,NX)*VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)*patomw
+    trc_solml_vr(ids_H1PO4,L,NY,NX)=trcn_irrig(ids_H1PO4,L,NY,NX)*VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)*patomw
+    trc_solml_vr(ids_H1PO4B,L,NY,NX)=trcn_irrig(ids_H1PO4B,L,NY,NX)*VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)*patomw
 
     trc_solml_vr(ids_NO2,L,NY,NX)=0._r8
     trc_solml_vr(ids_NO2B,L,NY,NX)=0._r8
@@ -435,13 +435,13 @@ module StarteMod
 !
     if(salt_model)then
       do nsalts=idsalt_beg,idsalt_KSO4
-        trcSalt_solml(nsalts,L,NY,NX)=trcsalt_subirrig_conc(nsalts,L,NY,NX)*VLWatMicP(L,NY,NX)
+        trcSalt_solml(nsalts,L,NY,NX)=trcsalt_subirrig_conc(nsalts,L,NY,NX)*VLWatMicP_vr(L,NY,NX)
       ENDDO
 
       DO nsalts=idsalt_H0PO4,idsalt_MgHPO4
         ids=nsalts-idsalt_H0PO4+idsalt_H0PO4B
-        trcSalt_solml(nsalts,L,NY,NX)=trcsalt_subirrig_conc(nsalts,L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
-        trcSalt_solml(ids,L,NY,NX)=trcsalt_subirrig_conc(nsalts,L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
+        trcSalt_solml(nsalts,L,NY,NX)=trcsalt_subirrig_conc(nsalts,L,NY,NX)*VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
+        trcSalt_solml(ids,L,NY,NX)=trcsalt_subirrig_conc(nsalts,L,NY,NX)*VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
       ENDDO
       trcSalt_soHml(idsalt_beg:idsaltb_end,L,NY,NX)=0._r8
     endif
@@ -449,7 +449,7 @@ module StarteMod
 !
 !     INITIAL STATE VARIABLES FOR ALL MATERIAL IN SOIL MACROPORES
 !
-    trc_soHml(ids_beg:ids_end,L,NY,NX)=0._r8
+    trc_soHml_vr(ids_beg:ids_end,L,NY,NX)=0._r8
 !
 !     INITIAL STATE VARIABLES FOR EXCHANGEABLE CATIONS AND ANIONS
 !

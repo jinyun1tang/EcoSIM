@@ -369,11 +369,11 @@ module BoundaryTranspMod
     enddo
 
     DO idg=idg_beg,idg_end-2
-      R3PoreSoHFlx(idg,N,M6,M5,M4)=VFLW*AZMAX1(trc_soHml2(idg,M3,M2,M1))
+      R3PoreSoHFlx(idg,N,M6,M5,M4)=VFLW*AZMAX1(trc_soHml2_vr(idg,M3,M2,M1))
     ENDDO
 
     DO NTN=ids_nuts_beg,ids_nuts_end
-      R3PoreSoHFlx(NTN,N,M6,M5,M4)=VFLW*AZMAX1(trc_soHml2(NTN,M3,M2,M1))*trcs_VLN_vr(NTN,M3,M2,M1)
+      R3PoreSoHFlx(NTN,N,M6,M5,M4)=VFLW*AZMAX1(trc_soHml2_vr(NTN,M3,M2,M1))*trcs_VLN_vr(NTN,M3,M2,M1)
     ENDDO
 !
 !     NO SOLUTE GAIN IN SUBSURFACE MACROPORES

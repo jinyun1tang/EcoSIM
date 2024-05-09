@@ -63,7 +63,7 @@ implicit none
     real(r8) :: LOGPSIAtSat
     real(r8) :: PSISD
     real(r8) :: PSISE
-    real(r8), allocatable :: CFOMC(:)  !allocation coefficient to humus fractions
+    real(r8), allocatable :: ElmAllocmatMicrblitr2POM(:)  !allocation coefficient to humus fractions
     real(r8), allocatable :: CNOSC(:,:)
     real(r8), allocatable :: CPOSC(:,:)
     real(r8), allocatable :: SolidOM(:,:,:)
@@ -71,8 +71,8 @@ implicit none
     real(r8), allocatable :: OMBioResdu(:,:,:)
     real(r8), allocatable :: SorbedOM(:,:)
     real(r8), allocatable :: DOM(:,:)
-    real(r8), allocatable :: mBOMHeter(:,:,:)
-    real(r8), allocatable :: mBOMAutor(:,:)
+    real(r8), allocatable :: mBiomeHeter(:,:,:)
+    real(r8), allocatable :: mBiomeAutor(:,:)
 
 !    real(r8) :: O2_irrig_conc        !surface irrigation  O2 concentration, [g m-3]
 !    real(r8) :: O2_rain_conc        !precipitation  O2 concentration, [g m-3]
@@ -236,14 +236,14 @@ implicit none
   nlbiomcp=get_dim_len(ncf,'nlbiomcp')
   ndbiomcp=get_dim_len(ncf,'ndbiomcp')
   NumMicbFunGrupsPerCmplx    =get_dim_len(ncf,'NumMicbFunGrupsPerCmplx')
-  allocate(forc%mBOMHeter(NumPlantChemElms,NumLiveHeterBioms,1:jcplx))
+  allocate(forc%mBiomeHeter(NumPlantChemElms,NumLiveHeterBioms,1:jcplx))
   allocate(forc%DOM(idom_beg:idom_end,1:jcplx))
   allocate(forc%SolidOM(1:NumPlantChemElms,jsken,1:jcplx))
   allocate(forc%SolidOMAct(jsken,1:jcplx))
   allocate(forc%OMBioResdu(1:NumPlantChemElms,ndbiomcp,1:jcplx))
-  allocate(forc%mBOMAutor(NumPlantChemElms,NumLiveAutoBioms))
+  allocate(forc%mBiomeAutor(NumPlantChemElms,NumLiveAutoBioms))
   allocate(forc%SorbedOM(idom_beg:idom_end,1:jcplx))
-  allocate(forc%CFOMC(ndbiomcp))
+  allocate(forc%ElmAllocmatMicrblitr2POM(ndbiomcp))
   allocate(forc%CNOSC(1:jsken,1:jcplx))
   allocate(forc%CPOSC(1:jsken,1:jcplx))
   call ncd_getvar(ncf,'ZNH4S',forc%ZNH4S)
@@ -256,7 +256,7 @@ implicit none
   call ncd_getvar(ncf,'pH',forc%PH)
   call ncd_getvar(ncf,'VLSoilPoreMicP',forc%VLSoilPoreMicP)
   call ncd_getvar(ncf,'ORGC',forc%ORGC)
-  call ncd_getvar(ncf,'CFOMC',forc%CFOMC)
+  call ncd_getvar(ncf,'ElmAllocmatMicrblitr2POM',forc%ElmAllocmatMicrblitr2POM)
   call ncd_getvar(ncf,'VLSoilMicP',forc%VLSoilMicP)
   call ncd_getvar(ncf,'BKVL',forc%SoilMicPMassLayer)
   call ncd_getvar(ncf,'POROS',forc%POROS)
@@ -289,8 +289,8 @@ implicit none
   call ncd_getvar(ncf,'CCASO',forc%CCASO)
   call ncd_getvar(ncf,'BKDS',forc%BKDS)
   call ncd_getvar(ncf,'ATCS',forc%ATCS)
-  call ncd_getvar(ncf,'mBOMHeter',forc%mBOMHeter)
-  call ncd_getvar(ncf,'mBOMAutor',forc%mBOMAutor)
+  call ncd_getvar(ncf,'mBiomeHeter',forc%mBiomeHeter)
+  call ncd_getvar(ncf,'mBiomeAutor',forc%mBiomeAutor)
   call ncd_getvar(ncf,'OSM',forc%SolidOM)
   call ncd_getvar(ncf,'OSA',forc%SolidOMAct)
   call ncd_getvar(ncf,'ORM',forc%OMBioResdu)

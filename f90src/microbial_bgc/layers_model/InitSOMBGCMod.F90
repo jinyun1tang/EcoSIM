@@ -244,7 +244,7 @@ module InitSOMBGCMOD
 !     OSCX,OSNX,OSPX=remaining unallocated SOC,SON,SOP
 !  The reason that initialization of complex 5 microbes is repated for each
 ! complex is because complex 5 is shared by the other complexes
-    mBOMAutor_vr(1:NumPlantChemElms,1:NumLiveAutoBioms,L,NY,NX)=0._r8
+    mBiomeAutor_vr(1:NumPlantChemElms,1:NumLiveAutoBioms,L,NY,NX)=0._r8
 
     D8990: DO N=1,NumMicbFunGrupsPerCmplx
       tglds=JGnfo(N)-JGnio(N)+1._r8
@@ -254,9 +254,9 @@ module InitSOMBGCMOD
         OMP1=AZMAX1(OMC1*rPCOMCa(M,N,K)*FOSPI)
         do NGL=JGnio(N),JGnfo(N)
           MID=micpar%get_micb_id(M,NGL)
-          mBOMHeter_vr(ielmc,MID,K,L,NY,NX)=OMC1/tglds
-          mBOMHeter_vr(ielmn,MID,K,L,NY,NX)=OMN1/tglds
-          mBOMHeter_vr(ielmp,MID,K,L,NY,NX)=OMP1/tglds
+          mBiomeHeter_vr(ielmc,MID,K,L,NY,NX)=OMC1/tglds
+          mBiomeHeter_vr(ielmn,MID,K,L,NY,NX)=OMN1/tglds
+          mBiomeHeter_vr(ielmp,MID,K,L,NY,NX)=OMP1/tglds
         ENDDO
         OSCX(KK)=OSCX(KK)+OMC1
         OSNX(KK)=OSNX(KK)+OMN1
@@ -265,9 +265,9 @@ module InitSOMBGCMOD
           tglds=JGnfA(N)-JGniA(N)+1._r8
           do NGL=JGniA(N),JGnfA(N)
             MID=micpar%get_micb_id(M,NGL)
-            mBOMAutor_vr(ielmc,MID,L,NY,NX)=mBOMAutor_vr(ielmc,MID,L,NY,NX)+OMC1*OMCA(NN)/tglds
-            mBOMAutor_vr(ielmn,MID,L,NY,NX)=mBOMAutor_vr(ielmn,MID,L,NY,NX)+OMN1*OMCA(NN)/tglds
-            mBOMAutor_vr(ielmp,MID,L,NY,NX)=mBOMAutor_vr(ielmp,MID,L,NY,NX)+OMP1*OMCA(NN)/tglds
+            mBiomeAutor_vr(ielmc,MID,L,NY,NX)=mBiomeAutor_vr(ielmc,MID,L,NY,NX)+OMC1*OMCA(NN)/tglds
+            mBiomeAutor_vr(ielmn,MID,L,NY,NX)=mBiomeAutor_vr(ielmn,MID,L,NY,NX)+OMN1*OMCA(NN)/tglds
+            mBiomeAutor_vr(ielmp,MID,L,NY,NX)=mBiomeAutor_vr(ielmp,MID,L,NY,NX)+OMP1*OMCA(NN)/tglds
           ENDDO
           OSCX(KK)=OSCX(KK)+OMC1*OMCA(NN)
           OSNX(KK)=OSNX(KK)+OMN1*OMCA(NN)
@@ -610,10 +610,10 @@ module InitSOMBGCMOD
 !   MICROBIAL DETRITUS ALLOCATED TO HUMUS MAINTAINS
 !   HUMUS PARTITIONING TO COMPONENTS
 !
-!   CFOMC_vr=fraction of microbial litter allocated to humus components
+!   ElmAllocmatMicrblitr2POM_vr=fraction of microbial litter allocated to humus components
 !
-    CFOMC_vr(1,L,NY,NX)=3.0_r8*FC1/(2.0_r8*FC1+1.0_r8)
-    CFOMC_vr(2,L,NY,NX)=1.0_r8-CFOMC_vr(1,L,NY,NX)
+    ElmAllocmatMicrblitr2POM_vr(1,L,NY,NX)=3.0_r8*FC1/(2.0_r8*FC1+1.0_r8)
+    ElmAllocmatMicrblitr2POM_vr(2,L,NY,NX)=1.0_r8-ElmAllocmatMicrblitr2POM_vr(1,L,NY,NX)
   ENDIF
 
   IF(L.GT.0)THEN

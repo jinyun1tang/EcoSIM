@@ -66,7 +66,7 @@ implicit none
             units='m3 d-2', missing_value=spval, fill_value=spval)
     call ncd_defvar(ncf, 'ORGC', ncd_float, long_name='total soil organic C',  &
             units='gC d-2', missing_value=spval, fill_value=spval)
-    call ncd_defvar(ncf, 'CFOMC', ncd_float, dim1name='ndbiomcp', &
+    call ncd_defvar(ncf, 'ElmAllocmatMicrblitr2POM', ncd_float, dim1name='ndbiomcp', &
             long_name='allocation coefficient to humus fractions',  &
             units='none', missing_value=spval, fill_value=spval)
     call ncd_defvar(ncf, 'VLSoilMicP', ncd_float, long_name='micropore volume',  &
@@ -162,12 +162,12 @@ implicit none
     call ncd_defvar(ncf, 'ORM', ncd_float, dim1name='element',dim2name='ndbiomcp',&
             dim3name='jcplx',long_name='microbial residue C in each complex',  &
             units='gC d-2', missing_value=spval, fill_value=spval)
-    call ncd_defvar(ncf, 'mBOMHeter', ncd_float,dim1name='element',&
+    call ncd_defvar(ncf, 'mBiomeHeter', ncd_float,dim1name='element',&
             dim2name='NumLiveHeterBioms',dim3name='jcplx',&
             long_name='heterotrophic microbial biomass element in each complex',  &
             units='gC d-2', missing_value=spval, fill_value=spval)
 
-    call ncd_defvar(ncf, 'mBOMAutor', ncd_float, dim1name='element',dim2name='NumLiveAutoBioms',&
+    call ncd_defvar(ncf, 'mBiomeAutor', ncd_float, dim1name='element',dim2name='NumLiveAutoBioms',&
             long_name='microbial biomass element in autotrophic complex',  &
             units='gC d-2', missing_value=spval, fill_value=spval)
 
@@ -211,7 +211,7 @@ implicit none
     call ncd_putvar(ncf,'pH',PH(L,NY,NX))
     call ncd_putvar(ncf,'VLSoilPoreMicP_vr',VLSoilPoreMicP_vr(L,NY,NX))
     call ncd_putvar(ncf,'ORGC',SoilOrgM_vr(ielmc,L,NY,NX))
-    call ncd_putvar(ncf,'CFOMC',CFOMC_vr(:,L,NY,NX))
+    call ncd_putvar(ncf,'ElmAllocmatMicrblitr2POM',ElmAllocmatMicrblitr2POM_vr(:,L,NY,NX))
     call ncd_putvar(ncf,'VLSoilMicP',VLSoilMicP(L,NY,NX))
     call ncd_putvar(ncf,'BKVL',SoilMicPMassLayer(L,NY,NX))
     call ncd_putvar(ncf,'POROS',POROS(L,NY,NX))
@@ -263,8 +263,8 @@ implicit none
     call ncd_putvar(ncf,'OSM',SolidOM_vr(:,:,:,L,NY,NX))
     call ncd_putvar(ncf,'OSA',SolidOMAct_vr(:,:,L,NY,NX))
     call ncd_putvar(ncf,'ORM',OMBioResdu_vr(:,:,:,L,NY,NX))
-    call ncd_putvar(ncf,'mBOMHeter',mBOMHeter_vr(:,:,:,L,NY,NX))
-    call ncd_putvar(ncf,'mBOMAutor',mBOMAutor_vr(:,:,L,NY,NX))
+    call ncd_putvar(ncf,'mBiomeHeter',mBiomeHeter_vr(:,:,:,L,NY,NX))
+    call ncd_putvar(ncf,'mBiomeAutor',mBiomeAutor_vr(:,:,L,NY,NX))
 
     if(bgc_forc_conf%laddband)then
       call ncd_putvar(ncf,'ZNH4S',trc_solml_vr(ids_NH4,L,NY,NX)+trc_solml_vr(ids_NH4B,L,NY,NX))

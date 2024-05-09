@@ -9,7 +9,7 @@ implicit none
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
 
-  real(r8),target,allocatable :: mBOMHeter_vr(:,:,:,:,:,:)    !microbial biomass element	[g d-2]
+  real(r8),target,allocatable :: mBiomeHeter_vr(:,:,:,:,:,:)    !microbial biomass element	[g d-2]
   real(r8),target,allocatable :: RO2DmndHetert(:,:,:,:,:)    !aqueous O2 demand	[g d-2 h-1]
   real(r8),target,allocatable :: RDOCUptkHeter_vr(:,:,:,:,:)    !net microbial DOC flux	[g d-2 h-1]
   real(r8),target,allocatable :: RAcetateUptkHeter_vr(:,:,:,:,:)    !net microbial acetate flux	[g d-2 h-1]
@@ -32,7 +32,7 @@ implicit none
   real(r8),target,allocatable :: RH1PO4DmndLitrHeter_col(:,:,:,:)     !substrate-unlimited HPO4 immobilization
   real(r8),target,allocatable :: OMEERhetr(:,:,:,:,:,:,:)  !microbial C  erosion 	[g d-2 h-1]
 
-  real(r8),target,allocatable :: mBOMAutor_vr(:,:,:,:,:)
+  real(r8),target,allocatable :: mBiomeAutor_vr(:,:,:,:,:)
   real(r8),target,allocatable :: RO2DmndAutort(:,:,:,:)
   real(r8),target,allocatable :: RNH4UptkSoilAutor_vr(:,:,:,:)
   real(r8),target,allocatable :: RNO3UptkSoilAutor_vr(:,:,:,:)
@@ -68,7 +68,7 @@ implicit none
   subroutine InitAllocate
 
   implicit none
-  allocate(mBOMHeter_vr(NumPlantChemElms,NumLiveHeterBioms,1:jcplx,0:JZ,JY,JX))
+  allocate(mBiomeHeter_vr(NumPlantChemElms,NumLiveHeterBioms,1:jcplx,0:JZ,JY,JX))
   allocate(RO2DmndHetert(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX))
   allocate(RDOCUptkHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX))
   allocate(RAcetateUptkHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX))
@@ -91,7 +91,7 @@ implicit none
   allocate(RH1PO4DmndLitrHeter_col(NumHetetrMicCmplx,1:jcplx,JY,JX))
   allocate(OMEERhetr(NumPlantChemElms,NumLiveHeterBioms,1:jcplx,2,2,JV,JH))
 
-  allocate(mBOMAutor_vr(NumPlantChemElms,NumLiveAutoBioms,0:JZ,JY,JX))
+  allocate(mBiomeAutor_vr(NumPlantChemElms,NumLiveAutoBioms,0:JZ,JY,JX))
   allocate(RO2DmndAutort(NumMicrobAutrophCmplx,0:JZ,JY,JX))
   allocate(RNH4UptkSoilAutor_vr(NumMicrobAutrophCmplx,0:JZ,JY,JX))
   allocate(RNO3UptkSoilAutor_vr(NumMicrobAutrophCmplx,0:JZ,JY,JX))
@@ -117,7 +117,7 @@ implicit none
   subroutine DestructMicrobialData
   implicit none
 
-  if(allocated(mBOMHeter_vr))deallocate(mBOMHeter_vr)
+  if(allocated(mBiomeHeter_vr))deallocate(mBiomeHeter_vr)
   if(allocated(RO2DmndHetert))deallocate(RO2DmndHetert)
   if(allocated(RDOCUptkHeter_vr))deallocate(RDOCUptkHeter_vr)
   if(allocated(RAcetateUptkHeter_vr))deallocate(RAcetateUptkHeter_vr)
@@ -140,7 +140,7 @@ implicit none
   if(allocated(RH1PO4DmndLitrHeter_col))deallocate(RH1PO4DmndLitrHeter_col)
   if(allocated(OMEERhetr))deallocate(OMEERhetr)
 
-  if(allocated(mBOMAutor_vr))deallocate(mBOMAutor_vr)
+  if(allocated(mBiomeAutor_vr))deallocate(mBiomeAutor_vr)
   if(allocated(RO2DmndAutort))deallocate(RO2DmndAutort)
   if(allocated(RNH4UptkSoilAutor_vr))deallocate(RNH4UptkSoilAutor_vr)
   if(allocated(RNO3UptkSoilAutor_vr))deallocate(RNO3UptkSoilAutor_vr)

@@ -454,11 +454,11 @@ implicit none
   ! IN HEAT STORAGE
   !
   VHeatCapacityLitrX=VHeatCapacity(0,NY,NX)                          
-  VHeatCapacityLitR=cpw*VLWatMicP(0,NY,NX)+cpi*VLiceMicP(0,NY,NX)+cpo*SoilOrgM_vr(ielmc,0,NY,NX) 
-  VLWatMicPr=VLWatMicP(0,NY,NX)
+  VHeatCapacityLitR=cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP(0,NY,NX)+cpo*SoilOrgM_vr(ielmc,0,NY,NX) 
+  VLWatMicPr=VLWatMicP_vr(0,NY,NX)
   VLiceMicPr=VLiceMicP(0,NY,NX)
-  if(VLWatMicP(0,NY,NX)<0._r8 .or. VLiceMicP(0,NY,NX)<0._r8 .or. VHeatCapacityLitR<0._r8)then
-    write(*,*)'negative litr water',VLWatMicP(0,NY,NX),VLiceMicP(0,NY,NX)
+  if(VLWatMicP_vr(0,NY,NX)<0._r8 .or. VLiceMicP(0,NY,NX)<0._r8 .or. VHeatCapacityLitR<0._r8)then
+    write(*,*)'negative litr water',VLWatMicP_vr(0,NY,NX),VLiceMicP(0,NY,NX)
     call endrun(trim(mod_filename)//' at line',__LINE__)    
   endif
   dVHeatCapacityLitr=VHeatCapacityLitR-VHeatCapacityLitrX            
@@ -467,9 +467,9 @@ implicit none
   ENGYZ=VHeatCapacityLitrX*TKS(0,NY,NX)
 
   !update water, ice content and heat capacity of residue
-  VLWatMicP(0,NY,NX)=AZMAX1(VLWatMicP(0,NY,NX)+WatFLo2Litr(NY,NX)+TLitrIceFlxThaw(NY,NX)+WatInByRunoff)
+  VLWatMicP_vr(0,NY,NX)=AZMAX1(VLWatMicP_vr(0,NY,NX)+WatFLo2Litr(NY,NX)+TLitrIceFlxThaw(NY,NX)+WatInByRunoff)
   VLiceMicP(0,NY,NX)=AZMAX1(VLiceMicP(0,NY,NX)-TLitrIceFlxThaw(NY,NX)/DENSICE)
-  VHeatCapacity(0,NY,NX)=cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP(0,NY,NX)+cpi*VLiceMicP(0,NY,NX)
+  VHeatCapacity(0,NY,NX)=cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP(0,NY,NX)
 
   IF(VHeatCapacity(0,NY,NX).GT.VHeatCapLitR(NY,NX))THEN
     !when there are still significant heat capacity of the residual layer
@@ -479,7 +479,7 @@ implicit none
     if(TKS(0,NY,NX)<100._r8 .or. TKS(0,NY,NX)>400._r8)then
       write(*,*)mod_filename,NY,NX,TKS(0,NY,NX),tkspre
       write(*,*)'WatFLo2Litr, WatInByRunoff=',WatFLo2Litr(NY,NX),WatInByRunoff
-      write(*,*)'wat flo2litr icethaw runoff',VLWatMicPr,VLWatMicP(0,NY,NX),WatFLo2Litr(NY,NX),TLitrIceFlxThaw(NY,NX),WatInByRunoff
+      write(*,*)'wat flo2litr icethaw runoff',VLWatMicPr,VLWatMicP_vr(0,NY,NX),WatFLo2Litr(NY,NX),TLitrIceFlxThaw(NY,NX),WatInByRunoff
       write(*,*)'ice',VLiceMicPr,VLiceMicP(0,NY,NX)
       write(*,*)'engy',ENGYZ,HeatFLo2LitrByWat(NY,NX),TLitrIceHeatFlxFrez(NY,NX),HeatByLitrMassChange, &
         HeatInByRunoff,VHeatCapacity(0,NY,NX)        
@@ -591,7 +591,7 @@ implicit none
   ELSE
     TKSoi1(0,NY,NX)=TKSoi1(NUM(NY,NX),NY,NX)
   ENDIF
-!  if(NY==1 .AND. NX==1)write(191,*)'M  UpdateLitRB4RunoffM',M,VLWatMicP(0,NY,NX),VLWatMicP10,VLWatMicP1(0,NY,NX),&
+!  if(NY==1 .AND. NX==1)write(191,*)'M  UpdateLitRB4RunoffM',M,VLWatMicP_vr(0,NY,NX),VLWatMicP10,VLWatMicP1(0,NY,NX),&
 !    watflw(NY,NX),waticefl(NY,NX)
 
   watflw(NY, NX)=watflw(NY,NX)+WatFLow2LitR(NY,NX)
@@ -683,6 +683,6 @@ implicit none
   ELSE
     TKSoi1(0,NY,NX)=TKSoi1(NUM(NY,NX),NY,NX)
   ENDIF
-!  if(NY==1 .AND. NX==1 .and. M>=26)write(192,*)'UpdateLitRAftRunoff',M,VLWatMicP(0,NY,NX),VLWatMicP1(0,NY,NX),cumWatFlx2LitRByRunoff(NY,NX)
+!  if(NY==1 .AND. NX==1 .and. M>=26)write(192,*)'UpdateLitRAftRunoff',M,VLWatMicP_vr(0,NY,NX),VLWatMicP1(0,NY,NX),cumWatFlx2LitRByRunoff(NY,NX)
   end subroutine UpdateLitRAftRunoff  
 end module SurfLitterPhysMod

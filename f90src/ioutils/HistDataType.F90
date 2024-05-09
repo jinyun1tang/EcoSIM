@@ -279,7 +279,7 @@ implicit none
   real(r8),pointer   :: h2D_RootH2OUP_vr_col(:,:)   !root water uptake flux                                 
   real(r8),pointer   :: h2D_cNO3t_vr_col(:,:)       !(trc_solml_vr(ids_NO3,1:JZ,NY,NX)+trc_solml_vr(ids_NO3B,1:JZ,NY,NX) &
                                                                   !+trc_solml_vr(ids_NO2,1,NY,NX)+trc_solml_vr(ids_NO2B,1,NY,NX))/SoilMicPMassLayer(1,NY,NX)
-  real(r8),pointer   :: h2D_cPO4_vr_col(:,:)        !(trc_solml_vr(ids_H1PO4,1:JZ,NY,NX)+trc_solml_vr(ids_H1PO4B,1,NY,NX)+trc_solml_vr(ids_H2PO4,1,NY,NX)+trc_solml_vr(ids_H2PO4B,1,NY,NX))/VLWatMicP(1,NY,NX)
+  real(r8),pointer   :: h2D_cPO4_vr_col(:,:)        !(trc_solml_vr(ids_H1PO4,1:JZ,NY,NX)+trc_solml_vr(ids_H1PO4B,1,NY,NX)+trc_solml_vr(ids_H2PO4,1,NY,NX)+trc_solml_vr(ids_H2PO4B,1,NY,NX))/VLWatMicP_vr(1,NY,NX)
   real(r8),pointer   :: h2D_cEXCH_P_vr_col(:,:)     !31.0*(trcx_solml(idx_HPO4,1,NY,NX)+trcx_solml(idx_H2PO4,1,NY,NX)+trcx_solml(idx_HPO4B,1,NY,NX)+trcx_solml(idx_H2PO4B,1,NY,NX))/SoilMicPMassLayer(1,NY,NX)
   real(r8),pointer   :: h2D_ECND_vr_col(:,:)         !ECND(1:JZ,NY,NX)
 
@@ -1657,7 +1657,7 @@ implicit none
       this%h1D_SURF_tLITR_N_FLX_col(ncol) = tLitrOM_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_AMENDED_N_col(ncol)        = FertNFlx_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tNH4X_col(ncol)            = UNH4(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_tNO3_col(ncol)             = UNO3(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_tNO3_col(ncol)             = UNO3(NY,NX)/AREA(3,NU(NY,NX),NY,NX)      
       this%h1D_tMICRO_N_col(ncol)         = tMicBiome_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_TEMP_LITR_col(ncol)        = TCS(0,NY,NX)
       if(VcumSnowWE(NY,NX)<=ZEROS(NY,NX))then
@@ -1749,7 +1749,7 @@ implicit none
                                                SoilMicPMassLayer(L,NY,NX))
         this%h2D_cPO4_vr_col(ncol,L) = safe_adb(trc_solml_vr(ids_H1PO4,L,NY,NX)+trc_solml_vr(ids_H1PO4B,L,NY,NX) &
                                                +trc_solml_vr(ids_H2PO4,L,NY,NX)+trc_solml_vr(ids_H2PO4B,L,NY,NX),&
-                                               VLWatMicP(L,NY,NX))
+                                               VLWatMicP_vr(L,NY,NX))
         this%h2D_cEXCH_P_vr_col(ncol,L)= patomw*safe_adb(trcx_solml(idx_HPO4,L,NY,NX)+trcx_solml(idx_H2PO4,L,NY,NX) &
                                                +trcx_solml(idx_HPO4B,L,NY,NX)+trcx_solml(idx_H2PO4B,L,NY,NX),&
                                                SoilMicPMassLayer(L,NY,NX))

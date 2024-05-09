@@ -149,9 +149,9 @@ contains
 !     PSISM*=litter matric water potential
 !
   LWRadBySurf(NY,NX)=0.0_r8
-  VLHeatCapacity(0,NY,NX)=cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP(0,NY,NX)+cpi*VLiceMicP(0,NY,NX)
+  VLHeatCapacity(0,NY,NX)=cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP(0,NY,NX)
   VLPoreLitR(NY,NX)=VLMicP(0,NY,NX)
-  VLWatMicP1(0,NY,NX)=AZMAX1(VLWatMicP(0,NY,NX))
+  VLWatMicP1(0,NY,NX)=AZMAX1(VLWatMicP_vr(0,NY,NX))
   VLiceMicP1(0,NY,NX)=AZMAX1(VLiceMicP(0,NY,NX))
   VLairMicP1(0,NY,NX)=AZMAX1(VLPoreLitR(NY,NX)-VLWatMicP1(0,NY,NX)-VLiceMicP1(0,NY,NX))
   VLWatMicPM(1,0,NY,NX)=VLWatMicP1(0,NY,NX)
@@ -1270,7 +1270,7 @@ contains
 ! VWatLitRHoldCapcity=surface litter water holding capacity, [m3 d-2]
   IF(VWatLitRHoldCapcity(NY,NX).GT.ZEROS(NY,NX))THEN
     !litter is able to hold water
-    THETWT=AMIN1(1.0_r8,VLWatMicP(0,NY,NX)/VWatLitRHoldCapcity(NY,NX))
+    THETWT=AMIN1(1.0_r8,VLWatMicP_vr(0,NY,NX)/VWatLitRHoldCapcity(NY,NX))
   ELSE
     THETWT=1.0
   ENDIF

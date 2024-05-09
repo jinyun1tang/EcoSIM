@@ -248,7 +248,7 @@ module UptakesMod
     VLiceMicP                       => plt_soilchem%VLiceMicP         , &
     THETY_vr                        => plt_soilchem%THETY_vr          , &
     SoiBulkDensity                  => plt_soilchem%SoiBulkDensity    , &
-    VLWatMicP                       => plt_soilchem%VLWatMicP         , &
+    VLWatMicP_vr                    => plt_soilchem%VLWatMicP_vr      , &
     VLSoilMicP                      => plt_soilchem%VLSoilMicP        , &
     CanopyStemArea_pft              => plt_morph%CanopyStemArea_pft   , &
     MY                              => plt_morph%MY                   , &
@@ -306,7 +306,7 @@ module UptakesMod
     ElvAdjstedtSoiPSIMPa(L)=TotalSoilH2OPSIMPa(L)-mGravAccelerat*ALT
     IF(SoiBulkDensity(L).GT.ZERO)THEN
       WatAvail4Uptake(L)=VLWatMicPM(NPH,L)-THETY_vr(L)*VLSoilMicP(L)     !maximum amount of water for uptake
-      AirPoreAvail4Fill(L)=AZMAX1(VLMicP(L)-VLWatMicP(L)-VLiceMicP(L))  !air volume
+      AirPoreAvail4Fill(L)=AZMAX1(VLMicP(L)-VLWatMicP_vr(L)-VLiceMicP(L))  !air volume
     ELSE
       WatAvail4Uptake(L)=VLWatMicPM(NPH,L)
       AirPoreAvail4Fill(L)=0.0_r8

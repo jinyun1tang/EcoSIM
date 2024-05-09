@@ -236,10 +236,10 @@ implicit none
     micfor%RNO3EcoDmndLitrPrev =RNO3EcoDmndSoilPrev_vr(NU(NY,NX),NY,NX)
     micfor%RH2PO4EcoDmndLitrPrev =RH2PO4EcoDmndSoilPrev_vr(NU(NY,NX),NY,NX)
     micfor%RH1PO4EcoDmndLitrPrev =RH1PO4EcoDmndSoilPrev_vr(NU(NY,NX),NY,NX)
-    micfor%VOLWU =VLWatMicP(NU(NY,NX),NY,NX)
-    micfor%CFOMCU=CFOMC_vr(1:2,NU(NY,NX),NY,NX)
+    micfor%VOLWU =VLWatMicP_vr(NU(NY,NX),NY,NX)
+    micfor%ElmAllocmatMicrblitr2POMU=ElmAllocmatMicrblitr2POM_vr(1:2,NU(NY,NX),NY,NX)
   else
-    micfor%CFOMC =CFOMC_vr(1:2,L,NY,NX)
+    micfor%ElmAllocmatMicrblitr2POM =ElmAllocmatMicrblitr2POM_vr(1:2,L,NY,NX)
   endif
   micstt%CNH4B =trc_solcl_vr(ids_NH4B,L,NY,NX)
   micstt%CNH4S =trc_solcl_vr(ids_NH4,L,NY,NX)
@@ -253,7 +253,7 @@ implicit none
   micfor%RNO3EcoDmndSoilPrev =RNO3EcoDmndSoilPrev_vr(L,NY,NX)
   micfor%RH2PO4EcoDmndSoilPrev =RH2PO4EcoDmndSoilPrev_vr(L,NY,NX)
   micfor%RH1PO4EcoDmndSoilPrev =RH1PO4EcoDmndSoilPrev_vr(L,NY,NX)
-  micfor%VLWatMicP  =VLWatMicP(L,NY,NX)
+  micfor%VLWatMicP  =VLWatMicP_vr(L,NY,NX)
 
   if(micfor%Lsurf)then
     micfor%SoilMicPMassLayer0=SoilMicPMassLayer(0,NY,NX)
@@ -302,8 +302,8 @@ implicit none
   micstt%OMBioResdu(1:NumPlantChemElms,1:ndbiomcp,1:jcplx)=OMBioResdu_vr(1:NumPlantChemElms,1:ndbiomcp,1:jcplx,L,NY,NX)
   micstt%CNOSC(1:jsken,1:jcplx)=CNOSC(1:jsken,1:jcplx,L,NY,NX)
   micstt%CPOSC(1:jsken,1:jcplx)=CPOSC(1:jsken,1:jcplx,L,NY,NX)
-  micstt%mBOMHeter(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx)=mBOMHeter_vr(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx,L,NY,NX)
-  micstt%mBOMAutor(1:NumPlantChemElms,1:NumLiveAutoBioms)=mBOMAutor_vr(1:NumPlantChemElms,1:NumLiveAutoBioms,L,NY,NX)
+  micstt%mBiomeHeter(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx)=mBiomeHeter_vr(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx,L,NY,NX)
+  micstt%mBiomeAutor(1:NumPlantChemElms,1:NumLiveAutoBioms)=mBiomeAutor_vr(1:NumPlantChemElms,1:NumLiveAutoBioms,L,NY,NX)
   if(.not.micfor%litrm)then
     micfor%AEC=AEC(L,NY,NX)
     micstt%OXYG=trc_gasml_vr(idg_O2,L,NY,NX)
@@ -436,8 +436,8 @@ implicit none
   SorbedOM_vr(idom_beg:idom_end,1:jcplx,L,NY,NX)=micstt%SorbedOM(idom_beg:idom_end,1:jcplx)
 
   OMBioResdu_vr(1:NumPlantChemElms,1:ndbiomcp,1:jcplx,L,NY,NX)=micstt%OMBioResdu(1:NumPlantChemElms,1:ndbiomcp,1:jcplx)
-  mBOMHeter_vr(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx,L,NY,NX)=micstt%mBOMHeter(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx)
-  mBOMAutor_vr(1:NumPlantChemElms,1:NumLiveAutoBioms,L,NY,NX)=micstt%mBOMAutor(1:NumPlantChemElms,1:NumLiveAutoBioms)
+  mBiomeHeter_vr(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx,L,NY,NX)=micstt%mBiomeHeter(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx)
+  mBiomeAutor_vr(1:NumPlantChemElms,1:NumLiveAutoBioms,L,NY,NX)=micstt%mBiomeAutor(1:NumPlantChemElms,1:NumLiveAutoBioms)
 
   end subroutine MicAPIRecv
 end module MicBGCAPI
