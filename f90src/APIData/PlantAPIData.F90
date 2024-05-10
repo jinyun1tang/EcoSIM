@@ -108,7 +108,7 @@ implicit none
   real(r8), pointer :: RCS(:)    => null()   !shape parameter for calculating stomatal resistance from turgor pressure, [-]
   real(r8), pointer :: CanPCi2CaRatio(:)   => null()   !Ci:Ca ratio, [-]
   real(r8), pointer :: MaxCanPStomaResistH2O_pft(:)   => null()   !maximum stomatal resistance to vapor, [s h-1]
-  real(r8), pointer :: CHILL(:)  => null()   !chilling effect on CO2 fixation, [-]
+  real(r8), pointer :: ChillHours_pft(:)  => null()   !chilling effect on CO2 fixation, [-]
   real(r8), pointer :: CO2Solubility_pft(:)   => null()   !leaf CO2 solubility, [uM /umol mol-1]
   real(r8), pointer :: CanopyGasCO2_pft(:)   => null()   !canopy gaesous CO2 concentration , [umol mol-1]
   real(r8), pointer :: O2L(:)    => null()   !leaf aqueous O2 concentration, [uM]
@@ -565,7 +565,7 @@ implicit none
   real(r8), pointer :: TKS(:)    => null()    !mean annual soil temperature, [K]
   real(r8), pointer :: PSICanPDailyMin(:)  => null()    !minimum daily canopy water potential, [MPa]
   real(r8), pointer :: TCelciusCanopy_pft(:)    => null()    !canopy temperature, [oC]
-  real(r8), pointer :: DTKC(:)   => null()    !change in canopy temperature, [K]
+  real(r8), pointer :: DeltaTKC(:)   => null()    !change in canopy temperature, [K]
   real(r8), pointer :: ENGYX(:)  => null()    !canopy heat storage from previous time step, [MJ d-2]
   real(r8), pointer :: TKC(:)    => null()    !canopy temperature, [K]
   real(r8), pointer :: PSICanopyOsmo_pft(:)  => null()    !canopy osmotic water potential, [Mpa]
@@ -660,7 +660,7 @@ implicit none
   real(r8), pointer :: RO2AquaXchangePrev_vr(:)      => null()   !net aqueous O2 flux, [g d-2 h-1]
   real(r8), pointer :: RO2EcoDmndPrev_vr(:)      => null()   !total root + microbial O2 uptake, [g d-2 h-1]
   real(r8), pointer :: TCO2P(:)      => null()   !total root CO2 flux, [gC d-2 h-1]
-  real(r8), pointer :: TRO2Uptk_vr(:)     => null()   !total root internal O2 flux, [g d-2 h-1]
+  real(r8), pointer :: tRO2MicrbUptk_vr(:)     => null()   !total root internal O2 flux, [g d-2 h-1]
   real(r8), pointer :: LitrfalStrutElms_vr(:,:,:,:)   => null() !total LitrFall element, [g d-2 h-1]
   real(r8), pointer :: REcoDOMUptk_vr(:,:,:)    => null()  !net microbial DOC flux, [gC d-2 h-1]
   real(r8), pointer :: CO2NetFix_pft(:)       => null()  !canopy net CO2 exchange, [gC d-2 h-1]
@@ -966,7 +966,7 @@ implicit none
   class(plant_bgcrate_type) :: this
 
   allocate(this%TCO2P(JZ1)); this%TCO2P=spval
-  allocate(this%TRO2Uptk_vr(JZ1)); this%TRO2Uptk_vr=spval
+  allocate(this%tRO2MicrbUptk_vr(JZ1)); this%tRO2MicrbUptk_vr=spval
   allocate(this%RH2PO4EcoDmndSoilPrev_vr(0:JZ1)); this%RH2PO4EcoDmndSoilPrev_vr=spval
   allocate(this%RH2PO4EcoDmndBandPrev_vr(0:JZ1)); this%RH2PO4EcoDmndBandPrev_vr=spval
   allocate(this%RH1PO4EcoDmndSoilPrev_vr(0:JZ1)); this%RH1PO4EcoDmndSoilPrev_vr=spval
@@ -1115,7 +1115,7 @@ implicit none
   allocate(this%TKS(0:JZ1));this%TKS=spval
   allocate(this%OSMO(JP1));this%OSMO=spval
   allocate(this%RAZ(JP1));this%RAZ=spval
-  allocate(this%DTKC(JP1));this%DTKC=spval
+  allocate(this%DeltaTKC(JP1));this%DeltaTKC=spval
   allocate(this%TKC(JP1));this%TKC=spval
   allocate(this%ENGYX(JP1));this%ENGYX=spval
   allocate(this%TCelciusCanopy_pft(JP1));this%TCelciusCanopy_pft=spval
@@ -1153,7 +1153,7 @@ implicit none
 !  if(allocated(PSICanPDailyMin))deallocate(PSICanPDailyMin)
 !  if(allocated(RAZ))deallocate(RAZ)
 !  if(allocated(OSMO))deallocate(OSMO)
-!  if(allocated(DTKC))deallocate(DTKC)
+!  if(allocated(DeltaTKC))deallocate(DeltaTKC)
 !  if(allocated(TKC))deallocate(TKC)
 !  if(allocated(ENGYX))deallocate(ENGYX)
 !  if(allocated(TCelciusCanopy_pft))deallocate(TCelciusCanopy_pft)
@@ -1670,7 +1670,7 @@ implicit none
   allocate(this%O2L(JP1));this%O2L=spval
   allocate(this%CO2Solubility_pft(JP1));this%CO2Solubility_pft=spval
   allocate(this%CanopyGasCO2_pft(JP1));this%CanopyGasCO2_pft=spval
-  allocate(this%CHILL(JP1));this%CHILL=spval
+  allocate(this%ChillHours_pft(JP1));this%ChillHours_pft=spval
   allocate(this%SpecChloryfilAct_pft(JP1));this%SpecChloryfilAct_pft=spval
   allocate(this%LeafC3ChlorofilConc_pft(JP1));this%LeafC3ChlorofilConc_pft=spval
   allocate(this%FracLeafProtinAsPEPCarboxyl_pft(JP1));this%FracLeafProtinAsPEPCarboxyl_pft=spval

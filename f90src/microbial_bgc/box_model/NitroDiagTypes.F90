@@ -32,20 +32,20 @@ type, public :: NitroAQMFluxDiagType
     real(r8) :: TFPO4X
 !fluxes
     real(r8) :: TRH2G
-    real(r8) :: TRINH
-    real(r8) :: TRIPO
-    real(r8) :: TRINO
-    real(r8) :: TRIP1
-    real(r8) :: TRINB
-    real(r8) :: TRIOB
-    real(r8) :: TRIPB
-    real(r8) :: TRIB1
-    real(r8) :: TRGOM
-    real(r8) :: TRGOC
-    real(r8) :: TRGOD
+    real(r8) :: tRNH4MicrbTransfSoil
+    real(r8) :: tRH2PO4MicrbTransfSoil
+    real(r8) :: tRNO3MicrbTransfSoil
+    real(r8) :: tRH1PO4MicrbTransfSoil
+    real(r8) :: tRNH4MicrbTransfBand
+    real(r8) :: tRNO3MicrbTransfBand
+    real(r8) :: tRH2PO4MicrbTransfBand
+    real(r8) :: tRH1PO4MicrbTransfBand
+    real(r8) :: tRCO2MicrbProd
+    real(r8) :: tRCH4MicrbProd
+    real(r8) :: tRNOxMicrbRedux
     real(r8) :: TRGOA
     real(r8) :: TProdH2               !H2 production by fermenters
-    real(r8) :: TUPOX
+    real(r8) :: tRO2MicrbUptk
     real(r8) :: TReduxNO3Soil         !NO3 reduction in non-band soil by denitrifiers
     real(r8) :: TReduxNO3Band         !NO3 reduction in banded soil by denitrifiers
     real(r8) :: TReduxNO2Soil         !NO2 reduction in non-band soil, by ammonia oxidizers, and denitrifiers
@@ -227,10 +227,10 @@ type, public :: NitroAQMFluxDiagType
     real(r8),allocatable :: TOPK(:)
     real(r8),allocatable :: FOCA(:)
     real(r8),allocatable :: FOAA(:)
-    real(r8),allocatable :: CNQ(:)
-    real(r8),allocatable :: CPQ(:)
-    real(r8),allocatable :: CNH(:)
-    real(r8),allocatable :: CPH(:)
+    real(r8),allocatable :: rCNDOM(:)
+    real(r8),allocatable :: rCPDOM(:)
+    real(r8),allocatable :: rCNSorbOM(:)
+    real(r8),allocatable :: rCPSorbOM(:)
     real(r8),allocatable :: OMBioResduK(:)
     real(r8),allocatable :: SolidOMK(:)
     real(r8),allocatable :: SolidOMActK(:)
@@ -295,21 +295,21 @@ type, public :: NitroAQMFluxDiagType
   this%TFPO4X = 0._r8
 
   this%TRH2G = 0._r8
-  this%TRINH = 0._r8
-  this%TRIPO = 0._r8
-  this%TRINO=0.0_r8
-  this%TRIPO=0.0_r8
-  this%TRIP1=0.0_r8
-  this%TRINB=0.0_r8
-  this%TRIOB=0.0_r8
-  this%TRIPB=0.0_r8
-  this%TRIB1=0.0_r8
-  this%TRGOM=0.0_r8
-  this%TRGOC=0.0_r8
-  this%TRGOD=0.0_r8
+  this%tRNH4MicrbTransfSoil = 0._r8
+  this%tRH2PO4MicrbTransfSoil = 0._r8
+  this%tRNO3MicrbTransfSoil=0.0_r8
+  this%tRH2PO4MicrbTransfSoil=0.0_r8
+  this%tRH1PO4MicrbTransfSoil=0.0_r8
+  this%tRNH4MicrbTransfBand=0.0_r8
+  this%tRNO3MicrbTransfBand=0.0_r8
+  this%tRH2PO4MicrbTransfBand=0.0_r8
+  this%tRH1PO4MicrbTransfBand=0.0_r8
+  this%tRCO2MicrbProd=0.0_r8
+  this%tRCH4MicrbProd=0.0_r8
+  this%tRNOxMicrbRedux=0.0_r8
   this%TRGOA=0.0_r8
   this%TProdH2=0.0_r8
-  this%TUPOX=0.0_r8
+  this%tRO2MicrbUptk=0.0_r8
   this%TReduxNO3Soil=0.0_r8
   this%TReduxNO3Band=0.0_r8
   this%TReduxNO2Soil=0.0_r8
@@ -794,10 +794,10 @@ type, public :: NitroAQMFluxDiagType
   allocate(this%TOPK(1:ncplx+1));this%TOPK=spval
   allocate(this%FOCA(1:ncplx));this%FOCA=spval
   allocate(this%FOAA(1:ncplx));this%FOAA=spval
-  allocate(this%CNQ(1:ncplx));this%CNQ=spval
-  allocate(this%CPQ(1:ncplx));this%CPQ=spval
-  allocate(this%CNH(1:ncplx));this%CNH=spval
-  allocate(this%CPH(1:ncplx));this%CPH=spval
+  allocate(this%rCNDOM(1:ncplx));this%rCNDOM=spval
+  allocate(this%rCPDOM(1:ncplx));this%rCPDOM=spval
+  allocate(this%rCNSorbOM(1:ncplx));this%rCNSorbOM=spval
+  allocate(this%rCPSorbOM(1:ncplx));this%rCPSorbOM=spval
   allocate(this%OMBioResduK(1:ncplx));this%OMBioResduK=spval
   allocate(this%SolidOMK(1:ncplx));this%SolidOMK=spval
   allocate(this%SolidOMActK(1:ncplx));this%SolidOMActK=spval
@@ -819,10 +819,10 @@ type, public :: NitroAQMFluxDiagType
   this%TOPK=0._r8
   this%FOCA=0._r8
   this%FOAA=0._r8
-  this%CNQ=0._r8
-  this%CPQ=0._r8
-  this%CNH=0._r8
-  this%CPH=0._r8
+  this%rCNDOM=0._r8
+  this%rCPDOM=0._r8
+  this%rCNSorbOM=0._r8
+  this%rCPSorbOM=0._r8
   this%OMBioResduK=0._r8
   this%SolidOMK=0._r8
   this%SolidOMActK=0._r8
@@ -843,10 +843,10 @@ type, public :: NitroAQMFluxDiagType
   call destroy(this%TOPK)
   call destroy(this%FOCA)
   call destroy(this%FOAA)
-  call destroy(this%CNQ)
-  call destroy(this%CPQ)
-  call destroy(this%CNH)
-  call destroy(this%CPH)
+  call destroy(this%rCNDOM)
+  call destroy(this%rCPDOM)
+  call destroy(this%rCNSorbOM)
+  call destroy(this%rCPSorbOM)
   call destroy(this%OMBioResduK)
   call destroy(this%SolidOMK)
   call destroy(this%SolidOMActK)

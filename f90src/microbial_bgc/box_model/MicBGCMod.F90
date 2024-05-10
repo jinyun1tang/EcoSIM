@@ -245,8 +245,8 @@ module MicBGCMod
     TOPK                      => ncplxs%TOPK,                      &
     FOCA                      => ncplxs%FOCA,                      &
     FOAA                      => ncplxs%FOAA,                      &
-    CNQ                       => ncplxs%CNQ,                       &
-    CPQ                       => ncplxs%CPQ,                       &
+    rCNDOM                       => ncplxs%rCNDOM,                       &
+    rCPDOM                       => ncplxs%rCPDOM,                       &
     CDOM                      => ncplxs%CDOM,                      &
     OMBioResduK               => ncplxs%OMBioResduK,               &
     SolidOMK                  => ncplxs%SolidOMK,                  &
@@ -576,14 +576,14 @@ module MicBGCMod
       CDOM(idom_acetate,K)=0.0_r8
     ENDIF
 !
-!     CNQ,CPQ=DON:DOC,DOP:DOC,FOCA,FOAA=DOC,DOA:(DOC+DOA)
+!     rCNDOM,rCPDOM=DON:DOC,DOP:DOC,FOCA,FOAA=DOC,DOA:(DOC+DOA)
 !
     IF(DOM(idom_doc,K).GT.ZEROS)THEN
-      CNQ(K)=AZMAX1(DOM(idom_don,K)/DOM(idom_doc,K))
-      CPQ(K)=AZMAX1(DOM(idom_dop,K)/DOM(idom_doc,K))
+      rCNDOM(K)=AZMAX1(DOM(idom_don,K)/DOM(idom_doc,K))
+      rCPDOM(K)=AZMAX1(DOM(idom_dop,K)/DOM(idom_doc,K))
     ELSE
-      CNQ(K)=0.0_r8
-      CPQ(K)=0.0_r8
+      rCNDOM(K)=0.0_r8
+      rCPDOM(K)=0.0_r8
     ENDIF
     IF(DOM(idom_doc,K).GT.ZEROS.AND.DOM(idom_acetate,K).GT.ZEROS)THEN
       FOCA(K)=DOM(idom_doc,K)/(DOM(idom_doc,K)+DOM(idom_acetate,K))
@@ -1350,8 +1350,8 @@ module MicBGCMod
     TOMK                 => ncplxs%TOMK,                 &
     TONK                 => ncplxs%TONK,                 &
     TOPK                 => ncplxs%TOPK,                 &
-    CNH                  => ncplxs%CNH,                  &
-    CPH                  => ncplxs%CPH,                  &
+    rCNSorbOM                  => ncplxs%rCNSorbOM,                  &
+    rCPSorbOM                  => ncplxs%rCPSorbOM,                  &
     TONX                 => ncplxs%TONX,                 &
     TOPX                 => ncplxs%TOPX,                 &
     VOLWZ                => nmicdiag%VOLWZ,              &
@@ -1548,7 +1548,7 @@ module MicBGCMod
 !     TEMPERATURE, SUBSTRATE C:N, C:P
 !
 !     OHC,OHN,OHP,OHA=adsorbed C,N,P,acetate
-!     CNH,CPH=N:C,P:C ratios of adsorbed C,N,P
+!     rCNSorbOM,rCPSorbOM=N:C,P:C ratios of adsorbed C,N,P
 !     RDOHC,RDOHN,RDOHP,RDOHA=decomposition of adsorbed C,N,P,acetate
 !     SPOHC=specific decomposition rate constant for adsorbed C
 !     ROQC4HeterMicActCmpK=total respiration of DOC+DOA used to represent microbial activity
@@ -1560,26 +1560,26 @@ module MicBGCMod
 !
   IF(BulkSOMC(K).GT.ZEROS)THEN
     IF(SorbedOM(ielmc,K).GT.ZEROS)THEN
-      CNH(K)=AZMAX1(SorbedOM(ielmn,K)/SorbedOM(ielmc,K))
-      CPH(K)=AZMAX1(SorbedOM(ielmp,K)/SorbedOM(ielmc,K))
+      rCNSorbOM(K)=AZMAX1(SorbedOM(ielmn,K)/SorbedOM(ielmc,K))
+      rCPSorbOM(K)=AZMAX1(SorbedOM(ielmp,K)/SorbedOM(ielmc,K))
       RHydlysSorptOM(ielmc,K)=AZMAX1(AMIN1(SorbedOM(ielmc,K) &
         ,SPOHC*ROQC4HeterMicActCmpK(K)*DFNS*OQCI*TSensGrowth*SorbedOM(ielmc,K)/BulkSOMC(K)))
 !    3*AMIN1(FCNK(K),FCPK(K))
-      RHydlysSorptOM(ielmn,K)=AZMAX1(AMIN1(SorbedOM(ielmn,K),CNH(K)*RHydlysSorptOM(ielmc,K)))/FCNK(K)
-      RHydlysSorptOM(ielmp,K)=AZMAX1(AMIN1(SorbedOM(ielmp,K),CPH(K)*RHydlysSorptOM(ielmc,K)))/FCPK(K)
+      RHydlysSorptOM(ielmn,K)=AZMAX1(AMIN1(SorbedOM(ielmn,K),rCNSorbOM(K)*RHydlysSorptOM(ielmc,K)))/FCNK(K)
+      RHydlysSorptOM(ielmp,K)=AZMAX1(AMIN1(SorbedOM(ielmp,K),rCPSorbOM(K)*RHydlysSorptOM(ielmc,K)))/FCPK(K)
       RHydlysSorptOM(idom_acetate,K)=AZMAX1(AMIN1(SorbedOM(idom_acetate,K) &
         ,SPOHA*ROQC4HeterMicActCmpK(K)*DFNS*TSensGrowth*SorbedOM(idom_acetate,K)/BulkSOMC(K)))
 !    3*AMIN1(FCNK(K),FCPK(K))
     ELSE
-      CNH(K)=0.0_r8
-      CPH(K)=0.0_r8
+      rCNSorbOM(K)=0.0_r8
+      rCPSorbOM(K)=0.0_r8
       DO idom=idom_beg,idom_end
         RHydlysSorptOM(idom,K)=0.0_r8
       ENDDO
     ENDIF
   ELSE
-    CNH(K)=0.0_r8
-    CPH(K)=0.0_r8
+    rCNSorbOM(K)=0.0_r8
+    rCPSorbOM(K)=0.0_r8
     DO idom=idom_beg,idom_end          
       RHydlysSorptOM(idom,K)=0.0_r8
     ENDDO
@@ -1603,7 +1603,7 @@ module MicBGCMod
 !     begin_execution
   associate(                                                                    &
     k_POM                            => micpar%k_POM,                           &
-    DOMuptk4GrothHeter                      => nmicf%DOMuptk4GrothHeter,                      &
+    DOMuptk4GrothHeter               => nmicf%DOMuptk4GrothHeter,               &
     RAnabolDOCUptkHeter              => nmicf%RAnabolDOCUptkHeter,              &
     RAnabolAcetUptkHeter             => nmicf%RAnabolAcetUptkHeter,             &
     RkillLitrfal2ResduOMHeter        => nmicf%RkillLitrfal2ResduOMHeter,        &
@@ -2062,25 +2062,25 @@ module MicBGCMod
     IF(.not.litrm.OR.(K.NE.k_POM.AND.K.NE.k_humus))THEN
       DO N=1,NumMicbFunGrupsPerCmplx
         DO NGL=JGnio(N),JGnfo(N)
-          naqfdiag%TRINH=naqfdiag%TRINH+RNH4TransfSoilHeter(NGL,K)
-          naqfdiag%TRINO=naqfdiag%TRINO+RNO3TransfSoilHeter(NGL,K)
-          naqfdiag%TRIPO=naqfdiag%TRIPO+RH2PO4TransfSoilHeter(NGL,K)
-          naqfdiag%TRIP1=naqfdiag%TRIP1+RH1PO4TransfSoilHeter(NGL,K)
-          naqfdiag%TRINB=naqfdiag%TRINB+RNH4TransfBandHeter(NGL,K)
-          naqfdiag%TRIOB=naqfdiag%TRIOB+RNO3TransfBandHeter(NGL,K)
-          naqfdiag%TRIPB=naqfdiag%TRIPB+RH2PO4TransfBandHeter(NGL,K)
-          naqfdiag%TRIB1=naqfdiag%TRIB1+RH1PO4TransfBandHeter(NGL,K)
+          naqfdiag%tRNH4MicrbTransfSoil=naqfdiag%tRNH4MicrbTransfSoil+RNH4TransfSoilHeter(NGL,K)
+          naqfdiag%tRNO3MicrbTransfSoil=naqfdiag%tRNO3MicrbTransfSoil+RNO3TransfSoilHeter(NGL,K)
+          naqfdiag%tRH2PO4MicrbTransfSoil=naqfdiag%tRH2PO4MicrbTransfSoil+RH2PO4TransfSoilHeter(NGL,K)
+          naqfdiag%tRH1PO4MicrbTransfSoil=naqfdiag%tRH1PO4MicrbTransfSoil+RH1PO4TransfSoilHeter(NGL,K)
+          naqfdiag%tRNH4MicrbTransfBand=naqfdiag%tRNH4MicrbTransfBand+RNH4TransfBandHeter(NGL,K)
+          naqfdiag%tRNO3MicrbTransfBand=naqfdiag%tRNO3MicrbTransfBand+RNO3TransfBandHeter(NGL,K)
+          naqfdiag%tRH2PO4MicrbTransfBand=naqfdiag%tRH2PO4MicrbTransfBand+RH2PO4TransfBandHeter(NGL,K)
+          naqfdiag%tRH1PO4MicrbTransfBand=naqfdiag%tRH1PO4MicrbTransfBand+RH1PO4TransfBandHeter(NGL,K)
           naqfdiag%TFixN2=naqfdiag%TFixN2+RN2FixHeter(NGL,K)
           IF(Lsurf)THEN
-            naqfdiag%TRINH=naqfdiag%TRINH+RNH4TransfLitrHeter(NGL,K)
-            naqfdiag%TRINO=naqfdiag%TRINO+RNO3TransfLitrHeter(NGL,K)
-            naqfdiag%TRIPO=naqfdiag%TRIPO+RH2PO4TransfLitrHeter(NGL,K)
-            naqfdiag%TRIP1=naqfdiag%TRIP1+RH1PO4TransfLitrHeter(NGL,K)
+            naqfdiag%tRNH4MicrbTransfSoil=naqfdiag%tRNH4MicrbTransfSoil+RNH4TransfLitrHeter(NGL,K)
+            naqfdiag%tRNO3MicrbTransfSoil=naqfdiag%tRNO3MicrbTransfSoil+RNO3TransfLitrHeter(NGL,K)
+            naqfdiag%tRH2PO4MicrbTransfSoil=naqfdiag%tRH2PO4MicrbTransfSoil+RH2PO4TransfLitrHeter(NGL,K)
+            naqfdiag%tRH1PO4MicrbTransfSoil=naqfdiag%tRH1PO4MicrbTransfSoil+RH1PO4TransfLitrHeter(NGL,K)
           ENDIF
-          naqfdiag%TRGOM=naqfdiag%TRGOM+RCO2ProdHeter(NGL,K)
-          naqfdiag%TRGOC=naqfdiag%TRGOC+RCH4ProdHeter(NGL,K)
-          naqfdiag%TRGOD=naqfdiag%TRGOD+RNOxReduxRespDenitLim(NGL,K)
-          naqfdiag%TUPOX=naqfdiag%TUPOX+RO2UptkHeter(NGL,K)
+          naqfdiag%tRCO2MicrbProd=naqfdiag%tRCO2MicrbProd+RCO2ProdHeter(NGL,K)
+          naqfdiag%tRCH4MicrbProd=naqfdiag%tRCH4MicrbProd+RCH4ProdHeter(NGL,K)
+          naqfdiag%tRNOxMicrbRedux=naqfdiag%tRNOxMicrbRedux+RNOxReduxRespDenitLim(NGL,K)
+          naqfdiag%tRO2MicrbUptk=naqfdiag%tRO2MicrbUptk+RO2UptkHeter(NGL,K)
           naqfdiag%TReduxNO3Soil=naqfdiag%TReduxNO3Soil+RNO3ReduxHeterSoil(NGL,K)
           naqfdiag%TReduxNO3Band=naqfdiag%TReduxNO3Band+RNO3ReduxHeterBand(NGL,K)
           naqfdiag%TReduxNO2Soil=naqfdiag%TReduxNO2Soil+RNO2ReduxHeterSoil(NGL,K)
@@ -2095,25 +2095,25 @@ module MicBGCMod
   DO  N=1,NumMicbFunGrupsPerCmplx
     IF(is_activeMicrbFungrpAutor(N))THEN
       DO NGL=JGniA(N),JGnfA(N)
-        naqfdiag%TRINH=naqfdiag%TRINH+RNH4TransfSoilAutor(NGL)
-        naqfdiag%TRINO=naqfdiag%TRINO+RNO3TransfSoilAutor(NGL)
-        naqfdiag%TRIPO=naqfdiag%TRIPO+RH2PO4TransfSoilAutor(NGL)
-        naqfdiag%TRIP1=naqfdiag%TRIP1+RH1PO4TransfSoilAutor(NGL)
-        naqfdiag%TRINB=naqfdiag%TRINB+RNH4TransfBandAutor(NGL)
-        naqfdiag%TRIOB=naqfdiag%TRIOB+RNO3TransfBandAutor(NGL)
-        naqfdiag%TRIPB=naqfdiag%TRIPB+RH2PO4TransfBandAutor(NGL)
-        naqfdiag%TRIB1=naqfdiag%TRIB1+RH1PO4TransfBandAutor(NGL)
+        naqfdiag%tRNH4MicrbTransfSoil=naqfdiag%tRNH4MicrbTransfSoil+RNH4TransfSoilAutor(NGL)
+        naqfdiag%tRNO3MicrbTransfSoil=naqfdiag%tRNO3MicrbTransfSoil+RNO3TransfSoilAutor(NGL)
+        naqfdiag%tRH2PO4MicrbTransfSoil=naqfdiag%tRH2PO4MicrbTransfSoil+RH2PO4TransfSoilAutor(NGL)
+        naqfdiag%tRH1PO4MicrbTransfSoil=naqfdiag%tRH1PO4MicrbTransfSoil+RH1PO4TransfSoilAutor(NGL)
+        naqfdiag%tRNH4MicrbTransfBand=naqfdiag%tRNH4MicrbTransfBand+RNH4TransfBandAutor(NGL)
+        naqfdiag%tRNO3MicrbTransfBand=naqfdiag%tRNO3MicrbTransfBand+RNO3TransfBandAutor(NGL)
+        naqfdiag%tRH2PO4MicrbTransfBand=naqfdiag%tRH2PO4MicrbTransfBand+RH2PO4TransfBandAutor(NGL)
+        naqfdiag%tRH1PO4MicrbTransfBand=naqfdiag%tRH1PO4MicrbTransfBand+RH1PO4TransfBandAutor(NGL)
         naqfdiag%TFixN2=naqfdiag%TFixN2+RN2FixAutor(NGL)
         IF(Lsurf)THEN
-          naqfdiag%TRINH=naqfdiag%TRINH+RNH4TransfLitrAutor(NGL)
-          naqfdiag%TRINO=naqfdiag%TRINO+RNO3TransfLitrAutor(NGL)
-          naqfdiag%TRIPO=naqfdiag%TRIPO+RH2PO4TransfLitrAutor(NGL)
-          naqfdiag%TRIP1=naqfdiag%TRIP1+RH1PO4TransfLitrAutor(NGL)
+          naqfdiag%tRNH4MicrbTransfSoil=naqfdiag%tRNH4MicrbTransfSoil+RNH4TransfLitrAutor(NGL)
+          naqfdiag%tRNO3MicrbTransfSoil=naqfdiag%tRNO3MicrbTransfSoil+RNO3TransfLitrAutor(NGL)
+          naqfdiag%tRH2PO4MicrbTransfSoil=naqfdiag%tRH2PO4MicrbTransfSoil+RH2PO4TransfLitrAutor(NGL)
+          naqfdiag%tRH1PO4MicrbTransfSoil=naqfdiag%tRH1PO4MicrbTransfSoil+RH1PO4TransfLitrAutor(NGL)
         ENDIF
-        naqfdiag%TRGOM=naqfdiag%TRGOM+RCO2ProdAutor(NGL)
-        naqfdiag%TRGOC=naqfdiag%TRGOC+RCH4ProdAutor(NGL)
-        naqfdiag%TRGOD=naqfdiag%TRGOD+RNOxReduxRespAutorLim(NGL)
-        naqfdiag%TUPOX=naqfdiag%TUPOX+RO2UptkAutor(NGL)
+        naqfdiag%tRCO2MicrbProd=naqfdiag%tRCO2MicrbProd+RCO2ProdAutor(NGL)
+        naqfdiag%tRCH4MicrbProd=naqfdiag%tRCH4MicrbProd+RCH4ProdAutor(NGL)
+        naqfdiag%tRNOxMicrbRedux=naqfdiag%tRNOxMicrbRedux+RNOxReduxRespAutorLim(NGL)
+        naqfdiag%tRO2MicrbUptk=naqfdiag%tRO2MicrbUptk+RO2UptkAutor(NGL)
         naqfdiag%TReduxNO3Soil=naqfdiag%TReduxNO3Soil+RNO3UptkAutor(NGL)
         naqfdiag%TReduxNO2Soil=naqfdiag%TReduxNO2Soil+RNO2ReduxAutorSoil(NGL)
         naqfdiag%TReduxNO2Band=naqfdiag%TReduxNO2Band+RNO2ReduxAutorBand(NGL)
@@ -2135,31 +2135,31 @@ module MicBGCMod
 !     STATE VARIABLES IN 'REDIST'
 !
 !     RCO2NetUptkMicb=net CO2 uptake
-!     TRGOM total CO2 emission by heterotrophs reducing O2
-!     TRGOD=total CO2 emission by denitrifiers reducing NOx
+!     tRCO2MicrbProd total CO2 emission by heterotrophs reducing O2
+!     tRNOxMicrbRedux=total CO2 emission by denitrifiers reducing NOx
 !     RSOxidSoilAutor(3)=CH4 oxidation
 !     RCH4UptkAutor=net CH4 uptake
 !     DOMuptk4GrothHeter=total CH4 uptake by autotrophs
-!     TRGOC=total CH4 emission
+!     tRCH4MicrbProd=total CH4 emission
 !     RH2NetUptkMicb=net H2 uptake
 !     RH2UptkAutor,TProdH2=total H2 uptake, emission
-!     RO2UptkMicb,TUPOX=total O2 uptake
+!     RO2UptkMicb,tRO2MicrbUptk=total O2 uptake
 !     RN2NetUptkMicb=total N2 production
 !     TReduxN2O=total N2O reduction
 !     RN2ONetUptkMicb=total N2O uptake
 !     TReduxNO2Soil,TReduxNO2Band=total NO2 reduction in non-band,band
 !     RN2OProdSoilChemo,RN2OProdBandChemo=nitrous acid reduction in non-band,band
 !
-!  print*,'RCO2NetUptkMicb',naqfdiag%TRGOA,naqfdiag%TRGOM,naqfdiag%TRGOD
-  RCO2NetUptkMicb=naqfdiag%TRGOA-naqfdiag%TRGOM-naqfdiag%TRGOD
-  RCH4UptkAutor=-naqfdiag%TRGOC
+!  print*,'RCO2NetUptkMicb',naqfdiag%TRGOA,naqfdiag%tRCO2MicrbProd,naqfdiag%tRNOxMicrbRedux
+  RCO2NetUptkMicb=naqfdiag%TRGOA-naqfdiag%tRCO2MicrbProd-naqfdiag%tRNOxMicrbRedux
+  RCH4UptkAutor=-naqfdiag%tRCH4MicrbProd
 
   DO NGL=JGniA(AerobicMethanotrofBacter),JGnfA(AerobicMethanotrofBacter)
     RCO2NetUptkMicb=RCO2NetUptkMicb-RSOxidSoilAutor(NGL)
     RCH4UptkAutor=RCH4UptkAutor+RSOxidSoilAutor(NGL)+DOMuptk4GrothAutor(ielmc,NGL)
   ENDDO
   RH2NetUptkMicb =RH2UptkAutor-naqfdiag%TProdH2
-  RO2UptkMicb=naqfdiag%TUPOX
+  RO2UptkMicb=naqfdiag%tRO2MicrbUptk
   RN2NetUptkMicb  =-naqfdiag%TReduxN2O
   RN2ONetUptkMicb  =-naqfdiag%TReduxNO2Soil-naqfdiag%TReduxNO2Band-RN2OProdSoilChemo-RN2OProdBandChemo+naqfdiag%TReduxN2O
 !
@@ -2194,10 +2194,10 @@ module MicBGCMod
   ENDDO D655
 !
 !     RNH4MicbTransfSoil,RNH4MicbTransfBand=net change in NH4 in band,non-band
-!     TRINH,TRINB=total NH4 mineraln-immobn in non-band,band
+!     tRNH4MicrbTransfSoil,tRNH4MicrbTransfBand=total NH4 mineraln-immobn in non-band,band
 !     RSOxidSoilAutor(1),RSOxidBandAutor(1)=total NH4 oxidation in non-band,band
 !     RNO3MicbTransfSoil,RNO3MicbTransfBand=net change in NO3 in band,non-band
-!     TRINO,TRIOB=total NO3 immobn in non-band,band
+!     tRNO3MicrbTransfSoil,tRNO3MicrbTransfBand=total NO3 immobn in non-band,band
 !     RSOxidSoilAutor(2),RSOxidBandAutor(2)=total NO2 oxidation in non-band,band
 !     TReduxNO3Soil,TReduxNO3Band=total NO3 reduction in non-band,band
 !     RNO3ProdSoilChemo,RNO3ProdBandChemo=NO3 production from nitrous acid reduction in non-band,band
@@ -2205,20 +2205,20 @@ module MicBGCMod
 !     TReduxNO2Soil,TReduxNO2Band=total NO2 reduction in non-band,band
 !     RNO2ReduxSoilChemo,RNO2ReduxBandChemo=substrate-limited nitrous acid reduction in non-band,band
 !     RH2PO4MicbTransfSoil,RH2PO4MicbTransfBand=net change in H2PO4 in band,non-band
-!     TRIPO,TRIPB=total H2PO4 mineraln-immobn in non-band,band
+!     tRH2PO4MicrbTransfSoil,tRH2PO4MicrbTransfBand=total H2PO4 mineraln-immobn in non-band,band
 !     RH1PO4MicbTransfSoil,RH1PO4MicbTransfBand=net change in HPO4 in band,non-band
-!     TRIP1,TRIB1=total HPO4 mineraln-immobn in non-band,band
+!     tRH1PO4MicrbTransfSoil,tRH1PO4MicrbTransfBand=total HPO4 mineraln-immobn in non-band,band
 !     MicrbN2Fix=total N2 fixation
 !     XZHYS=total H+ production
 !     TFixN2=total N2 fixation
 !
-  RNH4MicbTransfSoil=-naqfdiag%TRINH
-  RNO3MicbTransfSoil=-naqfdiag%TRINO-naqfdiag%TReduxNO3Soil+RNO3ProdSoilChemo
+  RNH4MicbTransfSoil=-naqfdiag%tRNH4MicrbTransfSoil
+  RNO3MicbTransfSoil=-naqfdiag%tRNO3MicrbTransfSoil-naqfdiag%TReduxNO3Soil+RNO3ProdSoilChemo
   RNO2MicbTransfSoil=+naqfdiag%TReduxNO3Soil-naqfdiag%TReduxNO2Soil-RNO2ReduxSoilChemo
-  RH2PO4MicbTransfSoil=-naqfdiag%TRIPO
-  RH1PO4MicbTransfSoil=-naqfdiag%TRIP1
-  RNH4MicbTransfBand=-naqfdiag%TRINB
-  RNO3MicbTransfBand=-naqfdiag%TRIOB-naqfdiag%TReduxNO3Band+RNO3ProdBandChemo
+  RH2PO4MicbTransfSoil=-naqfdiag%tRH2PO4MicrbTransfSoil
+  RH1PO4MicbTransfSoil=-naqfdiag%tRH1PO4MicrbTransfSoil
+  RNH4MicbTransfBand=-naqfdiag%tRNH4MicrbTransfBand
+  RNO3MicbTransfBand=-naqfdiag%tRNO3MicrbTransfBand-naqfdiag%TReduxNO3Band+RNO3ProdBandChemo
   RNO2MicbTransfBand=naqfdiag%TReduxNO3Band-naqfdiag%TReduxNO2Band-RNO2ReduxBandChemo
   !AmmoniaOxidBacter=1, NitriteOxidBacter=2, AerobicMethanotrofBacter=3
   DO NGL=JGniA(AmmoniaOxidBacter),JGnfA(AmmoniaOxidBacter)
@@ -2233,8 +2233,8 @@ module MicBGCMod
     RNO2MicbTransfBand=RNO2MicbTransfBand-RSOxidBandAutor(NGL)
   ENDDO
 
-  RH2PO4MicbTransfBand=-naqfdiag%TRIPB
-  RH1PO4MicbTransfBand=-naqfdiag%TRIB1
+  RH2PO4MicbTransfBand=-naqfdiag%tRH2PO4MicrbTransfBand
+  RH1PO4MicbTransfBand=-naqfdiag%tRH1PO4MicrbTransfBand
   MicrbN2Fix=naqfdiag%TFixN2
   TSens4MicbGrwoth=TSensGrowth
   VWatMicrobAct=VOLWZ
@@ -3709,8 +3709,8 @@ module MicBGCMod
     RMaintDefcitRecycOMHeter         => nmicf%RMaintDefcitRecycOMHeter,         &
     Resp4NFixHeter                   => nmicf%Resp4NFixHeter,                   &
     TDOMUptkHeter                    => ncplxf%TDOMUptkHeter,                   &
-    CNQ                              => ncplxs%CNQ,                             &
-    CPQ                              => ncplxs%CPQ,                             &
+    rCNDOM                              => ncplxs%rCNDOM,                             &
+    rCPDOM                              => ncplxs%rCPDOM,                             &
     rNCOMC                           => micpar%rNCOMC,                          &
     rPCOMC                           => micpar%rPCOMC,                          &
     FL                               => micpar%FL,                              &
@@ -3737,7 +3737,7 @@ module MicBGCMod
 !     FGOCP,FGOAP=DOC,acetate/(DOC+acetate)
 !     OQN,OPQ=DON,DOP
 !     FracHeterBiomOfActK=faction of OMActHeterin total OMA
-!     CNQ,CPQ=DON/DOC, DOP/DOC
+!     rCNDOM,rCPDOM=DON/DOC, DOP/DOC
 !     FCN,FCP=limitation from N,P
 !
 
@@ -3748,8 +3748,8 @@ module MicBGCMod
   RAnabolDOCUptkHeter(NGL,K)=CGOMX*FGOCP+CGOMD
   RAnabolAcetUptkHeter(NGL,K)=CGOMX*FGOAP
   CGOXC=RAnabolDOCUptkHeter(NGL,K)+RAnabolAcetUptkHeter(NGL,K)
-  DOMuptk4GrothHeter(ielmn,NGL,K)=AZMAX1(AMIN1(DOM(idom_don,K)*FracHeterBiomOfActK(NGL,K),CGOXC*CNQ(K)/FCN(NGL,K)))
-  DOMuptk4GrothHeter(ielmp,NGL,K)=AZMAX1(AMIN1(DOM(idom_dop,K)*FracHeterBiomOfActK(NGL,K),CGOXC*CPQ(K)/FCP(NGL,K)))
+  DOMuptk4GrothHeter(ielmn,NGL,K)=AZMAX1(AMIN1(DOM(idom_don,K)*FracHeterBiomOfActK(NGL,K),CGOXC*rCNDOM(K)/FCN(NGL,K)))
+  DOMuptk4GrothHeter(ielmp,NGL,K)=AZMAX1(AMIN1(DOM(idom_dop,K)*FracHeterBiomOfActK(NGL,K),CGOXC*rCPDOM(K)/FCP(NGL,K)))
 
   TDOMUptkHeter(ielmc,K)=TDOMUptkHeter(ielmc,K)+RAnabolDOCUptkHeter(NGL,K)
   TDOMUptkHeter(idom_acetate,K)=TDOMUptkHeter(idom_acetate,K)+RAnabolAcetUptkHeter(NGL,K)

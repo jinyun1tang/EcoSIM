@@ -525,7 +525,7 @@ module StartqMod
 !     INITIALIZE PLANT MORPHOLOGY AND BIOMASS
 !
   HoursCanopyPSITooLow_pft(NZ,NY,NX)=0._r8
-  CHILL(NZ,NY,NX)=0._r8
+  ChillHours_pft(NZ,NY,NX)=0._r8
   CanopyNonstElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)=0._r8
   CanopyNodulNonstElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)=0._r8
   ShootStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)=0._r8
@@ -683,7 +683,7 @@ module StartqMod
 !
   VHeatCapCanP(NZ,NY,NX)=cpw*ShootStrutElms_pft(ielmc,NZ,NY,NX)*10.0E-06
   ENGYX(NZ,NY,NX)=0._r8
-  DTKC(NZ,NY,NX)=0._r8
+  DeltaTKC(NZ,NY,NX)=0._r8
   TCelciusCanopy_pft(NZ,NY,NX)=ATCA(NY,NX)
   TKC(NZ,NY,NX)=units%Celcius2Kelvin(TCelciusCanopy_pft(NZ,NY,NX))
   TCG(NZ,NY,NX)=TCelciusCanopy_pft(NZ,NY,NX)

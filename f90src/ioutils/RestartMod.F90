@@ -1627,16 +1627,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='DTKC', dim1name='pft',&
+    call restartvar(ncid, flag, varname='DeltaTKC', dim1name='pft',&
      long_name='change in canopy temperature', units='K', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,DTKC,datrp_1d,NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft) 
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,DeltaTKC,datrp_1d,NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft) 
   else
-    !print*,'DTKC'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,DTKC,datrp_1d,NumActivePlants=NumActivePlants,&
+    !print*,'DeltaTKC'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,DeltaTKC,datrp_1d,NumActivePlants=NumActivePlants,&
       IsPlantActive_pft=IsPlantActive_pft)   
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='DTKC', dim1name='pft',&
+    call restartvar(ncid, flag, varname='DeltaTKC', dim1name='pft',&
      long_name='change in canopy temperature', units='K', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)
   endif  
@@ -1887,16 +1887,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='CHILL', dim1name='pft',&
+    call restartvar(ncid, flag, varname='ChillHours_pft', dim1name='pft',&
      long_name='chilling effect on CO2 fixation', units='m', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)     
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,CHILL,datrp_1d,NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft)     
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,ChillHours_pft,datrp_1d,NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft)     
   else
     !print*,'CHILL'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,CHILL,datrp_1d,NumActivePlants=NumActivePlants,&
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,ChillHours_pft,datrp_1d,NumActivePlants=NumActivePlants,&
       IsPlantActive_pft=IsPlantActive_pft)       
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='CHILL', dim1name='pft',&
+    call restartvar(ncid, flag, varname='ChillHours_pft', dim1name='pft',&
      long_name='chilling effect on CO2 fixation', units='m', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)     
   endif  

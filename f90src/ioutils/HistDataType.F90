@@ -49,14 +49,14 @@ implicit none
   real(r8),pointer   :: h1D_HUMUS_P_col(:)        !tHumOM_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_AMENDED_P_col(:)       !FerPFlx_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_tLITRf_P_FLX_col(:)   !LiterfalOrgM_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_tEXCH_PO4_col(:)       !UPO4(NY,NX)/AREA(3,NU(NY,NX),NY,NX), exchangeable 
+  real(r8),pointer   :: h1D_tEXCH_PO4_col(:)       !tHxPO4_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX), exchangeable 
   real(r8),pointer   :: h1D_SUR_DOP_FLX_col(:)    !HydroSufDOPFlx_col(NY,NX)/TAREA
   real(r8),pointer   :: h1D_SUB_DOP_FLX_col(:)    !HydroSubsDOPFlx_col(NY,NX)/TAREA
   real(r8),pointer   :: h1D_SUR_DIP_FLX_col(:)    !HydroSufDIPFlx_col(NY,NX)/TAREA
   real(r8),pointer   :: h1D_SUB_DIP_FLX_col(:)    !HydroSubsDIPFlx_col(NY,NX)/TAREA
   real(r8),pointer   :: h1D_HeatFlx2G_col(:)      !
   real(r8),pointer   :: h1D_Qinfl2soi_col(:)      !
-  real(r8),pointer   :: h1D_tPRECIP_P_col(:)       !UPP4(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_tPRECIP_P_col(:)       !tXPO4_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_tMICRO_P_col(:)        !tMicBiome_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_tSoilOrgC_col(:)
   real(r8),pointer   :: h1D_tSoilOrgN_col(:)
@@ -75,8 +75,8 @@ implicit none
   real(r8),pointer   :: h1D_AMENDED_N_col(:)       !FertNFlx_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_tLITRf_N_FLX_col(:)  !LiterfalOrgM_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_tLITRf_C_FLX_col(:)  !LiterfalOrgM_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_tNH4X_col(:)           !UNH4(NY,NX)/AREA(3,NU(NY,NX),NY,NX), total NH3+NH4 content
-  real(r8),pointer   :: h1D_tNO3_col(:)           !UNO3(NY,NX)/AREA(3,NU(NY,NX),NY,NX), total NO3+NO2 content
+  real(r8),pointer   :: h1D_tNH4X_col(:)           !tNH4_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX), total NH3+NH4 content
+  real(r8),pointer   :: h1D_tNO3_col(:)           !tNO3_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX), total NO3+NO2 content
   real(r8),pointer   :: h1D_SUR_DON_FLX_col(:)    !HydroSufDONFlx_col(NY,NX)/TAREA, daily flux
   real(r8),pointer   :: h1D_SUB_DON_FLX_col(:)    !HydroSubsDONFlx_col(NY,NX)/TAREA, daily flux
   real(r8),pointer   :: h1D_SUR_DIN_FLX_col(:)    !HydroSufDINFlx_col(NY,NX)/TAREA
@@ -652,7 +652,7 @@ implicit none
 
   data1d_ptr => this%h1D_tEXCH_PO4_col(beg_col:end_col)      
   call hist_addfld1d(fname='tEXCH_PO4',units='gP/m2',avgflag='A',&
-    long_name='total bioavailable (exchangeable) mineral P',ptr_col=data1d_ptr)      
+    long_name='total bioavailable (exchangeable) mineral P: H2PO4+HPO4',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_SUR_DOC_FLX_col(beg_col:end_col)  
   call hist_addfld1d(fname='SUR_DOC_FLX',units='gC/m2/hr',avgflag='A',&
@@ -1626,7 +1626,7 @@ implicit none
       this%h1D_tLITRf_C_FLX_col(ncol)     = LiterfalOrgM_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tLITRf_N_FLX_col(ncol)     = LiterfalOrgM_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tLITRf_P_FLX_col(ncol)     = LiterfalOrgM_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_tEXCH_PO4_col(ncol)        = UPO4(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_tEXCH_PO4_col(ncol)        = tHxPO4_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_SUR_DOP_FLX_col(ncol)      = HydroSufDOPFlx_col(NY,NX)/TAREA
       this%h1D_SUB_DOP_FLX_col(ncol)      = HydroSubsDOPFlx_col(NY,NX)/TAREA
       this%h1D_SUR_DIP_FLX_col(ncol)      = HydroSufDIPFlx_col(NY,NX)/TAREA
@@ -1643,7 +1643,7 @@ implicit none
       this%h1D_SUR_DIC_FLX_col(ncol)      = HydroSufDICFlx_col(NY,NX)/TAREA
       this%h1D_SUB_DIC_FLX_col(ncol)      = HydroSubsDICFlx_col(NY,NX)/TAREA
       this%h1D_SUR_DIP_FLX_col(ncol)      = HydroSufDIPFlx_col(NY,NX)/TAREA
-      this%h1D_tPRECIP_P_col(ncol)        = UPP4(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_tPRECIP_P_col(ncol)        = tXPO4_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tMICRO_P_col(ncol)         = tMicBiome_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_PO4_FIRE_col(ncol)         = PO4byFire_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_cPO4_LITR_col(ncol)        = safe_adb(trc_solml_vr(ids_H2PO4,0,NY,NX),SoilMicPMassLayer(0,NY,NX))
@@ -1656,8 +1656,8 @@ implicit none
       this%h1D_SURF_ELEV_col(ncol)        = -CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)+DLYR(3,0,NY,NX)
       this%h1D_SURF_tLITR_N_FLX_col(ncol) = tLitrOM_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_AMENDED_N_col(ncol)        = FertNFlx_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_tNH4X_col(ncol)            = UNH4(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_tNO3_col(ncol)             = UNO3(NY,NX)/AREA(3,NU(NY,NX),NY,NX)      
+      this%h1D_tNH4X_col(ncol)            = tNH4_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_tNO3_col(ncol)             = tNO3_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)      
       this%h1D_tMICRO_N_col(ncol)         = tMicBiome_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_TEMP_LITR_col(ncol)        = TCS(0,NY,NX)
       if(VcumSnowWE(NY,NX)<=ZEROS(NY,NX))then

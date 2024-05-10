@@ -300,7 +300,7 @@ module Hour1Mod
   TLCO2G=0.0_r8
   TLN2G=0.0_r8
   TLNH4=0.0_r8
-  TLNO3=0.0_r8
+  tNO3_lnd=0.0_r8
   TLPO4=0.0_r8
   TION=0.0_r8
   PlantElemntStoreLandscape(:)=0.0_r8
@@ -753,10 +753,10 @@ module Hour1Mod
   UVLWatMicP(NY,NX)=0.0_r8
   tLitrOM_col(1:NumPlantChemElms,NY,NX)=0.0_r8
   tHumOM_col(1:NumPlantChemElms,NY,NX)=0.0_r8
-  UNH4(NY,NX)=0.0_r8
-  UNO3(NY,NX)=0.0_r8
-  UPO4(NY,NX)=0.0_r8
-  UPP4(NY,NX)=0.0_r8
+  tNH4_col(NY,NX)=0.0_r8
+  tNO3_col(NY,NX)=0.0_r8
+  tHxPO4_col(NY,NX)=0.0_r8
+  tXPO4_col(NY,NX)=0.0_r8
   UION(NY,NX)=0.0_r8
   FWatDischarge(NY,NX)=0.0_r8
   SurfGasFlx_col(idg_beg:idg_NH3,NY,NX)=0.0_r8
@@ -2323,7 +2323,7 @@ module Hour1Mod
     trcs_plant_uptake_vr(ids_beg:ids_end,L,NY,NX)=0.0_r8
     TCO2P(L,NY,NX)=0.0_r8
     trcg_TLP(idg_beg:idg_end-1,L,NY,NX)=0.0_r8
-    TRO2Uptk_vr(L,NY,NX)=0.0_r8
+    tRO2MicrbUptk_vr(L,NY,NX)=0.0_r8
     trcg_air2root_flx_vr(idg_beg:idg_end-1,L,NY,NX)=0.0_r8
 
     trcn_RChem_band_soil_vr(ids_NH4B,L,NY,NX)=0.0_r8

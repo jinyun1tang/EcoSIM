@@ -395,7 +395,7 @@ module MicAutoCPLXMod
   associate(                                                                    &
     rCNBiomeActAutor                 => nmics%rCNBiomeActAutor,                 &
     GrowthEnvScalAutor               => nmics%GrowthEnvScalAutor,               &
-    DOMuptk4GrothAutor                      => nmicf%DOMuptk4GrothAutor,                      &
+    DOMuptk4GrothAutor               => nmicf%DOMuptk4GrothAutor,               &
     NonstX2stBiomAutor               => nmicf%NonstX2stBiomAutor,               &
     RespGrossAutor                   => nmicf%RespGrossAutor,                   &
     RNOxReduxRespAutorLim            => nmicf%RNOxReduxRespAutorLim,            &
@@ -412,14 +412,12 @@ module MicAutoCPLXMod
     RMaintDefcitRecycOMAutor         => nmicf%RMaintDefcitRecycOMAutor,         &
     Resp4NFixAutor                   => nmicf%Resp4NFixAutor,                   &
     TDOMUptkHeter                    => ncplxf%TDOMUptkHeter,                   &
-    CNQ                              => ncplxs%CNQ,                             &
-    CPQ                              => ncplxs%CPQ,                             &
     rNCOMCAutor                      => micpar%rNCOMCAutor,                     &
     rPCOMCAutor                      => micpar%rPCOMCAutor,                     &
     FL                               => micpar%FL,                              &
     ZEROS                            => micfor%ZEROS,                           &
     ZERO                             => micfor%ZERO,                            &
-    mBiomeAutor                        => micstt%mBiomeAutor,                       &
+    mBiomeAutor                      => micstt%mBiomeAutor,                     &
     EHUM                             => micstt%EHUM                             &
   )
 
@@ -439,7 +437,6 @@ module MicAutoCPLXMod
 !     FGOCP,FGOAP=DOC,acetate/(DOC+acetate)
 !     OQN,OPQ=DON,DOP
 !     FOMK=faction of OMA in total OMA
-!     CNQ,CPQ=DON/DOC, DOP/DOC
 !     FCN,FCP=limitation from N,P
 !
 

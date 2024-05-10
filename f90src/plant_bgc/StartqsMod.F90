@@ -590,7 +590,7 @@ module StartqsMod
     C4PhotosynDowreg_brch             =>  plt_photo%C4PhotosynDowreg_brch  , &
     CPOOL3_node                       =>  plt_photo%CPOOL3_node , &
     CPOOL4_node                       =>  plt_photo%CPOOL4_node , &
-    CHILL                             =>  plt_photo%CHILL  , &
+    ChillHours_pft                             =>  plt_photo%ChillHours_pft  , &
     RubiscoActivity_brch              =>  plt_photo%RubiscoActivity_brch   , &
     CMassHCO3BundleSheath_node        =>  plt_photo%CMassHCO3BundleSheath_node   , &
     CMassCO2BundleSheath_node         =>  plt_photo%CMassCO2BundleSheath_node   , &
@@ -674,7 +674,7 @@ module StartqsMod
 !     INITIALIZE PLANT MORPHOLOGY AND BIOMASS
 !
   HoursCanopyPSITooLow_pft(NZ)=0._r8
-  CHILL(NZ)=0._r8
+  ChillHours_pft(NZ)=0._r8
   plt_biom%CanopyNonstElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ)=0._r8
   plt_biom%CanopyNodulNonstElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ)=0._r8
   plt_biom%PetoleStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ)=0._r8
@@ -850,7 +850,7 @@ module StartqsMod
     PSICanopyTurg_pft        =>  plt_ew%PSICanopyTurg_pft   , &
     PSICanopyOsmo_pft        =>  plt_ew%PSICanopyOsmo_pft   , &
     ENGYX                    =>  plt_ew%ENGYX   , &
-    DTKC                     =>  plt_ew%DTKC    , &
+    DeltaTKC                     =>  plt_ew%DeltaTKC    , &
     TCelciusCanopy_pft       =>  plt_ew%TCelciusCanopy_pft    , &
     TKG                      =>  plt_pheno%TKG  , &
     TCG                      =>  plt_pheno%TCG  , &
@@ -868,7 +868,7 @@ module StartqsMod
 !
   VHeatCapCanP(NZ)=cpw*ShootStrutElms_pft(ielmc,NZ)*10.0E-06
   ENGYX(NZ)=0._r8
-  DTKC(NZ)=0._r8
+  DeltaTKC(NZ)=0._r8
   TCelciusCanopy_pft(NZ)=ATCA
   TKC(NZ)=units%Celcius2Kelvin(TCelciusCanopy_pft(NZ))
   TCG(NZ)=TCelciusCanopy_pft(NZ)

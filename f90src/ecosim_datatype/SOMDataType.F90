@@ -37,9 +37,9 @@ module SOMDataType
   real(r8),target,allocatable ::  CDOM_vr(:,:,:,:,:)                     !DOC concentration, [g m-3]
   real(r8),target,allocatable ::  FracBulkSOMC_vr(:,:,:,:)                    !fraction of total organic C in complex, [-]
   real(r8),target,allocatable ::  DIC_mass_col(:,:)                        !total soil DIC, [g d-2]
-  real(r8),target,allocatable ::  UNH4(:,:)                         !total soil NH4 + NH3 content, [g d-2]
-  real(r8),target,allocatable ::  UNO3(:,:)                         !total soil NO3 + NO2 content, [g d-2]
-  real(r8),target,allocatable ::  UPO4(:,:)                         !total soil PO4 content, [g d-2]
+  real(r8),target,allocatable ::  tNH4_col(:,:)                         !total soil NH4 + NH3 content, [g d-2]
+  real(r8),target,allocatable ::  tNO3_col(:,:)                         !total soil NO3 + NO2 content, [g d-2]
+  real(r8),target,allocatable ::  tHxPO4_col(:,:)                         !total soil PO4 content, [g d-2]
 
   private :: InitAllocate
   contains
@@ -85,9 +85,9 @@ module SOMDataType
   allocate(CDOM_vr(idom_beg:idom_end,1:jcplx,0:JZ,JY,JX));CDOM_vr=0._r8
   allocate(FracBulkSOMC_vr(1:jcplx,0:JZ,JY,JX));FracBulkSOMC_vr=0._r8
   allocate(DIC_mass_col(JY,JX));       DIC_mass_col=0._r8
-  allocate(UNH4(JY,JX));        UNH4=0._r8
-  allocate(UNO3(JY,JX));        UNO3=0._r8
-  allocate(UPO4(JY,JX));        UPO4=0._r8
+  allocate(tNH4_col(JY,JX));        tNH4_col=0._r8
+  allocate(tNO3_col(JY,JX));        tNO3_col=0._r8
+  allocate(tHxPO4_col(JY,JX));        tHxPO4_col=0._r8
 
   end subroutine InitAllocate
 !------------------------------------------------------------------------------------------
@@ -125,8 +125,8 @@ module SOMDataType
   call destroy(CDOM_vr)
   call destroy(FracBulkSOMC_vr)
   call destroy(DIC_mass_col)
-  call destroy(UNH4)
-  call destroy(UNO3)
-  call destroy(UPO4)
+  call destroy(tNH4_col)
+  call destroy(tNO3_col)
+  call destroy(tHxPO4_col)
   end subroutine DestructSOMData
 end module SOMDataType

@@ -626,7 +626,7 @@
 !
 !     CHILL=accumulated chilling hours used to limit CO2 fixn
 !
-!     RubiscoActivity_brch(NB,NZ)=RubiscoActivity_brch(NB,NZ)/(1.0_r8+0.25_r8*CHILL(NZ))
+!     RubiscoActivity_brch(NB,NZ)=RubiscoActivity_brch(NB,NZ)/(1.0_r8+0.25_r8*ChillHours_pft(NZ))
 !
 !     DEHARDENING OF EVERGREENS IN SPRING
 !

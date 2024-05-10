@@ -46,7 +46,7 @@ implicit none
   real(r8),target,allocatable ::  HydroSubsDONFlx_col(:,:)                         !total subsurface DON flux, [g d-2]
   real(r8),target,allocatable ::  HydroSufDOPFlx_col(:,:)                         !total surface DOP flux, [g d-2]
   real(r8),target,allocatable ::  HydroSubsDOPFlx_col(:,:)                         !total subsurface DOP flux, [g d-2]
-  real(r8),target,allocatable ::  UPP4(:,:)                          !total soil precipited P, [g d-2]
+  real(r8),target,allocatable ::  tXPO4_col(:,:)                          !total soil precipited P, [g d-2]
   real(r8),target,allocatable ::  UCOP(:,:)                          !total soil autotrophic respiration, [g d-2]
   real(r8),target,allocatable ::  USEDOU(:,:)                        !total sediment subsurface flux, [Mg d-2]
   real(r8),target,allocatable ::  HydroSufDICFlx_col(:,:)                         !total surface DIC flux, [g d-2]
@@ -148,7 +148,7 @@ implicit none
   allocate(HydroSubsDONFlx_col(JY,JX));       HydroSubsDONFlx_col=0._r8
   allocate(HydroSufDOPFlx_col(JY,JX));       HydroSufDOPFlx_col=0._r8
   allocate(HydroSubsDOPFlx_col(JY,JX));       HydroSubsDOPFlx_col=0._r8
-  allocate(UPP4(JY,JX));        UPP4=0._r8
+  allocate(tXPO4_col(JY,JX));        tXPO4_col=0._r8
 
   allocate(UCOP(JY,JX));        UCOP=0._r8
   allocate(USEDOU(JY,JX));      USEDOU=0._r8
@@ -242,7 +242,7 @@ implicit none
   call destroy(HydroSubsDONFlx_col)
   call destroy(HydroSufDOPFlx_col)
   call destroy(HydroSubsDOPFlx_col)
-  call destroy(UPP4)
+  call destroy(tXPO4_col)
   call destroy(UCOP)
   call destroy(USEDOU)
   call destroy(HydroSufDICFlx_col)

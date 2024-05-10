@@ -236,7 +236,7 @@ module RedistMod
     OXYGSO=OXYGSO+trcg_solsml(idg_O2,L,NY,NX)
     TLN2G=TLN2G+trcg_solsml(idg_N2,L,NY,NX)+trcg_solsml(idg_N2O,L,NY,NX)
     TLNH4=TLNH4+trcn_solsml(ids_NH4,L,NY,NX)+trcg_solsml(idg_NH3,L,NY,NX)
-    TLNO3=TLNO3+trcn_solsml(ids_NO3,L,NY,NX)
+    tNO3_lnd=tNO3_lnd+trcn_solsml(ids_NO3,L,NY,NX)
     TLPO4=TLPO4+trcn_solsml(ids_H1PO4,L,NY,NX)+trcn_solsml(ids_H2PO4,L,NY,NX)
 
     IF(salt_model)THEN
@@ -742,12 +742,12 @@ module RedistMod
   Z4F=natomw*(FertN_soil_vr(ifert_nh4,0,NY,NX)+FertN_soil_vr(ifert_urea,0,NY,NX) &
     +FertN_soil_vr(ifert_nh3,0,NY,NX))
   TLNH4=TLNH4+Z4S+Z4X+Z4F
-  UNH4(NY,NX)=UNH4(NY,NX)+Z4S+Z4X
+  tNH4_col(NY,NX)=tNH4_col(NY,NX)+Z4S+Z4X
 
   ZOS=trc_solml_vr(ids_NO3,0,NY,NX)+trc_solml_vr(ids_NO2,0,NY,NX)
   ZOF=natomw*FertN_soil_vr(ifert_no3,0,NY,NX)
-  TLNO3=TLNO3+ZOS+ZOF
-  UNO3(NY,NX)=UNO3(NY,NX)+ZOS
+  tNO3_lnd=tNO3_lnd+ZOS+ZOF
+  tNO3_col(NY,NX)=tNO3_col(NY,NX)+ZOS
 
   POS=trc_solml_vr(ids_H1PO4,0,NY,NX)+trc_solml_vr(ids_H2PO4,0,NY,NX)
   POX=patomw*(trcx_solml(idx_HPO4,0,NY,NX)+trcx_solml(idx_H2PO4,0,NY,NX))
@@ -755,8 +755,8 @@ module RedistMod
     +trcp_salml(idsp_CaHPO4,0,NY,NX))+2._r8*patomw*trcp_salml(idsp_CaH4P2O8,0,NY,NX) &
     +3._r8*patomw*trcp_salml(idsp_HA,0,NY,NX)
   TLPO4=TLPO4+POS+POX+POP
-  UPO4(NY,NX)=UPO4(NY,NX)+POX
-  UPP4(NY,NX)=UPP4(NY,NX)+POP
+  tHxPO4_col(NY,NX)=tHxPO4_col(NY,NX)+POX
+  tXPO4_col(NY,NX)=tXPO4_col(NY,NX)+POP
 
   IF(salt_model)call DiagSurfLitRLayerSalt(NY,NX,TLPO4)
 
@@ -1108,7 +1108,7 @@ module RedistMod
     HydroSubsDICFlx_col(NY,NX)=HydroSubsDICFlx_col(NY,NX)-12.0*TBCO2(L,NY,NX)
     TXCO2(NY,NX)=TXCO2(NY,NX)+12.0*TBCO2(L,NY,NX)
     OXYGIN=OXYGIN+OIB
-    OOB=trcg_RMicbTransf_vr(idg_O2,L,NY,NX)+TRO2Uptk_vr(L,NY,NX)+trcs_plant_uptake_vr(idg_O2,L,NY,NX)
+    OOB=trcg_RMicbTransf_vr(idg_O2,L,NY,NX)+tRO2MicrbUptk_vr(L,NY,NX)+trcs_plant_uptake_vr(idg_O2,L,NY,NX)
     OXYGOU=OXYGOU+OOB
     H2GIN=H2GIN+HGB
     HOB=trcg_RMicbTransf_vr(idg_H2,L,NY,NX)+trcs_plant_uptake_vr(idg_H2,L,NY,NX)
@@ -1185,15 +1185,15 @@ module RedistMod
       +FertN_soil_vr(ifert_nh3,L,NY,NX)+FertN_Band_vr(ifert_nh4_band,L,NY,NX) &
       +FertN_Band_vr(ifert_urea_band,L,NY,NX)+FertN_Band_vr(ifert_nh3_band,L,NY,NX))
     TLNH4=TLNH4+Z4S+Z4X+Z4F
-    UNH4(NY,NX)=UNH4(NY,NX)+Z4S+Z4X
+    tNH4_col(NY,NX)=tNH4_col(NY,NX)+Z4S+Z4X
 
     ZOS=trc_solml_vr(ids_NO3,L,NY,NX)+trc_soHml_vr(ids_NO3,L,NY,NX) &
       +trc_solml_vr(ids_NO3B,L,NY,NX)+trc_soHml_vr(ids_NO3B,L,NY,NX) &
       +trc_solml_vr(ids_NO2,L,NY,NX)+trc_soHml_vr(ids_NO2,L,NY,NX) &
       +trc_solml_vr(ids_NO2B,L,NY,NX)+trc_soHml_vr(ids_NO2B,L,NY,NX)
     ZOF=natomw*(FertN_soil_vr(ifert_no3,L,NY,NX)+FertN_soil_vr(ifert_no3,L,NY,NX))
-    TLNO3=TLNO3+ZOS+ZOF
-    UNO3(NY,NX)=UNO3(NY,NX)+ZOS
+    tNO3_lnd=tNO3_lnd+ZOS+ZOF
+    tNO3_col(NY,NX)=tNO3_col(NY,NX)+ZOS
 
     POS=trc_solml_vr(ids_H2PO4,L,NY,NX)+trc_soHml_vr(ids_H2PO4,L,NY,NX)+trc_solml_vr(ids_H2PO4B,L,NY,NX) &
       +trc_soHml_vr(ids_H2PO4B,L,NY,NX)+trc_solml_vr(ids_H1PO4,L,NY,NX)+trc_soHml_vr(ids_H1PO4,L,NY,NX) &
@@ -1211,8 +1211,8 @@ module RedistMod
       +3._r8*patomw*(trcp_salml(idsp_HA,L,NY,NX)+trcp_salml(idsp_HAB,L,NY,NX))
 
     TLPO4=TLPO4+POS+POX+POP
-    UPO4(NY,NX)=UPO4(NY,NX)+POX
-    UPP4(NY,NX)=UPP4(NY,NX)+POP
+    tHxPO4_col(NY,NX)=tHxPO4_col(NY,NX)+POX
+    tXPO4_col(NY,NX)=tXPO4_col(NY,NX)+POP
     !
     call SumOMStates(L,NY,NX,DORGC(L),DORGE(NY,NX))
 !

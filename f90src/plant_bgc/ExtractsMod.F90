@@ -169,7 +169,7 @@ module ExtractsMod
     REcoNH4DmndBand_vr        => plt_bgcr%REcoNH4DmndBand_vr,       &
     REcoO2DmndResp_vr         => plt_bgcr%REcoO2DmndResp_vr,        &
     tRootMycoExud2Soil_vr     => plt_bgcr%tRootMycoExud2Soil_vr,    &
-    TRO2Uptk_vr               => plt_bgcr%TRO2Uptk_vr,              &
+    tRO2MicrbUptk_vr               => plt_bgcr%tRO2MicrbUptk_vr,              &
     TCO2P                     => plt_bgcr%TCO2P,                    &
     REcoH2PO4DmndBand_vr      => plt_bgcr%REcoH2PO4DmndBand_vr,     &
     REcoH1PO4DmndBand_vr      => plt_bgcr%REcoH1PO4DmndBand_vr,     &
@@ -258,7 +258,7 @@ module ExtractsMod
       ENDDO
 
       TCO2P(L)=TCO2P(L)-RootCO2Emis_pvr(N,L,NZ)
-      TRO2Uptk_vr(L)=TRO2Uptk_vr(L)+RootO2Uptk_pvr(N,L,NZ)
+      tRO2MicrbUptk_vr(L)=tRO2MicrbUptk_vr(L)+RootO2Uptk_pvr(N,L,NZ)
       DO idg=idg_beg,idg_end
         trcs_plant_uptake_vr(idg,L)=trcs_plant_uptake_vr(idg,L)+RUPGasSol_vr(idg,N,L,NZ)
       ENDDO

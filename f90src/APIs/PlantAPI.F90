@@ -133,7 +133,7 @@ implicit none
     trcg_TLP(idg_beg:idg_end-1,L,NY,NX)=plt_rbgc%trcg_TLP(idg_beg:idg_end-1,L)
     trcg_air2root_flx_vr(idg_beg:idg_end-1,L,NY,NX)=plt_rbgc%trcg_air2root_flx_vr(idg_beg:idg_end-1,L)
     TCO2P(L,NY,NX) =plt_bgcr%TCO2P(L)
-    TRO2Uptk_vr(L,NY,NX)=plt_bgcr%TRO2Uptk_vr(L)
+    tRO2MicrbUptk_vr(L,NY,NX)=plt_bgcr%tRO2MicrbUptk_vr(L)
     
     trcs_plant_uptake_vr(ids_beg:ids_end,L,NY,NX) =plt_rbgc%trcs_plant_uptake_vr(ids_beg:ids_end,L)
     DO  K=1,jcplx
@@ -186,9 +186,9 @@ implicit none
     ETCanopy_pft(NZ,NY,NX) =plt_ew%ETCanopy_pft(NZ)
     GrossCO2Fix_pft(NZ,NY,NX) =plt_bgcr%GrossCO2Fix_pft(NZ)
     GrossCO2FixCum_pft(NZ,NY,NX)=GrossCO2FixCum_pft(NZ,NY,NX)+GrossCO2Fix_pft(NZ,NY,NX)
-    CHILL(NZ,NY,NX) =plt_photo%CHILL(NZ)
+    ChillHours_pft(NZ,NY,NX) =plt_photo%ChillHours_pft(NZ)
     DiffCO2Atmos2Intracel_pft(NZ,NY,NX)  =plt_photo%DiffCO2Atmos2Intracel_pft(NZ)
-    DTKC(NZ,NY,NX)  =plt_ew%DTKC(NZ)
+    DeltaTKC(NZ,NY,NX)  =plt_ew%DeltaTKC(NZ)
     ENGYX(NZ,NY,NX) =plt_ew%ENGYX(NZ)
     Transpiration_pft(NZ,NY,NX)    =plt_ew%Transpiration_pft(NZ)
     VapXAir2Canopy_pft(NZ,NY,NX) =plt_ew%VapXAir2Canopy_pft(NZ)
@@ -969,7 +969,7 @@ implicit none
     plt_rbgc%trcg_TLP(idg_beg:idg_end-1,L)=trcg_TLP(idg_beg:idg_end-1,L,NY,NX)
     plt_rbgc%trcg_air2root_flx_vr(idg_beg:idg_end-1,L)=trcg_air2root_flx_vr(idg_beg:idg_end-1,L,NY,NX)
     plt_bgcr%TCO2P(L) =TCO2P(L,NY,NX)
-    plt_bgcr%TRO2Uptk_vr(L)=TRO2Uptk_vr(L,NY,NX)
+    plt_bgcr%tRO2MicrbUptk_vr(L)=tRO2MicrbUptk_vr(L,NY,NX)
     DO  K=1,jcplx
       plt_bgcr%tRootMycoExud2Soil_vr(1:NumPlantChemElms,K,L)=tRootMycoExud2Soil_vr(1:NumPlantChemElms,K,L,NY,NX)
     ENDDO
@@ -1027,14 +1027,14 @@ implicit none
     plt_pheno%SSTX(NZ)=SSTX(NZ,NY,NX)
     plt_rad%FracRadPARbyCanopy_pft(NZ) =FracRadPARbyCanopy_pft(NZ,NY,NX)
     plt_bgcr%NH3Dep2Can_pft(NZ)=NH3Dep2Can_pft(NZ,NY,NX)
-    plt_ew%DTKC(NZ)   =DTKC(NZ,NY,NX)
+    plt_ew%DeltaTKC(NZ)   =DeltaTKC(NZ,NY,NX)
     plt_pheno%iPlantThermoAdaptZone(NZ)=iPlantThermoAdaptZone(NZ,NY,NX)
     plt_pheno%HighTCLimtSeed_pft(NZ) =HighTCLimtSeed_pft(NZ,NY,NX)
     plt_ew%Transpiration_pft(NZ)      =Transpiration_pft(NZ,NY,NX)
 
     plt_biom%CanopyStalkC_pft(NZ) =CanopyStalkC_pft(NZ,NY,NX)
 
-    plt_photo%CHILL(NZ)=CHILL(NZ,NY,NX)
+    plt_photo%ChillHours_pft(NZ)=ChillHours_pft(NZ,NY,NX)
     plt_ew%PSICanopyOsmo_pft(NZ)=PSICanopyOsmo_pft(NZ,NY,NX)
 
     plt_ew%TCelciusCanopy_pft(NZ)=TCelciusCanopy_pft(NZ,NY,NX)

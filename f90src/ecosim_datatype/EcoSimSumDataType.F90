@@ -20,7 +20,7 @@ module EcoSimSumDataType
   real(r8) :: LitRMStoreLndscap(1:NumPlantChemElms)   !total soil litter OM content	g d-2
   real(r8) :: POMHumStoreLndscap(NumPlantChemElms)   !total soil POM + humus C content	g d-2
   real(r8) :: TLNH4    !total soil NH4 content	g d-2
-  real(r8) :: TLNO3    !total soil NO3 content	g d-2
+  real(r8) :: tNO3_lnd    !total soil NO3 content	g d-2
   real(r8) :: TLPO4    !total soil PO4 content	g d-2
   real(r8), pointer :: PlantElemntStoreLandscape(:)    !total plant element (C,N,P, etc) balance	g d-2
   real(r8) :: CRAIN    !total precipitation	m3 d-2

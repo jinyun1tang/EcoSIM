@@ -74,7 +74,7 @@ module UptakesMod
     PSICanopy_pft                  => plt_ew%PSICanopy_pft              , &
     HeatXAir2PCan                  => plt_ew%HeatXAir2PCan              , &
     Canopy_Heat_Sens_col           => plt_ew%Canopy_Heat_Sens_col       , &
-    DTKC                           => plt_ew%DTKC                       , &
+    DeltaTKC                           => plt_ew%DeltaTKC                       , &
     VapXAir2Canopy_pft             => plt_ew%VapXAir2Canopy_pft         , &
     TairK                          => plt_ew%TairK                      , &
     Canopy_Heat_Latent_col         => plt_ew%Canopy_Heat_Latent_col     , &
@@ -184,11 +184,11 @@ module UptakesMod
 !
 !     TKC=final estimate of canopy temperature TKCanopy_pft
 !     TairK=current air temperature
-!     DTKC=TKC-TairK for next hour
+!     DeltaTKC=TKC-TairK for next hour
 !
         TKC(NZ)=TKCanopy_pft(NZ)
         TCelciusCanopy_pft(NZ)=units%Kelvin2Celcius(TKC(NZ))
-        DTKC(NZ)=TKC(NZ)-TairK
+        DeltaTKC(NZ)=TKC(NZ)-TairK
 !
 !     IF CONVERGENCE NOT ACHIEVED (RARE), SET DEFAULT
 !     TEMPERATURES, ENERGY FLUXES, WATER POTENTIALS, RESISTANCES
@@ -264,7 +264,7 @@ module UptakesMod
 
   ARLSC=0.0_r8
   D9984: DO NZ=1,NP0
-!     TKC(NZ)=TairK+DTKC(NZ)
+!     TKC(NZ)=TairK+DeltaTKC(NZ)
 !     TCelciusCanopy_pft(NZ)=TKC(NZ)-TC2K
     ARLSC=ARLSC+CanopyLeafArea_pft(NZ)+CanopyStemArea_pft(NZ)
     RadNet2Canopy_pft(NZ)=0.0_r8
@@ -338,7 +338,7 @@ module UptakesMod
     KoppenClimZone            =>  plt_site%KoppenClimZone         , &
     BndlResistAboveCanG       =>  plt_ew%BndlResistAboveCanG      , &
     TairK                     =>  plt_ew%TairK                    , &
-    DTKC                      =>  plt_ew%DTKC                     , &
+    DeltaTKC                      =>  plt_ew%DeltaTKC                     , &
     ZeroPlanDisp              =>  plt_ew%ZeroPlanDisp             , &
     RoughHeight               =>  plt_ew%RoughHeight              , &
     RAZ                       =>  plt_ew%RAZ                      , &
@@ -428,9 +428,9 @@ module UptakesMod
 !
 !     TKCanopy_pft=initial estimate of canopy temperature TKC
 !     TairK=current air temperature
-!     DTKC=TKC-TairK from previous hour
+!     DeltaTKC=TKC-TairK from previous hour
 !
-  TKCanopy_pft(NZ)=TairK+DTKC(NZ)
+  TKCanopy_pft(NZ)=TairK+DeltaTKC(NZ)
   end associate
   end subroutine UpdateCanopyProperty
 !------------------------------------------------------------------------
@@ -548,7 +548,7 @@ module UptakesMod
 ! begin_execution
   associate(                                                                &
    RAZ                             => plt_ew%RAZ                          , &
-   DTKC                            => plt_ew%DTKC                         , &
+   DeltaTKC                            => plt_ew%DeltaTKC                         , &
    OSMO                            => plt_ew%OSMO                         , &
    PSICanopyOsmo_pft               => plt_ew%PSICanopyOsmo_pft            , &
    TKC                             => plt_ew%TKC                          , &
@@ -590,7 +590,7 @@ module UptakesMod
       plt_ew%HeatStorCanP(NZ)=0.0_r8
       plt_ew%VapXAir2Canopy_pft(NZ)=0.0_r8
       plt_ew%Transpiration_pft(NZ)=0.0_r8
-      TKC(NZ)=TairK+DTKC(NZ)
+      TKC(NZ)=TairK+DeltaTKC(NZ)
       TCelciusCanopy_pft(NZ)=units%Kelvin2Celcius(TKC(NZ))
       FTHRM=EMMC*stefboltz_const*FracRadPARbyCanopy_pft(NZ)*AREA3(NU)
       LWRadCanopy_pft(NZ)=FTHRM*TKC(NZ)**4._r8
@@ -607,7 +607,7 @@ module UptakesMod
         +(MaxCanPStomaResistH2O_pft(NZ)-MinCanPStomaResistH2O_pft(NZ))*Stomata_Stress
       CanopyBndlResist_pft(NZ)=RAZ(NZ)
       VHeatCapCanP(NZ)=cpw*(ShootStrutElms_pft(ielmc,NZ)*10.0E-06_r8)
-      DTKC(NZ)=0.0_r8
+      DeltaTKC(NZ)=0.0_r8
       D4290: DO N=1,MY(NZ)
         DO  L=NU,MaxSoiL4Root(NZ)
           PSIRoot_pvr(N,L,NZ)=ElvAdjstedtSoiPSIMPa(L)
@@ -1160,7 +1160,7 @@ module UptakesMod
     TKS                            =>  plt_ew%TKS                          , &
     TairK                          =>  plt_ew%TairK                        , &
     SnowDepth                      =>  plt_ew%SnowDepth                    , &
-    DTKC                           =>  plt_ew%DTKC                         , &
+    DeltaTKC                           =>  plt_ew%DeltaTKC                         , &
     RAZ                            =>  plt_ew%RAZ                          , &
     VHeatCapCanP                   =>  plt_ew%VHeatCapCanP                 , &
     PSICanopyOsmo_pft              =>  plt_ew%PSICanopyOsmo_pft            , &
@@ -1219,7 +1219,7 @@ module UptakesMod
     +(MaxCanPStomaResistH2O_pft(NZ)-MinCanPStomaResistH2O_pft(NZ))*Stomata_Stress
   CanopyBndlResist_pft(NZ)=RAZ(NZ)
   VHeatCapCanP(NZ)=cpw*(ShootStrutElms_pft(ielmc,NZ)*10.0E-06_r8)
-  DTKC(NZ)=0.0_r8
+  DeltaTKC(NZ)=0.0_r8
 
   DO N=1,MY(NZ)
     DO  L=NU,MaxSoiL4Root(NZ)
@@ -1326,23 +1326,23 @@ module UptakesMod
   integer, intent(in) :: NZ
   real(r8) :: ACTV,RTK,STK,TKGO,TKSO
   integer :: L
-  associate(                                                        &
-    TCelciusCanopy_pft         =>  plt_ew%TCelciusCanopy_pft      , &
-    TKC                        =>  plt_ew%TKC                     , &
-    TKS                        =>  plt_ew%TKS                     , &
-    PSICanPDailyMin            =>  plt_ew%PSICanPDailyMin         , &
-    PSICanopy_pft              =>  plt_ew%PSICanopy_pft           , &
-    NU                         =>  plt_site%NU                    , &
-    CHILL                      =>  plt_photo%CHILL                , &
-    TempOffset_pft                      =>  plt_pheno%TempOffset_pft                , &
-    TCChill4Seed_pft           =>  plt_pheno%TCChill4Seed_pft     , &
-    fTgrowRootP_vr             =>  plt_pheno%fTgrowRootP_vr       , &
-    TCG                        =>  plt_pheno%TCG                  , &
-    TKG                        =>  plt_pheno%TKG                  , &
-    iPlantCalendar_brch        =>  plt_pheno%iPlantCalendar_brch  , &
-    fTgrowCanP                 =>  plt_pheno%fTgrowCanP           , &
-    MaxSoiL4Root               =>  plt_morph%MaxSoiL4Root         , &
-    MainBranchNum_pft          =>  plt_morph%MainBranchNum_pft      &
+  associate(                                              &
+    TCelciusCanopy_pft  => plt_ew%TCelciusCanopy_pft,     &
+    TKC                 => plt_ew%TKC,                    &
+    TKS                 => plt_ew%TKS,                    &
+    PSICanPDailyMin     => plt_ew%PSICanPDailyMin,        &
+    PSICanopy_pft       => plt_ew%PSICanopy_pft,          &
+    NU                  => plt_site%NU,                   &
+    ChillHours_pft      => plt_photo%ChillHours_pft,      &
+    TempOffset_pft      => plt_pheno%TempOffset_pft,      &
+    TCChill4Seed_pft    => plt_pheno%TCChill4Seed_pft,    &
+    fTgrowRootP_vr      => plt_pheno%fTgrowRootP_vr,      &
+    TCG                 => plt_pheno%TCG,                 &
+    TKG                 => plt_pheno%TKG,                 &
+    iPlantCalendar_brch => plt_pheno%iPlantCalendar_brch, &
+    fTgrowCanP          => plt_pheno%fTgrowCanP,          &
+    MaxSoiL4Root        => plt_morph%MaxSoiL4Root,        &
+    MainBranchNum_pft   => plt_morph%MainBranchNum_pft    &
   )
   !
   !     SET CANOPY GROWTH TEMPERATURE FROM SOIL SURFACE
@@ -1384,9 +1384,9 @@ module UptakesMod
   !     CHILL=accumulated chilling hours used to limit CO2 fixn in stomate.f
   !
   IF(TCelciusCanopy_pft(NZ).LT.TCChill4Seed_pft(NZ))THEN
-    CHILL(NZ)=AMIN1(24.0_r8,CHILL(NZ)+1.0_r8)
+    ChillHours_pft(NZ)=AMIN1(24.0_r8,ChillHours_pft(NZ)+1.0_r8)
   ELSE
-    CHILL(NZ)=AZMAX1(CHILL(NZ)-1.0_r8)
+    ChillHours_pft(NZ)=AZMAX1(ChillHours_pft(NZ)-1.0_r8)
   ENDIF
   end associate
   end subroutine SetCanopyGrowthFuncs
