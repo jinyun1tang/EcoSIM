@@ -58,8 +58,8 @@ module NitroDisturbMod
 
 !     begin_execution
 
-  IF(J.EQ.INT(SolarNoonHour_col(NY,NX)) .AND. (ITILL(I,NY,NX).EQ.21 .OR. ITILL(I,NY,NX).EQ.22))THEN
-    IF(ITILL(I,NY,NX).EQ.22)THEN
+  IF(J.EQ.INT(SolarNoonHour_col(NY,NX)) .AND. (iSoilDisturbType_col(I,NY,NX).EQ.21 .OR. iSoilDisturbType_col(I,NY,NX).EQ.22))THEN
+    IF(iSoilDisturbType_col(I,NY,NX).EQ.22)THEN
       IFLGS(NY,NX)=1
       IFLGJ=0
       NLL=-1
@@ -81,7 +81,7 @@ module NitroDisturbMod
 
     D2950: DO L=0,NLL
       IF(NLL.GE.0)THEN
-        IF(ITILL(I,NY,NX).EQ.22)THEN
+        IF(iSoilDisturbType_col(I,NY,NX).EQ.22)THEN
           IF(L.EQ.0)THEN
             FORGCX=0.0_r8
           ELSE
@@ -114,8 +114,8 @@ module NitroDisturbMod
                     rmBiom(NE)=DCORPC*mBiomeHeter_vr(NE,MID,K,L,NY,NX)
                   enddo
 
-                  ONX=EFIRE(1,ITILL(I,NY,NX))*rmBiom(ielmn)
-                  OPX=EFIRE(2,ITILL(I,NY,NX))*rmBiom(ielmp)
+                  ONX=EFIRE(1,iSoilDisturbType_col(I,NY,NX))*rmBiom(ielmn)
+                  OPX=EFIRE(2,iSoilDisturbType_col(I,NY,NX))*rmBiom(ielmp)
                   IF(micpar%is_litter(K))THEN
                     ONL(4,K)=ONL(4,K)+rmBiom(ielmn)-ONX
                     OPL(4,K)=OPL(4,K)+rmBiom(ielmp)-OPX
@@ -149,8 +149,8 @@ module NitroDisturbMod
                 rmBiom(NE)=DCORPC*mBiomeAutor_vr(NE,MID,L,NY,NX)
               enddo
 
-              ONX=EFIRE(1,ITILL(I,NY,NX))*rmBiom(ielmn)
-              OPX=EFIRE(2,ITILL(I,NY,NX))*rmBiom(ielmp)
+              ONX=EFIRE(1,iSoilDisturbType_col(I,NY,NX))*rmBiom(ielmn)
+              OPX=EFIRE(2,iSoilDisturbType_col(I,NY,NX))*rmBiom(ielmp)
 
               ONL(4,1)=ONL(4,1)+rmBiom(ielmn)-ONX
               OPL(4,1)=OPL(4,1)+rmBiom(ielmp)-OPX
@@ -177,8 +177,8 @@ module NitroDisturbMod
                 rmBiom(NE)=DCORPC*OMBioResdu_vr(NE,M,K,L,NY,NX)
               enddo
 
-              ONX=EFIRE(1,ITILL(I,NY,NX))*rmBiom(ielmn)
-              OPX=EFIRE(2,ITILL(I,NY,NX))*rmBiom(ielmp)
+              ONX=EFIRE(1,iSoilDisturbType_col(I,NY,NX))*rmBiom(ielmn)
+              OPX=EFIRE(2,iSoilDisturbType_col(I,NY,NX))*rmBiom(ielmp)
               IF(micpar%is_litter(K))THEN
                 ONL(4,K)=ONL(4,K)+rmBiom(ielmn)-ONX
                 OPL(4,K)=OPL(4,K)+rmBiom(ielmp)-OPX
@@ -201,8 +201,8 @@ module NitroDisturbMod
               rmDOM(idom)=DCORPC*DOM_vr(idom_doc,K,L,NY,NX)
             enddo
 
-            ONX=EFIRE(1,ITILL(I,NY,NX))*rmDOM(ielmn)
-            OPX=EFIRE(2,ITILL(I,NY,NX))*rmDOM(ielmp)
+            ONX=EFIRE(1,iSoilDisturbType_col(I,NY,NX))*rmDOM(ielmn)
+            OPX=EFIRE(2,iSoilDisturbType_col(I,NY,NX))*rmDOM(ielmp)
             IF(micpar%is_litter(K))THEN
               ONL(4,K)=ONL(4,K)+rmDOM(ielmn)-ONX
               OPL(4,K)=OPL(4,K)+rmDOM(ielmp)-OPX
@@ -222,8 +222,8 @@ module NitroDisturbMod
               rmDOM(idom)=DCORPC*DOM_MacP_vr(idom,K,L,NY,NX)
             enddo
 
-            ONX=EFIRE(1,ITILL(I,NY,NX))*rmDOM(ielmn)
-            OPX=EFIRE(2,ITILL(I,NY,NX))*rmDOM(ielmp)
+            ONX=EFIRE(1,iSoilDisturbType_col(I,NY,NX))*rmDOM(ielmn)
+            OPX=EFIRE(2,iSoilDisturbType_col(I,NY,NX))*rmDOM(ielmp)
             IF(micpar%is_litter(K))THEN
               ONL(4,K)=ONL(4,K)+rmDOM(ielmn)-ONX
               OPL(4,K)=OPL(4,K)+rmDOM(ielmp)-OPX
@@ -245,8 +245,8 @@ module NitroDisturbMod
               rmDOM(idom)=DCORPC*SorbedOM_vr(idom,K,L,NY,NX)
             enddo
 
-            ONX=EFIRE(1,ITILL(I,NY,NX))*rmDOM(ielmn)
-            OPX=EFIRE(2,ITILL(I,NY,NX))*rmDOM(ielmp)
+            ONX=EFIRE(1,iSoilDisturbType_col(I,NY,NX))*rmDOM(ielmn)
+            OPX=EFIRE(2,iSoilDisturbType_col(I,NY,NX))*rmDOM(ielmp)
             IF(micpar%is_litter(K))THEN
               ONL(4,K)=ONL(4,K)+rmDOM(ielmn)-ONX
               OPL(4,K)=OPL(4,K)+rmDOM(ielmp)-OPX
@@ -274,8 +274,8 @@ module NitroDisturbMod
               enddo
 
               OCA=DCORPC*SolidOMAct_vr(M,K,L,NY,NX)
-              ONX=EFIRE(1,ITILL(I,NY,NX))*rmBiom(ielmn)
-              OPX=EFIRE(2,ITILL(I,NY,NX))*rmBiom(ielmp)
+              ONX=EFIRE(1,iSoilDisturbType_col(I,NY,NX))*rmBiom(ielmn)
+              OPX=EFIRE(2,iSoilDisturbType_col(I,NY,NX))*rmBiom(ielmp)
               ONL(M,K)=ONL(M,K)+rmBiom(ielmn)-ONX
               OPL(M,K)=OPL(M,K)+rmBiom(ielmp)-OPX
 
@@ -305,7 +305,7 @@ module NitroDisturbMod
 !
 !     REMOVE FERTILIZER IN RESIDUE
 !
-        IF(ITILL(I,NY,NX).EQ.21)THEN
+        IF(iSoilDisturbType_col(I,NY,NX).EQ.21)THEN
           OMelm(ielmn)=OMelm(ielmn)+DCORPC*(trc_solml_vr(ids_NH4,L,NY,NX)+trc_solml_vr(idg_NH3,L,NY,NX) &
             +trc_solml_vr(ids_NO3,L,NY,NX)+trc_solml_vr(ids_NO2,L,NY,NX))
           OMelm(ielmp)=OMelm(ielmp)+DCORPC*(trc_solml_vr(ids_H1PO4,L,NY,NX)+trc_solml_vr(ids_H2PO4,L,NY,NX))
@@ -341,7 +341,7 @@ module NitroDisturbMod
 !     VHeatCapacity(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+4.19*(VLWatMicP_vr(L,NY,NX)+VLWatMacP(L,NY,NX))
 !    2+1.9274*(VLiceMicP(L,NY,NX)+VLiceMacP(L,NY,NX))
 !     ENDIF
-        IF(ITILL(I,NY,NX).EQ.21)THEN
+        IF(iSoilDisturbType_col(I,NY,NX).EQ.21)THEN
           DO NE=1,NumPlantChemElms
             TOMOU(NE)=TOMOU(NE)+OMelm(NE)
           ENDDO
@@ -351,7 +351,7 @@ module NitroDisturbMod
           HydroSufDOPFlx_col(NY,NX)=HydroSufDOPFlx_col(NY,NX)+OMelm(ielmp)
           
           Eco_NBP_col(NY,NX)=Eco_NBP_col(NY,NX)-OMelm(ielmc)
-        ELSEIF(ITILL(I,NY,NX).EQ.22)THEN
+        ELSEIF(iSoilDisturbType_col(I,NY,NX).EQ.22)THEN
           CO2GIN=CO2GIN-OMelm(ielmc)
           OXYGIN=OXYGIN+2.667_r8*OMelm(ielmc)
           OXYGOU=OXYGOU+2.667_r8*OMelm(ielmc)

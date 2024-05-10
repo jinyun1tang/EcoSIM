@@ -297,11 +297,11 @@ module Hour1Mod
   POMHumStoreLndscap(ielmc)=0.0_r8
   POMHumStoreLndscap(ielmn)=0.0_r8
   POMHumStoreLndscap(ielmp)=0.0_r8
-  TLCO2G=0.0_r8
-  TLN2G=0.0_r8
-  TLNH4=0.0_r8
+  TGasC_lnd=0.0_r8
+  TGasN_lnd=0.0_r8
+  TDisolNH4_lnd=0.0_r8
   tNO3_lnd=0.0_r8
-  TLPO4=0.0_r8
+  TDisolPi_lnd=0.0_r8
   TION=0.0_r8
   PlantElemntStoreLandscape(:)=0.0_r8
   end subroutine ResetLndscapeAccumlators
@@ -596,14 +596,14 @@ module Hour1Mod
       POROS(L,NY,NX)=1.0_r8
       !write(*,*) "final else - POROS(L,NY,NX) = ", POROS(L,NY,NX)
     ENDIF
-    !     VLMicP(L,NY,NX)=AMAX1(POROS(L,NY,NX)*VLSoilMicP(L,NY,NX)
+    !     VLMicP_vr(L,NY,NX)=AMAX1(POROS(L,NY,NX)*VLSoilMicP(L,NY,NX)
     !    2,VLWatMicP_vr(L,NY,NX)+VLiceMicP(L,NY,NX))
     !     VLMacP(L,NY,NX)=AMAX1(SoilFracAsMacP(L,NY,NX)*VGeomLayer(L,NY,NX)
     !    2,VLWatMacP(L,NY,NX)+VLiceMacP(L,NY,NX))
-    VLMicP(L,NY,NX)=POROS(L,NY,NX)*VLSoilMicP(L,NY,NX)
+    VLMicP_vr(L,NY,NX)=POROS(L,NY,NX)*VLSoilMicP(L,NY,NX)
     VLMacP(L,NY,NX)=SoilFracAsMacP(L,NY,NX)*VGeomLayer(L,NY,NX)
     IF(SoiBulkDensity(L,NY,NX).GT.ZERO)THEN
-      VLsoiAirP(L,NY,NX)=AZMAX1(VLMicP(L,NY,NX)-VLWatMicP_vr(L,NY,NX)-VLiceMicP(L,NY,NX)) &
+      VLsoiAirP(L,NY,NX)=AZMAX1(VLMicP_vr(L,NY,NX)-VLWatMicP_vr(L,NY,NX)-VLiceMicP(L,NY,NX)) &
         +AZMAX1(VLMacP(L,NY,NX)-VLWatMacP(L,NY,NX)-VLiceMacP(L,NY,NX))
     ELSE
       VLsoiAirP(L,NY,NX)=0.0_r8
@@ -786,7 +786,7 @@ module Hour1Mod
   TRootGasLossDisturb_pft(idg_beg:idg_end-1,NY,NX)=0.0_r8
   LitrFallStrutElms_col(:,NY,NX)=0.0_r8
   StandingDeadStrutElms_col(1:NumPlantChemElms,NY,NX)=0.0_r8
-  PPT(NY,NX)=0.0_r8
+  PlantPopu_col(NY,NX)=0.0_r8
 ! zero arrays in the snow layers
   WatConvSno2MicP(1:JS,NY,NX)=0.0_r8
   WatConvSno2MacP(1:JS,NY,NX)=0.0_r8
@@ -1030,14 +1030,14 @@ module Hour1Mod
     IF(FoundActiveLayer)exit
     !current layer
     VLiceTot=VLiceMicP(L,NY,NX)+VLiceMacP(L,NY,NX)
-    VLPoreTot=VLMicP(L,NY,NX)+VLMacP(L,NY,NX)
+    VLPoreTot=VLMicP_vr(L,NY,NX)+VLMacP(L,NY,NX)
 
     IF(VLPoreTot.GT.ZEROS2(NY,NX).AND.VLiceTot.GT.0.01*VLPoreTot)THEN
       !significant ice and pore
       D5700: DO LL=MIN(L+1,NL(NY,NX)),NL(NY,NX)
         VLiceTotL=VLiceMicP(LL,NY,NX)+VLiceMacP(LL,NY,NX)
         VOLWTL=VLWatMicP_vr(LL,NY,NX)+VLWatMacP(LL,NY,NX)
-        VLPoreTotL=VLMicP(LL,NY,NX)+VLMacP(LL,NY,NX)
+        VLPoreTotL=VLMicP_vr(LL,NY,NX)+VLMacP(LL,NY,NX)
         !defined as significant increase in ice content
         goto5701=(VLPoreTotL.GT.ZEROS2(NY,NX).AND.VLiceTotL.LT.ZERO2*VLPoreTotL)
         if(goto5701)exit
@@ -1466,10 +1466,10 @@ module Hour1Mod
   IF(VGeomLayer(0,NY,NX).GT.ZEROS2(NY,NX))THEN
     VLSoilPoreMicP_vr(0,NY,NX)=VGeomLayer(0,NY,NX)
     SoilMicPMassLayer(0,NY,NX)=MWC2Soil*SoilOrgM_vr(ielmc,0,NY,NX)
-    VLMicP(0,NY,NX)=AZMAX1(VLitR(NY,NX)-SoilMicPMassLayer(0,NY,NX)/1.30_r8)
-    VLsoiAirP(0,NY,NX)=AZMAX1(VLMicP(0,NY,NX)-VLWatMicP_vr(0,NY,NX)-VLiceMicP(0,NY,NX))
+    VLMicP_vr(0,NY,NX)=AZMAX1(VLitR(NY,NX)-SoilMicPMassLayer(0,NY,NX)/1.30_r8)
+    VLsoiAirP(0,NY,NX)=AZMAX1(VLMicP_vr(0,NY,NX)-VLWatMicP_vr(0,NY,NX)-VLiceMicP(0,NY,NX))
     IF(VLitR(NY,NX).GT.ZEROS(NY,NX))THEN
-      POROS(0,NY,NX)=VLMicP(0,NY,NX)/VLitR(NY,NX)
+      POROS(0,NY,NX)=VLMicP_vr(0,NY,NX)/VLitR(NY,NX)
       !write(*,*) "VLitR gt 0 - POROS(0,NY,NX) = ", POROS(0,NY,NX)
       THETW_vr(0,NY,NX)=AZMAX1(AMIN1(1.0_r8,VLWatMicP_vr(0,NY,NX)/VLitR(NY,NX)))
       THETI(0,NY,NX)=AZMAX1(AMIN1(1.0_r8,VLiceMicP(0,NY,NX)/VLitR(NY,NX)))
@@ -1525,7 +1525,7 @@ module Hour1Mod
   ELSE
     VLSoilPoreMicP_vr(0,NY,NX)=0.0_r8
     SoilMicPMassLayer(0,NY,NX)=0.0_r8
-    VLMicP(0,NY,NX)=0.0_r8
+    VLMicP_vr(0,NY,NX)=0.0_r8
     VLsoiAirP(0,NY,NX)=0.0_r8
     POROS(0,NY,NX)=1.0
     DLYR(3,0,NY,NX)=0.0_r8
@@ -2321,8 +2321,8 @@ module Hour1Mod
   DO L=NUI(NY,NX),NLI(NY,NX)
     FWatExMacP2MicP(L,NY,NX)=0.0_r8
     trcs_plant_uptake_vr(ids_beg:ids_end,L,NY,NX)=0.0_r8
-    TCO2P(L,NY,NX)=0.0_r8
-    trcg_TLP(idg_beg:idg_end-1,L,NY,NX)=0.0_r8
+    tRootCO2Emis_vr(L,NY,NX)=0.0_r8
+    trcg_root_vr(idg_beg:idg_end-1,L,NY,NX)=0.0_r8
     tRO2MicrbUptk_vr(L,NY,NX)=0.0_r8
     trcg_air2root_flx_vr(idg_beg:idg_end-1,L,NY,NX)=0.0_r8
 

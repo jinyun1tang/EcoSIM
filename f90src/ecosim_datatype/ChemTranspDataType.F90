@@ -26,8 +26,8 @@ module ChemTranspDataType
 
   real(r8),target,allocatable ::  GasSolbility_vr(:,:,:,:)                !solubility of gases
 
-  real(r8),target,allocatable ::  RCO2F(:,:,:)                       !net gaseous CO2 flux, [g d-2 h-1]
-  real(r8),target,allocatable ::  RCH4L(:,:,:)                       !net aqueous CH4 flux, [g d-2 h-1]
+  real(r8),target,allocatable ::  RCO2GasFlxPrev_vr(:,:,:)                       !net gaseous CO2 flux, [g d-2 h-1]
+  real(r8),target,allocatable ::  RCH4PhysexchPrev_vr(:,:,:)                       !net aqueous CH4 flux, [g d-2 h-1]
   real(r8),target,allocatable ::  RO2GasXchangePrev_vr(:,:,:)                       !net gaseous O2 flux, [g d-2 h-1]
   real(r8),target,allocatable ::  RO2AquaXchangePrev_vr(:,:,:)                       !net aqueous O2 flux, [g d-2 h-1]
   real(r8),target,allocatable ::  RCH4F(:,:,:)                       !net gaseous CH4 flux, [g d-2 h-1]
@@ -73,8 +73,8 @@ module ChemTranspDataType
 
   allocate(Gas_Disol_Flx_vr(idg_beg:idg_end,0:JZ,JY,JX)); Gas_Disol_Flx_vr=0._r8
 
-  allocate(RCO2F(0:JZ,JY,JX));  RCO2F=0._r8
-  allocate(RCH4L(0:JZ,JY,JX));  RCH4L=0._r8
+  allocate(RCO2GasFlxPrev_vr(0:JZ,JY,JX));  RCO2GasFlxPrev_vr=0._r8
+  allocate(RCH4PhysexchPrev_vr(0:JZ,JY,JX));  RCH4PhysexchPrev_vr=0._r8
   allocate(RO2GasXchangePrev_vr(0:JZ,JY,JX));  RO2GasXchangePrev_vr=0._r8
   allocate(RO2AquaXchangePrev_vr(0:JZ,JY,JX));  RO2AquaXchangePrev_vr=0._r8
   allocate(RCH4F(0:JZ,JY,JX));  RCH4F=0._r8
@@ -115,8 +115,8 @@ module ChemTranspDataType
   call destroy(trcg_2DFloXSurRunoff)
   call destroy(GasSolbility_vr)
   call destroy(AquaIonDifusivty_vr)
-  call destroy(RCO2F)
-  call destroy(RCH4L)
+  call destroy(RCO2GasFlxPrev_vr)
+  call destroy(RCH4PhysexchPrev_vr)
   call destroy(RO2GasXchangePrev_vr)
   call destroy(RO2AquaXchangePrev_vr)
   call destroy(RCH4F)

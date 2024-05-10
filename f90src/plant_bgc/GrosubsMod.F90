@@ -156,7 +156,7 @@ module grosubsMod
     NetPrimProduct_pft             => plt_bgcr%NetPrimProduct_pft          , &
     PlantN2FixCum_pft              => plt_bgcr%PlantN2FixCum_pft           , &
     LitrfalStrutElms_pft           => plt_bgcr%LitrfalStrutElms_pft        , &
-    NH3EmisCum_pft                  => plt_bgcr%NH3EmisCum_pft               , &
+    NH3EmisCum_pft                 => plt_bgcr%NH3EmisCum_pft              , &
     LitrfalStrutElmsCum_pft        => plt_bgcr%LitrfalStrutElmsCum_pft     , &
     SurfLitrfalStrutElmsCum_pft    => plt_bgcr%SurfLitrfalStrutElmsCum_pft , &
     GrossResp_pft                  => plt_bgcr%GrossResp_pft               , &
@@ -380,49 +380,49 @@ module grosubsMod
   real(r8) :: ACTVM,RTK,STK,TKCM,TKSM
 !     begin_execution
 
-  associate(                                                            &
-    TKC                       =>  plt_ew%TKC                          , &
-    TKS                       =>  plt_ew%TKS                          , &
-    PSICanopy_pft             =>  plt_ew%PSICanopy_pft                , &
-    PSICanopyTurg_pft         =>  plt_ew%PSICanopyTurg_pft            , &
-    PlantPopulation_pft       =>  plt_site%PlantPopulation_pft        , &
-    NU                        =>  plt_site%NU                         , &
-    MaxNumRootLays            =>  plt_site%MaxNumRootLays             , &
-    TempOffset_pft                     =>  plt_pheno%TempOffset_pft                     , &
-    ZEROP                     =>  plt_biom%ZEROP                      , &
-    CanopyStalkC_pft          =>  plt_biom%CanopyStalkC_pft           , &
-    RootProteinC_pvr          =>  plt_biom%RootProteinC_pvr           , &
-    RootBiomCPerPlant_pft     =>  plt_biom%RootBiomCPerPlant_pft      , &
-    StalkStrutElms_pft        =>  plt_biom%StalkStrutElms_pft         , &
-    RootElms_pft              =>  plt_biom%RootElms_pft               , &
-    CanopyLeafCLyr_pft        =>  plt_biom%CanopyLeafCLyr_pft         , &
-    iPlantTurnoverPattern_pft =>  plt_pheno%iPlantTurnoverPattern_pft , &
-    iPlantRootProfile_pft     =>  plt_pheno%iPlantRootProfile_pft     , &
-    RootCO2Autor_pvr                 =>  plt_rbgc%RootCO2Autor_pvr                  , &
-    RootRespPotent_pvr        =>  plt_rbgc%RootRespPotent_pvr         , &
-    RCO2N_pvr                 =>  plt_rbgc%RCO2N_pvr                  , &
-    RootrNC_pft               =>  plt_allom%RootrNC_pft               , &
-    RootrPC_pft               =>  plt_allom%RootrPC_pft               , &
-    FracHour4LeafoffRemob     =>  plt_allom%FracHour4LeafoffRemob     , &
-    FWODLE                    =>  plt_allom%FWODLE                    , &
-    FWODBE                    =>  plt_allom%FWODBE                    , &
-    FWOODE                    =>  plt_allom%FWOODE                    , &
-    FWODRE                    =>  plt_allom%FWODRE                    , &
-    CNLF                      =>  plt_allom%CNLF                      , &
-    CPLF                      =>  plt_allom%CPLF                      , &
-    CNSHE                     =>  plt_allom%CNSHE                     , &
-    CPSHE                     =>  plt_allom%CPSHE                     , &
-    rNCStalk_pft              =>  plt_allom%rNCStalk_pft              , &
-    rPCStalk_pft              =>  plt_allom%rPCStalk_pft              , &
-    k_fine_litr               =>  pltpar%k_fine_litr                  , &
-    k_woody_litr              =>  pltpar%k_woody_litr                 , &
-    RCS                       =>  plt_photo%RCS                       , &
-    Root1stXNumL_pvr          =>  plt_morph%Root1stXNumL_pvr          , &
-    Root2ndXNum_pvr           =>  plt_morph%Root2ndXNum_pvr           , &
-    MY                        =>  plt_morph%MY                        , &
-    CanopyLeafAreaZ_pft        =>  plt_morph%CanopyLeafAreaZ_pft        , &
-    CanopyStemAreaZ_pft       =>  plt_morph%CanopyStemAreaZ_pft       , &
-    NumRootAxes_pft           =>  plt_morph%NumRootAxes_pft             &
+  associate(                                                              &
+    TKC                         => plt_ew%TKC,                            &
+    TKS                         => plt_ew%TKS,                            &
+    PSICanopy_pft               => plt_ew%PSICanopy_pft,                  &
+    PSICanopyTurg_pft           => plt_ew%PSICanopyTurg_pft,              &
+    PlantPopulation_pft         => plt_site%PlantPopulation_pft,          &
+    NU                          => plt_site%NU,                           &
+    MaxNumRootLays              => plt_site%MaxNumRootLays,               &
+    TempOffset_pft              => plt_pheno%TempOffset_pft,              &
+    ZEROP                       => plt_biom%ZEROP,                        &
+    CanopyStalkC_pft            => plt_biom%CanopyStalkC_pft,             &
+    RootProteinC_pvr            => plt_biom%RootProteinC_pvr,             &
+    RootBiomCPerPlant_pft       => plt_biom%RootBiomCPerPlant_pft,        &
+    StalkStrutElms_pft          => plt_biom%StalkStrutElms_pft,           &
+    RootElms_pft                => plt_biom%RootElms_pft,                 &
+    CanopyLeafCLyr_pft          => plt_biom%CanopyLeafCLyr_pft,           &
+    iPlantTurnoverPattern_pft   => plt_pheno%iPlantTurnoverPattern_pft,   &
+    iPlantRootProfile_pft       => plt_pheno%iPlantRootProfile_pft,       &
+    RootCO2Autor_pvr            => plt_rbgc%RootCO2Autor_pvr,             &
+    RootRespPotent_pvr          => plt_rbgc%RootRespPotent_pvr,           &
+    RootCO2EmisPot_pvr          => plt_rbgc%RootCO2EmisPot_pvr,           &
+    RootrNC_pft                 => plt_allom%RootrNC_pft,                 &
+    RootrPC_pft                 => plt_allom%RootrPC_pft,                 &
+    FracHour4LeafoffRemob       => plt_allom%FracHour4LeafoffRemob,       &
+    FracShootStalkElmAlloc2Litr => plt_allom%FracShootStalkElmAlloc2Litr, &
+    FracShootLeafElmAlloc2Litr  => plt_allom%FracShootLeafElmAlloc2Litr,  &
+    FracRootStalkElmAlloc2Litr  => plt_allom%FracRootStalkElmAlloc2Litr,  &
+    FracRootElmAlloc2Litr       => plt_allom%FracRootElmAlloc2Litr,       &
+    CNLF                        => plt_allom%CNLF,                        &
+    CPLF                        => plt_allom%CPLF,                        &
+    CNSHE                       => plt_allom%CNSHE,                       &
+    CPSHE                       => plt_allom%CPSHE,                       &
+    rNCStalk_pft                => plt_allom%rNCStalk_pft,                &
+    rPCStalk_pft                => plt_allom%rPCStalk_pft,                &
+    k_fine_litr                 => pltpar%k_fine_litr,                    &
+    k_woody_litr                => pltpar%k_woody_litr,                   &
+    RCS                         => plt_photo%RCS,                         &
+    Root1stXNumL_pvr            => plt_morph%Root1stXNumL_pvr,            &
+    Root2ndXNum_pvr             => plt_morph%Root2ndXNum_pvr,             &
+    MY                          => plt_morph%MY,                          &
+    CanopyLeafAreaZ_pft         => plt_morph%CanopyLeafAreaZ_pft,         &
+    CanopyStemAreaZ_pft         => plt_morph%CanopyStemAreaZ_pft,         &
+    NumRootAxes_pft             => plt_morph%NumRootAxes_pft              &
   )
   D2: DO L=1,NumOfCanopyLayers1
     CanopyLeafAreaZ_pft(L,NZ)=0._r8
@@ -436,7 +436,7 @@ module grosubsMod
       Root1stXNumL_pvr(N,L,NZ)=0._r8
       Root2ndXNum_pvr(N,L,NZ)=0._r8
       RootRespPotent_pvr(N,L,NZ)=0._r8
-      RCO2N_pvr(N,L,NZ)=0._r8
+      RootCO2EmisPot_pvr(N,L,NZ)=0._r8
       RootCO2Autor_pvr(N,L,NZ)=0._r8
     ENDDO D6
   ENDDO D9
@@ -454,47 +454,47 @@ module grosubsMod
   IF(iPlantTurnoverPattern_pft(NZ).EQ.0 &
     .OR.(.not.is_plant_treelike(iPlantRootProfile_pft(NZ)))&
     .OR.StalkStrutElms_pft(ielmc,NZ).LE.ZEROP(NZ))THEN
-    FWODBE(ielmc,k_fine_litr)=1.0_r8
-    FWOODE(ielmc,k_fine_litr)=1.0_r8
-    FWODRE(ielmc,k_fine_litr)=1.0_r8
+    FracShootLeafElmAlloc2Litr(ielmc,k_fine_litr)=1.0_r8
+    FracRootStalkElmAlloc2Litr(ielmc,k_fine_litr)=1.0_r8
+    FracRootElmAlloc2Litr(ielmc,k_fine_litr)=1.0_r8
   ELSE
-    FWODBE(ielmc,k_fine_litr)=1.0_r8
-    FWOODE(ielmc,k_fine_litr)=SQRT(CanopyStalkC_pft(NZ)/StalkStrutElms_pft(ielmc,NZ))
-    FWODRE(ielmc,k_fine_litr)=SQRT(FRTX*CanopyStalkC_pft(NZ)/StalkStrutElms_pft(ielmc,NZ))
+    FracShootLeafElmAlloc2Litr(ielmc,k_fine_litr)=1.0_r8
+    FracRootStalkElmAlloc2Litr(ielmc,k_fine_litr)=SQRT(CanopyStalkC_pft(NZ)/StalkStrutElms_pft(ielmc,NZ))
+    FracRootElmAlloc2Litr(ielmc,k_fine_litr)=SQRT(FRTX*CanopyStalkC_pft(NZ)/StalkStrutElms_pft(ielmc,NZ))
   ENDIF
 
-  FWODBE(ielmc,k_woody_litr)=1.0_r8-FWODBE(ielmc,k_fine_litr)
-  FWOODE(ielmc,k_woody_litr)=1.0_r8-FWOODE(ielmc,k_fine_litr)
-  FWODRE(ielmc,k_woody_litr)=1.0_r8-FWODRE(ielmc,k_fine_litr)
+  FracShootLeafElmAlloc2Litr(ielmc,k_woody_litr)=1.0_r8-FracShootLeafElmAlloc2Litr(ielmc,k_fine_litr)
+  FracRootStalkElmAlloc2Litr(ielmc,k_woody_litr)=1.0_r8-FracRootStalkElmAlloc2Litr(ielmc,k_fine_litr)
+  FracRootElmAlloc2Litr(ielmc,k_woody_litr)=1.0_r8-FracRootElmAlloc2Litr(ielmc,k_fine_litr)
 
-  CNLFW=FWODBE(ielmc,k_woody_litr)*rNCStalk_pft(NZ)+FWODBE(ielmc,k_fine_litr)*CNLF(NZ)
-  CPLFW=FWODBE(ielmc,k_woody_litr)*rPCStalk_pft(NZ)+FWODBE(ielmc,k_fine_litr)*CPLF(NZ)
+  CNLFW=FracShootLeafElmAlloc2Litr(ielmc,k_woody_litr)*rNCStalk_pft(NZ)+FracShootLeafElmAlloc2Litr(ielmc,k_fine_litr)*CNLF(NZ)
+  CPLFW=FracShootLeafElmAlloc2Litr(ielmc,k_woody_litr)*rPCStalk_pft(NZ)+FracShootLeafElmAlloc2Litr(ielmc,k_fine_litr)*CPLF(NZ)
 
-  CNSHW=FWODBE(ielmc,k_woody_litr)*rNCStalk_pft(NZ)+FWODBE(ielmc,k_fine_litr)*CNSHE(NZ)
-  CPSHW=FWODBE(ielmc,k_woody_litr)*rPCStalk_pft(NZ)+FWODBE(ielmc,k_fine_litr)*CPSHE(NZ)
+  CNSHW=FracShootLeafElmAlloc2Litr(ielmc,k_woody_litr)*rNCStalk_pft(NZ)+FracShootLeafElmAlloc2Litr(ielmc,k_fine_litr)*CNSHE(NZ)
+  CPSHW=FracShootLeafElmAlloc2Litr(ielmc,k_woody_litr)*rPCStalk_pft(NZ)+FracShootLeafElmAlloc2Litr(ielmc,k_fine_litr)*CPSHE(NZ)
 
-  CNRTW=FWODRE(ielmc,k_woody_litr)*rNCStalk_pft(NZ)+FWODRE(ielmc,k_fine_litr)*RootrNC_pft(NZ)
-  CPRTW=FWODRE(ielmc,k_woody_litr)*rPCStalk_pft(NZ)+FWODRE(ielmc,k_fine_litr)*RootrPC_pft(NZ)
+  CNRTW=FracRootElmAlloc2Litr(ielmc,k_woody_litr)*rNCStalk_pft(NZ)+FracRootElmAlloc2Litr(ielmc,k_fine_litr)*RootrNC_pft(NZ)
+  CPRTW=FracRootElmAlloc2Litr(ielmc,k_woody_litr)*rPCStalk_pft(NZ)+FracRootElmAlloc2Litr(ielmc,k_fine_litr)*RootrPC_pft(NZ)
 
-  FWODLE(ielmc,1:NumOfPlantLitrCmplxs)=FWODBE(ielmc,1:NumOfPlantLitrCmplxs)
+  FracShootStalkElmAlloc2Litr(ielmc,1:NumOfPlantLitrCmplxs)=FracShootLeafElmAlloc2Litr(ielmc,1:NumOfPlantLitrCmplxs)
 
-  FWODLE(ielmn,k_woody_litr)=FWODBE(ielmc,k_woody_litr)*rNCStalk_pft(NZ)/CNLFW
-  FWODLE(ielmp,k_woody_litr)=FWODBE(ielmc,k_woody_litr)*rPCStalk_pft(NZ)/CPLFW
+  FracShootStalkElmAlloc2Litr(ielmn,k_woody_litr)=FracShootLeafElmAlloc2Litr(ielmc,k_woody_litr)*rNCStalk_pft(NZ)/CNLFW
+  FracShootStalkElmAlloc2Litr(ielmp,k_woody_litr)=FracShootLeafElmAlloc2Litr(ielmc,k_woody_litr)*rPCStalk_pft(NZ)/CPLFW
 
-  FWODBE(ielmn,k_woody_litr)=FWODBE(ielmc,k_woody_litr)*rNCStalk_pft(NZ)/CNSHW
-  FWODBE(ielmp,k_woody_litr)=FWODBE(ielmc,k_woody_litr)*rPCStalk_pft(NZ)/CPSHW
+  FracShootLeafElmAlloc2Litr(ielmn,k_woody_litr)=FracShootLeafElmAlloc2Litr(ielmc,k_woody_litr)*rNCStalk_pft(NZ)/CNSHW
+  FracShootLeafElmAlloc2Litr(ielmp,k_woody_litr)=FracShootLeafElmAlloc2Litr(ielmc,k_woody_litr)*rPCStalk_pft(NZ)/CPSHW
 
-  FWOODE(ielmn,k_woody_litr)=FWOODE(ielmc,k_woody_litr)*rNCStalk_pft(NZ)/CNRTW
-  FWOODE(ielmp,k_woody_litr)=FWOODE(ielmc,k_woody_litr)*rPCStalk_pft(NZ)/CPRTW
+  FracRootStalkElmAlloc2Litr(ielmn,k_woody_litr)=FracRootStalkElmAlloc2Litr(ielmc,k_woody_litr)*rNCStalk_pft(NZ)/CNRTW
+  FracRootStalkElmAlloc2Litr(ielmp,k_woody_litr)=FracRootStalkElmAlloc2Litr(ielmc,k_woody_litr)*rPCStalk_pft(NZ)/CPRTW
 
-  FWODRE(ielmn,k_woody_litr)=FWODRE(ielmc,k_woody_litr)*RootrNC_pft(NZ)/CNRTW
-  FWODRE(ielmp,k_woody_litr)=FWODRE(ielmc,k_woody_litr)*RootrPC_pft(NZ)/CPRTW
+  FracRootElmAlloc2Litr(ielmn,k_woody_litr)=FracRootElmAlloc2Litr(ielmc,k_woody_litr)*RootrNC_pft(NZ)/CNRTW
+  FracRootElmAlloc2Litr(ielmp,k_woody_litr)=FracRootElmAlloc2Litr(ielmc,k_woody_litr)*RootrPC_pft(NZ)/CPRTW
 
   DO NE=2,NumPlantChemElms
-    FWODLE(NE,k_fine_litr)=1.0_r8-FWODLE(NE,k_woody_litr)
-    FWODBE(NE,k_fine_litr)=1.0_r8-FWODBE(NE,k_woody_litr)
-    FWOODE(NE,k_fine_litr)=1.0_r8-FWOODE(NE,k_woody_litr)
-    FWODRE(NE,k_fine_litr)=1.0_r8-FWODRE(NE,k_woody_litr)
+    FracShootStalkElmAlloc2Litr(NE,k_fine_litr)=1.0_r8-FracShootStalkElmAlloc2Litr(NE,k_woody_litr)
+    FracShootLeafElmAlloc2Litr(NE,k_fine_litr)=1.0_r8-FracShootLeafElmAlloc2Litr(NE,k_woody_litr)
+    FracRootStalkElmAlloc2Litr(NE,k_fine_litr)=1.0_r8-FracRootStalkElmAlloc2Litr(NE,k_woody_litr)
+    FracRootElmAlloc2Litr(NE,k_fine_litr)=1.0_r8-FracRootElmAlloc2Litr(NE,k_woody_litr)
   ENDDO
 !
 !     SHOOT AND ROOT TEMPERATURE FUNCTIONS FOR MAINTENANCE

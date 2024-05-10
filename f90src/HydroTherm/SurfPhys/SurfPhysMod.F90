@@ -150,7 +150,7 @@ contains
 !
   LWRadBySurf(NY,NX)=0.0_r8
   VLHeatCapacity(0,NY,NX)=cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP(0,NY,NX)
-  VLPoreLitR(NY,NX)=VLMicP(0,NY,NX)
+  VLPoreLitR(NY,NX)=VLMicP_vr(0,NY,NX)
   VLWatMicP1(0,NY,NX)=AZMAX1(VLWatMicP_vr(0,NY,NX))
   VLiceMicP1(0,NY,NX)=AZMAX1(VLiceMicP(0,NY,NX))
   VLairMicP1(0,NY,NX)=AZMAX1(VLPoreLitR(NY,NX)-VLWatMicP1(0,NY,NX)-VLiceMicP1(0,NY,NX))

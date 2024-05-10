@@ -82,7 +82,7 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  URAIN(:,:)                        !total precipitation, [m3 d-2]
   real(r8),target,allocatable ::  URUN(:,:)                         !total surface runoff, [m3 d-2]
   real(r8),target,allocatable ::  UVLWatMicP(:,:)                !total soil water content, [m3 d-2]
-  real(r8),target,allocatable ::  UVOLO(:,:)                        !total subsurface water flux, [m3 d-2]
+  real(r8),target,allocatable ::  AnualH2OLoss_col(:,:)                        !total subsurface water flux, [m3 d-2]
   real(r8),target,allocatable ::  UDRAIN(:,:)                       !total water drainage below root zone, [m3 d-2]
   real(r8),target,allocatable ::  Wat2GridBySurfRunoff(:,:,:,:)                       !soil surface runoff water, [m3 d-2 h-1]
   real(r8),target,allocatable ::  Heat2GridBySurfRunoff(:,:,:,:)                      !soil surface runoff heat, [MJ d-2 h-1]
@@ -179,7 +179,7 @@ module SoilWaterDataType
   allocate(URAIN(JY,JX));       URAIN=0._r8
   allocate(URUN(JY,JX));        URUN=0._r8
   allocate(UVLWatMicP(JY,JX));       UVLWatMicP=0._r8
-  allocate(UVOLO(JY,JX));       UVOLO=0._r8
+  allocate(AnualH2OLoss_col(JY,JX));       AnualH2OLoss_col=0._r8
   allocate(UDRAIN(JY,JX));      UDRAIN=0._r8
   allocate(Wat2GridBySurfRunoff(2,2,JV,JH));      Wat2GridBySurfRunoff=0._r8
   allocate(Heat2GridBySurfRunoff(2,2,JV,JH));     Heat2GridBySurfRunoff=0._r8
@@ -266,7 +266,7 @@ module SoilWaterDataType
   call destroy(URAIN)
   call destroy(URUN)
   call destroy(UVLWatMicP)
-  call destroy(UVOLO)
+  call destroy(AnualH2OLoss_col)
   call destroy(UDRAIN)
   call destroy(Wat2GridBySurfRunoff)
   call destroy(Heat2GridBySurfRunoff)

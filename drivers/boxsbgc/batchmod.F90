@@ -175,7 +175,7 @@ contains
   micfor%RH1PO4EcoDmndBandPrev =ystates0l(fid_RH1PO4EcoDmndBandPrev)
   micfor%RDOMEcoDmndPrev(1:jcplx)=ystates0l(fid_RDOMEcoDmndPrev_b:fid_RDOMEcoDmndPrev_e)
   micfor%RAcetateEcoDmndPrev(1:jcplx)=ystates0l(fid_RAcetateEcoDmndPrev_b:fid_RAcetateEcoDmndPrev_e)
-  micfor%RCH4L = 0._r8
+  micfor%RCH4PhysexchPrev_vr = 0._r8
   micfor%RO2AquaXchangePrev = 0._r8
   micfor%ElmAllocmatMicrblitr2POM =forc%ElmAllocmatMicrblitr2POM(1:ndbiomcp)
   micfor%litrm=.false.

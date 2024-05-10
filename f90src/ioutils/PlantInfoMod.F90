@@ -448,8 +448,8 @@ implicit none
   call ncd_getvar(pft_nfid, 'RRAD2M', loc,Root2ndMaxRadius_pft(1,NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'PORT', loc,RootPorosity_pft(1,NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'PR', loc,MinNonstC2InitRoot_pft(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'RSRR', loc,RSRR(1,NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'RSRA', loc,RSRA(1,NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'RSRR', loc,RoottRadialResist_pft(1,NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'RSRA', loc,RoottAxialResist_pft(1,NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'PTSHT', loc,ShutRutNonstructElmntConducts_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'RTFQ', loc,RootBranchFreq_pft(NZ,NY,NX))
 
@@ -796,8 +796,8 @@ implicit none
   call writefixl(nu_plt,'primary/fine root porosity (m3 m-3) PORT',RootPorosity_pft(1,NZ,NY,NX),73)
   call writefixl(nu_plt,'nonstructural C concentration needed for root'// &
     ' branching (gC/gC) PR',MinNonstC2InitRoot_pft(NZ,NY,NX),70)
-  call writefixl(nu_plt,'radial root resistivity for water uptake (m2 MPa-1 h-1) RSRR',RSRR(1,NZ,NY,NX),73)
-  call writefixl(nu_plt,'axial root resistivity for water uptake (m2 MPa-1 h-1) RSRA',RSRA(1,NZ,NY,NX),73)
+  call writefixl(nu_plt,'radial root resistivity for water uptake (m2 MPa-1 h-1) RSRR',RoottRadialResist_pft(1,NZ,NY,NX),73)
+  call writefixl(nu_plt,'axial root resistivity for water uptake (m2 MPa-1 h-1) RSRA',RoottAxialResist_pft(1,NZ,NY,NX),73)
   call writefixl(nu_plt,'rate constant for equilibrating shoot-root '// &
     'nonstructural C concn PTSHT',ShutRutNonstructElmntConducts_pft(NZ,NY,NX),73)
   call writefixl(nu_plt,'root branching frequency (m-1) RTFQ',RootBranchFreq_pft(NZ,NY,NX),73)

@@ -220,7 +220,7 @@ module WatsubMod
     !   VLHeatCapacityA,VLHeatCapacityB=volumetric heat capacities of micropore,macropore
     !
         PSISM1(L,NY,NX)=PSISoilMatricP(L,NY,NX)
-        VLMicP1(L,NY,NX)=VLMicP(L,NY,NX)
+        VLMicP1(L,NY,NX)=VLMicP_vr(L,NY,NX)
         VLWatMicP1(L,NY,NX)=VLWatMicP_vr(L,NY,NX)
         VLWatMicPX1(L,NY,NX)=VLWatMicPX(L,NY,NX)
         VLiceMicP1(L,NY,NX)=VLiceMicP(L,NY,NX)

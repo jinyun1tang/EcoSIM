@@ -112,7 +112,7 @@ module StartqMod
   iYearPlantHarvest_pft(NZ,NY,NX)=IYRY(NZ,NY,NX)
   iDayPlantHarvest_pft(NZ,NY,NX)=IDAYY(NZ,NY,NX)
   PPI(NZ,NY,NX)=PPZ(NZ,NY,NX)
-  PPX(NZ,NY,NX)=PPI(NZ,NY,NX)
+  PPX_pft(NZ,NY,NX)=PPI(NZ,NY,NX)
   ClumpFactor_pft(NZ,NY,NX)=ClumpFactorInit_pft(NZ,NY,NX)       !clumping factor
   
   MaxCanPStomaResistH2O_pft(NZ,NY,NX)=RSMX(NZ,NY,NX)/3600.0_r8
@@ -371,7 +371,7 @@ module StartqMod
 !     TempOffset_pft=shift in Arrhenius curve for thermal adaptation (oC)
 !     TCZ,TC4LeafOff_pft=threshold temperature for leafout,leafoff
 !     HTC=high temperature threshold for grain number loss (oC)
-!     SSTX=sensitivity to HTC (seeds oC-1 above HTC)
+!     SeedTempSens_pft=sensitivity to HTC (seeds oC-1 above HTC)
 !
   iPlantThermoAdaptZone(NZ,NY,NX)=PlantInitThermoAdaptZone(NZ,NY,NX)
   TempOffset_pft(NZ,NY,NX)=2.667*(2.5-iPlantThermoAdaptZone(NZ,NY,NX))
@@ -379,15 +379,15 @@ module StartqMod
   TC4LeafOff_pft(NZ,NY,NX)=AMIN1(15.0,TCXD-TempOffset_pft(NZ,NY,NX))
   IF(iPlantPhotosynthesisType(NZ,NY,NX).EQ.3)THEN
     IF(DATAP(NZ,NY,NX)(1:4).EQ.'soyb')THEN
-      HighTCLimtSeed_pft(NZ,NY,NX)=30.0_r8+3.0_r8*iPlantThermoAdaptZone(NZ,NY,NX)
-      SSTX(NZ,NY,NX)=0.002_r8
+      HighTempLimitSeed_pft(NZ,NY,NX)=30.0_r8+3.0_r8*iPlantThermoAdaptZone(NZ,NY,NX)
+      SeedTempSens_pft(NZ,NY,NX)=0.002_r8
     ELSE
-      HighTCLimtSeed_pft(NZ,NY,NX)=27.0_r8+3.0_r8*iPlantThermoAdaptZone(NZ,NY,NX)
-      SSTX(NZ,NY,NX)=0.002_r8
+      HighTempLimitSeed_pft(NZ,NY,NX)=27.0_r8+3.0_r8*iPlantThermoAdaptZone(NZ,NY,NX)
+      SeedTempSens_pft(NZ,NY,NX)=0.002_r8
     ENDIF
   ELSE
-    HighTCLimtSeed_pft(NZ,NY,NX)=27.0_r8+3.0_r8*iPlantThermoAdaptZone(NZ,NY,NX)
-    SSTX(NZ,NY,NX)=0.005_r8
+    HighTempLimitSeed_pft(NZ,NY,NX)=27.0_r8+3.0_r8*iPlantThermoAdaptZone(NZ,NY,NX)
+    SeedTempSens_pft(NZ,NY,NX)=0.005_r8
   ENDIF
   end subroutine PFTThermalAcclimation
 !------------------------------------------------------------------------------------------
@@ -443,8 +443,8 @@ module StartqMod
   VmaxPO4Root_pft(imycorrhz,NZ,NY,NX)=VmaxPO4Root_pft(1,NZ,NY,NX)
   KmPO4Root_pft(imycorrhz,NZ,NY,NX)=KmPO4Root_pft(1,NZ,NY,NX)
   CMinPO4Root_pft(imycorrhz,NZ,NY,NX)=CMinPO4Root_pft(1,NZ,NY,NX)
-  RSRR(imycorrhz,NZ,NY,NX)=1.0E+04
-  RSRA(imycorrhz,NZ,NY,NX)=1.0E+12
+  RoottRadialResist_pft(imycorrhz,NZ,NY,NX)=1.0E+04
+  RoottAxialResist_pft(imycorrhz,NZ,NY,NX)=1.0E+12
 !
 !     RootPoreTortu4Gas=tortuosity for gas transport
 !     RootRaidus_rpft=path length for radial diffusion within root (m)
@@ -478,7 +478,7 @@ module StartqMod
 !
 !     PP=population (grid cell-1)
 !
-  PlantPopulation_pft(NZ,NY,NX)=PPX(NZ,NY,NX)*AREA(3,NU(NY,NX),NY,NX)
+  PlantPopulation_pft(NZ,NY,NX)=PPX_pft(NZ,NY,NX)*AREA(3,NU(NY,NX),NY,NX)
   doInitPlant_pft(NZ,NY,NX)=ifalse
   iPlantShootState_pft(NZ,NY,NX)=iDead
   iPlantRootState_pft(NZ,NY,NX)=iDead
@@ -499,7 +499,7 @@ module StartqMod
     NumOfLeaves_brch(NB,NZ,NY,NX)=0._r8
     LeafNumberAtFloralInit_brch(NB,NZ,NY,NX)=0._r8
     KLeafNumber_brch(NB,NZ,NY,NX)=1
-    KLEAFX(NB,NZ,NY,NX)=1
+    KMinNumLeaf4GroAlloc_brch(NB,NZ,NY,NX)=1
     KHiestGroLeafNode_brch(NB,NZ,NY,NX)=1
     KLowestGroLeafNode_brch(NB,NZ,NY,NX)=0
     NodeNumNormByMatgrp_brch(NB,NZ,NY,NX)=0._r8

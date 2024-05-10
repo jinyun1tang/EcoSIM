@@ -482,10 +482,10 @@ implicit none
     IF(abs(WO)>0._r8)THEN
       VOLWOU=VOLWOU-WO
       FWatDischarge(N2,N1)=FWatDischarge(N2,N1)-WO
-      UVOLO(N2,N1)=UVOLO(N2,N1)-WO
+      AnualH2OLoss_col(N2,N1)=AnualH2OLoss_col(N2,N1)-WO
 !     IF((I/10)*10.EQ.I.AND.J.EQ.15)THEN
 !     WRITE(*,3488)'UVOLO',I,J,N6,N5,N4,N,XN,WO
-!    2,UVOLO(NY,NX),WaterFlowSoiMicP(N,N6,N5,N4),WaterFlowMacP(N,N6,N5,N4)
+!    2,AnualH2OLoss_col(NY,NX),WaterFlowSoiMicP(N,N6,N5,N4),WaterFlowMacP(N,N6,N5,N4)
 !3488  FORMAT(A8,6I4,12E12.4)
 !     ENDIF
 !

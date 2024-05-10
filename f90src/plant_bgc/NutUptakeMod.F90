@@ -1028,10 +1028,10 @@ module NutUptakeMod
   associate(                                                   &
     ZERO2                  => plt_site%ZERO2,                  &
     ZEROS                  => plt_site%ZEROS,                  &
-    RootNO3DmndBand_pvr                 => plt_rbgc%RootNO3DmndBand_pvr,                 &
-    RootNH4DmndSoil_pvr                 => plt_rbgc%RootNH4DmndSoil_pvr,                 &
-    RootNH4DmndBand_pvr                 => plt_rbgc%RootNH4DmndBand_pvr,                 &
-    RootNO3DmndSoil_pvr                 => plt_rbgc%RootNO3DmndSoil_pvr,                 &
+    RootNO3DmndBand_pvr    => plt_rbgc%RootNO3DmndBand_pvr,    &
+    RootNH4DmndSoil_pvr    => plt_rbgc%RootNH4DmndSoil_pvr,    &
+    RootNH4DmndBand_pvr    => plt_rbgc%RootNH4DmndBand_pvr,    &
+    RootNO3DmndSoil_pvr    => plt_rbgc%RootNO3DmndSoil_pvr,    &
     RNO3EcoDmndSoilPrev_vr => plt_bgcr%RNO3EcoDmndSoilPrev_vr, &
     RNH4EcoDmndBandPrev_vr => plt_bgcr%RNH4EcoDmndBandPrev_vr, &
     RNH4EcoDmndSoilPrev_vr => plt_bgcr%RNH4EcoDmndSoilPrev_vr, &
@@ -1096,21 +1096,21 @@ module NutUptakeMod
   REAL(R8), INTENT(IN):: FracPRoot4Uptake(jroots,JZ1,JP1),MinFracPRoot4Uptake(jroots,JZ1,JP1)
   real(r8), intent(out):: FCUP,FZUP,FPUP,FWSRT,PerPlantRootH2OUptake,dtPerPlantRootH2OUptake,FOXYX
 
-  associate(                                                                 &
-    RO2EcoDmndPrev_vr               => plt_bgcr%RO2EcoDmndPrev_vr          , &
-    RCO2N_pvr                       => plt_rbgc%RCO2N_pvr                  , &
-    RootO2Dmnd4Resp_pvr             => plt_rbgc%RootO2Dmnd4Resp_pvr        , &
-    PlantPopulation_pft             => plt_site%PlantPopulation_pft        , &
-    ZEROS                           => plt_site%ZEROS                      , &
-    ZERO                            => plt_site%ZERO                       , &
-    AllPlantRootH2OUptake_vr        => plt_ew%AllPlantRootH2OUptake_vr     , &
-    RootFracRemobilizableBiom       => plt_allom%RootFracRemobilizableBiom , &
-    ZEROP                           => plt_biom%ZEROP                      , &
-    RootProteinConc_pvr             => plt_biom%RootProteinConc_pvr        , &
-    RootProteinC_pvr                => plt_biom%RootProteinC_pvr           , &
-    RootMycoNonstElms_rpvr          => plt_biom%RootMycoNonstElms_rpvr     , &
-    RootNonstructElmConc_pvr        => plt_biom%RootNonstructElmConc_pvr   , &
-    RootMycoActiveBiomC_pvr         => plt_biom%RootMycoActiveBiomC_pvr      &
+  associate(                                                          &
+    RO2EcoDmndPrev_vr         => plt_bgcr%RO2EcoDmndPrev_vr,          &
+    RootCO2EmisPot_pvr        => plt_rbgc%RootCO2EmisPot_pvr,         &
+    RootO2Dmnd4Resp_pvr       => plt_rbgc%RootO2Dmnd4Resp_pvr,        &
+    PlantPopulation_pft       => plt_site%PlantPopulation_pft,        &
+    ZEROS                     => plt_site%ZEROS,                      &
+    ZERO                      => plt_site%ZERO,                       &
+    AllPlantRootH2OUptake_vr  => plt_ew%AllPlantRootH2OUptake_vr,     &
+    RootFracRemobilizableBiom => plt_allom%RootFracRemobilizableBiom, &
+    ZEROP                     => plt_biom%ZEROP,                      &
+    RootProteinConc_pvr       => plt_biom%RootProteinConc_pvr,        &
+    RootProteinC_pvr          => plt_biom%RootProteinC_pvr,           &
+    RootMycoNonstElms_rpvr    => plt_biom%RootMycoNonstElms_rpvr,     &
+    RootNonstructElmConc_pvr  => plt_biom%RootNonstructElmConc_pvr,   &
+    RootMycoActiveBiomC_pvr   => plt_biom%RootMycoActiveBiomC_pvr      &
   )
   !
   !     UPTAKE CAPACITY 'FWSRT' DEPENDS ON ROOT,MYCORRHIZAL
@@ -1131,12 +1131,12 @@ module NutUptakeMod
   !
   !     RESPIRATION CONSTRAINT ON UPTAKE FROM NON-STRUCTURAL C
   !
-  !     RCO2N_pvr=total respiration from CPOOLR
+  !     RootCO2EmisPot_pvr=total respiration from CPOOLR
   !     FCUP=limitation to active uptake respiration from CPOOLR
   !     CPOOLR=nonstructural C content
   !
-  IF(RCO2N_pvr(N,L,NZ).GT.ZEROP(NZ))THEN
-    FCUP=AZMAX1(AMIN1(1.0_r8,0.25_r8*safe_adb(RootMycoNonstElms_rpvr(ielmc,N,L,NZ),RCO2N_pvr(N,L,NZ))))
+  IF(RootCO2EmisPot_pvr(N,L,NZ).GT.ZEROP(NZ))THEN
+    FCUP=AZMAX1(AMIN1(1.0_r8,0.25_r8*safe_adb(RootMycoNonstElms_rpvr(ielmc,N,L,NZ),RootCO2EmisPot_pvr(N,L,NZ))))
   ELSE
     FCUP=0.0_r8
   ENDIF

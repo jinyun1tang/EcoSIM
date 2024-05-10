@@ -150,7 +150,7 @@ type, public :: NitroAQMFluxDiagType
   real(r8),allocatable :: RSOxidSoilAutor(:)
   real(r8),allocatable :: RSOxidBandAutor(:)
 
-  real(r8),allocatable :: XOMZ(:,:,:,:)
+  real(r8),allocatable :: XferBiomeHeterK(:,:,:,:)
   real(r8),allocatable :: RH1PO4TransfSoilHeter(:,:)
   real(r8),allocatable :: RH1PO4TransfBandHeter(:,:)
   real(r8),allocatable :: RH1PO4TransfLitrHeter(:,:)
@@ -212,8 +212,8 @@ type, public :: NitroAQMFluxDiagType
     real(r8),allocatable :: RDOMSorp(:,:)                !rate of DOM adsorption
     real(r8),allocatable :: TDOMUptkHeter(:,:)
     real(r8),allocatable :: ROQC4HeterMicActCmpK(:)
-    real(r8),allocatable :: XOQCK(:)
-    real(r8),allocatable :: XOQMZ(:,:)
+    real(r8),allocatable :: XferRespHeterK(:)
+    real(r8),allocatable :: XferDOMK(:,:)
   contains
     procedure, public :: Init => nit_omcplxf_init
     procedure, public :: ZeroOut => nit_omcplxf_zero
@@ -234,8 +234,8 @@ type, public :: NitroAQMFluxDiagType
     real(r8),allocatable :: OMBioResduK(:)
     real(r8),allocatable :: SolidOMK(:)
     real(r8),allocatable :: SolidOMActK(:)
-    real(r8),allocatable :: TONX(:)
-    real(r8),allocatable :: TOPX(:)
+    real(r8),allocatable :: tMaxNActMicrbK(:)
+    real(r8),allocatable :: tMaxPActMicrbK(:)
     real(r8),allocatable :: CDOM(:,:)
   contains
     procedure, public :: Init => nit_omcplxs_init
@@ -382,7 +382,7 @@ type, public :: NitroAQMFluxDiagType
 
   allocate(this%RSOxidSoilAutor(NumMicrobAutrophCmplx));this%RSOxidSoilAutor=spval
   allocate(this%RSOxidBandAutor(NumMicrobAutrophCmplx));this%RSOxidBandAutor=spval
-  allocate(this%XOMZ(1:NumPlantChemElms,3,NumHetetrMicCmplx,1:jcplx));this%XOMZ=spval
+  allocate(this%XferBiomeHeterK(1:NumPlantChemElms,3,NumHetetrMicCmplx,1:jcplx));this%XferBiomeHeterK=spval
   allocate(this%ROQC4HeterMicrobAct(NumHetetrMicCmplx,1:jcplx));this%ROQC4HeterMicrobAct=spval
   allocate(this%RCCMEheter(NumPlantChemElms,ndbiomcp,NumHetetrMicCmplx,1:jcplx));this%RCCMEheter=spval
 
@@ -529,7 +529,7 @@ type, public :: NitroAQMFluxDiagType
   this%RCH4ProdHeter = 0._r8
   this%RSOxidSoilAutor = 0._r8
   this%RSOxidBandAutor = 0._r8
-  this%XOMZ = 0._r8
+  this%XferBiomeHeterK = 0._r8
   this%RH1PO4TransfSoilHeter = 0._r8
   this%RH1PO4TransfBandHeter = 0._r8
   this%RH1PO4TransfLitrHeter = 0._r8
@@ -638,7 +638,7 @@ type, public :: NitroAQMFluxDiagType
   call destroy(this%RCH4ProdHeter)
   call destroy(this%RSOxidSoilAutor)
   call destroy(this%RSOxidBandAutor)
-  call destroy(this%XOMZ)
+  call destroy(this%XferBiomeHeterK)
   call destroy(this%RH1PO4TransfSoilHeter)
   call destroy(this%RH1PO4TransfBandHeter)
   call destroy(this%RH1PO4TransfLitrHeter)
@@ -742,8 +742,8 @@ type, public :: NitroAQMFluxDiagType
   allocate(this%RDOMSorp(idom_beg:idom_end,1:ncplx))
   allocate(this%TDOMUptkHeter(idom_beg:idom_end,1:ncplx+1))
   allocate(this%ROQC4HeterMicActCmpK(1:ncplx))
-  allocate(this%XOQCK(1:ncplx))
-  allocate(this%XOQMZ(idom_beg:idom_end,1:ncplx))
+  allocate(this%XferRespHeterK(1:ncplx))
+  allocate(this%XferDOMK(idom_beg:idom_end,1:ncplx))
 
   call this%ZeroOut()
   end subroutine nit_omcplxf_init
@@ -760,8 +760,8 @@ type, public :: NitroAQMFluxDiagType
   call destroy(this%RHydlysSorptOM)
   call destroy(this%RDOMSorp)
   call destroy(this%ROQC4HeterMicActCmpK)
-  call destroy(this%XOQCK)
-  call destroy(this%XOQMZ)
+  call destroy(this%XferRespHeterK)
+  call destroy(this%XferDOMK)
 
   end subroutine nit_omcplxf_destroy
 !------------------------------------------------------------------------------------------
@@ -777,8 +777,8 @@ type, public :: NitroAQMFluxDiagType
   this%RHydlysSorptOM=0._r8
   this%RDOMSorp=0._r8
   this%ROQC4HeterMicActCmpK=0._r8
-  this%XOQCK=0._r8
-  this%XOQMZ=0._r8
+  this%XferRespHeterK=0._r8
+  this%XferDOMK=0._r8
   end subroutine nit_omcplxf_zero
 !------------------------------------------------------------------------------------------
 
@@ -801,8 +801,8 @@ type, public :: NitroAQMFluxDiagType
   allocate(this%OMBioResduK(1:ncplx));this%OMBioResduK=spval
   allocate(this%SolidOMK(1:ncplx));this%SolidOMK=spval
   allocate(this%SolidOMActK(1:ncplx));this%SolidOMActK=spval
-  allocate(this%TONX(1:ncplx+1));this%TONX=spval
-  allocate(this%TOPX(1:ncplx+1));this%TOPX=spval
+  allocate(this%tMaxNActMicrbK(1:ncplx+1));this%tMaxNActMicrbK=spval
+  allocate(this%tMaxPActMicrbK(1:ncplx+1));this%tMaxPActMicrbK=spval
   allocate(this%CDOM(idom_beg:idom_end,1:ncplx));this%CDOM=spval
   call this%ZeroOut()
   end subroutine nit_omcplxs_init
@@ -826,8 +826,8 @@ type, public :: NitroAQMFluxDiagType
   this%OMBioResduK=0._r8
   this%SolidOMK=0._r8
   this%SolidOMActK=0._r8
-  this%TONX=0._r8
-  this%TOPX=0._r8
+  this%tMaxNActMicrbK=0._r8
+  this%tMaxPActMicrbK=0._r8
 
   end subroutine nit_omcplxs_zero
 
@@ -850,8 +850,8 @@ type, public :: NitroAQMFluxDiagType
   call destroy(this%OMBioResduK)
   call destroy(this%SolidOMK)
   call destroy(this%SolidOMActK)
-  call destroy(this%TONX)
-  call destroy(this%TOPX)
+  call destroy(this%tMaxNActMicrbK)
+  call destroy(this%tMaxPActMicrbK)
   call destroy(this%CDOM)
 
   end subroutine nit_omcplxs_destroy

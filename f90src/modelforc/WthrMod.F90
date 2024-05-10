@@ -478,9 +478,9 @@ module WthrMod
             !     TC4LeafOut_pft(NZ,NY,NX)=TCZD-TempOffset_pft(NZ,NY,NX)
             !     TC4LeafOff_pft(NZ,NY,NX)=AMIN1(15.0,TC4LeafOut_pft(NZ,NY,NX)+TCXD)
             IF(iPlantPhotosynthesisType(NZ,NY,NX).EQ.3)THEN
-              HighTCLimtSeed_pft(NZ,NY,NX)=27.0+3.0*iPlantThermoAdaptZone(NZ,NY,NX)
+              HighTempLimitSeed_pft(NZ,NY,NX)=27.0+3.0*iPlantThermoAdaptZone(NZ,NY,NX)
             ELSE
-              HighTCLimtSeed_pft(NZ,NY,NX)=30.0+3.0*iPlantThermoAdaptZone(NZ,NY,NX)
+              HighTempLimitSeed_pft(NZ,NY,NX)=30.0+3.0*iPlantThermoAdaptZone(NZ,NY,NX)
             ENDIF
             MatureGroup_pft(NZ,NY,NX)=GROUPX(NZ,NY,NX)+0.30_r8*DTA
             IF(iPlantTurnoverPattern_pft(NZ,NY,NX).NE.0)THEN

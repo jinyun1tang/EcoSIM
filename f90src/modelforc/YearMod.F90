@@ -51,7 +51,7 @@
   UEVAP(NY,NX)=0._r8
   URUN(NY,NX)=0._r8
   USEDOU(NY,NX)=0._r8
-  UVOLO(NY,NX)=0._r8
+  AnualH2OLoss_col(NY,NX)=0._r8
   HydroIonFlx_col(NY,NX)=0._r8
   FertNFlx_col(NY,NX)=0._r8
   LiterfalOrgM_col(ielmn,NY,NX)=0._r8

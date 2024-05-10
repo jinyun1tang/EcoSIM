@@ -59,7 +59,7 @@ module NoduleBGCMod
     ZERO                      => plt_site%ZERO,                      &
     AREA3                     => plt_site%AREA3,                     &
     k_fine_litr               => pltpar%k_fine_litr,                 &
-    ElmAllocmat4Litr                     => plt_soilchem%ElmAllocmat4Litr,                 &
+    ElmAllocmat4Litr          => plt_soilchem%ElmAllocmat4Litr,      &
     iPlantNfixType            => plt_morph%iPlantNfixType,           &
     fTgrowCanP                => plt_pheno%fTgrowCanP,               &
     CanopyGrosRCO2_pft        => plt_bgcr%CanopyGrosRCO2_pft,        &
@@ -271,8 +271,10 @@ module NoduleBGCMod
 !
     IF(RSNDL.GT.0.0_r8 .AND. CanopyNodulStrutElms_brch(ielmc,NB,NZ).GT.ZEROP(NZ) .AND. RCCC.GT.ZERO)THEN
       NodulELmLoss2Senes(ielmc)=RSNDL/RCCC
-      NodulELmLoss2Senes(ielmn)=NodulELmLoss2Senes(ielmc)*CanopyNodulStrutElms_brch(ielmn,NB,NZ)/CanopyNodulStrutElms_brch(ielmc,NB,NZ)
-      NodulELmLoss2Senes(ielmp)=NodulELmLoss2Senes(ielmc)*CanopyNodulStrutElms_brch(ielmp,NB,NZ)/CanopyNodulStrutElms_brch(ielmc,NB,NZ)
+      NodulELmLoss2Senes(ielmn)=NodulELmLoss2Senes(ielmc)*CanopyNodulStrutElms_brch(ielmn,NB,NZ)&
+        /CanopyNodulStrutElms_brch(ielmc,NB,NZ)
+      NodulELmLoss2Senes(ielmp)=NodulELmLoss2Senes(ielmc)*CanopyNodulStrutElms_brch(ielmp,NB,NZ)&
+        /CanopyNodulStrutElms_brch(ielmc,NB,NZ)
 
       NodulELmSenes2Litr(ielmc)=NodulELmLoss2Senes(ielmc)*(1.0_r8-RCCC)
       NodulELmSenes2Litr(ielmn)=NodulELmLoss2Senes(ielmn)*(1.0_r8-RCCC)*(1.0_r8-RCCN)
@@ -451,7 +453,7 @@ module NoduleBGCMod
     k_fine_litr            => pltpar%k_fine_litr,              &
     iroot                  => pltpar%iroot,                    &
     RootRespPotent_pvr     => plt_rbgc%RootRespPotent_pvr,     &
-    RCO2N_pvr              => plt_rbgc%RCO2N_pvr,              &
+    RootCO2EmisPot_pvr     => plt_rbgc%RootCO2EmisPot_pvr,     &
     RAutoRootO2Limter_pvr  => plt_rbgc%RAutoRootO2Limter_pvr,  &
     RootCO2Autor_pvr       => plt_rbgc%RootCO2Autor_pvr,       &
     NodulInfectElms_pft    => plt_bgcr%NodulInfectElms_pft,    &
@@ -464,7 +466,7 @@ module NoduleBGCMod
     RootNodulNonstElms_pvr => plt_biom%RootNodulNonstElms_pvr, &
     ZEROL                  => plt_biom%ZEROL,                  &
     RootMycoNonstElms_rpvr => plt_biom%RootMycoNonstElms_rpvr, &
-    ElmAllocmat4Litr                  => plt_soilchem%ElmAllocmat4Litr,              &
+    ElmAllocmat4Litr       => plt_soilchem%ElmAllocmat4Litr,   &
     iPlantNfixType         => plt_morph%iPlantNfixType,        &
     NIXBotRootLayer_pft    => plt_morph%NIXBotRootLayer_pft    &
   )
@@ -664,8 +666,10 @@ module NoduleBGCMod
 !
         IF(RSNDL.GT.0.0_r8 .AND. RootNodulStrutElms_pvr(ielmc,L,NZ).GT.ZEROP(NZ) .AND. RCCC.GT.ZERO)THEN
           NodulELmLoss2Senes(ielmc)=RSNDL/RCCC
-          NodulELmLoss2Senes(ielmn)=NodulELmLoss2Senes(ielmc)*RootNodulStrutElms_pvr(ielmn,L,NZ)/RootNodulStrutElms_pvr(ielmc,L,NZ)
-          NodulELmLoss2Senes(ielmp)=NodulELmLoss2Senes(ielmc)*RootNodulStrutElms_pvr(ielmp,L,NZ)/RootNodulStrutElms_pvr(ielmc,L,NZ)
+          NodulELmLoss2Senes(ielmn)=NodulELmLoss2Senes(ielmc)*RootNodulStrutElms_pvr(ielmn,L,NZ)&
+            /RootNodulStrutElms_pvr(ielmc,L,NZ)
+          NodulELmLoss2Senes(ielmp)=NodulELmLoss2Senes(ielmc)*RootNodulStrutElms_pvr(ielmp,L,NZ)&
+            /RootNodulStrutElms_pvr(ielmc,L,NZ)
           NodulELmSenes2Litr(ielmc)=NodulELmLoss2Senes(ielmc)*(1.0_r8-RCCC)
           NodulELmSenes2Litr(ielmn)=NodulELmLoss2Senes(ielmn)*(1.0_r8-RCCC)*(1.0_r8-RCCN)
           NodulELmSenes2Litr(ielmp)=NodulELmLoss2Senes(ielmp)*(1.0_r8-RCCC)*(1.0_r8-RCCP)
@@ -687,12 +691,12 @@ module NoduleBGCMod
 !     NoduleCResp=bacterial respiration for growth and N2 fixation
 !     NodulELmSenes2Recyc(ielmc)=bacterial C senescence to recycling
 !     RootCO2Autor_pvr=total root respiration
-!     RootRespPotent_pvr,RCO2N_pvr,RootCO2Autor_pvr unlimited by O2,nonstructural C
+!     RootRespPotent_pvr,RootCO2EmisPot_pvr,RootCO2Autor_pvr unlimited by O2,nonstructural C
 !
         RCO2TM=AMIN1(Rmaint,RespNonst_OUltd)+RGNDLM+NodulELmSenes2Recyc(ielmc)
         RCO2T=AMIN1(Rmaint,RespNonst_Oltd)+NoduleCResp+NodulELmSenes2Recyc(ielmc)
         RootRespPotent_pvr(ipltroot,L,NZ)=RootRespPotent_pvr(ipltroot,L,NZ)+RCO2TM
-        RCO2N_pvr(ipltroot,L,NZ)=RCO2N_pvr(ipltroot,L,NZ)+RCO2T
+        RootCO2EmisPot_pvr(ipltroot,L,NZ)=RootCO2EmisPot_pvr(ipltroot,L,NZ)+RCO2T
         RootCO2Autor_pvr(ipltroot,L,NZ)=RootCO2Autor_pvr(ipltroot,L,NZ)-RCO2T
 !
 !     NODULE LitrFall CAUSED BY REMOBILIZATION

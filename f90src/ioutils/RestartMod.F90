@@ -937,10 +937,10 @@ implicit none
     call restartvar(ncid, flag, varname='PPX', dim1name='pft',&
      long_name='plant population', units='# m-2', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)       
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,PPX,datrp_1d,NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft)  
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,PPX_pft,datrp_1d,NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft)  
   else
     !print*,'PPX'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,PPX,datrp_1d,NumActivePlants=NumActivePlants,&
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,PPX_pft,datrp_1d,NumActivePlants=NumActivePlants,&
       IsPlantActive_pft=IsPlantActive_pft)  
     datpr1 => datrp_1d
     call restartvar(ncid, flag, varname='PPX', dim1name='pft',&
@@ -2893,16 +2893,16 @@ implicit none
 
   if(flag=='read')then
     datpr3 => datrp_3d(1:npfts,1:pltpar%jroots,1:JZ)
-    call restartvar(ncid, flag, varname='RCO2N_pvr', dim1name='pft',dim2name='rootyps',&
+    call restartvar(ncid, flag, varname='RootCO2EmisPot_pvr', dim1name='pft',dim2name='rootyps',&
      dim3name='levsoi',long_name='root CO2 efflux unconstrained by root nonstructural C', units='g d-2 h-1', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval) 
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,RCO2N_pvr,datrp_3d,NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft) 
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,RootCO2EmisPot_pvr,datrp_3d,NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft) 
   else
-    !print*,'RCO2N_pvr'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,RCO2N_pvr,datrp_3d,NumActivePlants=NumActivePlants,&
+    !print*,'RootCO2EmisPot_pvr'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,RootCO2EmisPot_pvr,datrp_3d,NumActivePlants=NumActivePlants,&
       IsPlantActive_pft=IsPlantActive_pft)   
     datpr3 => datrp_3d(1:npfts,1:pltpar%jroots,1:JZ)
-    call restartvar(ncid, flag, varname='RCO2N_pvr', dim1name='pft',dim2name='rootyps',&
+    call restartvar(ncid, flag, varname='RootCO2EmisPot_pvr', dim1name='pft',dim2name='rootyps',&
      dim3name='levsoi',long_name='root CO2 efflux unconstrained by root nonstructural C', units='g d-2 h-1', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval) 
   endif  
@@ -3775,10 +3775,10 @@ implicit none
        long_name='total plant population', units='# d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,PPT,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,PlantPopu_col,datrc_1d) 
   else
     !print*,'PPT'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,PPT,datrc_1d)   
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,PlantPopu_col,datrc_1d)   
     datpr1 => datrc_1d    
     call restartvar(ncid, flag, varname='PPT', dim1name='column',&
        long_name='total plant population', units='# d-2', &
@@ -3992,16 +3992,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d        
-    call restartvar(ncid, flag, varname='UVOLO', dim1name='column',&
+    call restartvar(ncid, flag, varname='AnualH2OLoss_col', dim1name='column',&
        long_name='total subsurface water flux', units='m3 d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,UVOLO,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,AnualH2OLoss_col,datrc_1d) 
   else
-    !print*,'UVOLO'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,UVOLO,datrc_1d)   
+    !print*,'AnualH2OLoss_col'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,AnualH2OLoss_col,datrc_1d)   
     datpr1 => datrc_1d          
-    call restartvar(ncid, flag, varname='UVOLO', dim1name='column',&
+    call restartvar(ncid, flag, varname='AnualH2OLoss_col', dim1name='column',&
        long_name='total subsurface water flux', units='m3 d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
@@ -5405,16 +5405,16 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrc_2d(1:ncols,1:JZ+1)    
-    call restartvar(ncid, flag, varname='VLMicP', dim1name='column',dim2name='levsoi1',&
+    call restartvar(ncid, flag, varname='VLMicP_vr', dim1name='column',dim2name='levsoi1',&
        long_name='total volume in micropores', units='m3 d-2', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)      
-    call cpcol(flag,NHW,NHE,NVN,NVS,VLMicP,datrc_2d)     
+    call cpcol(flag,NHW,NHE,NVN,NVS,VLMicP_vr,datrc_2d)     
   else
-    !print*,'VLMicP'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VLMicP,datrc_2d)       
+    !print*,'VLMicP_vr'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VLMicP_vr,datrc_2d)       
     datpr2 => datrc_2d(1:ncols,1:JZ+1)    
-    call restartvar(ncid, flag, varname='VLMicP', dim1name='column',dim2name='levsoi1',&
+    call restartvar(ncid, flag, varname='VLMicP_vr', dim1name='column',dim2name='levsoi1',&
        long_name='total volume in micropores', units='m3 d-2', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)      
@@ -5593,16 +5593,16 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrc_2d(1:ncols,1:JZ+1)        
-    call restartvar(ncid, flag, varname='RCO2F', dim1name='column',dim2name='levsoi1',&
+    call restartvar(ncid, flag, varname='RCO2GasFlxPrev_vr', dim1name='column',dim2name='levsoi1',&
        long_name='net gaseous CO2 flux', units='g d-2 h-1', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)  
-    call cpcol(flag,NHW,NHE,NVN,NVS,RCO2F,datrc_2d)     
+    call cpcol(flag,NHW,NHE,NVN,NVS,RCO2GasFlxPrev_vr,datrc_2d)     
   else
-    !print*,'RCO2F'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RCO2F,datrc_2d)       
+    !print*,'RCO2GasFlxPrev_vr'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RCO2GasFlxPrev_vr,datrc_2d)       
     datpr2 => datrc_2d(1:ncols,1:JZ+1)        
-    call restartvar(ncid, flag, varname='RCO2F', dim1name='column',dim2name='levsoi1',&
+    call restartvar(ncid, flag, varname='RCO2GasFlxPrev_vr', dim1name='column',dim2name='levsoi1',&
        long_name='net gaseous CO2 flux', units='g d-2 h-1', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)  
@@ -5648,10 +5648,10 @@ implicit none
        long_name='net aqueous CH4 flux', units='g d-2 h-1', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)  
-    call cpcol(flag,NHW,NHE,NVN,NVS,RCH4L,datrc_2d)       
+    call cpcol(flag,NHW,NHE,NVN,NVS,RCH4PhysexchPrev_vr,datrc_2d)       
   else
     !print*,'RCH4L'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RCH4L,datrc_2d)         
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RCH4PhysexchPrev_vr,datrc_2d)         
     datpr2 => datrc_2d(1:ncols,1:JZ+1)        
     call restartvar(ncid, flag, varname='RCH4L', dim1name='column',dim2name='levsoi1',&
        long_name='net aqueous CH4 flux', units='g d-2 h-1', &

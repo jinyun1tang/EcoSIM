@@ -72,7 +72,7 @@ module RootGasMod
     TortMicPM                => plt_site%TortMicPM,                &
     FILM                     => plt_site%FILM,                     &
     RO2GasXchangePrev_vr     => plt_bgcr%RO2GasXchangePrev_vr,     &
-    RCO2F                    => plt_bgcr%RCO2F,                    &
+    RCO2GasFlxPrev_vr        => plt_bgcr%RCO2GasFlxPrev_vr,        &
     RO2AquaXchangePrev_vr    => plt_bgcr%RO2AquaXchangePrev_vr,    &
     RootO2Uptk_pvr           => plt_rbgc%RootO2Uptk_pvr,           &
     RAutoRootO2Limter_pvr    => plt_rbgc%RAutoRootO2Limter_pvr,    &
@@ -150,7 +150,7 @@ module RootGasMod
     RTVLWB=RootVH2O_pvr(N,L,NZ)*trcs_VLN_vr(ids_NH4B,L)
     RootOxyDemandPerPlant=RootO2Dmnd4Resp_pvr(N,L,NZ)*dts_gas/PlantPopulation_pft(NZ)
     ROXYFX=RO2GasXchangePrev_vr(L)*FOXYX*dts_gas
-    RCO2FX=RCO2F(L)*FOXYX*dts_gas
+    RCO2FX=RCO2GasFlxPrev_vr(L)*FOXYX*dts_gas
     ROXYLX=RO2AquaXchangePrev_vr(L)*FOXYX*dts_gas
 !
 !     GASEOUS AND AQUEOUS DIFFUSIVITIES IN ROOT AND SOIL

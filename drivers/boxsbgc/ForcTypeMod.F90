@@ -203,7 +203,7 @@ implicit none
     real(r8) :: RH2PO4EcoDmndSoilPrev       !total root + microbial PO4 uptake non-band from previous hour, [g d-2 h-1]
     real(r8) :: RH1PO4EcoDmndSoilPrev       !HPO4 demand in non-band by all microbial, root, myco populations from previous hour
     real(r8) :: RO2GasXchangePrev       !net gaseous O2 flux, [g d-2 h-1], updated in redist.f
-    real(r8) :: RCH4L       !net aqueous CH4 flux, [g d-2 h-1], updated in redist.f
+    real(r8) :: RCH4PhysexchPrev_vr       !net aqueous CH4 flux, [g d-2 h-1], updated in redist.f
     real(r8) :: RO2AquaXchangePrev       !net aqueous O2 flux from previous hour, [g d-2 h-1], updated in redist.f
     logical  :: disvolonly  !flag to only do dissolution/volatilization
   end type forc_type
@@ -492,7 +492,7 @@ implicit none
   forc%RH2PO4EcoDmndSoilPrev=0._r8
   forc%RH1PO4EcoDmndSoilPrev=0._r8
   forc%RO2GasXchangePrev=0._r8
-  forc%RCH4L=0._r8
+  forc%RCH4PhysexchPrev_vr=0._r8
   forc%RO2AquaXchangePrev=0._r8
 
   first=.false.

@@ -12,7 +12,7 @@ implicit none
   integer  ::  IWTHR(2)                            !weather data type:1=daily,2=hourly for first(L=1) or second(L=2) scene
 
   integer,target,allocatable ::  IYTYP(:,:,:,:)                      !fertilizer release type from fertilizer input file
-  integer,target,allocatable ::  ITILL(:,:,:)                        !soil disturbance type, [-]
+  integer,target,allocatable ::  iSoilDisturbType_col(:,:,:)                        !soil disturbance type, [-]
   integer,target,allocatable ::  KoppenClimZone(:,:)                          !Koppen climate zone
   integer,target,allocatable ::  IFLGV(:,:)                          !flag for irrigation criterion,0=SWC,1=canopy water potential
   integer,target,allocatable ::  IFLGS(:,:)                          !disturbance flag
@@ -44,7 +44,7 @@ contains
 
   implicit none
   allocate(IYTYP(0:2,366,JY,JX));IYTYP=0
-  allocate(ITILL(366,JY,JX));   ITILL=0
+  allocate(iSoilDisturbType_col(366,JY,JX));   iSoilDisturbType_col=0
   allocate(KoppenClimZone(JY,JX));       KoppenClimZone=0
   allocate(IFLGV(JY,JX));       IFLGV=0
   allocate(IFLGS(JY,JX));       IFLGS=0
@@ -75,7 +75,7 @@ contains
   use abortutils, only : destroy
   implicit none
   call destroy(IYTYP)
-  call destroy(ITILL)
+  call destroy(iSoilDisturbType_col)
   call destroy(KoppenClimZone)
   call destroy(IFLGV)
   call destroy(IFLGS)

@@ -300,7 +300,7 @@ module TillageMixMod
         TVOLW=TVOLW+TI*VLWatMicP_vr(L,NY,NX)
         TVOLI=TVOLI+TI*VLiceMicP(L,NY,NX)
 !     TVOLP=TVOLP+TI*VLsoiAirP(L,NY,NX)
-!     TVOLA=TVOLA+TI*VLMicP(L,NY,NX)
+!     TVOLA=TVOLA+TI*VLMicP_vr(L,NY,NX)
         TENGY=TENGY+TI*(cpw*(VLWatMicP_vr(L,NY,NX)+VLWatMacP(L,NY,NX)) &
           +cpi*(VLiceMicP(L,NY,NX)+VLiceMacP(L,NY,NX)))*TKS(L,NY,NX)
         DO NTN=ifertn_beg,ifertn_end
@@ -419,7 +419,7 @@ module TillageMixMod
         VLWatMicPX(L,NY,NX)=VLWatMicP_vr(L,NY,NX)
 !     VLWatMicP_vr(L,NY,NX)=VLWatMicP_vr(L,NY,NX)+CORP*VLWatMacP(L,NY,NX)
 !     VLiceMicP(L,NY,NX)=VLiceMicP(L,NY,NX)+CORP*VLiceMacP(L,NY,NX)
-!     VLMicP(L,NY,NX)=VLMicP(L,NY,NX)+CORP*VLMacP(L,NY,NX)
+!     VLMicP_vr(L,NY,NX)=VLMicP_vr(L,NY,NX)+CORP*VLMacP(L,NY,NX)
 !     VLWatMacP(L,NY,NX)=XCORP(NY,NX)*VLWatMacP(L,NY,NX)
 !     VLiceMacP(L,NY,NX)=XCORP(NY,NX)*VLiceMacP(L,NY,NX)
 !     VLMacP(L,NY,NX)=XCORP(NY,NX)*VLMacP(L,NY,NX)

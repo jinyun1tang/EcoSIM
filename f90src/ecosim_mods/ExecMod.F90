@@ -47,9 +47,9 @@ module ExecMod
 !    endif
     TLH=HeatStoreLandscape-HEATIN+HEATOU
     TLO=OXYGSO-OXYGIN+OXYGOU
-    TLC=LitRMStoreLndscap(ielmc)+POMHumStoreLndscap(ielmc)+TLCO2G-CO2GIN+TOMOU(ielmc)-TORGF-Litrfall_lnds(ielmc)
-    TLN=LitRMStoreLndscap(ielmn)+POMHumStoreLndscap(ielmn)+TLN2G+TLNH4+tNO3_lnd-ZN2GIN-TZIN+TOMOU(ielmn)-TORGN-Litrfall_lnds(ielmn)
-    TLP=LitRMStoreLndscap(ielmp)+POMHumStoreLndscap(ielmp)+TLPO4-TPIN+TOMOU(ielmp)-TORGP-Litrfall_lnds(ielmp)
+    TLC=LitRMStoreLndscap(ielmc)+POMHumStoreLndscap(ielmc)+TGasC_lnd-CO2GIN+TOMOU(ielmc)-TORGF-Litrfall_lnds(ielmc)
+    TLN=LitRMStoreLndscap(ielmn)+POMHumStoreLndscap(ielmn)+TGasN_lnd+TDisolNH4_lnd+tNO3_lnd-ZN2GIN-TZIN+TOMOU(ielmn)-TORGN-Litrfall_lnds(ielmn)
+    TLP=LitRMStoreLndscap(ielmp)+POMHumStoreLndscap(ielmp)+TDisolPi_lnd-TPIN+TOMOU(ielmp)-TORGP-Litrfall_lnds(ielmp)
     TLI=TION-TIONIN+TIONOU
   ENDIF
 !
@@ -59,10 +59,10 @@ module ExecMod
     DIFFQ=(WaterStoreLandscape-CRAIN+CRUN+CEVAP+VOLWOU-TLW)/TAREA
     DIFFH=(HeatStoreLandscape-HEATIN+HEATOU-TLH)/TAREA
     DIFFO=(OXYGSO-OXYGIN+OXYGOU-TLO)/TAREA
-    DIFFC=(LitRMStoreLndscap(ielmc)+POMHumStoreLndscap(ielmc)+TLCO2G-CO2GIN+TOMOU(ielmc)-TORGF-Litrfall_lnds(ielmc)-TLC)/TAREA
-    DIFFN=(LitRMStoreLndscap(ielmn)+POMHumStoreLndscap(ielmn)+TLN2G+TLNH4+tNO3_lnd-ZN2GIN-TZIN+TOMOU(ielmn) &
+    DIFFC=(LitRMStoreLndscap(ielmc)+POMHumStoreLndscap(ielmc)+TGasC_lnd-CO2GIN+TOMOU(ielmc)-TORGF-Litrfall_lnds(ielmc)-TLC)/TAREA
+    DIFFN=(LitRMStoreLndscap(ielmn)+POMHumStoreLndscap(ielmn)+TGasN_lnd+TDisolNH4_lnd+tNO3_lnd-ZN2GIN-TZIN+TOMOU(ielmn) &
       -TORGN-Litrfall_lnds(ielmn)-TLN)/TAREA
-    DIFFP=(LitRMStoreLndscap(ielmp)+POMHumStoreLndscap(ielmp)+TLPO4-TPIN+TOMOU(ielmp)-TORGP-Litrfall_lnds(ielmp)-TLP)/TAREA
+    DIFFP=(LitRMStoreLndscap(ielmp)+POMHumStoreLndscap(ielmp)+TDisolPi_lnd-TPIN+TOMOU(ielmp)-TORGP-Litrfall_lnds(ielmp)-TLP)/TAREA
     DIFFI=(TION-TIONIN+TIONOU-TLI)/TAREA
     WRITE(*,212)I,iYearCurrent
     WRITE(18,213)I,iYearCurrent,DIFFQ,DIFFH,DIFFO,DIFFC,DIFFN &
@@ -87,17 +87,17 @@ module ExecMod
     IF(ABS(DIFFC).GT.ppmc)THEN
       WRITE(18,191)I,iYearCurrent
 191   FORMAT('CARBON BALANCE LOST ON DAY, YEAR',2I4)
-      TLC=LitRMStoreLndscap(ielmc)+POMHumStoreLndscap(ielmc)+TLCO2G-CO2GIN+TOMOU(ielmc)-TORGF-Litrfall_lnds(ielmc)
+      TLC=LitRMStoreLndscap(ielmc)+POMHumStoreLndscap(ielmc)+TGasC_lnd-CO2GIN+TOMOU(ielmc)-TORGF-Litrfall_lnds(ielmc)
     ENDIF
     IF(ABS(DIFFN).GT.ppmc)THEN
       WRITE(18,192)I,iYearCurrent
 192   FORMAT('NITROGEN BALANCE LOST ON DAY, YEAR',2I4)
-      TLN=LitRMStoreLndscap(ielmn)+POMHumStoreLndscap(ielmn)+TLN2G+TLNH4+tNO3_lnd-ZN2GIN-TZIN+TOMOU(ielmn)-TORGN-Litrfall_lnds(ielmn)
+      TLN=LitRMStoreLndscap(ielmn)+POMHumStoreLndscap(ielmn)+TGasN_lnd+TDisolNH4_lnd+tNO3_lnd-ZN2GIN-TZIN+TOMOU(ielmn)-TORGN-Litrfall_lnds(ielmn)
     ENDIF
     IF(ABS(DIFFP).GT.ppmc)THEN
       WRITE(18,193)I,iYearCurrent
 193   FORMAT('PHOSPHORUS BALANCE LOST ON DAY, YEAR',2I4)
-      TLP=LitRMStoreLndscap(ielmp)+POMHumStoreLndscap(ielmp)+TLPO4-TPIN+TOMOU(ielmp)-TORGP-Litrfall_lnds(ielmp)
+      TLP=LitRMStoreLndscap(ielmp)+POMHumStoreLndscap(ielmp)+TDisolPi_lnd-TPIN+TOMOU(ielmp)-TORGP-Litrfall_lnds(ielmp)
     ENDIF
     IF(ABS(DIFFQ).GT.ppmc)THEN
       WRITE(18,194)I,iYearCurrent

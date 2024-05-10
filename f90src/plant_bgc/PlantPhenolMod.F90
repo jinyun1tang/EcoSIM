@@ -55,7 +55,7 @@ module PlantPhenolMod
     iPlantCalendar_brch              =>  plt_pheno%iPlantCalendar_brch             , &
     DayLenthCurrent                  =>  plt_site%DayLenthCurrent                  , &
     DATAP                            =>  plt_site%DATAP                            , &
-    PPT                              =>  plt_site%PPT                              , &
+    PlantPopu_col                    =>  plt_site%PlantPopu_col                    , &
     DayLenthPrev                     =>  plt_site%DayLenthPrev                     , &
     NP                               =>  plt_site%NP                               , &
     PlantPopulation_pft              =>  plt_site%PlantPopulation_pft              , &
@@ -65,9 +65,9 @@ module PlantPhenolMod
 
     IF(DATAP(NZ).NE.'NO')THEN
 !
-!     PPT=total biome population
+!     PlantPopu_col=total biome population
 !
-      PPT=PPT+PlantPopulation_pft(NZ)
+      PlantPopu_col=PlantPopu_col+PlantPopulation_pft(NZ)
 !
 !         SET CROP FLAG ACCORDINGTopRootLayer_pftTO PLANTING, HARVEST DATES, DEATH,
 !         1 = ALIVE, 0 = NOT ALIVE

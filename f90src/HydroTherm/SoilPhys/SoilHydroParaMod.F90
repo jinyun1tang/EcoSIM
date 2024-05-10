@@ -247,7 +247,7 @@ contains
     ENDIF
   ENDIF
   if(lverb)write(*,*)'finish soilp set'
-  VLsoiAirP(L,NY,NX)=AZMAX1(VLMicP(L,NY,NX)-VLWatMicP_vr(L,NY,NX)-VLiceMicP(L,NY,NX)) &
+  VLsoiAirP(L,NY,NX)=AZMAX1(VLMicP_vr(L,NY,NX)-VLWatMicP_vr(L,NY,NX)-VLiceMicP(L,NY,NX)) &
     +AZMAX1(VLMacP(L,NY,NX)-VLWatMacP(L,NY,NX)-VLiceMacP(L,NY,NX))
 
   IF(VGeomLayer(L,NY,NX).GT.ZEROS2(NY,NX))THEN

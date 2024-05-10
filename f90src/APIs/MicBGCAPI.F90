@@ -198,7 +198,7 @@ implicit none
   micfor%RNO2EcoUptkBandPrev =RNO2EcoUptkBandPrev_vr(L,NY,NX)
   micfor%RO2EcoDmndPrev =RO2EcoDmndPrev_vr(L,NY,NX)
   micfor%RO2GasXchangePrev =RO2GasXchangePrev_vr(L,NY,NX)
-  micfor%RCH4L =RCH4L(L,NY,NX)
+  micfor%RCH4PhysexchPrev_vr =RCH4PhysexchPrev_vr(L,NY,NX)
   micfor%RNH4EcoDmndBandPrev =RNH4EcoDmndBandPrev_vr(L,NY,NX)
   micfor%RNO3EcoDmndBandPrev =RNO3EcoDmndBandPrev_vr(L,NY,NX)
   micfor%RH2PO4EcoDmndBandPrev =RH2PO4EcoDmndBandPrev_vr(L,NY,NX)

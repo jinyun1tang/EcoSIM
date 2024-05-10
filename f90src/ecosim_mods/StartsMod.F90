@@ -404,10 +404,10 @@ module StartsMod
     PSISE(L,NY,NX)=PSIPS
     PSISoilAirEntry(L,NY,NX)=-1.5E-03_r8
     RO2GasXchangePrev_vr(L,NY,NX)=0.0_r8
-    RCO2F(L,NY,NX)=0.0_r8
+    RCO2GasFlxPrev_vr(L,NY,NX)=0.0_r8
     RO2AquaXchangePrev_vr(L,NY,NX)=0.0_r8
     RCH4F(L,NY,NX)=0.0_r8
-    RCH4L(L,NY,NX)=0.0_r8
+    RCH4PhysexchPrev_vr(L,NY,NX)=0.0_r8
 
     IF(L.GT.0)THEN
       IF(SoiBulkDensity(L,NY,NX).GT.ZERO)THEN
@@ -421,8 +421,8 @@ module StartsMod
         POROS(L,NY,NX)=1.0_r8
       ENDIF
       POROSI(L,NY,NX)=POROS(L,NY,NX)*FracSoiAsMicP(L,NY,NX)
-      VLMicP(L,NY,NX)=POROS(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
-      VLMicPt0(L,NY,NX)=VLMicP(L,NY,NX)
+      VLMicP_vr(L,NY,NX)=POROS(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
+      VLMicPt0(L,NY,NX)=VLMicP_vr(L,NY,NX)
       VLMacP(L,NY,NX)=SoilFracAsMacP(L,NY,NX)*VGeomLayert0(L,NY,NX)
       !
       !     LAYER HEAT CONTENTS
@@ -480,7 +480,7 @@ module StartsMod
         VLiceMicP(L,NY,NX)=THETI(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
         VLiceMacP(L,NY,NX)=THETI(L,NY,NX)*VLMacP(L,NY,NX)
 !       total air-filled porosity, micropores + macropores
-        VLsoiAirP(L,NY,NX)=AZMAX1(VLMicP(L,NY,NX)-VLWatMicP_vr(L,NY,NX)-VLiceMicP(L,NY,NX)) &
+        VLsoiAirP(L,NY,NX)=AZMAX1(VLMicP_vr(L,NY,NX)-VLWatMicP_vr(L,NY,NX)-VLiceMicP(L,NY,NX)) &
           +AZMAX1(VLMacP(L,NY,NX)-VLWatMacP(L,NY,NX)-VLiceMacP(L,NY,NX))
         VHeatCapacity(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+cpw*(VLWatMicP_vr(L,NY,NX) &
           +VLWatMacP(L,NY,NX))+cpi*(VLiceMicP(L,NY,NX)+VLiceMacP(L,NY,NX))
@@ -778,7 +778,7 @@ module StartsMod
   AmendCFlx_col(:,:)=0.0_r8
   FertNFlx_col(:,:)=0.0_r8
   FerPFlx_col(:,:)=0.0_r8
-  UVOLO(:,:)=0.0_r8
+  AnualH2OLoss_col(:,:)=0.0_r8
   UEVAP(:,:)=0.0_r8
   URUN(:,:)=0.0_r8
   USEDOU(:,:)=0.0_r8
@@ -822,7 +822,7 @@ module StartsMod
   CanopyLeafArea_col(:,:)=0.0_r8
   StemArea_col(:,:)=0.0_r8
   PrecIntcptByCanG(:,:)=0.0_r8
-  PPT(:,:)=0.0_r8
+  PlantPopu_col(:,:)=0.0_r8
   DayLenthCurrent(:,:)=12.0_r8
   SurfAlbedo_col(:,:)=SoilAlbedo(:,:)
   EcoHavstElmnt_col(:,:,:)=0.0_r8

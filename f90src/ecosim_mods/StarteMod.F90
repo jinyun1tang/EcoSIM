@@ -114,7 +114,7 @@ module StarteMod
                     BulkSoilMass=SoilMicPMassLayer(L,NY,NX)
                   ELSE
                     !this is for water
-                    BulkSoilMass=VLMicP(L,NY,NX)
+                    BulkSoilMass=VLMicP_vr(L,NY,NX)
                   ENDIF
                   trcx_solml(idx_CEC,L,NY,NX)=AMAX1(CNH4(L,NY,NX),CEC(L,NY,NX))*BulkSoilMass
                   trcx_solml(idx_AEC,L,NY,NX)=AMAX1(CPO4(L,NY,NX),AEC(L,NY,NX))*BulkSoilMass

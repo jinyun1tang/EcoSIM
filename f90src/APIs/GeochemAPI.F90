@@ -118,7 +118,7 @@ module GeochemAPI
             chemvar%BKVLPO=SoilMicPMassLayer(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
             chemvar%BKVLPB=SoilMicPMassLayer(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
           ELSE
-            chemvar%SoilMicPMassLayerX=VLMicP(L,NY,NX)
+            chemvar%SoilMicPMassLayerX=VLMicP_vr(L,NY,NX)
             chemvar%BKVLNH=chemvar%VLWatMicPNH
             chemvar%BKVLNB=chemvar%VLWatMicPNB
             chemvar%BKVLNO=chemvar%VLWatMicPNO

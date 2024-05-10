@@ -116,7 +116,7 @@ module StartqsMod
     IDAYY                      =>  plt_distb%IDAYY , &
     RSMX                       =>  plt_photo%RSMX  , &
     PPI                        =>  plt_site%PPI    , &
-    PPX                        =>  plt_site%PPX    , &
+    PPX_pft                        =>  plt_site%PPX_pft    , &
     PPZ                        =>  plt_site%PPZ    , &
     RootFracRemobilizableBiom  =>  plt_allom%RootFracRemobilizableBiom , &
     rCNNonstructRemob_pft      =>  plt_allom%rCNNonstructRemob_pft , &
@@ -136,7 +136,7 @@ module StartqsMod
   iYearPlantHarvest_pft(NZ)=IYRY(NZ)
   iDayPlantHarvest_pft(NZ)=IDAYY(NZ)
   PPI(NZ)=PPZ(NZ)
-  PPX(NZ)=PPI(NZ)
+  PPX_pft(NZ)=PPI(NZ)
   ClumpFactor_pft(NZ)=ClumpFactorInit_pft(NZ)
 
   MaxCanPStomaResistH2O_pft(NZ)=RSMX(NZ)/3600.0_r8
@@ -396,16 +396,16 @@ module StartqsMod
   real(r8), parameter :: TCZD = 5.0_r8        !basal value for threshold temperature for spring leafout/dehardening	oC
   real(r8), parameter :: TCXD = 12.0_r8       !basal value for threshold temperature for autumn leafoff/hardening	oC
 
-  associate(                            &
-    DATAP                      =>  plt_site%DATAP   , &
-    iPlantPhotosynthesisType   =>  plt_photo%iPlantPhotosynthesisType , &
-    HighTCLimtSeed_pft         =>  plt_pheno%HighTCLimtSeed_pft   , &
-    TC4LeafOff_pft =>  plt_pheno%TC4LeafOff_pft    , &
-    TC4LeafOut_pft        =>  plt_pheno%TC4LeafOut_pft   , &
-    TempOffset_pft                      =>  plt_pheno%TempOffset_pft  , &
-    PlantInitThermoAdaptZone   =>  plt_pheno%PlantInitThermoAdaptZone , &
-    iPlantThermoAdaptZone      =>  plt_pheno%iPlantThermoAdaptZone  , &
-    SSTX                       =>  plt_pheno%SSTX     &
+  associate(                                                        &
+    DATAP                    => plt_site%DATAP,                     &
+    iPlantPhotosynthesisType => plt_photo%iPlantPhotosynthesisType, &
+    HighTempLimitSeed_pft       => plt_pheno%HighTempLimitSeed_pft,       &
+    TC4LeafOff_pft           => plt_pheno%TC4LeafOff_pft,           &
+    TC4LeafOut_pft           => plt_pheno%TC4LeafOut_pft,           &
+    TempOffset_pft           => plt_pheno%TempOffset_pft,           &
+    PlantInitThermoAdaptZone => plt_pheno%PlantInitThermoAdaptZone, &
+    iPlantThermoAdaptZone    => plt_pheno%iPlantThermoAdaptZone,    &
+    SeedTempSens_pft                     => plt_pheno%SeedTempSens_pft                      &
   )
 !
 !     PFT THERMAL ACCLIMATION
@@ -414,7 +414,7 @@ module StartqsMod
 !     TempOffset_pft=shift in Arrhenius curve for thermal adaptation (oC)
 !     TCZ,TC4LeafOff_pft=threshold temperature for leafout,leafoff
 !     HTC=high temperature threshold for grain number loss (oC)
-!     SSTX=sensitivity to HTC (seeds oC-1 above HTC)
+!     SeedTempSens_pft=sensitivity to HTC (seeds oC-1 above HTC)
 !
   iPlantThermoAdaptZone(NZ)=PlantInitThermoAdaptZone(NZ)
   TempOffset_pft(NZ)=2.667_r8*(2.5_r8-iPlantThermoAdaptZone(NZ))
@@ -422,15 +422,15 @@ module StartqsMod
   TC4LeafOff_pft(NZ)=AMIN1(15.0_r8,TCXD-TempOffset_pft(NZ))
   IF(iPlantPhotosynthesisType(NZ).EQ.ic3_photo)THEN
     IF(DATAP(NZ)(1:4).EQ.'soyb')THEN
-      HighTCLimtSeed_pft(NZ)=30.0_r8+3.0_r8*iPlantThermoAdaptZone(NZ)
-      SSTX(NZ)=0.002_r8
+      HighTempLimitSeed_pft(NZ)=30.0_r8+3.0_r8*iPlantThermoAdaptZone(NZ)
+      SeedTempSens_pft(NZ)=0.002_r8
     ELSE
-      HighTCLimtSeed_pft(NZ)=27.0_r8+3.0_r8*iPlantThermoAdaptZone(NZ)
-      SSTX(NZ)=0.002_r8
+      HighTempLimitSeed_pft(NZ)=27.0_r8+3.0_r8*iPlantThermoAdaptZone(NZ)
+      SeedTempSens_pft(NZ)=0.002_r8
     ENDIF
   ELSE
-    HighTCLimtSeed_pft(NZ)=27.0_r8+3.0_r8*iPlantThermoAdaptZone(NZ)
-    SSTX(NZ)=0.005_r8
+    HighTempLimitSeed_pft(NZ)=27.0_r8+3.0_r8*iPlantThermoAdaptZone(NZ)
+    SeedTempSens_pft(NZ)=0.005_r8
   ENDIF
   end associate
   end subroutine PFTThermalAcclimation
@@ -441,47 +441,47 @@ module StartqsMod
   implicit none
   integer, intent(in) :: NZ
   INTEGER :: L,N,NR
-  associate(                             &
-    CNRTS_pft                     =>  plt_allom%CNRTS_pft   , &
-    CPRTS_pft                     =>  plt_allom%CPRTS_pft   , &
-    RootBiomGrosYld_pft       =>  plt_allom%RootBiomGrosYld_pft    , &
-    RootrNC_pft               =>  plt_allom%RootrNC_pft   , &
-    RootrPC_pft               =>  plt_allom%RootrPC_pft   , &
-    CMinPO4Root_pft           =>  plt_rbgc%CMinPO4Root_pft   , &
-    KmPO4Root_pft             =>  plt_rbgc%KmPO4Root_pft   , &
-    VmaxPO4Root_pft           =>  plt_rbgc%VmaxPO4Root_pft   , &
-    CminNO3Root_pft           =>  plt_rbgc%CminNO3Root_pft   , &
-    KmNO3Root_pft             =>  plt_rbgc%KmNO3Root_pft   , &
-    VmaxNO3Root_pft           =>  plt_rbgc%VmaxNO3Root_pft   , &
-    CMinNH4Root_pft           =>  plt_rbgc%CMinNH4Root_pft   , &
-    VmaxNH4Root_pft           =>  plt_rbgc%VmaxNH4Root_pft   , &
-    KmNH4Root_pft             =>  plt_rbgc%KmNH4Root_pft   , &
-    CumSoilThickness          =>  plt_site%CumSoilThickness   , &
-    NU                        =>  plt_site%NU       , &
-    NL                        =>  plt_site%NL       , &
-    NGTopRootLayer_pft        =>  plt_morph%NGTopRootLayer_pft      , &
-    SeedDepth_pft             =>  plt_morph%SeedDepth_pft   , &
-    SeedAreaMean_pft          =>  plt_morph%SeedAreaMean_pft    , &
-    SeedCMass                 =>  plt_morph%SeedCMass    , &
-    PlantinDepth              =>  plt_morph%PlantinDepth  , &
-    Root2ndMaxRadius1_pft         =>  plt_morph%Root2ndMaxRadius1_pft  , &
-    Root2ndXSecArea_pft         =>  plt_morph%Root2ndXSecArea_pft  , &
-    Root1stMaxRadius1_pft         =>  plt_morph%Root1stMaxRadius1_pft  , &
-    Root1stXSecArea_pft          =>  plt_morph%Root1stXSecArea_pft  , &
-    Root2ndMaxRadius_pft          =>  plt_morph%Root2ndMaxRadius_pft  , &
-    Root1stMaxRadius_pft          =>  plt_morph%Root1stMaxRadius_pft  , &
-    Root2ndSpecLen_pft          =>  plt_morph%Root2ndSpecLen_pft  , &
-    NIXBotRootLayer_pft       =>  plt_morph%NIXBotRootLayer_pft    , &
-    RSRR                      =>  plt_morph%RSRR    , &
-    Root1stSpecLen_pft           =>  plt_morph%Root1stSpecLen_pft  , &
-    RootPorosity_pft              =>  plt_morph%RootPorosity_pft   , &
-    RootPoreTortu4Gas         =>  plt_morph%RootPoreTortu4Gas   , &
-    RootRaidus_rpft           =>  plt_morph%RootRaidus_rpft   , &
-    RootVolPerMassC_pft       =>  plt_morph%RootVolPerMassC_pft    , &
-    RSRA                      =>  plt_morph%RSRA    , &
-    NIXBotRootLayer_rpft      =>  plt_morph%NIXBotRootLayer_rpft    , &
-    SeedVolumeMean_pft        =>  plt_morph%SeedVolumeMean_pft    , &
-    SeedMeanLen_pft        =>  plt_morph%SeedMeanLen_pft      &
+  associate(                                                  &
+    CNRTS_pft             => plt_allom%CNRTS_pft,             &
+    CPRTS_pft             => plt_allom%CPRTS_pft,             &
+    RootBiomGrosYld_pft   => plt_allom%RootBiomGrosYld_pft,   &
+    RootrNC_pft           => plt_allom%RootrNC_pft,           &
+    RootrPC_pft           => plt_allom%RootrPC_pft,           &
+    CMinPO4Root_pft       => plt_rbgc%CMinPO4Root_pft,        &
+    KmPO4Root_pft         => plt_rbgc%KmPO4Root_pft,          &
+    VmaxPO4Root_pft       => plt_rbgc%VmaxPO4Root_pft,        &
+    CminNO3Root_pft       => plt_rbgc%CminNO3Root_pft,        &
+    KmNO3Root_pft         => plt_rbgc%KmNO3Root_pft,          &
+    VmaxNO3Root_pft       => plt_rbgc%VmaxNO3Root_pft,        &
+    CMinNH4Root_pft       => plt_rbgc%CMinNH4Root_pft,        &
+    VmaxNH4Root_pft       => plt_rbgc%VmaxNH4Root_pft,        &
+    KmNH4Root_pft         => plt_rbgc%KmNH4Root_pft,          &
+    CumSoilThickness      => plt_site%CumSoilThickness,       &
+    NU                    => plt_site%NU,                     &
+    NL                    => plt_site%NL,                     &
+    NGTopRootLayer_pft    => plt_morph%NGTopRootLayer_pft,    &
+    SeedDepth_pft         => plt_morph%SeedDepth_pft,         &
+    SeedAreaMean_pft      => plt_morph%SeedAreaMean_pft,      &
+    SeedCMass             => plt_morph%SeedCMass,             &
+    PlantinDepth          => plt_morph%PlantinDepth,          &
+    Root2ndMaxRadius1_pft => plt_morph%Root2ndMaxRadius1_pft, &
+    Root2ndXSecArea_pft   => plt_morph%Root2ndXSecArea_pft,   &
+    Root1stMaxRadius1_pft => plt_morph%Root1stMaxRadius1_pft, &
+    Root1stXSecArea_pft   => plt_morph%Root1stXSecArea_pft,   &
+    Root2ndMaxRadius_pft  => plt_morph%Root2ndMaxRadius_pft,  &
+    Root1stMaxRadius_pft  => plt_morph%Root1stMaxRadius_pft,  &
+    Root2ndSpecLen_pft    => plt_morph%Root2ndSpecLen_pft,    &
+    NIXBotRootLayer_pft   => plt_morph%NIXBotRootLayer_pft,   &
+    RoottRadialResist_pft => plt_morph%RoottRadialResist_pft, &
+    Root1stSpecLen_pft    => plt_morph%Root1stSpecLen_pft,    &
+    RootPorosity_pft      => plt_morph%RootPorosity_pft,      &
+    RootPoreTortu4Gas     => plt_morph%RootPoreTortu4Gas,     &
+    RootRaidus_rpft       => plt_morph%RootRaidus_rpft,       &
+    RootVolPerMassC_pft   => plt_morph%RootVolPerMassC_pft,   &
+    RoottAxialResist_pft  => plt_morph%RoottAxialResist_pft,  &
+    NIXBotRootLayer_rpft  => plt_morph%NIXBotRootLayer_rpft,  &
+    SeedVolumeMean_pft    => plt_morph%SeedVolumeMean_pft,    &
+    SeedMeanLen_pft       => plt_morph%SeedMeanLen_pft        &
   )
 !
 !     SEED CHARACTERISTICS
@@ -502,7 +502,7 @@ module StartqsMod
 !     VmaxNH4Root_pft,KmNH4Root_pft,CMinNH4Root_pft=NH4 max uptake(g m-2 h-1),Km(uM),min concn (uM)
 !     VmaxNO3Root_pft,KmNO3Root_pft,CminNO3Root_pft=NO3 max uptake(g m-2 h-1),Km(uM), min concn (uM)
 !     VmaxPO4Root_pft,KmPO4Root_pft,CMinPO4Root_pft=H2PO4 max uptake(g m-2 h-1),Km(uM),min concn (uM)
-!     RSRR,RSRA=radial,axial root resistivity (m2 MPa-1 h-1)
+!     RoottRadialResist_pft,RoottAxialResist_pft=radial,axial root resistivity (m2 MPa-1 h-1)
 !
   SeedDepth_pft(NZ)=PlantinDepth(NZ)
   D9795: DO L=NU,NL
@@ -529,8 +529,8 @@ module StartqsMod
   VmaxPO4Root_pft(2,NZ)=VmaxPO4Root_pft(1,NZ)
   KmPO4Root_pft(2,NZ)=KmPO4Root_pft(1,NZ)
   CMinPO4Root_pft(2,NZ)=CMinPO4Root_pft(1,NZ)
-  RSRR(2,NZ)=1.0E+04_r8
-  RSRA(2,NZ)=1.0E+12_r8
+  RoottRadialResist_pft(2,NZ)=1.0E+04_r8
+  RoottAxialResist_pft(2,NZ)=1.0E+12_r8
 !
 !     RootPoreTortu4Gas=tortuosity for gas transport
 !     RootRaidus_rpft=path length for radial diffusion within root (m)
@@ -562,7 +562,7 @@ module StartqsMod
   integer :: K,L,M,N,NB
   associate(                                                                        &
     NU                                =>  plt_site%NU                             , &
-    PPX                               =>  plt_site%PPX                            , &
+    PPX_pft                               =>  plt_site%PPX_pft                            , &
     PlantPopulation_pft               =>  plt_site%PlantPopulation_pft            , &
     ALAT                              =>  plt_site%ALAT                           , &
     AREA3                             =>  plt_site%AREA3                          , &
@@ -619,7 +619,7 @@ module StartqsMod
     HypoctoHeight_pft                 =>  plt_morph%HypoctoHeight_pft  , &
     BranchNumber_brch                 =>  plt_morph%BranchNumber_brch   , &
     NodeNum2InitFloral_brch           =>  plt_morph%NodeNum2InitFloral_brch  , &
-    KLEAFX                            =>  plt_morph%KLEAFX , &
+    KMinNumLeaf4GroAlloc_brch                            =>  plt_morph%KMinNumLeaf4GroAlloc_brch , &
     NumOfBranches_pft                 =>  plt_morph%NumOfBranches_pft      &
   )
 !
@@ -627,7 +627,7 @@ module StartqsMod
 !
 !     PP=population (grid cell-1)
 !
-  PlantPopulation_pft(NZ)=PPX(NZ)*AREA3(NU)
+  PlantPopulation_pft(NZ)=PPX_pft(NZ)*AREA3(NU)
   plt_pheno%doInitPlant_pft(NZ)=ifalse
   plt_pheno%iPlantShootState_pft(NZ)=iDead
   plt_pheno%iPlantRootState_pft(NZ)=iDead
@@ -648,7 +648,7 @@ module StartqsMod
     NumOfLeaves_brch(NB,NZ)=0._r8
     LeafNumberAtFloralInit_brch(NB,NZ)=0._r8
     KLeafNumber_brch(NB,NZ)=1
-    KLEAFX(NB,NZ)=1
+    KMinNumLeaf4GroAlloc_brch(NB,NZ)=1
     KHiestGroLeafNode_brch(NB,NZ)=1
     KLowestGroLeafNode_brch(NB,NZ)=0
     NodeNumNormByMatgrp_brch(NB,NZ)=0._r8

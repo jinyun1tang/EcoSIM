@@ -242,7 +242,7 @@ module readsmod
       ROWO(NY,NX)=0.0_r8
       ROWP(NY,NX)=0.0_r8
       D325: DO I=1,366
-        ITILL(I,NY,NX)=0
+        iSoilDisturbType_col(I,NY,NX)=0
         DCORP(I,NY,NX)=0.0_r8
       ENDDO D325
       D40: DO I=1,366
