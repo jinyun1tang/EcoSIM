@@ -66,7 +66,7 @@ module PlantBranchMod
   real(r8) :: CNLFX,CPLFX,CNSHX,CPSHX
   real(r8) :: NonstC4Groth_brch
   real(r8) :: CNRDM,RCO2NonstC4Nassim_brch
-  real(r8) :: ShootStructE(ielmn)
+  real(r8) :: ShootStructE(1:NumPlantChemElms)
   real(r8) :: DMLFB
   real(r8) :: DMSHB
   real(r8) :: CNLFB
@@ -100,7 +100,7 @@ module PlantBranchMod
     call CalcPartitionCoeff(I,J,NB,NZ,PART,PTRT,LRemob_brch,BegRemoblize)
 
     call UpdateBranchAllometry(I,J,NZ,NB,PART,CNLFW,CNRTW,CNSHW,CPLFW,&
-    CPRTW,CPSHW,ShootStructE,DMSHD,CNLFM,CPLFM,&
+      CPRTW,CPSHW,ShootStructE,DMSHD,CNLFM,CPLFM,&
       CNSHX,CPSHX,CNLFX,CPLFX,DMLFB,DMSHB,CNLFB,CPLFB,CNSHB,CPSHB)
 !
 !   GROSS PRIMARY PRODUCTIVITY
@@ -2970,7 +2970,7 @@ module PlantBranchMod
 !------------------------------------------------------------------------------------------
 
   subroutine ComputRAutoAfEmergence(I,J,NB,NZ,DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX,CO2F,&
-    CH2O,TFN5,WFNG,WFNSG,ShootStructE,CanopyNonstElm4Gros,CNPG,RCO2NonstC_brch,RCO2Maint_brch,RMxess_brch,&
+    CH2O,TFN5,WFNG,WFNSG,ShootStructN,CanopyNonstElm4Gros,CNPG,RCO2NonstC_brch,RCO2Maint_brch,RMxess_brch,&
     NonstC4Groth_brch,RCO2NonstC4Nassim_brch)
   implicit none
   integer, intent(in) :: I,J,NB,NZ
@@ -2980,7 +2980,7 @@ module PlantBranchMod
   real(r8), intent(out) :: RCO2Maint_brch,RMxess_brch,NonstC4Groth_brch,RCO2NonstC4Nassim_brch
   real(r8), intent(in) :: DMSHD
   real(r8), intent(in) :: CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX
-  real(r8), intent(in) :: ShootStructE(NumPlantChemElms),CO2F,CH2O,TFN5
+  real(r8), intent(in) :: ShootStructN,CO2F,CH2O,TFN5
   real(r8), intent(in) :: WFNG,WFNSG
   real(r8) :: ZPOOLB
   real(r8) :: PPOOLB
@@ -3045,7 +3045,7 @@ module PlantBranchMod
 ! iPlantPhenolType_pft=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
 ! WFNG=growth function of canopy water potential
 !
-  RCO2Maint_brch=AZMAX1(RmSpecPlant*TFN5*ShootStructE(ielmn))
+  RCO2Maint_brch=AZMAX1(RmSpecPlant*TFN5*ShootStructN)
   IF(is_root_shallow(iPlantRootProfile_pft(NZ)).OR.&
     iPlantPhenolType_pft(NZ).EQ.iphenotyp_drouhtdecidu)THEN
     RCO2Maint_brch=RCO2Maint_brch*WFNG
@@ -3143,13 +3143,13 @@ module PlantBranchMod
 !------------------------------------------------------------------------------------------
 
   subroutine ComputRAutoB4Emergence(I,NB,NZ,TFN6_vr,DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,&
-    CNLFX,CPLFX,ShootStructE,WFNG,WFNSG,CanopyNonstElm4Gros,CNPG,RCO2NonstC_brch,&
+    CNLFX,CPLFX,ShootStructN,WFNG,WFNSG,CanopyNonstElm4Gros,CNPG,RCO2NonstC_brch,&
     RCO2Maint_brch,RMxess_brch,NonstC4Groth_brch,CNRDM,RCO2NonstC4Nassim_brch)
   implicit none
   integer, intent(in) :: I,NB,NZ
   real(r8),intent(in) :: TFN6_vr(JZ1)
   real(r8), intent(in) :: DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX
-  real(r8), intent(in) :: ShootStructE(NumPlantChemElms),WFNG
+  real(r8), intent(in) :: ShootStructN,WFNG
   real(r8), intent(in) :: WFNSG
   real(r8), intent(out) :: CanopyNonstElm4Gros(NumPlantChemElms)
   real(r8), intent(out) :: RCO2NonstC_brch
@@ -3167,20 +3167,20 @@ module PlantBranchMod
   real(r8) :: RCO2TM
   real(r8) :: SNCRM,CNG,CPG
 ! begin_execution
-  associate(                                                                      &
-    LeafPetoNonstElmConc_brch          =>  plt_biom%LeafPetoNonstElmConc_brch   , &
-    CanopyNonstElms_brch               =>  plt_biom%CanopyNonstElms_brch        , &
-    iPlantRootProfile_pft              =>  plt_pheno%iPlantRootProfile_pft      , &
-    fTgrowRootP_vr                     =>  plt_pheno%fTgrowRootP_vr             , &
-    RAutoRootO2Limter_pvr              =>  plt_rbgc%RAutoRootO2Limter_pvr       , &
-    iPlantPhenolType_pft               =>  plt_pheno%iPlantPhenolType_pft       , &
-    CO2NetFix_pft                      =>  plt_bgcr%CO2NetFix_pft               , &
-    RootRespPotent_pvr                 =>  plt_rbgc%RootRespPotent_pvr          , &
-    RootCO2EmisPot_pvr                          =>  plt_rbgc%RootCO2EmisPot_pvr                   , &
-    RootCO2Autor_pvr                          =>  plt_rbgc%RootCO2Autor_pvr                   , &
-    ZERO                               =>  plt_site%ZERO                        , &
-    NGTopRootLayer_pft                 =>  plt_morph%NGTopRootLayer_pft         , &
-    C4PhotosynDowreg_brch              =>  plt_photo%C4PhotosynDowreg_brch        &
+  associate(                                                         &
+    LeafPetoNonstElmConc_brch => plt_biom%LeafPetoNonstElmConc_brch, &
+    CanopyNonstElms_brch      => plt_biom%CanopyNonstElms_brch,      &
+    iPlantRootProfile_pft     => plt_pheno%iPlantRootProfile_pft,    &
+    fTgrowRootP_vr            => plt_pheno%fTgrowRootP_vr,           &
+    RAutoRootO2Limter_pvr     => plt_rbgc%RAutoRootO2Limter_pvr,     &
+    iPlantPhenolType_pft      => plt_pheno%iPlantPhenolType_pft,     &
+    CO2NetFix_pft             => plt_bgcr%CO2NetFix_pft,             &
+    RootRespPotent_pvr        => plt_rbgc%RootRespPotent_pvr,        &
+    RootCO2EmisPot_pvr        => plt_rbgc%RootCO2EmisPot_pvr,        &
+    RootCO2Autor_pvr          => plt_rbgc%RootCO2Autor_pvr,          &
+    ZERO                      => plt_site%ZERO,                      &
+    NGTopRootLayer_pft        => plt_morph%NGTopRootLayer_pft,       &
+    C4PhotosynDowreg_brch     => plt_photo%C4PhotosynDowreg_brch     &
   )
 !
 ! N,P CONSTRAINT ON RESPIRATION FROM NON-STRUCTURAL C:N:P
@@ -3224,7 +3224,7 @@ module PlantBranchMod
 ! iPlantPhenolType_pft=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
 ! WFNG=growth function of canopy water potential
 !
-  RCO2Maint_brch=AZMAX1(RmSpecPlant*TFN6_vr(NGTopRootLayer_pft(NZ))*ShootStructE(ielmn))
+  RCO2Maint_brch=AZMAX1(RmSpecPlant*TFN6_vr(NGTopRootLayer_pft(NZ))*ShootStructN)
   IF(is_root_shallow(iPlantRootProfile_pft(NZ)).OR.&
     iPlantPhenolType_pft(NZ).EQ.iphenotyp_drouhtdecidu)THEN
     RCO2Maint_brch=RCO2Maint_brch*WFNG
