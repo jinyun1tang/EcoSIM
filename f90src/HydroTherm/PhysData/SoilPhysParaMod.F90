@@ -43,7 +43,7 @@ implicit none
   !     DTHETW=minimum water content for numerical purpose
   ! soil matric potential upper layer
 
-  THETA1=AMAX1(THETY(N3,N2,N1),AMIN1(POROS(N3,N2,N1),safe_adb(VLWatMicP1(N3,N2,N1),VLSoilMicP(N3,N2,N1))))
+  THETA1=AMAX1(THETY_vr(N3,N2,N1),AMIN1(POROS(N3,N2,N1),safe_adb(VLWatMicP1(N3,N2,N1),VLSoilMicP(N3,N2,N1))))
 
   IF(SoilMicPMassLayer(N3,N2,N1).GT.ZEROS(NY,NX))THEN
     !source layer is active soil
@@ -121,15 +121,15 @@ implicit none
 !     IF(IDWaterTable(NY,NX).EQ.0)THEN
 !       0.25_r8 is the geometric decreasing ratio (tunable)
 !  or different scheme can be used
-    CORGC(L,NY,NX)=0.25_r8*CORGC(L-1,NY,NX)
-    CORGR(L,NY,NX)=0.25_r8*CORGR(L-1,NY,NX)
-    CORGN(L,NY,NX)=0.25_r8*CORGN(L-1,NY,NX)
-    CORGP(L,NY,NX)=0.25_r8*CORGP(L-1,NY,NX)
+    CSoilOrgM_vr(ielmc,L,NY,NX)=0.25_r8*CSoilOrgM_vr(ielmc,L-1,NY,NX)
+    COMLitrC_vr(L,NY,NX)=0.25_r8*COMLitrC_vr(L-1,NY,NX)
+    CSoilOrgM_vr(ielmn,L,NY,NX)=0.25_r8*CSoilOrgM_vr(ielmn,L-1,NY,NX)
+    CSoilOrgM_vr(ielmp,L,NY,NX)=0.25_r8*CSoilOrgM_vr(ielmp,L-1,NY,NX)
 !     ELSE
-!       CORGC(L,NY,NX)=CORGC(L-1,NY,NX)
-!       CORGR(L,NY,NX)=CORGR(L-1,NY,NX)
-!       CORGN(L,NY,NX)=CORGN(L-1,NY,NX)
-!       CORGP(L,NY,NX)=CORGP(L-1,NY,NX)
+!       CSoilOrgM_vr(ielmc,L,NY,NX)=CSoilOrgM_vr(ielmc,L-1,NY,NX)
+!       COMLitrC_vr(L,NY,NX)=COMLitrC_vr(L-1,NY,NX)
+!       CSoilOrgM_vr(ielmn,L,NY,NX)=CSoilOrgM_vr(ielmn,L-1,NY,NX)
+!       CSoilOrgM_vr(ielmp,L,NY,NX)=CSoilOrgM_vr(ielmp,L-1,NY,NX)
 !     ENDIF
     CNH4(L,NY,NX)=CNH4(L-1,NY,NX)
     CNO3(L,NY,NX)=CNO3(L-1,NY,NX)

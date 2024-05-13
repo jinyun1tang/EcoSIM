@@ -22,6 +22,7 @@ module nitrosMod
   use SoilPropertyDataType
   use GridDataType
   use MicBGCMod
+  use EcoSIMConfig , only : ndbiomcp => NumDeadMicrbCompts  
   implicit none
 
   private
@@ -31,7 +32,12 @@ module nitrosMod
 
 !
   public :: initNitro
-  public :: VerticalLitterMixLvsLL
+  public :: DownwardMixOM
+  public :: sumORGMLayL
+  public :: sumLitrOMLayL
+  public :: sumSurfOMCK
+  public :: sumMicBiomLayL
+  public :: sumHumOMLayL
   contains
 
 !------------------------------------------------------------------------------------------
@@ -46,35 +52,34 @@ module nitrosMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine VerticalLitterMixLvsLL(I,J,L,NY,NX)
+  subroutine DownwardMixOM(I,J,L,NY,NX)
 
   implicit none
   integer, intent(in) :: I,J,L,NY,NX
-  real(r8) :: FOSCXS,FOSCXD
+  real(r8) :: FracLitrMix,FOSCXD
   real(r8) :: ORGRL,ORGRLL
   real(r8) :: OSCXD
   integer :: LL,LN
 !     begin_execution
 
   IF(FOSCZ0.GT.ZERO)THEN
-!     ORGR=total litter C
+!     OMLitrC_vr=total litter C
 !     FOSCZ0=rate constant for mixing surface litter
-!     FOSCXS=mixing fraction for surface litter
-!     TOQCK=total active biomass respiration activity
-!     TFNX=temperature function
+!     FracLitrMix=mixing fraction for surface litter
+!     TMicHeterAct_vr=total active biomass respiration activity
 !     VLSoilPoreMicP_vr=soil layer volume
 !     OSCXD=mixing required for equilibrating litter concentration
 !     FOSCXD=mixing fraction for equilibrating subsurface litter
-!     FOSCXS=mixing fraction for subsurface litter
+!     FracLitrMix=mixing fraction for subsurface litter
 !
     IF(L.LT.NL(NY,NX))THEN
 !     get mixing rate
       IF(L.EQ.0)THEN
         LL=NU(NY,NX)
-        IF(ORGR(L,NY,NX).GT.ZEROS(NY,NX))THEN
-          FOSCXS=AMIN1(1.0_r8,FOSCZ0/ORGR(L,NY,NX)*TOQCK(L,NY,NX))
+        IF(OMLitrC_vr(L,NY,NX).GT.ZEROS(NY,NX))THEN
+          FracLitrMix=AMIN1(1.0_r8,FOSCZ0/OMLitrC_vr(L,NY,NX)*TMicHeterAct_vr(L,NY,NX))
         ELSE
-          FOSCXS=0.0_r8
+          FracLitrMix=0.0_r8
         ENDIF
       ELSE
         D1100: DO LN=L+1,NL(NY,NX)
@@ -83,68 +88,61 @@ module nitrosMod
             exit
           ENDIF
         ENDDO D1100
-        ORGRL=AZMAX1(ORGR(L,NY,NX))
-        ORGRLL=AZMAX1(ORGR(LL,NY,NX))
+        ORGRL=AZMAX1(OMLitrC_vr(L,NY,NX))
+        ORGRLL=AZMAX1(OMLitrC_vr(LL,NY,NX))
         OSCXD=(ORGRL*VGeomLayer(LL,NY,NX)-ORGRLL*VGeomLayer(L,NY,NX))/(VGeomLayer(L,NY,NX)+VGeomLayer(LL,NY,NX))
-        IF(OSCXD.GT.0.0_r8.AND.ORGR(L,NY,NX).GT.ZEROS(NY,NX))THEN
-          FOSCXD=OSCXD/ORGR(L,NY,NX)
-        ELSEIF(OSCXD.LT.0.0_r8.AND.ORGR(LL,NY,NX).GT.ZEROS(NY,NX))THEN
-          FOSCXD=OSCXD/ORGR(LL,NY,NX)
+        IF(OSCXD.GT.0.0_r8.AND.OMLitrC_vr(L,NY,NX).GT.ZEROS(NY,NX))THEN
+          FOSCXD=OSCXD/OMLitrC_vr(L,NY,NX)
+        ELSEIF(OSCXD.LT.0.0_r8.AND.OMLitrC_vr(LL,NY,NX).GT.ZEROS(NY,NX))THEN
+          FOSCXD=OSCXD/OMLitrC_vr(LL,NY,NX)
         ELSE
           FOSCXD=0.0_r8
         ENDIF
         IF(VGeomLayer(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-          FOSCXS=FOSCZL*FOSCXD*TOQCK(L,NY,NX)/VGeomLayer(L,NY,NX)
+          FracLitrMix=FOSCZL*FOSCXD*TMicHeterAct_vr(L,NY,NX)/VGeomLayer(L,NY,NX)
         ELSE
-          FOSCXS=0.0_r8
+          FracLitrMix=0.0_r8
         ENDIF
       ENDIF
 
 !     apply mixing
-      call ApplyVerticalMix(FOSCXS,L,LL,NY,NX)
+      call ApplyVerticalMix(FracLitrMix,L,LL,NY,NX)
     ENDIF
 
   ENDIF
-  end subroutine VerticalLitterMixLvsLL
+  end subroutine DownwardMixOM
 !------------------------------------------------------------------------------------------
 
-  subroutine ApplyVerticalMix(FOSCXS,L,LL,NY,NX)
+  subroutine ApplyVerticalMix(FracLitrMix,L,LL,NY,NX)
 
   implicit none
-  real(r8), intent(in) :: FOSCXS
+  real(r8), intent(in) :: FracLitrMix
   integer, intent(in) :: L,LL,NY,NX
 
-  real(r8) :: OMCXS,OMNXS,OMPXS
-  real(r8) :: ORCXS,ORNXS,ORPXS
-  real(r8) :: OQCXS,OQCHXS,OHCXS,OQAXS
-  real(r8) :: OQAHXS,OHAXS,OQNXS,OQNHXS
-  real(r8) :: OHNXS,OQPXS,OQPHXS,OHPXS
-  real(r8) :: OSCXS,OSAXS,OSNXS,OSPXS
-  integer :: K,M,N,NGL,MID
+  real(r8) :: OMEXS,ORMXS
+  real(r8) :: OQMXS,OQMHXS,OHMXS
+  real(r8) :: OSMXS,OSAXS
+  integer :: K,M,N,NGL,MID,NE,L1
   
 !     begin_execution
-  IF(FOSCXS.GT.ZERO)THEN
+  IF(FracLitrMix.GT.ZERO)THEN
+    !mix microbial biomass
     D7971: DO K=1,micpar%NumOfLitrCmplxs
       if(.not.micpar%is_finelitter(K))cycle
-      D7961: DO N=1,NumMicbFunGroups
+      D7961: DO N=1,NumMicbFunGrupsPerCmplx
         DO NGL=JGnio(N),JGnfo(N)
           D7962: DO M=1,micpar%nlbiomcp
-            MID=micpar%get_micb_id(M,NGL)
-            IF(FOSCXS.GT.0.0)THEN
-              OMCXS=FOSCXS*AZMAX1(OMEhetr(ielmc,MID,K,L,NY,NX))
-              OMNXS=FOSCXS*AZMAX1(OMEhetr(ielmn,MID,K,L,NY,NX))
-              OMPXS=FOSCXS*AZMAX1(OMEhetr(ielmp,MID,K,L,NY,NX))
+            MID=micpar%get_micb_id(M,NGL)            
+            IF(FracLitrMix.GT.0.0_r8)THEN
+              L1=L
             ELSE
-              OMCXS=FOSCXS*AZMAX1(OMEhetr(ielmc,MID,K,LL,NY,NX))
-              OMNXS=FOSCXS*AZMAX1(OMEhetr(ielmn,MID,K,LL,NY,NX))
-              OMPXS=FOSCXS*AZMAX1(OMEhetr(ielmp,MID,K,LL,NY,NX))
+              L1=LL
             ENDIF
-            OMEhetr(ielmc,MID,K,L,NY,NX)=OMEhetr(ielmc,MID,K,L,NY,NX)-OMCXS
-            OMEhetr(ielmn,MID,K,L,NY,NX)=OMEhetr(ielmn,MID,K,L,NY,NX)-OMNXS
-            OMEhetr(ielmp,MID,K,L,NY,NX)=OMEhetr(ielmp,MID,K,L,NY,NX)-OMPXS
-            OMEhetr(ielmc,MID,K,LL,NY,NX)=OMEhetr(ielmc,MID,K,LL,NY,NX)+OMCXS
-            OMEhetr(ielmn,MID,K,LL,NY,NX)=OMEhetr(ielmn,MID,K,LL,NY,NX)+OMNXS
-            OMEhetr(ielmp,MID,K,LL,NY,NX)=OMEhetr(ielmp,MID,K,LL,NY,NX)+OMPXS
+            DO NE=1,NumPlantChemElms            
+              OMEXS=FracLitrMix*AZMAX1(mBiomeHeter_vr(NE,MID,K,L1,NY,NX))
+              mBiomeHeter_vr(NE,MID,K,L,NY,NX)=mBiomeHeter_vr(NE,MID,K,L,NY,NX)-OMEXS
+              mBiomeHeter_vr(NE,MID,K,LL,NY,NX)=mBiomeHeter_vr(NE,MID,K,LL,NY,NX)+OMEXS
+            ENDDO
           ENDDO D7962
         ENDDO
       ENDDO D7961
@@ -152,97 +150,359 @@ module nitrosMod
 
     D7901: DO K=1,micpar%NumOfLitrCmplxs
       if(.not.micpar%is_finelitter(K))cycle
+      !mix fine litter
       D7941: DO M=1,micpar%ndbiomcp
-        IF(FOSCXS.GT.0.0_r8)THEN
-          ORCXS=FOSCXS*AZMAX1(ORM(ielmc,M,K,L,NY,NX))
-          ORNXS=FOSCXS*AZMAX1(ORM(ielmn,M,K,L,NY,NX))
-          ORPXS=FOSCXS*AZMAX1(ORM(ielmp,M,K,L,NY,NX))
+        IF(FracLitrMix.GT.0.0_r8)THEN
+          L1=L
         ELSE
-          ORCXS=FOSCXS*AZMAX1(ORM(ielmc,M,K,LL,NY,NX))
-          ORNXS=FOSCXS*AZMAX1(ORM(ielmn,M,K,LL,NY,NX))
-          ORPXS=FOSCXS*AZMAX1(ORM(ielmp,M,K,LL,NY,NX))
+          L1=LL
         ENDIF
-        ORM(ielmc,M,K,L,NY,NX)=ORM(ielmc,M,K,L,NY,NX)-ORCXS
-        ORM(ielmn,M,K,L,NY,NX)=ORM(ielmn,M,K,L,NY,NX)-ORNXS
-        ORM(ielmp,M,K,L,NY,NX)=ORM(ielmp,M,K,L,NY,NX)-ORPXS
-        ORM(ielmc,M,K,LL,NY,NX)=ORM(ielmc,M,K,LL,NY,NX)+ORCXS
-        ORM(ielmn,M,K,LL,NY,NX)=ORM(ielmn,M,K,LL,NY,NX)+ORNXS
-        ORM(ielmp,M,K,LL,NY,NX)=ORM(ielmp,M,K,LL,NY,NX)+ORPXS
+
+        DO NE=1,NumPlantChemElms
+          ORMXS=FracLitrMix*AZMAX1(OMBioResdu_vr(NE,M,K,L1,NY,NX))        
+          OMBioResdu_vr(NE,M,K,L,NY,NX)=OMBioResdu_vr(NE,M,K,L,NY,NX)-ORMXS
+          OMBioResdu_vr(NE,M,K,LL,NY,NX)=OMBioResdu_vr(NE,M,K,LL,NY,NX)+ORMXS
+        ENDDO
       ENDDO D7941
-      IF(FOSCXS.GT.0.0_r8)THEN
-        OQCXS=FOSCXS*AZMAX1(DOM(idom_doc,K,L,NY,NX))
-        OQCHXS=FOSCXS*AZMAX1(DOM_Macp(idom_doc,K,L,NY,NX))
-        OHCXS=FOSCXS*AZMAX1(OHM(ielmc,K,L,NY,NX))
-        OQAXS=FOSCXS*AZMAX1(DOM(idom_acetate,K,L,NY,NX))
-        OQAHXS=FOSCXS*AZMAX1(DOM_Macp(idom_acetate,K,L,NY,NX))
-        OHAXS=FOSCXS*AZMAX1(OHM(idom_acetate,K,L,NY,NX))
-        OQNXS=FOSCXS*AZMAX1(DOM(idom_don,K,L,NY,NX))
-        OQNHXS=FOSCXS*AZMAX1(DOM_Macp(idom_don,K,L,NY,NX))
-        OHNXS=FOSCXS*AZMAX1(OHM(ielmn,K,L,NY,NX))
-        OQPXS=FOSCXS*AZMAX1(DOM(idom_dop,K,L,NY,NX))
-        OQPHXS=FOSCXS*AZMAX1(DOM_Macp(idom_dop,K,L,NY,NX))
-        OHPXS=FOSCXS*AZMAX1(OHM(ielmp,K,L,NY,NX))
+      !mix dissolved organic matter
+      IF(FracLitrMix.GT.0.0_r8)THEN
+        L1=L
       ELSE
-        OQCXS=FOSCXS*AZMAX1(DOM(idom_doc,K,LL,NY,NX))
-        OQCHXS=FOSCXS*AZMAX1(DOM_Macp(idom_doc,K,LL,NY,NX))
-        OHCXS=FOSCXS*AZMAX1(OHM(ielmc,K,LL,NY,NX))
-        OQAXS=FOSCXS*AZMAX1(DOM(idom_acetate,K,LL,NY,NX))
-        OQAHXS=FOSCXS*AZMAX1(DOM_Macp(idom_acetate,K,LL,NY,NX))
-        OHAXS=FOSCXS*AZMAX1(OHM(idom_acetate,K,LL,NY,NX))
-        OQNXS=FOSCXS*AZMAX1(DOM(idom_don,K,LL,NY,NX))
-        OQNHXS=FOSCXS*AZMAX1(DOM_Macp(idom_don,K,LL,NY,NX))
-        OHNXS=FOSCXS*AZMAX1(OHM(ielmn,K,LL,NY,NX))
-        OQPXS=FOSCXS*AZMAX1(DOM(idom_dop,K,LL,NY,NX))
-        OQPHXS=FOSCXS*AZMAX1(DOM_Macp(idom_dop,K,LL,NY,NX))
-        OHPXS=FOSCXS*AZMAX1(OHM(ielmp,K,LL,NY,NX))
-      ENDIF
-      DOM(idom_doc,K,L,NY,NX)=DOM(idom_doc,K,L,NY,NX)-OQCXS
-      DOM_Macp(idom_doc,K,L,NY,NX)=DOM_Macp(idom_doc,K,L,NY,NX)-OQCHXS
-      OHM(ielmc,K,L,NY,NX)=OHM(ielmc,K,L,NY,NX)-OHCXS
-      DOM(idom_acetate,K,L,NY,NX)=DOM(idom_acetate,K,L,NY,NX)-OQAXS
-      DOM_Macp(idom_acetate,K,L,NY,NX)=DOM_Macp(idom_acetate,K,L,NY,NX)-OQAHXS
-      OHM(idom_acetate,K,L,NY,NX)=OHM(idom_acetate,K,L,NY,NX)-OHAXS
-      DOM(idom_don,K,L,NY,NX)=DOM(idom_don,K,L,NY,NX)-OQNXS
-      DOM_Macp(idom_don,K,L,NY,NX)=DOM_Macp(idom_don,K,L,NY,NX)-OQNHXS
-      OHM(ielmn,K,L,NY,NX)=OHM(ielmn,K,L,NY,NX)-OHNXS
-      DOM(idom_dop,K,L,NY,NX)=DOM(idom_dop,K,L,NY,NX)-OQPXS
-      DOM_Macp(idom_dop,K,L,NY,NX)=DOM_Macp(idom_dop,K,L,NY,NX)-OQPHXS
-      OHM(ielmp,K,L,NY,NX)=OHM(ielmp,K,L,NY,NX)-OHPXS
-      DOM(idom_doc,K,LL,NY,NX)=DOM(idom_doc,K,LL,NY,NX)+OQCXS
-      DOM_Macp(idom_doc,K,LL,NY,NX)=DOM_Macp(idom_doc,K,LL,NY,NX)+OQCHXS
-      OHM(ielmc,K,LL,NY,NX)=OHM(ielmc,K,LL,NY,NX)+OHCXS
-      DOM(idom_acetate,K,LL,NY,NX)=DOM(idom_acetate,K,LL,NY,NX)+OQAXS
-      DOM_Macp(idom_acetate,K,LL,NY,NX)=DOM_Macp(idom_acetate,K,LL,NY,NX)+OQAHXS
-      OHM(idom_acetate,K,LL,NY,NX)=OHM(idom_acetate,K,LL,NY,NX)+OHAXS
-      DOM(idom_don,K,LL,NY,NX)=DOM(idom_don,K,LL,NY,NX)+OQNXS
-      DOM_Macp(idom_don,K,LL,NY,NX)=DOM_Macp(idom_don,K,LL,NY,NX)+OQNHXS
-      OHM(ielmn,K,LL,NY,NX)=OHM(ielmn,K,LL,NY,NX)+OHNXS
-      DOM(idom_dop,K,LL,NY,NX)=DOM(idom_dop,K,LL,NY,NX)+OQPXS
-      DOM_Macp(idom_dop,K,LL,NY,NX)=DOM_Macp(idom_dop,K,LL,NY,NX)+OQPHXS
-      OHM(ielmp,K,LL,NY,NX)=OHM(ielmp,K,LL,NY,NX)+OHPXS
+        L1=LL
+      ENDIF      
+      DO NE=idom_beg,idom_end
+        OQMXS=FracLitrMix*AZMAX1(DOM_vr(NE,K,L1,NY,NX))
+        OQMHXS=FracLitrMix*AZMAX1(DOM_MacP_vr(NE,K,L1,NY,NX))
+        OHMXS=FracLitrMix*AZMAX1(SorbedOM_vr(NE,K,L1,NY,NX))
+
+        DOM_vr(NE,K,L,NY,NX)=DOM_vr(NE,K,L,NY,NX)-OQMXS
+        DOM_MacP_vr(NE,K,L,NY,NX)=DOM_MacP_vr(NE,K,L,NY,NX)-OQMHXS
+        SorbedOM_vr(NE,K,L,NY,NX)=SorbedOM_vr(NE,K,L,NY,NX)-OHMXS
+
+        DOM_vr(NE,K,LL,NY,NX)=DOM_vr(NE,K,LL,NY,NX)+OQMXS
+        DOM_MacP_vr(NE,K,LL,NY,NX)=DOM_MacP_vr(NE,K,LL,NY,NX)+OQMHXS
+        SorbedOM_vr(NE,K,LL,NY,NX)=SorbedOM_vr(NE,K,LL,NY,NX)+OHMXS
+      ENDDO
+
+      !mix solid organic matter
       D7931: DO M=1,jsken
-        IF(FOSCXS.GT.0.0_r8)THEN
-          OSCXS=FOSCXS*AZMAX1(OSM(ielmc,M,K,L,NY,NX))
-          OSAXS=FOSCXS*AZMAX1(OSA(M,K,L,NY,NX))
-          OSNXS=FOSCXS*AZMAX1(OSM(ielmn,M,K,L,NY,NX))
-          OSPXS=FOSCXS*AZMAX1(OSM(ielmp,M,K,L,NY,NX))
+        IF(FracLitrMix.GT.0.0_r8)THEN
+          L1=L
         ELSE
-          OSCXS=FOSCXS*AZMAX1(OSM(ielmc,M,K,LL,NY,NX))
-          OSNXS=FOSCXS*AZMAX1(OSM(ielmn,M,K,LL,NY,NX))
-          OSPXS=FOSCXS*AZMAX1(OSM(ielmp,M,K,LL,NY,NX))
-          OSAXS=FOSCXS*AZMAX1(OSA(M,K,LL,NY,NX))          
+          L1=LL
         ENDIF
-        OSM(ielmc,M,K,L,NY,NX)=OSM(ielmc,M,K,L,NY,NX)-OSCXS
-        OSA(M,K,L,NY,NX)=OSA(M,K,L,NY,NX)-OSAXS
-        OSM(ielmn,M,K,L,NY,NX)=OSM(ielmn,M,K,L,NY,NX)-OSNXS
-        OSM(ielmp,M,K,L,NY,NX)=OSM(ielmp,M,K,L,NY,NX)-OSPXS
-        OSM(ielmc,M,K,LL,NY,NX)=OSM(ielmc,M,K,LL,NY,NX)+OSCXS
-        OSA(M,K,LL,NY,NX)=OSA(M,K,LL,NY,NX)+OSAXS
-        OSM(ielmn,M,K,LL,NY,NX)=OSM(ielmn,M,K,LL,NY,NX)+OSNXS
-        OSM(ielmp,M,K,LL,NY,NX)=OSM(ielmp,M,K,LL,NY,NX)+OSPXS
+        DO NE=1,NumPlantChemElms
+          OSMXS=FracLitrMix*AZMAX1(SolidOM_vr(NE,M,K,L1,NY,NX))
+          SolidOM_vr(NE,M,K,L,NY,NX)=SolidOM_vr(NE,M,K,L,NY,NX)-OSMXS
+          SolidOM_vr(NE,M,K,LL,NY,NX)=SolidOM_vr(NE,M,K,LL,NY,NX)+OSMXS
+        ENDDO
+        OSAXS=FracLitrMix*AZMAX1(SolidOMAct_vr(M,K,L1,NY,NX))
+        SolidOMAct_vr(M,K,L,NY,NX)=SolidOMAct_vr(M,K,L,NY,NX)-OSAXS
+        SolidOMAct_vr(M,K,LL,NY,NX)=SolidOMAct_vr(M,K,LL,NY,NX)+OSAXS
       ENDDO D7931
     ENDDO D7901
   ENDIF
   end subroutine ApplyVerticalMix
 
+!------------------------------------------------------------------------------------------
+  subroutine sumORGMLayL(L,NY,NX,ORGM,conly)
+  !
+  !sum up organic matter in layer L
+  !including live microbial biomass, microbial residue, sorbed dom+acetate, and solid SOM
+  
+  implicit none
+  integer, intent(in) :: L, NY,NX
+  real(r8), intent(out) :: ORGM(1:NumPlantChemElms)
+  logical, optional, intent(in) :: conly
+  integer :: K,N,NGL,M,MID,NE,jcplx1,nelms
+  logical :: conly_loc
+
+  if(present(conly))then
+    conly_loc=conly
+  else
+    conly_loc=.false.
+  endif
+
+  ORGM=0._r8
+  !sumup heterotrophic microbes
+  if(L==0)then
+    jcplx1=micpar%NumOfLitrCmplxs
+  else
+    jcplx1=jcplx
+  endif
+  if(conly_loc)then
+    nelms=1
+  else
+    nelms=NumPlantChemElms
+  endif  
+  !add autotrophic microbes
+  DO  N=1,NumMicbFunGrupsPerCmplx
+    DO NGL=JGniA(N),JGnfA(N)
+      DO  M=1,nlbiomcp
+        MID=micpar%get_micb_id(M,NGL)
+        DO NE=1,nelms
+          ORGM(NE)=ORGM(NE)+mBiomeAutor_vr(NE,MID,L,NY,NX)
+        ENDDO
+      enddo
+    enddo
+  enddo
+
+  DO K=1,jcplx1
+    !add heterotrophic microbes
+    DO  N=1,NumMicbFunGrupsPerCmplx
+      DO NGL=JGnio(N),JGnfo(N)
+        DO  M=1,nlbiomcp
+          MID=micpar%get_micb_id(M,NGL)
+          DO NE=1,nelms
+            ORGM(NE)=ORGM(NE)+mBiomeHeter_vr(NE,MID,K,L,NY,NX)
+          ENDDO
+        enddo
+      enddo
+    enddo
+
+  !add microbial residual
+    DO  M=1,ndbiomcp
+      DO NE=1,nelms
+        ORGM(NE)=ORGM(NE)+OMBioResdu_vr(NE,M,K,L,NY,NX)
+      ENDDO    
+    ENDDO
+
+    !add dom
+    DO NE=1,nelms
+      ORGM(NE)=ORGM(NE)+DOM_vr(NE,K,L,NY,NX)+DOM_MacP_vr(NE,K,L,NY,NX)+SorbedOM_vr(NE,K,L,NY,NX)
+    ENDDO
+    ORGM(ielmc)=ORGM(ielmc)+DOM_vr(idom_acetate,K,L,NY,NX)+DOM_MacP_vr(idom_acetate,K,L,NY,NX)+SorbedOM_vr(idom_acetate,K,L,NY,NX)    
+
+    !add solid organic matter
+    DO  M=1,jsken
+      DO NE=1,nelms
+        ORGM(NE)=ORGM(NE)+SolidOM_vr(NE,M,K,L,NY,NX)
+      ENDDO  
+    ENDDO  
+  ENDDO    
+
+  end subroutine sumORGMLayL
+!------------------------------------------------------------------------------------------
+
+  subroutine sumLitrOMLayL(L,NY,NX,ORGM)
+  !
+  !sum up litter OM (DOM + litter OM) in layer L
+  implicit none
+  integer, intent(in) :: L, NY,NX
+  real(r8), intent(out) :: ORGM(1:NumPlantChemElms)
+  integer :: K,N,NGL,M,MID,NE
+
+  ORGM=0._r8
+
+  !add autotrophic microbes
+  DO  N=1,NumMicbFunGrupsPerCmplx
+    DO NGL=JGniA(N),JGnfA(N)
+      DO  M=1,nlbiomcp
+        MID=micpar%get_micb_id(M,NGL)
+        DO NE=1,NumPlantChemElms
+          ORGM(NE)=ORGM(NE)+mBiomeAutor_vr(NE,MID,L,NY,NX)
+        ENDDO
+      enddo
+    enddo
+  enddo
+
+
+  DO K=1,micpar%NumOfLitrCmplxs
+    !add live heterotrophic microbes
+    DO  N=1,NumMicbFunGrupsPerCmplx
+      DO NGL=JGnio(N),JGnfo(N)
+        DO  M=1,nlbiomcp
+          MID=micpar%get_micb_id(M,NGL)
+          DO NE=1,NumPlantChemElms
+            ORGM(NE)=ORGM(NE)+mBiomeHeter_vr(NE,MID,K,L,NY,NX)
+          ENDDO
+        enddo
+      enddo
+    enddo
+
+   !add microbial residual
+    DO  M=1,ndbiomcp
+      DO NE=1,NumPlantChemElms
+        ORGM(NE)=ORGM(NE)+OMBioResdu_vr(NE,M,K,L,NY,NX)
+      ENDDO    
+    ENDDO
+
+    !add dom
+    DO NE=1,NumPlantChemElms
+      ORGM(NE)=ORGM(NE)+DOM_vr(NE,K,L,NY,NX)+DOM_MacP_vr(NE,K,L,NY,NX)+SorbedOM_vr(NE,K,L,NY,NX)
+    ENDDO
+    ORGM(ielmc)=ORGM(ielmc)+DOM_vr(idom_acetate,K,L,NY,NX)+DOM_MacP_vr(idom_acetate,K,L,NY,NX)+SorbedOM_vr(idom_acetate,K,L,NY,NX)    
+
+    !add solid organic matter
+    DO  M=1,jsken
+      DO NE=1,NumPlantChemElms
+        ORGM(NE)=ORGM(NE)+SolidOM_vr(NE,M,K,L,NY,NX)
+      ENDDO  
+    ENDDO  
+  ENDDO    
+
+  end subroutine sumLitrOMLayL
+
+!------------------------------------------------------------------------------------------
+
+  subroutine sumHumOMLayL(L,NY,NX,ORGM)
+  !
+  !sum up litter OM in layer L
+  implicit none
+  integer, intent(in) :: L, NY,NX
+  real(r8), intent(out) :: ORGM(1:NumPlantChemElms)
+  integer :: K,N,NGL,M,MID,NE
+
+  ORGM=0._r8
+
+  !add autotrophic microbes
+  DO  N=1,NumMicbFunGrupsPerCmplx
+    DO NGL=JGniA(N),JGnfA(N)
+      DO  M=1,nlbiomcp
+        MID=micpar%get_micb_id(M,NGL)
+        DO NE=1,NumPlantChemElms
+          ORGM(NE)=ORGM(NE)+mBiomeAutor_vr(NE,MID,L,NY,NX)
+        ENDDO
+      enddo
+    enddo
+  enddo
+
+  DO  K=micpar%NumOfLitrCmplxs+1,jcplx
+   !sumup heterotrophic microbes
+    DO  N=1,NumMicbFunGrupsPerCmplx
+      DO NGL=JGnio(N),JGnfo(N)
+        DO  M=1,nlbiomcp
+          MID=micpar%get_micb_id(M,NGL)
+          DO NE=1,NumPlantChemElms
+            ORGM(NE)=ORGM(NE)+mBiomeHeter_vr(NE,MID,K,L,NY,NX)
+          ENDDO
+        enddo
+      enddo
+    enddo
+  !add microbial residual
+    DO  M=1,ndbiomcp
+      DO NE=1,NumPlantChemElms
+        ORGM(NE)=ORGM(NE)+OMBioResdu_vr(NE,M,K,L,NY,NX)
+      ENDDO    
+    ENDDO
+
+    !add dom
+    DO NE=1,NumPlantChemElms
+      ORGM(NE)=ORGM(NE)+DOM_vr(NE,K,L,NY,NX)+DOM_MacP_vr(NE,K,L,NY,NX)+SorbedOM_vr(NE,K,L,NY,NX)
+    ENDDO
+    !add acetate
+    ORGM(ielmc)=ORGM(ielmc)+DOM_vr(idom_acetate,K,L,NY,NX)+DOM_MacP_vr(idom_acetate,K,L,NY,NX)+SorbedOM_vr(idom_acetate,K,L,NY,NX)    
+
+    !add solid organic matter
+    DO  M=1,jsken
+      DO NE=1,NumPlantChemElms
+        ORGM(NE)=ORGM(NE)+SolidOM_vr(NE,M,K,L,NY,NX)
+      ENDDO  
+    ENDDO  
+  ENDDO    
+
+  end subroutine sumHumOMLayL
+  
+
+!------------------------------------------------------------------------------------------
+
+  subroutine sumMicBiomLayL(L,NY,NX,ORGM)
+  !
+  !sum up litter OM in layer L
+  implicit none
+  integer, intent(in) :: L, NY,NX
+  real(r8), intent(out) :: ORGM(1:NumPlantChemElms)
+  integer :: K,N,NGL,M,MID,NE,jcplx1
+
+  ORGM=0._r8
+
+  if(L==0)then
+    jcplx1=micpar%NumOfLitrCmplxs
+  else
+    jcplx1=jcplx
+  endif
+
+  !add autotrophic microbes
+  DO  N=1,NumMicbFunGrupsPerCmplx
+    DO NGL=JGniA(N),JGnfA(N)
+      DO  M=1,nlbiomcp
+        MID=micpar%get_micb_id(M,NGL)
+        DO NE=1,NumPlantChemElms
+          ORGM(NE)=ORGM(NE)+mBiomeAutor_vr(NE,MID,L,NY,NX)
+        ENDDO
+      enddo
+    enddo
+  enddo
+
+  DO K=1,jcplx1
+    !add heterotrophic microbes
+    DO  N=1,NumMicbFunGrupsPerCmplx
+      DO NGL=JGnio(N),JGnfo(N)
+        DO  M=1,nlbiomcp
+          MID=micpar%get_micb_id(M,NGL)
+          DO NE=1,NumPlantChemElms
+            ORGM(NE)=ORGM(NE)+mBiomeHeter_vr(NE,MID,K,L,NY,NX)
+          ENDDO
+        enddo
+      enddo
+    enddo
+  enddo  
+  end subroutine sumMicBiomLayL
+!------------------------------------------------------------------------------------------
+
+  subroutine sumSurfOMCK(NY,NX,SOMHeterK,SOMAutor)
+  implicit none
+  integer, intent(in) :: NY,NX
+  real(r8), intent(out) :: SOMHeterK(1:micpar%NumOfLitrCmplxs)
+  real(r8), intent(out) :: SOMAutor
+  integer :: K,N,NGL,M,MID,NE,L
+
+  SOMHeterK=0._r8
+  SOMAutor=0._r8
+  L=0
+
+  DO  N=1,NumMicbFunGrupsPerCmplx
+    do NGL=JGniA(n),JGnfA(n)
+      DO  M=1,nlbiomcp
+        MID=micpar%get_micb_id(M,NGL)
+        DO NE=1,ielmc
+          SOMAutor=SOMAutor+mBiomeAutor_vr(NE,MID,L,NY,NX)
+        ENDDO
+      ENDDO
+    ENDDO
+  enddo
+
+  DO K=1,micpar%NumOfLitrCmplxs
+    DO  N=1,NumMicbFunGrupsPerCmplx
+      do NGL=JGnio(n),JGnfo(n)
+        DO  M=1,nlbiomcp
+          MID=micpar%get_micb_id(M,NGL)
+          DO NE=1,ielmc
+            SOMHeterK(K)=SOMHeterK(K)+mBiomeHeter_vr(NE,MID,K,L,NY,NX)
+          ENDDO
+        enddo
+      enddo  
+    enddo    
+
+    DO  M=1,ndbiomcp
+      DO NE=1,ielmc
+        SOMHeterK(K)=SOMHeterK(K)+OMBioResdu_vr(NE,M,K,L,NY,NX)        
+      ENDDO
+    ENDDO  
+
+    !add dom
+    DO NE=1,ielmc
+      SOMHeterK(K)=SOMHeterK(K)+DOM_vr(NE,K,L,NY,NX)+DOM_MacP_vr(NE,K,L,NY,NX)+SorbedOM_vr(NE,K,L,NY,NX)
+    ENDDO
+    !add acetate
+    SOMHeterK(K)=SOMHeterK(K)+DOM_vr(idom_acetate,K,L,NY,NX)+DOM_MacP_vr(idom_acetate,K,L,NY,NX)+SorbedOM_vr(idom_acetate,K,L,NY,NX)    
+
+    DO M=1,jsken
+      DO NE=1,ielmc
+        SOMHeterK(K)=SOMHeterK(K)+SolidOM_vr(NE,M,K,L,NY,NX)
+      ENDDO
+    ENDDO  
+  ENDDO
+  
+  end subroutine sumSurfOMCK
 end module nitrosMod

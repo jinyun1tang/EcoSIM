@@ -461,8 +461,8 @@ module WthrMod
         !
         !     DTS=change in daily average soil temperature
         !     ATCA,ATCS=mean annual air,soil temperature
-        !     OFFSET=shift in Arrhenius curve for MFT activity in nitro.f
-        !     OFFST=shift in Arrhenius curve for PFT activity in uptake.f
+        !     TempOffset_col=shift in Arrhenius curve for MFT activity in nitro.f
+        !     TempOffset_pft=shift in Arrhenius curve for PFT activity in uptake.f
         !     iPlantThermoAdaptZone=PFT thermal adaptation zone
         !     HTC=high temperature threshold for grain number loss (oC)
         !     GROUPI,ShootNodeNumAtPlanting_pft=node number at floral initiation,planting (maturity group)
@@ -471,16 +471,16 @@ module WthrMod
           DTS=0.5_r8*DTA
           ATCA(NY,NX)=ATCAI(NY,NX)+DTA
           ATCS(NY,NX)=ATCAI(NY,NX)+DTS
-          OFFSET(NY,NX)=0.33*(12.5-AZMAX1(AMIN1(25.0,ATCS(NY,NX))))
+          TempOffset_col(NY,NX)=0.33*(12.5-AZMAX1(AMIN1(25.0,ATCS(NY,NX))))
           DO NZ=1,NP(NY,NX)
             iPlantThermoAdaptZone(NZ,NY,NX)=PlantInitThermoAdaptZone(NZ,NY,NX)+0.30_r8/2.667_r8*DTA
-            OFFST(NZ,NY,NX)=2.667*(2.5-iPlantThermoAdaptZone(NZ,NY,NX))
-            !     TC4LeafOut_pft(NZ,NY,NX)=TCZD-OFFST(NZ,NY,NX)
+            TempOffset_pft(NZ,NY,NX)=2.667*(2.5-iPlantThermoAdaptZone(NZ,NY,NX))
+            !     TC4LeafOut_pft(NZ,NY,NX)=TCZD-TempOffset_pft(NZ,NY,NX)
             !     TC4LeafOff_pft(NZ,NY,NX)=AMIN1(15.0,TC4LeafOut_pft(NZ,NY,NX)+TCXD)
             IF(iPlantPhotosynthesisType(NZ,NY,NX).EQ.3)THEN
-              HighTCLimtSeed_pft(NZ,NY,NX)=27.0+3.0*iPlantThermoAdaptZone(NZ,NY,NX)
+              HighTempLimitSeed_pft(NZ,NY,NX)=27.0+3.0*iPlantThermoAdaptZone(NZ,NY,NX)
             ELSE
-              HighTCLimtSeed_pft(NZ,NY,NX)=30.0+3.0*iPlantThermoAdaptZone(NZ,NY,NX)
+              HighTempLimitSeed_pft(NZ,NY,NX)=30.0+3.0*iPlantThermoAdaptZone(NZ,NY,NX)
             ENDIF
             MatureGroup_pft(NZ,NY,NX)=GROUPX(NZ,NY,NX)+0.30_r8*DTA
             IF(iPlantTurnoverPattern_pft(NZ,NY,NX).NE.0)THEN
@@ -557,15 +557,15 @@ module WthrMod
       !
       !     PRECR,PRECW=rainfall,snowfall
       !     PRECI,PRECU=surface,subsurface irrigation
-      !     PRECA,PrecAtm=rain+irrigation,rain+snow
+      !     PRECA,PrecAtm_col=rain+irrigation,rain+snow
       !     THS=sky LW radiation
 !
       RainFalPrec(NY,NX)=PrecAsRain(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
       SnoFalPrec(NY,NX)=PrecAsSnow(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
       IrrigSurface(NY,NX)=PRECII(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
-      IrrigSubsurf(NY,NX)=PRECUI(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
+      IrrigSubsurf_col(NY,NX)=PRECUI(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
       PrecRainAndSurfirrig(NY,NX)=RainFalPrec(NY,NX)+IrrigSurface(NY,NX)
-      PrecAtm(NY,NX)=RainFalPrec(NY,NX)+SnoFalPrec(NY,NX)
+      PrecAtm_col(NY,NX)=RainFalPrec(NY,NX)+SnoFalPrec(NY,NX)
       LWRadSky(NY,NX)=THSX(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
     ENDDO
   ENDDO

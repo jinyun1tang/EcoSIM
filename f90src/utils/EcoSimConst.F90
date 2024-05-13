@@ -32,7 +32,7 @@ module EcosimConst
   real(r8), parameter :: hpresc=8.4334E+03_r8      !elapsing height for atmospheric pressure, m
   real(r8), parameter :: POROQ=0.66_r8                    !soil porosity ^ 2/3
   real(r8), parameter :: FORGC=0.1E+06_r8                 !minimum SOC for combustion 	[g Mg-1]
-  real(r8), parameter :: FVLWB=1.0_r8                     !maximum soil water content for combustion	[m3 m-3]
+  real(r8), parameter :: VolMaxSoilMoist4Fire=1.0_r8                     !maximum soil water content for combustion	[m3 m-3]
   real(r8), parameter :: FCH4F=0.01_r8                    !fraction of combusted C released as CH4
   real(r8), parameter :: PSIHY=-2500.0_r8                 !hygroscopic water potential, very dry (but not air dry) [MPa]
   real(r8), parameter :: OXKM=0.080_r8                    !Km for heterotrophic O2 uptake

@@ -106,7 +106,7 @@ implicit none
 
   call InitMicrobialData
 
-  call InitChemTranspData
+  call InitChemTranspData(salt_model)
 
   call InitSoilBGCData(pltpar%NumOfPlantLitrCmplxs)
 
@@ -140,7 +140,7 @@ implicit none
 
   call InitSoilPhysData
 
-  call InitSoluteProperty
+  if(salt_model)call InitSoluteProperty
   end subroutine InitAlloc
 !------------------------------------------------------------------------------------------
   subroutine InitPlantMorphSize()

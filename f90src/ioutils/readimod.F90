@@ -445,10 +445,10 @@ module readiMod
     call ncd_getvar(grid_nfid, 'CEC',ntp,CEC(1:JZ,NV1,NH1))
     call ncd_getvar(grid_nfid, 'AEC',ntp,AEC(1:JZ,NV1,NH1))
 
-    call ncd_getvar(grid_nfid, 'CORGC',ntp,CORGC(1:JZ,NV1,NH1))
-    call ncd_getvar(grid_nfid, 'CORGR',ntp,CORGR(1:JZ,NV1,NH1))
-    call ncd_getvar(grid_nfid, 'CORGN',ntp,CORGN(1:JZ,NV1,NH1))
-    call ncd_getvar(grid_nfid, 'CORGP',ntp,CORGP(1:JZ,NV1,NH1))
+    call ncd_getvar(grid_nfid, 'CORGC',ntp,CSoilOrgM_vr(ielmc,1:JZ,NV1,NH1))
+    call ncd_getvar(grid_nfid, 'CORGR',ntp,COMLitrC_vr(1:JZ,NV1,NH1))
+    call ncd_getvar(grid_nfid, 'CORGN',ntp,CSoilOrgM_vr(ielmn,1:JZ,NV1,NH1))
+    call ncd_getvar(grid_nfid, 'CORGP',ntp,CSoilOrgM_vr(ielmp,1:JZ,NV1,NH1))
 
     call ncd_getvar(grid_nfid, 'CNH4',ntp,CNH4(1:JZ,NV1,NH1))
     call ncd_getvar(grid_nfid, 'CNO3',ntp,CNO3(1:JZ,NV1,NH1))
@@ -556,10 +556,10 @@ module readiMod
             PH(L,NY,NX)=PH(L,NV1,NH1)
             CEC(L,NY,NX)=CEC(L,NV1,NH1)
             AEC(L,NY,NX)=AEC(L,NV1,NH1)
-            CORGC(L,NY,NX)=CORGC(L,NV1,NH1)
-            CORGR(L,NY,NX)=CORGR(L,NV1,NH1)
-            CORGN(L,NY,NX)=CORGN(L,NV1,NH1)
-            CORGP(L,NY,NX)=CORGP(L,NV1,NH1)
+            CSoilOrgM_vr(ielmc,L,NY,NX)=CSoilOrgM_vr(ielmc,L,NV1,NH1)
+            COMLitrC_vr(L,NY,NX)=COMLitrC_vr(L,NV1,NH1)
+            CSoilOrgM_vr(ielmn,L,NY,NX)=CSoilOrgM_vr(ielmn,L,NV1,NH1)
+            CSoilOrgM_vr(ielmp,L,NY,NX)=CSoilOrgM_vr(ielmp,L,NV1,NH1)
 
             CNH4(L,NY,NX)=CNH4(L,NV1,NH1)
             CNO3(L,NY,NX)=CNO3(L,NV1,NH1)
@@ -646,10 +646,10 @@ module readiMod
               PH(L,NY,NX)=PH(L+1,NY,NX)
               CEC(L,NY,NX)=CEC(L+1,NY,NX)
               AEC(L,NY,NX)=AEC(L+1,NY,NX)
-              CORGC(L,NY,NX)=1.0_r8*CORGC(L+1,NY,NX)
-              CORGR(L,NY,NX)=1.0_r8*CORGR(L+1,NY,NX)
-              CORGN(L,NY,NX)=1.0_r8*CORGN(L+1,NY,NX)
-              CORGP(L,NY,NX)=1.0_r8*CORGP(L+1,NY,NX)
+              CSoilOrgM_vr(ielmc,L,NY,NX)=1.0_r8*CSoilOrgM_vr(ielmc,L+1,NY,NX)
+              COMLitrC_vr(L,NY,NX)=1.0_r8*COMLitrC_vr(L+1,NY,NX)
+              CSoilOrgM_vr(ielmn,L,NY,NX)=1.0_r8*CSoilOrgM_vr(ielmn,L+1,NY,NX)
+              CSoilOrgM_vr(ielmp,L,NY,NX)=1.0_r8*CSoilOrgM_vr(ielmp,L+1,NY,NX)
               CNH4(L,NY,NX)=CNH4(L+1,NY,NX)
               CNO3(L,NY,NX)=CNO3(L+1,NY,NX)
               CPO4(L,NY,NX)=CPO4(L+1,NY,NX)
@@ -720,14 +720,14 @@ module readiMod
           SatHydroCondVert(L,NY,NX)=0.098_r8*SatHydroCondVert(L,NY,NX)*FracSoiAsMicP(L,NY,NX)
           SatHydroCondHrzn(L,NY,NX)=0.098_r8*SatHydroCondHrzn(L,NY,NX)*FracSoiAsMicP(L,NY,NX)
           CCLAY(L,NY,NX)=AZMAX1(1.0E+03_r8-(CSAND(L,NY,NX)+CSILT(L,NY,NX)))
-          CORGC(L,NY,NX)=CORGC(L,NY,NX)*1.0E+03_r8   !convert from Kg to g C
-          CORGR(L,NY,NX)=CORGR(L,NY,NX)*1.0E+03_r8   !convert from Kg to g C
-          CORGCI(L,NY,NX)=CORGC(L,NY,NX)
+          CSoilOrgM_vr(ielmc,L,NY,NX)=CSoilOrgM_vr(ielmc,L,NY,NX)*1.0E+03_r8   !convert from Kg to g C
+          COMLitrC_vr(L,NY,NX)=COMLitrC_vr(L,NY,NX)*1.0E+03_r8   !convert from Kg to g C
+          CORGCI(L,NY,NX)=CSoilOrgM_vr(ielmc,L,NY,NX)
           SoilFracAsMacPt0(L,NY,NX)=SoilFracAsMacP(L,NY,NX)
   !
-          CSAND(L,NY,NX)=CSAND(L,NY,NX)*1.0E-03_r8*AZMAX1((1.0_r8-CORGC(L,NY,NX)/orgcden))
-          CSILT(L,NY,NX)=CSILT(L,NY,NX)*1.0E-03_r8*AZMAX1((1.0_r8-CORGC(L,NY,NX)/orgcden))
-          CCLAY(L,NY,NX)=CCLAY(L,NY,NX)*1.0E-03_r8*AZMAX1((1.0_r8-CORGC(L,NY,NX)/orgcden))
+          CSAND(L,NY,NX)=CSAND(L,NY,NX)*1.0E-03_r8*AZMAX1((1.0_r8-CSoilOrgM_vr(ielmc,L,NY,NX)/orgcden))
+          CSILT(L,NY,NX)=CSILT(L,NY,NX)*1.0E-03_r8*AZMAX1((1.0_r8-CSoilOrgM_vr(ielmc,L,NY,NX)/orgcden))
+          CCLAY(L,NY,NX)=CCLAY(L,NY,NX)*1.0E-03_r8*AZMAX1((1.0_r8-CSoilOrgM_vr(ielmc,L,NY,NX)/orgcden))
           CEC(L,NY,NX)=CEC(L,NY,NX)*10.0_r8   !convert from meq/100g to cmol/kg
           AEC(L,NY,NX)=AEC(L,NY,NX)*10.0_r8   !convert from meq/100g to cmol/kg
           CNH4(L,NY,NX)=CNH4(L,NY,NX)/natomw
@@ -753,21 +753,21 @@ module readiMod
   !     ESTIMATE SON,SOP,CEC IF UNKNOWN
   !     BIOCHEMISTRY 130:117-131
   !
-          IF(CORGN(L,NY,NX).LT.0.0_r8)THEN
+          IF(CSoilOrgM_vr(ielmn,L,NY,NX).LT.0.0_r8)THEN
   !  default ORGN parameterization
-            CORGN(L,NY,NX)=AMIN1(0.125_r8*CORGC(L,NY,NX),8.9E+02_r8*(CORGC(L,NY,NX)/1.0E+04_r8)**0.80_r8)
+            CSoilOrgM_vr(ielmn,L,NY,NX)=AMIN1(0.125_r8*CSoilOrgM_vr(ielmc,L,NY,NX),8.9E+02_r8*(CSoilOrgM_vr(ielmc,L,NY,NX)/1.0E+04_r8)**0.80_r8)
           ENDIF
-          IF(CORGP(L,NY,NX).LT.0.0_r8)THEN
-            CORGP(L,NY,NX)=AMIN1(0.0125_r8*CORGC(L,NY,NX),1.2E+02_r8*(CORGC(L,NY,NX)/1.0E+04_r8)**0.52_r8)
+          IF(CSoilOrgM_vr(ielmp,L,NY,NX).LT.0.0_r8)THEN
+            CSoilOrgM_vr(ielmp,L,NY,NX)=AMIN1(0.0125_r8*CSoilOrgM_vr(ielmc,L,NY,NX),1.2E+02_r8*(CSoilOrgM_vr(ielmc,L,NY,NX)/1.0E+04_r8)**0.52_r8)
           ENDIF
           IF(CEC(L,NY,NX).LT.0.0_r8)THEN
             !estimate from input data
-            CEC(L,NY,NX)=10.0_r8*(200.0_r8*2.0_r8*CORGC(L,NY,NX)/1.0E+06_r8 &
+            CEC(L,NY,NX)=10.0_r8*(200.0_r8*2.0_r8*CSoilOrgM_vr(ielmc,L,NY,NX)/1.0E+06_r8 &
               +80.0_r8*CCLAY(L,NY,NX)+20.0_r8*CSILT(L,NY,NX) &
               +5.0_r8*CSAND(L,NY,NX))
           ENDIF
         ENDDO
-        CORGC(0,NY,NX)=orgcden
+        CSoilOrgM_vr(ielmc,0,NY,NX)=orgcden
         FracSoiAsMicP(0,NY,NX)=1.0_r8
       ENDDO
     ENDDO
@@ -877,18 +877,18 @@ module readiMod
 !
 !     ORGANIC C, N AND P CONCENTRATIONS
 !
-!     CORGC,CORGR=total SOC,POC(part of SOC) (kg Mg-1)
+!     CORGC,COMLitrC_vr=total SOC,POC(part of SOC) (kg Mg-1)
 !     CORGN,CORGP=SON,SOP:<0=unknown (g Mg-1)
 !
   write(*,*)''
   write(*,*)'Total SOC (kg C/Mg soil): CORGC'
-  write(*,*)(CORGC(L,NY,NX),L=NU,NM)
+  write(*,*)(CSoilOrgM_vr(ielmc,L,NY,NX),L=NU,NM)
   write(*,*)'POC (part of SOC) (kg C/Mg soil): CORGR '
-  write(*,*)(CORGR(L,NY,NX),L=NU,NM)
+  write(*,*)(COMLitrC_vr(L,NY,NX),L=NU,NM)
   write(*,*)'Total SON (g N/Mg soil): CORGN '
-  write(*,*)(CORGN(L,NY,NX),L=NU,NM)
+  write(*,*)(CSoilOrgM_vr(ielmn,L,NY,NX),L=NU,NM)
   write(*,*)'Total SOP (g P/Mg soil): CORGP'
-  write(*,*)(CORGP(L,NY,NX),L=NU,NM)
+  write(*,*)(CSoilOrgM_vr(ielmp,L,NY,NX),L=NU,NM)
 !
 !     INORGANIC N AND P CONCENTRATIONS
 !

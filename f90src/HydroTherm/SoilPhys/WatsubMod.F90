@@ -220,8 +220,8 @@ module WatsubMod
     !   VLHeatCapacityA,VLHeatCapacityB=volumetric heat capacities of micropore,macropore
     !
         PSISM1(L,NY,NX)=PSISoilMatricP(L,NY,NX)
-        VLMicP1(L,NY,NX)=VLMicP(L,NY,NX)
-        VLWatMicP1(L,NY,NX)=VLWatMicP(L,NY,NX)
+        VLMicP1(L,NY,NX)=VLMicP_vr(L,NY,NX)
+        VLWatMicP1(L,NY,NX)=VLWatMicP_vr(L,NY,NX)
         VLWatMicPX1(L,NY,NX)=VLWatMicPX(L,NY,NX)
         VLiceMicP1(L,NY,NX)=VLiceMicP(L,NY,NX)
         VLWatMacP1(L,NY,NX)=VLWatMacP(L,NY,NX)
@@ -300,8 +300,8 @@ module WatsubMod
         endif
         !LyrIrrig=layer number where irrigation is applied
         IF(L.EQ.LyrIrrig)THEN
-          FWatIrrigate2MicP(L,NY,NX)=IrrigSubsurf(NY,NX)
-          HeatIrrigation(L,NY,NX)=cpw*TairK(NY,NX)*IrrigSubsurf(NY,NX)
+          FWatIrrigate2MicP(L,NY,NX)=IrrigSubsurf_col(NY,NX)
+          HeatIrrigation(L,NY,NX)=cpw*TairK(NY,NX)*IrrigSubsurf_col(NY,NX)
           FWatIrrigate2MicP1(L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*dts_HeatWatTP
           HeatIrrigation1(L,NY,NX)=HeatIrrigation(L,NY,NX)*dts_HeatWatTP
         ELSE
@@ -846,8 +846,8 @@ module WatsubMod
 !
                 IF(IDWaterTable(N2,N1).EQ.0.OR.N.EQ.ivertdir)THEN              
                   !involve no water table or vertical direction
-                  THETA1=AMAX1(THETY(N3,N2,N1),AMIN1(POROS(N3,N2,N1),safe_adb(VLWatMicP1(N3,N2,N1),VLSoilMicP(N3,N2,N1))))
-                  THETAX=AMAX1(THETY(N3,N2,N1),AMIN1(POROS(N3,N2,N1),safe_adb(VLWatMicPX1(N3,N2,N1),VLSoilMicP(N3,N2,N1))))
+                  THETA1=AMAX1(THETY_vr(N3,N2,N1),AMIN1(POROS(N3,N2,N1),safe_adb(VLWatMicP1(N3,N2,N1),VLSoilMicP(N3,N2,N1))))
+                  THETAX=AMAX1(THETY_vr(N3,N2,N1),AMIN1(POROS(N3,N2,N1),safe_adb(VLWatMicPX1(N3,N2,N1),VLSoilMicP(N3,N2,N1))))
                   K1=MAX(1,MIN(100,INT(100.0_r8*(POROS(N3,N2,N1)-THETA1)/POROS(N3,N2,N1))+1))
                   KL=MAX(1,MIN(100,INT(100.0_r8*(POROS(N3,N2,N1)-THETAX)/POROS(N3,N2,N1))+1))
                   IF(N3.EQ.NUM(NY,NX))THEN
@@ -1390,7 +1390,7 @@ module WatsubMod
   implicit none
   integer, intent(in) :: NY,NX,M
   integer :: L
-  real(r8) :: THETWT,TFND1,THETWA
+  real(r8) :: THETWT,TScal4Aquadifsvity,THETWA
   real(r8) :: VLSoiPorAV,VLWatSoi,scalar
   real(r8) :: THETWH,Z3S
 
@@ -1408,7 +1408,7 @@ module WatsubMod
 !   VOLA1,VLiceMicP1,VLWatMicP1=total,ice-,water-filled microporosity
 !   VLMacP1,VLiceMacP1,VLWatMacP1=total,ice-,water-filled macroporosity
 !   VLsoiAirPM=air-filled porosity
-!   TFND1=temperature effect on gas diffusivity
+!   TScal4Aquadifsvity=temperature effect on gas diffusivity
 !   DiffusivitySolutEff=rate constant for air-water gas exchange
 !   Z1S,Z2SW,Z2SD,Z3SX=parameters for soil air-water gas transfers
 !   XNPD=time step for gas transfer calculations
@@ -1418,9 +1418,9 @@ module WatsubMod
     VLSoiPorAV=VLMicP1(L,NY,NX)+VLMacP1(L,NY,NX)-VLiceMicP1(L,NY,NX)-VLiceMacP1(L,NY,NX)
     IF(VLSoiPorAV.GT.ZEROS2(NY,NX).AND.VLsoiAirPM(M,L,NY,NX).GT.ZEROS2(NY,NX))THEN
       THETWA=AZMAX1(AMIN1(1.0_r8,VLWatSoi/VLSoiPorAV))
-      TFND1=TEFAQUDIF(TKSoi1(0,NY,NX))
+      TScal4Aquadifsvity=TEFAQUDIF(TKSoi1(0,NY,NX))
       Z3S=FieldCapacity(L,NY,NX)/POROS(L,NY,NX)
-      scalar=TFND1*XNPD
+      scalar=TScal4Aquadifsvity*XNPD
       DiffusivitySolutEff(M,L,NY,NX)=fDiffusivitySolutEff(scalar,THETWA,Z3S)
     ELSE
       DiffusivitySolutEff(M,L,NY,NX)=0.0_r8
@@ -1479,7 +1479,7 @@ module WatsubMod
   ELSEIF(PSISoilMatricPtmp(N3,N2,N1).GT.PSISoilAirEntry(N3,N2,N1))THEN
     !source grid is saturated
     THETW1=THETA1
-    THETWL=AMAX1(THETY(N6,N5,N4),AMIN1(POROS(N6,N5,N4),safe_adb(VLWatMicPX1(N6,N5,N4),VLSoilMicP(N6,N5,N4))))
+    THETWL=AMAX1(THETY_vr(N6,N5,N4),AMIN1(POROS(N6,N5,N4),safe_adb(VLWatMicPX1(N6,N5,N4),VLSoilMicP(N6,N5,N4))))
     K1=MAX(1,MIN(100,INT(100.0_r8*(POROS(N3,N2,N1)-THETW1)/POROS(N3,N2,N1))+1))
     KL=MAX(1,MIN(100,INT(100.0_r8*(POROS(N6,N5,N4)-AMIN1(Theta_sat(N6,N5,N4),THETWL))/POROS(N6,N5,N4))+1))
     PSISM1(N3,N2,N1)=PSISoilMatricPtmp(N3,N2,N1)
@@ -1507,7 +1507,7 @@ module WatsubMod
 !
   ELSEIF(PSISoilMatricPtmp(N6,N5,N4).GT.PSISoilAirEntry(N6,N5,N4))THEN
     !source grid is saturated, dest grid is not
-    THETW1=AMAX1(THETY(N3,N2,N1),AMIN1(POROS(N3,N2,N1),safe_adb(VLWatMicPX1(N3,N2,N1),VLSoilMicP(N3,N2,N1))))
+    THETW1=AMAX1(THETY_vr(N3,N2,N1),AMIN1(POROS(N3,N2,N1),safe_adb(VLWatMicPX1(N3,N2,N1),VLSoilMicP(N3,N2,N1))))
     THETWL=THETAL
     K1=MAX(1,MIN(100,INT(100.0*(POROS(N3,N2,N1)-AMIN1(Theta_sat(N3,N2,N1),THETW1))/POROS(N3,N2,N1))+1))
     KL=MAX(1,MIN(100,INT(100.0*(POROS(N6,N5,N4)-THETWL)/POROS(N6,N5,N4))+1))
@@ -1724,7 +1724,7 @@ module WatsubMod
   !     PSISV1,PSISVL=matric+osmotic water potl in source,destination
   !     CNV1,CNVL=vapor conductivities of source, destination
   !     POROS,POROQ=porosity, tortuosity
-  !     WGSGL=vapor diffusivity
+  !     WVapDifusvitySoil_vr=vapor diffusivity
   !     ATCNVL=source,destination vapor conductance
   !     DLYR=soil layer depth
   !     PotentialVaporFlux,MaxVaporFlux=vapor flux unlimited,limited by vapor
@@ -1738,8 +1738,8 @@ module WatsubMod
 
     VP1=vapsat(TK11)*EXP(18.0_r8*PSISV1/(RGAS*TK11))
     VPL=vapsat(TK12)*EXP(18.0_r8*PSISVL/(RGAS*TK12))
-    CNV1=WGSGL(N3,N2,N1)*THETPM(M,N3,N2,N1)*POROQ*THETPM(M,N3,N2,N1)/POROS(N3,N2,N1)
-    CNVL=WGSGL(N6,N5,N4)*THETPM(M,N6,N5,N4)*POROQ*THETPM(M,N6,N5,N4)/POROS(N6,N5,N4)
+    CNV1=WVapDifusvitySoil_vr(N3,N2,N1)*THETPM(M,N3,N2,N1)*POROQ*THETPM(M,N3,N2,N1)/POROS(N3,N2,N1)
+    CNVL=WVapDifusvitySoil_vr(N6,N5,N4)*THETPM(M,N6,N5,N4)*POROQ*THETPM(M,N6,N5,N4)/POROS(N6,N5,N4)
     ATCNVL=2.0_r8*CNV1*CNVL/(CNV1*DLYR(N,N6,N5,N4)+CNVL*DLYR(N,N3,N2,N1))
     !
     !     VAPOR FLUX FROM VAPOR PRESSURE AND DIFFUSIVITY,

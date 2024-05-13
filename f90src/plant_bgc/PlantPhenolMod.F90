@@ -1,4 +1,4 @@
-module HfuncsMod
+module PlantPhenolMod
 !!
 ! Description:
 ! code to do plant phenology
@@ -55,7 +55,7 @@ module HfuncsMod
     iPlantCalendar_brch              =>  plt_pheno%iPlantCalendar_brch             , &
     DayLenthCurrent                  =>  plt_site%DayLenthCurrent                  , &
     DATAP                            =>  plt_site%DATAP                            , &
-    PPT                              =>  plt_site%PPT                              , &
+    PlantPopu_col                    =>  plt_site%PlantPopu_col                    , &
     DayLenthPrev                     =>  plt_site%DayLenthPrev                     , &
     NP                               =>  plt_site%NP                               , &
     PlantPopulation_pft              =>  plt_site%PlantPopulation_pft              , &
@@ -65,9 +65,9 @@ module HfuncsMod
 
     IF(DATAP(NZ).NE.'NO')THEN
 !
-!     PPT=total biome population
+!     PlantPopu_col=total biome population
 !
-      PPT=PPT+PlantPopulation_pft(NZ)
+      PlantPopu_col=PlantPopu_col+PlantPopulation_pft(NZ)
 !
 !         SET CROP FLAG ACCORDINGTopRootLayer_pftTO PLANTING, HARVEST DATES, DEATH,
 !         1 = ALIVE, 0 = NOT ALIVE
@@ -798,7 +798,7 @@ module HfuncsMod
     iPlantCalendar_brch                  =>  plt_pheno%iPlantCalendar_brch              , &
     RefLeafAppearRate_pft                =>  plt_pheno%RefLeafAppearRate_pft            , &
     ReprodNodeNumNormByMatrgrp_brch      =>  plt_pheno%ReprodNodeNumNormByMatrgrp_brch  , &
-    OFFST                                =>  plt_pheno%OFFST                            , &
+    TempOffset_pft                       =>  plt_pheno%TempOffset_pft                   , &
     iPlantPhenolPattern_pft              =>  plt_pheno%iPlantPhenolPattern_pft          , &
     doPlantLeafOut_brch                  =>  plt_pheno%doPlantLeafOut_brch              , &
     NumOfLeaves_brch                     =>  plt_morph%NumOfLeaves_brch                 , &
@@ -844,7 +844,7 @@ module HfuncsMod
 ! iPlantPhenolType_pft=phenology type from PFT file, 0=evergreen,1=cold deciduous, 2=drought deciduous,3=1+2
 ! Hours4LeafOff_brch,VRNX=leafoff hours,hours required for leafoff
 ! TKG,TKCO=canopy temperature,canopy temp used in Arrhenius eqn
-! OFFST=shift in Arrhenius curve for thermal adaptation
+! TempOffset_pft=shift in Arrhenius curve for thermal adaptation
 ! TFNP=temperature function for phenology (25 oC =1 )
 ! 8.313,710.0=gas constant,enthalpy
 ! 60000,197500,218500=energy of activn,high,low temp inactivn(KJ mol-1)
@@ -853,7 +853,7 @@ module HfuncsMod
 !
   IF(iPlantPhenolType_pft(NZ).EQ.iphenotyp_evgreen &
     .OR. Hours4LeafOff_brch(NB,NZ).LT.HourReq4LeafOff_brch(NB,NZ))THEN
-    TKCO=TKG(NZ)+OFFST(NZ)
+    TKCO=TKG(NZ)+TempOffset_pft(NZ)
     TFNP=calc_leave_grow_tempf(TKCO)    
     NodeInitRate=AZMAX1(RefNodeInitRate_pft(NZ)*TFNP)
     LeafAppearRate=AZMAX1(RefLeafAppearRate_pft(NZ)*TFNP)
@@ -943,6 +943,8 @@ module HfuncsMod
     CanHeightChk=CanopyHeight_pft(NZ).GE.SnowDepth-ZERO
     PhenoChk1=iPlantPhenolPattern_pft(NZ).EQ.iplt_perennial .AND. &
       (iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldecid.OR.iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldroutdecid)
+    !Annual crop plants (i.e. those seeded by human) are set as evergreen, if it is self-seeding, then 
+    !iPlantPhenolType_pft should be set according to koppen climate zone.  
     PhenoChk2=iPlantPhenolPattern_pft(NZ).EQ.iplt_annual.AND.iPlantPhenolType_pft(NZ).EQ.iphenotyp_evgreen
     
 !    if(NZ==1)THEN
@@ -1116,4 +1118,4 @@ module HfuncsMod
   end associate
   end subroutine live_branch_phenology
 
-end module HfuncsMod
+end module PlantPhenolMod

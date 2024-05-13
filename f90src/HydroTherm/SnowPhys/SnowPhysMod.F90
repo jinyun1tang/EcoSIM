@@ -1387,7 +1387,7 @@ contains
   real(r8) :: THETW1,VPY,FCX,WPX
   real(r8) :: LOGFCX,LOGWPX,PSDX,FCDX
 
-  THETW1=AMAX1(THETY(NUM(NY,NX),NY,NX),AMIN1(POROS(NUM(NY,NX),NY,NX) &
+  THETW1=AMAX1(THETY_vr(NUM(NY,NX),NY,NX),AMIN1(POROS(NUM(NY,NX),NY,NX) &
     ,safe_adb(VLWatMicP1(NUM(NY,NX),NY,NX),VLSoilMicP(NUM(NY,NX),NY,NX))))
   IF(SoilMicPMassLayer(NUM(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
     IF(THETW1.LT.FieldCapacity(NUM(NY,NX),NY,NX))THEN
@@ -1534,7 +1534,7 @@ contains
   ! VapCond1,VapCond2=vapor conductances of source, destination layers
   ! VapSnoSrc,VapSoiDest=vapor concentrations of source, destination layers
   ! POROS,POROQ=porosity, tortuosity
-  ! WGSGL=vapor diffusivity
+  ! WVapDifusvitySoil_vr=vapor diffusivity
   ! TKSnow1,TK1=snow,soil surface temperature
   ! PSISV1=soil matric+osmotic potential
   ! AvgVaporCondctSoilLitR=snow-soil vapor conductance
@@ -1545,7 +1545,7 @@ contains
   ! VapFlxSno2Soi1,HeatConvFlxSno2Soi1=vapor flux and its convective heat flux
   !
   IF(VLairSno1.GT.ZEROS2(NY,NX).AND.THETPM(M,NUM(NY,NX),NY,NX).GT.THETX)THEN
-    VapCond2=WGSGL(NUM(NY,NX),NY,NX)*THETPM(M,NUM(NY,NX),NY,NX)*POROQ &
+    VapCond2=WVapDifusvitySoil_vr(NUM(NY,NX),NY,NX)*THETPM(M,NUM(NY,NX),NY,NX)*POROQ &
       *THETPM(M,NUM(NY,NX),NY,NX)/POROS(NUM(NY,NX),NY,NX)
     VapSoiDest=vapsat(TKSoi1(NUM(NY,NX),NY,NX))*EXP(18.0_r8*PSISV1/(RGAS*TKSoi1(NUM(NY,NX),NY,NX)))
     AvgVaporCondctSoilLitR=2.0_r8*VapCond1*VapCond2/(VapCond1*DLYR(3,NUM(NY,NX),NY,NX)+VapCond2*SnowLayerThick0(L,NY,NX))

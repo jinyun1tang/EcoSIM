@@ -166,7 +166,7 @@ module TranspSaltMod
 !
   DO nsalts=idsalt_beg,idsalt_end
     trcSalt3DFlo2Cell(nsalts,3,0,NY,NX)=0.0
-    trcSaltFlo2SnowLay(nsalts,1,NY,NX)=Rain2SoilSurf(NY,NX)*trcsalt_rain_conc(nsalts,NY,NX) &
+    trcSaltFlo2SnowLay(nsalts,1,NY,NX)=Rain2SoilSurf_col(NY,NX)*trcsalt_rain_conc(nsalts,NY,NX) &
       +Irrig2SoilSurf(NY,NX)*trcsalt_irrig_conc(nsalts,I,NY,NX)    
   ENDDO
 
@@ -188,10 +188,10 @@ module TranspSaltMod
 !     HOURLY SOLUTE FLUXES FROM ATMOSPHERE TO SNOWPACK
 !     IN SNOWFALL AND IRRIGATION IS ZERO IF SNOWPACK IS ABSENT
 !
-!     PrecAtm,PRECI=snow+rain,irrigation
+!     PrecAtm_col,PRECI=snow+rain,irrigation
 !     X*BLS=hourly solute flux to snowpack
 !     X*FLS,X*FLB=hourly solute flux to surface litter,soil surface micropore non-band,band
-!     Rain2LitRSurf,Irrig2LitRSurf=water flux to surface litter from rain,irrigation
+!     Rain2LitRSurf_col,Irrig2LitRSurf=water flux to surface litter from rain,irrigation
 !     FLQGQ,FLQGI=water flux to soil surface from rain,irrigation
 !     C*R,C*Q=precipitation,irrigation solute concentrations
 !     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
@@ -207,20 +207,20 @@ module TranspSaltMod
 !
   DO nsalts=idsalt_beg,idsalt_end
     trcSaltFlo2SnowLay(nsalts,1,NY,NX)=0.0_r8
-    trcSalt3DFlo2Cell(nsalts,3,0,NY,NX)=Rain2LitRSurf(NY,NX)*trcsalt_rain_conc(nsalts,NY,NX) &
+    trcSalt3DFlo2Cell(nsalts,3,0,NY,NX)=Rain2LitRSurf_col(NY,NX)*trcsalt_rain_conc(nsalts,NY,NX) &
       +Irrig2LitRSurf(NY,NX)*trcsalt_irrig_conc(nsalts,I,NY,NX)
   ENDDO
 
   DO nsalts=idsalt_beg,idsalt_KSO4
-    trcSalt3DFlo2Cell(nsalts,3,NU(NY,NX),NY,NX)=Rain2SoilSurf(NY,NX)*trcsalt_rain_conc(nsalts,NY,NX) &
+    trcSalt3DFlo2Cell(nsalts,3,NU(NY,NX),NY,NX)=Rain2SoilSurf_col(NY,NX)*trcsalt_rain_conc(nsalts,NY,NX) &
       +Irrig2SoilSurf(NY,NX)*trcsalt_irrig_conc(nsalts,I,NY,NX)
   ENDDO
   
   DO nsalts=idsalt_H0PO4,idsalt_MgHPO4
     ids=nsalts-idsalt_H0PO4+idsalt_H0PO4B  
-    trcSalt3DFlo2Cell(nsalts,3,NU(NY,NX),NY,NX)=(Rain2SoilSurf(NY,NX)*trcsalt_rain_conc(nsalts,NY,NX) &
+    trcSalt3DFlo2Cell(nsalts,3,NU(NY,NX),NY,NX)=(Rain2SoilSurf_col(NY,NX)*trcsalt_rain_conc(nsalts,NY,NX) &
       +Irrig2SoilSurf(NY,NX)*trcsalt_irrig_conc(nsalts,I,NY,NX))*trcs_VLN_vr(ids_H1PO4,NU(NY,NX),NY,NX)
-    trcSalt3DFlo2Cell(ids,3,NU(NY,NX),NY,NX)=(Rain2SoilSurf(NY,NX)*trcsalt_rain_conc(nsalts,NY,NX) &
+    trcSalt3DFlo2Cell(ids,3,NU(NY,NX),NY,NX)=(Rain2SoilSurf_col(NY,NX)*trcsalt_rain_conc(nsalts,NY,NX) &
       +Irrig2SoilSurf(NY,NX)*trcsalt_irrig_conc(nsalts,I,NY,NX))*trcs_VLN_vr(ids_H1PO4B,NU(NY,NX),NY,NX)    
   ENDDO
 
@@ -351,19 +351,9 @@ module TranspSaltMod
 !     *SGL*=solute diffusivity from hour1.f
 !     solute code:PO=PO4,AL=Al,FE=Fe,HY=H,CA=Ca,GM=Mg,AN=Na,AK=KOH=OH
 !                :SO=SO4,CL=Cl,C3=CO3,HC=HCO3
-    POSGL2(L,NY,NX)=SolDifc_vr(ids_H1PO4,L,NY,NX)*dts_HeatWatTP
-    ALSGL2(L,NY,NX)=ALSGL(L,NY,NX)*dts_HeatWatTP
-    FESGL2(L,NY,NX)=FESGL(L,NY,NX)*dts_HeatWatTP
-    HYSGL2(L,NY,NX)=HYSGL(L,NY,NX)*dts_HeatWatTP
-    CASGL2(L,NY,NX)=CASGL(L,NY,NX)*dts_HeatWatTP
-    GMSGL2(L,NY,NX)=GMSGL(L,NY,NX)*dts_HeatWatTP
-    ANSGL2(L,NY,NX)=ANSGL(L,NY,NX)*dts_HeatWatTP
-    AKSGL2(L,NY,NX)=AKSGL(L,NY,NX)*dts_HeatWatTP
-    OHSGL2(L,NY,NX)=OHSGL(L,NY,NX)*dts_HeatWatTP
-    SOSGL2(L,NY,NX)=SOSGL(L,NY,NX)*dts_HeatWatTP
-    CLSXL2(L,NY,NX)=CLSXL(L,NY,NX)*dts_HeatWatTP
-    C3SGL2(L,NY,NX)=C3SGL(L,NY,NX)*dts_HeatWatTP
-    HCSGL2(L,NY,NX)=HCSGL(L,NY,NX)*dts_HeatWatTP
+    POSGL2(L,NY,NX)=SoluteDifusvty_vr(ids_H1PO4,L,NY,NX)*dts_HeatWatTP
+
+    AquaIonDifusivty2_vr(idsalt_beg:idsalt_mend,L,NY,NX)=AquaIonDifusivty_vr(idsalt_beg:idsalt_mend,L,NY,NX)*dts_HeatWatTP
 !
 !     STATE VARIABLES FOR SOLUTES USED IN 'TranspSalt'
 !     TO STORE SUB-HOURLY CHANGES DURING FLUX CALCULATIONS
@@ -418,7 +408,7 @@ module TranspSaltMod
   !     IN RAINFALL AND IRRIGATION ACCORDING TO CONCENTRATIONS
   !     ENTERED IN WEATHER AND IRRIGATION FILES
   !
-      ELSEIF((PrecAtm(NY,NX).GT.0.0_r8.OR.IrrigSurface(NY,NX).GT.0.0_r8) &
+      ELSEIF((PrecAtm_col(NY,NX).GT.0.0_r8.OR.IrrigSurface(NY,NX).GT.0.0_r8) &
         .AND.VLSnowHeatCapM(1,1,NY,NX).LE.VLHeatCapSnowMin_col(NY,NX))THEN
   !     there is no significant snowpack, but precipitation
         call AtmosSoluteFluxToTopsoil(I,NY,NX)

@@ -56,8 +56,8 @@ implicit none
     call ncd_defdim(ncf,'nlbiomcp',3,recordDimID)
     call ncd_defdim(ncf,'NumLiveAutoBioms',NumLiveAutoBioms,recordDimID)
     call ncd_defdim(ncf,'NumLiveHeterBioms',NumLiveHeterBioms,recordDimID)
-    call ncd_defdim(ncf,'NumMicrbHetetrophCmplx',NumMicrbHetetrophCmplx,recordDimID)
-    call ncd_defdim(ncf,'NumMicrobAutotrophCmplx',NumMicrobAutotrophCmplx,recordDimID)
+    call ncd_defdim(ncf,'NumHetetrMicCmplx',NumHetetrMicCmplx,recordDimID)
+    call ncd_defdim(ncf,'NumMicrobAutrophCmplx',NumMicrobAutrophCmplx,recordDimID)
     call ncd_defdim(ncf,'element',NumPlantChemElms,recordDimID)
     call ncd_defdim(ncf,'ndoms',trc_confs%NDOMS,recordDimID)
     call ncd_defvar(ncf, 'pH', ncd_float, long_name='soil pH',  &
@@ -66,7 +66,7 @@ implicit none
             units='m3 d-2', missing_value=spval, fill_value=spval)
     call ncd_defvar(ncf, 'ORGC', ncd_float, long_name='total soil organic C',  &
             units='gC d-2', missing_value=spval, fill_value=spval)
-    call ncd_defvar(ncf, 'CFOMC', ncd_float, dim1name='ndbiomcp', &
+    call ncd_defvar(ncf, 'ElmAllocmatMicrblitr2POM', ncd_float, dim1name='ndbiomcp', &
             long_name='allocation coefficient to humus fractions',  &
             units='none', missing_value=spval, fill_value=spval)
     call ncd_defvar(ncf, 'VLSoilMicP', ncd_float, long_name='micropore volume',  &
@@ -135,7 +135,7 @@ implicit none
             units='mg kg-1', missing_value=spval, fill_value=spval)
     call ncd_defvar(ncf, 'CCASO', ncd_float, long_name='soil CaSO4 content',  &
             units='mg kg-1', missing_value=spval, fill_value=spval)
-    call ncd_defvar(ncf, 'FOSRH', ncd_float, dim1name='jcplx',&
+    call ncd_defvar(ncf, 'FracBulkSOMC_vr', ncd_float, dim1name='jcplx',&
             long_name='fraction of total organic C in complex',  &
             units='none', missing_value=spval, fill_value=spval)
     call ncd_defvar(ncf, 'OQM', ncd_float, dim1name='ndom',dim2name='jcplx',&
@@ -162,12 +162,12 @@ implicit none
     call ncd_defvar(ncf, 'ORM', ncd_float, dim1name='element',dim2name='ndbiomcp',&
             dim3name='jcplx',long_name='microbial residue C in each complex',  &
             units='gC d-2', missing_value=spval, fill_value=spval)
-    call ncd_defvar(ncf, 'OMEhetr', ncd_float,dim1name='element',&
+    call ncd_defvar(ncf, 'mBiomeHeter', ncd_float,dim1name='element',&
             dim2name='NumLiveHeterBioms',dim3name='jcplx',&
             long_name='heterotrophic microbial biomass element in each complex',  &
             units='gC d-2', missing_value=spval, fill_value=spval)
 
-    call ncd_defvar(ncf, 'OMEauto', ncd_float, dim1name='element',dim2name='NumLiveAutoBioms',&
+    call ncd_defvar(ncf, 'mBiomeAutor', ncd_float, dim1name='element',dim2name='NumLiveAutoBioms',&
             long_name='microbial biomass element in autotrophic complex',  &
             units='gC d-2', missing_value=spval, fill_value=spval)
 
@@ -210,8 +210,8 @@ implicit none
 
     call ncd_putvar(ncf,'pH',PH(L,NY,NX))
     call ncd_putvar(ncf,'VLSoilPoreMicP_vr',VLSoilPoreMicP_vr(L,NY,NX))
-    call ncd_putvar(ncf,'ORGC',ORGC(L,NY,NX))
-    call ncd_putvar(ncf,'CFOMC',CFOMC(:,L,NY,NX))
+    call ncd_putvar(ncf,'ORGC',SoilOrgM_vr(ielmc,L,NY,NX))
+    call ncd_putvar(ncf,'ElmAllocmatMicrblitr2POM',ElmAllocmatMicrblitr2POM_vr(:,L,NY,NX))
     call ncd_putvar(ncf,'VLSoilMicP',VLSoilMicP(L,NY,NX))
     call ncd_putvar(ncf,'BKVL',SoilMicPMassLayer(L,NY,NX))
     call ncd_putvar(ncf,'POROS',POROS(L,NY,NX))
@@ -221,7 +221,7 @@ implicit none
     call ncd_putvar(ncf,'SRP',SRP(L,NY,NX))
     call ncd_putvar(ncf,'EHUM',EHUM(L,NY,NX))
     call ncd_putvar(ncf,'EPOC',EPOC(L,NY,NX))
-    call ncd_putvar(ncf,'THETY',THETY(L,NY,NX))
+    call ncd_putvar(ncf,'THETY',THETY_vr(L,NY,NX))
     call ncd_putvar(ncf,'PSIMX',LOGPSIFLD(NY,NX))
     call ncd_putvar(ncf,'PSIMD',LOGPSIMND(NY,NX))
     call ncd_putvar(ncf,'PSIMS',LOGPSIAtSat(NY,NX))
@@ -253,18 +253,18 @@ implicit none
     call ncd_putvar(ncf,'CCASO',CCASO(L,NY,NX))
     call ncd_putvar(ncf,'BKDS',SoiBulkDensity(L,NY,NX))
 
-    call ncd_putvar(ncf,'FOSRH',FOSRH(:,L,NY,NX))
-    call ncd_putvar(ncf,'OQM',DOM(:,:,L,NY,NX))
-    call ncd_putvar(ncf,'OHM',OHM(:,:,L,NY,NX))
+    call ncd_putvar(ncf,'FracBulkSOMC_vr',FracBulkSOMC_vr(:,L,NY,NX))
+    call ncd_putvar(ncf,'OQM',DOM_vr(:,:,L,NY,NX))
+    call ncd_putvar(ncf,'OHM',SorbedOM_vr(:,:,L,NY,NX))
 
     call ncd_putvar(ncf,'CNOSC',CNOSC(:,:,L,NY,NX))
     call ncd_putvar(ncf,'CPOSC',CPOSC(:,:,L,NY,NX))
     call ncd_putvar(ncf,'ATCS',ATCS(NY,NX))
-    call ncd_putvar(ncf,'OSM',OSM(:,:,:,L,NY,NX))
-    call ncd_putvar(ncf,'OSA',OSA(:,:,L,NY,NX))
-    call ncd_putvar(ncf,'ORM',ORM(:,:,:,L,NY,NX))
-    call ncd_putvar(ncf,'OMEhetr',OMEhetr(:,:,:,L,NY,NX))
-    call ncd_putvar(ncf,'OMEauto',OMEauto(:,:,L,NY,NX))
+    call ncd_putvar(ncf,'OSM',SolidOM_vr(:,:,:,L,NY,NX))
+    call ncd_putvar(ncf,'OSA',SolidOMAct_vr(:,:,L,NY,NX))
+    call ncd_putvar(ncf,'ORM',OMBioResdu_vr(:,:,:,L,NY,NX))
+    call ncd_putvar(ncf,'mBiomeHeter',mBiomeHeter_vr(:,:,:,L,NY,NX))
+    call ncd_putvar(ncf,'mBiomeAutor',mBiomeAutor_vr(:,:,L,NY,NX))
 
     if(bgc_forc_conf%laddband)then
       call ncd_putvar(ncf,'ZNH4S',trc_solml_vr(ids_NH4,L,NY,NX)+trc_solml_vr(ids_NH4B,L,NY,NX))

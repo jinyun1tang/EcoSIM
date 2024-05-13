@@ -10,7 +10,7 @@ module SurfLitterDataType
 
   real(r8) ,target,allocatable ::   BulkDensLitR(:)                          !surface litter bulk density	[Mg m-3]
   real(r8) ,target,allocatable ::   PARR(:,:)                        !surface litter boundary layer conductance, [m t-1]
-  integer  ,target,allocatable ::   IXTYP(:,:,:)                     !surface litter type:1=plant,2=manure
+  integer  ,target,allocatable ::   IXTYP(:,:,:)                     !surface litter type:1 = plant, 2 = manure
   real(r8) ,target,allocatable ::   XCORP(:,:)                       !factor for surface litter incorporation and soil mixing
   real(r8) ,target,allocatable ::   WatFLo2LitrM(:,:,:)                     !water transfer between soil surface and surface litter, [g d-2 t-1]
   real(r8) ,target,allocatable ::   WatFlowSno2LitRM(:,:,:)                     !meltwater flux into surface litter, [m3 d-2 h-1]
@@ -22,11 +22,11 @@ module SurfLitterDataType
   real(r8) ,target,allocatable ::   WatFLo2Litr(:,:)                        !net water transfer to surface litter, [MJ d-2 t-1]
   real(r8) ,target,allocatable ::   TLitrIceFlxThaw(:,:)             !water from ice thaw in surface litter, [m3 d-2 h-1]
   real(r8) ,target,allocatable ::   TLitrIceHeatFlxFrez(:,:)         !latent heat released from water freeze in surface litter, [MJ d-2 h-1]
-  real(r8) ,target,allocatable ::   Rain2LitRSurf(:,:)                       !precipitation flux into surface litter, [m3 d-2 h-1]
+  real(r8) ,target,allocatable ::   Rain2LitRSurf_col(:,:)                       !precipitation flux into surface litter, [m3 d-2 h-1]
   real(r8) ,target,allocatable ::   Irrig2LitRSurf(:,:)                       !irrigation flux into surface litter, [m3 d-2 h-1]
   real(r8) ,target,allocatable ::   POROS0(:,:)                      !litter porosity
   real(r8) ,target,allocatable ::   RC0(:,:,:)                       !surface litter in each complex	g d-2
-  real(r8),target,allocatable ::  RC0ff(:,:)
+  real(r8) ,target,allocatable ::   RC0ff(:,:)
 
   private :: InitAllocate
   contains
@@ -60,10 +60,10 @@ module SurfLitterDataType
   allocate(WatFLo2Litr(JY,JX));         WatFLo2Litr=0._r8
   allocate(TLitrIceFlxThaw(JY,JX));        TLitrIceFlxThaw=0._r8
   allocate(TLitrIceHeatFlxFrez(JY,JX));       TLitrIceHeatFlxFrez=0._r8
-  allocate(Rain2LitRSurf(JY,JX));        Rain2LitRSurf=0._r8
+  allocate(Rain2LitRSurf_col(JY,JX));        Rain2LitRSurf_col=0._r8
   allocate(Irrig2LitRSurf(JY,JX));        Irrig2LitRSurf=0._r8
   allocate(POROS0(JY,JX));       POROS0=0._r8
-  allocate(RC0(1:jcplx,JY,JX));      Rc0=0._r8
+  allocate(RC0(1:NumOfLitrCmplxs,JY,JX));      Rc0=0._r8
   allocate(RC0ff(JY,JX)); RC0ff=0._r8
   end subroutine InitAllocate
 
@@ -86,7 +86,7 @@ module SurfLitterDataType
   call destroy(WatFLo2Litr)
   call destroy(TLitrIceFlxThaw)
   call destroy(TLitrIceHeatFlxFrez)
-  call destroy(Rain2LitRSurf)
+  call destroy(Rain2LitRSurf_col)
   call destroy(Irrig2LitRSurf)
   call destroy(POROS0)
   call destroy(RC0)

@@ -1,7 +1,7 @@
 module PlantMod
   use data_kind_mod   , only : r8 => DAT_KIND_R8
   use grosubsMod      , only : grosubs
-  use HfuncsMod       , only : hfuncs
+  use PlantPhenolMod       , only : hfuncs
   use UptakesMod      , only : uptakes  
   use PlantDisturbMod , only : PrepLandscapeGrazing
   use EcoSimSumDataType

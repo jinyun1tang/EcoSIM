@@ -19,7 +19,7 @@ module MicForcTypeMod
   real(r8) :: O2_rain_conc
   real(r8) :: Irrig2LitRSurf
   real(r8) :: Rain2LitRSurf
-  real(r8) :: offset
+  real(r8) :: TempOffset
   real(r8) :: VLitR
   real(r8) :: VWatLitRHoldCapcity
   real(r8) :: ZEROS2
@@ -36,8 +36,8 @@ module MicForcTypeMod
   real(r8) :: pH
   real(r8) :: ZERO
   real(r8) :: SoilMicPMassLayer
-  real(r8) :: VLSoilPoreMicP_vr
-  real(r8) :: TFND
+  real(r8) :: VLSoilPoreMicP
+  real(r8) :: TScal4Difsvity
   real(r8) :: VLNOB
   real(r8) :: VLNO3
   real(r8) :: VLNH4
@@ -46,36 +46,36 @@ module MicForcTypeMod
   real(r8) :: VLPOB
   real(r8) :: AEC
   real(r8) :: PSISoilMatricP
-  real(r8) :: OLSGL
+  real(r8) :: O2AquaDiffusvity
   real(r8) :: ORGC
-  real(r8) :: RNO2Y
-  real(r8) :: RN2BY
-  real(r8) :: RN2OY
-  real(r8) :: ROXYY
-  real(r8) :: ROXYF
-  real(r8) :: RCH4L
+  real(r8) :: RNO2EcoUptkSoilPrev
+  real(r8) :: RNO2EcoUptkBandPrev
+  real(r8) :: RN2OEcoUptkSoilPrev
+  real(r8) :: RO2EcoDmndPrev
+  real(r8) :: RO2GasXchangePrev
+  real(r8) :: RCH4PhysexchPrev_vr
   real(r8) :: RCH4F
-  real(r8) :: RNH4Y
-  real(r8) :: RNHBY
-  real(r8) :: RNO3Y
-  real(r8) :: RN3BY
-  real(r8) :: RPO4Y
-  real(r8) :: RPOBY
-  real(r8) :: RP14Y
-  real(r8) :: RP1BY
+  real(r8) :: RNH4EcoDmndSoilPrev
+  real(r8) :: RNH4EcoDmndBandPrev
+  real(r8) :: RNO3EcoDmndSoilPrev
+  real(r8) :: RNO3EcoDmndBandPrev
+  real(r8) :: RH2PO4EcoDmndSoilPrev
+  real(r8) :: RH2PO4EcoDmndBandPrev
+  real(r8) :: RH1PO4EcoDmndSoilPrev
+  real(r8) :: RH1PO4EcoDmndBandPrev
   real(r8) :: SoilMicPMassLayer0
   logical  :: LitrM                     !true if it is the litter layer
   logical  :: Lsurf
-  real(r8) :: RNH4YU
-  real(r8) :: RNO3YU
-  real(r8) :: RPO4YU
-  real(r8) :: RP14YU
-  real(r8) :: ROXYL
+  real(r8) :: RNH4EcoDmndLitrPrev
+  real(r8) :: RNO3EcoDmndLitrPrev
+  real(r8) :: RH2PO4EcoDmndLitrPrev
+  real(r8) :: RH1PO4EcoDmndLitrPrev
+  real(r8) :: RO2AquaXchangePrev
   real(r8) :: VOLWU
-  real(r8), allocatable :: CFOMC(:)
-  real(r8), allocatable :: CFOMCU(:)
-  real(r8), allocatable :: ROQCY(:)
-  real(r8), allocatable :: ROQAY(:)
+  real(r8), allocatable :: ElmAllocmatMicrblitr2POM(:)
+  real(r8), allocatable :: ElmAllocmatMicrblitr2POMU(:)
+  real(r8), allocatable :: RDOMEcoDmndPrev(:)
+  real(r8), allocatable :: RAcetateEcoDmndPrev(:)
   real(r8), allocatable :: DiffusivitySolutEff(:)  !rate constant for air-water gas exchange
   real(r8), allocatable :: FILM(:)
   real(r8), allocatable :: THETPM(:)
@@ -96,10 +96,10 @@ module MicForcTypeMod
   class(micforctype) :: this
   integer :: jcplx
   jcplx=micpar%jcplx
-  allocate(this%CFOMC(1:micpar%ndbiomcp));this%CFOMC=spval
-  allocate(this%CFOMCU(1:micpar%ndbiomcp));this%CFOMCU=spval
-  allocate(this%ROQCY(1:jcplx));this%ROQCY=spval
-  allocate(this%ROQAY(1:jcplx));this%ROQAY=spval
+  allocate(this%ElmAllocmatMicrblitr2POM(1:micpar%ndbiomcp));this%ElmAllocmatMicrblitr2POM=spval
+  allocate(this%ElmAllocmatMicrblitr2POMU(1:micpar%ndbiomcp));this%ElmAllocmatMicrblitr2POMU=spval
+  allocate(this%RDOMEcoDmndPrev(1:jcplx));this%RDOMEcoDmndPrev=spval
+  allocate(this%RAcetateEcoDmndPrev(1:jcplx));this%RAcetateEcoDmndPrev=spval
   allocate(this%VLWatMicPM(NPH));this%VLWatMicPM=spval
   allocate(this%THETPM(NPH));this%THETPM=spval
   allocate(this%FILM(NPH));this%FILM=spval
@@ -121,10 +121,10 @@ module MicForcTypeMod
   call destroy(this%TortMicPM)
   call destroy(this%VLsoiAirPM)
   call destroy(this%DiffusivitySolutEff)
-  call destroy(this%ROQCY)
-  call destroy(this%ROQAY)
-  call destroy(this%CFOMC)
-  call destroy(this%CFOMCU)
+  call destroy(this%RDOMEcoDmndPrev)
+  call destroy(this%RAcetateEcoDmndPrev)
+  call destroy(this%ElmAllocmatMicrblitr2POM)
+  call destroy(this%ElmAllocmatMicrblitr2POMU)
 
   end subroutine Destruct
 

@@ -21,7 +21,7 @@ module SurfSoilDataType
   real(r8),target,allocatable ::  MaxVLWatByLitR(:,:)                         !soil surface water retention capacity
   real(r8),target,allocatable ::  VHCPNX(:,:)                        !minimum heat capacities
   real(r8),target,allocatable ::  PARG(:,:,:)                        !soil surface boundary layer conductance, [m t-1]
-  real(r8),target,allocatable ::  Rain2SoilSurf(:,:)                         !precipitation flux into soil surface , [m3 d-2 h-1]
+  real(r8),target,allocatable ::  Rain2SoilSurf_col(:,:)                         !precipitation flux into soil surface , [m3 d-2 h-1]
   real(r8),target,allocatable ::  Irrig2SoilSurf(:,:)                         !irrifation flux into soil surface , [m3 d-2 h-1]
   real(r8),target,allocatable ::  LakeSurfFlowMicP(:,:)                         !lake surface water flux
   real(r8),target,allocatable ::  LakeSurfFlowMicPX(:,:)                        !lake surface water flux
@@ -47,7 +47,7 @@ contains
   allocate(MaxVLWatByLitR(JY,JX));       MaxVLWatByLitR=0._r8
   allocate(VHCPNX(JY,JX));      VHCPNX=0._r8
   allocate(PARG(60,JY,JX));     PARG=0._r8
-  allocate(Rain2SoilSurf(JY,JX));       Rain2SoilSurf=0._r8
+  allocate(Rain2SoilSurf_col(JY,JX));       Rain2SoilSurf_col=0._r8
   allocate(Irrig2SoilSurf(JY,JX));       Irrig2SoilSurf=0._r8
   allocate(LakeSurfFlowMicP(JY,JX));       LakeSurfFlowMicP=0._r8
   allocate(LakeSurfFlowMicPX(JY,JX));      LakeSurfFlowMicPX=0._r8
@@ -73,7 +73,7 @@ contains
   call destroy(MaxVLWatByLitR)
   call destroy(VHCPNX)
   call destroy(PARG)
-  call destroy(Rain2SoilSurf)
+  call destroy(Rain2SoilSurf_col)
   call destroy(Irrig2SoilSurf)
   call destroy(LakeSurfFlowMicP)
   call destroy(LakeSurfFlowMicPX)

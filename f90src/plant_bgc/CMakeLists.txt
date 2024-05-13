@@ -18,7 +18,7 @@ set(PLANT_BGC_SOURCES
   CanopyCondsMod.F90
   UptakePars.F90
   StartqsMod.F90
-  HfuncsMod.F90
+  PlantPhenolMod.F90
 )
 include(add_ecosim_library)
 add_ecosim_library(plant_bgc ${PLANT_BGC_SOURCES})

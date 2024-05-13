@@ -14,68 +14,66 @@ implicit none
   
   type, public :: micfluxtype
 
-  real(r8) :: RCO2O
-  real(r8) :: RCH4O
-  real(r8) :: RH2GO
-  real(r8) :: RUPOXO
-  real(r8) :: RN2G
-  real(r8) :: RN2O
-  real(r8) :: RNH4MicbTransf_vr
-  real(r8) :: RNO3MicbTransf_vr
-  real(r8) :: RNO2MicbTransf_vr
-  real(r8) :: RH2PO4MicbTransf_vr
-  real(r8) :: RH1PO4MicbTransf_vr
-  real(r8) :: XNH4B
-  real(r8) :: XNO3B
-  real(r8) :: XNO2B
-  real(r8) :: XH2BS
-  real(r8) :: XH1BS
-  real(r8) :: XN2GS
-  real(r8) :: RVMXC
-  real(r8) :: RVMBC
-  real(r8) :: NetNH4Mineralize_col
-  real(r8) :: NetPO4Mineralize_col
-  real(r8), allocatable :: RDOM_micb_flx(:,:)
-  real(r8), allocatable :: ROXYSff(:)
-  real(r8), allocatable :: RVMX4ff(:)
-  real(r8), allocatable :: RVMB4ff(:)
-  real(r8), allocatable :: RVMX2ff(:)
-  real(r8), allocatable :: RVMB2ff(:)
-  real(r8), allocatable :: ROXYS(:,:)
-  real(r8), allocatable :: ROQCS(:,:)
-  real(r8), allocatable :: ROQAS(:,:)
-  real(r8), allocatable :: RVMX3(:,:)
-  real(r8), allocatable :: RVMB3(:,:)
-  real(r8), allocatable :: RVMX2(:,:)
-  real(r8), allocatable :: RVMB2(:,:)
-  real(r8), allocatable :: RVMX1(:,:)
-  real(r8), allocatable :: ROXSK(:)
-  real(r8), allocatable :: RVMX4(:,:)
-  real(r8), allocatable :: RVMB4(:,:)
-  real(r8), allocatable :: RINHO(:,:)
-  real(r8), allocatable :: RINHB(:,:)
-  real(r8), allocatable :: RINOO(:,:)
-  real(r8), allocatable :: RINOB(:,:)
-  real(r8), allocatable :: RIPOO(:,:)
-  real(r8), allocatable :: RIPBO(:,:)
-  real(r8), allocatable :: RIPO1(:,:)
-  real(r8), allocatable :: RIPB1(:,:)
-  real(r8), allocatable :: RINHOR(:,:)
-  real(r8), allocatable :: RINOOR(:,:)
-  real(r8), allocatable :: RIPOOR(:,:)
-  real(r8), allocatable :: RIPO1R(:,:)
-  real(r8), allocatable :: RINHOff(:)
-  real(r8), allocatable :: RINHBff(:)
-  real(r8), allocatable :: RINOOff(:)
-  real(r8), allocatable :: RINOBff(:)
-  real(r8), allocatable :: RIPOOff(:)
-  real(r8), allocatable :: RIPBOff(:)
-  real(r8), allocatable :: RIPO1ff(:)
-  real(r8), allocatable :: RIPB1ff(:)
-  real(r8), allocatable :: RINHORff(:)
-  real(r8), allocatable :: RINOORff(:)
-  real(r8), allocatable :: RIPOORff(:)
-  real(r8), allocatable :: RIPO1Rff(:)
+  real(r8) :: RCO2NetUptkMicb
+  real(r8) :: RCH4UptkAutor
+  real(r8) :: RH2NetUptkMicb
+  real(r8) :: RO2UptkMicb
+  real(r8) :: RN2NetUptkMicb
+  real(r8) :: RN2ONetUptkMicb
+  real(r8) :: RNH4MicbTransfSoil
+  real(r8) :: RNO3MicbTransfSoil
+  real(r8) :: RNO2MicbTransfSoil
+  real(r8) :: RH2PO4MicbTransfSoil
+  real(r8) :: RH1PO4MicbTransfSoil
+  real(r8) :: RNH4MicbTransfBand
+  real(r8) :: RNO3MicbTransfBand
+  real(r8) :: RNO2MicbTransfBand
+  real(r8) :: RH2PO4MicbTransfBand
+  real(r8) :: RH1PO4MicbTransfBand
+  real(r8) :: MicrbN2Fix
+  real(r8) :: RNO2DmndSoilChemo
+  real(r8) :: RNO2DmndBandChemo
+  real(r8) :: NetNH4Mineralize
+  real(r8) :: NetPO4Mineralize
+  real(r8), allocatable :: REcoDOMUptk(:,:)
+  real(r8), allocatable :: RO2DmndAutort(:)
+  real(r8), allocatable :: RNH3OxidAutor(:)
+  real(r8), allocatable :: RNH3OxidAutorBand(:)
+  real(r8), allocatable :: RNO2OxidAutor(:)
+  real(r8), allocatable :: RNO2OxidAutorBand(:)
+  real(r8), allocatable :: RO2DmndHetert(:,:)
+  real(r8), allocatable :: RDOCUptkHeter(:,:)
+  real(r8), allocatable :: RAcetateUptkHeter(:,:)
+  real(r8), allocatable :: RNO3ReduxDmndSoilHeter(:,:)
+  real(r8), allocatable :: RNO3ReduxDmndBandHeter(:,:)
+  real(r8), allocatable :: RNO2DmndReduxSoilHeter(:,:)
+  real(r8), allocatable :: RNO2DmndReduxBandHeter(:,:)
+  real(r8), allocatable :: RN2ODmndReduxHeter(:,:)
+  real(r8), allocatable :: RO2UptkSoilM(:)
+  real(r8), allocatable :: RNH4DmndSoilHeter(:,:)
+  real(r8), allocatable :: RNH4DmndBandHeter(:,:)
+  real(r8), allocatable :: RNO3DmndSoilHeter(:,:)
+  real(r8), allocatable :: RNO3DmndBandHeter(:,:)
+  real(r8), allocatable :: RH2PO4DmndSoilHeter(:,:)
+  real(r8), allocatable :: RH2PO4DmndBandHeter(:,:)
+  real(r8), allocatable :: RH1PO4DmndSoilHeter(:,:)
+  real(r8), allocatable :: RH1PO4DmndBandHeter(:,:)
+  real(r8), allocatable :: RNH4DmndLitrHeter(:,:)
+  real(r8), allocatable :: RNO3DmndLitrHeter(:,:)
+  real(r8), allocatable :: RH2PO4DmndLitrHeter(:,:)
+  real(r8), allocatable :: RH1PO4DmndLitrHeter(:,:)
+  real(r8), allocatable :: RNH4UptkSoilAutor(:)
+  real(r8), allocatable :: RNH4UptkBandAutor(:)
+  real(r8), allocatable :: RNO3UptkSoilAutor(:)
+  real(r8), allocatable :: RNO3UptkBandAutor(:)
+  real(r8), allocatable :: RH2PO4UptkSoilAutor(:)
+  real(r8), allocatable :: RH2PO4UptkBandAutor(:)
+  real(r8), allocatable :: RH1PO4UptkSoilAutor(:)
+  real(r8), allocatable :: RH1PO4UptkBandAutor(:)
+  real(r8), allocatable :: RNH4UptkLitrAutor(:)
+  real(r8), allocatable :: RNO3UptkLitrAutor(:)
+  real(r8), allocatable :: RH2PO4UptkLitrAutor(:)
+  real(r8), allocatable :: RH1PO4UptkLitrAutor(:)
   contains
    procedure, public :: Init
    procedure, public :: Destroy=> Destruct
@@ -88,56 +86,54 @@ implicit none
 
   implicit none
   class(micfluxtype) :: this
-  integer :: jcplx,JG,NumMicbFunGroups
-  integer :: NumMicrbHetetrophCmplx, NumMicrobAutotrophCmplx
+  integer :: jcplx,JG,NumMicbFunGrupsPerCmplx
+  integer :: NumHetetrMicCmplx, NumMicrobAutrophCmplx
 
   jcplx=micpar%jcplx
   JG=micpar%jguilds
-  NumMicbFunGroups=micpar%NumMicbFunGroups
-  NumMicrbHetetrophCmplx=micpar%NumMicrbHetetrophCmplx
-  NumMicrobAutotrophCmplx=micpar%NumMicrobAutotrophCmplx
+  NumMicbFunGrupsPerCmplx=micpar%NumMicbFunGrupsPerCmplx
+  NumHetetrMicCmplx=micpar%NumHetetrMicCmplx
+  NumMicrobAutrophCmplx=micpar%NumMicrobAutrophCmplx
 
-  allocate(this%ROXSK(NPH));this%ROXSK = spval
-  allocate(this%RDOM_micb_flx(idom_beg:idom_end,1:jcplx));this%RDOM_micb_flx=spval
-  allocate(this%ROXYS(NumMicrbHetetrophCmplx,1:jcplx));this%ROXYS=spval
-  allocate(this%ROQCS(NumMicrbHetetrophCmplx,1:jcplx));this%ROQCS=spval
-  allocate(this%ROQAS(NumMicrbHetetrophCmplx,1:jcplx));this%ROQAS=spval
-  allocate(this%RVMX3(NumMicrbHetetrophCmplx,1:jcplx));this%RVMX3=spval
-  allocate(this%RVMB3(NumMicrbHetetrophCmplx,1:jcplx));this%RVMB3=spval
-  allocate(this%RVMX2(NumMicrbHetetrophCmplx,1:jcplx));this%RVMX2=spval
-  allocate(this%RVMB2(NumMicrbHetetrophCmplx,1:jcplx));this%RVMB2=spval
-  allocate(this%RVMX1(NumMicrbHetetrophCmplx,1:jcplx));this%RVMX1=spval
-  allocate(this%RVMX4(NumMicrbHetetrophCmplx,1:jcplx));this%RVMX4=spval
-  allocate(this%RVMB4(NumMicrbHetetrophCmplx,1:jcplx));this%RVMB4=spval
-  allocate(this%RINHO(NumMicrbHetetrophCmplx,1:jcplx));this%RINHO=spval
-  allocate(this%RINHB(NumMicrbHetetrophCmplx,1:jcplx));this%RINHB=spval
-  allocate(this%RINOO(NumMicrbHetetrophCmplx,1:jcplx));this%RINOO=spval
-  allocate(this%RINOB(NumMicrbHetetrophCmplx,1:jcplx));this%RINOB=spval
-  allocate(this%RIPOO(NumMicrbHetetrophCmplx,1:jcplx));this%RIPOO=spval
-  allocate(this%RIPBO(NumMicrbHetetrophCmplx,1:jcplx));this%RIPBO=spval
-  allocate(this%RIPO1(NumMicrbHetetrophCmplx,1:jcplx));this%RIPO1=spval
-  allocate(this%RIPB1(NumMicrbHetetrophCmplx,1:jcplx));this%RIPB1=spval
-  allocate(this%RINHOR(NumMicrbHetetrophCmplx,1:jcplx));this%RINHOR=spval
-  allocate(this%RINOOR(NumMicrbHetetrophCmplx,1:jcplx));this%RINOOR=spval
-  allocate(this%RIPOOR(NumMicrbHetetrophCmplx,1:jcplx));this%RIPOOR=spval
-  allocate(this%RIPO1R(NumMicrbHetetrophCmplx,1:jcplx));this%RIPO1R=spval
-  allocate(this%ROXYSff(NumMicrobAutotrophCmplx));this%ROXYSff=spval
-  allocate(this%RINHOff(NumMicrobAutotrophCmplx));this%RINHOff=spval
-  allocate(this%RINHBff(NumMicrobAutotrophCmplx));this%RINHBff=spval
-  allocate(this%RINOOff(NumMicrobAutotrophCmplx));this%RINOOff=spval
-  allocate(this%RINOBff(NumMicrobAutotrophCmplx));this%RINOBff=spval
-  allocate(this%RIPOOff(NumMicrobAutotrophCmplx));this%RIPOOff=spval
-  allocate(this%RIPBOff(NumMicrobAutotrophCmplx));this%RIPBOff=spval
-  allocate(this%RIPO1ff(NumMicrobAutotrophCmplx));this%RIPO1ff=spval
-  allocate(this%RIPB1ff(NumMicrobAutotrophCmplx));this%RIPB1ff=spval
-  allocate(this%RINHORff(NumMicrobAutotrophCmplx));this%RINHORff=spval
-  allocate(this%RINOORff(NumMicrobAutotrophCmplx));this%RINOORff=spval
-  allocate(this%RIPOORff(NumMicrobAutotrophCmplx));this%RIPOORff=spval
-  allocate(this%RIPO1Rff(NumMicrobAutotrophCmplx));this%RIPO1Rff=spval
-  allocate(this%RVMX4ff(NumMicrobAutotrophCmplx));this%RVMX4ff=spval
-  allocate(this%RVMB4ff(NumMicrobAutotrophCmplx));this%RVMB4ff=spval
-  allocate(this%RVMX2ff(NumMicrobAutotrophCmplx));this%RVMX2ff=spval
-  allocate(this%RVMB2ff(NumMicrobAutotrophCmplx));this%RVMB2ff=spval
+  allocate(this%RO2UptkSoilM(NPH));this%RO2UptkSoilM = spval
+  allocate(this%REcoDOMUptk(idom_beg:idom_end,1:jcplx));this%REcoDOMUptk=spval
+  allocate(this%RO2DmndHetert(NumHetetrMicCmplx,1:jcplx));this%RO2DmndHetert=spval
+  allocate(this%RDOCUptkHeter(NumHetetrMicCmplx,1:jcplx));this%RDOCUptkHeter=spval
+  allocate(this%RAcetateUptkHeter(NumHetetrMicCmplx,1:jcplx));this%RAcetateUptkHeter=spval
+  allocate(this%RNO3ReduxDmndSoilHeter(NumHetetrMicCmplx,1:jcplx));this%RNO3ReduxDmndSoilHeter=spval
+  allocate(this%RNO3ReduxDmndBandHeter(NumHetetrMicCmplx,1:jcplx));this%RNO3ReduxDmndBandHeter=spval
+  allocate(this%RNO2DmndReduxSoilHeter(NumHetetrMicCmplx,1:jcplx));this%RNO2DmndReduxSoilHeter=spval
+  allocate(this%RNO2DmndReduxBandHeter(NumHetetrMicCmplx,1:jcplx));this%RNO2DmndReduxBandHeter=spval
+  allocate(this%RN2ODmndReduxHeter(NumHetetrMicCmplx,1:jcplx));this%RN2ODmndReduxHeter=spval
+  allocate(this%RNH4DmndSoilHeter(NumHetetrMicCmplx,1:jcplx));this%RNH4DmndSoilHeter=spval
+  allocate(this%RNH4DmndBandHeter(NumHetetrMicCmplx,1:jcplx));this%RNH4DmndBandHeter=spval
+  allocate(this%RNO3DmndSoilHeter(NumHetetrMicCmplx,1:jcplx));this%RNO3DmndSoilHeter=spval
+  allocate(this%RNO3DmndBandHeter(NumHetetrMicCmplx,1:jcplx));this%RNO3DmndBandHeter=spval
+  allocate(this%RH2PO4DmndSoilHeter(NumHetetrMicCmplx,1:jcplx));this%RH2PO4DmndSoilHeter=spval
+  allocate(this%RH2PO4DmndBandHeter(NumHetetrMicCmplx,1:jcplx));this%RH2PO4DmndBandHeter=spval
+  allocate(this%RH1PO4DmndSoilHeter(NumHetetrMicCmplx,1:jcplx));this%RH1PO4DmndSoilHeter=spval
+  allocate(this%RH1PO4DmndBandHeter(NumHetetrMicCmplx,1:jcplx));this%RH1PO4DmndBandHeter=spval
+  allocate(this%RNH4DmndLitrHeter(NumHetetrMicCmplx,1:jcplx));this%RNH4DmndLitrHeter=spval
+  allocate(this%RNO3DmndLitrHeter(NumHetetrMicCmplx,1:jcplx));this%RNO3DmndLitrHeter=spval
+  allocate(this%RH2PO4DmndLitrHeter(NumHetetrMicCmplx,1:jcplx));this%RH2PO4DmndLitrHeter=spval
+  allocate(this%RH1PO4DmndLitrHeter(NumHetetrMicCmplx,1:jcplx));this%RH1PO4DmndLitrHeter=spval
+  allocate(this%RO2DmndAutort(NumMicrobAutrophCmplx));this%RO2DmndAutort=spval
+  allocate(this%RNH4UptkSoilAutor(NumMicrobAutrophCmplx));this%RNH4UptkSoilAutor=spval
+  allocate(this%RNH4UptkBandAutor(NumMicrobAutrophCmplx));this%RNH4UptkBandAutor=spval
+  allocate(this%RNO3UptkSoilAutor(NumMicrobAutrophCmplx));this%RNO3UptkSoilAutor=spval
+  allocate(this%RNO3UptkBandAutor(NumMicrobAutrophCmplx));this%RNO3UptkBandAutor=spval
+  allocate(this%RH2PO4UptkSoilAutor(NumMicrobAutrophCmplx));this%RH2PO4UptkSoilAutor=spval
+  allocate(this%RH2PO4UptkBandAutor(NumMicrobAutrophCmplx));this%RH2PO4UptkBandAutor=spval
+  allocate(this%RH1PO4UptkSoilAutor(NumMicrobAutrophCmplx));this%RH1PO4UptkSoilAutor=spval
+  allocate(this%RH1PO4UptkBandAutor(NumMicrobAutrophCmplx));this%RH1PO4UptkBandAutor=spval
+  allocate(this%RNH4UptkLitrAutor(NumMicrobAutrophCmplx));this%RNH4UptkLitrAutor=spval
+  allocate(this%RNO3UptkLitrAutor(NumMicrobAutrophCmplx));this%RNO3UptkLitrAutor=spval
+  allocate(this%RH2PO4UptkLitrAutor(NumMicrobAutrophCmplx));this%RH2PO4UptkLitrAutor=spval
+  allocate(this%RH1PO4UptkLitrAutor(NumMicrobAutrophCmplx));this%RH1PO4UptkLitrAutor=spval
+  allocate(this%RNH3OxidAutor(NumMicrobAutrophCmplx));this%RNH3OxidAutor=spval
+  allocate(this%RNH3OxidAutorBand(NumMicrobAutrophCmplx));this%RNH3OxidAutorBand=spval
+  allocate(this%RNO2OxidAutor(NumMicrobAutrophCmplx));this%RNO2OxidAutor=spval
+  allocate(this%RNO2OxidAutorBand(NumMicrobAutrophCmplx));this%RNO2OxidAutorBand=spval
 
   end subroutine Init
 !------------------------------------------------------------------------------------------
@@ -145,49 +141,47 @@ implicit none
 
   implicit none
   class(micfluxtype) :: this
-  integer :: jcplx,JG,NumMicbFunGroups
+  integer :: jcplx,JG,NumMicbFunGrupsPerCmplx
 
-  this%ROXSK = 0._r8
-  this%RDOM_micb_flx=0._r8
-  this%ROXYS=0._r8
-  this%ROQCS=0._r8
-  this%ROQAS=0._r8
-  this%RVMX3=0._r8
-  this%RVMB3=0._r8
-  this%RVMX2=0._r8
-  this%RVMB2=0._r8
-  this%RVMX1=0._r8
-  this%RVMX4=0._r8
-  this%RVMB4=0._r8
-  this%RINHO=0._r8
-  this%RINHB=0._r8
-  this%RINOO=0._r8
-  this%RINOB=0._r8
-  this%RIPOO=0._r8
-  this%RIPBO=0._r8
-  this%RIPO1=0._r8
-  this%RIPB1=0._r8
-  this%RINHOR=0._r8
-  this%RINOOR=0._r8
-  this%RIPOOR=0._r8
-  this%RIPO1R=0._r8
-  this%ROXYSff=0._r8
-  this%RINHOff=0._r8
-  this%RINHBff=0._r8
-  this%RINOOff=0._r8
-  this%RINOBff=0._r8
-  this%RIPOOff=0._r8
-  this%RIPBOff=0._r8
-  this%RIPO1ff=0._r8
-  this%RIPB1ff=0._r8
-  this%RINHORff=0._r8
-  this%RINOORff=0._r8
-  this%RIPOORff=0._r8
-  this%RIPO1Rff=0._r8
-  this%RVMX4ff=0._r8
-  this%RVMB4ff=0._r8
-  this%RVMX2ff=0._r8
-  this%RVMB2ff=0._r8
+  this%RO2UptkSoilM = 0._r8
+  this%REcoDOMUptk=0._r8
+  this%RO2DmndHetert=0._r8
+  this%RDOCUptkHeter=0._r8
+  this%RAcetateUptkHeter=0._r8
+  this%RNO3ReduxDmndSoilHeter=0._r8
+  this%RNO3ReduxDmndBandHeter=0._r8
+  this%RNO2DmndReduxSoilHeter=0._r8
+  this%RNO2DmndReduxBandHeter=0._r8
+  this%RN2ODmndReduxHeter=0._r8
+  this%RNH4DmndSoilHeter=0._r8
+  this%RNH4DmndBandHeter=0._r8
+  this%RNO3DmndSoilHeter=0._r8
+  this%RNO3DmndBandHeter=0._r8
+  this%RH2PO4DmndSoilHeter=0._r8
+  this%RH2PO4DmndBandHeter=0._r8
+  this%RH1PO4DmndSoilHeter=0._r8
+  this%RH1PO4DmndBandHeter=0._r8
+  this%RNH4DmndLitrHeter=0._r8
+  this%RNO3DmndLitrHeter=0._r8
+  this%RH2PO4DmndLitrHeter=0._r8
+  this%RH1PO4DmndLitrHeter=0._r8
+  this%RO2DmndAutort=0._r8
+  this%RNH4UptkSoilAutor=0._r8
+  this%RNH4UptkBandAutor=0._r8
+  this%RNO3UptkSoilAutor=0._r8
+  this%RNO3UptkBandAutor=0._r8
+  this%RH2PO4UptkSoilAutor=0._r8
+  this%RH2PO4UptkBandAutor=0._r8
+  this%RH1PO4UptkSoilAutor=0._r8
+  this%RH1PO4UptkBandAutor=0._r8
+  this%RNH4UptkLitrAutor=0._r8
+  this%RNO3UptkLitrAutor=0._r8
+  this%RH2PO4UptkLitrAutor=0._r8
+  this%RH1PO4UptkLitrAutor=0._r8
+  this%RNH3OxidAutor=0._r8
+  this%RNH3OxidAutorBand=0._r8
+  this%RNO2OxidAutor=0._r8
+  this%RNO2OxidAutorBand=0._r8
 
   end subroutine ZeroOut
 !------------------------------------------------------------------------------------------
@@ -196,47 +190,45 @@ implicit none
   implicit none
   class(micfluxtype) :: this
 
-  call destroy(this%RDOM_micb_flx)
-  call destroy(this%RVMX4ff)
-  call destroy(this%RVMB4ff)
-  call destroy(this%RVMX2ff)
-  call destroy(this%RVMB2ff)
-  call destroy(this%ROXYS)
-  call destroy(this%ROQCS)
-  call destroy(this%ROQAS)
-  call destroy(this%RVMX3)
-  call destroy(this%RVMB3)
-  call destroy(this%RVMX2)
-  call destroy(this%RVMB2)
-  call destroy(this%RVMX1)
-  call destroy(this%ROXSK)
-  call destroy(this%RVMX4)
-  call destroy(this%RVMB4)
-  call destroy(this%RINHO)
-  call destroy(this%RINHB)
-  call destroy(this%RINOO)
-  call destroy(this%RINOB)
-  call destroy(this%RIPOO)
-  call destroy(this%RIPBO)
-  call destroy(this%RIPO1)
-  call destroy(this%RIPB1)
-  call destroy(this%RINHOR)
-  call destroy(this%RINOOR)
-  call destroy(this%RIPOOR)
-  call destroy(this%RIPO1R)
-  call destroy(this%RINHOff)
-  call destroy(this%RINHBff)
-  call destroy(this%RINOOff)
-  call destroy(this%RINOBff)
-  call destroy(this%RIPOOff)
-  call destroy(this%RIPBOff)
-  call destroy(this%RIPO1ff)
-  call destroy(this%RIPB1ff)
-  call destroy(this%RINHORff)
-  call destroy(this%RINOORff)
-  call destroy(this%RIPOORff)
-  call destroy(this%RIPO1Rff)
-  call destroy(this%ROXYSff)
+  call destroy(this%REcoDOMUptk)
+  call destroy(this%RNH3OxidAutor)
+  call destroy(this%RNH3OxidAutorBand)
+  call destroy(this%RNO2OxidAutor)
+  call destroy(this%RNO2OxidAutorBand)
+  call destroy(this%RO2DmndHetert)
+  call destroy(this%RDOCUptkHeter)
+  call destroy(this%RAcetateUptkHeter)
+  call destroy(this%RNO3ReduxDmndSoilHeter)
+  call destroy(this%RNO3ReduxDmndBandHeter)
+  call destroy(this%RNO2DmndReduxSoilHeter)
+  call destroy(this%RNO2DmndReduxBandHeter)
+  call destroy(this%RN2ODmndReduxHeter)
+  call destroy(this%RO2UptkSoilM)
+  call destroy(this%RNH4DmndSoilHeter)
+  call destroy(this%RNH4DmndBandHeter)
+  call destroy(this%RNO3DmndSoilHeter)
+  call destroy(this%RNO3DmndBandHeter)
+  call destroy(this%RH2PO4DmndSoilHeter)
+  call destroy(this%RH2PO4DmndBandHeter)
+  call destroy(this%RH1PO4DmndSoilHeter)
+  call destroy(this%RH1PO4DmndBandHeter)
+  call destroy(this%RNH4DmndLitrHeter)
+  call destroy(this%RNO3DmndLitrHeter)
+  call destroy(this%RH2PO4DmndLitrHeter)
+  call destroy(this%RH1PO4DmndLitrHeter)
+  call destroy(this%RNH4UptkSoilAutor)
+  call destroy(this%RNH4UptkBandAutor)
+  call destroy(this%RNO3UptkSoilAutor)
+  call destroy(this%RNO3UptkBandAutor)
+  call destroy(this%RH2PO4UptkSoilAutor)
+  call destroy(this%RH2PO4UptkBandAutor)
+  call destroy(this%RH1PO4UptkSoilAutor)
+  call destroy(this%RH1PO4UptkBandAutor)
+  call destroy(this%RNH4UptkLitrAutor)
+  call destroy(this%RNO3UptkLitrAutor)
+  call destroy(this%RH2PO4UptkLitrAutor)
+  call destroy(this%RH1PO4UptkLitrAutor)
+  call destroy(this%RO2DmndAutort)
 
   end subroutine Destruct
 end module MicFluxTypeMod

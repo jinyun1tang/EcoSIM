@@ -14,10 +14,10 @@ module PlantTraitDataType
 
 !allocation parameter
   real(r8) :: FracHour4LeafoffRemob(0:5)              !allocation parameter
-  REAL(R8),target,allocatable :: FWODBE(:,:)             !woody element allocation
-  real(r8),target,allocatable :: FWODLE(:,:)             !element allocation for leaf
-  real(r8),target,allocatable :: FWODRE(:,:)
-  real(r8),target,allocatable :: FWOODE(:,:)             !woody C allocation
+  REAL(R8),target,allocatable :: FracShootLeafElmAlloc2Litr(:,:)             !woody element allocation
+  real(r8),target,allocatable :: FracShootStalkElmAlloc2Litr(:,:)             !element allocation for leaf
+  real(r8),target,allocatable :: FracRootElmAlloc2Litr(:,:)
+  real(r8),target,allocatable :: FracRootStalkElmAlloc2Litr(:,:)             !woody C allocation
   real(r8),target,allocatable :: PARTS_brch(:,:,:,:,:)       !C partitioning coefficient
   real(r8),target,allocatable ::  CanopyStalkArea_lbrch(:,:,:,:,:)              !stem layer area, [m2 d-2]
   real(r8),target,allocatable ::  CanopyLeafArea_pft(:,:,:)                       !plant leaf area, [m2 d-2]
@@ -84,9 +84,9 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  GROUPX(:,:,:)                      !initial plant maturity group, [-]
   real(r8),target,allocatable ::  PPI(:,:,:)                         !initial plant population, [m-2]
   real(r8),target,allocatable ::  StandingDeadInitC_pft(:,:,:)                      !initial standing dead C, [g C m-2]
-  real(r8),target,allocatable ::  PPX(:,:,:)                         !plant population, [m-2]
+  real(r8),target,allocatable ::  PPX_pft(:,:,:)                         !plant population, [m-2]
   integer,target,allocatable ::  NumActivePlants(:,:)                          !number of active PFT
-  real(r8),target,allocatable ::  PPT(:,:)                           !total plant population, [d-2]
+  real(r8),target,allocatable ::  PlantPopu_col(:,:)                           !total plant population, [d-2]
   real(r8),target,allocatable ::  PPZ(:,:,:)                         !plant population at seeding, [m-2]
   real(r8),target,allocatable ::  HoursCanopyPSITooLow_pft(:,:,:)                        !canopy plant water stress indicator, number of hours PSILT < PSILY, []
   real(r8),target,allocatable ::  PlantO2Stress(:,:,:)                        !plant O2 stress indicator, []
@@ -109,7 +109,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  Hours4LeafOff_brch(:,:,:,:)                      !cold requirement for autumn leafoff/hardening, [h]
   integer,target,allocatable ::  KLeafNumber_brch(:,:,:,:)                      !leaf number, [-]
   integer,target,allocatable ::  KLowestGroLeafNode_brch(:,:,:,:)                     !leaf growth stage counter, [-]
-  integer,target,allocatable ::  KLEAFX(:,:,:,:)                     !NUMBER OF MINIMUM LEAFED NODE USED IN GROWTH ALLOCATION
+  integer,target,allocatable ::  KMinNumLeaf4GroAlloc_brch(:,:,:,:)                     !NUMBER OF MINIMUM LEAFED NODE USED IN GROWTH ALLOCATION
   integer,target,allocatable ::  KHiestGroLeafNode_brch(:,:,:,:)                      !leaf growth stage counter, [-]
   real(r8),target,allocatable ::  RefLeafAppearRate_pft(:,:,:)                        !rate of leaf initiation, [h-1 at 25 oC]
   real(r8),target,allocatable ::  WDLF(:,:,:)                        !leaf length:width ratio, [-]
@@ -158,13 +158,13 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  HoursDoingRemob_brch(:,:,:,:)                      !counter for mobilizing nonstructural C during autumn leafoff/hardening, [h]
   integer,target,allocatable ::  iPlantCalendar_brch(:,:,:,:,:)                     !plant growth stage, [-]
   real(r8),target,allocatable ::  TCChill4Seed_pft(:,:,:)                         !temperature below which seed set is adversely affected, [oC]
-  real(r8),target,allocatable ::  HighTCLimtSeed_pft(:,:,:)                         !temperature above which seed set is adversely affected, [oC]
-  real(r8),target,allocatable ::  SSTX(:,:,:)                        !sensitivity to HTC (seeds oC-1 above HTC)
+  real(r8),target,allocatable ::  HighTempLimitSeed_pft(:,:,:)                         !temperature above which seed set is adversely affected, [oC]
+  real(r8),target,allocatable ::  SeedTempSens_pft(:,:,:)                        !sensitivity to HTC (seeds oC-1 above HTC)
   real(r8),target,allocatable ::  CriticPhotoPeriod_pft(:,:,:)                         !critical daylength for phenological progress, [h]
   real(r8),target,allocatable ::  PhotoPeriodSens_pft(:,:,:)                        !difference between current and critical daylengths used to calculate  phenological progress, [h]
   real(r8),target,allocatable ::  ClumpFactorInit_pft(:,:,:)                         !initial clumping factor for self-shading in canopy layer, [-]
   real(r8),target,allocatable ::  HourReq4LeafOff_brch(:,:,:,:)                      !number of hours below set temperature required for autumn leafoff/hardening, [-]
-  real(r8),target,allocatable ::  OFFST(:,:,:)                       !adjustment of Arhhenius curves for plant thermal acclimation, [oC]
+  real(r8),target,allocatable ::  TempOffset_pft(:,:,:)                       !adjustment of Arhhenius curves for plant thermal acclimation, [oC]
 !----------------------------------------------------------------------
 
 contains
@@ -174,10 +174,10 @@ contains
   integer, intent(in) :: NumOfPlantLitrCmplxs
 
   FracHour4LeafoffRemob =real((/0.75,0.5,0.5,0.5,0.5,0.5/),r8)
-  allocate(FWODLE(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FWODLE=0._r8
-  allocate(FWODBE(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FWODBE=0._r8
-  allocate(FWODRE(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FWODRE=0._r8         !
-  allocate(FWOODE(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FWOODE=0._r8         !woody element allocation
+  allocate(FracShootStalkElmAlloc2Litr(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FracShootStalkElmAlloc2Litr=0._r8
+  allocate(FracShootLeafElmAlloc2Litr(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FracShootLeafElmAlloc2Litr=0._r8
+  allocate(FracRootElmAlloc2Litr(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FracRootElmAlloc2Litr=0._r8         !
+  allocate(FracRootStalkElmAlloc2Litr(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FracRootStalkElmAlloc2Litr=0._r8         !woody element allocation
   allocate(CanopyStalkArea_lbrch(NumOfCanopyLayers,MaxNumBranches,JP,JY,JX));CanopyStalkArea_lbrch=0._r8
   allocate(CanopyLeafArea_pft(JP,JY,JX));    CanopyLeafArea_pft=0._r8
   allocate(LeafStalkArea_pft(JP,JY,JX));    LeafStalkArea_pft=0._r8
@@ -244,9 +244,9 @@ contains
   allocate(GROUPX(JP,JY,JX));   GROUPX=0._r8
   allocate(PPI(JP,JY,JX));      PPI=0._r8
   allocate(StandingDeadInitC_pft(JP,JY,JX));   StandingDeadInitC_pft=0._r8
-  allocate(PPX(JP,JY,JX));      PPX=0._r8
+  allocate(PPX_pft(JP,JY,JX));      PPX_pft=0._r8
   allocate(NumActivePlants(JY,JX));       NumActivePlants=0
-  allocate(PPT(JY,JX));         PPT=0._r8
+  allocate(PlantPopu_col(JY,JX));         PlantPopu_col=0._r8
   allocate(PPZ(JP,JY,JX));      PPZ=0._r8
   allocate(HoursCanopyPSITooLow_pft(JP,JY,JX));     HoursCanopyPSITooLow_pft=0._r8
   allocate(PlantO2Stress(JP,JY,JX));     PlantO2Stress=0._r8
@@ -269,7 +269,7 @@ contains
   allocate(Hours4LeafOff_brch(MaxNumBranches,JP,JY,JX));  Hours4LeafOff_brch=0._r8
   allocate(KLeafNumber_brch(MaxNumBranches,JP,JY,JX)); KLeafNumber_brch=0
   allocate(KLowestGroLeafNode_brch(MaxNumBranches,JP,JY,JX));KLowestGroLeafNode_brch=0
-  allocate(KLEAFX(MaxNumBranches,JP,JY,JX));KLEAFX=0
+  allocate(KMinNumLeaf4GroAlloc_brch(MaxNumBranches,JP,JY,JX));KMinNumLeaf4GroAlloc_brch=0
   allocate(KHiestGroLeafNode_brch(MaxNumBranches,JP,JY,JX)); KHiestGroLeafNode_brch=0
   allocate(RefLeafAppearRate_pft(JP,JY,JX));     RefLeafAppearRate_pft=0._r8
   allocate(WDLF(JP,JY,JX));     WDLF=0._r8
@@ -318,13 +318,13 @@ contains
   allocate(HoursDoingRemob_brch(MaxNumBranches,JP,JY,JX));  HoursDoingRemob_brch=0._r8
   allocate(iPlantCalendar_brch(NumGrowthStages,MaxNumBranches,JP,JY,JX));iPlantCalendar_brch=0
   allocate(TCChill4Seed_pft(JP,JY,JX));      TCChill4Seed_pft=0._r8
-  allocate(HighTCLimtSeed_pft(JP,JY,JX));      HighTCLimtSeed_pft=0._r8
-  allocate(SSTX(JP,JY,JX));     SSTX=0._r8
+  allocate(HighTempLimitSeed_pft(JP,JY,JX));      HighTempLimitSeed_pft=0._r8
+  allocate(SeedTempSens_pft(JP,JY,JX));     SeedTempSens_pft=0._r8
   allocate(CriticPhotoPeriod_pft(JP,JY,JX));      CriticPhotoPeriod_pft=0._r8
   allocate(PhotoPeriodSens_pft(JP,JY,JX));     PhotoPeriodSens_pft=0._r8
   allocate(ClumpFactorInit_pft(JP,JY,JX));      ClumpFactorInit_pft=0._r8
   allocate(HourReq4LeafOff_brch(NumOfCanopyLayers,JP,JY,JX));  HourReq4LeafOff_brch=0._r8
-  allocate(OFFST(JP,JY,JX));    OFFST=0._r8
+  allocate(TempOffset_pft(JP,JY,JX));    TempOffset_pft=0._r8
   end subroutine InitPlantTraits
 
 !----------------------------------------------------------------------
@@ -332,9 +332,9 @@ contains
   use abortutils, only : destroy
   implicit none
 
-  call destroy(FWODBE)
-  call destroy(FWODRE)
-  call destroy(FWOODE)
+  call destroy(FracShootLeafElmAlloc2Litr)
+  call destroy(FracRootElmAlloc2Litr)
+  call destroy(FracRootStalkElmAlloc2Litr)
   call destroy(CanopyStalkArea_lbrch)
   call destroy(CanopyLeafArea_pft)
   call destroy(LeafStalkArea_pft)
@@ -401,9 +401,9 @@ contains
   call destroy(GROUPX)
   call destroy(PPI)
   call destroy(StandingDeadInitC_pft)
-  call destroy(PPX)
+  call destroy(PPX_pft)
   call destroy(NumActivePlants)
-  call destroy(PPT)
+  call destroy(PlantPopu_col)
   call destroy(PPZ)
   call destroy(HoursCanopyPSITooLow_pft)
   call destroy(PlantO2Stress)
@@ -426,7 +426,7 @@ contains
   call destroy(Hours4LeafOff_brch)
   call destroy(KLeafNumber_brch)
   call destroy(KLowestGroLeafNode_brch)
-  call destroy(KLEAFX)
+  call destroy(KMinNumLeaf4GroAlloc_brch)
   call destroy(KHiestGroLeafNode_brch)
   call destroy(RefLeafAppearRate_pft)
   call destroy(WDLF)
@@ -475,13 +475,13 @@ contains
   call destroy(HoursDoingRemob_brch)
   call destroy(iPlantCalendar_brch)
   call destroy(TCChill4Seed_pft)
-  call destroy(HighTCLimtSeed_pft)
-  call destroy(SSTX)
+  call destroy(HighTempLimitSeed_pft)
+  call destroy(SeedTempSens_pft)
   call destroy(CriticPhotoPeriod_pft)
   call destroy(PhotoPeriodSens_pft)
   call destroy(ClumpFactorInit_pft)
   call destroy(HourReq4LeafOff_brch)
-  call destroy(OFFST)
+  call destroy(TempOffset_pft)
   end subroutine DestructPlantTraits
 
 end module PlantTraitDataType

@@ -32,7 +32,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  LeafO2Solubility_pft(:,:,:)                         !leaf O2 solubility, [uM /umol mol-1]
   real(r8),target,allocatable ::  Km4LeafaqCO2_pft(:,:,:)                      !leaf aqueous CO2 Km no O2, [uM]
   real(r8),target,allocatable ::  Km4RubiscoCarboxy_pft(:,:,:)                      !leaf aqueous CO2 Km ambient O2, [uM]
-  real(r8),target,allocatable ::  CHILL(:,:,:)                       !chilling effect on CO2 fixation, [-]
+  real(r8),target,allocatable ::  ChillHours_pft(:,:,:)                       !chilling effect on CO2 fixation, [-]
   real(r8),target,allocatable ::  Vmax4RubiscoCarboxy_pft(:,:,:,:,:)                   !maximum dark carboxylation rate under saturating CO2, [umol m-2 s-1]
   real(r8),target,allocatable ::  CO2lmtRubiscoCarboxyRate_node(:,:,:,:,:)                    !carboxylation rate, [umol m-2 s-1]
   real(r8),target,allocatable ::  CO2CompenPoint_node(:,:,:,:,:)                   !CO2 compensation point, [uM]
@@ -91,7 +91,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  VapXAir2CanG(:,:)                        !total canopy evaporation, [m3 d-2]
   real(r8),target,allocatable ::  TENGYC(:,:)                        !total canopy heat content, [MJ  d-2]
   real(r8),target,allocatable ::  THFLXC(:,:)                        !total canopy heat flux, [MJ  d-2]
-  real(r8),target,allocatable ::  CanWatg(:,:)                       !total canopy water content stored in dry matter, [m3 d-2]
+  real(r8),target,allocatable ::  CanWat_col(:,:)                       !total canopy water content stored in dry matter, [m3 d-2]
   real(r8),target,allocatable ::  LWRadCanG(:,:)                         !total canopy LW emission, [MJ d-2 h-1]
   real(r8),target,allocatable ::  RadSWLeafAlbedo_pft(:,:,:)                        !canopy shortwave albedo , [-]
   real(r8),target,allocatable ::  RadSWLeafTransmis_pft(:,:,:)                        !canopy shortwave transmissivity , [-]
@@ -99,12 +99,12 @@ module CanopyDataType
   real(r8),target,allocatable ::  WatByPCanopy(:,:,:)                   !canopy held water content, [m3 d-2]
   real(r8),target,allocatable ::  TKC(:,:,:)                         !canopy temperature, [K]
   real(r8),target,allocatable ::  TCelciusCanopy_pft(:,:,:)                         !canopy temperature, [oC]
-  real(r8),target,allocatable ::  DTKC(:,:,:)                        !change in canopy temperature, [K]
+  real(r8),target,allocatable ::  DeltaTKC(:,:,:)                        !change in canopy temperature, [K]
   real(r8),target,allocatable ::  TKCanopy_pft(:,:,:)                        !canopy temperature, [K]
   real(r8),target,allocatable ::  CPOOL3_node(:,:,:,:,:)                  !minimum sink strength for nonstructural C transfer, [g d-2]
   real(r8),target,allocatable ::  NetCumElmntFlx2Plant_pft(:,:,:,:)                     !effect of canopy element status on seed set , []
-  real(r8),target,allocatable ::  WGLFT(:,:,:)                       !total leaf mass, [g d-2]
-  real(r8),target,allocatable ::  CFOPE(:,:,:,:,:,:)                 !litter kinetic fraction, [-]
+  real(r8),target,allocatable ::  tCanLeafC_cl(:,:,:)                       !total leaf mass, [g d-2]
+  real(r8),target,allocatable ::  ElmAllocmat4Litr(:,:,:,:,:,:)                 !litter kinetic fraction, [-]
   real(r8),target,allocatable ::  ShootElms_pft(:,:,:,:)                 !
   real(r8),target,allocatable ::  ShootElmsbeg_pft(:,:,:,:)           !shoot biomass for each pft
   real(r8),target,allocatable ::  ShootElms_brch(:,:,:,:,:)           !shoot biomass for each branch, struct + nonstructual, g/d2
@@ -186,7 +186,7 @@ module CanopyDataType
   allocate(LeafO2Solubility_pft(JP,JY,JX));      LeafO2Solubility_pft=0._r8
   allocate(Km4LeafaqCO2_pft(JP,JY,JX));   Km4LeafaqCO2_pft=0._r8
   allocate(Km4RubiscoCarboxy_pft(JP,JY,JX));   Km4RubiscoCarboxy_pft=0._r8
-  allocate(CHILL(JP,JY,JX));    CHILL=0._r8
+  allocate(ChillHours_pft(JP,JY,JX));    ChillHours_pft=0._r8
   allocate(Vmax4RubiscoCarboxy_pft(MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));Vmax4RubiscoCarboxy_pft=0._r8
   allocate(CO2lmtRubiscoCarboxyRate_node(MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));CO2lmtRubiscoCarboxyRate_node=0._r8
   allocate(CO2CompenPoint_node(MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));CO2CompenPoint_node=0._r8
@@ -245,7 +245,7 @@ module CanopyDataType
   allocate(VapXAir2CanG(JY,JX));      VapXAir2CanG=0._r8
   allocate(TENGYC(JY,JX));      TENGYC=0._r8
   allocate(THFLXC(JY,JX));      THFLXC=0._r8
-  allocate(CanWatg(JY,JX));      CanWatg=0._r8
+  allocate(CanWat_col(JY,JX));      CanWat_col=0._r8
   allocate(LWRadCanG(JY,JX));       LWRadCanG=0._r8
   allocate(RadSWLeafAlbedo_pft(JP,JY,JX));     RadSWLeafAlbedo_pft=0._r8
   allocate(RadSWLeafTransmis_pft(JP,JY,JX));     RadSWLeafTransmis_pft=0._r8
@@ -253,12 +253,12 @@ module CanopyDataType
   allocate(WatByPCanopy(JP,JY,JX));    WatByPCanopy=0._r8
   allocate(TKC(JP,JY,JX));      TKC=0._r8
   allocate(TCelciusCanopy_pft(JP,JY,JX));      TCelciusCanopy_pft=0._r8
-  allocate(DTKC(JP,JY,JX));     DTKC=0._r8
+  allocate(DeltaTKC(JP,JY,JX));     DeltaTKC=0._r8
   allocate(TKCanopy_pft(JP,JY,JX));     TKCanopy_pft=0._r8
   allocate(CPOOL3_node(MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));CPOOL3_node=0._r8
   allocate(NetCumElmntFlx2Plant_pft(NumPlantChemElms,JP,JY,JX));    NetCumElmntFlx2Plant_pft=0._r8
-  allocate(WGLFT(NumOfCanopyLayers,JY,JX));    WGLFT=0._r8
-  allocate(CFOPE(NumPlantChemElms,0:NumLitterGroups,jsken,JP,JY,JX));CFOPE=0._r8
+  allocate(tCanLeafC_cl(NumOfCanopyLayers,JY,JX));    tCanLeafC_cl=0._r8
+  allocate(ElmAllocmat4Litr(NumPlantChemElms,0:NumLitterGroups,jsken,JP,JY,JX));ElmAllocmat4Litr=0._r8
   allocate(ShootElmsbeg_pft(NumPlantChemElms,JP,JY,JX)); ShootElmsbeg_pft=0._r8
   allocate(ShootStrutElms_pft(NumPlantChemElms,JP,JY,JX)); ShootStrutElms_pft=0._r8
   allocate(LeafStrutElms_pft(NumPlantChemElms,JP,JY,JX));  LeafStrutElms_pft=0._r8
@@ -343,7 +343,7 @@ module CanopyDataType
   call destroy(LeafO2Solubility_pft)
   call destroy(Km4LeafaqCO2_pft)
   call destroy(Km4RubiscoCarboxy_pft)
-  call destroy(CHILL)
+  call destroy(ChillHours_pft)
   call destroy(Vmax4RubiscoCarboxy_pft)
   call destroy(CO2lmtRubiscoCarboxyRate_node)
   call destroy(CO2CompenPoint_node)
@@ -402,7 +402,7 @@ module CanopyDataType
   call destroy(VapXAir2CanG)
   call destroy(TENGYC)
   call destroy(THFLXC)
-  call destroy(CanWatg)
+  call destroy(CanWat_col)
   call destroy(LWRadCanG)
   call destroy(RadSWLeafAlbedo_pft)
   call destroy(RadSWLeafTransmis_pft)
@@ -410,13 +410,13 @@ module CanopyDataType
   call destroy(WatByPCanopy)
   call destroy(TKC)
   call destroy(TCelciusCanopy_pft)
-  call destroy(DTKC)
+  call destroy(DeltaTKC)
   call destroy(TKCanopy_pft)
   call destroy(CPOOL3_node)
   call destroy(ShootElms_pft)
   call destroy(NetCumElmntFlx2Plant_pft)
-  call destroy(WGLFT)
-  call destroy(CFOPE)
+  call destroy(tCanLeafC_cl)
+  call destroy(ElmAllocmat4Litr)
   call destroy(ShootElmsbeg_pft)
   call destroy(ShootStrutElms_pft)
   call destroy(LeafStrutElms_pft)

@@ -54,8 +54,8 @@ implicit none
   integer :: cid_orc_b,cid_orc_e     !microbial mass residue C [gC d-2]
   integer :: cid_orn_b,cid_orn_e     !microbial mass residue N [gN d-2]
   integer :: cid_orp_b,cid_orp_e     !microbial mass residue P [gP d-2]
-  integer :: cid_omehetr_b,cid_omehetr_e     !microbial biomass component	[g d-2]
-  integer :: cid_omeauto_b,cid_omeauto_e   !autotrophic microbial biomass component	[g d-2]
+  integer :: cid_mBiomeHeter_b,cid_mBiomeHeter_e     !microbial biomass component	[g d-2]
+  integer :: cid_mBiomeAutor_b,cid_mBiomeAutor_e   !autotrophic microbial biomass component	[g d-2]
 
   integer :: fid_XCODFS             !CO2 dissolution (+)-volatiziation (-) with respect to atmosphere
   integer :: fid_XCHDFS             !CH4 dissolution (+)-volatiziation (-) with respect to atmosphere
@@ -82,28 +82,28 @@ implicit none
   integer :: fid_XHGFLG             !H2 gaseous exchange with atmosphere (-) into atmosphere
 
 
-  integer :: fid_ROXYF               !net gaseous O2 flux from previous hour, [g d-2 h-1]
-  integer :: fid_ROXYY               !total root + microbial O2 uptake, [g d-2 h-1]
-  integer :: fid_RNH4Y               !total root + microbial NH4(+) uptake non-band, [gN d-2 h-1]
-  integer :: fid_RNO3Y               !total root + microbial NO3(-) uptake non-band, [gN d-2 h-1]
-  integer :: fid_RNO2Y               !total root + microbial NO2(-) uptake non-band, [gN d-2 h-1]
-  integer :: fid_RN2OY               !total root + microbial N2O uptake, [g d-2 h-1]
-  integer :: fid_RPO4Y               !total root + microbial PO4 uptake non-band, [gP d-2 h-1]
-  integer :: fid_RP14Y               !HPO4 demand in non-band by all microbial,root,myco populations [gP d-2 h-1]
-  integer :: fid_RNHBY               !total root + microbial NH4 uptake band, [gN d-2 h-1]
-  integer :: fid_RN3BY               !total root + microbial NO3(-) uptake band, [gN d-2 h-1]
-  integer :: fid_RN2BY               !total root + microbial NO2(-) uptake band, [gN d-2 h-1]
-  integer :: fid_RPOBY               !total root + microbial PO4 uptake band, [gP d-2 h-1]
-  integer :: fid_RP1BY               !HPO4 demand in band by all microbial,root,myco populations [gP d-2 h-1]
-  integer :: fid_ROQCY_b,fid_ROQCY_e !total root + microbial DOC uptake, [gC d-2 h-1]
-  integer :: fid_ROQAY_b,fid_ROQAY_e !total root + microbial acetate uptake, [gC d-2 h-1]
-  integer :: fid_RINHO_b,fid_RINHO_e
-  integer :: fid_RINHB_b,fid_RINHB_e
-  integer :: fid_RINOO_b,fid_RINOO_e
-  integer :: fid_RINOB_b,fid_RINOB_e
-  integer :: fid_RIPOO_b,fid_RIPOO_e
-  integer :: fid_RIPBO_b,fid_RIPBO_e
-  integer :: fid_RIPO1_b,fid_RIPO1_e
-  integer :: fid_RIPB1_b,fid_RIPB1_e
-  integer :: fid_ROXYS_b,fid_ROXYS_e
+  integer :: fid_RO2GasXchangePrev               !net gaseous O2 flux from previous hour, [g d-2 h-1]
+  integer :: fid_RO2EcoDmndPrev               !total root + microbial O2 uptake, [g d-2 h-1]
+  integer :: fid_RNH4EcoDmndSoilPrev               !total root + microbial NH4(+) uptake non-band, [gN d-2 h-1]
+  integer :: fid_RNO3EcoDmndSoilPrev               !total root + microbial NO3(-) uptake non-band, [gN d-2 h-1]
+  integer :: fid_RNO2EcoUptkSoilPrev               !total root + microbial NO2(-) uptake non-band, [gN d-2 h-1]
+  integer :: fid_RN2OEcoUptkSoilPrev               !total root + microbial N2O uptake, [g d-2 h-1]
+  integer :: fid_RH2PO4EcoDmndSoilPrev               !total root + microbial PO4 uptake non-band, [gP d-2 h-1]
+  integer :: fid_RH1PO4EcoDmndSoilPrev               !HPO4 demand in non-band by all microbial,root,myco populations [gP d-2 h-1]
+  integer :: fid_RNH4EcoDmndBandPrev               !total root + microbial NH4 uptake band, [gN d-2 h-1]
+  integer :: fid_RNO3EcoDmndBandPrev               !total root + microbial NO3(-) uptake band, [gN d-2 h-1]
+  integer :: fid_RNO2EcoUptkBandPrev               !total root + microbial NO2(-) uptake band, [gN d-2 h-1]
+  integer :: fid_RH2PO4EcoDmndBandPrev               !total root + microbial PO4 uptake band, [gP d-2 h-1]
+  integer :: fid_RH1PO4EcoDmndBandPrev               !HPO4 demand in band by all microbial,root,myco populations [gP d-2 h-1]
+  integer :: fid_RDOMEcoDmndPrev_b,fid_RDOMEcoDmndPrev_e !total root + microbial DOC uptake, [gC d-2 h-1]
+  integer :: fid_RAcetateEcoDmndPrev_b,fid_RAcetateEcoDmndPrev_e !total root + microbial acetate uptake, [gC d-2 h-1]
+  integer :: fid_RNH4DmndSoilHeter_b,fid_RNH4DmndSoilHeter_e
+  integer :: fid_RNH4DmndBandHeter_b,fid_RNH4DmndBandHeter_e
+  integer :: fid_RNO3DmndSoilHeter_b,fid_RNO3DmndSoilHeter_e
+  integer :: fid_RNO3DmndBandHeter_b,fid_RNO3DmndBandHeter_e
+  integer :: fid_RH2PO4DmndSoilHeter_b,fid_RH2PO4DmndSoilHeter_e
+  integer :: fid_RH2PO4DmndBandHeter_b,fid_RH2PO4DmndBandHeter_e
+  integer :: fid_RH1PO4DmndSoilHeter_b,fid_RH1PO4DmndSoilHeter_e
+  integer :: fid_RH1PO4DmndBandHeter_b,fid_RH1PO4DmndBandHeter_e
+  integer :: fid_RO2DmndHetert_b,fid_RO2DmndHetert_e
 end module MicIDMod
