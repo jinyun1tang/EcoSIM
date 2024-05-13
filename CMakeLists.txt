@@ -10,6 +10,8 @@ set (ECOSIM_VERSION "${ECOSIM_MAJOR_VERSION}.${ECOSIM_MINOR_VERSION}.${ECOSIM_PA
 
 message("We are in the EcoSIM top-level CMakeLists")
 
+set(TPL_INSTALL_PREFIX /global2/agraus/code/ats_dev_dir/amanzi_tpls-install-master-Debug)
+
 # Adjust CMake's module path.
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
