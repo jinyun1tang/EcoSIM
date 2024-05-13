@@ -32,33 +32,33 @@ implicit none
   real(r8) :: balc
 
 !     begin_execution
-  associate(                                                                &
-    NU                             =>  plt_site%NU                        , &  
-    MaxNodesPerBranch1             =>  pltpar%MaxNodesPerBranch1          , &
-    iPlantPhotosynthesisType       =>  plt_photo%iPlantPhotosynthesisType , &    
-    NH3Dep2Can_pft                 =>  plt_bgcr%NH3Dep2Can_pft            , &             
-    NH3Dep2Can_brch                =>  plt_rbgc%NH3Dep2Can_brch           , &    !
-    GrossResp_pft                  =>  plt_bgcr%GrossResp_pft             , &
-    CanopyGrosRCO2_pft             =>  plt_bgcr%CanopyGrosRCO2_pft     , &           
-    RootGrosRCO2_pft               =>  plt_bgcr%RootGrosRCO2_pft       , &
-    GrossCO2Fix_pft                =>  plt_bgcr%GrossCO2Fix_pft        , &
-    NumOfBranches_pft              =>  plt_morph%NumOfBranches_pft     , &       
-    NodulInfectElms_pft            =>  plt_bgcr%NodulInfectElms_pft    , &    
-    LitrfalStrutElms_pft           =>  plt_bgcr%LitrfalStrutElms_pft   , &
-    LitrfalStrutElms_pvr           =>  plt_bgcr%LitrfalStrutElms_pvr   , &    
-    RootMycoExudElms_pft           =>  plt_rbgc%RootMycoExudElms_pft   , &    
-    MY                             =>  plt_morph%MY                    , &        
-    MaxSoiL4Root                   =>  plt_morph%MaxSoiL4Root          , &    
-    NumRootAxes_pft                =>  plt_morph%NumRootAxes_pft       , &
-    MaxNumRootLays                 =>  plt_site%MaxNumRootLays         , &  
-    SeasonalNonstElms_pft          =>  plt_biom%SeasonalNonstElms_pft  , &    
-    RootElmsBeg_pft                =>  plt_biom%RootElmsBeg_pft        , &
-    ShootElmsBeg_pft               =>  plt_biom%ShootElmsBeg_pft       , &
-    RootElms_pft                   =>  plt_biom%RootElms_pft           , &    
-    ShootElms_brch                 =>  plt_biom%ShootElms_brch         , &
-    ShootC4NonstC_brch             =>  plt_biom%ShootC4NonstC_brch     , &    
-    RCO2A_pvr                      =>  plt_rbgc%RCO2A_pvr              , & 
-    ShootElms_pft                  =>  plt_biom%ShootElms_pft            &
+  associate(                                                        &
+    NU                       => plt_site%NU,                        &
+    MaxNodesPerBranch1       => pltpar%MaxNodesPerBranch1,          &
+    iPlantPhotosynthesisType => plt_photo%iPlantPhotosynthesisType, &
+    NH3Dep2Can_pft           => plt_bgcr%NH3Dep2Can_pft,            &
+    NH3Dep2Can_brch          => plt_rbgc%NH3Dep2Can_brch,           &    !
+    GrossResp_pft            => plt_bgcr%GrossResp_pft,             &
+    CanopyGrosRCO2_pft       => plt_bgcr%CanopyGrosRCO2_pft,        &
+    RootGrosRCO2_pft         => plt_bgcr%RootGrosRCO2_pft,          &
+    GrossCO2Fix_pft          => plt_bgcr%GrossCO2Fix_pft,           &
+    NumOfBranches_pft        => plt_morph%NumOfBranches_pft,        &
+    NodulInfectElms_pft      => plt_bgcr%NodulInfectElms_pft,       &
+    LitrfalStrutElms_pft     => plt_bgcr%LitrfalStrutElms_pft,      &
+    LitrfalStrutElms_pvr     => plt_bgcr%LitrfalStrutElms_pvr,      &
+    RootMycoExudElms_pft     => plt_rbgc%RootMycoExudElms_pft,      &
+    MY                       => plt_morph%MY,                       &
+    MaxSoiL4Root             => plt_morph%MaxSoiL4Root,             &
+    NumRootAxes_pft          => plt_morph%NumRootAxes_pft,          &
+    MaxNumRootLays           => plt_site%MaxNumRootLays,            &
+    SeasonalNonstElms_pft    => plt_biom%SeasonalNonstElms_pft,     &
+    RootElmsBeg_pft          => plt_biom%RootElmsBeg_pft,           &
+    ShootElmsBeg_pft         => plt_biom%ShootElmsBeg_pft,          &
+    RootElms_pft             => plt_biom%RootElms_pft,              &
+    ShootElms_brch           => plt_biom%ShootElms_brch,            &
+    ShootC4NonstC_brch       => plt_biom%ShootC4NonstC_brch,        &
+    RootCO2Autor_pvr         => plt_rbgc%RootCO2Autor_pvr,          &
+    ShootElms_pft            => plt_biom%ShootElms_pft              &
   )
 
   CALL SumPlantBiomStates(I,J,NZ,header)
@@ -86,7 +86,7 @@ implicit none
   RootGrosRCO2_pft(NZ)=0._r8
   DO N=1,MY(NZ)
     DO L=NU,MaxSoiL4Root(NZ)
-      RootGrosRCO2_pft(NZ)=RootGrosRCO2_pft(NZ)+RCO2A_pvr(N,L,NZ)
+      RootGrosRCO2_pft(NZ)=RootGrosRCO2_pft(NZ)+RootCO2Autor_pvr(N,L,NZ)
     ENDDO     
   ENDDO  
 
@@ -262,23 +262,23 @@ implicit none
   implicit none
   integer :: NZ,K,L,M,NE
 
-  associate(                                                       &
-    NP0                     =>  plt_site%NP0                     , &  
-    MY                      =>  plt_morph%MY                     , &     
-    NU                      =>  plt_site%NU                      , &      
-    MaxSoiL4Root            =>  plt_morph%MaxSoiL4Root           , &        
-    MaxNumRootLays          =>  plt_site%MaxNumRootLays          , &
-    CO2NetFix_pft           =>  plt_bgcr%CO2NetFix_pft           , &
-    CanopyRespC_pft         =>  plt_bgcr%CanopyRespC_pft         , &
-    LitrfalStrutElms_pft    =>  plt_bgcr%LitrfalStrutElms_pft    , &
-    NodulInfectElms_pft     =>  plt_bgcr%NodulInfectElms_pft     , &
-    RootMycoExudElms_pft    =>  plt_rbgc%RootMycoExudElms_pft    , &
-    NH3Dep2Can_pft          =>  plt_bgcr%NH3Dep2Can_pft          , &             
-    GrossResp_pft           =>  plt_bgcr%GrossResp_pft           , &
-    GrossCO2Fix_pft         =>  plt_bgcr%GrossCO2Fix_pft         , &    
-    CanopyGrosRCO2_pft      =>  plt_bgcr%CanopyGrosRCO2_pft      , &               
-    RCO2A_pvr               =>  plt_rbgc%RCO2A_pvr               , &     
-    LitrfalStrutElms_pvr    =>  plt_bgcr%LitrfalStrutElms_pvr      &
+  associate(                                               &
+    NP0                  => plt_site%NP0,                  &
+    MY                   => plt_morph%MY,                  &
+    NU                   => plt_site%NU,                   &
+    MaxSoiL4Root         => plt_morph%MaxSoiL4Root,        &
+    MaxNumRootLays       => plt_site%MaxNumRootLays,       &
+    CO2NetFix_pft        => plt_bgcr%CO2NetFix_pft,        &
+    CanopyRespC_pft      => plt_bgcr%CanopyRespC_pft,      &
+    LitrfalStrutElms_pft => plt_bgcr%LitrfalStrutElms_pft, &
+    NodulInfectElms_pft  => plt_bgcr%NodulInfectElms_pft,  &
+    RootMycoExudElms_pft => plt_rbgc%RootMycoExudElms_pft, &
+    NH3Dep2Can_pft       => plt_bgcr%NH3Dep2Can_pft,       &
+    GrossResp_pft        => plt_bgcr%GrossResp_pft,        &
+    GrossCO2Fix_pft      => plt_bgcr%GrossCO2Fix_pft,      &
+    CanopyGrosRCO2_pft   => plt_bgcr%CanopyGrosRCO2_pft,   &
+    RootCO2Autor_pvr     => plt_rbgc%RootCO2Autor_pvr,     &
+    LitrfalStrutElms_pvr => plt_bgcr%LitrfalStrutElms_pvr  &
   )  
   
   D9980: DO NZ=1,NP0
@@ -291,7 +291,7 @@ implicit none
         ENDDO
       ENDDO
     ENDDO D1
-    RCO2A_pvr(1:MY(NZ),NU:MaxSoiL4Root(NZ),NZ)=0._r8
+    RootCO2Autor_pvr(1:MY(NZ),NU:MaxSoiL4Root(NZ),NZ)=0._r8
     NH3Dep2Can_pft(NZ)=0._r8
     GrossResp_pft(NZ)=0._r8
     GrossCO2Fix_pft(NZ)=0._r8    

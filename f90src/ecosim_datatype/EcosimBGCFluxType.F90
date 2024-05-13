@@ -27,10 +27,10 @@ module EcosimBGCFluxType
   real(r8),target,allocatable ::  LitrFallStrutElms_col(:,:,:)                       !total LitrFall element, [g d-2 h-1]
   real(r8),target,allocatable ::  ECO_ER_col(:,:)                          !ecosystem respiration, [g d-2 h-1]
   real(r8),target,allocatable ::  Eco_NBP_col(:,:)                          !total NBP, [g d-2]
-  real(r8),target,allocatable ::  RP14X(:,:,:)                       !HPO4 demand in non-band by all microbial,root,myco populations
-  real(r8),target,allocatable ::  RP14Y(:,:,:)                       !HPO4 demand in non-band by all microbial,root,myco populations
-  real(r8),target,allocatable ::  RP1BX(:,:,:)                       !HPO4 demand in band by all microbial,root,myco populations
-  real(r8),target,allocatable ::  RP1BY(:,:,:)                       !HPO4 demand in band by all microbial,root,myco populations
+  real(r8),target,allocatable ::  REcoH1PO4DmndSoil_vr(:,:,:)                       !HPO4 demand in non-band by all microbial,root,myco populations
+  real(r8),target,allocatable ::  RH1PO4EcoDmndSoilPrev_vr(:,:,:)                       !HPO4 demand in non-band by all microbial,root,myco populations
+  real(r8),target,allocatable ::  REcoH1PO4DmndBand_vr(:,:,:)                       !HPO4 demand in band by all microbial,root,myco populations
+  real(r8),target,allocatable ::  RH1PO4EcoDmndBandPrev_vr(:,:,:)                       !HPO4 demand in band by all microbial,root,myco populations
 !----------------------------------------------------------------------
 
 contains
@@ -53,10 +53,10 @@ contains
   allocate(LitrFallStrutElms_col(NumPlantChemElms,JY,JX));       LitrFallStrutElms_col=0._r8
   allocate(ECO_ER_col(JY,JX));        ECO_ER_col=0._r8
   allocate(Eco_NBP_col(JY,JX));        Eco_NBP_col=0._r8
-  allocate(RP14X(0:JZ,JY,JX));  RP14X=0._r8
-  allocate(RP14Y(0:JZ,JY,JX));  RP14Y=0._r8
-  allocate(RP1BX(0:JZ,JY,JX));  RP1BX=0._r8
-  allocate(RP1BY(0:JZ,JY,JX));  RP1BY=0._r8
+  allocate(REcoH1PO4DmndSoil_vr(0:JZ,JY,JX));  REcoH1PO4DmndSoil_vr=0._r8
+  allocate(RH1PO4EcoDmndSoilPrev_vr(0:JZ,JY,JX));  RH1PO4EcoDmndSoilPrev_vr=0._r8
+  allocate(REcoH1PO4DmndBand_vr(0:JZ,JY,JX));  REcoH1PO4DmndBand_vr=0._r8
+  allocate(RH1PO4EcoDmndBandPrev_vr(0:JZ,JY,JX));  RH1PO4EcoDmndBandPrev_vr=0._r8
   end subroutine InitEcosimBGCFluxData
 
 !----------------------------------------------------------------------
@@ -79,10 +79,10 @@ contains
   call destroy(LitrFallStrutElms_col)
   call destroy(ECO_ER_col)
   call destroy(Eco_NBP_col)
-  call destroy(RP14X)
-  call destroy(RP14Y)
-  call destroy(RP1BX)
-  call destroy(RP1BY)
+  call destroy(REcoH1PO4DmndSoil_vr)
+  call destroy(RH1PO4EcoDmndSoilPrev_vr)
+  call destroy(REcoH1PO4DmndBand_vr)
+  call destroy(RH1PO4EcoDmndBandPrev_vr)
   end subroutine DestructEcosimBGCFluxData
 
 end module EcosimBGCFluxType

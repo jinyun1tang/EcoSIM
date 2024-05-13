@@ -626,7 +626,7 @@
 !
 !     CHILL=accumulated chilling hours used to limit CO2 fixn
 !
-!     RubiscoActivity_brch(NB,NZ)=RubiscoActivity_brch(NB,NZ)/(1.0_r8+0.25_r8*CHILL(NZ))
+!     RubiscoActivity_brch(NB,NZ)=RubiscoActivity_brch(NB,NZ)/(1.0_r8+0.25_r8*ChillHours_pft(NZ))
 !
 !     DEHARDENING OF EVERGREENS IN SPRING
 !
@@ -679,7 +679,7 @@
   associate(                                                                  &
     LeafPetoNonstElmConc_brch       =>  plt_biom%LeafPetoNonstElmConc_brch  , &
     TKCanopy_pft                    =>  plt_ew%TKCanopy_pft                 , &
-    OFFST                           =>  plt_pheno%OFFST                     , &
+    TempOffset_pft                           =>  plt_pheno%TempOffset_pft                     , &
     XKO2                            =>  plt_photo%XKO2                      , &
     CO2Solubility_pft               =>  plt_photo%CO2Solubility_pft         , &
     CanopyGasCO2_pft                =>  plt_photo%CanopyGasCO2_pft          , &
@@ -714,7 +714,7 @@
 !     ARRHENIUS FUNCTIONS FOR CARBOXYLATION AND OXYGENATION
 !
 !     TKCanopy_pft,TKCO=canopy temperature,canopy temp used in Arrhenius eqn
-!     OFFST=shift in Arrhenius curve for thermal adaptation
+!     TempOffset_pft=shift in Arrhenius curve for thermal adaptation
 !     TFN_Carboxy,TFN_Oxy,TFN_eTransp=temperature function for carboxylation,
 !     oxygenation,e- transport (25 oC =1)
 !     8.313,710.0=gas constant,enthalpy
@@ -723,7 +723,7 @@
 !     oxygenation,e- transport
 !
   CH2O=0.0_r8
-  TKCO=TKCanopy_pft(NZ)+OFFST(NZ)
+  TKCO=TKCanopy_pft(NZ)+TempOffset_pft(NZ)
   RTK=RGAS*TKCO
   STK=710.0_r8*TKCO
   ACTV=1+EXP((197500._r8-STK)/RTK)+EXP((STK-222500._r8)/RTK)

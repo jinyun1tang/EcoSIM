@@ -19,7 +19,7 @@ module LateralTranspMod
   use EcoSimConst
   use EcoSiMParDataMod, only : micpar
   use minimathmod , only : AZMAX1
-  use EcoSIMConfig, only : jcplx => jcplxc,NumMicbFunGroups=>NumMicbFunGroups
+  use EcoSIMConfig, only : jcplx => jcplxc,NumMicbFunGrupsPerCmplx=>NumMicbFunGrupsPerCmplx
   use EcoSIMConfig, only : nlbiomcp=>NumLiveMicrbCompts
   use ErosionBalMod
   use SnowBalanceMod
@@ -84,7 +84,7 @@ implicit none
 
     IF(THETP(L,NY,NX).GE.THETX.AND.LX.EQ.0)LG=L
     !make a copy of soil water/ice in micro- and macropores
-    VLWatMicP1(L,NY,NX)=VLWatMicP(L,NY,NX)
+    VLWatMicP1(L,NY,NX)=VLWatMicP_vr(L,NY,NX)
     VLiceMicP1(L,NY,NX)=VLiceMicP(L,NY,NX)
     VLWatMacP1(L,NY,NX)=VLWatMacP(L,NY,NX)
     VLiceMacP1(L,NY,NX)=VLiceMacP(L,NY,NX)
@@ -342,14 +342,14 @@ implicit none
         TSANER(N2,N1)=TSANER(N2,N1)+XSANER(N,NN,N2,N1)
         TSILER(N2,N1)=TSILER(N2,N1)+XSILER(N,NN,N2,N1)
         TCLAER(N2,N1)=TCLAER(N2,N1)+XCLAER(N,NN,N2,N1)
-        TNH4ER(N2,N1)=TNH4ER(N2,N1)+XNH4ER(N,NN,N2,N1)
-        TNH3ER(N2,N1)=TNH3ER(N2,N1)+XNH3ER(N,NN,N2,N1)
-        TNHUER(N2,N1)=TNHUER(N2,N1)+XNHUER(N,NN,N2,N1)
-        TNO3ER(N2,N1)=TNO3ER(N2,N1)+XNO3ER(N,NN,N2,N1)
-        TNH4EB(N2,N1)=TNH4EB(N2,N1)+XNH4EB(N,NN,N2,N1)
-        TNH3EB(N2,N1)=TNH3EB(N2,N1)+XNH3EB(N,NN,N2,N1)
-        TNHUEB(N2,N1)=TNHUEB(N2,N1)+XNHUEB(N,NN,N2,N1)
-        TNO3EB(N2,N1)=TNO3EB(N2,N1)+XNO3EB(N,NN,N2,N1)
+        TNH4Eros_col(N2,N1)=TNH4Eros_col(N2,N1)+XNH4ER(N,NN,N2,N1)
+        TNH3Eros_col(N2,N1)=TNH3Eros_col(N2,N1)+XNH3ER(N,NN,N2,N1)
+        TNUreaEros_col(N2,N1)=TNUreaEros_col(N2,N1)+XNHUER(N,NN,N2,N1)
+        TNO3Eros_col(N2,N1)=TNO3Eros_col(N2,N1)+XNO3ER(N,NN,N2,N1)
+        TNH4ErosBand_col(N2,N1)=TNH4ErosBand_col(N2,N1)+XNH4EB(N,NN,N2,N1)
+        TNH3ErosBand_col(N2,N1)=TNH3ErosBand_col(N2,N1)+XNH3EB(N,NN,N2,N1)
+        TNUreaErosBand_col(N2,N1)=TNUreaErosBand_col(N2,N1)+XNHUEB(N,NN,N2,N1)
+        TNO3ErosBand_col(N2,N1)=TNO3ErosBand_col(N2,N1)+XNO3EB(N,NN,N2,N1)
 
         DO NTX=idx_beg,idx_end
           trcx_TER(NTX,N2,N1)=trcx_TER(NTX,N2,N1)+trcx_XER(NTX,N,NN,N2,N1)
@@ -360,7 +360,7 @@ implicit none
         ENDDO
 
         DO  K=1,jcplx
-          DO NO=1,NumMicbFunGroups
+          DO NO=1,NumMicbFunGrupsPerCmplx
             DO NGL=JGnio(NO),JGnfo(NO)
               DO M=1,nlbiomcp
                 MID=micpar%get_micb_id(M,NGL)
@@ -375,7 +375,7 @@ implicit none
           enddo
         ENDDO
 
-        DO NO=1,NumMicbFunGroups
+        DO NO=1,NumMicbFunGrupsPerCmplx
           DO NGL=JGniA(NO),JGnfA(NO)
             DO M=1,nlbiomcp
               MID=micpar%get_micb_id(M,NGL)
@@ -414,14 +414,14 @@ implicit none
         TSANER(N2,N1)=TSANER(N2,N1)-XSANER(N,NN,N5,N4)
         TSILER(N2,N1)=TSILER(N2,N1)-XSILER(N,NN,N5,N4)
         TCLAER(N2,N1)=TCLAER(N2,N1)-XCLAER(N,NN,N5,N4)
-        TNH4ER(N2,N1)=TNH4ER(N2,N1)-XNH4ER(N,NN,N5,N4)
-        TNH3ER(N2,N1)=TNH3ER(N2,N1)-XNH3ER(N,NN,N5,N4)
-        TNHUER(N2,N1)=TNHUER(N2,N1)-XNHUER(N,NN,N5,N4)
-        TNO3ER(N2,N1)=TNO3ER(N2,N1)-XNO3ER(N,NN,N5,N4)
-        TNH4EB(N2,N1)=TNH4EB(N2,N1)-XNH4EB(N,NN,N5,N4)
-        TNH3EB(N2,N1)=TNH3EB(N2,N1)-XNH3EB(N,NN,N5,N4)
-        TNHUEB(N2,N1)=TNHUEB(N2,N1)-XNHUEB(N,NN,N5,N4)
-        TNO3EB(N2,N1)=TNO3EB(N2,N1)-XNO3EB(N,NN,N5,N4)
+        TNH4Eros_col(N2,N1)=TNH4Eros_col(N2,N1)-XNH4ER(N,NN,N5,N4)
+        TNH3Eros_col(N2,N1)=TNH3Eros_col(N2,N1)-XNH3ER(N,NN,N5,N4)
+        TNUreaEros_col(N2,N1)=TNUreaEros_col(N2,N1)-XNHUER(N,NN,N5,N4)
+        TNO3Eros_col(N2,N1)=TNO3Eros_col(N2,N1)-XNO3ER(N,NN,N5,N4)
+        TNH4ErosBand_col(N2,N1)=TNH4ErosBand_col(N2,N1)-XNH4EB(N,NN,N5,N4)
+        TNH3ErosBand_col(N2,N1)=TNH3ErosBand_col(N2,N1)-XNH3EB(N,NN,N5,N4)
+        TNUreaErosBand_col(N2,N1)=TNUreaErosBand_col(N2,N1)-XNHUEB(N,NN,N5,N4)
+        TNO3ErosBand_col(N2,N1)=TNO3ErosBand_col(N2,N1)-XNO3EB(N,NN,N5,N4)
 
         DO NTX=idx_beg,idx_end
           trcx_TER(NTX,N2,N1)=trcx_TER(NTX,N2,N1)-trcx_XER(NTX,N,NN,N5,N4)
@@ -432,7 +432,7 @@ implicit none
         ENDDO
 
         DO  K=1,jcplx
-          DO  NO=1,NumMicbFunGroups
+          DO  NO=1,NumMicbFunGrupsPerCmplx
             DO NGL=JGnio(NO),JGnfo(NO)
               DO  M=1,nlbiomcp
                 MID=micpar%get_micb_id(M,NGL)
@@ -448,7 +448,7 @@ implicit none
         ENDDO
 
 
-        DO  NO=1,NumMicbFunGroups
+        DO  NO=1,NumMicbFunGrupsPerCmplx
           DO  M=1,nlbiomcp
             DO NGL=JGniA(NO),JGnfA(NO)
               MID=micpar%get_micb_id(M,NGL)            
@@ -487,14 +487,14 @@ implicit none
           TSANER(N2,N1)=TSANER(N2,N1)-XSANER(N,NN,N5B,N4B)
           TSILER(N2,N1)=TSILER(N2,N1)-XSILER(N,NN,N5B,N4B)
           TCLAER(N2,N1)=TCLAER(N2,N1)-XCLAER(N,NN,N5B,N4B)
-          TNH4ER(N2,N1)=TNH4ER(N2,N1)-XNH4ER(N,NN,N5B,N4B)
-          TNH3ER(N2,N1)=TNH3ER(N2,N1)-XNH3ER(N,NN,N5B,N4B)
-          TNHUER(N2,N1)=TNHUER(N2,N1)-XNHUER(N,NN,N5B,N4B)
-          TNO3ER(N2,N1)=TNO3ER(N2,N1)-XNO3ER(N,NN,N5B,N4B)
-          TNH4EB(N2,N1)=TNH4EB(N2,N1)-XNH4EB(N,NN,N5B,N4B)
-          TNH3EB(N2,N1)=TNH3EB(N2,N1)-XNH3EB(N,NN,N5B,N4B)
-          TNHUEB(N2,N1)=TNHUEB(N2,N1)-XNHUEB(N,NN,N5B,N4B)
-          TNO3EB(N2,N1)=TNO3EB(N2,N1)-XNO3EB(N,NN,N5B,N4B)
+          TNH4Eros_col(N2,N1)=TNH4Eros_col(N2,N1)-XNH4ER(N,NN,N5B,N4B)
+          TNH3Eros_col(N2,N1)=TNH3Eros_col(N2,N1)-XNH3ER(N,NN,N5B,N4B)
+          TNUreaEros_col(N2,N1)=TNUreaEros_col(N2,N1)-XNHUER(N,NN,N5B,N4B)
+          TNO3Eros_col(N2,N1)=TNO3Eros_col(N2,N1)-XNO3ER(N,NN,N5B,N4B)
+          TNH4ErosBand_col(N2,N1)=TNH4ErosBand_col(N2,N1)-XNH4EB(N,NN,N5B,N4B)
+          TNH3ErosBand_col(N2,N1)=TNH3ErosBand_col(N2,N1)-XNH3EB(N,NN,N5B,N4B)
+          TNUreaErosBand_col(N2,N1)=TNUreaErosBand_col(N2,N1)-XNHUEB(N,NN,N5B,N4B)
+          TNO3ErosBand_col(N2,N1)=TNO3ErosBand_col(N2,N1)-XNO3EB(N,NN,N5B,N4B)
 
           DO NTX=idx_beg,idx_end
             trcx_TER(NTX,N2,N1)=trcx_TER(NTX,N2,N1)-trcx_XER(NTX,N,NN,N5B,N4B)
@@ -505,7 +505,7 @@ implicit none
           ENDDO
 
           D8380: DO K=1,jcplx
-            DO  NO=1,NumMicbFunGroups
+            DO  NO=1,NumMicbFunGrupsPerCmplx
               DO NGL=JGnio(NO),JGnfo(NO)
                 DO  M=1,nlbiomcp
                   MID=micpar%get_micb_id(M,NGL)                
@@ -520,7 +520,7 @@ implicit none
             enddo
           ENDDO D8380
 
-          DO  NO=1,NumMicbFunGroups
+          DO  NO=1,NumMicbFunGrupsPerCmplx
             DO NGL=JGniA(NO),JGnfA(NO)
               DO  M=1,nlbiomcp
                 MID=micpar%get_micb_id(M,NGL)              
@@ -620,7 +620,7 @@ implicit none
       !     WRITE(*,6632)'TFLW',I,J,N,N1,N2,N3,N4,N5,N6,NU(N2,N1)
       !    2,TWatFlowCellMicP(N3,N2,N1),WaterFlowSoiMicP(N,N3,N2,N1),WaterFlowSoiMicP(N,N6,N5,N4),LakeSurfFlowMicP(N5,N4)
       !    3,THeatFlow2Soil(N3,N2,N1),HeatFlow2Soil(N,N3,N2,N1),HeatFlow2Soil(N,N6,N5,N4)
-      !    2,LakeSurfHeatFlux(N5,N4),VLWatMicP(N3,N2,N1)
+      !    2,LakeSurfHeatFlux(N5,N4),VLWatMicP_vr(N3,N2,N1)
 !6632  FORMAT(A8,10I4,12E16.8)
       !     ENDIF
       !
@@ -644,7 +644,7 @@ implicit none
 
       DO NTS=ids_beg,ids_end
         trcs_Transp2MicP_vr(NTS,N3,N2,N1)=trcs_Transp2MicP_vr(NTS,N3,N2,N1) &
-          +trcs_3DTransp2MicP(NTS,N,N3,N2,N1)-trcs_3DTransp2MicP(NTS,N,N6,N5,N4)
+          +trcs_3DTransp2MicP_vr(NTS,N,N3,N2,N1)-trcs_3DTransp2MicP_vr(NTS,N,N6,N5,N4)
         trcs_Transp2MacP_vr(NTS,N3,N2,N1)=trcs_Transp2MacP_vr(NTS,N3,N2,N1) &
           +trcs_3DTransp2MacP(NTS,N,N3,N2,N1)-trcs_3DTransp2MacP(NTS,N,N6,N5,N4)
       ENDDO

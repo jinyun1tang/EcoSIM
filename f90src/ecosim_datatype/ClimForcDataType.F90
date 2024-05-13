@@ -76,7 +76,7 @@ implicit none
   real(r8),target,allocatable ::  TWIND(:,:)                         !total daily wind travel, [m d-1]
   real(r8),target,allocatable ::  TRAI(:,:)                          !total daily precipitation, [m d-1]
   real(r8),target,allocatable ::  THSX(:,:)                          !sky longwave radiation , [MJ m-2 h-1]
-  real(r8),target,allocatable ::  OFFSET(:,:)                        !offset for calculating temperature in Arrhenius curves, [oC]
+  real(r8),target,allocatable ::  TempOffset_col(:,:)                        !TempOffset_col for calculating temperature in Arrhenius curves, [oC]
   real(r8),target,allocatable ::  PRECD(:,:)                         !precipitation at ground surface used to calculate soil erosion, [m h-1]
   real(r8),target,allocatable ::  PRECB(:,:)                         !precipitation at ground surface used to calculate soil erosion, [m h-1]
   real(r8),target,allocatable ::  CO2EI(:,:)                         !initial atmospheric CO2 concentration, [umol mol-1]
@@ -114,7 +114,7 @@ implicit none
   real(r8),target,allocatable ::  ATKS(:,:)                          !mean annual soil temperature, [K]
   real(r8),target,allocatable ::  RainFalPrec(:,:)                   !rainfall, [m3 d-2 h-1]
   real(r8),target,allocatable ::  SnoFalPrec(:,:)                    !snowfall, [m3 d-2 h-1]
-  real(r8),target,allocatable ::  PrecAtm(:,:)                         !rainfall + snowfall, [m3 d-2 h-1]
+  real(r8),target,allocatable ::  PrecAtm_col(:,:)                         !rainfall + snowfall, [m3 d-2 h-1]
   real(r8),target,allocatable ::  PrecRainAndSurfirrig(:,:)                         !rainfall + irrigation, [m3 d-2 h-1]
   real(r8),target,allocatable ::  EnergyImpact4Erosion(:,:)                         !cumulative rainfall energy impact on soil surface
   real(r8),target,allocatable ::  PHR(:,:)                           !precipitation pH, [-]
@@ -205,7 +205,7 @@ implicit none
   allocate(TWIND(JY,JX));       TWIND=0._r8
   allocate(TRAI(JY,JX));        TRAI=0._r8
   allocate(THSX(JY,JX));        THSX=0._r8
-  allocate(OFFSET(JY,JX));      OFFSET=0._r8
+  allocate(TempOffset_col(JY,JX));      TempOffset_col=0._r8
   allocate(PRECD(JY,JX));       PRECD=0._r8
   allocate(PRECB(JY,JX));       PRECB=0._r8
   allocate(CO2EI(JY,JX));       CO2EI=0._r8
@@ -244,7 +244,7 @@ implicit none
   allocate(ATKS(JY,JX));        ATKS=0._r8
   allocate(RainFalPrec(JY,JX));       RainFalPrec=0._r8
   allocate(SnoFalPrec(JY,JX));       SnoFalPrec=0._r8
-  allocate(PrecAtm(JY,JX));       PrecAtm=0._r8
+  allocate(PrecAtm_col(JY,JX));       PrecAtm_col=0._r8
   allocate(PrecRainAndSurfirrig(JY,JX));       PrecRainAndSurfirrig=0._r8
   allocate(EnergyImpact4Erosion(JY,JX));       EnergyImpact4Erosion=0._r8
   allocate(PHR(JY,JX));         PHR=0._r8
@@ -335,7 +335,7 @@ implicit none
   call destroy(TWIND)
   call destroy(TRAI)
   call destroy(THSX)
-  call destroy(OFFSET)
+  call destroy(TempOffset_col)
   call destroy(PRECD)
   call destroy(PRECB)
   call destroy(CO2EI)
@@ -374,7 +374,7 @@ implicit none
   call destroy(ATKS)
   call destroy(RainFalPrec)
   call destroy(SnoFalPrec)
-  call destroy(PrecAtm)
+  call destroy(PrecAtm_col)
   call destroy(PrecRainAndSurfirrig)
   call destroy(EnergyImpact4Erosion)
   call destroy(PHR)

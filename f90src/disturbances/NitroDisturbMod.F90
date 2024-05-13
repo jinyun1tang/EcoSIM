@@ -37,32 +37,38 @@ module NitroDisturbMod
   subroutine SOMRemovalByDisturbance(I,J,NY,NX)
 !
 !     Description:
-!
+!ITILL,DCORP=disturbance type,intensity
+!ITILL=soil disturbance type 1-20:tillage,21=litter removal,22=fire,23-24=drainage
   implicit none
   integer, intent(in) :: I,J,NY,NX
 
-  integer :: L,K,M,N,IFLGJ,NLL,NGL,NTF,MID
+  integer :: L,K,M,N,IFLGJ,NLL,NGL,NTF,MID,ids,NE,idom
   real(r8) :: DC,DN,DP
   real(r8) :: DCORPC
   real(r8) :: FORGCX
   real(r8) :: HFLXD
-  real(r8) :: OC,ON,OP,OCH,ONH,OPH,ONX
+  real(r8) :: ONX
   REAL(R8) :: OPX,OCA,OAH
   real(r8) :: ONL(4,1:jcplx),OPL(4,1:jcplx)
+  real(r8) :: rmDOM(idom_beg:idom_end)
+  real(r8) :: rmBiom(1:NumPlantChemElms )
+  real(r8) :: OMelm(1:NumPlantChemElms)
+  real(r8) :: dOMelm(1:NumPlantChemElms)
   real(r8) :: DCORPC1
+
 !     begin_execution
 
-  IF(J.EQ.INT(SolarNoonHour_col(NY,NX)).AND.(ITILL(I,NY,NX).EQ.21.OR.ITILL(I,NY,NX).EQ.22))THEN
-    IF(ITILL(I,NY,NX).EQ.22)THEN
+  IF(J.EQ.INT(SolarNoonHour_col(NY,NX)) .AND. (iSoilDisturbType_col(I,NY,NX).EQ.21 .OR. iSoilDisturbType_col(I,NY,NX).EQ.22))THEN
+    IF(iSoilDisturbType_col(I,NY,NX).EQ.22)THEN
       IFLGS(NY,NX)=1
       IFLGJ=0
       NLL=-1
-      D2945: DO L=0,NL(NY,NX)
 
-        IF(L.EQ.0.OR.L.GE.NUM(NY,NX))THEN
+      D2945: DO L=0,NL(NY,NX)
+        IF(L.EQ.0 .OR. L.GE.NUM(NY,NX))THEN
           IF(IFLGJ.EQ.1)THEN
             exit
-          ELSEIF(THETW(L,NY,NX).GT.FVLWB.OR.CORGC(L,NY,NX).LE.FORGC)THEN
+          ELSEIF(THETW_vr(L,NY,NX).GT.VolMaxSoilMoist4Fire .OR. CSoilOrgM_vr(ielmc,L,NY,NX).LE.FORGC)THEN
             IFLGJ=1
           ELSE
             NLL=L
@@ -75,26 +81,23 @@ module NitroDisturbMod
 
     D2950: DO L=0,NLL
       IF(NLL.GE.0)THEN
-        IF(ITILL(I,NY,NX).EQ.22)THEN
+        IF(iSoilDisturbType_col(I,NY,NX).EQ.22)THEN
           IF(L.EQ.0)THEN
             FORGCX=0.0_r8
           ELSE
             FORGCX=FORGC
           ENDIF
-          DCORPC=AMIN1(0.999_r8,DCORP(I,NY,NX))*(CORGC(L,NY,NX)-FORGCX) &
-            /(AMAX1(CORGC(L,NY,NX),orgcden)-FORGCX)
+          DCORPC=AMIN1(0.999_r8,DCORP(I,NY,NX))*(CSoilOrgM_vr(ielmc,L,NY,NX)-FORGCX) &
+            /(AMAX1(CSoilOrgM_vr(ielmc,L,NY,NX),orgcden)-FORGCX)
         ELSE
           DCORPC=AMIN1(0.999_r8,DCORP(I,NY,NX))
         ENDIF
-!     VOLWOU=VOLWOU+DCORPC*VLWatMicP(L,NY,NX)
-!     HEATOU=HEATOU+DCORPC*4.19*TKS(L,NY,NX)*VLWatMicP(L,NY,NX)
-!     VLWatMicP(L,NY,NX)=VLWatMicP(L,NY,NX)-DCORPC*VLWatMicP(L,NY,NX)
-        OC=0.0_r8
-        ON=0.0_r8
-        OP=0.0_r8
-        DC=0.0_r8
-        DN=0.0_r8
-        DP=0.0_r8
+!     VOLWOU=VOLWOU+DCORPC*VLWatMicP_vr(L,NY,NX)
+!     HEATOU=HEATOU+DCORPC*4.19*TKS(L,NY,NX)*VLWatMicP_vr(L,NY,NX)
+!     VLWatMicP_vr(L,NY,NX)=VLWatMicP_vr(L,NY,NX)-DCORPC*VLWatMicP_vr(L,NY,NX)
+        OMelm=0._r8
+        dOMelm=0._r8
+
         ONL(1:4,1:jcplx)=0._r8
         OPL(1:4,1:jcplx)=0._r8
 
@@ -103,31 +106,30 @@ module NitroDisturbMod
 !
 !     REMOVE MICROBIAL BIOMASS
 !
-            D2960: DO N=1,NumMicbFunGroups
+            D2960: DO N=1,NumMicbFunGrupsPerCmplx
               DO NGL=JGnio(N),JGnfo(N)
                 DO M=1,nlbiomcp
                   MID=micpar%get_micb_id(M,NGL)
-                  OCH=DCORPC*OMEhetr(ielmc,MID,K,L,NY,NX)
-                  ONH=DCORPC*OMEhetr(ielmn,MID,K,L,NY,NX)
-                  OPH=DCORPC*OMEhetr(ielmp,MID,K,L,NY,NX)
-                  ONX=EFIRE(1,ITILL(I,NY,NX))*ONH
-                  OPX=EFIRE(2,ITILL(I,NY,NX))*OPH
+                  DO NE=1,NumPlantChemElms 
+                    rmBiom(NE)=DCORPC*mBiomeHeter_vr(NE,MID,K,L,NY,NX)
+                  enddo
+
+                  ONX=EFIRE(1,iSoilDisturbType_col(I,NY,NX))*rmBiom(ielmn)
+                  OPX=EFIRE(2,iSoilDisturbType_col(I,NY,NX))*rmBiom(ielmp)
                   IF(micpar%is_litter(K))THEN
-                    ONL(4,K)=ONL(4,K)+ONH-ONX
-                    OPL(4,K)=OPL(4,K)+OPH-OPX
+                    ONL(4,K)=ONL(4,K)+rmBiom(ielmn)-ONX
+                    OPL(4,K)=OPL(4,K)+rmBiom(ielmp)-OPX
                   ELSE
-                    ONL(1,K)=ONL(1,K)+ONH-ONX
-                    OPL(1,K)=OPL(1,K)+OPH-OPX
+                    ONL(1,K)=ONL(1,K)+rmBiom(ielmn)-ONX
+                    OPL(1,K)=OPL(1,K)+rmBiom(ielmp)-OPX
                   ENDIF
-                  OMEhetr(ielmc,MID,K,L,NY,NX)=OMEhetr(ielmc,MID,K,L,NY,NX)-OCH
-                  OMEhetr(ielmn,MID,K,L,NY,NX)=OMEhetr(ielmn,MID,K,L,NY,NX)-ONH
-                  OMEhetr(ielmp,MID,K,L,NY,NX)=OMEhetr(ielmp,MID,K,L,NY,NX)-OPH
-                  DC=DC+OMEhetr(ielmc,MID,K,L,NY,NX)
-                  DN=DN+OMEhetr(ielmn,MID,K,L,NY,NX)
-                  DP=DP+OMEhetr(ielmp,MID,K,L,NY,NX)
-                  OC=OC+OCH
-                  ON=ON+ONX
-                  OP=OP+OPX
+                  DO  NE=1,NumPlantChemElms 
+                    mBiomeHeter_vr(NE,MID,K,L,NY,NX)=mBiomeHeter_vr(NE,MID,K,L,NY,NX)-rmBiom(NE)
+                    dOMelm(NE)=dOMelm(NE)+mBiomeHeter_vr(NE,MID,K,L,NY,NX)                    
+                  ENDDO
+                  OMelm(ielmc)=OMelm(ielmc)+rmBiom(ielmc)
+                  OMelm(ielmn)=OMelm(ielmn)+ONX
+                  OMelm(ielmp)=OMelm(ielmp)+OPX
                 enddo
               enddo
             ENDDO D2960
@@ -139,26 +141,27 @@ module NitroDisturbMod
 !
 !     REMOVE MICROBIAL BIOMASS
 !
-        DO  N=1,NumMicbFunGroups
+        DO  N=1,NumMicbFunGrupsPerCmplx
           DO NGL=JGniA(N),JGnfA(N)
             DO M=1,nlbiomcp
               MID=micpar%get_micb_id(M,NGL)
-              OCH=DCORPC*OMEauto(ielmc,MID,L,NY,NX)
-              ONH=DCORPC*OMEauto(ielmn,MID,L,NY,NX)
-              OPH=DCORPC*OMEauto(ielmp,MID,L,NY,NX)
-              ONX=EFIRE(1,ITILL(I,NY,NX))*ONH
-              OPX=EFIRE(2,ITILL(I,NY,NX))*OPH
-              ONL(4,1)=ONL(4,1)+ONH-ONX
-              OPL(4,1)=OPL(4,1)+OPH-OPX
-              OMEauto(ielmc,MID,L,NY,NX)=OMEauto(ielmc,MID,L,NY,NX)-OCH
-              OMEauto(ielmn,MID,L,NY,NX)=OMEauto(ielmn,MID,L,NY,NX)-ONH
-              OMEauto(ielmp,MID,L,NY,NX)=OMEauto(ielmp,MID,L,NY,NX)-OPH
-              DC=DC+OMEauto(ielmc,MID,L,NY,NX)
-              DN=DN+OMEauto(ielmn,MID,L,NY,NX)
-              DP=DP+OMEauto(ielmp,MID,L,NY,NX)
-              OC=OC+OCH
-              ON=ON+ONX
-              OP=OP+OPX
+              DO NE=1,NumPlantChemElms
+                rmBiom(NE)=DCORPC*mBiomeAutor_vr(NE,MID,L,NY,NX)
+              enddo
+
+              ONX=EFIRE(1,iSoilDisturbType_col(I,NY,NX))*rmBiom(ielmn)
+              OPX=EFIRE(2,iSoilDisturbType_col(I,NY,NX))*rmBiom(ielmp)
+
+              ONL(4,1)=ONL(4,1)+rmBiom(ielmn)-ONX
+              OPL(4,1)=OPL(4,1)+rmBiom(ielmp)-OPX
+
+              DO NE=1,NumPlantChemElms
+                mBiomeAutor_vr(NE,MID,L,NY,NX)=mBiomeAutor_vr(NE,MID,L,NY,NX)-rmBiom(NE)
+                dOMelm(NE)=dOMelm(NE)+mBiomeAutor_vr(NE,MID,L,NY,NX)
+              enddo
+              OMelm(ielmc)=OMelm(ielmc)+rmBiom(ielmc)
+              OMelm(ielmn)=OMelm(ielmn)+ONX
+              OMelm(ielmp)=OMelm(ielmp)+OPX              
             enddo
           enddo
         ENDDO
@@ -168,122 +171,123 @@ module NitroDisturbMod
 !     REMOVE MICROBIAL RESIDUE
 !
         D2900: DO K=1,jcplx
-          IF(L.NE.0.OR.(micpar%is_litter(K)))THEN
+          IF(L.NE.0 .OR. (micpar%is_litter(K)))THEN
             D2940: DO M=1,ndbiomcp
-              OCH=DCORPC*ORM(ielmc,M,K,L,NY,NX)
-              ONH=DCORPC*ORM(ielmn,M,K,L,NY,NX)
-              OPH=DCORPC*ORM(ielmp,M,K,L,NY,NX)
-              ONX=EFIRE(1,ITILL(I,NY,NX))*ONH
-              OPX=EFIRE(2,ITILL(I,NY,NX))*OPH
+              DO NE=1,NumPlantChemElms
+                rmBiom(NE)=DCORPC*OMBioResdu_vr(NE,M,K,L,NY,NX)
+              enddo
+
+              ONX=EFIRE(1,iSoilDisturbType_col(I,NY,NX))*rmBiom(ielmn)
+              OPX=EFIRE(2,iSoilDisturbType_col(I,NY,NX))*rmBiom(ielmp)
               IF(micpar%is_litter(K))THEN
-                ONL(4,K)=ONL(4,K)+ONH-ONX
-                OPL(4,K)=OPL(4,K)+OPH-OPX
+                ONL(4,K)=ONL(4,K)+rmBiom(ielmn)-ONX
+                OPL(4,K)=OPL(4,K)+rmBiom(ielmp)-OPX
               ELSE
-                ONL(1,K)=ONL(1,K)+ONH-ONX
-                OPL(1,K)=OPL(1,K)+OPH-OPX
+                ONL(1,K)=ONL(1,K)+rmBiom(ielmn)-ONX
+                OPL(1,K)=OPL(1,K)+rmBiom(ielmp)-OPX
               ENDIF
-              ORM(ielmc,M,K,L,NY,NX)=ORM(ielmc,M,K,L,NY,NX)-OCH
-              ORM(ielmn,M,K,L,NY,NX)=ORM(ielmn,M,K,L,NY,NX)-ONH
-              ORM(ielmp,M,K,L,NY,NX)=ORM(ielmp,M,K,L,NY,NX)-OPH
-              DC=DC+ORM(ielmc,M,K,L,NY,NX)
-              DN=DN+ORM(ielmn,M,K,L,NY,NX)
-              DP=DP+ORM(ielmp,M,K,L,NY,NX)
-              OC=OC+OCH
-              ON=ON+ONX
-              OP=OP+OPX
+              DO NE=1,NumPlantChemElms
+                OMBioResdu_vr(NE,M,K,L,NY,NX)=OMBioResdu_vr(NE,M,K,L,NY,NX)-rmBiom(NE)
+                dOMelm(NE)=dOMelm(NE)+OMBioResdu_vr(NE,M,K,L,NY,NX)
+              enddo
+              OMelm(ielmc)=OMelm(ielmc)+rmBiom(ielmc)
+              OMelm(ielmn)=OMelm(ielmn)+ONX
+              OMelm(ielmp)=OMelm(ielmp)+OPX                            
             ENDDO D2940
 !
 !     REMOVE DOC, DON, DOP
 !
-            OCH=DCORPC*DOM(idom_doc,K,L,NY,NX)
-            OCA=DCORPC*DOM(idom_acetate,K,L,NY,NX)
-            ONH=DCORPC*DOM(idom_don,K,L,NY,NX)
-            OPH=DCORPC*DOM(idom_dop,K,L,NY,NX)
-            ONX=EFIRE(1,ITILL(I,NY,NX))*ONH
-            OPX=EFIRE(2,ITILL(I,NY,NX))*OPH
+            DO idom=idom_beg,idom_end
+              rmDOM(idom)=DCORPC*DOM_vr(idom_doc,K,L,NY,NX)
+            enddo
+
+            ONX=EFIRE(1,iSoilDisturbType_col(I,NY,NX))*rmDOM(ielmn)
+            OPX=EFIRE(2,iSoilDisturbType_col(I,NY,NX))*rmDOM(ielmp)
             IF(micpar%is_litter(K))THEN
-              ONL(4,K)=ONL(4,K)+ONH-ONX
-              OPL(4,K)=OPL(4,K)+OPH-OPX
+              ONL(4,K)=ONL(4,K)+rmDOM(ielmn)-ONX
+              OPL(4,K)=OPL(4,K)+rmDOM(ielmp)-OPX
             ELSE
-              ONL(1,K)=ONL(1,K)+ONH-ONX
-              OPL(1,K)=OPL(1,K)+OPH-OPX
+              ONL(1,K)=ONL(1,K)+rmDOM(ielmn)-ONX
+              OPL(1,K)=OPL(1,K)+rmDOM(ielmp)-OPX
             ENDIF
-            DOM(idom_doc,K,L,NY,NX)=DOM(idom_doc,K,L,NY,NX)-OCH
-            DOM(idom_acetate,K,L,NY,NX)=DOM(idom_acetate,K,L,NY,NX)-OCA
-            DOM(idom_don,K,L,NY,NX)=DOM(idom_don,K,L,NY,NX)-ONH
-            DOM(idom_dop,K,L,NY,NX)=DOM(idom_dop,K,L,NY,NX)-OPH
-            OC=OC+OCH+OCA
-            ON=ON+ONX
-            OP=OP+OPX
-            OCH=DCORPC*DOM_Macp(idom_doc,K,L,NY,NX)
-            ONH=DCORPC*DOM_Macp(idom_don,K,L,NY,NX)
-            OPH=DCORPC*DOM_Macp(idom_dop,K,L,NY,NX)
-            OAH=DCORPC*DOM_Macp(idom_acetate,K,L,NY,NX)
-            ONX=EFIRE(1,ITILL(I,NY,NX))*ONH
-            OPX=EFIRE(2,ITILL(I,NY,NX))*OPH
+            DO idom=idom_beg,idom_end
+              DOM_vr(idom,K,L,NY,NX)=DOM_vr(idom,K,L,NY,NX)-rmDOM(idom)
+            enddo
+
+            OMelm(ielmc)=OMelm(ielmc)+rmDOM(idom_doc)+rmDOM(idom_acetate)            
+            OMelm(ielmn)=OMelm(ielmn)+ONX
+            OMelm(ielmp)=OMelm(ielmp)+OPX
+
+            DO idom=idom_beg,idom_end
+              rmDOM(idom)=DCORPC*DOM_MacP_vr(idom,K,L,NY,NX)
+            enddo
+
+            ONX=EFIRE(1,iSoilDisturbType_col(I,NY,NX))*rmDOM(ielmn)
+            OPX=EFIRE(2,iSoilDisturbType_col(I,NY,NX))*rmDOM(ielmp)
             IF(micpar%is_litter(K))THEN
-              ONL(4,K)=ONL(4,K)+ONH-ONX
-              OPL(4,K)=OPL(4,K)+OPH-OPX
+              ONL(4,K)=ONL(4,K)+rmDOM(ielmn)-ONX
+              OPL(4,K)=OPL(4,K)+rmDOM(ielmp)-OPX
             ELSE
-              ONL(1,K)=ONL(1,K)+ONH-ONX
-              OPL(1,K)=OPL(1,K)+OPH-OPX
+              ONL(1,K)=ONL(1,K)+rmDOM(ielmn)-ONX
+              OPL(1,K)=OPL(1,K)+rmDOM(ielmp)-OPX
             ENDIF
-            DOM_Macp(idom_doc,K,L,NY,NX)=DOM_Macp(idom_doc,K,L,NY,NX)-OCH
-            DOM_Macp(idom_don,K,L,NY,NX)=DOM_Macp(idom_don,K,L,NY,NX)-ONH
-            DOM_Macp(idom_dop,K,L,NY,NX)=DOM_Macp(idom_dop,K,L,NY,NX)-OPH
-            DOM_Macp(idom_acetate,K,L,NY,NX)=DOM_Macp(idom_acetate,K,L,NY,NX)-OAH
-            OC=OC+OCH+OAH
-            ON=ON+ONX
-            OP=OP+OPX
+            DO idom=idom_beg,idom_end
+              DOM_MacP_vr(idom,K,L,NY,NX)=DOM_MacP_vr(idom,K,L,NY,NX)-rmDOM(idom)
+            enddo
+
+            OMelm(ielmc)=OMelm(ielmc)+rmDOM(idom_doc)+rmDOM(idom_acetate)            
+            OMelm(ielmn)=OMelm(ielmn)+ONX
+            OMelm(ielmp)=OMelm(ielmp)+OPX
 !
 !     REMOVE ADSORBED OM
 !
-            OCH=DCORPC*OHM(ielmc,K,L,NY,NX)
-            ONH=DCORPC*OHM(ielmn,K,L,NY,NX)
-            OPH=DCORPC*OHM(ielmp,K,L,NY,NX)
-            OAH=DCORPC*OHM(idom_acetate,K,L,NY,NX)
-            ONX=EFIRE(1,ITILL(I,NY,NX))*ONH
-            OPX=EFIRE(2,ITILL(I,NY,NX))*OPH
+            DO idom=idom_beg,idom_end
+              rmDOM(idom)=DCORPC*SorbedOM_vr(idom,K,L,NY,NX)
+            enddo
+
+            ONX=EFIRE(1,iSoilDisturbType_col(I,NY,NX))*rmDOM(ielmn)
+            OPX=EFIRE(2,iSoilDisturbType_col(I,NY,NX))*rmDOM(ielmp)
             IF(micpar%is_litter(K))THEN
-              ONL(4,K)=ONL(4,K)+ONH-ONX
-              OPL(4,K)=OPL(4,K)+OPH-OPX
+              ONL(4,K)=ONL(4,K)+rmDOM(ielmn)-ONX
+              OPL(4,K)=OPL(4,K)+rmDOM(ielmp)-OPX
             ELSE
-              ONL(1,K)=ONL(1,K)+ONH-ONX
-              OPL(1,K)=OPL(1,K)+OPH-OPX
+              ONL(1,K)=ONL(1,K)+rmDOM(ielmn)-ONX
+              OPL(1,K)=OPL(1,K)+rmDOM(ielmp)-OPX
             ENDIF
-            OHM(ielmc,K,L,NY,NX)=OHM(ielmc,K,L,NY,NX)-OCH
-            OHM(ielmn,K,L,NY,NX)=OHM(ielmn,K,L,NY,NX)-ONH
-            OHM(ielmp,K,L,NY,NX)=OHM(ielmp,K,L,NY,NX)-OPH
-            OHM(idom_acetate,K,L,NY,NX)=OHM(idom_acetate,K,L,NY,NX)-OAH
-            DC=DC+DOM(idom_doc,K,L,NY,NX)+DOM_Macp(idom_doc,K,L,NY,NX)+OHM(ielmc,K,L,NY,NX) &
-              +DOM(idom_acetate,K,L,NY,NX)+DOM_Macp(idom_acetate,K,L,NY,NX)+OHM(idom_acetate,K,L,NY,NX)
-            DN=DN+DOM(idom_don,K,L,NY,NX)+DOM_Macp(idom_don,K,L,NY,NX)+OHM(ielmn,K,L,NY,NX)
-            DP=DP+DOM(idom_dop,K,L,NY,NX)+DOM_Macp(idom_dop,K,L,NY,NX)+OHM(ielmp,K,L,NY,NX)
-            OC=OC+OCH
-            ON=ON+ONX
-            OP=OP+OPX
-!
+            DO idom=idom_beg,idom_end
+              SorbedOM_vr(idom,K,L,NY,NX)=SorbedOM_vr(idom,K,L,NY,NX)-rmDOM(idom)
+            enddo
+
+            dOMelm(ielmc)=dOMelm(ielmc)+DOM_vr(idom_doc,K,L,NY,NX)+DOM_MacP_vr(idom_doc,K,L,NY,NX)+SorbedOM_vr(ielmc,K,L,NY,NX) &
+              +DOM_vr(idom_acetate,K,L,NY,NX)+DOM_MacP_vr(idom_acetate,K,L,NY,NX)+SorbedOM_vr(idom_acetate,K,L,NY,NX)
+            dOMelm(ielmn)=dOMelm(ielmn)+DOM_vr(idom_don,K,L,NY,NX)+DOM_MacP_vr(idom_don,K,L,NY,NX)+SorbedOM_vr(ielmn,K,L,NY,NX)
+            dOMelm(ielmp)=dOMelm(ielmp)+DOM_vr(idom_dop,K,L,NY,NX)+DOM_MacP_vr(idom_dop,K,L,NY,NX)+SorbedOM_vr(ielmp,K,L,NY,NX)
+
+            OMelm(ielmc)=OMelm(ielmc)+rmDOM(idom_doc)+rmDOM(idom_acetate)
+            OMelm(ielmn)=OMelm(ielmn)+ONX
+            OMelm(ielmp)=OMelm(ielmp)+OPX!
 !     REMOVE RESIDUE
 !
             D2930: DO M=1,jsken
-              OCH=DCORPC*OSM(ielmc,M,K,L,NY,NX)
-              ONH=DCORPC*OSM(ielmn,M,K,L,NY,NX)
-              OPH=DCORPC*OSM(ielmp,M,K,L,NY,NX)
-              OCA=DCORPC*OSA(M,K,L,NY,NX)
-              ONX=EFIRE(1,ITILL(I,NY,NX))*ONH
-              OPX=EFIRE(2,ITILL(I,NY,NX))*OPH
-              ONL(M,K)=ONL(M,K)+ONH-ONX
-              OPL(M,K)=OPL(M,K)+OPH-OPX
-              OSM(ielmc,M,K,L,NY,NX)=OSM(ielmc,M,K,L,NY,NX)-OCH
-              OSM(ielmn,M,K,L,NY,NX)=OSM(ielmn,M,K,L,NY,NX)-ONH
-              OSM(ielmp,M,K,L,NY,NX)=OSM(ielmp,M,K,L,NY,NX)-OPH
-              OSA(M,K,L,NY,NX)=OSA(M,K,L,NY,NX)-OCA              
-              DC=DC+OSM(ielmc,M,K,L,NY,NX)
-              DN=DN+OSM(ielmn,M,K,L,NY,NX)
-              DP=DP+OSM(ielmp,M,K,L,NY,NX)
-              OC=OC+OCH
-              ON=ON+ONX
-              OP=OP+OPX
+              do NE=1,NumPlantChemElms
+                rmBiom(NE)=DCORPC*SolidOM_vr(NE,M,K,L,NY,NX)
+              enddo
+
+              OCA=DCORPC*SolidOMAct_vr(M,K,L,NY,NX)
+              ONX=EFIRE(1,iSoilDisturbType_col(I,NY,NX))*rmBiom(ielmn)
+              OPX=EFIRE(2,iSoilDisturbType_col(I,NY,NX))*rmBiom(ielmp)
+              ONL(M,K)=ONL(M,K)+rmBiom(ielmn)-ONX
+              OPL(M,K)=OPL(M,K)+rmBiom(ielmp)-OPX
+
+              do NE=1,NumPlantChemElms
+                SolidOM_vr(NE,M,K,L,NY,NX)=SolidOM_vr(NE,M,K,L,NY,NX)-rmBiom(NE)
+                dOMelm(NE)=dOMelm(NE)+SolidOM_vr(NE,M,K,L,NY,NX)
+              enddo
+                            
+              SolidOMAct_vr(M,K,L,NY,NX)=SolidOMAct_vr(M,K,L,NY,NX)-OCA              
+              OMelm(ielmc)=OMelm(ielmc)+rmBiom(ielmc)
+              OMelm(ielmn)=OMelm(ielmn)+ONX
+              OMelm(ielmp)=OMelm(ielmp)+OPX      
             ENDDO D2930
           ENDIF
         ENDDO D2900
@@ -292,8 +296,8 @@ module NitroDisturbMod
 !
         D2905: DO K=1,jcplx
           DO  M=1,jsken
-            OSM(ielmn,M,K,L,NY,NX)=OSM(ielmn,M,K,L,NY,NX)+ONL(M,K)
-            OSM(ielmp,M,K,L,NY,NX)=OSM(ielmp,M,K,L,NY,NX)+OPL(M,K)
+            SolidOM_vr(ielmn,M,K,L,NY,NX)=SolidOM_vr(ielmn,M,K,L,NY,NX)+ONL(M,K)
+            SolidOM_vr(ielmp,M,K,L,NY,NX)=SolidOM_vr(ielmp,M,K,L,NY,NX)+OPL(M,K)
             DN=DN+ONL(M,K)
             DP=DP+OPL(M,K)
           enddo
@@ -301,62 +305,66 @@ module NitroDisturbMod
 !
 !     REMOVE FERTILIZER IN RESIDUE
 !
-        IF(ITILL(I,NY,NX).EQ.21)THEN
-          ON=ON+DCORPC*(trc_solml_vr(ids_NH4,L,NY,NX)+trc_solml_vr(idg_NH3,L,NY,NX) &
+        IF(iSoilDisturbType_col(I,NY,NX).EQ.21)THEN
+          OMelm(ielmn)=OMelm(ielmn)+DCORPC*(trc_solml_vr(ids_NH4,L,NY,NX)+trc_solml_vr(idg_NH3,L,NY,NX) &
             +trc_solml_vr(ids_NO3,L,NY,NX)+trc_solml_vr(ids_NO2,L,NY,NX))
-          OP=OP+DCORPC*(trc_solml_vr(ids_H1PO4,L,NY,NX)+trc_solml_vr(ids_H2PO4,L,NY,NX))
+          OMelm(ielmp)=OMelm(ielmp)+DCORPC*(trc_solml_vr(ids_H1PO4,L,NY,NX)+trc_solml_vr(ids_H2PO4,L,NY,NX))
+          
           DCORPC1=1.0_r8-DCORPC
-          trc_solml_vr(ids_NH4,L,NY,NX)=DCORPC1*trc_solml_vr(ids_NH4,L,NY,NX)
+
           trc_solml_vr(idg_NH3,L,NY,NX)=DCORPC1*trc_solml_vr(idg_NH3,L,NY,NX)
-          trc_solml_vr(ids_NO3,L,NY,NX)=DCORPC1*trc_solml_vr(ids_NO3,L,NY,NX)
-          trc_solml_vr(ids_NO2,L,NY,NX)=DCORPC1*trc_solml_vr(ids_NO2,L,NY,NX)
-          trc_solml_vr(ids_H1PO4,L,NY,NX)=DCORPC1*trc_solml_vr(ids_H1PO4,L,NY,NX)
-          trc_solml_vr(ids_H2PO4,L,NY,NX)=DCORPC1*trc_solml_vr(ids_H2PO4,L,NY,NX)
+          do ids=ids_nut_beg,ids_nuts_end
+            trc_solml_vr(ids,L,NY,NX)=DCORPC1*trc_solml_vr(ids,L,NY,NX)
+          enddo
           trcx_solml(idx_NH4,L,NY,NX)  =DCORPC1*trcx_solml(idx_NH4,L,NY,NX)
-          trcp_salml(idsp_AlPO4,L,NY,NX)=DCORPC1*trcp_salml(idsp_AlPO4,L,NY,NX)
-          trcp_salml(idsp_FePO4,L,NY,NX)=DCORPC1*trcp_salml(idsp_FePO4,L,NY,NX)
-          trcp_salml(idsp_CaHPO4,L,NY,NX)=DCORPC1*trcp_salml(idsp_CaHPO4,L,NY,NX)
-          trcp_salml(idsp_HA,L,NY,NX)=DCORPC1*trcp_salml(idsp_HA,L,NY,NX)
-          trcp_salml(idsp_CaH4P2O8,L,NY,NX)=DCORPC1*trcp_salml(idsp_CaH4P2O8,L,NY,NX)
+          trcp_salml(idsp_AlPO4,L,NY,NX)    = DCORPC1*trcp_salml(idsp_AlPO4,L,NY,NX)
+          trcp_salml(idsp_FePO4,L,NY,NX)    = DCORPC1*trcp_salml(idsp_FePO4,L,NY,NX)
+          trcp_salml(idsp_CaHPO4,L,NY,NX)   = DCORPC1*trcp_salml(idsp_CaHPO4,L,NY,NX)
+          trcp_salml(idsp_HA,L,NY,NX)       = DCORPC1*trcp_salml(idsp_HA,L,NY,NX)
+          trcp_salml(idsp_CaH4P2O8,L,NY,NX) = DCORPC1*trcp_salml(idsp_CaH4P2O8,L,NY,NX)
 
           DO NTF=ifertn_beg,ifertn_end
-            FertN_soil(NTF,L,NY,NX)=DCORPC1*FertN_soil(NTF,L,NY,NX)
+            FertN_soil_vr(NTF,L,NY,NX)=DCORPC1*FertN_soil_vr(NTF,L,NY,NX)
           ENDDO
         ENDIF
-        ORGC(L,NY,NX)=DC
-        ORGN(L,NY,NX)=DN
+        SoilOrgM_vr(ielmc,L,NY,NX)=dOMelm(ielmc)
+        SoilOrgM_vr(ielmn,L,NY,NX)=dOMelm(ielmn)
+        SoilOrgM_vr(ielmp,L,NY,NX)=dOMelm(ielmp)
         IF(L.EQ.0)THEN
-          HFLXD=4.19E-06_r8*(ORGCX(L,NY,NX)-ORGC(L,NY,NX))*TKS(L,NY,NX)
+          HFLXD=4.19E-06_r8*(ORGCX_vr(L,NY,NX)-SoilOrgM_vr(ielmc,L,NY,NX))*TKS(L,NY,NX)
           HEATOU=HEATOU+HFLXD
         ENDIF
 !     IF(L.EQ.0)THEN
-!     VHeatCapacity(0,NY,NX)=2.496E-06*ORGC(0,NY,NX)+4.19*VLWatMicP(0,NY,NX)
+!     VHeatCapacity(0,NY,NX)=2.496E-06*SoilOrgM_vr(ielmc,0,NY,NX)+4.19*VLWatMicP_vr(0,NY,NX)
 !    2+1.9274*VLiceMicP(0,NY,NX)
 !     ELSE
-!     VHeatCapacity(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+4.19*(VLWatMicP(L,NY,NX)+VLWatMacP(L,NY,NX))
+!     VHeatCapacity(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+4.19*(VLWatMicP_vr(L,NY,NX)+VLWatMacP(L,NY,NX))
 !    2+1.9274*(VLiceMicP(L,NY,NX)+VLiceMacP(L,NY,NX))
 !     ENDIF
-        IF(ITILL(I,NY,NX).EQ.21)THEN
-          TOMOU(ielmc)=TOMOU(ielmc)+OC
-          TOMOU(ielmn)=TOMOU(ielmn)+ON
-          TOMOU(ielmp)=TOMOU(ielmp)+OP
-          HydroSufDOCFlx_col(NY,NX)=HydroSufDOCFlx_col(NY,NX)+OC
-          HydroSufDONFlx_col(NY,NX)=HydroSufDONFlx_col(NY,NX)+ON
-          HydroSufDOPFlx_col(NY,NX)=HydroSufDOPFlx_col(NY,NX)+OP
-          Eco_NBP_col(NY,NX)=Eco_NBP_col(NY,NX)-OC
-        ELSEIF(ITILL(I,NY,NX).EQ.22)THEN
-          CO2GIN=CO2GIN-OC
-          OXYGIN=OXYGIN+2.667_r8*OC
-          OXYGOU=OXYGOU+2.667_r8*OC
-          TOMOU(ielmn)=TOMOU(ielmn)+ON
-          TOMOU(ielmp)=TOMOU(ielmp)+OP
-          CO2byFire_col(NY,NX)=CO2byFire_col(NY,NX)-(1.0_r8-FCH4F)*OC
-          CH4byFire_col(NY,NX)=CH4byFire_col(NY,NX)-FCH4F*OC
-          O2byFire_col(NY,NX)=O2byFire_col(NY,NX)+(1.0_r8-FCH4F)*2.667_r8*OC
-          NH3byFire_col(NY,NX)=NH3byFire_col(NY,NX)-ON
+        IF(iSoilDisturbType_col(I,NY,NX).EQ.21)THEN
+          DO NE=1,NumPlantChemElms
+            TOMOU(NE)=TOMOU(NE)+OMelm(NE)
+          ENDDO
+
+          HydroSufDOCFlx_col(NY,NX)=HydroSufDOCFlx_col(NY,NX)+OMelm(ielmc)
+          HydroSufDONFlx_col(NY,NX)=HydroSufDONFlx_col(NY,NX)+OMelm(ielmn)
+          HydroSufDOPFlx_col(NY,NX)=HydroSufDOPFlx_col(NY,NX)+OMelm(ielmp)
+          
+          Eco_NBP_col(NY,NX)=Eco_NBP_col(NY,NX)-OMelm(ielmc)
+        ELSEIF(iSoilDisturbType_col(I,NY,NX).EQ.22)THEN
+          CO2GIN=CO2GIN-OMelm(ielmc)
+          OXYGIN=OXYGIN+2.667_r8*OMelm(ielmc)
+          OXYGOU=OXYGOU+2.667_r8*OMelm(ielmc)
+
+          TOMOU(ielmn)=TOMOU(ielmn)+OMelm(ielmn)
+          TOMOU(ielmp)=TOMOU(ielmp)+OMelm(ielmp)
+          CO2byFire_col(NY,NX)=CO2byFire_col(NY,NX)-(1.0_r8-FCH4F)*OMelm(ielmc)
+          CH4byFire_col(NY,NX)=CH4byFire_col(NY,NX)-FCH4F*OMelm(ielmc)
+          O2byFire_col(NY,NX)=O2byFire_col(NY,NX)+(1.0_r8-FCH4F)*2.667_r8*OMelm(ielmc)
+          NH3byFire_col(NY,NX)=NH3byFire_col(NY,NX)-OMelm(ielmn)
           N2ObyFire_col(NY,NX)=N2ObyFire_col(NY,NX)-0.0_r8
-          PO4byFire_col(NY,NX)=PO4byFire_col(NY,NX)-OP
-          Eco_NBP_col(NY,NX)=Eco_NBP_col(NY,NX)-OC
+          PO4byFire_col(NY,NX)=PO4byFire_col(NY,NX)-OMelm(ielmp)
+          Eco_NBP_col(NY,NX)=Eco_NBP_col(NY,NX)-OMelm(ielmc)
         ENDIF
       ENDIF
     ENDDO D2950

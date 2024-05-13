@@ -1775,7 +1775,7 @@ implicit none
     ! Determine if file needs to be closed
 
     if(ntapes>0)then
-      call hist_do_disp (ntapes, hist_ntimes, hist_mfilt, if_stop, if_disphist, rstwr, nlend)
+      call hist_do_disp (ntapes, hist_ntimes, hist_mfilt, if_stop, if_disphist, rstwr, nlend, lnyr)
     endif
 
     ! Close open history file
@@ -1801,22 +1801,23 @@ implicit none
 !                print*,tape(t)%ntimes,tape(t)%mfilt,rstwr, nlend
  !            end if
           endif
-       else
-          if(lnyr)then
-!            if (masterproc) then
-               write(iulog,*)
-               write(iulog,*)  trim(subname),' : Closing local history file ',&
-                    trim(locfnh(t)),' at nstep = ', etimer%get_nstep()
-               write(iulog,*)
-!            endif
-	          call ncd_pio_closefile(nfid(t))
-          endif
+       !else
+       !   if(lnyr)then
+!      !      if (masterproc) then
+       !        write(iulog,*)
+       !        write(iulog,*)  trim(subname),' : Closing local history file ',&
+       !             trim(locfnh(t)),' at nstep = ', etimer%get_nstep()
+       !        write(iulog,*)
+!      !      endif
+	    !      call ncd_pio_closefile(nfid(t))
+       !   endif
        endif
     end do
     ! Reset number of time samples to zero if file is full
 
     do t = 1, ntapes
-       if ((if_disphist(t) .and. tape(t)%ntimes==tape(t)%mfilt) .or. lnyr) then
+       if ( tape(t)%nhtfrq/=-24 .and. ((if_disphist(t) .and. tape(t)%ntimes==tape(t)%mfilt) .or. lnyr) &
+         .or. (if_disphist(t) .and. tape(t)%ntimes>=tape(t)%mfilt .and. tape(t)%nhtfrq==-24 .and. lnyr)) then
           tape(t)%ntimes = 0
        end if
     end do
@@ -1972,7 +1973,7 @@ implicit none
   end subroutine hfields_write
 
   !------------------------------------------------------------------------
-  subroutine hist_do_disp (ntapes, hist_ntimes, hist_mfilt, if_stop, if_disphist, rstwr, nlend)
+  subroutine hist_do_disp (ntapes, hist_ntimes, hist_mfilt, if_stop, if_disphist, rstwr, nlend, lnyr)
 
     !
     ! !DESCRIPTION:
@@ -1992,6 +1993,7 @@ implicit none
     logical, intent(out) :: if_disphist(ntapes) !true => save and dispose history file
     logical, intent(in)  :: rstwr
     logical, intent(in)  :: nlend
+    logical, intent(in)  :: lnyr
     !
     ! !LOCAL VARIABLES:
     integer :: t                   ! history tape index
@@ -2022,9 +2024,10 @@ implicit none
        ! Dispose
 
        if_disphist(1:ntapes) = .false.
-       do t = 1,ntapes
-          if (hist_ntimes(t) ==  hist_mfilt(t)) then
-             if_disphist(t) = .true.
+       do t = 1,ntapes          
+          if ((hist_ntimes(t) ==  hist_mfilt(t) .and. tape(t)%nhtfrq/=-24) .or. &
+            hist_ntimes(t) >=  hist_mfilt(t) .and. tape(t)%nhtfrq==-24 .and. lnyr) then
+            if_disphist(t) = .true.
           endif
        end do
     endif
@@ -2057,9 +2060,11 @@ implicit none
      character(len=1) :: inst_suffix=' '
      character(len=*),parameter :: subname = 'set_hist_filename'
 
-   if (hist_freq == 0 .and. hist_mfilt == 1) then   !monthly
-      call etimer%get_prev_date (yr, mon, day, sec)
-      write(cdate,'(i4.4,"-",i2.2)') yr,mon
+   if (hist_freq == 0) then   !monthly
+     call etimer%get_prev_date (yr, mon, day, sec)
+
+     if(hist_mfilt /= 1)mon=mon-1       
+     write(cdate,'(i4.4,"-",i2.2)') yr,mon
    else                        !other
       call etimer%get_curr_date (yr, mon, day, sec)
       write(cdate,'(i4.4,"-",i2.2,"-",i2.2,"-",i5.5)') yr,mon,day-1,sec

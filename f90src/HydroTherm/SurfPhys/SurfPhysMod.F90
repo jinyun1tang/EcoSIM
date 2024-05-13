@@ -149,9 +149,9 @@ contains
 !     PSISM*=litter matric water potential
 !
   LWRadBySurf(NY,NX)=0.0_r8
-  VLHeatCapacity(0,NY,NX)=cpo*ORGC(0,NY,NX)+cpw*VLWatMicP(0,NY,NX)+cpi*VLiceMicP(0,NY,NX)
-  VLPoreLitR(NY,NX)=VLMicP(0,NY,NX)
-  VLWatMicP1(0,NY,NX)=AZMAX1(VLWatMicP(0,NY,NX))
+  VLHeatCapacity(0,NY,NX)=cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP(0,NY,NX)
+  VLPoreLitR(NY,NX)=VLMicP_vr(0,NY,NX)
+  VLWatMicP1(0,NY,NX)=AZMAX1(VLWatMicP_vr(0,NY,NX))
   VLiceMicP1(0,NY,NX)=AZMAX1(VLiceMicP(0,NY,NX))
   VLairMicP1(0,NY,NX)=AZMAX1(VLPoreLitR(NY,NX)-VLWatMicP1(0,NY,NX)-VLiceMicP1(0,NY,NX))
   VLWatMicPM(1,0,NY,NX)=VLWatMicP1(0,NY,NX)
@@ -201,7 +201,7 @@ contains
   FracSurfSnoFree(NY,NX)=1.0_r8-FracSurfAsSnow(NY,NX)
   !if there is heat-wise significant litter layer
   IF(VLHeatCapacity(0,NY,NX).GT.VHeatCapLitR(NY,NX))THEN
-    FracSurfAsBareSoi(NY,NX)=AMIN1(1.0_r8,AZMAX1(EXP(-0.8E-02_r8*(ORGC(0,NY,NX)/AREA(3,0,NY,NX)))))
+    FracSurfAsBareSoi(NY,NX)=AMIN1(1.0_r8,AZMAX1(EXP(-0.8E-02_r8*(SoilOrgM_vr(ielmc,0,NY,NX)/AREA(3,0,NY,NX)))))
   ELSE
     FracSurfAsBareSoi(NY,NX)=1.0_r8
   ENDIF
@@ -792,7 +792,7 @@ contains
     ELSE
       ThetaWLitR=POROS0(NY,NX)
     ENDIF
-    THETW1=AMAX1(THETY(NUM(NY,NX),NY,NX),AMIN1(POROS(NUM(NY,NX),NY,NX) &
+    THETW1=AMAX1(THETY_vr(NUM(NY,NX),NY,NX),AMIN1(POROS(NUM(NY,NX),NY,NX) &
       ,safe_adb(VLWatMicP1(NUM(NY,NX),NY,NX),VLSoilMicP(NUM(NY,NX),NY,NX))))
     !litter layer  
     K0=MAX(1,MIN(100,INT(100.0*(AZMAX1(POROS0(NY,NX)-ThetaWLitR))/POROS0(NY,NX))+1))
@@ -927,7 +927,7 @@ contains
 !     VLWatMicP1*,VLiceMicP1=litter water,ice volume
 !     VLHeatCapacity*=litter volumetric heat capacity
 !     TK1*=litter temperature
-!     ORGC=litter organic C
+!     ORGC_vr=litter organic C
 !     HFLWRL=total litter conductive, convective heat flux
 !     LitrIceHeatFlxFrezPt,TFLX=unltd,ltd latent heat from freeze-thaw
 !     LitrIceHeatFlxFrez,LitrIceFlxThaw=litter water,latent heat flux from freeze-thaw
@@ -935,7 +935,7 @@ contains
   TFREEZ=-9.0959E+04_r8/(PSISM1(0,NY,NX)-LtHeatIceMelt)
   VLWatMicP1X=AZMAX1(VLWatMicP1(0,NY,NX)+WatFLow2LitR(NY,NX))
   ENGYR=VLHeatCapacity(0,NY,NX)*TKSoi1(0,NY,NX)
-  VLHeatCapacityX=cpo*ORGC(0,NY,NX)+cpw*VLWatMicP1X+cpi*VLiceMicP1(0,NY,NX)
+  VLHeatCapacityX=cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP1X+cpi*VLiceMicP1(0,NY,NX)
 
   IF(VLHeatCapacityX.GT.ZEROS(NY,NX))THEN
     TK1X=(ENGYR+HeatFLoByWat2LitRi(NY,NX))/VLHeatCapacityX
@@ -1188,7 +1188,7 @@ contains
   integer :: L  
   real(r8) :: scalar,THETWT,HFLQR1,FLQRS
   real(r8) :: FLQRH,VOLAT0,ENGYD
-  real(r8) :: ENGYB,RAS,TFND1,THETWA
+  real(r8) :: ENGYB,RAS,TScal4Aquadifsvity,THETWA
   real(r8) :: HV
 
 ! begin_execution
@@ -1249,7 +1249,7 @@ contains
 ! WATER GAS EXCHANGE COEFFICIENTS IN SURFACE LITTER
 !
 ! VOLA1,VLiceMicP1,VLWatMicP1,VsoiPM=total,ice-,water-,air-filled porosity
-! TFND1=temperature effect on gas diffusivity
+! TScal4Aquadifsvity=temperature effect on gas diffusivity
 ! DiffusivitySolutEff=rate constant for air-water gas exchange
 ! Z1R,Z2RW,Z2RD,Z3RX=parameters for litter air-water gas transfers
 ! XNPD=time step for gas transfer calculations, it is tunable parameter
@@ -1260,8 +1260,8 @@ contains
   IF(VOLAT0.GT.ZEROS2(NY,NX).AND.VLsoiAirPM(M,0,NY,NX).GT.ZEROS2(NY,NX))THEN
     !litter layer is not saturated
     THETWA=AZMAX1(AMIN1(1.0_r8,VLWatMicP1(0,NY,NX)/VOLAT0))
-    TFND1=TEFAQUDIF(TKSoi1(0,NY,NX))
-    scalar=TFND1*XNPD
+    TScal4Aquadifsvity=TEFAQUDIF(TKSoi1(0,NY,NX))
+    scalar=TScal4Aquadifsvity*XNPD
     DiffusivitySolutEff(M,0,NY,NX)=fDiffusivitySolutEff(scalar,THETWA,0.0_r8,is_litter=.true.)
   ELSE
     !litter layer saturated
@@ -1270,7 +1270,7 @@ contains
 ! VWatLitRHoldCapcity=surface litter water holding capacity, [m3 d-2]
   IF(VWatLitRHoldCapcity(NY,NX).GT.ZEROS(NY,NX))THEN
     !litter is able to hold water
-    THETWT=AMIN1(1.0_r8,VLWatMicP(0,NY,NX)/VWatLitRHoldCapcity(NY,NX))
+    THETWT=AMIN1(1.0_r8,VLWatMicP_vr(0,NY,NX)/VWatLitRHoldCapcity(NY,NX))
   ELSE
     THETWT=1.0
   ENDIF
@@ -1474,30 +1474,30 @@ contains
 !     PRECIP ON SNOW ARRAYS EXPORTED TO TranspNoSalt.F, TranspSalt.F
 !     FOR SOLUTE FLUX CALCULATIONS
 !
-!     SnoFalPrec,RainFalPrec,PrecAtm,PRECI=snow,rain,snow+rain,irrigation
+!     SnoFalPrec,RainFalPrec,PrecAtm_col,PRECI=snow,rain,snow+rain,irrigation
 !     VHCPW,VLHeatCapSnowMin_col=current, minimum snowpack heat capacities
-!     Rain2LitRSurf,Irrig2LitRSurf=water flux to surface litter from rain,irrigation
+!     Rain2LitRSurf_col,Irrig2LitRSurf=water flux to surface litter from rain,irrigation
 !     FLQGQ,FLQGI=water flux to snowpack from rain,irrigation
 !
   IF(SnoFalPrec(NY,NX).GT.0.0_r8.OR.(RainFalPrec(NY,NX).GT.0.0_r8 &
     .AND.VLHeatCapSnow(1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX)))THEN
     !there is precipitation, there is significant snow layer
-    Rain2LitRSurf(NY,NX)=0.0_r8
+    Rain2LitRSurf_col(NY,NX)=0.0_r8
     Irrig2LitRSurf(NY,NX)=0.0_r8
-    Rain2SoilSurf(NY,NX)=PrecAtm(NY,NX)
+    Rain2SoilSurf_col(NY,NX)=PrecAtm_col(NY,NX)
     Irrig2SoilSurf(NY,NX)=IrrigSurface(NY,NX)
-  ELSEIF((PrecAtm(NY,NX).GT.0.0.OR.IrrigSurface(NY,NX).GT.0.0_r8) &
+  ELSEIF((PrecAtm_col(NY,NX).GT.0.0.OR.IrrigSurface(NY,NX).GT.0.0_r8) &
     .AND.VLHeatCapSnow(1,NY,NX).LE.VLHeatCapSnowMin_col(NY,NX))THEN
     !there is insignificant snow layer
-    Rain2LitRSurf(NY,NX)=PrecThrufall2LitR*PrecAtm(NY,NX)/(PrecAtm(NY,NX)+IrrigSurface(NY,NX))
-    Irrig2LitRSurf(NY,NX)=PrecThrufall2LitR*IrrigSurface(NY,NX)/(PrecAtm(NY,NX)+IrrigSurface(NY,NX))
-    Rain2SoilSurf(NY,NX)=PrecAtm(NY,NX)-Rain2LitRSurf(NY,NX)
+    Rain2LitRSurf_col(NY,NX)=PrecThrufall2LitR*PrecAtm_col(NY,NX)/(PrecAtm_col(NY,NX)+IrrigSurface(NY,NX))
+    Irrig2LitRSurf(NY,NX)=PrecThrufall2LitR*IrrigSurface(NY,NX)/(PrecAtm_col(NY,NX)+IrrigSurface(NY,NX))
+    Rain2SoilSurf_col(NY,NX)=PrecAtm_col(NY,NX)-Rain2LitRSurf_col(NY,NX)
     Irrig2SoilSurf(NY,NX)=IrrigSurface(NY,NX)-Irrig2LitRSurf(NY,NX)
   ELSE
     !no precipitation
-    Rain2LitRSurf(NY,NX)=0.0_r8
+    Rain2LitRSurf_col(NY,NX)=0.0_r8
     Irrig2LitRSurf(NY,NX)=0.0_r8
-    Rain2SoilSurf(NY,NX)=0.0_r8
+    Rain2SoilSurf_col(NY,NX)=0.0_r8
     Irrig2SoilSurf(NY,NX)=0.0_r8
   ENDIF
 !

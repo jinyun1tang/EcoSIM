@@ -241,16 +241,16 @@
 !     ITILL=soil disturbance type, 1-20:tillage,21=litter removal,22=fire,23-24=drainage
 !     CORP=soil mixing fraction used in redist.f
 !
-      IF(ITILL(I,NY,NX).LE.10)THEN
+      IF(iSoilDisturbType_col(I,NY,NX).LE.10)THEN
       ! type-1 tillage
-        CORP=AMIN1(1.0_r8,AZMAX1(ITILL(I,NY,NX)/10.0_r8))
-      ELSEIF(ITILL(I,NY,NX).LE.20)THEN
+        CORP=AMIN1(1.0_r8,AZMAX1(iSoilDisturbType_col(I,NY,NX)/10.0_r8))
+      ELSEIF(iSoilDisturbType_col(I,NY,NX).LE.20)THEN
       ! type-2 tillage
-        CORP=AMIN1(1.0_r8,AZMAX1((ITILL(I,NY,NX)-10.0_r8)/10.0_r8))
+        CORP=AMIN1(1.0_r8,AZMAX1((iSoilDisturbType_col(I,NY,NX)-10.0_r8)/10.0_r8))
       ENDIF
 
       XCORP(NY,NX)=1.0_r8-CORP
-!     WRITE(*,2227)'TILL',I,ITILL(I,NY,NX),CORP,XCORP(NY,NX)
+!     WRITE(*,2227)'TILL',I,iSoilDisturbType_col(I,NY,NX),CORP,XCORP(NY,NX)
 !2227  FORMAT(A8,2I4,12E12.4)
 !
 !     AUTOMATIC IRRIGATION IF SELECTED
@@ -286,7 +286,7 @@
               FZ=AMIN1(POROS(L,NY,NX),WiltPoint(L,NY,NX)+CIRRA(NY,NX)*(FieldCapacity(L,NY,NX)-WiltPoint(L,NY,NX)))
               TFZ=TFZ+FW*FZ*VLSoilPoreMicP_vr(L,NY,NX)
               TWP=TWP+FW*WiltPoint(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
-              TVW=TVW+FW*(VLWatMicP(L,NY,NX)+VLiceMicP(L,NY,NX))
+              TVW=TVW+FW*(VLWatMicP_vr(L,NY,NX)+VLiceMicP(L,NY,NX))
             ENDIF
           ENDDO D165
 

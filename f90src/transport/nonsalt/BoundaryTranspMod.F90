@@ -322,11 +322,11 @@ module BoundaryTranspMod
     enddo
     !does not include NH3 and NH3B
     DO idg=idg_beg,idg_end-2
-      R3PoreSolFlx(idg,N,M6,M5,M4)=VFLW*AZMAX1(trc_solml_vr2(idg,M3,M2,M1))
+      R3PoreSolFlx_vr(idg,N,M6,M5,M4)=VFLW*AZMAX1(trc_solml_vr2(idg,M3,M2,M1))
     ENDDo
 
     DO NTN=ids_nuts_beg,ids_nuts_end
-      R3PoreSolFlx(NTN,N,M6,M5,M4)=VFLW*AZMAX1(trc_solml_vr2(NTN,M3,M2,M1))*trcs_VLN_vr(NTN,M3,M2,M1)
+      R3PoreSolFlx_vr(NTN,N,M6,M5,M4)=VFLW*AZMAX1(trc_solml_vr2(NTN,M3,M2,M1))*trcs_VLN_vr(NTN,M3,M2,M1)
     ENDDO
 !
 !     SOLUTE GAIN WITH SUBSURFACE MICROPORE WATER GAIN
@@ -335,11 +335,11 @@ module BoundaryTranspMod
     DO  K=1,jcplx
       DOM_3DMicp_Transp_flxM(idom_beg:idom_end,K,N,M6,M5,M4)=0.0_r8
     enddo
-    R3PoreSolFlx(idg_beg:idg_end-2,N,M6,M5,M4)=0.0_r8
+    R3PoreSolFlx_vr(idg_beg:idg_end-2,N,M6,M5,M4)=0.0_r8
 
 !add irrigation flux
     DO ids=ids_nuts_beg,ids_nuts_end
-      R3PoreSolFlx(ids,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4) &
+      R3PoreSolFlx_vr(ids,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4) &
         *trcn_irrig(ids,M3,M2,M1)*trcs_VLN_vr(ids,M3,M2,M1)
     ENDDO
 
@@ -369,11 +369,11 @@ module BoundaryTranspMod
     enddo
 
     DO idg=idg_beg,idg_end-2
-      R3PoreSoHFlx(idg,N,M6,M5,M4)=VFLW*AZMAX1(trc_soHml2(idg,M3,M2,M1))
+      R3PoreSoHFlx(idg,N,M6,M5,M4)=VFLW*AZMAX1(trc_soHml2_vr(idg,M3,M2,M1))
     ENDDO
 
     DO NTN=ids_nuts_beg,ids_nuts_end
-      R3PoreSoHFlx(NTN,N,M6,M5,M4)=VFLW*AZMAX1(trc_soHml2(NTN,M3,M2,M1))*trcs_VLN_vr(NTN,M3,M2,M1)
+      R3PoreSoHFlx(NTN,N,M6,M5,M4)=VFLW*AZMAX1(trc_soHml2_vr(NTN,M3,M2,M1))*trcs_VLN_vr(NTN,M3,M2,M1)
     ENDDO
 !
 !     NO SOLUTE GAIN IN SUBSURFACE MACROPORES
@@ -402,7 +402,7 @@ module BoundaryTranspMod
   enddo
 
   DO ids=ids_beg,ids_end
-    trcs_3DTransp2MicP(ids,N,M6,M5,M4)=trcs_3DTransp2MicP(ids,N,M6,M5,M4)+R3PoreSolFlx(ids,N,M6,M5,M4)
+    trcs_3DTransp2MicP_vr(ids,N,M6,M5,M4)=trcs_3DTransp2MicP_vr(ids,N,M6,M5,M4)+R3PoreSolFlx_vr(ids,N,M6,M5,M4)
     trcs_3DTransp2MacP(ids,N,M6,M5,M4)=trcs_3DTransp2MacP(ids,N,M6,M5,M4)+R3PoreSoHFlx(ids,N,M6,M5,M4)
   ENDDO
 
@@ -623,21 +623,21 @@ module BoundaryTranspMod
     ! exclude NH3 and NH3B
         DO idg=idg_beg,idg_NH3
           trcg_TBLS(idg,LS,N2,N1)=trcg_TBLS(idg,LS,N2,N1) &
-            +trcg_RBLS(idg,LS,N2,N1)-R3PoreSolFlx(idg,3,0,N2,N1) &
-            -R3PoreSolFlx(idg,3,NUM(N2,N1),N2,N1)
+            +trcg_RBLS(idg,LS,N2,N1)-R3PoreSolFlx_vr(idg,3,0,N2,N1) &
+            -R3PoreSolFlx_vr(idg,3,NUM(N2,N1),N2,N1)
   !    3-R3PoreSoHFlx(idg,3,NUM(N2,N1),N2,N1)
         ENDDO
 
         trcg_TBLS(idg_NH3,LS,N2,N1)=trcg_TBLS(idg_NH3,LS,N2,N1) &
-          -R3PoreSolFlx(idg_NH3B,3,NUM(N2,N1),N2,N1)
+          -R3PoreSolFlx_vr(idg_NH3B,3,NUM(N2,N1),N2,N1)
 !    3-R3PoreSoHFlx(idg_NH3B,3,NUM(N2,N1),N2,N1)
 
 ! check trnsfr.f, loop 1205
         DO NTN=0,ids_nuts
           trcn_TBLS(ids_NH4+NTN,LS,N2,N1)=trcn_TBLS(ids_NH4+NTN,LS,N2,N1) &
-            +trcn_RBLS(ids_NH4+NTN,LS,N2,N1)-R3PoreSolFlx(ids_NH4+NTN,3,0,N2,N1) &
-            -R3PoreSolFlx(ids_NH4+NTN,3,NUM(N2,N1),N2,N1) &
-            -R3PoreSolFlx(ids_NH4B+NTN,3,NUM(N2,N1),N2,N1)
+            +trcn_RBLS(ids_NH4+NTN,LS,N2,N1)-R3PoreSolFlx_vr(ids_NH4+NTN,3,0,N2,N1) &
+            -R3PoreSolFlx_vr(ids_NH4+NTN,3,NUM(N2,N1),N2,N1) &
+            -R3PoreSolFlx_vr(ids_NH4B+NTN,3,NUM(N2,N1),N2,N1)
 !    -R3PoreSoHFlx(ids_NH4+NTN,3,NUM(N2,N1),N2,N1) &
 !    -R3PoreSoHFlx(ids_NH4B+NTN,3,NUM(N2,N1),N2,N1)
         ENDDO
@@ -673,7 +673,7 @@ module BoundaryTranspMod
       enddo
       DO ids=ids_beg,ids_end
         R3PorTSolFlx(ids,N3,N2,N1)=R3PorTSolFlx(ids,N3,N2,N1) &
-          +R3PoreSolFlx(ids,N,N3,N2,N1)-R3PoreSolFlx(ids,N,N6,N5,N4)
+          +R3PoreSolFlx_vr(ids,N,N3,N2,N1)-R3PoreSolFlx_vr(ids,N,N6,N5,N4)
         R3PorTSoHFlx(ids,N3,N2,N1)=R3PorTSoHFlx(ids,N3,N2,N1) &
           +R3PoreSoHFlx(ids,N,N3,N2,N1)-R3PoreSoHFlx(ids,N,N6,N5,N4)
       ENDDO

@@ -1,6 +1,6 @@
 module MicrobialDataType
   use data_kind_mod, only : r8 => DAT_KIND_R8
-  use EcoSIMConfig, only : jcplx => jcplxc,nlbiomcp=>NumLiveMicrbCompts,NumMicbFunGroups=> NumMicbFunGroups
+  use EcoSIMConfig, only : jcplx => jcplxc,nlbiomcp=>NumLiveMicrbCompts,NumMicbFunGrupsPerCmplx=> NumMicbFunGrupsPerCmplx
   use GridConsts
   use ElmIDMod, only : NumPlantChemElms
 implicit none
@@ -9,52 +9,48 @@ implicit none
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
 
-  real(r8),target,allocatable :: OMEhetr(:,:,:,:,:,:)    !microbial biomass element	[g d-2]
-  real(r8),target,allocatable :: ROXYS(:,:,:,:,:)    !aqueous O2 demand	[g d-2 h-1]
-  real(r8),target,allocatable :: ROQCS(:,:,:,:,:)    !net microbial DOC flux	[g d-2 h-1]
-  real(r8),target,allocatable :: ROQAS(:,:,:,:,:)    !net microbial acetate flux	[g d-2 h-1]
-  real(r8),target,allocatable :: RINHO(:,:,:,:,:)    !microbial NH4 demand in soil	[g d-2 h-1]
-  real(r8),target,allocatable :: RINOO(:,:,:,:,:)    !microbial NO3 demand in soil	[g d-2 h-1]
-  real(r8),target,allocatable :: RIPOO(:,:,:,:,:)    !microbial PO4 demand in soil	[g d-2 h-1]
-  real(r8),target,allocatable :: RINHOR(:,:,:,:)     !microbial NH4 demand in surface litter	[g d-2 h-1]
-  real(r8),target,allocatable :: RIPOOR(:,:,:,:)     !microbial PO4 demand in surface litter	[g d-2 h-1]
-  real(r8),target,allocatable :: RINOOR(:,:,:,:)     !microbial NO3 demand in surface litter	[g d-2 h-1]
-  real(r8),target,allocatable :: RVMX4(:,:,:,:,:)    !total microbial NH4 uptake non-band unconstrained by NH4	[g d-2 h-1]
-  real(r8),target,allocatable :: RVMX3(:,:,:,:,:)    !total microbial NO3 uptake non-band unconstrained by NO3	[g d-2 h-1]
-  real(r8),target,allocatable :: RVMX2(:,:,:,:,:)    !total microbial NO2 uptake non-band unconstrained by NO2	[g d-2 h-1]
-  real(r8),target,allocatable :: RVMB4(:,:,:,:,:)    !total microbial NH4 uptake non-band unconstrained by NH4	[g d-2 h-1]
-  real(r8),target,allocatable :: RVMB3(:,:,:,:,:)    !total microbial NO3 uptake band unconstrained by NO3	[g d-2 h-1]
-  real(r8),target,allocatable :: RVMB2(:,:,:,:,:)    !total microbial NO2 uptake band unconstrained by NH4	[g d-2 h-1]
-  real(r8),target,allocatable :: RVMX1(:,:,:,:,:)    !total microbial N2O uptake unconstrained by N2O	[g d-2 h-1]
-  real(r8),target,allocatable :: RINHB(:,:,:,:,:)    !microbial NH4 immobilization (+ve) - mineralization (-ve) band	[g d-2 h-1]
-  real(r8),target,allocatable :: RINOB(:,:,:,:,:)    !microbial NO3 immobilization (+ve) - mineralization (-ve) band	[g d-2 h-1]
-  real(r8),target,allocatable :: RIPBO(:,:,:,:,:)    !substrate-unlimited H2PO4 mineraln-immobiln
-  real(r8),target,allocatable :: RIPO1(:,:,:,:,:)    !substrate-unlimited HPO4 immobilization
-  real(r8),target,allocatable :: RIPB1(:,:,:,:,:)    !substrate-unlimited HPO4 mineraln-immobiln
-  real(r8),target,allocatable :: RIPO1R(:,:,:,:)     !substrate-unlimited HPO4 immobilization
+  real(r8),target,allocatable :: mBiomeHeter_vr(:,:,:,:,:,:)    !microbial biomass element	[g d-2]
+  real(r8),target,allocatable :: RO2DmndHetert(:,:,:,:,:)    !aqueous O2 demand	[g d-2 h-1]
+  real(r8),target,allocatable :: RDOCUptkHeter_vr(:,:,:,:,:)    !net microbial DOC flux	[g d-2 h-1]
+  real(r8),target,allocatable :: RAcetateUptkHeter_vr(:,:,:,:,:)    !net microbial acetate flux	[g d-2 h-1]
+  real(r8),target,allocatable :: RNH4DmndSoilHeter_vr(:,:,:,:,:)    !microbial NH4 demand in soil	[g d-2 h-1]
+  real(r8),target,allocatable :: RNO3DmndSoilHeter_vr(:,:,:,:,:)    !microbial NO3 demand in soil	[g d-2 h-1]
+  real(r8),target,allocatable :: RH2PO4DmndSoilHeter_vr(:,:,:,:,:)    !microbial PO4 demand in soil	[g d-2 h-1]
+  real(r8),target,allocatable :: RNH4DmndLitrHeter_col(:,:,:,:)     !microbial NH4 demand in surface litter	[g d-2 h-1]
+  real(r8),target,allocatable :: RH2PO4DmndLitrHeter_col(:,:,:,:)     !microbial PO4 demand in surface litter	[g d-2 h-1]
+  real(r8),target,allocatable :: RNO3DmndLitrHeter_col(:,:,:,:)     !microbial NO3 demand in surface litter	[g d-2 h-1]
+  real(r8),target,allocatable :: RNO3ReduxDmndSoilHeter_vr(:,:,:,:,:)    !total microbial NO3 uptake non-band unconstrained by NO3	[g d-2 h-1]
+  real(r8),target,allocatable :: RNO2DmndReduxSoilHeter_vr(:,:,:,:,:)    !total microbial NO2 uptake non-band unconstrained by NO2	[g d-2 h-1]
+  real(r8),target,allocatable :: RNO3ReduxDmndBandHeter_vr(:,:,:,:,:)    !total microbial NO3 uptake band unconstrained by NO3	[g d-2 h-1]
+  real(r8),target,allocatable :: RNO2DmndReduxBandHeter_vr(:,:,:,:,:)    !total microbial NO2 uptake band unconstrained by NH4	[g d-2 h-1]
+  real(r8),target,allocatable :: RN2ODmndReduxHeter_vr(:,:,:,:,:)    !total microbial N2O uptake unconstrained by N2O	[g d-2 h-1]
+  real(r8),target,allocatable :: RNH4DmndBandHeter_vr(:,:,:,:,:)    !microbial NH4 immobilization (+ve) - mineralization (-ve) band	[g d-2 h-1]
+  real(r8),target,allocatable :: RNO3DmndBandHeter_vr(:,:,:,:,:)    !microbial NO3 immobilization (+ve) - mineralization (-ve) band	[g d-2 h-1]
+  real(r8),target,allocatable :: RH2PO4DmndBandHeter_vr(:,:,:,:,:)    !substrate-unlimited H2PO4 mineraln-immobiln
+  real(r8),target,allocatable :: RH1PO4DmndSoilHeter_vr(:,:,:,:,:)    !substrate-unlimited HPO4 immobilization
+  real(r8),target,allocatable :: RH1PO4DmndBandHeter_vr(:,:,:,:,:)    !substrate-unlimited HPO4 mineraln-immobiln
+  real(r8),target,allocatable :: RH1PO4DmndLitrHeter_col(:,:,:,:)     !substrate-unlimited HPO4 immobilization
   real(r8),target,allocatable :: OMEERhetr(:,:,:,:,:,:,:)  !microbial C  erosion 	[g d-2 h-1]
 
-  real(r8),target,allocatable :: OMEauto(:,:,:,:,:)
-  real(r8),target,allocatable :: ROXYSff(:,:,:,:)
-  real(r8),target,allocatable :: RINHOff(:,:,:,:)
-  real(r8),target,allocatable :: RINOOff(:,:,:,:)
-  real(r8),target,allocatable :: RIPOOff(:,:,:,:)
-  real(r8),target,allocatable :: RINHORff(:,:,:)
-  real(r8),target,allocatable :: RIPOORff(:,:,:)
-  real(r8),target,allocatable :: RINOORff(:,:,:)
-  real(r8),target,allocatable :: RVMX4ff(:,:,:,:)
-  real(r8),target,allocatable :: RVMX3ff(:,:,:,:)
-  real(r8),target,allocatable :: RVMX2ff(:,:,:,:)
-  real(r8),target,allocatable :: RVMB4ff(:,:,:,:)
-  real(r8),target,allocatable :: RVMB3ff(:,:,:,:)
-  real(r8),target,allocatable :: RVMB2ff(:,:,:,:)
-  real(r8),target,allocatable :: RVMX1ff(:,:,:,:)
-  real(r8),target,allocatable :: RINHBff(:,:,:,:)
-  real(r8),target,allocatable :: RINOBff(:,:,:,:)
-  real(r8),target,allocatable :: RIPBOff(:,:,:,:)
-  real(r8),target,allocatable :: RIPO1ff(:,:,:,:)
-  real(r8),target,allocatable :: RIPB1ff(:,:,:,:)
-  real(r8),target,allocatable :: RIPO1Rff(:,:,:)
+  real(r8),target,allocatable :: mBiomeAutor_vr(:,:,:,:,:)
+  real(r8),target,allocatable :: RO2DmndAutort(:,:,:,:)
+  real(r8),target,allocatable :: RNH4UptkSoilAutor_vr(:,:,:,:)
+  real(r8),target,allocatable :: RNO3UptkSoilAutor_vr(:,:,:,:)
+  real(r8),target,allocatable :: RH2PO4UptkSoilAutor_vr(:,:,:,:)
+  real(r8),target,allocatable :: RNH4UptkLitrAutor_col(:,:,:)
+  real(r8),target,allocatable :: RH2PO4UptkLitrAutor_col(:,:,:)
+  real(r8),target,allocatable :: RNO3UptkLitrAutor_col(:,:,:)
+  real(r8),target,allocatable :: RNH3OxidAutor(:,:,:,:)
+  real(r8),target,allocatable :: RNO2OxidAutor(:,:,:,:)
+  real(r8),target,allocatable :: RNH3OxidAutorBand(:,:,:,:)
+  real(r8),target,allocatable :: RNO2OxidAutorBand(:,:,:,:)
+  real(r8),target,allocatable :: RN2ODmndReduxAutor_vr(:,:,:,:)
+  real(r8),target,allocatable :: RNH4UptkBandAutor_vr(:,:,:,:)
+  real(r8),target,allocatable :: RNO3UptkBandAutor_vr(:,:,:,:)
+  real(r8),target,allocatable :: RH2PO4UptkBandAutor_vr(:,:,:,:)
+  real(r8),target,allocatable :: RH1PO4UptkSoilAutor_vr(:,:,:,:)
+  real(r8),target,allocatable :: RH1PO4UptkBandAutor_vr(:,:,:,:)
+  real(r8),target,allocatable :: RH1PO4UptkLitrAutor_col(:,:,:)
   real(r8),target,allocatable :: OMEERauto(:,:,:,:,:,:)
 
   private :: InitAllocate
@@ -72,52 +68,48 @@ implicit none
   subroutine InitAllocate
 
   implicit none
-  allocate(OMEhetr(NumPlantChemElms,NumLiveHeterBioms,1:jcplx,0:JZ,JY,JX))
-  allocate(ROXYS(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(ROQCS(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(ROQAS(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(RINHO(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(RINOO(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(RIPOO(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(RINHOR(NumMicrbHetetrophCmplx,1:jcplx,JY,JX))
-  allocate(RIPOOR(NumMicrbHetetrophCmplx,1:jcplx,JY,JX))
-  allocate(RINOOR(NumMicrbHetetrophCmplx,1:jcplx,JY,JX))
-  allocate(RVMX4(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(RVMX3(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(RVMX2(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(RVMB4(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(RVMB3(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(RVMB2(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(RVMX1(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(RINHB(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(RINOB(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(RIPBO(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(RIPO1(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(RIPB1(NumMicrbHetetrophCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(RIPO1R(NumMicrbHetetrophCmplx,1:jcplx,JY,JX))
+  allocate(mBiomeHeter_vr(NumPlantChemElms,NumLiveHeterBioms,1:jcplx,0:JZ,JY,JX))
+  allocate(RO2DmndHetert(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX))
+  allocate(RDOCUptkHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX))
+  allocate(RAcetateUptkHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX))
+  allocate(RNH4DmndSoilHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX))
+  allocate(RNO3DmndSoilHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX))
+  allocate(RH2PO4DmndSoilHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX))
+  allocate(RNH4DmndLitrHeter_col(NumHetetrMicCmplx,1:jcplx,JY,JX))
+  allocate(RH2PO4DmndLitrHeter_col(NumHetetrMicCmplx,1:jcplx,JY,JX))
+  allocate(RNO3DmndLitrHeter_col(NumHetetrMicCmplx,1:jcplx,JY,JX))
+  allocate(RNO3ReduxDmndSoilHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX))
+  allocate(RNO2DmndReduxSoilHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX))
+  allocate(RNO3ReduxDmndBandHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX))
+  allocate(RNO2DmndReduxBandHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX))
+  allocate(RN2ODmndReduxHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX))
+  allocate(RNH4DmndBandHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX))
+  allocate(RNO3DmndBandHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX))
+  allocate(RH2PO4DmndBandHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX))
+  allocate(RH1PO4DmndSoilHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX))
+  allocate(RH1PO4DmndBandHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX))
+  allocate(RH1PO4DmndLitrHeter_col(NumHetetrMicCmplx,1:jcplx,JY,JX))
   allocate(OMEERhetr(NumPlantChemElms,NumLiveHeterBioms,1:jcplx,2,2,JV,JH))
 
-  allocate(OMEauto(NumPlantChemElms,NumLiveAutoBioms,0:JZ,JY,JX))
-  allocate(ROXYSff(NumMicrobAutotrophCmplx,0:JZ,JY,JX))
-  allocate(RINHOff(NumMicrobAutotrophCmplx,0:JZ,JY,JX))
-  allocate(RINOOff(NumMicrobAutotrophCmplx,0:JZ,JY,JX))
-  allocate(RIPOOff(NumMicrobAutotrophCmplx,0:JZ,JY,JX))
-  allocate(RINHORff(NumMicrobAutotrophCmplx,JY,JX))
-  allocate(RIPOORff(NumMicrobAutotrophCmplx,JY,JX))
-  allocate(RINOORff(NumMicrobAutotrophCmplx,JY,JX))
-  allocate(RVMX4ff(NumMicrobAutotrophCmplx,0:JZ,JY,JX))
-  allocate(RVMX3ff(NumMicrobAutotrophCmplx,0:JZ,JY,JX))
-  allocate(RVMX2ff(NumMicrobAutotrophCmplx,0:JZ,JY,JX))
-  allocate(RVMB4ff(NumMicrobAutotrophCmplx,0:JZ,JY,JX))
-  allocate(RVMB3ff(NumMicrobAutotrophCmplx,0:JZ,JY,JX))
-  allocate(RVMB2ff(NumMicrobAutotrophCmplx,0:JZ,JY,JX))
-  allocate(RVMX1ff(NumMicrobAutotrophCmplx,0:JZ,JY,JX))
-  allocate(RINHBff(NumMicrobAutotrophCmplx,0:JZ,JY,JX))
-  allocate(RINOBff(NumMicrobAutotrophCmplx,0:JZ,JY,JX))
-  allocate(RIPBOff(NumMicrobAutotrophCmplx,0:JZ,JY,JX))
-  allocate(RIPO1ff(NumMicrobAutotrophCmplx,0:JZ,JY,JX))
-  allocate(RIPB1ff(NumMicrobAutotrophCmplx,0:JZ,JY,JX))
-  allocate(RIPO1Rff(NumMicrobAutotrophCmplx,JY,JX))
+  allocate(mBiomeAutor_vr(NumPlantChemElms,NumLiveAutoBioms,0:JZ,JY,JX))
+  allocate(RO2DmndAutort(NumMicrobAutrophCmplx,0:JZ,JY,JX))
+  allocate(RNH4UptkSoilAutor_vr(NumMicrobAutrophCmplx,0:JZ,JY,JX))
+  allocate(RNO3UptkSoilAutor_vr(NumMicrobAutrophCmplx,0:JZ,JY,JX))
+  allocate(RH2PO4UptkSoilAutor_vr(NumMicrobAutrophCmplx,0:JZ,JY,JX))
+  allocate(RNH4UptkLitrAutor_col(NumMicrobAutrophCmplx,JY,JX))
+  allocate(RH2PO4UptkLitrAutor_col(NumMicrobAutrophCmplx,JY,JX))
+  allocate(RNO3UptkLitrAutor_col(NumMicrobAutrophCmplx,JY,JX))
+  allocate(RNH3OxidAutor(NumMicrobAutrophCmplx,0:JZ,JY,JX))
+  allocate(RNO2OxidAutor(NumMicrobAutrophCmplx,0:JZ,JY,JX))
+  allocate(RNH3OxidAutorBand(NumMicrobAutrophCmplx,0:JZ,JY,JX))
+  allocate(RNO2OxidAutorBand(NumMicrobAutrophCmplx,0:JZ,JY,JX))
+  allocate(RN2ODmndReduxAutor_vr(NumMicrobAutrophCmplx,0:JZ,JY,JX))
+  allocate(RNH4UptkBandAutor_vr(NumMicrobAutrophCmplx,0:JZ,JY,JX))
+  allocate(RNO3UptkBandAutor_vr(NumMicrobAutrophCmplx,0:JZ,JY,JX))
+  allocate(RH2PO4UptkBandAutor_vr(NumMicrobAutrophCmplx,0:JZ,JY,JX))
+  allocate(RH1PO4UptkSoilAutor_vr(NumMicrobAutrophCmplx,0:JZ,JY,JX))
+  allocate(RH1PO4UptkBandAutor_vr(NumMicrobAutrophCmplx,0:JZ,JY,JX))
+  allocate(RH1PO4UptkLitrAutor_col(NumMicrobAutrophCmplx,JY,JX))
   allocate(OMEERauto(NumPlantChemElms,NumLiveAutoBioms,2,2,JV,JH))
   end subroutine InitAllocate
 !----------------------------------------------------------------------------------------------
@@ -125,52 +117,48 @@ implicit none
   subroutine DestructMicrobialData
   implicit none
 
-  if(allocated(OMEhetr))deallocate(OMEhetr)
-  if(allocated(ROXYS))deallocate(ROXYS)
-  if(allocated(ROQCS))deallocate(ROQCS)
-  if(allocated(ROQAS))deallocate(ROQAS)
-  if(allocated(RINHO))deallocate(RINHO)
-  if(allocated(RINOO))deallocate(RINOO)
-  if(allocated(RIPOO))deallocate(RIPOO)
-  if(allocated(RINHOR))deallocate(RINHOR)
-  if(allocated(RIPOOR))deallocate(RIPOOR)
-  if(allocated(RINOOR))deallocate(RINOOR)
-  if(allocated(RVMX4))deallocate(RVMX4)
-  if(allocated(RVMX3))deallocate(RVMX3)
-  if(allocated(RVMX2))deallocate(RVMX2)
-  if(allocated(RVMB4))deallocate(RVMB4)
-  if(allocated(RVMB3))deallocate(RVMB3)
-  if(allocated(RVMB2))deallocate(RVMB2)
-  if(allocated(RVMX1))deallocate(RVMX1)
-  if(allocated(RINHB))deallocate(RINHB)
-  if(allocated(RINOB))deallocate(RINOB)
-  if(allocated(RIPBO))deallocate(RIPBO)
-  if(allocated(RIPO1))deallocate(RIPO1)
-  if(allocated(RIPB1))deallocate(RIPB1)
-  if(allocated(RIPO1R))deallocate(RIPO1R)
+  if(allocated(mBiomeHeter_vr))deallocate(mBiomeHeter_vr)
+  if(allocated(RO2DmndHetert))deallocate(RO2DmndHetert)
+  if(allocated(RDOCUptkHeter_vr))deallocate(RDOCUptkHeter_vr)
+  if(allocated(RAcetateUptkHeter_vr))deallocate(RAcetateUptkHeter_vr)
+  if(allocated(RNH4DmndSoilHeter_vr))deallocate(RNH4DmndSoilHeter_vr)
+  if(allocated(RNO3DmndSoilHeter_vr))deallocate(RNO3DmndSoilHeter_vr)
+  if(allocated(RH2PO4DmndSoilHeter_vr))deallocate(RH2PO4DmndSoilHeter_vr)
+  if(allocated(RNH4DmndLitrHeter_col))deallocate(RNH4DmndLitrHeter_col)
+  if(allocated(RH2PO4DmndLitrHeter_col))deallocate(RH2PO4DmndLitrHeter_col)
+  if(allocated(RNO3DmndLitrHeter_col))deallocate(RNO3DmndLitrHeter_col)
+  if(allocated(RNO3ReduxDmndSoilHeter_vr))deallocate(RNO3ReduxDmndSoilHeter_vr)
+  if(allocated(RNO2DmndReduxSoilHeter_vr))deallocate(RNO2DmndReduxSoilHeter_vr)
+  if(allocated(RNO3ReduxDmndBandHeter_vr))deallocate(RNO3ReduxDmndBandHeter_vr)
+  if(allocated(RNO2DmndReduxBandHeter_vr))deallocate(RNO2DmndReduxBandHeter_vr)
+  if(allocated(RN2ODmndReduxHeter_vr))deallocate(RN2ODmndReduxHeter_vr)
+  if(allocated(RNH4DmndBandHeter_vr))deallocate(RNH4DmndBandHeter_vr)
+  if(allocated(RNO3DmndBandHeter_vr))deallocate(RNO3DmndBandHeter_vr)
+  if(allocated(RH2PO4DmndBandHeter_vr))deallocate(RH2PO4DmndBandHeter_vr)
+  if(allocated(RH1PO4DmndSoilHeter_vr))deallocate(RH1PO4DmndSoilHeter_vr)
+  if(allocated(RH1PO4DmndBandHeter_vr))deallocate(RH1PO4DmndBandHeter_vr)
+  if(allocated(RH1PO4DmndLitrHeter_col))deallocate(RH1PO4DmndLitrHeter_col)
   if(allocated(OMEERhetr))deallocate(OMEERhetr)
 
-  if(allocated(OMEauto))deallocate(OMEauto)
-  if(allocated(ROXYSff))deallocate(ROXYSff)
-  if(allocated(RINHOff))deallocate(RINHOff)
-  if(allocated(RINOOff))deallocate(RINOOff)
-  if(allocated(RIPOOff))deallocate(RIPOOff)
-  if(allocated(RINHORff))deallocate(RINHORff)
-  if(allocated(RIPOORff))deallocate(RIPOORff)
-  if(allocated(RINOORff))deallocate(RINOORff)
-  if(allocated(RVMX4ff))deallocate(RVMX4ff)
-  if(allocated(RVMX3ff))deallocate(RVMX3ff)
-  if(allocated(RVMX2ff))deallocate(RVMX2ff)
-  if(allocated(RVMB4ff))deallocate(RVMB4ff)
-  if(allocated(RVMB3ff))deallocate(RVMB3ff)
-  if(allocated(RVMB2ff))deallocate(RVMB2ff)
-  if(allocated(RVMX1ff))deallocate(RVMX1ff)
-  if(allocated(RINHBff))deallocate(RINHBff)
-  if(allocated(RINOBff))deallocate(RINOBff)
-  if(allocated(RIPBOff))deallocate(RIPBOff)
-  if(allocated(RIPO1ff))deallocate(RIPO1ff)
-  if(allocated(RIPB1ff))deallocate(RIPB1ff)
-  if(allocated(RIPO1Rff))deallocate(RIPO1Rff)
+  if(allocated(mBiomeAutor_vr))deallocate(mBiomeAutor_vr)
+  if(allocated(RO2DmndAutort))deallocate(RO2DmndAutort)
+  if(allocated(RNH4UptkSoilAutor_vr))deallocate(RNH4UptkSoilAutor_vr)
+  if(allocated(RNO3UptkSoilAutor_vr))deallocate(RNO3UptkSoilAutor_vr)
+  if(allocated(RH2PO4UptkSoilAutor_vr))deallocate(RH2PO4UptkSoilAutor_vr)
+  if(allocated(RNH4UptkLitrAutor_col))deallocate(RNH4UptkLitrAutor_col)
+  if(allocated(RH2PO4UptkLitrAutor_col))deallocate(RH2PO4UptkLitrAutor_col)
+  if(allocated(RNO3UptkLitrAutor_col))deallocate(RNO3UptkLitrAutor_col)
+  if(allocated(RNH3OxidAutor))deallocate(RNH3OxidAutor)
+  if(allocated(RNO2OxidAutor))deallocate(RNO2OxidAutor)
+  if(allocated(RNH3OxidAutorBand))deallocate(RNH3OxidAutorBand)
+  if(allocated(RNO2OxidAutorBand))deallocate(RNO2OxidAutorBand)
+  if(allocated(RN2ODmndReduxAutor_vr))deallocate(RN2ODmndReduxAutor_vr)
+  if(allocated(RNH4UptkBandAutor_vr))deallocate(RNH4UptkBandAutor_vr)
+  if(allocated(RNO3UptkBandAutor_vr))deallocate(RNO3UptkBandAutor_vr)
+  if(allocated(RH2PO4UptkBandAutor_vr))deallocate(RH2PO4UptkBandAutor_vr)
+  if(allocated(RH1PO4UptkSoilAutor_vr))deallocate(RH1PO4UptkSoilAutor_vr)
+  if(allocated(RH1PO4UptkBandAutor_vr))deallocate(RH1PO4UptkBandAutor_vr)
+  if(allocated(RH1PO4UptkLitrAutor_col))deallocate(RH1PO4UptkLitrAutor_col)
   if(allocated(OMEERauto))deallocate(OMEERauto)
   end subroutine DestructMicrobialData
 

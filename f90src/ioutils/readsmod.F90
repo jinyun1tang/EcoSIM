@@ -4,7 +4,7 @@ module readsmod
   use abortutils , only : endrun
   use fileUtil   , only : open_safe
   use minimathmod, only : isLeap,AZMAX1
-  use EcoSIMCtrlMod, only : lverb
+  use EcoSIMCtrlMod, only : lverb, salt_model  
   use GridConsts
   use FlagDataType
   use FertilizerDataType
@@ -197,16 +197,24 @@ module readsmod
       NH4_rain_conc(NY,NX)=CN4RIG
       NO3_rain_conc(NY,NX)=CNORIG
       H2PO4_rain_conc(NY,NX)=CPORG
-      trcsalt_rain_conc(idsalt_Al,NY,NX)=CALRG
-      trcsalt_rain_conc(idsalt_Fe,NY,NX)=CFERG
-      trcsalt_rain_conc(idsalt_Ca,NY,NX)=CCARG
-      trcsalt_rain_conc(idsalt_Mg,NY,NX)=CMGRG
-      trcsalt_rain_conc(idsalt_Na,NY,NX)=CNARG
-      trcsalt_rain_conc(idsalt_K,NY,NX)=CKARG
-      trcsalt_rain_conc(idsalt_SO4,NY,NX)=CSORG
-      trcsalt_rain_conc(idsalt_Cl,NY,NX)=CCLRG
+
     ENDDO D8975
   ENDDO D8970
+
+  if(salt_model)then
+    DO NX=NHW,NHE
+      DO NY=NVN,NVS
+        trcsalt_rain_conc(idsalt_Al,NY,NX)=CALRG
+        trcsalt_rain_conc(idsalt_Fe,NY,NX)=CFERG
+        trcsalt_rain_conc(idsalt_Ca,NY,NX)=CCARG
+        trcsalt_rain_conc(idsalt_Mg,NY,NX)=CMGRG
+        trcsalt_rain_conc(idsalt_Na,NY,NX)=CNARG
+        trcsalt_rain_conc(idsalt_K,NY,NX)=CKARG
+        trcsalt_rain_conc(idsalt_SO4,NY,NX)=CSORG
+        trcsalt_rain_conc(idsalt_Cl,NY,NX)=CCLRG  
+      ENDDO
+    ENDDO    
+  endif
 !
 ! DERIVE END DATES FROM TIME VARIABLES
 !
@@ -234,7 +242,7 @@ module readsmod
       ROWO(NY,NX)=0.0_r8
       ROWP(NY,NX)=0.0_r8
       D325: DO I=1,366
-        ITILL(I,NY,NX)=0
+        iSoilDisturbType_col(I,NY,NX)=0
         DCORP(I,NY,NX)=0.0_r8
       ENDDO D325
       D40: DO I=1,366
@@ -254,19 +262,29 @@ module readsmod
         NH4_irrig_conc(I,NY,NX)=0.0_r8
         NO3_irrig_conc(I,NY,NX)=0.0_r8
         H2PO4_irrig_conc(I,NY,NX)=0.0_r8
-        trcsalt_irrig_conc(idsalt_Al,I,NY,NX)=0.0_r8
-        trcsalt_irrig_conc(idsalt_Fe,I,NY,NX)=0.0_r8
-        trcsalt_irrig_conc(idsalt_Ca,I,NY,NX)=0.0_r8
-        trcsalt_irrig_conc(idsalt_Mg,I,NY,NX)=0.0_r8
-        trcsalt_irrig_conc(idsalt_Na,I,NY,NX)=0.0_r8
-        trcsalt_irrig_conc(idsalt_K,I,NY,NX)=0.0_r8
-        trcsalt_irrig_conc(idsalt_SO4,I,NY,NX)=0.0_r8
-        trcsalt_irrig_conc(idsalt_Cl,I,NY,NX)=0.0_r8
+
+
         WDPTH(I,NY,NX)=0.0_r8
         ROWI(I,NY,NX)=0.0_r8
       ENDDO D125
     ENDDO D9985
   ENDDO D9980
+  if(salt_model)then
+    DO NX=NHW,NHE
+      DO NY=NVN,NVS
+        DO I=1,366
+          trcsalt_irrig_conc(idsalt_Al,I,NY,NX)=0.0_r8
+          trcsalt_irrig_conc(idsalt_Fe,I,NY,NX)=0.0_r8
+          trcsalt_irrig_conc(idsalt_Ca,I,NY,NX)=0.0_r8
+          trcsalt_irrig_conc(idsalt_Mg,I,NY,NX)=0.0_r8
+          trcsalt_irrig_conc(idsalt_Na,I,NY,NX)=0.0_r8
+          trcsalt_irrig_conc(idsalt_K,I,NY,NX)=0.0_r8
+          trcsalt_irrig_conc(idsalt_SO4,I,NY,NX)=0.0_r8
+          trcsalt_irrig_conc(idsalt_Cl,I,NY,NX)=0.0_r8  
+        ENDDO
+      ENDDO  
+    ENDDO   
+  endif 
 !
 ! READ LAND MANAGEMENT FILE DATAC(9 LOADED IN 'MAIN'.
 ! THIS FILE CONTAINS NAMES OF TILLAGE, IRRIGATION

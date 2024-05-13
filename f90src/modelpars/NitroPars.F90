@@ -61,7 +61,7 @@ module NitroPars
 !     ECNH=efficiency CO2 conversion to biomass by ammonia oxidizers
 !     ECNO=efficiency CO2 conversion to biomass by nitrite oxidizers
 !     ECHO=efficiency CO2 conversion to biomass by methane oxidizers
-!     ECN3,ECN2,ECN1=N2:O2 ratios for e- transfers to NO3, NO2 and N2O
+!     eQNO3toOxy,eQNO2toOxy,eQN2OtoOxy=N2:O2 ratios for e- transfers to NO3, NO2 and N2O
 !     by denitrifiers, RNFNI=parameter for nitrification inhibition
 !     ZHKI=inhibition of nitrification inhibition by NH3 (g N m-3)
 !     VMKI=product inhibn for NOx reduction by denitrifiers(g N m-3)
@@ -152,9 +152,9 @@ module NitroPars
   real(r8) :: ECNH
   real(r8) :: ECNO
   real(r8) :: ECHO
-  real(r8) :: ECN3
-  real(r8) :: ECN2
-  real(r8) :: ECN1
+  real(r8) :: eQNO3toOxy
+  real(r8) :: eQNO2toOxy
+  real(r8) :: eQN2OtoOxy
   real(r8) :: RNFNI
   real(r8) :: ZHKI
   real(r8) :: VMKI
@@ -250,9 +250,9 @@ module NitroPars
   ECNH=0.30_r8
   ECNO=0.10_r8
   ECHO=0.75_r8
-  ECN3=0.857_r8
-  ECN2=0.857_r8
-  ECN1=0.429_r8
+  eQNO3toOxy=0.857_r8
+  eQNO2toOxy=0.857_r8
+  eQN2OtoOxy=0.429_r8
   RNFNI=2.0E-04_r8
   ZHKI=7.0E+03_r8
   VMKI=0.25_r8

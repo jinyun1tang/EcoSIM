@@ -30,7 +30,7 @@ implicit none
    real(r8) ,target,allocatable ::  SAND(:,:,:)                      !soil sand content	Mg d-2
    real(r8) ,target,allocatable ::  SILT(:,:,:)                      !soil silt content	Mg d-2
    real(r8) ,target,allocatable ::  CLAY(:,:,:)                      !soil clay content	Mg d-2
-   real(r8) ,target,allocatable ::  VLMicP(:,:,:)                    !total micropore volume in layer
+   real(r8) ,target,allocatable ::  VLMicP_vr(:,:,:)                    !total micropore volume in layer
    real(r8) ,target,allocatable ::  VLMacP(:,:,:)                    !total macropore volume in layer
    real(r8) ,target,allocatable ::  VGeomLayer(:,:,:)                      !soil volume including  macropores+rock [m3 d-2]
    real(r8) ,target,allocatable ::  VGeomLayert0(:,:,:)                     !initial soil volume including  macropores+rock [m3 d-2]
@@ -75,7 +75,7 @@ contains
   allocate(SAND(JZ,JY,JX));      SAND=0._r8
   allocate(SILT(JZ,JY,JX));      SILT=0._r8
   allocate(CLAY(JZ,JY,JX));      CLAY=0._r8
-  allocate(VLMicP(0:JZ,JY,JX));    VLMicP=0._r8
+  allocate(VLMicP_vr(0:JZ,JY,JX));    VLMicP_vr=0._r8
   allocate(VLMacP(JZ,JY,JX));     VLMacP=0._r8
   allocate(VGeomLayer(0:JZ,JY,JX));    VGeomLayer=0._r8
   allocate(VGeomLayert0(0:JZ,JY,JX));   VGeomLayert0=0._r8
@@ -109,7 +109,7 @@ contains
   call destroy(SAND)
   call destroy(SILT)
   call destroy(CLAY)
-  call destroy(VLMicP)
+  call destroy(VLMicP_vr)
   call destroy(VLMacP)
   call destroy(VGeomLayer)
   call destroy(VGeomLayert0)

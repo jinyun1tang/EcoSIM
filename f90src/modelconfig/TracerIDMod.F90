@@ -31,7 +31,7 @@ implicit none
   integer :: ids_nut_beg,ids_nuts_beg,ids_nuts_end
   integer :: ids_nutb_beg,ids_nutb_end
 ! salt tracers
-  integer :: idsalt_beg,idsalt_end
+  integer :: idsalt_beg,idsalt_end,idsalt_mend
 
   integer :: idsalt_Al      ! Al
   integer :: idsalt_Fe      ! Fe
@@ -175,12 +175,12 @@ implicit none
   idg_end=idg_NH3B;
 
   ids_nuts_beg=idg_NH3;  !the first nutrient tracer, including band
-  ids_end=idg_end   !initalize the solute counter
+  ids_end=idg_end        !initalize the solute counter
   ids_NH4B=addone(ids_end);
   ids_NO3B=addone(ids_end);
   ids_NO2B=addone(ids_end);
-  ids_H1PO4B=addone(ids_end)
-  ids_H2PO4B=addone(ids_end)
+  ids_H1PO4B=addone(ids_end);
+  ids_H2PO4B=addone(ids_end);
   ids_nuts=ids_H2PO4B-ids_NH4B
 
   ids_nutb_beg=idg_NH3B;ids_nutb_end=ids_H2PO4B
@@ -200,9 +200,9 @@ implicit none
   idom_don=addone(idom_end)
   idom_dop=addone(idom_end)
   idom_acetate=addone(idom_end)
-  
+
+  idsalt_beg=1;idsalt_end=0  
   if(lsalt_model)then
-    idsalt_beg=1;idsalt_end=0
     idsalt_Al=addone(idsalt_end)
     idsalt_Fe=addone(idsalt_end)
     idsalt_Hp=addone(idsalt_end)
@@ -215,6 +215,7 @@ implicit none
     idsalt_Cl=addone(idsalt_end)
     idsalt_CO3=addone(idsalt_end)
     idsalt_HCO3=addone(idsalt_end)
+    idsalt_mend=idsalt_end
     idsalt_AlOH=addone(idsalt_end)
     idsalt_AlOH2=addone(idsalt_end)
     idsalt_AlOH3=addone(idsalt_end)

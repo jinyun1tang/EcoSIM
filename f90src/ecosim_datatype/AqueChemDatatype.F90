@@ -77,58 +77,7 @@ module AqueChemDatatype
   real(r8),target,allocatable ::  trcg_XBLS(:,:,:,:)
   real(r8),target,allocatable ::  trcn_XBLS(:,:,:,:)
   real(r8),target,allocatable ::  trcSaltFlo2SnowLay(:,:,:,:)
-  real(r8),target,allocatable ::  XCOBLS(:,:,:)                      !wet deposition of CO2, [g d-2 h-1]
-  real(r8),target,allocatable ::  XCHBLS(:,:,:)                      !wet deposition of CH4, [g d-2 h-1]
-  real(r8),target,allocatable ::  XOXBLS(:,:,:)                      !wet deposition of O2, [g d-2 h-1]
-  real(r8),target,allocatable ::  XNGBLS(:,:,:)                      !wet deposition of N2, [g d-2 h-1]
-  real(r8),target,allocatable ::  XN2BLS(:,:,:)                      !wet deposition of N2O, [g d-2 h-1]
-  real(r8),target,allocatable ::  XN4BLW(:,:,:)                      !wet deposition of NH4, [g d-2 h-1]
-  real(r8),target,allocatable ::  XN3BLW(:,:,:)                      !wet deposition of NH3, [g d-2 h-1]
-  real(r8),target,allocatable ::  XNOBLW(:,:,:)                      !wet deposition of NO3, [g d-2 h-1]
-  real(r8),target,allocatable ::  XH1PBS(:,:,:)                      !wet deposition of HPO4, [g d-2 h-1]
-  real(r8),target,allocatable ::  XH2PBS(:,:,:)                      !wet deposition of H2PO4, [g d-2 h-1]
-  real(r8),target,allocatable ::  XALBLS(:,:,:)                      !wet deposition of Al, [g d-2 h-1]
-  real(r8),target,allocatable ::  XFEBLS(:,:,:)                      !wet deposition of Fe, [g d-2 h-1]
-  real(r8),target,allocatable ::  XHYBLS(:,:,:)                      !wet deposition of H, [g d-2 h-1]
-  real(r8),target,allocatable ::  XCABLS(:,:,:)                      !wet deposition of Ca, [g d-2 h-1]
-  real(r8),target,allocatable ::  XMGBLS(:,:,:)                      !wet deposition of Mg, [g d-2 h-1]
-  real(r8),target,allocatable ::  XNABLS(:,:,:)                      !wet deposition of Na, [g d-2 h-1]
-  real(r8),target,allocatable ::  XKABLS(:,:,:)                      !wet deposition of K, [g d-2 h-1]
-  real(r8),target,allocatable ::  XOHBLS(:,:,:)                      !wet deposition of OH, [g d-2 h-1]
-  real(r8),target,allocatable ::  XSOBLS(:,:,:)                      !wet deposition of SO4, [g d-2 h-1]
-  real(r8),target,allocatable ::  XCLBLS(:,:,:)                      !wet deposition of Cl, [g d-2 h-1]
-  real(r8),target,allocatable ::  XC3BLS(:,:,:)                      !wet deposition of CO3, [g d-2 h-1]
-  real(r8),target,allocatable ::  XHCBLS(:,:,:)                      !wet deposition of HCO3, [g d-2 h-1]
-  real(r8),target,allocatable ::  XAL1BS(:,:,:)                      !wet deposition of AlOH, [g d-2 h-1]
-  real(r8),target,allocatable ::  XAL2BS(:,:,:)                      !wet deposition of AlOH2, [g d-2 h-1]
-  real(r8),target,allocatable ::  XAL3BS(:,:,:)                      !wet deposition of AlOH3, [g d-2 h-1]
-  real(r8),target,allocatable ::  XAL4BS(:,:,:)                      !wet deposition of AlOH4, [g d-2 h-1]
-  real(r8),target,allocatable ::  XALSBS(:,:,:)                      !wet deposition of AlSO4, [g d-2 h-1]
-  real(r8),target,allocatable ::  XFE1BS(:,:,:)                      !wet deposition of FeOH, [g d-2 h-1]
-  real(r8),target,allocatable ::  XFE2BS(:,:,:)                      !wet deposition of FeOH2, [g d-2 h-1]
-  real(r8),target,allocatable ::  XFE3BS(:,:,:)                      !wet deposition of FeOH3, [g d-2 h-1]
-  real(r8),target,allocatable ::  XFE4BS(:,:,:)                      !wet deposition of FeOH4, [g d-2 h-1]
-  real(r8),target,allocatable ::  XFESBS(:,:,:)                      !wet deposition of FeSO4, [g d-2 h-1]
-  real(r8),target,allocatable ::  XCAOBS(:,:,:)                      !wet deposition of CaOH, [g d-2 h-1]
-  real(r8),target,allocatable ::  XCACBS(:,:,:)                      !wet deposition of CaCO3, [g d-2 h-1]
-  real(r8),target,allocatable ::  XCAHBS(:,:,:)                      !wet deposition of CaHCO3, [g d-2 h-1]
-  real(r8),target,allocatable ::  XCASBS(:,:,:)                      !wet deposition of CaSO4, [g d-2 h-1]
-  real(r8),target,allocatable ::  XMGOBS(:,:,:)                      !wet deposition of MgOH, [g d-2 h-1]
-  real(r8),target,allocatable ::  XMGCBS(:,:,:)                      !wet deposition of MgCO3, [g d-2 h-1]
-  real(r8),target,allocatable ::  XHGBLS(:,:,:)                      !wet deposition of H2, [g d-2 h-1]
-  real(r8),target,allocatable ::  XMGHBS(:,:,:)                      !wet deposition of MgHCO3, [g d-2 h-1]
-  real(r8),target,allocatable ::  XMGSBS(:,:,:)                      !wet deposition of MgSO4, [g d-2 h-1]
-  real(r8),target,allocatable ::  XNACBS(:,:,:)                      !wet deposition of NaCO3, [g d-2 h-1]
-  real(r8),target,allocatable ::  XNASBS(:,:,:)                      !wet deposition of NaSO4, [g d-2 h-1]
-  real(r8),target,allocatable ::  XKASBS(:,:,:)                      !wet deposition of KSO4, [g d-2 h-1]
-  real(r8),target,allocatable ::  XH0PBS(:,:,:)                      !wet deposition of PO4, [g d-2 h-1]
-  real(r8),target,allocatable ::  XH3PBS(:,:,:)                      !wet deposition of H3PO4, [g d-2 h-1]
-  real(r8),target,allocatable ::  XF1PBS(:,:,:)                      !wet deposition of FeHPO4, [g d-2 h-1]
-  real(r8),target,allocatable ::  XF2PBS(:,:,:)                      !wet deposition of FeH2PO4, [g d-2 h-1]
-  real(r8),target,allocatable ::  XC0PBS(:,:,:)                      !wet deposition of CaPO4, [g d-2 h-1]
-  real(r8),target,allocatable ::  XC1PBS(:,:,:)                      !wet deposition of CHPO4, [g d-2 h-1]
-  real(r8),target,allocatable ::  XC2PBS(:,:,:)                      !wet deposition of CaH4P2O8, [g d-2 h-1]
-  real(r8),target,allocatable ::  XM1PBS(:,:,:)                      !wet deposition of MgHPO4, [g d-2 h-1]
+
   private :: InitAllocate
   contains
 
@@ -166,27 +115,21 @@ module AqueChemDatatype
   allocate(GKCM(JZ,JY,JX));     GKCM=0._r8
   allocate(GKCN(JZ,JY,JX));     GKCN=0._r8
   allocate(GKCK(JZ,JY,JX));     GKCK=0._r8
-
-  allocate(trcSalt_solml(idsalt_beg:idsaltb_end,0:JZ,JY,JX));trcSalt_solml=0._r8
-  allocate(trcsalt_rain_conc(idsalt_beg:idsalt_end,JY,JX));trcsalt_rain_conc=0._r8
   allocate(trcx_solml(idx_beg:idx_end,0:JZ,JY,JX));trcx_solml=0._r8
   allocate(trcp_salml(idsp_beg:idsp_end,0:JZ,JY,JX)); trcp_salml=0._r8
-  allocate(trcSaltIonNumber(idsalt_beg:idsaltb_end))
   allocate(ECND(JZ,JY,JX));     ECND=0._r8
   allocate(CSTR(JZ,JY,JX));     CSTR=0._r8
   allocate(CION(JZ,JY,JX));     CION=0._r8
 
-  allocate(trcSalt_soHml(idsalt_beg:idsaltb_end,JZ,JY,JX)); trcSalt_soHml=0._r8
   allocate(DOM_PoreTranspFlx(idom_beg:idom_end,1:jcplx,JZ,JY,JX));DOM_PoreTranspFlx=0._r8
   allocate(trcs_PoreTranspFlx_vr(ids_beg:ids_end,JZ,JY,JX));   trcs_PoreTranspFlx_vr=0._r8
-  allocate(trcSalt_XFXS(idsalt_beg:idsaltb_end,JZ,JY,JX));   trcSalt_XFXS=0._r8
+
   allocate(trcn_RChem_soil_vr(ids_nut_beg:ids_nuts_end,0:JZ,JY,JX)); trcn_RChem_soil_vr=0._r8
 
   allocate(TR_NH3_soil_vr(0:JZ,JY,JX));  TR_NH3_soil_vr=0._r8
 
   allocate(trcn_RChem_band_soil_vr(ids_nutb_beg:ids_nutb_end,JZ,JY,JX)); trcn_RChem_band_soil_vr=0._r8
 
-  allocate(trcSalt_TR(idsalt_beg:idsaltb_end,JZ,JY,JX));    trcSalt_TR=0._r8
   allocate(trcx_TRSoilChem_vr(idx_beg:idx_end,0:JZ,JY,JX));  trcx_TRSoilChem_vr=0._r8
 
   allocate(TRHCO(JZ,JY,JX));    TRHCO=0._r8
@@ -214,59 +157,14 @@ module AqueChemDatatype
     allocate(trcSaltFlo2SnowLay(idsalt_beg:idsalt_end,JS,JY,JX)); trcSaltFlo2SnowLay=0._r8
     allocate(trcSalt3DFlo2Cell(idsalt_beg:idsaltb_end,3,0:JD,JV,JH));trcSalt3DFlo2Cell=0._r8
     allocate(trcSalt_XFHS(idsalt_beg:idsaltb_end,3,JD,JV,JH));trcSalt_XFHS=0._r8
+    allocate(trcSalt_solml(idsalt_beg:idsaltb_end,0:JZ,JY,JX));trcSalt_solml=0._r8
+    allocate(trcsalt_rain_conc(idsalt_beg:idsalt_end,JY,JX));trcsalt_rain_conc=0._r8
+    allocate(trcSaltIonNumber(idsalt_beg:idsaltb_end))
+    allocate(trcSalt_soHml(idsalt_beg:idsaltb_end,JZ,JY,JX)); trcSalt_soHml=0._r8
+    allocate(trcSalt_XFXS(idsalt_beg:idsaltb_end,JZ,JY,JX));   trcSalt_XFXS=0._r8
+    allocate(trcSalt_TR(idsalt_beg:idsaltb_end,JZ,JY,JX));    trcSalt_TR=0._r8
   endif
-  allocate(XCOBLS(JS,JY,JX));   XCOBLS=0._r8
-  allocate(XCHBLS(JS,JY,JX));   XCHBLS=0._r8
-  allocate(XOXBLS(JS,JY,JX));   XOXBLS=0._r8
-  allocate(XNGBLS(JS,JY,JX));   XNGBLS=0._r8
-  allocate(XN2BLS(JS,JY,JX));   XN2BLS=0._r8
-  allocate(XN4BLW(JS,JY,JX));   XN4BLW=0._r8
-  allocate(XN3BLW(JS,JY,JX));   XN3BLW=0._r8
-  allocate(XNOBLW(JS,JY,JX));   XNOBLW=0._r8
-  allocate(XH1PBS(JS,JY,JX));   XH1PBS=0._r8
-  allocate(XH2PBS(JS,JY,JX));   XH2PBS=0._r8
-  allocate(XALBLS(JS,JY,JX));   XALBLS=0._r8
-  allocate(XFEBLS(JS,JY,JX));   XFEBLS=0._r8
-  allocate(XHYBLS(JS,JY,JX));   XHYBLS=0._r8
-  allocate(XCABLS(JS,JY,JX));   XCABLS=0._r8
-  allocate(XMGBLS(JS,JY,JX));   XMGBLS=0._r8
-  allocate(XNABLS(JS,JY,JX));   XNABLS=0._r8
-  allocate(XKABLS(JS,JY,JX));   XKABLS=0._r8
-  allocate(XOHBLS(JS,JY,JX));   XOHBLS=0._r8
-  allocate(XSOBLS(JS,JY,JX));   XSOBLS=0._r8
-  allocate(XCLBLS(JS,JY,JX));   XCLBLS=0._r8
-  allocate(XC3BLS(JS,JY,JX));   XC3BLS=0._r8
-  allocate(XHCBLS(JS,JY,JX));   XHCBLS=0._r8
-  allocate(XAL1BS(JS,JY,JX));   XAL1BS=0._r8
-  allocate(XAL2BS(JS,JY,JX));   XAL2BS=0._r8
-  allocate(XAL3BS(JS,JY,JX));   XAL3BS=0._r8
-  allocate(XAL4BS(JS,JY,JX));   XAL4BS=0._r8
-  allocate(XALSBS(JS,JY,JX));   XALSBS=0._r8
-  allocate(XFE1BS(JS,JY,JX));   XFE1BS=0._r8
-  allocate(XFE2BS(JS,JY,JX));   XFE2BS=0._r8
-  allocate(XFE3BS(JS,JY,JX));   XFE3BS=0._r8
-  allocate(XFE4BS(JS,JY,JX));   XFE4BS=0._r8
-  allocate(XFESBS(JS,JY,JX));   XFESBS=0._r8
-  allocate(XCAOBS(JS,JY,JX));   XCAOBS=0._r8
-  allocate(XCACBS(JS,JY,JX));   XCACBS=0._r8
-  allocate(XCAHBS(JS,JY,JX));   XCAHBS=0._r8
-  allocate(XCASBS(JS,JY,JX));   XCASBS=0._r8
-  allocate(XMGOBS(JS,JY,JX));   XMGOBS=0._r8
-  allocate(XMGCBS(JS,JY,JX));   XMGCBS=0._r8
-  allocate(XHGBLS(JS,JY,JX));   XHGBLS=0._r8
-  allocate(XMGHBS(JS,JY,JX));   XMGHBS=0._r8
-  allocate(XMGSBS(JS,JY,JX));   XMGSBS=0._r8
-  allocate(XNACBS(JS,JY,JX));   XNACBS=0._r8
-  allocate(XNASBS(JS,JY,JX));   XNASBS=0._r8
-  allocate(XKASBS(JS,JY,JX));   XKASBS=0._r8
-  allocate(XH0PBS(JS,JY,JX));   XH0PBS=0._r8
-  allocate(XH3PBS(JS,JY,JX));   XH3PBS=0._r8
-  allocate(XF1PBS(JS,JY,JX));   XF1PBS=0._r8
-  allocate(XF2PBS(JS,JY,JX));   XF2PBS=0._r8
-  allocate(XC0PBS(JS,JY,JX));   XC0PBS=0._r8
-  allocate(XC1PBS(JS,JY,JX));   XC1PBS=0._r8
-  allocate(XC2PBS(JS,JY,JX));   XC2PBS=0._r8
-  allocate(XM1PBS(JS,JY,JX));   XM1PBS=0._r8
+
   end subroutine InitAllocate
 
 !----------------------------------------------------------------------
@@ -329,58 +227,8 @@ module AqueChemDatatype
   call destroy(TBCO2)
   call destroy(TBION)
   call destroy(TRN3G)
-  call destroy(XCOBLS)
-  call destroy(XCHBLS)
-  call destroy(XOXBLS)
-  call destroy(XNGBLS)
-  call destroy(XN2BLS)
-  call destroy(XN4BLW)
-  call destroy(XN3BLW)
-  call destroy(XNOBLW)
-  call destroy(XH1PBS)
-  call destroy(XH2PBS)
-  call destroy(XALBLS)
-  call destroy(XFEBLS)
-  call destroy(XHYBLS)
-  call destroy(XCABLS)
-  call destroy(XMGBLS)
-  call destroy(XNABLS)
-  call destroy(XKABLS)
-  call destroy(XOHBLS)
-  call destroy(XSOBLS)
-  call destroy(XCLBLS)
-  call destroy(XC3BLS)
-  call destroy(XHCBLS)
-  call destroy(XAL1BS)
-  call destroy(XAL2BS)
-  call destroy(XAL3BS)
-  call destroy(XAL4BS)
-  call destroy(XALSBS)
-  call destroy(XFE1BS)
-  call destroy(XFE2BS)
-  call destroy(XFE3BS)
-  call destroy(XFE4BS)
-  call destroy(XFESBS)
-  call destroy(XCAOBS)
-  call destroy(XCACBS)
-  call destroy(XCAHBS)
-  call destroy(XCASBS)
-  call destroy(XMGOBS)
-  call destroy(XMGCBS)
-  call destroy(XHGBLS)
-  call destroy(XMGHBS)
-  call destroy(XMGSBS)
-  call destroy(XNACBS)
-  call destroy(XNASBS)
-  call destroy(XKASBS)
-  call destroy(XH0PBS)
-  call destroy(XH3PBS)
-  call destroy(XF1PBS)
-  call destroy(XF2PBS)
-  call destroy(XC0PBS)
-  call destroy(XC1PBS)
-  call destroy(XC2PBS)
-  call destroy(XM1PBS)
+
+
   call destroy(trcSaltIonNumber)
   call destroy(trcs_PoreTranspFlx_vr)
   call destroy(DOM_PoreTranspFlx)

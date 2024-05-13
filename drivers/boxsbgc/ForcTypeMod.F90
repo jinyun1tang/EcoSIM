@@ -47,7 +47,7 @@ implicit none
     real(r8) :: EHUM        !partitioning coefficient between humus and microbial residue, [], hour1.f
     real(r8) :: pH          !pH value
     real(r8) :: SoilMicPMassLayer        !mass of soil layer	Mg d-2
-    real(r8) :: VLSoilPoreMicP_vr        !volume of soil layer	m3 d-2
+    real(r8) :: VLSoilPoreMicP        !volume of soil layer	m3 d-2
     real(r8) :: ZNH4S       !NH4 non-band micropore, [g d-2]
     real(r8) :: ZNO3S       !NO3 band micropore, [g d-2]
     real(r8) :: H2PO4       !PO4 non-band micropore, [g d-2]
@@ -63,16 +63,16 @@ implicit none
     real(r8) :: LOGPSIAtSat
     real(r8) :: PSISD
     real(r8) :: PSISE
-    real(r8), allocatable :: CFOMC(:)  !allocation coefficient to humus fractions
+    real(r8), allocatable :: ElmAllocmatMicrblitr2POM(:)  !allocation coefficient to humus fractions
     real(r8), allocatable :: CNOSC(:,:)
     real(r8), allocatable :: CPOSC(:,:)
-    real(r8), allocatable :: OSM(:,:,:)
-    real(r8), allocatable :: OSA(:,:)
-    real(r8), allocatable :: ORM(:,:,:)
-    real(r8), allocatable :: OHM(:,:)
+    real(r8), allocatable :: SolidOM(:,:,:)
+    real(r8), allocatable :: SolidOMAct(:,:)
+    real(r8), allocatable :: OMBioResdu(:,:,:)
+    real(r8), allocatable :: SorbedOM(:,:)
     real(r8), allocatable :: DOM(:,:)
-    real(r8), allocatable :: OMEhetr(:,:,:)
-    real(r8), allocatable :: OMEauto(:,:)
+    real(r8), allocatable :: mBiomeHeter(:,:,:)
+    real(r8), allocatable :: mBiomeAutor(:,:)
 
 !    real(r8) :: O2_irrig_conc        !surface irrigation  O2 concentration, [g m-3]
 !    real(r8) :: O2_rain_conc        !precipitation  O2 concentration, [g m-3]
@@ -92,7 +92,7 @@ implicit none
     real(r8) :: DNH3GQ
     real(r8) :: DH2GGQ
 
-    real(r8) :: OFFSET      !offset for calculating temperature in Arrhenius curves, [oC]
+    real(r8) :: TempOffset      !offset for calculating temperature in Arrhenius curves, [oC]
 
     real(r8) :: THETY       !air-dry water content, [m3 m-3]
     real(r8) :: VLWatMicP        !soil micropore water content [m3 d-2]
@@ -107,7 +107,7 @@ implicit none
     real(r8) :: VLPO4       !PO4 non-band volume fraction,[-]:=1-VLPOB
 
     real(r8) :: PSISoilMatricP       !soil micropore matric water potential, [MPa]
-    real(r8) :: OLSGL       !aqueous O2 diffusivity, [m2 h-1], set in hour1
+    real(r8) :: O2AquaDiffusvity       !aqueous O2 diffusivity, [m2 h-1], set in hour1
     real(r8) :: CLSGL       !aqueous CO2 diffusivity	[m2 h-1]
     real(r8) :: CQSGL       !aqueous CH4 diffusivity	m2 h-1
     real(r8) :: ZLSGL       !aqueous N2 diffusivity, [m2 h-1]
@@ -174,8 +174,8 @@ implicit none
     real(r8) :: OXYS      !aqueous O2  micropore	[g d-2]
     real(r8) :: H2GS      !aqueous H2 	[g d-2]
     real(r8) :: CH4S      !aqueous CO2  micropore	[g d-2]
-    real(r8) :: SCH4L     !solubility of CH4, [m3 m-3]
-    real(r8) :: SOXYL     !solubility of O2, [m3 m-3]
+    real(r8) :: CH4AquaSolubility     !solubility of CH4, [m3 m-3]
+    real(r8) :: O2GSolubility     !solubility of O2, [m3 m-3]
     real(r8) :: SCO2L     !solubility of CO2, [m3 m-3]
     real(r8) :: SN2GL     !solubility of N2, [m3 m-3]
     real(r8) :: SN2OL     !solubility of N2O, [m3 m-3]
@@ -184,27 +184,27 @@ implicit none
     real(r8) :: ZNFN0     !initial nitrification inhibition activity
     real(r8) :: ZNFNI     !current nitrification inhibition activity
 
-    real(r8) :: TFND      !temperature effect on aqueous diffusivity
+    real(r8) :: TScal4Difsvity      !temperature effect on aqueous diffusivity
     real(r8) :: ATKA      !mean annual air temperature [K]
  !litter layer
     real(r8) :: VLitR      !surface litter volume, [m3 d-2]
     real(r8) :: VWatLitRHoldCapcity    !surface litter water holding capacity, [m3 d-2]
  !non litter layer
-    real(r8) :: ROXYY       !total root + microbial O2 uptake from previous hour, [g d-2 h-1], updated in hour1
-    real(r8) :: RN2OY       !total root + microbial N2O uptake from previous hour, [g d-2 h-1]
-    real(r8) :: RNO2Y       !total root + microbial NO2 uptake non-band from previous hour, [g d-2 h-1]
-    real(r8) :: RN2BY       !total root + microbial NO2 uptake band from previous hour, [g d-2 h-1]
-    real(r8) :: RNHBY       !total root + microbial NH4 uptake band from previous hour, [g d-2 h-1]
-    real(r8) :: RN3BY       !total root + microbial NO3 uptake band from previous hour, [g d-2 h-1]
-    real(r8) :: RPOBY       !total root + microbial PO4 uptake band from previous hour, [g d-2 h-1]
-    real(r8) :: RP1BY       !HPO4 demand in band by all microbial, root, myco populations from previous hour
-    real(r8) :: RNH4Y       !total root + microbial NH4 uptake non-band from previous hour, [g d-2 h-1]
-    real(r8) :: RNO3Y       !total root + microbial NO3 uptake non-band from previous hour, [g d-2 h-1]
-    real(r8) :: RPO4Y       !total root + microbial PO4 uptake non-band from previous hour, [g d-2 h-1]
-    real(r8) :: RP14Y       !HPO4 demand in non-band by all microbial, root, myco populations from previous hour
-    real(r8) :: ROXYF       !net gaseous O2 flux, [g d-2 h-1], updated in redist.f
-    real(r8) :: RCH4L       !net aqueous CH4 flux, [g d-2 h-1], updated in redist.f
-    real(r8) :: ROXYL       !net aqueous O2 flux from previous hour, [g d-2 h-1], updated in redist.f
+    real(r8) :: RO2EcoDmndPrev       !total root + microbial O2 uptake from previous hour, [g d-2 h-1], updated in hour1
+    real(r8) :: RN2OEcoUptkSoilPrev       !total root + microbial N2O uptake from previous hour, [g d-2 h-1]
+    real(r8) :: RNO2EcoUptkSoilPrev       !total root + microbial NO2 uptake non-band from previous hour, [g d-2 h-1]
+    real(r8) :: RNO2EcoUptkBandPrev       !total root + microbial NO2 uptake band from previous hour, [g d-2 h-1]
+    real(r8) :: RNH4EcoDmndBandPrev       !total root + microbial NH4 uptake band from previous hour, [g d-2 h-1]
+    real(r8) :: RNO3EcoDmndBandPrev       !total root + microbial NO3 uptake band from previous hour, [g d-2 h-1]
+    real(r8) :: RH2PO4EcoDmndBandPrev       !total root + microbial PO4 uptake band from previous hour, [g d-2 h-1]
+    real(r8) :: RH1PO4EcoDmndBandPrev       !HPO4 demand in band by all microbial, root, myco populations from previous hour
+    real(r8) :: RNH4EcoDmndSoilPrev       !total root + microbial NH4 uptake non-band from previous hour, [g d-2 h-1]
+    real(r8) :: RNO3EcoDmndSoilPrev       !total root + microbial NO3 uptake non-band from previous hour, [g d-2 h-1]
+    real(r8) :: RH2PO4EcoDmndSoilPrev       !total root + microbial PO4 uptake non-band from previous hour, [g d-2 h-1]
+    real(r8) :: RH1PO4EcoDmndSoilPrev       !HPO4 demand in non-band by all microbial, root, myco populations from previous hour
+    real(r8) :: RO2GasXchangePrev       !net gaseous O2 flux, [g d-2 h-1], updated in redist.f
+    real(r8) :: RCH4PhysexchPrev_vr       !net aqueous CH4 flux, [g d-2 h-1], updated in redist.f
+    real(r8) :: RO2AquaXchangePrev       !net aqueous O2 flux from previous hour, [g d-2 h-1], updated in redist.f
     logical  :: disvolonly  !flag to only do dissolution/volatilization
   end type forc_type
 
@@ -219,7 +219,7 @@ implicit none
   type(forc_type), intent(inout) :: forc
   character(len=*), intent(in) :: fname
   integer :: jcplx,ndbiomcp,nlbiomcp
-  integer :: NumMicbFunGroups,jsken,NumMicrbHetetrophCmplx,NumMicrobAutotrophCmplx
+  integer :: NumMicbFunGrupsPerCmplx,jsken,NumHetetrMicCmplx,NumMicrobAutrophCmplx
   integer :: NumLiveHeterBioms,NumLiveAutoBioms
   integer :: NumPlantChemElms
   type(file_desc_t) :: ncf
@@ -228,22 +228,22 @@ implicit none
 
   jcplx=get_dim_len(ncf,'jcplx')
   jsken =get_dim_len(ncf,'jsken')
-  NumMicrbHetetrophCmplx=get_dim_len(ncf,'NumMicrbHetetrophCmplx')
-  NumMicrobAutotrophCmplx=get_dim_len(ncf,'NumMicrobAutotrophCmplx')
+  NumHetetrMicCmplx=get_dim_len(ncf,'NumHetetrMicCmplx')
+  NumMicrobAutrophCmplx=get_dim_len(ncf,'NumMicrobAutrophCmplx')
   NumLiveHeterBioms = get_dim_len(ncf,'NumLiveHeterBioms')
   NumLiveAutoBioms = get_dim_len(ncf,'NumLiveAutoBioms')
   NumPlantChemElms=get_dim_len(ncf,'element')
   nlbiomcp=get_dim_len(ncf,'nlbiomcp')
   ndbiomcp=get_dim_len(ncf,'ndbiomcp')
-  NumMicbFunGroups    =get_dim_len(ncf,'NumMicbFunGroups')
-  allocate(forc%OMEhetr(NumPlantChemElms,NumLiveHeterBioms,1:jcplx))
+  NumMicbFunGrupsPerCmplx    =get_dim_len(ncf,'NumMicbFunGrupsPerCmplx')
+  allocate(forc%mBiomeHeter(NumPlantChemElms,NumLiveHeterBioms,1:jcplx))
   allocate(forc%DOM(idom_beg:idom_end,1:jcplx))
-  allocate(forc%OSM(1:NumPlantChemElms,jsken,1:jcplx))
-  allocate(forc%OSA(jsken,1:jcplx))
-  allocate(forc%ORM(1:NumPlantChemElms,ndbiomcp,1:jcplx))
-  allocate(forc%OMEauto(NumPlantChemElms,NumLiveAutoBioms))
-  allocate(forc%OHM(idom_beg:idom_end,1:jcplx))
-  allocate(forc%CFOMC(ndbiomcp))
+  allocate(forc%SolidOM(1:NumPlantChemElms,jsken,1:jcplx))
+  allocate(forc%SolidOMAct(jsken,1:jcplx))
+  allocate(forc%OMBioResdu(1:NumPlantChemElms,ndbiomcp,1:jcplx))
+  allocate(forc%mBiomeAutor(NumPlantChemElms,NumLiveAutoBioms))
+  allocate(forc%SorbedOM(idom_beg:idom_end,1:jcplx))
+  allocate(forc%ElmAllocmatMicrblitr2POM(ndbiomcp))
   allocate(forc%CNOSC(1:jsken,1:jcplx))
   allocate(forc%CPOSC(1:jsken,1:jcplx))
   call ncd_getvar(ncf,'ZNH4S',forc%ZNH4S)
@@ -254,9 +254,9 @@ implicit none
   call ncd_getvar(ncf,'CNOSC',forc%CNOSC)
   call ncd_getvar(ncf,'CPOSC',forc%CPOSC)
   call ncd_getvar(ncf,'pH',forc%PH)
-  call ncd_getvar(ncf,'VLSoilPoreMicP_vr',forc%VLSoilPoreMicP_vr)
+  call ncd_getvar(ncf,'VLSoilPoreMicP',forc%VLSoilPoreMicP)
   call ncd_getvar(ncf,'ORGC',forc%ORGC)
-  call ncd_getvar(ncf,'CFOMC',forc%CFOMC)
+  call ncd_getvar(ncf,'ElmAllocmatMicrblitr2POM',forc%ElmAllocmatMicrblitr2POM)
   call ncd_getvar(ncf,'VLSoilMicP',forc%VLSoilMicP)
   call ncd_getvar(ncf,'BKVL',forc%SoilMicPMassLayer)
   call ncd_getvar(ncf,'POROS',forc%POROS)
@@ -289,12 +289,12 @@ implicit none
   call ncd_getvar(ncf,'CCASO',forc%CCASO)
   call ncd_getvar(ncf,'BKDS',forc%BKDS)
   call ncd_getvar(ncf,'ATCS',forc%ATCS)
-  call ncd_getvar(ncf,'OMEhetr',forc%OMEhetr)
-  call ncd_getvar(ncf,'OMEauto',forc%OMEauto)
-  call ncd_getvar(ncf,'OSM',forc%OSM)
-  call ncd_getvar(ncf,'OSA',forc%OSA)
-  call ncd_getvar(ncf,'ORM',forc%ORM)
-  call ncd_getvar(ncf,'OHM',forc%OHM)
+  call ncd_getvar(ncf,'mBiomeHeter',forc%mBiomeHeter)
+  call ncd_getvar(ncf,'mBiomeAutor',forc%mBiomeAutor)
+  call ncd_getvar(ncf,'OSM',forc%SolidOM)
+  call ncd_getvar(ncf,'OSA',forc%SolidOMAct)
+  call ncd_getvar(ncf,'ORM',forc%OMBioResdu)
+  call ncd_getvar(ncf,'OHM',forc%SorbedOM)
   call ncd_getvar(ncf,'DOM',forc%DOM)
   call ncd_getvar(ncf,'THETY',forc%THETY)
   call ncd_getvar(ncf,'PSIMX',forc%LOGPSIMX)
@@ -305,7 +305,7 @@ implicit none
   call ncd_getvar(ncf,'ATKA', forc%ATKA)
   call ncd_pio_closefile(ncf)
 
-  forc%OFFSET=fOFFSET(forc%ATCS)
+  forc%TempOffset=fOFFSET(forc%ATCS)
   forc%VLNOB=0._r8
   forc%VLNO3=1._r8
   forc%VLNHB=0._r8
@@ -403,8 +403,8 @@ implicit none
   if(first .or. forctype ==0 .or. forctype==2)then
 
     TCS=TKS-TC2K
-    forc%SCH4L=gas_solubility(idg_CH4,TCS)
-    forc%SOXYL=gas_solubility(idg_O2, TCS)
+    forc%CH4AquaSolubility=gas_solubility(idg_CH4,TCS)
+    forc%O2GSolubility=gas_solubility(idg_O2, TCS)
     forc%SCO2L=gas_solubility(idg_CO2, TCS)     !solubility of CO2, [m3 m-3]
     forc%SN2GL=gas_solubility(idg_N2, TCS)      !solubility of N2, [m3 m-3]
     forc%SN2OL=gas_solubility(idg_N2O, TCS)     !solubility of N2O, [m3 m-3]
@@ -421,21 +421,21 @@ implicit none
     forc%CH2GE=forc%H2GE*8.92E-05_r8*Tref/TKS    ![gH/m3]
 
     !variable temperature
-    forc%TFND=TEFAQUDIF(TKS)
-    forc%OLSGL=OLSG*forc%TFND       !aqueous O2 diffusivity [m2 h-1]
-    forc%CLSGL=CLSG*forc%TFND       !aqueous CO2 diffusivity	[m2 h-1]
-    forc%CQSGL=CQSG*forc%TFND       !aqueous CH4 diffusivity	m2 h-1
-    forc%ZLSGL=ZLSG*forc%TFND       !aqueous N2 diffusivity, [m2 h-1]
-    forc%ZNSGL=ZNSG*forc%TFND       !aqueous NH3 diffusivity, [m2 h-1]
-    forc%ZVSGL=ZVSG*forc%TFND       !aqueous N2O diffusivity, [m2 h-1]
-    forc%HLSGL=HLSG*forc%TFND       !aqueous H2 diffusivity, [m2 h-1]
+    forc%TScal4Difsvity=TEFAQUDIF(TKS)
+    forc%O2AquaDiffusvity=OLSG*forc%TScal4Difsvity       !aqueous O2 diffusivity [m2 h-1]
+    forc%CLSGL=CLSG*forc%TScal4Difsvity       !aqueous CO2 diffusivity	[m2 h-1]
+    forc%CQSGL=CQSG*forc%TScal4Difsvity       !aqueous CH4 diffusivity	m2 h-1
+    forc%ZLSGL=ZLSG*forc%TScal4Difsvity       !aqueous N2 diffusivity, [m2 h-1]
+    forc%ZNSGL=ZNSG*forc%TScal4Difsvity       !aqueous NH3 diffusivity, [m2 h-1]
+    forc%ZVSGL=ZVSG*forc%TScal4Difsvity       !aqueous N2O diffusivity, [m2 h-1]
+    forc%HLSGL=HLSG*forc%TScal4Difsvity       !aqueous H2 diffusivity, [m2 h-1]
 
   endif
 
   if (first .or. forctype <=2)then
     Z3S=forc%FieldCapacity/forc%POROS
     XNPD=600.0_r8*dts_gas
-    scalar=forc%TFND*XNPD
+    scalar=forc%TScal4Difsvity*XNPD
     forc%DiffusivitySolutEff=fDiffusivitySolutEff(scalar,THETW,Z3S)
 
     DFLG2=2.0_r8*AZMAX1(forc%THETPM)*POROQ &
@@ -479,21 +479,21 @@ implicit none
 
   endif
 
-  forc%ROXYY=0._r8
-  forc%RN2OY=0._r8
-  forc%RNO2Y=0._r8
-  forc%RN2BY=0._r8
-  forc%RNHBY=0._r8
-  forc%RN3BY=0._r8
-  forc%RPOBY=0._r8
-  forc%RP1BY=0._r8
-  forc%RNH4Y=0._r8
-  forc%RNO3Y=0._r8
-  forc%RPO4Y=0._r8
-  forc%RP14Y=0._r8
-  forc%ROXYF=0._r8
-  forc%RCH4L=0._r8
-  forc%ROXYL=0._r8
+  forc%RO2EcoDmndPrev=0._r8
+  forc%RN2OEcoUptkSoilPrev=0._r8
+  forc%RNO2EcoUptkSoilPrev=0._r8
+  forc%RNO2EcoUptkBandPrev=0._r8
+  forc%RNH4EcoDmndBandPrev=0._r8
+  forc%RNO3EcoDmndBandPrev=0._r8
+  forc%RH2PO4EcoDmndBandPrev=0._r8
+  forc%RH1PO4EcoDmndBandPrev=0._r8
+  forc%RNH4EcoDmndSoilPrev=0._r8
+  forc%RNO3EcoDmndSoilPrev=0._r8
+  forc%RH2PO4EcoDmndSoilPrev=0._r8
+  forc%RH1PO4EcoDmndSoilPrev=0._r8
+  forc%RO2GasXchangePrev=0._r8
+  forc%RCH4PhysexchPrev_vr=0._r8
+  forc%RO2AquaXchangePrev=0._r8
 
   first=.false.
   end associate

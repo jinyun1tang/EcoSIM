@@ -132,7 +132,7 @@ implicit none
 
             IF(NN.EQ.1)THEN
               IF(SoiBulkDensity(L0,NY,NX).LE.ZERO.AND.SoiBulkDensity(L1,NY,NX).LE.ZERO &
-                .AND.VLWatMicP(L0,NY,NX)+VLiceMicP(L0,NY,NX).LE.ZEROS(NY,NX))THEN
+                .AND.VLWatMicP_vr(L0,NY,NX)+VLiceMicP(L0,NY,NX).LE.ZEROS(NY,NX))THEN
                 CumDepth2LayerBottom(L1,NY,NX)=CumDepth2LayerBottom(L0,NY,NX)
                 CDPTHY(L1)=CDPTHY(L0)
               ENDIF
@@ -196,7 +196,7 @@ implicit none
       ! current layer is water, layer below is soil, or top layer is soil
       IF(SoiBulkDensity(LX+1,NY,NX).GT.ZERO.OR.itoplyr_type.EQ.ist_soil)THEN
         !next layer is soil, or it is a soil column 
-        DLYR_ExludeMicP=DLYR(3,LX,NY,NX)-(VLWatMicP(LX,NY,NX)+VLiceMicP(LX,NY,NX))/AREA(3,LX,NY,NX)
+        DLYR_ExludeMicP=DLYR(3,LX,NY,NX)-(VLWatMicP_vr(LX,NY,NX)+VLiceMicP(LX,NY,NX))/AREA(3,LX,NY,NX)
         DDLYX(LX,ich_watlev)=DLYR_ExludeMicP+DDLYX(LX+1,ich_watlev)   !combined thickness current + next layer
         DDLYR(LX,ich_watlev)=DDLYX(LX+1,ich_watlev)                   !make a copy of the next layer
         IFLGL(LX,ich_watlev)=2                                        !
@@ -204,10 +204,10 @@ implicit none
         !next, current and top layers are all water
         !DLYR_ExludeMicP: non-micropore soil equivalent depth
         !DLYRI: initial water layer thickness, [m]
-        DLYR_ExludeMicP=DLYRI(3,LX,NY,NX)-(VLWatMicP(LX,NY,NX)+VLiceMicP(LX,NY,NX))/AREA(3,LX,NY,NX)
+        DLYR_ExludeMicP=DLYRI(3,LX,NY,NX)-(VLWatMicP_vr(LX,NY,NX)+VLiceMicP(LX,NY,NX))/AREA(3,LX,NY,NX)
 
         !DLEqv_MicP: water+ice total thickness of next layer
-        DLEqv_MicP=(VLWatMicP(LX+1,NY,NX)+VLiceMicP(LX+1,NY,NX))/AREA(3,LX,NY,NX)
+        DLEqv_MicP=(VLWatMicP_vr(LX+1,NY,NX)+VLiceMicP(LX+1,NY,NX))/AREA(3,LX,NY,NX)
 
         !there is expansion in layer LX, or next layer has water + ice
         IF(DLYR_ExludeMicP.LT.-ZERO.OR.DLEqv_MicP.GT.ZERO)THEN
@@ -223,7 +223,7 @@ implicit none
           ENDIF
         ELSE
           !shrink
-          DLYR_ExludeMicP=DLYR(3,LX,NY,NX)-(VLWatMicP(LX,NY,NX)+VLiceMicP(LX,NY,NX))/AREA(3,LX,NY,NX)
+          DLYR_ExludeMicP=DLYR(3,LX,NY,NX)-(VLWatMicP_vr(LX,NY,NX)+VLiceMicP(LX,NY,NX))/AREA(3,LX,NY,NX)
           DDLYX(LX,ich_watlev)=DLYR_ExludeMicP+DDLYX(LX+1,ich_watlev)    !combine next layer to current
           DDLYR(LX,ich_watlev)=DDLYX(LX+1,ich_watlev)
           IFLGL(LX,ich_watlev)=2
@@ -407,8 +407,8 @@ implicit none
             !  top layer
             IF(LX.EQ.NU(NY,NX))THEN
               CumDepth2LayerBottom(LX-1,NY,NX)=CumDepth2LayerBottom(LX,NY,NX) &
-                -(VLWatMicP(LX,NY,NX)+VLiceMicP(LX,NY,NX))/AREA(3,LX,NY,NX)
-              CDPTHY(LX-1)=CDPTHY(LX)-(VLWatMicP(LX,NY,NX)+VLiceMicP(LX,NY,NX))/AREA(3,LX,NY,NX)
+                -(VLWatMicP_vr(LX,NY,NX)+VLiceMicP(LX,NY,NX))/AREA(3,LX,NY,NX)
+              CDPTHY(LX-1)=CDPTHY(LX)-(VLWatMicP_vr(LX,NY,NX)+VLiceMicP(LX,NY,NX))/AREA(3,LX,NY,NX)
             ENDIF
           ENDIF
           !
@@ -467,7 +467,7 @@ implicit none
     ENDDO D200
     VLSoilMicP(LX,NY,NX)=VLSoilPoreMicP_vr(LX,NY,NX)
   ENDDO D225
-  VLSoilMicP(0,NY,NX)=VLWatMicP(0,NY,NX)+VLiceMicP(0,NY,NX)
+  VLSoilMicP(0,NY,NX)=VLWatMicP_vr(0,NY,NX)+VLiceMicP(0,NY,NX)
   end subroutine SoilRelayering
 
 !------------------------------------------------------------------------------------------
@@ -503,7 +503,7 @@ implicit none
       FO=1.0_r8
     ELSE
       IF(SoiBulkDensity(L0,NY,NX).LE.ZERO)THEN
-        DLEqv_MicP=(VLWatMicP(L0,NY,NX)+VLiceMicP(L0,NY,NX))/AREA(3,L0,NY,NX)
+        DLEqv_MicP=(VLWatMicP_vr(L0,NY,NX)+VLiceMicP(L0,NY,NX))/AREA(3,L0,NY,NX)
         IF(DLEqv_MicP.GT.ZERO)THEN
           FX=AMIN1(1.0_r8,DDLYRX(NN)/DLEqv_MicP)
           FO=FX
@@ -533,7 +533,7 @@ implicit none
       L0=0
     ENDIF
     IF(SoiBulkDensity(L0,NY,NX).LE.ZERO)THEN
-      DLEqv_MicP=(VLWatMicP(L0,NY,NX)+VLiceMicP(L0,NY,NX))/AREA(3,L0,NY,NX)
+      DLEqv_MicP=(VLWatMicP_vr(L0,NY,NX)+VLiceMicP(L0,NY,NX))/AREA(3,L0,NY,NX)
       IF(DLEqv_MicP.GT.ZERO)THEN
         FX=AMIN1(1.0,-DDLYRX(NN)/DLEqv_MicP)
         FO=FX
@@ -652,7 +652,7 @@ implicit none
   ELSEIF(NN.EQ.3)THEN
     !CumSoilDeptht0 is the initial litter layer bottom
     !obtain the water exceeds litter layer water holding capacity
-    XVOLWP=AZMAX1(VLWatMicP(0,NY,NX)-MaxVLWatByLitR(NY,NX))
+    XVOLWP=AZMAX1(VLWatMicP_vr(0,NY,NX)-MaxVLWatByLitR(NY,NX))
     IF(L.EQ.NU(NY,NX).AND.CumDepth2LayerBottom(0,NY,NX).GT.CumSoilDeptht0(NY,NX) &
       .AND.XVOLWP.GT.MaxVLWatByLitR(NY,NX)+VHCPNX(NY,NX)/cpw)THEN
           !     IF((SoiBulkDensity(L,NY,NX).GT.ZERO.AND.NU(NY,NX).GT.NUI(NY,NX))
@@ -662,7 +662,7 @@ implicit none
         NUM(NY,NX)=NUI(NY,NX)
         DDLYRX(NN)=(MaxVLWatByLitR(NY,NX)-XVOLWP)/AREA(3,0,NY,NX)
         IFLGL(L,NN)=1
-        DLYR0=(AZMAX1(VLWatMicP(0,NY,NX)+VLiceMicP(0,NY,NX)-VWatLitRHoldCapcity(NY,NX)) &
+        DLYR0=(AZMAX1(VLWatMicP_vr(0,NY,NX)+VLiceMicP(0,NY,NX)-VWatLitRHoldCapcity(NY,NX)) &
           +VLitR(NY,NX))/AREA(3,0,NY,NX)
         DLYR(3,0,NY,NX)=DLYR0+DDLYRX(NN)
         DLYR(3,NU(NY,NX),NY,NX)=DLYR(3,NU(NY,NX),NY,NX)-DDLYRX(NN)
@@ -699,7 +699,7 @@ implicit none
   real(r8), intent(inout) :: CDPTHY(0:JZ)
   integer, intent(in) ::  IFLGL(0:JZ,6)
   integer :: N,M,NZ,K,NGL,NR,NE,NTU,NTSA,NTSAB,NTG,NTP
-  integer :: NTX,NTF,MID
+  integer :: NTX,NTF,MID,idom
   real(r8) :: ENGY0,ENGY1
 ! begin_execution
 
@@ -713,18 +713,18 @@ implicit none
       +FX*trcx_solml(idx_AEC,L0,NY,NX)
   ENDIF
 
-  VLWatMicP(L1,NY,NX)=VLWatMicP(L1,NY,NX)+FX*VLWatMicP(L0,NY,NX)
+  VLWatMicP_vr(L1,NY,NX)=VLWatMicP_vr(L1,NY,NX)+FX*VLWatMicP_vr(L0,NY,NX)
   VLiceMicP(L1,NY,NX)=VLiceMicP(L1,NY,NX)+FX*VLiceMicP(L0,NY,NX)
   VLsoiAirP(L1,NY,NX)=VLsoiAirP(L1,NY,NX)+FX*VLsoiAirP(L0,NY,NX)
-  VLMicP(L1,NY,NX)=VLMicP(L1,NY,NX)+FX*VLMicP(L0,NY,NX)
+  VLMicP_vr(L1,NY,NX)=VLMicP_vr(L1,NY,NX)+FX*VLMicP_vr(L0,NY,NX)
   VLSoilMicP(L1,NY,NX)=VLSoilMicP(L1,NY,NX)+FX*VLSoilMicP(L0,NY,NX)
-  VLWatMicPX(L1,NY,NX)=VLWatMicP(L1,NY,NX)
+  VLWatMicPX(L1,NY,NX)=VLWatMicP_vr(L1,NY,NX)
   ENGY1=VHeatCapacity(L1,NY,NX)*TKS(L1,NY,NX)
   ENGY0=VHeatCapacity(L0,NY,NX)*TKS(L0,NY,NX)
   ENGY1=ENGY1+FX*ENGY0
   VHeatCapacitySoilM(L1,NY,NX)=VHeatCapacitySoilM(L1,NY,NX)+FX*VHeatCapacitySoilM(L0,NY,NX)
   VHeatCapacity(L1,NY,NX)=VHeatCapacitySoilM(L1,NY,NX) &
-    +cpw*(VLWatMicP(L1,NY,NX)+VLWatMacP(L1,NY,NX)) &
+    +cpw*(VLWatMicP_vr(L1,NY,NX)+VLWatMacP(L1,NY,NX)) &
     +cpi*(VLiceMicP(L1,NY,NX)+VLiceMacP(L1,NY,NX))
 
   IF(VHeatCapacity(L1,NY,NX).GT.ZEROS(NY,NX))THEN
@@ -735,11 +735,11 @@ implicit none
   TCS(L1,NY,NX)=units%Kelvin2Celcius(TKS(L1,NY,NX))
 
   DO NTF=ifertn_beg,ifertn_end
-    FertN_soil(NTF,L1,NY,NX)=FertN_soil(NTF,L1,NY,NX)+FX*FertN_soil(NTF,L0,NY,NX)
+    FertN_soil_vr(NTF,L1,NY,NX)=FertN_soil_vr(NTF,L1,NY,NX)+FX*FertN_soil_vr(NTF,L0,NY,NX)
   ENDDO
 
   DO NTF=ifertnb_beg,ifertnb_end
-    FertN_band(NTF,L1,NY,NX)=FertN_band(NTF,L1,NY,NX)+FX*FertN_band(NTF,L0,NY,NX)
+    FertN_Band_vr(NTF,L1,NY,NX)=FertN_Band_vr(NTF,L1,NY,NX)+FX*FertN_Band_vr(NTF,L0,NY,NX)
   ENDDO
 
   DO NTU=ids_nuts_beg,ids_nuts_end
@@ -790,55 +790,45 @@ implicit none
 
   IF(IFLGL(L,3).EQ.0)THEN
     DO  K=1,jcplx
-      DO  N=1,NumMicbFunGroups
+      DO  N=1,NumMicbFunGrupsPerCmplx
         DO  M=1,nlbiomcp
           DO NGL=JGnio(N),JGnfo(N)
             MID=micpar%get_micb_id(M,NGL)
-            OMEhetr(ielmc,MID,K,L1,NY,NX)=OMEhetr(ielmc,MID,K,L1,NY,NX)+FX*OMEhetr(ielmc,MID,K,L0,NY,NX)
-            OMEhetr(ielmn,MID,K,L1,NY,NX)=OMEhetr(ielmn,MID,K,L1,NY,NX)+FX*OMEhetr(ielmn,MID,K,L0,NY,NX)
-            OMEhetr(ielmp,MID,K,L1,NY,NX)=OMEhetr(ielmp,MID,K,L1,NY,NX)+FX*OMEhetr(ielmp,MID,K,L0,NY,NX)
+            DO NE=1,NumPlantChemElms
+              mBiomeHeter_vr(NE,MID,K,L1,NY,NX)=mBiomeHeter_vr(NE,MID,K,L1,NY,NX)+FX*mBiomeHeter_vr(NE,MID,K,L0,NY,NX)
+            ENDDO
           enddo
         enddo
       enddo
     ENDDO
-    DO  N=1,NumMicbFunGroups
+    DO  N=1,NumMicbFunGrupsPerCmplx
       DO  M=1,nlbiomcp
         DO NGL=JGniA(N),JGnfA(N)
           MID=micpar%get_micb_id(M,NGL)
-          OMEauto(ielmc,MID,L1,NY,NX)=OMEauto(ielmc,MID,L1,NY,NX)+FX*OMEauto(ielmc,MID,L0,NY,NX)
-          OMEauto(ielmn,MID,L1,NY,NX)=OMEauto(ielmn,MID,L1,NY,NX)+FX*OMEauto(ielmn,MID,L0,NY,NX)
-          OMEauto(ielmp,MID,L1,NY,NX)=OMEauto(ielmp,MID,L1,NY,NX)+FX*OMEauto(ielmp,MID,L0,NY,NX)
+          DO NE=1,NumPlantChemElms
+            mBiomeAutor_vr(NE,MID,L1,NY,NX)=mBiomeAutor_vr(NE,MID,L1,NY,NX)+FX*mBiomeAutor_vr(NE,MID,L0,NY,NX)
+          ENDDO
         enddo
       enddo
     enddo
 
     DO K=1,jcplx
       DO  M=1,ndbiomcp
-        ORM(ielmc,M,K,L1,NY,NX)=ORM(ielmc,M,K,L1,NY,NX)+FX*ORM(ielmc,M,K,L0,NY,NX)
-        ORM(ielmn,M,K,L1,NY,NX)=ORM(ielmn,M,K,L1,NY,NX)+FX*ORM(ielmn,M,K,L0,NY,NX)
-        ORM(ielmp,M,K,L1,NY,NX)=ORM(ielmp,M,K,L1,NY,NX)+FX*ORM(ielmp,M,K,L0,NY,NX)
+        DO NE=1,NumPlantChemElms
+          OMBioResdu_vr(NE,M,K,L1,NY,NX)=OMBioResdu_vr(NE,M,K,L1,NY,NX)+FX*OMBioResdu_vr(NE,M,K,L0,NY,NX)
+        ENDDO
       ENDDO
-
-      DOM(idom_doc,K,L1,NY,NX)=DOM(idom_doc,K,L1,NY,NX)+FX*DOM(idom_doc,K,L0,NY,NX)
-      DOM(idom_don,K,L1,NY,NX)=DOM(idom_don,K,L1,NY,NX)+FX*DOM(idom_don,K,L0,NY,NX)
-      DOM(idom_dop,K,L1,NY,NX)=DOM(idom_dop,K,L1,NY,NX)+FX*DOM(idom_dop,K,L0,NY,NX)
-      DOM(idom_acetate,K,L1,NY,NX)=DOM(idom_acetate,K,L1,NY,NX)+FX*DOM(idom_acetate,K,L0,NY,NX)
-
-      DOM_Macp(idom_doc,K,L1,NY,NX)=DOM_Macp(idom_doc,K,L1,NY,NX)+FX*DOM_Macp(idom_doc,K,L0,NY,NX)
-      DOM_Macp(idom_don,K,L1,NY,NX)=DOM_Macp(idom_don,K,L1,NY,NX)+FX*DOM_Macp(idom_don,K,L0,NY,NX)
-      DOM_Macp(idom_dop,K,L1,NY,NX)=DOM_Macp(idom_dop,K,L1,NY,NX)+FX*DOM_Macp(idom_dop,K,L0,NY,NX)
-      DOM_Macp(idom_acetate,K,L1,NY,NX)=DOM_Macp(idom_acetate,K,L1,NY,NX)+FX*DOM_Macp(idom_acetate,K,L0,NY,NX)
-      
-      OHM(ielmc,K,L1,NY,NX)=OHM(ielmc,K,L1,NY,NX)+FX*OHM(ielmc,K,L0,NY,NX)
-      OHM(ielmn,K,L1,NY,NX)=OHM(ielmn,K,L1,NY,NX)+FX*OHM(ielmn,K,L0,NY,NX)
-      OHM(ielmp,K,L1,NY,NX)=OHM(ielmp,K,L1,NY,NX)+FX*OHM(ielmp,K,L0,NY,NX)
-      OHM(idom_acetate,K,L1,NY,NX)=OHM(idom_acetate,K,L1,NY,NX)+FX*OHM(idom_acetate,K,L0,NY,NX)
+      DO idom=idom_beg,idom_end
+        DOM_vr(idom,K,L1,NY,NX)=DOM_vr(idom,K,L1,NY,NX)+FX*DOM_vr(idom,K,L0,NY,NX)
+        DOM_MacP_vr(idom,K,L1,NY,NX)=DOM_MacP_vr(idom,K,L1,NY,NX)+FX*DOM_MacP_vr(idom,K,L0,NY,NX)
+        SorbedOM_vr(idom,K,L1,NY,NX)=SorbedOM_vr(idom,K,L1,NY,NX)+FX*SorbedOM_vr(idom,K,L0,NY,NX)
+      enddo
       
       DO M=1,jsken
-        OSA(M,K,L1,NY,NX)=OSA(M,K,L1,NY,NX)+FX*OSA(M,K,L0,NY,NX)
-        OSM(ielmc,M,K,L1,NY,NX)=OSM(ielmc,M,K,L1,NY,NX)+FX*OSM(ielmc,M,K,L0,NY,NX)
-        OSM(ielmn,M,K,L1,NY,NX)=OSM(ielmn,M,K,L1,NY,NX)+FX*OSM(ielmn,M,K,L0,NY,NX)
-        OSM(ielmp,M,K,L1,NY,NX)=OSM(ielmp,M,K,L1,NY,NX)+FX*OSM(ielmp,M,K,L0,NY,NX)
+        SolidOMAct_vr(M,K,L1,NY,NX)=SolidOMAct_vr(M,K,L1,NY,NX)+FX*SolidOMAct_vr(M,K,L0,NY,NX)
+        DO NE=1,NumPlantChemElms
+          SolidOM_vr(NE,M,K,L1,NY,NX)=SolidOM_vr(NE,M,K,L1,NY,NX)+FX*SolidOM_vr(NE,M,K,L0,NY,NX)
+        ENDDO
       ENDDO
     ENDDO
   ENDIF
@@ -856,8 +846,10 @@ implicit none
           ENDDO
           DO  NR=1,NumRootAxes_pft(NZ,NY,NX)
             DO NE=1,NumPlantChemElms
-              RootMyco1stStrutElms_rpvr(NE,N,L1,NR,NZ,NY,NX)=RootMyco1stStrutElms_rpvr(NE,N,L1,NR,NZ,NY,NX)+FX*RootMyco1stStrutElms_rpvr(NE,N,L0,NR,NZ,NY,NX)
-              RootMyco2ndStrutElms_rpvr(NE,N,L1,NR,NZ,NY,NX)=RootMyco2ndStrutElms_rpvr(NE,N,L1,NR,NZ,NY,NX)+FX*RootMyco2ndStrutElms_rpvr(NE,N,L0,NR,NZ,NY,NX)
+              RootMyco1stStrutElms_rpvr(NE,N,L1,NR,NZ,NY,NX)=RootMyco1stStrutElms_rpvr(NE,N,L1,NR,NZ,NY,NX) &
+                +FX*RootMyco1stStrutElms_rpvr(NE,N,L0,NR,NZ,NY,NX)
+              RootMyco2ndStrutElms_rpvr(NE,N,L1,NR,NZ,NY,NX)=RootMyco2ndStrutElms_rpvr(NE,N,L1,NR,NZ,NY,NX) &
+                +FX*RootMyco2ndStrutElms_rpvr(NE,N,L0,NR,NZ,NY,NX)
             ENDDO
             Root1stLen_rpvr(N,L1,NR,NZ,NY,NX)=Root1stLen_rpvr(N,L1,NR,NZ,NY,NX)+FX*Root1stLen_rpvr(N,L0,NR,NZ,NY,NX)
             Root2ndLen_pvr(N,L1,NR,NZ,NY,NX)=Root2ndLen_pvr(N,L1,NR,NZ,NY,NX)+FX*Root2ndLen_pvr(N,L0,NR,NZ,NY,NX)
@@ -901,20 +893,20 @@ implicit none
 !     VGeomLayer(L0,NY,NX)=FY*VGeomLayer(L0,NY,NX)
 !     VLSoilPoreMicP_vr(L0,NY,NX)=FY*VLSoilPoreMicP_vr(L0,NY,NX)
 !     ENDIF
-  VLWatMicP(L0,NY,NX)=FY*VLWatMicP(L0,NY,NX)
+  VLWatMicP_vr(L0,NY,NX)=FY*VLWatMicP_vr(L0,NY,NX)
   VLiceMicP(L0,NY,NX)=FY*VLiceMicP(L0,NY,NX)
   VLsoiAirP(L0,NY,NX)=FY*VLsoiAirP(L0,NY,NX)
-  VLMicP(L0,NY,NX)=FY*VLMicP(L0,NY,NX)
+  VLMicP_vr(L0,NY,NX)=FY*VLMicP_vr(L0,NY,NX)
   VLSoilMicP(L0,NY,NX)=FY*VLSoilMicP(L0,NY,NX)
-  VLWatMicPX(L0,NY,NX)=VLWatMicP(L0,NY,NX)
+  VLWatMicPX(L0,NY,NX)=VLWatMicP_vr(L0,NY,NX)
   ENGY0=FY*ENGY0
   VHeatCapacitySoilM(L0,NY,NX)=FY*VHeatCapacitySoilM(L0,NY,NX)
   IF(L0.NE.0)THEN
     VHeatCapacity(L0,NY,NX)=VHeatCapacitySoilM(L0,NY,NX) &
-      +cpw*(VLWatMicP(L0,NY,NX)+VLWatMacP(L0,NY,NX)) &
+      +cpw*(VLWatMicP_vr(L0,NY,NX)+VLWatMacP(L0,NY,NX)) &
       +cpi*(VLiceMicP(L0,NY,NX)+VLiceMacP(L0,NY,NX))
   ELSE
-    VHeatCapacity(L0,NY,NX)=VHeatCapacitySoilM(L0,NY,NX)+cpw*VLWatMicP(L0,NY,NX)+cpi*VLiceMicP(L0,NY,NX)
+    VHeatCapacity(L0,NY,NX)=VHeatCapacitySoilM(L0,NY,NX)+cpw*VLWatMicP_vr(L0,NY,NX)+cpi*VLiceMicP(L0,NY,NX)
   ENDIF
   IF(VHeatCapacity(L0,NY,NX).GT.ZEROS(NY,NX))THEN
     TKS(L0,NY,NX)=ENGY0/VHeatCapacity(L0,NY,NX)
@@ -924,11 +916,11 @@ implicit none
   TCS(L0,NY,NX)=units%Kelvin2Celcius(TKS(L0,NY,NX))
 
   DO NTF=ifertn_beg,ifertn_end
-    FertN_soil(NTF,L0,NY,NX)=FY*FertN_soil(NTF,L0,NY,NX)
+    FertN_soil_vr(NTF,L0,NY,NX)=FY*FertN_soil_vr(NTF,L0,NY,NX)
   ENDDO
 
   DO NTF=ifertnb_beg,ifertnb_end
-    FertN_band(NTF,L0,NY,NX)=FY*FertN_band(NTF,L0,NY,NX)
+    FertN_Band_vr(NTF,L0,NY,NX)=FY*FertN_Band_vr(NTF,L0,NY,NX)
   ENDDO
 
   DO NTU=ids_nuts_beg,ids_nuts_end
@@ -972,54 +964,45 @@ implicit none
   ENDDO
   IF(IFLGL(L,3).EQ.0)THEN
     DO  K=1,jcplx
-       DO N=1,NumMicbFunGroups
+       DO N=1,NumMicbFunGrupsPerCmplx
         DO M=1,nlbiomcp
           DO NGL=JGnio(N),JGnfo(N)
             MID=micpar%get_micb_id(M,NGL)
-            OMEhetr(ielmc,MID,K,L0,NY,NX)=FY*OMEhetr(ielmc,MID,K,L0,NY,NX)
-            OMEhetr(ielmn,MID,K,L0,NY,NX)=FY*OMEhetr(ielmn,MID,K,L0,NY,NX)
-            OMEhetr(ielmp,MID,K,L0,NY,NX)=FY*OMEhetr(ielmp,MID,K,L0,NY,NX)
+            DO NE=1,NumPlantChemElms
+              mBiomeHeter_vr(NE,MID,K,L0,NY,NX)=FY*mBiomeHeter_vr(NE,MID,K,L0,NY,NX)
+            ENDDO
           ENDDO
         enddo
       enddo
     ENDDO
 
-    DO N=1,NumMicbFunGroups
+    DO N=1,NumMicbFunGrupsPerCmplx
       DO M=1,nlbiomcp
         DO NGL=JGniA(N),JGnfA(N)
           MID=micpar%get_micb_id(M,NGL)
-          OMEauto(ielmc,MID,L0,NY,NX)=FY*OMEauto(ielmc,MID,L0,NY,NX)
-          OMEauto(ielmn,MID,L0,NY,NX)=FY*OMEauto(ielmn,MID,L0,NY,NX)
-          OMEauto(ielmp,MID,L0,NY,NX)=FY*OMEauto(ielmp,MID,L0,NY,NX)
+          DO NE=1,NumPlantChemElms
+            mBiomeAutor_vr(NE,MID,L0,NY,NX)=FY*mBiomeAutor_vr(NE,MID,L0,NY,NX)
+          ENDDO
         ENDDO
       enddo
     enddo
 
     DO K=1,jcplx
       DO  M=1,ndbiomcp
-        ORM(ielmc,M,K,L0,NY,NX)=FY*ORM(ielmc,M,K,L0,NY,NX)
-        ORM(ielmn,M,K,L0,NY,NX)=FY*ORM(ielmn,M,K,L0,NY,NX)
-        ORM(ielmp,M,K,L0,NY,NX)=FY*ORM(ielmp,M,K,L0,NY,NX)
+        DO NE=1,NumPlantChemElms
+          OMBioResdu_vr(NE,M,K,L0,NY,NX)=FY*OMBioResdu_vr(NE,M,K,L0,NY,NX)
+        ENDDO
       ENDDO
-      DOM(idom_doc,K,L0,NY,NX)=FY*DOM(idom_doc,K,L0,NY,NX)
-      DOM(idom_don,K,L0,NY,NX)=FY*DOM(idom_don,K,L0,NY,NX)
-      DOM(idom_dop,K,L0,NY,NX)=FY*DOM(idom_dop,K,L0,NY,NX)
-      DOM(idom_acetate,K,L0,NY,NX)=FY*DOM(idom_acetate,K,L0,NY,NX)
-
-      DOM_Macp(idom_doc,K,L0,NY,NX)=FY*DOM_Macp(idom_doc,K,L0,NY,NX)
-      DOM_Macp(idom_don,K,L0,NY,NX)=FY*DOM_Macp(idom_don,K,L0,NY,NX)
-      DOM_Macp(idom_dop,K,L0,NY,NX)=FY*DOM_Macp(idom_dop,K,L0,NY,NX)
-      DOM_Macp(idom_acetate,K,L0,NY,NX)=FY*DOM_Macp(idom_acetate,K,L0,NY,NX)
-
-      OHM(ielmc,K,L0,NY,NX)=FY*OHM(ielmc,K,L0,NY,NX)
-      OHM(ielmn,K,L0,NY,NX)=FY*OHM(ielmn,K,L0,NY,NX)
-      OHM(ielmp,K,L0,NY,NX)=FY*OHM(ielmp,K,L0,NY,NX)
-      OHM(idom_acetate,K,L0,NY,NX)=FY*OHM(idom_acetate,K,L0,NY,NX)
+      do idom=idom_beg,idom_end
+        DOM_vr(idom,K,L0,NY,NX)=FY*DOM_vr(idom,K,L0,NY,NX)
+        DOM_MacP_vr(idom,K,L0,NY,NX)=FY*DOM_MacP_vr(idom,K,L0,NY,NX)
+        SorbedOM_vr(idom,K,L0,NY,NX)=FY*SorbedOM_vr(idom,K,L0,NY,NX)
+      enddo
       DO  M=1,jsken
-        OSM(ielmc,M,K,L0,NY,NX)=FY*OSM(ielmc,M,K,L0,NY,NX)
-        OSA(M,K,L0,NY,NX)=FY*OSA(M,K,L0,NY,NX)
-        OSM(ielmn,M,K,L0,NY,NX)=FY*OSM(ielmn,M,K,L0,NY,NX)
-        OSM(ielmp,M,K,L0,NY,NX)=FY*OSM(ielmp,M,K,L0,NY,NX)
+        SolidOMAct_vr(M,K,L0,NY,NX)=FY*SolidOMAct_vr(M,K,L0,NY,NX)
+        do NE=1,NumPlantChemElms
+          SolidOM_vr(NE,M,K,L0,NY,NX)=FY*SolidOM_vr(NE,M,K,L0,NY,NX)
+        ENDDO
       ENDDO
     ENDDO
   ENDIF
@@ -1071,7 +1054,7 @@ implicit none
   ENDIF
   IF(NN.EQ.1)THEN
     IF(SoiBulkDensity(L0,NY,NX).LE.ZERO.AND.SoiBulkDensity(L1,NY,NX).LE.ZERO &
-      .AND.VLWatMicP(L0,NY,NX)+VLiceMicP(L0,NY,NX).LE.ZEROS(NY,NX))THEN
+      .AND.VLWatMicP_vr(L0,NY,NX)+VLiceMicP(L0,NY,NX).LE.ZEROS(NY,NX))THEN
       CumDepth2LayerBottom(L1,NY,NX)=CumDepth2LayerBottom(L0,NY,NX)
       CDPTHY(L1)=CDPTHY(L0)
     ENDIF
@@ -1088,7 +1071,7 @@ implicit none
   real(r8),intent(in) :: FO
   integer, intent(in) :: IFLGL(0:JZ,6)
 
-  integer :: K,N,M,NGL,NR,NZ,NE,NTG,MID
+  integer :: K,N,M,NGL,NR,NZ,NE,NTG,MID,idom
   real(r8) :: FXO,FRO
   real(r8) :: FXRTLG2,FXRTN2,FXEPOOLR,FXWTRTL
   real(r8) :: WTNDLE,FXEPOOLN
@@ -1113,104 +1096,78 @@ implicit none
     ENDIF
 
     DO  K=1,jcplx
-      DO  N=1,NumMicbFunGroups
+      DO  N=1,NumMicbFunGrupsPerCmplx
         DO  M=1,nlbiomcp
           DO NGL=JGnio(N),JGnfo(N)
             MID=micpar%get_micb_id(M,NGL)          
-            FXOMC=FXO*OMEhetr(ielmc,MID,K,L0,NY,NX)
-            OMEhetr(ielmc,MID,K,L1,NY,NX)=OMEhetr(ielmc,MID,K,L1,NY,NX)+FXOMC
-            OMEhetr(ielmc,MID,K,L0,NY,NX)=OMEhetr(ielmc,MID,K,L0,NY,NX)-FXOMC
-            FXOMN=FXO*OMEhetr(ielmn,MID,K,L0,NY,NX)
-            OMEhetr(ielmn,MID,K,L1,NY,NX)=OMEhetr(ielmn,MID,K,L1,NY,NX)+FXOMN
-            OMEhetr(ielmn,MID,K,L0,NY,NX)=OMEhetr(ielmn,MID,K,L0,NY,NX)-FXOMN
-            FXOMP=FXO*OMEhetr(ielmp,MID,K,L0,NY,NX)
-            OMEhetr(ielmp,MID,K,L1,NY,NX)=OMEhetr(ielmp,MID,K,L1,NY,NX)+FXOMP
-            OMEhetr(ielmp,MID,K,L0,NY,NX)=OMEhetr(ielmp,MID,K,L0,NY,NX)-FXOMP
+            FXOMC=FXO*mBiomeHeter_vr(ielmc,MID,K,L0,NY,NX)
+            mBiomeHeter_vr(ielmc,MID,K,L1,NY,NX)=mBiomeHeter_vr(ielmc,MID,K,L1,NY,NX)+FXOMC
+            mBiomeHeter_vr(ielmc,MID,K,L0,NY,NX)=mBiomeHeter_vr(ielmc,MID,K,L0,NY,NX)-FXOMC
+            FXOMN=FXO*mBiomeHeter_vr(ielmn,MID,K,L0,NY,NX)
+            mBiomeHeter_vr(ielmn,MID,K,L1,NY,NX)=mBiomeHeter_vr(ielmn,MID,K,L1,NY,NX)+FXOMN
+            mBiomeHeter_vr(ielmn,MID,K,L0,NY,NX)=mBiomeHeter_vr(ielmn,MID,K,L0,NY,NX)-FXOMN
+            FXOMP=FXO*mBiomeHeter_vr(ielmp,MID,K,L0,NY,NX)
+            mBiomeHeter_vr(ielmp,MID,K,L1,NY,NX)=mBiomeHeter_vr(ielmp,MID,K,L1,NY,NX)+FXOMP
+            mBiomeHeter_vr(ielmp,MID,K,L0,NY,NX)=mBiomeHeter_vr(ielmp,MID,K,L0,NY,NX)-FXOMP
           enddo
         enddo
       enddo
     ENDDO
 
-    DO  N=1,NumMicbFunGroups
+    DO  N=1,NumMicbFunGrupsPerCmplx
       DO  M=1,nlbiomcp
         DO NGL=JGniA(N),JGnfA(N)
           MID=micpar%get_micb_id(M,NGL)
-          FXOMC=FXO*OMEauto(ielmc,MID,L0,NY,NX)
-          OMEauto(ielmc,MID,L1,NY,NX)=OMEauto(ielmc,MID,L1,NY,NX)+FXOMC
-          OMEauto(ielmc,MID,L0,NY,NX)=OMEauto(ielmc,MID,L0,NY,NX)-FXOMC
-          FXOMN=FXO*OMEauto(ielmn,MID,L0,NY,NX)
-          OMEauto(ielmn,MID,L1,NY,NX)=OMEauto(ielmn,MID,L1,NY,NX)+FXOMN
-          OMEauto(ielmn,MID,L0,NY,NX)=OMEauto(ielmn,MID,L0,NY,NX)-FXOMN
-          FXOMP=FXO*OMEauto(ielmp,MID,L0,NY,NX)
-          OMEauto(ielmp,MID,L1,NY,NX)=OMEauto(ielmp,MID,L1,NY,NX)+FXOMP
-          OMEauto(ielmp,MID,L0,NY,NX)=OMEauto(ielmp,MID,L0,NY,NX)-FXOMP
+          FXOMC=FXO*mBiomeAutor_vr(ielmc,MID,L0,NY,NX)
+          mBiomeAutor_vr(ielmc,MID,L1,NY,NX)=mBiomeAutor_vr(ielmc,MID,L1,NY,NX)+FXOMC
+          mBiomeAutor_vr(ielmc,MID,L0,NY,NX)=mBiomeAutor_vr(ielmc,MID,L0,NY,NX)-FXOMC
+          FXOMN=FXO*mBiomeAutor_vr(ielmn,MID,L0,NY,NX)
+          mBiomeAutor_vr(ielmn,MID,L1,NY,NX)=mBiomeAutor_vr(ielmn,MID,L1,NY,NX)+FXOMN
+          mBiomeAutor_vr(ielmn,MID,L0,NY,NX)=mBiomeAutor_vr(ielmn,MID,L0,NY,NX)-FXOMN
+          FXOMP=FXO*mBiomeAutor_vr(ielmp,MID,L0,NY,NX)
+          mBiomeAutor_vr(ielmp,MID,L1,NY,NX)=mBiomeAutor_vr(ielmp,MID,L1,NY,NX)+FXOMP
+          mBiomeAutor_vr(ielmp,MID,L0,NY,NX)=mBiomeAutor_vr(ielmp,MID,L0,NY,NX)-FXOMP
         enddo
       enddo
     enddo
 
     DO  K=1,jcplx
       DO  M=1,ndbiomcp
-        FXORC=FXO*ORM(ielmc,M,K,L0,NY,NX)
-        ORM(ielmc,M,K,L1,NY,NX)=ORM(ielmc,M,K,L1,NY,NX)+FXORC
-        ORM(ielmc,M,K,L0,NY,NX)=ORM(ielmc,M,K,L0,NY,NX)-FXORC
-        FXORN=FXO*ORM(ielmn,M,K,L0,NY,NX)
-        ORM(ielmn,M,K,L1,NY,NX)=ORM(ielmn,M,K,L1,NY,NX)+FXORN
-        ORM(ielmn,M,K,L0,NY,NX)=ORM(ielmn,M,K,L0,NY,NX)-FXORN
-        FXORP=FXO*ORM(ielmp,M,K,L0,NY,NX)
-        ORM(ielmp,M,K,L1,NY,NX)=ORM(ielmp,M,K,L1,NY,NX)+FXORP
-        ORM(ielmp,M,K,L0,NY,NX)=ORM(ielmp,M,K,L0,NY,NX)-FXORP
+        FXORC=FXO*OMBioResdu_vr(ielmc,M,K,L0,NY,NX)
+        OMBioResdu_vr(ielmc,M,K,L1,NY,NX)=OMBioResdu_vr(ielmc,M,K,L1,NY,NX)+FXORC
+        OMBioResdu_vr(ielmc,M,K,L0,NY,NX)=OMBioResdu_vr(ielmc,M,K,L0,NY,NX)-FXORC
+        FXORN=FXO*OMBioResdu_vr(ielmn,M,K,L0,NY,NX)
+        OMBioResdu_vr(ielmn,M,K,L1,NY,NX)=OMBioResdu_vr(ielmn,M,K,L1,NY,NX)+FXORN
+        OMBioResdu_vr(ielmn,M,K,L0,NY,NX)=OMBioResdu_vr(ielmn,M,K,L0,NY,NX)-FXORN
+        FXORP=FXO*OMBioResdu_vr(ielmp,M,K,L0,NY,NX)
+        OMBioResdu_vr(ielmp,M,K,L1,NY,NX)=OMBioResdu_vr(ielmp,M,K,L1,NY,NX)+FXORP
+        OMBioResdu_vr(ielmp,M,K,L0,NY,NX)=OMBioResdu_vr(ielmp,M,K,L0,NY,NX)-FXORP
       ENDDO
-      FXOQC=FXO*DOM(idom_doc,K,L0,NY,NX)
-      DOM(idom_doc,K,L1,NY,NX)=DOM(idom_doc,K,L1,NY,NX)+FXOQC
-      DOM(idom_doc,K,L0,NY,NX)=DOM(idom_doc,K,L0,NY,NX)-FXOQC
-      FXOQN=FXO*DOM(idom_don,K,L0,NY,NX)
-      DOM(idom_don,K,L1,NY,NX)=DOM(idom_don,K,L1,NY,NX)+FXOQN
-      DOM(idom_don,K,L0,NY,NX)=DOM(idom_don,K,L0,NY,NX)-FXOQN
-      FXOQP=FXO*DOM(idom_dop,K,L0,NY,NX)
-      DOM(idom_dop,K,L1,NY,NX)=DOM(idom_dop,K,L1,NY,NX)+FXOQP
-      DOM(idom_dop,K,L0,NY,NX)=DOM(idom_dop,K,L0,NY,NX)-FXOQP
-      FXOQA=FXO*DOM(idom_acetate,K,L0,NY,NX)
-      DOM(idom_acetate,K,L1,NY,NX)=DOM(idom_acetate,K,L1,NY,NX)+FXOQA
-      DOM(idom_acetate,K,L0,NY,NX)=DOM(idom_acetate,K,L0,NY,NX)-FXOQA
+
+      DO idom=idom_beg,idom_end
+        FXOQC=FXO*DOM_vr(idom,K,L0,NY,NX)
+        DOM_vr(idom,K,L1,NY,NX)=DOM_vr(idom,K,L1,NY,NX)+FXOQC
+        DOM_vr(idom,K,L0,NY,NX)=DOM_vr(idom,K,L0,NY,NX)-FXOQC
+      enddo
+
       IF(SoilFracAsMacP(L1,NY,NX).GT.ZERO.AND.SoilFracAsMacP(L0,NY,NX).GT.ZERO)THEN
-        FXOQCH=FXO*DOM_Macp(idom_doc,K,L0,NY,NX)
-        DOM_Macp(idom_doc,K,L1,NY,NX)=DOM_Macp(idom_doc,K,L1,NY,NX)+FXOQCH
-        DOM_Macp(idom_doc,K,L0,NY,NX)=DOM_Macp(idom_doc,K,L0,NY,NX)-FXOQCH
-        FXOQNH=FXO*DOM_Macp(idom_don,K,L0,NY,NX)
-        DOM_Macp(idom_don,K,L1,NY,NX)=DOM_Macp(idom_don,K,L1,NY,NX)+FXOQNH
-        DOM_Macp(idom_don,K,L0,NY,NX)=DOM_Macp(idom_don,K,L0,NY,NX)-FXOQNH
-        FXOQPH=FXO*DOM_Macp(idom_dop,K,L0,NY,NX)
-        DOM_Macp(idom_dop,K,L1,NY,NX)=DOM_Macp(idom_dop,K,L1,NY,NX)+FXOQPH
-        DOM_Macp(idom_dop,K,L0,NY,NX)=DOM_Macp(idom_dop,K,L0,NY,NX)-FXOQPH
-        FXOQAH=FXO*DOM_Macp(idom_acetate,K,L0,NY,NX)
-        DOM_Macp(idom_acetate,K,L1,NY,NX)=DOM_Macp(idom_acetate,K,L1,NY,NX)+FXOQAH
-        DOM_Macp(idom_acetate,K,L0,NY,NX)=DOM_Macp(idom_acetate,K,L0,NY,NX)-FXOQAH
+        DO idom=idom_beg,idom_end
+          FXOQCH=FXO*DOM_MacP_vr(idom,K,L0,NY,NX)
+          DOM_MacP_vr(idom,K,L1,NY,NX)=DOM_MacP_vr(idom,K,L1,NY,NX)+FXOQCH
+          DOM_MacP_vr(idom,K,L0,NY,NX)=DOM_MacP_vr(idom,K,L0,NY,NX)-FXOQCH
+        ENDDO
       ENDIF
-      FXOHC=FXO*OHM(ielmc,K,L0,NY,NX)
-      OHM(ielmc,K,L1,NY,NX)=OHM(ielmc,K,L1,NY,NX)+FXOHC
-      OHM(ielmc,K,L0,NY,NX)=OHM(ielmc,K,L0,NY,NX)-FXOHC
-      FXOHN=FXO*OHM(ielmn,K,L0,NY,NX)
-      OHM(ielmn,K,L1,NY,NX)=OHM(ielmn,K,L1,NY,NX)+FXOHN
-      OHM(ielmn,K,L0,NY,NX)=OHM(ielmn,K,L0,NY,NX)-FXOHN
-      FXOHP=FXO*OHM(ielmp,K,L0,NY,NX)
-      OHM(ielmp,K,L1,NY,NX)=OHM(ielmp,K,L1,NY,NX)+FXOHP
-      OHM(ielmp,K,L0,NY,NX)=OHM(ielmp,K,L0,NY,NX)-FXOHP
-      FXOHA=FXO*OHM(idom_acetate,K,L0,NY,NX)
-      OHM(idom_acetate,K,L1,NY,NX)=OHM(idom_acetate,K,L1,NY,NX)+FXOHA
-      OHM(idom_acetate,K,L0,NY,NX)=OHM(idom_acetate,K,L0,NY,NX)-FXOHA
+       DO idom=idom_beg,idom_end
+        FXOHC=FXO*SorbedOM_vr(idom,K,L0,NY,NX)
+        SorbedOM_vr(idom,K,L1,NY,NX)=SorbedOM_vr(idom,K,L1,NY,NX)+FXOHC
+        SorbedOM_vr(idom,K,L0,NY,NX)=SorbedOM_vr(idom,K,L0,NY,NX)-FXOHC
+      ENDDO
       DO M=1,jsken
-        FXOSC=FXO*OSM(ielmc,M,K,L0,NY,NX)
-        OSM(ielmc,M,K,L1,NY,NX)=OSM(ielmc,M,K,L1,NY,NX)+FXOSC
-        OSM(ielmc,M,K,L0,NY,NX)=OSM(ielmc,M,K,L0,NY,NX)-FXOSC
-        FXOSA=FXO*OSA(M,K,L0,NY,NX)
-        OSA(M,K,L1,NY,NX)=OSA(M,K,L1,NY,NX)+FXOSA
-        OSA(M,K,L0,NY,NX)=OSA(M,K,L0,NY,NX)-FXOSA
-        FXOSN=FXO*OSM(ielmn,M,K,L0,NY,NX)
-        OSM(ielmn,M,K,L1,NY,NX)=OSM(ielmn,M,K,L1,NY,NX)+FXOSN
-        OSM(ielmn,M,K,L0,NY,NX)=OSM(ielmn,M,K,L0,NY,NX)-FXOSN
-        FXOSP=FXO*OSM(ielmp,M,K,L0,NY,NX)
-        OSM(ielmp,M,K,L1,NY,NX)=OSM(ielmp,M,K,L1,NY,NX)+FXOSP
-        OSM(ielmp,M,K,L0,NY,NX)=OSM(ielmp,M,K,L0,NY,NX)-FXOSP
+        DO NE=1,NumPlantChemElms
+          FXOSC=FXO*SolidOM_vr(NE,M,K,L0,NY,NX)
+          SolidOM_vr(NE,M,K,L1,NY,NX)=SolidOM_vr(NE,M,K,L1,NY,NX)+FXOSC
+          SolidOM_vr(NE,M,K,L0,NY,NX)=SolidOM_vr(NE,M,K,L0,NY,NX)-FXOSC
+        ENDDO
       ENDDO
     ENDDO
 !
@@ -1337,9 +1294,9 @@ implicit none
   IF(SoilFracAsMacP(L1,NY,NX).GT.ZERO.AND.SoilFracAsMacP(L0,NY,NX).GT.ZERO)THEN
 
     DO NTS=ids_beg,ids_end
-      FXSH=FHO*trc_soHml(NTS,L0,NY,NX)
-      trc_soHml(NTS,L1,NY,NX)=trc_soHml(NTS,L1,NY,NX)+FXSH
-      trc_soHml(NTS,L0,NY,NX)=trc_soHml(NTS,L0,NY,NX)-FXSH
+      FXSH=FHO*trc_soHml_vr(NTS,L0,NY,NX)
+      trc_soHml_vr(NTS,L1,NY,NX)=trc_soHml_vr(NTS,L1,NY,NX)+FXSH
+      trc_soHml_vr(NTS,L0,NY,NX)=trc_soHml_vr(NTS,L0,NY,NX)-FXSH
     ENDDO
 
 !
@@ -1464,16 +1421,16 @@ implicit none
 
 ! begin_execution
   DO NTF=ifertn_beg,ifertn_end
-    FXZN=AMIN1(FX*FertN_soil(NTF,L,NY,NX),FertN_soil(NTF,L0,NY,NX))
-    FertN_soil(NTF,L1,NY,NX)=FertN_soil(NTF,L1,NY,NX)+FXZN
-    FertN_soil(NTF,L0,NY,NX)=FertN_soil(NTF,L0,NY,NX)-FXZN
+    FXZN=AMIN1(FX*FertN_soil_vr(NTF,L,NY,NX),FertN_soil_vr(NTF,L0,NY,NX))
+    FertN_soil_vr(NTF,L1,NY,NX)=FertN_soil_vr(NTF,L1,NY,NX)+FXZN
+    FertN_soil_vr(NTF,L0,NY,NX)=FertN_soil_vr(NTF,L0,NY,NX)-FXZN
   ENDDO
 
   IF (L0>0) then
     DO NTF=ifertnb_beg,ifertnb_end
-      FXZN=AMIN1(FX*FertN_band(NTF,L,NY,NX),FertN_band(NTF,L0,NY,NX))
-      FertN_band(NTF,L1,NY,NX)=FertN_band(NTF,L1,NY,NX)+FXZN
-      FertN_band(NTF,L0,NY,NX)=FertN_band(NTF,L0,NY,NX)-FXZN
+      FXZN=AMIN1(FX*FertN_Band_vr(NTF,L,NY,NX),FertN_Band_vr(NTF,L0,NY,NX))
+      FertN_Band_vr(NTF,L1,NY,NX)=FertN_Band_vr(NTF,L1,NY,NX)+FXZN
+      FertN_Band_vr(NTF,L0,NY,NX)=FertN_Band_vr(NTF,L0,NY,NX)-FXZN
     ENDDO
   endif
 !
@@ -1668,21 +1625,21 @@ implicit none
   IF(L0.EQ.0)THEN
     FXVOLW=FX*AZMAX1(XVOLWP-MaxVLWatByLitR(NY,NX))
   ELSE
-    FXVOLW=FWO*VLWatMicP(L0,NY,NX)
+    FXVOLW=FWO*VLWatMicP_vr(L0,NY,NX)
   ENDIF
-  VLWatMicP(L1,NY,NX)=VLWatMicP(L1,NY,NX)+FXVOLW
-  VLWatMicP(L0,NY,NX)=VLWatMicP(L0,NY,NX)-FXVOLW
+  VLWatMicP_vr(L1,NY,NX)=VLWatMicP_vr(L1,NY,NX)+FXVOLW
+  VLWatMicP_vr(L0,NY,NX)=VLWatMicP_vr(L0,NY,NX)-FXVOLW
 !     IF(VLiceMicP(L1,NY,NX).GT.ZEROS(NY,NX))THEN
   FXVOLI=FWO*VLiceMicP(L0,NY,NX)
   VLiceMicP(L1,NY,NX)=VLiceMicP(L1,NY,NX)+FXVOLI
   VLiceMicP(L0,NY,NX)=VLiceMicP(L0,NY,NX)-FXVOLI
 !     ENDIF
-!     FXVOLA=FWO*VLMicP(L0,NY,NX)
+!     FXVOLA=FWO*VLMicP_vr(L0,NY,NX)
 !     IF(L1.NE.NU(NY,NX))THEN
-!     VLMicP(L1,NY,NX)=VLMicP(L1,NY,NX)+FXVOLA
+!     VLMicP_vr(L1,NY,NX)=VLMicP_vr(L1,NY,NX)+FXVOLA
 !     ENDIF
 !     IF(L0.NE.NU(NY,NX))THEN
-!     VLMicP(L0,NY,NX)=VLMicP(L0,NY,NX)-FXVOLA
+!     VLMicP_vr(L0,NY,NX)=VLMicP_vr(L0,NY,NX)-FXVOLA
 !     ENDIF
   FXVLSoilMicP=FWO*VLSoilMicP(L0,NY,NX)
   VLSoilMicP(L1,NY,NX)=VLSoilMicP(L1,NY,NX)+FXVLSoilMicP

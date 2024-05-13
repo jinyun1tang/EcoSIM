@@ -21,7 +21,7 @@ module ErosionMod
   use GridDataType
   use EcoSIMConfig, only : nlbiomcp => NumLiveMicrbCompts
   use EcoSIMConfig, only : ndbiomcp=> NumDeadMicrbCompts
-  use EcoSIMConfig, only : jcplx1=> jcplx1c, NumMicbFunGroups => NumMicbFunGroups,jcplx=>jcplxc
+  use EcoSIMConfig, only : jcplx1=> jcplx1c, NumMicbFunGrupsPerCmplx => NumMicbFunGrupsPerCmplx,jcplx=>jcplxc
   use EcoSIMConfig, only : column_mode
   implicit none
 
@@ -121,7 +121,7 @@ module ErosionMod
 !     KINETIC ENERGY AND FROM DETACHMENT COEFFICIENT IN 'HOUR1'
 !     ATTENUATED BY DEPTH OF SURFACE WATER
 !
-        DETW=SoilDetachability4Erosion1(NY,NX)*(1.0_r8+2.0_r8*VLWatMicPM(M,NU(NY,NX),NY,NX)/VLMicP(NU(NY,NX),NY,NX))
+        DETW=SoilDetachability4Erosion1(NY,NX)*(1.0_r8+2.0_r8*VLWatMicPM(M,NU(NY,NX),NY,NX)/VLMicP_vr(NU(NY,NX),NY,NX))
         SoilDetachRate=AMIN1(SoilMicPMassLayer(NU(NY,NX),NY,NX)*dts_wat &
           ,DETW*EnergyImpact4ErosionM(M,NY,NX)*AREA(3,NU(NY,NX),NY,NX) &
           *FracSoiAsMicP(NU(NY,NX),NY,NX)*FracSurfSnoFree(NY,NX)*(1.0-FVOLIM(NY,NX)))
@@ -468,15 +468,15 @@ module ErosionMod
 !     sediment code:NH4,NH3,NHU,NO3=NH4,NH3,urea,NO3 in non-band
 !                  :NH4B,NH3B,NHUB,NO3B=NH4,NH3,urea,NO3 in band
 !
-              XNH4ER(N,2,N5,N4)=FSEDER*FertN_soil(ifert_nh4,NU(N2,N1),N2,N1)
-              XNH3ER(N,2,N5,N4)=FSEDER*FertN_soil(ifert_nh3,NU(N2,N1),N2,N1)
-              XNHUER(N,2,N5,N4)=FSEDER*FertN_soil(ifert_urea,NU(N2,N1),N2,N1)
-              XNO3ER(N,2,N5,N4)=FSEDER*FertN_soil(ifert_no3,NU(N2,N1),N2,N1)
+              XNH4ER(N,2,N5,N4)=FSEDER*FertN_soil_vr(ifert_nh4,NU(N2,N1),N2,N1)
+              XNH3ER(N,2,N5,N4)=FSEDER*FertN_soil_vr(ifert_nh3,NU(N2,N1),N2,N1)
+              XNHUER(N,2,N5,N4)=FSEDER*FertN_soil_vr(ifert_urea,NU(N2,N1),N2,N1)
+              XNO3ER(N,2,N5,N4)=FSEDER*FertN_soil_vr(ifert_no3,NU(N2,N1),N2,N1)
 
-              XNH4EB(N,2,N5,N4)=FSEDER*FertN_band(ifert_nh4_band,NU(N2,N1),N2,N1)
-              XNH3EB(N,2,N5,N4)=FSEDER*FertN_band(ifert_nh3_band,NU(N2,N1),N2,N1)
-              XNHUEB(N,2,N5,N4)=FSEDER*FertN_band(ifert_urea_band,NU(N2,N1),N2,N1)
-              XNO3EB(N,2,N5,N4)=FSEDER*FertN_band(ifert_no3_band,NU(N2,N1),N2,N1)
+              XNH4EB(N,2,N5,N4)=FSEDER*FertN_Band_vr(ifert_nh4_band,NU(N2,N1),N2,N1)
+              XNH3EB(N,2,N5,N4)=FSEDER*FertN_Band_vr(ifert_nh3_band,NU(N2,N1),N2,N1)
+              XNHUEB(N,2,N5,N4)=FSEDER*FertN_Band_vr(ifert_urea_band,NU(N2,N1),N2,N1)
+              XNO3EB(N,2,N5,N4)=FSEDER*FertN_Band_vr(ifert_no3_band,NU(N2,N1),N2,N1)
 !
 !     EXCHANGEABLE CATIONS AND ANIONS
 !
@@ -510,24 +510,24 @@ module ErosionMod
 !     ORGANIC MATTER
 !
               DO  K=1,jcplx
-                DO NO=1,NumMicbFunGroups
+                DO NO=1,NumMicbFunGrupsPerCmplx
                   DO NGL=JGnio(NO),JGnfo(NO)
                     DO M=1,nlbiomcp
                       MID=micpar%get_micb_id(M,NGL)
                       DO NE=1,NumPlantChemElms
-                        OMEERhetr(NE,MID,K,N,2,N5,N4)=FSEDER*OMEhetr(NE,MID,K,NU(N2,N1),N2,N1)
+                        OMEERhetr(NE,MID,K,N,2,N5,N4)=FSEDER*mBiomeHeter_vr(NE,MID,K,NU(N2,N1),N2,N1)
                       ENDDO
                     ENDDO
                   ENDDO
                 ENDDO
               ENDDO
 
-              DO NO=1,NumMicbFunGroups
+              DO NO=1,NumMicbFunGrupsPerCmplx
                 DO NGL=JGniA(NO),JGnfA(NO)
                   DO M=1,nlbiomcp
                     MID=micpar%get_micb_id(M,NGL)
                     DO NE=1,NumPlantChemElms
-                      OMEERauto(NE,MID,N,2,N5,N4)=FSEDER*OMEauto(NE,MID,NU(N2,N1),N2,N1)
+                      OMEERauto(NE,MID,N,2,N5,N4)=FSEDER*mBiomeAutor_vr(NE,MID,NU(N2,N1),N2,N1)
                     ENDDO
                   ENDDO
                 ENDDO
@@ -536,17 +536,17 @@ module ErosionMod
               DO  K=1,jcplx
                 DO  M=1,ndbiomcp
                   DO NE=1,NumPlantChemElms
-                    ORMER(NE,M,K,N,2,N5,N4)=FSEDER*ORM(NE,M,K,NU(N2,N1),N2,N1)
+                    ORMER(NE,M,K,N,2,N5,N4)=FSEDER*OMBioResdu_vr(NE,M,K,NU(N2,N1),N2,N1)
                   ENDDO
                 ENDDO
                 DO idom=idom_beg,idom_end
-                  OHMER(idom,K,N,2,N5,N4)=FSEDER*OHM(idom,K,NU(N2,N1),N2,N1)
+                  OHMER(idom,K,N,2,N5,N4)=FSEDER*SorbedOM_vr(idom,K,NU(N2,N1),N2,N1)
                 ENDDO
                 DO  M=1,jsken
                   DO NE=1,NumPlantChemElms
-                    OSMER(NE,M,K,N,2,N5,N4)=FSEDER*OSM(NE,M,K,NU(N2,N1),N2,N1)
+                    OSMER(NE,M,K,N,2,N5,N4)=FSEDER*SolidOM_vr(NE,M,K,NU(N2,N1),N2,N1)
                   ENDDO
-                  OSAER(M,K,N,2,N5,N4)=FSEDER*OSA(M,K,NU(N2,N1),N2,N1)
+                  OSAER(M,K,N,2,N5,N4)=FSEDER*SolidOMAct_vr(M,K,NU(N2,N1),N2,N1)
                 ENDDO
               ENDDO
             ELSE
@@ -576,7 +576,7 @@ module ErosionMod
 !     ORGANIC MATTER
 !
               DO  K=1,jcplx
-                DO  NO=1,NumMicbFunGroups
+                DO  NO=1,NumMicbFunGrupsPerCmplx
                   DO NGL=JGnio(NO),JGnfo(NO)
                     DO  M=1,nlbiomcp
                       MID=micpar%get_micb_id(M,NGL)
@@ -588,7 +588,7 @@ module ErosionMod
                 enddo
               ENDDO
 
-              DO  NO=1,NumMicbFunGroups
+              DO  NO=1,NumMicbFunGrupsPerCmplx
                 DO NGL=JGniA(NO),JGnfA(NO)
                   DO  M=1,nlbiomcp
                     MID=micpar%get_micb_id(M,NGL)
@@ -629,14 +629,14 @@ module ErosionMod
 !     sediment code:NH4,NH3,NHU,NO3=NH4,NH3,urea,NO3 in non-band
 !                  :NH4B,NH3B,NHUB,NO3B=NH4,NH3,urea,NO3 in band
 !
-                XNH4ER(N,1,N5B,N4B)=FSEDER*FertN_soil(ifert_nh4,NU(N2,N1),N2,N1)
-                XNH3ER(N,1,N5B,N4B)=FSEDER*FertN_soil(ifert_nh3,NU(N2,N1),N2,N1)
-                XNHUER(N,1,N5B,N4B)=FSEDER*FertN_soil(ifert_urea,NU(N2,N1),N2,N1)
-                XNO3ER(N,1,N5B,N4B)=FSEDER*FertN_soil(ifert_no3,NU(N2,N1),N2,N1)
-                XNH4EB(N,1,N5B,N4B)=FSEDER*FertN_band(ifert_nh4_band,NU(N2,N1),N2,N1)
-                XNH3EB(N,1,N5B,N4B)=FSEDER*FertN_band(ifert_nh3_band,NU(N2,N1),N2,N1)
-                XNHUEB(N,1,N5B,N4B)=FSEDER*FertN_band(ifert_urea_band,NU(N2,N1),N2,N1)
-                XNO3EB(N,1,N5B,N4B)=FSEDER*FertN_band(ifert_no3_band,NU(N2,N1),N2,N1)
+                XNH4ER(N,1,N5B,N4B)=FSEDER*FertN_soil_vr(ifert_nh4,NU(N2,N1),N2,N1)
+                XNH3ER(N,1,N5B,N4B)=FSEDER*FertN_soil_vr(ifert_nh3,NU(N2,N1),N2,N1)
+                XNHUER(N,1,N5B,N4B)=FSEDER*FertN_soil_vr(ifert_urea,NU(N2,N1),N2,N1)
+                XNO3ER(N,1,N5B,N4B)=FSEDER*FertN_soil_vr(ifert_no3,NU(N2,N1),N2,N1)
+                XNH4EB(N,1,N5B,N4B)=FSEDER*FertN_Band_vr(ifert_nh4_band,NU(N2,N1),N2,N1)
+                XNH3EB(N,1,N5B,N4B)=FSEDER*FertN_Band_vr(ifert_nh3_band,NU(N2,N1),N2,N1)
+                XNHUEB(N,1,N5B,N4B)=FSEDER*FertN_Band_vr(ifert_urea_band,NU(N2,N1),N2,N1)
+                XNO3EB(N,1,N5B,N4B)=FSEDER*FertN_Band_vr(ifert_no3_band,NU(N2,N1),N2,N1)
 !
 !     EXCHANGEABLE CATIONS AND ANIONS
 !
@@ -670,23 +670,23 @@ module ErosionMod
 !     ORGANIC MATTER
 !
                 DO  K=1,jcplx
-                  DO  NO=1,NumMicbFunGroups
+                  DO  NO=1,NumMicbFunGrupsPerCmplx
                     DO NGL=JGnio(NO),JGnfo(NO)
                       DO  M=1,nlbiomcp
                         MID=micpar%get_micb_id(M,NGL)      
                         DO NE=1,NumPlantChemElms                                                 
-                          OMEERhetr(NE,MID,K,N,1,N5B,N4B)=FSEDER*OMEhetr(NE,MID,K,NU(N2,N1),N2,N1)
+                          OMEERhetr(NE,MID,K,N,1,N5B,N4B)=FSEDER*mBiomeHeter_vr(NE,MID,K,NU(N2,N1),N2,N1)
                         ENDDO
                       enddo
                     enddo
                   ENDDO
                 ENDDO
-                DO  NO=1,NumMicbFunGroups
+                DO  NO=1,NumMicbFunGrupsPerCmplx
                   DO NGL=JGniA(NO),JGnfA(NO)
                     DO  M=1,nlbiomcp
                       MID=micpar%get_micb_id(M,NGL)
                       DO NE=1,NumPlantChemElms         
-                        OMEERauto(NE,MID,N,1,N5B,N4B)=FSEDER*OMEauto(NE,MID,NU(N2,N1),N2,N1)
+                        OMEERauto(NE,MID,N,1,N5B,N4B)=FSEDER*mBiomeAutor_vr(NE,MID,NU(N2,N1),N2,N1)
                       ENDDO
                     enddo
                   enddo
@@ -695,16 +695,16 @@ module ErosionMod
                 DO  K=1,jcplx
                   DO  M=1,ndbiomcp
                     DO NE=1,NumPlantChemElms   
-                      ORMER(NE,M,K,N,1,N5B,N4B)=FSEDER*ORM(NE,M,K,NU(N2,N1),N2,N1)
+                      ORMER(NE,M,K,N,1,N5B,N4B)=FSEDER*OMBioResdu_vr(NE,M,K,NU(N2,N1),N2,N1)
                     ENDDO
                   ENDDO
                   DO idom=idom_beg,idom_end
-                    OHMER(idom,K,N,1,N5B,N4B)=FSEDER*OHM(idom,K,NU(N2,N1),N2,N1)
+                    OHMER(idom,K,N,1,N5B,N4B)=FSEDER*SorbedOM_vr(idom,K,NU(N2,N1),N2,N1)
                   ENDDO
                   DO  M=1,jsken
-                    OSAER(M,K,N,1,N5B,N4B)=FSEDER*OSA(M,K,NU(N2,N1),N2,N1)
+                    OSAER(M,K,N,1,N5B,N4B)=FSEDER*SolidOMAct_vr(M,K,NU(N2,N1),N2,N1)
                     DO NE=1,NumPlantChemElms                      
-                      OSMER(NE,M,K,N,1,N5B,N4B)=FSEDER*OSM(NE,M,K,NU(N2,N1),N2,N1)
+                      OSMER(NE,M,K,N,1,N5B,N4B)=FSEDER*SolidOM_vr(NE,M,K,NU(N2,N1),N2,N1)
                     ENDDO  
                   ENDDO
                 ENDDO
@@ -735,7 +735,7 @@ module ErosionMod
 !     ORGANIC MATTER
 !
                 DO  K=1,jcplx
-                  DO  NO=1,NumMicbFunGroups
+                  DO  NO=1,NumMicbFunGrupsPerCmplx
                     DO NGL=JGnio(NO),JGnfo(NO)
                       DO  M=1,nlbiomcp
                         MID=micpar%get_micb_id(M,NGL)
@@ -747,7 +747,7 @@ module ErosionMod
                   enddo
                 ENDDO
 
-                DO  NO=1,NumMicbFunGroups
+                DO  NO=1,NumMicbFunGrupsPerCmplx
                   DO NGL=JGniA(NO),JGnfA(NO)
                     DO  M=1,nlbiomcp
                       MID=micpar%get_micb_id(M,NGL)
@@ -884,7 +884,7 @@ module ErosionMod
 !     ORGANIC MATTER
 !
               DO  K=1,jcplx
-                DO  NO=1,NumMicbFunGroups
+                DO  NO=1,NumMicbFunGrupsPerCmplx
                   DO NGL=JGnio(NO),JGnfo(NO)
                     DO  M=1,nlbiomcp
                       MID=micpar%get_micb_id(M,NGL)
@@ -895,7 +895,7 @@ module ErosionMod
                   ENDDO
                 enddo
               enddo
-              DO  NO=1,NumMicbFunGroups
+              DO  NO=1,NumMicbFunGrupsPerCmplx
                 DO NGL=JGniA(NO),JGnfA(NO)
                   DO  M=1,nlbiomcp
                     MID=micpar%get_micb_id(M,NGL)
@@ -935,14 +935,14 @@ module ErosionMod
 !
 !     FERTILIZER POOLS
 !
-              XNH4ER(N,NN,M5,M4)=FSEDER*FertN_soil(ifert_nh4,NU(N2,N1),N2,N1)
-              XNH3ER(N,NN,M5,M4)=FSEDER*FertN_soil(ifert_nh3,NU(N2,N1),N2,N1)
-              XNHUER(N,NN,M5,M4)=FSEDER*FertN_soil(ifert_urea,NU(N2,N1),N2,N1)
-              XNO3ER(N,NN,M5,M4)=FSEDER*FertN_soil(ifert_no3,NU(N2,N1),N2,N1)
-              XNH4EB(N,NN,M5,M4)=FSEDER*FertN_band(ifert_nh4_band,NU(N2,N1),N2,N1)
-              XNH3EB(N,NN,M5,M4)=FSEDER*FertN_band(ifert_nh3_band,NU(N2,N1),N2,N1)
-              XNHUEB(N,NN,M5,M4)=FSEDER*FertN_band(ifert_urea_band,NU(N2,N1),N2,N1)
-              XNO3EB(N,NN,M5,M4)=FSEDER*FertN_band(ifert_no3_band,NU(N2,N1),N2,N1)
+              XNH4ER(N,NN,M5,M4)=FSEDER*FertN_soil_vr(ifert_nh4,NU(N2,N1),N2,N1)
+              XNH3ER(N,NN,M5,M4)=FSEDER*FertN_soil_vr(ifert_nh3,NU(N2,N1),N2,N1)
+              XNHUER(N,NN,M5,M4)=FSEDER*FertN_soil_vr(ifert_urea,NU(N2,N1),N2,N1)
+              XNO3ER(N,NN,M5,M4)=FSEDER*FertN_soil_vr(ifert_no3,NU(N2,N1),N2,N1)
+              XNH4EB(N,NN,M5,M4)=FSEDER*FertN_Band_vr(ifert_nh4_band,NU(N2,N1),N2,N1)
+              XNH3EB(N,NN,M5,M4)=FSEDER*FertN_Band_vr(ifert_nh3_band,NU(N2,N1),N2,N1)
+              XNHUEB(N,NN,M5,M4)=FSEDER*FertN_Band_vr(ifert_urea_band,NU(N2,N1),N2,N1)
+              XNO3EB(N,NN,M5,M4)=FSEDER*FertN_Band_vr(ifert_no3_band,NU(N2,N1),N2,N1)
 !
 !     EXCHANGEABLE CATIONS AND ANIONS
 !
@@ -959,23 +959,23 @@ module ErosionMod
 !     ORGANIC MATTER
 !
               DO  K=1,jcplx
-                DO NO=1,NumMicbFunGroups
+                DO NO=1,NumMicbFunGrupsPerCmplx
                   DO NGL=JGnio(NO),JGnfo(NO)
                     DO M=1,nlbiomcp
                       MID=micpar%get_micb_id(M,NGL)                    
                       DO NE=1,NumPlantChemElms                       
-                        OMEERhetr(NE,MID,K,N,NN,M5,M4)=FSEDER*OMEhetr(NE,MID,K,NU(N2,N1),N2,N1)
+                        OMEERhetr(NE,MID,K,N,NN,M5,M4)=FSEDER*mBiomeHeter_vr(NE,MID,K,NU(N2,N1),N2,N1)
                       ENDDO
                     ENDDO
                   ENDDO
                 ENDDO
               ENDDO
-              DO NO=1,NumMicbFunGroups
+              DO NO=1,NumMicbFunGrupsPerCmplx
                 DO NGL=JGniA(NO),JGnfo(NO)
                   DO M=1,nlbiomcp
                     MID=micpar%get_micb_id(M,NGL)
                     DO NE=1,NumPlantChemElms                       
-                      OMEERauto(NE,MID,N,NN,M5,M4)=FSEDER*OMEauto(NE,MID,NU(N2,N1),N2,N1)
+                      OMEERauto(NE,MID,N,NN,M5,M4)=FSEDER*mBiomeAutor_vr(NE,MID,NU(N2,N1),N2,N1)
                     ENDDO
                   ENDDO
                 ENDDO
@@ -984,16 +984,16 @@ module ErosionMod
               DO  K=1,jcplx
                 DO  M=1,ndbiomcp
                   DO NE=1,NumPlantChemElms                       
-                    ORMER(NE,M,K,N,NN,M5,M4)=FSEDER*ORM(NE,M,K,NU(N2,N1),N2,N1)
+                    ORMER(NE,M,K,N,NN,M5,M4)=FSEDER*OMBioResdu_vr(NE,M,K,NU(N2,N1),N2,N1)
                   ENDDO  
                 ENDDO
                 DO idom=idom_beg,idom_end
-                  OHMER(idom,K,N,NN,M5,M4)=FSEDER*OHM(idom,K,NU(N2,N1),N2,N1)
+                  OHMER(idom,K,N,NN,M5,M4)=FSEDER*SorbedOM_vr(idom,K,NU(N2,N1),N2,N1)
                 ENDDO
                 DO  M=1,jsken
-                  OSAER(M,K,N,NN,M5,M4)=FSEDER*OSA(M,K,NU(N2,N1),N2,N1)
+                  OSAER(M,K,N,NN,M5,M4)=FSEDER*SolidOMAct_vr(M,K,NU(N2,N1),N2,N1)
                   DO NE=1,NumPlantChemElms                       
-                    OSMER(NE,M,K,N,NN,M5,M4)=FSEDER*OSM(NE,M,K,NU(N2,N1),N2,N1)
+                    OSMER(NE,M,K,N,NN,M5,M4)=FSEDER*SolidOM_vr(NE,M,K,NU(N2,N1),N2,N1)
                   ENDDO
                 ENDDO
               ENDDO

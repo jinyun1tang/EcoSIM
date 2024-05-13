@@ -19,9 +19,9 @@ module EcoSimSumDataType
   real(r8) :: OXYGSO   !total soil O2 content	g d-2
   real(r8) :: LitRMStoreLndscap(1:NumPlantChemElms)   !total soil litter OM content	g d-2
   real(r8) :: POMHumStoreLndscap(NumPlantChemElms)   !total soil POM + humus C content	g d-2
-  real(r8) :: TLNH4    !total soil NH4 content	g d-2
-  real(r8) :: TLNO3    !total soil NO3 content	g d-2
-  real(r8) :: TLPO4    !total soil PO4 content	g d-2
+  real(r8) :: TDisolNH4_lnd    !total soil NH4 content	g d-2
+  real(r8) :: tNO3_lnd    !total soil NO3 content	g d-2
+  real(r8) :: TDisolPi_lnd    !total soil PO4 content	g d-2
   real(r8), pointer :: PlantElemntStoreLandscape(:)    !total plant element (C,N,P, etc) balance	g d-2
   real(r8) :: CRAIN    !total precipitation	m3 d-2
   real(r8) :: HEATIN   !total surface heat flux	MJ d-2
@@ -39,9 +39,9 @@ module EcoSimSumDataType
   real(r8) :: TOMOU(NumPlantChemElms)     !total subsurface C flux	g d-2
   real(r8) :: TZIN     !total surface N flux	g d-2
   real(r8) :: TPIN     !total surface P flux	g d-2
-  real(r8) :: XESN(NumPlantChemElms)     !total LitrFall C	g d-2
-  real(r8) :: TLCO2G   !total soil CO2	g d-2
-  real(r8) :: TLN2G    !total soil N2	g d-2
+  real(r8) :: Litrfall_lnds(NumPlantChemElms)     !total LitrFall C	g d-2
+  real(r8) :: TGasC_lnd   !total soil CO2	g d-2
+  real(r8) :: TGasN_lnd    !total soil N2	g d-2
 
   private :: InitAllocate
   contains

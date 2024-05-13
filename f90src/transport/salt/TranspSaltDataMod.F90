@@ -10,18 +10,7 @@ implicit none
   __FILE__
 
   real(r8), PARAMETER :: VFLWX=0.5_r8
-  real(r8),allocatable ::  ALSGL2(:,:,:)                      !
-  real(r8),allocatable ::  FESGL2(:,:,:)                      !
-  real(r8),allocatable ::  HYSGL2(:,:,:)                      !
-  real(r8),allocatable ::  CASGL2(:,:,:)                      !
-  real(r8),allocatable ::  GMSGL2(:,:,:)                      !
-  real(r8),allocatable ::  ANSGL2(:,:,:)                      !
-  real(r8),allocatable ::  AKSGL2(:,:,:)                      !
-  real(r8),allocatable ::  OHSGL2(:,:,:)                      !
-  real(r8),allocatable ::  C3SGL2(:,:,:)                      !
-  real(r8),allocatable ::  HCSGL2(:,:,:)                      !
-  real(r8),allocatable ::  SOSGL2(:,:,:)                      !
-  real(r8),allocatable ::  CLSXL2(:,:,:)                      !
+  real(r8),allocatable ::  AquaIonDifusivty2_vr(:,:,:,:)                      !
   real(r8),allocatable ::  trcSalt_RQR(:,:,:,:,:)                     !
   real(r8),allocatable ::  trcSalt_RQ(:,:,:,:)                       !
   real(r8),allocatable ::  trcSalt_RQR0(:,:,:)                        !
@@ -48,18 +37,7 @@ contains
   subroutine InitTranspSaltData
 
   implicit none
-  allocate(ALSGL2(JZ,JY,JX));   ALSGL2=0._r8
-  allocate(FESGL2(JZ,JY,JX));   FESGL2=0._r8
-  allocate(HYSGL2(JZ,JY,JX));   HYSGL2=0._r8
-  allocate(CASGL2(JZ,JY,JX));   CASGL2=0._r8
-  allocate(GMSGL2(JZ,JY,JX));   GMSGL2=0._r8
-  allocate(ANSGL2(JZ,JY,JX));   ANSGL2=0._r8
-  allocate(AKSGL2(JZ,JY,JX));   AKSGL2=0._r8
-  allocate(OHSGL2(JZ,JY,JX));   OHSGL2=0._r8
-  allocate(C3SGL2(JZ,JY,JX));   C3SGL2=0._r8
-  allocate(HCSGL2(JZ,JY,JX));   HCSGL2=0._r8
-  allocate(SOSGL2(JZ,JY,JX));   SOSGL2=0._r8
-  allocate(CLSXL2(JZ,JY,JX));   CLSXL2=0._r8
+  allocate(AquaIonDifusivty2_vr(idsalt_beg:idsalt_mend,JZ,JY,JX));   AquaIonDifusivty2_vr=0._r8
 
   allocate(trcSalt_RQR(idsalt_beg:idsalt_end,2,2,JV,JH));   trcSalt_RQR=0._r8
   allocate(trcSalt_RQ(idsalt_beg:idsaltb_end,2,JV,JH));     trcSalt_RQ=0._r8
@@ -88,18 +66,6 @@ contains
   call destroy(trcSalt_solml2)
   call destroy(trcSalt_solml2R)
 
-  call destroy(ALSGL2)
-  call destroy(FESGL2)
-  call destroy(HYSGL2)
-  call destroy(CASGL2)
-  call destroy(GMSGL2)
-  call destroy(ANSGL2)
-  call destroy(AKSGL2)
-  call destroy(OHSGL2)
-  call destroy(C3SGL2)
-  call destroy(HCSGL2)
-  call destroy(SOSGL2)
-  call destroy(CLSXL2)
   call destroy(trcSalt_RQ)
 
   call destroy(POSGL2)

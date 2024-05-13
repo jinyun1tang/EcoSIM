@@ -112,7 +112,7 @@ module StartqMod
   iYearPlantHarvest_pft(NZ,NY,NX)=IYRY(NZ,NY,NX)
   iDayPlantHarvest_pft(NZ,NY,NX)=IDAYY(NZ,NY,NX)
   PPI(NZ,NY,NX)=PPZ(NZ,NY,NX)
-  PPX(NZ,NY,NX)=PPI(NZ,NY,NX)
+  PPX_pft(NZ,NY,NX)=PPI(NZ,NY,NX)
   ClumpFactor_pft(NZ,NY,NX)=ClumpFactorInit_pft(NZ,NY,NX)       !clumping factor
   
   MaxCanPStomaResistH2O_pft(NZ,NY,NX)=RSMX(NZ,NY,NX)/3600.0_r8
@@ -159,76 +159,76 @@ module StartqMod
 !
 !     NONSTRUCTURAL
 !
-  CFOPE(ielmc,inonstruct,iprotein,NZ,NY,NX)=0.0_r8
-  CFOPE(ielmc,inonstruct,icarbhyro,NZ,NY,NX)=0.67_r8
-  CFOPE(ielmc,inonstruct,icellulos,NZ,NY,NX)=0.33_r8
-  CFOPE(ielmc,inonstruct,ilignin,NZ,NY,NX)=0.0_r8
+  ElmAllocmat4Litr(ielmc,inonstruct,iprotein,NZ,NY,NX)=0.0_r8
+  ElmAllocmat4Litr(ielmc,inonstruct,icarbhyro,NZ,NY,NX)=0.67_r8
+  ElmAllocmat4Litr(ielmc,inonstruct,icellulos,NZ,NY,NX)=0.33_r8
+  ElmAllocmat4Litr(ielmc,inonstruct,ilignin,NZ,NY,NX)=0.0_r8
 !
 !     NON-VASCULAR (E.G. MOSSES)
 !
   IF(is_root_shallow(iPlantRootProfile_pft(NZ,NY,NX)))THEN
-    CFOPE(ielmc,ifoliar,iprotein,NZ,NY,NX)=0.07_r8
-    CFOPE(ielmc,ifoliar,icarbhyro,NZ,NY,NX)=0.25_r8
-    CFOPE(ielmc,ifoliar,icellulos,NZ,NY,NX)=0.30_r8
-    CFOPE(ielmc,ifoliar,ilignin,NZ,NY,NX)=0.38_r8
+    ElmAllocmat4Litr(ielmc,ifoliar,iprotein,NZ,NY,NX)=0.07_r8
+    ElmAllocmat4Litr(ielmc,ifoliar,icarbhyro,NZ,NY,NX)=0.25_r8
+    ElmAllocmat4Litr(ielmc,ifoliar,icellulos,NZ,NY,NX)=0.30_r8
+    ElmAllocmat4Litr(ielmc,ifoliar,ilignin,NZ,NY,NX)=0.38_r8
 
-    CFOPE(ielmc,inonfoliar,iprotein,NZ,NY,NX)=0.07_r8
-    CFOPE(ielmc,inonfoliar,icarbhyro,NZ,NY,NX)=0.25_r8
-    CFOPE(ielmc,inonfoliar,icellulos,NZ,NY,NX)=0.30_r8
-    CFOPE(ielmc,inonfoliar,ilignin,NZ,NY,NX)=0.38_r8
+    ElmAllocmat4Litr(ielmc,inonfoliar,iprotein,NZ,NY,NX)=0.07_r8
+    ElmAllocmat4Litr(ielmc,inonfoliar,icarbhyro,NZ,NY,NX)=0.25_r8
+    ElmAllocmat4Litr(ielmc,inonfoliar,icellulos,NZ,NY,NX)=0.30_r8
+    ElmAllocmat4Litr(ielmc,inonfoliar,ilignin,NZ,NY,NX)=0.38_r8
 !
 !     LEGUMES
 !
   ELSEIF(iPlantNfixType(NZ,NY,NX).NE.0)THEN
-    CFOPE(ielmc,ifoliar,iprotein,NZ,NY,NX)=0.16_r8
-    CFOPE(ielmc,ifoliar,icarbhyro,NZ,NY,NX)=0.38_r8
-    CFOPE(ielmc,ifoliar,icellulos,NZ,NY,NX)=0.34_r8
-    CFOPE(ielmc,ifoliar,ilignin,NZ,NY,NX)=0.12_r8
+    ElmAllocmat4Litr(ielmc,ifoliar,iprotein,NZ,NY,NX)=0.16_r8
+    ElmAllocmat4Litr(ielmc,ifoliar,icarbhyro,NZ,NY,NX)=0.38_r8
+    ElmAllocmat4Litr(ielmc,ifoliar,icellulos,NZ,NY,NX)=0.34_r8
+    ElmAllocmat4Litr(ielmc,ifoliar,ilignin,NZ,NY,NX)=0.12_r8
 
-    CFOPE(ielmc,inonfoliar,iprotein,NZ,NY,NX)=0.07_r8
-    CFOPE(ielmc,inonfoliar,icarbhyro,NZ,NY,NX)=0.41_r8
-    CFOPE(ielmc,inonfoliar,icellulos,NZ,NY,NX)=0.37_r8
-    CFOPE(ielmc,inonfoliar,ilignin,NZ,NY,NX)=0.15_r8
+    ElmAllocmat4Litr(ielmc,inonfoliar,iprotein,NZ,NY,NX)=0.07_r8
+    ElmAllocmat4Litr(ielmc,inonfoliar,icarbhyro,NZ,NY,NX)=0.41_r8
+    ElmAllocmat4Litr(ielmc,inonfoliar,icellulos,NZ,NY,NX)=0.37_r8
+    ElmAllocmat4Litr(ielmc,inonfoliar,ilignin,NZ,NY,NX)=0.15_r8
 !
 !     ANNUALS, GRASSES, SHRUBS
 !
   ELSEIF(iPlantTurnoverPattern_pft(NZ,NY,NX).EQ.0 .OR. &
     (.not.is_plant_treelike(iPlantRootProfile_pft(NZ,NY,NX))))THEN
-    CFOPE(ielmc,ifoliar,iprotein,NZ,NY,NX)=0.08_r8
-    CFOPE(ielmc,ifoliar,icarbhyro,NZ,NY,NX)=0.41_r8
-    CFOPE(ielmc,ifoliar,icellulos,NZ,NY,NX)=0.36_r8
-    CFOPE(ielmc,ifoliar,ilignin,NZ,NY,NX)=0.15_r8
+    ElmAllocmat4Litr(ielmc,ifoliar,iprotein,NZ,NY,NX)=0.08_r8
+    ElmAllocmat4Litr(ielmc,ifoliar,icarbhyro,NZ,NY,NX)=0.41_r8
+    ElmAllocmat4Litr(ielmc,ifoliar,icellulos,NZ,NY,NX)=0.36_r8
+    ElmAllocmat4Litr(ielmc,ifoliar,ilignin,NZ,NY,NX)=0.15_r8
 
-    CFOPE(ielmc,inonfoliar,iprotein,NZ,NY,NX)=0.07_r8
-    CFOPE(ielmc,inonfoliar,icarbhyro,NZ,NY,NX)=0.41_r8
-    CFOPE(ielmc,inonfoliar,icellulos,NZ,NY,NX)=0.36_r8
-    CFOPE(ielmc,inonfoliar,ilignin,NZ,NY,NX)=0.16_r8
+    ElmAllocmat4Litr(ielmc,inonfoliar,iprotein,NZ,NY,NX)=0.07_r8
+    ElmAllocmat4Litr(ielmc,inonfoliar,icarbhyro,NZ,NY,NX)=0.41_r8
+    ElmAllocmat4Litr(ielmc,inonfoliar,icellulos,NZ,NY,NX)=0.36_r8
+    ElmAllocmat4Litr(ielmc,inonfoliar,ilignin,NZ,NY,NX)=0.16_r8
 !
 !     DECIDUOUS TREES
 !
   ELSEIF(iPlantTurnoverPattern_pft(NZ,NY,NX).EQ.1 .OR. iPlantTurnoverPattern_pft(NZ,NY,NX).GE.3)THEN
-    CFOPE(ielmc,ifoliar,iprotein,NZ,NY,NX)=0.07_r8
-    CFOPE(ielmc,ifoliar,icarbhyro,NZ,NY,NX)=0.34_r8
-    CFOPE(ielmc,ifoliar,icellulos,NZ,NY,NX)=0.36_r8
-    CFOPE(ielmc,ifoliar,ilignin,NZ,NY,NX)=0.23_r8
+    ElmAllocmat4Litr(ielmc,ifoliar,iprotein,NZ,NY,NX)=0.07_r8
+    ElmAllocmat4Litr(ielmc,ifoliar,icarbhyro,NZ,NY,NX)=0.34_r8
+    ElmAllocmat4Litr(ielmc,ifoliar,icellulos,NZ,NY,NX)=0.36_r8
+    ElmAllocmat4Litr(ielmc,ifoliar,ilignin,NZ,NY,NX)=0.23_r8
 
-    CFOPE(ielmc,inonfoliar,iprotein,NZ,NY,NX)=0.0_r8
-    CFOPE(ielmc,inonfoliar,icarbhyro,NZ,NY,NX)=0.045_r8
-    CFOPE(ielmc,inonfoliar,icellulos,NZ,NY,NX)=0.660_r8
-    CFOPE(ielmc,inonfoliar,ilignin,NZ,NY,NX)=0.295_r8
+    ElmAllocmat4Litr(ielmc,inonfoliar,iprotein,NZ,NY,NX)=0.0_r8
+    ElmAllocmat4Litr(ielmc,inonfoliar,icarbhyro,NZ,NY,NX)=0.045_r8
+    ElmAllocmat4Litr(ielmc,inonfoliar,icellulos,NZ,NY,NX)=0.660_r8
+    ElmAllocmat4Litr(ielmc,inonfoliar,ilignin,NZ,NY,NX)=0.295_r8
 !
 !     CONIFEROUS TREES
 !
   ELSE
-    CFOPE(ielmc,ifoliar,iprotein,NZ,NY,NX)=0.07_r8
-    CFOPE(ielmc,ifoliar,icarbhyro,NZ,NY,NX)=0.25_r8
-    CFOPE(ielmc,ifoliar,icellulos,NZ,NY,NX)=0.38_r8
-    CFOPE(ielmc,ifoliar,ilignin,NZ,NY,NX)=0.30_r8
+    ElmAllocmat4Litr(ielmc,ifoliar,iprotein,NZ,NY,NX)=0.07_r8
+    ElmAllocmat4Litr(ielmc,ifoliar,icarbhyro,NZ,NY,NX)=0.25_r8
+    ElmAllocmat4Litr(ielmc,ifoliar,icellulos,NZ,NY,NX)=0.38_r8
+    ElmAllocmat4Litr(ielmc,ifoliar,ilignin,NZ,NY,NX)=0.30_r8
 
-    CFOPE(ielmc,inonfoliar,iprotein,NZ,NY,NX)=0.0_r8
-    CFOPE(ielmc,inonfoliar,icarbhyro,NZ,NY,NX)=0.045_r8
-    CFOPE(ielmc,inonfoliar,icellulos,NZ,NY,NX)=0.660_r8
-    CFOPE(ielmc,inonfoliar,ilignin,NZ,NY,NX)=0.295_r8
+    ElmAllocmat4Litr(ielmc,inonfoliar,iprotein,NZ,NY,NX)=0.0_r8
+    ElmAllocmat4Litr(ielmc,inonfoliar,icarbhyro,NZ,NY,NX)=0.045_r8
+    ElmAllocmat4Litr(ielmc,inonfoliar,icellulos,NZ,NY,NX)=0.660_r8
+    ElmAllocmat4Litr(ielmc,inonfoliar,ilignin,NZ,NY,NX)=0.295_r8
   ENDIF
 !
 !     FRACTIONS OF WOODY LITTER ALLOCATED TO
@@ -237,27 +237,27 @@ module StartqMod
 !     NON-VASCULAR
 !
   IF(is_root_shallow(iPlantRootProfile_pft(NZ,NY,NX)))THEN
-    CFOPE(ielmc,istalk,iprotein,NZ,NY,NX)=0.07_r8
-    CFOPE(ielmc,istalk,icarbhyro,NZ,NY,NX)=0.25_r8
-    CFOPE(ielmc,istalk,icellulos,NZ,NY,NX)=0.30_r8
-    CFOPE(ielmc,istalk,ilignin,NZ,NY,NX)=0.38_r8
+    ElmAllocmat4Litr(ielmc,istalk,iprotein,NZ,NY,NX)=0.07_r8
+    ElmAllocmat4Litr(ielmc,istalk,icarbhyro,NZ,NY,NX)=0.25_r8
+    ElmAllocmat4Litr(ielmc,istalk,icellulos,NZ,NY,NX)=0.30_r8
+    ElmAllocmat4Litr(ielmc,istalk,ilignin,NZ,NY,NX)=0.38_r8
 !
 !     ANNUALS, GRASSES, SHRUBS
 !
   ELSEIF(iPlantTurnoverPattern_pft(NZ,NY,NX).EQ.0 .OR. &
     (.not.is_plant_treelike(iPlantRootProfile_pft(NZ,NY,NX))))THEN
-    CFOPE(ielmc,istalk,iprotein,NZ,NY,NX)=0.03_r8
-    CFOPE(ielmc,istalk,icarbhyro,NZ,NY,NX)=0.25_r8
-    CFOPE(ielmc,istalk,icellulos,NZ,NY,NX)=0.57_r8
-    CFOPE(ielmc,istalk,ilignin,NZ,NY,NX)=0.15_r8
+    ElmAllocmat4Litr(ielmc,istalk,iprotein,NZ,NY,NX)=0.03_r8
+    ElmAllocmat4Litr(ielmc,istalk,icarbhyro,NZ,NY,NX)=0.25_r8
+    ElmAllocmat4Litr(ielmc,istalk,icellulos,NZ,NY,NX)=0.57_r8
+    ElmAllocmat4Litr(ielmc,istalk,ilignin,NZ,NY,NX)=0.15_r8
 !
 !     DECIDUOUS AND CONIFEROUS TREES
 !
   ELSE
-    CFOPE(ielmc,istalk,iprotein,NZ,NY,NX)=0.0_r8
-    CFOPE(ielmc,istalk,icarbhyro,NZ,NY,NX)=0.045_r8
-    CFOPE(ielmc,istalk,icellulos,NZ,NY,NX)=0.660_r8
-    CFOPE(ielmc,istalk,ilignin,NZ,NY,NX)=0.295_r8
+    ElmAllocmat4Litr(ielmc,istalk,iprotein,NZ,NY,NX)=0.0_r8
+    ElmAllocmat4Litr(ielmc,istalk,icarbhyro,NZ,NY,NX)=0.045_r8
+    ElmAllocmat4Litr(ielmc,istalk,icellulos,NZ,NY,NX)=0.660_r8
+    ElmAllocmat4Litr(ielmc,istalk,ilignin,NZ,NY,NX)=0.295_r8
   ENDIF
 !
 !     FRACTIONS OF FINE ROOT LITTER ALLOCATED TO
@@ -266,43 +266,43 @@ module StartqMod
 !     NON-VASCULAR
 !
   IF(is_root_shallow(iPlantRootProfile_pft(NZ,NY,NX)))THEN
-    CFOPE(ielmc,iroot,iprotein,NZ,NY,NX)=0.07_r8
-    CFOPE(ielmc,iroot,icarbhyro,NZ,NY,NX)=0.25_r8
-    CFOPE(ielmc,iroot,icellulos,NZ,NY,NX)=0.30_r8
-    CFOPE(ielmc,iroot,ilignin,NZ,NY,NX)=0.38_r8
+    ElmAllocmat4Litr(ielmc,iroot,iprotein,NZ,NY,NX)=0.07_r8
+    ElmAllocmat4Litr(ielmc,iroot,icarbhyro,NZ,NY,NX)=0.25_r8
+    ElmAllocmat4Litr(ielmc,iroot,icellulos,NZ,NY,NX)=0.30_r8
+    ElmAllocmat4Litr(ielmc,iroot,ilignin,NZ,NY,NX)=0.38_r8
 !
 !     ANNUALS, GRASSES, SHRUBS
 !
   ELSEIF(iPlantTurnoverPattern_pft(NZ,NY,NX).EQ.0 .OR. &
     (.not.is_plant_treelike(iPlantRootProfile_pft(NZ,NY,NX))))THEN
-    CFOPE(ielmc,iroot,iprotein,NZ,NY,NX)=0.057_r8
-    CFOPE(ielmc,iroot,icarbhyro,NZ,NY,NX)=0.263_r8
-    CFOPE(ielmc,iroot,icellulos,NZ,NY,NX)=0.542_r8
-    CFOPE(ielmc,iroot,ilignin,NZ,NY,NX)=0.138_r8
+    ElmAllocmat4Litr(ielmc,iroot,iprotein,NZ,NY,NX)=0.057_r8
+    ElmAllocmat4Litr(ielmc,iroot,icarbhyro,NZ,NY,NX)=0.263_r8
+    ElmAllocmat4Litr(ielmc,iroot,icellulos,NZ,NY,NX)=0.542_r8
+    ElmAllocmat4Litr(ielmc,iroot,ilignin,NZ,NY,NX)=0.138_r8
 !
 !     DECIDUOUS TREES
 !
   ELSEIF(iPlantTurnoverPattern_pft(NZ,NY,NX).EQ.1 .OR. iPlantTurnoverPattern_pft(NZ,NY,NX).GE.3)THEN
-    CFOPE(ielmc,iroot,iprotein,NZ,NY,NX)=0.059_r8
-    CFOPE(ielmc,iroot,icarbhyro,NZ,NY,NX)=0.308_r8
-    CFOPE(ielmc,iroot,icellulos,NZ,NY,NX)=0.464_r8
-    CFOPE(ielmc,iroot,ilignin,NZ,NY,NX)=0.169_r8
+    ElmAllocmat4Litr(ielmc,iroot,iprotein,NZ,NY,NX)=0.059_r8
+    ElmAllocmat4Litr(ielmc,iroot,icarbhyro,NZ,NY,NX)=0.308_r8
+    ElmAllocmat4Litr(ielmc,iroot,icellulos,NZ,NY,NX)=0.464_r8
+    ElmAllocmat4Litr(ielmc,iroot,ilignin,NZ,NY,NX)=0.169_r8
 !
 !     CONIFEROUS TREES
 !
   ELSE
-    CFOPE(ielmc,iroot,iprotein,NZ,NY,NX)=0.059_r8
-    CFOPE(ielmc,iroot,icarbhyro,NZ,NY,NX)=0.308_r8
-    CFOPE(ielmc,iroot,icellulos,NZ,NY,NX)=0.464_r8
-    CFOPE(ielmc,iroot,ilignin,NZ,NY,NX)=0.169_r8
+    ElmAllocmat4Litr(ielmc,iroot,iprotein,NZ,NY,NX)=0.059_r8
+    ElmAllocmat4Litr(ielmc,iroot,icarbhyro,NZ,NY,NX)=0.308_r8
+    ElmAllocmat4Litr(ielmc,iroot,icellulos,NZ,NY,NX)=0.464_r8
+    ElmAllocmat4Litr(ielmc,iroot,ilignin,NZ,NY,NX)=0.169_r8
   ENDIF
 !
 !     COARSE WOODY LITTER FROM BOLES AND ROOTS
 !
-  CFOPE(ielmc,icwood,iprotein,NZ,NY,NX)=0.00_r8
-  CFOPE(ielmc,icwood,icarbhyro,NZ,NY,NX)=0.045_r8
-  CFOPE(ielmc,icwood,icellulos,NZ,NY,NX)=0.660_r8
-  CFOPE(ielmc,icwood,ilignin,NZ,NY,NX)=0.295_r8
+  ElmAllocmat4Litr(ielmc,icwood,iprotein,NZ,NY,NX)=0.00_r8
+  ElmAllocmat4Litr(ielmc,icwood,icarbhyro,NZ,NY,NX)=0.045_r8
+  ElmAllocmat4Litr(ielmc,icwood,icellulos,NZ,NY,NX)=0.660_r8
+  ElmAllocmat4Litr(ielmc,icwood,ilignin,NZ,NY,NX)=0.295_r8
 !
 !     INITIALIZE C-N AND C-P RATIOS IN PLANT LITTER
 !
@@ -323,12 +323,12 @@ module StartqMod
     CNOPCT=0.0_r8
     CPOPCT=0.0_r8
     D100: DO M=1,jskenc
-      CNOPCT=CNOPCT+CFOPE(ielmc,N,M,NZ,NY,NX)*CNOPC(M)
-      CPOPCT=CPOPCT+CFOPE(ielmc,N,M,NZ,NY,NX)*CPOPC(M)
+      CNOPCT=CNOPCT+ElmAllocmat4Litr(ielmc,N,M,NZ,NY,NX)*CNOPC(M)
+      CPOPCT=CPOPCT+ElmAllocmat4Litr(ielmc,N,M,NZ,NY,NX)*CPOPC(M)
     ENDDO D100
     D105: DO M=1,jskenc
-      CFOPE(ielmn,N,M,NZ,NY,NX)=CFOPE(ielmc,N,M,NZ,NY,NX)*CNOPC(M)/CNOPCT
-      CFOPE(ielmp,N,M,NZ,NY,NX)=CFOPE(ielmc,N,M,NZ,NY,NX)*CPOPC(M)/CPOPCT
+      ElmAllocmat4Litr(ielmn,N,M,NZ,NY,NX)=ElmAllocmat4Litr(ielmc,N,M,NZ,NY,NX)*CNOPC(M)/CNOPCT
+      ElmAllocmat4Litr(ielmp,N,M,NZ,NY,NX)=ElmAllocmat4Litr(ielmc,N,M,NZ,NY,NX)*CPOPC(M)/CPOPCT
     ENDDO D105
   ENDDO D110
 !
@@ -368,26 +368,26 @@ module StartqMod
 !     PFT THERMAL ACCLIMATION
 !
 !     ZTYP,PlantInitThermoAdaptZone=dynamic,initial thermal adaptation zone from PFT file
-!     OFFST=shift in Arrhenius curve for thermal adaptation (oC)
+!     TempOffset_pft=shift in Arrhenius curve for thermal adaptation (oC)
 !     TCZ,TC4LeafOff_pft=threshold temperature for leafout,leafoff
 !     HTC=high temperature threshold for grain number loss (oC)
-!     SSTX=sensitivity to HTC (seeds oC-1 above HTC)
+!     SeedTempSens_pft=sensitivity to HTC (seeds oC-1 above HTC)
 !
   iPlantThermoAdaptZone(NZ,NY,NX)=PlantInitThermoAdaptZone(NZ,NY,NX)
-  OFFST(NZ,NY,NX)=2.667*(2.5-iPlantThermoAdaptZone(NZ,NY,NX))
-  TC4LeafOut_pft(NZ,NY,NX)=TCZD-OFFST(NZ,NY,NX)
-  TC4LeafOff_pft(NZ,NY,NX)=AMIN1(15.0,TCXD-OFFST(NZ,NY,NX))
+  TempOffset_pft(NZ,NY,NX)=2.667*(2.5-iPlantThermoAdaptZone(NZ,NY,NX))
+  TC4LeafOut_pft(NZ,NY,NX)=TCZD-TempOffset_pft(NZ,NY,NX)
+  TC4LeafOff_pft(NZ,NY,NX)=AMIN1(15.0,TCXD-TempOffset_pft(NZ,NY,NX))
   IF(iPlantPhotosynthesisType(NZ,NY,NX).EQ.3)THEN
     IF(DATAP(NZ,NY,NX)(1:4).EQ.'soyb')THEN
-      HighTCLimtSeed_pft(NZ,NY,NX)=30.0_r8+3.0_r8*iPlantThermoAdaptZone(NZ,NY,NX)
-      SSTX(NZ,NY,NX)=0.002_r8
+      HighTempLimitSeed_pft(NZ,NY,NX)=30.0_r8+3.0_r8*iPlantThermoAdaptZone(NZ,NY,NX)
+      SeedTempSens_pft(NZ,NY,NX)=0.002_r8
     ELSE
-      HighTCLimtSeed_pft(NZ,NY,NX)=27.0_r8+3.0_r8*iPlantThermoAdaptZone(NZ,NY,NX)
-      SSTX(NZ,NY,NX)=0.002_r8
+      HighTempLimitSeed_pft(NZ,NY,NX)=27.0_r8+3.0_r8*iPlantThermoAdaptZone(NZ,NY,NX)
+      SeedTempSens_pft(NZ,NY,NX)=0.002_r8
     ENDIF
   ELSE
-    HighTCLimtSeed_pft(NZ,NY,NX)=27.0_r8+3.0_r8*iPlantThermoAdaptZone(NZ,NY,NX)
-    SSTX(NZ,NY,NX)=0.005_r8
+    HighTempLimitSeed_pft(NZ,NY,NX)=27.0_r8+3.0_r8*iPlantThermoAdaptZone(NZ,NY,NX)
+    SeedTempSens_pft(NZ,NY,NX)=0.005_r8
   ENDIF
   end subroutine PFTThermalAcclimation
 !------------------------------------------------------------------------------------------
@@ -443,8 +443,8 @@ module StartqMod
   VmaxPO4Root_pft(imycorrhz,NZ,NY,NX)=VmaxPO4Root_pft(1,NZ,NY,NX)
   KmPO4Root_pft(imycorrhz,NZ,NY,NX)=KmPO4Root_pft(1,NZ,NY,NX)
   CMinPO4Root_pft(imycorrhz,NZ,NY,NX)=CMinPO4Root_pft(1,NZ,NY,NX)
-  RSRR(imycorrhz,NZ,NY,NX)=1.0E+04
-  RSRA(imycorrhz,NZ,NY,NX)=1.0E+12
+  RoottRadialResist_pft(imycorrhz,NZ,NY,NX)=1.0E+04
+  RoottAxialResist_pft(imycorrhz,NZ,NY,NX)=1.0E+12
 !
 !     RootPoreTortu4Gas=tortuosity for gas transport
 !     RootRaidus_rpft=path length for radial diffusion within root (m)
@@ -478,7 +478,7 @@ module StartqMod
 !
 !     PP=population (grid cell-1)
 !
-  PlantPopulation_pft(NZ,NY,NX)=PPX(NZ,NY,NX)*AREA(3,NU(NY,NX),NY,NX)
+  PlantPopulation_pft(NZ,NY,NX)=PPX_pft(NZ,NY,NX)*AREA(3,NU(NY,NX),NY,NX)
   doInitPlant_pft(NZ,NY,NX)=ifalse
   iPlantShootState_pft(NZ,NY,NX)=iDead
   iPlantRootState_pft(NZ,NY,NX)=iDead
@@ -499,7 +499,7 @@ module StartqMod
     NumOfLeaves_brch(NB,NZ,NY,NX)=0._r8
     LeafNumberAtFloralInit_brch(NB,NZ,NY,NX)=0._r8
     KLeafNumber_brch(NB,NZ,NY,NX)=1
-    KLEAFX(NB,NZ,NY,NX)=1
+    KMinNumLeaf4GroAlloc_brch(NB,NZ,NY,NX)=1
     KHiestGroLeafNode_brch(NB,NZ,NY,NX)=1
     KLowestGroLeafNode_brch(NB,NZ,NY,NX)=0
     NodeNumNormByMatgrp_brch(NB,NZ,NY,NX)=0._r8
@@ -525,7 +525,7 @@ module StartqMod
 !     INITIALIZE PLANT MORPHOLOGY AND BIOMASS
 !
   HoursCanopyPSITooLow_pft(NZ,NY,NX)=0._r8
-  CHILL(NZ,NY,NX)=0._r8
+  ChillHours_pft(NZ,NY,NX)=0._r8
   CanopyNonstElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)=0._r8
   CanopyNodulNonstElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)=0._r8
   ShootStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)=0._r8
@@ -641,7 +641,7 @@ module StartqMod
     LitrfalStrutElmsCum_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
     PlantN2FixCum_pft(NZ,NY,NX)=0._r8
     NH3Dep2Can_pft(NZ,NY,NX)=0._r8
-    NH3EmiCum_pft(NZ,NY,NX)=0._r8
+    NH3EmisCum_pft(NZ,NY,NX)=0._r8
     CO2ByFire_pft(NZ,NY,NX)=0._r8
     CH4ByFire_pft(NZ,NY,NX)=0._r8
     O2ByFire_pft(NZ,NY,NX)=0._r8
@@ -655,9 +655,9 @@ module StartqMod
     StandDeadStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
     WTSTDX=StandingDeadInitC_pft(NZ,NY,NX)*AREA(3,NU(NY,NX),NY,NX)
     D155: DO M=1,jskenc
-      StandDeadKCompElms_pft(ielmc,M,NZ,NY,NX)=WTSTDX*CFOPE(ielmc,icwood,M,NZ,NY,NX)
-      StandDeadKCompElms_pft(ielmn,M,NZ,NY,NX)=WTSTDX*rNCStalk_pft(NZ,NY,NX)*CFOPE(ielmn,icwood,M,NZ,NY,NX)
-      StandDeadKCompElms_pft(ielmp,M,NZ,NY,NX)=WTSTDX*rPCStalk_pft(NZ,NY,NX)*CFOPE(ielmp,icwood,M,NZ,NY,NX)
+      StandDeadKCompElms_pft(ielmc,M,NZ,NY,NX)=WTSTDX*ElmAllocmat4Litr(ielmc,icwood,M,NZ,NY,NX)
+      StandDeadKCompElms_pft(ielmn,M,NZ,NY,NX)=WTSTDX*rNCStalk_pft(NZ,NY,NX)*ElmAllocmat4Litr(ielmn,icwood,M,NZ,NY,NX)
+      StandDeadKCompElms_pft(ielmp,M,NZ,NY,NX)=WTSTDX*rPCStalk_pft(NZ,NY,NX)*ElmAllocmat4Litr(ielmp,icwood,M,NZ,NY,NX)
       
       DO NE=1,NumPlantChemElms
       StandDeadStrutElms_pft(NE,NZ,NY,NX)=StandDeadStrutElms_pft(NE,NZ,NY,NX) &
@@ -683,7 +683,7 @@ module StartqMod
 !
   VHeatCapCanP(NZ,NY,NX)=cpw*ShootStrutElms_pft(ielmc,NZ,NY,NX)*10.0E-06
   ENGYX(NZ,NY,NX)=0._r8
-  DTKC(NZ,NY,NX)=0._r8
+  DeltaTKC(NZ,NY,NX)=0._r8
   TCelciusCanopy_pft(NZ,NY,NX)=ATCA(NY,NX)
   TKC(NZ,NY,NX)=units%Celcius2Kelvin(TCelciusCanopy_pft(NZ,NY,NX))
   TCG(NZ,NY,NX)=TCelciusCanopy_pft(NZ,NY,NX)
@@ -748,15 +748,15 @@ module StartqMod
       RootNutUptake_pvr(ids_NO3B,N,L,NZ,NY,NX)=0._r8
       RootNutUptake_pvr(ids_H2PO4B,N,L,NZ,NY,NX)=0._r8
       RootNutUptake_pvr(ids_H1PO4B,N,L,NZ,NY,NX)=0._r8
-      ROXYP(N,L,NZ,NY,NX)=0._r8
-      RUNNHP(N,L,NZ,NY,NX)=0._r8
-      RUNNBP(N,L,NZ,NY,NX)=0._r8
-      RUNNOP(N,L,NZ,NY,NX)=0._r8
-      RUNNXP(N,L,NZ,NY,NX)=0._r8
-      RUPP2P(N,L,NZ,NY,NX)=0._r8
-      RUPP1P(N,L,NZ,NY,NX)=0._r8
-      RUPP2B(N,L,NZ,NY,NX)=0._r8
-      RUPP1B(N,L,NZ,NY,NX)=0._r8
+      RootO2Dmnd4Resp_pvr(N,L,NZ,NY,NX)=0._r8
+      RootNH4DmndSoil_pvr(N,L,NZ,NY,NX)=0._r8
+      RootNH4DmndBand_pvr(N,L,NZ,NY,NX)=0._r8
+      RootNO3DmndSoil_pvr(N,L,NZ,NY,NX)=0._r8
+      RootNO3DmndBand_pvr(N,L,NZ,NY,NX)=0._r8
+      RootH2PO4DmndSoil_pvr(N,L,NZ,NY,NX)=0._r8
+      RootH1PO4DmndSoil_pvr(N,L,NZ,NY,NX)=0._r8
+      RootH2PO4DmndBand_pvr(N,L,NZ,NY,NX)=0._r8
+      RootH1PO4DmndBand_pvr(N,L,NZ,NY,NX)=0._r8
       CCO2A=CCO2EI(NY,NX)
       CCO2P=0.030_r8*EXP(-2.621_r8-0.0317_r8*ATCA(NY,NX))*CO2EI(NY,NX)
       trcg_rootml_pvr(idg_CO2,N,L,NZ,NY,NX)=CCO2A*RootPoreVol_pvr(N,L,NZ,NY,NX)
@@ -764,7 +764,7 @@ module StartqMod
       trcg_air2root_flx__pvr(idg_CO2,N,L,NZ,NY,NX)=0._r8
       trcg_Root_DisEvap_flx_vr(idg_CO2,N,L,NZ,NY,NX)=0._r8
       RUPGasSol_vr(idg_CO2,N,L,NZ,NY,NX)=0._r8
-      RCO2P_pvr(N,L,NZ,NY,NX)=0._r8
+      RootCO2Emis_pvr(N,L,NZ,NY,NX)=0._r8
       COXYA=AtmGasCgperm3(idg_O2,NY,NX)
       COXYP=0.032_r8*EXP(-6.175_r8-0.0211_r8*ATCA(NY,NX))*OXYE(NY,NX)
       trcg_rootml_pvr(idg_beg:idg_end-1,N,L,NZ,NY,NX)=0._r8

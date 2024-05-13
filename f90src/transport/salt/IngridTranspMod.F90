@@ -474,31 +474,31 @@ module IngridTranspMod
 
   DIFPO=(POSGL2(NU(NY,NX),NY,NX)*TORTL+DISPN)*AREA(3,NU(NY,NX),NY,NX)
 
-  DIFAL=(ALSGL2(NU(NY,NX),NY,NX)*TORTL+DISPN)*AREA(3,NU(NY,NX),NY,NX)
+  DIFAL=(AquaIonDifusivty2_vr(idsalt_Al,NU(NY,NX),NY,NX)*TORTL+DISPN)*AREA(3,NU(NY,NX),NY,NX)
   trcSaltDiffConductance((/idsalt_Al,idsalt_AlOH,idsalt_AlOH2,idsalt_AlOH3,idsalt_AlOH4,idsalt_AlSO4/))=DIFAL
 
-  DIFFE=(FESGL2(NU(NY,NX),NY,NX)*TORTL+DISPN)*AREA(3,NU(NY,NX),NY,NX)
+  DIFFE=(AquaIonDifusivty2_vr(idsalt_Fe,NU(NY,NX),NY,NX)*TORTL+DISPN)*AREA(3,NU(NY,NX),NY,NX)
   trcSaltDiffConductance((/idsalt_Fe,idsalt_FeOH,idsalt_FeOH2,idsalt_FeOH3,idsalt_FeOH4,idsalt_FeSO4/))=DIFFE
 
-  trcSaltDiffConductance(idsalt_Hp)=(HYSGL2(NU(NY,NX),NY,NX)*TORTL+DISPN)*AREA(3,NU(NY,NX),NY,NX)
+  trcSaltDiffConductance(idsalt_Hp)=(AquaIonDifusivty2_vr(idsalt_Hp,NU(NY,NX),NY,NX)*TORTL+DISPN)*AREA(3,NU(NY,NX),NY,NX)
 
-  DIFCA=(CASGL2(NU(NY,NX),NY,NX)*TORTL+DISPN)*AREA(3,NU(NY,NX),NY,NX)
+  DIFCA=(AquaIonDifusivty2_vr(idsalt_Ca,NU(NY,NX),NY,NX)*TORTL+DISPN)*AREA(3,NU(NY,NX),NY,NX)
   trcSaltDiffConductance((/idsalt_Ca,idsalt_CaOH,idsalt_CO3,idsalt_HCO3,idsalt_CaSO4/))=DIFCA
 
-  DIFMG=(GMSGL2(NU(NY,NX),NY,NX)*TORTL+DISPN)*AREA(3,NU(NY,NX),NY,NX)
+  DIFMG=(AquaIonDifusivty2_vr(idsalt_Mg,NU(NY,NX),NY,NX)*TORTL+DISPN)*AREA(3,NU(NY,NX),NY,NX)
   trcSaltDiffConductance((/idsalt_Mg,idsalt_MgOH2,idsalt_MgCO3,idsalt_MgHCO3,idsalt_SO4/))=DIFMG
 
-  DIFNA=(ANSGL2(NU(NY,NX),NY,NX)*TORTL+DISPN)*AREA(3,NU(NY,NX),NY,NX)
+  DIFNA=(AquaIonDifusivty2_vr(idsalt_Na,NU(NY,NX),NY,NX)*TORTL+DISPN)*AREA(3,NU(NY,NX),NY,NX)
   trcSaltDiffConductance((/idsalt_Na,idsalt_NaCO3,idsalt_NaSO4/))=DIFNA
 
-  DIFKA=(AKSGL2(NU(NY,NX),NY,NX)*TORTL+DISPN)*AREA(3,NU(NY,NX),NY,NX)
+  DIFKA=(AquaIonDifusivty2_vr(idsalt_K,NU(NY,NX),NY,NX)*TORTL+DISPN)*AREA(3,NU(NY,NX),NY,NX)
   trcSaltDiffConductance((/idsalt_K,idsalt_KSO4/))=DIFKA
 
-  trcSaltDiffConductance(idsalt_OH)=(OHSGL2(NU(NY,NX),NY,NX)*TORTL+DISPN)*AREA(3,NU(NY,NX),NY,NX)
-  trcSaltDiffConductance(idsalt_SO4)=(SOSGL2(NU(NY,NX),NY,NX)*TORTL+DISPN)*AREA(3,NU(NY,NX),NY,NX)
-  trcSaltDiffConductance(idsalt_Cl)=(CLSXL2(NU(NY,NX),NY,NX)*TORTL+DISPN)*AREA(3,NU(NY,NX),NY,NX)
-  trcSaltDiffConductance(idsalt_CO3)=(C3SGL2(NU(NY,NX),NY,NX)*TORTL+DISPN)*AREA(3,NU(NY,NX),NY,NX)
-  trcSaltDiffConductance(idsalt_HCO3)=(HCSGL2(NU(NY,NX),NY,NX)*TORTL+DISPN)*AREA(3,NU(NY,NX),NY,NX)
+  trcSaltDiffConductance(idsalt_OH)=(AquaIonDifusivty2_vr(idsalt_OH,NU(NY,NX),NY,NX)*TORTL+DISPN)*AREA(3,NU(NY,NX),NY,NX)
+  trcSaltDiffConductance(idsalt_SO4)=(AquaIonDifusivty2_vr(idsalt_SO4,NU(NY,NX),NY,NX)*TORTL+DISPN)*AREA(3,NU(NY,NX),NY,NX)
+  trcSaltDiffConductance(idsalt_Cl)=(AquaIonDifusivty2_vr(idsalt_Cl,NU(NY,NX),NY,NX)*TORTL+DISPN)*AREA(3,NU(NY,NX),NY,NX)
+  trcSaltDiffConductance(idsalt_CO3)=(AquaIonDifusivty2_vr(idsalt_CO3,NU(NY,NX),NY,NX)*TORTL+DISPN)*AREA(3,NU(NY,NX),NY,NX)
+  trcSaltDiffConductance(idsalt_HCO3)=(AquaIonDifusivty2_vr(idsalt_HCO3,NU(NY,NX),NY,NX)*TORTL+DISPN)*AREA(3,NU(NY,NX),NY,NX)
 !
 !     DIFFUSIVE FLUXES BETWEEN CURRENT AND ADJACENT GRID CELL
 !     MICROPORES
@@ -1066,8 +1066,8 @@ module IngridTranspMod
 !     ADJACENT GRID CELL MICROPORES FROM AQUEOUS DIFFUSIVITIES
 !     AND CONCENTRATION DIFFERENCES
 !
-  IF(THETW1(N3,N2,N1).GT.THETY(N3,N2,N1) &
-    .AND.THETW1(N6,N5,N4).GT.THETY(N6,N5,N4) &
+  IF(THETW1(N3,N2,N1).GT.THETY_vr(N3,N2,N1) &
+    .AND.THETW1(N6,N5,N4).GT.THETY_vr(N6,N5,N4) &
     .AND.VLWatMicPM(M,N3,N2,N1).GT.ZEROS2(N2,N1) &
     .AND.VLWatMicPM(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
 !
@@ -1170,31 +1170,31 @@ module IngridTranspMod
     DISPN=DISP(N,N6,N5,N4)*AMIN1(VFLWX,ABS(WaterFlow2MicPM(M,N,N6,N5,N4)/AREA(N,N6,N5,N4)))
     DIFPO=(POSGL2(N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
 
-    DIFAL=(ALSGL2(N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
+    DIFAL=(AquaIonDifusivty2_vr(idsalt_Al,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
     trcSaltDiffConductance((/idsalt_Al,idsalt_AlOH,idsalt_AlOH2,idsalt_AlOH3,idsalt_AlOH4,idsalt_AlSO4/))=DIFAL
 
-    DIFFE=(FESGL2(N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
+    DIFFE=(AquaIonDifusivty2_vr(idsalt_Fe,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
     trcSaltDiffConductance((/idsalt_Fe,idsalt_FeOH,idsalt_FeOH2,idsalt_FeOH3,idsalt_FeOH4,idsalt_FeSO4/))=DIFFE
 
-    trcSaltDiffConductance(idsalt_Hp)=(HYSGL2(N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
+    trcSaltDiffConductance(idsalt_Hp)=(AquaIonDifusivty2_vr(idsalt_Hp,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
 
-    DIFCA=(CASGL2(N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
+    DIFCA=(AquaIonDifusivty2_vr(idsalt_Ca,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
     trcSaltDiffConductance((/idsalt_Ca,idsalt_CaOH,idsalt_CO3,idsalt_HCO3,idsalt_CaSO4/))=DIFCA
 
-    DIFMG=(GMSGL2(N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
+    DIFMG=(AquaIonDifusivty2_vr(idsalt_Mg,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
     trcSaltDiffConductance((/idsalt_Mg,idsalt_MgOH2,idsalt_MgCO3,idsalt_MgHCO3,idsalt_SO4/))=DIFMG
 
-    DIFNA=(ANSGL2(N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
+    DIFNA=(AquaIonDifusivty2_vr(idsalt_Na,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
     trcSaltDiffConductance((/idsalt_Na,idsalt_NaCO3,idsalt_NaSO4/))=DIFNA
 
-    DIFKA=(AKSGL2(N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
+    DIFKA=(AquaIonDifusivty2_vr(idsalt_K,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
     trcSaltDiffConductance((/idsalt_K,idsalt_KSO4/))=DIFKA
 
-    trcSaltDiffConductance(idsalt_OH)=(OHSGL2(N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
-    trcSaltDiffConductance(idsalt_SO4)=(SOSGL2(N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
-    trcSaltDiffConductance(idsalt_Cl)=(CLSXL2(N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
-    trcSaltDiffConductance(idsalt_CO3)=(C3SGL2(N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
-    trcSaltDiffConductance(idsalt_HCO3)=(HCSGL2(N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
+    trcSaltDiffConductance(idsalt_OH)=(AquaIonDifusivty2_vr(idsalt_OH,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
+    trcSaltDiffConductance(idsalt_SO4)=(AquaIonDifusivty2_vr(idsalt_SO4,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
+    trcSaltDiffConductance(idsalt_Cl)=(AquaIonDifusivty2_vr(idsalt_Cl,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
+    trcSaltDiffConductance(idsalt_CO3)=(AquaIonDifusivty2_vr(idsalt_CO3,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
+    trcSaltDiffConductance(idsalt_HCO3)=(AquaIonDifusivty2_vr(idsalt_HCO3,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
 !
 !     DIFFUSIVE FLUXES BETWEEN CURRENT AND ADJACENT GRID CELL
 !     MICROPORES
@@ -1358,8 +1358,8 @@ module IngridTranspMod
 !     THETY=hygroscopic water content
 !     VOLAH=total macropore volume
 
-  IF(VLWatMacPM(M,N3,N2,N1).GT.THETY(N3,N2,N1)*VLMacP(N3,N2,N1) &
-    .AND.VLWatMacPM(M,N6,N5,N4).GT.THETY(N6,N5,N4)*VLMacP(N6,N5,N4))THEN
+  IF(VLWatMacPM(M,N3,N2,N1).GT.THETY_vr(N3,N2,N1)*VLMacP(N3,N2,N1) &
+    .AND.VLWatMacPM(M,N6,N5,N4).GT.THETY_vr(N6,N5,N4)*VLMacP(N6,N5,N4))THEN
 !
 !     MACROPORE CONCENTRATIONS IN CURRENT AND ADJACENT GRID CELLS
 !
@@ -1412,31 +1412,31 @@ module IngridTranspMod
     DISPN=DISP(N,N6,N5,N4)*AMIN1(VFLWX,ABS(WaterFlow2MacPM(M,N,N6,N5,N4)/AREA(N,N6,N5,N4)))
     DIFPO=(POSGL2(N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
 
-    DIFAL=(ALSGL2(N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
+    DIFAL=(AquaIonDifusivty2_vr(idsalt_Al,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
     trcSaltDiffConductance((/idsalt_Al,idsalt_AlOH,idsalt_AlOH2,idsalt_AlOH3,idsalt_AlOH4,idsalt_AlSO4/))=DIFAL
 
-    DIFFE=(FESGL2(N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
+    DIFFE=(AquaIonDifusivty2_vr(idsalt_Fe,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
     trcSaltDiffConductance((/idsalt_Fe,idsalt_FeOH,idsalt_FeOH2,idsalt_FeOH3,idsalt_FeOH4,idsalt_FeSO4/))=DIFFE
 
-    trcSaltDiffConductance(idsalt_Hp)=(HYSGL2(N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
+    trcSaltDiffConductance(idsalt_Hp)=(AquaIonDifusivty2_vr(idsalt_Hp,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
 
-    DIFCA=(CASGL2(N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
+    DIFCA=(AquaIonDifusivty2_vr(idsalt_Ca,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
     trcSaltDiffConductance((/idsalt_Ca,idsalt_CaOH,idsalt_CO3,idsalt_HCO3,idsalt_CaSO4/))=DIFCA
 
-    DIFMG=(GMSGL2(N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
+    DIFMG=(AquaIonDifusivty2_vr(idsalt_Mg,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
     trcSaltDiffConductance((/idsalt_Mg,idsalt_MgOH2,idsalt_MgCO3,idsalt_MgHCO3,idsalt_SO4/))=DIFMG
 
-    DIFNA=(ANSGL2(N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
+    DIFNA=(AquaIonDifusivty2_vr(idsalt_Na,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
     trcSaltDiffConductance((/idsalt_Na,idsalt_NaCO3,idsalt_NaSO4/))=DIFNA
 
-    DIFKA=(AKSGL2(N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
+    DIFKA=(AquaIonDifusivty2_vr(idsalt_K,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
     trcSaltDiffConductance((/idsalt_K,idsalt_KSO4/))=DIFKA
 
-    trcSaltDiffConductance(idsalt_OH)=(OHSGL2(N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
-    trcSaltDiffConductance(idsalt_SO4)=(SOSGL2(N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
-    trcSaltDiffConductance(idsalt_Cl)=(CLSXL2(N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
-    trcSaltDiffConductance(idsalt_CO3)=(C3SGL2(N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
-    trcSaltDiffConductance(idsalt_HCO3)=(HCSGL2(N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
+    trcSaltDiffConductance(idsalt_OH)=(AquaIonDifusivty2_vr(idsalt_OH,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
+    trcSaltDiffConductance(idsalt_SO4)=(AquaIonDifusivty2_vr(idsalt_SO4,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
+    trcSaltDiffConductance(idsalt_Cl)=(AquaIonDifusivty2_vr(idsalt_Cl,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
+    trcSaltDiffConductance(idsalt_CO3)=(AquaIonDifusivty2_vr(idsalt_CO3,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
+    trcSaltDiffConductance(idsalt_HCO3)=(AquaIonDifusivty2_vr(idsalt_HCO3,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
 !
 !     DIFFUSIVE FLUXES BETWEEN CURRENT AND ADJACENT GRID CELL
 !     MACROPORES

@@ -402,7 +402,7 @@ subroutine soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
 
       nlend=etimer%its_time_to_exit()
       rstwr=etimer%its_time_to_write_restart()
-      lnyr=etimer%its_a_new_year().and.hist_yrclose
+      lnyr=etimer%its_a_new_year()
 
       call hist_htapes_wrapup( rstwr, nlend, bounds, lnyr )
 
