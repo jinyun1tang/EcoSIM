@@ -5,7 +5,7 @@ module MicAutoCPLXMod
   use MicForcTypeMod, only : micforctype
   use MicFluxTypeMod, only: micfluxtype
   use MicStateTraitTypeMod, only : micsttype
-  use NitroDiagTypes
+  use MicrobeDiagTypes
   use ElmIDMod
   use TracerIDMod
   use EcoSiMParDataMod, only : micpar

@@ -13,7 +13,7 @@ module nitrosMod
   use SOMDataType
   use ChemTranspDataType
   use FertilizerDataType
-  use NitroDiagTypes
+  use MicrobeDiagTypes
   use NitroDisturbMod
   use GridConsts
   use SoilBGCDataType

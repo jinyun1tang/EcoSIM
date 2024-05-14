@@ -12,7 +12,7 @@ module MicBGCMod
   use EcosimConst
   use EcoSIMSolverPar
   use NitroPars
-  use NitroDiagTypes
+  use MicrobeDiagTypes
   use MicFLuxTypeMod,       only: micfluxtype
   use MicStateTraitTypeMod, only: micsttype
   use MicForcTypeMod,       only: micforctype

@@ -5,7 +5,7 @@ set(BOX_MODEL_SOURCES
   MicFluxTypeMod.F90
   MicForcTypeMod.F90
   MicStateTraitTypeMod.F90
-  NitroDiagTypes.F90
+  MicrobeDiagTypes.F90
 )
 
 include(add_ecosim_library)

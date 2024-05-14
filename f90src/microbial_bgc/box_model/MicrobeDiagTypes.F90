@@ -1,4 +1,4 @@
-module NitroDiagTypes
+module MicrobeDiagTypes
   ! !PUBLIC TYPES:
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use data_const_mod, only : spval => DAT_CONST_SPVAL       
@@ -855,4 +855,4 @@ type, public :: NitroAQMFluxDiagType
   call destroy(this%CDOM)
 
   end subroutine nit_omcplxs_destroy
-end module NitroDiagTypes
+end module MicrobeDiagTypes
