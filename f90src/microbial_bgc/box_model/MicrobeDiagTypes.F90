@@ -12,7 +12,7 @@ module MicrobeDiagTypes
   __FILE__
 
 ! accumulative flux diagnostics
-type, public :: NitroAQMFluxDiagType
+type, public :: Cumlate_Flux_Diag_type
 ! ratios
     real(r8) :: TFNH4B
     real(r8) :: TFNO3B
@@ -45,7 +45,7 @@ type, public :: NitroAQMFluxDiagType
     real(r8) :: tRNOxMicrbRedux
     real(r8) :: TRGOA
     real(r8) :: TProdH2               !H2 production by fermenters
-    real(r8) :: tRO2MicrbUptk
+    real(r8) :: tRO2MicrbUptk         !O2 uptake by microbes
     real(r8) :: TReduxNO3Soil         !NO3 reduction in non-band soil by denitrifiers
     real(r8) :: TReduxNO3Band         !NO3 reduction in banded soil by denitrifiers
     real(r8) :: TReduxNO2Soil         !NO2 reduction in non-band soil, by ammonia oxidizers, and denitrifiers
@@ -54,9 +54,9 @@ type, public :: NitroAQMFluxDiagType
     real(r8) :: TFixN2                !N2 fixation by aerobic and anaerobic N2 fixers
   contains
     procedure, public :: ZeroOut => nit_aqmf_diag
-  end type NitroAQMFluxDiagType
+  end type Cumlate_Flux_Diag_type
 
-  type, public :: NitroMicStateType
+  type, public :: Microbe_State_type
   real(r8),allocatable :: rCNBiomeActHeter(:,:,:)  !Nutrient to carbon ratio for active heterotrophs
   real(r8),allocatable :: OMActHeter(:,:)
 
@@ -91,9 +91,9 @@ type, public :: NitroAQMFluxDiagType
   contains
    procedure, public :: Init => nit_mics_init
    procedure, public :: Destroy => nit_mics_destroy
-  end type NitroMicStateType
+  end type Microbe_State_type
 
-  type, public :: NitroMicFluxType
+  type, public :: Microbe_Flux_type
   !fluxes
   real(r8) :: RTotNH3OxidSoilAutor
   real(r8) :: RTotNH3OxidBandAutor  
@@ -201,9 +201,9 @@ type, public :: NitroAQMFluxDiagType
     procedure, public :: Init => nit_micf_init
     procedure, public :: ZeroOut => nit_micf_zero
     procedure, public :: destroy => nit_micf_destroy
-  end type NitroMicFluxType
+  end type Microbe_Flux_type
 
-  type, public :: NitroOMcplxFluxType
+  type, public :: OMCplx_Flux_type
     real(r8),allocatable :: RHydlysSolidOM(:,:,:)
     real(r8),allocatable :: RHumifySolidOM(:,:,:)
     real(r8),allocatable :: RDcmpProdDOM(:,:,:)
@@ -218,9 +218,9 @@ type, public :: NitroAQMFluxDiagType
     procedure, public :: Init => nit_omcplxf_init
     procedure, public :: ZeroOut => nit_omcplxf_zero
     procedure, public :: Destroy => nit_omcplxf_destroy
-  end type NitroOMcplxFluxType
+  end type OMCplx_Flux_type
 
-  type, public :: NitroOMcplxStateType
+  type, public :: OMCplx_State_type
     real(r8),allocatable :: BulkSOMC(:)
     real(r8),allocatable :: TOMK(:)
     real(r8),allocatable :: TONK(:)
@@ -236,14 +236,14 @@ type, public :: NitroAQMFluxDiagType
     real(r8),allocatable :: SolidOMActK(:)
     real(r8),allocatable :: tMaxNActMicrbK(:)
     real(r8),allocatable :: tMaxPActMicrbK(:)
-    real(r8),allocatable :: CDOM(:,:)
+    real(r8),allocatable :: CDOM(:,:)            !dom concentration
   contains
     procedure, public :: Init => nit_omcplxs_init
     procedure, public :: ZeroOut => nit_omcplxs_zero
     procedure, public :: Destroy => nit_omcplxs_destroy
-  end type NitroOMcplxStateType
+  end type OMCplx_State_type
 
-  type, public :: NitroMicDiagType
+  type, public :: Microbe_Diag_type
   real(r8) :: H1P4T
   real(r8) :: H2P4T
   real(r8) :: RH2UptkAutor
@@ -268,14 +268,14 @@ type, public :: NitroAQMFluxDiagType
   real(r8) :: ZNO3T
   real(r8) :: ZNO2T
 
-  end type NitroMicDiagType
+  end type Microbe_Diag_type
 
   contains
 !------------------------------------------------------------------------------------------
 
   subroutine nit_aqmf_diag(this)
   implicit none
-  class(NitroAQMFluxDiagType) :: this
+  class(Cumlate_Flux_Diag_type) :: this
 
   this%TFNH4B = 0._r8
   this%TFNO3B = 0._r8
@@ -321,7 +321,7 @@ type, public :: NitroAQMFluxDiagType
 
   subroutine nit_micf_init(this,jcplx,NumMicbFunGrupsPerCmplx)
   implicit none
-  class(NitroMicFluxType) :: this
+  class(Microbe_Flux_type) :: this
   integer, intent(in) :: jcplx,NumMicbFunGrupsPerCmplx
   integer :: ndbiomcp
   integer :: NumMicrobAutrophCmplx
@@ -436,7 +436,7 @@ type, public :: NitroAQMFluxDiagType
   subroutine nit_mics_init(this, jcplx,NumMicbFunGrupsPerCmplx)
 
   implicit none
-  class(NitroMicStateType) :: this
+  class(Microbe_State_type) :: this
   integer, intent(in) :: jcplx,NumMicbFunGrupsPerCmplx
   integer :: NumMicrobAutrophCmplx,NumHetetrMicCmplx
   NumMicrobAutrophCmplx=micpar%NumMicrobAutrophCmplx
@@ -476,7 +476,7 @@ type, public :: NitroAQMFluxDiagType
 
   subroutine nit_micf_zero(this)
   implicit none
-  class(NitroMicFLuxType) :: this
+  class(Microbe_Flux_type) :: this
 
   this%RO2UptkHeter = 0._r8
   this%Resp4NFixHeter = 0._r8
@@ -586,7 +586,7 @@ type, public :: NitroAQMFluxDiagType
   subroutine nit_micf_destroy(this)
 
   implicit none
-  class(NitroMicFLuxType) :: this
+  class(Microbe_Flux_type) :: this
 
   call destroy(this%RO2UptkHeter)
   call destroy(this%Resp4NFixHeter)
@@ -691,7 +691,7 @@ type, public :: NitroAQMFluxDiagType
 
   subroutine nit_mics_destroy(this)
   implicit none
-  class(NitroMicStateType) :: this
+  class(Microbe_State_type) :: this
 
   call destroy(this%rCNBiomeActHeter)
   call destroy(this%OMActHeter)
@@ -726,7 +726,7 @@ type, public :: NitroAQMFluxDiagType
 !------------------------------------------------------------------------------------------
   subroutine nit_omcplxf_init(this)
   implicit none
-  class(NitroOMcplxFluxType) :: this
+  class(OMCplx_Flux_type) :: this
   integer :: nkinets
   integer :: ncplx
   integer :: ndbiomcp
@@ -751,7 +751,7 @@ type, public :: NitroAQMFluxDiagType
 
   subroutine nit_omcplxf_destroy(this)
   implicit none
-  class(NitroOMcplxFluxType) :: this
+  class(OMCplx_Flux_type) :: this
 
   call destroy(this%RHydlysSolidOM)
   call destroy(this%RHumifySolidOM)
@@ -768,7 +768,7 @@ type, public :: NitroAQMFluxDiagType
 
   subroutine nit_omcplxf_zero(this)
   implicit none
-  class(NitroOMcplxFluxType) :: this
+  class(OMCplx_Flux_type) :: this
 
   this%RHydlysSolidOM=0._r8
   this%RHumifySolidOM=0._r8
@@ -784,7 +784,7 @@ type, public :: NitroAQMFluxDiagType
 
   subroutine nit_omcplxs_init(this)
   implicit none
-  class(NitroOMcplxStateType) :: this
+  class(OMCplx_State_type) :: this
   integer :: ncplx
 
   ncplx=micpar%jcplx
@@ -811,7 +811,7 @@ type, public :: NitroAQMFluxDiagType
   subroutine nit_omcplxs_zero(this)
 
   implicit none
-  class(NitroOMcplxStateType) :: this
+  class(OMCplx_State_type) :: this
 
   this%BulkSOMC=0._r8
   this%TOMK=0._r8
@@ -835,7 +835,7 @@ type, public :: NitroAQMFluxDiagType
 !------------------------------------------------------------------------------------------
   subroutine nit_omcplxs_destroy(this)
   implicit none
-  class(NitroOMcplxStateType) :: this
+  class(OMCplx_State_type) :: this
 
   call destroy(this%BulkSOMC)
   call destroy(this%TOMK)

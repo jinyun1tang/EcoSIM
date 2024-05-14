@@ -70,12 +70,12 @@ module MicBGCMod
 !local variables
   integer :: LL,K,KL,NGL
   integer :: M,N
-  type(NitroMicDiagType) :: nmicdiag
-  type(NitroAQMFluxDiagType) :: naqfdiag
-  type(NitroMicStateType) :: nmics
-  type(NitroMicFluxType) :: nmicf
-  type(NitroOMcplxFluxType) :: ncplxf
-  type(NitroOMcplxStateType) :: ncplxs
+  type(Microbe_Diag_type) :: nmicdiag
+  type(Cumlate_Flux_Diag_type) :: naqfdiag
+  type(Microbe_State_type) :: nmics
+  type(Microbe_Flux_type) :: nmicf
+  type(OMCplx_Flux_type) :: ncplxf
+  type(OMCplx_State_type) :: ncplxs
   real(r8) :: totOMbeg(1:NumPlantChemElms)
   real(r8) :: totOMend(1:NumPlantChemElms)
 
@@ -218,10 +218,10 @@ module MicBGCMod
   type(micforctype), intent(in) :: micfor
   integer, intent(out) :: KL
   type(micsttype), intent(inout) :: micstt
-  type(NitroAQMFluxDiagType), INTENT(INOUT) :: naqfdiag
-  type(NitroMicDiagType), intent(inout) :: nmicdiag
-  type(NitroMicStateType), intent(inout) :: nmics
-  type(NitroOMcplxStateType),intent(inout):: ncplxs
+  type(Cumlate_Flux_Diag_type), INTENT(INOUT) :: naqfdiag
+  type(Microbe_Diag_type), intent(inout) :: nmicdiag
+  type(Microbe_State_type), intent(inout) :: nmics
+  type(OMCplx_State_type),intent(inout):: ncplxs
   real(r8) :: TBulkOMC  
   integer  :: K
   integer  :: M,N,NGL,MID1,MID2
@@ -707,12 +707,12 @@ module MicBGCMod
   type(micforctype), intent(in) :: micfor
   type(micsttype), intent(inout) :: micstt
   type(micfluxtype), intent(inout) :: micflx
-  type(NitroMicDiagType), intent(inout) :: nmicdiag
-  type(NitroAQMFluxDiagType), INTENT(INOUT) :: naqfdiag
-  type(NitroMicFluxType), intent(inout) :: nmicf
-  type(NitroMicStateType), intent(inout):: nmics
-  type(NitroOMcplxFluxType), intent(inout) :: ncplxf
-  type(NitroOMcplxStateType), intent(inout):: ncplxs
+  type(Microbe_Diag_type), intent(inout) :: nmicdiag
+  type(Cumlate_Flux_Diag_type), INTENT(INOUT) :: naqfdiag
+  type(Microbe_Flux_type), intent(inout) :: nmicf
+  type(Microbe_State_type), intent(inout):: nmics
+  type(OMCplx_Flux_type), intent(inout) :: ncplxf
+  type(OMCplx_State_type), intent(inout):: ncplxs
   integer :: K,M,N,NGL,MID
   real(r8) :: SPOMK(2)
   real(r8) :: RMOMK(2)    
@@ -830,11 +830,11 @@ module MicBGCMod
   real(r8), intent(in) :: RMOMK(2)  
   type(micforctype), intent(in) :: micfor
   type(micsttype), intent(inout) :: micstt
-  type(NitroAQMFluxDiagType), INTENT(INOUT) :: naqfdiag
-  type(NitroMicStateType), intent(inout) :: nmics
-  type(NitroMicFluxType), intent(inout) :: nmicf
-  type(NitroOMcplxFluxType), intent(inout) :: ncplxf
-  type(NitroOMcplxStateType), intent(inout) :: ncplxs
+  type(Cumlate_Flux_Diag_type), INTENT(INOUT) :: naqfdiag
+  type(Microbe_State_type), intent(inout) :: nmics
+  type(Microbe_Flux_type), intent(inout) :: nmicf
+  type(OMCplx_Flux_type), intent(inout) :: ncplxf
+  type(OMCplx_State_type), intent(inout) :: ncplxs
   type(micfluxtype), intent(inout) :: micflx
   integer  :: M
   real(r8) :: COMC
@@ -1036,8 +1036,8 @@ module MicBGCMod
   implicit none
   type(micforctype), intent(in) :: micfor
   type(micsttype), intent(inout) :: micstt
-  type(NitroMicDiagType), intent(inout) :: nmicdiag
-  type(NitroAQMFluxDiagType), INTENT(INOUT):: naqfdiag
+  type(Microbe_Diag_type), intent(inout) :: nmicdiag
+  type(Cumlate_Flux_Diag_type), INTENT(INOUT):: naqfdiag
   type(micfluxtype), intent(inout) :: micflx
   real(r8) :: H_1p_conc,CHNO2,CHNOB
   real(r8) :: FNO3S,FNO3B
@@ -1121,10 +1121,10 @@ module MicBGCMod
   integer, intent(in) :: KL
   type(micforctype), intent(in) :: micfor
   type(micsttype), intent(inout) :: micstt
-  type(NitroMicFLuxType), intent(inout) :: nmicf
-  type(NitroMicStateType), intent(inout) :: nmics
-  type(NitroOMcplxFluxType), intent(inout):: ncplxf
-  type(NitroOMcplxStateType),intent(inout):: ncplxs
+  type(Microbe_Flux_type), intent(inout) :: nmicf
+  type(Microbe_State_type), intent(inout) :: nmics
+  type(OMCplx_Flux_type), intent(inout):: ncplxf
+  type(OMCplx_State_type),intent(inout):: ncplxs
   integer  :: K,M,N,KK,NGL,MID,idom,NE
   real(r8) :: OSRT
   real(r8) :: XFRK,XFROM(idom_beg:idom_end)
@@ -1236,9 +1236,9 @@ module MicBGCMod
   integer, intent(in) :: K                 !from 1 to 5
   type(micforctype), intent(in) :: micfor
   type(micsttype), intent(inout) :: micstt
-  type(NitroMicFluxType), intent(inout) :: nmicf
-  type(NitroOMcplxFluxType), intent(inout) :: ncplxf
-  type(NitroOMcplxStateType),intent(inout) :: ncplxs
+  type(Microbe_Flux_type), intent(inout) :: nmicf
+  type(OMCplx_Flux_type), intent(inout) :: ncplxf
+  type(OMCplx_State_type),intent(inout) :: ncplxs
   real(r8) :: AECX
   real(r8) :: OQEX(idom_beg:idom_end)
   real(r8) :: OHEX(idom_beg:idom_end)
@@ -1324,10 +1324,10 @@ module MicBGCMod
   integer, intent(in) :: K
   type(micforctype), intent(in) :: micfor
   type(micsttype), intent(inout) :: micstt
-  type(NitroAQMFluxDiagType), INTENT(INOUT) :: naqfdiag
-  type(NitroMicDiagType), intent(inout) :: nmicdiag
-  type(NitroOMcplxFluxType), intent(inout) :: ncplxf
-  type(NitroOMcplxStateType),intent(inout) :: ncplxs
+  type(Cumlate_Flux_Diag_type), INTENT(INOUT) :: naqfdiag
+  type(Microbe_Diag_type), intent(inout) :: nmicdiag
+  type(OMCplx_Flux_type), intent(inout) :: ncplxf
+  type(OMCplx_State_type),intent(inout) :: ncplxs
   integer  :: M,NE,idom
   real(r8) :: CNOMX,CPOMX
   real(r8) :: COQCK,COSC
@@ -1595,10 +1595,10 @@ module MicBGCMod
   integer, intent(in) :: KL
   type(micforctype), intent(in) :: micfor
   type(micsttype), intent(inout) :: micstt
-  type(NitroMicDiagType), intent(in) :: nmicdiag
-  type(NitroMicFluxType), intent(inout) :: nmicf
-  type(NitroOMcplxFluxType), intent(inout) :: ncplxf
-  type(NitroOMcplxStateType), intent(inout):: ncplxs
+  type(Microbe_Diag_type), intent(in) :: nmicdiag
+  type(Microbe_Flux_type), intent(inout) :: nmicf
+  type(OMCplx_Flux_type), intent(inout) :: ncplxf
+  type(OMCplx_State_type), intent(inout):: ncplxs
   integer :: K,M,N,NGL,NE,idom
   real(r8) :: FORC(0:jcplx)
 !     begin_execution
@@ -1768,7 +1768,7 @@ module MicBGCMod
   implicit none
   type(micforctype), intent(in) :: micfor
   type(micsttype), intent(inout) :: micstt
-  type(NitroMicFluxType), intent(inout) :: nmicf
+  type(Microbe_Flux_type), intent(inout) :: nmicf
   integer  :: K,M,N,NGL,MID3,MID,NE
   real(r8) ::CGROMC
 !     begin_execution
@@ -1912,8 +1912,8 @@ module MicBGCMod
   integer, intent(in) :: KL
   type(micforctype), intent(in) :: micfor
   type(micsttype), intent(inout) :: micstt
-  type(NitroOMcplxFluxType), intent(inout) :: ncplxf
-  type(NitroOMcplxStateType),intent(inout) :: ncplxs
+  type(OMCplx_Flux_type), intent(inout) :: ncplxf
+  type(OMCplx_State_type),intent(inout) :: ncplxs
   integer  :: K,M
   real(r8) :: DOSAK
 
@@ -1961,10 +1961,10 @@ module MicBGCMod
   implicit none
   type(micforctype), intent(in) :: micfor
   type(micsttype), intent(inout) :: micstt
-  type(NitroMicDiagType),intent(in) :: nmicdiag
-  type(NitroAQMFluxDiagType), intent(inout) :: naqfdiag
-  type(NitroMicFluxType), intent(inout) :: nmicf
-  type(NitroOMcplxFluxType), intent(inout) :: ncplxf
+  type(Microbe_Diag_type),intent(in) :: nmicdiag
+  type(Cumlate_Flux_Diag_type), intent(inout) :: naqfdiag
+  type(Microbe_Flux_type), intent(inout) :: nmicf
+  type(OMCplx_Flux_type), intent(inout) :: ncplxf
   type(micfluxtype), intent(inout) :: micflx
   integer  :: K,M,N,NGL,NE
 !     begin_execution
@@ -2256,9 +2256,9 @@ module MicBGCMod
   real(r8),intent(out) :: FPO4X,FPOBX,FP14X,FP1BX
   real(r8),intent(out) :: FOQC,FOQA
   type(micforctype), intent(in) :: micfor
-  type(NitroAQMFluxDiagType),INTENT(INOUT)::  naqfdiag
-  type(NitroMicStateType), intent(inout) :: nmics
-  type(NitroMicFluxType), intent(inout) :: nmicf
+  type(Cumlate_Flux_Diag_type),INTENT(INOUT)::  naqfdiag
+  type(Microbe_State_type), intent(inout) :: nmics
+  type(Microbe_Flux_type), intent(inout) :: nmicf
   type(micfluxtype), intent(inout) :: micflx
 ! begin_execution
   associate(                                               &
@@ -2432,10 +2432,10 @@ module MicBGCMod
   REAL(R8), intent(out) :: FGOCP,FGOAP,RGOMP
   type(micforctype), intent(in) :: micfor
   type(micsttype), intent(inout) :: micstt
-  type(NitroAQMFluxDiagType), intent(inout) :: naqfdiag
-  type(NitroMicFluxType), intent(inout) :: nmicf
-  type(NitroMicStateType), intent(inout):: nmics
-  type(NitroOMcplxStateType),intent(in):: ncplxs
+  type(Cumlate_Flux_Diag_type), intent(inout) :: naqfdiag
+  type(Microbe_Flux_type), intent(inout) :: nmicf
+  type(Microbe_State_type), intent(inout):: nmics
+  type(OMCplx_State_type),intent(in):: ncplxs
   type(micfluxtype), intent(inout) :: micflx
   real(r8) :: FSBST
   real(r8) :: GOMX,GOMM
@@ -2506,10 +2506,10 @@ module MicBGCMod
   real(r8), intent(out) :: RGOCP
   type(micforctype), intent(in) :: micfor
   type(micsttype), intent(inout) :: micstt
-  type(NitroAQMFluxDiagType), INTENT(INOUT) :: naqfdiag
-  type(NitroMicFluxType), intent(inout) :: nmicf
-  type(NitroMicStateType), intent(inout) :: nmics
-  type(NitroOMcplxStateType),intent(inout):: ncplxs
+  type(Cumlate_Flux_Diag_type), INTENT(INOUT) :: naqfdiag
+  type(Microbe_Flux_type), intent(inout) :: nmicf
+  type(Microbe_State_type), intent(inout) :: nmics
+  type(OMCplx_State_type),intent(inout):: ncplxs
   type(micfluxtype), intent(inout) :: micflx
 
   real(r8) :: EO2Q
@@ -2614,10 +2614,10 @@ module MicBGCMod
   real(r8), intent(out) :: FGOCP,FGOAP
   type(micforctype), intent(in) :: micfor
   type(micsttype), intent(inout) :: micstt
-  type(NitroAQMFluxDiagType), INTENT(INOUT) :: naqfdiag
-  type(NitroOMcplxStateType), intent(inout) :: ncplxs
-  type(NitroMicFluxType), intent(inout) :: nmicf
-  type(NitroMicStateType), intent(inout):: nmics
+  type(Cumlate_Flux_Diag_type), INTENT(INOUT) :: naqfdiag
+  type(OMCplx_State_type), intent(inout) :: ncplxs
+  type(Microbe_Flux_type), intent(inout) :: nmicf
+  type(Microbe_State_type), intent(inout):: nmics
   type(micfluxtype), intent(inout) :: micflx
   real(r8) :: GH2X,GH2F
   real(r8) :: GOAX,GOAF
@@ -2697,10 +2697,10 @@ module MicBGCMod
   real(r8), intent(in) :: VOLWZ
   type(micforctype), intent(in) :: micfor
   type(micsttype), intent(inout) :: micstt
-  type(NitroAQMFluxDiagType), intent(inout) :: naqfdiag
-  type(NitroMicStateType), intent(inout) :: nmics
-  type(NitroMicFluxType), intent(inout) :: nmicf
-  type(NitroOMcplxStateType),intent(inout) :: ncplxs
+  type(Cumlate_Flux_Diag_type), intent(inout) :: naqfdiag
+  type(Microbe_State_type), intent(inout) :: nmics
+  type(Microbe_Flux_type), intent(inout) :: nmicf
+  type(OMCplx_State_type),intent(inout) :: ncplxs
   type(micfluxtype), intent(inout) :: micflx
   real(r8) :: FNO3S,FNO3B
   real(r8) :: FNO2S,FNO2B
@@ -2989,8 +2989,8 @@ module MicBGCMod
   real(r8), intent(in) :: RVOXPB
   type(micforctype), intent(in) :: micfor
   type(micsttype), intent(inout) :: micstt
-  type(NitroMicFluxType), intent(inout) :: nmicf
-  type(NitroMicStateType),intent(inout) :: nmics
+  type(Microbe_Flux_type), intent(inout) :: nmicf
+  type(Microbe_State_type),intent(inout) :: nmics
   type(micfluxtype), intent(inout) :: micflx
   integer  :: M,MX
   real(r8) :: COXYS1,DIFOX
@@ -3175,8 +3175,8 @@ module MicBGCMod
   type(micforctype), intent(in) :: micfor
   type(micsttype), intent(inout) :: micstt
   type(micfluxtype), intent(inout) :: micflx
-  type(NitroMicFluxType), intent(inout) :: nmicf
-  type(NitroMicStateType),intent(inout) :: nmics
+  type(Microbe_Flux_type), intent(inout) :: nmicf
+  type(Microbe_State_type),intent(inout) :: nmics
   real(r8) :: CNH4X,CNH4Y,CNO3X,CNO3Y
   real(r8) :: CH2PX,CH2PY
   real(r8) :: CH1PX,CH1PY
@@ -3583,8 +3583,8 @@ module MicBGCMod
   real(r8), intent(out) :: RMaintRespHeter
   type(micforctype), intent(in) :: micfor
   type(micsttype), intent(inout) :: micstt
-  type(NitroMicStateType), intent(inout) :: nmics
-  type(NitroMicFluxType), intent(inout) :: nmicf
+  type(Microbe_State_type), intent(inout) :: nmics
+  type(Microbe_Flux_type), intent(inout) :: nmicf
   integer :: MID3,MID1
   REAL(R8) :: FPH,RMOMX
   real(r8) :: RGN2P
@@ -3674,10 +3674,10 @@ module MicBGCMod
   real(r8), intent(in) :: RMOMK(2)
   type(micforctype), intent(in) :: micfor
   type(micsttype), intent(inout) :: micstt
-  type(NitroMicStateType), intent(inout) :: nmics
-  type(NitroMicFluxType), intent(inout) :: nmicf
-  type(NitroOMcplxFluxType), intent(inout) :: ncplxf
-  type(NitroOMcplxStateType), intent(inout) :: ncplxs
+  type(Microbe_State_type), intent(inout) :: nmics
+  type(Microbe_Flux_type), intent(inout) :: nmicf
+  type(OMCplx_Flux_type), intent(inout) :: ncplxf
+  type(OMCplx_State_type), intent(inout) :: ncplxs
   integer :: M,MID1,MID3,MID,NE
   real(r8) :: RCCC,RCCN,RCCP
   real(r8) :: CCC,CGOMX,CGOMD
