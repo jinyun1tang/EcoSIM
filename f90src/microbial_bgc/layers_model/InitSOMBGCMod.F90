@@ -390,7 +390,7 @@ module InitSOMBGCMOD
   SoilOrgM_vr(ielmn,L,NY,NX)=ORGM(ielmn)
   SoilOrgM_vr(ielmp,L,NY,NX)=ORGM(ielmp)
   ORGCX_vr(L,NY,NX)=SoilOrgM_vr(ielmc,L,NY,NX)
-
+  
   call sumLitrOMLayL(L,NY,NX,litrOM)
   OMLitrC_vr(L,NY,NX)=litrOM(ielmc)
 

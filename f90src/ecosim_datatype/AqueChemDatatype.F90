@@ -74,8 +74,8 @@ module AqueChemDatatype
   real(r8),target,allocatable ::  TBION(:,:,:)                       !total solute ion transformation boundary, [mol d-2 h-1]
   real(r8),target,allocatable ::  TRN3G(:,:,:)                       !total gaseous NH3 transformation, [mol d-2 h-1]
   real(r8),target,allocatable ::  trcp_RChem_soil(:,:,:,:)                   !total precipitated P containing transformation non-band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  trcg_XBLS(:,:,:,:)
-  real(r8),target,allocatable ::  trcn_XBLS(:,:,:,:)
+  real(r8),target,allocatable ::  trcg_Xbndl_flx(:,:,:,:)
+  real(r8),target,allocatable ::  trcn_Xbndl_flx(:,:,:,:)
   real(r8),target,allocatable ::  trcSaltFlo2SnowLay(:,:,:,:)
 
   private :: InitAllocate
@@ -151,8 +151,8 @@ module AqueChemDatatype
   allocate(TBION(0:JZ,JY,JX));  TBION=0._r8
   allocate(TRN3G(0:JZ,JY,JX));  TRN3G=0._r8
   allocate(trcp_RChem_soil(idsp_beg:idsp_end,0:JZ,JY,JX)); trcp_RChem_soil=0._r8
-  allocate(trcg_XBLS(idg_beg:idg_end-1,JS,JY,JX)); trcg_XBLS=0._r8
-  allocate(trcn_XBLS(ids_nut_beg:ids_nuts_end,JS,JY,JX)); trcn_XBLS=0._r8
+  allocate(trcg_Xbndl_flx(idg_beg:idg_end-1,JS,JY,JX)); trcg_Xbndl_flx=0._r8
+  allocate(trcn_Xbndl_flx(ids_nut_beg:ids_nuts_end,JS,JY,JX)); trcn_Xbndl_flx=0._r8
   if(salt_model)then
     allocate(trcSaltFlo2SnowLay(idsalt_beg:idsalt_end,JS,JY,JX)); trcSaltFlo2SnowLay=0._r8
     allocate(trcSalt3DFlo2Cell(idsalt_beg:idsaltb_end,3,0:JD,JV,JH));trcSalt3DFlo2Cell=0._r8

@@ -1464,12 +1464,13 @@ contains
   TK0X=TKSnow1(L,NY,NX)
   TKXR=TKSoi1(0,NY,NX)
   TK1X=TKSoi1(NUM(NY,NX),NY,NX)
-  CNVR=VaporDiffusivityLitR(NY,NX)*THETPM(M,0,NY,NX)*POROQ*THETPM(M,0,NY,NX)/POROS(0,NY,NX)
+  CNVR=safe_adb(VaporDiffusivityLitR(NY,NX)*THETPM(M,0,NY,NX)*POROQ*THETPM(M,0,NY,NX),POROS(0,NY,NX))
+
   if(TKXR<0._r8)then
     write(*,*)'SnowSurLitterExch negative M, L, TKR',M,L,TKXR
   endif
   IF(FracSurfByLitR(NY,NX).GT.ZERO)THEN
-    IF(VapCond1.GT.ZERO.AND.CNVR.GT.ZERO)THEN
+    IF(VapCond1.GT.ZERO .AND. CNVR.GT.ZERO)THEN      
       AvgVaporCondctSnowLitR=2.0_r8*CNVR*VapCond1/(VapCond1*DLYRR(NY,NX)+CNVR*SnowLayerThick0(L,NY,NX))
     ELSE
       AvgVaporCondctSnowLitR=2.0_r8*VapCond1/(DLYRR(NY,NX)+SnowLayerThick0(L,NY,NX))

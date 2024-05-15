@@ -458,7 +458,7 @@ implicit none
   VLWatMicPr=VLWatMicP_vr(0,NY,NX)
   VLiceMicPr=VLiceMicP(0,NY,NX)
   if(VLWatMicP_vr(0,NY,NX)<0._r8 .or. VLiceMicP(0,NY,NX)<0._r8 .or. VHeatCapacityLitR<0._r8)then
-    write(*,*)'negative litr water',VLWatMicP_vr(0,NY,NX),VLiceMicP(0,NY,NX)
+    write(*,*)'negative litr water',VLWatMicP_vr(0,NY,NX),VLiceMicP(0,NY,NX),VHeatCapacityLitR,SoilOrgM_vr(ielmc,0,NY,NX) 
     call endrun(trim(mod_filename)//' at line',__LINE__)    
   endif
   dVHeatCapacityLitr=VHeatCapacityLitR-VHeatCapacityLitrX            

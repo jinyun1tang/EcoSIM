@@ -1206,12 +1206,12 @@ contains
         ENDIF
         DO ngases=idg_beg,idg_NH3
           trcg_RBLS(ngases,L2,NY,NX)=trcg_solsml2(ngases,L,NY,NX)*VFLWW
-          trcg_XBLS(ngases,L2,NY,NX)=trcg_XBLS(ngases,L2,NY,NX)+trcg_RBLS(ngases,L2,NY,NX)
+          trcg_Xbndl_flx(ngases,L2,NY,NX)=trcg_Xbndl_flx(ngases,L2,NY,NX)+trcg_RBLS(ngases,L2,NY,NX)
         ENDDO
 
         DO nnut=ids_nut_beg,ids_nuts_end
           trcn_RBLS(nnut,L2,NY,NX)=trcn_solsml2(nnut,L,NY,NX)*VFLWW
-          trcn_XBLS(nnut,L2,NY,NX)=trcn_XBLS(nnut,L2,NY,NX)+trcn_RBLS(nnut,L2,NY,NX)
+          trcn_Xbndl_flx(nnut,L2,NY,NX)=trcn_Xbndl_flx(nnut,L2,NY,NX)+trcn_RBLS(nnut,L2,NY,NX)
         ENDDO
       ELSE
         IF(L.LT.JS)THEN

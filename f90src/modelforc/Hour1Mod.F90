@@ -745,62 +745,63 @@ module Hour1Mod
   integer :: L
 !     begin_execution
 
-  Qinflx2Soil_col(NY,NX)=0._r8
-  HeatFlx2G_col(NY,NX)=0._r8
-  DIC_mass_col(NY,NX)=0.0_r8
-  tMicBiome_col(1:NumPlantChemElms,NY,NX)=0.0_r8
-  tSoilOrgM_col(1:NumPlantChemElms,NY,NX)=0._r8
-  UVLWatMicP(NY,NX)=0.0_r8
-  tLitrOM_col(1:NumPlantChemElms,NY,NX)=0.0_r8
-  tHumOM_col(1:NumPlantChemElms,NY,NX)=0.0_r8
-  tNH4_col(NY,NX)=0.0_r8
-  tNO3_col(NY,NX)=0.0_r8
-  tHxPO4_col(NY,NX)=0.0_r8
-  tXPO4_col(NY,NX)=0.0_r8
-  UION(NY,NX)=0.0_r8
-  FWatDischarge(NY,NX)=0.0_r8
-  SurfGasFlx_col(idg_beg:idg_NH3,NY,NX)=0.0_r8
-  WatFLo2Litr(NY,NX)=0.0_r8
-  HeatFLo2LitrByWat(NY,NX)=0.0_r8
-  TLitrIceFlxThaw(NY,NX)=0.0_r8
-  TLitrIceHeatFlxFrez(NY,NX)=0.0_r8
-  HeatByRadiation(NY,NX)=0.0_r8
-  HeatSensAir2Surf(NY,NX)=0.0_r8
-  HeatEvapAir2Surf(NY,NX)=0.0_r8
-  HeatSensVapAir2Surf(NY,NX)=0.0_r8
-  HeatNet2Surf(NY,NX)=0.0_r8
-  VapXAir2GSurf(NY,NX)=0.0_r8
+  tRDOE2Die_col(1:NumPlantChemElms,NY,NX)  = 0._r8
+  Qinflx2Soil_col(NY,NX)                  = 0._r8
+  HeatFlx2G_col(NY,NX)                    = 0._r8
+  DIC_mass_col(NY,NX)                     = 0.0_r8
+  tMicBiome_col(1:NumPlantChemElms,NY,NX) = 0.0_r8
+  tSoilOrgM_col(1:NumPlantChemElms,NY,NX) = 0._r8
+  UVLWatMicP(NY,NX)                       = 0.0_r8
+  tLitrOM_col(1:NumPlantChemElms,NY,NX)   = 0.0_r8
+  tHumOM_col(1:NumPlantChemElms,NY,NX)    = 0.0_r8
+  tNH4_col(NY,NX)                         = 0.0_r8
+  tNO3_col(NY,NX)                         = 0.0_r8
+  tHxPO4_col(NY,NX)                       = 0.0_r8
+  tXPO4_col(NY,NX)                        = 0.0_r8
+  UION(NY,NX)                             = 0.0_r8
+  FWatDischarge(NY,NX)                    = 0.0_r8
+  SurfGasFlx_col(idg_beg:idg_NH3,NY,NX)   = 0.0_r8
+  WatFLo2Litr(NY,NX)                      = 0.0_r8
+  HeatFLo2LitrByWat(NY,NX)                = 0.0_r8
+  TLitrIceFlxThaw(NY,NX)                  = 0.0_r8
+  TLitrIceHeatFlxFrez(NY,NX)              = 0.0_r8
+  HeatByRadiation(NY,NX)                  = 0.0_r8
+  HeatSensAir2Surf(NY,NX)                 = 0.0_r8
+  HeatEvapAir2Surf(NY,NX)                 = 0.0_r8
+  HeatSensVapAir2Surf(NY,NX)              = 0.0_r8
+  HeatNet2Surf(NY,NX)                     = 0.0_r8
+  VapXAir2GSurf(NY,NX)                    = 0.0_r8
 
-  GasSfAtmFlx_col(idg_beg:idg_end,NY,NX)=0._r8
+  GasSfAtmFlx_col(idg_beg:idg_end,NY,NX) = 0._r8
   trcg_surf_disevap_flx(idg_beg:idg_end-1,NY,NX)=0.0_r8
 
-  CanWat_col(NY,NX)=0.0_r8
-  CanH2OHeldVg(NY,NX)=0.0_r8
-  TFLWCI(NY,NX)=0.0_r8
-  PrecIntcptByCanG(NY,NX)=0.0_r8
-  TEVAPP(NY,NX)=0.0_r8
-  VapXAir2CanG(NY,NX)=0.0_r8
-  THFLXC(NY,NX)=0.0_r8
-  TENGYC(NY,NX)=0.0_r8
+  CanWat_col(NY,NX)       = 0.0_r8
+  CanH2OHeldVg(NY,NX)     = 0.0_r8
+  TFLWCI(NY,NX)           = 0.0_r8
+  PrecIntcptByCanG(NY,NX) = 0.0_r8
+  TEVAPP(NY,NX)           = 0.0_r8
+  VapXAir2CanG(NY,NX)     = 0.0_r8
+  THFLXC(NY,NX)           = 0.0_r8
+  TENGYC(NY,NX)           = 0.0_r8
 
   TRootGasLossDisturb_pft(idg_beg:idg_end-1,NY,NX)=0.0_r8
   LitrFallStrutElms_col(:,NY,NX)=0.0_r8
   StandingDeadStrutElms_col(1:NumPlantChemElms,NY,NX)=0.0_r8
   PlantPopu_col(NY,NX)=0.0_r8
 ! zero arrays in the snow layers
-  WatConvSno2MicP(1:JS,NY,NX)=0.0_r8
-  WatConvSno2MacP(1:JS,NY,NX)=0.0_r8
-  HeatConvSno2Soi(1:JS,NY,NX)=0.0_r8
-  WatConvSno2LitR(1:JS,NY,NX)=0.0_r8
-  HeatConvSno2LitR(1:JS,NY,NX)=0.0_r8
-  SnoXfer2SnoLay(1:JS,NY,NX)=0.0_r8
-  WatXfer2SnoLay(1:JS,NY,NX)=0.0_r8
-  IceXfer2SnoLay(1:JS,NY,NX)=0.0_r8
-  HeatXfer2SnoLay(1:JS,NY,NX)=0.0_r8
-  XPhaseChangeHeatL(1:JS,NY,NX)=0.0_r8
+  WatConvSno2MicP(1:JS,NY,NX)   = 0.0_r8
+  WatConvSno2MacP(1:JS,NY,NX)   = 0.0_r8
+  HeatConvSno2Soi(1:JS,NY,NX)   = 0.0_r8
+  WatConvSno2LitR(1:JS,NY,NX)   = 0.0_r8
+  HeatConvSno2LitR(1:JS,NY,NX)  = 0.0_r8
+  SnoXfer2SnoLay(1:JS,NY,NX)    = 0.0_r8
+  WatXfer2SnoLay(1:JS,NY,NX)    = 0.0_r8
+  IceXfer2SnoLay(1:JS,NY,NX)    = 0.0_r8
+  HeatXfer2SnoLay(1:JS,NY,NX)   = 0.0_r8
+  XPhaseChangeHeatL(1:JS,NY,NX) = 0.0_r8
 
-  trcg_XBLS(idg_beg:idg_end-1,1:JS,NY,NX)=0.0_r8
-  trcn_XBLS(ids_nut_beg:ids_nuts_end,1:JS,NY,NX)=0.0_r8
+  trcg_Xbndl_flx(idg_beg:idg_end-1,1:JS,NY,NX)=0.0_r8
+  trcn_Xbndl_flx(ids_nut_beg:ids_nuts_end,1:JS,NY,NX)=0.0_r8
   IF(salt_model)THEN
     trcSaltFlo2SnowLay(idsalt_beg:idsalt_end,1:JS,NY,NX)=0.0_r8
   ENDIF

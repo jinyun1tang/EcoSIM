@@ -521,17 +521,17 @@ module TranspNoSaltMod
   integer, intent(in) :: I
   integer, intent(in) :: NY,NX
   IF(SnoFalPrec(NY,NX).GT.0.0_r8.OR.(RainFalPrec(NY,NX).GT.0.0_r8.AND.VLSnowHeatCapM(1,1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX)))THEN
-    trcg_XBLS(idg_CO2,1,NY,NX)=Rain2SoilSurf_col(NY,NX)*CO2_rain_conc(NY,NX)+Irrig2SoilSurf(NY,NX)*CO2_irrig_conc(NY,NX)
-    trcg_XBLS(idg_CH4,1,NY,NX)=Rain2SoilSurf_col(NY,NX)*CH4_rain_conc(NY,NX)+Irrig2SoilSurf(NY,NX)*CH4_irrig_conc(NY,NX)
-    trcg_XBLS(idg_O2,1,NY,NX)=Rain2SoilSurf_col(NY,NX)*O2_rain_conc(NY,NX)+Irrig2SoilSurf(NY,NX)*O2_irrig_conc(NY,NX)
-    trcg_XBLS(idg_N2,1,NY,NX)=Rain2SoilSurf_col(NY,NX)*N2_rain_conc(NY,NX)+Irrig2SoilSurf(NY,NX)*N2_irrig_conc(NY,NX)
-    trcg_XBLS(idg_N2O,1,NY,NX)=Rain2SoilSurf_col(NY,NX)*N2O_rain_conc(NY,NX)+Irrig2SoilSurf(NY,NX)*N2O_irrig_conc(NY,NX)
-    trcg_XBLS(idg_NH3,1,NY,NX)=(Rain2SoilSurf_col(NY,NX)*NH3_rain_conc(NY,NX)+Irrig2SoilSurf(NY,NX)*NH3_irrig_conc(I,NY,NX))*natomw
+    trcg_Xbndl_flx(idg_CO2,1,NY,NX)=Rain2SoilSurf_col(NY,NX)*CO2_rain_conc(NY,NX)+Irrig2SoilSurf(NY,NX)*CO2_irrig_conc(NY,NX)
+    trcg_Xbndl_flx(idg_CH4,1,NY,NX)=Rain2SoilSurf_col(NY,NX)*CH4_rain_conc(NY,NX)+Irrig2SoilSurf(NY,NX)*CH4_irrig_conc(NY,NX)
+    trcg_Xbndl_flx(idg_O2,1,NY,NX)=Rain2SoilSurf_col(NY,NX)*O2_rain_conc(NY,NX)+Irrig2SoilSurf(NY,NX)*O2_irrig_conc(NY,NX)
+    trcg_Xbndl_flx(idg_N2,1,NY,NX)=Rain2SoilSurf_col(NY,NX)*N2_rain_conc(NY,NX)+Irrig2SoilSurf(NY,NX)*N2_irrig_conc(NY,NX)
+    trcg_Xbndl_flx(idg_N2O,1,NY,NX)=Rain2SoilSurf_col(NY,NX)*N2O_rain_conc(NY,NX)+Irrig2SoilSurf(NY,NX)*N2O_irrig_conc(NY,NX)
+    trcg_Xbndl_flx(idg_NH3,1,NY,NX)=(Rain2SoilSurf_col(NY,NX)*NH3_rain_conc(NY,NX)+Irrig2SoilSurf(NY,NX)*NH3_irrig_conc(I,NY,NX))*natomw
 
-    trcn_XBLS(ids_NH4,1,NY,NX)=(Rain2SoilSurf_col(NY,NX)*NH4_rain_conc(NY,NX)+Irrig2SoilSurf(NY,NX)*NH4_irrig_conc(I,NY,NX))*natomw
-    trcn_XBLS(ids_NO3,1,NY,NX)=(Rain2SoilSurf_col(NY,NX)*NO3_rain_conc(NY,NX)+Irrig2SoilSurf(NY,NX)*NO3_irrig_conc(I,NY,NX))*natomw
-    trcn_XBLS(ids_H1PO4,1,NY,NX)=(Rain2SoilSurf_col(NY,NX)*HPO4_rain_conc(NY,NX)+Irrig2SoilSurf(NY,NX)*HPO4_irrig_conc(I,NY,NX))*patomw
-    trcn_XBLS(ids_H2PO4,1,NY,NX)=(Rain2SoilSurf_col(NY,NX)*H2PO4_rain_conc(NY,NX)+Irrig2SoilSurf(NY,NX)*H2PO4_irrig_conc(I,NY,NX))*patomw
+    trcn_Xbndl_flx(ids_NH4,1,NY,NX)=(Rain2SoilSurf_col(NY,NX)*NH4_rain_conc(NY,NX)+Irrig2SoilSurf(NY,NX)*NH4_irrig_conc(I,NY,NX))*natomw
+    trcn_Xbndl_flx(ids_NO3,1,NY,NX)=(Rain2SoilSurf_col(NY,NX)*NO3_rain_conc(NY,NX)+Irrig2SoilSurf(NY,NX)*NO3_irrig_conc(I,NY,NX))*natomw
+    trcn_Xbndl_flx(ids_H1PO4,1,NY,NX)=(Rain2SoilSurf_col(NY,NX)*HPO4_rain_conc(NY,NX)+Irrig2SoilSurf(NY,NX)*HPO4_irrig_conc(I,NY,NX))*patomw
+    trcn_Xbndl_flx(ids_H2PO4,1,NY,NX)=(Rain2SoilSurf_col(NY,NX)*H2PO4_rain_conc(NY,NX)+Irrig2SoilSurf(NY,NX)*H2PO4_irrig_conc(I,NY,NX))*patomw
 !
 !     HOURLY SOLUTE FLUXES FROM ATMOSPHERE TO SOIL SURFACE
 !     IF RAINFALL AND IRRIGATION IS ZERO IF SNOWPACK IS PRESENT
@@ -563,9 +563,9 @@ module TranspNoSaltMod
 !     C*R,C*Q=precipitation,irrigation solute concentrations
 !     gas code: *CO*=CO2,*OX*=O2,*CH*=CH4,*NG*=N2,*N2*=N2O,*NH*=NH3,*H2*=H2
 !
-    trcg_XBLS(idg_beg:idg_end-1,1,NY,NX)=0.0_r8
+    trcg_Xbndl_flx(idg_beg:idg_end-1,1,NY,NX)=0.0_r8
 
-    trcn_XBLS(ids_nut_beg:ids_nuts_end,1,NY,NX)=0.0_r8
+    trcn_Xbndl_flx(ids_nut_beg:ids_nuts_end,1,NY,NX)=0.0_r8
 
     trcs_3DTransp2MicP_vr(idg_CO2,3,0,NY,NX)=Rain2LitRSurf_col(NY,NX)*CO2_rain_conc(NY,NX)+Irrig2LitRSurf(NY,NX)*CO2_irrig_conc(NY,NX)
     trcs_3DTransp2MicP_vr(idg_CH4,3,0,NY,NX)=Rain2LitRSurf_col(NY,NX)*CH4_rain_conc(NY,NX)+Irrig2LitRSurf(NY,NX)*CH4_irrig_conc(NY,NX)
@@ -613,8 +613,8 @@ module TranspNoSaltMod
 !     NO SOLUTE FLUXES FROM ATMOSPHERE
 !
   ELSE
-    trcg_XBLS(idg_beg:idg_end-1,1,NY,NX)=0.0_r8
-    trcn_XBLS(ids_nut_beg:ids_nuts_end,1,NY,NX)=0.0_r8
+    trcg_Xbndl_flx(idg_beg:idg_end-1,1,NY,NX)=0.0_r8
+    trcn_Xbndl_flx(ids_nut_beg:ids_nuts_end,1,NY,NX)=0.0_r8
 
     trcs_3DTransp2MicP_vr(idg_beg:idg_end-1,3,0,NY,NX)=0.0_r8
     trcs_3DTransp2MicP_vr(ids_nut_beg:ids_nuts_end,3,0,NY,NX)=0.0_r8
@@ -642,11 +642,11 @@ module TranspNoSaltMod
   enddo
 
   DO NTG=idg_beg,idg_end-1
-    trcg_RBLS(idg_CO2,1,NY,NX)=trcg_XBLS(idg_CO2,1,NY,NX)*dts_HeatWatTP
+    trcg_RBLS(idg_CO2,1,NY,NX)=trcg_Xbndl_flx(idg_CO2,1,NY,NX)*dts_HeatWatTP
   ENDDO
 
   DO NTN=ids_nut_beg,ids_nuts_end
-    trcn_RBLS(NTN,1,NY,NX)=trcn_XBLS(NTN,1,NY,NX)*dts_HeatWatTP
+    trcn_RBLS(NTN,1,NY,NX)=trcn_Xbndl_flx(NTN,1,NY,NX)*dts_HeatWatTP
   ENDDO
 
   DO NTG=idg_beg,idg_end-1

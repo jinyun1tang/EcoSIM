@@ -158,6 +158,7 @@ implicit none
   real(r8) :: CVISC,DENSX
   real(r8) :: dHPhaseChange,VLDrySnoWEtmp
   real(r8) :: frcnew,SnowIceMass,VLwatNet
+  
 ! begin_execution
 
   !the line below is a hack, and likely a better snow layering scheme is needed.
@@ -196,9 +197,13 @@ implicit none
         XPhaseChangeHeatL(L,NY,NX)=XPhaseChangeHeatL(L,NY,NX)+dHPhaseChange        
         VLWatSnow(L,NY,NX)=0._r8
       else
-        write(*,*)'negative snowmass cannot be fixed',L,VLDrySnoWE(L,NY,NX),&
-          VLWatSnow(L,NY,NX),VLIceSnow(L,NY,NX)
-        call endrun(trim(mod_filename)//' at line',__LINE__)        
+        if(abs(VLWatSnow(L,NY,NX)) < ZEROS2(NY,NX))then
+          VLWatSnow(L,NY,NX)=0._r8
+        else
+          write(*,*)'negative snowmass cannot be fixed',L,VLDrySnoWE(L,NY,NX),&
+            VLWatSnow(L,NY,NX),VLIceSnow(L,NY,NX)
+          call endrun(trim(mod_filename)//' at line',__LINE__)       
+        endif   
       endif
     endif
   endif
@@ -542,13 +547,13 @@ implicit none
         !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
         !
         DO NTG=idg_beg,idg_end-1
-          trcg_TBLS(NTG,LS,N2,N1)=trcg_TBLS(NTG,LS,N2,N1)+trcg_XBLS(NTG,LS,N2,N1) &
-            -trcg_XBLS(NTG,LS2,N2,N1)
+          trcg_TBLS(NTG,LS,N2,N1)=trcg_TBLS(NTG,LS,N2,N1)+trcg_Xbndl_flx(NTG,LS,N2,N1) &
+            -trcg_Xbndl_flx(NTG,LS2,N2,N1)
         ENDDO
 
         DO NTN=ids_nut_beg,ids_nuts_end
-          trcn_TBLS(NTN,LS,N2,N1)=trcn_TBLS(NTN,LS,N2,N1)+trcn_XBLS(NTN,LS,N2,N1) &
-            -trcn_XBLS(NTN,LS2,N2,N1)
+          trcn_TBLS(NTN,LS,N2,N1)=trcn_TBLS(NTN,LS,N2,N1)+trcn_Xbndl_flx(NTN,LS,N2,N1) &
+            -trcn_Xbndl_flx(NTN,LS2,N2,N1)
         ENDDO
         !
         !     NET SALT FLUXES THROUGH SNOWPACK
@@ -585,13 +590,13 @@ implicit none
 
         ! and NH3B
         DO NTG=idg_beg,idg_end-1
-          trcg_TBLS(NTG,LS,N2,N1)=trcg_TBLS(NTG,LS,N2,N1)+trcg_XBLS(NTG,LS,N2,N1) &
+          trcg_TBLS(NTG,LS,N2,N1)=trcg_TBLS(NTG,LS,N2,N1)+trcg_Xbndl_flx(NTG,LS,N2,N1) &
             -trcs_3DTransp2MicP_vr(NTG,3,0,N2,N1)-trcs_3DTransp2MicP_vr(NTG,3,NUM(N2,N1),N2,N1) &
             -trcs_3DTransp2MacP(NTG,3,NUM(N2,N1),N2,N1)
         ENDDO
 
         DO NTN=ids_nut_beg,ids_nuts_end
-          trcn_TBLS(NTN,LS,N2,N1)=trcn_TBLS(NTN,LS,N2,N1)+trcn_XBLS(NTN,LS,N2,N1) &
+          trcn_TBLS(NTN,LS,N2,N1)=trcn_TBLS(NTN,LS,N2,N1)+trcn_Xbndl_flx(NTN,LS,N2,N1) &
             -trcs_3DTransp2MicP_vr(NTN,3,0,N2,N1)-trcs_3DTransp2MicP_vr(NTN,3,NUM(N2,N1),N2,N1) &
             -trcs_3DTransp2MacP(NTN,3,NUM(N2,N1),N2,N1)
         ENDDO
@@ -631,11 +636,11 @@ implicit none
         CumHeat2SnowLay(LS,N2,N1)=CumHeat2SnowLay(LS,N2,N1)+HeatXfer2SnoLay(LS,N2,N1)
 
         DO NTG=idg_beg,idg_end-1
-          trcg_TBLS(NTG,LS,N2,N1)=trcg_TBLS(NTG,LS,N2,N1)+trcg_XBLS(NTG,LS,N2,N1)
+          trcg_TBLS(NTG,LS,N2,N1)=trcg_TBLS(NTG,LS,N2,N1)+trcg_Xbndl_flx(NTG,LS,N2,N1)
         ENDDO
 
         DO NTN=ids_nut_beg,ids_nuts_end
-          trcn_TBLS(NTN,LS,N2,N1)=trcn_TBLS(NTN,LS,N2,N1)+trcn_XBLS(NTN,LS,N2,N1)
+          trcn_TBLS(NTN,LS,N2,N1)=trcn_TBLS(NTN,LS,N2,N1)+trcn_Xbndl_flx(NTN,LS,N2,N1)
         ENDDO
 
         IF(salt_model)THEN

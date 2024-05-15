@@ -438,6 +438,6 @@ implicit none
   OMBioResdu_vr(1:NumPlantChemElms,1:ndbiomcp,1:jcplx,L,NY,NX)=micstt%OMBioResdu(1:NumPlantChemElms,1:ndbiomcp,1:jcplx)
   mBiomeHeter_vr(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx,L,NY,NX)=micstt%mBiomeHeter(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx)
   mBiomeAutor_vr(1:NumPlantChemElms,1:NumLiveAutoBioms,L,NY,NX)=micstt%mBiomeAutor(1:NumPlantChemElms,1:NumLiveAutoBioms)
-
+  tRDOE2Die_col(1:NumPlantChemElms,NY,NX)=tRDOE2Die_col(1:NumPlantChemElms,NY,NX)+micflx%TRDOE2DIE(1:NumPlantChemElms)
   end subroutine MicAPIRecv
 end module MicBGCAPI

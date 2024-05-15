@@ -35,6 +35,7 @@ implicit none
   real(r8) :: RNO2DmndBandChemo
   real(r8) :: NetNH4Mineralize
   real(r8) :: NetPO4Mineralize
+  real(r8) :: TRDOE2DIE(1:NumPlantChemElms)              !cumulative conversion of organic element to inorganic element  
   real(r8), allocatable :: REcoDOMUptk(:,:)
   real(r8), allocatable :: RO2DmndAutort(:)
   real(r8), allocatable :: RNH3OxidAutor(:)
@@ -143,6 +144,7 @@ implicit none
   class(micfluxtype) :: this
   integer :: jcplx,JG,NumMicbFunGrupsPerCmplx
 
+  this%TRDOE2DIE =0._r8
   this%RO2UptkSoilM = 0._r8
   this%REcoDOMUptk=0._r8
   this%RO2DmndHetert=0._r8

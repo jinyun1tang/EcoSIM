@@ -337,10 +337,11 @@ module nitrosMod
     DO  M=1,jsken
       DO NE=1,NumPlantChemElms
         ORGM(NE)=ORGM(NE)+SolidOM_vr(NE,M,K,L,NY,NX)
+
       ENDDO  
     ENDDO  
   ENDDO    
-
+  
   end subroutine sumLitrOMLayL
 
 !------------------------------------------------------------------------------------------

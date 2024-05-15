@@ -13,14 +13,14 @@ module MicrobeDiagTypes
 
 ! accumulative flux diagnostics
 type, public :: Cumlate_Flux_Diag_type
-! ratios
+! fraction diagnostics, used for substrate competition/uptake
     real(r8) :: TFNH4B
     real(r8) :: TFNO3B
     real(r8) :: TFNO2B
     real(r8) :: TFP14B
     real(r8) :: TFPO4B
-    real(r8) :: TCH4H
-    real(r8) :: TCH4A
+    real(r8) :: tCH4ProdAceto    !acetoclastic CH4 production 
+    real(r8) :: tCH4ProdH2       !Hydrogenotrophic methane production
     real(r8) :: TFOQC
     real(r8) :: TFOQA
     real(r8) :: TFOXYX
@@ -31,7 +31,7 @@ type, public :: Cumlate_Flux_Diag_type
     real(r8) :: TFP14X
     real(r8) :: TFPO4X
 !fluxes
-    real(r8) :: TRH2G
+    real(r8) :: tCResp4H2Prod
     real(r8) :: tRNH4MicrbTransfSoil
     real(r8) :: tRH2PO4MicrbTransfSoil
     real(r8) :: tRNO3MicrbTransfSoil
@@ -43,7 +43,7 @@ type, public :: Cumlate_Flux_Diag_type
     real(r8) :: tRCO2MicrbProd
     real(r8) :: tRCH4MicrbProd
     real(r8) :: tRNOxMicrbRedux
-    real(r8) :: TRGOA
+    real(r8) :: tRCO2Groth            !CO2 taken up for autotrophic biomass growth
     real(r8) :: TProdH2               !H2 production by fermenters
     real(r8) :: tRO2MicrbUptk         !O2 uptake by microbes
     real(r8) :: TReduxNO3Soil         !NO3 reduction in non-band soil by denitrifiers
@@ -52,6 +52,7 @@ type, public :: Cumlate_Flux_Diag_type
     real(r8) :: TReduxNO2Band         !NO2 reduction in banded soil, by ammonia oxidizers, and denitrifiers
     real(r8) :: TReduxN2O             !N2O reduction by detnitrifiers
     real(r8) :: TFixN2                !N2 fixation by aerobic and anaerobic N2 fixers
+
   contains
     procedure, public :: ZeroOut => nit_aqmf_diag
   end type Cumlate_Flux_Diag_type
@@ -197,6 +198,7 @@ type, public :: Cumlate_Flux_Diag_type
   real(r8),allocatable :: RH1PO4TransfSoilAutor(:)
   real(r8),allocatable :: RH1PO4TransfBandAutor(:)
   real(r8),allocatable :: RH1PO4TransfLitrAutor(:)
+
   contains
     procedure, public :: Init => nit_micf_init
     procedure, public :: ZeroOut => nit_micf_zero
@@ -267,7 +269,6 @@ type, public :: Cumlate_Flux_Diag_type
   real(r8) :: ZNH4T
   real(r8) :: ZNO3T
   real(r8) :: ZNO2T
-
   end type Microbe_Diag_type
 
   contains
@@ -282,8 +283,8 @@ type, public :: Cumlate_Flux_Diag_type
   this%TFNO2B = 0._r8
   this%TFP14B = 0._r8
   this%TFPO4B = 0._r8
-  this%TCH4H = 0._r8
-  this%TCH4A = 0._r8
+  this%tCH4ProdAceto = 0._r8
+  this%tCH4ProdH2 = 0._r8
   this%TFOQC = 0._r8
   this%TFOQA = 0._r8
   this%TFOXYX = 0._r8
@@ -294,7 +295,7 @@ type, public :: Cumlate_Flux_Diag_type
   this%TFP14X = 0._r8
   this%TFPO4X = 0._r8
 
-  this%TRH2G = 0._r8
+  this%tCResp4H2Prod = 0._r8
   this%tRNH4MicrbTransfSoil = 0._r8
   this%tRH2PO4MicrbTransfSoil = 0._r8
   this%tRNO3MicrbTransfSoil=0.0_r8
@@ -307,7 +308,7 @@ type, public :: Cumlate_Flux_Diag_type
   this%tRCO2MicrbProd=0.0_r8
   this%tRCH4MicrbProd=0.0_r8
   this%tRNOxMicrbRedux=0.0_r8
-  this%TRGOA=0.0_r8
+  this%tRCO2Groth=0.0_r8
   this%TProdH2=0.0_r8
   this%tRO2MicrbUptk=0.0_r8
   this%TReduxNO3Soil=0.0_r8

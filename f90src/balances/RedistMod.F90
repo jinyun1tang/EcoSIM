@@ -710,7 +710,10 @@ module RedistMod
   call sumMicBiomLayL(0,NY,NX,tMicBiome_col(1:NumPlantChemElms,NY,NX))
   
   call sumLitrOMLayL(0,NY,NX,litrOM)
-
+  if(litrOM(ielmc)<0._r8)then
+    print*,'redist negative litr'
+    stop
+  endif
   SoilOrgM_vr(1:NumPlantChemElms,0,NY,NX)=litrOM
 
   DO NE=1,NumPlantChemElms
@@ -1363,6 +1366,7 @@ module RedistMod
   call sumORGMLayL(L,NY,NX,SoilOrgM_vr(1:NumPlantChemElms,L,NY,NX))
   
   DO NE=1,NumPlantChemElms
+    if(SoilOrgM_vr(NE,L,NY,NX)<0._r8)write(*,*)'redist',NE,L,SoilOrgM_vr(NE,L,NY,NX)
     tSoilOrgM_col(NE,NY,NX)=tSoilOrgM_col(NE,NY,NX)+SoilOrgM_vr(NE,L,NY,NX)
   ENDDO
 

@@ -24,13 +24,13 @@ implicit none
   integer :: NitriteOxidBacter
   integer :: AerobicMethanotrofBacter
   integer :: H2GenoMethanogArchea
-  integer :: n_aero_hetrophb
-  integer :: n_O2facult_bacter
-  integer :: n_aero_fungi
-  integer :: n_anaero_ferm
-  integer :: AcetotroMethanogenArchea
-  integer :: n_aero_n2fixer
-  integer :: n_anero_n2fixer
+  integer :: mid_Aerob_HeteroBacter
+  integer :: mid_Facult_DenitBacter
+  integer :: mid_Aerob_Fungi
+  integer :: mid_fermentor
+  integer :: mid_AcetoMethanogArchea
+  integer :: mid_aerob_N2Fixer
+  integer :: mid_Anaerob_N2Fixer
   integer :: ndbiomcp   !number of necrobiomass components
   integer :: nlbiomcp   !number of living biomass components
 
@@ -161,21 +161,21 @@ contains
 
 !set up functional group ids
 !five om-complexes
-  this%n_aero_hetrophb=1
-  this%n_O2facult_bacter=2
-  this%n_aero_fungi=3
-  this%n_anaero_ferm=4
-  this%AcetotroMethanogenArchea=5
-  this%n_aero_n2fixer=6
-  this%n_anero_n2fixer=7
+  this%mid_Aerob_HeteroBacter=1
+  this%mid_Facult_DenitBacter=2
+  this%mid_Aerob_Fungi=3
+  this%mid_fermentor=4
+  this%mid_AcetoMethanogArchea=5
+  this%mid_aerob_N2Fixer=6
+  this%mid_Anaerob_N2Fixer=7
 
-  this%is_aerobic_hetr(this%n_aero_hetrophb)=.true.
-  this%is_aerobic_hetr(this%n_O2facult_bacter)=.true.
-  this%is_aerobic_hetr(this%n_aero_fungi)=.true.
-  this%is_aerobic_hetr(this%n_aero_n2fixer)=.true.
+  this%is_aerobic_hetr(this%mid_Aerob_HeteroBacter)=.true.
+  this%is_aerobic_hetr(this%mid_Facult_DenitBacter)=.true.
+  this%is_aerobic_hetr(this%mid_Aerob_Fungi)=.true.
+  this%is_aerobic_hetr(this%mid_aerob_N2Fixer)=.true.
 
-  this%is_anerobic_hetr(this%n_anaero_ferm)=.true.
-  this%is_anerobic_hetr(this%n_anero_n2fixer)=.true.
+  this%is_anerobic_hetr(this%mid_fermentor)=.true.
+  this%is_anerobic_hetr(this%mid_Anaerob_N2Fixer)=.true.
 !the abstract complex
   this%AmmoniaOxidBacter=1
   this%NitriteOxidBacter=2
@@ -276,7 +276,7 @@ contains
 
   D95: DO K=1,this%jcplx
     DO  N=1,this%NumMicbFunGrupsPerCmplx
-      IF(N.EQ.this%n_aero_fungi)THEN
+      IF(N.EQ.this%mid_Aerob_Fungi)THEN
         DO NGL=this%JGnio(n),this%JGnfo(n)
           rNCOMC(1,NGL,K)=0.15_r8           !maximum
           rNCOMC(2,NGL,K)=0.09_r8           !minimum
