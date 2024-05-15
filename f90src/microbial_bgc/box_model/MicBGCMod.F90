@@ -284,7 +284,7 @@ module MicBGCMod
     k_POM                     => micpar%k_POM,                     &
     is_activeMicrbFungrpAutor => micpar%is_activeMicrbFungrpAutor, &
     mid_Facult_DenitBacter         => micpar%mid_Facult_DenitBacter,         &
-    AmmoniaOxidBacter         => micpar%AmmoniaOxidBacter,         &
+    mid_AmmoniaOxidBacter         => micpar%mid_AmmoniaOxidBacter,         &
     litrm                     => micfor%litrm,                     &
     VWatLitRHoldCapcity       => micfor%VWatLitRHoldCapcity,       &
     VLWatMicP                 => micfor%VLWatMicP,                 &
@@ -494,7 +494,7 @@ module MicBGCMod
 !
         TotActMicrobiom=TotActMicrobiom+OMActAutor(NGL)
 
-        IF(N.EQ.AmmoniaOxidBacter)THEN
+        IF(N.EQ.mid_AmmoniaOxidBacter)THEN
           TotBiomNO2Consumers=TotBiomNO2Consumers+OMActAutor(NGL)
         ENDIF
         MID2=micpar%get_micb_id(2,NGL)
@@ -793,7 +793,7 @@ module MicBGCMod
     ENDIF
   ENDDO D760
 
-  N=micpar%AmmoniaOxidBacter
+  N=micpar%mid_AmmoniaOxidBacter
   nmicf%RTotNH3OxidSoilAutor=SUM(nmicf%RSOxidSoilAutor(JGniA(N):JGnfA(N)))
   nmicf%RTotNH3OxidBandAutor=SUM(nmicf%RSOxidBandAutor(JGniA(N):JGnfA(N)))
   DO  N=1,NumMicbFunGrupsPerCmplx
@@ -2055,9 +2055,9 @@ module MicBGCMod
     Lsurf                     => micfor%Lsurf,                     &
     k_POM                     => micpar%k_POM,                     &
     k_humus                   => micpar%k_humus,                   &
-    AmmoniaOxidBacter         => micpar%AmmoniaOxidBacter,         &
-    AerobicMethanotrofBacter  => micpar%AerobicMethanotrofBacter,  &
-    NitriteOxidBacter         => micpar%NitriteOxidBacter,         &
+    mid_AmmoniaOxidBacter         => micpar%mid_AmmoniaOxidBacter,         &
+    mid_AerobicMethanotrofBacter  => micpar%mid_AerobicMethanotrofBacter,  &
+    mid_NitriteOxidBacter         => micpar%mid_NitriteOxidBacter,         &
     is_activeMicrbFungrpAutor => micpar%is_activeMicrbFungrpAutor, &
     RCH4UptkAutor             => micflx%RCH4UptkAutor,             &
     RCO2NetUptkMicb           => micflx%RCO2NetUptkMicb,           &
@@ -2107,6 +2107,7 @@ module MicBGCMod
           naqfdiag%TReduxNO2Band=naqfdiag%TReduxNO2Band+RNO2ReduxHeterBand(NGL,K)
           naqfdiag%TReduxN2O=naqfdiag%TReduxN2O+RN2OReduxHeter(NGL,K)
           naqfdiag%TProdH2=naqfdiag%TProdH2+RH2ProdHeter(NGL,K)
+          micflx%TRDOE2DIE(ielmc)=micflx%TRDOE2DIE(ielmc)+RCO2ProdHeter(NGL,K)+RCH4ProdHeter(NGL,K)          
         ENDDO
       ENDDO
     ENDIF
@@ -2137,19 +2138,23 @@ module MicBGCMod
         naqfdiag%TReduxNO3Soil=naqfdiag%TReduxNO3Soil+RNO3UptkAutor(NGL)
         naqfdiag%TReduxNO2Soil=naqfdiag%TReduxNO2Soil+RNO2ReduxAutorSoil(NGL)
         naqfdiag%TReduxNO2Band=naqfdiag%TReduxNO2Band+RNO2ReduxAutorBand(NGL)
+        if(micpar%is_CO2_autotroph(N))then
+          micflx%TRDOE2DIE(ielmc)=micflx%TRDOE2DIE(ielmc)+RCO2ProdAutor(NGL)
+        endif
       ENDDO
     ENDIF
   ENDDO
 
-!     tRCO2Groth=total CO2 uptake by autotrophs, ammonia oxidizer
+!     tRCO2GrothAutor=total CO2 uptake by autotrophs, ammonia oxidizer
 !  nitrite oxidizer, and hydrogenotophic methanogens
   D645: DO N=1,NumMicbFunGrupsPerCmplx
     IF(micpar%is_CO2_autotroph(N))THEN
       DO NGL=JGniA(N),JGnfA(N)
-        naqfdiag%tRCO2Groth=naqfdiag%tRCO2Groth+DOMuptk4GrothAutor(ielmc,NGL)
+        naqfdiag%tRCO2GrothAutor=naqfdiag%tRCO2GrothAutor+DOMuptk4GrothAutor(ielmc,NGL)
       ENDDO
     ENDIF
   ENDDO D645
+
 !
 !     ALLOCATE AGGREGATED TRANSFOMBioResduATIONS INTO ARRAYS TO UPDATE
 !     STATE VARIABLES IN 'REDIST'
@@ -2158,7 +2163,7 @@ module MicBGCMod
 !     tRCO2MicrbProd total CO2 emission by heterotrophs reducing O2
 !     tRNOxMicrbRedux=total CO2 emission by denitrifiers reducing NOx
 !     RSOxidSoilAutor(3)=CH4 oxidation
-!     RCH4UptkAutor=net CH4 uptake
+!     RCH4UptkAutor=net CH4 uptake, >0, means uptake
 !     DOMuptk4GrothHeter=total CH4 uptake by autotrophs
 !     tRCH4MicrbProd=total CH4 emission
 !     RH2NetUptkMicb=net H2 uptake
@@ -2170,13 +2175,14 @@ module MicBGCMod
 !     TReduxNO2Soil,TReduxNO2Band=total NO2 reduction in non-band,band
 !     RN2OProdSoilChemo,RN2OProdBandChemo=nitrous acid reduction in non-band,band
 !
-!  print*,'RCO2NetUptkMicb',naqfdiag%tRCO2Groth,naqfdiag%tRCO2MicrbProd,naqfdiag%tRNOxMicrbRedux
-  RCO2NetUptkMicb=naqfdiag%tRCO2Groth-naqfdiag%tRCO2MicrbProd-naqfdiag%tRNOxMicrbRedux
+!  print*,'RCO2NetUptkMicb',naqfdiag%tRCO2GrothAutor,naqfdiag%tRCO2MicrbProd,naqfdiag%tRNOxMicrbRedux
+  RCO2NetUptkMicb=naqfdiag%tRCO2GrothAutor-naqfdiag%tRCO2MicrbProd-naqfdiag%tRNOxMicrbRedux
   RCH4UptkAutor=-naqfdiag%tRCH4MicrbProd
 
-  DO NGL=JGniA(AerobicMethanotrofBacter),JGnfA(AerobicMethanotrofBacter)
+  DO NGL=JGniA(mid_AerobicMethanotrofBacter),JGnfA(mid_AerobicMethanotrofBacter)
     RCO2NetUptkMicb=RCO2NetUptkMicb-RSOxidSoilAutor(NGL)
     RCH4UptkAutor=RCH4UptkAutor+RSOxidSoilAutor(NGL)+DOMuptk4GrothAutor(ielmc,NGL)
+    micflx%TRDOE2DIE(ielmc)=micflx%TRDOE2DIE(ielmc)-RSOxidSoilAutor(NGL)-DOMuptk4GrothAutor(ielmc,NGL)
   ENDDO
   RH2NetUptkMicb =RH2UptkAutor-naqfdiag%TProdH2
   RO2UptkMicb=naqfdiag%tRO2MicrbUptk
@@ -2233,6 +2239,16 @@ module MicBGCMod
 !     XZHYS=total H+ production
 !     TFixN2=total N2 fixation
 !
+!  micflx%TRDOE2DIE(ielmc)=micflx%TRDOE2DIE(ielmc)+
+
+  micflx%TRDOE2DIE(ielmn)=micflx%TRDOE2DIE(ielmn)+naqfdiag%tRNH4MicrbTransfSoil &
+    +naqfdiag%tRNH4MicrbTransfBand+naqfdiag%tRNO3MicrbTransfSoil &
+    +naqfdiag%tRNO3MicrbTransfBand+naqfdiag%TFixN2
+  micflx%TRDOE2DIE(ielmp)=micflx%TRDOE2DIE(ielmp)+naqfdiag%tRH1PO4MicrbTransfSoil &
+    +naqfdiag%tRH2PO4MicrbTransfSoil+naqfdiag%tRH1PO4MicrbTransfBand &
+    +naqfdiag%tRH2PO4MicrbTransfBand
+
+
   RNH4MicbTransfSoil=-naqfdiag%tRNH4MicrbTransfSoil
   RNO3MicbTransfSoil=-naqfdiag%tRNO3MicrbTransfSoil-naqfdiag%TReduxNO3Soil+RNO3ProdSoilChemo
   RNO2MicbTransfSoil=+naqfdiag%TReduxNO3Soil-naqfdiag%TReduxNO2Soil-RNO2ReduxSoilChemo
@@ -2241,13 +2257,13 @@ module MicBGCMod
   RNH4MicbTransfBand=-naqfdiag%tRNH4MicrbTransfBand
   RNO3MicbTransfBand=-naqfdiag%tRNO3MicrbTransfBand-naqfdiag%TReduxNO3Band+RNO3ProdBandChemo
   RNO2MicbTransfBand=naqfdiag%TReduxNO3Band-naqfdiag%TReduxNO2Band-RNO2ReduxBandChemo
-  !AmmoniaOxidBacter=1, NitriteOxidBacter=2, AerobicMethanotrofBacter=3
-  DO NGL=JGniA(AmmoniaOxidBacter),JGnfA(AmmoniaOxidBacter)
+  !mid_AmmoniaOxidBacter=1, mid_NitriteOxidBacter=2, mid_AerobicMethanotrofBacter=3
+  DO NGL=JGniA(mid_AmmoniaOxidBacter),JGnfA(mid_AmmoniaOxidBacter)
     RNH4MicbTransfSoil=RNH4MicbTransfSoil-RSOxidSoilAutor(NGL)
     RNO2MicbTransfSoil=RNO2MicbTransfSoil+RSOxidSoilAutor(NGL)
     RNH4MicbTransfBand=RNH4MicbTransfBand-RSOxidBandAutor(NGL)
   ENDDO
-  DO NGL=JGniA(NitriteOxidBacter),JGnfA(NitriteOxidBacter)
+  DO NGL=JGniA(mid_NitriteOxidBacter),JGnfA(mid_NitriteOxidBacter)
     RNO3MicbTransfSoil=RNO3MicbTransfSoil+RSOxidSoilAutor(NGL)
     RNO2MicbTransfSoil=RNO2MicbTransfSoil-RSOxidSoilAutor(NGL)
     RNO3MicbTransfBand=RNO3MicbTransfBand+RSOxidBandAutor(NGL)

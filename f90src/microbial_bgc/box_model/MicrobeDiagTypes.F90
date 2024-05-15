@@ -43,7 +43,7 @@ type, public :: Cumlate_Flux_Diag_type
     real(r8) :: tRCO2MicrbProd
     real(r8) :: tRCH4MicrbProd
     real(r8) :: tRNOxMicrbRedux
-    real(r8) :: tRCO2Groth            !CO2 taken up for autotrophic biomass growth
+    real(r8) :: tRCO2GrothAutor            !CO2 taken up for autotrophic biomass growth
     real(r8) :: TProdH2               !H2 production by fermenters
     real(r8) :: tRO2MicrbUptk         !O2 uptake by microbes
     real(r8) :: TReduxNO3Soil         !NO3 reduction in non-band soil by denitrifiers
@@ -308,7 +308,7 @@ type, public :: Cumlate_Flux_Diag_type
   this%tRCO2MicrbProd=0.0_r8
   this%tRCH4MicrbProd=0.0_r8
   this%tRNOxMicrbRedux=0.0_r8
-  this%tRCO2Groth=0.0_r8
+  this%tRCO2GrothAutor=0.0_r8
   this%TProdH2=0.0_r8
   this%tRO2MicrbUptk=0.0_r8
   this%TReduxNO3Soil=0.0_r8

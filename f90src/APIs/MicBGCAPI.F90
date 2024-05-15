@@ -1,7 +1,7 @@
 module MicBGCAPI
 
   use data_kind_mod  , only : r8 => DAT_KIND_R8
-  use NitrosMod      , only : DownwardMixOM
+  use NitrosMod      , only : DownwardMixOM,sumMicBiomLayL
   use NitroDisturbMod, only : SOMRemovalByDisturbance
   use EcoSIMSolverPar
   use MicFLuxTypeMod, only : micfluxtype
@@ -72,7 +72,9 @@ implicit none
   implicit none
   integer, intent(in) :: I, J
   integer, intent(in) :: NHW,NHE,NVN,NVS
-
+  real(r8) :: OrGM_beg(1:NumPlantChemElms)
+  real(r8) :: dOrGM(1:NumPlantChemElms)
+  real(r8) :: tdOrGM(1:NumPlantChemElms)
   integer :: L,NX,NY
 
 !   begin_execution
@@ -86,7 +88,12 @@ implicit none
       D998: DO L=0,NL(NY,NX)
         IF(VLSoilPoreMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
           IF(L.EQ.0.OR.L.GE.NU(NY,NX))THEN
+
+             call sumMicBiomLayL(L,NY,NX,OrGM_beg)
              call MicBGC1Layer(I,J,L,NY,NX)
+             call sumMicBiomLayL(L,NY,NX,dOrGM)
+             dOrGM=dOrGM-OrGM_beg
+             tdOrGM=tdOrGM+dOrGM
           ELSE
 
             trcg_RMicbTransf_vr(idg_beg:idg_NH3-1,L,NY,NX)=0.0_r8
@@ -439,5 +446,6 @@ implicit none
   mBiomeHeter_vr(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx,L,NY,NX)=micstt%mBiomeHeter(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx)
   mBiomeAutor_vr(1:NumPlantChemElms,1:NumLiveAutoBioms,L,NY,NX)=micstt%mBiomeAutor(1:NumPlantChemElms,1:NumLiveAutoBioms)
   tRDOE2Die_col(1:NumPlantChemElms,NY,NX)=tRDOE2Die_col(1:NumPlantChemElms,NY,NX)+micflx%TRDOE2DIE(1:NumPlantChemElms)
+
   end subroutine MicAPIRecv
 end module MicBGCAPI

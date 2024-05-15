@@ -20,10 +20,10 @@ implicit none
   integer :: k_manure
   integer :: k_POM
   integer :: k_humus
-  integer :: AmmoniaOxidBacter
-  integer :: NitriteOxidBacter
-  integer :: AerobicMethanotrofBacter
-  integer :: H2GenoMethanogArchea
+  integer :: mid_AmmoniaOxidBacter
+  integer :: mid_NitriteOxidBacter
+  integer :: mid_AerobicMethanotrofBacter
+  integer :: mid_H2GenoMethanogArchea
   integer :: mid_Aerob_HeteroBacter
   integer :: mid_Facult_DenitBacter
   integer :: mid_Aerob_Fungi
@@ -177,19 +177,19 @@ contains
   this%is_anerobic_hetr(this%mid_fermentor)=.true.
   this%is_anerobic_hetr(this%mid_Anaerob_N2Fixer)=.true.
 !the abstract complex
-  this%AmmoniaOxidBacter=1
-  this%NitriteOxidBacter=2
-  this%AerobicMethanotrofBacter=3
-  this%H2GenoMethanogArchea=5
+  this%mid_AmmoniaOxidBacter=1
+  this%mid_NitriteOxidBacter=2
+  this%mid_AerobicMethanotrofBacter=3
+  this%mid_H2GenoMethanogArchea=5
 
-  this%is_activeMicrbFungrpAutor(this%AmmoniaOxidBacter)=.True.
-  this%is_activeMicrbFungrpAutor(this%NitriteOxidBacter)=.True.
-  this%is_activeMicrbFungrpAutor(this%AerobicMethanotrofBacter)=.True.
-  this%is_activeMicrbFungrpAutor(this%H2GenoMethanogArchea)=.True.
+  this%is_activeMicrbFungrpAutor(this%mid_AmmoniaOxidBacter)=.True.
+  this%is_activeMicrbFungrpAutor(this%mid_NitriteOxidBacter)=.True.
+  this%is_activeMicrbFungrpAutor(this%mid_AerobicMethanotrofBacter)=.True.
+  this%is_activeMicrbFungrpAutor(this%mid_H2GenoMethanogArchea)=.True.
 
-  this%is_CO2_autotroph(this%AmmoniaOxidBacter)=.true.
-  this%is_CO2_autotroph(this%NitriteOxidBacter)=.true.
-  this%is_CO2_autotroph(this%H2GenoMethanogArchea)=.true.
+  this%is_CO2_autotroph(this%mid_AmmoniaOxidBacter)=.true.
+  this%is_CO2_autotroph(this%mid_NitriteOxidBacter)=.true.
+  this%is_CO2_autotroph(this%mid_H2GenoMethanogArchea)=.true.
 
   end subroutine Init
 !------------------------------------------------------------------------------------------
