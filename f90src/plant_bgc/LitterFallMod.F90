@@ -833,7 +833,7 @@ implicit none
     CanopyStalkArea_lbrch         => plt_morph%CanopyStalkArea_lbrch        , &
     NumOfBranches_pft             => plt_morph%NumOfBranches_pft            , &
     LeafAreaNode_brch             => plt_morph%LeafAreaNode_brch            , &
-    PetioleLengthNode_brch        => plt_morph%PetioleLengthNode_brch       , &
+    PetoleLensNode_brch        => plt_morph%PetoleLensNode_brch       , &
     InternodeHeightDying_brch     => plt_morph%InternodeHeightDying_brch    , &
     LeafAreaZsec_brch             => plt_morph%LeafAreaZsec_brch            , &
     LiveInterNodeHight_brch       => plt_morph%LiveInterNodeHight_brch      , &
@@ -896,7 +896,7 @@ implicit none
     LeafAreaNode_brch(K,NB,NZ)=0._r8
     LiveInterNodeHight_brch(K,NB,NZ)=0._r8
     InternodeHeightDying_brch(K,NB,NZ)=0._r8
-    PetioleLengthNode_brch(K,NB,NZ)=0._r8
+    PetoleLensNode_brch(K,NB,NZ)=0._r8
     LeafProteinCNode_brch(K,NB,NZ)=0._r8
     PetioleProteinCNode_brch(K,NB,NZ)=0._r8
     LeafElmntNode_brch(1:NumPlantChemElms,K,NB,NZ)=0._r8

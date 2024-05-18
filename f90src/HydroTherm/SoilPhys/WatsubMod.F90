@@ -1428,10 +1428,10 @@ module WatsubMod
 
     IF(SoiBulkDensity(L,NY,NX).GT.ZERO)THEN
       THETWT=safe_adb(VLWatMicPM(M,L,NY,NX),VLSoilMicP(L,NY,NX))
-      TortMicPM(M,L,NY,NX)=TortMicporew(THETWT)*(1.0_r8-SoilFracAsMacP(L,NY,NX))
+      TortMicPM_vr(M,L,NY,NX)=TortMicporew(THETWT)*(1.0_r8-SoilFracAsMacP(L,NY,NX))
     ELSE
 !   standing water has tortuosity 0.7?
-      TortMicPM(M,L,NY,NX)=0.7_r8
+      TortMicPM_vr(M,L,NY,NX)=0.7_r8
     ENDIF
     IF(VLMacP1(L,NY,NX).GT.ZEROS2(NY,NX))THEN
       THETWH=VLWatMacPM(M,L,NY,NX)/VLMacP1(L,NY,NX)

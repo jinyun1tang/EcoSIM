@@ -402,7 +402,7 @@ implicit none
         LeafAreaNode_brch(K,NB,NZ,NY,NX)=plt_morph%LeafAreaNode_brch(K,NB,NZ)
         InternodeHeightDying_brch(K,NB,NZ,NY,NX)=plt_morph%InternodeHeightDying_brch(K,NB,NZ)
         LiveInterNodeHight_brch(K,NB,NZ,NY,NX)=plt_morph%LiveInterNodeHight_brch(K,NB,NZ)
-        PetioleLengthNode_brch(K,NB,NZ,NY,NX) =plt_morph%PetioleLengthNode_brch(K,NB,NZ)
+        PetoleLensNode_brch(K,NB,NZ,NY,NX) =plt_morph%PetoleLensNode_brch(K,NB,NZ)
         InternodeStrutElms_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX)=plt_biom%InternodeStrutElms_brch(1:NumPlantChemElms,K,NB,NZ)
         LeafElmntNode_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX)  =plt_biom%LeafElmntNode_brch(1:NumPlantChemElms,K,NB,NZ)
         LeafProteinCNode_brch(K,NB,NZ,NY,NX)  =plt_biom%LeafProteinCNode_brch(K,NB,NZ)
@@ -778,7 +778,7 @@ implicit none
     plt_pheno%RefNodeInitRate_pft(NZ)=RefNodeInitRate_pft(NZ,NY,NX)
     plt_pheno%RefLeafAppearRate_pft(NZ)=RefLeafAppearRate_pft(NZ,NY,NX)
     plt_pheno%TCChill4Seed_pft(NZ)=TCChill4Seed_pft(NZ,NY,NX)
-    plt_morph%WDLF(NZ)=WDLF(NZ,NY,NX)
+    plt_morph%rLen2WidthLeaf(NZ)=rLen2WidthLeaf(NZ,NY,NX)
     plt_pheno%MinNonstC2InitBranch_pft(NZ)=MinNonstC2InitBranch_pft(NZ,NY,NX)
     plt_morph%ShootNodeNumAtPlanting_pft(NZ)=ShootNodeNumAtPlanting_pft(NZ,NY,NX)
     plt_pheno%CriticPhotoPeriod_pft(NZ)=CriticPhotoPeriod_pft(NZ,NY,NX)
@@ -888,7 +888,7 @@ implicit none
     DO M=1,NPH
       plt_site%VLWatMicPM(M,L)=VLWatMicPM(M,L,NY,NX)
       plt_site%VLsoiAirPM(M,L)=VLsoiAirPM(M,L,NY,NX)
-      plt_site%TortMicPM(M,L)=TortMicPM(M,L,NY,NX)
+      plt_site%TortMicPM_vr(M,L)=TortMicPM_vr(M,L,NY,NX)
       plt_site%FILM(M,L)=FILM(M,L,NY,NX)
       plt_soilchem%DiffusivitySolutEff(M,L)=DiffusivitySolutEff(M,L,NY,NX)
     ENDDO
@@ -1254,7 +1254,7 @@ implicit none
       DO K=0,MaxNodesPerBranch
         plt_morph%LeafAreaNode_brch(K,NB,NZ) =LeafAreaNode_brch(K,NB,NZ,NY,NX)
         plt_morph%InternodeHeightDying_brch(K,NB,NZ)=InternodeHeightDying_brch(K,NB,NZ,NY,NX)
-        plt_morph%PetioleLengthNode_brch(K,NB,NZ) =PetioleLengthNode_brch(K,NB,NZ,NY,NX)
+        plt_morph%PetoleLensNode_brch(K,NB,NZ) =PetoleLensNode_brch(K,NB,NZ,NY,NX)
         plt_morph%LiveInterNodeHight_brch(K,NB,NZ)=LiveInterNodeHight_brch(K,NB,NZ,NY,NX)
         plt_biom%InternodeStrutElms_brch(1:NumPlantChemElms,K,NB,NZ) =InternodeStrutElms_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX)
         plt_biom%LeafElmntNode_brch(1:NumPlantChemElms,K,NB,NZ)   =LeafElmntNode_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX)

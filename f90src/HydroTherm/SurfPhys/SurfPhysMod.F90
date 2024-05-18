@@ -1275,7 +1275,7 @@ contains
     THETWT=1.0
   ENDIF
   !TORT=tortuosity in litter (treated as micropore)
-  TortMicPM(M,0,NY,NX)=TortMicporeW(THETWT)
+  TortMicPM_vr(M,0,NY,NX)=TortMicporeW(THETWT)
 !
 ! KINETIC ENERGY OF DIRECT RAINFALL AND THROUGHFALL
 !

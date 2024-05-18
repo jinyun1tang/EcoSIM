@@ -66,7 +66,7 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  WatFlowSno2MicPM(:,:,:)                      !meltwater flux into soil micropores
   real(r8),target,allocatable ::  WatFlowSno2MacPM(:,:,:)                      !meltwater flux into soil macropores
   real(r8),target,allocatable ::  THETPM(:,:,:,:)                   !soil air-filled porosity, [m3 m-3]
-  real(r8),target,allocatable ::  TortMicPM(:,:,:,:)                     !soil tortuosity, []
+  real(r8),target,allocatable ::  TortMicPM_vr(:,:,:,:)                     !soil tortuosity, []
   real(r8),target,allocatable ::  TortMacPM(:,:,:,:)                    !macropore tortuosity, []
   real(r8),target,allocatable ::  DiffusivitySolutEff(:,:,:,:)                     !coefficient for dissolution - volatilization, []
   real(r8),target,allocatable ::  SoilResit4RootPentrate_vr(:,:,:)                       !soil hydraulic resistance, [MPa h m-2]
@@ -164,7 +164,7 @@ module SoilWaterDataType
   allocate(WatFlowSno2MicPM(60,JY,JX));    WatFlowSno2MicPM=0._r8
   allocate(WatFlowSno2MacPM(60,JY,JX));    WatFlowSno2MacPM=0._r8
   allocate(THETPM(60,0:JZ,JY,JX));THETPM=0._r8
-  allocate(TortMicPM(60,0:JZ,JY,JX));TortMicPM=0._r8
+  allocate(TortMicPM_vr(60,0:JZ,JY,JX));TortMicPM_vr=0._r8
   allocate(TortMacPM(60,JZ,JY,JX)); TortMacPM=0._r8
   allocate(DiffusivitySolutEff(60,0:JZ,JY,JX));DiffusivitySolutEff=0._r8
   allocate(SoilResit4RootPentrate_vr(JZ,JY,JX));     SoilResit4RootPentrate_vr=0._r8
@@ -250,7 +250,7 @@ module SoilWaterDataType
   call destroy(WatFlowSno2MicPM)
   call destroy(WatFlowSno2MacPM)
   call destroy(THETPM)
-  call destroy(TortMicPM)
+  call destroy(TortMicPM_vr)
   call destroy(TortMacPM)
   call destroy(DiffusivitySolutEff)
   call destroy(SoilResit4RootPentrate_vr)

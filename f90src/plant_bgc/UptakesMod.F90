@@ -55,7 +55,8 @@ module UptakesMod
   real(r8) :: RootResistAxial(jroots,JZ1)
   real(r8) :: SoiH2OResist(jroots,JZ1)
   real(r8) :: SoiAddRootResist(jroots,JZ1),AllRootC_vr(JZ1)
-  real(r8) :: FracPRoot4Uptake(jroots,JZ1,JP1),MinFracPRoot4Uptake(jroots,JZ1,JP1)
+  real(r8) :: FracPRoot4Uptake(jroots,JZ1,JP1)
+  real(r8) :: MinFracPRoot4Uptake_vr(jroots,JZ1,JP1)
   real(r8) :: FracSoiLayByPrimRoot(JZ1,JP1),RootAreaDivRadius_vr(jroots,JZ1)
   real(r8) :: AirPoreAvail4Fill(JZ1),WatAvail4Uptake(JZ1)
   real(r8) :: TKCX,CNDT,PrecHeatIntcptByCanP1,VHCPX
@@ -121,7 +122,7 @@ module UptakesMod
 !
 !     CALCULATE VARIABLES USED IN ROOT UPTAKE OF WATER AND NUTRIENTS
       call UpdateRootProperty(NZ,PATH,FineRootRadius,AllRootC_vr,FracPRoot4Uptake,&
-        MinFracPRoot4Uptake,FracSoiLayByPrimRoot,RootAreaDivRadius_vr)
+        MinFracPRoot4Uptake_vr,FracSoiLayByPrimRoot,RootAreaDivRadius_vr)
 !
 !     CALCULATE CANOPY WATER STATUS FROM CONVERGENCE SOLUTION FOR
 !     TRANSPIRATION - ROOT WATER UPTAKE = CHANGE IN CANOPY WATER CONTENT
@@ -207,7 +208,7 @@ module UptakesMod
       call SetCanopyGrowthFuncs(NZ)
 
       call PlantNutientO2Uptake(I,NZ,FDMP,PopPlantO2Uptake,PopPlantO2Demand,&
-        PATH,FineRootRadius,FracPRoot4Uptake,MinFracPRoot4Uptake,FracSoiLayByPrimRoot,RootAreaDivRadius_vr)
+        PATH,FineRootRadius,FracPRoot4Uptake,MinFracPRoot4Uptake_vr,FracSoiLayByPrimRoot,RootAreaDivRadius_vr)
 
       Canopy_Heat_Latent_col=Canopy_Heat_Latent_col+EvapTransHeat_pft(NZ)*CanopyBndlResist_pft(NZ)
       Canopy_Heat_Sens_col=Canopy_Heat_Sens_col+HeatXAir2PCan(NZ)*CanopyBndlResist_pft(NZ)
@@ -436,7 +437,7 @@ module UptakesMod
   end subroutine UpdateCanopyProperty
 !------------------------------------------------------------------------
   subroutine UpdateRootProperty(NZ,PATH,FineRootRadius,AllRootC_vr,&
-    FracPRoot4Uptake,MinFracPRoot4Uptake,FracSoiLayByPrimRoot,RootAreaDivRadius_vr)
+    FracPRoot4Uptake,MinFracPRoot4Uptake_vr,FracSoiLayByPrimRoot,RootAreaDivRadius_vr)
 !
 !     update root characterization
 
@@ -446,7 +447,7 @@ module UptakesMod
   real(r8), intent(out) :: PATH(jroots,JZ1)
   real(r8), intent(out) :: FineRootRadius(jroots,JZ1)
   real(r8), intent(out) :: FracPRoot4Uptake(jroots,JZ1,JP1)
-  real(r8), intent(out) :: MinFracPRoot4Uptake(jroots,JZ1,JP1)
+  real(r8), intent(out) :: MinFracPRoot4Uptake_vr(jroots,JZ1,JP1)
   real(r8), intent(out) :: FracSoiLayByPrimRoot(JZ1,JP1)
   real(r8), intent(out) :: RootAreaDivRadius_vr(jroots,JZ1)
   real(r8) :: RootDepZ,RTDPX
@@ -515,7 +516,7 @@ module UptakesMod
       ELSE
         FracPRoot4Uptake(N,L,NZ)=1.0_r8
       ENDIF
-      MinFracPRoot4Uptake(N,L,NZ)=FMN*FracPRoot4Uptake(N,L,NZ)
+      MinFracPRoot4Uptake_vr(N,L,NZ)=FMN*FracPRoot4Uptake(N,L,NZ)
       IF(RootLenDensPerPlant_pvr(N,L,NZ).GT.ZERO .AND. FracSoiLayByPrimRoot(L,NZ).GT.ZERO)THEN
         FineRootRadius(N,L)=AMAX1(Root2ndMaxRadius1_pft(N,NZ),SQRT((RootVH2O_pvr(N,L,NZ) &
           /(1.0_r8-RootPorosity_pft(N,NZ)))/(PICON*PlantPopulation_pft(NZ)*RootLenPerPlant_pvr(N,L,NZ))))

@@ -1114,6 +1114,7 @@ module Hour1Mod
 
   SoluteDifusvty_vr(ids_NO3,0,NY,NX)=ZOSG*TFACL
   SoluteDifusvty_vr(ids_H1PO4,0,NY,NX)=POSG*TFACL
+  
   SoluteDifusvty_vr(ids_NH4,0,NY,NX)   =SoluteDifusvty_vr(idg_NH3,0,NY,NX)
   SoluteDifusvty_vr(ids_NH4B,0,NY,NX)  =SoluteDifusvty_vr(ids_NH4,0,NY,NX)
   SoluteDifusvty_vr(idg_NH3B,0,NY,NX)  =SoluteDifusvty_vr(idg_NH3,0,NY,NX)

@@ -565,7 +565,7 @@ module StartqMod
       LeafAreaNode_brch(K,NB,NZ,NY,NX)=0._r8
       LiveInterNodeHight_brch(K,NB,NZ,NY,NX)=0._r8
       InternodeHeightDying_brch(K,NB,NZ,NY,NX)=0._r8
-      PetioleLengthNode_brch(K,NB,NZ,NY,NX)=0._r8
+      PetoleLensNode_brch(K,NB,NZ,NY,NX)=0._r8
       LeafElmntNode_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX)=0._r8
       PetioleElmntNode_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX)=0._r8
       InternodeStrutElms_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX)=0._r8

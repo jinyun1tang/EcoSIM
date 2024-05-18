@@ -80,7 +80,7 @@ implicit none
   real(r8), pointer :: DLYR3(:)   => null()    !vertical thickness of soil layer [m]
   real(r8), pointer :: VLWatMicPM(:,:) => null()    !soil micropore water content, [m3 d-2]
   real(r8), pointer :: VLsoiAirPM(:,:) => null()    !soil air content, [m3 d-2]
-  real(r8), pointer :: TortMicPM(:,:)  => null()    !micropore soil tortuosity, []
+  real(r8), pointer :: TortMicPM_vr(:,:)  => null()    !micropore soil tortuosity, []
   real(r8), pointer :: FILM(:,:)  => null()    !soil water film thickness , [m]
   contains
     procedure, public :: Init =>  plt_site_Init
@@ -259,7 +259,7 @@ implicit none
   real(r8), pointer :: CanopyLeafAareZ_col(:)        => null() !total leaf area, [m2 d-2]
   real(r8), pointer :: LeafStalkArea_pft(:)        => null() !plant leaf+stem/stalk area, [m2 d-2]
   real(r8), pointer :: InternodeHeightDying_brch(:,:,:)   => null() !internode height, [m]
-  real(r8), pointer :: PetioleLengthNode_brch(:,:,:)    => null() !sheath height, [m]
+  real(r8), pointer :: PetoleLensNode_brch(:,:,:)    => null() !sheath height, [m]
   real(r8), pointer :: LiveInterNodeHight_brch(:,:,:)   => null() !internode height, [m]
   real(r8), pointer :: StemAreaZsec_brch(:,:,:,:)  => null() !stem surface area, [m2 d-2]
   real(r8), pointer :: CanopyLeafArea_lpft(:,:,:,:)  => null() !layer/node/branch leaf area, [m2 d-2]
@@ -273,7 +273,7 @@ implicit none
   integer , pointer :: iPlantGrainType_pft(:)        => null() !grain type (below or above-ground)
   real(r8), pointer :: MaxPotentSeedNumber_pft(:)         => null() !maximum grain node number per branch, [-]
   real(r8), pointer :: MaxSeedNumPerSite_pft(:)         => null() !maximum grain number per node , [-]
-  real(r8), pointer :: WDLF(:)         => null() !leaf length:width ratio, [-]
+  real(r8), pointer :: rLen2WidthLeaf(:)         => null() !leaf length:width ratio, [-]
   real(r8), pointer :: MaxSeedCMass(:)         => null() !maximum grain size   , [g]
   real(r8), pointer :: Root1stRadius_pvr(:,:,:)    => null() !root layer diameter primary axes, [m ]
   real(r8), pointer :: Root2ndRadius_pvr(:,:,:)    => null() !root layer diameter secondary axes, [m ]
@@ -930,7 +930,7 @@ implicit none
   allocate(this%flag_pft_active(JP1));  this%flag_pft_active=.false.
   allocate(this%VLWatMicPM(60,0:JZ1));this%VLWatMicPM=spval
   allocate(this%VLsoiAirPM(60,0:JZ1));this%VLsoiAirPM=spval
-  allocate(this%TortMicPM(60,0:JZ1));this%TortMicPM=spval
+  allocate(this%TortMicPM_vr(60,0:JZ1));this%TortMicPM_vr=spval
   allocate(this%FILM(60,0:JZ1)); this%FILM=spval
 
   end subroutine plt_site_Init
@@ -941,7 +941,7 @@ implicit none
 
 !  if(allocated(DLYR3))deallocate(DLYR3)
 !  if(allocated(FracSoiAsMicP))deallocate(FracSoiAsMicP)
-!  if(allocated(TortMicPM))deallocate(TortMicPM)
+!  if(allocated(TortMicPM_vr))deallocate(TortMicPM_vr)
 !  if(allocated(FILM))deallocate(FILM)
 !  if(allocated(DATAP))deallocate(DATAP)
 !  if(allocated(DATA))deallocate(DATA)
@@ -1802,7 +1802,7 @@ implicit none
   allocate(this%ClumpFactorNow_pft(JP1));this%ClumpFactorNow_pft=spval
   allocate(this%HypoctoHeight_pft(JP1));this%HypoctoHeight_pft=spval
   allocate(this%RootPoreTortu4Gas(jroots,JP1));this%RootPoreTortu4Gas=spval
-  allocate(this%WDLF(JP1));this%WDLF=spval
+  allocate(this%rLen2WidthLeaf(JP1));this%rLen2WidthLeaf=spval
   allocate(this%MaxSeedNumPerSite_pft(JP1));this%MaxSeedNumPerSite_pft=spval
   allocate(this%MaxPotentSeedNumber_pft(JP1));this%MaxPotentSeedNumber_pft=spval
   allocate(this%MaxSeedCMass(JP1));this%MaxSeedCMass=spval
@@ -1871,7 +1871,7 @@ implicit none
   allocate(this%CanopyLeafAareZ_col(NumOfCanopyLayers1));this%CanopyLeafAareZ_col=spval
   allocate(this%LeafStalkArea_pft(JP1));this%LeafStalkArea_pft=spval
   allocate(this%InternodeHeightDying_brch(0:MaxNodesPerBranch1,MaxNumBranches,JP1));this%InternodeHeightDying_brch=spval
-  allocate(this%PetioleLengthNode_brch(0:MaxNodesPerBranch1,MaxNumBranches,JP1));this%PetioleLengthNode_brch=spval
+  allocate(this%PetoleLensNode_brch(0:MaxNodesPerBranch1,MaxNumBranches,JP1));this%PetoleLensNode_brch=spval
   allocate(this%LiveInterNodeHight_brch(0:MaxNodesPerBranch1,MaxNumBranches,JP1));this%LiveInterNodeHight_brch=spval
   allocate(this%StemAreaZsec_brch(NumOfLeafZenithSectors1,NumOfCanopyLayers1,MaxNumBranches,JP1));this%StemAreaZsec_brch=spval
   allocate(this%CanopyLeafArea_lpft(NumOfCanopyLayers1,0:MaxNodesPerBranch1,MaxNumBranches,JP1));this%CanopyLeafArea_lpft=spval

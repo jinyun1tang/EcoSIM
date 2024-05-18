@@ -24,7 +24,8 @@ module RootGasMod
   integer , intent(in) :: I,N,L,NZ
   real(r8), intent(in) :: FineRootRadius(jroots,JZ1),FracPRoot4Uptake(jroots,JZ1,JP1)
   real(r8), intent(in) :: FracSoiLayByPrimRoot(JZ1,JP1)
-  real(r8), intent(in) :: RootAreaDivRadius_vr(jroots,JZ1),dtPerPlantRootH2OUptake,FOXYX
+  real(r8), intent(in) :: RootAreaDivRadius_vr(jroots,JZ1)
+  real(r8), intent(in) :: dtPerPlantRootH2OUptake,FOXYX
   real(r8), intent(out):: PopPlantO2Uptake_vr
   !local variables
   integer :: M,MX
@@ -69,7 +70,7 @@ module RootGasMod
     ZERO                     => plt_site%ZERO,                     &
     VLWatMicPM               => plt_site%VLWatMicPM,               &
     VLsoiAirPM               => plt_site%VLsoiAirPM,               &
-    TortMicPM                => plt_site%TortMicPM,                &
+    TortMicPM_vr                => plt_site%TortMicPM_vr,                &
     FILM                     => plt_site%FILM,                     &
     RO2GasXchangePrev_vr     => plt_bgcr%RO2GasXchangePrev_vr,     &
     RCO2GasFlxPrev_vr        => plt_bgcr%RCO2GasFlxPrev_vr,        &
@@ -244,7 +245,7 @@ module RootGasMod
 !     VLNH4,VLNHB=fraction of soil volume in NH4 non-band,band
 !     VOLX=soil volume excluding rock,macropores
 !     THETW1=soil water concentration
-!     TortMicPM=soil tortuosity
+!     TortMicPM_vr=soil tortuosity
 !     FILM=soil water film thickness
 !     FineRootRadius=root radius
 !     RRADS=path length for radial diffusion from soil to root
@@ -263,8 +264,8 @@ module RootGasMod
       VOLWSB=RTVLWB+VLWatMicPMB
       THETW1=AZMAX1(VLWatMicPM(M,L)/VLSoilMicP(L))
 
-      IF(THETW1.GT.THETY_vr(L).AND.FracPRoot4Uptake(N,L,NZ).GT.ZEROQ(NZ))THEN
-        THETM=TortMicPM(M,L)*THETW1
+      IF(THETW1.GT.THETY_vr(L) .AND. FracPRoot4Uptake(N,L,NZ).GT.ZEROQ(NZ))THEN
+        THETM=TortMicPM_vr(M,L)*THETW1
         RRADS=LOG((FILM(M,L)+FineRootRadius(N,L))/FineRootRadius(N,L))
         RTARRX=RootAreaDivRadius_vr(N,L)/RRADS
         do NTG=idg_beg,idg_end-1
@@ -380,9 +381,9 @@ module RootGasMod
 !     C*B1=soil aqueous concentration band
 !     C*P1=root aqueous concentration
 !
-
           RUPOSX=RDFOXS*PlantPopulation_pft(NZ)
           RUPSolute(idg_O2)=-RDFOXP*PlantPopulation_pft(NZ)
+
           RDFSolute(idg_CO2)=RMFGas(idg_CO2)+DIFLGas(idg_CO2)*&
             (trcaqu_conc_soi_loc(idg_CO2)-trcrootconc_loc(idg_CO2))
           RDXSolute(idg_CO2)=(RootVH2O_pvr(N,L,NZ)*AMAX1(ZEROP(NZ),trc_solml_loc(idg_CO2)) &

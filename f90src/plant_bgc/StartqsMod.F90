@@ -81,7 +81,7 @@ module StartqsMod
       DO NZ=NZ1Q,NZ2X
         ZEROP(NZ)=ZERO*PlantPopulation_pft(NZ)
         ZEROQ(NZ)=ZERO*PlantPopulation_pft(NZ)/AREA3(NU)
-        ZEROL(NZ)=ZERO*PlantPopulation_pft(NZ)*1.0E+06_r8
+        ZEROL(NZ)=ZERO*PlantPopulation_pft(NZ)*1.0E+05_r8  !zerol revised from 1.e6 to 1.e5
       ENDDO  
 !
 !     FILL OUT UNUSED ARRAYS
@@ -712,7 +712,7 @@ module StartqsMod
       LeafAreaNode_brch(K,NB,NZ)=0._r8
       LiveInterNodeHight_brch(K,NB,NZ)=0._r8
       plt_morph%InternodeHeightDying_brch(K,NB,NZ)=0._r8
-      plt_morph%PetioleLengthNode_brch(K,NB,NZ)=0._r8
+      plt_morph%PetoleLensNode_brch(K,NB,NZ)=0._r8
       plt_biom%LeafProteinCNode_brch(K,NB,NZ)=0._r8
       plt_biom%PetioleProteinCNode_brch(K,NB,NZ)=0._r8
       plt_biom%LeafElmntNode_brch(1:NumPlantChemElms,K,NB,NZ)=0._r8

@@ -902,7 +902,7 @@ module PlantDisturbsMod
               LeafAreaNode_brch(K,NB,NZ)=LeafAreaNode_brch(K,NB,NZ)*XHVST
 
               LeafProteinCNode_brch(K,NB,NZ)=LeafProteinCNode_brch(K,NB,NZ)*XHVST
-!     PetioleLengthNode_brch(K,NB,NZ)=PetioleLengthNode_brch(K,NB,NZ)*XHVST
+!     PetoleLensNode_brch(K,NB,NZ)=PetoleLensNode_brch(K,NB,NZ)*XHVST
 
               PetioleProteinCNode_brch(K,NB,NZ)=PetioleProteinCNode_brch(K,NB,NZ)*XHVST
 !     LiveInterNodeHight_brch(K,NB,NZ)=LiveInterNodeHight_brch(K,NB,NZ)*XHVST
@@ -1286,7 +1286,7 @@ module PlantDisturbsMod
     LiveInterNodeHight_brch             =>  plt_morph%LiveInterNodeHight_brch            , &
     PotentialSeedSites_brch             =>  plt_morph%PotentialSeedSites_brch            , &
     SeedNumSet_brch                     =>  plt_morph%SeedNumSet_brch                    , &
-    PetioleLengthNode_brch              =>  plt_morph%PetioleLengthNode_brch             , &
+    PetoleLensNode_brch              =>  plt_morph%PetoleLensNode_brch             , &
     LeafAreaNode_brch                   =>  plt_morph%LeafAreaNode_brch                  , &
     CanopyLeafAreaZ_pft                 =>  plt_morph%CanopyLeafAreaZ_pft                , &
     CanopyStemAreaZ_pft                 =>  plt_morph%CanopyStemAreaZ_pft                , &
@@ -1760,7 +1760,7 @@ module PlantDisturbsMod
 !     PetioleElmntHarv2Litr(ielmc),PetioleElmntHarv2Litr(ielmn),PetioleElmntHarv2Litr(ielmp)=harvested petiole C,N,P to litter
 !     FWODB=C woody fraction in other organs:0=woody,1=non-woody
 !     FWODLN,FWODLP=N,P woody fraction in leaf:0=woody,1=non-woody
-!     PetioleLengthNode_brch,LiveInterNodeHight_brch=petiole,internode length
+!     PetoleLensNode_brch,LiveInterNodeHight_brch=petiole,internode length
 !
           IF((iHarvstType_pft(NZ).NE.iharvtyp_grazing.AND.iHarvstType_pft(NZ).NE.iharvtyp_herbivo)&
             .OR.WHVSBS.GT.0.0_r8)THEN
@@ -1790,7 +1790,7 @@ module PlantDisturbsMod
 !
 !     PetioleElmntNode_brch=petiole node C mass
 !     WTSHEB,WTSHBN,WTSHBP=branch petiole C,N,P mass
-!     PetioleLengthNode_brch=node petiole height
+!     PetoleLensNode_brch=node petiole height
 !     PetioleProteinCNode_brch=petiole protein mass
 !
             WGSHGY=WGSHGY+PetioleElmntNode_brch(ielmc,K,NB,NZ)
@@ -1802,12 +1802,12 @@ module PlantDisturbsMod
               PetioleElmntNode_brch(NE,K,NB,NZ)=FHVSETK(K)*PetioleElmntNode_brch(NE,K,NB,NZ)
             ENDDO
 !            PetioleProteinCNode_brch(K,NB,NZ)=FHVSETK(K)*PetioleProteinCNode_brch(K,NB,NZ)
-            IF(iHarvstType_pft(NZ).LE.iharvtyp_allabv.AND.PetioleLengthNode_brch(K,NB,NZ).GT.0.0_r8)THEN
+            IF(iHarvstType_pft(NZ).LE.iharvtyp_allabv.AND.PetoleLensNode_brch(K,NB,NZ).GT.0.0_r8)THEN
               FHGT=AZMAX1(AMIN1(1.0_r8,(LiveInterNodeHight_brch(K,NB,NZ) &
-                +PetioleLengthNode_brch(K,NB,NZ)-HVST(NZ))/PetioleLengthNode_brch(K,NB,NZ)))
-              PetioleLengthNode_brch(K,NB,NZ)=(1._r8-FHGT)*PetioleLengthNode_brch(K,NB,NZ)
+                +PetoleLensNode_brch(K,NB,NZ)-HVST(NZ))/PetoleLensNode_brch(K,NB,NZ)))
+              PetoleLensNode_brch(K,NB,NZ)=(1._r8-FHGT)*PetoleLensNode_brch(K,NB,NZ)
             ELSE
-              PetioleLengthNode_brch(K,NB,NZ)=FHVSETK(K)*PetioleLengthNode_brch(K,NB,NZ)
+              PetoleLensNode_brch(K,NB,NZ)=FHVSETK(K)*PetoleLensNode_brch(K,NB,NZ)
             ENDIF
             WGSHGX=WGSHGX+PetioleElmntNode_brch(ielmc,K,NB,NZ)
 !     IF(iHarvstType_pft(NZ).NE.iharvtyp_grazing.AND.iHarvstType_pft(NZ).NE.iharvtyp_herbivo)THEN

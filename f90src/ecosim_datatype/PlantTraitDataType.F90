@@ -47,7 +47,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  RAZ(:,:,:)                         !canopy roughness height, [m]
   real(r8),target,allocatable ::  CanPHeight4WatUptake(:,:,:)                       !canopy height, [m]
   real(r8),target,allocatable ::  LeafAreaNode_brch(:,:,:,:,:)                    !leaf area, [m2 d-2]
-  real(r8),target,allocatable ::  PetioleLengthNode_brch(:,:,:,:,:)                   !sheath height, [m]
+  real(r8),target,allocatable ::  PetoleLensNode_brch(:,:,:,:,:)                   !sheath height, [m]
   real(r8),target,allocatable ::  LiveInterNodeHight_brch(:,:,:,:,:)                  !internode height, [m]
   real(r8),target,allocatable ::  LeafAreaLive_brch(:,:,:,:)                     !branch leaf area, [m2 d-2]
   real(r8),target,allocatable ::  LeafAreaDying_brch(:,:,:,:)                     !branch leaf area, [m2 d-2]
@@ -112,7 +112,7 @@ module PlantTraitDataType
   integer,target,allocatable ::  KMinNumLeaf4GroAlloc_brch(:,:,:,:)                     !NUMBER OF MINIMUM LEAFED NODE USED IN GROWTH ALLOCATION
   integer,target,allocatable ::  KHiestGroLeafNode_brch(:,:,:,:)                      !leaf growth stage counter, [-]
   real(r8),target,allocatable ::  RefLeafAppearRate_pft(:,:,:)                        !rate of leaf initiation, [h-1 at 25 oC]
-  real(r8),target,allocatable ::  WDLF(:,:,:)                        !leaf length:width ratio, [-]
+  real(r8),target,allocatable ::  rLen2WidthLeaf(:,:,:)                        !leaf length:width ratio, [-]
   real(r8),target,allocatable ::  SLA1(:,:,:)                        !leaf area:mass during growth, [m2 g-1]
   real(r8),target,allocatable ::  TC4LeafOut_pft(:,:,:)                         !threshold temperature for spring leafout/dehardening, [oC]
   real(r8),target,allocatable ::  PetoLen2Mass_pft(:,:,:)                        !petiole length:mass during growth, [m g-1]
@@ -207,7 +207,7 @@ contains
   allocate(CanPHeight4WatUptake(JP,JY,JX));    CanPHeight4WatUptake=0._r8
   allocate(PARTS_brch(NumOfPlantMorphUnits,MaxNumBranches,JP,JY,JX));PARTS_brch=0._r8
   allocate(LeafAreaNode_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));LeafAreaNode_brch=0._r8
-  allocate(PetioleLengthNode_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));PetioleLengthNode_brch=0._r8
+  allocate(PetoleLensNode_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));PetoleLensNode_brch=0._r8
   allocate(LiveInterNodeHight_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));LiveInterNodeHight_brch=0._r8
   allocate(LeafAreaLive_brch(MaxNumBranches,JP,JY,JX)); LeafAreaLive_brch=0._r8
   allocate(LeafAreaDying_brch(MaxNumBranches,JP,JY,JX)); LeafAreaDying_brch=0._r8
@@ -272,7 +272,7 @@ contains
   allocate(KMinNumLeaf4GroAlloc_brch(MaxNumBranches,JP,JY,JX));KMinNumLeaf4GroAlloc_brch=0
   allocate(KHiestGroLeafNode_brch(MaxNumBranches,JP,JY,JX)); KHiestGroLeafNode_brch=0
   allocate(RefLeafAppearRate_pft(JP,JY,JX));     RefLeafAppearRate_pft=0._r8
-  allocate(WDLF(JP,JY,JX));     WDLF=0._r8
+  allocate(rLen2WidthLeaf(JP,JY,JX));     rLen2WidthLeaf=0._r8
   allocate(SLA1(JP,JY,JX));     SLA1=0._r8
   allocate(TC4LeafOut_pft(JP,JY,JX));      TC4LeafOut_pft=0._r8
   allocate(PetoLen2Mass_pft(JP,JY,JX));     PetoLen2Mass_pft=0._r8
@@ -363,7 +363,7 @@ contains
   call destroy(RAZ)
   call destroy(CanPHeight4WatUptake)
   call destroy(LeafAreaNode_brch)
-  call destroy(PetioleLengthNode_brch)
+  call destroy(PetoleLensNode_brch)
   call destroy(LiveInterNodeHight_brch)
   call destroy(LeafAreaLive_brch)
   call destroy(LeafAreaDying_brch)
@@ -429,7 +429,7 @@ contains
   call destroy(KMinNumLeaf4GroAlloc_brch)
   call destroy(KHiestGroLeafNode_brch)
   call destroy(RefLeafAppearRate_pft)
-  call destroy(WDLF)
+  call destroy(rLen2WidthLeaf)
   call destroy(SLA1)
   call destroy(TC4LeafOut_pft)
   call destroy(PetoLen2Mass_pft)

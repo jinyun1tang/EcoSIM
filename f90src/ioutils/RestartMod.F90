@@ -2471,17 +2471,17 @@ implicit none
 
   if(flag=='read')then
     datpr3 => datrp_3d(1:npfts,1:MaxNodesPerBranch,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='PetioleLengthNode_brch', dim1name='pft',dim2name='nodes',&
+    call restartvar(ncid, flag, varname='PetoleLensNode_brch', dim1name='pft',dim2name='nodes',&
      dim3name='nbranches',long_name='plant sheath height', units='m', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)  
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,PetioleLengthNode_brch,datrp_3d,NumActivePlants=NumActivePlants,&
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,PetoleLensNode_brch,datrp_3d,NumActivePlants=NumActivePlants,&
       IsPlantActive_pft=IsPlantActive_pft) 
   else
-    !print*,'PetioleLengthNode_brch'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,PetioleLengthNode_brch,datrp_3d,&
+    !print*,'PetoleLensNode_brch'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,PetoleLensNode_brch,datrp_3d,&
       NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft)   
     datpr3 => datrp_3d(1:npfts,1:MaxNodesPerBranch,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='PetioleLengthNode_brch', dim1name='pft',dim2name='nodes',&
+    call restartvar(ncid, flag, varname='PetoleLensNode_brch', dim1name='pft',dim2name='nodes',&
      dim3name='nbranches',long_name='plant sheath height', units='m', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)  
   endif 

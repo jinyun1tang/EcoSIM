@@ -240,9 +240,9 @@ contains
 !     DIF*=aqueous diffusivity-dispersivity between litter and soil surface
 !
     DLYR0=AMAX1(ZERO2,DLYR(3,0,NY,NX))
-    TORT0=TortMicPM(M,0,NY,NX)/DLYR0*FracSurfByLitR(NY,NX)
+    TORT0=TortMicPM_vr(M,0,NY,NX)/DLYR0*FracSurfByLitR(NY,NX)
     DLYR1=AMAX1(ZERO2,DLYR(3,NU(NY,NX),NY,NX))
-    TORT1=TortMicPM(M,NU(NY,NX),NY,NX)/DLYR1
+    TORT1=TortMicPM_vr(M,NU(NY,NX),NY,NX)/DLYR1
     DISPN=DISP(3,NU(NY,NX),NY,NX)*AMIN1(VFLWX,ABS(FLWRM1/AREA(3,NU(NY,NX),NY,NX)))
     DIFOC0=(DOMdiffusivity2_vr(idom_doc,0,NY,NX)*TORT0+DISPN)
     DIFON0=(DOMdiffusivity2_vr(idom_don,0,NY,NX)*TORT0+DISPN)
@@ -958,7 +958,7 @@ contains
 
   IF(VGeomLayer(0,NY,NX).GT.ZEROS2(NY,NX).AND.VLWatMicPM(M,0,NY,NX).GT.ZEROS2(NY,NX))THEN
     DLYR0=AMAX1(ZERO2,DLYR(3,0,NY,NX)) !vertical layer thickness
-    TORT0=TortMicPM(M,0,NY,NX)*AREA(3,NU(NY,NX),NY,NX)/(0.5_r8*DLYR0)*FracSurfByLitR(NY,NX)
+    TORT0=TortMicPM_vr(M,0,NY,NX)*AREA(3,NU(NY,NX),NY,NX)/(0.5_r8*DLYR0)*FracSurfByLitR(NY,NX)
 
     DO ngases=idg_beg,idg_NH3
       DFGcc(ngases)=SoluteDifusvty_vrc(ngases,0,NY,NX)*TORT0
@@ -1064,7 +1064,7 @@ contains
     VLWatMicPPA=VLWatMicPM(M,NU(NY,NX),NY,NX)*trcs_VLN_vr(ids_H1PO4,NU(NY,NX),NY,NX)
     VLWatMicPPB=VLWatMicPM(M,NU(NY,NX),NY,NX)*trcs_VLN_vr(ids_H1PO4B,NU(NY,NX),NY,NX)
     DLYR1=AMAX1(ZERO2,DLYR(3,NU(NY,NX),NY,NX))
-    TORT1=TortMicPM(M,NU(NY,NX),NY,NX)*AREA(3,NU(NY,NX),NY,NX)/(0.5_r8*DLYR1)
+    TORT1=TortMicPM_vr(M,NU(NY,NX),NY,NX)*AREA(3,NU(NY,NX),NY,NX)/(0.5_r8*DLYR1)
 
     D8910: DO  K=1,jcplx
       CDOM_MicP2(idom_doc,K)=AZMAX1(DOM_MicP2(idom_doc,K,NU(NY,NX),NY,NX)/VLWatMicPM(M,NU(NY,NX),NY,NX))
