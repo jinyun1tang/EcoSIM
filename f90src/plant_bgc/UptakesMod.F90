@@ -514,9 +514,10 @@ module UptakesMod
       IF(AllRootC_vr(L).GT.ZEROS)THEN
         FracPRoot4Uptake(N,L,NZ)=AZMAX1(PopuRootMycoC_pvr(N,L,NZ))/AllRootC_vr(L)
       ELSE
-        FracPRoot4Uptake(N,L,NZ)=1.0_r8
+        !FracPRoot4Uptake(N,L,NZ)=1.0_r8
+        FracPRoot4Uptake(N,L,NZ)=FMN
       ENDIF
-      MinFracPRoot4Uptake_vr(N,L,NZ)=FMN*FracPRoot4Uptake(N,L,NZ)
+      MinFracPRoot4Uptake_vr(N,L,NZ)=AMAX1(FMN,FracPRoot4Uptake(N,L,NZ))
       IF(RootLenDensPerPlant_pvr(N,L,NZ).GT.ZERO .AND. FracSoiLayByPrimRoot(L,NZ).GT.ZERO)THEN
         FineRootRadius(N,L)=AMAX1(Root2ndMaxRadius1_pft(N,NZ),SQRT((RootVH2O_pvr(N,L,NZ) &
           /(1.0_r8-RootPorosity_pft(N,NZ)))/(PICON*PlantPopulation_pft(NZ)*RootLenPerPlant_pvr(N,L,NZ))))

@@ -148,15 +148,15 @@ module PlantBranchMod
 !
     IF(iPlantCalendar_brch(ipltcal_Emerge,NB,NZ).NE.0.AND.LeafPetoNonstElmConc_brch(ielmc,NB,NZ).GT.ZERO)THEN
       CCC=AZMAX1(AMIN1(1.0_r8 &
-        ,safe_adb(LeafPetoNonstElmConc_brch(ielmn,NB,NZ),LeafPetoNonstElmConc_brch(ielmn,NB,NZ) &
+        ,LeafPetoNonstElmConc_brch(ielmn,NB,NZ)/(LeafPetoNonstElmConc_brch(ielmn,NB,NZ) &
         +LeafPetoNonstElmConc_brch(ielmc,NB,NZ)*CNKI) &
-        ,safe_adb(LeafPetoNonstElmConc_brch(ielmp,NB,NZ),LeafPetoNonstElmConc_brch(ielmp,NB,NZ) &
+        ,LeafPetoNonstElmConc_brch(ielmp,NB,NZ)/(LeafPetoNonstElmConc_brch(ielmp,NB,NZ) &
         +LeafPetoNonstElmConc_brch(ielmc,NB,NZ)*CPKI)))
       CNC=AZMAX1(AMIN1(1.0_r8 &
-        ,safe_adb(LeafPetoNonstElmConc_brch(ielmc,NB,NZ),LeafPetoNonstElmConc_brch(ielmc,NB,NZ) &
+        ,LeafPetoNonstElmConc_brch(ielmc,NB,NZ)/(LeafPetoNonstElmConc_brch(ielmc,NB,NZ) &
         +LeafPetoNonstElmConc_brch(ielmn,NB,NZ)/CNKI)))
       CPC=AZMAX1(AMIN1(1.0_r8 &
-        ,safe_adb(LeafPetoNonstElmConc_brch(ielmc,NB,NZ),LeafPetoNonstElmConc_brch(ielmc,NB,NZ) &
+        ,LeafPetoNonstElmConc_brch(ielmc,NB,NZ)/(LeafPetoNonstElmConc_brch(ielmc,NB,NZ) &
         +LeafPetoNonstElmConc_brch(ielmp,NB,NZ)/CPKI)))
     ELSE
       CCC=0._r8
@@ -970,9 +970,9 @@ module PlantBranchMod
   real(r8), intent(inout) :: SNCT
   logical,intent(out):: lgoto565
 
-  real(r8) :: SNCLF
-  real(r8) :: FSNAS,FNCLF,FSNCS  
-  real(r8) :: SNCSH,FSNCL,FSNAL
+  real(r8) :: FracSensResp4Leaf
+  real(r8) :: FSNAS,FracNodeAsLeaf,FSNCS  
+  real(r8) :: SensResp2Use,Frac2Remobl,FSNAL
   integer :: K,KK,NE,M
   real(r8) :: RCES(NumPlantChemElms)  
   real(r8) :: ElmntRemobFallingLeaf(NumPlantChemElms)
@@ -1010,37 +1010,37 @@ module PlantBranchMod
 
   lgoto565=.false.
   D650: DO KK=KN,KHiestGroLeafNode_brch(NB,NZ)
-    SNCLF=0._r8
-    SNCSH=0._r8
+    FracSensResp4Leaf=0._r8
+    SensResp2Use=0._r8
     K=pMOD(KK,MaxNodesPerBranch1)
 !
 !       REMOBILIZATION OF LEAF C,N,P DEPENDS ON NON-STRUCTURAL C:N:P
 !
 !       WGLF,PetioleElmntNode_brch=node leaf,petiole C mass
   !       SCNF,SCNSH=leaf,petiole senescence respiration
-  !       ElmntRemobFallingLeaf(ielmc),ElmntRemobFallingLeaf(ielmn),ElmntRemobFallingLeaf(ielmp)=remobilization of C,N,P from senescing leaf
+  !       ElmntRemobFallingLeaf(:)=remobilization of C,N,P from senescing leaf
   !       RCCC,RCCN,RCCP=remobilization coefficient for C,N,P
   !       RCCZ,RCCY=min,max fractions for shoot C recycling
   !
     IF(LeafElmntNode_brch(ielmc,K,NB,NZ).GT.ZEROP(NZ))THEN
-      FNCLF=LeafElmntNode_brch(ielmc,K,NB,NZ)/(LeafElmntNode_brch(ielmc,K,NB,NZ)+&
+      FracNodeAsLeaf=LeafElmntNode_brch(ielmc,K,NB,NZ)/(LeafElmntNode_brch(ielmc,K,NB,NZ)+&
         PetioleElmntNode_brch(ielmc,K,NB,NZ))
-      SNCLF=FNCLF*SNCT
-      SNCSH=SNCT-SNCLF
+      FracSensResp4Leaf=FracNodeAsLeaf*SNCT
+      SensResp2Use=SNCT-FracSensResp4Leaf
       ElmntRemobFallingLeaf(ielmc)=RCCC*LeafElmntNode_brch(ielmc,K,NB,NZ)
       ElmntRemobFallingLeaf(ielmn)=LeafElmntNode_brch(ielmn,K,NB,NZ)*(RCCN+(1.0_r8-RCCN)*RCCC)
       ElmntRemobFallingLeaf(ielmp)=LeafElmntNode_brch(ielmp,K,NB,NZ)*(RCCP+(1.0_r8-RCCP)*RCCC)
 !
   !         FRACTION OF CURRENT LEAF TO BE REMOBILIZED
   !
-  !         FSNCL,FSNAL=fraction of current leaf C,area to be remobilized
+  !         Frac2Remobl,FSNAL=fraction of current leaf C,area to be remobilized
   !
       IF(ElmntRemobFallingLeaf(ielmc).GT.ZEROP(NZ))THEN
-        FSNCL=AZMAX1(AMIN1(1.0_r8,SNCLF/ElmntRemobFallingLeaf(ielmc)))
+        Frac2Remobl=AZMAX1(AMIN1(1.0_r8,FracSensResp4Leaf/ElmntRemobFallingLeaf(ielmc)))
       ELSE
-        FSNCL=1.0_r8
+        Frac2Remobl=1.0_r8
       ENDIF
-      FSNAL=FSNCL
+      FSNAL=Frac2Remobl
 !
       !     NON-REMOBILIZABLE C,N,P BECOMES LitrFall ALLOCATED
       !     TO FRACTIONS SET IN 'STARTQ'
@@ -1048,9 +1048,9 @@ module PlantBranchMod
       !     CSNC,ZSNC,PSNC=literfall C,N,P
       !     CFOPC=fraction of plant litter allocated in nonstructural(0,*),
       !     foliar(1,*),non-foliar(2,*),stalk(3,*),root(4,*), coarse woody (5,*)
-      !     FSNCL=fraction of current leaf to be remobilized
+      !     Frac2Remobl=fraction of current leaf to be remobilized
       !     WGLF,WGLFN,WGLFP=node leaf C,N,P mass
-      !     ElmntRemobFallingLeaf(ielmc),ElmntRemobFallingLeaf(ielmn),ElmntRemobFallingLeaf(ielmp)=remobilization of C,N,P from senescing leaf
+      !     ElmntRemobFallingLeaf(:)=remobilization of C,N,P from senescing leaf
       !     FWODB=C woody fraction in other organs:0=woody,1=non-woody
       !     FWODLN,FWODLP=N,P woody fraction in leaf:0=woody,1=non-woody
       !     CPOOL3_node,CPOOL4_node=C4 nonstructural C mass in bundle sheath,mesophyll
@@ -1059,19 +1059,19 @@ module PlantBranchMod
       D6310: DO M=1,jsken
         DO NE=1,NumPlantChemElms
           LitrfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)=LitrfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)&
-            +ElmAllocmat4Litr(NE,icwood,M,NZ)*FSNCL*(LeafElmntNode_brch(NE,K,NB,NZ) &
+            +ElmAllocmat4Litr(NE,icwood,M,NZ)*Frac2Remobl*(LeafElmntNode_brch(NE,K,NB,NZ) &
             -ElmntRemobFallingLeaf(NE))*FracShootStalkElmAlloc2Litr(NE,k_woody_litr)
 
           LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ) &
-            +ElmAllocmat4Litr(NE,ifoliar,M,NZ)*FSNCL*(LeafElmntNode_brch(NE,K,NB,NZ) &
+            +ElmAllocmat4Litr(NE,ifoliar,M,NZ)*Frac2Remobl*(LeafElmntNode_brch(NE,K,NB,NZ) &
             -ElmntRemobFallingLeaf(NE))*FracShootStalkElmAlloc2Litr(NE,k_fine_litr)
         ENDDO
       ENDDO D6310
       IF(K.NE.0)THEN
         LitrfalStrutElms_pvr(ielmc,icarbhyro,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(ielmc,icarbhyro,k_fine_litr,0,NZ) &
-          +FSNCL*(CPOOL3_node(K,NB,NZ)+CPOOL4_node(K,NB,NZ))
-        CPOOL3_node(K,NB,NZ)=CPOOL3_node(K,NB,NZ)-FSNCL*CPOOL3_node(K,NB,NZ)
-        CPOOL4_node(K,NB,NZ)=CPOOL4_node(K,NB,NZ)-FSNCL*CPOOL4_node(K,NB,NZ)
+          +Frac2Remobl*(CPOOL3_node(K,NB,NZ)+CPOOL4_node(K,NB,NZ))
+        CPOOL3_node(K,NB,NZ)=CPOOL3_node(K,NB,NZ)-Frac2Remobl*CPOOL3_node(K,NB,NZ)
+        CPOOL4_node(K,NB,NZ)=CPOOL4_node(K,NB,NZ)-Frac2Remobl*CPOOL4_node(K,NB,NZ)
       ENDIF
 !
 !     UPDATE STATE VARIABLES FOR REMOBILIZATION AND LitrFall
@@ -1079,34 +1079,34 @@ module PlantBranchMod
 !     LeafAreaLive_brch=leaf area
 !     WTLFB,WTLFBN,WTLFBP=branch leaf C,N,P mass
 !     WGLF,WGLFN,WGLFP,LeafProteinCNode_brch=node leaf C,N,P,protein mass
-!     FSNCL=fraction of current leaf to be remobilized
+!     Frac2Remobl=fraction of current leaf to be remobilized
 !     CNWS,rCPNonstructRemob_pft=protein:N,protein:P ratios from startq.f
 !
       LeafAreaLive_brch(NB,NZ)=AZMAX1(LeafAreaLive_brch(NB,NZ)-FSNAL*LeafAreaNode_brch(K,NB,NZ))
       LeafAreaNode_brch(K,NB,NZ)=LeafAreaNode_brch(K,NB,NZ)-FSNAL*LeafAreaNode_brch(K,NB,NZ)
 
       DO NE=1,NumPlantChemElms
-        LeafStrutElms_brch(NE,NB,NZ)=AZMAX1(LeafStrutElms_brch(NE,NB,NZ)-FSNCL*LeafElmntNode_brch(NE,K,NB,NZ))
-        LeafElmntNode_brch(NE,K,NB,NZ)=LeafElmntNode_brch(NE,K,NB,NZ)-FSNCL*LeafElmntNode_brch(NE,K,NB,NZ)
+        LeafStrutElms_brch(NE,NB,NZ)=AZMAX1(LeafStrutElms_brch(NE,NB,NZ)-Frac2Remobl*LeafElmntNode_brch(NE,K,NB,NZ))
+        LeafElmntNode_brch(NE,K,NB,NZ)=LeafElmntNode_brch(NE,K,NB,NZ)-Frac2Remobl*LeafElmntNode_brch(NE,K,NB,NZ)
       ENDDO
       LeafProteinCNode_brch(K,NB,NZ)=AZMAX1(LeafProteinCNode_brch(K,NB,NZ) &
-        -FSNCL*AMAX1(LeafElmntNode_brch(ielmn,K,NB,NZ)*rCNNonstructRemob_pft(NZ) &
+        -Frac2Remobl*AMAX1(LeafElmntNode_brch(ielmn,K,NB,NZ)*rCNNonstructRemob_pft(NZ) &
         ,LeafElmntNode_brch(ielmp,K,NB,NZ)*rCPNonstructRemob_pft(NZ)))
 !
 !     FRACTION OF C REMOBILIZED FOR GROWTH RESPIRATION < 0 IS
 !     RESPIRED AND NOT TRANSFERRED TO NON-STRUCTURAL POOLS
 !
 !     CPOOL,ZPOOL,PPOOL=non-structural C,N,P mass
-!     FSNCL=fraction of current leaf C to be remobilized
+!     Frac2Remobl=fraction of current leaf C to be remobilized
 !     ElmntRemobFallingLeaf(ielmc),ElmntRemobFallingLeaf(ielmn),ElmntRemobFallingLeaf(ielmp)=remobilization of C,N,P from senescing leaf
-!     SNCLF,SNCT=remaining senescence respiration carried to next node
+!     FracSensResp4Leaf,SNCT=remaining senescence respiration carried to next node
 !
-      CanopyNonstElms_brch(ielmc,NB,NZ)=CanopyNonstElms_brch(ielmc,NB,NZ)+FSNCL*ElmntRemobFallingLeaf(ielmc)*SenesFrac
+      CanopyNonstElms_brch(ielmc,NB,NZ)=CanopyNonstElms_brch(ielmc,NB,NZ)+Frac2Remobl*ElmntRemobFallingLeaf(ielmc)*SenesFrac
       DO NE=2,NumPlantChemElms
-        CanopyNonstElms_brch(NE,NB,NZ)=CanopyNonstElms_brch(NE,NB,NZ)+FSNCL*ElmntRemobFallingLeaf(NE)
+        CanopyNonstElms_brch(NE,NB,NZ)=CanopyNonstElms_brch(NE,NB,NZ)+Frac2Remobl*ElmntRemobFallingLeaf(NE)
       ENDDO
-      SNCLF=SNCLF-FSNCL*ElmntRemobFallingLeaf(ielmc)
-      SNCT=SNCT-FSNCL*ElmntRemobFallingLeaf(ielmc)
+      FracSensResp4Leaf=FracSensResp4Leaf-Frac2Remobl*ElmntRemobFallingLeaf(ielmc)
+      SNCT=SNCT-Frac2Remobl*ElmntRemobFallingLeaf(ielmc)
       IF(LeafStrutElms_brch(ielmc,NB,NZ).LE.ZEROL(NZ))THEN
         LeafStrutElms_brch(ielmc,NB,NZ)=0._r8
         LeafAreaLive_brch(NB,NZ)=0._r8
@@ -1114,7 +1114,7 @@ module PlantBranchMod
     !
       !     EXIT LOOP IF REMOBILIZATION REQUIREMENT HAS BEEN MET
       !
-!        IF(SNCLF.LE.ZEROP(NZ))GO TO 564
+!        IF(FracSensResp4Leaf.LE.ZEROP(NZ))GO TO 564
       !
       !     OTHERWISE REMAINING C,N,P IN LEAF GOES TO LitrFall
       !
@@ -1176,7 +1176,7 @@ module PlantBranchMod
     !     FSNCS,FSNAS=fraction of current petiole C,length to be remobilized
     !
       IF(RCES(ielmc).GT.ZEROP(NZ))THEN
-        FSNCS=AZMAX1(AMIN1(1.0_r8,SNCSH/RCES(ielmc)))
+        FSNCS=AZMAX1(AMIN1(1.0_r8,SensResp2Use/RCES(ielmc)))
       ELSE
         FSNCS=1.0_r8
       ENDIF
@@ -1229,13 +1229,13 @@ module PlantBranchMod
 !     CPOOL,ZPOOL,PPOOL=non-structural C,N,P mass
 !     FSNCS=fraction of current petiole C to be remobilized
 !     RCES(ielmc),RCES(ielmn),RCES(ielmp)=remobilization of C,N,P from senescing petiole
-!     SNCSH,SNCT=remaining senescence respiration carried to next node
+!     SensResp2Use,SNCT=remaining senescence respiration carried to next node
 !
       CanopyNonstElms_brch(ielmc,NB,NZ)=CanopyNonstElms_brch(ielmc,NB,NZ)+FSNCS*RCES(ielmc)*SenesFrac
       DO NE=2,NumPlantChemElms
         CanopyNonstElms_brch(NE,NB,NZ)=CanopyNonstElms_brch(NE,NB,NZ)+FSNCS*RCES(NE)
       ENDDO
-      SNCSH=SNCSH-FSNCS*RCES(ielmc)
+      SensResp2Use=SensResp2Use-FSNCS*RCES(ielmc)
       SNCT=SNCT-FSNCS*RCES(ielmc)
       IF(PetoleStrutElms_brch(ielmc,NB,NZ).LE.ZEROL(NZ))THEN
         PetoleStrutElms_brch(ielmc,NB,NZ)=0._r8
@@ -1243,7 +1243,7 @@ module PlantBranchMod
 !
 !     EXIT LOOP IF REMOBILIZATION REQUIREMENT HAS BEEN MET
 !
-      lgoto565=(SNCSH.LE.ZEROP(NZ))
+      lgoto565=(SensResp2Use.LE.ZEROP(NZ))
 !
     !     OTHERWISE REMAINING C,N,P IN SHEATH OR PETIOLE GOES TO LitrFall
     !
@@ -1260,11 +1260,9 @@ module PlantBranchMod
       D6325: DO M=1,jsken
         DO NE=1,NumPlantChemElms
           LitrfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)=LitrfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ) &
-            +ElmAllocmat4Litr(NE,icwood,M,NZ) &
-            *PetioleElmntNode_brch(NE,K,NB,NZ)*FracShootLeafElmAlloc2Litr(NE,k_woody_litr)
+            +ElmAllocmat4Litr(NE,icwood,M,NZ)*PetioleElmntNode_brch(NE,K,NB,NZ)*FracShootLeafElmAlloc2Litr(NE,k_woody_litr)
           LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ) &
-            +ElmAllocmat4Litr(NE,inonfoliar,M,NZ) &
-            *PetioleElmntNode_brch(NE,K,NB,NZ)*FracShootLeafElmAlloc2Litr(NE,k_fine_litr)
+            +ElmAllocmat4Litr(NE,inonfoliar,M,NZ)*PetioleElmntNode_brch(NE,K,NB,NZ)*FracShootLeafElmAlloc2Litr(NE,k_fine_litr)
         ENDDO    
       ENDDO D6325
       DO NE=1,NumPlantChemElms
@@ -1638,7 +1636,7 @@ module PlantBranchMod
     KHiestGroLeafNode_brch      => plt_pheno%KHiestGroLeafNode_brch,     &
     iPlantTurnoverPattern_pft   => plt_pheno%iPlantTurnoverPattern_pft,  &
     KLowestGroLeafNode_brch     => plt_pheno%KLowestGroLeafNode_brch,    &
-    rLen2WidthLeaf                        => plt_morph%rLen2WidthLeaf,                       &
+    rLen2WidthLeaf              => plt_morph%rLen2WidthLeaf,             &
     SeedDepth_pft               => plt_morph%SeedDepth_pft,              &
     MainBranchNum_pft           => plt_morph%MainBranchNum_pft,          &
     CanopyLeafArea_lpft         => plt_morph%CanopyLeafArea_lpft,        &

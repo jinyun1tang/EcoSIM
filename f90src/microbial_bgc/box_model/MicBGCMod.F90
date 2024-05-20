@@ -3741,7 +3741,7 @@ module MicBGCMod
   real(r8) :: C3C,CNC,CPC
   real(r8) :: CGOMZ
   real(r8) :: SPOMX
-  real(r8) :: FRM
+  real(r8) :: FracMaintDeficit
 !     begin_execution
   associate(                                                                    &
     rCNBiomeActHeter                 => nmics%rCNBiomeActHeter,                 &
@@ -3919,17 +3919,19 @@ module MicBGCMod
 !     RMaintDefcitRecycOMHeter,R3MMN,R3MMP=microbial C,N,P recycling from senescence
 !
   IF(RMaintDefcitcitHeter.GT.ZEROS.AND.RMaintRespHeter.GT.ZEROS.AND.RCCC.GT.ZERO)THEN
-    FRM=RMaintDefcitcitHeter/RMaintRespHeter
+    FracMaintDeficit=RMaintDefcitcitHeter/RMaintRespHeter
     D730: DO M=1,2
       MID=micpar%get_micb_id(M,NGL)    
-      RMaintDefcitKillOMHeter(ielmc,M,NGL,K)=AMIN1(mBiomeHeter(ielmc,MID,K),AZMAX1(FRM*RMaintDmndHeter(M,NGL,K)/RCCC))
+      RMaintDefcitKillOMHeter(ielmc,M,NGL,K)=AMIN1(mBiomeHeter(ielmc,MID,K),AZMAX1(FracMaintDeficit*RMaintDmndHeter(M,NGL,K)/RCCC))
       RMaintDefcitKillOMHeter(ielmn,M,NGL,K)=AMIN1(mBiomeHeter(ielmn,MID,K),&
         AZMAX1(RMaintDefcitKillOMHeter(ielmc,M,NGL,K)*rCNBiomeActHeter(ielmn,NGL,K)))
       RMaintDefcitKillOMHeter(ielmp,M,NGL,K)=AMIN1(mBiomeHeter(ielmp,MID,K),&
         AZMAX1(RMaintDefcitKillOMHeter(ielmc,M,NGL,K)*rCNBiomeActHeter(ielmp,NGL,K)))
+        
       RMaintDefcitLitrfalOMHeter(ielmc,M,NGL,K)=RMaintDefcitKillOMHeter(ielmc,M,NGL,K)*(1.0_r8-RCCC)
-      RMaintDefcitLitrfalOMHeter(ielmn,M,NGL,K)=RMaintDefcitKillOMHeter(ielmn,M,NGL,K)*(1.0_r8-RCCN)*(1.0_r8-RCCC)
-      RMaintDefcitLitrfalOMHeter(ielmp,M,NGL,K)=RMaintDefcitKillOMHeter(ielmp,M,NGL,K)*(1.0_r8-RCCP)*(1.0_r8-RCCC)
+      RMaintDefcitLitrfalOMHeter(ielmn,M,NGL,K)=RMaintDefcitKillOMHeter(ielmn,M,NGL,K)*(1.0_r8-RCCC)*(1.0_r8-RCCN)
+      RMaintDefcitLitrfalOMHeter(ielmp,M,NGL,K)=RMaintDefcitKillOMHeter(ielmp,M,NGL,K)*(1.0_r8-RCCC)*(1.0_r8-RCCP)
+
       DO NE=1,NumPlantChemElms
         RMaintDefcitRecycOMHeter(NE,M,NGL,K)=RMaintDefcitKillOMHeter(NE,M,NGL,K)-RMaintDefcitLitrfalOMHeter(NE,M,NGL,K)
 !

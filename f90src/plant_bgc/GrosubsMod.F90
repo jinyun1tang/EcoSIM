@@ -670,16 +670,12 @@ module grosubsMod
   
   DO NE=1,NumPlantChemElms
     CanopyNonstElms_pft(NE,NZ)=sum(CanopyNonstElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
+    StalkRsrvElms_pft(NE,NZ)=sum(StalkRsrvElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))    
+
     ShootStrutElms_pft(NE,NZ)=sum(ShootStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
     PetioleStrutElms_pft(NE,NZ)=sum(PetoleStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
     StalkStrutElms_pft(NE,NZ)=sum(StalkStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
     LeafStrutElms_pft(NE,NZ)=sum(LeafStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
-    StalkRsrvElms_pft(NE,NZ)=sum(StalkRsrvElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
-!    if(StalkRsrvElms_pft(NE,NZ)>1.e20)then
-!      print*,NZ,NE,I+J/24.,StalkRsrvElms_pft(NE,NZ),NumOfBranches_pft(NZ)
-!      print*,'755',StalkRsrvElms_brch(NE,1,NZ)
-!      stop
-!    endif
     HuskStrutElms_pft(NE,NZ)=sum(HuskStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
     GrainStrutElms_pft(NE,NZ)=sum(GrainStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
     EarStrutElms_pft(NE,NZ)=sum(EarStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
