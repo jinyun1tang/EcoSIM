@@ -1343,7 +1343,7 @@ module UptakesMod
     TCG                 => plt_pheno%TCG,                 &
     TKG                 => plt_pheno%TKG,                 &
     iPlantCalendar_brch => plt_pheno%iPlantCalendar_brch, &
-    fTgrowCanP          => plt_pheno%fTgrowCanP,          &
+    fTCanopyGroth_pft          => plt_pheno%fTCanopyGroth_pft,          &
     MaxSoiL4Root        => plt_morph%MaxSoiL4Root,        &
     MainBranchNum_pft   => plt_morph%MainBranchNum_pft    &
   )
@@ -1367,13 +1367,13 @@ module UptakesMod
   !     TKG,TKGO=canopy temperature,canopy temp used in Arrhenius eqn
   !     TKS,TKSO=soil temperature,soil temp used in Arrhenius eqn
   !     TempOffset_pft=shift in Arrhenius curve for thermal adaptation
-  !     fTgrowCanP,fTgrowRootP_vr=temperature function for canopy,root growth (25 oC =1)
+  !     fTCanopyGroth_pft,fTgrowRootP_vr=temperature function for canopy,root growth (25 oC =1)
   !     RGAS,710.0=gas constant,enthalpy
   !     62500,197500,222500=energy of activn,high,low temp inactivn(KJ mol-1)
   !     PSICanPDailyMin=minimum daily canopy water potential
   !
   TKGO=TKG(NZ)+TempOffset_pft(NZ)
-  fTgrowCanP(NZ)=calc_canopy_grow_tempf(TKGO)
+  fTCanopyGroth_pft(NZ)=calc_canopy_grow_tempf(TKGO)
 
   D100: DO L=NU,MaxSoiL4Root(NZ)
     TKSO=TKS(L)+TempOffset_pft(NZ)

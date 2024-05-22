@@ -456,11 +456,11 @@ contains
 
 !------------------------------------------------------------------------------------------
 
-  subroutine SolveSnowpack(M,NY,NX,LatentHeatAir2Sno,Radnet2Snow,HeatSensEvap,HeatSensAir2Snow,&
+  subroutine SolveSnowpack(I,J,M,NY,NX,LatentHeatAir2Sno,Radnet2Snow,HeatSensEvap,HeatSensAir2Snow,&
     HeatNetFlx2Snow,CumWatFlx2SoiMacP,CumWatFlx2SoiMicP,CumWatXFlx2SoiMicP,CumWatFlow2LitR,&
     CumHeatFlow2LitR,cumHeatFlowSno2Soi)
   implicit none
-  integer, intent(in) :: M,NY,NX
+  integer, intent(in) :: I,J,M,NY,NX
   real(r8), intent(inout) :: HeatSensEvap
   real(r8), intent(out) :: CumWatFlow2LitR
   real(r8), intent(out) :: HeatNetFlx2Snow
@@ -510,7 +510,7 @@ contains
 
      if(TKSoi1(0,NY,NX)<100._r8 .or. TKSoi1(0,NY,NX)>400._r8)write(*,*)'TXKR MM=',MM,TKSoi1(0,NY,NX)
 !    write(*,*)'CumHeatFlow2LitR MM=',MM,NY,NX,CumHeatFlow2LitR
-    call SnowAtmosExchange(M,NY,NX,LatentHeatAir2Sno,HeatSensEvap,HeatNetFlx2Snow,Radnet2Snow,HeatSensAir2Snow)
+    call SnowAtmosExchange(I,J,M,NY,NX,LatentHeatAir2Sno,HeatSensEvap,HeatNetFlx2Snow,Radnet2Snow,HeatSensAir2Snow)
 
     call SnowPackIterationM(M,NY,NX,TotWatXFlx2SoiMicP,TotHeatFlow2Soi,WatFlowSno2MacP,&
       TotWatFlow2LitrByWat,TotHeatFlow2LitrByWat,CumWatFlx2SoiMacP,CumWatFlx2SoiMicP,&
@@ -678,9 +678,9 @@ contains
   ENDDO D3000
   end subroutine SolveSnowpack  
 !------------------------------------------------------------------------------------------
-  subroutine SnowAtmosExchange(M,NY,NX,LatentHeatAir2Sno,HeatSensEvap,HeatNetFlx2Snow,Radnet2Snow,HeatSensAir2Snow)
+  subroutine SnowAtmosExchange(I,J,M,NY,NX,LatentHeatAir2Sno,HeatSensEvap,HeatNetFlx2Snow,Radnet2Snow,HeatSensAir2Snow)
   implicit none  
-  integer, intent(in) :: M,NY,NX
+  integer, intent(in) :: I,J,M,NY,NX
   real(r8), intent(inout) :: LatentHeatAir2Sno,HeatSensEvap,HeatNetFlx2Snow,Radnet2Snow,HeatSensAir2Snow
   real(r8) :: SnowAlbedo,RFLX0,RI
   real(r8) :: LWRadSno1,RadNet2Sno2
@@ -698,6 +698,7 @@ contains
 
   RFLX0=(1.0_r8-SnowAlbedo)*RadSWonSno(NY,NX)+LWRad2Snow(NY,NX)    !incoming radiation, short + longwave
   LWRadSno1=LWEmscefSnow(NY,NX)*TKSnow1(1,NY,NX)**4._r8         !emitting longwave radiation,
+!  if(I>=365 .or. I<=1)print*,RFLX0,LWRadSno1,SnowAlbedo,RadSWonSno(NY,NX),LWRad2Snow(NY,NX) 
   RadNet2Sno2=RFLX0-LWRadSno1                            !net radiation
   !
   !     AERODYNAMIC RESISTANCE ABOVE SNOWPACK INCLUDING
@@ -756,7 +757,7 @@ contains
 !     HeatNetFlx2Sno1=storage heat flux
 !     SnoFall,Rainfall,IceFall=snow,water,ice input to snowpack
 !     HeatSnofall2Snow=convective heat from snow,water,ice input to snowpack
-!
+!  
   HeatSensAir2Sno2=CdSnoHSens*(TKQ(NY,NX)-TKSnow1(1,NY,NX))
   !occasionally, RadNet2Sno2 and HeatSensAir2Sno2 go to infinity
   HeatNetFlx2Sno1=RadNet2Sno2+LatentHeatAir2Sno2+HeatSensAir2Sno2   

@@ -26,6 +26,7 @@ module readsmod
   __FILE__
 
   public :: ReadClimSoilForcing
+  integer, save :: yearhi  =0
   contains
 
   SUBROUTINE ReadClimSoilForcing(yearc,yeari,NE,NEX,NHW,NHE,NVN,NVS)
@@ -166,8 +167,8 @@ module readsmod
 ! IDAT,DAT=time,weather variable
 !
 
-  call ReadClimNC(yearc,yeari,L,atmf)
-
+  if(yearhi/=yeari)call ReadClimNC(yearc,yeari,L,atmf)
+  yearhi=yeari
 !
 ! CALCULATE PRECIPITATION CONCENTRATIONS IN MOLE UNITS
 !

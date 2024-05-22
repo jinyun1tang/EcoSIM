@@ -111,7 +111,7 @@ module WthrMod
     ENDDO
   ENDDO
 
-  call SummaryForOutput(NHW,NHE,NVN,NVS,PRECUI,PrecAsRain,PRECII,PrecAsSnow)
+  call SummaryClimateForc(I,J,NHW,NHE,NVN,NVS,PRECUI,PrecAsRain,PRECII,PrecAsSnow)
 
   END subroutine wthr
 !------------------------------------------------------------------------------------------
@@ -220,7 +220,7 @@ module WthrMod
   real(r8), intent(out) :: VPS(JY,JX)
   integer :: NY,NX
   !     begin_execution
-
+  
   DO  NX=NHW,NHE
     DO NY=NVN,NVS
  !
@@ -232,7 +232,7 @@ module WthrMod
       !     PrecAsRain,PrecAsSnow=rainfall,snowfall
 !
       RADN(NY,NX)=SWRad_hrly(J,I)  
-      TCA(NY,NX)=TMPH(J,I)
+      TCA(NY,NX)=TMP_hrly(J,I)
 
       TairK(NY,NX)=units%Celcius2Kelvin(TCA(NY,NX))
       !elevation corrected saturated air vapor pressure
@@ -342,12 +342,13 @@ module WthrMod
       !     atmospheric properties
 !
       IF(RadLWClm(J,I).GT.0.0_r8)THEN
-        !     THSX(NY,NX)=EMM*(stefboltz_const*TairK(NY,NX)**4)
-        !     THSX(NY,NX)=THSX(NY,NX)+RadLWClm(J,I)
-        THSX(NY,NX)=RadLWClm(J,I)
+        !     SkyLonwRad_col(NY,NX)=EMM*(stefboltz_const*TairK(NY,NX)**4)
+        !     SkyLonwRad_col(NY,NX)=SkyLonwRad_col(NY,NX)+RadLWClm(J,I)
+        SkyLonwRad_col(NY,NX)=RadLWClm(J,I)
       ELSE
-        THSX(NY,NX)=EMM*(stefboltz_const*TairK(NY,NX)**4._r8)
+        SkyLonwRad_col(NY,NX)=EMM*stefboltz_const*TairK(NY,NX)**4._r8 
       ENDIF
+!      if(I<=1 .or. I>=365)print*,'EMM',EMM,stefboltz_const,TairK(NY,NX),TCA(NY,NX)
 !
       !     INSERT CESM WEATHER HERE
       !
@@ -525,12 +526,13 @@ module WthrMod
   end subroutine CorrectClimate
 !------------------------------------------------------------------------------------------
 
-  subroutine SummaryForOutput(NHW,NHE,NVN,NVS,PRECUI,PrecAsRain,PRECII,PrecAsSnow)
+  subroutine SummaryClimateForc(I,J,NHW,NHE,NVN,NVS,PRECUI,PrecAsRain,PRECII,PrecAsSnow)
   !
   !     DESCRIPTION:
   !     DAILY WEATHER TOTALS, MAXIMA AND MINIMA FOR DAILY OUTPUT
   !     CHECK AGAINST INPUTS FROM WEATHER FILE
   implicit none
+  integer, intent(in) :: I,J
   integer, intent(in) :: NHW,NHE,NVN,NVS
   real(r8), intent(in):: PRECUI(JY,JX),PrecAsRain(JY,JX)
   real(r8), intent(in) :: PRECII(JY,JX),PrecAsSnow(JY,JX)
@@ -548,8 +550,8 @@ module WthrMod
       HUDN(NY,NX)=AMIN1(HUDN(NY,NX),VPK(NY,NX))
       TWIND(NY,NX)=TWIND(NY,NX)+WindSpeedAtm(NY,NX)
       VPA(NY,NX)=VPK(NY,NX)*2.173E-03_r8/TairK(NY,NX)
-      TRAI(NY,NX)=TRAI(NY,NX)+(PrecAsRain(NY,NX)+PrecAsSnow(NY,NX) &
-        +PRECII(NY,NX)+PRECUI(NY,NX))*1000.0_r8
+!      PrecDaily_col(NY,NX)=PrecDaily_col(NY,NX)+(PrecAsRain(NY,NX)+PrecAsSnow(NY,NX) &
+!        +PRECII(NY,NX)+PRECUI(NY,NX))*1000.0_r8
 !
       !     WATER AND HEAT INPUTS TO GRID CELLS
       !
@@ -566,9 +568,10 @@ module WthrMod
       IrrigSubsurf_col(NY,NX)=PRECUI(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
       PrecRainAndSurfirrig(NY,NX)=RainFalPrec(NY,NX)+IrrigSurface(NY,NX)
       PrecAtm_col(NY,NX)=RainFalPrec(NY,NX)+SnoFalPrec(NY,NX)
-      LWRadSky(NY,NX)=THSX(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
+      LWRadSky(NY,NX)=SkyLonwRad_col(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
+!      if(I<=1 .or. I>=365)print*,'SummaryClimateForc',SkyLonwRad_col(NY,NX)
     ENDDO
   ENDDO
-  end subroutine SummaryForOutput
+  end subroutine SummaryClimateForc
 
 end module WthrMod

@@ -108,7 +108,7 @@ module WatsubMod
     call FWDCopyTopLayerWatVolMit(NHW,NHE,NVN,NVS,TopLayWatVol)
 
 !    if(I>=132)print*,M,' run surface energy balance model, uses ResistanceLitRLay'
-    call RunSurfacePhysModel(M,NHE,NHW,NVS,NVN,ResistanceLitRLay,KSatRedusByRainKinetEnergyS,&
+    call RunSurfacePhysModel(I,J,M,NHE,NHW,NVS,NVN,ResistanceLitRLay,KSatRedusByRainKinetEnergyS,&
       TopLayWatVol,HeatFluxAir2Soi,Qinfl2MicP,Hinfl2Soil)
 
     call CopySoilWatVolMit(NHW,NHE,NVN,NVS,TopLayWatVol)

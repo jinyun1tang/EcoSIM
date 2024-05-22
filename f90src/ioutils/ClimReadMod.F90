@@ -66,8 +66,8 @@ implicit none
 ! INFILL 3-HOURLY WEATHER DATA
 !
   IF(II.LT.1)THEN
-    TMPH(J-2,I)=TMPH(J,I)
-    TMPH(J-1,I)=TMPH(J,I)
+    TMP_hrly(J-2,I)=TMP_hrly(J,I)
+    TMP_hrly(J-1,I)=TMP_hrly(J,I)
     SWRad_hrly(J-2,I)=SWRad_hrly(J,I)
     SWRad_hrly(J-1,I)=SWRad_hrly(J,I)
     WINDH(J-2,I)=WINDH(J,I)
@@ -80,8 +80,8 @@ implicit none
     RadLWClm(J-2,I)=RadLWClm(J,I)
     RadLWClm(J-1,I)=RadLWClm(J,I)
   ELSE
-    TMPH(J-2,I)=0.667_r8*TMPH(JJ,II)+0.333_r8*TMPH(J,I)
-    TMPH(J-1,I)=0.333_r8*TMPH(JJ,II)+0.667_r8*TMPH(J,I)
+    TMP_hrly(J-2,I)=0.667_r8*TMP_hrly(JJ,II)+0.333_r8*TMP_hrly(J,I)
+    TMP_hrly(J-1,I)=0.333_r8*TMP_hrly(JJ,II)+0.667_r8*TMP_hrly(J,I)
     SWRad_hrly(J-2,I)=0.667_r8*SWRad_hrly(JJ,II)+0.333_r8*SWRad_hrly(J,I)
     SWRad_hrly(J-1,I)=0.333_r8*SWRad_hrly(JJ,II)+0.667_r8*SWRad_hrly(J,I)
     WINDH(J-2,I)=0.667_r8*WINDH(JJ,II)+0.333_r8*WINDH(J,I)
@@ -208,12 +208,12 @@ implicit none
     IF(VAR(K).EQ.'T')THEN
       IF(TYP(K).EQ.'F')THEN
 ! Fahrenheit to celcius
-        TMPH(J,I)=((DAT(K)+DATK(K))/IH-32.0_r8)*0.556_r8
+        TMP_hrly(J,I)=((DAT(K)+DATK(K))/IH-32.0_r8)*0.556_r8
       ELSEIF(TYP(K).EQ.'K')THEN
 ! Temperature given as kelvin
-        TMPH(J,I)=units%Kelvin2Celcius((DAT(K)+DATK(K))/IH)
+        TMP_hrly(J,I)=units%Kelvin2Celcius((DAT(K)+DATK(K))/IH)
       ELSE
-        TMPH(J,I)=(DAT(K)+DATK(K))/IH
+        TMP_hrly(J,I)=(DAT(K)+DATK(K))/IH
       ENDIF
 !
 !         SOLAR RADIATION
@@ -267,20 +267,20 @@ implicit none
         DWPTH(J,I)=vapsat0(tempK)
       ELSEIF(TYP(K).EQ.'H')THEN
 ! given as relative humidity, [0, 1], return value kPa
-        tempK=units%Celcius2Kelvin(TMPH(J,I))
+        tempK=units%Celcius2Kelvin(TMP_hrly(J,I))
         DWPTH(J,I)=vapsat0(tempK)*AZMAX1(AMIN1(1.0_r8,(DAT(K)+DATK(K))/IH))
       ELSEIF(TYP(K).EQ.'R')THEN
 ! given as relative humidity [0, 100],return value kPa
-        tempK=units%Celcius2Kelvin(TMPH(J,I))
+        tempK=units%Celcius2Kelvin(TMP_hrly(J,I))
         DWPTH(J,I)=vapsat0(tempK)*AZMAX1(AMIN1(1._r8,0.01_r8*(DAT(K)+DATK(K))/IH))
       ELSEIF(TYP(K).EQ.'S')THEN
 ! molar mixing ratio? [0,100]
         DWPTH(J,I)=AZMAX1((DAT(K)+DATK(K))/IH)*0.0289_r8/18.0_r8*101.325_r8 &
-          *EXP(-ALTIG/7272.0_r8)*288.15_r8/units%Celcius2Kelvin(TMPH(J,I))
+          *EXP(-ALTIG/7272.0_r8)*288.15_r8/units%Celcius2Kelvin(TMP_hrly(J,I))
       ELSEIF(TYP(K).EQ.'G')THEN
 ! molar mixing ratio [0, 1] ALTIG is doing altitude correction,
         DWPTH(J,I)=AZMAX1((DAT(K)+DATK(K))/IH)*28.9_r8/18.0_r8*101.325_r8 &
-          *EXP(-ALTIG/7272.0_r8)*288.15_r8/units%Celcius2Kelvin(TMPH(J,I))
+          *EXP(-ALTIG/7272.0_r8)*288.15_r8/units%Celcius2Kelvin(TMP_hrly(J,I))
       ELSEIF(TYP(K).EQ.'M')THEN
 ! given as hPa
         DWPTH(J,I)=AZMAX1((DAT(K)+DATK(K))/IH*0.1_r8)
@@ -709,7 +709,7 @@ implicit none
   I=365
   if(isleap(yeari))I=366
   print*,size(fdatam,1),size(fdatam,2),size(fdatam,3),irec
-  call ncd_getvar(clm_nfid,'TMPH',irec,fdatam); call reshape2(TMPH,fdatam)
+  call ncd_getvar(clm_nfid,'TMPH',irec,fdatam); call reshape2(TMP_hrly,fdatam)
   call ncd_getvar(clm_nfid,'WINDH',irec,fdatam); call reshape2(WINDH,fdatam)
   call ncd_getvar(clm_nfid,'DWPTH',irec,fdatam); call reshape2(DWPTH,fdatam)
   call ncd_getvar(clm_nfid,'RAINH',irec,fdatam); call reshape2(RAINH,fdatam)
@@ -738,9 +738,10 @@ implicit none
     RadLWClm=0._r8
   endif
 
-  if (I==365 .and. isLeap(yearc))then
+  if (.not. isLeap(yeari))then
+    I=365
     DO J=1,24
-      TMPH(J,I+1) = TMPH(J,I)
+      TMP_hrly(J,I+1) = TMP_hrly(J,I)
       WINDH(J,I+1)= WINDH(J,I)
       DWPTH(J,I+1)= DWPTH(J,I)
       RAINH(J,I+1)= RAINH(J,I)
@@ -750,10 +751,10 @@ implicit none
   endif
 
   if(isleap(yearc))LYR=1
-  DO II=1,365+LYR
+  DO II=1,366
     DO JJ=1,24
       SWRad_hrly(JJ,II)=SWRad_hrly(JJ,II)*3600._r8*1.e-6_r8  !convert from W/m2 to MJ/m^2/hour
-      WINDH(JJ,II)=WINDH(JJ,II)*3600._r8       !convert from m/s to m/hour
+      WINDH(JJ,II)=WINDH(JJ,II)*3600._r8        !convert from m/s to m/hour
       RAINH(JJ,II)=RAINH(JJ,II)*1.e-3_r8        !convert into m hr^-1
     enddo
   ENDDO
@@ -761,7 +762,7 @@ implicit none
   if(lverb)then
   DO II=1,365+LYR
     DO JJ=1,24
-      print*,TMPH(JJ,II),SWRad_hrly(JJ,II),WINDH(JJ,II),RAINH(JJ,II),DWPTH(JJ,II)
+      print*,TMP_hrly(JJ,II),SWRad_hrly(JJ,II),WINDH(JJ,II),RAINH(JJ,II),DWPTH(JJ,II)
     ENDDO
   ENDDO
   endif

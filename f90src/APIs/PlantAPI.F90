@@ -263,7 +263,7 @@ implicit none
     TKCanopy_pft(NZ,NY,NX)   =plt_ew%TKCanopy_pft(NZ)
     TKG(NZ,NY,NX)    =plt_pheno%TKG(NZ)
     TCG(NZ,NY,NX)    =plt_pheno%TCG(NZ)
-    fTgrowCanP(NZ,NY,NX)   =plt_pheno%fTgrowCanP(NZ)
+    fTCanopyGroth_pft(NZ,NY,NX)   =plt_pheno%fTCanopyGroth_pft(NZ)
     RootN2Fix_pft(NZ,NY,NX)   =plt_rbgc%RootN2Fix_pft(NZ)
     RootNH4Uptake_pft(NZ,NY,NX)  =plt_rbgc%RootNH4Uptake_pft(NZ)
     RootNO3Uptake_pft(NZ,NY,NX)  =plt_rbgc%RootNO3Uptake_pft(NZ)
@@ -1118,7 +1118,7 @@ implicit none
     plt_pheno%TCG(NZ)    =TCG(NZ,NY,NX)
     plt_pheno%TC4LeafOff_pft(NZ)    =TC4LeafOff_pft(NZ,NY,NX)
     plt_pheno%TKG(NZ)      =TKG(NZ,NY,NX)
-    plt_pheno%fTgrowCanP(NZ)  =fTgrowCanP(NZ,NY,NX)
+    plt_pheno%fTCanopyGroth_pft(NZ)  =fTCanopyGroth_pft(NZ,NY,NX)
 
     plt_photo%Km4LeafaqCO2_pft(NZ)=Km4LeafaqCO2_pft(NZ,NY,NX)
     plt_photo%Km4RubiscoCarboxy_pft(NZ)=Km4RubiscoCarboxy_pft(NZ,NY,NX)

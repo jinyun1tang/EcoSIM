@@ -1228,7 +1228,7 @@ module PlantDisturbsMod
     FracShootStalkElmAlloc2Litr                              => plt_allom%FracShootStalkElmAlloc2Litr                              , &
     GrainSeedBiomCMean_brch             => plt_allom%GrainSeedBiomCMean_brch             , &
     iPlantBranchState_brch              =>  plt_pheno%iPlantBranchState_brch             , &
-    fTgrowCanP                          =>  plt_pheno%fTgrowCanP                         , &
+    fTCanopyGroth_pft                          =>  plt_pheno%fTCanopyGroth_pft                         , &
     iPlantCalendar_brch                 =>  plt_pheno%iPlantCalendar_brch                , &
     MatureGroup_brch                    =>  plt_pheno%MatureGroup_brch                   , &
     LeafNumberAtFloralInit_brch         =>  plt_pheno%LeafNumberAtFloralInit_brch        , &
@@ -1372,7 +1372,7 @@ module PlantDisturbsMod
 !     THIN_pft=iHarvstType_pft=0-3,5: fraction of population removed,
 !          iHarvstType_pft=4 or 6:specific herbivory rate (g DM g-1 LM d-1)
 !     TotPhytomassRemoval=total phytomass grazed, removed
-!     fTgrowCanP=temperature function for canopy growth
+!     fTCanopyGroth_pft=temperature function for canopy growth
 !     CCPOLP=nonstructural C concentration in canopy
 !     NoduleNonstructCconc_pft=nonstructural C concentration in canopy nodules
 !
@@ -1383,7 +1383,7 @@ module PlantDisturbsMod
         TotPhytomassRemoval=0._r8
       ENDIF
       IF(iHarvstType_pft(NZ).EQ.iharvtyp_herbivo)THEN
-        TotPhytomassRemoval=TotPhytomassRemoval*fTgrowCanP(NZ)
+        TotPhytomassRemoval=TotPhytomassRemoval*fTCanopyGroth_pft(NZ)
       ENDIF
       CCPOLX=CanopyNonstElmConc_pft(ielmc,NZ)/(1.0_r8+CanopyNonstElmConc_pft(ielmc,NZ))
       CCPLNX=NoduleNonstructCconc_pft(NZ)/(1.0_r8+NoduleNonstructCconc_pft(NZ))

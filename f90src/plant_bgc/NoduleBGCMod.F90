@@ -61,7 +61,7 @@ module NoduleBGCMod
     k_fine_litr               => pltpar%k_fine_litr,                 &
     ElmAllocmat4Litr          => plt_soilchem%ElmAllocmat4Litr,      &
     iPlantNfixType            => plt_morph%iPlantNfixType,           &
-    fTgrowCanP                => plt_pheno%fTgrowCanP,               &
+    fTCanopyGroth_pft                => plt_pheno%fTCanopyGroth_pft,               &
     CanopyGrosRCO2_pft        => plt_bgcr%CanopyGrosRCO2_pft,        &
     ECO_ER_col                => plt_bgcr%ECO_ER_col,                &
     CanopyRespC_pft           => plt_bgcr%CanopyRespC_pft,           &
@@ -148,14 +148,14 @@ module NoduleBGCMod
 !     CPOLNB,ZPOLNB,PPOLNB=nonstructural C,N,P in bacteria
 !     VMXO=specific respiration rate by bacterial N2 fixers
 !     WTNDB=bacterial C mass
-!     fTgrowCanP=temperature function for canopy growth
+!     fTCanopyGroth_pft=temperature function for canopy growth
 !     FCNPF=N,P constraint to bacterial activity
 !     WFNG=growth function of canopy water potential
 !
     RespNonst_Oltd=AZMAX1(AMIN1(CanopyNodulNonstElms_brch(ielmc,NB,NZ),&
-      VMXO*CanopyNodulStrutElms_brch(ielmc,NB,NZ))*FCNPF*fTgrowCanP(NZ)*WFNG)
+      VMXO*CanopyNodulStrutElms_brch(ielmc,NB,NZ))*FCNPF*fTCanopyGroth_pft(NZ)*WFNG)
 !     CPOOLNX=CanopyNodulNonstElms_brch(ielmc,NB,NZ)
-!     VMXOX=VMXO*CanopyNodulStrutElms_brch(ielmc,NB,NZ)*FCNPF*fTgrowCanP(NZ)*WFNG
+!     VMXOX=VMXO*CanopyNodulStrutElms_brch(ielmc,NB,NZ)*FCNPF*fTCanopyGroth_pft(NZ)*WFNG
 !
 !     NODULE MAINTENANCE RESPIRATION FROM SOIL TEMPERATURE,
 !     NODULE STRUCTURAL N
@@ -219,7 +219,7 @@ module NoduleBGCMod
     RCCC=RCCZN+CCC*RCCYN
     RCCN=CNC*RCCXN
     RCCP=CPC*RCCQN
-    SPNDX=SPNDL*SQRT(fTgrowCanP(NZ)*WFNG)
+    SPNDX=SPNDL*SQRT(fTCanopyGroth_pft(NZ)*WFNG)
     DO NE=1,NumPlantChemElms
       NoduleElmDecayLoss(NE)=SPNDX*CanopyNodulStrutElms_brch(NE,NB,NZ)
     ENDDO

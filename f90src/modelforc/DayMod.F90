@@ -114,7 +114,7 @@
       HUDX(NY,NX)=0._r8
       HUDN(NY,NX)=100.0_r8
       TWIND(NY,NX)=0._r8
-      TRAI(NY,NX)=0._r8
+!      PrecDaily_col(NY,NX)=0._r8
 !
 !
 !     CALCULATE DAYLENGTH FROM SOLAR ANGLE

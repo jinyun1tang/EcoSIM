@@ -139,7 +139,7 @@ module grosubsMod
     NodulStrutElms_pft             => plt_biom%NodulStrutElms_pft          , &
     SeasonalNonstElms_pft          => plt_biom%SeasonalNonstElms_pft       , &
     StandDeadStrutElms_pft         => plt_biom%StandDeadStrutElms_pft      , &
-    fTgrowCanP                     => plt_pheno%fTgrowCanP                 , &
+    fTCanopyGroth_pft                     => plt_pheno%fTCanopyGroth_pft                 , &
     NetCumElmntFlx2Plant_pft       => plt_pheno%NetCumElmntFlx2Plant_pft   , &
     IsPlantActive_pft              => plt_pheno%IsPlantActive_pft          , &
     iPlantRootProfile_pft          => plt_pheno%iPlantRootProfile_pft      , &
@@ -185,14 +185,14 @@ module grosubsMod
 !     LitrFall FROM STANDING DEAD
 !
 !     XFRC,XFRN,XFRP=LitrFall from standing dead
-!     fTgrowCanP=temperature function for canopy growth
+!     fTCanopyGroth_pft=temperature function for canopy growth
 !     WTSTG,WTSTDN,WTSTDP=standing dead C,N,P mass
 !     CSNC,ZSNC,PSNC=C,N,P LitrFall
 !
     
     D6235: DO M=1,jsken
       DO NE=1,NumPlantChemElms
-        XFRE=1.5814E-05_r8*fTgrowCanP(NZ)*StandDeadKCompElms_pft(NE,M,NZ)
+        XFRE=1.5814E-05_r8*fTCanopyGroth_pft(NZ)*StandDeadKCompElms_pft(NE,M,NZ)
         IF(iPlantTurnoverPattern_pft(NZ).EQ.0.OR.iPlantRootProfile_pft(NZ).LE.1)THEN
           LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)+XFRE
         ELSE
@@ -314,7 +314,7 @@ module grosubsMod
   real(r8) :: TFN5
   real(r8) :: WFNG
   real(r8) :: Stomata_Stress
-  real(r8) :: WFNS,WFNSG
+  real(r8) :: WFNS,CanTurgPSIFun4Expans
 ! begin_execution
   associate(                                                            &
     iPlantRootProfile_pft     => plt_pheno%iPlantRootProfile_pft      , &
@@ -337,7 +337,7 @@ module grosubsMod
 !    call SumPlantBiom(I,J,NZ,'bfstageplant')
     
     call StagePlantForGrowth(I,J,NZ,TFN6_vr,CNLFW,CPLFW,&
-      CNSHW,CPSHW,CNRTW,CPRTW,RootPrimeAxsNum,TFN5,WFNG,Stomata_Stress,WFNS,WFNSG)
+      CNSHW,CPSHW,CNRTW,CPRTW,RootPrimeAxsNum,TFN5,WFNG,Stomata_Stress,WFNS,CanTurgPSIFun4Expans)
 !
 !     CALCULATE GROWTH OF EACH BRANCH
 !
@@ -348,7 +348,7 @@ module grosubsMod
     
     DO  NB=1,NumOfBranches_pft(NZ)
       call GrowOneBranch(I,J,NB,NZ,TFN6_vr,CanopyHeight_copy,CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW,&
-        TFN5,WFNG,Stomata_Stress,WFNS,WFNSG,PTRT,CanopyN2Fix_pft,BegRemoblize)
+        TFN5,WFNG,Stomata_Stress,WFNS,CanTurgPSIFun4Expans,PTRT,CanopyN2Fix_pft,BegRemoblize)
     ENDDO
 !
 !    call SumPlantBiom(I,J,NZ,'bfRootBGCM')
@@ -370,12 +370,12 @@ module grosubsMod
 
 !------------------------------------------------------------------------------------------
   subroutine StagePlantForGrowth(I,J,NZ,TFN6_vr,CNLFW,CPLFW,CNSHW,&
-    CPSHW,CNRTW,CPRTW,RootPrimeAxsNum,TFN5,WFNG,Stomata_Stress,WFNS,WFNSG)
+    CPSHW,CNRTW,CPRTW,RootPrimeAxsNum,TFN5,WFNG,Stomata_Stress,WFNS,CanTurgPSIFun4Expans)
   integer, intent(in) :: I,J,NZ
   REAL(R8), INTENT(OUT):: TFN6_vr(JZ1)
   REAL(R8), INTENT(OUT) :: CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW
   real(r8), intent(out) :: RootPrimeAxsNum,TFN5,WFNG,Stomata_Stress
-  real(r8), intent(out) :: WFNS,WFNSG
+  real(r8), intent(out) :: WFNS,CanTurgPSIFun4Expans
   integer :: L,NR,N,NE
   real(r8) :: ACTVM,RTK,STK,TKCM,TKSM
 !     begin_execution
@@ -533,7 +533,7 @@ module grosubsMod
 !     Stomata_Stress=stomatal resistance function of canopy turgor
 !     PSICanopy_pft=canopy water potential
 !     WFNG=growth function of canopy water potential
-!     WFNSG=expansion,extension function of canopy water potential
+!     CanTurgPSIFun4Expans=expansion,extension function of canopy water potential
 !
   WFNS=AMIN1(1.0_r8,AZMAX1(PSICanopyTurg_pft(NZ)-PSIMin4OrganExtens))
 
@@ -541,13 +541,13 @@ module grosubsMod
     !bryophyte, no turgor
     Stomata_Stress=1.0_r8
     WFNG=EXP(0.05_r8*PSICanopy_pft(NZ))
-    WFNSG=WFNS**0.10_r8
+    CanTurgPSIFun4Expans=WFNS**0.10_r8
   ELSE
     !others
     Stomata_Stress=EXP(RCS(NZ)*PSICanopyTurg_pft(NZ))
 
     WFNG=EXP(0.10_r8*PSICanopy_pft(NZ))
-    WFNSG=WFNS**0.25_r8
+    CanTurgPSIFun4Expans=WFNS**0.25_r8
   ENDIF
   end associate
   end subroutine StagePlantForGrowth

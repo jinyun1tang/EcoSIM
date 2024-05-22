@@ -3,7 +3,7 @@ module HistDataType
 ! this module is an intermediate step to support ascii output
 ! when output is done with netcdf, no id is needed.
   use data_kind_mod , only : r8 => DAT_KIND_R8
-  use data_const_mod, only : spval  => DAT_CONST_SPVAL
+  use data_const_mod, only : spval  => DAT_CONST_SPVAL, ispval => DAT_CONST_ISPVAL
   use GridConsts
   use GridMod
   use HistFileMod
@@ -160,7 +160,7 @@ implicit none
   real(r8),pointer   :: h1D_CAN_H_ptc(:)         !277.8*HeatXAir2PCan(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_CAN_G_ptc(:)         !277.8*HeatStorCanP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_CAN_TEMPC_ptc(:)      !TCelciusCanopy_pft(NZ,NY,NX)
-  real(r8),pointer   :: h1D_CAN_TEMPFN_ptc(:)       !fTgrowCanP(NZ,NY,NX), canopy temperature growth function/stress
+  real(r8),pointer   :: h1D_CAN_TEMPFN_ptc(:)       !fTCanopyGroth_pft(NZ,NY,NX), canopy temperature growth function/stress
   real(r8),pointer   :: h1D_CAN_CO2_FLX_ptc(:)   !CO2NetFix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.148, umol m-2 s-1
   real(r8),pointer   :: h1D_CAN_GPP_ptc(:)       !GrossCO2Fix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX),  gross CO2 fixation, gC m-2/hr
   real(r8),pointer   :: h1D_CAN_RA_ptc(:)        !CanopyRespC_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total autotrophic respiration
@@ -260,7 +260,7 @@ implicit none
   real(r8),pointer   :: h1D_LEAF_NONSTN_ptc(:)   !
   real(r8),pointer   :: h1D_LEAF_NONSTP_ptc(:)   !
   real(r8),pointer   :: h1D_LEAF_NC_ptc(:)       !(LeafStrutElms_pft(ielmn,NZ,NY,NX)+CanopyNonstElms_pft(ielmn,NZ,NY,NX))/(LeafStrutElms_pft(ielmc,NZ,NY,NX)+CanopyNonstElms_pft(ielmc,NZ,NY,NX)),mass based CN ratio of leaf  
-  real(r8),pointer   :: h1D_Growth_Stage_ptc(:)    !plant development stage, integer, 0-10, planting, emergence, floral_init, jointing, 
+  real(r8),pointer    :: h1D_Growth_Stage_ptc(:)    !plant development stage, integer, 0-10, planting, emergence, floral_init, jointing, 
                                       !elongation, heading, anthesis, seed_fill, see_no_set, seed_mass_set, end_seed_fill
   real(r8),pointer   :: h2D_LEAF_NODE_NO_ptc(:,:)       !NumOfLeaves_brch(MainBranchNum_pft(NZ,NY,NX),NZ,NY,NX), leaf NO
   real(r8),pointer   :: h2D_RUB_ACTVN_ptc(:,:)     !RubiscoActivity_brch(MainBranchNum_pft(NZ,NY,NX),NZ,NY,NX), branch down-regulation of CO2 fixation
@@ -307,6 +307,7 @@ implicit none
   integer :: beg_col, end_col
   integer :: beg_ptc, end_ptc
   real(r8), pointer :: data1d_ptr(:)
+  integer , pointer :: idata1d_ptr(:)
   real(r8), pointer :: data2d_ptr(:,:)
   integer :: nbr
   character(len=32) :: fieldname
@@ -1596,9 +1597,10 @@ implicit none
   end subroutine init_hist_data
 
 !----------------------------------------------------------------------
-  subroutine hist_update(this,bounds)
+  subroutine hist_update(this,I,J,bounds)
   implicit none
   class(histdata_type) :: this
+  integer, intent(in) :: I,J
   type(bounds_type), intent(in) :: bounds
   integer :: ncol,nptc
   integer :: L,NZ,NY,NX,KN,NB
@@ -1607,6 +1609,11 @@ implicit none
   real(r8),parameter :: m2mm=1000._r8
   real(r8),parameter :: gC1hour2umol1sec=1.e6_r8/(12._r8*3600._r8)
   real(r8),parameter :: gO1hour2umol1sec=1.e6_r8/(32._r8*3600._r8)
+  character(len=15) :: grow_stage_str(11)=(/'Planting      ','Emergence     ','Floral_init   ', &
+                                            'Jointing      ','Elongation    ','Heading       ', &
+                                            'Anthesis      ','Seed_fill     ','See_no_set    ', &
+                                            'Seed_mass_set ','End_seed_fill '/)
+
   DO NX=bounds%NHW,bounds%NHE   
     DO NY=bounds%NVN,bounds%NVS
       ncol=get_col(NY,NX)
@@ -1773,7 +1780,7 @@ implicit none
         this%h1D_CAN_H_ptc(nptc)         = MJ2W*HeatXAir2PCan(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_CAN_G_ptc(nptc)         = MJ2W*HeatStorCanP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_CAN_TEMPC_ptc(nptc)     = TCelciusCanopy_pft(NZ,NY,NX)
-        this%h1D_CAN_TEMPFN_ptc(nptc)    = fTgrowCanP(NZ,NY,NX)
+        this%h1D_CAN_TEMPFN_ptc(nptc)    = fTCanopyGroth_pft(NZ,NY,NX)
         this%h1D_CAN_CO2_FLX_ptc(nptc)   = CO2NetFix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*gC1hour2umol1sec
         this%h1D_CAN_GPP_ptc(nptc)       = GrossCO2Fix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_CAN_RA_ptc(nptc)        = CanopyRespC_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -1889,6 +1896,7 @@ implicit none
               endif  
             ENDIF  
           ENDDO
+          write(112,*)'growth: ',I+J/24.,grow_stage_str(nint(this%h1D_Growth_Stage_ptc(nptc))+1)
           DO NB=1,MainBranchNum_pft(NZ,NY,NX)
             this%h2D_LEAF_NODE_NO_ptc(nptc,NB) = NumOfLeaves_brch(NB,NZ,NY,NX)
             this%h2D_RUB_ACTVN_ptc(nptc,NB)  = RubiscoActivity_brch(NB,NZ,NY,NX)

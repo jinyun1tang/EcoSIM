@@ -854,7 +854,7 @@ module StartqsMod
     TCelciusCanopy_pft       =>  plt_ew%TCelciusCanopy_pft    , &
     TKG                      =>  plt_pheno%TKG  , &
     TCG                      =>  plt_pheno%TCG  , &
-    fTgrowCanP               =>  plt_pheno%fTgrowCanP , &
+    fTCanopyGroth_pft               =>  plt_pheno%fTCanopyGroth_pft , &
     ShootStrutElms_pft        =>  plt_biom%ShootStrutElms_pft , &
     FracRadPARbyCanopy_pft   =>  plt_rad%FracRadPARbyCanopy_pft    &
   )
@@ -873,7 +873,7 @@ module StartqsMod
   TKC(NZ)=units%Celcius2Kelvin(TCelciusCanopy_pft(NZ))
   TCG(NZ)=TCelciusCanopy_pft(NZ)
   TKG(NZ)=units%Celcius2Kelvin(TCG(NZ))
-  fTgrowCanP(NZ)=1.0
+  fTCanopyGroth_pft(NZ)=1.0
   PSICanopy_pft(NZ)=-1.0E-03
   PSICanopyOsmo_pft(NZ)=OSMO(NZ)+PSICanopy_pft(NZ)
   PSICanopyTurg_pft(NZ)=AZMAX1(PSICanopy_pft(NZ)-PSICanopyOsmo_pft(NZ))

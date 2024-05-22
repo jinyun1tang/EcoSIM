@@ -32,7 +32,7 @@ implicit none
   real(r8) :: WIND(366)                         !daily wind travel, [m d-1]
   real(r8) :: DWPT(2,366)                       !daily dewpoint temperature, [oC]
 
-  real(r8) :: TMPH(24,366)                      !hourly air temperature, [oC]
+  real(r8) :: TMP_hrly(24,366)                      !hourly air temperature, [oC]
   real(r8) :: SWRad_hrly(24,366)                !hourly solar radiation, [MJ m-2 h-1]
   real(r8) :: RAINH(24,366)                     !hourly precipitation, [mm h-1]
   real(r8) :: WINDH(24,366)                     !hourly wind speed, [m h-1]
@@ -74,8 +74,8 @@ implicit none
   real(r8),target,allocatable ::  HUDX(:,:)                          !daily maximum vapor pressure , [kPa]
   real(r8),target,allocatable ::  HUDN(:,:)                          !daily minimum vapor pressure , [kPa]
   real(r8),target,allocatable ::  TWIND(:,:)                         !total daily wind travel, [m d-1]
-  real(r8),target,allocatable ::  TRAI(:,:)                          !total daily precipitation, [m d-1]
-  real(r8),target,allocatable ::  THSX(:,:)                          !sky longwave radiation , [MJ m-2 h-1]
+!  real(r8),target,allocatable ::  PrecDaily_col(:,:)                          !total daily precipitation, [m d-1]
+  real(r8),target,allocatable ::  SkyLonwRad_col(:,:)                          !sky longwave radiation , [MJ m-2 h-1]
   real(r8),target,allocatable ::  TempOffset_col(:,:)                        !TempOffset_col for calculating temperature in Arrhenius curves, [oC]
   real(r8),target,allocatable ::  PRECD(:,:)                         !precipitation at ground surface used to calculate soil erosion, [m h-1]
   real(r8),target,allocatable ::  PRECB(:,:)                         !precipitation at ground surface used to calculate soil erosion, [m h-1]
@@ -203,8 +203,8 @@ implicit none
   allocate(HUDX(JY,JX));        HUDX=0._r8
   allocate(HUDN(JY,JX));        HUDN=0._r8
   allocate(TWIND(JY,JX));       TWIND=0._r8
-  allocate(TRAI(JY,JX));        TRAI=0._r8
-  allocate(THSX(JY,JX));        THSX=0._r8
+!  allocate(PrecDaily_col(JY,JX));        PrecDaily_col=0._r8
+  allocate(SkyLonwRad_col(JY,JX));        SkyLonwRad_col=0._r8
   allocate(TempOffset_col(JY,JX));      TempOffset_col=0._r8
   allocate(PRECD(JY,JX));       PRECD=0._r8
   allocate(PRECB(JY,JX));       PRECB=0._r8
@@ -333,8 +333,8 @@ implicit none
   call destroy(HUDX)
   call destroy(HUDN)
   call destroy(TWIND)
-  call destroy(TRAI)
-  call destroy(THSX)
+!  call destroy(PrecDaily_col)
+  call destroy(SkyLonwRad_col)
   call destroy(TempOffset_col)
   call destroy(PRECD)
   call destroy(PRECB)

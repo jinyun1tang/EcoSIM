@@ -110,7 +110,7 @@ contains
 
       call PartitionPrecip(NY,NX)
 
-      call SurfaceRadiation(NY,NX)
+      call SurfaceRadiation(I,J,NY,NX)
 
       call SurfaceResistances(NY,NX,ResistanceLitRLay)
 
@@ -240,10 +240,10 @@ contains
   end subroutine SetCanopyProperty
 !------------------------------------------------------------------------------------------
 
-  subroutine SurfaceRadiation(NY,NX)
+  subroutine SurfaceRadiation(I,J,NY,NX)
 
   implicit none
-  integer, intent(in) :: NY,NX
+  integer, intent(in) :: I,J,NY,NX
   real(r8) :: THRYX,RADGX
 !
 !     INITIALIZE PARAMETERS, FLUXES FOR ENERGY EXCHANGE
@@ -268,6 +268,10 @@ contains
   RadSWonLitR(NY,NX)=RADGX*FracSurfSnoFree(NY,NX)*FracSurfByLitR(NY,NX)*XNPR
 
   THRYX=(LWRadSky(NY,NX)*FracSWRad2Grnd(NY,NX)+LWRadCanGPrev(NY,NX))*dts_HeatWatTP
+!  if(I<=1 .or. I>=365)then
+!  print*,'THRYX',LWRadSky(NY,NX),FracSWRad2Grnd(NY,NX),LWRadCanGPrev(NY,NX)
+!  print*,THRYX,FracSurfAsSnow(NY,NX),XNPS
+!  endif
   LWRad2Snow(NY,NX)=THRYX*FracSurfAsSnow(NY,NX)*XNPS
   LWRad2Grnd(NY,NX)=THRYX*FracSurfSnoFree(NY,NX)*FracSurfAsBareSoi(NY,NX)
   LWRad2LitR(NY,NX)=THRYX*FracSurfSnoFree(NY,NX)*FracSurfByLitR(NY,NX)*XNPR
@@ -651,10 +655,10 @@ contains
 
 !------------------------------------------------------------------------------------------
 
-  subroutine AtmLandSurfExchange(M,NY,NX,ResistanceLitRLay,TopLayWatVol,LatentHeatAir2Sno,&
+  subroutine AtmLandSurfExchange(I,J,M,NY,NX,ResistanceLitRLay,TopLayWatVol,LatentHeatAir2Sno,&
     HeatSensEvap,HeatSensAir2Snow,Radnet2Snow,VapXAir2TopLay,HeatFluxAir2Soi1)
   implicit none
-  integer, intent(in) :: M,NY,NX
+  integer, intent(in) :: M,NY,NX,I,J
   real(r8), dimension(:,:), intent(inout) :: ResistanceLitRLay
   real(r8), dimension(:,:),intent(inout) :: TopLayWatVol  
   real(r8), intent(out) :: LatentHeatAir2Sno,HeatSensAir2Snow,Radnet2Snow,HeatSensEvap
@@ -682,7 +686,7 @@ contains
   IF(VLSnowHeatCapM(M,1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
 !    print*,'SolveSnowpack'
 !   VHCPW,VLHeatCapSnowMin_col=current, minimum snowpack heat capacities
-    call SolveSnowpack(M,NY,NX,LatentHeatAir2Sno,Radnet2Snow,HeatSensEvap,HeatSensAir2Snow,&
+    call SolveSnowpack(I,J,M,NY,NX,LatentHeatAir2Sno,Radnet2Snow,HeatSensEvap,HeatSensAir2Snow,&
       HeatNetFlx2Snow,CumWatFlx2SoiMacP,CumWatFlx2SoiMicP,CumWatXFlx2SoiMicP,CumWatFlow2LitR,&
       CumHeatFlow2LitR,cumHeatFlowSno2Soi)
   ENDIF
@@ -1614,10 +1618,10 @@ contains
   LWRadBySurf(NY,NX)=LWRadBySurf(NY,NX)+LWRadGrnd
   end subroutine SumAftEnergyBalance
 !------------------------------------------------------------------------------------------
-  subroutine RunSurfacePhysModel(M,NHE,NHW,NVS,NVN,ResistanceLitRLay,KSatReductByRainKineticEnergy,&
+  subroutine RunSurfacePhysModel(I,J,M,NHE,NHW,NVS,NVN,ResistanceLitRLay,KSatReductByRainKineticEnergy,&
     TopLayWatVol,HeatFluxAir2Soi,Qinfl2MicP,Hinfl2Soil)
   implicit none
-  integer, intent(in) :: M,NHE,NHW,NVS,NVN
+  integer, intent(in) :: I,J,M,NHE,NHW,NVS,NVN
   real(r8), dimension(:,:),intent(inout) :: ResistanceLitRLay
   REAL(R8), dimension(:,:),INTENT(OUT) :: KSatReductByRainKineticEnergy
   real(r8), dimension(:,:),intent(inout) :: TopLayWatVol  
@@ -1632,7 +1636,7 @@ contains
     D9890: DO  NY=NVN,NVS
 !      write(*,*)'RunSurfacePhysModel',NY,NX,'M=',M,TKS(0,NY,NX)
 
-      call SurfaceEnergyModel(M,NX,NY,ResistanceLitRLay,KSatReductByRainKineticEnergy(NY,NX),&
+      call SurfaceEnergyModel(I,J,M,NX,NY,ResistanceLitRLay,KSatReductByRainKineticEnergy(NY,NX),&
         HeatFluxAir2Soi(NY,NX),LatentHeatAir2Sno,HeatSensEvap,HeatSensAir2Snow,Radnet2Snow,&
         TopLayWatVol,VapXAir2TopLay)
 
@@ -1659,11 +1663,11 @@ contains
   end subroutine RunSurfacePhysModel
 
 !------------------------------------------------------------------------------------------
-  subroutine SurfaceEnergyModel(M,NX,NY,ResistanceLitRLay,KSatReductByRainKineticEnergy,&
+  subroutine SurfaceEnergyModel(I,J,M,NX,NY,ResistanceLitRLay,KSatReductByRainKineticEnergy,&
     HeatFluxAir2Soi1,LatentHeatAir2Sno,HeatSensEvap,HeatSensAir2Snow,Radnet2Snow,&
     TopLayWatVol,VapXAir2TopLay)
   implicit none
-  integer, intent(in) :: M,NX,NY
+  integer, intent(in) :: I,J,M,NX,NY
   real(r8), dimension(:,:),intent(inout) :: ResistanceLitRLay
   REAL(R8),INTENT(OUT) :: KSatReductByRainKineticEnergy,HeatFluxAir2Soi1
   real(r8), intent(out) :: Radnet2Snow,LatentHeatAir2Sno,HeatSensAir2Snow,HeatSensEvap
@@ -1675,7 +1679,7 @@ contains
   call InitSurfModel(M,NY,NX,ResistanceLitRLay,KSatReductByRainKineticEnergy)
 
 ! updates ResistanceLitRLay
-  call AtmLandSurfExchange(M,NY,NX,ResistanceLitRLay,TopLayWatVol,LatentHeatAir2Sno,&
+  call AtmLandSurfExchange(I,J,M,NY,NX,ResistanceLitRLay,TopLayWatVol,LatentHeatAir2Sno,&
     HeatSensEvap,HeatSensAir2Snow,Radnet2Snow,VapXAir2TopLay,HeatFluxAir2Soi1)
 
   !update snow pack before doing snow redistribution to avoid negative mass values  

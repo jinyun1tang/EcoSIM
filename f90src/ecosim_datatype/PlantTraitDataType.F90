@@ -90,7 +90,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  PPZ(:,:,:)                         !plant population at seeding, [m-2]
   real(r8),target,allocatable ::  HoursCanopyPSITooLow_pft(:,:,:)                        !canopy plant water stress indicator, number of hours PSILT < PSILY, []
   real(r8),target,allocatable ::  PlantO2Stress(:,:,:)                        !plant O2 stress indicator, []
-  real(r8),target,allocatable ::  fTgrowCanP(:,:,:)                  !canopy temperature growth function, [-]
+  real(r8),target,allocatable ::  fTCanopyGroth_pft(:,:,:)                  !canopy temperature growth function, [-]
   real(r8),target,allocatable ::  TCG(:,:,:)                         !canopy growth temperature, [oC]
   real(r8),target,allocatable ::  TKG(:,:,:)                         !canopy growth temperature, [K]
   real(r8),target,allocatable ::  PetioleBiomGrowthYield(:,:,:)                       !sheath growth yield, [g g-1]
@@ -250,7 +250,7 @@ contains
   allocate(PPZ(JP,JY,JX));      PPZ=0._r8
   allocate(HoursCanopyPSITooLow_pft(JP,JY,JX));     HoursCanopyPSITooLow_pft=0._r8
   allocate(PlantO2Stress(JP,JY,JX));     PlantO2Stress=0._r8
-  allocate(fTgrowCanP(JP,JY,JX));     fTgrowCanP=0._r8
+  allocate(fTCanopyGroth_pft(JP,JY,JX));     fTCanopyGroth_pft=0._r8
   allocate(TCG(JP,JY,JX));      TCG=0._r8
   allocate(TKG(JP,JY,JX));      TKG=0._r8
   allocate(PetioleBiomGrowthYield(JP,JY,JX));    PetioleBiomGrowthYield=0._r8
@@ -407,7 +407,7 @@ contains
   call destroy(PPZ)
   call destroy(HoursCanopyPSITooLow_pft)
   call destroy(PlantO2Stress)
-  call destroy(fTgrowCanP)
+  call destroy(fTCanopyGroth_pft)
   call destroy(TCG)
   call destroy(TKG)
   call destroy(PetioleBiomGrowthYield)

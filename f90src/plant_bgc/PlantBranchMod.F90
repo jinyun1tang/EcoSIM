@@ -32,7 +32,7 @@ module PlantBranchMod
 !------------------------------------------------------------------------------------------
 
   subroutine GrowOneBranch(I,J,NB,NZ,TFN6_vr,CanopyHeight_copy,CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW,TFN5,WaterStress4Groth,&
-    Stomata_Stress,WFNS,WFNSG,PTRT,CanopyN2Fix_pft,BegRemoblize)
+    Stomata_Stress,WFNS,CanTurgPSIFun4Expans,PTRT,CanopyN2Fix_pft,BegRemoblize)
   implicit none
   integer, intent(in)  :: I,J,NB,NZ
   REAL(R8), INTENT(IN) :: TFN6_vr(JZ1)
@@ -42,7 +42,7 @@ module PlantBranchMod
   real(r8), intent(in) :: CNRTW,CPRTW
   real(r8), intent(in) :: TFN5,WaterStress4Groth
   real(r8), intent(in) :: Stomata_Stress
-  real(r8), intent(in) :: WFNS,WFNSG
+  real(r8), intent(in) :: WFNS,CanTurgPSIFun4Expans
   real(r8), intent(inout) :: CanopyN2Fix_pft(JP1)
   real(r8), intent(out) :: PTRT
   integer, intent(out) :: BegRemoblize
@@ -86,7 +86,7 @@ module PlantBranchMod
     iPlantCalendar_brch          =>  plt_pheno%iPlantCalendar_brch        , &
     iPlantTurnoverPattern_pft    =>  plt_pheno%iPlantTurnoverPattern_pft  , &
     iPlantPhenolPattern_pft      =>  plt_pheno%iPlantPhenolPattern_pft    , &
-    SineSunInclAnglNxtHour_col  =>  plt_rad%SineSunInclAnglNxtHour_col  , &
+    SineSunInclAnglNxtHour_col   =>  plt_rad%SineSunInclAnglNxtHour_col   , &
     PlantPopulation_pft          =>  plt_site%PlantPopulation_pft         , &
     ZERO                         =>  plt_site%ZERO                        , &
     MainBranchNum_pft            =>  plt_morph%MainBranchNum_pft            &
@@ -106,7 +106,7 @@ module PlantBranchMod
 !   GROSS PRIMARY PRODUCTIVITY
 !
     call UpdatePhotosynthates(I,J,NB,NZ,TFN6_vr,DMSHD,CNLFM,CPLFM,CNSHX,CPSHX &
-      ,CNLFX,CPLFX,ShootStructE,TFN5,WaterStress4Groth,Stomata_Stress,WFNSG,CH2O3,CH2O4,CNPG &
+      ,CNLFX,CPLFX,ShootStructE,TFN5,WaterStress4Groth,Stomata_Stress,CanTurgPSIFun4Expans,CH2O3,CH2O4,CNPG &
       ,RCO2NonstC_brch,RCO2Maint_brch,RMxess_brch,NonstC4Groth_brch,RCO2NonstC4Nassim_brch)
 !
 !
@@ -121,9 +121,10 @@ module PlantBranchMod
       call C4PhotoProductTransfer(I,J,NZ,NB,CH2O3,CH2O4)
     ENDIF
 
-   call BranchBiomAllocate(I,J,NB,NZ,PART,NonstC4Groth_brch,&
-    DMLFB,DMSHB,CNLFB,CPLFB,CNSHB,CPSHB,ZPLFD,CNPG,Growth_brch,EtoliationCoeff,MinNodeNum)
+    call BranchBiomAllocate(I,J,NB,NZ,PART,NonstC4Groth_brch,&
+      DMLFB,DMSHB,CNLFB,CPLFB,CNSHB,CPSHB,ZPLFD,CNPG,Growth_brch,EtoliationCoeff,MinNodeNum)
 
+!    write(111,*)I,J,Growth_brch(:,ibrch_leaf)
     CALL GrowLeavesOnBranch(NZ,NB,MinNodeNum,Growth_brch(:,ibrch_leaf),EtoliationCoeff,WFNS,ALLOCL)
 !
 !     DISTRIBUTE SHEATH OR PETIOLE GROWTH AMONG CURRENTLY GROWING NODES
@@ -172,7 +173,7 @@ module PlantBranchMod
 !
 !       doSenescence_brch=PFT branch senescence flag
 !       KHiestGroLeafNode_brch=integer of most recent leaf number
-!       fTgrowCanP=temperature function for canopy growth
+!       fTCanopyGroth_pft=temperature function for canopy growth
 !       XRLA=rate of leaf appearance at 25 oC (h-1)
 !       FSNC=fraction of lowest leaf to be remobilized
 !
@@ -221,7 +222,7 @@ module PlantBranchMod
     call ResetBranchPhenology(I,NB,NZ)
 !   
 !    print*,'branchbf',NZ,StalkRsrvElms_brch(1,1,NZ)
-    call BranchElmntTransfer(I,J,NB,NZ,BegRemoblize,WaterStress4Groth,WFNSG)
+    call BranchElmntTransfer(I,J,NB,NZ,BegRemoblize,WaterStress4Groth,CanTurgPSIFun4Expans)
 
 !   CANOPY N2 FIXATION (CYANOBACTERIA)
 !
@@ -777,15 +778,15 @@ module PlantBranchMod
 !------------------------------------------------------------------------------------------
 
   subroutine UpdatePhotosynthates(I,J,NB,NZ,TFN6_vr,DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX,&
-    ShootStructE,TFN5,WaterStress4Groth,Stomata_Stress,WFNSG,CH2O3,CH2O4,CNPG,RCO2NonstC_brch,RCO2Maint_brch,&
-    RMxess_brch,NonstC4Groth_brch,RCO2NonstC4Nassim_brch)
+    ShootStructE,TFN5,WaterStress4Groth,Stomata_Stress,CanTurgPSIFun4Expans,CH2O3,CH2O4,CNPG,&
+    RCO2NonstC_brch,RCO2Maint_brch,RMxess_brch,NonstC4Groth_brch,RCO2NonstC4Nassim_brch)
   implicit none
   integer, intent(in) :: I,J,NB,NZ
   real(r8), intent(in) :: TFN6_vr(JZ1)
   real(r8), intent(in) :: DMSHD
   real(r8), intent(in) :: CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX
   real(r8), intent(in) :: ShootStructE(NumPlantChemElms),TFN5,WaterStress4Groth
-  real(r8), intent(in) :: Stomata_Stress,WFNSG
+  real(r8), intent(in) :: Stomata_Stress,CanTurgPSIFun4Expans
   real(r8), intent(out) :: RCO2NonstC_brch
   real(r8), intent(out) :: RCO2Maint_brch
   real(r8), intent(out) :: CH2O3(pltpar%MaxNodesPerBranch1)
@@ -810,13 +811,13 @@ module PlantBranchMod
 !
   IF(iPlantCalendar_brch(ipltcal_Emerge,NB,NZ).NE.0)THEN
 !  
-    call ComputeGPP(NB,NZ,WaterStress4Groth,Stomata_Stress,CH2O3,CH2O4,CH2O,CO2F,CH2OClm,CH2OLlm)
+    call ComputeGPP(I,J,NB,NZ,WaterStress4Groth,Stomata_Stress,CH2O3,CH2O4,CH2O,CO2F,CH2OClm,CH2OLlm)
 
 !    CH2O=CH2O*50._r8;CO2F=CO2F*50._r8
 !   SHOOT AUTOTROPHIC RESPIRATION AFTER EMERGENCE
 !
     call ComputRAutoAfEmergence(I,J,NB,NZ,DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX,&
-      CO2F,CH2O,TFN5,WaterStress4Groth,WFNSG,ShootStructE(ielmn),CanopyNonstElm4Gros,CNPG,&
+      CO2F,CH2O,TFN5,WaterStress4Groth,CanTurgPSIFun4Expans,ShootStructE(ielmn),CanopyNonstElm4Gros,CNPG,&
       RCO2NonstC_brch,RCO2Maint_brch,RMxess_brch,&
       NonstC4Groth_brch,RCO2NonstC4Nassim_brch)
 
@@ -825,7 +826,7 @@ module PlantBranchMod
   ELSE
     CH2O=0._r8
     call ComputRAutoB4Emergence(I,NB,NZ,TFN6_vr,DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX,ShootStructE(ielmn),&
-      WaterStress4Groth,WFNSG,CanopyNonstElm4Gros,CNPG,RCO2NonstC_brch,RCO2Maint_brch,RMxess_brch,NonstC4Groth_brch,&
+      WaterStress4Groth,CanTurgPSIFun4Expans,CanopyNonstElm4Gros,CNPG,RCO2NonstC_brch,RCO2Maint_brch,RMxess_brch,NonstC4Groth_brch,&
       RCO2NonstC4Nassim_brch)
   ENDIF
 
@@ -1961,7 +1962,7 @@ module PlantBranchMod
     CNGR                                  =>  plt_allom%CNGR                        , &
     CPGR                                  =>  plt_allom%CPGR                        , &
     fTgrowRootP_vr                        =>  plt_pheno%fTgrowRootP_vr              , &
-    fTgrowCanP                            =>  plt_pheno%fTgrowCanP                  , &
+    fTCanopyGroth_pft                            =>  plt_pheno%fTCanopyGroth_pft                  , &
     iPlantPhenolType_pft                  =>  plt_pheno%iPlantPhenolType_pft        , &
     Hours4LeafOff_brch                    =>  plt_pheno%Hours4LeafOff_brch          , &
     HourFailGrainFill_brch                =>  plt_pheno%HourFailGrainFill_brch      , &
@@ -2070,14 +2071,14 @@ module PlantBranchMod
 !   SeedNumSet_brch=seed set number
 !   GROLM=maximum grain fill rate
 !   GrainFillRate25C_pft=grain filling rate at 25 oC from PFT file
-!   fTgrowCanP=temperature function for canopy growth
+!   fTCanopyGroth_pft=temperature function for canopy growth
 !   fTgrowRootP_vr=temperature function for root growth
 !
   IF(iPlantCalendar_brch(ipltcal_BeginSeedFill,NB,NZ).NE.0)THEN
     IF(GrainStrutElms_brch(ielmc,NB,NZ).GE.GrainSeedBiomCMean_brch(NB,NZ)*SeedNumSet_brch(NB,NZ))THEN
       GROLM=0._r8
     ELSEIF(iPlantGrainType_pft(NZ).EQ.igraintyp_abvgrnd)THEN
-      GROLM=AZMAX1(GrainFillRate25C_pft(NZ)*SeedNumSet_brch(NB,NZ)*SQRT(fTgrowCanP(NZ)))
+      GROLM=AZMAX1(GrainFillRate25C_pft(NZ)*SeedNumSet_brch(NB,NZ)*SQRT(fTCanopyGroth_pft(NZ)))
     ELSE
       GROLM=AZMAX1(GrainFillRate25C_pft(NZ)*SeedNumSet_brch(NB,NZ)*SQRT(fTgrowRootP_vr(NGTopRootLayer_pft(NZ),NZ)))
     ENDIF
@@ -2547,10 +2548,10 @@ module PlantBranchMod
   end associate
   end subroutine ResetBranchPhenology
 !------------------------------------------------------------------------------------------
-  subroutine BranchElmntTransfer(I,J,NB,NZ,BegRemoblize,WaterStress4Groth,WFNSG)
+  subroutine BranchElmntTransfer(I,J,NB,NZ,BegRemoblize,WaterStress4Groth,CanTurgPSIFun4Expans)
   implicit none
   integer, intent(in) :: I,J,NB,NZ,BegRemoblize
-  real(r8), intent(in) :: WaterStress4Groth,WFNSG
+  real(r8), intent(in) :: WaterStress4Groth,CanTurgPSIFun4Expans
   integer :: L,NE
   real(r8) :: NonstGradt
   real(r8) :: XFRPX,XFRCX,XFRNX
@@ -2602,7 +2603,7 @@ module PlantBranchMod
     StalkBiomassC_brch        => plt_biom%StalkBiomassC_brch,         &
     VLSoilPoreMicP_vr         => plt_soilchem%VLSoilPoreMicP_vr,      &
     iPlantCalendar_brch       => plt_pheno%iPlantCalendar_brch,       &
-    fTgrowCanP                => plt_pheno%fTgrowCanP,                &
+    fTCanopyGroth_pft                => plt_pheno%fTCanopyGroth_pft,                &
     HourReq4LeafOff_brch      => plt_pheno%HourReq4LeafOff_brch,      &
     Hours4Leafout_brch        => plt_pheno%Hours4Leafout_brch,        &
     HourReq4LeafOut_brch      => plt_pheno%HourReq4LeafOut_brch,      &
@@ -2655,8 +2656,8 @@ module PlantBranchMod
   ! CriticPhotoPeriod_pft=critical photoperiod (h):<0=maximum daylength from site file
   ! PhotoPeriodSens_pft=photoperiod sensitivity (node h-1)
   ! DayLenthCurrent=daylength
-  ! WFNSG=expansion,extension function of canopy water potential
-  ! fTgrowCanP=temperature function for canopy growth
+  ! CanTurgPSIFun4Expans=expansion,extension function of canopy water potential
+  ! fTCanopyGroth_pft=temperature function for canopy growth
   ! HourReq2InitSStor4LeafOut=number of hours required to initiate remobilization of storage C for leafout
   ! main branch leaf out
     IF(NB.EQ.MainBranchNum_pft(NZ))THEN
@@ -2669,11 +2670,11 @@ module PlantBranchMod
         ATRPPD=1.0_r8
       ENDIF
       IF(.not.is_root_shallow(iPlantRootProfile_pft(NZ)))THEN
-        WFNSP=WFNSG
+        WFNSP=CanTurgPSIFun4Expans
       ELSE
         WFNSP=1.0_r8
       ENDIF
-      DATRP=ATRPPD*fTgrowCanP(NZ)*WFNSP
+      DATRP=ATRPPD*fTCanopyGroth_pft(NZ)*WFNSP
       Hours2LeafOut_brch(NB,NZ)=Hours2LeafOut_brch(NB,NZ)+DATRP
       PlantChk=iPlantPhenolPattern_pft(NZ).EQ.iplt_annual .AND.iPlantPhenolType_pft(NZ).EQ.iphenotyp_evgreen
       IF(Hours2LeafOut_brch(NB,NZ).LE.HourReq2InitSStor4LeafOut(iPlantPhenolPattern_pft(NZ)).OR.(plantChk))THEN
@@ -2823,7 +2824,7 @@ module PlantBranchMod
   ! REDISTRIBUTE TRANFERRED C FROM MAIN STEM TO OTHER BRANCHES
   !
   ! ATRP=hourly leafout counter
-  ! fTgrowCanP=temperature function for canopy growth
+  ! fTCanopyGroth_pft=temperature function for canopy growth
   ! HourReq2InitSStor4LeafOut=number of hours required for remobilization of storage C during leafout
   ! WaterStress4Groth=growth function of canopy water potential
   ! CPOOL,ZPOOL,PPOOL=non-structural C,N,P mass
@@ -2831,10 +2832,10 @@ module PlantBranchMod
   ! 
     IF(NB.NE.MainBranchNum_pft(NZ) .AND. &
       Hours2LeafOut_brch(NB,NZ).LE.HourReq2InitSStor4LeafOut(iPlantPhenolPattern_pft(NZ)))THEN
-      Hours2LeafOut_brch(NB,NZ)=Hours2LeafOut_brch(NB,NZ)+fTgrowCanP(NZ)*WaterStress4Groth
+      Hours2LeafOut_brch(NB,NZ)=Hours2LeafOut_brch(NB,NZ)+fTCanopyGroth_pft(NZ)*WaterStress4Groth
 
       DO NE=1,NumPlantChemElms
-        XFRE(NE)=AZMAX1(0.05_r8*fTgrowCanP(NZ) &
+        XFRE(NE)=AZMAX1(0.05_r8*fTCanopyGroth_pft(NZ) &
           *(0.5_r8*(CanopyNonstElms_brch(NE,MainBranchNum_pft(NZ),NZ)+CanopyNonstElms_brch(NE,NB,NZ)) &
           -CanopyNonstElms_brch(NE,NB,NZ)))
         CanopyNonstElms_brch(NE,NB,NZ)=CanopyNonstElms_brch(NE,NB,NZ)+XFRE(NE)
@@ -3001,18 +3002,19 @@ module PlantBranchMod
 !------------------------------------------------------------------------------------------
 
   subroutine ComputRAutoAfEmergence(I,J,NB,NZ,DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX,CO2F,&
-    CH2O,TFN5,WaterStress4Groth,WFNSG,ShootStructN,CanopyNonstElm4Gros,CNPG,RCO2NonstC_brch,RCO2Maint_brch,RMxess_brch,&
-    NonstC4Groth_brch,RCO2NonstC4Nassim_brch)
+    CH2O,TFN5,WaterStress4Groth,CanTurgPSIFun4Expans,ShootStructN,CanopyNonstElm4Gros,CNPG,&
+    RCO2NonstC_brch,RCO2Maint_brch,RMxess_brch,NonstC4Groth_brch,RCO2NonstC4Nassim_brch)
   implicit none
   integer, intent(in) :: I,J,NB,NZ
   real(r8), intent(out) :: CanopyNonstElm4Gros(NumPlantChemElms)
   real(r8), INTENT(OUT) :: CNPG
   real(r8), intent(out) :: RCO2NonstC_brch
-  real(r8), intent(out) :: RCO2Maint_brch,RMxess_brch,NonstC4Groth_brch,RCO2NonstC4Nassim_brch
+  real(r8), intent(out) :: RCO2Maint_brch,RMxess_brch
+  real(r8), intent(out) :: NonstC4Groth_brch,RCO2NonstC4Nassim_brch
   real(r8), intent(in) :: DMSHD
   real(r8), intent(in) :: CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX
   real(r8), intent(in) :: ShootStructN,CO2F,CH2O,TFN5
-  real(r8), intent(in) :: WaterStress4Groth,WFNSG
+  real(r8), intent(in) :: WaterStress4Groth,CanTurgPSIFun4Expans
   real(r8) :: ZPOOLB
   real(r8) :: PPOOLB
   real(r8) :: RCO2X,RCO2Y
@@ -3033,7 +3035,7 @@ module PlantBranchMod
     LeafAreaLive_brch                  =>  plt_morph%LeafAreaLive_brch        , &        
     ZERO                               =>  plt_site%ZERO                      , &
     iPlantRootProfile_pft              =>  plt_pheno%iPlantRootProfile_pft    , &
-    fTgrowCanP                         =>  plt_pheno%fTgrowCanP               , &
+    fTCanopyGroth_pft                  =>  plt_pheno%fTCanopyGroth_pft        , &
     iPlantPhenolType_pft               =>  plt_pheno%iPlantPhenolType_pft     , &
     C4PhotosynDowreg_brch              =>  plt_photo%C4PhotosynDowreg_brch      &
   )
@@ -3059,13 +3061,13 @@ module PlantBranchMod
 ! RCO2NonstC_brch=respiration from non-structural C
 ! VMXC=rate constant for nonstructural C oxidation in respiration (h-1)
 ! CPOOL=non-structural C mass
-! fTgrowCanP=temperature function for canopy growth
+! fTCanopyGroth_pft=temperature function for canopy growth
 ! WaterStress4Groth=growth function of canopy water potential
 ! CNPG=N,P constraint on respiration
 ! C4PhotosynDowreg_brch=termination feedback inhibition on C3 CO2
 !
   RCO2NonstC_brch=AZMAX1(VMXC*CanopyNonstElms_brch(ielmc,NB,NZ) &
-    *fTgrowCanP(NZ))*CNPG*C4PhotosynDowreg_brch(NB,NZ)*WaterStress4Groth
+    *fTCanopyGroth_pft(NZ))*CNPG*C4PhotosynDowreg_brch(NB,NZ)*WaterStress4Groth
 !
 ! MAINTENANCE RESPIRATION FROM TEMPERATURE, PLANT STRUCTURAL N
 !
@@ -3088,13 +3090,13 @@ module PlantBranchMod
 !
 ! RCO2X=difference between non-structural C respn and mntc respn
 ! RCO2Y=growth respiration unlimited by N,P
-! WFNSG=expansion,extension function of canopy water potential
+! CanTurgPSIFun4Expans=expansion,extension function of canopy water potential
 ! RMxess_brch=excess maintenance respiration, drives remobilization & senescence
 !
   RCO2X=RCO2NonstC_brch-RCO2Maint_brch
-  RCO2Y=AZMAX1(RCO2X)*WFNSG
+  RCO2Y=AZMAX1(RCO2X)*CanTurgPSIFun4Expans
   RMxess_brch=AZMAX1(-RCO2X)
-  
+!  write(112,*)I,J,RCO2Y,CanTurgPSIFun4Expans,fTCanopyGroth_pft(NZ)
 !
 ! GROWTH RESPIRATION MAY BE LIMITED BY NON-STRUCTURAL N,P
 ! AVAILABLE FOR GROWTH
@@ -3174,14 +3176,14 @@ module PlantBranchMod
 !------------------------------------------------------------------------------------------
 
   subroutine ComputRAutoB4Emergence(I,NB,NZ,TFN6_vr,DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,&
-    CNLFX,CPLFX,ShootStructN,WaterStress4Groth,WFNSG,CanopyNonstElm4Gros,CNPG,RCO2NonstC_brch,&
+    CNLFX,CPLFX,ShootStructN,WaterStress4Groth,CanTurgPSIFun4Expans,CanopyNonstElm4Gros,CNPG,RCO2NonstC_brch,&
     RCO2Maint_brch,RMxess_brch,NonstC4Groth_brch,RCO2NonstC4Nassim_brch)
   implicit none
   integer, intent(in) :: I,NB,NZ
   real(r8),intent(in) :: TFN6_vr(JZ1)
   real(r8), intent(in) :: DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX
   real(r8), intent(in) :: ShootStructN,WaterStress4Groth
-  real(r8), intent(in) :: WFNSG
+  real(r8), intent(in) :: CanTurgPSIFun4Expans
   real(r8), intent(out) :: CanopyNonstElm4Gros(NumPlantChemElms)
   real(r8), intent(out) :: RCO2NonstC_brch
   real(r8), INTENT(OUT) :: CNPG,RCO2Maint_brch,RMxess_brch
@@ -3267,13 +3269,13 @@ module PlantBranchMod
 !
 ! RCO2X_O2ulm,RCO2X=diff between C respn unltd,ltd by O2 and mntc respn
 ! RCO2YM,RCO2Y=growth respiration unltd,ltd by O2 and unlimited by N,P
-! WFNSG=expansion,extension function of canopy water potential
+! CanTurgPSIFun4Expans=expansion,extension function of canopy water potential
 ! SenesMaxByMaintDefcit,RMxess_brch=excess maintenance respiration unltd,ltd by O2
 !
   RCO2X_O2ulm=RCO2CM-RCO2Maint_brch
   RCO2X=RCO2NonstC_brch-RCO2Maint_brch
-  RCO2YM=AZMAX1(RCO2X_O2ulm)*WFNSG
-  RCO2Y=AZMAX1(RCO2X)*WFNSG
+  RCO2YM=AZMAX1(RCO2X_O2ulm)*CanTurgPSIFun4Expans
+  RCO2Y=AZMAX1(RCO2X)*CanTurgPSIFun4Expans
   SenesMaxByMaintDefcit=AZMAX1(-RCO2X_O2ulm)
   RMxess_brch=AZMAX1(-RCO2X)
 !
@@ -3385,7 +3387,7 @@ module PlantBranchMod
     FNOD                         =>   plt_allom%FNOD                   , &
     PlantPopulation_pft          =>   plt_site%PlantPopulation_pft       &
   )
-
+  
   IF(GrowthLeaf(ielmc).GT.0.0_r8)THEN
     MXNOD=KHiestGroLeafNode_brch(NB,NZ)
     MNNOD=MAX(MinNodeNum,MXNOD-NumCogrowNode(NZ)+1)
@@ -3620,7 +3622,7 @@ module PlantBranchMod
   integer  :: NBK,NE
 
   associate(                                                              &
-    fTgrowCanP                =>  plt_pheno%fTgrowCanP                  , &  
+    fTCanopyGroth_pft                =>  plt_pheno%fTCanopyGroth_pft                  , &  
     iPlantTurnoverPattern_pft =>  plt_pheno%iPlantTurnoverPattern_pft   , &    
     HoursDoingRemob_brch      =>  plt_pheno%HoursDoingRemob_brch        , &
     KHiestGroLeafNode_brch    =>  plt_pheno%KHiestGroLeafNode_brch      , &    
@@ -3643,11 +3645,11 @@ module PlantBranchMod
 !     WTRSVB=stalk reserve C mass
 !     RCO2V=remobilization of stalk reserve C
 !     VMXC=rate constant for nonstructural C oxidation in respiration
-!     fTgrowCanP=temperature function for canopy growth
+!     fTCanopyGroth_pft=temperature function for canopy growth
 !
   IF(BegRemoblize.EQ.ifalse)THEN
     IF(RMxess_brch.GT.0.0_r8 .AND. StalkRsrvElms_brch(ielmc,NB,NZ).GT.0.0_r8)THEN
-      RCO2V=AMIN1(RMxess_brch,VMXC*StalkRsrvElms_brch(ielmc,NB,NZ)*fTgrowCanP(NZ))
+      RCO2V=AMIN1(RMxess_brch,VMXC*StalkRsrvElms_brch(ielmc,NB,NZ)*fTCanopyGroth_pft(NZ))
       StalkRsrvElms_brch(ielmc,NB,NZ)=StalkRsrvElms_brch(ielmc,NB,NZ)-RCO2V
       RMxess_brch=RMxess_brch-RCO2V
     ENDIF
@@ -3789,14 +3791,14 @@ module PlantBranchMod
     RefLeafAppearRate_pft       => plt_pheno%RefLeafAppearRate_pft,       &
     KHiestGroLeafNode_brch      => plt_pheno%KHiestGroLeafNode_brch,      &
     LeafElmntRemobFlx_brch      => plt_pheno%LeafElmntRemobFlx_brch,      &
-    fTgrowCanP                  => plt_pheno%fTgrowCanP                    &
+    fTCanopyGroth_pft                  => plt_pheno%fTCanopyGroth_pft                    &
   )    
   
   IF(doSenescence_brch(NB,NZ).EQ.itrue)THEN
     KMinGroingLeafNodeNum=MAX(0,KHiestGroLeafNode_brch(NB,NZ)-MaxNodesPerBranch1+1)
     IF(KMinGroingLeafNodeNum.GT.0)THEN
       K=pMOD(KMinGroingLeafNodeNum,MaxNodesPerBranch1)               
-      FSNC=fTgrowCanP(NZ)*RefLeafAppearRate_pft(NZ)
+      FSNC=fTCanopyGroth_pft(NZ)*RefLeafAppearRate_pft(NZ)
 !
       !   REMOBILIZATION OF LEAF C,N,P ALSO DEPENDS ON STRUCTURAL C:N:P
       !

@@ -688,7 +688,7 @@ module StartqMod
   TKC(NZ,NY,NX)=units%Celcius2Kelvin(TCelciusCanopy_pft(NZ,NY,NX))
   TCG(NZ,NY,NX)=TCelciusCanopy_pft(NZ,NY,NX)
   TKG(NZ,NY,NX)=units%Celcius2Kelvin(TCG(NZ,NY,NX))
-  fTgrowCanP(NZ,NY,NX)=1.0_r8
+  fTCanopyGroth_pft(NZ,NY,NX)=1.0_r8
   PSICanopy_pft(NZ,NY,NX)=-1.0E-03_r8
   PSICanopyOsmo_pft(NZ,NY,NX)=OSMO(NZ,NY,NX)+PSICanopy_pft(NZ,NY,NX)
   PSICanopyTurg_pft(NZ,NY,NX)=AZMAX1(PSICanopy_pft(NZ,NY,NX)-PSICanopyOsmo_pft(NZ,NY,NX))

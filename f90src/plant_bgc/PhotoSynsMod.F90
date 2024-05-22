@@ -15,11 +15,12 @@ implicit none
 
 !------------------------------------------------------------------------------------------
 
-  subroutine ComputeGPP_C3(K,NB,NZ,WFNG,Stomata_Stress,CH2O3K,CH2OClmK,CH2OLlmK)
+  subroutine ComputeGPP_C3(I,J,K,NB,NZ,PsiCan4Photosyns,Stomata_Stress,CH2O3K,CH2OClmK,CH2OLlmK)
 
   implicit none
-  integer, intent(in) :: K,NB,NZ
-  real(r8), intent(in) :: WFNG,Stomata_Stress
+  integer, intent(in) :: I,J,K,NB,NZ
+  real(r8), intent(in) :: PsiCan4Photosyns
+  real(r8), intent(in) :: Stomata_Stress
   real(r8), intent(out) :: CH2O3K,CH2OClmK,CH2OLlmK
   integer :: L,NN,M,N,LP
   real(r8) :: WFNB
@@ -61,7 +62,7 @@ implicit none
   TAU_RadThru                   => plt_rad%TAU_RadThru                     , &
   TAU_DirRadTransm              => plt_rad%TAU_DirRadTransm                  &
   )
-
+    
   CH2O3K=0._r8
 ! FOR EACH CANOPY LAYER
   CH2OClmK=0._r8
@@ -78,7 +79,7 @@ implicit none
 !
 !         LeafAUnshaded_zsec=unself-shaded leaf surface area
 !
-          IF(LeafAUnshaded_zsec(N,L,K,NB,NZ).GT.ZEROP(NZ))THEN
+          IF(LeafAUnshaded_zsec(N,L,K,NB,NZ).GT.ZEROP(NZ))THEN            
             DO LP=1,2
               if (LP==1)then
                 PAR_zsec=RadPAR_zsec(N,M,L,NZ)
@@ -137,7 +138,7 @@ implicit none
                   IF(.not.is_root_shallow(iPlantRootProfile_pft(NZ)))THEN
                     WFNB=SQRT(RS/RSL)
                   ELSE
-                    WFNB=WFNG
+                    WFNB=PsiCan4Photosyns
                   ENDIF
 !
 !               CONVERGENCE SOLUTION FOR LeafIntracellularCO2_pftAT WHICH CARBOXYLATION
@@ -204,10 +205,10 @@ implicit none
 
 !------------------------------------------------------------------------------------------
 
-  subroutine ComputeGPP_C4(K,NB,NZ,WFNG,Stomata_Stress,CH2O3K,CH2O4K)
+  subroutine ComputeGPP_C4(I,J,K,NB,NZ,PsiCan4Photosyns,Stomata_Stress,CH2O3K,CH2O4K)
   implicit none
-  integer, intent(in) :: K,NB,NZ
-  real(r8), intent(in):: WFNG,Stomata_Stress
+  integer, intent(in) :: I,J,K,NB,NZ
+  real(r8), intent(in):: PsiCan4Photosyns,Stomata_Stress
   real(r8), intent(out) :: CH2O3K,CH2O4K
   integer :: L,NN,M,N,LP
   real(r8) :: WFN4
@@ -324,8 +325,8 @@ implicit none
                     WFN4=RS/RSL
                     WFNB=SQRT(RS/RSL)
                   ELSE
-                    WFN4=WFNG
-                    WFNB=WFNG
+                    WFN4=PsiCan4Photosyns
+                    WFNB=PsiCan4Photosyns
                   ENDIF
 !
 !               CONVERGENCE SOLUTION FOR LeafIntracellularCO2_pftAT WHICH CARBOXYLATION
@@ -413,10 +414,10 @@ implicit none
 
 !------------------------------------------------------------------------------------------
 
-  subroutine ComputeGPP(NB,NZ,WFNG,Stomata_Stress,CH2O3,CH2O4,CH2O,CO2F,CH2OClm,CH2OLlm)
+  subroutine ComputeGPP(I,J,NB,NZ,PsiCan4Photosyns,Stomata_Stress,CH2O3,CH2O4,CH2O,CO2F,CH2OClm,CH2OLlm)
   implicit none
-  integer, intent(in) :: NB,NZ
-  real(r8), intent(in) :: WFNG
+  integer, intent(in) :: I,J,NB,NZ
+  real(r8), intent(in) :: PsiCan4Photosyns
   real(r8), intent(in) :: Stomata_Stress    !between 0. and 1., a function of canopy turgor
   real(r8), intent(out) :: CH2O3(MaxNodesPerBranch1),CH2O4(MaxNodesPerBranch1)
   real(r8), intent(out) :: CO2F,CH2O   !CO2 fixation
@@ -462,7 +463,7 @@ implicit none
 !
             IF(iPlantPhotosynthesisType(NZ).EQ.ic4_photo.AND.Vmax4PEPCarboxy_pft(K,NB,NZ).GT.0.0_r8)THEN
 !
-              CALL ComputeGPP_C4(K,NB,NZ,WFNG,Stomata_Stress,CH2O3(K),CH2O4(K))
+              CALL ComputeGPP_C4(I,J,K,NB,NZ,PsiCan4Photosyns,Stomata_Stress,CH2O3(K),CH2O4(K))
               CO2F=CO2F+CH2O4(K)
               CH2O=CH2O+CH2O3(K)
               
@@ -470,7 +471,7 @@ implicit none
 !               C3 PHOTOSYNTHESIS
 !
             ELSEIF(iPlantPhotosynthesisType(NZ).EQ.ic3_photo.AND.Vmax4RubiscoCarboxy_pft(K,NB,NZ).GT.0.0_r8)THEN
-              call ComputeGPP_C3(K,NB,NZ,WFNG,Stomata_Stress,CH2O3(K),CH2OClmK,CH2OLlmK)
+              call ComputeGPP_C3(I,J,K,NB,NZ,PsiCan4Photosyns,Stomata_Stress,CH2O3(K),CH2OClmK,CH2OLlmK)
               CO2F=CO2F+CH2O3(K)
               CH2O=CH2O+CH2O3(K)
               CH2OClm=CH2OClm+CH2OClmK
