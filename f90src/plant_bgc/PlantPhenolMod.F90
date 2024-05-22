@@ -7,7 +7,7 @@ module PlantPhenolMod
   use EcosimConst
   use PlantAPIData
   use minimathmod, only : AZMAX1
-  use StartqsMod, only : StartPlants
+  use InitPlantMod, only : StartPlants
   use PlantMathFuncMod
   use EcoSIMCtrlMod, only : etimer
   implicit none
@@ -258,7 +258,7 @@ module PlantPhenolMod
     PlantPopulation_pft             =>   plt_site%PlantPopulation_pft          , &
     Hours4Leafout_brch              =>   plt_pheno%Hours4Leafout_brch          , &
     PSIRootTurg_vr                  =>   plt_ew%PSIRootTurg_vr                 , &
-    FNOD                            =>   plt_allom%FNOD                        , &
+    FracGroth2Node_pft                            =>   plt_allom%FracGroth2Node_pft                        , &
     NumRootAxes_pft                 =>   plt_morph%NumRootAxes_pft             , &
     MainBranchNum_pft               =>   plt_morph%MainBranchNum_pft           , &
     NumOfBranches_pft               =>   plt_morph%NumOfBranches_pft           , &
@@ -283,7 +283,7 @@ module PlantPhenolMod
 ! PB=nonstructural C concentration needed for branching
 ! iPlantBranchState_brch=branch life flag:0=living,1=dead
 ! PSTG=node number
-! FNOD=scales node number for perennial vegetation (e.g. trees)
+! FracGroth2Node_pft=scales node number for perennial vegetation (e.g. trees)
 ! NumCogrowNode=number of concurrently growing nodes
 ! ShootNodeNumAtPlanting_pft,GROUP=node number at planting,floral initiation
 ! IBTYP: setup for phenologically-driven above-ground turnover
@@ -303,7 +303,7 @@ module PlantPhenolMod
             D120: DO NB=1,MaxNumBranches
               IF(iPlantBranchState_brch(NB,NZ).EQ.iDead)THEN
                 IF(NB.EQ.MainBranchNum_pft(NZ) .OR. ShootNodeNum_brch(MainBranchNum_pft(NZ),NZ) &
-                  .GT.BranchNumber_pft(NZ)+NumCogrowNode(NZ)/FNOD(NZ)+ShootNodeNumAtPlanting_pft(NZ))THEN
+                  .GT.BranchNumber_pft(NZ)+NumCogrowNode(NZ)/FracGroth2Node_pft(NZ)+ShootNodeNumAtPlanting_pft(NZ))THEN
                   !initiate a new branch
                   BranchNumber_pft(NZ)=BranchNumber_pft(NZ)+1
                   NumOfBranches_pft(NZ)=MIN(BranchNumMax(iPlantTurnoverPattern_pft(NZ)),MAX(NB,NumOfBranches_pft(NZ)))
@@ -328,7 +328,7 @@ module PlantPhenolMod
 !     CONCENTRATION PERMIT
 !
 !     PR=nonstructural C concentration needed for root branching
-!     FNOD: parameter for allocation of growth to nodes
+!     FracGroth2Node_pft: parameter for allocation of growth to nodes
 !     XLI: number of nodes in seed
 !     PSTG: node number
 !     MainBranchNum_pft: number of main branch
@@ -338,7 +338,7 @@ module PlantPhenolMod
 !     root axis initialization
       IF(PSIRootTurg_vr(ipltroot,NGTopRootLayer_pft(NZ),NZ).GT.PSIMin4LeafExpansion)THEN
         IF(NumRootAxes_pft(NZ).EQ.0 .OR. ShootNodeNum_brch(MainBranchNum_pft(NZ),NZ) &
-          .GT.NumRootAxes_pft(NZ)/FNOD(NZ)+ShootNodeNumAtPlanting_pft(NZ))THEN
+          .GT.NumRootAxes_pft(NZ)/FracGroth2Node_pft(NZ)+ShootNodeNumAtPlanting_pft(NZ))THEN
           IF((NumRootAxes_pft(NZ).EQ.0 .AND. SeasonalNonstElms_pft(ielmc,NZ).GT.0.0_r8) &
             .OR.(CanopyNonstElmConc_pft(ielmc,NZ).GT.MinNonstC2InitRoot_pft(NZ) & 
             .AND.MinNonstC2InitRoot_pft(NZ).GT.0.0_r8))THEN

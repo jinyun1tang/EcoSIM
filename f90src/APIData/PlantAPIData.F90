@@ -248,7 +248,7 @@ implicit none
   real(r8), pointer :: LeafAreaNode_brch(:,:,:)    => null() !leaf area, [m2 d-2]
   real(r8), pointer :: CanopySeedNum_pft(:)         => null() !canopy grain number, [d-2]
   real(r8), pointer :: SeedDepth_pft(:)        => null() !seeding depth, [m]
-  real(r8), pointer :: PlantinDepth(:)       => null() !planting depth, [m]
+  real(r8), pointer :: PlantinDepz_pft(:)       => null() !planting depth, [m]
   real(r8), pointer :: SeedMeanLen_pft(:)         => null() !seed length, [m]
   real(r8), pointer :: SeedVolumeMean_pft(:)         => null() !seed volume, [m3 ]
   real(r8), pointer :: SeedAreaMean_pft(:)         => null() !seed surface area, [m2]
@@ -442,7 +442,7 @@ implicit none
   real(r8), pointer :: rPCStalk_pft(:)    => null()  !stalk P:C ratio, [g g-1]
   real(r8), pointer :: CNLF(:)     => null()  !maximum leaf N:C ratio, [g g-1]
   real(r8), pointer :: GrainSeedBiomCMean_brch(:,:)  => null()  !maximum grain C during grain fill, [g d-2]
-  real(r8), pointer :: FNOD(:)     => null()  !parameter for allocation of growth to nodes, [-]
+  real(r8), pointer :: FracGroth2Node_pft(:)     => null()  !parameter for allocation of growth to nodes, [-]
   real(r8), pointer ::RootFracRemobilizableBiom(:)    => null()  !fraction of remobilizable nonstructural biomass in root, [-]
 
   contains
@@ -569,7 +569,7 @@ implicit none
   real(r8), pointer :: ENGYX(:)  => null()    !canopy heat storage from previous time step, [MJ d-2]
   real(r8), pointer :: TKC(:)    => null()    !canopy temperature, [K]
   real(r8), pointer :: PSICanopyOsmo_pft(:)  => null()    !canopy osmotic water potential, [Mpa]
-  real(r8), pointer :: OSMO(:)   => null()    !canopy osmotic potential when canopy water potential = 0 MPa, [MPa]
+  real(r8), pointer :: CanOsmoPsi0pt_pft(:)   => null()    !canopy osmotic potential when canopy water potential = 0 MPa, [MPa]
   real(r8), pointer :: HeatXAir2PCan(:)  => null()    !canopy sensible heat flux, [MJ d-2 h-1]
   real(r8), pointer :: TKCanopy_pft(:)   => null()    !canopy temperature, [K]
   real(r8), pointer :: PSIRoot_pvr(:,:,:) => null() !root total water potential , [Mpa]
@@ -599,9 +599,9 @@ implicit none
   integer,  pointer :: IDAYY(:)    => null()  !alternate day of harvest, [-]
   real(r8), pointer :: FERT(:)     => null()  !fertilizer application, [g m-2]
   integer,  pointer :: iYearPlanting_pft(:)     => null()  !year of planting
-  integer,  pointer :: IDAYX(:)    => null()  !alternate day of planting
-  integer,  pointer :: IYRX(:)     => null()  !alternate year of planting
-  integer,  pointer :: IYRY(:)     => null()  !alternate year of harvest
+  integer,  pointer :: iPlantingDay_pft(:)    => null()  !alternate day of planting
+  integer,  pointer :: iPlantingYear_pft(:)     => null()  !alternate year of planting
+  integer,  pointer :: iHarvestYear_pft(:)     => null()  !alternate year of harvest
   integer,  pointer :: iDayPlanting_pft(:)    => null()  !day of planting
   integer,  pointer :: iDayPlantHarvest_pft(:)    => null()  !day of harvest
   integer,  pointer :: iYearPlantHarvest_pft(:)     => null()  !year of harvest
@@ -1045,9 +1045,9 @@ implicit none
   allocate(this%iYearPlantHarvest_pft(JP1));this%iYearPlantHarvest_pft=0
   allocate(this%FERT(1:20));this%FERT=spval
   allocate(this%iYearPlanting_pft(JP1));this%iYearPlanting_pft=0
-  allocate(this%IDAYX(JP1));this%IDAYX=0
-  allocate(this%IYRX(JP1));this%IYRX=0
-  allocate(this%IYRY(JP1));this%IYRY=0
+  allocate(this%iPlantingDay_pft(JP1));this%iPlantingDay_pft=0
+  allocate(this%iPlantingYear_pft(JP1));this%iPlantingYear_pft=0
+  allocate(this%iHarvestYear_pft(JP1));this%iHarvestYear_pft=0
   allocate(this%iDayPlanting_pft(JP1));this%iDayPlanting_pft=0
   allocate(this%iDayPlantHarvest_pft(JP1));this%iDayPlantHarvest_pft=0
   allocate(this%iHarvstType_pft(JP1));this%iHarvstType_pft=0
@@ -1076,11 +1076,11 @@ implicit none
 !  if(allocated(iYearPlantHarvest_pft))deallocate(iYearPlantHarvest_pft)
 !  if(allocated(iDayPlanting_pft))deallocate(iDayPlanting_pft)
 !  if(allocated(iDayPlantHarvest_pft))deallocate(iDayPlantHarvest_pft)
-!  if(allocated(IYRY))deallocate(IYRY)
-!  if(allocated(IDAYX))deallocate(IDAYX)
+!  if(allocated(iHarvestYear_pft))deallocate(iHarvestYear_pft)
+!  if(allocated(iPlantingDay_pft))deallocate(iPlantingDay_pft)
 !  if(allocated(iYearPlanting_pft))deallocate(iYearPlanting_pft)
 !  if(allocated(FERT))deallocate(FERT)
-!  if(allocated(IYRX))deallocate(IYRX)
+!  if(allocated(iPlantingYear_pft))deallocate(iPlantingYear_pft)
 !  if(allocated(iHarvstType_pft))deallocate(iHarvstType_pft)
 !  if(allocated(jHarvst_pft))deallocate(jHarvst_pft)
 
@@ -1113,7 +1113,7 @@ implicit none
   allocate(this%Transpiration_pft(JP1));this%Transpiration_pft=spval
   allocate(this%PSICanopyOsmo_pft(JP1));this%PSICanopyOsmo_pft=spval
   allocate(this%TKS(0:JZ1));this%TKS=spval
-  allocate(this%OSMO(JP1));this%OSMO=spval
+  allocate(this%CanOsmoPsi0pt_pft(JP1));this%CanOsmoPsi0pt_pft=spval
   allocate(this%RAZ(JP1));this%RAZ=spval
   allocate(this%DeltaTKC(JP1));this%DeltaTKC=spval
   allocate(this%TKC(JP1));this%TKC=spval
@@ -1152,7 +1152,7 @@ implicit none
 !  if(allocated(TKS))deallocate(TKS)
 !  if(allocated(PSICanPDailyMin))deallocate(PSICanPDailyMin)
 !  if(allocated(RAZ))deallocate(RAZ)
-!  if(allocated(OSMO))deallocate(OSMO)
+!  if(allocated(CanOsmoPsi0pt_pft))deallocate(CanOsmoPsi0pt_pft)
 !  if(allocated(DeltaTKC))deallocate(DeltaTKC)
 !  if(allocated(TKC))deallocate(TKC)
 !  if(allocated(ENGYX))deallocate(ENGYX)
@@ -1168,7 +1168,7 @@ implicit none
 
 
   allocate(this%RootFracRemobilizableBiom(JP1));this%RootFracRemobilizableBiom=spval
-  allocate(this%FNOD(JP1));this%FNOD=spval
+  allocate(this%FracGroth2Node_pft(JP1));this%FracGroth2Node_pft=spval
   allocate(this%GrainSeedBiomCMean_brch(MaxNumBranches,JP1));this%GrainSeedBiomCMean_brch=spval
   allocate(this%NoduGrowthYield_pft(JP1));this%NoduGrowthYield_pft=spval
   allocate(this%RootBiomGrosYld_pft(JP1));this%RootBiomGrosYld_pft=spval
@@ -1216,7 +1216,7 @@ implicit none
 
   class(plant_allometry_type) :: this
 
-!  if(allocated(FNOD))deallocate(FNOD)
+!  if(allocated(FracGroth2Node_pft))deallocate(FracGroth2Node_pft)
 !  if(allocated(GrainSeedBiomCMean_brch))deallocate(GrainSeedBiomCMean_brch)
 !  if(allocated(NoduGrowthYield_pft))deallocate(NoduGrowthYield_pft)
 !  if(allocated(RootBiomGrosYld_pft))deallocate(RootBiomGrosYld_pft)
@@ -1860,7 +1860,7 @@ implicit none
   allocate(this%LeafAreaNode_brch(0:MaxNodesPerBranch1,MaxNumBranches,JP1));this%LeafAreaNode_brch=spval
   allocate(this%CanopySeedNum_pft(JP1));this%CanopySeedNum_pft=spval
   allocate(this%SeedDepth_pft(JP1));this%SeedDepth_pft=spval
-  allocate(this%PlantinDepth(JP1));this%PlantinDepth=spval
+  allocate(this%PlantinDepz_pft(JP1));this%PlantinDepz_pft=spval
   allocate(this%SeedMeanLen_pft(JP1));this%SeedMeanLen_pft=spval
   allocate(this%SeedVolumeMean_pft(JP1));this%SeedVolumeMean_pft=spval
   allocate(this%SeedAreaMean_pft(JP1));this%SeedAreaMean_pft=spval

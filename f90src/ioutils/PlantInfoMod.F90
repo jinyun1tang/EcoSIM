@@ -133,16 +133,16 @@ implicit none
             jHarvst_pft(NZ,M,NY,NX)=0
             HVST(NZ,M,NY,NX)=1.0E+06_r8
             THIN_pft(NZ,M,NY,NX)=-1.0_r8
-            FracBiomRMbyHVST(1,iplthvst_leaf,NZ,M,NY,NX)=1.0_r8
-            FracBiomRMbyHVST(1,iplthvst_finenonleaf,NZ,M,NY,NX)=1.0_r8
-            FracBiomRMbyHVST(1,iplthvst_woody,NZ,M,NY,NX)=1.0_r8
-            FracBiomRMbyHVST(1,iplthvst_stdead,NZ,M,NY,NX)=1.0_r8
-            FracBiomRMbyHVST(2,iplthvst_leaf,NZ,M,NY,NX)=1.0_r8
-            FracBiomRMbyHVST(2,iplthvst_finenonleaf,NZ,M,NY,NX)=1.0_r8
-            FracBiomRMbyHVST(2,iplthvst_woody,NZ,M,NY,NX)=1.0_r8
-            FracBiomRMbyHVST(2,iplthvst_stdead,NZ,M,NY,NX)=1.0_r8
+            FracBiomRMbyHVST(1,iplthvst_leaf,NZ,M,NY,NX)        = 1.0_r8
+            FracBiomRMbyHVST(1,iplthvst_finenonleaf,NZ,M,NY,NX) = 1.0_r8
+            FracBiomRMbyHVST(1,iplthvst_woody,NZ,M,NY,NX)       = 1.0_r8
+            FracBiomRMbyHVST(1,iplthvst_stdead,NZ,M,NY,NX)      = 1.0_r8
+            FracBiomRMbyHVST(2,iplthvst_leaf,NZ,M,NY,NX)        = 1.0_r8
+            FracBiomRMbyHVST(2,iplthvst_finenonleaf,NZ,M,NY,NX) = 1.0_r8
+            FracBiomRMbyHVST(2,iplthvst_woody,NZ,M,NY,NX)       = 1.0_r8
+            FracBiomRMbyHVST(2,iplthvst_stdead,NZ,M,NY,NX)      = 1.0_r8
           ENDDO
-          PlantinDepth(NZ,NY,NX)=ppmc
+          PlantinDepz_pft(NZ,NY,NX)=ppmc
         ENDDO
       ENDDO
     ENDDO
@@ -211,7 +211,7 @@ implicit none
           DO NZ=1,MIN(NS,NP(NY,NX))
             tstr=trim(pft_pltinfo(NZ))
             read(tstr,'(I2,I2,I4)')IDX,IMO,IYR
-            read(tstr,*)DY,PPI(NZ,NY,NX),PlantinDepth(NZ,NY,NX)
+            read(tstr,*)DY,PPI(NZ,NY,NX),PlantinDepz_pft(NZ,NY,NX)
 
             LPY=0
             if(isLeap(iyr) .and. IMO.GT.2)LPY=1
@@ -225,8 +225,8 @@ implicit none
               iDayPlanting_pft(NZ,NY,NX)=IDY
               IYR=yearc
               iYearPlanting_pft(NZ,NY,NX)=MIN(IYR,iYearCurrent)
-              IDAYX(NZ,NY,NX)=iDayPlanting_pft(NZ,NY,NX) !planting day
-              IYRX(NZ,NY,NX)=iYearPlanting_pft(NZ,NY,NX)   !planting year
+              iPlantingDay_pft(NZ,NY,NX)=iDayPlanting_pft(NZ,NY,NX) !planting day
+              iPlantingYear_pft(NZ,NY,NX)=iYearPlanting_pft(NZ,NY,NX)   !planting year
               PPZ(NZ,NY,NX)=PPI(NZ,NY,NX)     !population density
             ENDIF
 
@@ -302,7 +302,7 @@ implicit none
     DO NY=NVN,NVS
       DO NZ=1,NP(NY,NX)
         IDAYY(NZ,NY,NX)=iDayPlantHarvest_pft(NZ,NY,NX)
-        IYRY(NZ,NY,NX)=iYearPlantHarvest_pft(NZ,NY,NX)
+        iHarvestYear_pft(NZ,NY,NX)=iYearPlantHarvest_pft(NZ,NY,NX)
       ENDDO
     ENDDO
   ENDDO
@@ -330,26 +330,25 @@ implicit none
 !
 !   LeafSWabsorpty_pft,LeafPARabsorpty_pft=leaf SW,PAR absorbtivity
 !
-    VmaxRubCarboxyRef_pft(NZ,NY,NX)=2.5_r8*VmaxRubCarboxyRef_pft(NZ,NY,NX)
-    VmaxRubOxyRef_pft(NZ,NY,NX)=2.5_r8*VmaxRubOxyRef_pft(NZ,NY,NX)
-    VmaxPEPCarboxyRef_pft(NZ,NY,NX)=2.5_r8*VmaxPEPCarboxyRef_pft(NZ,NY,NX)
-    SpecChloryfilAct_pft(NZ,NY,NX)=2.5_r8*SpecChloryfilAct_pft(NZ,NY,NX)
-    LeafSWabsorpty_pft(NZ,NY,NX)=1.0_r8-RadSWLeafAlbedo_pft(NZ,NY,NX)-RadSWLeafTransmis_pft(NZ,NY,NX)
-    LeafPARabsorpty_pft(NZ,NY,NX)=1.0_r8-CanopyPARalbedo_pft(NZ,NY,NX)-RadPARLeafTransmis_pft(NZ,NY,NX)
-    RadSWLeafAlbedo_pft(NZ,NY,NX)=RadSWLeafAlbedo_pft(NZ,NY,NX)/LeafSWabsorpty_pft(NZ,NY,NX)
-    CanopyPARalbedo_pft(NZ,NY,NX)=CanopyPARalbedo_pft(NZ,NY,NX)/LeafPARabsorpty_pft(NZ,NY,NX)
-    RadSWLeafTransmis_pft(NZ,NY,NX)=RadSWLeafTransmis_pft(NZ,NY,NX)/LeafSWabsorpty_pft(NZ,NY,NX)
-    RadPARLeafTransmis_pft(NZ,NY,NX)=RadPARLeafTransmis_pft(NZ,NY,NX)/LeafPARabsorpty_pft(NZ,NY,NX)
-    SineBranchAngle_pft(NZ,NY,NX)=SIN(BranchAngle_pft(NZ,NY,NX)*RadianPerDegree)
-    SinePetioleAngle_pft(NZ,NY,NX)=SIN(PetioleAngle_pft(NZ,NY,NX)*RadianPerDegree)
-    MatureGroup_pft(NZ,NY,NX)=GROUPX(NZ,NY,NX)
+    VmaxRubCarboxyRef_pft(NZ,NY,NX)  = 2.5_r8*VmaxRubCarboxyRef_pft(NZ,NY,NX)
+    VmaxRubOxyRef_pft(NZ,NY,NX)      = 2.5_r8*VmaxRubOxyRef_pft(NZ,NY,NX)
+    VmaxPEPCarboxyRef_pft(NZ,NY,NX)  = 2.5_r8*VmaxPEPCarboxyRef_pft(NZ,NY,NX)
+    SpecChloryfilAct_pft(NZ,NY,NX)   = 2.5_r8*SpecChloryfilAct_pft(NZ,NY,NX)
+    LeafSWabsorpty_pft(NZ,NY,NX)     = 1.0_r8-RadSWLeafAlbedo_pft(NZ,NY,NX)-RadSWLeafTransmis_pft(NZ,NY,NX)
+    LeafPARabsorpty_pft(NZ,NY,NX)    = 1.0_r8-CanopyPARalbedo_pft(NZ,NY,NX)-RadPARLeafTransmis_pft(NZ,NY,NX)
+    RadSWLeafAlbedo_pft(NZ,NY,NX)    = RadSWLeafAlbedo_pft(NZ,NY,NX)/LeafSWabsorpty_pft(NZ,NY,NX)
+    CanopyPARalbedo_pft(NZ,NY,NX)    = CanopyPARalbedo_pft(NZ,NY,NX)/LeafPARabsorpty_pft(NZ,NY,NX)
+    RadSWLeafTransmis_pft(NZ,NY,NX)  = RadSWLeafTransmis_pft(NZ,NY,NX)/LeafSWabsorpty_pft(NZ,NY,NX)
+    RadPARLeafTransmis_pft(NZ,NY,NX) = RadPARLeafTransmis_pft(NZ,NY,NX)/LeafPARabsorpty_pft(NZ,NY,NX)
+    SineBranchAngle_pft(NZ,NY,NX)    = SIN(BranchAngle_pft(NZ,NY,NX)*RadianPerDegree)
+    SinePetioleAngle_pft(NZ,NY,NX)   = SIN(PetioleAngle_pft(NZ,NY,NX)*RadianPerDegree)
+    MatureGroup_pft(NZ,NY,NX)        = GROUPX(NZ,NY,NX)
 
     IF(iPlantTurnoverPattern_pft(NZ,NY,NX).NE.0)THEN
-!
-      RefNodeInitRate_pft(NZ,NY,NX)=RefNodeInitRate_pft(NZ,NY,NX)/MaxNodesPerBranch
-      RefLeafAppearRate_pft(NZ,NY,NX)=RefLeafAppearRate_pft(NZ,NY,NX)/MaxNodesPerBranch
-      MatureGroup_pft(NZ,NY,NX)=MatureGroup_pft(NZ,NY,NX)/MaxNodesPerBranch
-      ShootNodeNumAtPlanting_pft(NZ,NY,NX)=ShootNodeNumAtPlanting_pft(NZ,NY,NX)/MaxNodesPerBranch
+      RefNodeInitRate_pft(NZ,NY,NX)        = RefNodeInitRate_pft(NZ,NY,NX)/MaxNodesPerBranch
+      RefLeafAppearRate_pft(NZ,NY,NX)      = RefLeafAppearRate_pft(NZ,NY,NX)/MaxNodesPerBranch
+      MatureGroup_pft(NZ,NY,NX)            = MatureGroup_pft(NZ,NY,NX)/MaxNodesPerBranch
+      ShootNodeNumAtPlanting_pft(NZ,NY,NX) = ShootNodeNumAtPlanting_pft(NZ,NY,NX)/MaxNodesPerBranch
     ENDIF
     MatureGroup_pft(NZ,NY,NX)=MatureGroup_pft(NZ,NY,NX)-ShootNodeNumAtPlanting_pft(NZ,NY,NX)
     IF(CriticPhotoPeriod_pft(NZ,NY,NX).LT.0.0_r8)THEN
@@ -465,7 +464,7 @@ implicit none
   call ncd_getvar(pft_nfid, 'UPKMPO', loc,KmPO4Root_pft(ipltroot,NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'UPMNPO', loc,CMinPO4Root_pft(ipltroot,NZ,NY,NX))
 
-  call ncd_getvar(pft_nfid, 'OSMO', loc,OSMO(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'OSMO', loc,CanOsmoPsi0pt_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'RCS', loc,RCS(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'RSMX', loc,RSMX(NZ,NY,NX))
 
@@ -834,7 +833,7 @@ implicit none
   write(nu_plt,*)('-',j=1,100)  
   write(nu_plt,*)'WATER RELATIONS'
   call writefixl(nu_plt,'leaf osmotic potential at zero leaf water '// &
-     'potential (MPa) OSMO',OSMO(NZ,NY,NX),70)
+     'potential (MPa) OSMO',CanOsmoPsi0pt_pft(NZ,NY,NX),70)
   call writefixl(nu_plt,'shape parameter for stomatal resistance vs '// &
      'leaf turgor potential RCS',RCS(NZ,NY,NX),70)
   call writefixl(nu_plt,'cuticular resistance (s m-1) RSMX',RSMX(NZ,NY,NX),70)
@@ -1061,7 +1060,7 @@ implicit none
                 IF(KoppenClimZone(NY,NX).GT.0)THEN
                   WRITE(CLIMATE,'(I2)')KoppenClimZone(NY,NX)
                   !the type of pft is specified by genra+Koppen climate zone
-                  DATAX(NZ)=pft_gtype(NZ)(1:4)//CLIMATE
+                  DATAX_pft(NZ)=pft_gtype(NZ)(1:4)//CLIMATE
                 ENDIF
               ENDDO D4965
               if(first_pft)then
@@ -1081,7 +1080,7 @@ implicit none
               NP(NY,NX)=NS
     !DATAP(NZ,NY,NX) and DATAM(NZ,NY,NX) are to be read in readqmod.F90
               D100: DO NZ=1,NP(NY,NX)
-                DATAP(NZ,NY,NX)=DATAX(NZ)
+                DATAP(NZ,NY,NX)=DATAX_pft(NZ)
               ENDDO D100
 
               D101: DO NZ=NP(NY,NX)+1,JP
@@ -1135,7 +1134,7 @@ implicit none
     D7975: DO NX=NHW,NHE
       D7970: DO NY=NVN,NVS
         D7965: DO NZ=1,NS
-          DATAA(NZ,NY,NX)=DATAX(NZ)
+          DATAA(NZ,NY,NX)=DATAX_pft(NZ)
           DATAB(NZ,NY,NX)=DATAY(NZ)
         ENDDO D7965
       ENDDO D7970
@@ -1153,8 +1152,8 @@ implicit none
 ! the check point file has non-zero pft
           D200: DO NN=1,NPP(NY,NX)
             D205: DO NZ=1,NS
-              IF(DATAZ(NN,NY,NX).EQ.DATAX(NZ).AND.IsPlantActive_pft(NN,NY,NX).EQ.iActive)THEN
-                DATAP(NN,NY,NX)=DATAX(NZ)
+              IF(DATAZ(NN,NY,NX).EQ.DATAX_pft(NZ).AND.IsPlantActive_pft(NN,NY,NX).EQ.iActive)THEN
+                DATAP(NN,NY,NX)=DATAX_pft(NZ)
                 DATAM(NN,NY,NX)=DATAY(NZ)
                 DATAA(NZ,NY,NX)='NO'
                 DATAB(NZ,NY,NX)='NO'
@@ -1186,7 +1185,7 @@ implicit none
 
 ! assign using information from pft files
           D265: DO NZ=1,NS
-            DATAP(NZ,NY,NX)=DATAX(NZ)
+            DATAP(NZ,NY,NX)=DATAX_pft(NZ)
             DATAM(NZ,NY,NX)=DATAY(NZ)
           ENDDO D265
           D270: DO NZ=NS+1,JP
@@ -1215,7 +1214,7 @@ implicit none
     D6990: DO NY=NVN,NVS
       NP(NY,NX)=NS
       D300: DO NZ=1,NP(NY,NX)
-        DATAP(NZ,NY,NX)=DATAX(NZ)
+        DATAP(NZ,NY,NX)=DATAX_pft(NZ)
         DATAM(NZ,NY,NX)=DATAY(NZ)
       ENDDO D300
       D301: DO NZ=NP(NY,NX)+1,JP

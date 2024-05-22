@@ -394,7 +394,7 @@ subroutine soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
 
       call end_timer_loop()
 
-      call hist_ecosim%hist_update(bounds)
+      call hist_ecosim%hist_update(I,J,bounds)
 
       call hist_update_hbuf(bounds)
 

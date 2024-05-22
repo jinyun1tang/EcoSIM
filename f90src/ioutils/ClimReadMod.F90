@@ -21,9 +21,9 @@ implicit none
   CHARACTER(len=1) :: IVAR(20),VAR(50),TYP(50),CTYPE
   real(r8) :: DATK(50),OUT(50)
   real(r8) :: datav(40)
-  integer,save :: IYRD,IFLGY,IYRX
+  integer,save :: IYRD,IFLGY,iPlantingYear_pft
   integer :: IFLG3
-  DATA IYRD,IFLGY,IYRX/0,0,0/
+  DATA IYRD,IFLGY,iPlantingYear_pft/0,0,0/
 
   type, public :: atm_forc_type
     real(r8) :: Z0G
@@ -140,7 +140,7 @@ implicit none
     ENDIF
   ENDDO D190
 
-  IF(IFLGY.EQ.1.AND.IYRX.LT.iYearCurrent)then
+  IF(IFLGY.EQ.1.AND.iPlantingYear_pft.LT.iYearCurrent)then
     GO60=.true.
     return
   endif
@@ -362,7 +362,7 @@ implicit none
     IF(IVAR(K).EQ.'Y')THEN
       IFLGY=1
 ! compute the shifted/correced year
-      IYRX=IDAT(K)+(NTX-1)*NFX
+      iPlantingYear_pft=IDAT(K)+(NTX-1)*NFX
       IF(isLeap(IDAT(K)))then
         IYRD=366
       else
@@ -371,7 +371,7 @@ implicit none
     ENDIF
   ENDDO D160
 
-  IF(IFLGY.EQ.1.AND.IYRX.LT.iYearCurrent)THEN
+  IF(IFLGY.EQ.1.AND.iPlantingYear_pft.LT.iYearCurrent)THEN
 ! if the year read in is not equal to year required
     GO60=.TRUE.
     RETURN

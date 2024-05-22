@@ -138,11 +138,24 @@ implicit none
   read(4,*,END=1000)iyear
   DO while(.true.)
     read(4,'(A)',END=1000)clmfile
-    print*,'processing file ', trim(clmfile), iyear
-    TMPH=spval;SWRad_hrly=spval;WINDH=spval;RAINH=spval;DWPTH=spval
+    print*,'processing file ', trim(clmfile), iyear,isleap(iyear)
+    TMP_hrly=spval;SWRad_hrly=spval;WINDH=spval;RAINH=spval;DWPTH=spval
     call ReadClim(iyear,clmfile,NTX,NFX,L,I,IX,TTYPE,atmf)
     LYR=0
+    if(isleap(iyear))then
+    !correct wrong data 
+    DO JJ=1,24
+    if(any((/TMP_hrly(jj,366),windh(jj,366),dwpth(jj,366),rainh(jj,366),swrad_hrly(jj,366)/)>1.e20))then
+    TMP_hrly(jj,366)=TMP_hrly(jj,365)
+    windh(jj,366)=windh(jj,365)
+    dwpth(jj,366)=dwpth(jj,365)
+    rainh(jj,366)=rainh(jj,365)
+    swrad_hrly(jj,366)=swrad_hrly(jj,365)
+    endif
+    enddo    
+    endif
     if(isleap(iyear))LYR=1
+
     DO II=1,365+LYR
       DO JJ=1,24
         SWRad_hrly(JJ,II)=SWRad_hrly(JJ,II)*1.e6/3600._r8  !convert from MJ/m2 into W m^-2
@@ -151,7 +164,7 @@ implicit none
       enddo
     ENDDO
     k=k+1
-    call reshape1(TMPH,data); call ncd_putvar(ncf,'TMPH',k,data)
+    call reshape1(TMP_hrly,data); call ncd_putvar(ncf,'TMPH',k,data)
     call reshape1(WINDH,data); call ncd_putvar(ncf,'WINDH',k,data)
     call reshape1(DWPTH,data); call ncd_putvar(ncf,'DWPTH',k,data)
     call reshape1(RAINH,data); call ncd_putvar(ncf,'RAINH',k,data)

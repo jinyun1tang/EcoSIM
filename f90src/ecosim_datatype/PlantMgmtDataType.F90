@@ -18,9 +18,9 @@ module PlantMgmtDataType
   integer ,target,allocatable ::  iDayPlanting_pft(:,:,:)                        !day of planting, [-]
   integer ,target,allocatable ::  iDayPlantHarvest_pft(:,:,:)                        !day of harvest, [-]
   integer ,target,allocatable ::  iPlantState_pft(:,:,:)                         !flag for species death, [-]
-  integer ,target,allocatable ::  IYRX(:,:,:)                         !alternate year of planting, [-]
-  integer ,target,allocatable ::  IDAYX(:,:,:)                        !alternate day of planting, [-]
-  integer ,target,allocatable ::  IYRY(:,:,:)                         !alternate year of harvest, [-]
+  integer ,target,allocatable ::  iPlantingYear_pft(:,:,:)                         !alternate year of planting, [-]
+  integer ,target,allocatable ::  iPlantingDay_pft(:,:,:)                        !alternate day of planting, [-]
+  integer ,target,allocatable ::  iHarvestYear_pft(:,:,:)                         !alternate year of harvest, [-]
   integer ,target,allocatable ::  IDAYY(:,:,:)                        !alternate day of harvest, [-]
   real(r8),target,allocatable ::  CO2byFire_col(:,:)                         !total CO2 flux from fire, [g d-2]
   real(r8),target,allocatable ::  CH4byFire_col(:,:)                         !total CH4 flux from fire, [g d-2]
@@ -56,9 +56,9 @@ module PlantMgmtDataType
   allocate(iDayPlanting_pft(JP,JY,JX));    iDayPlanting_pft=0
   allocate(iDayPlantHarvest_pft(JP,JY,JX));    iDayPlantHarvest_pft=0
   allocate(iPlantState_pft(JP,JY,JX));     iPlantState_pft=0
-  allocate(IYRX(JP,JY,JX));     IYRX=0
-  allocate(IDAYX(JP,JY,JX));    IDAYX=0
-  allocate(IYRY(JP,JY,JX));     IYRY=0
+  allocate(iPlantingYear_pft(JP,JY,JX));     iPlantingYear_pft=0
+  allocate(iPlantingDay_pft(JP,JY,JX));    iPlantingDay_pft=0
+  allocate(iHarvestYear_pft(JP,JY,JX));     iHarvestYear_pft=0
   allocate(IDAYY(JP,JY,JX));    IDAYY=0
   allocate(CO2byFire_col(JY,JX));       CO2byFire_col=0._r8
   allocate(CH4byFire_col(JY,JX));       CH4byFire_col=0._r8
@@ -85,9 +85,9 @@ module PlantMgmtDataType
   call destroy(iDayPlanting_pft)
   call destroy(iDayPlantHarvest_pft)
   call destroy(iPlantState_pft)
-  call destroy(IYRX)
-  call destroy(IDAYX)
-  call destroy(IYRY)
+  call destroy(iPlantingYear_pft)
+  call destroy(iPlantingDay_pft)
+  call destroy(iHarvestYear_pft)
   call destroy(IDAYY)
   call destroy(CO2byFire_col)
   call destroy(CH4byFire_col)

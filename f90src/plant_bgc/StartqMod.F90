@@ -107,9 +107,9 @@ module StartqMod
   implicit none
   integer, intent(in) :: NZ, NY, NX
 
-  iYearPlanting_pft(NZ,NY,NX)=IYRX(NZ,NY,NX)   !planting year
-  iDayPlanting_pft(NZ,NY,NX)=IDAYX(NZ,NY,NX) !planting day
-  iYearPlantHarvest_pft(NZ,NY,NX)=IYRY(NZ,NY,NX)
+  iYearPlanting_pft(NZ,NY,NX)=iPlantingYear_pft(NZ,NY,NX)   !planting year
+  iDayPlanting_pft(NZ,NY,NX)=iPlantingDay_pft(NZ,NY,NX) !planting day
+  iYearPlantHarvest_pft(NZ,NY,NX)=iHarvestYear_pft(NZ,NY,NX)
   iDayPlantHarvest_pft(NZ,NY,NX)=IDAYY(NZ,NY,NX)
   PPI(NZ,NY,NX)=PPZ(NZ,NY,NX)
   PPX_pft(NZ,NY,NX)=PPI(NZ,NY,NX)
@@ -334,13 +334,13 @@ module StartqMod
 !
 !     CONCURRENT NODE GROWTH
 !
-!     FNOD=scales node number for perennial vegetation (e.g. trees)
+!     FracGroth2Node_pft=scales node number for perennial vegetation (e.g. trees)
 !     NumCogrowNode=number of concurrently growing nodes
 !
   IF(iPlantTurnoverPattern_pft(NZ,NY,NX).EQ.0 .OR. &
     (.not.is_plant_treelike(iPlantRootProfile_pft(NZ,NY,NX))))THEN
     ! deciduous or shallow root
-    FNOD(NZ,NY,NX)=1.0_r8
+    FracGroth2Node_pft(NZ,NY,NX)=1.0_r8
 !
     IF(MatureGroup_pft(NZ,NY,NX).LE.10)THEN
       NumCogrowNode(NZ,NY,NX)=3
@@ -350,7 +350,7 @@ module StartqMod
       NumCogrowNode(NZ,NY,NX)=5
     ENDIF
   ELSE
-    FNOD(NZ,NY,NX)=AMAX1(1.0_r8,0.04_r8/RefLeafAppearRate_pft(NZ,NY,NX))
+    FracGroth2Node_pft(NZ,NY,NX)=AMAX1(1.0_r8,0.04_r8/RefLeafAppearRate_pft(NZ,NY,NX))
     NumCogrowNode(NZ,NY,NX)=24
   ENDIF
   end associate
@@ -417,7 +417,7 @@ module StartqMod
 !     VmaxPO4Root_pft,KmPO4Root_pft,CMinPO4Root_pft=H2PO4 max uptake(g m-2 h-1),Km(uM),min concn (uM)
 !     RSRR,RSRA=radial,axial root resistivity (m2 MPa-1 h-1)
 !
-  SeedDepth_pft(NZ,NY,NX)=PlantinDepth(NZ,NY,NX)
+  SeedDepth_pft(NZ,NY,NX)=PlantinDepz_pft(NZ,NY,NX)
   D9795: DO L=NU(NY,NX),NL(NY,NX)
     IF(SeedDepth_pft(NZ,NY,NX).GE.CumSoilThickness(L-1,NY,NX) &
       .AND.SeedDepth_pft(NZ,NY,NX).LT.CumSoilThickness(L,NY,NX))THEN
@@ -690,7 +690,7 @@ module StartqMod
   TKG(NZ,NY,NX)=units%Celcius2Kelvin(TCG(NZ,NY,NX))
   fTCanopyGroth_pft(NZ,NY,NX)=1.0_r8
   PSICanopy_pft(NZ,NY,NX)=-1.0E-03_r8
-  PSICanopyOsmo_pft(NZ,NY,NX)=OSMO(NZ,NY,NX)+PSICanopy_pft(NZ,NY,NX)
+  PSICanopyOsmo_pft(NZ,NY,NX)=CanOsmoPsi0pt_pft(NZ,NY,NX)+PSICanopy_pft(NZ,NY,NX)
   PSICanopyTurg_pft(NZ,NY,NX)=AZMAX1(PSICanopy_pft(NZ,NY,NX)-PSICanopyOsmo_pft(NZ,NY,NX))
   Transpiration_pft(NZ,NY,NX)=0._r8
   FracRadPARbyCanopy_pft(NZ,NY,NX)=0._r8
@@ -722,7 +722,7 @@ module StartqMod
     D20: DO L=1,NL(NY,NX)
       AllPlantRootH2OUptake_vr(N,L,NZ,NY,NX)=0._r8
       PSIRoot_pvr(N,L,NZ,NY,NX)=-0.01_r8
-      PSIRootOSMO_vr(N,L,NZ,NY,NX)=OSMO(NZ,NY,NX)+PSIRoot_pvr(N,L,NZ,NY,NX)
+      PSIRootOSMO_vr(N,L,NZ,NY,NX)=CanOsmoPsi0pt_pft(NZ,NY,NX)+PSIRoot_pvr(N,L,NZ,NY,NX)
       PSIRootTurg_vr(N,L,NZ,NY,NX)=AZMAX1(PSIRoot_pvr(N,L,NZ,NY,NX)-PSIRootOSMO_vr(N,L,NZ,NY,NX))
       RootMycoNonstElms_rpvr(1:NumPlantChemElms,N,L,NZ,NY,NX)=0._r8
       RootNonstructElmConc_pvr(1:NumPlantChemElms,N,L,NZ,NY,NX)=0._r8

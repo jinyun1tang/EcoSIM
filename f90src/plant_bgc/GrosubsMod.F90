@@ -163,7 +163,7 @@ module grosubsMod
     GrossCO2Fix_pft                => plt_bgcr%GrossCO2Fix_pft             , &
     PlantExudChemElmCum_pft        => plt_rbgc%PlantExudChemElmCum_pft     , &
     CumSoilThickness               => plt_site%CumSoilThickness            , &
-    PlantinDepth                   => plt_morph%PlantinDepth               , &
+    PlantinDepz_pft                => plt_morph%PlantinDepz_pft            , &
     NumOfBranches_pft              => plt_morph%NumOfBranches_pft            &
   )
   D9975: DO NZ=1,NP0
@@ -175,7 +175,7 @@ module grosubsMod
         IF(doPlantLeafOut_brch(NB,NZ).EQ.iEnable.AND.Hours4Leafout_brch(NB,NZ).GE.HourReq4LeafOut_brch(NB,NZ))THEN
           iDayPlanting_pft(NZ)=I
           iYearPlanting_pft(NZ)=iYearCurrent
-          PlantinDepth(NZ)=0.005_r8+CumSoilThickness(0)
+          PlantinDepz_pft(NZ)=0.005_r8+CumSoilThickness(0)
           !mark plant as initialized
           doInitPlant_pft(NZ)=ifalse
         ENDIF

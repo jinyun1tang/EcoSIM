@@ -552,7 +552,7 @@ module UptakesMod
   associate(                                                                &
    RAZ                             => plt_ew%RAZ                          , &
    DeltaTKC                        => plt_ew%DeltaTKC                     , &
-   OSMO                            => plt_ew%OSMO                         , &
+   CanOsmoPsi0pt_pft               => plt_ew%CanOsmoPsi0pt_pft            , &
    PSICanopyOsmo_pft               => plt_ew%PSICanopyOsmo_pft            , &
    TKC                             => plt_ew%TKC                          , &
    TairK                           => plt_ew%TairK                        , &
@@ -602,7 +602,7 @@ module UptakesMod
       CCPOLT=CanopyNonstElmConc_pft(ielmc,NZ)+CanopyNonstElmConc_pft(ielmn,NZ)&
         +CanopyNonstElmConc_pft(ielmp,NZ)
 
-      CALL update_osmo_turg_pressure(PSICanopy_pft(NZ),CCPOLT,OSMO(NZ),TKC(NZ) &
+      CALL update_osmo_turg_pressure(PSICanopy_pft(NZ),CCPOLT,CanOsmoPsi0pt_pft(NZ),TKC(NZ) &
         ,PSICanopyOsmo_pft(NZ),PSICanopyTurg_pft(NZ),FDMP)
 
       Stomata_Stress=EXP(RCS(NZ)*PSICanopyTurg_pft(NZ))
@@ -615,7 +615,7 @@ module UptakesMod
         DO  L=NU,MaxSoiL4Root(NZ)
           PSIRoot_pvr(N,L,NZ)=ElvAdjstedtSoiPSIMPa(L)
           CCPOLT=sum(RootNonstructElmConc_pvr(1:NumPlantChemElms,N,L,NZ))
-          CALL update_osmo_turg_pressure(PSIRoot_pvr(N,L,NZ),CCPOLT,OSMO(NZ),TKS(L),&
+          CALL update_osmo_turg_pressure(PSIRoot_pvr(N,L,NZ),CCPOLT,CanOsmoPsi0pt_pft(NZ),TKS(L),&
             PSIRootOSMO_vr(N,L,NZ),PSIRootTurg_vr(N,L,NZ))
 
           AllPlantRootH2OUptake_vr(N,L,NZ)=0.0_r8
@@ -672,7 +672,7 @@ module UptakesMod
     NU                              => plt_site%NU                           , &
     AREA3                           => plt_site%AREA3                        , &
     PSICanopyOsmo_pft               => plt_ew%PSICanopyOsmo_pft              , &
-    OSMO                            => plt_ew%OSMO                           , &
+    CanOsmoPsi0pt_pft               => plt_ew%CanOsmoPsi0pt_pft              , &
     RAZ                             => plt_ew%RAZ                            , &
     VPA                             => plt_ew%VPA                            , &
     TKS                             => plt_ew%TKS                            , &
@@ -762,10 +762,10 @@ module UptakesMod
 !     CANOPY WATER AND OSMOTIC POTENTIALS
 !
 !     PSICanopy_pft=canopy total water potential
-!     OSMO=osmotic potential at PSICanopy_pft=0 from PFT file
+!     CanOsmoPsi0pt_pft=osmotic potential at PSICanopy_pft=0 from PFT file
 !     PSICanopyOsmo_pft,PSICanopyTurg_pft=canopy osmotic,turgor water potential
 !
-     call update_osmo_turg_pressure(PSICanopy_pft(NZ),CCPOLT,OSMO(NZ),TKC1 &
+     call update_osmo_turg_pressure(PSICanopy_pft(NZ),CCPOLT,CanOsmoPsi0pt_pft(NZ),TKC1 &
        ,PSICanopyOsmo_pft(NZ),PSICanopyTurg_pft(NZ),FDMP)
 !
 !     CANOPY STOMATAL RESISTANCE
@@ -1157,7 +1157,7 @@ module UptakesMod
 ! begin_execution
   associate(                                                                 &
     TCelciusCanopy_pft             =>  plt_ew%TCelciusCanopy_pft           , &
-    OSMO                           =>  plt_ew%OSMO                         , &
+    CanOsmoPsi0pt_pft              =>  plt_ew%CanOsmoPsi0pt_pft            , &
     TKSnow                         =>  plt_ew%TKSnow                       , &
     TKC                            =>  plt_ew%TKC                          , &
     TKS                            =>  plt_ew%TKS                          , &
@@ -1214,7 +1214,7 @@ module UptakesMod
   PSICanopy_pft(NZ)=ElvAdjstedtSoiPSIMPa(NGTopRootLayer_pft(NZ))  
   CCPOLT=sum(CanopyNonstElmConc_pft(1:NumPlantChemElms,NZ))
 
-  call update_osmo_turg_pressure(PSICanopy_pft(NZ),CCPOLT,OSMO(NZ),TKC(NZ)&
+  call update_osmo_turg_pressure(PSICanopy_pft(NZ),CCPOLT,CanOsmoPsi0pt_pft(NZ),TKC(NZ)&
     ,PSICanopyOsmo_pft(NZ),PSICanopyTurg_pft(NZ),FDMP)
 
   Stomata_Stress=EXP(RCS(NZ)*PSICanopyTurg_pft(NZ))
@@ -1229,7 +1229,7 @@ module UptakesMod
       PSIRoot_pvr(N,L,NZ)=ElvAdjstedtSoiPSIMPa(L)      
       CCPOLT=sum(RootNonstructElmConc_pvr(1:NumPlantChemElms,N,L,NZ))
 
-      call update_osmo_turg_pressure(PSIRoot_pvr(N,L,NZ),CCPOLT,OSMO(NZ),TKS(L),&
+      call update_osmo_turg_pressure(PSIRoot_pvr(N,L,NZ),CCPOLT,CanOsmoPsi0pt_pft(NZ),TKS(L),&
         PSIRootOSMO_vr(N,L,NZ),PSIRootTurg_vr(N,L,NZ))
 
       AllPlantRootH2OUptake_vr(N,L,NZ)=0.0_r8
@@ -1257,7 +1257,7 @@ module UptakesMod
   integer :: N,L
   associate(                                                       &
     NU                       => plt_site%NU,                       &
-    OSMO                     => plt_ew%OSMO,                       &
+    CanOsmoPsi0pt_pft        => plt_ew%CanOsmoPsi0pt_pft,          &
     TairK                    => plt_ew%TairK,                      &
     TKC                      => plt_ew%TKC,                        &
     TKS                      => plt_ew%TKS,                        &
@@ -1301,7 +1301,7 @@ module UptakesMod
   !     SoiH2OResist,SoiAddRootResist,RootResist=soil,soil+root,root radial+axial resistance
   !     PSIRootOSMO_vr,PSIRootTurg_vr=root osmotic,turgor water potential
   !     FDMR=dry matter content
-  !     OSMO=osmotic potential at PSIRoot_pvr=0 from PFT file
+  !     CanOsmoPsi0pt_pft=osmotic potential at PSIRoot_pvr=0 from PFT file
 !
   !
   D4505: DO N=1,MY(NZ)
@@ -1314,7 +1314,7 @@ module UptakesMod
       ENDIF           
       CCPOLT=sum(RootNonstructElmConc_pvr(1:NumPlantChemElms,N,L,NZ))
 
-      CALL update_osmo_turg_pressure(PSIRoot_pvr(N,L,NZ),CCPOLT,OSMO(NZ),TKS(L),&
+      CALL update_osmo_turg_pressure(PSIRoot_pvr(N,L,NZ),CCPOLT,CanOsmoPsi0pt_pft(NZ),TKS(L),&
         PSIRootOSMO_vr(N,L,NZ),PSIRootTurg_vr(N,L,NZ))
 
     ENDDO D4510
@@ -1343,7 +1343,7 @@ module UptakesMod
     TCG                 => plt_pheno%TCG,                 &
     TKG                 => plt_pheno%TKG,                 &
     iPlantCalendar_brch => plt_pheno%iPlantCalendar_brch, &
-    fTCanopyGroth_pft          => plt_pheno%fTCanopyGroth_pft,          &
+    fTCanopyGroth_pft   => plt_pheno%fTCanopyGroth_pft,   &
     MaxSoiL4Root        => plt_morph%MaxSoiL4Root,        &
     MainBranchNum_pft   => plt_morph%MainBranchNum_pft    &
   )

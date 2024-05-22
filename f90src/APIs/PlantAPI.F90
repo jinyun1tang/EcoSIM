@@ -195,7 +195,7 @@ implicit none
     EvapTransHeat_pft(NZ,NY,NX) =plt_ew%EvapTransHeat_pft(NZ)
     AirConc_pft(NZ,NY,NX)  =plt_photo%AirConc_pft(NZ)
     FracRadPARbyCanopy_pft(NZ,NY,NX) =plt_rad%FracRadPARbyCanopy_pft(NZ)
-    FNOD(NZ,NY,NX)  =plt_allom%FNOD(NZ)
+    FracGroth2Node_pft(NZ,NY,NX)  =plt_allom%FracGroth2Node_pft(NZ)
     CanopySeedNum_pft(NZ,NY,NX)  =plt_morph%CanopySeedNum_pft(NZ)
     HypoctoHeight_pft(NZ,NY,NX) =plt_morph%HypoctoHeight_pft(NZ)
     HighTempLimitSeed_pft(NZ,NY,NX)   =plt_pheno%HighTempLimitSeed_pft(NZ)
@@ -239,7 +239,7 @@ implicit none
     RAZ(NZ,NY,NX)   =plt_ew%RAZ(NZ)
     CanPStomaResistH2O_pft(NZ,NY,NX)    =plt_photo%CanPStomaResistH2O_pft(NZ)
     CanopyBndlResist_pft(NZ,NY,NX)    =plt_photo%CanopyBndlResist_pft(NZ)
-    PlantinDepth(NZ,NY,NX)=plt_morph%PlantinDepth(NZ)
+    PlantinDepz_pft(NZ,NY,NX)=plt_morph%PlantinDepz_pft(NZ)
     CO2Solubility_pft(NZ,NY,NX)  =plt_photo%CO2Solubility_pft(NZ)
     LeafO2Solubility_pft(NZ,NY,NX)   =plt_photo%LeafO2Solubility_pft(NZ)
     SeedTempSens_pft(NZ,NY,NX)  =plt_pheno%SeedTempSens_pft(NZ)
@@ -819,7 +819,7 @@ implicit none
     plt_pheno%MinNonstC2InitRoot_pft(NZ)=MinNonstC2InitRoot_pft(NZ,NY,NX)
     plt_pheno%ShutRutNonstructElmntConducts_pft(NZ)=ShutRutNonstructElmntConducts_pft(NZ,NY,NX)
     plt_morph%RootBranchFreq_pft(NZ)=RootBranchFreq_pft(NZ,NY,NX)
-    plt_ew%OSMO(NZ)=OSMO(NZ,NY,NX)
+    plt_ew%CanOsmoPsi0pt_pft(NZ)=CanOsmoPsi0pt_pft(NZ,NY,NX)
     plt_photo%RCS(NZ)=RCS(NZ,NY,NX)
     plt_photo%RSMX(NZ)=RSMX(NZ,NY,NX)
 
@@ -854,9 +854,9 @@ implicit none
 !plant properties end
 
     plt_morph%LeafStalkArea_pft(NZ)=LeafStalkArea_pft(NZ,NY,NX)
-    plt_distb%IYRX(NZ)=IYRX(NZ,NY,NX)
-    plt_distb%IDAYX(NZ)=IDAYX(NZ,NY,NX)
-    plt_distb%IYRY(NZ)=IYRY(NZ,NY,NX)
+    plt_distb%iPlantingYear_pft(NZ)=iPlantingYear_pft(NZ,NY,NX)
+    plt_distb%iPlantingDay_pft(NZ)=iPlantingDay_pft(NZ,NY,NX)
+    plt_distb%iHarvestYear_pft(NZ)=iHarvestYear_pft(NZ,NY,NX)
     plt_rad%RadPARbyCanopy_pft(NZ)=RadPARbyCanopy_pft(NZ,NY,NX)
     plt_rad%RadSWbyCanopy_pft(NZ)=RadSWbyCanopy_pft(NZ,NY,NX)
     plt_ew%PrecIntcptByCanopy_pft(NZ)=PrecIntcptByCanopy_pft(NZ,NY,NX)
@@ -1085,7 +1085,7 @@ implicit none
 
     plt_photo%DiffCO2Atmos2Intracel_pft(NZ)=DiffCO2Atmos2Intracel_pft(NZ,NY,NX)
     plt_photo%AirConc_pft(NZ)=AirConc_pft(NZ,NY,NX)
-    plt_allom%FNOD(NZ)=FNOD(NZ,NY,NX)
+    plt_allom%FracGroth2Node_pft(NZ)=FracGroth2Node_pft(NZ,NY,NX)
 
     plt_morph%HypoctoHeight_pft(NZ)=HypoctoHeight_pft(NZ,NY,NX)
     plt_rbgc%PlantRootSoilElmNetX_pft(1:NumPlantChemElms,NZ)=PlantRootSoilElmNetX_pft(1:NumPlantChemElms,NZ,NY,NX)
@@ -1110,7 +1110,7 @@ implicit none
     plt_ew%RAZ(NZ)=RAZ(NZ,NY,NX)
     plt_photo%CO2Solubility_pft(NZ)=CO2Solubility_pft(NZ,NY,NX)
     plt_morph%SeedDepth_pft(NZ)=SeedDepth_pft(NZ,NY,NX)
-    plt_morph%PlantinDepth(NZ)=PlantinDepth(NZ,NY,NX)
+    plt_morph%PlantinDepz_pft(NZ)=PlantinDepz_pft(NZ,NY,NX)
     plt_morph%SeedMeanLen_pft(NZ)=SeedMeanLen_pft(NZ,NY,NX)
     plt_morph%SeedVolumeMean_pft(NZ)=SeedVolumeMean_pft(NZ,NY,NX)
     plt_morph%SeedAreaMean_pft(NZ)=SeedAreaMean_pft(NZ,NY,NX)
