@@ -301,7 +301,7 @@ implicit none
   DO NX=NHW,NHE
     DO NY=NVN,NVS
       DO NZ=1,NP(NY,NX)
-        IDAYY(NZ,NY,NX)=iDayPlantHarvest_pft(NZ,NY,NX)
+        iHarvestDay_pft(NZ,NY,NX)=iDayPlantHarvest_pft(NZ,NY,NX)
         iHarvestYear_pft(NZ,NY,NX)=iYearPlantHarvest_pft(NZ,NY,NX)
       ENDDO
     ENDDO
@@ -466,7 +466,7 @@ implicit none
 
   call ncd_getvar(pft_nfid, 'OSMO', loc,CanOsmoPsi0pt_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'RCS', loc,RCS(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'RSMX', loc,RSMX(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'RSMX', loc,CuticleResist_pft(NZ,NY,NX))
 
   call ncd_getvar(pft_nfid, 'DMLF', loc,LeafBiomGrowthYield(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'DMSHE', loc,PetioleBiomGrowthYield(NZ,NY,NX))
@@ -836,7 +836,7 @@ implicit none
      'potential (MPa) OSMO',CanOsmoPsi0pt_pft(NZ,NY,NX),70)
   call writefixl(nu_plt,'shape parameter for stomatal resistance vs '// &
      'leaf turgor potential RCS',RCS(NZ,NY,NX),70)
-  call writefixl(nu_plt,'cuticular resistance (s m-1) RSMX',RSMX(NZ,NY,NX),70)
+  call writefixl(nu_plt,'H2O cuticular resistance (s m-1) RSMX',CuticleResist_pft(NZ,NY,NX),70)
   end subroutine plant_water_trait_disp
 
 !------------------------------------------------------------------------------------------

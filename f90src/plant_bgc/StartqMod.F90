@@ -46,7 +46,7 @@ module StartqMod
 !     iYearPlanting_pft,iDayPlanting_pft,iYearPlantHarvest_pft,iDayPlantHarvest_pft=year,day of planting,arvesting
 !     PPI,PPX=initial,current population (m-2)
 !     CF,ClumpFactorInit_pft=current,initial clumping factor
-!     MaxCanPStomaResistH2O_pft=cuticular resistance to water (h m-1)
+!     H2OCuticleResist_pft=cuticular resistance to water (h m-1)
 !     CO2CuticleResist_pft=cuticular resistance to CO2 (s m-1)
 !     CNWS,rCPNonstructRemob_pft=protein:N,protein:P ratios
 !    RootFracRemobilizableBiom=maximum root protein concentration (g g-1)
@@ -110,13 +110,13 @@ module StartqMod
   iYearPlanting_pft(NZ,NY,NX)=iPlantingYear_pft(NZ,NY,NX)   !planting year
   iDayPlanting_pft(NZ,NY,NX)=iPlantingDay_pft(NZ,NY,NX) !planting day
   iYearPlantHarvest_pft(NZ,NY,NX)=iHarvestYear_pft(NZ,NY,NX)
-  iDayPlantHarvest_pft(NZ,NY,NX)=IDAYY(NZ,NY,NX)
+  iDayPlantHarvest_pft(NZ,NY,NX)=iHarvestDay_pft(NZ,NY,NX)
   PPI(NZ,NY,NX)=PPZ(NZ,NY,NX)
   PPX_pft(NZ,NY,NX)=PPI(NZ,NY,NX)
   ClumpFactor_pft(NZ,NY,NX)=ClumpFactorInit_pft(NZ,NY,NX)       !clumping factor
   
-  MaxCanPStomaResistH2O_pft(NZ,NY,NX)=RSMX(NZ,NY,NX)/3600.0_r8
-  CO2CuticleResist_pft(NZ,NY,NX)=RSMX(NZ,NY,NX)*1.56_r8
+  H2OCuticleResist_pft(NZ,NY,NX)=CuticleResist_pft(NZ,NY,NX)/3600.0_r8
+  CO2CuticleResist_pft(NZ,NY,NX)=CuticleResist_pft(NZ,NY,NX)*1.56_r8
   rCNNonstructRemob_pft(NZ,NY,NX)=2.5_r8
   rCPNonstructRemob_pft(NZ,NY,NX)=25.0_r8
   RootFracRemobilizableBiom(NZ,NY,NX)=AMIN1(RootrNC_pft(NZ,NY,NX)*rCNNonstructRemob_pft(NZ,NY,NX)&
@@ -693,7 +693,7 @@ module StartqMod
   PSICanopyOsmo_pft(NZ,NY,NX)=CanOsmoPsi0pt_pft(NZ,NY,NX)+PSICanopy_pft(NZ,NY,NX)
   PSICanopyTurg_pft(NZ,NY,NX)=AZMAX1(PSICanopy_pft(NZ,NY,NX)-PSICanopyOsmo_pft(NZ,NY,NX))
   Transpiration_pft(NZ,NY,NX)=0._r8
-  FracRadPARbyCanopy_pft(NZ,NY,NX)=0._r8
+  FracPARRadbyCanopy_pft(NZ,NY,NX)=0._r8
   end subroutine InitPlantHeatandWater
 !------------------------------------------------------------------------------------------
 

@@ -194,7 +194,7 @@ implicit none
     VapXAir2Canopy_pft(NZ,NY,NX) =plt_ew%VapXAir2Canopy_pft(NZ)
     EvapTransHeat_pft(NZ,NY,NX) =plt_ew%EvapTransHeat_pft(NZ)
     AirConc_pft(NZ,NY,NX)  =plt_photo%AirConc_pft(NZ)
-    FracRadPARbyCanopy_pft(NZ,NY,NX) =plt_rad%FracRadPARbyCanopy_pft(NZ)
+    FracPARRadbyCanopy_pft(NZ,NY,NX) =plt_rad%FracPARRadbyCanopy_pft(NZ)
     FracGroth2Node_pft(NZ,NY,NX)  =plt_allom%FracGroth2Node_pft(NZ)
     CanopySeedNum_pft(NZ,NY,NX)  =plt_morph%CanopySeedNum_pft(NZ)
     HypoctoHeight_pft(NZ,NY,NX) =plt_morph%HypoctoHeight_pft(NZ)
@@ -232,7 +232,7 @@ implicit none
 
     RootGasLossDisturb_pft(idg_beg:idg_end-1,NZ,NY,NX) =plt_bgcr%RootGasLossDisturb_pft(idg_beg:idg_end-1,NZ)
     MinCanPStomaResistH2O_pft(NZ,NY,NX)  =plt_photo%MinCanPStomaResistH2O_pft(NZ)
-    MaxCanPStomaResistH2O_pft(NZ,NY,NX)  =plt_photo%MaxCanPStomaResistH2O_pft(NZ)
+    H2OCuticleResist_pft(NZ,NY,NX)  =plt_photo%H2OCuticleResist_pft(NZ)
     CO2CuticleResist_pft(NZ,NY,NX)  =plt_photo%CO2CuticleResist_pft(NZ)
     NH3Dep2Can_pft(NZ,NY,NX) =plt_bgcr%NH3Dep2Can_pft(NZ)
     RadNet2Canopy_pft(NZ,NY,NX)  =plt_rad%RadNet2Canopy_pft(NZ)
@@ -821,7 +821,7 @@ implicit none
     plt_morph%RootBranchFreq_pft(NZ)=RootBranchFreq_pft(NZ,NY,NX)
     plt_ew%CanOsmoPsi0pt_pft(NZ)=CanOsmoPsi0pt_pft(NZ,NY,NX)
     plt_photo%RCS(NZ)=RCS(NZ,NY,NX)
-    plt_photo%RSMX(NZ)=RSMX(NZ,NY,NX)
+    plt_photo%CuticleResist_pft(NZ)=CuticleResist_pft(NZ,NY,NX)
 
     plt_allom%LeafBiomGrowthYield(NZ) =LeafBiomGrowthYield(NZ,NY,NX)
     plt_allom%PetioleBiomGrowthYield(NZ)=PetioleBiomGrowthYield(NZ,NY,NX)
@@ -862,7 +862,7 @@ implicit none
     plt_ew%PrecIntcptByCanopy_pft(NZ)=PrecIntcptByCanopy_pft(NZ,NY,NX)
 
     plt_site%PPZ(NZ)=PPZ(NZ,NY,NX)
-    plt_distb%IDAYY(NZ)=IDAYY(NZ,NY,NX)
+    plt_distb%iHarvestDay_pft(NZ)=iHarvestDay_pft(NZ,NY,NX)
     plt_morph%ClumpFactorNow_pft(NZ)=ClumpFactorNow_pft(NZ,NY,NX)
     plt_site%DATAP(NZ)=DATAP(NZ,NY,NX)
     plt_pheno%MatureGroup_pft(NZ)=MatureGroup_pft(NZ,NY,NX)
@@ -1025,7 +1025,7 @@ implicit none
 
     plt_rbgc%ZEROQ(NZ)=ZEROQ(NZ,NY,NX)
     plt_pheno%SeedTempSens_pft(NZ)=SeedTempSens_pft(NZ,NY,NX)
-    plt_rad%FracRadPARbyCanopy_pft(NZ) =FracRadPARbyCanopy_pft(NZ,NY,NX)
+    plt_rad%FracPARRadbyCanopy_pft(NZ) =FracPARRadbyCanopy_pft(NZ,NY,NX)
     plt_bgcr%NH3Dep2Can_pft(NZ)=NH3Dep2Can_pft(NZ,NY,NX)
     plt_ew%DeltaTKC(NZ)   =DeltaTKC(NZ,NY,NX)
     plt_pheno%iPlantThermoAdaptZone(NZ)=iPlantThermoAdaptZone(NZ,NY,NX)
@@ -1039,7 +1039,7 @@ implicit none
 
     plt_ew%TCelciusCanopy_pft(NZ)=TCelciusCanopy_pft(NZ,NY,NX)
     plt_allom%RootFracRemobilizableBiom(NZ)=RootFracRemobilizableBiom(NZ,NY,NX)
-    plt_photo%MaxCanPStomaResistH2O_pft(NZ)=MaxCanPStomaResistH2O_pft(NZ,NY,NX)
+    plt_photo%H2OCuticleResist_pft(NZ)=H2OCuticleResist_pft(NZ,NY,NX)
     plt_biom%RootBiomCPerPlant_pft(NZ)=RootBiomCPerPlant_pft(NZ,NY,NX)
     plt_morph%ClumpFactor_pft(NZ)=ClumpFactor_pft(NZ,NY,NX)
 
@@ -1572,7 +1572,7 @@ implicit none
     RadSWbyCanopy_pft(NZ,NY,NX) =plt_rad%RadSWbyCanopy_pft(NZ)
     RadPARbyCanopy_pft(NZ,NY,NX) =plt_rad%RadPARbyCanopy_pft(NZ)
     ClumpFactorNow_pft(NZ,NY,NX)  =plt_morph%ClumpFactorNow_pft(NZ)
-    FracRadPARbyCanopy_pft(NZ,NY,NX)=plt_rad%FracRadPARbyCanopy_pft(NZ)
+    FracPARRadbyCanopy_pft(NZ,NY,NX)=plt_rad%FracPARRadbyCanopy_pft(NZ)
 
     DO L=1,NumOfCanopyLayers
       DO M=1,NumOfSkyAzimuSects

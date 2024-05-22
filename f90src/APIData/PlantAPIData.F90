@@ -107,7 +107,7 @@ implicit none
   real(r8), pointer :: Km4LeafaqCO2_pft(:) => null()   !leaf aqueous CO2 Km no O2, [uM]
   real(r8), pointer :: RCS(:)    => null()   !shape parameter for calculating stomatal resistance from turgor pressure, [-]
   real(r8), pointer :: CanPCi2CaRatio(:)   => null()   !Ci:Ca ratio, [-]
-  real(r8), pointer :: MaxCanPStomaResistH2O_pft(:)   => null()   !maximum stomatal resistance to vapor, [s h-1]
+  real(r8), pointer :: H2OCuticleResist_pft(:)   => null()   !maximum stomatal resistance to vapor, [s h-1]
   real(r8), pointer :: ChillHours_pft(:)  => null()   !chilling effect on CO2 fixation, [-]
   real(r8), pointer :: CO2Solubility_pft(:)   => null()   !leaf CO2 solubility, [uM /umol mol-1]
   real(r8), pointer :: CanopyGasCO2_pft(:)   => null()   !canopy gaesous CO2 concentration , [umol mol-1]
@@ -115,7 +115,7 @@ implicit none
   real(r8), pointer :: Km4PEPCarboxy_pft(:) => null()   !Km for PEP carboxylase activity, [uM]
   integer,  pointer :: iPlantPhotosynthesisType(:)  => null()   !plant photosynthetic type (C3 or C4)
   real(r8), pointer :: MinCanPStomaResistH2O_pft(:)   => null()   !canopy minimum stomatal resistance, [s m-1]
-  real(r8), pointer :: RSMX(:)   => null()   !maximum stomatal resistance to vapor, [s m-1]
+  real(r8), pointer :: CuticleResist_pft(:)   => null()   !maximum stomatal resistance to vapor, [s m-1]
   real(r8), pointer :: CanPStomaResistH2O_pft(:)     => null()   !canopy stomatal resistance, [h m-1]
   real(r8), pointer :: CanopyBndlResist_pft(:)     => null()   !canopy boundary layer resistance, [h m-1]
   real(r8), pointer :: LeafO2Solubility_pft(:)    => null()   !leaf O2 solubility, [uM /umol mol-1]
@@ -181,7 +181,7 @@ implicit none
   real(r8), pointer :: RadSWLeafTransmis_pft(:)     => null() !canopy shortwave transmissivity , [-]
   real(r8), pointer :: RadPARLeafTransmis_pft(:)     => null() !canopy PAR transmissivity , [-]
   real(r8), pointer :: RadPARbyCanopy_pft(:)     => null() !canopy absorbed PAR , [umol m-2 s-1]
-  real(r8), pointer :: FracRadPARbyCanopy_pft(:)    => null() !fraction of incoming PAR absorbed by canopy, [-]
+  real(r8), pointer :: FracPARRadbyCanopy_pft(:)    => null() !fraction of incoming PAR absorbed by canopy, [-]
   real(r8), pointer :: RadPAR_zsec(:,:,:,:)=> null()     !direct incoming PAR, [umol m-2 s-1]
   real(r8), pointer :: RadDifPAR_zsec(:,:,:,:)=> null()  !diffuse incoming PAR, [umol m-2 s-1]
   contains
@@ -596,7 +596,7 @@ implicit none
   integer  :: iSoilDisturbType_col      !soil disturbance type, [-]
   real(r8), pointer :: EcoHavstElmnt_col(:)   => null()  !ecosystem harvest element, [gC d-2]
   real(r8), pointer :: O2ByFire_pft(:)    => null()  !plant O2 uptake from fire, [g d-2 ]
-  integer,  pointer :: IDAYY(:)    => null()  !alternate day of harvest, [-]
+  integer,  pointer :: iHarvestDay_pft(:)    => null()  !alternate day of harvest, [-]
   real(r8), pointer :: FERT(:)     => null()  !fertilizer application, [g m-2]
   integer,  pointer :: iYearPlanting_pft(:)     => null()  !year of planting
   integer,  pointer :: iPlantingDay_pft(:)    => null()  !alternate day of planting
@@ -1038,7 +1038,7 @@ implicit none
   allocate(this%NH3byFire_pft(JP1));this%NH3byFire_pft=spval
   allocate(this%PO4byFire_pft(JP1));this%PO4byFire_pft=spval
 
-  allocate(this%IDAYY(JP1)); this%IDAYY=0
+  allocate(this%iHarvestDay_pft(JP1)); this%iHarvestDay_pft=0
   allocate(this%O2ByFire_pft(JP1));this%O2ByFire_pft=spval
   allocate(this%FracBiomRMbyHVST(1:2,1:4,JP1));this%FracBiomRMbyHVST=spval
   allocate(this%HVST(JP1)); this%HVST=spval
@@ -1069,7 +1069,7 @@ implicit none
 !  if(allocated(NH3byFire_pft))deallocate(NH3byFire_pft)
 !  if(allocated(PO4byFire_pft))deallocate(PO4byFire_pft)
 
-!  if(allocated(IDAYY))deallocate(IDAYY)
+!  if(allocated(iHarvestDay_pft))deallocate(iHarvestDay_pft)
 !  if(allocated(O2ByFire_pft))deallocate(O2ByFire_pft)
 !  if(allocated(FracBiomRMbyHVST))deallocate(FracBiomRMbyHVST)
 !  if(allocated(HVST))deallocate(HVST)
@@ -1623,7 +1623,7 @@ implicit none
   allocate(this%RadPARLeafTransmis_pft(JP1))
   allocate(this%RadSWLeafTransmis_pft(JP1))
   allocate(this%RadPARbyCanopy_pft(JP1))
-  allocate(this%FracRadPARbyCanopy_pft(JP1))
+  allocate(this%FracPARRadbyCanopy_pft(JP1))
   end subroutine plt_rad_init
 !------------------------------------------------------------------------
   subroutine plt_rad_destroy(this)
@@ -1640,7 +1640,7 @@ implicit none
   subroutine plt_photo_init(this)
   class(plant_photosyns_type) :: this
 
-  allocate(this%RSMX(JP1));this%RSMX=spval
+  allocate(this%CuticleResist_pft(JP1));this%CuticleResist_pft=spval
   allocate(this%MinCanPStomaResistH2O_pft(JP1));this%MinCanPStomaResistH2O_pft=spval
   allocate(this%LeafO2Solubility_pft(JP1));this%LeafO2Solubility_pft=spval
   allocate(this%CanopyBndlResist_pft(JP1));this%CanopyBndlResist_pft=spval
@@ -1690,7 +1690,7 @@ implicit none
   allocate(this%O2I(JP1));this%O2I=spval
   allocate(this%RCS(JP1));this%RCS=spval
   allocate(this%CanPCi2CaRatio(JP1));this%CanPCi2CaRatio=spval
-  allocate(this%MaxCanPStomaResistH2O_pft(JP1));this%MaxCanPStomaResistH2O_pft=spval
+  allocate(this%H2OCuticleResist_pft(JP1));this%H2OCuticleResist_pft=spval
 
   end subroutine plt_photo_init
 !------------------------------------------------------------------------

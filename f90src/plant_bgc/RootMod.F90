@@ -405,55 +405,55 @@ implicit none
   real(r8) :: massnodul(NumPlantChemElms),massnodul1(NumPlantChemElms)
 
 !begin_execution
-  associate(                                                                     &
-    RootMyco2ndStrutElms_rpvr       =>  plt_biom%RootMyco2ndStrutElms_rpvr     , &
-    RootNonstructElmConc_pvr        =>  plt_biom%RootNonstructElmConc_pvr      , &
-    RootMyco1stStrutElms_rpvr       =>  plt_biom%RootMyco1stStrutElms_rpvr     , &
-    RootMycoNonstElms_rpvr          =>  plt_biom%RootMycoNonstElms_rpvr        , &
-    RootProteinC_pvr                =>  plt_biom%RootProteinC_pvr              , &
-    RootMycoActiveBiomC_pvr         =>  plt_biom%RootMycoActiveBiomC_pvr       , &
-    ZEROP                           =>  plt_biom%ZEROP                         , &
-    Root2ndRadius_pvr               =>  plt_morph%Root2ndRadius_pvr            , &    
-    PSIRoot_pvr                     =>  plt_ew%PSIRoot_pvr                     , &    
-    PSIRootTurg_vr                  =>  plt_ew%PSIRootTurg_vr                  , &    
-    RootCO2Autor_pvr                       =>  plt_rbgc%RootCO2Autor_pvr                     , &
-    RootCO2EmisPot_pvr                       =>  plt_rbgc%RootCO2EmisPot_pvr                     , &
-    RootRespPotent_pvr              =>  plt_rbgc%RootRespPotent_pvr            , &
-    RAutoRootO2Limter_pvr           =>  plt_rbgc%RAutoRootO2Limter_pvr         , &
-    LitrfalStrutElms_pvr            =>  plt_bgcr%LitrfalStrutElms_pvr          , &
-    rCNNonstructRemob_pft           =>  plt_allom%rCNNonstructRemob_pft        , &
-    rCPNonstructRemob_pft           =>  plt_allom%rCPNonstructRemob_pft        , &
-    FracRootElmAlloc2Litr                          =>  plt_allom%FracRootElmAlloc2Litr                       , &
-    CNRTS_pft                       =>  plt_allom%CNRTS_pft                    , &
-    CPRTS_pft                       =>  plt_allom%CPRTS_pft                    , &
-    RootBiomGrosYld_pft             =>  plt_allom%RootBiomGrosYld_pft          , &
-    k_woody_litr                    =>  pltpar%k_woody_litr                    , &
-    k_fine_litr                     =>  pltpar%k_fine_litr                     , &
-    icwood                          =>  pltpar%icwood                          , &
-    iroot                           =>  pltpar%iroot                           , &
-    inonstruct                      =>  pltpar%inonstruct                      , &
-    iPlantRootProfile_pft           =>  plt_pheno%iPlantRootProfile_pft        , &
-    iPlantPhenolType_pft            =>  plt_pheno%iPlantPhenolType_pft         , &
-    fTgrowRootP_vr                  =>  plt_pheno%fTgrowRootP_vr               , &
-    iPlantCalendar_brch             =>  plt_pheno%iPlantCalendar_brch          , &
-    ElmAllocmat4Litr                           =>  plt_soilchem%ElmAllocmat4Litr                     , &
-    SoilResit4RootPentrate_vr       =>  plt_soilchem%SoilResit4RootPentrate_vr , &
-    DLYR3                           =>  plt_site%DLYR3                         , &
-    ZERO                            =>  plt_site%ZERO                          , &
-    Root2ndXNum_pvr                 =>  plt_morph%Root2ndXNum_pvr              , &
-    MaxSeedCMass                    =>  plt_morph%MaxSeedCMass                 , &
-    NGTopRootLayer_pft              =>  plt_morph%NGTopRootLayer_pft           , &
-    NIXBotRootLayer_pft             =>  plt_morph%NIXBotRootLayer_pft          , &
-    Root2ndXNum_rpvr                =>  plt_morph%Root2ndXNum_rpvr             , &
-    NumRootAxes_pft                 =>  plt_morph%NumRootAxes_pft              , &
-    RootBranchFreq_pft              =>  plt_morph%RootBranchFreq_pft           , &
-    SeedDepth_pft                   =>  plt_morph%SeedDepth_pft                , &
-    Root1stLen_rpvr                 =>  plt_morph%Root1stLen_rpvr              , &
-    Root2ndSpecLen_pft              =>  plt_morph%Root2ndSpecLen_pft           , &
-    Root2ndLen_pvr                  =>  plt_morph%Root2ndLen_pvr               , &
-    NIXBotRootLayer_rpft            =>  plt_morph%NIXBotRootLayer_rpft         , &
-    MainBranchNum_pft               =>  plt_morph%MainBranchNum_pft            , &
-    C4PhotosynDowreg_brch           =>  plt_photo%C4PhotosynDowreg_brch          &
+  associate(                                                             &
+    RootMyco2ndStrutElms_rpvr => plt_biom%RootMyco2ndStrutElms_rpvr,     &
+    RootNonstructElmConc_pvr  => plt_biom%RootNonstructElmConc_pvr,      &
+    RootMyco1stStrutElms_rpvr => plt_biom%RootMyco1stStrutElms_rpvr,     &
+    RootMycoNonstElms_rpvr    => plt_biom%RootMycoNonstElms_rpvr,        &
+    RootProteinC_pvr          => plt_biom%RootProteinC_pvr,              &
+    RootMycoActiveBiomC_pvr   => plt_biom%RootMycoActiveBiomC_pvr,       &
+    ZEROP                     => plt_biom%ZEROP,                         &
+    Root2ndRadius_pvr         => plt_morph%Root2ndRadius_pvr,            &
+    PSIRoot_pvr               => plt_ew%PSIRoot_pvr,                     &
+    PSIRootTurg_vr            => plt_ew%PSIRootTurg_vr,                  &
+    RootCO2Autor_pvr          => plt_rbgc%RootCO2Autor_pvr,              &
+    RootCO2EmisPot_pvr        => plt_rbgc%RootCO2EmisPot_pvr,            &
+    RootRespPotent_pvr        => plt_rbgc%RootRespPotent_pvr,            &
+    RAutoRootO2Limter_pvr     => plt_rbgc%RAutoRootO2Limter_pvr,         &
+    LitrfalStrutElms_pvr      => plt_bgcr%LitrfalStrutElms_pvr,          &
+    rCNNonstructRemob_pft     => plt_allom%rCNNonstructRemob_pft,        &
+    rCPNonstructRemob_pft     => plt_allom%rCPNonstructRemob_pft,        &
+    FracRootElmAlloc2Litr     => plt_allom%FracRootElmAlloc2Litr,        &
+    CNRTS_pft                 => plt_allom%CNRTS_pft,                    &
+    CPRTS_pft                 => plt_allom%CPRTS_pft,                    &
+    RootBiomGrosYld_pft       => plt_allom%RootBiomGrosYld_pft,          &
+    k_woody_litr              => pltpar%k_woody_litr,                    &
+    k_fine_litr               => pltpar%k_fine_litr,                     &
+    icwood                    => pltpar%icwood,                          &
+    iroot                     => pltpar%iroot,                           &
+    inonstruct                => pltpar%inonstruct,                      &
+    iPlantRootProfile_pft     => plt_pheno%iPlantRootProfile_pft,        &
+    iPlantPhenolType_pft      => plt_pheno%iPlantPhenolType_pft,         &
+    fTgrowRootP_vr            => plt_pheno%fTgrowRootP_vr,               &
+    iPlantCalendar_brch       => plt_pheno%iPlantCalendar_brch,          &
+    ElmAllocmat4Litr          => plt_soilchem%ElmAllocmat4Litr,          &
+    SoilResit4RootPentrate_vr => plt_soilchem%SoilResit4RootPentrate_vr, &
+    DLYR3                     => plt_site%DLYR3,                         &
+    ZERO                      => plt_site%ZERO,                          &
+    Root2ndXNum_pvr           => plt_morph%Root2ndXNum_pvr,              &
+    MaxSeedCMass              => plt_morph%MaxSeedCMass,                 &
+    NGTopRootLayer_pft        => plt_morph%NGTopRootLayer_pft,           &
+    NIXBotRootLayer_pft       => plt_morph%NIXBotRootLayer_pft,          &
+    Root2ndXNum_rpvr          => plt_morph%Root2ndXNum_rpvr,             &
+    NumRootAxes_pft           => plt_morph%NumRootAxes_pft,              &
+    RootBranchFreq_pft        => plt_morph%RootBranchFreq_pft,           &
+    SeedDepth_pft             => plt_morph%SeedDepth_pft,                &
+    Root1stLen_rpvr           => plt_morph%Root1stLen_rpvr,              &
+    Root2ndSpecLen_pft        => plt_morph%Root2ndSpecLen_pft,           &
+    Root2ndLen_pvr            => plt_morph%Root2ndLen_pvr,               &
+    NIXBotRootLayer_rpft      => plt_morph%NIXBotRootLayer_rpft,         &
+    MainBranchNum_pft         => plt_morph%MainBranchNum_pft,            &
+    C4PhotosynDowreg_brch     => plt_photo%C4PhotosynDowreg_brch          &
   )
 
 !     WATER STRESS CONSTRAINT ON SECONDARY ROOT EXTENSION IMPOSED
@@ -1364,21 +1364,21 @@ implicit none
   real(r8) :: RCO2Nonst4Xmaint1st_Oltd,RCO2Nonst4Xmaint1st_OUltd
   real(r8) :: dsenecE
 ! begin_execution
-  associate(                                                                &
-    Root1stElm_raxs                 =>  plt_biom%Root1stElm_raxs          , &
-    RootNonstructElmConc_pvr        =>  plt_biom%RootNonstructElmConc_pvr , &
-    ZEROP                           =>  plt_biom%ZEROP                    , &
-    ZERO                            =>  plt_site%ZERO                     , &
-    icwood                          =>  pltpar%icwood                     , &
-    k_woody_litr                    =>  pltpar%k_woody_litr               , &
-    k_fine_litr                     =>  pltpar%k_fine_litr                , &
-    iroot                           =>  pltpar%iroot                      , &
-    FracRootElmAlloc2Litr                          =>  plt_allom%FracRootElmAlloc2Litr                  , &
-    ElmAllocmat4Litr                           =>  plt_soilchem%ElmAllocmat4Litr                , &
-    RAutoRootO2Limter_pvr           =>  plt_rbgc%RAutoRootO2Limter_pvr    , &
-    LitrfalStrutElms_pvr            =>  plt_bgcr%LitrfalStrutElms_pvr     , &
-    iPlantCalendar_brch             =>  plt_pheno%iPlantCalendar_brch     , &
-    MainBranchNum_pft               =>  plt_morph%MainBranchNum_pft         &
+  associate(                                                       &
+    Root1stElm_raxs          => plt_biom%Root1stElm_raxs,          &
+    RootNonstructElmConc_pvr => plt_biom%RootNonstructElmConc_pvr, &
+    ZEROP                    => plt_biom%ZEROP,                    &
+    ZERO                     => plt_site%ZERO,                     &
+    icwood                   => pltpar%icwood,                     &
+    k_woody_litr             => pltpar%k_woody_litr,               &
+    k_fine_litr              => pltpar%k_fine_litr,                &
+    iroot                    => pltpar%iroot,                      &
+    FracRootElmAlloc2Litr    => plt_allom%FracRootElmAlloc2Litr,   &
+    ElmAllocmat4Litr         => plt_soilchem%ElmAllocmat4Litr,     &
+    RAutoRootO2Limter_pvr    => plt_rbgc%RAutoRootO2Limter_pvr,    &
+    LitrfalStrutElms_pvr     => plt_bgcr%LitrfalStrutElms_pvr,     &
+    iPlantCalendar_brch      => plt_pheno%iPlantCalendar_brch,     &
+    MainBranchNum_pft        => plt_morph%MainBranchNum_pft         &
   )
 !
 !     PRIMARY ROOT GROWTH RESPIRATION FROM TOTAL - MAINTENANCE
@@ -1889,7 +1889,7 @@ implicit none
     ShutRutNonstructElmntConducts_pft  =>   plt_pheno%ShutRutNonstructElmntConducts_pft  , &
     iPlantCalendar_brch                =>   plt_pheno%iPlantCalendar_brch                , &
     Hours2LeafOut_brch                 =>   plt_pheno%Hours2LeafOut_brch                 , &
-    RootCO2Autor_pvr                          =>   plt_rbgc%RootCO2Autor_pvr                           , &
+    RootCO2Autor_pvr                   =>   plt_rbgc%RootCO2Autor_pvr                    , &
     ECO_ER_col                         =>   plt_bgcr%ECO_ER_col                          , &
     Eco_AutoR_col                      =>   plt_bgcr%Eco_AutoR_col                       , &
     NU                                 =>   plt_site%NU                                  , &

@@ -741,7 +741,7 @@ module PlantDisturbsMod
     RootCO2Autor_pvr            =>  plt_rbgc%RootCO2Autor_pvr            , &
     RootRespPotent_pvr          =>  plt_rbgc%RootRespPotent_pvr          , &
     RootCO2EmisPot_pvr                   =>  plt_rbgc%RootCO2EmisPot_pvr                   , &
-    FracRadPARbyCanopy_pft      =>  plt_rad%FracRadPARbyCanopy_pft       , &
+    FracPARRadbyCanopy_pft      =>  plt_rad%FracPARRadbyCanopy_pft       , &
     Root1stLen_rpvr             =>  plt_morph%Root1stLen_rpvr            , &
     RootVH2O_pvr                =>  plt_morph%RootVH2O_pvr               , &
     RootAreaPerPlant_pvr        =>  plt_morph%RootAreaPerPlant_pvr       , &
@@ -771,7 +771,7 @@ module PlantDisturbsMod
 !     iSoilDisturbType_col=soil disturbance type 1-20:tillage,21=litter removal,22=fire,23-24=drainage
 !     XHVST=fraction of PFT remaining after disturbance
 !     PPX,PP=PFT population per m2,grid cell
-!     FracRadPARbyCanopy_pft=fraction of radiation received by each PFT canopy
+!     FracPARRadbyCanopy_pft=fraction of radiation received by each PFT canopy
 !     VHeatCapCanP=canopy heat capacity
 !
   IF(J.EQ.INT(SolarNoonHour_col).AND.(iPlantTurnoverPattern_pft(NZ).EQ.0 &
@@ -783,7 +783,7 @@ module PlantDisturbsMod
         XHVST=XCORP
         PPX_pft(NZ)=PPX_pft(NZ)*XHVST
         PlantPopulation_pft(NZ)=PlantPopulation_pft(NZ)*XHVST
-        FracRadPARbyCanopy_pft(NZ)=FracRadPARbyCanopy_pft(NZ)*XHVST
+        FracPARRadbyCanopy_pft(NZ)=FracPARRadbyCanopy_pft(NZ)*XHVST
         VHeatCapCanP(NZ)=VHeatCapCanP(NZ)*XHVST
         CanopyLeafShethC_pft(NZ)=0._r8
         CanopyStalkC_pft(NZ)=0._r8

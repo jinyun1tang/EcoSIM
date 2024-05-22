@@ -210,8 +210,7 @@ module PlantPhenolMod
     ELSE
       HarvestChk=I.LT.iDayPlanting_pft(NZ).AND.I.GT.iDayPlantHarvest_pft(NZ) &
         .AND.iYearCurrent.GE.iYearPlantHarvest_pft(NZ)
-      PlantingChk=I.LT.iDayPlanting_pft(NZ).AND.iYearPlanting_pft(NZ) &
-        .GT.iYearPlantHarvest_pft(NZ)  
+      PlantingChk=I.LT.iDayPlanting_pft(NZ) .AND. iYearPlanting_pft(NZ).GT.iYearPlantHarvest_pft(NZ)  
       !not planted
       IF((HarvestChk.AND.iPlantState_pft(NZ).EQ.iDead) .OR. PlantingChk)THEN
         IsPlantActive_pft(NZ)=iDormant
@@ -258,7 +257,7 @@ module PlantPhenolMod
     PlantPopulation_pft             =>   plt_site%PlantPopulation_pft          , &
     Hours4Leafout_brch              =>   plt_pheno%Hours4Leafout_brch          , &
     PSIRootTurg_vr                  =>   plt_ew%PSIRootTurg_vr                 , &
-    FracGroth2Node_pft                            =>   plt_allom%FracGroth2Node_pft                        , &
+    FracGroth2Node_pft              =>   plt_allom%FracGroth2Node_pft          , &
     NumRootAxes_pft                 =>   plt_morph%NumRootAxes_pft             , &
     MainBranchNum_pft               =>   plt_morph%MainBranchNum_pft           , &
     NumOfBranches_pft               =>   plt_morph%NumOfBranches_pft           , &
@@ -569,8 +568,8 @@ module PlantPhenolMod
       IF(DayLenthCurrent.LT.DayLenthPrev)THEN
         Hours4LeafOff_brch(NB,NZ)=Hours4ShortenPhotoPeriod_brch(NB,NZ)
         IF(Hours4LeafOff_brch(NB,NZ).GE.HourReq4LeafOff_brch(NB,NZ) &
-          .OR.(ALAT.GT.0.0_r8 .AND. I.EQ.355) &
-          .OR.(ALAT.LT.0.0_r8 .AND. I.EQ.173))THEN
+          .OR.(ALAT.GT.0.0_r8 .AND. I.EQ.355) &     !northern hemisphere
+          .OR.(ALAT.LT.0.0_r8 .AND. I.EQ.173))THEN  !southern hemisphere
           Hours4Leafout_brch(NB,NZ)=0.0_r8
           doPlantLeafOut_brch(NB,NZ)=iEnable
         ENDIF
@@ -599,20 +598,21 @@ module PlantPhenolMod
         ENDIF
         !not sufficient leafout hour
         IF(Hours4Leafout_brch(NB,NZ).LT.HourReq4LeafOut_brch(NB,NZ))THEN
-          !unfavorable temperature
+          !unfavorable cold temperature
           IF(TCG(NZ).LT.TCChill4Seed_pft(NZ))THEN
             Hours4Leafout_brch(NB,NZ)=AZMAX1(Hours4Leafout_brch(NB,NZ)-1.0_r8)
           ENDIF
         ENDIF
         IF(Hours4Leafout_brch(NB,NZ).GE.HourReq4LeafOut_brch(NB,NZ) &
-          .OR.(ALAT.GT.0.0_r8 .AND.I.EQ.173) &
-          .OR.(ALAT.LT.0.0_r8 .AND.I.EQ.355))THEN
+          .OR.(ALAT.GT.0.0_r8 .AND.I.EQ.173) &     !northern hemisphere
+          .OR.(ALAT.LT.0.0_r8 .AND.I.EQ.355))THEN  !southern hemisphere
           Hours4LeafOff_brch(NB,NZ)=0.0_r8
         ENDIF
       ENDIF
 
       IF(iPlantCalendar_brch(ipltcal_InitFloral,NB,NZ).NE.0 .OR. &
         (DayLenthCurrent.LT.DayLenthPrev .AND. DayLenthCurrent.LT.12.0_r8))THEN
+        !has flower or (day length is decreasing, and current daytime is short)
         doPlantLeaveOff_brch(NB,NZ)=iEnable
       ENDIF
   !
@@ -753,8 +753,10 @@ module PlantPhenolMod
   !     ALAT=latitude
   !     iPlantCalendar_brch(ipltcal_InitFloral,=date of floral initiation
   !
-        IF((DayLenthCurrent.LT.DayLenthPrev .OR. DayLenthCurrent.LT.24.0_r8-DayLenthMax+2.0_r8) &
+        IF((DayLenthCurrent.LT.DayLenthPrev &
+          .OR. DayLenthCurrent.LT.24.0_r8-DayLenthMax+2.0_r8) &
           .AND. doPlantLeaveOff_brch(NB,NZ).EQ.iEnable)THEN
+
           IF(TCG(NZ).LE.TC4LeafOff_pft(NZ) &
             .OR. PSICanopy_pft(NZ).LT.PSIMin4LeafOff(iPlantRootProfile_pft(NZ)))THEN
             Hours4LeafOff_brch(NB,NZ)=Hours4LeafOff_brch(NB,NZ)+1.0_r8

@@ -21,7 +21,7 @@ module PlantMgmtDataType
   integer ,target,allocatable ::  iPlantingYear_pft(:,:,:)                         !alternate year of planting, [-]
   integer ,target,allocatable ::  iPlantingDay_pft(:,:,:)                        !alternate day of planting, [-]
   integer ,target,allocatable ::  iHarvestYear_pft(:,:,:)                         !alternate year of harvest, [-]
-  integer ,target,allocatable ::  IDAYY(:,:,:)                        !alternate day of harvest, [-]
+  integer ,target,allocatable ::  iHarvestDay_pft(:,:,:)                        !alternate day of harvest, [-]
   real(r8),target,allocatable ::  CO2byFire_col(:,:)                         !total CO2 flux from fire, [g d-2]
   real(r8),target,allocatable ::  CH4byFire_col(:,:)                         !total CH4 flux from fire, [g d-2]
   real(r8),target,allocatable ::  O2byFire_col(:,:)                         !total O2 flux from fire, [g d-2]
@@ -59,7 +59,7 @@ module PlantMgmtDataType
   allocate(iPlantingYear_pft(JP,JY,JX));     iPlantingYear_pft=0
   allocate(iPlantingDay_pft(JP,JY,JX));    iPlantingDay_pft=0
   allocate(iHarvestYear_pft(JP,JY,JX));     iHarvestYear_pft=0
-  allocate(IDAYY(JP,JY,JX));    IDAYY=0
+  allocate(iHarvestDay_pft(JP,JY,JX));    iHarvestDay_pft=0
   allocate(CO2byFire_col(JY,JX));       CO2byFire_col=0._r8
   allocate(CH4byFire_col(JY,JX));       CH4byFire_col=0._r8
   allocate(O2byFire_col(JY,JX));       O2byFire_col=0._r8
@@ -88,7 +88,7 @@ module PlantMgmtDataType
   call destroy(iPlantingYear_pft)
   call destroy(iPlantingDay_pft)
   call destroy(iHarvestYear_pft)
-  call destroy(IDAYY)
+  call destroy(iHarvestDay_pft)
   call destroy(CO2byFire_col)
   call destroy(CH4byFire_col)
   call destroy(O2byFire_col)

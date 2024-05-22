@@ -58,7 +58,7 @@
     AirConc_pft                =>  plt_photo%AirConc_pft                , &
     MinCanPStomaResistH2O_pft  =>  plt_photo%MinCanPStomaResistH2O_pft  , &
     CanPCi2CaRatio             =>  plt_photo%CanPCi2CaRatio             , &
-    MaxCanPStomaResistH2O_pft  =>  plt_photo%MaxCanPStomaResistH2O_pft  , &
+    H2OCuticleResist_pft  =>  plt_photo%H2OCuticleResist_pft  , &
     LeafIntracellularCO2_pft   =>  plt_photo%LeafIntracellularCO2_pft     &
   )
   ii=i;jj=j
@@ -104,7 +104,7 @@
     call PhotoActivePFT(I,J,NZ)
   ELSE
 !
-    MinCanPStomaResistH2O_pft(NZ)=MaxCanPStomaResistH2O_pft(NZ)
+    MinCanPStomaResistH2O_pft(NZ)=H2OCuticleResist_pft(NZ)
   ENDIF
 
   RETURN
@@ -690,7 +690,7 @@
     LeafO2Solubility_pft            =>  plt_photo%LeafO2Solubility_pft      , &
     LeafIntracellularCO2_pft        =>  plt_photo%LeafIntracellularCO2_pft  , &
     O2I                             =>  plt_photo%O2I                       , &
-    MaxCanPStomaResistH2O_pft       =>  plt_photo%MaxCanPStomaResistH2O_pft , &
+    H2OCuticleResist_pft       =>  plt_photo%H2OCuticleResist_pft , &
     Km4RubiscoCarboxy_pft           =>  plt_photo%Km4RubiscoCarboxy_pft     , &
     Km4LeafaqCO2_pft                =>  plt_photo%Km4LeafaqCO2_pft          , &
     XKCO2                           =>  plt_photo%XKCO2                       &
@@ -771,8 +771,8 @@
     Vmax4PEPCarboxy_pft         =>  plt_photo%Vmax4PEPCarboxy_pft        , &
     MinCanPStomaResistH2O_pft   =>  plt_photo%MinCanPStomaResistH2O_pft  , &
     DiffCO2Atmos2Intracel_pft   =>  plt_photo%DiffCO2Atmos2Intracel_pft  , &
-    MaxCanPStomaResistH2O_pft   =>  plt_photo%MaxCanPStomaResistH2O_pft  , &
-    FracRadPARbyCanopy_pft      =>  plt_rad%FracRadPARbyCanopy_pft       , &
+    H2OCuticleResist_pft   =>  plt_photo%H2OCuticleResist_pft  , &
+    FracPARRadbyCanopy_pft      =>  plt_rad%FracPARRadbyCanopy_pft       , &
     NumOfBranches_pft           =>  plt_morph%NumOfBranches_pft            &
   )
 
@@ -808,17 +808,17 @@
 !
 !     RSX,MinCanPStomaResistH2O_pft=minimum canopy stomatal resistance to CO2,H2O (h m-1)
 !     CH2O=total PEP(C4) or rubisco(C3) carboxylation rate
-!     FracRadPARbyCanopy_pft=fraction of radiation received by each PFT canopy
+!     FracPARRadbyCanopy_pft=fraction of radiation received by each PFT canopy
 !     DiffCO2Atmos2Intracel_pft=difference between atmosph and intercellular CO2 concn (umol m-3)
 !     AREA=area of grid cell
 !     RSMY=minimum stomatal resistance for CO2 uptake (h m-1)
 ! hourly time step
   IF(CH2O.GT.ZEROP(NZ))THEN
-    RSX=FracRadPARbyCanopy_pft(NZ)*DiffCO2Atmos2Intracel_pft(NZ)*AREA3(NU)/(CH2O*secsperhour)
+    RSX=FracPARRadbyCanopy_pft(NZ)*DiffCO2Atmos2Intracel_pft(NZ)*AREA3(NU)/(CH2O*secsperhour)
   ELSE
-    RSX=MaxCanPStomaResistH2O_pft(NZ)*1.56_r8
+    RSX=H2OCuticleResist_pft(NZ)*1.56_r8
   ENDIF
-  MinCanPStomaResistH2O_pft(NZ)=AMIN1(MaxCanPStomaResistH2O_pft(NZ),AMAX1(RSMY,RSX*0.641_r8))
+  MinCanPStomaResistH2O_pft(NZ)=AMIN1(H2OCuticleResist_pft(NZ),AMAX1(RSMY,RSX*0.641_r8))
   end associate
   end subroutine PhotoActivePFT
 

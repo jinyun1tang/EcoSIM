@@ -46,7 +46,7 @@ module InitPlantMod
 !     iYearPlanting_pft,iDayPlanting_pft,iYearPlantHarvest_pft,iDayPlantHarvest_pft=year,day of planting,arvesting
 !     PPI,PPX=initial,current population (m-2)
 !     CF,ClumpFactorInit_pft=current,initial clumping factor
-!     MaxCanPStomaResistH2O_pft=cuticular resistance to water (h m-1)
+!     H2OCuticleResist_pft=cuticular resistance to water (h m-1)
 !     CO2CuticleResist_pft=cuticular resistance to CO2 (s m-1)
 !     CNWS,rCPNonstructRemob_pft=protein:N,protein:P ratios
 !     RootFracRemobilizableBiom=maximum root protein concentration (g g-1)
@@ -113,8 +113,8 @@ module InitPlantMod
     iYearPlantHarvest_pft     => plt_distb%iYearPlantHarvest_pft,     &
     iDayPlantHarvest_pft      => plt_distb%iDayPlantHarvest_pft,      &
     iDayPlanting_pft          => plt_distb%iDayPlanting_pft,          &
-    IDAYY                     => plt_distb%IDAYY,                     &
-    RSMX                      => plt_photo%RSMX,                      &
+    iHarvestDay_pft           => plt_distb%iHarvestDay_pft,           &
+    CuticleResist_pft         => plt_photo%CuticleResist_pft,         &
     PPI                       => plt_site%PPI,                        &
     PPX_pft                   => plt_site%PPX_pft,                    &
     PPZ                       => plt_site%PPZ,                        &
@@ -126,7 +126,7 @@ module InitPlantMod
     O2I                       => plt_photo%O2I,                       &
     CO2CuticleResist_pft      => plt_photo%CO2CuticleResist_pft,      &
     iPlantPhotosynthesisType  => plt_photo%iPlantPhotosynthesisType,  &
-    MaxCanPStomaResistH2O_pft => plt_photo%MaxCanPStomaResistH2O_pft, &
+    H2OCuticleResist_pft      => plt_photo%H2OCuticleResist_pft,      &
     ClumpFactorInit_pft       => plt_morph%ClumpFactorInit_pft,       &
     ClumpFactor_pft           => plt_morph%ClumpFactor_pft,           &
     NumRootAxes_pft           => plt_morph%NumRootAxes_pft            &
@@ -134,13 +134,13 @@ module InitPlantMod
   iYearPlanting_pft(NZ)=iPlantingYear_pft(NZ)
   iDayPlanting_pft(NZ)=iPlantingDay_pft(NZ)
   iYearPlantHarvest_pft(NZ)=iHarvestYear_pft(NZ)
-  iDayPlantHarvest_pft(NZ)=IDAYY(NZ)
+  iDayPlantHarvest_pft(NZ)=iHarvestDay_pft(NZ)
   PPI(NZ)=PPZ(NZ)
   PPX_pft(NZ)=PPI(NZ)
   ClumpFactor_pft(NZ)=ClumpFactorInit_pft(NZ)
 
-  MaxCanPStomaResistH2O_pft(NZ)=RSMX(NZ)/3600.0_r8
-  CO2CuticleResist_pft(NZ)=RSMX(NZ)*1.56_r8
+  H2OCuticleResist_pft(NZ)=CuticleResist_pft(NZ)/3600.0_r8        
+  CO2CuticleResist_pft(NZ)=CuticleResist_pft(NZ)*1.56_r8    !1.56=sqrt(44./18.)
   rCNNonstructRemob_pft(NZ)=2.5_r8
   rCPNonstructRemob_pft(NZ)=25.0_r8
   RootFracRemobilizableBiom(NZ)=AMIN1(RootrNC_pft(NZ)*rCNNonstructRemob_pft(NZ),&
@@ -857,7 +857,7 @@ module InitPlantMod
     TCG                    => plt_pheno%TCG,               &
     fTCanopyGroth_pft      => plt_pheno%fTCanopyGroth_pft, &
     ShootStrutElms_pft     => plt_biom%ShootStrutElms_pft, &
-    FracRadPARbyCanopy_pft => plt_rad%FracRadPARbyCanopy_pft    &
+    FracPARRadbyCanopy_pft => plt_rad%FracPARRadbyCanopy_pft    &
   )
 !
 !     INITIALIZE PLANT HEAT AND WATER STATUS
@@ -879,7 +879,7 @@ module InitPlantMod
   PSICanopyOsmo_pft(NZ)=CanOsmoPsi0pt_pft(NZ)+PSICanopy_pft(NZ)
   PSICanopyTurg_pft(NZ)=AZMAX1(PSICanopy_pft(NZ)-PSICanopyOsmo_pft(NZ))
   Transpiration_pft(NZ)=0._r8
-  FracRadPARbyCanopy_pft(NZ)=0._r8
+  FracPARRadbyCanopy_pft(NZ)=0._r8
   end associate
   end subroutine InitPlantHeatandWater
 !------------------------------------------------------------------------------------------

@@ -139,7 +139,7 @@ module grosubsMod
     NodulStrutElms_pft             => plt_biom%NodulStrutElms_pft          , &
     SeasonalNonstElms_pft          => plt_biom%SeasonalNonstElms_pft       , &
     StandDeadStrutElms_pft         => plt_biom%StandDeadStrutElms_pft      , &
-    fTCanopyGroth_pft                     => plt_pheno%fTCanopyGroth_pft                 , &
+    fTCanopyGroth_pft              => plt_pheno%fTCanopyGroth_pft          , &
     NetCumElmntFlx2Plant_pft       => plt_pheno%NetCumElmntFlx2Plant_pft   , &
     IsPlantActive_pft              => plt_pheno%IsPlantActive_pft          , &
     iPlantRootProfile_pft          => plt_pheno%iPlantRootProfile_pft      , &
@@ -172,7 +172,8 @@ module grosubsMod
 !
     D205: DO NB=1,NumOfBranches_pft(NZ)
       IF(doInitPlant_pft(NZ).EQ.itrue)THEN
-        IF(doPlantLeafOut_brch(NB,NZ).EQ.iEnable.AND.Hours4Leafout_brch(NB,NZ).GE.HourReq4LeafOut_brch(NB,NZ))THEN
+        IF(doPlantLeafOut_brch(NB,NZ).EQ.iEnable &
+          .AND. Hours4Leafout_brch(NB,NZ).GE.HourReq4LeafOut_brch(NB,NZ))THEN
           iDayPlanting_pft(NZ)=I
           iYearPlanting_pft(NZ)=iYearCurrent
           PlantinDepz_pft(NZ)=0.005_r8+CumSoilThickness(0)

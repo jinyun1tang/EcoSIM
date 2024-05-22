@@ -102,7 +102,7 @@ module UptakesMod
     LeafStalkArea_pft              => plt_morph%LeafStalkArea_pft       , &
     SeedDepth_pft                  => plt_morph%SeedDepth_pft           , &
     MainBranchNum_pft              => plt_morph%MainBranchNum_pft       , &
-    FracRadPARbyCanopy_pft         => plt_rad%FracRadPARbyCanopy_pft      &
+    FracPARRadbyCanopy_pft         => plt_rad%FracPARRadbyCanopy_pft      &
   )
 
   call PrepH2ONutrientUptake(ElvAdjstedtSoiPSIMPa,AllRootC_vr,AirPoreAvail4Fill,WatAvail4Uptake)
@@ -130,7 +130,7 @@ module UptakesMod
 !     (AG: - originally this line had a N0B1 here )
       IF((iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).NE.0)&
         .AND.(LeafStalkArea_pft(NZ).GT.ZEROL(NZ) &
-        .AND.FracRadPARbyCanopy_pft(NZ).GT.0.0_r8)&
+        .AND.FracPARRadbyCanopy_pft(NZ).GT.0.0_r8)&
         .AND.(Root1stDepz_pft(ipltroot,1,NZ).GT.SeedDepth_pft(NZ)+CumSoilThickness(0)))THEN
         !shoot area > 0, absorped par>0, and rooting depth > seeding depth
 !
@@ -346,7 +346,7 @@ module UptakesMod
     TKCanopy_pft              => plt_ew%TKCanopy_pft,                 &
     LeafProteinCNode_brch     => plt_biom%LeafProteinCNode_brch,      &
     ZEROP                     => plt_biom%ZEROP,                      &
-    FracRadPARbyCanopy_pft    => plt_rad%FracRadPARbyCanopy_pft,      &
+    FracPARRadbyCanopy_pft    => plt_rad%FracPARRadbyCanopy_pft,      &
     LeafAUnshaded_zsec        => plt_photo%LeafAUnshaded_zsec,        &
     LeafAreaNode_brch         => plt_morph%LeafAreaNode_brch,         &
     KMinNumLeaf4GroAlloc_brch => plt_morph%KMinNumLeaf4GroAlloc_brch, &
@@ -392,7 +392,7 @@ module UptakesMod
 !
 !     KoppenClimZone=Koppen climate zone
 !     ZC,ZT,RoughHeight=PFT canopy,grid biome,surface roughness height
-!     FracRadPARbyCanopy_pft=fraction of radiation received by each PFT canopy
+!     FracPARRadbyCanopy_pft=fraction of radiation received by each PFT canopy
 !     ALFZ=shape parameter for windspeed attenuation in canopy
 !     BndlResistAboveCanG=biome canopy isothermal boundary layer resistance
 !     RACZ,RAZ=additional,total PFT canopy isothermal blr
@@ -402,7 +402,7 @@ module UptakesMod
       TFRADP=0.0_r8
       D700: DO NZZ=1,NP
         IF(CanopyHeight_pft(NZZ).GT.CanopyHeight_pft(NZ)+RoughHeight)THEN
-          TFRADP=TFRADP+FracRadPARbyCanopy_pft(NZZ)
+          TFRADP=TFRADP+FracPARRadbyCanopy_pft(NZZ)
         ENDIF
       ENDDO D700
       ALFZ=2.0_r8*TFRADP
@@ -577,9 +577,9 @@ module UptakesMod
    CanopyBndlResist_pft            => plt_photo%CanopyBndlResist_pft      , &
    MinCanPStomaResistH2O_pft       => plt_photo%MinCanPStomaResistH2O_pft , &
    CanPStomaResistH2O_pft          => plt_photo%CanPStomaResistH2O_pft    , &
-   MaxCanPStomaResistH2O_pft       => plt_photo%MaxCanPStomaResistH2O_pft , &
+   H2OCuticleResist_pft       => plt_photo%H2OCuticleResist_pft , &
    RCS                             => plt_photo%RCS                       , &
-   FracRadPARbyCanopy_pft          => plt_rad%FracRadPARbyCanopy_pft      , &
+   FracPARRadbyCanopy_pft          => plt_rad%FracPARRadbyCanopy_pft      , &
    LWRadCanopy_pft                 => plt_rad%LWRadCanopy_pft               &
   )
   IF(NN.GE.MaxIterNum)THEN
@@ -595,7 +595,7 @@ module UptakesMod
       plt_ew%Transpiration_pft(NZ)=0.0_r8
       TKC(NZ)=TairK+DeltaTKC(NZ)
       TCelciusCanopy_pft(NZ)=units%Kelvin2Celcius(TKC(NZ))
-      FTHRM=EMMC*stefboltz_const*FracRadPARbyCanopy_pft(NZ)*AREA3(NU)
+      FTHRM=EMMC*stefboltz_const*FracPARRadbyCanopy_pft(NZ)*AREA3(NU)
       LWRadCanopy_pft(NZ)=FTHRM*TKC(NZ)**4._r8
       PSICanopy_pft(NZ)=ElvAdjstedtSoiPSIMPa(NGTopRootLayer_pft(NZ))     
 
@@ -607,7 +607,7 @@ module UptakesMod
 
       Stomata_Stress=EXP(RCS(NZ)*PSICanopyTurg_pft(NZ))
       CanPStomaResistH2O_pft(NZ)=MinCanPStomaResistH2O_pft(NZ) &
-        +(MaxCanPStomaResistH2O_pft(NZ)-MinCanPStomaResistH2O_pft(NZ))*Stomata_Stress
+        +(H2OCuticleResist_pft(NZ)-MinCanPStomaResistH2O_pft(NZ))*Stomata_Stress
       CanopyBndlResist_pft(NZ)=RAZ(NZ)
       VHeatCapCanP(NZ)=cpw*(ShootStrutElms_pft(ielmc,NZ)*10.0E-06_r8)
       DeltaTKC(NZ)=0.0_r8
@@ -697,12 +697,12 @@ module UptakesMod
     MinCanPStomaResistH2O_pft       => plt_photo%MinCanPStomaResistH2O_pft   , &
     RCS                             => plt_photo%RCS                         , &
     CanopyBndlResist_pft            => plt_photo%CanopyBndlResist_pft        , &
-    MaxCanPStomaResistH2O_pft       => plt_photo%MaxCanPStomaResistH2O_pft   , &
+    H2OCuticleResist_pft       => plt_photo%H2OCuticleResist_pft   , &
     CanPStomaResistH2O_pft          => plt_photo%CanPStomaResistH2O_pft      , &
     RadNet2Canopy_pft               => plt_rad%RadNet2Canopy_pft             , &
     RadSWbyCanopy_pft               => plt_rad%RadSWbyCanopy_pft             , &
     LWRadSky                        => plt_rad%LWRadSky                      , &
-    FracRadPARbyCanopy_pft          => plt_rad%FracRadPARbyCanopy_pft        , &
+    FracPARRadbyCanopy_pft          => plt_rad%FracPARRadbyCanopy_pft        , &
     LWRadCanopy_pft                 => plt_rad%LWRadCanopy_pft               , &
     LWRadGrnd                       => plt_rad%LWRadGrnd                       &
   )
@@ -711,9 +711,9 @@ module UptakesMod
   CCPOLT=CanopyNonstElmConc_pft(ielmc,NZ)+CanopyNonstElmConc_pft(ielmn,NZ) &
     +CanopyNonstElmConc_pft(ielmp,NZ)
   !coefficient for LW emitted by canopy  
-  FTHRM=EMMC*stefboltz_const*FracRadPARbyCanopy_pft(NZ)*AREA3(NU)
+  FTHRM=EMMC*stefboltz_const*FracPARRadbyCanopy_pft(NZ)*AREA3(NU)
   !long-wave absorbed by canopy
-  LWRad2CanP=(LWRadSky+LWRadGrnd)*FracRadPARbyCanopy_pft(NZ)
+  LWRad2CanP=(LWRadSky+LWRadGrnd)*FracPARRadbyCanopy_pft(NZ)
 !     RAZ=canopy isothermal boundary later resistance
 
   cumPRootH2OUptake=0.0_r8
@@ -773,12 +773,12 @@ module UptakesMod
 !     RCS=shape parameter for CanPStomaResistH2O_pftvs PSICanopyTurg_pft from PFT file
 !     RC=canopy stomatal resistance
 !     MinCanPStomaResistH2O_pft=minimum CanPStomaResistH2O_pftat PSICanopy_pft=0 from stomate.f
-!     RSMX=cuticular resistance from PFT file
+!     CuticleResist_pft=cuticular resistance from PFT file
 !
     Stomata_Stress=EXP(RCS(NZ)*PSICanopyTurg_pft(NZ))
 
     CanPStomaResistH2O_pft(NZ)=MinCanPStomaResistH2O_pft(NZ)+Stomata_Stress &
-      *(MaxCanPStomaResistH2O_pft(NZ)-MinCanPStomaResistH2O_pft(NZ))
+      *(H2OCuticleResist_pft(NZ)-MinCanPStomaResistH2O_pft(NZ))
 !
 !     CANOPY VAPOR PRESSURE AND EVAPORATION OF INTERCEPTED WATER
 !     OR TRANSPIRATION OF UPTAKEN WATER
@@ -1192,8 +1192,8 @@ module UptakesMod
     CanopyBndlResist_pft           =>  plt_photo%CanopyBndlResist_pft      , &
     CanPStomaResistH2O_pft         =>  plt_photo%CanPStomaResistH2O_pft    , &
     MinCanPStomaResistH2O_pft      =>  plt_photo%MinCanPStomaResistH2O_pft , &
-    MaxCanPStomaResistH2O_pft      =>  plt_photo%MaxCanPStomaResistH2O_pft , &
-    FracRadPARbyCanopy_pft         =>  plt_rad%FracRadPARbyCanopy_pft      , &
+    H2OCuticleResist_pft      =>  plt_photo%H2OCuticleResist_pft , &
+    FracPARRadbyCanopy_pft         =>  plt_rad%FracPARRadbyCanopy_pft      , &
     LWRadCanopy_pft                =>  plt_rad%LWRadCanopy_pft             , &
     RadNet2Canopy_pft              =>  plt_rad%RadNet2Canopy_pft             &
   )
@@ -1209,7 +1209,7 @@ module UptakesMod
     TKC(NZ)=TKSnow
   ENDIF
   TCelciusCanopy_pft(NZ)=units%Kelvin2Celcius(TKC(NZ))
-  FTHRM=EMMC*stefboltz_const*FracRadPARbyCanopy_pft(NZ)*AREA3(NU)
+  FTHRM=EMMC*stefboltz_const*FracPARRadbyCanopy_pft(NZ)*AREA3(NU)
   LWRadCanopy_pft(NZ)=FTHRM*TKC(NZ)**4._r8
   PSICanopy_pft(NZ)=ElvAdjstedtSoiPSIMPa(NGTopRootLayer_pft(NZ))  
   CCPOLT=sum(CanopyNonstElmConc_pft(1:NumPlantChemElms,NZ))
@@ -1219,7 +1219,7 @@ module UptakesMod
 
   Stomata_Stress=EXP(RCS(NZ)*PSICanopyTurg_pft(NZ))
   CanPStomaResistH2O_pft(NZ)=MinCanPStomaResistH2O_pft(NZ) &
-    +(MaxCanPStomaResistH2O_pft(NZ)-MinCanPStomaResistH2O_pft(NZ))*Stomata_Stress
+    +(H2OCuticleResist_pft(NZ)-MinCanPStomaResistH2O_pft(NZ))*Stomata_Stress
   CanopyBndlResist_pft(NZ)=RAZ(NZ)
   VHeatCapCanP(NZ)=cpw*(ShootStrutElms_pft(ielmc,NZ)*10.0E-06_r8)
   DeltaTKC(NZ)=0.0_r8
@@ -1352,6 +1352,7 @@ module UptakesMod
   !     OR CANOPY TEMPERATURE DEPENDING ON GROWTH STAGE
   !
   IF(iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).EQ.0)THEN
+    !before seed emergence
     TKG(NZ)=TKS(NU)
     !     ELSEIF((iPlantTurnoverPattern_pft(NZ).EQ.0.OR.iPlantRootProfile_pft(NZ).LE.1)
     !    2.AND.iPlantCalendar_brch(ipltcal_InitFloral,MainBranchNum_pft(NZ),NZ).EQ.0)THEN
