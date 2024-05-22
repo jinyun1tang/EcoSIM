@@ -55,7 +55,7 @@ implicit none
   CO2CompenPoint_node           => plt_photo%CO2CompenPoint_node           , &
   AirConc_pft                   => plt_photo%AirConc_pft                   , &
   DiffCO2Atmos2Intracel_pft     => plt_photo%DiffCO2Atmos2Intracel_pft     , &
-  ZEROP                         => plt_biom%ZEROP                          , &
+  ZERO4Groth_pft                         => plt_biom%ZERO4Groth_pft                          , &
   CanopyLeafArea_lpft           => plt_morph%CanopyLeafArea_lpft           , &
   RadDifPAR_zsec                => plt_rad%RadDifPAR_zsec                  , &
   RadPAR_zsec                   => plt_rad%RadPAR_zsec                     , &
@@ -68,7 +68,7 @@ implicit none
   CH2OClmK=0._r8
   CH2OLlmK=0._r8
   D210: DO L=NumOfCanopyLayers1,1,-1
-    IF(CanopyLeafArea_lpft(L,K,NB,NZ).GT.ZEROP(NZ))THEN
+    IF(CanopyLeafArea_lpft(L,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
 !
 !     FOR EACH LEAF AZIMUTH AND INCLINATION
 !
@@ -79,7 +79,7 @@ implicit none
 !
 !         LeafAUnshaded_zsec=unself-shaded leaf surface area
 !
-          IF(LeafAUnshaded_zsec(N,L,K,NB,NZ).GT.ZEROP(NZ))THEN            
+          IF(LeafAUnshaded_zsec(N,L,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN            
             DO LP=1,2
               if (LP==1)then
                 PAR_zsec=RadPAR_zsec(N,M,L,NZ)
@@ -230,7 +230,7 @@ implicit none
 ! begin_execution
   associate(                                                                    &
   iPlantRootProfile_pft             => plt_pheno%iPlantRootProfile_pft        , &
-  ZEROP                             => plt_biom%ZEROP                         , &
+  ZERO4Groth_pft                             => plt_biom%ZERO4Groth_pft                         , &
   Km4PEPCarboxy_pft                 => plt_photo%Km4PEPCarboxy_pft            , &
   NutrientCtrlonC4Carboxy_node      => plt_photo%NutrientCtrlonC4Carboxy_node , &
   CO2Solubility_pft                 => plt_photo%CO2Solubility_pft            , &
@@ -260,7 +260,7 @@ implicit none
 ! FOR EACH CANOPY LAYER
 !
   D110: DO L=NumOfCanopyLayers1,1,-1
-    IF(CanopyLeafArea_lpft(L,K,NB,NZ).GT.ZEROP(NZ))THEN
+    IF(CanopyLeafArea_lpft(L,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
 !
 !     FOR EACH LEAF AZIMUTH AND INCLINATION
 !
@@ -271,7 +271,7 @@ implicit none
 !
 !         LeafAUnshaded_zsec=unself-shaded leaf surface area
 !
-          IF(LeafAUnshaded_zsec(N,L,K,NB,NZ).GT.ZEROP(NZ))THEN
+          IF(LeafAUnshaded_zsec(N,L,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
             DO LP=1,2
               if(LP==1)then
                 PAR_zsec=RadPAR_zsec(N,M,L,NZ)
@@ -435,7 +435,7 @@ implicit none
     iPlantRootProfile_pft     =>  plt_pheno%iPlantRootProfile_pft    , &
     SineSunInclAngle_col      =>  plt_rad%SineSunInclAngle_col       , &
     RadPARbyCanopy_pft        =>  plt_rad%RadPARbyCanopy_pft         , &
-    ZEROP                     =>  plt_biom%ZEROP                     , &
+    ZERO4Groth_pft                     =>  plt_biom%ZERO4Groth_pft                     , &
     LeafAreaNode_brch         =>  plt_morph%LeafAreaNode_brch        , &
     RubiscoActivity_brch      =>  plt_photo%RubiscoActivity_brch       &
   )
@@ -453,7 +453,7 @@ implicit none
           CH2O3(K)=0._r8
           CH2O4(K)=0._r8
 
-          IF(LeafAreaNode_brch(K,NB,NZ).GT.ZEROP(NZ))THEN
+          IF(LeafAreaNode_brch(K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
 !
 !             C4 PHOTOSYNTHESIS
 !

@@ -53,7 +53,7 @@ module StartsMod
   !
   !     BulkDensLitR=dry bulk density of woody(0),fine(1),manure(2) litter
   !     FORGC=minimum SOC for organic soil (g Mg-1)
-  !      VolMaxSoilMoist4Fire,FCH4F=maximum SWC,CH4 emission fraction for combustion
+  !      VolMaxSoilMoist4Fire,FrcAsCH4byFire=maximum SWC,CH4 emission fraction for combustion
   !     PSIHY=hygroscopic water potential (MPa)
   !     FCI,WPI=FC,WP for water retention by ice (MPa)
   !     CDPTHSI=depth to bottom of snowpack layers
@@ -767,7 +767,7 @@ module StartsMod
   ATCS(:,:)=ATCAI(:,:)
   TairKClimMean(:,:)=units%Celcius2Kelvin(ATCA)
   ATKS(:,:)=units%Celcius2Kelvin(ATCS)
-  URAIN(:,:)=0.0_r8
+  URAIN_col(:,:)=0.0_r8
 
   CO2byFire_col(:,:)=0.0_r8
   CH4byFire_col(:,:)=0.0_r8

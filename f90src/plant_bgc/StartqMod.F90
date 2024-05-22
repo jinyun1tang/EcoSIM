@@ -77,9 +77,9 @@ module StartqMod
 
           call InitSeedMorphoBio(NZ,NY,NX)
         ENDIF
-        ZEROP(NZ,NY,NX)=ZERO*PlantPopulation_pft(NZ,NY,NX)
-        ZEROQ(NZ,NY,NX)=ZERO*PlantPopulation_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        ZEROL(NZ,NY,NX)=ZERO*PlantPopulation_pft(NZ,NY,NX)*1.0E+06_r8
+        ZERO4Groth_pft(NZ,NY,NX)=ZERO*PlantPopulation_pft(NZ,NY,NX)
+        ZERO4Uptk_pft(NZ,NY,NX)=ZERO*PlantPopulation_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        ZERO4LeafVar_pft(NZ,NY,NX)=ZERO*PlantPopulation_pft(NZ,NY,NX)*1.0E+06_r8
       ENDDO D9985
 !
 !     FILL OUT UNUSED ARRAYS
@@ -111,7 +111,7 @@ module StartqMod
   iDayPlanting_pft(NZ,NY,NX)=iPlantingDay_pft(NZ,NY,NX) !planting day
   iYearPlantHarvest_pft(NZ,NY,NX)=iHarvestYear_pft(NZ,NY,NX)
   iDayPlantHarvest_pft(NZ,NY,NX)=iHarvestDay_pft(NZ,NY,NX)
-  PPI(NZ,NY,NX)=PPZ(NZ,NY,NX)
+  PPI(NZ,NY,NX)=PPatSeeding_pft(NZ,NY,NX)
   PPX_pft(NZ,NY,NX)=PPI(NZ,NY,NX)
   ClumpFactor_pft(NZ,NY,NX)=ClumpFactorInit_pft(NZ,NY,NX)       !clumping factor
   
@@ -524,7 +524,7 @@ module StartqMod
 !
 !     INITIALIZE PLANT MORPHOLOGY AND BIOMASS
 !
-  HoursCanopyPSITooLow_pft(NZ,NY,NX)=0._r8
+  HoursTooLowPsiCan_pft(NZ,NY,NX)=0._r8
   ChillHours_pft(NZ,NY,NX)=0._r8
   CanopyNonstElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)=0._r8
   CanopyNodulNonstElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)=0._r8

@@ -62,7 +62,7 @@ module RootGasMod
 !     begin_execution
   associate(                                                       &
     RootStrutElms_pft        => plt_biom%RootStrutElms_pft,        &
-    ZEROP                    => plt_biom%ZEROP,                    &
+    ZERO4Groth_pft                    => plt_biom%ZERO4Groth_pft,                    &
     PlantPopulation_pft      => plt_site%PlantPopulation_pft,      &
     DPTHZ                    => plt_site%DPTHZ,                    &
     AtmGasc                  => plt_site%AtmGasc,                  &
@@ -77,7 +77,7 @@ module RootGasMod
     RO2AquaXchangePrev_vr    => plt_bgcr%RO2AquaXchangePrev_vr,    &
     RootO2Uptk_pvr           => plt_rbgc%RootO2Uptk_pvr,           &
     RAutoRootO2Limter_pvr    => plt_rbgc%RAutoRootO2Limter_pvr,    &
-    ZEROQ                    => plt_rbgc%ZEROQ,                    &
+    ZERO4Uptk_pft                    => plt_rbgc%ZERO4Uptk_pft,                    &
     RootRespPotent_pvr       => plt_rbgc%RootRespPotent_pvr,       &
     RootO2Dmnd4Resp_pvr      => plt_rbgc%RootO2Dmnd4Resp_pvr,      &
     RO2UptkSoilM_vr          => plt_rbgc%RO2UptkSoilM_vr,          &
@@ -117,8 +117,8 @@ module RootGasMod
     MainBranchNum_pft        => plt_morph%MainBranchNum_pft        &
   )
   
-  IF(RootRespPotent_pvr(N,L,NZ).GT.ZEROP(NZ).AND.RootVH2O_pvr(N,L,NZ).GT.ZEROP(NZ) &
-    .AND.FOXYX.GT.ZEROQ(NZ))THEN
+  IF(RootRespPotent_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ).AND.RootVH2O_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ) &
+    .AND.FOXYX.GT.ZERO4Uptk_pft(NZ))THEN
 !
 !     INITIALIZE VARIABLES USED IN ROOT GAS EXCHANGE
 !     (CO2, O2, CH4, N2, N2O, NH3, H2)
@@ -134,18 +134,18 @@ module RootGasMod
 !
 
     DO NTG=idg_beg,idg_end-1
-      trcg_gmas_loc(NTG)=AMAX1(ZEROP(NZ),trcg_rootml_pvr(NTG,N,L,NZ))
-      trcs_rootml_loc(NTG)=AMAX1(ZEROP(NZ),trcs_rootml_pvr(NTG,N,L,NZ))
+      trcg_gmas_loc(NTG)=AMAX1(ZERO4Groth_pft(NZ),trcg_rootml_pvr(NTG,N,L,NZ))
+      trcs_rootml_loc(NTG)=AMAX1(ZERO4Groth_pft(NZ),trcs_rootml_pvr(NTG,N,L,NZ))
     ENDDO
 
     DO NTG=idg_beg,idg_end
-      if(NTG/=idg_O2)trc_solml_loc(NTG)=AMAX1(ZEROP(NZ),trc_solml_vr(NTG,L)*FracPRoot4Uptake(N,L,NZ))
+      if(NTG/=idg_O2)trc_solml_loc(NTG)=AMAX1(ZERO4Groth_pft(NZ),trc_solml_vr(NTG,L)*FracPRoot4Uptake(N,L,NZ))
     enddo
     trc_solml_loc(idg_O2)=trc_solml_vr(idg_O2,L)*FOXYX
 
 !  the two lines below may be redundant
-!    trc_gasml_loc(idg_CO2)=AMAX1(ZEROP(NZ),trc_gasml_vr(idg_CO2,L)*FracPRoot4Uptake(N,L,NZ))
-!    trc_gasml_loc(idg_O2)=AMAX1(ZEROP(NZ),trc_gasml_vr(idg_O2,L)*FOXYX)
+!    trc_gasml_loc(idg_CO2)=AMAX1(ZERO4Groth_pft(NZ),trc_gasml_vr(idg_CO2,L)*FracPRoot4Uptake(N,L,NZ))
+!    trc_gasml_loc(idg_O2)=AMAX1(ZERO4Groth_pft(NZ),trc_gasml_vr(idg_O2,L)*FOXYX)
 
     RTVLWA=RootVH2O_pvr(N,L,NZ)*trcs_VLN_vr(ids_NH4,L)
     RTVLWB=RootVH2O_pvr(N,L,NZ)*trcs_VLN_vr(ids_NH4B,L)
@@ -181,7 +181,7 @@ module RootGasMod
 !     DPTHZ=depth of primary root from surface
 !     Root2ndAveLen_pvr=average secondary root length
 !
-    IF(RootStrutElms_pft(ielmc,NZ).GT.ZEROP(NZ).AND.FracSoiLayByPrimRoot(L,NZ).GT.ZERO)THEN
+    IF(RootStrutElms_pft(ielmc,NZ).GT.ZERO4Groth_pft(NZ).AND.FracSoiLayByPrimRoot(L,NZ).GT.ZERO)THEN
       RTCR1=AMAX1(PlantPopulation_pft(NZ),Root1stXNumL_pvr(N,L,NZ)) &
         *PICON*Root1stRadius_pvr(N,L,NZ)**2/DPTHZ(L)
       RTCR2=(Root2ndXNum_pvr(N,L,NZ)*PICON*Root2ndRadius_pvr(N,L,NZ)**2 &
@@ -213,7 +213,7 @@ module RootGasMod
 !
 
     IF(N.EQ.ipltroot.AND.iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).GT.0 &
-      .AND.RootLenPerPlant_pvr(N,L,NZ).GT.ZEROP(NZ))THEN
+      .AND.RootLenPerPlant_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ))THEN
       RTARRX=RootAreaDivRadius_vr(N,L)/RootRaidus_rpft(N,NZ)
       DIFOP=O2AquaDiffusvityP*RTARRX
       DO NTG=idg_beg,idg_end-1
@@ -264,7 +264,7 @@ module RootGasMod
       VOLWSB=RTVLWB+VLWatMicPMB
       THETW1=AZMAX1(VLWatMicPM(M,L)/VLSoilMicP(L))
 
-      IF(THETW1.GT.THETY_vr(L) .AND. FracPRoot4Uptake(N,L,NZ).GT.ZEROQ(NZ))THEN
+      IF(THETW1.GT.THETY_vr(L) .AND. FracPRoot4Uptake(N,L,NZ).GT.ZERO4Uptk_pft(NZ))THEN
         THETM=TortMicPM_vr(M,L)*THETW1
         RRADS=LOG((FILM(M,L)+FineRootRadius(N,L))/FineRootRadius(N,L))
         RTARRX=RootAreaDivRadius_vr(N,L)/RRADS
@@ -340,7 +340,7 @@ module RootGasMod
           X=(DIFLGas(idg_O2)+dtPerPlantRootH2OUptake)*trcaqu_conc_soi_loc(idg_O2)+&
             DIFOP*trcrootconc_loc(idg_O2)
 
-          IF(X.GT.ZERO.AND.trc_solml_loc(idg_O2).GT.ZEROP(NZ))THEN
+          IF(X.GT.ZERO.AND.trc_solml_loc(idg_O2).GT.ZERO4Groth_pft(NZ))THEN
             !root take up O2
             B=-RootOxyDemandPerPlant-DIFOX*OXKM-X
             C=X*RootOxyDemandPerPlant            
@@ -352,7 +352,7 @@ module RootGasMod
           ELSE
             !root release O2
             X=DIFOP*trcrootconc_loc(idg_O2)
-            IF(X.GT.ZERO.AND.trcs_rootml_loc(idg_O2).GT.ZEROP(NZ))THEN
+            IF(X.GT.ZERO.AND.trcs_rootml_loc(idg_O2).GT.ZERO4Groth_pft(NZ))THEN
               B=-RootOxyDemandPerPlant-DIFOP*OXKM-X
               C=X*RootOxyDemandPerPlant
               RootOxyUptakePerPlant=(-B-SQRT(B*B-4.0_r8*C))/2.0_r8
@@ -386,8 +386,8 @@ module RootGasMod
 
           RDFSolute(idg_CO2)=RMFGas(idg_CO2)+DIFLGas(idg_CO2)*&
             (trcaqu_conc_soi_loc(idg_CO2)-trcrootconc_loc(idg_CO2))
-          RDXSolute(idg_CO2)=(RootVH2O_pvr(N,L,NZ)*AMAX1(ZEROP(NZ),trc_solml_loc(idg_CO2)) &
-            -VLWatMicPMM*AMAX1(ZEROP(NZ),trcs_rootml_loc(idg_CO2)))/VOLWSP
+          RDXSolute(idg_CO2)=(RootVH2O_pvr(N,L,NZ)*AMAX1(ZERO4Groth_pft(NZ),trc_solml_loc(idg_CO2)) &
+            -VLWatMicPMM*AMAX1(ZERO4Groth_pft(NZ),trcs_rootml_loc(idg_CO2)))/VOLWSP
 
           IF(RDFSolute(idg_CO2).GT.0.0_r8)THEN
             RUPSolute(idg_CO2)=AMIN1(AZMAX1(RDXSolute(idg_CO2)),RDFSolute(idg_CO2) &
@@ -401,8 +401,8 @@ module RootGasMod
             DO NTG=idg_beg,idg_end-1
               if(NTG/=idg_CO2.and.NTG/=idg_NH3.and.NTG/=idg_O2)then
                 RDFSolute(NTG)=RMFGas(NTG)+DIFLGas(NTG)*(trcaqu_conc_soi_loc(NTG)-trcrootconc_loc(NTG))
-                RDXSolute(NTG)=(RootVH2O_pvr(N,L,NZ)*AMAX1(ZEROP(NZ),trc_solml_loc(NTG)) &
-                  -VLWatMicPMM*AMAX1(ZEROP(NZ),trcs_rootml_loc(NTG)))/VOLWSP
+                RDXSolute(NTG)=(RootVH2O_pvr(N,L,NZ)*AMAX1(ZERO4Groth_pft(NZ),trc_solml_loc(NTG)) &
+                  -VLWatMicPMM*AMAX1(ZERO4Groth_pft(NZ),trcs_rootml_loc(NTG)))/VOLWSP
                 IF(RDFSolute(NTG).GT.0.0_r8)THEN
                   RUPSolute(NTG)=AMIN1(AZMAX1(RDXSolute(NTG)),RDFSolute(NTG)*PlantPopulation_pft(NZ))
                 ELSE
@@ -413,10 +413,10 @@ module RootGasMod
 
             RDFSolute(idg_NH3)=RMFGas(idg_NH3)+DIFLGas(idg_NH3)*&
               (trcaqu_conc_soi_loc(idg_NH3)-trcrootconc_loc(idg_NH3))
-            IF(VOLWSA.GT.ZEROP(NZ))THEN
+            IF(VOLWSA.GT.ZERO4Groth_pft(NZ))THEN
               ZH3PA=trcs_rootml_loc(idg_NH3)*trcs_VLN_vr(ids_NH4,L)
-              RDXSolute(idg_NH3)=(RTVLWA*AMAX1(ZEROP(NZ),trc_solml_loc(idg_NH3)) &
-                -VLWatMicPMA*AMAX1(ZEROP(NZ),ZH3PA))/VOLWSA
+              RDXSolute(idg_NH3)=(RTVLWA*AMAX1(ZERO4Groth_pft(NZ),trc_solml_loc(idg_NH3)) &
+                -VLWatMicPMA*AMAX1(ZERO4Groth_pft(NZ),ZH3PA))/VOLWSA
             ELSE
               RDXSolute(idg_NH3)=0.0_r8
             ENDIF
@@ -430,10 +430,10 @@ module RootGasMod
 
             RDFSolute(idg_NH3B)=RMFGas(idg_NH3B)+DIFLGas(idg_NH3B)* &
               (trcaqu_conc_soi_loc(idg_NH3B)-trcrootconc_loc(idg_NH3))
-            IF(VOLWSB.GT.ZEROP(NZ))THEN
+            IF(VOLWSB.GT.ZERO4Groth_pft(NZ))THEN
               ZH3PB=trcs_rootml_loc(idg_NH3)*trcs_VLN_vr(ids_NH4B,L)
-              RDXSolute(idg_NH3B)=(RTVLWB*AMAX1(ZEROP(NZ),trc_solml_loc(idg_NH3B)) &
-                -VLWatMicPMB*AMAX1(ZEROP(NZ),ZH3PB))/VOLWSB
+              RDXSolute(idg_NH3B)=(RTVLWB*AMAX1(ZERO4Groth_pft(NZ),trc_solml_loc(idg_NH3B)) &
+                -VLWatMicPMB*AMAX1(ZERO4Groth_pft(NZ),ZH3PB))/VOLWSB
             ELSE
               RDXSolute(idg_NH3B)=0.0_r8
             ENDIF
@@ -466,35 +466,35 @@ module RootGasMod
 !         
           IF(THETPM(M,L).GT.THETX)THEN
             DiffusivitySolutEffP=FracPRoot4Uptake(N,L,NZ)*DiffusivitySolutEff(M,L)
-            RDFQSolute(idg_CO2)=DiffusivitySolutEffP*(AMAX1(ZEROP(NZ),trc_gasml_loc(idg_CO2))&
+            RDFQSolute(idg_CO2)=DiffusivitySolutEffP*(AMAX1(ZERO4Groth_pft(NZ),trc_gasml_loc(idg_CO2))&
               *VOLWSolute(idg_CO2)-(AMAX1(ZEROS,trc_solml_loc(idg_CO2))-RUPSolute(idg_CO2))*VLsoiAirPMM) &
               /(VOLWSolute(idg_CO2)+VLsoiAirPMM)
             RUPOST=RUPOSX-ROXYLX
-            RDFQSolute(idg_O2)=DiffusivitySolutEffP*(AMAX1(ZEROP(NZ),trc_gasml_loc(idg_O2))*VOLWSolute(idg_O2) &
+            RDFQSolute(idg_O2)=DiffusivitySolutEffP*(AMAX1(ZERO4Groth_pft(NZ),trc_gasml_loc(idg_O2))*VOLWSolute(idg_O2) &
               -(AMAX1(ZEROS,trc_solml_loc(idg_O2))-RUPOST)*VLsoiAirPMM)/(VOLWSolute(idg_O2)+VLsoiAirPMM)
 
             IF(N.EQ.ipltroot)THEN
               DO NTG=idg_beg,idg_NH3-1
                 if(NTG/=idg_CO2.and.NTG/=idg_O2)then
-                  RDFQSolute(NTG)=DiffusivitySolutEffP*(AMAX1(ZEROP(NZ),trc_gasml_loc(NTG))*VOLWSolute(NTG) &
+                  RDFQSolute(NTG)=DiffusivitySolutEffP*(AMAX1(ZERO4Groth_pft(NZ),trc_gasml_loc(NTG))*VOLWSolute(NTG) &
                     -(AMAX1(ZEROS,trc_solml_loc(NTG))-RUPSolute(NTG))*VLsoiAirPMM)/(VOLWSolute(NTG)+VLsoiAirPMM)
                 endif
               ENDDO
 
-              IF(VOLWSolute(idg_NH3)+VOLPNH.GT.ZEROP(NZ))THEN
+              IF(VOLWSolute(idg_NH3)+VOLPNH.GT.ZERO4Groth_pft(NZ))THEN
                 ZH3GA=trc_gasml_loc(idg_NH3)*trcs_VLN_vr(ids_NH4,L)
                 RDFQSolute(idg_NH3)=AMIN1(RUPSolute(idg_NH3),AMAX1(-RUPSolute(idg_NH3) &
-                  ,DiffusivitySolutEffP*(AMAX1(ZEROP(NZ),ZH3GA)*VOLWSolute(idg_NH3) &
+                  ,DiffusivitySolutEffP*(AMAX1(ZERO4Groth_pft(NZ),ZH3GA)*VOLWSolute(idg_NH3) &
                   -(AMAX1(ZEROS,trc_solml_loc(idg_NH3))-RUPSolute(idg_NH3))*VOLPNH) &
                   /(VOLWSolute(idg_NH3)+VOLPNH)))
               ELSE
                 RDFQSolute(idg_NH3)=0.0_r8
               ENDIF
 
-              IF(VOLWSolute(idg_NH3B)+VOLPNB.GT.ZEROP(NZ))THEN
+              IF(VOLWSolute(idg_NH3B)+VOLPNB.GT.ZERO4Groth_pft(NZ))THEN
                 ZH3GB=trc_gasml_loc(idg_NH3)*trcs_VLN_vr(ids_NH4B,L)
                 RDFQSolute(idg_NH3B)=AMIN1(RUPSolute(idg_NH3),AMAX1(-RUPSolute(idg_NH3) &
-                  ,DiffusivitySolutEffP*(AMAX1(ZEROP(NZ),ZH3GB)*VOLWSolute(idg_NH3B)   &
+                  ,DiffusivitySolutEffP*(AMAX1(ZERO4Groth_pft(NZ),ZH3GB)*VOLWSolute(idg_NH3B)   &
                   -(AMAX1(ZEROS,trc_solml_loc(idg_NH3B))-RUPSolute(idg_NH3B))*VOLPNB)  &
                   /(VOLWSolute(idg_NH3B)+VOLPNB)))
               ELSE
@@ -519,7 +519,7 @@ module RootGasMod
 !
 !     GAS TRANSFER THROUGH ROOTS
 !
-          IF(N.EQ.ipltroot.AND.RootPoreVol_pvr(N,L,NZ).GT.ZEROP(NZ))THEN
+          IF(N.EQ.ipltroot.AND.RootPoreVol_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ))THEN
             RUPNTX=RUPSolute(idg_NH3)+RUPSolute(idg_NH3B)
 !
 !     GAS EXCHANGE BETWEEN GASEOUS AND AQUEOUS PHASES IN ROOTS
@@ -540,7 +540,7 @@ module RootGasMod
 
             DO NTG=idg_beg,idg_end-1
               if(NTG/=idg_CO2.and.NTG/=idg_NH3)GasPX(NTG)=trcs_rootml_loc(NTG)+RUPSolute(NTG)
-              trcg_Root2Soil_flx(NTG)=AMAX1(-GasPX(NTG),DFGP*(AMAX1(ZEROP(NZ),trcg_gmas_loc(NTG)) &
+              trcg_Root2Soil_flx(NTG)=AMAX1(-GasPX(NTG),DFGP*(AMAX1(ZERO4Groth_pft(NZ),trcg_gmas_loc(NTG)) &
                 *DisolvedGasVolume(NTG)-GasPX(NTG)*RootPoreVol_pvr(N,L,NZ)) &
                 /(DisolvedGasVolume(NTG)+RootPoreVol_pvr(N,L,NZ)))
               !positive into root

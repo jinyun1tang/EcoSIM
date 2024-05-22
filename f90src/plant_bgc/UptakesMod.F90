@@ -89,8 +89,8 @@ module UptakesMod
     AREA3                          => plt_site%AREA3                    , &
     ZEROS                          => plt_site%ZEROS                    , &
     PopuRootMycoC_pvr              => plt_biom% PopuRootMycoC_pvr       , &
-    ZEROL                          => plt_biom%ZEROL                    , &
-    ZEROP                          => plt_biom%ZEROP                    , &
+    ZERO4LeafVar_pft                          => plt_biom%ZERO4LeafVar_pft                    , &
+    ZERO4Groth_pft                          => plt_biom%ZERO4Groth_pft                    , &
     CanopyLeafShethC_pft           => plt_biom%CanopyLeafShethC_pft     , &
     CanopyStalkC_pft               => plt_biom%CanopyStalkC_pft         , &
     iPlantCalendar_brch            => plt_pheno%iPlantCalendar_brch     , &
@@ -129,7 +129,7 @@ module UptakesMod
 !
 !     (AG: - originally this line had a N0B1 here )
       IF((iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).NE.0)&
-        .AND.(LeafStalkArea_pft(NZ).GT.ZEROL(NZ) &
+        .AND.(LeafStalkArea_pft(NZ).GT.ZERO4LeafVar_pft(NZ) &
         .AND.FracPARRadbyCanopy_pft(NZ).GT.0.0_r8)&
         .AND.(Root1stDepz_pft(ipltroot,1,NZ).GT.SeedDepth_pft(NZ)+CumSoilThickness(0)))THEN
         !shoot area > 0, absorped par>0, and rooting depth > seeding depth
@@ -212,7 +212,7 @@ module UptakesMod
 
       Canopy_Heat_Latent_col=Canopy_Heat_Latent_col+EvapTransHeat_pft(NZ)*CanopyBndlResist_pft(NZ)
       Canopy_Heat_Sens_col=Canopy_Heat_Sens_col+HeatXAir2PCan(NZ)*CanopyBndlResist_pft(NZ)
-      IF(PopPlantO2Demand.GT.ZEROP(NZ))THEN
+      IF(PopPlantO2Demand.GT.ZERO4Groth_pft(NZ))THEN
         PlantO2Stress(NZ)=PopPlantO2Uptake/PopPlantO2Demand
       ELSE
         PlantO2Stress(NZ)=0.0_r8
@@ -340,12 +340,12 @@ module UptakesMod
     BndlResistAboveCanG       => plt_ew%BndlResistAboveCanG,          &
     TairK                     => plt_ew%TairK,                        &
     DeltaTKC                  => plt_ew%DeltaTKC,                     &
-    ZeroPlanDisp              => plt_ew%ZeroPlanDisp,                 &
+    ZERO4Groth_pftlanDisp              => plt_ew%ZERO4Groth_pftlanDisp,                 &
     RoughHeight               => plt_ew%RoughHeight,                  &
     RAZ                       => plt_ew%RAZ,                          &
     TKCanopy_pft              => plt_ew%TKCanopy_pft,                 &
     LeafProteinCNode_brch     => plt_biom%LeafProteinCNode_brch,      &
-    ZEROP                     => plt_biom%ZEROP,                      &
+    ZERO4Groth_pft                     => plt_biom%ZERO4Groth_pft,                      &
     FracPARRadbyCanopy_pft    => plt_rad%FracPARRadbyCanopy_pft,      &
     LeafAUnshaded_zsec        => plt_photo%LeafAUnshaded_zsec,        &
     LeafAreaNode_brch         => plt_morph%LeafAreaNode_brch,         &
@@ -372,7 +372,7 @@ module UptakesMod
 !     LeafAUnshaded_zsec,LeafAreaZsec_brch=unself-shaded,total leaf surface area
 !     ClumpFactorNow_pft=clumping factor from PFT file
 !
-      IF(LeafAreaNode_brch(K,NB,NZ).GT.ZEROP(NZ) .AND. LeafProteinCNode_brch(K,NB,NZ).GT.ZEROP(NZ))THEN
+      IF(LeafAreaNode_brch(K,NB,NZ).GT.ZERO4Groth_pft(NZ) .AND. LeafProteinCNode_brch(K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
         KMinNumLeaf4GroAlloc_brch(NB,NZ)=K
       ENDIF
 
@@ -411,7 +411,7 @@ module UptakesMod
         .AND.ALFZ.GT.ZERO)THEN
         RACZ(NZ)=AMIN1(RACX,AZMAX1(CanopyHeight_col*EXP(ALFZ) &
           /(ALFZ/BndlResistAboveCanG)*(EXP(-ALFZ*CanopyHeight_pft(NZ)/CanopyHeight_col) &
-          -EXP(-ALFZ*(ZeroPlanDisp+RoughHeight)/CanopyHeight_col))))
+          -EXP(-ALFZ*(ZERO4Groth_pftlanDisp+RoughHeight)/CanopyHeight_col))))
       ELSE
         RACZ(NZ)=0.0_r8
       ENDIF
@@ -689,8 +689,8 @@ module UptakesMod
     WatByPCanopy                    => plt_ew%WatByPCanopy                   , &
     PrecIntcptByCanopy_pft          => plt_ew%PrecIntcptByCanopy_pft         , &
     EvapTransHeat_pft               => plt_ew%EvapTransHeat_pft              , &
-    ZEROL                           => plt_biom%ZEROL                        , &
-    ZEROP                           => plt_biom%ZEROP                        , &
+    ZERO4LeafVar_pft                           => plt_biom%ZERO4LeafVar_pft                        , &
+    ZERO4Groth_pft                           => plt_biom%ZERO4Groth_pft                        , &
     CanopyNonstElmConc_pft          => plt_biom%CanopyNonstElmConc_pft       , &
     MaxSoiL4Root                    => plt_morph%MaxSoiL4Root                , &
     MY                              => plt_morph%MY                          , &
@@ -934,32 +934,32 @@ module UptakesMod
         CYCLE
       ENDIF
       
-      IF(ABS(SymplasmicWat-VOLWPX).GT.ZEROP(NZ))THEN
+      IF(ABS(SymplasmicWat-VOLWPX).GT.ZERO4Groth_pft(NZ))THEN
         RSSZ=ABS((PSICanopy_pft(NZ)-PSICanPPre)/(SymplasmicWat-VOLWPX))
-      ELSEIF(CNDT.GT.ZEROP(NZ))THEN
+      ELSEIF(CNDT.GT.ZERO4Groth_pft(NZ))THEN
         RSSZ=1.0_r8/CNDT   !resistance
       ELSE
-        RSSZ=ZEROL(NZ)
+        RSSZ=ZERO4LeafVar_pft(NZ)
       ENDIF
       
-      IF(ABS(Transpiration_pft(NZ)-PTransPre).GT.ZEROP(NZ))THEN
+      IF(ABS(Transpiration_pft(NZ)-PTransPre).GT.ZERO4Groth_pft(NZ))THEN
         RSSUX=ABS((PSICanopy_pft(NZ)-PSICanPPre)/(Transpiration_pft(NZ)-PTransPre))
-        IF(CNDT.GT.ZEROP(NZ))THEN
+        IF(CNDT.GT.ZERO4Groth_pft(NZ))THEN
           RSSU=AMIN1(1.0_r8/CNDT,RSSUX)  !resistance for uptake
         ELSE
           RSSU=RSSUX
         ENDIF
-      ELSEIF(ABS(cumPRootH2OUptake-cumPRootH2OUptakePre).GT.ZEROP(NZ))THEN
+      ELSEIF(ABS(cumPRootH2OUptake-cumPRootH2OUptakePre).GT.ZERO4Groth_pft(NZ))THEN
         RSSUX=ABS((PSICanopy_pft(NZ)-PSICanPPre)/(cumPRootH2OUptake-cumPRootH2OUptakePre))
-        IF(CNDT.GT.ZEROP(NZ))THEN
+        IF(CNDT.GT.ZERO4Groth_pft(NZ))THEN
           RSSU=AMIN1(1.0_r8/CNDT,RSSUX)  !resistance
         ELSE
           RSSU=RSSUX
         ENDIF
-      ELSEIF(CNDT.GT.ZEROP(NZ))THEN
+      ELSEIF(CNDT.GT.ZERO4Groth_pft(NZ))THEN
         RSSU=1.0_r8/CNDT
       ELSE
-        RSSU=ZEROL(NZ)
+        RSSU=ZERO4LeafVar_pft(NZ)
       ENDIF
 !
 !     CHANGE IN CANOPY WATER POTENTIAL REQUIRED TO BRING AGREEMENT
@@ -1023,7 +1023,7 @@ module UptakesMod
     ZEROS2                         => plt_site%ZEROS2                       , &
     NU                             => plt_site%NU                           , &
     PSICanopy_pft                  => plt_ew%PSICanopy_pft                  , &
-    ZEROP                          => plt_biom%ZEROP                        , &
+    ZERO4Groth_pft                          => plt_biom%ZERO4Groth_pft                        , &
     THETW_vr                       => plt_soilchem%THETW_vr                 , &
     VLMicP_vr                      => plt_soilchem%VLMicP_vr                , &
     HydroCondMicP4RootUptake       => plt_soilchem%HydroCondMicP4RootUptake , &
@@ -1073,8 +1073,8 @@ module UptakesMod
         .AND.VLWatMicPM(NPH,L).GT.ZEROS2 &
         .AND.RootLenDensPerPlant_pvr(N,L,NZ).GT.ZERO &
         .AND.HydroCondMicP4RootUptake(L).GT.ZERO &
-        .AND.Root1stXNumL_pvr(ipltroot,L,NZ).GT.ZEROP(NZ) &
-        .AND.Root2ndXNum_pvr(N,L,NZ).GT.ZEROP(NZ) &
+        .AND.Root1stXNumL_pvr(ipltroot,L,NZ).GT.ZERO4Groth_pft(NZ) &
+        .AND.Root2ndXNum_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ) &
         .AND.THETW_vr(L).GT.ZERO)THEN
         LayrHasRoot(N,L)=itrue
         !

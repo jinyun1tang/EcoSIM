@@ -79,7 +79,7 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  WaterFlowSoiMicPX(:,:,:,:)                     !unsaturated water flux , [m3 d-2 h-1]
   real(r8),target,allocatable ::  EvapoTransp_col(:,:)              !evapotranspiration
   real(r8),target,allocatable ::  UEVAP(:,:)                        !total evaporation, [m3 d-2]
-  real(r8),target,allocatable ::  URAIN(:,:)                        !total precipitation, [m3 d-2]
+  real(r8),target,allocatable ::  URAIN_col(:,:)                        !total precipitation, [m3 d-2]
   real(r8),target,allocatable ::  URUN(:,:)                         !total surface runoff, [m3 d-2]
   real(r8),target,allocatable ::  UVLWatMicP(:,:)                !total soil water content, [m3 d-2]
   real(r8),target,allocatable ::  AnualH2OLoss_col(:,:)                        !total subsurface water flux, [m3 d-2]
@@ -176,7 +176,7 @@ module SoilWaterDataType
   allocate(Theta_sat(0:JZ,JY,JX));  Theta_sat=0._r8
   allocate(WaterFlowSoiMicPX(3,JD,JV,JH));   WaterFlowSoiMicPX=0._r8
   allocate(UEVAP(JY,JX));       UEVAP=0._r8
-  allocate(URAIN(JY,JX));       URAIN=0._r8
+  allocate(URAIN_col(JY,JX));       URAIN_col=0._r8
   allocate(URUN(JY,JX));        URUN=0._r8
   allocate(UVLWatMicP(JY,JX));       UVLWatMicP=0._r8
   allocate(AnualH2OLoss_col(JY,JX));       AnualH2OLoss_col=0._r8
@@ -263,7 +263,7 @@ module SoilWaterDataType
   call destroy(WaterFlowSoiMicPX)
   call destroy(UEVAP)
   call destroy(EvapoTransp_col)
-  call destroy(URAIN)
+  call destroy(URAIN_col)
   call destroy(URUN)
   call destroy(UVLWatMicP)
   call destroy(AnualH2OLoss_col)

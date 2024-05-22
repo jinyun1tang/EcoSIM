@@ -33,7 +33,7 @@ implicit none
     iPlantRootState_pft      => plt_pheno%iPlantRootState_pft,      &
     iPlantShootState_pft     => plt_pheno%iPlantShootState_pft,     &
     doInitPlant_pft          => plt_pheno%doInitPlant_pft,          &
-    HoursCanopyPSITooLow_pft => plt_pheno%HoursCanopyPSITooLow_pft, &
+    HoursTooLowPsiCan_pft => plt_pheno%HoursTooLowPsiCan_pft, &
     iPlantCalendar_brch      => plt_pheno%iPlantCalendar_brch,      &
     PlantPopulation_pft      => plt_site%PlantPopulation_pft,       &
     iYearCurrent             => plt_site%iYearCurrent,              &
@@ -81,7 +81,7 @@ implicit none
     IF(NumDeadBranches.EQ.NumOfBranches_pft(NZ))THEN
       iPlantShootState_pft(NZ)=iDead
       BranchNumber_pft(NZ)=0
-      HoursCanopyPSITooLow_pft(NZ)=0._r8
+      HoursTooLowPsiCan_pft(NZ)=0._r8
       IF(doInitPlant_pft(NZ).EQ.itrue)THEN
         NumOfBranches_pft(NZ)=1
       ELSE
@@ -540,7 +540,7 @@ implicit none
     PetoleStrutElms_brch               =>  plt_biom%PetoleStrutElms_brch              , &
     CanopyNodulStrutElms_brch          =>  plt_biom%CanopyNodulStrutElms_brch         , &
     LeafStrutElms_brch                 =>  plt_biom%LeafStrutElms_brch                , &
-    ZEROP                              =>  plt_biom%ZEROP                             , &
+    ZERO4Groth_pft                              =>  plt_biom%ZERO4Groth_pft                             , &
     EarStrutElms_brch                  =>  plt_biom%EarStrutElms_brch                 , &
     CanopyNonstElms_brch               =>  plt_biom%CanopyNonstElms_brch              , &
     GrainStrutElms_brch                =>  plt_biom%GrainStrutElms_brch               , &

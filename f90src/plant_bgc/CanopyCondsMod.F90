@@ -58,7 +58,7 @@ module CanopyCondsMod
     ZEROS                   => plt_site%ZEROS                 , &
     NU                      => plt_site%NU                    , &
     BndlResistAboveCanG     => plt_ew%BndlResistAboveCanG     , &
-    ZeroPlanDisp            => plt_ew%ZeroPlanDisp            , &
+    ZERO4Groth_pftlanDisp            => plt_ew%ZERO4Groth_pftlanDisp            , &
     RoughHeight             => plt_ew%RoughHeight             , &
     RIB                     => plt_ew%RIB                     , &
     TairK                   => plt_ew%TairK                   , &
@@ -73,7 +73,7 @@ module CanopyCondsMod
 !
 !     CanopyLeafArea_col,StemArea_col=leaf,stalk area of combined canopy
 !     SnowDepth,DepthSurfWatIce=snowpack,surface water depths
-!     ZT,ZeroPlanDisp,RoughHeight=canopy,zero plane displacement,roughness height
+!     ZT,ZERO4Groth_pftlanDisp,RoughHeight=canopy,zero plane displacement,roughness height
 !     ZZ=reference height for wind speed
 !
   ARLSC=CanopyLeafArea_col+StemArea_col
@@ -81,16 +81,16 @@ module CanopyCondsMod
     ARLSG=ARLSC/AREA3(NU)
     ZX=EXP(-0.5_r8*ARLSG)
     ZY=1.0_r8-ZX
-    ZeroPlanDisp=CanopyHeight_col*AZMAX1(1.0_r8-2.0_r8/ARLSG*ZY)
+    ZERO4Groth_pftlanDisp=CanopyHeight_col*AZMAX1(1.0_r8-2.0_r8/ARLSG*ZY)
     ZE=CanopyHeight_col*AMAX1(0.05_r8,ZX*ZY)
   ELSE
-    ZeroPlanDisp=0.0_r8
+    ZERO4Groth_pftlanDisp=0.0_r8
     ZE=0.0_r8
   ENDIF
   IF(IFLGW.EQ.1)THEN
     ZZ=WindMesHeight+CanopyHeight_col
   ELSE
-    ZZ=AMAX1(WindMesHeight,ZeroPlanDisp+2.0_r8)
+    ZZ=AMAX1(WindMesHeight,ZERO4Groth_pftlanDisp+2.0_r8)
   ENDIF
 
   IF(KoppenClimZone.GE.0)THEN
@@ -106,7 +106,7 @@ module CanopyCondsMod
 !     WindSpeedAtm=wind speed
 !     RIB=canopy isothermal Richardson number
 !
-    BndlResistAboveCanG=AMAX1(RAM,(LOG((ZZ-ZeroPlanDisp)/RoughHeight))**2._r8/(0.168_r8*WindSpeedAtm))
+    BndlResistAboveCanG=AMAX1(RAM,(LOG((ZZ-ZERO4Groth_pftlanDisp)/RoughHeight))**2._r8/(0.168_r8*WindSpeedAtm))
     RIB=1.27E+08_r8*(ZZ-RoughHeight)/(WindSpeedAtm**2._r8*TairK)
   ELSE
     BndlResistAboveCanG=RAM

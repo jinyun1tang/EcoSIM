@@ -1871,16 +1871,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='HoursCanopyPSITooLow_pft', dim1name='pft',&
+    call restartvar(ncid, flag, varname='HoursTooLowPsiCan_pft', dim1name='pft',&
      long_name='canopy plant water stress indicator, number of hours PSICanopy_pft(< PSILY', units='h', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)  
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,HoursCanopyPSITooLow_pft,datrp_1d,NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft)     
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,HoursTooLowPsiCan_pft,datrp_1d,NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft)     
   else
-    !print*,'HoursCanopyPSITooLow_pft'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,HoursCanopyPSITooLow_pft,datrp_1d,NumActivePlants=NumActivePlants,&
+    !print*,'HoursTooLowPsiCan_pft'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,HoursTooLowPsiCan_pft,datrp_1d,NumActivePlants=NumActivePlants,&
       IsPlantActive_pft=IsPlantActive_pft)       
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='HoursCanopyPSITooLow_pft', dim1name='pft',&
+    call restartvar(ncid, flag, varname='HoursTooLowPsiCan_pft', dim1name='pft',&
      long_name='canopy plant water stress indicator, number of hours PSICanopy_pft(< PSILY', units='h', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)  
   endif  
@@ -3720,16 +3720,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d  
-    call restartvar(ncid, flag, varname='URAIN', dim1name='column',&
+    call restartvar(ncid, flag, varname='URAIN_col', dim1name='column',&
        long_name='total precipitation', units='m3 d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,URAIN,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,URAIN_col,datrc_1d) 
   else
-    !print*,'URAIN'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,URAIN,datrc_1d)   
+    !print*,'URAIN_col'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,URAIN_col,datrc_1d)   
     datpr1 => datrc_1d    
-    call restartvar(ncid, flag, varname='URAIN', dim1name='column',&
+    call restartvar(ncid, flag, varname='URAIN_col', dim1name='column',&
        long_name='total precipitation', units='m3 d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    

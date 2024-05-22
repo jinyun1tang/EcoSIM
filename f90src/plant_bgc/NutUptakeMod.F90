@@ -59,7 +59,7 @@ module NutUptakeMod
     NU                        => plt_site%NU,                        &
     AREA3                     => plt_site%AREA3,                     &
     NH3Dep2Can_brch           => plt_rbgc%NH3Dep2Can_brch,           &
-    ZEROP                     => plt_biom%ZEROP,                     &
+    ZERO4Groth_pft                     => plt_biom%ZERO4Groth_pft,                     &
     AtmGasc                   => plt_site%AtmGasc,                   &
     LeafPetolBiomassC_brch    => plt_biom%LeafPetolBiomassC_brch,    &
     CanopyNonstElms_brch      => plt_biom%CanopyNonstElms_brch,      &
@@ -88,10 +88,10 @@ module NutUptakeMod
   !
   SNH3P=SNH3X*EXP(0.513_r8-0.0171_r8*TCelciusCanopy_pft(NZ))
   FNH3P=1.0E-04_r8*FDMP
-  if(FracPARRadbyCanopy_pft(NZ).GT.ZEROP(NZ))then
+  if(FracPARRadbyCanopy_pft(NZ).GT.ZERO4Groth_pft(NZ))then
     D105: DO NB=1,NumOfBranches_pft(NZ)
-      IF(LeafPetolBiomassC_brch(NB,NZ).GT.ZEROP(NZ).AND.LeafAreaLive_brch(NB,NZ).GT.ZEROP(NZ) &
-        .AND.CanopyLeafArea_pft(NZ).GT.ZEROP(NZ))THEN
+      IF(LeafPetolBiomassC_brch(NB,NZ).GT.ZERO4Groth_pft(NZ).AND.LeafAreaLive_brch(NB,NZ).GT.ZERO4Groth_pft(NZ) &
+        .AND.CanopyLeafArea_pft(NZ).GT.ZERO4Groth_pft(NZ))THEN
         CNH3P=AZMAX1(FNH3P*LeafPetoNonstElmConc_brch(ielmn,NB,NZ)/SNH3P)
         ZPOOLB=AZMAX1(CanopyNonstElms_brch(ielmn,NB,NZ))
         NH3Dep2Can_brch(NB,NZ)=AMIN1(0.1_r8*ZPOOLB &
@@ -129,7 +129,7 @@ module NutUptakeMod
     ZEROS2                  => plt_site%ZEROS2,                   &
     NU                      => plt_site%NU,                       &
     ZERO                    => plt_site%ZERO,                     &
-    ZEROP                   => plt_biom%ZEROP,                    &
+    ZERO4Groth_pft                   => plt_biom%ZERO4Groth_pft,                    &
     RootO2Dmnd4Resp_pvr     => plt_rbgc%RootO2Dmnd4Resp_pvr,      &
     RAutoRootO2Limter_pvr   => plt_rbgc%RAutoRootO2Limter_pvr,    &
     RootRespPotent_pvr      => plt_rbgc%RootRespPotent_pvr,       &
@@ -145,7 +145,7 @@ module NutUptakeMod
   D955: DO N=1,MY(NZ)
     D950: DO L=NU,MaxSoiL4Root(NZ)
       IF(VLSoilPoreMicP_vr(L).GT.ZEROS2.AND.RootLenDensPerPlant_pvr(N,L,NZ).GT.ZERO &
-        .AND.RootVH2O_pvr(N,L,NZ).GT.ZEROP(NZ).AND.THETW_vr(L).GT.ZERO)THEN
+        .AND.RootVH2O_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ).AND.THETW_vr(L).GT.ZERO)THEN
         TFOXYX=0.0_r8
         call GetUptakeCapcity(N,L,NZ,FracPRoot4Uptake,MinFracPRoot4Uptake_vr,FCUP,FZUP,FPUP,&
           FWSRT,PerPlantRootH2OUptake,dtPerPlantRootH2OUptake,FOXYX)
@@ -177,7 +177,7 @@ module NutUptakeMod
 !     RootLenPerPlant_pvr=root,myco length per plant
 !
         IF(RAutoRootO2Limter_pvr(N,L,NZ).GT.ZERO.AND.FCUP.GT.ZERO.AND.FWSRT.GT.ZERO &
-          .AND.RootLenPerPlant_pvr(N,L,NZ).GT.ZEROP(NZ))THEN
+          .AND.RootLenPerPlant_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ))THEN
 !
 !     FZUP=limitn to active uptake respiration from CZPOLR
 !
@@ -1108,7 +1108,7 @@ module NutUptakeMod
     ZERO                      => plt_site%ZERO,                       &
     AllPlantRootH2OUptake_vr  => plt_ew%AllPlantRootH2OUptake_vr,     &
     RootFracRemobilizableBiom => plt_allom%RootFracRemobilizableBiom, &
-    ZEROP                     => plt_biom%ZEROP,                      &
+    ZERO4Groth_pft                     => plt_biom%ZERO4Groth_pft,                      &
     RootProteinConc_pvr       => plt_biom%RootProteinConc_pvr,        &
     RootProteinC_pvr          => plt_biom%RootProteinC_pvr,           &
     RootMycoNonstElms_rpvr    => plt_biom%RootMycoNonstElms_rpvr,     &
@@ -1124,7 +1124,7 @@ module NutUptakeMod
   !     RootProteinC_pvr,WTRTL=protein content,mass
   !     FWSRT=protein concentration relative to 5%
   !
-  IF(RootMycoActiveBiomC_pvr(N,L,NZ).GT.ZEROP(NZ))THEN
+  IF(RootMycoActiveBiomC_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ))THEN
     RootProteinConc_pvr(N,L,NZ)=AMIN1(RootFracRemobilizableBiom(NZ),RootProteinC_pvr(N,L,NZ)/RootMycoActiveBiomC_pvr(N,L,NZ))
     FWSRT=RootProteinConc_pvr(N,L,NZ)/0.05_r8
   ELSE
@@ -1138,7 +1138,7 @@ module NutUptakeMod
   !     FCUP=limitation to active uptake respiration from CPOOLR
   !     CPOOLR=nonstructural C content
   !
-  IF(RootCO2EmisPot_pvr(N,L,NZ).GT.ZEROP(NZ))THEN
+  IF(RootCO2EmisPot_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ))THEN
     FCUP=AZMAX1(AMIN1(1.0_r8,0.25_r8*safe_adb(RootMycoNonstElms_rpvr(ielmc,N,L,NZ),RootCO2EmisPot_pvr(N,L,NZ))))
   ELSE
     FCUP=0.0_r8
@@ -1227,7 +1227,7 @@ module NutUptakeMod
   !     begin_execution
   associate(                                                   &
     RootMycoNonstElms_rpvr => plt_biom%RootMycoNonstElms_rpvr, &
-    ZEROP                  => plt_biom%ZEROP,                  &
+    ZERO4Groth_pft                  => plt_biom%ZERO4Groth_pft,                  &
     ZEROS                  => plt_site%ZEROS,                  &
     ZEROS2                 => plt_site%ZEROS2,                 &
     VLWatMicPM             => plt_site%VLWatMicPM,             &
@@ -1256,13 +1256,13 @@ module NutUptakeMod
   !
   D195: DO K=1,jcplx
     VLWatMicPK=VLWatMicPM(NPH,L)*FracBulkSOMC_vr(K,L)
-    IF(VLWatMicPK.GT.ZEROS2.AND.RootVH2O_pvr(N,L,NZ).GT.ZEROP(NZ))THEN
+    IF(VLWatMicPK.GT.ZEROS2.AND.RootVH2O_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ))THEN
       VLWatMicPT=VLWatMicPK+RootVH2O_pvr(N,L,NZ)
       CPOOLX=AMIN1(1.25E+03_r8*RootVH2O_pvr(N,L,NZ),RootMycoNonstElms_rpvr(ielmc,N,L,NZ))
       XFRE(ielmc)=(DOM_vr(idom_doc,K,L)*RootVH2O_pvr(N,L,NZ)-CPOOLX*VLWatMicPK)/VLWatMicPT
       !XFRC, positive into plants
       RootMycoExudElm_pvr(ielmc,N,K,L,NZ)=FEXUDE(ielmc)*XFRE(ielmc)
-      IF(DOM_vr(idom_doc,K,L).GT.ZEROS.AND. RootMycoNonstElms_rpvr(ielmc,N,L,NZ).GT.ZEROP(NZ))THEN
+      IF(DOM_vr(idom_doc,K,L).GT.ZEROS.AND. RootMycoNonstElms_rpvr(ielmc,N,L,NZ).GT.ZERO4Groth_pft(NZ))THEN
         CPOOLT=DOM_vr(idom_doc,K,L)+RootMycoNonstElms_rpvr(ielmc,N,L,NZ)
         ZPOOLX=0.1_r8*RootMycoNonstElms_rpvr(ielmn,N,L,NZ)
         PPOOLX=0.1_r8*RootMycoNonstElms_rpvr(ielmp,N,L,NZ)

@@ -106,7 +106,7 @@ module PlantPhenolMod
   associate(                                                                       &
     iPlantBranchState_brch           =>  plt_pheno%iPlantBranchState_brch        , &
     LeafNumberAtFloralInit_brch      =>  plt_pheno%LeafNumberAtFloralInit_brch   , &    
-    HoursCanopyPSITooLow_pft         =>  plt_pheno%HoursCanopyPSITooLow_pft      , &    
+    HoursTooLowPsiCan_pft         =>  plt_pheno%HoursTooLowPsiCan_pft      , &    
     PSICanopy_pft                    =>  plt_ew%PSICanopy_pft                    , &    
     NumOfLeaves_brch                 =>  plt_morph%NumOfLeaves_brch              , &    
     doRemobilization_brch            =>  plt_pheno%doRemobilization_brch         , &    
@@ -145,10 +145,10 @@ module PlantPhenolMod
 !
 !             PSICanopy_pft=canopy total water potential
 !             PSIMin4LeafOff=minimum canopy water potential for leafoff
-!             HoursCanopyPSITooLow_pft=number of hours PSICanopy_pft(< PSIMin4LeafOff (for output only)
+!             HoursTooLowPsiCan_pft=number of hours PSICanopy_pft(< PSIMin4LeafOff (for output only)
 !
   IF(PSICanopy_pft(NZ).LT.PSIMin4LeafOff(iPlantRootProfile_pft(NZ)))THEN
-    HoursCanopyPSITooLow_pft(NZ)=HoursCanopyPSITooLow_pft(NZ)+1.0_r8
+    HoursTooLowPsiCan_pft(NZ)=HoursTooLowPsiCan_pft(NZ)+1.0_r8
   ENDIF
   end associate
   end subroutine Emerged_plant_Phenology          
@@ -371,8 +371,8 @@ module PlantPhenolMod
     RootMycoNonstElms_rpvr          =>  plt_biom%RootMycoNonstElms_rpvr     , &
     CanopyNonstElms_brch            =>  plt_biom%CanopyNonstElms_brch       , &
     RootNonstructElmConc_pvr        =>  plt_biom%RootNonstructElmConc_pvr   , &
-    ZEROL                           =>  plt_biom%ZEROL                      , &
-    ZEROP                           =>  plt_biom%ZEROP                      , &
+    ZERO4LeafVar_pft                           =>  plt_biom%ZERO4LeafVar_pft                      , &
+    ZERO4Groth_pft                           =>  plt_biom%ZERO4Groth_pft                      , &
     RootMycoActiveBiomC_pvr         =>  plt_biom%RootMycoActiveBiomC_pvr    , &
     CanopyNodulNonstElms_pft        =>  plt_biom%CanopyNodulNonstElms_pft   , &
     WatByPCanopy                    =>  plt_ew%WatByPCanopy                 , &
@@ -430,7 +430,7 @@ module PlantPhenolMod
 !
   D180: DO N=1,MY(NZ)
     D160: DO L=NU,MaxSoiL4Root(NZ)
-      IF(RootMycoActiveBiomC_pvr(N,L,NZ).GT.ZEROL(NZ))THEN
+      IF(RootMycoActiveBiomC_pvr(N,L,NZ).GT.ZERO4LeafVar_pft(NZ))THEN
         DO NE=1,NumPlantChemElms
           RootNonstructElmConc_pvr(NE,N,L,NZ)=AZMAX1(RootMycoNonstElms_rpvr(NE,N,L,NZ) &
             /RootMycoActiveBiomC_pvr(N,L,NZ))
@@ -449,7 +449,7 @@ module PlantPhenolMod
 ! NoduleNonstructCconc_pft=nonstructural C concentration in canopy nodules
 ! CCPOLB,CZPOLB,CPPOLB=nonstructural C,N,P concn in branch(g g-1)
 !
-  IF(CanopyLeafShethC_pft(NZ).GT.ZEROL(NZ))THEN
+  IF(CanopyLeafShethC_pft(NZ).GT.ZERO4LeafVar_pft(NZ))THEN
     DO NE=1,NumPlantChemElms
       CanopyNonstElmConc_pft(NE,NZ)=AZMAX1(AMIN1(1.0_r8,CanopyNonstElms_pft(NE,NZ)/CanopyLeafShethC_pft(NZ)))
     ENDDO
@@ -460,7 +460,7 @@ module PlantPhenolMod
   ENDIF
   
   D190: DO NB=1,NumOfBranches_pft(NZ)
-    IF(LeafPetolBiomassC_brch(NB,NZ).GT.ZEROP(NZ))THEN
+    IF(LeafPetolBiomassC_brch(NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
       DO NE=1,NumPlantChemElms      
         LeafPetoNonstElmConc_brch(NE,NB,NZ)=AZMAX1(CanopyNonstElms_brch(NE,NB,NZ)/LeafPetolBiomassC_brch(NB,NZ))
       ENDDO  
@@ -481,9 +481,9 @@ module PlantPhenolMod
   ShootArea=0._r8
   IF(iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).EQ.0)THEN
     ShootArea=CanopyLeafArea_pft(NZ)+CanopyStemArea_pft(NZ)
-    CanopyChk=(HypoctoHeight_pft(NZ).GT.SeedDepth_pft(NZ)).AND.(ShootArea.GT.ZEROL(NZ))
+    CanopyChk=(HypoctoHeight_pft(NZ).GT.SeedDepth_pft(NZ)).AND.(ShootArea.GT.ZERO4LeafVar_pft(NZ))
     RootChk=(Root1stDepz_pft(ipltroot,1,NZ).GT.SeedDepth_pft(NZ)+ppmc)
-!    write(112,*)'emerg chk',I,J,CanopyChk, RootChk,HypoctoHeight_pft(NZ),SeedDepth_pft(NZ),ShootArea,ZEROL(NZ)
+!    write(112,*)'emerg chk',I,J,CanopyChk, RootChk,HypoctoHeight_pft(NZ),SeedDepth_pft(NZ),ShootArea,ZERO4LeafVar_pft(NZ)
     IF(CanopyChk .AND. RootChk)THEN
       iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ)=I
       VHeatCapCanP(NZ)=cpw*(ShootStrutElms_pft(ielmc,NZ)*10.0E-06_r8+WatByPCanopy(NZ))

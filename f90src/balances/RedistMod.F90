@@ -333,9 +333,9 @@ module RedistMod
   !
   !     SURFACE BOUNDARY WATER FLUXES
   !
-  WI=PrecAtm_col(NY,NX)+IrrigSurface(NY,NX)   !total incoming water flux=rain/snowfall + irrigation
+  WI=PrecAtm_col(NY,NX)+IrrigSurface_col(NY,NX)   !total incoming water flux=rain/snowfall + irrigation
   CRAIN=CRAIN+WI
-  URAIN(NY,NX)=URAIN(NY,NX)+WI
+  URAIN_col(NY,NX)=WI
   WO=VapXAir2GSurf(NY,NX)+TEVAPP(NY,NX) !total outgoing water flux
   CEVAP=CEVAP-WO
   UEVAP(NY,NX)=UEVAP(NY,NX)-WO
@@ -495,7 +495,7 @@ module RedistMod
     ENDDO  
     SIR=SIR*PrecAtm_col(NY,NX)
     SBU=-IrrigSubsurf_col(NY,NX)*SII
-    SII=SII*IrrigSurface(NY,NX)
+    SII=SII*IrrigSurface_col(NY,NX)
     TIONIN=TIONIN+SIR+SII
     !
     !     SUBSURFACE BOUNDARY SALT FLUXES FROM SUBSURFACE IRRIGATION

@@ -390,7 +390,7 @@ module grosubsMod
     NU                          => plt_site%NU,                           &
     MaxNumRootLays              => plt_site%MaxNumRootLays,               &
     TempOffset_pft              => plt_pheno%TempOffset_pft,              &
-    ZEROP                       => plt_biom%ZEROP,                        &
+    ZERO4Groth_pft                       => plt_biom%ZERO4Groth_pft,                        &
     CanopyStalkC_pft            => plt_biom%CanopyStalkC_pft,             &
     RootProteinC_pvr            => plt_biom%RootProteinC_pvr,             &
     RootBiomCPerPlant_pft       => plt_biom%RootBiomCPerPlant_pft,        &
@@ -454,7 +454,7 @@ module grosubsMod
 !
   IF(iPlantTurnoverPattern_pft(NZ).EQ.0 &
     .OR.(.not.is_plant_treelike(iPlantRootProfile_pft(NZ)))&
-    .OR.StalkStrutElms_pft(ielmc,NZ).LE.ZEROP(NZ))THEN
+    .OR.StalkStrutElms_pft(ielmc,NZ).LE.ZERO4Groth_pft(NZ))THEN
     FracShootLeafElmAlloc2Litr(ielmc,k_fine_litr)=1.0_r8
     FracRootStalkElmAlloc2Litr(ielmc,k_fine_litr)=1.0_r8
     FracRootElmAlloc2Litr(ielmc,k_fine_litr)=1.0_r8

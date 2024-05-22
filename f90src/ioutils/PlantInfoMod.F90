@@ -131,7 +131,7 @@ implicit none
           DO M=1,366
             iHarvstType_pft(NZ,M,NY,NX)=-1
             jHarvst_pft(NZ,M,NY,NX)=0
-            HVST(NZ,M,NY,NX)=1.0E+06_r8
+            CutingHeightORFrac_pft(NZ,M,NY,NX)=1.0E+06_r8
             THIN_pft(NZ,M,NY,NX)=-1.0_r8
             FracBiomRMbyHVST(1,iplthvst_leaf,NZ,M,NY,NX)        = 1.0_r8
             FracBiomRMbyHVST(1,iplthvst_finenonleaf,NZ,M,NY,NX) = 1.0_r8
@@ -227,7 +227,7 @@ implicit none
               iYearPlanting_pft(NZ,NY,NX)=MIN(IYR,iYearCurrent)
               iPlantingDay_pft(NZ,NY,NX)=iDayPlanting_pft(NZ,NY,NX) !planting day
               iPlantingYear_pft(NZ,NY,NX)=iYearPlanting_pft(NZ,NY,NX)   !planting year
-              PPZ(NZ,NY,NX)=PPI(NZ,NY,NX)     !population density
+              PPatSeeding_pft(NZ,NY,NX)=PPI(NZ,NY,NX)     !population density
             ENDIF
 
             if(pft_nmgnt(NZ)>0)then
@@ -254,7 +254,7 @@ implicit none
 
                 iHarvstType_pft(NZ,IDY,NY,NX)=ICUT
                 jHarvst_pft(NZ,IDY,NY,NX)=NumOfCanopyLayersUT
-                HVST(NZ,IDY,NY,NX)=HCUT
+                CutingHeightORFrac_pft(NZ,IDY,NY,NX)=HCUT
                 THIN_pft(NZ,IDY,NY,NX)=PCUT
                 FracBiomRMbyHVST(1,iplthvst_leaf,NZ,IDY,NY,NX)=ECUT11
                 FracBiomRMbyHVST(1,iplthvst_finenonleaf,NZ,IDY,NY,NX)=ECUT12
@@ -273,7 +273,7 @@ implicit none
                     D580: DO IDYG=IDYS+1,IDYE-1
                       iHarvstType_pft(NZ,IDYG,NY,NX)=ICUT
                       jHarvst_pft(NZ,IDYG,NY,NX)=NumOfCanopyLayersUT
-                      HVST(NZ,IDYG,NY,NX)=HCUT
+                      CutingHeightORFrac_pft(NZ,IDYG,NY,NX)=HCUT
                       THIN_pft(NZ,IDYG,NY,NX)=PCUT
                       FracBiomRMbyHVST(1,iplthvst_leaf,NZ,IDYG,NY,NX)=ECUT11
                       FracBiomRMbyHVST(1,iplthvst_finenonleaf,NZ,IDYG,NY,NX)=ECUT12

@@ -20,7 +20,7 @@ module IrrigationDataType
   real(r8),target,allocatable ::  RRIG(:,:,:,:)                      !irrigation application, [mm h-1]
   real(r8),target,allocatable ::  WDPTH(:,:,:)                       !depth of irrigation application, [m]
   real(r8),target,allocatable ::  IrrigSubsurf_col(:,:)                  !underground irrigation, [m3 d-2 h-1]
-  real(r8),target,allocatable ::  IrrigSurface(:,:)                        !surface irrigation, [m3 d-2 h-1]
+  real(r8),target,allocatable ::  IrrigSurface_col(:,:)                        !surface irrigation, [m3 d-2 h-1]
   real(r8),target,allocatable ::  FIRRA(:,:)                        !fraction of FC - WP below which automatic irrigation applied, [-]
   real(r8),target,allocatable ::  CIRRA(:,:)                        !fraction of FC - WP to which automatic irrigation applied, [-]
   real(r8),target,allocatable ::  DIRRA(:,:,:)                      !depth to which automatic irrigation applied, [m]
@@ -160,7 +160,7 @@ module IrrigationDataType
 
   allocate(IIRRA(4,JY,JX));     IIRRA=0
   allocate(IrrigSubsurf_col(JY,JX));       IrrigSubsurf_col=0._r8
-  allocate(IrrigSurface(JY,JX));       IrrigSurface=0._r8
+  allocate(IrrigSurface_col(JY,JX));       IrrigSurface_col=0._r8
   allocate(FIRRA(JY,JX));       FIRRA=0._r8
   allocate(CIRRA(JY,JX));       CIRRA=0._r8
   allocate(DIRRA(2,JY,JX));     DIRRA=0._r8
@@ -244,7 +244,7 @@ module IrrigationDataType
   call destroy(WDPTH)
   call destroy(IIRRA)
   call destroy(IrrigSubsurf_col)
-  call destroy(IrrigSurface)
+  call destroy(IrrigSurface_col)
   call destroy(FIRRA)
   call destroy(CIRRA)
   call destroy(DIRRA)

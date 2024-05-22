@@ -34,9 +34,9 @@ module InitPlantMod
     NL                  => plt_site%NL,                  &
     ZERO                => plt_site%ZERO,                &
     AREA3               => plt_site%AREA3,               &
-    ZEROQ               => plt_rbgc%ZEROQ,               &
-    ZEROP               => plt_biom%ZEROP,               &
-    ZEROL               => plt_biom%ZEROL,               &
+    ZERO4Uptk_pft               => plt_rbgc%ZERO4Uptk_pft,               &
+    ZERO4Groth_pft               => plt_biom%ZERO4Groth_pft,               &
+    ZERO4LeafVar_pft               => plt_biom%ZERO4LeafVar_pft,               &
     IsPlantActive_pft   => plt_pheno%IsPlantActive_pft   &
   )
 !
@@ -79,9 +79,9 @@ module InitPlantMod
       ENDDO D9985
 
       DO NZ=NZ1Q,NZ2X
-        ZEROP(NZ)=ZERO*PlantPopulation_pft(NZ)
-        ZEROQ(NZ)=ZERO*PlantPopulation_pft(NZ)/AREA3(NU)
-        ZEROL(NZ)=ZERO*PlantPopulation_pft(NZ)*1.0E+05_r8  !zerol revised from 1.e6 to 1.e5
+        ZERO4Groth_pft(NZ)=ZERO*PlantPopulation_pft(NZ)
+        ZERO4Uptk_pft(NZ)=ZERO*PlantPopulation_pft(NZ)/AREA3(NU)
+        ZERO4LeafVar_pft(NZ)=ZERO*PlantPopulation_pft(NZ)*1.0E+06_r8  
       ENDDO  
 !
 !     FILL OUT UNUSED ARRAYS
@@ -117,7 +117,7 @@ module InitPlantMod
     CuticleResist_pft         => plt_photo%CuticleResist_pft,         &
     PPI                       => plt_site%PPI,                        &
     PPX_pft                   => plt_site%PPX_pft,                    &
-    PPZ                       => plt_site%PPZ,                        &
+    PPatSeeding_pft           => plt_site%PPatSeeding_pft,            &
     RootFracRemobilizableBiom => plt_allom%RootFracRemobilizableBiom, &
     rCNNonstructRemob_pft     => plt_allom%rCNNonstructRemob_pft,     &
     rCPNonstructRemob_pft     => plt_allom%rCPNonstructRemob_pft,     &
@@ -135,7 +135,7 @@ module InitPlantMod
   iDayPlanting_pft(NZ)=iPlantingDay_pft(NZ)
   iYearPlantHarvest_pft(NZ)=iHarvestYear_pft(NZ)
   iDayPlantHarvest_pft(NZ)=iHarvestDay_pft(NZ)
-  PPI(NZ)=PPZ(NZ)
+  PPI(NZ)=PPatSeeding_pft(NZ)
   PPX_pft(NZ)=PPI(NZ)
   ClumpFactor_pft(NZ)=ClumpFactorInit_pft(NZ)
 
@@ -583,7 +583,7 @@ module InitPlantMod
     iPlantCalendar_brch               => plt_pheno%iPlantCalendar_brch,               &
     Hours4Leafout_brch                => plt_pheno%Hours4Leafout_brch,                &
     Hours2LeafOut_brch                => plt_pheno%Hours2LeafOut_brch,                &
-    HoursCanopyPSITooLow_pft          => plt_pheno%HoursCanopyPSITooLow_pft,          &
+    HoursTooLowPsiCan_pft          => plt_pheno%HoursTooLowPsiCan_pft,          &
     MatureGroup_pft                   => plt_pheno%MatureGroup_pft,                   &
     PetioleChemElmRemobFlx_brch       => plt_pheno%PetioleChemElmRemobFlx_brch,       &
     TotReproNodeNumNormByMatrgrp_brch => plt_pheno%TotReproNodeNumNormByMatrgrp_brch, &
@@ -674,7 +674,7 @@ module InitPlantMod
 !
 !     INITIALIZE PLANT MORPHOLOGY AND BIOMASS
 !
-  HoursCanopyPSITooLow_pft(NZ)=0._r8
+  HoursTooLowPsiCan_pft(NZ)=0._r8
   ChillHours_pft(NZ)=0._r8
   plt_biom%CanopyNonstElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ)=0._r8
   plt_biom%CanopyNodulNonstElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ)=0._r8

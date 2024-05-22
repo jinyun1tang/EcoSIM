@@ -52,7 +52,7 @@
     CO2E                       =>  plt_site%CO2E                        , &
     CanopyGasCO2_pft           =>  plt_photo%CanopyGasCO2_pft           , &
     CanopyLeafArea_pft         =>  plt_morph%CanopyLeafArea_pft         , &
-    ZEROP                      =>  plt_biom%ZEROP                       , &
+    ZERO4Groth_pft                      =>  plt_biom%ZERO4Groth_pft                       , &
     NetCO2Flx2Canopy_col       =>  plt_bgcr%NetCO2Flx2Canopy_col        , &
     SineSunInclAngle_col       =>  plt_rad%SineSunInclAngle_col         , &
     AirConc_pft                =>  plt_photo%AirConc_pft                , &
@@ -99,7 +99,7 @@
 !
   LeafIntracellularCO2_pft(NZ)=CanPCi2CaRatio(NZ)*CanopyGasCO2_pft(NZ)
 
-  IF(SineSunInclAngle_col.GT.0.0_r8 .AND. CanopyLeafArea_pft(NZ).GT.ZEROP(NZ))THEN
+  IF(SineSunInclAngle_col.GT.0.0_r8 .AND. CanopyLeafArea_pft(NZ).GT.ZERO4Groth_pft(NZ))THEN
 !
     call PhotoActivePFT(I,J,NZ)
   ELSE
@@ -167,7 +167,7 @@
   real(r8) :: PAR_zsec,Tau_rad
 !     begin_execution
   associate(                                                 &
-    ZEROP               => plt_biom%ZEROP                  , &
+    ZERO4Groth_pft               => plt_biom%ZERO4Groth_pft                  , &
     LeafAUnshaded_zsec  => plt_photo%LeafAUnshaded_zsec    , &
     RadPAR_zsec         => plt_rad%RadPAR_zsec             , &
     RadDifPAR_zsec      => plt_rad%RadDifPAR_zsec          , &
@@ -178,7 +178,7 @@
 !
   DO N=1,NumOfLeafZenithSectors1
     DO M=1,NumOfSkyAzimuSects1
-      IF(LeafAUnshaded_zsec(N,L,K,NB,NZ).GT.ZEROP(NZ))THEN
+      IF(LeafAUnshaded_zsec(N,L,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
 !
         DO LP=1,2
           IF(LP==1)THEN
@@ -211,7 +211,7 @@
 !     begin_execution
   associate(                                                                      & 
     CanopyLeafArea_lpft             =>  plt_morph%CanopyLeafArea_lpft           , &
-    ZEROP                           =>  plt_biom%ZEROP                          , &
+    ZERO4Groth_pft                           =>  plt_biom%ZERO4Groth_pft                          , &
     O2L                             =>  plt_photo%O2L                           , &
     aquCO2Intraleaf_pft             =>  plt_photo%aquCO2Intraleaf_pft           , &
     LeafC3ChlorofilConc_pft         =>  plt_photo%LeafC3ChlorofilConc_pft       , &
@@ -281,7 +281,7 @@
 !     LeafAUnshaded_zsec=unself-shaded leaf surface area
 !
   DO L=NumOfCanopyLayers1,1,-1
-    IF(CanopyLeafArea_lpft(L,K,NB,NZ).GT.ZEROP(NZ))THEN
+    IF(CanopyLeafArea_lpft(L,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
       call C3PhotosynsCanopyLayerL(I,J,L,K,NB,NZ,CH2O)
     ENDIF
   ENDDO
@@ -303,7 +303,7 @@
 !     begin_execution
   associate(                                                                       &
     LeafElmntNode_brch             =>  plt_biom%LeafElmntNode_brch               , &
-    ZEROP                          =>  plt_biom%ZEROP                            , &
+    ZERO4Groth_pft                          =>  plt_biom%ZERO4Groth_pft                            , &
     CanopyLeafArea_lpft            =>  plt_morph%CanopyLeafArea_lpft             , &
     C4PhotosynDowreg_brch          =>  plt_photo%C4PhotosynDowreg_brch           , &
     LeafC4ChlorofilConc_pft        =>  plt_photo%LeafC4ChlorofilConc_pft         , &
@@ -392,7 +392,7 @@
 !     LeafAUnshaded_zsec=unself-shaded leaf surface area
 !
   DO L=NumOfCanopyLayers1,1,-1
-    IF(CanopyLeafArea_lpft(L,K,NB,NZ).GT.ZEROP(NZ))THEN
+    IF(CanopyLeafArea_lpft(L,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
       call C4PhotosynsCanopyLayerL(I,J,L,K,NB,NZ,CH2O)
     ENDIF
   ENDDO
@@ -457,7 +457,7 @@
 !     begin_execution
   associate(                                               &
     LeafAUnshaded_zsec  => plt_photo%LeafAUnshaded_zsec  , &
-    ZEROP               => plt_biom%ZEROP                , &
+    ZERO4Groth_pft               => plt_biom%ZERO4Groth_pft                , &
     RadPAR_zsec         => plt_rad%RadPAR_zsec           , &
     RadDifPAR_zsec      => plt_rad%RadDifPAR_zsec        , &
     TAU_RadThru         => plt_rad%TAU_RadThru           , &
@@ -469,7 +469,7 @@
 !
   DO  N=1,NumOfLeafZenithSectors1
     DO  M=1,NumOfSkyAzimuSects1
-      IF(LeafAUnshaded_zsec(N,L,K,NB,NZ).GT.ZEROP(NZ))THEN
+      IF(LeafAUnshaded_zsec(N,L,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
 !
         DO LP=1,2
 !     SUNLIT LEAVES
@@ -552,13 +552,13 @@
     Vmax4RubiscoCarboxy_pft    => plt_photo%Vmax4RubiscoCarboxy_pft   , &
     ZERO                       => plt_site%ZERO                       , &
     LeafElmntNode_brch         => plt_biom%LeafElmntNode_brch         , &
-    ZEROP                      => plt_biom%ZEROP                      , &
+    ZERO4Groth_pft                      => plt_biom%ZERO4Groth_pft                      , &
     LeafProteinCNode_brch      => plt_biom%LeafProteinCNode_brch      , &
     LeafAreaNode_brch          => plt_morph%LeafAreaNode_brch           &
   )
   DO K=1,MaxNodesPerBranch1
-    IF(LeafAreaNode_brch(K,NB,NZ).GT.ZEROP(NZ)&
-      .AND.LeafElmntNode_brch(ielmc,K,NB,NZ).GT.ZEROP(NZ))THEN
+    IF(LeafAreaNode_brch(K,NB,NZ).GT.ZERO4Groth_pft(NZ)&
+      .AND.LeafElmntNode_brch(ielmc,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
       ProteinPerLeafArea=LeafProteinCNode_brch(K,NB,NZ)/LeafAreaNode_brch(K,NB,NZ)
     ELSE
       ProteinPerLeafArea=0.0_r8
@@ -761,7 +761,7 @@
     HourReq4LeafOut_brch        =>  plt_pheno%HourReq4LeafOut_brch       , &
     Hours4Leafout_brch          =>  plt_pheno%Hours4Leafout_brch         , &
     iPlantPhenolType_pft        =>  plt_pheno%iPlantPhenolType_pft       , &
-    ZEROP                       =>  plt_biom%ZEROP                       , &
+    ZERO4Groth_pft                       =>  plt_biom%ZERO4Groth_pft                       , &
     NU                          =>  plt_site%NU                          , &
     AREA3                       =>  plt_site%AREA3                       , &
     Vmax4RubiscoCarboxy_pft     =>  plt_photo%Vmax4RubiscoCarboxy_pft    , &
@@ -813,7 +813,7 @@
 !     AREA=area of grid cell
 !     RSMY=minimum stomatal resistance for CO2 uptake (h m-1)
 ! hourly time step
-  IF(CH2O.GT.ZEROP(NZ))THEN
+  IF(CH2O.GT.ZERO4Groth_pft(NZ))THEN
     RSX=FracPARRadbyCanopy_pft(NZ)*DiffCO2Atmos2Intracel_pft(NZ)*AREA3(NU)/(CH2O*secsperhour)
   ELSE
     RSX=H2OCuticleResist_pft(NZ)*1.56_r8

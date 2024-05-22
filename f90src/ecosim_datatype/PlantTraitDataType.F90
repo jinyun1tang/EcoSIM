@@ -87,8 +87,8 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  PPX_pft(:,:,:)                         !plant population, [m-2]
   integer,target,allocatable ::  NumActivePlants(:,:)                          !number of active PFT
   real(r8),target,allocatable ::  PlantPopu_col(:,:)                           !total plant population, [d-2]
-  real(r8),target,allocatable ::  PPZ(:,:,:)                         !plant population at seeding, [m-2]
-  real(r8),target,allocatable ::  HoursCanopyPSITooLow_pft(:,:,:)                        !canopy plant water stress indicator, number of hours PSILT < PSILY, []
+  real(r8),target,allocatable ::  PPatSeeding_pft(:,:,:)                         !plant population at seeding, [m-2]
+  real(r8),target,allocatable ::  HoursTooLowPsiCan_pft(:,:,:)                        !canopy plant water stress indicator, number of hours PSILT < PSILY, []
   real(r8),target,allocatable ::  PlantO2Stress(:,:,:)                        !plant O2 stress indicator, []
   real(r8),target,allocatable ::  fTCanopyGroth_pft(:,:,:)                  !canopy temperature growth function, [-]
   real(r8),target,allocatable ::  TCG(:,:,:)                         !canopy growth temperature, [oC]
@@ -247,8 +247,8 @@ contains
   allocate(PPX_pft(JP,JY,JX));      PPX_pft=0._r8
   allocate(NumActivePlants(JY,JX));       NumActivePlants=0
   allocate(PlantPopu_col(JY,JX));         PlantPopu_col=0._r8
-  allocate(PPZ(JP,JY,JX));      PPZ=0._r8
-  allocate(HoursCanopyPSITooLow_pft(JP,JY,JX));     HoursCanopyPSITooLow_pft=0._r8
+  allocate(PPatSeeding_pft(JP,JY,JX));      PPatSeeding_pft=0._r8
+  allocate(HoursTooLowPsiCan_pft(JP,JY,JX));     HoursTooLowPsiCan_pft=0._r8
   allocate(PlantO2Stress(JP,JY,JX));     PlantO2Stress=0._r8
   allocate(fTCanopyGroth_pft(JP,JY,JX));     fTCanopyGroth_pft=0._r8
   allocate(TCG(JP,JY,JX));      TCG=0._r8
@@ -404,8 +404,8 @@ contains
   call destroy(PPX_pft)
   call destroy(NumActivePlants)
   call destroy(PlantPopu_col)
-  call destroy(PPZ)
-  call destroy(HoursCanopyPSITooLow_pft)
+  call destroy(PPatSeeding_pft)
+  call destroy(HoursTooLowPsiCan_pft)
   call destroy(PlantO2Stress)
   call destroy(fTCanopyGroth_pft)
   call destroy(TCG)

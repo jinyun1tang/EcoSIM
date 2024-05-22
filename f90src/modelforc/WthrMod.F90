@@ -564,9 +564,9 @@ module WthrMod
 !
       RainFalPrec(NY,NX)=PrecAsRain(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
       SnoFalPrec(NY,NX)=PrecAsSnow(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
-      IrrigSurface(NY,NX)=PRECII(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
+      IrrigSurface_col(NY,NX)=PRECII(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
       IrrigSubsurf_col(NY,NX)=PRECUI(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
-      PrecRainAndSurfirrig(NY,NX)=RainFalPrec(NY,NX)+IrrigSurface(NY,NX)
+      PrecRainAndSurfirrig(NY,NX)=RainFalPrec(NY,NX)+IrrigSurface_col(NY,NX)
       PrecAtm_col(NY,NX)=RainFalPrec(NY,NX)+SnoFalPrec(NY,NX)
       LWRadSky(NY,NX)=SkyLonwRad_col(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
 !      if(I<=1 .or. I>=365)print*,'SummaryClimateForc',SkyLonwRad_col(NY,NX)

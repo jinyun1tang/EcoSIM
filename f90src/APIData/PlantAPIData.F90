@@ -71,7 +71,7 @@ implicit none
   real(r8), pointer :: ElmBalanceCum_pft(:,:)      => null()    !plant element balance, [g d-2]
   real(r8), pointer :: CumSoilThickness(:)         => null()    !depth to bottom of soil layer from  surface of grid cell [m]
   real(r8), pointer :: PPI(:)                      => null()    !initial plant population, [m-2]
-  real(r8), pointer :: PPZ(:)                      => null()    !plant population at seeding, [m-2]
+  real(r8), pointer :: PPatSeeding_pft(:)                      => null()    !plant population at seeding, [m-2]
   real(r8), pointer :: PPX_pft(:)                      => null()    !plant population, [m-2]
   logical , pointer :: flag_pft_active(:)          => null()
   real(r8), pointer :: PlantPopulation_pft(:)      => null()    !plant population, [d-2]
@@ -309,7 +309,7 @@ implicit none
   real(r8), pointer :: TC4LeafOff_pft(:)     => null()     !threshold temperature for autumn leafoff/hardening, [oC]
   real(r8), pointer :: TKG(:)     => null()     !canopy growth temperature, [K]
   real(r8), pointer :: fTCanopyGroth_pft(:)    => null()     !canopy temperature growth function, [-]
-  real(r8), pointer :: HoursCanopyPSITooLow_pft(:)    => null()     !canopy plant water stress indicator, number of hours PSICanopy_pft(< PSILY, []
+  real(r8), pointer :: HoursTooLowPsiCan_pft(:)    => null()     !canopy plant water stress indicator, number of hours PSICanopy_pft(< PSILY, []
   real(r8), pointer :: TCChill4Seed_pft(:)     => null()     !temperature below which seed set is adversely affected, [oC]
   real(r8), pointer :: iPlantThermoAdaptZone(:)    => null()     !plant thermal adaptation zone, [-]
   real(r8), pointer :: PlantInitThermoAdaptZone(:)   => null()     !initial plant thermal adaptation zone, [-]
@@ -452,8 +452,8 @@ implicit none
 
   type, public :: plant_biom_type
   real(r8), pointer :: StandingDeadStrutElms_col(:)           => null()    !total standing dead element, [g d-2]
-  real(r8), pointer :: ZEROL(:)                               => null()    !threshold zero for leaf calculation
-  real(r8), pointer :: ZEROP(:)                               => null()    !threshold zero for p calculation
+  real(r8), pointer :: ZERO4LeafVar_pft(:)                               => null()    !threshold zero for leaf calculation
+  real(r8), pointer :: ZERO4Groth_pft(:)                               => null()    !threshold zero for p calculation
   real(r8), pointer :: RootNodulNonstElms_pvr(:,:,:)          => null()    !root  layer nonstructural element, [g d-2]
   real(r8), pointer :: RootNodulStrutElms_pvr(:,:,:)          => null()    !root layer nodule element, [g d-2]
   real(r8), pointer :: CanopyLeafCLyr_pft(:,:)                => null()    !canopy layer leaf C, [g d-2]
@@ -550,7 +550,7 @@ implicit none
   real(r8) :: CanH2OHeldVg    !canopy surface water content, [m3 d-2]
   real(r8) :: Eco_Heat_Sens_col       !ecosystem sensible heat flux, [MJ d-2 h-1]
   real(r8) :: RoughHeight        !canopy surface roughness height, [m]
-  real(r8) :: ZeroPlanDisp        !zero plane displacement height, [m]
+  real(r8) :: ZERO4Groth_pftlanDisp        !zero plane displacement height, [m]
   real(r8) :: BndlResistAboveCanG       !isothermal boundary layer resistance, [h m-1]
   real(r8) :: RIB       !Richardson number for calculating boundary layer resistance, [-]
   real(r8) :: Eco_Heat_Grnd_col       !ecosystem storage heat flux, [MJ d-2 h-1]
@@ -608,7 +608,7 @@ implicit none
   integer,  pointer :: iHarvstType_pft(:)    => null()  !type of harvest
   integer,  pointer :: jHarvst_pft(:)    => null()  !flag for stand replacing disturbance
   real(r8), pointer :: FracBiomRMbyHVST(:,:,:)=> null()  !harvest efficiency, [-]
-  real(r8), pointer :: HVST(:)     => null()  !harvest cutting height (+ve) or fractional LAI removal (-ve), [m or -]
+  real(r8), pointer :: CutingHeightORFrac_pft(:)     => null()  !harvest cutting height (+ve) or fractional LAI removal (-ve), [m or -]
   real(r8), pointer :: THIN_pft(:)     => null()  !thinning of plant population, [-]
   real(r8), pointer :: CH4ByFire_pft(:)    => null()  !plant CH4 emission from fire, [g d-2 ]
   real(r8), pointer :: CO2ByFire_pft(:)    => null()  !plant CO2 emission from fire, [g d-2 ]
@@ -694,7 +694,7 @@ implicit none
   real(r8), pointer :: RootMycoExudElm_pvr(:,:,:,:,:)  => null()  !root uptake (+ve) - exudation (-ve) of DOE, [g d-2 h-1]
   real(r8), pointer :: PlantRootSoilElmNetX_pft(:,:)      => null()  !net root element uptake (+ve) - exudation (-ve), [gC d-2 h-1]
   real(r8), pointer :: RO2UptkSoilM_vr(:,:)       => null()  !total O2 sink, [g d-2 t-1]
-  real(r8), pointer :: ZEROQ(:)         => null()  !threshold zero for uptake calculation
+  real(r8), pointer :: ZERO4Uptk_pft(:)         => null()  !threshold zero for uptake calculation
   real(r8), pointer :: CMinPO4Root_pft(:,:)      => null()  !minimum PO4 concentration for root NH4 uptake, [g m-3]
   real(r8), pointer :: VmaxPO4Root_pft(:,:)      => null()  !maximum root PO4 uptake rate, [g m-2 h-1]
   real(r8), pointer :: KmPO4Root_pft(:,:)      => null()  !Km for root PO4 uptake, [g m-3]
@@ -771,7 +771,7 @@ implicit none
   allocate(this%RootHPO4Uptake_pft(JP1)); this%RootHPO4Uptake_pft=spval
   allocate(this%RootH2PO4Uptake_pft(JP1)); this%RootH2PO4Uptake_pft=spval
 
-  allocate(this%ZEROQ(JP1)); this%ZEROQ=spval
+  allocate(this%ZERO4Uptk_pft(JP1)); this%ZERO4Uptk_pft=spval
   allocate(this%RootRespPotent_pvr(jroots,JZ1,JP1)); this%RootRespPotent_pvr=spval
   allocate(this%RootCO2EmisPot_pvr(jroots,JZ1,JP1)); this%RootCO2EmisPot_pvr=spval
   allocate(this%RootCO2Autor_pvr(jroots,JZ1,JP1)); this%RootCO2Autor_pvr=spval
@@ -836,7 +836,7 @@ implicit none
 !  if(allocated(RootHPO4Uptake_pft))deallocate(RootHPO4Uptake_pft)
 !  if(allocated(RootH2PO4Uptake_pft))deallocate(RootH2PO4Uptake_pft)
 !  if(allocated(NH3Dep2Can_brch))deallocate(NH3Dep2Can_brch)
-!  if(allocated(ZEROQ))deallocate(ZEROQ)
+!  if(allocated(ZERO4Uptk_pft))deallocate(ZERO4Uptk_pft)
 !  if(allocated(RootRespPotent_pvr))deallocate(RootRespPotent_pvr)
 !  if(allocated(RootCO2EmisPot_pvr))deallocate(RootCO2EmisPot_pvr)
 !  if(allocated(RootCO2Autor_pvr))deallocate(RootCO2Autor_pvr)
@@ -924,7 +924,7 @@ implicit none
   allocate(this%CumSoilThickness(0:JZ1));this%CumSoilThickness=spval
   allocate(this%DPTHZ(0:JZ1));this%DPTHZ=spval
   allocate(this%PPI(JP1));this%PPI=spval
-  allocate(this%PPZ(JP1));this%PPZ=spval
+  allocate(this%PPatSeeding_pft(JP1));this%PPatSeeding_pft=spval
   allocate(this%PPX_pft(JP1));this%PPX_pft=spval
   allocate(this%PlantPopulation_pft(JP1));this%PlantPopulation_pft=spval
   allocate(this%flag_pft_active(JP1));  this%flag_pft_active=.false.
@@ -952,7 +952,7 @@ implicit none
 !  if(allocated(CumSoilThickness))deallocate(CumSoilThickness)
 !  if(allocated(DPTHZ))deallocate(DPTHZ)
 !  if(allocated(PPI)) deallocate(PPI)
-!  if(allocated(PPZ)) deallocate(PPZ)
+!  if(allocated(PPatSeeding_pft)) deallocate(PPatSeeding_pft)
 !  if(allocated(PPX)) deallocate(PPX)
 !  if(allocated(PP))deallocate(PP)
 !  if(allocated(VLWatMicPM))deallocate(VLWatMicPM)
@@ -1041,7 +1041,7 @@ implicit none
   allocate(this%iHarvestDay_pft(JP1)); this%iHarvestDay_pft=0
   allocate(this%O2ByFire_pft(JP1));this%O2ByFire_pft=spval
   allocate(this%FracBiomRMbyHVST(1:2,1:4,JP1));this%FracBiomRMbyHVST=spval
-  allocate(this%HVST(JP1)); this%HVST=spval
+  allocate(this%CutingHeightORFrac_pft(JP1)); this%CutingHeightORFrac_pft=spval
   allocate(this%iYearPlantHarvest_pft(JP1));this%iYearPlantHarvest_pft=0
   allocate(this%FERT(1:20));this%FERT=spval
   allocate(this%iYearPlanting_pft(JP1));this%iYearPlanting_pft=0
@@ -1262,8 +1262,8 @@ implicit none
   implicit none
   class(plant_biom_type) :: this
 
-  allocate(this%ZEROL(JP1));this%ZEROL=spval
-  allocate(this%ZEROP(JP1));this%ZEROP=spval
+  allocate(this%ZERO4LeafVar_pft(JP1));this%ZERO4LeafVar_pft=spval
+  allocate(this%ZERO4Groth_pft(JP1));this%ZERO4Groth_pft=spval
   allocate(this%StandingDeadStrutElms_col(NumPlantChemElms));this%StandingDeadStrutElms_col=spval
   allocate(this%RootNodulStrutElms_pvr(NumPlantChemElms,JZ1,JP1));this%RootNodulStrutElms_pvr=spval
   allocate(this%CanopyLeafCLyr_pft(NumOfCanopyLayers1,JP1));this%CanopyLeafCLyr_pft=spval
@@ -1348,8 +1348,8 @@ implicit none
   implicit none
   class(plant_biom_type) :: this
 
-!  if(allocated(ZEROL))deallocate(ZEROL)
-!  if(allocated(ZEROP))deallocate(ZEROP)
+!  if(allocated(ZERO4LeafVar_pft))deallocate(ZERO4LeafVar_pft)
+!  if(allocated(ZERO4Groth_pft))deallocate(ZERO4Groth_pft)
 !  if(allocated(RootNodulNonstElms_pvr))deallocate(RootNodulNonstElms_pvr)
 !  if(allocated(RootNodulStrutElms_pvr))deallocate(RootNodulStrutElms_pvr)
 !  if(allocated(CanopyLeafCLyr_pft))deallocate(CanopyLeafCLyr_pft)
@@ -1718,7 +1718,7 @@ implicit none
   allocate(this%TCG(JP1));this%TCG=spval
   allocate(this%TKG(JP1));this%TKG=spval
   allocate(this%TC4LeafOff_pft(JP1));this%TC4LeafOff_pft=spval
-  allocate(this%HoursCanopyPSITooLow_pft(JP1));this%HoursCanopyPSITooLow_pft=spval
+  allocate(this%HoursTooLowPsiCan_pft(JP1));this%HoursTooLowPsiCan_pft=spval
   allocate(this%LeafElmntRemobFlx_brch(NumPlantChemElms,MaxNumBranches,JP1));this%LeafElmntRemobFlx_brch=spval
   allocate(this%PetioleChemElmRemobFlx_brch(NumPlantChemElms,MaxNumBranches,JP1));this%PetioleChemElmRemobFlx_brch=spval
 

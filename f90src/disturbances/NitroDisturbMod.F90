@@ -358,9 +358,9 @@ module NitroDisturbMod
 
           TOMOU(ielmn)=TOMOU(ielmn)+OMelm(ielmn)
           TOMOU(ielmp)=TOMOU(ielmp)+OMelm(ielmp)
-          CO2byFire_col(NY,NX)=CO2byFire_col(NY,NX)-(1.0_r8-FCH4F)*OMelm(ielmc)
-          CH4byFire_col(NY,NX)=CH4byFire_col(NY,NX)-FCH4F*OMelm(ielmc)
-          O2byFire_col(NY,NX)=O2byFire_col(NY,NX)+(1.0_r8-FCH4F)*2.667_r8*OMelm(ielmc)
+          CO2byFire_col(NY,NX)=CO2byFire_col(NY,NX)-(1.0_r8-FrcAsCH4byFire)*OMelm(ielmc)
+          CH4byFire_col(NY,NX)=CH4byFire_col(NY,NX)-FrcAsCH4byFire*OMelm(ielmc)
+          O2byFire_col(NY,NX)=O2byFire_col(NY,NX)+(1.0_r8-FrcAsCH4byFire)*2.667_r8*OMelm(ielmc)
           NH3byFire_col(NY,NX)=NH3byFire_col(NY,NX)-OMelm(ielmn)
           N2ObyFire_col(NY,NX)=N2ObyFire_col(NY,NX)-0.0_r8
           PO4byFire_col(NY,NX)=PO4byFire_col(NY,NX)-OMelm(ielmp)
