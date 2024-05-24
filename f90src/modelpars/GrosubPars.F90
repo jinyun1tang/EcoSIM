@@ -142,7 +142,7 @@ module GrosubPars
 
   integer :: HoursReq4LiterfalAftMature
   REAL(R8) :: FRSV(0:3),FXFY(0:1),FXFZ(0:1)
-  real(r8) :: FXFB(0:3),FXFR(0:3),FXRT(0:1),FXSH(0:1),FXRN(6)
+  real(r8) :: RateConst4ShootSeaStoreNonstXfer(0:3),RateConst4RootSeaStoreNonstXfer(0:3),FXRT(0:1),FXSH(0:1),FXRN(6)
   REAL(R8) :: RCCX(0:3),RCCQ(0:3)
   REAL(R8) :: RCCZ(0:3),RCCY(0:3)
   real(r8) :: Hours4SenesAftMature(0:3)
@@ -165,22 +165,22 @@ module GrosubPars
   integer :: istalk
   integer :: iroot
   integer :: icwood
-  integer :: NumGrowthStages       !number of growth stages
-  integer :: MaxNumRootAxes          !maximum number of root axes
-  integer  :: JP1         !number of plants
-  integer  :: MaxNumBranches         !maximum number of branches
+  integer :: NumGrowthStages             !number of growth stages
+  integer :: MaxNumRootAxes              !maximum number of root axes
+  integer  :: JP1                        !number of plants
+  integer  :: MaxNumBranches             !maximum number of branches
   integer  :: NumOfSkyAzimuSects1        !number of sectors for the sky azimuth  [0,2*pi]
-  integer  :: jcplx       !number of organo-microbial complexes
-  integer  :: NumOfLeafAzimuthSectors        !number of sectors for the leaf azimuth, [0,pi]
+  integer  :: jcplx                      !number of organo-microbial complexes
+  integer  :: NumOfLeafAzimuthSectors    !number of sectors for the leaf azimuth, [0,pi]
   integer  :: NumOfCanopyLayers1         !number of canopy layers
-  integer  :: JZ1         !number of soil layers
-  integer  :: NumOfLeafZenithSectors1        !number of sectors for the leaf zenith [0,pi/2]
-  integer  :: MaxNodesPerBranch1      !number of canopy nodes
-  integer  :: jsken       !number of kinetic components in litter,  PROTEIN(*,1),CH2O(*,2),CELLULOSE(*,3),LIGNIN(*,4) IN SOIL LITTER
-  integer  :: NumLitterGroups     !number of litter groups nonstructural(0,*),
-                          !     foliar(1,*),non-foliar(2,*),stalk(3,*),root(4,*), coarse woody (5,*)
-  integer  :: NumOfPlantMorphUnits        !number of plant organs
-  integer  :: NumOfPlantLitrCmplxs  !number of plant litter microbial-om complexes
+  integer  :: JZ1                        !number of soil layers
+  integer  :: NumOfLeafZenithSectors1    !number of sectors for the leaf zenith [0,pi/2]
+  integer  :: MaxNodesPerBranch1         !number of canopy nodes
+  integer  :: jsken                      !number of kinetic components in litter,PROTEIN(*,1),CH2O(*,2),CELLULOSE(*,3),LIGNIN(*,4) IN SOIL LITTER
+  integer  :: NumLitterGroups            !number of litter groups nonstructural(0,*),
+                                         !     foliar(1,*),non-foliar(2,*),stalk(3,*),root(4,*), coarse woody (5,*)
+  integer  :: NumOfPlantMorphUnits       !number of plant organs
+  integer  :: NumOfPlantLitrCmplxs       !number of plant litter microbial-om complexes
   integer :: iprotein
   integer :: icarbhyro
   integer :: icellulos
@@ -319,8 +319,8 @@ module GrosubPars
 
   RTSK=real((/0.25,1.0,4.0,4.0/),r8)
   FXRN=real((/0.25,0.125,0.0625,0.225,0.075,0.025/),r8)
-  FXFB=real((/1.0E-02,1.0E-02,1.0E-05,5.0E-05/),r8)
-  FXFR=real((/1.0E-02,1.0E-02,1.0E-05,5.0E-05/),r8)
+  RateConst4ShootSeaStoreNonstXfer=real((/1.0E-02,1.0E-02,1.0E-05,5.0E-05/),r8)
+  RateConst4RootSeaStoreNonstXfer=real((/1.0E-02,1.0E-02,1.0E-05,5.0E-05/),r8)
   FXSH=real((/0.50,0.75/),r8);FXRT=real((/0.50,0.25/),r8)
   FRSV=real((/0.025,0.025,0.001,0.001/),r8)
   FXFY=real((/0.025,0.005/),r8);FXFZ=real((/0.25,0.05/),r8)

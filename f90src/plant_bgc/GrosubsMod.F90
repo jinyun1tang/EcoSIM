@@ -11,6 +11,7 @@ module grosubsMod
   use PhotoSynsMod
   use PlantMathFuncMod
   use RootMod, only : RootBGCModel
+  use PlantNonstElmDynMod, only :   PlantNonstElmTransfer
   use LitrFallMod
   use PlantBranchMod
   use PlantBalMod
@@ -26,8 +27,8 @@ module grosubsMod
 !
 !     RTSK=relative primary root sink strength 0.25=shallow,4.0=deep root profile
 !     FXRN=rate constant for plant-bacteria nonstructl C,N,P exchange (h-1)
-!     FXFB=rate constant for leaf-storage nonstructl C,N,P exchange (h-1)
-!     FXFR=rate constant for root-storage nonstructl C,N,P exchange (h-1)
+!     RateConst4ShootSeaStoreNonstXfer=rate constant for leaf-storage nonstructl C,N,P exchange (h-1)
+!     RateConst4RootSeaStoreNonstXfer=rate constant for root-storage nonstructl C,N,P exchange (h-1)
 !     FPART=parameter for allocating nonstructural C to shoot organs
 !     FXSH,FXRT=shoot-root partitioning of storage C during leafout
 !     FRSV=rate constant for remobiln of storage C,N,P during leafout (h-1)
@@ -316,6 +317,10 @@ module grosubsMod
   real(r8) :: WFNG
   real(r8) :: Stomata_Stress
   real(r8) :: WFNS,CanTurgPSIFun4Expans
+  real(r8) :: RootSinkC_vr(jroots,JZ1),RootSinkC(jroots)
+  real(r8) :: Root1stSink_pvr(jroots,JZ1,pltpar%MaxNumRootAxes)
+  real(r8) :: Root2ndSink_pvr(jroots,JZ1,pltpar%MaxNumRootAxes)
+  
 ! begin_execution
   associate(                                                            &
     iPlantRootProfile_pft     => plt_pheno%iPlantRootProfile_pft      , &
@@ -353,7 +358,10 @@ module grosubsMod
     ENDDO
 !
 !    call SumPlantBiom(I,J,NZ,'bfRootBGCM')
-    call RootBGCModel(I,J,NZ,BegRemoblize,PTRT,TFN6_vr,CNRTW,CPRTW,RootPrimeAxsNum)
+    call RootBGCModel(I,J,NZ,BegRemoblize,PTRT,TFN6_vr,CNRTW,CPRTW,RootPrimeAxsNum, &
+      RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,RootSinkC)
+
+    call PlantNonstElmTransfer(I,J,NZ,PTRT,RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,RootSinkC,BegRemoblize)
 !
     call ComputeTotalBiom(I,J,NZ)
   ENDIF
@@ -390,7 +398,7 @@ module grosubsMod
     NU                          => plt_site%NU,                           &
     MaxNumRootLays              => plt_site%MaxNumRootLays,               &
     TempOffset_pft              => plt_pheno%TempOffset_pft,              &
-    ZERO4Groth_pft                       => plt_biom%ZERO4Groth_pft,                        &
+    ZERO4Groth_pft              => plt_biom%ZERO4Groth_pft,               &
     CanopyStalkC_pft            => plt_biom%CanopyStalkC_pft,             &
     RootProteinC_pvr            => plt_biom%RootProteinC_pvr,             &
     RootBiomCPerPlant_pft       => plt_biom%RootBiomCPerPlant_pft,        &
@@ -425,6 +433,7 @@ module grosubsMod
     CanopyStemAreaZ_pft         => plt_morph%CanopyStemAreaZ_pft,         &
     NumRootAxes_pft             => plt_morph%NumRootAxes_pft              &
   )
+
   D2: DO L=1,NumOfCanopyLayers1
     CanopyLeafAreaZ_pft(L,NZ)=0._r8
     CanopyLeafCLyr_pft(L,NZ)=0._r8
@@ -684,7 +693,11 @@ module grosubsMod
     !sum structural biomass
 
   ENDDO
-
+  if(NZ==1)THEN
+  write(111,*)I+J/24.,'tree',CanopyNonstElms_pft(:,NZ)
+  ELSEIF(NZ==2)THEN
+  write(112,*)I+J/24.,'grass',CanopyNonstElms_pft(:,NZ)
+  ENDIF
   CanopyStalkC_pft(NZ)=sum(StalkBiomassC_brch(1:NumOfBranches_pft(NZ),NZ))
   CanopyLeafShethC_pft(NZ) =sum(LeafPetolBiomassC_brch(1:NumOfBranches_pft(NZ),NZ))
   CanopySeedNum_pft(NZ) =sum(SeedNumSet_brch(1:NumOfBranches_pft(NZ),NZ))

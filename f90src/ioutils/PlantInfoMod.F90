@@ -794,7 +794,7 @@ implicit none
   call writefixl(nu_plt,'radius of secondary roots (m) RRAD2M',Root2ndMaxRadius_pft(1,NZ,NY,NX),73)
   call writefixl(nu_plt,'primary/fine root porosity (m3 m-3) PORT',RootPorosity_pft(1,NZ,NY,NX),73)
   call writefixl(nu_plt,'nonstructural C concentration needed for root'// &
-    ' branching (gC/gC) PR',MinNonstC2InitRoot_pft(NZ,NY,NX),70)
+    ' branching (gC/gC) PR',MinNonstC2InitRoot_pft(NZ,NY,NX),73)
   call writefixl(nu_plt,'radial root resistivity for water uptake (m2 MPa-1 h-1) RSRR',RoottRadialResist_pft(1,NZ,NY,NX),73)
   call writefixl(nu_plt,'axial root resistivity for water uptake (m2 MPa-1 h-1) RSRA',RoottAxialResist_pft(1,NZ,NY,NX),73)
   call writefixl(nu_plt,'rate constant for equilibrating shoot-root '// &

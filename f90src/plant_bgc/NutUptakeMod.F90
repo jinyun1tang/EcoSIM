@@ -1108,7 +1108,7 @@ module NutUptakeMod
     ZERO                      => plt_site%ZERO,                       &
     AllPlantRootH2OUptake_vr  => plt_ew%AllPlantRootH2OUptake_vr,     &
     RootFracRemobilizableBiom => plt_allom%RootFracRemobilizableBiom, &
-    ZERO4Groth_pft                     => plt_biom%ZERO4Groth_pft,                      &
+    ZERO4Groth_pft            => plt_biom%ZERO4Groth_pft,             &
     RootProteinConc_pvr       => plt_biom%RootProteinConc_pvr,        &
     RootProteinC_pvr          => plt_biom%RootProteinC_pvr,           &
     RootMycoNonstElms_rpvr    => plt_biom%RootMycoNonstElms_rpvr,     &
