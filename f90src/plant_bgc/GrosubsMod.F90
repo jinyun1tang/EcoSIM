@@ -693,11 +693,11 @@ module grosubsMod
     !sum structural biomass
 
   ENDDO
-  if(NZ==1)THEN
-  write(111,*)I+J/24.,'tree',CanopyNonstElms_pft(:,NZ)
-  ELSEIF(NZ==2)THEN
-  write(112,*)I+J/24.,'grass',CanopyNonstElms_pft(:,NZ)
-  ENDIF
+!  if(NZ==1)THEN
+!  write(111,*)I+J/24.,'tree',CanopyNonstElms_pft(:,NZ)
+!  ELSEIF(NZ==2)THEN
+!  write(112,*)I+J/24.,'grass',CanopyNonstElms_pft(:,NZ)
+!  ENDIF
   CanopyStalkC_pft(NZ)=sum(StalkBiomassC_brch(1:NumOfBranches_pft(NZ),NZ))
   CanopyLeafShethC_pft(NZ) =sum(LeafPetolBiomassC_brch(1:NumOfBranches_pft(NZ),NZ))
   CanopySeedNum_pft(NZ) =sum(SeedNumSet_brch(1:NumOfBranches_pft(NZ),NZ))

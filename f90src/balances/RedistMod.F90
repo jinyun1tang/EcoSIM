@@ -111,7 +111,7 @@ module RedistMod
 
       call LateralTranspt(I,J,NY,NX,LG)
 
-      call SnowMassUpdate(NY,NX)
+      call SnowMassUpdate(I,J,NY,NX)
 
       call HandleSurfaceBoundary(I,NY,NX)
 !
@@ -131,7 +131,8 @@ module RedistMod
       call UpdateChemInSoilLays(NY,NX,LG,DORGC,TXCO2,DORGE)
 !
 !     SNOWPACK LAYERING
-      call SnowpackLayering(NY,NX)
+
+      call SnowpackLayering(I,J,NY,NX)
 
       call RelayerSoilProfile(NY,NX,DORGC,DVLiceMicP)
 
@@ -229,7 +230,7 @@ module RedistMod
 
     WaterStoreLandscape=WaterStoreLandscape+WS
     UVLWatMicP(NY,NX)=UVLWatMicP(NY,NX)+WS
-    ENGYW=VLHeatCapSnow(L,NY,NX)*TKSnow(L,NY,NX)
+    ENGYW=VLHeatCapSnow_col(L,NY,NX)*TKSnow(L,NY,NX)
     HeatStoreLandscape=HeatStoreLandscape+ENGYW
     TGasC_lnd=TGasC_lnd+trcg_solsml(idg_CO2,L,NY,NX)+trcg_solsml(idg_CH4,L,NY,NX)
     DIC_mass_col(NY,NX)=DIC_mass_col(NY,NX)+trcg_solsml(idg_CO2,L,NY,NX)+trcg_solsml(idg_CH4,L,NY,NX)

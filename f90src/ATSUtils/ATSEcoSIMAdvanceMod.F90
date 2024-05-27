@@ -13,7 +13,7 @@ module ATSEcoSIMAdvanceMod
   use ClimForcDataType, only : LWRadSky, TairK, &
       VPA, WindSpeedAtm, RainH  
   use SoilPropertyDataType
-  use HydroThermData, only : PSISM1, TKSoi1, VLHeatCapacity, &
+  use HydroThermData, only : PSISM1, TKSoi1, VLHeatCapacity_col, &
       SoilFracAsMicP, VLWatMicP1, VLiceMicP1 !need the only as some vars are double defined
   use EcoSIMSolverPar, only : NPH, dts_HeatWatTP
 implicit none
@@ -82,7 +82,7 @@ implicit none
       VLWatMicP1(L,NY,NX)=a_WC(L,NY)
       VLiceMicP1(L,NY,NX)=0.0
       TKSoi1(L,NY,NX) = a_TEMP(L,NY)
-      VLHeatCapacity(L,NY,NX) = heat_capacity
+      VLHeatCapacity_col(L,NY,NX) = heat_capacity
       SoilFracAsMicP(L,NY,NX) = 1.0
       PSISM1(L,NY,NX) = a_MATP(L,NY)
       POROS(L,NY,NX) = a_PORO(L,NY)

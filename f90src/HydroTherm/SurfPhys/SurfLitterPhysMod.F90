@@ -72,7 +72,7 @@ implicit none
   HeatSensLitR2Soi1=0.0_r8
   LWRadLitR=0.0_r8
 
-  IF(VLHeatCapacity(0,NY,NX).LE.VHeatCapLitR(NY,NX))THEN
+  IF(VLHeatCapacity_col(0,NY,NX).LE.VHeatCapLitR(NY,NX))THEN
     TKSoi1(0,NY,NX)=TKSoi1(NUM(NY,NX),NY,NX)
     RETURN
   ENDIF  
@@ -215,8 +215,8 @@ implicit none
 ! begin_execution
 
   VWatLitr2=VLWatMicP1(0,NY,NX)
-  VLHeatCapcityLitR2=VLHeatCapacity(0,NY,NX)                          
-  VLHeatCapacity2=VLHeatCapacity(NUM(NY,NX),NY,NX)
+  VLHeatCapcityLitR2=VLHeatCapacity_col(0,NY,NX)                          
+  VLHeatCapacity2=VLHeatCapacity_col(NUM(NY,NX),NY,NX)
   VLWatMicP12=VLWatMicP1(NUM(NY,NX),NY,NX)
   TKR1=TKSoi1(0,NY,NX)
   TKS1=TKSoi1(NUM(NY,NX),NY,NX)
@@ -523,13 +523,13 @@ implicit none
   ! XVOLT,XVOLW=free water+ice,water in litter layer
   ! VOLWM,VsoiPM=surface water,air content for use in TranspNoSalt.f
   ! VWatLitRHoldCapcity=maximum water retention by litter
-  ! VLHeatCapacity=volumetric heat capacity of litter
+  ! VLHeatCapacity_col=volumetric heat capacity of litter
   ! VOLA1,VLWatMicP1,VLiceMicP1,VOLP1=pore,water,ice,air volumes of litter
   ! VWatLitRHoldCapcity=maximum water retention by litter
   ! LitrIceHeatFlxFrez,LitrIceFlxThaw=litter water,latent heat flux from freeze-thaw
   ! VLitR=dry litter volume
   ! THETWX,FracSoiPAsIce,FracSoiPAsAir=water,ice,air concentrations
-  ! VLHeatCapacity=volumetric heat capacity of litter
+  ! VLHeatCapacity_col=volumetric heat capacity of litter
   ! TK1=litter temperature
   ! HFLWRL,LitrIceHeatFlxFrez,cumHeatFlx2LitRByRunoff=litter total cond+conv,latent,runoff heat flux
   VLWatMicP10=VLWatMicP1(0,NY,NX)
@@ -566,25 +566,25 @@ implicit none
     FracSoiPAsAir(0,NY,NX)=1.0_r8
   ENDIF
   THETPM(M+1,0,NY,NX)=FracSoiPAsAir(0,NY,NX)
-  VLHeatCapLitRPre=VLHeatCapacity(0,NY,NX)                !heat capacity
+  VLHeatCapLitRPre=VLHeatCapacity_col(0,NY,NX)                !heat capacity
   TK0Prev=TKSoi1(0,NY,NX)                                 !residual temperature
-  ENGYR=VLHeatCapacity(0,NY,NX)*TKSoi1(0,NY,NX)  !initial energy content
-  VLHeatCapacity(0,NY,NX)=cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP1(0,NY,NX)+cpi*VLiceMicP1(0,NY,NX)  !update heat capacity
+  ENGYR=VLHeatCapacity_col(0,NY,NX)*TKSoi1(0,NY,NX)  !initial energy content
+  VLHeatCapacity_col(0,NY,NX)=cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP1(0,NY,NX)+cpi*VLiceMicP1(0,NY,NX)  !update heat capacity
 
-  IF(VLHeatCapacity(0,NY,NX).GT.VHeatCapLitR(NY,NX))THEN
-    TKSoi1(0,NY,NX)=(ENGYR+HeatFLoByWat2LitRi(NY,NX)+LitrIceHeatFlxFrez(NY,NX))/VLHeatCapacity(0,NY,NX)
-!    print*,'cpksoi0',VLHeatCapacity(0,NY,NX),SoilOrgM_vr(ielmc,0,NY,NX),VLWatMicP1(0,NY,NX),VLiceMicP1(0,NY,NX)
+  IF(VLHeatCapacity_col(0,NY,NX).GT.VHeatCapLitR(NY,NX))THEN
+    TKSoi1(0,NY,NX)=(ENGYR+HeatFLoByWat2LitRi(NY,NX)+LitrIceHeatFlxFrez(NY,NX))/VLHeatCapacity_col(0,NY,NX)
+!    print*,'cpksoi0',VLHeatCapacity_col(0,NY,NX),SoilOrgM_vr(ielmc,0,NY,NX),VLWatMicP1(0,NY,NX),VLiceMicP1(0,NY,NX)
     if(TKSoi1(0,NY,NX)<100._r8 .or. TKSoi1(0,NY,NX)>400._r8)then
-      write(*,*)'weird litter temp UpdateLitRB4RunoffM=',M,NY,NX,TKSoi1(0,NY,NX),TK0Prev,VLHeatCapacity(0,NY,NX)
-      write(*,*)'engy',ENGYR/VLHeatCapacity(0,NY,NX),HeatFLoByWat2LitRi(NY,NX)/VLHeatCapacity(0,NY,NX),&
-        LitrIceHeatFlxFrez(NY,NX)/VLHeatCapacity(0,NY,NX)
+      write(*,*)'weird litter temp UpdateLitRB4RunoffM=',M,NY,NX,TKSoi1(0,NY,NX),TK0Prev,VLHeatCapacity_col(0,NY,NX)
+      write(*,*)'engy',ENGYR/VLHeatCapacity_col(0,NY,NX),HeatFLoByWat2LitRi(NY,NX)/VLHeatCapacity_col(0,NY,NX),&
+        LitrIceHeatFlxFrez(NY,NX)/VLHeatCapacity_col(0,NY,NX)
       write(*,*)'cpo',cpo*SoilOrgM_vr(ielmc,0,NY,NX),cpw*VLWatMicP1(0,NY,NX),cpi*VLiceMicP1(0,NY,NX),VLHeatCapLitRPre,VHeatCapLitR(NY,NX) 
       write(*,*)'cpw',cpw*VLWatMicP10,VLWatMicP10,VLiceMicP10,VLWatMicP1(0,NY,NX),VLiceMicP1(0,NY,NX)
       write(*,*)'watflw',ENGYR,WatFLow2LitR(NY,NX),HeatFLoByWat2LitRi(NY,NX),HeatFLoByWat2LitRi(NY,NX)/(WatFLow2LitR(NY,NX)*cpw)
       write(*,*)'vlwat',VLWatMicP10,WatFLow2LitR(NY,NX),cumWatFlx2LitRByRunoff(NY,NX),cumHeatFlx2LitRByRunoff(NY,NX)
       call endrun(trim(mod_filename)//'at line',__LINE__)
     endif
-!    IF(ABS(VLHeatCapacity(0,NY,NX)/VLHeatCapLitRPre-1._r8)>0.025_r8.or. &
+!    IF(ABS(VLHeatCapacity_col(0,NY,NX)/VLHeatCapLitRPre-1._r8)>0.025_r8.or. &
 !      abs(TKSoi1(0,NY,NX)/TK0Prev-1._r8)>0.025_r8)THEN
 !      TKSoi1(0,NY,NX)=TKSoi1(NUM(NY,NX),NY,NX)
 !    ENDIF
@@ -612,13 +612,13 @@ implicit none
   ! XVOLT,XVOLW=free water+ice,water in litter layer
   ! VOLWM,VsoiPM=surface water,air content for use in TranspNoSalt.f
   ! VWatLitRHoldCapcity=maximum water retention by litter
-  ! VLHeatCapacity=volumetric heat capacity of litter
+  ! VLHeatCapacity_col=volumetric heat capacity of litter
   ! VOLA1,VLWatMicP1,VLiceMicP1,VOLP1=pore,water,ice,air volumes of litter
   ! VWatLitRHoldCapcity=maximum water retention by litter
   ! LitrIceHeatFlxFrez,LitrIceFlxThaw=litter water,latent heat flux from freeze-thaw
   ! VLitR=dry litter volume
   ! THETWX,FracSoiPAsIce,FracSoiPAsAir=water,ice,air concentrations
-  ! VLHeatCapacity=volumetric heat capacity of litter
+  ! VLHeatCapacity_col=volumetric heat capacity of litter
   ! TK1=litter temperature
   ! HFLWRL,LitrIceHeatFlxFrez,cumHeatFlx2LitRByRunoff=litter total cond+conv,latent,runoff heat flux
   VLWatMicP10=VLWatMicP1(0,NY,NX)
@@ -654,29 +654,29 @@ implicit none
     FracSoiPAsAir(0,NY,NX)=1.0_r8
   ENDIF
   THETPM(M+1,0,NY,NX)=FracSoiPAsAir(0,NY,NX)
-  VLHeatCapLitRPre=VLHeatCapacity(0,NY,NX)                !heat capacity
+  VLHeatCapLitRPre=VLHeatCapacity_col(0,NY,NX)                !heat capacity
   TK0Prev=TKSoi1(0,NY,NX)                                 !residual temperature
-  ENGYR=VLHeatCapacity(0,NY,NX)*TKSoi1(0,NY,NX)  !initial energy content
-  VLHeatCapacity(0,NY,NX)=cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP1(0,NY,NX)+cpi*VLiceMicP1(0,NY,NX)  !update heat capacity
+  ENGYR=VLHeatCapacity_col(0,NY,NX)*TKSoi1(0,NY,NX)  !initial energy content
+  VLHeatCapacity_col(0,NY,NX)=cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP1(0,NY,NX)+cpi*VLiceMicP1(0,NY,NX)  !update heat capacity
 
-  IF(VLHeatCapacity(0,NY,NX).GT.VHeatCapLitR(NY,NX))THEN
-    TKSoi1(0,NY,NX)=(ENGYR+cumHeatFlx2LitRByRunoff(NY,NX))/VLHeatCapacity(0,NY,NX)
+  IF(VLHeatCapacity_col(0,NY,NX).GT.VHeatCapLitR(NY,NX))THEN
+    TKSoi1(0,NY,NX)=(ENGYR+cumHeatFlx2LitRByRunoff(NY,NX))/VLHeatCapacity_col(0,NY,NX)
 
     if(TKSoi1(0,NY,NX)<100._r8 .or. TKSoi1(0,NY,NX)>400._r8)then
 !      if(TKSoi1(0,NY,NX)-TK0Prev>20._r8 .and. HeatFLoByWat2LitRi(NY,NX)<0._r8)then
-!        dEvap=AMIN1((TKSoi1(0,NY,NX)-TK0Prev)*VLHeatCapacity(0,NY,NX)/EvapLHTC,VLWatMicP1(0,NY,NX))
+!        dEvap=AMIN1((TKSoi1(0,NY,NX)-TK0Prev)*VLHeatCapacity_col(0,NY,NX)/EvapLHTC,VLWatMicP1(0,NY,NX))
 !        VLWatMicP1(0,NY,NX)=VLWatMicP1(0,NY,NX)-dEvap
 
-!        VLHeatCapacity(0,NY,NX)=cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP1(0,NY,NX)+cpi*VLiceMicP1(0,NY,NX)
+!        VLHeatCapacity_col(0,NY,NX)=cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP1(0,NY,NX)+cpi*VLiceMicP1(0,NY,NX)
 !      endif
-      write(*,*)'weird litter temp UpdateLitRAftRunoff  =',M,NY,NX,TKSoi1(0,NY,NX),TK0Prev,VLHeatCapacity(0,NY,NX)
-      write(*,*)ENGYR/VLHeatCapacity(0,NY,NX),cumHeatFlx2LitRByRunoff(NY,NX)/VLHeatCapacity(0,NY,NX)
+      write(*,*)'weird litter temp UpdateLitRAftRunoff  =',M,NY,NX,TKSoi1(0,NY,NX),TK0Prev,VLHeatCapacity_col(0,NY,NX)
+      write(*,*)ENGYR/VLHeatCapacity_col(0,NY,NX),cumHeatFlx2LitRByRunoff(NY,NX)/VLHeatCapacity_col(0,NY,NX)
       write(*,*)cpo*SoilOrgM_vr(ielmc,0,NY,NX),cpw*VLWatMicP1(0,NY,NX),cpi*VLiceMicP1(0,NY,NX),VLHeatCapLitRPre,VHeatCapLitR(NY,NX) 
       write(*,*)cpw*VLWatMicP10,VLWatMicP10,VLiceMicP10,VLWatMicP1(0,NY,NX),VLiceMicP1(0,NY,NX)
       write(*,*)VLWatMicP10,cumWatFlx2LitRByRunoff(NY,NX),cumHeatFlx2LitRByRunoff(NY,NX)
       call endrun(trim(mod_filename)//'at line',__LINE__)
     endif
-!    IF(ABS(VLHeatCapacity(0,NY,NX)/VLHeatCapLitRPre-1._r8)>0.025_r8.or. &
+!    IF(ABS(VLHeatCapacity_col(0,NY,NX)/VLHeatCapLitRPre-1._r8)>0.025_r8.or. &
 !      abs(TKSoi1(0,NY,NX)/TK0Prev-1._r8)>0.025_r8)THEN
 !      TKSoi1(0,NY,NX)=TKSoi1(NUM(NY,NX),NY,NX)
 !    ENDIF

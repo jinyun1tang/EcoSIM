@@ -1666,13 +1666,24 @@ module PlantBranchMod
 !   PetoleLensNode_brch=petiole length
 !
   KLowestGroLeafNode_brch(NB,NZ)=0
-  IF(HypoctoHeight_pft(NZ).LE.SeedDepth_pft(NZ).AND. &
+  if(NZ==1)then
+  write(113,*)I+J/24.,'bftreehight',HypoctoHeight_pft(NZ)
+  elseif(NZ==2)THEN
+  write(114,*)I+J/24.,'afgrashight',HypoctoHeight_pft(NZ)
+  ENDIF
+
+  IF(HypoctoHeight_pft(NZ).LE.SeedDepth_pft(NZ) .AND. &
     LeafAreaNode_brch(0,MainBranchNum_pft(NZ),NZ).GT.0.0_r8)THEN
     LeafLength=SQRT(1.0E+02_r8*LeafAreaNode_brch(0,MainBranchNum_pft(NZ),NZ)/PlantPopulation_pft(NZ))
     HypoctoHeight_pft(NZ)=LeafLength+PetoleLensNode_brch(0,MainBranchNum_pft(NZ),NZ) &
       +LiveInterNodeHight_brch(0,MainBranchNum_pft(NZ),NZ)
-!    WRITE(113,*)'allocleaf',I,J,LeafLength,PetoleLensNode_brch(0,MainBranchNum_pft(NZ),NZ), &
-!      LiveInterNodeHight_brch(0,MainBranchNum_pft(NZ),NZ),LeafAreaNode_brch(0,MainBranchNum_pft(NZ),NZ)  
+!    WRITE(113,*)'allocleaf',I+J/24.,LeafLength,PetoleLensNode_brch(0,MainBranchNum_pft(NZ),NZ), &
+!      LiveInterNodeHight_brch(0,MainBranchNum_pft(NZ),NZ)
+  ENDIF
+  if(NZ==1)then
+  write(113,*)I+J/24.,'treehight',HypoctoHeight_pft(NZ)
+  elseif(NZ==2)THEN
+  write(114,*)I+J/24.,'grashight',HypoctoHeight_pft(NZ)
   ENDIF
 !
 ! IF CANOPY HAS EMERGED
@@ -2624,17 +2635,17 @@ module PlantBranchMod
   ! HourReq2InitSStor4LeafOut=number of hours required to initiate remobilization of storage C for leafout
   ! main branch leaf out
     IF(NB.EQ.MainBranchNum_pft(NZ))THEN
-      if(NZ==1)THEN
-        write(117,*)I+J/24.,'bftreedeveop',NB,CanopyNonstElms_brch(1:2,NB,NZ)
-      ELSEIF(NZ==2)THEN
-        write(118,*)I+J/24.,'bfgrasdeveop',NB,CanopyNonstElms_brch(1:2,NB,NZ)      
-      ENDIF
+!      if(NZ==1)THEN
+!        write(117,*)I+J/24.,'bftreedeveop',NB,CanopyNonstElms_brch(1:2,NB,NZ)
+!      ELSEIF(NZ==2)THEN
+!        write(118,*)I+J/24.,'bfgrasdeveop',NB,CanopyNonstElms_brch(1:2,NB,NZ)      
+!      ENDIF
       call DevelopMainBranch(I,J,NB,NZ,CanTurgPSIFun4Expans)
-      if(NZ==1)THEN
-        write(117,*)I+J/24.,'aftreedeveop',NB,CanopyNonstElms_brch(1:2,NB,NZ)
-      ELSEIF(NZ==2)THEN
-        write(118,*)I+J/24.,'afgrasdeveop',NB,CanopyNonstElms_brch(1:2,NB,NZ)      
-      ENDIF      
+!      if(NZ==1)THEN
+!        write(117,*)I+J/24.,'aftreedeveop',NB,CanopyNonstElms_brch(1:2,NB,NZ)
+!      ELSEIF(NZ==2)THEN
+!        write(118,*)I+J/24.,'afgrasdeveop',NB,CanopyNonstElms_brch(1:2,NB,NZ)      
+!      ENDIF      
     ENDIF
   !
   ! REDISTRIBUTE TRANFERRED C FROM MAIN STEM TO OTHER BRANCHES
@@ -3071,10 +3082,10 @@ module PlantBranchMod
       ,PPOOLB*DMSHD/(CPSHX+CPLFM+CPLFX*CNPG))
     if(NZ==1)THEN
 !    write(113,*)I+J/24.,RgroCO2_ltd,RCO2Maint_brch/RCO2NonstC_brch,RCO2Y,CanTurgPSIFun4Expans,fTCanopyGroth_pft(NZ)
-    write(113,*)I+J/24.,NB,CanopyNonstElms_brch(:,NB,NZ)
+!    write(113,*)I+J/24.,NB,CanopyNonstElms_brch(:,NB,NZ)
     ELSEif(NZ==2)then
 !    write(114,*)I+J/24.,RgroCO2_ltd,RCO2Maint_brch/RCO2NonstC_brch,RCO2Y,CanTurgPSIFun4Expans,fTCanopyGroth_pft(NZ)
-    write(114,*)I+J/24.,NB,CanopyNonstElms_brch(:,NB,NZ)
+!    write(114,*)I+J/24.,NB,CanopyNonstElms_brch(:,NB,NZ)
     ENDIF
   ELSE
     RgroCO2_ltd=0._r8

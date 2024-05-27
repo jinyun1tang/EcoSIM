@@ -49,7 +49,7 @@ module SnowPhysData
   real(r8),allocatable ::  VLIceSnow0(:,:,:)                  !snow-held ice layer volume before update
   real(r8),allocatable ::  VLWatSnow0(:,:,:)                       !snow-held water layer volume before update
   real(r8),allocatable ::  VLSnoDWI1(:,:,:)                   !
-  real(r8),allocatable ::  SnowLayerThick0(:,:,:)                      !
+  real(r8),allocatable ::  SnowThickL_col0(:,:,:)                      !
    
   public :: InitSnowPhysData
   public :: DestructSnowPhysData
@@ -98,7 +98,7 @@ module SnowPhysData
   allocate(VLIceSnow0(JS,JY,JX));    VLIceSnow0=0._r8
   allocate(VLWatSnow0(JS,JY,JX));    VLWatSnow0=0._r8
   allocate(VLSnoDWI1(JS,JY,JX));    VLSnoDWI1=0._r8
-  allocate(SnowLayerThick0(JS,JY,JX));   SnowLayerThick0=0._r8
+  allocate(SnowThickL_col0(JS,JY,JX));   SnowThickL_col0=0._r8
   allocate(XSnowThawMassL(JS,JY,JX));   XSnowThawMassL=0._r8
   allocate(XIceThawMassL(JS,JY,JX));   XIceThawMassL=0._r8  
   end subroutine  InitSnowPhysData
@@ -143,7 +143,7 @@ module SnowPhysData
   call destroy(VLIceSnow0)
   call destroy(VLWatSnow0)
   call destroy(VLSnoDWI1)
-  call destroy(SnowLayerThick0)
+  call destroy(SnowThickL_col0)
   call destroy(XSnowThawMassL)  
   call destroy(trcSalt_TQS)
   call destroy(cumHeatFlx2LitRByRunoff)

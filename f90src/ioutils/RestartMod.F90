@@ -4945,16 +4945,16 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrc_2d(1:ncols,1:JS)        
-    call restartvar(ncid, flag, varname='VLSnoDWI', dim1name='column',dim2name='levsno',&
+    call restartvar(ncid, flag, varname='VLSnoDWIprev_col', dim1name='column',dim2name='levsno',&
        long_name='total snow volume in snowpack layer', units='m3 d-2', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,VLSnoDWI,datrc_2d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,VLSnoDWIprev_col,datrc_2d) 
   else
-    !print*,'VLSnoDWI'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VLSnoDWI,datrc_2d)   
+    !print*,'VLSnoDWIprev_col
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VLSnoDWIprev_col,datrc_2d)   
     datpr2 => datrc_2d(1:ncols,1:JS)        
-    call restartvar(ncid, flag, varname='VLSnoDWI', dim1name='column',dim2name='levsno',&
+    call restartvar(ncid, flag, varname='VLSnoDWIprev_col', dim1name='column',dim2name='levsno',&
        long_name='total snow volume in snowpack layer', units='m3 d-2', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
@@ -4979,16 +4979,16 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrc_2d(1:ncols,1:JS)        
-    call restartvar(ncid, flag, varname='SnowLayerThick', dim1name='column',dim2name='levsno',&
+    call restartvar(ncid, flag, varname='SnowThickL_col', dim1name='column',dim2name='levsno',&
        long_name='snowpack layer depth', units='m', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,SnowLayerThick,datrc_2d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,SnowThickL_col,datrc_2d) 
   else
-    !print*,'SnowLayerThick'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SnowLayerThick,datrc_2d)   
+    !print*,'SnowThickL_col'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SnowThickL_col,datrc_2d)   
     datpr2 => datrc_2d(1:ncols,1:JS)        
-    call restartvar(ncid, flag, varname='SnowLayerThick', dim1name='column',dim2name='levsno',&
+    call restartvar(ncid, flag, varname='SnowThickL_col', dim1name='column',dim2name='levsno',&
        long_name='snowpack layer depth', units='m', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
@@ -4996,16 +4996,16 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrc_2d(1:ncols,1:JS)        
-    call restartvar(ncid, flag, varname='VLHeatCapSnow', dim1name='column',dim2name='levsno',&
+    call restartvar(ncid, flag, varname='VLHeatCapSnow_col', dim1name='column',dim2name='levsno',&
        long_name='snowpack heat capacity', units='MJ m-3 K-1', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,VLHeatCapSnow,datrc_2d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,VLHeatCapSnow_col,datrc_2d) 
   else
     !print*,'VLHeatCapSnow'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VLHeatCapSnow,datrc_2d)   
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VLHeatCapSnow_col,datrc_2d)   
     datpr2 => datrc_2d(1:ncols,1:JS)        
-    call restartvar(ncid, flag, varname='VLHeatCapSnow', dim1name='column',dim2name='levsno',&
+    call restartvar(ncid, flag, varname='VLHeatCapSnow_col', dim1name='column',dim2name='levsno',&
        long_name='snowpack heat capacity', units='MJ m-3 K-1', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    

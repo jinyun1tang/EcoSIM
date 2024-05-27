@@ -139,7 +139,7 @@ contains
 !     FOR USE AT INTERNAL TIME STEP IN SURFACE LITTER
 !
 !     LWRadBySurf=longwave emission from litter surface
-!     VLHeatCapacity=volumetric heat capacity of litter
+!     VLHeatCapacity_col=volumetric heat capacity of litter
 !     VOLA*,VOLW*,VOLI*,VOLP*=pore,water,ice,air volumes of litter
 !     VWatLitRHoldCapcity=maximum water retention by litter
 !     XVOLT,XVOLW=free surface water+ice,water
@@ -149,7 +149,7 @@ contains
 !     PSISM*=litter matric water potential
 !
   LWRadBySurf(NY,NX)=0.0_r8
-  VLHeatCapacity(0,NY,NX)=cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP(0,NY,NX)
+  VLHeatCapacity_col(0,NY,NX)=cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP(0,NY,NX)
   VLPoreLitR(NY,NX)=VLMicP_vr(0,NY,NX)
   VLWatMicP1(0,NY,NX)=AZMAX1(VLWatMicP_vr(0,NY,NX))
   VLiceMicP1(0,NY,NX)=AZMAX1(VLiceMicP(0,NY,NX))
@@ -200,7 +200,7 @@ contains
   FracSurfAsSnow(NY,NX)=AMIN1(1.0_r8,SQRT((SnowDepth(NY,NX)/MinSnowDepth)))
   FracSurfSnoFree(NY,NX)=1.0_r8-FracSurfAsSnow(NY,NX)
   !if there is heat-wise significant litter layer
-  IF(VLHeatCapacity(0,NY,NX).GT.VHeatCapLitR(NY,NX))THEN
+  IF(VLHeatCapacity_col(0,NY,NX).GT.VHeatCapLitR(NY,NX))THEN
     FracSurfAsBareSoi(NY,NX)=AMIN1(1.0_r8,AZMAX1(EXP(-0.8E-02_r8*(SoilOrgM_vr(ielmc,0,NY,NX)/AREA(3,0,NY,NX)))))
   ELSE
     FracSurfAsBareSoi(NY,NX)=1.0_r8
@@ -694,7 +694,7 @@ contains
 ! ENERGY EXCHANGE AT SOIL SURFACE IF EXPOSED UNDER SNOWPACK
 ! FSNW,FSNX=fractions of snow,snow-free cover
   IF(FracSurfSnoFree(NY,NX).GT.0.0_r8.AND.(SoiBulkDensity(NUM(NY,NX),NY,NX).GT.ZERO.OR. &
-    VLHeatCapacity(NUM(NY,NX),NY,NX).GT.VHCPNX(NY,NX)))THEN
+    VLHeatCapacity_col(NUM(NY,NX),NY,NX).GT.VHCPNX(NY,NX)))THEN
     !Ground partically covered by snow
      
     call ExposedSoilFlux(M,NY,NX,ResistanceLitRLay,TopLayWatVol,VapXAir2TopLay,HeatFluxAir2Soi1,&
@@ -938,7 +938,7 @@ contains
 !
   TFREEZ=-9.0959E+04_r8/(PSISM1(0,NY,NX)-LtHeatIceMelt)
   VLWatMicP1X=AZMAX1(VLWatMicP1(0,NY,NX)+WatFLow2LitR(NY,NX))
-  ENGYR=VLHeatCapacity(0,NY,NX)*TKSoi1(0,NY,NX)
+  ENGYR=VLHeatCapacity_col(0,NY,NX)*TKSoi1(0,NY,NX)
   VLHeatCapacityX=cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP1X+cpi*VLiceMicP1(0,NY,NX)
 
   IF(VLHeatCapacityX.GT.ZEROS(NY,NX))THEN
@@ -949,7 +949,7 @@ contains
 
   IF((TK1X.LT.TFREEZ.AND.VLWatMicP1(0,NY,NX).GT.ZERO*VGeomLayer(0,NY,NX)) &
     .OR.(TK1X.GT.TFREEZ.AND.VLiceMicP1(0,NY,NX).GT.ZERO*VGeomLayer(0,NY,NX)))THEN
-    LitrIceHeatFlxFrezPt=VLHeatCapacity(0,NY,NX)*(TFREEZ-TK1X) &
+    LitrIceHeatFlxFrezPt=VLHeatCapacity_col(0,NY,NX)*(TFREEZ-TK1X) &
       /((1.0_r8+TFREEZ*6.2913E-03_r8)*(1.0_r8-0.10_r8*PSISM1(0,NY,NX)))*dts_wat
     IF(LitrIceHeatFlxFrezPt.LT.0.0_r8)THEN
       !ice thaw
@@ -968,7 +968,7 @@ contains
 !     THICKNESS OF WATER FILMS IN LITTER AND SOIL SURFACE
 !     FROM WATER POTENTIALS FOR GAS EXCHANGE IN TranspNoSalt.F
 !
-  IF(VLHeatCapacity(0,NY,NX).GT.VHeatCapLitR(NY,NX))THEN
+  IF(VLHeatCapacity_col(0,NY,NX).GT.VHeatCapLitR(NY,NX))THEN
     FILM(M,0,NY,NX)=FilmThickness(PSISM1(0,NY,NX), is_top_layer=.true.)
   ELSE
     FILM(M,0,NY,NX)=1.0E-03_r8
@@ -1206,7 +1206,7 @@ contains
 !
   call ZeroSnowFlux(NY,NX)
 
-  IF(VLHeatCapacity(0,NY,NX).GT.VHeatCapLitR(NY,NX))THEN
+  IF(VLHeatCapacity_col(0,NY,NX).GT.VHeatCapLitR(NY,NX))THEN
     BAREW(NY,NX)=AZMAX1(FracSurfAsBareSoi(NY,NX)-AMIN1(1.0_r8,&
       AZMAX1(XVLMobileWaterLitR(NY,NX)/MaxVLWatByLitR(NY,NX))))
   ELSE
@@ -1484,14 +1484,14 @@ contains
 !     FLQGQ,FLQGI=water flux to snowpack from rain,irrigation
 !
   IF(SnoFalPrec(NY,NX).GT.0.0_r8.OR.(RainFalPrec(NY,NX).GT.0.0_r8 &
-    .AND.VLHeatCapSnow(1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX)))THEN
+    .AND.VLHeatCapSnow_col(1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX)))THEN
     !there is precipitation, there is significant snow layer
     Rain2LitRSurf_col(NY,NX)=0.0_r8
     Irrig2LitRSurf(NY,NX)=0.0_r8
     Rain2SoilSurf_col(NY,NX)=PrecAtm_col(NY,NX)
     Irrig2SoilSurf(NY,NX)=IrrigSurface_col(NY,NX)
   ELSEIF((PrecAtm_col(NY,NX).GT.0.0.OR.IrrigSurface_col(NY,NX).GT.0.0_r8) &
-    .AND.VLHeatCapSnow(1,NY,NX).LE.VLHeatCapSnowMin_col(NY,NX))THEN
+    .AND.VLHeatCapSnow_col(1,NY,NX).LE.VLHeatCapSnowMin_col(NY,NX))THEN
     !there is insignificant snow layer
     Rain2LitRSurf_col(NY,NX)=PrecThrufall2LitR*PrecAtm_col(NY,NX)/(PrecAtm_col(NY,NX)+IrrigSurface_col(NY,NX))
     Irrig2LitRSurf(NY,NX)=PrecThrufall2LitR*IrrigSurface_col(NY,NX)/(PrecAtm_col(NY,NX)+IrrigSurface_col(NY,NX))
@@ -1600,7 +1600,7 @@ contains
 ! HeatXfer2SnoLay=hourly convective heat flux from snow,water,ice transfer
 ! HeatFall2Snowt=convective heat flux from snow,water,ice to snowpack
 !
-  IF(VLHeatCapSnow(1,NY,NX).LE.VLHeatCapSnowMin_col(NY,NX).AND.SnowFallt(NY,NX).GT.ZEROS(NY,NX))THEN
+  IF(VLHeatCapSnow_col(1,NY,NX).LE.VLHeatCapSnowMin_col(NY,NX).AND.SnowFallt(NY,NX).GT.ZEROS(NY,NX))THEN
     SnoXfer2SnoLay(1,NY,NX)=SnoXfer2SnoLay(1,NY,NX)+SnowFallt(NY,NX)
     WatXfer2SnoLay(1,NY,NX)=WatXfer2SnoLay(1,NY,NX)+Rain2Snowt(NY,NX)
     IceXfer2SnoLay(1,NY,NX)=IceXfer2SnoLay(1,NY,NX)+Ice2Snowt(NY,NX)
@@ -1608,9 +1608,9 @@ contains
 !     WRITE(*,4422)'INIT',I,J,SnowFallt(NY,NX),Rain2Snowt(NY,NX)
 !    3,Ice2Snowt(NY,NX),HeatFall2Snowt(NY,NX),SnoXfer2SnoLay(1,NY,NX),WatXfer2SnoLay(1,NY,NX)
 !    2,IceXfer2SnoLay(1,NY,NX),HeatXfer2SnoLay(1,NY,NX),HeatFlow2Soili(3,NUM(NY,NX),NY,NX)
-!    3,HeatFlow2Soil(3,NUM(NY,NX),NY,NX),FracSurfSnoFree(NY,NX),VLHeatCapacity(NUM(NY,NX),NY,NX)
+!    3,HeatFlow2Soil(3,NUM(NY,NX),NY,NX),FracSurfSnoFree(NY,NX),VLHeatCapacity_col(NUM(NY,NX),NY,NX)
 !    4*TKSoi1(NUM(NY,NX),NY,NX),HeatFLoByWat2LitRi(NY,NX),HeatFLo2LitrByWat(NY,NX)
-!    5,VLHeatCapacity(0,NY,NX)*TKSoi1(0,NY,NX),HeatNet2Surf(NY,NX),Radnet2LitGrnd,Radnet2Snow
+!    5,VLHeatCapacity_col(0,NY,NX)*TKSoi1(0,NY,NX),HeatNet2Surf(NY,NX),Radnet2LitGrnd,Radnet2Snow
 !    2,HeatSensAir2Grnd,HeatSensAir2Snow,LatentHeatEvapAir2Grnd
 !      ,LatentHeatAir2Sno,HeatSensVapAir2Soi,HeatSensEvap
   ENDIF
