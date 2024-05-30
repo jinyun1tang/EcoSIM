@@ -35,8 +35,10 @@ foreach (env_var IN LISTS ENV)
 endforeach()
 
 if (NOT CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX local)
+  set(CMAKE_INSTALL_PREFIX ${PROJECT_BINARY_DIR}/local)
 endif()
+
+set(CMAKE_INSTALL_PREFIX ${PROJECT_BINARY_DIR}/local)
 
 # set the number of cores to something reasonable so we don't over
 # subscribe a laptop or exceed hpc login node restrictions. could
@@ -131,9 +133,9 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 # Basic libraries to be linked in.
 # added the standard mathematical library for C and C++
-set(ECOSIM_LIBRARIES "")
+#set(ECOSIM_LIBRARIES "")
+#set(ECOSIM_TPLS m)
 
-set(ECOSIM_TPLS m)
 if (${NEED_LAPACK})
   # NEED_LAPACK is set by set_up_platform()
   include(FindBLAS)
@@ -187,38 +189,48 @@ set(ATS-EcoSIM TRUE)
 
 if (ATS-EcoSIM)
     message(STATUS "In if statement")
-    set(NETCDF_FFLAGS "${TPL_INSTALL_PREFIX}/include")
+    message(STATUS "CMAKE_FIND_LIBRARY_SUFFIXES: ${CMAKE_FIND_LIBRARY_SUFFIXES}")
+    set(CMAKE_FIND_LIBRARY_SUFFIXES ".so" ".a")
+    set(NETCDF_FFLAGS "-I${TPL_INSTALL_PREFIX}/include")
     set(NETCDF_FLIBS "-L${TPL_INSTALL_PREFIX}/lib -lnetcdff -lnetcdf -lnetcdf -lhdf5")
     set(Z_INCLUDE_DIR "${TPL_INSTALL_PREFIX}/include")
     set(Z_LIBRARY "-L${TPL_INSTALL_PREFIX}/lib")
     set(HDF5_INCLUDE_DIR "${TPL_INSTALL_PREFIX}/include")
     set(HDF5_LIBRARY "-L${TPL_INSTALL_PREFIX}/lib")    
     set(ECOSIM_HAVE_NETCDF TRUE)
+    set(NETCDF_LIBRARY "-L${TPL_INSTALL_PREFIX}/lib/libnetcdf${LIB_SUFFIX}")
+    set(NETCDF_CFLAGS "-I/global2/agraus/code/ats_dev_dir/amanzi_tpls-install-master-Debug/include")
+    set(NETCDF_CLIBS "-L/global2/agraus/code/ats_dev_dir/amanzi_tpls-install-master-Debug/lib -lnetcdf")
     #Needed to share with ATS (probably an easier way to do this)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
-    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fPIC")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${NETCDF_CFLAGS} -fPIC")
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} ${NETCDF_FFLAGS} -fPIC")
+
+    
+
+    #What were these even for? are they neccesary?
+    include_directories("/global2/agraus/code/ats_dev_dir/amanzi_tpls-install-master-Debug/include")
+    #link_directories("/global2/agraus/code/ats_dev_dir/amanzi_tpls-install-master-Debug/lib")
+
+    set(ECOSIM_TPLS "${NETCDF_FLIBS} ${NETCDF_CLIBS} ${Z_LIBRARY} ${HDF5_LIBRARY} -lhdf5_hl -lm -lz -lzip -lxml2 -lcurl")
+
+else()
+    add_subdirectory(3rd-partylibs)
 endif()
 
-message(STATUS "ATS-EcoSIM: ${ATS-EcoSIM}")
-message(STATUS "NETCDF_FFLAGS: ${NETCDF_FFLAGS}")
-message(STATUS "NETCDF_FLIBS: ${NETCDF_FLIBS}")
-message(STATUS "Z_INCLUDE_DIR: ${Z_INCLUDE_DIR}")
-message(STATUS "Z_LIBRARY: ${Z_LIBRARY}")
-message(STATUS "HDF5_INCLUDE_DIR: ${HDF5_INCLUDE_DIR}")
-message(STATUS "HDF5_LIBRARY: ${HDF5_LIBRARY}")
-message(STATUS "ECOSIM_HAVE_NETCDF: ${ECOSIM_HAVE_NETCDF}")
+message("After ATS-EcoSIM loop:")
+message(STATUS "TPL_NETCDF_LIBRARIES: ${TPL_NETCDF_LIBRARIES}")
+message(STATUS "TPL_NETCDF_INCLUDE_DIRS: ${TPL_NETCDF_INCLUDE_DIRS}")
+message(STATUS "ECOSIM_LIBRARIES: ${ECOSIM_LIBRARIES}")
+message(STATUS "ECOSIM_TPLS: ${ECOSIM_TPLS}")
+message(STATUS "PROJECT_BINARY_DIR: ${PROJECT_BINARY_DIR}")
+#set(CONFIG_FLAGS "-DTPL_NETCDF_INCLUDE_DIRS=\"${NETCDF_FFLAGS}\"")
+#set(CONFIG_FLAGS "${CONFIG_FLAGS} -DTPL_NETCDF_LIBRARIES=\"${NETCDF_FLIBS}\"")
 
-message(STATUS "CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
-message(STATUS "CMAKE_C_FLAGS: ${CMAKE_C_FLAGS}")
-message(STATUS "CMAKE_Fortran_FLAGS: ${CMAKE_Fortran_FLAGS}")
-
-set(CONFIG_FLAGS "-DTPL_NETCDF_INCLUDE_DIRS=\"${NETCDF_FFLAGS}\"")
-set(CONFIG_FLAGS "${CONFIG_FLAGS} -DTPL_NETCDF_LIBRARIES=\"${NETCDF_FLIBS}\"")
-
-add_subdirectory(3rd-partylibs)
+#add_subdirectory(3rd-partylibs)
 
 if (NOT ECOSIM_HAVE_NETCDF)
+  message("not ecosim have netcdf")
   message(("TPL_NETCDF_LIBRARIES: ${TPL_NETCDF_LIBRARIES}"))
   list(APPEND ECOSIM_TPLS ${TPL_NETCDF_LIBRARIES})
   list(APPEND ECOSIM_INCLUDE_DIRS ${TPL_NETCDF_INCLUDE_DIRS})
@@ -226,11 +238,23 @@ endif()
 # Include the binary directory in the header file search path,
 # since it's where we place the third-party libraries.
 
+message(STATUS "linking directories: ")
+message(STATUS "linking include and lib in ${PROJECT_BINARY_DIR}")
 include_directories("${PROJECT_BINARY_DIR}/include")
 link_directories("${PROJECT_BINARY_DIR}/lib")
 
-list(APPEND ECOSIM_INCLUDE_DIRS "${PROJECT_BINARY_DIR}/include")
-include_directories(${ECOSIM_INCLUDE_DIRS})
+#list(APPEND ECOSIM_INCLUDE_DIRS "${PROJECT_BINARY_DIR}/include")
+#include_directories(${ECOSIM_INCLUDE_DIRS})
+
+set(CMAKE_INSTALL_PREFIX ${PROJECT_BINARY_DIR}/local)
+
+message("After other things get set:")
+message(STATUS "TPL_NETCDF_LIBRARIES: ${TPL_NETCDF_LIBRARIES}")
+message(STATUS "TPL_NETCDF_INCLUDE_DIRS: ${TPL_NETCDF_INCLUDE_DIRS}")
+message(STATUS "ECOSIM_LIBRARIES: ${ECOSIM_LIBRARIES}")
+message(STATUS "ECOSIM_TPLS: ${ECOSIM_TPLS}")
+message(STATUS "ECOSIM_INCLUDE_DIRS: ${ECOSIM_INCLUDE_DIRS}")
+message(STATUS "CMAKE_INSTALL_PREFIX: ${CMAKE_INSTALL_PREFIX}")
 
 enable_testing()
 
