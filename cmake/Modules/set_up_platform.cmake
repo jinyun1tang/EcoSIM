@@ -63,6 +63,7 @@ endif()
 
 # check if we are building within ATS and if so change the TPL dirs
   if (ATS)
+    message("In the Modules dir")
     set(Z_LIBRARY "${TPL_INSTALL_PREFIX}/lib/libz.a")
     set(Z_INCLUDE_DIR "${TPL_INSTALL_PREFIX}/include")
     get_filename_component(Z_LIBRARY_DIR ${Z_LIBRARY} DIRECTORY)

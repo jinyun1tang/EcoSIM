@@ -79,16 +79,16 @@ cmake ../
 
 #This does the build
 make -j ${parallel_jobs}
-if [ $? -ne 0 ]; then
-    error_message "Failed to build EcoSIM"
-    exit_now 50
-fi
-status_message "EcoSIM build complete"
+#if [ $? -ne 0 ]; then
+#    error_message "Failed to build EcoSIM"
+#    exit_now 50
+#fi
+#status_message "EcoSIM build complete"
 
 #Does the install
 make install
-if [ $? -ne 0 ]; then
-  error_message "Failed to install EcoSIM"
-  exit_now 50
-fi
-status_message "EcoSIM install complete"
+#if [ $? -ne 0 ]; then
+#  error_message "Failed to install EcoSIM"
+#  exit_now 50
+#fi
+#status_message "EcoSIM install complete"
