@@ -40,6 +40,7 @@ module RedistMod
   USE LateralTranspMod
   use UnitMod, only : units
   use SnowBalanceMod
+  use SnowTransportMod
   implicit none
 
   private
@@ -111,7 +112,7 @@ module RedistMod
 
       call LateralTranspt(I,J,NY,NX,LG)
 
-      call SnowMassUpdate(NY,NX)
+      call SnowMassUpdate(I,J,NY,NX)
 
       call HandleSurfaceBoundary(I,NY,NX)
 !
@@ -119,8 +120,6 @@ module RedistMod
       call OverlandFlow(NY,NX)
 
       call SoilErosion(NY,NX,DORGE)
-!
-      call ChemicalBySnowRedistribution(NY,NX)
 !
       call DiagSnowChemMass(NY,NX)
 !
@@ -131,7 +130,8 @@ module RedistMod
       call UpdateChemInSoilLays(NY,NX,LG,DORGC,TXCO2,DORGE)
 !
 !     SNOWPACK LAYERING
-      call SnowpackLayering(NY,NX)
+
+      call SnowpackLayering(I,J,NY,NX)
 
       call RelayerSoilProfile(NY,NX,DORGC,DVLiceMicP)
 
@@ -208,46 +208,7 @@ module RedistMod
   ENDDO D9945
   end subroutine UpdateOutputVars
 
-!------------------------------------------------------------------------------------------
 
-  subroutine DiagSnowChemMass(NY,NX)
-  implicit none
-  integer, intent(in) :: NY,NX
-  real(r8) :: SSW,ENGYW,WS
-  integer :: L,nsalts
-  !
-  !     UPDATE STATE VARIABLES WITH TOTAL FLUXES CALCULATED ABOVE
-  !
-  !     IF(J.EQ.24)THEN
-  !
-  !     SNOWPACK VARIABLES NEEDED FOR WATER, C, N, P, O, SOLUTE AND
-  !     ENERGY BALANCES INCLUDING SUM OF ALL CURRENT STATE VARIABLES,
-  !     CUMULATIVE SUMS OF ALL ADDITIONS AND REMOVALS
-  !
-  DO  L=1,JS
-    WS=VLDrySnoWE(L,NY,NX)+VLWatSnow(L,NY,NX)+VLIceSnow(L,NY,NX)*DENSICE
-
-    WaterStoreLandscape=WaterStoreLandscape+WS
-    UVLWatMicP(NY,NX)=UVLWatMicP(NY,NX)+WS
-    ENGYW=VLHeatCapSnow(L,NY,NX)*TKSnow(L,NY,NX)
-    HeatStoreLandscape=HeatStoreLandscape+ENGYW
-    TGasC_lnd=TGasC_lnd+trcg_solsml(idg_CO2,L,NY,NX)+trcg_solsml(idg_CH4,L,NY,NX)
-    DIC_mass_col(NY,NX)=DIC_mass_col(NY,NX)+trcg_solsml(idg_CO2,L,NY,NX)+trcg_solsml(idg_CH4,L,NY,NX)
-    OXYGSO=OXYGSO+trcg_solsml(idg_O2,L,NY,NX)
-    TGasN_lnd=TGasN_lnd+trcg_solsml(idg_N2,L,NY,NX)+trcg_solsml(idg_N2O,L,NY,NX)
-    TDisolNH4_lnd=TDisolNH4_lnd+trcn_solsml(ids_NH4,L,NY,NX)+trcg_solsml(idg_NH3,L,NY,NX)
-    tNO3_lnd=tNO3_lnd+trcn_solsml(ids_NO3,L,NY,NX)
-    TDisolPi_lnd=TDisolPi_lnd+trcn_solsml(ids_H1PO4,L,NY,NX)+trcn_solsml(ids_H2PO4,L,NY,NX)
-
-    IF(salt_model)THEN
-      SSW=0._r8
-      do nsalts=idsalt_beg,idsalt_end
-        SSW=SSW+trcs_solsml(nsalts,L,NY,NX)*trcSaltIonNumber(nsalts)
-      ENDDO  
-      TION=TION+SSW
-    ENDIF
-  ENDDO
-  end subroutine DiagSnowChemMass
 !------------------------------------------------------------------------------------------
 
   subroutine ModifyExWTBLByDisturbance(I,J,NY,NX)
@@ -333,9 +294,9 @@ module RedistMod
   !
   !     SURFACE BOUNDARY WATER FLUXES
   !
-  WI=PrecAtm_col(NY,NX)+IrrigSurface(NY,NX)   !total incoming water flux=rain/snowfall + irrigation
+  WI=PrecAtm_col(NY,NX)+IrrigSurface_col(NY,NX)   !total incoming water flux=rain/snowfall + irrigation
   CRAIN=CRAIN+WI
-  URAIN(NY,NX)=URAIN(NY,NX)+WI
+  URAIN_col(NY,NX)=WI
   WO=VapXAir2GSurf(NY,NX)+TEVAPP(NY,NX) !total outgoing water flux
   CEVAP=CEVAP-WO
   UEVAP(NY,NX)=UEVAP(NY,NX)-WO
@@ -495,7 +456,7 @@ module RedistMod
     ENDDO  
     SIR=SIR*PrecAtm_col(NY,NX)
     SBU=-IrrigSubsurf_col(NY,NX)*SII
-    SII=SII*IrrigSurface(NY,NX)
+    SII=SII*IrrigSurface_col(NY,NX)
     TIONIN=TIONIN+SIR+SII
     !
     !     SUBSURFACE BOUNDARY SALT FLUXES FROM SUBSURFACE IRRIGATION
@@ -568,7 +529,7 @@ module RedistMod
   implicit none
   integer, intent(in) :: NY,NX
 
-  integer :: K,NTG,idom
+  integer :: K,idom
   !     begin_execution
   !
   IF(ABS(TWat2GridBySurfRunoff(NY,NX)).GT.ZEROS(NY,NX))THEN
@@ -581,7 +542,8 @@ module RedistMod
       ENDDO
     ENDDO D8570
 !
-    call OverlandSnowFlow(NY,NX)
+
+    call OverlandFlowThruSnow(NY,NX)
 
   ENDIF
   end subroutine OverlandFlow
@@ -710,7 +672,10 @@ module RedistMod
   call sumMicBiomLayL(0,NY,NX,tMicBiome_col(1:NumPlantChemElms,NY,NX))
   
   call sumLitrOMLayL(0,NY,NX,litrOM)
-
+  if(litrOM(ielmc)<0._r8)then
+    print*,'redist negative litr'
+    stop
+  endif
   SoilOrgM_vr(1:NumPlantChemElms,0,NY,NX)=litrOM
 
   DO NE=1,NumPlantChemElms
@@ -1363,6 +1328,7 @@ module RedistMod
   call sumORGMLayL(L,NY,NX,SoilOrgM_vr(1:NumPlantChemElms,L,NY,NX))
   
   DO NE=1,NumPlantChemElms
+    if(SoilOrgM_vr(NE,L,NY,NX)<0._r8)write(*,*)'redist',NE,L,SoilOrgM_vr(NE,L,NY,NX)
     tSoilOrgM_col(NE,NY,NX)=tSoilOrgM_col(NE,NY,NX)+SoilOrgM_vr(NE,L,NY,NX)
   ENDDO
 

@@ -33,13 +33,18 @@ module SnowPhysData
   real(r8),allocatable ::  VLHeatCapSnowM1(:,:,:)             ! temporary snow layer volumetric heat capacity 
   real(r8),allocatable ::  VLIceSnow0M(:,:,:)                 !
   real(r8),allocatable ::  VLWatSnow0M(:,:,:)                 !snow-held water volume during iteration
+  real(r8),allocatable ::  CumSno2SnowLayM(:,:,:)
+  real(r8),allocatable ::  CumWat2SnowLayM(:,:,:)
+  real(r8),allocatable ::  CumIce2SnowLayM(:,:,:)
+  real(r8),allocatable ::  CumHeat2SnowLayM(:,:,:)
+  real(r8),allocatable ::  XSnowThawMassLM(:,:,:)
+  real(r8),allocatable ::  XIceThawMassLM(:,:,:)
+
   real(r8),allocatable ::  CumSno2SnowLay(:,:,:)                       !
   real(r8),allocatable ::  CumWat2SnowLay(:,:,:)                       !
   real(r8),allocatable ::  CumIce2SnowLay(:,:,:)                       !
   real(r8),allocatable ::  CumHeat2SnowLay(:,:,:)                      !
-  real(r8),allocatable ::  PhaseChangeHeatL(:,:,:)                       !
-  real(r8),allocatable ::  SnowThawMassL(:,:,:)                       !
-  real(r8),allocatable ::  IceThawMassL(:,:,:)                       !
+  real(r8),allocatable ::  XPhaseChangeHeatLM(:,:,:)                       !
   real(r8),allocatable ::  WatX2SnoLay(:,:,:)                       !
   real(r8),allocatable ::  SnoX2SnoLay(:,:,:)                       !
   real(r8),allocatable ::  IceX2SnoLay(:,:,:)                       !
@@ -49,8 +54,7 @@ module SnowPhysData
   real(r8),allocatable ::  VLIceSnow0(:,:,:)                  !snow-held ice layer volume before update
   real(r8),allocatable ::  VLWatSnow0(:,:,:)                       !snow-held water layer volume before update
   real(r8),allocatable ::  VLSnoDWI1(:,:,:)                   !
-  real(r8),allocatable ::  SnowLayerThick0(:,:,:)                      !
-   
+  real(r8),allocatable ::  SnowThickL_col0(:,:,:)                      !
   public :: InitSnowPhysData
   public :: DestructSnowPhysData
   contains
@@ -83,12 +87,18 @@ module SnowPhysData
   allocate(VLIceSnow0M(JS,JY,JX));   VLIceSnow0M=0._r8
   allocate(VLWatSnow0M(JS,JY,JX));   VLWatSnow0M=0._r8
   allocate(CumSno2SnowLay(JS,JY,JX));    CumSno2SnowLay=0._r8
+
+  allocate(CumSno2SnowLayM(JS,JY,JX)); CumSno2SnowLayM=0._r8
+  allocate(CumWat2SnowLayM(JS,JY,JX)); CumWat2SnowLayM=0._r8
+  allocate(CumIce2SnowLayM(JS,JY,JX)); CumIce2SnowLayM=0._r8
+  allocate(CumHeat2SnowLayM(JS,JY,JX)); CumHeat2SnowLayM=0._r8
+  allocate(XSnowThawMassLM(JS,JY,JX)); XSnowThawMassLM=0._r8
+  allocate(XIceThawMassLM(JS,JY,JX)); XIceThawMassLM=0._r8
+
   allocate(CumWat2SnowLay(JS,JY,JX));    CumWat2SnowLay=0._r8
   allocate(CumIce2SnowLay(JS,JY,JX));    CumIce2SnowLay=0._r8
   allocate(CumHeat2SnowLay(JS,JY,JX));   CumHeat2SnowLay=0._r8
-  allocate(PhaseChangeHeatL(JS,JY,JX));    PhaseChangeHeatL=0._r8
-  allocate(SnowThawMassL(JS,JY,JX));    SnowThawMassL=0._r8
-  allocate(IceThawMassL(JS,JY,JX));    IceThawMassL=0._r8
+  allocate(XPhaseChangeHeatLM(JS,JY,JX));    XPhaseChangeHeatLM=0._r8
   allocate(WatX2SnoLay(JS,JY,JX));    WatX2SnoLay=0._r8
   allocate(SnoX2SnoLay(JS,JY,JX));    SnoX2SnoLay=0._r8
   allocate(IceX2SnoLay(JS,JY,JX));    IceX2SnoLay=0._r8
@@ -98,7 +108,7 @@ module SnowPhysData
   allocate(VLIceSnow0(JS,JY,JX));    VLIceSnow0=0._r8
   allocate(VLWatSnow0(JS,JY,JX));    VLWatSnow0=0._r8
   allocate(VLSnoDWI1(JS,JY,JX));    VLSnoDWI1=0._r8
-  allocate(SnowLayerThick0(JS,JY,JX));   SnowLayerThick0=0._r8
+  allocate(SnowThickL_col0(JS,JY,JX));   SnowThickL_col0=0._r8
   allocate(XSnowThawMassL(JS,JY,JX));   XSnowThawMassL=0._r8
   allocate(XIceThawMassL(JS,JY,JX));   XIceThawMassL=0._r8  
   end subroutine  InitSnowPhysData
@@ -128,12 +138,16 @@ module SnowPhysData
   call destroy(VLIceSnow0M)
   call destroy(VLWatSnow0M)
   call destroy(CumSno2SnowLay)
+  call destroy(CumSno2SnowLayM)
+  call destroy(CumWat2SnowLayM)
+  call destroy(CumIce2SnowLayM)
+  call destroy(CumHeat2SnowLayM)
+  call destroy(XSnowThawMassLM)
+  call destroy(XIceThawMassLM)
   call destroy(CumWat2SnowLay)
   call destroy(CumIce2SnowLay)
   call destroy(CumHeat2SnowLay)
-  call destroy(PhaseChangeHeatL)
-  call destroy(SnowThawMassL)
-  call destroy(IceThawMassL)
+  call destroy(XPhaseChangeHeatLM)
   call destroy(WatX2SnoLay)
   call destroy(SnoX2SnoLay)
   call destroy(IceX2SnoLay)
@@ -143,7 +157,7 @@ module SnowPhysData
   call destroy(VLIceSnow0)
   call destroy(VLWatSnow0)
   call destroy(VLSnoDWI1)
-  call destroy(SnowLayerThick0)
+  call destroy(SnowThickL_col0)
   call destroy(XSnowThawMassL)  
   call destroy(trcSalt_TQS)
   call destroy(cumHeatFlx2LitRByRunoff)

@@ -11,6 +11,7 @@ module grosubsMod
   use PhotoSynsMod
   use PlantMathFuncMod
   use RootMod, only : RootBGCModel
+  use PlantNonstElmDynMod, only :   PlantNonstElmTransfer
   use LitrFallMod
   use PlantBranchMod
   use PlantBalMod
@@ -26,8 +27,8 @@ module grosubsMod
 !
 !     RTSK=relative primary root sink strength 0.25=shallow,4.0=deep root profile
 !     FXRN=rate constant for plant-bacteria nonstructl C,N,P exchange (h-1)
-!     FXFB=rate constant for leaf-storage nonstructl C,N,P exchange (h-1)
-!     FXFR=rate constant for root-storage nonstructl C,N,P exchange (h-1)
+!     RateConst4ShootSeaStoreNonstXfer=rate constant for leaf-storage nonstructl C,N,P exchange (h-1)
+!     RateConst4RootSeaStoreNonstXfer=rate constant for root-storage nonstructl C,N,P exchange (h-1)
 !     FPART=parameter for allocating nonstructural C to shoot organs
 !     FXSH,FXRT=shoot-root partitioning of storage C during leafout
 !     FRSV=rate constant for remobiln of storage C,N,P during leafout (h-1)
@@ -139,7 +140,7 @@ module grosubsMod
     NodulStrutElms_pft             => plt_biom%NodulStrutElms_pft          , &
     SeasonalNonstElms_pft          => plt_biom%SeasonalNonstElms_pft       , &
     StandDeadStrutElms_pft         => plt_biom%StandDeadStrutElms_pft      , &
-    fTgrowCanP                     => plt_pheno%fTgrowCanP                 , &
+    fTCanopyGroth_pft              => plt_pheno%fTCanopyGroth_pft          , &
     NetCumElmntFlx2Plant_pft       => plt_pheno%NetCumElmntFlx2Plant_pft   , &
     IsPlantActive_pft              => plt_pheno%IsPlantActive_pft          , &
     iPlantRootProfile_pft          => plt_pheno%iPlantRootProfile_pft      , &
@@ -163,7 +164,7 @@ module grosubsMod
     GrossCO2Fix_pft                => plt_bgcr%GrossCO2Fix_pft             , &
     PlantExudChemElmCum_pft        => plt_rbgc%PlantExudChemElmCum_pft     , &
     CumSoilThickness               => plt_site%CumSoilThickness            , &
-    PlantinDepth                   => plt_morph%PlantinDepth               , &
+    PlantinDepz_pft                => plt_morph%PlantinDepz_pft            , &
     NumOfBranches_pft              => plt_morph%NumOfBranches_pft            &
   )
   D9975: DO NZ=1,NP0
@@ -172,10 +173,11 @@ module grosubsMod
 !
     D205: DO NB=1,NumOfBranches_pft(NZ)
       IF(doInitPlant_pft(NZ).EQ.itrue)THEN
-        IF(doPlantLeafOut_brch(NB,NZ).EQ.iEnable.AND.Hours4Leafout_brch(NB,NZ).GE.HourReq4LeafOut_brch(NB,NZ))THEN
+        IF(doPlantLeafOut_brch(NB,NZ).EQ.iEnable &
+          .AND. Hours4Leafout_brch(NB,NZ).GE.HourReq4LeafOut_brch(NB,NZ))THEN
           iDayPlanting_pft(NZ)=I
           iYearPlanting_pft(NZ)=iYearCurrent
-          PlantinDepth(NZ)=0.005_r8+CumSoilThickness(0)
+          PlantinDepz_pft(NZ)=0.005_r8+CumSoilThickness(0)
           !mark plant as initialized
           doInitPlant_pft(NZ)=ifalse
         ENDIF
@@ -185,14 +187,14 @@ module grosubsMod
 !     LitrFall FROM STANDING DEAD
 !
 !     XFRC,XFRN,XFRP=LitrFall from standing dead
-!     fTgrowCanP=temperature function for canopy growth
+!     fTCanopyGroth_pft=temperature function for canopy growth
 !     WTSTG,WTSTDN,WTSTDP=standing dead C,N,P mass
 !     CSNC,ZSNC,PSNC=C,N,P LitrFall
 !
     
     D6235: DO M=1,jsken
       DO NE=1,NumPlantChemElms
-        XFRE=1.5814E-05_r8*fTgrowCanP(NZ)*StandDeadKCompElms_pft(NE,M,NZ)
+        XFRE=1.5814E-05_r8*fTCanopyGroth_pft(NZ)*StandDeadKCompElms_pft(NE,M,NZ)
         IF(iPlantTurnoverPattern_pft(NZ).EQ.0.OR.iPlantRootProfile_pft(NZ).LE.1)THEN
           LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)+XFRE
         ELSE
@@ -314,7 +316,11 @@ module grosubsMod
   real(r8) :: TFN5
   real(r8) :: WFNG
   real(r8) :: Stomata_Stress
-  real(r8) :: WFNS,WFNSG
+  real(r8) :: WFNS,CanTurgPSIFun4Expans
+  real(r8) :: RootSinkC_vr(jroots,JZ1),RootSinkC(jroots)
+  real(r8) :: Root1stSink_pvr(jroots,JZ1,pltpar%MaxNumRootAxes)
+  real(r8) :: Root2ndSink_pvr(jroots,JZ1,pltpar%MaxNumRootAxes)
+  
 ! begin_execution
   associate(                                                            &
     iPlantRootProfile_pft     => plt_pheno%iPlantRootProfile_pft      , &
@@ -337,7 +343,7 @@ module grosubsMod
 !    call SumPlantBiom(I,J,NZ,'bfstageplant')
     
     call StagePlantForGrowth(I,J,NZ,TFN6_vr,CNLFW,CPLFW,&
-      CNSHW,CPSHW,CNRTW,CPRTW,RootPrimeAxsNum,TFN5,WFNG,Stomata_Stress,WFNS,WFNSG)
+      CNSHW,CPSHW,CNRTW,CPRTW,RootPrimeAxsNum,TFN5,WFNG,Stomata_Stress,WFNS,CanTurgPSIFun4Expans)
 !
 !     CALCULATE GROWTH OF EACH BRANCH
 !
@@ -348,11 +354,14 @@ module grosubsMod
     
     DO  NB=1,NumOfBranches_pft(NZ)
       call GrowOneBranch(I,J,NB,NZ,TFN6_vr,CanopyHeight_copy,CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW,&
-        TFN5,WFNG,Stomata_Stress,WFNS,WFNSG,PTRT,CanopyN2Fix_pft,BegRemoblize)
+        TFN5,WFNG,Stomata_Stress,WFNS,CanTurgPSIFun4Expans,PTRT,CanopyN2Fix_pft,BegRemoblize)
     ENDDO
 !
 !    call SumPlantBiom(I,J,NZ,'bfRootBGCM')
-    call RootBGCModel(I,J,NZ,BegRemoblize,PTRT,TFN6_vr,CNRTW,CPRTW,RootPrimeAxsNum)
+    call RootBGCModel(I,J,NZ,BegRemoblize,PTRT,TFN6_vr,CNRTW,CPRTW,RootPrimeAxsNum, &
+      RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,RootSinkC)
+
+    call PlantNonstElmTransfer(I,J,NZ,PTRT,RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,RootSinkC,BegRemoblize)
 !
     call ComputeTotalBiom(I,J,NZ)
   ENDIF
@@ -370,12 +379,12 @@ module grosubsMod
 
 !------------------------------------------------------------------------------------------
   subroutine StagePlantForGrowth(I,J,NZ,TFN6_vr,CNLFW,CPLFW,CNSHW,&
-    CPSHW,CNRTW,CPRTW,RootPrimeAxsNum,TFN5,WFNG,Stomata_Stress,WFNS,WFNSG)
+    CPSHW,CNRTW,CPRTW,RootPrimeAxsNum,TFN5,WFNG,Stomata_Stress,WFNS,CanTurgPSIFun4Expans)
   integer, intent(in) :: I,J,NZ
   REAL(R8), INTENT(OUT):: TFN6_vr(JZ1)
   REAL(R8), INTENT(OUT) :: CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW
   real(r8), intent(out) :: RootPrimeAxsNum,TFN5,WFNG,Stomata_Stress
-  real(r8), intent(out) :: WFNS,WFNSG
+  real(r8), intent(out) :: WFNS,CanTurgPSIFun4Expans
   integer :: L,NR,N,NE
   real(r8) :: ACTVM,RTK,STK,TKCM,TKSM
 !     begin_execution
@@ -389,7 +398,7 @@ module grosubsMod
     NU                          => plt_site%NU,                           &
     MaxNumRootLays              => plt_site%MaxNumRootLays,               &
     TempOffset_pft              => plt_pheno%TempOffset_pft,              &
-    ZEROP                       => plt_biom%ZEROP,                        &
+    ZERO4Groth_pft              => plt_biom%ZERO4Groth_pft,               &
     CanopyStalkC_pft            => plt_biom%CanopyStalkC_pft,             &
     RootProteinC_pvr            => plt_biom%RootProteinC_pvr,             &
     RootBiomCPerPlant_pft       => plt_biom%RootBiomCPerPlant_pft,        &
@@ -424,6 +433,7 @@ module grosubsMod
     CanopyStemAreaZ_pft         => plt_morph%CanopyStemAreaZ_pft,         &
     NumRootAxes_pft             => plt_morph%NumRootAxes_pft              &
   )
+
   D2: DO L=1,NumOfCanopyLayers1
     CanopyLeafAreaZ_pft(L,NZ)=0._r8
     CanopyLeafCLyr_pft(L,NZ)=0._r8
@@ -453,7 +463,7 @@ module grosubsMod
 !
   IF(iPlantTurnoverPattern_pft(NZ).EQ.0 &
     .OR.(.not.is_plant_treelike(iPlantRootProfile_pft(NZ)))&
-    .OR.StalkStrutElms_pft(ielmc,NZ).LE.ZEROP(NZ))THEN
+    .OR.StalkStrutElms_pft(ielmc,NZ).LE.ZERO4Groth_pft(NZ))THEN
     FracShootLeafElmAlloc2Litr(ielmc,k_fine_litr)=1.0_r8
     FracRootStalkElmAlloc2Litr(ielmc,k_fine_litr)=1.0_r8
     FracRootElmAlloc2Litr(ielmc,k_fine_litr)=1.0_r8
@@ -533,7 +543,7 @@ module grosubsMod
 !     Stomata_Stress=stomatal resistance function of canopy turgor
 !     PSICanopy_pft=canopy water potential
 !     WFNG=growth function of canopy water potential
-!     WFNSG=expansion,extension function of canopy water potential
+!     CanTurgPSIFun4Expans=expansion,extension function of canopy water potential
 !
   WFNS=AMIN1(1.0_r8,AZMAX1(PSICanopyTurg_pft(NZ)-PSIMin4OrganExtens))
 
@@ -541,13 +551,13 @@ module grosubsMod
     !bryophyte, no turgor
     Stomata_Stress=1.0_r8
     WFNG=EXP(0.05_r8*PSICanopy_pft(NZ))
-    WFNSG=WFNS**0.10_r8
+    CanTurgPSIFun4Expans=WFNS**0.10_r8
   ELSE
     !others
     Stomata_Stress=EXP(RCS(NZ)*PSICanopyTurg_pft(NZ))
 
     WFNG=EXP(0.10_r8*PSICanopy_pft(NZ))
-    WFNSG=WFNS**0.25_r8
+    CanTurgPSIFun4Expans=WFNS**0.25_r8
   ENDIF
   end associate
   end subroutine StagePlantForGrowth
@@ -670,16 +680,12 @@ module grosubsMod
   
   DO NE=1,NumPlantChemElms
     CanopyNonstElms_pft(NE,NZ)=sum(CanopyNonstElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
+    StalkRsrvElms_pft(NE,NZ)=sum(StalkRsrvElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))    
+
     ShootStrutElms_pft(NE,NZ)=sum(ShootStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
     PetioleStrutElms_pft(NE,NZ)=sum(PetoleStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
     StalkStrutElms_pft(NE,NZ)=sum(StalkStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
     LeafStrutElms_pft(NE,NZ)=sum(LeafStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
-    StalkRsrvElms_pft(NE,NZ)=sum(StalkRsrvElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
-!    if(StalkRsrvElms_pft(NE,NZ)>1.e20)then
-!      print*,NZ,NE,I+J/24.,StalkRsrvElms_pft(NE,NZ),NumOfBranches_pft(NZ)
-!      print*,'755',StalkRsrvElms_brch(NE,1,NZ)
-!      stop
-!    endif
     HuskStrutElms_pft(NE,NZ)=sum(HuskStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
     GrainStrutElms_pft(NE,NZ)=sum(GrainStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
     EarStrutElms_pft(NE,NZ)=sum(EarStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
@@ -687,7 +693,11 @@ module grosubsMod
     !sum structural biomass
 
   ENDDO
-
+!  if(NZ==1)THEN
+!  write(111,*)I+J/24.,'tree',CanopyNonstElms_pft(:,NZ)
+!  ELSEIF(NZ==2)THEN
+!  write(112,*)I+J/24.,'grass',CanopyNonstElms_pft(:,NZ)
+!  ENDIF
   CanopyStalkC_pft(NZ)=sum(StalkBiomassC_brch(1:NumOfBranches_pft(NZ),NZ))
   CanopyLeafShethC_pft(NZ) =sum(LeafPetolBiomassC_brch(1:NumOfBranches_pft(NZ),NZ))
   CanopySeedNum_pft(NZ) =sum(SeedNumSet_brch(1:NumOfBranches_pft(NZ),NZ))

@@ -7,7 +7,7 @@ module PlantPhenolMod
   use EcosimConst
   use PlantAPIData
   use minimathmod, only : AZMAX1
-  use StartqsMod, only : StartPlants
+  use InitPlantMod, only : StartPlants
   use PlantMathFuncMod
   use EcoSIMCtrlMod, only : etimer
   implicit none
@@ -106,7 +106,7 @@ module PlantPhenolMod
   associate(                                                                       &
     iPlantBranchState_brch           =>  plt_pheno%iPlantBranchState_brch        , &
     LeafNumberAtFloralInit_brch      =>  plt_pheno%LeafNumberAtFloralInit_brch   , &    
-    HoursCanopyPSITooLow_pft         =>  plt_pheno%HoursCanopyPSITooLow_pft      , &    
+    HoursTooLowPsiCan_pft         =>  plt_pheno%HoursTooLowPsiCan_pft      , &    
     PSICanopy_pft                    =>  plt_ew%PSICanopy_pft                    , &    
     NumOfLeaves_brch                 =>  plt_morph%NumOfLeaves_brch              , &    
     doRemobilization_brch            =>  plt_pheno%doRemobilization_brch         , &    
@@ -145,10 +145,10 @@ module PlantPhenolMod
 !
 !             PSICanopy_pft=canopy total water potential
 !             PSIMin4LeafOff=minimum canopy water potential for leafoff
-!             HoursCanopyPSITooLow_pft=number of hours PSICanopy_pft(< PSIMin4LeafOff (for output only)
+!             HoursTooLowPsiCan_pft=number of hours PSICanopy_pft(< PSIMin4LeafOff (for output only)
 !
   IF(PSICanopy_pft(NZ).LT.PSIMin4LeafOff(iPlantRootProfile_pft(NZ)))THEN
-    HoursCanopyPSITooLow_pft(NZ)=HoursCanopyPSITooLow_pft(NZ)+1.0_r8
+    HoursTooLowPsiCan_pft(NZ)=HoursTooLowPsiCan_pft(NZ)+1.0_r8
   ENDIF
   end associate
   end subroutine Emerged_plant_Phenology          
@@ -210,8 +210,7 @@ module PlantPhenolMod
     ELSE
       HarvestChk=I.LT.iDayPlanting_pft(NZ).AND.I.GT.iDayPlantHarvest_pft(NZ) &
         .AND.iYearCurrent.GE.iYearPlantHarvest_pft(NZ)
-      PlantingChk=I.LT.iDayPlanting_pft(NZ).AND.iYearPlanting_pft(NZ) &
-        .GT.iYearPlantHarvest_pft(NZ)  
+      PlantingChk=I.LT.iDayPlanting_pft(NZ) .AND. iYearPlanting_pft(NZ).GT.iYearPlantHarvest_pft(NZ)  
       !not planted
       IF((HarvestChk.AND.iPlantState_pft(NZ).EQ.iDead) .OR. PlantingChk)THEN
         IsPlantActive_pft(NZ)=iDormant
@@ -258,7 +257,7 @@ module PlantPhenolMod
     PlantPopulation_pft             =>   plt_site%PlantPopulation_pft          , &
     Hours4Leafout_brch              =>   plt_pheno%Hours4Leafout_brch          , &
     PSIRootTurg_vr                  =>   plt_ew%PSIRootTurg_vr                 , &
-    FNOD                            =>   plt_allom%FNOD                        , &
+    FracGroth2Node_pft              =>   plt_allom%FracGroth2Node_pft          , &
     NumRootAxes_pft                 =>   plt_morph%NumRootAxes_pft             , &
     MainBranchNum_pft               =>   plt_morph%MainBranchNum_pft           , &
     NumOfBranches_pft               =>   plt_morph%NumOfBranches_pft           , &
@@ -283,7 +282,7 @@ module PlantPhenolMod
 ! PB=nonstructural C concentration needed for branching
 ! iPlantBranchState_brch=branch life flag:0=living,1=dead
 ! PSTG=node number
-! FNOD=scales node number for perennial vegetation (e.g. trees)
+! FracGroth2Node_pft=scales node number for perennial vegetation (e.g. trees)
 ! NumCogrowNode=number of concurrently growing nodes
 ! ShootNodeNumAtPlanting_pft,GROUP=node number at planting,floral initiation
 ! IBTYP: setup for phenologically-driven above-ground turnover
@@ -303,7 +302,7 @@ module PlantPhenolMod
             D120: DO NB=1,MaxNumBranches
               IF(iPlantBranchState_brch(NB,NZ).EQ.iDead)THEN
                 IF(NB.EQ.MainBranchNum_pft(NZ) .OR. ShootNodeNum_brch(MainBranchNum_pft(NZ),NZ) &
-                  .GT.BranchNumber_pft(NZ)+NumCogrowNode(NZ)/FNOD(NZ)+ShootNodeNumAtPlanting_pft(NZ))THEN
+                  .GT.BranchNumber_pft(NZ)+NumCogrowNode(NZ)/FracGroth2Node_pft(NZ)+ShootNodeNumAtPlanting_pft(NZ))THEN
                   !initiate a new branch
                   BranchNumber_pft(NZ)=BranchNumber_pft(NZ)+1
                   NumOfBranches_pft(NZ)=MIN(BranchNumMax(iPlantTurnoverPattern_pft(NZ)),MAX(NB,NumOfBranches_pft(NZ)))
@@ -328,7 +327,7 @@ module PlantPhenolMod
 !     CONCENTRATION PERMIT
 !
 !     PR=nonstructural C concentration needed for root branching
-!     FNOD: parameter for allocation of growth to nodes
+!     FracGroth2Node_pft: parameter for allocation of growth to nodes
 !     XLI: number of nodes in seed
 !     PSTG: node number
 !     MainBranchNum_pft: number of main branch
@@ -338,7 +337,7 @@ module PlantPhenolMod
 !     root axis initialization
       IF(PSIRootTurg_vr(ipltroot,NGTopRootLayer_pft(NZ),NZ).GT.PSIMin4LeafExpansion)THEN
         IF(NumRootAxes_pft(NZ).EQ.0 .OR. ShootNodeNum_brch(MainBranchNum_pft(NZ),NZ) &
-          .GT.NumRootAxes_pft(NZ)/FNOD(NZ)+ShootNodeNumAtPlanting_pft(NZ))THEN
+          .GT.NumRootAxes_pft(NZ)/FracGroth2Node_pft(NZ)+ShootNodeNumAtPlanting_pft(NZ))THEN
           IF((NumRootAxes_pft(NZ).EQ.0 .AND. SeasonalNonstElms_pft(ielmc,NZ).GT.0.0_r8) &
             .OR.(CanopyNonstElmConc_pft(ielmc,NZ).GT.MinNonstC2InitRoot_pft(NZ) & 
             .AND.MinNonstC2InitRoot_pft(NZ).GT.0.0_r8))THEN
@@ -372,8 +371,8 @@ module PlantPhenolMod
     RootMycoNonstElms_rpvr          =>  plt_biom%RootMycoNonstElms_rpvr     , &
     CanopyNonstElms_brch            =>  plt_biom%CanopyNonstElms_brch       , &
     RootNonstructElmConc_pvr        =>  plt_biom%RootNonstructElmConc_pvr   , &
-    ZEROL                           =>  plt_biom%ZEROL                      , &
-    ZEROP                           =>  plt_biom%ZEROP                      , &
+    ZERO4LeafVar_pft                           =>  plt_biom%ZERO4LeafVar_pft                      , &
+    ZERO4Groth_pft                           =>  plt_biom%ZERO4Groth_pft                      , &
     RootMycoActiveBiomC_pvr         =>  plt_biom%RootMycoActiveBiomC_pvr    , &
     CanopyNodulNonstElms_pft        =>  plt_biom%CanopyNodulNonstElms_pft   , &
     WatByPCanopy                    =>  plt_ew%WatByPCanopy                 , &
@@ -431,7 +430,7 @@ module PlantPhenolMod
 !
   D180: DO N=1,MY(NZ)
     D160: DO L=NU,MaxSoiL4Root(NZ)
-      IF(RootMycoActiveBiomC_pvr(N,L,NZ).GT.ZEROL(NZ))THEN
+      IF(RootMycoActiveBiomC_pvr(N,L,NZ).GT.ZERO4LeafVar_pft(NZ))THEN
         DO NE=1,NumPlantChemElms
           RootNonstructElmConc_pvr(NE,N,L,NZ)=AZMAX1(RootMycoNonstElms_rpvr(NE,N,L,NZ) &
             /RootMycoActiveBiomC_pvr(N,L,NZ))
@@ -450,7 +449,7 @@ module PlantPhenolMod
 ! NoduleNonstructCconc_pft=nonstructural C concentration in canopy nodules
 ! CCPOLB,CZPOLB,CPPOLB=nonstructural C,N,P concn in branch(g g-1)
 !
-  IF(CanopyLeafShethC_pft(NZ).GT.ZEROL(NZ))THEN
+  IF(CanopyLeafShethC_pft(NZ).GT.ZERO4LeafVar_pft(NZ))THEN
     DO NE=1,NumPlantChemElms
       CanopyNonstElmConc_pft(NE,NZ)=AZMAX1(AMIN1(1.0_r8,CanopyNonstElms_pft(NE,NZ)/CanopyLeafShethC_pft(NZ)))
     ENDDO
@@ -461,7 +460,7 @@ module PlantPhenolMod
   ENDIF
   
   D190: DO NB=1,NumOfBranches_pft(NZ)
-    IF(LeafPetolBiomassC_brch(NB,NZ).GT.ZEROP(NZ))THEN
+    IF(LeafPetolBiomassC_brch(NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
       DO NE=1,NumPlantChemElms      
         LeafPetoNonstElmConc_brch(NE,NB,NZ)=AZMAX1(CanopyNonstElms_brch(NE,NB,NZ)/LeafPetolBiomassC_brch(NB,NZ))
       ENDDO  
@@ -482,8 +481,16 @@ module PlantPhenolMod
   ShootArea=0._r8
   IF(iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).EQ.0)THEN
     ShootArea=CanopyLeafArea_pft(NZ)+CanopyStemArea_pft(NZ)
-    CanopyChk=(HypoctoHeight_pft(NZ).GT.SeedDepth_pft(NZ)).AND.(ShootArea.GT.ZEROL(NZ))
+    CanopyChk=(HypoctoHeight_pft(NZ).GT.SeedDepth_pft(NZ)).AND.(ShootArea.GT.ZERO4LeafVar_pft(NZ))
     RootChk=(Root1stDepz_pft(ipltroot,1,NZ).GT.SeedDepth_pft(NZ)+ppmc)
+!    if(NZ==1)THEN
+!    write(111,*)'tree emerg chk',I+J/24.,CanopyChk, RootChk,HypoctoHeight_pft(NZ),SeedDepth_pft(NZ),&
+!      ShootArea,ZERO4LeafVar_pft(NZ)
+!    ELSEIF(NZ==2)then
+!    write(112,*)'grass emerg chk',I+J/24.,CanopyChk, RootChk,HypoctoHeight_pft(NZ),SeedDepth_pft(NZ),&
+!      ShootArea,ZERO4LeafVar_pft(NZ)    
+!    endif
+
     IF(CanopyChk .AND. RootChk)THEN
       iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ)=I
       VHeatCapCanP(NZ)=cpw*(ShootStrutElms_pft(ielmc,NZ)*10.0E-06_r8+WatByPCanopy(NZ))
@@ -568,8 +575,8 @@ module PlantPhenolMod
       IF(DayLenthCurrent.LT.DayLenthPrev)THEN
         Hours4LeafOff_brch(NB,NZ)=Hours4ShortenPhotoPeriod_brch(NB,NZ)
         IF(Hours4LeafOff_brch(NB,NZ).GE.HourReq4LeafOff_brch(NB,NZ) &
-          .OR.(ALAT.GT.0.0_r8 .AND. I.EQ.355) &
-          .OR.(ALAT.LT.0.0_r8 .AND. I.EQ.173))THEN
+          .OR.(ALAT.GT.0.0_r8 .AND. I.EQ.355) &     !northern hemisphere
+          .OR.(ALAT.LT.0.0_r8 .AND. I.EQ.173))THEN  !southern hemisphere
           Hours4Leafout_brch(NB,NZ)=0.0_r8
           doPlantLeafOut_brch(NB,NZ)=iEnable
         ENDIF
@@ -598,20 +605,21 @@ module PlantPhenolMod
         ENDIF
         !not sufficient leafout hour
         IF(Hours4Leafout_brch(NB,NZ).LT.HourReq4LeafOut_brch(NB,NZ))THEN
-          !unfavorable temperature
+          !unfavorable cold temperature
           IF(TCG(NZ).LT.TCChill4Seed_pft(NZ))THEN
             Hours4Leafout_brch(NB,NZ)=AZMAX1(Hours4Leafout_brch(NB,NZ)-1.0_r8)
           ENDIF
         ENDIF
         IF(Hours4Leafout_brch(NB,NZ).GE.HourReq4LeafOut_brch(NB,NZ) &
-          .OR.(ALAT.GT.0.0_r8 .AND.I.EQ.173) &
-          .OR.(ALAT.LT.0.0_r8 .AND.I.EQ.355))THEN
+          .OR.(ALAT.GT.0.0_r8 .AND.I.EQ.173) &     !northern hemisphere
+          .OR.(ALAT.LT.0.0_r8 .AND.I.EQ.355))THEN  !southern hemisphere
           Hours4LeafOff_brch(NB,NZ)=0.0_r8
         ENDIF
       ENDIF
 
       IF(iPlantCalendar_brch(ipltcal_InitFloral,NB,NZ).NE.0 .OR. &
         (DayLenthCurrent.LT.DayLenthPrev .AND. DayLenthCurrent.LT.12.0_r8))THEN
+        !has flower or (day length is decreasing, and current daytime is short)
         doPlantLeaveOff_brch(NB,NZ)=iEnable
       ENDIF
   !
@@ -752,8 +760,10 @@ module PlantPhenolMod
   !     ALAT=latitude
   !     iPlantCalendar_brch(ipltcal_InitFloral,=date of floral initiation
   !
-        IF((DayLenthCurrent.LT.DayLenthPrev .OR. DayLenthCurrent.LT.24.0_r8-DayLenthMax+2.0_r8) &
+        IF((DayLenthCurrent.LT.DayLenthPrev &
+          .OR. DayLenthCurrent.LT.24.0_r8-DayLenthMax+2.0_r8) &
           .AND. doPlantLeaveOff_brch(NB,NZ).EQ.iEnable)THEN
+
           IF(TCG(NZ).LE.TC4LeafOff_pft(NZ) &
             .OR. PSICanopy_pft(NZ).LT.PSIMin4LeafOff(iPlantRootProfile_pft(NZ)))THEN
             Hours4LeafOff_brch(NB,NZ)=Hours4LeafOff_brch(NB,NZ)+1.0_r8

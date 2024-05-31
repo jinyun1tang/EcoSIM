@@ -10,9 +10,9 @@ module EcoSIMCtrlDataType
   real(r8) :: ZERO
   real(r8) :: ZERO2
   real(r8),target,allocatable :: ZEROS(:,:)
-  real(r8),target,allocatable :: ZEROP(:,:,:)
-  real(r8),target,allocatable :: ZEROQ(:,:,:)
-  real(r8),target,allocatable :: ZEROL(:,:,:)
+  real(r8),target,allocatable :: ZERO4Groth_pft(:,:,:)
+  real(r8),target,allocatable :: ZERO4Uptk_pft(:,:,:)
+  real(r8),target,allocatable :: ZERO4LeafVar_pft(:,:,:)
   real(r8),target,allocatable :: ZEROS2(:,:)
 
   integer :: NPX             !number of cycles per hour for water, heat, and solute flux calcns
@@ -44,9 +44,9 @@ module EcoSIMCtrlDataType
   implicit none
 
   allocate(ZEROS(JY,JX)); ZEROS(:,:) = 0._r8
-  allocate(ZEROP(JP,JY,JX)); ZEROP(:,:,:)=0._r8
-  allocate(ZEROQ(JP,JY,JX)); ZEROQ(:,:,:)=0._r8
-  allocate(ZEROL(JP,JY,JX)); ZEROL(:,:,:)=0._r8
+  allocate(ZERO4Groth_pft(JP,JY,JX)); ZERO4Groth_pft(:,:,:)=0._r8
+  allocate(ZERO4Uptk_pft(JP,JY,JX)); ZERO4Uptk_pft(:,:,:)=0._r8
+  allocate(ZERO4LeafVar_pft(JP,JY,JX)); ZERO4LeafVar_pft(:,:,:)=0._r8
   allocate(ZEROS2(JY,JX));  ZEROS2(:,:)=0._r8
 
   end subroutine InitEcoSIMCtrlData
@@ -57,9 +57,9 @@ module EcoSIMCtrlDataType
   implicit none
 
   call destroy(ZEROS)
-  call destroy(ZEROP)
-  call destroy(ZEROQ)
-  call destroy(ZEROL)
+  call destroy(ZERO4Groth_pft)
+  call destroy(ZERO4Uptk_pft)
+  call destroy(ZERO4LeafVar_pft)
   call destroy(ZEROS2)
 
   end subroutine DestructEcoSIMCtrlData

@@ -21,7 +21,7 @@ module NutUptakeMod
 !------------------------------------------------------------------------
 
   subroutine PlantNutientO2Uptake(I,NZ,FDMP,PopPlantO2Uptake,PopPlantO2Demand,&
-    PATH,FineRootRadius,FracPRoot4Uptake,MinFracPRoot4Uptake,FracSoiLayByPrimRoot,RootAreaDivRadius_vr)
+    PATH,FineRootRadius,FracPRoot4Uptake,MinFracPRoot4Uptake_vr,FracSoiLayByPrimRoot,RootAreaDivRadius_vr)
   !
   !DESCRIPTION
   !doing plant population level nutrient, and O2 uptake
@@ -29,7 +29,7 @@ module NutUptakeMod
   integer, intent(in) :: I,NZ
   real(r8), intent(in):: FDMP
   real(r8), intent(in) :: PATH(jroots,JZ1),FineRootRadius(jroots,JZ1),FracPRoot4Uptake(jroots,JZ1,JP1)
-  real(r8), intent(in) :: MinFracPRoot4Uptake(jroots,JZ1,JP1)
+  real(r8), intent(in) :: MinFracPRoot4Uptake_vr(jroots,JZ1,JP1)
   real(r8), intent(in) :: FracSoiLayByPrimRoot(JZ1,JP1),RootAreaDivRadius_vr(jroots,JZ1)
   real(r8), intent(inout) :: PopPlantO2Uptake,PopPlantO2Demand
 
@@ -38,7 +38,7 @@ module NutUptakeMod
 !     ROOT(N=1) AD MYCORRHIZAL(N=2) O2 AND NUTRIENT UPTAKE
 !
   call RootMycoO2NutrientUptake(I,NZ,PopPlantO2Uptake,PopPlantO2Demand,PATH,FineRootRadius,&
-    FracPRoot4Uptake,MinFracPRoot4Uptake,FracSoiLayByPrimRoot,RootAreaDivRadius_vr)
+    FracPRoot4Uptake,MinFracPRoot4Uptake_vr,FracSoiLayByPrimRoot,RootAreaDivRadius_vr)
 
   end subroutine PlantNutientO2Uptake
 !------------------------------------------------------------------------
@@ -59,7 +59,7 @@ module NutUptakeMod
     NU                        => plt_site%NU,                        &
     AREA3                     => plt_site%AREA3,                     &
     NH3Dep2Can_brch           => plt_rbgc%NH3Dep2Can_brch,           &
-    ZEROP                     => plt_biom%ZEROP,                     &
+    ZERO4Groth_pft                     => plt_biom%ZERO4Groth_pft,                     &
     AtmGasc                   => plt_site%AtmGasc,                   &
     LeafPetolBiomassC_brch    => plt_biom%LeafPetolBiomassC_brch,    &
     CanopyNonstElms_brch      => plt_biom%CanopyNonstElms_brch,      &
@@ -68,7 +68,7 @@ module NutUptakeMod
     CanopyBndlResist_pft      => plt_photo%CanopyBndlResist_pft,     &
     LeafAreaLive_brch         => plt_morph%LeafAreaLive_brch,        &
     NumOfBranches_pft         => plt_morph%NumOfBranches_pft,        &
-    FracRadPARbyCanopy_pft    => plt_rad%FracRadPARbyCanopy_pft,     &
+    FracPARRadbyCanopy_pft    => plt_rad%FracPARRadbyCanopy_pft,     &
     CanopyLeafArea_pft        => plt_morph%CanopyLeafArea_pft        &
   )
   !
@@ -84,19 +84,19 @@ module NutUptakeMod
   !     CZPOLB,ZPOOLB=nonstplt_rbgc%RUCtural N concentration,content in branch
   !     NH3Dep2Can_brch=NH3 flux between atmosphere and branch
   !     RA,CanPStomaResistH2O_pft=canopy boundary layer,stomatal resistance
-  !     FracRadPARbyCanopy_pft=fraction of radiation received by each PFT canopy
+  !     FracPARRadbyCanopy_pft=fraction of radiation received by each PFT canopy
   !
   SNH3P=SNH3X*EXP(0.513_r8-0.0171_r8*TCelciusCanopy_pft(NZ))
   FNH3P=1.0E-04_r8*FDMP
-  if(FracRadPARbyCanopy_pft(NZ).GT.ZEROP(NZ))then
+  if(FracPARRadbyCanopy_pft(NZ).GT.ZERO4Groth_pft(NZ))then
     D105: DO NB=1,NumOfBranches_pft(NZ)
-      IF(LeafPetolBiomassC_brch(NB,NZ).GT.ZEROP(NZ).AND.LeafAreaLive_brch(NB,NZ).GT.ZEROP(NZ) &
-        .AND.CanopyLeafArea_pft(NZ).GT.ZEROP(NZ))THEN
+      IF(LeafPetolBiomassC_brch(NB,NZ).GT.ZERO4Groth_pft(NZ).AND.LeafAreaLive_brch(NB,NZ).GT.ZERO4Groth_pft(NZ) &
+        .AND.CanopyLeafArea_pft(NZ).GT.ZERO4Groth_pft(NZ))THEN
         CNH3P=AZMAX1(FNH3P*LeafPetoNonstElmConc_brch(ielmn,NB,NZ)/SNH3P)
         ZPOOLB=AZMAX1(CanopyNonstElms_brch(ielmn,NB,NZ))
         NH3Dep2Can_brch(NB,NZ)=AMIN1(0.1_r8*ZPOOLB &
           ,AMAX1((AtmGasc(idg_NH3)-CNH3P)/(CanopyBndlResist_pft(NZ)+CanPStomaResistH2O_pft(NZ)) &
-          *FracRadPARbyCanopy_pft(NZ)*AREA3(NU)*LeafAreaLive_brch(NB,NZ)/CanopyLeafArea_pft(NZ),-0.1_r8*ZPOOLB))
+          *FracPARRadbyCanopy_pft(NZ)*AREA3(NU)*LeafAreaLive_brch(NB,NZ)/CanopyLeafArea_pft(NZ),-0.1_r8*ZPOOLB))
       ELSE
         NH3Dep2Can_brch(NB,NZ)=0.0_r8
       ENDIF
@@ -110,16 +110,17 @@ module NutUptakeMod
 !------------------------------------------------------------------------------------------
 
   subroutine RootMycoO2NutrientUptake(I,NZ,PopPlantO2Uptake,PopPlantO2Demand,PATH,FineRootRadius,&
-    FracPRoot4Uptake,MinFracPRoot4Uptake,FracSoiLayByPrimRoot,RootAreaDivRadius_vr)
+    FracPRoot4Uptake,MinFracPRoot4Uptake_vr,FracSoiLayByPrimRoot,RootAreaDivRadius_vr)
 
   implicit none
   integer, intent(in) :: I,NZ
   real(r8), intent(in) :: PATH(jroots,JZ1),FineRootRadius(jroots,JZ1),FracPRoot4Uptake(jroots,JZ1,JP1)
-  real(r8),  intent(in) :: MinFracPRoot4Uptake(jroots,JZ1,JP1)
+  real(r8),  intent(in) :: MinFracPRoot4Uptake_vr(jroots,JZ1,JP1)
   real(r8), intent(in) :: FracSoiLayByPrimRoot(JZ1,JP1),RootAreaDivRadius_vr(jroots,JZ1)
   real(r8), intent(inout) :: PopPlantO2Uptake,PopPlantO2Demand
   real(r8) :: TFOXYX
-  real(r8) :: FCUP,FZUP,FPUP,FWSRT,PerPlantRootH2OUptake,dtPerPlantRootH2OUptake,FOXYX,PopPlantO2Uptake_vr
+  real(r8) :: FCUP,FZUP,FPUP,FWSRT,PerPlantRootH2OUptake
+  real(r8) :: dtPerPlantRootH2OUptake,FOXYX,PopPlantO2Uptake_vr
   integer :: N,L
 !     begin_execution
   associate(                                                      &
@@ -128,7 +129,7 @@ module NutUptakeMod
     ZEROS2                  => plt_site%ZEROS2,                   &
     NU                      => plt_site%NU,                       &
     ZERO                    => plt_site%ZERO,                     &
-    ZEROP                   => plt_biom%ZEROP,                    &
+    ZERO4Groth_pft                   => plt_biom%ZERO4Groth_pft,                    &
     RootO2Dmnd4Resp_pvr     => plt_rbgc%RootO2Dmnd4Resp_pvr,      &
     RAutoRootO2Limter_pvr   => plt_rbgc%RAutoRootO2Limter_pvr,    &
     RootRespPotent_pvr      => plt_rbgc%RootRespPotent_pvr,       &
@@ -144,9 +145,9 @@ module NutUptakeMod
   D955: DO N=1,MY(NZ)
     D950: DO L=NU,MaxSoiL4Root(NZ)
       IF(VLSoilPoreMicP_vr(L).GT.ZEROS2.AND.RootLenDensPerPlant_pvr(N,L,NZ).GT.ZERO &
-        .AND.RootVH2O_pvr(N,L,NZ).GT.ZEROP(NZ).AND.THETW_vr(L).GT.ZERO)THEN
+        .AND.RootVH2O_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ).AND.THETW_vr(L).GT.ZERO)THEN
         TFOXYX=0.0_r8
-        call GetUptakeCapcity(N,L,NZ,FracPRoot4Uptake,MinFracPRoot4Uptake,FCUP,FZUP,FPUP,&
+        call GetUptakeCapcity(N,L,NZ,FracPRoot4Uptake,MinFracPRoot4Uptake_vr,FCUP,FZUP,FPUP,&
           FWSRT,PerPlantRootH2OUptake,dtPerPlantRootH2OUptake,FOXYX)
 
         TFOXYX=TFOXYX+FOXYX
@@ -176,16 +177,16 @@ module NutUptakeMod
 !     RootLenPerPlant_pvr=root,myco length per plant
 !
         IF(RAutoRootO2Limter_pvr(N,L,NZ).GT.ZERO.AND.FCUP.GT.ZERO.AND.FWSRT.GT.ZERO &
-          .AND.RootLenPerPlant_pvr(N,L,NZ).GT.ZEROP(NZ))THEN
+          .AND.RootLenPerPlant_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ))THEN
 !
 !     FZUP=limitn to active uptake respiration from CZPOLR
 !
-          call UptakeMineralNitrogen(N,L,NZ,PATH,FineRootRadius,FracPRoot4Uptake,MinFracPRoot4Uptake,&
+          call UptakeMineralNitrogen(N,L,NZ,PATH,FineRootRadius,FracPRoot4Uptake,MinFracPRoot4Uptake_vr,&
             RootAreaDivRadius_vr,FCUP,FZUP,FWSRT,PerPlantRootH2OUptake)
 !
 !     FPUP=limitn to active uptake respiration from CPPOLR
 !
-          call UptakeMineralPhosporhus(N,L,NZ,PATH,FineRootRadius,FracPRoot4Uptake,MinFracPRoot4Uptake,&
+          call UptakeMineralPhosporhus(N,L,NZ,PATH,FineRootRadius,FracPRoot4Uptake,MinFracPRoot4Uptake_vr,&
             RootAreaDivRadius_vr,FCUP,FPUP,FWSRT,PerPlantRootH2OUptake)
         ENDIF
       ELSE
@@ -253,14 +254,14 @@ module NutUptakeMod
 
 !------------------------------------------------------------------------0
 
-  subroutine UptakeMineralPhosporhus(N,L,NZ,PATH,FineRootRadius,FracPRoot4Uptake,MinFracPRoot4Uptake,&
+  subroutine UptakeMineralPhosporhus(N,L,NZ,PATH,FineRootRadius,FracPRoot4Uptake,MinFracPRoot4Uptake_vr,&
     RootAreaDivRadius_vr,FCUP,FPUP,FWSRT,PerPlantRootH2OUptake)
 
   implicit none
   integer, intent(in) :: N,L
   integer, intent(in) :: NZ
   real(r8), intent(in):: PATH(jroots,JZ1),FineRootRadius(jroots,JZ1),FracPRoot4Uptake(jroots,JZ1,JP1)
-  real(r8), intent(in) :: MinFracPRoot4Uptake(jroots,JZ1,JP1)
+  real(r8), intent(in) :: MinFracPRoot4Uptake_vr(jroots,JZ1,JP1)
   real(r8), intent(in):: RootAreaDivRadius_vr(jroots,JZ1),FCUP,FPUP,FWSRT,PerPlantRootH2OUptake
   real(r8) :: TFPO4X,TFP14X,TFPOBX,TFP1BX
   real(r8) :: DIFFL
@@ -269,13 +270,13 @@ module NutUptakeMod
   real(r8) :: POSGX
   real(r8) :: PATHL
   associate(                                                       &
-    TortMicPM                => plt_site%TortMicPM,                &
+    TortMicPM_vr             => plt_site%TortMicPM_vr,             &
     ZEROS                    => plt_site%ZEROS,                    &
     ZERO2                    => plt_site%ZERO2,                    &
-    RootH1PO4DmndBand_pvr                   => plt_rbgc%RootH1PO4DmndBand_pvr,                   &
-    RootH1PO4DmndSoil_pvr                   => plt_rbgc%RootH1PO4DmndSoil_pvr,                   &
-    RootH2PO4DmndSoil_pvr                   => plt_rbgc%RootH2PO4DmndSoil_pvr,                   &
-    RootH2PO4DmndBand_pvr                   => plt_rbgc%RootH2PO4DmndBand_pvr,                   &
+    RootH1PO4DmndBand_pvr    => plt_rbgc%RootH1PO4DmndBand_pvr,    &
+    RootH1PO4DmndSoil_pvr    => plt_rbgc%RootH1PO4DmndSoil_pvr,    &
+    RootH2PO4DmndSoil_pvr    => plt_rbgc%RootH2PO4DmndSoil_pvr,    &
+    RootH2PO4DmndBand_pvr    => plt_rbgc%RootH2PO4DmndBand_pvr,    &
     SoluteDifusvty_vr        => plt_soilchem%SoluteDifusvty_vr,    &
     RH1PO4EcoDmndBandPrev_vr => plt_bgcr%RH1PO4EcoDmndBandPrev_vr, &
     RH2PO4EcoDmndBandPrev_vr => plt_bgcr%RH2PO4EcoDmndBandPrev_vr, &
@@ -289,22 +290,22 @@ module NutUptakeMod
 
 !     begin_execution
   IF(RH2PO4EcoDmndSoilPrev_vr(L).GT.ZEROS)THEN
-    FPO4X=AMAX1(MinFracPRoot4Uptake(N,L,NZ),RootH2PO4DmndSoil_pvr(N,L,NZ)/RH2PO4EcoDmndSoilPrev_vr(L))
+    FPO4X=AMAX1(MinFracPRoot4Uptake_vr(N,L,NZ),RootH2PO4DmndSoil_pvr(N,L,NZ)/RH2PO4EcoDmndSoilPrev_vr(L))
   ELSE
     FPO4X=FracPRoot4Uptake(N,L,NZ)
   ENDIF
   IF(RH2PO4EcoDmndBandPrev_vr(L).GT.ZEROS)THEN
-    FPOBX=AMAX1(MinFracPRoot4Uptake(N,L,NZ),RootH2PO4DmndBand_pvr(N,L,NZ)/RH2PO4EcoDmndBandPrev_vr(L))
+    FPOBX=AMAX1(MinFracPRoot4Uptake_vr(N,L,NZ),RootH2PO4DmndBand_pvr(N,L,NZ)/RH2PO4EcoDmndBandPrev_vr(L))
   ELSE
     FPOBX=FracPRoot4Uptake(N,L,NZ)
   ENDIF
   IF(RH1PO4EcoDmndSoilPrev_vr(L).GT.ZEROS)THEN
-    FP14X=AMAX1(MinFracPRoot4Uptake(N,L,NZ),RootH1PO4DmndSoil_pvr(N,L,NZ)/RH1PO4EcoDmndSoilPrev_vr(L))
+    FP14X=AMAX1(MinFracPRoot4Uptake_vr(N,L,NZ),RootH1PO4DmndSoil_pvr(N,L,NZ)/RH1PO4EcoDmndSoilPrev_vr(L))
   ELSE
     FP14X=FracPRoot4Uptake(N,L,NZ)
   ENDIF
   IF(RH1PO4EcoDmndBandPrev_vr(L).GT.ZEROS)THEN
-    FP1BX=AMAX1(MinFracPRoot4Uptake(N,L,NZ),RootH1PO4DmndBand_pvr(N,L,NZ)/RH1PO4EcoDmndBandPrev_vr(L))
+    FP1BX=AMAX1(MinFracPRoot4Uptake_vr(N,L,NZ),RootH1PO4DmndBand_pvr(N,L,NZ)/RH1PO4EcoDmndBandPrev_vr(L))
   ELSE
     FP1BX=FracPRoot4Uptake(N,L,NZ)
   ENDIF
@@ -321,12 +322,12 @@ module NutUptakeMod
     !     FROM SOIL TO ROOT
     !
     !     POSGL=PO4 diffusivity
-    !     TortMicPM=soil tortuosity
+    !     TortMicPM_vr=soil tortuosity
     !     PATH=path length of water and nutrient uptake
     !     FineRootRadius=root radius
     !     DIFFL=PO4 diffusion per plant
     !
-    POSGX=SoluteDifusvty_vr(ids_H1PO4,L)*TortMicPM(NPH,L)
+    POSGX=SoluteDifusvty_vr(ids_H1PO4,L)*TortMicPM_vr(NPH,L)
     PATHL=AMIN1(PATH(N,L),FineRootRadius(N,L)+SQRT(2.0*POSGX))
     DIFFL=POSGX*safe_adb(RootAreaDivRadius_vr(N,L),LOG(PATHL/FineRootRadius(N,L)))
 
@@ -359,7 +360,7 @@ module NutUptakeMod
 ! begin_execution
   associate(                                                 &
     PlantPopulation_pft   => plt_site%PlantPopulation_pft,   &
-    TortMicPM             => plt_site%TortMicPM,             &
+    TortMicPM_vr          => plt_site%TortMicPM_vr,          &
     ZERO                  => plt_site%ZERO,                  &
     RootAreaPerPlant_pvr  => plt_morph%RootAreaPerPlant_pvr, &
     fTgrowRootP_vr        => plt_pheno%fTgrowRootP_vr,       &
@@ -383,12 +384,12 @@ module NutUptakeMod
 ! FROM SOIL TO ROOT
 !
 ! ZOSGL=NO3 diffusivity
-! TortMicPM=soil tortuosity
+! TortMicPM_vr=soil tortuosity
 ! FineRootRadius=root radius
 ! PATH=path length of water and nutrient uptake
 ! DIFFL=NO3 diffusion per plant
 !
-  ZOSGX=SoluteDifusvty_vr(ids_NO3,L)*TortMicPM(NPH,L)
+  ZOSGX=SoluteDifusvty_vr(ids_NO3,L)*TortMicPM_vr(NPH,L)
   PATHL=AMIN1(PATH(N,L),FineRootRadius(N,L)+SQRT(2.0_r8*ZOSGX))
   DIFFL=ZOSGX*safe_adb(RootAreaDivRadius_vr(N,L),LOG(PATHL/FineRootRadius(N,L)))
   !
@@ -536,7 +537,7 @@ module NutUptakeMod
   associate(                                                 &
     PlantPopulation_pft   => plt_site%PlantPopulation_pft,   &
     ZERO                  => plt_site%ZERO,                  &
-    TortMicPM             => plt_site%TortMicPM,             &
+    TortMicPM_vr             => plt_site%TortMicPM_vr,             &
     fTgrowRootP_vr        => plt_pheno%fTgrowRootP_vr,       &
     RAutoRootO2Limter_pvr => plt_rbgc%RAutoRootO2Limter_pvr, &
     CMinNH4Root_pft       => plt_rbgc%CMinNH4Root_pft,       &
@@ -555,12 +556,12 @@ module NutUptakeMod
     trc_solcl_vr          => plt_soilchem%trc_solcl_vr       &
   )
 ! ZNSGL=NH4 diffusivity
-! TortMicPM=soil tortuosity
+! TortMicPM_vr=soil tortuosity
 ! PATH=path length of water and nutrient uptake
 ! FineRootRadius=root radius
 ! DIFFL=NH4 diffusion per plant
 !
-  ZNSGX=SoluteDifusvty_vr(idg_NH3,L)*TortMicPM(NPH,L)
+  ZNSGX=SoluteDifusvty_vr(idg_NH3,L)*TortMicPM_vr(NPH,L)
   PATHL=AMIN1(PATH(N,L),FineRootRadius(N,L)+SQRT(2.0*ZNSGX))
   DIFFL=ZNSGX*safe_adb(RootAreaDivRadius_vr(N,L),LOG(PATHL/FineRootRadius(N,L)))
 !
@@ -1013,13 +1014,14 @@ module NutUptakeMod
 !------------------------------------------------------------------------
 
   subroutine UptakeMineralNitrogen(N,L,NZ,PATH,FineRootRadius,FracPRoot4Uptake,&
-    MinFracPRoot4Uptake,RootAreaDivRadius_vr,FCUP,FZUP,FWSRT,PerPlantRootH2OUptake)
+    MinFracPRoot4Uptake_vr,RootAreaDivRadius_vr,FCUP,FZUP,FWSRT,PerPlantRootH2OUptake)
 
   implicit none
   integer , intent(in) :: N,L
   integer , intent(in) :: NZ
   real(r8), intent(in) :: PATH(jroots,JZ1),FineRootRadius(jroots,JZ1),FracPRoot4Uptake(jroots,JZ1,JP1)
-  real(r8), intent(in) :: MinFracPRoot4Uptake(jroots,JZ1,JP1),RootAreaDivRadius_vr(jroots,JZ1)
+  real(r8), intent(in) :: MinFracPRoot4Uptake_vr(jroots,JZ1,JP1)
+  real(r8), intent(in) :: RootAreaDivRadius_vr(jroots,JZ1)
   real(r8), intent(in) :: FCUP,FZUP,FWSRT,PerPlantRootH2OUptake
   real(r8) :: FNO3X,FNOBX,FNH4X,FNHBX
   real(r8) :: TFNH4X,TFNO3X,TFNHBX,TFNOBX
@@ -1044,23 +1046,23 @@ module NutUptakeMod
 
 
   IF(RNH4EcoDmndSoilPrev_vr(L).GT.ZEROS)THEN
-    FNH4X=AMAX1(MinFracPRoot4Uptake(N,L,NZ),RootNH4DmndSoil_pvr(N,L,NZ)/RNH4EcoDmndSoilPrev_vr(L))
+    FNH4X=AMAX1(MinFracPRoot4Uptake_vr(N,L,NZ),RootNH4DmndSoil_pvr(N,L,NZ)/RNH4EcoDmndSoilPrev_vr(L))
   ELSE
     FNH4X=FracPRoot4Uptake(N,L,NZ)
   ENDIF
   IF(RNH4EcoDmndBandPrev_vr(L).GT.ZEROS)THEN
-    FNHBX=AMAX1(MinFracPRoot4Uptake(N,L,NZ),RootNH4DmndBand_pvr(N,L,NZ)/RNH4EcoDmndBandPrev_vr(L))
+    FNHBX=AMAX1(MinFracPRoot4Uptake_vr(N,L,NZ),RootNH4DmndBand_pvr(N,L,NZ)/RNH4EcoDmndBandPrev_vr(L))
   ELSE
     FNHBX=FracPRoot4Uptake(N,L,NZ)
   ENDIF
 
   IF(RNO3EcoDmndSoilPrev_vr(L).GT.ZEROS)THEN
-    FNO3X=AMAX1(MinFracPRoot4Uptake(N,L,NZ),RootNO3DmndSoil_pvr(N,L,NZ)/RNO3EcoDmndSoilPrev_vr(L))
+    FNO3X=AMAX1(MinFracPRoot4Uptake_vr(N,L,NZ),RootNO3DmndSoil_pvr(N,L,NZ)/RNO3EcoDmndSoilPrev_vr(L))
   ELSE
     FNO3X=FracPRoot4Uptake(N,L,NZ)
   ENDIF
   IF(RNO3EcoDmndBandPrev_vr(L).GT.ZEROS)THEN
-    FNOBX=AMAX1(MinFracPRoot4Uptake(N,L,NZ),RootNO3DmndBand_pvr(N,L,NZ)/RNO3EcoDmndBandPrev_vr(L))
+    FNOBX=AMAX1(MinFracPRoot4Uptake_vr(N,L,NZ),RootNO3DmndBand_pvr(N,L,NZ)/RNO3EcoDmndBandPrev_vr(L))
   ELSE
     FNOBX=FracPRoot4Uptake(N,L,NZ)
   ENDIF
@@ -1087,13 +1089,14 @@ module NutUptakeMod
 
 !------------------------------------------------------------------------
 
-  subroutine GetUptakeCapcity(N,L,NZ,FracPRoot4Uptake,MinFracPRoot4Uptake,FCUP,FZUP,FPUP,&
+  subroutine GetUptakeCapcity(N,L,NZ,FracPRoot4Uptake,MinFracPRoot4Uptake_vr,FCUP,FZUP,FPUP,&
     FWSRT,PerPlantRootH2OUptake,dtPerPlantRootH2OUptake,FOXYX)
 
   implicit none
   integer, intent(in) :: N,L
   integer, intent(in) :: NZ
-  REAL(R8), INTENT(IN):: FracPRoot4Uptake(jroots,JZ1,JP1),MinFracPRoot4Uptake(jroots,JZ1,JP1)
+  REAL(R8), INTENT(IN):: FracPRoot4Uptake(jroots,JZ1,JP1)
+  real(r8), intent(in) :: MinFracPRoot4Uptake_vr(jroots,JZ1,JP1)
   real(r8), intent(out):: FCUP,FZUP,FPUP,FWSRT,PerPlantRootH2OUptake,dtPerPlantRootH2OUptake,FOXYX
 
   associate(                                                          &
@@ -1105,12 +1108,12 @@ module NutUptakeMod
     ZERO                      => plt_site%ZERO,                       &
     AllPlantRootH2OUptake_vr  => plt_ew%AllPlantRootH2OUptake_vr,     &
     RootFracRemobilizableBiom => plt_allom%RootFracRemobilizableBiom, &
-    ZEROP                     => plt_biom%ZEROP,                      &
+    ZERO4Groth_pft            => plt_biom%ZERO4Groth_pft,             &
     RootProteinConc_pvr       => plt_biom%RootProteinConc_pvr,        &
     RootProteinC_pvr          => plt_biom%RootProteinC_pvr,           &
     RootMycoNonstElms_rpvr    => plt_biom%RootMycoNonstElms_rpvr,     &
     RootNonstructElmConc_pvr  => plt_biom%RootNonstructElmConc_pvr,   &
-    RootMycoActiveBiomC_pvr   => plt_biom%RootMycoActiveBiomC_pvr      &
+    RootMycoActiveBiomC_pvr   => plt_biom%RootMycoActiveBiomC_pvr     &
   )
   !
   !     UPTAKE CAPACITY 'FWSRT' DEPENDS ON ROOT,MYCORRHIZAL
@@ -1121,7 +1124,7 @@ module NutUptakeMod
   !     RootProteinC_pvr,WTRTL=protein content,mass
   !     FWSRT=protein concentration relative to 5%
   !
-  IF(RootMycoActiveBiomC_pvr(N,L,NZ).GT.ZEROP(NZ))THEN
+  IF(RootMycoActiveBiomC_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ))THEN
     RootProteinConc_pvr(N,L,NZ)=AMIN1(RootFracRemobilizableBiom(NZ),RootProteinC_pvr(N,L,NZ)/RootMycoActiveBiomC_pvr(N,L,NZ))
     FWSRT=RootProteinConc_pvr(N,L,NZ)/0.05_r8
   ELSE
@@ -1135,7 +1138,7 @@ module NutUptakeMod
   !     FCUP=limitation to active uptake respiration from CPOOLR
   !     CPOOLR=nonstructural C content
   !
-  IF(RootCO2EmisPot_pvr(N,L,NZ).GT.ZEROP(NZ))THEN
+  IF(RootCO2EmisPot_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ))THEN
     FCUP=AZMAX1(AMIN1(1.0_r8,0.25_r8*safe_adb(RootMycoNonstElms_rpvr(ielmc,N,L,NZ),RootCO2EmisPot_pvr(N,L,NZ))))
   ELSE
     FCUP=0.0_r8
@@ -1197,11 +1200,11 @@ module NutUptakeMod
   !     RH1PO4EcoDmndBandPrev_vr=HPO4 demand in band by all microbial,root,myco populations
   !     RootH1PO4DmndBand_pvr=HPO4 demand in band by each root,myco population
   !     FP1BX=fraction of RH1PO4EcoDmndBandPrev_vr by each root,myco populn
-  !     MinFracPRoot4Uptake=minimum uptake fraction
+  !     MinFracPRoot4Uptake_vr=minimum uptake fraction
   !     FracPRoot4Uptake=PFT fraction of biome root mass
   !
   IF(RO2EcoDmndPrev_vr(L).GT.ZEROS)THEN
-    FOXYX=AMAX1(MinFracPRoot4Uptake(N,L,NZ),RootO2Dmnd4Resp_pvr(N,L,NZ)/RO2EcoDmndPrev_vr(L))
+    FOXYX=AMAX1(MinFracPRoot4Uptake_vr(N,L,NZ),RootO2Dmnd4Resp_pvr(N,L,NZ)/RO2EcoDmndPrev_vr(L))
   ELSE
     FOXYX=FracPRoot4Uptake(N,L,NZ)
   ENDIF
@@ -1224,7 +1227,7 @@ module NutUptakeMod
   !     begin_execution
   associate(                                                   &
     RootMycoNonstElms_rpvr => plt_biom%RootMycoNonstElms_rpvr, &
-    ZEROP                  => plt_biom%ZEROP,                  &
+    ZERO4Groth_pft                  => plt_biom%ZERO4Groth_pft,                  &
     ZEROS                  => plt_site%ZEROS,                  &
     ZEROS2                 => plt_site%ZEROS2,                 &
     VLWatMicPM             => plt_site%VLWatMicPM,             &
@@ -1253,13 +1256,13 @@ module NutUptakeMod
   !
   D195: DO K=1,jcplx
     VLWatMicPK=VLWatMicPM(NPH,L)*FracBulkSOMC_vr(K,L)
-    IF(VLWatMicPK.GT.ZEROS2.AND.RootVH2O_pvr(N,L,NZ).GT.ZEROP(NZ))THEN
+    IF(VLWatMicPK.GT.ZEROS2.AND.RootVH2O_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ))THEN
       VLWatMicPT=VLWatMicPK+RootVH2O_pvr(N,L,NZ)
       CPOOLX=AMIN1(1.25E+03_r8*RootVH2O_pvr(N,L,NZ),RootMycoNonstElms_rpvr(ielmc,N,L,NZ))
       XFRE(ielmc)=(DOM_vr(idom_doc,K,L)*RootVH2O_pvr(N,L,NZ)-CPOOLX*VLWatMicPK)/VLWatMicPT
       !XFRC, positive into plants
       RootMycoExudElm_pvr(ielmc,N,K,L,NZ)=FEXUDE(ielmc)*XFRE(ielmc)
-      IF(DOM_vr(idom_doc,K,L).GT.ZEROS.AND. RootMycoNonstElms_rpvr(ielmc,N,L,NZ).GT.ZEROP(NZ))THEN
+      IF(DOM_vr(idom_doc,K,L).GT.ZEROS.AND. RootMycoNonstElms_rpvr(ielmc,N,L,NZ).GT.ZERO4Groth_pft(NZ))THEN
         CPOOLT=DOM_vr(idom_doc,K,L)+RootMycoNonstElms_rpvr(ielmc,N,L,NZ)
         ZPOOLX=0.1_r8*RootMycoNonstElms_rpvr(ielmn,N,L,NZ)
         PPOOLX=0.1_r8*RootMycoNonstElms_rpvr(ielmp,N,L,NZ)

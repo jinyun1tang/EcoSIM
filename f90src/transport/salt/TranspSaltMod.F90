@@ -408,7 +408,7 @@ module TranspSaltMod
   !     IN RAINFALL AND IRRIGATION ACCORDING TO CONCENTRATIONS
   !     ENTERED IN WEATHER AND IRRIGATION FILES
   !
-      ELSEIF((PrecAtm_col(NY,NX).GT.0.0_r8.OR.IrrigSurface(NY,NX).GT.0.0_r8) &
+      ELSEIF((PrecAtm_col(NY,NX).GT.0.0_r8.OR.IrrigSurface_col(NY,NX).GT.0.0_r8) &
         .AND.VLSnowHeatCapM(1,1,NY,NX).LE.VLHeatCapSnowMin_col(NY,NX))THEN
   !     there is no significant snowpack, but precipitation
         call AtmosSoluteFluxToTopsoil(I,NY,NX)

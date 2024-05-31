@@ -69,7 +69,7 @@ implicit none
   real(r8),target,allocatable ::  TSens4MicbGrwoth_vr(:,:,:)                        !constraints of temperature and water potential on microbial activity, []
   real(r8),target,allocatable ::  LitrfalStrutElms_vr(:,:,:,:,:,:)                    !total LitrFall C, [g d-2 h-1]
   real(r8),target,allocatable :: trcs_VLN_vr(:,:,:,:)
-
+  real(r8),target,allocatable :: tRDOE2Die_col(:,:,:)
   real(r8),target,allocatable ::  VLNHB(:,:,:)                       !NH4 band volume fracrion, []
   real(r8),target,allocatable ::  VLNOB(:,:,:)                       !NO3 band volume fracrion, []
   real(r8),target,allocatable ::  VLPO4(:,:,:)                       !PO4 non-band volume fracrion, []
@@ -125,6 +125,7 @@ implicit none
   allocate(trc_solml_vr(ids_beg:ids_end,0:JZ,JY,JX)); trc_solml_vr=0._r8
   allocate(trc_solcl_vr(ids_beg:ids_end,0:JZ,JY,JX)); trc_solcl_vr=0._r8
   allocate(trc_gascl_vr(idg_beg:idg_end,0:JZ,JY,JX)); trc_gascl_vr=0._r8
+  allocate(tRDOE2Die_col(1:NumPlantChemElms,JY,JX)); tRDOE2Die_col=0._r8
 
   allocate(ZNFNI(0:JZ,JY,JX));  ZNFNI=0._r8
   allocate(ZNFN0(0:JZ,JY,JX));  ZNFN0=0._r8
@@ -212,6 +213,8 @@ implicit none
   use abortutils, only : destroy
 
   implicit none
+
+  call destroy(tRDOE2Die_col)
   call destroy(CNH4)
   call destroy(CNO3)
   call destroy(CPO4)

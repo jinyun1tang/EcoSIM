@@ -2,6 +2,7 @@ set(SNOWPHYS_SOURCES
  SnowPhysData.F90
  SnowPhysMod.F90
  SnowBalanceMod.F90
+ SnowTransportMod.F90
 )
 include(add_ecosim_library)
 add_ecosim_library(SnowPhys ${SNOWPHYS_SOURCES})
