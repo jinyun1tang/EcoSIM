@@ -54,6 +54,15 @@ implicit none
   
   D9780: DO L=1,JS
 
+    IF(VLHeatCapSnow_col(L,NY,NX).LE.VLHeatCapSnowMin_col(NY,NX) .and. L.EQ.1)THEN
+      IF(abs(SnoXfer2SnoLay(L,NY,NX))>0._r8)THEN
+        CumSno2SnowLay(L,NY,NX)=CumSno2SnowLay(L,NY,NX)+SnoXfer2SnoLay(L,NY,NX)
+        CumWat2SnowLay(L,NY,NX)=CumWat2SnowLay(L,NY,NX)+WatXfer2SnoLay(L,NY,NX)
+        CumIce2SnowLay(L,NY,NX)=CumIce2SnowLay(L,NY,NX)+IceXfer2SnoLay(L,NY,NX)
+        CumHeat2SnowLay(L,NY,NX)=CumHeat2SnowLay(L,NY,NX)+HeatXfer2SnoLay(L,NY,NX)
+      ENDIF  
+    ENDIF
+
     call UpdateSnowLayerL(I,J,L,NY,NX,VOLSWI)
 
     call UpdateSoluteInSnow(L,NY,NX)
@@ -788,11 +797,6 @@ implicit none
 !
     ELSEIF(LS.EQ.1)THEN
       IF(abs(SnoXfer2SnoLay(LS,N2,N1))>0._r8)THEN
-!        if(I>=138.and.I<=139)write(149,*)I+J/24.,'runofff',CumHeat2SnowLay(LS,N2,N1),HeatXfer2SnoLay(LS,N2,N1)
-        CumSno2SnowLay(LS,N2,N1)=CumSno2SnowLay(LS,N2,N1)+SnoXfer2SnoLay(LS,N2,N1)
-        CumWat2SnowLay(LS,N2,N1)=CumWat2SnowLay(LS,N2,N1)+WatXfer2SnoLay(LS,N2,N1)
-        CumIce2SnowLay(LS,N2,N1)=CumIce2SnowLay(LS,N2,N1)+IceXfer2SnoLay(LS,N2,N1)
-        CumHeat2SnowLay(LS,N2,N1)=CumHeat2SnowLay(LS,N2,N1)+HeatXfer2SnoLay(LS,N2,N1)
 
         DO NTG=idg_beg,idg_end-1
           trcg_TBLS(NTG,LS,N2,N1)=trcg_TBLS(NTG,LS,N2,N1)+trcg_Xbndl_flx(NTG,LS,N2,N1)
