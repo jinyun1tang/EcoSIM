@@ -167,9 +167,9 @@ implicit none
   real(r8) :: dVice,fi,fs,cpold
 
   SnoIce=VLDrySnoWE_col(L,NY,NX)+VLIceSnow_col(L,NY,NX)*DENSICE
-  if(SnoIce<=ZEROS(NY,NX))then
-    write(*,*)'not sufficient ice to counter high temperature'
-  endif
+  if(SnoIce<ZEROS(NY,NX))return
+!    write(*,*)'not sufficient ice to counter high temperature drysnow ice',I+J/24.,VLDrySnoWE_col(L,NY,NX),VLIceSnow_col(L,NY,NX)
+!  endif
   
   !the starting enthalpy
   ENGY=VLHeatCapSnow_col(L,NY,NX)*TKSnow(L,NY,NX)
