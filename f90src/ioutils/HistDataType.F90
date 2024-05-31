@@ -3,7 +3,7 @@ module HistDataType
 ! this module is an intermediate step to support ascii output
 ! when output is done with netcdf, no id is needed.
   use data_kind_mod , only : r8 => DAT_KIND_R8
-  use data_const_mod, only : spval  => DAT_CONST_SPVAL
+  use data_const_mod, only : spval  => DAT_CONST_SPVAL, ispval => DAT_CONST_ISPVAL
   use GridConsts
   use GridMod
   use HistFileMod
@@ -108,7 +108,7 @@ implicit none
   real(r8),pointer   :: h1D_tSTANDING_DEAD_C_col(:)       !StandingDeadStrutElms_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_tSTANDING_DEAD_N_col(:)       !StandingDeadStrutElms_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_tSTANDING_DEAD_P_col(:)       !StandingDeadStrutElms_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)    
-  real(r8),pointer   :: h1D_tPRECN_col(:)          !1000.0_r8*URAIN(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_tPRECN_col(:)          !1000.0_r8*URAIN_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_ET_col(:)             !1000.0_r8*UEVAP(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_N2O_LITR_col(:)       !trc_solcl_vr(idg_N2O,0,NY,NX)
   real(r8),pointer   :: h1D_NH3_LITR_col(:)       !trc_solcl_vr(idg_NH3,0,NY,NX)
@@ -160,7 +160,7 @@ implicit none
   real(r8),pointer   :: h1D_CAN_H_ptc(:)         !277.8*HeatXAir2PCan(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_CAN_G_ptc(:)         !277.8*HeatStorCanP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_CAN_TEMPC_ptc(:)      !TCelciusCanopy_pft(NZ,NY,NX)
-  real(r8),pointer   :: h1D_CAN_TEMPFN_ptc(:)       !fTgrowCanP(NZ,NY,NX), canopy temperature growth function/stress
+  real(r8),pointer   :: h1D_CAN_TEMPFN_ptc(:)       !fTCanopyGroth_pft(NZ,NY,NX), canopy temperature growth function/stress
   real(r8),pointer   :: h1D_CAN_CO2_FLX_ptc(:)   !CO2NetFix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.148, umol m-2 s-1
   real(r8),pointer   :: h1D_CAN_GPP_ptc(:)       !GrossCO2Fix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX),  gross CO2 fixation, gC m-2/hr
   real(r8),pointer   :: h1D_CAN_RA_ptc(:)        !CanopyRespC_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total autotrophic respiration
@@ -217,7 +217,7 @@ implicit none
   real(r8),pointer   :: h1D_CAN_HT_ptc(:)        !CanopyHeight_pft(NZ,NY,NX), canopy height, m
   real(r8),pointer   :: h1D_POPN_ptc(:)          !PP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), plant population
   real(r8),pointer   :: h1D_tTRANSPN_ptc(:)      !-ETCanopy_pft(NZ,NY,NX)*1000.0/AREA(3,NU(NY,NX),NY,NX), total transpiration
-  real(r8),pointer   :: h1D_WTR_STRESS_ptc(:)    !HoursCanopyPSITooLow_pft(NZ,NY,NX)
+  real(r8),pointer   :: h1D_WTR_STRESS_ptc(:)    !HoursTooLowPsiCan_pft(NZ,NY,NX)
   real(r8),pointer   :: h1D_OXY_STRESS_ptc(:)    !OSTR(NZ,NY,NX)
   real(r8),pointer   :: h1D_SHOOT_N_ptc(:)       !ShootStrutElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_LEAF_N_ptc(:)        !LeafStrutElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -256,11 +256,11 @@ implicit none
   real(r8),pointer   :: h1D_FIREp_P_FLX_ptc(:)        !PO4byFire_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_SURF_LITRf_P_FLX_ptc(:)  !SurfLitrfalStrutElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_BRANCH_NO_ptc(:)     !NumOfBranches_pft(NZ,NY,NX)
-  real(r8),pointer   :: h1D_LEAF_NONSTC_ptc(:)   !CanopyNonstElms_pft(ielmc,NY,NX)
-  real(r8),pointer   :: h1D_LEAF_NONSTN_ptc(:)   !
-  real(r8),pointer   :: h1D_LEAF_NONSTP_ptc(:)   !
+  real(r8),pointer   :: h1D_SHOOT_NONSTC_ptc(:)   !CanopyNonstElms_pft(ielmc,NY,NX)
+  real(r8),pointer   :: h1D_SHOOT_NONSTN_ptc(:)   !
+  real(r8),pointer   :: h1D_SHOOT_NONSTP_ptc(:)   !
   real(r8),pointer   :: h1D_LEAF_NC_ptc(:)       !(LeafStrutElms_pft(ielmn,NZ,NY,NX)+CanopyNonstElms_pft(ielmn,NZ,NY,NX))/(LeafStrutElms_pft(ielmc,NZ,NY,NX)+CanopyNonstElms_pft(ielmc,NZ,NY,NX)),mass based CN ratio of leaf  
-  real(r8),pointer   :: h1D_Growth_Stage_ptc(:)    !plant development stage, integer, 0-10, planting, emergence, floral_init, jointing, 
+  real(r8),pointer    :: h1D_Growth_Stage_ptc(:)    !plant development stage, integer, 0-10, planting, emergence, floral_init, jointing, 
                                       !elongation, heading, anthesis, seed_fill, see_no_set, seed_mass_set, end_seed_fill
   real(r8),pointer   :: h2D_LEAF_NODE_NO_ptc(:,:)       !NumOfLeaves_brch(MainBranchNum_pft(NZ,NY,NX),NZ,NY,NX), leaf NO
   real(r8),pointer   :: h2D_RUB_ACTVN_ptc(:,:)     !RubiscoActivity_brch(MainBranchNum_pft(NZ,NY,NX),NZ,NY,NX), branch down-regulation of CO2 fixation
@@ -307,6 +307,7 @@ implicit none
   integer :: beg_col, end_col
   integer :: beg_ptc, end_ptc
   real(r8), pointer :: data1d_ptr(:)
+  integer , pointer :: idata1d_ptr(:)
   real(r8), pointer :: data2d_ptr(:,:)
   integer :: nbr
   character(len=32) :: fieldname
@@ -533,9 +534,9 @@ implicit none
   allocate(this%h1D_BRANCH_NO_ptc(beg_ptc:end_ptc))       ;this%h1D_BRANCH_NO_ptc(:)=spval
   allocate(this%h1D_Growth_Stage_ptc(beg_ptc:end_ptc))    ;this%h1D_Growth_Stage_ptc(:)=spval
   allocate(this%h1D_LEAF_NC_ptc(beg_ptc:end_ptc));        ;this%h1D_LEAF_NC_ptc(:)=spval
-  allocate(this%h1D_LEAF_NONSTC_ptc(beg_ptc:end_ptc))     ;this%h1D_LEAF_NONSTC_ptc(:)=spval
-  allocate(this%h1D_LEAF_NONSTN_ptc(beg_ptc:end_ptc))     ;this%h1D_LEAF_NONSTN_ptc(:)=spval
-  allocate(this%h1D_LEAF_NONSTP_ptc(beg_ptc:end_ptc))     ;this%h1D_LEAF_NONSTP_ptc(:)=spval
+  allocate(this%h1D_SHOOT_NONSTC_ptc(beg_ptc:end_ptc))     ;this%h1D_SHOOT_NONSTC_ptc(:)=spval
+  allocate(this%h1D_SHOOT_NONSTN_ptc(beg_ptc:end_ptc))     ;this%h1D_SHOOT_NONSTN_ptc(:)=spval
+  allocate(this%h1D_SHOOT_NONSTP_ptc(beg_ptc:end_ptc))     ;this%h1D_SHOOT_NONSTP_ptc(:)=spval
   allocate(this%h1D_ROOT_NONSTC_ptc(beg_ptc:end_ptc))     ;this%h1D_ROOT_NONSTC_ptc(:)=spval
   allocate(this%h1D_ROOT_NONSTN_ptc(beg_ptc:end_ptc))     ;this%h1D_ROOT_NONSTN_ptc(:)=spval
   allocate(this%h1D_ROOT_NONSTP_ptc(beg_ptc:end_ptc))     ;this%h1D_ROOT_NONSTP_ptc(:)=spval
@@ -763,14 +764,6 @@ implicit none
   data1d_ptr => this%h1D_RADN_col(beg_col:end_col)         
   call hist_addfld1d(fname='RADN',units='MJ/day',avgflag='A',&
     long_name='*total daily solar radiation',ptr_col=data1d_ptr)      
-
-  data1d_ptr => this%h1D_AIR_TEMP_col(beg_col:end_col)    
-  call hist_addfld1d(fname='TMAX_AIR',units='oC',avgflag='X',&
-    long_name='daily maximum air temperature',ptr_col=data1d_ptr)      
-
-  data1d_ptr => this%h1D_AIR_TEMP_col(beg_col:end_col)     
-  call hist_addfld1d(fname='TMIN_AIR',units='oC',avgflag='M',&
-    long_name='daily minimum air temperature',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_HUM_col(beg_col:end_col)       
   call hist_addfld1d(fname='HMAX_AIR',units='kPa',avgflag='X',&
@@ -1222,16 +1215,16 @@ implicit none
   call hist_addfld1d(fname='ROOT_NONSTP',units='gP/m2',avgflag='A',&
     long_name='plant root storage of nonstructural P',ptr_patch=data1d_ptr)      
 
-  data1d_ptr => this%h1D_LEAF_NONSTC_ptc(beg_ptc:end_ptc)
-  call hist_addfld1d(fname='LEAF_NONSTC',units='gC/m2',avgflag='A',&
+  data1d_ptr => this%h1D_SHOOT_NONSTC_ptc(beg_ptc:end_ptc)
+  call hist_addfld1d(fname='SHOOT_NONSTC',units='gC/m2',avgflag='A',&
     long_name='plant leaf storage of nonstructural C',ptr_patch=data1d_ptr)      
 
-  data1d_ptr => this%h1D_LEAF_NONSTN_ptc(beg_ptc:end_ptc)
-  call hist_addfld1d(fname='LEAF_NONSTN',units='gN/m2',avgflag='A',&
+  data1d_ptr => this%h1D_SHOOT_NONSTN_ptc(beg_ptc:end_ptc)
+  call hist_addfld1d(fname='SHOOT_NONSTN',units='gN/m2',avgflag='A',&
     long_name='plant leaf storage of nonstructural N',ptr_patch=data1d_ptr)      
 
-  data1d_ptr => this%h1D_LEAF_NONSTP_ptc(beg_ptc:end_ptc)
-  call hist_addfld1d(fname='LEAF_NONSTP',units='gP/m2',avgflag='A',&
+  data1d_ptr => this%h1D_SHOOT_NONSTP_ptc(beg_ptc:end_ptc)
+  call hist_addfld1d(fname='SHOOT_NONSTP',units='gP/m2',avgflag='A',&
     long_name='plant leaf storage of nonstructural P',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_GRAIN_NO_ptc(beg_ptc:end_ptc) 
@@ -1280,7 +1273,7 @@ implicit none
 
   data1d_ptr => this%h1D_NPP_ptc(beg_ptc:end_ptc)  
   call hist_addfld1d(fname='NPP',units='gC/m2',avgflag='A',&
-    long_name='Cumulative net primary productivity',ptr_patch=data1d_ptr)      
+    long_name='Net primary productivity',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_CAN_HT_ptc(beg_ptc:end_ptc)    
   call hist_addfld1d(fname='CAN_HT',units='m',avgflag='A',&
@@ -1294,7 +1287,7 @@ implicit none
   call hist_addfld1d(fname='tTRANSPN',units='mmH2O/m2/hr',avgflag='A',&
     long_name='Total evapotranspiration (>0 into atmosphere)',ptr_patch=data1d_ptr)      
 
-  data1d_ptr => this%h1D_WTR_STRESS_ptc(beg_ptc:end_ptc)    !HoursCanopyPSITooLow_pft(NZ,NY,NX)
+  data1d_ptr => this%h1D_WTR_STRESS_ptc(beg_ptc:end_ptc)    !HoursTooLowPsiCan_pft(NZ,NY,NX)
   call hist_addfld1d(fname='WTR_STRESS',units='hr',avgflag='A',&
     long_name='canopy plant water stress indicator: number of ' &
     //'hours PSICanopy_pft(< PSILY',ptr_patch=data1d_ptr)      
@@ -1596,9 +1589,10 @@ implicit none
   end subroutine init_hist_data
 
 !----------------------------------------------------------------------
-  subroutine hist_update(this,bounds)
+  subroutine hist_update(this,I,J,bounds)
   implicit none
   class(histdata_type) :: this
+  integer, intent(in) :: I,J
   type(bounds_type), intent(in) :: bounds
   integer :: ncol,nptc
   integer :: L,NZ,NY,NX,KN,NB
@@ -1607,6 +1601,11 @@ implicit none
   real(r8),parameter :: m2mm=1000._r8
   real(r8),parameter :: gC1hour2umol1sec=1.e6_r8/(12._r8*3600._r8)
   real(r8),parameter :: gO1hour2umol1sec=1.e6_r8/(32._r8*3600._r8)
+  character(len=15) :: grow_stage_str(11)=(/'Planting      ','Emergence     ','Floral_init   ', &
+                                            'Jointing      ','Elongation    ','Heading       ', &
+                                            'Anthesis      ','Seed_fill     ','See_no_set    ', &
+                                            'Seed_mass_set ','End_seed_fill '/)
+
   DO NX=bounds%NHW,bounds%NHE   
     DO NY=bounds%NVN,bounds%NVS
       ncol=get_col(NY,NX)
@@ -1689,13 +1688,14 @@ implicit none
       this%h1D_tSTANDING_DEAD_C_col(ncol)    = StandingDeadStrutElms_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tSTANDING_DEAD_N_col(ncol)    = StandingDeadStrutElms_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tSTANDING_DEAD_P_col(ncol)    = StandingDeadStrutElms_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)            
-      this%h1D_tPRECN_col(ncol)       = m2mm*URAIN(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_tPRECN_col(ncol)       = m2mm*URAIN_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_ET_col(ncol)          = m2mm*EvapoTransp_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_N2O_LITR_col(ncol)    = trc_solcl_vr(idg_N2O,0,NY,NX)
       this%h1D_NH3_LITR_col(ncol)    = trc_solcl_vr(idg_NH3,0,NY,NX)
       this%h1D_SOL_RADN_col(ncol)    = RadSWSolarBeam_col(NY,NX)*MJ2W
       this%h1D_AIR_TEMP_col(ncol)    = TCA(NY,NX)
       this%h1D_HUM_col(ncol)         = VPK(NY,NX)
+      
       this%h1D_WIND_col(ncol)        = WindSpeedAtm(NY,NX)/secs1hour
       this%h1D_PREC_col(ncol)        = (RainFalPrec(NY,NX)+SnoFalPrec(NY,NX))*m2mm/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_SOIL_RN_col(ncol)     = HeatByRadiation(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
@@ -1761,9 +1761,9 @@ implicit none
         this%h1D_ROOT_NONSTC_ptc(nptc)   = RootMycoNonstElms_pft(ielmc,ipltroot,NZ,NY,NX)
         this%h1D_ROOT_NONSTN_ptc(nptc)   = RootMycoNonstElms_pft(ielmn,ipltroot,NZ,NY,NX)
         this%h1D_ROOT_NONSTP_ptc(nptc)   = RootMycoNonstElms_pft(ielmp,ipltroot,NZ,NY,NX)                
-        this%h1D_LEAF_NONSTC_ptc(nptc)   = CanopyNonstElms_pft(ielmc,NZ,NY,NX)
-        this%h1D_LEAF_NONSTN_ptc(nptc)   = CanopyNonstElms_pft(ielmn,NZ,NY,NX)
-        this%h1D_LEAF_NONSTP_ptc(nptc)   = CanopyNonstElms_pft(ielmp,NZ,NY,NX)
+        this%h1D_SHOOT_NONSTC_ptc(nptc)   = CanopyNonstElms_pft(ielmc,NZ,NY,NX)
+        this%h1D_SHOOT_NONSTN_ptc(nptc)   = CanopyNonstElms_pft(ielmn,NZ,NY,NX)
+        this%h1D_SHOOT_NONSTP_ptc(nptc)   = CanopyNonstElms_pft(ielmp,NZ,NY,NX)
         this%h1D_CAN_TEMPK_ptc(nptc)     = TKCanopy_pft(NZ,NY,NX)
         this%h1D_MIN_LWP_ptc(nptc)       = PSICanPDailyMin(NZ,NY,NX)
         this%h1D_LEAF_PC_ptc(nptc)       = safe_adb(LeafStrutElms_pft(ielmp,NZ,NY,NX)+CanopyNonstElms_pft(ielmp,NZ,NY,NX), &
@@ -1773,7 +1773,7 @@ implicit none
         this%h1D_CAN_H_ptc(nptc)         = MJ2W*HeatXAir2PCan(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_CAN_G_ptc(nptc)         = MJ2W*HeatStorCanP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_CAN_TEMPC_ptc(nptc)     = TCelciusCanopy_pft(NZ,NY,NX)
-        this%h1D_CAN_TEMPFN_ptc(nptc)    = fTgrowCanP(NZ,NY,NX)
+        this%h1D_CAN_TEMPFN_ptc(nptc)    = fTCanopyGroth_pft(NZ,NY,NX)
         this%h1D_CAN_CO2_FLX_ptc(nptc)   = CO2NetFix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*gC1hour2umol1sec
         this%h1D_CAN_GPP_ptc(nptc)       = GrossCO2Fix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_CAN_RA_ptc(nptc)        = CanopyRespC_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -1794,7 +1794,7 @@ implicit none
         this%h1D_N2_FIXN_FLX_ptc(nptc)   = RootN2Fix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_cNH3_FLX_ptc(nptc)      = NH3Dep2Can_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_PO4_UPTK_FLX_ptc(nptc)  = RootH2PO4Uptake_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_frcPARabs_ptc(nptc)     = FracRadPARbyCanopy_pft(NZ,NY,NX)
+        this%h1D_frcPARabs_ptc(nptc)     = FracPARRadbyCanopy_pft(NZ,NY,NX)
         this%h1D_PAR_CAN_ptc(nptc)       = RadPARbyCanopy_pft(NZ,NY,NX)   !umol /m2/s        
         this%h1D_SHOOTST_C_ptc(nptc)     = ShootStrutElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_SHOOT_C_ptc(nptc)       = ShootElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -1833,7 +1833,7 @@ implicit none
         this%h1D_CAN_HT_ptc(nptc)       = CanopyHeight_pft(NZ,NY,NX)
         this%h1D_POPN_ptc(nptc)         = PlantPopulation_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_tTRANSPN_ptc(nptc)     =-ETCanopy_pft(NZ,NY,NX)*1000.0/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_WTR_STRESS_ptc(nptc)   = HoursCanopyPSITooLow_pft(NZ,NY,NX)
+        this%h1D_WTR_STRESS_ptc(nptc)   = HoursTooLowPsiCan_pft(NZ,NY,NX)
         this%h1D_OXY_STRESS_ptc(nptc)   = PlantO2Stress(NZ,NY,NX)
         this%h1D_SHOOTST_N_ptc(nptc)    = ShootStrutElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_SHOOT_N_ptc(nptc)      = ShootElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)        
@@ -1889,6 +1889,7 @@ implicit none
               endif  
             ENDIF  
           ENDDO
+
           DO NB=1,MainBranchNum_pft(NZ,NY,NX)
             this%h2D_LEAF_NODE_NO_ptc(nptc,NB) = NumOfLeaves_brch(NB,NZ,NY,NX)
             this%h2D_RUB_ACTVN_ptc(nptc,NB)  = RubiscoActivity_brch(NB,NZ,NY,NX)

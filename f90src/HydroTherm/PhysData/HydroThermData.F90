@@ -10,7 +10,7 @@ implicit none
   real(r8),allocatable ::  DLYRR(:,:)                         !  
   real(r8),allocatable ::  FracSoiPAsIce(:,:,:)               !  
   real(r8),allocatable ::  FracSoiPAsAir(:,:,:)               !  
-  real(r8),allocatable ::  VLHeatCapacity(:,:,:)              !whole layer heat capacity (not snow)
+  real(r8),allocatable ::  VLHeatCapacity_col(:,:,:)              !whole layer heat capacity (not snow)
   real(r8),allocatable ::  FracSoilAsAirt(:,:,:)              !fraction of soil volume as air, normalized using current pore volume
   real(r8),allocatable ::  VLWatMicP1(:,:,:)                  !    
   real(r8),allocatable ::  VLiceMicP1(:,:,:)                  !  
@@ -69,7 +69,7 @@ implicit none
   allocate(DLYRR(JY,JX));       DLYRR=0._r8  
   allocate(FracSoiPAsIce(0:JZ,JY,JX)); FracSoiPAsIce=0._r8 
   allocate(FracSoiPAsAir(0:JZ,JY,JX)); FracSoiPAsAir=0._r8   
-  allocate(VLHeatCapacity(0:JZ,JY,JX));  VLHeatCapacity=0._r8  
+  allocate(VLHeatCapacity_col(0:JZ,JY,JX));  VLHeatCapacity_col=0._r8  
   allocate(FracSoilAsAirt(0:JZ,JY,JX)); FracSoilAsAirt=0._r8  
   allocate(VLWatMicP1(0:JZ,JY,JX));  VLWatMicP1=0._r8  
   allocate(VLiceMicP1(0:JZ,JY,JX));  VLiceMicP1=0._r8
@@ -127,7 +127,7 @@ implicit none
   call destroy(DLYRR)  
   call destroy(FracSoiPAsIce)  
   call destroy(FracSoiPAsAir)  
-  call destroy(VLHeatCapacity)  
+  call destroy(VLHeatCapacity_col)  
   call destroy(FracSoilAsAirt)  
   call destroy(VLWatMicP1)  
   call destroy(VLiceMicP1)

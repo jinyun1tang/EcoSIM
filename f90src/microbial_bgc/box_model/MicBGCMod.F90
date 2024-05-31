@@ -12,7 +12,7 @@ module MicBGCMod
   use EcosimConst
   use EcoSIMSolverPar
   use NitroPars
-  use NitroDiagTypes
+  use MicrobeDiagTypes
   use MicFLuxTypeMod,       only: micfluxtype
   use MicStateTraitTypeMod, only: micsttype
   use MicForcTypeMod,       only: micforctype
@@ -70,12 +70,12 @@ module MicBGCMod
 !local variables
   integer :: LL,K,KL,NGL
   integer :: M,N
-  type(NitroMicDiagType) :: nmicdiag
-  type(NitroAQMFluxDiagType) :: naqfdiag
-  type(NitroMicStateType) :: nmics
-  type(NitroMicFluxType) :: nmicf
-  type(NitroOMcplxFluxType) :: ncplxf
-  type(NitroOMcplxStateType) :: ncplxs
+  type(Microbe_Diag_type) :: nmicdiag
+  type(Cumlate_Flux_Diag_type) :: naqfdiag
+  type(Microbe_State_type) :: nmics
+  type(Microbe_Flux_type) :: nmicf
+  type(OMCplx_Flux_type) :: ncplxf
+  type(OMCplx_State_type) :: ncplxs
   real(r8) :: totOMbeg(1:NumPlantChemElms)
   real(r8) :: totOMend(1:NumPlantChemElms)
 
@@ -137,7 +137,7 @@ module MicBGCMod
 !
         !write(*,*)'MICROBIAL GROWTH FROM RESPIRATION, MINERALIZATION'
 
-  call MicrobialAnabolicUpdate(micfor,micstt,nmicf)
+  call MicrobialAnabolicUpdate(micfor,micstt,nmicf,micflx)
 !
         !write(*,*)'MICROBIAL COLONIZATION OF NEW LITTER'
 !
@@ -145,7 +145,7 @@ module MicBGCMod
 !
 !     AGGREGATE ALL TRANSFOMBioResduATIONS CALCULATED ABOVE FOR EACH N,K
 !
-  call AggregateTransfOMBioResduations(micfor,micstt,nmicdiag,naqfdiag,nmicf,ncplxf,micflx)
+  call AggregateTransfOMBioResdue(micfor,micstt,nmicdiag,naqfdiag,nmicf,ncplxf,micflx)
 
 !  call SumOneLayer(KL,micstt,totOMend)
 
@@ -218,10 +218,10 @@ module MicBGCMod
   type(micforctype), intent(in) :: micfor
   integer, intent(out) :: KL
   type(micsttype), intent(inout) :: micstt
-  type(NitroAQMFluxDiagType), INTENT(INOUT) :: naqfdiag
-  type(NitroMicDiagType), intent(inout) :: nmicdiag
-  type(NitroMicStateType), intent(inout) :: nmics
-  type(NitroOMcplxStateType),intent(inout):: ncplxs
+  type(Cumlate_Flux_Diag_type), INTENT(INOUT) :: naqfdiag
+  type(Microbe_Diag_type), intent(inout) :: nmicdiag
+  type(Microbe_State_type), intent(inout) :: nmics
+  type(OMCplx_State_type),intent(inout):: ncplxs
   real(r8) :: TBulkOMC  
   integer  :: K
   integer  :: M,N,NGL,MID1,MID2
@@ -283,8 +283,8 @@ module MicBGCMod
     k_humus                   => micpar%k_humus,                   &
     k_POM                     => micpar%k_POM,                     &
     is_activeMicrbFungrpAutor => micpar%is_activeMicrbFungrpAutor, &
-    n_O2facult_bacter         => micpar%n_O2facult_bacter,         &
-    AmmoniaOxidBacter         => micpar%AmmoniaOxidBacter,         &
+    mid_Facult_DenitBacter         => micpar%mid_Facult_DenitBacter,         &
+    mid_AmmoniaOxidBacter         => micpar%mid_AmmoniaOxidBacter,         &
     litrm                     => micfor%litrm,                     &
     VWatLitRHoldCapcity       => micfor%VWatLitRHoldCapcity,       &
     VLWatMicP                 => micfor%VLWatMicP,                 &
@@ -455,7 +455,7 @@ module MicBGCMod
 !       OMC2=active biomass in recalcitrant fraction
 !
           TotActMicrobiom=TotActMicrobiom+OMActHeter(NGL,K)
-          IF(N.EQ.n_O2facult_bacter)THEN
+          IF(N.EQ.mid_Facult_DenitBacter)THEN
             TotBiomNO2Consumers=TotBiomNO2Consumers+OMActHeter(NGL,K)
           ENDIF
           MID2=micpar%get_micb_id(2,NGL)
@@ -494,7 +494,7 @@ module MicBGCMod
 !
         TotActMicrobiom=TotActMicrobiom+OMActAutor(NGL)
 
-        IF(N.EQ.AmmoniaOxidBacter)THEN
+        IF(N.EQ.mid_AmmoniaOxidBacter)THEN
           TotBiomNO2Consumers=TotBiomNO2Consumers+OMActAutor(NGL)
         ENDIF
         MID2=micpar%get_micb_id(2,NGL)
@@ -707,12 +707,12 @@ module MicBGCMod
   type(micforctype), intent(in) :: micfor
   type(micsttype), intent(inout) :: micstt
   type(micfluxtype), intent(inout) :: micflx
-  type(NitroMicDiagType), intent(inout) :: nmicdiag
-  type(NitroAQMFluxDiagType), INTENT(INOUT) :: naqfdiag
-  type(NitroMicFluxType), intent(inout) :: nmicf
-  type(NitroMicStateType), intent(inout):: nmics
-  type(NitroOMcplxFluxType), intent(inout) :: ncplxf
-  type(NitroOMcplxStateType), intent(inout):: ncplxs
+  type(Microbe_Diag_type), intent(inout) :: nmicdiag
+  type(Cumlate_Flux_Diag_type), INTENT(INOUT) :: naqfdiag
+  type(Microbe_Flux_type), intent(inout) :: nmicf
+  type(Microbe_State_type), intent(inout):: nmics
+  type(OMCplx_Flux_type), intent(inout) :: ncplxf
+  type(OMCplx_State_type), intent(inout):: ncplxs
   integer :: K,M,N,NGL,MID
   real(r8) :: SPOMK(2)
   real(r8) :: RMOMK(2)    
@@ -743,7 +743,7 @@ module MicBGCMod
   OMActAutor                => nmics%OMActAutor,                 &
   k_humus                   => micpar%k_humus,                   &
   k_POM                     => micpar%k_POM,                     &
-  n_aero_fungi              => micpar%n_aero_fungi,              &
+  mid_Aerob_Fungi              => micpar%mid_Aerob_Fungi,              &
   is_activeMicrbFungrpAutor => micpar%is_activeMicrbFungrpAutor, &
   PSISoilMatricP            => micfor%PSISoilMatricP,            &
   litrm                     => micfor%litrm,                     &
@@ -775,7 +775,7 @@ module MicBGCMod
 !           OXKM=Km for heterotrophic O2 uptake set in starts.f
 !           GrowthEnvScalHeter=combined temp and water stress effect on growth respiration
 !           TempMaintRHeter=temperature effect on maintenance respiration
-          IF(N.EQ.n_aero_fungi)THEN
+          IF(N.EQ.mid_Aerob_Fungi)THEN
             WatStressMicb=EXP(0.1_r8*PSISoilMatricP)
           ELSE
             WatStressMicb=EXP(0.2_r8*PSISoilMatricP)
@@ -793,7 +793,7 @@ module MicBGCMod
     ENDIF
   ENDDO D760
 
-  N=micpar%AmmoniaOxidBacter
+  N=micpar%mid_AmmoniaOxidBacter
   nmicf%RTotNH3OxidSoilAutor=SUM(nmicf%RSOxidSoilAutor(JGniA(N):JGnfA(N)))
   nmicf%RTotNH3OxidBandAutor=SUM(nmicf%RSOxidBandAutor(JGniA(N):JGnfA(N)))
   DO  N=1,NumMicbFunGrupsPerCmplx
@@ -830,11 +830,11 @@ module MicBGCMod
   real(r8), intent(in) :: RMOMK(2)  
   type(micforctype), intent(in) :: micfor
   type(micsttype), intent(inout) :: micstt
-  type(NitroAQMFluxDiagType), INTENT(INOUT) :: naqfdiag
-  type(NitroMicStateType), intent(inout) :: nmics
-  type(NitroMicFluxType), intent(inout) :: nmicf
-  type(NitroOMcplxFluxType), intent(inout) :: ncplxf
-  type(NitroOMcplxStateType), intent(inout) :: ncplxs
+  type(Cumlate_Flux_Diag_type), INTENT(INOUT) :: naqfdiag
+  type(Microbe_State_type), intent(inout) :: nmics
+  type(Microbe_Flux_type), intent(inout) :: nmicf
+  type(OMCplx_Flux_type), intent(inout) :: ncplxf
+  type(OMCplx_State_type), intent(inout) :: ncplxs
   type(micfluxtype), intent(inout) :: micflx
   integer  :: M
   real(r8) :: COMC
@@ -857,7 +857,7 @@ module MicBGCMod
   associate(                                              &
     FracOMActHeter        => nmics%FracOMActHeter,        &
     FracNO2ReduxHeter     => nmics%FracNO2ReduxHeter,     &
-    n_O2facult_bacter     => micpar%n_O2facult_bacter,    &
+    mid_Facult_DenitBacter     => micpar%mid_Facult_DenitBacter,    &
     FracHeterBiomOfActK   => nmics%FracHeterBiomOfActK,   &
     OMActHeter            => nmics%OMActHeter,            &
     RO2UptkHeter          => nmicf%RO2UptkHeter,          &
@@ -890,7 +890,7 @@ module MicBGCMod
     FracOMActHeter(NGL,K)=1.0_r8
   ENDIF
 
-  IF(TotBiomNO2Consumers.GT.ZEROS .and. N.EQ.n_O2facult_bacter)THEN
+  IF(TotBiomNO2Consumers.GT.ZEROS .and. N.EQ.mid_Facult_DenitBacter)THEN
     FracNO2ReduxHeter(NGL,K)=OMActHeter(NGL,K)/TotBiomNO2Consumers
   ELSE
     FracNO2ReduxHeter(NGL,K)=1.0_r8
@@ -916,15 +916,16 @@ module MicBGCMod
 ! HETEROTROPHIC BIOMASS RESPIRATION
           !
 !  IF(K.LE.jcplx1)THEN
-!
+!!
+  IF(micpar%is_aerobic_hetr(N))THEN
 !   RESPIRATION BY HETEROTROPHIC AEROBES:
 !   N=(1)OBLIGATE AEROBES,(2)FACULTATIVE ANAEROBES,(3)FUNGI
 !   (6)N2 FIXERS
-!
-  IF(micpar%is_aerobic_hetr(N))THEN
-!     write(*,*)'AerobicHeterotrophCatabolism'
+
     call AerobicHeterotrophCatabolism(NGL,N,K,TSensGrowth,WatStressMicb,FOQC,FOQA, &
       ECHZ,FGOCP,FGOAP,RGOCP,RGOMP,micfor,micstt,naqfdiag,nmicf,nmics,ncplxs,micflx)
+!
+  ELSEIF(micpar%is_anerobic_hetr(N))THEN
 !     RESPIRATION BY HETEROTROPHIC ANAEROBES:
 !     N=(4)ACETOGENIC FERMENTERS (7) ACETOGENIC N2 FIXERS
 !
@@ -935,19 +936,18 @@ module MicBGCMod
 !     GHAX=H2 effect on energy yield of fermentation
 !     GOAX=acetate effect on energy yield of fermentation
 !     ECHZ=growth respiration efficiency of fermentation
-!
-  ELSEIF(micpar%is_anerobic_hetr(N))THEN
-!     write(*,*)'AnaerobCatabolism'
-    call AnaerobCatabolism(NGL,N,K,TSensGrowth,WatStressMicb,FOQC,ECHZ,FGOCP,FGOAP,RGOMP, &
+
+!     write(*,*)'AnaerobAcetogenCatabolism'
+    call AnaerobAcetogenCatabolism(NGL,N,K,TSensGrowth,WatStressMicb,FOQC,ECHZ,FGOCP,FGOAP,RGOMP, &
       micfor,micstt,naqfdiag,ncplxs,nmicf,nmics,micflx)
+  ELSEIF(N.EQ.micpar%mid_AcetoMethanogArchea)THEN
 !     ENERGY YIELD FROM ACETOTROPHIC METHANOGENESIS
 !
 !     GOMX=acetate effect on energy yield
 !     ECHZ=growth respiration efficiency of aceto. methanogenesis
 !
-  ELSEIF(N.EQ.micpar%AcetotroMethanogenArchea)THEN
-!     write(*,*)'AcetMicBiome_colhanogenCatabolism'
-    call AcetMicBiome_colhanogenCatabolism(NGL,N,K,TSensGrowth,WatStressMicb,FOQA,ECHZ, &
+
+    call AcetoMethanogenCatabolism(NGL,N,K,TSensGrowth,WatStressMicb,FOQA,ECHZ, &
       FGOCP,FGOAP,RGOMP,micfor,micstt,naqfdiag,nmicf,nmics,ncplxs,micflx)
   ENDIF
 !
@@ -982,13 +982,15 @@ module MicBGCMod
       micfor,micstt,nmicf,nmics,micflx)
   !anaerboic fertmenting heterotrophs
   ELSEIF(micpar%is_anerobic_hetr(N))THEN
+  !fermentation  (CH2O)6 -> 2CO2 + 2(CH2O)2  
     RespGrossHeter(NGL,K)=RGOMP
     RCO2ProdHeter(NGL,K)=0.333_r8*RespGrossHeter(NGL,K)
     RAcettProdHeter(NGL,K)=0.667_r8*RespGrossHeter(NGL,K)
     RCH4ProdHeter(NGL,K)=0.0_r8
     RO2Uptk4RespHeter(NGL,K)=RO2Dmnd4RespHeter(NGL,K)
     RH2ProdHeter(NGL,K)=0.111_r8*RespGrossHeter(NGL,K)
-  ELSEIF(N.EQ.micpar%AcetotroMethanogenArchea)THEN
+  ELSEIF(N.EQ.micpar%mid_AcetoMethanogArchea)THEN
+  ! CH3COOH -> CO2 + CH4
     RespGrossHeter(NGL,K)=RGOMP
     RCO2ProdHeter(NGL,K)=0.50_r8*RespGrossHeter(NGL,K)
     RAcettProdHeter(NGL,K)=0.0_r8
@@ -999,9 +1001,9 @@ module MicBGCMod
 !
 !  write(*,*)'HETEROTROPHIC DENITRIFICATION'
 !
-  IF(N.EQ.micpar%n_O2facult_bacter .AND. RO2Dmnd4RespHeter(NGL,K).GT.0.0_r8 &
-    .AND.(.not.litrm.OR.VLSoilPoreMicP.GT.ZEROS))THEN
-
+  IF(N.EQ.micpar%mid_Facult_DenitBacter .AND. RO2Dmnd4RespHeter(NGL,K).GT.0.0_r8 &
+    .AND.(.not.litrm .OR. VLSoilPoreMicP.GT.ZEROS))THEN
+  !no litter layer denitrifcation
     call HeteroDenitrificCatabolism(NGL,N,K,FOQC,RGOCP, &
       VOLWZ,micfor,micstt,naqfdiag,nmicf,nmics,ncplxs,micflx)
   ELSE
@@ -1021,11 +1023,11 @@ module MicBGCMod
     ZNH4T,ZNO3T,ZNO2T,H2P4T,H1P4T,micfor,micstt, &
     nmicf,nmics,micflx)
 !
-  call GatherMicrobialRespiration(NGL,N,K,RMOMK,RGrowthRespHeter,RMaintDefcitcitHeter,RMaintRespHeter, &
+  call GatherHetertrophRespiration(NGL,N,K,RMOMK,RGrowthRespHeter,RMaintDefcitcitHeter,RMaintRespHeter, &
     micfor,micstt,nmicf,nmics)
 !
-  call GetMicrobialAnabolismFlux(NGL,N,K,ECHZ,FGOCP, &
-    FGOAP,RGrowthRespHeter,RMaintDefcitcitHeter,RMaintRespHeter,spomk,rmomk,micfor,micstt,nmicf, &
+  call GatherHetertrophAnabolicFlux(NGL,N,K,ECHZ,FGOCP,FGOAP,RGrowthRespHeter,&
+    RMaintDefcitcitHeter,RMaintRespHeter,spomk,rmomk,micfor,micstt,nmicf, &
     nmics,ncplxf,ncplxs)
   end associate
   end subroutine ActiveMicrobes
@@ -1036,8 +1038,8 @@ module MicBGCMod
   implicit none
   type(micforctype), intent(in) :: micfor
   type(micsttype), intent(inout) :: micstt
-  type(NitroMicDiagType), intent(inout) :: nmicdiag
-  type(NitroAQMFluxDiagType), INTENT(INOUT):: naqfdiag
+  type(Microbe_Diag_type), intent(inout) :: nmicdiag
+  type(Cumlate_Flux_Diag_type), INTENT(INOUT):: naqfdiag
   type(micfluxtype), intent(inout) :: micflx
   real(r8) :: H_1p_conc,CHNO2,CHNOB
   real(r8) :: FNO3S,FNO3B
@@ -1121,10 +1123,10 @@ module MicBGCMod
   integer, intent(in) :: KL
   type(micforctype), intent(in) :: micfor
   type(micsttype), intent(inout) :: micstt
-  type(NitroMicFLuxType), intent(inout) :: nmicf
-  type(NitroMicStateType), intent(inout) :: nmics
-  type(NitroOMcplxFluxType), intent(inout):: ncplxf
-  type(NitroOMcplxStateType),intent(inout):: ncplxs
+  type(Microbe_Flux_type), intent(inout) :: nmicf
+  type(Microbe_State_type), intent(inout) :: nmics
+  type(OMCplx_Flux_type), intent(inout):: ncplxf
+  type(OMCplx_State_type),intent(inout):: ncplxs
   integer  :: K,M,N,KK,NGL,MID,idom,NE
   real(r8) :: OSRT
   real(r8) :: XFRK,XFROM(idom_beg:idom_end)
@@ -1236,9 +1238,9 @@ module MicBGCMod
   integer, intent(in) :: K                 !from 1 to 5
   type(micforctype), intent(in) :: micfor
   type(micsttype), intent(inout) :: micstt
-  type(NitroMicFluxType), intent(inout) :: nmicf
-  type(NitroOMcplxFluxType), intent(inout) :: ncplxf
-  type(NitroOMcplxStateType),intent(inout) :: ncplxs
+  type(Microbe_Flux_type), intent(inout) :: nmicf
+  type(OMCplx_Flux_type), intent(inout) :: ncplxf
+  type(OMCplx_State_type),intent(inout) :: ncplxs
   real(r8) :: AECX
   real(r8) :: OQEX(idom_beg:idom_end)
   real(r8) :: OHEX(idom_beg:idom_end)
@@ -1324,10 +1326,10 @@ module MicBGCMod
   integer, intent(in) :: K
   type(micforctype), intent(in) :: micfor
   type(micsttype), intent(inout) :: micstt
-  type(NitroAQMFluxDiagType), INTENT(INOUT) :: naqfdiag
-  type(NitroMicDiagType), intent(inout) :: nmicdiag
-  type(NitroOMcplxFluxType), intent(inout) :: ncplxf
-  type(NitroOMcplxStateType),intent(inout) :: ncplxs
+  type(Cumlate_Flux_Diag_type), INTENT(INOUT) :: naqfdiag
+  type(Microbe_Diag_type), intent(inout) :: nmicdiag
+  type(OMCplx_Flux_type), intent(inout) :: ncplxf
+  type(OMCplx_State_type),intent(inout) :: ncplxs
   integer  :: M,NE,idom
   real(r8) :: CNOMX,CPOMX
   real(r8) :: COQCK,COSC
@@ -1595,10 +1597,10 @@ module MicBGCMod
   integer, intent(in) :: KL
   type(micforctype), intent(in) :: micfor
   type(micsttype), intent(inout) :: micstt
-  type(NitroMicDiagType), intent(in) :: nmicdiag
-  type(NitroMicFluxType), intent(inout) :: nmicf
-  type(NitroOMcplxFluxType), intent(inout) :: ncplxf
-  type(NitroOMcplxStateType), intent(inout):: ncplxs
+  type(Microbe_Diag_type), intent(in) :: nmicdiag
+  type(Microbe_Flux_type), intent(inout) :: nmicf
+  type(OMCplx_Flux_type), intent(inout) :: ncplxf
+  type(OMCplx_State_type), intent(inout):: ncplxs
   integer :: K,M,N,NGL,NE,idom
   real(r8) :: FORC(0:jcplx)
 !     begin_execution
@@ -1764,11 +1766,12 @@ module MicBGCMod
   end subroutine RedistDecompProduct
 !------------------------------------------------------------------------------------------
 
-  subroutine MicrobialAnabolicUpdate(micfor,micstt,nmicf)
+  subroutine MicrobialAnabolicUpdate(micfor,micstt,nmicf,micflx)
   implicit none
   type(micforctype), intent(in) :: micfor
   type(micsttype), intent(inout) :: micstt
-  type(NitroMicFluxType), intent(inout) :: nmicf
+  type(Microbe_Flux_type), intent(inout) :: nmicf
+  type(micfluxtype), intent(inout) :: micflx
   integer  :: K,M,N,NGL,MID3,MID,NE
   real(r8) ::CGROMC
 !     begin_execution
@@ -1808,7 +1811,9 @@ module MicBGCMod
     ElmAllocmatMicrblitr2POMU      => micfor%ElmAllocmatMicrblitr2POMU,     &
     icarbhyro                      => micpar%icarbhyro,                     &
     iprotein                       => micpar%iprotein,                      &
-    Litrm                          => micfor%litrm                          &
+    Litrm                          => micfor%litrm,                         &
+    NetNH4Mineralize               => micflx%NetNH4Mineralize,              &
+    NetPO4Mineralize               => micflx%NetPO4Mineralize               &
   )
 !
 !     OMC,OMN,OMP=microbial C,N,P
@@ -1885,6 +1890,7 @@ module MicBGCMod
               mBiomeHeter(NE,MID3,K)=mBiomeHeter(NE,MID3,K)-NonstX2stBiomHeter(NE,M,NGL,K)+RkillRecycOMHeter(NE,M,NGL,K)
             ENDDO
             mBiomeHeter(ielmn,MID3,K)=mBiomeHeter(ielmn,MID3,K)+RMaintDefcitRecycOMHeter(ielmn,M,NGL,K)
+
             mBiomeHeter(ielmp,MID3,K)=mBiomeHeter(ielmp,MID3,K)+RMaintDefcitRecycOMHeter(ielmp,M,NGL,K)
             RCO2ProdHeter(NGL,K)=RCO2ProdHeter(NGL,K)+RMaintDefcitRecycOMHeter(ielmc,M,NGL,K)
           ENDDO D555
@@ -1892,13 +1898,24 @@ module MicBGCMod
           mBiomeHeter(ielmn,MID3,K)=mBiomeHeter(ielmn,MID3,K)+DOMuptk4GrothHeter(ielmn,NGL,K) &
             +RNH4TransfSoilHeter(NGL,K)+RNH4TransfBandHeter(NGL,K)+RNO3TransfSoilHeter(NGL,K) &
             +RNO3TransfBandHeter(NGL,K)+RN2FixHeter(NGL,K)
+          if(mBiomeHeter(ielmn,MID3,K)<0._r8)then
+            RNH4TransfSoilHeter(NGL,K)=RNH4TransfSoilHeter(NGL,K)-mBiomeHeter(ielmn,MID3,K)
+            NetNH4Mineralize=NetNH4Mineralize-mBiomeHeter(ielmn,MID3,K)
+            mBiomeHeter(ielmn,MID3,K)=0._r8          
+          endif
           mBiomeHeter(ielmp,MID3,K)=mBiomeHeter(ielmp,MID3,K)+DOMuptk4GrothHeter(ielmp,NGL,K) &
             +RH2PO4TransfSoilHeter(NGL,K)+RH2PO4TransfBandHeter(NGL,K)+RH1PO4TransfSoilHeter(NGL,K) &
             +RH1PO4TransfBandHeter(NGL,K)
+          if(mBiomeHeter(ielmp,MID3,K)<0._r8)then
+            RH2PO4TransfSoilHeter(NGL,K)=RH2PO4TransfSoilHeter(NGL,K)-mBiomeHeter(ielmp,MID3,K)
+            NetPO4Mineralize=NetPO4Mineralize-mBiomeHeter(ielmp,MID3,K)
+            mBiomeHeter(ielmp,MID3,K)=0._r8
+          endif  
           IF(litrm)THEN
             mBiomeHeter(ielmn,MID3,K)=mBiomeHeter(ielmn,MID3,K)+RNH4TransfLitrHeter(NGL,K)+RNO3TransfLitrHeter(NGL,K)
             mBiomeHeter(ielmp,MID3,K)=mBiomeHeter(ielmp,MID3,K)+RH2PO4TransfLitrHeter(NGL,K)+RH1PO4TransfLitrHeter(NGL,K)
           ENDIF
+
         enddo
       ENDDO
     ENDIF
@@ -1912,8 +1929,8 @@ module MicBGCMod
   integer, intent(in) :: KL
   type(micforctype), intent(in) :: micfor
   type(micsttype), intent(inout) :: micstt
-  type(NitroOMcplxFluxType), intent(inout) :: ncplxf
-  type(NitroOMcplxStateType),intent(inout) :: ncplxs
+  type(OMCplx_Flux_type), intent(inout) :: ncplxf
+  type(OMCplx_State_type),intent(inout) :: ncplxs
   integer  :: K,M
   real(r8) :: DOSAK
 
@@ -1957,14 +1974,14 @@ module MicBGCMod
   end subroutine MicrobialLitterColonization
 !------------------------------------------------------------------------------------------
 
-  subroutine AggregateTransfOMBioResduations(micfor,micstt,nmicdiag,naqfdiag,nmicf,ncplxf,micflx)
+  subroutine AggregateTransfOMBioResdue(micfor,micstt,nmicdiag,naqfdiag,nmicf,ncplxf,micflx)
   implicit none
   type(micforctype), intent(in) :: micfor
   type(micsttype), intent(inout) :: micstt
-  type(NitroMicDiagType),intent(in) :: nmicdiag
-  type(NitroAQMFluxDiagType), intent(inout) :: naqfdiag
-  type(NitroMicFluxType), intent(inout) :: nmicf
-  type(NitroOMcplxFluxType), intent(inout) :: ncplxf
+  type(Microbe_Diag_type),intent(in) :: nmicdiag
+  type(Cumlate_Flux_Diag_type), intent(inout) :: naqfdiag
+  type(Microbe_Flux_type), intent(inout) :: nmicf
+  type(OMCplx_Flux_type), intent(inout) :: ncplxf
   type(micfluxtype), intent(inout) :: micflx
   integer  :: K,M,N,NGL,NE
 !     begin_execution
@@ -2038,9 +2055,9 @@ module MicBGCMod
     Lsurf                     => micfor%Lsurf,                     &
     k_POM                     => micpar%k_POM,                     &
     k_humus                   => micpar%k_humus,                   &
-    AmmoniaOxidBacter         => micpar%AmmoniaOxidBacter,         &
-    AerobicMethanotrofBacter  => micpar%AerobicMethanotrofBacter,  &
-    NitriteOxidBacter         => micpar%NitriteOxidBacter,         &
+    mid_AmmoniaOxidBacter         => micpar%mid_AmmoniaOxidBacter,         &
+    mid_AerobicMethanotrofBacter  => micpar%mid_AerobicMethanotrofBacter,  &
+    mid_NitriteOxidBacter         => micpar%mid_NitriteOxidBacter,         &
     is_activeMicrbFungrpAutor => micpar%is_activeMicrbFungrpAutor, &
     RCH4UptkAutor             => micflx%RCH4UptkAutor,             &
     RCO2NetUptkMicb           => micflx%RCO2NetUptkMicb,           &
@@ -2090,6 +2107,7 @@ module MicBGCMod
           naqfdiag%TReduxNO2Band=naqfdiag%TReduxNO2Band+RNO2ReduxHeterBand(NGL,K)
           naqfdiag%TReduxN2O=naqfdiag%TReduxN2O+RN2OReduxHeter(NGL,K)
           naqfdiag%TProdH2=naqfdiag%TProdH2+RH2ProdHeter(NGL,K)
+          micflx%TRDOE2DIE(ielmc)=micflx%TRDOE2DIE(ielmc)+RCO2ProdHeter(NGL,K)+RCH4ProdHeter(NGL,K)          
         ENDDO
       ENDDO
     ENDIF
@@ -2120,19 +2138,23 @@ module MicBGCMod
         naqfdiag%TReduxNO3Soil=naqfdiag%TReduxNO3Soil+RNO3UptkAutor(NGL)
         naqfdiag%TReduxNO2Soil=naqfdiag%TReduxNO2Soil+RNO2ReduxAutorSoil(NGL)
         naqfdiag%TReduxNO2Band=naqfdiag%TReduxNO2Band+RNO2ReduxAutorBand(NGL)
+        if(micpar%is_CO2_autotroph(N))then
+          micflx%TRDOE2DIE(ielmc)=micflx%TRDOE2DIE(ielmc)+RCO2ProdAutor(NGL)
+        endif
       ENDDO
     ENDIF
   ENDDO
 
-!     TRGOA=total CO2 uptake by autotrophs, ammonia oxidizer
+!     tRCO2GrothAutor=total CO2 uptake by autotrophs, ammonia oxidizer
 !  nitrite oxidizer, and hydrogenotophic methanogens
   D645: DO N=1,NumMicbFunGrupsPerCmplx
     IF(micpar%is_CO2_autotroph(N))THEN
       DO NGL=JGniA(N),JGnfA(N)
-        naqfdiag%TRGOA=naqfdiag%TRGOA+DOMuptk4GrothAutor(ielmc,NGL)
+        naqfdiag%tRCO2GrothAutor=naqfdiag%tRCO2GrothAutor+DOMuptk4GrothAutor(ielmc,NGL)
       ENDDO
     ENDIF
   ENDDO D645
+
 !
 !     ALLOCATE AGGREGATED TRANSFOMBioResduATIONS INTO ARRAYS TO UPDATE
 !     STATE VARIABLES IN 'REDIST'
@@ -2141,7 +2163,7 @@ module MicBGCMod
 !     tRCO2MicrbProd total CO2 emission by heterotrophs reducing O2
 !     tRNOxMicrbRedux=total CO2 emission by denitrifiers reducing NOx
 !     RSOxidSoilAutor(3)=CH4 oxidation
-!     RCH4UptkAutor=net CH4 uptake
+!     RCH4UptkAutor=net CH4 uptake, >0, means uptake
 !     DOMuptk4GrothHeter=total CH4 uptake by autotrophs
 !     tRCH4MicrbProd=total CH4 emission
 !     RH2NetUptkMicb=net H2 uptake
@@ -2153,13 +2175,14 @@ module MicBGCMod
 !     TReduxNO2Soil,TReduxNO2Band=total NO2 reduction in non-band,band
 !     RN2OProdSoilChemo,RN2OProdBandChemo=nitrous acid reduction in non-band,band
 !
-!  print*,'RCO2NetUptkMicb',naqfdiag%TRGOA,naqfdiag%tRCO2MicrbProd,naqfdiag%tRNOxMicrbRedux
-  RCO2NetUptkMicb=naqfdiag%TRGOA-naqfdiag%tRCO2MicrbProd-naqfdiag%tRNOxMicrbRedux
+!  print*,'RCO2NetUptkMicb',naqfdiag%tRCO2GrothAutor,naqfdiag%tRCO2MicrbProd,naqfdiag%tRNOxMicrbRedux
+  RCO2NetUptkMicb=naqfdiag%tRCO2GrothAutor-naqfdiag%tRCO2MicrbProd-naqfdiag%tRNOxMicrbRedux
   RCH4UptkAutor=-naqfdiag%tRCH4MicrbProd
 
-  DO NGL=JGniA(AerobicMethanotrofBacter),JGnfA(AerobicMethanotrofBacter)
+  DO NGL=JGniA(mid_AerobicMethanotrofBacter),JGnfA(mid_AerobicMethanotrofBacter)
     RCO2NetUptkMicb=RCO2NetUptkMicb-RSOxidSoilAutor(NGL)
     RCH4UptkAutor=RCH4UptkAutor+RSOxidSoilAutor(NGL)+DOMuptk4GrothAutor(ielmc,NGL)
+    micflx%TRDOE2DIE(ielmc)=micflx%TRDOE2DIE(ielmc)-RSOxidSoilAutor(NGL)-DOMuptk4GrothAutor(ielmc,NGL)
   ENDDO
   RH2NetUptkMicb =RH2UptkAutor-naqfdiag%TProdH2
   RO2UptkMicb=naqfdiag%tRO2MicrbUptk
@@ -2216,6 +2239,16 @@ module MicBGCMod
 !     XZHYS=total H+ production
 !     TFixN2=total N2 fixation
 !
+!  micflx%TRDOE2DIE(ielmc)=micflx%TRDOE2DIE(ielmc)+
+
+  micflx%TRDOE2DIE(ielmn)=micflx%TRDOE2DIE(ielmn)+naqfdiag%tRNH4MicrbTransfSoil &
+    +naqfdiag%tRNH4MicrbTransfBand+naqfdiag%tRNO3MicrbTransfSoil &
+    +naqfdiag%tRNO3MicrbTransfBand+naqfdiag%TFixN2
+  micflx%TRDOE2DIE(ielmp)=micflx%TRDOE2DIE(ielmp)+naqfdiag%tRH1PO4MicrbTransfSoil &
+    +naqfdiag%tRH2PO4MicrbTransfSoil+naqfdiag%tRH1PO4MicrbTransfBand &
+    +naqfdiag%tRH2PO4MicrbTransfBand
+
+
   RNH4MicbTransfSoil=-naqfdiag%tRNH4MicrbTransfSoil
   RNO3MicbTransfSoil=-naqfdiag%tRNO3MicrbTransfSoil-naqfdiag%TReduxNO3Soil+RNO3ProdSoilChemo
   RNO2MicbTransfSoil=+naqfdiag%TReduxNO3Soil-naqfdiag%TReduxNO2Soil-RNO2ReduxSoilChemo
@@ -2224,13 +2257,13 @@ module MicBGCMod
   RNH4MicbTransfBand=-naqfdiag%tRNH4MicrbTransfBand
   RNO3MicbTransfBand=-naqfdiag%tRNO3MicrbTransfBand-naqfdiag%TReduxNO3Band+RNO3ProdBandChemo
   RNO2MicbTransfBand=naqfdiag%TReduxNO3Band-naqfdiag%TReduxNO2Band-RNO2ReduxBandChemo
-  !AmmoniaOxidBacter=1, NitriteOxidBacter=2, AerobicMethanotrofBacter=3
-  DO NGL=JGniA(AmmoniaOxidBacter),JGnfA(AmmoniaOxidBacter)
+  !mid_AmmoniaOxidBacter=1, mid_NitriteOxidBacter=2, mid_AerobicMethanotrofBacter=3
+  DO NGL=JGniA(mid_AmmoniaOxidBacter),JGnfA(mid_AmmoniaOxidBacter)
     RNH4MicbTransfSoil=RNH4MicbTransfSoil-RSOxidSoilAutor(NGL)
     RNO2MicbTransfSoil=RNO2MicbTransfSoil+RSOxidSoilAutor(NGL)
     RNH4MicbTransfBand=RNH4MicbTransfBand-RSOxidBandAutor(NGL)
   ENDDO
-  DO NGL=JGniA(NitriteOxidBacter),JGnfA(NitriteOxidBacter)
+  DO NGL=JGniA(mid_NitriteOxidBacter),JGnfA(mid_NitriteOxidBacter)
     RNO3MicbTransfSoil=RNO3MicbTransfSoil+RSOxidSoilAutor(NGL)
     RNO2MicbTransfSoil=RNO2MicbTransfSoil-RSOxidSoilAutor(NGL)
     RNO3MicbTransfBand=RNO3MicbTransfBand+RSOxidBandAutor(NGL)
@@ -2243,7 +2276,7 @@ module MicBGCMod
   TSens4MicbGrwoth=TSensGrowth
   VWatMicrobAct=VOLWZ
   end associate
-  end subroutine AggregateTransfOMBioResduations
+  end subroutine AggregateTransfOMBioResdue
 !------------------------------------------------------------------------------------------
 
   subroutine SubstrateAttenf4Compet(NGL,N,K,FOXYX, &
@@ -2256,9 +2289,9 @@ module MicBGCMod
   real(r8),intent(out) :: FPO4X,FPOBX,FP14X,FP1BX
   real(r8),intent(out) :: FOQC,FOQA
   type(micforctype), intent(in) :: micfor
-  type(NitroAQMFluxDiagType),INTENT(INOUT)::  naqfdiag
-  type(NitroMicStateType), intent(inout) :: nmics
-  type(NitroMicFluxType), intent(inout) :: nmicf
+  type(Cumlate_Flux_Diag_type),INTENT(INOUT)::  naqfdiag
+  type(Microbe_State_type), intent(inout) :: nmics
+  type(Microbe_Flux_type), intent(inout) :: nmicf
   type(micfluxtype), intent(inout) :: micflx
 ! begin_execution
   associate(                                               &
@@ -2423,23 +2456,25 @@ module MicBGCMod
   end subroutine SubstrateAttenf4Compet
 !------------------------------------------------------------------------------------------
 
-  subroutine AcetMicBiome_colhanogenCatabolism(NGL,N,K,TSensGrowth,WatStressMicb,FOQA,ECHZ, &
+  subroutine AcetoMethanogenCatabolism(NGL,N,K,TSensGrowth,WatStressMicb,FOQA,ECHZ, &
     FGOCP,FGOAP,RGOMP,micfor,micstt,naqfdiag,nmicf,nmics,ncplxs,micflx)
   implicit none
   integer, intent(in) :: NGL,N,K
   real(r8), intent(in) :: FOQA,TSensGrowth,WatStressMicb
   real(r8), intent(out) :: ECHZ
-  REAL(R8), intent(out) :: FGOCP,FGOAP,RGOMP
+  REAL(R8), intent(out) :: FGOCP,FGOAP
+  reaL(r8), intent(out) :: RGOMP         !substrate-limited potential respiration 
   type(micforctype), intent(in) :: micfor
   type(micsttype), intent(inout) :: micstt
-  type(NitroAQMFluxDiagType), intent(inout) :: naqfdiag
-  type(NitroMicFluxType), intent(inout) :: nmicf
-  type(NitroMicStateType), intent(inout):: nmics
-  type(NitroOMcplxStateType),intent(in):: ncplxs
+  type(Cumlate_Flux_Diag_type), intent(inout) :: naqfdiag
+  type(Microbe_Flux_type), intent(inout) :: nmicf
+  type(Microbe_State_type), intent(inout):: nmics
+  type(OMCplx_State_type),intent(in):: ncplxs
   type(micfluxtype), intent(inout) :: micflx
   real(r8) :: FSBST
   real(r8) :: GOMX,GOMM
-  real(r8) :: RGOGY,RGOGZ,RGOGX
+  real(r8) :: RGOGY,RGOGZ
+  real(r8) :: RGroMax   !kinetically unlimited acetate uptake
 
 ! begin_execution
   associate(                                            &
@@ -2471,8 +2506,8 @@ module MicBGCMod
 !     VMXM=specific respiration rate
 !     WatStressMicb=water stress effect, OMA=active biomass
 !     TSensGrowth=temp stress effect, FOQA= acetate limitation
-!     RGOGX=substrate-limited respiration of acetate
-!     RGOGX=competition-limited respiration of acetate
+!     RGroMax=substrate-limited respiration of acetate
+!     RGroMax=competition-limited respiration of acetate
 !     OQA=acetate, FOQA=fraction of biological demand for acetate
 !     RGOMP=O2-unlimited respiration of acetate
 !     ROXY*=O2 demand, RDOCUptkHeter,ROQCA=DOC, acetate demand
@@ -2480,9 +2515,9 @@ module MicBGCMod
 !
   FSBST=CDOM(idom_acetate,K)/(CDOM(idom_acetate,K)+OQKAM)
   RGOGY=AZMAX1(FBiomStoiScalarHeter(NGL,K)*VMXM*WatStressMicb*OMActHeter(NGL,K))
-  RGOGZ=RGOGY*FSBST*TSensGrowth
-  RGOGX=AZMAX1(DOM(idom_acetate,K)*FOQA*ECHZ)
-  RGOMP=AMIN1(RGOGX,RGOGZ)
+  RGOGZ=RGOGY*FSBST*TSensGrowth  
+  RGroMax=AZMAX1(DOM(idom_acetate,K)*FOQA*ECHZ)
+  RGOMP=AMIN1(RGroMax,RGOGZ)
   FGOCP=0.0_r8
   FGOAP=1.0_r8
   RO2Dmnd4RespHeter(NGL,K)=0.0_r8
@@ -2491,9 +2526,10 @@ module MicBGCMod
   RDOCUptkHeter(NGL,K)=0.0_r8
   RAcetateUptkHeter(NGL,K)=RGOGZ
   ROQC4HeterMicrobAct(NGL,K)=0.0_r8
-  naqfdiag%TCH4H=naqfdiag%TCH4H+0.5_r8*RGOMP
+  !given CH3COOH -> CH4+CO2, 0.5 is into CH4.
+  naqfdiag%tCH4ProdAceto=naqfdiag%tCH4ProdAceto+0.5_r8*RGOMP
   end associate
-  end subroutine AcetMicBiome_colhanogenCatabolism
+  end subroutine AcetoMethanogenCatabolism
 !------------------------------------------------------------------------------------------
 
   subroutine AerobicHeterotrophCatabolism(NGL,N,K,TSensGrowth,WatStressMicb,FOQC,FOQA, &
@@ -2501,15 +2537,16 @@ module MicBGCMod
   implicit none
   integer, intent(in) :: NGL,N,K
   REAL(R8), INTENT(IN) :: FOQC,FOQA,WatStressMicb,TSensGrowth
-  real(r8), intent(out) :: ECHZ,RGOMP
+  real(r8), intent(out) :: ECHZ
+  real(r8), intent(out) :: RGOMP  !total DOC/acetate C uptake for potential respiraiton
   REAL(R8), INTENT(OUT) :: FGOCP,FGOAP
   real(r8), intent(out) :: RGOCP
   type(micforctype), intent(in) :: micfor
   type(micsttype), intent(inout) :: micstt
-  type(NitroAQMFluxDiagType), INTENT(INOUT) :: naqfdiag
-  type(NitroMicFluxType), intent(inout) :: nmicf
-  type(NitroMicStateType), intent(inout) :: nmics
-  type(NitroOMcplxStateType),intent(inout):: ncplxs
+  type(Cumlate_Flux_Diag_type), INTENT(INOUT) :: naqfdiag
+  type(Microbe_Flux_type), intent(inout) :: nmicf
+  type(Microbe_State_type), intent(inout) :: nmics
+  type(OMCplx_State_type),intent(inout):: ncplxs
   type(micfluxtype), intent(inout) :: micflx
 
   real(r8) :: EO2Q
@@ -2520,35 +2557,35 @@ module MicBGCMod
   real(r8) :: RO2DmndHetertX
   real(r8) :: FSBST
 !     begin_execution
-  associate(                                            &
-    OMActHeter           => nmics%OMActHeter,           &
-    FBiomStoiScalarHeter => nmics%FBiomStoiScalarHeter, &
-    RO2Dmnd4RespHeter    => nmicf%RO2Dmnd4RespHeter,    &
-    RO2DmndHeter         => nmicf%RO2DmndHeter,         &
-    ROQC4HeterMicrobAct  => nmicf%ROQC4HeterMicrobAct,  &
-    ZEROS                => micfor%ZEROS,               &
-    DOM                  => micstt%DOM,                 &
-    n_aero_hetrophb      => micpar%n_aero_hetrophb,     &
-    n_O2facult_bacter    => micpar%n_O2facult_bacter,   &
-    n_aero_fungi         => micpar%n_aero_fungi,        &
-    n_aero_n2fixer       => micpar%n_aero_n2fixer,      &
-    RO2DmndHetert        => micflx%RO2DmndHetert,       &
-    RDOCUptkHeter        => micflx%RDOCUptkHeter,       &
-    RAcetateUptkHeter    => micflx%RAcetateUptkHeter,   &
-    FOCA                 => ncplxs%FOCA,                &
-    FOAA                 => ncplxs%FOAA,                &
-    CDOM                 => ncplxs%CDOM                 &
+  associate(                                                 &
+    OMActHeter             => nmics%OMActHeter,              &
+    FBiomStoiScalarHeter   => nmics%FBiomStoiScalarHeter,    &
+    RO2Dmnd4RespHeter      => nmicf%RO2Dmnd4RespHeter,       &
+    RO2DmndHeter           => nmicf%RO2DmndHeter,            &
+    ROQC4HeterMicrobAct    => nmicf%ROQC4HeterMicrobAct,     &
+    ZEROS                  => micfor%ZEROS,                  &
+    DOM                    => micstt%DOM,                    &
+    mid_Aerob_HeteroBacter => micpar%mid_Aerob_HeteroBacter, &
+    mid_Facult_DenitBacter => micpar%mid_Facult_DenitBacter, &
+    mid_Aerob_Fungi        => micpar%mid_Aerob_Fungi,        &
+    mid_aerob_N2Fixer      => micpar%mid_aerob_N2Fixer,      &
+    RO2DmndHetert          => micflx%RO2DmndHetert,          &
+    RDOCUptkHeter          => micflx%RDOCUptkHeter,          &
+    RAcetateUptkHeter      => micflx%RAcetateUptkHeter,      &
+    FOCA                   => ncplxs%FOCA,                   &
+    FOAA                   => ncplxs%FOAA,                   &
+    CDOM                   => ncplxs%CDOM                    &
   )
 !     ENERGY YIELDS OF O2 REDOX REACTIONS
 !     E* = growth respiration efficiency calculated in PARAMETERS
 !
-  IF(N.EQ.n_aero_hetrophb)THEN
+  IF(N.EQ.mid_Aerob_HeteroBacter)THEN
     EO2Q=EO2X
-  ELSEIF(N.EQ.n_O2facult_bacter)THEN
+  ELSEIF(N.EQ.mid_Facult_DenitBacter)THEN
     EO2Q=EO2D
-  ELSEIF(N.EQ.n_aero_fungi)THEN
+  ELSEIF(N.EQ.mid_Aerob_Fungi)THEN
     EO2Q=EO2G
-  ELSEIF(N.EQ.n_aero_n2fixer)THEN
+  ELSEIF(N.EQ.mid_aerob_N2Fixer)THEN
     EO2Q=ENFX
   ENDIF
 !
@@ -2571,8 +2608,10 @@ module MicBGCMod
   RGOCY=AZMAX1(FBiomStoiScalarHeter(NGL,K)*VMXO*WatStressMicb*OMActHeter(NGL,K))
   RGOCZ=RGOCY*FSBSTC*FOCA(K)*TSensGrowth
   RGOAZ=RGOCY*FSBSTA*FOAA(K)*TSensGrowth
+  !obtain kinetically unlimited DOM/acetate uptake 
   RGOCX=AZMAX1(DOM(idom_doc,K)*FOQC*EO2Q)
   RGOAX=AZMAX1(DOM(idom_acetate,K)*FOQA*EO2A)
+  !obtain the final uptake
   RGOCP=AMIN1(RGOCX,RGOCZ)
   RGOAP=AMIN1(RGOAX,RGOAZ)
   RGOMP=RGOCP+RGOAP
@@ -2587,11 +2626,11 @@ module MicBGCMod
 ! ENERGY YIELD AND O2 DEMAND FROM DOC AND ACETATE OXIDATION
 ! BY HETEROTROPHIC AEROBES
 
-! ECHZ=growth respiration yield
+! ECHZ=growth respiration yield, averaged over acetate and DOC/glucose
 ! RO2Dmnd4RespHeter,RO2DmndHeter,RO2DmndHetert=O2 demand from DOC,DOA oxidation
 ! RDOCUptkHeter,RAcetateUptkHeter=DOC,DOA demand from DOC,DOA oxidation
 ! ROQC4HeterMicrobAct=microbial respiration used to represent microbial activity
-!
+! CH2O+O2 -> CO2 + H2O, (32/12.=2.667)
   ECHZ=EO2Q*FGOCP+EO2A*FGOAP
   RO2Dmnd4RespHeter(NGL,K)=2.667_r8*RGOMP
   RO2DmndHeter(NGL,K)=RO2Dmnd4RespHeter(NGL,K)
@@ -2605,8 +2644,13 @@ module MicBGCMod
   end subroutine AerobicHeterotrophCatabolism
 !------------------------------------------------------------------------------------------
 
-  subroutine AnaerobCatabolism(NGL,N,K,TSensGrowth,WatStressMicb,FOQC,ECHZ,FGOCP,FGOAP,RGOMP, &
+  subroutine AnaerobAcetogenCatabolism(NGL,N,K,TSensGrowth,WatStressMicb,FOQC,ECHZ,FGOCP,FGOAP,RGOMP, &
     micfor,micstt,naqfdiag,ncplxs,nmicf,nmics,micflx)
+  !
+  !fermentation
+  !(CH2O)6 +2H2O-> 2CO2 + 2(CH2O)2 + 4H2, mole based
+  !(CH2O)6 -> 2CO2 + 2/3 (CH2O)2 + 8/(72)H2, mass based
+  !fermenters only take up DOC/glucose
   implicit none
   integer, intent(in) :: NGL,N,K
   REAL(R8), INTENT(IN) :: FOQC,WatStressMicb,TSensGrowth
@@ -2614,10 +2658,10 @@ module MicBGCMod
   real(r8), intent(out) :: FGOCP,FGOAP
   type(micforctype), intent(in) :: micfor
   type(micsttype), intent(inout) :: micstt
-  type(NitroAQMFluxDiagType), INTENT(INOUT) :: naqfdiag
-  type(NitroOMcplxStateType), intent(inout) :: ncplxs
-  type(NitroMicFluxType), intent(inout) :: nmicf
-  type(NitroMicStateType), intent(inout):: nmics
+  type(Cumlate_Flux_Diag_type), INTENT(INOUT) :: naqfdiag
+  type(OMCplx_State_type), intent(inout) :: ncplxs
+  type(Microbe_Flux_type), intent(inout) :: nmicf
+  type(Microbe_State_type), intent(inout):: nmics
   type(micfluxtype), intent(inout) :: micflx
   real(r8) :: GH2X,GH2F
   real(r8) :: GOAX,GOAF
@@ -2640,7 +2684,7 @@ module MicBGCMod
     RO2DmndHetert        => micflx%RO2DmndHetert,       &
     RDOCUptkHeter        => micflx%RDOCUptkHeter,       &
     RAcetateUptkHeter    => micflx%RAcetateUptkHeter,   &
-    n_anaero_ferm        => micpar%n_anaero_ferm,       &
+    mid_fermentor        => micpar%mid_fermentor,       &
     CDOM                 => ncplxs%CDOM                 &
   )
   GH2X=RGAS*1.E-3_r8*TKS*LOG((AMAX1(1.0E-03,CH2GS)/H2KI)**4)
@@ -2648,7 +2692,7 @@ module MicBGCMod
   GOAX=RGAS*1.E-3_r8*TKS*LOG((AMAX1(ZERO,CDOM(idom_acetate,K))/OAKI)**2)
   GOAF=GOAX/72.0
   GHAX=GH2F+GOAF
-  IF(N.EQ.n_anaero_ferm)THEN
+  IF(N.EQ.mid_fermentor)THEN
     ECHZ=AMAX1(EO2X,AMIN1(1.0_r8,1.0/(1.0+AZMAX1((GCHX-GHAX))/EOMF)))
   ELSE
     ECHZ=AMAX1(ENFX,AMIN1(1.0_r8,1.0/(1.0+AZMAX1((GCHX-GHAX))/EOMN)))
@@ -2683,24 +2727,31 @@ module MicBGCMod
   RDOCUptkHeter(NGL,K)=RGOFZ
   RAcetateUptkHeter(NGL,K)=0.0_r8
   ROQC4HeterMicrobAct(NGL,K)=RGOFY
-  naqfdiag%TRH2G=naqfdiag%TRH2G+RGOMP
+  naqfdiag%tCResp4H2Prod=naqfdiag%tCResp4H2Prod+RGOMP
 !
   end associate
-  end subroutine AnaerobCatabolism
+  end subroutine AnaerobAcetogenCatabolism
 !------------------------------------------------------------------------------------------
 
   subroutine HeteroDenitrificCatabolism(NGL,N,K,FOQC,RGOCP, &
     VOLWZ,micfor,micstt,naqfdiag,nmicf,nmics,ncplxs,micflx)
+
+  !Description
+  !FACULTATIVE denitrifcation
+  !(CH2O)6  + 6O2 -> 6CO2 +6 H2O
+  !(CH2O)6 + 12NO3(-) -> 6CO2 + 12NO2(-) + 6H2O, 12*14/(6*32) = 7/8=0.875
+  !(CH2O)6 + 12NO2(-) -> 6CO2 + 6N2O + 12OH(-), 12*14/(6*32)=7/8=0.875
+  !(CH2O)6 + 12N2O    -> 6CO2 + 12N2 + 6H2O,  24*14/(6*32)=7/4 = 1.75
   implicit none
   integer, intent(in) :: NGL,N,K
   REAL(R8), INTENT(IN) :: FOQC,RGOCP
   real(r8), intent(in) :: VOLWZ
   type(micforctype), intent(in) :: micfor
   type(micsttype), intent(inout) :: micstt
-  type(NitroAQMFluxDiagType), intent(inout) :: naqfdiag
-  type(NitroMicStateType), intent(inout) :: nmics
-  type(NitroMicFluxType), intent(inout) :: nmicf
-  type(NitroOMcplxStateType),intent(inout) :: ncplxs
+  type(Cumlate_Flux_Diag_type), intent(inout) :: naqfdiag
+  type(Microbe_State_type), intent(inout) :: nmics
+  type(Microbe_Flux_type), intent(inout) :: nmicf
+  type(OMCplx_State_type),intent(inout) :: ncplxs
   type(micfluxtype), intent(inout) :: micflx
   real(r8) :: FNO3S,FNO3B
   real(r8) :: FNO2S,FNO2B
@@ -2989,8 +3040,8 @@ module MicBGCMod
   real(r8), intent(in) :: RVOXPB
   type(micforctype), intent(in) :: micfor
   type(micsttype), intent(inout) :: micstt
-  type(NitroMicFluxType), intent(inout) :: nmicf
-  type(NitroMicStateType),intent(inout) :: nmics
+  type(Microbe_Flux_type), intent(inout) :: nmicf
+  type(Microbe_State_type),intent(inout) :: nmics
   type(micfluxtype), intent(inout) :: micflx
   integer  :: M,MX
   real(r8) :: COXYS1,DIFOX
@@ -3175,8 +3226,8 @@ module MicBGCMod
   type(micforctype), intent(in) :: micfor
   type(micsttype), intent(inout) :: micstt
   type(micfluxtype), intent(inout) :: micflx
-  type(NitroMicFluxType), intent(inout) :: nmicf
-  type(NitroMicStateType),intent(inout) :: nmics
+  type(Microbe_Flux_type), intent(inout) :: nmicf
+  type(Microbe_State_type),intent(inout) :: nmics
   real(r8) :: CNH4X,CNH4Y,CNO3X,CNO3Y
   real(r8) :: CH2PX,CH2PY
   real(r8) :: CH1PX,CH1PY
@@ -3574,17 +3625,18 @@ module MicBGCMod
   end subroutine BiomassMineralization
 !------------------------------------------------------------------------------------------
 
-  subroutine GatherMicrobialRespiration(NGL,N,K,RMOMK,RGrowthRespHeter,RMaintDefcitcitHeter,RMaintRespHeter, &
+  subroutine GatherHetertrophRespiration(NGL,N,K,RMOMK,RGrowthRespHeter,RMaintDefcitcitHeter,RMaintRespHeter, &
     micfor,micstt,nmicf,nmics)
   implicit none
   integer, intent(in) :: NGL,N,K
   real(r8), intent(in) :: RMOMK(2)
-  real(r8), intent(out) :: RGrowthRespHeter,RMaintDefcitcitHeter
+  real(r8), intent(out) :: RGrowthRespHeter       !growth respiraiton
+  real(r8), intent(out) :: RMaintDefcitcitHeter   !deficit for maintenance respiraiton
   real(r8), intent(out) :: RMaintRespHeter
   type(micforctype), intent(in) :: micfor
   type(micsttype), intent(inout) :: micstt
-  type(NitroMicStateType), intent(inout) :: nmics
-  type(NitroMicFluxType), intent(inout) :: nmicf
+  type(Microbe_State_type), intent(inout) :: nmics
+  type(Microbe_Flux_type), intent(inout) :: nmicf
   integer :: MID3,MID1
   REAL(R8) :: FPH,RMOMX
   real(r8) :: RGN2P
@@ -3602,8 +3654,8 @@ module MicBGCMod
     rPCOMC              => micpar%rPCOMC,             &
     pH                  => micfor%pH,                 &
     ZEROS               => micfor%ZEROS,              &
-    n_aero_n2fixer      => micpar%n_aero_n2fixer,     &
-    n_anero_n2fixer     => micpar%n_anero_n2fixer,    &
+    mid_aerob_N2Fixer   => micpar%mid_aerob_N2Fixer,  &
+    mid_Anaerob_N2Fixer  => micpar%mid_Anaerob_N2Fixer, &
     CZ2GS               => micstt%CZ2GS,              &
     mBiomeHeter         => micstt%mBiomeHeter         &
   )
@@ -3648,36 +3700,39 @@ module MicBGCMod
 !     OMGR*OMC(3,NGL,N,K)=nonstructural C limitation to Resp4NFixHeter
 !     RN2FixHeter=N2 fixation rate
 !
-  IF(N.EQ.n_aero_n2fixer .OR. N.EQ.n_anero_n2fixer)THEN
+  IF(N.EQ.mid_aerob_N2Fixer .OR. N.EQ.mid_Anaerob_N2Fixer)THEN
     MID3=micpar%get_micb_id(3,NGL)
     RGN2P=AZMAX1(mBiomeHeter(ielmc,MID3,K)*rNCOMC(3,NGL,K)-mBiomeHeter(ielmn,MID3,K))/EN2F(N)
     IF(RGrowthRespHeter.GT.ZEROS)THEN
       Resp4NFixHeter(NGL,K)=AMIN1(RGrowthRespHeter*RGN2P/(RGrowthRespHeter+RGN2P) &
         *CZ2GS/(CZ2GS+ZFKM),OMGR*mBiomeHeter(ielmc,MID3,K))
+      RN2FixHeter(NGL,K)=Resp4NFixHeter(NGL,K)*EN2F(N)  
     ELSE
       Resp4NFixHeter(NGL,K)=0.0_r8
-    ENDIF
-    RN2FixHeter(NGL,K)=Resp4NFixHeter(NGL,K)*EN2F(N)
+      RN2FixHeter(NGL,K)=0._r8
+    ENDIF    
   ENDIF
   end associate
-  end subroutine GatherMicrobialRespiration
+  end subroutine GatherHetertrophRespiration
 !------------------------------------------------------------------------------------------
 
-  subroutine GetMicrobialAnabolismFlux(NGL,N,K,ECHZ,FGOCP,FGOAP, &
+  subroutine GatherHetertrophAnabolicFlux(NGL,N,K,ECHZ,FGOCP,FGOAP, &
     RGrowthRespHeter,RMaintDefcitcitHeter,RMaintRespHeter,spomk,rmomk,micfor,micstt,nmicf,nmics,ncplxf,ncplxs)
   implicit none
   integer, intent(in) :: NGL,N,K
   real(r8), intent(in) :: ECHZ
-  real(r8), intent(in) :: FGOCP,FGOAP,RGrowthRespHeter
-  real(r8), intent(in) :: RMaintDefcitcitHeter,RMaintRespHeter
+  real(r8), intent(in) :: FGOCP,FGOAP
+  real(r8), intent(in) :: RGrowthRespHeter      !growth respiraiton
+  real(r8), intent(in) :: RMaintDefcitcitHeter  !maintenance deficit
+  real(r8), intent(in) :: RMaintRespHeter       !respiraiton for maintenance
   real(r8), intent(in) :: spomk(2)
   real(r8), intent(in) :: RMOMK(2)
   type(micforctype), intent(in) :: micfor
   type(micsttype), intent(inout) :: micstt
-  type(NitroMicStateType), intent(inout) :: nmics
-  type(NitroMicFluxType), intent(inout) :: nmicf
-  type(NitroOMcplxFluxType), intent(inout) :: ncplxf
-  type(NitroOMcplxStateType), intent(inout) :: ncplxs
+  type(Microbe_State_type), intent(inout) :: nmics
+  type(Microbe_Flux_type), intent(inout) :: nmicf
+  type(OMCplx_Flux_type), intent(inout) :: ncplxf
+  type(OMCplx_State_type), intent(inout) :: ncplxs
   integer :: M,MID1,MID3,MID,NE
   real(r8) :: RCCC,RCCN,RCCP
   real(r8) :: CCC,CGOMX,CGOMD
@@ -3686,7 +3741,7 @@ module MicBGCMod
   real(r8) :: C3C,CNC,CPC
   real(r8) :: CGOMZ
   real(r8) :: SPOMX
-  real(r8) :: FRM
+  real(r8) :: FracMaintDeficit
 !     begin_execution
   associate(                                                                    &
     rCNBiomeActHeter                 => nmics%rCNBiomeActHeter,                 &
@@ -3744,14 +3799,15 @@ module MicBGCMod
 !     rCNDOM,rCPDOM=DON/DOC, DOP/DOC
 !     FCN,FCP=limitation from N,P
 !
-
+!  write(*,*)'bf cgom',N,K,ECHZ,ENOX
   CGOMX=AMIN1(RMaintRespHeter,RespGrossHeter(NGL,K))+Resp4NFixHeter(NGL,K)+(RGrowthRespHeter-Resp4NFixHeter(NGL,K))/ECHZ
   CGOMD=RNOxReduxRespDenitLim(NGL,K)/ENOX
   DOMuptk4GrothHeter(ielmc,NGL,K)=CGOMX+CGOMD
-
+!  write(*,*)'CGOMX',N,K,CGOMX
   RAnabolDOCUptkHeter(NGL,K)=CGOMX*FGOCP+CGOMD
   RAnabolAcetUptkHeter(NGL,K)=CGOMX*FGOAP
   CGOXC=RAnabolDOCUptkHeter(NGL,K)+RAnabolAcetUptkHeter(NGL,K)
+  !obtain organic nutrient uptake
   DOMuptk4GrothHeter(ielmn,NGL,K)=AZMAX1(AMIN1(DOM(idom_don,K)*FracHeterBiomOfActK(NGL,K),CGOXC*rCNDOM(K)/FCN(NGL,K)))
   DOMuptk4GrothHeter(ielmp,NGL,K)=AZMAX1(AMIN1(DOM(idom_dop,K)*FracHeterBiomOfActK(NGL,K),CGOXC*rCPDOM(K)/FCP(NGL,K)))
 
@@ -3759,8 +3815,9 @@ module MicBGCMod
   TDOMUptkHeter(idom_acetate,K)=TDOMUptkHeter(idom_acetate,K)+RAnabolAcetUptkHeter(NGL,K)
   TDOMUptkHeter(ielmn,K)=TDOMUptkHeter(ielmn,K)+DOMuptk4GrothHeter(ielmn,NGL,K)
   TDOMUptkHeter(ielmp,K)=TDOMUptkHeter(ielmp,K)+DOMuptk4GrothHeter(ielmp,NGL,K)
+
 !
-!     TRANSFER UPTAKEN C,N,P FROM STORAGE TO ACTIVE BIOMASS
+!     TRANSFER UPTAKEN C,N,P FROM STORAGE/nonstructural TO ACTIVE BIOMASS
 !
 !     OMC,OMN,OMP=nonstructural C,N,P
 !     CCC,CNC,CPC=C:N:P ratios used to calculate C,N,P recycling
@@ -3821,12 +3878,14 @@ module MicBGCMod
 !
     MID=micpar%get_micb_id(M,NGL)
     SPOMX=SQRT(GrowthEnvScalHeter(NGL,K))*SPOMC(M)*SPOMK(M)
-    RKillOMHeter(ielmc,M,NGL,K)=AZMAX1(mBiomeHeter(ielmc,MID,K)*SPOMX)
-    RKillOMHeter(ielmn,M,NGL,K)=AZMAX1(mBiomeHeter(ielmn,MID,K)*SPOMX)
-    RKillOMHeter(ielmp,M,NGL,K)=AZMAX1(mBiomeHeter(ielmp,MID,K)*SPOMX)
+    DO NE=1,NumPlantChemElms
+      RKillOMHeter(NE,M,NGL,K)=AZMAX1(mBiomeHeter(NE,MID,K)*SPOMX)
+    ENDDO
+
     RkillLitfalOMHeter(ielmc,M,NGL,K)=RKillOMHeter(ielmc,M,NGL,K)*(1.0_r8-RCCC)
     RkillLitfalOMHeter(ielmn,M,NGL,K)=RKillOMHeter(ielmn,M,NGL,K)*(1.0_r8-RCCC)*(1.0_r8-RCCN)
     RkillLitfalOMHeter(ielmp,M,NGL,K)=RKillOMHeter(ielmp,M,NGL,K)*(1.0_r8-RCCC)*(1.0_r8-RCCP)
+
     DO NE=1,NumPlantChemElms    
       RkillRecycOMHeter(NE,M,NGL,K)=RKillOMHeter(NE,M,NGL,K)-RkillLitfalOMHeter(NE,M,NGL,K)
 !
@@ -3846,7 +3905,7 @@ module MicBGCMod
     ENDDO
   ENDDO D745
 !
-!     MICROBIAL DECOMPOSITION WHEN MAINTENANCE RESPIRATION
+!     MICROBIAL DECOMPOSITION/renomalization WHEN MAINTENANCE RESPIRATION
 !     EXCEEDS UPTAKE
 !
 !     OMC,OMN,OMP=microbial C,N,P
@@ -3860,17 +3919,19 @@ module MicBGCMod
 !     RMaintDefcitRecycOMHeter,R3MMN,R3MMP=microbial C,N,P recycling from senescence
 !
   IF(RMaintDefcitcitHeter.GT.ZEROS.AND.RMaintRespHeter.GT.ZEROS.AND.RCCC.GT.ZERO)THEN
-    FRM=RMaintDefcitcitHeter/RMaintRespHeter
+    FracMaintDeficit=RMaintDefcitcitHeter/RMaintRespHeter
     D730: DO M=1,2
       MID=micpar%get_micb_id(M,NGL)    
-      RMaintDefcitKillOMHeter(ielmc,M,NGL,K)=AMIN1(mBiomeHeter(ielmc,MID,K),AZMAX1(FRM*RMaintDmndHeter(M,NGL,K)/RCCC))
+      RMaintDefcitKillOMHeter(ielmc,M,NGL,K)=AMIN1(mBiomeHeter(ielmc,MID,K),AZMAX1(FracMaintDeficit*RMaintDmndHeter(M,NGL,K)/RCCC))
       RMaintDefcitKillOMHeter(ielmn,M,NGL,K)=AMIN1(mBiomeHeter(ielmn,MID,K),&
         AZMAX1(RMaintDefcitKillOMHeter(ielmc,M,NGL,K)*rCNBiomeActHeter(ielmn,NGL,K)))
       RMaintDefcitKillOMHeter(ielmp,M,NGL,K)=AMIN1(mBiomeHeter(ielmp,MID,K),&
         AZMAX1(RMaintDefcitKillOMHeter(ielmc,M,NGL,K)*rCNBiomeActHeter(ielmp,NGL,K)))
+        
       RMaintDefcitLitrfalOMHeter(ielmc,M,NGL,K)=RMaintDefcitKillOMHeter(ielmc,M,NGL,K)*(1.0_r8-RCCC)
-      RMaintDefcitLitrfalOMHeter(ielmn,M,NGL,K)=RMaintDefcitKillOMHeter(ielmn,M,NGL,K)*(1.0_r8-RCCN)*(1.0_r8-RCCC)
-      RMaintDefcitLitrfalOMHeter(ielmp,M,NGL,K)=RMaintDefcitKillOMHeter(ielmp,M,NGL,K)*(1.0_r8-RCCP)*(1.0_r8-RCCC)
+      RMaintDefcitLitrfalOMHeter(ielmn,M,NGL,K)=RMaintDefcitKillOMHeter(ielmn,M,NGL,K)*(1.0_r8-RCCC)*(1.0_r8-RCCN)
+      RMaintDefcitLitrfalOMHeter(ielmp,M,NGL,K)=RMaintDefcitKillOMHeter(ielmp,M,NGL,K)*(1.0_r8-RCCC)*(1.0_r8-RCCP)
+
       DO NE=1,NumPlantChemElms
         RMaintDefcitRecycOMHeter(NE,M,NGL,K)=RMaintDefcitKillOMHeter(NE,M,NGL,K)-RMaintDefcitLitrfalOMHeter(NE,M,NGL,K)
 !
@@ -3899,6 +3960,6 @@ module MicBGCMod
     ENDDO D720
   ENDIF
   end associate
-  end subroutine GetMicrobialAnabolismFlux
+  end subroutine GatherHetertrophAnabolicFlux
 
 end module MicBGCMod

@@ -231,8 +231,8 @@ module IngridTranspMod
     IF(VLSnowHeatCapM(M,L,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
       L2=MIN(JS,L+1)
       IF(L.LT.JS.AND.VLSnowHeatCapM(M,L2,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
-        IF(VLWatSnow(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-          VFLWW=AZMAX1(AMIN1(1.0_r8,WatFlowInSnowM(M,L2,NY,NX)/VLWatSnow(L,NY,NX)))
+        IF(VLWatSnow_col(L,NY,NX).GT.ZEROS2(NY,NX))THEN
+          VFLWW=AZMAX1(AMIN1(1.0_r8,WatFlowInSnowM(M,L2,NY,NX)/VLWatSnow_col(L,NY,NX)))
         ELSE
           VFLWW=1.0_r8
         ENDIF
@@ -261,9 +261,9 @@ module IngridTranspMod
 !
         IF(ICHKL.EQ.0)THEN
           !flow into soil
-          IF(VLWatSnow(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-            VFLWR=AZMAX1(AMIN1(1.0_r8,WatFlowSno2LitRM(M,NY,NX)/VLWatSnow(L,NY,NX)))
-            VFLWS=AZMAX1(AMIN1(1.0_r8,(WatFlowSno2MicPM(M,NY,NX)+WatFlowSno2MacPM(M,NY,NX))/VLWatSnow(L,NY,NX)))
+          IF(VLWatSnow_col(L,NY,NX).GT.ZEROS2(NY,NX))THEN
+            VFLWR=AZMAX1(AMIN1(1.0_r8,WatFlowSno2LitRM(M,NY,NX)/VLWatSnow_col(L,NY,NX)))
+            VFLWS=AZMAX1(AMIN1(1.0_r8,(WatFlowSno2MicPM(M,NY,NX)+WatFlowSno2MacPM(M,NY,NX))/VLWatSnow_col(L,NY,NX)))
           ELSE
             VFLWR=FracSurfByLitR(NY,NX)
             VFLWS=FracSurfAsBareSoi(NY,NX)
@@ -466,9 +466,9 @@ module IngridTranspMod
 !     DIF*=aqueous diffusivity-dispersivity between litter and soil surface
 !
   DLYR0=AMAX1(ZERO2,DLYR(3,0,NY,NX))
-  TORT0=TortMicPM(M,0,NY,NX)*FracSurfByLitR(NY,NX)
+  TORT0=TortMicPM_vr(M,0,NY,NX)*FracSurfByLitR(NY,NX)
   DLYR1=AMAX1(ZERO2,DLYR(3,NU(NY,NX),NY,NX))
-  TORT1=TortMicPM(M,NU(NY,NX),NY,NX)
+  TORT1=TortMicPM_vr(M,NU(NY,NX),NY,NX)
   TORTL=AMIN1(1.0_r8,(TORT0+TORT1)/(DLYR0+DLYR1))
   DISPN=DISP(3,NU(NY,NX),NY,NX)*AMIN1(VFLWX,ABS(FLWRM1/AREA(3,NU(NY,NX),NY,NX)))
 
@@ -1165,7 +1165,7 @@ module IngridTranspMod
 
     DLYR1=AMAX1(ZERO2,DLYR(N,N3,N2,N1))
     DLYR2=AMAX1(ZERO2,DLYR(N,N6,N5,N4))
-    TORTL=(TortMicPM(M,N3,N2,N1)*DLYR1+TortMicPM(M,N6,N5,N4)*DLYR2)/(DLYR1+DLYR2)
+    TORTL=(TortMicPM_vr(M,N3,N2,N1)*DLYR1+TortMicPM_vr(M,N6,N5,N4)*DLYR2)/(DLYR1+DLYR2)
 
     DISPN=DISP(N,N6,N5,N4)*AMIN1(VFLWX,ABS(WaterFlow2MicPM(M,N,N6,N5,N4)/AREA(N,N6,N5,N4)))
     DIFPO=(POSGL2(N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)

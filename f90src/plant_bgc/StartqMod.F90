@@ -46,7 +46,7 @@ module StartqMod
 !     iYearPlanting_pft,iDayPlanting_pft,iYearPlantHarvest_pft,iDayPlantHarvest_pft=year,day of planting,arvesting
 !     PPI,PPX=initial,current population (m-2)
 !     CF,ClumpFactorInit_pft=current,initial clumping factor
-!     MaxCanPStomaResistH2O_pft=cuticular resistance to water (h m-1)
+!     H2OCuticleResist_pft=cuticular resistance to water (h m-1)
 !     CO2CuticleResist_pft=cuticular resistance to CO2 (s m-1)
 !     CNWS,rCPNonstructRemob_pft=protein:N,protein:P ratios
 !    RootFracRemobilizableBiom=maximum root protein concentration (g g-1)
@@ -77,9 +77,9 @@ module StartqMod
 
           call InitSeedMorphoBio(NZ,NY,NX)
         ENDIF
-        ZEROP(NZ,NY,NX)=ZERO*PlantPopulation_pft(NZ,NY,NX)
-        ZEROQ(NZ,NY,NX)=ZERO*PlantPopulation_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        ZEROL(NZ,NY,NX)=ZERO*PlantPopulation_pft(NZ,NY,NX)*1.0E+06_r8
+        ZERO4Groth_pft(NZ,NY,NX)=ZERO*PlantPopulation_pft(NZ,NY,NX)
+        ZERO4Uptk_pft(NZ,NY,NX)=ZERO*PlantPopulation_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        ZERO4LeafVar_pft(NZ,NY,NX)=ZERO*PlantPopulation_pft(NZ,NY,NX)*1.0E+06_r8
       ENDDO D9985
 !
 !     FILL OUT UNUSED ARRAYS
@@ -107,16 +107,16 @@ module StartqMod
   implicit none
   integer, intent(in) :: NZ, NY, NX
 
-  iYearPlanting_pft(NZ,NY,NX)=IYRX(NZ,NY,NX)   !planting year
-  iDayPlanting_pft(NZ,NY,NX)=IDAYX(NZ,NY,NX) !planting day
-  iYearPlantHarvest_pft(NZ,NY,NX)=IYRY(NZ,NY,NX)
-  iDayPlantHarvest_pft(NZ,NY,NX)=IDAYY(NZ,NY,NX)
-  PPI(NZ,NY,NX)=PPZ(NZ,NY,NX)
+  iYearPlanting_pft(NZ,NY,NX)=iPlantingYear_pft(NZ,NY,NX)   !planting year
+  iDayPlanting_pft(NZ,NY,NX)=iPlantingDay_pft(NZ,NY,NX) !planting day
+  iYearPlantHarvest_pft(NZ,NY,NX)=iHarvestYear_pft(NZ,NY,NX)
+  iDayPlantHarvest_pft(NZ,NY,NX)=iHarvestDay_pft(NZ,NY,NX)
+  PPI(NZ,NY,NX)=PPatSeeding_pft(NZ,NY,NX)
   PPX_pft(NZ,NY,NX)=PPI(NZ,NY,NX)
   ClumpFactor_pft(NZ,NY,NX)=ClumpFactorInit_pft(NZ,NY,NX)       !clumping factor
   
-  MaxCanPStomaResistH2O_pft(NZ,NY,NX)=RSMX(NZ,NY,NX)/3600.0_r8
-  CO2CuticleResist_pft(NZ,NY,NX)=RSMX(NZ,NY,NX)*1.56_r8
+  H2OCuticleResist_pft(NZ,NY,NX)=CuticleResist_pft(NZ,NY,NX)/3600.0_r8
+  CO2CuticleResist_pft(NZ,NY,NX)=CuticleResist_pft(NZ,NY,NX)*1.56_r8
   rCNNonstructRemob_pft(NZ,NY,NX)=2.5_r8
   rCPNonstructRemob_pft(NZ,NY,NX)=25.0_r8
   RootFracRemobilizableBiom(NZ,NY,NX)=AMIN1(RootrNC_pft(NZ,NY,NX)*rCNNonstructRemob_pft(NZ,NY,NX)&
@@ -334,13 +334,13 @@ module StartqMod
 !
 !     CONCURRENT NODE GROWTH
 !
-!     FNOD=scales node number for perennial vegetation (e.g. trees)
+!     FracGroth2Node_pft=scales node number for perennial vegetation (e.g. trees)
 !     NumCogrowNode=number of concurrently growing nodes
 !
   IF(iPlantTurnoverPattern_pft(NZ,NY,NX).EQ.0 .OR. &
     (.not.is_plant_treelike(iPlantRootProfile_pft(NZ,NY,NX))))THEN
     ! deciduous or shallow root
-    FNOD(NZ,NY,NX)=1.0_r8
+    FracGroth2Node_pft(NZ,NY,NX)=1.0_r8
 !
     IF(MatureGroup_pft(NZ,NY,NX).LE.10)THEN
       NumCogrowNode(NZ,NY,NX)=3
@@ -350,7 +350,7 @@ module StartqMod
       NumCogrowNode(NZ,NY,NX)=5
     ENDIF
   ELSE
-    FNOD(NZ,NY,NX)=AMAX1(1.0_r8,0.04_r8/RefLeafAppearRate_pft(NZ,NY,NX))
+    FracGroth2Node_pft(NZ,NY,NX)=AMAX1(1.0_r8,0.04_r8/RefLeafAppearRate_pft(NZ,NY,NX))
     NumCogrowNode(NZ,NY,NX)=24
   ENDIF
   end associate
@@ -417,7 +417,7 @@ module StartqMod
 !     VmaxPO4Root_pft,KmPO4Root_pft,CMinPO4Root_pft=H2PO4 max uptake(g m-2 h-1),Km(uM),min concn (uM)
 !     RSRR,RSRA=radial,axial root resistivity (m2 MPa-1 h-1)
 !
-  SeedDepth_pft(NZ,NY,NX)=PlantinDepth(NZ,NY,NX)
+  SeedDepth_pft(NZ,NY,NX)=PlantinDepz_pft(NZ,NY,NX)
   D9795: DO L=NU(NY,NX),NL(NY,NX)
     IF(SeedDepth_pft(NZ,NY,NX).GE.CumSoilThickness(L-1,NY,NX) &
       .AND.SeedDepth_pft(NZ,NY,NX).LT.CumSoilThickness(L,NY,NX))THEN
@@ -524,7 +524,7 @@ module StartqMod
 !
 !     INITIALIZE PLANT MORPHOLOGY AND BIOMASS
 !
-  HoursCanopyPSITooLow_pft(NZ,NY,NX)=0._r8
+  HoursTooLowPsiCan_pft(NZ,NY,NX)=0._r8
   ChillHours_pft(NZ,NY,NX)=0._r8
   CanopyNonstElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)=0._r8
   CanopyNodulNonstElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)=0._r8
@@ -565,7 +565,7 @@ module StartqMod
       LeafAreaNode_brch(K,NB,NZ,NY,NX)=0._r8
       LiveInterNodeHight_brch(K,NB,NZ,NY,NX)=0._r8
       InternodeHeightDying_brch(K,NB,NZ,NY,NX)=0._r8
-      PetioleLengthNode_brch(K,NB,NZ,NY,NX)=0._r8
+      PetoleLensNode_brch(K,NB,NZ,NY,NX)=0._r8
       LeafElmntNode_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX)=0._r8
       PetioleElmntNode_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX)=0._r8
       InternodeStrutElms_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX)=0._r8
@@ -688,12 +688,12 @@ module StartqMod
   TKC(NZ,NY,NX)=units%Celcius2Kelvin(TCelciusCanopy_pft(NZ,NY,NX))
   TCG(NZ,NY,NX)=TCelciusCanopy_pft(NZ,NY,NX)
   TKG(NZ,NY,NX)=units%Celcius2Kelvin(TCG(NZ,NY,NX))
-  fTgrowCanP(NZ,NY,NX)=1.0_r8
+  fTCanopyGroth_pft(NZ,NY,NX)=1.0_r8
   PSICanopy_pft(NZ,NY,NX)=-1.0E-03_r8
-  PSICanopyOsmo_pft(NZ,NY,NX)=OSMO(NZ,NY,NX)+PSICanopy_pft(NZ,NY,NX)
+  PSICanopyOsmo_pft(NZ,NY,NX)=CanOsmoPsi0pt_pft(NZ,NY,NX)+PSICanopy_pft(NZ,NY,NX)
   PSICanopyTurg_pft(NZ,NY,NX)=AZMAX1(PSICanopy_pft(NZ,NY,NX)-PSICanopyOsmo_pft(NZ,NY,NX))
   Transpiration_pft(NZ,NY,NX)=0._r8
-  FracRadPARbyCanopy_pft(NZ,NY,NX)=0._r8
+  FracPARRadbyCanopy_pft(NZ,NY,NX)=0._r8
   end subroutine InitPlantHeatandWater
 !------------------------------------------------------------------------------------------
 
@@ -722,7 +722,7 @@ module StartqMod
     D20: DO L=1,NL(NY,NX)
       AllPlantRootH2OUptake_vr(N,L,NZ,NY,NX)=0._r8
       PSIRoot_pvr(N,L,NZ,NY,NX)=-0.01_r8
-      PSIRootOSMO_vr(N,L,NZ,NY,NX)=OSMO(NZ,NY,NX)+PSIRoot_pvr(N,L,NZ,NY,NX)
+      PSIRootOSMO_vr(N,L,NZ,NY,NX)=CanOsmoPsi0pt_pft(NZ,NY,NX)+PSIRoot_pvr(N,L,NZ,NY,NX)
       PSIRootTurg_vr(N,L,NZ,NY,NX)=AZMAX1(PSIRoot_pvr(N,L,NZ,NY,NX)-PSIRootOSMO_vr(N,L,NZ,NY,NX))
       RootMycoNonstElms_rpvr(1:NumPlantChemElms,N,L,NZ,NY,NX)=0._r8
       RootNonstructElmConc_pvr(1:NumPlantChemElms,N,L,NZ,NY,NX)=0._r8

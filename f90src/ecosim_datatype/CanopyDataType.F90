@@ -14,9 +14,9 @@ module CanopyDataType
   real(r8),target,allocatable ::  RadPARLeafTransmis_pft(:,:,:)                        !canopy PAR transmissivity , [-]
   real(r8),target,allocatable ::  LeafSWabsorpty_pft(:,:,:)                        !canopy shortwave absorptivity , [-]
   real(r8),target,allocatable ::  LeafPARabsorpty_pft(:,:,:)                        !canopy PAR absorptivity , [-]
-  real(r8),target,allocatable ::  RSMX(:,:,:)                        !maximum stomatal resistance to vapor, [s m-1]
+  real(r8),target,allocatable ::  CuticleResist_pft(:,:,:)                        !maximum stomatal resistance to vapor, [s m-1]
   real(r8),target,allocatable ::  CO2CuticleResist_pft(:,:,:)                        !maximum stomatal resistance to CO2, [s h-1]
-  real(r8),target,allocatable ::  MaxCanPStomaResistH2O_pft(:,:,:)      !maximum stomatal resistance to vapor, [s h-1]
+  real(r8),target,allocatable ::  H2OCuticleResist_pft(:,:,:)      !maximum stomatal resistance to vapor, [s h-1]
   real(r8),target,allocatable ::  RCS(:,:,:)                         !shape parameter for calculating stomatal resistance from turgor pressure, [-]
   real(r8),target,allocatable ::  CanPStomaResistH2O_pft(:,:,:)         !canopy stomatal resistance, [h m-1]
   real(r8),target,allocatable ::  MinCanPStomaResistH2O_pft(:,:,:)      !canopy minimum stomatal resistance, [s m-1]
@@ -65,7 +65,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  LWRadCanopy_pft(:,:,:)                   !canopy longwave radiation , [MJ d-2 h-1]
   real(r8),target,allocatable ::  RadSWbyCanopy_pft(:,:,:)                 !canopy absorbed shortwave radiation , [MJ d-2 h-1]
   real(r8),target,allocatable ::  RadPARbyCanopy_pft(:,:,:)                   !canopy absorbed PAR , [umol m-2 s-1]
-  real(r8),target,allocatable ::  FracRadPARbyCanopy_pft(:,:,:)                       !fraction of incoming PAR absorbed by canopy, [-]
+  real(r8),target,allocatable ::  FracPARRadbyCanopy_pft(:,:,:)                       !fraction of incoming PAR absorbed by canopy, [-]
   real(r8),target,allocatable ::  TAU_RadThru(:,:,:)                        !fraction of radiation transmitted by canopy layer, [-]
   real(r8),target,allocatable ::  TAU_DirRadTransm(:,:,:)                        !fraction of radiation intercepted by canopy layer, [-]
   real(r8),target,allocatable ::  FracSWRad2Grnd(:,:)                         !fraction of radiation intercepted by ground surface, [-]
@@ -168,9 +168,9 @@ module CanopyDataType
   allocate(RadPARLeafTransmis_pft(JP,JY,JX));     RadPARLeafTransmis_pft=0._r8
   allocate(LeafSWabsorpty_pft(JP,JY,JX));     LeafSWabsorpty_pft=0._r8
   allocate(LeafPARabsorpty_pft(JP,JY,JX));     LeafPARabsorpty_pft=0._r8
-  allocate(RSMX(JP,JY,JX));     RSMX=0._r8
+  allocate(CuticleResist_pft(JP,JY,JX));     CuticleResist_pft=0._r8
   allocate(CO2CuticleResist_pft(JP,JY,JX));     CO2CuticleResist_pft=0._r8
-  allocate(MaxCanPStomaResistH2O_pft(JP,JY,JX));     MaxCanPStomaResistH2O_pft=0._r8
+  allocate(H2OCuticleResist_pft(JP,JY,JX));     H2OCuticleResist_pft=0._r8
   allocate(RCS(JP,JY,JX));      RCS=0._r8
   allocate(CanPStomaResistH2O_pft(JP,JY,JX));       CanPStomaResistH2O_pft=0._r8
   allocate(MinCanPStomaResistH2O_pft(JP,JY,JX));     MinCanPStomaResistH2O_pft=0._r8
@@ -219,7 +219,7 @@ module CanopyDataType
   allocate(LWRadCanopy_pft(JP,JY,JX));    LWRadCanopy_pft=0._r8
   allocate(RadSWbyCanopy_pft(JP,JY,JX));     RadSWbyCanopy_pft=0._r8
   allocate(RadPARbyCanopy_pft(JP,JY,JX));     RadPARbyCanopy_pft=0._r8
-  allocate(FracRadPARbyCanopy_pft(JP,JY,JX));    FracRadPARbyCanopy_pft=0._r8
+  allocate(FracPARRadbyCanopy_pft(JP,JY,JX));    FracPARRadbyCanopy_pft=0._r8
   allocate(TAU_RadThru(NumOfCanopyLayers+1,JY,JX));   TAU_RadThru=0._r8
   allocate(TAU_DirRadTransm(NumOfCanopyLayers+1,JY,JX));   TAU_DirRadTransm=0._r8
   allocate(FracSWRad2Grnd(JY,JX));       FracSWRad2Grnd=0._r8
@@ -325,9 +325,9 @@ module CanopyDataType
   call destroy(RadPARLeafTransmis_pft)
   call destroy(LeafSWabsorpty_pft)
   call destroy(LeafPARabsorpty_pft)
-  call destroy(RSMX)
+  call destroy(CuticleResist_pft)
   call destroy(CO2CuticleResist_pft)
-  call destroy(MaxCanPStomaResistH2O_pft)
+  call destroy(H2OCuticleResist_pft)
   call destroy(RCS)
   call destroy(CanPStomaResistH2O_pft)
   call destroy(MinCanPStomaResistH2O_pft)
@@ -376,7 +376,7 @@ module CanopyDataType
   call destroy(LWRadCanopy_pft)
   call destroy(RadSWbyCanopy_pft)
   call destroy(RadPARbyCanopy_pft)
-  call destroy(FracRadPARbyCanopy_pft)
+  call destroy(FracPARRadbyCanopy_pft)
   call destroy(TAU_RadThru)
   call destroy(TAU_DirRadTransm)
   call destroy(FracSWRad2Grnd)

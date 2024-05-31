@@ -15,7 +15,7 @@ module EcoSIMHistMod
   CHARACTER(len=16),target,allocatable :: DATAZ(:,:,:)
   CHARACTER(len=16),target,allocatable :: OUTFILS(:,:,:)
   CHARACTER(len=16),target,allocatable :: OUTFILP(:,:,:,:)
-  CHARACTER(len=16) :: DATAX(JP),DATAY(JP)
+  CHARACTER(len=16) :: DATAX_pft(JP),DATAY(JP)
   CHARACTER(len=16) :: OUTS(10)
   CHARACTER(len=16) :: OUTP(10)
   CHARACTER(len=3) :: CHOICE(102,20)

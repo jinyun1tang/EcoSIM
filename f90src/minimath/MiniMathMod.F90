@@ -52,7 +52,11 @@ module minimathmod
    real(r8), intent(in) :: a,b
    real(r8) :: ans
 
-   ans = a*b/(b*b+tiny_val)
+   if(abs(b)<tiny_val)then
+     ans=tiny_val
+   else
+     ans = a/b
+   endif
 
    return
    end function safe_adb

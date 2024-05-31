@@ -53,7 +53,7 @@ module StartsMod
   !
   !     BulkDensLitR=dry bulk density of woody(0),fine(1),manure(2) litter
   !     FORGC=minimum SOC for organic soil (g Mg-1)
-  !      VolMaxSoilMoist4Fire,FCH4F=maximum SWC,CH4 emission fraction for combustion
+  !      VolMaxSoilMoist4Fire,FrcAsCH4byFire=maximum SWC,CH4 emission fraction for combustion
   !     PSIHY=hygroscopic water potential (MPa)
   !     FCI,WPI=FC,WP for water retention by ice (MPa)
   !     CDPTHSI=depth to bottom of snowpack layers
@@ -102,7 +102,6 @@ module StartsMod
 
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
-
       !
       !     MINIMUM SURFACE ELEVATION IN LANDSCAPE
       !
@@ -163,9 +162,6 @@ module StartsMod
     ! ActiveLayDepth=active layer depth (m)
       ActiveLayDepth(NY,NX)=9999.0_r8
 !
-!     INITIALIZE SNOWPACK LAYERS
-      call InitSnowLayers(NY,NX)
-
 !     VHeatCapLitR,VHCPNX=minimum heat capacities for solving
 !      surface litter,soil layer water and heat fluxes
       VHeatCapLitR(NY,NX)=VLHeatCapLitRMin*AREA(3,NU(NY,NX),NY,NX)
@@ -184,7 +180,6 @@ module StartsMod
       TKS(0,NY,NX)=ATKS(NY,NX)
       TKSD(NY,NX)=ATKS(NY,NX)+2.052E-04_r8*SoilHeatSrcDepth(NY,NX)/TCNDG
 !
-
     ENDDO
   ENDDO
 
@@ -200,6 +195,12 @@ module StartsMod
 !
   call InitSoilVars(NHW,NHE,NVN,NVS,ALTZG,LandScape1stSoiLayDepth)
 
+  DO  NX=NHW,NHE
+    DO  NY=NVN,NVS
+!     INITIALIZE SNOWPACK LAYERS
+      call InitSnowLayers(NY,NX)
+    ENDDO  
+  ENDDO
   RETURN
   END subroutine starts
 !------------------------------------------------------------------------------------------
@@ -315,9 +316,13 @@ module StartsMod
       !     SURFACE LITTER HEAT CAPACITY
       !
       SoilMicPMassLayerMn(NY,NX)=AZMAX1(SAND(NU(NY,NX),NY,NX)+SILT(NU(NY,NX),NY,NX)+CLAY(NU(NY,NX),NY,NX))
-      VHeatCapacity(0,NY,NX)=cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP(0,NY,NX)
+      IF(VLitR(NY,NX).GT.ZEROS(NY,NX))THEN
+        VHeatCapacity(0,NY,NX)=cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP(0,NY,NX)
+      else
+        VHeatCapacity(0,NY,NX)=0._r8
+      endif
       VHeatCapacitySoilM(0,NY,NX)=0.0_r8
-      VLMicPt0(0,NY,NX)=0.0_r8
+      VLMicPt0_col(0,NY,NX)=0.0_r8      
     ENDDO
   ENDDO
   end subroutine InitSoilVars
@@ -422,7 +427,7 @@ module StartsMod
       ENDIF
       POROSI(L,NY,NX)=POROS(L,NY,NX)*FracSoiAsMicP(L,NY,NX)
       VLMicP_vr(L,NY,NX)=POROS(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
-      VLMicPt0(L,NY,NX)=VLMicP_vr(L,NY,NX)
+      VLMicPt0_col(L,NY,NX)=VLMicP_vr(L,NY,NX)
       VLMacP(L,NY,NX)=SoilFracAsMacP(L,NY,NX)*VGeomLayert0(L,NY,NX)
       !
       !     LAYER HEAT CONTENTS
@@ -767,7 +772,7 @@ module StartsMod
   ATCS(:,:)=ATCAI(:,:)
   TairKClimMean(:,:)=units%Celcius2Kelvin(ATCA)
   ATKS(:,:)=units%Celcius2Kelvin(ATCS)
-  URAIN(:,:)=0.0_r8
+  URAIN_col(:,:)=0.0_r8
 
   CO2byFire_col(:,:)=0.0_r8
   CH4byFire_col(:,:)=0.0_r8
@@ -850,11 +855,11 @@ module StartsMod
   integer, intent(in) :: NY, NX
   integer :: L,K,j
   real(r8) :: VLitR0
-  associate(                              &
-    NumOfLitrCmplxs    => micpar%NumOfLitrCmplxs    , &
-    k_woody_litr => micpar%k_woody_litr , &
-    k_fine_litr  => micpar%k_fine_litr  , &
-    k_manure     => micpar%k_manure       &
+  associate(                                   &
+    NumOfLitrCmplxs => micpar%NumOfLitrCmplxs, &
+    k_woody_litr    => micpar%k_woody_litr,    &
+    k_fine_litr     => micpar%k_fine_litr,     &
+    k_manure        => micpar%k_manure         &
   )
 
 !     begin_execution
@@ -1056,13 +1061,12 @@ module StartsMod
 !     BIOLOGICAL ACTIVITY
 !
       call InitHGrid(NY,NX)
+
       call InitLayerDepths(NY,NX)
+
     ! ActiveLayDepth=active layer depth (m)
       ActiveLayDepth(NY,NX)=9999.0_r8
 !
-!     INITIALIZE SNOWPACK LAYERS
-      call InitSnowLayers(NY,NX)
-
 !     VHeatCapLitR,VHCPNX=minimum heat capacities for solving
 !      surface litter,soil layer water and heat fluxes
       VHeatCapLitR(NY,NX)=VLHeatCapLitRMin*AREA(3,NU(NY,NX),NY,NX)
@@ -1081,7 +1085,6 @@ module StartsMod
       TKS(0,NY,NX)=ATKS(NY,NX)
       TKSD(NY,NX)=ATKS(NY,NX)+2.052E-04_r8*SoilHeatSrcDepth(NY,NX)/TCNDG
 !
-
     ENDDO
   ENDDO
 
@@ -1093,9 +1096,15 @@ module StartsMod
   CanopyLeafAareZ_col(1:NumOfCanopyLayers,:,:)=0.0_r8
   CanopyStemAareZ_col(1:NumOfCanopyLayers,:,:)=0.0_r8
   tCanLeafC_cl(1:NumOfCanopyLayers,:,:)=0.0_r8
-
 !
   call InitSoilVars(NHW,NHE,NVN,NVS,ALTZG,LandScape1stSoiLayDepth)
+
+!     INITIALIZE SNOWPACK LAYERS
+  DO  NX=NHW,NHE
+    DO  NY=NVN,NVS
+      call InitSnowLayers(NY,NX)
+    ENDDO  
+  ENDDO
   end subroutine startsim
 
 end module StartsMod

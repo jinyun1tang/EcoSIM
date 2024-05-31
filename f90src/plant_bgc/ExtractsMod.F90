@@ -152,7 +152,7 @@ module ExtractsMod
     RUPGasSol_vr              => plt_rbgc%RUPGasSol_vr,             &
     RootNutUptake_pvr         => plt_rbgc%RootNutUptake_pvr,        &
     trcg_air2root_flx_vr      => plt_rbgc%trcg_air2root_flx_vr,     &
-    trcg_root_vr                  => plt_rbgc%trcg_root_vr,                 &
+    trcg_root_vr              => plt_rbgc%trcg_root_vr,             &
     RootO2Dmnd4Resp_pvr       => plt_rbgc%RootO2Dmnd4Resp_pvr,      &
     RootMycoExudElm_pvr       => plt_rbgc%RootMycoExudElm_pvr,      &
     RootNH4DmndSoil_pvr       => plt_rbgc%RootNH4DmndSoil_pvr,      &

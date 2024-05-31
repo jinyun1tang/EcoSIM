@@ -268,13 +268,13 @@ module Hour1Mod
 !     CanopyLeafArea_pft,CanopyStemArea_pft=leaf,stalk area of PFT
 !     FLWC,TFLWC=water retention of PFT,combined canopy
 !     PRECA=precipitation+irrigation
-!     FracRadPARbyCanopy_pft=fraction of radiation received by each PFT canopy
+!     FracPARRadbyCanopy_pft=fraction of radiation received by each PFT canopy
 !     VOLWC=canopy surface water retention
 !
   DO  NZ=1,NP(NY,NX)
     VOLWCX=XVOLWC(iPlantRootProfile_pft(NZ,NY,NX))*(CanopyLeafArea_pft(NZ,NY,NX)+CanopyStemArea_pft(NZ,NY,NX))
-    PrecIntcptByCanopy_pft(NZ,NY,NX)=AZMAX1(AMIN1(PrecRainAndSurfirrig(NY,NX)*FracRadPARbyCanopy_pft(NZ,NY,NX),VOLWCX-WatByPCanopy(NZ,NY,NX)))
-    TFLWCI(NY,NX)=TFLWCI(NY,NX)+PrecRainAndSurfirrig(NY,NX)*FracRadPARbyCanopy_pft(NZ,NY,NX)
+    PrecIntcptByCanopy_pft(NZ,NY,NX)=AZMAX1(AMIN1(PrecRainAndSurfirrig(NY,NX)*FracPARRadbyCanopy_pft(NZ,NY,NX),VOLWCX-WatByPCanopy(NZ,NY,NX)))
+    TFLWCI(NY,NX)=TFLWCI(NY,NX)+PrecRainAndSurfirrig(NY,NX)*FracPARRadbyCanopy_pft(NZ,NY,NX)
     PrecIntcptByCanG(NY,NX)=PrecIntcptByCanG(NY,NX)+PrecIntcptByCanopy_pft(NZ,NY,NX)
   ENDDO
 
@@ -745,62 +745,63 @@ module Hour1Mod
   integer :: L
 !     begin_execution
 
-  Qinflx2Soil_col(NY,NX)=0._r8
-  HeatFlx2G_col(NY,NX)=0._r8
-  DIC_mass_col(NY,NX)=0.0_r8
-  tMicBiome_col(1:NumPlantChemElms,NY,NX)=0.0_r8
-  tSoilOrgM_col(1:NumPlantChemElms,NY,NX)=0._r8
-  UVLWatMicP(NY,NX)=0.0_r8
-  tLitrOM_col(1:NumPlantChemElms,NY,NX)=0.0_r8
-  tHumOM_col(1:NumPlantChemElms,NY,NX)=0.0_r8
-  tNH4_col(NY,NX)=0.0_r8
-  tNO3_col(NY,NX)=0.0_r8
-  tHxPO4_col(NY,NX)=0.0_r8
-  tXPO4_col(NY,NX)=0.0_r8
-  UION(NY,NX)=0.0_r8
-  FWatDischarge(NY,NX)=0.0_r8
-  SurfGasFlx_col(idg_beg:idg_NH3,NY,NX)=0.0_r8
-  WatFLo2Litr(NY,NX)=0.0_r8
-  HeatFLo2LitrByWat(NY,NX)=0.0_r8
-  TLitrIceFlxThaw(NY,NX)=0.0_r8
-  TLitrIceHeatFlxFrez(NY,NX)=0.0_r8
-  HeatByRadiation(NY,NX)=0.0_r8
-  HeatSensAir2Surf(NY,NX)=0.0_r8
-  HeatEvapAir2Surf(NY,NX)=0.0_r8
-  HeatSensVapAir2Surf(NY,NX)=0.0_r8
-  HeatNet2Surf(NY,NX)=0.0_r8
-  VapXAir2GSurf(NY,NX)=0.0_r8
+  tRDOE2Die_col(1:NumPlantChemElms,NY,NX)  = 0._r8
+  Qinflx2Soil_col(NY,NX)                  = 0._r8
+  HeatFlx2G_col(NY,NX)                    = 0._r8
+  DIC_mass_col(NY,NX)                     = 0.0_r8
+  tMicBiome_col(1:NumPlantChemElms,NY,NX) = 0.0_r8
+  tSoilOrgM_col(1:NumPlantChemElms,NY,NX) = 0._r8
+  UVLWatMicP(NY,NX)                       = 0.0_r8
+  tLitrOM_col(1:NumPlantChemElms,NY,NX)   = 0.0_r8
+  tHumOM_col(1:NumPlantChemElms,NY,NX)    = 0.0_r8
+  tNH4_col(NY,NX)                         = 0.0_r8
+  tNO3_col(NY,NX)                         = 0.0_r8
+  tHxPO4_col(NY,NX)                       = 0.0_r8
+  tXPO4_col(NY,NX)                        = 0.0_r8
+  UION(NY,NX)                             = 0.0_r8
+  FWatDischarge(NY,NX)                    = 0.0_r8
+  SurfGasFlx_col(idg_beg:idg_NH3,NY,NX)   = 0.0_r8
+  WatFLo2Litr(NY,NX)                      = 0.0_r8
+  HeatFLo2LitrByWat(NY,NX)                = 0.0_r8
+  TLitrIceFlxThaw(NY,NX)                  = 0.0_r8
+  TLitrIceHeatFlxFrez(NY,NX)              = 0.0_r8
+  HeatByRadiation(NY,NX)                  = 0.0_r8
+  HeatSensAir2Surf(NY,NX)                 = 0.0_r8
+  HeatEvapAir2Surf(NY,NX)                 = 0.0_r8
+  HeatSensVapAir2Surf(NY,NX)              = 0.0_r8
+  HeatNet2Surf(NY,NX)                     = 0.0_r8
+  VapXAir2GSurf(NY,NX)                    = 0.0_r8
 
-  GasSfAtmFlx_col(idg_beg:idg_end,NY,NX)=0._r8
+  GasSfAtmFlx_col(idg_beg:idg_end,NY,NX) = 0._r8
   trcg_surf_disevap_flx(idg_beg:idg_end-1,NY,NX)=0.0_r8
 
-  CanWat_col(NY,NX)=0.0_r8
-  CanH2OHeldVg(NY,NX)=0.0_r8
-  TFLWCI(NY,NX)=0.0_r8
-  PrecIntcptByCanG(NY,NX)=0.0_r8
-  TEVAPP(NY,NX)=0.0_r8
-  VapXAir2CanG(NY,NX)=0.0_r8
-  THFLXC(NY,NX)=0.0_r8
-  TENGYC(NY,NX)=0.0_r8
+  CanWat_col(NY,NX)       = 0.0_r8
+  CanH2OHeldVg(NY,NX)     = 0.0_r8
+  TFLWCI(NY,NX)           = 0.0_r8
+  PrecIntcptByCanG(NY,NX) = 0.0_r8
+  TEVAPP(NY,NX)           = 0.0_r8
+  VapXAir2CanG(NY,NX)     = 0.0_r8
+  THFLXC(NY,NX)           = 0.0_r8
+  TENGYC(NY,NX)           = 0.0_r8
 
   TRootGasLossDisturb_pft(idg_beg:idg_end-1,NY,NX)=0.0_r8
   LitrFallStrutElms_col(:,NY,NX)=0.0_r8
   StandingDeadStrutElms_col(1:NumPlantChemElms,NY,NX)=0.0_r8
   PlantPopu_col(NY,NX)=0.0_r8
 ! zero arrays in the snow layers
-  WatConvSno2MicP(1:JS,NY,NX)=0.0_r8
-  WatConvSno2MacP(1:JS,NY,NX)=0.0_r8
-  HeatConvSno2Soi(1:JS,NY,NX)=0.0_r8
-  WatConvSno2LitR(1:JS,NY,NX)=0.0_r8
-  HeatConvSno2LitR(1:JS,NY,NX)=0.0_r8
-  SnoXfer2SnoLay(1:JS,NY,NX)=0.0_r8
-  WatXfer2SnoLay(1:JS,NY,NX)=0.0_r8
-  IceXfer2SnoLay(1:JS,NY,NX)=0.0_r8
-  HeatXfer2SnoLay(1:JS,NY,NX)=0.0_r8
-  XPhaseChangeHeatL(1:JS,NY,NX)=0.0_r8
+  WatConvSno2MicP(1:JS,NY,NX)   = 0.0_r8
+  WatConvSno2MacP(1:JS,NY,NX)   = 0.0_r8
+  HeatConvSno2Soi(1:JS,NY,NX)   = 0.0_r8
+  WatConvSno2LitR(1:JS,NY,NX)   = 0.0_r8
+  HeatConvSno2LitR(1:JS,NY,NX)  = 0.0_r8
+  SnoXfer2SnoLay(1:JS,NY,NX)    = 0.0_r8
+  WatXfer2SnoLay(1:JS,NY,NX)    = 0.0_r8
+  IceXfer2SnoLay(1:JS,NY,NX)    = 0.0_r8
+  HeatXfer2SnoLay(1:JS,NY,NX)   = 0.0_r8
+  XPhaseChangeHeatL(1:JS,NY,NX) = 0.0_r8
 
-  trcg_XBLS(idg_beg:idg_end-1,1:JS,NY,NX)=0.0_r8
-  trcn_XBLS(ids_nut_beg:ids_nuts_end,1:JS,NY,NX)=0.0_r8
+  trcg_Xbndl_flx(idg_beg:idg_end-1,1:JS,NY,NX)=0.0_r8
+  trcn_Xbndl_flx(ids_nut_beg:ids_nuts_end,1:JS,NY,NX)=0.0_r8
   IF(salt_model)THEN
     trcSaltFlo2SnowLay(idsalt_beg:idsalt_end,1:JS,NY,NX)=0.0_r8
   ENDIF
@@ -1113,6 +1114,7 @@ module Hour1Mod
 
   SoluteDifusvty_vr(ids_NO3,0,NY,NX)=ZOSG*TFACL
   SoluteDifusvty_vr(ids_H1PO4,0,NY,NX)=POSG*TFACL
+  
   SoluteDifusvty_vr(ids_NH4,0,NY,NX)   =SoluteDifusvty_vr(idg_NH3,0,NY,NX)
   SoluteDifusvty_vr(ids_NH4B,0,NY,NX)  =SoluteDifusvty_vr(ids_NH4,0,NY,NX)
   SoluteDifusvty_vr(idg_NH3B,0,NY,NX)  =SoluteDifusvty_vr(idg_NH3,0,NY,NX)
@@ -2120,17 +2122,8 @@ module Hour1Mod
         trcs_VLN_vr(ids_H1PO4,L,NY,NX)=1.0-trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
         trcs_VLN_vr(ids_H2PO4B,L,NY,NX)=trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
         trcs_VLN_vr(ids_H2PO4,L,NY,NX)=trcs_VLN_vr(ids_H1PO4,L,NY,NX)
-
-        H0PO4T=trcSalt_solml(idsalt_H0PO4,L,NY,NX)+trcSalt_solml(idsalt_H0PO4B,L,NY,NX)
         H1PO4T=trc_solml_vr(ids_H1PO4,L,NY,NX)+trc_solml_vr(ids_H1PO4B,L,NY,NX)
         H2PO4T=trc_solml_vr(ids_H2PO4,L,NY,NX)+trc_solml_vr(ids_H2PO4B,L,NY,NX)
-        H3PO4T=trcSalt_solml(idsalt_H3PO4,L,NY,NX)+trcSalt_solml(idsalt_H3PO4B,L,NY,NX)
-        ZFE1PT=trcSalt_solml(idsalt_FeHPO4,L,NY,NX)+trcSalt_solml(idsalt_FeHPO4B,L,NY,NX)
-        ZFE2PT=trcSalt_solml(idsalt_FeH2PO4,L,NY,NX)+trcSalt_solml(idsalt_FeH2PO4B,L,NY,NX)
-        ZCA0PT=trcSalt_solml(idsalt_CaPO4,L,NY,NX)+trcSalt_solml(idsalt_CaPO4B,L,NY,NX)
-        ZCA1PT=trcSalt_solml(idsalt_CaHPO4,L,NY,NX)+trcSalt_solml(idsalt_CaHPO4B,L,NY,NX)
-        ZCA2PT=trcSalt_solml(idsalt_CaH4P2O8,L,NY,NX)+trcSalt_solml(idsalt_CaH4P2O8B,L,NY,NX)
-        ZMG1PT=trcSalt_solml(idsalt_MgHPO4,L,NY,NX)+trcSalt_solml(idsalt_MgHPO4B,L,NY,NX)
 
         XOH0T=trcx_solml(idx_OHe,L,NY,NX)+trcx_solml(idx_OHeB,L,NY,NX)
         XOH1T=trcx_solml(idx_OH,L,NY,NX)+trcx_solml(idx_OHB,L,NY,NX)
@@ -2143,26 +2136,10 @@ module Hour1Mod
         PCAPHT=trcp_salml(idsp_HA,L,NY,NX)+trcp_salml(idsp_HAB,L,NY,NX)
         PCAPMT=trcp_salml(idsp_CaH4P2O8,L,NY,NX)+trcp_salml(idsp_CaH4P2O8B,L,NY,NX)
 
-        trcSalt_solml(idsalt_H0PO4,L,NY,NX)=H0PO4T*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
         trc_solml_vr(ids_H1PO4,L,NY,NX)=H1PO4T*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
         trc_solml_vr(ids_H2PO4,L,NY,NX)=H2PO4T*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
-        trcSalt_solml(idsalt_H3PO4,L,NY,NX)=H3PO4T*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
-        trcSalt_solml(idsalt_FeHPO4,L,NY,NX)=ZFE1PT*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
-        trcSalt_solml(idsalt_FeH2PO4,L,NY,NX)=ZFE2PT*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
-        trcSalt_solml(idsalt_CaPO4,L,NY,NX)=ZCA0PT*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
-        trcSalt_solml(idsalt_CaHPO4,L,NY,NX)=ZCA1PT*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
-        trcSalt_solml(idsalt_CaH4P2O8,L,NY,NX)=ZCA2PT*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
-        trcSalt_solml(idsalt_MgHPO4,L,NY,NX)=ZMG1PT*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
-        trcSalt_solml(idsalt_H0PO4B,L,NY,NX)=H0PO4T*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
         trc_solml_vr(ids_H1PO4B,L,NY,NX)=H1PO4T*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
         trc_solml_vr(ids_H2PO4B,L,NY,NX)=H2PO4T*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
-        trcSalt_solml(idsalt_H3PO4B,L,NY,NX)=H3PO4T*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
-        trcSalt_solml(idsalt_FeHPO4B,L,NY,NX)=ZFE1PT*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
-        trcSalt_solml(idsalt_FeH2PO4B,L,NY,NX)=ZFE2PT*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
-        trcSalt_solml(idsalt_CaPO4B,L,NY,NX)=ZCA0PT*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
-        trcSalt_solml(idsalt_CaHPO4B,L,NY,NX)=ZCA1PT*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
-        trcSalt_solml(idsalt_CaH4P2O8B,L,NY,NX)=ZCA2PT*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
-        trcSalt_solml(idsalt_MgHPO4B,L,NY,NX)=ZMG1PT*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
 
         trcx_solml(idx_OHe,L,NY,NX)=XOH0T*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
         trcx_solml(idx_OH,L,NY,NX)=XOH1T*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
@@ -2184,6 +2161,36 @@ module Hour1Mod
         trcp_salml(idsp_CaHPO4B,L,NY,NX)=PCAPDT*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
         trcp_salml(idsp_HAB,L,NY,NX)=PCAPHT*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
         trcp_salml(idsp_CaH4P2O8B,L,NY,NX)=PCAPMT*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
+
+        if(salt_model)then
+          H0PO4T=trcSalt_solml(idsalt_H0PO4,L,NY,NX)+trcSalt_solml(idsalt_H0PO4B,L,NY,NX)
+          H3PO4T=trcSalt_solml(idsalt_H3PO4,L,NY,NX)+trcSalt_solml(idsalt_H3PO4B,L,NY,NX)
+          ZFE1PT=trcSalt_solml(idsalt_FeHPO4,L,NY,NX)+trcSalt_solml(idsalt_FeHPO4B,L,NY,NX)
+          ZFE2PT=trcSalt_solml(idsalt_FeH2PO4,L,NY,NX)+trcSalt_solml(idsalt_FeH2PO4B,L,NY,NX)
+          ZCA0PT=trcSalt_solml(idsalt_CaPO4,L,NY,NX)+trcSalt_solml(idsalt_CaPO4B,L,NY,NX)
+          ZCA1PT=trcSalt_solml(idsalt_CaHPO4,L,NY,NX)+trcSalt_solml(idsalt_CaHPO4B,L,NY,NX)
+          ZCA2PT=trcSalt_solml(idsalt_CaH4P2O8,L,NY,NX)+trcSalt_solml(idsalt_CaH4P2O8B,L,NY,NX)
+          ZMG1PT=trcSalt_solml(idsalt_MgHPO4,L,NY,NX)+trcSalt_solml(idsalt_MgHPO4B,L,NY,NX)
+          
+          trcSalt_solml(idsalt_H0PO4,L,NY,NX)=H0PO4T*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
+          trcSalt_solml(idsalt_H3PO4,L,NY,NX)=H3PO4T*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
+          trcSalt_solml(idsalt_FeHPO4,L,NY,NX)=ZFE1PT*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
+          trcSalt_solml(idsalt_FeH2PO4,L,NY,NX)=ZFE2PT*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
+          trcSalt_solml(idsalt_CaPO4,L,NY,NX)=ZCA0PT*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
+          trcSalt_solml(idsalt_CaHPO4,L,NY,NX)=ZCA1PT*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
+          trcSalt_solml(idsalt_CaH4P2O8,L,NY,NX)=ZCA2PT*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
+          trcSalt_solml(idsalt_MgHPO4,L,NY,NX)=ZMG1PT*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
+          trcSalt_solml(idsalt_H0PO4B,L,NY,NX)=H0PO4T*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
+
+          trcSalt_solml(idsalt_H3PO4B,L,NY,NX)=H3PO4T*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
+          trcSalt_solml(idsalt_FeHPO4B,L,NY,NX)=ZFE1PT*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
+          trcSalt_solml(idsalt_FeH2PO4B,L,NY,NX)=ZFE2PT*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
+          trcSalt_solml(idsalt_CaPO4B,L,NY,NX)=ZCA0PT*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
+          trcSalt_solml(idsalt_CaHPO4B,L,NY,NX)=ZCA1PT*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
+          trcSalt_solml(idsalt_CaH4P2O8B,L,NY,NX)=ZCA2PT*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
+          trcSalt_solml(idsalt_MgHPO4B,L,NY,NX)=ZMG1PT*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
+        endif
+
       ENDDO
       DPPO4(NY,NX)=DPPOB(LFDPTH,NY,NX)+CumDepth2LayerBottom(LFDPTH-1,NY,NX)
     ENDIF
@@ -2246,8 +2253,8 @@ module Hour1Mod
     trcp_salml(idsp_CaCO3,NU(NY,NX),NY,NX)=trcp_salml(idsp_CaCO3,NU(NY,NX),NY,NX)+CACX
     trcp_salml(idsp_CaSO4,NU(NY,NX),NY,NX)=trcp_salml(idsp_CaSO4,NU(NY,NX),NY,NX)+CASX
     TZIN=TZIN+natomw*(Z4AX+Z3AX+ZUAX+ZOAX+Z4BX+Z3BX+ZUBX+ZOBX)
-    TPIN=TPIN+62.0*(PMAX+PMBX)+93.0*PHAX
-    TIONIN=TIONIN+2.0*(CACX+CASX)
+    TPIN=TPIN+62.0_r8*(PMAX+PMBX)+93.0_r8*PHAX
+    TIONIN=TIONIN+2.0_r8*(CACX+CASX)
     FertNFlx_col(NY,NX)=FertNFlx_col(NY,NX)+natomw*(Z4AX+Z4BX+Z3AX+Z3BX+ZUAX+ZUBX+ZOAX+ZOBX)
     FerPFlx_col(NY,NX)=FerPFlx_col(NY,NX)+62.0_r8*(PMAX+PMBX)+93.0_r8*PHAX
   ENDIF

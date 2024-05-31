@@ -13,7 +13,7 @@ module nitrosMod
   use SOMDataType
   use ChemTranspDataType
   use FertilizerDataType
-  use NitroDiagTypes
+  use MicrobeDiagTypes
   use NitroDisturbMod
   use GridConsts
   use SoilBGCDataType
@@ -99,7 +99,7 @@ module nitrosMod
           FOSCXD=0.0_r8
         ENDIF
         IF(VGeomLayer(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-          FracLitrMix=FOSCZL*FOSCXD*TMicHeterAct_vr(L,NY,NX)/VGeomLayer(L,NY,NX)
+          FracLitrMix=FOSCZL*FOSCXD*TMicHeterAct_vr(L,NY,NX)/VGeomLayer(L,NY,NX)          
         ELSE
           FracLitrMix=0.0_r8
         ENDIF
@@ -125,6 +125,8 @@ module nitrosMod
   integer :: K,M,N,NGL,MID,NE,L1
   
 !     begin_execution
+! only downward mixing is considered
+! upward mixing is yet to be considered, even though FracLitrMix could be negative
   IF(FracLitrMix.GT.ZERO)THEN
     !mix microbial biomass
     D7971: DO K=1,micpar%NumOfLitrCmplxs
@@ -337,10 +339,11 @@ module nitrosMod
     DO  M=1,jsken
       DO NE=1,NumPlantChemElms
         ORGM(NE)=ORGM(NE)+SolidOM_vr(NE,M,K,L,NY,NX)
+
       ENDDO  
     ENDDO  
   ENDDO    
-
+  
   end subroutine sumLitrOMLayL
 
 !------------------------------------------------------------------------------------------

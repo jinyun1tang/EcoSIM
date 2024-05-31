@@ -651,16 +651,16 @@ implicit none
 
   if(flag=='read')then  
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='fTgrowCanP', dim1name='pft',&
+    call restartvar(ncid, flag, varname='fTCanopyGroth_pft', dim1name='pft',&
      long_name='canopy temperature growth function', units='none', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)           
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,fTgrowCanP,datrp_1d,NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft)  
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,fTCanopyGroth_pft,datrp_1d,NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft)  
   else
-    !print*,'fTgrowCanP'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,fTgrowCanP,datrp_1d,NumActivePlants=NumActivePlants,&
+    !print*,'fTCanopyGroth_pft'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,fTCanopyGroth_pft,datrp_1d,NumActivePlants=NumActivePlants,&
       IsPlantActive_pft=IsPlantActive_pft)    
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='fTgrowCanP', dim1name='pft',&
+    call restartvar(ncid, flag, varname='fTCanopyGroth_pft', dim1name='pft',&
      long_name='canopy temperature growth function', units='none', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)               
   endif  
@@ -1871,16 +1871,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='HoursCanopyPSITooLow_pft', dim1name='pft',&
+    call restartvar(ncid, flag, varname='HoursTooLowPsiCan_pft', dim1name='pft',&
      long_name='canopy plant water stress indicator, number of hours PSICanopy_pft(< PSILY', units='h', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)  
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,HoursCanopyPSITooLow_pft,datrp_1d,NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft)     
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,HoursTooLowPsiCan_pft,datrp_1d,NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft)     
   else
-    !print*,'HoursCanopyPSITooLow_pft'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,HoursCanopyPSITooLow_pft,datrp_1d,NumActivePlants=NumActivePlants,&
+    !print*,'HoursTooLowPsiCan_pft'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,HoursTooLowPsiCan_pft,datrp_1d,NumActivePlants=NumActivePlants,&
       IsPlantActive_pft=IsPlantActive_pft)       
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='HoursCanopyPSITooLow_pft', dim1name='pft',&
+    call restartvar(ncid, flag, varname='HoursTooLowPsiCan_pft', dim1name='pft',&
      long_name='canopy plant water stress indicator, number of hours PSICanopy_pft(< PSILY', units='h', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)  
   endif  
@@ -1903,16 +1903,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='FracRadPARbyCanopy_pft', dim1name='pft',&
+    call restartvar(ncid, flag, varname='FracPARRadbyCanopy_pft', dim1name='pft',&
      long_name='fraction of incoming PAR absorbed by canopy', units='m', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)   
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,FracRadPARbyCanopy_pft,datrp_1d,NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft)     
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,FracPARRadbyCanopy_pft,datrp_1d,NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft)     
   else
-    !print*,'FracRadPARbyCanopy_pft'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,FracRadPARbyCanopy_pft,datrp_1d,NumActivePlants=NumActivePlants,&
+    !print*,'FracPARRadbyCanopy_pft'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,FracPARRadbyCanopy_pft,datrp_1d,NumActivePlants=NumActivePlants,&
       IsPlantActive_pft=IsPlantActive_pft)       
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='FracRadPARbyCanopy_pft', dim1name='pft',&
+    call restartvar(ncid, flag, varname='FracPARRadbyCanopy_pft', dim1name='pft',&
      long_name='fraction of incoming PAR absorbed by canopy', units='m', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)   
 
@@ -2471,17 +2471,17 @@ implicit none
 
   if(flag=='read')then
     datpr3 => datrp_3d(1:npfts,1:MaxNodesPerBranch,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='PetioleLengthNode_brch', dim1name='pft',dim2name='nodes',&
+    call restartvar(ncid, flag, varname='PetoleLensNode_brch', dim1name='pft',dim2name='nodes',&
      dim3name='nbranches',long_name='plant sheath height', units='m', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)  
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,PetioleLengthNode_brch,datrp_3d,NumActivePlants=NumActivePlants,&
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,PetoleLensNode_brch,datrp_3d,NumActivePlants=NumActivePlants,&
       IsPlantActive_pft=IsPlantActive_pft) 
   else
-    !print*,'PetioleLengthNode_brch'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,PetioleLengthNode_brch,datrp_3d,&
+    !print*,'PetoleLensNode_brch'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,PetoleLensNode_brch,datrp_3d,&
       NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft)   
     datpr3 => datrp_3d(1:npfts,1:MaxNodesPerBranch,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='PetioleLengthNode_brch', dim1name='pft',dim2name='nodes',&
+    call restartvar(ncid, flag, varname='PetoleLensNode_brch', dim1name='pft',dim2name='nodes',&
      dim3name='nbranches',long_name='plant sheath height', units='m', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)  
   endif 
@@ -3720,16 +3720,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d  
-    call restartvar(ncid, flag, varname='URAIN', dim1name='column',&
+    call restartvar(ncid, flag, varname='URAIN_col', dim1name='column',&
        long_name='total precipitation', units='m3 d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,URAIN,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,URAIN_col,datrc_1d) 
   else
-    !print*,'URAIN'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,URAIN,datrc_1d)   
+    !print*,'URAIN_col'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,URAIN_col,datrc_1d)   
     datpr1 => datrc_1d    
-    call restartvar(ncid, flag, varname='URAIN', dim1name='column',&
+    call restartvar(ncid, flag, varname='URAIN_col', dim1name='column',&
        long_name='total precipitation', units='m3 d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
@@ -4898,10 +4898,10 @@ implicit none
        long_name='water equivalent dry snow in snowpack layer', units='m3 d-2', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,VLDrySnoWE,datrc_2d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,VLDrySnoWE_col,datrc_2d) 
   else
     !print*,'VLDrySnoWE'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VLDrySnoWE,datrc_2d)   
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VLDrySnoWE_col,datrc_2d)   
     datpr2 => datrc_2d(1:ncols,1:JS)    
     call restartvar(ncid, flag, varname='VLDrySnoWE', dim1name='column',dim2name='levsno',&
        long_name='water equivalent dry snow in snowpack layer', units='m3 d-2', &
@@ -4915,10 +4915,10 @@ implicit none
        long_name='snow ice volume in snowpack layer', units='m3 d-2', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,VLIceSnow,datrc_2d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,VLIceSnow_col,datrc_2d) 
   else
     !print*,'VLIceSnow'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VLIceSnow,datrc_2d)   
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VLIceSnow_col,datrc_2d)   
     datpr2 => datrc_2d(1:ncols,1:JS)    
     call restartvar(ncid, flag, varname='VLIceSnow', dim1name='column',dim2name='levsno',&
        long_name='snow ice volume in snowpack layer', units='m3 d-2', &
@@ -4932,10 +4932,10 @@ implicit none
        long_name='snow water volume in snowpack layer', units='m3 d-2', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,VLWatSnow,datrc_2d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,VLWatSnow_col,datrc_2d) 
   else
     !print*,'VLWatSnow'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VLWatSnow,datrc_2d)   
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VLWatSnow_col,datrc_2d)   
     datpr2 => datrc_2d(1:ncols,1:JS)        
     call restartvar(ncid, flag, varname='VLWatSnow', dim1name='column',dim2name='levsno',&
        long_name='snow water volume in snowpack layer', units='m3 d-2', &
@@ -4945,16 +4945,16 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrc_2d(1:ncols,1:JS)        
-    call restartvar(ncid, flag, varname='VLSnoDWI', dim1name='column',dim2name='levsno',&
+    call restartvar(ncid, flag, varname='VLSnoDWIprev_col', dim1name='column',dim2name='levsno',&
        long_name='total snow volume in snowpack layer', units='m3 d-2', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,VLSnoDWI,datrc_2d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,VLSnoDWIprev_col,datrc_2d) 
   else
-    !print*,'VLSnoDWI'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VLSnoDWI,datrc_2d)   
+    !print*,'VLSnoDWIprev_col
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VLSnoDWIprev_col,datrc_2d)   
     datpr2 => datrc_2d(1:ncols,1:JS)        
-    call restartvar(ncid, flag, varname='VLSnoDWI', dim1name='column',dim2name='levsno',&
+    call restartvar(ncid, flag, varname='VLSnoDWIprev_col', dim1name='column',dim2name='levsno',&
        long_name='total snow volume in snowpack layer', units='m3 d-2', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
@@ -4979,16 +4979,16 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrc_2d(1:ncols,1:JS)        
-    call restartvar(ncid, flag, varname='SnowLayerThick', dim1name='column',dim2name='levsno',&
+    call restartvar(ncid, flag, varname='SnowThickL_col', dim1name='column',dim2name='levsno',&
        long_name='snowpack layer depth', units='m', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,SnowLayerThick,datrc_2d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,SnowThickL_col,datrc_2d) 
   else
-    !print*,'SnowLayerThick'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SnowLayerThick,datrc_2d)   
+    !print*,'SnowThickL_col'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SnowThickL_col,datrc_2d)   
     datpr2 => datrc_2d(1:ncols,1:JS)        
-    call restartvar(ncid, flag, varname='SnowLayerThick', dim1name='column',dim2name='levsno',&
+    call restartvar(ncid, flag, varname='SnowThickL_col', dim1name='column',dim2name='levsno',&
        long_name='snowpack layer depth', units='m', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
@@ -4996,16 +4996,16 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrc_2d(1:ncols,1:JS)        
-    call restartvar(ncid, flag, varname='VLHeatCapSnow', dim1name='column',dim2name='levsno',&
+    call restartvar(ncid, flag, varname='VLHeatCapSnow_col', dim1name='column',dim2name='levsno',&
        long_name='snowpack heat capacity', units='MJ m-3 K-1', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,VLHeatCapSnow,datrc_2d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,VLHeatCapSnow_col,datrc_2d) 
   else
     !print*,'VLHeatCapSnow'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VLHeatCapSnow,datrc_2d)   
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VLHeatCapSnow_col,datrc_2d)   
     datpr2 => datrc_2d(1:ncols,1:JS)        
-    call restartvar(ncid, flag, varname='VLHeatCapSnow', dim1name='column',dim2name='levsno',&
+    call restartvar(ncid, flag, varname='VLHeatCapSnow_col', dim1name='column',dim2name='levsno',&
        long_name='snowpack heat capacity', units='MJ m-3 K-1', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    

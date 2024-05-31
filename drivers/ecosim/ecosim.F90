@@ -147,5 +147,5 @@ PROGRAM main
     call regressiontest(trim(nmlfile),trim(case_name),NHW,NVN)
   endif
   call DestructEcoSIM
-close(111)  
+!close(111)  
 END program main

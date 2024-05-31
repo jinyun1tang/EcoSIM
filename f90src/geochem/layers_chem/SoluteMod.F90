@@ -492,9 +492,9 @@ module SoluteMod
 !     DWNH4=change in NH4 fertilizer band width
 !     WDNHB=layer NH4 fertilizer band width
 !     ZNSGL=NH4 diffusivity
-!     TortMicPM=tortuosity
+!     TortMicPM_vr=tortuosity
 !
-      DWNH4=0.5*SQRT(SoluteDifusvty_vr(idg_NH3,L,NY,NX))*TortMicPM(NPH,L,NY,NX)
+      DWNH4=0.5*SQRT(SoluteDifusvty_vr(idg_NH3,L,NY,NX))*TortMicPM_vr(NPH,L,NY,NX)
       WDNHB(L,NY,NX)=AMIN1(ROWN(NY,NX),AMAX1(0.025,WDNHB(L,NY,NX))+DWNH4)
 !
 !     NH4 BAND DEPTH
@@ -594,9 +594,9 @@ module SoluteMod
 !     DWPO4=change in H2PO4 fertilizer band width
 !     WDPO4=layer H2PO4 fertilizer band width
 !     POSGL=H2PO4 diffusivity
-!     TortMicPM=tortuosity
+!     TortMicPM_vr=tortuosity
 !
-      DWPO4=0.5*SQRT(SoluteDifusvty_vr(ids_H1PO4,L,NY,NX))*TortMicPM(NPH,L,NY,NX)
+      DWPO4=0.5*SQRT(SoluteDifusvty_vr(ids_H1PO4,L,NY,NX))*TortMicPM_vr(NPH,L,NY,NX)
       WDPOB(L,NY,NX)=AMIN1(ROWP(NY,NX),WDPOB(L,NY,NX)+DWPO4)
 !
 !     PO4 BAND DEPTH
@@ -646,9 +646,10 @@ module SoluteMod
 !     DZ*,DX*,DP*=transfer of solute,adsorbed,precipitated HPO4,H2PO4
 !
       IF(salt_model)THEN
-        DZH0P=FVLPO4*trcSalt_solml(idsalt_H0PO4,L,NY,NX)
         DZH1P=FVLPO4*trc_solml_vr(ids_H1PO4,L,NY,NX)/patomw
         DZH2P=FVLPO4*trc_solml_vr(ids_H2PO4,L,NY,NX)/patomw
+
+        DZH0P=FVLPO4*trcSalt_solml(idsalt_H0PO4,L,NY,NX)
         DZH3P=FVLPO4*trcSalt_solml(idsalt_H3PO4,L,NY,NX)
         DZF1P=FVLPO4*trcSalt_solml(idsalt_FeHPO4,L,NY,NX)
         DZF2P=FVLPO4*trcSalt_solml(idsalt_FeH2PO4,L,NY,NX)
@@ -667,6 +668,9 @@ module SoluteMod
         DPCHP=FVLPO4*trcp_salml(idsp_HA,L,NY,NX)
         DPCMP=FVLPO4*trcp_salml(idsp_CaH4P2O8,L,NY,NX)
 
+        trcn_RChem_band_soil_vr(ids_H1PO4B,L,NY,NX) = trcn_RChem_band_soil_vr(ids_H1PO4B,L,NY,NX)-DZH1P
+        trcn_RChem_band_soil_vr(ids_H2PO4B,L,NY,NX) = trcn_RChem_band_soil_vr(ids_H2PO4B,L,NY,NX)-DZH2P
+
         trcSalt_TR(idsalt_H0PO4,L,NY,NX)            = trcSalt_TR(idsalt_H0PO4,L,NY,NX)+DZH0P
         trcn_RChem_soil_vr(ids_H1PO4,L,NY,NX)       = trcn_RChem_soil_vr(ids_H1PO4,L,NY,NX)+DZH1P
         trcn_RChem_soil_vr(ids_H2PO4,L,NY,NX)       = trcn_RChem_soil_vr(ids_H2PO4,L,NY,NX)+DZH2P
@@ -678,8 +682,7 @@ module SoluteMod
         trcSalt_TR(idsalt_CaH4P2O8,L,NY,NX)         = trcSalt_TR(idsalt_CaH4P2O8,L,NY,NX)+DZC2P
         trcSalt_TR(idsalt_MgHPO4,L,NY,NX)           = trcSalt_TR(idsalt_MgHPO4,L,NY,NX)+DZM1P
         trcSalt_TR(idsalt_H0PO4B,L,NY,NX)           = trcSalt_TR(idsalt_H0PO4B,L,NY,NX)-DZH0P
-        trcn_RChem_band_soil_vr(ids_H1PO4B,L,NY,NX) = trcn_RChem_band_soil_vr(ids_H1PO4B,L,NY,NX)-DZH1P
-        trcn_RChem_band_soil_vr(ids_H2PO4B,L,NY,NX) = trcn_RChem_band_soil_vr(ids_H2PO4B,L,NY,NX)-DZH2P
+
         trcSalt_TR(idsalt_H3PO4B,L,NY,NX)           = trcSalt_TR(idsalt_H3PO4B,L,NY,NX)-DZH3P
         trcSalt_TR(idsalt_FeHPO4B,L,NY,NX)          = trcSalt_TR(idsalt_FeHPO4B,L,NY,NX)-DZF1P
         trcSalt_TR(idsalt_FeH2PO4B,L,NY,NX)         = trcSalt_TR(idsalt_FeH2PO4B,L,NY,NX)-DZF2P
@@ -687,6 +690,7 @@ module SoluteMod
         trcSalt_TR(idsalt_CaHPO4B,L,NY,NX)          = trcSalt_TR(idsalt_CaHPO4B,L,NY,NX)-DZC1P
         trcSalt_TR(idsalt_CaH4P2O8B,L,NY,NX)        = trcSalt_TR(idsalt_CaH4P2O8B,L,NY,NX)-DZC2P
         trcSalt_TR(idsalt_MgHPO4B,L,NY,NX)      = trcSalt_TR(idsalt_MgHPO4B,L,NY,NX)-DZM1P
+        
         trcx_TRSoilChem_vr(idx_OHe,L,NY,NX)     = trcx_TRSoilChem_vr(idx_OHe,L,NY,NX)+DXOH0
         trcx_TRSoilChem_vr(idx_OH,L,NY,NX)      = trcx_TRSoilChem_vr(idx_OH,L,NY,NX)+DXOH1
         trcx_TRSoilChem_vr(idx_OHp,L,NY,NX)     = trcx_TRSoilChem_vr(idx_OHp,L,NY,NX)+DXOH2
@@ -754,24 +758,24 @@ module SoluteMod
       trc_solml_vr(ids_H2PO4,L,NY,NX)=trc_solml_vr(ids_H2PO4,L,NY,NX)+trc_solml_vr(ids_H2PO4B,L,NY,NX)
       trc_solml_vr(ids_H1PO4B,L,NY,NX)=0._r8
       trc_solml_vr(ids_H2PO4B,L,NY,NX)=0._r8
-
-      trcSalt_solml(idsalt_H0PO4,L,NY,NX)=trcSalt_solml(idsalt_H0PO4,L,NY,NX)+trcSalt_solml(idsalt_H0PO4B,L,NY,NX)
-      trcSalt_solml(idsalt_H3PO4,L,NY,NX)=trcSalt_solml(idsalt_H3PO4,L,NY,NX)+trcSalt_solml(idsalt_H3PO4B,L,NY,NX)
-      trcSalt_solml(idsalt_FeHPO4,L,NY,NX)=trcSalt_solml(idsalt_FeHPO4,L,NY,NX)+trcSalt_solml(idsalt_FeHPO4B,L,NY,NX)
-      trcSalt_solml(idsalt_FeH2PO4,L,NY,NX)=trcSalt_solml(idsalt_FeH2PO4,L,NY,NX)+trcSalt_solml(idsalt_FeH2PO4B,L,NY,NX)
-      trcSalt_solml(idsalt_CaPO4,L,NY,NX)=trcSalt_solml(idsalt_CaPO4,L,NY,NX)+trcSalt_solml(idsalt_CaPO4B,L,NY,NX)
-      trcSalt_solml(idsalt_CaHPO4,L,NY,NX)=trcSalt_solml(idsalt_CaHPO4,L,NY,NX)+trcSalt_solml(idsalt_CaHPO4B,L,NY,NX)
-      trcSalt_solml(idsalt_CaH4P2O8,L,NY,NX)=trcSalt_solml(idsalt_CaH4P2O8,L,NY,NX)+trcSalt_solml(idsalt_CaH4P2O8B,L,NY,NX)
-      trcSalt_solml(idsalt_MgHPO4,L,NY,NX)=trcSalt_solml(idsalt_MgHPO4,L,NY,NX)+trcSalt_solml(idsalt_MgHPO4B,L,NY,NX)
-      trcSalt_solml(idsalt_H0PO4B,L,NY,NX)=0._r8
-      trcSalt_solml(idsalt_H3PO4B,L,NY,NX)=0._r8
-      trcSalt_solml(idsalt_FeHPO4B,L,NY,NX)=0._r8
-      trcSalt_solml(idsalt_FeH2PO4B,L,NY,NX)=0._r8
-      trcSalt_solml(idsalt_CaPO4B,L,NY,NX)=0._r8
-      trcSalt_solml(idsalt_CaHPO4B,L,NY,NX)=0._r8
-      trcSalt_solml(idsalt_CaH4P2O8B,L,NY,NX)=0._r8
-      trcSalt_solml(idsalt_MgHPO4B,L,NY,NX)=0._r8
-
+      IF(salt_model)THEN
+        trcSalt_solml(idsalt_H0PO4,L,NY,NX)=trcSalt_solml(idsalt_H0PO4,L,NY,NX)+trcSalt_solml(idsalt_H0PO4B,L,NY,NX)
+        trcSalt_solml(idsalt_H3PO4,L,NY,NX)=trcSalt_solml(idsalt_H3PO4,L,NY,NX)+trcSalt_solml(idsalt_H3PO4B,L,NY,NX)
+        trcSalt_solml(idsalt_FeHPO4,L,NY,NX)=trcSalt_solml(idsalt_FeHPO4,L,NY,NX)+trcSalt_solml(idsalt_FeHPO4B,L,NY,NX)
+        trcSalt_solml(idsalt_FeH2PO4,L,NY,NX)=trcSalt_solml(idsalt_FeH2PO4,L,NY,NX)+trcSalt_solml(idsalt_FeH2PO4B,L,NY,NX)
+        trcSalt_solml(idsalt_CaPO4,L,NY,NX)=trcSalt_solml(idsalt_CaPO4,L,NY,NX)+trcSalt_solml(idsalt_CaPO4B,L,NY,NX)
+        trcSalt_solml(idsalt_CaHPO4,L,NY,NX)=trcSalt_solml(idsalt_CaHPO4,L,NY,NX)+trcSalt_solml(idsalt_CaHPO4B,L,NY,NX)
+        trcSalt_solml(idsalt_CaH4P2O8,L,NY,NX)=trcSalt_solml(idsalt_CaH4P2O8,L,NY,NX)+trcSalt_solml(idsalt_CaH4P2O8B,L,NY,NX)
+        trcSalt_solml(idsalt_MgHPO4,L,NY,NX)=trcSalt_solml(idsalt_MgHPO4,L,NY,NX)+trcSalt_solml(idsalt_MgHPO4B,L,NY,NX)
+        trcSalt_solml(idsalt_H0PO4B,L,NY,NX)=0._r8
+        trcSalt_solml(idsalt_H3PO4B,L,NY,NX)=0._r8
+        trcSalt_solml(idsalt_FeHPO4B,L,NY,NX)=0._r8
+        trcSalt_solml(idsalt_FeH2PO4B,L,NY,NX)=0._r8
+        trcSalt_solml(idsalt_CaPO4B,L,NY,NX)=0._r8
+        trcSalt_solml(idsalt_CaHPO4B,L,NY,NX)=0._r8
+        trcSalt_solml(idsalt_CaH4P2O8B,L,NY,NX)=0._r8
+        trcSalt_solml(idsalt_MgHPO4B,L,NY,NX)=0._r8
+      endif
       trcx_solml(idx_OHe,L,NY,NX)=trcx_solml(idx_OHe,L,NY,NX)+trcx_solml(idx_OHeB,L,NY,NX)
       trcx_solml(idx_OH,L,NY,NX)=trcx_solml(idx_OH,L,NY,NX)+trcx_solml(idx_OHB,L,NY,NX)
       trcx_solml(idx_OHp,L,NY,NX)=trcx_solml(idx_OHp,L,NY,NX)+trcx_solml(idx_OHpB,L,NY,NX)
@@ -819,9 +823,9 @@ module SoluteMod
 !     DWNO3=change in NO3 fertilizer band width
 !     WDNOB=layer NO3 fertilizer band width
 !     ZOSGL=NO3 diffusivity
-!     TortMicPM=tortuosity
+!     TortMicPM_vr=tortuosity
 !
-      DWNO3=0.5_r8*SQRT(SoluteDifusvty_vr(ids_NO3,L,NY,NX))*TortMicPM(NPH,L,NY,NX)
+      DWNO3=0.5_r8*SQRT(SoluteDifusvty_vr(ids_NO3,L,NY,NX))*TortMicPM_vr(NPH,L,NY,NX)
       WDNOB(L,NY,NX)=AMIN1(ROWO(NY,NX),WDNOB(L,NY,NX)+DWNO3)
 !
 !     NO3 BAND DEPTH

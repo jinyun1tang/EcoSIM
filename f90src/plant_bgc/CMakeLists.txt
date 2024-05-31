@@ -6,6 +6,7 @@ set(PLANT_BGC_SOURCES
   NutUptakeMod.F90
 	UptakesMod.F90
   NoduleBGCMod.F90
+  PlantNonstElmDynMod.F90
   PlantBranchMod.F90
   RootMod.F90
 	StartqMod.F90
@@ -17,7 +18,7 @@ set(PLANT_BGC_SOURCES
 	StomatesMod.F90
   CanopyCondsMod.F90
   UptakePars.F90
-  StartqsMod.F90
+  InitPlantMod.F90
   PlantPhenolMod.F90
 )
 include(add_ecosim_library)

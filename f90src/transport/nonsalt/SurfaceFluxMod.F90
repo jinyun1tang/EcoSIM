@@ -240,9 +240,9 @@ contains
 !     DIF*=aqueous diffusivity-dispersivity between litter and soil surface
 !
     DLYR0=AMAX1(ZERO2,DLYR(3,0,NY,NX))
-    TORT0=TortMicPM(M,0,NY,NX)/DLYR0*FracSurfByLitR(NY,NX)
+    TORT0=TortMicPM_vr(M,0,NY,NX)/DLYR0*FracSurfByLitR(NY,NX)
     DLYR1=AMAX1(ZERO2,DLYR(3,NU(NY,NX),NY,NX))
-    TORT1=TortMicPM(M,NU(NY,NX),NY,NX)/DLYR1
+    TORT1=TortMicPM_vr(M,NU(NY,NX),NY,NX)/DLYR1
     DISPN=DISP(3,NU(NY,NX),NY,NX)*AMIN1(VFLWX,ABS(FLWRM1/AREA(3,NU(NY,NX),NY,NX)))
     DIFOC0=(DOMdiffusivity2_vr(idom_doc,0,NY,NX)*TORT0+DISPN)
     DIFON0=(DOMdiffusivity2_vr(idom_don,0,NY,NX)*TORT0+DISPN)
@@ -958,7 +958,7 @@ contains
 
   IF(VGeomLayer(0,NY,NX).GT.ZEROS2(NY,NX).AND.VLWatMicPM(M,0,NY,NX).GT.ZEROS2(NY,NX))THEN
     DLYR0=AMAX1(ZERO2,DLYR(3,0,NY,NX)) !vertical layer thickness
-    TORT0=TortMicPM(M,0,NY,NX)*AREA(3,NU(NY,NX),NY,NX)/(0.5_r8*DLYR0)*FracSurfByLitR(NY,NX)
+    TORT0=TortMicPM_vr(M,0,NY,NX)*AREA(3,NU(NY,NX),NY,NX)/(0.5_r8*DLYR0)*FracSurfByLitR(NY,NX)
 
     DO ngases=idg_beg,idg_NH3
       DFGcc(ngases)=SoluteDifusvty_vrc(ngases,0,NY,NX)*TORT0
@@ -1064,7 +1064,7 @@ contains
     VLWatMicPPA=VLWatMicPM(M,NU(NY,NX),NY,NX)*trcs_VLN_vr(ids_H1PO4,NU(NY,NX),NY,NX)
     VLWatMicPPB=VLWatMicPM(M,NU(NY,NX),NY,NX)*trcs_VLN_vr(ids_H1PO4B,NU(NY,NX),NY,NX)
     DLYR1=AMAX1(ZERO2,DLYR(3,NU(NY,NX),NY,NX))
-    TORT1=TortMicPM(M,NU(NY,NX),NY,NX)*AREA(3,NU(NY,NX),NY,NX)/(0.5_r8*DLYR1)
+    TORT1=TortMicPM_vr(M,NU(NY,NX),NY,NX)*AREA(3,NU(NY,NX),NY,NX)/(0.5_r8*DLYR1)
 
     D8910: DO  K=1,jcplx
       CDOM_MicP2(idom_doc,K)=AZMAX1(DOM_MicP2(idom_doc,K,NU(NY,NX),NY,NX)/VLWatMicPM(M,NU(NY,NX),NY,NX))
@@ -1199,19 +1199,19 @@ contains
     IF(VLSnowHeatCapM(M,L,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
       L2=MIN(JS,L+1)
       IF(L.LT.JS.AND.VLSnowHeatCapM(M,L2,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
-        IF(VLWatSnow(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-          VFLWW=AZMAX1(AMIN1(1.0_r8,WatFlowInSnowM(M,L2,NY,NX)/VLWatSnow(L,NY,NX)))
+        IF(VLWatSnow_col(L,NY,NX).GT.ZEROS2(NY,NX))THEN
+          VFLWW=AZMAX1(AMIN1(1.0_r8,WatFlowInSnowM(M,L2,NY,NX)/VLWatSnow_col(L,NY,NX)))
         ELSE
           VFLWW=1.0_r8
         ENDIF
         DO ngases=idg_beg,idg_NH3
           trcg_RBLS(ngases,L2,NY,NX)=trcg_solsml2(ngases,L,NY,NX)*VFLWW
-          trcg_XBLS(ngases,L2,NY,NX)=trcg_XBLS(ngases,L2,NY,NX)+trcg_RBLS(ngases,L2,NY,NX)
+          trcg_Xbndl_flx(ngases,L2,NY,NX)=trcg_Xbndl_flx(ngases,L2,NY,NX)+trcg_RBLS(ngases,L2,NY,NX)
         ENDDO
 
         DO nnut=ids_nut_beg,ids_nuts_end
           trcn_RBLS(nnut,L2,NY,NX)=trcn_solsml2(nnut,L,NY,NX)*VFLWW
-          trcn_XBLS(nnut,L2,NY,NX)=trcn_XBLS(nnut,L2,NY,NX)+trcn_RBLS(nnut,L2,NY,NX)
+          trcn_Xbndl_flx(nnut,L2,NY,NX)=trcn_Xbndl_flx(nnut,L2,NY,NX)+trcn_RBLS(nnut,L2,NY,NX)
         ENDDO
       ELSE
         IF(L.LT.JS)THEN
@@ -1231,9 +1231,9 @@ contains
 !     CO2W,CH4W,OXYW,ZNGW,ZN2W,ZN4W,ZN3W,ZNOW,Z1PW,ZHPW=CO2,CH4,O2,N2,N2O,H2 content in snowpack
 !
         IF(ICHKL.EQ.0)THEN
-          IF(VLWatSnow(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-            VFLWR=AZMAX1(AMIN1(1.0_r8,WatFlowSno2LitRM(M,NY,NX)/VLWatSnow(L,NY,NX)))
-            VFLWS=AZMAX1(AMIN1(1.0_r8,(WatFlowSno2MicPM(M,NY,NX)+WatFlowSno2MacPM(M,NY,NX))/VLWatSnow(L,NY,NX)))
+          IF(VLWatSnow_col(L,NY,NX).GT.ZEROS2(NY,NX))THEN
+            VFLWR=AZMAX1(AMIN1(1.0_r8,WatFlowSno2LitRM(M,NY,NX)/VLWatSnow_col(L,NY,NX)))
+            VFLWS=AZMAX1(AMIN1(1.0_r8,(WatFlowSno2MicPM(M,NY,NX)+WatFlowSno2MacPM(M,NY,NX))/VLWatSnow_col(L,NY,NX)))
           ELSE
             VFLWR=FracSurfByLitR(NY,NX)
             VFLWS=FracSurfAsBareSoi(NY,NX)
