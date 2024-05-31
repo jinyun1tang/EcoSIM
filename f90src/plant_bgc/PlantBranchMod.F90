@@ -847,11 +847,11 @@ module PlantBranchMod
   CanopyNonstElms_brch(ielmc,NB,NZ)=CanopyNonstElms_brch(ielmc,NB,NZ)+CH2O-dNonstCX  
   CanopyNonstElms_brch(ielmn,NB,NZ)=CanopyNonstElms_brch(ielmn,NB,NZ)-CanopyNonstElm4Gros(ielmn)+NH3Dep2Can_brch(NB,NZ)
   CanopyNonstElms_brch(ielmp,NB,NZ)=CanopyNonstElms_brch(ielmp,NB,NZ)-CanopyNonstElm4Gros(ielmp)
-  if(NZ==1)THEN
-  WRITE(115,*)I+J/24.,'treephoto',NB,CanopyNonstElms_brch(ielmc,NB,NZ),CH2O
-  ELSEIF(NZ==2)THEN
-  WRITE(116,*)I+J/24.,'grassphoto',NB,CanopyNonstElms_brch(ielmc,NB,NZ),CH2O
-  ENDIF
+!  if(NZ==1)THEN
+!  WRITE(115,*)I+J/24.,'treephoto',NB,CanopyNonstElms_brch(ielmc,NB,NZ),CH2O
+!  ELSEIF(NZ==2)THEN
+!  WRITE(116,*)I+J/24.,'grassphoto',NB,CanopyNonstElms_brch(ielmc,NB,NZ),CH2O
+!  ENDIF
 !  IF(NZ==1)THEN  
 !    if(ffirst(1))then
 !    write(101,'(A10,X,A3,6(X,A16))')'doy','brc','nonst4gro','canopynonst','NonstCX'&
@@ -1666,11 +1666,11 @@ module PlantBranchMod
 !   PetoleLensNode_brch=petiole length
 !
   KLowestGroLeafNode_brch(NB,NZ)=0
-  if(NZ==1)then
-  write(113,*)I+J/24.,'bftreehight',HypoctoHeight_pft(NZ)
-  elseif(NZ==2)THEN
-  write(114,*)I+J/24.,'afgrashight',HypoctoHeight_pft(NZ)
-  ENDIF
+!  if(NZ==1)then
+!  write(113,*)I+J/24.,'bftreehight',HypoctoHeight_pft(NZ)
+!  elseif(NZ==2)THEN
+!  write(114,*)I+J/24.,'afgrashight',HypoctoHeight_pft(NZ)
+!  ENDIF
 
   IF(HypoctoHeight_pft(NZ).LE.SeedDepth_pft(NZ) .AND. &
     LeafAreaNode_brch(0,MainBranchNum_pft(NZ),NZ).GT.0.0_r8)THEN
@@ -1680,11 +1680,11 @@ module PlantBranchMod
 !    WRITE(113,*)'allocleaf',I+J/24.,LeafLength,PetoleLensNode_brch(0,MainBranchNum_pft(NZ),NZ), &
 !      LiveInterNodeHight_brch(0,MainBranchNum_pft(NZ),NZ)
   ENDIF
-  if(NZ==1)then
-  write(113,*)I+J/24.,'treehight',HypoctoHeight_pft(NZ)
-  elseif(NZ==2)THEN
-  write(114,*)I+J/24.,'grashight',HypoctoHeight_pft(NZ)
-  ENDIF
+!  if(NZ==1)then
+!  write(113,*)I+J/24.,'treehight',HypoctoHeight_pft(NZ)
+!  elseif(NZ==2)THEN
+!  write(114,*)I+J/24.,'grashight',HypoctoHeight_pft(NZ)
+!  ENDIF
 !
 ! IF CANOPY HAS EMERGED
 !

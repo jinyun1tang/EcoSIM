@@ -1393,13 +1393,13 @@ module UptakesMod
   !
   TKGO=TKG(NZ)+TempOffset_pft(NZ)
   fTCanopyGroth_pft(NZ)=calc_canopy_grow_tempf(TKGO)
-  if(NZ==1)THEN
-  write(123,*)I+J/24.,'tree',TKGO,TairK,TKC(NZ),TKS(NU),TKG(NZ) &
-    ,iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).EQ.0
-  ELSEIF(NZ==2)THEN
-  write(124,*)I+J/24.,'gras',TKGO,TairK,TKC(NZ),TKS(NU),TKG(NZ) &
-    ,iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).EQ.0  
-  ENDIF
+!  if(NZ==1)THEN
+!  write(123,*)I+J/24.,'tree',TKGO,TairK,TKC(NZ),TKS(NU),TKG(NZ) &
+!    ,iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).EQ.0
+!  ELSEIF(NZ==2)THEN
+!  write(124,*)I+J/24.,'gras',TKGO,TairK,TKC(NZ),TKS(NU),TKG(NZ) &
+!    ,iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).EQ.0  
+!  ENDIF
   D100: DO L=NU,MaxSoiL4Root(NZ)
     TKSO=TKS(L)+TempOffset_pft(NZ)
     fTgrowRootP_vr(L,NZ)=calc_root_grow_tempf(TKSO)

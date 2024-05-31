@@ -483,13 +483,13 @@ module PlantPhenolMod
     ShootArea=CanopyLeafArea_pft(NZ)+CanopyStemArea_pft(NZ)
     CanopyChk=(HypoctoHeight_pft(NZ).GT.SeedDepth_pft(NZ)).AND.(ShootArea.GT.ZERO4LeafVar_pft(NZ))
     RootChk=(Root1stDepz_pft(ipltroot,1,NZ).GT.SeedDepth_pft(NZ)+ppmc)
-    if(NZ==1)THEN
-    write(111,*)'tree emerg chk',I+J/24.,CanopyChk, RootChk,HypoctoHeight_pft(NZ),SeedDepth_pft(NZ),&
-      ShootArea,ZERO4LeafVar_pft(NZ)
-    ELSEIF(NZ==2)then
-    write(112,*)'grass emerg chk',I+J/24.,CanopyChk, RootChk,HypoctoHeight_pft(NZ),SeedDepth_pft(NZ),&
-      ShootArea,ZERO4LeafVar_pft(NZ)    
-    endif
+!    if(NZ==1)THEN
+!    write(111,*)'tree emerg chk',I+J/24.,CanopyChk, RootChk,HypoctoHeight_pft(NZ),SeedDepth_pft(NZ),&
+!      ShootArea,ZERO4LeafVar_pft(NZ)
+!    ELSEIF(NZ==2)then
+!    write(112,*)'grass emerg chk',I+J/24.,CanopyChk, RootChk,HypoctoHeight_pft(NZ),SeedDepth_pft(NZ),&
+!      ShootArea,ZERO4LeafVar_pft(NZ)    
+!    endif
 
     IF(CanopyChk .AND. RootChk)THEN
       iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ)=I
