@@ -23,6 +23,7 @@ module LateralTranspMod
   use EcoSIMConfig, only : nlbiomcp=>NumLiveMicrbCompts
   use ErosionBalMod
   use SnowBalanceMod
+  use SnowTransportMod
   use EcoSIMCtrlMod
 implicit none
   private
@@ -126,11 +127,11 @@ implicit none
           !horizontal exchange
           call OMH2OFluxesFromRunoff(N,N1,N2,N4,N5,N4B,N5B)
 
-          call MassFluxFromSnowRunoff(N,N1,N2,N4,N5,N4B,N5B)
+          call MassFluxThruSnowRunoff(N,N1,N2,N4,N5,N4B,N5B)
           !
         ELSEIF(N.EQ.3)THEN
           !vertical direction
-          call SaltFromRunoffSnowpack(I,J,N1,N2,NY,NX)
+          call VerticalSaltFluxThruSnowpack(I,J,N1,N2,NY,NX)
         ENDIF
 !
         ! TOTAL FLUXES FROM SEDIMENT TRANSPORT

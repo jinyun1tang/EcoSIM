@@ -40,6 +40,7 @@ module RedistMod
   USE LateralTranspMod
   use UnitMod, only : units
   use SnowBalanceMod
+  use SnowTransportMod
   implicit none
 
   private
@@ -119,8 +120,6 @@ module RedistMod
       call OverlandFlow(NY,NX)
 
       call SoilErosion(NY,NX,DORGE)
-!
-      call ChemicalBySnowRedistribution(NY,NX)
 !
       call DiagSnowChemMass(NY,NX)
 !
@@ -209,46 +208,7 @@ module RedistMod
   ENDDO D9945
   end subroutine UpdateOutputVars
 
-!------------------------------------------------------------------------------------------
 
-  subroutine DiagSnowChemMass(NY,NX)
-  implicit none
-  integer, intent(in) :: NY,NX
-  real(r8) :: SSW,ENGYW,WS
-  integer :: L,nsalts
-  !
-  !     UPDATE STATE VARIABLES WITH TOTAL FLUXES CALCULATED ABOVE
-  !
-  !     IF(J.EQ.24)THEN
-  !
-  !     SNOWPACK VARIABLES NEEDED FOR WATER, C, N, P, O, SOLUTE AND
-  !     ENERGY BALANCES INCLUDING SUM OF ALL CURRENT STATE VARIABLES,
-  !     CUMULATIVE SUMS OF ALL ADDITIONS AND REMOVALS
-  !
-  DO  L=1,JS
-    WS=VLDrySnoWE_col(L,NY,NX)+VLWatSnow_col(L,NY,NX)+VLIceSnow_col(L,NY,NX)*DENSICE
-
-    WaterStoreLandscape=WaterStoreLandscape+WS
-    UVLWatMicP(NY,NX)=UVLWatMicP(NY,NX)+WS
-    ENGYW=VLHeatCapSnow_col(L,NY,NX)*TKSnow(L,NY,NX)
-    HeatStoreLandscape=HeatStoreLandscape+ENGYW
-    TGasC_lnd=TGasC_lnd+trcg_solsml(idg_CO2,L,NY,NX)+trcg_solsml(idg_CH4,L,NY,NX)
-    DIC_mass_col(NY,NX)=DIC_mass_col(NY,NX)+trcg_solsml(idg_CO2,L,NY,NX)+trcg_solsml(idg_CH4,L,NY,NX)
-    OXYGSO=OXYGSO+trcg_solsml(idg_O2,L,NY,NX)
-    TGasN_lnd=TGasN_lnd+trcg_solsml(idg_N2,L,NY,NX)+trcg_solsml(idg_N2O,L,NY,NX)
-    TDisolNH4_lnd=TDisolNH4_lnd+trcn_solsml(ids_NH4,L,NY,NX)+trcg_solsml(idg_NH3,L,NY,NX)
-    tNO3_lnd=tNO3_lnd+trcn_solsml(ids_NO3,L,NY,NX)
-    TDisolPi_lnd=TDisolPi_lnd+trcn_solsml(ids_H1PO4,L,NY,NX)+trcn_solsml(ids_H2PO4,L,NY,NX)
-
-    IF(salt_model)THEN
-      SSW=0._r8
-      do nsalts=idsalt_beg,idsalt_end
-        SSW=SSW+trcs_solsml(nsalts,L,NY,NX)*trcSaltIonNumber(nsalts)
-      ENDDO  
-      TION=TION+SSW
-    ENDIF
-  ENDDO
-  end subroutine DiagSnowChemMass
 !------------------------------------------------------------------------------------------
 
   subroutine ModifyExWTBLByDisturbance(I,J,NY,NX)
@@ -569,7 +529,7 @@ module RedistMod
   implicit none
   integer, intent(in) :: NY,NX
 
-  integer :: K,NTG,idom
+  integer :: K,idom
   !     begin_execution
   !
   IF(ABS(TWat2GridBySurfRunoff(NY,NX)).GT.ZEROS(NY,NX))THEN
@@ -582,7 +542,8 @@ module RedistMod
       ENDDO
     ENDDO D8570
 !
-    call OverlandSnowFlow(NY,NX)
+
+    call OverlandFlowThruSnow(NY,NX)
 
   ENDIF
   end subroutine OverlandFlow
