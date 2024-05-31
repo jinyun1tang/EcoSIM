@@ -226,7 +226,7 @@ module RedistMod
   !     CUMULATIVE SUMS OF ALL ADDITIONS AND REMOVALS
   !
   DO  L=1,JS
-    WS=VLDrySnoWE(L,NY,NX)+VLWatSnow(L,NY,NX)+VLIceSnow(L,NY,NX)*DENSICE
+    WS=VLDrySnoWE_col(L,NY,NX)+VLWatSnow_col(L,NY,NX)+VLIceSnow_col(L,NY,NX)*DENSICE
 
     WaterStoreLandscape=WaterStoreLandscape+WS
     UVLWatMicP(NY,NX)=UVLWatMicP(NY,NX)+WS

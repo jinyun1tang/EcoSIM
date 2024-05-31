@@ -4898,10 +4898,10 @@ implicit none
        long_name='water equivalent dry snow in snowpack layer', units='m3 d-2', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,VLDrySnoWE,datrc_2d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,VLDrySnoWE_col,datrc_2d) 
   else
     !print*,'VLDrySnoWE'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VLDrySnoWE,datrc_2d)   
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VLDrySnoWE_col,datrc_2d)   
     datpr2 => datrc_2d(1:ncols,1:JS)    
     call restartvar(ncid, flag, varname='VLDrySnoWE', dim1name='column',dim2name='levsno',&
        long_name='water equivalent dry snow in snowpack layer', units='m3 d-2', &
@@ -4915,10 +4915,10 @@ implicit none
        long_name='snow ice volume in snowpack layer', units='m3 d-2', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,VLIceSnow,datrc_2d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,VLIceSnow_col,datrc_2d) 
   else
     !print*,'VLIceSnow'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VLIceSnow,datrc_2d)   
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VLIceSnow_col,datrc_2d)   
     datpr2 => datrc_2d(1:ncols,1:JS)    
     call restartvar(ncid, flag, varname='VLIceSnow', dim1name='column',dim2name='levsno',&
        long_name='snow ice volume in snowpack layer', units='m3 d-2', &
@@ -4932,10 +4932,10 @@ implicit none
        long_name='snow water volume in snowpack layer', units='m3 d-2', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,VLWatSnow,datrc_2d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,VLWatSnow_col,datrc_2d) 
   else
     !print*,'VLWatSnow'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VLWatSnow,datrc_2d)   
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VLWatSnow_col,datrc_2d)   
     datpr2 => datrc_2d(1:ncols,1:JS)        
     call restartvar(ncid, flag, varname='VLWatSnow', dim1name='column',dim2name='levsno',&
        long_name='snow water volume in snowpack layer', units='m3 d-2', &

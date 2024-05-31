@@ -545,7 +545,7 @@ module StarteMod
 !
     D9985: DO L=1,JS
       IF(VLHeatCapSnow_col(L,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
-        VOLWW=VLWatSnow(L,NY,NX)+VLDrySnoWE(L,NY,NX)+VLIceSnow(L,NY,NX)*DENSICE
+        VOLWW=VLWatSnow_col(L,NY,NX)+VLDrySnoWE_col(L,NY,NX)+VLIceSnow_col(L,NY,NX)*DENSICE
         trcg_solsml(idg_CO2,L,NY,NX)=VOLWW*CO2_rain_conc(NY,NX)
         trcg_solsml(idg_CH4,L,NY,NX)=VOLWW*CH4_rain_conc(NY,NX)
         trcg_solsml(idg_O2,L,NY,NX)=VOLWW*O2_rain_conc(NY,NX)

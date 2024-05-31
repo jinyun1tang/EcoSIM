@@ -231,8 +231,8 @@ module IngridTranspMod
     IF(VLSnowHeatCapM(M,L,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
       L2=MIN(JS,L+1)
       IF(L.LT.JS.AND.VLSnowHeatCapM(M,L2,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
-        IF(VLWatSnow(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-          VFLWW=AZMAX1(AMIN1(1.0_r8,WatFlowInSnowM(M,L2,NY,NX)/VLWatSnow(L,NY,NX)))
+        IF(VLWatSnow_col(L,NY,NX).GT.ZEROS2(NY,NX))THEN
+          VFLWW=AZMAX1(AMIN1(1.0_r8,WatFlowInSnowM(M,L2,NY,NX)/VLWatSnow_col(L,NY,NX)))
         ELSE
           VFLWW=1.0_r8
         ENDIF
@@ -261,9 +261,9 @@ module IngridTranspMod
 !
         IF(ICHKL.EQ.0)THEN
           !flow into soil
-          IF(VLWatSnow(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-            VFLWR=AZMAX1(AMIN1(1.0_r8,WatFlowSno2LitRM(M,NY,NX)/VLWatSnow(L,NY,NX)))
-            VFLWS=AZMAX1(AMIN1(1.0_r8,(WatFlowSno2MicPM(M,NY,NX)+WatFlowSno2MacPM(M,NY,NX))/VLWatSnow(L,NY,NX)))
+          IF(VLWatSnow_col(L,NY,NX).GT.ZEROS2(NY,NX))THEN
+            VFLWR=AZMAX1(AMIN1(1.0_r8,WatFlowSno2LitRM(M,NY,NX)/VLWatSnow_col(L,NY,NX)))
+            VFLWS=AZMAX1(AMIN1(1.0_r8,(WatFlowSno2MicPM(M,NY,NX)+WatFlowSno2MacPM(M,NY,NX))/VLWatSnow_col(L,NY,NX)))
           ELSE
             VFLWR=FracSurfByLitR(NY,NX)
             VFLWS=FracSurfAsBareSoi(NY,NX)

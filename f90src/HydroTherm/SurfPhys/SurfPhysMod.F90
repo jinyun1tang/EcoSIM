@@ -102,7 +102,7 @@ contains
       Altitude_grid(NY,NX)=ALT(NY,NX)-CumDepth2LayerBottom(NUM(NY,NX)-1,NY,NX)
       EnergyImpact4Erosion(NY,NX)=EnergyImpact4Erosion(NY,NX)*(1.0_r8-FEnergyImpact4Erosion)
 
-      call CopySnowStates(NY,NX)
+      call CopySnowStates(I,J,NY,NX)
 
       call CopySurfaceVars(NY,NX)
 
@@ -197,6 +197,7 @@ contains
 !     SnowDepth=snowpack depth
 !     MinSnowDepth=minimum snowpack depth for full cover
 !     BARE,CVRD=fractions of soil,litter cover
+
   FracSurfAsSnow(NY,NX)=AMIN1(1.0_r8,SQRT((SnowDepth(NY,NX)/MinSnowDepth)))
   FracSurfSnoFree(NY,NX)=1.0_r8-FracSurfAsSnow(NY,NX)
   !if there is heat-wise significant litter layer
@@ -671,10 +672,10 @@ contains
   real(r8) :: CumWatFlow2LitR
   real(r8) :: HeatNetFlx2Snow
   real(r8) :: NetWatFlx2SoiMicP
-
+  integer  :: L
 ! begin_execution
   VapXAir2TopLay=0._r8;CumWatXFlx2SoiMicP=0._r8
-  CumWatFlow2LitR=0._r8;CumHeatFlow2LitR=0._r8
+  CumWatFLow2LitR=0._r8;CumHeatFlow2LitR=0._r8
   CumWatFlx2SoiMicP=0._r8;CumWatFlx2SoiMacP=0._r8
   HeatSensEvap=0._r8;HeatNetFlx2Snow=0._r8
   LatentHeatAir2Sno=0._r8
@@ -682,6 +683,7 @@ contains
   Radnet2Snow=0._r8
   cumHeatFlowSno2Soi=0._r8
   HeatFluxAir2Soi1=0._r8
+
   !solve if there is significant snow layer 
   IF(VLSnowHeatCapM(M,1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
 !    print*,'SolveSnowpack'
@@ -690,10 +692,11 @@ contains
       HeatNetFlx2Snow,CumWatFlx2SoiMacP,CumWatFlx2SoiMicP,CumWatXFlx2SoiMicP,CumWatFlow2LitR,&
       CumHeatFlow2LitR,cumHeatFlowSno2Soi)
   ENDIF
+
 !
 ! ENERGY EXCHANGE AT SOIL SURFACE IF EXPOSED UNDER SNOWPACK
 ! FSNW,FSNX=fractions of snow,snow-free cover
-  IF(FracSurfSnoFree(NY,NX).GT.0.0_r8.AND.(SoiBulkDensity(NUM(NY,NX),NY,NX).GT.ZERO.OR. &
+  IF(FracSurfSnoFree(NY,NX).GT.0.0_r8 .AND. (SoiBulkDensity(NUM(NY,NX),NY,NX).GT.ZERO.OR. &
     VLHeatCapacity_col(NUM(NY,NX),NY,NX).GT.VHCPNX(NY,NX)))THEN
     !Ground partically covered by snow
      
@@ -704,6 +707,7 @@ contains
 !   ground is fully snow covered, thus no flux from soil & litter
     call SnowCoveredTopSoilFlux(NY,NX,NetWatFlx2SoiMicP)
   ENDIF
+
 !
 ! AGGREGATE RESIDUE AND SOIL SURFACE FLUXES BENEATH SNOW
 ! AND ATMOSPHERE
@@ -722,14 +726,16 @@ contains
 !  if(NUM(NY,NX)==1.and.HeatFlow2Soili(3,NUM(NY,NX),NY,NX)>10._r8)then
 !    write(*,*)'atlmdn',cumHeatFlowSno2Soi,cumHeatSensAir2Soil
 !  endif
-  WatFLow2LitR(NY,NX)=CumWatFlow2LitR+NetWatFlx2LitR
+  WatFLow2LitR_col(NY,NX)=CumWatFlow2LitR+NetWatFlx2LitR
   HeatFLoByWat2LitRi(NY,NX)=CumHeatFlow2LitR+CumHeatSensAir2LitR
-!  write(*,*)'WatFLow2LitR',CumWatFlow2LitR,CumHeatFlow2LitR,NetWatFlx2LitR
+
+!  write(*,*)I+J/24.,'WatFLow2LitR',CumWatFlow2LitR,CumHeatFlow2LitR,NetWatFlx2LitR
+!  if(WatFLow2LitR_col(NY,NX)>1.e10)stop
 !  write(*,*)'AtmLandSurfExchange  init',M,NY,NX,HeatFLoByWat2LitRi(NY,NX),&
 !  CumHeatFlow2LitR,CumHeatSensAir2LitR
-!  write(*,*)'atmlnd',HeatFLoByWat2LitRi(NY,NX),WatFLow2LitR(NY,NX),&
-!    safe_adb(HeatFLoByWat2LitRi(NY,NX),WatFLow2LitR(NY,NX)*cpw),&
-!    safe_adb(CumHeatFlow2LitR,cpw*CumWatFlow2LitR),&
+!  write(*,*)'atmlnd',HeatFLoByWat2LitRi(NY,NX),WatFLow2LitR_col(NY,NX),&
+!    safe_adb(HeatFLoByWat2LitRi(NY,NX),WatFLow2LitR_col(NY,NX)*cpw),&
+!    safe_adb(CumHeatFlow2LitR,cpw*CumWatFLow2LitR),&
 !    safe_adb(CumHeatSensAir2LitR,NetWatFlx2LitR*cpw)
   end subroutine AtmLandSurfExchange
 !------------------------------------------------------------------------------------------
@@ -754,9 +760,9 @@ contains
   end subroutine SnowCoveredTopSoilFlux  
 !------------------------------------------------------------------------------------------
 
-  subroutine SurfLitrSoilWaterExchange(M,NY,NX,KSatReductByRainKineticEnergy)
+  subroutine SurfLitrSoilWaterExchange(I,J,M,NY,NX,KSatReductByRainKineticEnergy)
   implicit none
-  integer, intent(in) :: M,NY,NX
+  integer, intent(in) :: I,J,M,NY,NX
   real(r8),intent(in) :: KSatReductByRainKineticEnergy
 
   real(r8) :: THETW1,ThetaWLitR,PSIST1
@@ -858,10 +864,10 @@ contains
 !    if(HeatFlow2Soili(3,NUM(NY,NX),NY,NX)>10._r8)then
 !      write(*,*)'HeatFlow2Soili(3,NUM(NY,NX),NY,NX)',HeatFlow2Soili(3,NUM(NY,NX),NY,NX),HeatFlxLitR2Soi
 !    endif
-    WatFLow2LitR(NY,NX)=WatFLow2LitR(NY,NX)-WatDarcyFloLitR2SoiMicP
+    WatFLow2LitR_col(NY,NX)=WatFLow2LitR_col(NY,NX)-WatDarcyFloLitR2SoiMicP
     HeatFLoByWat2LitRi(NY,NX)=HeatFLoByWat2LitRi(NY,NX)-HeatFlxLitR2Soi
     WatFLo2LitrM(M,NY,NX)=WatDarcyFloLitR2SoiMicP
-!    write(*,*)'if1',HeatFlxLitR2Soi,WatDarcyFloLitR2SoiMicP,&
+!    write(*,*)I+J/24.,'if1',HeatFlxLitR2Soi,WatDarcyFloLitR2SoiMicP,&
 !      safe_adb(HeatFlxLitR2Soi,(cpw*WatDarcyFloLitR2SoiMicP))
   ELSE
     !top layer is water
@@ -877,15 +883,15 @@ contains
 !    if(HeatFlow2Soili(3,NUM(NY,NX),NY,NX)>10._r8)then
 !      write(*,*)'HeatFlow2Soili(3,NUM(NY,NX),NY,NX)=',HeatFlow2Soili(3,NUM(NY,NX),NY,NX),HeatFlxLitR2Soi
 !    endif
-    WatFLow2LitR(NY,NX)=WatFLow2LitR(NY,NX)-WatDarcyFloLitR2SoiMicP
+    WatFLow2LitR_col(NY,NX)=WatFLow2LitR_col(NY,NX)-WatDarcyFloLitR2SoiMicP
     HeatFLoByWat2LitRi(NY,NX)=HeatFLoByWat2LitRi(NY,NX)-HeatFlxLitR2Soi
 
     WatFLo2LitrM(M,NY,NX)=WatDarcyFloLitR2SoiMicP
 !    write(*,*)'else',HeatFlxLitR2Soi,WatDarcyFloLitR2SoiMicP,&
 !      safe_adb(HeatFlxLitR2Soi,(cpw*WatDarcyFloLitR2SoiMicP))
   ENDIF
-!  write(*,*)'SurfLitrSoilWaterExchange micP',M,NY,NX,HeatFLoByWat2LitRi(NY,NX),WatFLow2LitR(NY,NX),&
-!    safe_adb(HeatFLoByWat2LitRi(NY,NX),cpw*WatFLow2LitR(NY,NX)),TKSoi1(0,NY,NX),TKSoi1(NUM(NY,NX),NY,NX)
+!  write(*,*)'SurfLitrSoilWaterExchange micP',M,NY,NX,HeatFLoByWat2LitRi(NY,NX),WatFLow2LitR_col(NY,NX),&
+!    safe_adb(HeatFLoByWat2LitRi(NY,NX),cpw*WatFLow2LitR_col(NY,NX)),TKSoi1(0,NY,NX),TKSoi1(NUM(NY,NX),NY,NX)
 
 !     OVERLAND FLOW INTO SOIL MACROPORES WHEN WATER STORAGE CAPACITY
 !     OF THE LITTER IS EXCEEDED
@@ -904,9 +910,9 @@ contains
 !    if(HeatFlow2Soili(3,NUM(NY,NX),NY,NX)>10._r8)then
 !      write(*,*)'HeatFlow2Soili(3,NUM(NY,NX),NY,NX)x=',HeatFlow2Soili(3,NUM(NY,NX),NY,NX),HeatFlowLitR2MacP
 !    endif
-    WatFLow2LitR(NY,NX)=WatFLow2LitR(NY,NX)-WatFlowLitR2MacP
+    WatFLow2LitR_col(NY,NX)=WatFLow2LitR_col(NY,NX)-WatFlowLitR2MacP
     HeatFLoByWat2LitRi(NY,NX)=HeatFLoByWat2LitRi(NY,NX)-HeatFlowLitR2MacP
-!    write(*,*)'surif',HeatFlowLitR2MacP,WatFlowLitR2MacP,safe_adb(HeatFlowLitR2MacP,WatFlowLitR2MacP*cpw)
+!    write(*,*)I+J/24.,'surif',HeatFlowLitR2MacP,WatFlowLitR2MacP,safe_adb(HeatFlowLitR2MacP,WatFlowLitR2MacP*cpw)
   ENDIF
 !  if(M==11)write(*,*)'SurfLitrSoilWaterExchange macP',M,NY,NX,HeatFLoByWat2LitRi(NY,NX)
   end subroutine SurfLitrSoilWaterExchange
@@ -937,7 +943,7 @@ contains
 !     LitrIceHeatFlxFrez,LitrIceFlxThaw=litter water,latent heat flux from freeze-thaw
 !
   TFREEZ=-9.0959E+04_r8/(PSISM1(0,NY,NX)-LtHeatIceMelt)
-  VLWatMicP1X=AZMAX1(VLWatMicP1(0,NY,NX)+WatFLow2LitR(NY,NX))
+  VLWatMicP1X=AZMAX1(VLWatMicP1(0,NY,NX)+WatFLow2LitR_col(NY,NX))
   ENGYR=VLHeatCapacity_col(0,NY,NX)*TKSoi1(0,NY,NX)
   VLHeatCapacityX=cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP1X+cpi*VLiceMicP1(0,NY,NX)
 
@@ -1163,7 +1169,7 @@ contains
     +ConvectWaterFlowMacP(3,NUM(NY,NX),NY,NX)
   HeatFlow2Soil(3,NUM(NY,NX),NY,NX)=HeatFlow2Soil(3,NUM(NY,NX),NY,NX) &
     +HeatFlow2Soili(3,NUM(NY,NX),NY,NX)
-  WatFLo2Litr(NY,NX)=WatFLo2Litr(NY,NX)+WatFLow2LitR(NY,NX)
+  WatFLo2Litr(NY,NX)=WatFLo2Litr(NY,NX)+WatFLow2LitR_col(NY,NX)
   HeatFLo2LitrByWat(NY,NX)=HeatFLo2LitrByWat(NY,NX)+HeatFLoByWat2LitRi(NY,NX)
 
   HeatByRadiation(NY,NX)=HeatByRadiation(NY,NX)+Radnet2LitGrnd+Radnet2Snow
@@ -1184,9 +1190,9 @@ contains
 
 !------------------------------------------------------------------------------------------
 
-  subroutine InitSurfModel(M,NY,NX,ResistanceLitRLay,KSatReductByRainKineticEnergy)
+  subroutine InitSurfModel(I,J,M,NY,NX,ResistanceLitRLay,KSatReductByRainKineticEnergy)
   implicit none
-  integer, intent(in) :: M,NY,NX
+  integer, intent(in) :: M,NY,NX,I,J
   real(r8),dimension(:,:),intent(in) :: ResistanceLitRLay
   real(r8),intent(out):: KSatReductByRainKineticEnergy
   integer :: L  
@@ -1320,33 +1326,9 @@ contains
 !
 !  SNOWPACK FLUX ACCUMULATORS
 !
-   call InitSnowAccums(NY,NX)
+   call InitSnowAccums(I,J,M,NY,NX)
 !
-! SURFACE FLUX ACCUMULATORS
-!
-! TWFLXL,TMLiceThawMacP=total freeze-thaw in micropores,macropores
-! TLPhaseChangeHeat2Soi=total latent heat from freeze-thaw
-! TFLWL,TFLWHL=net water flux in micropores,macropores
-! THFLWL=net heat flux
-!
-!
-! ENERGY EXCHANGE VARIABLES AT SNOW SURFACE IF PRESENT
-!
-! Radnet2Snow,LatentHeatAir2Sno,HeatSensEvap,HeatSensAir2Snow,HeatNetFlx2Snow=netradn,latent,convective,sensible
-! and storage heat fluxes
-! CumWatFlx2SoiMacP=water from snowpack to soil micropores,macropores
-! cumHeatFlowSno2Soi=conv heat from snowpack to soil micropores,macropores
-!
-! EVAPS,EVAPW=evaporation from soil,snowpack surfaces
-! WatFlowSno2LitRM,WatFlowSno2MicPM,WatFlowSno2MacPM=water into litter,soil micropores,micropores for use in TranspNoSalt.f
-!
-  VapXAir2Sno(NY,NX)=0._r8;EVAPS(NY,NX)=0.0_r8;EVAPW(NY,NX)=0.0_r8
-
-  WatFlowSno2LitRM(M,NY,NX)=0.0_r8
-  WatFlowSno2MicPM(M,NY,NX)=0.0_r8
-  WatFlowSno2MacPM(M,NY,NX)=0.0_r8
-!
-  call PrepIterSnowLayer(M,NY,NX)
+  call PrepIterSnowLayer(I,J,M,NY,NX)
 !
   end subroutine InitSurfModel  
 !------------------------------------------------------------------------------------------
@@ -1449,7 +1431,7 @@ contains
 !     TFLWC=canopy intercepted precipitation
 !     FSNW=fraction of snow cover
 
-  IF(PrecRainAndSurfirrig(NY,NX).GT.0.0_r8.OR.SnoFalPrec(NY,NX).GT.0.0_r8)THEN
+  IF(PrecRainAndSurfirrig(NY,NX).GT.0.0_r8 .OR. SnoFalPrec(NY,NX).GT.0.0_r8)THEN
   ! there is precipitation
     Rain4ToSno=(PrecRainAndSurfirrig(NY,NX)-PrecIntcptByCanG(NY,NX))*FracSurfAsSnow(NY,NX)
     SnoFall=SnoFalPrec(NY,NX)                                                        !snowfall
@@ -1483,8 +1465,8 @@ contains
 !     Rain2LitRSurf_col,Irrig2LitRSurf=water flux to surface litter from rain,irrigation
 !     FLQGQ,FLQGI=water flux to snowpack from rain,irrigation
 !
-  IF(SnoFalPrec(NY,NX).GT.0.0_r8.OR.(RainFalPrec(NY,NX).GT.0.0_r8 &
-    .AND.VLHeatCapSnow_col(1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX)))THEN
+  IF(SnoFalPrec(NY,NX).GT.0.0_r8 .OR. (RainFalPrec(NY,NX).GT.0.0_r8 &
+    .AND. VLHeatCapSnow_col(1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX)))THEN
     !there is precipitation, there is significant snow layer
     Rain2LitRSurf_col(NY,NX)=0.0_r8
     Irrig2LitRSurf(NY,NX)=0.0_r8
@@ -1532,9 +1514,9 @@ contains
   end subroutine PartitionPrecip
 !------------------------------------------------------------------------------------------  
 
-  subroutine UpdateSurfaceAtM(M,NHW,NHE,NVN,NVS)
+  subroutine UpdateSurfaceAtM(I,J,M,NHW,NHE,NVN,NVS)
   implicit none
-  integer, intent(in) :: M
+  integer, intent(in) :: M,I,J
   integer, intent(in) :: NHW,NHE,NVN,NVS
   integer  :: NY,NX
 
@@ -1543,7 +1525,7 @@ contains
     D9790: DO NY=NVN,NVS
 
       !update snow
-      call UpdateSnowAtM(M,NY,NX)
+      call UpdateSnowAtM(I,J,M,NY,NX)
 
       call UpdateLitRAftRunoff(M,NY,NX)
       
@@ -1600,19 +1582,11 @@ contains
 ! HeatXfer2SnoLay=hourly convective heat flux from snow,water,ice transfer
 ! HeatFall2Snowt=convective heat flux from snow,water,ice to snowpack
 !
-  IF(VLHeatCapSnow_col(1,NY,NX).LE.VLHeatCapSnowMin_col(NY,NX).AND.SnowFallt(NY,NX).GT.ZEROS(NY,NX))THEN
+  IF(VLHeatCapSnow_col(1,NY,NX).LE.VLHeatCapSnowMin_col(NY,NX) .AND. SnowFallt(NY,NX).GT.ZEROS(NY,NX))THEN
     SnoXfer2SnoLay(1,NY,NX)=SnoXfer2SnoLay(1,NY,NX)+SnowFallt(NY,NX)
     WatXfer2SnoLay(1,NY,NX)=WatXfer2SnoLay(1,NY,NX)+Rain2Snowt(NY,NX)
     IceXfer2SnoLay(1,NY,NX)=IceXfer2SnoLay(1,NY,NX)+Ice2Snowt(NY,NX)
     HeatXfer2SnoLay(1,NY,NX)=HeatXfer2SnoLay(1,NY,NX)+HeatFall2Snowt(NY,NX)
-!     WRITE(*,4422)'INIT',I,J,SnowFallt(NY,NX),Rain2Snowt(NY,NX)
-!    3,Ice2Snowt(NY,NX),HeatFall2Snowt(NY,NX),SnoXfer2SnoLay(1,NY,NX),WatXfer2SnoLay(1,NY,NX)
-!    2,IceXfer2SnoLay(1,NY,NX),HeatXfer2SnoLay(1,NY,NX),HeatFlow2Soili(3,NUM(NY,NX),NY,NX)
-!    3,HeatFlow2Soil(3,NUM(NY,NX),NY,NX),FracSurfSnoFree(NY,NX),VLHeatCapacity_col(NUM(NY,NX),NY,NX)
-!    4*TKSoi1(NUM(NY,NX),NY,NX),HeatFLoByWat2LitRi(NY,NX),HeatFLo2LitrByWat(NY,NX)
-!    5,VLHeatCapacity_col(0,NY,NX)*TKSoi1(0,NY,NX),HeatNet2Surf(NY,NX),Radnet2LitGrnd,Radnet2Snow
-!    2,HeatSensAir2Grnd,HeatSensAir2Snow,LatentHeatEvapAir2Grnd
-!      ,LatentHeatAir2Sno,HeatSensVapAir2Soi,HeatSensEvap
   ENDIF
   !LWRadBySurf=longwave emission from litter and surface soil
   LWRadBySurf(NY,NX)=LWRadBySurf(NY,NX)+LWRadGrnd
@@ -1641,7 +1615,7 @@ contains
         TopLayWatVol,VapXAir2TopLay)
 
     ! CAPILLARY EXCHANGE OF WATER BETWEEN SOIL SURFACE AND RESIDUE
-      call SurfLitrSoilWaterExchange(M,NY,NX,KSatReductByRainKineticEnergy(NY,NX))
+      call SurfLitrSoilWaterExchange(I,J,M,NY,NX,KSatReductByRainKineticEnergy(NY,NX))
 
       call InfilSRFRoffPartition(M,NY,NX,N1,N2)
     !
@@ -1649,11 +1623,10 @@ contains
 
       if(snowRedist_model)call SnowRedistribution(M,NY,NX,NHE,NHW,NVS,NVN,N1,N2)
 
-    !
       call AccumWaterVaporHeatFluxes(M,NY,NX,LatentHeatAir2Sno,HeatSensEvap,HeatSensAir2Snow,&
         Radnet2Snow,VapXAir2TopLay)
 !      write(*,*)'end RunSurfacePhysModel'
-       call UpdateLitRB4RunoffM(M,NY,NX)
+       call UpdateLitRB4RunoffM(I,J,M,NY,NX)
        if(present(Qinfl2MicP))Qinfl2MicP(NY,NX)=WatXChange2WatTable(3,NUM(NY,NX),NY,NX)
        if(present(Hinfl2Soil))Hinfl2Soil(NY,NX)=HeatFlow2Soili(3,NUM(NY,NX),NY,NX)
 
@@ -1676,14 +1649,14 @@ contains
   integer :: N1,N2
 
   !ResistanceLitRLay is input
-  call InitSurfModel(M,NY,NX,ResistanceLitRLay,KSatReductByRainKineticEnergy)
+  call InitSurfModel(I,J,M,NY,NX,ResistanceLitRLay,KSatReductByRainKineticEnergy)
 
 ! updates ResistanceLitRLay
   call AtmLandSurfExchange(I,J,M,NY,NX,ResistanceLitRLay,TopLayWatVol,LatentHeatAir2Sno,&
     HeatSensEvap,HeatSensAir2Snow,Radnet2Snow,VapXAir2TopLay,HeatFluxAir2Soi1)
 
   !update snow pack before doing snow redistribution to avoid negative mass values  
-  call UpdateSnowPack1(M,NY,NX)
+  call UpdateSnowPack1(I,J,M,NY,NX)
 
   end subroutine SurfaceEnergyModel
 

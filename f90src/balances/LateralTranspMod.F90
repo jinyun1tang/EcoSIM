@@ -46,6 +46,7 @@ implicit none
   
 ! begin_execution
   call ZeroFluxArrays(NY,NX)
+
   call ZeroFluxAccumulators(NY,NX)
 
   LG=0;LX=0
@@ -120,17 +121,16 @@ implicit none
 !
 !
       IF(L.EQ.NUM(N2,N1))THEN
-        !top layer
+        !top layer runoff
         IF(N.NE.3)THEN
           !horizontal exchange
           call OMH2OFluxesFromRunoff(N,N1,N2,N4,N5,N4B,N5B)
 
           call MassFluxFromSnowRunoff(N,N1,N2,N4,N5,N4B,N5B)
           !
-    !
         ELSEIF(N.EQ.3)THEN
           !vertical direction
-          call SaltFromRunoffSnowpack(N1,N2,NY,NX)
+          call SaltFromRunoffSnowpack(I,J,N1,N2,NY,NX)
         ENDIF
 !
         ! TOTAL FLUXES FROM SEDIMENT TRANSPORT
@@ -242,7 +242,7 @@ implicit none
   implicit none
   integer, intent(in) :: N,N1,N2,N4,N5,N4B,N5B
 
-  integer :: NN,K,NTG,NTN
+  integer :: NN,K,NTG,NTN,idom
   !     begin_execution
   !     NET WATER, SNOW AND HEAT FLUXES FROM RUNOFF
   !
@@ -259,10 +259,9 @@ implicit none
     !heat flux
     THeat2GridBySurfRunoff(N2,N1)=THeat2GridBySurfRunoff(N2,N1)+Heat2GridBySurfRunoff(N,NN,N2,N1)
     D8590: DO K=1,micpar%NumOfLitrCmplxs
-      TOMQRS(idom_doc,K,N2,N1)=TOMQRS(idom_doc,K,N2,N1)+dom_2DFloXSurRunoff(idom_doc,K,N,NN,N2,N1)
-      TOMQRS(idom_don,K,N2,N1)=TOMQRS(idom_don,K,N2,N1)+dom_2DFloXSurRunoff(idom_don,K,N,NN,N2,N1)
-      TOMQRS(idom_dop,K,N2,N1)=TOMQRS(idom_dop,K,N2,N1)+dom_2DFloXSurRunoff(idom_dop,K,N,NN,N2,N1)
-      TOMQRS(idom_acetate,K,N2,N1)=TOMQRS(idom_acetate,K,N2,N1)+dom_2DFloXSurRunoff(idom_acetate,K,N,NN,N2,N1)
+      DO idom=idom_beg,idom_end
+        TOMQRS(idom,K,N2,N1)=TOMQRS(idom,K,N2,N1)+dom_2DFloXSurRunoff(idom,K,N,NN,N2,N1)
+      ENDDO
     ENDDO D8590
 
     IF(IFLBH(N,NN,N5,N4).EQ.0)THEN
@@ -272,10 +271,9 @@ implicit none
       !heat flux
       THeat2GridBySurfRunoff(N2,N1)=THeat2GridBySurfRunoff(N2,N1)-Heat2GridBySurfRunoff(N,NN,N5,N4)
       D8591: DO K=1,micpar%NumOfLitrCmplxs
-        TOMQRS(idom_doc,K,N2,N1)=TOMQRS(idom_doc,K,N2,N1)-dom_2DFloXSurRunoff(idom_doc,K,N,NN,N5,N4)
-        TOMQRS(idom_don,K,N2,N1)=TOMQRS(idom_don,K,N2,N1)-dom_2DFloXSurRunoff(idom_don,K,N,NN,N5,N4)
-        TOMQRS(idom_dop,K,N2,N1)=TOMQRS(idom_dop,K,N2,N1)-dom_2DFloXSurRunoff(idom_dop,K,N,NN,N5,N4)
-        TOMQRS(idom_acetate,K,N2,N1)=TOMQRS(idom_acetate,K,N2,N1)-dom_2DFloXSurRunoff(idom_acetate,K,N,NN,N5,N4)
+        DO idom=idom_beg,idom_end
+          TOMQRS(idom,K,N2,N1)=TOMQRS(idom,K,N2,N1)-dom_2DFloXSurRunoff(idom,K,N,NN,N5,N4)
+        ENDDO
       ENDDO D8591
 
     ENDIF
@@ -285,10 +283,9 @@ implicit none
       TWat2GridBySurfRunoff(N2,N1)=TWat2GridBySurfRunoff(N2,N1)-Wat2GridBySurfRunoff(N,NN,N5B,N4B)
       THeat2GridBySurfRunoff(N2,N1)=THeat2GridBySurfRunoff(N2,N1)-Heat2GridBySurfRunoff(N,NN,N5B,N4B)
       D8592: DO K=1,micpar%NumOfLitrCmplxs
-        TOMQRS(idom_doc,K,N2,N1)=TOMQRS(idom_doc,K,N2,N1)-dom_2DFloXSurRunoff(idom_doc,K,N,NN,N5B,N4B)
-        TOMQRS(idom_don,K,N2,N1)=TOMQRS(idom_don,K,N2,N1)-dom_2DFloXSurRunoff(idom_don,K,N,NN,N5B,N4B)
-        TOMQRS(idom_dop,K,N2,N1)=TOMQRS(idom_dop,K,N2,N1)-dom_2DFloXSurRunoff(idom_dop,K,N,NN,N5B,N4B)
-        TOMQRS(idom_acetate,K,N2,N1)=TOMQRS(idom_acetate,K,N2,N1)-dom_2DFloXSurRunoff(idom_acetate,K,N,NN,N5B,N4B)
+        DO idom=idom_beg,idom_end
+          TOMQRS(idom,K,N2,N1)=TOMQRS(idom,K,N2,N1)-dom_2DFloXSurRunoff(idom,K,N,NN,N5B,N4B)
+        enddo
       ENDDO D8592
       ENDIF
 
@@ -298,7 +295,6 @@ implicit none
 !6631  FORMAT(A8,9I4,12E12.4)
     ENDIF
   ENDDO D1202
-
 
   end subroutine OMH2OFluxesFromRunoff
 !------------------------------------------------------------------------------------------

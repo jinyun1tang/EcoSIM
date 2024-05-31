@@ -128,7 +128,7 @@ module WatsubMod
 
     IF(M.NE.NPH)THEN
 !      if(I>=132)print*,M,'intermediate iteration'
-      call UpdateSurfaceAtM(M,NHW,NHE,NVN,NVS)
+      call UpdateSurfaceAtM(I,J,M,NHW,NHE,NVN,NVS)
 
       call UpdateStateFluxAtM(M,NHW,NHE,NVN,NVS)
     ELSE

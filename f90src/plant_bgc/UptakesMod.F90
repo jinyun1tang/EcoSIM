@@ -127,11 +127,11 @@ module UptakesMod
 !     CALCULATE CANOPY WATER STATUS FROM CONVERGENCE SOLUTION FOR
 !     TRANSPIRATION - ROOT WATER UPTAKE = CHANGE IN CANOPY WATER CONTENT
 !
-      if(NZ==1)THEN
-      write(117,*)I+J/24.,'intree',NN,TKCanopy_pft(NZ),TKC(NZ),TairK,plt_ew%TKSnow
-      ELSEIF(nz==2)then
-      write(118,*)I+J/24.,'intree',NN,TKCanopy_pft(NZ),TKC(NZ),TairK,plt_ew%TKSnow
-      ENDIF
+!      if(NZ==1)THEN
+!      write(117,*)I+J/24.,'intree',NN,TKCanopy_pft(NZ),TKC(NZ),TairK,plt_ew%TKSnow
+!      ELSEIF(nz==2)then
+!      write(118,*)I+J/24.,'intree',NN,TKCanopy_pft(NZ),TKC(NZ),TairK,plt_ew%TKSnow
+!      ENDIF
 
 !     (AG: - originally this line had a N0B1 here )
       IF((iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).NE.0)&
@@ -193,11 +193,11 @@ module UptakesMod
 !     TairK=current air temperature
 !     DeltaTKC=TKC-TairK for next hour
 !
-        if(NZ==1)THEN
-        write(117,*)I+J/24.,'outree',NN,TKCanopy_pft(NZ),TairK,TKC(NZ)
-        ELSEIF(nz==2)then
-        write(118,*)I+J/24.,'outree',NN,TKCanopy_pft(NZ),TairK,TKC(NZ)        
-        ENDIF
+!        if(NZ==1)THEN
+!        write(117,*)I+J/24.,'outree',NN,TKCanopy_pft(NZ),TairK,TKC(NZ)
+!        ELSEIF(nz==2)then
+!        write(118,*)I+J/24.,'outree',NN,TKCanopy_pft(NZ),TairK,TKC(NZ)        
+!        ENDIF
         TKC(NZ)=TKCanopy_pft(NZ)
         TCelciusCanopy_pft(NZ)=units%Kelvin2Celcius(TKC(NZ))
         DeltaTKC(NZ)=TKC(NZ)-TairK
@@ -861,11 +861,11 @@ module UptakesMod
     ENDIF
     !0.1 is the learning/updating rate
     TKCanopy_pft(NZ)=TKC1+0.1_r8*(TKCY-TKC1)
-    if(NZ==1)THEN
-    write(117,*)I+J/24.,'treeiter',NN,TKCanopy_pft(NZ),TairK,TKC1
-    ELSEIF(NZ==2)THEN
-    write(118,*)I+J/24.,'grasiter',NN,TKCanopy_pft(NZ),TairK,TKC1    
-    ENDIF
+!    if(NZ==1)THEN
+!    write(117,*)I+J/24.,'treeiter',NN,TKCanopy_pft(NZ),TairK,TKC1
+!    ELSEIF(NZ==2)THEN
+!    write(118,*)I+J/24.,'grasiter',NN,TKCanopy_pft(NZ),TairK,TKC1    
+!    ENDIF
     IF(TKCY.GT.TKC1)THEN
       !warming
       IC=1
