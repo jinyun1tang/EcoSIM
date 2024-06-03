@@ -128,9 +128,9 @@ PROGRAM main
         frectyp%yearclm=nyr1
         frectyp%yearcur=etimer%get_curr_yearAD()
         nlend=.false.
+        IGO=yeari-year_ini
         if(frectyp%yearcur==yeari)then
           call soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
-          IGO=IGO+1
         endif
         if(nlend)exit
         frectyp%yearacc=frectyp%yearacc+1
