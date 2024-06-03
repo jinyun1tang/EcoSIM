@@ -73,13 +73,22 @@ module PlantPhenolMod
 !         1 = ALIVE, 0 = NOT ALIVE
 !         DATAP=PFT file name
 !
+!      IF(NZ==1)write(199,*)I+J/24.,'bf set needle',IsPlantActive_pft(NZ).EQ.iActive,&
+!        plt_pheno%iPlantState_pft(NZ),iLive
       call set_plant_flags(I,J,NZ)
+
 !
 !         INITIALIZE VARIABLES IN ACTIVE PFT
 !
+!      IF(NZ==1)write(199,*)I+J/24.,'af set needle',IsPlantActive_pft(NZ).EQ.iActive,&
+!        plt_pheno%iPlantState_pft(NZ),iLive
       IF(IsPlantActive_pft(NZ).EQ.iActive)THEN
-        
+
+        call FindMainBranchNumber(NZ)
+
         call stage_plant_phenology(I,J,NZ)
+
+        call TestPlantEmergence(I,J,NZ)
 
         call root_shoot_branching(I,J,NZ)
 !
@@ -180,7 +189,8 @@ module PlantPhenolMod
   IF(J.EQ.1)THEN
     HarvestChk=iDayPlanting_pft(NZ).LE.iDayPlantHarvest_pft(NZ) &
       .OR.iYearPlanting_pft(NZ).LT.iYearPlantHarvest_pft(NZ)
-
+!    IF(NZ==1)write(199,*)'harvest',iDayPlanting_pft(NZ),iDayPlantHarvest_pft(NZ), &
+!      iYearPlanting_pft(NZ),iYearPlantHarvest_pft(NZ)
     !Before harvest  
     IF(HarvestChk)THEN
       !planting is feasible
@@ -189,9 +199,11 @@ module PlantPhenolMod
         IF(I.GT.iDayPlantHarvest_pft(NZ).AND.iYearCurrent.GE.iYearPlantHarvest_pft(NZ) &
           .AND.iPlantState_pft(NZ).EQ.iDead)THEN
           !post harvest
+ !         if(NZ==1)write(199,*)'postharvst'
           IsPlantActive_pft(NZ)=iDormant
         ELSE
-          IF(I.EQ.iDayPlanting_pft(NZ).AND.iYearCurrent.EQ.iYearPlanting_pft(NZ))THEN
+          IF(I.EQ.iDayPlanting_pft(NZ) .AND. iYearCurrent.EQ.iYearPlanting_pft(NZ))THEN
+!             if(NZ==1)write(199,*)'startplants'
             !planting day of year
             IsPlantActive_pft(NZ)=iDormant
             iPlantState_pft(NZ)=iLive
@@ -213,10 +225,12 @@ module PlantPhenolMod
       PlantingChk=I.LT.iDayPlanting_pft(NZ) .AND. iYearPlanting_pft(NZ).GT.iYearPlantHarvest_pft(NZ)  
       !not planted
       IF((HarvestChk.AND.iPlantState_pft(NZ).EQ.iDead) .OR. PlantingChk)THEN
+!        if(NZ==1)write(199,*)'iplantcheck'
         IsPlantActive_pft(NZ)=iDormant
       ELSE
         !planting
         IF(I.EQ.iDayPlanting_pft(NZ).AND.iYearCurrent.EQ.iYearPlanting_pft(NZ))THEN
+!          if(NZ==1)write(199,*)'iplanting'
           IsPlantActive_pft(NZ)=iDormant
           iPlantState_pft(NZ)=iLive
           CALL StartPlants(NZ,NZ)
@@ -352,53 +366,67 @@ module PlantPhenolMod
   end subroutine root_shoot_branching
 !------------------------------------------------------------------------------------------
 
+  subroutine FindMainBranchNumber(NZ)
+  implicit none
+  integer, intent(in) :: NZ
+  integer :: NB,BranchNumberX_pft
+
+  associate(                                                    &
+    iPlantBranchState_brch => plt_pheno%iPlantBranchState_brch, &
+    NumOfBranches_pft      => plt_morph%NumOfBranches_pft,      &
+    BranchNumber_brch      => plt_morph%BranchNumber_brch,      &
+    MainBranchNum_pft      => plt_morph%MainBranchNum_pft       &
+  )
+
+  MainBranchNum_pft(NZ)=1
+  BranchNumberX_pft=1.0E+06_r8  
+
+  DD140: DO NB=1,NumOfBranches_pft(NZ)
+    IF(iPlantBranchState_brch(NB,NZ).EQ.iLive)THEN
+      !find main branch number, which is the most recent live branch      
+      IF(BranchNumber_brch(NB,NZ).LT.BranchNumberX_pft)THEN
+        MainBranchNum_pft(NZ)=NB
+        BranchNumberX_pft=BranchNumber_brch(NB,NZ)
+      ENDIF      
+    ENDIF
+  ENDDO DD140
+  end associate
+  end subroutine FindMainBranchNumber
+!------------------------------------------------------------------------------------------
   subroutine stage_plant_phenology(I,J,NZ)
   implicit none
   integer, intent(in) :: I,J,NZ
 
-  integer :: NB,N,L,NE,BranchNumberX_pft
-  real(r8):: ShootArea
-  logical :: CanopyChk,RootChk
-  associate(                                                                  &
-    CanopyLeafShethC_pft            =>  plt_biom%CanopyLeafShethC_pft       , &
-    LeafPetolBiomassC_brch          =>  plt_biom%LeafPetolBiomassC_brch     , &
-    ShootStrutElms_pft              =>  plt_biom%ShootStrutElms_pft         , &
-    NoduleNonstructCconc_pft        =>  plt_biom%NoduleNonstructCconc_pft   , &
-    LeafPetoNonstElmConc_brch       =>  plt_biom%LeafPetoNonstElmConc_brch  , &
-    CanopyNonstElmConc_pft          =>  plt_biom%CanopyNonstElmConc_pft     , &
-    CanopyNonstElms_pft             =>  plt_biom%CanopyNonstElms_pft        , &
-    CanopyNodulNonstElms_brch       =>  plt_biom%CanopyNodulNonstElms_brch  , &
-    RootMycoNonstElms_rpvr          =>  plt_biom%RootMycoNonstElms_rpvr     , &
-    CanopyNonstElms_brch            =>  plt_biom%CanopyNonstElms_brch       , &
-    RootNonstructElmConc_pvr        =>  plt_biom%RootNonstructElmConc_pvr   , &
-    ZERO4LeafVar_pft                           =>  plt_biom%ZERO4LeafVar_pft                      , &
-    ZERO4Groth_pft                           =>  plt_biom%ZERO4Groth_pft                      , &
-    RootMycoActiveBiomC_pvr         =>  plt_biom%RootMycoActiveBiomC_pvr    , &
-    CanopyNodulNonstElms_pft        =>  plt_biom%CanopyNodulNonstElms_pft   , &
-    WatByPCanopy                    =>  plt_ew%WatByPCanopy                 , &
-    VHeatCapCanP                    =>  plt_ew%VHeatCapCanP                 , &
-    NU                              =>  plt_site%NU                         , &
-    iPlantBranchState_brch          =>  plt_pheno%iPlantBranchState_brch    , &
-    iPlantCalendar_brch             =>  plt_pheno%iPlantCalendar_brch       , &
-    MainBranchNum_pft               =>  plt_morph%MainBranchNum_pft         , &
-    Root1stDepz_pft                 =>  plt_morph%Root1stDepz_pft           , &
-    MY                              =>  plt_morph%MY                        , &
-    CanopyLeafArea_pft              =>  plt_morph%CanopyLeafArea_pft        , &
-    NGTopRootLayer_pft              =>  plt_morph%NGTopRootLayer_pft        , &
-    NIXBotRootLayer_pft             =>  plt_morph%NIXBotRootLayer_pft       , &
-    NumOfBranches_pft               =>  plt_morph%NumOfBranches_pft         , &
-    BranchNumber_brch               =>  plt_morph%BranchNumber_brch         , &
-    HypoctoHeight_pft               =>  plt_morph%HypoctoHeight_pft         , &
-    SeedDepth_pft                   =>  plt_morph%SeedDepth_pft             , &
-    CanopyStemArea_pft              =>  plt_morph%CanopyStemArea_pft        , &
-    MaxSoiL4Root                    =>  plt_morph%MaxSoiL4Root                &
+  integer :: NB,N,L,NE
+
+  associate(                                                         &
+    CanopyLeafShethC_pft      => plt_biom%CanopyLeafShethC_pft,      &
+    LeafPetolBiomassC_brch    => plt_biom%LeafPetolBiomassC_brch,    &
+    NoduleNonstructCconc_pft  => plt_biom%NoduleNonstructCconc_pft,  &
+    LeafPetoNonstElmConc_brch => plt_biom%LeafPetoNonstElmConc_brch, &
+    CanopyNonstElmConc_pft    => plt_biom%CanopyNonstElmConc_pft,    &
+    CanopyNonstElms_pft       => plt_biom%CanopyNonstElms_pft,       &
+    CanopyNodulNonstElms_brch => plt_biom%CanopyNodulNonstElms_brch, &
+    RootMycoNonstElms_rpvr    => plt_biom%RootMycoNonstElms_rpvr,    &
+    CanopyNonstElms_brch      => plt_biom%CanopyNonstElms_brch,      &
+    RootNonstructElmConc_pvr  => plt_biom%RootNonstructElmConc_pvr,  &
+    ZERO4LeafVar_pft          => plt_biom%ZERO4LeafVar_pft,          &
+    ZERO4Groth_pft            => plt_biom%ZERO4Groth_pft,            &
+    RootMycoActiveBiomC_pvr   => plt_biom%RootMycoActiveBiomC_pvr,   &
+    CanopyNodulNonstElms_pft  => plt_biom%CanopyNodulNonstElms_pft,  &
+    NU                        => plt_site%NU,                        &
+    iPlantBranchState_brch    => plt_pheno%iPlantBranchState_brch,   &
+    MY                        => plt_morph%MY,                       &
+    NGTopRootLayer_pft        => plt_morph%NGTopRootLayer_pft,       &
+    NIXBotRootLayer_pft       => plt_morph%NIXBotRootLayer_pft,      &
+    NumOfBranches_pft         => plt_morph%NumOfBranches_pft,        &
+    MaxSoiL4Root              => plt_morph%MaxSoiL4Root              &
   )
   plt_bgcr%RootGasLossDisturb_pft(idg_beg:idg_end-1,NZ)=0.0_r8
   CanopyNonstElms_pft(1:NumPlantChemElms,NZ)=0.0_r8
   MaxSoiL4Root(NZ)=NIXBotRootLayer_pft(NZ)
   NGTopRootLayer_pft(NZ)=MIN(MaxSoiL4Root(NZ),MAX(NGTopRootLayer_pft(NZ),NU))
-  MainBranchNum_pft(NZ)=1
-  BranchNumberX_pft=1.0E+06_r8
+
 !
 ! TOTAL PLANT NON-STRUCTURAL C, N, P
 !
@@ -406,21 +434,14 @@ module PlantPhenolMod
 ! CPOLN*,ZPOLN*,PPOLN*=non-structl C,N,P in branch,canopy nodules (g)
 ! MainBranchNum_pft=main branch number
 !
-  
   D140: DO NB=1,NumOfBranches_pft(NZ)
     IF(iPlantBranchState_brch(NB,NZ).EQ.iLive)THEN
       DO NE=1,NumPlantChemElms      
         CanopyNonstElms_pft(NE,NZ)=CanopyNonstElms_pft(NE,NZ)+CanopyNonstElms_brch(NE,NB,NZ)
         CanopyNodulNonstElms_pft(NE,NZ)=CanopyNodulNonstElms_pft(NE,NZ)+CanopyNodulNonstElms_brch(NE,NB,NZ)    
       ENDDO     
-      !find main branch number, which is the most recent live branch      
-      IF(BranchNumber_brch(NB,NZ).LT.BranchNumberX_pft)THEN
-        MainBranchNum_pft(NZ)=NB
-        BranchNumberX_pft=BranchNumber_brch(NB,NZ)
-      ENDIF      
     ENDIF
   ENDDO D140
-
 !
 ! NON-STRUCTURAL C, N, P CONCENTRATIONS IN ROOT
 !
@@ -468,6 +489,29 @@ module PlantPhenolMod
       LeafPetoNonstElmConc_brch(1:NumPlantChemElms,NB,NZ)=1.0_r8
     ENDIF    
   ENDDO D190
+
+  end associate
+  end subroutine stage_plant_phenology
+!------------------------------------------------------------------------------------------
+  subroutine TestPlantEmergence(I,J,NZ)
+  implicit none
+  integer, intent(in) :: I,J,NZ
+  real(r8):: ShootArea
+  logical :: CanopyChk,RootChk
+
+  associate(                                                         &
+    MainBranchNum_pft         => plt_morph%MainBranchNum_pft,        &  
+    CanopyLeafArea_pft        => plt_morph%CanopyLeafArea_pft,       &    
+    ShootStrutElms_pft        => plt_biom%ShootStrutElms_pft,        &    
+    HypoctoHeight_pft         => plt_morph%HypoctoHeight_pft,        &    
+    WatByPCanopy              => plt_ew%WatByPCanopy,                &    
+    Root1stDepz_pft           => plt_morph%Root1stDepz_pft,          &    
+    ZERO4LeafVar_pft          => plt_biom%ZERO4LeafVar_pft,          &    
+    VHeatCapCanP              => plt_ew%VHeatCapCanP,                &    
+    CanopyStemArea_pft        => plt_morph%CanopyStemArea_pft,       &    
+    SeedDepth_pft             => plt_morph%SeedDepth_pft,            &    
+    iPlantCalendar_brch       => plt_pheno%iPlantCalendar_brch       &
+  )
 !
 ! EMERGENCE DATE FROM COTYLEDON HEIGHT, LEAF AREA, ROOT DEPTH
 !
@@ -479,6 +523,8 @@ module PlantPhenolMod
 ! VHeatCapCanP,WTSHT,WatByPCanopy=canopy heat capacity,mass,water content
 !
   ShootArea=0._r8
+!  if(NZ==1)write(211,*)I+J/24.,MainBranchNum_pft(NZ) &
+!    ,iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ)
   IF(iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).EQ.0)THEN
     ShootArea=CanopyLeafArea_pft(NZ)+CanopyStemArea_pft(NZ)
     CanopyChk=(HypoctoHeight_pft(NZ).GT.SeedDepth_pft(NZ)).AND.(ShootArea.GT.ZERO4LeafVar_pft(NZ))
@@ -497,9 +543,8 @@ module PlantPhenolMod
     ENDIF
   ENDIF
   end associate
-  end subroutine stage_plant_phenology
-!------------------------------------------------------------------------------------------
-
+  end subroutine TestPlantEmergence
+!------------------------------------------------------------------------------------------  
   subroutine branch_specific_phenology(I,J,NB,NZ)
   implicit none
   integer, intent(in) :: I,J,NB,NZ

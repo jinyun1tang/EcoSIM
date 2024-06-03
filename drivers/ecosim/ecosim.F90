@@ -111,7 +111,7 @@ PROGRAM main
 
   IGO=0
   yeari=year_ini
-  print*,frectyp%ymdhs0,yeari
+!  print*,frectyp%ymdhs0,yeari
 
   DO nn1=1,3
     call set_ecosim_solver(NPXS(NN1),NPYS(NN1),NCYC_LITR,NCYC_SNOW)
@@ -130,6 +130,7 @@ PROGRAM main
         nlend=.false.
         if(frectyp%yearcur==yeari)then
           call soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
+          IGO=IGO+1
         endif
         if(nlend)exit
         frectyp%yearacc=frectyp%yearacc+1

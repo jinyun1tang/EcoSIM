@@ -123,7 +123,7 @@ implicit none
   if (len_trim(pft_mgmt_in)==0)then
     return
   else
-  !  print*,'ReadPlantManagementNC'
+!    write(199,*)'ReadPlantManagementNC'
   ! initialize the disturbance arrays
     DO NX=NHW,NHE
       DO NY=NVN,NVS
@@ -153,7 +153,7 @@ implicit none
 
     call check_ret(nf90_get_var(pftinfo_nfid%fh, vardesc%varid, pft_dflag), &
       trim(mod_filename)//'::at line '//trim(int2str(__LINE__)))
-
+!    write(199,*)'pppft_dflag=',pft_dflag,IGO
     if(pft_dflag==0)then
       ! constant pft data
       iyear=1
