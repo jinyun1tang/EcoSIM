@@ -185,7 +185,13 @@ configure_file(
 # Other third-party libraries.
 # adding in ATS tpl support:
 
-set(ATS-EcoSIM TRUE)
+if(NOT DEFINED ATS-EcoSIM)
+  message("ATS-EcoSIM not set, settting ...")
+  set(ATS-EcoSIM TRUE)
+endif()
+
+message("ATS-EcoSIM: ${ATS-EcoSIM}")
+message("ECOSIM_INSTALL_PREFIX: ${ECOSIM_INSTALL_PREFIX}")
 
 if (ATS-EcoSIM)
     message(STATUS "In if statement")
@@ -205,8 +211,6 @@ if (ATS-EcoSIM)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${NETCDF_CFLAGS} -fPIC")
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} ${NETCDF_FFLAGS} -fPIC")
-
-    
 
     #What were these even for? are they neccesary?
     include_directories("/global2/agraus/code/ats_dev_dir/amanzi_tpls-install-master-Debug/include")
