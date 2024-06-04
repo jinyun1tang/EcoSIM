@@ -185,12 +185,12 @@ configure_file(
 # Other third-party libraries.
 # adding in ATS tpl support:
 
-if(NOT DEFINED ATS-EcoSIM)
-  message(STATUS "ATS-EcoSIM not set, settting ...")
-  set(ATS-EcoSIM TRUE)
+if(NOT DEFINED ATS_ECOSIM)
+  message(STATUS "ATS_EcoSIM not set")
+  #set(ATS_ECOSIM TRUE)
 endif()
 
-message(STATUS "ATS-EcoSIM: ${ATS-EcoSIM}")
+message(STATUS "ATS_ECOSIM: ${ATS_ECOSIM}")
 message(STATUS "ECOSIM_INSTALL_PREFIX: ${ECOSIM_INSTALL_PREFIX}")
 
 if (ATS-EcoSIM)
