@@ -186,12 +186,12 @@ configure_file(
 # adding in ATS tpl support:
 
 if(NOT DEFINED ATS-EcoSIM)
-  message("ATS-EcoSIM not set, settting ...")
+  message(STATUS "ATS-EcoSIM not set, settting ...")
   set(ATS-EcoSIM TRUE)
 endif()
 
-message("ATS-EcoSIM: ${ATS-EcoSIM}")
-message("ECOSIM_INSTALL_PREFIX: ${ECOSIM_INSTALL_PREFIX}")
+message(STATUS "ATS-EcoSIM: ${ATS-EcoSIM}")
+message(STATUS "ECOSIM_INSTALL_PREFIX: ${ECOSIM_INSTALL_PREFIX}")
 
 if (ATS-EcoSIM)
     message(STATUS "In if statement")
