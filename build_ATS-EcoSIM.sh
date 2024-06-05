@@ -67,6 +67,9 @@ fi
 cmd_configure="${cmake_binary} \
     ${ecosim_source_dir}"
 
+ATS_ECOSIM=$ATS_ECOSIM
+echo $ATS_ECOSIM
+
 echo "cmd_configure: $cmd_configure"
 
 echo "building in: $ecosim_build_dir"
@@ -75,7 +78,7 @@ echo "building in: $ecosim_build_dir"
 #${cmd_configure}
 cd build
 pwd
-cmake ../
+cmake ../ -DATS_ECOSIM=ATS_ECOSIM
 
 #This does the build
 make -j ${parallel_jobs}
