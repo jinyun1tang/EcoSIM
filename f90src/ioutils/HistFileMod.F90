@@ -2157,16 +2157,16 @@ implicit none
   ! If branch run, initialize file times and return
 
   if (flag == 'read') then
-     if (nsrest == nsrBranch) then
-         do t = 1,ntapes
-            tape(t)%ntimes = 0
-         end do
-         return
-      end if
-      ! If startup run just return
-      if (nsrest == nsrStartup) then
-         RETURN
-      end if
+    if (nsrest == nsrBranch) then
+      do t = 1,ntapes
+        tape(t)%ntimes = 0
+      end do
+      return
+     end if
+   ! If startup run just return
+     if (nsrest == nsrStartup) then
+       RETURN
+     end if
    endif
 
     ! Read history file data only for restart run (not for branch run)
@@ -2400,7 +2400,9 @@ implicit none
        !
        ! Add history namelist data to each history restart tape
        !
+       
        do t = 1,ntapes
+          
           call ncd_io(varname='fincl', data=fincl(:,t), ncid=ncid_hist(t), flag='write')
 
           call ncd_io(varname='fexcl', data=fexcl(:,t), ncid=ncid_hist(t), flag='write')
@@ -2455,7 +2457,7 @@ implicit none
     !================================================
 
        call ncd_inqdlen(ncid,dimid,ntapes_onfile, name='ntapes')
-
+       
        if ( is_restart() .and. ntapes_onfile /= ntapes )then
           write(iulog,*) 'ntapes = ', ntapes, ' ntapes_onfile = ', ntapes_onfile
           call endrun(msg=' ERROR: number of ntapes different than on restart file!,'// &
@@ -2476,12 +2478,12 @@ implicit none
        start(1)=1
 
        if ( is_restart() )then
-          do t = 1,ntapes
+          D100: do t = 1,ntapes
 
              call getfil( locrest(t), locfnhr(t), 0 )
 
              call ncd_pio_openfile (ncid_hist(t), trim(locfnhr(t)), ncd_nowrite)
-
+             
              if ( t == 1 )then
 
                 call ncd_inqdlen(ncid_hist(1),dimid,max_nflds,name='max_nflds')
@@ -2516,7 +2518,7 @@ implicit none
              call ncd_io('begtime', tape(t)%begtime, 'read', ncid_hist(t) )
 
              call ncd_io(varname='is_endhist', data=tape(t)%is_endhist, ncid=ncid_hist(t), flag='read')
-
+             
              call ncd_io(varname='num2d', data=itemp2d(:,t), ncid=ncid_hist(t), flag='read')
              do f=1,tape(t)%nflds
                 tape(t)%hlist(f)%field%num2d = itemp2d(f,t)
@@ -2527,8 +2529,9 @@ implicit none
                 tape(t)%hlist(f)%field%hpindex = itemp2d(f,t)
              end do
 
-             do f=1,tape(t)%nflds
+             D101: do f=1,tape(t)%nflds
                 start(2) = f
+                
                 call ncd_io( name_desc,           tape(t)%hlist(f)%field%name,       &
                              'read', ncid_hist(t), start )
                 call ncd_io( longname_desc,       tape(t)%hlist(f)%field%long_name,  &
@@ -2616,16 +2619,16 @@ implicit none
                 tape(t)%hlist(f)%field%beg1d = beg1d
                 tape(t)%hlist(f)%field%end1d = end1d
 
-             end do   ! end of flds loop
+             end do D101   ! end of flds loop
 
              ! If history file is not full, open it
-
+             
              if (tape(t)%ntimes /= 0) then
                 call ncd_pio_openfile (nfid(t), trim(locfnh(t)), ncd_write)
              end if
 
-          end do  ! end of tapes loop
-          print*,'end of tapes loop'
+          end do  D100 ! end of tapes loop
+          
           hist_fincl1(:) = fincl(:,1)
           hist_fincl2(:) = fincl(:,2)
           hist_fincl3(:) = fincl(:,3)
@@ -2647,7 +2650,7 @@ implicit none
     end if
 
     !======================================================================
-    ! Read/write history file restart data.
+    !  Read/write history file restart data.
     ! If the current history file(s) are not full, file(s) are opened
     ! so that subsequent time samples are added until the file is full.
     ! A new history file is used on a branch run.
@@ -2679,7 +2682,7 @@ implicit none
 
                    hbuf1d(beg1d_out:end1d_out) = hbuf(beg1d_out:end1d_out,1)
                    nacs1d(beg1d_out:end1d_out) = nacs(beg1d_out:end1d_out,1)
-
+                   
                    call ncd_io(ncid=ncid_hist(t), flag='write', varname=trim(name), &
                         dim1name=type1d_out, data=hbuf1d)
                    call ncd_io(ncid=ncid_hist(t), flag='write', varname=trim(name_acc), &
@@ -2704,8 +2707,6 @@ implicit none
 
     else if (flag == 'read') then
 
-       ! Read history restart information if history files are not full
-
        do t = 1,ntapes
 
           if (.not. tape(t)%is_endhist) then
@@ -2720,7 +2721,7 @@ implicit none
                 end1d_out  =  tape(t)%hlist(f)%field%end1d_out
                 nacs       => tape(t)%hlist(f)%nacs
                 hbuf       => tape(t)%hlist(f)%hbuf
-
+                
                 if (num2d == 1) then
                    allocate(hbuf1d(beg1d_out:end1d_out), &
                         nacs1d(beg1d_out:end1d_out), stat=status)
@@ -2728,7 +2729,7 @@ implicit none
                       write(iulog,*) trim(subname),' ERROR: allocation'
                       call endrun(msg=errMsg(__FILE__, __LINE__))
                    end if
-
+                
                    call ncd_io(ncid=ncid_hist(t), flag='read', varname=trim(name), &
                         dim1name=type1d_out, data=hbuf1d)
                    call ncd_io(ncid=ncid_hist(t), flag='read', varname=trim(name_acc), &

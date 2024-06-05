@@ -55,12 +55,14 @@ implicit none
   logical :: disp_modelconfig=.true.
   logical :: do_rgres        !logical switch for regression tests
   integer :: grid_mode = 3  !vertical only
+
   type, public :: forc_data_rec_type
   integer :: pft_rec
   integer :: yearclm
   integer :: yearacc      !year passed
   integer :: yearcur      !current year 
   integer :: yearpre      !previous year
+  integer :: yearrst      !restart year
   logical :: lskip_loop   !logical switch to skip a loop
   character(len=datestrlen) :: ymdhs0  !the beginning yyyymmddhhmmss
   contains
@@ -80,6 +82,7 @@ implicit none
   this%yearacc=0    !accumulated years for the whole simulation
   this%yearcur=0    !current year
   this%yearpre=0    !previous year
+  this%yearrst=0    !restarting year
   this%lskip_loop=.true.
   this%ymdhs0='00000000000000'
   end subroutine Init_frectyp

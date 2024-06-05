@@ -65,16 +65,6 @@ implicit none
   contains
 
 !------------------------------------------------------------------------------------------
-  subroutine restartnc(ncid,flag)
-  implicit none
-  character(len=*), intent(in) :: flag
-  type(file_desc_t), intent(inout) :: ncid ! netcdf id
-
-  call wouts(ncid,flag)
-
-  CALL WOUTP(ncid,flag)
-  end subroutine restartnc
-!------------------------------------------------------------------------------------------
   subroutine restFile(flag)
   implicit none
   character(len=*), intent(in) :: flag
@@ -86,7 +76,7 @@ implicit none
 
   if (flag=='read')then
     call restFile_getfile(fnamer,path)
-    call restFile_read( bounds, fnamer)
+    call restFile_read( bounds, fnamer)    
   else if(flag=='write')then  
     call etimer%get_curr_date(yr,mon,day,tod)
     write(rdate,'(i4.4,"-",i2.2,"-",i2.2,"-",i5.5)') yr,mon,day,tod
@@ -96,7 +86,7 @@ implicit none
   end subroutine restFile
 
 !------------------------------------------------------------------------------------------
-  SUBROUTINE woutp(ncid,flag)  
+  SUBROUTINE restartnc(ncid,flag)  
 !
 !     THIS SUBROUTINE WRITES OUT ALL PLANT VARIABLES TO
 !     CHECKPOINT FILES AT THE FREQUENCY GIVEN IN THE OPTIONS
@@ -150,7 +140,7 @@ implicit none
 
   else 
     !print*,'NP'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,NP,datic_1d)
+    call cpcol(flag,NHW,NHE,NVN,NVS,NP,datic_1d)
     dat1pr => datic_1d
     call restartvar(ncid, flag, varname='NP', dim1name='column',&
        long_name='number of plant species', units='none', interpinic_flag='skip', &
@@ -166,7 +156,7 @@ implicit none
 
   else 
     !print*,'NumActivePlants'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,NumActivePlants,datic_1d)
+    call cpcol(flag,NHW,NHE,NVN,NVS,NumActivePlants,datic_1d)
     dat1pr=>datic_1d
     call restartvar(ncid, flag, varname='NumActivePlants', dim1name='column',&
        long_name='number of active PFT', units='none', interpinic_flag='skip', &
@@ -2957,7 +2947,7 @@ implicit none
 
   if(flag=='read')then
     datpr3 => datrp_3d(1:npfts,1:pltpar%jroots,1:JZ)
-    call restartvar(ncid, flag, varname=' PopuRootMycoC_pvr', dim1name='pft',dim2name='rootyps',&
+    call restartvar(ncid, flag, varname='PopuRootMycoC_pvr', dim1name='pft',dim2name='rootyps',&
      dim3name='levsoi',long_name='root/mycorh layer C', units='g d-2', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval) 
     call cppft(flag,NHW,NHE,NVN,NVS,NP, PopuRootMycoC_pvr,datrp_3d,NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft) 
@@ -2966,7 +2956,7 @@ implicit none
     if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP, PopuRootMycoC_pvr,datrp_3d,&
       NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft)
     datpr3 => datrp_3d(1:npfts,1:pltpar%jroots,1:JZ)
-    call restartvar(ncid, flag, varname=' PopuRootMycoC_pvr', dim1name='pft',dim2name='rootyps',&
+    call restartvar(ncid, flag, varname='PopuRootMycoC_pvr', dim1name='pft',dim2name='rootyps',&
      dim3name='levsoi',long_name='root/mycorh layer C', units='g d-2', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)   
   endif  
@@ -3152,7 +3142,7 @@ implicit none
 
   if(flag=='read')then
     datpr4 => datrp_4d(1:npfts,1:NumPlantChemElms, 1:pltpar%jroots,1:JZ)
-    call restartvar(ncid, flag, varname=' RootMycoNonstElms_rpvr', dim1name='pft',dim2name='elmnts', &
+    call restartvar(ncid, flag, varname='RootMycoNonstElms_rpvr', dim1name='pft',dim2name='elmnts', &
      dim3name='rootyps',dim4name='levsoi',long_name='root layer nonstructural element', units='g d-2', &
      interpinic_flag='skip', data=datpr4, missing_value=spval, fill_value=spval)
     call cppft(flag,NHW,NHE,NVN,NVS,NP, RootMycoNonstElms_rpvr,datrp_4d,NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft) 
@@ -3160,7 +3150,7 @@ implicit none
     !print*,' RootMycoNonstElms_rpvr'
     if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP, RootMycoNonstElms_rpvr,datrp_4d,NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft)   
     datpr4 => datrp_4d(1:npfts,1:NumPlantChemElms, 1:pltpar%jroots,1:JZ)
-    call restartvar(ncid, flag, varname=' RootMycoNonstElms_rpvr', dim1name='pft',dim2name='elmnts', &
+    call restartvar(ncid, flag, varname='RootMycoNonstElms_rpvr', dim1name='pft',dim2name='elmnts', &
      dim3name='rootyps',dim4name='levsoi',long_name='root layer nonstructural element', units='g d-2', &
      interpinic_flag='skip', data=datpr4, missing_value=spval, fill_value=spval)
   endif  
@@ -3200,7 +3190,7 @@ implicit none
   if(flag=='read')then
     datpr4 => datrp_4d(1:npfts, 1:pltpar%jroots,1:JZ,1:NumOfCanopyLayers)
     call restartvar(ncid, flag, varname='Root2ndXNum_rpvr', dim1name='pft',dim2name='rootyps',&
-     dim3name='levsoi',dim4name='levcan',long_name='root layer secondary axes number', units=' d-2', &
+     dim3name='levsoi',dim4name='levcan',long_name='root layer secondary axes number', units='d-2', &
      interpinic_flag='skip', data=datpr4, missing_value=spval, fill_value=spval)  
     call cppft(flag,NHW,NHE,NVN,NVS,NP,Root2ndXNum_rpvr,datrp_4d,NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft) 
   else
@@ -3209,7 +3199,7 @@ implicit none
       IsPlantActive_pft=IsPlantActive_pft)   
     datpr4 => datrp_4d(1:npfts, 1:pltpar%jroots,1:JZ,1:NumOfCanopyLayers)
     call restartvar(ncid, flag, varname='Root2ndXNum_rpvr', dim1name='pft',dim2name='rootyps',&
-     dim3name='levsoi',dim4name='levcan',long_name='root layer secondary axes number', units=' d-2', &
+     dim3name='levsoi',dim4name='levcan',long_name='root layer secondary axes number', units='d-2', &
      interpinic_flag='skip', data=datpr4, missing_value=spval, fill_value=spval)  
   endif  
 
@@ -3314,7 +3304,7 @@ implicit none
   call destroy(datrp_5d)  
   call destroy(datip_3d)
 
-  END SUBROUTINE woutp
+  END SUBROUTINE restartnc
 
 !------------------------------------------------------------------------------------------
 
@@ -3373,6 +3363,11 @@ implicit none
   call restartvar(ncid, flag, varname='TSEDOU', &
        long_name='total sediment subsurface flux', units='Mg d-2', &
        interpinic_flag='skip', data=TSEDOU, missing_value=spval, &
+       fill_value=spval)
+
+  call restartvar(ncid, flag, varname='TAREA', &
+       long_name='total surface grid area', units='m2', &
+       interpinic_flag='skip', data=TAREA, missing_value=spval, &
        fill_value=spval)
 
   call restartvar(ncid, flag, varname='HEATIN', &
@@ -3487,7 +3482,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,IFNHB,datic_1d)
   else
     !print*,'IFNHB'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,IFNHB,datic_1d)
+    call cpcol(flag,NHW,NHE,NVN,NVS,IFNHB,datic_1d)
     dat1pr => datic_1d
     call restartvar(ncid, flag, varname='IFNHB', dim1name='column',&
        long_name='banded NH4 fertilizer flag', units='none', &
@@ -3505,7 +3500,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,IDWaterTable,datic_1d)
   else
     !print*,'IDWaterTable'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,IDWaterTable,datic_1d)  
+    call cpcol(flag,NHW,NHE,NVN,NVS,IDWaterTable,datic_1d)  
     dat1pr => datic_1d
     call restartvar(ncid, flag, varname='IDWaterTable', dim1name='column',&
        long_name='water table flag from site file', units='none', &
@@ -3523,7 +3518,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,IFNOB,datic_1d)
   else
     !print*,'IFNOB'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,IFNOB,datic_1d)  
+    call cpcol(flag,NHW,NHE,NVN,NVS,IFNOB,datic_1d)  
     dat1pr => datic_1d
     call restartvar(ncid, flag, varname='IFNOB', dim1name='column',&
        long_name='banded NO3 fertilizer flag', units='none', &
@@ -3540,7 +3535,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,IFPOB,datic_1d)
   else
     !print*,'IFPOB'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,IFPOB,datic_1d)  
+    call cpcol(flag,NHW,NHE,NVN,NVS,IFPOB,datic_1d)  
     dat1pr => datic_1d
     call restartvar(ncid, flag, varname='IFPOB', dim1name='column',&
        long_name='banded H2PO4 fertilizer flag', units='none', &
@@ -3557,7 +3552,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,IUTYP,datic_1d)
   else
     !print*,'IUTYP'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,IUTYP,datic_1d)  
+    call cpcol(flag,NHW,NHE,NVN,NVS,IUTYP,datic_1d)  
     dat1pr => datic_1d
     call restartvar(ncid, flag, varname='IUTYP', dim1name='column',&
        long_name='urea hydrolysis inhibitor type (1=no,2=yes)', units='none', &
@@ -3574,7 +3569,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,CanopyHeight_col,datrc_1d)
   else
     !print*,'CanopyHeight_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,CanopyHeight_col,datrc_1d)  
+    call cpcol(flag,NHW,NHE,NVN,NVS,CanopyHeight_col,datrc_1d)  
     datpr1 => datrc_1d
     call restartvar(ncid, flag, varname='CanopyHeight_col', dim1name='column',&
        long_name='canopy height', units='m', &
@@ -3591,7 +3586,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,PrecIntcptByCanG,datrc_1d)
   else
     !print*,'PrecIntcptByCanG'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,PrecIntcptByCanG,datrc_1d)  
+    call cpcol(flag,NHW,NHE,NVN,NVS,PrecIntcptByCanG,datrc_1d)  
     datpr1 => datrc_1d    
     call restartvar(ncid, flag, varname='PrecIntcptByCanG', dim1name='column',&
        long_name='net water transfer to whole grid canopy', units='MJ d-2 t-1', &
@@ -3608,7 +3603,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,TSED,datrc_1d)
   else
     !print*,'TSED'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,TSED,datrc_1d)  
+    call cpcol(flag,NHW,NHE,NVN,NVS,TSED,datrc_1d)  
     datpr1 => datrc_1d    
     call restartvar(ncid, flag, varname='TSED', dim1name='column',&
        long_name='erosion rate', units='Mg d-2 h-1', &
@@ -3625,7 +3620,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,SoiSurfRoughnesst0,datrc_1d)
   else
     !print*,'SoiSurfRoughnesst0'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SoiSurfRoughnesst0,datrc_1d)  
+    call cpcol(flag,NHW,NHE,NVN,NVS,SoiSurfRoughnesst0,datrc_1d)  
     datpr1 => datrc_1d    
     call restartvar(ncid, flag, varname='SoiSurfRoughnesst0', dim1name='column',&
        long_name='initial soil surface roughness height', units='m', &
@@ -3642,7 +3637,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,LWRadCanG,datrc_1d)
   else
     !print*,'LWRadCanG'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,LWRadCanG,datrc_1d)  
+    call cpcol(flag,NHW,NHE,NVN,NVS,LWRadCanG,datrc_1d)  
     datpr1 => datrc_1d    
     call restartvar(ncid, flag, varname='LWRadCanG', dim1name='column',&
        long_name='grid total canopy LW emission', units='MJ d-2 h-1', &
@@ -3659,7 +3654,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,LWRadBySurf,datrc_1d)
   else
     !print*,'LWRadBySurf'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,LWRadBySurf,datrc_1d)  
+    call cpcol(flag,NHW,NHE,NVN,NVS,LWRadBySurf,datrc_1d)  
     datpr1 => datrc_1d    
     call restartvar(ncid, flag, varname='LWRadBySurf', dim1name='column',&
        long_name='longwave radiation emitted from ground surface  (including snow and litter)', units='MJ d-2 h-1', &
@@ -3676,7 +3671,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,Eco_NEE_col,datrc_1d)
   else
     !print*,'Eco_NEE_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,Eco_NEE_col,datrc_1d)  
+    call cpcol(flag,NHW,NHE,NVN,NVS,Eco_NEE_col,datrc_1d)  
     datpr1 => datrc_1d    
     call restartvar(ncid, flag, varname='Eco_NEE_col', dim1name='column',&
        long_name='total canopy net CO2 exchange', units='g d-2 h-1', &
@@ -3693,7 +3688,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,CanH2OHeldVg,datrc_1d) 
   else
     !print*,'CanH2OHeldVg'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,CanH2OHeldVg,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,CanH2OHeldVg,datrc_1d)   
     datpr1 => datrc_1d    
     call restartvar(ncid, flag, varname='CanH2OHeldVg', dim1name='column',&
        long_name='canopy surface water content', units='m3 d-2', &
@@ -3710,7 +3705,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,VWatStoreCapSurf,datrc_1d) 
   else
     !print*,'VWatStoreCapSurf'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VWatStoreCapSurf,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,VWatStoreCapSurf,datrc_1d)   
     datpr1 => datrc_1d      
     call restartvar(ncid, flag, varname='VWatStoreCapSurf', dim1name='column',&
        long_name='surface water storage capacity', units='m3 d-2', &
@@ -3727,7 +3722,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,URAIN_col,datrc_1d) 
   else
     !print*,'URAIN_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,URAIN_col,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,URAIN_col,datrc_1d)   
     datpr1 => datrc_1d    
     call restartvar(ncid, flag, varname='URAIN_col', dim1name='column',&
        long_name='total precipitation', units='m3 d-2', &
@@ -3744,7 +3739,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,CanopyLeafArea_col,datrc_1d) 
   else
     !print*,'CanopyLeafArea_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,CanopyLeafArea_col,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,CanopyLeafArea_col,datrc_1d)   
     datpr1 => datrc_1d    
     call restartvar(ncid, flag, varname='CanopyLeafArea_col', dim1name='column',&
        long_name='grid canopy leaf area', units='m2 d-2', &
@@ -3761,7 +3756,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,StemArea_col,datrc_1d) 
   else
     !print*,'StemArea_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,StemArea_col,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,StemArea_col,datrc_1d)   
     datpr1 => datrc_1d    
     call restartvar(ncid, flag, varname='StemArea_col', dim1name='column',&
        long_name='total canopy stem area', units='m2 d-2', &
@@ -3778,7 +3773,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,PlantPopu_col,datrc_1d) 
   else
     !print*,'PPT'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,PlantPopu_col,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,PlantPopu_col,datrc_1d)   
     datpr1 => datrc_1d    
     call restartvar(ncid, flag, varname='PPT', dim1name='column',&
        long_name='total plant population', units='# d-2', &
@@ -3795,7 +3790,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,MaxVLWatByLitR,datrc_1d) 
   else
     !print*,'MaxVLWatByLitR'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,MaxVLWatByLitR,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,MaxVLWatByLitR,datrc_1d)   
     datpr1 => datrc_1d      
     call restartvar(ncid, flag, varname='MaxVLWatByLitR', dim1name='column',&
        long_name='soil surface water retention capacity', units='m3 d-2', &
@@ -3812,7 +3807,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,SoiSurfRoughness,datrc_1d) 
   else
     !print*,'SoiSurfRoughness'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SoiSurfRoughness,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,SoiSurfRoughness,datrc_1d)   
     datpr1 => datrc_1d      
     call restartvar(ncid, flag, varname='SoiSurfRoughness', dim1name='column',&
        long_name='soil surface roughness height for calculating runoff velocity', units='m', &
@@ -3828,7 +3823,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,SurfGasFlx_col,datrc_2d) 
   else
     !print*,'UCH4G'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SurfGasFlx_col,datrc_2d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,SurfGasFlx_col,datrc_2d)   
     datpr2 => datrc_2d(1:ncols,1:trc_confs%NGasTracers)          
     call restartvar(ncid, flag, varname='SurfGasFlx_col', dim1name='column',&
        dim2name='gastrcs',long_name='total soil gas flux', units='g d-2', &
@@ -3845,7 +3840,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,CO2byFire_col,datrc_1d) 
   else
     !print*,'CO2byFire_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,CO2byFire_col,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,CO2byFire_col,datrc_1d) 
     datpr1 => datrc_1d          
     call restartvar(ncid, flag, varname='CO2byFire_col', dim1name='column',&
        long_name='total CO2 flux from fire', units='g d-2', &
@@ -3863,7 +3858,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,CH4byFire_col,datrc_1d) 
   else
     !print*,'CH4byFire_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,CH4byFire_col,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,CH4byFire_col,datrc_1d)   
     datpr1 => datrc_1d          
     call restartvar(ncid, flag, varname='CH4byFire_col', dim1name='column',&
        long_name='total CH4 flux from fire', units='g d-2', &
@@ -3880,7 +3875,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,O2byFire_col,datrc_1d) 
   else
     !print*,'O2byFire_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,O2byFire_col,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,O2byFire_col,datrc_1d)   
     datpr1 => datrc_1d          
     call restartvar(ncid, flag, varname='O2byFire_col', dim1name='column',&
        long_name='total O2 flux from fire', units='g d-2', &
@@ -3897,7 +3892,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,N2ObyFire_col,datrc_1d) 
   else
     !print*,'N2ObyFire_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,N2ObyFire_col,datrc_1d)
+    call cpcol(flag,NHW,NHE,NVN,NVS,N2ObyFire_col,datrc_1d)
     datpr1 => datrc_1d             
     call restartvar(ncid, flag, varname='N2ObyFire_col', dim1name='column',&
        long_name='total N2O flux from fire', units='g d-2', &
@@ -3914,7 +3909,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,NH3byFire_col,datrc_1d) 
   else
     !print*,'NH3byFire_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,NH3byFire_col,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,NH3byFire_col,datrc_1d)   
     datpr1 => datrc_1d          
     call restartvar(ncid, flag, varname='NH3byFire_col', dim1name='column',&
        long_name='total NH3 flux from fire', units='g d-2', &
@@ -3931,7 +3926,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,PO4byFire_col,datrc_1d) 
   else
     !print*,'PO4byFire_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,PO4byFire_col,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,PO4byFire_col,datrc_1d)   
     datpr1 => datrc_1d          
     call restartvar(ncid, flag, varname='PO4byFire_col', dim1name='column',&
        long_name='total PO4 flux from fire', units='g d-2', &
@@ -3948,7 +3943,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,AmendCFlx_col,datrc_1d) 
   else
     !print*,'AmendCFlx_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,AmendCFlx_col,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,AmendCFlx_col,datrc_1d)   
     datpr1 => datrc_1d          
     call restartvar(ncid, flag, varname='AmendCFlx_col', dim1name='column',&
        long_name='total C amendment', units='g d-2', &
@@ -3965,7 +3960,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,FertNFlx_col,datrc_1d) 
   else
     !print*,'FertNFlx_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,FertNFlx_col,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,FertNFlx_col,datrc_1d)   
     datpr1 => datrc_1d          
     call restartvar(ncid, flag, varname='FertNFlx_col', dim1name='column',&
        long_name='total fertilizer N amendment', units='g d-2', &
@@ -3982,7 +3977,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,FerPFlx_col,datrc_1d) 
   else
     !print*,'FerPFlx_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,FerPFlx_col,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,FerPFlx_col,datrc_1d)   
     datpr1 => datrc_1d          
     call restartvar(ncid, flag, varname='FerPFlx_col', dim1name='column',&
        long_name='total fertilizer P amendment', units='g d-2', &
@@ -3999,7 +3994,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,AnualH2OLoss_col,datrc_1d) 
   else
     !print*,'AnualH2OLoss_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,AnualH2OLoss_col,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,AnualH2OLoss_col,datrc_1d)   
     datpr1 => datrc_1d          
     call restartvar(ncid, flag, varname='AnualH2OLoss_col', dim1name='column',&
        long_name='total subsurface water flux', units='m3 d-2', &
@@ -4016,7 +4011,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,UEVAP,datrc_1d) 
   else
     !print*,'UEVAP'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,UEVAP,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,UEVAP,datrc_1d)   
     datpr1 => datrc_1d          
     call restartvar(ncid, flag, varname='UEVAP', dim1name='column',&
        long_name='total evaporation', units='m3 d-2', &
@@ -4033,7 +4028,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,URUN,datrc_1d) 
   else
     !print*,'URUN'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,URUN,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,URUN,datrc_1d)   
     datpr1 => datrc_1d          
     call restartvar(ncid, flag, varname='URUN', dim1name='column',&
        long_name='total surface runoff', units='m3 d-2', &
@@ -4050,7 +4045,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,HydroSufDOCFlx_col,datrc_1d) 
   else
     !print*,'HydroSufDOCFlx_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,HydroSufDOCFlx_col,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,HydroSufDOCFlx_col,datrc_1d)   
     datpr1 => datrc_1d          
     call restartvar(ncid, flag, varname='HydroSufDOCFlx_col', dim1name='column',&
        long_name='total surface DOC flux', units='g d-2', &
@@ -4067,7 +4062,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,HydroSubsDOCFlx_col,datrc_1d) 
   else
     !print*,'HydroSubsDOCFlx_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,HydroSubsDOCFlx_col,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,HydroSubsDOCFlx_col,datrc_1d)   
     datpr1 => datrc_1d          
     call restartvar(ncid, flag, varname='HydroSubsDOCFlx_col', dim1name='column',&
        long_name='total subsurface DOC flux', units='g d-2', &
@@ -4084,7 +4079,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,HydroSufDONFlx_col,datrc_1d) 
   else
     !print*,'HydroSufDONFlx_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,HydroSufDONFlx_col,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,HydroSufDONFlx_col,datrc_1d) 
     datpr1 => datrc_1d          
     call restartvar(ncid, flag, varname='HydroSufDONFlx_col', dim1name='column',&
        long_name='total surface DON flux', units='g d-2', &
@@ -4102,7 +4097,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,HydroSubsDONFlx_col,datrc_1d) 
   else
     !print*,'HydroSubsDONFlx_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,HydroSubsDONFlx_col,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,HydroSubsDONFlx_col,datrc_1d)   
     datpr1 => datrc_1d          
     call restartvar(ncid, flag, varname='HydroSubsDONFlx_col', dim1name='column',&
        long_name='total subsurface DON flux', units='g d-2', &
@@ -4119,7 +4114,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,HydroSufDOPFlx_col,datrc_1d) 
   else
     !print*,'HydroSufDOPFlx_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,HydroSufDOPFlx_col,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,HydroSufDOPFlx_col,datrc_1d)   
     datpr1 => datrc_1d          
     call restartvar(ncid, flag, varname='HydroSufDOPFlx_col', dim1name='column',&
        long_name='total surface DOP flux', units='g d-2', &
@@ -4136,7 +4131,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,HydroSubsDOPFlx_col,datrc_1d) 
   else
     !print*,'HydroSubsDOPFlx_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,HydroSubsDOPFlx_col,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,HydroSubsDOPFlx_col,datrc_1d)   
     datpr1 => datrc_1d          
     call restartvar(ncid, flag, varname='HydroSubsDOPFlx_col', dim1name='column',&
        long_name='total subsurface DOP flux', units='g d-2', &
@@ -4153,7 +4148,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,HydroSufDICFlx_col,datrc_1d) 
   else
     !print*,'HydroSufDICFlx_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,HydroSufDICFlx_col,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,HydroSufDICFlx_col,datrc_1d)   
     datpr1 => datrc_1d          
     call restartvar(ncid, flag, varname='HydroSufDICFlx_col', dim1name='column',&
        long_name='total surface DIC flux', units='g d-2', &
@@ -4170,7 +4165,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,HydroSubsDICFlx_col,datrc_1d) 
   else
     !print*,'HydroSubsDICFlx_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,HydroSubsDICFlx_col,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,HydroSubsDICFlx_col,datrc_1d)   
     datpr1 => datrc_1d              
     call restartvar(ncid, flag, varname='HydroSubsDICFlx_col', dim1name='column',&
        long_name='total subsurface DIC flux', units='g d-2', &
@@ -4187,7 +4182,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,HydroSufDINFlx_col,datrc_1d) 
   else
     !print*,'HydroSufDINFlx_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,HydroSufDINFlx_col,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,HydroSufDINFlx_col,datrc_1d)   
     datpr1 => datrc_1d              
     call restartvar(ncid, flag, varname='HydroSufDINFlx_col', dim1name='column',&
        long_name='total surface DIN flux', units='g d-2', &
@@ -4204,7 +4199,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,HydroSubsDINFlx_col,datrc_1d) 
   else
     !print*,'HydroSubsDINFlx_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,HydroSubsDINFlx_col,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,HydroSubsDINFlx_col,datrc_1d)   
     datpr1 => datrc_1d              
     call restartvar(ncid, flag, varname='HydroSubsDINFlx_col', dim1name='column',&
        long_name='total subsurface DIN flux', units='g d-2', &
@@ -4221,7 +4216,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,HydroSufDIPFlx_col,datrc_1d) 
   else
     !print*,'HydroSufDIPFlx_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,HydroSufDIPFlx_col,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,HydroSufDIPFlx_col,datrc_1d)   
     datpr1 => datrc_1d              
     call restartvar(ncid, flag, varname='HydroSufDIPFlx_col', dim1name='column',&
        long_name='total surface DIP flux', units='g d-2', &
@@ -4238,7 +4233,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,HydroSubsDIPFlx_col,datrc_1d) 
   else
     !print*,'HydroSubsDIPFlx_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,HydroSubsDIPFlx_col,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,HydroSubsDIPFlx_col,datrc_1d)   
     datpr1 => datrc_1d              
     call restartvar(ncid, flag, varname='HydroSubsDIPFlx_col', dim1name='column',&
        long_name='total subsurface DIP flux', units='g d-2', &
@@ -4249,15 +4244,16 @@ implicit none
   if(flag=='read')then
     datpr2 => datrc_2d(1:ncols,1:NumPlantChemElms)            
     call restartvar(ncid, flag, varname='LiterfalOrgM_col', dim1name='column',&
-       dim2name='elements',long_name='total LitrFall C', units='g d-2', &
+       dim2name='elmnts',long_name='total litrFall organic matter', units='g d-2', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,LiterfalOrgM_col,datrc_2d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,LiterfalOrgM_col(:,1:JY0,1:JX0),datrc_2d) 
   else
-    !print*,'LiterfalOrgC_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,LiterfalOrgM_col,datrc_2d)   
+!    print*,'LiterfalOrgC_col',size(LiterfalOrgM_col,1),size(LiterfalOrgM_col,2)
+    call cpcol(flag,NHW,NHE,NVN,NVS,LiterfalOrgM_col(:,1:JY0,1:JX0),datrc_2d)
+    datpr2 => datrc_2d(1:ncols,1:NumPlantChemElms)
     call restartvar(ncid, flag, varname='LiterfalOrgM_col', dim1name='column',&
-       dim2name='elements',long_name='total LitrFall C', units='g d-2', &
+       dim2name='elmnts',long_name='total litrFall organic matter', units='g d-2', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
   endif  
@@ -4271,7 +4267,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,UCOP,datrc_1d) 
   else
     !print*,'UCOP'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,UCOP,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,UCOP,datrc_1d)   
     datpr1 => datrc_1d              
     call restartvar(ncid, flag, varname='UCOP', dim1name='column',&
        long_name='total soil autotrophic respiration', units='g d-2', &
@@ -4288,7 +4284,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,UDRAIN,datrc_1d) 
   else
     !print*,'UDRAIN'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,UDRAIN,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,UDRAIN,datrc_1d)   
     datpr1 => datrc_1d              
     call restartvar(ncid, flag, varname='UDRAIN', dim1name='column',&
        long_name='total water drainage below root zone', units='m3 d-2', &
@@ -4305,7 +4301,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,ZDRAIN,datrc_1d) 
   else
     !print*,'ZDRAIN'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,ZDRAIN,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,ZDRAIN,datrc_1d)   
     datpr1 => datrc_1d              
     call restartvar(ncid, flag, varname='ZDRAIN', dim1name='column',&
        long_name='total N drainage below root zone', units='gN d-2', &
@@ -4322,7 +4318,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,PDRAIN,datrc_1d) 
   else
     !print*,'PDRAIN'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,PDRAIN,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,PDRAIN,datrc_1d)   
     datpr1 => datrc_1d              
     call restartvar(ncid, flag, varname='PDRAIN', dim1name='column',&
        long_name='total P drainage below root zone', units='g d-2', &
@@ -4339,7 +4335,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,DPNH4,datrc_1d) 
   else
     !print*,'DPNH4'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,DPNH4,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,DPNH4,datrc_1d)   
     datpr1 => datrc_1d              
     call restartvar(ncid, flag, varname='DPNH4', dim1name='column',&
        long_name='total depth of NH4 band', units='m', &
@@ -4356,7 +4352,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,DPNO3,datrc_1d) 
   else
     !print*,'DPNO3'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,DPNO3,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,DPNO3,datrc_1d)   
     datpr1 => datrc_1d              
     call restartvar(ncid, flag, varname='DPNO3', dim1name='column',&
        long_name='total depth of NO3 band', units='m', &
@@ -4373,7 +4369,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,DPPO4,datrc_1d) 
   else
     !print*,'DPPO4'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,DPPO4,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,DPPO4,datrc_1d)   
     datpr1 => datrc_1d              
     call restartvar(ncid, flag, varname='DPPO4', dim1name='column',&
        long_name='total depth of PO4 band', units='m', &
@@ -4390,7 +4386,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,SoilDetachability4Erosion1,datrc_1d) 
   else
     !print*,'SoilDetachability4Erosion1'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SoilDetachability4Erosion1,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,SoilDetachability4Erosion1,datrc_1d)   
     datpr1 => datrc_1d              
     call restartvar(ncid, flag, varname='SoilDetachability4Erosion1', dim1name='column',&
        long_name='soil detachability', units='none', &
@@ -4407,7 +4403,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,SoilDetachability4Erosion2,datrc_1d) 
   else
     !print*,'SoilDetachability4Erosion2'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SoilDetachability4Erosion2,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,SoilDetachability4Erosion2,datrc_1d)   
     datpr1 => datrc_1d              
     call restartvar(ncid, flag, varname='SoilDetachability4Erosion2', dim1name='column',&
        long_name='soil detachment', units='none', &
@@ -4424,7 +4420,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,CER,datrc_1d) 
   else
     !print*,'CER'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,CER,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,CER,datrc_1d)   
     datpr1 => datrc_1d              
     call restartvar(ncid, flag, varname='CER', dim1name='column',&
        long_name='microbial C  erosion', units='g d-2 h-1', &
@@ -4441,7 +4437,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,XER,datrc_1d) 
   else
     !print*,'XER'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,XER,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,XER,datrc_1d)   
     datpr1 => datrc_1d              
     call restartvar(ncid, flag, varname='XER', dim1name='column',&
        long_name='soil detachment/deposition', units='none', &
@@ -4458,7 +4454,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,USEDOU,datrc_1d) 
   else
     !print*,'USEDOU'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,USEDOU,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,USEDOU,datrc_1d)   
     datpr1 => datrc_1d              
     call restartvar(ncid, flag, varname='USEDOU', dim1name='column',&
        long_name='total sediment subsurface flux', units='Mg d-2', &
@@ -4475,7 +4471,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,ROWN,datrc_1d) 
   else
     !print*,'ROWN'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,ROWN,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,ROWN,datrc_1d)   
     datpr1 => datrc_1d              
     call restartvar(ncid, flag, varname='ROWN', dim1name='column',&
        long_name='row spacing of NH4 fertilizer band', units='m', &
@@ -4492,7 +4488,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,ROWO,datrc_1d) 
   else
     !print*,'ROWO'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,ROWO,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,ROWO,datrc_1d)   
     datpr1 => datrc_1d              
     call restartvar(ncid, flag, varname='ROWO', dim1name='column',&
        long_name='row spacing of NO3 fertilizer band', units='m', &
@@ -4509,7 +4505,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,ROWP,datrc_1d) 
   else
     !print*,'ROWP'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,ROWP,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,ROWP,datrc_1d)   
     datpr1 => datrc_1d              
     call restartvar(ncid, flag, varname='ROWP', dim1name='column',&
        long_name='row spacing of PO4 fertilizer band', units='m', &
@@ -4526,7 +4522,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,ExtWaterTablet0,datrc_1d) 
   else
     !print*,'ExtWaterTablet0'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,ExtWaterTablet0,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,ExtWaterTablet0,datrc_1d)   
     datpr1 => datrc_1d              
     call restartvar(ncid, flag, varname='ExtWaterTablet0', dim1name='column',&
        long_name='initial external water table depth', units='m', &
@@ -4543,7 +4539,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,DTBLD,datrc_1d) 
   else
     !print*,'DTBLD'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,DTBLD,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,DTBLD,datrc_1d)   
     datpr1 => datrc_1d              
     call restartvar(ncid, flag, varname='DTBLD', dim1name='column',&
        long_name='depth of artificial water table adjusted for elevation', units='m', &
@@ -4560,7 +4556,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,Eco_NBP_col,datrc_1d) 
   else
     !print*,'Eco_NBP_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,Eco_NBP_col,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,Eco_NBP_col,datrc_1d)   
     datpr1 => datrc_1d              
     call restartvar(ncid, flag, varname='Eco_NBP_col', dim1name='column',&
        long_name='total NBP', units='g d-2', &
@@ -4577,7 +4573,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,VLitR,datrc_1d) 
   else
     !print*,'VLitR'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VLitR,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,VLitR,datrc_1d)   
     datpr1 => datrc_1d              
     call restartvar(ncid, flag, varname='VLitR', dim1name='column',&
        long_name='surface litter volume', units='m3 d-2', &
@@ -4594,7 +4590,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,SED,datrc_1d) 
   else
     !print*,'SED'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SED,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,SED,datrc_1d)   
     datpr1 => datrc_1d              
     call restartvar(ncid, flag, varname='SED', dim1name='column',&
        long_name='sediment transport', units='Mg d-2 h-1', &
@@ -4611,7 +4607,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,Eco_GPP_col,datrc_1d) 
   else
     !print*,'Eco_GPP_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,Eco_GPP_col,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,Eco_GPP_col,datrc_1d)   
     datpr1 => datrc_1d              
     call restartvar(ncid, flag, varname='Eco_GPP_col', dim1name='column',&
        long_name='ecosystem GPP', units='g d-2 h-1', &
@@ -4628,7 +4624,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,Eco_AutoR_col,datrc_1d) 
   else
     !print*,'Eco_AutoR_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,Eco_AutoR_col,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,Eco_AutoR_col,datrc_1d)   
     datpr1 => datrc_1d              
     call restartvar(ncid, flag, varname='Eco_AutoR_col', dim1name='column',&
        long_name='ecosystem autotrophic respiration', units='g d-2 h-1', &
@@ -4645,7 +4641,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,Eco_NPP_col,datrc_1d) 
   else
     !print*,'Eco_NPP_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,Eco_NPP_col,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,Eco_NPP_col,datrc_1d)   
     datpr1 => datrc_1d              
     call restartvar(ncid, flag, varname='Eco_NPP_col', dim1name='column',&
        long_name='ecosystem NPP', units='g d-2 h-1', &
@@ -4662,7 +4658,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,Eco_HR_col,datrc_1d) 
   else
     !print*,'Eco_HR_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,Eco_HR_col,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,Eco_HR_col,datrc_1d)   
     datpr1 => datrc_1d              
     call restartvar(ncid, flag, varname='Eco_HR_col', dim1name='column',&
        long_name='ecosystem heterotrophic respiration', units='g d-2 h-1', &
@@ -4679,7 +4675,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,Canopy_Heat_Latent_col,datrc_1d) 
   else
     !print*,'Canopy_Heat_Latent_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,Canopy_Heat_Latent_col,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,Canopy_Heat_Latent_col,datrc_1d)   
     datpr1 => datrc_1d              
     call restartvar(ncid, flag, varname='Canopy_Heat_Latent_col', dim1name='column',&
        long_name='total latent heat flux x boundary layer resistance', units='MJ m-1', &
@@ -4696,7 +4692,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,Canopy_Heat_Sens_col,datrc_1d) 
   else
     !print*,'Canopy_Heat_Sens_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,Canopy_Heat_Sens_col,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,Canopy_Heat_Sens_col,datrc_1d)   
     datpr1 => datrc_1d              
     call restartvar(ncid, flag, varname='Canopy_Heat_Sens_col', dim1name='column',&
        long_name='total sensible heat flux x boundary layer resistance', units='MJ m-1', &
@@ -4713,7 +4709,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,DayLenthCurrent,datrc_1d) 
   else
     !print*,'DayLenthCurrent'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,DayLenthCurrent,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,DayLenthCurrent,datrc_1d)   
     datpr1 => datrc_1d              
     call restartvar(ncid, flag, varname='DayLenthCurrent', dim1name='column',&
        long_name='daylength', units='h', &
@@ -4730,7 +4726,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,DayLenthPrev,datrc_1d) 
   else
     !print*,'DayLenthPrev'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,DayLenthPrev,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,DayLenthPrev,datrc_1d)   
     datpr1 => datrc_1d        
     call restartvar(ncid, flag, varname='DayLenthPrev', dim1name='column',&
        long_name='daylength of previous day', units='h', &
@@ -4747,7 +4743,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,ExtWaterTable,datrc_1d) 
   else
     !print*,'ExtWaterTable'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,ExtWaterTable,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,ExtWaterTable,datrc_1d)   
     datpr1 => datrc_1d        
     call restartvar(ncid, flag, varname='ExtWaterTable', dim1name='column',&
        long_name='current external water table depth', units='m', &
@@ -4764,7 +4760,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,DTBLY,datrc_1d) 
   else
     !print*,'DTBLY'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,DTBLY,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,DTBLY,datrc_1d)   
     datpr1 => datrc_1d    
     call restartvar(ncid, flag, varname='DTBLY', dim1name='column',&
        long_name='artificial water table depth', units='m', &
@@ -4773,16 +4769,16 @@ implicit none
   endif  
 
   if(flag=='read')then
-    datpr2 => datrc_2d(1:ncols,1:jcplx)    
+    datpr2 => datrc_2d(1:ncols,1:micpar%NumOfLitrCmplxs)    
     call restartvar(ncid, flag, varname='RC0', dim1name='column',dim2name='nlitromcomplx',&
        long_name='surface OM in each complex', units='g d-2', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,RC0,datrc_2d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,RC0(:,1:JY0,1:JX0),datrc_2d) 
   else
-    !print*,'RC0',size(RC0,1),size(RC0,2)
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RC0,datrc_2d)   
-    datpr2 => datrc_2d(1:ncols,1:jcplx)    
+    !print*,'RC0',size(RC0,1),size(RC0,2),jcplx
+    call cpcol(flag,NHW,NHE,NVN,NVS,RC0(:,1:JY0,1:JX0),datrc_2d)   
+    datpr2 => datrc_2d(1:ncols,1:micpar%NumOfLitrCmplxs)    
     call restartvar(ncid, flag, varname='RC0', dim1name='column',dim2name='nlitromcomplx',&
        long_name='surface OM in each complex', units='g d-2', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
@@ -4798,7 +4794,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,VcumDrySnoWE_col,datrc_1d) 
   else
     !print*,'VcumDrySnoWE_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VcumDrySnoWE_col,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,VcumDrySnoWE_col,datrc_1d)   
     datpr1 => datrc_1d    
     call restartvar(ncid, flag, varname='VcumDrySnoWE_col', dim1name='column',&
        long_name='snow volume in snowpack (water equivalent)', units='m3 d-2', &
@@ -4815,7 +4811,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,VcumWatSnow_col,datrc_1d) 
   else
     !print*,'VcumWatSnow_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VcumWatSnow_col,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,VcumWatSnow_col,datrc_1d) 
     datpr1 => datrc_1d    
     call restartvar(ncid, flag, varname='VcumWatSnow_col', dim1name='column',&
        long_name='water volume in snowpack', units='m3 d-2', &
@@ -4832,7 +4828,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,VcumIceSnow_col,datrc_1d) 
   else
     !print*,'VcumIceSnow_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VcumIceSnow_col,datrc_1d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,VcumIceSnow_col,datrc_1d)   
     datpr1 => datrc_1d    
     call restartvar(ncid, flag, varname='VcumIceSnow_col', dim1name='column',&
        long_name='ice volume in snowpack', units='m3 d-2', &
@@ -4849,7 +4845,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,VcumSnoDWI,datrc_1d) 
   else
     !print*,'VcumSnoDWI'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VcumSnoDWI,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,VcumSnoDWI,datrc_1d) 
     datpr1 => datrc_1d    
     call restartvar(ncid, flag, varname='VcumSnoDWI', dim1name='column',&
        long_name='total snowpack volume', units='m3 d-2', &
@@ -4867,7 +4863,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,SnowDepth,datrc_1d) 
   else
     !print*,'SnowDepth'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SnowDepth,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,SnowDepth,datrc_1d) 
     datpr1 => datrc_1d    
     call restartvar(ncid, flag, varname='SnowDepth', dim1name='column',&
        long_name='snowpack depth', units='m', &
@@ -4884,7 +4880,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,EnergyImpact4Erosion,datrc_1d) 
   else
     !print*,'EnergyImpact4Erosion'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,EnergyImpact4Erosion,datrc_1d)    
+    call cpcol(flag,NHW,NHE,NVN,NVS,EnergyImpact4Erosion,datrc_1d)    
     datpr1 => datrc_1d    
     call restartvar(ncid, flag, varname='EnergyImpact4Erosion', dim1name='column',&
        long_name='cumulative rainfall energy impact on soil surface', units='m', &
@@ -4898,10 +4894,10 @@ implicit none
        long_name='water equivalent dry snow in snowpack layer', units='m3 d-2', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,VLDrySnoWE_col,datrc_2d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,VLDrySnoWE_col(:,1:JY0,1:JX0),datrc_2d) 
   else
     !print*,'VLDrySnoWE'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VLDrySnoWE_col,datrc_2d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,VLDrySnoWE_col(:,1:JY0,1:JX0),datrc_2d)   
     datpr2 => datrc_2d(1:ncols,1:JS)    
     call restartvar(ncid, flag, varname='VLDrySnoWE', dim1name='column',dim2name='levsno',&
        long_name='water equivalent dry snow in snowpack layer', units='m3 d-2', &
@@ -4915,10 +4911,10 @@ implicit none
        long_name='snow ice volume in snowpack layer', units='m3 d-2', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,VLIceSnow_col,datrc_2d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,VLIceSnow_col(:,1:JY0,1:JX0),datrc_2d) 
   else
     !print*,'VLIceSnow'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VLIceSnow_col,datrc_2d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,VLIceSnow_col(:,1:JY0,1:JX0),datrc_2d)   
     datpr2 => datrc_2d(1:ncols,1:JS)    
     call restartvar(ncid, flag, varname='VLIceSnow', dim1name='column',dim2name='levsno',&
        long_name='snow ice volume in snowpack layer', units='m3 d-2', &
@@ -4932,10 +4928,10 @@ implicit none
        long_name='snow water volume in snowpack layer', units='m3 d-2', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,VLWatSnow_col,datrc_2d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,VLWatSnow_col(:,1:JY0,1:JX0),datrc_2d) 
   else
     !print*,'VLWatSnow'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VLWatSnow_col,datrc_2d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,VLWatSnow_col(:,1:JY0,1:JX0),datrc_2d)   
     datpr2 => datrc_2d(1:ncols,1:JS)        
     call restartvar(ncid, flag, varname='VLWatSnow', dim1name='column',dim2name='levsno',&
        long_name='snow water volume in snowpack layer', units='m3 d-2', &
@@ -4949,10 +4945,10 @@ implicit none
        long_name='total snow volume in snowpack layer', units='m3 d-2', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,VLSnoDWIprev_col,datrc_2d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,VLSnoDWIprev_col(:,1:JY0,1:JX0),datrc_2d) 
   else
     !print*,'VLSnoDWIprev_col
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VLSnoDWIprev_col,datrc_2d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,VLSnoDWIprev_col(:,1:JY0,1:JX0),datrc_2d)   
     datpr2 => datrc_2d(1:ncols,1:JS)        
     call restartvar(ncid, flag, varname='VLSnoDWIprev_col', dim1name='column',dim2name='levsno',&
        long_name='total snow volume in snowpack layer', units='m3 d-2', &
@@ -4966,10 +4962,10 @@ implicit none
        long_name='snowpack density', units='Mg m-3', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,SnoDensL,datrc_2d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,SnoDensL(:,1:JY0,1:JX0),datrc_2d) 
   else
     !print*,'SnoDensL'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SnoDensL,datrc_2d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,SnoDensL(:,1:JY0,1:JX0),datrc_2d)   
     datpr2 => datrc_2d(1:ncols,1:JS)        
     call restartvar(ncid, flag, varname='SnoDensL', dim1name='column',dim2name='levsno',&
        long_name='snowpack density', units='Mg m-3', &
@@ -4983,10 +4979,10 @@ implicit none
        long_name='snowpack layer depth', units='m', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,SnowThickL_col,datrc_2d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,SnowThickL_col(:,1:JY0,1:JX0),datrc_2d) 
   else
     !print*,'SnowThickL_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SnowThickL_col,datrc_2d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,SnowThickL_col(:,1:JY0,1:JX0),datrc_2d)   
     datpr2 => datrc_2d(1:ncols,1:JS)        
     call restartvar(ncid, flag, varname='SnowThickL_col', dim1name='column',dim2name='levsno',&
        long_name='snowpack layer depth', units='m', &
@@ -5000,10 +4996,10 @@ implicit none
        long_name='snowpack heat capacity', units='MJ m-3 K-1', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,VLHeatCapSnow_col,datrc_2d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,VLHeatCapSnow_col(:,1:JY0,1:JX0),datrc_2d) 
   else
     !print*,'VLHeatCapSnow'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VLHeatCapSnow_col,datrc_2d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,VLHeatCapSnow_col(:,1:JY0,1:JX0),datrc_2d)   
     datpr2 => datrc_2d(1:ncols,1:JS)        
     call restartvar(ncid, flag, varname='VLHeatCapSnow_col', dim1name='column',dim2name='levsno',&
        long_name='snowpack heat capacity', units='MJ m-3 K-1', &
@@ -5017,10 +5013,10 @@ implicit none
        long_name='snow temperature', units='K', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,TKSnow,datrc_2d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,TKSnow(:,1:JY0,1:JX0),datrc_2d) 
   else
     !print*,'TKSnow'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,TKSnow,datrc_2d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,TKSnow(:,1:JY0,1:JX0),datrc_2d)   
     datpr2 => datrc_2d(1:ncols,1:JS)        
     call restartvar(ncid, flag, varname='TKSnow', dim1name='column',dim2name='levsno',&
        long_name='snow temperature', units='K', &
@@ -5034,10 +5030,10 @@ implicit none
        long_name='snow temperature', units='oC', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,TCSnow,datrc_2d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,TCSnow(:,1:JY0,1:JX0),datrc_2d) 
   else
     !print*,'TCSnow'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,TCSnow,datrc_2d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,TCSnow(:,1:JY0,1:JX0),datrc_2d)   
     datpr2 => datrc_2d(1:ncols,1:JS)        
     call restartvar(ncid, flag, varname='TCSnow', dim1name='column',dim2name='levsno',&
        long_name='snow temperature', units='oC', &
@@ -5051,10 +5047,10 @@ implicit none
        dim3name='levsno',long_name='snow temperature', units='oC', &
        interpinic_flag='skip', data=datpr3, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,trcg_solsml,datrc_3d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,trcg_solsml(:,:,1:JY0,1:JX0),datrc_3d) 
   else
     !print*,'trcg_solsml'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,trcg_solsml,datrc_3d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,trcg_solsml(:,:,1:JY0,1:JX0),datrc_3d)   
     datpr3 => datrc_3d(1:ncols,1:trc_confs%NGasTracers,1:JS)        
     call restartvar(ncid, flag, varname='trcg_solsml', dim1name='column',dim2name='gastrcs',&
        dim3name='levsno',long_name='snow temperature', units='oC', &
@@ -5071,7 +5067,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,trcn_solsml,datrc_3d) 
   else
     !print*,'trcn_solsml'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,trcn_solsml,datrc_3d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,trcn_solsml,datrc_3d)   
     datpr3 => datrc_3d(1:ncols,1:trc_confs%NnutrientTracers,1:JS)            
     call restartvar(ncid, flag, varname='trcn_solsml', dim1name='column',dim2name='NnutrientTracers',&
        dim3name='levsno',long_name='snow temperature', units='oC', &
@@ -5088,7 +5084,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,SoilFracAsMacP,datrc_2d) 
   else
     !print*,'SoilFracAsMacP'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SoilFracAsMacP,datrc_2d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,SoilFracAsMacP,datrc_2d)   
     datpr2 => datrc_2d(1:ncols,1:JZ)        
     call restartvar(ncid, flag, varname='SoilFracAsMacP', dim1name='column',dim2name='levsoi',&
        long_name='thickness of soil layer', units='m', &
@@ -5105,7 +5101,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,DLYR,datrc_3d) 
   else
     !print*,'DLYR'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,DLYR,datrc_3d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,DLYR,datrc_3d)   
     datpr3 => datrc_3d(1:ncols,1:3,1:JZ+1)            
     call restartvar(ncid, flag, varname='DLYR', dim1name='column',dim2name='sdim',&
        dim3name='levsoi1',long_name='snow temperature', units='oC', &
@@ -5123,7 +5119,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,CumDepth2LayerBottom,datrc_2d) 
   else
     !print*,'CumDepth2LayerBottom'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,CumDepth2LayerBottom,datrc_2d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,CumDepth2LayerBottom,datrc_2d)   
     datpr2 => datrc_2d(1:ncols,1:JZ+1)        
     call restartvar(ncid, flag, varname='CumDepth2LayerBottom', dim1name='column',dim2name='levsoi1',&
        long_name='depth to bottom of soil layer', units='m', &
@@ -5140,7 +5136,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,CumSoilThickness,datrc_2d) 
   else
     !print*,'CumSoilThickness'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,CumSoilThickness,datrc_2d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,CumSoilThickness,datrc_2d)   
     datpr2 => datrc_2d(1:ncols,1:JZ+1)        
     call restartvar(ncid, flag, varname='CumSoilThickness', dim1name='column',dim2name='levsoi1',&
        long_name='depth to bottom of soil layer from grid surface', units='m', &
@@ -5157,7 +5153,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,SoiBulkDensityt0,datrc_2d) 
   else
     !print*,'SoiBulkDensityt0'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SoiBulkDensityt0,datrc_2d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,SoiBulkDensityt0,datrc_2d)   
     datpr2 => datrc_2d(1:ncols,1:JZ)     
     call restartvar(ncid, flag, varname='SoiBulkDensityt0', dim1name='column',dim2name='levsoi',&
        long_name='initial bulk density,0=water', units='Mg m-3', &
@@ -5174,7 +5170,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,SoiBulkDensity,datrc_2d) 
   else
     !print*,'SoiBulkDensity'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SoiBulkDensity,datrc_2d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,SoiBulkDensity,datrc_2d)   
     datpr2 => datrc_2d(1:ncols,1:JZ+1)    
     call restartvar(ncid, flag, varname='SoiBulkDensity', dim1name='column',dim2name='levsoi1',&
        long_name='soil bulk density,0=water', units='Mg m-3', &
@@ -5191,7 +5187,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,CSoilOrgM_vr,datrc_3d) 
   else
     !print*,'CORGC'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,CSoilOrgM_vr,datrc_3d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,CSoilOrgM_vr,datrc_3d)   
     datpr3 => datrc_3d(1:ncols,1:NumPlantChemElms,1:JZ+1)    
     call restartvar(ncid, flag, varname='CSoilOrgM_vr', dim1name='column',dim2name='elmnts',dim3name='levsoi1',&
        long_name='soil organic matter content density', units='g kg-1 m-3', &
@@ -5208,7 +5204,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,POROS,datrc_2d) 
   else
     !print*,'POROS'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,POROS,datrc_2d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,POROS,datrc_2d)   
     datpr2 => datrc_2d(1:ncols,1:JZ+1)    
     call restartvar(ncid, flag, varname='POROS', dim1name='column',dim2name='levsoi1',&
        long_name='soil porosity', units='m3 m-3', &
@@ -5225,7 +5221,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,FieldCapacity,datrc_2d) 
   else
     !print*,'FieldCapacity'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,FieldCapacity,datrc_2d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,FieldCapacity,datrc_2d)   
     datpr2 => datrc_2d(1:ncols,1:JZ+1)    
     call restartvar(ncid, flag, varname='FieldCapacity', dim1name='column',dim2name='levsoi1',&
        long_name='Field capacity', units='m3 m-3', &
@@ -5242,7 +5238,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,WiltPoint,datrc_2d)   
   else
     !print*,'WiltPoint'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,WiltPoint,datrc_2d)    
+    call cpcol(flag,NHW,NHE,NVN,NVS,WiltPoint,datrc_2d)    
     datpr2 => datrc_2d(1:ncols,1:JZ+1)    
     call restartvar(ncid, flag, varname='WiltPoint', dim1name='column',dim2name='levsoi1',&
        long_name='Wilting point', units='m3 m-3', &
@@ -5259,7 +5255,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,SatHydroCondVert,datrc_2d)   
   else
     !print*,'SatHydroCondVert'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SatHydroCondVert,datrc_2d)     
+    call cpcol(flag,NHW,NHE,NVN,NVS,SatHydroCondVert,datrc_2d)     
     datpr2 => datrc_2d(1:ncols,1:JZ+1)    
     call restartvar(ncid, flag, varname='SatHydroCondVert', dim1name='column',dim2name='levsoi1',&
        long_name='soil vertical saturated hydraulic conductivity', units='mm h-1', &
@@ -5276,7 +5272,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,SatHydroCondHrzn,datrc_2d)   
   else
     !print*,'SatHydroCondHrzn'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SatHydroCondHrzn,datrc_2d)     
+    call cpcol(flag,NHW,NHE,NVN,NVS,SatHydroCondHrzn,datrc_2d)     
     datpr2 => datrc_2d(1:ncols,1:JZ)    
     call restartvar(ncid, flag, varname='SatHydroCondHrzn', dim1name='column',dim2name='levsoi',&
        long_name='soil horizontal saturated hydraulic conductivity', units='mm h-1', &
@@ -5293,7 +5289,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,SAND,datrc_2d)   
   else
     !print*,'SAND'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SAND,datrc_2d)     
+    call cpcol(flag,NHW,NHE,NVN,NVS,SAND,datrc_2d)     
     datpr2 => datrc_2d(1:ncols,1:JZ)    
     call restartvar(ncid, flag, varname='SAND', dim1name='column',dim2name='levsoi',&
        long_name='soil sand content', units='Mg d-2', &
@@ -5310,7 +5306,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,SILT,datrc_2d)   
   else
     !print*,'SILT'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SILT,datrc_2d)     
+    call cpcol(flag,NHW,NHE,NVN,NVS,SILT,datrc_2d)     
     datpr2 => datrc_2d(1:ncols,1:JZ)    
     call restartvar(ncid, flag, varname='SILT', dim1name='column',dim2name='levsoi',&
        long_name='soil silt content', units='Mg d-2', &
@@ -5327,7 +5323,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,CLAY,datrc_2d)   
   else
     !print*,'CLAY'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,CLAY,datrc_2d)     
+    call cpcol(flag,NHW,NHE,NVN,NVS,CLAY,datrc_2d)     
     datpr2 => datrc_2d(1:ncols,1:JZ)    
     call restartvar(ncid, flag, varname='CLAY', dim1name='column',dim2name='levsoi',&
        long_name='soil clay content', units='Mg d-2', &
@@ -5344,7 +5340,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,VLWatMicP_vr,datrc_2d)   
   else
     !print*,'VLWatMicP'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VLWatMicP_vr,datrc_2d)     
+    call cpcol(flag,NHW,NHE,NVN,NVS,VLWatMicP_vr,datrc_2d)     
     datpr2 => datrc_2d(1:ncols,1:JZ+1)    
     call restartvar(ncid, flag, varname='VLWatMicP_vr', dim1name='column',dim2name='levsoi1',&
        long_name='soil micropore water content', units='m3 d-2', &
@@ -5361,7 +5357,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,VLWatMicPX,datrc_2d)     
   else
     !print*,'VLWatMicPX'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VLWatMicPX,datrc_2d)       
+    call cpcol(flag,NHW,NHE,NVN,NVS,VLWatMicPX,datrc_2d)       
     datpr2 => datrc_2d(1:ncols,1:JZ+1)    
     call restartvar(ncid, flag, varname='VLWatMicPX', dim1name='column',dim2name='levsoi1',&
        long_name='soil micropore water content before wetting front', units='m3 d-2', &
@@ -5378,7 +5374,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,VLiceMicP,datrc_2d)     
   else
     !print*,'VLiceMicP'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VLiceMicP,datrc_2d)       
+    call cpcol(flag,NHW,NHE,NVN,NVS,VLiceMicP,datrc_2d)       
     datpr2 => datrc_2d(1:ncols,1:JZ+1)    
     call restartvar(ncid, flag, varname='VLiceMicP', dim1name='column',dim2name='levsoi1',&
        long_name='soil micropore ice content', units='m3 d-2', &
@@ -5395,7 +5391,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,VLsoiAirP,datrc_2d)     
   else
     !print*,'VLsoiAirP'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VLsoiAirP,datrc_2d)       
+    call cpcol(flag,NHW,NHE,NVN,NVS,VLsoiAirP,datrc_2d)       
     datpr2 => datrc_2d(1:ncols,1:JZ+1)    
     call restartvar(ncid, flag, varname='VLsoiAirP', dim1name='column',dim2name='levsoi1',&
        long_name='soil micropore air content', units='m3 d-2', &
@@ -5412,7 +5408,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,VLMicP_vr,datrc_2d)     
   else
     !print*,'VLMicP_vr'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VLMicP_vr,datrc_2d)       
+    call cpcol(flag,NHW,NHE,NVN,NVS,VLMicP_vr,datrc_2d)       
     datpr2 => datrc_2d(1:ncols,1:JZ+1)    
     call restartvar(ncid, flag, varname='VLMicP_vr', dim1name='column',dim2name='levsoi1',&
        long_name='total volume in micropores', units='m3 d-2', &
@@ -5429,7 +5425,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,VLSoilMicP,datrc_2d)     
   else
     !print*,'VLSoilMicP'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VLSoilMicP,datrc_2d)       
+    call cpcol(flag,NHW,NHE,NVN,NVS,VLSoilMicP,datrc_2d)       
     datpr2 => datrc_2d(1:ncols,1:JZ+1)    
     call restartvar(ncid, flag, varname='VLSoilMicP', dim1name='column',dim2name='levsoi1',&
        long_name='micropore volume', units='m3 d-2', &
@@ -5446,7 +5442,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,trcx_solml,datrc_3d)     
   else
     !print*,'trcx_solml'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,trcx_solml,datrc_3d)       
+    call cpcol(flag,NHW,NHE,NVN,NVS,trcx_solml,datrc_3d)       
     datpr3 => datrc_3d(1:ncols,1:trc_confs%nxtracers, 1:JZ+1)        
     call restartvar(ncid, flag, varname='trcx_solml', dim1name='column',dim2name='xtracers',&
        dim3name='levsoi1',long_name='exchangeable tracers', units='g d-2', &
@@ -5463,7 +5459,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,TCS,datrc_2d)     
   else
     !print*,'TCS'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,TCS,datrc_2d)       
+    call cpcol(flag,NHW,NHE,NVN,NVS,TCS,datrc_2d)       
     datpr2 => datrc_2d(1:ncols,1:JZ+1)            
     call restartvar(ncid, flag, varname='TCS', dim1name='column',dim2name='levsoi1',&
        long_name='soil temperature', units='oC', &
@@ -5480,7 +5476,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,TKS,datrc_2d)     
   else
     !print*,'TKS'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,TKS,datrc_2d)       
+    call cpcol(flag,NHW,NHE,NVN,NVS,TKS,datrc_2d)       
     datpr2 => datrc_2d(1:ncols,1:JZ+1)            
     call restartvar(ncid, flag, varname='TKS', dim1name='column',dim2name='levsoi1',&
        long_name='soil temperature', units='K', &
@@ -5497,7 +5493,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,VHeatCapacity,datrc_2d)     
   else
     !print*,'VHeatCapacity'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VHeatCapacity,datrc_2d)       
+    call cpcol(flag,NHW,NHE,NVN,NVS,VHeatCapacity,datrc_2d)       
     datpr2 => datrc_2d(1:ncols,1:JZ+1)            
     call restartvar(ncid, flag, varname='VHeatCapacity', dim1name='column',dim2name='levsoi1',&
        long_name='soil heat capacity', units='MJ m-3 K-1', &
@@ -5514,7 +5510,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,VHeatCapacitySoilM,datrc_2d)     
   else
     !print*,'VHeatCapacitySoilM'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VHeatCapacitySoilM,datrc_2d)       
+    call cpcol(flag,NHW,NHE,NVN,NVS,VHeatCapacitySoilM,datrc_2d)       
     datpr2 => datrc_2d(1:ncols,1:JZ+1)            
     call restartvar(ncid, flag, varname='VHeatCapacitySoilM', dim1name='column',dim2name='levsoi1',&
        long_name='soil solid heat capacity', units='MJ m-3 K-1', &
@@ -5531,7 +5527,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,trc_gasml_vr,datrc_3d)     
   else
     !print*,'trc_gasml_vr'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,trc_gasml_vr,datrc_3d)       
+    call cpcol(flag,NHW,NHE,NVN,NVS,trc_gasml_vr,datrc_3d)       
     datpr3 => datrc_3d(1:ncols,1:trc_confs%NGasTracers,1:JZ)        
     call restartvar(ncid, flag, varname='trc_gasml_vr', dim1name='column',dim2name='gastrcs',&
        dim3name='levsoi',long_name='layer mass of gases', units='g d-2', &
@@ -5548,7 +5544,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,trc_solml_vr,datrc_3d)     
   else
     !print*,'trc_solml_vr'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,trc_solml_vr,datrc_3d)       
+    call cpcol(flag,NHW,NHE,NVN,NVS,trc_solml_vr,datrc_3d)       
     datpr3 => datrc_3d(1:ncols,1:trc_confs%NSolutTracers,1:JZ+1)            
     call restartvar(ncid, flag, varname='trc_solml_vr', dim1name='column',dim2name='soltrcs',&
        dim3name='levsoi1',long_name='solute mass in micropore', units='g d-2', &
@@ -5565,7 +5561,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,trc_soHml_vr,datrc_3d)     
   else
     !print*,'trc_soHml_vr'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,trc_soHml_vr,datrc_3d)       
+    call cpcol(flag,NHW,NHE,NVN,NVS,trc_soHml_vr,datrc_3d)       
     datpr3 => datrc_3d(1:ncols,1:trc_confs%NSolutTracers,1:JZ+1)            
     call restartvar(ncid, flag, varname='trc_soHml_vr', dim1name='column',dim2name='soltrcs',&
        dim3name='levsoi1',long_name='solute mass in macropore', units='g d-2', &
@@ -5583,7 +5579,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,RO2GasXchangePrev_vr,datrc_2d)     
   else
     !print*,'RO2GasXchangePrev_vr'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RO2GasXchangePrev_vr,datrc_2d)       
+    call cpcol(flag,NHW,NHE,NVN,NVS,RO2GasXchangePrev_vr,datrc_2d)       
     datpr2 => datrc_2d(1:ncols,1:JZ+1)        
     call restartvar(ncid, flag, varname='RO2GasXchangePrev_vr', dim1name='column',dim2name='levsoi1',&
        long_name='net gaseous O2 flux', units='g d-2 h-1', &
@@ -5600,7 +5596,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,RCO2GasFlxPrev_vr,datrc_2d)     
   else
     !print*,'RCO2GasFlxPrev_vr'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RCO2GasFlxPrev_vr,datrc_2d)       
+    call cpcol(flag,NHW,NHE,NVN,NVS,RCO2GasFlxPrev_vr,datrc_2d)       
     datpr2 => datrc_2d(1:ncols,1:JZ+1)        
     call restartvar(ncid, flag, varname='RCO2GasFlxPrev_vr', dim1name='column',dim2name='levsoi1',&
        long_name='net gaseous CO2 flux', units='g d-2 h-1', &
@@ -5617,7 +5613,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,RO2AquaXchangePrev_vr,datrc_2d)       
   else
     !print*,'RO2AquaXchangePrev_vr'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RO2AquaXchangePrev_vr,datrc_2d)         
+    call cpcol(flag,NHW,NHE,NVN,NVS,RO2AquaXchangePrev_vr,datrc_2d)         
     datpr2 => datrc_2d(1:ncols,1:JZ+1)        
     call restartvar(ncid, flag, varname='RO2AquaXchangePrev_vr', dim1name='column',dim2name='levsoi1',&
        long_name='net aqueous O2 flux', units='g d-2 h-1', &
@@ -5634,7 +5630,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,RCH4F,datrc_2d)       
   else
     !print*,'RCH4F'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RCH4F,datrc_2d)         
+    call cpcol(flag,NHW,NHE,NVN,NVS,RCH4F,datrc_2d)         
     datpr2 => datrc_2d(1:ncols,1:JZ+1)        
     call restartvar(ncid, flag, varname='RCH4F', dim1name='column',dim2name='levsoi1',&
        long_name='net gaseous CH4 flux', units='g d-2 h-1', &
@@ -5651,7 +5647,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,RCH4PhysexchPrev_vr,datrc_2d)       
   else
     !print*,'RCH4L'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RCH4PhysexchPrev_vr,datrc_2d)         
+    call cpcol(flag,NHW,NHE,NVN,NVS,RCH4PhysexchPrev_vr,datrc_2d)         
     datpr2 => datrc_2d(1:ncols,1:JZ+1)        
     call restartvar(ncid, flag, varname='RCH4L', dim1name='column',dim2name='levsoi1',&
        long_name='net aqueous CH4 flux', units='g d-2 h-1', &
@@ -5668,7 +5664,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,REcoO2DmndResp_vr,datrc_2d)      
   else
     !print*,'REcoO2DmndResp_vr'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,REcoO2DmndResp_vr,datrc_2d)        
+    call cpcol(flag,NHW,NHE,NVN,NVS,REcoO2DmndResp_vr,datrc_2d)        
     datpr2 => datrc_2d(1:ncols,1:JZ+1)        
     call restartvar(ncid, flag, varname='REcoO2DmndResp_vr', dim1name='column',dim2name='levsoi1',&
        long_name='total root + microbial O2 uptake', units='g d-2 h-1', &
@@ -5685,7 +5681,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,REcoNH4DmndSoil_vr,datrc_2d)      
   else
     !print*,'REcoNH4DmndSoil_vr'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,REcoNH4DmndSoil_vr,datrc_2d)        
+    call cpcol(flag,NHW,NHE,NVN,NVS,REcoNH4DmndSoil_vr,datrc_2d)        
     datpr2 => datrc_2d(1:ncols,1:JZ+1)        
     call restartvar(ncid, flag, varname='REcoNH4DmndSoil_vr', dim1name='column',dim2name='levsoi1',&
        long_name='total root + microbial NH4 uptake non-band', units='g d-2 h-1', &
@@ -5702,7 +5698,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,REcoNO3DmndSoil_vr,datrc_2d)      
   else
     !print*,'REcoNO3DmndSoil_vr'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,REcoNO3DmndSoil_vr,datrc_2d)        
+    call cpcol(flag,NHW,NHE,NVN,NVS,REcoNO3DmndSoil_vr,datrc_2d)        
     datpr2 => datrc_2d(1:ncols,1:JZ+1)        
     call restartvar(ncid, flag, varname='REcoNO3DmndSoil_vr', dim1name='column',dim2name='levsoi1',&
        long_name='total root + microbial NO3 uptake non-band', units='g d-2 h-1', &
@@ -5736,7 +5732,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,RN2OEcoUptkSoil_vr,datrc_2d)      
   else
     !print*,'RN2OEcoUptkSoil_vr'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RN2OEcoUptkSoil_vr,datrc_2d)        
+    call cpcol(flag,NHW,NHE,NVN,NVS,RN2OEcoUptkSoil_vr,datrc_2d)        
     datpr2 => datrc_2d(1:ncols,1:JZ+1)        
     call restartvar(ncid, flag, varname='RN2OEcoUptkSoil_vr', dim1name='column',dim2name='levsoi1',&
        long_name='total root + microbial N2O uptake non-band', units='g d-2 h-1', &
@@ -5753,7 +5749,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,REcoH2PO4DmndSoil_vr,datrc_2d)      
   else
     !print*,'REcoH2PO4DmndSoil_vr'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,REcoH2PO4DmndSoil_vr,datrc_2d)        
+    call cpcol(flag,NHW,NHE,NVN,NVS,REcoH2PO4DmndSoil_vr,datrc_2d)        
     datpr2 => datrc_2d(1:ncols,1:JZ+1)        
     call restartvar(ncid, flag, varname='REcoH2PO4DmndSoil_vr', dim1name='column',dim2name='levsoi1',&
        long_name='total root + microbial PO4 uptake non-band', units='g d-2 h-1', &
@@ -5770,7 +5766,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,REcoH1PO4DmndSoil_vr,datrc_2d)      
   else
     !print*,'REcoH1PO4DmndSoil_vr'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,REcoH1PO4DmndSoil_vr,datrc_2d)        
+    call cpcol(flag,NHW,NHE,NVN,NVS,REcoH1PO4DmndSoil_vr,datrc_2d)        
     datpr2 => datrc_2d(1:ncols,1:JZ+1)        
     call restartvar(ncid, flag, varname='REcoH1PO4DmndSoil_vr', dim1name='column',dim2name='levsoi1',&
        long_name='HPO4 demand in non-band by all microbial,root,myco populations', units='g d-2 h-1', &
@@ -5787,7 +5783,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,REcoNH4DmndBand_vr,datrc_2d)      
   else
     !print*,'REcoNH4DmndBand_vr'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,REcoNH4DmndBand_vr,datrc_2d)        
+    call cpcol(flag,NHW,NHE,NVN,NVS,REcoNH4DmndBand_vr,datrc_2d)        
     datpr2 => datrc_2d(1:ncols,1:JZ+1)        
     call restartvar(ncid, flag, varname='REcoNH4DmndBand_vr', dim1name='column',dim2name='levsoi1',&
        long_name='total root + microbial NH4 uptake band', units='g d-2 h-1', &
@@ -5804,7 +5800,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,REcoNO3DmndBand_vr,datrc_2d)      
   else
     !print*,'REcoNO3DmndBand_vr'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,REcoNO3DmndBand_vr,datrc_2d)        
+    call cpcol(flag,NHW,NHE,NVN,NVS,REcoNO3DmndBand_vr,datrc_2d)        
     datpr2 => datrc_2d(1:ncols,1:JZ+1)        
     call restartvar(ncid, flag, varname='REcoNO3DmndBand_vr', dim1name='column',dim2name='levsoi1',&
        long_name='total root + microbial NO3 uptake band', units='g d-2 h-1', &
@@ -5821,7 +5817,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,RNO2EcoUptkBand_vr,datrc_2d)      
   else
     !print*,'RNO2EcoUptkBand_vr'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RNO2EcoUptkBand_vr,datrc_2d)        
+    call cpcol(flag,NHW,NHE,NVN,NVS,RNO2EcoUptkBand_vr,datrc_2d)        
     datpr2 => datrc_2d(1:ncols,1:JZ+1)        
     call restartvar(ncid, flag, varname='RNO2EcoUptkBand_vr', dim1name='column',dim2name='levsoi1',&
        long_name='total root + microbial NO2 uptake band', units='g d-2 h-1', &
@@ -5838,7 +5834,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,REcoH2PO4DmndBand_vr,datrc_2d)      
   else
     !print*,'REcoH2PO4DmndBand_vr'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,REcoH2PO4DmndBand_vr,datrc_2d)        
+    call cpcol(flag,NHW,NHE,NVN,NVS,REcoH2PO4DmndBand_vr,datrc_2d)        
     datpr2 => datrc_2d(1:ncols,1:JZ+1)        
     call restartvar(ncid, flag, varname='REcoH2PO4DmndBand_vr', dim1name='column',dim2name='levsoi1',&
        long_name='total root + microbial PO4 uptake band', units='g d-2 h-1', &
@@ -5855,7 +5851,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,REcoH1PO4DmndBand_vr,datrc_2d)      
   else
     !print*,'REcoH1PO4DmndBand_vr'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,REcoH1PO4DmndBand_vr,datrc_2d)        
+    call cpcol(flag,NHW,NHE,NVN,NVS,REcoH1PO4DmndBand_vr,datrc_2d)        
     datpr2 => datrc_2d(1:ncols,1:JZ+1)        
     call restartvar(ncid, flag, varname='REcoH1PO4DmndBand_vr', dim1name='column',dim2name='levsoi1',&
        long_name='HPO4 demand in band by all microbial,root,myco populations', units='g d-2 h-1', &
@@ -5872,7 +5868,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,ROQCX,datrc_3d)      
   else
     !print*,'ROQCX'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,ROQCX,datrc_3d)        
+    call cpcol(flag,NHW,NHE,NVN,NVS,ROQCX,datrc_3d)        
     datpr3 => datrc_3d(1:ncols,1:jcplx, 1:JZ+1)            
     call restartvar(ncid, flag, varname='ROQCX', dim1name='column',dim2name='nomcomplx',&
        dim3name='levsoi1',long_name='total root + microbial DOC uptake', units='g d-2 h-1', &
@@ -5889,7 +5885,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,ROQAX,datrc_3d)      
   else
     !print*,'ROQAX'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,ROQAX,datrc_3d)        
+    call cpcol(flag,NHW,NHE,NVN,NVS,ROQAX,datrc_3d)        
     datpr3 => datrc_3d(1:ncols,1:jcplx, 1:JZ+1)            
     call restartvar(ncid, flag, varname='ROQAX', dim1name='column',dim2name='nomcomplx',&
        dim3name='levsoi1',long_name='total root + microbial acetate uptake', units='g d-2 h-1', &
@@ -5906,7 +5902,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,VLWatMacP,datrc_2d)      
   else
     !print*,'VLWatMacP'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VLWatMacP,datrc_2d)        
+    call cpcol(flag,NHW,NHE,NVN,NVS,VLWatMacP,datrc_2d)        
     datpr2 => datrc_2d(1:ncols,1:JZ+1)                
     call restartvar(ncid, flag, varname='VLWatMacP', dim1name='column',dim2name='levsoi1',&
        long_name='soil macropore water content', units='m3 d-2', &
@@ -5924,7 +5920,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,VLiceMacP,datrc_2d)      
   else
     !print*,'VLiceMacP'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VLiceMacP,datrc_2d)        
+    call cpcol(flag,NHW,NHE,NVN,NVS,VLiceMacP,datrc_2d)        
     datpr2 => datrc_2d(1:ncols,1:JZ+1)                
     call restartvar(ncid, flag, varname='VLiceMacP', dim1name='column',dim2name='levsoi1',&
        long_name='soil macropore ice content', units='m3 d-2', &
@@ -5941,7 +5937,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,VLMacP,datrc_2d)      
   else
     !print*,'VLMacP'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VLMacP,datrc_2d)        
+    call cpcol(flag,NHW,NHE,NVN,NVS,VLMacP,datrc_2d)        
     datpr2 => datrc_2d(1:ncols,1:JZ)                    
     call restartvar(ncid, flag, varname='VLMacP', dim1name='column',dim2name='levsoi',&
        long_name='total volume in macropores', units='m3 d-2', &
@@ -5958,7 +5954,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,totRootLenDens_vr,datrc_2d)      
   else
     !print*,'totRootLenDens_vr'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,totRootLenDens_vr,datrc_2d)        
+    call cpcol(flag,NHW,NHE,NVN,NVS,totRootLenDens_vr,datrc_2d)        
     datpr2 => datrc_2d(1:ncols,1:JZ)                    
     call restartvar(ncid, flag, varname='totRootLenDens_vr', dim1name='column',dim2name='levsoi',&
        long_name='total root length density', units='m m-3', &
@@ -5975,7 +5971,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,CanopyHeightZ_col,datrc_2d)      
   else
     !print*,'ZL'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,CanopyHeightZ_col,datrc_2d)        
+    call cpcol(flag,NHW,NHE,NVN,NVS,CanopyHeightZ_col,datrc_2d)        
     datpr2 => datrc_2d(1:ncols,1:NumOfCanopyLayers+1)                        
     call restartvar(ncid, flag, varname='CanopyHeightZ_col', dim1name='column',dim2name='levcan1',&
        long_name='canopy layer height', units='m', &
@@ -5992,7 +5988,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,CanopyLeafAareZ_col,datrc_2d)      
   else
     !print*,'CanopyLeafAareZ_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,CanopyLeafAareZ_col,datrc_2d)        
+    call cpcol(flag,NHW,NHE,NVN,NVS,CanopyLeafAareZ_col,datrc_2d)        
     datpr2 => datrc_2d(1:ncols,1:NumOfCanopyLayers)    
     call restartvar(ncid, flag, varname='CanopyLeafAareZ_col', dim1name='column',dim2name='levcan',&
        long_name='Grid total leaf area', units='m2 d-2', &
@@ -6009,7 +6005,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,CanopyStemAareZ_col,datrc_2d)      
   else
     !print*,'CanopyStemAareZ_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,CanopyStemAareZ_col,datrc_2d)        
+    call cpcol(flag,NHW,NHE,NVN,NVS,CanopyStemAareZ_col,datrc_2d)        
     datpr2 => datrc_2d(1:ncols,1:NumOfCanopyLayers)    
     call restartvar(ncid, flag, varname='CanopyStemAareZ_col', dim1name='column',dim2name='levcan',&
        long_name='total stem area', units='m2 d-2', &
@@ -6026,7 +6022,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,tCanLeafC_cl,datrc_2d)      
   else
     !print*,'tCanLeafC_cl'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,tCanLeafC_cl,datrc_2d)        
+    call cpcol(flag,NHW,NHE,NVN,NVS,tCanLeafC_cl,datrc_2d)        
     datpr2 => datrc_2d(1:ncols,1:NumOfCanopyLayers)    
     call restartvar(ncid, flag, varname='tCanLeafC_cl', dim1name='column',dim2name='levcan',&
        long_name='total leaf mass', units='g d-2', &
@@ -6043,7 +6039,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,trcs_VLN_vr,datrc_3d)      
   else
     !print*,'trcs_VLN_vr'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,trcs_VLN_vr,datrc_3d)        
+    call cpcol(flag,NHW,NHE,NVN,NVS,trcs_VLN_vr,datrc_3d)        
     datpr3 => datrc_3d(1:ncols,1:trc_confs%NSolutTracers,1:JZ+1)    
     call restartvar(ncid, flag, varname='trcs_VLN_vr', dim1name='column',dim2name='soltrcs',&
        dim3name='levsoi1',long_name='nutrient salt tracers', units='g d-2', &
@@ -6077,7 +6073,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,CION,datrc_2d)      
   else
     !print*,'CION'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,CION,datrc_2d)        
+    call cpcol(flag,NHW,NHE,NVN,NVS,CION,datrc_2d)        
     datpr2 => datrc_2d(1:ncols,1:NumOfCanopyLayers)           
     call restartvar(ncid, flag, varname='CION', dim1name='column',dim2name='levcan',&
        long_name='solution ion concentratiom', units='mol m-3', &
@@ -6097,7 +6093,7 @@ implicit none
       call cpcol(flag,NHW,NHE,NVN,NVS,trcSalt_solml,datrc_3d)      
     else
       !print*,'trcSalt_solml'
-      if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,trcSalt_solml,datrc_3d)        
+      call cpcol(flag,NHW,NHE,NVN,NVS,trcSalt_solml,datrc_3d)        
       datpr3 => datrc_3d(1:ncols,1:trc_confs%NSaltTracers,1:JZ+1)               
       call restartvar(ncid, flag, varname='trcSalt_solml', dim1name='column',dim2name='satracers',&
         dim3name='levsoi1',long_name='soil aqueous salt content micropre', units='mol d-2', &
@@ -6114,7 +6110,7 @@ implicit none
         call cpcol(flag,NHW,NHE,NVN,NVS,trcs_solsml,datrc_3d)      
     else
       !print*,'trcs_solsml'
-      if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,trcs_solsml,datrc_3d)        
+      call cpcol(flag,NHW,NHE,NVN,NVS,trcs_solsml,datrc_3d)        
       datpr3 => datrc_3d(1:ncols,1:trc_confs%NSaltTracers,1:JS)    
       call restartvar(ncid, flag, varname='trcs_solsml', dim1name='column',dim2name='satracers',&
          dim3name='levsno',long_name='snowpack salt dissolved tracers', units='mol d-2', &
@@ -6132,7 +6128,7 @@ implicit none
       call cpcol(flag,NHW,NHE,NVN,NVS,trcSalt_soHml,datrc_3d)      
     else
       !print*,'trcSalt_soHml'
-      if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,trcSalt_soHml,datrc_3d)          
+      call cpcol(flag,NHW,NHE,NVN,NVS,trcSalt_soHml,datrc_3d)          
       datpr3 => datrc_3d(1:ncols,1:trc_confs%NSaltTracers,1:JZ)    
       call restartvar(ncid, flag, varname='trcSalt_soHml', dim1name='column',dim2name='satracers',&
         dim3name='levsoi',long_name='soil macropore aqueous salt dissolved tracers', units='mol d-2', &
@@ -6150,7 +6146,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,RO2DmndHetert,datrc_4d)      
   else
     !print*,'RO2DmndHetert'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RO2DmndHetert,datrc_4d)        
+    call cpcol(flag,NHW,NHE,NVN,NVS,RO2DmndHetert,datrc_4d)        
     datpr4 => datrc_4d(1:ncols,1:NumHetetrMicCmplx,1:jcplx,1:JZ+1)        
     call restartvar(ncid, flag, varname='RO2DmndHetert', dim1name='column',dim2name='hetrmicb',&
       dim3name='nomcomplx',dim4name='levsoi1',long_name='microbial aqueous O2 demand', units='g d-2 h-1', &
@@ -6167,7 +6163,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,RNO3ReduxDmndSoilHeter_vr,datrc_4d)      
   else
     !print*,'RNO3ReduxDmndSoilHeter_vr'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RNO3ReduxDmndSoilHeter_vr,datrc_4d)        
+    call cpcol(flag,NHW,NHE,NVN,NVS,RNO3ReduxDmndSoilHeter_vr,datrc_4d)        
     datpr4 => datrc_4d(1:ncols,1:NumHetetrMicCmplx,1:jcplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='RNO3ReduxDmndSoilHeter_vr', dim1name='column',dim2name='hetrmicb',&
       dim3name='nomcomplx',dim4name='levsoi1',long_name='total microbial NO3 uptake non-band unconstrained by NO3', &
@@ -6185,7 +6181,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,RNO2DmndReduxSoilHeter_vr,datrc_4d)      
   else
     !print*,'RNO2DmndReduxSoilHeter_vr'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RNO2DmndReduxSoilHeter_vr,datrc_4d)        
+    call cpcol(flag,NHW,NHE,NVN,NVS,RNO2DmndReduxSoilHeter_vr,datrc_4d)        
     datpr4 => datrc_4d(1:ncols,1:NumHetetrMicCmplx,1:jcplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='RNO2DmndReduxSoilHeter_vr', dim1name='column',dim2name='hetrmicb',&
       dim3name='nomcomplx',dim4name='levsoi1',long_name='total microbial NO2 uptake non-band unconstrained by NO2', &
@@ -6202,7 +6198,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,RN2ODmndReduxHeter_vr,datrc_4d)      
   else
     !print*,'RN2ODmndReduxHeter_vr'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RN2ODmndReduxHeter_vr,datrc_4d)        
+    call cpcol(flag,NHW,NHE,NVN,NVS,RN2ODmndReduxHeter_vr,datrc_4d)        
     datpr4 => datrc_4d(1:ncols,1:NumHetetrMicCmplx,1:jcplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='RN2ODmndReduxHeter_vr', dim1name='column',dim2name='hetrmicb',&
       dim3name='nomcomplx',dim4name='levsoi1',long_name='total heterotrophic microbial N2O uptake unconstrained by N2O', &
@@ -6219,7 +6215,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,RNO3ReduxDmndBandHeter_vr,datrc_4d)      
   else
     !print*,'RNO3ReduxDmndBandHeter_vr'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RNO3ReduxDmndBandHeter_vr,datrc_4d)        
+    call cpcol(flag,NHW,NHE,NVN,NVS,RNO3ReduxDmndBandHeter_vr,datrc_4d)        
     datpr4 => datrc_4d(1:ncols,1:NumHetetrMicCmplx,1:jcplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='RNO3ReduxDmndBandHeter_vr', dim1name='column',dim2name='hetrmicb',&
       dim3name='nomcomplx',dim4name='levsoi1',long_name='total microbial NO3 uptake band unconstrained by NO3', &
@@ -6236,7 +6232,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,RNO2DmndReduxBandHeter_vr,datrc_4d)      
   else
     !print*,'RNO2DmndReduxBandHeter_vr'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RNO2DmndReduxBandHeter_vr,datrc_4d)        
+    call cpcol(flag,NHW,NHE,NVN,NVS,RNO2DmndReduxBandHeter_vr,datrc_4d)        
     datpr4 => datrc_4d(1:ncols,1:NumHetetrMicCmplx,1:jcplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='RNO2DmndReduxBandHeter_vr', dim1name='column',dim2name='hetrmicb',&
       dim3name='nomcomplx',dim4name='levsoi1',long_name='total microbial NO2 uptake band unconstrained by NO2', &
@@ -6253,7 +6249,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,RNH4DmndSoilHeter_vr,datrc_4d)      
   else
     !print*,'RNH4DmndSoilHeter_vr'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RNH4DmndSoilHeter_vr,datrc_4d)        
+    call cpcol(flag,NHW,NHE,NVN,NVS,RNH4DmndSoilHeter_vr,datrc_4d)        
     datpr4 => datrc_4d(1:ncols,1:NumHetetrMicCmplx,1:jcplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='RNH4DmndSoilHeter_vr', dim1name='column',dim2name='hetrmicb',&
       dim3name='nomcomplx',dim4name='levsoi1',long_name='microbial NH4 demand in soil', &
@@ -6270,7 +6266,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,RNO3DmndSoilHeter_vr,datrc_4d)      
   else
     !print*,'RNO3DmndSoilHeter_vr'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RNO3DmndSoilHeter_vr,datrc_4d)        
+    call cpcol(flag,NHW,NHE,NVN,NVS,RNO3DmndSoilHeter_vr,datrc_4d)        
     datpr4 => datrc_4d(1:ncols,1:NumHetetrMicCmplx,1:jcplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='RNO3DmndSoilHeter_vr', dim1name='column',dim2name='hetrmicb',&
       dim3name='nomcomplx',dim4name='levsoi1',long_name='microbial NO3 demand in soil', &
@@ -6287,7 +6283,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,RH2PO4DmndSoilHeter_vr,datrc_4d)      
   else
     !print*,'RH2PO4DmndSoilHeter_vr'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RH2PO4DmndSoilHeter_vr,datrc_4d)        
+    call cpcol(flag,NHW,NHE,NVN,NVS,RH2PO4DmndSoilHeter_vr,datrc_4d)        
     datpr4 => datrc_4d(1:ncols,1:NumHetetrMicCmplx,1:jcplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='RH2PO4DmndSoilHeter_vr', dim1name='column',dim2name='hetrmicb',&
       dim3name='nomcomplx',dim4name='levsoi1',long_name='microbial PO4 demand in soil', &
@@ -6304,7 +6300,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,RNH4DmndBandHeter_vr,datrc_4d)      
   else
     !print*,'RNH4DmndBandHeter_vr'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RNH4DmndBandHeter_vr,datrc_4d)        
+    call cpcol(flag,NHW,NHE,NVN,NVS,RNH4DmndBandHeter_vr,datrc_4d)        
     datpr4 => datrc_4d(1:ncols,1:NumHetetrMicCmplx,1:jcplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='RNH4DmndBandHeter_vr', dim1name='column',dim2name='hetrmicb',&
       dim3name='nomcomplx',dim4name='levsoi1',long_name='microbial NH4 immobilization (+ve) - mineralization (-ve) band', &
@@ -6321,7 +6317,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,RNO3DmndBandHeter_vr,datrc_4d)      
   else
     !print*,'RNO3DmndBandHeter_vr'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RNO3DmndBandHeter_vr,datrc_4d)        
+    call cpcol(flag,NHW,NHE,NVN,NVS,RNO3DmndBandHeter_vr,datrc_4d)        
     datpr4 => datrc_4d(1:ncols,1:NumHetetrMicCmplx,1:jcplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='RNO3DmndBandHeter_vr', dim1name='column',dim2name='hetrmicb',&
       dim3name='nomcomplx',dim4name='levsoi1',long_name='microbial NO3 immobilization (+ve) - mineralization (-ve) band', &
@@ -6338,7 +6334,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,RH2PO4DmndBandHeter_vr,datrc_4d)      
   else
     !print*,'RH2PO4DmndBandHeter_vr'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RH2PO4DmndBandHeter_vr,datrc_4d)        
+    call cpcol(flag,NHW,NHE,NVN,NVS,RH2PO4DmndBandHeter_vr,datrc_4d)        
     datpr4 => datrc_4d(1:ncols,1:NumHetetrMicCmplx,1:jcplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='RH2PO4DmndBandHeter_vr', dim1name='column',dim2name='hetrmicb',&
       dim3name='nomcomplx',dim4name='levsoi1',long_name='substrate-unlimited H2PO4 mineraln-immobiln', &
@@ -6355,7 +6351,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,RDOCUptkHeter_vr,datrc_4d)      
   else
     !print*,'RDOCUptkHeter_vr'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RDOCUptkHeter_vr,datrc_4d)        
+    call cpcol(flag,NHW,NHE,NVN,NVS,RDOCUptkHeter_vr,datrc_4d)        
     datpr4 => datrc_4d(1:ncols,1:NumHetetrMicCmplx,1:jcplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='RDOCUptkHeter_vr', dim1name='column',dim2name='hetrmicb',&
       dim3name='nomcomplx',dim4name='levsoi1',long_name='net microbial DOC flux', &
@@ -6372,7 +6368,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,RAcetateUptkHeter_vr,datrc_4d)      
   else
     !print*,'RAcetateUptkHeter_vr'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RAcetateUptkHeter_vr,datrc_4d)        
+    call cpcol(flag,NHW,NHE,NVN,NVS,RAcetateUptkHeter_vr,datrc_4d)        
     datpr4 => datrc_4d(1:ncols,1:NumHetetrMicCmplx,1:jcplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='RAcetateUptkHeter_vr', dim1name='column',dim2name='hetrmicb',&
       dim3name='nomcomplx',dim4name='levsoi1',long_name='net microbial acetate flux', &
@@ -6389,7 +6385,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,RNH4DmndLitrHeter_col,datrc_3d)      
   else
     !print*,'RNH4DmndLitrHeter_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RNH4DmndLitrHeter_col,datrc_3d)        
+    call cpcol(flag,NHW,NHE,NVN,NVS,RNH4DmndLitrHeter_col,datrc_3d)        
     datpr3 => datrc_3d(1:ncols,1:NumHetetrMicCmplx,1:jcplx)    
     call restartvar(ncid, flag, varname='RNH4DmndLitrHeter_col', dim1name='column',dim2name='hetrmicb',&
       dim3name='nomcomplx',long_name='microbial NH4 demand in surface litter', &
@@ -6406,7 +6402,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,RNO3DmndLitrHeter_col,datrc_3d)      
   else
     !print*,'RNO3DmndLitrHeter_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RNO3DmndLitrHeter_col,datrc_3d)        
+    call cpcol(flag,NHW,NHE,NVN,NVS,RNO3DmndLitrHeter_col,datrc_3d)        
     datpr3 => datrc_3d(1:ncols,1:NumHetetrMicCmplx,1:jcplx)    
     call restartvar(ncid, flag, varname='RNO3DmndLitrHeter_col', dim1name='column',dim2name='hetrmicb',&
       dim3name='nomcomplx',long_name='microbial NO3 demand in surface litter', &
@@ -6423,7 +6419,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,RH2PO4DmndLitrHeter_col,datrc_3d)      
   else
     !print*,'RH2PO4DmndLitrHeter_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RH2PO4DmndLitrHeter_col,datrc_3d)        
+    call cpcol(flag,NHW,NHE,NVN,NVS,RH2PO4DmndLitrHeter_col,datrc_3d)        
     datpr3 => datrc_3d(1:ncols,1:NumHetetrMicCmplx,1:jcplx)    
     call restartvar(ncid, flag, varname='RH2PO4DmndLitrHeter_col', dim1name='column',dim2name='hetrmicb',&
       dim3name='nomcomplx',long_name='microbial PO4 demand in surface litter', &
@@ -6440,7 +6436,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,mBiomeHeter_vr,datrc_5d)      
   else
     !print*,'OMC'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,mBiomeHeter_vr,datrc_5d)        
+    call cpcol(flag,NHW,NHE,NVN,NVS,mBiomeHeter_vr,datrc_5d)        
     datpr5 => datrc_5d(1:ncols,1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='mBiomeHeter', dim1name='column',dim2name='elmnts',&
       dim3name='nlivehetermicb',dim4name='nomcomplx',dim5name='levsoi1',&
@@ -6459,7 +6455,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,RO2DmndAutort,datrc_3d)      
   else
     !print*,'RO2DmndAutort'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RO2DmndAutort,datrc_3d)        
+    call cpcol(flag,NHW,NHE,NVN,NVS,RO2DmndAutort,datrc_3d)        
     datpr3 => datrc_3d(1:ncols,1:NumMicrobAutrophCmplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='RO2DmndAutort', dim1name='column',dim2name='automicb',&
       dim3name='levsoi1',long_name='autotrophic aqueous O2 demand', &
@@ -6476,7 +6472,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,RNH3OxidAutor,datrc_3d)      
   else
     !print*,'RNH3OxidAutor'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RNH3OxidAutor,datrc_3d)        
+    call cpcol(flag,NHW,NHE,NVN,NVS,RNH3OxidAutor,datrc_3d)        
     datpr3 => datrc_3d(1:ncols,1:NumMicrobAutrophCmplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='RNH3OxidAutor', dim1name='column',dim2name='automicb',&
       dim3name='levsoi1',long_name='total autotrophic microbial NH4 uptake non-band unconstrained by NH4', &
@@ -6493,7 +6489,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,RNO2OxidAutor,datrc_3d)      
   else
     !print*,'RNO2OxidAutor'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RNO2OxidAutor,datrc_3d)        
+    call cpcol(flag,NHW,NHE,NVN,NVS,RNO2OxidAutor,datrc_3d)        
     datpr3 => datrc_3d(1:ncols,1:NumMicrobAutrophCmplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='RNO2OxidAutor', dim1name='column',dim2name='automicb',&
       dim3name='levsoi1',long_name='total autotrophic microbial NO2 uptake non-band unconstrained by NO2', &
@@ -6510,7 +6506,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,RN2ODmndReduxAutor_vr,datrc_3d)      
   else
     !print*,'RN2ODmndReduxAutor_vr'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RN2ODmndReduxAutor_vr,datrc_3d)        
+    call cpcol(flag,NHW,NHE,NVN,NVS,RN2ODmndReduxAutor_vr,datrc_3d)        
     datpr3 => datrc_3d(1:ncols,1:NumMicrobAutrophCmplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='RN2ODmndReduxAutor_vr', dim1name='column',dim2name='automicb',&
       dim3name='levsoi1',long_name='total autotrophic microbial N2O uptake non-band unconstrained by N2O', &
@@ -6527,7 +6523,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,RNH3OxidAutorBand,datrc_3d)      
   else
     !print*,'RNH3OxidAutorBand'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RNH3OxidAutorBand,datrc_3d)        
+    call cpcol(flag,NHW,NHE,NVN,NVS,RNH3OxidAutorBand,datrc_3d)        
     datpr3 => datrc_3d(1:ncols,1:NumMicrobAutrophCmplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='RNH3OxidAutorBand', dim1name='column',dim2name='automicb',&
       dim3name='levsoi1',long_name='total autotrophic microbial NH4 uptake non-band unconstrained by NH4', &
@@ -6544,7 +6540,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,RNO2OxidAutorBand,datrc_3d)     
   else
     !print*,'RNO2OxidAutorBand'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RNO2OxidAutorBand,datrc_3d)       
+    call cpcol(flag,NHW,NHE,NVN,NVS,RNO2OxidAutorBand,datrc_3d)       
     datpr3 => datrc_3d(1:ncols,1:NumMicrobAutrophCmplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='RNO2OxidAutorBand', dim1name='column',dim2name='automicb',&
       dim3name='levsoi1',long_name='total autotrophic microbial NO2 uptake band unconstrained by NO2', &
@@ -6561,7 +6557,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,RNH4UptkSoilAutor_vr,datrc_3d)     
   else
     !print*,'RNH4UptkSoilAutor_vr'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RNH4UptkSoilAutor_vr,datrc_3d)       
+    call cpcol(flag,NHW,NHE,NVN,NVS,RNH4UptkSoilAutor_vr,datrc_3d)       
     datpr3 => datrc_3d(1:ncols,1:NumMicrobAutrophCmplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='RNH4UptkSoilAutor_vr', dim1name='column',dim2name='automicb',&
       dim3name='levsoi1',long_name='total autotrophic microbial NH4 demand in soil', &
@@ -6578,7 +6574,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,RNO3UptkSoilAutor_vr,datrc_3d)     
   else
     !print*,'RNO3UptkSoilAutor_vr'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RNO3UptkSoilAutor_vr,datrc_3d)       
+    call cpcol(flag,NHW,NHE,NVN,NVS,RNO3UptkSoilAutor_vr,datrc_3d)       
     datpr3 => datrc_3d(1:ncols,1:NumMicrobAutrophCmplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='RNO3UptkSoilAutor_vr', dim1name='column',dim2name='automicb',&
       dim3name='levsoi1',long_name='total autotrophic microbial NO3 demand in soil', &
@@ -6595,7 +6591,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,RH2PO4UptkSoilAutor_vr,datrc_3d)     
   else
     !print*,'RH2PO4UptkSoilAutor_vr'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RH2PO4UptkSoilAutor_vr,datrc_3d)       
+    call cpcol(flag,NHW,NHE,NVN,NVS,RH2PO4UptkSoilAutor_vr,datrc_3d)       
     datpr3 => datrc_3d(1:ncols,1:NumMicrobAutrophCmplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='RH2PO4UptkSoilAutor_vr', dim1name='column',dim2name='automicb',&
       dim3name='levsoi1',long_name='total autotrophic microbial PO4 demand in soil', &
@@ -6612,7 +6608,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,RNH4UptkBandAutor_vr,datrc_3d)     
   else
     !print*,'RNH4UptkBandAutor_vr'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RNH4UptkBandAutor_vr,datrc_3d)       
+    call cpcol(flag,NHW,NHE,NVN,NVS,RNH4UptkBandAutor_vr,datrc_3d)       
     datpr3 => datrc_3d(1:ncols,1:NumMicrobAutrophCmplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='RNH4UptkBandAutor_vr', dim1name='column',dim2name='automicb',&
       dim3name='levsoi1',long_name='total autotrophic NH4 immobilization (+ve) - mineralization (-ve) band', &
@@ -6629,7 +6625,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,RNO3UptkBandAutor_vr,datrc_3d)     
   else
     !print*,'RNO3UptkBandAutor_vr'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RNO3UptkBandAutor_vr,datrc_3d)       
+    call cpcol(flag,NHW,NHE,NVN,NVS,RNO3UptkBandAutor_vr,datrc_3d)       
     datpr3 => datrc_3d(1:ncols,1:NumMicrobAutrophCmplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='RNO3UptkBandAutor_vr', dim1name='column',dim2name='automicb',&
       dim3name='levsoi1',long_name='total autotrophic NO3 immobilization (+ve) - mineralization (-ve) band', &
@@ -6646,7 +6642,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,RH2PO4UptkBandAutor_vr,datrc_3d)     
   else
     !print*,'RH2PO4UptkBandAutor_vr'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RH2PO4UptkBandAutor_vr,datrc_3d)       
+    call cpcol(flag,NHW,NHE,NVN,NVS,RH2PO4UptkBandAutor_vr,datrc_3d)       
     datpr3 => datrc_3d(1:ncols,1:NumMicrobAutrophCmplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='RH2PO4UptkBandAutor_vr', dim1name='column',dim2name='automicb',&
       dim3name='levsoi1',long_name='total autotrophic H2PO4 immobilization (+ve) - mineralization (-ve) band', &
@@ -6663,7 +6659,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,RNH4UptkLitrAutor_col,datrc_2d)     
   else
     !print*,'RNH4UptkLitrAutor_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RNH4UptkLitrAutor_col,datrc_2d)       
+    call cpcol(flag,NHW,NHE,NVN,NVS,RNH4UptkLitrAutor_col,datrc_2d)       
     datpr2 => datrc_2d(1:ncols,1:NumMicrobAutrophCmplx)       
     call restartvar(ncid, flag, varname='RNH4UptkLitrAutor_col', dim1name='column',dim2name='automicb',&
       long_name='total autotrophic microbial NH4 demand in surface litte', &
@@ -6680,7 +6676,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,RNO3UptkLitrAutor_col,datrc_2d)     
   else
     !print*,'RNO3UptkLitrAutor_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RNO3UptkLitrAutor_col,datrc_2d)       
+    call cpcol(flag,NHW,NHE,NVN,NVS,RNO3UptkLitrAutor_col,datrc_2d)       
     datpr2 => datrc_2d(1:ncols,1:NumMicrobAutrophCmplx)       
     call restartvar(ncid, flag, varname='RNO3UptkLitrAutor_col', dim1name='column',dim2name='automicb',&
       long_name='total autotrophic microbial NO3 demand in surface litte', &
@@ -6697,7 +6693,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,RH2PO4UptkLitrAutor_col,datrc_2d)     
   else
     !print*,'RH2PO4UptkLitrAutor_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RH2PO4UptkLitrAutor_col,datrc_2d)       
+    call cpcol(flag,NHW,NHE,NVN,NVS,RH2PO4UptkLitrAutor_col,datrc_2d)       
     datpr2 => datrc_2d(1:ncols,1:NumMicrobAutrophCmplx)       
     call restartvar(ncid, flag, varname='RH2PO4UptkLitrAutor_col', dim1name='column',dim2name='automicb',&
       long_name='total autotrophic microbial H2PO4 demand in surface litte', &
@@ -6714,7 +6710,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,RH1PO4UptkLitrAutor_col,datrc_2d)     
   else
     !print*,'RH1PO4UptkLitrAutor_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RH1PO4UptkLitrAutor_col,datrc_2d)       
+    call cpcol(flag,NHW,NHE,NVN,NVS,RH1PO4UptkLitrAutor_col,datrc_2d)       
     datpr2 => datrc_2d(1:ncols,1:NumMicrobAutrophCmplx)       
     call restartvar(ncid, flag, varname='RH1PO4UptkLitrAutor_col', dim1name='column',dim2name='automicb',&
       long_name='total autotrophic microbial H1PO4 demand in surface litte', &
@@ -6732,7 +6728,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,mBiomeAutor_vr,datrc_4d)     
   else
     !print*,'OMCff'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,mBiomeAutor_vr,datrc_4d)       
+    call cpcol(flag,NHW,NHE,NVN,NVS,mBiomeAutor_vr,datrc_4d)       
     datpr4 => datrc_4d(1:ncols,1:NumPlantChemElms,1:NumLiveAutoBioms,1:JZ+1)           
     call restartvar(ncid, flag, varname='mBiomeAutor', dim1name='column',dim2name='elmnts',&
       dim3name='nliveautomicb',dim4name='levsoi1',long_name='autotrophic microbial biomass element', &
@@ -6742,16 +6738,16 @@ implicit none
 
   if(flag=='read')then
     datpr5 => datrc_5d(1:ncols,1:NumPlantChemElms,1:nlbiomcp,1:jcplx,1:JZ+1)           
-    call restartvar(ncid, flag, varname='ORM', dim1name='column',dim2name='elements',&
+    call restartvar(ncid, flag, varname='ORM', dim1name='column',dim2name='elmnts',&
       dim3name='nlbiomcp',dim4name='nomcomplx',dim5name='levsoi1',long_name='microbial residue matter', &
       units='g d-2', interpinic_flag='skip', data=datpr5, missing_value=spval, &
       fill_value=spval)      
     call cpcol(flag,NHW,NHE,NVN,NVS,OMBioResdu_vr,datrc_5d)     
   else
     !print*,'ORC'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,OMBioResdu_vr,datrc_5d)       
+    call cpcol(flag,NHW,NHE,NVN,NVS,OMBioResdu_vr,datrc_5d)       
     datpr5 => datrc_5d(1:ncols,1:NumPlantChemElms,1:nlbiomcp,1:jcplx,1:JZ+1)           
-    call restartvar(ncid, flag, varname='ORM', dim1name='column',dim2name='elements',&
+    call restartvar(ncid, flag, varname='ORM', dim1name='column',dim2name='elmnts',&
       dim3name='nlbiomcp',dim4name='nomcomplx',dim5name='levsoi1',long_name='microbial residue matter', &
       units='g d-2', interpinic_flag='skip', data=datpr5, missing_value=spval, &
       fill_value=spval)      
@@ -6765,7 +6761,7 @@ implicit none
       fill_value=spval)      
     call cpcol(flag,NHW,NHE,NVN,NVS,DOM_vr,datrc_4d)     
   else
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,DOM_vr,datrc_4d)       
+    call cpcol(flag,NHW,NHE,NVN,NVS,DOM_vr,datrc_4d)       
     datpr4 => datrc_4d(1:ncols,1:trc_confs%NDOMS,1:jcplx,1:JZ+1)                   
     call restartvar(ncid, flag, varname='DOM', dim1name='column',dim2name='ndoms',&
       dim3name='nomcomplx',dim4name='levsoi1',long_name='dissolved organic matter micropore', &
@@ -6783,7 +6779,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,DOM_MacP_vr,datrc_4d)
   else
     !print*,'OQCH'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,DOM_MacP_vr,datrc_4d)  
+    call cpcol(flag,NHW,NHE,NVN,NVS,DOM_MacP_vr,datrc_4d)  
     datpr4 => datrc_4d(1:ncols,1:trc_confs%NDOMS,1:jcplx,1:JZ+1)                   
     call restartvar(ncid, flag, varname='DOM_MacP', dim1name='column',dim2name='ndoms',&
       dim3name='nomcomplx',dim4name='levsoi1',long_name='dissolved organic matter macropore', &
@@ -6799,7 +6795,7 @@ implicit none
       fill_value=spval)      
     call cpcol(flag,NHW,NHE,NVN,NVS,SorbedOM_vr,datrc_4d)
   else
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SorbedOM_vr,datrc_4d)  
+    call cpcol(flag,NHW,NHE,NVN,NVS,SorbedOM_vr,datrc_4d)  
     datpr4 => datrc_4d(1:ncols,1:trc_confs%NDOMS,1:jcplx,1:JZ+1)                   
     call restartvar(ncid, flag, varname='OHM', dim1name='column',dim2name='ndoms',&
       dim3name='nomcomplx',dim4name='levsoi1',long_name='adsorbed soil organic matter', &
@@ -6810,7 +6806,7 @@ implicit none
 
   if(flag=='read')then
     datpr5 => datrc_5d(1:ncols,1:NumPlantChemElms,1:jsken,1:jcplx,1:JZ+1)                   
-    call restartvar(ncid, flag, varname='OSM', dim1name='column',dim2name='elements',&
+    call restartvar(ncid, flag, varname='OSM', dim1name='column',dim2name='elmnts',&
       dim3name='nkinecmp',dim4name='nomcomplx',dim5name='levsoi1',&
       long_name='solid soil organic matter', &
       units='g d-2', interpinic_flag='skip', data=datpr5, missing_value=spval, &
@@ -6818,9 +6814,9 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,SolidOM_vr,datrc_5d)
   else
     !print*,'OSC'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SolidOM_vr,datrc_5d)  
+    call cpcol(flag,NHW,NHE,NVN,NVS,SolidOM_vr,datrc_5d)  
     datpr5 => datrc_5d(1:ncols,1:NumPlantChemElms,1:jsken,1:jcplx,1:JZ+1)    
-    call restartvar(ncid, flag, varname='OSM', dim1name='column',dim2name='elements',&
+    call restartvar(ncid, flag, varname='OSM', dim1name='column',dim2name='elmnts',&
       dim3name='nkinecmp',dim4name='nomcomplx',dim5name='levsoi1',&
       long_name='solid soil organic matter', &
       units='g d-2', interpinic_flag='skip', data=datpr5, missing_value=spval, &
@@ -6836,7 +6832,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,SolidOMAct_vr,datrc_4d)
   else
     !print*,'OSA'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SolidOMAct_vr,datrc_4d)  
+    call cpcol(flag,NHW,NHE,NVN,NVS,SolidOMAct_vr,datrc_4d)  
     datpr4 => datrc_4d(1:ncols,1:jsken,1:jcplx,1:JZ+1)    
     call restartvar(ncid, flag, varname='OSA', dim1name='column',dim2name='nkinecmp',&
       dim3name='nomcomplx',dim4name='levsoi1',long_name='colonized soil organic C', &
@@ -6854,7 +6850,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,RNO2DmndSoilChemo_vr,datrc_2d)
   else
     !print*,'RNO2DmndSoilChemo_vr'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RNO2DmndSoilChemo_vr,datrc_2d)  
+    call cpcol(flag,NHW,NHE,NVN,NVS,RNO2DmndSoilChemo_vr,datrc_2d)  
     datpr2 => datrc_2d(1:ncols,1:JZ+1)    
     call restartvar(ncid, flag, varname='RNO2DmndSoilChemo_vr', dim1name='column',dim2name='levsoi1',&
       long_name='total chemodenitrification N2O uptake non-band unconstrained by N2O', &
@@ -6871,7 +6867,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,SoilOrgM_vr,datrc_3d)
   else
     !print*,'ORGC'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SoilOrgM_vr,datrc_3d)  
+    call cpcol(flag,NHW,NHE,NVN,NVS,SoilOrgM_vr,datrc_3d)  
     datpr3 => datrc_3d(1:ncols,1:NumPlantChemElms,1:JZ+1)   
     call restartvar(ncid, flag, varname='ORGC', dim1name='column',dim2name='elmnts',dim3name='levsoi1',&
       long_name='total soil organic matter', units='g d-2', interpinic_flag='skip',&
@@ -6888,7 +6884,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,OMLitrC_vr,datrc_2d)
   else
     !print*,'ORGR'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,OMLitrC_vr,datrc_2d)  
+    call cpcol(flag,NHW,NHE,NVN,NVS,OMLitrC_vr,datrc_2d)  
     datpr2 => datrc_2d(1:ncols,1:JZ+1)    
     call restartvar(ncid, flag, varname='ORGR', dim1name='column',dim2name='levsoi1',&
       long_name='total particulate organic C', units='g d-2', interpinic_flag='skip',&
@@ -6904,7 +6900,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,FertN_soil_vr,datrc_3d)
   else
     !print*,'FertN_soil_vr'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,FertN_soil_vr,datrc_3d)  
+    call cpcol(flag,NHW,NHE,NVN,NVS,FertN_soil_vr,datrc_3d)  
     datpr3 => datrc_3d(1:ncols,1:trc_confs%NFertNitro,1:JZ+1)    
     call restartvar(ncid, flag, varname='FertN_soil_vr', dim1name='column',dim2name='fertN', &
       dim3name='levsoi1',long_name='fertilizer application', units='g d-2', interpinic_flag='skip',&
@@ -6919,7 +6915,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,FertN_Band_vr,datrc_3d)
   else
     !print*,'FertN_Band_vr'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,FertN_Band_vr,datrc_3d)  
+    call cpcol(flag,NHW,NHE,NVN,NVS,FertN_Band_vr,datrc_3d)  
     datpr3 => datrc_3d(1:ncols,1:trc_confs%NFertNitrob,1:JZ)    
     call restartvar(ncid, flag, varname='FertN_Band_vr', dim1name='column',dim2name='fertNb',&
       dim3name='levsoi',long_name='fertilizer application', units='g d-2', interpinic_flag='skip',&
@@ -6934,7 +6930,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,WDNHB,datrc_2d)
   else
     !print*,'WDNHB'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,WDNHB,datrc_2d)  
+    call cpcol(flag,NHW,NHE,NVN,NVS,WDNHB,datrc_2d)  
     datpr2 => datrc_2d(1:ncols,1:JZ)    
     call restartvar(ncid, flag, varname='WDNHB', dim1name='column', &
       dim2name='levsoi',long_name='width of NH4 band', units='m', interpinic_flag='skip',&
@@ -6949,7 +6945,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,DPNHB,datrc_2d)
   else
     !print*,'DPNHB'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,DPNHB,datrc_2d)  
+    call cpcol(flag,NHW,NHE,NVN,NVS,DPNHB,datrc_2d)  
     datpr2 => datrc_2d(1:ncols,1:JZ)    
     call restartvar(ncid, flag, varname='DPNHB', dim1name='column', &
       dim2name='levsoi',long_name='depth of NH4 band', units='m', interpinic_flag='skip',&
@@ -6964,7 +6960,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,WDNOB,datrc_2d)
   else
     !print*,'WDNOB'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,WDNOB,datrc_2d)  
+    call cpcol(flag,NHW,NHE,NVN,NVS,WDNOB,datrc_2d)  
     datpr2 => datrc_2d(1:ncols,1:JZ)    
     call restartvar(ncid, flag, varname='WDNOB', dim1name='column', &
       dim2name='levsoi',long_name='width of NO3 band', units='m', interpinic_flag='skip',&
@@ -6979,7 +6975,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,DPNOB,datrc_2d)
   else
     !print*,'DPNOB'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,DPNOB,datrc_2d)  
+    call cpcol(flag,NHW,NHE,NVN,NVS,DPNOB,datrc_2d)  
     datpr2 => datrc_2d(1:ncols,1:JZ)    
     call restartvar(ncid, flag, varname='DPNOB', dim1name='column', &
       dim2name='levsoi',long_name='depth of NO4 band', units='m', interpinic_flag='skip',&
@@ -6994,7 +6990,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,WDPOB,datrc_2d)
   else
     !print*,'WDPOB'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,WDPOB,datrc_2d)  
+    call cpcol(flag,NHW,NHE,NVN,NVS,WDPOB,datrc_2d)  
     datpr2 => datrc_2d(1:ncols,1:JZ)    
     call restartvar(ncid, flag, varname='WDPOB', dim1name='column', &
       dim2name='levsoi',long_name='width of PO4 band', units='m', interpinic_flag='skip',&
@@ -7009,7 +7005,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,DPPOB,datrc_2d)
   else
      !print*,'DPPOB'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,DPPOB,datrc_2d)  
+    call cpcol(flag,NHW,NHE,NVN,NVS,DPPOB,datrc_2d)  
     datpr2 => datrc_2d(1:ncols,1:JZ)    
     call restartvar(ncid, flag, varname='DPPOB', dim1name='column', &
       dim2name='levsoi',long_name='depth of PO4 band', units='m', interpinic_flag='skip',&
@@ -7025,7 +7021,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,ZNHUI,datrc_2d)
   else
     !print*,'ZNHUI'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,ZNHUI,datrc_2d)  
+    call cpcol(flag,NHW,NHE,NVN,NVS,ZNHUI,datrc_2d)  
     datpr2 => datrc_2d(1:ncols,1:JZ+1)    
     call restartvar(ncid, flag, varname='ZNHUI', dim1name='column', &
       dim2name='levsoi1',long_name='current inhibition activity', &
@@ -7043,7 +7039,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,ZNHU0,datrc_2d)
   else
     !print*,'ZNHU0'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,ZNHU0,datrc_2d)  
+    call cpcol(flag,NHW,NHE,NVN,NVS,ZNHU0,datrc_2d)  
     datpr2 => datrc_2d(1:ncols,1:JZ+1)    
     call restartvar(ncid, flag, varname='ZNHU0', dim1name='column', &
       dim2name='levsoi1',long_name='urea hydrolysis inhibition activity', &
@@ -7060,7 +7056,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,ZNFNI,datrc_2d)  
   else
     !print*,'ZNFNI'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,ZNFNI,datrc_2d)    
+    call cpcol(flag,NHW,NHE,NVN,NVS,ZNFNI,datrc_2d)    
     datpr2 => datrc_2d(1:ncols,1:JZ+1)    
     call restartvar(ncid, flag, varname='ZNFNI', dim1name='column', &
       dim2name='levsoi1',long_name='current nitrification inhibition activity', &
@@ -7077,7 +7073,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,ZNFN0,datrc_2d)  
   else
     !print*,'ZNFN0'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,ZNFN0,datrc_2d)    
+    call cpcol(flag,NHW,NHE,NVN,NVS,ZNFN0,datrc_2d)    
     datpr2 => datrc_2d(1:ncols,1:JZ+1)    
     call restartvar(ncid, flag, varname='ZNFN0', dim1name='column', &
       dim2name='levsoi1',long_name='initial nitrification inhibition activity', &
@@ -7094,7 +7090,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,TDTPX,datrc_2d)    
   else
     !print*,'TDTPX'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,TDTPX,datrc_2d)      
+    call cpcol(flag,NHW,NHE,NVN,NVS,TDTPX,datrc_2d)      
     datpr2 => datrc_2d(1:ncols,1:12)    
     call restartvar(ncid, flag, varname='TDTPX', dim1name='column', &
       dim2name='month',long_name='accumulated change for maximum temperature', &
@@ -7111,7 +7107,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,TDRAD,datrc_2d)    
   else
     !print*,'TDRAD'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,TDRAD,datrc_2d)      
+    call cpcol(flag,NHW,NHE,NVN,NVS,TDRAD,datrc_2d)      
     datpr2 => datrc_2d (1:ncols,1:12)   
     call restartvar(ncid, flag, varname='TDRAD', dim1name='column', &
       dim2name='month',long_name='accumulated change for radiation', &
@@ -7128,7 +7124,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,TDTPN,datrc_2d)    
   else
     !print*,'TDTPN'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,TDTPN,datrc_2d)      
+    call cpcol(flag,NHW,NHE,NVN,NVS,TDTPN,datrc_2d)      
     datpr2 => datrc_2d(1:ncols,1:12)    
     call restartvar(ncid, flag, varname='TDTPN', dim1name='column', &
       dim2name='month',long_name='accumulated change for minimum temperature', &
@@ -7145,7 +7141,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,TDWND,datrc_2d)    
   else
     !print*,'TDWND'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,TDWND,datrc_2d)      
+    call cpcol(flag,NHW,NHE,NVN,NVS,TDWND,datrc_2d)      
     datpr2 => datrc_2d(1:ncols,1:12)   
     call restartvar(ncid, flag, varname='TDWND', dim1name='column', &
       dim2name='month',long_name='accumulated change for wind speed', &
@@ -7163,7 +7159,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,TDHUM,datrc_2d)    
   else
     !print*,'TDHUM'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,TDHUM,datrc_2d)      
+    call cpcol(flag,NHW,NHE,NVN,NVS,TDHUM,datrc_2d)      
     datpr2 => datrc_2d(1:ncols,1:12)    
     call restartvar(ncid, flag, varname='TDHUM', dim1name='column', &
       dim2name='month',long_name='accumulated change for humidity', &
@@ -7180,7 +7176,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,TDPRC,datrc_2d)    
   else
     !print*,'TDPRC'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,TDPRC,datrc_2d)      
+    call cpcol(flag,NHW,NHE,NVN,NVS,TDPRC,datrc_2d)      
     datpr2 => datrc_2d(1:ncols,1:12)    
     call restartvar(ncid, flag, varname='TDPRC', dim1name='column', &
       dim2name='month',long_name='accumulated change for precipitation', &
@@ -7197,7 +7193,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,TDIRI,datrc_2d)    
   else
     !print*,'TDIRI'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,TDIRI,datrc_2d)      
+    call cpcol(flag,NHW,NHE,NVN,NVS,TDIRI,datrc_2d)      
     datpr2 => datrc_2d(1:ncols,1:12)    
     call restartvar(ncid, flag, varname='TDIRI', dim1name='column', &
       dim2name='month',long_name='accumulated change for irrigation', &
@@ -7214,7 +7210,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,TDCN4,datrc_2d)    
   else
     !print*,'TDCN4'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,TDCN4,datrc_2d)      
+    call cpcol(flag,NHW,NHE,NVN,NVS,TDCN4,datrc_2d)      
     datpr2 => datrc_2d(1:ncols,1:12)     
     call restartvar(ncid, flag, varname='TDCN4', dim1name='column', &
       dim2name='month',long_name='accumulated change for NH4 in precipitation', &
@@ -7231,7 +7227,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,TDCNO,datrc_2d)    
   else
     !print*,'TDCNO'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,TDCNO,datrc_2d)      
+    call cpcol(flag,NHW,NHE,NVN,NVS,TDCNO,datrc_2d)      
     datpr2 => datrc_2d(1:ncols,1:12)    
     call restartvar(ncid, flag, varname='TDCNO', dim1name='column', &
       dim2name='month',long_name='accumulated change for NO3 in precipitation', &
@@ -7248,7 +7244,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,GKC4,datrc_2d)    
   else
     !print*,'GKC4'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,GKC4,datrc_2d)      
+    call cpcol(flag,NHW,NHE,NVN,NVS,GKC4,datrc_2d)      
     datpr2 => datrc_2d(1:ncols,1:JZ)     
     call restartvar(ncid, flag, varname='GKC4', dim1name='column', &
       dim2name='levsoi',long_name='Ca-NH4 Gapon selectivity coefficient', &
@@ -7265,7 +7261,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,GKCH,datrc_2d)    
   else
     !print*,'GKCH'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,GKCH,datrc_2d)      
+    call cpcol(flag,NHW,NHE,NVN,NVS,GKCH,datrc_2d)      
     datpr2 => datrc_2d(1:ncols,1:JZ)     
     call restartvar(ncid, flag, varname='GKCH', dim1name='column', &
       dim2name='levsoi',long_name='Ca-H Gapon selectivity coefficient', &
@@ -7282,7 +7278,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,GKCA,datrc_2d)    
   else
     !print*,'GKCA'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,GKCA,datrc_2d)      
+    call cpcol(flag,NHW,NHE,NVN,NVS,GKCA,datrc_2d)      
     datpr2 => datrc_2d(1:ncols,1:JZ)    
     call restartvar(ncid, flag, varname='GKCA', dim1name='column', &
       dim2name='levsoi',long_name='Ca-Al Gapon selectivity coefficient', &
@@ -7299,7 +7295,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,GKCM,datrc_2d)    
   else
     !print*,'GKCM'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,GKCM,datrc_2d)      
+    call cpcol(flag,NHW,NHE,NVN,NVS,GKCM,datrc_2d)      
     datpr2 => datrc_2d(1:ncols,1:JZ)     
     call restartvar(ncid, flag, varname='GKCM', dim1name='column', &
       dim2name='levsoi',long_name='Ca-Mg Gapon selectivity coefficient', &
@@ -7316,7 +7312,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,GKCN,datrc_2d)    
   else
     !print*,'GKCN'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,GKCN,datrc_2d)      
+    call cpcol(flag,NHW,NHE,NVN,NVS,GKCN,datrc_2d)      
     datpr2 => datrc_2d(1:ncols,1:JZ)     
     call restartvar(ncid, flag, varname='GKCN', dim1name='column', &
       dim2name='levsoi',long_name='Ca-Na Gapon selectivity coefficient', &
@@ -7333,7 +7329,7 @@ implicit none
     call cpcol(flag,NHW,NHE,NVN,NVS,GKCK,datrc_2d)    
   else
     !print*,'GKCK'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,GKCK,datrc_2d)     
+    call cpcol(flag,NHW,NHE,NVN,NVS,GKCK,datrc_2d)     
     datpr2 => datrc_2d(1:ncols,1:JZ)     
     call restartvar(ncid, flag, varname='GKCK', dim1name='column', &
       dim2name='levsoi',long_name='Ca-K Gapon selectivity coefficient', &
@@ -7587,7 +7583,7 @@ implicit none
   print*,'hist_restart_ncd'
   call hist_restart_ncd (bounds, ncid, flag='read')
 
-  ! Do error checking on file
+  print*,'Do error checking on file'
   
   call restFile_check_consistency(bounds, ncid)
   

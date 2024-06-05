@@ -290,13 +290,9 @@ module Hour1Mod
   OXYGSO=0.0_r8
   TLH2G=0.0_r8
   TSEDSO=0.0_r8
-  LitRMStoreLndscap(ielmc)=0.0_r8
-  LitRMStoreLndscap(ielmn)=0.0_r8
-  LitRMStoreLndscap(ielmp)=0.0_r8
+  LitRMStoreLndscap(:)=0.0_r8
 
-  POMHumStoreLndscap(ielmc)=0.0_r8
-  POMHumStoreLndscap(ielmn)=0.0_r8
-  POMHumStoreLndscap(ielmp)=0.0_r8
+  POMHumStoreLndscap(:)=0.0_r8
   TGasC_lnd=0.0_r8
   TGasN_lnd=0.0_r8
   TDisolNH4_lnd=0.0_r8

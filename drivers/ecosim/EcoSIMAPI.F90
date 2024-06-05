@@ -313,7 +313,7 @@ subroutine soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
   call etimer%get_ymdhs(ymdhs)
 
   IF(ymdhs(1:4)==frectyp%ymdhs0(1:4))THEN
-!   the first simulation year
+    print*,'the first simulation year    '
     if(lverb)WRITE(*,333)'STARTS'
     CALL STARTS(NHW,NHE,NVN,NVS)
 !
@@ -339,7 +339,7 @@ subroutine soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
 
   ENDIF
 
-  if(soichem_model)then
+  if(ymdhs(1:4)==frectyp%ymdhs0(1:4) .and. soichem_model)then
 ! INITIALIZE ALL SOIL CHEMISTRY VARIABLES IN 'STARTE'
 ! This is done done every year, because tracer concentrations
 ! in rainfall vary every year. In a more reasonable way, e.g.,
@@ -361,11 +361,13 @@ subroutine soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
 
     DO J=1,24
       call etimer%get_ymdhs(ymdhs)
-
+      
       if(ymdhs==frectyp%ymdhs0)then
-        frectyp%lskip_loop=.false.
+        frectyp%lskip_loop=.false.        
         if(is_restart())then
+          print*,'reading restart file'
           call restFile(flag='read')
+          print*,'finish reading restart file'
         endif
       endif
       if(frectyp%lskip_loop)then
@@ -415,9 +417,9 @@ subroutine soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
 !
 ! PERFORM MASS AND ENERGY BALANCE CHECKS IN 'EXEC'
 !
+    if(frectyp%lskip_loop)cycle
     if(lverb)WRITE(*,333)'EXEC'
     CALL EXEC(I)
-!
 
     if(do_bgcforc_write)then
       call WriteBBGCFORC(I,IYRR)

@@ -60,7 +60,7 @@ contains
   ! FCI,WPI=FC,WP of ice
   ! THETIX=ice concentration
 !
-    IF(SoilMicPMassLayer(L,NY,NX).GT.ZEROS(NY,NX).AND.VLSoilPoreMicP_vr(L,NY,NX).GT.ZEROS(NY,NX))THEN
+    IF(SoilMicPMassLayer(L,NY,NX).GT.ZEROS(NY,NX) .AND. VLSoilPoreMicP_vr(L,NY,NX).GT.ZEROS(NY,NX))THEN
       THETW1=AZMAX1(AMIN1(POROS(L,NY,NX),VLWatMicP_vr(L,NY,NX)/VLSoilMicP(L,NY,NX)),1.e-6_r8)
       IF(THETW1.LT.FieldCapacity(L,NY,NX))THEN
         PSISoilMatricP(L,NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIFLD(NY,NX) &
@@ -71,7 +71,7 @@ contains
       ELSE
         PSISoilMatricP(L,NY,NX)=PSISE(L,NY,NX)
       ENDIF
-    ELSE IF(VLSoilPoreMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX).and.THETI(L,NY,NX)>ZEROS2(NY,NX))THEN
+    ELSE IF(VLSoilPoreMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX) .and. THETI(L,NY,NX)>ZEROS2(NY,NX))THEN
       FCX=FCI*THETI(L,NY,NX)
       WPX=WPI*THETI(L,NY,NX)
       FCLX=LOG(FCX)
@@ -150,8 +150,10 @@ contains
   if(lverb)write(*,*)'SoilHydroProperty::setshape',POROS(L,NY,NX),cold_run()
 ! double check cold_run() setup
   LOGPOROS(L,NY,NX)=LOG(POROS(L,NY,NX))
-  IF((ISOIL(isoi_fc,L,NY,NX).EQ.0.AND.ISOIL(isoi_wp,L,NY,NX).EQ.0).OR.(.not.cold_run()))THEN
+
+  IF((ISOIL(isoi_fc,L,NY,NX).EQ.0 .AND. ISOIL(isoi_wp,L,NY,NX).EQ.0).OR.(.not.cold_run()))THEN
   ! read from check point file or if soil properties are set with soil file
+    print*,'fldcap',L,FieldCapacity(L,NY,NX)
     LOGFldCapacity(L,NY,NX)=LOG(FieldCapacity(L,NY,NX))
     LOGWiltPoint(L,NY,NX)=LOG(WiltPoint(L,NY,NX))
     PSD(L,NY,NX)=LOGPOROS(L,NY,NX)-LOGFldCapacity(L,NY,NX)
