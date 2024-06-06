@@ -52,6 +52,14 @@ ecosim_build_dir='./build/'
 
 ############## END EDIT ####################
 
+cmake_binary='which cmake'
+
+cmd_configure="${cmake_binary} \
+      -DCMAKE_C_FLAGS:STRING="${build_c_flags}" \
+      -DATS_ECOSIM=$ATS_ECOSIM
+      ${ecosim_source_dir}"
+
+
 # Check if the build exists
 if [ ! -d "$ecosim_build_dir" ]; then
     echo "Directory $ecosim_build_dir does not exist. Creating..."
@@ -64,21 +72,17 @@ fi
 # Note: many of the options that used to be in the CMakeLists.txt file
 # have been moved here to remove redundancies
 
-cmd_configure="${cmake_binary} \
-    ${ecosim_source_dir}"
-
 ATS_ECOSIM=$ATS_ECOSIM
 echo $ATS_ECOSIM
 
 echo "cmd_configure: $cmd_configure"
-
 echo "building in: $ecosim_build_dir"
 #run the configure command
 #cd ${ecosim_build_dir}
 #${cmd_configure}
 cd build
 pwd
-cmake ../ -DATS_ECOSIM=ATS_ECOSIM
+cmake ../ -DATS_ECOSIM=$ATS_ECOSIM
 
 #This does the build
 make -j ${parallel_jobs}
