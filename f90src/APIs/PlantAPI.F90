@@ -1264,7 +1264,7 @@ implicit none
       ENDDO
 
       DO K=0,MaxNodesPerBranch
-        DO  L=1,NumOfCanopyLayers
+        DO  L=1,NumOfCanopyLayers                    
           plt_morph%CanopyLeafArea_lpft(L,K,NB,NZ)=CanopyLeafArea_lpft(L,K,NB,NZ,NY,NX)
           plt_biom%LeafChemElmByLayerNode_brch(1:NumPlantChemElms,L,K,NB,NZ) =&
             LeafChemElmByLayerNode_brch(1:NumPlantChemElms,L,K,NB,NZ,NY,NX)

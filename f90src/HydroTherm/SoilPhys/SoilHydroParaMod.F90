@@ -152,8 +152,7 @@ contains
   LOGPOROS(L,NY,NX)=LOG(POROS(L,NY,NX))
 
   IF((ISOIL(isoi_fc,L,NY,NX).EQ.0 .AND. ISOIL(isoi_wp,L,NY,NX).EQ.0).OR.(.not.cold_run()))THEN
-  ! read from check point file or if soil properties are set with soil file
-    print*,'fldcap',L,FieldCapacity(L,NY,NX)
+  ! read from check point file or if soil properties are set with soil file    
     LOGFldCapacity(L,NY,NX)=LOG(FieldCapacity(L,NY,NX))
     LOGWiltPoint(L,NY,NX)=LOG(WiltPoint(L,NY,NX))
     PSD(L,NY,NX)=LOGPOROS(L,NY,NX)-LOGFldCapacity(L,NY,NX)

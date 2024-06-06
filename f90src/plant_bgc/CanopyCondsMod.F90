@@ -48,26 +48,26 @@ module CanopyCondsMod
   real(r8) :: ZX,ZY,ZE
   REAL(R8) :: ZZ
 !     begin_execution
-  associate(                                                    &
-    WindSpeedAtm            => plt_site%WindSpeedAtm          , &
-    ZERO                    => plt_site%ZERO                  , &
-    AREA3                   => plt_site%AREA3                 , &
-    KoppenClimZone          => plt_site%KoppenClimZone        , &
-    SoiSurfRoughnesst0      => plt_site%SoiSurfRoughnesst0    , &
-    WindMesHeight           => plt_site%WindMesHeight         , &
-    ZEROS                   => plt_site%ZEROS                 , &
-    NU                      => plt_site%NU                    , &
-    BndlResistAboveCanG     => plt_ew%BndlResistAboveCanG     , &
-    ZERO4Groth_pftlanDisp            => plt_ew%ZERO4Groth_pftlanDisp            , &
-    RoughHeight             => plt_ew%RoughHeight             , &
-    RIB                     => plt_ew%RIB                     , &
-    TairK                   => plt_ew%TairK                   , &
-    VLHeatCapSnowMin_col    => plt_ew%VLHeatCapSnowMin_col    , &
-    SnowDepth               => plt_ew%SnowDepth               , &
-    VLHeatCapSurfSnow_col   => plt_ew%VLHeatCapSurfSnow_col   , &
-    CanopyHeight_col        => plt_morph%CanopyHeight_col     , &
-    StemArea_col            => plt_morph%StemArea_col         , &
-    CanopyLeafArea_col      => plt_morph%CanopyLeafArea_col     &
+  associate(                                               &
+    WindSpeedAtm          => plt_site%WindSpeedAtm,        &
+    ZERO                  => plt_site%ZERO,                &
+    AREA3                 => plt_site%AREA3,               &
+    KoppenClimZone        => plt_site%KoppenClimZone,      &
+    SoiSurfRoughnesst0    => plt_site%SoiSurfRoughnesst0,  &
+    WindMesHeight         => plt_site%WindMesHeight,       &
+    ZEROS                 => plt_site%ZEROS,               &
+    NU                    => plt_site%NU,                  &
+    BndlResistAboveCanG   => plt_ew%BndlResistAboveCanG,   &
+    ZERO4Groth_pftlanDisp => plt_ew%ZERO4Groth_pftlanDisp, &
+    RoughHeight           => plt_ew%RoughHeight,           &
+    RIB                   => plt_ew%RIB,                   &
+    TairK                 => plt_ew%TairK,                 &
+    VLHeatCapSnowMin_col  => plt_ew%VLHeatCapSnowMin_col,  &
+    SnowDepth             => plt_ew%SnowDepth,             &
+    VLHeatCapSurfSnow_col => plt_ew%VLHeatCapSurfSnow_col, &
+    CanopyHeight_col      => plt_morph%CanopyHeight_col,   &
+    StemArea_col          => plt_morph%StemArea_col,       &
+    CanopyLeafArea_col    => plt_morph%CanopyLeafArea_col  &
   )
 !     CANOPY ZERO PLANE AND ROUGHNESS HEIGHTS
 !
@@ -308,7 +308,7 @@ module CanopyCondsMod
     ZEROS2                   => plt_site%ZEROS2                      , &
     POROS1                   => plt_site%POROS1                      , &
     SolarNoonHour_col        => plt_site%SolarNoonHour_col           , &
-    VLSoilPoreMicP_vr        => plt_soilchem%VLSoilPoreMicP_vr    , &
+    VLSoilPoreMicP_vr        => plt_soilchem%VLSoilPoreMicP_vr       , &
     VLSoilMicP               => plt_soilchem%VLSoilMicP              , &
     VLWatMicP_vr             => plt_soilchem%VLWatMicP_vr            , &
     ClumpFactorNow_pft       => plt_morph%ClumpFactorNow_pft         , &
