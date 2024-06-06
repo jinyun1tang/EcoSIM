@@ -10,7 +10,7 @@ set (ECOSIM_VERSION "${ECOSIM_MAJOR_VERSION}.${ECOSIM_MINOR_VERSION}.${ECOSIM_PA
 
 message("We are in the EcoSIM top-level CMakeLists")
 
-set(TPL_INSTALL_PREFIX /global2/agraus/code/ats_dev_dir/amanzi_tpls-install-master-Debug)
+set(TPL_INSTALL_PREFIX $ENV{AMANZI_TPLS_DIR})
 
 # Adjust CMake's module path.
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
@@ -23,16 +23,6 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 #option(XSDK_WITH_NETCDF "Enables support for netcdf [OFF]." ON)
 #option(TPL_NETCDF_LIBRARIES "List of absolute paths to netcdf link libraries [].")
 #option(TPL_NETCDF_INCLUDE_DIRS "List of absolute paths to netcdf include directories [].")
-
-message(STATUS "ATS_ECOSIM_BUILD: ${ATS_ECOSIM_BUILD}")
-if (ATS_ECOSIM_BUILD)
-  message(STATUS "Building EcoSIM within ATS")
-endif()
-
-message(STATUS "Environment variables:")
-foreach (env_var IN LISTS ENV)
-    message(STATUS "${env_var}=${$ENV{env_var}}")
-endforeach()
 
 if (NOT CMAKE_INSTALL_PREFIX)
   set(CMAKE_INSTALL_PREFIX ${PROJECT_BINARY_DIR}/local)
@@ -205,15 +195,15 @@ if (ATS-EcoSIM)
     set(HDF5_LIBRARY "-L${TPL_INSTALL_PREFIX}/lib")    
     set(ECOSIM_HAVE_NETCDF TRUE)
     set(NETCDF_LIBRARY "-L${TPL_INSTALL_PREFIX}/lib/libnetcdf${LIB_SUFFIX}")
-    set(NETCDF_CFLAGS "-I/global2/agraus/code/ats_dev_dir/amanzi_tpls-install-master-Debug/include")
-    set(NETCDF_CLIBS "-L/global2/agraus/code/ats_dev_dir/amanzi_tpls-install-master-Debug/lib -lnetcdf")
+    set(NETCDF_CFLAGS "-I${TPL_INSTALL_PREFIX}/include")
+    set(NETCDF_CLIBS "-L${TPL_INSTALL_PREFIX}/lib -lnetcdf")
     #Needed to share with ATS (probably an easier way to do this)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${NETCDF_CFLAGS} -fPIC")
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} ${NETCDF_FFLAGS} -fPIC")
 
     #What were these even for? are they neccesary?
-    include_directories("/global2/agraus/code/ats_dev_dir/amanzi_tpls-install-master-Debug/include")
+    include_directories("${TPL_INSTALL_PREFIX}/include")
     #link_directories("/global2/agraus/code/ats_dev_dir/amanzi_tpls-install-master-Debug/lib")
 
     set(ECOSIM_TPLS "${NETCDF_FLIBS} ${NETCDF_CLIBS} ${Z_LIBRARY} ${HDF5_LIBRARY} -lhdf5_hl -lm -lz -lzip -lxml2 -lcurl")
@@ -251,14 +241,6 @@ link_directories("${PROJECT_BINARY_DIR}/lib")
 #include_directories(${ECOSIM_INCLUDE_DIRS})
 
 set(CMAKE_INSTALL_PREFIX ${PROJECT_BINARY_DIR}/local)
-
-message("After other things get set:")
-message(STATUS "TPL_NETCDF_LIBRARIES: ${TPL_NETCDF_LIBRARIES}")
-message(STATUS "TPL_NETCDF_INCLUDE_DIRS: ${TPL_NETCDF_INCLUDE_DIRS}")
-message(STATUS "ECOSIM_LIBRARIES: ${ECOSIM_LIBRARIES}")
-message(STATUS "ECOSIM_TPLS: ${ECOSIM_TPLS}")
-message(STATUS "ECOSIM_INCLUDE_DIRS: ${ECOSIM_INCLUDE_DIRS}")
-message(STATUS "CMAKE_INSTALL_PREFIX: ${CMAKE_INSTALL_PREFIX}")
 
 enable_testing()
 
