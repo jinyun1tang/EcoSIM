@@ -145,27 +145,6 @@ set(ECOSIM_NEED_PFUNIT 0)
 set(ECOSIM_NEED_PETSC 0)
 set(ECOSIM_INCLUDE_DIRS "" CACHE LIST "Include directory of EcoSIM")
 
-message("TPL_NETCDF_LIBRARIES: ${TPL_NETCDF_LIBRARIES}")
-message("TPL_NETCDF_INCLUDE_DIRS: ${TPL_NETCDF_INCLUDE_DIRS}")
-message("ECOSIM_LIBRARIES: ${ECOSIM_LIBRARIES}")
-
-message("XSDK_WITH_NETCDF: ${XSDK_WITH_NETCDF}")
-message("MACHINE: ${MACHINE}")
-
-#if (XSDK_WITH_NETCDF AND MACHINE MATCHES "supported")
-#  if ((TPL_NETCDF_LIBRARIES MATCHES "lib") AND (TPL_NETCDF_INCLUDE_DIRS MATCHES "include"))
-#     message("ECOSIM has netcdf support from the system")
-#     message("TPL_NETCDF_LIBRARIES ${TPL_NETCDF_LIBRARIES}")
-#     message("TPL_NETCDF_INCLUDE_DIRS ${TPL_NETCDF_INCLUDE_DIRS}")
-#     list(APPEND ECOSIM_TPLS ${TPL_NETCDF_LIBRARIES})
-#     list(APPEND ECOSIM_INCLUDE_DIRS ${TPL_NETCDF_INCLUDE_DIRS})
-#     set(ECOSIM_HAVE_NETCDF 1)
-#  else()
-#     message("ECOSIM does not have netcdf support from the system")
-#     set(ECOSIM_HAVE_NETCDF 0)
-#  endif()
-#endif()
-
 configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Templates/ecosim.cmake.in"
   "${CMAKE_CURRENT_BINARY_DIR}/ecosim.cmake"
@@ -185,6 +164,9 @@ endif()
 
 message(STATUS "ATS_ECOSIM: ${ATS_ECOSIM}")
 message(STATUS "ECOSIM_INSTALL_PREFIX: ${ECOSIM_INSTALL_PREFIX}")
+message(STATUS "BGC: ${BGC}")
+message(STATUS "ECOSIM_BGC: ${ECOSIM_BGC}")
+message(STATUS "ECOSIM: ${ECOSIM}")
 
 if (ATS_ECOSIM)
     message(STATUS "In if statement")
@@ -216,13 +198,8 @@ else()
 endif()
 
 message("After ATS-EcoSIM loop:")
-message(STATUS "TPL_NETCDF_LIBRARIES: ${TPL_NETCDF_LIBRARIES}")
-message(STATUS "TPL_NETCDF_INCLUDE_DIRS: ${TPL_NETCDF_INCLUDE_DIRS}")
 message(STATUS "ECOSIM_LIBRARIES: ${ECOSIM_LIBRARIES}")
 message(STATUS "ECOSIM_TPLS: ${ECOSIM_TPLS}")
-message(STATUS "PROJECT_BINARY_DIR: ${PROJECT_BINARY_DIR}")
-#set(CONFIG_FLAGS "-DTPL_NETCDF_INCLUDE_DIRS=\"${NETCDF_FFLAGS}\"")
-#set(CONFIG_FLAGS "${CONFIG_FLAGS} -DTPL_NETCDF_LIBRARIES=\"${NETCDF_FLIBS}\"")
 
 #add_subdirectory(3rd-partylibs)
 

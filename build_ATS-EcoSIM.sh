@@ -20,28 +20,18 @@ function status_message()
 }
 
 ############# EDIT THESE! ##################
-#cmake
-#cmake_binary=$(which cmake)
 
-#Compilers 
-#GNU compilers should work, intel compilers are trickier
-#compiler_c=$(which gcc)
-#compiler_cxx=$(which g++)
-#compiler_fc=$(which gfortran)
 
-#Compiler flags
-#build_c_flags='-std=c99 -Wall -Wpedantic -Wextra -Wno-sign-compare -Wno-unused-parameter -Wno-unused-function -Wno-cast-qual -Wno-unused-but-set-variable -Wno-overlength-strings -Wno-int-to-pointer-cast -Wno-pointer-to-int-cast -Wno-discarded-qualifiers -Wno-sign-conversion -Wno-maybe-uninitialized'
-#build_cxx_flags=' '
-#build_fort_flags='-W -Wall -Wno-unused-variable -Wno-unused-parameter -Wno-unused-function -Wuninitialized -Wno-unused-dummy-argument'
-#build_link_flags=' '
+debug=0
+mpi=0
+shared=0
+verbose=0
+sanitize=0
+travis=0
 
-#Install prefix
-#ecosim_install_prefix=local
-#build_type=Debug
-#structured=0
-#unstructured=0
-#shared=0
-#openmp=0
+precision="double"
+prefix=""
+systype=""
 
 #This is a little confusing, but we have to move into the build dir
 #and then point cmake to the top-level CMakeLists file which will
@@ -54,10 +44,59 @@ ecosim_build_dir='./build/'
 
 cmake_binary='which cmake'
 
+if [ "$shared" -eq 1 ]; then
+    BUILDDIR="${BUILDDIR}-shared"
+    CONFIG_FLAGS="${CONFIG_FLAGS} -DBUILD_SHARED_LIBS=ON"
+else
+    BUILDDIR="${BUILDDIR}-static"
+    CONFIG_FLAGS="${CONFIG_FLAGS} -DBUILD_SHARED_LIBS=OFF"
+fi
+
+if [ "$precision" != "double" ]; then
+    BUILDDIR="${BUILDDIR}-double"
+    CONFIG_FLAGS="${CONFIG_FLAGS} -DECOSIM_PRECISION=double"
+else
+    BUILDDIR="${BUILDDIR}-${precision}"
+    CONFIG_FLAGS="${CONFIG_FLAGS} -DECOSIM_PRECISION=${precision}"
+fi
+
+if [ "$debug" -eq 0 ]; then
+    BUILDDIR="${BUILDDIR}-Release"
+    CONFIG_FLAGS="${CONFIG_FLAGS} -DCMAKE_BUILD_TYPE=Release"
+else
+    BUILDDIR="${BUILDDIR}-Debug"
+    CONFIG_FLAGS="${CONFIG_FLAGS} -DCMAKE_BUILD_TYPE=Debug"
+fi
+
+if [ -n "$prefix"]; then
+    CONFIG_FLAGS="${CONFIG_FLAGS} -DCMAKE_INSTALL_PREFIX:PATH=${prefix}"
+fi
+
+if [ "$systype" == "Darwin" ]; then
+    CONFIG_FLAGS="${CONFIG_FLAGS} -DAPPLE=1"
+elif [ "$systype" == "Linux" ]; then
+    #Do I want this?
+    #CONFIG_FLAGS="${CONFIG_FLAGS} -DLINUX=1"
+    echo "We're on linux"
+fi
+
+if [ "$sanitize" -eq 1 ]; then
+    BUILDDIR="${BUILDDIR}-AddressSanitizer"
+    CONFIG_FLAGS="${CONFIG_FLAGS} -DADDRESS_SANITIZER=1"
+fi
+
+if [ $ATS_ECOSIM -eq 1 ]; then
+    echo "Building ATS-EcoSIM"
+fi
+
+CONFIG_FLAGS="${CONFIG_FLAGS} -DATS_ECOSIM=$ATS_ECOSIM"
+
+echo "Config Flags: "
+echo "${CONFIG_FLAGS}"
+
 cmd_configure="${cmake_binary} \
-      -DCMAKE_C_FLAGS:STRING="${build_c_flags}" \
-      -DATS_ECOSIM=$ATS_ECOSIM
-      ${ecosim_source_dir}"
+  ${CONFIG_FLAGS}
+  ${ecosim_source_dir}"
 
 
 # Check if the build exists
