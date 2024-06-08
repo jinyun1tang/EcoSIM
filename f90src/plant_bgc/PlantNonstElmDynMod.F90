@@ -340,7 +340,7 @@ module PlantNonstElmDynMod
     iPlantRootProfile_pft             => plt_pheno%iPlantRootProfile_pft,             &
     iPlantBranchState_brch            => plt_pheno%iPlantBranchState_brch,            &
     iPlantPhenolPattern_pft           => plt_pheno%iPlantPhenolPattern_pft,           &
-    ShutRutNonstructElmntConducts_pft => plt_pheno%ShutRutNonstructElmntConducts_pft, &
+    ShutRutNonstElmntConducts_pft     => plt_pheno%ShutRutNonstElmntConducts_pft,     &
     RootCO2Autor_pvr                  => plt_rbgc%RootCO2Autor_pvr,                   &
     ECO_ER_col                        => plt_bgcr%ECO_ER_col,                         &
     Eco_AutoR_col                     => plt_bgcr%Eco_AutoR_col,                      &
@@ -432,8 +432,8 @@ module PlantNonstElmDynMod
 !     iPlantPhenolPattern_pft=growth habit:0=annual,1=perennial from PFT file
 !     iPlantCalendar_brch(ipltcal_SetSeedNumber,=end date for setting final seed number
 !     BranchSinkWeight_pft=branch sink weighting factor
-!     ShutRutNonstructElmntConducts_pft=rate constant for equilibrating shoot-root nonstructural C concn from PFT file
-!     PTRT=allocation to leaf+petiole used to modify ShutRutNonstructElmntConducts_pftin annuals
+!     ShutRutNonstElmntConducts_pft=rate constant for equilibrating shoot-root nonstructural C concn from PFT file
+!     PTRT=allocation to leaf+petiole used to modify ShutRutNonstElmntConducts_pft,in annuals
 !     FWTC,FWTS,FWTR=canopy,root system,root layer sink weighting factor
 !     FWOOD,FWOODN,FWOODP=C,N,P woody fraction in root:0=woody,1=non-woody
 !     FWODB=C woody fraction in branch:0=woody,1=non-woody
@@ -454,9 +454,9 @@ module PlantNonstElmDynMod
         BranchSinkWeight_pft(NB)=1.0_r8
       ENDIF
       IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual)THEN
-        PTSHTR=ShutRutNonstructElmntConducts_pft(NZ)*PTRT**0.167_r8
+        PTSHTR=ShutRutNonstElmntConducts_pft(NZ)*PTRT**0.167_r8
       ELSE
-        PTSHTR=ShutRutNonstructElmntConducts_pft(NZ)
+        PTSHTR=ShutRutNonstElmntConducts_pft(NZ)
       ENDIF
 
       D415: DO L=NU,MaxSoiL4Root(NZ)

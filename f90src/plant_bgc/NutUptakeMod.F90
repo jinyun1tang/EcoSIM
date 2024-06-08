@@ -59,7 +59,7 @@ module NutUptakeMod
     NU                        => plt_site%NU,                        &
     AREA3                     => plt_site%AREA3,                     &
     NH3Dep2Can_brch           => plt_rbgc%NH3Dep2Can_brch,           &
-    ZERO4Groth_pft                     => plt_biom%ZERO4Groth_pft,                     &
+    ZERO4Groth_pft            => plt_biom%ZERO4Groth_pft,            &
     AtmGasc                   => plt_site%AtmGasc,                   &
     LeafPetolBiomassC_brch    => plt_biom%LeafPetolBiomassC_brch,    &
     CanopyNonstElms_brch      => plt_biom%CanopyNonstElms_brch,      &
@@ -129,7 +129,7 @@ module NutUptakeMod
     ZEROS2                  => plt_site%ZEROS2,                   &
     NU                      => plt_site%NU,                       &
     ZERO                    => plt_site%ZERO,                     &
-    ZERO4Groth_pft                   => plt_biom%ZERO4Groth_pft,                    &
+    ZERO4Groth_pft          => plt_biom%ZERO4Groth_pft,           &
     RootO2Dmnd4Resp_pvr     => plt_rbgc%RootO2Dmnd4Resp_pvr,      &
     RAutoRootO2Limter_pvr   => plt_rbgc%RAutoRootO2Limter_pvr,    &
     RootRespPotent_pvr      => plt_rbgc%RootRespPotent_pvr,       &
@@ -537,7 +537,7 @@ module NutUptakeMod
   associate(                                                 &
     PlantPopulation_pft   => plt_site%PlantPopulation_pft,   &
     ZERO                  => plt_site%ZERO,                  &
-    TortMicPM_vr             => plt_site%TortMicPM_vr,             &
+    TortMicPM_vr          => plt_site%TortMicPM_vr,          &
     fTgrowRootP_vr        => plt_pheno%fTgrowRootP_vr,       &
     RAutoRootO2Limter_pvr => plt_rbgc%RAutoRootO2Limter_pvr, &
     CMinNH4Root_pft       => plt_rbgc%CMinNH4Root_pft,       &

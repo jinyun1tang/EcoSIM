@@ -423,8 +423,8 @@ implicit none
     RootRespPotent_pvr        => plt_rbgc%RootRespPotent_pvr,            &
     RAutoRootO2Limter_pvr     => plt_rbgc%RAutoRootO2Limter_pvr,         &
     LitrfalStrutElms_pvr      => plt_bgcr%LitrfalStrutElms_pvr,          &
-    rCNNonstructRemob_pft     => plt_allom%rCNNonstructRemob_pft,        &
-    rCPNonstructRemob_pft     => plt_allom%rCPNonstructRemob_pft,        &
+    rCNNonstRemob_pft     => plt_allom%rCNNonstRemob_pft,        &
+    rCPNonstRemob_pft     => plt_allom%rCPNonstRemob_pft,        &
     FracRootElmAlloc2Litr     => plt_allom%FracRootElmAlloc2Litr,        &
     CNRTS_pft                 => plt_allom%CNRTS_pft,                    &
     CPRTS_pft                 => plt_allom%CPRTS_pft,                    &
@@ -804,7 +804,7 @@ implicit none
 !     WTRT2,WTRT2N,WTRT2P=secondary root C,N,P mass
 !     Root2ndNetGrowthElms(ielmc),Root2ndNetGrowthElms(ielmn),Root2ndNetGrowthElms(ielmp)=net root C,N,P growth
 !     RootProteinC_pvr=total root protein C mass
-!     CNWS,rCPNonstructRemob_pft=protein:N,protein:P ratios from startq.f
+!     CNWS,rCPNonstRemob_pft=protein:N,protein:P ratios from startq.f
 !     RootBranchFreq_pft=root branching frequency from PFT file
 !     Root2ndXNum_rpvr,Root2ndXNum_pvr=number of secondary root axes
 !
@@ -812,9 +812,9 @@ implicit none
       DO NE=1,NumPlantChemElms
         RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ)=RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ)+Root2ndNetGrowthElms(NE)
       ENDDO
-      RootProteinC_pvr(N,L,NZ)=RootProteinC_pvr(N,L,NZ)+AMIN1(rCNNonstructRemob_pft(NZ) &
+      RootProteinC_pvr(N,L,NZ)=RootProteinC_pvr(N,L,NZ)+AMIN1(rCNNonstRemob_pft(NZ) &
         *RootMyco2ndStrutElms_rpvr(ielmn,N,L,NR,NZ) &
-        ,rCPNonstructRemob_pft(NZ)*RootMyco2ndStrutElms_rpvr(ielmp,N,L,NR,NZ))
+        ,rCPNonstRemob_pft(NZ)*RootMyco2ndStrutElms_rpvr(ielmp,N,L,NR,NZ))
       TotRoot2ndLen=TotRoot2ndLen+Root2ndLen_pvr(N,L,NR,NZ)
       Root2ndC=Root2ndC+RootMyco2ndStrutElms_rpvr(ielmc,N,L,NR,NZ)
 
@@ -1534,8 +1534,8 @@ implicit none
     PopuRootMycoC_pvr            =>  plt_biom% PopuRootMycoC_pvr             , &
     RootMycoNonstElms_rpvr       =>  plt_biom%RootMycoNonstElms_rpvr         , &
     ZERO4Groth_pft                        =>  plt_biom%ZERO4Groth_pft                          , &
-    rCNNonstructRemob_pft        =>  plt_allom%rCNNonstructRemob_pft         , &
-    rCPNonstructRemob_pft        =>  plt_allom%rCPNonstructRemob_pft         , &
+    rCNNonstRemob_pft        =>  plt_allom%rCNNonstRemob_pft         , &
+    rCPNonstRemob_pft        =>  plt_allom%rCPNonstRemob_pft         , &
     FracRootElmAlloc2Litr                       =>  plt_allom%FracRootElmAlloc2Litr                        , &
     CumSoilThickness             =>  plt_site%CumSoilThickness               , &
     DLYR3                        =>  plt_site%DLYR3                          , &
@@ -1609,7 +1609,7 @@ implicit none
 !     WTRT1,WTRT1N,WTRT1P=primary root C,N,P mass in soil layer
 !     FGROL,FGROZ=fraction of Root1stExtension in current,next lower soil layer
 !     RootProteinC_pvr=total root protein C mass
-!     CNWS,rCPNonstructRemob_pft=protein:N,protein:P ratios from startq.f
+!     CNWS,rCPNonstRemob_pft=protein:N,protein:P ratios from startq.f
 !     Root1stLen_rpvr=primary root length
 !
   Root1stDepz_pft(N,NR,NZ)=Root1stDepz_pft(N,NR,NZ)+Root1stExtension
@@ -1621,8 +1621,8 @@ implicit none
   ENDDO
 
   RootProteinC_pvr(N,L,NZ)=RootProteinC_pvr(N,L,NZ)+ &
-    AMIN1(rCNNonstructRemob_pft(NZ)*RootMyco1stStrutElms_rpvr(ielmn,N,L,NR,NZ) &
-         ,rCPNonstructRemob_pft(NZ)*RootMyco1stStrutElms_rpvr(ielmp,N,L,NR,NZ))
+    AMIN1(rCNNonstRemob_pft(NZ)*RootMyco1stStrutElms_rpvr(ielmn,N,L,NR,NZ) &
+         ,rCPNonstRemob_pft(NZ)*RootMyco1stStrutElms_rpvr(ielmp,N,L,NR,NZ))
   Root1stLen_rpvr(N,L,NR,NZ)=Root1stLen_rpvr(N,L,NR,NZ)+Root1stExtension*FGROL
 !
 !     TRANSFER STRUCTURAL, NONSTRUCTURAL C,N,P INTO NEXT SOIL LAYER
@@ -1633,7 +1633,7 @@ implicit none
 !     WTRT1,WTRT1N,WTRT1P=primary root C,N,P mass in soil layer
 !     RootNetGrowthElms(ielmc),RootNetGrowthElms(ielmn),RootNetGrowthElms(ielmp)=net root C,N,P growth
 !     RootProteinC_pvr=total root protein C mass
-!     CNWS,rCPNonstructRemob_pft=protein:N,protein:P ratios from startq.f
+!     CNWS,rCPNonstRemob_pft=protein:N,protein:P ratios from startq.f
 !     WTRTD=root C mass
 !     Root1stLen_rpvr=primary root length
 !     Root1stExtension=primary root length extension
@@ -1648,8 +1648,8 @@ implicit none
         +RootNetGrowthElms(NE)*FGROZ
     ENDDO
     RootProteinC_pvr(N,L1,NZ)=RootProteinC_pvr(N,L1,NZ) &
-      +AMIN1(rCNNonstructRemob_pft(NZ)*RootMyco1stStrutElms_rpvr(ielmn,N,L1,NR,NZ) &
-            ,rCPNonstructRemob_pft(NZ)*RootMyco1stStrutElms_rpvr(ielmp,N,L1,NR,NZ))
+      +AMIN1(rCNNonstRemob_pft(NZ)*RootMyco1stStrutElms_rpvr(ielmn,N,L1,NR,NZ) &
+            ,rCPNonstRemob_pft(NZ)*RootMyco1stStrutElms_rpvr(ielmp,N,L1,NR,NZ))
     PopuRootMycoC_pvr(N,L1,NZ)= PopuRootMycoC_pvr(N,L1,NZ)+RootMyco1stStrutElms_rpvr(ielmc,N,L1,NR,NZ)
     Root1stLen_rpvr(N,L1,NR,NZ)=Root1stLen_rpvr(N,L1,NR,NZ)+Root1stExtension*FGROZ
     Root1stRadius_pvr(N,L1,NZ)=Root1stRadius_pvr(N,L,NZ)

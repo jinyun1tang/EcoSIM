@@ -48,7 +48,7 @@ module InitPlantMod
 !     CF,ClumpFactorInit_pft=current,initial clumping factor
 !     H2OCuticleResist_pft=cuticular resistance to water (h m-1)
 !     CO2CuticleResist_pft=cuticular resistance to CO2 (s m-1)
-!     CNWS,rCPNonstructRemob_pft=protein:N,protein:P ratios
+!     CNWS,rCPNonstRemob_pft=protein:N,protein:P ratios
 !     RootFracRemobilizableBiom=maximum root protein concentration (g g-1)
 !     O2I=intercellular O2 concentration in C3,C4 PFT (umol mol-1)
 !
@@ -119,8 +119,8 @@ module InitPlantMod
     PPX_pft                   => plt_site%PPX_pft,                    &
     PPatSeeding_pft           => plt_site%PPatSeeding_pft,            &
     RootFracRemobilizableBiom => plt_allom%RootFracRemobilizableBiom, &
-    rCNNonstructRemob_pft     => plt_allom%rCNNonstructRemob_pft,     &
-    rCPNonstructRemob_pft     => plt_allom%rCPNonstructRemob_pft,     &
+    rCNNonstRemob_pft     => plt_allom%rCNNonstRemob_pft,     &
+    rCPNonstRemob_pft     => plt_allom%rCPNonstRemob_pft,     &
     RootrNC_pft               => plt_allom%RootrNC_pft,               &
     RootrPC_pft               => plt_allom%RootrPC_pft,               &
     O2I                       => plt_photo%O2I,                       &
@@ -141,10 +141,10 @@ module InitPlantMod
 
   H2OCuticleResist_pft(NZ)=CuticleResist_pft(NZ)/3600.0_r8        
   CO2CuticleResist_pft(NZ)=CuticleResist_pft(NZ)*1.56_r8    !1.56=sqrt(44./18.)
-  rCNNonstructRemob_pft(NZ)=2.5_r8
-  rCPNonstructRemob_pft(NZ)=25.0_r8
-  RootFracRemobilizableBiom(NZ)=AMIN1(RootrNC_pft(NZ)*rCNNonstructRemob_pft(NZ),&
-    RootrPC_pft(NZ)*rCPNonstructRemob_pft(NZ))
+  rCNNonstRemob_pft(NZ)=2.5_r8
+  rCPNonstRemob_pft(NZ)=25.0_r8
+  RootFracRemobilizableBiom(NZ)=AMIN1(RootrNC_pft(NZ)*rCNNonstRemob_pft(NZ),&
+    RootrPC_pft(NZ)*rCPNonstRemob_pft(NZ))
   IF(iPlantPhotosynthesisType(NZ).EQ.ic3_photo)THEN
     O2I(NZ)=2.10E+05_r8
   ELSE

@@ -73,8 +73,8 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  rPCEar_pft(:,:,:)                       !ear P:C ratio, [g g-1]
   real(r8),target,allocatable ::  CPGR(:,:,:)                        !grain P:C ratio, [g g-1]
   real(r8),target,allocatable ::  NodulerPC_pft(:,:,:)                        !nodule P:C ratio, [g g-1]
-  real(r8),target,allocatable ::  rCNNonstructRemob_pft(:,:,:)                        !C:N ratio in remobilizable nonstructural biomass, [-]
-  real(r8),target,allocatable ::  rCPNonstructRemob_pft(:,:,:)                        !C:P ratio in remobilizable nonstructural biomass, [-]
+  real(r8),target,allocatable ::  rCNNonstRemob_pft(:,:,:)                        !C:N ratio in remobilizable nonstructural biomass, [-]
+  real(r8),target,allocatable ::  rCPNonstRemob_pft(:,:,:)                        !C:P ratio in remobilizable nonstructural biomass, [-]
   real(r8),target,allocatable ::  CanOsmoPsi0pt_pft(:,:,:)                        !canopy osmotic potential when canopy water potential = 0 MPa, [MPa]
   real(r8),target,allocatable ::  TC4LeafOff_pft(:,:,:)                         !threshold temperature for autumn leafoff/hardening, [oC]
   real(r8),target,allocatable ::  PlantInitThermoAdaptZone(:,:,:)                       !initial plant thermal adaptation zone, [-]
@@ -233,8 +233,8 @@ contains
   allocate(rPCEar_pft(JP,JY,JX));    rPCEar_pft=0._r8
   allocate(CPGR(JP,JY,JX));     CPGR=0._r8
   allocate(NodulerPC_pft(JP,JY,JX));     NodulerPC_pft=0._r8
-  allocate(rCNNonstructRemob_pft(JP,JY,JX));     rCNNonstructRemob_pft=0._r8
-  allocate(rCPNonstructRemob_pft(JP,JY,JX));     rCPNonstructRemob_pft=0._r8
+  allocate(rCNNonstRemob_pft(JP,JY,JX));     rCNNonstRemob_pft=0._r8
+  allocate(rCPNonstRemob_pft(JP,JY,JX));     rCPNonstRemob_pft=0._r8
   allocate(CanOsmoPsi0pt_pft(JP,JY,JX));     CanOsmoPsi0pt_pft=0._r8
   allocate(TC4LeafOff_pft(JP,JY,JX));      TC4LeafOff_pft=0._r8
   allocate(PlantInitThermoAdaptZone(JP,JY,JX));    PlantInitThermoAdaptZone=0._r8
@@ -390,8 +390,8 @@ contains
   call destroy(rPCEar_pft)
   call destroy(CPGR)
   call destroy(NodulerPC_pft)
-  call destroy(rCNNonstructRemob_pft)
-  call destroy(rCPNonstructRemob_pft)
+  call destroy(rCNNonstRemob_pft)
+  call destroy(rCPNonstRemob_pft)
   call destroy(CanOsmoPsi0pt_pft)
   call destroy(TC4LeafOff_pft)
   call destroy(PlantInitThermoAdaptZone)

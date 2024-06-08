@@ -296,7 +296,7 @@ implicit none
 
   type, public :: plant_pheno_type
   real(r8), pointer :: fTgrowRootP_vr(:,:)   => null()     !root layer temperature growth functiom, [-]
-  real(r8), pointer :: ShutRutNonstructElmntConducts_pft(:)    => null()     !shoot-root rate constant for nonstructural C exchange, [h-1]
+  real(r8), pointer :: ShutRutNonstElmntConducts_pft(:)    => null()     !shoot-root rate constant for nonstructural C exchange, [h-1]
   real(r8), pointer :: GrainFillRate25C_pft(:)    => null()     !maximum rate of fill per grain, [g h-1]
   real(r8), pointer :: TempOffset_pft(:)    => null()     !adjustment of Arhhenius curves for plant thermal acclimation, [oC]
   real(r8), pointer :: PlantO2Stress(:)     => null()     !plant O2 stress indicator, []
@@ -411,8 +411,8 @@ implicit none
   real(r8), pointer :: NodulerPC_pft(:)     => null()  !nodule P:C ratio, [gP gC-1]
   real(r8), pointer :: RootrNC_pft(:)     => null()  !root N:C ratio, [gN gC-1]
   real(r8), pointer :: RootrPC_pft(:)     => null()  !root P:C ratio, [gP gC-1]
-  real(r8), pointer :: rCNNonstructRemob_pft(:)     => null()  !C:N ratio in remobilizable nonstructural biomass, [-]
-  real(r8), pointer :: rCPNonstructRemob_pft(:)     => null()  !C:P ratio in remobilizable nonstructural biomass, [-]
+  real(r8), pointer :: rCNNonstRemob_pft(:)     => null()  !C:N ratio in remobilizable nonstructural biomass, [-]
+  real(r8), pointer :: rCPNonstRemob_pft(:)     => null()  !C:P ratio in remobilizable nonstructural biomass, [-]
   real(r8), pointer :: NoduGrowthYield_pft(:)     => null()  !nodule growth yield, [g g-1]
   real(r8), pointer :: RootBiomGrosYld_pft(:)     => null()  !root growth yield, [g g-1]
   real(r8), pointer :: rPCEar_pft(:)    => null()  !ear P:C ratio, [gP gC-1]
@@ -550,7 +550,7 @@ implicit none
   real(r8) :: CanH2OHeldVg    !canopy surface water content, [m3 d-2]
   real(r8) :: Eco_Heat_Sens_col       !ecosystem sensible heat flux, [MJ d-2 h-1]
   real(r8) :: RoughHeight        !canopy surface roughness height, [m]
-  real(r8) :: ZERO4Groth_pftlanDisp        !zero plane displacement height, [m]
+  real(r8) :: ZERO4PlantDisplace_col        !zero plane displacement height, [m]
   real(r8) :: BndlResistAboveCanG       !isothermal boundary layer resistance, [h m-1]
   real(r8) :: RIB       !Richardson number for calculating boundary layer resistance, [-]
   real(r8) :: Eco_Heat_Grnd_col       !ecosystem storage heat flux, [MJ d-2 h-1]
@@ -1173,8 +1173,8 @@ implicit none
   allocate(this%NoduGrowthYield_pft(JP1));this%NoduGrowthYield_pft=spval
   allocate(this%RootBiomGrosYld_pft(JP1));this%RootBiomGrosYld_pft=spval
   allocate(this%RootrPC_pft(JP1));this%RootrPC_pft=spval
-  allocate(this%rCNNonstructRemob_pft(JP1));this%rCNNonstructRemob_pft=spval
-  allocate(this%rCPNonstructRemob_pft(JP1));this%rCPNonstructRemob_pft=spval
+  allocate(this%rCNNonstRemob_pft(JP1));this%rCNNonstRemob_pft=spval
+  allocate(this%rCPNonstRemob_pft(JP1));this%rCPNonstRemob_pft=spval
   allocate(this%CPRTS_pft(JP1));this%CPRTS_pft=spval
   allocate(this%CNRTS_pft(JP1));this%CNRTS_pft=spval
   allocate(this%NodulerNC_pft(JP1));this%NodulerNC_pft=spval
@@ -1221,8 +1221,8 @@ implicit none
 !  if(allocated(NoduGrowthYield_pft))deallocate(NoduGrowthYield_pft)
 !  if(allocated(RootBiomGrosYld_pft))deallocate(RootBiomGrosYld_pft)
 !  if(allocated(RootrPC_pft))deallocate(RootrPC_pft)
-!  if(allocated(rCNNonstructRemob_pft))deallocate(rCNNonstructRemob_pft)
-!  if(allocated(rCPNonstructRemob_pft))deallocate(rCPNonstructRemob_pft)
+!  if(allocated(rCNNonstRemob_pft))deallocate(rCNNonstRemob_pft)
+!  if(allocated(rCPNonstRemob_pft))deallocate(rCPNonstRemob_pft)
 !  if(allocated(CPRTS_pft))deallocate(CPRTS_pft)
 !  if(allocated(CNRTS_pft))deallocate(CNRTS_pft)
 !  if(allocated(NodulerNC_pft))deallocate(NodulerNC_pft)
@@ -1724,7 +1724,7 @@ implicit none
 
   allocate(this%fTgrowRootP_vr(JZ1,JP1));this%fTgrowRootP_vr=spval
   allocate(this%GrainFillRate25C_pft(JP1));this%GrainFillRate25C_pft=spval
-  allocate(this%ShutRutNonstructElmntConducts_pft(JP1));this%ShutRutNonstructElmntConducts_pft=spval
+  allocate(this%ShutRutNonstElmntConducts_pft(JP1));this%ShutRutNonstElmntConducts_pft=spval
   allocate(this%SeedTempSens_pft(JP1));this%SeedTempSens_pft=spval
   allocate(this%HighTempLimitSeed_pft(JP1));this%HighTempLimitSeed_pft=spval
   allocate(this%PlantInitThermoAdaptZone(JP1));this%PlantInitThermoAdaptZone=spval

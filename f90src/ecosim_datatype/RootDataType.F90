@@ -30,7 +30,7 @@ module RootDataType
   real(r8),target,allocatable ::  RootPorosity_pft(:,:,:,:)                      !root porosity, [m3 m-3]
   real(r8),target,allocatable ::  RoottRadialResist_pft(:,:,:,:)                      !root radial resistivity, [MPa h m-2]
   real(r8),target,allocatable ::  RoottAxialResist_pft(:,:,:,:)                      !root axial resistivity, [MPa h m-4]
-  real(r8),target,allocatable ::  ShutRutNonstructElmntConducts_pft(:,:,:)                       !shoot-root rate constant for nonstructural C exchange, [h-1]
+  real(r8),target,allocatable ::  ShutRutNonstElmntConducts_pft(:,:,:)                       !shoot-root rate constant for nonstructural C exchange, [h-1]
   real(r8),target,allocatable ::  VmaxNH4Root_pft(:,:,:,:)                    !maximum root NH4 uptake rate, [g m-2 h-1]
   real(r8),target,allocatable ::  KmNH4Root_pft(:,:,:,:)                    !Km for root NH4 uptake, [g m-3]
   real(r8),target,allocatable ::  CMinNH4Root_pft(:,:,:,:)                    !minimum NH4 concentration for root NH4 uptake, [g m-3]
@@ -115,7 +115,7 @@ contains
   allocate(RootPorosity_pft(jroots,JP,JY,JX));   RootPorosity_pft=0._r8
   allocate(RoottRadialResist_pft(jroots,JP,JY,JX));   RoottRadialResist_pft=0._r8
   allocate(RoottAxialResist_pft(jroots,JP,JY,JX));   RoottAxialResist_pft=0._r8
-  allocate(ShutRutNonstructElmntConducts_pft(JP,JY,JX));    ShutRutNonstructElmntConducts_pft=0._r8
+  allocate(ShutRutNonstElmntConducts_pft(JP,JY,JX));    ShutRutNonstElmntConducts_pft=0._r8
   allocate(VmaxNH4Root_pft(jroots,JP,JY,JX)); VmaxNH4Root_pft=0._r8
   allocate(KmNH4Root_pft(jroots,JP,JY,JX)); KmNH4Root_pft=0._r8
   allocate(CMinNH4Root_pft(jroots,JP,JY,JX)); CMinNH4Root_pft=0._r8
@@ -198,7 +198,7 @@ contains
   call destroy(RootPorosity_pft)
   call destroy(RoottRadialResist_pft)
   call destroy(RoottAxialResist_pft)
-  call destroy(ShutRutNonstructElmntConducts_pft)
+  call destroy(ShutRutNonstElmntConducts_pft)
   call destroy(VmaxNH4Root_pft)
   call destroy(KmNH4Root_pft)
   call destroy(CMinNH4Root_pft)

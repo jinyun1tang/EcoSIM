@@ -351,7 +351,7 @@ module UptakesMod
     BndlResistAboveCanG       => plt_ew%BndlResistAboveCanG,          &
     TairK                     => plt_ew%TairK,                        &
     DeltaTKC                  => plt_ew%DeltaTKC,                     &
-    ZERO4Groth_pftlanDisp     => plt_ew%ZERO4Groth_pftlanDisp,        &
+    ZERO4PlantDisplace_col     => plt_ew%ZERO4PlantDisplace_col,        &
     RoughHeight               => plt_ew%RoughHeight,                  &
     RAZ                       => plt_ew%RAZ,                          &
     TKCanopy_pft              => plt_ew%TKCanopy_pft,                 &
@@ -422,7 +422,7 @@ module UptakesMod
         .AND. ALFZ.GT.ZERO)THEN
         RACZ(NZ)=AMIN1(RACX,AZMAX1(CanopyHeight_col*EXP(ALFZ) &
           /(ALFZ/BndlResistAboveCanG)*(EXP(-ALFZ*CanopyHeight_pft(NZ)/CanopyHeight_col) &
-          -EXP(-ALFZ*(ZERO4Groth_pftlanDisp+RoughHeight)/CanopyHeight_col))))
+          -EXP(-ALFZ*(ZERO4PlantDisplace_col+RoughHeight)/CanopyHeight_col))))
       ELSE
         RACZ(NZ)=0.0_r8
       ENDIF
