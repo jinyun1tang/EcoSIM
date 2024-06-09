@@ -89,7 +89,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  PlantPopu_col(:,:)                           !total plant population, [d-2]
   real(r8),target,allocatable ::  PPatSeeding_pft(:,:,:)                         !plant population at seeding, [m-2]
   real(r8),target,allocatable ::  HoursTooLowPsiCan_pft(:,:,:)                        !canopy plant water stress indicator, number of hours PSILT < PSILY, []
-  real(r8),target,allocatable ::  PlantO2Stress(:,:,:)                        !plant O2 stress indicator, []
+  real(r8),target,allocatable ::  PlantO2Stress_pft(:,:,:)                        !plant O2 stress indicator, []
   real(r8),target,allocatable ::  fTCanopyGroth_pft(:,:,:)                  !canopy temperature growth function, [-]
   real(r8),target,allocatable ::  TCG(:,:,:)                         !canopy growth temperature, [oC]
   real(r8),target,allocatable ::  TKG(:,:,:)                         !canopy growth temperature, [K]
@@ -142,7 +142,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  RefNodeInitRate_pft(:,:,:)                        !rate of node initiation, [h-1 at 25 oC]
   real(r8),target,allocatable ::  NodeLenPergC(:,:,:)                        !internode length:mass during growth, [m g-1]
   real(r8),target,allocatable ::  FracGroth2Node_pft(:,:,:)                        !parameter for allocation of growth to nodes, [-]
-  integer,target,allocatable ::  NumCogrowNode(:,:,:)                         !number of concurrently growing nodes
+  integer,target,allocatable ::  NumCogrothNode_pft(:,:,:)                         !number of concurrently growing nodes
   real(r8),target,allocatable ::  PSICanPDailyMin(:,:,:)                       !minimum daily canopy water potential, [MPa]
   real(r8),target,allocatable ::  ClumpFactorNow_pft(:,:,:)                         !clumping factor for self-shading in canopy layer at current LAI, [-]
   real(r8),target,allocatable ::  ClumpFactor_pft(:,:,:)                          !clumping factor for self-shading in canopy layer, [-]
@@ -249,7 +249,7 @@ contains
   allocate(PlantPopu_col(JY,JX));         PlantPopu_col=0._r8
   allocate(PPatSeeding_pft(JP,JY,JX));      PPatSeeding_pft=0._r8
   allocate(HoursTooLowPsiCan_pft(JP,JY,JX));     HoursTooLowPsiCan_pft=0._r8
-  allocate(PlantO2Stress(JP,JY,JX));     PlantO2Stress=0._r8
+  allocate(PlantO2Stress_pft(JP,JY,JX));     PlantO2Stress_pft=0._r8
   allocate(fTCanopyGroth_pft(JP,JY,JX));     fTCanopyGroth_pft=0._r8
   allocate(TCG(JP,JY,JX));      TCG=0._r8
   allocate(TKG(JP,JY,JX));      TKG=0._r8
@@ -302,7 +302,7 @@ contains
   allocate(RefNodeInitRate_pft(JP,JY,JX));     RefNodeInitRate_pft=0._r8
   allocate(NodeLenPergC(JP,JY,JX));     NodeLenPergC=0._r8
   allocate(FracGroth2Node_pft(JP,JY,JX));     FracGroth2Node_pft=0._r8
-  allocate(NumCogrowNode(JP,JY,JX));     NumCogrowNode=0
+  allocate(NumCogrothNode_pft(JP,JY,JX));     NumCogrothNode_pft=0
   allocate(PSICanPDailyMin(JP,JY,JX));    PSICanPDailyMin=0._r8
   allocate(ClumpFactorNow_pft(JP,JY,JX));      ClumpFactorNow_pft=0._r8
   allocate(ClumpFactor_pft(JP,JY,JX));       ClumpFactor_pft=0._r8
@@ -406,7 +406,7 @@ contains
   call destroy(PlantPopu_col)
   call destroy(PPatSeeding_pft)
   call destroy(HoursTooLowPsiCan_pft)
-  call destroy(PlantO2Stress)
+  call destroy(PlantO2Stress_pft)
   call destroy(fTCanopyGroth_pft)
   call destroy(TCG)
   call destroy(TKG)
@@ -459,7 +459,7 @@ contains
   call destroy(RefNodeInitRate_pft)
   call destroy(NodeLenPergC)
   call destroy(FracGroth2Node_pft)
-  call destroy(NumCogrowNode)
+  call destroy(NumCogrothNode_pft)
   call destroy(PSICanPDailyMin)
   call destroy(ClumpFactorNow_pft)
   call destroy(ClumpFactor_pft)

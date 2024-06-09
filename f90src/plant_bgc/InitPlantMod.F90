@@ -180,7 +180,7 @@ module InitPlantMod
     ElmAllocmat4Litr          => plt_soilchem%ElmAllocmat4Litr,       &
     FracGroth2Node_pft        => plt_allom%FracGroth2Node_pft,        &
     iPlantNfixType            => plt_morph%iPlantNfixType,            &
-    NumCogrowNode             => plt_morph%NumCogrowNode              &
+    NumCogrothNode_pft             => plt_morph%NumCogrothNode_pft              &
   )
 !
 !     FRACTIONS OF PLANT LITTER ALLOCATED TO KINETIC COMPONENTS
@@ -369,22 +369,22 @@ module InitPlantMod
 !     CONCURRENT NODE GROWTH
 !
 !     FracGroth2Node_pft=scales node number for perennial vegetation (e.g. trees)
-!     NumCogrowNode=number of concurrently growing nodes
+!     NumCogrothNode_pft=number of concurrently growing nodes
 !     iPlantTurnoverPattern_pft=turnover:0=all aboveground,1=all leaf+petiole,2=none,3=between 1,2!
   IF(iPlantTurnoverPattern_pft(NZ).EQ.0 &
     .OR.(.not.is_plant_treelike(iPlantRootProfile_pft(NZ))))THEN
     FracGroth2Node_pft(NZ)=1.0_r8
     IF(MatureGroup_pft(NZ).LE.10)THEN
-      NumCoGrowNode(NZ)=3
+      NumCogrothNode_pft(NZ)=3
     ELSEIF(MatureGroup_pft(NZ).LE.15)THEN
-      NumCoGrowNode(NZ)=4
+      NumCogrothNode_pft(NZ)=4
     ELSE
-      NumCoGrowNode(NZ)=5
+      NumCogrothNode_pft(NZ)=5
     ENDIF
   ELSE
     !not grasslike plant
     FracGroth2Node_pft(NZ)=AMAX1(1.0_r8,0.04_r8/RefLeafAppearRate_pft(NZ))
-    NumCoGrowNode(NZ)=24
+    NumCogrothNode_pft(NZ)=24
   ENDIF
   end associate
   end subroutine PlantLitterFraction

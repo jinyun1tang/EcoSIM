@@ -887,7 +887,7 @@ module Hour1Mod
             IF(THETPZ(L,NY,NX).GE.THETPW.AND.L.NE.NL(NY,NX))THEN
               !not bottom layer, saturated
               !PSIeqv
-              PSIEquil=PSISoilMatricP(L+1,NY,NX)-mGravAccelerat*(SoiDepthMidLay(L+1,NY,NX)-SoiDepthMidLay(L,NY,NX))
+              PSIEquil=PSISoilMatricP_vr(L+1,NY,NX)-mGravAccelerat*(SoiDepthMidLay(L+1,NY,NX)-SoiDepthMidLay(L,NY,NX))
 
               THETWM=THETWP*POROS(L,NY,NX)
               THETW1=AMIN1(THETWM,EXP((LOGPSIAtSat(NY,NX)-LOG(-PSIEquil)) &
@@ -901,7 +901,7 @@ module Hour1Mod
               ENDIF
             ELSEIF(L.GT.NU(NY,NX))THEN
               !not bottom layer, and not topsoil layer, partially saturated
-              PSIEquil=PSISoilMatricP(L,NY,NX)-mGravAccelerat*(SoiDepthMidLay(L,NY,NX)-SoiDepthMidLay(L-1,NY,NX))
+              PSIEquil=PSISoilMatricP_vr(L,NY,NX)-mGravAccelerat*(SoiDepthMidLay(L,NY,NX)-SoiDepthMidLay(L-1,NY,NX))
 
               THETWM=THETWP*POROS(L-1,NY,NX)
               THETW1=AMIN1(THETWM,EXP((LOGPSIAtSat(NY,NX)-LOG(-PSIEquil)) &
@@ -1495,18 +1495,18 @@ module Hour1Mod
     IF(VLitR(NY,NX).GT.ZEROS(NY,NX).AND.VLWatMicP_vr(0,NY,NX).GT.ZEROS2(NY,NX))THEN
       ThetaWLitR=AMIN1(VWatLitRHoldCapcity(NY,NX),VLWatMicP_vr(0,NY,NX))/VLitR(NY,NX)
       IF(ThetaWLitR.LT.FieldCapacity(0,NY,NX))THEN
-        PSISoilMatricP(0,NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIFLD(NY,NX)+((LOGFldCapacity(0,NY,NX)-LOG(ThetaWLitR)) &
+        PSISoilMatricP_vr(0,NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIFLD(NY,NX)+((LOGFldCapacity(0,NY,NX)-LOG(ThetaWLitR)) &
           /FCD(0,NY,NX)*LOGPSIMND(NY,NX))))
       ELSEIF(ThetaWLitR.LT.POROS(0,NY,NX))THEN
-        PSISoilMatricP(0,NY,NX)=-EXP(LOGPSIAtSat(NY,NX)+(((LOGPOROS(0,NY,NX)-LOG(ThetaWLitR)) &
+        PSISoilMatricP_vr(0,NY,NX)=-EXP(LOGPSIAtSat(NY,NX)+(((LOGPOROS(0,NY,NX)-LOG(ThetaWLitR)) &
           /PSD(0,NY,NX))**SRP(0,NY,NX)*LOGPSIMXD(NY,NX)))
       ELSE
-        PSISoilMatricP(0,NY,NX)=PSISE(0,NY,NX)
+        PSISoilMatricP_vr(0,NY,NX)=PSISE(0,NY,NX)
       ENDIF
       PSISoilOsmotic(0,NY,NX)=0.0_r8
       PSIGrav(0,NY,NX)=mGravAccelerat*(ALT(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX) &
         +0.5_r8*DLYR(3,0,NY,NX))
-      TotalSoilH2OPSIMPa(0,NY,NX)=AZMIN1(PSISoilMatricP(0,NY,NX)+PSISoilOsmotic(0,NY,NX)+PSIGrav(0,NY,NX))
+      TotalSoilH2OPSIMPa(0,NY,NX)=AZMIN1(PSISoilMatricP_vr(0,NY,NX)+PSISoilOsmotic(0,NY,NX)+PSIGrav(0,NY,NX))
 !
 !     LITTER NH4,NH3,NO3,NO2,HPO4,H2PO4 CONCENTRATIONS
 !
@@ -1517,7 +1517,7 @@ module Hour1Mod
       ENDDO
 
     ELSE
-      PSISoilMatricP(0,NY,NX)=PSISoilMatricP(NU(NY,NX),NY,NX)
+      PSISoilMatricP_vr(0,NY,NX)=PSISoilMatricP_vr(NU(NY,NX),NY,NX)
       trc_solcl_vr(ids_nut_beg:ids_nuts_end,0,NY,NX)=0.0_r8
     ENDIF
   ELSE
@@ -1531,7 +1531,7 @@ module Hour1Mod
     THETI(0,NY,NX)=0.0_r8
     THETP(0,NY,NX)=1.0
     VWatLitRHoldCapcity(NY,NX)=0.0_r8
-    PSISoilMatricP(0,NY,NX)=PSISoilMatricP(NU(NY,NX),NY,NX)
+    PSISoilMatricP_vr(0,NY,NX)=PSISoilMatricP_vr(NU(NY,NX),NY,NX)
 
     trc_solcl_vr(ids_nut_beg:ids_nuts_end,0,NY,NX)=0.0_r8
     trc_solcl_vr(idg_beg:idg_end-1,0,NY,NX)=0.0_r8

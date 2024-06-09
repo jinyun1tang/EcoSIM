@@ -137,13 +137,13 @@ module NutUptakeMod
     MY                      => plt_morph%MY,                      &
     RootLenDensPerPlant_pvr => plt_morph%RootLenDensPerPlant_pvr, &
     RootVH2O_pvr            => plt_morph%RootVH2O_pvr,            &
-    MaxSoiL4Root            => plt_morph%MaxSoiL4Root             &
+    MaxSoiL4Root_pft        => plt_morph%MaxSoiL4Root_pft         &
   )
 
   call ZeroUptake(NZ)
 
   D955: DO N=1,MY(NZ)
-    D950: DO L=NU,MaxSoiL4Root(NZ)
+    D950: DO L=NU,MaxSoiL4Root_pft(NZ)
       IF(VLSoilPoreMicP_vr(L).GT.ZEROS2.AND.RootLenDensPerPlant_pvr(N,L,NZ).GT.ZERO &
         .AND.RootVH2O_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ).AND.THETW_vr(L).GT.ZERO)THEN
         TFOXYX=0.0_r8
@@ -208,7 +208,7 @@ module NutUptakeMod
   integer :: K, L1,L2,NN
   !     begin_execution
 
-  L1=plt_site%NU;L2=plt_morph%MaxSoiL4Root(NZ);NN=plt_morph%MY(NZ)
+  L1=plt_site%NU;L2=plt_morph%MaxSoiL4Root_pft(NZ);NN=plt_morph%MY(NZ)
 
   plt_rbgc%trcg_air2root_flx__pvr(idg_beg:idg_end-1,1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%trcg_Root_DisEvap_flx_vr(idg_beg:idg_end-1,1:NN,L1:L2,NZ)=0.0_r8

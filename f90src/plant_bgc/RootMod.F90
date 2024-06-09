@@ -182,7 +182,7 @@ implicit none
     Root2ndXNum_pvr               =>   plt_morph%Root2ndXNum_pvr              , &
     Root1stXSecArea_pft           =>   plt_morph%Root1stXSecArea_pft          , &
     RootPorosity_pft              =>   plt_morph%RootPorosity_pft             , &
-    MaxSoiL4Root                  =>   plt_morph%MaxSoiL4Root                 , &
+    MaxSoiL4Root_pft                  =>   plt_morph%MaxSoiL4Root_pft                 , &
     RootVolPerMassC_pft           =>   plt_morph%RootVolPerMassC_pft          , &
     SeedMeanLen_pft               =>   plt_morph%SeedMeanLen_pft              , &
     MY                            =>   plt_morph%MY                           , &
@@ -200,14 +200,14 @@ implicit none
 !  mass_inital(ielmc)=mass_inital(ielmc)+SeasonalNonstElms_pft(ielmc,NZ)
   litrflx=0._r8;RCO2flx=0._r8
   D5010: DO N=1,MY(NZ)
-    D5000: DO L=NU,MaxSoiL4Root(NZ)
+    D5000: DO L=NU,MaxSoiL4Root_pft(NZ)
 !
 !     IDENTIFY NEXT LOWER ROOT LAYER
 !
 !     VLSoilPoreMicP_vr=soil layer volume excluding macropore, rocks
 !
       IF(VLSoilPoreMicP_vr(L).GT.ZEROS2)THEN
-        !why not using MaxSoiL4Root(NZ)
+        !why not using MaxSoiL4Root_pft(NZ)
         D5003: DO LZ=L+1,NL
           IF(VLSoilPoreMicP_vr(LZ).GT.ZEROS2.OR.LZ.EQ.NL)THEN
             L1=LZ
@@ -1864,7 +1864,7 @@ implicit none
     Root2ndXNum_rpvr          =>   plt_morph%Root2ndXNum_rpvr         , &
     Root2ndAveLen_pvr         =>   plt_morph%Root2ndAveLen_pvr        , &
     SeedDepth_pft             =>   plt_morph%SeedDepth_pft            , &
-    MaxSoiL4Root              =>   plt_morph%MaxSoiL4Root             , &
+    MaxSoiL4Root_pft              =>   plt_morph%MaxSoiL4Root_pft             , &
     NumRootAxes_pft           =>   plt_morph%NumRootAxes_pft            &
   )
 
@@ -1877,7 +1877,7 @@ implicit none
   RCO2flx=0._r8
 !   call SumRootBiome(NZ,mass_inital)
   D4995: DO N=1,MY(NZ)
-    D4990: DO L=NU,MaxSoiL4Root(NZ)
+    D4990: DO L=NU,MaxSoiL4Root_pft(NZ)
 !
 !     RESPIRATION FROM NUTRIENT UPTAKE CALCULATED IN 'UPTAKE':
 !     ACTUAL, O2-UNLIMITED AND C-UNLIMITED

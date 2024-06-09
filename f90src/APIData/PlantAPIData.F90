@@ -222,10 +222,10 @@ implicit none
   real(r8), pointer :: CanopyStemArea_pft(:)        => null() !plant stem area, [m2 d-2]
   real(r8), pointer :: CanopyLeafArea_pft(:)        => null() !plant canopy leaf area, [m2 d-2]
   integer,  pointer :: MainBranchNum_pft(:)          => null() !number of main branch
-  integer,  pointer :: MaxSoiL4Root(:)           => null() !maximum soil layer number for all root axes
+  integer,  pointer :: MaxSoiL4Root_pft(:)           => null() !maximum soil layer number for all root axes
   integer,  pointer :: NIXBotRootLayer_pft(:)          => null() !maximum soil layer number for all root axes, [-]
   integer,  pointer :: NumRootAxes_pft(:)          => null() !root primary axis number
-  integer,  pointer :: NumCogrowNode(:)         => null() !number of concurrently growing nodes
+  integer,  pointer :: NumCogrothNode_pft(:)         => null() !number of concurrently growing nodes
   integer,  pointer :: BranchNumber_pft(:)          => null() !branch number
   integer,  pointer :: NumOfBranches_pft(:)          => null() !branch number
   integer,  pointer :: NIXBotRootLayer_rpft(:,:)       => null() !maximum soil layer number for root axes, [-]
@@ -299,7 +299,7 @@ implicit none
   real(r8), pointer :: ShutRutNonstElmntConducts_pft(:)    => null()     !shoot-root rate constant for nonstructural C exchange, [h-1]
   real(r8), pointer :: GrainFillRate25C_pft(:)    => null()     !maximum rate of fill per grain, [g h-1]
   real(r8), pointer :: TempOffset_pft(:)    => null()     !adjustment of Arhhenius curves for plant thermal acclimation, [oC]
-  real(r8), pointer :: PlantO2Stress(:)     => null()     !plant O2 stress indicator, []
+  real(r8), pointer :: PlantO2Stress_pft(:)     => null()     !plant O2 stress indicator, []
   real(r8), pointer :: MinNonstC2InitBranch_pft(:)       => null()     !branch nonstructural C content required for new branch, [gC gC-1]
   real(r8), pointer :: MinNonstC2InitRoot_pft(:)       => null()     !threshold root nonstructural C content for initiating new root axis, [gC gC-1]
   real(r8), pointer :: LeafElmntRemobFlx_brch(:,:,:) => null()    !element translocated from leaf during senescence, [g d-2 h-1]
@@ -1710,7 +1710,7 @@ implicit none
   allocate(this%TCChill4Seed_pft(JP1));this%TCChill4Seed_pft=spval
   allocate(this%TempOffset_pft(JP1));this%TempOffset_pft=spval
   allocate(this%MatureGroup_pft(JP1));this%MatureGroup_pft=spval
-  allocate(this%PlantO2Stress(JP1));this%PlantO2Stress=spval
+  allocate(this%PlantO2Stress_pft(JP1));this%PlantO2Stress_pft=spval
   allocate(this%MinNonstC2InitBranch_pft(JP1));this%MinNonstC2InitBranch_pft=spval
   allocate(this%MinNonstC2InitRoot_pft(JP1));this%MinNonstC2InitRoot_pft=spval
   allocate(this%fTCanopyGroth_pft(JP1));this%fTCanopyGroth_pft=spval
@@ -1836,7 +1836,7 @@ implicit none
   allocate(this%MainBranchNum_pft(JP1));this%MainBranchNum_pft=0
   allocate(this%NIXBotRootLayer_pft(JP1));this%NIXBotRootLayer_pft=0
   allocate(this%NumRootAxes_pft(JP1));this%NumRootAxes_pft=0
-  allocate(this%NumCogrowNode(JP1));this%NumCogrowNode=0
+  allocate(this%NumCogrothNode_pft(JP1));this%NumCogrothNode_pft=0
   allocate(this%BranchNumber_pft(JP1));this%BranchNumber_pft=0
   allocate(this%NumOfBranches_pft(JP1));this%NumOfBranches_pft=0
   allocate(this%NIXBotRootLayer_rpft(NumOfCanopyLayers1,JP1));this%NIXBotRootLayer_rpft=0
@@ -1876,7 +1876,7 @@ implicit none
   allocate(this%StemAreaZsec_brch(NumOfLeafZenithSectors1,NumOfCanopyLayers1,MaxNumBranches,JP1));this%StemAreaZsec_brch=0._r8
   allocate(this%CanopyLeafArea_lpft(NumOfCanopyLayers1,0:MaxNodesPerBranch1,MaxNumBranches,JP1));this%CanopyLeafArea_lpft=0._r8
   allocate(this%CanopyStalkArea_lbrch(NumOfCanopyLayers1,MaxNumBranches,JP1));this%CanopyStalkArea_lbrch=spval
-  allocate(this%MaxSoiL4Root(JP1));this%MaxSoiL4Root=0
+  allocate(this%MaxSoiL4Root_pft(JP1));this%MaxSoiL4Root_pft=0
   allocate(this%SeedNumSet_brch(MaxNumBranches,JP1));this%SeedNumSet_brch=spval
   allocate(this%ClumpFactor_pft(JP1));this%ClumpFactor_pft=spval
   allocate(this%RootVolPerMassC_pft(jroots,JP1));this%RootVolPerMassC_pft=spval

@@ -335,7 +335,7 @@ module StartqMod
 !     CONCURRENT NODE GROWTH
 !
 !     FracGroth2Node_pft=scales node number for perennial vegetation (e.g. trees)
-!     NumCogrowNode=number of concurrently growing nodes
+!     NumCogrothNode_pft=number of concurrently growing nodes
 !
   IF(iPlantTurnoverPattern_pft(NZ,NY,NX).EQ.0 .OR. &
     (.not.is_plant_treelike(iPlantRootProfile_pft(NZ,NY,NX))))THEN
@@ -343,15 +343,15 @@ module StartqMod
     FracGroth2Node_pft(NZ,NY,NX)=1.0_r8
 !
     IF(MatureGroup_pft(NZ,NY,NX).LE.10)THEN
-      NumCogrowNode(NZ,NY,NX)=3
+      NumCogrothNode_pft(NZ,NY,NX)=3
     ELSEIF(MatureGroup_pft(NZ,NY,NX).LE.15)THEN
-      NumCogrowNode(NZ,NY,NX)=4
+      NumCogrothNode_pft(NZ,NY,NX)=4
     ELSE
-      NumCogrowNode(NZ,NY,NX)=5
+      NumCogrothNode_pft(NZ,NY,NX)=5
     ENDIF
   ELSE
     FracGroth2Node_pft(NZ,NY,NX)=AMAX1(1.0_r8,0.04_r8/RefLeafAppearRate_pft(NZ,NY,NX))
-    NumCogrowNode(NZ,NY,NX)=24
+    NumCogrothNode_pft(NZ,NY,NX)=24
   ENDIF
   end associate
   end subroutine PlantLitterFractions

@@ -181,7 +181,7 @@ contains
     FracSoiPAsAir(0,NY,NX)=1.0
   ENDIF
   THETPM(1,0,NY,NX)=FracSoiPAsAir(0,NY,NX)
-  PSISM1(0,NY,NX)=PSISoilMatricP(0,NY,NX)
+  PSISM1(0,NY,NX)=PSISoilMatricP_vr(0,NY,NX)
   TKSoi1(0,NY,NX)=TKS(0,NY,NX)
 
   end subroutine CopySurfaceVars

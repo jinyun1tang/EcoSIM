@@ -1324,7 +1324,7 @@ module PlantBranchMod
     KHiestGroLeafNode_brch      => plt_pheno%KHiestGroLeafNode_brch,      &
     iPlantBranchState_brch      => plt_pheno%iPlantBranchState_brch,      &
     iPlantPhenolPattern_pft     => plt_pheno%iPlantPhenolPattern_pft,     &
-    NumCogrowNode               => plt_morph%NumCogrowNode,               &
+    NumCogrothNode_pft               => plt_morph%NumCogrothNode_pft,               &
     LiveInterNodeHight_brch     => plt_morph%LiveInterNodeHight_brch,     &
     InternodeHeightDying_brch   => plt_morph%InternodeHeightDying_brch    &
   )
@@ -1363,7 +1363,7 @@ module PlantBranchMod
 !     WTSTKB,StalkBiomassC_brch=stalk,sapwood C mass
 !     RCCC,RCCN,RCCP=remobilization coefficient for C,N,P
 !     MXNOD,MNNOD=max,min node number currently growing
-!     NumCogrowNode=number of concurrently growing nodes
+!     NumCogrothNode_pft=number of concurrently growing nodes
 !     KHiestGroLeafNode_brch=integer of most recent leaf number
 !
     RespSenesPhenol_brch=FXFS*RMxess_brch
@@ -1376,7 +1376,7 @@ module PlantBranchMod
       RCSN=RCCN*FRCC
       RCSP=RCCP*FRCC
       MXNOD=KHiestGroLeafNode_brch(NB,NZ)
-      MNNOD=MAX(MIN(0,MAX(0,MXNOD-NumCogrowNode(NZ))),KHiestGroLeafNode_brch(NB,NZ)-MaxNodesPerBranch1+2)
+      MNNOD=MAX(MIN(0,MAX(0,MXNOD-NumCogrothNode_pft(NZ))),KHiestGroLeafNode_brch(NB,NZ)-MaxNodesPerBranch1+2)
       MXNOD=MAX(MXNOD,MNNOD)
       D1650: DO KK=MXNOD,MNNOD,-1
         K=pMOD(KK,MaxNodesPerBranch1)
@@ -2602,7 +2602,7 @@ module PlantBranchMod
     doInitLeafOut_brch        => plt_pheno%doInitLeafOut_brch,        &
     Hours2LeafOut_brch        => plt_pheno%Hours2LeafOut_brch,        &
     MainBranchNum_pft         => plt_morph%MainBranchNum_pft,         &
-    MaxSoiL4Root              => plt_morph%MaxSoiL4Root               &
+    MaxSoiL4Root_pft              => plt_morph%MaxSoiL4Root_pft               &
   )
 !   TRANSFER C,N,P FROM SEASONAL STORAGE TO SHOOT AND ROOT
 !   NON-STRUCTURAL C DURING SEED GERMINATION OR LEAFOUT
@@ -2789,13 +2789,13 @@ module PlantBranchMod
     iPlantPhenolPattern_pft   => plt_pheno%iPlantPhenolPattern_pft,   &    
     iPlantTurnoverPattern_pft => plt_pheno%iPlantTurnoverPattern_pft, &    
     iPlantPhotoperiodType_pft => plt_pheno%iPlantPhotoperiodType_pft, &    
-    MaxSoiL4Root              => plt_morph%MaxSoiL4Root  ,            &    
+    MaxSoiL4Root_pft              => plt_morph%MaxSoiL4Root_pft  ,            &    
     DayLenthCurrent           => plt_site%DayLenthCurrent             &
   )  
 
     TotPopuPlantRootC=0._r8
     TotalRootNonstElms(ielmc)=0._r8
-    D4: DO L=NU,MaxSoiL4Root(NZ)
+    D4: DO L=NU,MaxSoiL4Root_pft(NZ)
       TotPopuPlantRootC=TotPopuPlantRootC+AZMAX1(PopuRootMycoC_pvr(ipltroot,L,NZ))
       TotalRootNonstElms(ielmc)=TotalRootNonstElms(ielmc)+&
         AZMAX1(RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ))
@@ -2843,7 +2843,7 @@ module PlantBranchMod
 
 !         if root condition met
       IF(TotPopuPlantRootC.GT.ZERO4Groth_pft(NZ).AND.TotalRootNonstElms(ielmc).GT.ZERO4Groth_pft(NZ))THEN
-        D50: DO L=NU,MaxSoiL4Root(NZ)
+        D50: DO L=NU,MaxSoiL4Root_pft(NZ)
           FXFC=AZMAX1(PopuRootMycoC_pvr(ipltroot,L,NZ))/TotPopuPlantRootC
           RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ)=RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ)&
               +FXFC*CH2OH*FXRT(iPlantPhenolPattern_pft(NZ))
@@ -2906,7 +2906,7 @@ module PlantBranchMod
 
   DO NE=1,NumPlantChemElms
     TotalRootNonstElms(NE)=0._r8
-    D3: DO L=NU,MaxSoiL4Root(NZ)
+    D3: DO L=NU,MaxSoiL4Root_pft(NZ)
       TotalRootNonstElms(NE)=TotalRootNonstElms(NE)+ &
         AZMAX1(RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ))
     ENDDO D3
@@ -2947,7 +2947,7 @@ module PlantBranchMod
   ENDDO
   
   IF(TotPopuPlantRootC.GT.ZERO4Groth_pft(NZ).AND.TotalRootNonstElms(ielmc).GT.ZERO4Groth_pft(NZ))THEN
-    D51: DO L=NU,MaxSoiL4Root(NZ)
+    D51: DO L=NU,MaxSoiL4Root_pft(NZ)
       FXFN=AZMAX1(RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ))/TotalRootNonstElms(ielmc)
       DO NE=2,NumPlantChemElms
         RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ)=RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ)&
@@ -3346,7 +3346,7 @@ module PlantBranchMod
   REAL(R8) :: GrowthChemElmt(NumPlantChemElms)
 
   associate(                                                    &
-    NumCogrowNode          => plt_morph%NumCogrowNode,          &
+    NumCogrothNode_pft          => plt_morph%NumCogrothNode_pft,          &
     LeafAreaNode_brch      => plt_morph%LeafAreaNode_brch,      &
     LeafAreaLive_brch      => plt_morph%LeafAreaLive_brch,      &
     SLA1                   => plt_morph%SLA1,                   &
@@ -3362,7 +3362,7 @@ module PlantBranchMod
   
   IF(GrowthLeaf(ielmc).GT.0.0_r8)THEN
     MXNOD=KHiestGroLeafNode_brch(NB,NZ)
-    MNNOD=MAX(MinNodeNum,MXNOD-NumCogrowNode(NZ)+1)
+    MNNOD=MAX(MinNodeNum,MXNOD-NumCogrothNode_pft(NZ)+1)
     MXNOD=MAX(MXNOD,MNNOD)
     KNOD=MXNOD-MNNOD+1
     GNOD=KNOD           !number of growing nodes
@@ -3370,7 +3370,7 @@ module PlantBranchMod
     DO NE=1,NumPlantChemElms
       GrowthChemElmt(NE)=ALLOCL*GrowthLeaf(NE)
     ENDDO
-    GrowthSLA=ALLOCL*FracGroth2Node_pft(NZ)*NumCogrowNode(NZ)
+    GrowthSLA=ALLOCL*FracGroth2Node_pft(NZ)*NumCogrothNode_pft(NZ)
 !
 !     GROWTH AT EACH CURRENT NODE
 !
@@ -3424,7 +3424,7 @@ module PlantBranchMod
   REAL(R8) :: SSL
   
   associate(                                                       &
-    NumCogrowNode            => plt_morph%NumCogrowNode,           &
+    NumCogrothNode_pft            => plt_morph%NumCogrothNode_pft,           &
     PetoleLensNode_brch      => plt_morph%PetoleLensNode_brch,     &
     PetoLen2Mass_pft         => plt_morph%PetoLen2Mass_pft,        &
     SinePetioleAngle_pft     => plt_morph%SinePetioleAngle_pft,    &
@@ -3441,14 +3441,14 @@ module PlantBranchMod
 
   IF(GrowthPetiole(ielmc).GT.0.0_r8)THEN
     MXNOD=KHiestGroLeafNode_brch(NB,NZ)
-    MNNOD=MAX(MinNodeNum,MXNOD-NumCogrowNode(NZ)+1)
+    MNNOD=MAX(MinNodeNum,MXNOD-NumCogrothNode_pft(NZ)+1)
     MXNOD=MAX(MXNOD,MNNOD)
     GNOD=MXNOD-MNNOD+1
     ALLOCS=1.0_r8/GNOD
     DO NE=1,NumPlantChemElms
       GrowthChemElmt(NE)=ALLOCS*GrowthPetiole(NE)
     ENDDO
-    GSSL=ALLOCL*FracGroth2Node_pft(NZ)*NumCogrowNode(NZ)
+    GSSL=ALLOCL*FracGroth2Node_pft(NZ)*NumCogrothNode_pft(NZ)
 !
 !       GROWTH AT EACH CURRENT NODE
 !
@@ -3503,7 +3503,7 @@ module PlantBranchMod
   real(r8) :: StalkLenGrowth,StalkAveStrutC_brch
 
   associate(                                                                &
-    NumCogrowNode                =>   plt_morph%NumCogrowNode             , &  
+    NumCogrothNode_pft                =>   plt_morph%NumCogrothNode_pft             , &  
     NodeLenPergC                 =>   plt_morph%NodeLenPergC              , &      
     SineBranchAngle_pft          =>   plt_morph%SineBranchAngle_pft       , &    
     InternodeHeightDying_brch    =>   plt_morph%InternodeHeightDying_brch , &
@@ -3522,7 +3522,7 @@ module PlantBranchMod
   ENDIF
 
   MXNOD=KHiestGroLeafNode_brch(NB,NZ)
-  MNNOD=MAX(MIN(NN,MAX(NN,MXNOD-NumCogrowNode(NZ))),&
+  MNNOD=MAX(MIN(NN,MAX(NN,MXNOD-NumCogrothNode_pft(NZ))),&
     KHiestGroLeafNode_brch(NB,NZ)-MaxNodesPerBranch1+2)
   MXNOD=MAX(MXNOD,MNNOD)
 

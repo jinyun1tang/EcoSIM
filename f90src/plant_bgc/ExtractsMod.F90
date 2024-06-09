@@ -56,7 +56,7 @@ module ExtractsMod
    LitrFallStrutElms_col     => plt_bgcr%LitrFallStrutElms_col,     &
    LitrfalStrutElms_vr       => plt_bgcr%LitrfalStrutElms_vr,       &
    LitrfalStrutElms_pvr      => plt_bgcr%LitrfalStrutElms_pvr,      &
-   MaxSoiL4Root              => plt_morph%MaxSoiL4Root,             &
+   MaxSoiL4Root_pft              => plt_morph%MaxSoiL4Root_pft,             &
    CanopyStemAareZ_col       => plt_morph%CanopyStemAareZ_col,      &
    CanopyLeafAareZ_col       => plt_morph%CanopyLeafAareZ_col,      &
    StemArea_col              => plt_morph%StemArea_col,             &
@@ -78,7 +78,7 @@ module ExtractsMod
       StandingDeadStrutElms_col(NE)=StandingDeadStrutElms_col(NE)+StandDeadStrutElms_pft(NE,NZ)
     ENDDO
 
-    DO  L=0,MaxSoiL4Root(NZ)
+    DO  L=0,MaxSoiL4Root_pft(NZ)
       DO K=1,pltpar%NumOfPlantLitrCmplxs
         DO NE=1,NumPlantChemElms
           DO  M=1,pltpar%jsken
@@ -182,12 +182,12 @@ module ExtractsMod
     RootLenDensPerPlant_pvr   => plt_morph%RootLenDensPerPlant_pvr, &
     totRootLenDens_vr         => plt_morph%totRootLenDens_vr,       &
     MY                        => plt_morph%MY,                      &
-    MaxSoiL4Root              => plt_morph%MaxSoiL4Root             &
+    MaxSoiL4Root_pft              => plt_morph%MaxSoiL4Root_pft             &
   )
 
   trcs_plant_uptake_vr=0._r8
   DO N=1,MY(NZ)
-    DO L=NU,MaxSoiL4Root(NZ)
+    DO L=NU,MaxSoiL4Root_pft(NZ)
 !
 !     TOTAL ROOT DENSITY
 !
@@ -369,7 +369,7 @@ module ExtractsMod
     NH3Dep2Can_pft            => plt_bgcr%NH3Dep2Can_pft,            &
     StemArea_col              => plt_morph%StemArea_col,             &
     CanopyLeafArea_col        => plt_morph%CanopyLeafArea_col,       &
-    MaxSoiL4Root              => plt_morph%MaxSoiL4Root,             &
+    MaxSoiL4Root_pft              => plt_morph%MaxSoiL4Root_pft,             &
     NumOfBranches_pft         => plt_morph%NumOfBranches_pft,        &
     CanopyStemArea_pft        => plt_morph%CanopyStemArea_pft,       &
     CanopyLeafArea_pft        => plt_morph%CanopyLeafArea_pft,       &
@@ -377,7 +377,7 @@ module ExtractsMod
     LWRadCanopy_pft           => plt_rad%LWRadCanopy_pft,            &
     Eco_NetRad_col            => plt_rad%Eco_NetRad_col              &
   )
-  DO L=NU,MaxSoiL4Root(NZ)
+  DO L=NU,MaxSoiL4Root_pft(NZ)
     trcs_plant_uptake_vr(idg_N2,L)=trcs_plant_uptake_vr(idg_N2,L)+RootN2Fix_pvr(L,NZ)
   ENDDO
 !
