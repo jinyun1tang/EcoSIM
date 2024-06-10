@@ -1457,7 +1457,7 @@ module RedistMod
 
   DO  N=1,NumMicbFunGrupsPerCmplx
     DO NGL=JGniA(N),JGnfA(N)
-      REcoO2DmndResp_vr(0,NY,NX)=REcoO2DmndResp_vr(0,NY,NX)+RO2DmndAutort(NGL,0,NY,NX)
+      REcoO2DmndResp_vr(0,NY,NX)=REcoO2DmndResp_vr(0,NY,NX)+RO2DmndAutort_vr(NGL,0,NY,NX)
       REcoNH4DmndSoil_vr(0,NY,NX)=REcoNH4DmndSoil_vr(0,NY,NX)+RNH3OxidAutor(NGL,0,NY,NX)
       RNO2EcoUptkSoil_vr(0,NY,NX)=RNO2EcoUptkSoil_vr(0,NY,NX)+RNO2OxidAutor(NGL,0,NY,NX)
       RN2OEcoUptkSoil_vr(0,NY,NX)=RN2OEcoUptkSoil_vr(0,NY,NX)+RN2ODmndReduxAutor_vr(NGL,0,NY,NX)
@@ -1504,7 +1504,7 @@ module RedistMod
     ROQCX(K,L,NY,NX)=ROQCX(K,L,NY,NX)+SUM(RDOCUptkHeter_vr(1:NumHetetrMicCmplx,1:jcplx,L,NY,NX))
     ROQAX(K,L,NY,NX)=ROQAX(K,L,NY,NX)+SUM(RAcetateUptkHeter_vr(1:NumHetetrMicCmplx,1:jcplx,L,NY,NX))
   ENDDO
-  REcoO2DmndResp_vr(L,NY,NX)=REcoO2DmndResp_vr(L,NY,NX)+SUM(RO2DmndAutort(1:NumHetetrMicCmplx,L,NY,NX))
+  REcoO2DmndResp_vr(L,NY,NX)=REcoO2DmndResp_vr(L,NY,NX)+SUM(RO2DmndAutort_vr(1:NumHetetrMicCmplx,L,NY,NX))
   REcoNH4DmndSoil_vr(L,NY,NX)=REcoNH4DmndSoil_vr(L,NY,NX)+SUM(RNH3OxidAutor(1:NumHetetrMicCmplx,L,NY,NX)) &
     +SUM(RNH4UptkSoilAutor_vr(1:NumHetetrMicCmplx,L,NY,NX))
   REcoNO3DmndSoil_vr(L,NY,NX)=REcoNO3DmndSoil_vr(L,NY,NX)+SUM(RNO3UptkSoilAutor_vr(1:NumHetetrMicCmplx,L,NY,NX))

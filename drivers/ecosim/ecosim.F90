@@ -99,10 +99,13 @@ PROGRAM main
   
   call frectyp%Init()
 
+  yeari=year_ini
+
   if(is_restart())then
-    print*,'read restart/checkpoint info file: ecosim_rst'
     call get_restart_date(curr_date)
     frectyp%ymdhs0=curr_date    !the actual simulation beginning year
+    print*,'read restart/checkpoint info file: ecosim_rst ',curr_date    
+    read(curr_date,'(I4)')frectyp%yearrst
   else
     frectyp%ymdhs0=start_date   !the actual simulation beginning year
   endif
@@ -110,8 +113,8 @@ PROGRAM main
   call hist_htapes_build()
 
   IGO=0
-  yeari=year_ini
-  print*,frectyp%ymdhs0,yeari
+
+!  print*,frectyp%ymdhs0,yeari
 
   DO nn1=1,3
     call set_ecosim_solver(NPXS(NN1),NPYS(NN1),NCYC_LITR,NCYC_SNOW)
@@ -128,6 +131,7 @@ PROGRAM main
         frectyp%yearclm=nyr1
         frectyp%yearcur=etimer%get_curr_yearAD()
         nlend=.false.
+        IGO=yeari-year_ini
         if(frectyp%yearcur==yeari)then
           call soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
         endif

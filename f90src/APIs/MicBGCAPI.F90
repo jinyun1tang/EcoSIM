@@ -178,7 +178,6 @@ implicit none
   micfor%TempOffset=TempOffset_col(NY,NX)
   micfor%VLitR  =VLitR(NY,NX)
   micfor%VWatLitRHoldCapcity=VWatLitRHoldCapcity(NY,NX)
-  micfor%VWatLitRHoldCapcity=VWatLitRHoldCapcity(NY,NX)
   micfor%ZEROS2=ZEROS2(NY,NX)
   micfor%ZEROS =ZEROS(NY,NX)
   micfor%VLSoilMicP  =VLSoilMicP(L,NY,NX)
@@ -197,7 +196,7 @@ implicit none
   micfor%VLNHB =trcs_VLN_vr(ids_NH4B,L,NY,NX)
   micfor%VLPO4 =trcs_VLN_vr(ids_H1PO4,L,NY,NX)
   micfor%VLPOB =trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
-  micfor%PSISoilMatricP =PSISoilMatricP(L,NY,NX)
+  micfor%PSISoilMatricP =PSISoilMatricP_vr(L,NY,NX)
   micfor%O2AquaDiffusvity =SoluteDifusvty_vr(idg_O2,L,NY,NX)
   micfor%ORGC  =SoilOrgM_vr(ielmc,L,NY,NX)
   micfor%RNO2EcoUptkSoilPrev =RNO2EcoUptkSoilPrev_vr(L,NY,NX)
@@ -325,7 +324,7 @@ implicit none
   micflx%RH2PO4UptkBandAutor(1:NumMicrobAutrophCmplx)=RH2PO4UptkBandAutor_vr(1:NumMicrobAutrophCmplx,L,NY,NX)
   micflx%RH1PO4UptkSoilAutor(1:NumMicrobAutrophCmplx)=RH1PO4UptkSoilAutor_vr(1:NumMicrobAutrophCmplx,L,NY,NX)
   micflx%RH1PO4UptkBandAutor(1:NumMicrobAutrophCmplx)=RH1PO4UptkBandAutor_vr(1:NumMicrobAutrophCmplx,L,NY,NX)
-  micflx%RO2DmndAutort(1:NumMicrobAutrophCmplx)=RO2DmndAutort(1:NumMicrobAutrophCmplx,L,NY,NX)
+  micflx%RO2DmndAutort(1:NumMicrobAutrophCmplx)=RO2DmndAutort_vr(1:NumMicrobAutrophCmplx,L,NY,NX)
 
   micflx%RNH4DmndSoilHeter(1:NumHetetrMicCmplx,1:jcplx)=RNH4DmndSoilHeter_vr(1:NumHetetrMicCmplx,1:jcplx,L,NY,NX)
   micflx%RNH4DmndBandHeter(1:NumHetetrMicCmplx,1:jcplx)=RNH4DmndBandHeter_vr(1:NumHetetrMicCmplx,1:jcplx,L,NY,NX)
@@ -380,7 +379,7 @@ implicit none
     REcoDOMUptk_vr(idom,1:jcplx,L,NY,NX)=micflx%REcoDOMUptk(idom,1:jcplx)
   ENDDO
  
-  RO2DmndAutort(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RO2DmndAutort(1:NumMicrobAutrophCmplx)
+  RO2DmndAutort_vr(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RO2DmndAutort(1:NumMicrobAutrophCmplx)
   RNH3OxidAutor(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RNH3OxidAutor(1:NumMicrobAutrophCmplx)
   RNH3OxidAutorBand(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RNH3OxidAutorBand(1:NumMicrobAutrophCmplx)
   RNO2OxidAutor(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RNO2OxidAutor(1:NumMicrobAutrophCmplx)

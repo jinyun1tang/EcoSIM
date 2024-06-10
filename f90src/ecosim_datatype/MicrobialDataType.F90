@@ -33,7 +33,7 @@ implicit none
   real(r8),target,allocatable :: OMEERhetr(:,:,:,:,:,:,:)  !microbial C  erosion 	[g d-2 h-1]
 
   real(r8),target,allocatable :: mBiomeAutor_vr(:,:,:,:,:)
-  real(r8),target,allocatable :: RO2DmndAutort(:,:,:,:)
+  real(r8),target,allocatable :: RO2DmndAutort_vr(:,:,:,:)
   real(r8),target,allocatable :: RNH4UptkSoilAutor_vr(:,:,:,:)
   real(r8),target,allocatable :: RNO3UptkSoilAutor_vr(:,:,:,:)
   real(r8),target,allocatable :: RH2PO4UptkSoilAutor_vr(:,:,:,:)
@@ -68,49 +68,49 @@ implicit none
   subroutine InitAllocate
 
   implicit none
-  allocate(mBiomeHeter_vr(NumPlantChemElms,NumLiveHeterBioms,1:jcplx,0:JZ,JY,JX))
-  allocate(RO2DmndHetert(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(RDOCUptkHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(RAcetateUptkHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(RNH4DmndSoilHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(RNO3DmndSoilHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(RH2PO4DmndSoilHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(RNH4DmndLitrHeter_col(NumHetetrMicCmplx,1:jcplx,JY,JX))
-  allocate(RH2PO4DmndLitrHeter_col(NumHetetrMicCmplx,1:jcplx,JY,JX))
-  allocate(RNO3DmndLitrHeter_col(NumHetetrMicCmplx,1:jcplx,JY,JX))
-  allocate(RNO3ReduxDmndSoilHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(RNO2DmndReduxSoilHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(RNO3ReduxDmndBandHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(RNO2DmndReduxBandHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(RN2ODmndReduxHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(RNH4DmndBandHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(RNO3DmndBandHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(RH2PO4DmndBandHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(RH1PO4DmndSoilHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(RH1PO4DmndBandHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX))
-  allocate(RH1PO4DmndLitrHeter_col(NumHetetrMicCmplx,1:jcplx,JY,JX))
-  allocate(OMEERhetr(NumPlantChemElms,NumLiveHeterBioms,1:jcplx,2,2,JV,JH))
+  allocate(mBiomeHeter_vr(NumPlantChemElms,NumLiveHeterBioms,1:jcplx,0:JZ,JY,JX));mBiomeHeter_vr=0._r8
+  allocate(RO2DmndHetert(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX)); RO2DmndHetert=0._r8
+  allocate(RDOCUptkHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX));RDOCUptkHeter_vr=0._r8
+  allocate(RAcetateUptkHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX));RAcetateUptkHeter_vr=0._r8
+  allocate(RNH4DmndSoilHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX));RNH4DmndSoilHeter_vr=0._r8
+  allocate(RNO3DmndSoilHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX));RNO3DmndSoilHeter_vr=0._r8
+  allocate(RH2PO4DmndSoilHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX));RH2PO4DmndSoilHeter_vr=0._r8
+  allocate(RNH4DmndLitrHeter_col(NumHetetrMicCmplx,1:jcplx,JY,JX));RNH4DmndLitrHeter_col=0._r8
+  allocate(RH2PO4DmndLitrHeter_col(NumHetetrMicCmplx,1:jcplx,JY,JX));RH2PO4DmndLitrHeter_col=0._r8
+  allocate(RNO3DmndLitrHeter_col(NumHetetrMicCmplx,1:jcplx,JY,JX));RNO3DmndLitrHeter_col=0._r8
+  allocate(RNO3ReduxDmndSoilHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX));RNO3ReduxDmndSoilHeter_vr=0._r8
+  allocate(RNO2DmndReduxSoilHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX));RNO2DmndReduxSoilHeter_vr=0._r8
+  allocate(RNO3ReduxDmndBandHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX));RNO3ReduxDmndBandHeter_vr=0._r8
+  allocate(RNO2DmndReduxBandHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX));RNO2DmndReduxBandHeter_vr=0._r8
+  allocate(RN2ODmndReduxHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX));RN2ODmndReduxHeter_vr=0._r8
+  allocate(RNH4DmndBandHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX));RNH4DmndBandHeter_vr=0._r8
+  allocate(RNO3DmndBandHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX));RNO3DmndBandHeter_vr=0._r8
+  allocate(RH2PO4DmndBandHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX));RH2PO4DmndBandHeter_vr=0._r8
+  allocate(RH1PO4DmndSoilHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX));RH1PO4DmndSoilHeter_vr=0._r8
+  allocate(RH1PO4DmndBandHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX));RH1PO4DmndBandHeter_vr=0._r8
+  allocate(RH1PO4DmndLitrHeter_col(NumHetetrMicCmplx,1:jcplx,JY,JX));RH1PO4DmndLitrHeter_col=0._r8
+  allocate(OMEERhetr(NumPlantChemElms,NumLiveHeterBioms,1:jcplx,2,2,JV,JH));OMEERhetr=0._r8
 
-  allocate(mBiomeAutor_vr(NumPlantChemElms,NumLiveAutoBioms,0:JZ,JY,JX))
-  allocate(RO2DmndAutort(NumMicrobAutrophCmplx,0:JZ,JY,JX))
-  allocate(RNH4UptkSoilAutor_vr(NumMicrobAutrophCmplx,0:JZ,JY,JX))
-  allocate(RNO3UptkSoilAutor_vr(NumMicrobAutrophCmplx,0:JZ,JY,JX))
-  allocate(RH2PO4UptkSoilAutor_vr(NumMicrobAutrophCmplx,0:JZ,JY,JX))
-  allocate(RNH4UptkLitrAutor_col(NumMicrobAutrophCmplx,JY,JX))
-  allocate(RH2PO4UptkLitrAutor_col(NumMicrobAutrophCmplx,JY,JX))
-  allocate(RNO3UptkLitrAutor_col(NumMicrobAutrophCmplx,JY,JX))
-  allocate(RNH3OxidAutor(NumMicrobAutrophCmplx,0:JZ,JY,JX))
-  allocate(RNO2OxidAutor(NumMicrobAutrophCmplx,0:JZ,JY,JX))
-  allocate(RNH3OxidAutorBand(NumMicrobAutrophCmplx,0:JZ,JY,JX))
-  allocate(RNO2OxidAutorBand(NumMicrobAutrophCmplx,0:JZ,JY,JX))
-  allocate(RN2ODmndReduxAutor_vr(NumMicrobAutrophCmplx,0:JZ,JY,JX))
-  allocate(RNH4UptkBandAutor_vr(NumMicrobAutrophCmplx,0:JZ,JY,JX))
-  allocate(RNO3UptkBandAutor_vr(NumMicrobAutrophCmplx,0:JZ,JY,JX))
-  allocate(RH2PO4UptkBandAutor_vr(NumMicrobAutrophCmplx,0:JZ,JY,JX))
-  allocate(RH1PO4UptkSoilAutor_vr(NumMicrobAutrophCmplx,0:JZ,JY,JX))
-  allocate(RH1PO4UptkBandAutor_vr(NumMicrobAutrophCmplx,0:JZ,JY,JX))
-  allocate(RH1PO4UptkLitrAutor_col(NumMicrobAutrophCmplx,JY,JX))
-  allocate(OMEERauto(NumPlantChemElms,NumLiveAutoBioms,2,2,JV,JH))
+  allocate(mBiomeAutor_vr(NumPlantChemElms,NumLiveAutoBioms,0:JZ,JY,JX));mBiomeAutor_vr=0._r8
+  allocate(RO2DmndAutort_vr(NumMicrobAutrophCmplx,0:JZ,JY,JX));RO2DmndAutort_vr=0._r8
+  allocate(RNH4UptkSoilAutor_vr(NumMicrobAutrophCmplx,0:JZ,JY,JX));RNH4UptkSoilAutor_vr=0._r8
+  allocate(RNO3UptkSoilAutor_vr(NumMicrobAutrophCmplx,0:JZ,JY,JX));RNO3UptkSoilAutor_vr=0._r8
+  allocate(RH2PO4UptkSoilAutor_vr(NumMicrobAutrophCmplx,0:JZ,JY,JX));RH2PO4UptkSoilAutor_vr=0._r8
+  allocate(RNH4UptkLitrAutor_col(NumMicrobAutrophCmplx,JY,JX));RNH4UptkLitrAutor_col=0._r8
+  allocate(RH2PO4UptkLitrAutor_col(NumMicrobAutrophCmplx,JY,JX));RH2PO4UptkLitrAutor_col=0._r8
+  allocate(RNO3UptkLitrAutor_col(NumMicrobAutrophCmplx,JY,JX));RNO3UptkLitrAutor_col=0._r8
+  allocate(RNH3OxidAutor(NumMicrobAutrophCmplx,0:JZ,JY,JX));RNH3OxidAutor=0._r8
+  allocate(RNO2OxidAutor(NumMicrobAutrophCmplx,0:JZ,JY,JX));RNO2OxidAutor=0._r8
+  allocate(RNH3OxidAutorBand(NumMicrobAutrophCmplx,0:JZ,JY,JX));RNH3OxidAutorBand=0._r8
+  allocate(RNO2OxidAutorBand(NumMicrobAutrophCmplx,0:JZ,JY,JX));RNO2OxidAutorBand=0._r8
+  allocate(RN2ODmndReduxAutor_vr(NumMicrobAutrophCmplx,0:JZ,JY,JX));RN2ODmndReduxAutor_vr=0._r8
+  allocate(RNH4UptkBandAutor_vr(NumMicrobAutrophCmplx,0:JZ,JY,JX));RNH4UptkBandAutor_vr=0._r8
+  allocate(RNO3UptkBandAutor_vr(NumMicrobAutrophCmplx,0:JZ,JY,JX));RNO3UptkBandAutor_vr=0._r8
+  allocate(RH2PO4UptkBandAutor_vr(NumMicrobAutrophCmplx,0:JZ,JY,JX));RH2PO4UptkBandAutor_vr=0._r8
+  allocate(RH1PO4UptkSoilAutor_vr(NumMicrobAutrophCmplx,0:JZ,JY,JX));RH1PO4UptkSoilAutor_vr=0._r8
+  allocate(RH1PO4UptkBandAutor_vr(NumMicrobAutrophCmplx,0:JZ,JY,JX));RH1PO4UptkBandAutor_vr=0._r8
+  allocate(RH1PO4UptkLitrAutor_col(NumMicrobAutrophCmplx,JY,JX));RH1PO4UptkLitrAutor_col=0._r8
+  allocate(OMEERauto(NumPlantChemElms,NumLiveAutoBioms,2,2,JV,JH));OMEERauto=0._r8
   end subroutine InitAllocate
 !----------------------------------------------------------------------------------------------
 
@@ -141,7 +141,7 @@ implicit none
   if(allocated(OMEERhetr))deallocate(OMEERhetr)
 
   if(allocated(mBiomeAutor_vr))deallocate(mBiomeAutor_vr)
-  if(allocated(RO2DmndAutort))deallocate(RO2DmndAutort)
+  if(allocated(RO2DmndAutort_vr))deallocate(RO2DmndAutort_vr)
   if(allocated(RNH4UptkSoilAutor_vr))deallocate(RNH4UptkSoilAutor_vr)
   if(allocated(RNO3UptkSoilAutor_vr))deallocate(RNO3UptkSoilAutor_vr)
   if(allocated(RH2PO4UptkSoilAutor_vr))deallocate(RH2PO4UptkSoilAutor_vr)

@@ -48,7 +48,7 @@ implicit none
     LitrfalStrutElms_pvr     => plt_bgcr%LitrfalStrutElms_pvr,      &
     RootMycoExudElms_pft     => plt_rbgc%RootMycoExudElms_pft,      &
     MY                       => plt_morph%MY,                       &
-    MaxSoiL4Root             => plt_morph%MaxSoiL4Root,             &
+    MaxSoiL4Root_pft             => plt_morph%MaxSoiL4Root_pft,             &
     NumRootAxes_pft          => plt_morph%NumRootAxes_pft,          &
     MaxNumRootLays           => plt_site%MaxNumRootLays,            &
     SeasonalNonstElms_pft    => plt_biom%SeasonalNonstElms_pft,     &
@@ -85,7 +85,7 @@ implicit none
 
   RootGrosRCO2_pft(NZ)=0._r8
   DO N=1,MY(NZ)
-    DO L=NU,MaxSoiL4Root(NZ)
+    DO L=NU,MaxSoiL4Root_pft(NZ)
       RootGrosRCO2_pft(NZ)=RootGrosRCO2_pft(NZ)+RootCO2Autor_pvr(N,L,NZ)
     ENDDO     
   ENDDO  
@@ -132,7 +132,7 @@ implicit none
     iPlantNfixType                 =>  plt_morph%iPlantNfixType           , &
     NodulInfectElms_pft            =>  plt_bgcr%NodulInfectElms_pft       , &    
     NumOfBranches_pft              =>  plt_morph%NumOfBranches_pft        , &   
-    MaxSoiL4Root                   =>  plt_morph%MaxSoiL4Root             , &    
+    MaxSoiL4Root_pft                   =>  plt_morph%MaxSoiL4Root_pft             , &    
     NumRootAxes_pft                =>  plt_morph%NumRootAxes_pft          , &
     MaxNumRootLays                 =>  plt_site%MaxNumRootLays            , &  
     SeasonalNonstElms_pft          =>  plt_biom%SeasonalNonstElms_pft     , &    
@@ -266,7 +266,7 @@ implicit none
     NP0                  => plt_site%NP0,                  &
     MY                   => plt_morph%MY,                  &
     NU                   => plt_site%NU,                   &
-    MaxSoiL4Root         => plt_morph%MaxSoiL4Root,        &
+    MaxSoiL4Root_pft         => plt_morph%MaxSoiL4Root_pft,        &
     MaxNumRootLays       => plt_site%MaxNumRootLays,       &
     CO2NetFix_pft        => plt_bgcr%CO2NetFix_pft,        &
     CanopyRespC_pft      => plt_bgcr%CanopyRespC_pft,      &
@@ -291,7 +291,7 @@ implicit none
         ENDDO
       ENDDO
     ENDDO D1
-    RootCO2Autor_pvr(1:MY(NZ),NU:MaxSoiL4Root(NZ),NZ)=0._r8
+    RootCO2Autor_pvr(1:MY(NZ),NU:MaxSoiL4Root_pft(NZ),NZ)=0._r8
     NH3Dep2Can_pft(NZ)=0._r8
     GrossResp_pft(NZ)=0._r8
     GrossCO2Fix_pft(NZ)=0._r8    
@@ -323,7 +323,7 @@ implicit none
     NU                            =>  plt_site%NU                            , &  
     MY                            =>  plt_morph%MY                           , &                  
     MaxNumRootLays                =>  plt_site%MaxNumRootLays                , &  
-    MaxSoiL4Root                  =>  plt_morph%MaxSoiL4Root                 , &        
+    MaxSoiL4Root_pft                  =>  plt_morph%MaxSoiL4Root_pft                 , &        
     iPlantNfixType                =>  plt_morph%iPlantNfixType               , &    
     NumRootAxes_pft               =>  plt_morph%NumRootAxes_pft              , &  
     RootNodulStrutElms_pvr        =>  plt_biom%RootNodulStrutElms_pvr        , &   
@@ -347,8 +347,8 @@ implicit none
     mass_roots(NE)=massr1st1(NE)+massr2nd1(NE)+massnonst1(NE)
     !add reserve to struct
     if(is_plant_N2fix(iPlantNfixType(NZ)) .and. is_root_N2fix(iPlantNfixType(NZ)))THEN
-      massnodul1(NE)=sum(RootNodulStrutElms_pvr(NE,NU:MaxSoiL4Root(NZ),NZ))+&
-          sum(RootNodulNonstElms_pvr(NE,NU:MaxSoiL4Root(NZ),NZ))
+      massnodul1(NE)=sum(RootNodulStrutElms_pvr(NE,NU:MaxSoiL4Root_pft(NZ),NZ))+&
+          sum(RootNodulNonstElms_pvr(NE,NU:MaxSoiL4Root_pft(NZ),NZ))
       mass_roots(NE)=mass_roots(NE)+massnodul1(NE)    
     endif      
   ENDDO

@@ -88,6 +88,7 @@ module ncdio_pio
 
   interface ncd_getvar
     module procedure ncd_getvar_int
+    module procedure ncd_getvar_logical
     module procedure ncd_getvar_logical_1d    
     module procedure ncd_getvar_real_sp
     module procedure ncd_getvar_int_1d
@@ -203,6 +204,7 @@ module ncdio_pio
 
   type, public :: file_desc_t
     integer(i4) :: fh
+    character(len=128) :: filename
   end type file_desc_t
 
   type, public :: Var_desc_t
@@ -685,6 +687,31 @@ module ncdio_pio
   call check_ret( nf90_put_var(ncid%fh, vardesc%varid, data, start = (/1,rec/)),'ncd_putvar_int_1d')
 
   end subroutine ncd_putvar_int_1d
+!----------------------------------------------------------------------
+  subroutine ncd_putvar_logical(ncid, varname, data)
+
+  implicit none
+  class(file_desc_t), intent(in) :: ncid
+  logical, intent(in) :: data
+  character(len=*), intent(in) :: varname
+  integer :: varid
+  logical :: readvar
+  type(Var_desc_t)  :: vardesc
+
+  integer :: data_loc
+  integer :: jj, nsz
+
+  if(data)then
+    data_loc=1      
+  else
+    data_loc=0
+  endif  
+
+  call check_var(ncid, trim(varname), vardesc, readvar)
+
+  call check_ret( nf90_put_var(ncid%fh, vardesc%varid, data_loc),'ncd_putvar_logical')
+
+  end subroutine ncd_putvar_logical
 !----------------------------------------------------------------------
   subroutine ncd_putvar_logical_1d(ncid, varname, rec, data)
 
@@ -1443,6 +1470,32 @@ module ncdio_pio
 
   end subroutine ncd_getvar_int_1d
 !----------------------------------------------------------------------
+  subroutine ncd_getvar_logical(ncid, varname, data)
+  !
+  !DESCRIPTION
+  !read 1d integer array
+  !
+
+!**********************************************************************
+  implicit none
+  class(file_desc_t), intent(in) :: ncid
+  logical, intent(out) :: data
+  character(len=*), intent(in) :: varname
+  integer :: varid
+  logical :: readvar
+  type(Var_desc_t)  :: vardesc
+  integer :: data_loc
+  integer :: nsz, jj
+
+  call check_var(ncid, trim(varname), vardesc, readvar)
+
+  call check_ret( nf90_get_var(ncid%fh, vardesc%varid, data_loc),&
+    trim(mod_filename)//'::ncd_getvar_logical::'//trim(varname))
+  
+  data=(data_loc==1)
+  
+  end subroutine ncd_getvar_logical
+!----------------------------------------------------------------------
   subroutine ncd_getvar_logical_1d(ncid, varname, rec, data)
   !
   !DESCRIPTION
@@ -1770,7 +1823,8 @@ module ncdio_pio
     character(len=*) ,  intent(in)    :: fname   ! File name to create
     !
     !-----------------------------------------------------------------------
-    print*,trim(fname)
+    
+    write(file%filename,'(A)')trim(fname)
     call check_ret(nf90_create(fname, nf90_clobber, file%fh), &
       trim(mod_filename)//'::ncd_pio_createfile')
 
@@ -1805,7 +1859,7 @@ module ncdio_pio
     ! !LOCAL VARIABLES:
     integer :: ierr
     !-----------------------------------------------------------------------
-
+    write(file%filename,'(A)')trim(fname)
     write(iulog,*) 'Opened existing file ', trim(fname)
     call check_ret(nf90_open(fname, mode, file%fh),'open file '//trim(fname))
 
@@ -1826,6 +1880,7 @@ module ncdio_pio
     !-----------------------------------------------------------------------
 
     write(iulog,*)'open file ',trim(fname), ' to write'
+    write(file%filename,'(A)')trim(fname)
     call check_ret(nf90_open(fname, NF90_WRITE, file%fh),'open file '//trim(fname))
   end subroutine ncd_pio_openfile_for_write
 
@@ -1842,7 +1897,7 @@ module ncdio_pio
   ! !LOCAL VARIABLES:
   integer :: status   ! error status
   !-----------------------------------------------------------------------
-  print*,ncid%fh
+  
   call check_ret(nf90_enddef(ncid%fh), trim(mod_filename)//'::ncd_enddef')
 
   end subroutine ncd_enddef
@@ -2229,6 +2284,11 @@ module ncdio_pio
     type(var_desc_t)  :: vardesc            ! local vardesc pointer
     character(len=*),parameter :: subname=trim(mod_filename)//'::ncd_io_0d_log_glob'
 
+    if(flag=='write')then
+      call ncd_putvar_logical(ncid, varname, data)
+    elseif(flag=='read')then
+      call ncd_getvar_logical(ncid, varname, data)  
+    endif
   end subroutine ncd_io_0d_log_glob
 
     !-----------------------------------------------------------------------
@@ -2336,8 +2396,7 @@ module ncdio_pio
     integer(i4) :: temp(1)
     character(len=*),parameter :: subname=trim(mod_filename)//'::ncd_io_1d_int_glob'
 
-    if (flag == 'read') then
-      print*,subname,' ',trim(varname)
+    if (flag == 'read') then      
       if(present(nt))then
         call ncd_getvar_int_1d(ncid, varname, nt, data)
       else

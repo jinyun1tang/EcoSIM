@@ -219,7 +219,7 @@ module WatsubMod
     !   VLHeatCapacity_col,VHCM=volumetric heat capacities of total volume, solid
     !   VLHeatCapacityA,VLHeatCapacityB=volumetric heat capacities of micropore,macropore
     !
-        PSISM1(L,NY,NX)=PSISoilMatricP(L,NY,NX)
+        PSISM1(L,NY,NX)=PSISoilMatricP_vr(L,NY,NX)
         VLMicP1(L,NY,NX)=VLMicP_vr(L,NY,NX)
         VLWatMicP1(L,NY,NX)=VLWatMicP_vr(L,NY,NX)
         VLWatMicPX1(L,NY,NX)=VLWatMicPX(L,NY,NX)

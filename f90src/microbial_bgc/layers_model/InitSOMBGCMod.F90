@@ -365,7 +365,7 @@ module InitSOMBGCMOD
   ENDIF
 
 
-  RO2DmndAutort(:,L,NY,NX)=0.0_r8
+  RO2DmndAutort_vr(:,L,NY,NX)=0.0_r8
   RNH3OxidAutor(:,L,NY,NX)=0.0_r8
   RNO2OxidAutor(:,L,NY,NX)=0.0_r8
   RN2ODmndReduxAutor_vr(:,L,NY,NX)=0.0_r8

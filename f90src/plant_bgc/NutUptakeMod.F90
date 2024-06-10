@@ -59,7 +59,7 @@ module NutUptakeMod
     NU                        => plt_site%NU,                        &
     AREA3                     => plt_site%AREA3,                     &
     NH3Dep2Can_brch           => plt_rbgc%NH3Dep2Can_brch,           &
-    ZERO4Groth_pft                     => plt_biom%ZERO4Groth_pft,                     &
+    ZERO4Groth_pft            => plt_biom%ZERO4Groth_pft,            &
     AtmGasc                   => plt_site%AtmGasc,                   &
     LeafPetolBiomassC_brch    => plt_biom%LeafPetolBiomassC_brch,    &
     CanopyNonstElms_brch      => plt_biom%CanopyNonstElms_brch,      &
@@ -129,7 +129,7 @@ module NutUptakeMod
     ZEROS2                  => plt_site%ZEROS2,                   &
     NU                      => plt_site%NU,                       &
     ZERO                    => plt_site%ZERO,                     &
-    ZERO4Groth_pft                   => plt_biom%ZERO4Groth_pft,                    &
+    ZERO4Groth_pft          => plt_biom%ZERO4Groth_pft,           &
     RootO2Dmnd4Resp_pvr     => plt_rbgc%RootO2Dmnd4Resp_pvr,      &
     RAutoRootO2Limter_pvr   => plt_rbgc%RAutoRootO2Limter_pvr,    &
     RootRespPotent_pvr      => plt_rbgc%RootRespPotent_pvr,       &
@@ -137,13 +137,13 @@ module NutUptakeMod
     MY                      => plt_morph%MY,                      &
     RootLenDensPerPlant_pvr => plt_morph%RootLenDensPerPlant_pvr, &
     RootVH2O_pvr            => plt_morph%RootVH2O_pvr,            &
-    MaxSoiL4Root            => plt_morph%MaxSoiL4Root             &
+    MaxSoiL4Root_pft        => plt_morph%MaxSoiL4Root_pft         &
   )
 
   call ZeroUptake(NZ)
 
   D955: DO N=1,MY(NZ)
-    D950: DO L=NU,MaxSoiL4Root(NZ)
+    D950: DO L=NU,MaxSoiL4Root_pft(NZ)
       IF(VLSoilPoreMicP_vr(L).GT.ZEROS2.AND.RootLenDensPerPlant_pvr(N,L,NZ).GT.ZERO &
         .AND.RootVH2O_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ).AND.THETW_vr(L).GT.ZERO)THEN
         TFOXYX=0.0_r8
@@ -208,7 +208,7 @@ module NutUptakeMod
   integer :: K, L1,L2,NN
   !     begin_execution
 
-  L1=plt_site%NU;L2=plt_morph%MaxSoiL4Root(NZ);NN=plt_morph%MY(NZ)
+  L1=plt_site%NU;L2=plt_morph%MaxSoiL4Root_pft(NZ);NN=plt_morph%MY(NZ)
 
   plt_rbgc%trcg_air2root_flx__pvr(idg_beg:idg_end-1,1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%trcg_Root_DisEvap_flx_vr(idg_beg:idg_end-1,1:NN,L1:L2,NZ)=0.0_r8
@@ -537,7 +537,7 @@ module NutUptakeMod
   associate(                                                 &
     PlantPopulation_pft   => plt_site%PlantPopulation_pft,   &
     ZERO                  => plt_site%ZERO,                  &
-    TortMicPM_vr             => plt_site%TortMicPM_vr,             &
+    TortMicPM_vr          => plt_site%TortMicPM_vr,          &
     fTgrowRootP_vr        => plt_pheno%fTgrowRootP_vr,       &
     RAutoRootO2Limter_pvr => plt_rbgc%RAutoRootO2Limter_pvr, &
     CMinNH4Root_pft       => plt_rbgc%CMinNH4Root_pft,       &

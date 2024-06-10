@@ -60,18 +60,18 @@ contains
   ! FCI,WPI=FC,WP of ice
   ! THETIX=ice concentration
 !
-    IF(SoilMicPMassLayer(L,NY,NX).GT.ZEROS(NY,NX).AND.VLSoilPoreMicP_vr(L,NY,NX).GT.ZEROS(NY,NX))THEN
+    IF(SoilMicPMassLayer(L,NY,NX).GT.ZEROS(NY,NX) .AND. VLSoilPoreMicP_vr(L,NY,NX).GT.ZEROS(NY,NX))THEN
       THETW1=AZMAX1(AMIN1(POROS(L,NY,NX),VLWatMicP_vr(L,NY,NX)/VLSoilMicP(L,NY,NX)),1.e-6_r8)
       IF(THETW1.LT.FieldCapacity(L,NY,NX))THEN
-        PSISoilMatricP(L,NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIFLD(NY,NX) &
+        PSISoilMatricP_vr(L,NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIFLD(NY,NX) &
           +((LOGFldCapacity(L,NY,NX)-LOG(THETW1))/FCD(L,NY,NX)*LOGPSIMND(NY,NX))))
       ELSE IF(THETW1.LT.POROS(L,NY,NX)-DTHETW)THEN
-        PSISoilMatricP(L,NY,NX)=-EXP(LOGPSIAtSat(NY,NX)+(((LOGPOROS(L,NY,NX)-LOG(THETW1)) &
+        PSISoilMatricP_vr(L,NY,NX)=-EXP(LOGPSIAtSat(NY,NX)+(((LOGPOROS(L,NY,NX)-LOG(THETW1)) &
           /PSD(L,NY,NX))**SRP(L,NY,NX)*LOGPSIMXD(NY,NX)))
       ELSE
-        PSISoilMatricP(L,NY,NX)=PSISE(L,NY,NX)
+        PSISoilMatricP_vr(L,NY,NX)=PSISE(L,NY,NX)
       ENDIF
-    ELSE IF(VLSoilPoreMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX).and.THETI(L,NY,NX)>ZEROS2(NY,NX))THEN
+    ELSE IF(VLSoilPoreMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX) .and. THETI(L,NY,NX)>ZEROS2(NY,NX))THEN
       FCX=FCI*THETI(L,NY,NX)
       WPX=WPI*THETI(L,NY,NX)
       FCLX=LOG(FCX)
@@ -79,16 +79,16 @@ contains
       PSDX=LOGPOROS(L,NY,NX)-FCLX
       FCDX=FCLX-WPLX
       IF(THETW_vr(L,NY,NX).LT.FCX)THEN
-        PSISoilMatricP(L,NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIFLD(NY,NX) &
+        PSISoilMatricP_vr(L,NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIFLD(NY,NX) &
           +((FCLX-LOG(THETW_vr(L,NY,NX)))/FCDX*LOGPSIMND(NY,NX))))
       ELSE IF(THETW_vr(L,NY,NX).LT.POROS(L,NY,NX)-DTHETW)THEN
-        PSISoilMatricP(L,NY,NX)=-EXP(LOGPSIAtSat(NY,NX)+(((LOGPOROS(L,NY,NX)-LOG(THETW_vr(L,NY,NX))) &
+        PSISoilMatricP_vr(L,NY,NX)=-EXP(LOGPSIAtSat(NY,NX)+(((LOGPOROS(L,NY,NX)-LOG(THETW_vr(L,NY,NX))) &
           /PSDX)*LOGPSIMXD(NY,NX)))
       ELSE
-        PSISoilMatricP(L,NY,NX)=PSISE(L,NY,NX)
+        PSISoilMatricP_vr(L,NY,NX)=PSISE(L,NY,NX)
       ENDIF
     ELSE
-      PSISoilMatricP(L,NY,NX)=PSISE(L,NY,NX)
+      PSISoilMatricP_vr(L,NY,NX)=PSISE(L,NY,NX)
     ENDIF
 !
 !     SOIL OSMOTIC, GRAVIMETRIC AND MATRIC WATER POTENTIALS
@@ -97,7 +97,7 @@ contains
 !
     PSISoilOsmotic(L,NY,NX)=-RGAS*1.E-6_r8*TKS(L,NY,NX)*CION(L,NY,NX)
     PSIGrav(L,NY,NX)=mGravAccelerat*(ALT(NY,NX)-SoiDepthMidLay(L,NY,NX))
-    TotalSoilH2OPSIMPa(L,NY,NX)=AZMIN1(PSISoilMatricP(L,NY,NX)+PSISoilOsmotic(L,NY,NX)+PSIGrav(L,NY,NX))
+    TotalSoilH2OPSIMPa(L,NY,NX)=AZMIN1(PSISoilMatricP_vr(L,NY,NX)+PSISoilOsmotic(L,NY,NX)+PSIGrav(L,NY,NX))
 
 !
 !     SOIL RESISTANCE TO ROOT PENETRATION
@@ -150,8 +150,9 @@ contains
   if(lverb)write(*,*)'SoilHydroProperty::setshape',POROS(L,NY,NX),cold_run()
 ! double check cold_run() setup
   LOGPOROS(L,NY,NX)=LOG(POROS(L,NY,NX))
-  IF((ISOIL(isoi_fc,L,NY,NX).EQ.0.AND.ISOIL(isoi_wp,L,NY,NX).EQ.0).OR.(.not.cold_run()))THEN
-  ! read from check point file or if soil properties are set with soil file
+
+  IF((ISOIL(isoi_fc,L,NY,NX).EQ.0 .AND. ISOIL(isoi_wp,L,NY,NX).EQ.0).OR.(.not.cold_run()))THEN
+  ! read from check point file or if soil properties are set with soil file    
     LOGFldCapacity(L,NY,NX)=LOG(FieldCapacity(L,NY,NX))
     LOGWiltPoint(L,NY,NX)=LOG(WiltPoint(L,NY,NX))
     PSD(L,NY,NX)=LOGPOROS(L,NY,NX)-LOGFldCapacity(L,NY,NX)

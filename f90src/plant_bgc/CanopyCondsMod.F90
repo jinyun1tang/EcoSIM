@@ -48,32 +48,32 @@ module CanopyCondsMod
   real(r8) :: ZX,ZY,ZE
   REAL(R8) :: ZZ
 !     begin_execution
-  associate(                                                    &
-    WindSpeedAtm            => plt_site%WindSpeedAtm          , &
-    ZERO                    => plt_site%ZERO                  , &
-    AREA3                   => plt_site%AREA3                 , &
-    KoppenClimZone          => plt_site%KoppenClimZone        , &
-    SoiSurfRoughnesst0      => plt_site%SoiSurfRoughnesst0    , &
-    WindMesHeight           => plt_site%WindMesHeight         , &
-    ZEROS                   => plt_site%ZEROS                 , &
-    NU                      => plt_site%NU                    , &
-    BndlResistAboveCanG     => plt_ew%BndlResistAboveCanG     , &
-    ZERO4Groth_pftlanDisp            => plt_ew%ZERO4Groth_pftlanDisp            , &
-    RoughHeight             => plt_ew%RoughHeight             , &
-    RIB                     => plt_ew%RIB                     , &
-    TairK                   => plt_ew%TairK                   , &
-    VLHeatCapSnowMin_col    => plt_ew%VLHeatCapSnowMin_col    , &
-    SnowDepth               => plt_ew%SnowDepth               , &
-    VLHeatCapSurfSnow_col   => plt_ew%VLHeatCapSurfSnow_col   , &
-    CanopyHeight_col        => plt_morph%CanopyHeight_col     , &
-    StemArea_col            => plt_morph%StemArea_col         , &
-    CanopyLeafArea_col      => plt_morph%CanopyLeafArea_col     &
+  associate(                                               &
+    WindSpeedAtm          => plt_site%WindSpeedAtm,        &
+    ZERO                  => plt_site%ZERO,                &
+    AREA3                 => plt_site%AREA3,               &
+    KoppenClimZone        => plt_site%KoppenClimZone,      &
+    SoiSurfRoughnesst0    => plt_site%SoiSurfRoughnesst0,  &
+    WindMesHeight         => plt_site%WindMesHeight,       &
+    ZEROS                 => plt_site%ZEROS,               &
+    NU                    => plt_site%NU,                  &
+    BndlResistAboveCanG   => plt_ew%BndlResistAboveCanG,   &
+    ZERO4PlantDisplace_col => plt_ew%ZERO4PlantDisplace_col, &
+    RoughHeight           => plt_ew%RoughHeight,           &
+    RIB                   => plt_ew%RIB,                   &
+    TairK                 => plt_ew%TairK,                 &
+    VLHeatCapSnowMin_col  => plt_ew%VLHeatCapSnowMin_col,  &
+    SnowDepth             => plt_ew%SnowDepth,             &
+    VLHeatCapSurfSnow_col => plt_ew%VLHeatCapSurfSnow_col, &
+    CanopyHeight_col      => plt_morph%CanopyHeight_col,   &
+    StemArea_col          => plt_morph%StemArea_col,       &
+    CanopyLeafArea_col    => plt_morph%CanopyLeafArea_col  &
   )
 !     CANOPY ZERO PLANE AND ROUGHNESS HEIGHTS
 !
 !     CanopyLeafArea_col,StemArea_col=leaf,stalk area of combined canopy
 !     SnowDepth,DepthSurfWatIce=snowpack,surface water depths
-!     ZT,ZERO4Groth_pftlanDisp,RoughHeight=canopy,zero plane displacement,roughness height
+!     ZT,ZERO4PlantDisplace_col,RoughHeight=canopy,zero plane displacement,roughness height
 !     ZZ=reference height for wind speed
 !
   ARLSC=CanopyLeafArea_col+StemArea_col
@@ -81,16 +81,16 @@ module CanopyCondsMod
     ARLSG=ARLSC/AREA3(NU)
     ZX=EXP(-0.5_r8*ARLSG)
     ZY=1.0_r8-ZX
-    ZERO4Groth_pftlanDisp=CanopyHeight_col*AZMAX1(1.0_r8-2.0_r8/ARLSG*ZY)
+    ZERO4PlantDisplace_col=CanopyHeight_col*AZMAX1(1.0_r8-2.0_r8/ARLSG*ZY)
     ZE=CanopyHeight_col*AMAX1(0.05_r8,ZX*ZY)
   ELSE
-    ZERO4Groth_pftlanDisp=0.0_r8
+    ZERO4PlantDisplace_col=0.0_r8
     ZE=0.0_r8
   ENDIF
   IF(IFLGW.EQ.1)THEN
     ZZ=WindMesHeight+CanopyHeight_col
   ELSE
-    ZZ=AMAX1(WindMesHeight,ZERO4Groth_pftlanDisp+2.0_r8)
+    ZZ=AMAX1(WindMesHeight,ZERO4PlantDisplace_col+2.0_r8)
   ENDIF
 
   IF(KoppenClimZone.GE.0)THEN
@@ -106,7 +106,7 @@ module CanopyCondsMod
 !     WindSpeedAtm=wind speed
 !     RIB=canopy isothermal Richardson number
 !
-    BndlResistAboveCanG=AMAX1(RAM,(LOG((ZZ-ZERO4Groth_pftlanDisp)/RoughHeight))**2._r8/(0.168_r8*WindSpeedAtm))
+    BndlResistAboveCanG=AMAX1(RAM,(LOG((ZZ-ZERO4PlantDisplace_col)/RoughHeight))**2._r8/(0.168_r8*WindSpeedAtm))
     RIB=1.27E+08_r8*(ZZ-RoughHeight)/(WindSpeedAtm**2._r8*TairK)
   ELSE
     BndlResistAboveCanG=RAM
@@ -308,7 +308,7 @@ module CanopyCondsMod
     ZEROS2                   => plt_site%ZEROS2                      , &
     POROS1                   => plt_site%POROS1                      , &
     SolarNoonHour_col        => plt_site%SolarNoonHour_col           , &
-    VLSoilPoreMicP_vr        => plt_soilchem%VLSoilPoreMicP_vr    , &
+    VLSoilPoreMicP_vr        => plt_soilchem%VLSoilPoreMicP_vr       , &
     VLSoilMicP               => plt_soilchem%VLSoilMicP              , &
     VLWatMicP_vr             => plt_soilchem%VLWatMicP_vr            , &
     ClumpFactorNow_pft       => plt_morph%ClumpFactorNow_pft         , &

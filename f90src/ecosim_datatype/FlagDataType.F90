@@ -55,7 +55,7 @@ contains
   allocate(ISOILR(JY,JX));      ISOILR=0
   allocate(IUTYP(JY,JX));       IUTYP=0
   allocate(ITILL1(JY,JX));      ITILL1=0
-  allocate(IsPlantActive_pft(JP,JY,JX));    IsPlantActive_pft=0
+  allocate(IsPlantActive_pft(JP,JY,JX));    IsPlantActive_pft=iDormant
   allocate(doInitPlant_pft(JP,JY,JX));    doInitPlant_pft=ifalse
   allocate(iPlantPhotosynthesisType(JP,JY,JX));    iPlantPhotosynthesisType=0
   allocate(iPlantRootProfile_pft(JP,JY,JX));    iPlantRootProfile_pft=0
