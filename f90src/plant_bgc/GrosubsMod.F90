@@ -336,6 +336,8 @@ module grosubsMod
     NumOfBranches_pft         => plt_morph%NumOfBranches_pft          , &
     NumRootAxes_pft           => plt_morph%NumRootAxes_pft              &
   )
+
+
   IF(iPlantShootState_pft(NZ).EQ.iLive .OR. iPlantRootState_pft(NZ).EQ.iLive)THEN
     CanopyN2Fix_pft(NZ)=0._r8
     BegRemoblize = 0
@@ -351,7 +353,7 @@ module grosubsMod
 !     iPlantBranchState_brch=branch living flag: 0=alive,1=dead
 !
 !    call SumPlantBiom(I,J,NZ,'bfgrowpbrch')
-    
+
     DO  NB=1,NumOfBranches_pft(NZ)
       call GrowOneBranch(I,J,NB,NZ,TFN6_vr,CanopyHeight_copy,CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW,&
         TFN5,WFNG,Stomata_Stress,WFNS,CanTurgPSIFun4Expans,PTRT,CanopyN2Fix_pft,BegRemoblize)

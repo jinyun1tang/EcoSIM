@@ -95,6 +95,11 @@ module PlantBranchMod
   II=I;JJ=J
   LeafPetolBiomassC_brch(NB,NZ)=AZMAX1(LeafStrutElms_brch(ielmc,NB,NZ)+PetoleStrutElms_brch(ielmc,NB,NZ))
 
+!  if(NZ==1)then
+!  WRITE(113,*)I+J/24.,NB,iPlantBranchState_brch(NB,NZ).EQ.iLive
+!  elseif(NZ==2)then
+!  WRITE(114,*)I+J/24.,NB,iPlantBranchState_brch(NB,NZ).EQ.iLive
+!  endif
   IF(iPlantBranchState_brch(NB,NZ).EQ.iLive)THEN
 
     call CalcPartitionCoeff(I,J,NB,NZ,PART,PTRT,LRemob_brch,BegRemoblize)
@@ -827,6 +832,11 @@ module PlantBranchMod
       WaterStress4Groth,CanTurgPSIFun4Expans,CanopyNonstElm4Gros,CNPG,RCO2NonstC_brch,&
       RCO2Maint_brch,RMxess_brch,NonstC4Groth_brch,RCO2NonstC4Nassim_brch)
   ENDIF
+!  if(NZ==1)then
+!  WRITE(111,*)I+J/24.,NB,CH2O,iPlantCalendar_brch(ipltcal_Emerge,NB,NZ)
+!  elseif(NZ==2)then
+!  WRITE(112,*)I+J/24.,NB,CH2O,iPlantCalendar_brch(ipltcal_Emerge,NB,NZ)  
+!  endif
 
 !   REMOVE C,N,P USED IN MAINTENANCE + GROWTH REPIRATION AND GROWTH
 !   FROM NON-STRUCTURAL POOLS
