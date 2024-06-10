@@ -1651,7 +1651,7 @@ implicit none
       this%h1D_ECO_HVST_P_col(ncol)       = EcoHavstElmnt_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_NET_P_MIN_col(ncol)        =  -NetPO4Mineralize_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_RADN_col(ncol)             = TRAD(NY,NX)
-      this%h1D_PSI_SURF_col(ncol)         = PSISoilMatricP(0,NY,NX)
+      this%h1D_PSI_SURF_col(ncol)         = PSISoilMatricP_vr(0,NY,NX)
       this%h1D_SURF_ELEV_col(ncol)        = -CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)+DLYR(3,0,NY,NX)
       this%h1D_SURF_tLITR_N_FLX_col(ncol) = tLitrOM_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_AMENDED_N_col(ncol)        = FertNFlx_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -1739,7 +1739,7 @@ implicit none
         this%h2D_TEMP_vr_col(ncol,L) =  TCS(L,NY,NX)
         this%h2D_vWATER_vr_col(ncol,L)=  THETWZ(L,NY,NX)
         this%h2D_vICE_vr_col(ncol,L)  =  THETIZ(L,NY,NX)
-        this%h2D_PSI_vr_col(ncol,L)  =  PSISoilMatricP(L,NY,NX)+PSISoilOsmotic(L,NY,NX)     
+        this%h2D_PSI_vr_col(ncol,L)  =  PSISoilMatricP_vr(L,NY,NX)+PSISoilOsmotic(L,NY,NX)     
         this%h2D_RootH2OUP_vr_col(ncol,L)=GridPlantRootH2OUptake_vr(L,NY,NX)
         this%h2D_cNH4t_vr_col(ncol,L)=  safe_adb(trc_solml_vr(ids_NH4,L,NY,NX)+trc_solml_vr(ids_NH4B,L,NY,NX) &
                                                +natomw*(trcx_solml(idx_NH4,L,NY,NX)+trcx_solml(idx_NH4B,L,NY,NX)),&
@@ -1834,7 +1834,8 @@ implicit none
         this%h1D_POPN_ptc(nptc)         = PlantPopulation_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_tTRANSPN_ptc(nptc)     =-ETCanopy_pft(NZ,NY,NX)*1000.0/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_WTR_STRESS_ptc(nptc)   = HoursTooLowPsiCan_pft(NZ,NY,NX)
-        this%h1D_OXY_STRESS_ptc(nptc)   = PlantO2Stress(NZ,NY,NX)
+                
+        this%h1D_OXY_STRESS_ptc(nptc)   = PlantO2Stress_pft(NZ,NY,NX)
         this%h1D_SHOOTST_N_ptc(nptc)    = ShootStrutElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_SHOOT_N_ptc(nptc)      = ShootElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)        
         this%h1D_Plant_N_ptc(nptc)      = (ShootElms_pft(ielmn,NZ,NY,NX)&

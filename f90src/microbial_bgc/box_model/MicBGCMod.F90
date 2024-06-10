@@ -770,7 +770,7 @@ module MicBGCMod
 
         DO NGL=JGnio(N),JGnfo(N)        
 
-!           WatStressMicb=water potential (PSISoilMatricP) effect on microbial respiration
+!           WatStressMicb=water potential (PSISoilMatricP_vr) effect on microbial respiration
 !           OXKX=Km for O2 uptake
 !           OXKM=Km for heterotrophic O2 uptake set in starts.f
 !           GrowthEnvScalHeter=combined temp and water stress effect on growth respiration

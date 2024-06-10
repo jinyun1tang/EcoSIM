@@ -62,7 +62,7 @@ module RootGasMod
 !     begin_execution
   associate(                                                       &
     RootStrutElms_pft        => plt_biom%RootStrutElms_pft,        &
-    ZERO4Groth_pft                    => plt_biom%ZERO4Groth_pft,                    &
+    ZERO4Groth_pft           => plt_biom%ZERO4Groth_pft,           &
     PlantPopulation_pft      => plt_site%PlantPopulation_pft,      &
     DPTHZ                    => plt_site%DPTHZ,                    &
     AtmGasc                  => plt_site%AtmGasc,                  &
@@ -70,14 +70,14 @@ module RootGasMod
     ZERO                     => plt_site%ZERO,                     &
     VLWatMicPM               => plt_site%VLWatMicPM,               &
     VLsoiAirPM               => plt_site%VLsoiAirPM,               &
-    TortMicPM_vr                => plt_site%TortMicPM_vr,                &
+    TortMicPM_vr             => plt_site%TortMicPM_vr,             &
     FILM                     => plt_site%FILM,                     &
     RO2GasXchangePrev_vr     => plt_bgcr%RO2GasXchangePrev_vr,     &
     RCO2GasFlxPrev_vr        => plt_bgcr%RCO2GasFlxPrev_vr,        &
     RO2AquaXchangePrev_vr    => plt_bgcr%RO2AquaXchangePrev_vr,    &
     RootO2Uptk_pvr           => plt_rbgc%RootO2Uptk_pvr,           &
     RAutoRootO2Limter_pvr    => plt_rbgc%RAutoRootO2Limter_pvr,    &
-    ZERO4Uptk_pft                    => plt_rbgc%ZERO4Uptk_pft,                    &
+    ZERO4Uptk_pft            => plt_rbgc%ZERO4Uptk_pft,            &
     RootRespPotent_pvr       => plt_rbgc%RootRespPotent_pvr,       &
     RootO2Dmnd4Resp_pvr      => plt_rbgc%RootO2Dmnd4Resp_pvr,      &
     RO2UptkSoilM_vr          => plt_rbgc%RO2UptkSoilM_vr,          &
@@ -153,6 +153,7 @@ module RootGasMod
     ROXYFX=RO2GasXchangePrev_vr(L)*FOXYX*dts_gas
     RCO2FX=RCO2GasFlxPrev_vr(L)*FOXYX*dts_gas
     ROXYLX=RO2AquaXchangePrev_vr(L)*FOXYX*dts_gas
+
 !
 !     GASEOUS AND AQUEOUS DIFFUSIVITIES IN ROOT AND SOIL
 !
@@ -382,6 +383,7 @@ module RootGasMod
 !     C*P1=root aqueous concentration
 !
           RUPOSX=RDFOXS*PlantPopulation_pft(NZ)
+
           RUPSolute(idg_O2)=-RDFOXP*PlantPopulation_pft(NZ)
 
           RDFSolute(idg_CO2)=RMFGas(idg_CO2)+DIFLGas(idg_CO2)*&

@@ -139,53 +139,53 @@ implicit none
   REAL(R8),INTENT(INOUT) :: ShootC4NonstC_brch(NumOfCanopyLayers1,JP1)
   integer :: L,M,NR,NB,N,NE
 !     begin_execution
-  associate(                            &
-    jHarvst_pft                      =>   plt_distb%jHarvst_pft   , &
-    iYearPlanting_pft                =>   plt_distb%iYearPlanting_pft    , &
-    iDayPlanting_pft                 =>   plt_distb%iDayPlanting_pft   , &
-    EarStrutElms_brch                =>   plt_biom%EarStrutElms_brch  , &
-    CanopyNonstElms_brch             =>   plt_biom%CanopyNonstElms_brch   , &
-    StalkStrutElms_brch              =>   plt_biom%StalkStrutElms_brch  , &
-    HuskStrutElms_brch               =>   plt_biom%HuskStrutElms_brch  , &
-    PetoleStrutElms_brch             =>   plt_biom%PetoleStrutElms_brch , &
-    CanopyNodulStrutElms_brch        =>   plt_biom%CanopyNodulStrutElms_brch   , &
-    StalkRsrvElms_brch               =>   plt_biom%StalkRsrvElms_brch  , &
-    CanopyNodulNonstElms_brch        =>   plt_biom%CanopyNodulNonstElms_brch   , &
-    SeasonalNonstElms_pft                 =>   plt_biom%SeasonalNonstElms_pft    , &
-    GrainStrutElms_brch              =>   plt_biom%GrainStrutElms_brch   , &
-    RootMyco1stStrutElms_rpvr        =>   plt_biom%RootMyco1stStrutElms_rpvr   , &
-    LeafStrutElms_brch               =>   plt_biom%LeafStrutElms_brch  , &
-     RootMycoNonstElms_rpvr          =>   plt_biom%RootMycoNonstElms_rpvr   , &
-    StandDeadKCompElms_pft           =>   plt_biom%StandDeadKCompElms_pft   , &
-    RootMyco2ndStrutElms_rpvr        =>   plt_biom%RootMyco2ndStrutElms_rpvr   , &
-    FracShootStalkElmAlloc2Litr                           =>   plt_allom%FracShootStalkElmAlloc2Litr  , &
-    FracShootLeafElmAlloc2Litr                           =>   plt_allom%FracShootLeafElmAlloc2Litr  , &
-    FracRootStalkElmAlloc2Litr                           =>   plt_allom%FracRootStalkElmAlloc2Litr  , &
-    FracRootElmAlloc2Litr                           =>   plt_allom%FracRootElmAlloc2Litr  , &
-    doInitPlant_pft                  =>   plt_pheno%doInitPlant_pft   , &
-    iPlantPhenolPattern_pft          =>   plt_pheno%iPlantPhenolPattern_pft  , &
-    iPlantPhenolType_pft             =>   plt_pheno%iPlantPhenolType_pft  , &
-    iPlantRootState_pft              =>   plt_pheno%iPlantRootState_pft  , &
-    iPlantRootProfile_pft            =>   plt_pheno%iPlantRootProfile_pft  , &
-    iPlantTurnoverPattern_pft        =>   plt_pheno%iPlantTurnoverPattern_pft  , &
-    iPlantShootState_pft             =>   plt_pheno%iPlantShootState_pft   , &
-    icwood                           =>   pltpar%icwood     , &
-    ifoliar                          =>   pltpar%ifoliar    , &
-    k_fine_litr                      =>   pltpar%k_fine_litr, &
-    k_woody_litr                     =>   pltpar%k_woody_litr, &
-    LitrfalStrutElms_pvr              =>   plt_bgcr%LitrfalStrutElms_pvr     , &
-    inonfoliar                       =>   pltpar%inonfoliar   , &
-    istalk                           =>   pltpar%istalk     , &
-    iroot                            =>   pltpar%iroot      , &
-    inonstruct                       =>   pltpar%inonstruct   , &
-    LYRC                             =>   plt_site%LYRC     , &
-    MaxNumRootLays                   =>   plt_site%MaxNumRootLays       , &
-    NU                               =>   plt_site%NU       , &
-    ElmAllocmat4Litr                            =>   plt_soilchem%ElmAllocmat4Litr, &
-    MY                               =>   plt_morph%MY      , &
-    NGTopRootLayer_pft               =>   plt_morph%NGTopRootLayer_pft      , &
-    NumOfBranches_pft                =>   plt_morph%NumOfBranches_pft     , &
-    NumRootAxes_pft                  =>   plt_morph%NumRootAxes_pft      &
+  associate(                                                              &
+    jHarvst_pft                 => plt_distb%jHarvst_pft,                 &
+    iYearPlanting_pft           => plt_distb%iYearPlanting_pft,           &
+    iDayPlanting_pft            => plt_distb%iDayPlanting_pft,            &
+    EarStrutElms_brch           => plt_biom%EarStrutElms_brch,            &
+    CanopyNonstElms_brch        => plt_biom%CanopyNonstElms_brch,         &
+    StalkStrutElms_brch         => plt_biom%StalkStrutElms_brch,          &
+    HuskStrutElms_brch          => plt_biom%HuskStrutElms_brch,           &
+    PetoleStrutElms_brch        => plt_biom%PetoleStrutElms_brch,         &
+    CanopyNodulStrutElms_brch   => plt_biom%CanopyNodulStrutElms_brch,    &
+    StalkRsrvElms_brch          => plt_biom%StalkRsrvElms_brch,           &
+    CanopyNodulNonstElms_brch   => plt_biom%CanopyNodulNonstElms_brch,    &
+    SeasonalNonstElms_pft       => plt_biom%SeasonalNonstElms_pft,        &
+    GrainStrutElms_brch         => plt_biom%GrainStrutElms_brch,          &
+    RootMyco1stStrutElms_rpvr   => plt_biom%RootMyco1stStrutElms_rpvr,    &
+    LeafStrutElms_brch          => plt_biom%LeafStrutElms_brch,           &
+    RootMycoNonstElms_rpvr      => plt_biom%RootMycoNonstElms_rpvr,       &
+    StandDeadKCompElms_pft      => plt_biom%StandDeadKCompElms_pft,       &
+    RootMyco2ndStrutElms_rpvr   => plt_biom%RootMyco2ndStrutElms_rpvr,    &
+    FracShootStalkElmAlloc2Litr => plt_allom%FracShootStalkElmAlloc2Litr, &
+    FracShootLeafElmAlloc2Litr  => plt_allom%FracShootLeafElmAlloc2Litr,  &
+    FracRootStalkElmAlloc2Litr  => plt_allom%FracRootStalkElmAlloc2Litr,  &
+    FracRootElmAlloc2Litr       => plt_allom%FracRootElmAlloc2Litr,       &
+    doInitPlant_pft             => plt_pheno%doInitPlant_pft,             &
+    iPlantPhenolPattern_pft     => plt_pheno%iPlantPhenolPattern_pft,     &
+    iPlantPhenolType_pft        => plt_pheno%iPlantPhenolType_pft,        &
+    iPlantRootState_pft         => plt_pheno%iPlantRootState_pft,         &
+    iPlantRootProfile_pft       => plt_pheno%iPlantRootProfile_pft,       &
+    iPlantTurnoverPattern_pft   => plt_pheno%iPlantTurnoverPattern_pft,   &
+    iPlantShootState_pft        => plt_pheno%iPlantShootState_pft,        &
+    icwood                      => pltpar%icwood,                         &
+    ifoliar                     => pltpar%ifoliar,                        &
+    k_fine_litr                 => pltpar%k_fine_litr,                    &
+    k_woody_litr                => pltpar%k_woody_litr,                   &
+    LitrfalStrutElms_pvr        => plt_bgcr%LitrfalStrutElms_pvr,         &
+    inonfoliar                  => pltpar%inonfoliar,                     &
+    istalk                      => pltpar%istalk,                         &
+    iroot                       => pltpar%iroot,                          &
+    inonstruct                  => pltpar%inonstruct,                     &
+    LYRC                        => plt_site%LYRC,                         &
+    MaxNumRootLays              => plt_site%MaxNumRootLays,               &
+    NU                          => plt_site%NU,                           &
+    ElmAllocmat4Litr            => plt_soilchem%ElmAllocmat4Litr,         &
+    MY                          => plt_morph%MY,                          &
+    NGTopRootLayer_pft          => plt_morph%NGTopRootLayer_pft,          &
+    NumOfBranches_pft           => plt_morph%NumOfBranches_pft,           &
+    NumRootAxes_pft             => plt_morph%NumRootAxes_pft      &
   )
 !     LitrFall AND STATE VARIABLES FOR SEASONAL STORAGE
 !     RESERVES FROM SHOOT AT DEATH
@@ -306,7 +306,7 @@ implicit none
 !     LYRC=number of days in current year
 !     iDayPlanting_pft,iYearPlanting_pft=day,year of planting
 !
-    IF(iPlantPhenolPattern_pft(NZ).NE.iplt_annual.AND.jHarvst_pft(NZ).EQ.jharvtyp_noaction)THEN
+    IF(iPlantPhenolPattern_pft(NZ).NE.iplt_annual .AND. jHarvst_pft(NZ).EQ.jharvtyp_noaction)THEN
       IF(I.LT.LYRC)THEN
         iDayPlanting_pft(NZ)=I+1
         iYearPlanting_pft(NZ)=iYearCurrent

@@ -14,7 +14,7 @@ module RootDataType
   integer,target,allocatable ::  NIXBotRootLayer_rpft(:,:,:,:)                   !maximum soil layer number for root axes, [-]
   integer,target,allocatable ::  iPlantRootState_pft(:,:,:)                      !flag to detect root system death , [-]
   integer,target,allocatable ::  NIXBotRootLayer_pft(:,:,:)              !maximum soil layer number for all root axes, [-]
-  integer,target,allocatable ::  MaxSoiL4Root(:,:,:)                           !maximum soil layer number for all root axes, [-]
+  integer,target,allocatable ::  MaxSoiL4Root_pft(:,:,:)                           !maximum soil layer number for all root axes, [-]
   real(r8),target,allocatable :: RootElmsbeg_pft(:,:,:,:)            !root biomass per pft
   real(r8),target,allocatable ::  RootBiomGrosYld_pft(:,:,:)                        !root growth yield, [g g-1]
   real(r8),target,allocatable ::  MinNonstC2InitRoot_pft(:,:,:)                          !threshold root nonstructural C content for initiating new root axis, [g g-1]
@@ -30,7 +30,7 @@ module RootDataType
   real(r8),target,allocatable ::  RootPorosity_pft(:,:,:,:)                      !root porosity, [m3 m-3]
   real(r8),target,allocatable ::  RoottRadialResist_pft(:,:,:,:)                      !root radial resistivity, [MPa h m-2]
   real(r8),target,allocatable ::  RoottAxialResist_pft(:,:,:,:)                      !root axial resistivity, [MPa h m-4]
-  real(r8),target,allocatable ::  ShutRutNonstructElmntConducts_pft(:,:,:)                       !shoot-root rate constant for nonstructural C exchange, [h-1]
+  real(r8),target,allocatable ::  ShutRutNonstElmntConducts_pft(:,:,:)                       !shoot-root rate constant for nonstructural C exchange, [h-1]
   real(r8),target,allocatable ::  VmaxNH4Root_pft(:,:,:,:)                    !maximum root NH4 uptake rate, [g m-2 h-1]
   real(r8),target,allocatable ::  KmNH4Root_pft(:,:,:,:)                    !Km for root NH4 uptake, [g m-3]
   real(r8),target,allocatable ::  CMinNH4Root_pft(:,:,:,:)                    !minimum NH4 concentration for root NH4 uptake, [g m-3]
@@ -99,7 +99,7 @@ contains
   allocate(NIXBotRootLayer_rpft(MaxNumRootAxes,JP,JY,JX));  NIXBotRootLayer_rpft=1  !set to one to avoid numerical failure
   allocate(iPlantRootState_pft(JP,JY,JX));    iPlantRootState_pft=iDead
   allocate(NIXBotRootLayer_pft(JP,JY,JX));      NIXBotRootLayer_pft=0
-  allocate(MaxSoiL4Root(JP,JY,JX));       MaxSoiL4Root=0
+  allocate(MaxSoiL4Root_pft(JP,JY,JX));       MaxSoiL4Root_pft=0
   allocate(RootElmsbeg_pft(NumPlantChemElms,JP,JY,JX)); RootElmsbeg_pft=0._r8
   allocate(RootBiomGrosYld_pft(JP,JY,JX));     RootBiomGrosYld_pft=0._r8
   allocate(MinNonstC2InitRoot_pft(JP,JY,JX));       MinNonstC2InitRoot_pft=0._r8
@@ -115,7 +115,7 @@ contains
   allocate(RootPorosity_pft(jroots,JP,JY,JX));   RootPorosity_pft=0._r8
   allocate(RoottRadialResist_pft(jroots,JP,JY,JX));   RoottRadialResist_pft=0._r8
   allocate(RoottAxialResist_pft(jroots,JP,JY,JX));   RoottAxialResist_pft=0._r8
-  allocate(ShutRutNonstructElmntConducts_pft(JP,JY,JX));    ShutRutNonstructElmntConducts_pft=0._r8
+  allocate(ShutRutNonstElmntConducts_pft(JP,JY,JX));    ShutRutNonstElmntConducts_pft=0._r8
   allocate(VmaxNH4Root_pft(jroots,JP,JY,JX)); VmaxNH4Root_pft=0._r8
   allocate(KmNH4Root_pft(jroots,JP,JY,JX)); KmNH4Root_pft=0._r8
   allocate(CMinNH4Root_pft(jroots,JP,JY,JX)); CMinNH4Root_pft=0._r8
@@ -182,7 +182,7 @@ contains
   call destroy(NIXBotRootLayer_rpft)
   call destroy(iPlantRootState_pft)
   call destroy(NIXBotRootLayer_pft)
-  call destroy(MaxSoiL4Root)
+  call destroy(MaxSoiL4Root_pft)
   call destroy(RootElmsbeg_pft)
   call destroy(RootBiomGrosYld_pft)
   call destroy(MinNonstC2InitRoot_pft)
@@ -198,7 +198,7 @@ contains
   call destroy(RootPorosity_pft)
   call destroy(RoottRadialResist_pft)
   call destroy(RoottAxialResist_pft)
-  call destroy(ShutRutNonstructElmntConducts_pft)
+  call destroy(ShutRutNonstElmntConducts_pft)
   call destroy(VmaxNH4Root_pft)
   call destroy(KmNH4Root_pft)
   call destroy(CMinNH4Root_pft)

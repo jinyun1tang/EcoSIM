@@ -123,7 +123,7 @@ implicit none
   if (len_trim(pft_mgmt_in)==0)then
     return
   else
-  !  print*,'ReadPlantManagementNC'
+!    write(199,*)'ReadPlantManagementNC'
   ! initialize the disturbance arrays
     DO NX=NHW,NHE
       DO NY=NVN,NVS
@@ -153,7 +153,7 @@ implicit none
 
     call check_ret(nf90_get_var(pftinfo_nfid%fh, vardesc%varid, pft_dflag), &
       trim(mod_filename)//'::at line '//trim(int2str(__LINE__)))
-
+!    write(199,*)'pppft_dflag=',pft_dflag,IGO
     if(pft_dflag==0)then
       ! constant pft data
       iyear=1
@@ -449,7 +449,7 @@ implicit none
   call ncd_getvar(pft_nfid, 'PR', loc,MinNonstC2InitRoot_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'RSRR', loc,RoottRadialResist_pft(1,NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'RSRA', loc,RoottAxialResist_pft(1,NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'PTSHT', loc,ShutRutNonstructElmntConducts_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'PTSHT', loc,ShutRutNonstElmntConducts_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'RTFQ', loc,RootBranchFreq_pft(NZ,NY,NX))
 
   call ncd_getvar(pft_nfid, 'UPMXZH', loc,VmaxNH4Root_pft(ipltroot,NZ,NY,NX))
@@ -798,7 +798,7 @@ implicit none
   call writefixl(nu_plt,'radial root resistivity for water uptake (m2 MPa-1 h-1) RSRR',RoottRadialResist_pft(1,NZ,NY,NX),73)
   call writefixl(nu_plt,'axial root resistivity for water uptake (m2 MPa-1 h-1) RSRA',RoottAxialResist_pft(1,NZ,NY,NX),73)
   call writefixl(nu_plt,'rate constant for equilibrating shoot-root '// &
-    'nonstructural C concn PTSHT',ShutRutNonstructElmntConducts_pft(NZ,NY,NX),73)
+    'nonstructural C concn PTSHT',ShutRutNonstElmntConducts_pft(NZ,NY,NX),73)
   call writefixl(nu_plt,'root branching frequency (m-1) RTFQ',RootBranchFreq_pft(NZ,NY,NX),73)
   end subroutine Root_trait_disp
 

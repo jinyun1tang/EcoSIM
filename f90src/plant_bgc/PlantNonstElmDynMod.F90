@@ -243,7 +243,7 @@ module PlantNonstElmDynMod
   real(r8) :: mass_finale(NumPlantChemElms)
 
   associate(                                                          &
-    MaxSoiL4Root              => plt_morph%MaxSoiL4Root,              &
+    MaxSoiL4Root_pft              => plt_morph%MaxSoiL4Root_pft,              &
     SeasonalNonstElms_pft     => plt_biom%SeasonalNonstElms_pft,      &
     NU                        => plt_site%NU,                         &
     MY                        => plt_morph%MY,                        &
@@ -253,11 +253,11 @@ module PlantNonstElmDynMod
     RootMycoNonstElms_rpvr    => plt_biom%RootMycoNonstElms_rpvr      &
   )
     DO NE=1,NumPlantChemElms
-      mass_inital(NE)=sum(RootMycoNonstElms_rpvr(NE,1:MY(NZ),NU:MaxSoiL4Root(NZ),NZ))+SeasonalNonstElms_pft(NE,NZ)
+      mass_inital(NE)=sum(RootMycoNonstElms_rpvr(NE,1:MY(NZ),NU:MaxSoiL4Root_pft(NZ),NZ))+SeasonalNonstElms_pft(NE,NZ)
     ENDDO
 
     D5545: DO N=1,MY(NZ)
-      D5550: DO L=NU,MaxSoiL4Root(NZ)
+      D5550: DO L=NU,MaxSoiL4Root_pft(NZ)
         IF(RootNonstructElmConc_pvr(ielmc,N,L,NZ).GT.ZERO)THEN
           CNL=RootNonstructElmConc_pvr(ielmc,N,L,NZ)/(RootNonstructElmConc_pvr(ielmc,N,L,NZ) &
             +RootNonstructElmConc_pvr(ielmn,N,L,NZ)/CNKI)
@@ -281,7 +281,7 @@ module PlantNonstElmDynMod
       ENDDO D5550      
     ENDDO D5545
     DO NE=1,NumPlantChemElms
-      mass_finale(NE)=sum(RootMycoNonstElms_rpvr(NE,1:MY(NZ),NU:MaxSoiL4Root(NZ),NZ))+SeasonalNonstElms_pft(NE,NZ)
+      mass_finale(NE)=sum(RootMycoNonstElms_rpvr(NE,1:MY(NZ),NU:MaxSoiL4Root_pft(NZ),NZ))+SeasonalNonstElms_pft(NE,NZ)
     ENDDO
 
   end associate
@@ -340,7 +340,7 @@ module PlantNonstElmDynMod
     iPlantRootProfile_pft             => plt_pheno%iPlantRootProfile_pft,             &
     iPlantBranchState_brch            => plt_pheno%iPlantBranchState_brch,            &
     iPlantPhenolPattern_pft           => plt_pheno%iPlantPhenolPattern_pft,           &
-    ShutRutNonstructElmntConducts_pft => plt_pheno%ShutRutNonstructElmntConducts_pft, &
+    ShutRutNonstElmntConducts_pft     => plt_pheno%ShutRutNonstElmntConducts_pft,     &
     RootCO2Autor_pvr                  => plt_rbgc%RootCO2Autor_pvr,                   &
     ECO_ER_col                        => plt_bgcr%ECO_ER_col,                         &
     Eco_AutoR_col                     => plt_bgcr%Eco_AutoR_col,                      &
@@ -349,7 +349,7 @@ module PlantNonstElmDynMod
     NIXBotRootLayer_pft               => plt_morph%NIXBotRootLayer_pft,               &
     NIXBotRootLayer_rpft              => plt_morph%NIXBotRootLayer_rpft,              &
     Root2ndRadius_pvr                 => plt_morph%Root2ndRadius_pvr,                 &
-    MaxSoiL4Root                      => plt_morph%MaxSoiL4Root,                      &
+    MaxSoiL4Root_pft                      => plt_morph%MaxSoiL4Root_pft,                      &
     NumRootAxes_pft                   => plt_morph%NumRootAxes_pft,                   &
     NumOfBranches_pft                 => plt_morph%NumOfBranches_pft                  &
   )  
@@ -363,7 +363,7 @@ module PlantNonstElmDynMod
 !     Eco_AutoR_col=total autotrophic respiration
 !
   D5445: DO N=1,MY(NZ)
-    D5450: DO L=NU,MaxSoiL4Root(NZ)
+    D5450: DO L=NU,MaxSoiL4Root_pft(NZ)
       RootMycoActiveBiomC_pvr(N,L,NZ)=0._r8
       PopuRootMycoC_pvr(N,L,NZ)=0._r8
       D5460: DO NR=1,NumRootAxes_pft(NZ)
@@ -407,7 +407,7 @@ module PlantNonstElmDynMod
 !     FWTC=1.0_r8
 !     FWTS=1.0_r8
 !     ENDIF
-  D290: DO L=NU,MaxSoiL4Root(NZ)
+  D290: DO L=NU,MaxSoiL4Root_pft(NZ)
     IF(RootSinkC(ipltroot).GT.ZERO4Groth_pft(NZ))THEN
       RootSinkWeight_pft(L)=AZMAX1(RootSinkC_vr(ipltroot,L)/RootSinkC(ipltroot))
     ELSE
@@ -432,8 +432,8 @@ module PlantNonstElmDynMod
 !     iPlantPhenolPattern_pft=growth habit:0=annual,1=perennial from PFT file
 !     iPlantCalendar_brch(ipltcal_SetSeedNumber,=end date for setting final seed number
 !     BranchSinkWeight_pft=branch sink weighting factor
-!     ShutRutNonstructElmntConducts_pft=rate constant for equilibrating shoot-root nonstructural C concn from PFT file
-!     PTRT=allocation to leaf+petiole used to modify ShutRutNonstructElmntConducts_pftin annuals
+!     ShutRutNonstElmntConducts_pft=rate constant for equilibrating shoot-root nonstructural C concn from PFT file
+!     PTRT=allocation to leaf+petiole used to modify ShutRutNonstElmntConducts_pft,in annuals
 !     FWTC,FWTS,FWTR=canopy,root system,root layer sink weighting factor
 !     FWOOD,FWOODN,FWOODP=C,N,P woody fraction in root:0=woody,1=non-woody
 !     FWODB=C woody fraction in branch:0=woody,1=non-woody
@@ -442,7 +442,7 @@ module PlantNonstElmDynMod
 !     CPOOLR,ZPOOLR,PPOOLR=non-structural C,N,P mass in root
 !
     DO NE=1,NumPlantChemElms
-      mass_inital(NE)=sum(RootMycoNonstElms_rpvr(NE,1:MY(NZ),NU:MaxSoiL4Root(NZ),NZ)) &
+      mass_inital(NE)=sum(RootMycoNonstElms_rpvr(NE,1:MY(NZ),NU:MaxSoiL4Root_pft(NZ),NZ)) &
         +SUM(CanopyNonstElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
     ENDDO
 
@@ -454,12 +454,12 @@ module PlantNonstElmDynMod
         BranchSinkWeight_pft(NB)=1.0_r8
       ENDIF
       IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual)THEN
-        PTSHTR=ShutRutNonstructElmntConducts_pft(NZ)*PTRT**0.167_r8
+        PTSHTR=ShutRutNonstElmntConducts_pft(NZ)*PTRT**0.167_r8
       ELSE
-        PTSHTR=ShutRutNonstructElmntConducts_pft(NZ)
+        PTSHTR=ShutRutNonstElmntConducts_pft(NZ)
       ENDIF
 
-      D415: DO L=NU,MaxSoiL4Root(NZ)
+      D415: DO L=NU,MaxSoiL4Root_pft(NZ)
         WTLSBX=LeafPetolBiomassC_brch(NB,NZ)*FracShootLeafElmAlloc2Litr(ielmc,k_fine_litr)*RootSinkWeight_pft(L)*FWTC
         WTRTLX=RootMycoActiveBiomC_pvr(ipltroot,L,NZ)*FracRootElmAlloc2Litr(ielmc,k_fine_litr)*BranchSinkWeight_pft(NB)*FWTS
         WTLSBB=AZMAX1(WTLSBX,FSNK*WTRTLX)
@@ -495,7 +495,7 @@ module PlantNonstElmDynMod
     ENDIF
   ENDDO D310
   DO NE=1,NumPlantChemElms
-    mass_finale(NE)=sum(RootMycoNonstElms_rpvr(NE,1:MY(NZ),NU:MaxSoiL4Root(NZ),NZ)) &
+    mass_finale(NE)=sum(RootMycoNonstElms_rpvr(NE,1:MY(NZ),NU:MaxSoiL4Root_pft(NZ),NZ)) &
       +SUM(CanopyNonstElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
   ENDDO
   end associate
@@ -695,9 +695,9 @@ module PlantNonstElmDynMod
     RootMycoNonstElms_rpvr  => plt_biom%RootMycoNonstElms_rpvr,   &
     ZERO4Groth_pft          => plt_biom%ZERO4Groth_pft,           &
     iPlantPhenolPattern_pft => plt_pheno%iPlantPhenolPattern_pft, &
-    MaxSoiL4Root            => plt_morph%MaxSoiL4Root             &
+    MaxSoiL4Root_pft            => plt_morph%MaxSoiL4Root_pft             &
   )
-  D2050: DO L=NU,MaxSoiL4Root(NZ)
+  D2050: DO L=NU,MaxSoiL4Root_pft(NZ)
     IF(VLSoilPoreMicP_vr(L).GT.ZEROS2)THEN
       WTRTRX=AMAX1(ZERO4Groth_pft(NZ),RootMycoActiveBiomC_pvr(ipltroot,L,NZ)*FracRootElmAlloc2Litr(ielmc,k_woody_litr))
       WTPLTX=WTRTRX+StalkBiomassC_brch(NB,NZ)

@@ -11,7 +11,7 @@ module LandSurfDataType
   real(r8) :: ALTIG                             !altitude of landscape, [m]
 
   real(r8),target,allocatable ::  SoiSurfRoughnesst0(:,:)                            !initial soil surface roughness height, [m]
-  real(r8),target,allocatable ::  ZERO4Groth_pftlanDisp(:,:)                            !zero plane displacement height, [m]
+  real(r8),target,allocatable ::  ZERO4PlantDisplace_col(:,:)                            !zero plane displacement height, [m]
   real(r8),target,allocatable ::  RoughHeight(:,:)                   !canopy surface roughness height, [m]
   real(r8),target,allocatable ::  SoiSurfRoughness(:,:)                            ! soil surface roughness height for calculating runoff velocity, [m]
   real(r8),target,allocatable ::  WindMesHeight(:,:)                            !wind speed measurement height, [m]
@@ -41,7 +41,7 @@ contains
 
   implicit none
   allocate(SoiSurfRoughnesst0(JY,JX));          SoiSurfRoughnesst0=0._r8
-  allocate(ZERO4Groth_pftlanDisp(JY,JX));          ZERO4Groth_pftlanDisp=0._r8
+  allocate(ZERO4PlantDisplace_col(JY,JX));          ZERO4PlantDisplace_col=0._r8
   allocate(RoughHeight(JY,JX));          RoughHeight=0._r8
   allocate(SoiSurfRoughness(JY,JX));          SoiSurfRoughness=0._r8
   allocate(WindMesHeight(JY,JX));          WindMesHeight=0._r8
@@ -72,7 +72,7 @@ contains
   use abortutils, only : destroy
   implicit none
   call destroy(SoiSurfRoughnesst0)
-  call destroy(ZERO4Groth_pftlanDisp)
+  call destroy(ZERO4PlantDisplace_col)
   call destroy(RoughHeight)
   call destroy(SoiSurfRoughness)
   call destroy(WindMesHeight)

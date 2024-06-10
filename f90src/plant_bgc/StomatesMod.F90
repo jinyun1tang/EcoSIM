@@ -52,7 +52,7 @@
     CO2E                       =>  plt_site%CO2E                        , &
     CanopyGasCO2_pft           =>  plt_photo%CanopyGasCO2_pft           , &
     CanopyLeafArea_pft         =>  plt_morph%CanopyLeafArea_pft         , &
-    ZERO4Groth_pft                      =>  plt_biom%ZERO4Groth_pft                       , &
+    ZERO4Groth_pft             =>  plt_biom%ZERO4Groth_pft              , &
     NetCO2Flx2Canopy_col       =>  plt_bgcr%NetCO2Flx2Canopy_col        , &
     SineSunInclAngle_col       =>  plt_rad%SineSunInclAngle_col         , &
     AirConc_pft                =>  plt_photo%AirConc_pft                , &
@@ -303,7 +303,7 @@
 !     begin_execution
   associate(                                                                       &
     LeafElmntNode_brch             =>  plt_biom%LeafElmntNode_brch               , &
-    ZERO4Groth_pft                          =>  plt_biom%ZERO4Groth_pft                            , &
+    ZERO4Groth_pft                 =>  plt_biom%ZERO4Groth_pft                   , &
     CanopyLeafArea_lpft            =>  plt_morph%CanopyLeafArea_lpft             , &
     C4PhotosynDowreg_brch          =>  plt_photo%C4PhotosynDowreg_brch           , &
     LeafC4ChlorofilConc_pft        =>  plt_photo%LeafC4ChlorofilConc_pft         , &

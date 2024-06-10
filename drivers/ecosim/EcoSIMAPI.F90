@@ -75,7 +75,7 @@ contains
   !   CALCULATE ADDITIONAL SOLUTE FLUXES IN 'TranspSalt' IF SALT OPTION SELECTED
   !
   if(lverb)WRITE(*,334)'TRNS'
-  !    if(I>=170)print*,TKS(0,NVN,NHW)'
+
   if(salt_model)then
     call start_timer(t1)
     CALL TranspSalt(I,J,NHW,NHE,NVN,NVS)
@@ -86,7 +86,7 @@ contains
   !   CALCULATE SOIL SEDIMENT TRANSPORT IN 'EROSION'
   !
   if(lverb)WRITE(*,334)'EROSION'
-  !    if(I>=170)print*,TKS(0,NVN,NHW)
+
   call start_timer(t1)
   CALL EROSION(I,J,NHW,NHE,NVN,NVS)
   call end_timer('EROSION',t1)
@@ -94,15 +94,14 @@ contains
   !   UPDATE ALL SOIL STATE VARIABLES FOR WATER, HEAT, GAS, SOLUTE
   !   AND SEDIMENT FLUXES IN 'REDIST'
   !
-  if(TKS(2,1,1)>400.)PRINT*,'bfTKS',TKS(2,1,1)
   if(lverb)WRITE(*,334)'RED'
 
-  !    if(I>=170)print*,TKS(0,NVN,NHW)
+
   call start_timer(t1)
-  if(TKS(2,1,1)>400.)PRINT*,'xrediTKS',TKS(2,1,1)
+
   CALL REDIST(I,J,NHW,NHE,NVN,NVS)
   call end_timer('RED',t1)
-  if(TKS(2,1,1)>400.)PRINT*,'rediTKS',TKS(2,1,1)
+
 334   FORMAT(A8)
 
   end subroutine Run_EcoSIM_one_step
@@ -312,8 +311,8 @@ subroutine soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
 
   call etimer%get_ymdhs(ymdhs)
 
+
   IF(ymdhs(1:4)==frectyp%ymdhs0(1:4))THEN
-!   the first simulation year
     if(lverb)WRITE(*,333)'STARTS'
     CALL STARTS(NHW,NHE,NVN,NVS)
 !
@@ -321,6 +320,7 @@ subroutine soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
 !   IN 'ROUTS' IF NEEDED
 
   ENDIF
+  
 !
   if(plant_model)then
     !plant information is read in every year, but the active flags
@@ -336,10 +336,9 @@ subroutine soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
     !initialize by year
     if(lverb)WRITE(*,333)'STARTQ'
     CALL STARTQ(NHW,NHE,NVN,NVS,1,JP)
-
   ENDIF
-
-  if(soichem_model)then
+  
+  if(ymdhs(1:4)==frectyp%ymdhs0(1:4) .and. soichem_model)then
 ! INITIALIZE ALL SOIL CHEMISTRY VARIABLES IN 'STARTE'
 ! This is done done every year, because tracer concentrations
 ! in rainfall vary every year. In a more reasonable way, e.g.,
@@ -361,9 +360,9 @@ subroutine soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
 
     DO J=1,24
       call etimer%get_ymdhs(ymdhs)
-
+      
       if(ymdhs==frectyp%ymdhs0)then
-        frectyp%lskip_loop=.false.
+        frectyp%lskip_loop=.false.        
         if(is_restart())then
           call restFile(flag='read')
         endif
@@ -415,9 +414,9 @@ subroutine soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
 !
 ! PERFORM MASS AND ENERGY BALANCE CHECKS IN 'EXEC'
 !
+    if(frectyp%lskip_loop)cycle
     if(lverb)WRITE(*,333)'EXEC'
     CALL EXEC(I)
-!
 
     if(do_bgcforc_write)then
       call WriteBBGCFORC(I,IYRR)

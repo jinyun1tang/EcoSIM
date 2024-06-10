@@ -336,6 +336,8 @@ module grosubsMod
     NumOfBranches_pft         => plt_morph%NumOfBranches_pft          , &
     NumRootAxes_pft           => plt_morph%NumRootAxes_pft              &
   )
+
+
   IF(iPlantShootState_pft(NZ).EQ.iLive .OR. iPlantRootState_pft(NZ).EQ.iLive)THEN
     CanopyN2Fix_pft(NZ)=0._r8
     BegRemoblize = 0
@@ -351,7 +353,7 @@ module grosubsMod
 !     iPlantBranchState_brch=branch living flag: 0=alive,1=dead
 !
 !    call SumPlantBiom(I,J,NZ,'bfgrowpbrch')
-    
+
     DO  NB=1,NumOfBranches_pft(NZ)
       call GrowOneBranch(I,J,NB,NZ,TFN6_vr,CanopyHeight_copy,CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW,&
         TFN5,WFNG,Stomata_Stress,WFNS,CanTurgPSIFun4Expans,PTRT,CanopyN2Fix_pft,BegRemoblize)
@@ -572,7 +574,7 @@ module grosubsMod
   associate(                                                             &
     NU                             =>  plt_site%NU                     , &  
     MY                             =>  plt_morph%MY                    , &        
-    MaxSoiL4Root                   =>  plt_morph%MaxSoiL4Root          , &    
+    MaxSoiL4Root_pft                   =>  plt_morph%MaxSoiL4Root_pft          , &    
     NumRootAxes_pft                =>  plt_morph%NumRootAxes_pft       , &
     MaxNumRootLays                 =>  plt_site%MaxNumRootLays         , &        
     RootMycoNonstElms_rpvr         =>  plt_biom%RootMycoNonstElms_rpvr , &
@@ -582,7 +584,7 @@ module grosubsMod
   call SumPlantBiom(I,J,NZ,'computotb')
 ! add the nonstrucal components
   D3451: DO N=1,MY(NZ)
-    DO  L=NU,MaxSoiL4Root(NZ)
+    DO  L=NU,MaxSoiL4Root_pft(NZ)
       PopuRootMycoC_pvr(N,L,NZ)=PopuRootMycoC_pvr(N,L,NZ)+RootMycoNonstElms_rpvr(ielmc,N,L,NZ)
     enddo
   ENDDO D3451
@@ -648,7 +650,7 @@ module grosubsMod
     NU                            =>  plt_site%NU                        , &
     NumOfBranches_pft             =>  plt_morph%NumOfBranches_pft        , &
     MY                            =>  plt_morph%MY                       , &
-    MaxSoiL4Root                  =>  plt_morph%MaxSoiL4Root             , &
+    MaxSoiL4Root_pft                  =>  plt_morph%MaxSoiL4Root_pft             , &
     NumRootAxes_pft               =>  plt_morph%NumRootAxes_pft          , &
     LeafAreaLive_brch             =>  plt_morph%LeafAreaLive_brch        , &
     CanopyStemArea_pft            =>  plt_morph%CanopyStemArea_pft       , &
@@ -729,8 +731,8 @@ module grosubsMod
       ENDDO
     ELSEIF(is_root_N2fix(iPlantNfixType(NZ)))THEN
       DO NE=1,NumPlantChemElms
-        RootNodulElms_pft(NE,NZ)=sum(RootNodulStrutElms_pvr(NE,NU:MaxSoiL4Root(NZ),NZ))+&
-          sum(RootNodulNonstElms_pvr(NE,NU:MaxSoiL4Root(NZ),NZ))
+        RootNodulElms_pft(NE,NZ)=sum(RootNodulStrutElms_pvr(NE,NU:MaxSoiL4Root_pft(NZ),NZ))+&
+          sum(RootNodulNonstElms_pvr(NE,NU:MaxSoiL4Root_pft(NZ),NZ))
       ENDDO
     ENDIF
   ENDIF
