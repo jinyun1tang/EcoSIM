@@ -91,9 +91,11 @@ module grosubsMod
 !
   D9985: DO NZ=1,NP
 
-! IsPlantActive_pft= flag for living pft
+    ! IsPlantActive_pft= flag for living pft
     IF(IsPlantActive_pft(NZ).EQ.iActive)THEN
       call GrowPlant(I,J,NZ,CanopyHeight_copy)
+    else
+      call ZeroPlantStates(I,J,NZ)  
     ENDIF
 
 !    call SumPlantBiom(I,J,NZ,'bfdistb')
@@ -650,7 +652,7 @@ module grosubsMod
     NU                            =>  plt_site%NU                        , &
     NumOfBranches_pft             =>  plt_morph%NumOfBranches_pft        , &
     MY                            =>  plt_morph%MY                       , &
-    MaxSoiL4Root_pft                  =>  plt_morph%MaxSoiL4Root_pft             , &
+    MaxSoiL4Root_pft              =>  plt_morph%MaxSoiL4Root_pft         , &
     NumRootAxes_pft               =>  plt_morph%NumRootAxes_pft          , &
     LeafAreaLive_brch             =>  plt_morph%LeafAreaLive_brch        , &
     CanopyStemArea_pft            =>  plt_morph%CanopyStemArea_pft       , &
@@ -693,7 +695,6 @@ module grosubsMod
     EarStrutElms_pft(NE,NZ)=sum(EarStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
     !root state variables
     !sum structural biomass
-
   ENDDO
 !  if(NZ==1)THEN
 !  write(111,*)I+J/24.,'tree',CanopyNonstElms_pft(:,NZ)
@@ -705,7 +706,7 @@ module grosubsMod
   CanopySeedNum_pft(NZ) =sum(SeedNumSet_brch(1:NumOfBranches_pft(NZ),NZ))
   CanopyLeafArea_pft(NZ)=sum(LeafAreaLive_brch(1:NumOfBranches_pft(NZ),NZ))
   CanopyStemArea_pft(NZ)=sum(CanopyStalkArea_lbrch(1:NumOfCanopyLayers1,1:NumOfBranches_pft(NZ),NZ))
-  CanopyStemAreaZ_pft(1:NumOfCanopyLayers1,1:NZ)=0._r8
+  CanopyStemAreaZ_pft(1:NumOfCanopyLayers1,NZ)=0._r8
 
   DO NB=1,NumOfBranches_pft(NZ)
     DO L=1,NumOfCanopyLayers1
@@ -764,5 +765,35 @@ module grosubsMod
   end associate
   end subroutine AccumulateStates
 
+!------------------------------------------------------------------------------------------
+
+  subroutine ZeroPlantStates(I,J,NZ)  
+  implicit none
+  integer, intent(in) :: I,J,NZ
+
+  integer :: NE
+  DO NE=1,NumPlantChemElms
+    plt_biom%CanopyNonstElms_pft(NE,NZ)=0._r8
+    plt_biom%StalkRsrvElms_pft(NE,NZ)=0._r8
+    plt_biom%ShootStrutElms_pft(NE,NZ)=0._r8
+    plt_biom%PetioleStrutElms_pft(NE,NZ)=0._r8
+    plt_biom%StalkStrutElms_pft(NE,NZ)=0._r8
+    plt_biom%LeafStrutElms_pft(NE,NZ)=0._r8
+    plt_biom%HuskStrutElms_pft(NE,NZ)=0._r8
+    plt_biom%GrainStrutElms_pft(NE,NZ)=0._r8
+    plt_biom%EarStrutElms_pft(NE,NZ)=0._r8
+    plt_biom%CanopyNodulElms_pft(NE,NZ)=0._r8
+    plt_biom%RootNodulElms_pft(NE,NZ)=0._r8
+    plt_rbgc%PlantRootSoilElmNetX_pft(NE,NZ)=0._r8
+  ENDDO
+
+  plt_biom%CanopyStalkC_pft(NZ)=0._r8
+  plt_biom%CanopyLeafShethC_pft(NZ) =0._r8
+  plt_morph%CanopySeedNum_pft(NZ) =0._r8
+  plt_morph%CanopyLeafArea_pft(NZ)=0._r8
+  plt_morph%CanopyStemArea_pft(NZ)=0._r8
+  plt_morph%CanopyStemAreaZ_pft(1:NumOfCanopyLayers1,NZ)=0._r8
+
+  end subroutine ZeroPlantStates
 
 end module grosubsMod

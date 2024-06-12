@@ -74,7 +74,7 @@ module PlantDataRateType
   real(r8),target,allocatable ::  PlantRootSoilElmNetX_pft(:,:,:,:)                    !net root element uptake (+ve) - exudation (-ve), [g d-2 h-1]
   real(r8),target,allocatable ::  PlantExudChemElmCum_pft(:,:,:,:)                    !total net root element uptake (+ve) - exudation (-ve), [g d-2 ]
   real(r8),target,allocatable ::  GridPlantRootH2OUptake_vr(:,:,:)                      !total root water uptake, [m3 d-2]
-  real(r8),target,allocatable ::  THeatRootUptake(:,:,:)                       !total root heat uptake, [MJ d-2]
+  real(r8),target,allocatable ::  THeatRootUptake_vr(:,:,:)                       !total root heat uptake, [MJ d-2]
   real(r8),target,allocatable ::  trcg_air2root_flx_vr(:,:,:,:)                 !total internal root gas flux , [g d-2 h-1]
   real(r8),target,allocatable ::  trcg_root_vr(:,:,:,:)                  !total root internal gas flux, [g d-2 h-1]
   real(r8),target,allocatable ::  trcs_plant_uptake_vr(:,:,:,:)      !total root-soil solute flux, [g d-2 h-1]
@@ -188,7 +188,7 @@ module PlantDataRateType
   allocate(PlantRootSoilElmNetX_pft(NumPlantChemElms,JP,JY,JX));   PlantRootSoilElmNetX_pft=0._r8
   allocate(PlantExudChemElmCum_pft(NumPlantChemElms,JP,JY,JX));   PlantExudChemElmCum_pft=0._r8
   allocate(GridPlantRootH2OUptake_vr(0:JZ,JY,JX)); GridPlantRootH2OUptake_vr=0._r8
-  allocate(THeatRootUptake(0:JZ,JY,JX));  THeatRootUptake=0._r8
+  allocate(THeatRootUptake_vr(0:JZ,JY,JX));  THeatRootUptake_vr=0._r8
   allocate(trcg_air2root_flx_vr(idg_beg:idg_end-1,JZ,JY,JX));   trcg_air2root_flx_vr=0._r8
   allocate(trcg_root_vr(idg_beg:idg_end-1,JZ,JY,JX));   trcg_root_vr=0._r8
   allocate(trcs_plant_uptake_vr(ids_beg:ids_end,JZ,JY,JX));    trcs_plant_uptake_vr=0._r8
@@ -287,7 +287,7 @@ module PlantDataRateType
   call destroy(PlantRootSoilElmNetX_pft)
   call destroy(PlantExudChemElmCum_pft)
   call destroy(GridPlantRootH2OUptake_vr)
-  call destroy(THeatRootUptake)
+  call destroy(THeatRootUptake_vr)
   call destroy(tRootMycoExud2Soil_vr)
   call destroy(tRootCO2Emis_vr)
   call destroy(tRO2MicrbUptk_vr)

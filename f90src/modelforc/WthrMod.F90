@@ -5,7 +5,7 @@ module WthrMod
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use MiniMathMod  , only : safe_adb,vapsat0,isclose
   use MiniFuncMod  , only : get_sun_declin
-  use EcoSIMCtrlMod, only : etimer
+  use EcoSIMCtrlMod, only : etimer,frectyp
   use EcosimConst
   use CanopyRadDataType
   use GridConsts
@@ -287,6 +287,7 @@ module WthrMod
         DEC=COS(ALAT(NY,NX)*RadianPerDegree)*COS(DECLIN*RadianPerDegree)
         !check eq.(11.1) in Campbell and Norman, 1998, p168.
         SineSunInclAngle_col(NY,NX)=AZMAX1(AZI+DEC*COS(PICON12*(SolarNoonHour_col(NY,NX)-(J-0.5_r8))))
+
         SineSunInclAnglNxtHour_col(NY,NX)=AZMAX1(AZI+DEC*COS(PICON12*(SolarNoonHour_col(NY,NX)-(J+0.5_r8))))
 
         !IF(SineSunInclAngle_col(NY,NX).GT.0.0_r8.AND.SineSunInclAngle_col(NY,NX).LT.TWILGT)SineSunInclAngle_col(NY,NX)=TWILGT

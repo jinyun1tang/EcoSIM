@@ -255,7 +255,7 @@ contains
 end subroutine readnamelist
 ! ----------------------------------------------------------------------
 
-subroutine soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
+subroutine soil(NHW,NHE,NVN,NVS,nlend)
 !!
 ! Description:
 ! THIS IS THE MAIN SUBROUTINE FROM WHICH ALL OTHERS ARE CALLED
@@ -283,7 +283,7 @@ subroutine soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
 
   implicit none
   integer :: yearc, yeari
-  integer, intent(in) :: NE,NEX,NHW,NHE,NVN,NVS
+  integer, intent(in) :: NHW,NHE,NVN,NVS
   logical, intent(out) :: nlend
   character(len=*), parameter :: mod_filename = &
   __FILE__
@@ -304,7 +304,7 @@ subroutine soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
   call init_timer(outdir)
 
   if(lverb)WRITE(*,333)'READS: read climate forcing'
-  CALL ReadClimSoilForcing(frectyp%yearcur,frectyp%yearclm,NE,NEX,NHW,NHE,NVN,NVS)
+  CALL ReadClimSoilForcing(frectyp%yearcur,frectyp%yearclm,NHW,NHE,NVN,NVS)
 
   !temporary set up for setting mass balance check
   IBEGIN=1;ISTART=1;ILAST=0
@@ -327,7 +327,7 @@ subroutine soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
     !are set using the checkpoint file.
     if(lverb)WRITE(*,333)'ReadPlantInfo'
     WRITE(*,333)'ReadPlantInfo'
-    call ReadPlantInfo(frectyp%yearcur,frectyp%yearclm,NE,NEX,NHW,NHE,NVN,NVS)
+    call ReadPlantInfo(frectyp%yearcur,frectyp%yearclm,NHW,NHE,NVN,NVS)
   endif
 
 ! INITIALIZE ALL PLANT VARIABLES IN 'STARTQ'

@@ -31,42 +31,40 @@ implicit none
   public :: ReadPlantInfo
   contains
 
-  subroutine ReadPlantInfo(yearc,yeari,NE,NEX,NHW,NHE,NVN,NVS)
+  subroutine ReadPlantInfo(yearc,yeari,NHW,NHE,NVN,NVS)
 !
 ! DESCRIPTION
 !
 
   implicit none
   integer, intent(in) :: yearc, yeari
-  integer, intent(in) :: NE   !
-  integer, intent(in) :: NEX  !
   integer, intent(in) :: NHW,NHE,NVN,NVS     !simulation domain specification
 
 ! RECOVER PLANT SPECIES DISTRIBUTION IN 'ROUTQ'
 !
   if(lverb)WRITE(*,333)'ROUTQ'
-  CALL ROUTQ(yearc,yeari,NE,NEX,NHW,NHE,NVN,NVS)
+  CALL ROUTQ(yearc,yeari,NHW,NHE,NVN,NVS)
 !
 !   READ INPUT DATA FOR PLANT SPECIES AND MANAGEMENT IN 'READQ'
 !   AND SET UP OUTPUT AND CHECKPOINT FILES IN 'FOUTP'
 !
   if(lverb)WRITE(*,333)'READQ'
-  CALL READQ(yearc,yeari,NE,NEX,NHW,NHE,NVN,NVS)
+  CALL READQ(yearc,yeari,NHW,NHE,NVN,NVS)
 
 333   FORMAT(A8)
 
   end subroutine ReadPlantInfo
 !------------------------------------------------------------------------------------------
 
-  SUBROUTINE readq(yearc,yeari,NE,NEX,NHW,NHE,NVN,NVS)
+  SUBROUTINE readq(yearc,yeari,NHW,NHE,NVN,NVS)
 !!
 ! Description
 ! THIS SUBROUTINE READS INPUT DATA FROM PLANT SPECIES
 !     AND MANAGEMENT FILES IDENTIFIED IN 'ROUTQ'
 !
   implicit none
-  integer, intent(in) :: yearc,yeari,NEX
-  integer, intent(in) :: NE,NHW,NHE,NVN,NVS
+  integer, intent(in) :: yearc,yeari
+  integer, intent(in) :: NHW,NHE,NVN,NVS
   integer :: NX,NY,NZ,nu_plt
   character(len=128) :: fnm_loc
 
@@ -103,7 +101,9 @@ implicit none
   use ncdio_pio
   use abortutils, only : endrun
   implicit none
-  integer, intent(in) :: NHW,NHE,NVN,NVS,yeari,yearc
+  integer, intent(in) :: NHW,NHE,NVN,NVS
+  integer, intent(in) :: yeari   !data year
+  integer, intent(in) :: yearc   !current model year
   integer :: NY,NX,NZ
 
   type(file_desc_t) :: pftinfo_nfid
@@ -123,7 +123,6 @@ implicit none
   if (len_trim(pft_mgmt_in)==0)then
     return
   else
-!    write(199,*)'ReadPlantManagementNC'
   ! initialize the disturbance arrays
     DO NX=NHW,NHE
       DO NY=NVN,NVS
@@ -153,7 +152,7 @@ implicit none
 
     call check_ret(nf90_get_var(pftinfo_nfid%fh, vardesc%varid, pft_dflag), &
       trim(mod_filename)//'::at line '//trim(int2str(__LINE__)))
-!    write(199,*)'pppft_dflag=',pft_dflag,IGO
+    
     if(pft_dflag==0)then
       ! constant pft data
       iyear=1
@@ -211,7 +210,7 @@ implicit none
           DO NZ=1,MIN(NS,NP(NY,NX))
             tstr=trim(pft_pltinfo(NZ))
             read(tstr,'(I2,I2,I4)')IDX,IMO,IYR
-            read(tstr,*)DY,PPI(NZ,NY,NX),PlantinDepz_pft(NZ,NY,NX)
+            read(tstr,*)DY,PPI_pft(NZ,NY,NX),PlantinDepz_pft(NZ,NY,NX)
 
             LPY=0
             if(isLeap(iyr) .and. IMO.GT.2)LPY=1
@@ -227,9 +226,9 @@ implicit none
               iYearPlanting_pft(NZ,NY,NX)=MIN(IYR,iYearCurrent)
               iPlantingDay_pft(NZ,NY,NX)=iDayPlanting_pft(NZ,NY,NX) !planting day
               iPlantingYear_pft(NZ,NY,NX)=iYearPlanting_pft(NZ,NY,NX)   !planting year
-              PPatSeeding_pft(NZ,NY,NX)=PPI(NZ,NY,NX)     !population density
+              PPatSeeding_pft(NZ,NY,NX)=PPI_pft(NZ,NY,NX)     !population density
             ENDIF
-
+            
             if(pft_nmgnt(NZ)>0)then
               NN=0
               DO nn1=1,pft_nmgnt(NZ)
@@ -915,7 +914,7 @@ implicit none
   end subroutine plant_optic_trait_disp
 !------------------------------------------------------------------------------------------
 
-  SUBROUTINE routq(yearc,yeari,NE,NEX,NHW,NHE,NVN,NVS)
+  SUBROUTINE routq(yearc,yeari,NHW,NHE,NVN,NVS)
 !
 !     THIS SUBROUTINE OPENS CHECKPOINT FILES AND READS
 !     FILE NAMES FOR PLANT SPECIES AND MANAGEMENT
@@ -923,7 +922,7 @@ implicit none
       use data_kind_mod, only : r8 => DAT_KIND_R8
   implicit none
   integer, intent(in) :: yearc,yeari
-  integer, intent(in) :: NE,NEX,NHW,NHE,NVN,NVS
+  integer, intent(in) :: NHW,NHE,NVN,NVS
 
   CHARACTER(len=16) :: OUTX,OUTC,OUTM,OUTR,OUTQ
   CHARACTER(len=4) :: CHARY
@@ -947,21 +946,21 @@ implicit none
 
   ENDIF
   if(lverb)write(*,*)'ReadPlantInfoNC'
-  call ReadPlantInfoNC(yeari,NE,NEX,NHW,NHE,NVN,NVS)
+  call ReadPlantInfoNC(yeari,NHW,NHE,NVN,NVS)
 
   END subroutine routq
 
 
 !------------------------------------------------------------------------------------------
 
-  subroutine ReadPlantInfoNC(yeari,NE,NEX,NHW,NHE,NVN,NVS)
+  subroutine ReadPlantInfoNC(yeari,NHW,NHE,NVN,NVS)
   !
   !Description
   use netcdf
   use ncdio_pio
   use abortutils, only : endrun
   implicit none
-  integer, intent(in) :: NE,NEX,NHW,NHE,NVN,NVS
+  integer, intent(in) :: NHW,NHE,NVN,NVS
   integer, intent(in) :: yeari
   integer :: IDATE
   integer :: NPP(JY,JX)

@@ -675,7 +675,7 @@ module PlantDisturbsMod
     trcs_rootml_pvr             => plt_rbgc%trcs_rootml_pvr,              &
     UVOLO                       => plt_ew%UVOLO,                          &
     CanopyWater_pft             => plt_ew%CanopyWater_pft,                &
-    VHeatCapCanP                => plt_ew%VHeatCapCanP,                   &
+    VHeatCapCanP_pft                => plt_ew%VHeatCapCanP_pft,                   &
     PSICanopy_pft               => plt_ew%PSICanopy_pft,                  &
     PPX_pft                     => plt_site%PPX_pft,                      &
     ShootC4NonstC_brch          => plt_biom%ShootC4NonstC_brch,           &
@@ -778,7 +778,7 @@ module PlantDisturbsMod
 !     XHVST=fraction of PFT remaining after disturbance
 !     PPX,PP=PFT population per m2,grid cell
 !     FracPARRadbyCanopy_pft=fraction of radiation received by each PFT canopy
-!     VHeatCapCanP=canopy heat capacity
+!     VHeatCapCanP_pft=canopy heat capacity
 !
   IF(J.EQ.INT(SolarNoonHour_col).AND.(iPlantTurnoverPattern_pft(NZ).EQ.0 &
     .OR.(.not.is_plant_treelike(iPlantRootProfile_pft(NZ)))) &
@@ -790,7 +790,7 @@ module PlantDisturbsMod
         PPX_pft(NZ)=PPX_pft(NZ)*XHVST
         PlantPopulation_pft(NZ)=PlantPopulation_pft(NZ)*XHVST
         FracPARRadbyCanopy_pft(NZ)=FracPARRadbyCanopy_pft(NZ)*XHVST
-        VHeatCapCanP(NZ)=VHeatCapCanP(NZ)*XHVST
+        VHeatCapCanP_pft(NZ)=VHeatCapCanP_pft(NZ)*XHVST
         CanopyLeafShethC_pft(NZ)=0._r8
         CanopyStalkC_pft(NZ)=0._r8
 !
@@ -1146,6 +1146,7 @@ module PlantDisturbsMod
   real(r8) :: WTNDPG,WGLFGX,WGSHGX,WGLFGY,WGSHGY
   real(r8) :: WHVSBS,WHVSCX,WHVSNX,WVPLT
   real(r8) :: FHVSH1,FHVSHT,dFHVST4
+  logical :: nonevgreenchk
   real(r8) :: WGLFGE(NumPlantChemElms)
   integer :: NTG
 !     begin_execution
@@ -1171,7 +1172,7 @@ module PlantDisturbsMod
     CPOOL3_node                       => plt_photo%CPOOL3_node,                       &
     CPOOL4_node                       => plt_photo%CPOOL4_node,                       &
     PlantPopulation_pft               => plt_site%PlantPopulation_pft,                &
-    PPI                               => plt_site%PPI,                                &
+    PPI_pft                           => plt_site%PPI_pft,                            &
     PPX_pft                           => plt_site%PPX_pft,                            &
     NU                                => plt_site%NU,                                 &
     MaxNumRootLays                    => plt_site%MaxNumRootLays,                     &
@@ -1336,8 +1337,8 @@ module PlantDisturbsMod
         PPX_pft(NZ)=PPX_pft(NZ)*(1._r8-THIN_pft(NZ))
         PlantPopulation_pft(NZ)=PlantPopulation_pft(NZ)*(1._r8-THIN_pft(NZ))
       ELSE
-!     PPI(NZ)=AMAX1(1.0_r8,0.5_r8*(PPI(NZ)+CanopySeedNum_pft(NZ)/AREA3(NU)))
-        PPX_pft(NZ)=PPI(NZ)
+!     PPI_pft(NZ)=AMAX1(1.0_r8,0.5_r8*(PPI_pft(NZ)+CanopySeedNum_pft(NZ)/AREA3(NU)))
+        PPX_pft(NZ)=PPI_pft(NZ)
         PlantPopulation_pft(NZ)=PPX_pft(NZ)*AREA3(NU)
       ENDIF
       IF(iHarvstType_pft(NZ).EQ.iharvtyp_pruning)THEN
@@ -2141,7 +2142,7 @@ module PlantDisturbsMod
 !           leaf,non-foliar,woody, standing dead removed from PFT
 !     WTHSK,WTEAR,WTGR=PFT husk,ear,grain C mass
 !
-        IF(iHarvstType_pft(NZ).NE.iharvtyp_grazing.AND.iHarvstType_pft(NZ).NE.iharvtyp_herbivo)THEN
+        IF(iHarvstType_pft(NZ).NE.iharvtyp_grazing .AND. iHarvstType_pft(NZ).NE.iharvtyp_herbivo)THEN
           IF(CutingHeightORFrac_pft(NZ).LT.RMedInternodeLen .OR. iHarvstType_pft(NZ).EQ.iharvtyp_grain &
             .OR. iHarvstType_pft(NZ).EQ.iharvtyp_pruning)THEN
             IF(isclose(THIN_pft(NZ),0._r8))THEN
@@ -2271,12 +2272,12 @@ module PlantDisturbsMod
 !     doInitLeafOut_brch=flag for initializing leafout
 !
         IF((iPlantTurnoverPattern_pft(NZ).EQ.0 .OR. (.not.is_plant_treelike(iPlantRootProfile_pft(NZ)))) &
-          .AND.(iHarvstType_pft(NZ).NE.iharvtyp_grazing .AND. iHarvstType_pft(NZ).NE.iharvtyp_herbivo) &
-          .AND.CanopyHeight_pft(NZ).GT.CutingHeightORFrac_pft(NZ))THEN
-          IF((iPlantPhenolType_pft(NZ).NE.0 .AND. Hours4LeafOff_brch(NB,NZ) &
-            .LE. FracHour4LeafoffRemob(iPlantPhenolType_pft(NZ))*HourReq4LeafOff_brch(NB,NZ)) &
-            .OR. (iPlantPhenolType_pft(NZ).EQ.iphenotyp_evgreen .AND. &
-            iPlantCalendar_brch(ipltcal_Emerge,NB,NZ).NE.0))THEN
+          .AND. (iHarvstType_pft(NZ).NE.iharvtyp_grazing .AND. iHarvstType_pft(NZ).NE.iharvtyp_herbivo) &
+          .AND. CanopyHeight_pft(NZ).GT.CutingHeightORFrac_pft(NZ))THEN
+
+          nonevgreenchk=iPlantPhenolType_pft(NZ).NE.iphenotyp_evgreen &
+            .AND. Hours4LeafOff_brch(NB,NZ).LE.FracHour4LeafoffRemob(iPlantPhenolType_pft(NZ))*HourReq4LeafOff_brch(NB,NZ)
+          IF(nonevgreenchk .OR. (iPlantPhenolType_pft(NZ).EQ.iphenotyp_evgreen .AND. iPlantCalendar_brch(ipltcal_Emerge,NB,NZ).NE.0))THEN
             MatureGroup_brch(NB,NZ)=MatureGroup_pft(NZ)
             NodeNum2InitFloral_brch(NB,NZ)=ShootNodeNum_brch(NB,NZ)
             NodeNumberAtAnthesis_brch(NB,NZ)=0._r8
@@ -2362,7 +2363,7 @@ module PlantDisturbsMod
 !     WTRT2,WTRT2N,WTRT2P=secondary root C,N,P mass in soil layer
 !     FWOOD,FWOODN,FWOODP=C,N,P woody fraction in root:0=woody,1=non-woody
 !
-      IF(iHarvstType_pft(NZ).NE.iharvtyp_grazing.AND.iHarvstType_pft(NZ).NE.iharvtyp_herbivo)THEN
+      IF(iHarvstType_pft(NZ).NE.iharvtyp_grazing .AND. iHarvstType_pft(NZ).NE.iharvtyp_herbivo)THEN
         compFracThin=1.0_r8-THIN_pft(NZ)
         D3985: DO N=1,MY(NZ)
           D3980: DO L=NU,MaxNumRootLays

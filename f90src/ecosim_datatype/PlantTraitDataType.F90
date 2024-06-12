@@ -82,7 +82,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  MatureGroup_brch(:,:,:,:)                     !plant maturity group, [-]
   real(r8),target,allocatable ::  MatureGroup_pft(:,:,:)                      !acclimated plant maturity group, [-]
   real(r8),target,allocatable ::  GROUPX(:,:,:)                      !initial plant maturity group, [-]
-  real(r8),target,allocatable ::  PPI(:,:,:)                         !initial plant population, [m-2]
+  real(r8),target,allocatable ::  PPI_pft(:,:,:)                         !initial plant population, [m-2]
   real(r8),target,allocatable ::  StandingDeadInitC_pft(:,:,:)                      !initial standing dead C, [g C m-2]
   real(r8),target,allocatable ::  PPX_pft(:,:,:)                         !plant population, [m-2]
   integer,target,allocatable ::  NumActivePlants(:,:)                          !number of active PFT
@@ -91,8 +91,8 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  HoursTooLowPsiCan_pft(:,:,:)                        !canopy plant water stress indicator, number of hours PSILT < PSILY, []
   real(r8),target,allocatable ::  PlantO2Stress_pft(:,:,:)                        !plant O2 stress indicator, []
   real(r8),target,allocatable ::  fTCanopyGroth_pft(:,:,:)                  !canopy temperature growth function, [-]
-  real(r8),target,allocatable ::  TCG(:,:,:)                         !canopy growth temperature, [oC]
-  real(r8),target,allocatable ::  TKG(:,:,:)                         !canopy growth temperature, [K]
+  real(r8),target,allocatable ::  TCGroth_pft(:,:,:)                         !canopy growth temperature, [oC]
+  real(r8),target,allocatable ::  TKGroth_pft(:,:,:)                         !canopy growth temperature, [K]
   real(r8),target,allocatable ::  PetioleBiomGrowthYield(:,:,:)                       !sheath growth yield, [g g-1]
   real(r8),target,allocatable ::  StalkBiomGrowthYield(:,:,:)                       !stalk growth yield, [g g-1]
   real(r8),target,allocatable ::  ReserveBiomGrowthYield(:,:,:)                       !reserve growth yield, [g g-1]
@@ -242,7 +242,7 @@ contains
   allocate(MatureGroup_brch(MaxNumBranches,JP,JY,JX)); MatureGroup_brch=0._r8
   allocate(MatureGroup_pft(JP,JY,JX));   MatureGroup_pft=0._r8
   allocate(GROUPX(JP,JY,JX));   GROUPX=0._r8
-  allocate(PPI(JP,JY,JX));      PPI=0._r8
+  allocate(PPI_pft(JP,JY,JX));      PPI_pft=0._r8
   allocate(StandingDeadInitC_pft(JP,JY,JX));   StandingDeadInitC_pft=0._r8
   allocate(PPX_pft(JP,JY,JX));      PPX_pft=0._r8
   allocate(NumActivePlants(JY,JX));       NumActivePlants=0
@@ -251,8 +251,8 @@ contains
   allocate(HoursTooLowPsiCan_pft(JP,JY,JX));     HoursTooLowPsiCan_pft=0._r8
   allocate(PlantO2Stress_pft(JP,JY,JX));     PlantO2Stress_pft=0._r8
   allocate(fTCanopyGroth_pft(JP,JY,JX));     fTCanopyGroth_pft=0._r8
-  allocate(TCG(JP,JY,JX));      TCG=0._r8
-  allocate(TKG(JP,JY,JX));      TKG=0._r8
+  allocate(TCGroth_pft(JP,JY,JX));      TCGroth_pft=0._r8
+  allocate(TKGroth_pft(JP,JY,JX));      TKGroth_pft=0._r8
   allocate(PetioleBiomGrowthYield(JP,JY,JX));    PetioleBiomGrowthYield=0._r8
   allocate(StalkBiomGrowthYield(JP,JY,JX));    StalkBiomGrowthYield=0._r8
   allocate(ReserveBiomGrowthYield(JP,JY,JX));    ReserveBiomGrowthYield=0._r8
@@ -399,7 +399,7 @@ contains
   call destroy(MatureGroup_brch)
   call destroy(MatureGroup_pft)
   call destroy(GROUPX)
-  call destroy(PPI)
+  call destroy(PPI_pft)
   call destroy(StandingDeadInitC_pft)
   call destroy(PPX_pft)
   call destroy(NumActivePlants)
@@ -408,8 +408,8 @@ contains
   call destroy(HoursTooLowPsiCan_pft)
   call destroy(PlantO2Stress_pft)
   call destroy(fTCanopyGroth_pft)
-  call destroy(TCG)
-  call destroy(TKG)
+  call destroy(TCGroth_pft)
+  call destroy(TKGroth_pft)
   call destroy(PetioleBiomGrowthYield)
   call destroy(StalkBiomGrowthYield)
   call destroy(ReserveBiomGrowthYield)

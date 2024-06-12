@@ -842,7 +842,7 @@ module RedistMod
       .and.VHeatCapacity(L,NY,NX)/(VHeatCapacityX+VHeatCapacity(L,NY,NX))>0.05_r8)THEN
       TKS00=TKS(L,NY,NX)
       TKS(L,NY,NX)=(ENGY+THeatFlow2Soil(L,NY,NX)+THeatSoiThaw(L,NY,NX) &
-        +THeatRootUptake(L,NY,NX)+HeatIrrigation(L,NY,NX))/VHeatCapacity(L,NY,NX)
+        +THeatRootUptake_vr(L,NY,NX)+HeatIrrigation(L,NY,NX))/VHeatCapacity(L,NY,NX)
 
 !      if(curday>=285.and.L<=2)write(*,*)'rexL=',L,NY,NX,curhour,VHeatCapacityX,VHeatCapacity(L,NY,NX),&
 !        SoiBulkDensity(L,NY,NX),NU(NY,NX)
@@ -852,7 +852,7 @@ module RedistMod
         write(*,*)'itemized',ENGY/VHeatCapacity(L,NY,NX),&
           THeatFlow2Soil(L,NY,NX)/VHeatCapacity(L,NY,NX),&
           THeatSoiThaw(L,NY,NX)/VHeatCapacity(L,NY,NX), &
-          THeatRootUptake(L,NY,NX)/VHeatCapacity(L,NY,NX),&
+          THeatRootUptake_vr(L,NY,NX)/VHeatCapacity(L,NY,NX),&
           HeatIrrigation(L,NY,NX)/VHeatCapacity(L,NY,NX)
         write(*,*)'wat',VLWatMicP_vr(L,NY,NX),VLWatMacP(L,NY,NX), &
           VLiceMicP(L,NY,NX),VLiceMacP(L,NY,NX)  
@@ -1028,7 +1028,7 @@ module RedistMod
     !
     !     GRID CELL BOUNDARY FLUXES FROM ROOT GAS TRANSFER
 !   watch out the following code for changes
-    HEATIN=HEATIN+THeatSoiThaw(L,NY,NX)+THeatRootUptake(L,NY,NX)
+    HEATIN=HEATIN+THeatSoiThaw(L,NY,NX)+THeatRootUptake_vr(L,NY,NX)
     CIB=trcg_air2root_flx_vr(idg_CO2,L,NY,NX)
     CHB=trcg_air2root_flx_vr(idg_CH4,L,NY,NX)
     OIB=trcg_air2root_flx_vr(idg_O2,L,NY,NX)

@@ -849,32 +849,32 @@ implicit none
 
   if(flag=='read')then  
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='TCG', dim1name='pft',&
+    call restartvar(ncid, flag, varname='TCGroth_pft', dim1name='pft',&
      long_name='canopy growth temperature', units='oC', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)       
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,TCG,datrp_1d,NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft)  
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,TCGroth_pft,datrp_1d,NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft)  
   else
     !print*,'TCG'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,TCG,datrp_1d,NumActivePlants=NumActivePlants,&
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,TCGroth_pft,datrp_1d,NumActivePlants=NumActivePlants,&
       IsPlantActive_pft=IsPlantActive_pft)    
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='TCG', dim1name='pft',&
+    call restartvar(ncid, flag, varname='TCGroth_pft', dim1name='pft',&
      long_name='canopy growth temperature', units='oC', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)           
   endif  
 
   if(flag=='read')then  
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='TKG', dim1name='pft',&
+    call restartvar(ncid, flag, varname='TKGroth_pft', dim1name='pft',&
      long_name='canopy growth temperature', units='K', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)           
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,TKG,datrp_1d,NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft)  
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,TKGroth_pft,datrp_1d,NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft)  
   else
     !print*,'TKG'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,TKG,datrp_1d,NumActivePlants=NumActivePlants,&
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,TKGroth_pft,datrp_1d,NumActivePlants=NumActivePlants,&
       IsPlantActive_pft=IsPlantActive_pft)    
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='TKG', dim1name='pft',&
+    call restartvar(ncid, flag, varname='TKGroth_pft', dim1name='pft',&
      long_name='canopy growth temperature', units='K', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)           
 
@@ -1224,16 +1224,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='PPI', dim1name='pft',&
+    call restartvar(ncid, flag, varname='PPI_pft',dim1name='pft',&
      long_name='initial plant population', units='# m-2', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)       
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,PPI,datrp_1d,NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft)  
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,PPI_pft,datrp_1d,NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft)  
   else
     !print*,'PPI'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,PPI,datrp_1d,NumActivePlants=NumActivePlants,&
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,PPI_pft,datrp_1d,NumActivePlants=NumActivePlants,&
       IsPlantActive_pft=IsPlantActive_pft)  
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='PPI', dim1name='pft',&
+    call restartvar(ncid, flag, varname='PPI_pft',dim1name='pft',&
      long_name='initial plant population', units='# m-2', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)       
 
@@ -1292,17 +1292,17 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='WatByPCanopy', dim1name='pft',&
+    call restartvar(ncid, flag, varname='WatByPCanopy_pft', dim1name='pft',&
      long_name='plant canopy held water content', units='m3 d-2', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)            
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,WatByPCanopy,datrp_1d,NumActivePlants=NumActivePlants,&
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,WatByPCanopy_pft,datrp_1d,NumActivePlants=NumActivePlants,&
       IsPlantActive_pft=IsPlantActive_pft)  
   else
-    !print*,'WatByPCanopy'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,WatByPCanopy,datrp_1d,NumActivePlants=NumActivePlants,&
+    !print*,'WatByPCanopy_pft'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,WatByPCanopy_pft,datrp_1d,NumActivePlants=NumActivePlants,&
       IsPlantActive_pft=IsPlantActive_pft)  
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='WatByPCanopy', dim1name='pft',&
+    call restartvar(ncid, flag, varname='WatByPCanopy_pft', dim1name='pft',&
      long_name='plant canopy held water content', units='m3 d-2', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)     
   endif  
@@ -1362,16 +1362,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='ENGYX', dim1name='pft',&
+    call restartvar(ncid, flag, varname='ENGYX_pft', dim1name='pft',&
      long_name='canopy heat storage from previous time step', units='MJ d-2', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)        
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,ENGYX,datrp_1d,NumActivePlants=NumActivePlants,&
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,ENGYX_pft,datrp_1d,NumActivePlants=NumActivePlants,&
       IsPlantActive_pft=IsPlantActive_pft)      
   else
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,ENGYX,datrp_1d,NumActivePlants=NumActivePlants,&
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,ENGYX_pft,datrp_1d,NumActivePlants=NumActivePlants,&
       IsPlantActive_pft=IsPlantActive_pft)        
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='ENGYX', dim1name='pft',&
+    call restartvar(ncid, flag, varname='ENGYX_pft', dim1name='pft',&
      long_name='canopy heat storage from previous time step', units='MJ d-2', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)            
 
@@ -1970,16 +1970,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='VHeatCapCanP', dim1name='pft',&
+    call restartvar(ncid, flag, varname='VHeatCapCanP_pft', dim1name='pft',&
      long_name='Volumetric canopy heat capacity', units='MJ d-2 K-1', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,VHeatCapCanP,datrp_1d,NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft) 
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,VHeatCapCanP_pft,datrp_1d,NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft) 
   else
-    !print*,'VHeatCapCanP'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,VHeatCapCanP,datrp_1d,NumActivePlants=NumActivePlants,&
+    !print*,'VHeatCapCanP_pft'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,VHeatCapCanP_pft,datrp_1d,NumActivePlants=NumActivePlants,&
       IsPlantActive_pft=IsPlantActive_pft)   
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='VHeatCapCanP', dim1name='pft',&
+    call restartvar(ncid, flag, varname='VHeatCapCanP_pft', dim1name='pft',&
      long_name='Volumetric canopy heat capacity', units='MJ d-2 K-1', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)
 
@@ -1987,16 +1987,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='DeltaTKC', dim1name='pft',&
+    call restartvar(ncid, flag, varname='DeltaTKC_pft', dim1name='pft',&
      long_name='change in canopy temperature', units='K', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,DeltaTKC,datrp_1d,NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft) 
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,DeltaTKC_pft,datrp_1d,NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft) 
   else
-    !print*,'DeltaTKC'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,DeltaTKC,datrp_1d,NumActivePlants=NumActivePlants,&
+    !print*,'DeltaTKC_pft'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,DeltaTKC_pft,datrp_1d,NumActivePlants=NumActivePlants,&
       IsPlantActive_pft=IsPlantActive_pft)   
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='DeltaTKC', dim1name='pft',&
+    call restartvar(ncid, flag, varname='DeltaTKC_pft', dim1name='pft',&
      long_name='change in canopy temperature', units='K', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)
   endif  

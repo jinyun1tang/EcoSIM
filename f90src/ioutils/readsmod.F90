@@ -29,7 +29,7 @@ module readsmod
   integer, save :: yearhi  =0
   contains
 
-  SUBROUTINE ReadClimSoilForcing(yearc,yeari,NE,NEX,NHW,NHE,NVN,NVS)
+  SUBROUTINE ReadClimSoilForcing(yearc,yeari,NHW,NHE,NVN,NVS)
 !
 ! THIS SUBROUTINE ReadClimSoilForcing ALL SOIL AND PLANT MANAGEMENT INPUT FILES
 !
@@ -38,26 +38,20 @@ module readsmod
   implicit none
   integer, intent(in) :: yearc   !current model year
   integer, intent(in) :: yeari   !current data year
-  integer, intent(in) :: NE,NEX,NHW,NHE,NVN,NVS
+  integer, intent(in) :: NHW,NHE,NVN,NVS
 
   CHARACTER(len=1) :: TTYPE
   integer :: kk,N,L,NY,NX,NZ,K
   integer :: LL,J
   integer :: LPY,IX
-  real(r8) :: CN4RIG,CNORIG,CN4RG,CNORG,CPORG,CALRG
-  real(r8) :: CFERG,CCARG,CMGRG,CNARG,CKARG,CSORG,CCLRG
-  real(r8) :: Z0G,ZNOONG
-  real(r8) :: PHRG
   CHARACTER(len=16) :: OUTW,OUTI,OUTT,OUTN,OUTF
   CHARACTER(len=4) :: CHARY
   integer :: IDATE,IDY,IFLG3,I,ICHECK
 
-  type(atm_forc_type) :: atmf
+! begin_execution
 
   ICLM=0
   call ReadClimateCorrections(yeari)
-
-! begin_execution
 
 !
 ! OPTIONS(4, AND LAND MANAGEMENT(9, FILES FROM
@@ -159,80 +153,12 @@ module readsmod
 ! NI,NN=number of time,weather data variables
 ! IVAR,VAR=time,weather variable type
 ! TYP=weather variable units
-! Z0G,IFLGW=windspeed mean height,flag for raising Z0G with vegn
-! ZNOONG=time of solar noon
-! PHRG,CN4RIG,CNORIG,CPORG,CALRG,CFERG,CCARG,CMGRG,CNARG,CKARG,
-! CSORG,CCLRG=pH,NH4,NO3,H2PO4,Al,Fe,Ca,Mg,Na,K,SO4,Cl
-! concentration in precipitation
 ! IDAT,DAT=time,weather variable
 !
 
-  if(yearhi/=yeari)call ReadClimNC(yearc,yeari,L,atmf)
+  if(yearhi/=yeari)call ReadClimateForc(yearc,yeari,L,NHW,NHE,NVN,NVS)
+
   yearhi=yeari
-!
-! CALCULATE PRECIPITATION CONCENTRATIONS IN MOLE UNITS
-!
-  CN4RIG=atmf%CN4RIG/14.0_r8
-  CNORIG=atmf%CNORIG/14.0_r8
-  CN4RG=CN4RIG
-  CNORG=CNORIG
-  CPORG=atmf%CPORG/31.0_r8
-  CALRG=atmf%CALRG/27.0_r8
-  CFERG=atmf%CFERG/55.8_r8
-  CCARG=atmf%CCARG/40.0_r8
-  CMGRG=atmf%CMGRG/24.3_r8
-  CNARG=atmf%CNARG/23.0_r8
-  CKARG=atmf%CKARG/39.1_r8
-  CSORG=atmf%CSORG/32.0_r8
-  CCLRG=atmf%CCLRG/35.5_r8
-  PHRG=atmf%PHRG
-  Z0G=atmf%Z0G
-  ZNOONG=atmf%ZNOONG
-  D8970: DO NX=NHW,NHE
-    D8975: DO NY=NVN,NVS
-      WindMesHeight(NY,NX)=Z0G         !windspeed meast height
-      SolarNoonHour_col(NY,NX)=ZNOONG
-      PHR(NY,NX)=PHRG
-      CN4RI(NY,NX)=CN4RIG
-      CNORI(NY,NX)=CNORIG
-      NH4_rain_conc(NY,NX)=CN4RIG
-      NO3_rain_conc(NY,NX)=CNORIG
-      H2PO4_rain_conc(NY,NX)=CPORG
-
-    ENDDO D8975
-  ENDDO D8970
-
-  if(salt_model)then
-    DO NX=NHW,NHE
-      DO NY=NVN,NVS
-        trcsalt_rain_conc(idsalt_Al,NY,NX)=CALRG
-        trcsalt_rain_conc(idsalt_Fe,NY,NX)=CFERG
-        trcsalt_rain_conc(idsalt_Ca,NY,NX)=CCARG
-        trcsalt_rain_conc(idsalt_Mg,NY,NX)=CMGRG
-        trcsalt_rain_conc(idsalt_Na,NY,NX)=CNARG
-        trcsalt_rain_conc(idsalt_K,NY,NX)=CKARG
-        trcsalt_rain_conc(idsalt_SO4,NY,NX)=CSORG
-        trcsalt_rain_conc(idsalt_Cl,NY,NX)=CCLRG  
-      ENDDO
-    ENDDO    
-  endif
-!
-! DERIVE END DATES FROM TIME VARIABLES
-!
-
-  ICHECK=0
-  IF(TTYPE.EQ.'H'.AND.J.NE.24)ICHECK=1
-
-  IEND=IX-ICHECK
-  IFIN=MIN(IFIN,IEND)
-  IDAYR=MIN(ISTART-1,ILAST) !day of recovery from earlier run
-  IYRR=IDATA(3)
-  NYR=0
-  IF(IDAYR.EQ.0)THEN
-    IDAYR=LYRX
-    IYRR=IDATA(3)-1
-    NYR=1
-  ENDIF
 
 !
 !     READ LAND MANAGEMENT FILE NAMES FOR EACH GRID CELL
@@ -355,4 +281,75 @@ module readsmod
   ENDDO
 
   end subroutine ReadClimateCorrections
+!------------------------------------------------------------------------------------------
+  subroutine ReadClimateForc(yearc,yeari,L,NHW,NHE,NVN,NVS) 
+
+  implicit none
+  integer, intent(in) :: yearc  ! current year of simulation
+  integer, intent(in) :: yeari  ! current year of forcing data
+  integer, intent(in) :: L
+  integer, intent(in) :: NHW,NHE,NVN,NVS
+  real(r8) :: Z0G,ZNOONG
+  real(r8) :: PHRG
+  real(r8) :: CN4RIG,CNORIG,CN4RG,CNORG,CPORG,CALRG
+  real(r8) :: CFERG,CCARG,CMGRG,CNARG,CKARG,CSORG,CCLRG
+  type(atm_forc_type) :: atmf
+  integer :: NY,NX
+
+  call ReadClimNC(yearc,yeari,L,atmf)    
+!
+! Z0G,IFLGW=windspeed mean height,flag for raising Z0G with vegn
+! ZNOONG=time of solar noon
+! PHRG,CN4RIG,CNORIG,CPORG,CALRG,CFERG,CCARG,CMGRG,CNARG,CKARG,
+! CSORG,CCLRG=pH,NH4,NO3,H2PO4,Al,Fe,Ca,Mg,Na,K,SO4,Cl
+! concentration in precipitation
+!
+! CALCULATE PRECIPITATION CONCENTRATIONS IN MOLE UNITS
+!
+  CN4RIG=atmf%CN4RIG/14.0_r8
+  CNORIG=atmf%CNORIG/14.0_r8
+  CN4RG=CN4RIG
+  CNORG=CNORIG
+  CPORG=atmf%CPORG/31.0_r8
+  CALRG=atmf%CALRG/27.0_r8
+  CFERG=atmf%CFERG/55.8_r8
+  CCARG=atmf%CCARG/40.0_r8
+  CMGRG=atmf%CMGRG/24.3_r8
+  CNARG=atmf%CNARG/23.0_r8
+  CKARG=atmf%CKARG/39.1_r8
+  CSORG=atmf%CSORG/32.0_r8
+  CCLRG=atmf%CCLRG/35.5_r8
+  PHRG=atmf%PHRG
+  Z0G=atmf%Z0G
+  ZNOONG=atmf%ZNOONG
+  D8970: DO NX=NHW,NHE
+    D8975: DO NY=NVN,NVS
+      WindMesHeight(NY,NX)=Z0G         !windspeed meast height
+      SolarNoonHour_col(NY,NX)=ZNOONG
+      PHR(NY,NX)=PHRG
+      CN4RI(NY,NX)=CN4RIG
+      CNORI(NY,NX)=CNORIG
+      NH4_rain_conc(NY,NX)=CN4RIG
+      NO3_rain_conc(NY,NX)=CNORIG
+      H2PO4_rain_conc(NY,NX)=CPORG
+
+    ENDDO D8975
+  ENDDO D8970
+
+  if(salt_model)then
+    DO NX=NHW,NHE
+      DO NY=NVN,NVS
+        trcsalt_rain_conc(idsalt_Al,NY,NX)=CALRG
+        trcsalt_rain_conc(idsalt_Fe,NY,NX)=CFERG
+        trcsalt_rain_conc(idsalt_Ca,NY,NX)=CCARG
+        trcsalt_rain_conc(idsalt_Mg,NY,NX)=CMGRG
+        trcsalt_rain_conc(idsalt_Na,NY,NX)=CNARG
+        trcsalt_rain_conc(idsalt_K,NY,NX)=CKARG
+        trcsalt_rain_conc(idsalt_SO4,NY,NX)=CSORG
+        trcsalt_rain_conc(idsalt_Cl,NY,NX)=CCLRG  
+      ENDDO
+    ENDDO    
+  endif
+  end subroutine ReadClimateForc    
+
 end module readsmod

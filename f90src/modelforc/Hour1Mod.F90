@@ -273,7 +273,8 @@ module Hour1Mod
 !
   DO  NZ=1,NP(NY,NX)
     VOLWCX=XVOLWC(iPlantRootProfile_pft(NZ,NY,NX))*(CanopyLeafArea_pft(NZ,NY,NX)+CanopyStemArea_pft(NZ,NY,NX))
-    PrecIntcptByCanopy_pft(NZ,NY,NX)=AZMAX1(AMIN1(PrecRainAndSurfirrig(NY,NX)*FracPARRadbyCanopy_pft(NZ,NY,NX),VOLWCX-WatByPCanopy(NZ,NY,NX)))
+    PrecIntcptByCanopy_pft(NZ,NY,NX)=AZMAX1(AMIN1(PrecRainAndSurfirrig(NY,NX)*FracPARRadbyCanopy_pft(NZ,NY,NX) &
+      ,VOLWCX-WatByPCanopy_pft(NZ,NY,NX)))
     TFLWCI(NY,NX)=TFLWCI(NY,NX)+PrecRainAndSurfirrig(NY,NX)*FracPARRadbyCanopy_pft(NZ,NY,NX)
     PrecIntcptByCanG(NY,NX)=PrecIntcptByCanG(NY,NX)+PrecIntcptByCanopy_pft(NZ,NY,NX)
   ENDDO
@@ -830,7 +831,7 @@ module Hour1Mod
   trcp_RChem_soil(idsp_psoi_beg:idsp_psoi_end,0:NL(NY,NX),NY,NX)=0.0_r8
 
   GridPlantRootH2OUptake_vr(0:NL(NY,NX),NY,NX)=0.0_r8
-  THeatRootUptake(0:NL(NY,NX),NY,NX)=0.0_r8
+  THeatRootUptake_vr(0:NL(NY,NX),NY,NX)=0.0_r8
 
   Gas_Disol_Flx_vr(idg_beg:idg_end,0:NL(NY,NX),NY,NX)=0.0_r8
 

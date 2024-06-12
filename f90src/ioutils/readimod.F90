@@ -58,13 +58,13 @@ module readiMod
   public :: GridConectionMode
   contains
 
-  SUBROUTINE readi(NE,NEX,NHW,NHE,NVN,NVS)
+  SUBROUTINE readi(NHW,NHE,NVN,NVS)
 !!
 ! Description:
 ! THIS SUBROUTINE READS ALL SOIL AND TOPOGRAPHIC INPUT FILES
 !
   implicit none
-  integer, intent(in) :: NE,NEX,NHW,NHE,NVN,NVS
+  integer, intent(in) :: NHW,NHE,NVN,NVS
   integer :: jj,NX,NY
   integer :: ierr
   character(len=200) :: tline
