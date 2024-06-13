@@ -47,12 +47,9 @@ cmake_binary='which cmake'
 if [ "$shared" -eq 1 ]; then
     BUILDDIR="${BUILDDIR}-shared"
     CONFIG_FLAGS="${CONFIG_FLAGS} -DBUILD_SHARED_LIBS=ON"
-else
-    BUILDDIR="${BUILDDIR}-static"
-    CONFIG_FLAGS="${CONFIG_FLAGS} -DBUILD_SHARED_LIBS=OFF"
 fi
 
-if [ "$precision" != "double" ]; then
+if [ "$precision" = "double" ]; then
     BUILDDIR="${BUILDDIR}-double"
     CONFIG_FLAGS="${CONFIG_FLAGS} -DECOSIM_PRECISION=double"
 else
@@ -120,8 +117,9 @@ echo "building in: $ecosim_build_dir"
 #cd ${ecosim_build_dir}
 #${cmd_configure}
 cd build
-pwd
-cmake ../ -DATS_ECOSIM=$ATS_ECOSIM
+#pwd
+#cmake ../ -DATS_ECOSIM=$ATS_ECOSIM
+${cmd_configure}
 
 #This does the build
 make -j ${parallel_jobs}
