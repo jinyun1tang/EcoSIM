@@ -195,7 +195,6 @@ module PlantPhenolMod
         IF(I.GT.iDayPlantHarvest_pft(NZ) .AND. iYearCurrent.GE.iYearPlantHarvest_pft(NZ) &
           .AND. iPlantState_pft(NZ).EQ.iDead)THEN
           !post harvest
-
           IsPlantActive_pft(NZ)=iDormant
         ELSE
           IF(I.EQ.iDayPlanting_pft(NZ) .AND. iYearCurrent.EQ.iYearPlanting_pft(NZ))THEN

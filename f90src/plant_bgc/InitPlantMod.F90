@@ -70,7 +70,7 @@ module InitPlantMod
 
           call InitMassBalance(NZ)
 
-          call InitPlantHeatandWater(NZ)
+          call InitPlantHeatWater(NZ)
 
           call InitRootMychorMorphoBio(NZ)
 
@@ -837,7 +837,7 @@ module InitPlantMod
   end subroutine InitMassBalance
 !------------------------------------------------------------------------------------------
 
-  subroutine InitPlantHeatandWater(NZ)
+  subroutine InitPlantHeatWater(NZ)
 
   implicit none
   integer, intent(in) :: NZ
@@ -881,7 +881,7 @@ module InitPlantMod
   Transpiration_pft(NZ)=0._r8
   FracPARRadbyCanopy_pft(NZ)=0._r8
   end associate
-  end subroutine InitPlantHeatandWater
+  end subroutine InitPlantHeatWater
 !------------------------------------------------------------------------------------------
 
   subroutine InitRootMychorMorphoBio(NZ)

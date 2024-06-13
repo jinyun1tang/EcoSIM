@@ -95,7 +95,7 @@ module grosubsMod
     IF(IsPlantActive_pft(NZ).EQ.iActive)THEN
       call GrowPlant(I,J,NZ,CanopyHeight_copy)
     else
-      call ZeroPlantStates(I,J,NZ)  
+      call AccumulateStates(I,J,NZ)
     ENDIF
 
 !    call SumPlantBiom(I,J,NZ,'bfdistb')
@@ -600,7 +600,7 @@ module grosubsMod
   
   implicit none
   integer, intent(in) :: I,J,NZ
-  real(r8), intent(in) :: CanopyN2Fix_pft(JP1)
+  real(r8), optional, intent(in) :: CanopyN2Fix_pft(JP1)
   integer :: L,NR,N,NE,NB
   real(r8) :: root1st, root2nd
 !     begin_execution
@@ -685,7 +685,6 @@ module grosubsMod
   DO NE=1,NumPlantChemElms
     CanopyNonstElms_pft(NE,NZ)=sum(CanopyNonstElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
     StalkRsrvElms_pft(NE,NZ)=sum(StalkRsrvElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))    
-
     ShootStrutElms_pft(NE,NZ)=sum(ShootStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
     PetioleStrutElms_pft(NE,NZ)=sum(PetoleStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
     StalkStrutElms_pft(NE,NZ)=sum(StalkStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
@@ -761,13 +760,16 @@ module grosubsMod
   PlantExudChemElmCum_pft(ielmp,NZ)=PlantExudChemElmCum_pft(ielmp,NZ)+ &
     RootH2PO4Uptake_pft(NZ)+RootHPO4Uptake_pft(NZ)
 
-  PlantN2FixCum_pft(NZ)=PlantN2FixCum_pft(NZ)+RootN2Fix_pft(NZ)+CanopyN2Fix_pft(NZ)
+  PlantN2FixCum_pft(NZ)=PlantN2FixCum_pft(NZ)+RootN2Fix_pft(NZ)
+  if(present(CanopyN2Fix_pft))PlantN2FixCum_pft(NZ)=PlantN2FixCum_pft(NZ)+CanopyN2Fix_pft(NZ)
   end associate
   end subroutine AccumulateStates
 
 !------------------------------------------------------------------------------------------
 
   subroutine ZeroPlantStates(I,J,NZ)  
+  !
+  !for annual plants
   implicit none
   integer, intent(in) :: I,J,NZ
 
