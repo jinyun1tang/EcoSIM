@@ -42,7 +42,7 @@ ecosim_build_dir='./build/'
 
 ############## END EDIT ####################
 
-cmake_binary='which cmake'
+cmake_binary=$(which cmake)
 
 if [ "$shared" -eq 1 ]; then
     BUILDDIR="${BUILDDIR}-shared"
